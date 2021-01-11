@@ -1,109 +1,22 @@
-﻿/*--SOAP--
-<message name="headerFileSearchRequest" fast_display = "true">
-	<part name="seq" type="xsd:integer"/>
-  <part name="SSN" type="xsd:string"/>
-  <part name="SSNTypos" type="xsd:boolean"/>
-	<part name="UnParsedFullName" type="xsd:string"/>
-  <part name="FirstName" type="xsd:string"/>
-  <part name="AllowNickNames" type="xsd:boolean"/>
-  <part name="RelativeFirstName1" type="xsd:string"/>
-  <part name="RelativeFirstName2" type="xsd:string"/>
-  <part name="LastName" type="xsd:string"/>
-  <part name="OtherLastName1" type="xsd:string"/>
-  <part name="PhoneticMatch" type="xsd:boolean"/>
-  <part name="PhoneticDistanceMatch" type="xsd:boolean"/>
-  <part name="DistanceThreshold" type="xsd:unsignedInt"/>
-  <part name="MiddleName" type="xsd:string"/>
-  <part name="Addr" type="xsd:string"/>
-  <part name="City" type="xsd:string"/>
-  <part name="OtherCity1" type="xsd:string"/>
-  <part name="County" type="xsd:string"/>
-  <part name="State" type="xsd:string"/>
-  <part name="OtherState1" type="xsd:string"/>
-  <part name="OtherState2" type="xsd:string"/>
-  <part name="Zip" type="xsd:string"/>
-  <part name="ZipRadius" type="xsd:unsignedInt"/>
-	<part name="CurrentResidentsOnly" type="xsd:boolean"/>
-	<part name="FuzzySecRange"		type="xsd:integer"/>
-  <part name="Phone" type="xsd:string"/>
-  <part name="DOB" type="xsd:unsignedInt"/>
-  <part name="AgeLow" type="xsd:byte"/>
-  <part name="AgeHigh" type="xsd:byte"/>
-  <part name="AllowDateSeen" type="xsd:boolean"/>
-  <part name="DateFirstSeen" type="xsd:integer"/>
-  <part name="DateLastSeen" type="xsd:integer"/>
-  <part name="DID" type="xsd:string" required="1"/>
-  <part name="Household" type="xsd:boolean"/> 
-  <part name="LookupType" type="xsd:string"/>
-  <part name="RID" type="xsd:string"/>
-  <part name="IncludeAllDIDRecords" type="xsd:boolean"/>
-  <part name="MaxResults" type="xsd:unsignedInt"/>
-  <part name="MaxResultsThisTime" type="xsd:unsignedInt"/>
-  <part name="SkipRecords" type="xsd:unsignedInt"/>
-  <part name="DPPAPurpose" type="xsd:byte"/>
-  <part name="GLBPurpose" type="xsd:byte"/> 
-  <part name="NoLookupSearch" type="xsd:boolean"/>
-  <part name="BestOnly" type="xsd:boolean"/>
-  <part name="DoNotFillBlanks" type="xsd:boolean"/> 
-  <part name="Raw" type="xsd:boolean"/> 
-  <part name="DIDOnly" type="xsd:boolean"/>
-  <part name="ScoreThreshold" type="xsd:unsignedInt"/>
-  <part name="SSNMask" type="xsd:string"/>
-  <part name="DLMask" type="xsd:string"/>
-  <part name="IndustryClass" type="xsd:string"/>
-	<part name="IncludeZeroDIDRefs" type="xsd:boolean"/>
-  <part name="IncludeHRI" type="xsd:boolean"/>
-  <part name="MaxHriPer" type="xsd:unsignedInt"/>
-  <part name="ProbationOverride" type="xsd:boolean"/>
-  <part name="LnBranded" type="xsd:boolean"/>
-  <part name="KeepOldSsns" type="xsd:boolean"/>
-  <part name="UsingKeepSsns" type="xsd:boolean"/>	
-	<part name="DataRestrictionMask" type="xsd:string"/>
-	<part name="DataPermissionMask" type="xsd:string"/>
-	<part name="DidTypeMask" type="xsd:string"/>
-  <part name="DialContactPrecision" type="xsd:unsignedInt"/>
-  <part name="AllowWildcard" type="xsd:boolean"/>
-  <part name="AllowHeaderQuick" type="xsd:boolean"/>
-	<part name="NonExclusion" type="xsd:boolean"/>
-	<part name="StrictMatch"	type="xsd:boolean"/>
-	<part name="IncludeDLInfo" type="xsd:boolean"/>
-	<part name="IncludePhonesFeedback" type="xsd:boolean"/>
-	<part name="IncludeAddressFeedback" type="xsd:boolean"/>
-	<part name="IncludeSourceDocCounts" type="xsd:boolean"/>
-	<part name="IncludeSourceList" type="tns:EspStringArray"/>
-	<part name="ReturnAlsoFound" type = "xsd:boolean"/>
-	<part name="ECL_NegateTrueDefaults" type = "xsd:boolean"/>
-  <part name="IncludeBankruptcyCount" type = "xsd:boolean"/>
-  <part name="IncludeCriminalIndicators" type="xsd:boolean"/>
-	<part name="IncludeCriminalImageIndicators" type="xsd:boolean"/>
-	<part name="ExcludeDMVPII" type="xsd:boolean"/>
-
-	<!-- FDN only option/fields -->
-	<part name="IncludeFraudDefenseNetwork" type="xsd:boolean"/>
-	<part name="GlobalCompanyId"				    type="xsd:unsignedInt"/>
-	<part name="IndustryType"	    			    type="xsd:unsignedInt"/>
-	<part name="ProductCode"		  		      type="xsd:unsignedInt"/>
-
-</message>
-*/
-/*--INFO-- This service searches the header file.*/
-/*
-<message name="headerFileSearchRequest" wuTimeout="300000">
-*/
-
+﻿// =====================================================================
+// ROXIE QUERY
+// -----------
+// For the complete list of input parameters please check published WU.
+// Look at the history of this attribute for the old SOAP info.
+// =====================================================================
 IMPORT  AutoStandardI,PhonesFeedback, PhonesFeedback_Services, AddressFeedback_Services, WSInput, Royalty, Suppress;
 
 EXPORT HeaderFileSearchService := MACRO
 #constant('SearchLibraryVersion', AutoheaderV2.Constants.LibVersion.SALT);
-		
-		//The following macro defines the field sequence on WsECL page of query. 
+
+		//The following macro defines the field sequence on WsECL page of query.
 		WSInput.MAC_HeaderFileSearchService();
-		
+
 		#CONSTANT('MaxRelatives',0);
 		boolean  IncludePhonesFeedback := false : stored('IncludePhonesFeedback');
 		boolean  IncludeAddressFeedback := false : stored('IncludeAddressFeedback');
 		set of string Include_SourceList := [] : stored('IncludeSourceList'); // keeping name in sync with IncludeSourceList in Doxie.HeaderSource_Service
-		
+
     doxie.MAC_Header_Field_Declare() //date_first_seen_value, date_last_seen_value, allow_date_seen_value, allow_wildcard_val, some includes, etc.
     mod_access := doxie.compliance.GetGlobalDataAccessModule();
 		unsigned seq_value := 0 : STORED('seq');
@@ -154,18 +67,18 @@ EXPORT HeaderFileSearchService := MACRO
 																								,ta1_tmp_LF
 																								,mod_access
                                            ,Listed_Feedback);
-															
+
 		PhonesFeedback_Services.Mac_Append_Feedback(ta1_tmp_LF
 																								,did
 																								,Phone
 																								,ta1_feedback
-                                           ,mod_access     
-																								);																					
+                                           ,mod_access
+																								);
 
 		ta_phFeedback:=if(IncludePhonesFeedback,ta1_feedback,ta1_tmp);
 
 		AddressFeedback_Services.MAC_Append_Feedback(ta_phFeedback,ta_addrFeedback,Address_Feedback);
-																								 
+
 		results := if(IncludeAddressFeedback, ta_addrFeedback, ta_phFeedback);
 
 		// This section of coding immediately below was added for the FDN project.
@@ -181,18 +94,17 @@ EXPORT HeaderFileSearchService := MACRO
 																		 FDNContDataPermitted, FDNInqDataPermitted),
 																	//Otherwise just pass along the original results dataset
 																	results);
-  
-    FDN_check     := ds_results_with_fdninds(fdn_results_found = true);   
+
+    FDN_check     := ds_results_with_fdninds(fdn_results_found = true);
 	  FDN_Royalties := Royalty.RoyaltyFDNCoRR.GetOnlineRoyalties(FDN_check);
     royalties     := if(IncludeFraudDefenseNetwork, FDN_Royalties);
     OUTPUT(Royalties, NAMED('RoyaltySet'));
-		
+
 		doxie.MAC_Marshall_Results(ds_results_with_fdninds,ta2);
 		ta3 := TABLE(ta2,{unsigned4 seq := seq_value,ta2});
-		
+
 		MAP( did_only => output(DEDUP(table(outf, {did}), did)),
 				 Raw_Records => output(outf),
 			 output(ta3, NAMED('Results')))
 
 ENDMACRO;
-// HeaderFileSearchService();

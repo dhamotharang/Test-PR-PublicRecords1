@@ -1,28 +1,10 @@
-﻿/*--SOAP--
-<message name="BH_ProfileSearchService">
-  <part name="CompanyName" 		type="xsd:string"/>
-  <part name="ExactOnly"   		type="xsd:boolean"/>
-	<part name="StrictMatch"		type="xsd:boolean"/>
-  <part name="FirstName"   		type="xsd:string"/>
-  <part name="MiddleName"  		type="xsd:string"/>
-  <part name="LastName"    		type="xsd:string"/>
-  <part name="Addr"	       		type="xsd:string"/>
-  <part name="City"        		type="xsd:string"/>
-  <part name="State"       		type="xsd:string"/>
-  <part name="Zip"         		type="xsd:string"/>
-  <part name="FEIN"		  		type="xsd:string"/>
-  <part name="Phone"	  		type="xsd:string"/>
-  <part name="MileRadius"  		type="xsd:unsignedInt"/>
-  <part name="MaxResults"  		type="xsd:unsignedInt"/>
-  <part name="MaxResultsThisTime" 	type="xsd:unsignedInt"/>
-  <part name="SkipRecords" 		type="xsd:unsignedInt"/>
-  <part name="DPPAPurpose" type="xsd:byte"/>
-</message>
-*/
-/*--INFO-- This service searches the business header file.*/
-
-
-import suppress, STD;
+﻿// =====================================================================
+// ROXIE QUERY
+// -----------
+// For the complete list of input parameters please check published WU.
+// Look at the history of this attribute for the old SOAP info.
+// =====================================================================
+import AutoheaderV2, doxie, Business_Header, suppress, STD;
 
 export BH_ProfileSearchService() := macro
 #CONSTANT('SearchLibraryVersion', AutoheaderV2.Constants.LibVersion.SALT);
@@ -60,7 +42,7 @@ cnv := if(is_CompSearch, '', company_name_Value); //we will combine later, so no
 cn_bdids_unf := IF(is_ContSearch,Business_Header.Fetch_BC(bdid_value,(unsigned6)did_value,ssn_value,fname_value,mname_value,lname_value,prange_value,pname_value,city_value,state_value,zip_val,cnv,glb_ok,dppa_ok,nicknames,phonetics)
 																 (from_hdr='N'));
 
- 
+
 res_rec cntra(cn_bdids_unf l) := transform
 	self.bdid := l.bdid;
 	self.seq := 2; //just to keep track of where i got the bdid, at least for now
@@ -72,11 +54,11 @@ cn_bdids := project(cn_bdids_unf, cntra(left));
 
 
 //***** PICK MY RESULT SET(S)
-filtered_res_dups := 
+filtered_res_dups :=
 	if(is_CompSearch and is_ContSearch,
 	   join(gb_bdids, cn_bdids, left.bdid = right.bdid, lookup), //then must hit both
 	   gb_bdids + cn_bdids);		//else use either
-	
+
 
 filtered_res_srt := sort(filtered_res_dups, bdid, seq, -score); //not sure seq is needed
 filtered_res_preSuppress := dedup(filtered_res_srt, bdid);
@@ -97,7 +79,7 @@ layout_most := record
 	qstring8  sec_range;
 	qstring25 city;
 	string2   state;
-	string5 zip; 
+	string5 zip;
 	unsigned1 seq;
 	unsigned1 score;
 	unsigned1 actual_zip_distance;
@@ -128,14 +110,14 @@ layout_result := record, maxlength(mymaxlength)
 	layout_most;
 end;
 
-string5 zip_used := 
+string5 zip_used :=
 	if(zip_val <> '', zip_val, city_zip_value);
 
 layout_temp AddBest(filtered_res l,  bhkb r) := transform
 	self.bdid := l.bdid;
 	self.seq := l.seq;
 	self.score := 0;	//better score below
-	self.actual_zip_distance := 
+	self.actual_zip_distance :=
 		map(mile_radius_value = 0 or zip_used = '' or STD.Str.ToUpperCase(city_val) = (string25)r.city => 0,
 			  ut.zip_Dist(zip_used, (string5)r.zip) > mile_radius_value => mile_radius_value,
 				ut.zip_Dist(zip_used, (string5)r.zip));
@@ -145,18 +127,18 @@ layout_temp AddBest(filtered_res l,  bhkb r) := transform
 	self.input_city_value := STD.Str.ToUpperCase(city_val);
 	self.input_state_value := STD.Str.ToUpperCase(state_val);
 	self.input_zip_value := STD.Str.ToUpperCase(zip_val);
-	self.zip:=intformat(r.zip,5,1); 
+	self.zip:=intformat(r.zip,5,1);
 	self := r;
 end;
 
 best_wls := join(filtered_res(bdid != 0), bhkb,
-				keyed(left.bdid = right.bdid) and 
+				keyed(left.bdid = right.bdid) and
 				doxie.compliance.isBusHeaderSourceAllowed(right.source, mod_access.DataPermissionMask, mod_access.DataRestrictionMask) AND
 				(right.dppa_state = '' or (mod_access.isValidDPPA() AND mod_access.isValidDPPAState(right.dppa_state, , right.source))),
 				AddBest(left, right),
 				keep (1), limit (0));
 
-//****** Add group ID and score 
+//****** Add group ID and score
 grpk := Business_Header.Key_BH_SuperGroup_BDID;
 
 layout_result AddGRPID(best_wls l, grpk r) := transform
@@ -175,20 +157,20 @@ wgrp := join(best_wls, grpk, keyed(left.bdid = right.bdid), AddGRPID(left, right
 
 
 //rollem up
-	
+
 gsort := sort(wgrp, group_id, prim_range, predir, prim_name, addr_suffix, postdir,
 									  unit_desig, sec_range, city, state, zip, -score, company_name);
-	
+
 gddpd := dedup(gsort, group_id, prim_range, predir, prim_name, addr_suffix, postdir,
-									  unit_desig, sec_range, city, state, zip, keep(20));	
-	
+									  unit_desig, sec_range, city, state, zip, keep(20));
+
 layout_result rollem(layout_result l, layout_result r) := transform
 	self.names_children := l.names_children + r.names_children(bdid > 0);
 	self.score := if(l.score > r.score, l.score, r.score);
 	self := l;
 end;
 
-groll := rollup(gddpd, rollem(left, right), 
+groll := rollup(gddpd, rollem(left, right),
 									  group_id, prim_range, predir, prim_name, addr_suffix, postdir,
 									  unit_desig, sec_range, city, state, zip);
 
@@ -209,7 +191,7 @@ end;
 wscores := join(groll, scores, left.group_id = right.group_id, addgscore(left, right), lookup);
 
 best_sorted := sort(wscores,-group_score, group_id, -score);//actual_zip_distance);
-//sort by -max score in the group and group_id 
+//sort by -max score in the group and group_id
 //sort the little names in the box?
 
 doxie.MAC_Marshall_Results(best_sorted,outfinal,mymaxlength);
@@ -220,5 +202,5 @@ DO_ALL := output(outfinal, NAMED('Results'));
 if(is_CompSearch or is_ContSearch or is_CompAddrSearch,
 	 DO_ALL,
 	 FAIL(11, doxie.ErrorCodes(11)))
-	 
+
 endmacro;

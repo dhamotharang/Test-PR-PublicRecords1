@@ -1,13 +1,13 @@
-import BIPV2,FFD;
-export layout_lien_party_parsed := record
-  string12 did;
-  string12 bdid;
-	BIPV2.IDlayouts.l_header_ids;
-	string9 ssn;
-	string9 tax_id;
-	string person_filter_id := '';
+IMPORT BIPV2,FFD;
+EXPORT layout_lien_party_parsed := RECORD
+  STRING12 did;
+  STRING12 bdid;
+  BIPV2.IDlayouts.l_header_ids;
+  STRING9 ssn;
+  STRING9 tax_id;
+  STRING person_filter_id := '';
   layout_lien_party_name;
-  boolean hasCriminalConviction;
-  boolean isSexualOffender;
-	FFD.Layouts.CommonRawRecordElements;
-end;
+  BOOLEAN hasCriminalConviction;
+  BOOLEAN isSexualOffender;
+  FFD.Layouts.CommonRawRecordElements;
+END;

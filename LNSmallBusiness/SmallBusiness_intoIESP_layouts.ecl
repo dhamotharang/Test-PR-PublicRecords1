@@ -31,13 +31,21 @@ EXPORT SmallBusiness_intoIESP_layouts :=
             SELF.Attributes := NameValuePairsVersion101;
           END;
 
-
         // Create Version 2 Name/Value Pair Attributes
         NameValuePairsVersion2 := NORMALIZE(SBA_Results, 316, LNSmallBusiness.SmallBusiness_BIP_Transforms.intoVersion2(LEFT, COUNTER));
         
         iesp.smallbusinessanalytics.t_SBAAttributesGroup xfm_SmallBiz_Version2(LNSmallBusiness.BIP_Layouts.IntermediateLayout le) := TRANSFORM
           SELF.Name := LNSmallBusiness.Constants.SMALL_BIZ_ATTR_V2_NAME;
           SELF.Attributes := NameValuePairsVersion2;
+        END;
+  
+
+        // Create Version 21 Name/Value Pair Attributes
+        NameValuePairsVersion21 := NORMALIZE(SBA_Results, 373, LNSmallBusiness.SmallBusiness_BIP_Transforms.intoVersion21(LEFT, COUNTER));
+        
+        iesp.smallbusinessanalytics.t_SBAAttributesGroup xfm_SmallBiz_Version21(LNSmallBusiness.BIP_Layouts.IntermediateLayout le) := TRANSFORM
+          SELF.Name := LNSmallBusiness.Constants.SMALL_BIZ_ATTR_V21_NAME;
+          SELF.Attributes := NameValuePairsVersion21;
         END;
   
         // Create SBFE Name/Value Pair Attributes
@@ -65,11 +73,13 @@ EXPORT SmallBusiness_intoIESP_layouts :=
             SELF.BusinessIDs.OrgID := le.OrgID;
             SELF.BusinessIDs.UltID := le.UltID;
             SELF.Models := ds_modelsToReturn, 
-            SELF.AttributesGroups := IF((UNSIGNED)AttributesRequested(AttributeGroup[1..18] = LNSmallBusiness.Constants.SMALL_BIZ_ATTR)[1].AttributeGroup[19..] = 1, PROJECT(le, xfm_SmallBiz_Version1(LEFT))) + 
-																	 IF((UNSIGNED)AttributesRequested(AttributeGroup[1..18] = LNSmallBusiness.Constants.SMALL_BIZ_ATTR)[1].AttributeGroup[19..] = 101, PROJECT(le, xfm_SmallBiz_Version101(LEFT))) +
-																	 IF((UNSIGNED)AttributesRequested(AttributeGroup[1..18] = LNSmallBusiness.Constants.SMALL_BIZ_ATTR)[1].AttributeGroup[19..] = 2, PROJECT(le, xfm_SmallBiz_Version2(LEFT))) +
-																	 IF((UNSIGNED)AttributesRequested(AttributeGroup[1..9] = LNSmallBusiness.Constants.SMALL_BIZ_SBFE_ATTR)[1].AttributeGroup[10..] = 1, PROJECT(le, xfm_SmallBiz_SBFEVersion1(LEFT))) +
-																	 DATASET([], iesp.smallbusinessanalytics.t_SBAAttributesGroup);
+            SELF.AttributesGroups := 
+              IF((UNSIGNED)AttributesRequested(AttributeGroup[1..18] = LNSmallBusiness.Constants.SMALL_BIZ_ATTR)[1].AttributeGroup[19..] = 1, PROJECT(le, xfm_SmallBiz_Version1(LEFT))) + 
+              IF((UNSIGNED)AttributesRequested(AttributeGroup[1..18] = LNSmallBusiness.Constants.SMALL_BIZ_ATTR)[1].AttributeGroup[19..] = 101, PROJECT(le, xfm_SmallBiz_Version101(LEFT))) +
+              IF((UNSIGNED)AttributesRequested(AttributeGroup[1..18] = LNSmallBusiness.Constants.SMALL_BIZ_ATTR)[1].AttributeGroup[19..] = 2, PROJECT(le, xfm_SmallBiz_Version2(LEFT))) +
+              IF((UNSIGNED)AttributesRequested(AttributeGroup[1..18] = LNSmallBusiness.Constants.SMALL_BIZ_ATTR)[1].AttributeGroup[19..] = 21, PROJECT(le, xfm_SmallBiz_Version21(LEFT))) +
+              IF((UNSIGNED)AttributesRequested(AttributeGroup[1..9] = LNSmallBusiness.Constants.SMALL_BIZ_SBFE_ATTR)[1].AttributeGroup[10..] = 1, PROJECT(le, xfm_SmallBiz_SBFEVersion1(LEFT))) +
+              DATASET([], iesp.smallbusinessanalytics.t_SBAAttributesGroup);
             SELF := [];
           END;
 

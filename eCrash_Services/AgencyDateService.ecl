@@ -1,4 +1,4 @@
-/*--SOAP--
+﻿/*--SOAP--
 <message name="AgencyDateService">
   <part name="GetAgencyPropertiesRequest" type="tns:XmlDataSet" cols="200" rows="20" />
   <part name="GetAgencyPropertiesResponse" type="tns:XmlDataSet" cols="200" rows="20" />
@@ -10,7 +10,7 @@
    Output: iesp.getagencyproperties.t_GetAgencyPropertiesResponse (xml)
 */
 
-import AutoStandardI, iesp, FLAccidents_Ecrash, Risk_Indicators, lib_stringlib, ut, Gateway;
+import eCrash_Services,AutoStandardI, iesp, FLAccidents_Ecrash, Risk_Indicators, lib_stringlib, ut, Gateway;
 EXPORT AgencyDateService() := FUNCTION
 
   Layout_AgencyPropertyRequest := iesp.getagencyproperties.t_GetAgencyPropertiesRequest;
@@ -31,18 +31,15 @@ EXPORT AgencyDateService() := FUNCTION
 	
 	DeltaBaseService := eCrash_Services.DeltaBaseSoapCall(InModuleDeltaBase);
 	InAgencyID 		:= Request.Options.AgencyId;
+	InSourceID 		:= Request.Options.SourceID;
+	IsSourceIDInput := InSourceID <>'' ;
 	
-	Layouts.AgencyDateRecord getAgencyLastUploadDates(FLAccidents_Ecrash.Key_eCrashv2_agencyId_sentdate L) := TRANSFORM
+	eCrash_Services.Layouts.AgencyDateRecord getAgencyLastUploadDates(FLAccidents_Ecrash.Key_eCrashv2_agencyId_sentdate L) := TRANSFORM
 		SELF.lastUploadDate := L.MaxSent_to_hpcc_date;
 		SELF.agencyID := L.jurisdiction_nbr;
+		SELF.sourceID := L.contrib_source;
 	END;
 	
-	/*Layout_AgencyPropertyResponse.LastReportUploadDate setLastReportDate(Layouts.AgencyDateRecord L) := TRANSFORM
-		SELF.Year := (INTEGER) L.lastUploadDate[1..4];
-		SELF.Month := (INTEGER) L.lastUploadDate[5..6];
-		SELF.Day := (INTEGER) L.lastUploadDate[7..8];
-	END;
-	*/
 	Layout_AgencyPropertyResponse GenerateResponse(Layouts.AgencyDateRecord L) := TRANSFORM
 	  SELF.LastReportUploadDate.Year := (INTEGER) L.lastUploadDate[1..4];
 		SELF.LastReportUploadDate.Month := (INTEGER) L.lastUploadDate[5..6];
@@ -50,18 +47,22 @@ EXPORT AgencyDateService() := FUNCTION
 		
 	END;
 	
-	DeltaSqlString := 'select date_format(max(date_added),"%Y%m%d") as last_upload_date from delta_ec.delta_key where agency_id = "'+InAgencyID+'" and is_deleted = 0';
+	DeltaSqlStringWsourceid := 'select date_format(max(date_added),"%Y%m%d") as last_upload_date from delta_ec.delta_key where agency_id = "'+InAgencyID+'" and contrib_source = "'+InSourceID+'" and is_deleted = 0';
+	DeltaSqlStringWOsourceid := 'select date_format(max(date_added),"%Y%m%d") as last_upload_date from delta_ec.delta_key where agency_id = "'+InAgencyID+'" and is_deleted = 0';
 	
+	DeltaSqlString := IF(IsSourceIDInput,DeltaSqlStringWsourceid,DeltaSqlStringWOsourceid);
 	agencyDeltaLastUploadDate := DeltaBaseService.GetAgencyLastReportDate(DeltaSqlString);
 	
 	
-	agencyLastUploadKey :=  CHOOSEN(FLAccidents_Ecrash.Key_eCrashv2_agencyId_sentdate(keyed(jurisdiction_nbr=InAgencyID)), 1);// Change the keyed field
+	agencyLastUploadKey :=  CHOOSEN(FLAccidents_Ecrash.Key_eCrashv2_agencyId_sentdate(keyed(jurisdiction_nbr=InAgencyID) and if(IsSourceIDInput,contrib_source = InSourceID,TRUE) ), eCrash_Services.Constants.MAX_SOURCES_PER_AGENCY);
 	agencyLastUploadDate := PROJECT(agencyLastUploadKey,getAgencyLastUploadDates(LEFT));
 	
 	agencyData := TOPN(agencyDeltaLastUploadDate + agencyLastUploadDate , 1, -lastUploadDate); 	
-//	lastUploaddate := PROJECT(agencyData, setLastReportDate(LEFT));	
 	
 	Result := PROJECT(agencyData, GenerateResponse(LEFT));
+	
+	// OUTPUT(agencyDeltaLastUploadDate, named('agencyDeltaLastUploadDate'));
+	// OUTPUT(agencyLastUploadKey, named('agencyLastUploadKey'));
 	
 	RETURN OUTPUT(Result, named('Results'));
 	

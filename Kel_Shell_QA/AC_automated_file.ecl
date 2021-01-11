@@ -27,14 +27,15 @@ Acceptance_Criteria_Module_lay:=RECORD
 	string	Acceptance_Criteria;
 END;
    
-acceptance_criteria_rules_file:= Kel_Shell_QA.acceptance_criteria_rules_file;
+//acceptance_criteria_rules_file:= Kel_Shell_QA.acceptance_criteria_rules_file;
 
 rules_append_lay:={string category;string	Jira;string	case_Type;string	def_vals; string Raw_Acceptance_Criteria;string Acceptance_Criteria; recordof(projected_input_file)};
 		
 Category_append_ds:= project(projected_input_file,transform({string category; recordof(projected_input_file)},self.category:=(string)Category_par;self:=left;));
  
 rules_appended_file:=join(Distribute(Category_append_ds,random()),
-													acceptance_criteria_rules_file,
+													//acceptance_criteria_rules_file,
+													Kel_Shell_QA.acceptance_criteria_rules_file,
 													trim(left.category,left,right)=trim(right.category,left,right),
 													transform(rules_append_lay,
 															 self.category:=trim(left.category,left,right);

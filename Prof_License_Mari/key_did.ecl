@@ -1,28 +1,31 @@
-﻿import doxie, ut, Data_Services, Prof_License_Mari, fcra, vault, _control;
+﻿import doxie, ut, Data_Services, Prof_License_Mari;
 
-#IF(_Control.Environment.onVault) // when running on vault cluster, we need to use the file pointer instead of the roxie key in boca
-export key_did(boolean IsFCRA = false) := vault.Prof_License_Mari.key_did(isFCRA);
-
-#ELSE
+// ---------------------------------------------------------------
+// For delta rollup logic (dx_common.mac_incremental_rollup) use:
+//  $.key_search_delta_rid
+// ---------------------------------------------------------------
 
 export key_did(boolean IsFCRA = false) := function
 
-base_file_ := Prof_License_Mari.file_mari_search((unsigned6)did != 0);
-base_file := project(base_file_, {base_file_}-enh_did_src);
+  // base_file := Prof_License_Mari.file_mari_search((unsigned6)did != 0);
+  base_file_ := if(IsFCRA,
+    Prof_License_Mari.file_mari_search((unsigned6)did != 0 and std_source_upd != 'S0903'),
+    Prof_License_Mari.file_mari_search((unsigned6)did != 0)
+  );
+  base_file := project(base_file_, {base_file_}-enh_did_src);
 
-KeyName 			:= 'thor_data400::key::proflic_mari::';
-KeyName_fcra 	:= 'thor_data400::key::proflic_mari::fcra::';
+  // DF-21891 Blank out fields specified in constants.fields_to_clear in thor_data400::key::proflic_mari::fcra::qa::did 
+  ut.MAC_CLEAR_FIELDS(base_file, base_file_cleared, Prof_License_Mari.constants.fields_to_clear);
 
+  base_file_final := if (IsFCRA,base_file_cleared, base_file);   
 
-key_name := Data_services.Data_location.Prefix('mari') + if(isFCRA, KeyName_fcra, KeyName) + doxie.Version_SuperKey + '::did';
+  KeyName := 'thor_data400::key::proflic_mari::';
+  KeyName_fcra := 'thor_data400::key::proflic_mari::fcra::';
 
+  key_name := Data_services.Data_location.Prefix('mari') + if(isFCRA, KeyName_fcra, KeyName) + doxie.Version_SuperKey + '::did';
 
-return_file		:= INDEX(dedup(base_file,all),{unsigned6 s_did := (unsigned6)base_file.did},{base_file},key_name);
-													
-return(return_file); 		
+  return_file	:= INDEX(dedup(base_file_final,all),{unsigned6 s_did := (unsigned6)base_file_final.did},{base_file_final},key_name);
+                            
+  return(return_file); 		
 
 end;
-
-
-#END;
-		   

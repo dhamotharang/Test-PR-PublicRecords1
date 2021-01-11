@@ -1,73 +1,14 @@
-﻿/*--SOAP--
-<message name="Phone_NoReconn_Service">
-  <part name="IncludeRealTimePhones" type="xsd:boolean"/>
-  <part name="Acctno" type="xsd:string"/>
-  <part name="DID" type="xsd:string"/>
-  <part name="UnParsedFullName" type="xsd:string"/>
-  <part name="SSN" type="xsd:string"/>
-  <part name="FirstName" type="xsd:string"/>
-  <part name="LastName" type="xsd:string"/>
-  <part name="MiddleName" type="xsd:string"/>
-  <part name="NameSuffix" type="xsd:string"/>
-  <part name="AllowNickNames" type="xsd:boolean"/>
-  <part name="PhoneticMatch" type="xsd:boolean"/>
-  <part name="TUGatewayPhoneticMatch" type="xsd:boolean"/>
-  <part name="CompanyName" type="xsd:string"/>
-  <part name="IncludeHRI" type="xsd:boolean"/>
-  <part name="Addr" type="xsd:string"/>
-  <part name="PrimRange" type="xsd:string"/>
-  <part name="PrimName" type="xsd:string"/>
-  <part name="SecRange" type="xsd:string"/>
-  <part name="City" type="xsd:string"/>
-  <part name="State" type="xsd:string"/>
-  <part name="Zip" type="xsd:string"/>
-  <part name="County" type="xsd:string"/>
-  <part name="Phone" type="xsd:string"/>
-  <part name="date_first_seen" type="xsd:unsigned"/>
-  <part name="date_last_seen" type="xsd:unsigned"/>
-  <part name="ExcludeCurrentGong" type="xsd:boolean"/>
-  <part name="IncludePhonesFeedback" type="xsd:boolean"/>
-  <part name="IncludeAddressFeedback" type="xsd:boolean"/>
-  <part name="MaxResults" type="xsd:unsignedInt"/>
-  <part name="MaxResultsThisTime" type="xsd:unsignedInt"/>
-  <part name="SkipRecords" type="xsd:unsignedInt"/>
-  <part name="DPPAPurpose" type="xsd:byte"/>
-  <part name="GLBPurpose" type="xsd:byte"/>
-  <part name="DataRestrictionMask" type="xsd:string"/>
-  <part name="SSNMask" type="xsd:string"/>
-  <part name="IndustryClass" type="xsd:string"/>
-  <part name="ApplicationType" type="xsd:string"/>
-  <part name="DataPermissionMask" type="xsd:string"/>
-  <part name="UseQSENTV2" type="xsd:boolean"/>
-  <part name="Gateways" type="tns:XmlDataSet" cols="70" rows="25"/>
-  <part name="BatchFriendly" type="xsd:boolean"/>
-  <part name="StrictMatch" type="xsd:boolean"/>
-  <part name="IncludeFullPhonesPlus" type="xsd:boolean"/>
-  <part name="IncludeLastResort" type="xsd:boolean"/>
-  <part name="UseDateSort" type="xsd:boolean"/>
-  <part name="IncludeDeadContacts" type="xsd:boolean"/>
-  <part name="ScoreThreshold" 		type="xsd:unsignedInt"/>
-  <part name="IncludeMinors" type="xsd:boolean"/>
-  <part name="ExcludeResidence" type="xsd:boolean"/>
-  <part name="ExcludeBusiness" type="xsd:boolean"/>
-  <part name="SuppressNewPorting" type="xsd:boolean"/>
-  <part name="SuppressPortedTestDate" type="xsd:string"/>
-  <part name="excludeLandlines" type="xsd:boolean"/>
-  <part name="SuppressBlankNameAddress" type="xsd:boolean"/>
-  <part name="GetSSNBest" type="xsd:boolean" default="false"/>
-</message>
-*/
-
+﻿// =====================================================================
+// ROXIE QUERY
+// -----------
+// For the complete list of input parameters please check published WU.
+// Look at the history of this attribute for the old SOAP info.
+// =====================================================================
 /*--INFO--
 This service searches for cell phone users, or who likely to be transferred their number
 from a land line, or current landline if included in the search. Also try Targus gateway
 if the permission is set. Try Qsent data if nothing found above.
 */
-
-/*
-<message name="phone_noreconn_search" wuTimeout="300000">
-*/
-
 IMPORT AutoStandardI, BatchServices, D2C, DeathV2_Services, DidVille, Doxie, Doxie_Raw, dx_death_master, iesp, MDR,
   Phones, PhonesFeedback_Services, Royalty, SSNBest_Services, STD, Suppress, ut, WSInput,
   dx_gateway, progressive_phone;
@@ -87,6 +28,7 @@ EXPORT phone_noreconn_search := MACRO
   boolean SuppressNewPorting := excludeLandlines : stored('SuppressNewPorting');
   boolean SuppressBlankNameAddress := false : stored('SuppressBlankNameAddress');
   boolean GetSSNBest := false : stored('GetSSNBest');
+
   string32 ApplicationType := '' : stored('ApplicationType');
 
   doxie.MAC_Header_Field_Declare();
@@ -409,6 +351,7 @@ EXPORT phone_noreconn_search := MACRO
 
   in_mod := MODULE(Phones.IParam.BatchParams)
     EXPORT UNSIGNED	max_age_days := Phones.Constants.PhoneAttributes.LastActivityThreshold;
+    EXPORT BOOLEAN AllowPortingData := TRUE;
   END;
   ds_ported_metadata := Phones.GetPhoneMetadata_wLERG6(phoneInfo,in_mod);
 
@@ -428,7 +371,7 @@ EXPORT phone_noreconn_search := MACRO
 
   ds_ported_dt_match := join(cmp_res_out, ds_ppmd_key_recs,
     left.phone = right.phone and
-    // from key recs, only use the 2 sources (PJ & PK) that have ported info
+    // from key recs, only use source (PK) that has ported info
     right.source in MDR.sourceTools.set_PhonesPorted and
     // check person/phone dates vs ported key port dates
     (unsigned) ut.date_math(left.dt_first_seen, -doxie.phone_noreconn_constants.PortingMarginOfError)
@@ -579,7 +522,7 @@ EXPORT phone_noreconn_search := MACRO
   // Note: Even though option name is SuppressBlankNameAddress, for gov application types we look for carrier_name  as well
   results_suppress := IF(~SuppressBlankNameAddress OR (SuppressBlankNameAddress AND EXISTS(results(listed_name != '' OR (fname != '' AND lname != '') OR (prim_name != '' AND ((city_name != '' AND st != '' ) OR zip != ''))  OR (IsGovsearch AND carrier_name != '')))), results);
 
-  
+
   doxie.MAC_Marshall_Results_NoCount(results_suppress,marshalled_results,,disp_cnt);
 
   results_friendly := project(marshalled_results, transform(recordof(marshalled_results),
@@ -649,4 +592,3 @@ EXPORT phone_noreconn_search := MACRO
     if(use_tg or use_qt or call_PVS or use_LR, parallel(disp_cnt, out_royal, out_rslt), parallel(disp_cnt, out_rslt)),out_rslt);
 
 ENDMACRO;
-// doxie.phone_noreconn_search();

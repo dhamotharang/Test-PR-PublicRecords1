@@ -31,8 +31,8 @@ IMPORT Models, iESP, Risk_Indicators, RiskWise, RiskProcessing, UT;
 			Scoring_Project_Macros.Regression.runtime_layout;
 		End;
 
-		ds_raw_input := IF(no_of_records <= 0, dataset( infile_name, layout_input, thor),
-																CHOOSEN(DATASET( infile_name, layout_input,thor), no_of_records));
+		ds_raw_input := distribute(IF(no_of_records <= 0, dataset( infile_name, layout_input, thor),
+																CHOOSEN(DATASET( infile_name, layout_input,thor), no_of_records)),(integer)accountnumber);
 																
 																
     //*********** Experian RV V3 BATCH SETUP AND SOAPCALL ******************

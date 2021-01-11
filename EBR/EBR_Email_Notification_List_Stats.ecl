@@ -1,1 +1,0 @@
-export EBR_Email_Notification_List_Stats := if(EBR.IsTesting, 'lbentley@seisint.com', 'lbentley@seisint.com; tmiddleton@seisint.com; cmorton@seisint.com');

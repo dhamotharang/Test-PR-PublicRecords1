@@ -1,22 +1,22 @@
-﻿IMPORT BIPV2, Business_Risk_BIP, MDR, OSHAIR, UT;
+﻿IMPORT BIPV2, Business_Risk_BIP, dx_OSHAIR, MDR, UT;
 
-EXPORT getOSHA(DATASET(Business_Risk_BIP.Layouts.Shell) Shell, 
+EXPORT getOSHA(DATASET(Business_Risk_BIP.Layouts.Shell) Shell,
 											 Business_Risk_BIP.LIB_Business_Shell_LIBIN Options,
 											 BIPV2.mod_sources.iParams linkingOptions,
 											 SET OF STRING2 AllowedSourcesSet) := FUNCTION
 
 	// ---------------- OSHA - Occupational Safety and Health Administration ------------------
-	OSHARaw := OSHAIR.Key_OSHAIR_LinkIds.kFetch2(Business_Risk_BIP.Common.GetLinkIDs(Shell),
+	OSHARaw := dx_OSHAIR.Key_LinkIds.kFetch2(Business_Risk_BIP.Common.GetLinkIDs(Shell),
 																						 Business_Risk_BIP.Common.SetLinkSearchLevel(Options.LinkSearchLevel),
 																							0, /*ScoreThreshold --> 0 = Give me everything*/
 																							Business_Risk_BIP.Constants.Limit_Default,
 																							Options.KeepLargeBusinesses);
 	// Add back our Seq numbers
 	Business_Risk_BIP.Common.AppendSeq2(OSHARaw, Shell, OSHASeq);
-	
+
 	// Figure out if the kFetch was successful
 	kFetchErrorCodes := Business_Risk_BIP.Common.GrabFetchErrorCode(OSHASeq);
-	
+
 	// Filter out records after our history date
 	OSHA := Business_Risk_BIP.Common.FilterRecords(OSHASeq, inspection_opening_date, inspection_close_date, MDR.SourceTools.src_OSHAIR, AllowedSourcesSet);
 
@@ -45,27 +45,27 @@ EXPORT getOSHA(DATASET(Business_Risk_BIP.Layouts.Shell) Shell,
 	OSHAStatsTemp := PROJECT(OSHAStats, TRANSFORM(tempLayout,
 																				SELF.Seq := LEFT.Seq;
 																				SELF.OwnershipType := IF(LEFT.PrivateOwnership, 2, 0);
-																				SELF.Sources := DATASET([{LEFT.Source, 
-																																	IF(LEFT.DateFirstSeen = Business_Risk_BIP.Constants.NinesDate, Business_Risk_BIP.Constants.MissingDate, LEFT.DateFirstSeen), 
-																																	IF(LEFT.DateVendorFirstSeen = Business_Risk_BIP.Constants.NinesDate, Business_Risk_BIP.Constants.MissingDate, LEFT.DateVendorFirstSeen), 																																	
+																				SELF.Sources := DATASET([{LEFT.Source,
+																																	IF(LEFT.DateFirstSeen = Business_Risk_BIP.Constants.NinesDate, Business_Risk_BIP.Constants.MissingDate, LEFT.DateFirstSeen),
+																																	IF(LEFT.DateVendorFirstSeen = Business_Risk_BIP.Constants.NinesDate, Business_Risk_BIP.Constants.MissingDate, LEFT.DateVendorFirstSeen),
 																																	LEFT.DateLastSeen,
 																																	LEFT.DateVendorLastSeen,
 																																	LEFT.RecordCount}], Business_Risk_BIP.Layouts.LayoutSources);
 																				SELF := []));
-	OSHAStatsRolled := ROLLUP(OSHAStatsTemp, LEFT.Seq = RIGHT.Seq, 
-																	TRANSFORM(tempLayout, 
-																							SELF.Seq := LEFT.Seq; 
+	OSHAStatsRolled := ROLLUP(OSHAStatsTemp, LEFT.Seq = RIGHT.Seq,
+																	TRANSFORM(tempLayout,
+																							SELF.Seq := LEFT.Seq;
 																							SELF.OwnershipType := MAX(LEFT.OwnershipType, RIGHT.OwnershipType);
-																							SELF.Sources := LEFT.Sources + RIGHT.Sources; 
+																							SELF.Sources := LEFT.Sources + RIGHT.Sources;
 																							SELF := LEFT));
-	
+
 	withOSHAStats := JOIN(Shell, OSHAStatsRolled, LEFT.Seq = RIGHT.Seq,
 																	TRANSFORM(Business_Risk_BIP.Layouts.Shell,
 																							SELF.Firmographic.OwnershipType := (STRING)RIGHT.OwnershipType;
 																							SELF.Sources := RIGHT.Sources;
 																							SELF := LEFT),
 																	LEFT OUTER, KEEP(1), ATMOST(100), FEW);
-	
+
 	// Get all unique NAIC Codes along with dates, for the primary and 1 secondary NAIC
 	getOSHANAIC(InputDataset, OutputTable, OutputTemp, OutputRolled, WithInput, WithOutput, NAICField, PrimaryNAIC) := MACRO
 		OutputTable := TABLE(InputDataset,
@@ -80,13 +80,13 @@ EXPORT getOSHA(DATASET(Business_Risk_BIP.Layouts.Shell) Shell,
 			 },
 			 Seq, Business_Risk_BIP.Common.GetLinkSearchLevel(Options.LinkSearchLevel, SeleID), ((STRING)NAICField)[1..6]
 			 );
-		
+
 		OutputTemp := PROJECT(OutputTable, TRANSFORM(tempLayout,
 																				SELF.Seq := LEFT.Seq;
 																				SELF.SICNAICSources := DATASET([{LEFT.Source, IF(LEFT.DateFirstSeen = Business_Risk_BIP.Constants.NinesDate, Business_Risk_BIP.Constants.MissingDate, LEFT.DateFirstSeen), LEFT.DateLastSeen, LEFT.RecordCount, '' /*SICCode*/, '' /*SICIndustry*/, LEFT.NAICCode, Business_Risk_BIP.Common.industryGroup(LEFT.NAICCode, Business_Risk_BIP.Constants.NAIC), LEFT.IsPrimary}], Business_Risk_BIP.Layouts.LayoutSICNAIC);
 																				SELF := []));
 		OutputRolled := ROLLUP(OutputTemp, LEFT.Seq = RIGHT.Seq, TRANSFORM(tempLayout, SELF.Seq := LEFT.Seq; SELF.SICNAICSources := LEFT.SICNAICSources + RIGHT.SICNAICSources; SELF := LEFT));
-	
+
 		WithOutput := JOIN(WithInput, OutputRolled, LEFT.Seq = RIGHT.Seq,
 																	TRANSFORM(Business_Risk_BIP.Layouts.Shell,
 																							SELF.SICNAICSources := LEFT.SICNAICSources + RIGHT.SICNAICSources;
@@ -110,26 +110,26 @@ EXPORT getOSHA(DATASET(Business_Risk_BIP.Layouts.Shell) Shell,
 			 },
 			 Seq, Business_Risk_BIP.Common.GetLinkSearchLevel(Options.LinkSearchLevel, SeleID), ((STRING)SIC_Code)[1..4]
 			 );
-	
+
 	OSHASICTemp := PROJECT(OSHASIC, TRANSFORM(tempLayout,
 																				SELF.Seq := LEFT.Seq;
 																				SELF.SICNAICSources := DATASET([{LEFT.Source, IF(LEFT.DateFirstSeen = Business_Risk_BIP.Constants.NinesDate, Business_Risk_BIP.Constants.MissingDate, LEFT.DateFirstSeen), LEFT.DateLastSeen, LEFT.RecordCount, LEFT.SICCode, Business_Risk_BIP.Common.industryGroup(LEFT.SICCode, Business_Risk_BIP.Constants.SIC), '' /*NAICCode*/, '' /*NAICIndustry*/, LEFT.IsPrimary}], Business_Risk_BIP.Layouts.LayoutSICNAIC);
 																				SELF := []));
-	
+
 	OSHASICRolled := ROLLUP(OSHASICTemp, LEFT.Seq = RIGHT.Seq, TRANSFORM(tempLayout, SELF.Seq := LEFT.Seq; SELF.SICNAICSources := LEFT.SICNAICSources + RIGHT.SICNAICSources; SELF := LEFT));
-	
+
 	withOSHA := JOIN(withOSHANAIC, OSHASICRolled, LEFT.Seq = RIGHT.Seq,
 																	TRANSFORM(Business_Risk_BIP.Layouts.Shell,
 																							SELF.SICNAICSources := LEFT.SICNAICSources + RIGHT.SICNAICSources;
 																							SELF := LEFT),
 																	LEFT OUTER, KEEP(1), ATMOST(100), FEW);
-																	
+
 	withErrorCodes := JOIN(withOSHA, kFetchErrorCodes, LEFT.Seq = RIGHT.Seq,
 																	TRANSFORM(Business_Risk_BIP.Layouts.Shell,
 																							SELF.Data_Fetch_Indicators.FetchCodeOSHA := (STRING)RIGHT.Fetch_Error_Code;
 																							SELF := LEFT),
 																	LEFT OUTER, KEEP(1), ATMOST(100), PARALLEL, FEW);
-	
+
 	// *********************
 	//   DEBUGGING OUTPUTS
 	// *********************
@@ -138,6 +138,6 @@ EXPORT getOSHA(DATASET(Business_Risk_BIP.Layouts.Shell) Shell,
 	// OUTPUT(CHOOSEN(OSHAStats, 100), NAMED('Sample_OSHAStats'));
 	// OUTPUT(CHOOSEN(OSHAStatsTemp, 100), NAMED('Sample_OSHAStatsTemp'));
 	// OUTPUT(CHOOSEN(withOSHA, 100), NAMED('Sample_withOSHA'));
-	
+
 	RETURN withErrorCodes;
 END;

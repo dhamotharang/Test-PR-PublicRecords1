@@ -1,15 +1,15 @@
 
-import $, BatchShare, iesp, ffd, liensv2, DeferredTask;
+IMPORT $, BatchShare, iesp, ffd, liensv2, DeferredTask;
 
-layout_main_raw  := liensv2.Layout_liens_main_module.layout_liens_main;
+layout_main_raw := liensv2.Layout_liens_main_module.layout_liens_main;
 layout_party_raw := liensv2.Layout_liens_party;
-layout_dte_case  := DeferredTask.Layouts.CaseLayout;
+layout_dte_case := DeferredTask.Layouts.CaseLayout;
 layout_dte_party := DeferredTask.Layouts.PartiesLayout;
 
-export layout_liens_retrieval := module
+EXPORT layout_liens_retrieval := MODULE
 
- export search_recs := record
-   unsigned6 did;
+ EXPORT search_recs := RECORD
+   UNSIGNED6 did;
    layout_main_raw.tmsid;
    layout_main_raw.rmsid;
    layout_main_raw.AgencyID;
@@ -57,26 +57,25 @@ export layout_liens_retrieval := module
    layout_party_raw.zip4;
 
    // for both main and debtor records
-   boolean isDisputed := false;
-   dataset(FFD.Layouts.StatementIdRec) StatementIds := dataset([],FFD.Layouts.StatementIdRec);
- end;
+   BOOLEAN isDisputed := FALSE;
+   DATASET(FFD.Layouts.StatementIdRec) StatementIds := DATASET([],FFD.Layouts.StatementIdRec);
+ END;
 
- export layout_workrec := record
+ EXPORT layout_workrec := RECORD
   BatchShare.Layouts.ShareDid;
   BatchShare.Layouts.ShareAcct;
   BatchShare.Layouts.ShareName;
-	BatchShare.Layouts.SharePII;
-	BatchShare.Layouts.ShareAddress;
+  BatchShare.Layouts.SharePII;
+  BatchShare.Layouts.ShareAddress;
   layout_dte_party.ReleaseDate;
   layout_dte_party.FilingTypeId;
   layout_dte_party.Amount;
-  boolean isOKCSuccess := false;
-  integer error_code := 0;
- end;
+  BOOLEAN isOKCSuccess := FALSE;
+  INTEGER error_code := 0;
+ END;
 
- export final_rec := record
-
-  unsigned6 did;
+ EXPORT final_rec := RECORD
+  UNSIGNED6 did;
   layout_party_raw.fname;
   layout_party_raw.mname;
   layout_party_raw.lname;
@@ -98,60 +97,56 @@ export layout_liens_retrieval := module
   layout_main_raw.Filing_Type_ID;
   layout_main_raw.amount;
   layout_main_raw.filing_date;
-  boolean isOKCSuccess := false;
-  boolean isDisputed := false;
-  dataset(FFD.Layouts.StatementIdRec) StatementIds := dataset([],FFD.Layouts.StatementIdRec);
-  string error_code := '';
-  string error_desc := '';
- end;
+  BOOLEAN isOKCSuccess := FALSE;
+  BOOLEAN isDisputed := FALSE;
+  DATASET(FFD.Layouts.StatementIdRec) StatementIds := DATASET([],FFD.Layouts.StatementIdRec);
+  STRING error_code := '';
+  STRING error_desc := '';
+ END;
 
  // test seed layouts
-export layout_testseed_liens := RECORD
+EXPORT layout_testseed_liens := RECORD
+   STRING30 Seq;
+   STRING8 DateFiled ;
+   STRING2 LienTypeID;
+   STRING15 Amount;
+   STRING8 ReleaseDate;
+   STRING120 Defendant ;
+   STRING10 StreetNumber ;
+   STRING2 StreetPreDirection ;
+   STRING28 StreetName ;
+   STRING4 StreetSuffix ;
+   STRING2 StreetPostDirection ;
+   STRING10 UnitDesignation ;
+   STRING8 UnitNumber;
+   STRING60 StreetAddress1;
+   STRING60 StreetAddress2;
+   STRING25 City;
+   STRING2 State;
+   STRING5 Zip5;
+   STRING4 Zip4;
+   STRING18 County ;
+   STRING9 PostalCode ;
+   STRING50 StateCityZip ;
+   UNSIGNED ConsumerStatementId;
+  END;
 
-   string30 Seq;
-	 string8 DateFiled ;  
-   string2 LienTypeID;
-   string15 Amount;    
-	 string8 ReleaseDate;    
-   string120 Defendant   ;
-   string10 StreetNumber ;
-   string2 StreetPreDirection ;
-   string28 StreetName ;
-   string4 StreetSuffix ;
-   string2 StreetPostDirection ;
-   string10 UnitDesignation ;
-   string8 UnitNumber;
-   string60 StreetAddress1;
-   string60 StreetAddress2;
-   string25 City;
-   string2 State;
-   string5 Zip5;
-   string4 Zip4;
-   string18 County ;
-   string9 PostalCode ;
-   string50  StateCityZip ;
-   unsigned ConsumerStatementId;
+ EXPORT layout_testseed_search := RECORD
+    STRING12 LexID;
+    STRING9 SSN;
+    DATASET(layout_testseed_liens) Liens;
+    STRING4 Alert1;
+    STRING4 Alert2;
+    STRING4 Alert3;
+    STRING4 Alert4;
+    STRING4 Alert5;
+    STRING4 Alert6;
+    STRING4 Alert7;
+    STRING4 Alert8;
+    STRING4 Alert9;
+    STRING4 Alert10;
+    DATASET(iesp.share_fcra.t_ConsumerStatement) ConsumerStatements;
+ END;
 
-  end;
-
- export layout_testseed_search := RECORD
-
-  	string12  LexID;
-    string9 SSN;
-    dataset(layout_testseed_liens) Liens;
-    string4 Alert1;
-  	string4 Alert2;
-  	string4 Alert3;
-  	string4 Alert4;
-	  string4 Alert5;
-	  string4 Alert6;
-  	string4 Alert7;
-	  string4 Alert8;
-	  string4 Alert9;
-	  string4 Alert10;
-   	dataset(iesp.share_fcra.t_ConsumerStatement) ConsumerStatements;
-    
- end;
-
-end;
+END;
 

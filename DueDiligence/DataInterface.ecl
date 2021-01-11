@@ -1,11 +1,7 @@
-﻿IMPORT DueDiligence;
-
-
-EXPORT DataInterface := MODULE
+﻿EXPORT DataInterface := MODULE
 
       EXPORT iRegisteredBusiness := INTERFACE
         EXPORT BOOLEAN includeRegisteredBusinessHit;
-        EXPORT BOOLEAN includeSICNAICS;
         EXPORT BOOLEAN includeRegisteredAgents;
         EXPORT BOOLEAN includeAll;
       END;
@@ -19,7 +15,6 @@ EXPORT DataInterface := MODULE
         EXPORT BOOLEAN includeFirstSeenFromNonCreditSources;
         EXPORT BOOLEAN includeOperatingLocataions;
         EXPORT BOOLEAN includeBusinessStructure;
-        EXPORT BOOLEAN includeSICNAICS;
         EXPORT BOOLEAN includeFirstSeenCleanedInputAddress;
         EXPORT BOOLEAN includeFEIN;
         EXPORT BOOLEAN includeIncorporatedWithLooseLaws;
@@ -33,7 +28,6 @@ EXPORT DataInterface := MODULE
         EXPORT BOOLEAN includeIncorporationDate;
         EXPORT BOOLEAN includeCorporateFilingDate;
         EXPORT BOOLEAN includeOperatingLocataions;
-        EXPORT BOOLEAN includeSICNAICS;
         EXPORT BOOLEAN includeFilingStatuses;
         EXPORT BOOLEAN includeIncorporatedWithLooseLaws;
         EXPORT BOOLEAN includeRegisteredAgents;

@@ -1,345 +1,329 @@
-﻿import doxie, ut, Data_Services; 
+﻿dseCrashSearch := File_KeybuildV2.eCrashSearchRecs(Accident_Location <> ''); 
 
-ds := FLAccidents_Ecrash.File_KeybuildV2.eCrashSearchRecs(Accident_Location <> '');  
-
-SlimAccident := record 
-ds;
-string100 Alocation1; 
-string99 Alocation2; 
-string98 Alocation3; 
-string97 Alocation4; 
-string96 Alocation5; 
-string95 Alocation6; 
-string94 Alocation7; 
-string93 Alocation8; 
-string92 Alocation9; 
-string90 Alocation10; 
-string89 Alocation11; 
-string88 Alocation12; 
-string87 Alocation13; 
-string86 Alocation14;
-string85 Alocation15;
-string84 Alocation16;
-string83 Alocation17;
-string82 Alocation18;
-string81 Alocation19;
-string80 Alocation20; 
-string79 Alocation21;
-string78 Alocation22;
-string77 Alocation23;
-string76 Alocation24;
-string75 Alocation25;
-string74 Alocation26;
-string73 Alocation27;
-string72 Alocation28;
-string71 Alocation29;
-string70 Alocation30;
-string69 Alocation31;
-string68 Alocation32;
-string67 Alocation33;
-string66 Alocation34;
-string65 Alocation35;
-string64 Alocation36;
-string63 Alocation37;
-string62 Alocation38;
-string61 Alocation39;
-string60 Alocation40;
-string59 Alocation41;
-string58 Alocation42;
-string57 Alocation43;
-string56 Alocation44;
-string55 Alocation45;
-string54 Alocation46;
-string53 Alocation47;
-string52 Alocation48;
-string51 Alocation49;
-string50 Alocation50;
-string49 Alocation51;
-string48 Alocation52;
-string47 Alocation53;
-string46 Alocation54;
-string45 Alocation55;
-string44 Alocation56;
-string43 Alocation57;
-string42 Alocation58;
-string41 Alocation59;
-string40 Alocation60;
-string39 Alocation61;
-string38 Alocation62;
-string37 Alocation63;
-string36 Alocation64;
-string35 Alocation65;
-
-string34 Alocation66;
-string33 Alocation67;
-string32 Alocation68;
-string31 Alocation69;
-string30 Alocation70;
-string29 Alocation71;
-string28 Alocation72;
-string27 Alocation73;
-string26 Alocation74;
-string25 Alocation75;
-string24 Alocation76;
-string23 Alocation77;
-string22 Alocation78;
-string21 Alocation79;
-string20 Alocation80;
-string19 Alocation81;
-string18 Alocation82;
-string17 Alocation83;
-string16 Alocation84;
-string15 Alocation85;
-string14 Alocation86;
-string13 Alocation87;
-string12 Alocation88;
-string11 Alocation89;
-string10 Alocation90;
-string9  Alocation91;
-string8  Alocation92;
-string7  Alocation93;
-string6  Alocation94;
-string5  Alocation95;
-string4  Alocation96;
-string3  Alocation97;
-end; 
-
-Parse_Accident_Location := project(ds, transform(SlimAccident, 
-
-  Part_AccidentLocation := if(trim(left.Accident_Location,left,right) = '' , '', trim(left.Accident_Location,left,right));
-  AlMaxLength	:=	100;
-  SELF.Alocation1 := Part_AccidentLocation[1..AlMaxLength];
-  SELF.Alocation2 := if(length(trim(Part_AccidentLocation[2..AlMaxLength],left,right)) < 4 , '',trim(Part_AccidentLocation[2..AlMaxLength], left, right)) ;
-  SELF.Alocation3 := if(length(trim(Part_AccidentLocation[3..AlMaxLength],left,right)) < 4 , '',trim(Part_AccidentLocation[3..AlMaxLength], left, right));
-  SELF.Alocation4 := if(length(trim(Part_AccidentLocation[4..AlMaxLength],left,right)) < 4 , '',trim(Part_AccidentLocation[4..AlMaxLength], left, right));
-  SELF.Alocation5 := if(length(trim(Part_AccidentLocation[5..AlMaxLength],left,right)) < 4 , '',trim(Part_AccidentLocation[5..AlMaxLength], left, right));
-  SELF.Alocation6 := if(length(trim(Part_AccidentLocation[6..AlMaxLength],left,right)) < 4 , '',trim(Part_AccidentLocation[6..AlMaxLength], left, right));
-  SELF.Alocation7 := if(length(trim(Part_AccidentLocation[7..AlMaxLength],left,right)) < 4 , '',trim(Part_AccidentLocation[7..AlMaxLength], left, right));
-  SELF.Alocation8 := if(length(trim(Part_AccidentLocation[8..AlMaxLength],left,right)) < 4 , '',trim(Part_AccidentLocation[8..AlMaxLength], left, right));
-  SELF.Alocation9 := if(length(trim(Part_AccidentLocation[9..AlMaxLength],left,right)) < 4 , '',trim(Part_AccidentLocation[9..AlMaxLength], left, right)) ; 
-  SELF.Alocation10 := if(length(trim(Part_AccidentLocation[10..AlMaxLength],left,right)) < 4 , '',trim(Part_AccidentLocation[10..AlMaxLength], left, right)); 
-  SELF.Alocation11 := if(length(trim(Part_AccidentLocation[11..AlMaxLength],left,right)) < 4 , '',trim(Part_AccidentLocation[11..AlMaxLength], left, right));
-  SELF.Alocation12 := if(length(trim(Part_AccidentLocation[12..AlMaxLength],left,right)) < 4 , '',trim(Part_AccidentLocation[12..AlMaxLength], left, right));
-  SELF.Alocation13 := if(length(trim(Part_AccidentLocation[13..AlMaxLength],left,right)) < 4 , '',trim(Part_AccidentLocation[13..AlMaxLength], left, right));
-  SELF.Alocation14 := if(length(trim(Part_AccidentLocation[14..AlMaxLength],left,right)) < 4 , '',trim(Part_AccidentLocation[14..AlMaxLength], left, right));
-  SELF.Alocation15 := if(length(trim(Part_AccidentLocation[15..AlMaxLength],left,right)) < 4 , '',trim(Part_AccidentLocation[15..AlMaxLength], left, right));
-  SELF.Alocation16 := if(length(trim(Part_AccidentLocation[16..AlMaxLength],left,right)) < 4 , '',trim(Part_AccidentLocation[16..AlMaxLength], left, right));
-  SELF.Alocation17 := if(length(trim(Part_AccidentLocation[17..AlMaxLength],left,right)) < 4 , '',trim(Part_AccidentLocation[17..AlMaxLength], left, right));
-	SELF.Alocation18 := if(length(trim(Part_AccidentLocation[18..AlMaxLength],left,right)) < 4 , '',trim(Part_AccidentLocation[18..AlMaxLength], left, right));
-  SELF.Alocation19 := if(length(trim(Part_AccidentLocation[19..AlMaxLength],left,right)) < 4 , '',trim(Part_AccidentLocation[19..AlMaxLength], left, right));
-  SELF.Alocation20 := if(length(trim(Part_AccidentLocation[20..AlMaxLength],left,right)) < 4 , '',trim(Part_AccidentLocation[20..AlMaxLength], left, right));
-  SELF.Alocation21 := if(length(trim(Part_AccidentLocation[21..AlMaxLength],left,right)) < 4 , '',trim(Part_AccidentLocation[21..AlMaxLength], left, right));
-  SELF.Alocation22 := if(length(trim(Part_AccidentLocation[22..AlMaxLength],left,right)) < 4 , '',trim(Part_AccidentLocation[22..AlMaxLength], left, right));
-  SELF.Alocation23 := if(length(trim(Part_AccidentLocation[23..AlMaxLength],left,right)) < 4 , '',trim(Part_AccidentLocation[23..AlMaxLength], left, right));
-	SELF.Alocation24 := if(length(trim(Part_AccidentLocation[24..AlMaxLength],left,right)) < 4 , '',trim(Part_AccidentLocation[24..AlMaxLength], left, right));
-  SELF.Alocation25 := if(length(trim(Part_AccidentLocation[25..AlMaxLength],left,right)) < 4 , '',trim(Part_AccidentLocation[25..AlMaxLength], left, right));
-	SELF.Alocation26 := if(length(trim(Part_AccidentLocation[26..AlMaxLength],left,right)) < 4 , '',trim(Part_AccidentLocation[26..AlMaxLength], left, right));
-  SELF.Alocation27 := if(length(trim(Part_AccidentLocation[27..AlMaxLength],left,right)) < 4 , '',trim(Part_AccidentLocation[27..AlMaxLength], left, right));
-  SELF.Alocation28 := if(length(trim(Part_AccidentLocation[28..AlMaxLength],left,right)) < 4 , '',trim(Part_AccidentLocation[28..AlMaxLength], left, right));
-  SELF.Alocation29 := if(length(trim(Part_AccidentLocation[29..AlMaxLength],left,right)) < 4 , '',trim(Part_AccidentLocation[29..AlMaxLength], left, right));
-  SELF.Alocation30 := if(length(trim(Part_AccidentLocation[30..AlMaxLength],left,right)) < 4 , '',trim(Part_AccidentLocation[30..AlMaxLength], left, right));
-  SELF.Alocation31 := if(length(trim(Part_AccidentLocation[31..AlMaxLength],left,right)) < 4 , '',trim(Part_AccidentLocation[31..AlMaxLength], left, right));
-  SELF.Alocation32 := if(length(trim(Part_AccidentLocation[32..AlMaxLength],left,right)) < 4 , '',trim(Part_AccidentLocation[32..AlMaxLength], left, right));
-  SELF.Alocation33 := if(length(trim(Part_AccidentLocation[33..AlMaxLength],left,right)) < 4 , '',trim(Part_AccidentLocation[33..AlMaxLength], left, right));
-  SELF.Alocation34 := if(length(trim(Part_AccidentLocation[34..AlMaxLength],left,right)) < 4 , '',trim(Part_AccidentLocation[34..AlMaxLength], left, right));
-  SELF.Alocation35 := if(length(trim(Part_AccidentLocation[35..AlMaxLength],left,right)) < 4 , '',trim(Part_AccidentLocation[35..AlMaxLength], left, right));
-  SELF.Alocation36 := if(length(trim(Part_AccidentLocation[36..AlMaxLength],left,right)) < 4 , '',trim(Part_AccidentLocation[36..AlMaxLength], left, right));
-  SELF.Alocation37 := if(length(trim(Part_AccidentLocation[37..AlMaxLength],left,right)) < 4 , '',trim(Part_AccidentLocation[37..AlMaxLength], left, right));
-	SELF.Alocation38 := if(length(trim(Part_AccidentLocation[38..AlMaxLength],left,right)) < 4 , '',trim(Part_AccidentLocation[38..AlMaxLength], left, right));
-	SELF.Alocation39 := if(length(trim(Part_AccidentLocation[39..AlMaxLength],left,right)) < 4 , '',trim(Part_AccidentLocation[39 ..AlMaxLength], left, right));
-	SELF.Alocation40 := if(length(trim(Part_AccidentLocation[40..AlMaxLength],left,right)) < 4 , '',trim(Part_AccidentLocation[40..AlMaxLength], left, right));
-	
-	 
-  SELF.Alocation41 := if(length(trim(Part_AccidentLocation[41..AlMaxLength],left,right)) < 4 , '',trim(Part_AccidentLocation[41..AlMaxLength], left, right));
-  SELF.Alocation42 := if(length(trim(Part_AccidentLocation[42..AlMaxLength],left,right)) < 4 , '',trim(Part_AccidentLocation[42..AlMaxLength], left, right));
-  SELF.Alocation43 := if(length(trim(Part_AccidentLocation[43..AlMaxLength],left,right)) < 4 , '',trim(Part_AccidentLocation[43..AlMaxLength], left, right));
-	SELF.Alocation44 := if(length(trim(Part_AccidentLocation[44..AlMaxLength],left,right)) < 4 , '',trim(Part_AccidentLocation[44..AlMaxLength], left, right));
-  SELF.Alocation45 := if(length(trim(Part_AccidentLocation[45..AlMaxLength],left,right)) < 4 , '',trim(Part_AccidentLocation[45..AlMaxLength], left, right));
-	SELF.Alocation46 := if(length(trim(Part_AccidentLocation[46..AlMaxLength],left,right)) < 4 , '',trim(Part_AccidentLocation[46..AlMaxLength], left, right));
-  SELF.Alocation47 := if(length(trim(Part_AccidentLocation[47..AlMaxLength],left,right)) < 4 , '',trim(Part_AccidentLocation[47..AlMaxLength], left, right));
-  SELF.Alocation48 := if(length(trim(Part_AccidentLocation[48..AlMaxLength],left,right)) < 4 , '',trim(Part_AccidentLocation[48..AlMaxLength], left, right));
-  SELF.Alocation49 := if(length(trim(Part_AccidentLocation[49..AlMaxLength],left,right)) < 4 , '',trim(Part_AccidentLocation[49..AlMaxLength], left, right));
-  SELF.Alocation50 := if(length(trim(Part_AccidentLocation[50..AlMaxLength],left,right)) < 4 , '',trim(Part_AccidentLocation[50..AlMaxLength], left, right));
-  SELF.Alocation51 := if(length(trim(Part_AccidentLocation[51..AlMaxLength],left,right)) < 4 , '',trim(Part_AccidentLocation[51..AlMaxLength], left, right));
-  SELF.Alocation52 := if(length(trim(Part_AccidentLocation[52..AlMaxLength],left,right)) < 4 , '',trim(Part_AccidentLocation[52..AlMaxLength], left, right));
-  SELF.Alocation53 := if(length(trim(Part_AccidentLocation[53..AlMaxLength],left,right)) < 4 , '',trim(Part_AccidentLocation[53..AlMaxLength], left, right));
-  SELF.Alocation54 := if(length(trim(Part_AccidentLocation[54..AlMaxLength],left,right)) < 4 , '',trim(Part_AccidentLocation[54..AlMaxLength], left, right));
-  SELF.Alocation55 := if(length(trim(Part_AccidentLocation[55..AlMaxLength],left,right)) < 4 , '',trim(Part_AccidentLocation[55..AlMaxLength], left, right));
-  SELF.Alocation56 := if(length(trim(Part_AccidentLocation[56..AlMaxLength],left,right)) < 4 , '',trim(Part_AccidentLocation[56..AlMaxLength], left, right));
-  SELF.Alocation57 := if(length(trim(Part_AccidentLocation[57..AlMaxLength],left,right)) < 4 , '',trim(Part_AccidentLocation[57..AlMaxLength], left, right));
-	SELF.Alocation58 := if(length(trim(Part_AccidentLocation[58..AlMaxLength],left,right)) < 4 , '',trim(Part_AccidentLocation[58..AlMaxLength], left, right));
-	SELF.Alocation59 := if(length(trim(Part_AccidentLocation[59..AlMaxLength],left,right)) < 4 , '',trim(Part_AccidentLocation[59 ..AlMaxLength], left, right));
-	SELF.Alocation60 := if(length(trim(Part_AccidentLocation[60..AlMaxLength],left,right)) < 4 , '',trim(Part_AccidentLocation[60..AlMaxLength], left, right));
-
-	SELF.Alocation61 := if(length(trim(Part_AccidentLocation[61..AlMaxLength],left,right)) < 4 , '',trim(Part_AccidentLocation[61..AlMaxLength], left, right));
-  SELF.Alocation62 := if(length(trim(Part_AccidentLocation[62..AlMaxLength],left,right)) < 4 , '',trim(Part_AccidentLocation[62..AlMaxLength], left, right));
-  SELF.Alocation63 := if(length(trim(Part_AccidentLocation[63..AlMaxLength],left,right)) < 4 , '',trim(Part_AccidentLocation[63..AlMaxLength], left, right));
-	SELF.Alocation64 := if(length(trim(Part_AccidentLocation[64..AlMaxLength],left,right)) < 4 , '',trim(Part_AccidentLocation[64..AlMaxLength], left, right));
-  SELF.Alocation65 := if(length(trim(Part_AccidentLocation[65..AlMaxLength],left,right)) < 4 , '',trim(Part_AccidentLocation[65..AlMaxLength], left, right));
-	SELF.Alocation66 := if(length(trim(Part_AccidentLocation[66..AlMaxLength],left,right)) < 4 , '',trim(Part_AccidentLocation[66..AlMaxLength], left, right));
-  SELF.Alocation67 := if(length(trim(Part_AccidentLocation[67..AlMaxLength],left,right)) < 4 , '',trim(Part_AccidentLocation[67..AlMaxLength], left, right));
-  SELF.Alocation68 := if(length(trim(Part_AccidentLocation[68..AlMaxLength],left,right)) < 4 , '',trim(Part_AccidentLocation[68..AlMaxLength], left, right));
-  SELF.Alocation69 := if(length(trim(Part_AccidentLocation[69..AlMaxLength],left,right)) < 4 , '',trim(Part_AccidentLocation[69..AlMaxLength], left, right));
-  SELF.Alocation70 := if(length(trim(Part_AccidentLocation[70..AlMaxLength],left,right)) < 4 , '',trim(Part_AccidentLocation[70..AlMaxLength], left, right));
-  SELF.Alocation71 := if(length(trim(Part_AccidentLocation[71..AlMaxLength],left,right)) < 4 , '',trim(Part_AccidentLocation[71..AlMaxLength], left, right));
-  SELF.Alocation72 := if(length(trim(Part_AccidentLocation[72..AlMaxLength],left,right)) < 4 , '',trim(Part_AccidentLocation[72..AlMaxLength], left, right));
-  SELF.Alocation73 := if(length(trim(Part_AccidentLocation[73..AlMaxLength],left,right)) < 4 , '',trim(Part_AccidentLocation[73..AlMaxLength], left, right));
-  SELF.Alocation74 := if(length(trim(Part_AccidentLocation[74..AlMaxLength],left,right)) < 4 , '',trim(Part_AccidentLocation[74..AlMaxLength], left, right));
-  SELF.Alocation75 := if(length(trim(Part_AccidentLocation[75..AlMaxLength],left,right)) < 4 , '',trim(Part_AccidentLocation[75..AlMaxLength], left, right));
-  SELF.Alocation76 := if(length(trim(Part_AccidentLocation[76..AlMaxLength],left,right)) < 4 , '',trim(Part_AccidentLocation[76..AlMaxLength], left, right));
-  SELF.Alocation77 := if(length(trim(Part_AccidentLocation[77..AlMaxLength],left,right)) < 4 , '',trim(Part_AccidentLocation[77..AlMaxLength], left, right));
-	SELF.Alocation78 := if(length(trim(Part_AccidentLocation[78..AlMaxLength],left,right)) < 4 , '',trim(Part_AccidentLocation[78..AlMaxLength], left, right));
-	SELF.Alocation79 := if(length(trim(Part_AccidentLocation[79..AlMaxLength],left,right)) < 4 , '',trim(Part_AccidentLocation[79 ..AlMaxLength], left, right));
-	SELF.Alocation80 := if(length(trim(Part_AccidentLocation[80..AlMaxLength],left,right)) < 4 , '',trim(Part_AccidentLocation[80..AlMaxLength], left, right));
-	
-	SELF.Alocation81 := if(length(trim(Part_AccidentLocation[81..AlMaxLength],left,right)) < 4 , '',trim(Part_AccidentLocation[81..AlMaxLength], left, right));
-  SELF.Alocation82 := if(length(trim(Part_AccidentLocation[82..AlMaxLength],left,right)) < 4 , '',trim(Part_AccidentLocation[82..AlMaxLength], left, right));
-  SELF.Alocation83 := if(length(trim(Part_AccidentLocation[83..AlMaxLength],left,right)) < 4 , '',trim(Part_AccidentLocation[83..AlMaxLength], left, right));
-	SELF.Alocation84 := if(length(trim(Part_AccidentLocation[84..AlMaxLength],left,right)) < 4 , '',trim(Part_AccidentLocation[84..AlMaxLength], left, right));
-  SELF.Alocation85 := if(length(trim(Part_AccidentLocation[85..AlMaxLength],left,right)) < 4 , '',trim(Part_AccidentLocation[85..AlMaxLength], left, right));
-	SELF.Alocation86 := if(length(trim(Part_AccidentLocation[86..AlMaxLength],left,right)) < 4 , '',trim(Part_AccidentLocation[86..AlMaxLength], left, right));
-  SELF.Alocation87 := if(length(trim(Part_AccidentLocation[87..AlMaxLength],left,right)) < 4 , '',trim(Part_AccidentLocation[87..AlMaxLength], left, right));
-  SELF.Alocation88 := if(length(trim(Part_AccidentLocation[88..AlMaxLength],left,right)) < 4 , '',trim(Part_AccidentLocation[88..AlMaxLength], left, right));
-  SELF.Alocation89 := if(length(trim(Part_AccidentLocation[89..AlMaxLength],left,right)) < 4 , '',trim(Part_AccidentLocation[89..AlMaxLength], left, right));
-  SELF.Alocation90 := if(length(trim(Part_AccidentLocation[90..AlMaxLength],left,right)) < 4 , '',trim(Part_AccidentLocation[90..AlMaxLength], left, right));
-  SELF.Alocation91 := if(length(trim(Part_AccidentLocation[91..AlMaxLength],left,right)) < 4 , '',trim(Part_AccidentLocation[91..AlMaxLength], left, right));
-  SELF.Alocation92 := if(length(trim(Part_AccidentLocation[92..AlMaxLength],left,right)) < 4 , '',trim(Part_AccidentLocation[92..AlMaxLength], left, right));
-  SELF.Alocation93 := if(length(trim(Part_AccidentLocation[93..AlMaxLength],left,right)) < 4 , '',trim(Part_AccidentLocation[93..AlMaxLength], left, right));
-  SELF.Alocation94 := if(length(trim(Part_AccidentLocation[94..AlMaxLength],left,right)) < 4 , '',trim(Part_AccidentLocation[94..AlMaxLength], left, right));
-  SELF.Alocation95 := if(length(trim(Part_AccidentLocation[95..AlMaxLength],left,right)) < 4 , '',trim(Part_AccidentLocation[95..AlMaxLength], left, right));
-  SELF.Alocation96 := if(length(trim(Part_AccidentLocation[96..AlMaxLength],left,right)) < 4 , '',trim(Part_AccidentLocation[96..AlMaxLength], left, right));
-  SELF.Alocation97 := if(length(trim(Part_AccidentLocation[97..AlMaxLength],left,right)) < 4 , '',trim(Part_AccidentLocation[97..AlMaxLength], left, right));
-	
-
-  self := left)); 
-	
-Slim_Accident_Rec	:=	RECORD
-	string100	Partial_Accident_Location := '';
-	FLAccidents_Ecrash.Layouts.key_slim_layout;
+InterimAccidentLocLayout := RECORD 
+	dseCrashSearch;
+	STRING100 Alocation1; 
+	STRING99 Alocation2; 
+	STRING98 Alocation3; 
+	STRING97 Alocation4; 
+	STRING96 Alocation5; 
+	STRING95 Alocation6; 
+	STRING94 Alocation7; 
+	STRING93 Alocation8; 
+	STRING92 Alocation9; 
+	STRING90 Alocation10; 
+	STRING89 Alocation11; 
+	STRING88 Alocation12; 
+	STRING87 Alocation13; 
+	STRING86 Alocation14;
+	STRING85 Alocation15;
+	STRING84 Alocation16;
+	STRING83 Alocation17;
+	STRING82 Alocation18;
+	STRING81 Alocation19;
+	STRING80 Alocation20; 
+	STRING79 Alocation21;
+	STRING78 Alocation22;
+	STRING77 Alocation23;
+	STRING76 Alocation24;
+	STRING75 Alocation25;
+	STRING74 Alocation26;
+	STRING73 Alocation27;
+	STRING72 Alocation28;
+	STRING71 Alocation29;
+	STRING70 Alocation30;
+	STRING69 Alocation31;
+	STRING68 Alocation32;
+	STRING67 Alocation33;
+	STRING66 Alocation34;
+	STRING65 Alocation35;
+	STRING64 Alocation36;
+	STRING63 Alocation37;
+	STRING62 Alocation38;
+	STRING61 Alocation39;
+	STRING60 Alocation40;
+	STRING59 Alocation41;
+	STRING58 Alocation42;
+	STRING57 Alocation43;
+	STRING56 Alocation44;
+	STRING55 Alocation45;
+	STRING54 Alocation46;
+	STRING53 Alocation47;
+	STRING52 Alocation48;
+	STRING51 Alocation49;
+	STRING50 Alocation50;
+	STRING49 Alocation51;
+	STRING48 Alocation52;
+	STRING47 Alocation53;
+	STRING46 Alocation54;
+	STRING45 Alocation55;
+	STRING44 Alocation56;
+	STRING43 Alocation57;
+	STRING42 Alocation58;
+	STRING41 Alocation59;
+	STRING40 Alocation60;
+	STRING39 Alocation61;
+	STRING38 Alocation62;
+	STRING37 Alocation63;
+	STRING36 Alocation64;
+	STRING35 Alocation65;
+	STRING34 Alocation66;
+	STRING33 Alocation67;
+	STRING32 Alocation68;
+	STRING31 Alocation69;
+	STRING30 Alocation70;
+	STRING29 Alocation71;
+	STRING28 Alocation72;
+	STRING27 Alocation73;
+	STRING26 Alocation74;
+	STRING25 Alocation75;
+	STRING24 Alocation76;
+	STRING23 Alocation77;
+	STRING22 Alocation78;
+	STRING21 Alocation79;
+	STRING20 Alocation80;
+	STRING19 Alocation81;
+	STRING18 Alocation82;
+	STRING17 Alocation83;
+	STRING16 Alocation84;
+	STRING15 Alocation85;
+	STRING14 Alocation86;
+	STRING13 Alocation87;
+	STRING12 Alocation88;
+	STRING11 Alocation89;
+	STRING10 Alocation90;
+	STRING9  Alocation91;
+	STRING8  Alocation92;
+	STRING7  Alocation93;
+	STRING6  Alocation94;
+	STRING5  Alocation95;
+	STRING4  Alocation96;
+	STRING3  Alocation97;
 END;
 
-Slim_Accident_Rec SlimLocation(SlimAccident l, integer cnt) := transform
+InterimAccidentLocLayout tParseAccidentLocation(dseCrashSearch L) := TRANSFORM
+  Part_AccidentLocation := IF(TRIM(L.Accident_Location, LEFT, RIGHT) = '', '', TRIM(L.Accident_Location, LEFT, RIGHT));
+  AlMaxLength	:= 100;
+  SELF.Alocation1 := Part_AccidentLocation[1..AlMaxLength];
+  SELF.Alocation2 := IF(LENGTH(TRIM(Part_AccidentLocation[2..AlMaxLength], LEFT, RIGHT)) < 4 , '', TRIM(Part_AccidentLocation[2..AlMaxLength], LEFT, RIGHT));
+  SELF.Alocation3 := IF(LENGTH(TRIM(Part_AccidentLocation[3..AlMaxLength], LEFT, RIGHT)) < 4 , '', TRIM(Part_AccidentLocation[3..AlMaxLength], LEFT, RIGHT));
+  SELF.Alocation4 := IF(LENGTH(TRIM(Part_AccidentLocation[4..AlMaxLength], LEFT, RIGHT)) < 4 , '', TRIM(Part_AccidentLocation[4..AlMaxLength], LEFT, RIGHT));
+  SELF.Alocation5 := IF(LENGTH(TRIM(Part_AccidentLocation[5..AlMaxLength], LEFT, RIGHT)) < 4 , '', TRIM(Part_AccidentLocation[5..AlMaxLength], LEFT, RIGHT));
+  SELF.Alocation6 := IF(LENGTH(TRIM(Part_AccidentLocation[6..AlMaxLength], LEFT, RIGHT)) < 4 , '', TRIM(Part_AccidentLocation[6..AlMaxLength], LEFT, RIGHT));
+  SELF.Alocation7 := IF(LENGTH(TRIM(Part_AccidentLocation[7..AlMaxLength], LEFT, RIGHT)) < 4 , '', TRIM(Part_AccidentLocation[7..AlMaxLength], LEFT, RIGHT));
+  SELF.Alocation8 := IF(LENGTH(TRIM(Part_AccidentLocation[8..AlMaxLength], LEFT, RIGHT)) < 4 , '', TRIM(Part_AccidentLocation[8..AlMaxLength], LEFT, RIGHT));
+  SELF.Alocation9 := IF(LENGTH(TRIM(Part_AccidentLocation[9..AlMaxLength], LEFT, RIGHT)) < 4 , '', TRIM(Part_AccidentLocation[9..AlMaxLength], LEFT, RIGHT)) ; 
+  SELF.Alocation10 := IF(LENGTH(TRIM(Part_AccidentLocation[10..AlMaxLength], LEFT, RIGHT)) < 4 , '', TRIM(Part_AccidentLocation[10..AlMaxLength], LEFT, RIGHT)); 
+  SELF.Alocation11 := IF(LENGTH(TRIM(Part_AccidentLocation[11..AlMaxLength], LEFT, RIGHT)) < 4 , '', TRIM(Part_AccidentLocation[11..AlMaxLength], LEFT, RIGHT));
+  SELF.Alocation12 := IF(LENGTH(TRIM(Part_AccidentLocation[12..AlMaxLength], LEFT, RIGHT)) < 4 , '', TRIM(Part_AccidentLocation[12..AlMaxLength], LEFT, RIGHT));
+  SELF.Alocation13 := IF(LENGTH(TRIM(Part_AccidentLocation[13..AlMaxLength], LEFT, RIGHT)) < 4 , '', TRIM(Part_AccidentLocation[13..AlMaxLength], LEFT, RIGHT));
+  SELF.Alocation14 := IF(LENGTH(TRIM(Part_AccidentLocation[14..AlMaxLength], LEFT, RIGHT)) < 4 , '', TRIM(Part_AccidentLocation[14..AlMaxLength], LEFT, RIGHT));
+  SELF.Alocation15 := IF(LENGTH(TRIM(Part_AccidentLocation[15..AlMaxLength], LEFT, RIGHT)) < 4 , '', TRIM(Part_AccidentLocation[15..AlMaxLength], LEFT, RIGHT));
+  SELF.Alocation16 := IF(LENGTH(TRIM(Part_AccidentLocation[16..AlMaxLength], LEFT, RIGHT)) < 4 , '', TRIM(Part_AccidentLocation[16..AlMaxLength], LEFT, RIGHT));
+  SELF.Alocation17 := IF(LENGTH(TRIM(Part_AccidentLocation[17..AlMaxLength], LEFT, RIGHT)) < 4 , '', TRIM(Part_AccidentLocation[17..AlMaxLength], LEFT, RIGHT));
+	SELF.Alocation18 := IF(LENGTH(TRIM(Part_AccidentLocation[18..AlMaxLength], LEFT, RIGHT)) < 4 , '', TRIM(Part_AccidentLocation[18..AlMaxLength], LEFT, RIGHT));
+  SELF.Alocation19 := IF(LENGTH(TRIM(Part_AccidentLocation[19..AlMaxLength], LEFT, RIGHT)) < 4 , '', TRIM(Part_AccidentLocation[19..AlMaxLength], LEFT, RIGHT));
+  SELF.Alocation20 := IF(LENGTH(TRIM(Part_AccidentLocation[20..AlMaxLength], LEFT, RIGHT)) < 4 , '', TRIM(Part_AccidentLocation[20..AlMaxLength], LEFT, RIGHT));
+  SELF.Alocation21 := IF(LENGTH(TRIM(Part_AccidentLocation[21..AlMaxLength], LEFT, RIGHT)) < 4 , '', TRIM(Part_AccidentLocation[21..AlMaxLength], LEFT, RIGHT));
+  SELF.Alocation22 := IF(LENGTH(TRIM(Part_AccidentLocation[22..AlMaxLength], LEFT, RIGHT)) < 4 , '', TRIM(Part_AccidentLocation[22..AlMaxLength], LEFT, RIGHT));
+  SELF.Alocation23 := IF(LENGTH(TRIM(Part_AccidentLocation[23..AlMaxLength], LEFT, RIGHT)) < 4 , '', TRIM(Part_AccidentLocation[23..AlMaxLength], LEFT, RIGHT));
+	SELF.Alocation24 := IF(LENGTH(TRIM(Part_AccidentLocation[24..AlMaxLength], LEFT, RIGHT)) < 4 , '', TRIM(Part_AccidentLocation[24..AlMaxLength], LEFT, RIGHT));
+  SELF.Alocation25 := IF(LENGTH(TRIM(Part_AccidentLocation[25..AlMaxLength], LEFT, RIGHT)) < 4 , '', TRIM(Part_AccidentLocation[25..AlMaxLength], LEFT, RIGHT));
+	SELF.Alocation26 := IF(LENGTH(TRIM(Part_AccidentLocation[26..AlMaxLength], LEFT, RIGHT)) < 4 , '', TRIM(Part_AccidentLocation[26..AlMaxLength], LEFT, RIGHT));
+  SELF.Alocation27 := IF(LENGTH(TRIM(Part_AccidentLocation[27..AlMaxLength], LEFT, RIGHT)) < 4 , '', TRIM(Part_AccidentLocation[27..AlMaxLength], LEFT, RIGHT));
+  SELF.Alocation28 := IF(LENGTH(TRIM(Part_AccidentLocation[28..AlMaxLength], LEFT, RIGHT)) < 4 , '', TRIM(Part_AccidentLocation[28..AlMaxLength], LEFT, RIGHT));
+  SELF.Alocation29 := IF(LENGTH(TRIM(Part_AccidentLocation[29..AlMaxLength], LEFT, RIGHT)) < 4 , '', TRIM(Part_AccidentLocation[29..AlMaxLength], LEFT, RIGHT));
+  SELF.Alocation30 := IF(LENGTH(TRIM(Part_AccidentLocation[30..AlMaxLength], LEFT, RIGHT)) < 4 , '', TRIM(Part_AccidentLocation[30..AlMaxLength], LEFT, RIGHT));
+  SELF.Alocation31 := IF(LENGTH(TRIM(Part_AccidentLocation[31..AlMaxLength], LEFT, RIGHT)) < 4 , '', TRIM(Part_AccidentLocation[31..AlMaxLength], LEFT, RIGHT));
+  SELF.Alocation32 := IF(LENGTH(TRIM(Part_AccidentLocation[32..AlMaxLength], LEFT, RIGHT)) < 4 , '', TRIM(Part_AccidentLocation[32..AlMaxLength], LEFT, RIGHT));
+  SELF.Alocation33 := IF(LENGTH(TRIM(Part_AccidentLocation[33..AlMaxLength], LEFT, RIGHT)) < 4 , '', TRIM(Part_AccidentLocation[33..AlMaxLength], LEFT, RIGHT));
+  SELF.Alocation34 := IF(LENGTH(TRIM(Part_AccidentLocation[34..AlMaxLength], LEFT, RIGHT)) < 4 , '', TRIM(Part_AccidentLocation[34..AlMaxLength], LEFT, RIGHT));
+  SELF.Alocation35 := IF(LENGTH(TRIM(Part_AccidentLocation[35..AlMaxLength], LEFT, RIGHT)) < 4 , '', TRIM(Part_AccidentLocation[35..AlMaxLength], LEFT, RIGHT));
+  SELF.Alocation36 := IF(LENGTH(TRIM(Part_AccidentLocation[36..AlMaxLength], LEFT, RIGHT)) < 4 , '', TRIM(Part_AccidentLocation[36..AlMaxLength], LEFT, RIGHT));
+  SELF.Alocation37 := IF(LENGTH(TRIM(Part_AccidentLocation[37..AlMaxLength], LEFT, RIGHT)) < 4 , '', TRIM(Part_AccidentLocation[37..AlMaxLength], LEFT, RIGHT));
+	SELF.Alocation38 := IF(LENGTH(TRIM(Part_AccidentLocation[38..AlMaxLength], LEFT, RIGHT)) < 4 , '', TRIM(Part_AccidentLocation[38..AlMaxLength], LEFT, RIGHT));
+	SELF.Alocation39 := IF(LENGTH(TRIM(Part_AccidentLocation[39..AlMaxLength], LEFT, RIGHT)) < 4 , '', TRIM(Part_AccidentLocation[39 ..AlMaxLength], LEFT, RIGHT));
+	SELF.Alocation40 := IF(LENGTH(TRIM(Part_AccidentLocation[40..AlMaxLength], LEFT, RIGHT)) < 4 , '', TRIM(Part_AccidentLocation[40..AlMaxLength], LEFT, RIGHT));
+	SELF.Alocation41 := IF(LENGTH(TRIM(Part_AccidentLocation[41..AlMaxLength], LEFT, RIGHT)) < 4 , '', TRIM(Part_AccidentLocation[41..AlMaxLength], LEFT, RIGHT));
+  SELF.Alocation42 := IF(LENGTH(TRIM(Part_AccidentLocation[42..AlMaxLength], LEFT, RIGHT)) < 4 , '', TRIM(Part_AccidentLocation[42..AlMaxLength], LEFT, RIGHT));
+  SELF.Alocation43 := IF(LENGTH(TRIM(Part_AccidentLocation[43..AlMaxLength], LEFT, RIGHT)) < 4 , '', TRIM(Part_AccidentLocation[43..AlMaxLength], LEFT, RIGHT));
+	SELF.Alocation44 := IF(LENGTH(TRIM(Part_AccidentLocation[44..AlMaxLength], LEFT, RIGHT)) < 4 , '', TRIM(Part_AccidentLocation[44..AlMaxLength], LEFT, RIGHT));
+  SELF.Alocation45 := IF(LENGTH(TRIM(Part_AccidentLocation[45..AlMaxLength], LEFT, RIGHT)) < 4 , '', TRIM(Part_AccidentLocation[45..AlMaxLength], LEFT, RIGHT));
+	SELF.Alocation46 := IF(LENGTH(TRIM(Part_AccidentLocation[46..AlMaxLength], LEFT, RIGHT)) < 4 , '', TRIM(Part_AccidentLocation[46..AlMaxLength], LEFT, RIGHT));
+  SELF.Alocation47 := IF(LENGTH(TRIM(Part_AccidentLocation[47..AlMaxLength], LEFT, RIGHT)) < 4 , '', TRIM(Part_AccidentLocation[47..AlMaxLength], LEFT, RIGHT));
+  SELF.Alocation48 := IF(LENGTH(TRIM(Part_AccidentLocation[48..AlMaxLength], LEFT, RIGHT)) < 4 , '', TRIM(Part_AccidentLocation[48..AlMaxLength], LEFT, RIGHT));
+  SELF.Alocation49 := IF(LENGTH(TRIM(Part_AccidentLocation[49..AlMaxLength], LEFT, RIGHT)) < 4 , '', TRIM(Part_AccidentLocation[49..AlMaxLength], LEFT, RIGHT));
+  SELF.Alocation50 := IF(LENGTH(TRIM(Part_AccidentLocation[50..AlMaxLength], LEFT, RIGHT)) < 4 , '', TRIM(Part_AccidentLocation[50..AlMaxLength], LEFT, RIGHT));
+  SELF.Alocation51 := IF(LENGTH(TRIM(Part_AccidentLocation[51..AlMaxLength], LEFT, RIGHT)) < 4 , '', TRIM(Part_AccidentLocation[51..AlMaxLength], LEFT, RIGHT));
+  SELF.Alocation52 := IF(LENGTH(TRIM(Part_AccidentLocation[52..AlMaxLength], LEFT, RIGHT)) < 4 , '', TRIM(Part_AccidentLocation[52..AlMaxLength], LEFT, RIGHT));
+  SELF.Alocation53 := IF(LENGTH(TRIM(Part_AccidentLocation[53..AlMaxLength], LEFT, RIGHT)) < 4 , '', TRIM(Part_AccidentLocation[53..AlMaxLength], LEFT, RIGHT));
+  SELF.Alocation54 := IF(LENGTH(TRIM(Part_AccidentLocation[54..AlMaxLength], LEFT, RIGHT)) < 4 , '', TRIM(Part_AccidentLocation[54..AlMaxLength], LEFT, RIGHT));
+  SELF.Alocation55 := IF(LENGTH(TRIM(Part_AccidentLocation[55..AlMaxLength], LEFT, RIGHT)) < 4 , '', TRIM(Part_AccidentLocation[55..AlMaxLength], LEFT, RIGHT));
+  SELF.Alocation56 := IF(LENGTH(TRIM(Part_AccidentLocation[56..AlMaxLength], LEFT, RIGHT)) < 4 , '', TRIM(Part_AccidentLocation[56..AlMaxLength], LEFT, RIGHT));
+  SELF.Alocation57 := IF(LENGTH(TRIM(Part_AccidentLocation[57..AlMaxLength], LEFT, RIGHT)) < 4 , '', TRIM(Part_AccidentLocation[57..AlMaxLength], LEFT, RIGHT));
+	SELF.Alocation58 := IF(LENGTH(TRIM(Part_AccidentLocation[58..AlMaxLength], LEFT, RIGHT)) < 4 , '', TRIM(Part_AccidentLocation[58..AlMaxLength], LEFT, RIGHT));
+	SELF.Alocation59 := IF(LENGTH(TRIM(Part_AccidentLocation[59..AlMaxLength], LEFT, RIGHT)) < 4 , '', TRIM(Part_AccidentLocation[59 ..AlMaxLength], LEFT, RIGHT));
+	SELF.Alocation60 := IF(LENGTH(TRIM(Part_AccidentLocation[60..AlMaxLength], LEFT, RIGHT)) < 4 , '', TRIM(Part_AccidentLocation[60..AlMaxLength], LEFT, RIGHT));
+	SELF.Alocation61 := IF(LENGTH(TRIM(Part_AccidentLocation[61..AlMaxLength], LEFT, RIGHT)) < 4 , '', TRIM(Part_AccidentLocation[61..AlMaxLength], LEFT, RIGHT));
+  SELF.Alocation62 := IF(LENGTH(TRIM(Part_AccidentLocation[62..AlMaxLength], LEFT, RIGHT)) < 4 , '', TRIM(Part_AccidentLocation[62..AlMaxLength], LEFT, RIGHT));
+  SELF.Alocation63 := IF(LENGTH(TRIM(Part_AccidentLocation[63..AlMaxLength], LEFT, RIGHT)) < 4 , '', TRIM(Part_AccidentLocation[63..AlMaxLength], LEFT, RIGHT));
+	SELF.Alocation64 := IF(LENGTH(TRIM(Part_AccidentLocation[64..AlMaxLength], LEFT, RIGHT)) < 4 , '', TRIM(Part_AccidentLocation[64..AlMaxLength], LEFT, RIGHT));
+  SELF.Alocation65 := IF(LENGTH(TRIM(Part_AccidentLocation[65..AlMaxLength], LEFT, RIGHT)) < 4 , '', TRIM(Part_AccidentLocation[65..AlMaxLength], LEFT, RIGHT));
+	SELF.Alocation66 := IF(LENGTH(TRIM(Part_AccidentLocation[66..AlMaxLength], LEFT, RIGHT)) < 4 , '', TRIM(Part_AccidentLocation[66..AlMaxLength], LEFT, RIGHT));
+  SELF.Alocation67 := IF(LENGTH(TRIM(Part_AccidentLocation[67..AlMaxLength], LEFT, RIGHT)) < 4 , '', TRIM(Part_AccidentLocation[67..AlMaxLength], LEFT, RIGHT));
+  SELF.Alocation68 := IF(LENGTH(TRIM(Part_AccidentLocation[68..AlMaxLength], LEFT, RIGHT)) < 4 , '', TRIM(Part_AccidentLocation[68..AlMaxLength], LEFT, RIGHT));
+  SELF.Alocation69 := IF(LENGTH(TRIM(Part_AccidentLocation[69..AlMaxLength], LEFT, RIGHT)) < 4 , '', TRIM(Part_AccidentLocation[69..AlMaxLength], LEFT, RIGHT));
+  SELF.Alocation70 := IF(LENGTH(TRIM(Part_AccidentLocation[70..AlMaxLength], LEFT, RIGHT)) < 4 , '', TRIM(Part_AccidentLocation[70..AlMaxLength], LEFT, RIGHT));
+  SELF.Alocation71 := IF(LENGTH(TRIM(Part_AccidentLocation[71..AlMaxLength], LEFT, RIGHT)) < 4 , '', TRIM(Part_AccidentLocation[71..AlMaxLength], LEFT, RIGHT));
+  SELF.Alocation72 := IF(LENGTH(TRIM(Part_AccidentLocation[72..AlMaxLength], LEFT, RIGHT)) < 4 , '', TRIM(Part_AccidentLocation[72..AlMaxLength], LEFT, RIGHT));
+  SELF.Alocation73 := IF(LENGTH(TRIM(Part_AccidentLocation[73..AlMaxLength], LEFT, RIGHT)) < 4 , '', TRIM(Part_AccidentLocation[73..AlMaxLength], LEFT, RIGHT));
+  SELF.Alocation74 := IF(LENGTH(TRIM(Part_AccidentLocation[74..AlMaxLength], LEFT, RIGHT)) < 4 , '', TRIM(Part_AccidentLocation[74..AlMaxLength], LEFT, RIGHT));
+  SELF.Alocation75 := IF(LENGTH(TRIM(Part_AccidentLocation[75..AlMaxLength], LEFT, RIGHT)) < 4 , '', TRIM(Part_AccidentLocation[75..AlMaxLength], LEFT, RIGHT));
+  SELF.Alocation76 := IF(LENGTH(TRIM(Part_AccidentLocation[76..AlMaxLength], LEFT, RIGHT)) < 4 , '', TRIM(Part_AccidentLocation[76..AlMaxLength], LEFT, RIGHT));
+  SELF.Alocation77 := IF(LENGTH(TRIM(Part_AccidentLocation[77..AlMaxLength], LEFT, RIGHT)) < 4 , '', TRIM(Part_AccidentLocation[77..AlMaxLength], LEFT, RIGHT));
+	SELF.Alocation78 := IF(LENGTH(TRIM(Part_AccidentLocation[78..AlMaxLength], LEFT, RIGHT)) < 4 , '', TRIM(Part_AccidentLocation[78..AlMaxLength], LEFT, RIGHT));
+	SELF.Alocation79 := IF(LENGTH(TRIM(Part_AccidentLocation[79..AlMaxLength], LEFT, RIGHT)) < 4 , '', TRIM(Part_AccidentLocation[79 ..AlMaxLength], LEFT, RIGHT));
+	SELF.Alocation80 := IF(LENGTH(TRIM(Part_AccidentLocation[80..AlMaxLength], LEFT, RIGHT)) < 4 , '', TRIM(Part_AccidentLocation[80..AlMaxLength], LEFT, RIGHT));
+	SELF.Alocation81 := IF(LENGTH(TRIM(Part_AccidentLocation[81..AlMaxLength], LEFT, RIGHT)) < 4 , '', TRIM(Part_AccidentLocation[81..AlMaxLength], LEFT, RIGHT));
+  SELF.Alocation82 := IF(LENGTH(TRIM(Part_AccidentLocation[82..AlMaxLength], LEFT, RIGHT)) < 4 , '', TRIM(Part_AccidentLocation[82..AlMaxLength], LEFT, RIGHT));
+  SELF.Alocation83 := IF(LENGTH(TRIM(Part_AccidentLocation[83..AlMaxLength], LEFT, RIGHT)) < 4 , '', TRIM(Part_AccidentLocation[83..AlMaxLength], LEFT, RIGHT));
+	SELF.Alocation84 := IF(LENGTH(TRIM(Part_AccidentLocation[84..AlMaxLength], LEFT, RIGHT)) < 4 , '', TRIM(Part_AccidentLocation[84..AlMaxLength], LEFT, RIGHT));
+  SELF.Alocation85 := IF(LENGTH(TRIM(Part_AccidentLocation[85..AlMaxLength], LEFT, RIGHT)) < 4 , '', TRIM(Part_AccidentLocation[85..AlMaxLength], LEFT, RIGHT));
+	SELF.Alocation86 := IF(LENGTH(TRIM(Part_AccidentLocation[86..AlMaxLength], LEFT, RIGHT)) < 4 , '', TRIM(Part_AccidentLocation[86..AlMaxLength], LEFT, RIGHT));
+  SELF.Alocation87 := IF(LENGTH(TRIM(Part_AccidentLocation[87..AlMaxLength], LEFT, RIGHT)) < 4 , '', TRIM(Part_AccidentLocation[87..AlMaxLength], LEFT, RIGHT));
+  SELF.Alocation88 := IF(LENGTH(TRIM(Part_AccidentLocation[88..AlMaxLength], LEFT, RIGHT)) < 4 , '', TRIM(Part_AccidentLocation[88..AlMaxLength], LEFT, RIGHT));
+  SELF.Alocation89 := IF(LENGTH(TRIM(Part_AccidentLocation[89..AlMaxLength], LEFT, RIGHT)) < 4 , '', TRIM(Part_AccidentLocation[89..AlMaxLength], LEFT, RIGHT));
+  SELF.Alocation90 := IF(LENGTH(TRIM(Part_AccidentLocation[90..AlMaxLength], LEFT, RIGHT)) < 4 , '', TRIM(Part_AccidentLocation[90..AlMaxLength], LEFT, RIGHT));
+  SELF.Alocation91 := IF(LENGTH(TRIM(Part_AccidentLocation[91..AlMaxLength], LEFT, RIGHT)) < 4 , '', TRIM(Part_AccidentLocation[91..AlMaxLength], LEFT, RIGHT));
+  SELF.Alocation92 := IF(LENGTH(TRIM(Part_AccidentLocation[92..AlMaxLength], LEFT, RIGHT)) < 4 , '', TRIM(Part_AccidentLocation[92..AlMaxLength], LEFT, RIGHT));
+  SELF.Alocation93 := IF(LENGTH(TRIM(Part_AccidentLocation[93..AlMaxLength], LEFT, RIGHT)) < 4 , '', TRIM(Part_AccidentLocation[93..AlMaxLength], LEFT, RIGHT));
+  SELF.Alocation94 := IF(LENGTH(TRIM(Part_AccidentLocation[94..AlMaxLength], LEFT, RIGHT)) < 4 , '', TRIM(Part_AccidentLocation[94..AlMaxLength], LEFT, RIGHT));
+  SELF.Alocation95 := IF(LENGTH(TRIM(Part_AccidentLocation[95..AlMaxLength], LEFT, RIGHT)) < 4 , '', TRIM(Part_AccidentLocation[95..AlMaxLength], LEFT, RIGHT));
+  SELF.Alocation96 := IF(LENGTH(TRIM(Part_AccidentLocation[96..AlMaxLength], LEFT, RIGHT)) < 4 , '', TRIM(Part_AccidentLocation[96..AlMaxLength], LEFT, RIGHT));
+  SELF.Alocation97 := IF(LENGTH(TRIM(Part_AccidentLocation[97..AlMaxLength], LEFT, RIGHT)) < 4 , '', TRIM(Part_AccidentLocation[97..AlMaxLength], LEFT, RIGHT));
+	SELF := L;
+END;  
+ParseAccidentLocation := PROJECT(dseCrashSearch, tParseAccidentLocation(LEFT));
 
-		self := l;
-		self.Partial_Accident_Location:= choose(cnt, l.Alocation1,
-																					 l.Alocation2,
-																					 l.Alocation3,
-																					 l.Alocation4,
-																					 l.Alocation5,
-																					 l.Alocation6,
-                                           l.Alocation7,
-                                           l.Alocation8,
-                                           l.Alocation9,
-                                           l.Alocation10,
-                                           l.Alocation11,
-                                           l.Alocation12,
-                                           l.Alocation13,
-                                           l.Alocation14,
-                                           l.Alocation15,
-                                           l.Alocation16,
-                                           l.Alocation17,
-                                           l.Alocation18,
-                                           l.Alocation19,
-                                           l.Alocation20,
-                                           l.Alocation21,
-                                           l.Alocation22, 
-																					 l.Alocation23,
-																					 l.Alocation24,
-																					 l.Alocation25,
-																					 l.Alocation26,
-																					 l.Alocation27,
-																					 l.Alocation28,
-																					 l.Alocation29,
-																					 l.Alocation30,
-																					 l.Alocation31,
-																					 l.Alocation32,
-																					 l.Alocation33,
-																					 l.Alocation34,
-																					 l.Alocation35,
-																					 l.Alocation36,
-																					 l.Alocation37,
-																					 
-																					 l.Alocation38,
-                                           l.Alocation39,
-                                           l.Alocation40,
-                                           l.Alocation41,
-                                           l.Alocation42, 
-																					 l.Alocation43,
-																					 l.Alocation44,
-																					 l.Alocation45,
-																					 l.Alocation46,
-																					 l.Alocation47,
-																					 l.Alocation48,
-																					 l.Alocation49,
-																					 l.Alocation50,
-																					 l.Alocation51,
-																					 l.Alocation52,
-																					 l.Alocation53,
-																					 l.Alocation54,
-																					 l.Alocation55,
-																					 l.Alocation56,
-																					 l.Alocation57,
-																					 l.Alocation58,
-                                           l.Alocation59,
-                                           l.Alocation60,
-                                           l.Alocation61,
-                                           l.Alocation62, 
-																					 l.Alocation63,
-																					 l.Alocation64,
-																					 l.Alocation65,
-																					 l.Alocation66,
-																					 l.Alocation67,
-																					 l.Alocation68,
-																					 l.Alocation69,
-																					 l.Alocation70,
-																					 l.Alocation71,
-																					 l.Alocation72,
-																					 l.Alocation73,
-																					 l.Alocation74,
-																					 l.Alocation75,
-																					 l.Alocation76,
-																					 l.Alocation77,
-																					 l.Alocation78,
-                                           l.Alocation79,
-                                           l.Alocation80,
-                                           l.Alocation81,
-                                           l.Alocation82, 
-																					 l.Alocation83,
-																					 l.Alocation84,
-																					 l.Alocation85,
-																					 l.Alocation86,
-																					 l.Alocation87,
-																					 l.Alocation88,
-																					 l.Alocation89,
-																					 l.Alocation90,
-																					 l.Alocation91,
-																					 l.Alocation92,
-																					 l.Alocation93,
-																					 l.Alocation94,
-																					 l.Alocation95,
-																					 l.Alocation96,
-																					 l.Alocation97
-																					 
-																					 );						  	
-		
-	end;
-					   
-norm_report := normalize(Parse_Accident_Location, 97, SlimLocation(left, counter))(partial_accident_location <> ''); 
+SlimAccidentLocLayout	:=	RECORD
+	STRING100	Partial_Accident_Location := '';
+	Layouts.key_slim_layout;
+END;
+SlimAccidentLocLayout tSlimLocation(InterimAccidentLocLayout L, INTEGER Cnt) := TRANSFORM
+	SELF := L;
+	SELF.Partial_Accident_Location := CHOOSE(Cnt, L.Alocation1,
+																					 L.Alocation2,
+																					 L.Alocation3,
+																					 L.Alocation4,
+																					 L.Alocation5,
+																					 L.Alocation6,
+																					 L.Alocation7,
+																					 L.Alocation8,
+																					 L.Alocation9,
+																					 L.Alocation10,
+																					 L.Alocation11,
+																					 L.Alocation12,
+																					 L.Alocation13,
+																					 L.Alocation14,
+																					 L.Alocation15,
+																					 L.Alocation16,
+																					 L.Alocation17,
+																					 L.Alocation18,
+																					 L.Alocation19,
+																					 L.Alocation20,
+																					 L.Alocation21,
+																					 L.Alocation22, 
+																					 L.Alocation23,
+																					 L.Alocation24,
+																					 L.Alocation25,
+																					 L.Alocation26,
+																					 L.Alocation27,
+																					 L.Alocation28,
+																					 L.Alocation29,
+																					 L.Alocation30,
+																					 L.Alocation31,
+																					 L.Alocation32,
+																					 L.Alocation33,
+																					 L.Alocation34,
+																					 L.Alocation35,
+																					 L.Alocation36,
+																					 L.Alocation37,
+																					 L.Alocation38,
+																					 L.Alocation39,
+																					 L.Alocation40,
+																					 L.Alocation41,
+																					 L.Alocation42, 
+																					 L.Alocation43,
+																					 L.Alocation44,
+																					 L.Alocation45,
+																					 L.Alocation46,
+																					 L.Alocation47,
+																					 L.Alocation48,
+																					 L.Alocation49,
+																					 L.Alocation50,
+																					 L.Alocation51,
+																					 L.Alocation52,
+																					 L.Alocation53,
+																					 L.Alocation54,
+																					 L.Alocation55,
+																					 L.Alocation56,
+																					 L.Alocation57,
+																					 L.Alocation58,
+																					 L.Alocation59,
+																					 L.Alocation60,
+																					 L.Alocation61,
+																					 L.Alocation62, 
+																					 L.Alocation63,
+																					 L.Alocation64,
+																					 L.Alocation65,
+																					 L.Alocation66,
+																					 L.Alocation67,
+																					 L.Alocation68,
+																					 L.Alocation69,
+																					 L.Alocation70,
+																					 L.Alocation71,
+																					 L.Alocation72,
+																					 L.Alocation73,
+																					 L.Alocation74,
+																					 L.Alocation75,
+																					 L.Alocation76,
+																					 L.Alocation77,
+																					 L.Alocation78,
+																					 L.Alocation79,
+																					 L.Alocation80,
+																					 L.Alocation81,
+																					 L.Alocation82, 
+																					 L.Alocation83,
+																					 L.Alocation84,
+																					 L.Alocation85,
+																					 L.Alocation86,
+																					 L.Alocation87,
+																					 L.Alocation88,
+																					 L.Alocation89,
+																					 L.Alocation90,
+																					 L.Alocation91,
+																					 L.Alocation92,
+																					 L.Alocation93,
+																					 L.Alocation94,
+																					 L.Alocation95,
+																					 L.Alocation96,
+																					 L.Alocation97);
+END;					   
+normAccidentLocation := NORMALIZE(ParseAccidentLocation, 97, tSlimLocation(LEFT, COUNTER));
 
-
-Final_Accident_Location	:=	dedup(sort(distributed(project(norm_report, transform(Slim_Accident_Rec, 
-                                                           self.Partial_Accident_Location := if(trim(left.Partial_Accident_Location,left,right) = '', 
-																													                                      '', 
-																																																trim(left.Partial_Accident_Location,left,right));
-					                                                 self := left;))(Partial_Accident_Location <> ''), 
-																			             hash64(accident_nbr)), 
-					                             accident_nbr,Partial_Accident_Location,report_code,jurisdiction_state,jurisdiction,accident_date,report_type_id, local), 
-					                        accident_nbr,Partial_Accident_Location,report_code,jurisdiction_state,jurisdiction,accident_date,report_type_id, local);
-					
-	 
-
-EXPORT Key_eCrashv2_StAndLocation  := index(Final_Accident_Location
-                                            ,{Partial_Accident_location, jurisdiction_state, jurisdiction}
-                                            ,{Final_Accident_Location}
-                                            ,Data_Services.Data_location.Prefix('ecrash')+'thor_data400::key::ecrashV2_StAndLocation_' + doxie.Version_SuperKey);
-																						// ,Data_Services.Data_location.Prefix('ecrash')+'thor_data400::key::PRUS::ecrashV2_StAndLocation_' + doxie.Version_SuperKey);
+pAccidentLocation	:= PROJECT(normAccidentLocation(partial_accident_location <> ''),
+                             TRANSFORM(SlimAccidentLocLayout, 
+                                       SELF.Partial_Accident_Location := IF(TRIM(LEFT.Partial_Accident_Location, LEFT, RIGHT) = '', 
+																													                  '', 
+																																						TRIM(LEFT.Partial_Accident_Location, LEFT, RIGHT));
+					                             SELF := LEFT;));
+dAccidentLocation	:= DISTRIBUTED(pAccidentLocation, HASH32(accident_nbr));
+sAccidentLocation	:= SORT(dAccidentLocation, accident_nbr, Partial_Accident_Location, report_code, jurisdiction_state, jurisdiction,
+                                             accident_date, report_type_id, LOCAL);
+uAccidentLocation	:= DEDUP(sAccidentLocation, accident_nbr, Partial_Accident_Location, report_code, jurisdiction_state, jurisdiction, 
+                                              accident_date, report_type_id, LOCAL);
+																							
+EXPORT Key_eCrashv2_StAndLocation := INDEX(uAccidentLocation,
+                                           {Partial_Accident_location, jurisdiction_state, jurisdiction},
+                                           {uAccidentLocation},
+                                           Files_eCrash.FILE_KEY_ST_AND_LOCATION_SF);

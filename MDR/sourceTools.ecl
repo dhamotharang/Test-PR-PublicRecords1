@@ -350,6 +350,7 @@ MODULE
 	export src_Phones_LIDB				 			 := 'PB';
 	export src_PhonesPorted_TCPA				 := 'PJ';
 	export src_PhonesPorted_iConectiv		 := 'PK';
+	export src_PhonesPorted2_iConectiv	 := 'P!';
 	export src_PhonesPorted_iConectiv_Rng:= 'PU';
 	export src_POS                       := 'PO';  // Provider of Services for Organization master repositry	
 	export src_Professional_License      := 'PL';	
@@ -1895,7 +1896,7 @@ export set_NonDerog_FCRA_sources_v50 := [
 	export set_Phones_Accudata_CNAM_CNM2 := [src_Phones_Accudata_CNAM_CNM2 ];
 	export set_Phones_Lerg6							 := [src_Phones_Lerg6							 ];
 	export set_Phones_LIDB				 			 := [src_Phones_LIDB				 			 ];
-	export set_PhonesPorted						   := [src_PhonesPorted_TCPA, src_PhonesPorted_TCPA_CL, src_PhonesPorted_iConectiv, src_PhonesPorted_iConectiv_Rng, src_Phones_Accudata_OCN_LNP];
+	export set_PhonesPorted						   := [src_PhonesPorted_TCPA, src_PhonesPorted_TCPA_CL, src_PhonesPorted_iConectiv, src_PhonesPorted2_iConectiv, src_PhonesPorted_iConectiv_Rng, src_Phones_Accudata_OCN_LNP];
 	export set_POS                       := [src_POS                       ];  			
 	export set_Professional_License      := [src_Professional_License      ];
 	export set_PSS								       := [src_PSS									     ];

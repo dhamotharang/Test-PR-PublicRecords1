@@ -3,7 +3,8 @@
 
 
 EXPORT getCivilLegalEvent(DATASET(DueDiligence.v3Layouts.Internal.BusinessTemp) inData,
-                          DATASET(DueDiligence.v3Layouts.InternalShared.LiensJudgementsEvictions) rawLJE) := FUNCTION
+                          DATASET(DueDiligence.v3Layouts.InternalShared.LiensJudgementsEvictions) rawLJE,
+                          DATASET(DueDiligence.v3Layouts.InternalShared.Bankruptcies) rawBank) := FUNCTION
 
 
     //for each lexID determine which levels were hit
@@ -13,40 +14,72 @@ EXPORT getCivilLegalEvent(DATASET(DueDiligence.v3Layouts.Internal.BusinessTemp) 
                                             SELF.orgID := LEFT.inquiredBusiness.orgID;
                                             SELF.seleID := LEFT.inquiredBusiness.seleID;
                                             
+                                            
+                                            busBankEvents := rawBank(ultID = LEFT.inquiredBusiness.ultID AND 
+                                                                     orgID = LEFT.inquiredBusiness.orgID AND 
+                                                                     seleID = LEFT.inquiredBusiness.seleID);
+                                                                     
+
+                                            bankOver7 := busBankEvents(dismissed = FALSE AND
+                                                                       IF(dateFirstSeen = 0,
+                                                                            DueDiligence.v3Common.Date.DaysApartAccountingForZero((STRING)filingDate, (STRING)historyDate) > ut.DaysInNYears(7),
+                                                                            DueDiligence.v3Common.Date.DaysApartAccountingForZero((STRING)dateFirstSeen, (STRING)historyDate) > ut.DaysInNYears(7)));
+
+                                            bankPast7 := busBankEvents(dismissed = FALSE AND
+                                                                       IF(dateFirstSeen = 0,
+                                                                            DueDiligence.v3Common.Date.DaysApartAccountingForZero((STRING)filingDate, (STRING)historyDate) <= ut.DaysInNYears(7),
+                                                                            DueDiligence.v3Common.Date.DaysApartAccountingForZero((STRING)dateFirstSeen, (STRING)historyDate) <= ut.DaysInNYears(7)));
+                                                                            
+                                            
+                                            bankUnknownTime := busBankEvents(dismissed = FALSE AND
+                                                                             DueDiligence.v3Common.Date.DaysApartAccountingForZero((STRING)filingDate, (STRING)historyDate) = ut.DaysInNYears(0) AND
+                                                                             DueDiligence.v3Common.Date.DaysApartAccountingForZero((STRING)dateFirstSeen, (STRING)historyDate) = ut.DaysInNYears(0));
+                                            
+                                            
+                                            
                                             busCivilEvents := rawLJE(ultID = LEFT.inquiredBusiness.ultID AND 
                                                                      orgID = LEFT.inquiredBusiness.orgID AND 
                                                                      seleID = LEFT.inquiredBusiness.seleID);
+                                                                                                               
                                             
                                             //evictions
-                                            evictionsOver3Yrs := busCivilEvents(espDetails.eviction AND
+                                            evictionsOver5Yrs := busCivilEvents(espDetails.eviction AND
                                                                                  releaseDate = 0 AND
-                                                                                 DueDiligence.v3Common.Date.DaysApartAccountingForZero((STRING)dateFirstSeen, (STRING)historyDate) > ut.DaysInNYears(3));
+                                                                                 IF(dateFirstSeen = 0,
+                                                                                      DueDiligence.v3Common.Date.DaysApartAccountingForZero((STRING)filingDate, (STRING)historyDate) > ut.DaysInNYears(5),
+                                                                                      DueDiligence.v3Common.Date.DaysApartAccountingForZero((STRING)dateFirstSeen, (STRING)historyDate) > ut.DaysInNYears(5)));
                                             
-                                            evictionsPast3Yrs := busCivilEvents(espDetails.eviction AND
+                                            evictionsPast5Yrs := busCivilEvents(espDetails.eviction AND
                                                                                  releaseDate = 0 AND
-                                                                                 DueDiligence.v3Common.Date.DaysApartAccountingForZero((STRING)dateFirstSeen, (STRING)historyDate) <= ut.DaysInNYears(3));
+                                                                                 IF(dateFirstSeen = 0,
+                                                                                      DueDiligence.v3Common.Date.DaysApartAccountingForZero((STRING)filingDate, (STRING)historyDate) <= ut.DaysInNYears(5),
+                                                                                      DueDiligence.v3Common.Date.DaysApartAccountingForZero((STRING)dateFirstSeen, (STRING)historyDate) <= ut.DaysInNYears(5)));
                                                                                    
                                                                                    
                                             //unreleased liens
-                                            unreleasedLiensOver3Yrs := busCivilEvents(espDetails.eviction = FALSE AND
+                                            unreleasedLiensOver5Yrs := busCivilEvents(espDetails.eviction = FALSE AND
                                                                                        releaseDate = 0 AND
-                                                                                       DueDiligence.v3Common.Date.DaysApartAccountingForZero((STRING)dateFirstSeen, (STRING)historyDate) > ut.DaysInNYears(3));
+                                                                                       IF(dateFirstSeen = 0,
+                                                                                            DueDiligence.v3Common.Date.DaysApartAccountingForZero((STRING)filingDate, (STRING)historyDate) > ut.DaysInNYears(5),
+                                                                                            DueDiligence.v3Common.Date.DaysApartAccountingForZero((STRING)dateFirstSeen, (STRING)historyDate) > ut.DaysInNYears(5)));
                                                                                          
-                                            unreleasedLiensPast3Yrs := busCivilEvents(espDetails.eviction = FALSE AND
+                                            unreleasedLiensPast5Yrs := busCivilEvents(espDetails.eviction = FALSE AND
                                                                                        releaseDate = 0 AND
-                                                                                       DueDiligence.v3Common.Date.DaysApartAccountingForZero((STRING)dateFirstSeen, (STRING)historyDate) <= ut.DaysInNYears(3));
+                                                                                       IF(dateFirstSeen = 0,
+                                                                                            DueDiligence.v3Common.Date.DaysApartAccountingForZero((STRING)filingDate, (STRING)historyDate) <= ut.DaysInNYears(5),
+                                                                                            DueDiligence.v3Common.Date.DaysApartAccountingForZero((STRING)dateFirstSeen, (STRING)historyDate) <= ut.DaysInNYears(5)));
                                           
                                             
                                                           
-                                            civilEvent9 := IF(COUNT(unreleasedLiensPast3Yrs + evictionsPast3Yrs) >= 10, DueDiligence.Constants.T_INDICATOR, DueDiligence.Constants.F_INDICATOR);
-                                            civilEvent8 := IF(COUNT(unreleasedLiensPast3Yrs + evictionsPast3Yrs) BETWEEN 5 AND 9, DueDiligence.Constants.T_INDICATOR, DueDiligence.Constants.F_INDICATOR);
-                                            civilEvent7 := IF(COUNT(unreleasedLiensPast3Yrs + evictionsPast3Yrs) BETWEEN 3 AND 4, DueDiligence.Constants.T_INDICATOR, DueDiligence.Constants.F_INDICATOR);
-                                            civilEvent6 := IF(COUNT(unreleasedLiensPast3Yrs + evictionsPast3Yrs) BETWEEN 1 AND 2, DueDiligence.Constants.T_INDICATOR, DueDiligence.Constants.F_INDICATOR);
-                                            civilEvent5 := IF(COUNT(unreleasedLiensOver3Yrs + evictionsOver3Yrs) >= 10, DueDiligence.Constants.T_INDICATOR, DueDiligence.Constants.F_INDICATOR);
-                                            civilEvent4 := IF(COUNT(unreleasedLiensOver3Yrs + evictionsOver3Yrs) BETWEEN 5 AND 9, DueDiligence.Constants.T_INDICATOR, DueDiligence.Constants.F_INDICATOR);
-                                            civilEvent3 := IF(COUNT(unreleasedLiensOver3Yrs + evictionsOver3Yrs) BETWEEN 3 AND 4, DueDiligence.Constants.T_INDICATOR, DueDiligence.Constants.F_INDICATOR);
-                                            civilEvent2 := IF(COUNT(unreleasedLiensOver3Yrs + evictionsOver3Yrs) BETWEEN 1 AND 2, DueDiligence.Constants.T_INDICATOR, DueDiligence.Constants.F_INDICATOR);
-                                            civilEvent1 := IF(COUNT(busCivilEvents) = 0 OR
+                                            civilEvent9 := IF(COUNT(bankPast7) > 0, DueDiligence.Constants.T_INDICATOR, DueDiligence.Constants.F_INDICATOR);
+                                            civilEvent8 := IF(COUNT(unreleasedLiensPast5Yrs + evictionsPast5Yrs) >= 10, DueDiligence.Constants.T_INDICATOR, DueDiligence.Constants.F_INDICATOR);
+                                            civilEvent7 := IF(COUNT(unreleasedLiensPast5Yrs + evictionsPast5Yrs) BETWEEN 5 AND 9, DueDiligence.Constants.T_INDICATOR, DueDiligence.Constants.F_INDICATOR);
+                                            civilEvent6 := IF(COUNT(unreleasedLiensPast5Yrs + evictionsPast5Yrs) BETWEEN 1 AND 4, DueDiligence.Constants.T_INDICATOR, DueDiligence.Constants.F_INDICATOR);
+                                            civilEvent5 := IF(COUNT(bankOver7) > 0 OR COUNT(bankUnknownTime) > 0, DueDiligence.Constants.T_INDICATOR, DueDiligence.Constants.F_INDICATOR);
+                                            civilEvent4 := IF(COUNT(unreleasedLiensOver5Yrs + evictionsOver5Yrs) >= 10, DueDiligence.Constants.T_INDICATOR, DueDiligence.Constants.F_INDICATOR);
+                                            civilEvent3 := IF(COUNT(unreleasedLiensOver5Yrs + evictionsOver5Yrs) BETWEEN 5 AND 9, DueDiligence.Constants.T_INDICATOR, DueDiligence.Constants.F_INDICATOR);
+                                            civilEvent2 := IF(COUNT(unreleasedLiensOver5Yrs + evictionsOver5Yrs) BETWEEN 1 AND 4, DueDiligence.Constants.T_INDICATOR, DueDiligence.Constants.F_INDICATOR);
+                                            civilEvent1 := IF((COUNT(busCivilEvents) = 0 AND COUNT(busBankEvents) = 0) OR
                                                               (civilEvent9 = DueDiligence.Constants.F_INDICATOR AND
                                                               civilEvent8 = DueDiligence.Constants.F_INDICATOR AND
                                                               civilEvent7 = DueDiligence.Constants.F_INDICATOR AND
@@ -70,6 +103,7 @@ EXPORT getCivilLegalEvent(DATASET(DueDiligence.v3Layouts.Internal.BusinessTemp) 
                                             SELF := [];));
 
 
+    // OUTPUT(rawLJE, NAMED('rawLJE'));
     // OUTPUT(civilEvent, NAMED('civilEvent'));
                                             
                           

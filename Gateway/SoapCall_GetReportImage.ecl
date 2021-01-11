@@ -11,20 +11,19 @@ EXPORT DATASET(iesp.accident_image.t_AccidentImageResponseEx) SoapCall_GetReport
 		SELF := Lreq;
 	END; 
 	
-	//The FAIL transform, assert without the FAIL param simply logs the error message.
-	iesp.accident_image.t_AccidentImageResponseEx FailCall(iesp.accident_image.t_AccidentImageRequest ds) := TRANSFORM
-		ASSERT(1 = 0, 'Soap Error:' + (string)FAILCODE + ':' + FAILMESSAGE + ':' + FAILMESSAGE('soapresponse'));
-		SELF := ds;
+	iesp.accident_image.t_AccidentImageResponseEx tf_OnFail() := TRANSFORM
+		SELF.Response.ErrorMessage             := FAILMESSAGE('soapresponse');
 		SELF := [];
-	END;
-
+	end;
+	
+	
 	//Get the timeout from "User.MaxWaitSeconds" in the request. If it's set to zero or less, assume 180 seconds.
 	DefaultTimeout := 180;
 	RawTimeout := (INTEGER) Request[1].User.MaxWaitSeconds;
 	TrueTimeout := IF(RawTimeout <= 0, DefaultTimeout, RawTimeout);
 
 	Url := IF(EXISTS(Request), gatewayCfg.Url, '');
-	Out := SOAPCALL(
+	ds_soapcall_out := SOAPCALL(
 		Request, 
 		Url, 
 		gatewayCfg.ServiceName, 
@@ -32,12 +31,12 @@ EXPORT DATASET(iesp.accident_image.t_AccidentImageResponseEx) SoapCall_GetReport
 		populateRequest(LEFT),
 		DATASET(iesp.accident_image.t_AccidentImageResponseEx),
 		XPATH('AccidentImageResponseEx'),
-		ONFAIL(FailCall(LEFT)), 
+		ONFAIL(tf_OnFail()), 
 		RETRY(0), 
 		TIMEOUT(TrueTimeout),
 		TRIM,
 		LOG
-	);	
-
-	RETURN Out;
+	);
+// output(ds_soapcall_out,named('soap_out'));
+	RETURN ds_soapcall_out;
 END;

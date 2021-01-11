@@ -41,8 +41,8 @@
 			Scoring_Project_Macros.Regression.runtime_layout;
 			END;
 
-			ds_raw_input := dataset (infile_name, layout_input, thor);
-
+			ds_raw_input := distribute(dataset (infile_name, layout_input, thor),(integer)accountnumber);
+			
 			ds_raw_input_project := project(ds_raw_input,TRANSFORM(layout_input, self.historydateyyyymm := archive_date, self:= LEFT));
 
 			ds_input := IF (no_of_records = 0, ds_raw_input_project, CHOOSEN (ds_raw_input_project, no_of_records));

@@ -7,6 +7,7 @@
   ASSUMPTIONS:
     **Data passed in has an unique seq identifier populated
     **Searching is done at the seleID level
+    **All attributes within a module have to be requested to return supplemental/report data
   
 
 
@@ -25,7 +26,7 @@
 
 
   INPUT DEPENDENCIES:
-    Legal Attributes - civil legal data is searched by seleID level
+    Legal Attributes - civil legal data is searched by LexID/SeleID level
                      - other legal attributes are based on the LexID/DID of the BEO(s)
     
 */
@@ -96,11 +97,11 @@ EXPORT getBusiness(DATASET(DueDiligence.v3Layouts.DDInput.BusinessSearch) inData
     beoData := DueDiligence.v3BusinessData.getExec(validBusiness, attributesRequested, regulatoryAccess, ddOptions);
     
     
-    //get information from shared resources and/or additional data used in various calls: bestinfo, header
-    // retrievePrereqs := DueDiligence.v3BusinessData.getDataDependencies(convertToInternal, attributesRequested, regulatoryAccess, ddOptions);
+    //get information from shared resources and/or additional data used in various calls
+    retrieveDataDependencies := DueDiligence.v3BusinessData.getDataDependencies(beoData, regulatoryAccess);
     
     
-    businessesToUse := beoData;
+    businessesToUse := retrieveDataDependencies;
 
     
     
@@ -126,8 +127,8 @@ EXPORT getBusiness(DATASET(DueDiligence.v3Layouts.DDInput.BusinessSearch) inData
     //      Legal Module Data
     /////////////////////////////////
     legalModuleInfo := IF(requestingLegalAttributes, 
-                                DueDiligence.v3AttributeModules.getBusinessLegal(businessesToUse, attributesRequested, regulatoryAccess, ddOptions),
-                                noResults);
+                          DueDiligence.v3AttributeModules.getBusinessLegal(businessesToUse, attributesRequested, regulatoryAccess, ddOptions),
+                          noResults);
                                 
                                 
     //////////////////////////////////
@@ -139,7 +140,10 @@ EXPORT getBusiness(DATASET(DueDiligence.v3Layouts.DDInput.BusinessSearch) inData
     //////////////////////////////////
     //     Operating Module Data
     /////////////////////////////////
-    operatingModuleInfo := noResults;
+    operatingModuleInfo := IF(requestingOperatingAttributes,
+                              DueDiligence.v3AttributeModules.getBusinessOperating(businessesToUse, attributesRequested, regulatoryAccess, ddOptions),
+                              noResults);
+                              
     
     
     //////////////////////////////////
@@ -180,9 +184,11 @@ EXPORT getBusiness(DATASET(DueDiligence.v3Layouts.DDInput.BusinessSearch) inData
                           LEFT.orgID = RIGHT.orgID AND
                           LEFT.seleID = RIGHT.seleID,
                           TRANSFORM(DueDiligence.v3Layouts.InternalBusiness.BusinessResults,
-                                    //attributes
+                                    //attributes - legal
                                     SELF.busCivilLegalEvent := DueDiligence.v3Common.General.FirstPopulatedString(busCivilLegalEvent);
                                     SELF.busCivilLegalEvent_Flag := DueDiligence.v3Common.General.FirstPopulatedString(busCivilLegalEvent_Flag);
+                                    SELF.busCivilLegalEventFilingAmt := DueDiligence.v3Common.General.FirstPopulatedString(busCivilLegalEventFilingAmt);
+                                    SELF.busCivilLegalEventFilingAmt_Flag := DueDiligence.v3Common.General.FirstPopulatedString(busCivilLegalEventFilingAmt_Flag);
                                     SELF.busOffenseType := DueDiligence.v3Common.General.FirstPopulatedString(busOffenseType);
                                     SELF.busOffenseType_Flag := DueDiligence.v3Common.General.FirstPopulatedString(busOffenseType_Flag);
                                     SELF.busStateLegalEvent := DueDiligence.v3Common.General.FirstPopulatedString(busStateLegalEvent);
@@ -206,7 +212,7 @@ EXPORT getBusiness(DATASET(DueDiligence.v3Layouts.DDInput.BusinessSearch) inData
                                     SELF.busAccessToFundsProperty := DueDiligence.v3Common.General.FirstPopulatedString(busAccessToFundsProperty);
                                     SELF.busAccessToFundsProperty_Flag := DueDiligence.v3Common.General.FirstPopulatedString(busAccessToFundsProperty_Flag);
                                     
-                                    //attributes - operating (non-modular)
+                                    //attributes - operating (part-modular-ish)
                                     SELF.busGeographic := DueDiligence.v3Common.General.FirstPopulatedString(busGeographic);
                                     SELF.busGeographic_Flag := DueDiligence.v3Common.General.FirstPopulatedString(busGeographic_Flag);
                                     SELF.busValidity := DueDiligence.v3Common.General.FirstPopulatedString(busValidity);
@@ -248,10 +254,22 @@ EXPORT getBusiness(DATASET(DueDiligence.v3Layouts.DDInput.BusinessSearch) inData
                                     economicSection := IF(RIGHT.economicReportIncluded, RIGHT, LEFT);
                                     networkSection := IF(RIGHT.networkReportIncluded, RIGHT, LEFT);
                                     
+                                    
                                     SELF.legalReportIncluded := LEFT.legalReportIncluded OR RIGHT.legalReportIncluded;
                                     SELF.operatingReportIncluded := LEFT.operatingReportIncluded OR RIGHT.operatingReportIncluded;
                                     SELF.economicReportIncluded := LEFT.economicReportIncluded OR RIGHT.economicReportIncluded;
                                     SELF.networkReportIncluded := LEFT.networkReportIncluded OR RIGHT.networkReportIncluded;
+                                    
+                                    //this should be temp once all operating is moved to the operating module
+                                    industry := IF(RIGHT.busIndustry <> DueDiligence.Constants.EMPTY, RIGHT, LEFT);
+                                    SELF.report.businessReport.businessAttributeDetails.operating.businessInformation.SICNAICs := industry.report.businessReport.businessAttributeDetails.Operating.businessInformation.SICNAICs;
+                                    
+                                    
+                                    
+                                    SELF.report.businessReport.businessInformation.NaicsCode := industry.report.businessReport.businessInformation.NaicsCode;
+                                    SELF.report.businessReport.businessInformation.NaicsDescription := industry.report.businessReport.businessInformation.NaicsDescription;
+                                    SELF.report.businessReport.businessInformation.SicCode := industry.report.businessReport.businessInformation.SicCode;
+                                    SELF.report.businessReport.businessInformation.SicDescription := industry.report.businessReport.businessInformation.SicDescription;
                                     
                                     SELF.report.businessReport.businessAttributeDetails.Legal := legalSection.report.businessReport.businessAttributeDetails.Legal;
                                     SELF.report.businessReport.businessAttributeDetails.Economic := economicSection.report.businessReport.businessAttributeDetails.Economic;
@@ -296,6 +314,7 @@ EXPORT getBusiness(DATASET(DueDiligence.v3Layouts.DDInput.BusinessSearch) inData
     IF(debugMode, OUTPUT(validBusiness, NAMED('validBusiness')));
     IF(debugMode, OUTPUT(invalidBusiness, NAMED('invalidBusiness')));
     IF(debugMode, OUTPUT(beoData, NAMED('beoData')));
+    IF(debugMode, OUTPUT(retrieveDataDependencies, NAMED('retrieveDataDependencies')));
     
     IF(debugMode, OUTPUT(matchLevelData, NAMED('matchLevelDataBus')));
     IF(debugMode, OUTPUT(legalModuleInfo, NAMED('legalModuleInfoBus')));
@@ -311,9 +330,7 @@ EXPORT getBusiness(DATASET(DueDiligence.v3Layouts.DDInput.BusinessSearch) inData
     IF(debugMode, OUTPUT(addInputBest, NAMED('addInputBestBus')));
     IF(debugMode, OUTPUT(noDataForAttribute, NAMED('noDataForAttributeBus')));
     IF(debugMode, OUTPUT(final, NAMED('finalBus')));
-    
-    
-   
+
     
     RETURN SORT(final, seq);
 END;

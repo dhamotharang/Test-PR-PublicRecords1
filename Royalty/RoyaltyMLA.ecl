@@ -1,6 +1,6 @@
 ﻿EXPORT RoyaltyMLA := module
 
-	IMPORT Models, Royalty;
+	IMPORT Models, Royalty, Riskview;
 
 	EXPORT GetOnlineRoyalties(search_results_temp) := 
 		FUNCTIONMACRO	
@@ -52,7 +52,7 @@
 
 				SELF.royalty_count 			:= if(gatewayHit, 1, 0);
 				SELF.non_royalty_count 	:= 0;
-				SELF.source_type        := 'I'; // Inhouse
+				SELF.source_type        := 'G'; // Gateway
 			END;
 
 			dRoyaltiesBySeq := 

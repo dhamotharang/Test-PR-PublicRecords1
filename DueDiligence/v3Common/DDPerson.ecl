@@ -61,7 +61,10 @@ EXPORT DDPerson := MODULE
                           attributesRequested.includeAccessToFundsIncome OR attributesRequested.includeAccessToFundsProperty;
                           
         geographicAttrs := attributesRequested.includeGeographic OR attributesRequested.includeMobility;
-        legalAttrs := attributesRequested.includeStateLegalEvent OR attributesRequested.includeCivilLegalEvent OR attributesRequested.includeOffenseType;
+        
+        legalAttrs := attributesRequested.includeStateLegalEvent OR attributesRequested.includeCivilLegalEvent OR 
+                      attributesRequested.includeOffenseType OR attributesRequested.includeCivilLegalEventFilingAmount;
+        
         identAttrs := attributesRequested.includeAgeRange OR attributesRequested.includeIdentityRisk OR  attributesRequested.includeUSResidency;
         networkAttrs := attributesRequested.includeAssociates OR attributesRequested.includeProfLicense OR attributesRequested.includeBusAssociations;
         

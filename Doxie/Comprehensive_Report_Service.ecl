@@ -174,6 +174,9 @@
   <!-- EmailV2 options/fields -->
   <part name="MaxEmailResults"	type="xsd:unsignedInt"/>
   <part name="EmailSearchTier"  type="xsd:string"/>
+   
+  <!-- Address Hierarchy options/fields -->
+  <part name="UseAddressHierarchy" type="xsd:boolean"/>
 
  </message>
 */
@@ -197,7 +200,6 @@ export Comprehensive_Report_Service := MACRO
 
 BOOLEAN in_getSSNBest := FALSE: STORED('GetSSNBest');
 UNSIGNED1 OFACversion      := 1        : stored('OFACversion');
-
 gateways_in := Gateway.Configuration.Get();
 
 Gateway.Layouts.Config gw_switch(gateways_in le) := transform

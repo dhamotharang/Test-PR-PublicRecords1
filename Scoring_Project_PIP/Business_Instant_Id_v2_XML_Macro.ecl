@@ -174,11 +174,11 @@ layout := RECORD
 END;
 
 ds_input := 
-	IF(
+	distribute(IF(
 		recordsToRun <= 0, 
 		DATASET(inputFile, layout, CSV(QUOTE('"'))), 
 		CHOOSEN( DATASET(inputFile, layout, CSV(QUOTE('"'))), recordsToRun )
-	);
+	),(integer)accountnumber);
 
 // 2.  Construct SOAPCALL request.
 layout_soap := RECORD

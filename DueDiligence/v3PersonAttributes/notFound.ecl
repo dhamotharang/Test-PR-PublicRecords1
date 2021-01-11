@@ -19,6 +19,9 @@ EXPORT notFound(DATASET(DueDiligence.v3Layouts.Internal.PersonTemp) inData,
                                               SELF.perCivilLegalEvent := IF(attributesRequested.includeAll OR attributesRequested.includeCivilLegalEvent, INVALID_INDIVIDUAL_SCORE, DueDiligence.Constants.EMPTY);
                                               SELF.perCivilLegalEvent_Flag := IF(attributesRequested.includeAll OR attributesRequested.includeCivilLegalEvent, INVALID_INDIVIDUAL_FLAGS, DueDiligence.Constants.EMPTY);
                                               
+                                              SELF.perCivilLegalEventFilingAmt := IF(attributesRequested.includeAll OR attributesRequested.includeCivilLegalEventFilingAmount, INVALID_INDIVIDUAL_SCORE, DueDiligence.Constants.EMPTY);
+                                              SELF.perCivilLegalEventFilingAmt_Flag := IF(attributesRequested.includeAll OR attributesRequested.includeCivilLegalEventFilingAmount, INVALID_INDIVIDUAL_FLAGS, DueDiligence.Constants.EMPTY);
+                                              
                                               SELF.perOffenseType := IF(attributesRequested.includeAll OR attributesRequested.includeOffenseType, INVALID_INDIVIDUAL_SCORE, DueDiligence.Constants.EMPTY);;
                                               SELF.perOffenseType_Flag := IF(attributesRequested.includeAll OR attributesRequested.includeOffenseType, INVALID_INDIVIDUAL_FLAGS, DueDiligence.Constants.EMPTY);
                                               

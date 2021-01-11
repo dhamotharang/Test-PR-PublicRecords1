@@ -1,7 +1,7 @@
-import doxie;
-export layout_did_ext :=
-	record
-		doxie.layout_references;
-		boolean isdeepdive;
-	end;
-	
+IMPORT doxie;
+EXPORT layout_did_ext :=
+  RECORD
+    doxie.layout_references;
+    BOOLEAN isdeepdive;
+  END;
+  

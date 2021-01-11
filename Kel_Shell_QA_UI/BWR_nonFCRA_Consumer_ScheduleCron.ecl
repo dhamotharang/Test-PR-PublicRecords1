@@ -73,13 +73,21 @@ nonFCRA_Consumer:= Kel_Shell_QA_UI.nonFCRA_Consumer( Query_Environment,
 
 // execute_type:= 'executeNow';
 // execute_type:=  'scheduleCron';
-cron_time :='0 10 19 * *';
 
 // IF(execute_type='executeNow',
                       // nonFCRA_Consumer):FAILURE(FileServices.SendEmail(email_list,'KEL SHELL QA UI run job','The failed workunit is:' + workunit + FailMessage));
 
-nonFCRA_Consumer: WHEN(CRON(cron_time)), 
-FAILURE(FileServices.SendEmail(email_list,'KEL SHELL QA UI run job','The failed workunit is:' + workunit + FailMessage));		
+cron_time :='0 10 19 * *';
+
+sprayMessage:='failed';
+dfuWUID:='W20200915-111742';
+dfuStatus:='finished';
+
+if(trim(sprayMessage,left,right) <> '', Kel_Shell_QA_UI.File_spray_notification_macro(email_list, dfuWUID, dfuStatus));
+
+if(trim(sprayMessage,left,right) = '', nonFCRA_Consumer): WHEN(CRON(cron_time)), 
+FAILURE(FileServices.SendEmail(email_list,'KAT Notification','Your job has failed. The failed workunit is:' + workunit + FailMessage));
+
 
 
 EXPORT BWR_nonFCRA_Consumer_ScheduleCron := 'todo';

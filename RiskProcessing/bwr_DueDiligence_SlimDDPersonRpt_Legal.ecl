@@ -6,7 +6,7 @@ IMPORT Data_Services, DueDiligence, iesp, RiskWise, STD;
 /* *****************************************************
  *                   Options Section                   *
  *******************************************************/
-inputFile := Data_Services.foreign_prod + 'jpyon::out::ln_8691_ln_consumer_duedil_slim_W20181108-074726_reprocess';
+inputFile := Data_Services.foreign_prod + 'jpyon::in::ln_8691_ln_consumer_ind.csv';
 outputFile := '~tgertken::out::duedil_out_' + thorlib.wuid();  //  change output file name to person running script
 
 
@@ -271,7 +271,7 @@ END;
                         
 SlimPersonReportLayout := RECORD
   PersonIdentifiers;
-  DueDiligence.Layouts.PerAttributes -PerLexID;
+  DueDiligence.v3Layouts.DDOutput.PerAttributes -PerLexID;
   DATASET(iesp.share.t_NameValuePair) Attributes;
 	DATASET(iesp.share.t_NameValuePair) AttributeHitFlags;
   DATASET(iesp.duediligenceshared.t_DDRLegalStateCriminal) Criminals;
@@ -288,7 +288,7 @@ END;
 
 FinalLayout := RECORD
   PersonIdentifiers;
-  DueDiligence.Layouts.PerAttributes -PerLexID;
+  DueDiligence.v3Layouts.DDOutput.PerAttributes -PerLexID;
   iesp.duediligenceshared.t_DDRLegalStateCriminal - sources -OffenseDDFirstReported -OffenseDDLastReportedActivity -OffenseDDMostRecentCourtDispDate;
   UNSIGNED4 OffenseDDMostRecentCourtDispDate;
   UNSIGNED4 OffenseDDFirstReported;
@@ -328,6 +328,7 @@ slimAttrs := PROJECT(slimReportRaw, TRANSFORM(SlimPersonReportLayout,
                                                 SELF.PerFederalLegalEvent := attributes(TRIM(name) = 'PerFederalLegalEvent')[1].value;
                                                 SELF.PerFederalLegalMatchLevel := attributes(TRIM(name) = 'PerFederalLegalMatchLevel')[1].value;
                                                 SELF.PerCivilLegalEvent := attributes(TRIM(name) = 'PerCivilLegalEvent')[1].value;
+                                                SELF.PerCivilLegalEventFilingAmt := attributes(TRIM(name) = 'PerCivilLegalEventFilingAmt')[1].value;
                                                 SELF.PerOffenseType := attributes(TRIM(name) = 'PerOffenseType')[1].value;
                                                 SELF.PerAgeRange := attributes(TRIM(name) = 'PerAgeRange')[1].value;
                                                 SELF.PerIdentityRisk := attributes(TRIM(name) = 'PerIdentityRisk')[1].value;
@@ -350,6 +351,7 @@ slimAttrs := PROJECT(slimReportRaw, TRANSFORM(SlimPersonReportLayout,
                                                 SELF.PerFederalLegalEvent_Flag := attributeHits(TRIM(name) = 'PerFederalLegalEvent_Flag')[1].value;
                                                 SELF.PerFederalLegalMatchLevel_Flag := attributeHits(TRIM(name) = 'PerFederalLegalMatchLevel_Flag')[1].value;
                                                 SELF.PerCivilLegalEvent_Flag := attributeHits(TRIM(name) = 'PerCivilLegalEvent_Flag')[1].value;
+                                                SELF.PerCivilLegalEventFilingAmt_Flag := attributeHits(TRIM(name) = 'PerCivilLegalEventFilingAmt_Flag')[1].value;
                                                 SELF.PerOffenseType_Flag := attributeHits(TRIM(name) = 'PerOffenseType_Flag')[1].value;
                                                 SELF.PerAgeRange_Flag := attributeHits(TRIM(name) = 'PerAgeRange_Flag')[1].value;
                                                 SELF.PerIdentityRisk_Flag := attributeHits(TRIM(name) = 'PerIdentityRisk_Flag')[1].value;

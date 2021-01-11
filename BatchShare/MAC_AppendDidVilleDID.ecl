@@ -1,4 +1,4 @@
-﻿EXPORT MAC_AppendDidVilleDID (batch_in, batch_out, in_mod, did_score_threshold=BatchShare.Constants.Defaults.didScoreThreshold) := MACRO
+EXPORT MAC_AppendDidVilleDID (batch_in, batch_out, in_mod, did_score_threshold=BatchShare.Constants.Defaults.didScoreThreshold, isFCRA = false) := MACRO
 IMPORT Address, AutoKeyI, BatchShare, DidVille, Gateway, Standard, Suppress;
 
 	// do soap call for remote DidVille dids using Gateway.SoapCall_DidVille()
@@ -92,7 +92,7 @@ IMPORT Address, AutoKeyI, BatchShare, DidVille, Gateway, Standard, Suppress;
 	%denormRec% %denormRecs%({UNSIGNED acctno} L,DATASET({UNSIGNED err_search,%resultRec%}) R) := TRANSFORM
 		didScoreRec:={UNSIGNED err_search,UNSIGNED score,UNSIGNED did};
 		ds_did_score:=PROJECT(R,TRANSFORM(didScoreRec,SELF.score:=(UNSIGNED)LEFT.score,SELF.did:=(UNSIGNED)LEFT.did,SELF.err_search:=LEFT.err_search));
-		Suppress.MAC_Suppress(ds_did_score,ds_recs,%dv_mod%.application_type,Suppress.Constants.LinkTypes.DID,did);
+		Suppress.MAC_Suppress(ds_did_score,ds_recs,%dv_mod%.application_type,Suppress.Constants.LinkTypes.DID,did,,,,,,,isFCRA);
 		rec:=SORT(ds_recs,-score,did)[1];
 		DID_PROVIDED:=rec.err_search>0;
 		DID_NOT_FOUND:=rec.did=0;

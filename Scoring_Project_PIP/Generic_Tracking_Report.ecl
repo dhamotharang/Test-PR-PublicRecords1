@@ -31,7 +31,7 @@ decimal19_2 thresh := 0;
 
 // nonfcra_ds_curr := dataset('~ScoringQA::out::NONFCRA::Profile_Booster_Batch_CapitalOne_attributes_v1_' + dt + '_1', Scoring_Project_Macros.Global_Output_Layouts.ProfileBooster_layout, thor)(length(trim(errorcode,left,right))= 0 );
 // nonfcra_ds_curr := dataset('~' + ds + dt + '_1', layout, thor)(length(trim(errorcode,left,right))= 0 );
-nonfcra_ds_curr := dataset('~' + ds + dt + '_1', layout, thor);
+nonfcra_ds_curr := distribute(dataset('~' + ds + dt + '_1', layout, thor),(integer)join_by);
 
 // nonfcra_ds_curr := nonfcra_ds_curr_in(errorcdoe = '');
 
@@ -53,7 +53,7 @@ cleaned_nonfcra_prev_date := nonfcra_prev_date;
 
 // nonfcra_ds_prev := dataset('~'+ nonfcra_p_file_name, Scoring_Project_Macros.Global_Output_Layouts.ProfileBooster_layout, thor)(length(trim(errorcode,left,right))= 0 );
 // nonfcra_ds_prev := dataset('~'+ nonfcra_p_file_name, layout, thor)(length(trim(errorcode,left,right))= 0 );
-nonfcra_ds_prev := dataset('~' + ds + nonfcra_prev_date + '_1', layout, thor);
+nonfcra_ds_prev := distribute(dataset('~' + ds + nonfcra_prev_date + '_1', layout, thor),(integer)join_by);
 
 
 

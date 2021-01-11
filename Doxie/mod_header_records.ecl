@@ -18,15 +18,6 @@ export mod_header_records(
   doxie.IDataAccess modAccess = MODULE (doxie.IDataAccess) END
 ) := MODULE
 
-// have to declare these for now, since they are used in a macro below
-shared string5 industry_class_value := modAccess.industry_class;
-shared unsigned1 dppa_purpose := modAccess.dppa;
-shared unsigned1 glb_purpose := modAccess.glb;
-shared boolean probation_override_value := modAccess.probation_override;
-shared boolean no_scrub := modAccess.no_scrub;
-
-shared dppa_ok := modAccess.isValidDPPA ();
-shared glb_ok := modAccess.isValidGLB ();
 shared boolean is_knowx := modAccess.isConsumer ();
 
 //***** GET THE DAILIES EITHER BY SEARCH OR FETCH
@@ -42,7 +33,7 @@ MODULE
       AllowFallBack := AllowGongFallBack, AllowLooseSuffixMatch:=false));
 
   shared DailyUtil :=
-    IF(include_dailies AND ~modAccess.isUtility() and ~is_knowx and glb_ok /* glb_ok is redundant here, because the underlying attributes apply glb. But it should perform better, since we avoid an additional call. */,
+    IF(include_dailies AND ~modAccess.isUtility() and ~is_knowx and modAccess.isValidGLB() /* glb-ok is redundant here, because the underlying attributes apply glb. But it should perform better, since we avoid an additional call. */,
        IF(DoSearch,
           doxie.Fetch_Utility_Daily(d,modAccess,allow_wildcard,daily_autokey_skipset,ApplyBpsFilter),
           Doxie_Raw.Util_Daily_Raw(d, modAccess)));

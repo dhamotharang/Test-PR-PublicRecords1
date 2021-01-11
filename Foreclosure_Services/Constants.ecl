@@ -1,16 +1,16 @@
-﻿IMPORT property;
+﻿IMPORT dx_property;
 export Constants(string filedate='') := module
 	export str_autokeyname := '~thor_data400::key::foreclosure::autokey::qa::';
 	export ak_keyname	:= '~thor_data400::key::foreclosure::autokey::@version@::';
 	export ak_logical	:= '~thor_data400::key::foreclosure::' + filedate + '::autokey::';
-	export ak_dataset	:=  Property.File_Foreclosure_Autokey;
+	export ak_dataset	:=  dataset([],dx_property.Layouts.i_autokey);
 	export ak_skipSet	:= ['P','Q','F'];
 	export ak_typeStr	:= 'AK';
 
 	export str_nod_autokeyname	:= '~thor_data400::key::nod::autokey::qa::';
 	export ak_nod_keyname				:= '~thor_data400::key::nod::autokey::@version@::';
 	export ak_nod_logical				:= '~thor_data400::key::nod::' + filedate + '::autokey::';
-	export ak_nod_dataset				:=  Property.File_NOD_Autokey;
+	export ak_nod_dataset				:=  dataset([],dx_property.Layouts.i_autokey);
 	export ak_nod_skipSet				:= ['P','Q','F'];
 	export ak_nod_typeStr				:= 'AK';
 	

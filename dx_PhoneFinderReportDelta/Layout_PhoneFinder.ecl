@@ -2,6 +2,7 @@
 
 	//DF-23251: Add 'dx_' Prefix to Index Definitions
 	//DF-23827: Update Transaction File
+	//DF-28255: Add 'Source' File
 	
 	///////////////////////////////////
 	//Transactions/////////////////////
@@ -158,6 +159,31 @@
 			string60	user_id;
 			string8 	transaction_date;
 			string16	transaction_id;	
+	end;
+	
+	///////////////////////////////////
+	//Sources//////////////////////////
+	///////////////////////////////////
+	
+	export Sources_Main := record
+			string8		date_file_loaded;
+			unsigned8 auto_id;
+			string16  transaction_id;
+			string15  phonenumber;
+			unsigned8 lexid;
+			integer5  phone_id;
+			integer5  identity_id;
+			integer5  sequence_number;
+			string60  source_type;
+			string60	category;
+			integer5  totalsourcecount;
+			string3		source;
+			string8		date_added;
+			string6		time_added;
+	end;
+	
+	export Sources_Index := record
+			Sources_Main-[date_file_loaded, auto_id];
 	end;
 	
 END;

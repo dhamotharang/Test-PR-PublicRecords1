@@ -5,9 +5,9 @@
 								 Records_to_Run,
 								 GLBA, 
 								 DPPA,
-								 DataPermissionMask,
-								 DataRestrictionMask,
-								 LexIdSourceOptout,
+								 DPM,
+								 DRM,
+								 LexIdSO,
 								 TransactionId,
 								 BatchUID,
 								 GCID, 
@@ -22,7 +22,7 @@
 								 Output_SALT_Profile,
 								 Exclude_Consumer_Attributes,
 								 AllowedSources,
-								 OverrideExperianRestriction,
+								 OverrideExperianRestriction_par,
 								 AllowedSourcesDataset_List,
 								 ExcludeSourcesDataset_List,
 								 IsMarketing,
@@ -223,11 +223,11 @@ Settings := MODULE(PublicRecords_KEL.Interface_BWR_Settings)
 	EXPORT BOOLEAN isFCRA := FALSE;
 	EXPORT STRING ArchiveDate := historyDate;
 	EXPORT STRING InputFileName := InputFile_LogicalName;
-	EXPORT STRING Data_Restriction_Mask := DataRestrictionMask;
-	EXPORT STRING Data_Permission_Mask := DataPermissionMask;
+	EXPORT STRING Data_Restriction_Mask := DRM;
+	EXPORT STRING Data_Permission_Mask := DPM;
 	EXPORT UNSIGNED GLBAPurpose := GLBA;
 	EXPORT UNSIGNED DPPAPurpose := DPPA;
-	EXPORT BOOLEAN Override_Experian_Restriction := OverrideExperianRestriction;
+	EXPORT BOOLEAN Override_Experian_Restriction := OverrideExperianRestriction_par;
 	EXPORT STRING Allowed_Sources := AllowedSources; // Controls inclusion of DNBDMI data
 	EXPORT UNSIGNED LexIDThreshold := Score_threshold;
 	EXPORT UNSIGNED BusinessLexIDThreshold := BIPAppend_Score_Threshold;
@@ -270,7 +270,7 @@ soapLayout trans (inDataReadyDist le):= TRANSFORM
 	SELF.BIPAppendPrimForce := Settings.BusinessLexIDPrimForce;
 	SELF.BIPAppendReAppend := Settings.BusinessLexIDReAppend;
 	SELF.BIPAppendIncludeAuthRep := Settings.BusinessLexIDIncludeAuthRep;
-	SELF.LexIdSourceOptout := LexIdSourceOptout;
+	SELF.LexIdSourceOptout := LexIdSO;
 	SELF._TransactionId := TransactionId;
 	SELF._BatchUID := BatchUID;
 	SELF._GCID := GCID;	
@@ -301,7 +301,7 @@ ResultSet :=
 //OUTPUT(CHOOSEN(inDataReady, eyeball), NAMED('Raw_input'));
 //OUTPUT( ResultSet, NAMED('Results') );
 
-Settings_Dataset := PublicRecords_KEL.ECL_Functions.fn_make_settings_dataset(Settings);
+Settings_Dataset := Kel_Shell_QA_UI.fn_make_settings_dataset(Settings);
 
 
 Passed := ResultSet(TRIM(Results.B_InpAcct) <> '');
@@ -351,7 +351,7 @@ Passed_Business :=
 			SELF := []),
 		INNER, KEEP(1));
       
-result1:=STD.System.Email.SendEmail(email_list, 'KEL SHELL QA UI run job',  'Your WUID ' + workunit + ' has just kicked-off!');
+result1:=STD.System.Email.SendEmail(email_list, 'KAT Notification',  'Your job has kicked-off. Your WUID is ' + workunit + '.');
 
 result2:=output(Passed_Business,named('Filtered_output'));
 
@@ -362,13 +362,13 @@ result3:=Kel_Shell_QA_UI.Output_Distribution_Report_Module(unique_id, Passed_Bus
 result4:=Kel_Shell_QA.descriptive_Stats_Report(unique_id, Passed_Business);
 
 Settings_Dataset_updated:= Settings_Dataset +
-                           DATASET([{'AllowedSources: ' + Kel_Shell_QA_UI.SetToString(AllowedSourcesDataset_List)},
-													  {'ExcludeSources: ' + Kel_Shell_QA_UI.SetToString(ExcludeSourcesDataset_List)}
+                           DATASET([{'AllowedSources: ' , Kel_Shell_QA_UI.SetToString(AllowedSourcesDataset_List)},
+													  {'ExcludeSources: ' , Kel_Shell_QA_UI.SetToString(ExcludeSourcesDataset_List)}
 		                       ],{RECORDOF(Settings_Dataset)});
 
 result5:=OUTPUT(Settings_Dataset_updated, NAMED('Attributes_Settings'));
 
-result6:=STD.System.Email.SendEmail(email_list, 'KEL SHELL QA UI run job',  'Your WUID ' + workunit + ' has completed!');
+result6:=STD.System.Email.SendEmail(email_list, 'KAT Notification',  'Your job has completed. Your WUID is ' + workunit + ' .' + '\n You can see the results here. \n http://alawqpnc018.risk.regn.net/KAT/ ');
 
 seq:=sequential(result1, result2, result3, result4, result5, result6);
 

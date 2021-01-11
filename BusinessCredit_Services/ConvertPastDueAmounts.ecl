@@ -1,4 +1,4 @@
-﻿IMPORT Business_Credit, BusinessCredit_Services;
+﻿IMPORT Business_Credit, BusinessCredit_Services, STD;
 
 /* 
 See RABS-226 for more details
@@ -25,36 +25,46 @@ EXPORT convertPastDueAmounts() :=
   MODULE
     
     // since there are so many numbers, I'm choosing for readability to not create any constants.
-    SHARED getPymtInterval (STRING pmtInt) :=  
-      MAP(pmtInt = 'M' OR  // monthly
-          pmtInt = '' OR   // blank has been defined by product as monthly as well as the next two
-          pmtInt = 'IM' OR // Irregular - more often than monthly
-          pmtInt = 'IL'    // Irregular - less often than monthly 
+    // NOTE: Since monthly is by far the most used interval, leaving the check for those variations up front  
+    //       so we can immediately jump out of the map for approx 97% of the cases.
+    SHARED getPymtInterval (STRING pmtInt) :=
+    FUNCTION
+      pmtIntUC := STD.str.ToUpperCase(pmtInt);
+      RETURN
+      MAP(pmtIntUC = 'M' OR  // monthly
+          pmtIntUC = '' OR   // blank has been defined by product as monthly as well as the next two
+          pmtIntUC = 'IM' OR // Irregular - more often than monthly
+          pmtIntUC = 'IL' OR // Irregular - less often than monthly 
+          pmtIntUC = 'SP'    // Single Payment - Scoring handles SP as a monthly payment
             => 30,
-          pmtInt = 'A'  // annual
+          pmtIntUC = 'A'     // annual
             => 365,
-          pmtInt = 'SA' // semi-annual
+          pmtIntUC = 'SA'    // semi-annual
             => 182,
-          pmtInt = 'Q' OR  // quartly
-          pmtInt = 'S' OR  // Seasonal-Non-Agricultural 
-          pmtInt = 'SF'    // Seasonal - Agricultural 
+          pmtIntUC = 'Q' OR  // quartly
+          pmtIntUC = 'S' OR  // Seasonal-Non-Agricultural 
+          pmtIntUC = 'SF'    // Seasonal - Agricultural 
             => 90,
-          pmtInt = 'BM'   //  Bi-Monthly 
+          pmtIntUC = 'BM'   //  Bi-Monthly 
             => 60,
-          pmtInt = 'SM'   // Semi-Monthly 
+          pmtIntUC = 'SM'   // Semi-Monthly 
             => 15,
-          pmtInt = 'BW'   // Bi-Weekly
+          pmtIntUC = 'BW'   // Bi-Weekly
             => 14,
-          pmtInt = 'W'    // Weekly
+          pmtIntUC = 'W'    // Weekly
             => 7,
-               1);  // /*  SP/Single Payment & D/Daily */
-
+          pmtIntUC = 'D'    // Daily
+            => 1,         
+               30);   // making the default = 30 for cases where the payment interval is either new and not coded 
+                      // for, blank or it's an unknown/fat fingered code. Buckets in these instances will remain as input.
+    END;
+    
     SHARED getHighestDaysBucket(UNSIGNED daysDelinquentIn) := 
       IF(daysDelinquentIn % 30 = 0,
          daysDelinquentIn DIV 30,
          (daysDelinquentIn DIV 30) + 1 );
 
-    SHARED gethighestPaymentBucket(UNSIGNED daysDelinquentIn, INTEGER pmtIntDaysIn) := 
+    SHARED gethighestPaymentBucket(UNSIGNED daysDelinquentIn, UNSIGNED pmtIntDaysIn) := 
       IF(daysDelinquentIn %  pmtIntDaysIn = 0,
          daysDelinquentIn DIV pmtIntDaysIn,
          (daysDelinquentIn DIV pmtIntDaysIn) + 1);
@@ -72,18 +82,24 @@ EXPORT convertPastDueAmounts() :=
     // For BiWeekly (14 day interval) and Weekly (7 day interval), a decision was made by product to consider 
     // four weeks a "month". Knowing and accepting the conversion would not be 100% accurate. 
     // BiWeekly - the first two buckets convert to bucket 1 (1-30 days)
-    SHARED getIntervalDaysDelinquent(UNSIGNED dayDel, INTEGER HiPmtBuck, INTEGER pmtIntDays) := dayDel - ((HiPmtBuck - 1) * pmtIntDays);
+    SHARED getIntervalDaysDelinquent(UNSIGNED dayDel, UNSIGNED HiPmtBuck, UNSIGNED pmtIntDays) := dayDel - ((HiPmtBuck - 1) * pmtIntDays);
        
     
     EXPORT checkConversionNeeded (RECORDOF(Business_Credit.key_tradeline()) rw_in, STRING LayoutChangeDate) := 
       getPymtInterval (rw_in.payment_interval) != 30 AND
-      (UNSIGNED)rw_in.past_due_amount != 0 AND
-      (UNSIGNED)rw_in.process_date >= (UNSIGNED)LayoutChangeDate;
+      (UNSIGNED)rw_in.process_date >= (UNSIGNED)LayoutChangeDate AND
+      (TRIM(rw_in.Past_Due_Aging_Amount_Bucket_1, LEFT, RIGHT) != '' OR   // If any bucket has even a zero, all buckets need to
+       TRIM(rw_in.Past_Due_Aging_Amount_Bucket_2, LEFT, RIGHT) != '' OR   // be converted. Only all blank buckets are not converted (unless the previous two conditions apply)
+       TRIM(rw_in.Past_Due_Aging_Amount_Bucket_3, LEFT, RIGHT) != '' OR   // (unless either of the previous two conditions are FALSE)
+       TRIM(rw_in.Past_Due_Aging_Amount_Bucket_4, LEFT, RIGHT) != '' OR 
+       TRIM(rw_in.Past_Due_Aging_Amount_Bucket_5, LEFT, RIGHT) != '' OR 
+       TRIM(rw_in.Past_Due_Aging_Amount_Bucket_6, LEFT, RIGHT) != '' OR 
+       TRIM(rw_in.Past_Due_Aging_Amount_Bucket_7, LEFT, RIGHT) != ''    );
     
     EXPORT convertBucket1(RECORDOF(Business_Credit.key_tradeline()) rw_in) := FUNCTION
       daysDelinquent := (UNSIGNED) rw_in.DBT_V5;
       highestDaysBucket := getHighestDaysBucket(daysDelinquent);        
-      pmtIntervalDays := getPymtInterval (rw_in.payment_interval);
+      pmtIntervalDays := getPymtInterval(rw_in.payment_interval);
       highestPaymentBucket := gethighestPaymentBucket(daysDelinquent,pmtIntervalDays);
       IntervalDaysDelinquent := getIntervalDaysDelinquent(daysDelinquent,highestPaymentBucket,pmtIntervalDays);
 
@@ -93,31 +109,54 @@ EXPORT convertPastDueAmounts() :=
                    => rw_in.Past_Due_Aging_Amount_Bucket_1,
                  pmtIntervalDays = 15 OR
                  pmtIntervalDays = 14
-                   => (STRING12)((UNSIGNED)rw_in.Past_Due_Aging_Amount_Bucket_1 +
-                                 (UNSIGNED)rw_in.Past_Due_Aging_Amount_Bucket_2),
+                   => IF((TRIM(rw_in.Past_Due_Aging_Amount_Bucket_1, LEFT, RIGHT) = '' AND
+                          TRIM(rw_in.Past_Due_Aging_Amount_Bucket_2, LEFT, RIGHT) = ''),
+                         '',
+                         (STRING12)((INTEGER)rw_in.Past_Due_Aging_Amount_Bucket_1 +
+                                    (INTEGER)rw_in.Past_Due_Aging_Amount_Bucket_2)),
                  pmtIntervalDays = 7
-                   => (STRING12)((UNSIGNED)rw_in.Past_Due_Aging_Amount_Bucket_1 +
-                                 (UNSIGNED)rw_in.Past_Due_Aging_Amount_Bucket_2 +
-                                 (UNSIGNED)rw_in.Past_Due_Aging_Amount_Bucket_3 +
-                                 (UNSIGNED)rw_in.Past_Due_Aging_Amount_Bucket_4),
+                   => IF((TRIM(rw_in.Past_Due_Aging_Amount_Bucket_1, LEFT, RIGHT) = '' AND
+                          TRIM(rw_in.Past_Due_Aging_Amount_Bucket_2, LEFT, RIGHT) = '' AND
+                          TRIM(rw_in.Past_Due_Aging_Amount_Bucket_3, LEFT, RIGHT) = '' AND
+                          TRIM(rw_in.Past_Due_Aging_Amount_Bucket_4, LEFT, RIGHT) = '' ),
+                         '',
+                         (STRING12)((INTEGER)rw_in.Past_Due_Aging_Amount_Bucket_1 +
+                                    (INTEGER)rw_in.Past_Due_Aging_Amount_Bucket_2 +
+                                    (INTEGER)rw_in.Past_Due_Aging_Amount_Bucket_3 +
+                                    (INTEGER)rw_in.Past_Due_Aging_Amount_Bucket_4)),
                  pmtIntervalDays = 1 AND
                  highestDaysBucket  > 1 
-                   => (STRING12)((UNSIGNED)rw_in.Past_Due_Aging_Amount_Bucket_1 +
-                                 (UNSIGNED)rw_in.Past_Due_Aging_Amount_Bucket_2 +
-                                 (UNSIGNED)rw_in.Past_Due_Aging_Amount_Bucket_3 +
-                                 (UNSIGNED)rw_in.Past_Due_Aging_Amount_Bucket_4 +
-                                 (UNSIGNED)rw_in.Past_Due_Aging_Amount_Bucket_5 +
-                                 (UNSIGNED)rw_in.Past_Due_Aging_Amount_Bucket_6),
+                   => IF((TRIM(rw_in.Past_Due_Aging_Amount_Bucket_1, LEFT, RIGHT) = '' AND
+                          TRIM(rw_in.Past_Due_Aging_Amount_Bucket_2, LEFT, RIGHT) = '' AND
+                          TRIM(rw_in.Past_Due_Aging_Amount_Bucket_3, LEFT, RIGHT) = '' AND
+                          TRIM(rw_in.Past_Due_Aging_Amount_Bucket_4, LEFT, RIGHT) = '' AND
+                          TRIM(rw_in.Past_Due_Aging_Amount_Bucket_5, LEFT, RIGHT) = '' AND
+                          TRIM(rw_in.Past_Due_Aging_Amount_Bucket_6, LEFT, RIGHT) = '' ),
+                         '',        
+                         (STRING12)((INTEGER)rw_in.Past_Due_Aging_Amount_Bucket_1 +
+                                    (INTEGER)rw_in.Past_Due_Aging_Amount_Bucket_2 +
+                                    (INTEGER)rw_in.Past_Due_Aging_Amount_Bucket_3 +
+                                    (INTEGER)rw_in.Past_Due_Aging_Amount_Bucket_4 +
+                                    (INTEGER)rw_in.Past_Due_Aging_Amount_Bucket_5 +
+                                    (INTEGER)rw_in.Past_Due_Aging_Amount_Bucket_6)),
                  pmtIntervalDays = 1 AND
                  highestDaysBucket = 1
-                   => (STRING12)((UNSIGNED)rw_in.Past_Due_Aging_Amount_Bucket_1 +
-                                 (UNSIGNED)rw_in.Past_Due_Aging_Amount_Bucket_2 +
-                                 (UNSIGNED)rw_in.Past_Due_Aging_Amount_Bucket_3 +
-                                 (UNSIGNED)rw_in.Past_Due_Aging_Amount_Bucket_4 +
-                                 (UNSIGNED)rw_in.Past_Due_Aging_Amount_Bucket_5 +
-                                 (UNSIGNED)rw_in.Past_Due_Aging_Amount_Bucket_6 +
-                                 (UNSIGNED)rw_in.Past_Due_Aging_Amount_Bucket_7),
-                      '0'
+                   => IF((TRIM(rw_in.Past_Due_Aging_Amount_Bucket_1, LEFT, RIGHT) = '' AND
+                          TRIM(rw_in.Past_Due_Aging_Amount_Bucket_2, LEFT, RIGHT) = '' AND
+                          TRIM(rw_in.Past_Due_Aging_Amount_Bucket_3, LEFT, RIGHT) = '' AND
+                          TRIM(rw_in.Past_Due_Aging_Amount_Bucket_4, LEFT, RIGHT) = '' AND
+                          TRIM(rw_in.Past_Due_Aging_Amount_Bucket_5, LEFT, RIGHT) = '' AND
+                          TRIM(rw_in.Past_Due_Aging_Amount_Bucket_6, LEFT, RIGHT) = '' AND
+                          TRIM(rw_in.Past_Due_Aging_Amount_Bucket_7, LEFT, RIGHT) = '' ),
+                         '',
+                         (STRING12)((INTEGER)rw_in.Past_Due_Aging_Amount_Bucket_1 +
+                                    (INTEGER)rw_in.Past_Due_Aging_Amount_Bucket_2 +
+                                    (INTEGER)rw_in.Past_Due_Aging_Amount_Bucket_3 +
+                                    (INTEGER)rw_in.Past_Due_Aging_Amount_Bucket_4 +
+                                    (INTEGER)rw_in.Past_Due_Aging_Amount_Bucket_5 +
+                                    (INTEGER)rw_in.Past_Due_Aging_Amount_Bucket_6 +
+                                    (INTEGER)rw_in.Past_Due_Aging_Amount_Bucket_7)),
+                        '' 
                 );
           END; 
 
@@ -125,8 +164,6 @@ EXPORT convertPastDueAmounts() :=
       daysDelinquent := (UNSIGNED) rw_in.DBT_V5;
       highestDaysBucket := getHighestDaysBucket(daysDelinquent);        
       pmtIntervalDays := getPymtInterval (rw_in.payment_interval);
-      // get the "original" number of days late (for when an account is more than one year old)
-      yrOneDaysLate := daysDelinquent % 365;
       highestPaymentBucket := gethighestPaymentBucket(daysDelinquent,pmtIntervalDays);
       IntervalDaysDelinquent := getIntervalDaysDelinquent(daysDelinquent,highestPaymentBucket,pmtIntervalDays);
 
@@ -137,16 +174,30 @@ EXPORT convertPastDueAmounts() :=
                    => rw_in.Past_Due_Aging_Amount_Bucket_1,
                  pmtIntervalDays = 15 OR
                  pmtIntervalDays = 14
-                   => (STRING12)((UNSIGNED)rw_in.Past_Due_Aging_Amount_Bucket_3 +
-                                 (UNSIGNED)rw_in.Past_Due_Aging_Amount_Bucket_4),
+                   => IF((TRIM(rw_in.Past_Due_Aging_Amount_Bucket_3, LEFT, RIGHT) = '' AND
+                          TRIM(rw_in.Past_Due_Aging_Amount_Bucket_4, LEFT, RIGHT) = '' ),
+                         '',
+                         (STRING12)((INTEGER)rw_in.Past_Due_Aging_Amount_Bucket_3 +
+                                    (INTEGER)rw_in.Past_Due_Aging_Amount_Bucket_4)),
+                 pmtIntervalDays = 7  AND daysDelinquent < 61
+                   => IF((TRIM(rw_in.Past_Due_Aging_Amount_Bucket_5, LEFT, RIGHT) = '' AND 
+                          TRIM(rw_in.Past_Due_Aging_Amount_Bucket_6, LEFT, RIGHT) = '' AND 
+                          TRIM(rw_in.Past_Due_Aging_Amount_Bucket_7, LEFT, RIGHT) = '' ), 
+                         '',       
+                         (STRING12)((INTEGER)rw_in.Past_Due_Aging_Amount_Bucket_5 + 
+                                    (INTEGER)rw_in.Past_Due_Aging_Amount_Bucket_6 + 
+                                    (INTEGER)rw_in.Past_Due_Aging_Amount_Bucket_7)), 
                  pmtIntervalDays = 7 
-                   => (STRING12)((UNSIGNED)rw_in.Past_Due_Aging_Amount_Bucket_5 +
-                                 (UNSIGNED)rw_in.Past_Due_Aging_Amount_Bucket_6),
+                   => IF((TRIM(rw_in.Past_Due_Aging_Amount_Bucket_5, LEFT, RIGHT) = '' AND
+                          TRIM(rw_in.Past_Due_Aging_Amount_Bucket_6, LEFT, RIGHT) = '' ),
+                          '',       
+                          (STRING12)((INTEGER)rw_in.Past_Due_Aging_Amount_Bucket_5 +
+                                     (INTEGER)rw_in.Past_Due_Aging_Amount_Bucket_6)),
                  pmtIntervalDays = 1 AND
-                 yrOneDaysLate > 30 AND
-                 yrOneDaysLate <= 60
+                 daysDelinquent > 30 AND
+                 daysDelinquent <= 60
                    => rw_in.Past_Due_Aging_Amount_Bucket_7,
-                      '0'
+                      ''
                 );
       END;
 
@@ -169,25 +220,25 @@ EXPORT convertPastDueAmounts() :=
                  pmtIntervalDays = 14 AND
                  daysDelinquent > 84 AND
                  daysDelinquent <= 90
-                   => (STRING12)((UNSIGNED)rw_in.Past_Due_Aging_Amount_Bucket_5 +
-                                 (UNSIGNED)rw_in.Past_Due_Aging_Amount_Bucket_6 +
-                                 (UNSIGNED)rw_in.Past_Due_Aging_Amount_Bucket_7),
+                   => IF((TRIM(rw_in.Past_Due_Aging_Amount_Bucket_5, LEFT, RIGHT) = '' AND
+                          TRIM(rw_in.Past_Due_Aging_Amount_Bucket_6, LEFT, RIGHT) = '' AND
+                          TRIM(rw_in.Past_Due_Aging_Amount_Bucket_7, LEFT, RIGHT) = '' ),
+                         '',       
+                         (STRING12)((INTEGER)rw_in.Past_Due_Aging_Amount_Bucket_5 +
+                                    (INTEGER)rw_in.Past_Due_Aging_Amount_Bucket_6 +
+                                    (INTEGER)rw_in.Past_Due_Aging_Amount_Bucket_7)),
                  pmtIntervalDays = 15 OR
                  pmtIntervalDays = 14 
-                   => (STRING12)((UNSIGNED)rw_in.Past_Due_Aging_Amount_Bucket_5 +
-                                 (UNSIGNED)rw_in.Past_Due_Aging_Amount_Bucket_6),
-                 // The following check is for an error condition in the SBFE data.  
-                 // Where bucket 7 is populated in the input, but shouldn't be because
-                 // the daysDelinquent is less than the definition for payment interval 
-                 // /bucket seven.
-                 pmtIntervalDays = 7  AND
-                 daysDelinquent < 61
-                   =>  rw_in.Past_Due_Aging_Amount_Bucket_7,
+                   => IF((TRIM(rw_in.Past_Due_Aging_Amount_Bucket_5, LEFT, RIGHT) = '' AND
+                          TRIM(rw_in.Past_Due_Aging_Amount_Bucket_6, LEFT, RIGHT) = '' ),
+                          '',       
+                          (STRING12)((INTEGER)rw_in.Past_Due_Aging_Amount_Bucket_5 +
+                                     (INTEGER)rw_in.Past_Due_Aging_Amount_Bucket_6)),
                  (pmtIntervalDays = 7 OR
                   pmtIntervalDays = 1) AND
                  highestDaysBucket = 3
                    => rw_in.Past_Due_Aging_Amount_Bucket_7,
-                        '0'
+                        ''
                 );
       END;
 
@@ -196,8 +247,6 @@ EXPORT convertPastDueAmounts() :=
       highestDaysBucket := getHighestDaysBucket(daysDelinquent);
       pmtIntervalDays := getPymtInterval (rw_in.payment_interval);
       highestPaymentBucket := gethighestPaymentBucket(daysDelinquent,pmtIntervalDays);
-      // get the "original" number of days late (for when an account is more than one year old)
-      yrOneDaysLate := daysDelinquent % 365;
       IntervalDaysDelinquent := getIntervalDaysDelinquent(daysDelinquent,highestPaymentBucket,pmtIntervalDays);
       RETURN MAP(pmtIntervalDays > 90 AND 
                  (highestDaysBucket = 4 OR
@@ -217,14 +266,14 @@ EXPORT convertPastDueAmounts() :=
                   daysDelinquent < 85) OR
                  (pmtIntervalDays = 15 AND
                   daysDelinquent < 91)
-                   => rw_in.Past_Due_Aging_Amount_Bucket_7,
+                   => rw_in.Past_Due_Aging_Amount_Bucket_7, 
                  (pmtIntervalDays = 15 OR
                   pmtIntervalDays = 14 OR
                   pmtIntervalDays = 7 OR
                   pmtIntervalDays = 1) AND
                  highestDaysBucket = 4
                    =>  rw_in.Past_Due_Aging_Amount_Bucket_7,
-                        '0'
+                        ''
                 );
       END;
 
@@ -236,15 +285,18 @@ EXPORT convertPastDueAmounts() :=
       // get the "original" number of days late (for when an account is more than one year old)
       yrOneDaysLate := daysDelinquent % 365;
       IntervalDaysDelinquent := getIntervalDaysDelinquent(daysDelinquent,highestPaymentBucket,pmtIntervalDays);
-      RETURN MAP(pmtIntervalDays > 182 AND 
-                 highestDaysBucket = 5  
-                   => rw_in.Past_Due_Aging_Amount_Bucket_1,
-                 pmtIntervalDays = 182 AND 
+      RETURN MAP((
+                  pmtIntervalDays > 182 AND 
+                  highestDaysBucket = 5 
+                  ) OR
+                 (
+                  pmtIntervalDays = 182 AND 
                  ((yrOneDaysLate > 120 AND
                    yrOneDaysLate <= 150) OR
                   (yrOneDaysLate > 182 AND
                    IntervalDaysDelinquent > 120 AND
-                   IntervalDaysDelinquent <= 150)) 
+                   IntervalDaysDelinquent <= 150))
+                 )
                   => rw_in.Past_Due_Aging_Amount_Bucket_1,
                  pmtIntervalDays = 90 AND
                  IntervalDaysDelinquent > 30 AND
@@ -259,7 +311,7 @@ EXPORT convertPastDueAmounts() :=
                   pmtIntervalDays = 1) AND
                  highestDaysBucket = 5
                     =>  rw_in.Past_Due_Aging_Amount_Bucket_7,
-                        '0'
+                        ''
                 );
       END;
 
@@ -269,15 +321,18 @@ EXPORT convertPastDueAmounts() :=
       pmtIntervalDays := getPymtInterval (rw_in.payment_interval);
       highestPaymentBucket := gethighestPaymentBucket(daysDelinquent,pmtIntervalDays);
       IntervalDaysDelinquent := getIntervalDaysDelinquent(daysDelinquent,highestPaymentBucket,pmtIntervalDays);
-      RETURN MAP(pmtIntervalDays = 365 AND 
-                 (highestDaysBucket = 6 OR
-                  (daysDelinquent > 365 AND
-                   IntervalDaysDelinquent > 150 AND
-                   IntervalDaysDelinquent <= 180))
-                    => rw_in.Past_Due_Aging_Amount_Bucket_1,
-                 pmtIntervalDays = 182 AND
-                 IntervalDaysDelinquent > 150 AND  // remaining days in pmt bucket 1 that falls in days bucket 6
-                 IntervalDaysDelinquent < 181   
+      RETURN MAP((
+                  pmtIntervalDays = 365 AND 
+                  (highestDaysBucket = 6 OR
+                   (daysDelinquent > 365 AND
+                    IntervalDaysDelinquent > 150 AND
+                    IntervalDaysDelinquent <= 180))
+                 ) OR
+                ( 
+                  pmtIntervalDays = 182 AND
+                  IntervalDaysDelinquent > 150 AND  // remaining days in pmt bucket 1 that falls in days bucket 6
+                  IntervalDaysDelinquent < 181 
+                )
                    => rw_in.Past_Due_Aging_Amount_Bucket_1,
                   pmtIntervalDays = 90 AND
                  ((daysDelinquent > 150 AND
@@ -294,7 +349,7 @@ EXPORT convertPastDueAmounts() :=
                   pmtIntervalDays = 1) AND
                  highestDaysBucket = 6
                    =>  rw_in.Past_Due_Aging_Amount_Bucket_7,
-                       '0'
+                       ''
                 );
       END;
 
@@ -309,55 +364,96 @@ EXPORT convertPastDueAmounts() :=
                    daysDelinquent <= 365) OR
                   (daysDelinquent > 365 AND
                    IntervalDaysDelinquent > 180))
-                   => (STRING12)((UNSIGNED)rw_in.Past_Due_Aging_Amount_Bucket_1 +
-                                 (UNSIGNED)rw_in.Past_Due_Aging_Amount_Bucket_2 +
-                                 (UNSIGNED)rw_in.Past_Due_Aging_Amount_Bucket_3 +
-                                 (UNSIGNED)rw_in.Past_Due_Aging_Amount_Bucket_4 +
-                                 (UNSIGNED)rw_in.Past_Due_Aging_Amount_Bucket_5 +
-                                 (UNSIGNED)rw_in.Past_Due_Aging_Amount_Bucket_6 +
-                                 (UNSIGNED)rw_in.Past_Due_Aging_Amount_Bucket_7),
+                   => IF((TRIM(rw_in.Past_Due_Aging_Amount_Bucket_1, LEFT, RIGHT) = '' AND
+                          TRIM(rw_in.Past_Due_Aging_Amount_Bucket_2, LEFT, RIGHT) = '' AND
+                          TRIM(rw_in.Past_Due_Aging_Amount_Bucket_3, LEFT, RIGHT) = '' AND
+                          TRIM(rw_in.Past_Due_Aging_Amount_Bucket_4, LEFT, RIGHT) = '' AND
+                          TRIM(rw_in.Past_Due_Aging_Amount_Bucket_5, LEFT, RIGHT) = '' AND
+                          TRIM(rw_in.Past_Due_Aging_Amount_Bucket_6, LEFT, RIGHT) = '' AND
+                          TRIM(rw_in.Past_Due_Aging_Amount_Bucket_7, LEFT, RIGHT) = '' ),
+                         '',
+                         (STRING12)((INTEGER)rw_in.Past_Due_Aging_Amount_Bucket_1 +
+                                    (INTEGER)rw_in.Past_Due_Aging_Amount_Bucket_2 +
+                                    (INTEGER)rw_in.Past_Due_Aging_Amount_Bucket_3 +
+                                    (INTEGER)rw_in.Past_Due_Aging_Amount_Bucket_4 +
+                                    (INTEGER)rw_in.Past_Due_Aging_Amount_Bucket_5 +
+                                    (INTEGER)rw_in.Past_Due_Aging_Amount_Bucket_6 +
+                                    (INTEGER)rw_in.Past_Due_Aging_Amount_Bucket_7)),
                  pmtIntervalDays = 365
-                   => (STRING12)((UNSIGNED)rw_in.Past_Due_Aging_Amount_Bucket_2 +
-                                 (UNSIGNED)rw_in.Past_Due_Aging_Amount_Bucket_3 +
-                                 (UNSIGNED)rw_in.Past_Due_Aging_Amount_Bucket_4 +
-                                 (UNSIGNED)rw_in.Past_Due_Aging_Amount_Bucket_5 +
-                                 (UNSIGNED)rw_in.Past_Due_Aging_Amount_Bucket_6 +
-                                 (UNSIGNED)rw_in.Past_Due_Aging_Amount_Bucket_7),
+                   => IF((TRIM(rw_in.Past_Due_Aging_Amount_Bucket_2, LEFT, RIGHT) = '' AND
+                          TRIM(rw_in.Past_Due_Aging_Amount_Bucket_3, LEFT, RIGHT) = '' AND
+                          TRIM(rw_in.Past_Due_Aging_Amount_Bucket_4, LEFT, RIGHT) = '' AND
+                          TRIM(rw_in.Past_Due_Aging_Amount_Bucket_5, LEFT, RIGHT) = '' AND
+                          TRIM(rw_in.Past_Due_Aging_Amount_Bucket_6, LEFT, RIGHT) = '' AND
+                          TRIM(rw_in.Past_Due_Aging_Amount_Bucket_7, LEFT, RIGHT) = '' ),
+                         '',
+                         (STRING12)((INTEGER)rw_in.Past_Due_Aging_Amount_Bucket_2 +
+                                    (INTEGER)rw_in.Past_Due_Aging_Amount_Bucket_3 +
+                                    (INTEGER)rw_in.Past_Due_Aging_Amount_Bucket_4 +
+                                    (INTEGER)rw_in.Past_Due_Aging_Amount_Bucket_5 +
+                                    (INTEGER)rw_in.Past_Due_Aging_Amount_Bucket_6 +
+                                    (INTEGER)rw_in.Past_Due_Aging_Amount_Bucket_7)),
                  pmtIntervalDays = 182 AND
                  IntervalDaysDelinquent > 180 
-                   => (STRING12)((UNSIGNED)rw_in.Past_Due_Aging_Amount_Bucket_1 +
-                                 (UNSIGNED)rw_in.Past_Due_Aging_Amount_Bucket_2 +
-                                 (UNSIGNED)rw_in.Past_Due_Aging_Amount_Bucket_3 +
-                                 (UNSIGNED)rw_in.Past_Due_Aging_Amount_Bucket_4 +
-                                 (UNSIGNED)rw_in.Past_Due_Aging_Amount_Bucket_5 +
-                                 (UNSIGNED)rw_in.Past_Due_Aging_Amount_Bucket_6 +
-                                 (UNSIGNED)rw_in.Past_Due_Aging_Amount_Bucket_7),
+                   => IF((TRIM(rw_in.Past_Due_Aging_Amount_Bucket_1, LEFT, RIGHT) = '' AND
+                          TRIM(rw_in.Past_Due_Aging_Amount_Bucket_2, LEFT, RIGHT) = '' AND
+                          TRIM(rw_in.Past_Due_Aging_Amount_Bucket_3, LEFT, RIGHT) = '' AND
+                          TRIM(rw_in.Past_Due_Aging_Amount_Bucket_4, LEFT, RIGHT) = '' AND
+                          TRIM(rw_in.Past_Due_Aging_Amount_Bucket_5, LEFT, RIGHT) = '' AND
+                          TRIM(rw_in.Past_Due_Aging_Amount_Bucket_6, LEFT, RIGHT) = '' AND
+                          TRIM(rw_in.Past_Due_Aging_Amount_Bucket_7, LEFT, RIGHT) = '' ),
+                         '',
+                         (STRING12)((INTEGER)rw_in.Past_Due_Aging_Amount_Bucket_1 +
+                                    (INTEGER)rw_in.Past_Due_Aging_Amount_Bucket_2 +
+                                    (INTEGER)rw_in.Past_Due_Aging_Amount_Bucket_3 +
+                                    (INTEGER)rw_in.Past_Due_Aging_Amount_Bucket_4 +
+                                    (INTEGER)rw_in.Past_Due_Aging_Amount_Bucket_5 +
+                                    (INTEGER)rw_in.Past_Due_Aging_Amount_Bucket_6 +
+                                    (INTEGER)rw_in.Past_Due_Aging_Amount_Bucket_7)),
                  pmtIntervalDays = 182 AND
                  IntervalDaysDelinquent <= 180
-                   => (STRING12)((UNSIGNED)rw_in.Past_Due_Aging_Amount_Bucket_2 +
-                                 (UNSIGNED)rw_in.Past_Due_Aging_Amount_Bucket_3 +
-                                 (UNSIGNED)rw_in.Past_Due_Aging_Amount_Bucket_4 +
-                                 (UNSIGNED)rw_in.Past_Due_Aging_Amount_Bucket_5 +
-                                 (UNSIGNED)rw_in.Past_Due_Aging_Amount_Bucket_6 +
-                                 (UNSIGNED)rw_in.Past_Due_Aging_Amount_Bucket_7),
+                   => IF((TRIM(rw_in.Past_Due_Aging_Amount_Bucket_2, LEFT, RIGHT) = '' AND
+                          TRIM(rw_in.Past_Due_Aging_Amount_Bucket_3, LEFT, RIGHT) = '' AND
+                          TRIM(rw_in.Past_Due_Aging_Amount_Bucket_4, LEFT, RIGHT) = '' AND
+                          TRIM(rw_in.Past_Due_Aging_Amount_Bucket_5, LEFT, RIGHT) = '' AND
+                          TRIM(rw_in.Past_Due_Aging_Amount_Bucket_6, LEFT, RIGHT) = '' AND
+                          TRIM(rw_in.Past_Due_Aging_Amount_Bucket_7, LEFT, RIGHT) = '' ),
+                         '',
+                         (STRING12)((INTEGER)rw_in.Past_Due_Aging_Amount_Bucket_2 +
+                                    (INTEGER)rw_in.Past_Due_Aging_Amount_Bucket_3 +
+                                    (INTEGER)rw_in.Past_Due_Aging_Amount_Bucket_4 +
+                                    (INTEGER)rw_in.Past_Due_Aging_Amount_Bucket_5 +
+                                    (INTEGER)rw_in.Past_Due_Aging_Amount_Bucket_6 +
+                                    (INTEGER)rw_in.Past_Due_Aging_Amount_Bucket_7)),
                  pmtIntervalDays = 90 
-                   => (STRING12)((UNSIGNED)rw_in.Past_Due_Aging_Amount_Bucket_3 +
-                                 (UNSIGNED)rw_in.Past_Due_Aging_Amount_Bucket_4 +
-                                 (UNSIGNED)rw_in.Past_Due_Aging_Amount_Bucket_5 +
-                                 (UNSIGNED)rw_in.Past_Due_Aging_Amount_Bucket_6 +
-                                 (UNSIGNED)rw_in.Past_Due_Aging_Amount_Bucket_7),
+                   => IF((TRIM(rw_in.Past_Due_Aging_Amount_Bucket_3, LEFT, RIGHT) = '' AND
+                          TRIM(rw_in.Past_Due_Aging_Amount_Bucket_4, LEFT, RIGHT) = '' AND
+                          TRIM(rw_in.Past_Due_Aging_Amount_Bucket_5, LEFT, RIGHT) = '' AND
+                          TRIM(rw_in.Past_Due_Aging_Amount_Bucket_6, LEFT, RIGHT) = '' AND
+                          TRIM(rw_in.Past_Due_Aging_Amount_Bucket_7, LEFT, RIGHT) = '' ),
+                         '',
+                         (STRING12)((INTEGER)rw_in.Past_Due_Aging_Amount_Bucket_3 +
+                                    (INTEGER)rw_in.Past_Due_Aging_Amount_Bucket_4 +
+                                    (INTEGER)rw_in.Past_Due_Aging_Amount_Bucket_5 +
+                                    (INTEGER)rw_in.Past_Due_Aging_Amount_Bucket_6 +
+                                    (INTEGER)rw_in.Past_Due_Aging_Amount_Bucket_7)),
                  pmtIntervalDays = 60
-                   => (STRING12)((UNSIGNED)rw_in.Past_Due_Aging_Amount_Bucket_4 +
-                                 (UNSIGNED)rw_in.Past_Due_Aging_Amount_Bucket_5 +
-                                 (UNSIGNED)rw_in.Past_Due_Aging_Amount_Bucket_6 +
-                                 (UNSIGNED)rw_in.Past_Due_Aging_Amount_Bucket_7),
+                   => IF((TRIM(rw_in.Past_Due_Aging_Amount_Bucket_4, LEFT, RIGHT) = '' AND
+                          TRIM(rw_in.Past_Due_Aging_Amount_Bucket_5, LEFT, RIGHT) = '' AND
+                          TRIM(rw_in.Past_Due_Aging_Amount_Bucket_6, LEFT, RIGHT) = '' AND
+                          TRIM(rw_in.Past_Due_Aging_Amount_Bucket_7, LEFT, RIGHT) = '' ),
+                         '',
+                         (STRING12)((INTEGER)rw_in.Past_Due_Aging_Amount_Bucket_4 +
+                                    (INTEGER)rw_in.Past_Due_Aging_Amount_Bucket_5 +
+                                    (INTEGER)rw_in.Past_Due_Aging_Amount_Bucket_6 +
+                                    (INTEGER)rw_in.Past_Due_Aging_Amount_Bucket_7)),
                  (pmtIntervalDays = 15 OR
                   pmtIntervalDays = 14 OR
                   pmtIntervalDays = 7  OR
                   pmtIntervalDays = 1) AND
                  highestDaysBucket > 6 
                    =>  rw_in.Past_Due_Aging_Amount_Bucket_7,
-                      '0'
+                      ''
                 );
       END;
   END;

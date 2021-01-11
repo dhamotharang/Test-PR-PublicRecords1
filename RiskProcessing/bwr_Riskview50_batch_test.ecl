@@ -2,11 +2,11 @@
 checkin in changes to keep insufficient hits on stream and sort output by order on input
 */
 //*to run Juli - make IncludeLNJReport uncommented and set to true
-import riskwise, ut, riskview, gateway, RiskProcessing;
+import riskwise,riskview, gateway, RiskProcessing, std;
 
 #workunit('name','Riskview 5.0 Batch Test');
 
-unsigned record_limit := 10;    //number of records to read from input file; 0 means ALL
+unsigned record_limit := 0;    //number of records to read from input file; 0 means ALL
 unsigned1 parallel_calls := 30;  //number of parallel soap calls to make [1..30]
 unsigned1 eyeball := 100;
 string DataRestrictionMask := '10000100010001000000000000000000000000000'; // to restrict fares, experian and transunion -- returns liens and judgments
@@ -15,7 +15,7 @@ string DataRestrictionMask := '10000100010001000000000000000000000000000'; // to
 
 infile_name :=  '~jpyon::in::lend_7582_p2_coapp_f_s_in_junk_test_in';
 
-outfile_name := '~tfuerstenberg::out::JUNK_riskview50_' + thorlib.wuid();
+outfile_name := '~jpyon::out::JUNK_riskview50_' + thorlib.wuid();
 //==================  input file layout  ========================
 layout_input := RECORD
     STRING Account;
@@ -146,10 +146,11 @@ soap_inrec t_f(ds_input le, integer c) := transform
 	self.Telecommunications_model_name := 'RVT1503_0';
 	self.Custom_model_name := '';
 	self.prescreen_score_threshold := '';
-	self.gateways := project(ut.ds_oneRecord, transform(gateway.layouts.config, 
-																												self.ServiceName := 'neutralroxie';
-																												self.url := neutral_roxie_IP;
-																												self := [];));
+	self.gateways := Dataset([Transform(Gateway.Layouts.Config,
+                                 self.ServiceName := 'neutralroxie';
+																	self.url := neutral_roxie_IP;
+                                  Self := [])]);
+
 	self.DataRestrictionMask := DataRestrictionMask;
 	self.DataPermissionMask := '';
 
@@ -167,15 +168,14 @@ soap_inrec t_f(ds_input le, integer c) := transform
 																					self.Home_Phone := le.homephone;
 																				//	SELF.LexID := le.LexID;
 																					 self.historyDateTimeStamp := map(
-         le.historydate in ['', '999999']           => '',  // leave timestamp blank, query will populate it with the current date   	
-			 regexfind('^\\d{8} \\d{8}$', le.historydate) => le.historydate,
-			 regexfind('^\\d{8}$',        le.historydate) => le.historydate +   ' 00000100',
-			 regexfind('^\\d{6}$',        le.historydate) => le.historydate + '01 00000100',		                                                
-			                                                 le.historydate
-	 );
-																			  	//	self.HistoryDateTimeStamp := ''; // most files still have just year and month, so add day of 01 and a timestamp
+														le.historydate in ['', '999999']           => '',  // leave timestamp blank, query will populate it with the current date   	
+														regexfind('^\\d{8} \\d{8}$', le.historydate) => le.historydate,
+														 regexfind('^\\d{8}$',        le.historydate) => le.historydate +   ' 00000100',
+														 regexfind('^\\d{6}$',        le.historydate) => le.historydate + '01 00000100',		                                                
+																													le.historydate);
+																			  	// self.HistoryDateTimeStamp := ''; // most files still have just year and month, so add day of 01 and a timestamp
 																					// self.HistoryDateTimeStamp := (string)le.historydateyyyymm + '01 00010100'; // most files still have just year and month, so add day of 01 and a timestamp
-																					// self.HistoryDateTimeStamp := ut.GetDate + ' 00010100';  // if your file doesn't have historydate populated
+																					// self.HistoryDateTimeStamp := (STRING8)Std.Date.Today() + ' 00010100';  // if your file doesn't have historydate populated
 																					// self.HistoryDateTimeStamp := le.historydatetimestamp;  // if your file already has a timestamp in the correct format
 																					self.custom_input1 := '';
 																					self.custom_input2 := '';
@@ -189,9 +189,31 @@ end;
 soap_input := project(ds_input_distributed, t_f(left, counter));
 output(choosen(soap_input,eyeball), named('soap_input'));
 
+layout_checkingindicators_FIS_temp := record
+  string2 CheckProfileIndex;
+  string3 CheckTimeOldest;
+  string3 CheckTimeNewest;
+  string2 CheckNegTimeOldest;
+	string2 CheckNegTimeNewest;
+  string2 CheckNegRiskDecTimeNewest;
+  string2 CheckNegPaidTimeNewest;
+  string4 CheckCountTotal;
+  string7 CheckAmountTotal;
+  string7 CheckAmountTotalSinceNegPaid;
+  string7 CheckAmountTotal03Month;
+	STRING1 rv3ConfirmationSubjectFound;
+  STRING3 rv3AddrChangeCount60Month;
+  STRING3 rv3AddrChangeCount12Month;
+  STRING3 rv3AddrInputTimeOldest;
+  STRING3 rv3SourceNonDerogCount;
+  STRING3 rv3AssetPropCurrentCount;
+  STRING2 rv3SSNDeceased;
+  STRING2 rv3AssetIndex;
+end;
+
 roxie_output_layout := record
 	unsigned8 time_ms{xpath('_call_latency_ms')} := 0;  // picks up timing
-	riskview.layouts.layout_riskview5_batch_response;
+	riskview.layouts.layout_riskview5_batch_response -layout_checkingindicators_FIS_temp;// -layout_FIS_custom_attributes;
 	STRING errorcode;
 END;
 
@@ -208,9 +230,13 @@ roxie_result := soapcall(soap_input,
 				DATASET(roxie_output_layout),
 				parallel(parallel_calls),
 				onFail(myFail(LEFT)));
-	
-output(choosen(roxie_result(acctno <> ''), eyeball), named('roxie_result'));
-roxie_errors := roxie_result(acctno <> '' and errorcode<>'');
+				
+//Remove royalty records from results dataset
+NoRoyaltyRecs := roxie_result(acctno <> '__BATCH__');
+roxie_errors := NoRoyaltyRecs(acctno <> '' and errorcode<>'');
+roxie_results_wAcctno := NoRoyaltyRecs(acctno <> '');
+output(choosen(roxie_results_wAcctno, eyeball), named('roxie_result'));
+
 
 roxie_output_layout_temp := record
 	roxie_output_layout;
@@ -230,7 +256,7 @@ ds_drops := join(ds_input, ds_inseq,
 
 output(choosen(ds_drops,eyeball), named('ds_drops'));
 
-hits_output := join(ds_drops, roxie_result(acctno <> ''),
+hits_output := join(ds_drops, roxie_results_wAcctno,
 	left.acctno = right.acctno,
 	transform(right), 
 	RIGHT ONLY);
@@ -262,15 +288,18 @@ NoiBehavior := project(rv50, transform(roxie_output_layout,
 //LNJReport is the Juli name as this contains Juli/LNR report info in output WITH OUT the Juli Details - Liens and Judgments datasets included
 roxie_output_layout_noDetails := record
 	unsigned8 time_ms{xpath('_call_latency_ms')} := 0;  // picks up timing
-	riskview.layouts.layout_riskview5_batch_response -riskview.layouts.layout_riskview_lnj_batch;
+	riskview.layouts.layout_riskview5_batch_response -riskview.layouts.layout_riskview_lnj_batch - layout_checkingindicators_FIS_temp;
 	STRING errorcode;
 END;
+
+
+
 NoiBehavior_noLnJDetails := project(NoiBehavior, transform(roxie_output_layout_noDetails, self := left, self :=[]));
 output(NoiBehavior_noLnJDetails(errorcode in valid_error_codes),,outfile_name+'_withLNJRreport', CSV(heading(single), quote('"')), named('file_LNJRreport'));
 output(choosen(NoiBehavior_noLnJDetails, eyeball), named('LNJRreport'));
 
 //no Juli output will be the standard output name 
-noJuli := project(NoiBehavior, transform(RiskProcessing.bwr_LayoutsJuli.layout_riskview5_batch_responseNoJuli, self := left));
+noJuli := project(NoiBehavior, transform(RiskProcessing.bwr_LayoutsJuli.layout_riskview5_batch_responseNoJuli -layout_checkingindicators_FIS_temp, self := left));
 output(noJuli(errorcode in valid_error_codes),,outfile_name, CSV(heading(single), quote('"')), named('file_RV50'));
 output(choosen(noJuli, eyeball), named('RV50'));
 

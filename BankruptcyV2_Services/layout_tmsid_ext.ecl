@@ -1,6 +1,6 @@
-export layout_tmsid_ext :=
-	record
-		string50 tmsid;
-		boolean isdeepdive;
-	end;
-	
+EXPORT layout_tmsid_ext :=
+  RECORD
+    STRING50 tmsid;
+    BOOLEAN isdeepdive;
+  END;
+  

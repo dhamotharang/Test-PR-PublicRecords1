@@ -22,8 +22,8 @@ FUNCTION
 
   // Primary phone
   //TOPN here to pick the best (Qsent gateway with metadata(PVSD)/InHouse) record associated with primary identity.
-  dPrimaryPhonePII := TOPN(GROUP(SORT(dSearchResultsWCnt(isPrimaryPhone), acctno, phone_source <> $.Constants.PhoneSource.QSentGateway, ~isPrimaryIdentity, phone_source), acctno),
-                           1,acctno, phone_source <> $.Constants.PhoneSource.QSentGateway, ~isPrimaryIdentity, phone_source);
+  dPrimaryPhonePII := TOPN(GROUP(SORT(dSearchResultsWCnt(isPrimaryPhone), acctno, IF(typeflag = Phones.Constants.TypeFlag.DataSource_PV, 0, 1), ~isPrimaryIdentity, phone_source), acctno),
+                           1,acctno, IF(typeflag = Phones.Constants.TypeFlag.DataSource_PV, 0, 1), ~isPrimaryIdentity, phone_source);
 
   dSearchResultsPrimaryPhone := IF(~inMod.IsPrimarySearchPII,
                                     dSearchResultsWCnt, UNGROUP(dPrimaryPhonePII));
@@ -176,6 +176,7 @@ FUNCTION
   #IF($.Constants.Debug.Main)
     OUTPUT(dCntPhoneIdentities, NAMED('dCntPhoneIdentities'), EXTEND);
     OUTPUT(dRemoveOtherPhoneHistory, NAMED('dRemoveOtherPhoneHistory'), EXTEND);
+    OUTPUT(dPrimaryPhonePII, NAMED('dPrimaryPhonePII'), EXTEND);
     OUTPUT(dIdentitiesInfo, NAMED('dIdentitiesInfo_PRI'), EXTEND);
     OUTPUT(dSearchResultsPrimaryPhone, NAMED('dSearchResultsPrimaryPhone_PRI'), EXTEND);
     IF(inMod.isPrimarySearchPII, OUTPUT(dSearchResultsOtherPhones, NAMED('dSearchResultsOtherPhones_PRI'), EXTEND));

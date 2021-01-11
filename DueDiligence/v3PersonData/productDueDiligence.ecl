@@ -112,7 +112,9 @@ EXPORT productDueDiligence(DATASET(DueDiligence.v3Layouts.DDInput.PersonSearch) 
                           TRANSFORM(DueDiligence.v3Layouts.InternalPerson.PersonResults,
                                     //attributes - legal
                                     SELF.perCivilLegalEvent := DueDiligence.v3Common.General.FirstPopulatedString(perCivilLegalEvent);
-                                    SELF.perCivilLegalEvent_Flag := DueDiligence.v3Common.General.FirstPopulatedString(perCivilLegalEvent_Flag);                                    
+                                    SELF.perCivilLegalEvent_Flag := DueDiligence.v3Common.General.FirstPopulatedString(perCivilLegalEvent_Flag); 
+                                    SELF.perCivilLegalEventFilingAmt := DueDiligence.v3Common.General.FirstPopulatedString(perCivilLegalEventFilingAmt);
+                                    SELF.perCivilLegalEventFilingAmt_Flag := DueDiligence.v3Common.General.FirstPopulatedString(perCivilLegalEventFilingAmt_Flag);                                    
                                     SELF.perOffenseType := DueDiligence.v3Common.General.FirstPopulatedString(perOffenseType);
                                     SELF.perOffenseType_Flag := DueDiligence.v3Common.General.FirstPopulatedString(perOffenseType_Flag);                                    
                                     SELF.perStateLegalEvent := DueDiligence.v3Common.General.FirstPopulatedString(perStateLegalEvent);

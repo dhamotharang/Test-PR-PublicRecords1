@@ -1,4 +1,4 @@
-﻿IMPORT Business_Risk_BIP, DueDiligence, Risk_Indicators, STD, WSInput;
+﻿IMPORT DueDiligence, Risk_Indicators, STD, WSInput;
 
 EXPORT DueDiligence_Batch_Service() := FUNCTION
 	
@@ -166,7 +166,7 @@ EXPORT DueDiligence_Batch_Service() := FUNCTION
   
 
   //retrieve compliance information
-  regulatoryCompliance := DueDiligence.CommonQuery.mac_GetCompliance(dppa, glba, dataRestriction, dataPermission, DueDiligence.Constants.EMPTY, lexIdSourceOptout, transactionID, batchUID, globalCompanyID);
+  regulatoryCompliance := DueDiligence.CommonQuery.GetCompliance(dppa, glba, dataRestriction, dataPermission, DueDiligence.Constants.EMPTY, lexIdSourceOptout, transactionID, batchUID, globalCompanyID);
 
 
   busProductResults := DueDiligence.CommonQuery.v3BusinessResults(busRecs, regulatoryCompliance, DueDiligence.Constants.EMPTY);

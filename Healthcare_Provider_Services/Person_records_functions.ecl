@@ -9,11 +9,9 @@ EXPORT Person_records_functions := Module
 		d := PROJECT (doxie.get_dids(,noFail), doxie.layout_references);
 		l := doxie.header_records_byDID(project (if(count(dids(did>0))>0, dids,d), doxie.layout_references_hh), include_dailies, allow_wildcard, daily_autokey_skipset,,,,,,,,isrollup);
 		RETURN l;
-	END;	
+	END;
 	shared historic_nbr_records_crs(boolean checkRNA=true,dataset (doxie.layout_references) dids=dataset ([],doxie.layout_references)) := FUNCTION
 		doxie.MAC_Selection_Declare();
-    glb_ok := mod_access.isValidGLB();
-    dppa_ok := mod_access.isValidDPPA();
 
 		doxie.historic_nbr_records(header_records(,,,,,dids),a,checkRNA, mod_access);
     afil := doxie.compliance.MAC_FilterOutMinors (a, , , mod_access.show_minors);
@@ -44,7 +42,7 @@ EXPORT Person_records_functions := Module
 		// OUTPUT(targetRecs, named('targetRecs')); // DEBUG
 
 		// then find the corresponding neighbor records
-		nbr_records_mode(string1 mode) := doxie.nbr_records(targetRecs,mode,	
+		nbr_records_mode(string1 mode) := doxie.nbr_records(targetRecs,mode,
 			// attrs declared in doxie.MAC_Selection_Declare
 			Max_Neighborhoods,
 			Neighbors_PerAddress,
@@ -93,11 +91,10 @@ EXPORT Person_records_functions := Module
 		header.MAC_GLB_DPPA_Clean_RNA(rr, rr_rna, mod_access)
 		ret_results := if (checkRNA, rr_rna, rr);
 		return ret_results;
-	END;	
+	END;
 	EXPORT Comp_Addresses(dataset (doxie.layout_references) dids=dataset ([],doxie.layout_references)) := function
 		doxie.MAC_Selection_Declare();
     glb_ok := mod_access.isValidGLB();
-    dppa_ok := mod_access.isValidDPPA();
 
 		Address_Format := doxie.Layout_Comp_Addresses;
 		isKnowx := mod_access.isConsumer();
@@ -126,10 +123,10 @@ EXPORT Person_records_functions := Module
 			end;
 		Ns2 := project(Nbrs2,fn_nbr(left));
 
-		Relative_addresses := 
-			relative_records(header.constants.checkRNA,dids)((Include_RelativeAddresses_val and isRelative) or 
+		Relative_addresses :=
+			relative_records(header.constants.checkRNA,dids)((Include_RelativeAddresses_val and isRelative) or
 											 (Include_Associates_val and ~isRelative));
-											 
+
 		Address_Format fr(Relative_Addresses  le) := transform
 			self.dt_first_seen := le.dt_first_seen;
 			// knowx key has non glb data so it does not need to get dt_nonglb_last_seen.
@@ -138,8 +135,8 @@ EXPORT Person_records_functions := Module
 			self.hri_address := [];
 			self := le;
 			end;
-			
-		Rels := project(Relative_Addresses,fr(left));  
+
+		Rels := project(Relative_Addresses,fr(left));
 
 		Main_tmp_a := Comp_Subject_Addresses_wrap(dids).addresses;
 
@@ -169,7 +166,7 @@ EXPORT Person_records_functions := Module
 							left.prim_range = right.prim_range and
 							ut.nneq(left.sec_range, Right.sec_range) and
 							left.zip = right.zip,
-							add_s(left,right),left outer);  
+							add_s(left,right),left outer);
 
 		doxie.MAC_Address_Rollup(Rels1,Max_RelativeAddresses,Rels_Dn, isKnowx)
 		doxie.MAC_Address_Rollup(NS1,Addresses_PerNeighbor,NS_Dn)
@@ -204,16 +201,16 @@ EXPORT Person_records_functions := Module
 
 		// Switches all the infutor dates that comes from data in the vendor dates.
 		Address_Format traConsumer(Address_Format lef,Address_Format ref) := transform
-			self.address_seq_no := if(lef.address_seq_no <=0,1,lef.address_seq_no +1);  
+			self.address_seq_no := if(lef.address_seq_no <=0,1,lef.address_seq_no +1);
 			self.dt_last_seen := if(ref.isSubject, ref.dt_last_seen, ref.dt_vendor_last_reported);
 			self.dt_first_seen := if(ref.isSubject, ref.dt_first_seen, ref.dt_vendor_first_reported);
 			self.dt_vendor_first_reported := if(ref.isSubject, ref.dt_vendor_first_reported, ref.dt_first_seen);
 			self.dt_vendor_last_reported := if(ref.isSubject, ref.dt_vendor_last_reported , ref.dt_last_seen);
-			self := ref;		
+			self := ref;
 			end;
-			
-		//****** Push infile through transform above, note that only non-subject 
-		//addresses will go through the transform because subject addresses 
+
+		//****** Push infile through transform above, note that only non-subject
+		//addresses will go through the transform because subject addresses
 		// already have a sequence.
 		wseq := iterate(sort(hadseq, address_seq_no) & needseq, tra(left,right));
 		wseq_C := iterate(sort(hadseq, address_seq_no) & needseq, traConsumer(left, right));
@@ -243,23 +240,23 @@ EXPORT Person_records_functions := Module
 			typeof(r.recent_cohabit)  recent_cohabit  := max(group, r.recent_cohabit);
 			typeof(r.number_cohabits) number_cohabits := max(group, r.number_cohabits);
 			end;
-			
+
 		re add_cnt(re le,re ri) := transform
 			self.cnt := le.cnt+ri.cnt;
 			self := le;
-			end;  
-			
+			end;
+
 		t := group(table(r,re,p2_sort,p3_sort,p4_sort,person2,fname,mname,lname),p2_sort,p3_sort,person2);
 
 		st1 := sort(t,fname,lname,-mname);
 
 		r_snames := rollup(st1,left.fname=right.fname and left.lname=right.lname and
 												 left.mname[1..length(trim(right.mname))]=right.mname,add_cnt(left,right));
-							 
-		st2 := rollup(sort(r_snames,lname,mname,-fname),left.lname=right.lname and left.mname=right.mname and 
+
+		st2 := rollup(sort(r_snames,lname,mname,-fname),left.lname=right.lname and left.mname=right.mname and
 													left.fname[1..length(trim(right.fname))]=right.fname,add_cnt(left,right));
 
-		st := sort(st2,-cnt,-age,-lname,-fname);					 
+		st := sort(st2,-cnt,-age,-lname,-fname);
 
 		re add_aka(st le, st ri) := transform
 			self.aka := le.person2 = ri.person2;
@@ -278,9 +275,6 @@ EXPORT Person_records_functions := Module
 	end;
 	EXPORT Resident_Records(dataset (doxie.layout_references) dids=dataset ([],doxie.layout_references)) := function
 		doxie.MAC_Selection_Declare();
-    glb_ok := mod_access.isValidGLB();
-    dppa_ok := mod_access.isValidDPPA();
-
 
 		//use all comp address, but if Exclude_ResidentsForAssociatesAddresses_val then exclude those by DID
 		all_addrs:= Comp_Addresses(dids)((not Exclude_ResidentsForAssociatesAddresses_val) or (did not in set(associate_summary(dids), person2)));
@@ -305,7 +299,7 @@ EXPORT Person_records_functions := Module
 			mod_access.ssn_mask,
 			mod_access.ln_branded,
 			mod_access.probation_override);
-			
+
     rfil := doxie.compliance.MAC_FilterOutMinors (r, , , mod_access.show_minors);
 
 		return rfil;
@@ -318,11 +312,11 @@ EXPORT Person_records_functions := Module
 
 		//relatives
 		rr := Relative_Records(header.constants.checkRNA,dids);
-			
+
 		rt fr(rr le) := transform
 			self := le;
-			end;  
-			
+			end;
+
 		rels := project(rr,fr(left));
 
 		//nbrs
@@ -330,8 +324,8 @@ EXPORT Person_records_functions := Module
 
 		rt fn(hnrs le) := transform
 			self := le;
-			end;  
-			
+			end;
+
 		nb := project(hnrs,fn(left));
 
 		//new version of nbrs
@@ -339,8 +333,8 @@ EXPORT Person_records_functions := Module
 
 		rt fn_nbr(nbrs le) := transform
 			self := le;
-			end;  
-			
+			end;
+
 		nb2 := project(nbrs,fn_nbr(left));
 
 		//residents
@@ -348,14 +342,14 @@ EXPORT Person_records_functions := Module
 
 		rt fn2(resrecs le) := transform
 			self := le;
-			end;  
-			
+			end;
+
 		resrecs2 := project(resrecs,fn2(left));
 
 		allrecs := nb+nb2+rels+resrecs2;
 
 		doxie.MAC_PruneOldSSNs(allrecs, recs, ssn, did);
-			
+
 		ta := sort(recs,did,fname,lname,mname,ssn,dob);
 
 		rt roll_into(rt le,rt ri) := transform
@@ -366,10 +360,10 @@ EXPORT Person_records_functions := Module
 			self.var_cnt := le.var_cnt + ri.var_cnt;
 			self := le;
 			end;
-			
+
 		r := rollup( ta, left.did=right.did and left.fname=right.fname and ut.lead_contains(left.mname,right.mname) and
-										 left.lname=right.lname and ut.NNEQ(left.ssn,right.ssn) and 
-						ut.NNEQ_Date(left.dob,right.dob),roll_into(left,right) ); 
+										 left.lname=right.lname and ut.NNEQ(left.ssn,right.ssn) and
+						ut.NNEQ_Date(left.dob,right.dob),roll_into(left,right) );
 
 		//add the age
 		doxie_crs.layout_comp_names addage(rt l) := transform
@@ -384,8 +378,6 @@ EXPORT Person_records_functions := Module
 	end;
 
 	export ssn_persons ( boolean checkRNA = false,dataset (doxie.layout_references) dids=dataset ([],doxie.layout_references) ) := function
-    glb_ok := mod_access.isValidGLB();
-    dppa_ok := mod_access.isValidDPPA();
 
 		keepOldSsns := doxie.keep_old_ssns_val;
 
@@ -393,7 +385,7 @@ EXPORT Person_records_functions := Module
 			string9 ssn;
 			unsigned6 did;
 			end;
-				
+
 		csa := Comp_Subject_Addresses_wrap(dids).raw;
 		recs := dedup (sort(csa, did,ssn), did, ssn);
 
@@ -403,10 +395,10 @@ EXPORT Person_records_functions := Module
 		trecs_pruned := join(trecs, dx_header.key_DID_SSN_date (), left.did = right.did and
 													left.ssn = right.ssn, TRANSFORM(LEFT),
 													LEFT ONLY);
-												
+
 		keep_trecs := IF(keepOldSsns, trecs, trecs_pruned);
 		use_trecs := project(keep_trecs, dids_ssns);
-												
+
 		others_pre := join(use_trecs,dx_header.key_ssn(),left.ssn[1]=right.s1 and
 											 left.ssn[2]=right.s2 and
 											 left.ssn[3]=right.s3 and
@@ -427,7 +419,7 @@ EXPORT Person_records_functions := Module
 													LEFT ONLY);
 
 		use_others := IF(keepOldSsns, others, others_pruned);
-													
+
 		the_set := dedup(use_others,did,ssn,all);
 
 		ssn_people := record
@@ -443,7 +435,7 @@ EXPORT Person_records_functions := Module
 			unsigned4 dt_last_seen;
 			boolean dead;
 			end;
-			
+
 		ssn_people_plus := record //some extra fields to allow us to use mac_glbclean
 			ssn_people;
 			string1 	 pflag1;		//for original pflag purposes
@@ -473,7 +465,7 @@ EXPORT Person_records_functions := Module
 			qstring5     cbsa;
 			string1      tnt;
 			string1	   valid_SSN;
-			string1	   jflag1;  
+			string1	   jflag1;
 			string1      jflag2;
       string1	   jflag3;
       unsigned6 rid;
@@ -490,21 +482,21 @@ EXPORT Person_records_functions := Module
 			self.dt_last_seen := MAP(le.dt_last_seen<>0 => le.dt_last_seen,le.dt_first_seen);
 			self := le;
 			end;
-			
+
 		jdirty := join(the_set,key_header,
-									 keyed(left.did=right.s_did) and 
+									 keyed(left.did=right.s_did) and
 									 (left.ssn = right.ssn or keepOldSsns),
 									 get_people(right), LIMIT (ut.limits.DID_PER_PERSON, SKIP));
 
 		// if any DID/ssn pairs existed in keep_trecs but were not found in Key_Header_SSN (i.e., from the dailies)
 		// they need to be preserved
 		daily_ssns := join(keep_trecs, jdirty, left.did=right.did and left.ssn = right.ssn,
-											 transform(ssn_people_plus, 
-																 self.date_ob := left.dob, 
+											 transform(ssn_people_plus,
+																 self.date_ob := left.dob,
 																 self.dead := left.tnt = 'D',
 																 self.global_sid:= right.global_sid,
 														 		 self.record_sid:= right.record_sid,
-																 self := left), 
+																 self := left),
 											 left only);
 		combined := jdirty+daily_ssns;
 		header.MAC_GlbClean_Header(combined,j_preRNA, , , mod_access);
@@ -525,7 +517,7 @@ EXPORT Person_records_functions := Module
 			unsigned6 did := rel.did;
 			rel.ssn_unmasked;
 			end;
-			
+
 		t := table(rel(ssn[1..5]<>''),r);
 
 		per := ssn_persons(,dids);
@@ -535,7 +527,7 @@ EXPORT Person_records_functions := Module
 			unsigned6 did;
 			typeof(rel.ssn_unmasked) ssn_unmasked;
 			end;
-			
+
 		r1 maker1(per l) := transform
 			self.ssn9 := l.ssn;
 			self.did := l.did;
@@ -543,7 +535,7 @@ EXPORT Person_records_functions := Module
 		end;
 
 		t1 := project(per(ssn[1..5]<>''),maker1(left));
-											
+
 		return t+t1;
 	end;
 
@@ -582,8 +574,8 @@ EXPORT Person_records_functions := Module
 		add_aggr := table(them_all (ssn<>''),p_sum,fname,mname,lname,name_suffix,ssn,did);
 		p_sum_t := group(sort(add_aggr,did,-cnt,-length(trim(fname))),did)
 							 ((Include_AKAs_val or did <> best_info_did) and
-								(Include_Imposters_val or not(ssn = best_info_ssn and did <> best_info_did))); 
-								
+								(Include_Imposters_val or not(ssn = best_info_ssn and did <> best_info_did)));
+
 		Best_SSN := 'Possible fragment';
 		p_sum add_prefer(p_sum_t le, p_sum_t ri) := transform
 			self.comment := IF(le.did=0,Best_SSN,'');
@@ -621,7 +613,7 @@ EXPORT Person_records_functions := Module
 		Rela := 'Relative ssn';
 
 		p_sum note_typo(p_sum_t le, p_sum_t ri,string val) := transform
-			self.comment := 
+			self.comment :=
 												MAP( ri.ssn = '' or le.comment IN [Aka,Typo,p_correct] => le.comment,
 														 le.comment = Best_SSN => val + ' causing fragment',
 														 val );
@@ -634,7 +626,7 @@ EXPORT Person_records_functions := Module
 		//output(matchables);
 		//output(do_pcorrect);
 
-		find_morphs := join(do_pcorrect,matchables,left.did=right.did and 
+		find_morphs := join(do_pcorrect,matchables,left.did=right.did and
 																					 ut.StringSimilar(left.ssn,right.ssn)<3,
 												note_typo(left,right,Typo),left outer);
 		//output(find_morphs);
@@ -690,17 +682,17 @@ EXPORT Person_records_functions := Module
 		str_close := 'CLOSE';
 		ssn_info check_and_skip(out_mskd l, best_info_mult r) := transform,
 			skip(		//this skip is designed to mimic the behavior of the left outer join that was here before, preventing dups in front end
-				 l.fname = r.fname and 
-				 l.mname = r.mname and 
+				 l.fname = r.fname and
+				 l.mname = r.mname and
 				 l.lname = r.lname and
 				 l.dob = r.dob and
 				 l.ssn = r.ssn and
 				 l.did = r.did)
-			
-			cn := 
-				if(l.fname = r.fname and 
-					 l.lname = r.lname and 
-					 (l.mname = r.mname or (l.mname[1] = r.mname[1] and 
+
+			cn :=
+				if(l.fname = r.fname and
+					 l.lname = r.lname and
+					 (l.mname = r.mname or (l.mname[1] = r.mname[1] and
 																	(length(trim(l.mname)) = 1 or length(trim(r.mname)) = 1))),
 					 str_yes,
 					 str_no);
@@ -708,18 +700,18 @@ EXPORT Person_records_functions := Module
 				map(l.ssn = r.ssn 											=> str_yes,
 						header.ssn_value(l.ssn, r.ssn) > 0  => str_close,	//moxie returns CLOSE
 						str_no);
-			cb := 
+			cb :=
 				if(l.dob = r.dob, str_yes, str_no);
-			
+
 			self.current_name := 						if(Include_AKAs_val, cn,  '');
 			self.subject_ssn_indicator := 	if(Include_AKAs_val, ssi, '');
 			self.correct_dob :=							if(Include_AKAs_val, cb,  '');
-			
+
 			self := l;
 		end;
 
 		ds_checked :=
-			join(out_mskd(not likely_fragment), 
+			join(out_mskd(not likely_fragment),
 					 best_info_mult,
 					 true,
 					 check_and_skip(left, right),
@@ -731,20 +723,20 @@ EXPORT Person_records_functions := Module
 		end;
 		ssn_extra addScore(ds_checked L) := transform
 			B := best_info_mult[1];
-			
+
 			fn_match	:= L.fname=B.fname;
 			mn_match	:= L.mname=B.mname or (L.mname[1]=B.mname[1] and (length(trim(L.mname))=1 or length(trim(B.mname))=1));
 			ln_match	:= L.lname=B.lname;
 			dob_match	:= L.dob=B.dob;
 			ssn_match	:= L.ssn=B.ssn;
 			ssn_close	:= header.ssn_value(L.ssn,B.ssn) > 0;
-			
+
 			self.best_score :=
 				if(fn_match and ln_match, 1, 0) +								// 1 point for a fname+lname match
 				if(fn_match and mn_match and ln_match, 1, 0) +	// 1 point for a mname match (only if fname+lname also match)
 				if(dob_match, 1, 0) +														// 1 point for a dob match
 				map(ssn_match=>3, ssn_close=>1, 0);							// 3 points for a perfect ssn match, 1 for a near match
-			
+
 			self := L;
 		end;
 		ds_scored := project(ds_checked, addScore(left));
@@ -777,7 +769,7 @@ EXPORT Person_records_functions := Module
 		//get all the dids together
 		return dedup(rels + nbrs, all);
 	end;
-	
+
 	EXPORT SSN_Lookups(dataset (doxie.layout_references) dids=dataset ([],doxie.layout_references)) := function
 		ssns := dedup(comp_ssns(dids)((unsigned)ssn_unmasked > 0),ssn_unmasked,all);
 		// Fetch the SSN information for all extent ssns
@@ -811,7 +803,7 @@ EXPORT Person_records_functions := Module
 			self.ssn_issue_early	:= Suppress.dateCorrect.sdate_u4(frm.ssn_unmasked, (unsigned4)R.start_date);
 			self.ssn_issue_last		:= Suppress.dateCorrect.edate_u4(frm.ssn_unmasked, r_end);
 			self.ssn_issue_place	:= Suppress.dateCorrect.state(frm.ssn_unmasked, R.state);
-			valid := (is_valid and not is_legacy and ((integer)frm.ssn_unmasked not in doxie.bad_ssn_list)); 
+			valid := (is_valid and not is_legacy and ((integer)frm.ssn_unmasked not in doxie.bad_ssn_list));
 			self.valid := Suppress.dateCorrect.valid(frm.ssn_unmasked, valid);
 			self.ssn := frm.ssn9;
 			self.ssn_unmasked := frm.ssn_unmasked;
@@ -856,7 +848,7 @@ EXPORT Person_records_functions := Module
 				AND LEFT.prim_name = RIGHT.prim_name
 				AND LEFT.prim_range = RIGHT.prim_range
 				AND LEFT.sec_range = RIGHT.sec_range,
-			doSeq(LEFT, RIGHT), keep (1) 
+			doSeq(LEFT, RIGHT), keep (1)
 		);
 
 		slimFmt doBaseSeq(slimRows L, addrRows R) := transform
@@ -905,12 +897,12 @@ EXPORT Person_records_functions := Module
 
 	//***** When legacy verified, we need an additional function call
 
-	falvv := Doxie.fn_addLVV(Comp_Subject_Addresses_wrap(dids).addresses).records_wListedPhone;  
+	falvv := Doxie.fn_addLVV(Comp_Subject_Addresses_wrap(dids).addresses).records_wListedPhone;
 
 	legacy := project(falvv(Address.isVerified(tnt, phone, phone)), transform(RecordLayout,self.timezone:='',self:=left));//i intentionally passed phone in twice so that listed_phone does not unverify me.  the legacy option of comp addresses actually returns a blank listed_phone to the ESP layer, which assigns verified
 
-	ut.getTimeZone(legacy,listed_phone,timezone,legacy_w_tzone)	
-	ut.getTimeZone(standard,listed_phone,timezone,standard_w_tzone)	
+	ut.getTimeZone(legacy,listed_phone,timezone,legacy_w_tzone)
+	ut.getTimeZone(standard,listed_phone,timezone,standard_w_tzone)
 
 
 	export records := choosen(dedup(if(Legacy_Verified_Value, legacy_w_tzone, standard_w_tzone)(listed_phone <> ''), all), MaxRecords);

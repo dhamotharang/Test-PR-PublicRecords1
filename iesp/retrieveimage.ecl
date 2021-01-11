@@ -25,11 +25,20 @@ export t_ECrashRetrieveImageReportBy := record
 	string AgencyORI {xpath('AgencyORI')};
 	iesp.share.t_Date DateOfCrash {xpath('DateOfCrash')};
 end;
+
+export t_ECrashRetrieveImageMetadata := record
+	string ReportID {xpath('ReportID')};
+	string ImageHash {xpath('ImageHash')};
+	string PageCount {xpath('PageCount')};
+	
+end;
 		
 export t_ECrashRetrieveImageResponse := record
 	iesp.share.t_ResponseHeader _Header {xpath('Header')};
 	boolean InitialPurchase {xpath('InitialPurchase')};
 	string ImageData {xpath('ImageData'), maxlength(iesp.Constants.Retrieve_Image.MaxImageSize)}; // Xsd type: base64Binary
+	string ErrorMessage {xpath('ErrorMessage'), maxlength(iesp.Constants.Retrieve_Image.MaxSoapErrorSize)};
+	dataset(t_ECrashRetrieveImageMetadata) ImageMetadata  {xpath('ImageMetaData'),Maxcount(iesp.Constants.Retrieve_Image.Maxcount_ImageMetadata)};
 end;
 		
 export t_ECrashRetrieveImageRequest := record (iesp.share.t_BaseRequest)

@@ -1,88 +1,9 @@
-﻿/*--SOAP--
-<message name="SearchService">
-
-  <!-- Autokey search fields -->
-  <part name="SSN" 								type="xsd:string"/>
-  <part name="UnParsedFullName" 	type="xsd:string"/>
-  <part name="FirstName"   				type="xsd:string"/>
-  <part name="MiddleName"  				type="xsd:string"/>
-  <part name="LastName"   	 			type="xsd:string"/>
-  <part name="Addr"	    	   			type="xsd:string"/>
-  <part name="City"   	     			type="xsd:string"/>
-  <part name="State"	       			type="xsd:string"/>
-  <part name="Zip" 	        			type="xsd:string"/>
-  <part name="County"             type="xsd:string"/>
-  <part name="CompanyName" 				type="xsd:string"/>
-
-  <!-- Autokey Tuning -->
-  <part name="AllowNickNames" 		type="xsd:boolean"/>
-  <part name="PhoneticMatch"  		type="xsd:boolean"/>
-  <part name="ExactOnly"   				type="xsd:boolean"/>
-  <part name="NoDeepDive" 				type="xsd:boolean"/>
-  <part name="ZipRadius"  				type="xsd:unsignedInt"/>
-
-  <!-- Property Keys -->
-  <part name="DID"								type="xsd:string"/>
-  <part name="BDID"								type="xsd:string"/>
-  <part name="FaresID"						type="xsd:string"/>
-  <part name="ParcelID"						type="xsd:string"/>
-
-  <!-- Property Tuning -->
-  <part name="PenaltThreshold"		type="xsd:unsignedInt"/>
-  <part name="StrictMatch"				type="xsd:boolean"/>
-  <part name="LookupType"					type="xsd:string"/>
-  <part name="PartyType"					type="xsd:string"/>
-  <part name="IncludeDetails"			type="xsd:boolean"/>
-  <part name="PropAddressSearch"	type="xsd:boolean"/>
-  <part name="xadl2_weight_threshold"	type="xsd:unsignedInt"/>
-
-  <!-- Data Restrictions -->
-  <part name="CurrentOnly"				type="xsd:boolean"/>
-  <part name="GroupByFidTypeOnly"		type="xsd:boolean"/>
-  <part name="CurrentByVendor"		type="xsd:boolean"/>
-  <part name="RobustnessScoreSorting" type="xsd:boolean"/>
-  <part name="LnBranded"					type="xsd:boolean"/>
-  <part name="DataRestrictionMask" type="xsd:string" default="0"/>
-  <part name="ApplicationType"     	type="xsd:string"/>
-  <part name="DataPermissionMask" type="xsd:string"/>
-  <part name="AllowAll"						type="xsd:boolean"/>
-
-  <!-- Privacy -->
-  <part name="SSNMask"						type="xsd:string"/>
-
-  <!-- Record management -->
-  <part name="MaxResults"					type="xsd:unsignedInt"/>
-  <part name="MaxResultsThisTime"	type="xsd:unsignedInt"/>
-  <part name="SkipRecords"				type="xsd:unsignedInt"/>
-  <part name="ReturnHashes"				type="xsd:boolean"/>
-  <part name="srch_hashvals"			type="tns:XmlDataSet" cols="70" rows="3"/>
-
-  <!-- Enhancement/Bug: 64514 -->
-  <part name="MatchByBuyerAddresses"    type="xsd:boolean"/>
-  <part name="MatchByMailingAddresses"  type="xsd:boolean"/>
-  <part name="MatchByOwnerAddresses"    type="xsd:boolean"/>
-  <part name="MatchByPropertyAddresses" type="xsd:boolean"/>
-  <part name="MatchBySellerAddresses"   type="xsd:boolean"/>
-
-  <!-- Include Foreclosures and/or Notices of Default -->
-  <part name="IncludeForeclosures"     type="xsd:boolean"/>
-  <part name="IncludeNoticesOfDefault" type="xsd:boolean"/>
-
-  <part name="UltID" type="xsd:unsignedInt"/>
-  <part name="OrgID" type="xsd:unsignedInt"/>
-  <part name="SeleID" type="xsd:unsignedInt"/>
-  <part name="ProxID" type="xsd:unsignedInt"/>
-  <part name="PowID" type="xsd:unsignedInt"/>
-  <part name="EmpID" type="xsd:unsignedInt"/>
-  <part name="DotID" type="xsd:unsignedInt"/>
-  <part name="BusinessIdFetchLevel" type="xsd:string"/>
-
-  <!-- Legal stuff -->
-  <part name="DPPAPurpose" type="xsd:byte" default="1"/>
-  <part name="GLBPurpose" type="xsd:byte" default="1"/>
-</message>
-*/
-
+﻿// =====================================================================
+// ROXIE QUERY
+// -----------
+// For the complete list of input parameters please check published WU.
+// Look at the history of this attribute for the old SOAP info.
+// =====================================================================
 /*--INFO-- Search for Property Records via simple keys and autokeys. It also searches
   the Forclosures file and/or the Notice of Default file. (ESP-compliant output)
 */
@@ -99,7 +20,10 @@ export SearchService() := macro
   #CONSTANT('usePropMarshall', true);
   #CONSTANT('DisplayMatchedParty', true);
 
-  raw := project(LN_PropertyV2_Services.SearchService_records().Records,
+  //This boolean is used in Property Report and Search Services to show Deeds, Assessments and A&R data when LooupType is blank
+  boolean includeBlackKnight := Ln_PropertyV2_Services.input.lookupVal = Ln_PropertyV2_Services.consts.LOOKUP_TYPE.EVERYTHING;
+
+  raw := project(LN_PropertyV2_Services.SearchService_records(,,,,includeBlackKnight).Records,
                    LN_PropertyV2_Services.layouts.combined.narrow);
 
   // standard record counts & limits

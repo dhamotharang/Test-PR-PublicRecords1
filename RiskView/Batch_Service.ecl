@@ -33,12 +33,25 @@
 	<part name="ExcludeOtherLiens" type="xsd:boolean"/>
 	<part name="ExcludeJudgments" type="xsd:boolean"/>
 	<part name="ExcludeEvictions" type="xsd:boolean"/>
+    <part name="MinimumAmount" type="xsd:integer"/>
+    <part name="ExcludeEvictions" type="xsd:boolean"/>
+    <part name="ExcludeStates" type="xsd:string"/>
+    <part name="ExcludeReportingSources" type="xsd:string"/>
+    <part name="IncludeStatusRefreshChecks" type="xsd:boolean"/>
+    <part name="AttributesOnly" type="xsd:boolean"/>
+    <part name="ExcludeStatusRefresh" type="xsd:boolean"/>
+    <part name="StatusRefreshWaitPeriod" type="xsd:string"/>
 	<part name="RetainInputDID" type="xsd:boolean"/>
+	<part name="ReturnDetailedRoyalties" type="xsd:boolean"/>
+
+	<part name="_BatchJobId" type="xsd:string"/>
+	<part name="_CompanyId" type="xsd:string"/>
+
 </message>
 */
 /*--INFO-- Contains RiskView Scores and attributes version 5.0 and higher */
 
-import iesp, gateway, risk_indicators, FFD, STD, Riskview, Models, Royalty;
+import iesp, gateway, risk_indicators, FFD, STD, Riskview, Royalty;
 
 export Batch_Service := MACRO
 
@@ -111,6 +124,11 @@ DeferredTransactionIDs := PROJECT(batchin(DeferredTransactionID <> ''), TRANSFOR
                                                                   SELF.DeferredTransactionID := LEFT.DeferredTransactionID));
 
 
+_BatchJobId := '' : stored('_BatchJobId');
+string20 _CompanyID := '' : stored('_CompanyId');
+
+
+
 //Default to being ON, which is 1. If Excluded, we change to 0.
 string tmpFilterLienTypes := Risk_Indicators.iid_constants.LnJDefault;
 
@@ -142,6 +160,8 @@ FilterLienTypes := tmpCityFltr +
         tmpExcludeStatusRefresh;
 
 boolean RetainInputDID := false				: stored('RetainInputDID');  // to be used by modelers in R&D mode
+
+BOOLEAN ReturnDetailedRoyalties := FALSE : STORED('ReturnDetailedRoyalties'); // Allows batch to specify if they want royalty details in RoyaltySet
 
 boolean isCalifornia_in_person := false;  // always false in batch
 STRING6 SSNMask := 'NONE';
@@ -237,6 +257,7 @@ valid_inputs := batchin_with_seq((
 							  ) or
 							(unsigned)LexID <> 0
 						) and ReportingPeriod > 0 and ReportingPeriod <= 84);
+
 						
 search_Results := riskview.Search_Function(valid_inputs, 
 	gateways,
@@ -276,15 +297,17 @@ search_Results := riskview.Search_Function(valid_inputs,
 	IncludeStatusRefreshChecks := IncludeStatusRefreshChecks,
     DeferredTransactionIDs := DeferredTransactionIDs,
 	StatusRefreshWaitPeriod := StatusRefreshWaitPeriod,
-    IsBatch := TRUE
+  IsBatch := TRUE,
+	CompanyID := _CompanyID,
+	TransactionID := _BatchJobId
 	);
 
 
-#if(Models.LIB_RiskView_Models().TurnOnValidation = FALSE)
+#if(Riskview.Constants.TurnOnValidation = FALSE)
 
 
 Results := join(batchin_with_seq, search_results, left.seq=right.seq,
-			RiskView.Transforms.FormatBatch(left, right),
+			RiskView.Transforms.FormatBatch(left, right, IncludeStatusRefreshChecks, ExcludeStatusRefresh),
 			left outer);
 
 AttributesOnlyResults := PROJECT(Results, RiskView.Transforms.AttributesOnlyBatch(LEFT));
@@ -300,8 +323,10 @@ MLA_royalties := if((STD.Str.ToLowerCase(custom_model_name)  = 'mla1608_0' OR
 										 STD.Str.ToLowerCase(custom5_model_name) = 'mla1608_0'), 
 										 Royalty.RoyaltyMLA.GetBatchRoyaltiesBySeq(batchin_with_seq, search_Results),
 										 Royalty.RoyaltyMLA.GetNoBatchRoyalties());
+                     
+dRoyalties := Royalty.GetBatchRoyalties(MLA_royalties, ReturnDetailedRoyalties);
 
-output(MLA_royalties, NAMED('RoyaltySet'));
+output(dRoyalties, NAMED('RoyaltySet'));
 
 output(FinalResults, named('Results')); /*Production*/
 // output(search_Results, named('Results')); /*Validation*/

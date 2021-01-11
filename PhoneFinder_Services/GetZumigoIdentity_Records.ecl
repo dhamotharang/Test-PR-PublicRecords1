@@ -53,7 +53,7 @@ MODULE
   // for pii search, sending in one primary wireless phone, if available, else one other phone per acct
   // sorting other phones(non primary) by score and dates
   PII_wireless := DEDUP(SORT(PROJECT(dWirelessPhonesBestInfo(isPiiSearch), PhoneFinder_Services.Layouts.PhoneFinder.Final),
-                              acctno, IF(isPrimaryPhone, 0, 1), -phone_score, -dt_last_seen, dt_first_seen),
+                              acctno, IF(isPrimaryPhone, 0, 1), IF(typeflag = Phones.Constants.TypeFlag.DataSource_PV, 0, 1), -phone_score, -dt_last_seen, dt_first_seen),
                         acctno);
 
   Phones_wireless := PII_wireless + PhoneSrch_wireless;
@@ -131,7 +131,7 @@ MODULE
     SELF.imei_Tenure_MinDays     := r.imei_Tenure_MinDays;
     SELF.imei_Tenure_MaxDays     := r.imei_Tenure_MaxDays;
     SELF.sim_Tenure_MinDays      := IF(r.sim_Tenure_MinDays != 0, r.sim_Tenure_MinDays, r.imsi_Tenure_MinDays);
-    SELF.sim_Tenure_MaxDays      := IF(r.sim_Tenure_MaxDays != 0, r.sim_Tenure_MaxDays, r.imsi_Tenure_MinDays);
+    SELF.sim_Tenure_MaxDays      := IF(r.sim_Tenure_MaxDays != 0, r.sim_Tenure_MaxDays, r.imsi_Tenure_MaxDays);
 
     BOOLEAN IsValidated          := (r.first_name_score BETWEEN Phones.Constants.Zumigo_NameAddr_Validation_Threshold_MIN AND Phones.Constants.Zumigo_NameAddr_Validation_Threshold_MAX) AND
                                     (r.last_name_score BETWEEN Phones.Constants.Zumigo_NameAddr_Validation_Threshold_MIN AND Phones.Constants.Zumigo_NameAddr_Validation_Threshold_MAX);

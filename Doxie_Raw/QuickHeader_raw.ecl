@@ -7,18 +7,18 @@ export QuickHeader_raw(
 ) := FUNCTION
 
 Layout_records_CCPA:= RECORD
-    header_quick.layout_records; 
+    header_quick.layout_records;
     UNSIGNED4 global_sid;
 	UNSIGNED8 record_sid;
 END;
 
 //**** JOIN TO KEY
 k := join(dids, header_quick.key_DID, keyed(left.did = right.did) and
-                                      (not ApplyBpsFilter or 
+                                      (not ApplyBpsFilter or
                                       doxie.bpssearch_filter.rec_OK(
                                           right.ssn, right.lname,right.fname,right.mname,
                                           right.prim_range,right.prim_name,right.suffix,
-                                          right.sec_range,right.city_name,right.zip,right.phone,'',right.dob)), 
+                                          right.sec_range,right.city_name,right.zip,right.phone,'',right.dob)),
                                       atmost(ut.limits .DID_PER_PERSON));
 
 //**** PROPER FORMAT
@@ -26,9 +26,6 @@ comm := project(if(Doxie.DataRestriction.WH, k(~mdr.sourceTools.sourceisWeeklyHe
 
 
 //***** CHECK PERMISSIONS
-
-dppa_ok := mod_access.isValidDPPA ();
-glb_ok := mod_access.isValidGLB ();
 
 header.MAC_GlbClean_Header(comm, clean, , , mod_access);
 

@@ -1,6 +1,6 @@
 import AutoStandardI;
 import address, doxie, dx_header, ut, corp2_services, vehiclev2_services, business_header_ss, business_header,
-       suppress, STD;
+       suppress, STD, dx_Suppression, Data_Services;
 
 export InterfaceTranslator := module
 	// provided only for backward compatibility
@@ -735,14 +735,15 @@ export InterfaceTranslator := module
       ssn_filt := ssn_filtered_value.val(in_mod);
 			app_type := application_type_val.val (in_mod);
 			Suppress.MAC_Suppress_Set(app_type,supp_set);
-			supp_key := suppress.Key_New_Suppression (
+			env := Data_Services.data_env.GetEnvFCRA(in_mod.isFCRAval);
+			supp_key := dx_Suppression.key_suppression(env) (
 				keyed (product in supp_set),
 				keyed (linking_type=Suppress.Constants.LinkTypes.SSN),
 				keyed (Linking_ID=ssn_filt));
 
       ssn_cleaned := IF (ssn_filt !='' and count(CHOOSEN(supp_key, 1)) > 0, '', ssn_filt);
 
-      RETURN IF (in_mod.isFCRAval, ssn_filt, ssn_cleaned);
+      RETURN ssn_cleaned;
     END;
 	end;
 	export phone_value := module

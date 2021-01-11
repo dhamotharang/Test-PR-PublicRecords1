@@ -114,8 +114,8 @@ string roxieIP := roxie_ip ;
 String Infile_name :=  Input_file_name;
 String outfile_name :=  Output_file_name ;
 
-ds_raw_input := IF(no_of_records <= 0, DATASET(  infile_name, layout_input,thor),
-																CHOOSEN(DATASET( infile_name, layout_input,thor), no_of_records));
+ds_raw_input := distribute(IF(no_of_records <= 0, DATASET(  infile_name, layout_input,thor),
+																CHOOSEN(DATASET( infile_name, layout_input,thor), no_of_records)),(integer)accountnumber);
 
 /*****************************FLAPSD Input****************************/    
 		layout_soap_input append_settings_flapsd(ds_raw_input le, INTEGER c) := TRANSFORM

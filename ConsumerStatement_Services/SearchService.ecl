@@ -1,64 +1,10 @@
-/*--SOAP--
-<message name="SearchService">
-  <part name="ConsumerStatementSearchRequest" type="tns:XmlDataSet" cols="80" rows="30" />
-</message>
-*/
+// =====================================================================
+// ROXIE QUERY
+// -----------
+// For the complete list of input parameters please check published WU.
+// Look at the history of this attribute for the old SOAP info.
+// =====================================================================
 /*--INFO-- Returns 100-word consumer statement for non-FCRA side.*/
-/*--HELP-- 
-<pre>
-&lt;ConsumerStatementSearchRequest&gt;
-&lt;row&gt;
-&lt;User&gt;
-  &lt;ReferenceCode&gt;&lt;/ReferenceCode&gt;
-  &lt;BillingCode&gt;&lt;/BillingCode&gt;
-  &lt;QueryId&gt;&lt;/QueryId&gt;
-  &lt;GLBPurpose&gt;&lt;/GLBPurpose&gt;
-  &lt;DLPurpose&gt;&lt;/DLPurpose&gt;
-  &lt;EndUser&gt;
-    &lt;CompanyName&gt;&lt;/CompanyName&gt;
-    &lt;StreetAddress1&gt;&lt;/StreetAddress1&gt;
-    &lt;City&gt;&lt;/City&gt;
-    &lt;State&gt;&lt;/State&gt;
-    &lt;Zip5&gt;&lt;/Zip5&gt;
-  &lt;/EndUser&gt;
-  &lt;MaxWaitSeconds&gt;&lt;/MaxWaitSeconds&gt;
-&lt;/User&gt;
-
-&lt;SearchBy&gt;
-  &lt;StatementId&gt;&lt;/StatementId&gt;
-  &lt;Address&gt;
-    &lt;StreetName&gt;&lt;/StreetName&gt;
-    &lt;StreetNumber&gt;&lt;/StreetNumber&gt;
-    &lt;StreetPreDirection&gt;&lt;/StreetPreDirection&gt;
-    &lt;StreetPostDirection&gt;&lt;/StreetPostDirection&gt;
-    &lt;StreetSuffix&gt;&lt;/StreetSuffix&gt;
-    &lt;UnitDesignation&gt;&lt;/UnitDesignation&gt;
-    &lt;UnitNumber&gt;&lt;/UnitNumber&gt;
-    &lt;StreetAddress1&gt;&lt;/StreetAddress1&gt;
-    &lt;StreetAddress2&gt;&lt;/StreetAddress2&gt;
-    &lt;State&gt;&lt;/State&gt;
-    &lt;City&gt;&lt;/City&gt;
-    &lt;Zip5&gt;&lt;/Zip5&gt;
-    &lt;Zip4&gt;&lt;/Zip4&gt;
-    &lt;County&gt;&lt;/County&gt;
-    &lt;PostalCode&gt;&lt;/PostalCode&gt;
-    &lt;StateCityZip&gt;&lt;/StateCityZip&gt;
-  &lt;/Address&gt;
-  &lt;Phone10&gt;&lt;/Phone10&gt;
-&lt;/SearchBy&gt;
-&lt;Options&gt;
-  &lt;IncludeHistory&gt;&lt;/IncludeHistory&gt;
-  &lt;PenaltyThreshold&gt;10&lt;/PenaltyThreshold&gt;
-  &lt;ReturnCount&gt;10&lt;/ReturnCount&gt;
-  &lt;StrictMatch&gt;0&lt;/StrictMatch&gt;
-&lt;/Options&gt;
-&lt;/row&gt;
-&lt;/ConsumerStatementSearchRequest&gt;
-</pre>
-*/
-
-/*--USES-- ut.input_xslt */
-
 import iesp, AutoStandardI, address, doxie;
 
 export SearchService := macro
@@ -127,12 +73,12 @@ export SearchService := macro
     Self.UniqueId := ''; // not yet
     Self.StatementId := L.statement_id;
     Self.Name := iesp.ECL2ESP.SetName (L.fname, L.mname, L.lname, L.name_suffix, L.title);
-    Self.Address := iesp.ECL2ESP.setAddress(L.prim_name, L.prim_range, L.predir, L.postdir, 
+    Self.Address := iesp.ECL2ESP.setAddress(L.prim_name, L.prim_range, L.predir, L.postdir,
                                     L.addr_suffix, L.unit_desig, L.sec_range, L.p_city_name,
 																		L.st, L.zip, L.zip4, ''); //r.county_name
     // Self.OriginalName := iesp.ECL2ESP.SetName (L.orig_fname, L.orig_mname, L.orig_lname, '', '');
-    // Self.OriginalAddress := iesp.ECL2ESP.setAddress ('', '', '', '', '', '', '', 
-                                                     // L.orig_city, L.orig_st, L.orig_zip, L.orig_zip4, 
+    // Self.OriginalAddress := iesp.ECL2ESP.setAddress ('', '', '', '', '', '', '',
+                                                     // L.orig_city, L.orig_st, L.orig_zip, L.orig_zip4,
                                                      // '', '', L.orig_address);
     Self.Phone := L.phone;
     // date-time stamp is expected in the form '2011-01-12 21:17:45'

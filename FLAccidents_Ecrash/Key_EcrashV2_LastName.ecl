@@ -1,36 +1,30 @@
-﻿import doxie, ut, Data_Services, std; 
-
-	FLAccidents_Ecrash.Layouts.key_slim_layout	ModifyLayout(FLAccidents_Ecrash.Layouts.key_search_layout l)	:= transform
-		self.lname	:= l.lname;
-		self.fname	:= l.fname;
-		self.mname	:= l.mname;
-		self	      := l;
-	end;
-	
-	FLAccidents_Ecrash.Layouts.key_search_layout copyNames(FLAccidents_Ecrash.Layouts.key_search_layout l) := transform
-		self.fname := l.orig_fname;
-		self.lname := l.orig_lname;
-		self.mname := l.orig_mname;
-		self       := l;
-	end;
+﻿IMPORT STD;
 	 
-dsKeyBuild := FLAccidents_Ecrash.File_KeybuildV2.eCrashSearchRecs(lname <> '');
+dseCrashSearch := File_KeybuildV2.eCrashSearchRecs(lname <> '');
+feCrashSearch := dseCrashSearch(TRIM(lname, LEFT, RIGHT) <> TRIM(orig_lname, LEFT, RIGHT) AND  
+                                (STD.Str.CountWords(lname, ' ') > 1 OR STD.Str.CountWords(orig_lname, ' ') > 1) AND 
+													      orig_lname <> '');
+Layouts.key_search_layout tCopyNames(Layouts.key_search_layout L) := TRANSFORM
+	SELF.fname := L.orig_fname;
+	SELF.lname := L.orig_lname;
+	SELF.mname := L.orig_mname;
+	SELF := L;
+END;
+peCrashSearch := PROJECT(feCrashSearch, tCopyNames(LEFT)); 
 
-mSSv2:= PROJECT(dsKeyBuild(trim(lname, left, right) <> trim(orig_lname, left, right) and  
-                           (STD.STr.CountWords(lname,' ') > 1 or STD.STr.CountWords(orig_lname,' ') > 1) and 
-													 orig_lname <> ''),
-								copyNames(left));
+Layouts.key_slim_layout	tModifyLayout(Layouts.key_search_layout L) := TRANSFORM
+  SELF.lname := L.lname;
+	SELF.fname := L.fname;
+	SELF.mname := L.mname;
+	SELF := L;
+END;
+pSlimeCrashSearch := PROJECT(peCrashSearch + dseCrashSearch, tModifyLayout(LEFT));
 
-dsSlimFile := project(mSSv2 + dsKeyBuild, ModifyLayout(left));
-ds_LastName	:= dedup(sort(distributed(dsSlimFile, hash64(accident_nbr)), 
-                          accident_nbr,lname,report_code,jurisdiction_state,jurisdiction,accident_date,report_type_id, local),
-										 accident_nbr,lname,report_code,jurisdiction_state,jurisdiction,accident_date,report_type_id, local); 
+dSlimeCrashSearch	:= DISTRIBUTED(pSlimeCrashSearch, HASH32(accident_nbr)); 
+sSlimeCrashSearch	:= SORT(dSlimeCrashSearch, accident_nbr, lname, report_code, jurisdiction_state, jurisdiction, accident_date, report_type_id, LOCAL); 
+uSlimeCrashSearch	:= DEDUP(sSlimeCrashSearch, accident_nbr, lname, report_code, jurisdiction_state, jurisdiction, accident_date, report_type_id, LOCAL); 
 
-
-EXPORT Key_EcrashV2_LastName := 	INDEX(ds_LastName
-																				,{lname,jurisdiction_state,jurisdiction}
-																				,{ds_LastName}
-																				,Data_Services.Data_location.Prefix('ecrash')+'thor_data400::key::eCrashV2_LastName_State_' + doxie.Version_SuperKey);
-																					
-																						
-																										
+EXPORT Key_EcrashV2_LastName := INDEX(uSlimeCrashSearch,
+																		 {lname, jurisdiction_state, jurisdiction},
+																		 {uSlimeCrashSearch},
+																		 Files_eCrash.FILE_KEY_LAST_NAME_STATE_SF);

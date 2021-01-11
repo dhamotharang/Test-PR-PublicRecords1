@@ -8,8 +8,9 @@ EXPORT getBusinessLegal(DATASET(DueDiligence.v3Layouts.Internal.BusinessTemp) in
 
 
     //get legal data for all unique businesses
-    uniqueBusinesses := DEDUP(SORT(inData, inquiredBusiness.ultID, inquiredBusiness.orgID, inquiredBusiness.seleID),inquiredBusiness.ultID, inquiredBusiness.orgID, inquiredBusiness.seleID);
+    uniqueBusinesses := DEDUP(SORT(inData, inquiredBusiness.ultID, inquiredBusiness.orgID, inquiredBusiness.seleID), inquiredBusiness.ultID, inquiredBusiness.orgID, inquiredBusiness.seleID);
     rawCivilResults := DueDiligence.v3BusinessData.getLienJundgementEviction(uniqueBusinesses, regulatoryAccess, ddOptions.ssnMask);
+    rawBankruptcyResults := DueDiligence.v3BusinessData.getBankruptcy(uniqueBusinesses, regulatoryAccess);
     
     
     //based on the legal data - populate requested attributes
@@ -17,16 +18,18 @@ EXPORT getBusinessLegal(DATASET(DueDiligence.v3Layouts.Internal.BusinessTemp) in
     
     offenseTypeAttributeResults := DueDiligence.v3BusinessAttributes.getOffenseType(inData);
     stateLegalEventAttributeResults := DueDiligence.v3BusinessAttributes.getStateLegalEvent(inData);
-    civilLegalEventAttributeResults := DueDiligence.v3BusinessAttributes.getCivilLegalEvent(inData, rawCivilResults);
+    civilLegalEventAttributeResults := DueDiligence.v3BusinessAttributes.getCivilLegalEvent(inData, rawCivilResults, rawBankruptcyResults);
+    civilLegalEventFilingAmountAttributeResults := DueDiligence.v3BusinessAttributes.getCivilLegalEventFilingAmt(inData, rawCivilResults);
     
     
     offenseType := IF(attributesRequested.includeAll OR attributesRequested.includeOffenseType, offenseTypeAttributeResults, noAttributeResults);
     stateLegalEvent := IF(attributesRequested.includeAll OR attributesRequested.includeStateLegalEvent, stateLegalEventAttributeResults, noAttributeResults);
     civilLegalEvent := IF(attributesRequested.includeAll OR attributesRequested.includeCivilLegalEvent, civilLegalEventAttributeResults, noAttributeResults);
+    civilLegalEventFilingAmt := IF(attributesRequested.includeAll OR attributesRequested.includeCivilLegalEventFilingAmount, civilLegalEventFilingAmountAttributeResults, noAttributeResults);
 
    
     //add all the attributes together to get all necessary legal attributes
-    legalAttributes := ROLLUP(SORT(offenseType + stateLegalEvent + civilLegalEvent, seq, ultID, orgID, seleID),
+    legalAttributes := ROLLUP(SORT(offenseType + stateLegalEvent + civilLegalEvent + civilLegalEventFilingAmt, seq, ultID, orgID, seleID),
                               LEFT.seq = RIGHT.seq AND
                               LEFT.ultID = RIGHT.ultID AND
                               LEFT.orgID = RIGHT.orgID AND
@@ -39,6 +42,9 @@ EXPORT getBusinessLegal(DATASET(DueDiligence.v3Layouts.Internal.BusinessTemp) in
 
                                         SELF.busCivilLegalEvent := DueDiligence.v3Common.General.FirstPopulatedString(busCivilLegalEvent);
                                         SELF.busCivilLegalEvent_Flag := DueDiligence.v3Common.General.FirstPopulatedString(busCivilLegalEvent_Flag);
+
+                                        SELF.busCivilLegalEventFilingAmt := DueDiligence.v3Common.General.FirstPopulatedString(busCivilLegalEventFilingAmt);
+                                        SELF.busCivilLegalEventFilingAmt_Flag := DueDiligence.v3Common.General.FirstPopulatedString(busCivilLegalEventFilingAmt_Flag);
                                         
                                         SELF.busOffenseType := DueDiligence.v3Common.General.FirstPopulatedString(busOffenseType);
                                         SELF.busOffenseType_Flag := DueDiligence.v3Common.General.FirstPopulatedString(busOffenseType_Flag);
@@ -58,7 +64,8 @@ EXPORT getBusinessLegal(DATASET(DueDiligence.v3Layouts.Internal.BusinessTemp) in
                         (attributesRequested.includeAll OR 
                         (attributesRequested.includeOffenseType AND
                         attributesRequested.includeStateLegalEvent AND
-                        attributesRequested.includeCivilLegalEvent));
+                        attributesRequested.includeCivilLegalEvent AND
+                        attributesRequested.includeCivilLegalEventFilingAmount));
                                             
     legalReport := IF(includeReportData, legalReportData, noLegalReportData);
     
@@ -77,6 +84,8 @@ EXPORT getBusinessLegal(DATASET(DueDiligence.v3Layouts.Internal.BusinessTemp) in
                                   
                                   SELF.busCivilLegalEvent := LEFT.busCivilLegalEvent;
                                   SELF.busCivilLegalEvent_Flag := LEFT.busCivilLegalEvent_Flag;
+                                  SELF.busCivilLegalEventFilingAmt := LEFT.busCivilLegalEventFilingAmt;
+                                  SELF.busCivilLegalEventFilingAmt_Flag := LEFT.busCivilLegalEventFilingAmt_Flag;
                                   SELF.busOffenseType := LEFT.busOffenseType;
                                   SELF.busOffenseType_Flag := LEFT.busOffenseType_Flag;
                                   SELF.busStateLegalEvent := LEFT.busStateLegalEvent;

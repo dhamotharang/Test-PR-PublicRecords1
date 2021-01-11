@@ -9,7 +9,7 @@ Customer := ENTITY(QUERY(UID=gc_id,
   MODEL(UID, CustomerId, IndustryType, JurisdictionState));
     
 
-Person := ENTITY(QUERY(UID=LexId,  
+Person := ENTITY(QUERY(UID=LexId, 
     INTEGER LexId, 
         DATE DateOfBirth,
         STRING Ssn,
@@ -98,7 +98,7 @@ Phone := ENTITY(QUERY(UID=PhoneNumber,
     PhoneFormatted, PhoneNumber, isCellPhone));
 
 InternetProtocol := ENTITY(QUERY(UID=ip_address,
-    STRING IpAddress=ip_address,
+    STRING IpAddress,
 
     STRING host,
     STRING alias,
@@ -232,6 +232,7 @@ Event := ENTITY(QUERY(UID(record_id),
         STRING ClientId,
 
     INTEGER RecordId=record_id,
+		STRING AcctNo,
     DATE EventDate,
         
         STRING Title=NULL(),
@@ -275,8 +276,13 @@ Event := ENTITY(QUERY(UID(record_id),
         STRING GeoMatch=NULL(),
         STRING ACECleanerErrorCode=NULL(),
         BOOLEAN isAdditional,
+				STRING address_vacancy_indicator,
+				STRING addrvalflag,
+				STRING drop_indicator,
 
     STRING PhoneFormatted,
+		BOOLEAN PhonesMetaHit,
+		STRING phone_prepaid,
 
     STRING LicenseNumber,
     STRING LicenseState, 
@@ -348,7 +354,7 @@ Event := ENTITY(QUERY(UID(record_id),
     STRING reason6,
     INTEGER socsvalflag,
     INTEGER drlcvalflag,
-    INTEGER hphonevalflag,
+    STRING hphonevalflag,
 
     BOOLEAN truedid = truedid,
     STRING best_fname   = best_flags.fname,
@@ -419,7 +425,7 @@ Event := ENTITY(QUERY(UID(record_id),
     STRING off_cat_list,
     INTEGER name_ssn_dob_match,
 
-    STRING IpAddress=ip_address,
+    STRING IpAddress,
     STRING iprngbeg,
     STRING iprngend,
     STRING edgecountry,
@@ -486,6 +492,7 @@ Event := ENTITY(QUERY(UID(record_id),
     MODEL(
       UID,
       RecordId,
+			AcctNo,
       EventDate,
       rCustomer,
       rSourceCustomer,
@@ -542,12 +549,15 @@ Event := ENTITY(QUERY(UID(record_id),
 
     addresspobox, addresscmra, PrimaryRange, Predirectional, PrimaryName, Suffix, Postdirectional, UnitDesignation, SecondaryRange, PostalCity, VanityCity, State, 
         Zip, Zip4, CarrierRouteNumber, CarrierRouteSortationAtZIP, LineOfTravel, LineOfTravelOrder, DeliveryPointBarcode, DeliveryPointBarcodeCheckDigit, 
-        TypeCode, County, Latitude, Longitude, MetropolitanStatisticalArea, GeoBlock, GeoMatch,ACECleanerErrorCode,isAdditional,
+        TypeCode, County, Latitude, Longitude, MetropolitanStatisticalArea, GeoBlock, GeoMatch,ACECleanerErrorCode,isAdditional,address_vacancy_indicator,
+				addrvalflag, drop_indicator,
         
         LicenseNumber,
     LicenseState,
 
     PhoneFormatted,
+		PhonesMetaHit,
+		phone_prepaid,
         
     EmailAddress, Type, CreatedOn, Host , EmailLastDomain, isdisposableemail,
 
@@ -604,7 +614,7 @@ Event: => AgencyProgJurSt := rCustomer.JurisdictionState;
 Event: => T_SrcAgencyUid := rSourceCustomer.CustomerId; 
 Event: => T_SrcAgencyProgType := rSourceCustomer.IndustryType; 
 
-Event: => T_ActUid := RecordId;
+Event: => T_ActUid := AcctNo;
 Event: => T_ActDtEcho := EventDate; 
 
 Event: => T_SrcType := MAP(rin_source <= 0 OR rin_source > 15 => -99997,rin_source); 
@@ -768,14 +778,81 @@ Event: => T9_AddrPopFlag := MAP((T_InpClnAddrPrimNmEcho != -99999 AND T_InpClnAd
 Event: => T9_AddrType := MAP(T9_AddrPopFlag < 1 => -99999,
                                                          Location.TypeCode = '' OR Location.TypeCode:Null => -99997,
                                                          Location.TypeCode);
+																												 
+Event: => T9_AddrValType := MAP(T9_AddrPopFlag=0 => -99999,
+                                T_SrcClassType < 4 OR T_IsBcShllHitFlag < 1 => -99998,
+																addrvalflag = '' => -99997,
+																addrvalflag);
+																
 Event: => T9_AddrStatus := MAP(T9_AddrPopFlag < 1 => -99999,
                                                              Location.ACECleanerErrorCode = '' OR Location.ACECleanerErrorCode:Null => -99997,
                                                              Location.ACECleanerErrorCode);
+																														 
+Event: => T9_AddrMailDropType := MAP(T9_AddrPopFlag=0 => -99999,
+                                     T_SrcClassType < 4 OR T_IsBcShllHitFlag < 1 => -99998,
+                                     drop_indicator:Null OR drop_indicator='' => -99997,
+																		 drop_indicator);
+																														 
+Event: => T9_AddrIsVacantFlag := MAP(T9_AddrPopFlag=0 => -99999,
+                                     T_SrcClassType < 4 OR T_IsBcShllHitFlag < 1 => -99998,
+																		 address_vacancy_indicator:Null OR address_vacancy_indicator='' => -99997,
+																		 address_vacancy_indicator='Y' => 1, 0);
+																		 
+Event: => T9_AddrIsInvalidFlag := MAP(T9_AddrPopFlag=0 => -99999,
+                                      T_SrcClassType < 4 OR T_IsBcShllHitFlag < 1 => -99998,
+																			T9_AddrValType=-99997=> -99997,
+																			TRIM(T9_AddrValType) = 'N' => 1, 0);
+Event: => T9_AddrIsCmraFlag := MAP(T9_AddrPopFlag=0 => -99999,
+                                   T_SrcClassType < 4 OR T_IsBcShllHitFlag < 1 => -99998,
+																	 T9_AddrMailDropType=-99997 => -99997,
+																	 T9_AddrMailDropType = 'C' => 1, 0);
+																	 
+Event: => T15_SsnPopFlag := MAP(T_InpClnSsnEcho <= -99997 OR LENGTH(T_InpClnSsnEcho) < 9 => 0, 1);
+
+Event: => T15_SsnValType := MAP(T15_SsnPopFlag=0 => -99999,
+                                T_SrcClassType < 4 OR T_IsBcShllHitFlag < 1 => -99998,
+																STRING(socsvalflag)=''=> -99997,
+																STRING(socsvalflag));
+																	 
+Event: => T15_SsnIsInvalidFlag := MAP(T15_SsnPopFlag=0 => -99999,
+                                      T_SrcClassType < 4 OR T_IsBcShllHitFlag < 1 => -99998,
+																			T15_SsnValType=-99997 => -99997,
+																			T15_SsnValType = 1 => 1, 0);
 
 Event: => T16_PhnPopFlag := MAP(T_InpClnPhnEcho IN ['-99999','-99998','-99997'] OR LENGTH(T_InpClnPhnEcho) < 10 => 0, 1);
-Event: => T15_SsnPopFlag := MAP(T_InpClnSsnEcho <= -99997 OR LENGTH(T_InpClnSsnEcho) < 9 => 0, 1);
-Event: => T20_DlPopFlag := MAP(T_InpClnDlEcho IN ['-99999','-99998','-99997'] OR T_InpClnDlStEcho IN ['-99999','-99998','-99997'] => 0, 1);
+
+Event: => T16_PhnValType := MAP(T16_PhnPopFlag=0 => -99999,
+                                T_SrcClassType < 4 OR T_IsBcShllHitFlag < 1 => -99998,
+																hphonevalflag='' => -99997,
+																hphonevalflag);
+																
+Event: => T16_IsPhnMetaHitFlag := MAP(T16_PhnPopFlag=0 => -99999,
+                                      PhonesMetaHit=TRUE => 1, 0);
+
+Event: => T16_PhnPrePdFlag := MAP(T16_PhnPopFlag=0 => -99999,
+                                  T_SrcClassType < 4 OR T16_IsPhnMetaHitFlag < 1 => -99998,
+																	phone_prepaid='' OR phone_prepaid:Null => -99997,
+																	phone_prepaid); 
+																	
+Event: => T16_PhnIsInvalidFlag := MAP(T16_PhnPopFlag=0 => -99999,
+                                  T_SrcClassType < 4 OR T_IsBcShllHitFlag < 1 => -99998,
+																	T16_PhnValType=-99997 => -99997,
+																	T16_PhnValType = '0' => 1, 0);
+																	
 Event: => T18_IpAddrPopFlag := MAP(T_InpClnIpAddrEcho IN ['-99999','-99998','-99997'] => 0, 1);
+
+																	
+Event: => T20_DlPopFlag := MAP(T_InpClnDlEcho IN ['-99999','-99998','-99997'] OR T_InpClnDlStEcho IN ['-99999','-99998','-99997'] => 0, 1);
+
+Event: => T20_DlValType := MAP(T20_DlPopFlag=0 => -99999,
+                               T_SrcClassType < 4 OR T_IsBcShllHitFlag < 1 => -99998,
+															 STRING(drlcvalflag)='' => -99997,
+															 STRING(drlcvalflag));
+
+Event: => T20_DlIsInvalidFlag := MAP(T20_DlPopFlag=0 => -99999,
+                                     T_SrcClassType < 4 OR T_IsBcShllHitFlag < 1 => -99998,
+																		 T20_DlValType=-99997 => -99997,
+																		 T20_DlValType IN ['1','3'] => 1, 0);
 
 
 Event: => T_InAgencyFlag := MAP(rSourceCustomer != rCustomer => 0, 1);
@@ -859,6 +936,15 @@ Event: => T19_BnkAcctIsKrFlag := MAP(T19_BnkAcctPopFlag = 0 => -99999,
                                                                  T_SrcClassType !=3 => -99998,
                                                                  T_BnkAcctStatusCodeEcho = -99997 => 0,
                                                                  T_BnkAcctStatusCodeEcho IN ['800','801','802','890','891','892','893'] => 1, -99997);
+																																 
+Event: => T1_HiRiskCviFlag :=  MAP(T1_LexIdPopFlag=0 AND T1_RinIdPopFlag=0 => -99999, 
+                                    T_IsBcShllHitFlag < 1 OR T_SrcClassType < 4 => -99998,
+																		T1_NapSummary < 1 AND T1L_NasSummary < 1 => -99997,
+																		T1_Cvi <= 20 => 1, 0);
+Event: => T1_MedRiskCviFlag := MAP(T1_LexIdPopFlag=0 AND T1_RinIdPopFlag=0 => -99999,
+                                    T_IsBcShllHitFlag < 1 OR T_SrcClassType < 4 => -99998,
+																		T1_NapSummary < 1 AND T1L_NasSummary < 1 => -99997,
+																		T1_Cvi IN [30,40] => 1, 0);
 
 Event: => T1_IdIsKrGenFrdFlag := MAP(T1_LexIdPopFlag = 0 AND T1_RinIdPopFlag = 0 => -99999,
                                                                  T_SrcClassType != 3 => -99998,
@@ -1045,7 +1131,7 @@ Event: => T1L_CurrAddrStEcho := MAP(T1_LexIdPopFlag=0 => -99999,
                                                                                      add_curr_st = '' OR add_curr_st:Null => -99997,
                                                                                      add_curr_st);  
 
-Event: => T1_HdrSrcCatCntLwFlag := MAP(T1_LexIdPopFlag=0 AND T1_RinIdPopFlag=0 => -99999,
+Event: => T1L_HdrSrcCatCntLwFlag := MAP(T1_LexIdPopFlag=0 AND T1_RinIdPopFlag=0 => -99999,
                                        T1L_IdIsBcShllHitFlag < 1 OR T_SrcClassType < 4 => -99998,
                                                                              T1L_Fp_SourceRiskLevel=-99997 => -99997,
                                                                              T1L_Fp_SourceRiskLevel >=7 => 1, 0);
@@ -1211,12 +1297,23 @@ Event: => P18_IpAddrRiskUnscrbleFlag := 1;
 Event: => P19_BnkAcctRiskUnscrbleFlag := 1;
 Event: => P20_DlRiskUnscrbleFlag := 1;
 
+Event: => T18_isanispecho := isanisp;
 
-QUERY: InputRin(DATASET OF RiskIntelligenceNetwork_Analytics.Layouts.LayoutInputPII_2 InputPIIDataset) <= Event 
+
+QUERY: InputRin(DATASET OF RiskIntelligenceNetwork_Analytics.Layouts.KelInputLayout InputPIIDataset) <= Event 
          {
+								T20_DlPopFlag,
+								T20_DlValType,
+								T16_PhnValType,
+								T1L_IdIsBcShllHitFlag,
+								T1L_LexIdSeenFlag,
+								T1L_BcShllLexIdMatchesInpFlag,
+								T_BcShllLexIdEcho,
                  T1L_IdCurrIncarcFlag,
                   T1L_IdCrimFlSdMatchFlag,
-                    
+									T18_isanispecho,
+									T_IsBcShllHitFlag,
+                    T1L_CurrAddrStEcho,
                     EntityContextUid,     
                     InCustomerPopulation,
 
@@ -1264,6 +1361,7 @@ T_InpClnAddrGeoBlkEcho,
 T_InpClnSsnEcho,
 T_InpClnDobEcho,
 T_InpClnDlStEcho,
+T_InpClnDlEcho,
 T_InpClnEmailEcho,
 T_InpClnBnkAcctEcho,
 T_InpClnBnkAcctRtgEcho,
@@ -1329,7 +1427,6 @@ T1_SsnPriorDOBFlag,
 T1L_SsnNotVerFlag,
 T1L_CurrAddrNotInAgcyJurStFlag,
 T1L_BestDlNotInAgcyJurStFlag,
-T1_HdrSrcCatCntLwFlag,
 T1L_IdDeceasedFlag,
 T1L_IdDtOfDeathAftIdActFlagEv,
 P1_AotIdKrStolIdActFlagEv,
@@ -1342,7 +1439,15 @@ P16_AotPhnKrActFlagEv,
 P17_AotEmailKrActFlagEv,
 P18_AotIpAddrKrActFlagEv,
 P19_AotBnkAcctKrActFlagEv,
-P20_AotDlKrActFlagEv
+P20_AotDlKrActFlagEv,
+T1L_HdrSrcCatCntLwFlag,
+T9_AddrIsVacantFlag,
+T9_AddrIsInvalidFlag,
+T9_AddrIsCmraFlag,
+T15_SsnIsInvalidFlag,
+T20_DlIsInvalidFlag,
+T16_PhnIsInvalidFlag,
+T16_PhnPrePdFlag
 
                  }
              USE InputPIIDataset(FLAT, 
@@ -1416,7 +1521,7 @@ P20_AotDlKrActFlagEv
                    EmailAddress = batchin_rec.email_address,
                      Host = '',
                      EmailLastDomain = '',
-                     isdisposableemail=0),  
+                     isdisposableemail=isDisposableEmail),  
 
                  Address(FILTER(/*(STRING10)batchin_rec.prim_range <> '' AND */ (STRING28)batchin_rec.prim_name <> '' AND (UNSIGNED3)batchin_rec.z5 <> 0),
                         PrimaryRange = batchin_rec.prim_range,
@@ -1449,11 +1554,11 @@ P20_AotDlKrActFlagEv
                         DateFirstSeen = advo_appends.date_first_seen, 
                         DateLastSeen = advo_appends.date_last_seen),
                  
-                 InternetProtocol(FILTER(AssociatedCustomerFileInfo > 0 AND (UNSIGNED)record_id > 0 AND TRIM(batchin_rec.ipaddress) != '' AND batchin_rec.ipaddress NOT IN ['0.0.0.0','10.121.146.247','10.121.146.90','10.121.146.15','10.121.146.159','10.121.146.249','10.121.146.34','10.121.146.231','10.121.146.235','10.121.146.232']),
+                 InternetProtocol(FILTER(AssociatedCustomerFileInfo > 0 AND (UNSIGNED)record_id > 0 AND TRIM(batchin_rec.ip_address) != '' AND batchin_rec.ip_address NOT IN ['0.0.0.0','10.121.146.247','10.121.146.90','10.121.146.15','10.121.146.159','10.121.146.249','10.121.146.34','10.121.146.231','10.121.146.235','10.121.146.232']),
                         host = host,
                         alias = alias,
                         location = location,
-                        ip_address = batchin_rec.ipaddress,
+                        ip_address = batchin_rec.ip_address,
                         ip_address_date = ip_address_date,
                         version = version,
                         class = class,
@@ -1465,70 +1570,70 @@ P20_AotDlKrActFlagEv
                         v2_ipcountry = v2_ipcountry,
                         v2_ipcontinent = v2_ipcontinent,
 
-                        iprngbeg = iprngbeg,
-                        iprngend = iprngend,
-                        edgecountry = edgecountry,
-                        edgeregion = edgeregion,
-                        edgecity = edgecity,
-                        edgeconnspeed = edgeconnspeed,
-                        edgemetrocode = edgemetrocode,
-                        edgelatitude = edgelatitude,
-                        edgelongitude = edgelongitude,
-                        edgepostalcode = edgepostalcode,
-                        edgecountrycode = edgecountrycode,
-                        edgeregioncode = edgeregioncode,
-                        edgecitycode = edgecitycode,
-                        edgecontinentcode = edgecontinentcode,
-                        edgetwolettercountry = edgetwolettercountry,
-                        edgeinternalcode = edgeinternalcode,
-                        edgeareacodes = edgeareacodes,
-                        edgecountryconf = edgecountryconf,
-                        edgeregionconf = edgeregionconf,
-                        edgecitycong = edgecitycong,
-                        edgepostalconf = edgepostalconf,
-                        edgegmtoffset = edgegmtoffset,
-                        edgeindst = edgeindst,
-                        siccode = siccode,
-                        domainname = domainname,
-                        ispname = ispname,
-                        homebiztype = homebiztype,
-                        asn = asn,
-                        asnname = asnname,
-                        primarylang = primarylang,
-                        secondarylang = secondarylang,
-                        proxytype = proxytype,
-                        proxydescription = proxydescription,
-                        isanisp = isanisp,
-                        companyname = companyname,
-                        ranks = ranks,
-                        households = households,
-                        women = women,
-                        women18to34 = women18to34,
-                        women35to49 = women35to49,
-                        men = men,
-                        men18to34 = men18to34,
-                        men35to49 = men35to49,
-                        teens = teens,
-                        kids = kids,
-                        naicscode = naicscode,
-                        cbsacode = cbsacode,
-                        cbsatitle = cbsatitle,
-                        cbsatype = cbsatype,
-                        csacode = csacode,
-                        csatitle = csatitle,
-                        mdcode = mdcode,
-                        mdtitle = mdtitle,
-                        organizationname = organizationname
+                        iprngbeg = ip_meta_data.ip_rng_beg,
+                        iprngend = ip_meta_data.ip_rng_end,
+                        edgecountry = ip_meta_data.edge_country,
+                        edgeregion = ip_meta_data.edge_region,
+                        edgecity = ip_meta_data.edge_city,
+                        edgeconnspeed = ip_meta_data.edge_conn_speed,
+                        edgemetrocode = ip_meta_data.edge_metro_code,
+                        edgelatitude = ip_meta_data.edge_latitude,
+                        edgelongitude = ip_meta_data.edge_longitude,
+                        edgepostalcode = ip_meta_data.edge_postal_code,
+                        edgecountrycode = ip_meta_data.edge_country_code,
+                        edgeregioncode = ip_meta_data.edge_region_code,
+                        edgecitycode = ip_meta_data.edge_city_code,
+                        edgecontinentcode = ip_meta_data.edge_continent_code,
+                        edgetwolettercountry = ip_meta_data.edge_two_letter_country,
+                        edgeinternalcode = ip_meta_data.edge_internal_code,
+                        edgeareacodes = ip_meta_data.edge_area_codes,
+                        edgecountryconf = ip_meta_data.edge_country_conf,
+                        edgeregionconf = ip_meta_data.edge_region_conf,
+                        edgecitycong = ip_meta_data.edge_city_conf,
+                        edgepostalconf = ip_meta_data.edge_postal_conf,
+                        edgegmtoffset = ip_meta_data.edge_gmt_offset,
+                        edgeindst = ip_meta_data.edge_in_dst,
+                        siccode = ip_meta_data.sic_code,
+                        domainname = ip_meta_data.domain_name,
+                        ispname = ip_meta_data.isp_name,
+                        homebiztype = ip_meta_data.homebiz_type,
+                        asn = ip_meta_data.asn,
+                        asnname = ip_meta_data.asn_name,
+                        primarylang = ip_meta_data.primary_lang,
+                        secondarylang = ip_meta_data.secondary_lang,
+                        proxytype = ip_meta_data.proxy_type,
+                        proxydescription = ip_meta_data.proxy_description,
+                        isanisp = ip_meta_data.is_an_isp,
+                        companyname = ip_meta_data.company_name,
+                        ranks = ip_meta_data.ranks,
+                        households = ip_meta_data.households,
+                        women = ip_meta_data.women,
+                        women18to34 = ip_meta_data.w18_34,
+                        women35to49 = ip_meta_data.w35_49,
+                        men = ip_meta_data.men,
+                        men18to34 = ip_meta_data.m18_34,
+                        men35to49 = ip_meta_data.m35_49,
+                        teens = ip_meta_data.teens,
+                        kids = ip_meta_data.kids,
+                        naicscode = ip_meta_data.naics_code,
+                        cbsacode = ip_meta_data.cbsa_code,
+                        cbsatitle = ip_meta_data.cbsa_title,
+                        cbsatype = ip_meta_data.cbsa_type,
+                        csacode = ip_meta_data.csa_code,
+                        csatitle = ip_meta_data.csa_title,
+                        mdcode = ip_meta_data.md_code,
+                        mdtitle = ip_meta_data.md_title,
+                        organizationname = ip_meta_data.organization_name
 ),               
 
                  Bank(FILTER(batchin_rec.bank_routing_number != '' AND batchin_rec.bank_account_number != ''),
                    RoutingNumber = batchin_rec.bank_routing_number,
-                   FullBankname = bank1FullBankname,
-                   AbbreviatedBankname = bank1AbbreviatedBankname,
-                   FractionalRoutingnumber = bank1FractionalRoutingnumber,
-                   HeadofficeRoutingnumber = bank1HeadofficeRoutingnumber,
-                   HeadofficeBranchcodes = bank1HeadofficeBranchcodes,
-                   hit = bank1hit 
+                   FullBankname = bankDetails_FullBankName,
+                   AbbreviatedBankname = bankDetails_AbbreviatedBankName,
+                   FractionalRoutingnumber = bankDetails_FractionalRoutingNumber,
+                   HeadofficeRoutingnumber = bankDetails_HeadOfficeRoutingNumber,
+                   HeadofficeBranchcodes = bankDetails_HeadOfficeBranchCodes,
+                   hit = bankDetails_Hit 
                     ),
 
                  BankAccount(FILTER((UNSIGNED)batchin_rec.did <> 0 AND TRIM(batchin_rec.bank_account_number) != ''),
@@ -1564,6 +1669,7 @@ P20_AotDlKrActFlagEv
                     OttoBankAccountId = OttoBankAccountId,
                     EventDate = event_date,
                     RecordId=record_id,
+										AcctNo = batchin_rec.acctno,
                     DateOfBirth = batchin_rec.dob,      
                     Title = pr_best_appends.best_title,
                     FirstName = batchin_rec.name_first,
@@ -1604,7 +1710,13 @@ P20_AotDlKrActFlagEv
                     GeoMatch = advo_appends.geo_match,
                     ACECleanerErrorCode = advo_appends.err_stat,
                     isAdditional=FALSE,
+										address_vacancy_indicator = boca_shell_appends.advo_input_addr.address_vacancy_indicator,
+										addrvalflag = boca_shell_appends.iid.addrvalflag,
+										drop_indicator = boca_shell_appends.iid.chrono_addr_flags.dropindicator,
+										PhoneNumber = batchin_rec.phoneno,
                     PhoneFormatted = batchin_rec.phoneno,   //Doesn't exist...I can create it with whatever format we need
+										PhonesMetaHit = phonesMetaHit,
+										phone_prepaid = prepaidPhone,
                     LicenseNumber = dl_number, //batchin_rec.dl_number,
                     LicenseState = dl_state, //batchin_rec.dl_state,
                     
@@ -1613,19 +1725,19 @@ P20_AotDlKrActFlagEv
                     CreatedOn = 0,
                     Host = '', // ??
                     EmailLastDomain = '', // ??
-                    isdisposableemail = 0,   //??
+                    isdisposableemail = isDisposableEmail,  
 
                     Ssn = batchin_rec.ssn,
                     SsnFormatted = '', //??
 
                     RoutingNumber = batchin_rec.bank_routing_number,
-                    FullBankname = '',
-                    AbbreviatedBankname = '',
-                    FractionalRoutingnumber = '',
-                    HeadofficeRoutingnumber = '',
-                    HeadofficeBranchcodes = '',
+                    FullBankname = bankDetails_FullBankName,
+                    AbbreviatedBankname = bankDetails_AbbreviatedBankName,
+                    FractionalRoutingnumber = bankDetails_FractionalRoutingNumber,
+                    HeadofficeRoutingnumber = bankDetails_HeadOfficeRoutingNumber,
+                    HeadofficeBranchcodes = bankDetails_HeadOfficeBranchCodes,
                     AccountNumber = batchin_rec.bank_account_number,
-                    BankHit = '',
+                    BankHit = bankDetails_Hit,
                                 
                     Confidence_that_activity_was_deceitful_id = Confidence_that_activity_was_deceitful_id,
                     name_risk_code = name_risk_code,
@@ -1691,7 +1803,7 @@ P20_AotDlKrActFlagEv
                             add_curr_unit_desig = boca_shell_appends.address_verification.input_address_information.unit_desig,
                             add_curr_sec_range = boca_shell_appends.address_verification.input_address_information.sec_range,
                             add_curr_city_name = boca_shell_appends.address_verification.input_address_information.city_name,
-                            add_curr_st = boca_shell_appends.address_verification.input_address_information.st,
+                            add_curr_st = curr_st,
                             add_curr_zip5 = boca_shell_appends.address_verification.input_address_information.zip5,
                             add_curr_county = boca_shell_appends.address_verification.input_address_information.county,
                             add_curr_geo_blk = boca_shell_appends.address_verification.input_address_information.geo_blk,
@@ -1730,69 +1842,69 @@ P20_AotDlKrActFlagEv
                             off_cat_list = '', //Need to build list from the offense categories
                             name_ssn_dob_match = crim_match_type, //??
 
-                            IpAddress=ip_address,
-                            iprngbeg = iprngbeg,
-                            iprngend = iprngend,
-                            edgecountry = edgecountry,
-                            edgeregion = edgeregion,
-                            edgecity = edgecity,
-                            edgeconnspeed = edgeconnspeed,
-                            edgemetrocode = edgemetrocode,
-                            edgelatitude = edgelatitude,
-                            edgelongitude = edgelongitude,
-                            edgepostalcode = edgepostalcode,
-                            edgecountrycode = edgecountrycode,
-                            edgeregioncode = edgeregioncode,
-                            edgecitycode = edgecitycode,
-                            edgecontinentcode = edgecontinentcode,
-                            edgetwolettercountry = edgetwolettercountry,
-                            edgeinternalcode = edgeinternalcode,
-                            edgeareacodes = edgeareacodes,
-                            edgecountryconf = edgecountryconf,
-                            edgeregionconf = edgeregionconf,
-                            edgecitycong = edgecitycong,
-                            edgepostalconf = edgepostalconf,
-                            edgegmtoffset = edgegmtoffset,
-                            edgeindst = edgeindst,
-                            siccode = siccode,
-                            domainname = domainname,
-                            ispname = ispname,
-                            homebiztype = homebiztype,
-                            asn = asn,
-                            asnname = asnname,
-                            primarylang = primarylang,
-                            secondarylang = secondarylang,
-                            proxytype = proxytype,
-                            proxydescription = proxydescription,
-                            isanisp = isanisp,
-                            companyname = companyname,
-                            ranks = ranks,
-                            households = households,
-                            women = women,
-                            women18to34 = women18to34,
-                            women35to49 = women35to49,
-                            men = men,
-                            men18to34 = men18to34,
-                            men35to49 = men35to49,
-                            teens = teens,
-                            kids = kids,
-                            naicscode = naicscode,
-                            cbsacode = cbsacode,
-                            cbsatitle = cbsatitle,
-                            cbsatype = cbsatype,
-                            csacode = csacode,
-                            csatitle = csatitle,
-                            mdcode = mdcode,
-                            mdtitle = mdtitle,
-                            organizationname = organizationname,
+                            IpAddress=batchin_rec.ip_address,
+                            iprngbeg = ip_meta_data.ip_rng_beg,
+                        iprngend = ip_meta_data.ip_rng_end,
+                        edgecountry = ip_meta_data.edge_country,
+                        edgeregion = ip_meta_data.edge_region,
+                        edgecity = ip_meta_data.edge_city,
+                        edgeconnspeed = ip_meta_data.edge_conn_speed,
+                        edgemetrocode = ip_meta_data.edge_metro_code,
+                        edgelatitude = ip_meta_data.edge_latitude,
+                        edgelongitude = ip_meta_data.edge_longitude,
+                        edgepostalcode = ip_meta_data.edge_postal_code,
+                        edgecountrycode = ip_meta_data.edge_country_code,
+                        edgeregioncode = ip_meta_data.edge_region_code,
+                        edgecitycode = ip_meta_data.edge_city_code,
+                        edgecontinentcode = ip_meta_data.edge_continent_code,
+                        edgetwolettercountry = ip_meta_data.edge_two_letter_country,
+                        edgeinternalcode = ip_meta_data.edge_internal_code,
+                        edgeareacodes = ip_meta_data.edge_area_codes,
+                        edgecountryconf = ip_meta_data.edge_country_conf,
+                        edgeregionconf = ip_meta_data.edge_region_conf,
+                        edgecitycong = ip_meta_data.edge_city_conf,
+                        edgepostalconf = ip_meta_data.edge_postal_conf,
+                        edgegmtoffset = ip_meta_data.edge_gmt_offset,
+                        edgeindst = ip_meta_data.edge_in_dst,
+                        siccode = ip_meta_data.sic_code,
+                        domainname = ip_meta_data.domain_name,
+                        ispname = ip_meta_data.isp_name,
+                        homebiztype = ip_meta_data.homebiz_type,
+                        asn = ip_meta_data.asn,
+                        asnname = ip_meta_data.asn_name,
+                        primarylang = ip_meta_data.primary_lang,
+                        secondarylang = ip_meta_data.secondary_lang,
+                        proxytype = ip_meta_data.proxy_type,
+                        proxydescription = ip_meta_data.proxy_description,
+                        isanisp = ip_meta_data.is_an_isp,
+                        companyname = ip_meta_data.company_name,
+                        ranks = ip_meta_data.ranks,
+                        households = ip_meta_data.households,
+                        women = ip_meta_data.women,
+                        women18to34 = ip_meta_data.w18_34,
+                        women35to49 = ip_meta_data.w35_49,
+                        men = ip_meta_data.men,
+                        men18to34 = ip_meta_data.m18_34,
+                        men35to49 = ip_meta_data.m35_49,
+                        teens = ip_meta_data.teens,
+                        kids = ip_meta_data.kids,
+                        naicscode = ip_meta_data.naics_code,
+                        cbsacode = ip_meta_data.cbsa_code,
+                        cbsatitle = ip_meta_data.cbsa_title,
+                        cbsatype = ip_meta_data.cbsa_type,
+                        csacode = ip_meta_data.csa_code,
+                        csatitle = ip_meta_data.csa_title,
+                        mdcode = ip_meta_data.md_code,
+                        mdtitle = ip_meta_data.md_title,
+                        organizationname = ip_meta_data.organization_name,
 
-                            advo_hitflag = '',
-                            advo_vacancyindicator = boca_shell_appends.advo_input_addr.address_vacancy_indicator,
-                            advo_addressstyle = advo_appends.address_style_flag,
-                            advo_dropindicator = boca_shell_appends.advo_input_addr.drop_indicator,
-                            advo_residentialorbusinessindicator  = boca_shell_appends.advo_input_addr.residential_or_business_ind,
-                            advo_addresstype = advo_appends.address_type,
-                            advo_addressusagetype = advo_appends.mixed_address_usage // ??
+												advo_hitflag = '',
+												advo_vacancyindicator = boca_shell_appends.advo_input_addr.address_vacancy_indicator,
+												advo_addressstyle = advo_appends.address_style_flag,
+												advo_dropindicator = boca_shell_appends.advo_input_addr.drop_indicator,
+												advo_residentialorbusinessindicator  = boca_shell_appends.advo_input_addr.residential_or_business_ind,
+												advo_addresstype = advo_appends.address_type,
+												advo_addressusagetype = advo_appends.mixed_address_usage // ??
   ));               
                     
                     

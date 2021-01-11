@@ -173,7 +173,11 @@ export FraudAdvisor_Service := MACRO
         '_TransactionId',
         '_BatchUID',
         '_GCID',
-				'UseIngestDate'
+        '_CompanyID',
+        '_LoginID',
+				'UseIngestDate',
+        'IDA_gateway_mode'
+
 	));
 
 Risk_indicators.MAC_unparsedfullname(title_val,first_value,middle_value,last_value,suffix_value,'FirstName','MiddleName','LastName','NameSuffix')
@@ -280,12 +284,18 @@ string8 TimeofApplication            := '' : stored('TimeofApplication');
 #stored('DisableBocaShellLogging', DisableOutcomeTracking);
 
 
-string20  Model              := ''    : stored('Model');
-boolean   IncludeRiskIndices := false : stored('IncludeRiskIndices');  // to include the 6 fraud indices that come back in fp1109_0
+string20  Model                := ''    : stored('Model');
+boolean   IncludeRiskIndices   := false : stored('IncludeRiskIndices');  // to include the 6 fraud indices that come back in fp1109_0
 boolean SuppressCompromisedDLs := false : stored('SuppressCompromisedDLs');
 // Set to TRUE when running RiskProcessing scripts to include some intermediate boca shell outputs for modelers
-boolean IncludeQAOutputs             := FALSE : stored('IncludeQAOutputs'); 
-boolean UseIngestDate             := FALSE : stored('UseIngestDate'); 
+boolean IncludeQAOutputs := FALSE : stored('IncludeQAOutputs'); 
+boolean UseIngestDate    := FALSE : stored('UseIngestDate'); 
+
+//IDA gateway modes 
+// 0 = production mode
+// 1 = UAT mode
+// 2 = Retro mode
+unsigned1 IDA_gateway_mode := 0 : stored('IDA_gateway_mode');
 
 Boolean TrackInsuranceRoyalties := Risk_Indicators.iid_constants.InsuranceDL_ok(DataPermission);
 
@@ -355,14 +365,18 @@ Gateway.Layouts.Config gw_switch(gateways_in le) := transform
                           le.servicename = 'bridgerwlc' and OFACVersion = 4 and Models.FP_models.Model_Check(Valid_requested_models, ['']) => le.servicename,
                           le.servicename = 'bridgerwlc' and OFACVersion = 4 and
                           Not Models.FP_models.Model_Check(Valid_requested_models, Risk_Indicators.iid_constants.FAXML_WatchlistModels)    => '',
-                                                                                                                                                 le.servicename);
+                          le.servicename in Models.FraudAdvisor_Constants.IDA_services and 
+													Not Models.FP_models.Model_Check(Valid_requested_models, Models.FraudAdvisor_Constants.IDA_models_set)           => '', //turn off IDA gateway if we don't need it
+                                                                                                                                              le.servicename);
                                                                                                                                                
 	self.url := map(Models.FP_models.Model_Check(Valid_requested_models, ['fd5609_2'])                                               => '',
                   Models.FP_models.Model_Check(Valid_requested_models, ['fp1303_1', 'fp1307_1']) and le.servicename = 'netacuity'  => '',
                   le.servicename = 'bridgerwlc' and OFACVersion = 4 and Models.FP_models.Model_Check(Valid_requested_models, ['']) => le.url,
                   le.servicename = 'bridgerwlc' and OFACVersion = 4 and
                   Not Models.FP_models.Model_Check(Valid_requested_models, Risk_Indicators.iid_constants.FAXML_WatchlistModels)    => '',
-                                                                                                                                         le.url); 
+                  le.servicename in Models.FraudAdvisor_Constants.IDA_services and 
+									Not Models.FP_models.Model_Check(Valid_requested_models, Models.FraudAdvisor_Constants.IDA_models_set)           => '', //turn off IDA gateway if we don't need it
+                                                                                                                                      le.url); 
   self := le;																																								
 end;
 
@@ -465,40 +479,49 @@ prep2_temp := DATASET([into2]);
 //replace in_zipCode value with custom parameter for fp1509_2 if requested
 prep2 := Models.FP_models.custom_field_replacement(prep2_temp, Valid_requested_models, 'fp1509_2', 'in_zipCode', 'retailzip', 'String');
 
+// New minimum input criteria for Fraud Intel models (i.e. IDA combo models)
+FraudIntel_minimum_check := Models.FP_models.Model_Check(Valid_requested_models, [Models.FraudAdvisor_Constants.IDA_models_set]) and
+                            ((trim(prep[1].fname)<>'' and trim(prep[1].lname)<>'' and 
+                            (trim(prep[1].in_streetAddress)<>'' and trim(prep[1].in_City)<>'' and trim(prep[1].in_State)<>''))
+                            or
+                            (trim(prep[1].fname)<>'' and trim(prep[1].lname)<>'' and trim(prep[1].dob)<>'')
+                            or
+                            (trim(prep[1].fname)<>'' and trim(prep[1].lname)<>'' and trim(prep[1].phone10)<>''));
+
 // requirement 2.5 - minimum input required
 // a. Model is AVENGER and cmLexID is populated, and is the only thing populated
 // b.	First Name, Last Name, Street Address, Zip
 // c.	First Name, Last Name, SSN
 input_ok := if( (Models.FP_models.FP31604_0_check(Valid_requested_models, 'fp31604_0', 'lexid')
-									 and trim(prep[1].fname)=''
-									 and trim(prep[1].mname)=''
-									 and trim(prep[1].lname)=''
-									 and trim(prep[1].suffix)=''
-									 and trim(prep[1].ssn)=''
-									 and trim(prep[1].dob)=''
-									 and trim(prep[1].age)='0'
-									 and trim(prep[1].phone10)=''
-									 and trim(prep[1].wphone10)=''
-									 and trim(prep[1].in_streetAddress)=''
-									 and trim(prep[1].in_city)=''
-									 and trim(prep[1].in_state)=''
-									 and trim(prep[1].in_zipCode)=''
-									 and trim(prep[1].in_country)=''
-									 and trim(prep[1].country)=''
-									 and trim(prep[1].dl_number)=''
-									 and trim(prep[1].dl_state)=''
-									 and trim(prep[1].email_address)=''
-									 and trim(prep[1].ip_address)=''
-									 and trim(prep[1].employer_name)=''
-									 and trim(prep[1].lname_prev)=''
-											) or
-								(trim(prep[1].fname)<>''
-									 and trim(prep[1].lname)<>''
-									 and (trim(prep[1].ssn)<>'' or (trim(prep[1].in_streetAddress)<>''
-																										and trim(prep[1].in_zipCode)<>''))
-											),
-						TRUE,
-						ERROR(301,doxie.ErrorCodes(301)));
+                  and trim(prep[1].fname)=''
+                  and trim(prep[1].mname)=''
+                  and trim(prep[1].lname)=''
+                  and trim(prep[1].suffix)=''
+                  and trim(prep[1].ssn)=''
+                  and trim(prep[1].dob)=''
+                  and trim(prep[1].age)='0'
+                  and trim(prep[1].phone10)=''
+                  and trim(prep[1].wphone10)=''
+                  and trim(prep[1].in_streetAddress)=''
+                  and trim(prep[1].in_city)=''
+                  and trim(prep[1].in_state)=''
+                  and trim(prep[1].in_zipCode)=''
+                  and trim(prep[1].in_country)=''
+                  and trim(prep[1].country)=''
+                  and trim(prep[1].dl_number)=''
+                  and trim(prep[1].dl_state)=''
+                  and trim(prep[1].email_address)=''
+                  and trim(prep[1].ip_address)=''
+                  and trim(prep[1].employer_name)=''
+                  and trim(prep[1].lname_prev)=''
+                 ) or
+                  (trim(prep[1].fname)<>'' and trim(prep[1].lname)<>'' and 
+                  (trim(prep[1].ssn)<>'' or (trim(prep[1].in_streetAddress)<>'' and trim(prep[1].in_zipCode)<>'')))
+                   or
+                   FraudIntel_minimum_check
+                  ,
+                  TRUE,
+                  ERROR(301,doxie.ErrorCodes(301)));
 						
 //=============================================================
 //===  Description: This is the attribute version section. 
@@ -525,11 +548,11 @@ doTMXAttributes := Models.FP_Models.Check_Valid_Attributes(attributesIn, [Models
 //These options are being hard coded to prevent target's fp1403_2 model from changing if FraudAdvisor settings change
 DisableInquiriesInCVI := True;																																								//Disable Customer Network: True
 unsigned3 LastSeenThresholdIn := map(	
-																		Models.FP_models.Model_Check(Valid_requested_models, ['fp1702_1','fp1702_2']) => risk_indicators.iid_constants.max_unsigned3,
-																		Models.FP_models.Model_Check(Valid_requested_models, ['fp1403_2','fp1510_2']) => 730,
-                                    Models.FP_models.Model_Check(Valid_requested_models, ['fp1908_1','fp1909_1','fp1909_2']) => risk_indicators.iid_constants.oneyear,
-																		doAttributesVersion201 OR doAttributesVersion202 => 9999,
-																		risk_indicators.iid_constants.oneyear);	//Last Seen Threshold: 365 days (1 year) for fp1403_2, otherwise use default
+                                  Models.FP_models.Model_Check(Valid_requested_models, ['fp1702_1','fp1702_2']) => risk_indicators.iid_constants.max_unsigned3,
+                                  Models.FP_models.Model_Check(Valid_requested_models, ['fp1403_2','fp1510_2']) => 730,
+                                  Models.FP_models.Model_Check(Valid_requested_models, ['fp1908_1','fp1909_1','fp1909_2']) => risk_indicators.iid_constants.oneyear,
+                                  doAttributesVersion201 OR doAttributesVersion202     => 9999,
+                                                                                          risk_indicators.iid_constants.oneyear);	//Last Seen Threshold: 365 days (1 year) for fp1403_2, otherwise use default
 
 boolean doInquiries := ~DisableInquiriesInCVI AND dataRestriction[risk_indicators.iid_constants.posInquiriesRestriction]<>risk_indicators.iid_constants.sTrue AND
                        Models.FP_models.Model_Check(Valid_requested_models, ['fp1403_2','fp1510_2']);
@@ -562,7 +585,7 @@ IncludeDLverification := if(doAttributesVersion2, true, false);
 //=========================
 bsVersion := map(
   Models.FP_models.Model_Check(Valid_requested_models, ['di31906_0']) or doTMXAttributes => 55,
-  Models.FP_models.Model_Check(Valid_requested_models, ['fp1902_1', 'fp1908_1', 'fp1909_1', 'fp1909_2', 'fp1907_1', 'fp1907_2']) => 54,
+  Models.FP_models.Model_Check(Valid_requested_models, ['fp1902_1', 'fp1908_1', 'fp1909_1', 'fp1909_2', 'fp1907_1', 'fp1907_2', 'fibn12010_0']) => 54,
   Models.FP_models.Model_Check(Valid_requested_models, Models.FraudAdvisor_Constants.BS_Version53_List) or doParoAttributes or doAttributesVersion202 => 53,
 	Models.FP_models.Model_Check(Valid_requested_models, ['fp1706_1','fp1705_1','fp1704_1']) => 52,
 	Models.FP_models.Model_Check(Valid_requested_models, ['fp1506_1', 'fp31505_0', 'fp3fdn1505_0', 'fp31505_9', 'fp3fdn1505_9','fp1509_1', 
@@ -707,20 +730,12 @@ attributes := Models.getFDAttributes(clam, iid, account_value, ipdata, model_ind
 //For Paro update
 // attributes := Models.getFDAttributes(clam, iid, account_value, ipdata, model_indicator, suppressCompromisedDLs,
                                      // DPPA_Purpose, GLB_Purpose, DataRestriction, DataPermission, '', Valid_requested_models);
-#if(Models.FraudAdvisor_Constants.VALIDATION_MODE)
-
-    // This is for ROUND 2 Validation ONLY //
- 	  ModelValidationResults := Models.FP1909_2_0(clam, 6, attributes);
- 	  OUTPUT(ModelValidationResults, named('Results'));
-    
-#ELSE// search for test seeds																					
+																			
 attr_test_seed := Risk_Indicators.FDAttributes_TestSeed_Function(test_prep, account_value, Test_Data_Table_Name);	
 																																									
 // choose either test seed or real
 pick_attr := if(Test_Data_Enabled, attr_test_seed, ungroup(attributes));	
-// pick_attr := ungroup(attributes);			
-
-output(attributes[1].compromisedDL_hash, named('compromisedDL_hash'));							
+// pick_attr := ungroup(attributes);									
 
 Layout_FA_Input := RECORD
 	Risk_Indicators.Layout_Input;
@@ -841,40 +856,96 @@ layout_FDAttributesOut formAttributeGroup(Models.Layout_FraudAttributes le) := t
                             );
   self := [];
 END;
-attributeOut_temp := project(pick_attr, formAttributeGroup(left));
+attributeOut_temp := PROJECT(pick_attr, formAttributeGroup(left));
 
 attributeOut := Models.FP_models.custom_field_replacement(attributeOut_temp, Valid_requested_models, '', 'input.grade', 'grade', 'string');
 // attributeOut := join(pick_attr,clam,  left.input.seq=right.seq, formAttributeGroup(LEFT,RIGHT));
+
+
+//Make sure we are passing in the input PII not the cleaned PII to IDA
+IDA_input := PROJECT(iid, Transform(Risk_Indicators.layouts.layout_IDAFraud_in,
+                      SELF.seq := left.seq;
+                      SELF.DID := left.did;
+                      SELF.fname := first_value;
+                      SELF.mname := middle_value;
+                      SELF.lname := last_value;
+                      SELF.suffix := suffix_value;
+                      SELF.in_streetAddress := addr_value;
+                      SELF.in_city := city_value;
+                      SELF.in_state := state_value;
+                      SELF.in_zipCode := zip_value;
+                      SELF.in_country := country_value;
+                      SELF.ssn := socs_value;
+                      SELF.dob := dob_value;
+                      SELF.phone10 := hphone_value;
+                      SELF.wphone10 := wphone_value;
+                      SELF.dl_number := drlc_value;
+                      SELF.dl_state := drlcstate_value;
+                      SELF.email_address := email_value;
+                      SELF.ip_address := ip_value;
+                      SELF.historydate := IF(historyDateTimeStamp <> '', (UNSIGNED)historyDateTimeStamp[1..6], history_date);
+                      SELF.historyDateTimeStamp := risk_indicators.iid_constants.mygetdateTimeStamp(historydateTimeStamp, history_date);
+                      
+                      SELF.Client := Map(IDA_gateway_mode = 2 => Trim('ACC1357055'),
+                                         IDA_gateway_mode = 1 => Trim('ACC1357055'),
+                                         IDA_gateway_mode = 0 => Trim('ACC'+CompanyID),
+                                                                 '' //shouldn't happen
+                                        );
+                      SELF.Solution := Trim('Standard/MultiProduct'); 
+                      SELF.ProductName := ''; //Populated per model
+                      SELF.ProductID := ''; //Populated per model
+                      SELF.App_ID := Trim(OtherApplicationIdentifier3);
+                      SELF.ESPTransactionId := TransactionID;
+                      SELF.Channel := Channel;
+                      SELF := [];
+
+                     ));
+
+
+//Call the IDA gateway if needed
+IDA_attributes_raw := Risk_Indicators.Prep_IDA_Fraud(ungroup(IDA_input), gateways, Valid_requested_models);
+
+IDA_attributes := IF(Models.FP_models.Model_Check(Valid_requested_models, Models.FraudAdvisor_Constants.IDA_models_set), 
+                      IDA_attributes_raw,
+                      DATASET([],Risk_Indicators.layouts.layout_IDAFraud_out)
+                    );
 
 // Get the Fraud Defender models
 ret  := Models.FD3510_0_0(clam, ofacSearching, isFCRA, inCalif, fdReasonsWith38, nugen, addtl_watchlists);
 ret2 := Models.FD5510_0_0(clam, ofacSearching, nugen, addtl_watchlists);
 ret3 := Models.FD9510_0_0(clam, ofacSearching, nugen, addtl_watchlists);
 
-All_models := Project(Valid_requested_models, transform(Models.layouts.Enhanced_layout_fp1109,
-                                              Model_params := MODULE(models.FraudAdvisor_Constants.FP_model_params)
-                                                EXPORT Grouped Dataset(risk_indicators.Layout_Boca_Shell) _clam := clam;
-                                                EXPORT Grouped Dataset(risk_indicators.layout_bocashell_btst_out) _clam_BtSt :=  clam_BtSt;
-                                                EXPORT Dataset(models.layouts.bs_with_ip) _clam_ip :=  clam_ip;
-                                                EXPORT Grouped Dataset(Risk_Indicators.Layout_Output) IID_ret := iid;
-                                                EXPORT Dataset(Models.Layouts.Layout_Model_Options) modeloptions  := left.modeloptions;
-                                                EXPORT Dataset(riskwise.Layout_SkipTrace) _skiptrace := skiptrace;
-                                                EXPORT Dataset(easi.layout_census) _easicensus := easi_census;
-                                                EXPORT Dataset(Models.Layout_FraudAttributes) _FDatributes := attributes;
+//Defining the bulk of FP_Mod here for use in LUCI wrapper debug mode
+FPMod_params := MODULE(models.FraudAdvisor_Constants.FP_model_params)
+  EXPORT Grouped DATASET(risk_indicators.Layout_Boca_Shell) _clam := clam;
+  EXPORT Grouped DATASET(risk_indicators.layout_bocashell_btst_out) _clam_BtSt :=  clam_BtSt;
+  EXPORT DATASET(models.layouts.bs_with_ip) _clam_ip :=  clam_ip;
+  EXPORT Grouped DATASET(Risk_Indicators.Layout_Output) IID_ret := iid;
+  EXPORT DATASET(riskwise.Layout_SkipTrace) _skiptrace := skiptrace;
+  EXPORT DATASET(easi.layout_census) _easicensus := easi_census;
+  EXPORT DATASET(Models.Layout_FraudAttributes) _FDattributes := attributes;
+  EXPORT DATASET(Risk_Indicators.layouts.layout_IDAFraud_out) IDAattributes := IDA_attributes;
+END;
+
+All_models := PROJECT(Valid_requested_models, transform(Models.layouts.Enhanced_layout_fp1109,
+
+                                              Model_params := MODULE(FPMod_params)
+                                                EXPORT DATASET(Models.Layouts.Layout_Model_Options) modeloptions  := left.modeloptions;
                                               END;
-                                              
+
                                               custom_temp  := left.ModelOptions(STD.STR.ToLowerCase(TRIM(OptionName)) = 'custom');
                                               custom_name  := STD.STR.ToLowerCase(TRIM(custom_temp[1].OptionValue));
                                               
                                               self.model_name := custom_name, // piping model name through to keep track of what's what
-                                              self := Models.FP_models.Execute_model(Model_params)));
+                                              self := Models.FP_models.Execute_model(Model_params)
+                      ));
 
-fp_test_seed := Project(Valid_requested_models, Transform(Models.layouts.Enhanced_layout_fp1109,
+fp_test_seed := PROJECT(Valid_requested_models, Transform(Models.layouts.Enhanced_layout_fp1109,
                                                 seed_custom_temp  := left.ModelOptions(STD.STR.ToLowerCase(TRIM(OptionName)) = 'custom');
                                                 seed_custom_name  := STD.STR.ToLowerCase(TRIM(seed_custom_temp[1].OptionValue));
                                                 
-                                                self := Risk_Indicators.FraudPoint_TestSeed_Function(test_prep, Test_Data_Table_Name, seed_custom_name)));
-
+                                                self := Risk_Indicators.FraudPoint_TestSeed_Function(test_prep, Test_Data_Table_Name, seed_custom_name)
+                        ));
 
 models.Layout_Reason_Codes form_modelout_rc(Models.Layout_ModelOut le, unsigned1 cnt) :=
 TRANSFORM
@@ -1036,6 +1107,10 @@ finalcustom := map( Models.FP_models.Model_Check(Valid_requested_models, ['idn60
                     Models.FP_models.Model_Check(Valid_requested_models, standard_model_set) => all_fraudpoint_models,
                                                                                                 final_v1 ); 
 
+#if(~Models.FraudAdvisor_Constants.VALIDATION_MODE)
+
+output(attributes[1].compromisedDL_hash, named('compromisedDL_hash'));	
+
 // Note: All intermediate logs must have the following name schema:
 // Starts with 'LOG_' (Upper case is important!!)
 // Middle part is the database name, in this case: 'log__mbs'
@@ -1177,6 +1252,14 @@ Deltabase_Logging := DATASET([{Deltabase_Logging_prep}], Risk_Reporting.Layouts.
 // #stored('Deltabase_Log', Deltabase_Logging);
 
 IF(~DisableOutcomeTracking and ~Test_Data_Enabled, OUTPUT(Deltabase_Logging, NAMED('LOG_log__mbs_transaction__log__scout')));
+
+#ELSE //Valiation_mode = true
+
+  // This is for ROUND 2 Validation ONLY //
+  // ModelValidationResults := Models.FP1909_2_0(clam, 6, attributes);
+  ModelValidationResults := Models.getLuciModel(FPMod_params).FIBN12010_0;
+  OUTPUT(ModelValidationResults, named('Results'));
+    
 
 #END //==== end of commented code for debug/validation mode ======
 

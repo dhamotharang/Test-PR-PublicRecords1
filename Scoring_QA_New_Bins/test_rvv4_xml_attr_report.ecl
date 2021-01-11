@@ -4,15 +4,15 @@
 
 import Scoring_Project_Macros;
 
- file1_2:= dataset(route + scoring_project_pip.Output_Sample_Names.RV_Attributes_V4_XML_Generic_outfile + previous_dt,Scoring_Project_Macros.Global_Output_Layouts.FCRA_RiskView_XML_Generic_Attributes_V4_Global_Layout,
+ file1_2:= distribute(dataset(route + scoring_project_pip.Output_Sample_Names.RV_Attributes_V4_XML_Generic_outfile + previous_dt,Scoring_Project_Macros.Global_Output_Layouts.FCRA_RiskView_XML_Generic_Attributes_V4_Global_Layout,
 
 
-thor);
+thor), (integer) accountnumber);
 
- file2_2:= dataset(route + scoring_project_pip.Output_Sample_Names.RV_Attributes_V4_XML_Generic_outfile + current_dt, Scoring_Project_Macros.Global_Output_Layouts.FCRA_RiskView_XML_Generic_Attributes_V4_Global_Layout,
+ file2_2:= distribute(dataset(route + scoring_project_pip.Output_Sample_Names.RV_Attributes_V4_XML_Generic_outfile + current_dt, Scoring_Project_Macros.Global_Output_Layouts.FCRA_RiskView_XML_Generic_Attributes_V4_Global_Layout,
 
 
-thor);
+thor), (integer) accountnumber);
 
 
 file1 := file1_2(errorcode='');

@@ -1,9 +1,10 @@
 ﻿#OPTION('multiplePersistInstances',FALSE);
 #workunit('name', 'SBFE_Tradeline_Processing_Script');
-IMPORT	ut, STD,	Address, Business_Credit, data_services;
+IMPORT	ut, STD, Business_Credit;
 /**********************************************************************************************************/
 // -- pFilename -	Original Raw Filename.  The file is expected to be sprayed to THOR with a 
 //								name of '~thor::in::sbfe::'+pFilename
+// -- pFilenameout - Specifies the name of the output file 
 // -- pSBFEContributorNumber - A specific SBFE_Contributor_Number to use for this extract.
 // -- pAccountType	-	A pipe delimited "|" string of possible Account Types.  Blank or ANY results in using 
 //										All Account Types. Ex. '001|099'
@@ -23,6 +24,20 @@ IMPORT	ut, STD,	Address, Business_Credit, data_services;
 // -- pUseOtherEnvironment	-	Allows the user to run from Dataland and still point to Prod input files and Keys
 // -- pEyeball							- Specifies the number of records that will be displayed by output statements. Has no effect on the number
 //												  records processed and output in the final CSV file.
+// -- pFilterTradelinesOnCycleEndDate - Specifies whether to filter the tradeline records based on the cycle_end_date field or on
+//                                      the original_version. If this option is set to false, choose tradelines based on original_version.
+//                                      Note that if the user chooses to filter on the original_version field by setting this option to false,
+//                                      this will only be applied if that original_version of the record is after the SBFE load date,
+//                                      otherwise we still continue to filter on cycle_end_date. This option was created to simulate how
+//                                      the current SBFE Production code works.
+// -- pFirstSBFELoadDate - Represents the date when SBFE data was first loaded to the Production Roxie. At this time, there was a lot of 
+//                         of historical data. So in order to be able to archive records prior to this date, for any records where the 
+//                         original_version is < than 20151012, the cycle_end_date is used for archive filtering. 
+// -- mSBFEContributorIDNoHash - A pipe delimited "|" string that accepts up to 10 possible SBFE contributor IDs. Created specifically for vendor tests with AMEX. 
+//                               If a contributor ID is not in the pipe delimited string, mask information about that account (e.g. SBFE contributor # + contract account number)
+//                               Or else, return account information as is.
+// -- mLNRSKey - LexisNexis 'key' used to hash the SBFE contributor and contract account numbers that are not specificed in mSBFEContributorIDNoHash.
+// -- pRecordLimit - Indicates the number of records to read from the input file where 0 means ALL
 /**********************************************************************************************************/
 /******************************* DEFAULT VALUES ***********************************************************/
 // pFilename								:=	'';
@@ -37,17 +52,24 @@ IMPORT	ut, STD,	Address, Business_Credit, data_services;
 // pUseOtherEnvironment			:=	FALSE;
 // pEyeball									:= 100;
 /**********************************************************************************************************/
-pFilename									:=	'blptemp::blptemp_jpmc_test_fewrecords.csv'; // This file can have history dates in YYYYMMDD or YYYYMM format.
-pSBFEContributorNumber		:=	'ANY';
-pAccountType							:=	'ANY';
-pOpenDateStart						:=	'';
-pOpenDateEnd							:=	'';
-pOpenDateDurationMonths		:=	0;
-pPerformanceWindowMonths	:=	0;
+pFilename                := 'tfuerstenberg::in::amex_9569_open_cust_file1_apr18_tl_in.csv'; // This file can have history dates in YYYYMMDD or YYYYMM format.
+pFilenameout             := 'tfuerstenberg::out::amex_9569_open_cust_file1_apr18_tl';  
+pRecordLimit             := 0;
+pSBFEContributorNumber   := 'ANY';
+pAccountType             := 'ANY';
+pOpenDateStart           := '';
+pOpenDateEnd             := '';
+pOpenDateDurationMonths  := 0;
+pPerformanceWindowMonths := 0;
+pFirstSBFELoadDate       := '20151012';
 pTradelineWindowMonthsAfter	:=	0;
 pTradelineWindowMonthsPrior	:=	13;
-pUseOtherEnvironment			:=	FALSE;
-pEyeball										:= 100;
+pUseOtherEnvironment     := FALSE;
+pEyeball                 := 100;
+// pFilterTradelinesOnCycleEndDate := TRUE;
+pFilterTradelinesOnCycleEndDate := FALSE;
+mSBFEContributorIDNoHash := 'ANY';
+mLNRSKey                 := 'LNRS_2020';
 /**********************************************************************************************************/
 
 /************************/
@@ -55,6 +77,8 @@ pEyeball										:= 100;
 /************************/
 
 pBIPIDString	:=	'UltID'+ ',OrgID' + ',SeleID';
+
+mSBFEContributorIDNoHashSet := STD.Str.SplitWords(TRIM(mSBFEContributorIDNoHash,ALL), '|');
 									
 sAccountType	:=	IF(ut.CleanSpacesAndUpper(pAccountType)	IN	['','ANY'],
 										['001','002','003','004','005','006','099'],
@@ -78,18 +102,17 @@ pFilenameSuffix	:=	'_'+
 										IF(pTradelineWindowMonthsPrior<>0,'Tp','Xp');
 
 pInputFilename	:=	'~'+pFilename;
-pOutputFilename	:=	'~'+pFilename+pFilenameSuffix;
+pOutputFilename	:=	'~'+pFilenameout+pFilenameSuffix;
 
 /************************/
 /* Declare Build Files	*/
 /************************/
 kLinkIDs		:=	INDEX(Business_Credit.Key_LinkIds().Key,Business_Credit.Keynames(,pUseOtherEnvironment).LinkIds.QA);
 kTradeline	:=	INDEX(Business_Credit.key_tradeline(),Business_Credit.Keynames(,pUseOtherEnvironment).Tradeline.QA);
-																				
+																		
 /********************/
 /* Original Records	*/
-/********************/
-									
+/********************/					
 rOriginalLayout	:=	RECORD
 	STRING		AccountNumber;
 	STRING8		historydate;
@@ -101,7 +124,12 @@ rOriginalLayout	:=	RECORD
 	STRING30	Sbfe_Contributor_Number;
 	STRING50	Contract_Account_Number;
 END;
-dOriginalRecords	:= DATASET(pInputFilename,rOriginalLayout,CSV(HEADING(SINGLE),SEPARATOR(','),QUOTE('"')));
+
+
+// dOriginalRecords	:= DATASET(pInputFilename,rOriginalLayout,CSV(HEADING(SINGLE),SEPARATOR(','),QUOTE('"')));
+dOriginalRecords	:= IF(pRecordLimit = 0,
+                        DATASET(pInputFilename,rOriginalLayout,CSV(HEADING(SINGLE),SEPARATOR(','),QUOTE('"'))),
+                        CHOOSEN(DATASET(pInputFilename,rOriginalLayout,CSV(HEADING(SINGLE),SEPARATOR(','),QUOTE('"'))), pRecordLimit));
 
 OUTPUT(CHOOSEN(SORT(dOriginalRecords,AccountNumber),pEyeball),NAMED('dOriginalRecordsSample'));
 OUTPUT(COUNT(dOriginalRecords),NAMED('OriginalRecordsCount'));
@@ -116,17 +144,21 @@ dOriginalRecordsStandardizedHistoryDate	:=	PROJECT(dOriginalRecords,
 																						);
 
 OUTPUT(CHOOSEN(dOriginalRecordsStandardizedHistoryDate, pEyeball), NAMED('dOriginalRecordsStandardizedHistoryDate'));
+
 /****************************************************************/
 /* Get SBFE Accounts associated with BIPIDs and Account Numbers	*/
 /****************************************************************/
-dBIPIDs								:=	dOriginalRecordsStandardizedHistoryDate(ultID>0);
-dContributorAccounts	:=	dOriginalRecordsStandardizedHistoryDate(TRIM(Sbfe_Contributor_Number,LEFT,RIGHT)<>'');
+dBIPIDs := dOriginalRecordsStandardizedHistoryDate(ultID>0);
+OUTPUT(CHOOSEN(dBIPIDs,pEyeball),NAMED('dBIPIDs'));
+
+dContributorAccounts := dOriginalRecordsStandardizedHistoryDate(TRIM(Sbfe_Contributor_Number,LEFT,RIGHT)<>'');
+OUTPUT(CHOOSEN(dContributorAccounts,pEyeball),NAMED('dContributorAccounts'));
 
 rSBFEAccounts	:=	RECORD
-	rOriginalLayout;
-	STRING3		Account_Type_Reported;
-	STRING8		Original_Date_Account_Opened:='';
-	BOOLEAN		byContributorAccounts:=FALSE;
+  rOriginalLayout;
+  STRING3 Account_Type_Reported;
+  STRING8 Original_Date_Account_Opened:='';
+  BOOLEAN byContributorAccounts:=FALSE;
 END;
 
 dUniqueBIPIDandSBFEAccounts	:=	SORT(DISTRIBUTE(PULL(kLinkIDs)(
@@ -186,18 +218,22 @@ dSBFEContributorAccounts	:=	IF(COUNT(dContributorAccounts)>0,
 																DATASET([],rSBFEAccounts)
 															);
 
-dSBFEAccounts :=	dSBFEBIPAccounts+dSBFEContributorAccounts;
+dSBFEAccounts1 := dSBFEBIPAccounts+dSBFEContributorAccounts;
+dSBFEAccounts := DEDUP(SORT(dSBFEAccounts1, accountnumber, SBFE_Contributor_Number, contract_account_number, account_type_reported, powid, proxid, seleid, orgid, ultid),
+                            accountnumber, SBFE_Contributor_Number, contract_account_number, account_type_reported, powid, proxid, seleid, orgid, ultid);
+                              
+
 
 OUTPUT(CHOOSEN(dSBFEAccounts, pEyeball), NAMED('dSBFEAccounts'));
 /**********************************/
 /* Set Original Account Open Date	*/
 /**********************************/
 rOriginalDateAccountOpened	:=	RECORD
-	STRING30	Sbfe_Contributor_Number;
-	STRING50	Contract_Account_Number;
-	STRING3		Account_Type_Reported;
-	STRING8		Cycle_End_Date;
-	STRING8		Original_Date_Account_Opened;
+  STRING30 Sbfe_Contributor_Number;
+  STRING50 Contract_Account_Number;
+  STRING3 Account_Type_Reported;
+  STRING8 Cycle_End_Date;
+  STRING8 Original_Date_Account_Opened;
 END;
 
 dOriginalDateAccountOpened	:=	SORT(DISTRIBUTE(
@@ -210,14 +246,15 @@ dOriginalDateAccountOpened	:=	SORT(DISTRIBUTE(
 																	
 
 OUTPUT(CHOOSEN(dOriginalDateAccountOpened, pEyeball), NAMED('dOriginalDateAccountOpened'));
+
 // /************************************************/
 // /* Get Tradelines associated with SBFE Accounts */
 // /************************************************/
 
-tempTradeline := record
-STRING		AccountNumber;
-RECORDOF(kTradeline);
-STRING historydate;
+tempTradeline := RECORD
+  STRING AccountNumber;
+  RECORDOF(kTradeline);
+  STRING historydate;
 END;
 
 dTradelines		:=	JOIN(SORT(DISTRIBUTE(PULL(kTradeline
@@ -228,22 +265,26 @@ dTradelines		:=	JOIN(SORT(DISTRIBUTE(PULL(kTradeline
 													Account_Type_Reported IN sAccountType
 													#IF (pPerformanceWindowMonths>0)
 														AND	Cycle_End_Date	>=	date_account_opened
-														AND	Cycle_End_Date	<=	ut.Month_Math(date_account_opened,pPerformanceWindow)
+														AND	Cycle_End_Date	<=	ut.Month_Math(date_account_opened,pPerformanceWindowMonths)
 													#END
 												)
 											),
 												HASH(	Sbfe_Contributor_Number,Contract_Account_Number,Account_Type_Reported)),
 												Sbfe_Contributor_Number,Contract_Account_Number,Account_Type_Reported,date_account_opened,Cycle_End_Date ,LOCAL),
-												SORT(DISTRIBUTE(dSBFEAccounts(
+
+												SORT(
+                        DISTRIBUTE(dSBFEAccounts(
 													UltID>0 
 													AND OrgID>0 
 													AND SeleID>0
 												), 
-												HASH(	Sbfe_Contributor_Number,Contract_Account_Number,Account_Type_Reported)),
+												  HASH( Sbfe_Contributor_Number,Contract_Account_Number,Account_Type_Reported)),
 												Sbfe_Contributor_Number,Contract_Account_Number,Account_Type_Reported,historydate, LOCAL),
+
 											LEFT.Sbfe_Contributor_Number	=		RIGHT.Sbfe_Contributor_Number	AND
 											LEFT.Contract_Account_Number	=		RIGHT.Contract_Account_Number	AND
 											LEFT.Account_Type_Reported		=		RIGHT.Account_Type_Reported
+
 											#IF (bUseDuration	AND	pOpenDateDurationMonths>0)
 												AND	LEFT.date_account_opened	>=	RIGHT.historydate
 												AND	LEFT.date_account_opened	<=	ut.Month_Math(RIGHT.historydate,pOpenDateDurationMonths)
@@ -252,15 +293,27 @@ dTradelines		:=	JOIN(SORT(DISTRIBUTE(PULL(kTradeline
 												AND	LEFT.date_account_opened	<=	pOpenDateEnd
 											#END
 											#IF	(pTradelineWindowMonthsPrior>0	OR	pTradelineWindowMonthsAfter>0)
-												#IF	(pTradelineWindowMonthsPrior>0)
-													AND	LEFT.Cycle_End_Date						>=    IF (RIGHT.historydate[5..6] = '02' AND pTradelineWindowMonthsPrior = 13, (STRING8)(((INTEGER)ut.Month_Math(RIGHT.historydate,-pTradelineWindowMonthsPrior)[1..4]) + 1) + '0101', ut.Month_Math(RIGHT.historydate,-pTradelineWindowMonthsPrior))
-												#ELSE
-													AND	LEFT.Cycle_End_Date						>=	RIGHT.historydate
+												/* Adding additional filter to filter tradeline records based on the original version, which is the version that we (LN) send a record to production
+												* but continue to filter on cycle end date if the history date is prior to the SBFE load date, which is used for archive filterning */
+												#IF	(pTradelineWindowMonthsPrior>0 AND pFilterTradelinesOnCycleEndDate)
+													AND	LEFT.Cycle_End_Date						>=    IF (RIGHT.historydate[5..6] = '02' AND pTradelineWindowMonthsPrior = 13, TRIM((STRING8)(((INTEGER)ut.Month_Math(RIGHT.historydate,-pTradelineWindowMonthsPrior)[1..4])) + '0101', ALL), ut.Month_Math(RIGHT.historydate,-pTradelineWindowMonthsPrior))
+												#ELSEIF (pTradelineWindowMonthsPrior>0 AND NOT pFilterTradelinesOnCycleEndDate)
+													AND (IF (LEFT.Original_version	> 	pFirstSBFELoadDate, LEFT.Original_Version, LEFT.Cycle_End_Date)) >= IF (RIGHT.historydate[5..6] = '02' AND pTradelineWindowMonthsPrior = 13, TRIM((STRING8)(((INTEGER)ut.Month_Math(RIGHT.historydate,-pTradelineWindowMonthsPrior)[1..4])) + '0101', ALL), ut.Month_Math(RIGHT.historydate,-pTradelineWindowMonthsPrior))
+													AND LEFT.Cycle_End_Date >= IF (RIGHT.historydate[5..6] = '02' AND pTradelineWindowMonthsPrior = 13, TRIM((STRING8)(((INTEGER)ut.Month_Math(RIGHT.historydate,-pTradelineWindowMonthsPrior)[1..4])) + '0101', ALL), ut.Month_Math(RIGHT.historydate,-pTradelineWindowMonthsPrior))
+												#ELSEIF (pTradelineWindowMonthsPrior = 0 AND pFilterTradelinesOnCycleEndDate)
+													AND LEFT.Cycle_End_Date	 >=	RIGHT.historydate
+												#ELSE	
+													AND	(IF (LEFT.Original_version	> 	pFirstSBFELoadDate, LEFT.Original_Version, LEFT.Cycle_End_Date))	 >=	RIGHT.historydate
 												#END
-												#IF	(pTradelineWindowMonthsAfter>0)
+												#IF	(pTradelineWindowMonthsAfter>0 AND pFilterTradelinesOnCycleEndDate)
 													AND	LEFT.Cycle_End_Date						<=	ut.Month_Math(RIGHT.historydate,pTradelineWindowMonthsAfter)
-												#ELSE
+												#ELSEIF (pTradelineWindowMonthsAfter>0 AND NOT pFilterTradelinesOnCycleEndDate)
+													AND	 (IF (LEFT.Original_version	> pFirstSBFELoadDate, LEFT.Original_Version, LEFT.Cycle_End_Date))	<=	ut.Month_Math(RIGHT.historydate,pTradelineWindowMonthsAfter)
+													AND LEFT.Cycle_End_Date <=	ut.Month_Math(RIGHT.historydate,pTradelineWindowMonthsAfter)
+												#ELSEIF (pTradelineWindowMonthsAfter = 0 AND pFilterTradelinesOnCycleEndDate)
 													AND	LEFT.Cycle_End_Date						<	RIGHT.historydate
+												#ELSE
+													AND	(IF (LEFT.Original_version	> 	pFirstSBFELoadDate, LEFT.Original_Version, LEFT.Cycle_End_Date)) <	RIGHT.historydate
 												#END
 											#END
 											,
@@ -300,7 +353,7 @@ END;
 
 dGetOriginalRecords	:=	PROJECT(dOriginalRecords,TRANSFORM(rNewLayout,SELF:=LEFT;SELF:=[]));
 OUTPUT(CHOOSEN(SORT(dGetOriginalRecords,accountnumber),pEyeball),NAMED('dGetOriginalRecords'));
-dGetSBFEAccounts	:=	JOIN(
+dGetSBFEAccounts1	:=	JOIN(
 												DISTRIBUTE(dGetOriginalRecords,HASH(accountnumber)),
 												DISTRIBUTE(dSBFEAccounts,HASH(accountnumber)),
 													LEFT.accountnumber	=	RIGHT.accountnumber AND
@@ -314,8 +367,12 @@ dGetSBFEAccounts	:=	JOIN(
 												LOCAL,
 												LEFT OUTER
 											);
+
+// get rid of the garbage                      
+dGetSBFEAccounts := dGetSBFEAccounts1(accountnumber<>'');
 OUTPUT(CHOOSEN(SORT(dGetSBFEAccounts,accountnumber),pEyeball),NAMED('dGetSBFEAccounts'));
-dGetTradelines	:=	JOIN(
+
+dGetTradelines1	:=	JOIN(
 											DISTRIBUTE(dTradelines,HASH(AccountNumber, Sbfe_Contributor_Number,Contract_Account_Number,Account_Type_Reported)),
 											DISTRIBUTE(dGetSBFEAccounts,HASH(AccountNumber, Sbfe_Contributor_Number,Contract_Account_Number,Account_Type_Reported)),
 												LEFT.AccountNumber						=		RIGHT.AccountNumber AND
@@ -334,7 +391,11 @@ dGetTradelines	:=	JOIN(
 											LOCAL,
 											RIGHT OUTER
 										)(Cycle_End_Date <> '');
-										
+
+// get these to be unique before joining back to doriginaldateaccountopened
+dGetTradelines := DEDUP(SORT(dGetTradelines1, AccountNumber, SBFE_Contributor_Number, Contract_account_number, account_type_reported, cycle_end_date, -version), 
+                                              AccountNumber, SBFE_Contributor_Number, Contract_Account_Number, account_type_reported, cycle_end_date);
+                                              
 dGetOriginalDateAccountOpened	:=	
 										JOIN(
 											DISTRIBUTE(dOriginalDateAccountOpened,HASH(Sbfe_Contributor_Number,Contract_Account_Number,Account_Type_Reported)),
@@ -345,12 +406,28 @@ dGetOriginalDateAccountOpened	:=
 												,
 											TRANSFORM(
 												RECORDOF(RIGHT),
-												SELF.Original_Date_Account_Opened	:=	LEFT.Original_Date_Account_Opened;
-												SELF															:=	RIGHT;
+												#IF (mSBFEContributorIDNoHash NOT IN ['','ANY'])
+                        SELF.Sbfe_Contributor_Number := IF(RIGHT.Sbfe_Contributor_Number IN mSBFEContributorIDNoHashSet,
+                                                          (RIGHT.Sbfe_Contributor_Number),
+                                                          (STRING)HASH64(RIGHT.Sbfe_Contributor_Number, mLNRSKey));
+                        SELF.Contract_Account_Number := IF(RIGHT.Sbfe_Contributor_Number IN mSBFEContributorIDNoHashSet,
+                                                          (RIGHT.Contract_Account_Number),
+                                                          (STRING)HASH64(RIGHT.Sbfe_Contributor_Number, RIGHT.Contract_Account_Number, RIGHT.Account_Type_Reported));                        
+                        SELF.Original_Contract_Account_Number := IF(RIGHT.Sbfe_Contributor_Number IN mSBFEContributorIDNoHashSet,
+                                                                   (RIGHT.Original_Contract_Account_Number),
+                                                                   (STRING)HASH64(RIGHT.Sbfe_Contributor_Number, RIGHT.Original_Contract_Account_Number, RIGHT.Account_Type_Reported));
+                        
+                        SELF.Original_Date_Account_Opened	:=	LEFT.Original_Date_Account_Opened;
+                        SELF	:=	RIGHT;
+												#ELSE
+                        SELF.Original_Date_Account_Opened	:=	LEFT.Original_Date_Account_Opened;
+                        SELF	:=	RIGHT;                        
+												#END
 											),
 											LOCAL,
 											RIGHT OUTER
 										);
+
 OUTPUT(CHOOSEN(SORT(dGetOriginalDateAccountOpened,accountnumber),pEyeball),NAMED('dGetTradelines'));
 
 dRecordWithTradelines	:=	SORT(DISTRIBUTE(dGetOriginalDateAccountOpened,

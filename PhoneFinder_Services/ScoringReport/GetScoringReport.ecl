@@ -38,7 +38,7 @@ iesp.phonefinder.t_PhoneFinderSearchRequest request_format(PhoneFinder_Services.
     SELF.SearchBy.Address.StreetAddress1 := dInputReq.StreetAddress;
     SELF.SearchBy.Address.City :=  dInputReq.City;
     SELF.SearchBy.Address.State :=  dInputReq.State;
-    SELF.SearchBy.Address.Zip4 :=  dInputReq.Zip;
+    SELF.SearchBy.Address.Zip5 :=  dInputReq.Zip;
     SELF.Options.VerificationOptions.VerifyPhoneName := ds_config[1].VerifyPhoneName;  
     SELF.Options.VerificationOptions.VerifyPhoneLastName := ds_config[1].VerifyPhoneLastName;
     SELF.Options.VerificationOptions.VerifyPhoneNameAddress := ds_config[1].VerifyPhoneNameAddress;   

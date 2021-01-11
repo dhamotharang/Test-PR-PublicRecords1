@@ -351,10 +351,10 @@ EXPORT Common := MODULE
     EXPORT LookAtOther(STRING1 offenseScore, STRING5 courtOffenseLevel, STRING75 charge, STRING40 courtDispDesc1, STRING40 courtDispDesc2, STRING35 offenseChargeLevelReported, STRING1 trafficFlag) := FUNCTION
       
       //Does the field "courtOffenseLevel" map to any of the listed FELONY, MISDEMEANOR, TRAFFIC, or INFRACCTION codes 
-      BOOLEAN MapsToFelony := STD.Str.ToUpperCase(TRIM(courtOffenseLevel, LEFT, RIGHT)) IN DueDiligence.Constants.setFELONY; 
-      BOOLEAN MapsToMisdemeanor := STD.Str.ToUpperCase(TRIM(courtOffenseLevel, LEFT, RIGHT)) IN DueDiligence.Constants.setMISDEMEANOR;
-      BOOLEAN MapsToTraffic := STD.Str.ToUpperCase(TRIM(courtOffenseLevel, LEFT, RIGHT)) IN DueDiligence.Constants.setTRAFFIC;
-      BOOLEAN MapsToInfraction := STD.Str.ToUpperCase(TRIM(courtOffenseLevel, LEFT, RIGHT)) IN DueDiligence.Constants.setINFRACTION;
+      BOOLEAN MapsToFelony := STD.Str.ToUpperCase(TRIM(courtOffenseLevel, LEFT, RIGHT)) IN DueDiligence.ConstantsLegal.SET_FELONY; 
+      BOOLEAN MapsToMisdemeanor := STD.Str.ToUpperCase(TRIM(courtOffenseLevel, LEFT, RIGHT)) IN DueDiligence.ConstantsLegal.SET_MISDEMEANOR;
+      BOOLEAN MapsToTraffic := STD.Str.ToUpperCase(TRIM(courtOffenseLevel, LEFT, RIGHT)) IN DueDiligence.ConstantsLegal.SET_TRAFFIC;
+      BOOLEAN MapsToInfraction := STD.Str.ToUpperCase(TRIM(courtOffenseLevel, LEFT, RIGHT)) IN DueDiligence.ConstantsLegal.SET_INFRACTION;
       
       //check to see if we can find key words
       STRING  TextStringConcatenated := charge + courtDispDesc1 + courtDispDesc2 + offenseChargeLevelReported;  
@@ -366,21 +366,21 @@ EXPORT Common := MODULE
       
       
       
-      waterfallValue  := MAP(MapsToFelony => DueDiligence.Constants.FELONY,
-                          foundFelonyKeyWord => DueDiligence.Constants.FELONY,
-                          MapsToMisdemeanor => DueDiligence.Constants.MISDEMEANOR,    
-                          MapsToTraffic => DueDiligence.Constants.TRAFFIC,
-                          MapsToInfraction => DueDiligence.Constants.INFRACTION,
-                          trafficFlag = DueDiligence.Constants.YES => DueDiligence.Constants.TRAFFIC,
-                          foundMisdemeanorKeyWord => DueDiligence.Constants.MISDEMEANOR,
-                          foundTrafficKeyWord => DueDiligence.Constants.TRAFFIC,
-                          foundInfractionKeyWord => DueDiligence.Constants.INFRACTION,
+      waterfallValue  := MAP(MapsToFelony => DueDiligence.ConstantsLegal.FELONY,
+                          foundFelonyKeyWord => DueDiligence.ConstantsLegal.FELONY,
+                          MapsToMisdemeanor => DueDiligence.ConstantsLegal.MISDEMEANOR,    
+                          MapsToTraffic => DueDiligence.ConstantsLegal.TRAFFIC,
+                          MapsToInfraction => DueDiligence.ConstantsLegal.INFRACTION,
+                          trafficFlag = DueDiligence.Constants.YES => DueDiligence.ConstantsLegal.TRAFFIC,
+                          foundMisdemeanorKeyWord => DueDiligence.ConstantsLegal.MISDEMEANOR,
+                          foundTrafficKeyWord => DueDiligence.ConstantsLegal.TRAFFIC,
+                          foundInfractionKeyWord => DueDiligence.ConstantsLegal.INFRACTION,
                           DueDiligence.Constants.UNKNOWN);
                           
-      returnValue := MAP(waterfallValue = DueDiligence.Constants.FELONY OR offenseScore = DueDiligence.Constants.FELONY => DueDiligence.Constants.FELONY,
-                          waterfallValue = DueDiligence.Constants.MISDEMEANOR OR offenseScore = DueDiligence.Constants.MISDEMEANOR => DueDiligence.Constants.MISDEMEANOR,
-                          waterfallValue = DueDiligence.Constants.TRAFFIC OR offenseScore = DueDiligence.Constants.TRAFFIC => DueDiligence.Constants.TRAFFIC,
-                          waterfallValue = DueDiligence.Constants.INFRACTION OR offenseScore = DueDiligence.Constants.INFRACTION => DueDiligence.Constants.TRAFFIC,
+      returnValue := MAP(waterfallValue = DueDiligence.ConstantsLegal.FELONY OR offenseScore = DueDiligence.ConstantsLegal.FELONY => DueDiligence.ConstantsLegal.FELONY,
+                          waterfallValue = DueDiligence.ConstantsLegal.MISDEMEANOR OR offenseScore = DueDiligence.ConstantsLegal.MISDEMEANOR => DueDiligence.ConstantsLegal.MISDEMEANOR,
+                          waterfallValue = DueDiligence.ConstantsLegal.TRAFFIC OR offenseScore = DueDiligence.ConstantsLegal.TRAFFIC => DueDiligence.ConstantsLegal.TRAFFIC,
+                          waterfallValue = DueDiligence.ConstantsLegal.INFRACTION OR offenseScore = DueDiligence.ConstantsLegal.INFRACTION => DueDiligence.ConstantsLegal.TRAFFIC,
                           DueDiligence.Constants.UNKNOWN);
 
       

@@ -64,10 +64,10 @@ FUNCTION
     SELF.iccid_changedthis_time  := IF(le.iccid_changedthis_time = 0, ri.iccid_changedthis_time, le.iccid_changedthis_time);
     SELF.imsi_changedthis_time   := IF(le.imsi_changedthis_time = 0, ri.imsi_changedthis_time, le.imsi_changedthis_time);
     SELF.imei_changedthis_time   := IF(le.imei_changedthis_time = 0, ri.imei_changedthis_time, le.imei_changedthis_time);
-    SELF.sim_Tenure_MinDays      := IF(le.sim_Tenure_MinDays = 0, ri.sim_Tenure_MinDays, le.sim_Tenure_MinDays);
-    SELF.sim_Tenure_MaxDays      := IF(le.sim_Tenure_MaxDays = 0, ri.sim_Tenure_MaxDays, le.sim_Tenure_MaxDays);
-    SELF.imei_Tenure_MinDays     := IF(le.imei_Tenure_MinDays = 0, ri.imei_Tenure_MinDays, le.imei_Tenure_MinDays);
-    SELF.imei_Tenure_MaxDays     := IF(le.imei_Tenure_MaxDays = 0, ri.imei_Tenure_MaxDays, le.imei_Tenure_MaxDays);
+    SELF.sim_Tenure_MinDays      := IF(le.sim_Tenure_MinDays != 0, le.sim_Tenure_MinDays, ri.sim_Tenure_MinDays);
+    SELF.sim_Tenure_MaxDays      := IF(le.sim_Tenure_MaxDays != 0, le.sim_Tenure_MaxDays, ri.sim_Tenure_MaxDays);
+    SELF.imei_Tenure_MinDays     := IF(le.imei_Tenure_MinDays != 0, le.imei_Tenure_MinDays, ri.imei_Tenure_MinDays);
+    SELF.imei_Tenure_MaxDays     := IF(le.imei_Tenure_MaxDays != 0, le.imei_Tenure_MaxDays, ri.imei_Tenure_MaxDays);
     SELF.phn_src_all             := le.phn_src_all + ri.phn_src_all;
     SELF                         := le;
   END;

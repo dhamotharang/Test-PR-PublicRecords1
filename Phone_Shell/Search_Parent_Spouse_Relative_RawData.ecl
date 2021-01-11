@@ -49,10 +49,6 @@ EXPORT Phone_Shell.Layouts.Layout_Parent_Spouse_Relative_RawData Search_Parent_S
    /* ***************************************************************
     * 						        	Get Blue Records						      			*
     *************************************************************** */
-  // why input GLB, DPPA are not used?
-
-  glb_ok := mod_access.isValidGLB();
-  dppa_ok := mod_access.isValidDPPA();
 
   Progressive_Phone.Mac_Get_Blue(withRelativeDid, blueRecords, FALSE, FALSE, FALSE, mod_access);
 

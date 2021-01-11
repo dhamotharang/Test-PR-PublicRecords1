@@ -11,6 +11,7 @@ export Constants := module
     export integer WAIT_TIMEOUT_EXPERIAN := 5;
     export integer STATUS_SUCCESS := 0;
     export integer MAX_THREADS := 20;
+    export integer TARGUS_TIMEOUT := 6;
   end;
 
   export ServiceName := module
@@ -42,12 +43,14 @@ export Constants := module
     export String40 ThreatMetrix_test := 'threatmetrix_test'; // added for threatmetrix_test transactions for modeling team
     export String40 FirstData := 'first_data';           // added for firstdata/fiserv
     export String40 EmailRisk := 'emailrisk'; // added for EmailRisk
+    export String40 IDAFraud := 'IDAReport'; // IDA fraud gateway
     export String40 News := 'news'; // WSK news gateway (currently for AML Attributes)
     export String40 ERI := 'erisalary';
     export String40 NeutralRoxie := 'neutralroxie'; // internal
     export String40 InsurancePhoneHeader := 'insurancephoneheader'; // internal call to insurance/alpharetta roxie
     export String40 FCRARoxie := 'fcra'; // from RiskWiseFCRA.Neutral_Service_Name
     export String40 SearchCore := 'searchcore'; // Bridger SearchCore service
+    export String40 bridgerAPI := 'bridgerapi'; // Bridger Stand alone SearchCore (no wsgateway call) Full World compliance file
     export String40 bridgerxg5 := 'bridgerxg5'; // Bridger Stand alone SearchCore (no wsgateway call) Full World compliance file
     export String40 bridgerwlc := 'bridgerwlc'; // Bridger Stand alone SearchCore (no wsgateway call) Subset of Watchlist files
     export String40 DeltaInquiry := 'delta_inquiry';

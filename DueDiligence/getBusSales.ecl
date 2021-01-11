@@ -43,23 +43,7 @@ EXPORT getBusSales(DATASET(DueDiligence.Layouts.Busn_Internal) busInfo,
 																		SELF := LEFT),
 																	LEFT OUTER, KEEP(DueDiligence.Constants.MAX_ATMOST_1), ATMOST(DueDiligence.Constants.MAX_ATMOST_100), FEW);
 																	
-	//retrieve SIC and NAIC codes with dates
-	outEbrSic := DueDiligence.CommonBusiness.getSicNaicCodes(ebrFilt, DueDiligence.Constants.EMPTY, DueDiligence.Constants.SOURCE_EBR, sic_1_code, TRUE, TRUE, date_first_seen, date_last_seen);
-	outEbrSic2 := DueDiligence.CommonBusiness.getSicNaicCodes(ebrFilt, DueDiligence.Constants.EMPTY, DueDiligence.Constants.SOURCE_EBR, sic_2_code, TRUE, FALSE, date_first_seen, date_last_seen);
-	outEbrSic3 := DueDiligence.CommonBusiness.getSicNaicCodes(ebrFilt, DueDiligence.Constants.EMPTY, DueDiligence.Constants.SOURCE_EBR, sic_3_code, TRUE, FALSE, date_first_seen, date_last_seen);
-	outEbrSic4 := DueDiligence.CommonBusiness.getSicNaicCodes(ebrFilt, DueDiligence.Constants.EMPTY, DueDiligence.Constants.SOURCE_EBR, sic_4_code, TRUE, FALSE, date_first_seen, date_last_seen);
-	
-	
-	allEbrSicNaic := outEbrSic + outEbrSic2 + outEbrSic3 + outEbrSic4;
-	sortEbrRollSicNaic := DueDiligence.CommonBusiness.rollSicNaicBySeqAndBIP(busInfo, allEbrSicNaic);
-		
-	addEbrSicNaic := JOIN(withEBR5600Stats, sortEbrRollSicNaic,
-													#EXPAND(DueDiligence.Constants.mac_JOINLinkids_BusInternal()),
-													TRANSFORM(DueDiligence.Layouts.Busn_Internal,
-																		SELF.SicNaicSources := RIGHT.sources;
-																		SELF := LEFT;),
-													LEFT OUTER,
-													ATMOST(1));	
+
 		
 	// *********************
 	//   DEBUGGING OUTPUTS
@@ -74,5 +58,5 @@ EXPORT getBusSales(DATASET(DueDiligence.Layouts.Busn_Internal) busInfo,
 	// OUTPUT(CHOOSEN(withEBR5600Stats, 100), NAMED('Sample_withEBR5600Stats'));
  
 
-	RETURN addEbrSicNaic;
+	RETURN withEBR5600Stats;
 END;

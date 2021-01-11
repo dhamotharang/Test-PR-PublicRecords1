@@ -1,7 +1,7 @@
-import address, Liensv2;
-export layout_lien_party_address := record
+IMPORT address, Liensv2, LiensV2_Services;
+EXPORT layout_lien_party_address := RECORD
   LiensV2.Layout_liens_base_module.layout_party_info.orig_address1;
-	LiensV2.Layout_liens_base_module.layout_party_info.orig_address2;
+  LiensV2.Layout_liens_base_module.layout_party_info.orig_address2;
   address.layout_clean182.prim_range;
   address.layout_clean182.predir;
   address.layout_clean182.prim_name;
@@ -16,6 +16,6 @@ export layout_lien_party_address := record
   address.layout_clean182.zip4;
   address.layout_clean182.county;
   address.layout_clean182.msa;
-	string18 county_name;
-	dataset(liensv2_services.layout_lien_party_phone) phones{maxcount(5)};
-end;
+  STRING18 county_name;
+  DATASET(liensv2_services.layout_lien_party_phone) phones{MAXCOUNT(5)};
+END;

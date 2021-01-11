@@ -76,7 +76,8 @@ EXPORT reportIndBusAssoc(DATASET(DueDiligence.Layouts.Indv_Internal) inData,
                                                                                                   SELF.FirstReported := iesp.ECL2ESP.toDate(RIGHT.firstSeen);
                                                                                                   SELF.LastReported := iesp.ECL2ESP.toDate(RIGHT.lastSeen);
                                                                                                   SELF := [];));
-                                        SELF := [];));
+                                        SELF := [];),
+                              RIGHT OUTER);
 
 
 
@@ -87,62 +88,50 @@ EXPORT reportIndBusAssoc(DATASET(DueDiligence.Layouts.Indv_Internal) inData,
     //       NAICS (North American Industry Classification System)
     //========================================================================================
 
-    //get the SIC/NAIC descriptions
-    industryRisk := NORMALIZE(uniqueBusinessID, (LEFT.perBusAssoc.sicNAICRisk.bestSic + LEFT.perBusAssoc.sicNAICRisk.bestNAICS + LEFT.perBusAssoc.sicNAICRisk.highestRisk)(code <> DueDiligence.Constants.EMPTY),
-                              TRANSFORM({DueDiligence.LayoutsInternal.InternalSeqAndIdentifiersLayout, UNSIGNED6 inputSeq, DueDiligence.Layouts.SICNAICRating, STRING8 rawCode, iesp.duediligencepersonreport.t_DDRIndustryRisk espRisk},
-                                        SELF.seq := LEFT.seq;
-                                        SELF.inputSeq := LEFT.busn_input.inputSeq;
-                                        SELF.seleID := LEFT.busn_info.BIP_IDs.SeleID.LinkID;																				
-                                        
-                                        tempSic := TRIM(RIGHT.code) + '00000000';
-                                        newSic := tempSic[1..8];
-                                        
-                                        SELF.code := IF(RIGHT.sicNAICSIndicator = DueDiligence.Constants.INDUSTRY_INDICATOR_SIC, newSic, RIGHT.code);
-                                        SELF.rawCode := RIGHT.code;
-                                        
-                                        SELF := RIGHT;
-                                        SELF := [];));
-                                                                    
-    //filter out sic and naics
-    sicOnly := industryRisk(sicNAICSIndicator = DueDiligence.Constants.INDUSTRY_INDICATOR_SIC);
-    naicsOnly := industryRisk(sicNAICSIndicator = DueDiligence.Constants.INDUSTRY_INDICATOR_NAICS);
-                                                                      
-    //get descriptions
-    sicDescriptions := JOIN(sicOnly, Risk_Indicators.Key_Sic_Description,
-                            LEFT.code = RIGHT.sic_code,
-                            TRANSFORM(RECORDOF(LEFT),	
-                                      SELF.espRisk.Code := LEFT.rawCode;
-                                      SELF.espRisk.Description := RIGHT.sic_description; // get desc from key
-                                      SELF.espRisk.IndustryRisk := DueDiligence.translateCodeToText.IndustryRiskText(LEFT.highestIndustryOrRiskLevel);
-                                      SELF := LEFT;),
-                            LEFT OUTER,
-                            ATMOST(DueDiligence.Constants.MAX_ATMOST_1000),
-                            KEEP(1)); // should only be 1 matching sic code on right
-                  
-
-    naicDiscriptions := JOIN(naicsOnly, Codes.Key_NAICS,
-                              LEFT.code = RIGHT.naics_code,
-                              TRANSFORM(RECORDOF(LEFT),	
-                                        SELF.espRisk.Code := LEFT.rawCode;
-                                        SELF.espRisk.Description := RIGHT.naics_description; // get desc from key
-                                        SELF.espRisk.IndustryRisk := DueDiligence.translateCodeToText.IndustryRiskText(LEFT.highestIndustryOrRiskLevel);
-                                        SELF := LEFT;),
-                              LEFT OUTER, 
-                              ATMOST(DueDiligence.Constants.MAX_ATMOST_1000),
-                              KEEP(1)); // should only be 1 matching naics code on right					 
+    industryRisk := PROJECT(uniqueBusinessID, TRANSFORM({UNSIGNED seq, UNSIGNED inputSeq, UNSIGNED6 inquiredDID, DueDiligence.LayoutsInternalReport.IndivBusAssociationLayout},
+                                                          SELF.seq := LEFT.seq;
+                                                          SELF.inputSeq := LEFT.busn_info.inputSeq;
+                                                          SELF.inquiredDID := LEFT.inquiredDID;
+                                                          SELF.ultID := LEFT.busn_info.BIP_IDs.UltID.LinkID;
+                                                          SELF.orgID := LEFT.busn_info.BIP_IDs.OrgID.LinkID;
+                                                          SELF.seleID := LEFT.busn_info.BIP_IDs.SeleID.LinkID;
+                                                          
+                                                          industryCodes := LEFT.perbusassoc.sicnaicsources;
+                                                        
+                                                          bestSic := industryCodes(sicCode <> DueDiligence.Constants.EMPTY AND isPrimary)[1];
+                                                          bestNaics := industryCodes(naicCode <> DueDiligence.Constants.EMPTY AND isPrimary)[1];
+                                                          
+                                                          riskyBusiness := SORT(industryCodes, -riskiestlevel, -isPrimary, -dateLastSeen)[1];
+                                                          
+                                                          
+                                                          SELF.association.bestSic.code := bestSic.sicCode;
+                                                          SELF.association.bestSic.description := bestSic.sicDesc;
+                                                          SELF.association.bestSic.industryRisk := bestSic.sicIndustry;
+                                                          
+                                                          SELF.association.bestNaics.code := bestNaics.naicCode;
+                                                          SELF.association.bestNaics.description := bestNaics.naicsDesc;
+                                                          SELF.association.bestNaics.industryRisk := bestNaics.naicIndustry;
+                                                          
+                                                          SELF.association.HighestRisk.code := IF(riskyBusiness.sicCode = DueDiligence.Constants.EMPTY, riskyBusiness.naicCode, riskyBusiness.sicCode); 
+                                                          SELF.association.HighestRisk.description := IF(riskyBusiness.sicCode = DueDiligence.Constants.EMPTY, riskyBusiness.naicsDesc, riskyBusiness.sicDesc);
+                                                          SELF.association.HighestRisk.industryRisk := IF(riskyBusiness.sicCode = DueDiligence.Constants.EMPTY, riskyBusiness.naicIndustry, riskyBusiness.sicIndustry);
+                                                          
+                                                          SELF := [];));
 
 
     //add the descriptions back together
-    addIndustryCodes := DENORMALIZE(populateBusiness, sicDescriptions + naicDiscriptions,
+    addIndustryCodes := JOIN(populateBusiness, industryRisk,
                                     LEFT.seq = RIGHT.seq AND
                                     LEFT.inputSeq = RIGHT.inputSeq AND
+                                    LEFT.inquiredDID = RIGHT.inquiredDID AND
                                     LEFT.seleID = RIGHT.seleID,
                                     TRANSFORM(DueDiligence.LayoutsInternalReport.IndivBusAssociationLayout,
-                                                SELF.association.BestSic := IF(RIGHT.industryCategory = DueDiligence.Constants.INDUSTRY_GROUP_BEST_SIC, RIGHT.espRisk, LEFT.association.BestSic);
-                                                SELF.association.BestNaics := IF(RIGHT.industryCategory = DueDiligence.Constants.INDUSTRY_GROUP_BEST_NAICS, RIGHT.espRisk, LEFT.association.BestNaics);
-                                                SELF.association.HighestRisk := IF(RIGHT.industryCategory = DueDiligence.Constants.INDUSTRY_GROUP_HIGHEST_RISK, RIGHT.espRisk, LEFT.association.HighestRisk);
+                                                SELF.association.BestSic := RIGHT.association.bestSic;
+                                                SELF.association.BestNaics := RIGHT.association.bestNaics;
+                                                SELF.association.HighestRisk := RIGHT.association.highestRisk;
                                                 SELF := LEFT;),
-                                    LEFT OUTER);
+                                    LEFT OUTER,
+                                    ATMOST(1));
 
 
 
@@ -250,7 +239,8 @@ EXPORT reportIndBusAssoc(DATASET(DueDiligence.Layouts.Indv_Internal) inData,
                                 TRANSFORM(DueDiligence.LayoutsInternalReport.IndivBusAssociationLayout,
                                             SELF.association.RegisteredAgents := RIGHT.espAgents;
                                             SELF := LEFT;),
-                                LEFT OUTER);
+                                LEFT OUTER,
+                                ATMOST(1));
                                 
                               
     //roll the associated businesses up to the inqured
@@ -284,16 +274,13 @@ EXPORT reportIndBusAssoc(DATASET(DueDiligence.Layouts.Indv_Internal) inData,
 
     // OUTPUT(convertToBusiness, NAMED('convertToBusiness'));
     // OUTPUT(uniqueBusinessID, NAMED('uniqueBusinessID'));
+    
     // OUTPUT(layoutForBusInfo, NAMED('layoutForBusInfo'));
     // OUTPUT(busInfo, NAMED('busInfo'));
     // OUTPUT(getAddressType, NAMED('getAddressType'));
     // OUTPUT(populateBusiness, NAMED('populateBusiness'));
 
     // OUTPUT(industryRisk, NAMED('industryRisk'));
-    // OUTPUT(sicOnly, NAMED('sicOnly'));
-    // OUTPUT(naicsOnly, NAMED('naicsOnly'));
-    // OUTPUT(sicDescriptions, NAMED('sicDescriptions'));
-    // OUTPUT(naicDiscriptions, NAMED('naicDiscriptions'));
     // OUTPUT(addIndustryCodes, NAMED('addIndustryCodes'));
 
     // OUTPUT(agents, NAMED('agents'));

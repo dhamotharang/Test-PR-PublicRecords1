@@ -1,4 +1,4 @@
-﻿IMPORT doxie, Property, ut, MDR;
+﻿IMPORT doxie, dx_Property, ut, MDR;
 
 EXPORT fn_getForeclosures(DATASET(HomesteadExemptionV2_Services.Layouts.propIdRec) ds_srch_recs) := FUNCTION
 
@@ -7,7 +7,7 @@ EXPORT fn_getForeclosures(DATASET(HomesteadExemptionV2_Services.Layouts.propIdRe
 		HomesteadExemptionV2_Services.Layouts.foreclosureRec;
 	END;
 
-	raw_foreclosures:=JOIN(ds_srch_recs,Property.Key_Foreclosures_Addr,
+	raw_foreclosures:=JOIN(ds_srch_recs,dx_Property.Key_Foreclosures_Addr,
 		KEYED(LEFT.z5=RIGHT.situs1_zip) AND
 		KEYED(LEFT.prim_range=RIGHT.situs1_prim_range) AND
 		KEYED(LEFT.prim_name=RIGHT.situs1_prim_name) AND

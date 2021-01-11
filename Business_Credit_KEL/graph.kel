@@ -73,7 +73,7 @@ Tradeline := ENTITY(FLAT(
 							STRING payment_interval=NULL(''),
 							STRING payment_status_category=NULL(''),
               INTEGER DBT_V5=NULL(''), 
-              STRING ln_delinquency_date=NULL(''), 
+              INTEGER raw_dbt_v5=NULL(''), 
 							term_of_account_in_months,
 							DATE first_payment_due_date=NULL(''),
 							DATE final_pyament_due_date=NULL(''),
@@ -2972,18 +2972,19 @@ Tradeline: => PaymentStatusV4 := MAP(IsChargeoff 												      				  => 9,
                                                                                            UNKNOWN_DATA);
 /* Check ln_delinquency_date to see whether it is an exceptional value (e.g.-1,-2,-3,-4)
 ** If so, we map it to 1 : unknown time frame. Decided by Product
+** Both -5 and -97 exception values coming from raw_dbt_v5 are automatically mapped into UNKNOWN_DATA
 */                                                                                         
-Tradeline: => PaymentStatusV5 := MAP(IsChargeoff 																			=> 9,
-                                     ln_delinquency_date:Null                         => 0,
-                                     ln_delinquency_date IN ['-1','-2','-3','-4']     => 1, 
-                                     DBT_V5 >= 0 AND DBT_V5 <= 30                     => 2,
-                                     DBT_V5 > 30 AND DBT_V5 <= 60                     => 3,
-                                     DBT_V5 > 60 AND DBT_V5 <= 90                     => 4,
-                                     DBT_V5 > 90 AND DBT_V5 <= 120                    => 5,
-                                     DBT_V5 > 120 AND DBT_V5 <= 150                   => 6,
-                                     DBT_V5 > 150 AND DBT_V5 <= 180                   => 7,
-                                     DBT_V5 > 180                                     => 8,
-																																												 UNKNOWN_DATA);
+Tradeline: => PaymentStatusV5 := MAP(IsChargeoff                                           => 9,
+                                     raw_dbt_v5 = 0                                        => 0,
+                                     raw_dbt_v5 IN [-1,-2,-3,-4]                           => 1, 
+                                     DBT_V5 > 0 AND DBT_V5 <= 30                           => 2,
+                                     DBT_V5 > 30 AND DBT_V5 <= 60                          => 3,
+                                     DBT_V5 > 60 AND DBT_V5 <= 90                          => 4,
+                                     DBT_V5 > 90 AND DBT_V5 <= 120                         => 5,
+                                     DBT_V5 > 120 AND DBT_V5 <= 150                        => 6,
+                                     DBT_V5 > 150 AND DBT_V5 <= 180                        => 7,
+                                     DBT_V5 > 180                                          => 8,
+                                                                                           UNKNOWN_DATA);
                                                                                 
 Tradeline: => PaymentStatus := IF(INTEGERFROMDATE(load_date) < CUTOFF_DATE OR MonthsBetweenPayment = 1, PaymentStatusV4, PaymentStatusV5);
 

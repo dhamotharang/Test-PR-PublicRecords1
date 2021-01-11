@@ -99,6 +99,7 @@ export Configuration := module
   export IsFCRARoxie(string40 svcName) := STD.Str.ToLowerCase(trim(svcName)) = Gateway.Constants.ServiceName.FCRARoxie;
   export IsInsurancePhoneHeader(string40 svcName) := STD.Str.ToLowerCase(trim(svcName)) = Gateway.Constants.ServiceName.InsurancePhoneHeader;
   export IsSearchCore(string40 svcName) := STD.Str.ToLowerCase(trim(svcName)) = Gateway.Constants.ServiceName.SearchCore;
+  export IsBridgerAPI(string40 svcName) := STD.Str.ToLowerCase(trim(svcName)) = Gateway.Constants.ServiceName.BridgerAPI;
   export IsBridgerXG5(string40 svcName) := STD.Str.ToLowerCase(trim(svcName)) = Gateway.Constants.ServiceName.BridgerXG5;
   export IsBridgerWLC(string40 svcName) := STD.Str.ToLowerCase(trim(svcName))=Gateway.Constants.ServiceName.BridgerWLC;
   export IsPhoneMetadata(string40 svcName) := STD.Str.ToLowerCase(trim(svcName)) = Gateway.Constants.ServiceName.PhonesMetaData;
@@ -113,6 +114,7 @@ export Configuration := module
   export IsAvm(string40 svcName) := STD.Str.ToLowerCase(trim(svcName))=STD.Str.ToLowerCase(Gateway.Constants.ServiceName.Avm);
   export IsOKCcourtrunner(string40 svcName) := STD.Str.ToLowerCase(trim(svcName)) = STD.Str.ToLowerCase(Gateway.Constants.ServiceName.OKCcourtrunner);
   export IsDTEGetRequestInfo(string40 svcName) := STD.Str.ToLowerCase(trim(svcName)) = STD.Str.ToLowerCase(Gateway.Constants.ServiceName.GetRequestInfo);
+  export IsIDAFraud(string40 svcName) := STD.Str.ToLowerCase(trim(svcName)) = STD.Str.ToLowerCase(Gateway.Constants.ServiceName.IDAFraud);
   // ************************************************************************
   // Use functions below to retrieve gateway configuration properties.
   //

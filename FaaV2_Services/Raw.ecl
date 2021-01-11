@@ -61,7 +61,7 @@ export Raw := module
 																self:=right), 
 																limit(1, skip));  // why not keep(1),limit(0) ? Why are we skipping records?
 																
-  		Suppress.MAC_Suppress(recs_raw,recs_1,applicationType,Suppress.Constants.LinkTypes.DID,did_out);
+  		Suppress.MAC_Suppress(recs_raw,recs_1,applicationType,Suppress.Constants.LinkTypes.DID,did_out, isFCRA := isFCRA);
 																
 			recs_over := project( choosen(FCRA.key_override_faa.aircraft (keyed(flag_file_id in aircraft_correct_ffid) and isFCRA),FCRA.compliance.MAX_OVERRIDE_LIMIT),
 											transform(FaaV2_Services.Layouts.Rawrec,self:=left,self:=[]));

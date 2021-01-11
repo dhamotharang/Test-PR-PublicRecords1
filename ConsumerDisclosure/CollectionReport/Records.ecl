@@ -1,7 +1,7 @@
-IMPORT $, alloymedia_student_list, american_student_list, canadianphones_v2, daybatchpcnsr, doxie, dx_email, dx_header, experian_crdb,
+IMPORT $, alloymedia_student_list, american_student_list, canadianphones_v2, daybatchpcnsr, doxie, dx_email, dx_header,
   dx_gong, header_quick, impulse_email, infutor, infutorcid, one_click_data, patriot, paw,
   phonemart, phonesplus, phonesplus_v2, phonesfeedback, poe, poesfromemails, prof_licensev2, prof_license_mari, profilebooster,
-  saleschannel, sanctn, spoke, targus, thrive, vehiclev2, zoom;
+  saleschannel, spoke, targus, thrive, vehiclev2, zoom;
 
 EXPORT Records(UNSIGNED6 lexid, $.IParam.IReportParam in_mod) := FUNCTION
 
@@ -12,9 +12,7 @@ EXPORT Records(UNSIGNED6 lexid, $.IParam.IReportParam in_mod) := FUNCTION
   email_recs := $.Raw.GetEmailRecs(dids);
   paw_recs := $.Raw.GetPawRecs(dids);
   link_ids := $.Raw.GetLinkIds(dids);
-  exp_recs := $.Raw.GetExperianCRDBRecs(link_ids, lexid);
   patriot_recs := $.Raw.GetPatriotRecs(dids); //-- special considerations (?)
-  sanct_recs := $.Raw.GetSanctionRecs(dids);
   vehicle_ids := $.Raw.GetVehicleIds(dids);
   vehicle_parties := $.Raw.GetVehiclePartyRecs(vehicle_ids);
   vehicle_main := $.Raw.GetVehicleMainRecs(vehicle_ids);
@@ -55,11 +53,6 @@ EXPORT Records(UNSIGNED6 lexid, $.IParam.IReportParam in_mod) := FUNCTION
     + $.MAC.GetCollectionFromRaw(vehicle_parties, in_mod, $.Constants.Collection.VEHICLE_PARTY, vehiclev2.Key_Vehicle_Party_Key, vehicle_key, date_last_seen,  $.Constants.DateFormat.YYYYMM)
     + $.MAC.GetCollectionFromRaw(vehicle_main, in_mod, $.Constants.Collection.VEHICLE_MAIN, vehiclev2.Key_Vehicle_Main_Key, vehicle_key)
     + $.MAC.GetCollection(dids, in_mod, $.Constants.Collection.ZOOM, zoom.keys().did.qa, did, dt_vendor_last_reported)
-
-    // the following have moved to tier 2 and will be removed from here once CD configuration is complete
-    + $.MAC.GetCollectionFromRaw(exp_recs, in_mod, $.Constants.Collection.EXPERIAN_CRDB, Experian_CRDB.Key_LinkIDs.kFetch(link_ids),, dt_vendor_last_reported)
-    + $.MAC.GetCollectionFromRaw(sanct_recs, in_mod, $.Constants.Collection.SANCTN, SANCTN.key_MIDEX_RPT_NBR, midex_rpt_nbr)
-
   ;
 
   RETURN recs;

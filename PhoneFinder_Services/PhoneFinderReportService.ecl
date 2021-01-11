@@ -1,69 +1,12 @@
-﻿/*--SOAP--
-<message name="PhoneFinderSearchService">
-	<part name="DID" type="xsd:string"/>
-	<separator />
-	<part name="SSN" type="xsd:string"/>
-	<separator />
-	<part name="UnParsedFullName" type="xsd:string"/>
-	<part name="FirstName" type="xsd:string"/>
-	<part name="MiddleName" type="xsd:string"/>
-	<part name="LastName" type="xsd:string"/>
-	<part name="PhoneticMatch" type="xsd:boolean"/>
-	<part name="AllowNickNames" type="xsd:boolean"/>
-	<separator />
-	<part name="Addr" type="xsd:string"/>
-	<part name="City" type="xsd:string"/>
-	<part name="State" type="xsd:string"/>
-	<part name="Zip" type="xsd:string"/>
-	<separator />
-	<part name="Phone" type="xsd:string"/>
-	<separator />
-	<part name="TransactionType" type="xsd:string" default="Basic" description="Basic, Premium, Ultimate"/>
-	<part name="PrimarySearchCriteria" type="xsd:string" default="" description="Phone, PII"/>
-	<separator />
-	<part name="DPPAPurpose" type="xsd:byte" default="1" size="2"/>
-	<part name="GLBPurpose" type="xsd:byte" default="1" size="2"/>
-	<part name="DataRestrictionMask" type="xsd:string" default="00000000000000"/>
-	<part name="DataPermissionMask" type="xsd:string" default="1111010000"/>
-	<part name="ApplicationType" type="xsd:string"/>
-	<part name="IndustryClass" type="xsd:string"/>
-	<separator />
-	<part name="SSNMask" type="xsd:string" default="FIRST5"/>
-	<part name="DOBMask" type="xsd:string" default="DAY"/>
-	<separator />
-	<part name="StrictMatch" type="xsd:boolean" default="false"/>
-	<part name="PenaltThreshold" type="xsd:string"/>
-	<separator />
-  <part name="VerifyPhoneName" type="xsd:boolean" default="false"/>
-	<part name="VerifyPhoneNameAddress" type="xsd:boolean" default="false"/>
-	<part name="VerifyPhoneIsActive" type="xsd:boolean" default="false"/>
-  <part name="DateFirstSeenThreshold" type="xsd:integer" default="180"/>
-  <part name="DateLastSeenThreshold" type="xsd:integer" default="30"/>
-  <part name="LengthOfTimeThreshold" type="xsd:integer" default="90"/>
- 	<part name="UseDateFirstSeenVerify" type="xsd:boolean" default="false"/>
-	<part name="UseDateLastSeenVerify" type="xsd:boolean" default="false"/>
-  <part name="UseLengthOfTimeVerify" type="xsd:boolean" default="false"/>
-  <part name="UseDeltabase" type="xsd:boolean" default="false"/>
-  <part name="IncludePhoneMetadata" type="xsd:boolean" default="true"/>
-  <part name="SubjectMetadataOnly" type="xsd:boolean" default="false"/>
-  <part name="SuppressNonRelevantRecs" type="xsd:boolean" default="false"/>
-  <separator />
-	<part name="Gateways" type="tns:XmlDataSet" cols="80" rows="15" />
-	<part name="PhoneFinderSearchRequest" type="tns:XmlDataSet" cols="80" rows="30" />
-	<part name="RiskIndicators" type="tns:XmlDataSet" cols="80" rows="20" />
-  <part name="IncludeOtherPhoneRiskIndicators" type="xsd:boolean" default="false"/>
-  <part name="UseInHousePhoneMetadata" type="xsd:boolean" default="false"/>
-  <part name="IncludePorting" type="xsd:boolean" default="false"/>
-  <part name="IncludeSpoofing" type="xsd:boolean" default="false"/>
-  <part name="IncludeOTP" type="xsd:boolean" default="false"/>
-  <part name="usewaterfallv6" type="xsd:boolean" default="false"/>
-</message>
-*/
-
-
+﻿// =====================================================================
+// ROXIE QUERY
+// -----------
+// For the complete list of input parameters please check published WU.
+// Look at the history of this attribute for the old SOAP info.
+// =====================================================================
 EXPORT PhoneFinderReportService() :=
 MACRO
-IMPORT Address, AutoStandardI, Gateway, iesp, PhoneFinder_Services, ut, doxie, AutoheaderV2, Autokey_batch;
+IMPORT Address, AutoStandardI, Gateway, iesp, PhoneFinder_Services, doxie, AutoheaderV2, Autokey_batch;
   #constant('SearchLibraryVersion', AutoheaderV2.Constants.LibVersion.SALT);
 	// parse ESDL input
   dIn       := DATASET([], iesp.phonefinder.t_PhoneFinderSearchRequest) : STORED('PhoneFinderSearchRequest',FEW);
@@ -195,62 +138,3 @@ IMPORT Address, AutoStandardI, Gateway, iesp, PhoneFinder_Services, ut, doxie, A
   OUTPUT(Zumigo_Log, named('LOG_DELTA__PHONEFINDER_DELTA__PHONES__GATEWAY'));
   OUTPUT(PF_Reporting_Dataset, named('LOG_DELTABASE'));
 ENDMACRO;
-
-/*--HELP--
-<pre>
-&lt;PhoneFinderSearchRequest&gt;
-&lt;row&gt;
-&lt;User&gt;
-  &lt;ReferenceCode&gt;ref_code_str&lt;/ReferenceCode&gt;
-  &lt;BillingCode&gt;billing_code&lt;/BillingCode&gt;
-  &lt;QueryId&gt;query_id&lt;/QueryId&gt;
-  &lt;GLBPurpose&gt;1&lt;/GLBPurpose&gt;
-  &lt;DLPurpose&gt;1&lt;/DLPurpose&gt;
-  &lt;DataRestrictionMask&gt;000000000000000&lt;/DataRestrictionMask&gt;
-  &lt;DataPermissionMask&gt;0000000000&lt;/DataPermissionMask&gt;
-  &lt;SSNMask&gt;first5&lt;/SSNMask&gt;
-  &lt;DOBMask&gt;&lt;/DOBMask&gt;
-  &lt;EndUser/&gt;
-&lt;/User&gt;
-&lt;Options&gt;
-  &lt;Type&gt;0&lt;/Type&gt;
-  &lt;UsePhonetics&gt;false&lt;/UsePhonetics&gt;
-  &lt;UseNicknames/&gt;
-  &lt;VerificationOptions&gt;
-		&lt;VerifyPhoneName&gt;&lt;/VerifyPhoneName&gt;
-		&lt;VerifyPhoneNameAddress&gt;&lt;/VerifyPhoneNameAddress&gt;
-		&lt;VerifyPhoneIsActive&gt;&lt;/VerifyPhoneIsActive&gt;
-		&lt;DateFirstSeenThreshold&gt;&lt;/DateFirstSeenThreshold&gt;
-		&lt;DateLastSeenThreshold&gt;&lt;/DateLastSeenThreshold&gt;
-		&lt;LengthOfTimeThreshold&gt;&lt;/LengthOfTimeThreshold&gt;
-		&lt;UseDateFirstSeenVerify&gt;&lt;/UseDateFirstSeenVerify&gt;
-		&lt;UseDateLastSeenVerify&gt;&lt;/UseDateLastSeenVerify&gt;
-		&lt;UseLengthOfTimeVerify&gt;&lt;/UseLengthOfTimeVerify&gt;
-	&lt;/VerificationOptions&gt;
-&lt;/Options&gt;
-&lt;SearchBy&gt;
-  &lt;UniqueID&gt;&lt;/UniqueID&gt;
-  &lt;SSN&gt;&lt;/SSN&gt;
-  &lt;PhoneNumber&gt;&lt;/PhoneNumber&gt;
-  &lt;Name&gt;
-    &lt;Full&gt;&lt;/Full&gt;
-    &lt;First&gt;&lt;/First&gt;
-    &lt;Middle&gt;&lt;/Middle&gt;
-    &lt;Last&gt;&lt;/Last&gt;
-  &lt;/Name&gt;
-  &lt;Address&gt;
-    &lt;StreetNumber&gt;&lt;/StreetNumber&gt;
-    &lt;StreetPreDirection&gt;&lt;/StreetPreDirection&gt;
-    &lt;StreetName&gt;&lt;/StreetName&gt;
-    &lt;StreetSuffix&gt;&lt;/StreetSuffix&gt;
-		&lt;StreetPostDirection&gt;&lt;/StreetPostDirection&gt;
-    &lt;UnitNumber&gt;&lt;/UnitNumber&gt;
-    &lt;City&gt;&lt;/City&gt;
-    &lt;State&gt;&lt;/State&gt;
-    &lt;Zip5&gt;&lt;/Zip5&gt;
-  &lt;/Address&gt;
-&lt;/SearchBy&gt;
-&lt;/row&gt;
-&lt;/PhoneFinderSearchRequest&gt;
-</pre>
-*/

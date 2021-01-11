@@ -230,6 +230,7 @@ IF(RunAll OR RunFast OR RunNullCounts,OUTPUT(E_Drivers_License.NullCounts,NAMED(
 //Event sanity checks
 IF(RunAll OR RunSanityCheckSummary,OUTPUT(E_Event.SanityCheck,NAMED('E_Event_SanityCheck')));
 IF(RunAll OR RunInvalidSingleValues,OUTPUT(E_Event.Record_Id__SingleValue_Invalid,NAMED('E_Event_Record_Id__SingleValue_Invalid')));
+IF(RunAll OR RunInvalidSingleValues,OUTPUT(E_Event.Acct_No__SingleValue_Invalid,NAMED('E_Event_Acct_No__SingleValue_Invalid')));
 IF(RunAll OR RunInvalidSingleValues,OUTPUT(E_Event.Event_Date__SingleValue_Invalid,NAMED('E_Event_Event_Date__SingleValue_Invalid')));
 IF(RunAll OR RunInvalidSingleValues,OUTPUT(E_Event._r_Customer__SingleValue_Invalid,NAMED('E_Event__r_Customer__SingleValue_Invalid')));
 IF(RunAll OR RunInvalidSingleValues,OUTPUT(E_Event._r_Source_Customer__SingleValue_Invalid,NAMED('E_Event__r_Source_Customer__SingleValue_Invalid')));
@@ -360,9 +361,14 @@ IF(RunAll OR RunInvalidSingleValues,OUTPUT(E_Event.Geo_Block__SingleValue_Invali
 IF(RunAll OR RunInvalidSingleValues,OUTPUT(E_Event.Geo_Match__SingleValue_Invalid,NAMED('E_Event_Geo_Match__SingleValue_Invalid')));
 IF(RunAll OR RunInvalidSingleValues,OUTPUT(E_Event.A_C_E_Cleaner_Error_Code__SingleValue_Invalid,NAMED('E_Event_A_C_E_Cleaner_Error_Code__SingleValue_Invalid')));
 IF(RunAll OR RunInvalidSingleValues,OUTPUT(E_Event._is_Additional__SingleValue_Invalid,NAMED('E_Event__is_Additional__SingleValue_Invalid')));
+IF(RunAll OR RunInvalidSingleValues,OUTPUT(E_Event._address__vacancy__indicator__SingleValue_Invalid,NAMED('E_Event__address__vacancy__indicator__SingleValue_Invalid')));
+IF(RunAll OR RunInvalidSingleValues,OUTPUT(E_Event._addrvalflag__SingleValue_Invalid,NAMED('E_Event__addrvalflag__SingleValue_Invalid')));
+IF(RunAll OR RunInvalidSingleValues,OUTPUT(E_Event._drop__indicator__SingleValue_Invalid,NAMED('E_Event__drop__indicator__SingleValue_Invalid')));
 IF(RunAll OR RunInvalidSingleValues,OUTPUT(E_Event.License_Number__SingleValue_Invalid,NAMED('E_Event_License_Number__SingleValue_Invalid')));
 IF(RunAll OR RunInvalidSingleValues,OUTPUT(E_Event.License_State__SingleValue_Invalid,NAMED('E_Event_License_State__SingleValue_Invalid')));
 IF(RunAll OR RunInvalidSingleValues,OUTPUT(E_Event.Phone_Formatted__SingleValue_Invalid,NAMED('E_Event_Phone_Formatted__SingleValue_Invalid')));
+IF(RunAll OR RunInvalidSingleValues,OUTPUT(E_Event.Phones_Meta_Hit__SingleValue_Invalid,NAMED('E_Event_Phones_Meta_Hit__SingleValue_Invalid')));
+IF(RunAll OR RunInvalidSingleValues,OUTPUT(E_Event._phone__prepaid__SingleValue_Invalid,NAMED('E_Event__phone__prepaid__SingleValue_Invalid')));
 IF(RunAll OR RunInvalidSingleValues,OUTPUT(E_Event.Email_Address__SingleValue_Invalid,NAMED('E_Event_Email_Address__SingleValue_Invalid')));
 IF(RunAll OR RunInvalidSingleValues,OUTPUT(E_Event.Type__SingleValue_Invalid,NAMED('E_Event_Type__SingleValue_Invalid')));
 IF(RunAll OR RunInvalidSingleValues,OUTPUT(E_Event.Created_On__SingleValue_Invalid,NAMED('E_Event_Created_On__SingleValue_Invalid')));

@@ -16,6 +16,16 @@ export FIS_custom_attr_request := 'riskviewattrv5fis';
 
 export valid_attributes := ['riskviewattrv5', 'insurview2attr', checking_indicators_attribute_request, FIS_custom_attr_request];
 
+export valid_IDA_models := ['rvg2005_0'];
+
+//List of models that are using the next gen riskview reason codes, used in Riskview. Transforms
+//these need to be the output model names that the customer sees
+export next_gen_models := ['ShortTermLendingRVG2005_0'];
+
+/* Model Validation -- Use this when trying to validate a new model through the RiskView.Search_Service */
+EXPORT TurnOnValidation := FALSE;
+// EXPORT TurnOnValidation := TRUE;
+
 //student
 export Public_schl := 'PUBLIC';
 export Private_schl := 'PRIVATE';
@@ -57,6 +67,10 @@ export purposeErrorCode := '24';
 export FDSubscriberIDErrorCode := '25';
 export FDGatewayTimeout := '26';
 export Deferred_request_code := '801';
+export DTEError := 'DTE22';
+export OKCError := 'OKC22';
+export generalErrorCodes :=['22','23','24'];
+export DTEErrorCodes := ['41', '42', '43', '44', '45', 'DTE22'];
 
 export Checking_Indicator_error_desc(string5 error_code) := function
   desc := map(
@@ -75,11 +89,12 @@ export MLA_error_desc(string5 error_code) := function
 	return desc;
 end;
 
+// Status Refresh Constants
 export StatusRefresh_error_desc := 'Error occurred in status refresh.';
-
 export DTE_error_desc := 'The record is no longer reporting and may not be used in an FCRA decision.';
-
 export Deferred_request_desc := 'Request has been Deferred';
+export DefendantDesc := 'DEFENDANT';
+
 
 export set_Valid_Name_Suffix := ['', 'JR', 'SR', 'ST', 'ND', 'RD', 'TH'];
 

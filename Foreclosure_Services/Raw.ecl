@@ -1,4 +1,4 @@
-﻿import $, doxie, doxie_cbrs, Property, UT, BIPV2, Suppress, MDR;
+﻿import $, doxie, doxie_cbrs, dx_property, UT, BIPV2, Suppress, MDR;
 
 export Raw := module
 
@@ -10,7 +10,7 @@ export Raw := module
 
     export $.Layouts.FIDNumberPlus byDIDs(dataset(doxie.layout_references) in_dids, boolean isNodSearch=false) := function
       deduped := dedup(sort(in_dids,did),did);
-      keyDID := if(isNodSearch,Property.Key_NOD_DID,Property.Key_Foreclosure_DID);
+      keyDID := if(isNodSearch,dx_Property.Key_NOD_DID,dx_Property.Key_Foreclosure_DID);
       joinup := join(deduped,keyDID,keyed(left.did= right.did),transform($.Layouts.FIDNumberPlus,
         self.fid := right.fid,
         self.did := right.did,
@@ -21,7 +21,7 @@ export Raw := module
 
     export $.Layouts.FIDNumberPlus byBDIDs(dataset(doxie_cbrs.layout_references) in_bdids, boolean isNodSearch=false) := function
       deduped := dedup(sort(in_bdids,bdid),bdid);
-      keyBDID := if(isNodSearch,Property.Key_NOD_BDID,Property.Key_Foreclosures_BDID);
+      keyBDID := if(isNodSearch,dx_Property.Key_NOD_BDID,dx_Property.Key_Foreclosures_BDID);
       joinup := join(deduped,keyBDID,keyed(left.bdid = right.bdid),transform($.Layouts.FIDNumberPlus,
         self.fid := right.fid,
         self.did := 0,
@@ -36,8 +36,8 @@ export Raw := module
                                            boolean isNodSearch=false) := function
 
       recs_LinkID := if (isNodSearch,
-            Property.Key_nod_Linkids.kfetch(link_ds, BusinessIdFetchLevel),
-            Property.Key_Foreclosure_Linkids.kfetch(link_ds, BusinessIdFetchLevel));
+            dx_Property.Key_nod_Linkids.kfetch(link_ds, BusinessIdFetchLevel),
+            dx_Property.Key_Foreclosure_Linkids.kfetch(link_ds, BusinessIdFetchLevel));
 
       recs := project(recs_LinkID, transform($.Layouts.FIDNumberPlus,
         self.fid := left.foreclosure_id,
@@ -54,7 +54,7 @@ export Raw := module
                                    boolean includeBlackKnight=false) :=function
 
       isCNSMR := IndustryClass = ut.IndustryClass.Knowx_IC;
-      keyFID := if(isNodSearch,Property.Key_NOD_FID,Property.Key_Foreclosures_FID);
+      keyFID := if(isNodSearch,dx_Property.Key_NOD_FID,dx_Property.Key_Foreclosures_FID);
 
       codes := $.Functions.getCodes(includeBlackKnight);
 
@@ -85,7 +85,7 @@ export Raw := module
  
  export $.Layouts.FIDNumberPlus byApn(dataset(Layouts.layout_apn) apn_in, boolean isNodSearch=false, boolean includeBlackKnight=false) := function
      deduped := dedup(sort(apn_in,apn),apn);
-     joinup := join(deduped, Property.Key_Foreclosure_ParcelNum, keyed(left.apn = right.parcel_number_parcel_id),transform(Layouts.FIDNumberPlus,
+     joinup := join(deduped, dx_Property.Key_Foreclosure_ParcelNum, keyed(left.apn = right.parcel_number_parcel_id),transform(Layouts.FIDNumberPlus,
             self.fid := right.fid,
             self.did := 0,
             self.bdid := 0));

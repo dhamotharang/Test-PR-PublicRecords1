@@ -1,9 +1,9 @@
-//HPCC Systems KEL Compiler Version 1.3.0
-IMPORT KEL13 AS KEL;
+//HPCC Systems KEL Compiler Version 1.5.0rc1
+IMPORT KEL15 AS KEL;
 IMPORT B_Professional_License_4,CFG_Compile,E_Professional_License FROM PublicRecords_KEL;
-IMPORT * FROM KEL13.Null;
+IMPORT * FROM KEL15.Null;
 EXPORT B_Professional_License_3(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG_Compile __cfg = CFG_Compile) := MODULE
   SHARED VIRTUAL TYPEOF(B_Professional_License_4(__in,__cfg).__ENH_Professional_License_4) __ENH_Professional_License_4 := B_Professional_License_4(__in,__cfg).__ENH_Professional_License_4;
-  SHARED __EE4094043 := __ENH_Professional_License_4;
-  EXPORT __ENH_Professional_License_3 := __EE4094043;
+  SHARED __EE6049408 := __ENH_Professional_License_4;
+  EXPORT __ENH_Professional_License_3 := __EE6049408;
 END;

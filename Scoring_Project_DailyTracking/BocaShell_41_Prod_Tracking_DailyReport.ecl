@@ -11,7 +11,7 @@ tag:='~';
 // Layout3 := zz_bbraaten2.Boca_41_Non_Cert_lay_new;   //NonFCRA
 
 
-ds_curr := dataset(tag + 'scoringqa::out::fcra::bocashell_41_historydate_999999_prod_' + dt + '_1', Scoring_Project_Macros.Global_Output_Layouts.BocaShell_Global_Layout, thor)(length(trim(errorcode,left,right))= 0 );
+ds_curr := distribute(dataset(tag + 'scoringqa::out::fcra::bocashell_41_historydate_999999_prod_' + dt + '_1', Scoring_Project_Macros.Global_Output_Layouts.BocaShell_Global_Layout, thor)(length(trim(errorcode,left,right))= 0 ),(integer)accountnumber);
 // ds_curr := dataset(tag + 'scoringqa::out::fcra::bocashell_41_historydate_999999_prod_' + dt + '_1', zz_bbraaten2.Boca_50_Cert_NonFCRA, thor)(length(trim(errorcode,left,right))= 0 );
 // bs_cert_curr_choosen;
 
@@ -26,7 +26,7 @@ prev_date := p_file_name[length(p_file_name)-9.. length(p_file_name)-2];
 cleaned_curr_date := dt;
 cleaned_prev_date := prev_date;
 
-ds_prev := dataset( tag + p_file_name, Scoring_Project_Macros.Global_Output_Layouts.BocaShell_Global_Layout, thor)(length(trim(errorcode,left,right))= 0 );
+ds_prev := distribute(dataset( tag + p_file_name, Scoring_Project_Macros.Global_Output_Layouts.BocaShell_Global_Layout, thor)(length(trim(errorcode,left,right))= 0 ),(integer)accountnumber);
 // ds_prev := dataset( tag + p_file_name, zz_bbraaten2.Boca_50_Cert_NonFCRA, thor)(length(trim(errorcode,left,right))= 0 );
 
 

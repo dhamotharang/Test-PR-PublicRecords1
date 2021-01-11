@@ -54,8 +54,6 @@ export STR_Functions := MODULE
                           BatchServices.Interfaces.str_config in_mod) := FUNCTION
 
     mod_access := PROJECT(in_mod, doxie.IDataAccess);
-    glb_ok := mod_access.isValidGLB ();
-    dppa_ok := mod_access.isValidDPPA ();
 
     ds_best_recs_raw := doxie.best_records(dids
                                            ,doSuppress    := false

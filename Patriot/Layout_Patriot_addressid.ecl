@@ -1,0 +1,33 @@
+import aid;
+
+export Layout_Patriot_addressid := record
+	Layout_Patriot;
+	string10	aid_prim_range;
+	string2		aid_predir;
+	string28	aid_prim_name;
+	string4		aid_addr_suffix;
+	string2		aid_postdir;
+	string10	aid_unit_desig;
+	string8		aid_sec_range;
+	string25	aid_p_city_name;
+	string25	aid_v_city_name;
+	string2		aid_st;
+	string5		aid_zip;
+	string4		aid_zip4;
+	string4		aid_cart;
+	string1		aid_cr_sort_sz;
+	string4		aid_lot;
+	string1		aid_lot_order;
+	string2		aid_dpbc;
+	string1		aid_chk_digit;
+	string2		aid_record_type;
+	string2		aid_fips_st;
+	string3		aid_county;
+	string10	aid_geo_lat;
+	string11	aid_geo_long;
+	string4		aid_msa;
+	string7		aid_geo_blk;
+	string1		aid_geo_match;
+	string4		aid_err_stat;
+	aid.common.xaid append_rawaid;
+end;

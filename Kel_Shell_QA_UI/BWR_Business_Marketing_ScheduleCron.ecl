@@ -103,16 +103,23 @@ Business:= Kel_Shell_QA_UI.Business( Query_Environment,
 																		
 // execute_type:= 'executeNow';
 // execute_type:=  'scheduleCron';
-cron_time :='0 10 19 * *';
+// cron_time :='0 10 19 * *';
 
 // IF(execute_type='executeNow',
                       // Business):FAILURE(FileServices.SendEmail(email_list,'KEL SHELL QA UI run job','The failed workunit is:' + workunit + FailMessage));
 
 // IF(execute_type='scheduleCron',Business: WHEN(CRON(cron_time)), 
-Business: WHEN(CRON(cron_time)),
-FAILURE(FileServices.SendEmail(email_list,'KEL SHELL QA UI run job','The failed workunit is:' + workunit + FailMessage));
 
-																					
-																		
+cron_time :='0 10 19 * *';
 
+sprayMessage:='failed';
+dfuWUID:='W20200915-111742';
+dfuStatus:='finished';
+
+if(trim(sprayMessage,left,right) <> '', Kel_Shell_QA_UI.File_spray_notification_macro(email_list, dfuWUID, dfuStatus));
+
+if(trim(sprayMessage,left,right) = '', Business): WHEN(CRON(cron_time)), 
+FAILURE(FileServices.SendEmail(email_list,'KAT Notification','Your job has failed. The failed workunit is:' + workunit + FailMessage));
+
+																																				
 EXPORT BWR_Business_Marketing_ScheduleCron := 'todo';

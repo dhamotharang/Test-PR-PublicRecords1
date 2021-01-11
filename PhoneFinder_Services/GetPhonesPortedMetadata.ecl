@@ -11,9 +11,10 @@ FUNCTION
 
   //Based on subject info get ALL ports and CURRENT deact records
   dInPhones := DEDUP(SORT(PROJECT(subjectInfo, TRANSFORM(Phones.Layouts.PhoneAttributes.BatchIn, SELF.phoneno := LEFT.Phone, SELF := [])), phoneno), phoneno);
-	in_mod := MODULE(Phones.IParam.BatchParams)
-		EXPORT UNSIGNED	max_age_days := Phones.Constants.PhoneAttributes.LastActivityThreshold;
-	END;
+  in_mod := MODULE(Phones.IParam.BatchParams)
+  EXPORT UNSIGNED	max_age_days := Phones.Constants.PhoneAttributes.LastActivityThreshold;
+  EXPORT BOOLEAN AllowPortingData := inMod.AllowPortingData;
+  END;
   dsPhonesmetadata:= PROJECT(Phones.GetPhoneMetadata_wLERG6(dInPhones, in_mod), TRANSFORM(Phones.Layouts.portedMetadata_Main, SELF := LEFT));
 
   dPorted	:= JOIN(subjectInfo, dsPhonesmetadata,

@@ -1,9 +1,19 @@
-﻿IMPORT RiskIntelligenceNetwork_Services, risk_indicators;
+﻿IMPORT Advo_Services, BatchServices, CriminalRecords_BatchService, DidVille, dx_PhonesInfo;
+IMPORT FraudShared_Services, RiskIntelligenceNetwork_Services, risk_indicators;
 
 EXPORT Layouts := MODULE
+
 EXPORT LayoutInputPII_2 := RECORD
-    RiskIntelligenceNetwork_Services.Layouts.realtime_appends_rec AND NOT [ boca_shell_appends ],
-    risk_indicators.Layout_Boca_Shell boca_shell_appends,
+    // RiskIntelligenceNetwork_Services.Layouts.realtime_appends_rec AND NOT [ boca_shell_appends ],
+    // risk_indicators.Layout_Boca_Shell boca_shell_appends,
+						FraudShared_Services.Layouts.BatchInExtended_rec batchin_rec,
+						CriminalRecords_BatchService.Layouts.batch_out crim_appends,
+						Advo_Services.Advo_Batch_Service_Layouts.Batch_Out advo_appends,
+						DidVille.Layout_Did_OutBatch pr_best_appends,
+						dx_PhonesInfo.Layouts.Phones_Type_Main prepaid_phone_appends,
+						RiskIntelligenceNetwork_Services.Layouts.dl_layout dl_appends,
+						risk_indicators.Layout_Boca_Shell boca_shell_appends,
+						BatchServices.IP_Metadata_Layouts.batch_out ip_meta_data,
 			//Note all the below extra fields are needed as KEL input but currently aren't provided to us
 					UNSIGNED event_date,
 					STRING EmailLastDomain,
@@ -15,6 +25,7 @@ EXPORT LayoutInputPII_2 := RECORD
 					//INTEGER8 OttoBankAccountId2,
 					UNSIGNED OttoDriversLicenseId,
 					UNSIGNED OttoPhoneId,
+					STRING entity_context_uid,
 					INTEGER1 BocaShellHit,
 					STRING mac_address,
 					STRING serial_number,
@@ -58,62 +69,6 @@ EXPORT LayoutInputPII_2 := RECORD
     STRING v2_ipstate,
     STRING v2_ipcountry,
     STRING v2_ipcontinent,
-
-    STRING iprngbeg,
-    STRING iprngend,
-    STRING edgecountry,
-    STRING edgeregion,
-    STRING edgecity,
-    STRING edgeconnspeed,
-    STRING edgemetrocode,
-    STRING edgelatitude,
-    STRING edgelongitude,
-    STRING edgepostalcode,
-    STRING edgecountrycode,
-    STRING edgeregioncode,
-    STRING edgecitycode,
-    STRING edgecontinentcode,
-    STRING edgetwolettercountry,
-    STRING edgeinternalcode,
-    STRING edgeareacodes,
-    STRING edgecountryconf,
-    STRING edgeregionconf,
-    STRING edgecitycong,
-    STRING edgepostalconf,
-    STRING edgegmtoffset,
-    STRING edgeindst,
-    STRING siccode,
-    STRING domainname,
-    STRING ispname,
-    STRING homebiztype,
-    STRING asn,
-    STRING asnname,
-    STRING primarylang,
-    STRING secondarylang,
-    STRING proxytype,
-    STRING proxydescription,
-    STRING isanisp,
-    STRING companyname,
-    STRING ranks,
-    STRING households,
-    STRING women,
-    STRING women18to34,
-    STRING women35to49,
-    STRING men,
-    STRING men18to34,
-    STRING men35to49,
-    STRING teens,
-    STRING kids,
-    STRING naicscode,
-    STRING cbsacode,
-    STRING cbsatitle,
-    STRING cbsatype,
-    STRING csacode,
-    STRING csatitle,
-    STRING mdcode,
-    STRING mdtitle,
-    STRING organizationname,
-					//END IP Fields
 					STRING gc_id,
 					STRING ind_type,
 					STRING agency_state,
@@ -123,9 +78,25 @@ EXPORT LayoutInputPII_2 := RECORD
 					INTEGER crim_match_type,
 					BOOLEAN crim_hit,
 					STRING dl_number,
-					STRING dl_state
+					STRING dl_state,
+					BOOLEAN phonesMetaHit,
+					STRING prepaidPhone,
+					STRING2 curr_st
 END;
 
+
+	
+EXPORT KelInputLayout := RECORD
+LayoutInputPII_2;
+STRING158 bankDetails_FullBankName;
+STRING50 bankDetails_AbbreviatedBankName;
+STRING11 bankDetails_FractionalRoutingNumber;
+STRING9 bankDetails_HeadOfficeRoutingNumber;
+STRING2 bankDetails_HeadOfficeBranchCodes;
+INTEGER bankDetails_Hit;
+INTEGER isDisposableEmail;
+END;
+	
 	source := RECORD
 		 unsigned2 source_type_id;
 		 string25 source_type;
@@ -2585,6 +2556,7 @@ END;
 	 END;
 
 	EXPORT LayoutRulesFlagsMatched := RECORD
+		STRING20 acctno;
 		UNSIGNED entitytype;	
 		STRING100 rulename;
 		STRING250 description;
@@ -2592,6 +2564,7 @@ END;
 	END;
 	
 	EXPORT LayoutEntityStats := RECORD
+					STRING20 acctno;
     UNSIGNED entitytype;
     STRING100 field;
     STRING250 value;
@@ -2599,6 +2572,7 @@ END;
     STRING250 indicatordescription;
     STRING250 label;
     INTEGER1 risklevel;
+					STRING100 agencydescription;
   END;
 	
 	EXPORT LayoutRiskScore := RECORD
@@ -2613,6 +2587,13 @@ END;
 		INTEGER1 P9_AddrRiskIndx;// 9
 		DATASET(LayoutRulesFlagsMatched) RulesFlagsMatched;
 		DATASET(LayoutEntityStats) EntityStats;
+	END;
+	
+	EXPORT LiveAssessmentScores := RECORD
+	LayoutRiskScore;
+	DATASET(LayoutEntityStats) KrAttributes;
+	UNSIGNED MostRecentActivityDate;
+	UNSIGNED TotalNumberOfIDActivities;
 	END;
 	
 END;

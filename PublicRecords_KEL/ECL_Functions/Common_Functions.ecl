@@ -13,7 +13,8 @@ EXPORT Common_Functions := MODULE;
 		
 		RETURN result[1].roll_field;
 	ENDMACRO;
-	
+	EXPORT IsFcra(STRING FunctionDescription) := FunctionDescription IN AccLogs_Constants.FCRA_Functions;
+	EXPORT IsNonFcra(STRING FunctionDescription) := FunctionDescription IN AccLogs_Constants.nonFCRA_Functions;
 	EXPORT IsBadPhone(STRING InputPhone):=InputPhone IN ut.Set_BadPhones;
 	EXPORT IsBadSSN(STRING InputSSN):=InputSSN IN ut.Set_BadSSN ;	
 

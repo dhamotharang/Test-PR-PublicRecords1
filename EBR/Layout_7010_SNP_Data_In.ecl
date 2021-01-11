@@ -5,5 +5,5 @@ record
    string4 SEGMENT_CODE;
    string5 SEQUENCE_NUMBER;
    string80 DATA_PRINT_LINE;
-   string1 lf;
+   string1 lf := '';
 end;

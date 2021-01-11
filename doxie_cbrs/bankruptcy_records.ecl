@@ -4,6 +4,8 @@ doxie.MAC_Header_Field_Declare()
 
 EXPORT bankruptcy_records(DATASET(doxie_cbrs.layout_references) bdids) := FUNCTION
 
+outrec := doxie_cbrs.layouts.bankruptcy_record;
+
 raw := Doxie_Raw.bk_raw
   (doxie_raw.ds_EmptyDIDs,
    PROJECT(bdids,doxie.Layout_ref_bdid),
@@ -15,11 +17,6 @@ raw := Doxie_Raw.bk_raw
     ssn_mask_value,
     'D'
 );
-
-outrec := RECORD (Doxie.layout_bk_output)
-  BOOLEAN SelfRepresented; //to match accurint
-  BOOLEAN AssetsForUnsecured;
-END;
 
 outrec add_decodes(Doxie.layout_bk_output l) := TRANSFORM
   SELF.SelfRepresented := l.pro_se_ind = 'Y';

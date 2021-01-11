@@ -1,5 +1,4 @@
-IMPORT OSHAIR, standard, ut;
-
+IMPORT dx_common, dx_oshair, OSHAIR, standard, ut;
 EXPORT layouts := MODULE
 
   EXPORT id := RECORD
@@ -16,7 +15,7 @@ EXPORT layouts := MODULE
     standard.L_Address.translated;
   end;
 
-  // slimmed version of OSHAIR.layout_OSHAIR_clean.oshair_Violations_rec
+  // slimmed version of dx_OSHAIR.layouts.Layout_Accident - dx_Common.layout_metadata & activity_number
   EXPORT Violation := RECORD
     string1              Delete_Flag;
     big_endian unsigned4 Issuance_Date;
@@ -45,13 +44,12 @@ EXPORT layouts := MODULE
     string40             FTA_Disposition_Event_Desc; // Derived
   END;
 
-  // inherited from OSHAIR.layout_OSHAIR_clean.oshair_Hazardous_Substance_rec, with substances compacted
   EXPORT hsubstance := RECORD
     string4 code;
     string50 description;
   END;
 
-  EXPORT Hazardous_Substance := RECORD 
+  EXPORT Hazardous_Substance := RECORD
     string5 id_number;
     string2 Citation_Number;
     string3 Item_Number;
@@ -59,7 +57,8 @@ EXPORT layouts := MODULE
     DATASET (hsubstance) substance {MAXCOUNT (5)};
   END;
 
-  EXPORT Accident := RECORD (OSHAIR.layout_OSHAIR_clean.oshair_Accident_rec)
+  EXPORT Accident := RECORD
+    dx_OSHAIR.layouts.Layout_Accident AND NOT activity_number AND NOT dx_common.layout_metadata;
     string7 sex_desc; // 7: maybe we will need 'UNKNOWN' later
   END;
 
@@ -104,8 +103,8 @@ EXPORT layouts := MODULE
     unsigned6	           bdid := 0;
     unsigned2            BDID_score := 0;
     string9              FEIN_append  := '';
-    AddressTranslated address;// clean 
-  END; 
+    AddressTranslated address;// clean
+  END;
 
   EXPORT PlanningGuides := RECORD
     // "HEALTH PLANNING GUIDE - MANUFACTURING INSPECTION" = 48 -- the longest in main rec
@@ -163,7 +162,7 @@ EXPORT layouts := MODULE
     string3              Walk_Around_desc;
 //    string1              Employees_Interviewed_Flag;
     string3              Employees_Interviewed_desc;
-    string1              Union_Flag; 
+    string1              Union_Flag;
     string3              Union_Flag_desc; // derived: YES, NO, blank
     string1              Closed_Case_Flag;
     string1              Why_No_Inspection_Code;
@@ -178,7 +177,7 @@ EXPORT layouts := MODULE
     // string1              Due_Date_Type;
     // string60             Due_Date_Desc := ''; // Derived
     DATASET (InspectionTime) inspection_hours {MAXCOUNT (9)};
-    
+
     // decimal11_2          Total_Penalties;
     // decimal11_2          Total_FTA;
     // decimal5             Total_Violations;
@@ -191,25 +190,20 @@ EXPORT layouts := MODULE
     AddressTranslated address;
   END;
 
-  // output for SEARCH service 
+  // output for SEARCH service
   EXPORT SearchOutput := RECORD (ReportSearchShared)
-  END; 
+  END;
 
   // SUBREPORT (as part of CRS, for instanse) //so far is same as SearchOutput, but shall be different
   EXPORT EmbeddedOutput := RECORD (ReportSearchShared)
-  END; 
+  END;
 
   // Complete stand-alone SOURCE/REPORT service
-  EXPORT SourceOutput := RECORD 
+  EXPORT SourceOutput := RECORD
     Inspection;
     DATASET (Violation) violations {MAXCOUNT (Constants.VIOLATION_MAX)}; // from other key
     DATASET (Hazardous_Substance) substances {MAXCOUNT (Constants.SUBSTANCE_MAX)}; // from other key
     DATASET (Accident) accidents {MAXCOUNT (Constants.ACCIDENT_MAX)}; // from other key
-  END; 
-
-  // most complete and close to original: SOURCE service (generally, infoUSA.Layout_ABIUS_Company_Base)
-  EXPORT DataOutput := RECORD (OSHAIR.layout_OSHAIR_clean.oshair_Inspection_rec)
-  END; 
+  END;
 
 END;
-

@@ -1,11 +1,11 @@
-//HPCC Systems KEL Compiler Version 1.3.0
-IMPORT KEL13 AS KEL;
+//HPCC Systems KEL Compiler Version 1.5.0rc1
+IMPORT KEL15 AS KEL;
 IMPORT CFG_Compile,E_Person,E_Person_S_S_N,E_Social_Security_Number FROM PublicRecords_KEL;
-IMPORT * FROM KEL13.Null;
+IMPORT * FROM KEL15.Null;
 EXPORT B_Person_S_S_N_2(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG_Compile __cfg = CFG_Compile) := MODULE
   SHARED VIRTUAL TYPEOF(E_Person_S_S_N(__in,__cfg).__Result) __E_Person_S_S_N := E_Person_S_S_N(__in,__cfg).__Result;
-  SHARED __EE4620737 := __E_Person_S_S_N;
-  EXPORT __ST171292_Layout := RECORD
+  SHARED __EE7191761 := __E_Person_S_S_N;
+  EXPORT __ST209227_Layout := RECORD
     KEL.typ.ntyp(E_Person().Typ) Subject_;
     KEL.typ.ntyp(E_Social_Security_Number().Typ) Social_;
     KEL.typ.ndataset(E_Person_S_S_N(__in,__cfg).Valid_S_S_N_Layout) Valid_S_S_N_;
@@ -14,20 +14,17 @@ EXPORT B_Person_S_S_N_2(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CF
     KEL.typ.epoch Archive___Date_ := 0;
     KEL.typ.epoch Date_First_Seen_ := 0;
     KEL.typ.epoch Date_Last_Seen_ := 0;
-    KEL.typ.epoch Date_Vendor_First_Reported_ := 0;
-    KEL.typ.epoch Date_Vendor_Last_Reported_ := 0;
     KEL.typ.epoch Hybrid_Archive_Date_ := 0;
-    KEL.typ.epoch Vault_Date_First_Seen_ := 0;
     KEL.typ.epoch Vault_Date_Last_Seen_ := 0;
     KEL.typ.int __RecordCount := 0;
   END;
-  SHARED __ST171292_Layout __ND4620709__Project(E_Person_S_S_N(__in,__cfg).Layout __PP1492147) := TRANSFORM
-    __EE4620675 := __EE4620737;
-    __EE4620692 := __EE4620675.Data_Sources_;
-    __JC4620695(E_Person_S_S_N(__in,__cfg).Data_Sources_Layout __EE4620692) := __T(__OP2(__EE4620692.Source_,IN,__CN(['BP','NEN','NEQ'])));
-    __EE4620707 := __EE4620675(EXISTS(__CHILDJOINFILTER(__EE4620692,__JC4620695)));
-    SELF.Best_S_S_N_Recs_ := __CN(__EE4620707);
-    SELF := __PP1492147;
+  SHARED __ST209227_Layout __ND7191731__Project(E_Person_S_S_N(__in,__cfg).Layout __PP1838011) := TRANSFORM
+    __EE7191696 := __EE7191761;
+    __EE7191713 := __EE7191696.Data_Sources_;
+    __JC7191716(E_Person_S_S_N(__in,__cfg).Data_Sources_Layout __EE7191713) := __T(__OP2(__EE7191713.Source_,IN,__CN(['BP','NEN','NEQ'])));
+    __EE7191729 := __EE7191696(EXISTS(__CHILDJOINFILTER(__EE7191713,__JC7191716)));
+    SELF.Best_S_S_N_Recs_ := __CN(__EE7191729);
+    SELF := __PP1838011;
   END;
-  EXPORT __ENH_Person_S_S_N_2 := PROJECT(__EE4620737,__ND4620709__Project(LEFT));
+  EXPORT __ENH_Person_S_S_N_2 := PROJECT(__EE7191761,__ND7191731__Project(LEFT));
 END;

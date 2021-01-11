@@ -1,13 +1,13 @@
-import codes;
+IMPORT codes;
 
-export fn_get_filing_jurisdiction_name(string fj) :=
+EXPORT fn_get_filing_jurisdiction_name(STRING fj) :=
 FUNCTION
 
-	//I WONDER, SHOULD WE ALSO CONSIDER USING THE FILING_STATE FIELD WHEN IT HOLDS THE ABBREVIATION?
+  //I WONDER, SHOULD WE ALSO CONSIDER USING THE FILING_STATE FIELD WHEN IT HOLDS THE ABBREVIATION?
 
-	st2 := fj[1..2];
+  st2 := fj[1..2];
 
-	boolean isState := length(trim(fj)) = 2 and codes.valid_st(fj);
+  BOOLEAN isState := LENGTH(TRIM(fj)) = 2 AND codes.valid_st(fj);
 
-	return if(isState, codes.St2Name(fj), '');
+  RETURN IF(isState, codes.St2Name(fj), '');
 END;

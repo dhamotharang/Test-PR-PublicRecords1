@@ -55,20 +55,48 @@ Output_Master_Results := TRUE;
 // Output_SALT_Profile := FALSE;
 Output_SALT_Profile := TRUE;
 
-//lets not get extra inquiries unless we need to
-IncludeDeltaBase := FALSE;
-// IncludeDeltaBase := true;
-
 // Use default list of allowed sources
 AllowedSourcesDataset := DATASET([],PublicRecords_KEL.ECL_Functions.Constants.Layout_Allowed_Sources);
 // Do not exclude any additional sources from allowed sources dataset.
 ExcludeSourcesDataset := DATASET([],PublicRecords_KEL.ECL_Functions.Constants.Layout_Allowed_Sources);
 
+IncludeDeltaBase := FALSE;
+// IncludeDeltaBase := TRUE;
+IncludeNetAcuity := FALSE;
+// IncludeNetAcuity := TRUE;
 
-RecordsToRun := 0;
+Empty_GW := DATASET([TRANSFORM(Gateway.Layouts.Config, 
+							SELF.ServiceName := ''; 
+							SELF.URL := ''; 
+							SELF := [])]);
+							
+DeltaBase_GW := IF(IncludeDeltaBase, DATASET([TRANSFORM(Gateway.Layouts.Config,
+							// The inquiry delta base which feeds the 1 day inq attrs is not needed for the input rep 1 at this point. for now we only run this delta base code in the nonFCRA service 
+							//below is the dev delta base for inquiries, this is the default to prevent hammering the production gateway by accident
+							SELF.ServiceName := RiskWise.shortcuts.gw_delta_dev[1].servicename; 
+							SELF.URL := RiskWise.shortcuts.gw_delta_dev[1].url; //dev
+							//below is the production delta base for inquiries.  be careful not to hammer this production gateway with too much traffic
+							// SELF.ServiceName := RiskWise.shortcuts.gw_delta_prod[1].servicename; 
+							// SELF.URL := RiskWise.shortcuts.gw_delta_prod[1].url; 
+							SELF := [])]),
+							Empty_GW);	
+							
+NetAcuity_GW := IF(IncludeNetAcuity, DATASET([TRANSFORM(Gateway.Layouts.Config,
+							SELF.ServiceName := RiskWise.shortcuts.gw_netacuityv4_prod[1].servicename; 
+							SELF.URL := RiskWise.shortcuts.gw_netacuityv4_prod[1].url; 
+							SELF := [])]),
+							Empty_GW);
+							
+Input_Gateways := (DeltaBase_GW + NetAcuity_GW)(URL <> '');
+
+// Store GLB AND DPPA values at a workflow level so they can be accessed by the gateways within attributes.kel
+#STORED('GLBPurposeValue', GLBA);
+#STORED('DPPAPurposeValue', DPPA);
+	
+RecordsToRun := 10;
 eyeball := 120;
 
-OutputFile := '~bbraaten::out::PersonNonFCRA_Roxie_100k_Current_KS-5842_test_marketing_'+ ThorLib.wuid();
+OutputFile := '~bbraaten::out::PersonNonFCRA_Roxie_100k_Current_KS-6233_'+ ThorLib.wuid();
 
 prii_layout := RECORD
     STRING Account             ;
@@ -170,21 +198,7 @@ soapLayout trans (pp le):= TRANSFORM
 	SELF.input := PROJECT(le, TRANSFORM(PublicRecords_KEL.ECL_Functions.Input_Layout,
 		SELF := LEFT;
 		SELF := []));
-	SELF.Gateways := IF(includedeltabase = TRUE, 
-				DATASET([TRANSFORM(Gateway.Layouts.Config,
-			// The inquiry delta base which feeds the 1 day inq attrs is not needed for the input rep 1 at this point. for now we only run this delta base code in the nonFCRA service 
-			
-			//below is the dev delta base for inquiries, this is the default to prevent hammering the production gateway by accident
-				SELF.ServiceName := RiskWise.shortcuts.gw_delta_dev[1].servicename; 
-				SELF.URL := RiskWise.shortcuts.gw_delta_dev[1].url; //dev
-			//below is the production delta base for inquiries.  be careful not to hammer this production gateway with too much traffic
-			// SELF.ServiceName := RiskWise.shortcuts.gw_delta_prod[1].servicename; 
-			// SELF.URL := RiskWise.shortcuts.gw_delta_prod[1].url; 
-				SELF := [])]), 
-				DATASET([TRANSFORM(Gateway.Layouts.Config, 
-				SELF.ServiceName := ''; 
-				SELF.URL := ''; 
-				SELF := [])]));				
+	SELF.Gateways := Input_Gateways;
 	SELF.ScoreThreshold := Settings.LexIDThreshold;
 	SELF.DataRestrictionMask := Settings.Data_Restriction_Mask;
 	SELF.DataPermissionMask := Settings.Data_Permission_Mask;

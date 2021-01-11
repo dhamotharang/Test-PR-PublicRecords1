@@ -93,8 +93,8 @@ export BatchRecords (CriminalRecords_BatchService.IParam.batch_params configData
 							 
 	// ssn prunning									 
 	doxie.MAC_PruneOldSSNs(crim_recs, out_pruned, ssn, did, isFCRA);
-  Suppress.MAC_Suppress(out_pruned,pruned_did,configData.application_type,Suppress.Constants.LinkTypes.DID,did);
-  Suppress.MAC_Suppress(pruned_did,results_np,configData.application_type,Suppress.Constants.LinkTypes.SSN,ssn);
+  Suppress.MAC_Suppress(out_pruned,pruned_did,configData.application_type,Suppress.Constants.LinkTypes.DID,did, isFCRA := isFCRA);
+  Suppress.MAC_Suppress(pruned_did,results_np,configData.application_type,Suppress.Constants.LinkTypes.SSN,ssn, isFCRA := isFCRA);
 	
 
   // Start of 06/13/2017 offense categories filtering enhancement?

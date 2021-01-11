@@ -44,5 +44,5 @@ export Layout_2015_Trade_Payment_Totals_In := record
    string8 account_balance_regular_tradelines;
    string8 account_balance_new;
    string8 account_balance_combined;
-   string1 lf;
+   string1 lf := '';
 end;

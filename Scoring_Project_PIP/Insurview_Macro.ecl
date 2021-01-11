@@ -71,12 +71,12 @@ import risk_indicators, riskwise, ut, iesp,  iss, scoring_project_PIP, gateway, 
   string other4;
 		END;
 
-		ds_raw_input := IF(no_of_records = 0, dataset( Infile_name, layout_input,  thor), ChooseN(dataset( infile_name, layout_input,  thor), no_of_records));
+		ds_raw_input := distribute(IF(no_of_records = 0, dataset( Infile_name, layout_input,  thor), ChooseN(dataset( infile_name, layout_input,  thor), no_of_records)), (integer)accountnumber);
 
 
 // ds_raw_input := IF(no_of_records = 0, dataset( Infile_name, layout_input,  thor), ChooseN(dataset( infile_name, layout_input,  thor), no_of_records));
-Input := IF(no_of_records <= 0, DATASET(Input_file_name, layout_input, thor),
-                            CHOOSEN(DATASET(Input_file_name, layout_input,thor), no_of_records));
+Input := distribute(IF(no_of_records <= 0, DATASET(Input_file_name, layout_input, thor),
+                            CHOOSEN(DATASET(Input_file_name, layout_input,thor), no_of_records)), (integer)accountnumber);
 
 layout_input Getseq(layout_input le, integer c) := transform
 	self.accountnumber := c;

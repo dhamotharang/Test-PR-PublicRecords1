@@ -1,5 +1,5 @@
 ﻿IMPORT BIPV2, BankruptcyV3, DeathV2_Services, doxie, LiensV2,TopBusiness_Services, iesp, LN_PropertyV2, MDR, 
-       Property, Suppress, UCCV2, UCCV2_Services, VehicleV2, Watercraft, Foreclosure_Services;
+       dx_Property, Suppress, UCCV2, UCCV2_Services, VehicleV2, Watercraft, Foreclosure_Services;
 
 
 EXPORT AssociateSection := MODULE;
@@ -870,7 +870,7 @@ EXPORT AssociateSection := MODULE;
 	   BIPV2.IDlayouts.l_header_ids;
 	   TopBusiness_Services.AssociateSection_layouts.rec_ids_with_linkidsdata_slimmed.role_source;
 		  TopBusiness_Services.AssociateSection_layouts.rec_ids_with_linkidsdata_slimmed.forec_name_Company;
-		  recordof(Property.Key_Foreclosures_FID_Linkids()) - [name1,name2, name3, name4];
+		  recordof(dx_Property.Key_Foreclosures_FID_Linkids()) - [name1,name2, name3, name4];
 	   BIPV2.IDlayouts.l_header_ids associated_business_linkids1;
 		  BIPV2.IDlayouts.l_header_ids associated_business_linkids2;
 		  BIPV2.IDlayouts.l_header_ids associated_business_linkids3;
@@ -881,7 +881,7 @@ EXPORT AssociateSection := MODULE;
 	// all of the foreclosure "party" data for the foreclosure_ids involved to output on the report.
   ds_fc_linkids_keyrecs_plusparty := 
 	                         join(ds_fc_linkids_keyrecs_deduped,
-	                              Property.Key_Foreclosures_FID_Linkids,
+	                              dx_Property.Key_Foreclosures_FID_Linkids,
                                    keyed(left.foreclosure_id = right.fid) //AND RIGHT.source=MDR.sourceTools.src_Foreclosures
 																																			AND right.source IN Foreclosure_Services.Functions.getCodes(in_options.IncludeVendorSourceB)
 																	 // vers1, just get all recs because they will have to be normalized first due to multiple names???
@@ -1139,7 +1139,7 @@ EXPORT AssociateSection := MODULE;
 	   BIPV2.IDlayouts.l_header_ids;
 	   TopBusiness_Services.AssociateSection_layouts.rec_ids_with_linkidsdata_slimmed.role_source;
 		  TopBusiness_Services.AssociateSection_layouts.rec_ids_with_linkidsdata_slimmed.nod_name_Company;
-		  recordof(Property.Key_NOD_FID_Linkids) - [name1, name2, name3, name4];
+		  recordof(dx_Property.Key_NOD_FID_Linkids) - [name1, name2, name3, name4];
 	   BIPV2.IDlayouts.l_header_ids associated_business_linkids1;
 	   BIPV2.IDlayouts.l_header_ids associated_business_linkids2;
 	   BIPV2.IDlayouts.l_header_ids associated_business_linkids3;
@@ -1150,7 +1150,7 @@ EXPORT AssociateSection := MODULE;
 	// all of the NOD "party" data for the foreclosure_ids involved to output on the report.
   ds_nod_linkids_keyrecs_plusparty := 
 	                         join(ds_nod_linkids_keyrecs_deduped,
-	                              Property.Key_NOD_FID_Linkids,
+	                              dx_Property.Key_NOD_FID_Linkids,
                                    keyed(left.foreclosure_id = right.fid) //AND RIGHT.source=MDR.sourceTools.src_Foreclosures
 																								AND right.source IN Foreclosure_Services.Functions.getCodes(in_options.IncludeVendorSourceB)
 																	 // vers1, just get all recs because they will have to be normalized first due to multiple names???
@@ -1651,7 +1651,7 @@ EXPORT AssociateSection := MODULE;
 													                                  left outer, keep(1)); //???
 
   ds_all_common_child_top100_per_derogf := join(ds_all_common_child_top100_per_derogl,
-	                                               Property.Key_Foreclosure_DID,
+	                                               dx_Property.Key_Foreclosure_DID,
 			                                             keyed((unsigned6)left.did = right.did),
 																							                           transform(TopBusiness_Services.AssociateSection_layouts.rec_child_party,
 															                                     self.has_derog := if(left.has_derog,left.has_derog,if(right.did != 0,true,false)),
@@ -1660,7 +1660,7 @@ EXPORT AssociateSection := MODULE;
 													                                   left outer, keep(1)); //???
 
 	ds_all_common_child_top100_per_derogn:= join(ds_all_common_child_top100_per_derogf,
-	                                             Property.Key_NOD_DID,
+	                                             dx_Property.Key_NOD_DID,
 			                                           keyed((unsigned6)left.did = right.did),
 																							                         transform(TopBusiness_Services.AssociateSection_layouts.rec_child_party,
 															                                   self.has_derog := if(left.has_derog,left.has_derog,if(right.did != 0,true,false)),

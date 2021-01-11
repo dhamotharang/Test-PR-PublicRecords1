@@ -67,7 +67,12 @@ parallel(Kel_Shell_QA.AC_automated_file(logical_file_name,unique_field, inut_fil
 				 Kel_Shell_QA.AC_automated_file(logical_file_name,unique_field, inut_file_records, Tag, filtered_lay,'Overall Derog History'),
 				 Kel_Shell_QA.AC_automated_file(logical_file_name,unique_field, inut_file_records, Tag, filtered_lay,'Input PII Characteristics'),
 				 Kel_Shell_QA.AC_automated_file(logical_file_name,unique_field, inut_file_records, Tag, filtered_lay,'Accidents'),
-				 Kel_Shell_QA.AC_automated_file(logical_file_name,unique_field, inut_file_records, Tag, filtered_lay,'Person - Business Property')
+				 Kel_Shell_QA.AC_automated_file(logical_file_name,unique_field, inut_file_records, Tag, filtered_lay,'Person - Business Property'),
+				 Kel_Shell_QA.AC_automated_file(logical_file_name,unique_field, inut_file_records, Tag, filtered_lay,'Person Characteristics'),
+				 Kel_Shell_QA.AC_automated_file(logical_file_name,unique_field, inut_file_records, Tag, filtered_lay,'Consumer Alerts'),
+				 Kel_Shell_QA.AC_automated_file(logical_file_name,unique_field, inut_file_records, Tag, filtered_lay,'Inferred Performance'),
+				 Kel_Shell_QA.AC_automated_file(logical_file_name,unique_field, inut_file_records, Tag, filtered_lay,'Verification'),
+				 Kel_Shell_QA.AC_automated_file(logical_file_name,unique_field, inut_file_records, Tag, filtered_lay,'EmergingID')
 				 );
 
 

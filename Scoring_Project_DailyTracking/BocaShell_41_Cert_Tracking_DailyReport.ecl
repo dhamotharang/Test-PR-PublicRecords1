@@ -7,7 +7,7 @@ dt := ut.getdate;
 decimal19_2 thresh := 1.25;
 
 
-ds_curr := dataset('~scoringqa::out::fcra::bocashell_41_historydate_999999_cert_' + dt + '_1', Scoring_Project_Macros.Global_Output_Layouts.BocaShell_Global_Layout, thor)(length(trim(errorcode,left,right))= 0 );
+ds_curr := distribute(dataset('~scoringqa::out::fcra::bocashell_41_historydate_999999_cert_' + dt + '_1', Scoring_Project_Macros.Global_Output_Layouts.BocaShell_Global_Layout, thor)(length(trim(errorcode,left,right))= 0 ),(integer)accountnumber);
 // bs_cert_curr_choosen := choosen(bs_cert_curr, 10);
 // bs_cert_curr_choosen;
 
@@ -22,7 +22,7 @@ prev_date := p_file_name[length(p_file_name)-9.. length(p_file_name)-2];
 cleaned_curr_date := dt;
 cleaned_prev_date := prev_date;
 
-ds_prev := dataset('~'+ p_file_name, Scoring_Project_Macros.Global_Output_Layouts.BocaShell_Global_Layout, thor)(length(trim(errorcode,left,right))= 0 );
+ds_prev := distribute(dataset('~'+ p_file_name, Scoring_Project_Macros.Global_Output_Layouts.BocaShell_Global_Layout, thor)(length(trim(errorcode,left,right))= 0 ),(integer)accountnumber);
 
 
 		join1 := JOIN(ds_curr, ds_prev, LEFT.accountnumber=RIGHT.accountnumber, transform(left));

@@ -27,5 +27,5 @@ record
    string20 OWNER_TYPE_DESC;
    string1 LOCATION_CODE;
    string20 LOCATION_DESC;
-   string1 lf;
+   string1 lf := '';
 end;

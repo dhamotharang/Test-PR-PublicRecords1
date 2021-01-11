@@ -90,7 +90,7 @@ EXPORT Layouts := MODULE
   EXPORT rec_company_best := RECORD
     rec_ids_in;
     rec_ids_in AND NOT acctno parent_ids;
-    RECORDOF(doxie_cbrs.fn_best_information) AND NOT bdid;
+    doxie_cbrs.layout_best_info AND NOT bdid;
     STRING60 corp_status_desc := '';
   END;
   

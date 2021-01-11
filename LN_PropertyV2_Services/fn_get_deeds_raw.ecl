@@ -26,10 +26,9 @@ export dataset(l_raw) fn_get_deeds_raw(
 
   boolean showDisputedRecords := FFD.FFDMask.isShowDisputed(inFFDOptionsMask);
   boolean ShowConsumerStatements := FFD.FFDMask.isShowConsumerStatements(inFFDOptionsMask);
-  //when blank show data for Deeds, Assessments and Assignments & Releases
-  boolean showEverything := Ln_PropertyV2_Services.input.lookupVal = Ln_PropertyV2_Services.consts.LOOKUP_TYPE.EVERYTHING;
+
   //show only Assignments & Releases data
-  boolean showAssignmentsandReleases := Ln_PropertyV2_Services.input.lookupVal = Ln_PropertyV2_Services.consts.LOOKUP_TYPE.ASSIGNMENTANDRELEASE;
+  boolean showAssignmentsandReleasesOnly := Ln_PropertyV2_Services.input.lookupVal = Ln_PropertyV2_Services.consts.LOOKUP_TYPE.ASSIGNMENTANDRELEASE;
 
   // join inputs to index to get raw data
   ds_raw0 := join(
@@ -37,9 +36,11 @@ export dataset(l_raw) fn_get_deeds_raw(
     keyed(left.ln_fares_id = right.ln_fares_id)
     and ~((string)right.ln_fares_id in set( flags( (unsigned6)did=left.search_did), record_id) and isFCRA)
     and (~isCNSMR or right.vendor_source_flag not in D2C.Constants.LNPropertyV2RestrictedSources )
-    AND map(includeBlackKnight or showEverything => true,
-          showAssignmentsandReleases => LN_PropertyV2.fn_isAssignmentAndReleaseRecord(right.record_type,right.state,right.document_type_code, right.ln_fares_id[2]),
-          not LN_PropertyV2.fn_isAssignmentAndReleaseRecord(right.record_type,right.state,right.document_type_code, right.ln_fares_id[2])),
+    AND map(
+            includeBlackKnight => true,
+            showAssignmentsandReleasesOnly => LN_PropertyV2.fn_isAssignmentAndReleaseRecord(right.record_type,right.state,right.document_type_code, right.ln_fares_id[2]),
+            not LN_PropertyV2.fn_isAssignmentAndReleaseRecord(right.record_type,right.state,right.document_type_code, right.ln_fares_id[2])
+           ),
     transform(l_raw,self:=left,self:=right,self:=[]),
     limit(max_raw)
   );

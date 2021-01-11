@@ -24,7 +24,7 @@ EXPORT BatchServiceFCRA() := MACRO
 	ds_validate:=BatchShare.MAC_Process_Validate(ds_batch_in,TRUE,BatchShare.Constants.Valid_Min_Cri.DID_OR_Name_Address);
 	ds_valid_recs:=PROJECT(ds_validate(error_code=0),paw_services.Layouts.FCRA.workRec);
 	ds_error_recs:=PROJECT(ds_validate(error_code>0),paw_services.Layouts.FCRA.workRec);
-	BatchShare.MAC_AppendDidVilleDID(ds_valid_recs,ds_work_recs,in_mod,in_mod.DidScoreThreshold);
+	BatchShare.MAC_AppendDidVilleDID(ds_valid_recs,ds_work_recs,in_mod,in_mod.DidScoreThreshold, true);
 
 	ds_PersonContext:=FFD.FetchPersonContext(PROJECT(ds_work_recs,TRANSFORM(FFD.Layouts.DidBatch,SELF:=LEFT)),in_mod.gateways,FFD.Constants.DataGroupSet.Paw);
 	ds_AlertFlags:=FFD.ConsumerFlag.getAlertIndicators(ds_PersonContext,in_mod.FCRAPurpose,in_mod.FFDOptionsMask);

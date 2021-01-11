@@ -292,10 +292,10 @@ export Raw := module
 		    self := left));
 
 		  // ***** DID & SSN pulling and suppression ****
-			Suppress.MAC_Suppress(recs_plus_pen,dids_pulled,in_mod.application_type,Suppress.Constants.LinkTypes.DID,did);
+			Suppress.MAC_Suppress(recs_plus_pen,dids_pulled,in_mod.application_type,Suppress.Constants.LinkTypes.DID,did, isFCRA := isFCRA);
 			// pull, prune & suppress ssns twice, once for ssn_appended & once for ssn
-			Suppress.MAC_Suppress(dids_pulled,ssns_pulled1,in_mod.application_type,Suppress.Constants.LinkTypes.SSN,ssn_appended);
-			Suppress.MAC_Suppress(ssns_pulled1,ssns_pulled2,in_mod.application_type,Suppress.Constants.LinkTypes.SSN,ssn);
+			Suppress.MAC_Suppress(dids_pulled,ssns_pulled1,in_mod.application_type,Suppress.Constants.LinkTypes.SSN,ssn_appended, isFCRA := isFCRA);
+			Suppress.MAC_Suppress(ssns_pulled1,ssns_pulled2,in_mod.application_type,Suppress.Constants.LinkTypes.SSN,ssn, isFCRA := isFCRA);
 	    doxie.MAC_PruneOldSSNs(ssns_pulled2, ssns_pruned1, ssn_appended, did, isFCRA);
 			doxie.MAC_PruneOldSSNs(ssns_pruned1, ssns_pruned2, ssn, did, isFCRA);
 
@@ -502,11 +502,11 @@ export Raw := module
 			recs_out := if(in_mod.include_bestaddress and ~isFCRA, recs_with_best, recs_pre_best);
 															 			
 		  // ***** DID & SSN pulling and suppression ****
-			Suppress.MAC_Suppress(recs_out,dids_pulled,in_mod.application_type,Suppress.Constants.LinkTypes.DID,UniqueId);
+			Suppress.MAC_Suppress(recs_out,dids_pulled,in_mod.application_type,Suppress.Constants.LinkTypes.DID,UniqueId, isFCRA := isFCRA);
 
 			// pull, prune & suppress ssns twice, once for ssn_appended & once for ssn
-			Suppress.MAC_Suppress(dids_pulled,ssns_pulled1,in_mod.application_type,Suppress.Constants.LinkTypes.SSN,ssn);
-			Suppress.MAC_Suppress(ssns_pulled1,ssns_pulled2,in_mod.application_type,Suppress.Constants.LinkTypes.SSN,OrigSSN);
+			Suppress.MAC_Suppress(dids_pulled,ssns_pulled1,in_mod.application_type,Suppress.Constants.LinkTypes.SSN,ssn, isFCRA := isFCRA);
+			Suppress.MAC_Suppress(ssns_pulled1,ssns_pulled2,in_mod.application_type,Suppress.Constants.LinkTypes.SSN,OrigSSN, isFCRA := isFCRA);
 	    doxie.MAC_PruneOldSSNs(ssns_pulled2, ssns_pruned1, SSN, UniqueId, isFCRA);
 			doxie.MAC_PruneOldSSNs(ssns_pruned1, ssns_pruned2, OrigSSN, UniqueId, isFCRA);
 

@@ -9,7 +9,7 @@ dt := ut.getdate;
 decimal19_2 thresh := 0.01;
 
 
-ds_curr := dataset('~ScoringQA::out::NONFCRA::Profile_Booster_Batch_Prod_CapitalOne_attributes_v1_' + dt + '_1', Scoring_Project_Macros.Global_Output_Layouts.ProfileBooster_layout, thor)(length(trim(errorcode,left,right))= 0 );
+ds_curr := distribute(dataset('~ScoringQA::out::NONFCRA::Profile_Booster_Batch_Prod_CapitalOne_attributes_v1_' + dt + '_1', Scoring_Project_Macros.Global_Output_Layouts.ProfileBooster_layout, thor)(length(trim(errorcode,left,right))= 0 ),(integer)acctno);
 
 filenames_details :=  nothor(STD.File.LogicalFileList('ScoringQA::out::NONFCRA::Profile_Booster_Batch_Prod_CapitalOne_attributes_v1_*_1'));
 
@@ -22,7 +22,7 @@ prev_date := p_file_name[length(p_file_name)-9.. length(p_file_name)-2];
 cleaned_curr := dt;
 cleaned_prev := prev_date;
 
-ds_prev := dataset('~'+ p_file_name, Scoring_Project_Macros.Global_Output_Layouts.ProfileBooster_layout, thor)(length(trim(errorcode,left,right))= 0 );
+ds_prev := distribute(dataset('~'+ p_file_name, Scoring_Project_Macros.Global_Output_Layouts.ProfileBooster_layout, thor)(length(trim(errorcode,left,right))= 0 ),(integer)acctno);
 
 clean_prev := ds_prev(errorcode = '');
 clean_curr := ds_curr(errorcode = '');

@@ -1,48 +1,9 @@
-/*--SOAP--
-<message name="BH_GID_RollupSearchService">
-	<part name="INDUSTRYCLASS" type="xsd:string"/>
-	<part name="ReturnBdls" type="xsd:boolean"/>
-	<part name="DPPAPurpose" type="xsd:byte"/>
-	<part name="GLBPurpose" type="xsd:byte"/> 	
-	<part name="CompanyName" type="xsd:string"/>
-	<part name="ExactOnly" type="xsd:boolean"/>
-	<part name="StrictMatch"	type="xsd:boolean"/>
-	<part name="FuzzinessDial" type="xsd:unsignedInt"/>
-	<part name="Addr" type="xsd:string"/>
-	<part name="City" type="xsd:string"/>
-	<part name="State" type="xsd:string"/>
-	<part name="Zip" type="xsd:string"/>
-	<part name="MileRadius" type="xsd:unsignedInt"/>
-	<part name="SIC" type="xsd:string"/>
-	<part name="Phone" type="xsd:string"/>
-	<part name="ForcePhoneMatch" type="xsd:boolean"/>
-	<part name="SSN" type="xsd:string"/>
-	<part name="UnParsedFullName" type="xsd:string"/>
-	<part name="FirstName" type="xsd:string"/>
-	<part name="AllowNickNames" type="xsd:boolean"/>
-	<part name="LastName" type="xsd:string"/>
-	<part name="PhoneticMatch" type="xsd:boolean"/>
-	<part name="MiddleName" type="xsd:string"/>
-	<part name="FEIN" type="xsd:string"/>
-	<part name="ForceFeinMatch" type="xsd:boolean"/>
-	<part name="BDID" type="xsd:string"/>
-	<part name="GID" type="xsd:string"/>
-	<part name="UseGIDnotBDID" type="xsd:boolean"/>
-	<part name="BDIDOnly" type="xsd:boolean"/>
-	<part name="PullBDIDS" type="xsd:boolean"/>
-	<part name="ShowRaw" type="xsd:boolean"/>
-	<part name="RollupLimit" type="xsd:unsignedInt"/>
-	<part name="IncludeMVAWFAHeaders" type="xsd:boolean"/>
-	<part name="Include_Bus_DPPA" type="xsd:boolean"/>
-	<part name="DataRestrictionMask" type="xsd:string"/>
-	<part name="ExcludeBlankAddresses" type="xsd:boolean"/>
-	<part name="OnlyShowParentsFromDca" type="xsd:boolean"/>
-	<part name="MaxResults"  				type="xsd:unsignedInt"/>
-	<part name="MaxResultsThisTime" type="xsd:unsignedInt"/>
-	<part name="SkipRecords" 				type="xsd:unsignedInt"/>
-	<part name="IncludeSourceDocCounts" type="xsd:boolean"/>
- </message>
-*/
+// =====================================================================
+// ROXIE QUERY
+// -----------
+// For the complete list of input parameters please check published WU.
+// Look at the history of this attribute for the old SOAP info.
+// =====================================================================
 /*--INFO-- This service searches the business header file, joins the records with the GID, and clusters BDIDs with the same GID.*/
 import doxie;
 
@@ -72,22 +33,22 @@ string30 pre_mname_val := '' : stored('MiddleName');
 
 doxie.MAC_Header_Field_Declare();
 mod_access := Doxie.compliance.GetGlobalDataAccessModule();
-// *** If input contains SIC and either zip or city&state ONLY and no other input 
+// *** If input contains SIC and either zip or city&state ONLY and no other input
 //     fields, set boolean on to be passed to Business_Header.fn_RSS_getBestRecords.
 boolean SIC_CODE_SEARCH := SIC_value<>'' AND
-                           ((city_val<>'' and state_val<>'') or zip_val0<>'') AND 
+                           ((city_val<>'' and state_val<>'') or zip_val0<>'') AND
                            company_name=''  AND addr_value=''    AND fein_val ='' AND
                            phone_val=''     AND ssn_value=''     AND unparsed_fullname_value='' AND
                            pre_fname_val='' AND pre_lname_val='' AND pre_mname_val='';
 
 display_set :=
-	business_header.fn_RSS_getBestRecords(mod_access, 
+	business_header.fn_RSS_getBestRecords(mod_access,
 		USE_GID,RETURN_BDLS,INCLUDE_MVAWFA_HEADERS,INCLUDE_BUS_DPPA,,FORCE_PHONE_MATCH,FORCE_FEIN_MATCH,,FALSE,FUZZINESS_DIAL,SIC_CODE_SEARCH);
 
 rollup_display_set :=
 	business_header.fn_RSS_rollupBestRecords(display_set, mod_access, ROLLUP_LIMIT);
 
-// Get sic_code info for all records, then filter out records that don't match 
+// Get sic_code info for all records, then filter out records that don't match
 // the filter-by sic-code, if one was input.
 sicinfo_display_set := business_header.fn_RSS_attachSICInfo(rollup_display_set, SIC_value);
 
@@ -96,7 +57,7 @@ parent_display_set :=
 
 pos_display_set_0 :=
 	business_header.fn_RSS_attachPOSInfo(parent_display_set,LN_Branded_value,DPPA_Purpose,RETURN_BDLS);
-	
+
 non_blank_addresses := pos_display_set_0(exists(addressrecs(
 		prim_range != '' or predir != '' or prim_name != '' or addr_suffix != '' or
 		postdir != '' or unit_desig != '' or sec_range != '' or city != '' or
@@ -129,7 +90,7 @@ gong_input1 := normalize(gong_input0,count(left.addressRecs),transform({unsigned
 gong_input2 := normalize(gong_input1,count(left.phoneRecs),transform({unsigned __seq,dataset(Business_Header.layout_biz_search.name_rec) nameRecs{maxcount(200)},string10 phone},
 	self.phone := if(left.phoneRecs[counter].phone = 0,'',intformat(left.phoneRecs[counter].phone,10,1)),
 	self := left));
-	
+
 gong_input3 := project(gong_input2,transform(doxie.Layout_Append_Gong_Biz.Layout_In,
 	self.company_names := project(left.nameRecs,transform({string120 company_name},
 		self.company_name := left.company_name)),
@@ -152,7 +113,7 @@ join_verified := join(pos_display_set,rollup_append,right.__seq = if(RETURN_BDLS
 // Append the source document count information if requested.
 src_info_appended := if(INCLUDE_SOURCE_DOC_COUNTS,business_header.fn_RSS_attachSourceInfo(join_verified, mod_access, USE_GID),join_verified);
 
-// Use project to blank out the bdidrecs child dataset which used to be done in 
+// Use project to blank out the bdidrecs child dataset which used to be done in
 // fn_RSS_AttachPOSInfo, but then they were needed in the new (Feb 2010)
 // fn_RSS_attachSourceInfo added above.
 bdidrecs_blanked := project(src_info_appended,

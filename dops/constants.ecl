@@ -109,8 +109,9 @@ export constants := module
 																							 'hthor_dev']
 																				);
 	
-end;import STD,lib_thorlib;
-export constants := module
+end;
+// import STD,lib_thorlib;
+/* export constants := module
 	
 	
 	export devdaliip := fileservices.ResolveHostName('dataland_dali.br.seisint.com');
@@ -199,3 +200,5 @@ export constants := module
 																							);
 	
 end;
+
+*/

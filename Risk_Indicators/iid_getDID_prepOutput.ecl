@@ -342,9 +342,9 @@ export iid_getDID_prepOutput(DATASET(risk_indicators.layout_input) indata, unsig
 	
 	appType := Suppress.Constants.ApplicationTypes.DEFAULT;
 	// search1_by_did := false;
-	Suppress.MAC_Suppress(appended_DID,got_DIDbySSN_t1_pulled,appType,Suppress.Constants.LinkTypes.SSN,ssn);
+	Suppress.MAC_Suppress(appended_DID,got_DIDbySSN_t1_pulled,appType,Suppress.Constants.LinkTypes.SSN,ssn, isFCRA := isFCRA);
 	// search2_by_did := true;
-	Suppress.MAC_Suppress(got_DIDbySSN_t1_pulled,got_DIDbySSN_t2,appType,Suppress.Constants.LinkTypes.DID,did);
+	Suppress.MAC_Suppress(got_DIDbySSN_t1_pulled,got_DIDbySSN_t2,appType,Suppress.Constants.LinkTypes.DID,did, isFCRA := isFCRA);
 
 	Risk_Indicators.layout_output CheckDIDorSSN(Risk_Indicators.layout_output le, Risk_Indicators.layout_output ri) := TRANSFORM
 		SELF.did := ri.did;

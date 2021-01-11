@@ -1,79 +1,14 @@
-﻿/*--SOAP--
-<message name="SearchService">
-
-  <!-- COMPLIANCE SETTINGS -->
-  <part name="GLBPurpose"          type="xsd:byte" default="1"/>
-  <part name="DPPAPurpose"         type="xsd:byte" default="1"/>
-  <part name="SSNMask"             type="xsd:string"/>
-  <part name="MaxWaitSeconds"      type="xsd:integer"/>
-  <part name="ApplicationType"     type="xsd:string"/>
-  
-  <!-- SEARCH FIELDS -->
-  <part name="SSN"                 type="xsd:string"/>
-  <part name="DOB"                 type="xsd:string"/>
-  <part name="AgeLow"              type="xsd:string"/>
-  <part name="AgeHigh"             type="xsd:string"/>
-  
-  <part name="UnParsedFullName"    type="xsd:string"/>
-  <part name="FirstName"           type="xsd:string"/>
-  <part name="MiddleName"          type="xsd:string"/>
-  <part name="LastName"            type="xsd:string"/>
-  <part name="NameSuffix"          type="xsd:string"/>
-  
-  <part name="prim_range"          type="xsd:string"/>
-  <part name="predir"              type="xsd:string"/>
-  <part name="prim_name"           type="xsd:string"/>
-  <part name="suffix"              type="xsd:string"/>
-  <part name="postdir"             type="xsd:string"/>
-  <part name="sec_range"           type="xsd:string"/>
-  <part name="Addr"                type="xsd:string"/>
-  <part name="City"                type="xsd:string"/>
-  <part name="State"               type="xsd:string"/>
-  <part name="Zip"                 type="xsd:string"/>
-  <part name="ZipRadius"           type="xsd:unsignedInt"/>
-  <part name="Latitude"            type="xsd:real"/>
-  <part name="Longitude"           type="xsd:real"/>
-
-  <!-- Roxie search service related options -->
-  <part name="AllowNickNames"      type="xsd:boolean"/>
-  <part name="PhoneticMatch"       type="xsd:boolean"/>
-  <part name="DeepDive"            type="xsd:boolean"/>
-  <part name="StrictMatch"         type="xsd:boolean"/>
-  <part name="did"                 type="xsd:string"/>
-
-  <!-- penalty fields -->
-  <part name="OffenseCategory"      type="xsd:string"/>
-  <part name="ScarsMarksTattoos"    type="xsd:string"/>
-
-  <!-- Search request options -->
-  <part name="ReturnCount"                  type="xsd:unsignedInt"/>
-  <part name="StartingRecord"               type="xsd:unsignedInt"/>
-  <part name="IncludeRegisteredAddresses"   type="xsd:boolean"/>
-  <part name="IncludeUnRegisteredAddresses" type="xsd:boolean"/>
-  <part name="IncludeHistoricalAddresses"   type="xsd:boolean"/>
-  <part name="IncludeAssociatedAddresses"   type="xsd:boolean"/>
-  <part name="IncludeOffenses"              type="xsd:boolean"/>
-  <part name="IncludeBestAddress"           type="xsd:boolean"/>
-  <part name="IncludeWeAlsoFound"           type="xsd:boolean"/>
-  <part name="SearchAroundAddress"          type="xsd:boolean"/>
-  <part name="FilterRecsByAltAddresses"     type="xsd:boolean"/>
-  
-  <!-- Alert related options -->
-  <part name="ReturnHashes" type="xsd:boolean"/>
-  <part name="srch_hashvals" type="tns:XmlDataSet" cols="70" rows="3"/>    
-
-  <!-- XML input search request -->
-  <part name="OffenderSearchRequest" type="tns:XmlDataSet" cols="80" rows="30" />
-
-</message>
-*/
-/*--INFO-- Search and return Sexual Offender information.*/
-
+﻿// =====================================================================
+// ROXIE QUERY
+// -----------
+// For the complete list of input parameters please check published WU.
+// Look at the history of this attribute for the old SOAP info.
+// =====================================================================
 import Alerts, AutoStandardI, iesp, ut;
 
 export SearchService := macro
   #CONSTANT('SearchLibraryVersion', AutoheaderV2.Constants.LibVersion.SALT);
-  // Get XML input 
+  // Get XML input
   rec_in := iesp.sexualoffender.t_OffenderSearchRequest;
   ds_in := DATASET ([], rec_in) : STORED ('OffenderSearchRequest', FEW);
   first_row := ds_in[1] : independent;
@@ -81,7 +16,7 @@ export SearchService := macro
   search_by := global (first_row.SearchBy);
 
   // This will set Name, Address, SSN, DID and DOB
-  // NOTE: Even though the ECL2ESP function used below is named SetInputReportBy, 
+  // NOTE: Even though the ECL2ESP function used below is named SetInputReportBy,
   // it can also be used to set certain search_by fields.
   report_by := ROW (search_by, transform (iesp.bpsreport.t_BpsReportBy, Self := Left; Self := []));
   iesp.ECL2ESP.SetInputReportBy (report_by);
@@ -97,7 +32,7 @@ export SearchService := macro
   // NOTE: AgeRange is in the iesp.sexualoffender t_OffenderSearchBy record structure and
   // was on the old moxie wsonline search form, but even though it was on the moxie search
   // form, it did not appear to work.  Also it is not on the Accurint.com Sex Offender
-  // search form, so it was not included here. 
+  // search form, so it was not included here.
 
   // set User, Base and generic search options
   iesp.ECL2ESP.SetInputBaseRequest (first_row);
@@ -128,7 +63,7 @@ export SearchService := macro
   mod_access := doxie.compliance.GetGlobalDataAccessModuleTranslated(input_params);
   tempmod := module(project(input_params,SexOffender_Services.IParam.search,opt))
     doxie.compliance.MAC_CopyModAccessValues(mod_access);
-    // Store soap/xml input fields unique to SexOffender SearchService into unique 
+    // Store soap/xml input fields unique to SexOffender SearchService into unique
     // attribute names to be passed into SexOffender_Services.Search_Records, etc.
     export boolean include_regaddrs   := false : stored('IncludeRegisteredAddresses');
     export boolean include_unregaddrs := false : stored('IncludeUnregisteredAddresses');
@@ -154,19 +89,13 @@ export SearchService := macro
     dataset([{lv.latitude, lv.longitude, lv.geo_match, ut.geo_desc(lv.geo_match)}], iesp.share.t_GeoLocationMatch),
     dataset([], iesp.share.t_GeoLocationMatch)
   );
-  
+
   // Convert to output layout, with pagination
   iesp.ECL2ESP.Marshall.MAC_Marshall_Results(
     tempresults, results, iesp.sexualoffender.t_OffenderSearchResponse,
     Records, false, RecordCount, SearchAroundInput, dsSearchAround
   );
 
-  // Uncomment line below for debugging
-  //output(tempresults,named('ss_tempresults'));
-  //output(alert_results,named('ss_alert_results'));
-  //output(alert_tokens,named('ss_alert_tokens'));
-  // output(final_proj,named('ss_final_proj'));
-  
   // This one is not for debugging.
   output(results,named('Results'));
 

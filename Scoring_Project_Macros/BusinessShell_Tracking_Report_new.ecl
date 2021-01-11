@@ -10,7 +10,7 @@ decimal19_2 thresh := 1.00;
 
 // ******** START: NON FCRA CURRENT MODE CALCULATIONS *********************************************************************************************************************
 
-nonfcra_ds_curr := dataset('~ScoringQA::out::NONFCRA::BusinessShell_xml_generic_attributes_v2_' + dt + '_1', Scoring_Project_Macros.Global_Output_Layouts.BusinessShell_Attributes_V2_XML_Generic_Global_Layout, thor)(length(trim(errorcode,left,right))= 0 );
+nonfcra_ds_curr := distribute(dataset('~ScoringQA::out::NONFCRA::BusinessShell_xml_generic_attributes_v2_' + dt + '_1', Scoring_Project_Macros.Global_Output_Layouts.BusinessShell_Attributes_V2_XML_Generic_Global_Layout, thor)(length(trim(errorcode,left,right))= 0 ),(integer)acctno);
 
 
 nonfcra_filenames_details :=  nothor(STD.File.LogicalFileList('ScoringQA::out::NONFCRA::BusinessShell_xml_generic_attributes_v2_*_1'));
@@ -24,7 +24,7 @@ nonfcra_prev_date := nonfcra_p_file_name[length(nonfcra_p_file_name)-9.. length(
 cleaned_nonfcra_curr_date := dt;
 cleaned_nonfcra_prev_date := nonfcra_prev_date;
 
-nonfcra_ds_prev := dataset('~'+ nonfcra_p_file_name, Scoring_Project_Macros.Global_Output_Layouts.BusinessShell_Attributes_V2_XML_Generic_Global_Layout, thor)(length(trim(errorcode,left,right))= 0 );
+nonfcra_ds_prev := distribute(dataset('~'+ nonfcra_p_file_name, Scoring_Project_Macros.Global_Output_Layouts.BusinessShell_Attributes_V2_XML_Generic_Global_Layout, thor)(length(trim(errorcode,left,right))= 0 ),(integer)acctno);
 
 clean_prev := nonfcra_ds_prev(errorcode = '');
 clean_curr := nonfcra_ds_curr(errorcode = '');

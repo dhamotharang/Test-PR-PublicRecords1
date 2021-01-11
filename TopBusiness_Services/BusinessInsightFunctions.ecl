@@ -1,5 +1,5 @@
-﻿Import  BIPv2, MDR, TopBusiness_Services , doxie, iesp, Advo, STD, ut, SAM, property, Corp2,
-              Cortera_Tradeline, DueDiligence, Liensv2;
+﻿Import  BIPv2, MDR, TopBusiness_Services , iesp, Advo, STD, ut, SAM, property, DueDiligence;
+             
 //////////////////////////////////////////////////////////////////////
 //  start of smart linx story #70 risk indicator code (business Evidence)
 ///////////////////////////////////////////////////////////////////////
@@ -138,8 +138,8 @@ EXPORT BusinessInsightFunctions := MODULE
                   
      // this code is from Due Diligence.
      // just pass in a dataset of SIC and NAICS codes and it does the calculation.
-    EXPORT BusinessInHighRiskIndustry(DATASET({STRING8 SicCode;})   DsSics
-                                                                       ,DATASET({STRING8 NaicsCode;}) DsNaics) := FUNCTION        
+    EXPORT BusinessInHighRiskIndustry( DATASET({STRING8 SicCode;})   BestSicDS
+                                                                        ,DATASET({STRING8 NaicsCode;}) BestNaicsDS) := FUNCTION        
               TempLayoutSIC := RECORD                   
                     STRING5 Sicindustry;
                     STRING5 SICRiskLevel;                       
@@ -148,25 +148,16 @@ EXPORT BusinessInsightFunctions := MODULE
                 TempLayoutNAICS := RECORD                      
                      STRING5 NaicsIndustry;
                      STRING5 NaicsRiskLevel;
-                 END;         
-                    
-           BoolRiskLayout := RECORD
-              BOOLEAN  cibRetailExists;
-              BOOLEAN  cibNonRetailExists;
-              BOOLEAN  msbExists;
-              BOOLEAN  nbfiExists;
-              BOOLEAN  cagExists;
-              BOOLEAN  autoExists;
-              BOOLEAN  legAcctTeleFlightTravExists;
-              BOOLEAN  otherHighRiskIndustExists;
-              BOOLEAN  moderateRiskIndustExists;
-              BOOLEAN  lowRiskIndustExists;
-              STRING6   sicCodes;
-              STRING6   naicCodes;              
-              END;
-                                       
-                 
-               tempSic := PROJECT(DsSICS, TRANSFORM(TempLayoutSIC,
+                 END;                                   
+              
+              BoolriskLayout := RECORD
+                boolean NineExists;
+                Boolean EightExists;
+                boolean sevenExists;
+                boolean sixExists;              
+                END;
+                                                    
+               tempSicBest := PROJECT(BestSicDS, TRANSFORM(TempLayoutSIC,
                     siccode := TRIM(LEFT.SicCode, LEFT,RIGHT);    
                     lengthOfSic := LENGTH(SicCode);                
                     SELF.SICIndustry := MAP(sicCode = DueDiligence.Constants.EMPTY => siccode,
@@ -189,8 +180,8 @@ EXPORT BusinessInsightFunctions := MODULE
 															siccode[1..6] IN DueDiligence.Constants.SIC_FIRST_6_STAR_RISK_HIGH) => DueDiligence.Constants.RISK_LEVEL_HIGH,
 				DueDiligence.Constants.RISK_LEVEL_LOW);
               ));
-                            
-               tempNaics := PROJECT(DsNaics, TRANSFORM(TempLayoutNAICS,									
+                                         
+                 tempNaicsBest := PROJECT(BestNaicsDS, TRANSFORM(TempLayoutNAICS,
                           naic := TRIM(LEFT.NAICSCode, ALL);
                           naic2 := naic[1..2];	            
                           SELF.NAICSIndustry := MAP(naic = DueDiligence.Constants.EMPTY => naic,
@@ -209,59 +200,46 @@ EXPORT BusinessInsightFunctions := MODULE
 					naic2 IN DueDiligence.Constants.NAICS_RISK_MED => DueDiligence.Constants.RISK_LEVEL_MEDIUM,
 					naic2 IN DueDiligence.Constants.NAICS_RISK_LOW => DueDiligence.Constants.RISK_LEVEL_LOW,
 					DueDiligence.Constants.RISK_LEVEL_LOW);          
-               ));
-         
-                  BoolRiskLayout  RiskCodeBooleans() := TRANSFORM                       
-                              // indust Flag 9                          
-                            SELF.cibNonRetailExists := EXISTS(TempSic (SICIndustry = DueDiligence.Constants.INDUSTRY_CASH_INTENSIVE_BUSINESS_NON_RETAIL)) OR 
-														 EXISTS(TempNaics(NAICsIndustry = DueDiligence.Constants.INDUSTRY_CASH_INTENSIVE_BUSINESS_NON_RETAIL));
-                                   // industry Flag 8                             
-                            SELF.cibRetailExists :=  EXISTS(tempSic(SicIndustry = DueDiligence.Constants.INDUSTRY_CASH_INTENSIVE_BUSINESS_RETAIL)) OR 
-													 EXISTS(tempNaics(NAICSIndustry = DueDiligence.Constants.INDUSTRY_CASH_INTENSIVE_BUSINESS_RETAIL));                            
-                                    // industry Flag 7
-                            SELF.msbExists :=  EXISTS(TempSic(SICIndustry = DueDiligence.Constants.INDUSTRY_MONEY_SERVICE_BUSINESS)) OR 
-										         EXISTS(TempNaics(NAICsIndustry = DueDiligence.Constants.INDUSTRY_MONEY_SERVICE_BUSINESS));
-                                    // industry Flag 6
-                            SELF.nbfiExists := EXISTS(TempSic(SICIndustry = DueDiligence.Constants.INDUSTRY_NON_BANK_FINANCIAL_INSTITUTIONS)) OR 
-										       EXISTS(TempNaics(NAICsIndustry = DueDiligence.Constants.INDUSTRY_NON_BANK_FINANCIAL_INSTITUTIONS));
-                                  // industry Flag 5
-                            SELF.cagExists := EXISTS(TempSic(SICIndustry = DueDiligence.Constants.INDUSTRY_CASINO_AND_GAMING))  OR 
-										     EXISTS(TempNAICS(NAICsIndustry = DueDiligence.Constants.INDUSTRY_CASINO_AND_GAMING));
-                                 // industry Flag 4
-                            SELF.legAcctTeleFlightTravExists :=  EXISTS(TempSic(SICIndustry = DueDiligence.Constants.INDUSTRY_LEGAL_ACCOUNTANT_TELEMARKETER_FLIGHT_TRAVEL)) OR 
-																	EXISTS(TempNaics(NAICsIndustry = DueDiligence.Constants.INDUSTRY_LEGAL_ACCOUNTANT_TELEMARKETER_FLIGHT_TRAVEL));
-                                // industry Flag 3
-                            SELF.autoExists := EXISTS(TempSic(SICIndustry = DueDiligence.Constants.INDUSTRY_AUTOMOTIVE)) OR 
-										       EXISTS(tempNAICS(NAICsIndustry = DueDiligence.Constants.INDUSTRY_AUTOMOTIVE));                          
-                                     // industry Flag 2
-                            SELF.otherHighRiskIndustExists := EXISTS(tempSic(SICRiskLevel = DueDiligence.Constants.RISK_LEVEL_HIGH AND SICIndustry = DueDiligence.Constants.INDUSTRY_OTHER)) OR
-																    EXISTS(TempNAICS(NAICSRiskLevel = DueDiligence.Constants.RISK_LEVEL_HIGH AND NAICSIndustry = DueDiligence.Constants.INDUSTRY_OTHER));								
-                                    // Business has a value of 2-9 in the Due Diligence Business Attribute: Business Industry    
-                                    // this function does not care about industry Flag 1
-                                    // some taken from 
-                                   //DueDiligence.Common.calcFinalFlagField
-          
-                                           // industry Flag 1
-                           // SELF.moderateRiskIndustExists := EXISTS(TempNAICS(NAICSRiskLevel = DueDiligence.Constants.RISK_LEVEL_MEDIUM));
-                                             // industry Flag 
-                           // SELF.lowRiskIndustExists := EXISTS(TempSic(SICRiskLevel = DueDiligence.Constants.RISK_LEVEL_LOW)) OR 
-															// EXISTS(tempNaics(NAICSRiskLevel = DueDiligence.Constants.RISK_LEVEL_LOW));
-                                                  // SELF.sicCodes := RIGHT.sicCode;
-                                                  // SELF.naicCodes := RIGHT.naicCode;                                    
-                                SELF := []
+               ));                               
+                 
+                  BoolRiskLayout  RiskCodeBooleans() := TRANSFORM          
+                            
+                              // indust Flag 9                // just primary                                     
+                            SELF.NineExists :=  
+                                                              EXISTS(TempSicBest(SICIndustry = DueDiligence.Constants.INDUSTRY_CASH_INTENSIVE_BUSINESS_NON_RETAIL)) OR 
+                                                              EXISTS(TempNaicsBest(NAICsIndustry = DueDiligence.Constants.INDUSTRY_CASH_INTENSIVE_BUSINESS_NON_RETAIL)) OR 
+                                                              EXISTS(TempSicBest(SicIndustry = DueDiligence.Constants.INDUSTRY_CASH_INTENSIVE_BUSINESS_RETAIL)) OR 
+                                                              EXISTS(TempNaicsBest(NAICSIndustry = DueDiligence.Constants.INDUSTRY_CASH_INTENSIVE_BUSINESS_RETAIL));   
+                                   // industry Flag 8       // just primary                                                 
+                            SELF.EightExists :=  EXISTS(TempSicBest(SICIndustry = DueDiligence.Constants.INDUSTRY_MONEY_SERVICE_BUSINESS)) OR     // 7
+										         EXISTS(TempNaicsBest(NAICsIndustry = DueDiligence.Constants.INDUSTRY_MONEY_SERVICE_BUSINESS)) OR                
+                                                              EXISTS(TempSicBest(SICIndustry = DueDiligence.Constants.INDUSTRY_NON_BANK_FINANCIAL_INSTITUTIONS)) OR   // 6
+										         EXISTS(TempNaicsBest(NAICsIndustry = DueDiligence.Constants.INDUSTRY_NON_BANK_FINANCIAL_INSTITUTIONS)) OR                           
+                                                              EXISTS(TempSicBest(SICIndustry = DueDiligence.Constants.INDUSTRY_CASINO_AND_GAMING))  OR   // 5
+	                                                         EXISTS(TempNAICSBest(NAICsIndustry = DueDiligence.Constants.INDUSTRY_CASINO_AND_GAMING));
+                                                            
+                                    // industry Flag 7 // just primary                        
+                            SELF.SevenExists :=   EXISTS(TempSicBest(SICIndustry = DueDiligence.Constants.INDUSTRY_LEGAL_ACCOUNTANT_TELEMARKETER_FLIGHT_TRAVEL)) OR  // 4
+												 EXISTS(TempNaicsBest(NAICsIndustry = DueDiligence.Constants.INDUSTRY_LEGAL_ACCOUNTANT_TELEMARKETER_FLIGHT_TRAVEL)) OR
+                                                                 EXISTS(TempSicBest(SICIndustry = DueDiligence.Constants.INDUSTRY_AUTOMOTIVE)) OR  // 3
+                                                                 EXISTS(TempNAICSBest(NAICsIndustry = DueDiligence.Constants.INDUSTRY_AUTOMOTIVE));      
+                            
+                                    // industry Flag 6                      
+                            SELF.SixExists := EXISTS(TempSicBest(SICRiskLevel = DueDiligence.Constants.RISK_LEVEL_HIGH AND SICIndustry = DueDiligence.Constants.INDUSTRY_OTHER)) OR // 2
+                                                          EXISTS(TempNAICSBest(NAICSRiskLevel = DueDiligence.Constants.RISK_LEVEL_HIGH AND NAICSIndustry = DueDiligence.Constants.INDUSTRY_OTHER));								                          
+                                SELF := [];
                        END;
-             resultsDS := DATASET([ RiskCodeBooleans() ]);	
-                                        // Any of industry Flags 2-9
-             res := EXISTS(resultsDS(cibNonRetailExists OR cibRetailExists OR msbExists  OR
-                                                        nbfiExists OR cagExists OR legAcctTeleFlightTravExists OR
-                                                         autoExists OR otherHighRiskIndustExists));
+                        resultsDS := DATASET([ RiskCodeBooleans() ]);	
+                        
+                                 // any of industry flags 6-9
+                 res := EXISTS( resultsDS( NineExists OR  EightExists OR SevenExists  OR SixExists));                       
               // output(tempSic, named('tempSic'));
               // output(tempNaics, named('tempNaics'));
-              // output(resultsDs, named('resultsDs'));                                                                                          
-                             
-       
+                   // output(tempSicBest, named('tempSicBest'));
+             // output(tempNaicsBest,named('tempNaicsBest'));        
+             // output(resultsDS, named('resultsDS'));                                    
              RETURN(res);
-         END;
+         END;         
           EXPORT  LiensBipLinkidsHighCount(Boolean HighLiensCount) := FUNCTION
                 res :=  HighLiensCount;
                RETURN(res);

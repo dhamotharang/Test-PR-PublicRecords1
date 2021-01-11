@@ -1,4 +1,4 @@
-import ebr;
+﻿import ebr;
 
 export Layout_1000_Executive_Summary_Expanded := RECORD
 	ebr.Layout_1000_Executive_Summary_In;

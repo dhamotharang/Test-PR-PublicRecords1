@@ -15,7 +15,7 @@ EXPORT fn_get_remote_linking_matches(DATASET(BatchServices.layout_BankruptcyV3_B
     TRANSFORM(BatchServices.layout_BankruptcyV3_Batch_out, SELF.sequenceNumber := COUNTER, SELF := LEFT));
 
   //Normalize bk results to process AKAs in debtor_2_* through debtor_5_* and place them in the debtor_1 field.
-  bk_out_layout normalize_bk_results(bk_out_layout L, integer C) := TRANSFORM
+  bk_out_layout normalize_bk_results(bk_out_layout L, INTEGER C) := TRANSFORM
     SELF.sequenceNumber := L.sequenceNumber;
 
     //Require at least a first name in order to normalize the AKAs. This will skip blank entries, which are common.
@@ -64,7 +64,7 @@ EXPORT fn_get_remote_linking_matches(DATASET(BatchServices.layout_BankruptcyV3_B
     SELF.debtor_sec_range := toUpper(R.debtor_sec_range);
     SELF.debtor_p_city_name := toUpper(R.debtor_p_city_name);
     SELF.debtor_st := toUpper(R.debtor_st);
-    SELF.debtor_zip := INTFORMAT((integer)R.debtor_zip, 5, 1);
+    SELF.debtor_zip := INTFORMAT((INTEGER)R.debtor_zip, 5, 1);
     SELF.debtor_did := R.debtor_did;
 
     //Grab the values from input, and uppercase them.
@@ -125,7 +125,7 @@ EXPORT fn_get_remote_linking_matches(DATASET(BatchServices.layout_BankruptcyV3_B
       SELF.CITY_Inq := L.p_city_name;
       SELF.ST_Inq := L.st;
       SELF.ZIP_Inq := L.z5;
-      SELF.Results_Lexid := (unsigned6)L.debtor_did;
+      SELF.Results_Lexid := (UNSIGNED6)L.debtor_did;
       SELF.SSN_Res := L.best_ssn;
       SELF.SNAME_Res := L.debtor_1_name_suffix;
       SELF.LNAME_Res := L.debtor_1_lname;

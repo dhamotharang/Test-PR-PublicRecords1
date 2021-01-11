@@ -171,17 +171,13 @@ export RARecords (IdentityManagement_Services.IParam._report in_params, dataset 
 
     // defenestrate any "PO BOX" before deduping into the "ready" address
     addr_ready_hdr := dedup(doxie.Comp_Addresses(STD.STR.touppercase(prim_name[1..6]) <> 'PO BOX'), record);
-    rec_tmp_hdr := record(doxie.Layout_Comp_Addresses)
-                     string2   addr_ind := '';
-                   end;
-    addr_ranked_metadata_in := PROJECT(addr_ready_hdr,rec_tmp_hdr) ;
     addr_ranked_metadata := Header.MAC_Append_Addr_Ind(
-                              addr_ranked_metadata_in, addr_ind, /*src*/, did, prim_range ,
-                              prim_name, sec_range, city_name, st, zip,
-                             predir, postdir, suffix ,
-                             dt_first_seen, dt_last_seen, dt_vendor_first_reported,
-                             dt_vendor_last_reported , /*isTrusted*/ ,
-                             false, /*hitQH*/, /*debug*/);
+                            addr_ready_hdr, addr_ind, /*src*/, did, prim_range ,
+                            prim_name, sec_range, city_name, st, zip,
+                            predir, postdir, suffix ,
+                            dt_first_seen, dt_last_seen, dt_vendor_first_reported,
+                            dt_vendor_last_reported , /*isTrusted*/ ,
+                            false, /*hitQH*/, /*debug*/);
 
     //Get addresses for relatives
     //slim_addr_rec ProjAddr (doxie.Layout_Comp_Addresses L) := transform

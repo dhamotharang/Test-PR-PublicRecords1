@@ -27,7 +27,7 @@
 </message>
 */
 
-IMPORT AutoStandardI, BatchServices, BankruptcyV3_Services, BankruptcyV3, FFD, Gateway;
+IMPORT AutoStandardI, BatchServices, BankruptcyV3_Services, BankruptcyV3, Data_Services,  dx_Banko, FFD, Gateway;
 
 export BkReport_BatchServiceFCRA(useCannedRecs = 'false') :=
   MACRO
@@ -35,7 +35,7 @@ export BkReport_BatchServiceFCRA(useCannedRecs = 'false') :=
     #OPTION('optimizeProjects', TRUE);
 
     #CONSTANT('isFCRA', true);
-    #CONSTANT('noDeepDive', true)
+    #CONSTANT('noDeepDive', true);
 
     STRING7 in_ssn_mask    := 'NONE' : STORED('SSNMask');
 
@@ -92,7 +92,7 @@ export BkReport_BatchServiceFCRA(useCannedRecs = 'false') :=
 
     /* Translate from incoming 'court' to 'moxie court' value value to build TMSID
         Moved the court look up above the key join for the full case number because
-        the banko.Key_Banko_courtcode_fullcasenumber keys are coded off of the
+        the dx_banko.Key_Banko_courtcode_fullcasenumber keys are coded off of the
         moxie court id, not the court id coming in. */
 
     ds_changed_to_moxie_court :=
@@ -114,7 +114,7 @@ export BkReport_BatchServiceFCRA(useCannedRecs = 'false') :=
       PROJECT(ds_changed_to_moxie_court, xfm_addCounter(LEFT, COUNTER));
 
     ds_moxie_court_from_full_case :=
-      JOIN(ds_moxie_court, banko.Key_Banko_courtcode_fullcasenumber(TRUE),
+      JOIN(ds_moxie_court, dx_banko.Key_Banko_courtcode_fullcasenumber(Data_Services.data_env.iFCRA),
            KEYED(LEFT.court       = RIGHT.court_code AND
                  LEFT.case_number = RIGHT.BKCaseNumber),
            TRANSFORM(BatchServices.layout_BkReport_Batch_in_plusCounter,

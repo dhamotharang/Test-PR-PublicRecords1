@@ -1,4 +1,4 @@
-﻿IMPORT Address_Attributes, Business_Risk, BIPV2, BusReg, Business_Risk_BIP, DueDiligence, Corp2, Riskwise, Risk_Indicators, business_header, STD;
+﻿IMPORT Business_Risk_BIP, DueDiligence;
 
 
 EXPORT getBusRegistration(DATASET(DueDiligence.Layouts.Busn_Internal) inData,
@@ -12,7 +12,6 @@ EXPORT getBusRegistration(DATASET(DueDiligence.Layouts.Busn_Internal) inData,
     //if we are processing from a person perspective, we only need certain information about the business
     regBusDataOptions := MODULE(DueDiligence.DataInterface.iRegisteredBusiness)
                                 EXPORT BOOLEAN includeRegisteredBusinessHit := FALSE;
-                                EXPORT BOOLEAN includeSICNAICS := TRUE;
                                 EXPORT BOOLEAN includeRegisteredAgents := TRUE;
                                 EXPORT BOOLEAN includeAll := includeAllBusDetails;
                          END;
@@ -20,17 +19,14 @@ EXPORT getBusRegistration(DATASET(DueDiligence.Layouts.Busn_Internal) inData,
     
     //if requesting registered business hit
     addRegBusHit := IF(regBusDataOptions.includeAll OR regBusDataOptions.includeRegisteredBusinessHit, DueDiligence.getBusRegistrationImpl.getRegisteredBusinessHit(inData, filteredBusRegData), inData);
-    
-    //if requesting SIC/NAICS data
-    addRegBusSicNaic := IF(regBusDataOptions.includeAll OR regBusDataOptions.includeSICNAICS, DueDiligence.getBusRegistrationImpl.getSICNAICS(addRegBusHit, filteredBusRegData), addRegBusHit);    
-    
+
+
     //if requesting registered agents data
-    addAgents := IF(regBusDataOptions.includeAll OR regBusDataOptions.includeRegisteredAgents, DueDiligence.getBusRegistrationImpl.getRegisteredAgents(addRegBusSicNaic, filteredBusRegData), addRegBusSicNaic);
+    addAgents := IF(regBusDataOptions.includeAll OR regBusDataOptions.includeRegisteredAgents, DueDiligence.getBusRegistrationImpl.getRegisteredAgents(addRegBusHit, filteredBusRegData), addRegBusHit);
 
 
 	
 	// OUTPUT(addRegBusHit, NAMED('addRegBusHit'));	
-	// OUTPUT(addRegBusSicNaic, NAMED('addRegBusSicNaic'));	
 	// OUTPUT(addAgents, NAMED('addAgentsReg'));	
 
 	

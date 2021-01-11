@@ -7,7 +7,7 @@ export Mac_Match_NmAddr(infile,outfil,
 					prim_range_field,prim_name_field,sec_range_field,zip_field,state_field,
 					use_fuzzy = 'true',bool_indiv_score = 'false',
 					score_a_field = 'score_a',bool_all_scores = 'false') := macro
-import didville;
+import header_slimsort, didville, ut;
 #uniquename(inf_prim)
 %inf_prim% := infile;
 
@@ -22,7 +22,7 @@ import didville;
 #end
 
 #uniquename(ca)
-%ca% := %canodist%; 
+%ca% := %canodist%;
 
 
 /* ******* JOIN RULE 1 ***************
@@ -44,8 +44,8 @@ integer %min2% (integer l, integer r) := IF(l<r,l,r);
 integer %min4% (integer l1, integer l2, integer l3, integer l4) := %min2%(%min2%(l1,l2),%min2%(l3,l4));
 #uniquename(add_tra)
 %rec_id% %add_tra%(%rec_id% l, %ca% r) := transform
-		
-		integer localscore := (integer)(100 div 
+
+		integer localscore := (integer)(100 div
 				//new logic for st and not zip match
 				%min2%(
 						if (l.state_field <> R.st or l.sec_Range_field != r.sec_range,999,r.fl_st_count),
@@ -61,7 +61,7 @@ integer %min4% (integer l1, integer l2, integer l3, integer l4) := %min2%(%min2%
 				* if(length(trim(l.prim_Range_field)) = datalib.slidingmatch(trim(l.prim_Range_field),trim(r.prim_range)) and length(trim(l.prim_Range_field)) = length(trim(r.prim_range)), 1, .90));
 
 		integer comboscore := did_add.compute_score(L.did_field,R.did,L.score_field,localscore);
-		self.%addr_score% := if (comboscore >= L.%addr_score% and comboscore != 0, comboscore, L.%addr_score%); 
+		self.%addr_score% := if (comboscore >= L.%addr_score% and comboscore != 0, comboscore, L.%addr_score%);
 		self.%addr_did% := if (comboscore >= L.%addr_score% and comboscore != 0, did_add.pick_did(L.did_field,R.did, l.score_field, comboscore), L.%addr_did%);
 		#if(bool_indiv_score)
 			self.score_a_field := if (self.%addr_did% = r.did and L.%addr_score% < comboscore,localscore, L.score_a_field);
@@ -74,7 +74,7 @@ end;
 		integer localscore := (integer)(100 / (r.fo_small_count * if(l.lname_field != R.lname,1.33,1)));
 		integer comboscore := did_add.compute_score(l.did_field, r.did, l.score_field,localscore);
 		self.%addr_score% := if (comboscore >= L.%addr_score% and comboscore != 0, comboscore, L.%addr_score%);
-		self.%addr_did% := if (comboscore >= L.%addr_score% and comboscore != 0, did_add.pick_did(L.did_field,R.did, l.score_field, comboscore), L.%addr_did%); 			
+		self.%addr_did% := if (comboscore >= L.%addr_score% and comboscore != 0, did_add.pick_did(L.did_field,R.did, l.score_field, comboscore), L.%addr_did%);
 		#if(bool_indiv_score)
 		 self.score_a_field := if (self.%addr_did% = r.did and L.%addr_score% < comboscore, localscore, l.score_a_field);
 		#end
@@ -82,7 +82,7 @@ end;
 end;
 
 #uniquename(infile_id_attempt)
-%infile_id_attempt% := 
+%infile_id_attempt% :=
 	distribute(%inf_prim%(prim_name_field<>'' and lname_field <> '' and (%didfilter%)),
 				hash((string)prim_name_field,(string)prim_range_field,(string)lname_field));
 
@@ -99,12 +99,12 @@ ut.MAC_Sequence_Records_NewRec(%infile_id_attempt%,%rec_id%,%local_temp_id%,%wit
       left.prim_range_field = right.prim_range and
 	 (integer)left.zip_field = (integer)right.zip and
 	 left.prim_name_field = right.prim_name and
-      left.lname_field = right.lname 
+      left.lname_field = right.lname
       and
-      ( 
-         datalib.preferredfirstNew(left.fname_field,Header_Slimsort.Constants.UsePFNew) = 
-         right.fname //rem pf(r) 
-         or 
+      (
+         datalib.preferredfirstNew(left.fname_field,Header_Slimsort.Constants.UsePFNew) =
+         right.fname //rem pf(r)
+         or
          ut.stringsimilar(datalib.preferredfirstNew(left.fname_field,Header_Slimsort.Constants.UsePFNew),right.fname) < 3
       ),
       %add_tra%(left, right), local, left outer,
@@ -126,20 +126,20 @@ ut.MAC_Sequence_Records_NewRec(%infile_id_attempt%,%rec_id%,%local_temp_id%,%wit
 %add_join_st% := join(
 	%first_dedup%,%ca%,
      left.prim_range_field = right.prim_range and
-	left.state_field != '' and left.state_field = right.st and 
+	left.state_field != '' and left.state_field = right.st and
 	left.sec_Range_field = right.sec_range and
 	left.prim_name_field = right.prim_name and
-     left.lname_field = right.lname 
+     left.lname_field = right.lname
      and
-     ( 
-         datalib.preferredfirstnew(left.fname_field,Header_Slimsort.Constants.UsePFNew) = 
+     (
+         datalib.preferredfirstnew(left.fname_field,Header_Slimsort.Constants.UsePFNew) =
          right.fname //rem pf(r)
-         or 
+         or
          ut.stringsimilar(datalib.preferredfirstNew(left.fname_field,Header_Slimsort.Constants.UsePFNew),right.fname) < 3
      ),
-     %add_tra%(left, right), local, left outer, 
+     %add_tra%(left, right), local, left outer,
 	atmost(left.prim_range_field = right.prim_range and
-	left.state_field = right.st and 
+	left.state_field = right.st and
 	left.sec_Range_field = right.sec_range and
 	left.prim_name_field = right.prim_name and
      left.lname_field = right.lname,500));
@@ -158,16 +158,16 @@ ut.MAC_Sequence_Records_NewRec(%infile_id_attempt%,%rec_id%,%local_temp_id%,%wit
 %add_join_pz% := join(
 	distribute(%add_join_st_ddp%,hash((String)prim_name_field,(String)zip_field,(String)lname_field)),
 	distribute(%ca%,hash((String)prim_name,(String)zip,(String)lname)),
-     (left.prim_Range_field = '' 
+     (left.prim_Range_field = ''
 	or datalib.slidingmatch(trim(left.prim_Range_field),trim(right.prim_range)) >= 2) and
 	right.fl_pz_count = 1 and (integer)left.zip_field = (integer)right.zip and
      left.prim_name_field = right.prim_name and
-     left.lname_field = right.lname 
+     left.lname_field = right.lname
      and
-     ( 
-         datalib.preferredfirstNew(left.fname_field,Header_Slimsort.Constants.UsePFNew) = 
-         right.fname //rem pf(r) 
-         or 
+     (
+         datalib.preferredfirstNew(left.fname_field,Header_Slimsort.Constants.UsePFNew) =
+         right.fname //rem pf(r)
+         or
          ut.stringsimilar(datalib.preferredfirstNew(left.fname_field,Header_Slimsort.Constants.UsePFNew),right.fname) < 3
      ),
      %add_tra%(left, right), local, left outer,
@@ -177,19 +177,19 @@ ut.MAC_Sequence_Records_NewRec(%infile_id_attempt%,%rec_id%,%local_temp_id%,%wit
 
 
 #uniquename(try_b)
-%try_b% := dedup(sort(%add_join_pz%(%addr_did% = 0), lname_field,  
-					prim_name_field,zip_field,prim_range_field,sec_range_field, fname_field, 
+%try_b% := dedup(sort(%add_join_pz%(%addr_did% = 0), lname_field,
+					prim_name_field,zip_field,prim_range_field,sec_range_field, fname_field,
 					mname_field, local),
 			     lname_field, prim_name_field,zip_field,prim_range_field,
 				 sec_range_field, fname_field, mname_field,  local);
 
 //****** Name Zip match
 #uniquename(getsafezips)
-%rec_id% %getsafezips%(%try_b% l, %ca% r) := transform	
+%rec_id% %getsafezips%(%try_b% l, %ca% r) := transform
 	self.%addr_did% := if (r.did > 0 and L.%addr_score% < DID_Add.mod_hard_scores.zip_dist_score, R.did, L.%addr_did%);
 	self.%addr_score% := if(r.did > 0 and L.%addr_score% < DID_Add.mod_hard_scores.zip_dist_score, DID_Add.mod_hard_scores.zip_dist_score, L.%addr_score%);
 	#if(bool_indiv_score)
-		self.score_a_field := self.%addr_score%;	
+		self.score_a_field := self.%addr_score%;
 	#end
 	self := l;
 end;
@@ -199,7 +199,7 @@ end;
 				 distribute(%ca%(safe_name_zip>0),hash(trim((string)fname), trim((string)lname))),
 				 left.fname_field = right.fname and
 				 left.lname_field = right.lname and
-				 ((integer)left.zip_field = (integer)right.zip or 
+				 ((integer)left.zip_field = (integer)right.zip or
 					(ut.zip_Dist(left.zip_field,right.zip) <= did_add.mod_hard_scores.zip_dist and right.safe_name_zip = 1)),
 				 %getsafezips%(left, right),
 				 //do i want a left outer?? yes, then redist, yuck.
@@ -216,7 +216,7 @@ end;
 
 
 #uniquename(try_c)
-%try_c% := dedup(sort(%safezips_dist%(%addr_did%=0), 
+%try_c% := dedup(sort(%safezips_dist%(%addr_did%=0),
 					  prim_range_field, prim_name_field, zip_field,
 					  sec_range_field, fname_field, mname_field, lname_field, local),
 			     prim_range_field, prim_name_field, zip_field,
@@ -231,7 +231,7 @@ end;
      left.prim_range_field = right.prim_range and
      left.prim_name_field = right.prim_name and
      (integer)left.zip_field = (integer)right.zip and
-     (left.sec_range_field = right.sec_range or 
+     (left.sec_range_field = right.sec_range or
 	 (right.apt_cnt < 100 and right.near_name = 0)) and
      ut.NameMatch(datalib.preferredfirstNew(left.fname_field,Header_Slimsort.Constants.UsePFNew),datalib.preferredfirstNew(left.mname_field,Header_Slimsort.Constants.UsePFNew),left.lname_field,//added pf(mname)
                   right.fname,right.mname,right.lname) < 3,
@@ -241,7 +241,7 @@ end;
 		  (integer)left.zip_field = (integer)right.zip,500)) + %safezips_dist%(%addr_did% <> 0);
 
 #uniquename(from_fuzzy_ddp)
-%from_fuzzy_ddp% := dedup(sort(%from_fuzzy%(%addr_did% = 0), 
+%from_fuzzy_ddp% := dedup(sort(%from_fuzzy%(%addr_did% = 0),
 					  prim_range_field, prim_name_field, zip_field,
 					  sec_range_field, fname_field, mname_field, lname_field, local),
 			     prim_range_field, prim_name_field, zip_field,
@@ -267,8 +267,8 @@ end;
 
 %fo_join_ddp% := dedup(sort(%fo_join%(%addr_did% != 0) + %from_fuzzy%(%addr_did% != 0) + %safezips_dist%(%addr_did% != 0),%local_temp_id%,%addr_did%,-%addr_score%,local),
 						%local_temp_id%,%addr_did%,local);
-	
-	
+
+
 
 //--------------------//
 //output(%fo_join_ddp%);
@@ -280,7 +280,7 @@ end;
 	self.%addr_score% := r.%addr_score%;
 	#if(bool_indiv_score)
 		self.score_a_field := self.%addr_score%;
-	#end	
+	#end
 	self.%addr_did% := r.%addr_did%;
 	self := l;
 end;
@@ -291,14 +291,14 @@ end;
 
 //****** Add the results back to the dups
 #uniquename(add_join2)
-%add_join2% := join(distribute(%add_join_orig_ddp%,hash((string)zip_field,(string)prim_name_field,(string)prim_range_field)), 
+%add_join2% := join(distribute(%add_join_orig_ddp%,hash((string)zip_field,(string)prim_name_field,(string)prim_range_field)),
 					%fo_join_ddp%,
-					left.prim_range_field = right.prim_range_field and 
+					left.prim_range_field = right.prim_range_field and
 					left.prim_name_field = right.prim_name_field and
-					(integer)left.zip_field = (integer)right.zip_field and 
-					left.sec_range_field = right.sec_range_field and 
-					left.fname_field = right.fname_field and 
-					left.mname_field = right.mname_field and 
+					(integer)left.zip_field = (integer)right.zip_field and
+					left.sec_range_field = right.sec_range_field and
+					left.fname_field = right.fname_field and
+					left.mname_field = right.mname_field and
 					left.lname_field = right.lname_field,
 					%make_add_join2%(left, right), left outer, local);
 

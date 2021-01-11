@@ -28,5 +28,5 @@ record
    string2 DISPUTE_CODE;
    string8 date_reported;
    string6 date_last_sale;
-   string1 lf;
+   string1 lf := '';
 end;

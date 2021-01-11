@@ -1,5 +1,8 @@
 ﻿IMPORT iesp, SALT28;
 
+
+//NOTE: a good chunk if not all of these record structures will be removed/deleted
+
 EXPORT Layouts := MODULE
 
   EXPORT LinkIDs := RECORD
@@ -327,6 +330,11 @@ EXPORT Layouts := MODULE
     PerAttributes;
     BusAttributes;
     DueDiligence.Citizenship.Layouts.LayoutScoreAndIndicators;
+    
+    STRING2 PerCivilLegalEventFilingAmt;
+    STRING10 PerCivilLegalEventFilingAmt_Flag;
+    STRING2 BusCivilLegalEventFilingAmt;
+    STRING10 BusCivilLegalEventFilingAmt_Flag;
   END;
 
 
@@ -334,38 +342,16 @@ EXPORT Layouts := MODULE
     UNSIGNED4 DateFirstSeen;
     UNSIGNED4 DateLastSeen;
     STRING10 SICCode;
+    STRING80 sicDesc;
     STRING5 SICIndustry;
     STRING7 SICRiskLevel;
     STRING10 NAICCode;
+    STRING120 naicsDesc;
     STRING5 NAICIndustry;
     STRING7 NAICRiskLevel;
     BOOLEAN IsPrimary;
     STRING3 source;
-  END;
-
-  EXPORT SICNAICRating := RECORD
-    STRING8 code;
-    STRING highestIndustryOrRiskLevel;
-    STRING1 sicNAICSIndicator;
-    STRING2 industryCategory;
-  END;
-
-  EXPORT SicNaicRiskLayout := RECORD
-    SICNAICRating bestSIC;
-    SICNAICRating bestNAICS;
-    SICNAICRating highestRisk;
-    BOOLEAN cibRetailExists;
-    BOOLEAN cibNonRetailExists;
-    BOOLEAN msbExists;
-    BOOLEAN nbfiExists;
-    BOOLEAN cagExists;
-    BOOLEAN legAcctTeleFlightTravExists;
-    BOOLEAN autoExists;
-    BOOLEAN otherHighRiskIndustExists;
-    BOOLEAN moderateRiskIndustExists;
-    BOOLEAN lowRiskIndustExists;
-    STRING800 sicCodes;
-    STRING800 naicCodes;
+    UNSIGNED riskiestLevel;
   END;
 
   EXPORT GeographicRiskLayout := RECORD 
@@ -597,9 +583,9 @@ EXPORT Layouts := MODULE
     UNSIGNED6 seleID;
     //busines info
     STRING structure;
-    SicNaicRiskLayout sicNaicRisk;
     DATASET(Associates) beos;
     DATASET(SlimIndividual) registeredAgents;
+    DATASET(LayoutSICNAIC) sicNaicSources;
   END;
 
   EXPORT PropertyDataLayout := RECORD
@@ -883,7 +869,6 @@ EXPORT Layouts := MODULE
     UNSIGNED1		personNameSSN;													            //populated in DueDiligence.getBusAsInd
     UNSIGNED1		personAddrSSN;													            //populated in DueDiligence.getBusAsInd
     //BusIndustryRisk
-    SicNaicRiskLayout sicNaicRisk;											            //populated in DueDiligence.getBusSicNaic -- ATTRIBUTE AND OTHER LAYOUTS??
     UNSIGNED3		numOfSicNaic;
     DATASET(LayoutSICNAIC) sicNaicSources {MAXCOUNT(DueDiligence.Constants.MAX_SIC_NAIC)};		//populated in DueDiligence.getBusSicNaic, DueDiligence.getBusHeader, DueDiligence.getBusRegistration, DueDiligence.getBusSOSDetail
 

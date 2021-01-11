@@ -1,20 +1,16 @@
-IMPORT doxie_crs, doxie, business_header, dnb;
+IMPORT doxie_cbrs, doxie_crs, doxie, dnb;
 
+doxie_cbrs.mac_Selection_Declare()
 
 EXPORT ID_Number_records_base(DATASET(doxie_cbrs.layout_references) bdids) :=
 MODULE
 
-doxie_cbrs.mac_Selection_Declare()
 SHARED raw_stateIDs := SORT(DEDUP(doxie_cbrs.Corp_IDs_raw(bdids)(Include_CompanyIDnumbers_val),corp_orig_sos_charter_nbr,corp_state_origin,ALL),corp_state_origin);
-doxie_cbrs.mac_Selection_Declare()
 SHARED raw_stateIDs_v2 := SORT(DEDUP(doxie_cbrs.Corp_IDs_raw_v2(bdids)(Include_CompanyIDnumbersv2_val),corp_orig_sos_charter_nbr,corp_state_origin,ALL),corp_state_origin);
-doxie_cbrs.mac_Selection_Declare()
 SHARED raw_FEINS := SORT(DEDUP(doxie_cbrs.fn_getBaseRecs(bdids,FALSE)(fein <> '' AND Include_CompanyIDnumbers_val),fein,ALL),fein);
-doxie_cbrs.mac_Selection_Declare()
 // shared raw_duns := sort(dedup(doxie_cbrs.DNB_records(Include_CompanyIDnumbers_val),duns_number,ALL),duns_number);
 SHARED raw_duns := DATASET([],DNB.Layout_DNB_Base);
 
-doxie_cbrs.mac_Selection_Declare()
 stateIDs := CHOOSEN(raw_stateIDs,Max_CompanyIDnumbers_val);
 stateIDs_v2 := CHOOSEN(raw_stateIDs_v2,Max_CompanyIDnumbers_val);
 FEINS := CHOOSEN(raw_FEINS,Max_CompanyIDnumbers_val);
@@ -68,17 +64,10 @@ recStateIDs := RECORDOF(STATE_recs);
 recStateIDs_v2 := RECORDOF(STATE_recs_v2);
 recFEINs := RECORDOF(FEIN_recs);
 
-idrecs := RECORD, MAXLENGTH(doxie_crs.maxlength_report)
-  DATASET(recDunsNumbers) duns_numbers;
-  DATASET(recFEINs) feins;
-  DATASET(recStateIDs) state_ids;
-  DATASET(recStateIDs_v2) state_ids_v2;
-END;
-
 //***** PROJECT THEM IN
 nada := DATASET([0], {UNSIGNED1 a});
 
-idrecs getall(nada l) := TRANSFORM
+doxie_cbrs.layouts.id_num_record getall(nada l) := TRANSFORM
   SELF.duns_numbers := GLOBAL(DUNS_recs);
   SELF.feins := GLOBAL(FEIN_recs);
   SELF.state_ids := GLOBAL(STATE_recs);

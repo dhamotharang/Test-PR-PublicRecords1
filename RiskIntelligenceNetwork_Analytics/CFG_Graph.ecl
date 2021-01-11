@@ -7,7 +7,7 @@ EXPORT CFG_Graph := MODULE, VIRTUAL
   // **** field will be ignored.                                                                   ****;
   EXPORT Input_Rin_Params_Layout := RECORD
     KEL.typ.uid __QueryId := 0;
-    DATASET(RECORDOF(RiskIntelligenceNetwork_Analytics.Layouts.LayoutInputPII_2)) Input_P_I_I_Dataset_ := DATASET([],RECORDOF(RiskIntelligenceNetwork_Analytics.Layouts.LayoutInputPII_2));
+    DATASET(RECORDOF(RiskIntelligenceNetwork_Analytics.Layouts.KelInputLayout)) Input_P_I_I_Dataset_ := DATASET([],RECORDOF(RiskIntelligenceNetwork_Analytics.Layouts.KelInputLayout));
     UNSIGNED4 __Part := 0;
   END;
 END;

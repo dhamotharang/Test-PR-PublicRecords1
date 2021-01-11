@@ -1,11 +1,11 @@
-//HPCC Systems KEL Compiler Version 1.3.0
-IMPORT KEL13 AS KEL;
-IMPORT B_Sele_Person_3,CFG_Compile,E_Business_Org,E_Business_Sele,E_Business_Ult,E_Person,E_Sele_Person,E_Surname,FN_Compile FROM PublicRecords_KEL;
-IMPORT * FROM KEL13.Null;
+//HPCC Systems KEL Compiler Version 1.5.0rc1
+IMPORT KEL15 AS KEL;
+IMPORT B_Sele_Person_3,CFG_Compile,E_Business_Org,E_Business_Sele,E_Business_Sele_Overflow,E_Business_Ult,E_Person,E_Sele_Person,E_Surname,FN_Compile FROM PublicRecords_KEL;
+IMPORT * FROM KEL15.Null;
 EXPORT B_Sele_Person_2(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG_Compile __cfg = CFG_Compile) := MODULE
   SHARED VIRTUAL TYPEOF(B_Sele_Person_3(__in,__cfg).__ENH_Sele_Person_3) __ENH_Sele_Person_3 := B_Sele_Person_3(__in,__cfg).__ENH_Sele_Person_3;
-  SHARED __EE4625610 := __ENH_Sele_Person_3;
-  EXPORT __ST172710_Layout := RECORD
+  SHARED __EE7198148 := __ENH_Sele_Person_3;
+  EXPORT __ST210686_Layout := RECORD
     KEL.typ.ntyp(E_Business_Sele().Typ) Legal_;
     KEL.typ.ntyp(E_Person().Typ) Contact_;
     KEL.typ.nint Ult_I_D_;
@@ -17,22 +17,19 @@ EXPORT B_Sele_Person_2(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG
     KEL.typ.nkdate Assoc_Fs_Date_;
     KEL.typ.nint Datemonths_;
     KEL.typ.bool Is_Executive_Ever_ := FALSE;
-    KEL.typ.ndataset(B_Sele_Person_3(__in,__cfg).__ST949919_Layout) Relatives_;
+    KEL.typ.ndataset(B_Sele_Person_3(__in,__cfg).__ST1136094_Layout) Relatives_;
     KEL.typ.nbool Two_Years_;
     KEL.typ.epoch Archive___Date_ := 0;
     KEL.typ.epoch Date_First_Seen_ := 0;
     KEL.typ.epoch Date_Last_Seen_ := 0;
-    KEL.typ.epoch Date_Vendor_First_Reported_ := 0;
-    KEL.typ.epoch Date_Vendor_Last_Reported_ := 0;
     KEL.typ.epoch Hybrid_Archive_Date_ := 0;
-    KEL.typ.epoch Vault_Date_First_Seen_ := 0;
     KEL.typ.epoch Vault_Date_Last_Seen_ := 0;
     KEL.typ.int __RecordCount := 0;
   END;
-  SHARED __ST172710_Layout __ND4625615__Project(B_Sele_Person_3(__in,__cfg).__ST184934_Layout __PP4625611) := TRANSFORM
-    __CC10499 := KEL.Routines.MinN(FN_Compile(__cfg).FN_G_E_T_B_U_I_L_D_D_A_T_E(__ECAST(KEL.typ.nstr,__CN('bip_build_version'))),__CN(__cfg.CurrentDate));
-    SELF.Datemonths_ := __FN2(KEL.Routines.MonthsBetween,__PP4625611.Assoc_Fs_Date_,__CC10499);
-    SELF := __PP4625611;
+  SHARED __ST210686_Layout __ND7198153__Project(B_Sele_Person_3(__in,__cfg).__ST225044_Layout __PP7198149) := TRANSFORM
+    __CC13185 := KEL.Routines.MinN(FN_Compile(__cfg).FN_G_E_T_B_U_I_L_D_D_A_T_E(__ECAST(KEL.typ.nstr,__CN('bip_build_version'))),__CN(__cfg.CurrentDate));
+    SELF.Datemonths_ := __FN2(KEL.Routines.MonthsBetween,__PP7198149.Assoc_Fs_Date_,__CC13185);
+    SELF := __PP7198149;
   END;
-  EXPORT __ENH_Sele_Person_2 := PROJECT(__EE4625610,__ND4625615__Project(LEFT));
+  EXPORT __ENH_Sele_Person_2 := PROJECT(__EE7198148,__ND7198153__Project(LEFT));
 END;

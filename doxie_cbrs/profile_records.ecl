@@ -21,19 +21,6 @@ EXPORT profile_records(DATASET(doxie_cbrs.layout_references) bdids) := MODULE
       INNER,
       KEEP(10000)
     );
-                                
-  SHARED profile_rec := RECORD, MAXLENGTH(100000)
-    pr_raw.bdid;
-    pr_raw.corp_legal_name;
-    pr_raw.corp_inc_date;
-    pr_raw.corp_inc_state;
-    pr_raw.corp_orig_sos_charter_nbr;
-    pr_raw.corp_status_desc;
-    pr_raw.corp_orig_org_structure_desc;
-    pr_raw.corp_term_exist_desc;
-    pr_raw.record_type;
-    STRING10 record_date;
-  END;
 
   // Sort to the top those records whose type is Current and disposition is Legal. This will
   // ensure the most recent record gets returned at the highest position. (These are the same
@@ -51,7 +38,7 @@ EXPORT profile_records(DATASET(doxie_cbrs.layout_references) bdids) := MODULE
   SHARED profile_info :=
     PROJECT(
       pr_raw_sorted,
-      TRANSFORM( profile_rec,
+      TRANSFORM( doxie_cbrs.layouts.profile_record,
         SELF.record_date := codes.corp2.corp_record_date(LEFT.record_type),
         SELF := LEFT
       )

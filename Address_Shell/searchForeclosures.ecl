@@ -4,7 +4,7 @@
  * ID (AID).
  */
 
-IMPORT ut, Property,suppress,doxie, MDR;
+IMPORT ut, dx_Property,suppress,doxie, MDR;
 
 EXPORT Address_Shell.layoutPropertyCharacteristics searchForeclosures (DATASET(Address_Shell.layoutPropertyCharacteristics) working,
                                                                         UNSIGNED1 attributesVersion = 1,doxie.IDataAccess mod_access = MODULE (doxie.IDataAccess) END) := FUNCTION
@@ -17,7 +17,7 @@ EXPORT Address_Shell.layoutPropertyCharacteristics searchForeclosures (DATASET(A
 	 Unsigned4 Global_sid;
    Unsigned6 DID;
    end;
-  Address_Shell_searchForeclosures_CCPA getForeclosuresV1(Address_Shell.layoutPropertyCharacteristics le, Property.Key_Foreclosures_Addr ri) := TRANSFORM
+  Address_Shell_searchForeclosures_CCPA getForeclosuresV1(Address_Shell.layoutPropertyCharacteristics le, dx_Property.Key_Foreclosures_Addr ri) := TRANSFORM
 		Self.Global_sid := ri.Global_sid;
 	  
     SELF.PropertyAttributes.Version1.Foreclosure_Recording_Date := ri.recording_date;
@@ -29,7 +29,7 @@ EXPORT Address_Shell.layoutPropertyCharacteristics searchForeclosures (DATASET(A
 		SELF := [];
 	END;
 		
-	version1Temp := JOIN(working, Property.Key_Foreclosures_Addr, (TRIM(LEFT.Input.Zip5) <> '' AND TRIM(LEFT.Input.StreetNumber) <> '' AND TRIM(LEFT.Input.StreetName) <> '')
+	version1Temp := JOIN(working, dx_Property.Key_Foreclosures_Addr, (TRIM(LEFT.Input.Zip5) <> '' AND TRIM(LEFT.Input.StreetNumber) <> '' AND TRIM(LEFT.Input.StreetName) <> '')
 																																AND KEYED(LEFT.Input.Zip5 = RIGHT.situs1_zip AND LEFT.Input.StreetNumber = RIGHT.situs1_prim_range
 																																AND LEFT.Input.StreetName = RIGHT.situs1_prim_name AND LEFT.Input.StreetSuffix = RIGHT.situs1_addr_suffix
 																																AND LEFT.Input.StreetPreDirection = RIGHT.situs1_predir)

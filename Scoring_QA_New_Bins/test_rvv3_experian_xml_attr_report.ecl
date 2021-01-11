@@ -1,12 +1,12 @@
 ﻿EXPORT test_rvv3_experian_xml_attr_report(route,current_dt,previous_dt) := functionmacro
 
 
-file1_2:= dataset(route + scoring_project_pip.Output_Sample_Names.RV_Attributes_V3_XML_Experian_outfile + previous_dt, Scoring_Project_Macros.Global_Output_Layouts.FCRA_RiskView_Experian_Attributes_V3_Global_Layout,
+file1_2:= distribute(dataset(route + scoring_project_pip.Output_Sample_Names.RV_Attributes_V3_XML_Experian_outfile + previous_dt, Scoring_Project_Macros.Global_Output_Layouts.FCRA_RiskView_Experian_Attributes_V3_Global_Layout,
 
-thor);
-file2_2:= dataset(route + scoring_project_pip.Output_Sample_Names.RV_Attributes_V3_XML_Experian_outfile + current_dt, Scoring_Project_Macros.Global_Output_Layouts.FCRA_RiskView_Experian_Attributes_V3_Global_Layout,
+thor),(integer)accountnumber);
+file2_2:= distribute(dataset(route + scoring_project_pip.Output_Sample_Names.RV_Attributes_V3_XML_Experian_outfile + current_dt, Scoring_Project_Macros.Global_Output_Layouts.FCRA_RiskView_Experian_Attributes_V3_Global_Layout,
 
-thor);
+thor),(integer)accountnumber);
  	   file1 := file1_2(errorcode='');
 file2 := file2_2(errorcode='');
 

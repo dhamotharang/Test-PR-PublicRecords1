@@ -331,8 +331,8 @@ export dataset(l_result) fn_getMD_report(
 								);
 	
 	// suppress sensitive data
-	Suppress.MAC_Suppress(md_ptype2,md_tmp,gm.applicationtype,Suppress.Constants.LinkTypes.DID,party1.did);
-	Suppress.MAC_Suppress(md_tmp,md_pulled,gm.applicationtype,Suppress.Constants.LinkTypes.DID,party2.did);
+	Suppress.MAC_Suppress(md_ptype2,md_tmp,gm.applicationtype,Suppress.Constants.LinkTypes.DID,party1.did, isFCRA := isFCRA);
+	Suppress.MAC_Suppress(md_tmp,md_pulled,gm.applicationtype,Suppress.Constants.LinkTypes.DID,party2.did, isFCRA := isFCRA);
 	
 	// Debugging
 /* 	output( override_can,			named('override_can') );

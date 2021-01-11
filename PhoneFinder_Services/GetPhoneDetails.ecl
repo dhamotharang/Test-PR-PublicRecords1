@@ -6,6 +6,7 @@
   FUNCTION
   tempMod := MODULE(Phones.IParam.BatchParams)
     EXPORT UNSIGNED	max_age_days := PhoneFinder_Services.Constants.LERG6_LastActivityThreshold;
+    EXPORT BOOLEAN AllowPortingData := inMod.AllowPortingData;
   END;
 
   mod_access := PROJECT(inMod, Doxie.IDataAccess);

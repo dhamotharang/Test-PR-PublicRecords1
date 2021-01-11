@@ -20,14 +20,20 @@ EXPORT notFound(DATASET(DueDiligence.v3Layouts.Internal.BusinessTemp) inData,
                                               SELF.busCivilLegalEvent := IF(attributesRequested.includeAll OR attributesRequested.includeCivilLegalEvent, INVALID_BUSINESS_SCORE, DueDiligence.Constants.EMPTY);
                                               SELF.busCivilLegalEvent_Flag := IF(attributesRequested.includeAll OR attributesRequested.includeCivilLegalEvent, INVALID_BUSINESS_FLAGS, DueDiligence.Constants.EMPTY);
                                               
+                                              SELF.busCivilLegalEventFilingAmt := IF(attributesRequested.includeAll OR attributesRequested.includeCivilLegalEventFilingAmount, INVALID_BUSINESS_SCORE, DueDiligence.Constants.EMPTY);
+                                              SELF.busCivilLegalEventFilingAmt_Flag := IF(attributesRequested.includeAll OR attributesRequested.includeCivilLegalEventFilingAmount, INVALID_BUSINESS_FLAGS, DueDiligence.Constants.EMPTY);
+                                              
                                               SELF.busOffenseType := IF(attributesRequested.includeAll OR attributesRequested.includeOffenseType, INVALID_BUSINESS_SCORE, DueDiligence.Constants.EMPTY);;
                                               SELF.busOffenseType_Flag := IF(attributesRequested.includeAll OR attributesRequested.includeOffenseType, INVALID_BUSINESS_FLAGS, DueDiligence.Constants.EMPTY);
                                               
-                                              SELF.busStateLegalEvent := IF(attributesRequested.includeAll OR attributesRequested.includeStateLegalEvent, INVALID_BUSINESS_SCORE, DueDiligence.Constants.EMPTY);;
+                                              SELF.busStateLegalEvent := IF(attributesRequested.includeAll OR attributesRequested.includeStateLegalEvent, INVALID_BUSINESS_SCORE, DueDiligence.Constants.EMPTY);
                                               SELF.busStateLegalEvent_Flag := IF(attributesRequested.includeAll OR attributesRequested.includeStateLegalEvent, INVALID_BUSINESS_FLAGS, DueDiligence.Constants.EMPTY);
                                               
-                                              SELF.busBEOAccessToFundsProperty := IF(attributesRequested.includeAll OR attributesRequested.includeBEOAccessToFundsProperty, INVALID_BUSINESS_SCORE, DueDiligence.Constants.EMPTY);;
+                                              SELF.busBEOAccessToFundsProperty := IF(attributesRequested.includeAll OR attributesRequested.includeBEOAccessToFundsProperty, INVALID_BUSINESS_SCORE, DueDiligence.Constants.EMPTY);
                                               SELF.busBEOAccessToFundsProperty_Flag := IF(attributesRequested.includeAll OR attributesRequested.includeBEOAccessToFundsProperty, INVALID_BUSINESS_FLAGS, DueDiligence.Constants.EMPTY);
+                                              
+                                              SELF.busIndustry := IF(attributesRequested.includeAll OR attributesRequested.includeIndustry, INVALID_BUSINESS_SCORE, DueDiligence.Constants.EMPTY);
+                                              SELF.busIndustry_Flag := IF(attributesRequested.includeAll OR attributesRequested.includeIndustry, INVALID_BUSINESS_FLAGS, DueDiligence.Constants.EMPTY);
                                               
                                               SELF := [];));
 

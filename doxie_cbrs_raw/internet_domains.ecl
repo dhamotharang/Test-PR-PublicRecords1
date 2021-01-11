@@ -1,4 +1,5 @@
-import domains, doxie_cbrs,business_header;
+import domains, doxie_cbrs;
+
 export internet_domains(
 	dataset(doxie_cbrs.layout_references) bdids,
 	boolean Include_val = false,
@@ -13,11 +14,11 @@ doxie_cbrs.mac_RollStart
 	 nn,Include_val,bdid,true,bdid,domain_name,create_date)
 
 shared out_f := outf1;
-shared simple_count := 
+shared simple_count :=
 	count(project(k(keyed(bdid in SET(doxie_cbrs.ds_SupergroupLevels(bdids), bdid))), transform({k.bdid}, self := left)));
 
 	export records := out_f;
-	export record_count(boolean count_only = false) := 
+	export record_count(boolean count_only = false) :=
 													IF(count_only,simple_count,count(out_f));
-	
+
 END;

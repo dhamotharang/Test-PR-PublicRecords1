@@ -1,12 +1,12 @@
-import autokeyi, autoheaderi, autostandardi;
-export input := module
+IMPORT autokeyi, autoheaderi, autostandardi;
+EXPORT input := MODULE
 
-	export params := interface(
-		AutoKeyI.AutoKeyStandardFetchBaseInterface,
-		AutoHeaderI.LIBIN.FetchI_Hdr_Indv.base,
-		AutoHeaderI.LIBIN.FetchI_Hdr_Biz.base)
-	end;
-	
-	export it 				:= AutoStandardI.InterfaceTranslator;
+  EXPORT params := INTERFACE(
+    AutoKeyI.AutoKeyStandardFetchBaseInterface,
+    AutoHeaderI.LIBIN.FetchI_Hdr_Indv.base,
+    AutoHeaderI.LIBIN.FetchI_Hdr_Biz.base)
+  END;
+  
+  EXPORT it := AutoStandardI.InterfaceTranslator;
 
-end;
+END;

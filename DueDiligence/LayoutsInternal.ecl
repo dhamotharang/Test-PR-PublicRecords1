@@ -86,7 +86,6 @@ EXPORT LayoutsInternal := MODULE
   EXPORT SicNaicUniqueIndustryLayout := RECORD
     InternalSeqAndIdentifiersLayout;
     DueDiligence.Layouts.LayoutSICNAIC;
-    DueDiligence.Layouts.SicNaicRiskLayout;
   END;
 
   EXPORT SlimSicNaicLayout := RECORD
@@ -209,6 +208,8 @@ EXPORT LayoutsInternal := MODULE
     InternalSeqAndIdentifiersLayout; 
     STRING12  LNFaresId;
     STRING2   sourceCode;
+    BOOLEAN isOwnership;
+    BOOLEAN isCurrent;
 
     //person related
     BOOLEAN inquiredOwned;

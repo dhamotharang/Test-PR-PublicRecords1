@@ -1,4 +1,4 @@
-﻿IMPORT iesp, MDR, risk_indicators;
+﻿IMPORT DueDiligence, iesp, MDR, risk_indicators;
 
 
 EXPORT Constants := MODULE
@@ -27,7 +27,10 @@ EXPORT Constants := MODULE
     
     EXPORT MAX_500 := 500;
     EXPORT MAX_1000 := 1000;
+    EXPORT MAX_2000 := 2000;
+    EXPORT MAX_4500 := 4500;
     EXPORT MAX_5000 := 5000;
+    EXPORT MAX_10000 := 10000;
     
     
     //PERSON
@@ -81,8 +84,8 @@ EXPORT DEFAULT_GLBA := 5;
 
 EXPORT DEFAULT_IS_FCRA := FALSE;
 
-EXPORT NUMBER_OF_INDIVIDUAL_ATTRIBUTES := 21;
-EXPORT NUMBER_OF_BUSINESS_ATTRIBUTES := 24;
+EXPORT NUMBER_OF_INDIVIDUAL_ATTRIBUTES := 22;
+EXPORT NUMBER_OF_BUSINESS_ATTRIBUTES := 25;
 
 EXPORT STRING_TRUE := 'TRUE';
 EXPORT STRING_FALSE := 'FALSE';
@@ -147,111 +150,6 @@ EXPORT UNKNOWN := 'U';
 
 EXPORT AML_PARENT_DEFINITION := [10];
 
-EXPORT FELONY := 'F';
-EXPORT MISDEMEANOR := 'M';
-EXPORT INFRACTION := 'I';
-EXPORT TRAFFIC := 'T';
-EXPORT UNKNOWN_OFFENSES := [UNKNOWN, EMPTY];   
-
-
-EXPORT INCARCERATION_TEXT := 'INCARCERATION';
-EXPORT PAROLE_TEXT := 'PAROLE';
-EXPORT PROBATION_TEXT := 'PROBATION';
-EXPORT PREVIOUSLY_INCARCERATED_TEXT := 'PREVIOUS INCARCERATION';
-
-
-EXPORT SET_INMATE_STATUS_INCARCERATION := ['ACTIVE, HOUSE ARREST', 'ACTIVE, INMATE', 'ACTIVELIFE SENTENCE',
-																						'ACTIVELY SERVING, INTENSIVE SUPERVISED RELEASE, CO', 'ACTIVELY SERVING, STANDARD CONFINEMENT',
-																						'ACTIVELY SERVING, STANDARD CONFINEMENT, CONDITIONA', 'BERGIN CI', 'BRIDGEPORT CC', 'BROOKLYN CI',
-																						'CD, ADMISSION REASON: NEWCASE', 'CHESHIRE CI', 'CLIENT ON ESCAPE',
-																						'CONDITIONAL TRANSFER TO OTHER AGENCY/STATE', 'CONDITIONAL TRANSFER WITHIN STATE',
-																						'CORRIGAN CI', 'CORRIGAN-RADGOWSKI', 'CORRIGAN-RADGOWSKI (CORRIGAN BUILDING)',
-																						'COUNTY JAIL', 'DEATH SENTENCE', 'DETERMINATE; ACTIVE', 'ENFIELD CI', 'FEDERAL', 'FROM ILLINOIS CUSTODY',
-																						'GARNER', 'GATES CI', 'HARTFORD CC', 'INCARCERATED', 'INMATE', 'JAIL (DESIGNATED SIT',
-																						'LIFE', 'LIFE SENTENCE', 'LIFE WITHOUT PAROLE', 'LIFE WITHOUT PAROLE; ACTIVE',
-																						'LIFE; ACTIVE', 'MACDOUGALL', 'MACDOUGALL-WALKER', 'MACDOUGALL-WALKER (WALKER BUILDING)', 'MANSON YI',
-																						'NEW HAVEN CC', 'NIANTIC ANNEX', 'NORTHERN CI', 'OSBORN CI', 'OWI CONTINUUM', 'OWI PRISON',
-																						'PR, ADMISSION REASON: NEWCASE',
-																						'PRE-RELEASE SUPV. PR', 'PRISON', 'RADGOWSKI', 'RE-ENTRY BERGIN CI', 'RETURN TO SENDING STATE', 'ROBINSON CI',
-																						'SENTENCED TO: BELL COUNTY FORESTRY CAMP;',
-																						'SENTENCED TO: BLACKBURN CORRECTIONAL COMPLEX;', 'SENTENCED TO: CD;', 'SENTENCED TO: COMMUNITY CUSTODY JAILED INMATESCD =',
-																						'SENTENCED TO: DISMAS HOUSE OWENSBORO;',
-																						'SENTENCED TO: EASTERN KENTUCKY CORRECTIONAL COMPLE', 'SENTENCED TO: FRANKFORT CAREER DEVELOPMENT CENTER;',
-																						'SENTENCED TO: GREEN RIVER CORRECTIONAL COMPLEX;', 'SENTENCED TO: KENTUCKY CORRECTIONAL INSTITUTION FO',
-																						'SENTENCED TO: KENTUCKY STATE PENITENTIARY;', 'SENTENCED TO: KENTUCKY STATE REFORMATORY;',
-																						'SENTENCED TO: KENTUCKY STATE REFORMATORYS;', 'SENTENCED TO: LEE ADJUSTMENT CENTER;',
-																						'SENTENCED TO: LUTHER LUCKETT CORRECTIONAL COMPLEX;', 'SENTENCED TO: MARION ADJUSTMENT CENTER;',
-																						'SENTENCED TO: NORTHPOINT TRAINING CENTER;', 'SENTENCED TO: OTTER CREEK CORRECTIONAL COMPLEX;',
-																						'SENTENCED TO: ROEDERER CORRECTIONAL COMPLEX;', 'SENTENCED TO: SHOCK INCARCERATION (BOOT CAMP);',
-																						'SENTENCED TO: WESTERN KENTUCKY CORRECTIONAL COMPLE', 'SHOCK INCARCERATION - SUCCESSFUL', 'TRANSFER',
-																						'WALKER RC', 'WEBSTER CI', 'WILLARD-CYBULSKI CI', 'WORK RELEASE', 'YORK CI', 'INMATE BOOT CAMP CONDITIONAL TRANSFER IN STATE'];
-
-EXPORT SET_INMATE_STATUS_PAROLE := ['430 PAROLE/COMM SERV', 'ACTIVE, ERS', 'ACTIVE430 PAROLE/COMM SERV', 'ACTIVE90 DAY FAIR PAROLE', 'ACTIVEDWI PAROLE',
-																		'ACTIVEREGULAR PAROLE', 'CLIENT ON PAROLE', 'COMMUTATION OR MODIFIED SENTENCE BY PAROLE BOARD', 'COMPACT IN PAROLE',
-																		'CONDITIONAL RELEASE', 'CONDITIONAL RELEASE BY PARDON & PAROLE BOARD', 'CONTINGENT RELEASE', 'DI, ADMISSION REASON: PARO',
-																		'DI, ADMISSION REASON: PAROVIOL', 'DI, ADMISSION REASON: POSTPARO', 'DISCH. ON PAROLE', 'DISCRETIONARY PAROLE',
-																		'DWI PAROLE', 'GOVERNOR\'S EMERGENCY RELEASE', 'INACTIVE, STANDARD SUPERVISED RELEASE, CONDITIONAL',
-																		'INACTIVE, SUPERVISION DISCHARGE, CONDITIONAL RELEA', 'INMATE BOOT CAMP PAROLE', 'INMATE BOOT CAMP REPRIEVE',
-																		'INTERSTATE PAROLE', 'JAIL PAROLE', 'PAR. CS', 'PAR/HOME CONFINEMENT', 'PAROLE', 'PAROLE BOARD - 90 DAY SENTENCE REDUCTION',
-																		'PAROLE CONTINUED', 'PAROLE TO CONSECUTIVE', 'PAROLE VIOLATION', 'PAROLE; ACTIVE', 'PAROLED',
-																		'PAROLED - REVENUE OWED (MAXED OUT)', 'PAROLED WHILE SERVING TIME IN ANOTHER STATE', 'PCREGULAR PAROLE', 'PRERELEASE CENTER',
-																		'REGULAR PAROLE', 'SPECIAL REPRIEVE OR CONDITIONAL COMMUTATION', 'SPECIAL SENTENCE', 'SUPERVISED REPRIEVE',
-																		'TERMINATED YOA PAROLE', 'YOA PAROLE - CONDITIONAL'];
-
-EXPORT SET_INMATE_STATUS_PROBATION := ['ABSCONDER - PROBATION', 'ACTIVE SUSPENSE', 'ACTIVE, ABSCONDED SUPERV', 'ACTIVELY SERVING, STANDARD SUPERVISED RELEASE, CON',
-																				'ACTIVEPOST RELEASE SENTENC', 'ACTIVEPROBATION REVOCATION', 'ACTIVESPECIAL PROBATION (S', 'ACTIVESUSPENDED SENTENCE',
-																				'AMENDED OR REMITTED TO PROBATION BY COURT', 'AMENDEDPROBATION REVOCATION', 'CANCELPROBATION REVOCATION',
-																				'CLASS A PROBATION', 'CLASS B/C PROBATION', 'COMMUNITY SUPERVISION', 'COMPACT IN PROBATION', 'COMPACT PROBATION FROM',
-																				'CONDITIONAL RELEASE OF YOUTHFUL OFFENDER', 'CONTINGENT PROBATION', 'CORRECTPROBATION REVOCATION',
-																				'COURTPROBATION REVOCATION', 'COURTSPECIAL PROBATION (S', 'CSD- DEFERRED SENTEN', 'CSD- SUSPENDED SENTE', 'DEFERRED',
-																				'DEFERRED SENTENCE', 'DEFERRED; ACTIVE', 'DI, ADMISSION REASON: PROB',
-																				'DI, ADMISSION REASON: PROBATIO', 'FELONY PROBATION', 'INACTIVE, CONFINEMENT DISCHARGE, CONDITIONAL RELEA',
-																				'INTERSTATE PROBATION', 'PCPROBATION REVOCATION', 'PR, ADMISSION REASON: PROB', 'PROBATION',
-																				'SENTENCED TO: COMMUNITY SERVICES (COMMUNITY RELEAS', 'SPECIAL PROBATION (S', 'SUSPENDED', 'SUSPENDED SENTENCE',
-																				'SUSPENDED SENTENCE; ACCELERATED TO SUSP.SENT.', 'SUSPENDED; ACTIVE', 'SPLIT; ACTIVE'];
-
-EXPORT SET_INMATE_STATUS_PREVIOUSLY_INCARCERATED := ['DETERMINATE; EXPIRED', 'EXPIRATION OF SENTENCE, INMATE',
-                                                      'POST-IMPRISONMENT SU; ACTIVE', 'PAROLE; DISCHARGED', 'PAROLE; EXPIRED',
-                                                      'DELAYED INCARCERATED; EXPIRED', 'PRE-RELEASE SUPV. PR; DISCHARGED',
-                                                      'POST-IMPRISONMENT SU; EXPIRED', 'INTERSTATE PAROLE; DISCHARGED',
-                                                      'PAROLE REVOCATION; EXPIRED', 'P&P POST IMPRISONMEN', 
-                                                      'P&P POST IMPRISONMEN; DISCHARGED', 'INTERSTATE PAROLE IN; EXPIRED', 
-                                                      'DEATH - UNKNOWN CAUSE, INMATE', 'DISCHARGED BY COURT, INMATE'];
-                                                      
-EXPORT SET_INMATE_STATUS_DISCHARGED := ['VALID RELEASE DATE', 'RELEASE', 'RELEASED', 'RELEASED/DISCHARGED',
-                                        'EXPIRATION OF SENTENCE', 'CLIENT DISCHARGED', 'EXPIRED', 'DISCHARGED',
-                                        'SUSPENDED; EXPIRED', 'SUSPENDED SENTENCE; DISCHARGED', 'SPLIT; EXPIRED',
-                                        'MANDATORY DISCHARGE', 'SENTENCE EXPIRED', 'EXPIRATION SENTENCE', 'CLIENT DEAD',
-                                        'DEFERRED SENTENCE; DISCHARGED', 'DECEASED', 'INSTITUTIONAL DISCHARGE - TO AOC ISP',
-                                        'DEFERRED; EXPIRED', 'INTERSTATE PROBATION; DISCHARGED', 'INACTIVE', 'DISCH', 'DEATH',
-                                        'CSD- SUSPENDED SENTE; DISCHARGED', 'DRUG COURT; DISCHARGED', 'DSCHG EX',
-                                        'EXPIRATION OF SENTENCE, ERS', 'DEATH, ALL TYPES. SEE DEATH TYPE.', 'VACATED',
-                                        'CSD- DEFERRED SENTEN; DISCHARGED', 'RELEASED FROM SUPERVISION', 'DISCHARGED BY COURT',
-                                        'INTERSTATE PROBATION; EXPIRED', 'DEATH - NATURAL CAUSES', 'BALANCE SUSPENDED; EXPIRED',
-                                        'DELAYED SENTENCE; DISCHARGED', 'CSD-GEN DISCIPLINE S; DISCHARGED', 'COURT ORDERED EARLY RELEASE',
-                                        'DEATH - UNKNOWN CAUSE', 'CLOSED', 'DISCHARGED, 20130828', 'RELEASED ON CASE'];
-                                        
-                                        
-EXPORT SET_INMATE_STATUS_UNKNOWN := ['ACTIVE', 'ACTIVECOMMITTED YOUTHFUL O', 'ACTIVECONTEMPT OF COURT', 'ACTIVECRV TERMINAL', 'ACTIVECRV/3M',
-                                      'ACTIVEDWI CONVICTION', 'ACTIVEHABITUAL FELON', 'ACTIVEIMPACT', 'ACTIVEJAIL POST RELEASE',
-                                      'ACTIVEMISDEMEANOR CONFINEM', 'ACTIVEPRE-SENTENCE DIAG/IN', 'ALTERNATIVE SECURE', 'AMENDEDPOST RELEASE SENTENC',
-                                      'AWOL', 'BOARD ORDER', 'CCNC', 'CLIENT SERVING SENTENCE PREFIX ACTIVE', 'COMMITTED YOUTHFUL O',
-                                      'COMMUTED OR MODIFIED SENTENCE BY COURT', 'CONCURRENT', 'CONTROLLING SENTENCE', 'CONV', 'CORRECTED NUMBER ASSIGNMENT RECORD',
-                                      'CORRECTHABITUAL FELON', 'CORRECTPOST RELEASE SENTENC', 'COURT ORDER', 'COURTIMPACT', 'COURTPRE-SENTENCE DIAG/IN',
-                                      'CRV TERMINAL', 'DI', 'DI, ADMISSION REASON: NEWCASE', 'DI, ADMISSION REASON: POST', 
-                                      'DI, ADMISSION REASON: POSTSUPR', 'DI, ADMISSION REASON: UNKNOWN', 'DI, ADMISSION REASON: VIOL', 'DIAGNOSTIC',
-                                      'DISCHARGE TO CONSECUTIVE', 'DIV OF CORRECTIONS OFFENDER', 'DRUG COURT', 'DWI CONVICTION', 'ESC/ABSC', 'FUTURE',
-                                      'IMPACT', 'IN, ADMISSION REASON: NEWCASE', 'IN, ADMISSION REASON: VIOL', 'INACTIVE, INTENSIVE SUPERVISED RELEASE, CONDITIONA',
-                                      'INACTIVE, STANDARD CONFINEMENT, CONDITIONAL RELEAS', 'INSTITUTIONAL DISCHARGE - RECALL', 'INTERSTATE COMPACT P',
-                                      'INTERSTATE COMPACT', 'LC, ADMISSION REASON: VIOL', 'MISDEMEANOR CONFINEM', 'NON-JUDGEMENT', 'PA, ADMISSION REASON: PARO, ABSC',
-                                      'PENDING', 'PL$DE', 'PLEA ABEYANCE', 'PO', 'PO, ABSC', 'PO, ADMISSION REASON: POST', 'PO, IMMI', 'PO, UNSU', 'PR',
-                                      'PR, ADMISSION REASON: NEWCASE, ABSC', 'PR, ADMISSION REASON: NEWCASE, CMPO', 'PR, ADMISSION REASON: NEWCASE, WARR',
-                                      'PR, ADMISSION REASON: PROB, ABSC', 'PRAYER FOR JUDGMENT', 'PRETRIAL RELEASE WIT', 'PRIOR CONVICTION', 'REL. C/S',
-                                      'SENTENCED TO: ASSESSMENT & CLASSIFICATION CENTER;', 'SENTENCED TO: CONTROLLED INTAKE;', 'SPLIT', 'TO BE SET',
-                                      'UNDER CUSTODY', 'UNSENTENCED', 'WEC RLSE-SUCCESSFUL'];
-
-
-
  
 
 //****SECTION FOR MACROS *****
@@ -314,8 +212,9 @@ EXPORT MAX_ADDRESS_SCORE := 100;
 EXPORT HighCrimeValue := 140;                 //  High = 140 or more,   Avg = 60 - 139,  Low = 1 - 59
 EXPORT LowCrimeValue := 59;                 //  High = 140 or more,   Avg = 60 - 139,  Low = 1 - 59
 
-EXPORT Owned_Property_code := 'OP'; 
-EXPORT Sold_Property_code  := 'SP';
+EXPORT OWNED_PROPERTY_CODE := 'OP'; 
+EXPORT SOLD_PROPERTY_CODE  := 'SP';
+EXPORT PREVIOUS_PROPERTY_CODE  := 'PO';
 
 EXPORT INQUIRED_BUSINESS_DEGREE := 'IB';
 EXPORT INQUIRED_BUSINESS_EXEC_DEGREE := 'IE';
@@ -330,8 +229,6 @@ EXPORT INQUIRED_INDIVIDUAL_FIRST_DEGREE := 'R1';
 EXPORT INQUIRED_INDIVIDUAL_SECOND_DEGREE := 'R2';
 EXPORT INQUIRED_INDIVIDUAL_BUSINESS_ASSOCIATE := 'RP';
 
-EXPORT STATE_CRIMINAL_DATA := 'S';
-EXPORT FEDERAL_CRIMINAL_DATA := 'F';
 
 EXPORT OWNERSHIP_PRONG_TITLES := ['FOUNDER', 'OWNER'];
 
@@ -681,19 +578,19 @@ EXPORT INDUSTRY_GROUP_BEST_SIC := 'BS';
 EXPORT INDUSTRY_GROUP_BEST_NAICS := 'BN';
 EXPORT INDUSTRY_GROUP_HIGHEST_RISK := 'HR';
 
-EXPORT INDUSTRY_CASH_INTENSIVE_BUSINESS_RETAIL := 'CIBR';
-EXPORT INDUSTRY_CASH_INTENSIVE_BUSINESS_NON_RETAIL := 'CIBNR';
-EXPORT INDUSTRY_MONEY_SERVICE_BUSINESS := 'MSB';
-EXPORT INDUSTRY_NON_BANK_FINANCIAL_INSTITUTIONS := 'NBFI';
-EXPORT INDUSTRY_CASINO_AND_GAMING := 'CAG';
-EXPORT INDUSTRY_LEGAL_ACCOUNTANT_TELEMARKETER_FLIGHT_TRAVEL := 'LEGAL';
-EXPORT INDUSTRY_AUTOMOTIVE := 'AUTO';
-EXPORT INDUSTRY_OTHER := 'OTHER';
+EXPORT INDUSTRY_CASH_INTENSIVE_BUSINESS_RETAIL := DueDiligence.ConstantsIndustry.CASH_INTENSIVE_BUSINESS_RETAIL : DEPRECATED('Use DueDiligence.ConstantsIndustry.CASH_INTENSIVE_BUSINESS_RETAIL');
+EXPORT INDUSTRY_CASH_INTENSIVE_BUSINESS_NON_RETAIL := DueDiligence.ConstantsIndustry.CASH_INTENSIVE_BUSINESS_NON_RETAIL : DEPRECATED('Use DueDiligence.ConstantsIndustry.CASH_INTENSIVE_BUSINESS_NON_RETAIL');
+EXPORT INDUSTRY_MONEY_SERVICE_BUSINESS := DueDiligence.ConstantsIndustry.MONEY_SERVICE_BUSINESS : DEPRECATED('Use DueDiligence.ConstantsIndustry.MONEY_SERVICE_BUSINESS');
+EXPORT INDUSTRY_NON_BANK_FINANCIAL_INSTITUTIONS := DueDiligence.ConstantsIndustry.NON_BANK_FINANCIAL_INSTITUTIONS : DEPRECATED('Use DueDiligence.ConstantsIndustry.NON_BANK_FINANCIAL_INSTITUTIONS');
+EXPORT INDUSTRY_CASINO_AND_GAMING := DueDiligence.ConstantsIndustry.CASINO_AND_GAMING : DEPRECATED('Use DueDiligence.ConstantsIndustry.CASINO_AND_GAMING');
+EXPORT INDUSTRY_LEGAL_ACCOUNTANT_TELEMARKETER_FLIGHT_TRAVEL := DueDiligence.ConstantsIndustry.LEGAL_ACCOUNTANT_TELEMARKETER_FLIGHT_TRAVEL : DEPRECATED('Use DueDiligence.ConstantsIndustry.LEGAL_ACCOUNTANT_TELEMARKETER_FLIGHT_TRAVEL');
+EXPORT INDUSTRY_AUTOMOTIVE := DueDiligence.ConstantsIndustry.AUTOMOTIVE : DEPRECATED('Use DueDiligence.ConstantsIndustry.AUTOMOTIVE');
+EXPORT INDUSTRY_OTHER := DueDiligence.ConstantsIndustry.OTHER : DEPRECATED('Use DueDiligence.ConstantsIndustry.OTHER');
 
-EXPORT RISK_LEVEL_HIGH := 'HIGH';
-EXPORT RISK_LEVEL_MEDIUM := 'MEDIUM';
-EXPORT RISK_LEVEL_LOW := 'LOW';
-EXPORT RISK_LEVEL_UNKNOWN := 'UNKNOWN';
+EXPORT RISK_LEVEL_HIGH := DueDiligence.ConstantsIndustry.RISK_LEVEL_HIGH : DEPRECATED('Use DueDiligence.ConstantsIndustry.RISK_LEVEL_HIGH');
+EXPORT RISK_LEVEL_MEDIUM := DueDiligence.ConstantsIndustry.RISK_LEVEL_MEDIUM : DEPRECATED('Use DueDiligence.ConstantsIndustry.RISK_LEVEL_MEDIUM');
+EXPORT RISK_LEVEL_LOW := DueDiligence.ConstantsIndustry.RISK_LEVEL_LOW : DEPRECATED('Use DueDiligence.ConstantsIndustry.RISK_LEVEL_LOW');
+EXPORT RISK_LEVEL_UNKNOWN := DueDiligence.ConstantsIndustry.RISK_LEVEL_UNKNOWN : DEPRECATED('Use DueDiligence.ConstantsIndustry.RISK_LEVEL_UNKNOWN');
 
 
 EXPORT NAICS_RISK_HIGH :=  ['42','44','45','48','49'];
@@ -709,97 +606,54 @@ EXPORT NAICS_RISK_HIGH_EXCEP := ['332991', '332992', '332993', '332994', '332996
 																	'813940'];
 
 //Cash Intensive Businesses
-EXPORT CIB_NAICS_RETAIL := ['442110', '442210', '442299', '443111', '443112',
-														'443120', '444110', '444120', '444210', '444220',
-														'445120', '445310', '446110', '447110', '448120',
-														'448150', '448190', '448210', '451110', '451120',
-														'451130', '451140', '451211', '451220', '452111',
-														'452112', '452998', '453110', '453210', '453220',
-														'453310', '453998', '454210'];
-EXPORT CIB_NAICS_NON_RETAIL := ['423930', '424940', '485310', '713120', '713990',
-																'722110', '722211', '722212', '811192', '812112',
-																'812113', '812310', '812930', '812990']; 
+EXPORT CIB_NAICS_RETAIL := DueDiligence.ConstantsIndustry.NAICS_CIB_RETAIL : DEPRECATED('Use DueDiligence.ConstantsIndustry.NAICS_CIB_RETAIL');
+EXPORT CIB_NAICS_NON_RETAIL :=  DueDiligence.ConstantsIndustry.NAICS_CIB_NON_RETAIL : DEPRECATED('Use DueDiligence.ConstantsIndustry.NAICS_CIB_NON_RETAIL'); 
 
 //Money Services Businesses											
-EXPORT MSB_NAICS := ['523130', '522390', '522320', '522291'];
+EXPORT MSB_NAICS :=  DueDiligence.ConstantsIndustry.NAICS_MSB : DEPRECATED('Use DueDiligence.ConstantsIndustry.NAICS_MSB');
 
 //Non-Bank Finaancial Institutions
-EXPORT NBFI_NAICS := ['522298', '522291', '448310', '423940']; 	       
+EXPORT NBFI_NAICS :=  DueDiligence.ConstantsIndustry.NAICS_NBFI : DEPRECATED('Use DueDiligence.ConstantsIndustry.NAICS_NBFI'); 	       
 
 //Casinos & Gaming
-EXPORT CASGAM_NAISC := ['721120', '713290', '713210'];   
+EXPORT CASGAM_NAISC :=  DueDiligence.ConstantsIndustry.NAICS_CASGAM : DEPRECATED('Use DueDiligence.ConstantsIndustry.NAICS_CASGAM');   
 
 //Legal, Accountant, Telemarketer, Flight Training or Travel Agency
-EXPORT LEGTRAV_NAISC := ['611512', '561990', '561510', '561422', '541211', 
-												 '541110'];   
+EXPORT LEGTRAV_NAISC :=  DueDiligence.ConstantsIndustry.NAICS_LEGTRAV : DEPRECATED('Use DueDiligence.ConstantsIndustry.NAICS_LEGTRAV');   
 
 //Automotive
-EXPORT AUTO_NAISC := ['811224', '811121', '811118', '811113', '811111', 
-											'441310', '441229', '441228', '441222', '441210', 
-											'441120', '441110'];	          
+EXPORT AUTO_NAISC :=  DueDiligence.ConstantsIndustry.NAICS_AUTO : DEPRECATED('Use DueDiligence.ConstantsIndustry.NAICS_AUTO');	          
 
 
 
-EXPORT SIC_LENGTH_2_RISK_HIGH	:= ['58'];
+EXPORT SIC_LENGTH_2_RISK_HIGH	:= DueDiligence.ConstantsIndustry.SIC_LENGTH_2_RISK_HIGH : DEPRECATED('Use DueDiligence.ConstantsIndustry.SIC_LENGTH_2_RISK_HIGH');
+EXPORT SIC_LENGTH_4_RISK_HIGH	:= DueDiligence.ConstantsIndustry.SIC_LENGTH_4_RISK_HIGH : DEPRECATED('Use DueDiligence.ConstantsIndustry.SIC_LENGTH_4_RISK_HIGH');
+EXPORT SIC_LENGTH_6_RISK_HIGH	:= DueDiligence.ConstantsIndustry.SIC_LENGTH_6_RISK_HIGH : DEPRECATED('Use DueDiligence.ConstantsIndustry.SIC_LENGTH_6_RISK_HIGH');																	
+EXPORT SIC_LENGTH_8_RISK_HIGH	:= DueDiligence.ConstantsIndustry.SIC_LENGTH_8_RISK_HIGH : DEPRECATED('Use DueDiligence.ConstantsIndustry.SIC_LENGTH_8_RISK_HIGH');																	
 
-EXPORT SIC_LENGTH_4_RISK_HIGH	:= ['3111', '3151', '3199', '3911', '4724', 
-																	'4725', '4729', '4789', '5094', '5411', 
-																	'5499', '5500', '5511', '5521', '5551', 
-																	'5561', '5571', '5599', '6081', '6082', 
-																	'6211', '6722', '6799', '8111', '8721'];
-																	
-EXPORT SIC_LENGTH_6_RISK_HIGH	:= ['315100', '315199', '608100', '608199', '608200', 
-																	'608299', '609901', '738914', '799913'];																	
-																	
-EXPORT SIC_LENGTH_8_RISK_HIGH	:= ['31510000', '47310101', '47310102', '47310102', '59329904', 
-																	'60810000', '60819901', '60820000', '60990100', '60990101', 
-																	'60990102', '60990103', '60999901', '60999902', '60999903', 
-																	'60999906', '60999908', '60999908', '70110301', '73891005', 
-																	'73891400', '73891402', '79930401', '79930402', '79930403', 
-																	'79990803', '79990804', '79991301', '79991302', '79991303', 
-																	'79991304', '79991305', '79991306'];																	
-
-EXPORT SIC_FIRST_2_STAR_RISK_HIGH := ['58']; //must match on first 2 char
-																	
-EXPORT SIC_FIRST_4_STAR_RISK_HIGH := ['3111', '3199', '3911', '4724', '4725',
-																			'4729', '4789', '5094', '5411', '5499',
-																			'5511', '5521', '5551', '5561', '5571',
-																			'5599', '6211', '6722', '6799', '8111',
-																			'8721']; //must match on first 4 char	
-
-EXPORT SIC_FIRST_6_STAR_RISK_HIGH := ['315199']; //must match on first 6 char															
+EXPORT SIC_FIRST_2_STAR_RISK_HIGH := DueDiligence.ConstantsIndustry.SIC_FIRST_2_STAR_RISK_HIGH : DEPRECATED('Use DueDiligence.ConstantsIndustry.SIC_FIRST_2_STAR_RISK_HIGH');
+EXPORT SIC_FIRST_4_STAR_RISK_HIGH := DueDiligence.ConstantsIndustry.SIC_FIRST_4_STAR_RISK_HIGH : DEPRECATED('Use DueDiligence.ConstantsIndustry.SIC_FIRST_4_STAR_RISK_HIGH');
+EXPORT SIC_FIRST_6_STAR_RISK_HIGH := DueDiligence.ConstantsIndustry.SIC_FIRST_6_STAR_RISK_HIGH : DEPRECATED('Use DueDiligence.ConstantsIndustry.SIC_FIRST_6_STAR_RISK_HIGH');														
 																	
 
 //Cash Intensive Businesses
-EXPORT CIB_SIC_RETAIL := ['5021', '5023', '5031', '5044', '5049', '5083', '5085', '5091', '5092',
-													'5111', '5112', '5113', '5122', '5131', '5136', '5137', '5139', '5153', '5159',
-													'5162', '5181', '5182', '5191', '5192', '5193', '5199', '5231', '5261',
-													'5292', '5311', '5411', '5541', '5611', '5621', '5632', '5661', '5699', '5712',
-													'5713', '5714', '5719', '5736', '5912', '5932', '5941', '5942', '5943', '5945',
-													'5947', '5949', '5962', '5992', '7699'];
-EXPORT CIB_SIC_NON_RETAIL := ['4121', '5093', '5194', '5999', '7215',
-															'7231', '7299', '7521', '7542', '7993']; 
+EXPORT CIB_SIC_RETAIL := DueDiligence.ConstantsIndustry.SIC_CIB_RETAIL : DEPRECATED('Use DueDiligence.ConstantsIndustry.SIC_CIB_RETAIL');
+EXPORT CIB_SIC_NON_RETAIL := DueDiligence.ConstantsIndustry.SIC_CIB_NON_RETAIL : DEPRECATED('Use DueDiligence.ConstantsIndustry.SIC_CIB_NON_RETAIL'); 
 											
 //Money Services Businesses											
-EXPORT  MSB_SIC := ['7389', '6799', '6221', '6162', '6153', 
-										'6141', '6099'];		
+EXPORT  MSB_SIC := DueDiligence.ConstantsIndustry.SIC_MSB : DEPRECATED('Use DueDiligence.ConstantsIndustry.SIC_MSB');		
 											
 //Non-Bank Finaancial Institutions
-EXPORT  NBFI_SIC := ['7631', '6159', '6153', '6141', '6111', 
-											'6082', '6081', '6019', '5944', '5932', 
-											'5094']; 	
+EXPORT  NBFI_SIC := DueDiligence.ConstantsIndustry.SIC_NBFI : DEPRECATED('Use DueDiligence.ConstantsIndustry.SIC_NBFI'); 	
 
 //Casinos & Gaming
-EXPORT CASGAM_SIC := ['7999', '7993', '7011'];  
+EXPORT CASGAM_SIC := DueDiligence.ConstantsIndustry.SIC_CASGAM : DEPRECATED('Use DueDiligence.ConstantsIndustry.SIC_CASGAM');  
 
 //Legal, Accountant, Telemarketer, Flight Training or Travel Agency
-EXPORT LEGTRAV_SIC := ['8721', '8299', '8249', '8111', '7389', 
-												'7299', '4724'];
+EXPORT LEGTRAV_SIC := DueDiligence.ConstantsIndustry.SIC_LEGTRAV : DEPRECATED('Use DueDiligence.ConstantsIndustry.SIC_LEGTRAV');
 
 //Automotive
-EXPORT AUTO_SIC := ['7539', '7538', '7537', '7532', '5731', 
-										'5599', '5571', '5561', '5551', '5531', 
-										'5521', '5511', '5015', '5013'];	          											
+EXPORT AUTO_SIC := DueDiligence.ConstantsIndustry.SIC_AUTO : DEPRECATED('Use DueDiligence.ConstantsIndustry.SIC_AUTO');	          											
 											
 											
  // Vehicle key orig_name_type values
@@ -1112,42 +966,5 @@ EXPORT CityFerryCrossing := ['MOBILE, AL', 'KETCHIKAN,AK', 'JUNEAU,AK','WHITTIER
 						'SEATTLE,WA',  'PORT ANGELES,WA','BELLINGHAM,WA','ANACORTES,WA'];					
 								
 
- //*** These are the 5 digit court offense levels that can be mapped to a FELONY
-EXPORT setFELONY := ['CA', '*F', '1F', '2F', '3F', '4 F', '4F', ';F2', 'AF', 'AF1', 
-                     'AF2', 'AF3', 'AF4', 'AGGF1', 'AGGF2', 'AGGF3', 'CAPIA', 'CCA', 
-                     'CF', 'CL', 'DF', 'F', 'F 3', 'F*', 'F*;F*', 'F*;F1', 'F*;F2', 
-                     'F*;F3', 'F*;FS', 'F*;FX', 'F*;M*', 'F*;MA', 'F*;MB', 'F*;MC', 
-                     'F*;MT', 'F*\\M*', 'F-1', 'F-1)', 'F-2', 'F-2)', 'F-3', 'F-3)', 
-                     'F-4', 'F-4)', 'F-4PR', 'F-5', 'F-5)', 'F/GM', 'F/M', 'F0', 'F1', 
-                     'F10', 'F1;F*', 'F1;F1', 'F1;F2', 'F1;F3', 'F1;FS', 'F1;MA', 'F1D', 
-                     'F2', 'F2;F*', 'F2;F1', 'F2;F2', 'F2;F3', 'F2;FS', 'F2;MA', 'F2D', 
-                     'F3', 'F3;F*', 'F3;F1', 'F3;F2', 'F3;F3', 'F3;FS', 'F3;MA', 'F3;MB', 
-                     'F3D', 'F4', 'F4D', 'F5', 'F5D', 'F6', 'F6TH', 'F7', 'F8', 'F9', 
-                     'FA', 'FAD', 'FB', 'FBC', 'FC', 'FCA', 'FCAP', 'FD', 'FDM', 'FE', 
-                     'FEM', 'FF', 'FG', 'FH', 'FI', 'FL', 'FL1', 'FLOWE', 'FM', 'FN', 
-                     'FNC', 'FNG', 'FO', 'FOG', 'FP', 'FQ', 'FS', 'FS;E', 'FS;E;', 
-                     'FS;F*', 'FS;F1', 'FS;F2', 'FS;F3', 'FS;FS', 'FS;MA', 'FS;MB', 
-                     'FSJ', 'FT', 'FU', 'FUPPE', 'FV', 'FW', 'FX', 'FX;F1', 'FX;FX', 
-                     'FY-1', 'FY-3', 'FZ', 'LIFE', 'MA;FS', 'MB;F3', 'MB;FS', 'SF', 
-                     'SJF', 'SPF', 'UF', 'MO', 'MT;F2', 'MT;FS', 'P', 'WF'];
-
-//*** These are the 5 digit court offense levels that can be mapped to a MISDEMEANOR
-EXPORT setMISDEMEANOR := ['AM', 'BM', 'GM', 'GMT', 'GM2', 'GM3', 'M', '*M', 'CM', 'CTM1', 
-                          'CTM2', 'CV', 'M 0', 'M*', 'M-1', 'M-1S)', 'M-2', 'M0', 'M1', 
-                          'M2', 'M2N', 'M3', 'M3R', 'M4', 'M5', 'M6', 'M7', 'M8', 'M9', 
-                          'MA', 'MAD', 'MAM', 'MAMUN', 'MAP', 'MB', 'MB)', 'MBD', 'MC', 
-                          'MCA', 'MCLAS', 'MCT', 'MD', 'ME', 'MF', 'MG', 'MH', 'MI', 
-                          'MIS', 'MK', 'ML', 'MM', 'MN', 'MO', 'MP', 'MQ', 'MR', 'MS', 
-                          'MSE', 'MT', 'MU', 'MUM', 'MUMUN', 'MUNCL', 'MUNK', 'MV', 'MW', 
-                          'MX', 'MY', 'MZ', 'P M', 'PM', 'PMT', 'PVM2', 'SPM', 'T', 'TM', 
-                          'TVM1', 'TVM2'];
-
-//*** These are the 5 digit court offense levels that can be mapped to a TRAFFIC
-EXPORT setTRAFFIC := ['T', 'C', 'CT', 'FFT', 'JTOT', 'MTV', 'T/MI', 'T2', 'T4', 'TA', 'TB', 
-                      'TC', 'TH', 'TI', 'TL', 'TM', 'TO', 'TP', 'TR', 'TT', 'TU', 'TV', 'UC', 'UO', 'CVI'];
-
-//*** These are the 5 digit court offense levels that can be mapped to a INFRACTION
-EXPORT setINFRACTION := ['CI', 'CTI', 'I', 'I1', 'I2', 'IN', 'MO', 'MO1', 'MO2', 'MOR', 'MU', 'MU1', 
-                         'MU2', 'MU3', 'OCO', 'OMU', 'ORD', 'OV', 'PVI', 'TVI', 'CO', 'COR', 'ICA'];
 
 END;

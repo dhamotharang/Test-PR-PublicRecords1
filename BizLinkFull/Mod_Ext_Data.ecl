@@ -137,10 +137,10 @@ EXPORT RawFetchL_CNPNAME_ZIP(TYPEOF(h.cnp_name) param_cnp_name = (TYPEOF(h.cnp_n
     indexOutputRecord := RECORDOF(KeyL_CNPNAME_ZIP);
     slimrec := { KeyL_CNPNAME_ZIP.gss_word_weight, KeyL_CNPNAME_ZIP.proxid, KeyL_CNPNAME_ZIP.seleid, KeyL_CNPNAME_ZIP.orgid, KeyL_CNPNAME_ZIP.ultid };
     BloomF := SALT311.Fn_Wordbag_To_Bloom(param_cnp_name); // Use for extra index filtering
-    doIndexRead(UNSIGNED4 search,UNSIGNED2 spc) := STEPPED(KEYL_CNPNAME_ZIP( KEYED(GSS_hash = search) AND (GSS_bloom & BloomF) = BloomF
+    doIndexRead(UNSIGNED4 search,UNSIGNED2 spc) := STEPPED(LIMIT(KEYL_CNPNAME_ZIP( KEYED(GSS_hash = search) AND (GSS_bloom & BloomF) = BloomF
       AND KEYED((zip IN SET(param_zip,zip)))
       AND ((param_prim_name = (TYPEOF(prim_name))'' OR prim_name = (TYPEOF(prim_name))'') OR (prim_name = param_prim_name) OR ((Config_BIP.WithinEditN(prim_name,prim_name_len,param_prim_name,param_prim_name_len,1, 0)) ))
-      AND ((param_st = (TYPEOF(st))'' OR st = (TYPEOF(st))'') OR (st = param_st))),ultid,orgid,seleid,proxid,PRIORITY(40-spc)); // Filter for each row of index fetch
+      AND ((param_st = (TYPEOF(st))'' OR st = (TYPEOF(st))'') OR (st = param_st))),Config_BIP.L_CNPNAME_ZIP_MAXBLOCKLIMIT,ONFAIL(TRANSFORM(KeyRec,SELF := ROW([],KeyRec))),KEYED)/*Hack28*/,ultid,orgid,seleid,proxid,PRIORITY(40-spc)); // Filter for each row of index fetch
     SALT311.MAC_collate_wordbag_matches4(wds,slimrec,doIndexRead,ultid,orgid,seleid,proxid,steppedmatches) // Perform N-way join
     res := JOIN( steppedmatches, KeyL_CNPNAME_ZIP, KEYED(RIGHT.GSS_Hash = wds[1].hsh)
       AND KEYED((RIGHT.zip IN SET(param_zip,zip))) AND KEYED(RIGHT.fallback_value >= param_fallback_value) AND KEYED(LEFT.proxid = RIGHT.proxid AND LEFT.seleid = RIGHT.seleid AND LEFT.orgid = RIGHT.orgid AND LEFT.ultid = RIGHT.ultid),TRANSFORM(indexOutputRecord,SELF.gss_word_weight := LEFT.gss_word_weight,SELF := RIGHT));
@@ -372,10 +372,10 @@ EXPORT RawFetchL_CNPNAME_ST(TYPEOF(h.cnp_name) param_cnp_name = (TYPEOF(h.cnp_na
     indexOutputRecord := RECORDOF(KeyL_CNPNAME_ST);
     slimrec := { KeyL_CNPNAME_ST.gss_word_weight, KeyL_CNPNAME_ST.proxid, KeyL_CNPNAME_ST.seleid, KeyL_CNPNAME_ST.orgid, KeyL_CNPNAME_ST.ultid };
     BloomF := SALT311.Fn_Wordbag_To_Bloom(param_cnp_name); // Use for extra index filtering
-    doIndexRead(UNSIGNED4 search,UNSIGNED2 spc) := STEPPED(KEYL_CNPNAME_ST( KEYED(GSS_hash = search) AND (GSS_bloom & BloomF) = BloomF
+    doIndexRead(UNSIGNED4 search,UNSIGNED2 spc) := STEPPED(LIMIT(KEYL_CNPNAME_ST( KEYED(GSS_hash = search) AND (GSS_bloom & BloomF) = BloomF
       AND KEYED((st = param_st))
       AND ((param_prim_name = (TYPEOF(prim_name))'' OR prim_name = (TYPEOF(prim_name))'') OR (prim_name = param_prim_name) OR ((Config_BIP.WithinEditN(prim_name,prim_name_len,param_prim_name,param_prim_name_len,1, 0)) ))
-      AND ((~EXISTS(param_zip) OR zip = (TYPEOF(zip))'') OR (zip IN SET(param_zip,zip)))),ultid,orgid,seleid,proxid,PRIORITY(40-spc)); // Filter for each row of index fetch
+      AND ((~EXISTS(param_zip) OR zip = (TYPEOF(zip))'') OR (zip IN SET(param_zip,zip)))),Config_BIP.L_CNPNAME_ST_MAXBLOCKLIMIT,ONFAIL(TRANSFORM(KeyRec,SELF := ROW([],KeyRec))),KEYED)/*Hack28*/,ultid,orgid,seleid,proxid,PRIORITY(40-spc)); // Filter for each row of index fetch
     SALT311.MAC_collate_wordbag_matches4(wds,slimrec,doIndexRead,ultid,orgid,seleid,proxid,steppedmatches) // Perform N-way join
     res := JOIN( steppedmatches, KeyL_CNPNAME_ST, KEYED(RIGHT.GSS_Hash = wds[1].hsh)
       AND KEYED((RIGHT.st = param_st)) AND KEYED(RIGHT.fallback_value >= param_fallback_value) AND KEYED(LEFT.proxid = RIGHT.proxid AND LEFT.seleid = RIGHT.seleid AND LEFT.orgid = RIGHT.orgid AND LEFT.ultid = RIGHT.ultid),TRANSFORM(indexOutputRecord,SELF.gss_word_weight := LEFT.gss_word_weight,SELF := RIGHT));
@@ -607,9 +607,9 @@ EXPORT RawFetchL_CNPNAME(TYPEOF(h.cnp_name) param_cnp_name = (TYPEOF(h.cnp_name)
     indexOutputRecord := RECORDOF(KeyL_CNPNAME);
     slimrec := { KeyL_CNPNAME.gss_word_weight, KeyL_CNPNAME.proxid, KeyL_CNPNAME.seleid, KeyL_CNPNAME.orgid, KeyL_CNPNAME.ultid };
     BloomF := SALT311.Fn_Wordbag_To_Bloom(param_cnp_name); // Use for extra index filtering
-    doIndexRead(UNSIGNED4 search,UNSIGNED2 spc) := STEPPED(KEYL_CNPNAME( KEYED(GSS_hash = search) AND (GSS_bloom & BloomF) = BloomF
+    doIndexRead(UNSIGNED4 search,UNSIGNED2 spc) := STEPPED(LIMIT(KEYL_CNPNAME( KEYED(GSS_hash = search) AND (GSS_bloom & BloomF) = BloomF
       AND ((param_prim_name = (TYPEOF(prim_name))'' OR prim_name = (TYPEOF(prim_name))'') OR (prim_name = param_prim_name) OR ((Config_BIP.WithinEditN(prim_name,prim_name_len,param_prim_name,param_prim_name_len,1, 0)) ))
-      AND ((param_city = (TYPEOF(city))'' OR city = (TYPEOF(city))'') OR (city = param_city) OR ( (metaphonelib.DMetaPhone1(city)=metaphonelib.DMetaPhone1(param_city))  OR (Config_BIP.WithinEditN(city,city_len,param_city,param_city_len,2, 0)) ))),ultid,orgid,seleid,proxid,PRIORITY(40-spc)); // Filter for each row of index fetch
+      AND ((param_city = (TYPEOF(city))'' OR city = (TYPEOF(city))'') OR (city = param_city) OR ( (metaphonelib.DMetaPhone1(city)=metaphonelib.DMetaPhone1(param_city))  OR (Config_BIP.WithinEditN(city,city_len,param_city,param_city_len,2, 0)) ))),Config_BIP.L_CNPNAME_MAXBLOCKLIMIT,ONFAIL(TRANSFORM(KeyRec,SELF := ROW([],KeyRec))),KEYED)/*Hack28*/,ultid,orgid,seleid,proxid,PRIORITY(40-spc)); // Filter for each row of index fetch
     SALT311.MAC_collate_wordbag_matches4(wds,slimrec,doIndexRead,ultid,orgid,seleid,proxid,steppedmatches) // Perform N-way join
     res := JOIN( steppedmatches, KeyL_CNPNAME, KEYED(RIGHT.GSS_Hash = wds[1].hsh) AND KEYED(RIGHT.fallback_value >= param_fallback_value) AND KEYED(LEFT.proxid = RIGHT.proxid AND LEFT.seleid = RIGHT.seleid AND LEFT.orgid = RIGHT.orgid AND LEFT.ultid = RIGHT.ultid),TRANSFORM(indexOutputRecord,SELF.gss_word_weight := LEFT.gss_word_weight,SELF := RIGHT));
     RETURN IF(SUM(wds,spec) > 19,res,IF(SUM(wds,spec) = 0,DATASET([],indexOutputRecord) ,DATASET(ROW([],indexOutputRecord)))); // Ensure at least spc of specificity in gss portion
@@ -2209,8 +2209,8 @@ EXPORT RawFetchL_URL(TYPEOF(h.company_url) param_company_url = (TYPEOF(h.company
     indexOutputRecord := RECORDOF(KeyL_URL);
     slimrec := { KeyL_URL.gss_word_weight, KeyL_URL.proxid, KeyL_URL.seleid, KeyL_URL.orgid, KeyL_URL.ultid };
     BloomF := SALT311.Fn_Wordbag_To_Bloom(param_company_url); // Use for extra index filtering
-    doIndexRead(UNSIGNED4 search,UNSIGNED2 spc) := STEPPED(KEYL_URL( KEYED(GSS_hash = search) AND (GSS_bloom & BloomF) = BloomF
-      AND ((param_st = (TYPEOF(st))'' OR st = (TYPEOF(st))'') OR (st = param_st))),ultid,orgid,seleid,proxid,PRIORITY(40-spc)); // Filter for each row of index fetch
+    doIndexRead(UNSIGNED4 search,UNSIGNED2 spc) := STEPPED(LIMIT(KEYL_URL( KEYED(GSS_hash = search) AND (GSS_bloom & BloomF) = BloomF
+      AND ((param_st = (TYPEOF(st))'' OR st = (TYPEOF(st))'') OR (st = param_st))),Config_BIP.L_URL_MAXBLOCKLIMIT,ONFAIL(TRANSFORM(KeyRec,SELF := ROW([],KeyRec))),KEYED)/*Hack28*/,ultid,orgid,seleid,proxid,PRIORITY(40-spc)); // Filter for each row of index fetch
     SALT311.MAC_collate_wordbag_matches4(wds,slimrec,doIndexRead,ultid,orgid,seleid,proxid,steppedmatches) // Perform N-way join
     res := JOIN( steppedmatches, KeyL_URL, KEYED(RIGHT.GSS_Hash = wds[1].hsh) AND KEYED(RIGHT.fallback_value >= param_fallback_value) AND KEYED(LEFT.proxid = RIGHT.proxid AND LEFT.seleid = RIGHT.seleid AND LEFT.orgid = RIGHT.orgid AND LEFT.ultid = RIGHT.ultid),TRANSFORM(indexOutputRecord,SELF.gss_word_weight := LEFT.gss_word_weight,SELF := RIGHT));
     RETURN IF(SUM(wds,spec) > 19,res,IF(SUM(wds,spec) = 0,DATASET([],indexOutputRecord) ,DATASET(ROW([],indexOutputRecord)))); // Ensure at least spc of specificity in gss portion

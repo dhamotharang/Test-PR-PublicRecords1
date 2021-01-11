@@ -1,4 +1,5 @@
-import business_header, doxie_cbrs,doxie,LiensV2,LiensV2_Services;
+import doxie_cbrs, LiensV2, LiensV2_Services;
+
 export Liens_v2(
   dataset(doxie_cbrs.layout_references) bdids,
 	boolean Include_val = false,
@@ -28,9 +29,9 @@ shared out_f := lie;
 
 	export records := out_f;
 	export records_moxieView := LiensV2_Services.liens_raw.moxie_view.by_rmsid(rmsids,ssn_mask_value);
-	export record_count(boolean count_only) := 
+	export record_count(boolean count_only) :=
 			IF(count_only,
 			   count(project(k(keyed(p_bdid in SET(doxie_cbrs.ds_SupergroupLevels(bdids), bdid))), transform({k.p_bdid}, self := left))),
 				 count(out_f));
-	
+
 END;

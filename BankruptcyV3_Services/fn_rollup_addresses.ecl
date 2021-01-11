@@ -1,40 +1,40 @@
-import bankruptcyv3_services;
-export fn_rollup_addresses(
-	dataset(bankruptcyv3_services.Layout_key_bankruptcyv3_search_full_bip_plus_case_numbers) in_records) :=
-		function
-			// SLIM DOWN TO REQUIRED FIELDS.  ROLLUP ON BDID/DID OR IF NOT AVAILABLE
-			// ROLLUP ON NAME.
-			temp_addresses_slim :=
-				project(
-					in_records,
-					transform(
-						bankruptcyv3_services.layouts.layout_address_ext,
-						self.debtor_type_1 := left.debtor_type[1],
-						self := left));
-			// SAVE THE LATEST LAST SEEN DATE FOR EACH UNIQUE ADDRESS FOR EACH PARTY
-			temp_addresses_dedup :=
-				dedup(
-					sort(
-						temp_addresses_slim,
-						record),
-					record,except date_last_seen,
-					right);
-			// SAVE THE MOST RECENT ADDRESSES FOR EACH PARTY
-			temp_addresses_keep :=
-				sort(
-					temp_addresses_dedup,
-					tmsid,debtor_type_1,bdid,did,ssn,app_ssn,tax_id,app_tax_id,-date_last_seen);
-			// ROLL UP THE ADDRESSES FOR EACH PARTY KEY
-			temp_addresses_roll :=
-				rollup(
-					group(temp_addresses_keep,tmsid,debtor_type_1,bdid,did,ssn,app_ssn,tax_id,app_tax_id),
-					group,
-					transform(
-						bankruptcyv3_services.layouts.layout_address_roll,
-						self.addresses := choosen(project(rows(left),bankruptcyv3_services.layouts.layout_address),
-																			bankruptcyv3_services.consts.ADDRESSES_PER_PARTY),
-						self := left));
-			return
-				temp_addresses_roll;
-		end;
-		
+IMPORT bankruptcyv3_services;
+EXPORT fn_rollup_addresses(
+  DATASET(bankruptcyv3_services.Layout_key_bankruptcyv3_search_full_bip_plus_case_numbers) in_records) :=
+    FUNCTION
+      // SLIM DOWN TO REQUIRED FIELDS. ROLLUP ON BDID/DID OR IF NOT AVAILABLE
+      // ROLLUP ON NAME.
+      temp_addresses_slim :=
+        PROJECT(
+          in_records,
+          TRANSFORM(
+            bankruptcyv3_services.layouts.layout_address_ext,
+            SELF.debtor_type_1 := LEFT.debtor_type[1],
+            SELF := LEFT));
+      // SAVE THE LATEST LAST SEEN DATE FOR EACH UNIQUE ADDRESS FOR EACH PARTY
+      temp_addresses_dedup :=
+        DEDUP(
+          SORT(
+            temp_addresses_slim,
+            RECORD),
+          RECORD,EXCEPT date_last_seen,
+          RIGHT);
+      // SAVE THE MOST RECENT ADDRESSES FOR EACH PARTY
+      temp_addresses_keep :=
+        SORT(
+          temp_addresses_dedup,
+          tmsid,debtor_type_1,bdid,did,ssn,app_ssn,tax_id,app_tax_id,-date_last_seen);
+      // ROLL UP THE ADDRESSES FOR EACH PARTY KEY
+      temp_addresses_roll :=
+        ROLLUP(
+          GROUP(temp_addresses_keep,tmsid,debtor_type_1,bdid,did,ssn,app_ssn,tax_id,app_tax_id),
+          GROUP,
+          TRANSFORM(
+            bankruptcyv3_services.layouts.layout_address_roll,
+            SELF.addresses := CHOOSEN(PROJECT(ROWS(LEFT),bankruptcyv3_services.layouts.layout_address),
+                                      bankruptcyv3_services.consts.ADDRESSES_PER_PARTY),
+            SELF := LEFT));
+      RETURN
+        temp_addresses_roll;
+    END;
+    

@@ -39,7 +39,7 @@ export SearchService_Records := module
                      recs_plus_pen (penalt <= pthreshold_translated));
 
     // suppress; by DID only
-    Suppress.MAC_Suppress(recs_filt,recs_supp,in_mod.applicationtype,Suppress.Constants.LinkTypes.DID,did_out);
+    Suppress.MAC_Suppress(recs_filt,recs_supp,in_mod.applicationtype,Suppress.Constants.LinkTypes.DID,did_out, isFCRA := isFCRA);
 
     // add crim indicators
     recsIn := PROJECT(recs_supp,TRANSFORM({atf_Services.Layouts.rawrecCrimInd,STRING12 UniqueId},SELF.UniqueId:=LEFT.did_out,SELF:=LEFT));

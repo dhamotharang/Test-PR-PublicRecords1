@@ -1,4 +1,5 @@
-import business_header, doxie_cbrs, YellowPages, MDR;
+import doxie_cbrs, YellowPages, MDR;
+
 export YellowPage(
 	dataset(doxie_cbrs.layout_references) bdids,
 	boolean Include_val = false,
@@ -15,11 +16,11 @@ doxie_cbrs.mac_RollStart
 shared out_f := outf1;
 
 
-shared simple_count := 
+shared simple_count :=
 	count(project(k(keyed(bdid in SET(doxie_cbrs.ds_SupergroupLevels(bdids), bdid)) and MDR.sourceTools.SourceIsYellow_Pages(source)), transform({k.bdid,k.source}, self := left)));
 
 	export records := out_f;
-	export record_count(boolean count_only = false) := 
+	export record_count(boolean count_only = false) :=
 													IF(count_only,simple_count,count(out_f));
-	
+
 END;

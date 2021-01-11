@@ -9,7 +9,7 @@ decimal19_2 thresh := 1.00;
 	
 // ******** START: NON FCRA CURRENT MODE CALCULATIONS *********************************************************************************************************************
 
-nonfcra_ds_curr := dataset('~scoringqa::out::nonfcra::addressshell_batch_generic_attributes_v1_' + dt + '_1', 	Scoring_Project_Macros.Global_Output_Layouts.AddressShell_Attributes_V1_BATCH_Generic_Global_Layout, thor)(length(trim(errorcode,left,right))= 0 );
+nonfcra_ds_curr := distribute(dataset('~scoringqa::out::nonfcra::addressshell_batch_generic_attributes_v1_' + dt + '_1', 	Scoring_Project_Macros.Global_Output_Layouts.AddressShell_Attributes_V1_BATCH_Generic_Global_Layout, thor)(length(trim(errorcode,left,right))= 0 ),(integer)acctno);
 
 
 nonfcra_filenames_details :=  nothor(STD.File.LogicalFileList('scoringqa::out::nonfcra::addressshell_batch_generic_attributes_v1_*_1'));
@@ -23,7 +23,7 @@ nonfcra_prev_date := nonfcra_p_file_name[length(nonfcra_p_file_name)-9.. length(
 cleaned_nonfcra_curr_date := dt;
 cleaned_nonfcra_prev_date := nonfcra_prev_date;
 
-nonfcra_ds_prev := dataset('~'+ nonfcra_p_file_name, Scoring_Project_Macros.Global_Output_Layouts.AddressShell_Attributes_V1_BATCH_Generic_Global_Layout, thor)(length(trim(errorcode,left,right))= 0 );
+nonfcra_ds_prev := distribute(dataset('~'+ nonfcra_p_file_name, Scoring_Project_Macros.Global_Output_Layouts.AddressShell_Attributes_V1_BATCH_Generic_Global_Layout, thor)(length(trim(errorcode,left,right))= 0 ),(integer)acctno);
 
 
 		nonfcra_join1 := JOIN(nonfcra_ds_curr, nonfcra_ds_prev, LEFT.acctno=RIGHT.acctno, transform(left));

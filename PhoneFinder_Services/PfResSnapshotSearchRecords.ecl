@@ -77,23 +77,64 @@ EXPORT PfResSnapshotSearchRecords (PhoneFinder_Services.Layouts.PFResSnapShotSea
                          KEYED(LEFT.transaction_id = RIGHT.transaction_id),
                          t_trans(LEFT, RIGHT),
                          LIMIT(0), KEEP(1));
-   
+
+   ds_wth_Src := RECORD
+    string16 Transaction_Id;
+    integer5 sequence_number;
+    integer1 PhoneId;
+    integer1 identity_id;
+    UNSIGNED8 UniqueId;
+    String Category;
+    UNSIGNED2 totalsourcecount;
+    BOOLEAN IsPhoneSearch;
+  END;
+
+  ds_wth_Src  t_srcs (iesp.phonefindertransactionsearch.t_PhoneFinderTransactionSearchRecord l,
+                                                                                   RECORDOF(dx_PhoneFinderReportDelta.Key_Sources) r) := TRANSFORM
+    SELF.transaction_id := r.transaction_id;
+    SELF.sequence_number := r.sequence_number;
+    SELF.PhoneId := r.Phone_Id;
+    SELF.identity_id := r.identity_id;
+    SELF.UniqueId := r.lexid;
+    SELF.Category := r.Category;
+    SELF.totalsourcecount    := (UNSIGNED)r.totalsourcecount;
+    SELF.isPhoneSearch := l.PhoneFinderSearchParameters.PhoneNumber != '';
+  END;
+
+  //Joining Transaction Ids with the main Sources Key
+  dGet_src_recs := JOIN(dGet_trans_recs, dx_PhoneFinderReportDelta.Key_Sources,
+                         KEYED(LEFT.transactionid = RIGHT.transaction_id),
+                         t_srcs(LEFT, RIGHT), LIMIT(0), KEEP(PhoneFinder_Services.Constants.PfResSnapshot.MaxSources));
+
+ //Adding Source to Primary phone                   
+ dNormSrc_Primary := DENORMALIZE(dGet_trans_recs, dGet_src_recs,
+                                     LEFT.TransactionId = RIGHT.Transaction_Id  AND RIGHT.phoneid = 0 AND ~RIGHT.isPhoneSearch,
+                                     GROUP,
+                                     TRANSFORM(iesp.phonefindertransactionsearch.t_PhoneFinderTransactionSearchRecord,
+                                     SELF.PrimaryPhone.SourceCategories := CHOOSEN(DEDUP((PROJECT(ROWS(RIGHT), TRANSFORM(iesp.share.t_StringArrayItem, SELF.Value := LEFT.Category))), ALL),iesp.constants.PfResSnapshot.MaxSrcCategories),
+                                     SELF.PrimaryPhone.totalsourcecount := COUNT(ROWS(RIGHT)),
+                                     SELF := LEFT), LIMIT(0));                                                                       
+
    InputCmpIds :=  SET(dInput.CompanyIds, Companyid);                      
  
   //Filtering the Records with additional search criteria and limiting to MaxSearchRecords
-  dfiltered_recs := LIMIT(dGet_trans_recs((~SearchbyCompanyids OR CompanyID IN InputCmpIds) AND
+  dfiltered_recs := LIMIT(dNormSrc_Primary((~SearchbyCompanyids OR CompanyID IN InputCmpIds) AND
                            (dInput.UserID ='' OR UserID = dInput.UserID) AND 
                            (dInput.ReferenceCode =''  OR ReferenceCode = dInput.ReferenceCode) AND 
                            (dInput.PhoneNumber =''    OR PrimaryPhone.PhoneNumber = dInput.PhoneNumber) 
                            AND (dInput.StartDate= ''  OR (iesp.ECL2ESP.t_DateToString8(TransactionDate) = dInput.StartDate  OR (dInput.EndDate<>'' AND  iesp.ECL2ESP.t_DateToString8(TransactionDate) BETWEEN dInput.StartDate AND dInput.EndDate)))), 
                            PhoneFinder_Services.Constants.PfResSnapshot.MaxSearchRecords, FAIL(203, doxie.ErrorCodes(203)));
-                      
+  
+  //Adding Source Details to Identities                    
   identity_wth_tid_rec :=RECORD
     string16 transaction_id;
+    integer5 sequence_number;
     iesp.phonefindertransactionsearch.t_PhoneIdentity;
   END;
      
    identity_wth_tid_rec  t_identity(RECORDOF(dx_PhoneFinderReportDelta.Key_Identities) r) := TRANSFORM
+    SELF.transaction_id := r.transaction_id;
+    SELF.sequence_number := r.sequence_number;
     SELF.UniqueId := (STRING)r.lexid;
     SELF.FullName := r.full_name;
     SELF.Address.StreetAddress1 := r.full_address;
@@ -101,16 +142,28 @@ EXPORT PfResSnapshotSearchRecords (PhoneFinder_Services.Layouts.PFResSnapShotSea
     SELF.Address.State := r.state;
     SELF.Address.Zip5 := r.zip;
     SELF.VerifiedCarrier := r.verified_carrier;
-    SELF.transaction_id := r.transaction_id;
     SELF := []
    END;
      
    dGet_identity_recs := JOIN(dfiltered_recs, dx_PhoneFinderReportDelta.Key_Identities,
                               KEYED(LEFT.TransactionId = RIGHT.transaction_id) AND (dInput.UniqueId = 0 OR RIGHT.lexid = dInput.UniqueId),
                               t_identity(RIGHT),
-                              LIMIT(PhoneFinder_Services.Constants.PfResSnapshot.MaxIdentities, SKIP));
-
-     otherphn_wth_tid_rec := RECORD
+                              LIMIT(PhoneFinder_Services.Constants.PfResSnapshot.MaxIdentities, SKIP));                    
+    
+    IdentityRec := RECORD
+     string16 transaction_id;
+     iesp.phonefindertransactionsearch.t_PhoneIdentity;
+    END;
+    
+    dNormSrc_Identity := DENORMALIZE(dGet_identity_recs, dGet_src_recs,
+                                     LEFT.Transaction_Id = RIGHT.Transaction_Id AND LEFT.sequence_number = RIGHT.identity_id AND RIGHT.isPhoneSearch,
+                                     GROUP,
+                                     TRANSFORM(IdentityRec,
+                                     SELF.SourceCategories := CHOOSEN(DEDUP((PROJECT(ROWS(RIGHT), TRANSFORM(iesp.share.t_StringArrayItem, SELF.Value := LEFT.Category))), ALL),iesp.constants.PfResSnapshot.MaxSrcCategories),
+                                     SELF.TotalSourceCount := COUNT(ROWS(RIGHT)),
+                                     SELF := LEFT));
+    
+    otherphn_wth_tid_rec := RECORD
       string16 transaction_id;
       integer1 PhoneId;
       iesp.phonefindertransactionsearch.t_OtherPhone;
@@ -133,8 +186,17 @@ EXPORT PfResSnapshotSearchRecords (PhoneFinder_Services.Layouts.PFResSnapShotSea
      dGet_otherphone_recs := JOIN(dfiltered_recs, dx_PhoneFinderReportDelta.Key_OtherPhones,
                                   KEYED(LEFT.TransactionId = RIGHT.transaction_id),
                                   t_otherphones(RIGHT),
-                                  LIMIT(PhoneFinder_Services.Constants.PfResSnapshot.MaxOtherPhones, SKIP));
-  
+                                  LIMIT(PhoneFinder_Services.Constants.PfResSnapshot.MaxOtherPhones, SKIP));                  
+    
+    
+    dNormSrc_OtherPhn  := DENORMALIZE(dGet_otherphone_recs, dGet_src_recs,
+                                     LEFT.Transaction_Id = RIGHT.Transaction_Id AND LEFT.phoneid = RIGHT.Phoneid AND ~RIGHT.isPhoneSearch AND RIGHT.Phoneid<>0,
+                                     GROUP,
+                                     TRANSFORM(otherphn_wth_tid_rec,
+                                     SELF.SourceCategories := CHOOSEN(DEDUP((PROJECT(ROWS(RIGHT), TRANSFORM(iesp.share.t_StringArrayItem, SELF.Value := LEFT.Category))), ALL),iesp.constants.PfResSnapshot.MaxSrcCategories),
+                                     SELF.TotalSourceCount := COUNT(ROWS(RIGHT)),
+                                     SELF := LEFT));
+
    RIs_wth_tid_rec := RECORD
      string16 transaction_id;
      integer1 PhoneId;
@@ -143,12 +205,12 @@ EXPORT PfResSnapshotSearchRecords (PhoneFinder_Services.Layouts.PFResSnapShotSea
      
    RIs_wth_tid_rec tAppendRiskInd(RECORDOF(dx_PhoneFinderReportDelta.Key_RiskIndicators) r) :=
        TRANSFORM
+       SELF.transaction_id := r.transaction_id,
         SELF.PhoneId := r.phone_id, 
         SELF.RiskId := r.risk_indicator_id, 
         SELF.Level := r.risk_indicator_level,
         SELF.RiskDescription := r.risk_indicator_text,
         SELF.Category := r.risk_indicator_category,
-        SELF.transaction_id := r.transaction_id,
    END;
      
    dGet_primaryRIs := JOIN(dfiltered_recs, dx_PhoneFinderReportDelta.Key_RiskIndicators,
@@ -156,13 +218,13 @@ EXPORT PfResSnapshotSearchRecords (PhoneFinder_Services.Layouts.PFResSnapShotSea
                                   tAppendRiskInd(RIGHT),
                                   LIMIT(PhoneFinder_Services.Constants.PfResSnapshot.MaxRIs, SKIP));
  
-   dGet_OthersRIs := JOIN(dGet_otherphone_recs, dx_PhoneFinderReportDelta.Key_RiskIndicators,
+   dGet_OthersRIs := JOIN(dNormSrc_OtherPhn, dx_PhoneFinderReportDelta.Key_RiskIndicators,
                           KEYED(LEFT.transaction_id = RIGHT.transaction_id) and RIGHT.phone_id = LEFT.PhoneId,
                           tAppendRiskInd(RIGHT),
                           LIMIT(PhoneFinder_Services.Constants.PfResSnapshot.MaxRIs, SKIP));                             
  
   //Denormalizing OtherPhoneRecs with OtherPhone RI's  
-  dNormOtherPhones_RIs := DENORMALIZE(dGet_otherphone_recs, dGet_OthersRIs,
+  dNormOtherPhones_RIs := DENORMALIZE(dNormSrc_OtherPhn, dGet_OthersRIs,
                                      LEFT.transaction_id = RIGHT.transaction_id and 
                                      LEFT.PhoneId = RIGHT.PhoneId,
                                      GROUP,
@@ -171,7 +233,7 @@ EXPORT PfResSnapshotSearchRecords (PhoneFinder_Services.Layouts.PFResSnapShotSea
                                      SELF := LEFT));
   
   // Denormalizing Filtered Transaction Recs with Identity Recs  
-  dNormIdentities := DENORMALIZE(dfiltered_recs, dGet_identity_recs,
+  dNormIdentities := DENORMALIZE(dfiltered_recs, dNormSrc_Identity,
                                 LEFT.TransactionId = RIGHT.transaction_id,
                                 GROUP,
                                 TRANSFORM(iesp.phonefindertransactionsearch.t_phonefindertransactionsearchrecord,
@@ -193,5 +255,8 @@ EXPORT PfResSnapshotSearchRecords (PhoneFinder_Services.Layouts.PFResSnapShotSea
                                  SELF             := LEFT));
 
 
-  return SORT(dNormPrimaryRIs, CompanyId, TransactionDate.Year, TransactionDate.Month, TransactionDate.Day, UserId, ProductCode, ReferenceCode, TransactionId);
+ final := SORT(dNormPrimaryRIs, CompanyId, TransactionDate.Year, TransactionDate.Month, TransactionDate.Day, UserId, ProductCode, ReferenceCode, TransactionId);
+
+  return final;
+  
 END;

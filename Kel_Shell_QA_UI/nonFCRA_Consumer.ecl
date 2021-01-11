@@ -5,9 +5,9 @@
 												 Records_to_Run,
 												 GLBA,
 												 DPPA,
-												 DataPermissionMask,
-												 DataRestrictionMask,
-												 LexIdSourceOptout,
+												 DPM,
+												 DRM,
+												 LexIdSO,
 												 TransactionId,
 												 BatchUID,
 												 GCID,
@@ -108,8 +108,8 @@ Settings := MODULE(PublicRecords_KEL.Interface_BWR_Settings)
 	EXPORT BOOLEAN isFCRA := FALSE;
 	EXPORT STRING ArchiveDate := histDate;
 	EXPORT STRING InputFileName := InputFile_LogicalName;
-	EXPORT STRING Data_Restriction_Mask := DataRestrictionMask;
-	EXPORT STRING Data_Permission_Mask := DataPermissionMask;
+	EXPORT STRING Data_Restriction_Mask := DRM;
+	EXPORT STRING Data_Permission_Mask := DPM;
 	EXPORT UNSIGNED GLBAPurpose := GLBA;
 	EXPORT UNSIGNED DPPAPurpose := DPPA;
 	EXPORT UNSIGNED LexIDThreshold := Score_threshold;
@@ -147,7 +147,7 @@ soapLayout trans (pp le):= TRANSFORM
 	SELF.DPPAPurpose := Settings.DPPAPurpose;
 	SELF.IsMarketing := FALSE;
 	SELF.OutputMasterResults := Output_Master_Results;
-	SELF.LexIdSourceOptout := LexIdSourceOptout;
+	SELF.LexIdSourceOptout := LexIdSO;
 	SELF._TransactionId := TransactionId;
 	SELF._BatchUID := BatchUID;
 	SELF._GCID := GCID;
@@ -167,8 +167,8 @@ END;
 bwr_results := 
 				SOAPCALL(soap_in, 
 				RoxieIP,
-				// 'publicrecords_kel.MAS_nonFCRA_Service', 
-				'publicrecords_kel.mas_nonfcra_service.27',
+				'publicrecords_kel.MAS_nonFCRA_Service', 
+				// 'publicrecords_kel.mas_nonfcra_service.27',
 				{soap_in}, 
 				DATASET(layout_MAS_Test_Service_output),
 				XPATH('*'),
@@ -223,10 +223,10 @@ Passed_Person :=
 			SELF := []),
 		INNER, KEEP(1));
 		
-Settings_Dataset := PublicRecords_KEL.ECL_Functions.fn_make_settings_dataset(Settings);
+Settings_Dataset := Kel_Shell_QA_UI.fn_make_settings_dataset(Settings);
 
      
-result1:=STD.System.Email.SendEmail(email_list, 'KEL SHELL QA UI run job',  'Your WUID ' + workunit + ' has just kicked-off!');
+result1:=STD.System.Email.SendEmail(email_list, 'KAT Notification',  'Your job has kicked-off. Your WUID is ' + workunit + '.');
 
 result2:=output(Passed_Person,named('Filtered_output'));
 
@@ -238,13 +238,13 @@ result4:=Kel_Shell_QA.descriptive_Stats_Report(unique_id, Passed_Person);
 
 
 Settings_Dataset_updated:= Settings_Dataset +
-                           DATASET([{'AllowedSources: ' + Kel_Shell_QA_UI.SetToString(AllowedSourcesDataset_List)},
-													  {'ExcludeSources: ' + Kel_Shell_QA_UI.SetToString(ExcludeSourcesDataset_List)}
+                           DATASET([{'AllowedSources: ' , Kel_Shell_QA_UI.SetToString(AllowedSourcesDataset_List)},
+													  {'ExcludeSources: ' , Kel_Shell_QA_UI.SetToString(ExcludeSourcesDataset_List)}
 		                       ],{RECORDOF(Settings_Dataset)});
 
 result5:=OUTPUT(Settings_Dataset_updated, NAMED('Attributes_Settings'));
 
-result6:=STD.System.Email.SendEmail(email_list, 'KEL SHELL QA UI run job',  'Your WUID ' + workunit + ' has completed!');
+result6:=STD.System.Email.SendEmail(email_list, 'KAT Notification',  'Your job has completed. Your WUID is ' + workunit + ' .' + '\n You can see the results here. \n http://alawqpnc018.risk.regn.net/KAT/ ');
 
 seq:=sequential(result1, result2, result3, result4, result5, result6);
 

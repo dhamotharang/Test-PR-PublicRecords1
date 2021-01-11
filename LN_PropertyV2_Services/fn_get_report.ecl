@@ -24,7 +24,7 @@ export dataset(l_out) fn_get_report(
 	doxie.MAC_Header_Field_Declare(isFCRA);
 	// Apply FaresID-based restrictions
 	fids1 := in_fids(ln_fares_id[1] not in LN_PropertyV2_Services.input.srcRestrict);	// blacklist FARES, Fidelity, or LnBranded as needed
-	Suppress.MAC_Suppress(fids1,fids2a,application_type_value,,,Suppress.Constants.DocTypes.FaresID,ln_fares_id);
+	Suppress.MAC_Suppress(fids1,fids2a,application_type_value,,,Suppress.Constants.DocTypes.FaresID,ln_fares_id, isFCRA := isFCRA);
 	
 	// Now, if TRIM_BY_SORTBY is true, get only the MAX_TRIM_BY_SORTBY records needed to fulfill the request
 	early_fid_rec := record
@@ -45,10 +45,10 @@ export dataset(l_out) fn_get_report(
 	
 	// Pull records (fids) and parties based on DID/SSN
 	Suppress.MAC_Suppress_Child.keyLinked(fids2,parties_extraRaw,fids2RemoveDID, application_type_value,
-											Suppress.Constants.LinkTypes.DID,did,ln_fares_id,'',false);
+											Suppress.Constants.LinkTypes.DID,did,ln_fares_id,'',false, isFCRA);
 
 	Suppress.MAC_Suppress_Child.keyLinked(fids2RemoveDID,parties_extraRaw,fids3, application_type_value,
-											Suppress.Constants.LinkTypes.SSN,app_ssn,ln_fares_id,'',false);
+											Suppress.Constants.LinkTypes.SSN,app_ssn,ln_fares_id,'',false, isFCRA);
 
 	// retrieve raw results with minimal processing (just the JOINs)
 	deeds_raw		:= LN_PropertyV2_Services.fn_get_deeds_raw(fids3,isFCRA,ds_flags,slim_pc_recs,inFFDOptionsMask,isCNSMR, includeBlackKnight);

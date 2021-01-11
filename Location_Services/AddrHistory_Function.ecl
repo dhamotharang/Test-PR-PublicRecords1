@@ -1,5 +1,5 @@
 ﻿import address, DeathV2_Services, dx_BestRecords, doxie, doxie_raw, doxie_ln, dx_death_master,
-       LN_PropertyV2, LN_PropertyV2_Services, location_services, MDR, property, risk_indicators, 
+       LN_PropertyV2, LN_PropertyV2_Services, location_services, MDR, dx_property, risk_indicators, 
        STD, ut;
 
 todays_date := (string) STD.Date.Today();
@@ -358,12 +358,12 @@ fclsrec := record
 end;
 
 
-fclsrec check_foreclosures(slimprop_srt_ddp L, property.Key_Foreclosure_DID R) := transform
+fclsrec check_foreclosures(slimprop_srt_ddp L, dx_Property.Key_Foreclosure_DID R) := transform
   self := L;
   self := R;
 end;
 
-fids := join(slimprop_srt_ddp(ln_fares_id[1]='R'), property.Key_Foreclosure_DID,
+fids := join(slimprop_srt_ddp(ln_fares_id[1]='R'), dx_Property.Key_Foreclosure_DID,
       keyed(left.did = right.did),
       check_foreclosures(LEFT,RIGHT),
       limit(ut.limits.Foreclosure_PER_DID, skip));
@@ -382,13 +382,13 @@ fclsrec2 := record
 end;
 
 
-fclsrec2 get_foreclosures(fids L, property.Key_Foreclosures_FID R) := transform
+fclsrec2 get_foreclosures(fids L, dx_Property.Key_Foreclosures_FID R) := transform
   self := L;
   self := R;
 end;
 
 frecs := join(fids,
-              property.Key_Foreclosures_FID,
+              dx_Property.Key_Foreclosures_FID,
               keyed(left.fid = right.fid) AND 
 													 RIGHT.source=MDR.sourceTools.src_Foreclosures,
               get_foreclosures(LEFT,RIGHT),

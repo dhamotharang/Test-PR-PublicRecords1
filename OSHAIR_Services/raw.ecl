@@ -1,7 +1,7 @@
 // This module provides OSHAIR data in different formats.
 // ids = Activity Number for OSHAIR
 
-IMPORT doxie_cbrs, OSHAIR, ut;
+IMPORT doxie_cbrs, dx_OSHAIR, ut;
 
 OSHAIR_ACTIVITY_PER_BDID := 500;
 
@@ -10,14 +10,14 @@ EXPORT raw := MODULE
   // Batch - Gets OSHAIR IDs by bdid (grouped by acctno)
   EXPORT Get_ids_from_bdids_batch (GROUPED DATASET (doxie_cbrs.layout_references_acctno) in_bdids) := function
 
-    res := JOIN (DEDUP (SORT (in_bdids, bdid), bdid), Oshair.Key_OSHAIR_BDID,
+    res := JOIN (DEDUP (SORT (in_bdids, bdid), bdid), dx_OSHAIR.key_bdid,
                  keyed (left.bdid = right.bdid),
                  transform (layouts.id, Self.acctno := Left.acctno, Self.activity_number := Right.activity_number),
                  LIMIT (OSHAIR_ACTIVITY_PER_BDID/*ut.limits.OSHAIR_ACTIVITY_PER_BDID*/, SKIP));
 
 		RETURN DEDUP (SORT (res, RECORD), RECORD);
 	END;
-	
+
   EXPORT layouts.id Get_ids_from_bdids (DATASET (doxie_cbrs.layout_references) bdids) := FUNCTION
     bdids_batch := GROUP (SORTED (PROJECT (bdids, doxie_cbrs.layout_references_acctno), acctno), acctno);
     RETURN UNGROUP (Get_ids_from_bdids_batch (bdids_batch));
@@ -33,7 +33,7 @@ EXPORT raw := MODULE
     shared by_id_batch (GROUPED DATASET (layouts.id) in_ids) := function
       res := OSHAIR_Services.GetOshairByID (in_ids);
       return PROJECT (res, layouts.EmbeddedOutput);
-    end;	
+    end;
 
     // Batch - by bdid
     shared by_bdid_batch (GROUPED DATASET (doxie_cbrs.layout_references_acctno) in_bdids) := function
@@ -45,17 +45,17 @@ EXPORT raw := MODULE
     export by_id (DATASET (layouts.id) in_ids) := function
 		  return UNGROUP (by_id_batch (GROUP (SORTED (in_ids, acctno), acctno)));
     end;
-	
+
     // by bdid
     export by_bdid (DATASET (doxie_cbrs.layout_references) in_bdids) := function
       ds_batch := GROUP (SORTED (PROJECT (in_bdids, doxie_cbrs.layout_references_acctno), acctno), acctno);
       return UNGROUP (by_bdid_batch (ds_batch));
     end;
 	END;
-	
+
 
   // ==========================================================================
-  // Returns OSHAIR data in search view 
+  // Returns OSHAIR data in search view
   // ==========================================================================
 	EXPORT SEARCH_VIEW := MODULE
 
@@ -68,7 +68,7 @@ EXPORT raw := MODULE
     end;
 	END;
 
-	
+
   // ===============================================================
   // Returns OSHAIR data in the stand-alone source/doc (report view)
   // ===============================================================

@@ -42,9 +42,11 @@ EXPORT Search_Function(
 	dataset(iesp.share.t_StringArrayItem) ExcludeReportingSources = dataset([], iesp.share.t_StringArrayItem),
 	boolean IncludeStatusRefreshChecks = FALSE,
 	DATASET({string32 DeferredTransactionID}) DeferredTransactionIDs = DATASET([], {string32 DeferredTransactionID}),
-    string5 StatusRefreshWaitPeriod = '',
-    string10 ESPInterfaceVersion = '',
-    boolean IsBatch = FALSE // Changes the output of the DTE child dataset
+  string5 StatusRefreshWaitPeriod = '',
+  boolean IsBatch = FALSE, // Changes the output of the DTE child dataset
+	string20 CompanyID = '',
+	string32 TransactionID ='',
+  string50 IDA_AppID = ''
   ) := function
 
 boolean   isPreScreenPurpose := STD.Str.ToUpperCase(intended_purpose) = 'PRESCREENING';
@@ -207,17 +209,6 @@ RiskView.Layouts.Layout_Custom_Inputs getCustomInputs(RiskView.Layouts.layout_ri
 END;
 customInputs := PROJECT(riskview_input, getCustomInputs(LEFT));
 
-lib_in := module(Models.RV_LIBIN)
-	EXPORT STRING30 modelName := '';
-	EXPORT STRING50 IntendedPurpose := '';
-	EXPORT BOOLEAN LexIDOnlyOnInput := FALSE;
-	EXPORT BOOLEAN isCalifornia := FALSE;
-	EXPORT BOOLEAN preScreenOptOut := FALSE;
-	EXPORT STRING65 returnCode := '';
-	EXPORT STRING65 payFrequency := '';
-	EXPORT DATASET(RiskView.Layouts.Layout_Custom_Inputs) Custom_Inputs := custominputs;
-end;
-
 // For batch, assuming that if 1 record is LexID only on input that all records are LexID only on input to greatly simplify this calculation/requirement
 LexIDOnlyOnInput := IF(onThor, FALSE,
 											bsprep[1].DID > 0 AND bsprep[1].SSN = '' AND bsprep[1].dob = '' AND bsprep[1].phone10 = '' AND bsprep[1].wphone10 = '' AND 
@@ -236,13 +227,10 @@ custom_models := DATASET([Custom_model_name,Custom2_model_name,Custom3_model_nam
 ucase_custom_models := PROJECT(custom_models, TRANSFORM(recordof(custom_models),SELF.model := STD.Str.ToUpperCase(LEFT.model)));
 Custom_model_name_array := SET(ucase_custom_models, model);
 
-
- 
 // end change to upper case
 
 // BF _ Custom models are set to blank for insurance, therefore version 50 is selected.
  bsversion := IF(Crossindustry_model in [ 'RVS1706_0'] or 'RVP1702_1' in Custom_model_name_array or  CheckingIndicatorsRequest,52,50); 
-
 
 	// set variables for passing to bocashell function fcra
 	BOOLEAN isUtility := FALSE;
@@ -299,9 +287,58 @@ Custom_model_name_array := SET(ucase_custom_models, model);
 		in_ExcludeStates := ExcludeStates,
 		in_ExcludeReportingSources := ExcludeReportingSources
 	);
-	
-#if(Models.LIB_RiskView_Models().TurnOnValidation = FALSE)
+  
+LN_IDA_input := UNGROUP(PROJECT(clam, TRANSFORM(Risk_Indicators.layouts.layout_IDA_in, 
+                                      SELF.CompanyID := companyID,
+                                      SELF.ESPTransactionID := TransactionID,
+                                      SELF.App_ID := IDA_AppID,
+                                      //Make sure to remove DOB zero filling as IDA gateway doesn't expect it
+                                        tempdob_year := LEFT.shell_input.dob[1..4];
+                                        tempdob_month := LEFT.shell_input.dob[5..6];
+                                        tempdob_day := LEFT.shell_input.dob[7..8];
+                                      SELF.DOB := IF(tempdob_year = '0000', '', tempdob_year) +
+                                                  IF(tempdob_month = '00', '', tempdob_month) +
+                                                  IF(tempdob_day = '00', '', tempdob_day);
+                                      SELF := LEFT.shell_input,
+                                      
+                                      // TODO:  when innovis attributes are ready, we can join to watchdog file to send in best fields here
+                                      // self.best_ssn := 's';
+                                      // self.best_dob := 'd';
+                                      // self.best_address := 'a';
+                                      // self.best_zip := 'z';
+                                      // self.best_phone := 'p';
+                                      SELF := [];)));
 
+IDA_call := Risk_Indicators.Prep_IDA_Credit(LN_IDA_input,
+                                            gateways, 
+                                            FALSE, //indicates if we need Innovis attributes
+                                            Intended_Purpose, 
+                                            isCalifornia_in_person
+                                            );
+
+Do_IDA := Auto_model_name in Riskview.Constants.valid_IDA_models or 
+          Bankcard_model_name in Riskview.Constants.valid_IDA_models or
+          Short_term_lending_model_name in Riskview.Constants.valid_IDA_models or
+          Telecommunications_model_name in Riskview.Constants.valid_IDA_models or
+          Crossindustry_model_name in Riskview.Constants.valid_IDA_models or
+          Custom_model_name in Riskview.Constants.valid_IDA_models or
+          Custom2_model_name in Riskview.Constants.valid_IDA_models or
+          Custom3_model_name in Riskview.Constants.valid_IDA_models or
+          Custom4_model_name in Riskview.Constants.valid_IDA_models or
+          Custom5_model_name in Riskview.Constants.valid_IDA_models;
+
+//Don't call the gateway unless a valid IDA model is being called...
+IDA_results := IF(Do_IDA, IDA_call, DATASET([],iesp.ida_report_response.t_IDAReportResponseEx));
+
+//We only need the attributes/Indicators for models, so slim it down
+IDASlim := JOIN(LN_IDA_input, IDA_results,
+              (string)LEFT.App_ID = RIGHT.response.outputrecord.AppID, //Using AppID as unique Identifier
+                TRANSFORM(Risk_Indicators.layouts.layout_IDA_out,
+                          SELF.Seq := LEFT.seq,
+                          SELF.APP_ID := RIGHT.response.outputrecord.AppID,
+                          SELF.Indicators := RIGHT.response.outputrecord.Indicators
+                          ));											
+	
 	returnedReportLayout := RECORD
 		unsigned4 Seq;
 		iesp.riskview2.t_RiskView2Report;
@@ -360,7 +397,7 @@ isReportAlone := if(RiskviewReportRequest and
 		true, false);
 		
 // if valid attributes aren't requested, don't bother calling get_attributes_v5
-attrv5 := if(valid_attributes_requested,
+attrv5 := if(valid_attributes_requested or Do_IDA,
 							riskview.get_attributes_v5(attributes_clam, isPreScreenPurpose),
 							project(attributes_clam, transform(riskview.layouts.attributes_internal_layout_noscore, 
 							self := left, self := []))
@@ -381,6 +418,21 @@ attrLnJ :=  if( IncludeLnJ /*and FilterLnJ = false*/, // uses clam_noScore
 						);
 
 emptyGateways := dataset([],Gateway.Layouts.Config); 
+
+lib_in := module(Models.RV_LIBIN)
+	EXPORT STRING30 modelName := '';
+	EXPORT STRING50 IntendedPurpose := Intended_Purpose;
+	EXPORT BOOLEAN LexIDOnlyOnInput := ^.LexIDOnlyOnInput;
+	EXPORT BOOLEAN isCalifornia := isCalifornia_in_person;
+	EXPORT BOOLEAN preScreenOptOut := FALSE;
+	EXPORT STRING65 returnCode := '';
+	EXPORT STRING65 payFrequency := '';
+	EXPORT DATASET(RiskView.Layouts.Layout_Custom_Inputs) Custom_Inputs := custominputs;
+  EXPORT GROUPED DATASET(RiskView.Layouts.attributes_internal_layout_noscore) v5_Attrs := attrv5;
+  EXPORT DATASET(Risk_Indicators.layouts.layout_IDA_out) IDA_Attrs := IDASlim;
+end;
+
+#if(Riskview.Constants.TurnOnValidation = FALSE)
 
 riskview5_attr_search_results_attrv5 := join(clam, attrv5, left.seq=right.seq,
 transform(riskview.layouts.layout_riskview5_search_results, 
@@ -434,57 +486,57 @@ noModelResults := DATASET([], Models.Layout_ModelOut);
 	
 auto_model := STD.Str.ToUpperCase(auto_model_name);
 valid_auto := auto_model <> '' AND auto_model IN valid_model_names;
-auto_model_result := MAP(valid_auto => Models.LIB_RiskView_V50_Function(clam, auto_model, intended_purpose, LexIDOnlyOnInput, Custom_Inputs_in := customInputs),
+auto_model_result := MAP(valid_auto => Models.LIB_RiskView_V50_Function(clam, auto_model, intended_purpose, LexIDOnlyOnInput, Custom_Inputs_in := customInputs, Attr_in := attrv5, IDA_Attr_in := IDASlim),
 																			 noModelResults);
 
 bankcard_model := STD.Str.ToUpperCase(bankcard_model_name);
 valid_bankcard := bankcard_model <> '' AND bankcard_model IN valid_model_names;
-bankcard_model_result := MAP(valid_bankcard	=> Models.LIB_RiskView_V50_Function(clam, bankcard_model, intended_purpose, LexIDOnlyOnInput, Custom_Inputs_in := customInputs),
+bankcard_model_result := MAP(valid_bankcard	=> Models.LIB_RiskView_V50_Function(clam, bankcard_model, intended_purpose, LexIDOnlyOnInput, Custom_Inputs_in := customInputs, Attr_in := attrv5, IDA_Attr_in := IDASlim),
 																							 noModelResults);
 
 short_term_lending_model := STD.Str.ToUpperCase(short_term_lending_model_name);
 valid_short_term_lending := short_term_lending_model <> '' AND short_term_lending_model IN valid_model_names;
-short_term_lending_model_result := MAP(valid_short_term_lending	=> Models.LIB_RiskView_V50_Function(clam, short_term_lending_model, intended_purpose, LexIDOnlyOnInput, Custom_Inputs_in := customInputs),
+short_term_lending_model_result := MAP(valid_short_term_lending	=> Models.LIB_RiskView_V50_Function(clam, short_term_lending_model, intended_purpose, LexIDOnlyOnInput, Custom_Inputs_in := customInputs, Attr_in := attrv5, IDA_Attr_in := IDASlim),
 																																	 noModelResults);
 
 telecommunications_model := STD.Str.ToUpperCase(Telecommunications_model_name);
 valid_telecommunications := telecommunications_model <> '' AND telecommunications_model IN valid_model_names;
-telecommunications_model_result := MAP(valid_telecommunications	=> Models.LIB_RiskView_V50_Function(clam, telecommunications_model, intended_purpose, LexIDOnlyOnInput, Custom_Inputs_in := customInputs),
+telecommunications_model_result := MAP(valid_telecommunications	=> Models.LIB_RiskView_V50_Function(clam, telecommunications_model, intended_purpose, LexIDOnlyOnInput, Custom_Inputs_in := customInputs, Attr_in := attrv5, IDA_Attr_in := IDASlim),
 																																	 noModelResults);
 
 
 valid_Crossindustry := Crossindustry_model <> '' AND Crossindustry_model IN valid_model_names;
-Crossindustry_model_result := MAP(valid_Crossindustry	=> Models.LIB_RiskView_V50_Function(clam, Crossindustry_model, intended_purpose, LexIDOnlyOnInput, Custom_Inputs_in := customInputs),
+Crossindustry_model_result := MAP(valid_Crossindustry	=> Models.LIB_RiskView_V50_Function(clam, Crossindustry_model, intended_purpose, LexIDOnlyOnInput, Custom_Inputs_in := customInputs, Attr_in := attrv5, IDA_Attr_in := IDASlim),
 																															 noModelResults);
 	
 custom_model := STD.Str.ToUpperCase(Custom_model_name);
 //MLA1608_0 is not a real model so bypass the call to the models library here
 valid_custom := custom_model not in ['','MLA1608_0'] AND custom_model IN valid_model_names;
-custom_model_result := MAP(valid_custom	=> Models.LIB_RiskView_V50_Function(clam, custom_model, intended_purpose, LexIDOnlyOnInput, Custom_Inputs_in := customInputs),
+custom_model_result := MAP(valid_custom	=> Models.LIB_RiskView_V50_Function(clam, custom_model, intended_purpose, LexIDOnlyOnInput, Custom_Inputs_in := customInputs, Attr_in := attrv5, IDA_Attr_in := IDASlim),
 																					 noModelResults);
 
 custom2_model := STD.Str.ToUpperCase(Custom2_model_name);
 //MLA1608_0 is not a real model so bypass the call to the models library here
 valid_custom2 := custom2_model not in ['','MLA1608_0'] AND custom2_model IN valid_model_names;
-custom2_model_result := MAP(valid_custom2	=> Models.LIB_RiskView_V50_Function(clam, custom2_model, intended_purpose, LexIDOnlyOnInput, Custom_Inputs_in := customInputs),
+custom2_model_result := MAP(valid_custom2	=> Models.LIB_RiskView_V50_Function(clam, custom2_model, intended_purpose, LexIDOnlyOnInput, Custom_Inputs_in := customInputs, Attr_in := attrv5, IDA_Attr_in := IDASlim),
 																						 noModelResults);
 
 custom3_model := STD.Str.ToUpperCase(Custom3_model_name);
 //MLA1608_0 is not a real model so bypass the call to the models library here
 valid_custom3 := custom3_model not in ['','MLA1608_0'] AND custom3_model IN valid_model_names;
-custom3_model_result := MAP(valid_custom3	=> Models.LIB_RiskView_V50_Function(clam, custom3_model, intended_purpose, LexIDOnlyOnInput, Custom_Inputs_in := customInputs),
+custom3_model_result := MAP(valid_custom3	=> Models.LIB_RiskView_V50_Function(clam, custom3_model, intended_purpose, LexIDOnlyOnInput, Custom_Inputs_in := customInputs, Attr_in := attrv5, IDA_Attr_in := IDASlim),
 																					   noModelResults);
 
 custom4_model := STD.Str.ToUpperCase(Custom4_model_name);
 //MLA1608_0 is not a real model so bypass the call to the models library here
 valid_custom4 := custom4_model not in ['','MLA1608_0'] AND custom4_model IN valid_model_names;
-custom4_model_result := MAP(valid_custom4	=> Models.LIB_RiskView_V50_Function(clam, custom4_model, intended_purpose, LexIDOnlyOnInput, Custom_Inputs_in := customInputs),
+custom4_model_result := MAP(valid_custom4	=> Models.LIB_RiskView_V50_Function(clam, custom4_model, intended_purpose, LexIDOnlyOnInput, Custom_Inputs_in := customInputs, Attr_in := attrv5, IDA_Attr_in := IDASlim),
 																					   noModelResults);
 
 custom5_model := STD.Str.ToUpperCase(Custom5_model_name);
 //MLA1608_0 is not a real model so bypass the call to the models library here
 valid_custom5 := custom5_model not in ['','MLA1608_0'] AND custom5_model IN valid_model_names;
-custom5_model_result := MAP(valid_custom5	=> Models.LIB_RiskView_V50_Function(clam, custom5_model, intended_purpose, LexIDOnlyOnInput, Custom_Inputs_in := customInputs),
+custom5_model_result := MAP(valid_custom5	=> Models.LIB_RiskView_V50_Function(clam, custom5_model, intended_purpose, LexIDOnlyOnInput, Custom_Inputs_in := customInputs, Attr_in := attrv5, IDA_Attr_in := IDASlim),
 																					   noModelResults);
 
 // Add those model scores to the attribute results
@@ -1217,6 +1269,7 @@ boolean Alerts200 := (le.SubjectDeceased='1' or attr.SubjectDeceased = '1') or (
   self.CheckTimeOldest := if(AlertRegulatoryCondition = '0' and CheckingIndicatorsRequest, '-1', '');
   self.CheckTimeNewest := if(AlertRegulatoryCondition = '0' and CheckingIndicatorsRequest, '-1', '');
   self.CheckNegTimeOldest := if(AlertRegulatoryCondition = '0' and CheckingIndicatorsRequest, '-1', '');
+  self.CheckNegTimeNewest := if(AlertRegulatoryCondition = '0' and CheckingIndicatorsRequest, '-1', '');
   self.CheckNegRiskDecTimeNewest := if(AlertRegulatoryCondition = '0' and CheckingIndicatorsRequest, '-1', '');
   self.CheckNegPaidTimeNewest := if(AlertRegulatoryCondition = '0' and CheckingIndicatorsRequest, '-1', '');
   self.CheckCountTotal := if(AlertRegulatoryCondition = '0' and CheckingIndicatorsRequest, '-1', '');
@@ -1351,12 +1404,12 @@ riskview5_final_results := if(CheckingIndicatorsRequest, riskview5_attr_search_r
 boolean InvokeStatusRefresh := IncludeStatusRefreshChecks = TRUE AND COUNT(DeferredTransactionIDs) = 0 AND ~AttributesOnly;
 boolean InvokeDTE := IncludeStatusRefreshChecks = TRUE AND COUNT(DeferredTransactionIDs) <> 0;
 
-riskview_status_refresh := IF(InvokeStatusRefresh, Riskview.Functions.JuLiProcessStatusRefresh(clam, gateways, riskview5_final_results, ExcludeStatusRefresh, StatusRefreshWaitPeriod, ESPInterfaceVersion, IsBatch, riskview_input, InvokeStatusRefresh), dataset([], riskview.layouts.layout_riskview5_search_results));
+riskview_status_refresh := IF(InvokeStatusRefresh, Riskview.Functions.JuLiProcessStatusRefresh(clam, gateways, riskview5_final_results, ExcludeStatusRefresh, StatusRefreshWaitPeriod, IsBatch, riskview_input, InvokeStatusRefresh), dataset([], riskview.layouts.layout_riskview5_search_results));
 riskview_dte := IF(InvokeDTE, Riskview.Functions.JuLiProcessDTE(DeferredTransactionIDs, clam, gateways, riskview5_final_results, InvokeDTE), dataset([], riskview.layouts.layout_riskview5_search_results));
 
-riskview5_with_status_refresh := MAP(InvokeStatusRefresh => riskview_status_refresh,
-                                                                   InvokeDTE => riskview_dte,
-                                                                   riskview5_final_results);
+riskview5_with_status_refresh := MAP( InvokeStatusRefresh => riskview_status_refresh,
+                                      InvokeDTE           => riskview_dte,
+                                                             riskview5_final_results);
                                                                    
                                                                   
  /* *************************************
@@ -1399,8 +1452,12 @@ riskview5_with_status_refresh := MAP(InvokeStatusRefresh => riskview_status_refr
 // output(AttributesVersionRequest, named('AttributesVersionRequest'));
 // output(prescreen_score_threshold, named('prescreen_score_threshold'));
 
+// output(isBatch, named('isBatch'));
+
 // output(bsprep, named('bsprep'));
-// output(clam, named('clam'));
+//output(clam, named('clam'));
+//output(ida_call, named('ida_call'));
+
 // output(riskview5_score_search_results, named('riskview5_score_search_results'));
 // output(riskview5_search_results, named('riskview5_search_results'));
 
@@ -1425,4 +1482,6 @@ return riskview5_with_status_refresh;
 
 return Models.LIB_RiskView_Models(clam, lib_in).ValidatingModel;
 #end
+
+
 END;

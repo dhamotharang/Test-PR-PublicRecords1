@@ -46,15 +46,15 @@ EXPORT Functions := MODULE
       SELF.name_suffix:= IF(hasFullName,cln.name_suffix,L.name_suffix);
       SELF:=L;
     END;
-    
-    RETURN PROJECT(ds_input_recs,cleanName(LEFT));  
+
+    RETURN PROJECT(ds_input_recs,cleanName(LEFT));
   END;
 
 
   EXPORT append_Dids (DATASET(ConsumerCreditReport_Services.Layouts.workRec) ds_work_in,
                       ConsumerCreditReport_Services.IParams.Params in_mod) := FUNCTION
 
-    BatchShare.MAC_AppendDidVilleDID(ds_work_in(error_code=0),ds_work_out,in_mod);
+    BatchShare.MAC_AppendDidVilleDID(ds_work_in(error_code=0),ds_work_out,in_mod,,isFCRA := true);
 
     ConsumerCreditReport_Services.Layouts.workRec appendDids(ds_work_in L, ds_work_out R) := TRANSFORM
       noRecordsFound:=R.err_search=Standard.Errors.SEARCH.DID_NOT_FOUND;
@@ -73,14 +73,14 @@ EXPORT Functions := MODULE
 
 
   EXPORT append_PersonContext (DATASET(ConsumerCreditReport_Services.Layouts.workRec) ds_work_in,
-                                ConsumerCreditReport_Services.IParams.Params in_mod, 
+                                ConsumerCreditReport_Services.IParams.Params in_mod,
                 DATASET(FFD.Layouts.PersonContextBatch) pc_recs = DATASET([],FFD.Layouts.PersonContextBatch)) := FUNCTION
-                
+
   isReseller := TRUE;
   pc_alert_flags := FFD.ConsumerFlag.getAlertIndicators(pc_recs, in_mod.FCRAPurpose, in_mod.FFDOptionsMask, isReseller);
   consumer_alerts := FFD.ConsumerFlag.prepareAlertMessages(pc_recs, pc_alert_flags[1], in_mod.FFDOptionsMask);
 
-    Risk_Indicators.Layouts.tmp_Consumer_Statements xformConsumerStatement(FFD.Layouts.PersonContextBatch L) := TRANSFORM  
+    Risk_Indicators.Layouts.tmp_Consumer_Statements xformConsumerStatement(FFD.Layouts.PersonContextBatch L) := TRANSFORM
       SELF.UniqueId:=L.LexID;
       SELF.Timestamp:=iesp.ECL2ESP.toTimeStamp(STD.Str.Filter(L.DateAdded,' 0123456789'));
       SELF.StatementId:=L.StatementId;
@@ -89,12 +89,12 @@ EXPORT Functions := MODULE
       SELF.Content:=L.Content;
       SELF.RecIdForStId:=L.RecId1;
     END;
-    
+
     consumer_statements:=PROJECT(pc_recs(RecordType IN [FFD.Constants.RecordType.StatementRecordLevel,
                                                      FFD.Constants.RecordType.StatementConsumerLevel
                                                     ]),xformConsumerStatement(LEFT));
 
-    ConsumerCreditReport_Services.Layouts.workRec addChildRecs(ConsumerCreditReport_Services.Layouts.workRec L, 
+    ConsumerCreditReport_Services.Layouts.workRec addChildRecs(ConsumerCreditReport_Services.Layouts.workRec L,
                                                    DATASET(Risk_Indicators.Layouts.tmp_Consumer_Statements) R) := TRANSFORM
       SELF.ConsumerStatements:=R;
       SELF:=L;
@@ -104,7 +104,7 @@ EXPORT Functions := MODULE
                                LEFT.did=(UNSIGNED)RIGHT.UniqueId,
                                GROUP,addChildRecs(LEFT,ROWS(RIGHT)));
 
-    ConsumerCreditReport_Services.Layouts.workRec addAlertRecs(ConsumerCreditReport_Services.Layouts.workRec L, 
+    ConsumerCreditReport_Services.Layouts.workRec addAlertRecs(ConsumerCreditReport_Services.Layouts.workRec L,
                                                    DATASET(iesp.share_fcra.t_ConsumerAlert) R) := TRANSFORM
       SELF.ConsumerAlerts:=R;
       SELF:=L;
@@ -114,16 +114,16 @@ EXPORT Functions := MODULE
                                    LEFT.did=(UNSIGNED)RIGHT.UniqueId,
                                    GROUP,addAlertRecs(LEFT,ROWS(RIGHT)));
 
-    ConsumerCreditReport_Services.Layouts.workRec checkForAlerts(ConsumerCreditReport_Services.Layouts.workRec L, 
+    ConsumerCreditReport_Services.Layouts.workRec checkForAlerts(ConsumerCreditReport_Services.Layouts.workRec L,
                                                                FFD.layouts.ConsumerFlagsBatch R) := TRANSFORM
       SELF.error_code:=MAP(
         L.error_code>0 => L.error_code,
         R.suppress_records => ConsumerCreditReport_Services.Constants.CONSUMER_ALERT_CODE, //records to be suppressed due to consumer alert(s), but no _header.exception to be generated, consumer alerts and CS statements to be returned
-        L.did=0 => ConsumerCreditReport_Services.Constants.NO_LEXID_FOUND_CODE, 
+        L.did=0 => ConsumerCreditReport_Services.Constants.NO_LEXID_FOUND_CODE,
         L.error_code);
-      ds_consumer_statements:=IF(R.suppress_records,L.ConsumerStatements(StatementType IN FFD.Constants.RecordType.StatementConsumerLevel), 
+      ds_consumer_statements:=IF(R.suppress_records,L.ConsumerStatements(StatementType IN FFD.Constants.RecordType.StatementConsumerLevel),
                                L.ConsumerStatements);
-      SELF.ConsumerStatements:= IF(R.has_consumer_statement OR R.has_record_statement,  ds_consumer_statements);                       
+      SELF.ConsumerStatements:= IF(R.has_consumer_statement OR R.has_record_statement,  ds_consumer_statements);
       // filtering out consumer statement alert in case of suppression of results and no consumer level statements on file for subject
       SELF.ConsumerAlerts:=IF(R.has_consumer_statement OR (R.has_record_statement AND ~R.suppress_records), L.ConsumerAlerts, L.ConsumerAlerts(Code<>FCRA.Constants.ALERT_CODE.CONSUMER_STATEMENT));
       SELF:=L;
@@ -167,7 +167,7 @@ EXPORT Functions := MODULE
 
     ds_didville_in:=PROJECT(ds_ccr_resp,didvilleReq(LEFT));
 
-    BatchShare.MAC_AppendDidVilleDID(ds_didville_in,ds_didville_out,in_mod);
+    BatchShare.MAC_AppendDidVilleDID(ds_didville_in,ds_didville_out,in_mod,,isFCRA := true);
 
     iesp.consumercreditreport_fcra.t_FcraCCReport applyMasking(iesp.consumercreditreport_fcra.t_FcraCCReport L) := TRANSFORM
       SELF.ReportHeader.Subject.SSN:=Suppress.ssn_mask(L.ReportHeader.Subject.SSN,in_mod.SSN_Mask);
@@ -176,7 +176,7 @@ EXPORT Functions := MODULE
       SELF.ReportHeader.Subject.DOB:=iesp.ECL2ESP.toDatestring8(dobMasked.Year+dobMasked.Month+dobMasked.day);
       SELF.IdentificationSSN.MDBSubject.SSN:=Suppress.ssn_mask(L.IdentificationSSN.MDBSubject.SSN,in_mod.SSN_Mask);
       SELF.IdentificationSSN.InquirySubject.SSN:=Suppress.ssn_mask(L.IdentificationSSN.InquirySubject.SSN,in_mod.SSN_Mask);
-      
+
       SELF:=L;
     END;
 
@@ -225,16 +225,16 @@ EXPORT Functions := MODULE
   pc_alert_flags := FFD.ConsumerFlag.getAlertIndicators(pc_recs, in_mod.FCRAPurpose, in_mod.FFDOptionsMask, isReseller);
   //since alerts might differ for reseller product vs Liens product we need to generate them for Liens and combine with relseller alerts
   consumer_alerts_nonreseller := FFD.ConsumerFlag.prepareAlertMessages(pc_recs, pc_alert_flags[1], in_mod.FFDOptionsMask);
-  
+
   // we keep only records which qualify for Liens results (not suppressed due to alerts)
   ds_ccr_fltrd := JOIN(ds_ccr_resp((UNSIGNED) UniqueId1 = (UNSIGNED) UniqueId2), pc_alert_flags,
-                          (UNSIGNED) LEFT.UniqueId = (UNSIGNED) RIGHT.UniqueID 
+                          (UNSIGNED) LEFT.UniqueId = (UNSIGNED) RIGHT.UniqueID
                           AND RIGHT.suppress_records,
                           TRANSFORM(LEFT), LEFT ONLY);
 
   flagfile := ds_flags(file_id=FCRA.FILE_ID.LIEN);
   pc_dr_records := pc_recs(datagroup IN FFD.Constants.DataGroupSet.Liens, recordtype=FFD.Constants.RecordType.DR);
-  
+
     Risk_Indicators.Layouts_Derog_Info.layout_derog_process_plus xformInput(ConsumerCreditReport_Services.Layouts.ccrResp L) := TRANSFORM
    override_flags:=flagfile(did=L.UniqueId1);
    DUD_flags := pc_dr_records(Lexid=L.UniqueId1);
@@ -280,7 +280,7 @@ EXPORT Functions := MODULE
       SELF.ReleaseDate:=iesp.ECL2ESP.toDate((UNSIGNED4)L.ReleaseDate);
       SELF.DateLastSeen:=iesp.ECL2ESP.toDate((UNSIGNED4)L.DateLastSeen);
 			self.Defendantaddress.streetnumber := L.StreetNumber;
-			self.Defendantaddress.streetpredirection := L.StreetPreDirection;			
+			self.Defendantaddress.streetpredirection := L.StreetPreDirection;
 			self.Defendantaddress.streetname := L.streetname;
 			self.Defendantaddress.streetsuffix := L.streetsuffix;
 			self.Defendantaddress.streetpostdirection := L.streetpostdirection;
@@ -304,7 +304,7 @@ EXPORT Functions := MODULE
       SELF.ReleaseDate:=iesp.ECL2ESP.toDate((UNSIGNED4)L.ReleaseDate);
       SELF.DateLastSeen:=iesp.ECL2ESP.toDate((UNSIGNED4)L.DateLastSeen);
 			self.Defendantaddress.streetnumber := L.StreetNumber;
-			self.Defendantaddress.streetpredirection := L.StreetPreDirection;			
+			self.Defendantaddress.streetpredirection := L.StreetPreDirection;
 			self.Defendantaddress.streetname := L.streetname;
 			self.Defendantaddress.streetsuffix := L.streetsuffix;
 			self.Defendantaddress.streetpostdirection := L.streetpostdirection;
@@ -356,7 +356,7 @@ EXPORT Functions := MODULE
       ds_attr:=DATASET([R],riskview.layouts.attributes_internal_layout);
       ds_null:=DATASET([],iesp.share.t_NameValuePair);
       SELF.LiensJudgmentsReports.LnJAttributes:=IF(recCnts>0,NORMALIZE(ds_attr,27,normAttributes(LEFT,COUNTER)),ds_null);
-      // for records without LnJ keeping consumer level statements only 
+      // for records without LnJ keeping consumer level statements only
       SELF.ConsumerStatements:=IF(recCnts>0, L.ConsumerStatements, L.ConsumerStatements(StatementType IN FFD.Constants.RecordType.StatementConsumerLevel));
       SELF.ConsumerAlerts:=L.ConsumerAlerts;
       SELF:=L;
@@ -365,20 +365,20 @@ EXPORT Functions := MODULE
     ds_ccr_with_liens := JOIN(ds_ccr_resp,ds_LiensJudgmentsAttributes,
       LEFT.AccountNumber=(STRING)RIGHT.seq AND (UNSIGNED)LEFT.UniqueId1=RIGHT.did,
       appendLiensJudgmentsAttributes(LEFT,RIGHT),LEFT OUTER,KEEP(1));
-      
+
     ConsumerCreditReport_Services.Layouts.ccrResp addLnJAlertRecs(ConsumerCreditReport_Services.Layouts.ccrResp L,
                                                                DATASET(iesp.share_fcra.t_ConsumerAlert) R) := TRANSFORM
-      // we combine alerts for resellers with alerts for in-house data                                                         
+      // we combine alerts for resellers with alerts for in-house data
       SELF.ConsumerAlerts := DEDUP(SORT(L.ConsumerAlerts + R, code, Message), code);
       SELF:=L;
     END;
-    
-    // we need to add non-reseller alerts  for records eligible for LnJ in-house data 
+
+    // we need to add non-reseller alerts  for records eligible for LnJ in-house data
     ds_res_with_alerts := DENORMALIZE(ds_ccr_with_liens,consumer_alerts_nonreseller,
                                    (UNSIGNED)LEFT.UniqueId=(UNSIGNED)RIGHT.UniqueId
-                                   AND (UNSIGNED) LEFT.UniqueId > 0,  
+                                   AND (UNSIGNED) LEFT.UniqueId > 0,
                                    GROUP,addLnJAlertRecs(LEFT,ROWS(RIGHT)));
-      
+
     RETURN ds_res_with_alerts;
   END;
 
@@ -392,7 +392,7 @@ EXPORT Functions := MODULE
       SELF._Header.Exceptions:=CASE(L.error_code,
         ConsumerCreditReport_Services.Constants.NO_LEXID_FOUND_CODE => ConsumerCreditReport_Services.Constants.NO_LEXID_FOUND,
         ConsumerCreditReport_Services.Constants.TOO_MANY_SUBJECTS_CODE => ConsumerCreditReport_Services.Constants.TOO_MANY_SUBJECTS,
-        ConsumerCreditReport_Services.Constants.INSUFFICIENT_INPUT_CODE => ConsumerCreditReport_Services.Constants.INSUFFICIENT_INPUT, 
+        ConsumerCreditReport_Services.Constants.INSUFFICIENT_INPUT_CODE => ConsumerCreditReport_Services.Constants.INSUFFICIENT_INPUT,
         DATASET([],iesp.share.t_WsException));
    // no Exceptions generated in case of CONSUMER_ALERT_CODE, results will be suppressed and consumer statements and alerts returned
       SELF.ConsumerStatements:=L.ConsumerStatements;

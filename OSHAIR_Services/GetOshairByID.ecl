@@ -3,7 +3,7 @@
 // TODO: change comments below
 // Assumptions:
 //    only most recent records (for any given abi-number) are used;
-//    contacts are rolled into child dataset, ordered by title-hierarchy; 
+//    contacts are rolled into child dataset, ordered by title-hierarchy;
 //    in rare cases when records (per contact) have different addresses, address is taken from the
 //       "most VIP" contact (actually, all business info is taken from such a record);
 //
@@ -11,23 +11,23 @@
 // The output layout is shared among subreport and search views (it's a little larger than any one of those)
 // =========================================================================================================
 
-IMPORT OSHAIR, OSHAIR_Services, ut, doxie, codes, suppress, census_data, standard;
+IMPORT OSHAIR_Services, ut, doxie, dx_OSHAIR, codes, suppress, census_data, standard;
 
 OUT_REC := OSHAIR_Services.layouts.ReportSearchShared;
- 
+
 EXPORT out_rec GetOshairByID (GROUPED DATASET (OSHAIR_Services.layouts.id) in_ids) := FUNCTION
 
   doxie.MAC_Header_Field_Declare (); // unfortunately: only to get input city name! Should be gone after interfaces are done
 
   // choose best match (for penalties) between postal/vicinity cities
   GetBestCity (string25 vcity, string25 pcity) := MAP (
-    vcity = '' => pcity, 
+    vcity = '' => pcity,
     pcity = '' => vcity,
     ut.StringSimilar (vcity, city_value) <= ut.StringSimilar (pcity, city_value) => vcity, pcity
   );
 
   // Fetch common info, calculating penalty for every record.
-  OUT_REC GetCommonInfo (OSHAIR.Key_OSHAIR_inspection L) := TRANSFORM
+  OUT_REC GetCommonInfo (dx_OSHAIR.key_payload_inspection L) := TRANSFORM
     // As of now activity number is considered always to be an integer, represented by 10-chars string,
     // padded with leading zeros, if needed, so that "12345", "012345" and "0000012345" are the same.
     // TODO: consider creating field with other name (different types)
@@ -35,14 +35,14 @@ EXPORT out_rec GetOshairByID (GROUPED DATASET (OSHAIR_Services.layouts.id) in_id
     SELF.report_id := L.Region_Code + L.Area_Code + L.Office_Code;
 
     // address penalty portion is calculated as minimum of addr1 and addr2 addresses penalty;
-    addr_penalty := doxie.FN_Tra_Penalty_Addr 
+    addr_penalty := doxie.FN_Tra_Penalty_Addr
       (L.predir, L.prim_range, L.prim_name, L.addr_suffix,
-       L.postdir, L.sec_range, 
+       L.postdir, L.sec_range,
        GetBestCity (L.v_city_name, L.p_city_name),
        L.st, L.zip5);
 
 		cname_penalty := doxie.FN_Tra_Penalty_Cname(L.cname);
-		
+
     SELF.penalt := addr_penalty + cname_penalty;
 
     SELF.address.prim_range := l.prim_range;
@@ -76,8 +76,8 @@ EXPORT out_rec GetOshairByID (GROUPED DATASET (OSHAIR_Services.layouts.id) in_id
     SELF.industry_codes.sic_code_desc      := sic_codes[1];
     SELF.industry_codes.secondary_sic_desc := sic_codes[2];
 
-    naics_codes := DATASET ([{'primary', L.NAICS_Code}, {'secondary', L.NAICS_Secondary_Code}, {'inspected', L.NAIC_Inspected}], 
-                             layouts.naics_codes); 
+    naics_codes := DATASET ([{'primary', L.NAICS_Code}, {'secondary', L.NAICS_Secondary_Code}, {'inspected', L.NAIC_Inspected}],
+                             layouts.naics_codes);
     naics_codes_descript := JOIN (naics_codes ((integer) code != 0), codes.Key_NAICS,
                                   keyed (Left.code = Right.naics_code),
                                   transform (layouts.naics_codes, Self.description := Right.naics_description, Self := Left),
@@ -87,7 +87,7 @@ EXPORT out_rec GetOshairByID (GROUPED DATASET (OSHAIR_Services.layouts.id) in_id
     SELF := L;
   END;
 
-  src_fetched := JOIN (in_ids, OSHAIR.Key_OSHAIR_inspection,
+  src_fetched := JOIN (in_ids, dx_OSHAIR.key_payload_inspection,
                    keyed (Left.activity_number = Right.activity_number),
                    GetCommonInfo (Right),
                    KEEP (100)); //

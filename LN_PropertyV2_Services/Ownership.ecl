@@ -154,7 +154,7 @@ export Ownership := module
 			transform(l_norm1, self.address_seq_no:=-1, self.owned:=true, self:=right.hist[1], self:=right),
 			limit(max_owned_per_did, skip)
 		);
-		Suppress.MAC_Suppress(ds_dids_prepulled,ds_dids,apptype,Suppress.Constants.LinkTypes.DID,did);
+		Suppress.MAC_Suppress(ds_dids_prepulled,ds_dids,apptype,Suppress.Constants.LinkTypes.DID,did, isFCRA := isFCRA);
 		
 		
 		// retrieve by address, allowing for the possibility the sec_range in the inputs could be bogus
@@ -253,7 +253,7 @@ export Ownership := module
 		// normalize history, and reduce to just FaresIds we're allowed to use
 		ds_norm			:= normalize(ds_all, left.hist, transform(l_norm2, self:=left, self:=right));
 		ds_fids1		:= ds_norm(ln_fares_id[1] not in input.srcRestrict);	// blacklist FARES, Fidelity, or LnBranded as needed
-		Suppress.MAC_Suppress(ds_fids1,ds_fids2,apptype,,,Suppress.Constants.DocTypes.FaresID,ln_fares_id);
+		Suppress.MAC_Suppress(ds_fids1,ds_fids2,apptype,,,Suppress.Constants.DocTypes.FaresID,ln_fares_id, isFCRA := isFCRA);
 		 
 		
 		ds_additional_sellers := JOIN(ds_fids2,
@@ -334,7 +334,7 @@ export Ownership := module
 		ds_addr3		:= ds_addr3_1 + ds_addr3_2 + ds_addr3_3 + ds_addr3_4;
 		
 		ds_addr3_fids1 := ds_addr3(ln_fares_id[1] not in input.srcRestrict);		// blacklist FARES, Fidelity, or LnBranded as needed
-		Suppress.MAC_Suppress(ds_addr3_fids1,ds_addr3_fids2,apptype,,,Suppress.Constants.DocTypes.FaresID,ln_fares_id);
+		Suppress.MAC_Suppress(ds_addr3_fids1,ds_addr3_fids2,apptype,,,Suppress.Constants.DocTypes.FaresID,ln_fares_id,isFCRA := isFCRA);
 
 		tmp_addr3_own_s	:= sort(ds_addr3_fids2(owned), address_seq_no, ln_fares_id[2], -doxie_ln.get_LNFirst(ln_fares_id), -ln_fares_id[3..], record);
 		tmp_addr3_own_d	:= dedup(tmp_addr3_own_s, address_seq_no, ln_fares_id[2]);

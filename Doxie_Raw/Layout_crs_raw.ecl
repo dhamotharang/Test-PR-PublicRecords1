@@ -36,7 +36,7 @@ export Layout_crs_raw := record, maxlength(doxie_crs.maxlength_report)
   dataset(Doxie_crs.layout_pilot_records) pilot_child;
   dataset(Doxie_crs.layout_pilot_cert_records) pilotCert_child;
   dataset(Doxie_crs.layout_watercraft_report) watercraft_child;
-  dataset(UCCv2_services.Legacy.layout_raw) ucc_child;
+  dataset(UCCv2_services.layout_legacy.raw_rec) ucc_child;
   dataset(UCCv2_services.layout_ucc_rollup_src) ucc_v2_child;
   dataset(doxie_crs.layout_corp_affiliations_records) corpAffil_child;
   dataset(Doxie_crs.layout_whois) whoIs_child;

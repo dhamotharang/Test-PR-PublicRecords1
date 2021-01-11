@@ -1,4 +1,4 @@
-﻿EXPORT UI_PSI_Compare_Macro(unique_field, new_input_file_records, old_input_file_records, new_Tag, old_Tag) := FUNCTIONMACRO
+﻿EXPORT UI_PSI_Compare_Macro(unique_field, new_input_file_records, old_input_file_records, new_Tag, old_Tag,email_list) := FUNCTIONMACRO
 
 
 		aa1:=join(new_input_file_records, old_input_file_records,left.#expand(unique_field)=right.#expand(unique_field),inner);
@@ -156,6 +156,16 @@
 		
 		final_PSI_output:=choosen(sort(dedup_jn,attribute,distribution_type,attribute_value),all);	
 		
-	  RETURN final_PSI_output;					
+	  //RETURN final_PSI_output;					
+
+result1:=STD.System.Email.SendEmail(email_list, 'KAT Notification',  'Your compare job has kicked-off. Your WUID is ' + workunit + ' .');
+
+// result2:=output(final_PSI_output);
+
+result3:=STD.System.Email.SendEmail(email_list, 'KAT Notification',  'Your compare job has completed. Your WUID is ' + workunit + ' .' + '\n You can see the results here. \n http://alawqpnc018.risk.regn.net/KAT/ ');
+
+seq:=sequential(result1,output(final_PSI_output), result3);
+
+RETURN seq;
 							
 ENDMACRO;

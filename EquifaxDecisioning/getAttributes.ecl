@@ -1,31 +1,33 @@
 ﻿IMPORT $,autoHeaderV2,AutoStandardI,doxie,EquifaxDecisioning,
-       Gateway,iesp,riskwisefcra,Suppress; 
+       Gateway,iesp,riskwisefcra,Suppress;
 
-EXPORT getAttributes (DATASET(doxie.layout_best) infile, 
+boolean isFCRA := true;
+
+EXPORT getAttributes (DATASET(doxie.layout_best) infile,
                       DATASET(Gateway.Layouts.Config) gateways,
                       BOOLEAN gw_Requested,
                       STRING  in_DataPermissionMask,
                       BOOLEAN suppress_due_alerts = FALSE,
                       STRING32 ApplicationType_in = Suppress.Constants.ApplicationTypes.DEFAULT
-                     ) := 
+                     ) :=
       FUNCTION
         dataPermissionTempMod := MODULE( AutoStandardI.DataPermissionI.params )
                                          EXPORT dataPermissionMask := in_dataPermissionMask;
 		                                     END;
-        
-        hasEquifaxAccess := AutoStandardI.DataPermissionI.val(dataPermissionTempMod).use_EquifaxAcctDecisioning;     
+
+        hasEquifaxAccess := AutoStandardI.DataPermissionI.val(dataPermissionTempMod).use_EquifaxAcctDecisioning;
         _rowInf := infile[1];
 
         ssn2send := IF(LENGTH(TRIM(_rowInf.ssn_unmasked,LEFT,RIGHT)) = 9,
                        _rowInf.ssn_unmasked,
                        _rowInf.ssn);
-                       
+
         fnamelnamePopulated := _rowInf.fname != '' AND _rowInf.lname != '';
         minAddressPopulated := _rowInf.prim_range != '' AND
                                _rowInf.prim_name != '' AND
                                _rowInf.city_name != '' AND
                                _rowInf.st != '';
-                            
+
         BOOLEAN pMakeGatewayCall := gw_Requested AND
                                     hasEquifaxAccess AND
                                     _rowInf.did != 0 AND
@@ -33,12 +35,12 @@ EXPORT getAttributes (DATASET(doxie.layout_best) infile,
                                     minAddressPopulated;
 
         iesp.equifax_attributes.t_EquifaxAttributesRequest xfm_populateEqfAcctDecSearch() :=
-          TRANSFORM				
+          TRANSFORM
             SELF.SearchBy.Name.Prefix := _rowInf.title;
             SELF.SearchBy.Name.First := _rowInf.fname;
             SELF.SearchBy.Name.Middle := _rowInf.mname;
             SELF.SearchBy.Name.Last := _rowInf.lname;
-            SELF.SearchBy.Name.Suffix := _rowInf.name_suffix; 
+            SELF.SearchBy.Name.Suffix := _rowInf.name_suffix;
             SELF.SearchBy.Address.HouseNumber := _rowInf.prim_range;
             SELF.SearchBy.Address.Quadrant := _rowInf.postdir;
             SELF.SearchBy.Address.StreetName := _rowInf.prim_name;
@@ -53,20 +55,20 @@ EXPORT getAttributes (DATASET(doxie.layout_best) infile,
             SELF.SearchBy.EndUser.PermisablePurpose := $.Constants.GATEWAY_END_USER_PERMISABLE_PURPOSE;
             SELF.SearchBy.Models := DATASET([{$.Constants.GATEWAY_MODEL_NUMBER,'',''}],iesp.equifax_sts.t_EqSTSModel);
             SELF := [];  // gateway params
-          END;																
-        
+          END;
+
         gatewayInput := DATASET([xfm_populateEqfAcctDecSearch()]);
-        
+
         ds_gatewayConfig := gateways(Gateway.Configuration.IsEquifaxAcctDecisioning(serviceName))[1];
-        gatewayOutput := Gateway.SoapCall_EquifaxDecisioning(gatewayInput,ds_gatewayConfig,pMakeGatewayCall):INDEPENDENT; 
+        gatewayOutput := Gateway.SoapCall_EquifaxDecisioning(gatewayInput,ds_gatewayConfig,pMakeGatewayCall):INDEPENDENT;
         gatewayResp := gatewayOutput[1].Response;
         _rowGw := gatewayResp.Report;
-        
+
         // FCRA URL needed for the remote header search
         gateway_check := gateways (servicename IN riskwisefcra.Neutral_Service_Name)[1].url;
         STRING remote_ip := IF (gateway_check='', ERROR (301, doxie.ErrorCodes(301)), gateway_check);
-        
-        AutoHeaderV2.layouts.unprocessed_input xfm_intoGetDidLayout(iesp.equifax_attributes.t_EquifaxAttributesReport l) := 
+
+        AutoHeaderV2.layouts.unprocessed_input xfm_intoGetDidLayout(iesp.equifax_attributes.t_EquifaxAttributesReport l) :=
           TRANSFORM
             useGatewayDOB := LENGTH(TRIM(l.EquifaxHeader.DateOfBirthOrAge,LEFT,RIGHT)) = 8;
 
@@ -88,13 +90,13 @@ EXPORT getAttributes (DATASET(doxie.layout_best) infile,
           END;
 
         ds_gatewayRecToGetDid := DATASET([xfm_intoGetDidLayout(_rowGw)]);
-        ds_gatewayRecDid := AutoHeaderV2.get_dids(ds_gatewayRecToGetDid,,FALSE); 
-        
+        ds_gatewayRecDid := AutoHeaderV2.get_dids(ds_gatewayRecToGetDid,,FALSE,,isFCRA);
+
         useGatewayResults := ds_gatewayRecDid[1].DID = _rowInf.DID;
 
-       $.Layouts.Eq_DecisioningAttr xfm_getValidOutput (iesp.equifax_attributes.t_EquifaxAttributes gw_attributes) := 
+       $.Layouts.Eq_DecisioningAttr xfm_getValidOutput (iesp.equifax_attributes.t_EquifaxAttributes gw_attributes) :=
           TRANSFORM
-            SELF.EQUIFAX_GATEWAY_USAGE :=  $.Constants.EQUIFAX_GATEWAY_USAGE.RESULTS_RETURNED;  
+            SELF.EQUIFAX_GATEWAY_USAGE :=  $.Constants.EQUIFAX_GATEWAY_USAGE.RESULTS_RETURNED;
             BalOpenAutoAcctsWithin3MonthsRaw :=  $.Functions.getAttributeValue(gw_attributes, $.Constants.ATTRIBUTE_TYPES.BAL_OPEN_AUTO_3MONTHS);
             BalOpenMortgageAcctsWithin3MonthsRaw := $.Functions.getAttributeValue(gw_attributes, $.Constants.ATTRIBUTE_TYPES.BAL_OPEN_MORT_3MONTHS);
             BalOpenHomeEquityLineAcctsWithin3MonthsRaw :=  $.Functions.getAttributeValue(gw_attributes, $.Constants.ATTRIBUTE_TYPES.BAL_OPEN_HOME_EQ_3MONTHS);
@@ -121,22 +123,22 @@ EXPORT getAttributes (DATASET(doxie.layout_best) infile,
             SELF.NumberOfThirdPartyCollectionsVal := $.Functions.fn_processNum3rdParty(NumberOfThirdPartyCollectionsRaw);
             SELF.Equifax_gateway_usage_Status := '';
           END;
-        
+
         ds_resultsToReturn := DATASET([xfm_getValidOutput(_rowGw.Attributes[1])]);
-        
-        ds_GatewayResultsToReturn := 
+
+        ds_GatewayResultsToReturn :=
           MAP(~gw_Requested =>
                  $.Functions.fn_formatGatewayUsageOutput($.Constants.EQUIFAX_GATEWAY_USAGE.GATEWAY_NOT_REQUESTED),
-              ~pMakeGatewayCall OR ~hasEquifaxAccess OR suppress_due_alerts => 
+              ~pMakeGatewayCall OR ~hasEquifaxAccess OR suppress_due_alerts =>
                  $.Functions.fn_formatGatewayUsageOutput($.Constants.EQUIFAX_GATEWAY_USAGE.GATEWAY_NOT_CALLED),
               $.Functions.fn_checkGwError(gatewayResp) =>
                  $.Functions.fn_formatGatewayUsageOutput($.Constants.EQUIFAX_GATEWAY_USAGE.GATEWAY_ERROR_RETURNED, gatewayResp),
-              ~EXISTS(_rowGw.Attributes) => 
+              ~EXISTS(_rowGw.Attributes) =>
                  $.Functions.fn_formatGatewayUsageOutput($.Constants.EQUIFAX_GATEWAY_USAGE.NO_GATEWAY_ATTRIBUTES_RETURNED),
               ~useGatewayResults =>
                  $.Functions.fn_formatGatewayUsageOutput($.Constants.EQUIFAX_GATEWAY_USAGE.NO_DID_MATCH),
                  ds_resultsToReturn
               );
-              
-       RETURN ds_GatewayResultsToReturn; 
-     END; 
+
+       RETURN ds_GatewayResultsToReturn;
+     END;

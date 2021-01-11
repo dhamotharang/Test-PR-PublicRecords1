@@ -71,6 +71,7 @@
       EXPORT STRING NoRoyaltySources   := 'NOROYALTY';
       EXPORT STRING Emailv2serviceBasic := 'basic';
       EXPORT STRING Emailv2servicePremium := 'premium';
+			EXPORT BOOLEAN  KeepUndeliverableEmail:=FALSE;
 			EXPORT STRING5 IndustryClass := '';
 			EXPORT BOOLEAN ReturnDetailedRoyalties := TRUE;
 			EXPORT BOOLEAN AllowNickNames:= FALSE;
@@ -209,7 +210,7 @@
 		Export Searchtype:='EAA';
 	 end;	
 
-		//Star rate, intended to replace phones confidence score (High, Middle, Low)
+   	//Star rate, intended to replace phones confidence score (High, Middle, Low)
 		EXPORT ConfidenceStarRateMod:= MODULE
 			EXPORT STRING6 Low:= '3 Star';
 			EXPORT STRING6 Mid:= '4 Star';

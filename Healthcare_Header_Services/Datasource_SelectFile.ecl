@@ -321,7 +321,7 @@
 																		self.FullDesc := if(trim(left.sanc1_desc,right)<>'',left.sanc1_desc,right.desc);
 																		self.SancLevel := if(RIGHT.level='STATE','',RIGHT.level);
 																		self.StateOrFederal := if(left.level='STATE','STATE','FEDERAL');
-																		self.SancLossOfLic := if((integer)left.ln_derived_rein_date>0,'FALSE',right.LossOfLicense);
+																		self.SancLossOfLic := right.LossOfLicense;
 																		self:=left;
 																		self:=[]),
 											keep(Healthcare_Header_Services.Constants.MAX_RECS_ON_JOIN), limit(0), left outer); 

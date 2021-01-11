@@ -74,7 +74,7 @@ EXPORT getDidVilleRecords(iesp.person_picklist.t_PersonPickListRequest srchReq,
 	srchResp:=PROJECT(ds_didville_out,TRANSFORM(iesp.person_picklist.t_PersonPickListResponse,
 		didScoreRec:={UNSIGNED score,UNSIGNED did};
 		ds_did_score:=PROJECT(LEFT.result,TRANSFORM(didScoreRec,SELF.score:=(UNSIGNED)LEFT.score,SELF.did:=(UNSIGNED)LEFT.did));
-		Suppress.MAC_Suppress(ds_did_score,ds_recs,dv_mod.application_type,Suppress.Constants.LinkTypes.DID,did);
+		Suppress.MAC_Suppress(ds_did_score,ds_recs,dv_mod.application_type,Suppress.Constants.LinkTypes.DID,did, isFCRA := true);
 		rec:=SORT(ds_recs,-score,did)[1];
 		DID_NOT_FOUND:=rec.did=0;
 		DIDS_BELOW_THRESHOLD:=COUNT(ds_recs)>1 AND rec.score<did_score_threshold;

@@ -149,9 +149,10 @@ EXPORT resultFmt := module
 			boolean isFCRA = false,
 			dataset (FFD.Layouts.PersonContextBatchSlim) slim_pc_recs = FFD.Constants.BlankPersonContextBatchSlim,
 			integer8 inFFDOptionsMask = 0,
-			dataset (FCRA.Layout_override_flag) ds_flags = FCRA.compliance.blank_flagfile
+			dataset (FCRA.Layout_override_flag) ds_flags = FCRA.compliance.blank_flagfile,
+   boolean includeBlackKnight = false
 		) := FUNCTION
-			    tmp := LN_PropertyV2_Services.fn_get_report(in_sids,,,,nonSS,isFCRA, slim_pc_recs, inFFDOptionsMask, ds_flags);
+			    tmp := LN_PropertyV2_Services.fn_get_report(in_sids,,,,nonSS,isFCRA, slim_pc_recs, inFFDOptionsMask, ds_flags, includeBlackKnight);
 			    xform(tmp, results, l_tmp, l_narrow, l_assess_narrow, l_deeds_narrow);
 		      return results;
 		end;

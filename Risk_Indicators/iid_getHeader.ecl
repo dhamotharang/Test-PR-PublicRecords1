@@ -374,7 +374,7 @@ self := left;
 // original filtering	
 // ======================================================
 real_header1 := join(g_inrec, real_header_nodate_filtering, 
-	left.seq=right.seq and 
+	left.seq=right.seq and left.did=right.did and
  RIGHT.h.dt_first_seen < left.historydate and // check dt_first_seen 
 (right.h.dt_vendor_first_reported < left.historydate or (isFCRA and right.h.src=mdr.sourcetools.src_Experian_Credit_Header)), // check vendor date (EN vendor dates are always recent because of full refresh, so that source is exception to this rule
 transform(Layout_Header_Data,
@@ -388,7 +388,7 @@ left outer );
 // new filter by ingest date
 // ======================================================
 real_header2 := join(g_inrec, real_header_with_ingestdate_appended, 
-	left.seq=right.seq and 
+	left.seq=right.seq and left.did=right.did and
 (
 (right.first_ingest_date<>0 and right.first_ingest_date < (unsigned)((string)left.historydate + '01') ) or
 (right.first_ingest_date=0 and right.h.dt_first_seen < left.historydate and right.h.dt_vendor_first_reported < left.historydate) // use old logic if ingest_date=0
@@ -1015,8 +1015,8 @@ risk_indicators.iid_constants.layout_outx getHeader(Layout_working le) := TRANSF
 	CIVaddrmatch := risk_indicators.iid_constants.ga(max(CIVaddrmatchcap1, CIVaddrmatchcap2, CIVaddrmatchcap3)) and if(ExactAddrRequired, le.prim_range=le.h.prim_range and le.prim_name=le.h.prim_name  and 
 									ut.nneq(le.sec_range,le.h.sec_range), true);
 	
-	isCurrentOccupant := addrmatch and dt_last >= risk_indicators.iid_constants.MonthRollback((string)le.historydate,CURRENT_OCCUPANT_MONTHS);
-	isEverOccupant    := addrmatch and ever_start_months - ever_past_months <= ut.Date_YYYYMM_i2(((string)dt_last)[1..6])
+	isCurrentOccupant := le.score >= 40 AND addrmatch and dt_last >= risk_indicators.iid_constants.MonthRollback((string)le.historydate,CURRENT_OCCUPANT_MONTHS);
+	isEverOccupant    := le.score >= 40 AND addrmatch and ever_start_months - ever_past_months <= ut.Date_YYYYMM_i2(((string)dt_last)[1..6])
 											 and ever_start_months >= ut.Date_YYYYMM_i2(((string)dt_first)[1..6]);
 
 	currOccFlag := risk_indicators.iid_constants.SetFlag( risk_indicators.iid_constants.IIDFlag.CurrentOccupant, isCurrentOccupant );
@@ -1625,8 +1625,8 @@ risk_indicators.iid_constants.layout_outx GetFakeHeaderRecords (Risk_Indicators.
 																																						(le.in_city=ri.city_name and le.in_state=ri.st) or (le.p_city_name=ri.city_name and le.st=ri.st)) and
 																																					ut.nneq(le.sec_range,ri.sec_range), true);
 
-	isCurrentOccupant := addrmatch and ri.dt_last_seen >= risk_indicators.iid_constants.MonthRollback((string)le.historydate,CURRENT_OCCUPANT_MONTHS);
-	isEverOccupant    := addrmatch and ever_start_months - ever_past_months <= ut.Date_YYYYMM_i2((string6)ri.dt_last_seen)
+	isCurrentOccupant := le.score >= 40 AND addrmatch and ri.dt_last_seen >= risk_indicators.iid_constants.MonthRollback((string)le.historydate,CURRENT_OCCUPANT_MONTHS);
+	isEverOccupant    := le.score >= 40 AND addrmatch and ever_start_months - ever_past_months <= ut.Date_YYYYMM_i2((string6)ri.dt_last_seen)
 		and ever_start_months >= ut.Date_YYYYMM_i2((string6)ri.dt_first_seen);
 
 
@@ -1806,10 +1806,12 @@ j_header := IF (isFCRA, j_combined, prison);
 // output(unCorrOnly, named('unCorrOnly'));
 // output(finalCorr, named('finalCorr'));
 // output(finalCorr2, named('finalCorr2'));
-// output(header_recs, named('header_recs'));	//ZZZ
+ //output(header_recs, named('header_recs'));	//ZZZ
 	
 // OUTPUT(tranHeader, NAMED('tranHeader'));
-// OUTPUT(j_header, named('j_header'));
+ //OUTPUT(all_corrections1,NAMED('all_corrections1'));
+
+ // OUTPUT(j_header, named('j_header'));
 // OUTPUT(j_combined, named('j_combined'));
 // OUTPUT(tranHeader, named('GHtranHeader'));	//ZZZ
 // OUTPUT(j_corrections, named('GHj_corrections'));	//ZZZ

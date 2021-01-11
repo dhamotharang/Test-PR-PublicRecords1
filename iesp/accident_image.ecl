@@ -41,6 +41,7 @@ end;
 		
 export t_AccidentImageResponse := record
 	string Source {xpath('Source')};
+	string ErrorMessage {xpath('ErrorMessage'), maxlength(iesp.Constants.Retrieve_Image.MaxSoapErrorSize)};
 	string ImageData {xpath('ImageData'), maxlength(iesp.Constants.Retrieve_Image.MaxImageSize)}; // Xsd type: base64Binary
 end;
 		

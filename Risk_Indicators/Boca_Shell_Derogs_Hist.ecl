@@ -1,4 +1,4 @@
-﻿import doxie_files, ut, liensv2, riskwise, property, bankruptcyv3, risk_indicators, MDR, doxie, Suppress;
+﻿import doxie_files, ut, liensv2, riskwise, dx_property, bankruptcyv3, risk_indicators, MDR, doxie, Suppress;
 
 export Boca_Shell_Derogs_Hist (GROUPED DATASET(risk_indicators.layouts.layout_derogs_input) ids, integer bsversion, doxie.IDataAccess mod_access = MODULE (doxie.IDataAccess) END) := FUNCTION
 															 
@@ -8,8 +8,8 @@ bans_search := BankruptcyV3.key_bankruptcyv3_search_full_bip();
 kld			:= liensv2.key_liens_DID;
 klr_nonFCRA	:= liensv2.key_liens_party_id;
 koff_nonFCRA	:= doxie_files.key_offenders_risk;
-kford 		:= property.key_foreclosure_did;
-kforf		:= property.key_foreclosures_fid;
+kford 		:= dx_Property.Key_Foreclosure_DID;
+kforf		:= dx_Property.Key_Foreclosures_FID;
 
 checkDays(string8 d1, string8 d2, unsigned2 days) := ut.DaysApart(d1,d2) <= days and d1>d2;
 

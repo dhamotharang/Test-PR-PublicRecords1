@@ -1,14 +1,12 @@
-﻿/*--SOAP--
-<message name="SearchServiceFCRA">
-	<part name="did"                 type="xsd:string"/>
- 	<part name="gateways" type="tns:XmlDataSet" cols="70" rows="4"/>
-  <part name="FcraAircraftSearchRequest" type="tns:XmlDataSet" cols="80" rows="30" />
+﻿// =====================================================================
+// ROXIE QUERY
+// -----------
+// For the complete list of input parameters please check published WU.
+// Look at the history of this attribute for the old SOAP info.
+// =====================================================================
 
-</message>
-*/
-/*--INFO-- Returns FAA Aircraft Search records.*/
-
-// so in general approach is 
+// Returns FAA Aircraft Search records.
+// so in general approach is
 // 1.  define input attrs from interfaces or via direct call to :STORED
 // 2.  using input attrs get ids
 // 3. filter ids
@@ -26,7 +24,7 @@ export SearchServiceFCRA := macro
     ds_in := DATASET ([], rec_in) : STORED ('FcraAircraftSearchRequest', FEW);
 	  first_row := ds_in[1] : independent;
     //set options
-		
+
 		iesp.ECL2ESP.SetInputBaseRequest (first_row);
     iesp.ECL2ESP.Marshall.Mac_Set (first_row.options);
 
@@ -34,7 +32,7 @@ export SearchServiceFCRA := macro
 	 search_by := global (first_row.SearchBy);
    iesp.ECL2ESP.SetInputReportBy (ROW (first_row.searchBy, transform (iesp.bpsreport.t_BpsReportBy, Self := Left, Self := [])));
    iesp.ECL2ESP.SetInputSearchOptions (first_row.options);
-	 
+
 	//soap call for remote DIDs
 	//------------------------------------------------------------------------------------
 	//Hack to skip a soapcall if DID is the input and just DID info was requested.
@@ -50,76 +48,15 @@ export SearchServiceFCRA := macro
 		  export integer8 FFDOptionsMask := FFD.FFDMask.Get(first_row.options.FFDOptionsMask);
 		  export integer FCRAPurpose := FCRA.FCRAPurpose.Get(first_row.options.FCRAPurpose);
 		end;
-		
+
 		recs := FaaV2_Services.SearchService_Records.fcra_val(tempmod);
-				
+
 	  input_consumer := FFD.MAC.PrepareConsumerRecord(rdid, true, search_by);
 
  		iesp.ECL2ESP.Marshall.MAC_Marshall_Results(recs.Records, results, iesp.faaaircraft_Fcra.t_FcraAircraftSearchResponse);
-   	
+
 		FFD.MAC.AppendConsumerAlertsAndStatements(results, results_out, recs.Statements, recs.ConsumerAlerts, input_consumer, iesp.faaaircraft_Fcra.t_FcraAircraftSearchResponse);
 
 	  output(results_out, named('Results'));
 
 	endmacro;
-   // SearchServiceFCRA();
-/*
-<AircraftSearchRequest>
-<row>
-<User>
-  <ReferenceCode></ReferenceCode>
-  <BillingCode></BillingCode>
-  <QueryId></QueryId>
-  <GLBPurpose></GLBPurpose>
-  <DLPurpose></DLPurpose>
-  <EndUser>
-    <CompanyName></CompanyName>
-    <StreetAddress1></StreetAddress1>
-    <City></City>
-    <State></State>
-    <Zip5></Zip5>
-  </EndUser>
-  <MaxWaitSeconds></MaxWaitSeconds>
-</User>
-
-<SearchBy>
-  <CompanyName></CompanyName>
-  <AircraftNumber></AircraftNumber>
-  <Name>
-    <Full></Full>
-    <First></First>
-    <Middle></Middle>
-    <Last></Last>
-    <Suffix></Suffix>
-    <Prefix></Prefix>
-  </Name>
-  <Address>
-    <StreetName></StreetName>
-    <StreetNumber></StreetNumber>
-    <StreetPreDirection></StreetPreDirection>
-    <StreetPostDirection></StreetPostDirection>
-    <StreetSuffix></StreetSuffix>
-    <UnitDesignation></UnitDesignation>
-    <UnitNumber></UnitNumber>
-    <StreetAddress1></StreetAddress1>
-    <StreetAddress2></StreetAddress2>
-    <State></State>
-    <City></City>
-    <Zip5></Zip5>
-    <Zip4></Zip4>
-    <County></County>
-    <PostalCode></PostalCode>
-    <StateCityZip></StateCityZip>
-  </Address>
-</SearchBy>
-<Options>
-  <ReturnCount>10</ReturnCount>
-  <StartingRecord>1</StartingRecord>
-  <UseNicknames>1</UseNicknames>
-  <IncludeAlsoFound>0</IncludeAlsoFound>
-  <UsePhonetics>0</UsePhonetics>
-  <StrictMatch>0</StrictMatch>
-</Options>
-</row>
-</AircraftSearchRequest>
-*/

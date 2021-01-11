@@ -1,13 +1,13 @@
 IMPORT liensv2, BatchShare;
 
-export layout_liens_case_extended := RECORD
-  string8 filing_date;
-	liensv2.Layout_liens_main_module .layout_liens_main.filing_number;
-	string20 filing_type_desc;
-	liensv2_services.layout_lien_case;
-	typeof(BatchShare.Layouts.ShareAcct.acctno) acctno := '';
-	string agency_state :='';   // bug 34534 -- needed for additional jurisdictional filtering
-	Boolean bcbflag := false;
-	string case_link_id := '';
-	unsigned case_link_priority := 0;
-end;
+EXPORT layout_liens_case_extended := RECORD
+  STRING8 filing_date;
+  liensv2.Layout_liens_main_module .layout_liens_main.filing_number;
+  STRING20 filing_type_desc;
+  liensv2_services.layout_lien_case;
+  TYPEOF(BatchShare.Layouts.ShareAcct.acctno) acctno := '';
+  STRING agency_state :=''; // bug 34534 -- needed for additional jurisdictional filtering
+  BOOLEAN bcbflag := FALSE;
+  STRING case_link_id := '';
+  UNSIGNED case_link_priority := 0;
+END;

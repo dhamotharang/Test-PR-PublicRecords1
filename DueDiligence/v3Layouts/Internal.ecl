@@ -73,6 +73,8 @@ EXPORT Internal := MODULE
       STRING9 fein;
       STRING10 phone;
       Address;
+      STRING8 sicCode;
+      STRING6 naicsCode;
     END;
     
     EXPORT beoTitles := RECORD
@@ -99,6 +101,19 @@ EXPORT Internal := MODULE
       UNSIGNED6 numAircraft;	
     END;
     
+    EXPORT LinkedBusiness := RECORD
+      UNSIGNED6 inquiredBusiness;
+      SlimBusiness;
+      UNSIGNED numBEOs;
+      UNSIGNED numDIDlessBEOs;
+      STRING2 industryType;
+      STRING2 shellShelf; 
+      STRING2 validity; 
+      STRING2 stability;
+      STRING2 stateLegalEvent;
+      STRING2 civilLegalEvent;
+    END;
+    
     
     EXPORT BusinessTemp := RECORD
       UNSIGNED6 seq;
@@ -109,6 +124,7 @@ EXPORT Internal := MODULE
       BOOLEAN validBusiness;
       UNSIGNED1 lexIDScore;
       DATASET(SlimExec) beos {MAXCOUNT(iesp.Constants.DDRAttributesConst.MaxBusinessExecs)};
+      // DATASET(LinkedBusiness) linkedBusinesses {MAXCOUNT(iesp.Constants.DDRAttributesConst.MaxLinkedBusinesses)};
       DATASET(iesp.duediligencebusinessreport.t_DDRBusinessExecutiveCriminalEvents) beoCrimReport {MAXCOUNT(iesp.constants.DDRAttributesConst.MaxLegalEvents)};
     END;
 

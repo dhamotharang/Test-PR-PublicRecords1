@@ -1,7 +1,7 @@
-﻿IMPORT Address, Advo_Services, Autokey_batch, CriminalRecords_BatchService, DriversV2, DriversV2_Services, dx_PhonesInfo,
-  FraudShared_Services, Gateway, risk_indicators, RiskIntelligenceNetwork_Services, ut;
+﻿IMPORT Address, Advo_Services, AppendIpMetadata, Autokey_batch, BatchServices, CriminalRecords_BatchService, DriversV2, DriversV2_Services, dx_PhonesInfo,
+  FraudShared_Services, Gateway, risk_indicators, RiskIntelligenceNetwork_Services, Std, ut;
 
-EXPORT fn_GetPubRecordAppends(DATASET(FraudShared_Services.Layouts.BatchIn_rec) ds_in,
+EXPORT fn_GetPubRecordAppends(DATASET(FraudShared_Services.Layouts.BatchInExtended_rec) ds_in,
                               RiskIntelligenceNetwork_Services.IParam.Params params) := MODULE
 
  EXPORT GetCriminal() := FUNCTION
@@ -48,7 +48,9 @@ EXPORT fn_GetPubRecordAppends(DATASET(FraudShared_Services.Layouts.BatchIn_rec) 
   ds_prepaidphone := JOIN(ds_in, dx_PhonesInfo.Key_Phones_Type,
                       KEYED(LEFT.phoneno = RIGHT.phone) AND
                       RIGHT.prepaid = RiskIntelligenceNetwork_Services.Constants.PREPAID_VALUE,
-                      TRANSFORM(RIGHT),
+                      TRANSFORM(RiskIntelligenceNetwork_Services.Layouts.prepaid_phone_layout,
+                        SELF.acctno := LEFT.acctno,
+                        SELF := RIGHT),
                      LIMIT(RiskIntelligenceNetwork_Services.Constants.MAX_JOIN_LIMIT));
   return ds_prepaidphone;
  END;
@@ -73,7 +75,7 @@ EXPORT fn_GetPubRecordAppends(DATASET(FraudShared_Services.Layouts.BatchIn_rec) 
 
  EXPORT GetBocaShell := FUNCTION
 
-  risk_indicators.Layout_Input tFormat2IIDIn(FraudShared_Services.Layouts.BatchIn_rec L)	:= TRANSFORM
+  risk_indicators.Layout_Input tFormat2IIDIn(FraudShared_Services.Layouts.BatchInExtended_rec L)	:= TRANSFORM
    self.score := if(L.did != 0,100,0);
    self.in_StreetAddress :=	L.addr;
    self.in_city := L.p_city_name;
@@ -156,6 +158,76 @@ EXPORT fn_GetPubRecordAppends(DATASET(FraudShared_Services.Layouts.BatchIn_rec) 
                                                     DataRestriction	:= params.DataRestrictionMask,
                                                     DataPermission := params.DataPermissionMask);
   return ungroup(dBocaShell);
+ END;
+
+ EXPORT GetIPMetaData := Function
+  slim_ip_rec := RECORD
+    string20 acctno;
+    string25 ip_address;
+  END;
+  
+  slim_ip_in := PROJECT(ds_in, TRANSFORM(slim_ip_rec, SELF := LEFT));
+  raw_ipmetadata := AppendIpMetadata.macAppendIPMetadata(slim_ip_in,ip_address); 
+  ds_IPMetaData := PROJECT(raw_ipmetadata, TRANSFORM(BatchServices.IP_Metadata_Layouts.batch_out, 
+                                              SELF.acctno := LEFT.acctno,
+                                              SELF.ip_address := LEFT.ip_address,
+                                              SELF.ip_rng_beg := LEFT.iprngbeg,
+                                              SELF.ip_rng_end := LEFT.iprngend,
+                                              SELF.edge_country := LEFT.edgecountry,
+                                              SELF.edge_region := LEFT.edgeregion,
+                                              SELF.edge_city := LEFT.edgecity,
+                                              SELF.edge_conn_speed := LEFT.edgeconnspeed,
+                                              SELF.edge_metro_code := LEFT.edgemetrocode,
+                                              SELF.edge_latitude := LEFT.edgelatitude,
+                                              SELF.edge_longitude := LEFT.edgelongitude,
+                                              SELF.edge_postal_code := LEFT.edgepostalcode,
+                                              SELF.edge_country_code := LEFT.edgecountrycode,
+                                              SELF.edge_region_code := LEFT.edgeregioncode,
+                                              SELF.edge_city_code := LEFT.edgecitycode,
+                                              SELF.edge_continent_code := LEFT.edgecontinentcode,
+                                              SELF.edge_two_letter_country := LEFT.edgetwolettercountry,
+                                              SELF.edge_internal_code := LEFT.edgeinternalcode,
+                                              SELF.edge_area_codes := LEFT.edgeareacodes,
+                                              SELF.edge_country_conf := LEFT.edgecountryconf,
+                                              SELF.edge_region_conf := LEFT.edgeregionconf,
+                                              SELF.edge_city_conf := LEFT.edgecitycong,
+                                              SELF.edge_postal_conf := LEFT.edgepostalconf,
+                                              SELF.edge_gmt_offset := LEFT.edgegmtoffset,
+                                              SELF.edge_in_dst := LEFT.edgeindst,
+                                              SELF.sic_code := LEFT.siccode,
+                                              SELF.domain_name := LEFT.domainname,
+                                              SELF.isp_name := LEFT.ispname,
+                                              SELF.homebiz_type := LEFT.homebiztype,
+                                              SELF.asn := LEFT.asn,
+                                              SELF.asn_name := LEFT.asnname,
+                                              SELF.primary_lang := LEFT.primarylang,
+                                              SELF.secondary_lang := LEFT.secondarylang,
+                                              SELF.proxy_type := LEFT.proxytype,
+                                              SELF.proxy_description := LEFT.proxydescription,
+                                              SELF.is_an_isp := LEFT.isanisp,
+                                              SELF.company_name := LEFT.companyname,
+                                              SELF.ranks := LEFT.ranks,
+                                              SELF.households := LEFT.households,
+                                              SELF.women := LEFT.women,
+                                              SELF.w18_34 := LEFT.women18to34,
+                                              SELF.w35_49 := LEFT.women35to49,
+                                              SELF.men := LEFT.men,
+                                              SELF.m18_34 := LEFT.men18to34,
+                                              SELF.m35_49 := LEFT.men35to49,
+                                              SELF.teens := LEFT.teens,
+                                              SELF.kids := LEFT.kids,
+                                              SELF.naics_code := LEFT.naicscode,
+                                              SELF.cbsa_code := LEFT.cbsacode,
+                                              SELF.cbsa_title := LEFT.cbsatitle,
+                                              SELF.cbsa_type := LEFT.cbsatype,
+                                              SELF.csa_code := LEFT.csacode,
+                                              SELF.csa_title := LEFT.csatitle,
+                                              SELF.md_code := LEFT.mdcode,
+                                              SELF.md_title := LEFT.mdtitle,
+                                              SELF.organization_name := LEFT.organizationname,
+                                              SELF.orig_acctno := LEFT.acctno));
+  
+  return ds_IPMetaData;
  END;
 
 END;

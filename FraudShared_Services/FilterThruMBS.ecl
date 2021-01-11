@@ -1,4 +1,4 @@
-﻿IMPORT iesp, FraudShared, FraudGovPlatform_Services;
+﻿IMPORT iesp, FraudShared;
 
 EXPORT FilterThruMBS(
   DATASET(FraudShared_Services.Layouts.Raw_Payload_rec) ds_ids,
@@ -93,7 +93,7 @@ EXPORT FilterThruMBS(
     LIMIT(0));
 
 	
-	ds_results := IF(fraud_platform = FraudGovPlatform_Services.Constants.FRAUD_PLATFORM , Include_FraudGov , ds_results_pre);
+	ds_results := IF(fraud_platform = FraudShared_Services.Constants.Platform.FraudGov , Include_FraudGov , ds_results_pre);
 
 	// OUTPUT(ds_ids, named('ds_ids'));
 	// OUTPUT(FdnMasterId_exclude_result, named('FdnMasterId_exclude_result'));

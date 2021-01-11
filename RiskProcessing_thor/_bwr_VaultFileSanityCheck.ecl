@@ -1,5 +1,7 @@
 ﻿//  This script can be run on hthor, doesn't need to wait in line on multi node cluster
 
+// sandbox Vault.Vault.MAC_Remove_Vault_Fields -- comment out this filter in the macro so it runs fast on hthor:  (vault_record_status in [4, 5, 6])
+
 // throw an error here if the controls aren't set correctly for running files on vault
 #WORKUNIT('name', 'Vault RiskView 5.0 Sanity Check ' + 	
 map(
@@ -74,13 +76,13 @@ output(choosen(		BankruptcyV3.key_bankruptcyV3_did(isFCRA := true)	, luckynumber
 output(choosen(		BankruptcyV3.Key_BankruptcyV3_WithdrawnStatus(isFCRA := True)	, luckynumber), named('vault_BankruptcyV3_Key_BankruptcyV3_WithdrawnStatus') );
 output(choosen(		BankruptcyV3.key_bankruptcyv3_search_full_bip(isFCRA := true)	, luckynumber), named('vault_BankruptcyV3_key_bankruptcyv3_search_full_bip') );
 output(choosen(		risk_indicators.key_HRI_Address_To_SIC_filtered_FCRA	, luckynumber), named('vault_risk_indicators_key_HRI_Address_To_SIC_filtered_FCRA') );
-output(choosen(		Gong.Key_FCRA_Business_Header_Phone_Table_Filtered_V2	, luckynumber), named('vault_Gong_Key_FCRA_Business_Header_Phone_Table_Filtered_V2') );
+output(choosen(		dx_Gong.key_phone_table(data_services.data_env.iFCRA)	, luckynumber), named('vault_Gong_Key_FCRA_Business_Header_Phone_Table_Filtered_V2') );
 output(choosen(		RiskWise.Key_CityStZip	, luckynumber), named('vault_RiskWise_Key_CityStZip') );
 output(choosen(		Codes.Key_Codes_V3	, luckynumber), named('vault_Codes_Key_Codes_V3') );
 output(choosen(		doxie_files.Key_Court_Offenses(isFCRA := true)	, luckynumber), named('vault_doxie_files_Key_Court_Offenses') );
 output(choosen(		doxie_files.Key_BocaShell_Crim_FCRA	, luckynumber), named('vault_doxie_files_Key_BocaShell_Crim_FCRA') );
 output(choosen(		misc2.key_dateCorrect_hval	, luckynumber), named('vault_misc2_key_dateCorrect_hval') );
-output(choosen(		Risk_Indicators.Key_ADL_Risk_Table_v4_Filtered	, luckynumber), named('vault_Risk_Indicators_Key_ADL_Risk_Table_v4_Filtered') );
+output(choosen(		risk_indicators.key_FCRA_ADL_Risk_Table_v4_filtered	, luckynumber), named('vault_Risk_Indicators_key_FCRA_ADL_Risk_Table_v4_filtered') );
 output(choosen(		Risk_Indicators.Key_SSN_Table_v4_filtered_FCRA	, luckynumber), named('vault_Risk_Indicators_Key_SSN_Table_v4_filtered_FCRA') );
 output(choosen(		faa.key_aircraft_id(isFCRA := true)	, luckynumber), named('vault_faa_key_aircraft_id') );
 output(choosen(		faa.key_aircraft_did(isFCRA := true)	, luckynumber), named('vault_faa_key_aircraft_did') );
@@ -95,14 +97,14 @@ output(choosen(		dx_header.key_addr_hist(data_services.data_env.iFCRA)	, luckynu
 output(choosen(		dx_Header.Key_Header_Address(data_services.data_env.iFCRA)	, luckynumber), named('vault_dx_header_Key_FCRA_Header_Address') );
 output(choosen(		dx_Header.Key_Header(data_services.data_env.iFCRA)	, luckynumber), named('vault_dx_header_Key_FCRA_Header') );
 output(choosen(		dx_Header.Key_max_dt_last_seen(data_services.data_env.iFCRA)	, luckynumber), named('vault_dx_header_Key_FCRA_max_dt_last_seen') );
-output(choosen(		fcra_opt_out.key_address	, luckynumber), named('vault_fcra_opt_out_key_address') );
-output(choosen(		fcra_opt_out.key_did	, luckynumber), named('vault_fcra_opt_out_key_did') );
-output(choosen(		fcra_opt_out.key_ssn	, luckynumber), named('vault_fcra_opt_out_key_ssn') );
+output(choosen(		dx_fcra_opt_out.key_address	, luckynumber), named('vault_dx_fcra_opt_out_key_address') );
+output(choosen(		dx_fcra_opt_out.key_did	, luckynumber), named('vault_dx_fcra_opt_out_key_did') );
+output(choosen(		dx_fcra_opt_out.key_ssn	, luckynumber), named('vault_dx_fcra_opt_out_key_ssn') );
 output(choosen(		Risk_Indicators.Key_FCRA_Telcordia_tpm_Slim	, luckynumber), named('vault_Risk_Indicators_Key_FCRA_Telcordia_tpm_Slim') );
 output(choosen(		Census_Data.Key_Fips2County	, luckynumber), named('vault_Census_Data_Key_Fips2County') );
-output(choosen(		Gong.Key_FCRA_History_Address	, luckynumber), named('vault_Gong_Key_FCRA_History_Address') );
-output(choosen(		Gong.Key_FCRA_History_did	, luckynumber), named('vault_Gong_Key_FCRA_History_did') );
-output(choosen(		Gong.Key_FCRA_History_Phone	, luckynumber), named('vault_Gong_Key_FCRA_History_Phone') );
+output(choosen(		dx_Gong.Key_History_Address(data_services.data_env.iFCRA)	, luckynumber), named('vault_Gong_Key_FCRA_History_Address') );
+output(choosen(		dx_Gong.Key_History_did(data_services.data_env.iFCRA)	, luckynumber), named('vault_Gong_Key_FCRA_History_did') );
+output(choosen(		dx_Gong.Key_History_Phone(data_services.data_env.iFCRA)	, luckynumber), named('vault_Gong_Key_FCRA_History_Phone') );
 output(choosen(		header_quick.Key_Did_FCRA	, luckynumber), named('vault_header_quick_Key_Did_FCRA') );
 output(choosen(		InfutorCID.Key_Infutor_DID_FCRA	, luckynumber), named('vault_InfutorCID_Key_Infutor_DID_FCRA') );
 output(choosen(		InfutorCID.Key_Infutor_Phone_FCRA	, luckynumber), named('vault_InfutorCID_Key_Infutor_Phone_FCRA') );

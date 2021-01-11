@@ -70,7 +70,7 @@ EXPORT BRM_Marketing_Attr_Batch_Services() := MACRO
 	UNSIGNED BIPAppend_Weight_Threshold := 0 : STORED('BIPAppendWeightThreshold');
 	BOOLEAN BIPAppend_PrimForce := FALSE : STORED('BIPAppendPrimForce');
 	BOOLEAN BIPAppend_Include_AuthRep := FALSE : STORED('BIPAppendIncludeAuthRep');
-	BOOLEAN BIPAppend_No_ReAppend := TRUE : STORED('BIPAppendNoReAppend');
+	BOOLEAN BIPAppend_No_ReAppend := FALSE : STORED('BIPAppendNoReAppend');
 	BOOLEAN Is_Marketing := TRUE;
 	BOOLEAN is_FCRA := FALSE;
 	BOOLEAN OverrideExperianRestriction := FALSE : STORED('OverrideExperianRestriction');
@@ -103,7 +103,7 @@ EXPORT BRM_Marketing_Attr_Batch_Services() := MACRO
 		EXPORT UNSIGNED DPPAPurpose := DPPA;
 		EXPORT BOOLEAN isFCRA := is_FCRA;
 		EXPORT STRING100 Allowed_Sources := AllowedSources;
-		EXPORT STRING IndustryClass := Industry_Class; // When set to UTILI or DRMKT this restricts Utility data
+		EXPORT STRING5 IndustryClass := Industry_Class; // When set to UTILI or DRMKT this restricts Utility data
 		EXPORT BOOLEAN Override_Experian_Restriction := OverrideExperianRestriction;
 		EXPORT DATA57 KEL_Permissions_Mask := PublicRecords_KEL.ECL_Functions.Fn_KEL_DPMBitmap.Generate(
 			DataRestrictionMask, 
@@ -123,7 +123,7 @@ EXPORT BRM_Marketing_Attr_Batch_Services() := MACRO
                                                 BIPAppend_Score_Threshold = 0 => 75, MIN(MAX(51,BIPAppend_Score_Threshold), 100));		
 		EXPORT UNSIGNED BIPAppendWeightThreshold := BIPAppend_Weight_Threshold;
 		EXPORT BOOLEAN BIPAppendPrimForce := BIPAppend_PrimForce;
-		EXPORT BOOLEAN BIPAppendReAppend := NOT BIPAppend_No_ReAppend;
+		EXPORT BOOLEAN BIPAppendReAppend := /*NOT*/ BIPAppend_No_ReAppend;
 		EXPORT BOOLEAN BIPAppendIncludeAuthRep := BIPAppend_Include_AuthRep;
 		// CCPA Options
 		EXPORT UNSIGNED1 LexIdSourceOptout := _LexIdSourceOptout;
@@ -188,41 +188,41 @@ EXPORT BRM_Marketing_Attr_Batch_Services() := MACRO
 			model_result_4 := ROW( le.ModelResults[4], iesp.business_marketing.t_BRMModelHRI );
 			model_result_5 := ROW( le.ModelResults[5], iesp.business_marketing.t_BRMModelHRI );
 			
-			SELF.Model_1_Name      := model_result_1.name; 
-			SELF.Model_1_Score     := (STRING)model_result_1.Scores[1].Value;
-			SELF.Model_1_RC1       := model_result_1.Scores[1].ScoreReasons[1].ReasonCode;
-			SELF.Model_1_RC2       := model_result_1.Scores[1].ScoreReasons[2].ReasonCode;
-			SELF.Model_1_RC3       := model_result_1.Scores[1].ScoreReasons[3].ReasonCode;
-			SELF.Model_1_RC4       := model_result_1.Scores[1].ScoreReasons[4].ReasonCode;
-			SELF.Model_1_RC5       := model_result_1.Scores[1].ScoreReasons[5].ReasonCode;
-			SELF.Model_2_Name      := model_result_2.name;
-			SELF.Model_2_Score     := (STRING)model_result_2.Scores[1].Value;
-			SELF.Model_2_RC1       := model_result_2.Scores[1].ScoreReasons[1].ReasonCode;
-			SELF.Model_2_RC2       := model_result_2.Scores[1].ScoreReasons[2].ReasonCode;
-			SELF.Model_2_RC3       := model_result_2.Scores[1].ScoreReasons[3].ReasonCode;
-			SELF.Model_2_RC4       := model_result_2.Scores[1].ScoreReasons[4].ReasonCode;
-			SELF.Model_2_RC5       := model_result_2.Scores[1].ScoreReasons[5].ReasonCode;
-			SELF.Model_3_Name      := model_result_2.name;
-			SELF.Model_3_Score     := (STRING)model_result_3.Scores[1].Value;
-			SELF.Model_3_RC1       := model_result_3.Scores[1].ScoreReasons[1].ReasonCode;
-			SELF.Model_3_RC2       := model_result_3.Scores[1].ScoreReasons[2].ReasonCode;
-			SELF.Model_3_RC3       := model_result_3.Scores[1].ScoreReasons[3].ReasonCode;
-			SELF.Model_3_RC4       := model_result_3.Scores[1].ScoreReasons[4].ReasonCode;
-			SELF.Model_3_RC5       := model_result_3.Scores[1].ScoreReasons[5].ReasonCode;
-			SELF.Model_4_Name      := model_result_4.name;
-			SELF.Model_4_Score     := (STRING)model_result_4.Scores[1].Value;
-			SELF.Model_4_RC1       := model_result_4.Scores[1].ScoreReasons[1].ReasonCode;
-			SELF.Model_4_RC2       := model_result_4.Scores[1].ScoreReasons[2].ReasonCode;
-			SELF.Model_4_RC3       := model_result_4.Scores[1].ScoreReasons[3].ReasonCode;
-			SELF.Model_4_RC4       := model_result_4.Scores[1].ScoreReasons[4].ReasonCode;
-			SELF.Model_4_RC5       := model_result_4.Scores[1].ScoreReasons[5].ReasonCode;
-			SELF.Model_5_Name      := model_result_4.name;
-			SELF.Model_5_Score     := (STRING)model_result_5.Scores[1].Value;
-			SELF.Model_5_RC1       := model_result_5.Scores[1].ScoreReasons[1].ReasonCode;
-			SELF.Model_5_RC2       := model_result_5.Scores[1].ScoreReasons[2].ReasonCode;
-			SELF.Model_5_RC3       := model_result_5.Scores[1].ScoreReasons[3].ReasonCode;
-			SELF.Model_5_RC4       := model_result_5.Scores[1].ScoreReasons[4].ReasonCode;
-			SELF.Model_5_RC5       := model_result_5.Scores[1].ScoreReasons[5].ReasonCode;
+			SELF.Model_1_Name      := (STRING20)model_result_1.name; 
+			SELF.Model_1_Score     := (STRING3)model_result_1.Scores[1].Value;
+			SELF.Model_1_RC1       := (STRING5)model_result_1.Scores[1].ScoreReasons[1].ReasonCode;
+			SELF.Model_1_RC2       := (STRING5)model_result_1.Scores[1].ScoreReasons[2].ReasonCode;
+			SELF.Model_1_RC3       := (STRING5)model_result_1.Scores[1].ScoreReasons[3].ReasonCode;
+			SELF.Model_1_RC4       := (STRING5)model_result_1.Scores[1].ScoreReasons[4].ReasonCode;
+			SELF.Model_1_RC5       := (STRING5)model_result_1.Scores[1].ScoreReasons[5].ReasonCode;
+			SELF.Model_2_Name      := (STRING20)model_result_2.name;
+			SELF.Model_2_Score     := (STRING3)model_result_2.Scores[1].Value;
+			SELF.Model_2_RC1       := (STRING5)model_result_2.Scores[1].ScoreReasons[1].ReasonCode;
+			SELF.Model_2_RC2       := (STRING5)model_result_2.Scores[1].ScoreReasons[2].ReasonCode;
+			SELF.Model_2_RC3       := (STRING5)model_result_2.Scores[1].ScoreReasons[3].ReasonCode;
+			SELF.Model_2_RC4       := (STRING5)model_result_2.Scores[1].ScoreReasons[4].ReasonCode;
+			SELF.Model_2_RC5       := (STRING5)model_result_2.Scores[1].ScoreReasons[5].ReasonCode;
+			SELF.Model_3_Name      := (STRING20)model_result_2.name;
+			SELF.Model_3_Score     := (STRING3)model_result_3.Scores[1].Value;
+			SELF.Model_3_RC1       := (STRING5)model_result_3.Scores[1].ScoreReasons[1].ReasonCode;
+			SELF.Model_3_RC2       := (STRING5)model_result_3.Scores[1].ScoreReasons[2].ReasonCode;
+			SELF.Model_3_RC3       := (STRING5)model_result_3.Scores[1].ScoreReasons[3].ReasonCode;
+			SELF.Model_3_RC4       := (STRING5)model_result_3.Scores[1].ScoreReasons[4].ReasonCode;
+			SELF.Model_3_RC5       := (STRING5)model_result_3.Scores[1].ScoreReasons[5].ReasonCode;
+			SELF.Model_4_Name      := (STRING20)model_result_4.name;
+			SELF.Model_4_Score     := (STRING3)model_result_4.Scores[1].Value;
+			SELF.Model_4_RC1       := (STRING5)model_result_4.Scores[1].ScoreReasons[1].ReasonCode;
+			SELF.Model_4_RC2       := (STRING5)model_result_4.Scores[1].ScoreReasons[2].ReasonCode;
+			SELF.Model_4_RC3       := (STRING5)model_result_4.Scores[1].ScoreReasons[3].ReasonCode;
+			SELF.Model_4_RC4       := (STRING5)model_result_4.Scores[1].ScoreReasons[4].ReasonCode;
+			SELF.Model_4_RC5       := (STRING5)model_result_4.Scores[1].ScoreReasons[5].ReasonCode;
+			SELF.Model_5_Name      := (STRING20)model_result_4.name;
+			SELF.Model_5_Score     := (STRING3)model_result_5.Scores[1].Value;
+			SELF.Model_5_RC1       := (STRING5)model_result_5.Scores[1].ScoreReasons[1].ReasonCode;
+			SELF.Model_5_RC2       := (STRING5)model_result_5.Scores[1].ScoreReasons[2].ReasonCode;
+			SELF.Model_5_RC3       := (STRING5)model_result_5.Scores[1].ScoreReasons[3].ReasonCode;
+			SELF.Model_5_RC4       := (STRING5)model_result_5.Scores[1].ScoreReasons[4].ReasonCode;
+			SELF.Model_5_RC5       := (STRING5)model_result_5.Scores[1].ScoreReasons[5].ReasonCode;
 			SELF := le;	
 			SELF := [];
 			END;
@@ -230,20 +230,70 @@ EXPORT BRM_Marketing_Attr_Batch_Services() := MACRO
 	Final_Results := PROJECT(FinalSet, xfm_to_Results(LEFT));
 	
 //joining invalid inputs with the valid output	
-	ds_batch_input_NOT_having_minimum_input := 
-    PROJECT(
-      batchin_with_UID( NOT MinimumInputMet() ),
-      TRANSFORM( BRM_Marketing_Attributes.Layout_BRM_NonFCRA.BatchOutput,
-        SELF.error_msg := 'minimum input criteria not met';
-        SELF := LEFT;
-					SELF:=[];
-      )
-    );
+ 	ds_batch_input_NOT_having_minimum_input := 
+       PROJECT(
+         batchin_with_UID( NOT MinimumInputMet() ),
+         TRANSFORM( BRM_Marketing_Attributes.Layout_BRM_NonFCRA.BatchOutput,
+           SELF.g_procbusuid := LEFT.g_procbusuid;
+           SELF.acctno := LEFT.acctno;
+           SELF.historydateyyyymm := LEFT.historydateyyyymm;
+           SELF.historydate := LEFT.historydate;
+           SELF.companyname := LEFT.companyname;
+           SELF.alternatecompanyname := LEFT.alternatecompanyname;
+           SELF.streetaddressline1 := LEFT.streetaddressline1;
+           SELF.streetaddressline2 := LEFT.streetaddressline2;
+           SELF.city1 := LEFT.city1;
+           SELF.state1 := LEFT.state1;
+           SELF.zip1 := LEFT.zip1;
+           SELF.businesstin := LEFT.businesstin;
+           SELF.businessphone := LEFT.businessphone;
+           SELF.businessurl := LEFT.businessurl;
+           SELF.businessemailaddress := LEFT.businessemailaddress;
+           SELF.powid := (STRING)LEFT.powid;
+           SELF.proxid := (STRING)LEFT.proxid;
+           SELF.seleid := (STRING)LEFT.seleid;
+           SELF.orgid := (STRING)LEFT.orgid;
+           SELF.ultid := (STRING)LEFT.ultid;
+           SELF.custom_input1 := LEFT.custom_input1;
+           SELF.custom_input2 := LEFT.custom_input2;	
+           SELF.custom_input3 := LEFT.custom_input3;
+           SELF.custom_input4 := LEFT.custom_input4;
+           SELF.custom_input5 := LEFT.custom_input5;
+           SELF.error_msg := 'minimum input criteria not met';
+           SELF := LEFT;
+           SELF := [];
+         )
+       );
+
 		Final_output := Dedup(sort((Final_Results +ds_batch_input_NOT_having_minimum_input),g_procbusuid,-error_msg),g_procbusuid);
 	//error message when the attribute name is not supplied.	
 		Results := IF(NOT allow_MA_attrs_only,Project(Final_output,transform(BRM_Marketing_Attributes.Layout_BRM_NonFCRA.BatchOutput, 
-																			SELF.error_msg := 'minimum input criteria not met';
-																			SELF := LEFT;
+																			SELF.g_procbusuid := LEFT.g_procbusuid;
+                                      SELF.acctno := LEFT.acctno;
+                                      SELF.historydateyyyymm := LEFT.historydateyyyymm;
+                                      SELF.historydate := LEFT.historydate;
+                                      SELF.companyname := LEFT.companyname;
+                                      SELF.alternatecompanyname := LEFT.alternatecompanyname;
+                                      SELF.streetaddressline1 := LEFT.streetaddressline1;
+                                      SELF.streetaddressline2 := LEFT.streetaddressline2;
+                                      SELF.city1 := LEFT.city1;
+                                      SELF.state1 := LEFT.state1;
+                                      SELF.zip1 := LEFT.zip1;
+                                      SELF.businesstin := LEFT.businesstin;
+                                      SELF.businessphone := LEFT.businessphone;
+                                      SELF.businessurl := LEFT.businessurl;
+                                      SELF.businessemailaddress := LEFT.businessemailaddress;
+                                      SELF.powid := LEFT.powid;
+                                      SELF.proxid := LEFT.proxid;
+                                      SELF.seleid := LEFT.seleid;
+                                      SELF.orgid := LEFT.orgid;
+                                      SELF.ultid := LEFT.ultid;
+                                      SELF.custom_input1 := LEFT.custom_input1;
+                                      SELF.custom_input2 := LEFT.custom_input2;	
+                                      SELF.custom_input3 := LEFT.custom_input3;
+                                      SELF.custom_input4 := LEFT.custom_input4;
+                                      SELF.custom_input5 := LEFT.custom_input5;
+                                      SELF.error_msg := 'minimum input criteria not met';
 																			self:=[])),Final_output);
 							
 	output(Results,named('Results'));
@@ -256,18 +306,18 @@ EXPORT BRM_Marketing_Attr_Batch_Services() := MACRO
 					SELF.G_ProcBusUID := LEFT.G_ProcBusUID,
 					SELF.AcctNo := LEFT.AcctNo,
 					SELF.B2BAccountCount :=
-					      If((  LEFT.BE_B2BActvCnt>0 OR 
-						           LEFT.BE_B2BActvCarrCnt> 0 OR 
-						           LEFT.BE_B2BActvFltCnt > 0 OR 
-						           LEFT.BE_B2BActvMatCnt > 0 OR 
-						           LEFT.BE_B2BActvOpsCnt > 0 OR 
-						           LEFT.BE_B2BActvOthCnt > 0 OR 
-						           LEFT.BE_B2BActvBalTot > 0 OR 
-						           LEFT.BE_B2BActvCarrBalTot > 0 OR 
-						           LEFT.BE_B2BActvFltBalTot > 0 OR 
-						           LEFT.BE_B2BActvMatBalTot > 0 OR 
-						           LEFT.BE_B2BActvOpsBalTot > 0 OR 
-						           LEFT.BE_B2BActvOthBalTot > 0 OR
+					      If((  (INTEGER)LEFT.BE_B2BActvCnt>0 OR 
+						           (INTEGER)LEFT.BE_B2BActvCarrCnt> 0 OR 
+						           (INTEGER)LEFT.BE_B2BActvFltCnt > 0 OR 
+						           (INTEGER)LEFT.BE_B2BActvMatCnt > 0 OR 
+						           (INTEGER)LEFT.BE_B2BActvOpsCnt > 0 OR 
+						           (INTEGER)LEFT.BE_B2BActvOthCnt > 0 OR 
+						           (INTEGER)LEFT.BE_B2BActvBalTot > 0 OR 
+						           (INTEGER)LEFT.BE_B2BActvCarrBalTot > 0 OR 
+						           (INTEGER)LEFT.BE_B2BActvFltBalTot > 0 OR 
+						           (INTEGER)LEFT.BE_B2BActvMatBalTot > 0 OR 
+						           (INTEGER)LEFT.BE_B2BActvOpsBalTot > 0 OR 
+						           (INTEGER)LEFT.BE_B2BActvOthBalTot > 0 OR
 						           (INTEGER)LEFT.BE_B2BActvBalTotRnge >0 OR
 						           (INTEGER)LEFT.BE_B2BActvCarrBalTotRnge >0 OR
 						           (INTEGER)LEFT.BE_B2BActvFltBalTotRnge >0 OR

@@ -1,4 +1,4 @@
-﻿IMPORT AutoStandardI, DueDiligence, iesp, STD, WSInput;
+﻿IMPORT DueDiligence, iesp, WSInput;
 
 
 EXPORT DueDiligence_PersonRptService := MACRO
@@ -29,7 +29,7 @@ EXPORT DueDiligence_PersonRptService := MACRO
     cleanData := DueDiligence.CommonQuery.GetCleanData(validRequest);
    
     //retrieve options & compliance information
-    regulatoryCompliance := DueDiligence.CommonQuery.mac_GetCompliance(dppa, glba, drm, dpm, userIn.IndustryClass, lexIdSourceOptout, transactionID, batchUID, globalCompanyID);
+    regulatoryCompliance := DueDiligence.CommonQuery.GetCompliance(dppa, glba, drm, dpm, userIn.IndustryClass, lexIdSourceOptout, transactionID, batchUID, globalCompanyID);
 
     //based on what was requested, call the appropriate attributes  
     ddResults := DueDiligence.CommonQueryXML.mac_v3PersonXML(wseq, cleanData, regulatoryCompliance, DDssnMask, optionsIn.AdditionalInput, 

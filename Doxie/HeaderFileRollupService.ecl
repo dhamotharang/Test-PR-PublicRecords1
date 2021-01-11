@@ -1,137 +1,12 @@
-/*--SOAP--
-<message name="headerFileRollupRequest">
-  <part name="IndustryCLASS" type="xsd:string"/>
-  <part name="SSN" type="xsd:string"/>
-  <part name="SSNTypos" type="xsd:boolean"/>
-  <part name="UnParsedFullName" type="xsd:string"/>
-  <part name="FirstName" type="xsd:string"/>
-  <part name="AllowNickNames" type="xsd:boolean"/>
-  <part name="RelativeFirstName1" type="xsd:string"/>
-  <part name="RelativeFirstName2" type="xsd:string"/>
-  <part name="LastName" type="xsd:string"/>
-  <part name="OtherLastName1" type="xsd:string"/>
-  <part name="PhoneticMatch" type="xsd:boolean"/>
-  <part name="PhoneticDistanceMatch" type="xsd:boolean"/>
-  <part name="DistanceThreshold" type="xsd:unsignedInt"/>
-  <part name="MiddleName" type="xsd:string"/>
-  <part name="Addr" type="xsd:string"/>
-  <part name="FuzzySecRange" type="xsd:integer"/>
-  <part name="City" type="xsd:string"/>
-  <part name="OtherCity1" type="xsd:string"/>
-  <part name="County" type="xsd:string"/>
-  <part name="State" type="xsd:string"/>
-  <part name="OtherState1" type="xsd:string"/>
-  <part name="OtherState2" type="xsd:string"/>
-  <part name="Zip" type="xsd:string"/>
-  <part name="ZipRadius" type="xsd:unsignedInt"/>
-  <part name="CurrentResidentsOnly" type="xsd:boolean"/>
-  <part name="Phone" type="xsd:string"/>
-  <part name="DOB" type="xsd:unsignedInt"/>
-  <part name="AgeLow" type="xsd:byte"/>
-  <part name="AgeHigh" type="xsd:byte"/>
-  <part name="AllowDateSeen" type="xsd:boolean"/>
-  <part name="DateFirstSeen" type="xsd:integer"/>
-  <part name="DateLastSeen" type="xsd:integer"/>
-  <part name="DID" type="xsd:string" required="1"/>
-  <part name="Household" type="xsd:boolean"/>
-  <part name="LookupType" type="xsd:string"/>
-  <part name="RID" type="xsd:string"/>
-  <part name="IncludeAllDIDRecords" type="xsd:boolean"/>
-  <part name="MaxResults" type="xsd:unsignedInt"/>
-  <part name="MaxResultsThisTime" type="xsd:unsignedInt"/>
-  <part name="SkipRecords" type="xsd:unsignedInt"/>
-  <part name="DPPAPurpose" type="xsd:byte"/>
-  <part name="GLBPurpose" type="xsd:byte"/>
-  <part name="ApplicationType" type="xsd:string"/>
-  <part name="NoLookupSearch" type="xsd:boolean"/>
-  <part name="BestOnly" type="xsd:boolean"/>
-  <part name="CurrentOnly" type="xsd:boolean"/>
-  <part name="DoNotFillBlanks" type="xsd:boolean"/>
-  <part name="Raw" type="xsd:boolean"/>
-  <part name="GroupByDID" type="xsd:boolean"/>
-  <part name="DIDOnly" type="xsd:boolean"/>
-  <part name="ScoreThreshold" type="xsd:unsignedInt"/>
-  <part name="AddressLimit" type="xsd:unsignedInt"/>
-  <part name="SSNMask" type="xsd:string"/>
-  <part name="DLMask" type="xsd:string"/>
-  <part name="IncludeZeroDIDRefs" type="xsd:boolean"/>
-  <part name="IncludeHRI" type="xsd:boolean"/>
-  <part name="MaxHriPer" type="xsd:unsignedInt"/>
-  <part name="ProbationOverride" type="xsd:boolean"/>
-  <part name="LnBranded" type="xsd:boolean"/>
-  <part name="KeepOldSsns" type="xsd:boolean"/>
-  <part name="DialRecordMatch" type="xsd:unsignedInt"/>
-  <part name="DialContactPrecision" type="xsd:unsignedInt"/>
-  <part name="DialBounceDistance" type="xsd:unsignedInt"/>
-  <part name="DataRestrictionMask" type="xsd:string"/>
-  <part name="DataPermissionMask" type="xsd:string"/>
-  <part name="DidTypeMask" type="xsd:string"/>
-  <part name="AllowWildcard" type="xsd:boolean"/>
-  <part name="AllowHeaderQuick" type="xsd:boolean"/>
-  <part name="IncludeRelativeNames" type="xsd:boolean"/>
-  <part name="IncludePhonesFeedback" type="xsd:boolean"/>
-  <part name="IncludeAddressFeedback" type="xsd:boolean"/>
-  <part name="NonExclusion" type="xsd:boolean"/>
-  <part name="ReducedData" type="xsd:boolean"/>
-  <part name="StrictMatch" type="xsd:boolean"/>
-  <part name="IncludeAddressCDSDetails" type="xsd:boolean"/>
-  <part name="IncludeDLInfo" type="xsd:boolean"/>
-  <part name="IncludeNonDMVSources"  type="xsd:boolean"/>
-  <part name="IncludePhonesPlus" type="xsd:boolean"/>
-  <part name="IncludePeopleAtWork" type = "xsd:boolean"/>
-  <part name="ReturnAlsoFound" type = "xsd:boolean"/> // utilize same name as in ESP
-  <part name="ECL_NegateTrueDefaults" type = "xsd:boolean"/>
-  <part name="IncludeBankruptcyCount" type = "xsd:boolean"/>
-  <part name="BatchFriendly" type = "xsd:boolean"/>
-  <part name="BatchAccount" type="xsd:string"/>
-  <part name="DLNumber" type="xsd:string"/>
-  <part name="DLState" type="xsd:string"/>
-  <part name="SmartRollup" type = "xsd:boolean"/>
-  <part name="IncludeSourceList" type="tns:EspStringArray"/>
-  <part name="IncludeCriminalIndicators" type="xsd:boolean"/>
-  <part name="IncludeCriminalImageIndicators" type="xsd:boolean"/>
-  <part name="ExcludeDMVPII" type="xsd:boolean"/>
-  <part name="IncludeExpandedPhonePlusSearch" type="xsd:boolean"/>
-  <part name="IncludeHouseHoldOnly" type="xsd:boolean"/>
-  <part name="IncludeLastResort" type="xsd:boolean"/>
-
-  <!-- Business Credit (SBFE) only option/fields -->
-  <part name="IncludeBusinessCredit" type="xsd:boolean"/>
-  <part name="SeleId" type="xsd:unsignedInt"/>
-  <part name="OrgId"  type="xsd:unsignedInt"/>
-  <part name="UltId"  type="xsd:unsignedInt"/>
-
-  <!-- FDN only option/fields -->
-  <part name="IncludeFraudDefenseNetwork" type="xsd:boolean"/>
-  <part name="GlobalCompanyId"            type="xsd:unsignedInt"/>
-  <part name="IndustryType"               type="xsd:unsignedInt"/>
-  <part name="ProductCode"                type="xsd:unsignedInt"/>
-
-  <!-- Progressive/waterfall Phone options -->
-  <part name="IncludeProgressivePhone" type="xsd:boolean"/>
-  <part name="ScoreModel"             type="xsd:string"/>
-  <part name="MaxNumAssociate"        type="xsd:unsignedInt"/>
-  <part name="MaxNumAssociateOther"   type="xsd:unsignedInt"/>
-  <part name="MaxNumFamilyOther"      type="xsd:unsignedInt"/>
-  <part name="MaxNumFamilyClose"      type="xsd:unsignedInt"/>
-  <part name="MaxNumParent"           type="xsd:unsignedInt"/>
-  <part name="MaxNumSpouse"           type="xsd:unsignedInt"/>
-  <part name="MaxNumSubject"          type="xsd:unsignedInt"/>
-  <part name="MaxNumNeighbor"         type="xsd:unsignedInt"/>
-  <part name="ReturnPhoneScore"       type="xsd:boolean"/>
-  <part name="IncludePhonesFeedback"  type="xsd:boolean"/>
-
-  <part name="Gateways" type="tns:XmlDataSet" cols="70" rows="25"/>
-</message>
-*/
+// =====================================================================
+// ROXIE QUERY
+// -----------
+// For the complete list of input parameters please check published WU.
+// Look at the history of this attribute for the old SOAP info.
+// =====================================================================
 /*--INFO-- This service searches the header file w/ Tsunami tweaks with results rolled up.*/
+IMPORT Gong_Services, WSInput, STD;
 
-/*
-<message name="headerFileRollupRequest" wuTimeout="300000">
-
-*/
-
-IMPORT Gong_Services,WSInput;
 EXPORT HeaderFileRollupService := MACRO
     #constant('SearchLibraryVersion', AutoheaderV2.Constants.LibVersion.SALT);
     //The following macro defines the field sequence on WsECL page of query.
@@ -145,7 +20,7 @@ EXPORT HeaderFileRollupService := MACRO
     STRING    DLNumber_Value          := ''    : STORED('DLNumber');
     STRING    DLState_Value           := ''    : STORED('DLState');
     BOOLEAN   IncProgressivePhone     := FALSE : STORED('IncludeProgressivePhone');
-    #STORED('dl_number',stringlib.stringtouppercase(DLNumber_Value));
+    #STORED('dl_number', STD.Str.ToUpperCase(DLNumber_Value));
 
     doxie.MAC_Header_Field_Declare();
     mod_access := doxie.compliance.GetGlobalDataAccessModule();
@@ -215,4 +90,3 @@ EXPORT HeaderFileRollupService := MACRO
     // output the telecordia info any time a 10 digit phone is part of the search criteria
     OUTPUT(IF(~reduced_data_value, Gong_Services.Fetch_Telcordia_for_Gong_History), NAMED('TelcordiaRecs'));
 ENDMACRO;
-//HeaderFileRollupService()

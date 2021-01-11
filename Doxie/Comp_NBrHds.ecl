@@ -1,7 +1,7 @@
-import doxie_crs, census_data;
+﻿import doxie, doxie_crs, census_data;
 doxie.MAC_Selection_Declare()
 
-a := Comp_Addresses(Include_CensusData_val);
+a := doxie.Comp_Addresses(Include_CensusData_val);
 
 r := record
   string2 st := a.st;

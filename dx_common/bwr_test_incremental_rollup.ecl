@@ -49,11 +49,7 @@ expected_results := dataset([
   ], test_rec);
 
 mod_key := MODULE
-  EXPORT layout := RECORD
-    dx_common.layout_metadata.record_sid;
-    dx_common.layout_metadata.dt_effective_first;
-    dx_common.layout_metadata.dt_effective_last;
-  END;
+  EXPORT layout := dx_common.layout_ridkey;
   SHARED base_file := '~cloud::poc::base_delta_rid';
   SHARED base_recs := DATASET(base_file, test_rec, THOR);
   SHARED delta_recs := PROJECT(base_recs(delta_ind=IND_DELTA_REC), TRANSFORM(layout, SELF := LEFT));
@@ -68,9 +64,9 @@ buildRidKey := SEQUENTIAL(
   output(mod_key.key, named('key_delta_rid'));
 );
 
-// results := dx_common.mac_incremental_rollup(test_recs);
-results := dx_common.mac_incremental_rollup(test_recs, mod_key.key);
-// results := dx_common.mac_incremental_rollup(test_recs, mod_key.key,,,,TRUE);
+// results := dx_common.Incrementals.mac_Rollup(test_recs);
+results := dx_common.Incrementals.mac_Rollup(test_recs, mod_key.key);
+// results := dx_common.Incrementals.mac_Rollup(test_recs, mod_key.key,,,,TRUE);
 
 eval_recs := join(expected_results, results, 
   left.record_sid = right.record_sid and 

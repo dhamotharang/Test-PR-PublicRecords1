@@ -47,7 +47,7 @@ EXPORT Raw := MODULE
                           #IF (left_outer)
                             ,LEFT OUTER
                           #END
-                          ,KEEP(100),LIMIT(0));
+                          ,KEEP(1000),LIMIT(0));
     RETURN _email_events;
   ENDMACRO;
 
@@ -58,9 +58,9 @@ EXPORT Raw := MODULE
                                     SELF := []));
     LOCAL __email_domains := JOIN(_email_domains, dx_Email.Key_domain_lkp(),
                                  KEYED(LEFT.domain_name = RIGHT.domain_name)
-                            ,TRANSFORM(dx_Email.layouts.i_Domain_lkp,
+                                ,TRANSFORM(dx_Email.layouts.i_Domain_lkp,
                                        SELF := RIGHT)
-                            ,KEEP(1),LIMIT(0));
+                                ,KEEP(1000),LIMIT(0));
     RETURN __email_domains;
   ENDMACRO;
 

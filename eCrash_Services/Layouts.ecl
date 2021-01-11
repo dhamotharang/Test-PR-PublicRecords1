@@ -226,6 +226,7 @@ EXPORT Layouts := MODULE
 		
    	EXPORT AgencyDateRecord := RECORD(DeltaBaseAgencyData) 
    		string agencyID;
+   		string sourceID;
     END;
 		
 		EXPORT DeltaBaseAgencyDataResponse := RECORD 

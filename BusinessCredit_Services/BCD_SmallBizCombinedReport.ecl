@@ -1,21 +1,21 @@
 ﻿/*--SOAP--
 
 <message name="BCD_SmallBizCombinedReport" wuTimeout="300000">
-	<part name="SmallBizCombinedReportRequest" type="tns:XmlDataSet" cols="110" rows="75"/>
+  <part name="SmallBizCombinedReportRequest" type="tns:XmlDataSet" cols="110" rows="75"/>
   <!-- Option Fields --> 
-	<part name="DPPAPurpose" type="xsd:integer"/>
-	<part name="GLBPurpose" type="xsd:integer"/>
-	<part name="DataRestrictionMask" type="xsd:string"/>
-	<part name="DataPermissionMask" type="xsd:string"/>
-	<part name="SSNMask" type="xsd:string"/>
-	<part name="DOBMask" type="xsd:string"/>
-	<part name="DLMask" type="xsd:boolean"/>
+  <part name="DPPAPurpose" type="xsd:integer"/>
+  <part name="GLBPurpose" type="xsd:integer"/>
+  <part name="DataRestrictionMask" type="xsd:string"/>
+  <part name="DataPermissionMask" type="xsd:string"/>
+  <part name="SSNMask" type="xsd:string"/>
+  <part name="DOBMask" type="xsd:string"/>
+  <part name="DLMask" type="xsd:boolean"/>
   <part name="ApplicationType" type="xsd:string"/>
-	<part name="IndustryClass" type="xsd:string"/>
-	<part name="Gateways" type="tns:XmlDataSet" cols="100" rows="8"/>
-	<part name="ReturnDetailedRoyalties" type="xsd:boolean"/>	
+  <part name="IndustryClass" type="xsd:string"/>
+  <part name="Gateways" type="tns:XmlDataSet" cols="100" rows="8"/>
+  <part name="ReturnDetailedRoyalties" type="xsd:boolean"/>	
   <part name="HistoryDateYYYYMM" type="xsd:integer"/>
-	<part name="HistoryDate" type="xsd:integer"/>
+  <part name="HistoryDate" type="xsd:integer"/>
   <part name="Watchlists_Requested" type="tns:XmlDataSet" cols="100" rows="8"/>
   <part name="OFAC_Version" type="xsd:integer"/>
   <part name="LinkSearchLevel" type="xsd:integer"/>
@@ -23,8 +23,8 @@
   <part name="AllowedSources" type="xsd:string"/>
   <part name="Global_Watchlist_Threshold" type="xsd:real"/>
   <part name="OutcomeTrackingOptOut" type="xsd:boolean"/>
-	<part name="IncludeTargusGateway" type="xsd:boolean"/>
-	<part name="RunTargusGatewayAnywayForTesting" type="xsd:boolean"/>
+  <part name="IncludeTargusGateway" type="xsd:boolean"/>
+  <part name="RunTargusGatewayAnywayForTesting" type="xsd:boolean"/>
   <part name="TestDataEnabled" type="xsd:boolean"/> 
   <part name="TestDataTableName" type="xsd:string"/> 
 </message>
@@ -35,8 +35,8 @@
 
 // #OPTION('expandSelectCreateRow', TRUE);
 IMPORT Address, AutoStandardI, BIPV2, Business_Risk_BIP, BusinessCredit_Services, 
-       Gateway, IESP, Inquiry_AccLogs, MDR, Phones, Risk_Reporting, Royalty, STD, 
-       UT, WSInput;
+       Gateway, IESP, Inquiry_AccLogs, LNSmallBusiness, MDR, Phones, Risk_Reporting,  
+       Royalty, STD, UT, WSInput;
 
 // This service was created for Capital One who has requested a new service they 
 // will have the ability to specialize to their specific needs. At the time of creating the 
@@ -78,23 +78,21 @@ EXPORT BCD_SmallBizCombinedReport :=
 		/* **********************************************
 			 *  Fields needed for improved Scout Logging  *
 			 **********************************************/
-			STRING32 _LoginID               := ''	: STORED('_LoginID');
-			outofbandCompanyID							:= '' : STORED('_CompanyID');
-			STRING20 CompanyID              := IF(users.CompanyId != '', users.CompanyId, outofbandCompanyID);
-			STRING20 FunctionName           := '' : STORED('_LogFunctionName');
-			STRING50 ESPMethod              := '' : STORED('_ESPMethodName');
-			STRING10 InterfaceVersion       := '' : STORED('_ESPClientInterfaceVersion');
-			STRING5 DeliveryMethod          := '' : STORED('_DeliveryMethod');
-			STRING5 DeathMasterPurpose      := '' : STORED('__deathmasterpurpose');
-			outofbandssnmask                := '' : STORED('SSNMask');
-			STRING10 SSN_Mask               := IF(users.SSNMask != '', users.SSNMask, outofbandssnmask);
-			outofbanddobmask                := '' : STORED('DOBMask');
-			STRING10 DOB_Mask               := IF(users.DOBMask != '', users.DOBMask, outofbanddobmask);
-			BOOLEAN DL_Mask                 := users.DLMask;
-			BOOLEAN ExcludeDMVPII           := users.ExcludeDMVPII;
-			BOOLEAN ArchiveOptIn            := FALSE : STORED('instantidarchivingoptin');
-			BOOLEAN DisableIntermediateShellLoggingOutOfBand := FALSE    : STORED('OutcomeTrackingOptOut');
-			DisableOutcomeTracking  := DisableIntermediateShellLoggingOutOfBand OR users.OutcomeTrackingOptOut;
+    STRING32 _LoginID               := ''	: STORED('_LoginID');
+    outofbandCompanyID							:= '' : STORED('_CompanyID');
+    STRING20 CompanyID              := IF(users.CompanyId != '', users.CompanyId, outofbandCompanyID);
+    STRING20 FunctionName           := '' : STORED('_LogFunctionName');
+    STRING50 ESPMethod              := '' : STORED('_ESPMethodName');
+    STRING10 InterfaceVersion       := '' : STORED('_ESPClientInterfaceVersion');
+    STRING5 DeliveryMethod          := '' : STORED('_DeliveryMethod');
+    STRING5 DeathMasterPurpose      := '' : STORED('__deathmasterpurpose');
+    STRING10 SSN_Mask               := IF(users.SSNMask != '', users.SSNMask, global_mod.ssnmask);
+    STRING10 DOB_Mask               := IF(users.DOBMask != '', users.DOBMask, global_mod.dobmask);			
+    BOOLEAN DL_Mask                 := users.DLMask;
+    BOOLEAN ExcludeDMVPII           := users.ExcludeDMVPII;
+    BOOLEAN ArchiveOptIn            := FALSE : STORED('instantidarchivingoptin');
+    BOOLEAN DisableIntermediateShellLoggingOutOfBand := FALSE    : STORED('OutcomeTrackingOptOut');
+    DisableOutcomeTracking  := DisableIntermediateShellLoggingOutOfBand OR users.OutcomeTrackingOptOut;
 
 			//Look up the industry by the company ID.
 			Industry_Search := Inquiry_AccLogs.Key_Inquiry_industry_use_vertical_login(FALSE)(s_company_id = CompanyID AND s_product_id = (STRING)Risk_Reporting.ProductID.BusinessCredit_Services__BCD_SmallBizCombinedReport);
@@ -331,14 +329,14 @@ EXPORT BCD_SmallBizCombinedReport :=
        EXPORT BOOLEAN   IncludeTargusGateway            := Include_TargusGateway;
        EXPORT BOOLEAN   RunTargusGateway                := Run_TargusGateway;
        EXPORT BOOLEAN   TestDataEnabled			            := TestData_Enabled;
-	     EXPORT STRING    TestDataTableName	              := TestData_TableName;
+       EXPORT STRING    TestDataTableName	              := TestData_TableName;
        EXPORT STRING6   DOBMask                         := global_mod.DOBMask;
        EXPORT STRING32  ApplicationType                 := global_mod.ApplicationType;
        EXPORT STRING1   FetchLevel 					            := BIPV2.IDconstants.Fetch_Level_SELEID;
        EXPORT BOOLEAN   IncludeCreditReport             := option.IncludeCreditReport;  
-	  EXPORT BOOLEAN   LimitPaymentHistory24Months := LimitPaymentHistory24MonthsVal; // bus credit report w SBFE additions.	 
-	  EXPORT STRING       SBFEContributorIds := ContributorIds; // bus credit report w SBFE additions project
-	 EXPORT STRING1     BusinessCreditReportType := BusinessCredit_Services.Constants.SBFEDataBusinessCreditReport; // default option to run Bus Credit report with SBFE data
+       EXPORT BOOLEAN   LimitPaymentHistory24Months := LimitPaymentHistory24MonthsVal; // bus credit report w SBFE additions.	 
+       EXPORT STRING    SBFEContributorIds := ContributorIds; // bus credit report w SBFE additions project
+       EXPORT STRING1   BusinessCreditReportType := BusinessCredit_Services.Constants.SBFEDataBusinessCreditReport; // default option to run Bus Credit report with SBFE data
        EXPORT BOOLEAN   MinInputMetForAuthRepPopulated  := MinimumInputMetForAuthorizedRepPopulated;
        EXPORT DATASET(iesp.Share.t_StringArrayItem) Watchlists_Requested := Watchlists_Requested_;
        EXPORT DATASET(Gateway.Layouts.Config) Gateways  := Gateways_;
@@ -349,11 +347,19 @@ EXPORT BCD_SmallBizCombinedReport :=
       END;
     
   ds_Results_withSmBizSBFEroyalty := LNSmallBusiness.SmallBusiness_BIP_Combined_Service_Records(SmallBizCombined_inmod);
+  
+  ds_Final_SmallBizAnaResults := 
+    LNSmallBusiness.SmallBusiness_intoIESP_layouts.fn_SmallBiz_intoESDL(ds_Results_withSmBizSBFEroyalty[1].SBA_Results,
+                                                                        SmallBizCombined_inmod.AttributesRequested,
+                                                                        ds_Results_withSmBizSBFEroyalty[1].LNSmallBizModelsType,
+                                                                        ds_Results_withSmBizSBFEroyalty[1].NewLNSmallBizModelsType
+                                                                       );
   ds_Results := 
-    PROJECT(ds_Results_withSmBizSBFEroyalty,
-      TRANSFORM(iesp.bcdsmallbusinesscombinedreport.t_BcdSmallBusinessCombinedReportResponse, 
+    PROJECT(ds_Results_withSmBizSBFEroyalty, 
+      TRANSFORM(iesp.bcdsmallbusinesscombinedreport.t_BcdSmallBusinessCombinedReportResponse,
         SELF.InputEcho := search; // Grab the exact input from the "search" ESDL near the top
-        SELF           := LEFT;
+        SELF.SmallBusinessAnalyticsResults := ds_Final_SmallBizAnaResults;
+        SELF := LEFT;
       ));
 
    /* ************************************************************************
@@ -400,8 +406,8 @@ EXPORT BCD_SmallBizCombinedReport :=
 																										 SELF.delivery_method := DeliveryMethod,
 																										 SELF.date_added := (STRING8)Std.Date.Today(),
 																										 SELF.death_master_purpose := DeathMasterPurpose,
-																										 SELF.ssn_mask := SSN_Mask,
-																										 SELF.dob_mask := DOB_Mask,
+																										 SELF.ssn_mask := IF(SSN_Mask = 'NONE', '', SSN_Mask),
+																										 SELF.dob_mask := IF(DOB_Mask = 'NONE', '', DOB_Mask),
 																										 SELF.dl_mask := (STRING)(INTEGER)DL_Mask,
 																										 SELF.exclude_dmv_pii := (STRING)(INTEGER)ExcludeDMVPII,
 																										 SELF.scout_opt_out := (STRING)(INTEGER)DisableOutcomeTracking,
@@ -469,24 +475,10 @@ EXPORT BCD_SmallBizCombinedReport :=
                                                      SELF := LEFT,
 																										 SELF := [] ));
 		Deltabase_Logging := DATASET([{Deltabase_Logging_prep}], Risk_Reporting.Layouts.LOG_Deltabase_Layout);
-		// #stored('Deltabase_Log', Deltabase_Logging);
 
 		//Improved Scout Logging
 		IF(~DisableOutcomeTracking and ~TestData_Enabled, OUTPUT(Deltabase_Logging, NAMED('LOG_log__mbs_transaction__log__scout')));
 		
-    // OUTPUT(SmallBizCombined_inmod);   
-    // OUTPUT(DPPAPurpose_stored, NAMED('DPPAPurpose_stored'));
-    // OUTPUT(GLBPurpose_stored, NAMED('GLBPurpose_stored'));
-    // OUTPUT(DataRestrictionMask_stored, NAMED('DataRestrictionMask_stored'));
-    // OUTPUT(DataPermissionMask_stored, NAMED('DataPermissionMask_stored'));
-    // OUTPUT(IndustryClass_stored, NAMED('IndustryClass_stored'));
-    // OUTPUT(SBA_Input, NAMED('SBA_Input'));
-    // OUTPUT(ds_Results.CreditReportRecords[1].PhoneSources, NAMED('Cred_Rpt_PhoneSources'));
-    // OUTPUT(ds_Results.CreditReportRecords[1].TopBusinessRecord, NAMED('TopBiz'));
-    // OUTPUT(ds_Results.CreditReportRecords[1].TopBusinessRecord.MotorVehicleSection,   NAMED('MotorVehicleSection'));
-    // OUTPUT(ds_Results.CreditReportRecords[1].TopBusinessRecord.AircraftSection,     NAMED('AircraftSection'));
-    // OUTPUT(ds_Results.CreditReportRecords[1].AdditionalInfo.CompanyNameVariations,  NAMED('CompanyNameVariations'));
-
     OUTPUT(ds_Results,   NAMED('Results')); 
     OUTPUT(ds_Royalties, NAMED('RoyaltySet'));
     

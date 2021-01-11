@@ -1,4 +1,4 @@
-﻿IMPORT BIPV2, Business_Risk_BIP, BusinessInstantID20_Services, DueDiligence, doxie;
+﻿IMPORT BIPV2, Business_Risk_BIP, DueDiligence, doxie;
 
 
 EXPORT getBusHeader(DATASET(DueDiligence.Layouts.Busn_Internal) inData,
@@ -27,7 +27,6 @@ EXPORT getBusHeader(DATASET(DueDiligence.Layouts.Busn_Internal) inData,
                                 EXPORT BOOLEAN includeFirstSeenFromNonCreditSources := FALSE;
                                 EXPORT BOOLEAN includeOperatingLocataions := FALSE;
                                 EXPORT BOOLEAN includeBusinessStructure := TRUE;
-                                EXPORT BOOLEAN includeSICNAICS := TRUE;
                                 EXPORT BOOLEAN includeFirstSeenCleanedInputAddress := FALSE;
                                 EXPORT BOOLEAN includeFEIN := FALSE;
                                 EXPORT BOOLEAN includeIncorporatedWithLooseLaws := FALSE;
@@ -57,12 +56,9 @@ EXPORT getBusHeader(DATASET(DueDiligence.Layouts.Busn_Internal) inData,
       
     //if requesting structure
     addStructure := IF(regBusDataOptions.includeAll OR regBusDataOptions.includeBusinessStructure, DueDiligence.getBusHeaderImpl.getStructure(addHdrAddrCount, busHeaderFilt), addHdrAddrCount);
-      
-    //if requesting SIC/NAICs
-    addSicNaic := IF(regBusDataOptions.includeAll OR regBusDataOptions.includeSICNAICS, DueDiligence.getBusHeaderImpl.getSICNAICS(addStructure, busHeaderFilt), addStructure);
-      
+         
     //if requesting first seen cleaned input address
-    addAddrFirstSeen := IF(regBusDataOptions.includeAll OR regBusDataOptions.includeFirstSeenCleanedInputAddress, DueDiligence.getBusHeaderImpl.getFirstSeenCleanedInputAddress(addSicNaic, busHeaderFilt), addSicNaic);
+    addAddrFirstSeen := IF(regBusDataOptions.includeAll OR regBusDataOptions.includeFirstSeenCleanedInputAddress, DueDiligence.getBusHeaderImpl.getFirstSeenCleanedInputAddress(addStructure, busHeaderFilt), addStructure);
       
     //if requesting FEIN
     addNoFein := IF(regBusDataOptions.includeAll OR regBusDataOptions.includeFEIN, DueDiligence.getBusHeaderImpl.getFEIN(addAddrFirstSeen, busHeaderFilt), addAddrFirstSeen);
@@ -94,7 +90,6 @@ EXPORT getBusHeader(DATASET(DueDiligence.Layouts.Busn_Internal) inData,
     // OUTPUT(addShellSrcCnt, NAMED('addShellSrcCnt'));
     // OUTPUT(addHdrAddrCount, NAMED('addHdrAddrCount'));
     // OUTPUT(addStructure, NAMED('addStructure'));
-    // OUTPUT(addSicNaic, NAMED('addSicNaic'));
     // OUTPUT(addAddrFirstSeen, NAMED('addAddrFirstSeen'));
     // OUTPUT(addNoFein, NAMED('addNoFein'));
     // OUTPUT(addIncLooseLaws, NAMED('addIncLooseLaws'));														

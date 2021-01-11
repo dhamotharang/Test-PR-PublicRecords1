@@ -258,30 +258,7 @@ EXPORT getBusKRI(DATASET(DueDiligence.Layouts.Busn_Internal) BusnBIPIDs) := FUNC
     SELF.BusStructureType := (STRING)(10-STD.Str.Find(structConcat_Final, DueDiligence.Constants.T_INDICATOR, 1)); 
 
         
-    //BUSINESS INDUSTRY RISK
-    industFlag9 := IF(le.sicNaicRisk.cibNonRetailExists, DueDiligence.Constants.T_INDICATOR, DueDiligence.Constants.F_INDICATOR);
-    industFlag8 := IF(le.sicNaicRisk.cibRetailExists, DueDiligence.Constants.T_INDICATOR, DueDiligence.Constants.F_INDICATOR);
-    industFlag7 := IF(le.sicNaicRisk.msbExists, DueDiligence.Constants.T_INDICATOR, DueDiligence.Constants.F_INDICATOR);
-    industFlag6 := IF(le.sicNaicRisk.nbfiExists, DueDiligence.Constants.T_INDICATOR, DueDiligence.Constants.F_INDICATOR);
-    industFlag5 := IF(le.sicNaicRisk.cagExists, DueDiligence.Constants.T_INDICATOR, DueDiligence.Constants.F_INDICATOR);
-    industFlag4 := IF(le.sicNaicRisk.legAcctTeleFlightTravExists, DueDiligence.Constants.T_INDICATOR, DueDiligence.Constants.F_INDICATOR);
-    industFlag3 := IF(le.sicNaicRisk.autoExists, DueDiligence.Constants.T_INDICATOR, DueDiligence.Constants.F_INDICATOR);
-    industFlag2 := IF(le.sicNaicRisk.otherHighRiskIndustExists, DueDiligence.Constants.T_INDICATOR, DueDiligence.Constants.F_INDICATOR);
-    industFlag1 := IF(le.sicNaicRisk.moderateRiskIndustExists OR le.sicNaicRisk.lowRiskIndustExists, DueDiligence.Constants.T_INDICATOR, DueDiligence.Constants.F_INDICATOR);
-
-    industConcat_Final := DueDiligence.Common.calcFinalFlagField(industFlag9,
-                                                                  industFlag8,
-                                                                  industFlag7,
-                                                                  industFlag6,
-                                                                  industFlag5,
-                                                                  industFlag4,
-                                                                  industFlag3,
-                                                                  industFlag2,
-                                                                  industFlag1);
-
-    SELF.BusIndustry_Flag := industConcat_Final;
-    SELF.BusIndustry := (STRING)(10-STD.Str.Find(industConcat_Final, DueDiligence.Constants.T_INDICATOR, 1)); 
-
+    
 
     //BUSINESS STABILITY RISK
     stabFirstSeenDays := DueDiligence.CommonDate.DaysApartWithZeroEmptyDate((STRING)le.firstReportedAtInputAddress, (STRING)le.historyDate);
@@ -467,8 +444,6 @@ EXPORT getBusKRI(DATASET(DueDiligence.Layouts.Busn_Internal) BusnBIPIDs) := FUNC
                                                     SELF.BusValidity_Flag := INVALID_BUSINESS_FLAGS;
                                                     SELF.BusStability := INVALID_BUSINESS_SCORE;
                                                     SELF.BusStability_Flag := INVALID_BUSINESS_FLAGS;
-                                                    SELF.BusIndustry := INVALID_BUSINESS_SCORE;
-                                                    SELF.BusIndustry_Flag := INVALID_BUSINESS_FLAGS;
                                                     SELF.BusStructureType := INVALID_BUSINESS_SCORE;
                                                     SELF.BusStructureType_Flag := INVALID_BUSINESS_FLAGS;
                                                     SELF.BusSOSAgeRange := INVALID_BUSINESS_SCORE;

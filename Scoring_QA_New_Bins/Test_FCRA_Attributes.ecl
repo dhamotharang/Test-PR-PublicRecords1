@@ -27,13 +27,13 @@ b1:=b +'_1';
 // ip:='~';
 ip:='~';
 						
-	  rpt1:=Scoring_QA_New_Bins.test_rvv3_generic_xml_attr_report(ip,a1,b1);
+	  rpt1:=Scoring_QA_New_Bins.test_rvv3_generic_xml_attr_report(ip,a1,b1); //done
 	
-	  rpt2:=Scoring_QA_New_Bins.test_rvv4_xml_attr_report(ip,a1,b1);
+	  rpt2:=Scoring_QA_New_Bins.test_rvv4_xml_attr_report(ip,a1,b1);//done
 		
-		rpt3:=Scoring_QA_New_Bins.test_rvv3_generic_batch_attr_report(ip,a1,b1);
+		rpt3:=Scoring_QA_New_Bins.test_rvv3_generic_batch_attr_report(ip,a1,b1);//done
 				
-    rpt4:=Scoring_QA_New_Bins.test_rvv4_batch_attr_report(ip,a1,b1);
+    rpt4:=Scoring_QA_New_Bins.test_rvv4_batch_attr_report(ip,a1,b1);//done
 		
 		// rpt5:=Scoring_QA.NONFCRA_ITA_capitalone_batch_v3(ip,a1,b1);
 		
@@ -73,12 +73,12 @@ ip:='~';
 		
 		// rpt23:=Scoring_QA.NONFCRA_IT61_xml_paro(ip,a1,b1);
 		
-rpt24:=Scoring_QA_New_Bins.test_rvv3_experian_batch_attr_report(ip,a1,b1);
+rpt24:=Scoring_QA_New_Bins.test_rvv3_experian_batch_attr_report(ip,a1,b1);//done
 		
-		rpt25:=Scoring_QA_New_Bins.test_rvv3_experian_xml_attr_report(ip,a1,b1);
+		rpt25:=Scoring_QA_New_Bins.test_rvv3_experian_xml_attr_report(ip,a1,b1);//done
 		// rpt26:=Scoring_QA.NONFCRA_Fraudpoint_xml_American_Express_attributes_v201(ip,a1,b1);
 
-		rpt27:=Scoring_QA_New_Bins.test_riskview_v5_generic_attr_report(ip,a1,b1);
+		rpt27:=Scoring_QA_New_Bins.test_riskview_v5_generic_attr_report(ip,a1,b1);//done
 		
 		rpt28:=Scoring_QA_New_Bins.test_riskview_v5_c1_attr_report(ip,a1,b1);
 		

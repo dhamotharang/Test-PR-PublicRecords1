@@ -231,39 +231,7 @@ EXPORT getBusHeaderImpl := MODULE
                                   ATMOST(1));
                                   
         RETURN addStructure;
-    ENDMACRO;
-    
-    
-    
-    EXPORT getSICNAICS(inBusiness, filteredData) := FUNCTIONMACRO
-        //SIC
-        outSic1 := DueDiligence.CommonBusiness.getSicNaicCodes(filteredData, source, DueDiligence.Constants.EMPTY, company_sic_code1, TRUE, TRUE, dt_first_seen, dt_last_seen);
-        outSic2 := DueDiligence.CommonBusiness.getSicNaicCodes(filteredData, source, DueDiligence.Constants.EMPTY, company_sic_code2, TRUE, FALSE, dt_first_seen, dt_last_seen);
-        outSic3 := DueDiligence.CommonBusiness.getSicNaicCodes(filteredData, source, DueDiligence.Constants.EMPTY, company_sic_code3, TRUE, FALSE, dt_first_seen, dt_last_seen);
-        outSic4 := DueDiligence.CommonBusiness.getSicNaicCodes(filteredData, source, DueDiligence.Constants.EMPTY, company_sic_code4, TRUE, FALSE, dt_first_seen, dt_last_seen);
-        outSic5 := DueDiligence.CommonBusiness.getSicNaicCodes(filteredData, source, DueDiligence.Constants.EMPTY, company_sic_code5, TRUE, FALSE, dt_first_seen, dt_last_seen);
-
-        // NAIC
-        outNaic1 := DueDiligence.CommonBusiness.getSicNaicCodes(filteredData, source, DueDiligence.Constants.EMPTY, company_naics_code1, FALSE, TRUE, dt_first_seen, dt_last_seen);
-        outNaic2 := DueDiligence.CommonBusiness.getSicNaicCodes(filteredData, source, DueDiligence.Constants.EMPTY, company_naics_code2, FALSE, FALSE, dt_first_seen, dt_last_seen);
-        outNaic3 := DueDiligence.CommonBusiness.getSicNaicCodes(filteredData, source, DueDiligence.Constants.EMPTY, company_naics_code3, FALSE, FALSE, dt_first_seen, dt_last_seen);
-        outNaic4 := DueDiligence.CommonBusiness.getSicNaicCodes(filteredData, source, DueDiligence.Constants.EMPTY, company_naics_code4, FALSE, FALSE, dt_first_seen, dt_last_seen);
-        outNaic5 := DueDiligence.CommonBusiness.getSicNaicCodes(filteredData, source, DueDiligence.Constants.EMPTY, company_naics_code5, FALSE, FALSE, dt_first_seen, dt_last_seen);
-        
-        allSicNaic := outSic1 + outSic2 + outSic3 + outSic4 + outSic5 + outNaic1 + outNaic2 + outNaic3 + outNaic4 + outNaic5;
-        sortRollSicNaic := DueDiligence.CommonBusiness.rollSicNaicBySeqAndBIP(inBusiness, allSicNaic);
-          
-        addSicNaic := JOIN(inBusiness, sortRollSicNaic,
-                                  #EXPAND(DueDiligence.Constants.mac_JOINLinkids_BusInternal()),
-                                  TRANSFORM(DueDiligence.Layouts.Busn_Internal,
-                                            SELF.SicNaicSources := RIGHT.sources;
-                                            SELF := LEFT;),
-                                  LEFT OUTER,
-                                  ATMOST(1));
-                                  
-        RETURN addSicNaic;
-    ENDMACRO;
-    
+    ENDMACRO;   
     
     
     EXPORT getFirstSeenCleanedInputAddress(inBusiness, filteredData) := FUNCTIONMACRO

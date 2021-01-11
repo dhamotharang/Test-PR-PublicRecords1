@@ -1,4 +1,4 @@
-﻿IMPORT BIPv2, Business_Risk_BIP, BusReg, DueDiligence, STD;
+﻿IMPORT BIPv2, Business_Risk_BIP, BusReg, DueDiligence;
 
 /* 
 	Following Keys being used:
@@ -28,6 +28,9 @@ EXPORT getBusRegistrationImpl := MODULE
 
 
     EXPORT getRegisteredBusinessHit(inBusiness, filteredData) := FUNCTIONMACRO
+        
+        IMPORT BIPv2, DueDiligence;
+    
         regBusSort := SORT(filteredData, seq, #EXPAND(BIPv2.IDmacros.mac_ListTop3Linkids()), -record_date);
         regBusDedup := DEDUP(regBusSort, seq, #EXPAND(BIPv2.IDmacros.mac_ListTop3Linkids()));
         
@@ -45,32 +48,12 @@ EXPORT getBusRegistrationImpl := MODULE
         RETURN regBusHit;
     ENDMACRO;
     
-    
-    
-    EXPORT getSICNAICS(inBusiness, filteredData) := FUNCTIONMACRO
-        outRegBusSic := DueDiligence.CommonBusiness.getSicNaicCodes(filteredData, DueDiligence.Constants.EMPTY, DueDiligence.Constants.SOURCE_BUSINESS_REGISTRATION, RawFields.SIC, TRUE, TRUE, dt_first_seen, dt_last_seen);
-        outRegBusNaic := DueDiligence.CommonBusiness.getSicNaicCodes(filteredData, DueDiligence.Constants.EMPTY, DueDiligence.Constants.SOURCE_BUSINESS_REGISTRATION, RawFields.NAICS, FALSE, TRUE, dt_first_seen, dt_last_seen);
-        
-        allRegBusSicNaic := outRegBusSic + outRegBusNaic;
-        sortRegBusRollSicNaic := DueDiligence.CommonBusiness.rollSicNaicBySeqAndBIP(inBusiness, allRegBusSicNaic);
-          
-        regBusSicNaic := JOIN(inBusiness, sortRegBusRollSicNaic,
-                              LEFT.seq = RIGHT.seq AND
-                              LEFT.Busn_info.BIP_IDS.UltID.LinkID = RIGHT.ultID AND
-                              LEFT.Busn_info.BIP_IDS.OrgID.LinkID = RIGHT.orgID AND
-                              LEFT.Busn_info.BIP_IDS.SeleID.LinkID = RIGHT.seleID,
-                              TRANSFORM(DueDiligence.Layouts.Busn_Internal,
-                                        SELF.SicNaicSources := RIGHT.sources;
-                                        SELF := LEFT;),
-                              LEFT OUTER,
-                              ATMOST(1));
-                              
-        RETURN regBusSicNaic;
-    ENDMACRO;
-    
-    
+       
     
     EXPORT getRegisteredAgents(inBusiness, filteredData) := FUNCTIONMACRO
+        
+        IMPORT BIPv2, DueDiligence;
+    
         busRegAgent := filteredData(rawfields.ra_name <> DueDiligence.Constants.EMPTY AND clean_ra_address.prim_name <> DueDiligence.Constants.EMPTY);
         sortBusRegAgent := SORT(busRegAgent, seq, #EXPAND(BIPv2.IDmacros.mac_ListTop3Linkids()), clean_ra_address.prim_range, clean_ra_address.predir, clean_ra_address.prim_name, clean_ra_address.addr_suffix, clean_ra_address.postdir, clean_ra_address.zip, dt_first_seen);
 

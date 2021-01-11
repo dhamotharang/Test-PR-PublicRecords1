@@ -32,8 +32,8 @@ EXPORT Records := MODULE
 		ds_paw_raw:=(ds_paw_less_overwritten+ds_override_recs)(glb='N' OR in_mod.isValidGlb()); // apply GLB filter
 
 		// apply suppressions
-		Suppress.MAC_Suppress(ds_paw_raw,ds_dids_pulled,in_mod.application_type,Suppress.Constants.LinkTypes.DID,did);
-		Suppress.MAC_Suppress(ds_dids_pulled,ds_dids_ssns_pulled,in_mod.application_type,Suppress.Constants.LinkTypes.SSN,ssn);
+		Suppress.MAC_Suppress(ds_paw_raw,ds_dids_pulled,in_mod.application_type,Suppress.Constants.LinkTypes.DID,did, isFCRA := true);
+		Suppress.MAC_Suppress(ds_dids_pulled,ds_dids_ssns_pulled,in_mod.application_type,Suppress.Constants.LinkTypes.SSN,ssn, isFCRA := true);
 
 		// filter raw to disclose only fields restore acctno
 		ds_paw_disclose:=JOIN(ds_work_recs,ds_dids_ssns_pulled,

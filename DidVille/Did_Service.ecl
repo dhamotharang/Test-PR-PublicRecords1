@@ -44,7 +44,7 @@
 */
 /*--INFO-- This service returns a did.*/
 
-import address, AutoStandardI, doxie, patriot, STD, ut, Suppress;
+import address, AutoStandardI, doxie, dx_common, patriot, STD, ut, Suppress;
 
 export Did_Service := MACRO
 
@@ -197,7 +197,7 @@ pj2 := JOIN(ptys, patriot.key_patriot_file,
 
 patrecs_suppressed := Suppress.MAC_SuppressSource(pj1+pj2, mod_access);
 patrecs := IF(patriotproc, patrecs_suppressed);
-patrecs_slim := project(patrecs, {patriot.Layout_Patriot - [global_sid, record_sid]});
+patrecs_slim := project(patrecs, {patriot.Layout_Patriot - dx_common.layout_metadata});
 output(patrecs_slim);
 
 //bug 69994: enable did only search.

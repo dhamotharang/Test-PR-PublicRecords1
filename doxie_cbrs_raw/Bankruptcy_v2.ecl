@@ -1,4 +1,5 @@
-import business_header, doxie_cbrs,doxie,BankruptcyV3,BankruptcyV2_Services;
+import doxie_cbrs, BankruptcyV3, BankruptcyV2_Services;
+
 export Bankruptcy_v2(
 	dataset(doxie_cbrs.layout_references) bdids,
 	boolean Include_val = false,
@@ -21,9 +22,9 @@ shared lie := BankruptcyV2_Services.bankruptcy_raw().report_view(in_tmsids := id
 shared out_f := lie;
 
 	export records := out_f;
-	export record_count(boolean count_only) := 
+	export record_count(boolean count_only) :=
 			IF(count_only,
 			   count(project(k(keyed(p_bdid in SET(doxie_cbrs.ds_SupergroupLevels(bdids), bdid))), transform({k.p_bdid}, self := left))),
 				 count(out_f));
-	
+
 END;

@@ -1,7 +1,7 @@
 ﻿/*--SOAP--
 <message name="SmallBusiness_Marketing_Service" wuTimeout="300000">
 	<part name="SmallBusinessMarketingRequest" type="tns:XmlDataSet" cols="110" rows="75"/>
-  <!-- Option Fields --> 
+  <!-- Option Fields -->
 	<part name="DPPAPurpose" type="xsd:integer"/>
 	<part name="GLBPurpose" type="xsd:integer"/>
 	<part name="DataRestrictionMask" type="xsd:string"/>
@@ -17,193 +17,6 @@
 </message>
 */
 /*--INFO-- Small Business XML Service - This service returns Small Business Attributes and Scores */
-/*--HELP--
-<pre>
-SmallBusinessMarketingRequest XML:
-&lt;lnsmallbusiness.SmallBusiness_Marketing_ServiceRequest&gt;
-&lt;SmallBusinessMarketingRequest&gt;
-  &lt;Row&gt;
-    &lt;User&gt;
-      &lt;GLBPurpose&gt;1&lt;/GLBPurpose&gt;
-      &lt;DLPurpose&gt;1&lt;/DLPurpose&gt;
-      &lt;IndustryClass&gt;&lt;/IndustryClass&gt;
-      &lt;DataRestrictionMask&gt;00000000000000000000&lt;/DataRestrictionMask&gt;
-      &lt;DataPermissionMask&gt;&lt;/DataPermissionMask&gt;
-      &lt;AccountNumber&gt;&lt;/AccountNumber&gt;
-      &lt;TestDataEnabled&gt;0&lt;/TestDataEnabled&gt;
-      &lt;TestDataTableName&gt;&lt;/TestDataTableName&gt;
-      &lt;OutcomeTrackingOptOut&gt;0&lt;/OutcomeTrackingOptOut&gt;
-    &lt;/User&gt;
-    &lt;Options&gt;
-      &lt;AttributesVersionRequest&gt;
-        &lt;Name&gt;SmallBusinessAttrV1&lt;/Name&gt;
-      &lt;/AttributesVersionRequest&gt;
-      &lt;IncludeModels&gt;
-        &lt;Names&gt;
-          &lt;Name&gt;&lt;/Name&gt;
-        &lt;/Names&gt;
-        &lt;ModelOptions&gt;
-          &lt;ModelOption&gt;
-           &lt;OptionName&gt;&lt;/OptionName&gt;
-           &lt;OptionValue&gt;&lt;/OptionValue&gt;
-          &lt;/ModelOption&gt;
-        &lt;/ModelOptions&gt;
-      &lt;/IncludeModels&gt;
-    &lt;/Options&gt;
-    &lt;SearchBy&gt;
-      &lt;Company&gt;
-        &lt;CompanyName&gt;&lt;/CompanyName&gt;
-        &lt;AlternateCompanyName&gt;&lt;/AlternateCompanyName&gt;
-        &lt;Address&gt;
-          &lt;StreetNumber&gt;&lt;/StreetNumber&gt;
-          &lt;StreetPreDirection&gt;&lt;/StreetPreDirection&gt;
-          &lt;StreetName&gt;&lt;/StreetName&gt;
-          &lt;StreetSuffix&gt;&lt;/StreetSuffix&gt;
-          &lt;StreetPostDirection&gt;&lt;/StreetPostDirection&gt;
-          &lt;UnitDesignation&gt;&lt;/UnitDesignation&gt;
-          &lt;UnitNumber&gt;&lt;/UnitNumber&gt;
-          &lt;StreetAddress1&gt;&lt;/StreetAddress1&gt;
-          &lt;StreetAddress2&gt;&lt;/StreetAddress2&gt;
-          &lt;City&gt;&lt;/City&gt;
-          &lt;State&gt;&lt;/State&gt;
-          &lt;Zip5&gt;&lt;/Zip5&gt;
-          &lt;Zip4&gt;&lt;/Zip4&gt;
-        &lt;/Address&gt;
-        &lt;Phone&gt;&lt;/Phone&gt;
-        &lt;FaxNumber&gt;&lt;/FaxNumber&gt;
-        &lt;FEIN&gt;&lt;/FEIN&gt;
-        &lt;SICCode&gt;&lt;/SICCode&gt;
-        &lt;NAICCode&gt;&lt;/NAICCode&gt;
-        &lt;BusinessStructure&gt;&lt;/BusinessStructure&gt;
-        &lt;YearsInBusiness&gt;&lt;/YearsInBusiness&gt;
-        &lt;BusinessStartDate&gt;
-          &lt;Year&gt;&lt;/Year&gt;
-          &lt;Month&gt;&lt;/Month&gt;
-          &lt;Day&gt;&lt;/Day&gt;
-        &lt;/BusinessStartDate&gt;
-        &lt;YearlyRevenue&gt;&lt;/YearlyRevenue&gt;
-      &lt;/Company&gt;
-      &lt;AuthorizedRep1&gt;
-        &lt;Name&gt;
-          &lt;Full&gt;&lt;/Full&gt;
-          &lt;First&gt;&lt;/First&gt;
-          &lt;Middle&gt;&lt;/Middle&gt;
-          &lt;Last&gt;&lt;/Last&gt;
-          &lt;Suffix&gt;&lt;/Suffix&gt;
-          &lt;Prefix&gt;&lt;/Prefix&gt;
-        &lt;/Name&gt;
-        &lt;FormerLastName&gt;&lt;/FormerLastName&gt;
-        &lt;Address&gt;
-          &lt;StreetNumber&gt;&lt;/StreetNumber&gt;
-          &lt;StreetPreDirection&gt;&lt;/StreetPreDirection&gt;
-          &lt;StreetName&gt;&lt;/StreetName&gt;
-          &lt;StreetSuffix&gt;&lt;/StreetSuffix&gt;
-          &lt;StreetPostDirection&gt;&lt;/StreetPostDirection&gt;
-          &lt;UnitDesignation&gt;&lt;/UnitDesignation&gt;
-          &lt;UnitNumber&gt;&lt;/UnitNumber&gt;
-          &lt;StreetAddress1&gt;&lt;/StreetAddress1&gt;
-          &lt;StreetAddress2&gt;&lt;/StreetAddress2&gt;
-          &lt;City&gt;&lt;/City&gt;
-          &lt;State&gt;&lt;/State&gt;
-          &lt;Zip5&gt;&lt;/Zip5&gt;
-          &lt;Zip4&gt;&lt;/Zip4&gt;
-        &lt;/Address&gt;
-        &lt;DOB&gt;
-          &lt;Year&gt;&lt;/Year&gt;
-          &lt;Month&gt;&lt;/Month&gt;
-          &lt;Day&gt;&lt;/Day&gt;
-        &lt;/DOB&gt;
-        &lt;Age&gt;&lt;/Age&gt;
-        &lt;SSN&gt;&lt;/SSN&gt;
-        &lt;Phone&gt;&lt;/Phone&gt;
-        &lt;DriverLicenseNumber&gt;&lt;/DriverLicenseNumber&gt;
-        &lt;DriverLicenseState&gt;&lt;/DriverLicenseState&gt;
-        &lt;BusinessTitle&gt;&lt;/BusinessTitle&gt;
-      &lt;/AuthorizedRep1&gt;
-      &lt;AuthorizedRep2&gt;
-        &lt;Name&gt;
-          &lt;Full&gt;&lt;/Full&gt;
-          &lt;First&gt;&lt;/First&gt;
-          &lt;Middle&gt;&lt;/Middle&gt;
-          &lt;Last&gt;&lt;/Last&gt;
-          &lt;Suffix&gt;&lt;/Suffix&gt;
-          &lt;Prefix&gt;&lt;/Prefix&gt;
-        &lt;/Name&gt;
-        &lt;FormerLastName&gt;&lt;/FormerLastName&gt;
-        &lt;Address&gt;
-          &lt;StreetNumber&gt;&lt;/StreetNumber&gt;
-          &lt;StreetPreDirection&gt;&lt;/StreetPreDirection&gt;
-          &lt;StreetName&gt;&lt;/StreetName&gt;
-          &lt;StreetSuffix&gt;&lt;/StreetSuffix&gt;
-          &lt;StreetPostDirection&gt;&lt;/StreetPostDirection&gt;
-          &lt;UnitDesignation&gt;&lt;/UnitDesignation&gt;
-          &lt;UnitNumber&gt;&lt;/UnitNumber&gt;
-          &lt;StreetAddress1&gt;&lt;/StreetAddress1&gt;
-          &lt;StreetAddress2&gt;&lt;/StreetAddress2&gt;
-          &lt;City&gt;&lt;/City&gt;
-          &lt;State&gt;&lt;/State&gt;
-          &lt;Zip5&gt;&lt;/Zip5&gt;
-          &lt;Zip4&gt;&lt;/Zip4&gt;
-        &lt;/Address&gt;
-        &lt;DOB&gt;
-          &lt;Year&gt;&lt;/Year&gt;
-          &lt;Month&gt;&lt;/Month&gt;
-          &lt;Day&gt;&lt;/Day&gt;
-        &lt;/DOB&gt;
-        &lt;Age&gt;&lt;/Age&gt;
-        &lt;SSN&gt;&lt;/SSN&gt;
-        &lt;Phone&gt;&lt;/Phone&gt;
-        &lt;DriverLicenseNumber&gt;&lt;/DriverLicenseNumber&gt;
-        &lt;DriverLicenseState&gt;&lt;/DriverLicenseState&gt;
-        &lt;BusinessTitle&gt;&lt;/BusinessTitle&gt;
-      &lt;/AuthorizedRep2&gt;
-      &lt;AuthorizedRep3&gt;
-        &lt;Name&gt;
-          &lt;Full&gt;&lt;/Full&gt;
-          &lt;First&gt;&lt;/First&gt;
-          &lt;Middle&gt;&lt;/Middle&gt;
-          &lt;Last&gt;&lt;/Last&gt;
-          &lt;Suffix&gt;&lt;/Suffix&gt;
-          &lt;Prefix&gt;&lt;/Prefix&gt;
-        &lt;/Name&gt;
-        &lt;FormerLastName&gt;&lt;/FormerLastName&gt;
-        &lt;Address&gt;
-          &lt;StreetNumber&gt;&lt;/StreetNumber&gt;
-          &lt;StreetPreDirection&gt;&lt;/StreetPreDirection&gt;
-          &lt;StreetName&gt;&lt;/StreetName&gt;
-          &lt;StreetSuffix&gt;&lt;/StreetSuffix&gt;
-          &lt;StreetPostDirection&gt;&lt;/StreetPostDirection&gt;
-          &lt;UnitDesignation&gt;&lt;/UnitDesignation&gt;
-          &lt;UnitNumber&gt;&lt;/UnitNumber&gt;
-          &lt;StreetAddress1&gt;&lt;/StreetAddress1&gt;
-          &lt;StreetAddress2&gt;&lt;/StreetAddress2&gt;
-          &lt;City&gt;&lt;/City&gt;
-          &lt;State&gt;&lt;/State&gt;
-          &lt;Zip5&gt;&lt;/Zip5&gt;
-          &lt;Zip4&gt;&lt;/Zip4&gt;
-        &lt;/Address&gt;
-        &lt;DOB&gt;
-          &lt;Year&gt;&lt;/Year&gt;
-          &lt;Month&gt;&lt;/Month&gt;
-          &lt;Day&gt;&lt;/Day&gt;
-        &lt;/DOB&gt;
-        &lt;Age&gt;&lt;/Age&gt;
-        &lt;SSN&gt;&lt;/SSN&gt;
-        &lt;Phone&gt;&lt;/Phone&gt;
-        &lt;DriverLicenseNumber&gt;&lt;/DriverLicenseNumber&gt;
-        &lt;DriverLicenseState&gt;&lt;/DriverLicenseState&gt;
-        &lt;BusinessTitle&gt;&lt;/BusinessTitle&gt;
-      &lt;/AuthorizedRep3&gt;
-    &lt;/SearchBy&gt;
-  &lt;/Row&gt;
-&lt;/SmallBusinessMarketingRequest&gt;
-&lt;Watchlists_Requested&gt;
-  &lt;Row&gt;&lt;/Row&gt;
-&lt;/Watchlists_Requested&gt;
-&lt;/lnsmallbusiness.SmallBusiness_Marketing_ServiceRequest&gt;
-</pre>
-*/
-
 #option('expandSelectCreateRow', true);
 #option('embeddedWarningsAsErrors', 0);
 
@@ -233,17 +46,17 @@ EXPORT SmallBusiness_Marketing_Service() := FUNCTION
     '_BatchUID',
     '_GCID'
 	));
-	
+
 	//localized constants
 	UNSIGNED1 NUMBER_OF_ATTRIBUTES := 200;
-	
+
 	/* ************************************************************************
 	 *                          Grab service inputs                           *
 	 ************************************************************************ */
 
-	// Can't have duplicate definitions of Stored with different default values, 
+	// Can't have duplicate definitions of Stored with different default values,
 	// so add the default to #stored to eliminate the assignment of a default value.
-	// Fixes "Duplicate definition of STORED('datarestrictionmask') with different type 
+	// Fixes "Duplicate definition of STORED('datarestrictionmask') with different type
 	// (use #stored to override default value)" error.
 	#STORED('DataRestrictionMask',Business_Risk_BIP.Constants.Default_DataRestrictionMask);
 	#STORED('DataPermissionMask' ,Business_Risk_BIP.Constants.Default_DataPermissionMask);
@@ -255,8 +68,8 @@ EXPORT SmallBusiness_Marketing_Service() := FUNCTION
   firstRow  := requestIn[1] : INDEPENDENT; // Since this is realtime and not batch, should only have one row on input.
 	search    := GLOBAL(firstRow.SearchBy);
 	option    := GLOBAL(firstRow.Options);
-	users     := GLOBAL(firstRow.User); 
-	
+	users     := GLOBAL(firstRow.User);
+
 	/* **********************************************
 		 *  Fields needed for improved Scout Logging  *
 		 **********************************************/
@@ -268,9 +81,9 @@ EXPORT SmallBusiness_Marketing_Service() := FUNCTION
 		string10 InterfaceVersion       := '' : STORED('_ESPClientInterfaceVersion');
 		string5 DeliveryMethod          := '' : STORED('_DeliveryMethod');
 		string5 DeathMasterPurpose      := '' : STORED('__deathmasterpurpose');
-		outofbandssnmask                := '' : STORED('SSNMask');
+		string6 outofbandssnmask        := 'NONE' : STORED('SSNMask'); //same as in "global module"
 		string10 SSN_Mask               := if(users.SSNMask != '', users.SSNMask, outofbandssnmask);
-		outofbanddobmask                := '' : STORED('DOBMask');
+		string6 outofbanddobmask        := 'NONE' : STORED('DOBMask'); //same as in "global module"
 		string10 DOB_Mask               := if(users.DOBMask != '', users.DOBMask, outofbanddobmask);
 		BOOLEAN DL_Mask                 := users.DLMask;
 		BOOLEAN ExcludeDMVPII           := users.ExcludeDMVPII;
@@ -298,7 +111,7 @@ EXPORT SmallBusiness_Marketing_Service() := FUNCTION
 	// DataRestrictionMask_stored, DataPermissionMask_stored, etc., since they are "internal" or overridden values
 	// populated for Development/QA purposes, etc.
 	STRING30 AcctNo := users.AccountNumber;
-	
+
 	// Business Input Information
 	STRING120 Bus_Company_Name := search.Company.CompanyName;
 	STRING120 Bus_Doing_Business_As := search.Company.AlternateCompanyName;
@@ -317,9 +130,9 @@ EXPORT SmallBusiness_Marketing_Service() := FUNCTION
 	STRING8 Bus_Start_Date := iesp.ECL2ESP.t_DateToString8(search.Company.BusinessStartDate);
 	STRING12 Bus_Yearly_Revenue := search.Company.YearlyRevenue;
 	STRING10 Bus_Fax_Number := search.Company.FaxNumber;
-	
+
 	UNSIGNED6 SeleID := (INTEGER)search.Company.BusinessIDs.seleid;
-	
+
 	// Authorized Representative 1 Input Information
 	STRING120 Rep_1_Full_Name := search.AuthorizedRep1.Name.Full;
 	STRING20 Rep_1_First_Name := search.AuthorizedRep1.Name.First;
@@ -340,7 +153,7 @@ EXPORT SmallBusiness_Marketing_Service() := FUNCTION
 	STRING25 Rep_1_DL_Number := search.AuthorizedRep1.DriverLicenseNumber;
 	STRING2 Rep_1_DL_State := search.AuthorizedRep1.DriverLicenseState;
 	STRING Rep_1_Business_Title := search.AuthorizedRep1.BusinessTitle;
-	
+
 	// Authorized Representative 2 Input Information
 	STRING120 Rep_2_Full_Name := search.AuthorizedRep2.Name.Full;
 	STRING20 Rep_2_First_Name := search.AuthorizedRep2.Name.First;
@@ -361,7 +174,7 @@ EXPORT SmallBusiness_Marketing_Service() := FUNCTION
 	STRING25 Rep_2_DL_Number := search.AuthorizedRep2.DriverLicenseNumber;
 	STRING2 Rep_2_DL_State := search.AuthorizedRep2.DriverLicenseState;
 	STRING Rep_2_Business_Title := search.AuthorizedRep2.BusinessTitle;
-	
+
 	// Authorized Representative 3 Input Information
 	STRING120 Rep_3_Full_Name := search.AuthorizedRep3.Name.Full;
 	STRING20 Rep_3_First_Name := search.AuthorizedRep3.Name.First;
@@ -383,7 +196,7 @@ EXPORT SmallBusiness_Marketing_Service() := FUNCTION
 	STRING2 Rep_3_DL_State := search.AuthorizedRep3.DriverLicenseState;
 	STRING Rep_3_Business_Title := search.AuthorizedRep3.BusinessTitle;
 
-	
+
 	// Option Fields
 	UNSIGNED3 HistoryDateYYYYMM		 := 0 : STORED('HistoryDateYYYYMM');
 	UNSIGNED6 HistoryDate          := 0 : STORED('HistoryDate');
@@ -405,14 +218,14 @@ EXPORT SmallBusiness_Marketing_Service() := FUNCTION
 
 	IF( OFAC_Version != 4 AND OFAC_XG5.constants.wlALLV4 IN SET(Watchlists_Requested, value),
 		FAIL( OFAC_XG5.Constants.ErrorMsg_OFACversion ) );
-	
+
 	// SmallBusinessAttrV1 (etc) is a valid input
 	AttributesRequested := PROJECT(option.AttributesVersionRequest, TRANSFORM(LNSmallBusiness.Layouts.AttributeGroupRec, SELF.AttributeGroup := STD.Str.ToUpperCase(LEFT.Value)));
 	ModelsRequested := PROJECT(option.IncludeModels.Names, TRANSFORM(LNSmallBusiness.Layouts.ModelNameRec, SELF.ModelName := STD.Str.ToUpperCase(LEFT.Value)));
 	ModelOptions := PROJECT(option.IncludeModels.ModelOptions, TRANSFORM(LNSmallBusiness.Layouts.ModelOptionsRec, SELF.OptionName := STD.Str.ToUpperCase(TRIM(LEFT.OptionName, LEFT, RIGHT));
 																																																								SELF.OptionValue := LEFT.OptionValue));
-	
-	
+
+
 	LNSmallBusiness.BIP_Layouts.Input intoInputLayout() := TRANSFORM
 		SELF.AcctNo := AcctNo;
 		SELF.HistoryDateYYYYMM := HistoryDateYYYYMM;
@@ -487,14 +300,14 @@ EXPORT SmallBusiness_Marketing_Service() := FUNCTION
 		SELF.Rep_3_DL_Number := Rep_3_DL_Number;
 		SELF.Rep_3_DL_State := Rep_3_DL_State;
 		SELF.Rep_3_Business_Title := Rep_3_Business_Title;
-		
+
 		SELF.SELEID := SeleID;
-		
+
 		SELF := [];
 	END;
 
 	Input := DATASET([intoInputLayout()]);
-	
+
 	/* *************************************
 	 *            Validate Input:          *
    ***************************************/
@@ -513,17 +326,17 @@ EXPORT SmallBusiness_Marketing_Service() := FUNCTION
 																			TRIM(Rep_1_SSN) = '' AND TRIM(Rep_1_DOB) = '' AND TRIM(Rep_1_Street_Address1) = '' AND TRIM(Rep_1_City) = '' AND TRIM(Rep_1_State) = '' AND TRIM(Rep_1_Zip) = '' AND TRIM(Rep_1_Phone10) = '' AND TRIM(Rep_1_DL_Number) = '' AND
 																			TRIM(Rep_2_SSN) = '' AND TRIM(Rep_2_DOB) = '' AND TRIM(Rep_2_Street_Address1) = '' AND TRIM(Rep_2_City) = '' AND TRIM(Rep_2_State) = '' AND TRIM(Rep_2_Zip) = '' AND TRIM(Rep_2_Phone10) = '' AND TRIM(Rep_2_DL_Number) = '' AND
 																			TRIM(Rep_3_SSN) = '' AND TRIM(Rep_3_DOB) = '' AND TRIM(Rep_3_Street_Address1) = '' AND TRIM(Rep_3_City) = '' AND TRIM(Rep_3_State) = '' AND TRIM(Rep_3_Zip) = '' AND TRIM(Rep_3_Phone10) = '' AND TRIM(Rep_3_DL_Number) = ''
-																		 );	 
+																		 );
 
-																		 
+
 	IF((MinimumInputMetForOption1 = FALSE AND MinimumInputMetForOption2 = FALSE AND MinimumInputMetForOption3 = FALSE) OR // Minimum Business Inputs not met
 		 ((MinimumInputMetForOption1 = TRUE OR MinimumInputMetForOption2 = TRUE OR MinimumInputMetForOption3 = TRUE) AND MinimumInputMetForAuthorizedRep = FALSE), // Minimum Business Inputs met, but minimum Authorized Rep Inputs not met
 		FAIL('Please input the minimum required fields:\nOption 1: Company Name, Street Address, Zip\nOR\nOption 2: Company Name, Street Address, City, State\nOR\nOption 3:Business LexID (SELEID)'));
-		
-		
-	//This will need to change if we want to search by anything other than SeleID (currently only coded for)	
+
+
+	//This will need to change if we want to search by anything other than SeleID (currently only coded for)
 	searchInputById := LNSmallBusiness.fn_search_business_ids(input, DPPA_Purpose, GLBA_Purpose, DataRestrictionMask, DataPermissionMask, LNSmallBusiness.Constants.BEST_INFO_REQ_TYPE.SELEID);
-	
+
 
 	/* ************************************************************************
 	 *         Get the Small Business Attributes and Scores Results           *
@@ -548,26 +361,26 @@ EXPORT SmallBusiness_Marketing_Service() := FUNCTION
 																														IncludeTargusGateway,
 																														RunTargusGateway, /* for testing purposes only */
 																														LNSmallBusiness.Constants.BIPID_WEIGHT_THRESHOLD.FOR_SmallBusiness_Marketing_Service,
-                                                                                                                        LexIdSourceOptout := LexIdSourceOptout, 
-                                                                                                                        TransactionID := TransactionID, 
-                                                                                                                        BatchUID := BatchUID, 
+                                                                                                                        LexIdSourceOptout := LexIdSourceOptout,
+                                                                                                                        TransactionID := TransactionID,
+                                                                                                                        BatchUID := BatchUID,
                                                                                                                         GlobalCompanyID := GlobalCompanyID
 																														);
-																														
+
 
 	SBA_Results_Temp := PROJECT( SBA_Results_Temp_with_PhoneSources, LNSmallBusiness.BIP_Layouts.IntermediateLayout );
-	
+
 	#if(Models.LIB_BusinessRisk_Models().TurnOnValidation) // If TRUE, output the model results directly
-		
+
 		RETURN OUTPUT(SBA_Results_Temp, NAMED('Results'));
-		
-	#else	
+
+	#else
 		SBA_Results := IF(TestDataEnabled = FALSE, SBA_Results_Temp,
 																		/* else */ LNSmallBusiness.SmallBusiness_BIP_Testseed_Function(Input,
 																																																	 TestDataTableName,
 																																																	 DataPermissionMask,
 																																																	 ModelsRequested));
-		
+
 		/* ************************************************************************
 		 * Transform the Small Business Attributes and Scores Results into IESP   *
 		 ************************************************************************ */
@@ -576,10 +389,10 @@ EXPORT SmallBusiness_Marketing_Service() := FUNCTION
 			SELF.Name := Name;
 			SELF.Value := Value;
 		END;
-		
+
 		// Create Version 1 Name/Value Pair Attributes
 		iesp.share.t_NameValuePair intoVersion1(LNSmallBusiness.BIP_Layouts.IntermediateLayout le, UNSIGNED AttributeNumber) := TRANSFORM
-			SELF := CASE(AttributeNumber, 
+			SELF := CASE(AttributeNumber,
 					1	=> ROW(createRecord('InputCheckBusName',	le.InputCheckBusName)),
 					2	=> ROW(createRecord('InputCheckBusAltName',	le.InputCheckBusAltName)),
 					3	=> ROW(createRecord('InputCheckBusAddr',	le.InputCheckBusAddr)),
@@ -782,9 +595,9 @@ EXPORT SmallBusiness_Marketing_Service() := FUNCTION
 					200	=> ROW(createRecord('AssociateCountyCount',	le.AssociateCountyCount)),
 								 ROW(createRecord('Invalid',	'Invalid')));
 		END;
-		
+
 		NameValuePairsVersion1 := NORMALIZE(SBA_Results, NUMBER_OF_ATTRIBUTES, intoVersion1(LEFT, COUNTER));
-		
+
 		iesp.smallbusinessmarketingattributes.t_SBMAttributesGroup Version1(LNSmallBusiness.BIP_Layouts.IntermediateLayout le) := TRANSFORM
 			SELF.Name := LNSmallBusiness.Constants.SMALL_BIZ_MKT_ATTR_V1_NAME;
 			SELF.Attributes := NameValuePairsVersion1;
@@ -799,9 +612,9 @@ EXPORT SmallBusiness_Marketing_Service() := FUNCTION
 			SELF.Result.BusinessID.SeleID := le.SeleID;
 			SELF.Result.BusinessID.OrgID := le.OrgID;
 			SELF.Result.BusinessID.UltID := le.UltID;
-			SELF.Result.Models := PROJECT(le.ModelResults, TRANSFORM(iesp.smallbusinessmarketingattributes.t_SBMModelHRI, 
-																		SELF.Name := LEFT.Name; 
-																		SELF.Scores := PROJECT(le.ModelResults.Scores, TRANSFORM(iesp.smallbusinessmarketingattributes.t_SBMScoreHRI, 
+			SELF.Result.Models := PROJECT(le.ModelResults, TRANSFORM(iesp.smallbusinessmarketingattributes.t_SBMModelHRI,
+																		SELF.Name := LEFT.Name;
+																		SELF.Scores := PROJECT(le.ModelResults.Scores, TRANSFORM(iesp.smallbusinessmarketingattributes.t_SBMScoreHRI,
 																													SELF._Type := LEFT._Type,
 																													SELF.Value := LEFT.Value,
 																													SELF.ScoreReasons := PROJECT(choosen(le.ModelResults.Scores.ScoreReasons, iesp.constants.SBAnalytics.MaxHRICount),
@@ -809,17 +622,17 @@ EXPORT SmallBusiness_Marketing_Service() := FUNCTION
 																																											SELF.Sequence := LEFT.Sequence,
 																																											SELF.ReasonCode := LEFT.ReasonCode,
 																																											SELF.Description := LEFT.Description))))));
-			
+
 
 			//If the first 13 characters in dataset AttributesRequested = 'SMBUSMKTATTRV' grab the 14th character to see which version we will use (1/11/17 currently only 1 version)
-			SELF.Result.AttributeGroups := IF((UNSIGNED)AttributesRequested(AttributeGroup[1..13] = LNSmallBusiness.Constants.SMALL_BIZ_MKT_ATTR)[1].AttributeGroup[14..] = 1, PROJECT(le, Version1(LEFT))) + 
-																		 DATASET([], iesp.smallbusinessmarketingattributes.t_SBMAttributesGroup);																															
+			SELF.Result.AttributeGroups := IF((UNSIGNED)AttributesRequested(AttributeGroup[1..13] = LNSmallBusiness.Constants.SMALL_BIZ_MKT_ATTR)[1].AttributeGroup[14..] = 1, PROJECT(le, Version1(LEFT))) +
+																		 DATASET([], iesp.smallbusinessmarketingattributes.t_SBMAttributesGroup);
 			SELF._Header := [];
 			SELF := [];
 		END;
-		
+
 		Final_Results := PROJECT(SBA_Results, intoESDL(LEFT));
-		
+
 		intermediateLog := DATASET([], Risk_Reporting.Layouts.LOG_Business_Shell) : STORED('Intermediate_Log');
 		// Note: All intermediate logs must have the following name schema:
 		// Starts with 'LOG_' (Upper case is important!!)
@@ -838,8 +651,8 @@ EXPORT SmallBusiness_Marketing_Service() := FUNCTION
 																										 self.delivery_method := DeliveryMethod,
 																										 self.date_added := (STRING8)Std.Date.Today(),
 																										 self.death_master_purpose := DeathMasterPurpose,
-																										 self.ssn_mask := SSN_Mask,
-																										 self.dob_mask := DOB_Mask,
+																										 SELF.ssn_mask := IF(SSN_Mask = 'NONE', '', SSN_Mask),
+																										 SELF.dob_mask := IF(DOB_Mask = 'NONE', '', DOB_Mask),
 																										 self.dl_mask := (String)(Integer)DL_Mask,
 																										 self.exclude_dmv_pii := (String)(Integer)ExcludeDMVPII,
 																										 self.scout_opt_out := (String)(Integer)DisableOutcomeTracking,
@@ -894,7 +707,7 @@ EXPORT SmallBusiness_Marketing_Service() := FUNCTION
 
 		//Improved Scout Logging
 		IF(~DisableOutcomeTracking and ~TestDataEnabled, OUTPUT(Deltabase_Logging, NAMED('LOG_log__mbs_transaction__log__scout')));
-		
+
 		// DEBUGs:
 		//OUTPUT(Input, NAMED('Input'));
 		// OUTPUT( SBA_Results_Temp_with_PhoneSources, NAMED('IntLayoutWithPhones') );
@@ -904,8 +717,8 @@ EXPORT SmallBusiness_Marketing_Service() := FUNCTION
 		// OUTPUT( 'DataPermissionMask: ' + DataPermissionMask );
 		// OUTPUT( 'IndustryClass: ' + IndustryClass );
 
-		
+
 		RETURN OUTPUT(Final_Results, NAMED('Results'));
 	#end
-	
+
 END;

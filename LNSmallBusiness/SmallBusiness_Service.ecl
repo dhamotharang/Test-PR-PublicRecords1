@@ -1,148 +1,25 @@
-﻿/*--SOAP--
-<message name="SmallBusiness_Service">
-	<!-- XML INPUT -->
-	<part name="SmallBusinessRiskRequest" type="tns:XmlDataSet" cols="80" rows="30" />
-	
-	<part name="gateways" type="tns:XmlDataSet" cols="110" rows="4"/>
-	<part name="HistoryDateYYYYMM" type="xsd:integer"/>
-	<part name="TestDataEnabled" type="xsd:boolean"/>
-	<part name="TestDataTableName" type="xsd:string"/>
-	<part name="DataRestrictionMask" type="xsd:string"/>
-	<part name="DataPermissionMask" type="xsd:string"/>
-  <part name="OutcomeTrackingOptOut" type="xsd:boolean"/>
-	</message>
-*/
+﻿// =====================================================================
+// ROXIE QUERY
+// -----------
+// For the complete list of input parameters please check published WU.
+// Look at the history of this attribute for the old SOAP info.
+// =====================================================================
 /*--INFO-- LexisNexis Small Business Risk Score real-time service */
-/*--HELP--
-<pre>
-SmallBusinessRiskRequest XML:
-&lt;Dataset&gt;
-   &lt;Row&gt;
-      &lt;remotelocations&gt;&lt;/remotelocations&gt;
-      &lt;servicelocations&gt;&lt;/servicelocations&gt;
-      &lt;user&gt;
-	 &lt;referencecode&gt;&lt;/referencecode&gt;
-	 &lt;billingcode&gt;&lt;/billingcode&gt;
-	 &lt;queryid&gt;&lt;/queryid&gt;
-	 &lt;companyid&gt;&lt;/companyid&gt;
-	 &lt;glbpurpose&gt;&lt;/glbpurpose&gt;
-	 &lt;dlpurpose&gt;&lt;/dlpurpose&gt;
-	 &lt;loginhistoryid&gt;&lt;/loginhistoryid&gt;
-	 &lt;debitunits&gt;0&lt;/debitunits&gt;
-	 &lt;ip&gt;&lt;/ip&gt;
-	 &lt;industryclass&gt;&lt;/industryclass&gt;
-	 &lt;resultformat&gt;&lt;/resultformat&gt;
-	 &lt;logasfunction&gt;&lt;/logasfunction&gt;
-	 &lt;ssnmask&gt;&lt;/ssnmask&gt;
-	 &lt;dobmask&gt;&lt;/dobmask&gt;
-	 &lt;dlmask&gt;false&lt;/dlmask&gt;
-	 &lt;datarestrictionmask&gt;&lt;/datarestrictionmask&gt;
-	 &lt;datapermissionmask&gt;&lt;/datapermissionmask&gt;
-	 &lt;ssnmaskingon&gt;false&lt;/ssnmaskingon&gt;
-	 &lt;dlmaskingon&gt;false&lt;/dlmaskingon&gt;
-	 &lt;enduser&gt;
-	    &lt;companyname&gt;&lt;/companyname&gt;
-	    &lt;streetaddress1&gt;&lt;/streetaddress1&gt;
-	    &lt;city&gt;&lt;/city&gt;
-	    &lt;state&gt;&lt;/state&gt;
-	    &lt;zip5&gt;&lt;/zip5&gt;
-	 &lt;/enduser&gt;
-	 &lt;maxwaitseconds&gt;0&lt;/maxwaitseconds&gt;
-	 &lt;relatedtransactionid&gt;&lt;/relatedtransactionid&gt;
-	 &lt;accountnumber&gt;&lt;/accountnumber&gt;
-      &lt;/user&gt;
-      &lt;options&gt;
-	 &lt;blind&gt;false&lt;/blind&gt;
-	 &lt;encrypt&gt;false&lt;/encrypt&gt;
-	 &lt;strictmatch&gt;false&lt;/strictmatch&gt;
-	 &lt;maxresults&gt;0&lt;/maxresults&gt;
-	 &lt;usenicknames&gt;false&lt;/usenicknames&gt;
-	 &lt;includealsofound&gt;false&lt;/includealsofound&gt;
-	 &lt;usephonetics&gt;false&lt;/usephonetics&gt;
-	 &lt;penaltythreshold&gt;0&lt;/penaltythreshold&gt;
-      &lt;/options&gt;
-      &lt;searchby&gt;
-	 &lt;business&gt;
-	    &lt;name&gt;&lt;/name&gt;
-	    &lt;alternatename&gt;&lt;/alternatename&gt;
-	    &lt;address&gt;
-	       &lt;streetname&gt;&lt;/streetname&gt;
-	       &lt;streetnumber&gt;&lt;/streetnumber&gt;
-	       &lt;streetpredirection&gt;&lt;/streetpredirection&gt;
-	       &lt;streetpostdirection&gt;&lt;/streetpostdirection&gt;
-	       &lt;streetsuffix&gt;&lt;/streetsuffix&gt;
-	       &lt;unitdesignation&gt;&lt;/unitdesignation&gt;
-	       &lt;unitnumber&gt;&lt;/unitnumber&gt;
-	       &lt;streetaddress1&gt;&lt;/streetaddress1&gt;
-	       &lt;streetaddress2&gt;&lt;/streetaddress2&gt;
-	       &lt;state&gt;&lt;/state&gt;
-	       &lt;city&gt;&lt;/city&gt;
-	       &lt;zip5&gt;&lt;/zip5&gt;
-	       &lt;zip4&gt;&lt;/zip4&gt;
-	       &lt;county&gt;&lt;/county&gt;
-	       &lt;postalcode&gt;&lt;/postalcode&gt;
-	       &lt;statecityzip&gt;&lt;/statecityzip&gt;
-	    &lt;/address&gt;
-	    &lt;fein&gt;&lt;/fein&gt;
-	    &lt;phone10&gt;&lt;/phone10&gt;
-	 &lt;/business&gt;
-	 &lt;owneragent&gt;
-	    &lt;name&gt;
-	       &lt;full&gt;&lt;/full&gt;
-	       &lt;first&gt;&lt;/first&gt;
-	       &lt;middle&gt;&lt;/middle&gt;
-	       &lt;last&gt;&lt;/last&gt;
-	       &lt;suffix&gt;&lt;/suffix&gt;
-	       &lt;prefix&gt;&lt;/prefix&gt;
-	    &lt;/name&gt;
-	    &lt;address&gt;
-	       &lt;streetname&gt;&lt;/streetname&gt;
-	       &lt;streetnumber&gt;&lt;/streetnumber&gt;
-	       &lt;streetpredirection&gt;&lt;/streetpredirection&gt;
-	       &lt;streetpostdirection&gt;&lt;/streetpostdirection&gt;
-	       &lt;streetsuffix&gt;&lt;/streetsuffix&gt;
-	       &lt;unitdesignation&gt;&lt;/unitdesignation&gt;
-	       &lt;unitnumber&gt;&lt;/unitnumber&gt;
-	       &lt;streetaddress1&gt;&lt;/streetaddress1&gt;
-	       &lt;streetaddress2&gt;&lt;/streetaddress2&gt;
-	       &lt;state&gt;&lt;/state&gt;
-	       &lt;city&gt;&lt;/city&gt;
-	       &lt;zip5&gt;&lt;/zip5&gt;
-	       &lt;zip4&gt;&lt;/zip4&gt;
-	       &lt;county&gt;&lt;/county&gt;
-	       &lt;postalcode&gt;&lt;/postalcode&gt;
-	       &lt;statecityzip&gt;&lt;/statecityzip&gt;
-	    &lt;/address&gt;
-	    &lt;ssn&gt;&lt;/ssn&gt;
-	    &lt;dob&gt;
-	       &lt;year&gt;0&lt;/year&gt;
-	       &lt;month&gt;0&lt;/month&gt;
-	       &lt;day&gt;0&lt;/day&gt;
-	    &lt;/dob&gt;
-	    &lt;phone10&gt;&lt;/phone10&gt;
-	    &lt;driverlicensenumber&gt;&lt;/driverlicensenumber&gt;
-	    &lt;driverlicensestate&gt;&lt;/driverlicensestate&gt;
-	 &lt;/owneragent&gt;
-      &lt;/searchby&gt;
-   &lt;/Row&gt;
-&lt;/Dataset&gt;
-</pre>
-*/
-
 import iesp, Risk_Indicators, Risk_Reporting, Address, Inquiry_AccLogs;
+
 export SmallBusiness_Service := macro
  #onwarning(4207, ignore);
-	// Can't have duplicate definitions of Stored with different default values, 
+	// Can't have duplicate definitions of Stored with different default values,
 	// so add the default to #stored to eliminate the assignment of a default value.
 	#stored('DataRestrictionMask',risk_indicators.iid_constants.default_DataRestriction);
-	
-	// Get XML input 
+
+	// Get XML input
 	ds_in    := dataset([], iesp.ws_analytics.t_SmallBusinessRiskRequest) : STORED ('SmallBusinessRiskRequest', few);
 	gateways := Gateway.Configuration.Get();
-	
+
 	userIn := ds_in[1].User;
 	search := ds_in[1].SearchBy;
-	
+
 /* **********************************************
 	 *  Fields needed for improved Scout Logging  *
 	 **********************************************/
@@ -167,13 +44,13 @@ export SmallBusiness_Service := macro
 	//Look up the industry by the company ID.
 	Industry_Search := Inquiry_AccLogs.Key_Inquiry_industry_use_vertical_login(FALSE)(s_company_id = CompanyID and s_product_id = (String)Risk_Reporting.ProductID.LNSmallBusiness__SmallBusiness_Service);
 /* ************* End Scout Fields **************/
-	
+
 	unsigned history_date         := 999999 : stored('HistoryDateYYYYMM');
 	boolean  Test_Data_Enabled    := FALSE  : stored('TestDataEnabled');
 	string20 Test_Data_Table_Name := ''     : stored('TestDataTableName');
 	string DataRestriction := risk_indicators.iid_constants.default_DataRestriction : stored('DataRestrictionMask');
 	string50 DataPermission := Risk_Indicators.iid_constants.default_DataPermission : stored('DataPermissionMask');
-  
+
     //CCPA fields
     unsigned1 LexIdSourceOptout := 1 : STORED('LexIdSourceOptout');
     string TransactionID := '' : STORED('_TransactionId');
@@ -181,7 +58,7 @@ export SmallBusiness_Service := macro
     unsigned6 GlobalCompanyId := 0 : STORED('_GCID');
 
 	#stored('DisableBocaShellLogging', DisableOutcomeTracking);
-				
+
 	// add a sequence value
 	LNSmallBusiness.Layouts.RequestEx addSeq( ds_in le, integer c ) := TRANSFORM
 		self.seq := c;
@@ -189,16 +66,16 @@ export SmallBusiness_Service := macro
 		self.historydate := history_date;
 		self := le;
 	end;
-	
+
 	prep := project( ds_in, addSeq(left,counter) );
 
-	lnsbResults := LNSmallBusiness.SmallBusiness_Function( prep, gateways, Test_Data_Enabled, Test_Data_Table_Name, 
+	lnsbResults := LNSmallBusiness.SmallBusiness_Function( prep, gateways, Test_Data_Enabled, Test_Data_Table_Name,
                                                                                                         DataRestriction, DataPermission,
-                                                                                                        LexIdSourceOptout := LexIdSourceOptout, 
-                                                                                                        TransactionID := TransactionID, 
-                                                                                                        BatchUID := BatchUID, 
+                                                                                                        LexIdSourceOptout := LexIdSourceOptout,
+                                                                                                        TransactionID := TransactionID,
+                                                                                                        BatchUID := BatchUID,
                                                                                                         GlobalCompanyID := GlobalCompanyID);
-	
+
 	// realtime gets only one record, so sequence is irrelevant. per 2008-01-13 discussions with Terrence, we believe
 	// accountnumber for realtime transactions are handled automagically via the ESP, so we can omit them as well
 	iesp.ws_analytics.t_SmallBusinessRiskResponse formOutput( lnsbResults le ) := TRANSFORM
@@ -234,7 +111,7 @@ export SmallBusiness_Service := macro
                                                self.i_name_full := search.OwnerAgent.Name.Full,
 																							 self.i_name_first := search.OwnerAgent.Name.First,
 																							 self.i_name_last := search.OwnerAgent.Name.Last,
-																							 // self.i_lexid := '', 
+																							 // self.i_lexid := '',
 																							 self.i_address := If(trim(search.OwnerAgent.address.streetaddress1)!='', search.OwnerAgent.address.streetaddress1,
 																																				 Address.Addr1FromComponents(search.OwnerAgent.address.streetnumber,
 																																				 search.OwnerAgent.address.streetpredirection, search.OwnerAgent.address.streetname,
@@ -281,10 +158,9 @@ export SmallBusiness_Service := macro
 	// Must end with '_intermediate__log'
 	intermediateLog := DATASET([], Risk_Reporting.Layouts.LOG_Boca_Shell) : STORED('Intermediate_Log');
 	IF(~DisableOutcomeTracking and ~Test_Data_Enabled, OUTPUT(intermediateLog, NAMED('LOG_log__mbs_intermediate__log')) );
-	
+
 	//Improved Scout Logging
 	IF(~DisableOutcomeTracking and ~Test_Data_Enabled, OUTPUT(Deltabase_Logging, NAMED('LOG_log__mbs_transaction__log__scout')) );
-	
+
 	output(final,named('Results'));
 endmacro;
-// LNSmallBusiness.SmallBusiness_Service();

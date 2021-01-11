@@ -162,11 +162,6 @@ EXPORT ImageSearchService() := FUNCTION
 		~isExternalGatewayCall,
 		FAIL(ErrorCodeImageNonReleasable, 'Image is non-releasable'));
 
-	IF(
-		ImageRetrievalResponse[1].response.ImageData = '' 
-		AND (EXISTS(SuperReportRow) OR isExternalGatewayCall),
-		FAIL(ErrorCodeImageRetrievalIssue, 'Image retrieval issue')
-	);
 	
 	EmptyHeader := ROW(
 		TRANSFORM(
@@ -190,11 +185,35 @@ EXPORT ImageSearchService() := FUNCTION
 	
 	HeaderImageOverflow := ROW(ExceptionImageOverflowLayout);
 	
+		// Header for when there is Image retrieval issue.
+	iesp.retrieveimage.t_ECrashRetrieveImageResponse._Header ExceptionImageRetrievalIssueLayout := TRANSFORM
+		SELF.Status := ErrorCodeImageRetrievalIssue;
+		SELF.Exceptions := DATASET([
+			{'Roxie', 
+				ErrorCodeImageRetrievalIssue, 
+				'eCrashServices.ImageSearchService', 
+				'Image retrieval issue'
+			}
+		], iesp.share.t_WsException);
+		SELF := [];
+	END;
+	
+	HeaderImageRetrievalissue := ROW(ExceptionImageRetrievalIssueLayout);
+	
 	// Compose the response header.
   BOOLEAN IsImageTooLarge := LENGTH(ImageRetrievalResponse[1].response.ImageData) >= iesp.Constants.Retrieve_Image.MaxImageSize;
+  BOOLEAN IsImageRetrievalIssue := ImageRetrievalResponse[1].response.ImageData = ''AND (EXISTS(SuperReportRow) OR isExternalGatewayCall);
 	
 	ResponseHeader := MAP(IsImageTooLarge => HeaderImageOverflow,
+	                      IsImageRetrievalIssue => HeaderImageRetrievalissue,
 		                    EmptyHeader);
+	ImageMetadata := PROJECT(CHOOSEN(ReportHashKeysFromKey,iesp.Constants.Retrieve_Image.Maxcount_ImageMetadata),
+															TRANSFORM(
+	                            iesp.retrieveimage.t_ECrashRetrieveImageMetadata, 
+															SELF.ReportID := LEFT.report_id,
+															SELF.ImageHash := LEFT.hash_key,
+															SELF.PageCount := LEFT.page_count
+															));
 	
   iesp.retrieveimage.t_ECrashRetrieveImageResponse GenerateResponse(
 		iesp.accident_image.t_AccidentImageResponseEx L,
@@ -204,10 +223,12 @@ EXPORT ImageSearchService() := FUNCTION
 		SELF._Header := H;
 		SELF.InitialPurchase := InitialPurchase;
 		SELF.ImageData := IF(
-			H.Exceptions[1].Code = ErrorCodeImageOverflow,
-			'',
-			L.response.ImageData
-		);
+  		H.Exceptions[1].Code = ErrorCodeImageOverflow,
+		  '',
+	  	L.response.ImageData
+	   );
+		SELF.ErrorMessage := L.response.ErrorMessage;
+		SELF.ImageMetadata := ImageMetadata;
 	END;
 	
 	InitialPurchase := FALSE; // RR-14857

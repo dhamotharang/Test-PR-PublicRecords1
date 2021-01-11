@@ -29,7 +29,7 @@ IMPORT ut, Risk_Indicators, riskwise, models;
 			Scoring_Project_Macros.Regression.runtime_layout;
 		END;
 
-		ds_raw_input := IF(no_of_records = 0, dataset( Infile_name, layout_input, thor), choosen(dataset (Infile_name, layout_input, thor), no_of_records));
+		ds_raw_input := distribute(IF(no_of_records = 0, dataset( Infile_name, layout_input, thor), choosen(dataset (Infile_name, layout_input, thor), no_of_records)),(integer)accountnumber);
 
 	  //*********** Instant_ID XML SETUP AND SOAPCALL ******************
 		
