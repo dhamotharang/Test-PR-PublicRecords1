@@ -15,7 +15,7 @@ Export ARKANSAS	:= Module
 		ds_CorpNames     :=dedup(sort(distribute(corp2_raw_ar.Files(filedate,pUseProd).input.CorpNames.Logical,hash(filing_number)),record,local),record,local) : independent;
 		ds_CorpOfficer   :=dedup(sort(distribute(corp2_raw_ar.Files(filedate,pUseProd).input.CorpOfficer.Logical,hash(filing_number)),record,local),record,local): independent; 
 				
-		domestic_List    :=['1','2','3','4','5','6','7','8','9','10','11','23','24','25','26','27','29','30','32','135','360','370','401','501'];
+		domestic_List    :=['1','2','3','4','5','6','7','8','9','10','11','23','24','25','26','27','29','30','32','135','320','330','360','370','401','501'];
 		foreign_List     :=['13','14','15','16','17','18','19','20','21','22','31'];
 		
 		invalid_fho_address 	:= corp2.t2u(ds_CorpData.fho_address1) not in ['X',''] and
@@ -157,7 +157,7 @@ Export ARKANSAS	:= Module
 			self.corp_term_exist_cd						:= if(corp2_mapping.fValidateDate(input.Duration_of_Existence).GeneralDate<>'','D','P');
 			self.corp_term_exist_desc					:= if(corp2_mapping.fValidateDate(input.Duration_of_Existence).GeneralDate<>'','EXPIRATION DATE','PERPETUAL');
 			self.corp_term_exist_exp					:= corp2_mapping.fValidateDate(input.Duration_of_Existence).GeneralDate;
-			self.corp_tax_program_cd					:= if((integer)input.Tax_Type_ID  in [255,0] ,'' ,trim(input.Tax_Type_ID,left,right)); //PER CI:Vendor confirmed that '255' was an error.
+			self.corp_tax_program_cd					:= if((integer)input.Tax_Type_ID  in [0,255,9999] ,'' ,trim(input.Tax_Type_ID,left,right)); //PER CI:Vendor confirmed that '255' was an error.
 			self.corp_tax_program_desc				:= corp2_raw_ar.Functions.GetTaxPrgdesc(self.corp_tax_program_cd);
 			self.corp_home_state_name					:= if(corp2.t2u(input.fho_Name) <> '','FOREIGN NAME: '+corp2.t2u(input.fho_Name),'');
 			self.corp_name_comment 						:= if(corp2.t2u(input.fho_Name) <> '','FOREIGN NAME',''); //overload
@@ -170,7 +170,7 @@ Export ARKANSAS	:= Module
 																							'B','');
 			self.corp_address1_type_desc    	:= if(corp2_mapping.fAddressExists(state_origin,state_desc,input.fho_address1,input.fho_address2,input.fho_city,input.fho_state,input.fho_zip).ifAddressExists,
 																							'BUSINESS','');
-			self.corp_Acts										:= if(trim(input.act,left,right) not in['','N/A',';',':','.','255'],corp2_raw_ar.Functions.CorpActDesc(input.act),'');
+			self.corp_Acts										:= if(trim(input.act,left,right) not in['','N/A',';',':','.','255','1402','1501','2901','13501','370001','401001','501001','1100000','1100100'],corp2_raw_ar.Functions.CorpActDesc(input.act),'');
 			//Added for scrubbing purposes; new vendor 'corp_type_id' values will be captured!,'corp_type_id' values are crucial for dates & indicator fields!
 			self.internalfield1								:= if(trim(input.corp_type_id,left,right)not in[domestic_List, foreign_List,''],'**'+ trim(input.corp_type_id,left,right),'');
 			self.recordorigin									:= 'C';	

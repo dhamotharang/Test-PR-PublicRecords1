@@ -1,12 +1,10 @@
 ﻿// Machine-readable versions of the spec file and subsets thereof
 IMPORT SALT311;
 EXPORT Deltabase_GenerationMod := MODULE(SALT311.iGenerationMod)
- 
   // SALT Version info
-  EXPORT salt_VERSION := 'V3.11.8';
+  EXPORT salt_VERSION := 'V3.11.11';
   EXPORT salt_MODULE := 'SALT311'; // Optional override by HACK:SALTMODULE
   EXPORT salt_TOOLSMODULE := 'SALTTOOLS30'; // Optional override by HACK:SALTTOOLSMODULE
- 
   // Core module configuration values
   EXPORT spc_MODULE := 'Scrubs_FraudGov';
   EXPORT spc_NAMESCOPE := 'Deltabase';
@@ -35,10 +33,9 @@ EXPORT Deltabase_GenerationMod := MODULE(SALT311.iGenerationMod)
   EXPORT spc_HAS_PARENTS := FALSE;
   EXPORT spc_HAS_FORCE := FALSE;
   EXPORT spc_HAS_BLOCKLINK := FALSE;
- 
   // The entire spec file
   EXPORT spcString :=
-    'OPTIONS:-gh\n'
+    'ï»¿OPTIONS:-gh\n'
     + 'MODULE:Scrubs_FraudGov\n'
     + 'FILENAME:Deltabase\n'
     + 'NAMESCOPE:Deltabase\n'
@@ -55,18 +52,18 @@ EXPORT Deltabase_GenerationMod := MODULE(SALT311.iGenerationMod)
     + '// FUZZY can be used to create new types of FUZZY linking\n'
     + 'FIELDTYPE:invalid_alpha:ALLOW(\\NABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz):ONFAIL(BLANK)\n'
     + 'FIELDTYPE:invalid_alphanumeric:ALLOW(\\ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789):SPACES( <>{}[]-^=\'`!+&,./#()_):ONFAIL(BLANK)\n'
-    + 'FIELDTYPE:invalid_email:ALLOW(\\-_.0123456789@ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz):ONFAIL(BLANK)\n'
+    + 'FIELDTYPE:invalid_email:ALLOW(\\-_.0123456789@ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz):ONFAIL(BLANK) \n'
     + 'FIELDTYPE:invalid_date:ALLOW(\\N0123456789):SPACES( ./:-):LEFTTRIM:ONFAIL(BLANK)\n'
     + 'FIELDTYPE:invalid_numeric:ALLOW(0123456789):ONFAIL(BLANK)\n'
-    + 'FIELDTYPE:invalid_numeric_string:ALLOW(\\N-0123456789):ONFAIL(BLANK)\n'
+    + 'FIELDTYPE:invalid_numeric_string:ALLOW(\\N-0123456789):ONFAIL(BLANK) \n'
     + 'FIELDTYPE:invalid_real:ALLOW(-.,0123456789):ONFAIL(BLANK)\n'
     + 'FIELDTYPE:invalid_real_string:ALLOW(\\N-.,0123456789):ONFAIL(BLANK)\n'
-    + 'FIELDTYPE:invalid_zip:ALLOW(\\N-0123456789):SPACES( -):LEFTTRIM:LENGTHS(2,5,9,10):ONFAIL(BLANK)\n'
-    + 'FIELDTYPE:invalid_state:ALLOW(\\ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz):LEFTTRIM:LENGTHS(2):ONFAIL(BLANK)\n'
-    + 'FIELDTYPE:invalid_ssn:ALLOW(\\N0123456789):SPACES( -):LEFTTRIM:LENGTHS(2,9..):ONFAIL(BLANK)\n'
-    + 'FIELDTYPE:invalid_phone:ALLOW(\\N0123456789):SPACES( +#()-):LEFTTRIM:LENGTHS(2,10..):ONFAIL(BLANK)\n'
+    + 'FIELDTYPE:invalid_zip:ALLOW(\\N-0123456789):SPACES( -):LEFTTRIM:LENGTHS(0,2,5,9,10):ONFAIL(BLANK)\n'
+    + 'FIELDTYPE:invalid_state:ALLOW(\\ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz):LEFTTRIM:LENGTHS(0,2):ONFAIL(BLANK)\n'
+    + 'FIELDTYPE:invalid_ssn:ALLOW(\\N0123456789):SPACES( -):LEFTTRIM:LENGTHS(0,2,9..):ONFAIL(BLANK)\n'
+    + 'FIELDTYPE:invalid_phone:ALLOW(\\N0123456789):SPACES( +#()-):LEFTTRIM:LENGTHS(0,2,10..):ONFAIL(BLANK)\n'
     + 'FIELDTYPE:invalid_ip:ALLOW(\\N.x0123456789):SPACES( .):LEFTTRIM:ONFAIL(BLANK)\n'
-    + 'FIELDTYPE:invalid_name:ALLOW(\\NABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz):LEFTTRIM:SPACES( \'):ONFAIL(BLANK)\n'
+    + 'FIELDTYPE:invalid_name:ALLOW(\\NABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz):LEFTTRIM:SPACES( \',):ONFAIL(BLANK)\n'
     + '// Remember to generate specificities and update the 0,0 placeholders below before running any sort of linking.\n'
     + '// If the actual specificity for a field is <1, round it up to 1 rather than down to 0.  If your cluster is running\n'
     + '// a shared repository, calling SALTTOOLS30.mac_Patch_SPC from the bottom of BWR_Specificities may be a convenience.\n'
@@ -101,7 +98,7 @@ EXPORT Deltabase_GenerationMod := MODULE(SALT311.iGenerationMod)
     + 'FIELD:mailing_city:TYPE(STRING30):LIKE(invalid_name):0,0\n'
     + 'FIELD:mailing_state:TYPE(STRING2):LIKE(invalid_state):0,0\n'
     + 'FIELD:mailing_zip:TYPE(STRING9):LIKE(invalid_zip):0,0\n'
-    + 'FIELD:mailing_county:TYPE(STRING3):LIKE(invalid_name):0,0\n'
+    + 'FIELD:mailing_county:TYPE(STRING3):LIKE(invalid_alphanumeric):0,0 \n'
     + 'FIELD:phone_number:TYPE(STRING10):LIKE(invalid_phone):0,0\n'
     + 'FIELD:ultid:TYPE(UNSIGNED6):LIKE(invalid_numeric):0,0\n'
     + 'FIELD:orgid:TYPE(UNSIGNED6):LIKE(invalid_numeric):0,0\n'
@@ -132,10 +129,8 @@ EXPORT Deltabase_GenerationMod := MODULE(SALT311.iGenerationMod)
     + '// SOURCEFIELD is used if a field of the file denotes a source of the records in that file\n'
     + '// LINKPATH is used to define access paths for external linking\n'
     ;
- 
   // Structured values
   EXPORT linkpaths := DATASET([
     ],{STRING linkpath;STRING compulsory;STRING optional;STRING bonus;STRING required;STRING search});
- 
 END;
 
