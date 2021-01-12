@@ -157,7 +157,7 @@ EXPORT DATASET(layouts.history) fn_cgm_property(
 
 		// Now create a hash value from only the fields we're interested in (these are the
 		// non *id fields in the temp_layout).
-		temp_redist_again := SORT(DISTRIBUTE(temp_add_refi_flag,HASH64(pid,rid)),pid,rid,LOCAL);
+		temp_redist_again := SORT(DISTRIBUTE(temp_add_refi_flag,HASH64(pid,rid)),pid,rid, ln_fares_id,LOCAL);
 															
 		temp_unrolled_hashes := PROJECT(temp_redist_again,
 			transform(layouts.history,
