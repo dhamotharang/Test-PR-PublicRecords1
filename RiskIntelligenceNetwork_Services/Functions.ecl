@@ -20,29 +20,74 @@ EXPORT Functions := MODULE
   recs_dl := _PRAppends.GetDL();
   recs_boca_shell := _PRAppends.GetBocaShell();
   recs_ip_meta_data := _PRAppends.GetIPMetaData();
+  
+  ds_in_w_crim := JOIN(ds_in, recs_Criminal, 
+                    LEFT.acctno = RIGHT.acctno,
+                    TRANSFORM(_rin_Layout.realtime_appends_rec, 
+                      SELF.batchin_rec := LEFT,
+                      SELF.crim_appends := RIGHT,
+                      SELF := []),
+                    LEFT OUTER);
+  
+  ds_in_w_advo := JOIN(ds_in_w_crim, recs_advo,
+                    LEFT.batchin_rec.acctno = RIGHT.acctno,
+                    TRANSFORM(_rin_Layout.realtime_appends_rec, 
+                      SELF.advo_appends := RIGHT,
+                      SELF := LEFT,
+                      SELF := []),
+                    LEFT OUTER);
+  
+  ds_in_w_pr_best := JOIN(ds_in_w_advo, ds_best_in,
+                       LEFT.batchin_rec.acctno = (string) RIGHT.seq,
+                      TRANSFORM(_rin_Layout.realtime_appends_rec, 
+                        SELF.pr_best_appends := RIGHT,
+                        SELF := LEFT,
+                        SELF := []),
+                    LEFT OUTER);
+                    
+  ds_in_w_prepaid_phone := JOIN(ds_in_w_pr_best, recs_prepaid_phone,
+                            LEFT.batchin_rec.acctno = RIGHT.acctno,
+                            TRANSFORM(_rin_Layout.realtime_appends_rec, 
+                              SELF.prepaid_phone_appends := RIGHT,
+                              SELF := LEFT,
+                              SELF := []),
+                           LEFT OUTER);
+                           
+  ds_in_w_dl := JOIN(ds_in_w_prepaid_phone, recs_dl,
+                  LEFT.batchin_rec.acctno = RIGHT.acctno,
+                  TRANSFORM(_rin_Layout.realtime_appends_rec,
+                    SELF.dl_appends := RIGHT,
+                    SELF := LEFT,
+                    SELF := []),
+                  LEFT OUTER);
+                  
+  ds_in_w_boca_shell := JOIN(ds_in_w_prepaid_phone, recs_boca_shell,
+                          LEFT.batchin_rec.acctno = (string) RIGHT.seq,
+                          TRANSFORM(_rin_Layout.realtime_appends_rec, 
+                            SELF.boca_shell_appends := RIGHT,
+                            SELF := LEFT,
+                            SELF := []),
+                          LEFT OUTER);
+                          
+  ds_in_w_ip_meta_data := JOIN(ds_in_w_boca_shell, recs_ip_meta_data,
+                            LEFT.batchin_rec.acctno = RIGHT.acctno,
+                            TRANSFORM(_rin_Layout.realtime_appends_rec,
+                              SELF.ip_meta_data := RIGHT,
+                              SELF := LEFT,
+                              SELF := []),
+                            LEFT OUTER);
 
-  _rin_Layout.realtime_appends_rec xfm_Compilation(_sharedLayout.BatchInExtended_rec L) := TRANSFORM
-    SELF.batchin_rec := L;
-    SELF.crim_appends := recs_Criminal;
-    SELF.advo_appends := recs_advo;
-    SELF.pr_best_appends := ds_best_in;
-    SELF.prepaid_phone_appends := recs_prepaid_phone;
-    SELF.dl_appends := recs_dl;
-    SELF.boca_shell_appends := recs_boca_shell;
-    SELF.ip_meta_data := recs_ip_meta_data;
-  END;
-
-  final_recs := PROJECT(ds_in, xfm_Compilation(LEFT));
-
-  // output(ds_appends_in, named('ds_appends_in'));
+  // output(ds_in, named('ds_in'));
   // output(recs_Criminal, named('recs_Criminal'));
   // output(recs_advo, named('recs_advo'));
   // output(ds_best_in, named('ds_best_in'));
   // output(recs_prepaid_phone, named('recs_prepaid_phone'));
   // output(recs_dl, named('recs_dl'));
   // output(recs_boca_shell, named('recs_boca_shell'));
+  // output(recs_ip_meta_data, named('recs_ip_meta_data'));
+  // output(ds_in_w_ip_meta_data, named('ds_in_w_ip_meta_data'));
 
-  return final_recs;
+  return ds_in_w_ip_meta_data;
  END;
  
  EXPORT getRealtimePRAppends(DATASET(DidVille.Layout_Did_OutBatch) ds_best_in,
@@ -313,5 +358,10 @@ EXPORT Functions := MODULE
               _Constants.EntityType.DLNUMBER => _Constants.Fragment_Types.DRIVERS_LICENSE_NUMBER_FRAGMENT,
               '');
  END;
+ 
+ EXPORT hasValue(string s1) := FUNCTION
+  RETURN s1 != '';
+ END;
+ 
 
 END;

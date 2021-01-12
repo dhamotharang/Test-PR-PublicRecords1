@@ -1,45 +1,45 @@
-import civil_court;
+IMPORT civil_court;
 
-export Raw := module
+EXPORT Raw := MODULE
 
-		export civil_court.Layout_roxie_party  byCaseIDParty(string60 in_casekey) := function
-		
-				caseKeyDS1 := dataset([{(string60) in_casekey}],civilCourt_services.layouts.caseIDLayout);
-				
-				partySet := join(caseKeyDS1, civil_court.key_caseID,
-											keyed(left.case_key = right.case_key),
-											transform(civil_court.Layout_Roxie_Party,														 
-											self := right), 
-											limit(civilCourt_services.constants.max_recs_on_civilCourt_join, skip));
-				
-				return PartySet;			 
-		end;
-			 
-		export  civil_court.Layout_Roxie_case_activity  byCaseIDActivity(string60 in_casekey) := function	
-					
-					caseKeyDS2 := dataset([{(string60) in_casekey}],civilCourt_services.layouts.caseIDLayout);
-					
-					ActivitySet := join(caseKeyDS2, civil_court.key_caseID_activity,
-				               keyed(left.case_key = right.case_key),
-											 transform(civil_court.Layout_Roxie_Case_Activity,
-											 self := right),
-											 limit(civilcourt_services.constants.max_recs_on_civilCourt_join, skip));
-							 
-				return ActivitySet;	
-		end;
-		
-			 
-		export  civil_court.Layout_Roxie_Matter    byCaseIDMatter(string60 in_casekey) := function
-		
-				caseKeyDS3 := dataset([{(string60) in_casekey}],civilCourt_services.layouts.caseIDLayout);
-					
-	      MatterSet := join(caseKeyDS3, civil_court.key_caseID_matter,
-					             keyed(left.case_key = right.case_key),
-											 transform(civil_court.Layout_Roxie_Matter,
-											 self := right),
-											 limit(civilcourt_services.constants.max_recs_on_civilCourt_join, skip));
-     
-			  return MatterSet;
-		end;	                    													        											
-		
-end;
+    EXPORT civil_court.Layout_roxie_party byCaseIDParty(STRING60 in_casekey) := FUNCTION
+    
+      caseKeyDS1 := DATASET([{(STRING60) in_casekey}], civilCourt_services.layouts.caseIDLayout);
+      
+      partySet := JOIN(caseKeyDS1, civil_court.key_caseID,
+        KEYED(LEFT.case_key = RIGHT.case_key),
+        TRANSFORM(civil_court.Layout_Roxie_Party,
+        SELF := RIGHT),
+        LIMIT(civilCourt_services.constants.max_recs_on_civilCourt_join, SKIP));
+        
+      RETURN PartySet;
+    END;
+       
+    EXPORT civil_court.Layout_Roxie_case_activity byCaseIDActivity(STRING60 in_casekey) := FUNCTION
+          
+      caseKeyDS2 := DATASET([{(STRING60) in_casekey}], civilCourt_services.layouts.caseIDLayout);
+      
+      ActivitySet := JOIN(caseKeyDS2, civil_court.key_caseID_activity,
+        KEYED(LEFT.case_key = RIGHT.case_key),
+        TRANSFORM(civil_court.Layout_Roxie_Case_Activity,
+        SELF := RIGHT),
+        LIMIT(civilcourt_services.constants.max_recs_on_civilCourt_join, SKIP));
+               
+      RETURN ActivitySet;
+    END;
+    
+       
+    EXPORT civil_court.Layout_Roxie_Matter byCaseIDMatter(STRING60 in_casekey) := FUNCTION
+    
+      caseKeyDS3 := DATASET([{(STRING60) in_casekey}], civilCourt_services.layouts.caseIDLayout);
+        
+      MatterSet := JOIN(caseKeyDS3, civil_court.key_caseID_matter,
+        KEYED(LEFT.case_key = RIGHT.case_key),
+        TRANSFORM(civil_court.Layout_Roxie_Matter,
+        SELF := RIGHT),
+        LIMIT(civilcourt_services.constants.max_recs_on_civilCourt_join, SKIP));
+    
+      RETURN MatterSet;
+    END;
+    
+END;

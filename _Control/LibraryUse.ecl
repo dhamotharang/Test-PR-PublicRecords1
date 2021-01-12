@@ -41,6 +41,9 @@ export ForceOffOne_Models__LIB_RiskView_V50 := FALSE;
 export ForceOffOne_Models__LIB_FraudAvisor_V20 := FALSE;
 // export ForceOffOne_Models__LIB_FraudAvisor_V20 := TRUE;
 
+export ForceOffOne_PublicRecords_KEL__LIB_BusinessAttributes := FALSE;
+// export ForceOffOne_PublicRecords_KEL__LIB_BusinessAttributes := TRUE;
+
 //*** Libraries that are OFF by default ***
 
 // export ForceOffOne_Business_Risk_BIP__LIB_Business_Shell := FALSE;
@@ -99,5 +102,6 @@ export ForceOff_PublicRecords_KEL__LIB_NonFCRA_BusinessSeleAttributes := ForceOf
 export ForceOff_PublicRecords_KEL__LIB_NonFCRA_BusinessSeleAttributes_NoDates := ForceOff_AllLibraries OR ForceOffOne_PublicRecords_KEL__LIB_NonFCRA_BusinessSeleAttributes_NoDates;
 export ForceOff_PublicRecords_KEL__LIB_BusinessInputAttributes := ForceOff_AllLibraries OR ForceOffOne_PublicRecords_KEL__LIB_BusinessInputAttributes;
 export ForceOff_PublicRecords_KEL__LIB_ConsumerInputAttributes := ForceOff_AllLibraries OR ForceOffOne_PublicRecords_KEL__LIB_ConsumerInputAttributes;
+export ForceOff_PublicRecords_KEL__LIB_BusinessAttributes := ForceOff_AllLibraries OR ForceOffOne_PublicRecords_KEL__LIB_BusinessAttributes;
 
 end;

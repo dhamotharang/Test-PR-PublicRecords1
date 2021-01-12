@@ -175,7 +175,7 @@ export RiskView5_CapOne_Batch_Service := MACRO
 						);
 						
 	
-		#if(Models.LIB_RiskView_Models().TurnOnValidation = FALSE)
+		#if(Riskview.Constants.TurnOnValidation = FALSE)
 			
 
 		/*Valid Models on Input*/

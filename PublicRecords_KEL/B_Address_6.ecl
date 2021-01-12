@@ -1,11 +1,11 @@
-//HPCC Systems KEL Compiler Version 1.3.0
-IMPORT KEL13 AS KEL;
+﻿//HPCC Systems KEL Compiler Version 1.5.0rc1
+IMPORT KEL15 AS KEL;
 IMPORT CFG_Compile,E_Address,E_Geo_Link,E_Zip_Code FROM PublicRecords_KEL;
-IMPORT * FROM KEL13.Null;
+IMPORT * FROM KEL15.Null;
 EXPORT B_Address_6(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG_Compile __cfg = CFG_Compile) := MODULE
   SHARED VIRTUAL TYPEOF(E_Address(__in,__cfg).__Result) __E_Address := E_Address(__in,__cfg).__Result;
-  SHARED __EE347353 := __E_Address;
-  EXPORT __ST200373_Layout := RECORD
+  SHARED __EE381632 := __E_Address;
+  EXPORT __ST242724_Layout := RECORD
     KEL.typ.nuid UID;
     KEL.typ.nstr Primary_Range_;
     KEL.typ.nstr Predirectional_;
@@ -42,19 +42,16 @@ EXPORT B_Address_6(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG_Com
     KEL.typ.epoch Archive___Date_ := 0;
     KEL.typ.epoch Date_First_Seen_ := 0;
     KEL.typ.epoch Date_Last_Seen_ := 0;
-    KEL.typ.epoch Date_Vendor_First_Reported_ := 0;
-    KEL.typ.epoch Date_Vendor_Last_Reported_ := 0;
     KEL.typ.epoch Hybrid_Archive_Date_ := 0;
-    KEL.typ.epoch Vault_Date_First_Seen_ := 0;
     KEL.typ.epoch Vault_Date_Last_Seen_ := 0;
     KEL.typ.int __RecordCount := 0;
   END;
-  SHARED __ST200373_Layout __ND351050__Project(E_Address(__in,__cfg).Layout __PP346639) := TRANSFORM
-    __EE347142 := __PP346639.A_D_V_O_Summary_;
-    __BS347500 := __T(__EE347142);
-    __EE347520 := __BN(TOPN(__BS347500(__NN(__T(__EE347142).A_D_V_O_Date_First_Seen_)),1, -__T(__T(__EE347142).A_D_V_O_Date_First_Seen_),__T(Vacancy_Indicator_),__T(Throw_Back_Indicator_),__T(Seasonal_Delivery_Indicator_),__T(Style_Code_),__T(Drop_Indicator_),__T(College_Indicator_),__T(Only_Way_To_Get_Mail_Indicator_),__T(Residential_Or_Business_Indicator_),__T(Do_Not_Deliver_Indicator_),__T(A_D_V_O_Date_Last_Seen_)),__NL(__EE347142));
-    SELF.Bestchild_Advo_ := __EE347520;
-    SELF := __PP346639;
+  SHARED __ST242724_Layout __ND385329__Project(E_Address(__in,__cfg).Layout __PP380918) := TRANSFORM
+    __EE381421 := __PP380918.A_D_V_O_Summary_;
+    __BS381779 := __T(__EE381421);
+    __EE381799 := __BN(TOPN(__BS381779(__NN(__T(__EE381421).A_D_V_O_Date_First_Seen_)),1, -__T(__T(__EE381421).A_D_V_O_Date_First_Seen_),__T(Vacancy_Indicator_),__T(Throw_Back_Indicator_),__T(Seasonal_Delivery_Indicator_),__T(Style_Code_),__T(Drop_Indicator_),__T(College_Indicator_),__T(Only_Way_To_Get_Mail_Indicator_),__T(Residential_Or_Business_Indicator_),__T(Do_Not_Deliver_Indicator_),__T(A_D_V_O_Date_Last_Seen_)),__NL(__EE381421));
+    SELF.Bestchild_Advo_ := __EE381799;
+    SELF := __PP380918;
   END;
-  EXPORT __ENH_Address_6 := PROJECT(__EE347353,__ND351050__Project(LEFT));
+  EXPORT __ENH_Address_6 := PROJECT(__EE381632,__ND385329__Project(LEFT));
 END;

@@ -1,6 +1,7 @@
 ﻿import PublicRecords_KEL, Inquiry_Deltabase, Gateway, risk_indicators, std, MDR;
 
-
+//inquriy delta base is not archivable
+	
 EXPORT Deltabase_Inquiry(PublicRecords_KEL.Interface_Options Options) := MODULE 
 
 SHARED Layouts_FDC  := PublicRecords_KEL.ECL_Functions.Layouts_FDC(Options);
@@ -65,7 +66,7 @@ EXPORT Inquiry_Address(DATASET(Inquiry_Deltabase.Layouts.Inquiry_All) deltabase)
 
 	deltabase_address_results := deltabase(Zip5 <> '' AND Prim_Name <> '' AND Search_Type='1');
 
-	deltabasetrans_addr := PublicRecords_KEL.ecl_functions.DateSelector(project(deltabase_address_results, transform(Layouts_FDC.Layout_Inquiry_AccLogs__Inquiry_Table_Address,
+	deltabasetrans_addr := project(deltabase_address_results, transform(Layouts_FDC.Layout_Inquiry_AccLogs__Inquiry_Table_Address,
 					SELF.UIDAppend := LEFT.seq,
 					SELF.G_ProcUID := LEFT.seq,
 					SELF.DateOfInquiry := LEFT.Search_Info.DateTime[1..8];
@@ -73,8 +74,9 @@ EXPORT Inquiry_Address(DATASET(Inquiry_Deltabase.Layouts.Inquiry_All) deltabase)
 					SELF.IsUpdateRecord := FALSE,  //to help with debugging and data questions
 					SELF.IsDeltaBaseRecord := TRUE, 
 					SELF.DPMBitmap := SetDPMBitmap( Source := MDR.sourceTools.src_InquiryAcclogs, FCRA_Restricted := Options.isFCRA, GLBA_Restricted := NotRegulated, Pre_GLB_Restricted := NotRegulated, DPPA_Restricted := NotRegulated, DPPA_State := BlankString, KELPermissions := CFG_File),
+					self.Archive_Date := '';			
 					SELF := LEFT,
-					SELF := [])), false, false); 
+					SELF := [])); 
 
 	return deltabasetrans_addr;
 end;
@@ -84,7 +86,7 @@ EXPORT Inquiry_Did(DATASET(Inquiry_Deltabase.Layouts.Inquiry_All) deltabase) := 
 
 	deltaBase_did_results := deltabase(S_DID <> 0 AND Search_Type='2');
 
-	deltabasetrans_did := PublicRecords_KEL.ecl_functions.DateSelector(project(deltaBase_did_results, transform(Layouts_FDC.Layout_Inquiry_AccLogs__Inquiry_Table_DID,
+	deltabasetrans_did := project(deltaBase_did_results, transform(Layouts_FDC.Layout_Inquiry_AccLogs__Inquiry_Table_DID,
 					SELF.UIDAppend := LEFT.seq,
 					SELF.G_ProcUID := LEFT.seq,
 					SELF.DateOfInquiry := LEFT.Search_Info.DateTime[1..8];
@@ -92,8 +94,9 @@ EXPORT Inquiry_Did(DATASET(Inquiry_Deltabase.Layouts.Inquiry_All) deltabase) := 
 					SELF.IsUpdateRecord := FALSE,  //to help with debugging and data questions
 					SELF.IsDeltaBaseRecord := TRUE, 
 					SELF.DPMBitmap := SetDPMBitmap( Source := MDR.sourceTools.src_InquiryAcclogs, FCRA_Restricted := Options.isFCRA, GLBA_Restricted := NotRegulated, Pre_GLB_Restricted := NotRegulated, DPPA_Restricted := NotRegulated, DPPA_State := BlankString, KELPermissions := CFG_File),
+					self.Archive_Date := '';					
 					SELF := LEFT,
-					SELF := [])), false, false); 
+					SELF := [])); 
 
 	return deltabasetrans_did;
 end;
@@ -103,7 +106,7 @@ EXPORT Inquiry_Email(DATASET(Inquiry_Deltabase.Layouts.Inquiry_All) deltabase) :
 
 	deltabase_email_results := deltabase(Email <> '' AND Search_Type='3');
 
-	deltabasetrans_email := PublicRecords_KEL.ecl_functions.DateSelector(project(deltaBase_email_results, transform(Layouts_FDC.Layout_Inquiry_AccLogs__Inquiry_Table_Email,
+	deltabasetrans_email := project(deltaBase_email_results, transform(Layouts_FDC.Layout_Inquiry_AccLogs__Inquiry_Table_Email,
 					SELF.UIDAppend := LEFT.seq,
 					SELF.G_ProcUID := LEFT.seq,
 					SELF.DateOfInquiry := LEFT.Search_Info.DateTime[1..8];
@@ -111,8 +114,9 @@ EXPORT Inquiry_Email(DATASET(Inquiry_Deltabase.Layouts.Inquiry_All) deltabase) :
 					SELF.IsUpdateRecord := FALSE,  //to help with debugging and data questions
 					SELF.IsDeltaBaseRecord := TRUE, 
 					SELF.DPMBitmap := SetDPMBitmap( Source := MDR.sourceTools.src_InquiryAcclogs, FCRA_Restricted := Options.isFCRA, GLBA_Restricted := NotRegulated, Pre_GLB_Restricted := NotRegulated, DPPA_Restricted := NotRegulated, DPPA_State := BlankString, KELPermissions := CFG_File),
+					self.Archive_Date := '';
 					SELF := LEFT,
-					SELF := [])), false, false); 
+					SELF := [])); 
 
 	return deltabasetrans_email;
 end;
@@ -122,7 +126,7 @@ EXPORT Inquiry_Phone(DATASET(Inquiry_Deltabase.Layouts.Inquiry_All) deltabase) :
 
 	deltabase_phone_results := deltabase(Phone10 <> '' AND Search_Type='6');
 
-	deltabasetrans_phone := PublicRecords_KEL.ecl_functions.DateSelector(project(deltaBase_phone_results, transform(Layouts_FDC.Layout_Inquiry_AccLogs__Inquiry_Table_Phone,
+	deltabasetrans_phone := project(deltaBase_phone_results, transform(Layouts_FDC.Layout_Inquiry_AccLogs__Inquiry_Table_Phone,
 					SELF.UIDAppend := LEFT.seq,
 					SELF.G_ProcUID := LEFT.seq,
 					SELF.DateOfInquiry := LEFT.Search_Info.DateTime[1..8];
@@ -130,8 +134,9 @@ EXPORT Inquiry_Phone(DATASET(Inquiry_Deltabase.Layouts.Inquiry_All) deltabase) :
 					SELF.IsUpdateRecord := FALSE,  //to help with debugging and data questions
 					SELF.IsDeltaBaseRecord := TRUE, 
 					SELF.DPMBitmap := SetDPMBitmap( Source := MDR.sourceTools.src_InquiryAcclogs, FCRA_Restricted := Options.isFCRA, GLBA_Restricted := NotRegulated, Pre_GLB_Restricted := NotRegulated, DPPA_Restricted := NotRegulated, DPPA_State := BlankString, KELPermissions := CFG_File),
+					self.Archive_Date := '';					
 					SELF := LEFT,
-					SELF := [])), false, false); 
+					SELF := [])); 
 
 	return deltabasetrans_phone;
 end;
@@ -141,7 +146,7 @@ EXPORT Inquiry_SSN(DATASET(Inquiry_Deltabase.Layouts.Inquiry_All) deltabase) := 
 
 	deltabase_ssn_results := deltabase(SSN <> '' AND Search_Type='7');
 
-	deltabasetrans_ssn := PublicRecords_KEL.ecl_functions.DateSelector(project(deltaBase_ssn_results, transform(Layouts_FDC.Layout_Inquiry_AccLogs__Inquiry_Table_SSN,
+	deltabasetrans_ssn := project(deltaBase_ssn_results, transform(Layouts_FDC.Layout_Inquiry_AccLogs__Inquiry_Table_SSN,
 					SELF.UIDAppend := LEFT.seq,
 					SELF.G_ProcUID := LEFT.seq,
 					SELF.DateOfInquiry := LEFT.Search_Info.DateTime[1..8];
@@ -149,8 +154,9 @@ EXPORT Inquiry_SSN(DATASET(Inquiry_Deltabase.Layouts.Inquiry_All) deltabase) := 
 					SELF.IsUpdateRecord := FALSE,  //to help with debugging and data questions
 					SELF.IsDeltaBaseRecord := TRUE, 
 					SELF.DPMBitmap := SetDPMBitmap( Source := MDR.sourceTools.src_InquiryAcclogs, FCRA_Restricted := Options.isFCRA, GLBA_Restricted := NotRegulated, Pre_GLB_Restricted := NotRegulated, DPPA_Restricted := NotRegulated, DPPA_State := BlankString, KELPermissions := CFG_File),
+					self.Archive_Date := '';					
 					SELF := LEFT,
-					SELF := [])), false, false); 
+					SELF := [])); 
 
 	return deltabasetrans_ssn;
 end;

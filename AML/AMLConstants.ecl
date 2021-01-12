@@ -1,4 +1,6 @@
-EXPORT AMLConstants := MODULE
+﻿EXPORT AMLConstants := MODULE
+
+EXPORT EMPTY_STRING := '';
 
 EXPORT setHIFCA := [
 										// California Northern District	
@@ -1030,6 +1032,25 @@ EXPORT execsLnkdBusnDegree  := 40;
 EXPORT relatedbusnDegree  := 50;
 EXPORT ExecParentsdegree  := 60;
 EXPORT execRelativesDegree  := 70;
+
+
+
+//Bridger Constants
+EXPORT BRIDGER_MIN_SCORE := 95;
+EXPORT BRIDGER_MAX_RESULTS := 500;
+EXPORT BRIDGER_WC_FULL_DB_NAME := 'WorldCompliance - Full.BDF';
+EXPORT BRIDGER_DOB_TOLERANCE_YRS := 2;
+
+EXPORT BRIDGER_OFAC_SOURCES := ['US-OFAC Foreign Sanctions Evaders List', 
+                                'US-U.S. OFAC - Palestinian Legislative Council List', 
+                                'US-U.S. OFAC - Part 561 List', 
+                                'US-U.S. Office of Foreign Asset Control (OFAC) - Parastatal Entities of Iraq', 
+                                'US-U.S. Office of Foreign Asset Control (OFAC) - SDN List',
+                                'US-OFAC - Specially Designated Nationals (SDN) List', 
+                                'US-OFAC - Parastatal Entities of Iraq',
+                                'US-OFAC - Palestinian Legislative Council (PLC) List',
+                                'US-OFAC - Foreign Financial Institutions Subject to Part 561 List',
+                                'US-OFAC - Foreign Sanctions Evaders (FSE) List'];
 
 	
 

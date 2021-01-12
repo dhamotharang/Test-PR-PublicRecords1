@@ -374,7 +374,7 @@ self := left;
 // original filtering	
 // ======================================================
 real_header1 := join(g_inrec, real_header_nodate_filtering, 
-	left.seq=right.seq and 
+	left.seq=right.seq and left.did=right.did and
  RIGHT.h.dt_first_seen < left.historydate and // check dt_first_seen 
 (right.h.dt_vendor_first_reported < left.historydate or (isFCRA and right.h.src=mdr.sourcetools.src_Experian_Credit_Header)), // check vendor date (EN vendor dates are always recent because of full refresh, so that source is exception to this rule
 transform(Layout_Header_Data,
@@ -388,7 +388,7 @@ left outer );
 // new filter by ingest date
 // ======================================================
 real_header2 := join(g_inrec, real_header_with_ingestdate_appended, 
-	left.seq=right.seq and 
+	left.seq=right.seq and left.did=right.did and
 (
 (right.first_ingest_date<>0 and right.first_ingest_date < (unsigned)((string)left.historydate + '01') ) or
 (right.first_ingest_date=0 and right.h.dt_first_seen < left.historydate and right.h.dt_vendor_first_reported < left.historydate) // use old logic if ingest_date=0
@@ -1811,7 +1811,7 @@ j_header := IF (isFCRA, j_combined, prison);
 // OUTPUT(tranHeader, NAMED('tranHeader'));
  //OUTPUT(all_corrections1,NAMED('all_corrections1'));
 
- //OUTPUT(j_header, named('j_header'));
+ // OUTPUT(j_header, named('j_header'));
 // OUTPUT(j_combined, named('j_combined'));
 // OUTPUT(tranHeader, named('GHtranHeader'));	//ZZZ
 // OUTPUT(j_corrections, named('GHj_corrections'));	//ZZZ

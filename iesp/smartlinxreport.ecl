@@ -122,6 +122,7 @@ export t_SLRBestInfo := record
 	t_SLRAddressMetaData AddressCDS {xpath('AddressCDS')};
 	dataset(iesp.dirassistwireless.t_DirAssistWirelessSearchRecord) Phones {xpath('Phones/Phone'), MAXCOUNT(iesp.Constants.BR.MaxPhonesPlus)};
 	dataset(t_SLRBestPhone) PhonesV2 {xpath('PhonesV2/Phone'), MAXCOUNT(iesp.Constants.BR.MaxPhonesPlus)};
+     dataset(t_SLRBestPhone) PhonesV3 {xpath('PhonesV3/Phone'), MAXCOUNT(iesp.Constants.BR.MaxPhonesPlus)};     
 end;
 		
 export t_SLRKRIIndicators := record

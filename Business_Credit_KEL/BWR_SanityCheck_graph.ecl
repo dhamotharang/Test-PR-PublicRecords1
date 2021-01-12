@@ -1,8 +1,8 @@
-﻿//HPCC Systems KEL Compiler Version 1.2.1-dev
+﻿//HPCC Systems KEL Compiler Version 1.3.2
 #OPTION('expandSelectCreateRow',true);
-IMPORT KEL12 AS KEL;
+IMPORT KEL13 AS KEL;
 IMPORT CFG_graph,E_Account,E_Account_Bus_Owner,E_Account_Indiv_Owner,E_Account_Industry,E_Account_Tradeline,E_Business,E_Business_Account,E_Business_Industry,E_Business_Owner,E_Individual_Owner,E_Industry,E_Tradeline FROM Business_Credit_KEL;
-IMPORT * FROM KEL12.Null;
+IMPORT * FROM KEL13.Null;
  
 RunAll := TRUE;
 RunFast := FALSE;
@@ -87,7 +87,7 @@ IF(RunAll OR RunInvalidSingleValues,OUTPUT(E_Tradeline()._reporting__indicator__
 IF(RunAll OR RunInvalidSingleValues,OUTPUT(E_Tradeline()._payment__interval__SingleValue_Invalid,NAMED('E_Tradeline__payment__interval__SingleValue_Invalid')));
 IF(RunAll OR RunInvalidSingleValues,OUTPUT(E_Tradeline()._payment__status__category__SingleValue_Invalid,NAMED('E_Tradeline__payment__status__category__SingleValue_Invalid')));
 IF(RunAll OR RunInvalidSingleValues,OUTPUT(E_Tradeline().D_B_T___V5__SingleValue_Invalid,NAMED('E_Tradeline_D_B_T___V5__SingleValue_Invalid')));
-IF(RunAll OR RunInvalidSingleValues,OUTPUT(E_Tradeline()._ln__delinquency__date__SingleValue_Invalid,NAMED('E_Tradeline__ln__delinquency__date__SingleValue_Invalid')));
+IF(RunAll OR RunInvalidSingleValues,OUTPUT(E_Tradeline()._raw__dbt__v5__SingleValue_Invalid,NAMED('E_Tradeline__raw__dbt__v5__SingleValue_Invalid')));
 IF(RunAll OR RunInvalidSingleValues,OUTPUT(E_Tradeline()._term__of__account__in__months__SingleValue_Invalid,NAMED('E_Tradeline__term__of__account__in__months__SingleValue_Invalid')));
 IF(RunAll OR RunInvalidSingleValues,OUTPUT(E_Tradeline()._first__payment__due__date__SingleValue_Invalid,NAMED('E_Tradeline__first__payment__due__date__SingleValue_Invalid')));
 IF(RunAll OR RunInvalidSingleValues,OUTPUT(E_Tradeline()._final__pyament__due__date__SingleValue_Invalid,NAMED('E_Tradeline__final__pyament__due__date__SingleValue_Invalid')));

@@ -71,7 +71,14 @@ export shortcuts := module
     //deltabase gateways for Inquiries
   export gw_delta_dev := dataset( [{'delta_inquiry','http://rw_score_dev:Password01@10.176.68.151:7909/WsDeltaBase/preparedsql'}], risk_indicators.layout_gateways_in );
   export gw_delta_prod := dataset( [{'delta_inquiry','http://delta_iid_api_user:2rch%40p1$$@10.176.69.151:7909/WsDeltaBase/preparedsql'}], risk_indicators.layout_gateways_in );
+  export gw_bridgerApi_cert := dataset( [{'bridgerapi', 'https://HPCC_AML;amlAdmin1:CSS2LCE#!@bctwdbrg301.risk.regn.net/LN.WebServices/11.3/XgServices.svc/Search'}], risk_indicators.layout_gateways_in );
+
+  //Cert ESP gateways for IDA gateway
+  export cert_gw_IDA := dataset( [{'idareport','https://rw_score_dev:Password01@10.176.68.164:8726/wsgatewayex/?ver_=2.84'}], risk_indicators.layout_gateways_in );
+  export cert_gw_IDA_UAT := dataset( [{'idareport_uat','https://rw_score_dev:Password01@10.176.68.164:8726/wsgatewayex/?ver_=2.84'}], risk_indicators.layout_gateways_in );
+  export cert_gw_IDA_Retro := dataset( [{'idareport_retro','https://rw_score_dev:Password01@10.176.68.164:8726/wsgatewayex/?ver_=2.84'}], risk_indicators.layout_gateways_in );
 	
+  
 // <gateways><row><servicename>insurancephoneheader</servicename><url>http://rw_score_dev:Password01@10.176.68.164:7526/WsPrism/?ver_=1.82</url></row></gateways>
 
 	// DATA

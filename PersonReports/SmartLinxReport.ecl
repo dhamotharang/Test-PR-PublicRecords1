@@ -1,18 +1,18 @@
 ﻿// Simplified version of compreport, no distributed call to central records, no hash, no versioning of single sources, non-FCRA
 IMPORT $, Foreclosure_Services, PersonReports, doxie, doxie_crs, ATF_Services, iesp,
       AutoStandardI, ut, American_Student_Services, dx_header, EmailV2_Services,
-      SmartRollup, FCRA, LN_PropertyV2_Services, Royalty, STD;
+      SmartRollup, FCRA, LN_PropertyV2_Services, Royalty, STD, MDR;
 
 iespOut := iesp.smartlinxreport;
 out_rec := record(iespOut.t_SmartlinxReportIndividual)
     dataset(iesp.share.t_CodeMap) Messages;
     dataset(Royalty.Layouts.Royalty) EmailV2Royalties;
+    dataset(Royalty.Layouts.Royalty) EquifaxRoyalties;
 end;
 // accepts atmost one DID, actually
 EXPORT out_rec SmartLinxReport (dataset (doxie.layout_references) dids,
                                 PersonReports.IParam._smartlinxreport mod_smartlinx,
-                                boolean IsFCRA = false) := FUNCTION
-
+                                boolean IsFCRA = false) := FUNCTION                                                 
   mod_access := PROJECT (mod_smartlinx, doxie.IDataAccess);
 
   globals := AutoStandardI.GlobalModule();
@@ -38,12 +38,20 @@ EXPORT out_rec SmartLinxReport (dataset (doxie.layout_references) dids,
 		self.addressCDS := SmartRollup.fn_smart_getAddrMetadata.address(best_rec,doBadSecRange)[1];  // add additional data to best section for smartlinx
     phones2use := choosen(SmartRollup.fn_smart_getPhonesPlusMetadata.byDid(best_rec),iesp.Constants.BR.MaxPhonesPlus);
 		self.PhonesV2 := phones2use;
-		self.Phones := project(phones2use, iesp.dirassistwireless.t_DirAssistWirelessSearchRecord);
-		self := best_rec_esdl;
-    self.Attributes := SmartRollup.fn_getAttributes(subject_did, mod_smartlinx);
+		self.Phones := project(phones2use, iesp.dirassistwireless.t_DirAssistWirelessSearchRecord);      
+		self := best_rec_esdl;           
+           self.Attributes := SmartRollup.fn_getAttributes(subject_did, mod_smartlinx);                               
+           SELF.PhonesV3 := IF (mod_smartlinx.IncludeProgressivePhone,PersonReports.functions.ProgressivePhoneResults(dids, mod_access, mod_smartlinx));                                                                                                                                                        
 		self := [];
 	end;
+
   best_rec_smart   := if (mod_smartlinx.include_best,  dataset([additionalBest()]),dataset([],iesp.smartlinxreport.t_SLRBestInfo));
+  EQRoyalties  := IF (mod_smartlinx.include_best AND mod_smartlinx.IncludeProgressivePhone 
+                                      and mod_smartlinx.UsePremiumSourceA and 
+                                      ~doxie.compliance.isPhoneMartRestricted(mod_smartlinx.DataRestrictionMask) and
+                                      mod_access.isValidGLB(),
+                                  PersonReports.functions.CalculateBestSmartLinxRecPhoneRoyalties(best_rec_smart[1].PhonesV3, MDR.sourceTools.src_Equifax),                                           
+                                dataset([], Royalty.Layouts.Royalty));
 	subject_akas     := IF (mod_smartlinx.include_akas, project(pers.Akas,iesp.bps_share.t_BpsReportIdentity), dataset([],iesp.bps_share.t_BpsReportIdentity));
   s_akas           := SmartRollup.fn_smart_rollup_names(subject_akas);
 	p_aka_entities   := SmartRollup.fn_smart_aka_entities(s_akas, subject_akas);
@@ -247,7 +255,7 @@ EXPORT out_rec SmartLinxReport (dataset (doxie.layout_references) dids,
 														iesp.Constants.SMART.MaxVehicles);
 
 	watercraftMod := PersonReports.watercraft_records (dids, PROJECT (mod_smartlinx, $.IParam.watercrafts), IsFCRA,true, ds_flags);
-	//watercrafts   := watercraftMod.wtr_recs;
+
 	watercrafts   := IF (mod_smartlinx.include_watercrafts, watercraftMod.watercrafts_v2,dataset([],iesp.watercraft.t_WaterCraftReport2Record));
 	s_watercrafts := SmartRollup.fn_smart_rollup_watercraft(watercrafts);
 	s_watercrafts_current := s_watercrafts(CurrentPrior=iesp.Constants.SMART.CURRENT);
@@ -374,8 +382,7 @@ EXPORT out_rec SmartLinxReport (dataset (doxie.layout_references) dids,
 																			dataset([],iesp.smartlinxreport.t_SLRKeyRiskIndInfo));
 
 		 p_worldcompliance := IF(mod_smartlinx.include_kris,PROJECT(s_kris.WorldCompRecs,TRANSFORM(iesp.smartlinxsearchcore.t_SLRResultMatch,SELF := LEFT)),
-																			dataset([],iesp.smartlinxsearchcore.t_SLRResultMatch));
-
+																			dataset([],iesp.smartlinxsearchcore.t_SLRResultMatch));                                                              
 //****************************************************************************************************
 //     OUTPUT TRANSFORM
 //****************************************************************************************************
@@ -486,10 +493,11 @@ EXPORT out_rec SmartLinxReport (dataset (doxie.layout_references) dids,
 
 		Self.Sources :=     p_sources;
 		Self.Messages :=    messages_property_ds;//add addition messages once the Max of 1 is taken off of iesp.bpsreport.t_BpsReportBaseResponse
-		self.EmailV2Royalties := emailsv2.EmailV2Royalties;
+		self.EmailV2Royalties := emailsv2.EmailV2Royalties;         
+          SELF.EquifaxRoyalties :=  EQRoyalties;
 		self := [];
  END;
   individual := dataset ([Format ()]); // is supposed to produce one row only (usebestdid = true)
-
+  
 	return individual;
 END;

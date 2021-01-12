@@ -48,7 +48,9 @@ EXPORT fn_GetPubRecordAppends(DATASET(FraudShared_Services.Layouts.BatchInExtend
   ds_prepaidphone := JOIN(ds_in, dx_PhonesInfo.Key_Phones_Type,
                       KEYED(LEFT.phoneno = RIGHT.phone) AND
                       RIGHT.prepaid = RiskIntelligenceNetwork_Services.Constants.PREPAID_VALUE,
-                      TRANSFORM(RIGHT),
+                      TRANSFORM(RiskIntelligenceNetwork_Services.Layouts.prepaid_phone_layout,
+                        SELF.acctno := LEFT.acctno,
+                        SELF := RIGHT),
                      LIMIT(RiskIntelligenceNetwork_Services.Constants.MAX_JOIN_LIMIT));
   return ds_prepaidphone;
  END;

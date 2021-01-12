@@ -1,10 +1,11 @@
-﻿import	iesp,InsuranceContext_iesp,ut;
+﻿import	iesp,InsuranceContext_iesp,ut, doxie;
 
 export	Get_Transaction_Logs(	iesp.property_info.t_PropertyInformationRequest														pRequest,
 															InsuranceContext_iesp.insurance_risk_context.t_PropertyInformationContext	pInsContext,
 															iesp.property_info.t_PropertyInformation																	pResponse,
 															// iesp.property_value_report.t_PropertyValueReportResponseEx								pGatewayResponse,
-															PropertyCharacteristics_Services.IParam.SearchRecords											pInMod
+															PropertyCharacteristics_Services.IParam.SearchRecords											pInMod,
+                              doxie.IDataAccess                                                         mod_access
 														)	:=
 function
 	// ITV transaction log ?
@@ -77,25 +78,25 @@ function
 
 		self.processing_status				:=	MAP(pInMod.isHomeGateway and pResponse.Report.ReportIdSection.ProcessingStatus	=	'5' => '401',
 		                                      pInMod.isHomeGateway and pResponse.Report.ReportIdSection.ProcessingStatus	=	'4' => '402',
-																					pInMod.isHomeGateway and pResponse.Report.ReportIdSection.ProcessingStatus	=	'1' => '501',
+																					pInMod.isHomeGateway and pResponse.Report.ReportIdSection.ProcessingStatus	in	['1', '9'] => '501',
 																					pInMod.isHomeGateway                                                              => '503',
 																					~ITV                                   => '',    
-                                            pResponse.Report.ReportIdSection.ProcessingStatus	=	'1'	and	pResponse.Report.ReportIdSection.AttachmentProcessingStatus	=	'1'	=>	'A',
-																						pResponse.Report.ReportIdSection.ProcessingStatus	=	'1'	and	pResponse.Report.ReportIdSection.AttachmentProcessingStatus	=	'2'	=>	'B',
-																						pResponse.Report.ReportIdSection.ProcessingStatus	=	'1'	and	pResponse.Report.ReportIdSection.AttachmentProcessingStatus	=	'7'	=>	'I',
-																						pResponse.Report.ReportIdSection.ProcessingStatus	=	'2'	and	pResponse.Report.ReportIdSection.AttachmentProcessingStatus	=	'1'	=>	'C',
+                                            pResponse.Report.ReportIdSection.ProcessingStatus	in	['1', '9']	and	pResponse.Report.ReportIdSection.AttachmentProcessingStatus	in	['1', '6']	=>	'A',
+																						pResponse.Report.ReportIdSection.ProcessingStatus	in	['1', '9']	and	pResponse.Report.ReportIdSection.AttachmentProcessingStatus	=	'2'	=>	'B',
+																						pResponse.Report.ReportIdSection.ProcessingStatus	in	['1', '9']	and	pResponse.Report.ReportIdSection.AttachmentProcessingStatus	=	'7'	=>	'I',
+																						pResponse.Report.ReportIdSection.ProcessingStatus	=	'2'	and	pResponse.Report.ReportIdSection.AttachmentProcessingStatus	in	['1', '6']	=>	'C',
 																						pResponse.Report.ReportIdSection.ProcessingStatus	=	'2'	and	pResponse.Report.ReportIdSection.AttachmentProcessingStatus	=	'2'	=>	'D',
 																						pResponse.Report.ReportIdSection.ProcessingStatus	=	'2'	and	pResponse.Report.ReportIdSection.AttachmentProcessingStatus	=	'7'	=>	'L',
 																						pResponse.Report.ReportIdSection.ProcessingStatus	=	'4'	and	pResponse.Report.ReportIdSection.AttachmentProcessingStatus	=	'4'	=>	'E',
-																						pResponse.Report.ReportIdSection.ProcessingStatus	=	'5'	and	pResponse.Report.ReportIdSection.AttachmentProcessingStatus	=	'1'	=>	'G',
+																						pResponse.Report.ReportIdSection.ProcessingStatus	=	'5'	and	pResponse.Report.ReportIdSection.AttachmentProcessingStatus	in	['1', '6']	=>	'G',
 																						pResponse.Report.ReportIdSection.ProcessingStatus	=	'5'	and	pResponse.Report.ReportIdSection.AttachmentProcessingStatus	=	'2'	=>	'M',
 																						pResponse.Report.ReportIdSection.ProcessingStatus	=	'5'	and	pResponse.Report.ReportIdSection.AttachmentProcessingStatus	=	'5'	=>	'F',
 																						pResponse.Report.ReportIdSection.ProcessingStatus	=	'5'	and	pResponse.Report.ReportIdSection.AttachmentProcessingStatus	=	'7'	=>	'N',
-																						pResponse.Report.ReportIdSection.ProcessingStatus	=	'7'	and	pResponse.Report.ReportIdSection.AttachmentProcessingStatus	=	'1'	=>	'J',
-																						pResponse.Report.ReportIdSection.ProcessingStatus	=	'7'	and	pResponse.Report.ReportIdSection.AttachmentProcessingStatus	=	'2'	=>	'O',
-																						pResponse.Report.ReportIdSection.ProcessingStatus	=	'7'	and	pResponse.Report.ReportIdSection.AttachmentProcessingStatus	=	'5'	=>	'P',
-																						pResponse.Report.ReportIdSection.ProcessingStatus	=	'7'	and	pResponse.Report.ReportIdSection.AttachmentProcessingStatus	=	'7'	=>	'H',
-																						pResponse.Report.ReportIdSection.ProcessingStatus	=	'8'	and	pResponse.Report.ReportIdSection.AttachmentProcessingStatus	=	'1'	=>	'K',
+																						pResponse.Report.ReportIdSection.ProcessingStatus	in	['7', '6']	and	pResponse.Report.ReportIdSection.AttachmentProcessingStatus	in	['1', '6']	=>	'J',
+																						pResponse.Report.ReportIdSection.ProcessingStatus	in	['7', '6']	and	pResponse.Report.ReportIdSection.AttachmentProcessingStatus	=	'2'	=>	'O',
+																						pResponse.Report.ReportIdSection.ProcessingStatus	in	['7', '6']	and	pResponse.Report.ReportIdSection.AttachmentProcessingStatus	=	'5'	=>	'P',
+																						pResponse.Report.ReportIdSection.ProcessingStatus	in	['7', '6']	and	pResponse.Report.ReportIdSection.AttachmentProcessingStatus	=	'7'	=>	'H',
+																						pResponse.Report.ReportIdSection.ProcessingStatus	=	'8'	and	pResponse.Report.ReportIdSection.AttachmentProcessingStatus	in	['1', '6']	=>	'K',
 																						pResponse.Report.ReportIdSection.ProcessingStatus	=	'8'	and	pResponse.Report.ReportIdSection.AttachmentProcessingStatus	=	'2'	=>	'Q',
 																						pResponse.Report.ReportIdSection.ProcessingStatus	=	'8'	and	pResponse.Report.ReportIdSection.AttachmentProcessingStatus	=	'5'	=>	'R',
 																						pResponse.Report.ReportIdSection.ProcessingStatus	=	'8'	and	pResponse.Report.ReportIdSection.AttachmentProcessingStatus	=	'7'	=>	'S',
@@ -118,7 +119,8 @@ function
 		self.record_count_1_type			:=	IF(ITV,1,0);
 		self.record_count_2						:=	IF(ITV,(integer)pResponse.Report.ReportIdSection.AttachmentProcessingStatus,0);
 		self.record_count_2_type			:=	IF(ITV,2,0);
-	
+		self.glba_code      					:=	(STRING3)mod_access.glb;
+
 		self													:=	[];
 	end;
 	
