@@ -1,4 +1,4 @@
-﻿/*2011-07-06T18:43:20Z (Chris Albee_prod)
+﻿﻿/*2011-07-06T18:43:20Z (Chris Albee_prod)
 Add BK daily files.
 */
 IMPORT AccountMonitoring,BankruptcyV2, Business_Header, CellPhone, CourtLink, Corrections, Did_Add, Doxie, 
@@ -1076,19 +1076,18 @@ EXPORT product_files := MODULE
 	
 	EXPORT phonefeedback := MODULE
 		
-      EXPORT phonefeedback_phone_keyname := 'thor_data400::key::phonesFeedback::'+doxie.Version_SuperKey+'::phone';
-      EXPORT PhonesFeedback_Phone_superkey_monitor := 'monitor::PhonesFeedback::Phone';
-      EXPORT PhonesFeedback_superkey     := AccountMonitoring.constants.MONITOR_KEY_CLUSTER + PhonesFeedback_Phone_superkey_monitor + '_qa';
+		EXPORT phonefeedback_phone_keyname := 'thor_data400::key::phonesFeedback::'+doxie.Version_SuperKey+'::phone';
+		EXPORT PhonesFeedback_Phone_superkey_monitor := 'monitor::PhonesFeedback::Phone';
+		EXPORT PhonesFeedback_superkey     := AccountMonitoring.constants.MONITOR_KEY_CLUSTER + PhonesFeedback_Phone_superkey_monitor + '_qa';
 
-      SHARED PhonesFeedback_key_undist := INDEX(
-												PhonesFeedback.Key_PhonesFeedback_phone(),  
-												PhonesFeedback_superkey
-												);
+		SHARED PhonesFeedback_key_undist := INDEX(
+											PhonesFeedback.Key_PhonesFeedback_phone(),  
+											PhonesFeedback_superkey
+											);
 
-      EXPORT PhonesFeedback_key_monitor := DISTRIBUTE(PhonesFeedback_key_undist(did != 0), 
-                                             HASH64(did)
-                                            ): INDEPENDENT; 
-	
+		EXPORT PhonesFeedback_key_monitor := DISTRIBUTE(PhonesFeedback_key_undist(did != 0), 
+																						HASH64(did)
+																					): INDEPENDENT;			
 	END;
 
 	EXPORT workplace := MODULE
@@ -1173,22 +1172,23 @@ EXPORT product_files := MODULE
 	END; // end workplace module
 
 	EXPORT PhoneOwnership := MODULE
-		EXPORT pphone_superkeyname := AccountMonitoring.constants.DATA_LOCATION + 'thor_data400::key::phones_ported_metadata_'+doxie.Version_SuperKey;
-		pphone_build_version         := TRIM( did_add.get_EnvVariable('pphones_build_version') ):INDEPENDENT;
-		key_pphone_keyname_raw := 'thor_data400::key::'+pphone_build_version+'::phones_ported_metadata';
-		key_pphone_keyname     := AccountMonitoring.constants.DATA_LOCATION + key_pphone_keyname_raw;
-		// Define a Duplicate Index; this points to the logical key file
-		EXPORT key_pphone := 
-			INDEX(
-				PhonesInfo.Key_Phones.Ported_Metadata,  
-				key_pphone_keyname
-			);
+
+	  EXPORT phones_transaction_superfile	:= 'thor_data400::key::Phones_transaction_'+doxie.Version_SuperKey;
+    EXPORT phones_transaction_for_superkey_monitor := 'monitor::Phones_transaction';
+	  EXPORT phones_transaction_superkeyname := AccountMonitoring.constants.MONITOR_KEY_CLUSTER + phones_transaction_for_superkey_monitor + '_qa';
+	
+		EXPORT key_phones_transaction := 
+			PULL(INDEX(
+				dx_PhonesInfo.Key_Phones_Transaction,  
+				phones_transaction_superkeyname
+			));
 			
-		EXPORT key_pphone_dist :=
+		EXPORT key_phones_transaction_dist :=
 			DISTRIBUTE(
-				key_pphone, 
+				key_phones_transaction, 
 				HASH64(phone)
 			): INDEPENDENT;
+
 	END; //end of phone ownership
 	
 	EXPORT sbfe := MODULE
