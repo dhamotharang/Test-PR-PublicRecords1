@@ -641,8 +641,8 @@ export Layouts := module
 		STRING8 email10_latest_orig_login_date:='';
 		UNSIGNED email10_num_email_per_did:=0;
 		UNSIGNED email10_num_did_per_email:=0;
-		STRING   input_email_invalid;
-    STRING   input_email_invalid_reason;
+		STRING15   input_email_invalid;
+    	STRING50   input_email_invalid_reason;
 		
 end;
 	
@@ -825,9 +825,10 @@ end;
     UNSIGNED num_did_per_email := 0;
 END;
 	
-  	export  EmailRecInvalidforV2:=record
-		STRING input_email_invalid;
-    	STRING  input_email_invalid_reason;
+  	export	EmailRecInvalidforV2:=record
+		STRING20 acctno := '';
+		STRING15 input_email_invalid;
+		STRING50 input_email_invalid_reason;
 	end;
 	
 	export EmailRecforv2 := record

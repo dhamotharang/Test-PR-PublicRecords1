@@ -33,23 +33,21 @@ EXPORT getEmailInfo(dataset (MemberPoint.Layouts.BestExtended) dsBestE,
 																											  Self               :=[];));
 						
 						Emailv2EAAjoined:=join(	Emailv2EAA,dsBestE,
-							                                    left.did=right.did,
-							                                   transform(memberpoint.Layouts.EmailRecInvalidforV2,
-																								                              self.input_email_invalid:=if(StringLib.StringToUpperCase(trim(right.input_email,left,right))=StringLib.StringToUpperCase(trim(left.orig_email,left,right)),left.email_status,'');
-																									                           	self.input_email_invalid_reason:=if(StringLib.StringToUpperCase(trim(right.input_email,left,right))=StringLib.StringToUpperCase(trim(left.orig_email,left,right)),left.email_status_reason,'');
-																								                              self:=left,
-																													 									  self:=[];
-							                                             ));
+												left.did=right.did,
+												transform(memberpoint.Layouts.EmailRecInvalidforV2,
+												self.input_email_invalid:=if(StringLib.StringToUpperCase(trim(right.input_email,left,right))=StringLib.StringToUpperCase(trim(left.orig_email,left,right))
+																			,left.email_status,'');
+												self.input_email_invalid_reason:=if(StringLib.StringToUpperCase(trim(right.input_email,left,right))=StringLib.StringToUpperCase(trim(left.orig_email,left,right))
+																			,left.email_status_reason,'');
+												self.acctNo := left.acctNo;
+												self:=left;
+												self:=[];
+												));
 							
 						 srtd_recs := GROUP(SORT(Email_v2_EAAResult.records, acctno, -date_last_seen, date_first_seen, -original.login_date, -process_date, RECORD), acctno);
 					  //IN HOUSE ROYALTIES
 					  inh_royalties := Royalty.RoyaltyEmail.GetBatchRoyaltySet(srtd_recs, email_src, InputParams.MaxResultsPerAcct, InputParams.ReturnDetailedRoyalties);
 						dsEmail := dataset([{Emailv2EAA(email_status!='invalid'),Emailv2EAAjoined(input_email_invalid!=''),inh_royalties+Email_v2_EaaResult.Royalties}],MemberPoint.Layouts.EmailRec);
-  // output(	dsBestE,named('dsBestE'));
-   //output(	Email_v2_EAAResult,named('Email_v2_EAAResult'));
-   //output(	Emailv2EAA,named('Emailv2EAA'));
-   //output(	Emailv2EAAjoined,named('Emailv2EAAjoined'));
-   //output(	dsEmail,named('dsEmail'));
 	 
 		return dsEmail;
 end;
