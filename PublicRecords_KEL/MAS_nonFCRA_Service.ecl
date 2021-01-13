@@ -183,13 +183,13 @@ STRING100 Default_data_permission_mask := '';
 		TRANSFORM(PublicRecords_KEL.ECL_Functions.Layout_Person_NonFCRA,
 			SELF := LEFT));
 	
-	IF(COUNT(ResultSet(NetAcuityRoyalty <> 0)) > 0, 
-    OUTPUT(DATASET([TRANSFORM(Royalty.Layouts.Royalty, 
-	SELF.royalty_type_code := Royalty.Constants.RoyaltyCode.NETACUITY;
-	SELF.royalty_type := Royalty.Constants.RoyaltyType.NETACUITY;
-	SELF.royalty_count  := COUNT(ResultSet(NetAcuityRoyalty <> 0)); 
-	SELF := [];
-	)]), NAMED('RoyaltySet')));
+	// IF(COUNT(ResultSet(NetAcuityRoyalty <> 0)) > 0, 
+    // OUTPUT(DATASET([TRANSFORM(Royalty.Layouts.Royalty, 
+	// SELF.royalty_type_code := Royalty.Constants.RoyaltyCode.NETACUITY;
+	// SELF.royalty_type := Royalty.Constants.RoyaltyType.NETACUITY;
+	// SELF.royalty_count  := COUNT(ResultSet(NetAcuityRoyalty <> 0)); 
+	// SELF := [];
+	// )]), NAMED('RoyaltySet')));
 	
   OUTPUT( FinalResults, NAMED('Results') );
 

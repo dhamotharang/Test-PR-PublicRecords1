@@ -1,4 +1,4 @@
-//HPCC Systems KEL Compiler Version 1.5.0rc1
+﻿//HPCC Systems KEL Compiler Version 1.5.0rc1
 IMPORT KEL15 AS KEL;
 IMPORT CFG_Compile FROM PublicRecords_KEL;
 IMPORT * FROM KEL15.Null;
@@ -212,9 +212,6 @@ EXPORT L_Compile := MODULE
     KEL.typ.nstr C_O_C_Type_;
     KEL.typ.nstr S_S_C_;
     KEL.typ.nstr Wireless_Indicator_;
-    KEL.typ.nstr I_Paddr_;
-    KEL.typ.nstr I_Presponse_;
-    KEL.typ.nint Net_Acuity_Royalty_;
     KEL.typ.epoch Archive___Date_ := 0;
     KEL.typ.epoch Date_First_Seen_ := 0;
     KEL.typ.epoch Date_Last_Seen_ := 0;
@@ -1202,7 +1199,7 @@ EXPORT L_Compile := MODULE
     KEL.typ.nuid Lex_I_D_;
     KEL.typ.str P___Lex_I_D_Seen_Flag_ := '';
     KEL.typ.nstr P___Lex_I_D_Category_;
-    KEL.typ.str P___Lex_I_D_Is_Deceased_ := '';
+    KEL.typ.str P___Lex_I_D_Is_Deceased_Flag_ := '';
     KEL.typ.int P_L___Ast_Veh_Auto_Cnt_Ev_ := 0;
     KEL.typ.ndataset(Non_F_C_R_A_Person_Attributes_V1_Dynamic_Res0_Internal_Layout_P_L___Ast_Veh_Auto_Emrg_Dt_List_Ev_Layout) P_L___Ast_Veh_Auto_Emrg_Dt_List_Ev_;
     KEL.typ.ndataset(Non_F_C_R_A_Person_Attributes_V1_Dynamic_Res0_Internal_Layout_P_L___Ast_Veh_Auto_Last_Dt_List_Ev_Layout) P_L___Ast_Veh_Auto_Last_Dt_List_Ev_;
@@ -1366,6 +1363,8 @@ EXPORT L_Compile := MODULE
     KEL.typ.int P_L___Curr_Addr_Is_Simp_Addr_Flag_ := 0;
     KEL.typ.int P_L___Curr_Addr_Is_Drop_Delivery_Flag_ := 0;
     KEL.typ.int P_L___Curr_Addr_Is_Business_Flag_ := 0;
+    KEL.typ.int P_L___Curr_Addr_Is_Multi_Unit_Flag_ := 0;
+    KEL.typ.int P_L___Curr_Addr_Is_Apt_Flag_ := 0;
     KEL.typ.nstr P_L___Best_Name_First_;
     KEL.typ.nstr P_L___Best_Name_Mid_;
     KEL.typ.nstr P_L___Best_Name_Last_;
@@ -1831,7 +1830,7 @@ EXPORT L_Compile := MODULE
   SHARED F_C_R_A_Person_Attributes_V1_Dynamic_Res0_Internal_Layout := RECORD
     KEL.typ.nuid Lex_I_D_;
     KEL.typ.str P___Lex_I_D_Seen_Flag_ := '';
-    KEL.typ.str P___Lex_I_D_Is_Deceased_ := '';
+    KEL.typ.str P___Lex_I_D_Is_Deceased_Flag_ := '';
     KEL.typ.int P_L___Ast_Veh_Air_Cnt_Ev_ := 0;
     KEL.typ.ndataset(F_C_R_A_Person_Attributes_V1_Dynamic_Res0_Internal_Layout_P_L___Ast_Veh_Air_Emrg_Dt_List_Ev_Layout) P_L___Ast_Veh_Air_Emrg_Dt_List_Ev_;
     KEL.typ.nstr P_L___Ast_Veh_Air_Emrg_New_Dt_Ev_;
@@ -1976,6 +1975,8 @@ EXPORT L_Compile := MODULE
     KEL.typ.int P_L___Curr_Addr_Is_Simp_Addr_Flag_ := 0;
     KEL.typ.int P_L___Curr_Addr_Is_Drop_Delivery_Flag_ := 0;
     KEL.typ.int P_L___Curr_Addr_Is_Business_Flag_ := 0;
+    KEL.typ.int P_L___Curr_Addr_Is_Multi_Unit_Flag_ := 0;
+    KEL.typ.int P_L___Curr_Addr_Is_Apt_Flag_ := 0;
     KEL.typ.nstr P_L___Best_Name_First_;
     KEL.typ.nstr P_L___Best_Name_Mid_;
     KEL.typ.nstr P_L___Best_Name_Last_;
@@ -2860,9 +2861,6 @@ EXPORT L_Compile := MODULE
     KEL.typ.nstr C_O_C_Type_;
     KEL.typ.nstr S_S_C_;
     KEL.typ.nstr Wireless_Indicator_;
-    KEL.typ.nstr I_Paddr_;
-    KEL.typ.nstr I_Presponse_;
-    KEL.typ.nint Net_Acuity_Royalty_;
     KEL.typ.epoch Archive___Date_ := 0;
     KEL.typ.epoch Date_First_Seen_ := 0;
     KEL.typ.epoch Date_Last_Seen_ := 0;
@@ -3850,7 +3848,7 @@ EXPORT L_Compile := MODULE
     KEL.typ.nuid Lex_I_D_;
     KEL.typ.str P___Lex_I_D_Seen_Flag_ := '';
     KEL.typ.nstr P___Lex_I_D_Category_;
-    KEL.typ.str P___Lex_I_D_Is_Deceased_ := '';
+    KEL.typ.str P___Lex_I_D_Is_Deceased_Flag_ := '';
     KEL.typ.int P_L___Ast_Veh_Auto_Cnt_Ev_ := 0;
     KEL.typ.ndataset(Non_F_C_R_A_Person_Attributes_V1_Hybrid_Res0_Internal_Layout_P_L___Ast_Veh_Auto_Emrg_Dt_List_Ev_Layout) P_L___Ast_Veh_Auto_Emrg_Dt_List_Ev_;
     KEL.typ.ndataset(Non_F_C_R_A_Person_Attributes_V1_Hybrid_Res0_Internal_Layout_P_L___Ast_Veh_Auto_Last_Dt_List_Ev_Layout) P_L___Ast_Veh_Auto_Last_Dt_List_Ev_;
@@ -4014,6 +4012,8 @@ EXPORT L_Compile := MODULE
     KEL.typ.int P_L___Curr_Addr_Is_Simp_Addr_Flag_ := 0;
     KEL.typ.int P_L___Curr_Addr_Is_Drop_Delivery_Flag_ := 0;
     KEL.typ.int P_L___Curr_Addr_Is_Business_Flag_ := 0;
+    KEL.typ.int P_L___Curr_Addr_Is_Multi_Unit_Flag_ := 0;
+    KEL.typ.int P_L___Curr_Addr_Is_Apt_Flag_ := 0;
     KEL.typ.nstr P_L___Best_Name_First_;
     KEL.typ.nstr P_L___Best_Name_Mid_;
     KEL.typ.nstr P_L___Best_Name_Last_;
@@ -4479,7 +4479,7 @@ EXPORT L_Compile := MODULE
   SHARED F_C_R_A_Person_Attributes_V1_Hybrid_Res0_Internal_Layout := RECORD
     KEL.typ.nuid Lex_I_D_;
     KEL.typ.str P___Lex_I_D_Seen_Flag_ := '';
-    KEL.typ.str P___Lex_I_D_Is_Deceased_ := '';
+    KEL.typ.str P___Lex_I_D_Is_Deceased_Flag_ := '';
     KEL.typ.int P_L___Ast_Veh_Air_Cnt_Ev_ := 0;
     KEL.typ.ndataset(F_C_R_A_Person_Attributes_V1_Hybrid_Res0_Internal_Layout_P_L___Ast_Veh_Air_Emrg_Dt_List_Ev_Layout) P_L___Ast_Veh_Air_Emrg_Dt_List_Ev_;
     KEL.typ.nstr P_L___Ast_Veh_Air_Emrg_New_Dt_Ev_;
@@ -4624,6 +4624,8 @@ EXPORT L_Compile := MODULE
     KEL.typ.int P_L___Curr_Addr_Is_Simp_Addr_Flag_ := 0;
     KEL.typ.int P_L___Curr_Addr_Is_Drop_Delivery_Flag_ := 0;
     KEL.typ.int P_L___Curr_Addr_Is_Business_Flag_ := 0;
+    KEL.typ.int P_L___Curr_Addr_Is_Multi_Unit_Flag_ := 0;
+    KEL.typ.int P_L___Curr_Addr_Is_Apt_Flag_ := 0;
     KEL.typ.nstr P_L___Best_Name_First_;
     KEL.typ.nstr P_L___Best_Name_Mid_;
     KEL.typ.nstr P_L___Best_Name_Last_;
@@ -11821,6 +11823,8 @@ EXPORT L_Compile := MODULE
     KEL.typ.nstr Curr_Addr_Full_;
     KEL.typ.ndataset(Index_Build_Entity_Res22_Internal_Layout_Curr_Addr_Full_Set_Layout) Curr_Addr_Full_Set_;
     KEL.typ.ntyp(E_Address().Typ) Curr_Addr_Helper_Attribute_;
+    KEL.typ.int Curr_Addr_Sec_Rng_Empty_Check_ := 0;
+    KEL.typ.int Curr_Addr_Unit_Dsg_Empty_Check_ := 0;
     Index_Build_Entity_Res22_Internal_Layout_Current_Layout Current_;
     KEL.typ.nstr Current_Addr_City_;
     KEL.typ.nstr Current_Addr_Cnty_;
@@ -11836,6 +11840,7 @@ EXPORT L_Compile := MODULE
     KEL.typ.nstr Current_Addr_State_Code_;
     KEL.typ.nstr Current_Addr_Status_;
     KEL.typ.nstr Current_Addr_Type_;
+    KEL.typ.nstr Current_Addr_Unit_Designation_;
     KEL.typ.nstr Current_Addr_Zip5_;
     KEL.typ.nstr Current_Postdirectional_;
     KEL.typ.int Drg_Cnt_Contact_ := 0;
@@ -12032,11 +12037,13 @@ EXPORT L_Compile := MODULE
     KEL.typ.nstr P_L___Curr_Addr_Cnty_;
     KEL.typ.nstr P_L___Curr_Addr_Full_;
     KEL.typ.nstr P_L___Curr_Addr_Geo_;
+    KEL.typ.int P_L___Curr_Addr_Is_Apt_Flag_ := 0;
     KEL.typ.int P_L___Curr_Addr_Is_Business_Flag_ := 0;
     KEL.typ.int P_L___Curr_Addr_Is_C_M_R_A_Flag_ := 0;
     KEL.typ.int P_L___Curr_Addr_Is_College_Flag_ := 0;
     KEL.typ.int P_L___Curr_Addr_Is_D_N_D_Flag_ := 0;
     KEL.typ.int P_L___Curr_Addr_Is_Drop_Delivery_Flag_ := 0;
+    KEL.typ.int P_L___Curr_Addr_Is_Multi_Unit_Flag_ := 0;
     KEL.typ.int P_L___Curr_Addr_Is_Simp_Addr_Flag_ := 0;
     KEL.typ.int P_L___Curr_Addr_Is_Throwback_Flag_ := 0;
     KEL.typ.int P_L___Curr_Addr_Is_Vacant_Flag_ := 0;
@@ -12372,7 +12379,7 @@ EXPORT L_Compile := MODULE
     KEL.typ.nstr P___Inp_Cln_S_S_N_;
     KEL.typ.nstr P___Inp_Cln_S_S_N_Raw_;
     KEL.typ.nstr P___Lex_I_D_Category_;
-    KEL.typ.str P___Lex_I_D_Is_Deceased_ := '';
+    KEL.typ.str P___Lex_I_D_Is_Deceased_Flag_ := '';
     KEL.typ.str P___Lex_I_D_Rstd_Only_Flag_ := '';
     KEL.typ.str P___Lex_I_D_Seen_Flag_ := '';
     KEL.typ.str P___Lex_I_D_Seen_Flag_N_O_W_ := '';
@@ -16397,6 +16404,8 @@ EXPORT L_Compile := MODULE
     KEL.typ.nstr Curr_Addr_Full_;
     KEL.typ.ndataset(Index_Build_Association_Res4_Internal_Layout_Curr_Addr_Full_Set_Layout) Curr_Addr_Full_Set_;
     KEL.typ.ntyp(E_Address().Typ) Curr_Addr_Helper_Attribute_;
+    KEL.typ.int Curr_Addr_Sec_Rng_Empty_Check_ := 0;
+    KEL.typ.int Curr_Addr_Unit_Dsg_Empty_Check_ := 0;
     Index_Build_Association_Res4_Internal_Layout_Current_Layout Current_;
     KEL.typ.nstr Current_Addr_City_;
     KEL.typ.nstr Current_Addr_Cnty_;
@@ -16412,6 +16421,7 @@ EXPORT L_Compile := MODULE
     KEL.typ.nstr Current_Addr_State_Code_;
     KEL.typ.nstr Current_Addr_Status_;
     KEL.typ.nstr Current_Addr_Type_;
+    KEL.typ.nstr Current_Addr_Unit_Designation_;
     KEL.typ.nstr Current_Addr_Zip5_;
     KEL.typ.nstr Current_Postdirectional_;
     KEL.typ.int Drg_Cnt_Contact_ := 0;
@@ -16608,11 +16618,13 @@ EXPORT L_Compile := MODULE
     KEL.typ.nstr P_L___Curr_Addr_Cnty_;
     KEL.typ.nstr P_L___Curr_Addr_Full_;
     KEL.typ.nstr P_L___Curr_Addr_Geo_;
+    KEL.typ.int P_L___Curr_Addr_Is_Apt_Flag_ := 0;
     KEL.typ.int P_L___Curr_Addr_Is_Business_Flag_ := 0;
     KEL.typ.int P_L___Curr_Addr_Is_C_M_R_A_Flag_ := 0;
     KEL.typ.int P_L___Curr_Addr_Is_College_Flag_ := 0;
     KEL.typ.int P_L___Curr_Addr_Is_D_N_D_Flag_ := 0;
     KEL.typ.int P_L___Curr_Addr_Is_Drop_Delivery_Flag_ := 0;
+    KEL.typ.int P_L___Curr_Addr_Is_Multi_Unit_Flag_ := 0;
     KEL.typ.int P_L___Curr_Addr_Is_Simp_Addr_Flag_ := 0;
     KEL.typ.int P_L___Curr_Addr_Is_Throwback_Flag_ := 0;
     KEL.typ.int P_L___Curr_Addr_Is_Vacant_Flag_ := 0;
@@ -16948,7 +16960,7 @@ EXPORT L_Compile := MODULE
     KEL.typ.nstr P___Inp_Cln_S_S_N_;
     KEL.typ.nstr P___Inp_Cln_S_S_N_Raw_;
     KEL.typ.nstr P___Lex_I_D_Category_;
-    KEL.typ.str P___Lex_I_D_Is_Deceased_ := '';
+    KEL.typ.str P___Lex_I_D_Is_Deceased_Flag_ := '';
     KEL.typ.str P___Lex_I_D_Rstd_Only_Flag_ := '';
     KEL.typ.str P___Lex_I_D_Seen_Flag_ := '';
     KEL.typ.str P___Lex_I_D_Seen_Flag_N_O_W_ := '';
@@ -22040,6 +22052,8 @@ EXPORT L_Compile := MODULE
     KEL.typ.nstr Curr_Addr_Full_;
     KEL.typ.ndataset(Index_Build_Association_Res10_Internal_Layout_Curr_Addr_Full_Set_Layout) Curr_Addr_Full_Set_;
     KEL.typ.ntyp(E_Address().Typ) Curr_Addr_Helper_Attribute_;
+    KEL.typ.int Curr_Addr_Sec_Rng_Empty_Check_ := 0;
+    KEL.typ.int Curr_Addr_Unit_Dsg_Empty_Check_ := 0;
     Index_Build_Association_Res10_Internal_Layout_Current_Layout Current_;
     KEL.typ.nstr Current_Addr_City_;
     KEL.typ.nstr Current_Addr_Cnty_;
@@ -22055,6 +22069,7 @@ EXPORT L_Compile := MODULE
     KEL.typ.nstr Current_Addr_State_Code_;
     KEL.typ.nstr Current_Addr_Status_;
     KEL.typ.nstr Current_Addr_Type_;
+    KEL.typ.nstr Current_Addr_Unit_Designation_;
     KEL.typ.nstr Current_Addr_Zip5_;
     KEL.typ.nstr Current_Postdirectional_;
     KEL.typ.int Drg_Cnt_Contact_ := 0;
@@ -22251,11 +22266,13 @@ EXPORT L_Compile := MODULE
     KEL.typ.nstr P_L___Curr_Addr_Cnty_;
     KEL.typ.nstr P_L___Curr_Addr_Full_;
     KEL.typ.nstr P_L___Curr_Addr_Geo_;
+    KEL.typ.int P_L___Curr_Addr_Is_Apt_Flag_ := 0;
     KEL.typ.int P_L___Curr_Addr_Is_Business_Flag_ := 0;
     KEL.typ.int P_L___Curr_Addr_Is_C_M_R_A_Flag_ := 0;
     KEL.typ.int P_L___Curr_Addr_Is_College_Flag_ := 0;
     KEL.typ.int P_L___Curr_Addr_Is_D_N_D_Flag_ := 0;
     KEL.typ.int P_L___Curr_Addr_Is_Drop_Delivery_Flag_ := 0;
+    KEL.typ.int P_L___Curr_Addr_Is_Multi_Unit_Flag_ := 0;
     KEL.typ.int P_L___Curr_Addr_Is_Simp_Addr_Flag_ := 0;
     KEL.typ.int P_L___Curr_Addr_Is_Throwback_Flag_ := 0;
     KEL.typ.int P_L___Curr_Addr_Is_Vacant_Flag_ := 0;
@@ -22591,7 +22608,7 @@ EXPORT L_Compile := MODULE
     KEL.typ.nstr P___Inp_Cln_S_S_N_;
     KEL.typ.nstr P___Inp_Cln_S_S_N_Raw_;
     KEL.typ.nstr P___Lex_I_D_Category_;
-    KEL.typ.str P___Lex_I_D_Is_Deceased_ := '';
+    KEL.typ.str P___Lex_I_D_Is_Deceased_Flag_ := '';
     KEL.typ.str P___Lex_I_D_Rstd_Only_Flag_ := '';
     KEL.typ.str P___Lex_I_D_Seen_Flag_ := '';
     KEL.typ.str P___Lex_I_D_Seen_Flag_N_O_W_ := '';
@@ -27835,6 +27852,8 @@ EXPORT L_Compile := MODULE
     KEL.typ.nstr Curr_Addr_Full_;
     KEL.typ.ndataset(Index_Build_Association_Res22_Internal_Layout_Curr_Addr_Full_Set_Layout) Curr_Addr_Full_Set_;
     KEL.typ.ntyp(E_Address().Typ) Curr_Addr_Helper_Attribute_;
+    KEL.typ.int Curr_Addr_Sec_Rng_Empty_Check_ := 0;
+    KEL.typ.int Curr_Addr_Unit_Dsg_Empty_Check_ := 0;
     Index_Build_Association_Res22_Internal_Layout_Current_Layout Current_;
     KEL.typ.nstr Current_Addr_City_;
     KEL.typ.nstr Current_Addr_Cnty_;
@@ -27850,6 +27869,7 @@ EXPORT L_Compile := MODULE
     KEL.typ.nstr Current_Addr_State_Code_;
     KEL.typ.nstr Current_Addr_Status_;
     KEL.typ.nstr Current_Addr_Type_;
+    KEL.typ.nstr Current_Addr_Unit_Designation_;
     KEL.typ.nstr Current_Addr_Zip5_;
     KEL.typ.nstr Current_Postdirectional_;
     KEL.typ.int Drg_Cnt_Contact_ := 0;
@@ -28046,11 +28066,13 @@ EXPORT L_Compile := MODULE
     KEL.typ.nstr P_L___Curr_Addr_Cnty_;
     KEL.typ.nstr P_L___Curr_Addr_Full_;
     KEL.typ.nstr P_L___Curr_Addr_Geo_;
+    KEL.typ.int P_L___Curr_Addr_Is_Apt_Flag_ := 0;
     KEL.typ.int P_L___Curr_Addr_Is_Business_Flag_ := 0;
     KEL.typ.int P_L___Curr_Addr_Is_C_M_R_A_Flag_ := 0;
     KEL.typ.int P_L___Curr_Addr_Is_College_Flag_ := 0;
     KEL.typ.int P_L___Curr_Addr_Is_D_N_D_Flag_ := 0;
     KEL.typ.int P_L___Curr_Addr_Is_Drop_Delivery_Flag_ := 0;
+    KEL.typ.int P_L___Curr_Addr_Is_Multi_Unit_Flag_ := 0;
     KEL.typ.int P_L___Curr_Addr_Is_Simp_Addr_Flag_ := 0;
     KEL.typ.int P_L___Curr_Addr_Is_Throwback_Flag_ := 0;
     KEL.typ.int P_L___Curr_Addr_Is_Vacant_Flag_ := 0;
@@ -28386,7 +28408,7 @@ EXPORT L_Compile := MODULE
     KEL.typ.nstr P___Inp_Cln_S_S_N_;
     KEL.typ.nstr P___Inp_Cln_S_S_N_Raw_;
     KEL.typ.nstr P___Lex_I_D_Category_;
-    KEL.typ.str P___Lex_I_D_Is_Deceased_ := '';
+    KEL.typ.str P___Lex_I_D_Is_Deceased_Flag_ := '';
     KEL.typ.str P___Lex_I_D_Rstd_Only_Flag_ := '';
     KEL.typ.str P___Lex_I_D_Seen_Flag_ := '';
     KEL.typ.str P___Lex_I_D_Seen_Flag_N_O_W_ := '';
@@ -32454,6 +32476,8 @@ EXPORT L_Compile := MODULE
     KEL.typ.nstr Curr_Addr_Full_;
     KEL.typ.ndataset(Index_Build_Association_Res40_Internal_Layout_Curr_Addr_Full_Set_Layout) Curr_Addr_Full_Set_;
     KEL.typ.ntyp(E_Address().Typ) Curr_Addr_Helper_Attribute_;
+    KEL.typ.int Curr_Addr_Sec_Rng_Empty_Check_ := 0;
+    KEL.typ.int Curr_Addr_Unit_Dsg_Empty_Check_ := 0;
     Index_Build_Association_Res40_Internal_Layout_Current_Layout Current_;
     KEL.typ.nstr Current_Addr_City_;
     KEL.typ.nstr Current_Addr_Cnty_;
@@ -32469,6 +32493,7 @@ EXPORT L_Compile := MODULE
     KEL.typ.nstr Current_Addr_State_Code_;
     KEL.typ.nstr Current_Addr_Status_;
     KEL.typ.nstr Current_Addr_Type_;
+    KEL.typ.nstr Current_Addr_Unit_Designation_;
     KEL.typ.nstr Current_Addr_Zip5_;
     KEL.typ.nstr Current_Postdirectional_;
     KEL.typ.int Drg_Cnt_Contact_ := 0;
@@ -32665,11 +32690,13 @@ EXPORT L_Compile := MODULE
     KEL.typ.nstr P_L___Curr_Addr_Cnty_;
     KEL.typ.nstr P_L___Curr_Addr_Full_;
     KEL.typ.nstr P_L___Curr_Addr_Geo_;
+    KEL.typ.int P_L___Curr_Addr_Is_Apt_Flag_ := 0;
     KEL.typ.int P_L___Curr_Addr_Is_Business_Flag_ := 0;
     KEL.typ.int P_L___Curr_Addr_Is_C_M_R_A_Flag_ := 0;
     KEL.typ.int P_L___Curr_Addr_Is_College_Flag_ := 0;
     KEL.typ.int P_L___Curr_Addr_Is_D_N_D_Flag_ := 0;
     KEL.typ.int P_L___Curr_Addr_Is_Drop_Delivery_Flag_ := 0;
+    KEL.typ.int P_L___Curr_Addr_Is_Multi_Unit_Flag_ := 0;
     KEL.typ.int P_L___Curr_Addr_Is_Simp_Addr_Flag_ := 0;
     KEL.typ.int P_L___Curr_Addr_Is_Throwback_Flag_ := 0;
     KEL.typ.int P_L___Curr_Addr_Is_Vacant_Flag_ := 0;
@@ -33005,7 +33032,7 @@ EXPORT L_Compile := MODULE
     KEL.typ.nstr P___Inp_Cln_S_S_N_;
     KEL.typ.nstr P___Inp_Cln_S_S_N_Raw_;
     KEL.typ.nstr P___Lex_I_D_Category_;
-    KEL.typ.str P___Lex_I_D_Is_Deceased_ := '';
+    KEL.typ.str P___Lex_I_D_Is_Deceased_Flag_ := '';
     KEL.typ.str P___Lex_I_D_Rstd_Only_Flag_ := '';
     KEL.typ.str P___Lex_I_D_Seen_Flag_ := '';
     KEL.typ.str P___Lex_I_D_Seen_Flag_N_O_W_ := '';
@@ -39943,6 +39970,8 @@ EXPORT L_Compile := MODULE
     KEL.typ.nstr Curr_Addr_Full_;
     KEL.typ.ndataset(Index_Build_Association_Res67_Internal_Layout_Curr_Addr_Full_Set_Layout) Curr_Addr_Full_Set_;
     KEL.typ.ntyp(E_Address().Typ) Curr_Addr_Helper_Attribute_;
+    KEL.typ.int Curr_Addr_Sec_Rng_Empty_Check_ := 0;
+    KEL.typ.int Curr_Addr_Unit_Dsg_Empty_Check_ := 0;
     Index_Build_Association_Res67_Internal_Layout_Current_Layout Current_;
     KEL.typ.nstr Current_Addr_City_;
     KEL.typ.nstr Current_Addr_Cnty_;
@@ -39958,6 +39987,7 @@ EXPORT L_Compile := MODULE
     KEL.typ.nstr Current_Addr_State_Code_;
     KEL.typ.nstr Current_Addr_Status_;
     KEL.typ.nstr Current_Addr_Type_;
+    KEL.typ.nstr Current_Addr_Unit_Designation_;
     KEL.typ.nstr Current_Addr_Zip5_;
     KEL.typ.nstr Current_Postdirectional_;
     KEL.typ.int Drg_Cnt_Contact_ := 0;
@@ -40154,11 +40184,13 @@ EXPORT L_Compile := MODULE
     KEL.typ.nstr P_L___Curr_Addr_Cnty_;
     KEL.typ.nstr P_L___Curr_Addr_Full_;
     KEL.typ.nstr P_L___Curr_Addr_Geo_;
+    KEL.typ.int P_L___Curr_Addr_Is_Apt_Flag_ := 0;
     KEL.typ.int P_L___Curr_Addr_Is_Business_Flag_ := 0;
     KEL.typ.int P_L___Curr_Addr_Is_C_M_R_A_Flag_ := 0;
     KEL.typ.int P_L___Curr_Addr_Is_College_Flag_ := 0;
     KEL.typ.int P_L___Curr_Addr_Is_D_N_D_Flag_ := 0;
     KEL.typ.int P_L___Curr_Addr_Is_Drop_Delivery_Flag_ := 0;
+    KEL.typ.int P_L___Curr_Addr_Is_Multi_Unit_Flag_ := 0;
     KEL.typ.int P_L___Curr_Addr_Is_Simp_Addr_Flag_ := 0;
     KEL.typ.int P_L___Curr_Addr_Is_Throwback_Flag_ := 0;
     KEL.typ.int P_L___Curr_Addr_Is_Vacant_Flag_ := 0;
@@ -40494,7 +40526,7 @@ EXPORT L_Compile := MODULE
     KEL.typ.nstr P___Inp_Cln_S_S_N_;
     KEL.typ.nstr P___Inp_Cln_S_S_N_Raw_;
     KEL.typ.nstr P___Lex_I_D_Category_;
-    KEL.typ.str P___Lex_I_D_Is_Deceased_ := '';
+    KEL.typ.str P___Lex_I_D_Is_Deceased_Flag_ := '';
     KEL.typ.str P___Lex_I_D_Rstd_Only_Flag_ := '';
     KEL.typ.str P___Lex_I_D_Seen_Flag_ := '';
     KEL.typ.str P___Lex_I_D_Seen_Flag_N_O_W_ := '';
@@ -42926,6 +42958,8 @@ EXPORT L_Compile := MODULE
     KEL.typ.nstr Curr_Addr_Full_;
     KEL.typ.ndataset(Index_Build_Association_Res71_Internal_Layout_Curr_Addr_Full_Set_Layout) Curr_Addr_Full_Set_;
     KEL.typ.ntyp(E_Address().Typ) Curr_Addr_Helper_Attribute_;
+    KEL.typ.int Curr_Addr_Sec_Rng_Empty_Check_ := 0;
+    KEL.typ.int Curr_Addr_Unit_Dsg_Empty_Check_ := 0;
     Index_Build_Association_Res71_Internal_Layout_Current_Layout Current_;
     KEL.typ.nstr Current_Addr_City_;
     KEL.typ.nstr Current_Addr_Cnty_;
@@ -42941,6 +42975,7 @@ EXPORT L_Compile := MODULE
     KEL.typ.nstr Current_Addr_State_Code_;
     KEL.typ.nstr Current_Addr_Status_;
     KEL.typ.nstr Current_Addr_Type_;
+    KEL.typ.nstr Current_Addr_Unit_Designation_;
     KEL.typ.nstr Current_Addr_Zip5_;
     KEL.typ.nstr Current_Postdirectional_;
     KEL.typ.int Drg_Cnt_Contact_ := 0;
@@ -43137,11 +43172,13 @@ EXPORT L_Compile := MODULE
     KEL.typ.nstr P_L___Curr_Addr_Cnty_;
     KEL.typ.nstr P_L___Curr_Addr_Full_;
     KEL.typ.nstr P_L___Curr_Addr_Geo_;
+    KEL.typ.int P_L___Curr_Addr_Is_Apt_Flag_ := 0;
     KEL.typ.int P_L___Curr_Addr_Is_Business_Flag_ := 0;
     KEL.typ.int P_L___Curr_Addr_Is_C_M_R_A_Flag_ := 0;
     KEL.typ.int P_L___Curr_Addr_Is_College_Flag_ := 0;
     KEL.typ.int P_L___Curr_Addr_Is_D_N_D_Flag_ := 0;
     KEL.typ.int P_L___Curr_Addr_Is_Drop_Delivery_Flag_ := 0;
+    KEL.typ.int P_L___Curr_Addr_Is_Multi_Unit_Flag_ := 0;
     KEL.typ.int P_L___Curr_Addr_Is_Simp_Addr_Flag_ := 0;
     KEL.typ.int P_L___Curr_Addr_Is_Throwback_Flag_ := 0;
     KEL.typ.int P_L___Curr_Addr_Is_Vacant_Flag_ := 0;
@@ -43477,7 +43514,7 @@ EXPORT L_Compile := MODULE
     KEL.typ.nstr P___Inp_Cln_S_S_N_;
     KEL.typ.nstr P___Inp_Cln_S_S_N_Raw_;
     KEL.typ.nstr P___Lex_I_D_Category_;
-    KEL.typ.str P___Lex_I_D_Is_Deceased_ := '';
+    KEL.typ.str P___Lex_I_D_Is_Deceased_Flag_ := '';
     KEL.typ.str P___Lex_I_D_Rstd_Only_Flag_ := '';
     KEL.typ.str P___Lex_I_D_Seen_Flag_ := '';
     KEL.typ.str P___Lex_I_D_Seen_Flag_N_O_W_ := '';
@@ -47735,6 +47772,8 @@ EXPORT L_Compile := MODULE
     KEL.typ.nstr Curr_Addr_Full_;
     KEL.typ.ndataset(Index_Build_Association_Res73_Internal_Layout_Curr_Addr_Full_Set_Layout) Curr_Addr_Full_Set_;
     KEL.typ.ntyp(E_Address().Typ) Curr_Addr_Helper_Attribute_;
+    KEL.typ.int Curr_Addr_Sec_Rng_Empty_Check_ := 0;
+    KEL.typ.int Curr_Addr_Unit_Dsg_Empty_Check_ := 0;
     Index_Build_Association_Res73_Internal_Layout_Current_Layout Current_;
     KEL.typ.nstr Current_Addr_City_;
     KEL.typ.nstr Current_Addr_Cnty_;
@@ -47750,6 +47789,7 @@ EXPORT L_Compile := MODULE
     KEL.typ.nstr Current_Addr_State_Code_;
     KEL.typ.nstr Current_Addr_Status_;
     KEL.typ.nstr Current_Addr_Type_;
+    KEL.typ.nstr Current_Addr_Unit_Designation_;
     KEL.typ.nstr Current_Addr_Zip5_;
     KEL.typ.nstr Current_Postdirectional_;
     KEL.typ.int Drg_Cnt_Contact_ := 0;
@@ -47946,11 +47986,13 @@ EXPORT L_Compile := MODULE
     KEL.typ.nstr P_L___Curr_Addr_Cnty_;
     KEL.typ.nstr P_L___Curr_Addr_Full_;
     KEL.typ.nstr P_L___Curr_Addr_Geo_;
+    KEL.typ.int P_L___Curr_Addr_Is_Apt_Flag_ := 0;
     KEL.typ.int P_L___Curr_Addr_Is_Business_Flag_ := 0;
     KEL.typ.int P_L___Curr_Addr_Is_C_M_R_A_Flag_ := 0;
     KEL.typ.int P_L___Curr_Addr_Is_College_Flag_ := 0;
     KEL.typ.int P_L___Curr_Addr_Is_D_N_D_Flag_ := 0;
     KEL.typ.int P_L___Curr_Addr_Is_Drop_Delivery_Flag_ := 0;
+    KEL.typ.int P_L___Curr_Addr_Is_Multi_Unit_Flag_ := 0;
     KEL.typ.int P_L___Curr_Addr_Is_Simp_Addr_Flag_ := 0;
     KEL.typ.int P_L___Curr_Addr_Is_Throwback_Flag_ := 0;
     KEL.typ.int P_L___Curr_Addr_Is_Vacant_Flag_ := 0;
@@ -48286,7 +48328,7 @@ EXPORT L_Compile := MODULE
     KEL.typ.nstr P___Inp_Cln_S_S_N_;
     KEL.typ.nstr P___Inp_Cln_S_S_N_Raw_;
     KEL.typ.nstr P___Lex_I_D_Category_;
-    KEL.typ.str P___Lex_I_D_Is_Deceased_ := '';
+    KEL.typ.str P___Lex_I_D_Is_Deceased_Flag_ := '';
     KEL.typ.str P___Lex_I_D_Rstd_Only_Flag_ := '';
     KEL.typ.str P___Lex_I_D_Seen_Flag_ := '';
     KEL.typ.str P___Lex_I_D_Seen_Flag_N_O_W_ := '';
@@ -51639,6 +51681,8 @@ EXPORT L_Compile := MODULE
     KEL.typ.nstr Curr_Addr_Full_;
     KEL.typ.ndataset(Index_Build_Association_Res79_Internal_Layout_Curr_Addr_Full_Set_Layout) Curr_Addr_Full_Set_;
     KEL.typ.ntyp(E_Address().Typ) Curr_Addr_Helper_Attribute_;
+    KEL.typ.int Curr_Addr_Sec_Rng_Empty_Check_ := 0;
+    KEL.typ.int Curr_Addr_Unit_Dsg_Empty_Check_ := 0;
     Index_Build_Association_Res79_Internal_Layout_Current_Layout Current_;
     KEL.typ.nstr Current_Addr_City_;
     KEL.typ.nstr Current_Addr_Cnty_;
@@ -51654,6 +51698,7 @@ EXPORT L_Compile := MODULE
     KEL.typ.nstr Current_Addr_State_Code_;
     KEL.typ.nstr Current_Addr_Status_;
     KEL.typ.nstr Current_Addr_Type_;
+    KEL.typ.nstr Current_Addr_Unit_Designation_;
     KEL.typ.nstr Current_Addr_Zip5_;
     KEL.typ.nstr Current_Postdirectional_;
     KEL.typ.int Drg_Cnt_Contact_ := 0;
@@ -51850,11 +51895,13 @@ EXPORT L_Compile := MODULE
     KEL.typ.nstr P_L___Curr_Addr_Cnty_;
     KEL.typ.nstr P_L___Curr_Addr_Full_;
     KEL.typ.nstr P_L___Curr_Addr_Geo_;
+    KEL.typ.int P_L___Curr_Addr_Is_Apt_Flag_ := 0;
     KEL.typ.int P_L___Curr_Addr_Is_Business_Flag_ := 0;
     KEL.typ.int P_L___Curr_Addr_Is_C_M_R_A_Flag_ := 0;
     KEL.typ.int P_L___Curr_Addr_Is_College_Flag_ := 0;
     KEL.typ.int P_L___Curr_Addr_Is_D_N_D_Flag_ := 0;
     KEL.typ.int P_L___Curr_Addr_Is_Drop_Delivery_Flag_ := 0;
+    KEL.typ.int P_L___Curr_Addr_Is_Multi_Unit_Flag_ := 0;
     KEL.typ.int P_L___Curr_Addr_Is_Simp_Addr_Flag_ := 0;
     KEL.typ.int P_L___Curr_Addr_Is_Throwback_Flag_ := 0;
     KEL.typ.int P_L___Curr_Addr_Is_Vacant_Flag_ := 0;
@@ -52190,7 +52237,7 @@ EXPORT L_Compile := MODULE
     KEL.typ.nstr P___Inp_Cln_S_S_N_;
     KEL.typ.nstr P___Inp_Cln_S_S_N_Raw_;
     KEL.typ.nstr P___Lex_I_D_Category_;
-    KEL.typ.str P___Lex_I_D_Is_Deceased_ := '';
+    KEL.typ.str P___Lex_I_D_Is_Deceased_Flag_ := '';
     KEL.typ.str P___Lex_I_D_Rstd_Only_Flag_ := '';
     KEL.typ.str P___Lex_I_D_Seen_Flag_ := '';
     KEL.typ.str P___Lex_I_D_Seen_Flag_N_O_W_ := '';

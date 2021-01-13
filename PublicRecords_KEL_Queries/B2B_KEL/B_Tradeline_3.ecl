@@ -4,8 +4,8 @@ IMPORT B_Tradeline_4,CFG_Compile,E_Tradeline FROM PublicRecords_KEL_Queries.B2B_
 IMPORT * FROM KEL13.Null;
 EXPORT B_Tradeline_3(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG_Compile __cfg = CFG_Compile) := MODULE
   SHARED VIRTUAL TYPEOF(B_Tradeline_4(__in,__cfg).__ENH_Tradeline_4) __ENH_Tradeline_4 := B_Tradeline_4(__in,__cfg).__ENH_Tradeline_4;
-  SHARED __EE477624 := __ENH_Tradeline_4;
-  EXPORT __ST131205_Layout := RECORD
+  SHARED __EE477605 := __ENH_Tradeline_4;
+  EXPORT __ST131186_Layout := RECORD
     KEL.typ.nkdate A_R_Date_;
     KEL.typ.nint Total_A_R_;
     KEL.typ.nint Current_A_R_;
@@ -47,13 +47,13 @@ EXPORT B_Tradeline_3(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG_C
     KEL.typ.epoch Vault_Date_Last_Seen_ := 0;
     KEL.typ.int __RecordCount := 0;
   END;
-  EXPORT __ST131198_Layout := RECORD
+  EXPORT __ST131179_Layout := RECORD
     KEL.typ.nuid UID;
     KEL.typ.nint Ult_I_D_;
     KEL.typ.nint Org_I_D_;
     KEL.typ.nint Sele_I_D_;
     KEL.typ.nstr Account_Key_;
-    KEL.typ.ndataset(__ST131205_Layout) Records_;
+    KEL.typ.ndataset(__ST131186_Layout) Records_;
     KEL.typ.ndataset(E_Tradeline(__in,__cfg).Vendor_Dates_Layout) Vendor_Dates_;
     KEL.typ.ndataset(E_Tradeline(__in,__cfg).Data_Sources_Layout) Data_Sources_;
     KEL.typ.nkdate Current_Date_First_Of_Month_;
@@ -77,22 +77,22 @@ EXPORT B_Tradeline_3(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG_C
     KEL.typ.epoch Vault_Date_Last_Seen_ := 0;
     KEL.typ.int __RecordCount := 0;
   END;
-  SHARED __ST131198_Layout __ND477589__Project(B_Tradeline_4(__in,__cfg).__ST134187_Layout __PP477228) := TRANSFORM
-    __EE477627 := __PP477228.Records_;
-    __ST131205_Layout __ND477276__Project(B_Tradeline_4(__in,__cfg).__ST134194_Layout __PP477272) := TRANSFORM
-      SELF.D_P_D1_Total_ := __OP2(__OP2(__OP2(__PP477272.Aging1_To30_L_N_,+,__PP477272.Aging31_To60_L_N_),+,__PP477272.Aging61_To90_L_N_),+,__PP477272.Aging91_Plus_L_N_);
-      SELF.D_P_D31_Total_ := __OP2(__OP2(__PP477272.Aging31_To60_L_N_,+,__PP477272.Aging61_To90_L_N_),+,__PP477272.Aging91_Plus_L_N_);
-      SELF.D_P_D61_Total_ := __OP2(__PP477272.Aging61_To90_L_N_,+,__PP477272.Aging91_Plus_L_N_);
-      SELF.D_P_D91_Total_ := __PP477272.Aging91_Plus_L_N_;
-      SELF := __PP477272;
+  SHARED __ST131179_Layout __ND477570__Project(B_Tradeline_4(__in,__cfg).__ST134168_Layout __PP477209) := TRANSFORM
+    __EE477608 := __PP477209.Records_;
+    __ST131186_Layout __ND477257__Project(B_Tradeline_4(__in,__cfg).__ST134175_Layout __PP477253) := TRANSFORM
+      SELF.D_P_D1_Total_ := __OP2(__OP2(__OP2(__PP477253.Aging1_To30_L_N_,+,__PP477253.Aging31_To60_L_N_),+,__PP477253.Aging61_To90_L_N_),+,__PP477253.Aging91_Plus_L_N_);
+      SELF.D_P_D31_Total_ := __OP2(__OP2(__PP477253.Aging31_To60_L_N_,+,__PP477253.Aging61_To90_L_N_),+,__PP477253.Aging91_Plus_L_N_);
+      SELF.D_P_D61_Total_ := __OP2(__PP477253.Aging61_To90_L_N_,+,__PP477253.Aging91_Plus_L_N_);
+      SELF.D_P_D91_Total_ := __PP477253.Aging91_Plus_L_N_;
+      SELF := __PP477253;
     END;
-    SELF.Records_ := __PROJECT(__EE477627,__ND477276__Project(LEFT));
-    __EE477563 := __PP477228.Records_;
-    __EE477578 := __PP477228.Records_;
-    __BS477564 := __T(__EE477563);
-    __EE477584 := __BS477564(__T(__OP2(__T(__EE477563).Record_Age_In_Days_,=,KEL.Aggregates.MinNN(__EE477578,__T(__EE477578).Record_Age_In_Days_))));
-    SELF.Total_A_R_L_N_ := (__EE477584)[1].Total_A_R_L_N_;
-    SELF := __PP477228;
+    SELF.Records_ := __PROJECT(__EE477608,__ND477257__Project(LEFT));
+    __EE477544 := __PP477209.Records_;
+    __EE477559 := __PP477209.Records_;
+    __BS477545 := __T(__EE477544);
+    __EE477565 := __BS477545(__T(__OP2(__T(__EE477544).Record_Age_In_Days_,=,KEL.Aggregates.MinNN(__EE477559,__T(__EE477559).Record_Age_In_Days_))));
+    SELF.Total_A_R_L_N_ := (__EE477565)[1].Total_A_R_L_N_;
+    SELF := __PP477209;
   END;
-  EXPORT __ENH_Tradeline_3 := PROJECT(__EE477624,__ND477589__Project(LEFT));
+  EXPORT __ENH_Tradeline_3 := PROJECT(__EE477605,__ND477570__Project(LEFT));
 END;

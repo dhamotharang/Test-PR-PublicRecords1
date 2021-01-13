@@ -55,6 +55,20 @@ end;
       
 lay makeFatRecord(rules_appended_file L) := TRANSFORM
 									self.sno:=(string)L.#expand(unique_id);
+									Months_between_python_func4_op:= Kel_Shell_QA.Months_between_python_func4(
+																									ROW(L, Base_Lay),
+																									trim(STD.Str.ToLowerCase(L.Acceptance_Criteria),left,right),
+																									(string)L.def_vals,Lay_para);
+																									
+									Months_between_python_func3_op:= Kel_Shell_QA.Months_between_python_func3(
+																									ROW(L, Base_Lay),
+																									trim(STD.Str.ToLowerCase(L.Acceptance_Criteria),left,right),
+																									(string)L.def_vals,Lay_para);
+									Years_between_python_func_op:= Kel_Shell_QA.Years_between_python_func(
+																									ROW(L, Base_Lay),
+																									trim(STD.Str.ToLowerCase(L.Acceptance_Criteria),left,right),
+																									(string)L.def_vals,Lay_para);	
+																									
 									self.Result:=MAP(STD.Str.Find(L.Raw_Acceptance_Criteria,'MIN(')>=1 and 
 									                 STD.Str.Find(L.case_Type,'custom')>=1 =>
 																														 Kel_Shell_QA.Months_between_python_func2(
@@ -71,12 +85,36 @@ lay makeFatRecord(rules_appended_file L) := TRANSFORM
 																	 Kel_Shell_QA.test(
 																								ROW(L, Base_Lay),
 																								trim(STD.Str.ToLowerCase(L.Acceptance_Criteria),left,right),
-																								(string)L.def_vals,Lay_para)
+																								(string)L.def_vals,Lay_para),
 
 																	// Kel_Shell_QA.Python_range_func(filtered_lay,
 																							// ROW(L, Base_Lay),
 																							// trim(STD.Str.ToLowerCase(L.Acceptance_Criteria),left,right),
 																							// (string)L.def_vals)
+																							
+														STD.Str.Find(L.Raw_Acceptance_Criteria,'and the last item in')>=1 and 
+									                 STD.Str.Find(L.case_Type,'custom')>=1 =>
+					IF(Months_between_python_func4_op not in['PASS','FAIL','NA'],
+								IF((integer)REGEXFIND('^(.*),(.*),(.*)$', trim(Months_between_python_func4_op,left,right), 3)=
+								 abs(Std.Date.MonthsBetween((integer)REGEXFIND('^(.*),(.*),(.*)$', trim(Months_between_python_func4_op,left,right), 1),
+															 (integer)REGEXFIND('^(.*),(.*),(.*)$', trim(Months_between_python_func4_op,left,right), 2))),
+															 'PASS','FAIL'),Months_between_python_func4_op),
+									
+																	 STD.Str.Find(L.Raw_Acceptance_Criteria,'and the first item in')>=1 and 
+									                 STD.Str.Find(L.case_Type,'custom')>=1 =>
+					IF(Months_between_python_func3_op not in['PASS','FAIL','NA'],
+								IF((integer)REGEXFIND('^(.*),(.*),(.*)$', trim(Months_between_python_func3_op,left,right), 3)=
+								 abs(Std.Date.MonthsBetween((integer)REGEXFIND('^(.*),(.*),(.*)$', trim(Months_between_python_func3_op,left,right), 1),
+															 (integer)REGEXFIND('^(.*),(.*),(.*)$', trim(Months_between_python_func3_op,left,right), 2))),
+															 'PASS','FAIL'),Months_between_python_func3_op),
+									
+									STD.Str.Find(L.Raw_Acceptance_Criteria,'YEARSBETWEEN')>=1 and 
+									                 STD.Str.Find(L.case_Type,'custom')>=1 =>
+					IF(Years_between_python_func_op not in['PASS','FAIL','NA'],
+								IF((integer)REGEXFIND('^(.*),(.*),(.*)$', trim(Years_between_python_func_op,left,right), 1)=
+								 abs(Std.Date.YearsBetween((integer)REGEXFIND('^(.*),(.*),(.*)$', trim(Years_between_python_func_op,left,right), 2),
+															 (integer)REGEXFIND('^(.*),(.*),(.*)$', trim(Years_between_python_func_op,left,right), 3))),
+															 'PASS','FAIL'),Years_between_python_func_op)
 																			);
 																	
 							self:=L;

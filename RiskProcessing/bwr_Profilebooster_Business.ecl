@@ -32,7 +32,7 @@ OutputFile := '~tfuerstenberg::out::profilebooster_bus_test_'+ ThorLib.wuid();
 		EXPORT BOOLEAN isMarketing := true; //always true for this query
 		EXPORT STRING100 Allowed_Sources := '';
 		EXPORT BOOLEAN Override_Experian_Restriction := false;
-		EXPORT STRING IndustryClass := ''; // When set to UTILI or DRMKT this restricts Utility data
+		EXPORT STRING5 IndustryClass := ''; // When set to UTILI or DRMKT this restricts Utility data
 		EXPORT DATA57 KEL_Permissions_Mask := PublicRecords_KEL.ECL_Functions.Fn_KEL_DPMBitmap.Generate(
 			Data_Restriction_Mask, 
 			Data_Permission_Mask, 
