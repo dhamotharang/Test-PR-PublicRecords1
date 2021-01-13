@@ -31,7 +31,7 @@ EXPORT Functions := MODULE
 																																														 SELF.OttoEmailId := HASH64(LEFT.batchin_rec.email_address),
 																																															SELF.OttoSSNId := HASH64(LEFT.batchin_rec.ssn),
 	
-																																															SELF.OttoPhoneId := HASH64(LEFT.batchin_rec.phoneno),
+																																															SELF.OttoPhoneId := (INTEGER)LEFT.batchin_rec.phoneno,
 																																															SELF.OttoBankAccountId := HASH64(TRIM(LEFT.batchin_rec.bank_routing_number, LEFT, RIGHT) + '|' + TRIM(LEFT.batchin_rec.bank_account_number, LEFT, RIGHT)),
 																																													 //SELF.OttoBankAccountId2 := HASH64(TRIM(LEFT.bank_routing_number_2, LEFT, RIGHT) + '|' + TRIM(LEFT.bank_account_number_2, LEFT, RIGHT)),
 																																													 SELF.OttoDriversLicenseId := HASH64(STD.Str.CleanSpaces(TRIM(LEFT.dl_appends[1].dl_number, LEFT, RIGHT)+ '|' + TRIM(LEFT.dl_appends[1].orig_state, LEFT, RIGHT))),                                                                                                                                                                                 
@@ -370,7 +370,7 @@ EXPORT Functions := MODULE
 																																														 SELF.OttoEmailId := HASH64(LEFT.batchin_rec.email_address),
 																																															SELF.OttoSSNId := HASH64(LEFT.batchin_rec.ssn),
 																																															// SELF.OttoSSNId := 7687709163006051155, //kr ssn
-																																															SELF.OttoPhoneId := HASH64(LEFT.batchin_rec.phoneno),
+																																															SELF.OttoPhoneId := (INTEGER)LEFT.batchin_rec.phoneno,
 																																															SELF.OttoBankAccountId := HASH64(TRIM(LEFT.batchin_rec.bank_routing_number, LEFT, RIGHT) + '|' + TRIM(LEFT.batchin_rec.bank_account_number, LEFT, RIGHT)),
 																																													 //SELF.OttoBankAccountId2 := HASH64(TRIM(LEFT.bank_routing_number_2, LEFT, RIGHT) + '|' + TRIM(LEFT.bank_account_number_2, LEFT, RIGHT)),
 																																													 SELF.OttoDriversLicenseId := HASH64(STD.Str.CleanSpaces(TRIM(LEFT.dl_appends[1].dl_number, LEFT, RIGHT)+ '|' + TRIM(LEFT.dl_appends[1].orig_state, LEFT, RIGHT))),                                                                                                                                                                                 
