@@ -26,7 +26,7 @@ Export Proc_Build_All( string pVersion, string datasetname, string location, str
 
     desprayDeltaStats := STD.File.DeSpray(DeltasStats, destinationIP, destdirectory+'Deltas'+Pversion+'.csv', allowoverwrite := true );
 
-    path := 'Sprayed to the server bctlpedata10 in path: '+destdirectory+' (Dataland)';
+    path := 'Desprayed to the server bctlpedata10 in path: '+destdirectory+' (Dataland)';
 
     buildAll := ordered(update_source,
                                   writeDeltas,
