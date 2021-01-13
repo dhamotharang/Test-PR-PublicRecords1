@@ -44,11 +44,10 @@ EXPORT getEmailInfo(dataset (MemberPoint.Layouts.BestExtended) dsBestE,
 												self:=[];
 												));
 							
-						 srtd_recs := GROUP(SORT(Email_v2_EAAResult.records, acctno, -date_last_seen, date_first_seen, -original.login_date, -process_date, RECORD), acctno);
+						srtd_recs := GROUP(SORT(Email_v2_EAAResult.records, acctno, -date_last_seen, date_first_seen, -original.login_date, -process_date, RECORD), acctno);
 					  //IN HOUSE ROYALTIES
-					  inh_royalties := Royalty.RoyaltyEmail.GetBatchRoyaltySet(srtd_recs, email_src, InputParams.MaxResultsPerAcct, InputParams.ReturnDetailedRoyalties);
-						dsEmail := dataset([{Emailv2EAA(email_status!='invalid'),Emailv2EAAjoined(input_email_invalid!=''),inh_royalties+Email_v2_EaaResult.Royalties}],MemberPoint.Layouts.EmailRec);
-	 
+					    inh_royalties := Royalty.RoyaltyEmail.GetBatchRoyaltySet(srtd_recs, email_src, InputParams.MaxResultsPerAcct, InputParams.ReturnDetailedRoyalties);
+	 					dsEmail := dataset([{Emailv2EAA(StringLib.StringToUpperCase(trim(email_status,left,right))!='INVALID'),Emailv2EAAjoined(input_email_invalid!=''),inh_royalties+Email_v2_EaaResult.Royalties}],MemberPoint.Layouts.EmailRec);
 		return dsEmail;
 end;
 
