@@ -3,8 +3,8 @@
 // Translates ne_phase01_update.mp
 
 process_date := (string8)STD.Date.Today();
-Watercraft.Macro_Clean_Hull_ID(watercraft_preprocess.file_NE_clean_in, watercraft.Layout_NE_20q1_new, hull_clean_in)
-watercraft.Macro_Is_hull_id_in_MIC(hull_clean_in, watercraft.Layout_NE_20q1_new, wDatasetwithflag)
+Watercraft.Macro_Clean_Hull_ID(watercraft_preprocess.file_NE_clean_in, watercraft.Layout_NE, hull_clean_in)
+watercraft.Macro_Is_hull_id_in_MIC(hull_clean_in, watercraft.Layout_NE, wDatasetwithflag)
 
 
 Watercraft_preprocess.Layout_Watercraft_Search_Common search_mapping_format(wDatasetwithflag L)
