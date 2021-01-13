@@ -1011,8 +1011,6 @@
    		end;	
    
    		finalRecords := dataset([{dsOutput ,dsEmailsWhole.Royalties}],finalRec);
-    //output(dsEmailsResults,named(	'dsEmailsResultsbatchrecords'));
-    output(finalRecords,named(	'ReportservicefinalRecords'));
-			return finalRecords;
+		return finalRecords;
 	end;
   
