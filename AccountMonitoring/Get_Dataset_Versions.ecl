@@ -536,6 +536,14 @@ EXPORT Get_Dataset_Versions(
 				'thor_data400::key::(.*)::phones_transaction',
 				LEFT.name,1,NOCASE)));	
 
+		Phones_WDNC := PROJECT(FileServices.SuperFileContents(AccountMonitoring.product_files.PhoneOwnership.phones_WDNC_superkeyname),
+			TRANSFORM(Final_Layout,
+				SELF.product := 'PHONEOWNERSHIP',
+				SELF.subfile := 'Phone_TCPA',
+				SELF.version := REGEXFIND(
+				'thor_data400::key::tcpa::(.*)::phone_history',
+				LEFT.name,1,NOCASE)));
+
 		PPhones_Type := PROJECT(FileServices.SuperFileContents(AccountMonitoring.product_files.phone.phones_type_superkeyname),
 			TRANSFORM(Final_Layout,
 				SELF.product := 'PHONEOWNERSHIP',
@@ -564,7 +572,8 @@ EXPORT Get_Dataset_Versions(
 		PPhones_Type +
 		PPhones_Lerg6 +
 		Phones_transaction +
-		pcarrier_reference;
+		pcarrier_reference+
+		Phones_WDNC;
 		
 		// BipBest Update
 		BipBestUpdate := PROJECT(FileServices.SuperFileContents(AccountMonitoring.product_files.header_files.r_bipbest_header_superkeyname),
