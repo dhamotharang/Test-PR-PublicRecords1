@@ -43,11 +43,15 @@
     <part name="StatusRefreshWaitPeriod" type="xsd:string"/>
 	<part name="RetainInputDID" type="xsd:boolean"/>
 	<part name="ReturnDetailedRoyalties" type="xsd:boolean"/>
+
+	<part name="_BatchJobId" type="xsd:string"/>
+	<part name="_CompanyId" type="xsd:string"/>
+
 </message>
 */
 /*--INFO-- Contains RiskView Scores and attributes version 5.0 and higher */
 
-import iesp, gateway, risk_indicators, FFD, STD, Riskview, Models, Royalty;
+import iesp, gateway, risk_indicators, FFD, STD, Riskview, Royalty;
 
 export Batch_Service := MACRO
 
@@ -118,6 +122,11 @@ boolean ExcludeStatusRefresh := false : stored('ExcludeStatusRefresh');
 string5 StatusRefreshWaitPeriod := '' : stored('StatusRefreshWaitPeriod');
 DeferredTransactionIDs := PROJECT(batchin(DeferredTransactionID <> ''), TRANSFORM({STRING32 DeferredTransactionID}, 
                                                                   SELF.DeferredTransactionID := LEFT.DeferredTransactionID));
+
+
+_BatchJobId := '' : stored('_BatchJobId');
+string20 _CompanyID := '' : stored('_CompanyId');
+
 
 
 //Default to being ON, which is 1. If Excluded, we change to 0.
@@ -248,6 +257,7 @@ valid_inputs := batchin_with_seq((
 							  ) or
 							(unsigned)LexID <> 0
 						) and ReportingPeriod > 0 and ReportingPeriod <= 84);
+
 						
 search_Results := riskview.Search_Function(valid_inputs, 
 	gateways,
@@ -287,11 +297,13 @@ search_Results := riskview.Search_Function(valid_inputs,
 	IncludeStatusRefreshChecks := IncludeStatusRefreshChecks,
     DeferredTransactionIDs := DeferredTransactionIDs,
 	StatusRefreshWaitPeriod := StatusRefreshWaitPeriod,
-    IsBatch := TRUE
+  IsBatch := TRUE,
+	CompanyID := _CompanyID,
+	TransactionID := _BatchJobId
 	);
 
 
-#if(Models.LIB_RiskView_Models().TurnOnValidation = FALSE)
+#if(Riskview.Constants.TurnOnValidation = FALSE)
 
 
 Results := join(batchin_with_seq, search_results, left.seq=right.seq,

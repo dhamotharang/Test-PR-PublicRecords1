@@ -1,11 +1,11 @@
-﻿//HPCC Systems KEL Compiler Version 1.2.1-dev
-IMPORT KEL12 AS KEL;
+﻿//HPCC Systems KEL Compiler Version 1.3.2
+IMPORT KEL13 AS KEL;
 IMPORT B_Tradeline_8,CFG_graph FROM Business_Credit_KEL;
-IMPORT * FROM KEL12.Null;
+IMPORT * FROM KEL13.Null;
 EXPORT B_Tradeline_7(CFG_graph.FDCDataset __in = CFG_graph.FDCDefault, CFG_graph __cfg = CFG_graph) := MODULE
   SHARED VIRTUAL TYPEOF(B_Tradeline_8(__in,__cfg).__ENH_Tradeline_8) __ENH_Tradeline_8 := B_Tradeline_8(__in,__cfg).__ENH_Tradeline_8;
-  SHARED __EE307408 := __ENH_Tradeline_8;
-  EXPORT __ST251429_Layout := RECORD
+  SHARED __EE9810415 := __ENH_Tradeline_8;
+  EXPORT __ST251468_Layout := RECORD
     KEL.typ.nuid UID;
     KEL.typ.nkdate _load__date_;
     KEL.typ.nstr _sbfe__contributor__number_;
@@ -36,7 +36,7 @@ EXPORT B_Tradeline_7(CFG_graph.FDCDataset __in = CFG_graph.FDCDefault, CFG_graph
     KEL.typ.nstr _payment__interval_;
     KEL.typ.nstr _payment__status__category_;
     KEL.typ.nint D_B_T___V5_;
-    KEL.typ.nstr _ln__delinquency__date_;
+    KEL.typ.nint _raw__dbt__v5_;
     KEL.typ.nunk _term__of__account__in__months_;
     KEL.typ.nkdate _first__payment__due__date_;
     KEL.typ.nkdate _final__pyament__due__date_;
@@ -102,9 +102,9 @@ EXPORT B_Tradeline_7(CFG_graph.FDCDataset __in = CFG_graph.FDCDefault, CFG_graph
     KEL.typ.nbool Shows_Closed_Account_;
     KEL.typ.int __RecordCount := 0;
   END;
-  SHARED __ST251429_Layout __ND307406__Project(B_Tradeline_8(__in,__cfg).__ST251864_Layout __PP306929) := TRANSFORM
-    SELF.Past_Due_Amount_ := __FN1(ABS,__PP306929._past__due__amount_);
-    SELF := __PP306929;
+  SHARED __ST251468_Layout __ND9810420__Project(B_Tradeline_8(__in,__cfg).__ST251903_Layout __PP9810416) := TRANSFORM
+    SELF.Past_Due_Amount_ := __FN1(ABS,__PP9810416._past__due__amount_);
+    SELF := __PP9810416;
   END;
-  EXPORT __ENH_Tradeline_7 := PROJECT(__EE307408,__ND307406__Project(LEFT));
+  EXPORT __ENH_Tradeline_7 := PROJECT(__EE9810415,__ND9810420__Project(LEFT));
 END;

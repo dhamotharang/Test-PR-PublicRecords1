@@ -16,7 +16,7 @@ EXPORT FnRoxie_GetBusinessProxIDAttributes(DATASET(PublicRecords_KEL.ECL_Functio
 		DATASET(PublicRecords_KEL.ECL_Functions.Layouts.LayoutInputPII) RepInput;
 	END;
 	
-	LayoutBusinessProxIDAttributes := RECORDOF(PublicRecords_KEL.Q_Non_F_C_R_A_Business_Prox_I_D_Attributes_V1(
+	LayoutBusinessProxIDAttributes := RECORDOF(PublicRecords_KEL.Q_Non_F_C_R_A_Business_Prox_I_D_Attributes_V1_Dynamic(
 																														0, 				
 																														0, 				
 																														0, 				
@@ -35,7 +35,7 @@ EXPORT FnRoxie_GetBusinessProxIDAttributes(DATASET(PublicRecords_KEL.ECL_Functio
 					
 	BusinessProxIDAttributesRaw := PROJECT(BusinessProxAttributesInput, TRANSFORM({INTEGER G_ProcBusUID, LayoutBusinessProxIDAttributes},
 		SELF.G_ProcBusUID := LEFT.InputData.G_ProcBusUID;
-		NonFCRABusinessProxIDResults := PublicRecords_KEL.Q_Non_F_C_R_A_Business_Prox_I_D_Attributes_V1(
+		NonFCRABusinessProxIDResults := PublicRecords_KEL.Q_Non_F_C_R_A_Business_Prox_I_D_Attributes_V1_Dynamic(
 				LEFT.InputData.B_LexIDUlt,
 				LEFT.InputData.B_LexIDOrg,
 				LEFT.InputData.B_LexIDLegal,

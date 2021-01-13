@@ -230,6 +230,7 @@ IF(RunAll OR RunFast OR RunNullCounts,OUTPUT(E_Drivers_License.NullCounts,NAMED(
 //Event sanity checks
 IF(RunAll OR RunSanityCheckSummary,OUTPUT(E_Event.SanityCheck,NAMED('E_Event_SanityCheck')));
 IF(RunAll OR RunInvalidSingleValues,OUTPUT(E_Event.Record_Id__SingleValue_Invalid,NAMED('E_Event_Record_Id__SingleValue_Invalid')));
+IF(RunAll OR RunInvalidSingleValues,OUTPUT(E_Event.Acct_No__SingleValue_Invalid,NAMED('E_Event_Acct_No__SingleValue_Invalid')));
 IF(RunAll OR RunInvalidSingleValues,OUTPUT(E_Event.Event_Date__SingleValue_Invalid,NAMED('E_Event_Event_Date__SingleValue_Invalid')));
 IF(RunAll OR RunInvalidSingleValues,OUTPUT(E_Event._r_Customer__SingleValue_Invalid,NAMED('E_Event__r_Customer__SingleValue_Invalid')));
 IF(RunAll OR RunInvalidSingleValues,OUTPUT(E_Event._r_Source_Customer__SingleValue_Invalid,NAMED('E_Event__r_Source_Customer__SingleValue_Invalid')));

@@ -4,7 +4,7 @@
 	INTEGER7 P_InpLexID;
 	STRING78 P_InpNameFirst;
 	STRING120 P_InpAddrLine1;
-	STRING120 P_InpAddrLine2;	
+	STRING120 P_InpAddrLine2;
 	STRING50 P_InpAddrCity;
 	STRING25 P_InpAddrState;
 	STRING10 P_InpAddrZip;
@@ -22,7 +22,7 @@
 	STRING1 P_InpAddrCityFlag;
 	STRING1 P_InpAddrStateFlag;
 	STRING1 P_InpAddrZipFlag;
-	STRING1 P_InpAddrSSNFlag;
+	STRING1 P_InpSSNFlag;
 	STRING1 P_InpDOBFlag;
 	STRING1 P_InpDLFlag;
 	STRING1 P_InpDLStateFlag;
@@ -106,8 +106,8 @@
 	STRING6 P_InpValEmailUserAllZeroFlag,
 	STRING6 P_InpValEmailUserBadCharFlag,
 	STRING6 P_InpValEmailDomAllZeroFlag,
-	STRING6 P_InpValEmailDomBadCharFlag,	
-	STRING6 P_InpValEmailBogusFlag,		
+	STRING6 P_InpValEmailDomBadCharFlag,
+	STRING6 P_InpValEmailBogusFlag,
 	STRING6 P_InpClnArchDtFlag;
 	STRING6 P_InpValNameBogusFlag;    
 	STRING6 P_InpValPhoneHomeBadCharFlag;
@@ -116,9 +116,9 @@
 	STRING6 P_InpValPhoneWorkBadCharFlag;
 	STRING6 P_InpValPhoneWorkBadLenFlag;
 	STRING6 P_InpValPhoneWorkBogusFlag;
-	STRING30 P_InpClnEmailUser;		
-	STRING30 P_InpClnEmailDom;		
-	STRING6  P_InpClnEmailExt;	
+	STRING30 P_InpClnEmailUser;
+	STRING30 P_InpClnEmailDom;
+	STRING6  P_InpClnEmailExt;
 	STRING45 P_InpClnIPAddr,
 	STRING6 P_InpValNameInvalidFlag,
 	STRING6 P_InpValAddrStInvalidFlag,
@@ -130,12 +130,12 @@
 	STRING6 P_InpValDOBInvalidFlag,
 	STRING6 P_InpValEmailInvalidFlag,
 	STRING6 P_InpValArchDtInvalidFlag,
-	// INTEGER4 PI_InpAddrAVMVal;		
-	// INTEGER4 PI_InpAddrAVMValA1Y;		
-	// DECIMAL7_2 PI_InpAddrAVMRatio1Y;		
-	// INTEGER4 PI_InpAddrAVMValA5Y;		
-	// DECIMAL7_2 PI_InpAddrAVMRatio5Y;		
-	// INTEGER4 PI_InpAddrAVMConfScore;
+	INTEGER4 PI_InpAddrAVMVal;
+	INTEGER4 PI_InpAddrAVMValA1Y;
+	DECIMAL7_2 PI_InpAddrAVMRatio1Y;
+	INTEGER4 PI_InpAddrAVMValA5Y;
+	DECIMAL7_2 PI_InpAddrAVMRatio5Y;
+	INTEGER4 PI_InpAddrAVMConfScore;
 	STRING6 PI_InpAddrOnFileFlagEv;
 	STRING6 PI_InpAddrIsVacantFlag;
 	STRING6 PI_InpAddrIsThrowbackFlag;
@@ -149,13 +149,64 @@
 	STRING6 PI_InpAddrOWGMFlag;
 	STRING6 PI_InpAddrIsMultiUnitFlag;
 	STRING6 PI_InpAddrIsAptFlag;
+	INTEGER PI_InpDOBAge;
+	STRING6 PI_InpSSNIsDeceasedFlag;
+	STRING10 PI_InpSSNDeceasedDt;
+	STRING6 PI_InpAddrStateDLAvailFlag;
+	STRING6 PI_InpAddrStateVoterAvailFlag;
+	INTEGER3 PI_SrchPerInpSSNCnt1Y;
+	INTEGER3 PI_SrchLexIDPerInpSSNCnt1Y;
+	INTEGER3 PI_SrchLNamePerInpSSNCnt1Y;
+	INTEGER3 PI_SrchAddrPerInpSSNCnt1Y;
+	INTEGER3 PI_SrchDOBPerInpSSNCnt1Y;
+	INTEGER3 PI_SrchPerInpAddrCnt1Y;
+	INTEGER3 PI_SrchLexIDPerInpAddrCnt1Y;
+	INTEGER3 PI_SrchLNamePerInpAddrCnt1Y;
+	INTEGER3 PI_SrchSSNPerInpAddrCnt1Y;
+	INTEGER3 PI_SrchPerInpEmailCnt1Y;
+	INTEGER3 PI_SrchLexIDPerInpEmailCnt1Y;
+	INTEGER3 PI_SrchPerInpPhoneCnt1Y;
+	INTEGER3 PI_SrchLexIDPerInpPhoneCnt1Y;
+	STRING100 PI_SrcWInpFLDListEv;
+	STRING300 PI_SrcWInpFLDEmrgDtListEv;
+	STRING300 PI_SrcWInpFLDLastDtListEv;
+	STRING100 PI_SrcWInpASListEv;
+	STRING300 PI_SrcWInpASEmrgDtListEv;
+	STRING300 PI_SrcWInpASLastDtListEv;
+	STRING100 PI_SrcWInpPDListEv; 
+	STRING300 PI_SrcWInpPDEmrgDtListEv; 
+	STRING300 PI_SrcWInpPDLastDtListEv;
+	STRING100 PI_SrcWInpLPListEv;
+	STRING300 PI_SrcWInpLPEmrgDtListEv;
+	STRING300 PI_SrcWInpLPLastDtListEv;
+	STRING100 PI_SrcWInpAPListEv; 
+	STRING300 PI_SrcWInpAPEmrgDtListEv; 
+	STRING300 PI_SrcWInpAPLastDtListEv;
+	STRING100 PI_SrcWInpFLAListEv;
+	STRING300 PI_SrcWInpFLAEmrgDtListEv;
+	STRING300 PI_SrcWInpFLALastDtListEv;
+	STRING100 PI_SrcWInpADListEv;
+	STRING300 PI_SrcWInpADEmrgDtListEv;
+	STRING300 PI_SrcWInpADLastDtListEv;
+	STRING100 PI_SrcWInpSDListEv;
+	STRING300 PI_SrcWInpSDEmrgDtListEv;
+	STRING300 PI_SrcWInpSDLastDtListEv;
+	STRING100 PI_SrcWInpPSListEv;
+	STRING300 PI_SrcWInpPSEmrgDtListEv;
+	STRING300 PI_SrcWInpPSLastDtListEv;
+	STRING100 PI_SrcWInpFLSListEv;
+	STRING300 PI_SrcWInpFLSEmrgDtListEv;
+	STRING300 PI_SrcWInpFLSLastDtListEv;
 	STRING10 G_BuildDrgCrimDt;
 	STRING10 G_BuildAstVehAutoDt;
 	STRING10 G_BuildAstVehAirDt;
 	STRING10 G_BuildAstVehWtrDt;
 	STRING10 G_BuildAstPropDt;
-	STRING10 G_BuildEduDt;	
+	STRING10 G_BuildEduDt;
+	STRING10 G_BuildPIICorrDt;
+	STRING10 G_BuildEmailDt;
 	STRING6	P_LexIDSeenFlag;
+	STRING12 P_LexIDCategory;
 	INTEGER3 PL_AstVehAutoCntEv;
 	STRING	PL_AstVehAutoEmrgDtListEv;
 	STRING	PL_AstVehAutoLastDtListEv;
@@ -177,6 +228,19 @@
 	STRING10 PL_AstVehWtrEmrgOldDtEv;
 	INTEGER3 PL_AstVehWtrEmrgNewMsncEv;
 	INTEGER3 PL_AstVehWtrEmrgOldMsncEv;
+	// Property
+	// INTEGER3 PL_AstPropCntEv;
+	// STRING900 PL_AstPropNewDtListEv;
+	// STRING900 PL_AstPropOldDtListEv;
+	// INTEGER3 PL_AstPropCurrCnt;
+	// INTEGER3 PL_AstPropSaleCntEv;
+	// STRING PL_AstPropSaleAmtListEv;
+	// INTEGER4 PL_AstPropSaleTotEv;
+	// STRING900 PL_AstPropSaleDtListEv;
+	// STRING10 PL_AstPropSaleNewDtEv;
+	// STRING10 PL_AstPropSaleOldDtEv;
+	// INTEGER3 PL_AstPropSaleNewMsncEv;
+	// INTEGER3 PL_AstPropSaleOldMsncEv;
 	INTEGER3 PL_DrgArstCnt1Y;
 	INTEGER3 PL_DrgArstCnt7Y;
 	STRING10 PL_DrgArstNewDt1Y;
@@ -295,11 +359,23 @@
 	STRING60 PL_ProfLicActvNewType;
 	STRING150 PL_ProfLicActvNewTitleType;
 	STRING6 PL_ProfLicActvNewIndx;
-	STRING6 PL_ProfLicActvNewSrcType;	
+	STRING6 PL_ProfLicActvNewSrcType;
 	STRING200 PL_CurrAddrFull;
 	// STRING200 PL_CurrAddrLocID;
 	STRING200 PL_PrevAddrFull;
 	// STRING200 PL_PrevAddrLocID;
+	STRING6 PL_CurrAddrCnty;
+	STRING7 PL_CurrAddrGeo;
+	STRING10 PL_CurrAddrLat;
+	STRING11 PL_CurrAddrLng;
+	STRING6 PL_CurrAddrType;
+	STRING6 PL_CurrAddrStatus;
+	STRING6 PL_PrevAddrCnty;
+	STRING7 PL_PrevAddrGeo;
+	STRING10 PL_PrevAddrLat;
+	STRING11 PL_PrevAddrLng;
+	STRING6 PL_PrevAddrType;
+	STRING6 PL_PrevAddrStatus;
 	//Current Address
 	STRING6 PL_CurrAddrIsVacantFlag;
 	STRING6 PL_CurrAddrIsThrowbackFlag;
@@ -310,22 +386,193 @@
 	STRING6 PL_CurrAddrIsSimpAddrFlag;
 	STRING6 PL_CurrAddrIsDropDeliveryFlag;
 	STRING6 PL_CurrAddrIsBusinessFlag;
-	//
-	STRING6 PL_EduRecFlagEv;		
-	STRING50 PL_EduSrcListEv;		
-	STRING6 PL_EduHSRecFlagEv;		
-	STRING6 PL_EduCollRecFlagEv;		
-	STRING PL_EduCollSrcEmrgDtListEv;		
-	STRING PL_EduCollSrcLastDtListEv;		
-	STRING8 PL_EduCollSrcNewRecOldDtEv;		
-	STRING8 PL_EduCollSrcNewRecNewDtEv;		
-	INTEGER3 PL_EduCollSrcNewRecOldMsncEv;		
-	INTEGER3 PL_EduCollSrcNewRecNewMsncEv;		
-	INTEGER3 PL_EduCollRecSpanEv;		
-			//consumer liens		
-	INTEGER3 PL_DrgJudgCnt7Y;		
-	INTEGER3 PL_DrgLTDCnt7Y;		
-	INTEGER3 PL_DrgLienCnt7Y;	
+	//Previous Address
+	STRING6 PL_PrevAddrIsSimpAddrFlag;
+	STRING6 PL_PrevAddrIsBusinessFlag;
+	STRING6 PL_EduRecFlagEv;
+	STRING50 PL_EduSrcListEv;
+	STRING6 PL_EduHSRecFlagEv;
+	STRING6 PL_EduCollRecFlagEv;
+	STRING PL_EduCollSrcEmrgDtListEv;
+	STRING PL_EduCollSrcLastDtListEv;
+	STRING8 PL_EduCollSrcNewRecOldDtEv;
+	STRING8 PL_EduCollSrcNewRecNewDtEv;
+	INTEGER3 PL_EduCollSrcNewRecOldMsncEv;
+	INTEGER3 PL_EduCollSrcNewRecNewMsncEv;
+	INTEGER3 PL_EduCollRecSpanEv;
+	//PersonBusiniessProperty
+	// INTEGER3 PL_AstPropBusCntEv;
+	// INTEGER3 PL_AstPropBusCurrCnt;
+	// INTEGER3 PL_AstPropBusCurrWTaxValCnt;
+	// STRING900 PL_AstPropBusCurrTaxValList;
+	// INTEGER4 PL_AstPropBusCurrTaxValTot;
+	//Email
+	INTEGER3 PL_EmailCntEv;
+	//Derog History
+	// INTEGER3 PL_DrgCnt7Y;
+	// STRING PL_DrgDtList7Y;
+	// INTEGER3 PL_DrgOldMsnc7Y;
+	// INTEGER3 PL_DrgNewMsnc7Y;	
+	//consumer liens
+	INTEGER3 PL_DrgJudgCnt7Y;
+	INTEGER3 PL_DrgLTDCnt7Y;
+	STRING PL_DrgLTDAmtList7Y;
+	STRING PL_DrgLTDDtList7Y;
+	INTEGER3 PL_DrgLTDNewMsnc7Y;
+	INTEGER3 PL_DrgLTDOldMsnc7Y;
+	INTEGER3 PL_DrgLienCnt7Y;
+	//Consumer Suits
+	INTEGER3 PL_DrgSuitCnt7Y;
+	STRING PL_DrgSuitAmtList7Y;
+	INTEGER3 PL_DrgSuitAmtTot7Y;
+	STRING PL_DrgSuitDtList7Y;
+	INTEGER3 PL_DrgSuitNewMsnc7Y;
+	INTEGER3 PL_DrgSuitOldMsnc7Y;
+	INTEGER3 PL_UtilCntEv;
+	STRING1000 PL_UtilOldDtListEv;
+	STRING8 PL_UtilOldDtEv;
+	INTEGER3 PL_UtilOldMsncEv;
+	//OverAllLnJ
+	INTEGER3 PL_DrgLnJCnt7Y;
+	STRING	PL_DrgLnJAmtList7Y;
+	STRING	PL_DrgLnJDtList7Y;
+	STRING10 PL_DrgLnJNewDt7Y;
+	INTEGER3 PL_DrgLnJNewMsnc7Y;
+	STRING10 PL_DrgLnJOldDt7Y;
+	INTEGER3 PL_DrgLnJOldMsnc7Y;
+	//Best PII
+	STRING20 PL_BestNameFirst;
+	STRING20 PL_BestNameMid;
+	STRING20 PL_BestNameLast;
+	STRING10 PL_BestSSN;
+	STRING10 PL_BestDOB;
+	INTEGER3 PL_BestDOBAge;
+	integer7 PL_HHID;
+	integer3 PL_HHMmbrCnt;
+	//Inquiry
+	//Inquiry History
+	STRING10 G_BuildSrchDt;
+	INTEGER3 PL_SrchCollCnt5Y;
+	STRING PL_SrchCollDtList5Y;
+	STRING10 PL_SrchCollNewDt5Y;
+	STRING10 PL_SrchCollOldDt5Y;
+	INTEGER3 PL_SrchCollNewMsnc5Y;
+	INTEGER3 PL_SrchCollOldMsnc5Y;
+	INTEGER3 PL_SrchCreditHRCnt5Y;
+	STRING PL_SrchCreditHRDtList5Y;
+	STRING10 PL_SrchCreditHRNewDt5Y;
+	STRING10 PL_SrchCreditHROldDt5Y;
+	INTEGER3 PL_SrchCreditHRNewMsnc5Y;
+	INTEGER3 PL_SrchCreditHROldMsnc5Y;
+	INTEGER3 PL_SrchBankCnt5Y;
+	STRING PL_SrchBankDtList5Y;
+	STRING10 PL_SrchBankNewDt5Y;
+	STRING10 PL_SrchBankOldDt5Y;
+	INTEGER3 PL_SrchBankNewMsnc5Y;
+	INTEGER3 PL_SrchBankOldMsnc5Y;
+	INTEGER3  PL_SrchAutoCnt5Y;
+	STRING PL_SrchAutoDtList5Y;
+	STRING10 PL_SrchAutoNewDt5Y;
+	STRING10 PL_SrchAutoOldDt5Y;
+	INTEGER3 PL_SrchAutoNewMsnc5Y;
+	INTEGER3 PL_SrchAutoOldMsnc5Y;
+	INTEGER3 PL_SrchMtgeCnt5Y;
+	STRING PL_SrchMtgeDtList5Y;
+	STRING10 PL_SrchMtgeNewDt5Y;
+	STRING10 PL_SrchMtgeOldDt5Y;
+	INTEGER3 PL_SrchMtgeNewMsnc5Y;
+	INTEGER3 PL_SrchMtgeOldMsnc5Y;
+	INTEGER3  PL_SrchUtilCnt5Y;
+	STRING PL_SrchUtilDtList5Y;
+	STRING10 PL_SrchUtilNewDt5Y;
+	STRING10 PL_SrchUtilOldDt5Y;
+	INTEGER3 PL_SrchUtilNewMsnc5Y;
+	INTEGER3 PL_SrchUtilOldMsnc5Y;
+	INTEGER3 PL_SrchPrepayCardCnt5Y;
+	STRING PL_SrchPrepayCardDtList5Y;
+	STRING10 PL_SrchPrepayCardNewDt5Y;
+	STRING10 PL_SrchPrepayCardOldDt5Y;
+	INTEGER3 PL_SrchPrepayCardNewMsnc5Y;
+	INTEGER3 PL_SrchPrepayCardOldMsnc5Y;
+	INTEGER3 PL_SrchCommCnt5Y;
+	STRING PL_SrchCommDtList5Y;
+	STRING10 PL_SrchCommNewDt5Y;
+	STRING10 PL_SrchCommOldDt5Y;
+	INTEGER3 PL_SrchCommNewMsnc5Y;
+	INTEGER3 PL_SrchCommOldMsnc5Y;
+	INTEGER3 PL_SrchStdntLoanCnt5Y;
+	STRING PL_SrchStdntLoanDtList5Y;
+	STRING10 PL_SrchStdntLoanNewDt5Y;
+	STRING10 PL_SrchStdntLoanOldDt5Y;
+	INTEGER3 PL_SrchStdntLoanNewMsnc5Y;
+	INTEGER3 PL_SrchStdntLoanOldMsnc5Y;
+	INTEGER3 PL_SrchRetailPymtCnt5Y;
+	STRING PL_SrchRetailPymtDtList5Y;
+	STRING10 PL_SrchRetailPymtNewDt5Y;
+	STRING10 PL_SrchRetailPymtOldDt5Y;
+	INTEGER3 PL_SrchRetailPymtNewMsnc5Y;
+	INTEGER3 PL_SrchRetailPymtOldMsnc5Y;
+	INTEGER3 PL_SrchQuizProvCnt5Y;
+	STRING PL_SrchQuizProvDtList5Y;
+	STRING10 PL_SrchQuizProvNewDt5Y;
+	STRING10 PL_SrchQuizProvOldDt5Y;
+	INTEGER3 PL_SrchQuizProvNewMsnc5Y;
+	INTEGER3 PL_SrchQuizProvOldMsnc5Y;
+	INTEGER3  PL_SrchRetailCnt5Y;
+	STRING PL_SrchRetailDtList5Y;
+	STRING10 PL_SrchRetailNewDt5Y;
+	STRING10 PL_SrchRetailOldDt5Y;
+	INTEGER3 PL_SrchRetailNewMsnc5Y;
+	INTEGER3 PL_SrchRetailOldMsnc5Y;
+	INTEGER3  PL_SrchOtherCnt5Y;
+	STRING PL_SrchOtherDtList5Y;
+	STRING10 PL_SrchOtherNewDt5Y;
+	STRING10 PL_SrchOtherOldDt5Y;
+	INTEGER3 PL_SrchOtherNewMsnc5Y;
+	INTEGER3 PL_SrchOtherOldMsnc5Y;
+	INTEGER3  PL_SrchCnt5Y;
+	STRING PL_SrchDtList5Y;
+	STRING10 PL_SrchNewDt5Y;
+	STRING10 PL_SrchOldDt5Y;
+	INTEGER3 PL_SrchNewMsnc5Y;
+	INTEGER3 PL_SrchOldMsnc5Y;
+	// NonFCRA Velocity Inquiries
+	INTEGER3 PL_SrchPerLexIDCnt1Y;
+	INTEGER3 PL_SrchSSNPerLexIDCnt1Y;
+	INTEGER3 PL_SrchAddrPerLexIDCnt1Y;
+	INTEGER3 PL_SrchLNamePerLexIDCnt1Y;
+	INTEGER3 PL_SrchFNamePerLexIDCnt1Y;
+	INTEGER3 PL_SrchPhonePerLexIDCnt1Y;
+	INTEGER3 PL_SrchDOBPerLexIDCnt1Y;
+	INTEGER3 PL_SrchEmailPerLexIDCnt1Y;
+	// INTEGER3 PL_SrchPerCurrAddrCnt1Y;
+	// INTEGER3 PL_SrchLexIDPerCurrAddrCnt1Y;
+	// INTEGER3 PL_SrchLNamePerCurrAddrCnt1Y;
+	// INTEGER3 PL_SrchSSNPerCurrAddrCnt1Y;
+	// Inquiry PII Corroboration
+	INTEGER3 PL_SrchPerLexIDWInpFLSCnt1Y;
+	INTEGER3 PL_SrchPerLexIDWInpASCnt1Y;
+	INTEGER3 PL_SrchPerLexIDWInpSDCnt1Y;
+	INTEGER3 PL_SrchPerLexIDWInpPSCnt1Y;
+	INTEGER3 PL_SrchPerLexIDWInpFLASCnt1Y;
+	INTEGER3 PL_SrchPerLexIDWInpFLPSCnt1Y;
+	INTEGER3 PL_SrchPerLexIDWInpFLAPSCnt1Y;
+	//Accidents
+	INTEGER3 PL_AccCntEv;
+	STRING6 PL_AccFlagEv;
+	STRING500 PL_AccDtListEv;
+	STRING8 PL_AccNewDtEv;
+	INTEGER3 PL_AccNewMsncEv;
+	STRING500 PL_AccDmgAmtListEv;
+	INTEGER4 PL_AccDmgTotEv;
+	INTEGER3 PL_AccNewDmgAmtEv;
+	INTEGER3 PL_AccCnt1Y;
+	//Short Term Lending
+	INTEGER PL_STLCnt1Y;
+	INTEGER PL_STLCnt2Y;
+	INTEGER PL_STLCnt5Y;
+	STRING PL_STLDtList5Y;
+	// Business attributes	
 	STRING65 B_InpAcct;
 	INTEGER	G_ProcBusUID;
 	INTEGER7 B_InpLexIDUlt;
@@ -841,7 +1088,7 @@
 	STRING6 B_InpValAltNameInvalidFlag;
 	STRING6 B_InpValNameBadCharFlag;
 	STRING6 B_InpValAltNameBadCharFlag;
-	STRING6 B_InpValNameMatchesAltNameFlag;	
+	STRING6 B_InpValNameMatchesAltNameFlag;
 	STRING6 B_InpValAddrStInvalidFlag;
 	STRING6 B_InpValPhoneInvalidFlag;
 	STRING6 B_InpValTINInvalidFlag;
@@ -875,9 +1122,9 @@
 	STRING6 BE_VerSrcBureauFlag;
 	STRING10 BE_VerSrcBureauOldDtEv;
 	INTEGER BE_VerSrcBureauOldMsncEv;
-	INTEGER3 BE_DBANameCnt2Y;	
+	INTEGER3 BE_DBANameCnt2Y;
 	STRING6 BE_AddrPOBoxFlag;
-	STRING6 BE_URLFlag;	
+	STRING6 BE_URLFlag;
 	STRING6  BE_VerNameFlag;
 	STRING BE_VerNameSrcListEv;
 	INTEGER BE_VerNameSrcCntEv;
@@ -914,7 +1161,7 @@
 	STRING10 BE_VerPhoneSrcOldDtEv;
 	STRING10 BE_VerPhoneSrcNewDtEv;
 	INTEGER BE_VerPhoneSrcOldMsncEv;
-	INTEGER BE_VerPhoneSrcNewMsncEv;	
+	INTEGER BE_VerPhoneSrcNewMsncEv;		
 	//Tradeline		
 	STRING10 G_BuildB2BDt;
 	INTEGER3 BE_B2BCntEv;
@@ -1090,7 +1337,7 @@
 	DECIMAL7_2 BE_B2BMatBalVol24Mc;
 	DECIMAL7_2 BE_B2BOpsBalVol24Mc;
 	DECIMAL7_2 BE_B2BOthBalVol24Mc;
-	// Asset Vehicle	
+	// Asset Vehicle
 	INTEGER3 BE_AstVehAirCntEv;
 	INTEGER3 BE_AstVehWtrCntEv;
 	INTEGER3 BE_AstVehAutoCntEv;
@@ -1101,22 +1348,22 @@
 	INTEGER4 BE_AstVehAutoValTot2Y;
 	INTEGER3 BE_AstVehAutoEmrgNewMsncEv;
 	STRING10 BE_AstVehAutoEmrgNewDtEv;
-	// Asset Property		
-	INTEGER3 BE_AstPropCntEv;		
-	INTEGER3 BE_AstPropStateCntEv;		
-	INTEGER3 BE_AstPropCurrCnt;		
-	INTEGER3 BE_AstPropCurrStateCnt;		
-	STRING10 BE_AstPropOldDtEv;		
-	INTEGER3 BE_AstPropOldMsncEv;		
-	STRING10 BE_AstPropNewDtEv;		
-	INTEGER3 BE_AstPropNewMsncEv; 		
-	INTEGER4 BE_AstPropCurrTaxValTot;		
-	INTEGER4 BE_AstPropCurrMktValTot;		
-	INTEGER4 BE_AstPropCurrValTot;		
-	INTEGER4 BE_AstPropCurrLotSizeTot;		
-	INTEGER4 BE_AstPropCurrBldgSizeTot;		
-	STRING6 BE_AstPropIndxEv;    		
-	// Bankruptcy	
+	// Asset Property
+	INTEGER3 BE_AstPropCntEv;
+	INTEGER3 BE_AstPropStateCntEv;
+	INTEGER3 BE_AstPropCurrCnt;
+	INTEGER3 BE_AstPropCurrStateCnt;
+	STRING10 BE_AstPropOldDtEv;
+	INTEGER3 BE_AstPropOldMsncEv;
+	STRING10 BE_AstPropNewDtEv;
+	INTEGER3 BE_AstPropNewMsncEv; 
+	INTEGER4 BE_AstPropCurrTaxValTot;
+	INTEGER4 BE_AstPropCurrMktValTot;
+	INTEGER4 BE_AstPropCurrValTot;
+	INTEGER4 BE_AstPropCurrLotSizeTot;
+	INTEGER4 BE_AstPropCurrBldgSizeTot;
+	STRING6 BE_AstPropIndxEv;	
+	// Bankruptcy
 	INTEGER3 BE_DrgBkCnt1Y;
 	INTEGER3 BE_DrgBkCnt7Y;
 	INTEGER3 BE_DrgBkCnt10Y;
@@ -1150,7 +1397,7 @@
 	STRING10 BE_SOSFrgnNewDtEv;
 	STRING10 BE_SOSFrgnOldDtEv;
 	INTEGER3 BE_SOSFrgnNewMsncEv;
-	INTEGER3 BE_SOSFrgnOldMsncEv;	
+	INTEGER3 BE_SOSFrgnOldMsncEv;
 	INTEGER6 BE_SOSDomStatusIndxEv;
 	STRING120 BE_BestName;
 	// INTEGER7 BE_BestAddrLocID;
@@ -1171,8 +1418,8 @@
 	STRING25 BP_BestAddrState;
 	STRING10 BP_BestAddrZip;
 	STRING10 BP_BestTIN;
-	STRING16 BP_BestPhone;	
-	STRING10 G_BuildDrgLnJDt;	
+	STRING16 BP_BestPhone;
+	STRING10 G_BuildDrgLnJDt;
 	STRING6 BE_DrgGovDebarredFlagEv;
 	INTEGER3 BE_DrgLTDCnt1Y;
 	INTEGER3 BE_DrgLTDCnt7Y;
@@ -1319,25 +1566,25 @@
 	STRING60  BE_BusNAICSCode3GroupDesc;
 	STRING6   BE_BusNAICSCode4;
 	STRING150 BE_BusNAICSCode4Desc;
-	STRING60  BE_BusNAICSCode4GroupDesc;
-	INTEGER3 BE_BusEmplCountCurr;	
-	STRING6 BE_BusEmplCountCurrRnge;		
-	INTEGER6 BE_BusAnnualSalesCurr;		
-	STRING6 BE_BusAnnualSalesCurrRnge;		
-	//Flag Attributes		
-	STRING6 BE_BusIsNonProfitFlag;		
-	STRING6 BE_BusIsFranchiseFlag;		
-	STRING6 BE_BusOffers401kFlag;		
-	STRING6 BE_BusHasNewLocationFlag1Y;		
-	INTEGER3 BE_BusLocActvCnt;		
-	STRING6 BE_BusIsSBEFlag;		
-	//Ownership Attributes		
-	STRING6 BE_BusInferFemaleOwnedFlag;		
-	STRING6 BE_BusInferFamilyOwnedFlag;		
-	STRING6 BE_BusIsFemaleOwnedFlag;		
-	STRING6 BE_BusIsMinorityOwnedFlag;		
+	STRING60  BE_BusNAICSCode4GroupDesc;	
+	INTEGER3 BE_BusEmplCountCurr;
+	STRING6 BE_BusEmplCountCurrRnge;
+	INTEGER6 BE_BusAnnualSalesCurr;
+	STRING6 BE_BusAnnualSalesCurrRnge;
+	//Flag Attributes
+	STRING6 BE_BusIsNonProfitFlag;
+	STRING6 BE_BusIsFranchiseFlag;
+	STRING6 BE_BusOffers401kFlag;
+	STRING6 BE_BusHasNewLocationFlag1Y;
+	INTEGER3 BE_BusLocActvCnt;
+	STRING6 BE_BusIsSBEFlag;
+	//Ownership Attributes
+	STRING6 BE_BusInferFemaleOwnedFlag;
+	STRING6 BE_BusInferFamilyOwnedFlag;
+	STRING6 BE_BusIsFemaleOwnedFlag;
+	STRING6 BE_BusIsMinorityOwnedFlag;
 	STRING6 BE_BusIsPublicFlag;
-		//assoc attributes
+	//assoc attributes
 	INTEGER3 BE_AssocCntEv;
 	INTEGER3 BE_AssocCnt2Y;
 	DECIMAL7_2 BE_AssocPct2Y;	
@@ -1350,44 +1597,44 @@
 	STRING6 BE_AssocEmailFlag2Y;
 	STRING6 BE_AssocExecEmailFlag2Y;
 	STRING6 BE_AssocNexecEmailFlag2Y;
-	INTEGER3 BE_AssocAgeAvg2Y;		
-	INTEGER3 BE_AssocExecAgeAvg2Y;		
-	INTEGER3 BE_AssocNexecAgeAvg2Y;		
-	INTEGER3 BE_AssocWEduCollCnt2Y;		
-	INTEGER3 BE_AssocExecWEduCollCnt2Y;		
-	INTEGER3 BE_AssocNexecWEduCollCnt2Y;		
-	INTEGER3 BE_AssocWDrgCrimFelCnt2Y;		
-	INTEGER3 BE_AssocExecWDrgCrimFelCnt2Y;		
-	INTEGER3 BE_AssocNexecWDrgCrimFelCnt2Y;		
-	INTEGER3 BE_AssocWDrgCrimCnt2Y;		
-	INTEGER3 BE_AssocExecWDrgCrimCnt2Y;		
-	INTEGER3 BE_AssocNexecWDrgCrimCnt2Y;    		
-	INTEGER3 BE_AssocWDrgBkCnt2Y;		
-	INTEGER3 BE_AssocExecWDrgBkCnt2Y;		
-	INTEGER3 BE_AssocNexecWDrgBkCnt2Y;		
-	INTEGER3 BE_AssocWDrgJudgCnt2Y;   		
-	INTEGER3 BE_AssocExecWDrgJudgCnt2Y;		
-	INTEGER3 BE_AssocNexecWDrgJudgCnt2Y;		
-	INTEGER3 BE_AssocWDrgLTDCnt2Y;		
-	INTEGER3 BE_AssocExecWDrgLTDCnt2Y;		
-	INTEGER3 BE_AssocNexecWDrgLTDCnt2Y;    		
-	INTEGER3 BE_AssocWDrgLienCnt2Y;   		
-	INTEGER3 BE_AssocExecWDrgLienCnt2Y;		
-	INTEGER3 BE_AssocNexecWDrgLienCnt2Y;		
-	INTEGER3 BE_AssocWDrgCnt2Y;   		
-	INTEGER3 BE_AssocExecWDrgCnt2Y;		
-	INTEGER3 BE_AssocNexecWDrgCnt2Y;		
-	INTEGER3 BE_AssocEmrgMsncAvg2Y;		
-	INTEGER3 BE_AssocExecEmrgMsncAvg2Y;		
-	INTEGER3 BE_AssocNexecEmrgMsncAvg2Y;		
-	INTEGER3 BE_AssocExecFemaleCnt2Y;		
-	DECIMAL7_2 BE_AssocExecFemalePct2Y;		
-	INTEGER3 BE_AssocExecRelatedCnt2Y;		
-	DECIMAL7_2 BE_AssocExecRelatedPct2Y;		
-	INTEGER3 BE_AssocBusCntAvg2Y;		
-	INTEGER3 BE_AssocExecBusCntAvg2Y;		
-	INTEGER3 BE_AssocNexecBusCntAvg2Y;	
-	//BestAddress
+	INTEGER3 BE_AssocAgeAvg2Y;
+	INTEGER3 BE_AssocExecAgeAvg2Y;
+	INTEGER3 BE_AssocNexecAgeAvg2Y;
+	INTEGER3 BE_AssocWEduCollCnt2Y;
+	INTEGER3 BE_AssocExecWEduCollCnt2Y;
+	INTEGER3 BE_AssocNexecWEduCollCnt2Y;
+	INTEGER3 BE_AssocWDrgCrimFelCnt2Y;
+	INTEGER3 BE_AssocExecWDrgCrimFelCnt2Y;
+	INTEGER3 BE_AssocNexecWDrgCrimFelCnt2Y;
+	INTEGER3 BE_AssocWDrgCrimCnt2Y;
+	INTEGER3 BE_AssocExecWDrgCrimCnt2Y;
+	INTEGER3 BE_AssocNexecWDrgCrimCnt2Y;	
+	INTEGER3 BE_AssocWDrgBkCnt2Y;
+	INTEGER3 BE_AssocExecWDrgBkCnt2Y;
+	INTEGER3 BE_AssocNexecWDrgBkCnt2Y;
+	INTEGER3 BE_AssocWDrgJudgCnt2Y;   
+	INTEGER3 BE_AssocExecWDrgJudgCnt2Y;
+	INTEGER3 BE_AssocNexecWDrgJudgCnt2Y;
+	INTEGER3 BE_AssocWDrgLTDCnt2Y;
+	INTEGER3 BE_AssocExecWDrgLTDCnt2Y;
+	INTEGER3 BE_AssocNexecWDrgLTDCnt2Y;	
+	INTEGER3 BE_AssocWDrgLienCnt2Y;   
+	INTEGER3 BE_AssocExecWDrgLienCnt2Y;
+	INTEGER3 BE_AssocNexecWDrgLienCnt2Y;
+	INTEGER3 BE_AssocWDrgCnt2Y;   
+	INTEGER3 BE_AssocExecWDrgCnt2Y;
+	INTEGER3 BE_AssocNexecWDrgCnt2Y;
+	INTEGER3 BE_AssocEmrgMsncAvg2Y;
+	INTEGER3 BE_AssocExecEmrgMsncAvg2Y;
+	INTEGER3 BE_AssocNexecEmrgMsncAvg2Y;
+	INTEGER3 BE_AssocExecFemaleCnt2Y;
+	DECIMAL7_2 BE_AssocExecFemalePct2Y;
+	INTEGER3 BE_AssocExecRelatedCnt2Y;
+	DECIMAL7_2 BE_AssocExecRelatedPct2Y;	
+	INTEGER3 BE_AssocBusCntAvg2Y;
+	INTEGER3 BE_AssocExecBusCntAvg2Y;
+	INTEGER3 BE_AssocNexecBusCntAvg2Y;
+	//BestAddress Attributes
 	STRING6 BE_BestAddrSeenFlag;
 	STRING  BE_BestAddrSrcListEv;
 	INTEGER3 BE_BestAddrSrcCntEv;
@@ -1402,13 +1649,21 @@
 	STRING6  BE_BestAddrBldgIsMultiUnitFlag;
 	STRING6 BE_BestAddrBldgType;
 	STRING6 BE_BestAddrIsPOBoxFlag;
-	STRING6 BE_BestAddrIsVacantFlag; 
+	STRING6 BE_BestAddrIsVacantFlag;
 	STRING6 BE_BestAddrIsOwnedFlag;
-	INTEGER BE_BestAddrNewMktValEv;
-	INTEGER BE_BestAddrNewTaxValEv;
+	INTEGER4 BE_BestAddrNewMktValEv;
+	INTEGER4 BE_BestAddrNewTaxValEv;
 	STRING6 BE_BestAddrNewMktValYrEv;
 	STRING6 BE_BestAddrNewTaxValYrEv;
-	INTEGER BE_BestAddrLotSize;
-	INTEGER BE_BestAddrBldgSize;
-
+	INTEGER4 BE_BestAddrLotSize;
+	INTEGER4 BE_BestAddrBldgSize;
+	//Person Header Source Verification
+	// STRING10 G_BuildHdrDt;
+	// INTEGER PL_VerSrcCntEv;
+	// STRING100 PL_VerSrcListEv;
+	// STRING300 PL_VerSrcEmrgDtListEv;
+	// STRING300 PL_VerSrcLastDtListEv;
+	// STRING10 PL_VerSrcOldDtEv;
+	// STRING10 PL_VerSrcNewDtEv;
+	// STRING6 P_LexIDRstdOnlyFlag;
 END;

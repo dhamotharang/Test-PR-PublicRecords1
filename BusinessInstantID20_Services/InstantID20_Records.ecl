@@ -22,14 +22,13 @@ EXPORT InstantID20_Records( DATASET(BusinessInstantID20_Services.layouts.InputCo
 		ds_Shell_Results := mod_BusShell.Records;
 		
 		// 2.  Clean the Business and the Authorized Rep data.	
-		// *** TODO: Create exportable attribute in mod_BusinessShell containing cleaned AuthRep 
-		// fields; these can be read from the Business Shell. Include LexIDs also, so we can get
-		// rid of fn_AppendLexIDs( ) below. Also add a Targus hit indicator in case we ever want 
-		// to use that Gateway. ***
 		ds_CleanedInput := BusinessInstantID20_Services.fn_CleanInput(ds_OriginalInput);
 		
 		// 3.  Append LexIDs.
-		ds_WithLexIDs := BusinessInstantID20_Services.fn_AppendLexIDs(ds_CleanedInput, Options);
+		ds_WithLexIDs := BusinessInstantID20_Services.fn_AppendLexIDs(ds_CleanedInput, ds_Shell_Results);
+		ds_OriginalInput_with_LexIDs := join(ds_originalInput, ds_withLexIDs, LEFT.SEQ=RIGHT.SEQ, transform(BusinessInstantID20_Services.layouts.InputCompanyAndAuthRepInfo, 
+		self.AuthReps := project(RIGHT.AuthReps, transform(BusinessInstantID20_Services.layouts.InputAuthRepInfo, self := left)), 
+		SELF := LEFT));  
 		
 		// 4.  Get BIPIDs. These'll be passed into any kFetches later. 
 		ds_BIPIDs := mod_BusShell.BIPIDs;
@@ -70,7 +69,7 @@ EXPORT InstantID20_Records( DATASET(BusinessInstantID20_Services.layouts.InputCo
 		// 14. Get Consumer InstantID records for *valid* Auth Reps.
 		ds_CleanedInputWithValidAuthReps := 
 			PROJECT( 
-				ds_CleanedInput,
+				ds_WithLexIDs,
 				TRANSFORM( BusinessInstantID20_Services.Layouts.InputCompanyAndAuthRepInfoClean,
 					SELF.AuthReps := BusinessInstantID20_Services.fn_MeetsAuthRepMinInputRequirements( LEFT.AuthReps ),
 					SELF := LEFT
@@ -101,7 +100,7 @@ EXPORT InstantID20_Records( DATASET(BusinessInstantID20_Services.layouts.InputCo
     
    
     
-    ds_Models_temp := BusinessInstantID20_Services.fn_GetModels(Input,ds_Shell_Results,ds_OriginalInput,LinkSearchLevel,MarketingMode,Options,AppendBestsFromLexIDs,LexIdSourceOptout := LexIdSourceOptout, 
+    ds_Models_temp := BusinessInstantID20_Services.fn_GetModels(Input,ds_Shell_Results,ds_OriginalInput_with_LexIDs,LinkSearchLevel,MarketingMode,Options,AppendBestsFromLexIDs,LexIdSourceOptout := LexIdSourceOptout, 
 	  TransactionID := TransactionID, 
 	  BatchUID := BatchUID, 
 	  GlobalCompanyID := GlobalCompanyID);
@@ -315,43 +314,46 @@ EXPORT InstantID20_Records( DATASET(BusinessInstantID20_Services.layouts.InputCo
 		/* ************ End Logging ************/
  
 		// DEBUGs.............:
-		// OUTPUT( ds_OriginalInput, NAMED('OriginalInput') );
-		// OUTPUT( ds_Shell_Results, NAMED('ds_Shell_Results') );
-		// OUTPUT( ds_CleanedInput, NAMED('CleanedInput') );
-		// OUTPUT( ds_WithLexIDs, NAMED('WithLexIDs') );
-		// OUTPUT( ds_BIPIDs, NAMED('BIPIDs') );
-		// OUTPUT( ds_NoBIPIDsFound, NAMED('NoBIPIDsFound') );
-		// OUTPUT( ds_BIPIDsFound, NAMED('BIPIDsFound') );
-		// OUTPUT( ds_BestBusinessInfo, NAMED('BestBusinessInfo') );
-		// OUTPUT( CHOOSEN(ds_BusinessHeaderRecs,100), NAMED('ds_BusinessHeaderRecs') );
-		// OUTPUT( ds_VerificationInfo, NAMED('VerificationInfo') );
-		// OUTPUT( ds_FirmographicsInfo, NAMED('FirmographicsInfo') );
-		// OUTPUT( ds_ParentInfo, NAMED('ParentInfo') );
-		// OUTPUT( ds_BusinessesByPhone, NAMED('BusinessesByPhone') );
-		// OUTPUT( ds_PhonesByAddress, NAMED('PhonesByAddress') );
-		// OUTPUT( ds_BusinessesByFEIN, NAMED('BusinessesByFEIN') );
-		// OUTPUT( ds_GlobalWatchlistInfo, NAMED('GlobalWatchlistInfo') );
-		// OUTPUT( ds_CleanedInputWithValidAuthReps, NAMED('CleanedInputWithValidAuthReps') );
-		// OUTPUT( ds_ConsumerInstantIDInfo, NAMED('ConsumerInstantIDInfo') );
-		// OUTPUT( ds_PersonRoleInfo, NAMED('PersonRoleInfo') );
-		// OUTPUT( ds_OutputWithScoresAndBusinessShellData, NAMED('OutputWithScoresAndBusinessShellData') );
-		// OUTPUT( ds_Models_temp, NAMED('ds_Models_temp') );
-		// OUTPUT( ds_Models, NAMED('ds_Models') );
-		// OUTPUT( ds_Attributes, NAMED('ds_Attributes') );
-		// OUTPUT( ds_OutputWithModelsAndAttributes, NAMED('ds_OutputWithModelsAndAttributes') );
-		// OUTPUT( ds_OutputWithVerificationInfo, NAMED('ds_OutputWithVerificationInfo') );
-		// OUTPUT( ds_ConsumerInstantIDWatchlist, NAMED('ds_ConsumerInstantIDWatchlist') );
-		// OUTPUT( ds_OutputWithOFACGWL, NAMED('ds_OutputWithOFACGWL') );
-		// OUTPUT( ds_OutputWithConsumerInstantID, NAMED('ds_OutputWithConsumerInstantID') );
-		// OUTPUT( ds_riskIndAuthRep1, NAMED('ds_riskIndAuthRep1') );
-		// OUTPUT( ds_riskIndAuthRep1Fua, NAMED('ds_riskIndAuthRep1Fua') );
-		// OUTPUT( ds_riskInd, NAMED('ds_riskInd') );
-		// OUTPUT( ds_riskIndBusn, NAMED('ds_riskIndBusn') );
-		// OUTPUT( ds_riskIndBusnPre, NAMED('ds_riskIndBusnPre') );
-		// OUTPUT( ds_OutputWithWatchlistRiskIndicators, NAMED('ds_OutputWithWatchlistRiskIndicators') );
-		// OUTPUT( ds_AddressRisk, named('ds_AddressRisk') );
-		// OUTPUT( ds_OutputWithAddressRisk, named('ds_OutputWithAddressRisk') );
-    // OUTPUT( ds_OutputWithEcho, named('ds_OutputWithEcho') );
+// output(ds_OriginalInput, named('ds_OriginalInput'));
+// output(ds_Shell_Results, named('ds_shell_results'));
+// output(ds_CleanedInput, named('ds_CleanedInput'));
+// output(ds_WithLexIDs, named('ds_WithLexIDs'));
+// output(ds_OriginalInput_with_LexIDs, named('ds_OriginalInput_with_LexIDs'));
+
+// OUTPUT( ds_BIPIDsFound, NAMED('BIPIDsFound') );
+// OUTPUT( ds_BestBusinessInfo, NAMED('BestBusinessInfo') );
+// OUTPUT( CHOOSEN(ds_BusinessHeaderRecs,10), NAMED('ds_BusinessHeaderRecs') );
+// OUTPUT( ds_VerificationInfo, NAMED('VerificationInfo') );
+// OUTPUT( ds_FirmographicsInfo, NAMED('FirmographicsInfo') );
+// OUTPUT( ds_ParentInfo, NAMED('ParentInfo') );
+// OUTPUT( ds_BusinessesByPhone, NAMED('BusinessesByPhone') );
+// OUTPUT( ds_PhonesByAddress, NAMED('PhonesByAddress') );
+// OUTPUT( ds_BusinessesByFEIN, NAMED('BusinessesByFEIN') );
+// OUTPUT( ds_GlobalWatchlistInfo, NAMED('GlobalWatchlistInfo') );
+// OUTPUT( ds_CleanedInputWithValidAuthReps, NAMED('CleanedInputWithValidAuthReps') );
+// OUTPUT( ds_ConsumerInstantIDInfo, NAMED('ConsumerInstantIDInfo') );
+// OUTPUT( ds_PersonRoleInfo, NAMED('PersonRoleInfo') );
+		
+// output(ds_OutputWithBIPIDs, named('ds_OutputWithBIPIDs'));
+// output(ds_OutputWithCleanedDataEtc, named('ds_OutputWithCleanedDataEtc'));
+// output(ds_OutputWithBestInfo, named('ds_OutputWithBestInfo'));
+// output(ds_OutputWithFirmographics, named('ds_OutputWithFirmographics'));
+// output(ds_OutputWithParentInfo, named('ds_OutputWithParentInfo'));
+// output(ds_OutputWithBusinessesByPhone, named('ds_OutputWithBusinessesByPhone'));
+// output(ds_OutputWithPhonesByAddress, named('ds_OutputWithPhonesByAddress'));
+// output(ds_OutputWithBusinessesByFEIN, named('ds_OutputWithBusinessesByFEIN'));
+// output(ds_OutputWithOFACGWL, named('ds_OutputWithOFACGWL'));
+// output(ds_OutputWithAddressRisk, named('ds_OutputWithAddressRisk'));
+// output(ds_ConsumerInstantIDwithWatchlist, named('ds_ConsumerInstantIDwithWatchlist'));
+// output(ds_OutputWithConsumerInstantID, named('ds_OutputWithConsumerInstantID'));
+// output(ds_OutputWithPersonRoles, named('ds_OutputWithPersonRoles'));
+// output(ds_Shell_Results_WatchlistVerfication, named('ds_Shell_Results_WatchlistVerfication'));
+// output(ds_OutputWithScoresAndBusinessShellData, named('ds_OutputWithScoresAndBusinessShellData'));
+// output(ds_OutputWithVerificationInfo, named('ds_OutputWithVerificationInfo'));
+// output(ds_OutputWithModelsAndAttributes, named('ds_OutputWithModelsAndAttributes'));
+// output(ds_Suppressed, named('ds_Suppressed'));
+// output(ds_Final, named('ds_Final'));
+
 		RETURN ds_Final;
 #else // Else, output the model results directly
 
