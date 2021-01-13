@@ -1,4 +1,4 @@
-//HPCC Systems KEL Compiler Version 1.5.0rc1
+﻿//HPCC Systems KEL Compiler Version 1.5.0rc1
 IMPORT KEL15 AS KEL;
 IMPORT PublicRecords_KEL;
 IMPORT B_Address_2,B_Address_3,B_Address_4,B_Address_5,B_Address_6,B_Aircraft_Owner_1,B_Aircraft_Owner_2,B_Aircraft_Owner_3,B_Bankruptcy_1,B_Bankruptcy_2,B_Bankruptcy_3,B_Bankruptcy_4,B_Bankruptcy_5,B_Bankruptcy_6,B_Bankruptcy_7,B_Bankruptcy_8,B_Criminal_Offense_1,B_Criminal_Offense_2,B_Criminal_Offense_3,B_Criminal_Offense_4,B_Criminal_Offense_5,B_Education_1,B_Education_2,B_Education_3,B_Education_4,B_Education_5,B_Education_6,B_Education_7,B_Email_2,B_First_Degree_Relative_5,B_Input_P_I_I_1,B_Input_P_I_I_2,B_Input_P_I_I_3,B_Input_P_I_I_4,B_Input_P_I_I_5,B_Input_P_I_I_6,B_Input_P_I_I_7,B_Input_P_I_I_8,B_Input_P_I_I_9,B_Inquiry_10,B_Inquiry_11,B_Inquiry_3,B_Inquiry_4,B_Inquiry_5,B_Inquiry_6,B_Inquiry_7,B_Inquiry_8,B_Inquiry_9,B_Lien_Judgment_13,B_Person,B_Person_1,B_Person_10,B_Person_11,B_Person_2,B_Person_3,B_Person_4,B_Person_5,B_Person_6,B_Person_7,B_Person_8,B_Person_9,B_Person_Accident_8,B_Person_Address_2,B_Person_Address_3,B_Person_Inquiry_3,B_Person_Inquiry_4,B_Person_Inquiry_5,B_Person_Inquiry_6,B_Person_Inquiry_7,B_Person_Inquiry_8,B_Person_Lien_Judgment_12,B_Person_Property_1,B_Person_Property_2,B_Person_Property_3,B_Person_Property_4,B_Person_Property_5,B_Person_Property_6,B_Person_S_S_N_1,B_Person_S_S_N_2,B_Person_Vehicle_1,B_Person_Vehicle_2,B_Person_Vehicle_3,B_Professional_License_1,B_Professional_License_2,B_Professional_License_3,B_Professional_License_4,B_Professional_License_5,B_Property_2,B_Property_3,B_Property_4,B_Property_5,B_Property_Event_1,B_Property_Event_2,B_Property_Event_3,B_Property_Event_4,B_Property_Event_5,B_Property_Event_6,B_Sele_Person_3,B_Sele_Person_4,B_Sele_Person_5,B_Sele_Person_6,B_Sele_Person_7,B_Watercraft_Owner_1,B_Watercraft_Owner_2,B_Watercraft_Owner_3,CFG_Compile,E_Accident,E_Address,E_Address_Inquiry,E_Address_Property,E_Aircraft,E_Aircraft_Owner,E_Bankruptcy,E_Criminal_Offense,E_Education,E_Email,E_Email_Inquiry,E_First_Degree_Associations,E_First_Degree_Relative,E_Geo_Link,E_Household,E_Household_Member,E_Input_P_I_I,E_Inquiry,E_Lien_Judgment,E_Person,E_Person_Accident,E_Person_Address,E_Person_Bankruptcy,E_Person_Education,E_Person_Email,E_Person_Inquiry,E_Person_Lien_Judgment,E_Person_Offenses,E_Person_Property,E_Person_Property_Event,E_Person_S_S_N,E_Person_Vehicle,E_Phone,E_Phone_Inquiry,E_Professional_License,E_Professional_License_Person,E_Property,E_Property_Event,E_S_S_N_Inquiry,E_Sele_Person,E_Social_Security_Number,E_Surname,E_Utility,E_Utility_Person,E_Vehicle,E_Watercraft,E_Watercraft_Owner,E_Zip_Code FROM PublicRecords_KEL;
@@ -672,16 +672,16 @@ EXPORT Q_Non_F_C_R_A_Person_Attributes_V1_Hybrid(KEL.typ.uid __PLexID_in, DATASE
     SHARED TYPEOF(B_Watercraft_Owner_1(__in,__cfg_Local).__ENH_Watercraft_Owner_1) __ENH_Watercraft_Owner_1 := B_Watercraft_Owner_1_Local.__ENH_Watercraft_Owner_1;
   END;
   SHARED TYPEOF(B_Person(__in,__cfg_Local).__ENH_Person) __ENH_Person := B_Person_Local.__ENH_Person;
-  SHARED __EE11561930 := __ENH_Person;
-  SHARED __EE11567037 := __EE11561930(__T(__OP2(__EE11561930.UID,=,__CN(__PLexID_in))));
-  SHARED __ST120684_Layout := RECORD
+  SHARED __EE11571588 := __ENH_Person;
+  SHARED __EE11576713 := __EE11571588(__T(__OP2(__EE11571588.UID,=,__CN(__PLexID_in))));
+  SHARED __ST120657_Layout := RECORD
     KEL.typ.nuid Lex_I_D_;
     KEL.typ.str P___Lex_I_D_Seen_Flag_ := '';
     KEL.typ.nstr P___Lex_I_D_Category_;
-    KEL.typ.str P___Lex_I_D_Is_Deceased_ := '';
+    KEL.typ.str P___Lex_I_D_Is_Deceased_Flag_ := '';
     KEL.typ.int P_L___Ast_Veh_Auto_Cnt_Ev_ := 0;
-    KEL.typ.ndataset(B_Person(__in,__cfg_Local).__ST3612082_Layout) P_L___Ast_Veh_Auto_Emrg_Dt_List_Ev_;
-    KEL.typ.ndataset(B_Person(__in,__cfg_Local).__ST3612102_Layout) P_L___Ast_Veh_Auto_Last_Dt_List_Ev_;
+    KEL.typ.ndataset(B_Person(__in,__cfg_Local).__ST3614436_Layout) P_L___Ast_Veh_Auto_Emrg_Dt_List_Ev_;
+    KEL.typ.ndataset(B_Person(__in,__cfg_Local).__ST3614456_Layout) P_L___Ast_Veh_Auto_Last_Dt_List_Ev_;
     KEL.typ.int P_L___Ast_Veh_Auto_Cnt10_Y_ := 0;
     KEL.typ.int P_L___Ast_Veh_Auto_Cnt2_Y_ := 0;
     KEL.typ.nstr P_L___Ast_Veh_Auto_Emrg_New_Dt_Ev_;
@@ -689,13 +689,13 @@ EXPORT Q_Non_F_C_R_A_Person_Attributes_V1_Hybrid(KEL.typ.uid __PLexID_in, DATASE
     KEL.typ.nint P_L___Ast_Veh_Auto_Emrg_New_Msnc_Ev_;
     KEL.typ.nint P_L___Ast_Veh_Auto_Emrg_Old_Msnc_Ev_;
     KEL.typ.int P_L___Ast_Veh_Air_Cnt_Ev_ := 0;
-    KEL.typ.ndataset(B_Person(__in,__cfg_Local).__ST81475_Layout) P_L___Ast_Veh_Air_Emrg_Dt_List_Ev_;
+    KEL.typ.ndataset(B_Person(__in,__cfg_Local).__ST81409_Layout) P_L___Ast_Veh_Air_Emrg_Dt_List_Ev_;
     KEL.typ.nstr P_L___Ast_Veh_Air_Emrg_New_Dt_Ev_;
     KEL.typ.nstr P_L___Ast_Veh_Air_Emrg_Old_Dt_Ev_;
     KEL.typ.nint P_L___Ast_Veh_Air_Emrg_New_Msnc_Ev_;
     KEL.typ.nint P_L___Ast_Veh_Air_Emrg_Old_Msnc_Ev_;
     KEL.typ.int P_L___Ast_Veh_Wtr_Cnt_Ev_ := 0;
-    KEL.typ.ndataset(B_Person(__in,__cfg_Local).__ST81728_Layout) P_L___Ast_Veh_Wtr_Emrg_Dt_List_Ev_;
+    KEL.typ.ndataset(B_Person(__in,__cfg_Local).__ST81662_Layout) P_L___Ast_Veh_Wtr_Emrg_Dt_List_Ev_;
     KEL.typ.nstr P_L___Ast_Veh_Wtr_Emrg_New_Dt_Ev_;
     KEL.typ.nstr P_L___Ast_Veh_Wtr_Emrg_Old_Dt_Ev_;
     KEL.typ.nint P_L___Ast_Veh_Wtr_Emrg_New_Msnc_Ev_;
@@ -745,9 +745,9 @@ EXPORT Q_Non_F_C_R_A_Person_Attributes_V1_Hybrid(KEL.typ.uid __PLexID_in, DATASE
     KEL.typ.int P_L___Drg_Bk_Cnt1_Y_ := 0;
     KEL.typ.int P_L___Drg_Bk_Cnt7_Y_ := 0;
     KEL.typ.int P_L___Drg_Bk_Cnt10_Y_ := 0;
-    KEL.typ.ndataset(B_Person(__in,__cfg_Local).__ST83356_Layout) P_L___Drg_Bk_Dt_List1_Y_;
-    KEL.typ.ndataset(B_Person(__in,__cfg_Local).__ST83378_Layout) P_L___Drg_Bk_Dt_List7_Y_;
-    KEL.typ.ndataset(B_Person(__in,__cfg_Local).__ST83400_Layout) P_L___Drg_Bk_Dt_List10_Y_;
+    KEL.typ.ndataset(B_Person(__in,__cfg_Local).__ST83290_Layout) P_L___Drg_Bk_Dt_List1_Y_;
+    KEL.typ.ndataset(B_Person(__in,__cfg_Local).__ST83312_Layout) P_L___Drg_Bk_Dt_List7_Y_;
+    KEL.typ.ndataset(B_Person(__in,__cfg_Local).__ST83334_Layout) P_L___Drg_Bk_Dt_List10_Y_;
     KEL.typ.nstr P_L___Drg_Bk_New_Dt1_Y_;
     KEL.typ.nstr P_L___Drg_Bk_New_Dt7_Y_;
     KEL.typ.nstr P_L___Drg_Bk_New_Dt10_Y_;
@@ -760,9 +760,9 @@ EXPORT Q_Non_F_C_R_A_Person_Attributes_V1_Hybrid(KEL.typ.uid __PLexID_in, DATASE
     KEL.typ.nint P_L___Drg_Bk_Old_Msnc1_Y_;
     KEL.typ.nint P_L___Drg_Bk_Old_Msnc7_Y_;
     KEL.typ.nint P_L___Drg_Bk_Old_Msnc10_Y_;
-    KEL.typ.ndataset(B_Person(__in,__cfg_Local).__ST83639_Layout) P_L___Drg_Bk_Ch_List1_Y_;
-    KEL.typ.ndataset(B_Person(__in,__cfg_Local).__ST83669_Layout) P_L___Drg_Bk_Ch_List7_Y_;
-    KEL.typ.ndataset(B_Person(__in,__cfg_Local).__ST83699_Layout) P_L___Drg_Bk_Ch_List10_Y_;
+    KEL.typ.ndataset(B_Person(__in,__cfg_Local).__ST83573_Layout) P_L___Drg_Bk_Ch_List1_Y_;
+    KEL.typ.ndataset(B_Person(__in,__cfg_Local).__ST83603_Layout) P_L___Drg_Bk_Ch_List7_Y_;
+    KEL.typ.ndataset(B_Person(__in,__cfg_Local).__ST83633_Layout) P_L___Drg_Bk_Ch_List10_Y_;
     KEL.typ.nstr P_L___Drg_Bk_New_Ch_Type1_Y_;
     KEL.typ.nstr P_L___Drg_Bk_New_Ch_Type7_Y_;
     KEL.typ.nstr P_L___Drg_Bk_New_Ch_Type10_Y_;
@@ -778,9 +778,9 @@ EXPORT Q_Non_F_C_R_A_Person_Attributes_V1_Hybrid(KEL.typ.uid __PLexID_in, DATASE
     KEL.typ.nstr P_L___Drg_Bk_Updt_New_Msnc1_Y_;
     KEL.typ.nstr P_L___Drg_Bk_Updt_New_Msnc7_Y_;
     KEL.typ.nstr P_L___Drg_Bk_Updt_New_Msnc10_Y_;
-    KEL.typ.ndataset(B_Person(__in,__cfg_Local).__ST84498_Layout) P_L___Drg_Bk_Disp_List1_Y_;
-    KEL.typ.ndataset(B_Person(__in,__cfg_Local).__ST84532_Layout) P_L___Drg_Bk_Disp_List7_Y_;
-    KEL.typ.ndataset(B_Person(__in,__cfg_Local).__ST84566_Layout) P_L___Drg_Bk_Disp_List10_Y_;
+    KEL.typ.ndataset(B_Person(__in,__cfg_Local).__ST84432_Layout) P_L___Drg_Bk_Disp_List1_Y_;
+    KEL.typ.ndataset(B_Person(__in,__cfg_Local).__ST84466_Layout) P_L___Drg_Bk_Disp_List7_Y_;
+    KEL.typ.ndataset(B_Person(__in,__cfg_Local).__ST84500_Layout) P_L___Drg_Bk_Disp_List10_Y_;
     KEL.typ.nstr P_L___Drg_Bk_New_Disp_Type1_Y_;
     KEL.typ.nstr P_L___Drg_Bk_New_Disp_Type7_Y_;
     KEL.typ.nstr P_L___Drg_Bk_New_Disp_Type10_Y_;
@@ -799,17 +799,17 @@ EXPORT Q_Non_F_C_R_A_Person_Attributes_V1_Hybrid(KEL.typ.uid __PLexID_in, DATASE
     KEL.typ.int P_L___Drg_Bk_Dsch_Cnt1_Y_ := 0;
     KEL.typ.int P_L___Drg_Bk_Dsch_Cnt7_Y_ := 0;
     KEL.typ.int P_L___Drg_Bk_Dsch_Cnt10_Y_ := 0;
-    KEL.typ.ndataset(B_Person(__in,__cfg_Local).__ST85106_Layout) P_L___Drg_Bk_Type_List1_Y_;
-    KEL.typ.ndataset(B_Person(__in,__cfg_Local).__ST85143_Layout) P_L___Drg_Bk_Type_List7_Y_;
-    KEL.typ.ndataset(B_Person(__in,__cfg_Local).__ST85180_Layout) P_L___Drg_Bk_Type_List10_Y_;
+    KEL.typ.ndataset(B_Person(__in,__cfg_Local).__ST85040_Layout) P_L___Drg_Bk_Type_List1_Y_;
+    KEL.typ.ndataset(B_Person(__in,__cfg_Local).__ST85077_Layout) P_L___Drg_Bk_Type_List7_Y_;
+    KEL.typ.ndataset(B_Person(__in,__cfg_Local).__ST85114_Layout) P_L___Drg_Bk_Type_List10_Y_;
     KEL.typ.nstr P_L___Drg_Bk_Bus_Flag1_Y_;
     KEL.typ.nstr P_L___Drg_Bk_Bus_Flag7_Y_;
     KEL.typ.nstr P_L___Drg_Bk_Bus_Flag10_Y_;
     KEL.typ.str P_L___Drg_Bk_Severity_Indx10_Y_ := '';
     KEL.typ.str P_L___Prof_Lic_Flag_Ev_ := '';
-    KEL.typ.ndataset(B_Person(__in,__cfg_Local).__ST85549_Layout) P_L___Prof_Lic_Issue_Dt_List_Ev_;
-    KEL.typ.ndataset(B_Person(__in,__cfg_Local).__ST85557_Layout) P_L___Prof_Lic_Exp_Dt_List_Ev_;
-    KEL.typ.ndataset(B_Person(__in,__cfg_Local).__ST85572_Layout) P_L___Prof_Lic_Indx_By_Lic_List_Ev_;
+    KEL.typ.ndataset(B_Person(__in,__cfg_Local).__ST85483_Layout) P_L___Prof_Lic_Issue_Dt_List_Ev_;
+    KEL.typ.ndataset(B_Person(__in,__cfg_Local).__ST85491_Layout) P_L___Prof_Lic_Exp_Dt_List_Ev_;
+    KEL.typ.ndataset(B_Person(__in,__cfg_Local).__ST85506_Layout) P_L___Prof_Lic_Indx_By_Lic_List_Ev_;
     KEL.typ.str P_L___Prof_Lic_Actv_Flag_ := '';
     KEL.typ.nstr P_L___Prof_Lic_Actv_New_Issue_Dt_;
     KEL.typ.nstr P_L___Prof_Lic_Actv_New_Exp_Dt_;
@@ -842,6 +842,8 @@ EXPORT Q_Non_F_C_R_A_Person_Attributes_V1_Hybrid(KEL.typ.uid __PLexID_in, DATASE
     KEL.typ.int P_L___Curr_Addr_Is_Simp_Addr_Flag_ := 0;
     KEL.typ.int P_L___Curr_Addr_Is_Drop_Delivery_Flag_ := 0;
     KEL.typ.int P_L___Curr_Addr_Is_Business_Flag_ := 0;
+    KEL.typ.int P_L___Curr_Addr_Is_Multi_Unit_Flag_ := 0;
+    KEL.typ.int P_L___Curr_Addr_Is_Apt_Flag_ := 0;
     KEL.typ.nstr P_L___Best_Name_First_;
     KEL.typ.nstr P_L___Best_Name_Mid_;
     KEL.typ.nstr P_L___Best_Name_Last_;
@@ -873,10 +875,10 @@ EXPORT Q_Non_F_C_R_A_Person_Attributes_V1_Hybrid(KEL.typ.uid __PLexID_in, DATASE
     KEL.typ.int P_L___Drg_Cnt7_Y_ := 0;
     KEL.typ.nint P_L___Drg_Old_Msnc7_Y_;
     KEL.typ.nint P_L___Drg_New_Msnc7_Y_;
-    KEL.typ.ndataset(B_Person(__in,__cfg_Local).__ST88602_Layout) Crim_List_;
-    KEL.typ.ndataset(B_Person(__in,__cfg_Local).__ST88617_Layout) Banko_List_;
-    KEL.typ.ndataset(B_Person(__in,__cfg_Local).__ST88633_Layout) Ln_J7_Y_List_;
-    KEL.typ.ndataset(B_Person(__in,__cfg_Local).__ST88650_Layout) L_T_D7_Y_List_;
+    KEL.typ.ndataset(B_Person(__in,__cfg_Local).__ST88576_Layout) Crim_List_;
+    KEL.typ.ndataset(B_Person(__in,__cfg_Local).__ST88591_Layout) Banko_List_;
+    KEL.typ.ndataset(B_Person(__in,__cfg_Local).__ST88607_Layout) Ln_J7_Y_List_;
+    KEL.typ.ndataset(B_Person(__in,__cfg_Local).__ST88624_Layout) L_T_D7_Y_List_;
     KEL.typ.str P_L___Edu_Rec_Flag_Ev_ := '';
     KEL.typ.nstr P_L___Edu_Src_List_Ev_;
     KEL.typ.str P_L___Edu_H_S_Rec_Flag_Ev_ := '';
@@ -1045,12 +1047,12 @@ EXPORT Q_Non_F_C_R_A_Person_Attributes_V1_Hybrid(KEL.typ.uid __PLexID_in, DATASE
     KEL.typ.epoch Vault_Date_Last_Seen_ := 0;
     KEL.typ.int __RecordCount := 0;
   END;
-  SHARED __ST120684_Layout __ND11567042__Project(B_Person(__in,__cfg_Local).__ST164099_Layout __PP11567038) := TRANSFORM
-    SELF.Lex_I_D_ := __PP11567038.UID;
-    SELF.P_L___Email_Cnt_Ev_ := __PP11567038.P_L___Email_Cnt_Ev_Non_F_C_R_A_;
-    SELF := __PP11567038;
+  SHARED __ST120657_Layout __ND11576718__Project(B_Person(__in,__cfg_Local).__ST164109_Layout __PP11576714) := TRANSFORM
+    SELF.Lex_I_D_ := __PP11576714.UID;
+    SELF.P_L___Email_Cnt_Ev_ := __PP11576714.P_L___Email_Cnt_Ev_Non_F_C_R_A_;
+    SELF := __PP11576714;
   END;
-  EXPORT Res0 := __UNWRAP(PROJECT(__EE11567037,__ND11567042__Project(LEFT)));
+  EXPORT Res0 := __UNWRAP(PROJECT(__EE11576713,__ND11576718__Project(LEFT)));
   EXPORT DBG_E_Input_P_I_I_PreEntity := __UNWRAP(E_Input_P_I_I_Params(__in,__cfg_Local).InData);
   EXPORT DBG_E_Input_P_I_I_Result := __UNWRAP(E_Input_P_I_I_Filtered.__Result);
   EXPORT DBG_E_Accident_Result := __UNWRAP(E_Accident_Filtered.__Result);

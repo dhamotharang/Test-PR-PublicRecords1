@@ -1,10 +1,10 @@
-//HPCC Systems KEL Compiler Version 1.5.0rc1
+﻿//HPCC Systems KEL Compiler Version 1.5.0rc1
 IMPORT KEL15 AS KEL;
 IMPORT CFG_Compile,E_First_Degree_Associations,E_First_Degree_Relative,E_Person FROM PublicRecords_KEL;
 IMPORT * FROM KEL15.Null;
 EXPORT B_First_Degree_Relative_5(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG_Compile __cfg = CFG_Compile) := MODULE
   SHARED VIRTUAL TYPEOF(E_First_Degree_Associations(__in,__cfg).__Result) __E_First_Degree_Associations := E_First_Degree_Associations(__in,__cfg).__Result;
-  SHARED __EE489445 := __E_First_Degree_Associations;
-  SHARED __EE4917700 := __EE489445(__T(__AND(__OP2(__EE489445.Title_,>=,__CN(1)),__OP2(__EE489445.Title_,<=,__CN(45)))));
-  EXPORT __ENH_First_Degree_Relative_5 := PROJECT(__EE4917700,TRANSFORM(E_First_Degree_Relative(__in,__cfg).Layout,SELF.Relative_ := LEFT.First_Degree_Association_,SELF := LEFT));
+  SHARED __EE489519 := __E_First_Degree_Associations;
+  SHARED __EE4922977 := __EE489519(__T(__AND(__OP2(__EE489519.Title_,>=,__CN(1)),__OP2(__EE489519.Title_,<=,__CN(45)))));
+  EXPORT __ENH_First_Degree_Relative_5 := PROJECT(__EE4922977,TRANSFORM(E_First_Degree_Relative(__in,__cfg).Layout,SELF.Relative_ := LEFT.First_Degree_Association_,SELF := LEFT));
 END;
