@@ -6191,6 +6191,47 @@ string10 MotivationScore_Category;
 STRING errorcode;
    END;
 	 
+EXPORT SBFE_SBBM_SBMO_Layout := RECORD
+  string30 accountnumber;
+  unsigned3 historydateyyyymm;
+  string120 bus_company_name;
+  unsigned6 powid;
+  unsigned6 proxid;
+  unsigned6 seleid;
+  unsigned6 orgid;
+  unsigned6 ultid;
+  string50 model1name;
+  string3 model1score;
+  string5 model1rc1;
+  string5 model1rc2;
+  string5 model1rc3;
+  string5 model1rc4;
+  string5 model1rc5;
+  string5 model1rc6;
+  string200 errorcode;
+  unsigned8 time_ms;
+ END;
+
+	 
+EXPORT NonSBFE_SLBO_SLBB_Layout := RECORD
+  string30 accountnumber;
+  unsigned3 historydateyyyymm;
+  string120 bus_company_name;
+  unsigned6 powid;
+  unsigned6 proxid;
+  unsigned6 seleid;
+  unsigned6 orgid;
+  unsigned6 ultid;
+  string50 model1name;
+  string3 model1score;
+  string5 model1rc1;
+  string5 model1rc2;
+  string5 model1rc3;
+  string5 model1rc4;
+  string5 model1rc5;
+  string5 model1rc6;
+  string200 errorcode;
+ END;
+
+	 
 END;
-
-
