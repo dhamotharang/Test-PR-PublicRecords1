@@ -13,7 +13,7 @@ EXPORT BatchService() := MACRO
  // but it comes in handy for everyone else.
  // **************************************************************************************
  batch_params := RiskIntelligenceNetwork_Services.IParam.getParams();
- ds_batch_in := DATASET([], FraudShared_Services.Layouts.BatchIn_rec) : STORED('batch_in', FEW);
+ ds_batch_in := DATASET([], RiskIntelligenceNetwork_Services.Layouts.BatchIn_rec) : STORED('batch_in', FEW);
  
  // **************************************************************************************
  //Checking that gc_id, industry type, and product code have some values - they are required.

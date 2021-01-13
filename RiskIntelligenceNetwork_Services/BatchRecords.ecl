@@ -1,6 +1,6 @@
 ﻿IMPORT Autokey_batch, BatchServices, DidVille, FraudShared, FraudShared_Services, IDLExternalLinking, RiskIntelligenceNetwork_Analytics,RiskIntelligenceNetwork_Services;
 
-EXPORT BatchRecords(DATASET(FraudShared_Services.Layouts.BatchIn_rec) ds_batch_in,
+EXPORT BatchRecords(DATASET(RiskIntelligenceNetwork_Services.Layouts.BatchIn_rec) ds_batch_in,
                     RiskIntelligenceNetwork_Services.IParam.Params in_params) := FUNCTION
            
  _Layout := RiskIntelligenceNetwork_Services.Layouts;
@@ -54,7 +54,13 @@ EXPORT BatchRecords(DATASET(FraudShared_Services.Layouts.BatchIn_rec) ds_batch_i
                                     SELF := []));
             
  // FIND Contributed Records DID or (RINID) for Input PII that does not already have a did
- ds_auto_out := RiskIntelligenceNetwork_Services.fn_postautokey_joins(ds_batch_in_without_did, in_params.FraudPlatform);
+ 
+ // Below project is workaround until all the layout decoupling (from fraudshared layouts) is completed.
+ ds_batch_in_without_did_proj := PROJECT(ds_batch_in_without_did, TRANSFORM(FraudShared_Services.Layouts.BatchIn_rec,
+                                                                    SELF := LEFT,
+                                                                    SELF := []));
+  
+ ds_auto_out := RiskIntelligenceNetwork_Services.fn_postautokey_joins(ds_batch_in_without_did_proj, in_params.FraudPlatform);
  ds_payload_recs := RiskIntelligenceNetwork_Services.fn_GetPayloadRecords(ds_auto_out, in_params, fraud_platform := in_params.FraudPlatform);
  
  ds_batch_in_without_did_w_min_pii := ds_batch_in_without_did(name_last != '' AND name_first != '' AND dob != '' AND
@@ -106,7 +112,8 @@ EXPORT BatchRecords(DATASET(FraudShared_Services.Layouts.BatchIn_rec) ds_batch_i
                                       SELF.did := MAP(LEFT.did != 0 => LEFT.did,
                                                       LEFT.did = 0 AND ~isMultipleDidResolved => RIGHT.did,
                                                       0);
-                                      SELF := LEFT),
+                                      SELF := LEFT,
+                                      SELF := []),
                                     LEFT OUTER);
                                     
  Rec_Appended_Dids_W_Source := RECORD
@@ -181,7 +188,8 @@ EXPORT BatchRecords(DATASET(FraudShared_Services.Layouts.BatchIn_rec) ds_batch_i
   SELF := L
  END;
  
- ds_batch_records_w_ra := DENORMALIZE(ds_batch_records, ds_live_assessment.EntityStats, LEFT.acctno = RIGHT.acctno, trans_denorm_ra(LEFT, RIGHT, COUNTER));
+ ds_riskAttributes_sorted := SORT(ds_live_assessment.EntityStats, acctno, -risklevel, -(indicatortype = 'ID'), indicatortype, record); 
+ ds_batch_records_w_ra := DENORMALIZE(ds_batch_records, ds_riskAttributes_sorted, LEFT.acctno = RIGHT.acctno, trans_denorm_ra(LEFT, RIGHT, COUNTER));
               
  _Layout.BatchOut_rec trans_denorm_kr(_Layout.BatchOut_rec L, _Analytics_Layout.LayoutEntityStats R,INTEGER C) := TRANSFORM
   SELF.Known_Risk_Reason_1 := IF(C = 1,R.label,L.Known_Risk_Reason_1);
@@ -210,8 +218,9 @@ EXPORT BatchRecords(DATASET(FraudShared_Services.Layouts.BatchIn_rec) ds_batch_i
   SELF.Known_Risk_Agency_12 := IF(C = 12,R.agencydescription,L.Known_Risk_Agency_12);
   SELF := L
  END;              
-          
- ds_batch_records_w_kr := DENORMALIZE(ds_batch_records_w_ra, ds_live_assessment.KrAttributes, LEFT.acctno = RIGHT.acctno,trans_denorm_kr(LEFT, RIGHT, COUNTER));
+
+ ds_knownRisks_sorted := SORT(ds_live_assessment.KrAttributes, acctno, -risklevel, entitytype, record);          
+ ds_batch_records_w_kr := DENORMALIZE(ds_batch_records_w_ra, ds_knownRisks_sorted, LEFT.acctno = RIGHT.acctno,trans_denorm_kr(LEFT, RIGHT, COUNTER));
               
  // OUTPUT(ds_batch_in, named('ds_batch_in'));
  // OUTPUT(ds_in_did_found_in_cr, named('ds_in_did_found_in_cr')); 

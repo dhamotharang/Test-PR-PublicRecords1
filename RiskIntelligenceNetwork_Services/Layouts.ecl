@@ -3,6 +3,23 @@
 
 EXPORT Layouts := MODULE
 
+ EXPORT BatchIn_rec := RECORD
+  unsigned4 seq := 0;
+  BatchShare.Layouts.ShareAcct;
+  BatchShare.Layouts.SharePII;
+  BatchShare.Layouts.ShareDID;
+  BatchShare.Layouts.ShareName;    
+  BatchShare.Layouts.ShareAddress; //physical or single address
+  BatchShare.Layouts.SharePhone;
+  string50 email_address;
+  string25 ip_address;
+  string50 device_id;
+  string10 bank_routing_number;
+  string30 bank_account_number; 
+  string2 dl_state;
+  string25 dl_number;
+ END;
+
  EXPORT fragment_w_value_recs := RECORD
   BatchShare.Layouts.ShareAcct;
   STRING60 fragment;
