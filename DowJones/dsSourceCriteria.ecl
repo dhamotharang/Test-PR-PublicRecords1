@@ -1981,7 +1981,10 @@ EXPORT dsSourceCriteria := DATASET([
 {'EC 2020/2129 Belarus List','1968'},
 {'EC 2020/2133 Democratic Republic of the Congo List','1969'},
 {'NACTA (Pakistan) Proscribed Organizations List','1970'},
-{'OFAC - Non-SDN Communist Chinese Military Companies List','1971'}
+{'OFAC - Non-SDN Communist Chinese Military Companies List','1971'},
+{'FCDO (UK) Sanctions List - Asset Freeze','1972'},
+{'FCDO (UK) Sanctions List - Non Asset Freeze','1973'},
+{'South Korea Financial Supervisory Service (FSS) Accounting Supervision Enforcement Actions','1974'}
 
 ],r);
 

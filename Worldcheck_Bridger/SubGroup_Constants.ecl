@@ -1289,6 +1289,8 @@
 		export string KEYWORD_EEPO									:= '971';
 		export string KEYWORD_IMHA_GN								:= '972';
 		export string KEYWORD_BXAMEU								:= '973';
+		export string KEYWORD_PLKAS_UG							:= '974';
+		export string KEYWORD_PHAMLC_TERR						:= '975';
 		
 		//When setting the keyword export use underscores for dashes (ex: For RBI-SANC, use RBI_SANC)	
 	end;
