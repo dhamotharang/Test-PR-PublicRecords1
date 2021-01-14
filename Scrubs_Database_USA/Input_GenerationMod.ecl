@@ -75,7 +75,7 @@ EXPORT Input_GenerationMod := MODULE(SALT311.iGenerationMod)
     + 'FIELDTYPE:invalid_executive_level:CUSTOM(Scrubs_Database_USA.Functions.fn_verify_executive_level > 0)\n'
     + 'FIELDTYPE:invalid_flag:ENUM(Y|1| ) \n'
     + 'FIELDTYPE:invalid_franchise:CUSTOM(Scrubs_Database_USA.Functions.fn_franchise > 0)\n'
-    + 'FIELDTYPE:invalid_gender_code:ENUM(F|M|U| )\n'
+    + 'FIELDTYPE:invalid_gender_code:ENUM(F|M|U)\n'
     + 'FIELDTYPE:invalid_generaldate:CUSTOM(Scrubs_Database_USA.Functions.fn_general_date > 0)\n'
     + 'FIELDTYPE:invalid_home_owner_renter:CUSTOM(Scrubs_Database_USA.Functions.fn_home_owner_renter > 0)\n'
     + 'FIELDTYPE:invalid_home_property:CUSTOM(Scrubs_Database_USA.Functions.fn_home_property > 0)\n'

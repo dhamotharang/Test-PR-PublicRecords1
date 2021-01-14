@@ -204,8 +204,8 @@ EXPORT InValidMessageFT_invalid_franchise(UNSIGNED1 wh) := CHOOSE(wh,SALT311.Hyg
 EXPORT MakeFT_invalid_gender_code(SALT311.StrType s0) := FUNCTION
   RETURN  s0;
 END;
-EXPORT InValidFT_invalid_gender_code(SALT311.StrType s) := WHICH(((SALT311.StrType) s) NOT IN ['F','M','U',' ']);
-EXPORT InValidMessageFT_invalid_gender_code(UNSIGNED1 wh) := CHOOSE(wh,SALT311.HygieneErrors.NotInEnum('F|M|U| '),SALT311.HygieneErrors.Good);
+EXPORT InValidFT_invalid_gender_code(SALT311.StrType s) := WHICH(((SALT311.StrType) s) NOT IN ['F','M','U']);
+EXPORT InValidMessageFT_invalid_gender_code(UNSIGNED1 wh) := CHOOSE(wh,SALT311.HygieneErrors.NotInEnum('F|M|U'),SALT311.HygieneErrors.Good);
  
 EXPORT MakeFT_invalid_generaldate(SALT311.StrType s0) := FUNCTION
   RETURN  s0;

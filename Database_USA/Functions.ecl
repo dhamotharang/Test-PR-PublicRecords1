@@ -44,7 +44,7 @@ export Functions := Module;
 	export  string fDBConsEthnicDesc(string code) := function
 
 		cd  := STD.Str.CleanSpaces( Std.Str.ToLowerCase(code));
-		return map( cd = 'aam' => 'AFRICAN AMERICAN/AFRICAN AMERICAN',
+		return map( cd = 'aam' => 'AFRICAN AMERICAN',
 								cd = 'afc' => 'AFRICAN CONTINENTAL',
 								cd = 'afg' => 'AFGHAN',
 								cd = 'aka' => 'AKAN/ASHANTI',
