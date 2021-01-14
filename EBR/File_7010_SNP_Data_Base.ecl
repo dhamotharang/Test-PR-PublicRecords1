@@ -1,1 +1,0 @@
-export File_7010_SNP_Data_Base := dataset(FileName_7010_SNP_Data_Base, Layout_7010_SNP_Data_Base,flat) : global;

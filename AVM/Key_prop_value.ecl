@@ -1,1 +1,0 @@
-export Key_prop_value := avm_keys.prop_value.qa;

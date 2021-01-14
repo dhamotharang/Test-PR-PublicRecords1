@@ -1,1 +1,0 @@
-export File_6510_Government_Debarred_Contractor_Base_bdid := project(File_6510_Government_Debarred_Contractor_Base, transform(Layout_6510_Government_Debarred_Contractor_Base_slim,self.bdid:=left.bdid,self:=left));

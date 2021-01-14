@@ -1,1 +1,0 @@
-export get_LNFirst(string fid) := if(fid[1] = 'R',1,0);

@@ -1,1 +1,0 @@
-export KeyName_2000_Trade_FILE_NUMBER := trim(GetSegmentKeyName_FILE_NUMBER('2000')) : global;

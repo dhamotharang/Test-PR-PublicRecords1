@@ -1,1 +1,0 @@
-export file_sanctnBase := dataset('~thor_data400::base::sanctn::20070530',SANCTN.layout_SANCTN_base.layout_SANCTN_fullFile,thor);

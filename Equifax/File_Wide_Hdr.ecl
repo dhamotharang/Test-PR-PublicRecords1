@@ -1,1 +1,0 @@
-export File_Wide_Hdr := dataset('DBTEMP::Intermed_EFX_File',Equifax.Layout_Wide_Hdr,flat);

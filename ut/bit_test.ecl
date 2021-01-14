@@ -1,1 +1,0 @@
-export bit_test(unsigned8 i,unsigned1 bit) := i & (unsigned8)(1<<bit) <> 0;

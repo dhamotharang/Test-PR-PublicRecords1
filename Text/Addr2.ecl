@@ -1,1 +1,0 @@
-export rule addr2 := city ws state ws zip ws*;

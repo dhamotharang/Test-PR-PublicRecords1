@@ -1,1 +1,0 @@
-EXPORT File_UCC_Debtor_Secured_Temp := DATASET('TEMP::UCC_Debtor_Secured', Layout_UCC_Initial_Party_Master, THOR);

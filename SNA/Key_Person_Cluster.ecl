@@ -1,2 +1,0 @@
-﻿import ut, Data_Services, doxie;
-export Key_Person_Cluster := INDEX(SNA.File_Person_Cluster,{cluster_id}, {degree, associated_did,global_sid,record_sid}, Data_Services.Data_location.Prefix('NONAMEGIVEN')+'thor_data400::key::sna::person_cluster_' + doxie.Version_SuperKey);

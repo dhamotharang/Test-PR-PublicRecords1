@@ -1,1 +1,0 @@
-export file_aircraft_registration_in := dataset('~thor_data400::in::faa_aircraft_IN',faa.layout_aircraft_registration_in,flat);

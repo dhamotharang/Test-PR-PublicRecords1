@@ -1,5 +1,0 @@
-EXPORT layout_american_student_ln_college_lkp := RECORD
-	STRING50	COLLEGE_NAME;
-	STRING50	LN_COLLEGE_NAME;
-	STRING8		DATE_ADDED;		
-END;

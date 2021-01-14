@@ -1,1 +1,0 @@
-OUTPUT(Business_Header.BC_Owner,,'BASE::Business_Owner_' + Business_Header.version, OVERWRITE);

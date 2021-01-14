@@ -1,1 +1,0 @@
-export File_FARES_1080 := DATASET(LN_Mortgage.Filename_FARES_1080, LN_Mortgage.Layout_Deed_Mortgage_Common_Model_BASE, flat);

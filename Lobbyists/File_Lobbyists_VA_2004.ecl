@@ -1,1 +1,0 @@
-export File_Lobbyists_VA_2004 := dataset('~thor_200::in::lobbyists_va_2004',Lobbyists.Layout_Lobbyists_VA_2004,CSV);

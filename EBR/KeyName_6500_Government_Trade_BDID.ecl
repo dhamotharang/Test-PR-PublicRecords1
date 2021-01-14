@@ -1,1 +1,0 @@
-export KeyName_6500_Government_Trade_BDID := trim(GetSegmentKeyName_BDID('6500')) : global;

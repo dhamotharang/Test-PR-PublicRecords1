@@ -1,1 +1,0 @@
-export File_NEJTL :=dataset('~thor_data400::in::Fictitious_Business_Names_Service_Abstract_D7575',Fictitious_Business_Names.Layout_NEJTL,XML('batch/doc'));

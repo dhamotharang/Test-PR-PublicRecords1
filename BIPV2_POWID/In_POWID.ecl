@@ -1,5 +1,0 @@
-IMPORT BIPV2_Files;
-EXPORT In_POWID := BIPV2_Files.files_powid('BIPV2_POWID').DS_BUILDING;
-//EXPORT In_POWID := DATASET('~dhw::temp::powid_base_file',BIPV2_POWID.Layout_POWID,THOR);
-// EXPORT In_POWID := DATASET('~temp::powid::BIPV2_POWID::it1',BIPV2_POWID.Layout_POWID,THOR);
-// EXPORT In_POWID := DATASET('~temp::powid::BIPV2_POWID::it2',BIPV2_POWID.Layout_POWID,THOR);

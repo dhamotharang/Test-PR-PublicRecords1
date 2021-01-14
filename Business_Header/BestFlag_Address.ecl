@@ -1,1 +1,0 @@
-EXPORT UNSIGNED BestFlag_Address := 1;

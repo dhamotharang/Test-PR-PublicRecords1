@@ -1,1 +1,0 @@
-export File_Zip_city_fips_latlong := dataset('~thor_data400::lookup::zip2fips', Layout_Zip_city_fips_latlong, flat);

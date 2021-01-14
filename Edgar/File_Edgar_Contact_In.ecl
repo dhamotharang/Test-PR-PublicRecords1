@@ -1,1 +1,0 @@
-export File_Edgar_Contact_In := dataset('~thor_marketing::edgar::bdgallnames', Layout_Edgar_Contact_In, flat);

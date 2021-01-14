@@ -1,1 +1,0 @@
-EXPORT File_YellowPages := DATASET('IN::yellow_pages_prethorc_200506',Layout_YellowPages,THOR);

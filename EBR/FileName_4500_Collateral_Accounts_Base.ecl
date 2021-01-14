@@ -1,1 +1,0 @@
-export FileName_4500_Collateral_Accounts_Base := trim(GetSegmentFileName_Base('4500')) : global;

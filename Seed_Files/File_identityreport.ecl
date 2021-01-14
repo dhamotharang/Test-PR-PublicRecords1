@@ -1,2 +1,0 @@
-export File_identityreport := DATASET ('~thor_data400::base::testseed_identityreport', layout_identityreport.rec_in, 
-                        CSV (heading(1), separator(','), QUOTE('"'), maxlength (40000)));

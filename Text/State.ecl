@@ -1,1 +1,0 @@
-export rule state := alpha*2;// not after alpha not before alpha;

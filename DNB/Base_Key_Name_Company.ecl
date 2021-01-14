@@ -1,1 +1,0 @@
-export Base_Key_Name_Company := 'key::moxie.dnb_companies.';

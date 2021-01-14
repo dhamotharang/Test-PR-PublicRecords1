@@ -1,1 +1,0 @@
-export unsigned6 stored_bdid_value := (unsigned6)business_header.stored_bdid_val;

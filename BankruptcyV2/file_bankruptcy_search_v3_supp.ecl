@@ -1,1 +1,0 @@
-export file_bankruptcy_search_v3_supp := project(BankruptcyV2.file_bankruptcy_search_v3_supp_bip, transform(BankruptcyV2.layout_bankruptcy_search_v3_supp, self := left));

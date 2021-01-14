@@ -1,1 +1,0 @@
-export file_hogan_party_full := project(LiensV2.file_Hogan_party_full_bid,transform(liensv2.layout_liens_party_SSn_for_hogan,self:=left));

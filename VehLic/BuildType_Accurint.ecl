@@ -1,1 +1,0 @@
-export BuildType_Accurint := 'A';

@@ -1,4 +1,0 @@
-export SET OF STRING30 OFAC_keywords := ['BPI','BPI-PA','BPI-SDNT','BPI-SDNTK','IRAQ.2','NPRO','NPWMD','NS-PLC','OFAC',
-										 'OFAC-BK','OFAC-BLR','OFAC-BM','OFAC-C','OFAC-COTED','OFAC-DFR','OFAC-DRC',
-										 'OFAC-IRN','OFAC-IRQ','OFAC-L','OFAC-NK','OFAC-S','OFAC-SYR','OFAC-Z',
-										 'SDGT','SDNT','SDNTK','SDT'];

@@ -1,1 +1,0 @@
-EXPORT foreign_fcra_logs := '~';

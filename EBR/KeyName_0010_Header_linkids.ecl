@@ -1,1 +1,0 @@
-export KeyName_0010_Header_linkids := trim(GetSegmentKeyName_Linkids('0010'));

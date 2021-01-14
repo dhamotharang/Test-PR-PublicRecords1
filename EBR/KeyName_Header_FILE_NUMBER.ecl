@@ -1,1 +1,0 @@
-export KeyName_Header_FILE_NUMBER := trim(GetSegmentKeyName_FILE_NUMBER('0010')) : global;

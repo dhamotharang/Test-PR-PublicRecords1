@@ -1,1 +1,0 @@
-export stored_Use_CurrentlyOwnedProperty_value := false : stored('UseCurrentlyOwnedProperty');

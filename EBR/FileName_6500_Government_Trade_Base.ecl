@@ -1,1 +1,0 @@
-export FileName_6500_Government_Trade_Base := trim(GetSegmentFileName_Base('6500')) : global;

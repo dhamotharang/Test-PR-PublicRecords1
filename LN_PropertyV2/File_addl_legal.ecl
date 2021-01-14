@@ -1,1 +1,0 @@
-export File_addl_legal := dataset('~thor_data400::base::ln_propertyv2::Addl::legal',LN_PropertyV2.layout_addl_legal,flat);;

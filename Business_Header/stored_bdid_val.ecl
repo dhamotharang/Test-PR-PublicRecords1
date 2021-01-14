@@ -1,1 +1,0 @@
-export string stored_bdid_val := '' : stored('BDID');

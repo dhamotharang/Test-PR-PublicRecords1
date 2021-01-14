@@ -1,1 +1,0 @@
-export string8 Date_ins_fraud_manage := '20040629';

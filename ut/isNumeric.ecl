@@ -1,1 +1,0 @@
-EXPORT BOOLEAN isNumeric(STRING a) := REGEXFIND('^[[:digit:]]+ *$',a);

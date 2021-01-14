@@ -1,1 +1,0 @@
-export FileName_2020_Trade_Payment_Trends_Base := trim(GetSegmentFileName_Base('2020')) : global;

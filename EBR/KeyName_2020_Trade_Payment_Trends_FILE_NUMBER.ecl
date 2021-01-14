@@ -1,1 +1,0 @@
-export KeyName_2020_Trade_Payment_Trends_FILE_NUMBER := trim(GetSegmentKeyName_FILE_NUMBER('2020')) : global;

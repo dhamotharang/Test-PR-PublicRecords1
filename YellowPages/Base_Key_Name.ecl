@@ -1,1 +1,0 @@
-export Base_Key_Name := 'key::moxie.yellow_pages.';

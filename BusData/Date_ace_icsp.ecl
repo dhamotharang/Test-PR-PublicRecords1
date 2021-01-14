@@ -1,1 +1,0 @@
-export string8 Date_ace_icsp := '20040629';

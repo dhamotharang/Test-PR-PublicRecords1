@@ -1,1 +1,0 @@
-export file_BK_Search_history_in  := dataset('~thor_data400::in::bankruptcyv2::search_history',BankruptcyV2.layout_BK_search_history_in ,flat);

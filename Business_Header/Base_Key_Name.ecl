@@ -1,1 +1,0 @@
-export string base_key_name := 'key::moxie.bh.';

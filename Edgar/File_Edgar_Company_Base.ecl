@@ -1,1 +1,0 @@
-export File_Edgar_Company_Base := dataset('~thor_data400::BASE::Edgar_Company', Layout_Edgar_Company, flat);

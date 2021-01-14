@@ -1,1 +1,0 @@
-export str_typeDebtor := 'D';

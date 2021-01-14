@@ -1,3 +1,0 @@
-﻿EXPORT Constants := MODULE
-
-END;

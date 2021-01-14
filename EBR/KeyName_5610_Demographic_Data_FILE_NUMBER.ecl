@@ -1,1 +1,0 @@
-export KeyName_5610_Demographic_Data_FILE_NUMBER := trim(GetSegmentKeyName_FILE_NUMBER('5610')) : global;

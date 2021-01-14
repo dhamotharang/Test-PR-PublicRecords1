@@ -1,3 +1,0 @@
-﻿EXPORT REAL8 aggADD(SET of REAL8 vals) := FUNCTION
-    RETURN SUM(vals);
-END;

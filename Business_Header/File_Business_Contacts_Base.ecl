@@ -1,1 +1,0 @@
-EXPORT File_Business_Contacts_Base := file_business_contacts;

@@ -1,1 +1,0 @@
-EXPORT Is_Valid_Wuid(string pWuid) := regexfind('^W[[:digit:]]{8}-[[:digit:]]{6}.*$',pWuid);

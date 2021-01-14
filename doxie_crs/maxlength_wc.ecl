@@ -1,1 +1,0 @@
-export maxlength_wc := 200000;

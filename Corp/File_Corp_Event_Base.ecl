@@ -1,1 +1,0 @@
-export File_Corp_Event_Base := dataset('~thor_data400::BASE::Corp_Event_Base', Corp.Layout_Corp_Event_Base, flat);

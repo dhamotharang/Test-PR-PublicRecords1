@@ -1,1 +1,0 @@
-export Moxie_mount := '/ucc_data2_15/';

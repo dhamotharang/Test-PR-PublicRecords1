@@ -1,1 +1,0 @@
-export Function_ReformatPhoneNumber(string pStringIn) := stringlib.stringfilterout(pStringIn, '-');

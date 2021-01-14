@@ -1,1 +1,0 @@
-export File_american_student_super := dataset(American_student_list.Thor_Cluster + 'in::American_student_list::Superfile',American_student_list.layout_american_student_base,flat);

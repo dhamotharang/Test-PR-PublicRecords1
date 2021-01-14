@@ -1,1 +1,0 @@
-export KeyName_4510_UCC_Filings_FILE_NUMBER := trim(GetSegmentKeyName_FILE_NUMBER('4510')) : global;

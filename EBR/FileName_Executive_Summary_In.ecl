@@ -1,1 +1,0 @@
-export FileName_Executive_Summary_In := trim(GetSegmentFileName_In('1000')) : global;

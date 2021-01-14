@@ -1,1 +1,0 @@
-export File_5000_Bank_Details_Base_AID := dataset(EBR.FileName_5000_Bank_Details_Base_AID,EBR.Layout_5000_Bank_Details_Base_AID,flat);

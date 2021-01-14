@@ -1,1 +1,0 @@
-export string8 Corp_Reset_Date := '20050122';

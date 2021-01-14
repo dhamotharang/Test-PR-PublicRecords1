@@ -1,1 +1,0 @@
-export File_SpanishTest := dataset('IN::SpanishTestFile',Equifax.Layout_SpanishTest,flat);

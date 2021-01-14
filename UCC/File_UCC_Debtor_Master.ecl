@@ -1,1 +1,0 @@
-EXPORT File_UCC_Debtor_Master :=DATASET('~thor_data400::BASE::UCC_Debtor_Master_' + UCC_Build_Date, Layout_UCC_Initial_Party_Master, THOR);

@@ -1,1 +1,0 @@
-export Name_Moxie_Case_Activity_Dev := '~thor_200::base::civil_case_activity_' + Civil_Court.Version_Development;

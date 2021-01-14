@@ -1,1 +1,0 @@
-export Key_Corp_NameAddr := keys().Corp.NameAddr.qa;

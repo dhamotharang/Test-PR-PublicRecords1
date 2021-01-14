@@ -1,5 +1,0 @@
-export search := MODULE
-			
-
-end;
-

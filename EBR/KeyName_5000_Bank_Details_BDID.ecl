@@ -1,1 +1,0 @@
-export KeyName_5000_Bank_Details_BDID := trim(GetSegmentKeyName_BDID('5000')) : global;

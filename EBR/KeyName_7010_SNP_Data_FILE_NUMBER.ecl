@@ -1,1 +1,0 @@
-export KeyName_7010_SNP_Data_FILE_NUMBER := trim(GetSegmentKeyName_FILE_NUMBER('7010')) : global;

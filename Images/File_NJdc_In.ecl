@@ -1,1 +1,0 @@
-export File_NJdc_In := DATASET('~images::in::nj20040316', Layout_MoxieDC_In, flat);

@@ -1,1 +1,0 @@
-export DoSkipPersist(string persist_suffix) := persist_suffix = 'SKIPIT';

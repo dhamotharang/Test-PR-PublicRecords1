@@ -1,1 +1,0 @@
-export Whois_Build_Date := '20050414';

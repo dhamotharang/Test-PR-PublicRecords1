@@ -1,1 +1,0 @@
-export version_airmen := version_aircraft;

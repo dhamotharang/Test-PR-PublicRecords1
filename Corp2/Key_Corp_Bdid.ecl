@@ -1,1 +1,0 @@
-export Key_Corp_Bdid := keys().Corp.Bdid.qa;

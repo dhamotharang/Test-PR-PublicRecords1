@@ -1,1 +1,0 @@
-export KeyName_4020_Tax_Liens_FILE_NUMBER := trim(GetSegmentKeyName_FILE_NUMBER('4020')) : global;

@@ -1,1 +1,0 @@
-export KeyName_4040_Bulk_Transfers_BDID := trim(GetSegmentKeyName_BDID('4040')) : global;

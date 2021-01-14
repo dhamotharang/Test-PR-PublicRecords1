@@ -1,1 +1,0 @@
-export str_AutokeyLogicalName(string filedate) := '~thor_data400::key::acclogs::'+filedate+'::autokey_';

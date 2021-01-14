@@ -1,1 +1,0 @@
-export File_4010_Bankruptcy_Base := dataset(FileName_4010_Bankruptcy_Base, Layout_4010_Bankruptcy_Base,flat) : global;

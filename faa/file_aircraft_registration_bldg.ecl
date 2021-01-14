@@ -1,1 +1,0 @@
-export file_aircraft_registration_bldg := dataset('~thor_data400::base::faa_aircraft_reg_building',{faa.layout_aircraft_registration_out, unsigned8 __fpos { virtual (fileposition)}},flat);

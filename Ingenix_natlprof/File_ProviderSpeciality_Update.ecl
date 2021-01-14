@@ -1,1 +1,0 @@
-export File_ProviderSpeciality_Update := dataset(Ingenix_NatlProf.File_In_Cluster + 'in::Ingenix_NatlProf_ProviderSpeciality_update', Ingenix_NatlProf.Layout_in_ProviderSpeciality,CSV(quote(''),separator('|')));

@@ -1,1 +1,0 @@
-export lname_risk := 100;

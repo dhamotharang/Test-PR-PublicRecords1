@@ -1,1 +1,0 @@
-EXPORT STRING8 FBN_Build_Date := '20050209';

@@ -1,1 +1,0 @@
-export pattern sws := PATTERN('[ \t\r\n]');

@@ -1,1 +1,0 @@
-export File_7000_SNP_Parent_Name_Address_Base := dataset(FileName_7000_SNP_Parent_Name_Address_Base, Layout_7000_SNP_Parent_Name_Address_Base,flat) : global;

@@ -1,1 +1,0 @@
-EXPORT File_Whois := DATASET('IN::who_is_20040504', Layout_Whois, THOR);

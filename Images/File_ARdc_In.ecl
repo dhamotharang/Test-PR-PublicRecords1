@@ -1,1 +1,0 @@
-export File_ARdc_In := DATASET('~images::in::ar20040316', Layout_MoxieDC_In, flat);

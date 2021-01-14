@@ -1,1 +1,0 @@
-export Base_Key_Name_Contacts := 'key::moxie.dnb_contacts.';

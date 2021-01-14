@@ -1,1 +1,0 @@
-export File_DNB_Contacts_Base_Plus := dataset('BASE::DNB_Contacts'/*_' + DNB.version*/, Layout_DNB_Contacts_Base, flat);

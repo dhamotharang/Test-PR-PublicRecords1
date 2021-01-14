@@ -1,1 +1,0 @@
-export FileName_4035_Attachment_Lien_Base := trim(GetSegmentFileName_Base('4035')) : global;

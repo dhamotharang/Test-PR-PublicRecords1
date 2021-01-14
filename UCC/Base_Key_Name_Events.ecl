@@ -1,1 +1,0 @@
-export Base_Key_Name_Events := 'key::moxie.ucc_filing_events.';

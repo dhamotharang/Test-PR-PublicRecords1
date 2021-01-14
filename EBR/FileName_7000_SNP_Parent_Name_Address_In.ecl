@@ -1,1 +1,0 @@
-export FileName_7000_SNP_Parent_Name_Address_In := trim(GetSegmentFileName_In('7000')) : global;

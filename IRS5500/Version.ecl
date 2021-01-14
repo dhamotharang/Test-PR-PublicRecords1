@@ -1,1 +1,0 @@
-EXPORT Version := '20050309';

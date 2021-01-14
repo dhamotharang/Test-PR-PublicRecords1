@@ -1,1 +1,0 @@
-export File_FBN_Business_Base_AID := DATASET(Cluster.Cluster_In + 'Base::FBNv2::Business',Layout_Common.Business_AID , flat);

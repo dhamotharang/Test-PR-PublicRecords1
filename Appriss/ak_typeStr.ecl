@@ -1,1 +1,0 @@
-export ak_typeStr := 'AK';

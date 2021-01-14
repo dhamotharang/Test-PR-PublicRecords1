@@ -1,1 +1,0 @@
-export string8 CA_Sales_Tax_File_Date := '20050624';

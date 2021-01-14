@@ -1,1 +1,0 @@
-EXPORT file_college_metadata_lkp := DATASET('~thor_data400::lookup::american_student_list::college_metadata', layout_college_metadata_lkp, CSV(HEADING(1), SEPARATOR(','), QUOTE('"')));

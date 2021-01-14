@@ -1,1 +1,0 @@
-export KeyName_5000_Bank_Details_FILE_NUMBER := trim(GetSegmentKeyName_FILE_NUMBER('5000')) : global;

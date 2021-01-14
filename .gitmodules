@@ -1,8 +1,0 @@
-[submodule "KnowledgeUniverse"]
-	path = KnowledgeUniverse
-	url = https://gitlab.ins.risk.regn.net/risk-engineering/KnowledgeUniverse.git
-	branch = master
-[submodule "Vault"]
-	path = Vault
-	url = https://gitlab.ins.risk.regn.net/risk-engineering/Vault.git
-	branch = master

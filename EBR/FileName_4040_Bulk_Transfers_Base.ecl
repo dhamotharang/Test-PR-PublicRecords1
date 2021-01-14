@@ -1,1 +1,0 @@
-export FileName_4040_Bulk_Transfers_Base := trim(GetSegmentFileName_Base('4040')) : global;

@@ -1,6 +1,0 @@
-EXPORT Layout_Seq_CID := RECORD
-STRING12 seq_num;
-STRING1  filler;
-STRING16 cid;
-STRING1  eor;
-END;

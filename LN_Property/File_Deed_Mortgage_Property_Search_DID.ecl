@@ -1,1 +1,0 @@
-export File_Deed_Mortgage_Property_Search_DID := DATASET(LN_Property.Filename_Deed_Mortgage_Property_Search_DID, LN_Property.Layout_DID_Out, flat);

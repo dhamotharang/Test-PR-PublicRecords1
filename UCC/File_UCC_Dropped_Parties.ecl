@@ -1,1 +1,0 @@
-EXPORT File_UCC_Dropped_Parties := DATASET('TEMP::UCC_Dropped_Parties', Layout_UCC_Initial_Party_Master, THOR);

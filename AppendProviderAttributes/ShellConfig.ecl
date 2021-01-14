@@ -1,3 +1,0 @@
-EXPORT ShellConfig := MODULE
-	EXPORT BOOLEAN isCCPA := true;
-END;

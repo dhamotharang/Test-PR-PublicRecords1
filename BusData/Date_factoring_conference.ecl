@@ -1,1 +1,0 @@
-export string8 Date_factoring_conference := '20040629';

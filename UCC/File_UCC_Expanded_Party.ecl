@@ -1,1 +1,0 @@
-EXPORT File_UCC_Expanded_Party := DATASET('~thor_data400::BASE::UCC_Expanded_Party_20050616', Layout_UCC_Expanded_Party, THOR);

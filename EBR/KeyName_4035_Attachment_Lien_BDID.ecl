@@ -1,1 +1,0 @@
-export KeyName_4035_Attachment_Lien_BDID := trim(GetSegmentKeyName_BDID('4035')) : global;

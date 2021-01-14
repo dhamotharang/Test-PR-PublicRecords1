@@ -1,1 +1,0 @@
-export File_Voters_Building := VotersV2.File_Voters_Base(intformat(did,12,1) not in VotersV2.Suppress_DID);

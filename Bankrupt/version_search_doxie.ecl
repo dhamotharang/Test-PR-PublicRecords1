@@ -1,1 +1,0 @@
-export version_search_doxie := '_20050824';

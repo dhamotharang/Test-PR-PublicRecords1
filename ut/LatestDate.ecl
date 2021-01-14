@@ -1,1 +1,0 @@
-export LatestDate(integer l, integer r) := MAX(l,r):DEPRECATED('Use Max function Instead'); 

@@ -1,1 +1,0 @@
-export File_american_student_DID := PROJECT(File_american_student_DID_v2, layout_american_student_base);

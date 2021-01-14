@@ -1,3 +1,0 @@
-EXPORT Layout_Vehicle_FEIN := RECORD
-  STRING9 FEIN;
-END;

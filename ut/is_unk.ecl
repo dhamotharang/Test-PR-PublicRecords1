@@ -1,1 +1,0 @@
-export is_unk(STRING5 str) := str[1..2]='UN' AND (str[3] IN ['K','1','2','3','4','5','6','7','8','9','0']);

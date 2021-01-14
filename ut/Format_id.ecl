@@ -1,1 +1,0 @@
-export Format_id(unsigned6 id) := if(id=0,'', intformat(id,12,1)):DEPRECATED('Use this code in-line');// several places have the code in-line already.

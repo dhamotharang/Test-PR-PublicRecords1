@@ -1,1 +1,0 @@
-export near_dob(integer l, integer r) :=  l=0 or r=0 or sig_near_dob(l,r);

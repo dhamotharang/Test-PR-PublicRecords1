@@ -1,1 +1,0 @@
-EXPORT File_IA_SalesTax_Base_AID := DATASET('~thor_data400::base::IA_Sales_Tax_AID', govdata.Layout_IA_SalesTax_Base_AID, FLAT);

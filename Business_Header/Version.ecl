@@ -1,1 +1,0 @@
-export string8 Version := '20060414';

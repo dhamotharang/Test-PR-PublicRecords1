@@ -1,1 +1,0 @@
-export header_ins := idl_header.files.ds_idl_policy_header_base;

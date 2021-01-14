@@ -1,1 +1,0 @@
-export File_NY_xml :=dataset('~thor_data400::in::FBNV2::xml2fix::NY',layout_xml.NY,flat);

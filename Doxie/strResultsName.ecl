@@ -1,1 +1,0 @@
-export strResultsName := 'Results';

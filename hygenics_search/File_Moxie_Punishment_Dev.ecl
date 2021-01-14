@@ -1,1 +1,0 @@
-export File_Moxie_Punishment_Dev := dataset(Name_Moxie_Punishment_Dev, Layout_Moxie_Punishment, flat)(length(trim(offender_key, left, right))>2);

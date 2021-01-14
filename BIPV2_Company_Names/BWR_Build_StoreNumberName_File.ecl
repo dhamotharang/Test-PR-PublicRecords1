@@ -1,1 +1,0 @@
-BIPV2_Company_Names.build_strNbrNameFile.bd;

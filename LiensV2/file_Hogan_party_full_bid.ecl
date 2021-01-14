@@ -1,1 +1,0 @@
-export file_hogan_party_full_bid := dataset('~thor_data400::base::Liens::party::qa::hogan_full',liensv2.layout_liens_party_SSn_for_hogan_bid,thor);

@@ -1,1 +1,0 @@
-export File_FBN_Contact_Base := DATASET(Cluster.Cluster_In + 'Base::FBNv2::Contact',Layout_Common.contact , flat);

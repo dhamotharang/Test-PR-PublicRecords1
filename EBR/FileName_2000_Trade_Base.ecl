@@ -1,1 +1,0 @@
-export FileName_2000_Trade_Base := trim(GetSegmentFileName_Base('2000')) : global;

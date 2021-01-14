@@ -1,1 +1,0 @@
-export File_Liens_Daily := dataset('~thor_data400::base::liens',bankrupt.Layout_Liens,flat);

@@ -1,1 +1,0 @@
-export MOXIE_PAW_MOUNT := '/paw_16/';

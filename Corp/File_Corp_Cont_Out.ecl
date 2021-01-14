@@ -1,1 +1,0 @@
-export File_Corp_Cont_Out := dataset('~thor_data400::OUT::Corp_Cont_' + corp.Corp_Build_Date, Layout_Corp_Cont_Out, flat);

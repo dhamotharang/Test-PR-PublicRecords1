@@ -1,1 +1,0 @@
-export Name_Moxie_Party_Dev := '~thor_200::base::civil_party_' + Civil_Court.Version_Development;

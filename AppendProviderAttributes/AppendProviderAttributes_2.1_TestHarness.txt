@@ -1,9 +1,0 @@
-Info Log -
-Monitoring WU W20190419-084946(HIPIE_ALAPERIASSX-W7D_PublicRecords.AppendProviderAttributes.AppendProviderAttributes_2.1_testcmp_periassx) to completion.
-Plugin AppendProviderAttributes's test composition AppendProviderAttributes_2.1_testcmp ran on cluster http://10.173.10.157:8010/ and created workunit W20190419-084946 with status completed
-Plugin AppendProviderAttributes's test composition AppendProviderAttributes_2.1_testcmp ran and completed with state "completed"
-Control workunit W20190419-084338 and this test workunit W20190419-084946 had the same number of results
-
-Err Log -
-
-

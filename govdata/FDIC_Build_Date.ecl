@@ -1,1 +1,0 @@
-export FDIC_Build_Date := '20050331';

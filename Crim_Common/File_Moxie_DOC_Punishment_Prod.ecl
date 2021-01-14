@@ -1,2 +1,0 @@
-export File_Moxie_DOC_Punishment_Prod
- := dataset(Crim_Common.Name_Moxie_DOC_Punishment_Prod,Crim_Common.Layout_Moxie_DOC_Punishment.new,flat);

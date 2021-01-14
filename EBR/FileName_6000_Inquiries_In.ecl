@@ -1,1 +1,0 @@
-export FileName_6000_Inquiries_In := trim(GetSegmentFileName_In('6000')) : global;

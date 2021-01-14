@@ -1,1 +1,0 @@
-EXPORT KeyPrefix := 'thor_data400';

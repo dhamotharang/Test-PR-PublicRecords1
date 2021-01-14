@@ -1,1 +1,0 @@
-export File_Business_Owner := DATASET('~thor_data400::BASE::Business_Owner_' + version, Layout_Business_Owner, FLAT);

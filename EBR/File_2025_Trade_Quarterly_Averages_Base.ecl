@@ -1,1 +1,0 @@
-export File_2025_Trade_Quarterly_Averages_Base := dataset(FileName_2025_Trade_Quarterly_Averages_Base, Layout_2025_Trade_Quarterly_Averages_Base,flat) : global;

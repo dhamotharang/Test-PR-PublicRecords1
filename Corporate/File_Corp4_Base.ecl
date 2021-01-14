@@ -1,1 +1,0 @@
-EXPORT File_Corp4_Base := DATASET('~thor_Data400::BASE::Corp4_' + Corp4_Build_Date, Layout_Corporate_Base, THOR);

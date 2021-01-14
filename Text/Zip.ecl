@@ -1,1 +1,0 @@
-export rule zip := digit*5 OPT('-' digit*4) ;

@@ -1,1 +1,0 @@
-export Superior_Liens_State := ['PA','DE','NJ','MD','VA','DC','NC','WV'];

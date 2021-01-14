@@ -1,1 +1,0 @@
-export KeyName_6510_Government_Debarred_Contractor_FILE_NUMBER := trim(GetSegmentKeyName_FILE_NUMBER('6510')) : global;

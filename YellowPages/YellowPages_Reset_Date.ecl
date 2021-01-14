@@ -1,1 +1,0 @@
-EXPORT STRING8 YellowPages_Reset_Date := '20040428';

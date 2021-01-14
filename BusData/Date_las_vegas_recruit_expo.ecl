@@ -1,1 +1,0 @@
-export string8 Date_las_vegas_recruit_expo := '20040629';

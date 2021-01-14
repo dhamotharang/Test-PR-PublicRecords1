@@ -1,1 +1,0 @@
-export set_Secured_std_type := ['S','A'];

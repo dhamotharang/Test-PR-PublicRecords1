@@ -1,1 +1,0 @@
-export string8 Date_ace_check_serv := '20040629';

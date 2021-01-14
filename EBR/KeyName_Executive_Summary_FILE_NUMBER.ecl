@@ -1,1 +1,0 @@
-export KeyName_Executive_Summary_FILE_NUMBER := trim(GetSegmentKeyName_FILE_NUMBER('1000')) : global;

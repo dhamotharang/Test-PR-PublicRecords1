@@ -1,1 +1,0 @@
-EXPORT File_UCC_Secured_Master :=DATASET('~thor_data400::BASE::UCC_Secured_Master_' + UCC_BUILD_Date, Layout_UCC_Initial_Party_Master, THOR);

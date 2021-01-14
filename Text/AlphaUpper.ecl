@@ -1,1 +1,0 @@
-export PATTERN AlphaUpper := PATTERN('[A-Z]');

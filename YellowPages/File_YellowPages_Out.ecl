@@ -1,1 +1,0 @@
-EXPORT File_YellowPages_Out := DATASET('OUT::YellowPages_' + YellowPages_Build_Date, Layout_YellowPages_Out, THOR);

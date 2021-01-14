@@ -1,1 +1,0 @@
-export pattern proper_noun := AlphaUpper word;

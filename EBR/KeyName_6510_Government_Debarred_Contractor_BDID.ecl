@@ -1,1 +1,0 @@
-export KeyName_6510_Government_Debarred_Contractor_BDID := trim(GetSegmentKeyName_BDID('6510')) : global;

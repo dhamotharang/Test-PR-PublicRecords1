@@ -1,1 +1,0 @@
-export foreign_poc := '~';

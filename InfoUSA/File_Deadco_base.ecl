@@ -1,1 +1,0 @@
-export File_DEADCO_Base:=dataset('~thor_data400::base::infoUSA::deadco', Layout_deadco_Base, thor); 

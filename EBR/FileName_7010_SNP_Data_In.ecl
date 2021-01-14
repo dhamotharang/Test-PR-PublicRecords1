@@ -1,1 +1,0 @@
-export FileName_7010_SNP_Data_In := trim(GetSegmentFileName_In('7010')) : global;

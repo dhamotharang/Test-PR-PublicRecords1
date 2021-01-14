@@ -1,1 +1,0 @@
-export KeyName_2020_Trade_Payment_Trends_BDID := trim(GetSegmentKeyName_BDID('2020')) : global;

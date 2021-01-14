@@ -1,1 +1,0 @@
-EXPORT File_UCC_Court_Codes := DATASET('IN::ucc2_court_codes_clean', Layout_UCC_Court_Codes, THOR);

@@ -1,2 +1,0 @@
-import ut;
-EXPORT File_flag := dedup(sort(dataset('~thor_data400::base::override::fcra::qa::flag',fcra.Layout_override_flag,flat,opt),-flag_file_id),except flag_file_id,keep(1))(trim(override_flag,left,right) <> '3');

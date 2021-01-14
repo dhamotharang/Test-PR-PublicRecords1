@@ -1,1 +1,0 @@
-export pattern last_name_prefix_form := opt(last_name_prefix ['-',' ']*) proper_noun;

@@ -1,3 +1,0 @@
-//SuperFile version coming shortly...
-export File_Base_Main_Prod
- := dataset(Watercraft.Cluster + 'base::watercraft_main_' + Watercraft.Version_Production,Watercraft.Layout_Watercraft_Main_Base,thor);

@@ -1,1 +1,0 @@
-export Cluster_thor := '~thor_data400::';

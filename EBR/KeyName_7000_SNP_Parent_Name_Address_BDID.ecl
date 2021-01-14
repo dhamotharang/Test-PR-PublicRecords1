@@ -1,1 +1,0 @@
-export KeyName_7000_SNP_Parent_Name_Address_BDID := trim(GetSegmentKeyName_BDID('7000')) : global;

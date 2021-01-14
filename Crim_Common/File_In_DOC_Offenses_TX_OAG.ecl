@@ -1,1 +1,0 @@
-export File_In_DOC_Offenses_TX_OAG := dataset('~thor_data400::in::crim_offenses_tx_oag', Layout_In_DOC_Offenses.new,flat);

@@ -1,1 +1,0 @@
-export string8 Date_card_tech_securtech := '20040629';

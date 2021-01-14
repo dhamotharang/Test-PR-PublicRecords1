@@ -1,2 +1,0 @@
-export doxie_get_bdids(boolean forceLocal = false,boolean nofail = false,boolean use_exec_search = true,boolean score_results=TRUE) := 
-	table(doxie_get_bdids_plus(forceLocal,nofail,use_exec_search,score_results),{bdid});

@@ -1,1 +1,0 @@
-export Name_Moxie_Court_Offenses_Dev := '~thor_data400::base::court_offenses_' + Crim_Common.Version_Development;

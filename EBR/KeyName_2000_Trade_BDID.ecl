@@ -1,1 +1,0 @@
-export KeyName_2000_Trade_BDID := trim(GetSegmentKeyName_BDID('2000')) : global;

@@ -1,1 +1,0 @@
-export returnsInput(STRING20 searchType) := MAP(searchType IN ['AC03','AC04','AC4A','AC2A','AC2B'] => false,true);

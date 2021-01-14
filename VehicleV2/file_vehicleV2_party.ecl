@@ -1,1 +1,0 @@
-export	file_vehicleV2_party	:=	project(vehicleV2.File_VehicleV2_Party_Building,transform(VehicleV2.Layout_Base_Party-[SRC_FIRST_DATE, SRC_LAST_DATE],self:=left;));

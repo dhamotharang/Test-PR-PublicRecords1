@@ -1,7 +1,0 @@
-EXPORT Constants := MODULE
-	EXPORT email_target	:= 'senthilkumar.periasamy@lexisnexis.com';
-	// EXPORT INVALID_LIC := DATASET ([{'PENDING'},{'NA'},{'NONE'},{'TEMPORARY'},{'0'},{'00000'},{'STUDENT'},{'000000'},{'NOTAPPLICABLE'},{'TEMP'},{'INPROCESS'},{'UNKNOWN'},{'RESIDENT'},{'000000000'}],HealthCareProvider.Layouts.BAD_LICENSE);
-	EXPORT Bogus_LIC	 := ['390200000X','NA','0000','INPROCESS','NOTAPPLICABLE','1234','0000000','00000000','NOLICNUMBER','NR','NULL',
-												 'PENDING','NONE','TEMPORARY','STUDENT','00000','000000','UNKNOWN','TEMP','RESIDENT','WC1','35','35NULL','34NULL','OPT','0','000000000'];
-	EXPORT Prof_Lic_ST := ['AL','AK','CA','CO','GA','HI','IL','IN','IA','MI','MN','NE','OK','SC','TX','VA','WI','WY'];
-END;

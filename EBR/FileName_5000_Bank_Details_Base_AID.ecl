@@ -1,1 +1,0 @@
-export FileName_5000_Bank_Details_Base_AID := trim(GetSegmentFileName_Base('5000','A'));
