@@ -202,43 +202,8 @@ export Search_Service := MACRO
   Integer outOfBandSubscriberId := 0 : stored('RVCheckingSubscriberId');
   INTEGER8 SubscriberId := IF(option.RVCheckingSubscriberId <> 0, option.RVCheckingSubscriberId, outOfBandSubscriberId);
 	
-  // Check if any IDA models are requested.
-  IDA_model_check :=  auto_model_name IN RiskView.Constants.valid_IDA_models OR 
-                      bankcard_model_name IN RiskView.Constants.valid_IDA_models OR  
-                      Short_term_lending_model_name IN RiskView.Constants.valid_IDA_models OR  
-                      Telecommunications_model_name IN RiskView.Constants.valid_IDA_models OR  
-                      Crossindustry_model_name IN RiskView.Constants.valid_IDA_models OR  
-                      Custom_model_name IN RiskView.Constants.valid_IDA_models OR 
-                      Custom2_model_name IN RiskView.Constants.valid_IDA_models OR 
-                      Custom3_model_name IN RiskView.Constants.valid_IDA_models OR 
-                      Custom4_model_name IN RiskView.Constants.valid_IDA_models OR 
-                      Custom5_model_name IN RiskView.Constants.valid_IDA_models;
- 
-	gateways_in := Gateway.Configuration.Get();
+  #stored('DisableBocaShellLogging', DisableOutcomeTracking);
   
-	Gateway.Layouts.Config gw_switch(gateways_in le) := TRANSFORM
-    service_name := STD.STR.ToLowerCase(le.servicename);
-  
-		SELF.servicename := Map( service_name IN [Risk_Indicators.iid_constants.idareport,
-                                              Risk_Indicators.iid_constants.idareportUAT,
-                                              Risk_Indicators.iid_constants.idareportRetro] AND ~IDA_model_check => '', 
-                                                                                                                      le.servicename);
-
-		SELF.url := Map(service_name IN ['targus']                                                          => '',// Don't allow Targus Gateway
-                    service_name IN [Risk_Indicators.iid_constants.idareport,
-                                     Risk_Indicators.iid_constants.idareportUAT,
-                                     Risk_Indicators.iid_constants.idareportRetro] AND ~IDA_model_check => '',
-                                                                                                           le.url); 
-    self.properties := if(service_name IN ['first_data'], dataset([transform(Gateway.Layouts.ConfigProperties,
-                        self.name := 'SubscriberId';
-                        self.val := (string8)SubscriberId;)]),
-    Dataset([], Gateway.Layouts.ConfigProperties));
-		SELF := le;
-	END;
-	gateways := PROJECT(gateways_in, gw_switch(LEFT));
-  
-	#stored('DisableBocaShellLogging', DisableOutcomeTracking);
-
 /* ***************************************
 	 *           Set User Values:          *
    *************************************** */
@@ -320,6 +285,18 @@ no_lexid_min_error_message := 'Error - Minimum input fields required: First Name
 rpt_period_error_message   := 'Error - Input Value for ReportingPeriod must be 1 - 84 months.';
 attr_only_error_message    := 'Error - The AttributesOnly option cannot be selected with the ExcludeReleasedCases option.';
 
+// Check if any IDA models are requested.
+IDA_model_check :=  auto_model_name IN RiskView.Constants.valid_IDA_models OR 
+                    bankcard_model_name IN RiskView.Constants.valid_IDA_models OR  
+                    Short_term_lending_model_name IN RiskView.Constants.valid_IDA_models OR  
+                    Telecommunications_model_name IN RiskView.Constants.valid_IDA_models OR  
+                    Crossindustry_model_name IN RiskView.Constants.valid_IDA_models OR  
+                    Custom_model_name IN RiskView.Constants.valid_IDA_models OR 
+                    Custom2_model_name IN RiskView.Constants.valid_IDA_models OR 
+                    Custom3_model_name IN RiskView.Constants.valid_IDA_models OR 
+                    Custom4_model_name IN RiskView.Constants.valid_IDA_models OR 
+                    Custom5_model_name IN RiskView.Constants.valid_IDA_models;
+
 Standard_min_check := (((TRIM(packagedInput[1].name_first)<>'' AND TRIM(packagedInput[1].name_last)<>'') OR TRIM(packagedInput[1].unparsedfullname)<>'') AND  // name check
 							           (TRIM(packagedInput[1].ssn)<>'' OR                                                                                                   // ssn check
 								           ( TRIM(packagedInput[1].street_addr)<>'' AND                                                                                       // address check
@@ -344,7 +321,34 @@ input_ok := map(AttributesOnly AND ExcludeReleasedCases                         
                                                                                          ERROR(301,min_error_message)         // if anything else is wrong, give the other error messages first priority.
                );
 
-		// output(input_ok);						
+gateways_in := Gateway.Configuration.Get();
+
+Gateway.Layouts.Config gw_switch(gateways_in le) := TRANSFORM
+  service_name := STD.STR.ToLowerCase(TRIM(le.servicename));
+
+  SELF.servicename := Map( service_name IN [Risk_Indicators.iid_constants.idareport,
+                                            Risk_Indicators.iid_constants.idareportUAT,
+                                            Risk_Indicators.iid_constants.idareportRetro] AND 
+                                            (~IDA_model_check OR ~Non_lexid_min_check)    => '', 
+                                                                                             le.servicename);
+
+  SELF.url := Map(service_name IN [Gateway.Constants.ServiceName.Targus]                  => '',// Don't allow Targus Gateway
+                  service_name IN [Risk_Indicators.iid_constants.idareport,
+                                   Risk_Indicators.iid_constants.idareportUAT,
+                                   Risk_Indicators.iid_constants.idareportRetro] AND
+                                   (~IDA_model_check OR ~Non_lexid_min_check)             => '',
+                                                                                             le.url); 
+  SELF.properties := if(service_name IN [Gateway.Constants.ServiceName.FirstData], 
+                        DATASET([TRANSFORM(Gateway.Layouts.ConfigProperties,
+                                           SELF.name := 'SubscriberId';
+                                           SELF.val := (STRING8)SubscriberId;)]),
+                        DATASET([], Gateway.Layouts.ConfigProperties));
+  SELF := le;
+END;
+
+gateways := PROJECT(gateways_in, gw_switch(LEFT));
+
+
 /* ***************************************
 	 *      Gather Attributes/Scores:      *
    *************************************** */
