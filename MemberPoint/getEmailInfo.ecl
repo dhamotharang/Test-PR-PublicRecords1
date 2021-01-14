@@ -1,4 +1,4 @@
-﻿IMPORT iesp,EmailV2_Services,Royalty,Gateway,STD;
+﻿IMPORT iesp,EmailV2_Services,Royalty,Gateway,STD, email_data;
 EXPORT getEmailInfo(dataset (MemberPoint.Layouts.BestExtended) dsBestE,
 									MemberPoint.IParam.BatchParams InputParams) := function
 
@@ -35,9 +35,13 @@ EXPORT getEmailInfo(dataset (MemberPoint.Layouts.BestExtended) dsBestE,
 	Emailv2EAAjoined := join(Emailv2EAA,dsBestE,
 						left.did=right.did,
 						transform(memberpoint.Layouts.EmailRecInvalidforV2,
-						self.input_email_invalid := if(STD.Str.ToUpperCase(trim(right.input_email,left,right))=STD.Str.ToUpperCase(trim(left.orig_email,left,right))
+						input_email_trm := trim(right.input_email,left,right);
+						input_email_username_cln := email_data.Fn_Clean_Email_Username(input_email_trm);
+						input_email_domain_cln := email_data.Fn_Clean_Email_Domain(input_email_trm);
+						input_email_cln := IF(input_email_username_cln != '' OR input_email_domain_cln != '', input_email_username_cln+'@'+input_email_domain_cln, '');
+						self.input_email_invalid := if(input_email_cln=STD.Str.ToUpperCase(trim(left.orig_email,left,right))
 													,left.email_status,'');
-						self.input_email_invalid_reason := if(STD.Str.ToUpperCase(trim(right.input_email,left,right))=STD.Str.ToUpperCase(trim(left.orig_email,left,right))
+						self.input_email_invalid_reason := if(input_email_cln=STD.Str.ToUpperCase(trim(left.orig_email,left,right))
 													,left.email_status_reason,'');
 						self.acctno := left.acctno;
 						self := left;
