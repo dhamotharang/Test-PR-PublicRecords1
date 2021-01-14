@@ -1291,6 +1291,7 @@
 		export string KEYWORD_BXAMEU								:= '973';
 		export string KEYWORD_PLKAS_UG							:= '974';
 		export string KEYWORD_PHAMLC_TERR						:= '975';
+		export string KEYWORD_IRAN_IEI_SEC					:= '976';
 		
 		//When setting the keyword export use underscores for dashes (ex: For RBI-SANC, use RBI_SANC)	
 	end;
