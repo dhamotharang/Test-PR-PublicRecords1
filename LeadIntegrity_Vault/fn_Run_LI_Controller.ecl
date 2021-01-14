@@ -38,7 +38,7 @@
 #ELSEIF (LIProcToRun = 4)
          local RunLI := SEQUENTIAL(LIApd04,LIApd05);
 #ELSEIF (LIProcToRun = 5)
-         local RunLI := LIApd05
+         local RunLI := SEQUENTIAL(LIApd05);
 #ELSE
          local RunLI := output(ERROR('fn_Run_LI_Controller - Invalid Parm for LIProcToRun'));
 #END

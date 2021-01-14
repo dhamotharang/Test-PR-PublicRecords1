@@ -23,7 +23,7 @@ EXPORT B_Person_S_S_N := MODULE
     SELF.Dt_Last_Seen_ := KEL.Aggregates.MaxNN(__EE4398497,__T(__EE4398497).Event_Date_);
     SELF := __PP4398430;
   END;
-  EXPORT __ENH_Person_S_S_N := PROJECT(__EE4398535,__ND4398569__Project(LEFT)) : PERSIST('~temp::KEL::FraudgovKEL::Person_S_S_N::Annotated',EXPIRE(7));
+  EXPORT __ENH_Person_S_S_N := PROJECT(__EE4398535,__ND4398569__Project(LEFT)) : PERSIST('~fraudgov::temp::KEL::FraudgovKEL::Person_S_S_N::Annotated',EXPIRE(7));
   SHARED __EE4670004 := __ENH_Person_S_S_N;
   SHARED __IDX_Person_S_S_N_Social__Filtered := __EE4670004(__NN(__EE4670004.Social_));
   SHARED IDX_Person_S_S_N_Social__Layout := RECORD

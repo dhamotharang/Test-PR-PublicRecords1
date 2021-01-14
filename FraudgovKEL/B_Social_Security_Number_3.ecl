@@ -893,5 +893,5 @@ EXPORT B_Social_Security_Number_3 := MODULE
     SELF.Id_Activity_Dt_Last_Seen_ := __PP609075.M_A_X___Event_Date__2_;
     SELF := __PP609075;
   END;
-  EXPORT __ENH_Social_Security_Number_3 := PROJECT(__EE609074,__ND609109__Project(LEFT)) : PERSIST('~temp::KEL::FraudgovKEL::Social_Security_Number::Annotated_3',EXPIRE(7));
+  EXPORT __ENH_Social_Security_Number_3 := PROJECT(__EE609074,__ND609109__Project(LEFT)) : PERSIST('~fraudgov::temp::KEL::FraudgovKEL::Social_Security_Number::Annotated_3',EXPIRE(7));
 END;

@@ -1,357 +1,357 @@
-﻿import ut, RoxieKeyBuild,flaccidents;
+﻿IMPORT RoxieKeyBuild;
+IMPORT dx_eCrash AS dx;
 
-export proc_build_EcrashV2_keys(string filedate) := function
+EXPORT proc_build_EcrashV2_keys(STRING filedate) := FUNCTION
 
-RoxieKeyBuild.Mac_SK_BuildProcess_Local(flaccidents_ecrash.Key_ecrashv2_Did
-									   ,'~thor_data400::key::ecrashv2::' +filedate+'::did'
-					  			       ,'~thor_data400::key::ecrashv2_did',bk_did,2);
-RoxieKeyBuild.Mac_SK_BuildProcess_Local(flaccidents_ecrash.Key_ecrashv2_AccNbr
-									   ,'~thor_data400::key::ecrashv2::' +filedate+'::accnbr'
-					                   ,'~thor_data400::key::ecrashv2_accnbr',bk_accnbr,2);
-RoxieKeyBuild.Mac_SK_BuildProcess_Local(flaccidents_ecrash.Key_ecrashv2_AccNbrV1
-									   ,'~thor_data400::key::ecrashv2::' +filedate+'::accnbrv1'
-					                   ,'~thor_data400::key::ecrashv2_accnbrv1',bk_accnbrv1,2);
-RoxieKeyBuild.Mac_SK_BuildProcess_Local(flaccidents_ecrash.key_EcrashV2_Unrestricted_accnbrv1
-									   ,'~thor_data400::key::ecrashv2::' +filedate+'::Unrestricted_accnbrv1'
-					                   ,'~thor_data400::key::ecrashv2_Unrestricted_accnbrv1',bk_Unrestricted_accnbrv1,2);
-RoxieKeyBuild.Mac_SK_BuildProcess_Local(flaccidents_ecrash.Key_ecrashv2_Bdid
-									   ,'~thor_data400::key::ecrashv2::' +filedate+'::bdid'
-					                   ,'~thor_data400::key::ecrashv2_bdid',bk_bdid,2);
-RoxieKeyBuild.Mac_SK_BuildProcess_Local(flaccidents_ecrash.Key_ecrashv2_DLNbr
-									   ,'~thor_data400::key::ecrashv2::' +filedate+'::dlnbr'
-					  			       ,'~thor_data400::key::ecrashv2_dlnbr',bk_dlnbr,2);
-RoxieKeyBuild.Mac_SK_BuildProcess_Local(flaccidents_ecrash.Key_ecrashv2_TagNbr
-									   ,'~thor_data400::key::ecrashv2::' +filedate+'::tagnbr'
-					      			   ,'~thor_data400::key::ecrashv2_tagnbr',bk_tagnbr,2);
-RoxieKeyBuild.Mac_SK_BuildProcess_Local(flaccidents_ecrash.Key_ecrashv2_VIN
-									   ,'~thor_data400::key::ecrashv2::' +filedate+'::vin'
-					  			       ,'~thor_data400::key::ecrashv2_vin',bk_vin,2);
-RoxieKeyBuild.Mac_SK_BuildProcess_Local(flaccidents_ecrash.Key_ecrashv2_vin7
-									   ,'~thor_data400::key::ecrashv2::' +filedate+'::vin7'
-					  			       ,'~thor_data400::key::ecrashv2_vin7',bk_vin7,2);
-RoxieKeyBuild.Mac_SK_BuildProcess_Local(flaccidents_ecrash.Key_ecrashv2_dol
-									   ,'~thor_data400::key::ecrashv2::' +filedate+'::dol'
-					  			       ,'~thor_data400::key::ecrashv2_dol',bk_dol,2);	
-RoxieKeyBuild.Mac_SK_BuildProcess_Local(FLAccidents_Ecrash.Key_EcrashV2_Partial_Report_Nbr
-									   ,'~thor_data400::key::ecrashv2::' +filedate+'::partialaccnbr'
-					  			       ,'~thor_data400::key::ecrashv2_partialaccnbr',bk_partialaccnbr,2);	
-RoxieKeyBuild.Mac_SK_BuildProcess_Local(FLAccidents_Ecrash.Key_EcrashV2_LinkIds.Key
-									   ,'~thor_data400::key::ecrashv2::' + filedate + '::linkids'
-					                   ,'~thor_data400::key::ecrashv2_linkids',bk_linkids,2);												 
-RoxieKeyBuild.Mac_SK_BuildProcess_Local(flaccidents_ecrash.Key_ecrash0
-                     ,'~thor_data400::key::ecrash::' +filedate+'::ecrash0'
-    									   ,'~thor_data400::key::ecrash0',bk0,2);
-RoxieKeyBuild.Mac_SK_BuildProcess_Local(flaccidents_ecrash.Key_ecrash1
-									   ,'~thor_data400::key::ecrash::' +filedate+'::ecrash1'
-					  			       ,'~thor_data400::key::ecrash1',bk1,2);
-RoxieKeyBuild.Mac_SK_BuildProcess_Local(flaccidents_ecrash.Key_ecrash2v
-									   ,'~thor_data400::key::ecrash::' +filedate+'::ecrash2v'
-					  			       ,'~thor_data400::key::ecrash2v',bk2,2);
-RoxieKeyBuild.Mac_SK_BuildProcess_Local(flaccidents_ecrash.Key_ecrash3v
-									   ,'~thor_data400::key::ecrash::' +filedate+'::ecrash3v'
-					  			       ,'~thor_data400::key::ecrash3v',bk3,2);
-RoxieKeyBuild.Mac_SK_BuildProcess_Local(flaccidents_ecrash.Key_ecrash4
-									   ,'~thor_data400::key::ecrash::' +filedate+'::ecrash4'
-	 				  			       ,'~thor_data400::key::ecrash4',bk4,2);
-RoxieKeyBuild.Mac_SK_BuildProcess_Local(flaccidents_ecrash.Key_ecrash5
-									   ,'~thor_data400::key::ecrash::' +filedate+'::ecrash5'
-					  			       ,'~thor_data400::key::ecrash5',bk5,2);
-RoxieKeyBuild.Mac_SK_BuildProcess_Local(flaccidents_ecrash.Key_ecrash6
-									   ,'~thor_data400::key::ecrash::' +filedate+'::ecrash6'
-					  			       ,'~thor_data400::key::ecrash6',bk6,2);
-RoxieKeyBuild.Mac_SK_BuildProcess_Local(flaccidents_ecrash.Key_ecrash7
-									   ,'~thor_data400::key::ecrash::' +filedate+'::ecrash7'
-					  			       ,'~thor_data400::key::ecrash7',bk7,2);
-RoxieKeyBuild.Mac_SK_BuildProcess_Local(FLAccidents_Ecrash.Key_eCrashv2_Supplemental
-									   ,'~thor_data400::key::ecrashv2::' +filedate+'::Supplemental'
-					  			       ,'~thor_data400::key::ecrashv2_Supplemental',bk_Supplemental,2);
-												 
-RoxieKeyBuild.Mac_SK_BuildProcess_Local(FLAccidents_Ecrash.Key_eCrashV2_ReportId
-									   ,'~thor_data400::key::ecrashv2::' +filedate+'::ReportId'
-					  			       ,'~thor_data400::key::ecrashv2_ReportId',bk_ReportId,2);
-												 
-RoxieKeyBuild.Mac_SK_BuildProcess_Local(FLAccidents_Ecrash.Key_eCrashV2_DeltaDate
-									   ,'~thor_data400::key::ecrashv2::' +filedate+'::deltadate'
-					  			       ,'~thor_data400::key::ecrashv2_deltadate',bk_deltadate,,true);	
-RoxieKeyBuild.Mac_SK_BuildProcess_Local(FLAccidents_Ecrash.key_EcrashV2_agency
-									   ,'~thor_data400::key::ecrashv2::' +filedate+'::agency'
-					                   ,'~thor_data400::key::ecrashv2_agency',bk_agency,2);
-//BuyCrash New keys	
+// ########################################################################### 
+//                    ECRASH0 KEY
+// ##########################################################################		 
+   L_FILE_KEY_ECRASH0 := dx.Files.FLACCIDENT_PR_KEY_PREFIX + '::' + dx.Files.ECRASH_PRODUCT + '::' + filedate + '::' + dx.Files.ECRASH0_SUFFIX;
+   RoxieKeybuild.MAC_build_logical(dx.KEY_ECRASH0, mod_PrepEcrashFLAccidentPRKeys.flc0_allrecs, dx.Files.FILE_KEY_ECRASH0, L_FILE_KEY_ECRASH0, bk_ecrash0);
+   RoxieKeyBuild.Mac_SK_Move_To_Built(L_FILE_KEY_ECRASH0, dx.Files.FILE_KEY_ECRASH0, move1_ecrash0);
+	 RoxieKeyBuild.Mac_SK_Move_V3(dx.Files.FILE_KEY_ECRASH0, 'Q', move2_ecrash0, filedate);
 
-RoxieKeyBuild.Mac_SK_BuildProcess_Local(FLAccidents_Ecrash.key_ecrashV2_DlnNbrDLState
-									   ,'~thor_data400::key::ecrashv2::' +filedate+'::dlnnbrdlstate'
-					                   ,'~thor_data400::key::ecrashv2_dlnnbrdlstate',bk_dlnnbrdlstate,2);
-RoxieKeyBuild.Mac_SK_BuildProcess_Local(FLAccidents_Ecrash.key_ecrashV2_LicensePlateNbr
-									   ,'~thor_data400::key::ecrashv2::' +filedate+'::licenseplatenbr'
-					                   ,'~thor_data400::key::ecrashv2_licenseplatenbr',bk_licenseplatenbr,2);
-RoxieKeyBuild.Mac_SK_BuildProcess_Local(FLAccidents_Ecrash.key_ecrashV2_OfficerBadgeNbr
-									   ,'~thor_data400::key::ecrashv2::' +filedate+'::officerbadgenbr'
-					                   ,'~thor_data400::key::ecrashv2_officerbadgenbr',bk_officerbadgenbr,2);
-RoxieKeyBuild.Mac_SK_BuildProcess_Local(FLAccidents_Ecrash.key_ecrashV2_VinNbr
-									   ,'~thor_data400::key::ecrashv2::' +filedate+'::vinnbr'
-					                   ,'~thor_data400::key::ecrashv2_agency',bk_vinnbr,2);
-// Analytics keys 
+// ########################################################################### 
+//                    ECRASH1 KEY
+// ##########################################################################
+   L_FILE_KEY_ECRASH1 := dx.Files.FLACCIDENT_PR_KEY_PREFIX + '::' +  dx.Files.ECRASH_PRODUCT + '::' + filedate + '::' + dx.Files.ECRASH1_SUFFIX;
+   RoxieKeybuild.MAC_build_logical(dx.KEY_ECRASH1, mod_PrepEcrashFLAccidentPRKeys.flc1_ptotal, dx.Files.FILE_KEY_ECRASH1, L_FILE_KEY_ECRASH1, bk_ecrash1);
+	 RoxieKeyBuild.Mac_SK_Move_To_Built(L_FILE_KEY_ECRASH1, dx.Files.FILE_KEY_ECRASH1, move1_ecrash1);
+   RoxieKeyBuild.Mac_SK_Move_V3(dx.Files.FILE_KEY_ECRASH1, 'Q', move2_ecrash1, filedate);
 
-RoxieKeyBuild.Mac_SK_BuildProcess_Local(FLAccidents_Ecrash.Key_eCrash_ByAgencyID
-									   ,'~thor_data400::key::ecrashV2::' +filedate+'::analytics_byAgencyID'
-					  			       ,'~thor_data400::key::ecrashv2::analytics_byAgencyID',bk_agencyid,2);	
-RoxieKeyBuild.Mac_SK_BuildProcess_Local(FLAccidents_Ecrash.Key_eCrash_ByDOW
-									   ,'~thor_data400::key::ecrashv2::' +filedate+'::analytics_byDOW'
-					  			       ,'~thor_data400::key::ecrashV2::analytics_byDOW',bk_DOW,2);	
-RoxieKeyBuild.Mac_SK_BuildProcess_Local(FLAccidents_Ecrash.Key_eCrash_byMOY
-									   ,'~thor_data400::key::ecrashv2::' +filedate+'::analytics_byMOY'
-					  			       ,'~thor_data400::key::ecrashV2::analytics_byMOY',bkMOY,2);	
+// ########################################################################### 
+//                    ECRASH2V KEY
+// ##########################################################################
+   L_FILE_KEY_ECRASH2V := dx.Files.FLACCIDENT_PR_KEY_PREFIX + '::' +  dx.Files.ECRASH_PRODUCT + '::' + filedate + '::' + dx.Files.ECRASH2V_SUFFIX;
+   RoxieKeybuild.MAC_build_logical(dx.KEY_ECRASH2V, mod_PrepEcrashFLAccidentPRKeys.flc2v_allrecs, dx.Files.FILE_KEY_ECRASH2V, L_FILE_KEY_ECRASH2V, bk_ecrash2);
+   RoxieKeyBuild.Mac_SK_Move_To_Built(L_FILE_KEY_ECRASH2V, dx.Files.FILE_KEY_ECRASH2V, move1_ecrash2);
+   RoxieKeyBuild.Mac_SK_Move_V3(dx.Files.FILE_KEY_ECRASH2V, 'Q', move2_ecrash2, filedate);
+	 
+// ########################################################################### 
+//                    ECRASH3V KEY
+// ##########################################################################
+   L_FILE_KEY_ECRASH3V := dx.Files.FLACCIDENT_PR_KEY_PREFIX + '::' +  dx.Files.ECRASH_PRODUCT + '::' + filedate + '::' + dx.Files.ECRASH3V_SUFFIX;
+   RoxieKeybuild.MAC_build_logical(dx.KEY_ECRASH3V, mod_PrepEcrashFLAccidentPRKeys.pflc3v, dx.Files.FILE_KEY_ECRASH3V, L_FILE_KEY_ECRASH3V, bk_ecrash3);
+   RoxieKeyBuild.Mac_SK_Move_To_Built(L_FILE_KEY_ECRASH3V, dx.Files.FILE_KEY_ECRASH3V, move1_ecrash3);
+   RoxieKeyBuild.Mac_SK_Move_V3(dx.Files.FILE_KEY_ECRASH3V, 'Q', move2_ecrash3, filedate);
 
-RoxieKeyBuild.Mac_SK_BuildProcess_Local(FLAccidents_Ecrash.Key_eCrash_ByHOD
-									   ,'~thor_data400::key::ecrashv2::' +filedate+'::analytics_byHOD'
-					  			       ,'~thor_data400::key::ecrashV2::analytics_byHOD',bkHOD,2);	
+// ########################################################################### 
+//                    ECRASH4 KEY
+// ##########################################################################
+   L_FILE_KEY_ECRASH4 := dx.Files.FLACCIDENT_PR_KEY_PREFIX + '::' +  dx.Files.ECRASH_PRODUCT + '::' + filedate + '::' + dx.Files.ECRASH4_SUFFIX;
+   RoxieKeybuild.MAC_build_logical(dx.KEY_ECRASH4, mod_PrepEcrashFLAccidentPRKeys.flc4_allrecs, dx.Files.FILE_KEY_ECRASH4, L_FILE_KEY_ECRASH4, bk_ecrash4);
+   RoxieKeyBuild.Mac_SK_Move_To_Built(L_FILE_KEY_ECRASH4, dx.Files.FILE_KEY_ECRASH4, move1_ecrash4);
+   RoxieKeyBuild.Mac_SK_Move_V3(dx.Files.FILE_KEY_ECRASH4, 'Q', move2_ecrash4, filedate);
 
-RoxieKeyBuild.Mac_SK_BuildProcess_Local(FLAccidents_Ecrash.Key_eCrash_ByCollisionType
-									   ,'~thor_data400::key::ecrashv2::' +filedate+'::analytics_byCollisionType'
-					  			       ,'~thor_data400::key::ecrashV2::analytics_byCollisionType',bkCol,2);	
-												 
- RoxieKeyBuild.Mac_SK_BuildProcess_Local(FLAccidents_Ecrash.Key_eCrash_ByInter
-									   ,'~thor_data400::key::ecrashv2::' +filedate+'::analytics_byInter'
-					  			       ,'~thor_data400::key::ecrashV2::analytics_byInter',bkInter,2);	
+// ########################################################################### 
+//                    ECRASH5 KEY
+// ##########################################################################
+   L_FILE_KEY_ECRASH5 := dx.Files.FLACCIDENT_PR_KEY_PREFIX + '::' +  dx.Files.ECRASH_PRODUCT + '::' + filedate + '::' + dx.Files.ECRASH5_SUFFIX;
+   RoxieKeybuild.MAC_build_logical(dx.KEY_ECRASH5, mod_PrepEcrashFLAccidentPRKeys.flc5_ptotal, dx.Files.FILE_KEY_ECRASH5, L_FILE_KEY_ECRASH5, bk_ecrash5);
+   RoxieKeyBuild.Mac_SK_Move_To_Built(L_FILE_KEY_ECRASH5, dx.Files.FILE_KEY_ECRASH5, move1_ecrash5);
+   RoxieKeyBuild.Mac_SK_Move_V3(dx.Files.FILE_KEY_ECRASH5, 'Q', move2_ecrash5, filedate);
 
-RoxieKeyBuild.Mac_SK_BuildProcess_Local(FLAccidents_ECrash.Key_eCrashv2_PrefName_State
-																				,'~thor_data400::key::eCrashv2::' +filedate+'::PrefName_State'
-																				,'~thor_data400::key::eCrashv2_PrefName_State',bk_PrefName_State,2); 		
-RoxieKeyBuild.Mac_SK_BuildProcess_Local(FLAccidents_Ecrash.Key_eCrashv2_agencyId_sentdate
-									   ,'~thor_data400::key::ecrashv2::' +filedate+'::agencyId_sentdate'
-					                   ,'~thor_data400::key::ecrashv2_agencyId_sentdate',bk_agencyId_sentdate,2);		
-														 
-RoxieKeyBuild.Mac_SK_BuildProcess_Local(FLAccidents_ECrash.Key_eCrashv2_StAndLocation
-																				,'~thor_data400::key::eCrashv2::' +filedate+'::StAndLocation'
-																				,'~thor_data400::key::eCrashv2_StAndLocation',bk_StAndLocation,2);
+// ########################################################################### 
+//                    ECRASH6 KEY
+// ##########################################################################
+   L_FILE_KEY_ECRASH6 := dx.Files.FLACCIDENT_PR_KEY_PREFIX + '::' +  dx.Files.ECRASH_PRODUCT + '::' + filedate + '::' + dx.Files.ECRASH6_SUFFIX;
+   RoxieKeybuild.MAC_build_logical(dx.KEY_ECRASH6, mod_PrepEcrashFLAccidentPRKeys.flc6_ptotal, dx.Files.FILE_KEY_ECRASH6, L_FILE_KEY_ECRASH6, bk_ecrash6);
+   RoxieKeyBuild.Mac_SK_Move_To_Built(L_FILE_KEY_ECRASH6, dx.Files.FILE_KEY_ECRASH6, move1_ecrash6);
+   RoxieKeyBuild.Mac_SK_Move_V3(dx.Files.FILE_KEY_ECRASH6, 'Q', move2_ecrash6, filedate);
+	 
+// ########################################################################### 
+//                    ECRASH7 KEY
+// ##########################################################################
+   L_FILE_KEY_ECRASH7 := dx.Files.FLACCIDENT_PR_KEY_PREFIX + '::' +  dx.Files.ECRASH_PRODUCT + '::' + filedate + '::' + dx.Files.ECRASH7_SUFFIX;
+   RoxieKeybuild.MAC_build_logical(dx.KEY_ECRASH7, mod_PrepEcrashFLAccidentPRKeys.flc7_ptotal, dx.Files.FILE_KEY_ECRASH7, L_FILE_KEY_ECRASH7, bk_ecrash7);
+   RoxieKeyBuild.Mac_SK_Move_To_Built(L_FILE_KEY_ECRASH7, dx.Files.FILE_KEY_ECRASH7, move1_ecrash7);
+   RoxieKeyBuild.Mac_SK_Move_V3(dx.Files.FILE_KEY_ECRASH7, 'Q', move2_ecrash7, filedate);
+	 
+// ########################################################################### 
+//                    ACCNBR KEY
+// ##########################################################################
+   L_FILE_KEY_ACCNBR := dx.Files.KEY_PREFIX + '::' + filedate + '::' + dx.Files.ACCNBR_SUFFIX;
+   RoxieKeybuild.MAC_build_logical(dx.KEY_ACCNBR, mod_PrepEcrashPRKeys().dep_accnbr_base, dx.Files.FILE_KEY_ACCNBR, L_FILE_KEY_ACCNBR, bk_accnbr);
+   RoxieKeyBuild.Mac_SK_Move_To_Built(L_FILE_KEY_ACCNBR, dx.Files.FILE_KEY_ACCNBR, move1_accnbr);
+   RoxieKeyBuild.Mac_SK_Move_V3(dx.Files.FILE_KEY_ACCNBR, 'Q', move2_accnbr, filedate);
 
-RoxieKeyBuild.Mac_SK_BuildProcess_Local(FLAccidents_ECrash.Key_eCrashv2_ReportLinkId
-																				,'~thor_data400::key::eCrashv2::' +filedate+'::ReportLinkId'
-																				,'~thor_data400::key::eCrashv2_ReportLinkId',bk_ReportLinkId,2);		
-RoxieKeyBuild.Mac_SK_BuildProcess_Local(FLAccidents_ECrash.Key_eCrashv2_LastName
-																				,'~thor_data400::key::eCrashv2::' +filedate+'::LastName_state'
-																				,'~thor_data400::key::eCrashv2_LastName_state',bk_LastName,2); 		
-RoxieKeyBuild.Mac_SK_BuildProcess_Local(FLAccidents_ECrash.Key_eCrashv2_PhotoId
-																				,'~thor_data400::key::eCrashv2::' +filedate+'::PhotoId'
-																				,'~thor_data400::key::eCrashv2_PhotoId',bk_PhotoId,2);				
-		
-build_keys := parallel(bk_did,bk_accnbr,bk_accnbrv1,bk_Unrestricted_accnbrv1,bk_bdid,bk_dlnbr,bk_tagnbr,bk_vin,bk_dol,bk_linkids,bk0,bk1,bk3,bk5,bk6,bk7,bk_agencyid,bk_DOW,bkMOY,bkHOD,bkCol,bkInter,
-                       bk_Supplemental,bk_ReportId,bk_agency,bk_PrefName_State,bk_agencyId_sentdate,bk_StAndLocation,bk_ReportLinkId,
-											 bk_LastName, bk_photoId, bk_dlnnbrdlstate, bk_licenseplatenbr, bk_officerbadgenbr, bk_vinnbr);
+// ########################################################################### 
+//                    ACCNBRV1 KEY
+// ##########################################################################
+   L_FILE_KEY_ACCNBRV1 := dx.Files.KEY_PREFIX + '::' + filedate + '::' + dx.Files.ACCNBRV1_SUFFIX;
+   RoxieKeybuild.MAC_build_logical(dx.KEY_ACCNBRV1, mod_PrepEcrashPRKeys().dep_accnbrv1_base, dx.Files.FILE_KEY_ACCNBRV1, L_FILE_KEY_ACCNBRV1, bk_accnbrv1);
+   RoxieKeyBuild.Mac_SK_Move_To_Built(L_FILE_KEY_ACCNBRV1, dx.Files.FILE_KEY_ACCNBRV1, move1_accnbrv1);
+   RoxieKeyBuild.Mac_SK_Move_V3(dx.Files.FILE_KEY_ACCNBRV1, 'Q', move2_accnbrv1, filedate);
+	 
+// ########################################################################### 
+//              PARTIAL REPORT NBR KEY
+// ##########################################################################
+   L_FILE_KEY_PARTIALACCNBR := dx.Files.KEY_PREFIX + '::' + filedate + '::' + dx.Files.PARTIAL_ACCNBR_SUFFIX;
+   RoxieKeybuild.MAC_build_logical(dx.KEY_PARTIALACCNBR, mod_PrepEcrashPRKeys().clean_partnbr, dx.Files.FILE_KEY_PARTIAL_ACCNBR, L_FILE_KEY_PARTIALACCNBR, bk_partialaccnbr);
+   RoxieKeyBuild.Mac_SK_Move_To_Built(L_FILE_KEY_PARTIALACCNBR, dx.Files.FILE_KEY_PARTIAL_ACCNBR, move1_partialaccnbr);
+   RoxieKeyBuild.Mac_SK_Move_V3(dx.Files.FILE_KEY_PARTIAL_ACCNBR, 'Q', move2_partialaccnbr, filedate);
 
-// move keys to built
+// ########################################################################### 
+//                       BDID KEY
+// ##########################################################################
+   L_FILE_KEY_BDID := dx.Files.KEY_PREFIX + '::' + filedate + '::' + dx.Files.BDID_SUFFIX;
+   RoxieKeybuild.MAC_build_logical(dx.KEY_BDID, mod_PrepEcrashPRKeys().ded_bdid_base, dx.Files.FILE_KEY_BDID, L_FILE_KEY_BDID, bk_bdid);
+   RoxieKeyBuild.Mac_SK_Move_To_Built(L_FILE_KEY_BDID, dx.Files.FILE_KEY_BDID, move1_bdid);
+   RoxieKeyBuild.Mac_SK_Move_V3(dx.Files.FILE_KEY_BDID, 'Q', move2_bdid, filedate);
+	 
+// ########################################################################### 
+//                        DID KEY
+// ##########################################################################
+   L_FILE_KEY_DID := dx.Files.KEY_PREFIX + '::' + filedate + '::' + dx.Files.DID_SUFFIX;
+   RoxieKeybuild.MAC_build_logical(dx.KEY_DID, mod_PrepEcrashPRKeys().DIDBase, dx.Files.FILE_KEY_DID, L_FILE_KEY_DID, bk_did);
+   RoxieKeyBuild.Mac_SK_Move_To_Built(L_FILE_KEY_DID, dx.Files.FILE_KEY_DID, move1_did);
+   RoxieKeyBuild.Mac_SK_Move_V3(dx.Files.FILE_KEY_DID, 'Q', move2_did, filedate);
+	 
+// ########################################################################### 
+//                       DL NBR KEY
+// ##########################################################################
+   L_FILE_KEY_DLNBR := dx.Files.KEY_PREFIX + '::' + filedate + '::' + dx.Files.DL_NBR_SUFFIX;
+   RoxieKeybuild.MAC_build_logical(dx.KEY_DLNBR, mod_PrepEcrashPRKeys().dep_dlnbr_base, dx.Files.FILE_KEY_DL_NBR, L_FILE_KEY_DLNBR, bk_dlnbr);
+   RoxieKeyBuild.Mac_SK_Move_To_Built(L_FILE_KEY_DLNBR, dx.Files.FILE_KEY_DL_NBR, move1_dlnbr);
+   RoxieKeyBuild.Mac_SK_Move_V3(dx.Files.FILE_KEY_DL_NBR, 'Q', move2_dlnbr, filedate);
 
-RoxieKeyBuild.Mac_SK_Move_To_Built('~thor_data400::key::ecrashv2::' +filedate+'::did'
-                                  ,'~thor_data400::key::ecrashv2_did'
-								  ,move10);
-RoxieKeyBuild.Mac_SK_Move_To_Built('~thor_data400::key::ecrashv2::' +filedate+'::accnbr'
-                                  ,'~thor_data400::key::ecrashv2_accnbr'
-								  ,move11);
-RoxieKeyBuild.Mac_SK_Move_To_Built('~thor_data400::key::ecrashv2::' +filedate+'::accnbrv1'
-                                  ,'~thor_data400::key::ecrashv2_accnbrv1'
-								  ,move11V1);
-RoxieKeyBuild.Mac_SK_Move_To_Built('~thor_data400::key::ecrashv2::' +filedate+'::Unrestricted_accnbrv1'
-                                  ,'~thor_data400::key::ecrashv2_Unrestricted_accnbrv1'
-								  ,move11V1_1);
-RoxieKeyBuild.Mac_SK_Move_To_Built('~thor_data400::key::ecrashv2::' +filedate+'::bdid'
-                                  ,'~thor_data400::key::ecrashv2_bdid'
-								  ,move12);
-RoxieKeyBuild.Mac_SK_Move_To_Built('~thor_data400::key::ecrashv2::' +filedate+'::dlnbr'
-                                  ,'~thor_data400::key::ecrashv2_dlnbr'
-								  ,move13);
-RoxieKeyBuild.Mac_SK_Move_To_Built('~thor_data400::key::ecrashv2::' +filedate+'::tagnbr'
-                                  ,'~thor_data400::key::ecrashv2_tagnbr'
-								  ,move14);
-RoxieKeyBuild.Mac_SK_Move_To_Built('~thor_data400::key::ecrashv2::' +filedate+'::vin'
-                                  ,'~thor_data400::key::ecrashv2_vin'
-								  ,move15);
-RoxieKeyBuild.Mac_SK_Move_To_Built('~thor_data400::key::ecrashv2::' +filedate+'::vin7'
-                                  ,'~thor_data400::key::ecrashv2_vin7'
-								  ,move17);
-RoxieKeyBuild.Mac_SK_Move_To_Built('~thor_data400::key::ecrashv2::' +filedate+'::dol'
-                                  ,'~thor_data400::key::ecrashv2_dol'
-								  ,move18);
-									
-RoxieKeyBuild.Mac_SK_Move_To_Built('~thor_data400::key::ecrashv2::' +filedate+'::partialaccnbr'
-                                  ,'~thor_data400::key::ecrashv2_partialaccnbr'
-								  ,move19);
+// ########################################################################### 
+//                       TAG NBR KEY
+// ##########################################################################
+   L_FILE_KEY_TAGNBR := dx.Files.KEY_PREFIX + '::' + filedate + '::' + dx.Files.TAG_NBR_SUFFIX;
+   RoxieKeybuild.MAC_build_logical(dx.KEY_TAGNBR, mod_PrepEcrashPRKeys().dep_tagnbr_base, dx.Files.FILE_KEY_TAG_NBR, L_FILE_KEY_TAGNBR, bk_tagnbr);
+   RoxieKeyBuild.Mac_SK_Move_To_Built(L_FILE_KEY_TAGNBR, dx.Files.FILE_KEY_TAG_NBR, move1_tagnbr);
+   RoxieKeyBuild.Mac_SK_Move_V3(dx.Files.FILE_KEY_TAG_NBR, 'Q', move2_tagnbr, filedate);
+	 
+// ########################################################################### 
+//                       VIN KEY
+// ##########################################################################	
+   L_FILE_KEY_VIN := dx.Files.KEY_PREFIX + '::' + filedate + '::' + dx.Files.VIN_SUFFIX;
+   RoxieKeybuild.MAC_build_logical(dx.KEY_VIN, mod_PrepEcrashPRKeys().VinBase, dx.Files.FILE_KEY_VIN, L_FILE_KEY_VIN, bk_vin);
+   RoxieKeyBuild.Mac_SK_Move_To_Built(L_FILE_KEY_VIN, dx.Files.FILE_KEY_VIN, move1_vin);
+   RoxieKeyBuild.Mac_SK_Move_V3(dx.Files.FILE_KEY_VIN, 'Q', move2_vin, filedate);
 
-RoxieKeyBuild.Mac_SK_Move_To_Built('~thor_data400::key::ecrashv2::' +filedate+ '::linkids'
-                                  ,'~thor_data400::key::ecrashv2_linkids'
-								  ,move20);									
-									
-RoxieKeyBuild.Mac_SK_Move_To_Built('~thor_data400::key::ecrash::' +filedate+'::ecrash0'
-                                  ,'~thor_data400::key::ecrash0'
-								  ,move1);
-RoxieKeyBuild.Mac_SK_Move_To_Built('~thor_data400::key::ecrash::' +filedate+'::ecrash1'
-                                  ,'~thor_data400::key::ecrash1'
-								  ,move2);
-RoxieKeyBuild.Mac_SK_Move_To_Built('~thor_data400::key::ecrash::' +filedate+'::ecrash2v'
-                                  ,'~thor_data400::key::ecrash2v'
-								  ,move3);
-RoxieKeyBuild.Mac_SK_Move_To_Built('~thor_data400::key::ecrash::' +filedate+'::ecrash3v'
-                                  ,'~thor_data400::key::ecrash3v'
-								  ,move4);
-RoxieKeyBuild.Mac_SK_Move_To_Built('~thor_data400::key::ecrash::' +filedate+'::ecrash4'
-                                  ,'~thor_data400::key::ecrash4'
-								  ,move5);
-RoxieKeyBuild.Mac_SK_Move_To_Built('~thor_data400::key::ecrash::' +filedate+'::ecrash5'
-                                  ,'~thor_data400::key::ecrash5'
-								  ,move6);
-RoxieKeyBuild.Mac_SK_Move_To_Built('~thor_data400::key::ecrash::' +filedate+'::ecrash6'
-                                  ,'~thor_data400::key::ecrash6'
-								  ,move7);
-RoxieKeyBuild.Mac_SK_Move_To_Built('~thor_data400::key::ecrash::' +filedate+'::ecrash7'
-                                  ,'~thor_data400::key::ecrash7'
-								  ,move8);
+// ########################################################################### 
+//                       VIN7 KEY
+// ########################################################################## 
+   L_FILE_KEY_VIN7 := dx.Files.KEY_PREFIX + '::' + filedate + '::' + dx.Files.VIN7_SUFFIX;
+   RoxieKeybuild.MAC_build_logical(dx.KEY_VIN7, mod_PrepEcrashPRKeys().ecrash_vin_base_7, dx.Files.FILE_KEY_VIN7, L_FILE_KEY_VIN7, bk_vin7);
+   RoxieKeyBuild.Mac_SK_Move_To_Built(L_FILE_KEY_VIN7, dx.Files.FILE_KEY_VIN7, move1_vin7);
+   RoxieKeyBuild.Mac_SK_Move_V3(dx.Files.FILE_KEY_VIN7, 'Q', move2_vin7, filedate);
 
-RoxieKeyBuild.Mac_SK_Move_To_Built('~thor_data400::key::ecrashv2::' +filedate+'::Supplemental'
-                                  ,'~thor_data400::key::ecrashv2_Supplemental'
-								  ,moveSupplemental);
+// ########################################################################### 
+//                   BY AGENCYID KEY
+// ########################################################################## 
+   L_FILE_KEY_BY_AGENCYID := dx.Files.KEY_PREFIX + '::' + filedate + '::' + dx.Files.ANALYTICS_BY_AGENCY_ID_SUFFIX;
+   RoxieKeybuild.MAC_build_logical(dx.KEY_BYAGENCYID, mod_PrepEcrashAnalyticKeys().by_AgencyID, dx.Files.FILE_KEY_ANALYTICS_BY_AGENCY_ID, L_FILE_KEY_BY_AGENCYID, bk_agencyid);
+   RoxieKeyBuild.Mac_SK_Move_To_Built(L_FILE_KEY_BY_AGENCYID, dx.Files.FILE_KEY_ANALYTICS_BY_AGENCY_ID, move1_agencyid);
+   RoxieKeyBuild.Mac_SK_Move_V3(dx.Files.FILE_KEY_ANALYTICS_BY_AGENCY_ID, 'Q', move2_agencyid, filedate);
+	 
+// ########################################################################### 
+//                      BY COLLISION TYPE KEY
+// ########################################################################## 
+   L_FILE_KEY_BY_CT := dx.Files.KEY_PREFIX + '::' + filedate + '::' + dx.Files.ANALYTICS_BY_COLLISION_TYPE_SUFFIX;
+   RoxieKeybuild.MAC_build_logical(dx.KEY_BYCOLLISIONTYPE, mod_PrepEcrashAnalyticKeys().dsByCollisionType, dx.Files.FILE_KEY_ANALYTICS_BY_COLLISION_TYPE, L_FILE_KEY_BY_CT, bk_ct);
+   RoxieKeyBuild.Mac_SK_Move_To_Built(L_FILE_KEY_BY_CT, dx.Files.FILE_KEY_ANALYTICS_BY_COLLISION_TYPE, move1_ct);
+   RoxieKeyBuild.Mac_SK_Move_V3(dx.Files.FILE_KEY_ANALYTICS_BY_COLLISION_TYPE, 'Q', move2_ct, filedate);
 
-RoxieKeyBuild.Mac_SK_Move_To_Built('~thor_data400::key::ecrashv2::' +filedate+'::ReportId'
-                                  ,'~thor_data400::key::ecrashv2_ReportId'
-								  ,moveReportId);
+// ########################################################################### 
+//                   BY DOW KEY
+// ########################################################################## 
+   L_FILE_KEY_BY_DOW := dx.Files.KEY_PREFIX + '::' + filedate + '::' + dx.Files.ANALYTICS_BY_DOW_SUFFIX;
+   RoxieKeybuild.MAC_build_logical(dx.KEY_BYDOW, mod_PrepEcrashAnalyticKeys().by_DOW, dx.Files.FILE_KEY_ANALYTICS_BY_DOW, L_FILE_KEY_BY_DOW, bk_dow);
+   RoxieKeyBuild.Mac_SK_Move_To_Built(L_FILE_KEY_BY_DOW, dx.Files.FILE_KEY_ANALYTICS_BY_DOW, move1_dow);
+   RoxieKeyBuild.Mac_SK_Move_V3(dx.Files.FILE_KEY_ANALYTICS_BY_DOW, 'Q', move2_dow, filedate);
+	
+// ########################################################################### 
+//                   BY HOD KEY
+// ########################################################################## 
+   L_FILE_KEY_BY_HOD := dx.Files.KEY_PREFIX + '::' + filedate + '::' + dx.Files.ANALYTICS_BY_HOD_SUFFIX;
+   RoxieKeybuild.MAC_build_logical(dx.KEY_BYHOD, mod_PrepEcrashAnalyticKeys().by_HOD, dx.Files.FILE_KEY_ANALYTICS_BY_HOD, L_FILE_KEY_BY_HOD, bk_hod);
+   RoxieKeyBuild.Mac_SK_Move_To_Built(L_FILE_KEY_BY_HOD, dx.Files.FILE_KEY_ANALYTICS_BY_HOD, move1_hod);
+   RoxieKeyBuild.Mac_SK_Move_V3(dx.Files.FILE_KEY_ANALYTICS_BY_HOD, 'Q', move2_hod, filedate);
+		 
+// ########################################################################### 
+//                   BY INTER KEY
+// ########################################################################## 
+   L_FILE_KEY_BY_INTER := dx.Files.KEY_PREFIX + '::' + filedate + '::' + dx.Files.ANALYTICS_BY_INTER_SUFFIX;
+   RoxieKeybuild.MAC_build_logical(dx.KEY_BYINTER, mod_PrepEcrashAnalyticKeys().dsByInter, dx.Files.FILE_KEY_ANALYTICS_BY_INTER, L_FILE_KEY_BY_INTER, bk_inter);
+   RoxieKeyBuild.Mac_SK_Move_To_Built(L_FILE_KEY_BY_INTER, dx.Files.FILE_KEY_ANALYTICS_BY_INTER, move1_inter);
+   RoxieKeyBuild.Mac_SK_Move_V3(dx.Files.FILE_KEY_ANALYTICS_BY_INTER, 'Q', move2_inter, filedate);
+	
+// ########################################################################### 
+//                   BY MOY KEY
+// ########################################################################## 
+   L_FILE_KEY_BY_MOY := dx.Files.KEY_PREFIX + '::' + filedate + '::' + dx.Files.ANALYTICS_BY_MOY_SUFFIX;
+   RoxieKeybuild.MAC_build_logical(dx.KEY_BYMOY, mod_PrepEcrashAnalyticKeys().by_MOY, dx.Files.FILE_KEY_ANALYTICS_BY_MOY, L_FILE_KEY_BY_MOY, bk_moy);
+   RoxieKeyBuild.Mac_SK_Move_To_Built(L_FILE_KEY_BY_MOY, dx.Files.FILE_KEY_ANALYTICS_BY_MOY, move1_moy);
+   RoxieKeyBuild.Mac_SK_Move_V3(dx.Files.FILE_KEY_ANALYTICS_BY_MOY, 'Q', move2_moy, filedate);
+	
+// ########################################################################### 
+//                    DOL KEY
+// ########################################################################## 
+   L_FILE_KEY_DOL := dx.Files.KEY_PREFIX + '::' + filedate + '::' + dx.Files.DOL_SUFFIX;
+   RoxieKeybuild.MAC_build_logical(dx.KEY_DOL, mod_PrepEcrashKeys().dep_base, dx.Files.FILE_KEY_DOL, L_FILE_KEY_DOL, bk_dol);
+   RoxieKeyBuild.Mac_SK_Move_To_Built(L_FILE_KEY_DOL, dx.Files.FILE_KEY_DOL, move1_dol);
+   RoxieKeyBuild.Mac_SK_Move_V3(dx.Files.FILE_KEY_DOL, 'Q', move2_dol, filedate);
+	
+// ########################################################################### 
+//             LINK ID KEY
+// ########################################################################## 
+   L_FILE_KEY_LINKIDS := dx.Files.KEY_PREFIX + '::' + filedate + '::' + dx.Files.LINKIDS_SUFFIX;
+   RoxieKeybuild.MAC_build_logical(dx.KEY_LINKIDS, FLAccidents_Ecrash.Key_EcrashV2_LinkIds.Key, dx.Files.FILE_KEY_LINKIDS, L_FILE_KEY_LINKIDS, bk_linkids);
+   RoxieKeyBuild.Mac_SK_Move_To_Built(L_FILE_KEY_LINKIDS, dx.Files.FILE_KEY_LINKIDS, move1_linkids);
+   RoxieKeyBuild.Mac_SK_Move_V3(dx.Files.FILE_KEY_LINKIDS, 'Q', move2_linkids, filedate);
 
-RoxieKeyBuild.Mac_SK_Move_To_Built('~thor_data400::key::ecrashv2::' +filedate+'::deltadate'
-                                  ,'~thor_data400::key::ecrashv2_deltadate'
-								  ,movedeltadate);									
-									
-RoxieKeyBuild.Mac_SK_Move_To_Built('~thor_data400::key::eCrashv2::' +filedate+'::PrefName_State'
-																		,'~thor_data400::key::eCrashv2_PrefName_State'
-																		,movePrefName_State);		
-RoxieKeyBuild.Mac_SK_Move_To_Built('~thor_data400::key::ecrashv2::' +filedate+'::agency'
-                                  ,'~thor_data400::key::ecrashv2_agency'
-								  ,moveagency);
-									
-//BuyCrash New keys								
-RoxieKeyBuild.Mac_SK_Move_To_Built('~thor_data400::key::ecrashv2::' +filedate+'::dlnnbrdlstate'
-                                  ,'~thor_data400::key::ecrashv2_dlnnbrdlstate'
-								  ,movedlnnbrdlstate);
-RoxieKeyBuild.Mac_SK_Move_To_Built('~thor_data400::key::ecrashv2::' +filedate+'::licenseplatenbr'
-                                  ,'~thor_data400::key::ecrashv2_licenseplatenbr'
-								  ,movelicenseplatenbr);
-RoxieKeyBuild.Mac_SK_Move_To_Built('~thor_data400::key::ecrashv2::' +filedate+'::officerbadgenbr'
-                                  ,'~thor_data400::key::ecrashv2_officerbadgenbr'
-								  ,moveofficerbadgenbr);
-RoxieKeyBuild.Mac_SK_Move_To_Built('~thor_data400::key::ecrashv2::' +filedate+'::vinnbr'
-                                  ,'~thor_data400::key::ecrashv2_vinnbr'
-								  ,movevinnbr);
-									
-//Analytics
-RoxieKeyBuild.Mac_SK_Move_To_Built('~thor_data400::key::ecrashV2::' +filedate+'::analytics_byAgencyID'
-                                  ,'~thor_data400::key::ecrashv2::analytics_byAgencyID'
-								  ,moveAgencyID);
-RoxieKeyBuild.Mac_SK_Move_To_Built('~thor_data400::key::ecrashv2::' +filedate+'::analytics_byDOW'
-                                  ,'~thor_data400::key::ecrashV2::analytics_byDOW'
-								  ,moveDOW);
-RoxieKeyBuild.Mac_SK_Move_To_Built('~thor_data400::key::ecrashv2::' +filedate+'::analytics_byMOY'
-                                  ,'~thor_data400::key::ecrashV2::analytics_byMOY'
-								  ,moveMOY);
+// ########################################################################### 
+//           UNRESTRICTED ACCNBRV1 KEY
+// ########################################################################## 
+   L_FILE_KEY_UNRESTRICTED_ACCNBRV1 := dx.Files.KEY_PREFIX + '::' + filedate + '::' + dx.Files.UNRESTRICTED_ACCNBRV1_SUFFIX;
+   RoxieKeybuild.MAC_build_logical(dx.KEY_UNRESTRICTEDACCNBRV1, mod_PrepEcrashKeys().Unrestricted_dep_accnbr_base, dx.Files.FILE_KEY_UNRESTRICTED_ACCNBRV1, L_FILE_KEY_UNRESTRICTED_ACCNBRV1, bk_unrestricted_accnbrv1);
+   RoxieKeyBuild.Mac_SK_Move_To_Built(L_FILE_KEY_UNRESTRICTED_ACCNBRV1, dx.Files.FILE_KEY_UNRESTRICTED_ACCNBRV1, move1_unrestricted_accnbrv1);
+   RoxieKeyBuild.Mac_SK_Move_V3(dx.Files.FILE_KEY_UNRESTRICTED_ACCNBRV1, 'Q', move2_unrestricted_accnbrv1, filedate);
+	
+// ########################################################################### 
+//                   DELTADATE KEY
+// ########################################################################## 	 
+   L_FILE_KEY_DELTADATE := dx.Files.KEY_PREFIX + '::' + filedate + '::' + dx.Files.DELTA_DATE_SUFFIX;
+   RoxieKeybuild.MAC_build_logical(dx.KEY_DELTADATE, mod_PrepEcrashKeys().DateFile, dx.Files.FILE_KEY_DELTA_DATE, L_FILE_KEY_DELTADATE, bk_deltadate);
+   RoxieKeyBuild.Mac_SK_Move_To_Built(L_FILE_KEY_DELTADATE, dx.Files.FILE_KEY_DELTA_DATE, move1_deltadate);
+   RoxieKeyBuild.Mac_SK_Move_V3(dx.Files.FILE_KEY_DELTA_DATE, 'Q', move2_deltadate, filedate);
+	 
+// ########################################################################### 
+//                   AGENCY KEY
+// ########################################################################## 
+   L_FILE_KEY_AGENCY := dx.Files.KEY_PREFIX + '::' + filedate + '::' + dx.Files.AGENCY_SUFFIX;
+   RoxieKeybuild.MAC_build_logical(dx.KEY_AGENCY, mod_PrepEcrashKeys().AgencyBase, dx.Files.FILE_KEY_AGENCY, L_FILE_KEY_AGENCY, bk_agency);
+   RoxieKeyBuild.Mac_SK_Move_To_Built(L_FILE_KEY_AGENCY, dx.Files.FILE_KEY_AGENCY, move1_agency);
+   RoxieKeyBuild.Mac_SK_Move_V3(dx.Files.FILE_KEY_AGENCY, 'Q', move2_agency, filedate);
+	
+// ########################################################################### 
+//                   PHOTO ID KEY
+// ########################################################################## 
+   L_FILE_KEY_PHOTO_ID := dx.Files.KEY_PREFIX + '::' + filedate + '::' + dx.Files.PHOTO_ID_SUFFIX;
+   RoxieKeybuild.MAC_build_logical(dx.KEY_PHOTOID, mod_PrepEcrashKeys().ds_PhotoSuperCmbnd, dx.Files.FILE_KEY_PHOTO_ID, L_FILE_KEY_PHOTO_ID, bk_photoid);
+   RoxieKeyBuild.Mac_SK_Move_To_Built(L_FILE_KEY_PHOTO_ID, dx.Files.FILE_KEY_PHOTO_ID, move1_photoid);
+   RoxieKeyBuild.Mac_SK_Move_V3(dx.Files.FILE_KEY_PHOTO_ID, 'Q', move2_photoid, filedate);
+	
+// ########################################################################### 
+//                   REPORT ID KEY
+// ########################################################################## 
+   L_FILE_KEY_REPORT_ID := dx.Files.KEY_PREFIX + '::' + filedate + '::' + dx.Files.REPORT_ID_SUFFIX;
+   RoxieKeybuild.MAC_build_logical(dx.KEY_REPORTID, mod_PrepEcrashKeys().dep_Report_base, dx.Files.FILE_KEY_REPORT_ID, L_FILE_KEY_REPORT_ID, bk_reportid);
+   RoxieKeyBuild.Mac_SK_Move_To_Built(L_FILE_KEY_REPORT_ID, dx.Files.FILE_KEY_REPORT_ID, move1_reportid);
+   RoxieKeyBuild.Mac_SK_Move_V3(dx.Files.FILE_KEY_REPORT_ID, 'Q', move2_reportid, filedate);
+	
+// ########################################################################### 
+//                   SUPPLEMENTAL KEY
+// ########################################################################## 
+   L_FILE_KEY_SUPPLEMENTAL := dx.Files.KEY_PREFIX + '::' + filedate + '::' + dx.Files.SUPPLEMENTAL_SUFFIX;
+   RoxieKeybuild.MAC_build_logical(dx.KEY_SUPPLEMENTAL, mod_PrepEcrashKeys().ded_base, dx.Files.FILE_KEY_SUPPLEMENTAL, L_FILE_KEY_SUPPLEMENTAL, bk_supplemental);
+   RoxieKeyBuild.Mac_SK_Move_To_Built(L_FILE_KEY_SUPPLEMENTAL, dx.Files.FILE_KEY_SUPPLEMENTAL, move1_supplemental);
+   RoxieKeyBuild.Mac_SK_Move_V3(dx.Files.FILE_KEY_SUPPLEMENTAL, 'Q', move2_supplemental, filedate);
+	
+// ########################################################################### 
+//                   DLN NBR DL STATE KEY
+// ########################################################################## 
+   L_FILE_KEY_DLNNBR_DLSTATE := dx.Files.KEY_PREFIX + '::' + filedate + '::' + dx.Files.DLN_NBR_DL_STATE_SUFFIX;
+   RoxieKeybuild.MAC_build_logical(dx.KEY_DLNNBRDLSTATE, mod_PrepEcrashSearchKeys().uSlimDlnNbrDLState, dx.Files.FILE_KEY_DLN_NBR_DL_STATE, L_FILE_KEY_DLNNBR_DLSTATE, bk_dlnnbrdlstate);
+   RoxieKeyBuild.Mac_SK_Move_To_Built(L_FILE_KEY_DLNNBR_DLSTATE, dx.Files.FILE_KEY_DLN_NBR_DL_STATE, move1_dlnnbrdlstate);
+   RoxieKeyBuild.Mac_SK_Move_V3(dx.Files.FILE_KEY_DLN_NBR_DL_STATE, 'Q', move2_dlnnbrdlstate, filedate);
+	 
+// ########################################################################### 
+//                      VIN NBR KEY
+// ########################################################################## 
+   L_FILE_KEY_VINNBR := dx.Files.KEY_PREFIX + '::' + filedate + '::' + dx.Files.VINNBR_SUFFIX;
+   RoxieKeybuild.MAC_build_logical(dx.KEY_VINNBR, mod_PrepEcrashSearchKeys().uSlimVinNbr, dx.Files.FILE_KEY_VINNBR, L_FILE_KEY_VINNBR, bk_vinnbr);
+   RoxieKeyBuild.Mac_SK_Move_To_Built(L_FILE_KEY_VINNBR, dx.Files.FILE_KEY_VINNBR, move1_vinnbr);
+   RoxieKeyBuild.Mac_SK_Move_V3(dx.Files.FILE_KEY_VINNBR, 'Q', move2_vinnbr, filedate);
+	 
+// ########################################################################### 
+//                  LICENSE PLATE NBR KEY
+// ########################################################################## 
+   L_FILE_KEY_LICENSE_PLATENBR := dx.Files.KEY_PREFIX + '::' + filedate + '::' + dx.Files.LICENSE_PLATE_NBR_SUFFIX;
+   RoxieKeybuild.MAC_build_logical(dx.KEY_LICENSEPLATENBR, mod_PrepEcrashSearchKeys().uSlimLicensePlateNbr, dx.Files.FILE_KEY_LICENSE_PLATE_NBR, L_FILE_KEY_LICENSE_PLATENBR, bk_licenseplatenbr);
+   RoxieKeyBuild.Mac_SK_Move_To_Built(L_FILE_KEY_LICENSE_PLATENBR, dx.Files.FILE_KEY_LICENSE_PLATE_NBR, move1_licenseplatenbr);
+   RoxieKeyBuild.Mac_SK_Move_V3(dx.Files.FILE_KEY_LICENSE_PLATE_NBR, 'Q', move2_licenseplatenbr, filedate);
 
-RoxieKeyBuild.Mac_SK_Move_To_Built('~thor_data400::key::ecrashv2::' +filedate+'::analytics_byHOD'
-                                  ,'~thor_data400::key::ecrashV2::analytics_byHOD'
-								  ,moveHOD);
+// ########################################################################### 
+//                  OFFICER BADGE NBR KEY
+// ########################################################################## 
+   L_FILE_KEY_OFFICER_BADGENBR := dx.Files.KEY_PREFIX + '::' + filedate + '::' + dx.Files.OFFICER_BADGE_NBR_STATE_SUFFIX;
+   RoxieKeybuild.MAC_build_logical(dx.KEY_OFFICERBADGENBR, mod_PrepEcrashSearchKeys().uSlimOfficerBadgeNbr, dx.Files.FILE_KEY_OFFICER_BADGE_NBR_STATE, L_FILE_KEY_OFFICER_BADGENBR, bk_officerbadgenbr);
+   RoxieKeyBuild.Mac_SK_Move_To_Built(L_FILE_KEY_OFFICER_BADGENBR, dx.Files.FILE_KEY_OFFICER_BADGE_NBR_STATE, move1_officerbadgenbr);
+   RoxieKeyBuild.Mac_SK_Move_V3(dx.Files.FILE_KEY_OFFICER_BADGE_NBR_STATE, 'Q', move2_officerbadgenbr, filedate);
 
-RoxieKeyBuild.Mac_SK_Move_To_Built('~thor_data400::key::ecrashv2::' +filedate+'::analytics_byCollisionType'
-                                  ,'~thor_data400::key::ecrashV2::analytics_byCollisionType'
-								  ,moveCol);
+// ########################################################################### 
+//                  LAST NAME KEY
+// ########################################################################## 
+   L_FILE_KEY_LASTNAME := dx.Files.KEY_PREFIX + '::' + filedate + '::' + dx.Files.LAST_NAME_STATE_SUFFIX;
+   RoxieKeybuild.MAC_build_logical(dx.KEY_LASTNAME, mod_PrepEcrashSearchKeys().uSlimLastName, dx.Files.FILE_KEY_LAST_NAME_STATE, L_FILE_KEY_LASTNAME, bk_lastname);
+   RoxieKeyBuild.Mac_SK_Move_To_Built(L_FILE_KEY_LASTNAME, dx.Files.FILE_KEY_LAST_NAME_STATE, move1_lastname);
+   RoxieKeyBuild.Mac_SK_Move_V3(dx.Files.FILE_KEY_LAST_NAME_STATE, 'Q', move2_lastname, filedate);
 
-RoxieKeyBuild.Mac_SK_Move_To_Built('~thor_data400::key::ecrashv2::' +filedate+'::analytics_byInter'
-                                  ,'~thor_data400::key::ecrashV2::analytics_byInter'
-								  ,moveinter);
+// ########################################################################### 
+//              PREF NAME STATE KEY
+// ########################################################################## 
+   L_FILE_KEY_PREFNAME := dx.Files.KEY_PREFIX + '::' + filedate + '::' + dx.Files.PREFNAME_STATE_SUFFIX;
+   RoxieKeybuild.MAC_build_logical(dx.KEY_PREFNAMESTATE, mod_PrepEcrashSearchKeys().uSlimPrefNameState, dx.Files.FILE_KEY_PREFNAME_STATE, L_FILE_KEY_PREFNAME, bk_prefname_state);
+   RoxieKeyBuild.Mac_SK_Move_To_Built(L_FILE_KEY_PREFNAME, dx.Files.FILE_KEY_PREFNAME_STATE, move1_prefname_state);
+   RoxieKeyBuild.Mac_SK_Move_V3(dx.Files.FILE_KEY_PREFNAME_STATE, 'Q', move2_prefname_state, filedate);
 
-RoxieKeyBuild.Mac_SK_Move_To_Built('~thor_data400::key::ecrashv2::' +filedate+'::agencyId_sentdate'
-                                  ,'~thor_data400::key::ecrashv2_agencyId_sentdate'
-								  ,moveagencyId_sentdate);
-									
-RoxieKeyBuild.Mac_SK_Move_To_Built('~thor_data400::key::eCrashv2::' +filedate+'::StAndLocation'
-																		,'~thor_data400::key::eCrashv2_StAndLocation'
-																		,moveStAndLocation);	
-RoxieKeyBuild.Mac_SK_Move_To_Built('~thor_data400::key::eCrashv2::' +filedate+'::ReportLinkId'
-																		,'~thor_data400::key::eCrashv2_ReportLinkId'
-																		,moveReportLinkId);		
-RoxieKeyBuild.Mac_SK_Move_To_Built('~thor_data400::key::eCrashv2::' +filedate+'::LastName_state'
-																		,'~thor_data400::key::eCrashv2_LastName_state'
-																		,moveLastName);																			
-RoxieKeyBuild.Mac_SK_Move_To_Built('~thor_data400::key::eCrashv2::' +filedate+'::PhotoId'
-																		,'~thor_data400::key::eCrashv2_PhotoId'
-																		,movePhotoId);								
-move_build_keys := parallel(move10,move11,move11V1,move11V1_1,move12,move13,move14,move15,move18,move1,move2,move4,move6,move7,move8,moveAgencyID,
-                            moveDOW,moveMOY,moveHOD,moveCol,moveinter,moveSupplemental,moveReportId, movePrefName_State,moveagency,moveagencyId_sentdate,
-														moveStAndLocation,moveReportLinkId,moveLastName, movePhotoId, movedlnnbrdlstate, movelicenseplatenbr, moveofficerbadgenbr, movevinnbr);
+// ########################################################################### 
+//              REPORT LINK ID KEY
+// ########################################################################## 
+   L_FILE_KEY_REPORT_LINKID := dx.Files.KEY_PREFIX + '::' + filedate + '::' + dx.Files.REPORT_LINKID_SUFFIX;
+   RoxieKeybuild.MAC_build_logical(dx.KEY_REPORTLINKID, mod_PrepEcrashSearchKeys().uSlimReportLinkId, dx.Files.FILE_KEY_REPORT_LINKID, L_FILE_KEY_REPORT_LINKID, bk_reportlinkid);
+   RoxieKeyBuild.Mac_SK_Move_To_Built(L_FILE_KEY_REPORT_LINKID, dx.Files.FILE_KEY_REPORT_LINKID, move1_reportlinkid);
+   RoxieKeyBuild.Mac_SK_Move_V3(dx.Files.FILE_KEY_REPORT_LINKID, 'Q', move2_reportlinkid, filedate);
 
-// Move keys to QA
-RoxieKeyBuild.Mac_SK_Move_V3('~thor_data400::key::ecrashv2_did', 'Q', moveq10);
-RoxieKeyBuild.Mac_SK_Move_V3('~thor_data400::key::ecrashv2_accnbr','Q', moveq11);
-RoxieKeyBuild.Mac_SK_Move_V3('~thor_data400::key::ecrashv2_accnbrv1','Q', moveq11v1);
-RoxieKeyBuild.Mac_SK_Move_V3('~thor_data400::key::ecrashv2_Unrestricted_accnbrv1','Q', moveq11v1_1);
-RoxieKeyBuild.Mac_SK_Move_V3('~thor_data400::key::ecrashv2_bdid',  'Q', moveq12);
-RoxieKeyBuild.Mac_SK_Move_V3('~thor_data400::key::ecrashv2_dlnbr', 'Q', moveq13);
-RoxieKeyBuild.Mac_SK_Move_V3('~thor_data400::key::ecrashv2_tagnbr','Q', moveq14);
-RoxieKeyBuild.Mac_SK_Move_V3('~thor_data400::key::ecrashv2_vin',   'Q', moveq15);
-RoxieKeyBuild.Mac_SK_Move_V3('~thor_data400::key::ecrashv2_vin7',   'Q', moveq17);
-RoxieKeyBuild.Mac_SK_Move_V3('~thor_data400::key::ecrashv2_dol',   'Q', moveq18);
-RoxieKeyBuild.Mac_SK_Move_V3('~thor_data400::key::ecrashv2_partialaccnbr',   'Q', moveq19);
-RoxieKeyBuild.Mac_SK_Move_V3('~thor_data400::key::ecrashv2_linkids',   'Q', moveq20);
-RoxieKeyBuild.Mac_SK_Move_V3('~thor_data400::key::ecrash0',    'Q', moveq1);
-RoxieKeyBuild.Mac_SK_Move_V3('~thor_data400::key::ecrash1',    'Q', moveq2);
-RoxieKeyBuild.Mac_SK_Move_V3('~thor_data400::key::ecrash2v',   'Q', moveq3);
-RoxieKeyBuild.Mac_SK_Move_V3('~thor_data400::key::ecrash3v',   'Q', moveq4);
-RoxieKeyBuild.Mac_SK_Move_V3('~thor_data400::key::ecrash4',    'Q', moveq5);
-RoxieKeyBuild.Mac_SK_Move_V3('~thor_data400::key::ecrash5',    'Q', moveq6);
-RoxieKeyBuild.Mac_SK_Move_V3('~thor_data400::key::ecrash6',    'Q', moveq7);
-RoxieKeyBuild.Mac_SK_Move_V3('~thor_data400::key::ecrash7',    'Q', moveq8);
-RoxieKeyBuild.Mac_SK_Move_V3('~thor_data400::key::ecrashv2::analytics_byAgencyID',    'Q', moveqAgencyID);
-RoxieKeyBuild.Mac_SK_Move_V3('~thor_data400::key::ecrashV2::analytics_byDOW',    'Q', moveqDOW);
-RoxieKeyBuild.Mac_SK_Move_V3('~thor_data400::key::ecrashV2::analytics_byMOY',    'Q', moveqMOY);
-RoxieKeyBuild.Mac_SK_Move_V3('~thor_data400::key::ecrashV2::analytics_byHOD',    'Q', moveqHOD);
-RoxieKeyBuild.Mac_SK_Move_V3('~thor_data400::key::ecrashV2::analytics_byCollisionType',    'Q', moveqCollision);
-RoxieKeyBuild.Mac_SK_Move_V3('~thor_data400::key::ecrashV2::analytics_byInter',    'Q', moveqInter);
-RoxieKeyBuild.Mac_SK_Move_V3('~thor_data400::key::ecrashv2_Supplemental',    'Q', moveqSupplemental);
-RoxieKeyBuild.Mac_SK_Move_V3('~thor_data400::key::ecrashv2_ReportId',    'Q', moveqReportId);
-RoxieKeyBuild.Mac_SK_Move_V3('~thor_data400::key::ecrashv2_deltadate',    'Q', moveqdeltadate);
-RoxieKeyBuild.Mac_SK_Move_V3('~thor_data400::key::eCrashv2_PrefName_State',	'Q', moveqPrefName_State);									
-RoxieKeyBuild.Mac_SK_Move_V3('~thor_data400::key::ecrashv2_agencyId_sentdate','Q', moveqagencyId_sentdate);		
-RoxieKeyBuild.Mac_SK_Move_V3('~thor_data400::key::eCrashv2_StAndLocation',	'Q', moveqStAndLocation);	
-RoxieKeyBuild.Mac_SK_Move_V3('~thor_data400::key::eCrashv2_ReportLinkId',	'Q', moveqReportLinkId);													
-RoxieKeyBuild.Mac_SK_Move_V3('~thor_data400::key::eCrashv2_LastName_state',	'Q', moveqLastName);
-RoxieKeyBuild.Mac_SK_Move_V3('~thor_data400::key::eCrashv2_PhotoId',	'Q', moveqPhoto);
-RoxieKeyBuild.Mac_SK_Move_V3('~thor_data400::key::ecrashv2_agency','Q', moveqagency);
-//BuyCrash New keys
-RoxieKeyBuild.Mac_SK_Move_V3('~thor_data400::key::ecrashv2_dlnnbrdlstate','Q', moveqdlnnbrdlstate);
-RoxieKeyBuild.Mac_SK_Move_V3('~thor_data400::key::ecrashv2_licenseplatenbr','Q', moveqlicenseplatenbr);
-RoxieKeyBuild.Mac_SK_Move_V3('~thor_data400::key::ecrashv2_officerbadgenbr','Q', moveqofficerbadgenbr);
-RoxieKeyBuild.Mac_SK_Move_V3('~thor_data400::key::ecrashv2_vinnbr','Q', moveqvinnbr);
-move_qa_keys := parallel(moveq10,moveq11,moveq11v1,moveq11v1_1,moveq12,moveq13,moveq14,moveq15,moveq18,moveq1,moveq2,moveq4,moveq6,moveq7,moveq8,moveqAgencyID,moveqDOW,
-                         moveqMOY,moveqHOD,moveqCollision,moveqInter,moveqSupplemental,moveqReportId, moveqPrefName_State,moveqagencyId_sentdate,moveqStAndLocation,
-												 moveqReportLinkId,moveqLastName,moveqPhoto,moveqagency, moveqdlnnbrdlstate, moveqlicenseplatenbr, moveqofficerbadgenbr, moveqvinnbr);
+// ########################################################################### 
+//              ST AND LOCATION KEY
+// ########################################################################## 
+   L_FILE_KEY_ST_AND_LOCATION := dx.Files.KEY_PREFIX + '::' + filedate + '::' + dx.Files.ST_AND_LOCATION_SUFFIX;
+   RoxieKeybuild.MAC_build_logical(dx.KEY_STANDLOCATION, mod_PrepEcrashSearchKeys().uAccidentLocation, dx.Files.FILE_KEY_ST_AND_LOCATION, L_FILE_KEY_ST_AND_LOCATION, bk_standlocation);
+   RoxieKeyBuild.Mac_SK_Move_To_Built(L_FILE_KEY_ST_AND_LOCATION, dx.Files.FILE_KEY_ST_AND_LOCATION, move1_standlocation);
+   RoxieKeyBuild.Mac_SK_Move_V3(dx.Files.FILE_KEY_ST_AND_LOCATION, 'Q', move2_standlocation, filedate);
+
+// ########################################################################### 
+//             AGENCY ID SENT DATE KEY
+// ########################################################################## 
+   L_FILE_KEY_AGENCYID_SENTDATE := dx.Files.KEY_PREFIX + '::' + filedate + '::' + dx.Files.AGENCY_ID_SENT_DATE_STATE_SUFFIX;
+   RoxieKeybuild.MAC_build_logical(dx.KEY_AGENCYIDSENTDATE, mod_PrepEcrashSearchKeys().tbSlimAgencyIdSentdate, dx.Files.FILE_KEY_AGENCY_ID_SENT_DATE_STATE, L_FILE_KEY_AGENCYID_SENTDATE, bk_agencyid_sentdate);
+   RoxieKeyBuild.Mac_SK_Move_To_Built(L_FILE_KEY_AGENCYID_SENTDATE, dx.Files.FILE_KEY_AGENCY_ID_SENT_DATE_STATE, move1_agencyid_sentdate);
+   RoxieKeyBuild.Mac_SK_Move_V3(dx.Files.FILE_KEY_AGENCY_ID_SENT_DATE_STATE, 'Q', move2_agencyid_sentdate, filedate);
 
 
-do_all:= sequential(	
-          FLAccidents_Ecrash.CreateSuperFiles,
-          FLAccidents_Ecrash.fn_Validate,
-          FLAccidents_Ecrash.Proc_Build_Alpha(filedate),			
-					build_keys
-					,move_build_keys
-					,move_qa_keys
-					,bk_partialaccnbr
-					,move19,moveq19
-					,move20,moveq20
-					,bk_vin7
-					,move17
-					,moveq17
-					,bk2
-					,move3
-					,moveq3
-					,bk4
-					,move5
-					,moveq5
-					,bk_deltadate
-					,movedeltadate
-					,moveqdeltadate
-					,FLAccidents_Ecrash.proc_build_ecrashV2_autokey(filedate)
-					); 
-return do_all;
+build_keys := parallel(bk_ecrash0, bk_ecrash1, bk_ecrash2, bk_ecrash3, bk_ecrash4, bk_ecrash5, bk_ecrash6, bk_ecrash7,                 //EcrashFLAccidentPRKeys
+                       bk_accnbr, bk_accnbrv1, bk_partialaccnbr, bk_bdid, bk_did, bk_dlnbr, bk_tagnbr, bk_vin, bk_vin7,                //EcrashPRKeys
+											 bk_agencyid, bk_ct, bk_dow, bk_hod, bk_inter, bk_moy,                                                           //EcrashAnalyticsKeys                                           
+											 bk_dol, bk_linkids, bk_unrestricted_accnbrv1, bk_deltadate, bk_agency, bk_photoid, bk_reportid, bk_supplemental,//EcrashKeys
+											 bk_dlnnbrdlstate, bk_vinnbr, bk_licenseplatenbr, bk_officerbadgenbr, bk_lastname, bk_prefname_state, bk_reportlinkid, bk_standlocation, bk_agencyid_sentdate);//EcrashSearchKeys
+							
+move_built_keys := parallel(move1_ecrash0, move1_ecrash1, move1_ecrash2, move1_ecrash3, move1_ecrash4, move1_ecrash5, move1_ecrash6, move1_ecrash7,
+                      move1_accnbr, move1_accnbrv1, move1_partialaccnbr, move1_bdid, move1_did, move1_dlnbr, move1_tagnbr, move1_vin, move1_vin7,
+										  move1_agencyid, move1_ct, move1_dow, move1_hod, move1_inter, move1_moy,
+										  move1_dol, move1_linkids, move1_unrestricted_accnbrv1, move1_deltadate, move1_agency, move1_photoid, move1_reportid, move1_supplemental,
+										  move1_dlnnbrdlstate, move1_vinnbr, move1_licenseplatenbr, move1_officerbadgenbr, move1_lastname, move1_prefname_state, move1_reportlinkid, move1_standlocation, move1_agencyid_sentdate);
+											
+move_qa_keys := parallel(move2_ecrash0, move2_ecrash1, move2_ecrash2, move2_ecrash3, move2_ecrash4, move2_ecrash5, move2_ecrash6, move2_ecrash7,
+                      move2_accnbr, move2_accnbrv1, move2_partialaccnbr, move2_bdid, move2_did, move2_dlnbr, move2_tagnbr, move2_vin, move2_vin7,
+										  move2_agencyid, move2_ct, move2_dow, move2_hod, move2_inter, move2_moy,
+										  move2_dol, move2_linkids, move2_unrestricted_accnbrv1, move2_deltadate, move2_agency, move2_photoid, move2_reportid, move2_supplemental,
+										  move2_dlnnbrdlstate, move2_vinnbr, move2_licenseplatenbr, move2_officerbadgenbr, move2_lastname, move2_prefname_state, move2_reportlinkid, move2_standlocation, move2_agencyid_sentdate);
+
+build_ecrash_keys_all := sequential(	
+                                    FLAccidents_Ecrash.CreateSuperFiles,
+                                    FLAccidents_Ecrash.fn_Validate,
+                                    FLAccidents_Ecrash.Proc_Build_Alpha(filedate),			
+					                          build_keys,
+					                          move_built_keys,
+					                          move_qa_keys,
+					                          FLAccidents_Ecrash.proc_build_ecrashV2_autokey(filedate)
+					                          );
+					
+RETURN build_ecrash_keys_all;
 												   
-end;
+END;

@@ -1,4 +1,4 @@
-IMPORT AccountMonitoring;
+﻿IMPORT AccountMonitoring;
 
 EXPORT config_UpdateSuperFiles(AccountMonitoring.types.productMask product_mask = 
                                  AccountMonitoring.types.productMask.allProducts,
@@ -97,7 +97,7 @@ end;
                     {
                       AccountMonitoring.product_files.Inquiry.inquiryUpdLinkid_Roxie_SuperFile, //(thor_data400::key::inquiry_table::qa::linkids_update)
                       AccountMonitoring.product_files.Inquiry.inquiryUpdLinkid_superkey_monitor, //(batchr3::monitor::inquiry_table::linkids_qa)
-                      AccountMonitoring.types.productMask.Inquiry
+                      AccountMonitoring.types.productMask.Inquiry 
                     },
                     {
                       AccountMonitoring.product_files.phonefeedback.phonefeedback_phone_keyname, //(thor_data400::key::phonesFeedback::qa::phone)
@@ -107,17 +107,40 @@ end;
                     ,{
                       AccountMonitoring.product_files.Phone.phones_type_superfile,
                       AccountMonitoring.product_files.Phone.phones_type_for_superkey_monitor,
-                      AccountMonitoring.types.productMask.phone
+                      AccountMonitoring.types.productMask.phone +
+                      AccountMonitoring.types.productMask.phoneownership
                     }
                     ,{
                       AccountMonitoring.product_files.Phone.phones_lerg6_superfile,
                       AccountMonitoring.product_files.Phone.Phones_Lerg6_for_superkey_monitor,
-                      AccountMonitoring.types.productMask.phone
+                      AccountMonitoring.types.productMask.phone +
+                      AccountMonitoring.types.productMask.phoneownership
                     }
                     ,{
                       AccountMonitoring.product_files.Phone.carrier_reference_superfile,
                       AccountMonitoring.product_files.Phone.carrier_reference_for_superkey_monitor,
-                      AccountMonitoring.types.productMask.phone
+                      AccountMonitoring.types.productMask.phone +
+                      AccountMonitoring.types.productMask.phoneownership
+                    },
+                    {
+                      AccountMonitoring.product_files.PhoneOwnership.phones_transaction_superfile,
+                      AccountMonitoring.product_files.PhoneOwnership.phones_transaction_for_superkey_monitor,
+                      AccountMonitoring.types.productMask.phoneownership
+                    }
+                    ,{
+                      AccountMonitoring.product_files.Property.Property_search_Roxiesuperfile, //(thor_data400::key::ln_propertyv2::qa::search.fid)
+                      AccountMonitoring.product_files.Property.Property_search_keyname_monitor, //(monitor::LN_PropertyV2::Search_fid)
+                      AccountMonitoring.types.productMask.property 
+                    }
+                    ,{
+                      AccountMonitoring.product_files.Property.Property_deed_Roxiesuperfile, //(thor_data400::key::ln_propertyv2::qa::addlfaresdeed.fid)
+                      AccountMonitoring.product_files.Property.Property_deed_keyname_monitor, //(monitor::LN_PropertyV2::addlfaresdeed.fid)
+                      AccountMonitoring.types.productMask.property 
+                    }
+                    ,{
+                      AccountMonitoring.product_files.Property.Property_SearchLinkid_Roxie_superfile, //(thor_data400::key::ln_propertyv2::qa::search.linkids)
+                      AccountMonitoring.product_files.Property.Property_SearchLinkid_keyname_monitor, //(monitor::LN_PropertyV2::search.linkids)
+                      AccountMonitoring.types.productMask.property 
                     }
 				            ],AccountMonitoring.layouts.UPDATE_SOURCE.roxie_monitor_superfile_layout);
                          

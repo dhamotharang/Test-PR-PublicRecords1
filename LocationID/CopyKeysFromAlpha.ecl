@@ -17,6 +17,9 @@ EXPORT CopyKeysFromAlpha(
             + LocationID_xLink.keynames(pversion).dall_filenames 
             ;
   
+	update_dopsV2  := dops.updateversion('LocationIDKeys',trim(pversion,left,right),LocationID_Build.email_list,,'N') : INDEPENDENT;
+	orbitUpdate    := Orbit3.proc_Orbit3_CreateBuild('LocationIDKeys',trim(pversion,left,right),'N') : INDEPENDENT;	
+	
   return sequential(
 
 		tools.fun_CopyRename(
@@ -34,9 +37,9 @@ EXPORT CopyKeysFromAlpha(
 			, //pFileDescription
 			,pIsTesting	
 			,pSrcDali
-		);
+		)
 		 
-		tools.mod_PromoteBuild(
+		,tools.mod_PromoteBuild(
 			 pversion
 			,myfiles // pBuildFilenames
 			,pFilter
@@ -50,7 +53,10 @@ EXPORT CopyKeysFromAlpha(
 			, // pCleanupFilter
 			, // pIsDeltaBuild
 			, // pForceGenPromotion
-		).new2qa;
+		).new2qa
+
+		,if(_Control.ThisEnvironment.Name = 'Prod_Thor',evaluate(update_dopsV2),output('Not a prod environment'))
+	  ,if(_Control.ThisEnvironment.Name = 'Prod_Thor',evaluate(orbitUpdate),output('Not a prod environment'))
 
 	); // end sequential
 

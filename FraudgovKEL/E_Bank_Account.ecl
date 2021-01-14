@@ -34,9 +34,9 @@ EXPORT E_Bank_Account := MODULE
   EXPORT NullKeyVal := TRIM((STRING)'') + '|' + TRIM((STRING)'');
   SHARED __Table := TABLE(__All_Trim(KeyVal <> NullKeyVal),__TabRec,KeyVal,MERGE);
   SHARED NullLookupRec := DATASET([{NullKeyVal,1,0}],__TabRec);
-  EXPORT Lookup := NullLookupRec + PROJECT(__Table,TRANSFORM(__TabRec,SELF.UID:=COUNTER,SELF:=LEFT)) : PERSIST('~temp::KEL::FraudgovKEL::Bank_Account::UidLookup',EXPIRE(7));
-  EXPORT UID_IdToText := INDEX(Lookup,{UID},{Lookup},'~temp::KEL::IDtoT::FraudgovKEL::Bank_Account');
-  EXPORT UID_TextToId := INDEX(Lookup,{ht:=HASH32(KeyVal)},{Lookup},'~temp::KEL::TtoID::FraudgovKEL::Bank_Account');
+  EXPORT Lookup := NullLookupRec + PROJECT(__Table,TRANSFORM(__TabRec,SELF.UID:=COUNTER,SELF:=LEFT)) : PERSIST('~fraudgov::temp::KEL::FraudgovKEL::Bank_Account::UidLookup',EXPIRE(7));
+  EXPORT UID_IdToText := INDEX(Lookup,{UID},{Lookup},'~fraudgov::temp::KEL::IDtoT::FraudgovKEL::Bank_Account');
+  EXPORT UID_TextToId := INDEX(Lookup,{ht:=HASH32(KeyVal)},{Lookup},'~fraudgov::temp::KEL::TtoID::FraudgovKEL::Bank_Account');
   EXPORT BuildAll := PARALLEL(BUILDINDEX(UID_IdToText,OVERWRITE),BUILDINDEX(UID_TextToId,OVERWRITE));
   EXPORT GetText(KEL.typ.uid i) := UID_IdToText(UID=i)[1];
   EXPORT GetId(STRING s) := UID_TextToId(ht=HASH32(s),KeyVal=s)[1];
@@ -105,7 +105,7 @@ EXPORT E_Bank_Account := MODULE
     SELF := __r;
   END;
   EXPORT __PreResult := ROLLUP(HAVING(Bank_Account_Group,COUNT(ROWS(LEFT))=1),GROUP,Bank_Account__Single_Rollup(LEFT)) + ROLLUP(HAVING(Bank_Account_Group,COUNT(ROWS(LEFT))>1),GROUP,Bank_Account__Rollup(LEFT, ROWS(LEFT)));
-  EXPORT __Result := __CLEARFLAGS(__PreResult) : PERSIST('~temp::KEL::FraudgovKEL::Bank_Account::Result',EXPIRE(7));
+  EXPORT __Result := __CLEARFLAGS(__PreResult) : PERSIST('~fraudgov::temp::KEL::FraudgovKEL::Bank_Account::Result',EXPIRE(7));
   EXPORT Result := __UNWRAP(__Result);
   EXPORT _r_Customer__SingleValue_Invalid := KEL.Intake.DetectMultipleValues(__PreResult,_r_Customer_);
   EXPORT _r_Bank__SingleValue_Invalid := KEL.Intake.DetectMultipleValues(__PreResult,_r_Bank_);

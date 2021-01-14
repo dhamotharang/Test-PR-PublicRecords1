@@ -5,7 +5,7 @@ IMPORT * FROM KEL011.Null;
 EXPORT B_Bank := MODULE
   SHARED VIRTUAL TYPEOF(B_Bank_1.__ENH_Bank_1) __ENH_Bank_1 := B_Bank_1.__ENH_Bank_1;
   SHARED __EE2740642 := __ENH_Bank_1;
-  EXPORT __ENH_Bank := __EE2740642 : PERSIST('~temp::KEL::FraudgovKEL::Bank::Annotated',EXPIRE(7));
+  EXPORT __ENH_Bank := __EE2740642 : PERSIST('~fraudgov::temp::KEL::FraudgovKEL::Bank::Annotated',EXPIRE(7));
   SHARED __EE4670612 := __ENH_Bank;
   SHARED IDX_Bank_UID_Layout := RECORD
     KEL.typ.uid UID;

@@ -1739,7 +1739,7 @@ EXPORT B_Social_Security_Number := MODULE
     SELF.Source_Customer_Count_ := KEL.Aggregates.CountN(__PP4546869.Source_Customers_);
     SELF := __PP4546869;
   END;
-  EXPORT __ENH_Social_Security_Number := PROJECT(__EE4546868,__ND4547314__Project(LEFT)) : PERSIST('~temp::KEL::FraudgovKEL::Social_Security_Number::Annotated',EXPIRE(7));
+  EXPORT __ENH_Social_Security_Number := PROJECT(__EE4546868,__ND4547314__Project(LEFT)) : PERSIST('~fraudgov::temp::KEL::FraudgovKEL::Social_Security_Number::Annotated',EXPIRE(7));
   SHARED __EE4670631 := __ENH_Social_Security_Number;
   SHARED IDX_Social_Security_Number_UID_Layout := RECORD
     KEL.typ.uid UID;

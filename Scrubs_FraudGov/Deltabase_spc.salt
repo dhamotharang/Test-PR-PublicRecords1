@@ -15,18 +15,18 @@ NAMESCOPE:Deltabase
 // FUZZY can be used to create new types of FUZZY linking
 FIELDTYPE:invalid_alpha:ALLOW(\NABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz):ONFAIL(BLANK)
 FIELDTYPE:invalid_alphanumeric:ALLOW(\ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789):SPACES( <>{}[]-^='`!+&,./#()_):ONFAIL(BLANK)
-FIELDTYPE:invalid_email:ALLOW(\-_.0123456789@ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz):ONFAIL(BLANK)
+FIELDTYPE:invalid_email:ALLOW(\-_.0123456789@ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz):ONFAIL(BLANK) 
 FIELDTYPE:invalid_date:ALLOW(\N0123456789):SPACES( ./:-):LEFTTRIM:ONFAIL(BLANK)
 FIELDTYPE:invalid_numeric:ALLOW(0123456789):ONFAIL(BLANK)
-FIELDTYPE:invalid_numeric_string:ALLOW(\N-0123456789):ONFAIL(BLANK)
+FIELDTYPE:invalid_numeric_string:ALLOW(\N-0123456789):ONFAIL(BLANK) 
 FIELDTYPE:invalid_real:ALLOW(-.,0123456789):ONFAIL(BLANK)
 FIELDTYPE:invalid_real_string:ALLOW(\N-.,0123456789):ONFAIL(BLANK)
-FIELDTYPE:invalid_zip:ALLOW(\N-0123456789):SPACES( -):LEFTTRIM:LENGTHS(2,5,9,10):ONFAIL(BLANK)
-FIELDTYPE:invalid_state:ALLOW(\ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz):LEFTTRIM:LENGTHS(2):ONFAIL(BLANK)
-FIELDTYPE:invalid_ssn:ALLOW(\N0123456789):SPACES( -):LEFTTRIM:LENGTHS(2,9..):ONFAIL(BLANK)
-FIELDTYPE:invalid_phone:ALLOW(\N0123456789):SPACES( +#()-):LEFTTRIM:LENGTHS(2,10..):ONFAIL(BLANK)
+FIELDTYPE:invalid_zip:ALLOW(\N-0123456789):SPACES( -):LEFTTRIM:LENGTHS(0,2,5,9,10):ONFAIL(BLANK)
+FIELDTYPE:invalid_state:ALLOW(\ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz):LEFTTRIM:LENGTHS(0,2):ONFAIL(BLANK)
+FIELDTYPE:invalid_ssn:ALLOW(\N0123456789):SPACES( -):LEFTTRIM:LENGTHS(0,2,9..):ONFAIL(BLANK)
+FIELDTYPE:invalid_phone:ALLOW(\N0123456789):SPACES( +#()-):LEFTTRIM:LENGTHS(0,2,10..):ONFAIL(BLANK)
 FIELDTYPE:invalid_ip:ALLOW(\N.x0123456789):SPACES( .):LEFTTRIM:ONFAIL(BLANK)
-FIELDTYPE:invalid_name:ALLOW(\NABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz):LEFTTRIM:SPACES( '):ONFAIL(BLANK)
+FIELDTYPE:invalid_name:ALLOW(\NABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz):LEFTTRIM:SPACES( ',):ONFAIL(BLANK)
 // Remember to generate specificities and update the 0,0 placeholders below before running any sort of linking.
 // If the actual specificity for a field is <1, round it up to 1 rather than down to 0.  If your cluster is running
 // a shared repository, calling SALTTOOLS30.mac_Patch_SPC from the bottom of BWR_Specificities may be a convenience.
@@ -61,7 +61,7 @@ FIELD:mailing_street_1:TYPE(STRING100):LIKE(invalid_alphanumeric):0,0
 FIELD:mailing_city:TYPE(STRING30):LIKE(invalid_name):0,0
 FIELD:mailing_state:TYPE(STRING2):LIKE(invalid_state):0,0
 FIELD:mailing_zip:TYPE(STRING9):LIKE(invalid_zip):0,0
-FIELD:mailing_county:TYPE(STRING3):LIKE(invalid_name):0,0
+FIELD:mailing_county:TYPE(STRING3):LIKE(invalid_alphanumeric):0,0 
 FIELD:phone_number:TYPE(STRING10):LIKE(invalid_phone):0,0
 FIELD:ultid:TYPE(UNSIGNED6):LIKE(invalid_numeric):0,0
 FIELD:orgid:TYPE(UNSIGNED6):LIKE(invalid_numeric):0,0

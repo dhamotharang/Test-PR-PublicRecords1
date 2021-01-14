@@ -769,5 +769,5 @@ EXPORT B_Event_5 := MODULE
     SELF.T___Act_Dt_Echo_ := __PP155156.Event_Date_;
     SELF := __PP155156;
   END;
-  EXPORT __ENH_Event_5 := PROJECT(__EE156672,__ND155160__Project(LEFT)) : PERSIST('~temp::KEL::FraudgovKEL::Event::Annotated_5',EXPIRE(7));
+  EXPORT __ENH_Event_5 := PROJECT(__EE156672,__ND155160__Project(LEFT)) : PERSIST('~fraudgov::temp::KEL::FraudgovKEL::Event::Annotated_5',EXPIRE(7));
 END;

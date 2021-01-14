@@ -1415,5 +1415,5 @@ EXPORT B_Bank_Account_2 := MODULE
     SELF.Last_Record_Id_ := MAP(NOT (__PP694062.C_O_U_N_T___Event_ <> 0)=>__ECAST(KEL.typ.nint,__PP694062.M_A_X___Record_Id_),__ECAST(KEL.typ.nint,__PP694062.M_A_X___Record_Id__1_));
     SELF := __PP694062;
   END;
-  EXPORT __ENH_Bank_Account_2 := PROJECT(__EE694061,__ND694066__Project(LEFT)) : PERSIST('~temp::KEL::FraudgovKEL::Bank_Account::Annotated_2',EXPIRE(7));
+  EXPORT __ENH_Bank_Account_2 := PROJECT(__EE694061,__ND694066__Project(LEFT)) : PERSIST('~fraudgov::temp::KEL::FraudgovKEL::Bank_Account::Annotated_2',EXPIRE(7));
 END;

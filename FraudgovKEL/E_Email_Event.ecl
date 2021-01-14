@@ -40,7 +40,7 @@ EXPORT E_Email_Event := MODULE
     KEL.typ.int __RecordCount := 0;
   END;
   EXPORT __PreResult := PROJECT(TABLE(InData,{KEL.typ.int __RecordCount := COUNT(GROUP),KEL.typ.epoch Date_First_Seen_ := KEL.era.SimpleRoll(GROUP,Date_First_Seen_,MIN,TRUE),KEL.typ.epoch Date_Last_Seen_ := KEL.era.SimpleRoll(GROUP,Date_Last_Seen_,MAX,FALSE),_r_Customer_,Emailof_,Event_Date_,Transaction_},_r_Customer_,Emailof_,Event_Date_,Transaction_,MERGE),Layout);
-  EXPORT __Result := __CLEARFLAGS(__PreResult) : PERSIST('~temp::KEL::FraudgovKEL::Email_Event::Result',EXPIRE(7));
+  EXPORT __Result := __CLEARFLAGS(__PreResult) : PERSIST('~fraudgov::temp::KEL::FraudgovKEL::Email_Event::Result',EXPIRE(7));
   EXPORT Result := __UNWRAP(__Result);
   EXPORT _r_Customer__Orphan := JOIN(InData(__NN(_r_Customer_)),E_Customer.__Result,__EEQP(LEFT._r_Customer_, RIGHT.UID),TRANSFORM(InLayout,SELF := LEFT,SELF:=[]),LEFT ONLY, HASH);
   EXPORT Emailof__Orphan := JOIN(InData(__NN(Emailof_)),E_Email.__Result,__EEQP(LEFT.Emailof_, RIGHT.UID),TRANSFORM(InLayout,SELF := LEFT,SELF:=[]),LEFT ONLY, HASH);

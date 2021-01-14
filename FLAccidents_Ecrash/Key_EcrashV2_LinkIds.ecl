@@ -1,9 +1,9 @@
-IMPORT BIPV2, Data_Services, doxie;
+﻿IMPORT BIPV2;
 
 EXPORT Key_EcrashV2_LinkIds   := MODULE
 
   // DEFINE THE INDEX
-	EXPORT out_SuperKeyName		:= Data_Services.Data_location.Prefix('ecrash')+'thor_data400::key::ecrashv2_linkids_' + doxie.Version_SuperKey; //SuperKeyName
+	EXPORT out_SuperKeyName		:= Files_eCrash.FILE_KEY_LINKIDS_SF; //SuperKeyName
 
 	SHARED Base						  	:= FLAccidents_Ecrash.File_KeybuildV2.out;
 

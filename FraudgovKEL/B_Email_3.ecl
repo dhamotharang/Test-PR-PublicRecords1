@@ -881,5 +881,5 @@ EXPORT B_Email_3 := MODULE
     SELF.Id_Activity_Dt_Last_Seen_ := __PP454124.M_A_X___Event_Date__2_;
     SELF := __PP454124;
   END;
-  EXPORT __ENH_Email_3 := PROJECT(__EE454123,__ND454153__Project(LEFT)) : PERSIST('~temp::KEL::FraudgovKEL::Email::Annotated_3',EXPIRE(7));
+  EXPORT __ENH_Email_3 := PROJECT(__EE454123,__ND454153__Project(LEFT)) : PERSIST('~fraudgov::temp::KEL::FraudgovKEL::Email::Annotated_3',EXPIRE(7));
 END;

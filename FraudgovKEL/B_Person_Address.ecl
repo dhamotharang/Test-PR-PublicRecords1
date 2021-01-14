@@ -23,7 +23,7 @@ EXPORT B_Person_Address := MODULE
     SELF.Dt_Last_Seen_ := KEL.Aggregates.MaxNN(__EE4397405,__T(__EE4397405).Event_Date_);
     SELF := __PP4397338;
   END;
-  EXPORT __ENH_Person_Address := PROJECT(__EE4397443,__ND4397477__Project(LEFT)) : PERSIST('~temp::KEL::FraudgovKEL::Person_Address::Annotated',EXPIRE(7));
+  EXPORT __ENH_Person_Address := PROJECT(__EE4397443,__ND4397477__Project(LEFT)) : PERSIST('~fraudgov::temp::KEL::FraudgovKEL::Person_Address::Annotated',EXPIRE(7));
   SHARED __EE4670523 := __ENH_Person_Address;
   SHARED __IDX_Person_Address_Location__Filtered := __EE4670523(__NN(__EE4670523.Location_));
   SHARED IDX_Person_Address_Location__Layout := RECORD

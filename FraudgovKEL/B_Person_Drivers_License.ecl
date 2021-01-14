@@ -23,7 +23,7 @@ EXPORT B_Person_Drivers_License := MODULE
     SELF.Dt_Last_Seen_ := KEL.Aggregates.MaxNN(__EE4397769,__T(__EE4397769).Event_Date_);
     SELF := __PP4397702;
   END;
-  EXPORT __ENH_Person_Drivers_License := PROJECT(__EE4397807,__ND4397841__Project(LEFT)) : PERSIST('~temp::KEL::FraudgovKEL::Person_Drivers_License::Annotated',EXPIRE(7));
+  EXPORT __ENH_Person_Drivers_License := PROJECT(__EE4397807,__ND4397841__Project(LEFT)) : PERSIST('~fraudgov::temp::KEL::FraudgovKEL::Person_Drivers_License::Annotated',EXPIRE(7));
   SHARED __EE4669741 := __ENH_Person_Drivers_License;
   SHARED __IDX_Person_Drivers_License_License__Filtered := __EE4669741(__NN(__EE4669741.License_));
   SHARED IDX_Person_Drivers_License_License__Layout := RECORD

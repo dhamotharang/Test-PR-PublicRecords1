@@ -375,5 +375,5 @@ EXPORT B_Event_7 := MODULE
     SELF.T___Ssn_Status_Code_Echo_ := MAP(__PP127023.T___Src_Class_Type_ <> 2 AND __PP127023.T___Src_Class_Type_ <> 3 AND __PP127023.T___Src_Class_Type_ <> 0=>__ECAST(KEL.typ.nint,__CN(-99998)),__T(__OR(__OP2(__CAST(KEL.typ.str,__PP127023._ssn__risk__code_),=,__CN('')),__NT(__PP127023._ssn__risk__code_)))=>__ECAST(KEL.typ.nint,__CN(-99997)),__ECAST(KEL.typ.nint,__PP127023._ssn__risk__code_));
     SELF := __PP127023;
   END;
-  EXPORT __ENH_Event_7 := PROJECT(__EE129045,__ND129741__Project(LEFT)) : PERSIST('~temp::KEL::FraudgovKEL::Event::Annotated_7',EXPIRE(7));
+  EXPORT __ENH_Event_7 := PROJECT(__EE129045,__ND129741__Project(LEFT)) : PERSIST('~fraudgov::temp::KEL::FraudgovKEL::Event::Annotated_7',EXPIRE(7));
 END;

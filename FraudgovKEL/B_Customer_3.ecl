@@ -56,5 +56,5 @@ EXPORT B_Customer_3 := MODULE
     KEL.typ.epoch Date_Last_Seen_ := 0;
     KEL.typ.int __RecordCount := 0;
   END;
-  EXPORT __ENH_Customer_3 := PROJECT(__EE399152,TRANSFORM(__ST91149_Layout,SELF.Event_Date_Max_ := LEFT.M_A_X___Event_Date_,SELF := LEFT)) : PERSIST('~temp::KEL::FraudgovKEL::Customer::Annotated_3',EXPIRE(7));
+  EXPORT __ENH_Customer_3 := PROJECT(__EE399152,TRANSFORM(__ST91149_Layout,SELF.Event_Date_Max_ := LEFT.M_A_X___Event_Date_,SELF := LEFT)) : PERSIST('~fraudgov::temp::KEL::FraudgovKEL::Customer::Annotated_3',EXPIRE(7));
 END;

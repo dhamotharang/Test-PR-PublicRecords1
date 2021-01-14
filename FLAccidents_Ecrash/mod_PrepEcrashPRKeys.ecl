@@ -7,7 +7,7 @@ EXPORT mod_PrepEcrashPRKeys(DATASET(Layout_eCrash.Consolidation) proutIn = FLAcc
 Ecrash := proutIn(report_code IN ['EA','TM','TF']);//for ecrash iyetek they need report number displayed even no vin and name
 Filter_CRU := proutIn(report_code NOT IN ['EA','TM','TF']);
 
-crash_accnbr_base := 	Ecrash + Filter_CRU (vin+driver_license_nbr+tag_nbr+lname <>'') ; 
+crash_accnbr_base := 	Ecrash + Filter_CRU (vin+driver_license_nbr+tag_nbr+lname <>''); 
 						
 // normalize addl_report_number 
 NormAddlRpt := PROJECT(crash_accnbr_base(TRIM(addl_report_number,LEFT,RIGHT) NOT IN ['','0','UNK', 'UNKNOWN'] AND report_code IN ['TF','TM']), TRANSFORM( {crash_accnbr_base}, 
@@ -18,7 +18,11 @@ crash_accnbr_base_norm := (crash_accnbr_base + NormAddlRpt) (TRIM(accident_nbr,L
 											 
 dst_accnbr_base := DISTRIBUTE(crash_accnbr_base_norm, HASH32(orig_accnbr));
 srt_accnbr_base := SORT(dst_accnbr_base, EXCEPT did, EXCEPT b_did, LOCAL);
-EXPORT dep_accnbr_base := DEDUP(srt_accnbr_base, EXCEPT did, EXCEPT b_did, LOCAL);
+unq_accnbr_base := DEDUP(srt_accnbr_base, EXCEPT did, EXCEPT b_did, LOCAL);
+EXPORT dep_accnbr_base := PROJECT(unq_accnbr_base, TRANSFORM({STRING40 l_accnbr, RECORDOF(unq_accnbr_base)},
+                                                              SELF.l_accnbr := LEFT.accident_nbr;
+																													    SELF := LEFT;
+																													    ));
 
 //***********************************************************************
 //                 key_EcrashV2_accnbrv1
@@ -54,60 +58,7 @@ in_accnbr := dep_accnbrv1_base(report_code IN ['EA','TM','TF'] AND work_type_id 
 																											(TRIM(report_type_id,ALL) IN ['A','DE'] OR STD.str.ToUpperCase(TRIM(vendor_code,LEFT,RIGHT)) = 'CMPD'));
                             														
 // parsing 40 char reportnumber 
-slim := RECORD 
-STRING40  l_accnbr; 
-STRING2   report_code;
-STRING2   jurisdiction_state;
-STRING100 jurisdiction;
-STRING8   accident_date;
-STRING40  orig_Accnbr; 
-STRING40  addl_report_number; 
-STRING4   work_type_id;
-STRING3   report_type_id;
-UNSIGNED8 Idfield,
-STRING20  ReportLinkID,	
-STRING100 Vendor_Code,
-STRING20  vendor_report_id,	
-STRING4 f1; 
-STRING4 f2; 
-STRING4 f3; 
-STRING4 f4; 
-STRING4 f5; 
-STRING4 f6; 
-STRING4 f7; 
-STRING4 f8; 
-STRING4 f9; 
-STRING4 f10; 
-STRING4 f11; 
-STRING4 f12; 
-STRING4 f13; 
-STRING4 f14;
-STRING4 f15;
-STRING4 f16;
-STRING4 f17;
-STRING4 f18;
-STRING4 f19;
-STRING4 f20; 
-STRING4 f21;
-STRING4 f22;
-STRING4 f23;
-STRING4 f24;
-STRING4 f25;
-STRING4 f26;
-STRING4 f27;
-STRING4 f28;
-STRING4 f29;
-STRING4 f30;
-STRING4 f31;
-STRING4 f32;
-STRING4 f33;
-STRING4 f34;
-STRING4 f35;
-STRING4 f36;
-STRING4 f37;
-END; 
-
-parse_report := PROJECT(in_accnbr, TRANSFORM(slim, 
+parse_report := PROJECT(in_accnbr, TRANSFORM(Layout_PrepEcrashPRKeys.Partial_Report_Nbr_Slim, 
 
   part_num := IF(TRIM(STD.Str.FilterOut(LEFT.l_accnbr,'0-'),LEFT,RIGHT) ='' , '', TRIM(LEFT.l_accnbr,LEFT,RIGHT));
  
@@ -150,24 +101,9 @@ parse_report := PROJECT(in_accnbr, TRANSFORM(slim,
   SELF.f37 := IF(LENGTH(TRIM(part_num[37..40],LEFT,RIGHT)) < 4 , '',part_num[37..40]);
   SELF := LEFT)); 
 
-slim_rec := RECORD 
-STRING4   partial_report_nbr; 
-STRING2   report_code;
-STRING2   jurisdiction_state;
-STRING100 jurisdiction;
-STRING8   accident_date;
-STRING40  l_accnbr; 
-STRING40  orig_Accnbr; 
-STRING40  addl_report_number; 
-STRING4   work_type_id;
-STRING3   report_type_id;
-STRING100 Vendor_Code,
-STRING20  vendor_report_id,	
-STRING20  ReportLinkID,	
-UNSIGNED8 Idfield,
-END; 
 
- slim_rec tslim(parse_report L, INTEGER cnt) := TRANSFORM
+
+ Layout_PrepEcrashPRKeys.Partial_Report_Nbr_slim_rec tslim(parse_report L, INTEGER cnt) := TRANSFORM
     SELF.partial_report_nbr := CHOOSE(cnt, l.f1,
 																					 l.f2,
 																					 l.f3,
@@ -209,7 +145,7 @@ END;
 	END;
 norm_report := NORMALIZE(parse_report, 37, tslim(LEFT, COUNTER))(partial_report_nbr <>''); 
 	 
-EXPORT clean_partnbr := DEDUP(DISTRIBUTE(PROJECT(norm_report , TRANSFORM(slim_rec , 
+EXPORT clean_partnbr := DEDUP(DISTRIBUTE(PROJECT(norm_report , TRANSFORM(Layout_PrepEcrashPRKeys.Partial_Report_Nbr_slim_rec , 
                                                                 SELF.partial_report_nbr := IF(TRIM(STD.Str.FilterOut(LEFT.partial_report_nbr,'0-'),LEFT,RIGHT) ='' , '', TRIM(LEFT.partial_report_nbr,LEFT,RIGHT)),
 					                                                      SELF := LEFT))(partial_report_nbr <>''),HASH32(l_accnbr)), ALL,LOCAL);
 	 
@@ -229,13 +165,21 @@ crash_accnbr_father_base_norm := crash_accnbr_father_base + NormAddlRpt;
 											 
 dst_accnbr_father_base := DISTRIBUTE(crash_accnbr_father_base_norm, HASH32(orig_accnbr));
 srt_accnbr_father_base := SORT(dst_accnbr_father_base, EXCEPT did, EXCEPT b_did, LOCAL);
-EXPORT dep_accnbr_father_base := DEDUP(srt_accnbr_father_base, EXCEPT did, EXCEPT b_did, LOCAL);
+unq_accnbr_father_base := DEDUP(srt_accnbr_father_base, EXCEPT did, EXCEPT b_did, LOCAL);
+EXPORT dep_accnbr_father_base := PROJECT(unq_accnbr_father_base, TRANSFORM({STRING40 l_accnbr, RECORDOF(unq_accnbr_father_base)},
+                                                              SELF.l_accnbr := LEFT.accident_nbr;
+																													    SELF := LEFT;
+																													    ));
 //***********************************************************************
 //                    key_EcrashV2_bdid
 //***********************************************************************
 dst_bdid_base := DISTRIBUTE(proutIn(b_did<>'',b_did<>'000000000000'), HASH32(b_did, orig_accnbr));
 srt_bdid_base := SORT(dst_bdid_base, b_did, orig_accnbr, LOCAL);
-EXPORT ded_bdid_base := DEDUP(srt_bdid_base, b_did, orig_accnbr, LOCAL);  
+unq_bdid_base := DEDUP(srt_bdid_base, b_did, orig_accnbr, LOCAL);  
+EXPORT ded_bdid_base := PROJECT(unq_bdid_base, TRANSFORM({UNSIGNED6 l_bdid, RECORDOF(unq_bdid_base)},
+                                                          SELF.l_bdid := (integer)LEFT.b_did;
+																												  SELF := LEFT;
+																												  ));
 
 //***********************************************************************
 //                     Key_EcrashV2_did
@@ -266,8 +210,11 @@ ecrash_dlnbr_base := proutIn(driver_license_nbr<>'');
 
 dst_dlnbr_base := DISTRIBUTE(ecrash_dlnbr_base, HASH32(driver_license_nbr, orig_accnbr));
 srt_dlnbr_base := SORT(dst_dlnbr_base, driver_license_nbr, orig_accnbr, LOCAL);
-EXPORT dep_dlnbr_base := DEDUP(srt_dlnbr_base, driver_license_nbr, orig_accnbr, LOCAL);
-
+unq_dlnbr_base := DEDUP(srt_dlnbr_base, driver_license_nbr, orig_accnbr, LOCAL);
+EXPORT dep_dlnbr_base := PROJECT(unq_dlnbr_base, TRANSFORM({STRING25 l_dlnbr, RECORDOF(unq_dlnbr_base)},
+                                                            SELF.l_dlnbr := LEFT.driver_license_nbr;
+																												    SELF := LEFT;
+																												    ));
 //***********************************************************************
 //                    Key_EcrashV2_tagnbr
 //***********************************************************************
@@ -275,7 +222,11 @@ ecrash_tagnbr_base := proutIn(tag_nbr<>'');
 
 dst_tagnbr_base := DISTRIBUTE(ecrash_tagnbr_base, HASH32(tag_nbr, orig_accnbr));
 srt_tagnbr_base := SORT(dst_tagnbr_base, tag_nbr, orig_accnbr, LOCAL);
-EXPORT dep_tagnbr_base := DEDUP(srt_tagnbr_base, tag_nbr, orig_accnbr, LOCAL);
+unq_tagnbr_base := DEDUP(srt_tagnbr_base, tag_nbr, orig_accnbr, LOCAL);
+EXPORT dep_tagnbr_base := PROJECT(unq_tagnbr_base, TRANSFORM({STRING10 l_tagnbr, RECORDOF(unq_tagnbr_base)},
+                                                            SELF.l_tagnbr := LEFT.tag_nbr;
+																												    SELF := LEFT;
+																												    ));
 
 //***********************************************************************
 //                     Key_EcrashV2_vin
@@ -304,14 +255,7 @@ EXPORT VinBase := PROJECT(uVinBase, xformVin(LEFT)):INDEPENDENT;
 //***********************************************************************
 ecrash_vin_base := VinBase;
 
-Layout_eCrash_vin7 := RECORD
-	STRING7  l_vin7,
-	STRING30 l_vin,
-	STRING40 accident_nbr,
-	STRING40 orig_accnbr, 
-END;
-
-Layout_eCrash_vin7 add_vin7(ecrash_vin_base l):=TRANSFORM
+Layout_PrepEcrashPRKeys.eCrash_vin7 add_vin7(ecrash_vin_base l):=TRANSFORM
  len:=LENGTH(TRIM(l.l_vin));
  SELF.l_vin7:=l.l_vin[len-6..len];
  SELF:=l;	

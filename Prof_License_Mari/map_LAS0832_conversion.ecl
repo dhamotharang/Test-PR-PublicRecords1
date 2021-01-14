@@ -97,7 +97,7 @@ RemovePattern := '(^.* LLC$|^.* LLC\\.$|^.* INC$|^.* INC\\.$|^.* INC.*$|^.* COMP
 	
 		tempStdLicType        := MAP(tempRawType[1..4]='SALE' => 'SALE',
 			                           tempRawType[1..4]='BROK' => 'BROK',
-			                           tempRawType[1..3]='TS.' => 'TSDEV',
+			                           tempRawType[1..4]='TIME' => 'TSDEV',
 																 '');															 
   	SELF.STD_LICENSE_TYPE := tempStdLicType;
 		//assigning type code based on license type. Example of license type: BROK.ACT, BROK.INA, BROK.CORP, BROK.ASA,

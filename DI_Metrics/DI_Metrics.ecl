@@ -90,6 +90,16 @@ DI_Metrics.FCRA_ASL_Students(pHostname, pTarget, pContact)
 
 ,DI_Metrics.Monthly_Cortera_Tradeline_Metrics.Cortera_Tradeline_Metrics( pHostname, pTarget, pContact )
 
+,DI_Metrics.FDN_Metrics(pHostname, pTarget, pContact)
+
+,DI_Metrics.InquiryRpts_bwrFCRAInq41(pHostname, pTarget, pContact)
+
+,DI_Metrics.InquiryRpts_bwrFCRAInq50(pHostname, pTarget, pContact)
+
+,DI_Metrics.InquiryRpts_bwrNonFCRAInq41(pHostname, pTarget, pContact)
+
+,DI_Metrics.InquiryRpts_bwrNonFCRAInq50(pHostname, pTarget, pContact)
+
 );
 
 return build_all;

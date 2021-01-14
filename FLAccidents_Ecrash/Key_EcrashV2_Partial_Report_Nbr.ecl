@@ -11,11 +11,9 @@
 /*2015-02-11T00:44:35Z (Ayeesha Kayttala)
 bug# 173256 - code review 
 */
-Import Data_Services, doxie;
-
 export Key_EcrashV2_Partial_Report_Nbr := index(mod_PrepEcrashPRKeys().clean_partnbr,
                                                 {partial_report_nbr,report_code, jurisdiction_state,jurisdiction,accident_date} ,
-																								{l_accnbr,orig_Accnbr,addl_report_number, report_type_id,work_type_id,vendor_code,vendor_report_id,Idfield,ReportLinkID }
-																								 ,Data_Services.Data_location.Prefix('ecrash')+'thor_data400::key::ecrashV2_partialaccnbr_' + doxie.Version_SuperKey);
+																								{l_accnbr,orig_Accnbr,addl_report_number, report_type_id,work_type_id,vendor_code,vendor_report_id,Idfield,ReportLinkID },
+																								Files_PR.FILE_KEY_PARTIAL_ACCNBR_SF);
 																							
 																								 

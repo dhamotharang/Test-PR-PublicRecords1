@@ -194,6 +194,9 @@ EXPORT PrepForYogurt(string location, string environment, string last_wuid = '')
 									+ ' srcname=~'+r.files 
 									+ thorbackup.constants.yogurt().nsplit 
 									+ thorbackup.constants.yogurt().wrap 
+									+ thorbackup.constants.yogurt().transferbuffersize
+									+ thorbackup.constants.yogurt().connect
+									+ thorbackup.constants.yogurt().nocommon
 									+ thorbackup.constants.yogurt().srcdali + ' compress=1';
 			self := l;
 		end;

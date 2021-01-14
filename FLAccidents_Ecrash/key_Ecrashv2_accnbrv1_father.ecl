@@ -1,9 +1,7 @@
-﻿Import Data_Services, doxie;
-																				
-export key_Ecrashv2_accnbrv1_father := 
+﻿export key_Ecrashv2_accnbrv1_father := 
 
 index(mod_PrepEcrashKeys().dep_accnbr_base,
-{string40 l_accnbr := accident_nbr, report_code,jurisdiction_state, jurisdiction},
+{l_accnbr, report_code,jurisdiction_state, jurisdiction},
 {
 orig_accnbr, 
 vehicle_incident_id,
@@ -154,7 +152,7 @@ date_vendor_last_reported;
 report_type_id;	
 tif_image_hash,							 
 },
-Data_Services.Data_location.Prefix('ecrash')+'thor_data400::key::ecrashv2_accnbrv1_father');
+Files_eCrash.FILE_KEY_ACCNBRV1_FATHER_SF);
  
 
 

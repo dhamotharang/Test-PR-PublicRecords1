@@ -1,4 +1,4 @@
-import corp2_mapping, corp2;
+﻿import corp2_mapping, corp2;
 
 EXPORT Layouts := module
 
@@ -146,7 +146,7 @@ EXPORT Layouts := module
 	EXPORT FilingHist_11_layout := RECORD
 			string2   rec_code;
 			string10  filing_number;
-			string12  document_no;
+			string14  document_no;
 			string12  filing_type_id;
 			string96  filing_type;
 			string8   entry_date;
@@ -154,7 +154,7 @@ EXPORT Layouts := module
 			string8   effective_date;
 			string2   effective_cond_flag;
 			string8   inactive_date;
-			string394 filler;
+			string392 filler;
 	END;
 			
 	EXPORT AuditLog_12_layout := RECORD
