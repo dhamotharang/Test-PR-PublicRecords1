@@ -138,7 +138,10 @@ PersonSecuredp									:=	output(PerSPIn,,'~thor_data400::in::uccv2::'+filedate+
 AddSuperPersonSecuredp					:=	fileservices.addsuperfile('~thor_data400::in::uccv2::ca::personsecuredp','~thor_data400::in::uccv2::'+filedate+'::ca::personsecuredp');
 AddSuperPersonSecuredpProcessed	:=	fileservices.addsuperfile('~thor_data400::in::uccv2::ca::personsecuredp::processed','~thor_data400::in::uccv2::'+filedate+'::ca::personsecuredp');
 
-retval := if (fileservices.getsuperfilesubcount(Cluster.Cluster_In + 'in::uccv2::CA::ALL') > 0,
+retval := if (fileservices.getsuperfilesubcount(Cluster.Cluster_In + 'in::uccv2::CA::AllDebtors') > 0       and
+              fileservices.getsuperfilesubcount(Cluster.Cluster_In + 'in::uccv2::CA::AllSecuredParty') > 0  and
+							fileservices.getsuperfilesubcount(Cluster.Cluster_In + 'in::uccv2::CA::FilingAmendments') > 0 and
+							fileservices.getsuperfilesubcount(Cluster.Cluster_In + 'in::uccv2::CA::Filings') > 0,
 								parallel(	sequential( FilingMaster
 																,AddSuperFiling
 																,AddSuperFilingProcessed
