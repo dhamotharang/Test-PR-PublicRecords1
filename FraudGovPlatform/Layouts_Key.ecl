@@ -185,6 +185,7 @@
  END;
 
  EXPORT DisposableEmailDomains := Record
-  UNICODE200 DisposableEmailDomain;
+  string200 domain;
+  string1 dispsblemail;
  END;
 END;

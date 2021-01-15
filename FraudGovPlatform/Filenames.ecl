@@ -50,7 +50,11 @@ module
 		export _RDPRejected := FileSprayed+'::Rejected::RDP';
 		export _RDPDelete := FileSprayed+'::Delete::RDP';
 		export RDP := _RDPPassed;		
-		
+
+		export _DisposableEmailDomainsPassed := FileSprayed+'::Passed::DisposableEmailDomains';  
+		export _DisposableEmailDomainsRejected := FileSprayed+'::Rejected::DisposableEmailDomains';
+		export _DisposableEmailDomainsDelete := FileSprayed+'::Delete::DisposableEmailDomains';
+		export DisposableEmailDomains := _DisposableEmailDomainsPassed;		
 	end;
 	
 	
@@ -64,9 +68,12 @@ module
 		export IdentityData                  			:= tools.mod_FilenamesInput(Template('IdentityData'),pversion);
 		export KnownFraud                  			:= tools.mod_FilenamesInput(Template('KnownFraud'),pversion);
 		export Deltabase							:= tools.mod_FilenamesInput(Template('Deltabase'),pversion);
+		export DisposableEmailDomains 				:= tools.mod_FilenamesInput(Template('DisposableEmailDomains'),pversion); 
+
 		export ByPassed_IdentityData						:= tools.mod_FilenamesInput(Template('ByPassed_IdentityData'),pversion);
 		export ByPassed_KnownFraud							:= tools.mod_FilenamesInput(Template('ByPassed_KnownFraud'),pversion);
 		export ByPassed_Deltabase							:= tools.mod_FilenamesInput(Template('ByPassed_Deltabase'),pversion);
+		export ByPassed_DisposableEmailDomains							:= tools.mod_FilenamesInput(Template('ByPassed_DisposableEmailDomains'),pversion);
 		
 		export DemoData											:= tools.mod_FilenamesInput(Template('DemoData'),pversion);
 		export MBSInclusionDemoData					:= tools.mod_FilenamesInput(Template('MBSInclusionDemoData'),pversion);
@@ -75,15 +82,16 @@ module
 		export ConfigRiskLevel							:= tools.mod_FilenamesInput(Template('ConfigRiskLevel'),pversion);
 		export ConfigAttributes							:= tools.mod_FilenamesInput(Template('ConfigAttributes'),pversion);
 		export ConfigRules									:= tools.mod_FilenamesInput(Template('ConfigRules'),pversion);
-		export DisposableEmailDomains 					:= tools.mod_FilenamesInput(Template('DisposableEmailDomains'),pversion); 
 
 		export dAll_filenames :=
 			IdentityData.dAll_filenames +
 			KnownFraud.dAll_filenames +
 			Deltabase.dAll_filenames +
+			DisposableEmailDomains.dAll_filenames +
 			ByPassed_IdentityData.dAll_filenames +
 			ByPassed_KnownFraud.dAll_filenames + 
-			ByPassed_Deltabase.dAll_filenames;
+			ByPassed_Deltabase.dAll_filenames +
+			ByPassed_DisposableEmailDomains.dAll_filenames;
 			
 	end;
 
@@ -141,6 +149,8 @@ module
 		export BaseUnitTests		:= tools.mod_FilenamesBuild(Template('BaseUnitTests'),pversion);
 		export KeysUnitTests		:= tools.mod_FilenamesBuild(Template('KeysUnitTests'),pversion);
 
+		export DisposableEmailDomains	:= tools.mod_FilenamesBuild(Template('DisposableEmailDomains'),pversion);
+
 		//Kel Files
 		export kel_EntityProfile								:= tools.mod_FilenamesBuild(Template('kel::EntityProfile'),pversion);
 		export kel_ConfigAttributes							:= tools.mod_FilenamesBuild(Template('kel::ConfigAttributes'),pversion);
@@ -195,7 +205,8 @@ module
 			Death_Orig.dAll_filenames +
 			IPMetaData.dAll_filenames + 
 			Advo.dAll_filenames +
-			Advo_Demo.dAll_filenames;;
+			Advo_Demo.dAll_filenames +
+			DisposableEmailDomains.dAll_filenames
 			; 
 	
 	end;
