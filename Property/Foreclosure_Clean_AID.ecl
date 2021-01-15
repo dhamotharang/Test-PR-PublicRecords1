@@ -1,13 +1,10 @@
 IMPORT ut
 		 , address
 		 , AID
-		 , DID_Add
-		 , header_slimsort
-		 , lib_stringlib
-		 , idl_header;
-	
+		 , lib_stringlib;
+
 	rsForeclosureIn		:=	File_Foreclosure_Sprayed;
-	
+
 	//Project the incoming data into the Layout_Foreclosure_In layout
 	Layout_Foreclosure_In	tProjectRawtoIn(rsForeclosureIn pInput)
 		:=
@@ -17,7 +14,7 @@ IMPORT ut
 			END;
 
 	rsRawInLayout	:=	PROJECT(rsForeclosureIn, tProjectRawtoIn(LEFT));
-	
+
 	//Project the existing base data into the Layout_Foreclosure_In layout
 	Layout_Foreclosure_In	tProjectBasetoIn(Layout_Fares_Foreclosure_v2 pInput)
 		:=
@@ -27,23 +24,23 @@ IMPORT ut
 			END;
 
 	rsBaseInLayout	:=	PROJECT(File_Foreclosure_Base_v2, tProjectBasetoIn(LEFT));
-	
+
 
 	//Combine the Raw input with the existing base file
 	rsRawPlusBase			:=	rsRawInLayout + rsBaseInLayout;
-	
-	Layout_Foreclosure_In_Sec 
+
+	Layout_Foreclosure_In_Sec
 		:=
 			RECORD
 				unsigned8 sequence := 0;
 				Layout_Foreclosure_In;
 			END;
-			
+
 	rsRawPlusBaseSecPrep := project(rsRawPlusBase, Layout_Foreclosure_In_Sec);
 
 	ut.MAC_Sequence_Records (rsRawPlusBaseSecPrep, sequence, rsRawPlusBaseSec);
-	
-	
+
+
 	//Distribute, Sort, and Dedup the combined Raw and Base records
 	rsRawPlusBaseDist	:=	DISTRIBUTE(rsRawPlusBaseSec, HASH(state,
 																												county,
@@ -166,9 +163,9 @@ IMPORT ut
 																												legal_2,
 																												legal_3,
 																												legal_4));
-																																																								
-	rsRawPlusBaseSort	:=	SORT(rsRawPlusBaseDist, RECORD, 
-																						EXCEPT	process_date, 
+
+	rsRawPlusBaseSort	:=	SORT(rsRawPlusBaseDist, RECORD,
+																						EXCEPT	process_date,
 																										foreclosure_id,
 																										name1_prefix,
 																										name1_first,
@@ -272,10 +269,10 @@ IMPORT ut
 																										situs2_geo_blk,
 																										situs2_geo_match,
 																										situs2_err_stat, LOCAL);
-	
+
 		rsRawPlusBaseDed	:=	DEDUP(rsRawPlusBaseSort, RECORD,
 																						EXCEPT	sequence,
-																										process_date, 
+																										process_date,
 																										foreclosure_id,
 																										name1_prefix,
 																										name1_first,
@@ -433,21 +430,21 @@ IMPORT ut
 																										situs2_geo_blk,
 																										situs2_geo_match,
 																										situs2_err_stat, LOCAL) : PERSIST(cluster + 'in::persist::foreclosure_base_dedup');
-																										
+
 
 	//Clean the addresses
-	
-	Layout_NormalizedRec 
+
+	Layout_NormalizedRec
 		:=
 			RECORD
 				// unsigned8 sequence;
-				
+
 				string10	situs_house_number;
 				string2		situs_direction;
 				string30	situs_street_name;
 				string5		situs_mode;
 				string6		apartment_unit_cln;
-				
+
 				string40 	property_city;
 				string2  	property_state;
 				string9  	property_address_zip_code;
@@ -484,25 +481,25 @@ IMPORT ut
 				string4  situs_err_stat;
 				recordof(rsRawPlusBaseDed);
 			END;
-	
+
 	Layout_NormalizedRec normalizeAddrLayout(rsRawPlusBaseDed nInput, unsigned1 AddrCnt) := TRANSFORM
 		self.AddrCnt										:= CHOOSE(AddrCnt, 1, 2);
-		
+
 		self.situs_house_number					:= CHOOSE(AddrCnt, nInput.situs_house_number_1, nInput.situs_house_number_2);
 		self.situs_direction						:= CHOOSE(AddrCnt, nInput.situs_direction_1, nInput.situs_direction_2);
 		self.situs_street_name					:= CHOOSE(AddrCnt, nInput.situs_street_name_1, nInput.situs_street_name_2);
 		self.situs_mode									:= CHOOSE(AddrCnt, nInput.situs_mode_1, nInput.situs_mode_2);
 		self.apartment_unit_cln					:= CHOOSE(AddrCnt, nInput.apartment_unit, nInput.apartment_unit_2);
-		
+
 		self.property_city 							:= CHOOSE(AddrCnt, nInput.property_city_1, nInput.property_city_2);
 		self.property_state							:= CHOOSE(AddrCnt, nInput.property_state_1, nInput.property_state_2);
 		self.property_address_zip_code	:= CHOOSE(AddrCnt, nInput.property_address_zip_code_1, nInput.property_address_zip_code_2);
 		self														:= nInput;
 		self														:= [];
 	END;
-	
+
 	rsRawPlusBaseNorm := normalize(rsRawPlusBaseDed, 2, normalizeAddrLayout(LEFT, COUNTER));
-	
+
 	//Format raw address before passing it to AID macro
 	STRING	fRawFixCommon(STRING pStringIn)
 	 :=
@@ -533,34 +530,34 @@ IMPORT ut
 			RETURN	lDropZip4;
 		END
 	 ;
-	
+
 	Layout_NormalizedRec	tPreAddrClean(Layout_NormalizedRec pInput)
 		:=
 			TRANSFORM
 				self.situs_RawAID										:=	IF(pInput.situs_RawAID <> 0, pInput.situs_RawAID, 0);
-				self.Append_Prep_Address_Situs			:=	fRawFixLine1(REGEXREPLACE('^0+', pInput.situs_house_number, '') + ' ' + 
-																														 pInput.situs_direction + ' ' + 
-																														 REGEXREPLACE('^0+', pInput.situs_street_name, '') + ' ' + 
-																														 REGEXREPLACE('^0+', pInput.situs_mode, '') + ' ' + 
+				self.Append_Prep_Address_Situs			:=	fRawFixLine1(REGEXREPLACE('^0+', pInput.situs_house_number, '') + ' ' +
+																														 pInput.situs_direction + ' ' +
+																														 REGEXREPLACE('^0+', pInput.situs_street_name, '') + ' ' +
+																														 REGEXREPLACE('^0+', pInput.situs_mode, '') + ' ' +
 																														 REGEXREPLACE('^0+', pInput.apartment_unit_cln, ''));
 				self.Append_Prep_Address_Last_Situs	:=	fRawFixLineLast(pInput.property_city
 																							+	IF(pInput.property_city <> '',', ','') + pInput.property_state
 																							+	' ' + pInput.property_address_zip_code);
 				self																:=	pInput;
 			END;
-			
+
 	rsRawPreClean := PROJECT(rsRawPlusBaseNorm ,tPreAddrClean(LEFT));
-	
+
 	unsigned4 lAIDFlags := AID.Common.eReturnValues.RawAID | AID.Common.eReturnValues.ACECacheRecords;
-	
+
 	//Only clean non-blank addresses
 	rsRawPreCleanNonBlank	:=	rsRawPreClean(TRIM(Append_Prep_Address_Situs) <> '');
 	AID.MacAppendFromRaw_2Line(rsRawPreCleanNonBlank,
 		Append_Prep_Address_Situs, Append_Prep_Address_Last_Situs, situs_RawAID,
 		rsCleanSitus,
 		lAIDFlags
-		);		
-		
+		);
+
 	Layout_NormalizedRec	tAppendCleanSitus(rsCleanSitus pInput)
 		:=
 			TRANSFORM
@@ -593,12 +590,12 @@ IMPORT ut
 				self.situs_err_stat			:=	pInput.aidwork_acecache.err_stat;
 				self										:=	pInput;
 			END;
-				
+
 	rsRawCleanSitus := PROJECT(rsCleanSitus ,tAppendCleanSitus(LEFT));
-	
+
 	//Combine cleaned records with blank address records
 	rsRawCleanSitusNorm	:=	rsRawCleanSitus + rsRawPreClean(TRIM(Append_Prep_Address_Situs) = '');
-	
+
 	Layout_Foreclosure_In_Sec DeNormalizeAddrLayout(Layout_Foreclosure_In_Sec dInput, Layout_NormalizedRec nInput) := TRANSFORM
 		self.situs1_RawAID				:=	IF(nInput.AddrCnt=1, nInput.situs_RawAID, dInput.situs1_RawAID);
 		self.situs1_prim_range		:=	IF(nInput.AddrCnt=1, nInput.situs_prim_range, dInput.situs1_prim_range);
@@ -606,7 +603,7 @@ IMPORT ut
 		self.situs1_prim_name			:=	IF(nInput.AddrCnt=1, nInput.situs_prim_name, dInput.situs1_prim_name);
 		self.situs1_addr_suffix		:=	IF(nInput.AddrCnt=1, nInput.situs_addr_suffix, dInput.situs1_addr_suffix);
 		self.situs1_postdir				:=	IF(nInput.AddrCnt=1, nInput.situs_postdir, dInput.situs1_postdir);
-		self.situs1_unit_desig		:=	IF(nInput.AddrCnt=1, nInput.situs_unit_desig, dInput.situs1_unit_desig);		
+		self.situs1_unit_desig		:=	IF(nInput.AddrCnt=1, nInput.situs_unit_desig, dInput.situs1_unit_desig);
 		self.situs1_sec_range			:=	IF(nInput.AddrCnt=1, nInput.situs_sec_range, dInput.situs1_sec_range);
 		self.situs1_p_city_name		:=	IF(nInput.AddrCnt=1, nInput.situs_p_city_name, dInput.situs1_p_city_name);
 		self.situs1_v_city_name		:=	IF(nInput.AddrCnt=1, nInput.situs_v_city_name, dInput.situs1_v_city_name);
@@ -628,14 +625,14 @@ IMPORT ut
 		self.situs1_geo_blk				:=	IF(nInput.AddrCnt=1, nInput.situs_geo_blk, dInput.situs1_geo_blk);
 		self.situs1_geo_match			:=	IF(nInput.AddrCnt=1, nInput.situs_geo_match, dInput.situs1_geo_match);
 		self.situs1_err_stat			:=	IF(nInput.AddrCnt=1, nInput.situs_err_stat, dInput.situs1_err_stat);
-		
+
 		self.situs2_RawAID				:=	IF(nInput.AddrCnt=2, nInput.situs_RawAID, dInput.situs2_RawAID);
 		self.situs2_prim_range		:=	IF(nInput.AddrCnt=2, nInput.situs_prim_range, dInput.situs2_prim_range);
 		self.situs2_predir				:=	IF(nInput.AddrCnt=2, nInput.situs_predir, dInput.situs2_predir);
 		self.situs2_prim_name			:=	IF(nInput.AddrCnt=2, nInput.situs_prim_name, dInput.situs2_prim_name);
 		self.situs2_addr_suffix		:=	IF(nInput.AddrCnt=2, nInput.situs_addr_suffix, dInput.situs2_addr_suffix);
 		self.situs2_postdir				:=	IF(nInput.AddrCnt=2, nInput.situs_postdir, dInput.situs2_postdir);
-		self.situs2_unit_desig		:=	IF(nInput.AddrCnt=2, nInput.situs_unit_desig, dInput.situs2_unit_desig);		
+		self.situs2_unit_desig		:=	IF(nInput.AddrCnt=2, nInput.situs_unit_desig, dInput.situs2_unit_desig);
 		self.situs2_sec_range			:=	IF(nInput.AddrCnt=2, nInput.situs_sec_range, dInput.situs2_sec_range);
 		self.situs2_p_city_name		:=	IF(nInput.AddrCnt=2, nInput.situs_p_city_name, dInput.situs2_p_city_name);
 		self.situs2_v_city_name		:=	IF(nInput.AddrCnt=2, nInput.situs_v_city_name, dInput.situs2_v_city_name);
@@ -658,13 +655,13 @@ IMPORT ut
 		self.situs2_geo_match			:=	IF(nInput.AddrCnt=2, nInput.situs_geo_match, dInput.situs2_geo_match);
 		self.situs2_err_stat			:=	IF(nInput.AddrCnt=2, nInput.situs_err_stat, dInput.situs2_err_stat);
 		self											:=	dInput;
-	END;				
-				
+	END;
+
 	rsRawCleanSitusDeNorm := DENORMALIZE(rsRawPlusBaseDed, rsRawCleanSitusNorm,
 									left.sequence = right.sequence,
 									DeNormalizeAddrLayout(left,right));
-				
-	//Clean the names	
+
+	//Clean the names
 	//Only clean person names
 	Layout_Foreclosure_In	tCleanName(rsRawCleanSitusDeNorm pInput)
 		:=
@@ -705,7 +702,7 @@ IMPORT ut
 			END;
 
 	rsCleanNames := PROJECT(rsRawCleanSitusDeNorm ,tCleanName(LEFT));
-	
+
 	//------------Apply Name Flipping Macro--------------------
 	ut.mac_flipnames(rsCleanNames,name1_first,name1_middle,name1_last,names_flipped1);
 	ut.mac_flipnames(names_flipped1,name2_first,name2_middle,name2_last,names_flipped2);

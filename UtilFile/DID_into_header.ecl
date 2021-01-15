@@ -1,4 +1,4 @@
-import header, did_add, header_slimsort, ut, didville, fair_isaac;
+import header, did_add;
 
 recfrmt := record
 	header.Layout_New_Records;
@@ -9,10 +9,10 @@ infile := sequenced;
 
 matchset := ['A','S','P'];
 did_Add.MAC_Match_Flex
-	(infile, matchset,						
-	 ssn, dob, fname, mname,lname, name_suffix, 
-	 prim_range, prim_name, sec_range, zip, st, phone, 
-	 DID, recfrmt, false, DID_Score_field,							
+	(infile, matchset,
+	 ssn, dob, fname, mname,lname, name_suffix,
+	 prim_range, prim_name, sec_range, zip, st, phone,
+	 DID, recfrmt, false, DID_Score_field,
 	 75, truout)
 
 header.layout_header slimUT(truout L) := transform
