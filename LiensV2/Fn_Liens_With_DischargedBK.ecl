@@ -45,7 +45,7 @@ LiensMainWithDischargedBK := JOIN(  DISTRIBUTE(dLMain(orig_filing_date <> ''),HA
 																		self.orig_filing_date := left.orig_filing_date;
 																		self := right; self :=left),LOCAL);																	 
 /* 4). Liens filed before the discharged BK. */		
-Filing_typ_to_supp :=['AJ','AR','BN','CD','FD','RD','CJ','CS','RL','RM','RS','SC','VJ'];
+Filing_typ_to_supp :=[/*'AJ','AR',*/'BN','CD','FD','RD','CJ','CS','RL','RM','RS','SC','VJ'];
 																																	
 final := LiensMainWithDischargedBK((party_filing_type in Filing_typ_to_supp or Main_filing_type in Filing_typ_to_supp) and
                                                orig_filing_date < discharged);
