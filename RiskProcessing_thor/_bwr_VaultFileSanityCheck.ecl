@@ -3,6 +3,8 @@
 // sandbox Vault.Vault.MAC_Remove_Vault_Fields -- comment out this filter in the macro so it runs fast on hthor:  (vault_record_status in [4, 5, 6])
 
 // throw an error here if the controls aren't set correctly for running files on vault
+IMPORT _Control;
+
 #WORKUNIT('name', 'Vault RiskView 5.0 Sanity Check ' + 	
 map(
 _Control.Environment.OnThor=false => ERROR(1,'Toggle Setting OnThor'), 
@@ -10,7 +12,12 @@ _Control.Environment.OnVault=false => ERROR(2,'Toggle Setting OnVault'),
 _Control.LibraryUse.ForceOff_AllLibraries=false => ERROR(3,'Toggle Setting LibraryUse'), 
 '' ) // if all is good, nothing left to say and it runs successfully to test the keys
 );  
-	
+
+IMPORT _Control, AID, PersonContext, InsuranceHeader_xLink, FCRA, Suppress, watchdog, doxie_files, Email_Data, Advo, AID_Build, AVM_V2, BankruptcyV3,
+	risk_indicators, gong, RiskWise, codes, misc2, InsuranceHeader_PostProcess, faa, watercraft, VotersV2, thrive,
+	Targus, doxie, SexOffender, prof_licenseV2, paw, LN_PropertyV2, LiensV2, Inquiry_AccLogs, InfutorCID, header_quick, AlloyMedia_student_list,
+	american_student_list, Death_Master, dx_Header, data_services, dx_fcra_opt_out, Census_Data, Prof_License_Mari, Prof_LicenseV2, dx_Gong;
+		
 #workunit('priority','high');
 #option('pickBestEngine', false);   // workaround to see data in the property keys on vault
 	
@@ -97,9 +104,9 @@ output(choosen(		dx_header.key_addr_hist(data_services.data_env.iFCRA)	, luckynu
 output(choosen(		dx_Header.Key_Header_Address(data_services.data_env.iFCRA)	, luckynumber), named('vault_dx_header_Key_FCRA_Header_Address') );
 output(choosen(		dx_Header.Key_Header(data_services.data_env.iFCRA)	, luckynumber), named('vault_dx_header_Key_FCRA_Header') );
 output(choosen(		dx_Header.Key_max_dt_last_seen(data_services.data_env.iFCRA)	, luckynumber), named('vault_dx_header_Key_FCRA_max_dt_last_seen') );
-output(choosen(		dx_fcra_opt_out.key_address	, luckynumber), named('vault_dx_fcra_opt_out_key_address') );
-output(choosen(		dx_fcra_opt_out.key_did	, luckynumber), named('vault_dx_fcra_opt_out_key_did') );
-output(choosen(		dx_fcra_opt_out.key_ssn	, luckynumber), named('vault_dx_fcra_opt_out_key_ssn') );
+output(choosen(		dx_fcra_opt_out.key_address	, luckynumber), named('vault_fcra_opt_out_key_address') );
+output(choosen(		dx_fcra_opt_out.key_did	, luckynumber), named('vault_fcra_opt_out_key_did') );
+output(choosen(		dx_fcra_opt_out.key_ssn	, luckynumber), named('vault_fcra_opt_out_key_ssn') );
 output(choosen(		Risk_Indicators.Key_FCRA_Telcordia_tpm_Slim	, luckynumber), named('vault_Risk_Indicators_Key_FCRA_Telcordia_tpm_Slim') );
 output(choosen(		Census_Data.Key_Fips2County	, luckynumber), named('vault_Census_Data_Key_Fips2County') );
 output(choosen(		dx_Gong.Key_History_Address(data_services.data_env.iFCRA)	, luckynumber), named('vault_Gong_Key_FCRA_History_Address') );
