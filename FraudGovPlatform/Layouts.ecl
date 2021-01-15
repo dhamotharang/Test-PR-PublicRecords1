@@ -269,7 +269,10 @@ EXPORT Layouts := MODULE
 			string  field5	:= '';
 		END;
 		
-		
+		EXPORT DisposableEmailDomains := Record
+			string200 domain;
+			string1	  dispsblemail;
+		END;			
 	END;
 
 	EXPORT vLoad := {string75 fn { virtual(logicalfilename)},Sprayed.IdentityData};
@@ -367,7 +370,9 @@ EXPORT Layouts := MODULE
 			integer8 risklevel;
 		END;
 		EXPORT DisposableEmailDomains := Record
-			UNICODE200 DisposableEmailDomain;
+			Sprayed.DisposableEmailDomains;
+			unsigned8		source_rec_id;
+			Provenance;
 		END;		
 	END;
 
@@ -382,6 +387,11 @@ EXPORT Layouts := MODULE
             string100 address_1 := '';   
             string50 address_2 := '';
 			unsigned4 address_cleaned;
+		END;
+
+		EXPORT DisposableEmailDomains := Record
+			string200 domain;
+			string1	  dispsblemail;
 		END;
 		
 	END;
@@ -430,6 +440,7 @@ EXPORT Layouts := MODULE
 			boolean SkipRDP;
 			boolean SkipDashboards;
 			boolean SkipDashboardVersion;
+			boolean SkipDEDI;
 		END;
 
 		export SkipValidationByGCID	 := RECORD

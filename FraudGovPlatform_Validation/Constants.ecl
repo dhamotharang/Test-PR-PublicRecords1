@@ -15,6 +15,9 @@ module
 	export	string		RDPLandingZonePathBase_dev	:=	'/data/super_credit/fraudgov/in/rdp/prod/';
 	export	string		RDPLandingZonePathBase_prod	:=	'/data/super_credit/fraudgov/in/rdp/prod/';
 
+	export	string		DEDILandingZonePathBase_dev	:=	'/data/super_credit/fraudgov/in/dedi/prod/';
+	export	string		DEDILandingZonePathBase_prod	:=	'/data/super_credit/fraudgov/in/dedi/prod/';
+
 	export	string		VRulesLandingZonePathBase	:=	'/data/otto/velocityrules/';
 	
 	export	string 		MBSLandingZonePathBase_dev	:='/data/super_credit/fraudgov/in/mbs/dbexport/prod';
