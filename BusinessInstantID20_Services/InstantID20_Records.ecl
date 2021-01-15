@@ -1,4 +1,4 @@
-﻿IMPORT BIPV2, Business_Risk_BIP, Risk_Reporting, LNSmallBusiness, BusinessInstantID20_Services, iesp, std, Models, Risk_Indicators;
+﻿IMPORT BIPV2, Business_Risk_BIP, Risk_Reporting, LNSmallBusiness, BusinessInstantID20_Services, iesp, Models, Risk_Indicators;
 
 EXPORT InstantID20_Records( DATASET(BusinessInstantID20_Services.layouts.InputCompanyAndAuthRepInfo) ds_input,
                             BusinessInstantID20_Services.iOptions Options,
@@ -11,7 +11,6 @@ EXPORT InstantID20_Records( DATASET(BusinessInstantID20_Services.layouts.InputCo
 							              Boolean useUpdatedBipAppend = true) := FUNCTION
 
 		AllowedSourcesSet := BusinessInstantID20_Services.set_AllowedSources( Options );
-
 		
 		// 0.  Rename "input" for Verification purposes later: more reader-friendly.
 		ds_OriginalInput := ds_input;
@@ -64,9 +63,9 @@ EXPORT InstantID20_Records( DATASET(BusinessInstantID20_Services.layouts.InputCo
 		ds_BusinessesByFEIN := BusinessInstantID20_Services.fn_GetBusinessByFEIN( ds_OriginalInput, ds_BIPIDsFound, Options, linkingOptions );
 		
 		// 13. Get GlobalWatchlist info.
-		ds_GlobalWatchlistInfo := BusinessInstantID20_Services.fn_GetGlobalWatchlistInfo( ds_OriginalInput, Options );
+   ds_GlobalWatchlistInfo := If( ExcludeWatchlists = FALSE, BusinessInstantID20_Services.fn_GetGlobalWatchlistInfo( ds_OriginalInput, Options ), Dataset([], BusinessInstantID20_Services.Layouts.OFACAndWatchlistLayoutFlat));	
 		
-		// 14. Get Consumer InstantID records for *valid* Auth Reps.
+    // 14. Get Consumer InstantID records for *valid* Auth Reps.
 		ds_CleanedInputWithValidAuthReps := 
 			PROJECT( 
 				ds_WithLexIDs,
@@ -75,8 +74,7 @@ EXPORT InstantID20_Records( DATASET(BusinessInstantID20_Services.layouts.InputCo
 					SELF := LEFT
 				)
 			);
-
-   			
+ 			
 		ds_ConsumerInstantIDInfo := BusinessInstantID20_Services.fn_GetConsumerInstantIDRecs( ds_CleanedInputWithValidAuthReps, Options, ds_GlobalWatchlistInfo,
 		LexIdSourceOptout := LexIdSourceOptout, 
 	  TransactionID := TransactionID, 
@@ -107,8 +105,7 @@ EXPORT InstantID20_Records( DATASET(BusinessInstantID20_Services.layouts.InputCo
    // ds_Models_temp := DATASET([], Layout_ModelOut_Plus);
   
   #if(Models.LIB_BusinessRisk_Models().TurnOnValidation = FALSE)
-    
-    
+       
     iesp.smallbusinessanalytics.t_SBAScoreHRI getScoreResults(Layout_ModelOut_Plus le) := TRANSFORM
       SELF._Type := IF((INTEGER)le.Score=0,'','0-999');
       SELF.Value := (INTEGER)le.Score;
