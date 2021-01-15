@@ -8,24 +8,11 @@ Key := InsuranceHeader_xLink.Process_xIDL_Layouts().key;
  hr0 := header.File_header_raw_latest.File;
  
  hr  := DISTRIBUTE(hr0(header.Blocked_data()), HASH(rid));
- 
- t:= { 
-    dx_header.layout_header,
- 	string1 valid_dob := '';
-	unsigned6 hhid := 0;
-	STRING18 county_name := '';
-	STRING120 listed_name := '';
-	STRING10 listed_phone := '';
-	unsigned4 dod := 0;
-	STRING1 death_code := '';
-	unsigned4 lookup_did := 0;
-	UNSIGNED4 DT_EFFECTIVE_FIRST, 
-	UNSIGNED4 DT_EFFECTIVE_LAST} ; 
 	
  Incpayload := JOIN(hr,DISTRIBUTE(KeyPayloadInc(SRC[1..3]='ADL'),HASH(source_rid))
                                   ,LEFT.rid = RIGHT.source_rid AND 
                                    LEFT.src = RIGHT.src[4..5]
-                                  ,TRANSFORM(t,
+                                  ,TRANSFORM(InsuranceHeader_xLink.layout_insuranceheader_payload,
                                    SELF.did := RIGHT.did;
                                    SELF.jflag2 := RIGHT.ambiguous;		
                                    SELF.src := RIGHT.src[4..5];
@@ -74,8 +61,18 @@ Key := InsuranceHeader_xLink.Process_xIDL_Layouts().key;
                                    SELF.address_ind:=0;  
                                    SELF.name_ind:=0;  
                                    SELF.persistent_record_ID := 0,
-																	                  SELF.DT_EFFECTIVE_FIRST := RIGHT.DT_EFFECTIVE_FIRST,
-																	                  SELF.DT_EFFECTIVE_LAST  := RIGHT.DT_EFFECTIVE_LAST,
+                                   // Default values for Incremental Key
+                                   SELF.valid_dob := '';
+                                   SELF.hhid := 0;
+                                   SELF.county_name := '';
+                                   SELF.listed_name := '';
+                                   SELF.listed_phone := '';
+                                   SELF.dod := 0;
+                                   SELF.death_code := '';
+                                   SELF.lookup_did := 0;
+                                   SELF.DT_EFFECTIVE_FIRST := RIGHT.DT_EFFECTIVE_FIRST,
+                                   SELF.DT_EFFECTIVE_LAST  := RIGHT.DT_EFFECTIVE_LAST,
+                                   SELF.locid := 0;
                                    ),local) ; 
 
 return Incpayload;
