@@ -1,12 +1,14 @@
 ﻿/*--SOAP--
 <message name="BusinessInstantID20_Service">
-	<part name="BusinessInstantID20Request" type="tns:XmlDataSet" cols="110" rows="75"/>
-	<part name="DPPAPurpose" type="xsd:integer"/>
-	<part name="GLBPurpose" type="xsd:integer"/>
-	<part name="DataRestrictionMask" type="xsd:string"/>
-	<part name="DataPermissionMask" type="xsd:string"/>
-	<part name="BIID20ProductType" type="xsd:integer"/> <!-- 1,2,3,4 -->
+  <part name="BusinessInstantID20Request" type="tns:XmlDataSet" cols="110" rows="75"/>
+  <part name="DPPAPurpose" type="xsd:integer"/>
+  <part name="GLBPurpose" type="xsd:integer"/>
+  <part name="DataRestrictionMask" type="xsd:string"/>
+  <part name="DataPermissionMask" type="xsd:string"/>
+  <part name="BIID20ProductType" type="xsd:integer"/> <!-- 1,2,3,4 -->
   <part name="Gateways" type="tns:XmlDataSet" cols="100" rows="8"/>
+  <part name="OFACVersion" type="xsd:integer"/>
+
 </message>
 */
 /*--INFO-- This Service is the interface into the Business InstantID ECL service, version 2.0. */
@@ -25,18 +27,19 @@ EXPORT InstantID20_Service() := MACRO
 		 *                      Force the order on the WsECL page                 *
 		 ************************************************************************ */
 		#WEBSERVICE(FIELDS(
-		'BusinessInstantID20Request',
-		'DPPAPurpose',
-		'GLBPurpose',
-		'DataRestrictionMask',
-		'DataPermissionMask',
-		'BIID20ProductType',
+    'BusinessInstantID20Request',
+    'DPPAPurpose',
+		 'GLBPurpose',
+		 'DataRestrictionMask',
+		 'DataPermissionMask',
+		 'BIID20ProductType',
     'Gateways',
-		'LexIdSourceOptout',
-		'_TransactionId',
-		'_BatchUID',
-		'_GCID'
-		));
+    'OFACVersion',
+		 'LexIdSourceOptout',
+		 '_TransactionId',
+		 '_BatchUID',
+		 '_GCID'
+		 ));
 
 		/* ************************************************************************
 		 *                          Grab service inputs                           *
@@ -56,26 +59,26 @@ EXPORT InstantID20_Service() := MACRO
 		/* **********************************************
 			 *  Fields needed for improved Scout Logging  *
 			 **********************************************/
-			string32 _LoginID               := ''	: STORED('_LoginID');
-			outofbandCompanyID							:= '' : STORED('_CompanyID');
-			string20 CompanyID              := IF(users.CompanyId != '', users.CompanyId, outofbandCompanyID);
-			string20 FunctionName           := '' : STORED('_LogFunctionName');
-			string50 ESPMethod              := '' : STORED('_ESPMethodName');
-			string10 InterfaceVersion       := '' : STORED('_ESPClientInterfaceVersion');
-			string5 DeliveryMethod          := '' : STORED('_DeliveryMethod');
-			string5 DeathMasterPurpose      := '' : STORED('__deathmasterpurpose');
-			outofbandssnmask                := '' : STORED('SSNMask');
-			string10 SSN_Mask               := IF(users.SSNMask != '', users.SSNMask, outofbandssnmask);
-			outofbanddobmask                := '' : STORED('DOBMask');
-			string10 DOB_Mask               := IF(users.DOBMask != '', users.DOBMask, outofbanddobmask);
-			BOOLEAN DL_Mask                 := users.DLMask;
-			BOOLEAN ExcludeDMVPII           := users.ExcludeDMVPII;
-			BOOLEAN DisableOutcomeTracking  := FALSE : STORED('OutcomeTrackingOptOut');
-			BOOLEAN ArchiveOptIn            := FALSE : STORED('instantidarchivingoptin');
-			unsigned1 LexIdSourceOptout 		:= 1 : STORED('LexIdSourceOptout');
-			string TransactionID 						:= '' : STORED('_TransactionId');
-			string BatchUID 								:= '' : STORED('_BatchUID');
-			unsigned6 GlobalCompanyId			  := 0 : STORED('_GCID');
+		string32 _LoginID               := ''	: STORED('_LoginID');
+		outofbandCompanyID							:= '' : STORED('_CompanyID');
+		string20 CompanyID              := IF(users.CompanyId != '', users.CompanyId, outofbandCompanyID);
+		string20 FunctionName           := '' : STORED('_LogFunctionName');
+		string50 ESPMethod              := '' : STORED('_ESPMethodName');
+		string10 InterfaceVersion       := '' : STORED('_ESPClientInterfaceVersion');
+		string5 DeliveryMethod          := '' : STORED('_DeliveryMethod');
+		string5 DeathMasterPurpose      := '' : STORED('__deathmasterpurpose');
+		outofbandssnmask                := '' : STORED('SSNMask');
+		string10 SSN_Mask               := IF(users.SSNMask != '', users.SSNMask, outofbandssnmask);
+		outofbanddobmask                := '' : STORED('DOBMask');
+		string10 DOB_Mask               := IF(users.DOBMask != '', users.DOBMask, outofbanddobmask);
+		BOOLEAN DL_Mask                 := users.DLMask;
+		BOOLEAN ExcludeDMVPII           := users.ExcludeDMVPII;
+		BOOLEAN DisableOutcomeTracking  := FALSE : STORED('OutcomeTrackingOptOut');
+		BOOLEAN ArchiveOptIn            := FALSE : STORED('instantidarchivingoptin');
+		unsigned1 LexIdSourceOptout 		:= 1 : STORED('LexIdSourceOptout');
+		string TransactionID 						:= '' : STORED('_TransactionId');
+		string BatchUID 								:= '' : STORED('_BatchUID');
+		unsigned6 GlobalCompanyId			  := 0 : STORED('_GCID');
 
 			//Look up the industry by the company ID.
 			Industry_Search := Inquiry_AccLogs.Key_Inquiry_industry_use_vertical_login(FALSE)(s_company_id = CompanyID and s_product_id = (String)Risk_Reporting.ProductID.Business_Risk__InstantID_20_Service);
