@@ -1,5 +1,4 @@
-IMPORT  ut, mdr, tools,_validate, Address, Ut, lib_stringlib, _Control, business_header, Enclarity,
-Header, Header_Slimsort, didville, ut, DID_Add,Business_Header_SS, NID, AID;
+IMPORT  ut, _validate, lib_stringlib, Enclarity;
 
 EXPORT StandardizeInputFile (string filedate, boolean pUseProd = false):= MODULE
 
@@ -15,7 +14,7 @@ EXPORT StandardizeInputFile (string filedate, boolean pUseProd = false):= MODULE
 
 	EXPORT Facility	:= FUNCTION
 		baseFile	:= Files(filedate,pUseProd).facility_input;
-		
+
 		enclarity.layouts.facility_base tMapping(layouts.facility_input L, integer C) := TRANSFORM, SKIP(L.group_key = 'group_key')
 			SELF.pid                      :=fn_scale_gk(l.group_key);
 			SELF.src											:= '64';
@@ -87,10 +86,10 @@ EXPORT StandardizeInputFile (string filedate, boolean pUseProd = false):= MODULE
 		END;
 
 		dStd := NORMALIZE(baseFile, 2, tMapping(LEFT, counter))(normed_addr_rec_type='P' or Prepped_addr1<>'');
-					
+
 		return dStd;
 	END;
-		
+
 	EXPORT Individual	(dataset(Layouts.individual_input) baseFile):=function
 
 		enclarity.layouts.individual_base tMapping(layouts.individual_input L) := TRANSFORM, SKIP((L.group_key = 'group_key')
@@ -126,10 +125,10 @@ EXPORT StandardizeInputFile (string filedate, boolean pUseProd = false):= MODULE
 		END;
 
 		dStd := PROJECT(baseFile, tMapping(LEFT));
-		
+
 		return dStd;
 	END;
-	
+
 	EXPORT Associate	:= FUNCTION
 		baseFile	:= Files(filedate,pUseProd).associate_input;
 		enclarity.layouts.associate_base tMapping(layouts.associate_input L, integer C) := TRANSFORM, SKIP(L.group_key = 'group_key')
@@ -177,10 +176,10 @@ EXPORT StandardizeInputFile (string filedate, boolean pUseProd = false):= MODULE
 			SELF  :=  L;
 			SELF  :=  [];
 		END;
-		
+
 		RETURN NORMALIZE(baseFile, 4, tMapping(LEFT, COUNTER))(normed_name_rec_type='1' or Prepped_name<>'');
 	END;
-	
+
 	EXPORT Address	:= FUNCTION
 		baseFile	:= Files(filedate,pUseProd).address_input;
 
@@ -247,9 +246,9 @@ EXPORT StandardizeInputFile (string filedate, boolean pUseProd = false):= MODULE
 			SELF  :=  [];
 		END;
 
-		RETURN NORMALIZE(baseFile, 2, tMapping(LEFT, counter))(normed_addr_rec_type='P' or Prepped_addr1<>'');			
+		RETURN NORMALIZE(baseFile, 2, tMapping(LEFT, counter))(normed_addr_rec_type='P' or Prepped_addr1<>'');
 	END;
-	
+
 	EXPORT DEA	:= FUNCTION
 		baseFile	:= Files(filedate,pUseProd).dea_input;
 
@@ -268,7 +267,7 @@ EXPORT StandardizeInputFile (string filedate, boolean pUseProd = false):= MODULE
 			SELF.dea_bus_act_ind					:= TRIM(L.dea_bus_act_ind, LEFT, RIGHT);
 			SELF.dea_bus_act_ind_sub			:= TRIM(Stringlib.StringToUpperCase(L.dea_bus_act_ind_sub), LEFT, RIGHT);
 			SELF.dea_drug_schedule				:= TRIM(Stringlib.StringToUpperCase(L.dea_drug_schedule), LEFT, RIGHT);
-			SELF.dea_num_deact_date				:= TRIM(Stringlib.StringToUpperCase(stringlib.stringfilterout(L.dea_num_deact_date,'-')), LEFT, RIGHT);		
+			SELF.dea_num_deact_date				:= TRIM(Stringlib.StringToUpperCase(stringlib.stringfilterout(L.dea_num_deact_date,'-')), LEFT, RIGHT);
 			SELF.addr_key									:= TRIM(L.addr_key, LEFT, RIGHT);
 
 			SELF.normed_addr_rec_type     := CHOOSE(C,'P','S');
@@ -291,12 +290,12 @@ EXPORT StandardizeInputFile (string filedate, boolean pUseProd = false):= MODULE
 			SELF  :=  [];
 		END;
 
-		RETURN NORMALIZE(baseFile, 2, tMapping(LEFT, counter))(normed_addr_rec_type='P' or Prepped_addr1<>'');	
+		RETURN NORMALIZE(baseFile, 2, tMapping(LEFT, counter))(normed_addr_rec_type='P' or Prepped_addr1<>'');
 	END;
 
 	EXPORT License	:= FUNCTION
 		baseFile	:= Files(filedate,pUseProd).license_input;
-	
+
 		enclarity.layouts.license_base tMapping(layouts.license_input L, integer C) := TRANSFORM, SKIP(L.group_key = 'group_key')
 			SELF.pid                      :=fn_scale_gk(l.group_key);
 			SELF.src											:= '64';
@@ -345,7 +344,7 @@ EXPORT StandardizeInputFile (string filedate, boolean pUseProd = false):= MODULE
 
 		RETURN NORMALIZE(baseFile, 2, tMapping(LEFT, counter))(normed_addr_rec_type='P' or Prepped_addr1<>'');
 	END;
-	
+
 	EXPORT Taxonomy	:= FUNCTION
 		baseFile	:= Files(filedate,pUseProd).taxonomy_input;
 
@@ -366,9 +365,9 @@ EXPORT StandardizeInputFile (string filedate, boolean pUseProd = false):= MODULE
 			SELF  :=  [];
 		END;
 
-		RETURN PROJECT(baseFile, tMapping(LEFT));		
+		RETURN PROJECT(baseFile, tMapping(LEFT));
 	END;
-	
+
 	EXPORT NPI	:= FUNCTION
 		baseFile	:= Files(filedate,pUseProd).npi_input;
 
@@ -419,7 +418,7 @@ EXPORT StandardizeInputFile (string filedate, boolean pUseProd = false):= MODULE
 			SELF.npi_type									:= TRIM(Stringlib.StringToUpperCase(L.npi_type), LEFT, RIGHT);
 			SELF.npi_sole_proprietor			:= TRIM(Stringlib.StringToUpperCase(L.npi_sole_proprietor), LEFT, RIGHT);
 			SELF.clean_phone							:= if(ut.CleanPhone(L.phone1) [1] not in ['0','1'],ut.CleanPhone(L.phone1), '') ;
-			SELF.npi_deact_date						:= TRIM(Stringlib.StringToUpperCase(stringlib.stringfilterout(L.npi_deact_date,'-')), LEFT, RIGHT);		
+			SELF.npi_deact_date						:= TRIM(Stringlib.StringToUpperCase(stringlib.stringfilterout(L.npi_deact_date,'-')), LEFT, RIGHT);
 			SELF.clean_npi_deact_date			:= _validate.date.fCorrectedDateString((string)SELF.npi_deact_date,false);
 					 npi_enum_date            := TRIM(Stringlib.StringToUpperCase(stringlib.stringfilterout(L.npi_enum_date, '/')), LEFT, RIGHT);
 			SELF.npi_enum_date						:= npi_enum_date[5..8]+npi_enum_date[1..2]+npi_enum_date[3..4];
@@ -428,9 +427,9 @@ EXPORT StandardizeInputFile (string filedate, boolean pUseProd = false):= MODULE
 			SELF  :=  [];
 		END;
 
-		RETURN NORMALIZE(baseFile, 2, tMapping(LEFT, counter))(normed_addr_rec_type='P' or Prepped_addr1<>'');			
+		RETURN NORMALIZE(baseFile, 2, tMapping(LEFT, counter))(normed_addr_rec_type='P' or Prepped_addr1<>'');
 	END;
-	
+
 	EXPORT Medschool	:= FUNCTION
 		baseFile	:= Files(filedate,pUseProd).medschool_input;
 
@@ -452,7 +451,7 @@ EXPORT StandardizeInputFile (string filedate, boolean pUseProd = false):= MODULE
 
 		RETURN PROJECT(baseFile, tMapping(LEFT));
 	END;
-	
+
 	EXPORT Tax_codes	:= FUNCTION
 		baseFile	:= Files(filedate,pUseProd).tax_codes_input;
 
@@ -468,9 +467,9 @@ EXPORT StandardizeInputFile (string filedate, boolean pUseProd = false):= MODULE
 			SELF.type1									:= TRIM(Stringlib.StringToUpperCase(L.type1), LEFT, RIGHT);
 			SELF.classification					:= TRIM(Stringlib.StringToUpperCase(L.classification), LEFT, RIGHT);
 			SELF.specialization					:= TRIM(Stringlib.StringToUpperCase(L.specialization), LEFT, RIGHT);
-			SELF.effect_date						:= ut.ConvertDate(L.effect_date);		
-			SELF.deact_date							:= ut.ConvertDate(L.deact_date);		
-			SELF.last_mod_date					:= ut.ConvertDate(L.last_mod_date);		
+			SELF.effect_date						:= ut.ConvertDate(L.effect_date);
+			SELF.deact_date							:= ut.ConvertDate(L.deact_date);
+			SELF.last_mod_date					:= ut.ConvertDate(L.last_mod_date);
 			SELF.clean_effect_date			:= _validate.date.fCorrectedDateString((string)SELF.effect_date,false);
 			SELF.clean_deact_date				:= _validate.date.fCorrectedDateString((string)SELF.deact_date,false);
 			SELF.clean_last_mod_date		:= _validate.date.fCorrectedDateString((string)SELF.last_mod_date,false);
@@ -480,7 +479,7 @@ EXPORT StandardizeInputFile (string filedate, boolean pUseProd = false):= MODULE
 
 		RETURN PROJECT(baseFile, tMapping(LEFT));
 	END;
-	
+
 	EXPORT Prov_ssn	:= FUNCTION
 		baseFile	:= Files(filedate,pUseProd).prov_ssn_input;
 
@@ -502,7 +501,7 @@ EXPORT StandardizeInputFile (string filedate, boolean pUseProd = false):= MODULE
 
 		RETURN PROJECT(baseFile, tMapping(LEFT));
 	END;
-	
+
 	EXPORT Specialty:= FUNCTION
 		baseFile	:= Files(filedate,pUseProd).specialty_input;
 
@@ -524,7 +523,7 @@ EXPORT StandardizeInputFile (string filedate, boolean pUseProd = false):= MODULE
 
 		RETURN PROJECT(baseFile, tMapping(LEFT));
 	END;
-	
+
 	EXPORT Sanc_prov_type:= FUNCTION
 		baseFile	:= Files(filedate,pUseProd).sanc_prov_type_input;
 
@@ -541,12 +540,12 @@ EXPORT StandardizeInputFile (string filedate, boolean pUseProd = false):= MODULE
 			SELF  :=  L;
 			SELF  :=  [];
 		END;
-		
+
 		tempBase	:= PROJECT(baseFile, tMapping(LEFT));
 		newBase		:= table(tempBase,{tempBase, cnt := count(group)}, prov_type_code, few) (cnt = 1); //do not accept ANY duplications
 		RETURN project(newBase,enclarity.Layouts.sanc_prov_type_base);
 	END;
-	
+
 	EXPORT Sanc_codes:= FUNCTION
 		baseFile	:= Files(filedate,pUseProd).sanc_codes_input;
 
@@ -569,7 +568,7 @@ EXPORT StandardizeInputFile (string filedate, boolean pUseProd = false):= MODULE
 		RETURN project(newBase, enclarity.Layouts.sanc_codes_base);
 
 	END;
-			
+
 	EXPORT Prov_birthdate	:= FUNCTION
 		baseFile	:= Files(filedate,pUseProd).prov_birthdate_input;
 
@@ -591,15 +590,15 @@ EXPORT StandardizeInputFile (string filedate, boolean pUseProd = false):= MODULE
 
 		RETURN PROJECT(baseFile, tMapping(LEFT));
 	END;
-	
+
 	EXPORT Sanction	:= FUNCTION
 		baseFile	:= Files(filedate,pUseProd).sanction_input;
 
-		STRING fGetSancDesc(STRING SancDescIn)	:=		MAP(SancDescIn = 'Letter or Reprimand  And or Reprimand with other r' => 
+		STRING fGetSancDesc(STRING SancDescIn)	:=		MAP(SancDescIn = 'Letter or Reprimand  And or Reprimand with other r' =>
 																											'Letter or Reprimand with other restrictions'
-																									,SancDescIn = 'License Reinstatements/Removal of License Restrict' => 
+																									,SancDescIn = 'License Reinstatements/Removal of License Restrict' =>
 																											'License Reinstatements/Removal of Lic Restrictions'
-																									,SancDescIn = 'License Revocation/Susptension/Surrender/Terminatio' => 
+																									,SancDescIn = 'License Revocation/Susptension/Surrender/Terminatio' =>
 																											'License Revocation/Susp/Surrender/Term/Inactive'
 																									,SancDescIn <> '' => SancDescIn
 																									,'');
@@ -614,7 +613,7 @@ EXPORT StandardizeInputFile (string filedate, boolean pUseProd = false):= MODULE
 			SELF.Dt_last_seen							:= 0;
 
 			SELF.group_key							:= TRIM(L.group_key, LEFT, RIGHT);
-			SELF.sanc1_date							:= TRIM(Stringlib.StringToUpperCase(stringlib.stringfilterout(L.sanc1_date,'-')), LEFT, RIGHT);		
+			SELF.sanc1_date							:= TRIM(Stringlib.StringToUpperCase(stringlib.stringfilterout(L.sanc1_date,'-')), LEFT, RIGHT);
 			SELF.sanc1_code							:= TRIM(Stringlib.StringToUpperCase(L.sanc1_code), LEFT, RIGHT);
 			SELF.sanc1_state						:= TRIM(Stringlib.StringToUpperCase(L.sanc1_state), LEFT, RIGHT);
 			SELF.sanc1_lic_num					:= TRIM(Stringlib.StringToUpperCase(L.sanc1_lic_num), LEFT, RIGHT);
@@ -631,8 +630,8 @@ EXPORT StandardizeInputFile (string filedate, boolean pUseProd = false):= MODULE
 		END;
 
 		newBase	:= PROJECT(baseFile, tMapping(LEFT));
-														
-		RETURN newBase;	
+
+		RETURN newBase;
 	END;
 
 	EXPORT Collapse	:= FUNCTION
@@ -644,7 +643,7 @@ EXPORT StandardizeInputFile (string filedate, boolean pUseProd = false):= MODULE
 
 		RETURN PROJECT(baseFile, tMapping(LEFT));
 	END;
-	
+
 	EXPORT Split	:= FUNCTION
 		baseFile	:= Files(filedate,pUseProd).Split_input;
 
@@ -654,7 +653,7 @@ EXPORT StandardizeInputFile (string filedate, boolean pUseProd = false):= MODULE
 
 		RETURN PROJECT(baseFile, tMapping(LEFT));
 	END;
-	
+
 	EXPORT Drop	:= FUNCTION
 		baseFile	:= Files(filedate,pUseProd).Drop_input;
 
@@ -664,5 +663,5 @@ EXPORT StandardizeInputFile (string filedate, boolean pUseProd = false):= MODULE
 
 		RETURN PROJECT(baseFile, tMapping(LEFT));
 	END;
-	
+
 END;

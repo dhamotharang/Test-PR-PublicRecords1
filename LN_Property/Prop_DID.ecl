@@ -1,4 +1,4 @@
-import did_add, header_slimsort, ut, header, Fair_Isaac, didville, business_header,business_header_ss;
+import did_add, header, business_header, business_header_ss;
 pj_in := ln_property.Prop_Joined;
 
 //  Remove Fail condition because the old property is letting bad dates through also
@@ -9,9 +9,9 @@ pj_in := ln_property.Prop_Joined;
 matchset := ['A', 'P', 'Z'];
 
 did_add.MAC_Match_Flex
-	(pj_in, matchset,					
-	 ssn_field, dob_field, fname, mname, lname, suffix, 
-	 prim_range, prim_name, sec_range, zip, st, phone, 
+	(pj_in, matchset,
+	 ssn_field, dob_field, fname, mname, lname, suffix,
+	 prim_range, prim_name, sec_range, zip, st, phone,
 	 DID, header.Layout_New_Records, false, DID_Score_field,
 	 75, pj_out)
 
@@ -37,7 +37,7 @@ business_header.MAC_Source_Match(for_bdid1,wbdid1,
 						prim_Range,Prim_name,sec_range,zip,
 						false,foo,
 						false,foo);
-						
+
 for_bdid2 := wbdid1(bdid = 0);
 myset := ['A'];
 
@@ -49,7 +49,7 @@ business_header_ss.MAC_Match_Flex(for_bdid2,myset,
 						Layout_did_out,
 						false,score,
 						wbdid2);
-						
+
 outfinal := wbdid2 + wbdid1(bdid!=0) + added_dids(cname = '');
 
 export Prop_DID := outfinal : persist('~thor_data400::persist::ln_property_did');

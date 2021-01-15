@@ -1,6 +1,6 @@
-﻿ 
-import AutoStandardI, risk_indicators, didville, ut, address, doxie_files, 
-census_data, header_slimsort, did_add, suppress, Bankruptcyv2, BankruptcyV3, mdr, Death_Master;
+﻿
+import AutoStandardI, risk_indicators, didville,
+census_data, suppress, BankruptcyV3, mdr, Death_Master;
 
 export skip_trace(DATASET(risk_indicators.Layout_Input) indata, unsigned1 dppa, unsigned1 glb,
 		string50 DataRestriction=risk_indicators.iid_constants.default_DataRestriction,string32 appType,
@@ -25,12 +25,12 @@ didville.MAC_DidAppend(didprep,did_results,dedup_these,fz,allscores);
 
 industryClass := AutoStandardI.InterfaceTranslator.industry_class_val.val(project(AutoStandardI.GlobalModule(),AutoStandardI.InterfaceTranslator.industry_class_val.params));
 
-didville.MAC_BestAppend(did_results, 
-											  appends, 
-												verify, 
-												thresh_num, 
-												glb_ok, 
-												best_data, 
+didville.MAC_BestAppend(did_results,
+											  appends,
+												verify,
+												thresh_num,
+												glb_ok,
+												best_data,
 												false,
 												DataRestriction,
 												,
@@ -48,9 +48,9 @@ Layout_SkipTrace add_best_address(indata le, best_data rt) := transform
 	addrtype := map(clean_best='' => 'X',
 				 clean_best[1..10]=le.prim_range and clean_best[13..40]=le.prim_name and clean_best[117..121]=le.z5 => 'C',
 				 'U');
-				 
+
 	self.addr_type_a := addrtype;
-	
+
 	SELF.in_streetAddress := if(addrtype='X', le.in_streetAddress, rt.best_Addr1);
 	SELF.in_city := if(addrtype='X', le.in_city, rt.best_city);
 	SELF.in_state := if(addrtype='X', le.in_state, rt.best_state);
@@ -71,7 +71,7 @@ Layout_SkipTrace add_best_address(indata le, best_data rt) := transform
 	self.addr_type := if(addrtype='X', le.addr_type, clean_best[139]);
 	self.addr_status := if(addrtype='X', le.addr_status, clean_best[179..182]);
 	self.county := if(addrtype='X', le.county, clean_best[143..145]);
-	self.geo_blk := if(addrtype='X', le.geo_blk, clean_best[171..177]);	
+	self.geo_blk := if(addrtype='X', le.geo_blk, clean_best[171..177]);
 	self := le;
 	self := [];
 end;
@@ -94,10 +94,10 @@ best_input := join(indata, best_data, left.seq=right.seq, add_best_address(left,
 
 	phones := join(best_input, dirsaddr,
 					  left.prim_name<>'' AND left.z5<>'' AND
-					  left.prim_name=right.prim_name and left.st=right.st and 
+					  left.prim_name=right.prim_name and left.st=right.st and
 					  left.z5=right.z5 and left.prim_range=right.prim_range and left.sec_range=right.sec_range,
 					  phoneByAddress(left,right),left outer, many lookup,
-					  ATMOST(left.prim_name=right.prim_name and left.st=right.st and 
+					  ATMOST(left.prim_name=right.prim_name and left.st=right.st and
 					  left.z5=right.z5 and left.prim_range=right.prim_range and left.sec_range=right.sec_range,RiskWise.max_atmost),
 					  keep(100));
 
@@ -131,7 +131,7 @@ best_input := join(indata, best_data, left.seq=right.seq, add_best_address(left,
 		string8 case_closing_date := '';
 		string35 disposition := '';
 		string1 filing_type := '';
-		string1 filer_type := '';	
+		string1 filer_type := '';
 		string1 match_flag := '';
 	end;
 
@@ -148,16 +148,16 @@ bans_did := BankruptcyV3.key_bankruptcyV3_did();
 		// hang on to the best data fname and lname for scoring when matching to full search file
 		self.debtor_fname := le.fname;
 		self.debtor_lname := le.lname;
-		self := [];		
+		self := [];
 	end;
 
 
 	// search by ssn and did to get TMSID, add flag to tell which one hit
 	// dedup by tmsid, making hit on ssn higher priority
-	bk_by_ssn := join(best_data, bans_ssn, 
+	bk_by_ssn := join(best_data, bans_ssn,
 				left.ssn!='' and keyed(right.ssn=left.ssn),
 				get_bans_by_ssn(left,right), atmost(riskwise.max_atmost), keep(50));
-	
+
 	bans_layout get_bans_by_did(best_data le, recordof(bans_did) rt) := transform
 		self.seq := le.seq;
 		self.match_flag := '2';
@@ -165,18 +165,18 @@ bans_did := BankruptcyV3.key_bankruptcyV3_did();
 		// hang on to the best data fname and lname for scoring when matching to full search file
 		self.debtor_fname := le.fname;
 		self.debtor_lname := le.lname;
-		self := [];		
-	end;	
+		self := [];
+	end;
 
 	bk_by_did := join(best_data, bans_did,
-				left.did!=0 and 
+				left.did!=0 and
 				keyed(left.did=right.did),
-				get_bans_by_did(left,right), atmost(riskwise.max_atmost), keep(50));			
-	
+				get_bans_by_did(left,right), atmost(riskwise.max_atmost), keep(50));
+
 	bk_tmsids1  := ungroup(bk_by_ssn + bk_by_did);
 	bk_tmsids := dedup(sort(bk_tmsids1, seq, tmsid, match_flag), seq, tmsid);
 
-	
+
 	bans_layout get_bans_by_tmsid(bk_tmsids le, recordof(BankruptcyV3.key_bankruptcyv3_search_full_bip()) rt) := transform
 		fscore := risk_indicators.FnameScore(le.debtor_fname, rt.fname);
 		lscore := risk_indicators.LnameScore(le.debtor_lname, rt.lname);
@@ -187,22 +187,22 @@ bans_did := BankruptcyV3.key_bankruptcyV3_did();
 		self.debtor_fname := rt.fname;
 		self.debtor_mname := rt.mname;
 		self.debtor_lname := rt.lname;
-		
+
 		self.chapter := rt.chapter;
 		self.date_filed := rt.date_filed;
 		self.disposition := rt.disposition;
 		self.filing_type := rt.filing_type;
-		
-		self := rt;		
-	end;	
+
+		self := rt;
+	end;
 
 	bk_search := join(bk_tmsids, BankruptcyV3.key_bankruptcyv3_search_full_bip(),
-				left.tmsid!='' and 
+				left.tmsid!='' and
 				keyed(left.tmsid=right.tmsid) and
 				right.name_type='D',  // only care about bankruptcy records which are the debtor
 				get_bans_by_tmsid(left,right));
-		
-	
+
+
 	//Populate county_name.
 	census_data.MAC_Fips2County_Keyed(bk_search,st,county,county_name,bk_search_recs);
 	// output(bk_by_ssn, named('bk_by_ssn'));
@@ -222,9 +222,9 @@ bans_did := BankruptcyV3.key_bankruptcyV3_did();
 				keyed(left.tmsid = right.tmsid),
 				get_more_bankrupt(LEFT,RIGHT),
 				ATMOST(RiskWise.max_atmost),keep(50));
-				
+
 	s_bankrupt := group(sort(full_bankrupt, seq, -date_filed, match_flag), seq);
-				
+
 	bans_layout roll_bankrupt(bans_layout le, bans_layout rt) := transform
 		chooser1 := map(le.date_filed > rt.date_filed => true,
 										le.date_filed = rt.date_filed and le.match_flag <= rt.match_flag => true,
@@ -233,7 +233,7 @@ bans_did := BankruptcyV3.key_bankruptcyV3_did();
 	end;
 
 	rolled_bankrupt := rollup(s_bankrupt, true, roll_bankrupt(left,right));
-		
+
 	Layout_SkipTrace add_bankrupt(Layout_SkipTrace le, bans_layout rt) := transform
 		self.bansmatchflag := if(rt.match_flag='', '0', rt.match_flag);
 		self.banscasenum := rt.case_number;
@@ -242,13 +242,13 @@ bans_did := BankruptcyV3.key_bankruptcyV3_did();
 							rt.chapter='12'=> '54',
 							rt.chapter='13'=> '06',
 							'');
-		
+
 		self.bansdispcode := map(StringLib.StringToLowerCase(rt.disposition) in ['discharged', 'discharge granted'] => '20',
 							StringLib.StringToLowerCase(rt.disposition) in ['case dismissed', 'dismissed'] => '15',
 							rt.disposed_date='' and rt.converted_date!='' => '30',
-							rt.disposed_date!='' => '99', 
+							rt.disposed_date!='' => '99',
 							rt.disposed_date='' and rt.converted_date='' and rt.case_closing_date='' and rt.case_number!='' => '02',
-							'');						
+							'');
 		self.bansdatefiled := rt.date_filed;
 		self.bansfirst := rt.debtor_fname;
 		self.bansmiddle := rt.debtor_mname;
@@ -267,7 +267,7 @@ bans_did := BankruptcyV3.key_bankruptcyV3_did();
 
 
 // append deceased information to the bankrupt_added recordset
-	Layout_SkipTrace add_deceased(Layout_SkipTrace le, risk_indicators.key_ssn_table_v4_2 ri) := transform										
+	Layout_SkipTrace add_deceased(Layout_SkipTrace le, risk_indicators.key_ssn_table_v4_2 ri) := transform
 		iid_constants := risk_indicators.iid_constants;
 
 		// determine which section of the table is permitted for use based on the data restriction mask
@@ -276,10 +276,10 @@ bans_did := BankruptcyV3.key_bankruptcyV3_did();
 													DataRestriction[iid_constants.posTransUnionRestriction]=iid_constants.sFalse=> ri.combo,
 													DataRestriction[iid_constants.posExperianRestriction]=iid_constants.sFalse => ri.en,
 													DataRestriction[iid_constants.posTransUnionRestriction]=iid_constants.sFalse => ri.tn,
-													ri.eq);  // default to the EQ version		
-													
+													ri.eq);  // default to the EQ version
+
 		// eq section is the SSA death records only. (what used to be known as Death v2)
-		// EN and TN bureau records are additional in their respective sections, use the date restriction 
+		// EN and TN bureau records are additional in their respective sections, use the date restriction
 		bureau_deceased_records_permitted := DataRestriction[iid_constants.posBureauDeceasedRestriction]=iid_constants.sFalse;
 		ri_isDeceased := if(bureau_deceased_records_permitted, header_version.isDeceased, ri.eq.isDeceased);
 		ri_dt_first_deceased := if(bureau_deceased_records_permitted, header_version.dt_first_deceased , ri.eq.dt_first_deceased );
@@ -288,9 +288,9 @@ bans_did := BankruptcyV3.key_bankruptcyV3_did();
 		ri_decs_last := if(bureau_deceased_records_permitted, header_version.decs_last , ri.eq.decs_last );
 		ri_decs_zip_lastres := if(bureau_deceased_records_permitted, header_version.decs_zip_lastres , ri.eq.decs_zip_lastres );
 		ri_decs_zip_lastpayment := if(bureau_deceased_records_permitted, header_version.decs_zip_lastpayment , ri.eq.decs_zip_lastpayment );
-	
+
 		dead := ri_isDeceased AND NOT Suppress.dateCorrect.do(le.ssn).needed;
-		self.decsflag := if(dead, '1', '0');				
+		self.decsflag := if(dead, '1', '0');
 		self.decsdob := if(dead, if(ri_decs_dob=0,'',(string)ri_decs_dob), '');
 		self.decszip := if(dead, ri_decs_zip_lastres, '');
 		self.decszip2 := if(dead, ri_decs_zip_lastpayment, '');
@@ -299,7 +299,7 @@ bans_did := BankruptcyV3.key_bankruptcyV3_did();
 		self.decsdod := if(dead, if(ri_decs_dob=0, '',(string)ri_dt_first_deceased), '');
 		self := le;
 	end;
-				
+
 	deceased_added := join(bankrupt_added,risk_indicators.key_ssn_table_v4_2,
 						keyed(left.ssn=right.ssn),
 						add_deceased(left,right), left outer, keep(1));
@@ -313,20 +313,20 @@ Layout_SkipTrace getDeathSSN (Layout_SkipTrace le, deathSSNKey ri) := transform
 	pre_history := (string)ri.dod8 < full_history_date;
 
 	dead := ssnDeathHit and pre_history;
-	self.decsflag := if(dead, '1', le.decsflag);		
+	self.decsflag := if(dead, '1', le.decsflag);
 	self.decsdob := if(dead, ri.dob8, le.decsdob);
 	self.decszip := if(dead, ri.zip_lastres, le.decszip);
 	self.decszip2 := if(dead, ri.zip_lastpayment, le.decszip2);
 	self.decslast := if(dead, ri.lname, le.decslast);
 	self.decsfirst := if(dead, ri.fname, le.decsfirst);
 	self.decsdod := if(dead, ri.dod8, le.decsdod);
-		
+
 	self := le;
-END;		    
+END;
 
 deceased_added2 := join (deceased_added, deathSSNKey,
                    left.ssn!='' and keyed(left.ssn=right.ssn) and
-									 (right.src <> MDR.sourceTools.src_Death_Restricted or Risk_Indicators.iid_constants.deathSSA_ok(DataPermission)), 
+									 (right.src <> MDR.sourceTools.src_Death_Restricted or Risk_Indicators.iid_constants.deathSSA_ok(DataPermission)),
                    getDeathSSN(left,right),left outer, ATMOST(keyed(left.ssn=right.ssn),500), keep(1));
 
 // output(best_data, named('best_data'));
@@ -342,4 +342,3 @@ deceased_added2 := join (deceased_added, deathSSNKey,
 return deceased_added2;
 
 end;
-

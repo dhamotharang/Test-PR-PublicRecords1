@@ -1,3 +1,5 @@
+IMPORT ut;
+
 export Corp_Combined_History_Function(DATASET(Layout_Corp_Temp) corp_base) :=
 FUNCTION
 
@@ -16,7 +18,7 @@ end;
 
 corp_all_final := group(iterate(corp_all_grpd_sort, SetRecordType(left, right)));
 
-// Should only rollup groups where both EX and direct state records exist					
+// Should only rollup groups where both EX and direct state records exist
 // Perform a rollup on the sample
 
 layout_corp_key := record
@@ -35,7 +37,7 @@ corp_all_final_list := join(corp_all_final_direct,
 						left.corp_key = right.corp_key,
 						SelectCorpKeysForRollup(left, right),
 						local);
-						
+
 Corp.Layout_Corp_Temp SelectCorpKeys(Corp.Layout_Corp_Temp l, layout_corp_key r) := transform
 self := l;
 end;
@@ -45,7 +47,7 @@ corp_all_final_both := join(corp_all_final,
 						    left.corp_key = right.corp_key,
 						    SelectCorpKeys(left, right),
 						    local);
-						
+
 corp_all_final_only := join(corp_all_final,
                             corp_all_final_list,
 						    left.corp_key = right.corp_key,
@@ -123,7 +125,7 @@ corp_ra_phone10,
 local);
 
 Corp.Layout_Corp_Temp RollupExperian(Corp.Layout_Corp_Temp l, Corp.Layout_Corp_Temp r) := transform
-SELF.dt_first_seen := 
+SELF.dt_first_seen :=
             ut.EarliestDate(ut.EarliestDate(l.dt_first_seen,r.dt_first_seen),
 		    ut.EarliestDate(l.dt_last_seen,r.dt_last_seen));
 SELF.dt_last_seen := ut.LatestDate(l.dt_last_seen,r.dt_last_seen);

@@ -1,5 +1,7 @@
 export MAC_Add_SSN_By_DID(infile, did_field, ssn_field, outfile,glb = 'true') := macro
 
+IMPORT watchdog;
+
 #uniquename(should_join)
 %should_join% := infile.did_field > 0; // and (integer)infile.ssn_field = 0;
 
