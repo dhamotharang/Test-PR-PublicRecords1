@@ -1,4 +1,4 @@
-import FraudShared, STD, data_services, ut,tools; 
+﻿import FraudShared, STD, data_services, ut,tools; 
 EXPORT Build_Base_Main  (
 	 string pversion
 	,dataset(FraudShared.Layouts.Base.Main) pBaseMainFile = IF(fraudgovplatform._Flags.FileExists.Base.MainOrigQA, fraudgovplatform.Files().Base.Main_Orig.QA, DATASET([], FraudShared.Layouts.Base.Main))
@@ -84,8 +84,10 @@ module
 
 	// Append RID
 	SHARED NewBaseRID := fraudgovplatform.Append_RID (IdentityData + KnownFraud + Deltabase,pBaseMainFile):independent;
+	
+	SHARED NewBaseDup	:= FraudGovPlatform.fn_dedup_main(NewBaseRID);
 	// Append Clean Values from Previous Build
-	EXPORT NewBasePreviousValues := fraudgovplatform.Append_PreviousValues(NewBaseRID,pBaseMainFile):independent;
+	EXPORT NewBasePreviousValues := fraudgovplatform.Append_PreviousValues(NewBaseDup,pBaseMainFile):independent;
 
 	SHARED NewFile := distribute(pull(NewBasePreviousValues),hash32(record_id));
 	SHARED OldFile := distribute(pull(pBaseMainFile),hash32(record_id));

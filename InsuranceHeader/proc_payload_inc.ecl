@@ -3,7 +3,14 @@
 IMPORT HEADER , InsuranceHeader_xLink, mdr ,_Control,doxie ;
  
    IncPayLoad := header.fn_incremental_payload;
-   Incpayload_with_tn := header.fn_persistent_record_ID(Incpayload + header.fn_tn_corrections_ikb());
+
+   // Corrections should not provide LOCID values
+   TnCorrectionsIKB := PROJECT(header.fn_tn_corrections_ikb(), TRANSFORM(InsuranceHeader_xLink.Layout_insuranceheader_payload,
+     SELF.locid := 0;
+     SELF := LEFT;
+   ));
+
+   Incpayload_with_tn := header.fn_persistent_record_ID(Incpayload + TnCorrectionsIKB);
 
    Incpayload_with_tn_ccpa_compliant:=header.fn_suppress_ccpa(Incpayload_with_tn,true);
 
