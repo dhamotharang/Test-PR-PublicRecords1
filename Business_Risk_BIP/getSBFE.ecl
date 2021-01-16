@@ -65,7 +65,11 @@ EXPORT getSBFE(DATASET(Business_Risk_BIP.Layouts.Shell) Shell_pre,
 		SELF := le;
 	END;
 	
-  linkid_recs_loaddate := JOIN(SBFESeq, Business_Credit.Key_ReleaseDates(), LEFT.original_version=RIGHT.version, getacctno_loaddate(LEFT,RIGHT), LEFT OUTER);
+	linkid_recs_loaddate := JOIN(SBFESeq, Business_Credit.Key_ReleaseDates(), 
+	keyed(LEFT.original_version=RIGHT.version), getacctno_loaddate(LEFT,RIGHT), 
+	LEFT OUTER, 
+	atmost(10));// shouldn't ever be more than 1, but using 10 just to remove the warning
+	
 	
 	linkid_recs_loaddate_dedup := DEDUP(SORT(linkid_recs_loaddate, seq, acct_no, original_version, -load_date), seq, acct_no);
 
