@@ -1,4 +1,4 @@
-IMPORT Address, Business_Risk_BIP, BIPV2, BIPV2_Best, Risk_Indicators;
+﻿IMPORT Address, Business_Risk_BIP, BIPV2, BIPV2_Best, Risk_Indicators;
 
 EXPORT BIP_Best_Append(DATASET(Business_Risk_BIP.Layouts.Shell) Shell, 
 												 Business_Risk_BIP.LIB_Business_Shell_LIBIN Options,
@@ -10,6 +10,7 @@ EXPORT BIP_Best_Append(DATASET(Business_Risk_BIP.Layouts.Shell) Shell,
 																								Business_Risk_BIP.Common.SetLinkSearchLevel(Options.LinkSearchLevel),
 																								0, /*ScoreThreshold --> 0 = Give me everything*/
 																								linkingOptions,
+																								true,
 																								Business_Risk_BIP.Constants.Limit_Default,
 																								Options.KeepLargeBusinesses));
 	

@@ -1,4 +1,4 @@
-﻿IMPORT _Validate, BIPV2, BIPV2_Build, Business_Risk_BIP, doxie_cbrs, Risk_Indicators, STD, doxie;
+﻿IMPORT _Validate, BIPV2, Business_Risk_BIP, doxie_cbrs, Risk_Indicators, STD, doxie, BIPV2_Contacts;
 
 // The following function finds the title for each Auth Rep at the time of the HistoryDate.
 EXPORT getAuthRepTitles( DATASET(Business_Risk_BIP.Layouts.Shell) Shell,
@@ -12,14 +12,17 @@ EXPORT getAuthRepTitles( DATASET(Business_Risk_BIP.Layouts.Shell) Shell,
 		alphabeticChars := _Validate.Strings.Alpha_Upper + _Validate.Strings.Alpha_Lower + commonTitleChars;
 
   ds_BIPIDs := Business_Risk_BIP.Common.GetLinkIDs(Shell);
-		
-		ds_contactLinkids_raw := BIPV2_Build.key_contact_linkids.kFetch(PROJECT(ds_BIPIDs, BIPV2.IDlayouts.l_xlink_ids),
-																						 Business_Risk_BIP.Common.SetLinkSearchLevel(Options.LinkSearchLevel),
-																						 0, // ScoreThreshold --> 0 = Give me everything
-																						 linkingOptions,
-																						 Business_Risk_BIP.Constants.Limit_Default,
-																						 Options.KeepLargeBusinesses,
-																						 mod_access := mod_access);
+																								 
+  include_DMI := false; 
+  ds_contactLinkids_raw := BIPV2_Contacts.key_contact_linkids.kFetch2(PROJECT(ds_BIPIDs, BIPV2.IDlayouts.l_xlink_ids2),
+                                           Business_Risk_BIP.Common.SetLinkSearchLevel(Options.LinkSearchLevel),
+                                           0, // ScoreThreshold --> 0 = Give me everything
+                                           linkingOptions,
+                                           Business_Risk_BIP.Constants.Limit_Default,
+                                           include_DMI,
+                                           mod_access,
+                                           Options.KeepLargeBusinesses);
+																					 
 		// 1. Add back our Seq numbers.
 		ds_contactLinkids_seq_pre := 
 			JOIN(

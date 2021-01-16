@@ -21,7 +21,7 @@
 																					 JoinLimit                := Business_Risk_BIP.Constants.Limit_BusHeader,
 																					 dnbFullRemove            := FALSE,
 																					 bypassContactSuppression := TRUE,
-																					 JoinType                 := BIPV2.IDconstants.JoinTypes.LimitTransformJoin );// Options.KeepLargeBusinesses  Business_Risk_BIP.Constants.DefaultJoinType );
+																					 JoinType                 := Options.KeepLargeBusinesses );
 	
 		// clean up the business header before doing anything else
 		Business_Risk_BIP.Common.mac_slim_header(ds_BusinessHeaderRaw1, ds_BusinessHeaderRaw);	

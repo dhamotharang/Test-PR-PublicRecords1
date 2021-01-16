@@ -9,10 +9,12 @@ EXPORT getProfLicenses(DATASET(Business_Risk_BIP.Layouts.Shell) Shell,
 	// ---------------- Professional License Records ------------------
   searchLevel := Business_Risk_BIP.Common.SetLinkSearchLevel(Options.LinkSearchLevel); // e.g. 'S'
 
-	ProfLicRaw := Prof_LicenseV2.Key_Proflic_LinkIDs.KeyFetch(Business_Risk_BIP.Common.GetLinkIDs(Shell), mod_access,
+	ProfLicRaw := Prof_LicenseV2.Key_Proflic_LinkIDs.kFetch2(Business_Risk_BIP.Common.GetLinkIDs(Shell), mod_access,
 																						 (STRING1)searchLevel,
-																							0 /*ScoreThreshold --> 0 = Give me everything*/ );
-
+																							0 /*ScoreThreshold --> 0 = Give me everything*/,
+																							Business_Risk_BIP.Constants.Limit_Default,
+																							Options.KeepLargeBusinesses);
+																							
 	// Add back our Seq numbers
 	Business_Risk_BIP.Common.AppendSeq(ProfLicRaw, Shell, ProfLicSeq, Options.LinkSearchLevel);
 

@@ -203,11 +203,13 @@ EXPORT getEBR(DATASET(Business_Risk_BIP.Layouts.Shell) Shell,
 	getEBR5600SIC(EBR5600, EBR5600SIC4, EBR5600SIC4Temp, EBR5600SIC4Rolled, withEBR5600SIC3, withEBR5600, SIC_4_Code, FALSE);
 
 	// ---------------- CRDB - Experian Credit Risk Data Base ------------------
-
-	EBRCRDBRaw := Experian_CRDB.Key_LinkIDs.kFetch(Business_Risk_BIP.Common.GetLinkIDs(Shell), 
+	EBRCRDBRaw := Experian_CRDB.Key_LinkIDs.kFetch2(Business_Risk_BIP.Common.GetLinkIDs(Shell), 
 																							mod_access,
 																							Business_Risk_BIP.Common.SetLinkSearchLevel(Options.LinkSearchLevel),
-																							0); /*ScoreThreshold --> 0 = Give me everything*/
+																							0,/*ScoreThreshold --> 0 = Give me everything*/
+																							Business_Risk_BIP.Constants.Limit_Default,
+																							Options.KeepLargeBusinesses
+																							); 
 																							
 	// Add back our Seq numbers
 	Business_Risk_BIP.Common.AppendSeq(EBRCRDBRaw, Shell, EBRCRDBSeq, Options.LinkSearchLevel);

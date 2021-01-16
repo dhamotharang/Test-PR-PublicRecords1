@@ -797,7 +797,8 @@ EXPORT Business_Shell_Function(DATASET(Business_Risk_BIP.Layouts.Input) InputOri
                                                 SELF := LEFT),
                                             LEFT OUTER, KEEP(1), ATMOST(100), PARALLEL, FEW);
 
- withAuthRepTitles := Business_Risk_BIP.getAuthRepTitles(withAssociates, Options, linkingOptions, AllowedSourcesSet, mod_access);
+	// don't need the authreptitles in BIID 2.0, we have a different function in biid 2.0 to getPersonRoles instead
+	withAuthRepTitles := if(options.IsBIID20, withAssociates, Business_Risk_BIP.getAuthRepTitles(withAssociates, Options, linkingOptions, AllowedSourcesSet, mod_access));
 
   withOSHA := JOIN(withAuthRepTitles, OSHA, LEFT.Seq = RIGHT.Seq, TRANSFORM(Business_Risk_BIP.Layouts.Shell,
                                                 SELF.Firmographic.OwnershipType := checkBlank(RIGHT.Firmographic.OwnershipType, '0', Business_Risk_BIP.Constants.BusShellVersion_v30);
