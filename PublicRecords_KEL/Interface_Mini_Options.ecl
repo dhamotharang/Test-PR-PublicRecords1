@@ -23,7 +23,9 @@ EXPORT Interface_Mini_Options (PublicRecords_KEL.Interface_Options OptionsRaw) :
 	EXPORT INTEGER upperage := OptionsRaw.upperage;
 	EXPORT STRING5 IndustryClass := OptionsRaw.IndustryClass;
 	EXPORT DATASET(Gateway.Layouts.Config) Gateways := OptionsRaw.Gateways;
-	
+		
+	EXPORT BOOLEAN isBRM_Marketing := OptionsRaw.isBRM_Marketing;
+
 	// BIP Append Options
 	EXPORT UNSIGNED BIPAppendScoreThreshold := OptionsRaw.BIPAppendScoreThreshold;
 	EXPORT UNSIGNED BIPAppendWeightThreshold := OptionsRaw.BIPAppendWeightThreshold;
