@@ -1,12 +1,15 @@
-// For sources that doesn't have a sourcetype please use "UCC" as sourcetype.
+﻿// For sources that doesn't have a sourcetype please use "UCC" as sourcetype.
 
 export UCCV2_Dictionary := 
 dataset(
 [
 {'CA','ALL',0},
+{'CA','AllSecureParty',0},
+{'CA','AllDebtors',0},
+{'CA','FilingAmendments',0},
+{'CA','Filings',0},
 {'CA','BusinessDebtor',sizeof(UCCV2.Layout_File_CA_BusinessDebtor_in)},
 {'CA','BusinessSecuredP',sizeof(UCCV2.Layout_File_CA_BusinessSecuredParty_in)},
-{'CA','Collateral',sizeof(UCCV2.Layout_File_CA_Collateral_in)},
 {'CA','InitialFiling',sizeof(UCCV2.Layout_File_CA_Filing_Master_in)},
 {'CA','PersonDebtor',sizeof(UCCV2.Layout_File_CA_PersonDebtor_in)},
 {'CA','PersonSecuredP',sizeof(UCCV2.Layout_File_CA_PersonSecuredParty_in)},
