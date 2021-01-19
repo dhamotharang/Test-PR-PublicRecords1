@@ -1,6 +1,6 @@
 ﻿IMPORT _control, Doxie, RoxieKeyBuild, std, Ut;
 
-EXPORT Proc_Build_Combined_Common_Port_Base(string version, string version2, const varstring eclsourceip, string thor_name):= function
+EXPORT Proc_Build_Combined_Common_Port_Base(string version, string version2, const varstring eclsourceip, string thor_name, string contacts):= function
 	
 //Process Daily Update Files
 	
@@ -24,8 +24,8 @@ EXPORT Proc_Build_Combined_Common_Port_Base(string version, string version2, con
 	sendEmail				:= sequential(//processPort, 
 																processPortDataV,
 																buildComBase, clearDelete, moveComBase):
-																Success(FileServices.SendEmail(_control.MyInfo.EmailAddressNotify + ';judy.tao@lexisnexisrisk.com' + ';gregory.rose@lexisnexisrisk.com' + ';darren.knowles@lexisnexisrisk.com', 'PhonesInfo Port Build Succeeded', workunit + ': Build complete.')),
-																Failure(FileServices.SendEmail(_control.MyInfo.EmailAddressNotify + ';judy.tao@lexisnexisrisk.com' + ';gregory.rose@lexisnexisrisk.com' + ';darren.knowles@lexisnexisrisk.com', 'PhonesInfo Port Build Failed', workunit + '\n' + FAILMESSAGE)
+																Success(FileServices.SendEmail(contacts, 'PhonesInfo Port Build Succeeded', workunit + ': Build complete.')),
+																Failure(FileServices.SendEmail(contacts, 'PhonesInfo Port Build Failed', workunit + '\n' + FAILMESSAGE)
 																);
 				
 	return sendEmail;

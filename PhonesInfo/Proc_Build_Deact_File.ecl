@@ -1,6 +1,6 @@
 ﻿IMPORT _control, std, ut;
 
-EXPORT Proc_Build_Deact_File(string version/*, string eclsourceip, string thor_name*/) := FUNCTION
+EXPORT Proc_Build_Deact_File(string version, string contacts/*, string eclsourceip, string thor_name*/) := FUNCTION
 
 	//This build uses the PhonesInfo.File_Deact.History2 file for the input.	
 
@@ -35,10 +35,10 @@ EXPORT Proc_Build_Deact_File(string version/*, string eclsourceip, string thor_n
 																												'~thor_data400::base::phones::deact2_main_grandfather',
 																												'~thor_data400::base::phones::deact2_main_delete'], '~thor_data400::base::phones::deact2_main_'+version, true);																						
 	//Email Build Status	
-	emailDOps						:= ';darren.knowles@lexisnexisrisk.com; charlene.ros@lexisnexisrisk.com; gregory.rose@lexisnexisrisk.com';
+	emailDOps						:= contacts;
 	emailDev						:= ';judy.tao@lexisnexisrisk.com';
 	
-	emailTarget					:= _control.MyInfo.EmailAddressNotify + emailDev;
+	emailTarget					:= contacts + emailDev;
 	emailBuildNotice 		:= if(count(PhonesInfo.File_Deact.Main(phone<>'')) > 0
 																	,fileservices.SendEmail(emailTarget, 'Phones Metadata: Digital Segment Deact File', 'Phones Metadata: Digital Segment Deact File Is Now Available.  Please see: ' + 'http://uspr-prod-thor-esp.risk.regn.net:8010/WsWorkunits/WUInfo?Wuid='+ workunit + '&Widget=WUDetailsWidget#/stub/Results-DL/Grid')
 																	,fileservices.SendEmail(emailTarget, 'Phones Metadata: No Digital Segment Deact File', 'There Were No Digital Segment Deact Records In This Build')

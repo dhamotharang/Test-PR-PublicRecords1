@@ -1,6 +1,6 @@
 IMPORT _control, Doxie, PromoteSupers, RoxieKeyBuild, std, ut;
 
-EXPORT Proc_Build_Deltabase_Gateway(string version, const varstring eclsourceip, string thor_name):= FUNCTION
+EXPORT Proc_Build_Deltabase_Gateway(string version, const varstring eclsourceip, string thor_name, string contacts):= FUNCTION
 	
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	//Spray Delta Gateway Files to Thor//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -89,8 +89,8 @@ EXPORT Proc_Build_Deltabase_Gateway(string version, const varstring eclsourceip,
 																	bkDltGwy, mvBltDltGwy, mvQADltGwy)/*, 
 																	dopsUpdate,
 																	buildStrata)*/:
-																	Success(FileServices.SendEmail(_control.MyInfo.EmailAddressNotify + ';judy.tao@lexisnexis.com', 'Deltabase Gateway Key Build Succeeded', workunit + ': Build completed.')),
-																	Failure(FileServices.SendEmail(_control.MyInfo.EmailAddressNotify + ';judy.tao@lexisnexis.com', 'Deltabase Gateway Build Failed', workunit + '\n' + FAILMESSAGE)
+																	Success(FileServices.SendEmail(contacts, 'Deltabase Gateway Key Build Succeeded', workunit + ': Build completed.')),
+																	Failure(FileServices.SendEmail(contacts, 'Deltabase Gateway Build Failed', workunit + '\n' + FAILMESSAGE)
 																	);
 
 	RETURN sendEmail;
