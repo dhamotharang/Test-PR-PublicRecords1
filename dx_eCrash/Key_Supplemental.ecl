@@ -1,6 +1,6 @@
 ﻿IMPORT $;
 
-EXPORT KEY_SUPPLEMENTAL := INDEX({$.Layouts.SUPPLEMENTAL_KEYED_FIELDS}, 
-		                             {$.Layouts.SUPPLEMENTAL_PAYLOAD_FIELDS},
-		                             $.Files.FILE_KEY_SUPPLEMENTAL_SF
-										             );
+EXPORT KEY_SUPPLEMENTAL := INDEX({$.Layouts.SUPPLEMENTAL_KEYED}, 
+                                 {$.Layouts.SUPPLEMENTAL_PAYLOAD},
+                                 $.Names.i_SUPPLEMENTAL_SF
+                                 );
