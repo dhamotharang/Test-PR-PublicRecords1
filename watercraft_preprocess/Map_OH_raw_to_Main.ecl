@@ -1,4 +1,4 @@
-import lib_stringlib, watercraft, watercraft_preprocess, ut, STD;
+﻿import lib_stringlib, watercraft, watercraft_preprocess, ut, STD;
 
 // translates oh_phase01.mp Ab intio graph into ECL
 
@@ -93,8 +93,8 @@ county_reg(string2 code)
 '87' => 'WOOD',
 '88' => 'WYANDOT','');
 
-Watercraft.Macro_Clean_Hull_ID(watercraft_preprocess.file_OH_clean_in, watercraft.Layout_OH, hull_clean_in)
-watercraft.Macro_Is_hull_id_in_MIC(hull_clean_in, watercraft.Layout_OH, wDatasetwithflag)
+Watercraft.Macro_Clean_Hull_ID(watercraft_preprocess.file_OH_clean_in, watercraft.layout_OH_20Q3, hull_clean_in)
+watercraft.Macro_Is_hull_id_in_MIC(hull_clean_in, watercraft.layout_OH_20Q3, wDatasetwithflag)
 
 watercraft.Layout_Watercraft_Main_Base main_mapping_format(wDatasetwithflag L) := TRANSFORM
 	//New watercraft_key logic to be implemented at a later date
@@ -122,10 +122,12 @@ watercraft.Layout_Watercraft_Main_Base main_mapping_format(wDatasetwithflag L) :
 	self.watercraft_length					:=	L.TOTAL_INCH;
 	self.model_year									:=	L.YEAR;
 	self.watercraft_make_description	:=	L.MAKE;
+	self.watercraft_model_description	:= L.MODEL;
 	IsValidRegDate										:=	STD.DATE.IsValidDate((integer)L.REG_DATE);
 	self.registration_date						:=	If(IsValidRegDate,L.REG_DATE,'');
 	IsValidExpireDate									:=	STD.DATE.IsValidDate((integer)L.EXPIRATION_DATE);
 	self.registration_expiration_date	:=	If(IsValidExpireDate,L.EXPIRATION_DATE,'');
+	self.registration_status_description := L.REG_STATUS;
 	self := L;
 	self := [];
 END;
