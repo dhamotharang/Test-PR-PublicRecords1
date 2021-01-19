@@ -1,4 +1,5 @@
-﻿IMPORT STD;
+﻿IMPORT STD, dx_Ecrash;
+
 EXPORT mod_PrepEcrashAnalyticKeys(DATASET(Layout_eCrash.Consolidation) EcrashIn = FLAccidents_Ecrash.File_KeybuildV2.out) := MODULE
 
 //Infile := FLAccidents_Ecrash.File_KeybuildV2.out(report_code in ['EA','TM','TF'] AND report_type_id = 'A' AND work_type_id NOT IN['2','3']) ;
@@ -76,8 +77,9 @@ by_AgencyID_interim := RECORD
 	INTEGER  FatalCnt  			:= SUM(GROUP, dsRolled.FatalCnt);
 	INTEGER  UnknownCnt			:= SUM(GROUP, dsRolled.InjuryUnkCnt);
 END;
+t_AgencyID := TABLE(dsRolled, {by_AgencyID_interim}, AgencyID, accident_date, precinct, beat);
 
-EXPORT by_AgencyID := TABLE(dsRolled, {by_AgencyID_interim}, AgencyID, accident_date, precinct, beat);
+EXPORT by_AgencyID := PROJECT(t_AgencyID, TRANSFORM(dx_Ecrash.Layouts.BY_AGENCYID, SELF := LEFT; SELF := [];)); 
 
 //***********************************************************************
 //                Key_eCrash_ByCollisionType
@@ -174,8 +176,9 @@ by_CT_interim := RECORD
 	INTEGER CTOther						  	:= SUM(GROUP, dsSlimCounts.CTOther);						
 	INTEGER CTUnknown					  	:= SUM(GROUP, dsSlimCounts.CTUnknown);					
 END;
+t_CollisionType := TABLE(dsSlimCounts, {by_CT_interim}, agencyid, Accident_date);
 
-EXPORT dsByCollisionType := TABLE(dsSlimCounts, {by_CT_interim}, agencyid, Accident_date);
+EXPORT dsByCollisionType := PROJECT(t_CollisionType, TRANSFORM(dx_Ecrash.Layouts.BY_CT, SELF := LEFT; SELF := [];)); 
 
 //***********************************************************************
 //                 Key_eCrash_ByDOW
@@ -223,8 +226,9 @@ by_dow_interim := RECORD
 	INTEGER FatalCnt  			:= SUM(GROUP, dsRolled.FatalCnt);
 	INTEGER UnknownCnt			:= SUM(GROUP, dsRolled.InjuryUnkCnt);
 END;
+t_DOW := TABLE(dsRolled, {by_dow_interim}, agencyid, Accident_date, DayOfWeek);
 
-EXPORT by_DOW := TABLE(dsRolled, {by_dow_interim}, agencyid, Accident_date, DayOfWeek);
+EXPORT by_DOW := PROJECT(t_DOW, TRANSFORM(dx_Ecrash.Layouts.BY_DOW, SELF := LEFT; SELF := [];)); 
 
 //***********************************************************************
 //                 Key_eCrash_ByHOD
@@ -272,8 +276,10 @@ by_hod_interim := RECORD
 	INTEGER FatalCnt  			:= SUM(GROUP, dsRolled.FatalCnt);
 	INTEGER UnknownCnt			:= SUM(GROUP, dsRolled.InjuryUnkCnt);
 END;
+t_HOD := TABLE(dsRolled, {by_hod_interim}, agencyid, Accident_date, HourOfDay);
 
-EXPORT by_HOD := TABLE(dsRolled, {by_hod_interim}, agencyid, Accident_date, HourOfDay);
+EXPORT by_HOD := PROJECT(t_HOD, TRANSFORM(dx_Ecrash.Layouts.BY_HOD, SELF := LEFT; SELF := [];));
+
 //***********************************************************************
 //                 Key_eCrash_ByInter
 //***********************************************************************
@@ -436,10 +442,10 @@ by_interim := RECORD
 	INTEGER InjuryCnt						  := SUM(GROUP, dsSlimCounts.InjuryCnt);
 	INTEGER FatalCnt							:= SUM(GROUP, dsSlimCounts.FatalCnt);
 	INTEGER PropDmgCnt						:= SUM(GROUP, dsSlimCounts.PropDmgCnt);
-
 END;
+t_Inter := TABLE(dsSlimCounts, {by_interim}, agencyid, Accident_date, DayOfWeek, Tour, Intersection);
 
-EXPORT dsByInter := TABLE(dsSlimCounts, {by_interim}, agencyid, Accident_date, DayOfWeek, Tour, Intersection);
+EXPORT dsByInter := PROJECT(t_Inter, TRANSFORM(dx_Ecrash.Layouts.BY_INTER, SELF := LEFT; SELF := [];)); 
 
 //***********************************************************************
 //                 Key_eCrash_byMOY
@@ -478,7 +484,6 @@ dsRolled := ROLLUP(dsWithCounts,
 									 LEFT.report_code = RIGHT.report_code,
 									 RollAccidents(LEFT,RIGHT));
 
-
 by_moy_interim := RECORD
 	dsRolled.agencyid;
 	dsRolled.accident_date;
@@ -488,7 +493,8 @@ by_moy_interim := RECORD
 	INTEGER FatalCnt  			:= SUM(GROUP, dsRolled.FatalCnt);
 	INTEGER UnknownCnt			:= SUM(GROUP, dsRolled.InjuryUnkCnt);
 END;
+t_MOY := TABLE(dsRolled, {by_moy_interim}, agencyid, Accident_date, MonthOfYear);
 
-EXPORT by_MOY := TABLE(dsRolled, {by_moy_interim}, agencyid, Accident_date, MonthOfYear);
+EXPORT by_MOY := PROJECT(t_MOY, TRANSFORM(dx_Ecrash.Layouts.BY_MOY, SELF := LEFT; SELF := [];)); 
 
 END;

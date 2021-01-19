@@ -1,14 +1,14 @@
-﻿Import FLAccidents_Ecrash;
-Import dx_eCrash as dx;
+﻿IMPORT dx_eCrash;
 
-export Constants := module
-	
+EXPORT Constants := MODULE
+ 
 //***************************************************************
 //           autokeys constants for eCrashV2
 //***************************************************************
-  export ak_skipSet	:= dx.Constants.ak_skipSet;
-	export ak_typeStr	:= dx.Constants.ak_typeStr;
-	
-	export eV2_keyname  := dx.Constants.ak_keyname;
-	export eV2_dataset	:= dx.Constants.ak_dataset;
-end;
+  EXPORT ak_skipSet := dx_eCrash.Constants.ak_skipSet;
+  EXPORT ak_typeStr := dx_eCrash.Constants.ak_typeStr;
+ 
+  EXPORT eV2_keyname  := dx_eCrash.Constants.ak_keyname;
+  EXPORT eV2_dataset := dx_eCrash.Constants.ak_dataset;
+END;
+ 
