@@ -25,7 +25,8 @@ EXPORT Interface_Options := INTERFACE
 	EXPORT INTEGER upperage := 20;
 
 	EXPORT DATASET(Gateway.Layouts.Config) Gateways := DATASET([], Gateway.Layouts.Config);
-	
+	EXPORT BOOLEAN isBRM_Marketing := FALSE;
+
 	// BIP Append Options
 	EXPORT UNSIGNED BIPAppendScoreThreshold := 75;
 	EXPORT UNSIGNED BIPAppendWeightThreshold := 0;
