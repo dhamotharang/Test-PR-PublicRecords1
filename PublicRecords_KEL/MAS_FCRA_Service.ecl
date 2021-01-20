@@ -61,8 +61,16 @@ EXPORT MAS_FCRA_Service() := MACRO
 	
 	BOOLEAN Retain_Input_Lexid := FALSE : STORED('RetainInputLexid');//keep what we have on input
 	BOOLEAN Append_PII := FALSE : STORED('AppendPII');//keep what we have on input
-	
-	
+		
+	// Nulling out stored variables to not propagate to Attributes.kel
+	#CONSTANT('GLBPurposeValue', 0);
+	#CONSTANT('DPPAPurposeValue', 0);
+	#CONSTANT('NetAcuityURL', '');
+	#CONSTANT('OFACURL', '');
+	#CONSTANT('Watchlists_RequestedValue', '');
+	#CONSTANT('IncludeOfacValue', FALSE);
+	#CONSTANT('IncludeAdditionalWatchListsValue', FALSE);
+	#CONSTANT('Global_Watchlist_ThresholdValue', 0);
 	
 	gateways_in := Gateway.Configuration.Get();
 	Gateway.Layouts.Config gw_switch(gateways_in le) := TRANSFORM

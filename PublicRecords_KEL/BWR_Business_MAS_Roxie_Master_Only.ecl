@@ -1,5 +1,5 @@
-﻿#workunit('name','MAS Busienss dev156 1 thread 10k');
-IMPORT PublicRecords_KEL, RiskWise, SALT38, SALTRoutines, STD, Gateway, ut;
+﻿#workunit('name','MAS Business dev156 1 thread 10k');
+IMPORT PublicRecords_KEL, RiskWise, SALT38, SALTRoutines, STD, Gateway, ut, Business_Risk_BIP;
 Threads := 1;
 
 RoxieIP := RiskWise.shortcuts.dev156;
@@ -67,6 +67,26 @@ Exclude_Consumer_Attributes := FALSE; //if TRUE, bypasses consumer logic and set
 AllowedSourcesDataset := DATASET([],PublicRecords_KEL.ECL_Functions.Constants.Layout_Allowed_Sources);
 // Do not exclude any additional sources from allowed sources dataset.
 ExcludeSourcesDataset := DATASET([],PublicRecords_KEL.ECL_Functions.Constants.Layout_Allowed_Sources);
+
+// OFAC parameters
+IncludeOFACGW := FALSE;
+include_ofac := TRUE : STORED('IncludeOfacValue'); // This is different than the param to turn off/on the gateway, this adds an OFAC watchlist in the gateway
+include_additional_watchlists  := TRUE : STORED('IncludeAdditionalWatchListsValue');
+Global_Watchlist_Threshold := Business_Risk_BIP.Constants.Default_Global_Watchlist_Threshold : STORED('Global_Watchlist_ThresholdValue');
+watchlists:= 'ALLV4' : STORED('Watchlists_RequestedValue'); // Returns all watchlists for OFAC Version 4
+
+Empty_GW := DATASET([TRANSFORM(Gateway.Layouts.Config, 
+							SELF.ServiceName := ''; 
+							SELF.URL := ''; 
+							SELF := [])]);
+              
+OFAC_GW := IF(IncludeOFACGW, DATASET([TRANSFORM(Gateway.Layouts.Config,
+							SELF.ServiceName := 'bridgerwlc'; 
+							SELF.URL := 'http://bridger_batch_cert:Br1dg3rBAtchC3rt@172.16.70.19:7003/WsSearchCore/?ver_=1'; 
+							SELF := [])]),
+							Empty_GW);    
+
+Input_Gateways := (OFAC_GW)(URL <> '');
 
 RecordsToRun := 0;
 eyeball := 20;
@@ -212,6 +232,7 @@ soapLayout := RECORD
 	// STRING CustomerId; // This is used only for failed transactions here; it's ignored by the ECL service.
 	DATASET(PublicRecords_KEL.ECL_Functions.Input_Bus_Layout) input;
 	INTEGER ScoreThreshold;
+	DATASET(Gateway.Layouts.Config) gateways := DATASET([], Gateway.Layouts.Config);
 	STRING DataRestrictionMask;
 	STRING DataPermissionMask;
 	UNSIGNED1 GLBPurpose;
@@ -228,12 +249,17 @@ soapLayout := RECORD
 	BOOLEAN BIPAppendPrimForce;
 	BOOLEAN BIPAppendReAppend;
 	BOOLEAN BIPAppendIncludeAuthRep;
-  BOOLEAN OverrideExperianRestriction;
-	
+	BOOLEAN OverrideExperianRestriction;
+
 	UNSIGNED1 LexIdSourceOptout;
-  STRING _TransactionId;
-  STRING _BatchUID;
-  UNSIGNED6 _GCID;
+	STRING _TransactionId;
+	STRING _BatchUID;
+	UNSIGNED6 _GCID;
+
+	BOOLEAN IncludeOfac;
+	BOOLEAN IncludeAdditionalWatchLists;
+	REAL Global_Watchlist_Threshold;
+	STRING Watchlists_Requested;
 end;
 
 Settings := MODULE(PublicRecords_KEL.Interface_BWR_Settings)
@@ -278,7 +304,8 @@ soapLayout trans (inDataReadyDist le):= TRANSFORM
 	SELF.input := PROJECT(le, TRANSFORM(PublicRecords_KEL.ECL_Functions.Input_Bus_Layout,
 		SELF := LEFT;
 		SELF := []));
-	SELF.ScoreThreshold := Settings.LexIDThreshold;		
+	SELF.ScoreThreshold := Settings.LexIDThreshold;	
+	SELF.gateways := Input_Gateways;
 	SELF.DataRestrictionMask := Settings.Data_Restriction_Mask;
 	SELF.DataPermissionMask := Settings.Data_Permission_Mask;
 	SELF.GLBPurpose := Settings.GLBAPurpose;
@@ -299,6 +326,10 @@ soapLayout trans (inDataReadyDist le):= TRANSFORM
 	SELF._TransactionId := TransactionId;
 	SELF._BatchUID := BatchUID;
 	SELF._GCID := GCID;	
+	SELF.IncludeOfac := include_ofac;
+	SELF.IncludeAdditionalWatchLists := include_additional_watchlists;
+	SELF.Global_Watchlist_Threshold := Global_Watchlist_Threshold;
+	SELF.Watchlists_Requested := watchlists;
 END;
 
 soap_in := PROJECT(inDataReadyDist, trans(LEFT));
