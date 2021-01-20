@@ -1,4 +1,4 @@
-import business_header, versioncontrol;
+﻿import business_header, versioncontrol;
 
 export Keynames(
 
@@ -14,7 +14,8 @@ module
 
 	export root					:= versioncontrol.mBuildFilenameVersions(lautokeyRoot									,lversiondate);
 
-	export companyname_domain := versioncontrol.mBuildFilenameVersions(lkeyRoot     + 'companyname_domain',lversiondate);
+	//*** Jira# DF-28405, PAW - Remove Deprecated Key
+	//export companyname_domain := versioncontrol.mBuildFilenameVersions(lkeyRoot     + 'companyname_domain',lversiondate);
 	export contactid					:= versioncontrol.mBuildFilenameVersions(lkeyRoot 		+ 'contactid'					,lversiondate);
 	export bdid								:= versioncontrol.mBuildFilenameVersions(lkeyRoot 		+ 'bdid'							,lversiondate);
 	export did								:= versioncontrol.mBuildFilenameVersions(lkeyRoot			+ 'did'								,lversiondate);
@@ -49,8 +50,8 @@ module
 	end;
 	
 	export dAll_filenames := 
-			companyname_domain.dAll_filenames
-		+ contactid.dAll_filenames
+	//		companyname_domain.dAll_filenames   //*** Jira# DF-28405, PAW - Remove Deprecated Key 
+			contactid.dAll_filenames
 		+ bdid.dAll_filenames
 		+ did.dAll_filenames
 		+ namewords2.dAll_filenames
