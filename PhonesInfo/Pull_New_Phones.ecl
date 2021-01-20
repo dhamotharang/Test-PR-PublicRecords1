@@ -79,8 +79,8 @@ EXPORT Pull_New_Phones(string version, string portV2, string contacts) := FUNCTI
 	
 	emailTarget				:= contacts + emailDev;
 	emailBuildNotice 	:= if(count(ddNewPhFile(phone<>'')) > 0
-																,fileservices.SendEmail(emailTarget, 'Phones Metadata: New LERG6_Phones', 'Phones Metadata: New Phones File Is Now Available.  Please see: ' + 'http://uspr-prod-thor-esp.risk.regn.net:8010/WsWorkunits/WUInfo?Wuid='+ workunit + '&Widget=WUDetailsWidget#/stub/Results-DL/Grid')
-																,fileservices.SendEmail(emailTarget, 'Phones Metadata: No New LERG6', 'There Were No New Phones Records In This Build')
+																,fileservices.SendEmail(emailTarget, 'Phones Metadata: New L6_Phones', 'Phones Metadata: New Phones File Is Now Available.  Please see: ' + 'http://uspr-prod-thor-esp.risk.regn.net:8010/WsWorkunits/WUInfo?Wuid='+ workunit + '&Widget=WUDetailsWidget#/stub/Results-DL/Grid')
+																,fileservices.SendEmail(emailTarget, 'Phones Metadata: No New L6', 'There Were No New Phones Records In This Build')
 																);
 																
 	RETURN sequential (outFile, emailBuildNotice);
