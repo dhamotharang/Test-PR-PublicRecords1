@@ -1,4 +1,4 @@
-import advo,Risk_Indicators,Standard,ut,PhonesFeedback_Services,iesp,paw_services, AddressFeedback_Services, Royalty, progressive_phone;
+﻿import advo,Risk_Indicators,Standard,ut,PhonesFeedback_Services,iesp,paw_services, AddressFeedback_Services, Royalty, progressive_phone;
 
 export Layout_Rollup := MODULE
 
@@ -83,14 +83,15 @@ doxie.Layout_HeaderFileSearch.tnt;
 	// signify to only some particular ESPs/downstream  that want this functionality
 	// to hardcode 'current'
 	// in output in GUI instead of using value in 'dt_last_seen' field
-	doxie.Layout_HeaderFileSearch.isCurrent;
+	doxie.Layout_HeaderFileSearch.isCurrent;  
+  unsigned8 location_id := 0;
 END;
 																		
 
 export AddrRec := RECORD  (AddrCommon)
 	DATASET(PhoneRec) phoneRecs {MAXCOUNT(doxie.rollup_limits.phones)}; // "although really 10 after dedup"... need to double check code that uses this layout
   DATASET(Risk_Indicators.Layout_Desc) hri_address {MAXCOUNT(doxie.rollup_limits.address_hris)}; // MAXLENGTH defined inside
-  Advo.Layouts.Layout_CDS  address_cds;	
+  Advo.Layouts.Layout_CDS  address_cds;
 END;
 
 export AddrRec_seq := RECORD // Added for the FDN project

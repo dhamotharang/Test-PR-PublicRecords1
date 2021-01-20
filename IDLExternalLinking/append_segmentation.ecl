@@ -37,6 +37,7 @@ IMPORT InsuranceHeader_PostProcess, _Control;
 	 													 self.res.best_dob := right.dob,                             
                               self.res := left.res,                             
                               self := left), left outer, keep(1));
+	// #IF(__TARGET_PLATFORM__ in ['thor', 'thorlcr'])
 	#IF(_Control.ThisEnvironment.IsPlatformThor)
 		#UNIQUENAME(trimReswSegPull)
   	%trimReswSegPull% := JOIN(DISTRIBUTE(%trimResNorm%, RES.DID),DISTRIBUTE(pull(%seg%),DID),
@@ -54,7 +55,7 @@ IMPORT InsuranceHeader_PostProcess, _Control;
                              self.res := left.res,                             
                              self := left), left outer, keep(1), LOCAL);
 
-		%trimReswSeg% := IF (thorlib.nodes() < 400 OR count(%trimResNorm%) < 50000000 , %trimReswSegKey%, %trimReswSegPull%);
+		%trimReswSeg% := IF (thorlib.nodes() < 400 OR count(%trimResNorm%) < 13000000 , %trimReswSegKey%, %trimReswSegPull%);
 	#ELSE 
 		%trimReswSeg% := %trimReswSegKey%;
 	#END;
@@ -62,7 +63,7 @@ IMPORT InsuranceHeader_PostProcess, _Control;
 	// filter out lexIDs that are insurance only if enviroment is Boca/PR.	
   #UNIQUENAME(trimReswSegIns) 
   #IF(InsuranceHeader_xLink.Environment.isCurrentBoca)
-     %trimReswSegIns% := %trimReswSeg%(res.LexID_type<>IDLExternalLinking.Constants.INSURANCE_LEXID and res.did < IDLExternalLinking.Constants.INSURANCE_LEXID_NUMBER);
+     %trimReswSegIns% := %trimReswSeg%(res.LexID_type<>IDLExternalLinking.Constants.INSURANCE_LEXID_TYPE AND res.did<IDLExternalLinking.Constants.INSURANCE_LEXID);
   #ELSE
      %trimReswSegIns% := %trimReswSeg%
   #END;
@@ -70,13 +71,23 @@ IMPORT InsuranceHeader_PostProcess, _Control;
 	#UNIQUENAME(trimResParentOnly)
 	%trimResParentOnly% := PROJECT(trimRes,TRANSFORM(recordof(left),self.Results:=[],self:=left));
 	#UNIQUENAME(trimResDeNorm)
-	%trimResDeNorm% := DENORMALIZE(DISTRIBUTE(%trimResParentOnly%, reference),DISTRIBUTE(%trimReswSegIns%, ID),
+	// #IF(__TARGET_PLATFORM__ in ['thor', 'thorlcr'])
+	#IF(_Control.ThisEnvironment.IsPlatformThor)
+		%trimResDeNorm% := DENORMALIZE(DISTRIBUTE(%trimResParentOnly%, reference),DISTRIBUTE(%trimReswSegIns%, ID),
 											LEFT.reference = RIGHT.id, 
 													TRANSFORM(RECORDOF(LEFT),
 															self.results := sort(LEFT.results + RIGHT.res, -weight),
 															self := left), LOCAL);
+	#ELSE
+		%trimResDeNorm% := DENORMALIZE(%trimResParentOnly%,%trimReswSegIns%,
+											LEFT.reference = RIGHT.id,
+													TRANSFORM(RECORDOF(LEFT),
+															 self.results := sort(LEFT.results + RIGHT.res, -weight),
+															self := left));
+	#END
 // OUTPUT(%trimResNorm%, NAMED('trimResNorm'));  
 // OUTPUT(%trimReswSeg%, NAMED('trimReswSeg')); 
+// OUTPUT(sort(%trimReswSeg%, res.reference, res.weight), NAMED('trimReswSegSort'));
 // OUTPUT(%trimReswSeg%(res.LexID_type<>IDLExternalLinking.Constants.INSURANCE_LEXID), NAMED('trimReswSegfilter')); 
 // OUTPUT(%trimResParentOnly%, NAMED('trimResParentOnly')); 
 // OUTPUT(%trimResDeNorm%, NAMED('trimResDeNorm'));    

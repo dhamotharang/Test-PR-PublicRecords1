@@ -1,5 +1,5 @@
-import ucc,did_add,didville,ut,header_slimsort;
-/* no did for experian */ 
+import ucc,did_add,ut;
+/* no did for experian */
 /* need to split debtor from secured/assigned */
 /* probably shouldn't normalize direct for clean names */
 
@@ -14,19 +14,19 @@ rec := uccd.Layout_WithExpParty;
 rec into_withExp(df L) := transform
 	self.isDirect := false;
 	self.record_type := 'C';
-	
+
 	self.ucc_vendor := ut.st2FipsCode(l.file_state);
 	self.ucc_process_Date := '';
 	self.ucc_key := uccd.constructUCCkey(l.file_state, l.orig_filing_num);
 	self.event_key 	:= uccd.constructUCCkey(l.file_state, l.orig_filing_num);
 	self.party_key := '';
 	self.collateral_key := '';
-	
+
 	self.party_status_cd := '';
 	self.party_status_desc := '';
 	self.party_address1_type_cd := '';
 	self.party_address1_type_desc := '';
-	
+
 	self.bdid := intformat(L.bdid,12,1);
 	self.did := '';
 	self.file_state := L.file_state;
@@ -43,7 +43,7 @@ rec into_withExp(df L) := transform
 	self.clean_address := L.prim_range + L.predir + L.prim_name + L.suffix + L.postdir + L.unit_desig + L.sec_range + L.p_city_name + L.v_city_name + L.state + L.zip5 + L.zip4 + L.cart + L.cr_sort_sz + L.lot + L.lot_order + L.dpbc + L.chk_digit + L.rec_type + L.ace_fips_st + L.county + L.geo_lat + L.geo_long + L.msa + L.geo_blk + L.geo_match + L.err_stat;
 	self.p_name := L.title + L.fname + L.mname + L.lname + L.name_suffix;
 	self.name := L.name;
-	
+
 end;
 
 o1 := project(df(file_state not in uccd.set_DirectStates),into_WithExp(LeFT));
@@ -64,19 +64,19 @@ end;
 denorm_rec into_WithExp2(df3 L) := transform
 	self.isDirect := true;
 	self.record_type := L.record_type;
-	
+
 	self.ucc_vendor := L.ucc_vendor;
 	self.ucc_process_Date := L.ucc_process_date;
 	self.ucc_key := L.ucc_key;
 	self.event_key := L.event_key;
 	self.party_key := L.party_key;
 	self.collateral_key := L.collateral_key;
-	
+
 	self.party_status_cd := L.status_cd;
 	self.party_status_desc := L.status_desc;
 	self.party_address1_type_cd := L.address1_type_cd;
 	self.party_address1_type_desc := L.address1_type_desc;
-	
+
 	self.bdid := intformat(L.bdid,12,1);
 	self.did 	:= intformat(L.did,12,1);
 	self.file_state := L.ucc_state_origin;
@@ -96,7 +96,7 @@ denorm_rec into_WithExp2(df3 L) := transform
 	self.pname2 := L.pname2_title + L.pname2_fname + L.pname2_mname + L.pname2_lname + L.pname2_name_suffix;
 	self.pname3 := L.pname3_title + L.pname3_fname + L.pname3_mname + L.pname3_lname + L.pname3_name_suffix;
 	self.pname4 := L.pname4_title + L.pname4_fname + L.pname4_mname + L.pname4_lname + L.pname4_name_suffix;
-	self.pname5 := L.pname5_title + L.pname5_fname + L.pname5_mname + L.pname5_lname + L.pname5_name_suffix;	
+	self.pname5 := L.pname5_title + L.pname5_fname + L.pname5_mname + L.pname5_lname + L.pname5_name_suffix;
 	self.name := trim(L.name);
 end;
 
@@ -104,7 +104,7 @@ o3 := project(df3,into_WithExp2(LEFT));
 
 //keep non-blank orig name and pname with blank
 
-o3_pname_blank := o3(orig_name <> '' and p_name ='' and pname2 ='' and pname3 ='' and pname4 ='' and pname5 =''); 
+o3_pname_blank := o3(orig_name <> '' and p_name ='' and pname2 ='' and pname3 ='' and pname4 ='' and pname5 ='');
 
 rec norm_direct(o3 L,integer C) := transform
 	self.clean_address := L.clean_address;

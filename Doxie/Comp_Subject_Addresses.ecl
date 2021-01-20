@@ -50,14 +50,18 @@ Layout_Comp_Addresses traConsumer(Main_Dn lef,Main_Dn ref) := transform
   end;
 
 //Do address Hiearchy sorting 
-Main_Dn_ranked := Header.Mac_Append_addr_ind(Main_Dn, addr_ind , /*src*/, did, prim_range, prim_name, sec_range, city_name
+Main_Dn_ranked_pre := Header.Mac_Append_addr_ind(Main_Dn, addr_ind , /*src*/, did, prim_range, prim_name, sec_range, city_name
                                              ,st , zip , predir, postdir, suffix, dt_first_seen, dt_last_seen
                                              , dt_vendor_first_reported, dt_vendor_last_reported);
                                                        
+Main_Dn_ranked := project(Main_Dn_ranked_pre,
+                    transform(Layout_Comp_Addresses,
+                       self.tnt := doxie.enhanceTNT(do_address_hierarchy, left.tnt, left.addr_ind, left.best_addr_rank),
+                               self := left));
 
 //****** Push infile through transform above
-Main_Dn_U := iterate(if(do_address_hierarchy,project(Main_Dn_ranked,Layout_Comp_Addresses),Main_Dn), tra(left, right));
-Main_Dn_C := iterate(if(do_address_hierarchy,project(Main_Dn_ranked,Layout_Comp_Addresses),Main_Dn), traConsumer(left, right));
+Main_Dn_U := iterate(if(do_address_hierarchy,Main_Dn_ranked,Main_Dn), tra(left, right));
+Main_Dn_C := iterate(if(do_address_hierarchy,Main_Dn_ranked,Main_Dn), traConsumer(left, right));
 Mainseq := if(mod_access.isConsumer (), Main_Dn_C, Main_Dn_U);
 export Addresses := Mainseq;
 

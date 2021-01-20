@@ -1,5 +1,3 @@
-IMPORT ut, DID_Add, header_slimsort;
-
 // Remove duplicate sequence numbers from test input file
 Layout_SeqNum := RECORD
 STRING12 seq;

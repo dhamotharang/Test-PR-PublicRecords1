@@ -1,4 +1,4 @@
-import ut, Business_Header, Business_Header_SS, address, Header, Header_Slimsort, didville, ut, DID_Add, corp;
+import ut, Business_Header, Business_Header_SS, address, DID_Add, corp;
 
 // Project Update to Temp Format
 Layout_Corp_Cont_Temp InitUpdate(Layout_Corporate_Direct_Cont_In l, unsigned1 cnt) := transform
@@ -94,18 +94,18 @@ self.cont_cname_score := choose(cnt, '',
 							   l.cont_cname2_score);
 // Set dates
 self.dt_first_seen :=
-  ut.EarliestDate((unsigned4)CheckDate(l.cont_filing_date), 
-  ut.EarliestDate((unsigned4)CheckDate(l.cont_effective_date), 
+  ut.EarliestDate((unsigned4)CheckDate(l.cont_filing_date),
+  ut.EarliestDate((unsigned4)CheckDate(l.cont_effective_date),
   ut.EarliestDate((unsigned4)CheckDate(l.cont_address_effective_date), (unsigned4)CheckDate(l.corp_process_date))));
 self.dt_last_seen := if(
-  ut.LatestDate((unsigned4)CheckDate(l.cont_filing_date), 
+  ut.LatestDate((unsigned4)CheckDate(l.cont_filing_date),
   ut.LatestDate((unsigned4)CheckDate(l.cont_effective_date), (unsigned4)CheckDate(l.cont_address_effective_date))) <> 0,
-  ut.LatestDate((unsigned4)CheckDate(l.cont_filing_date), 
+  ut.LatestDate((unsigned4)CheckDate(l.cont_filing_date),
   ut.LatestDate((unsigned4)CheckDate(l.cont_effective_date), (unsigned4)CheckDate(l.cont_address_effective_date))),
   (unsigned4)CheckDate(l.corp_process_date));
-self.dt_vendor_first_reported := 
-  ut.EarliestDate((unsigned4)CheckDate(l.cont_filing_date), 
-  ut.EarliestDate((unsigned4)CheckDate(l.cont_effective_date), 
+self.dt_vendor_first_reported :=
+  ut.EarliestDate((unsigned4)CheckDate(l.cont_filing_date),
+  ut.EarliestDate((unsigned4)CheckDate(l.cont_effective_date),
   ut.EarliestDate((unsigned4)CheckDate(l.cont_address_effective_date), (unsigned4)CheckDate(l.corp_process_date))));
 self.dt_vendor_last_reported := (unsigned4)CheckDate(l.corp_process_date);
 self.corp_phone10 := address.CleanPhone(l.corp_phone_number);
@@ -142,7 +142,7 @@ cont_update_init_sort := sort(cont_update_init_dist, except bdid, dt_first_seen,
                                dt_vendor_first_reported, dt_vendor_last_reported, corp_process_date, record_type, local);
 
 Layout_Corp_Cont_Temp RollupUpdate(Layout_Corp_Cont_Temp l, Layout_Corp_Cont_Temp r) := transform
-SELF.dt_first_seen := 
+SELF.dt_first_seen :=
             ut.EarliestDate(ut.EarliestDate(l.dt_first_seen,r.dt_first_seen),
 		    ut.EarliestDate(l.dt_last_seen,r.dt_last_seen));
 SELF.dt_last_seen := ut.LatestDate(l.dt_last_seen,r.dt_last_seen);
@@ -154,7 +154,7 @@ end;
 
 cont_update_init_rollup := rollup(cont_update_init_sort, RollupUpdate(left, right), except bdid, dt_first_seen, dt_last_seen,
                                dt_vendor_first_reported, dt_vendor_last_reported, corp_process_date, record_type, local);
-							   
+
 // Initialize Current base file
 Layout_Corp_Cont_Temp InitCurrentBase(Layout_Corp_Cont_Base l) := transform
 self.bdid := 0;
@@ -170,7 +170,7 @@ cont_current_init_dist := distribute(cont_current_init_dedup, hash(corp_key));
 cont_update_combined := if(Corp_Update_Flag,
                            cont_current_init_dist + cont_update_init_rollup,
 						   cont_update_init_rollup);
-						   
+
 // Combine new base with Experian Full States and Experian History
 cont_update_combined_history := Corp4_As_Corp_Contacts(corp_state_origin in Corp4_State_List) + Corp_Cont_Combined_History_Function(cont_update_combined);
 cont_update_combined_history_dist := distribute(cont_update_combined_history, hash(corp_key));
@@ -247,7 +247,7 @@ corp_cont_norm_ra := normalize(corp_updated_corp, 2, NormRegAgents(left, counter
 corp_cont_norm_ra_dedup := dedup(corp_cont_norm_ra(cont_name <> '', cont_lname <> ''), all);
 corp_cont_norm_ra_dist := distribute(corp_cont_norm_ra_dedup, hash(corp_key));
 
-						   
+
 // Propagate Information Forward to Blank Fields
 cont_update_combined_sort := sort(cont_update_combined_history_dist + corp_cont_norm_ra_dist, corp_key, local);
 cont_update_combined_grpd := group(cont_update_combined_sort, corp_key, local);
@@ -422,7 +422,7 @@ cont_update_event := join(cont_update,
 					UpdateDates(left, right),
 					left outer,
 					local);
-					
+
 // BDID Corporate records
 cont_to_bdid := cont_update_event;
 
@@ -503,15 +503,15 @@ cont_to_did_dedup := dedup(cont_to_did, all);
 Cont_Matchset := ['A','D','S','P'];
 
 DID_Add.MAC_Match_Flex(cont_to_did_dedup, Cont_Matchset,
-	 cont_ssn, cont_dob, cont_fname, cont_mname, cont_lname, cont_name_suffix, 
+	 cont_ssn, cont_dob, cont_fname, cont_mname, cont_lname, cont_name_suffix,
 	 cont_prim_range, cont_prim_name, cont_sec_range, cont_zip5, cont_state, cont_phone10,
 	 adl,
-	 layout_corp_cont_slim, 
+	 layout_corp_cont_slim,
 	 TRUE, adl_score,
 	 75,
 	 cont_did_all)
 
-// dedup, keep highest score	 
+// dedup, keep highest score
 cont_did_dist := distribute(cont_did_all, hash(uid));
 cont_did_sort := sort(cont_did_dist, uid, if(adl <> 0, 0, 1), -adl_score, local);
 cont_did_dedup := dedup(cont_did_sort, uid, local);
@@ -519,7 +519,7 @@ cont_did_dedup := dedup(cont_did_sort, uid, local);
 // Assign dids to original records
 cont_did_seq_dist := distribute(cont_did_seq, hash(uid));
 
-	 
+
 Layout_Corp_Cont_Temp AssignDIDs(Layout_Corp_Cont_Temp_DID l, layout_corp_cont_slim r) := transform
 self.did := if(r.adl <> 0, r.adl, 0);
 self := l;

@@ -1,5 +1,7 @@
 export MAC_Address_Clean(infile,addr1_expr,addr2_expr,clean_misses,out_file) := macro
 
+IMPORT ut;
+
 #uniquename(new_layout)
 %new_layout% := record
   infile;
@@ -41,8 +43,8 @@ end;
 
 #uniquename(infile_pre_id)
 #uniquename(pre_infile_id)
-%infile_pre_id% := project(%misses%, %make_id_layout%(left));			
-ut.MAC_Sequence_Records(%infile_pre_id%,temp_ID,%pre_infile_id%)	
+%infile_pre_id% := project(%misses%, %make_id_layout%(left));
+ut.MAC_Sequence_Records(%infile_pre_id%,temp_ID,%pre_infile_id%)
 
 #uniquename(infile_dist)
 %infile_dist% := distribute(%pre_infile_id%,hash(addr1_expr,addr2_expr));
@@ -58,7 +60,7 @@ ut.MAC_Sequence_Records(%infile_pre_id%,temp_ID,%pre_infile_id%)
 	self.temp_id := if (l.temp_id = 0, r.temp_id, l.temp_id);
 	self := r;
 end;
-	
+
 #uniquename(infile_iter)
 #uniquename(infile_dup)
 %infile_iter% := iterate(%infile_grpd%, %rid_em%(left, right));

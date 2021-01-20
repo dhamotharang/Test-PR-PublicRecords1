@@ -983,6 +983,7 @@ EXPORT Constants := MODULE
 		export yearOnly := 9999;
 		export yearMonthOnly := 999999;
 		export MaxWatchlists := MaxCountWatchLists;
+		export MaxGovIdAttributes := 42;
 	END;
 
 	// IdentityContactResolution (ICR) - As used by govt_collection_services

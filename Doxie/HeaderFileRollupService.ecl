@@ -1,4 +1,4 @@
-// =====================================================================
+﻿// =====================================================================
 // ROXIE QUERY
 // -----------
 // For the complete list of input parameters please check published WU.
@@ -50,7 +50,7 @@ EXPORT HeaderFileRollupService := MACRO
     // Set progressive phone params
     ProgPhone_mod := doxie.iParam.getProgressivePhoneParams();
 
-    ta1 := doxie.HeaderFileRollupService_Records.fn_get_ta1(mod_access, mod_ta1);
+    ta1 := doxie.HeaderFileRollupService_Records.fn_get_ta1(mod_access, mod_ta1,TRUE);
 
     ta1_results := ta1.Results;
     royalties := ta1.Royalty;

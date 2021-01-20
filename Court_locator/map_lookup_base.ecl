@@ -1,4 +1,4 @@
-import Address,ut,did_add,business_header_ss,header_slimsort,VehLic,didville,driversv2,idl_header,flaccidents,AID;
+import AID;
 
 export map_lookup_base(string filedate) := function
 
@@ -44,20 +44,3 @@ sequential(
 output(dedup(outf,record,all),,'~thor_data400::base::'+filedate+'::CourtLocatorLookup',overwrite,__compressed__)
 ,sfShuffle);
 end;
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

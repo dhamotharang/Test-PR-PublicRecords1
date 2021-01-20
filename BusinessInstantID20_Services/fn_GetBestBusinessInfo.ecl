@@ -1,4 +1,4 @@
-IMPORT Address, BIPV2, BIPV2_Best, BIPV2_Best_SBFE, Business_Risk_BIP, Codes, STD;
+﻿IMPORT Address, BIPV2, BIPV2_Best, BIPV2_Best_SBFE, Business_Risk_BIP, Codes, STD;
 
 	// The following function determines the Best information for a particular Business. 
 	EXPORT fn_GetBestBusinessInfo( DATASET(BIPV2.IDlayouts.l_xlink_ids2) ds_BIPIDs,
@@ -14,7 +14,7 @@ IMPORT Address, BIPV2, BIPV2_Best, BIPV2_Best_SBFE, Business_Risk_BIP, Codes, ST
 			                                                     in_mod := linkingOptions,
 																													 IncludeStatus := TRUE,
 			                                                     JoinLimit := Business_Risk_BIP.Constants.Limit_Default,
-			                                                     JoinType := /* Options.KeepLargeBusinesses */ Business_Risk_BIP.Constants.DefaultJoinType);
+			                                                     JoinType := Options.KeepLargeBusinesses);
 
 			// NOTE: this filter (proxid = 0) is only correct if we're doing a SELEID based level fetch
 			// --which is the default FETCH LEVEL set at upper most roxie service level. The dataset
@@ -63,7 +63,7 @@ IMPORT Address, BIPV2, BIPV2_Best, BIPV2_Best_SBFE, Business_Risk_BIP, Codes, ST
 																													ScoreThreshold := 0, // ScoreThreshold --> 0 = Give me everything
 																													DataPermissionMask := Options.DataPermissionMask,
 																													JoinLimit := Business_Risk_BIP.Constants.Limit_Default,
-																													JoinType := /* Options.KeepLargeBusinesses */ Business_Risk_BIP.Constants.DefaultJoinType);
+																													JoinType := Options.KeepLargeBusinesses);
 
 			ds_BestSBFERawFilt := ds_BestSBFERaw(proxid = 0);	
 			

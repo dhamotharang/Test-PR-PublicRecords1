@@ -1,5 +1,5 @@
 #workunit('name','Accutrend Contacts ' + busreg.BusReg_Build_Date);
-import ut,did_add,header_slimsort,didville;
+import ut, did_add;
 
 base := BusReg.File_BusReg_Base;
 
@@ -128,7 +128,7 @@ matchset := ['A','P','S'];
 //DID file
 DID_Add.MAC_Match_Flex(cnts,matchset,ssn,junk,name_first,name_middle,
 	name_last,name_suffix,prim_range,prim_name,sec_range,zip,st,phone,
-	did,busreg.Layout_BusReg_Contact,false,junk, 
+	did,busreg.Layout_BusReg_Contact,false,junk,
 	75,busreg_out)
 
 //Add old contacts

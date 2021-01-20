@@ -383,6 +383,7 @@
 			rowAddress := dsAddresses(acctno = adultsOrGuardians.acctno)[1];
 			rowDeceased := dsDeceased(acctno = adultsOrGuardians.acctno)[1];
 			rowsEmails := dsEmailsResults(acctno = adultsOrGuardians.acctno); 
+			rowsEmailStatus := dsEmailsWhole.emailstatus(acctno = adultsOrGuardians.acctno);
 			
 			SELF.acctno := adultsOrGuardians.acctno; // get guardian info AND classification 
 			BestName := address.NameFromComponents(rowBest.best_fname ,rowBest.best_mname ,rowBest.best_lname,rowBest.best_name_suffix );
@@ -878,6 +879,8 @@
 			self.Email10_latest_orig_login_date:=rowsEmails[10].latest_orig_login_date;
 			self.Email10_num_email_per_did:=rowsEmails[10].num_email_per_did;
 			self.Email10_num_did_per_email:=rowsEmails[10].num_did_per_email;
+			self.input_email_invalid:=rowsEmailStatus[1].input_email_invalid;
+			self.input_email_invalid_reason:=rowsEmailStatus[1].input_email_invalid_reason;
 			SELF := [];
 		END;
 		//Waterfall BatchOut Transformation
@@ -1008,6 +1011,6 @@
    		end;	
    
    		finalRecords := dataset([{dsOutput ,dsEmailsWhole.Royalties}],finalRec);
-		  return finalRecords;
+		return finalRecords;
 	end;
   
