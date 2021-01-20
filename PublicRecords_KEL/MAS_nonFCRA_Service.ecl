@@ -44,9 +44,13 @@ EXPORT MAS_nonFCRA_Service() := MACRO
 		'LexIdSourceOptout',
 		'RetainInputLexid',
 		'AppendPII',
-    '_TransactionId',
-    '_BatchUID',
-    '_GCID'
+		'_TransactionId',
+		'_BatchUID',
+		'_GCID',
+		'Watchlists_Requested',
+		'IncludeOfac',
+		'IncludeAdditionalWatchLists',
+		'Global_Watchlist_Threshold'
   ));
 
 STRING5 Default_Industry_Class := '';	
@@ -87,8 +91,23 @@ STRING100 Default_data_permission_mask := '';
 
 	DATASET(Gateway.Layouts.Config) GatewaysClean := PROJECT(gateways_in, gw_switch(LEFT));
 	
+	// OFAC parameters
+    BOOLEAN   include_ofac := FALSE : STORED('IncludeOfac');
+    BOOLEAN   include_additional_watchlists  := FALSE  : STORED('IncludeAdditionalWatchLists');
+    REAL Global_Watchlist_Threshold := Business_Risk_BIP.Constants.Default_Global_Watchlist_Threshold : STORED('Global_Watchlist_Threshold');
+    STRING watchlists := '' : STORED('Watchlists_Requested');
+    
+    OFACGW := GatewaysClean(STD.Str.ToLowerCase(servicename) = 'bridgerwlc')[1];
+	#STORED('OFACURL', OFACGW.url);
+    #STORED('IncludeOfacValue', include_ofac);
+    #STORED('IncludeAdditionalWatchListsValue', include_additional_watchlists);
+    #STORED('Watchlists_RequestedValue', watchlists);
+    #STORED('Global_Watchlist_ThresholdValue', Global_Watchlist_Threshold);
+  
+    // NetAcuity parameters
 	NetAcuityGW := GatewaysClean(STD.Str.ToLowerCase(servicename) = 'netacuity')[1];
 	#STORED('NetAcuityURL', NetAcuityGW.url);
+	#STORED('IsFCRAValue', FALSE);
 	
 	// If allowed sources aren't passed in, use default list of allowed sources
 	SetAllowedSources := IF(COUNT(AllowedSourcesDataset) = 0, PublicRecords_KEL.ECL_Functions.Constants.DEFAULT_ALLOWED_SOURCES_NONFCRA, AllowedSourcesDataset);
@@ -183,13 +202,13 @@ STRING100 Default_data_permission_mask := '';
 		TRANSFORM(PublicRecords_KEL.ECL_Functions.Layout_Person_NonFCRA,
 			SELF := LEFT));
 	
-	// IF(COUNT(ResultSet(NetAcuityRoyalty <> 0)) > 0, 
-    // OUTPUT(DATASET([TRANSFORM(Royalty.Layouts.Royalty, 
-	// SELF.royalty_type_code := Royalty.Constants.RoyaltyCode.NETACUITY;
-	// SELF.royalty_type := Royalty.Constants.RoyaltyType.NETACUITY;
-	// SELF.royalty_count  := COUNT(ResultSet(NetAcuityRoyalty <> 0)); 
-	// SELF := [];
-	// )]), NAMED('RoyaltySet')));
+	IF(COUNT(ResultSet(NetAcuityRoyalty <> 0)) > 0, 
+    OUTPUT(DATASET([TRANSFORM(Royalty.Layouts.Royalty, 
+	SELF.royalty_type_code := Royalty.Constants.RoyaltyCode.NETACUITY;
+	SELF.royalty_type := Royalty.Constants.RoyaltyType.NETACUITY;
+	SELF.royalty_count  := COUNT(ResultSet(NetAcuityRoyalty <> 0)); 
+	SELF := [];
+	)]), NAMED('RoyaltySet')));
 	
   OUTPUT( FinalResults, NAMED('Results') );
 

@@ -197,6 +197,8 @@
 	STRING100 PI_SrcWInpFLSListEv;
 	STRING300 PI_SrcWInpFLSEmrgDtListEv;
 	STRING300 PI_SrcWInpFLSLastDtListEv;
+	STRING10 PI_AlrtInpNameWatchlistRecNum;
+	STRING6 PI_AlrtInpNameOnWatchlistFlag;
 	STRING10 G_BuildDrgCrimDt;
 	STRING10 G_BuildAstVehAutoDt;
 	STRING10 G_BuildAstVehAirDt;

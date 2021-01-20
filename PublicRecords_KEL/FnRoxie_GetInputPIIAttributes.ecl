@@ -78,12 +78,11 @@ EXPORT FnRoxie_GetInputPIIAttributes(DATASET(PublicRecords_KEL.ECL_Functions.Lay
 			SELF.PI_SrchPerInpPhoneCnt1Y := IF(Options.IsFCRA,0,(INTEGER)LEFT.PI_SrchPerInpPhoneCnt1Y),
 			SELF.PI_SrchLexIDPerInpPhoneCnt1Y := IF(Options.IsFCRA,0,(INTEGER)LEFT.PI_SrchLexIDPerInpPhoneCnt1Y),
 			SELF.BestDataAppended := Options.BestPIIAppend,
-			SELF.IPaddr := '',
-			SELF.IPresponse := '',
-			SELF.NetAcuityRoyalty := 0,		
-			// SELF.IPaddr := (STRING)LEFT.IPaddr,
-			// SELF.IPresponse := (STRING)LEFT.IPresponse,
-			// SELF.NetAcuityRoyalty := (INTEGER4)LEFT.NetAcuityRoyalty,
+			SELF.PI_AlrtInpNameWatchlistRecNum := IF(Options.IsFCRA, '', (STRING)LEFT.PI_AlrtInpNameWatchlistRecNum),
+            SELF.PI_AlrtInpNameOnWatchlistFlag := IF(Options.IsFCRA, '', (STRING)LEFT.PI_AlrtInpNameOnWatchlistFlag),
+			SELF.IPaddr := (STRING)LEFT.IPaddr,
+			SELF.IPresponse := (STRING)LEFT.IPresponse,
+			SELF.NetAcuityRoyalty := (INTEGER4)LEFT.NetAcuityRoyalty,
 			SELF := LEFT,
 			SELF := []));
 	

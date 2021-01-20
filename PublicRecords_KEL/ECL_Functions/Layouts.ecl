@@ -296,6 +296,8 @@ EXPORT LayoutAppendedAddresses := RECORD
 		INTEGER3 PI_SrchLexIDPerInpEmailCnt1Y;
 		INTEGER3 PI_SrchPerInpPhoneCnt1Y;
 		INTEGER3 PI_SrchLexIDPerInpPhoneCnt1Y;
+		STRING10 PI_AlrtInpNameWatchlistRecNum;
+		STRING6 PI_AlrtInpNameOnWatchlistFlag;
 		Boolean BestDataAppended;
 		STRING45 IPaddr;
 		STRING24 IPresponse;
