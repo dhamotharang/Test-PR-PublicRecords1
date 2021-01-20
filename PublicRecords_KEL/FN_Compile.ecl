@@ -1,4 +1,4 @@
-//HPCC Systems KEL Compiler Version 1.5.0rc1
+﻿//HPCC Systems KEL Compiler Version 1.5.0
 IMPORT KEL15 AS KEL;
 IMPORT $,Email_Data,NID,PublicRecords_KEL,Risk_Indicators,Royalty,STD,address,header;
 IMPORT CFG_Compile FROM PublicRecords_KEL;
@@ -133,9 +133,9 @@ EXPORT FN_Compile(CFG_Compile __cfg = CFG_Compile) := MODULE
     __Value := PublicRecords_KEL.ECL_Functions.Fn_STD_Str_FilterOut_ValidChars(Field);
     RETURN __BNT(__Value,__IsNull,KEL.typ.nstr);
   END;
-  SHARED __CC13316 := -99999;
+  SHARED __CC13336 := -99999;
   EXPORT KEL.typ.str FN_Validate_Flag(KEL.typ.nstr __PFieldToCheck) := FUNCTION
-    RETURN MAP(__T(__OR(__NT(__PFieldToCheck),__OP2(__PFieldToCheck,=,__CN(''))))=>(KEL.typ.str)__CC13316,__T(__OP2(FN__fn_Filter_Out_Valid_Chars(__ECAST(KEL.typ.nstr,__FN1(KEL.Routines.ToUpperCase,__FN1(KEL.Routines.TrimBoth,__PFieldToCheck)))),=,__CN('')))=>'0','1');
+    RETURN MAP(__T(__OR(__NT(__PFieldToCheck),__OP2(__PFieldToCheck,=,__CN(''))))=>(KEL.typ.str)__CC13336,__T(__OP2(FN__fn_Filter_Out_Valid_Chars(__ECAST(KEL.typ.nstr,__FN1(KEL.Routines.ToUpperCase,__FN1(KEL.Routines.TrimBoth,__PFieldToCheck)))),=,__CN('')))=>'0','1');
   END;
   EXPORT KEL.typ.nstr FN__fn_Bogus_Names(KEL.typ.nstr __PsNameFirst, KEL.typ.nstr __PsNameMid, KEL.typ.nstr __PsNameLast) := FUNCTION
     sNameFirst := __T(__PsNameFirst);
@@ -319,6 +319,30 @@ EXPORT FN_Compile(CFG_Compile __cfg = CFG_Compile) := MODULE
     __Value := PublicRecords_KEL.MAS_get.Gateway.GatewayFunctions.GrabDPPAPurpose(StoredName);
     RETURN __BNT(__Value,__IsNull,KEL.typ.nint);
   END;
+  EXPORT KEL.typ.nstr FN_G_E_T___S_T_O_R_E_D___W_A_T_C_H_L_I_S_T_S___R_E_Q_U_E_S_T_E_D(KEL.typ.nstr __PStoredName) := FUNCTION
+    StoredName := __T(__PStoredName);
+    __IsNull := __NL(__PStoredName);
+    __Value := PublicRecords_KEL.MAS_get.Gateway.GatewayFunctions.GrabWatchlistsRequested(StoredName);
+    RETURN __BNT(__Value,__IsNull,KEL.typ.nstr);
+  END;
+  EXPORT KEL.typ.nbool FN_G_E_T___S_T_O_R_E_D___I_N_C_L_U_D_E___O_F_A_C(KEL.typ.nstr __PStoredName) := FUNCTION
+    StoredName := __T(__PStoredName);
+    __IsNull := __NL(__PStoredName);
+    __Value := PublicRecords_KEL.MAS_get.Gateway.GatewayFunctions.GrabIncludeOFAC(StoredName);
+    RETURN __BNT(__Value,__IsNull,KEL.typ.nbool);
+  END;
+  EXPORT KEL.typ.nbool FN_G_E_T___S_T_O_R_E_D___I_N_C_L_U_D_E___A_D_D_I_T_I_O_N_A_L___W_A_T_C_H_L_I_S_T_S(KEL.typ.nstr __PStoredName) := FUNCTION
+    StoredName := __T(__PStoredName);
+    __IsNull := __NL(__PStoredName);
+    __Value := PublicRecords_KEL.MAS_get.Gateway.GatewayFunctions.GrabIncludeAdditionalWatchlists(StoredName);
+    RETURN __BNT(__Value,__IsNull,KEL.typ.nbool);
+  END;
+  EXPORT KEL.typ.nfloat FN_G_E_T___S_T_O_R_E_D___G_L_O_B_A_L___W_A_T_C_H_L_I_S_T___T_H_R_E_S_H_O_L_D(KEL.typ.nstr __PStoredName) := FUNCTION
+    StoredName := __T(__PStoredName);
+    __IsNull := __NL(__PStoredName);
+    __Value := PublicRecords_KEL.MAS_get.Gateway.GatewayFunctions.GrabGlobalWatchlistThreshold(StoredName);
+    RETURN __BNT(__Value,__IsNull,KEL.typ.nfloat);
+  END;
   EXPORT KEL.typ.nstr FN_G_E_T___N_E_T_A_C_U_I_T_Y___U_R_L(KEL.typ.nstr __PStoredName) := FUNCTION
     StoredName := __T(__PStoredName);
     __IsNull := __NL(__PStoredName);
@@ -340,6 +364,25 @@ EXPORT FN_Compile(CFG_Compile __cfg = CFG_Compile) := MODULE
     __IsNull := __NL(__PIPAddress) OR __NL(__PIPType);
     __Value := Royalty.RoyaltyNetAcuity.GetCount(TRIM(IPAddress), TRIM(IPType));
     RETURN __BNT(__Value,__IsNull,KEL.typ.nint);
+  END;
+  EXPORT KEL.typ.nstr FN_G_E_T___O_F_A_C___U_R_L(KEL.typ.nstr __PStoredName) := FUNCTION
+    StoredName := __T(__PStoredName);
+    __IsNull := __NL(__PStoredName);
+    __Value := PublicRecords_KEL.MAS_get.Gateway.OFACWatchlistsFunctions.GrabOFACURL(StoredName);
+    RETURN __BNT(__Value,__IsNull,KEL.typ.nstr);
+  END;
+  EXPORT SET OF KEL.typ.str FN_G_A_T_E_W_A_Y___O_F_A_C(KEL.typ.nstr __PGatewayURL, KEL.typ.nstr __PFirstName, KEL.typ.nstr __PMiddleName, KEL.typ.nstr __PLastName, KEL.typ.nstr __PDateOfBirth, KEL.typ.nbool __PIncludeOFAC, KEL.typ.nbool __PIncludeAdditionalWatchlists, KEL.typ.nfloat __PGlobalWatchlistThreshold, KEL.typ.nstr __PWatchlistsRequested) := FUNCTION
+    GatewayURL := __T(__PGatewayURL);
+    FirstName := __T(__PFirstName);
+    MiddleName := __T(__PMiddleName);
+    LastName := __T(__PLastName);
+    DateOfBirth := __T(__PDateOfBirth);
+    IncludeOFAC := __T(__PIncludeOFAC);
+    IncludeAdditionalWatchlists := __T(__PIncludeAdditionalWatchlists);
+    GlobalWatchlistThreshold := __T(__PGlobalWatchlistThreshold);
+    WatchlistsRequested := __T(__PWatchlistsRequested);
+    __Value := PublicRecords_KEL.MAS_get.Gateway.OFACWatchlistsFunctions.OFACWatchlistsWrapper(GatewayURL, FirstName, MiddleName, LastName, DateOfBirth, IncludeOFAC, IncludeAdditionalWatchlists, GlobalWatchlistThreshold, WatchlistsRequested);
+    RETURN __Value;
   END;
   EXPORT KEL.typ.str FN__map_Filing_Type(KEL.typ.nstr __PfilingType) := FUNCTION
     RETURN MAP(__T(__OP2(__FN1(KEL.Routines.ToUpperCase,__FN1(TRIM,__PfilingType)),IN,__CN(['UCC-3 TERMINATION','TERMINATION','UCC3 TERMINATION'])))=>'1',__T(__OP2(__FN1(KEL.Routines.ToUpperCase,__FN1(TRIM,__PfilingType)),=,__CN('CORRECTION')))=>'2',__T(__OP2(__FN1(KEL.Routines.ToUpperCase,__FN1(TRIM,__PfilingType)),=,__CN('AMENDMENT')))=>'3',__T(__OP2(__FN1(KEL.Routines.ToUpperCase,__FN1(TRIM,__PfilingType)),=,__CN('ASSIGNMENT')))=>'4',__T(__OP2(__FN1(KEL.Routines.ToUpperCase,__FN1(TRIM,__PfilingType)),=,__CN('CONTINUATION')))=>'5',__T(__OP2(__FN1(KEL.Routines.ToUpperCase,__FN1(TRIM,__PfilingType)),=,__CN('FILING OFFICER STATEMENT')))=>'6',__T(__OP2(__FN1(KEL.Routines.ToUpperCase,__FN1(TRIM,__PfilingType)),=,__CN('INITIAL FILING')))=>'7','7');

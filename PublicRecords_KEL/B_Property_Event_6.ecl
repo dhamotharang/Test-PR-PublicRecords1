@@ -1,11 +1,11 @@
-﻿//HPCC Systems KEL Compiler Version 1.5.0rc1
+﻿//HPCC Systems KEL Compiler Version 1.5.0
 IMPORT KEL15 AS KEL;
 IMPORT CFG_Compile,E_Property,E_Property_Event,E_Zip_Code,FN_Compile FROM PublicRecords_KEL;
 IMPORT * FROM KEL15.Null;
 EXPORT B_Property_Event_6(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG_Compile __cfg = CFG_Compile) := MODULE
   SHARED VIRTUAL TYPEOF(E_Property_Event(__in,__cfg).__Result) __E_Property_Event := E_Property_Event(__in,__cfg).__Result;
-  SHARED __EE431168 := __E_Property_Event;
-  EXPORT __ST246196_Layout := RECORD
+  SHARED __EE431843 := __E_Property_Event;
+  EXPORT __ST246871_Layout := RECORD
     KEL.typ.nuid UID;
     KEL.typ.nstr L_N_Fares_I_D_;
     KEL.typ.nstr Primary_Range_;
@@ -76,11 +76,11 @@ EXPORT B_Property_Event_6(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, 
     KEL.typ.epoch Vault_Date_Last_Seen_ := 0;
     KEL.typ.int __RecordCount := 0;
   END;
-  SHARED __ST246196_Layout __ND4875437__Project(E_Property_Event(__in,__cfg).Layout __PP430825) := TRANSFORM
-    SELF.Dt_First_Seen_ := KEL.era.ToDate(__PP430825.Date_First_Seen_);
-    __CC13049 := KEL.Routines.MinN(FN_Compile(__cfg).FN_G_E_T_B_U_I_L_D_D_A_T_E(__ECAST(KEL.typ.nstr,__CN('property_build_version'))),__CN(__cfg.CurrentDate));
-    SELF.Is_Current_Assessment_Record_ := __AND(__PP430825.Is_Assessment_,__OP2(FN_Compile(__cfg).FN_A_B_S_Y_E_A_R_S_B_E_T_W_E_E_N(__ECAST(KEL.typ.nkdate,KEL.era.ToDate(__PP430825.Date_First_Seen_)),__ECAST(KEL.typ.nkdate,__CC13049)),<=,__CN(1)));
-    SELF := __PP430825;
+  SHARED __ST246871_Layout __ND4877716__Project(E_Property_Event(__in,__cfg).Layout __PP431500) := TRANSFORM
+    SELF.Dt_First_Seen_ := KEL.era.ToDate(__PP431500.Date_First_Seen_);
+    __CC13069 := KEL.Routines.MinN(FN_Compile(__cfg).FN_G_E_T_B_U_I_L_D_D_A_T_E(__ECAST(KEL.typ.nstr,__CN('property_build_version'))),__CN(__cfg.CurrentDate));
+    SELF.Is_Current_Assessment_Record_ := __AND(__PP431500.Is_Assessment_,__OP2(FN_Compile(__cfg).FN_A_B_S_Y_E_A_R_S_B_E_T_W_E_E_N(__ECAST(KEL.typ.nkdate,KEL.era.ToDate(__PP431500.Date_First_Seen_)),__ECAST(KEL.typ.nkdate,__CC13069)),<=,__CN(1)));
+    SELF := __PP431500;
   END;
-  EXPORT __ENH_Property_Event_6 := PROJECT(__EE431168,__ND4875437__Project(LEFT));
+  EXPORT __ENH_Property_Event_6 := PROJECT(__EE431843,__ND4877716__Project(LEFT));
 END;
