@@ -1,4 +1,4 @@
-﻿IMPORT Risk_Indicators, Gateway, STD, _control;
+﻿IMPORT Risk_Indicators, Gateway, STD, _control, iesp;
 
 EXPORT Prep_IDA_Credit( DATASET(Risk_Indicators.layouts.layout_IDA_in) indata, 
                         DATASET(Gateway.Layouts.Config) gateways,
@@ -66,7 +66,7 @@ EXPORT Prep_IDA_Credit( DATASET(Risk_Indicators.layouts.layout_IDA_in) indata,
 
   //Don't want IDA gateway running in batch yet
   #IF(_control.Environment.OnThor)
-    final := DATASET([], Risk_Indicators.layouts.layout_IDA_out);
+    final := DATASET([], iesp.ida_report_response.t_IDAReportResponseEx);
   #ELSE
 
   //Need the full response for credit since we need to know about consumer statements

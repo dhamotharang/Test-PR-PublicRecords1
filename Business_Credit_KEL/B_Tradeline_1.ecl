@@ -1,11 +1,11 @@
-﻿//HPCC Systems KEL Compiler Version 1.2.1-dev
-IMPORT KEL12 AS KEL;
+﻿//HPCC Systems KEL Compiler Version 1.3.2
+IMPORT KEL13 AS KEL;
 IMPORT B_Tradeline_2,CFG_graph FROM Business_Credit_KEL;
-IMPORT * FROM KEL12.Null;
+IMPORT * FROM KEL13.Null;
 EXPORT B_Tradeline_1(CFG_graph.FDCDataset __in = CFG_graph.FDCDefault, CFG_graph __cfg = CFG_graph) := MODULE
   SHARED VIRTUAL TYPEOF(B_Tradeline_2(__in,__cfg).__ENH_Tradeline_2) __ENH_Tradeline_2 := B_Tradeline_2(__in,__cfg).__ENH_Tradeline_2;
-  SHARED __EE2869237 := __ENH_Tradeline_2;
-  EXPORT __ST271938_Layout := RECORD
+  SHARED __EE10298253 := __ENH_Tradeline_2;
+  EXPORT __ST271992_Layout := RECORD
     KEL.typ.nuid UID;
     KEL.typ.nkdate _load__date_;
     KEL.typ.nstr _sbfe__contributor__number_;
@@ -36,7 +36,7 @@ EXPORT B_Tradeline_1(CFG_graph.FDCDataset __in = CFG_graph.FDCDefault, CFG_graph
     KEL.typ.nstr _payment__interval_;
     KEL.typ.nstr _payment__status__category_;
     KEL.typ.nint D_B_T___V5_;
-    KEL.typ.nstr _ln__delinquency__date_;
+    KEL.typ.nint _raw__dbt__v5_;
     KEL.typ.nunk _term__of__account__in__months_;
     KEL.typ.nkdate _first__payment__due__date_;
     KEL.typ.nkdate _final__pyament__due__date_;
@@ -214,9 +214,9 @@ EXPORT B_Tradeline_1(CFG_graph.FDCDataset __in = CFG_graph.FDCDefault, CFG_graph
     KEL.typ.nint _acc_;
     KEL.typ.int __RecordCount := 0;
   END;
-  SHARED __ST271938_Layout __ND2869448__Project(B_Tradeline_2(__in,__cfg).__ST269456_Layout __PP2868195) := TRANSFORM
-    SELF.Utilization_Percent_ := __OP2(__OP2(__PP2868195.Cycle_Balance_,/,__PP2868195._current__credit__limit_),*,__CN(100));
-    SELF := __PP2868195;
+  SHARED __ST271992_Layout __ND10299090__Project(B_Tradeline_2(__in,__cfg).__ST269505_Layout __PP10298254) := TRANSFORM
+    SELF.Utilization_Percent_ := __OP2(__OP2(__PP10298254.Cycle_Balance_,/,__PP10298254._current__credit__limit_),*,__CN(100));
+    SELF := __PP10298254;
   END;
-  EXPORT __ENH_Tradeline_1 := PROJECT(__EE2869237,__ND2869448__Project(LEFT));
+  EXPORT __ENH_Tradeline_1 := PROJECT(__EE10298253,__ND10299090__Project(LEFT));
 END;

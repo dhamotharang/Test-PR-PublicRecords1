@@ -11,6 +11,8 @@ EXPORT MAC_HHID_Append_By_Address
 	 zip_field
 ):= MACRO
 
+IMPORT ut, header_slimsort;
+
 #uniquename(layout_inf_seq)
 #uniquename(seq)
 %layout_inf_seq% := RECORD
@@ -28,7 +30,7 @@ ut.MAC_Sequence_Records_NewRec(infile, %layout_inf_seq%, %seq%, %inf_seq%)
 #uniquename(hhid_ss_dist)
 %hhid_ss_dist% := DISTRIBUTE(header_slimsort.File_Household,
 	HASH(lname, prim_name));
-	
+
 #uniquename(join_ss)
 %layout_inf_seq% %join_ss%(%hhid_ss_dist% l, %inf_seq_dist% r) := TRANSFORM
 	SELF.hhid_field := l.hhid_relat;
@@ -47,14 +49,14 @@ END;
 	) AND
 	(
 		(
-			LEFT.sec_range = RIGHT.srange_field AND 
+			LEFT.sec_range = RIGHT.srange_field AND
 			LEFT.sec_range != '' AND
 			LEFT.hhid_cnt = 1
 		) OR
 		LEFT.hhid_nosec_cnt = 1
 	),
 	%join_ss%(LEFT, RIGHT), RIGHT OUTER, LOCAL);
-	
+
 #uniquename(j_ded)
 %j_ded% := DEDUP(%j1%, %seq%, ALL);
 

@@ -1,5 +1,4 @@
-import Address, Ut, lib_stringlib, _Control, business_header,_Validate,
-Header, Header_Slimsort, didville, ut, DID_Add,Business_Header_SS,TopBusiness_External;
+import DID_Add, Business_Header_SS;
 
 
 export Append_Ids :=	module
@@ -14,20 +13,20 @@ export Append_Ids :=	module
 	// -- Slim record for Diding
 	//////////////////////////////////////////////////////////////////////////////////////
 	Layouts.DidSlim tSlimForDiding(Layouts.KeyBuild l, unsigned2 cnt) :=transform
-		self.unique_id		:= l.unique_id;									
+		self.unique_id		:= l.unique_id;
 		self.prim_range		:= choose(cnt,l.p_prim_range,l.m_prim_range	);
 		self.prim_name		:= choose(cnt,l.p_prim_name,l.m_prim_name			);
 		self.zip					:= choose(cnt,l.p_zip,l.m_zip					);
 		self.sec_range		:= choose(cnt,l.p_sec_range,l.m_sec_range			);
-		self.st						:= choose(cnt,l.p_st,l.m_st	);	       
+		self.st						:= choose(cnt,l.p_st,l.m_st	);
 		self.fname				:= l.fname	;
 		self.mname				:= l.mname	;
-		self.lname				:= l.lname	;		
+		self.lname				:= l.lname	;
 		self.phone				:= l.phone	;
 		self.suffix       := l.suffix	;
 		self.did					:= 0		;
 		self							:= l		;
-	end;  
+	end;
 
 	dSlimForDiding :=  normalize(pDataset, if(trim(left.m_p_city_name) <>'' and
 																						trim(left.m_st)        	 <>'' and
@@ -56,8 +55,8 @@ export Append_Ids :=	module
 												 ,TRUE               // Does output record have the score
 												 ,did_score         // did score field
 												 ,75               // score threshold
-												 ,dDidOut					// output dataset       
-											  );			
+												 ,dDidOut					// output dataset
+											  );
 
 	dDidOut_dist			:= distribute	(dDidOut(did != 0)	,unique_id										);
 	dDidOut_sort			:= sort				(dDidOut_dist				,unique_id, -did_score	,local);
@@ -96,57 +95,57 @@ export Append_Ids :=	module
 		self.zip					:= choose(cnt,l.p_zip,l.m_zip					);
 		self.sec_range		:= choose(cnt,l.p_sec_range,l.m_sec_range			);
 		self.p_city_name	:= choose(cnt,l.p_p_city_name,l.m_p_city_name		);
-		self.st						:= choose(cnt,l.p_st,l.m_st	);			
+		self.st						:= choose(cnt,l.p_st,l.m_st	);
 		self.phone				:= l.phone	;
 		self.email				:= l.email	;
 		self.bdid					:= 0	;
 		self.bdid_score		:= 0 	;
 		self							:= l	;
-	end;  
+	end;
 
 	dSlimForBdiding :=  normalize(pDataset, if(trim(left.m_p_city_name) <>'' and
 																						 trim(left.m_st)        	<>'' and
 																						 trim(left.m_zip)  				<>'',2,1),tSlimForBdiding(left,counter));
-						 
+
 	dSlimForBdiding_Sort := dedup(SORT(dSlimForBdiding, record), record);
 	BDID_Matchset 			 := ['A','P'];
 
-	Business_Header_SS.MAC_Add_BDID_Flex(dSlimForBdiding_Sort								       // Input Dataset						
-																			,BDID_Matchset                            // BDID Matchset           
-																			,BusinessName       		             		 // company_name	              
-																			,prim_range		                          // prim_range		              
-																			,prim_name		                         // prim_name		              
-																			,zip    				                      // zip5					              
-																			,sec_range		                       // sec_range		              
-																			,st				                          // state				              
-																			,phone				                     // phone				              
-																			,''                               // fein              
-																			,bdid											 			 // bdid												
-																			,Layouts.BdidSlim			 	    	  // Output Layout 
-																			,true                          // output layout has bdid score field?                       
-																			,BDID_Score                   // bdid_score                 
-																			,dBDidOut                    // Output Dataset   
+	Business_Header_SS.MAC_Add_BDID_Flex(dSlimForBdiding_Sort								       // Input Dataset
+																			,BDID_Matchset                            // BDID Matchset
+																			,BusinessName       		             		 // company_name
+																			,prim_range		                          // prim_range
+																			,prim_name		                         // prim_name
+																			,zip    				                      // zip5
+																			,sec_range		                       // sec_range
+																			,st				                          // state
+																			,phone				                     // phone
+																			,''                               // fein
+																			,bdid											 			 // bdid
+																			,Layouts.BdidSlim			 	    	  // Output Layout
+																			,true                          // output layout has bdid score field?
+																			,BDID_Score                   // bdid_score
+																			,dBDidOut                    // Output Dataset
 																			,														// deafult threscold
 																			,													 // use prod version of superfiles
-																			,													// default is to hit prod from dataland, and on prod hit prod.		
+																			,													// default is to hit prod from dataland, and on prod hit prod.
 																			,BIPV2.xlink_version_set // Create BIP Keys only
-																			,					           		// Url  ("Website" or "Webpage1" or "webpage2" or "webpage3" fields are available in the data but they didn't contain the valid url's) 
+																			,					           		// Url  ("Website" or "Webpage1" or "webpage2" or "webpage3" fields are available in the data but they didn't contain the valid url's)
 																			,Email								 // Email
 																			,p_city_name					// City
 																			,fname							 // fname
 																			,mname						  // mname
 																			,lname						 // lname
 																			);
-																		
-	dBdidOut_dist			:= distribute	(dBdidOut(bdid 		!= 0 or 
-																						Ultid 	!= 0 or 
-																						OrgID 	!= 0 or 
+
+	dBdidOut_dist			:= distribute	(dBdidOut(bdid 		!= 0 or
+																						Ultid 	!= 0 or
+																						OrgID 	!= 0 or
 																						ProxID 	!= 0 or
 																						SELEID 	!= 0 or
-																						POWID 	!= 0 or 
-																						EmpID 	!= 0 or 
+																						POWID 	!= 0 or
+																						EmpID 	!= 0 or
 																						DotID 	!= 0)	,unique_id);
-																				
+
 	dBdidOut_sort			:= sort(dBdidOut_dist, unique_id, -bdid_score, -proxscore,-selescore,-orgscore,-ultscore,-powscore,-empscore,-dotscore, local);
 	dBdidOut_dedup		:= dedup(dBdidOut_sort, unique_id	, local);
 
@@ -185,16 +184,16 @@ export Append_Ids :=	module
 												,left outer
 												,local
 												);
-								
+
 		return dAssignBdids;
-	end; 
+	end;
 
 	export fAll(dataset(Layouts.KeyBuild)	pDataset) :=	function
-	
+
 		dAppendDid    	:= 	fAppendDid	(pDataset);
 		dAppendBdid    	:= 	fAppendBdid (dAppendDid);
-		
+
 		return dAppendBdid ;
 	end;
-	
+
 end;

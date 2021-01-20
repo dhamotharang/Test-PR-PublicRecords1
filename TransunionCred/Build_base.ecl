@@ -1,4 +1,4 @@
-IMPORT  address, ut, header_slimsort, did_add, didville,AID;
+IMPORT ut, did_add, AID;
 
 #IF (IsFullUpdate = false)
 	TrnUn_credit := Files.update_in;
@@ -89,7 +89,7 @@ norm_names1:=join(distribute(norm_names0,hash(Prepped_name))
 
 // preprocess:=temp(norm_names1); //used for testing sample ecords
 
-unsigned4	lFlags := AID.Common.eReturnValues.RawAID | AID.Common.eReturnValues.ACECacheRecords;		
+unsigned4	lFlags := AID.Common.eReturnValues.RawAID | AID.Common.eReturnValues.ACECacheRecords;
 AID.MacAppendFromRaw_2Line(norm_names1,Prepped_addr1,Prepped_addr2,RawAID,norm_names, lFlags);
 
 Layouts.base tr_addr(norm_names le) := TRANSFORM
@@ -143,7 +143,7 @@ TN_ready := base_and_update(fname<>'',lname<>'',prim_name<>'');
 //-----------------------------------------------------------------
 //Rollup to eliminate duplications
 //-----------------------------------------------------------------
-build_TN_base_d := distribute(TN_ready, hash(Party_ID));  
+build_TN_base_d := distribute(TN_ready, hash(Party_ID));
 build_TN_base_s := sort(build_TN_base_d
 																	,Party_ID
 																	,Prepped_rec_type
@@ -228,9 +228,9 @@ TransunionCred_base := rollup(build_TN_base_s
 matchset := ['A','Z','D','S'];
 
 did_add.MAC_Match_Flex
-	(TransunionCred_base , matchset,					
-	 clean_ssn,clean_dob, fname, mname, lname, name_suffix, 
-	 prim_range, prim_name, sec_range, zip, st,'', 
+	(TransunionCred_base , matchset,
+	 clean_ssn,clean_dob, fname, mname, lname, name_suffix,
+	 prim_range, prim_name, sec_range, zip, st,'',
 	 DID, Layouts.base, true, did_score,
 	 75, d_did);
 

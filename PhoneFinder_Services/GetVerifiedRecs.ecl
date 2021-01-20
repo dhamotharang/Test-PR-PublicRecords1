@@ -1,29 +1,51 @@
-﻿IMPORT $, STD, NID, MDR, iesp, ut;
+﻿IMPORT $, STD, NID, MDR, iesp, ut, Address;
 
 // Function only invoked during a PHONE search
 EXPORT GetVerifiedRecs(DATASET($.Layouts.PhoneFinder.IdentitySlim) dIn,
                        DATASET($.Layouts.BatchIn) dInWithBestDIDs,
                        $.IParam.PhoneVerificationParams vmod) :=
 FUNCTION
+ 
   // Match on DID
   matchDid ($.Layouts.PhoneFinder.IdentitySlim L, $.Layouts.BatchIn R) :=
   (R.did > 0 AND L.did = R.did);
 
   //match last name
-  matchLastName ($.Layouts.PhoneFinder.IdentitySlim L, $.Layouts.BatchIn R) :=
+  matchLastName (STRING lname, STRING name_last) :=
   (
-      R.name_last != '' AND (L.lname = STD.STR.ToUpperCase(R.name_last))
+      name_last != '' AND (lname = STD.STR.ToUpperCase(name_last))
       OR
-      (vmod.phoneticMatch AND metaphonelib.DMetaPhone1(L.lname) = metaphonelib.DMetaPhone1(STD.STR.ToUpperCase(R.name_last)))
+      (vmod.phoneticMatch AND metaphonelib.DMetaPhone1(lname) = metaphonelib.DMetaPhone1(STD.STR.ToUpperCase(name_last)))
+  );
+  
+  // Match on name, DID
+  VerifyLastName ($.Layouts.PhoneFinder.IdentitySlim L, $.Layouts.BatchIn R) := FUNCTION
+
+  CleanName := Address.GetCleanNameAddress.CleanPersonName(L.listed_name, false);
+  
+  nameLastMatch := IF(L.fname= '' AND L.lname = '', (matchLastName(CleanName.lname, R.name_last)),
+                      (matchLastName(L.lname, R.name_last))
+                     );
+
+  return nameLastMatch;
+  END;
+  
+  matchFirstname (STRING fname, STRING name_first) :=
+  (
+  name_first != '' AND NID.mod_PFirstTools.PFLeqPFR(fname, STD.STR.ToUpperCase(name_first))
   );
 
   // Match on name, DID
-  matchName ($.Layouts.PhoneFinder.IdentitySlim L, $.Layouts.BatchIn R) :=
-  (matchDid(L, R) OR
-  (
-    R.name_first != '' AND NID.mod_PFirstTools.PFLeqPFR(L.fname, STD.STR.ToUpperCase(R.name_first))
-    AND matchLastName(L, R)
-  ));
+  matchName ($.Layouts.PhoneFinder.IdentitySlim L, $.Layouts.BatchIn R) := FUNCTION
+
+  CleanName := Address.GetCleanNameAddress.CleanPersonName(L.listed_name, false);
+  
+  nameMatch := IF(L.fname= '' AND L.lname = '', (matchFirstname(CleanName.fname, R.name_first) AND matchLastName(CleanName.lname, R.name_last)),
+                 (matchFirstname(L.fname, R.name_first) AND matchLastName(L.lname, R.name_last))
+                 );
+
+  return matchDid(L, R) OR nameMatch;
+  END;
 
   // Match name or DID and address
   matchNameAddress ($.Layouts.PhoneFinder.IdentitySlim L, $.Layouts.BatchIn R)  :=
@@ -67,7 +89,7 @@ FUNCTION
                           TRANSFORM($.Layouts.PhoneFinder.IdentitySlim,
                                     BOOLEAN isNameAddrVerified := vmod.VerifyPhoneNameAddress AND matchNameAddress(LEFT, RIGHT);
                                     BOOLEAN isNameVerified     := vmod.VerifyPhoneName AND matchName(LEFT, RIGHT);
-                                    BOOLEAN isLastNameVerified := vmod.VerifyPhoneLastName AND matchLastName(LEFT, RIGHT);
+                                    BOOLEAN isLastNameVerified := vmod.VerifyPhoneLastName AND VerifyLastName(LEFT, RIGHT);
                                     BOOLEAN isIdentityMatch    := isNameAddrVerified OR isNameVerified OR isLastNameVerified;
                                     SELF.acctno               := IF(isIdentityMatch OR (~vmod.VerifyPhoneNameAddress AND ~vmod.VerifyPhoneName AND ~vmod.VerifyPhoneLastName), LEFT.acctno, SKIP),
                                     SELF.is_identity_verified := isIdentityMatch,

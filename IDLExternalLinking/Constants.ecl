@@ -13,6 +13,7 @@ export Constants := module
 	EXPORT GOOD_CLUSTERS := [CORE_IND, NO_SSN_IND, DEAD_IND];
 	EXPORT GOOD_CANDIDATES_THESHOLD := 3;
 	EXPORT UNSIGNED6 INSURANCE_LEXID := 140737488355328;
+	EXPORT STRING3 INSURANCE_LEXID_TYPE := 'INS';
 	EXPORT UNSIGNED1 HIGH_STATE_WEIGHT := 7;
 	roxieEnv := stringlib.StringToUpperCase(thorlib.getenv('Environment','Default'));
 	EXPORT BOOLEAN isCustomerTest := roxieEnv in ['DQA', 'DPROD'];

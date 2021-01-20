@@ -4,6 +4,8 @@ c:\SuperComputer\Dataland\QueryBuilder\workspace\wma\Dataland_400_Staging\wma\Ma
 export Mac_Improve_Infile(infile,src_field,fname_field,mname_field,lname_field,prim_range_field,
 prim_name_field, sec_range_field,zip_field,ssn_field,dob_field,outfile) := macro
 
+IMPORT mdr, header;
+
 fn_cleanup(string pIn) := function
  pOut1 := trim(regexreplace('[!$^*<>?]',pIn,' '),left,right);
  pOut  := trim(stringlib.stringfindreplace(pOut1,'\'',''),left,right);
@@ -21,9 +23,9 @@ typeof(infile) %improve_infile1%(infile le) := transform
  boolean bad_dob := (~(v_dob between '1800' and ut.getdate[1..4])) and le.dob_field>0;
  self.dob_field       := if(bad_dob=true,0,le.dob_field);
 
- string v_prim_name := fn_cleanup(le.prim_name_field); 
+ string v_prim_name := fn_cleanup(le.prim_name_field);
  boolean prim_name_is_bogus := ut.bogusstreets(v_prim_name);
- 
+
  prim_name	:= if(prim_name_is_bogus,'',v_prim_name);;
  sec_range	:= if(prim_name_is_bogus,'',fn_cleanup(le.sec_range_field));
 
@@ -66,5 +68,3 @@ end;
 outfile := project(%keep_em_better_dob%, %improve_infile2%(left));
 
 endmacro;
-
-	 

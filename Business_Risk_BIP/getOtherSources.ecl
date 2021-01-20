@@ -976,11 +976,12 @@ EXPORT getOtherSources(DATASET(Business_Risk_BIP.Layouts.Shell) Shell,
 
 	// ---------------- DataBridge ------------------
 
-  dataBridge_raw := dx_DataBridge.Key_LinkIds.kFetch(Business_Risk_BIP.Common.GetLinkIDs(Shell),
+  dataBridge_raw := dx_DataBridge.Key_LinkIds.kFetch2(Business_Risk_BIP.Common.GetLinkIDs(Shell),
                                                         mod_access,
                                                         Business_Risk_BIP.Common.SetLinkSearchLevel(Options.LinkSearchLevel),
-                                                        0 /*ScoreThreshold --> 0 = Give me everything*/
-                                                        );
+                                                        0, /*ScoreThreshold --> 0 = Give me everything*/
+																												Business_Risk_BIP.Constants.Limit_Default,
+                                                        Options.KeepLargeBusinesses);
 
 	Business_Risk_BIP.Common.AppendSeq(dataBridge_raw, Shell, dataBridge_seq, Options.LinkSearchLevel);
 	
@@ -1035,12 +1036,13 @@ EXPORT getOtherSources(DATASET(Business_Risk_BIP.Layouts.Shell) Shell,
     );
  
   
-	// ---------------- TXBus ------------------
-  
-  TXBus_raw := TXBUS.Key_TXBUS_LinkIds.keyfetch(Business_Risk_BIP.Common.GetLinkIDs(Shell),
-                                                        Business_Risk_BIP.Common.SetLinkSearchLevel(Options.LinkSearchLevel),
-                                                        0, // ScoreThreshold --> 0 = Give me everything
-                                                        Business_Risk_BIP.Constants.Limit_Default);
+	// ---------------- TXBus ------------------																												
+	TXBus_raw := TXBUS.Key_TXBUS_LinkIds.kFetch2(Business_Risk_BIP.Common.GetLinkIDs(Shell),
+																						 Business_Risk_BIP.Common.SetLinkSearchLevel(Options.LinkSearchLevel),
+																							0, /*ScoreThreshold --> 0 = Give me everything*/
+																							Business_Risk_BIP.Constants.Limit_Default,
+																							Options.KeepLargeBusinesses);
+																							
 
 	Business_Risk_BIP.Common.AppendSeq(TXBus_raw, Shell, TXBus_seq, Options.LinkSearchLevel);
 	
@@ -1096,9 +1098,12 @@ EXPORT getOtherSources(DATASET(Business_Risk_BIP.Layouts.Shell) Shell,
 
 	// ---------------- Frandx ------------------
 
-  Frandx_raw := Frandx.Key_Linkids.kFetch(Business_Risk_BIP.Common.GetLinkIDs(Shell),
+  Frandx_raw := Frandx.Key_Linkids.kFetch2(Business_Risk_BIP.Common.GetLinkIDs(Shell),
                                                         Business_Risk_BIP.Common.SetLinkSearchLevel(Options.LinkSearchLevel),
-                                                        0); // ScoreThreshold --> 0 = Give me everything
+                                                        0, // ScoreThreshold --> 0 = Give me everything
+																												Business_Risk_BIP.Constants.Limit_Default,
+																												Options.KeepLargeBusinesses);
+																																																				
 
 	Business_Risk_BIP.Common.AppendSeq(Frandx_raw, Shell, Frandx_seq, Options.LinkSearchLevel);
 	
@@ -1154,10 +1159,11 @@ EXPORT getOtherSources(DATASET(Business_Risk_BIP.Layouts.Shell) Shell,
 
 	// ---------------- DNB FEIN ------------------
 
-  DNBFEIN_raw := DNB_FEINV2.Key_LinkIds.KeyFetch(Business_Risk_BIP.Common.GetLinkIDs(Shell),
+  DNBFEIN_raw := DNB_FEINV2.Key_LinkIds.kFetch2(Business_Risk_BIP.Common.GetLinkIDs(Shell),
                                                 Business_Risk_BIP.Common.SetLinkSearchLevel(Options.LinkSearchLevel),
                                                 0, // ScoreThreshold --> 0 = Give me everything
-                                                Business_Risk_BIP.Constants.Limit_Default);
+                                                Business_Risk_BIP.Constants.Limit_Default,
+																								Options.KeepLargeBusinesses);
 
 	Business_Risk_BIP.Common.AppendSeq(DNBFEIN_raw, Shell, DNBFEIN_seq, Options.LinkSearchLevel);
 	

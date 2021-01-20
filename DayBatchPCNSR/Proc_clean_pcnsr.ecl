@@ -1,4 +1,4 @@
-import InfoUSA,address,did_add,didville,ut,header_slimsort,standard, header;
+import InfoUSA,address,did_add,didville,ut,standard, header;
 
 ebc_p_cnsr_in := InfoUSA.File_PCNSR_In;
 
@@ -17,7 +17,7 @@ doSkip(ebc_p_cnsr_in l, INTEGER c) := FUNCTION
 		RETURN skipIt;
 END;
 
-getFullName(STRING given_name,STRING middle_initial, 
+getFullName(STRING given_name,STRING middle_initial,
 						STRING surname, STRING surname_suffix) := FUNCTION
 		STRING fullName := 	(string)given_name + ' ' +
 												(string)middle_initial + ' ' +
@@ -38,7 +38,7 @@ Layout_p_cnsr_for_clean normPCNSR(ebc_p_cnsr_in l,INTEGER c) := 	TRANSFORM,SKIP(
 																		getFullName(l.adult_4_given_name,l.adult_4_middle_initial,
 																								l.adult4_surname,l.adult_4_surname_suffix)
 															);
-											
+
 			SELF.name_for_clean2 := MAP(c = 1  AND l.adult_2_spouse_indicator = 'Y'
 																			=> getFullName(	l.adult_2_given_name,l.adult_2_middle_initial,
 																											l.adult_2_surname,l.adult_2_surname_suffix),
@@ -47,10 +47,10 @@ Layout_p_cnsr_for_clean normPCNSR(ebc_p_cnsr_in l,INTEGER c) := 	TRANSFORM,SKIP(
 																											l.adult3_surname,l.adult_3_surname_suffix),
 																	c = 1  AND l.adult_4_spouse_indicator = 'Y'
 																			=> getFullName(	l.adult_4_given_name,l.adult_4_middle_initial,
-																											l.adult4_surname,l.adult_4_surname_suffix),																																								
+																											l.adult4_surname,l.adult_4_surname_suffix),
 																	(c = 2 AND l.adult_2_spouse_indicator = 'Y') OR
 																	(c = 3 AND l.adult_3_spouse_indicator = 'Y') OR
-																	(c = 4 AND l.adult_4_spouse_indicator = 'Y') 																
+																	(c = 4 AND l.adult_4_spouse_indicator = 'Y')
 																			=> getFullName(	l.given_name,l.middle_initial,
 																											l.surname,l.surname_suffix),
 																	''
@@ -90,10 +90,10 @@ SELF.spouse_fname_orig := MAP(c = 1  AND l.adult_2_spouse_indicator = 'Y'
 													c = 1  AND l.adult_3_spouse_indicator = 'Y'
 															=> (STRING)l.adult_3_given_name,
 													c = 1  AND l.adult_4_spouse_indicator = 'Y'
-															=> (STRING)l.adult_4_given_name,																																								
+															=> (STRING)l.adult_4_given_name,
 													(c = 2 AND l.adult_2_spouse_indicator = 'Y') OR
 													(c = 3 AND l.adult_3_spouse_indicator = 'Y') OR
-													(c = 4 AND l.adult_4_spouse_indicator = 'Y') 																
+													(c = 4 AND l.adult_4_spouse_indicator = 'Y')
 															=> (STRING)l.given_name,
 													''
 													);
@@ -102,10 +102,10 @@ SELF.spouse_mname_orig := MAP(c = 1  AND l.adult_2_spouse_indicator = 'Y'
 													c = 1  AND l.adult_3_spouse_indicator = 'Y'
 															=> (STRING)l.adult_3_middle_initial,
 													c = 1  AND l.adult_4_spouse_indicator = 'Y'
-															=> (STRING)l.adult_4_middle_initial,																																								
+															=> (STRING)l.adult_4_middle_initial,
 													(c = 2 AND l.adult_2_spouse_indicator = 'Y') OR
 													(c = 3 AND l.adult_3_spouse_indicator = 'Y') OR
-													(c = 4 AND l.adult_4_spouse_indicator = 'Y') 																
+													(c = 4 AND l.adult_4_spouse_indicator = 'Y')
 															=> (STRING)l.middle_initial,
 													''
 													);
@@ -114,10 +114,10 @@ SELF.spouse_lname_orig := MAP(c = 1  AND l.adult_2_spouse_indicator = 'Y'
 													c = 1  AND l.adult_3_spouse_indicator = 'Y'
 															=> (STRING)l.adult3_surname,
 													c = 1  AND l.adult_4_spouse_indicator = 'Y'
-															=> (STRING)l.adult4_surname,																																								
+															=> (STRING)l.adult4_surname,
 													(c = 2 AND l.adult_2_spouse_indicator = 'Y') OR
 													(c = 3 AND l.adult_3_spouse_indicator = 'Y') OR
-													(c = 4 AND l.adult_4_spouse_indicator = 'Y') 																
+													(c = 4 AND l.adult_4_spouse_indicator = 'Y')
 															=> (STRING)l.surname,
 													''
 													);
@@ -126,10 +126,10 @@ SELF.spouse_name_suffix_orig := MAP(c = 1  AND l.adult_2_spouse_indicator = 'Y'
 													c = 1  AND l.adult_3_spouse_indicator = 'Y'
 															=> (STRING)l.adult_3_surname_suffix,
 													c = 1  AND l.adult_4_spouse_indicator = 'Y'
-															=> (STRING)l.adult_4_surname_suffix,																																								
+															=> (STRING)l.adult_4_surname_suffix,
 													(c = 2 AND l.adult_2_spouse_indicator = 'Y') OR
 													(c = 3 AND l.adult_3_spouse_indicator = 'Y') OR
-													(c = 4 AND l.adult_4_spouse_indicator = 'Y') 																
+													(c = 4 AND l.adult_4_spouse_indicator = 'Y')
 															=> (STRING)l.surname_suffix,
 													''
 													);
@@ -138,32 +138,32 @@ SELF.spouse_title_orig := MAP(c = 1  AND l.adult_2_spouse_indicator = 'Y'
 													c = 1  AND l.adult_3_spouse_indicator = 'Y'
 															=> (STRING)l.adult_3_title_code,
 													c = 1  AND l.adult_4_spouse_indicator = 'Y'
-															=> (STRING)l.adult_4_title_code,																																								
+															=> (STRING)l.adult_4_title_code,
 													(c = 2 AND l.adult_2_spouse_indicator = 'Y') OR
 													(c = 3 AND l.adult_3_spouse_indicator = 'Y') OR
-													(c = 4 AND l.adult_4_spouse_indicator = 'Y') 																
+													(c = 4 AND l.adult_4_spouse_indicator = 'Y')
 															=> (STRING)l.title_code,
 													''
 													);
-													
-		SELF.phone_forDID := MAP(	l.area_code <> '' AND l.phone_number <> '' AND	l.telephone_number_type = 'V' 
+
+		SELF.phone_forDID := MAP(	l.area_code <> '' AND l.phone_number <> '' AND	l.telephone_number_type = 'V'
 																	=> l.area_code + l.phone_number,
 															l.phone2_number <> '' AND l.telephone2_number_type = 'V'
 																	=> l.phone2_number,
 															'');
-															
+
 		SELF.addr1_for_clean := address.Addr1FromComponents(TRIM(l.house_number, left, right),TRIM(l.street_prefix_direction, left, right),
 																												TRIM(l.street_name, left, right),TRIM(l.street_suffix,left, right),'',
 																												TRIM(l.unit_type, left, right),TRIM(l.unit_number, left, right));
 		SELF.addr2_for_clean := address.Addr2FromComponents(TRIM(l.city_name, left, right),TRIM(l.state_abbreviation),l.zip_code);
-																												
+
 		SELF.spouse_indicator := IF(SELF.name_for_clean2 = '','N','Y');
-		
+
 		SELF.gender := CHOOSE(c,l.gender,
 													l.adult_2_gender,
 													l.adult_3_gender,
 													l.adult_4_gender);
-		
+
 		SELF.date_of_birth := CHOOSE(c,l.date_of_birth,
 																 l.adult_2_date_of_birth,
 																 l.adult_3_date_of_birth,
@@ -173,7 +173,7 @@ SELF.spouse_title_orig := MAP(c = 1  AND l.adult_2_spouse_indicator = 'Y'
 																l.refresh_date_2,
 																l.refresh_date_3,
 																l.refresh_date_4);
-		
+
 		SELF.name_address_verification_source := CHOOSE(c,l.name_address_verification_source,
 																										l.name_address_verification_source_2,
 																										l.name_address_verification_source_3,
@@ -193,13 +193,13 @@ SELF.spouse_title_orig := MAP(c = 1  AND l.adult_2_spouse_indicator = 'Y'
 																		l.do_not_call_flag_2,
 																		l.do_not_call_flag_3,
 																		l.do_not_call_flag_4);
-		
+
 		SELF.business_file_hit_flag := CHOOSE(c,l.business_file_hit_flag,
 																					l.business_file_hit_flag_2,
 																					l.business_file_hit_flag_3,
 																					l.business_file_hit_flag_4);
-		
-		
+
+
 		SELF.did := 0;
 		SELF.did_score := 0;
 		SELF := l;
@@ -259,7 +259,7 @@ pcnsrCleanNames1 := JOIN(dPCNSR1,cleanedNames,LEFT.name_for_clean1 = RIGHT.name_
 dPCNSR2_no_name := pcnsrCleanNames1(name_for_clean2='');
 dPCNSR2 := DISTRIBUTE(pcnsrCleanNames1(name_for_clean2!=''),HASH(name_for_clean2));
 
-								
+
 Layout_p_cnsr_for_clean addCleanName2(dPCNSR2 l,cleanedNames r):= TRANSFORM
 	SELF.spouse_title := r.title;
 	SELF.spouse_fname := r.fname;
@@ -332,11 +332,11 @@ did_add.MAC_Match_Flex(pcnsr_hhid_out,matchset,foo,date_of_birth,
 //END: Append DIDs
 
 //improve HHID
-out_with_hhid := outf(hhid<>0); 
+out_with_hhid := outf(hhid<>0);
 
 out_no_hhid := outf(hhid=0);
 
-//get_hhid_by_did 
+//get_hhid_by_did
 
 DayBatchPCNSR.Layout_PCNSR get_hhid_by_did(out_no_hhid l, header.File_HHID_Current r) := transform
 self.hhid := r.hhid;
@@ -345,7 +345,7 @@ end;
 
 f_out := join(out_no_hhid(did<>0), header.File_HHID_Current(ver=1),
                     left.did = right.did, get_hhid_by_did(left,right),
-left outer, hash) + out_no_hhid (did=0) + out_with_hhid; 
+left outer, hash) + out_no_hhid (did=0) + out_with_hhid;
 
 ut.MAC_SF_BuildProcess(f_out,'~thor_data::base::daybatch_pcnsr',out_file,2)
 

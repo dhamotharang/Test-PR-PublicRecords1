@@ -1,4 +1,4 @@
-﻿IMPORT ut, FLAccidents_Ecrash, eCrash_Services, std;
+﻿IMPORT ut, FLAccidents_Ecrash, eCrash_Services, std,iesp;
 
 EXPORT RawDeltaBaseSQL(eCrash_Services.IParam.searchrecords in_mod) := MODULE
 
@@ -73,20 +73,35 @@ EXPORT RawDeltaBaseSQL(eCrash_Services.IParam.searchrecords in_mod) := MODULE
 		tagSQL := IF(hasTag, ' AND v.tag_number = "' + in_mod.LicensePlate + '"', '');		
 		officerBadgeSQL := IF(hasOfficerBadge, ' AND k.officer_id = "' + in_mod.OfficerBadgeNumber + '"', '');
 
+	
+	recAgency := iesp.ecrash.t_ECrashSearchAgency;
+
+	
+	ds_Agencysort := SORT(in_mod.Agencies, JurisdictionState,Jurisdiction); 
+
+	recAgency rollupAgency(recAgency L, recAgency R) := TRANSFORM
+		SELF.Jurisdiction := TRIM(L.Jurisdiction, LEFT, RIGHT) + '","' + TRIM(R.Jurisdiction, LEFT, RIGHT);
+		SELF.AgencyId := TRIM(L.AgencyId, LEFT, RIGHT) + '","' + TRIM(R.AgencyId, LEFT, RIGHT);
+		SELF.AgencyORI := TRIM(L.AgencyORI, LEFT, RIGHT) + '","' + TRIM(R.AgencyORI, LEFT, RIGHT);
+		SELF.JurisdictionState := L.JurisdictionState;
+		SELF.PrimaryAgency := False;  // Not used in constructing the SQL string
+	END;
+
+	dsAgencyrolledup := ROLLUP(ds_Agencysort, LEFT.JurisdictionState = RIGHT.JurisdictionState, rollupAgency(LEFT, RIGHT));
+
+    shared dataset(eCrash_Services.Layouts.ECrashSearchAgency_alias_extended) GetNormzd_aliasrecs(eCrash_Services.IParam.searchrecords tmod):= FUNCTION
 		
-	  shared dataset(eCrash_Services.Layouts.ECrashSearchAgency_alias_extended) GetNormzd_aliasrecs(eCrash_Services.IParam.searchrecords tmod):= FUNCTION
-		
-			eCrash_Services.layouts.ECrashSearchAgency_alias_extended xform_normalize({tmod.Agencies} R, integer cnt) := TRANSFORM
+			eCrash_Services.layouts.ECrashSearchAgency_alias_extended xform_normalize({recAgency} R) := TRANSFORM
 				
 					hasAgencyORI 	  := R.AgencyORI <> '';
-					agencyORISQL 		:= IF(hasAgencyORI,' AND k.agency_ori="'+TRIM(R.AgencyORI)+'"','');
+					agencyORISQL 		:= IF(hasAgencyORI,' AND k.agency_ori in (' +  '"' + R.AgencyORI + '"' +')','');
 					imageHashNotNull := ' AND k.report_hashkey is not NULL';
 					hasJurisdiction 	 		:= R.Jurisdiction<>'';
 					hasJurisdictionState	:= R.JurisdictionState <> '';
 					jurisNotNullSQL				:= ' AND k.jurisdiction is not NULL';
-					jurisString						:= ' AND k.jurisdiction="' + TRIM(R.Jurisdiction)+'"';
+					jurisString						:= ' AND k.jurisdiction in (' +  '"' + R.Jurisdiction + '"' +')';
 					jurisIfParmSQL 				:= IF(hasJurisdiction,jurisString,'');
-					jurisStateString 			:= ' AND k.jurisdiction_state="' + TRIM(R.JurisdictionState)+'"';
+					jurisStateString 			:= ' AND k.jurisdiction_state =' + '"' + R.JurisdictionState + '"' ;
 					jurisStateIfParmSQL 	:= IF(hasJurisdictionState,jurisStateString,'');			
 					jurisNotNullIfNoParmSQL := IF(hasJurisdiction,'',jurisNotNullSQL);
 					jurisAndStateIfParms 	:= jurisIfParmSQL+jurisStateIfParmSQL;
@@ -119,7 +134,7 @@ EXPORT RawDeltaBaseSQL(eCrash_Services.IParam.searchrecords in_mod) := MODULE
 					self := R;						
 			END;
 			
-			out := NORMALIZE(tmod.Agencies,1,xform_normalize(LEFT,COUNTER));			
+			out := NORMALIZE(dsAgencyrolledup,1,xform_normalize(LEFT));
 			
 			RETURN out;					
 		END;
