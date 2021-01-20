@@ -1,6 +1,6 @@
 ﻿IMPORT $;
 
-EXPORT KEY_VIN7 := INDEX({$.Layouts.VIN7_KEYED_FIELDS}, 
-		                     {$.Layouts.VIN7_PAYLOAD_FIELDS},
-		                     $.Files.FILE_KEY_VIN7_SF
-										     );
+EXPORT KEY_VIN7 := INDEX({$.Layouts.VIN7_KEYED}, 
+                         {$.Layouts.VIN7_PAYLOAD},
+                         $.Names.i_VIN7_SF
+                         );

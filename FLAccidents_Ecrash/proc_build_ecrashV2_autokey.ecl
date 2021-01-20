@@ -1,13 +1,12 @@
-﻿IMPORT AutoKeyB2;
-IMPORT dx_eCrash AS dx;
+﻿IMPORT AutoKeyB2, dx_eCrash;
 
 EXPORT Proc_build_ecrashV2_autokey(STRING filedate) := FUNCTION
 
-ak_skipSet := dx.Constants.ak_skipSet;
-ak_typeStr := dx.Constants.ak_typeStr;
+ak_skipSet := dx_eCrash.Constants.ak_skipSet;
+ak_typeStr := dx_eCrash.Constants.ak_typeStr;
 
-ak_keyname  := dx.Constants.ak_keyname;
-ak_logical	:= dx.Files.KEY_PREFIX + '::' + filedate + '::' + dx.Files.ECRASHV2_AUTOKEY + '::';
+ak_keyname  := dx_eCrash.Constants.ak_keyname;
+ak_logical	:= dx_eCrash.Names.KEY_PREFIX + '::' + filedate + '::' + dx_eCrash.Names.ECRASHV2_AUTOKEY + '::';
 
 ak_dataset	:= File_Ecrash_AutoKeyV2;
 

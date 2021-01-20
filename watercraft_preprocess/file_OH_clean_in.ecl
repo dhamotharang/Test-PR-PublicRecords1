@@ -1,9 +1,9 @@
-import watercraft, watercraft_preprocess, ut, lib_StringLib;
+﻿import watercraft, watercraft_preprocess, ut, lib_StringLib;
 
 fIn_raw := watercraft_preprocess.Files_raw.OH;
 
 //Trim and uppercase all fields prior to mapping
-Watercraft.layout_oh CleanTrimRaw(fIn_raw L) := TRANSFORM
+Watercraft.layout_OH_20Q3 CleanTrimRaw(fIn_raw L) := TRANSFORM
 	self.STATEABREV	:= ut.CleanSpacesAndUpper(L.STATEABREV);
 	self.REG_NUM		:= ut.CleanSpacesAndUpper(IF(REGEXFIND('^[^A-Z0-9_]',L.REG_NUM), REGEXREPLACE('^[^A-Z0-9_]',L.REG_NUM,''), L.REG_NUM));
 	self.HULL_ID 		:= ut.CleanSpacesAndUpper(IF(REGEXFIND('^[^A-Z0-9_]',L.HULL_ID), REGEXREPLACE('^[^A-Z0-9_]',L.HULL_ID,''), L.HULL_ID));
@@ -33,6 +33,9 @@ Watercraft.layout_oh CleanTrimRaw(fIn_raw L) := TRANSFORM
 													ClnState = 'H' => 'OH',
 													ClnState);
 	self.ZIP				:= ut.CleanSpacesAndUpper(L.ZIP);
+	self.WATER_USE	:= ut.CleanSpacesAndUpper(L.WATER_USE);
+	self.MODEL			:= ut.CleanSpacesAndUpper(L.MODEL);
+	self.REG_STATUS	:= ut.CleanSpacesAndUpper(L.REG_STATUS);
 	self.EXPIRATION_DATE	:= IF(L.EXPIRATION_DATE = '20700301','20170301',
 															IF(L.EXPIRATION_DATE = '70000201','20170301',L.EXPIRATION_DATE));
 	self	:= L;

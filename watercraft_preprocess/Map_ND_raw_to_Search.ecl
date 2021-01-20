@@ -1,11 +1,11 @@
-import watercraft, watercraft_preprocess, ut, lib_StringLib, STD;
+﻿import watercraft, watercraft_preprocess, ut, lib_StringLib, STD;
 
 // translates  nd_phase01.mp Ab intio graph into ECL
 
 fIn_clean_raw := watercraft_preprocess.file_ND_clean_in;
 process_date := (string8)STD.Date.Today();
 
-Watercraft.Macro_Clean_Hull_ID(fIn_clean_raw,Watercraft.layout_ND_new14Q2,hull_clean_in)
+Watercraft.Macro_Clean_Hull_ID(fIn_clean_raw,Watercraft.layout_ND_20Q3,hull_clean_in)
 
 Watercraft_preprocess.Layout_Watercraft_Search_Common search_mapping_format(hull_clean_in L)
  := TRANSFORM
@@ -36,8 +36,8 @@ Watercraft_preprocess.Layout_Watercraft_Search_Common search_mapping_format(hull
 	self.orig_state					:=	L.STATE;
 	self.orig_zip						:=	L.ZIP;
 	self.orig_fips					:=	L.FIPS;
-	is_valid_date						:= STD.DATE.IsValidDate((integer)L.OWNER_DOB);
-	self.dob								:=	IF(is_valid_date,L.OWNER_DOB,'');
+	// is_valid_date						:= STD.DATE.IsValidDate((integer)L.OWNER_DOB);
+	// self.dob								:=	IF(is_valid_date,L.OWNER_DOB,''); //Removed from layout DOPS-864
 	self.name_format				:= 'U';
 	tempPrepLastSitus				:= StringLib.StringCleanSpaces(trim(L.CITY,left,right)
 																													+	IF(trim(L.CITY) <> '',', ','')
