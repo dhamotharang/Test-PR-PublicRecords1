@@ -2,7 +2,7 @@
 EXPORT Build_Base_DisposableEmailDomains (
    string pversion	
 	,dataset(FraudGovPlatform.Layouts.Input.DisposableEmailDomains) FileInput = FraudGovPlatform.Files().Input.DisposableEmailDomains.Sprayed
-    ,dataset(FraudGovPlatform.Layouts.Base.DisposableEmailDomains) Previous_Build =  DATASET([], FraudGovPlatform.Layouts.Base.DisposableEmailDomains)
+    ,dataset(FraudGovPlatform.Layouts.Base.DisposableEmailDomains) Previous_Build =  FraudGovPlatform.Files().Base.DisposableEmailDomains.QA
 ) := 
 module 
 

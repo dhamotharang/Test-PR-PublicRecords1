@@ -8,7 +8,7 @@ EXPORT SprayAndQualifyDEDI(
 
 	DateSearch := pVersion[1..8];
 
-	dsFileList:=NOTHOR(FileServices.RemoteDirectory(ip, pDEDIRootDir, '*'+DateSearch+'.csv')):INDEPENDENT;
+	dsFileList:=NOTHOR(FileServices.RemoteDirectory(ip, pDEDIRootDir + DateSearch, '*'+DateSearch+'.csv')):INDEPENDENT;
 	dsFileListSorted := SORT(dsFileList,modified);
 	fname_temp	:=dsFileListSorted[1].Name:independent;
 	fname	:= fname_temp;
@@ -37,11 +37,11 @@ EXPORT SprayAndQualifyDEDI(
 		
 
 	SprayIt:=SEQUENTIAL(
-							OUTPUT('Spraying: '+ ip + pDEDIRootDir + fname_temp + ' -> ' + FileSprayed) 
+							OUTPUT('Spraying: '+ ip + pDEDIRootDir  + DateSearch + '/' + fname_temp + ' -> ' + FileSprayed) 
 							,NOTHOR(ClearFiles)
 							,NOTHOR(FileServices.SprayVariable(
 								 IP //sourceIP 
-								,pDEDIRootDir + fname_temp //sourcepath 
+								,pDEDIRootDir  + DateSearch + '/' + fname_temp //sourcepath 
 								,//maxrecordsize 
 								,'\\,'//srcCSVseparator 
 								,'\\n,\\r\\n' //srcCSVterminator 
