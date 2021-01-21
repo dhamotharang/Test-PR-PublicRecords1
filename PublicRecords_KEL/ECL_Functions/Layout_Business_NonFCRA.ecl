@@ -231,18 +231,18 @@
 	INTEGER3 PL_AstVehWtrEmrgNewMsncEv;
 	INTEGER3 PL_AstVehWtrEmrgOldMsncEv;
 	// Property
-	// INTEGER3 PL_AstPropCntEv;
-	// STRING900 PL_AstPropNewDtListEv;
-	// STRING900 PL_AstPropOldDtListEv;
-	// INTEGER3 PL_AstPropCurrCnt;
-	// INTEGER3 PL_AstPropSaleCntEv;
-	// STRING PL_AstPropSaleAmtListEv;
-	// INTEGER4 PL_AstPropSaleTotEv;
-	// STRING900 PL_AstPropSaleDtListEv;
-	// STRING10 PL_AstPropSaleNewDtEv;
-	// STRING10 PL_AstPropSaleOldDtEv;
-	// INTEGER3 PL_AstPropSaleNewMsncEv;
-	// INTEGER3 PL_AstPropSaleOldMsncEv;
+	INTEGER3 PL_AstPropCntEv;
+	STRING900 PL_AstPropNewDtListEv;
+	STRING900 PL_AstPropOldDtListEv;
+	INTEGER3 PL_AstPropCurrCnt;
+	INTEGER3 PL_AstPropSaleCntEv;
+	STRING PL_AstPropSaleAmtListEv;
+	INTEGER4 PL_AstPropSaleTotEv;
+	STRING900 PL_AstPropSaleDtListEv;
+	STRING10 PL_AstPropSaleNewDtEv;
+	STRING10 PL_AstPropSaleOldDtEv;
+	INTEGER3 PL_AstPropSaleNewMsncEv;
+	INTEGER3 PL_AstPropSaleOldMsncEv;
 	INTEGER3 PL_DrgArstCnt1Y;
 	INTEGER3 PL_DrgArstCnt7Y;
 	STRING10 PL_DrgArstNewDt1Y;
@@ -403,11 +403,11 @@
 	INTEGER3 PL_EduCollSrcNewRecNewMsncEv;
 	INTEGER3 PL_EduCollRecSpanEv;
 	//PersonBusiniessProperty
-	// INTEGER3 PL_AstPropBusCntEv;
-	// INTEGER3 PL_AstPropBusCurrCnt;
-	// INTEGER3 PL_AstPropBusCurrWTaxValCnt;
-	// STRING900 PL_AstPropBusCurrTaxValList;
-	// INTEGER4 PL_AstPropBusCurrTaxValTot;
+	INTEGER3 PL_AstPropBusCntEv;
+	INTEGER3 PL_AstPropBusCurrCnt;
+	// INTEGER3 PL_AstPropBusCurrWTaxValCnt;//per jen leave this commented out
+	STRING900 PL_AstPropBusCurrTaxValList;
+	INTEGER4 PL_AstPropBusCurrTaxValTot;
 	//Email
 	INTEGER3 PL_EmailCntEv;
 	//Derog History

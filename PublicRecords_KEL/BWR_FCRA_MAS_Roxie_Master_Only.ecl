@@ -238,6 +238,8 @@ OUTPUT(CHOOSEN(Passed_with_Extras, eyeball), NAMED('Sample_Master_Layout'));
 
 OUTPUT(Passed_with_Extras,,OutputFile +'_MasterLayout.csv', CSV(HEADING(single), QUOTE('"')), expire(45));
 
+Output(ave(Passed, time_ms), named('average_time_ms')); 
+
 OUTPUT(Failed,,OutputFile+'errors', thor,  expire(20));
 
 	
