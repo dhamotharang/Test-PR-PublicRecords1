@@ -24,15 +24,10 @@ EXPORT HeaderFileRollupService_Records :=
                                                                , dt_vendor_last_reported /*,isTrusted,*/ /*isFCRA,*/ /*hitQH,*/ /*debug*/);
 
                                                                                      
-     //childAddrRecs_AHsorted := project(childAddrRecs_AHSorted_pre,
       temp_rec overwriteTNT(childAddrRecs_AHSorted_pre l, UNSIGNED cnt) := transform
           SELF.seq := cnt;
           SELF.location_id := l.locid;
-          tnt := map( 
-                      (unsigned)l.addr_ind = 1 and (unsigned)l.best_addr_rank = 1 => 'B', 
-                      (unsigned)l.addr_ind = 1 and (unsigned)l.best_addr_rank > 1 => 'C',
-                      l.tnt
-                    );
+          tnt := doxie.enhanceTNT(do_address_hierarchy,l.tnt, l.addr_ind, l.best_addr_rank); 
           SELF.tnt := tnt;             
           SELF.isCurrent := tnt in doxie.rollup_limits.TNT_CURRENT_SET;
           SELF := l;
