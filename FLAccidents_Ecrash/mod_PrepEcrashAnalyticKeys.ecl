@@ -1,4 +1,5 @@
-﻿IMPORT STD;
+﻿IMPORT STD, dx_Ecrash;
+
 EXPORT mod_PrepEcrashAnalyticKeys(DATASET(Layout_eCrash.Consolidation) EcrashIn = FLAccidents_Ecrash.File_KeybuildV2.out) := MODULE
 
 //Infile := FLAccidents_Ecrash.File_KeybuildV2.out(report_code in ['EA','TM','TF'] AND report_type_id = 'A' AND work_type_id NOT IN['2','3']) ;
@@ -8,16 +9,10 @@ Layout_eCrash.Consolidation transInFile(Layout_eCrash.Consolidation L) := TRANSF
  SELF.did := (STRING12) IF(L.did = '000000000000', '0', L.did);
  SELF := L;
 END;
-ModInfile:= PROJECT(InFile,transInFile(LEFT));
-
-tlayout := RECORD 
- Layout_eCrash.Consolidation; 
- STRING orig_case_identifier; 
- STRING orig_state_report_number; 
-END; 
+ModInfile:= PROJECT(InFile,transInFile(LEFT)); 
 
 // dedup across sources 
-tInfile := PROJECT (ModInfile, TRANSFORM( tlayout, 
+tInfile := PROJECT (ModInfile, TRANSFORM( Layout_PrepEcrashAnalyticKeys.interim, 
                 SELF:= LEFT ,
 								SELF.orig_case_identifier := IF(LEFT.report_code = 'EA', LEFT.orig_accnbr , LEFT.addl_report_number);
 								SELF.orig_state_report_number := IF(LEFT.report_code = 'EA', LEFT.addl_report_number, LEFT.orig_accnbr); 
@@ -39,20 +34,7 @@ SHARED DedupedKey := SORT(Dedup1 + Dedup2, jurisdiction_nbr + Vehicle_Incident_i
 //***********************************************************************
 //                 Key_eCrash_ByAgencyID
 //***********************************************************************
-accidents_by_AgencyID_slim := RECORD
-  STRING11 AgencyID;
-	STRING10 accident_date;
-  STRING30 precinct;
-  STRING20 beat;
-	STRING   report_code;
-	STRING   vehicle_incident_id;
-	INTEGER  AccidentCnt;
-	INTEGER  InjuryCnt;
-	INTEGER  FatalCnt;
-	INTEGER  InjuryUnkCnt;
-END;
-
-accidents_by_AgencyID_slim getCounts({DedupedKey} L) := TRANSFORM
+Layout_PrepEcrashAnalyticKeys.accidents_by_AgencyID_slim getCounts({DedupedKey} L) := TRANSFORM
   SELF.AgencyID								:= L.Jurisdiction_nbr;
 	SELF.accident_date 					:= L.accident_date;
 	SELF.precinct  							:= L.precinct; 
@@ -85,7 +67,7 @@ dsRolled := ROLLUP(dsWithCounts,
 									 LEFT.report_code = RIGHT.report_code,
 									 RollAccidents(LEFT,RIGHT));
 									 
-inter_layout := RECORD
+by_AgencyID_interim := RECORD
 	dsRolled.AgencyID;
 	dsRolled.Accident_date;
 	dsRolled.Precinct;
@@ -95,8 +77,9 @@ inter_layout := RECORD
 	INTEGER  FatalCnt  			:= SUM(GROUP, dsRolled.FatalCnt);
 	INTEGER  UnknownCnt			:= SUM(GROUP, dsRolled.InjuryUnkCnt);
 END;
+t_AgencyID := TABLE(dsRolled, {by_AgencyID_interim}, AgencyID, accident_date, precinct, beat);
 
-EXPORT by_AgencyID := TABLE(dsRolled, {inter_layout}, AgencyID, accident_date, precinct, beat);
+EXPORT by_AgencyID := PROJECT(t_AgencyID, TRANSFORM(dx_Ecrash.Layouts.BY_AGENCYID, SELF := LEFT; SELF := [];)); 
 
 //***********************************************************************
 //                Key_eCrash_ByCollisionType
@@ -104,16 +87,7 @@ EXPORT by_AgencyID := TABLE(dsRolled, {inter_layout}, AgencyID, accident_date, p
 /* Dedup1 := DEDUP(BaseKey(DID > '0'),DID + Vehicle_Incident_id);
    Dedup2 := DEDUP(BaseKey(DID = '0'),Vehicle_Incident_Id + fname + lname + name_suffix);
 */
-accidents_by_CT_slim := RECORD
-  STRING11 AgencyID;
-	STRING8  accident_date;
-	STRING   report_code;
-	STRING   vehicle_incident_id;
-	STRING   vehicle_unit_number;
-	STRING   Report_Collision_Type;
-END;
-
-accidents_by_CT_slim CTslim({DedupedKey} L) := TRANSFORM
+Layout_PrepEcrashAnalyticKeys.accidents_by_CT_slim CTslim({DedupedKey} L) := TRANSFORM
   SELF.AGENCYID 						:= L.Jurisdiction_nbr;
 	SELF := L;
 END;
@@ -135,25 +109,7 @@ dsVehiclesRolled := ROLLUP(dsSlimmed,
 														LEFT.vehicle_unit_number = RIGHT.vehicle_unit_number,
 						                RollVehicles(LEFT,RIGHT)); //,AgencyId, Accident_Date);
 
-accidents_by_CT_slim2 := RECORD
-  STRING11 AgencyID;
-	STRING8  accident_date;
-	STRING   report_code;
-	STRING   vehicle_incident_id;
-	STRING   vehicle_unit_number;
-	INTEGER  AccidentCnt;
-	INTEGER  CTFrontRear;
-	INTEGER  CTFrontFront;
-	INTEGER  CTAngle;
-	INTEGER  CTSideSwipeSame;
-	INTEGER  CTSideSwipeopposite;
-	INTEGER  CTRearSide;
-	INTEGER  CTRearRear;
-	INTEGER  CTOther;
-	INTEGER  CTUnknown;
-END;
-
-accidents_by_CT_slim2 CountCT({dsVehiclesRolled} L) := TRANSFORM
+Layout_PrepEcrashAnalyticKeys.accidents_by_CT_slim2 CountCT({dsVehiclesRolled} L) := TRANSFORM
 	SELF.AccidentCnt					:= 1;
   NewCTString               := STD.Str.ToUpperCase(TRIM(L.Report_Collision_Type,LEFT,RIGHT));
 	SELF.CTFrontRear					:= IF(STD.Str.FindCount(NewCTString, FLAccidents_Ecrash.Constants.FRONTREAR) > 0,1,0); 
@@ -206,7 +162,7 @@ dsCTRolled := SORT(ROLLUP(dsCTCounted,
 END;
 dsSlimCounts := PROJECT(dsCTRolled, SlimCounts(LEFT));	 
 
-inter_layout := RECORD
+by_CT_interim := RECORD
 	dsSlimCounts.agencyid;
 	dsSlimCounts.accident_date;
 	INTEGER AccidentCnt     			:= SUM(GROUP, dsSlimCounts.accidentcnt);
@@ -220,8 +176,9 @@ inter_layout := RECORD
 	INTEGER CTOther						  	:= SUM(GROUP, dsSlimCounts.CTOther);						
 	INTEGER CTUnknown					  	:= SUM(GROUP, dsSlimCounts.CTUnknown);					
 END;
+t_CollisionType := TABLE(dsSlimCounts, {by_CT_interim}, agencyid, Accident_date);
 
-EXPORT dsByCollisionType := TABLE(dsSlimCounts, {inter_layout}, agencyid, Accident_date);
+EXPORT dsByCollisionType := PROJECT(t_CollisionType, TRANSFORM(dx_Ecrash.Layouts.BY_CT, SELF := LEFT; SELF := [];)); 
 
 //***********************************************************************
 //                 Key_eCrash_ByDOW
@@ -229,19 +186,7 @@ EXPORT dsByCollisionType := TABLE(dsSlimCounts, {inter_layout}, agencyid, Accide
 /* Dedup1 := DEDUP(BaseKey(DID > '0'),DID + Vehicle_Incident_id);
    Dedup2 := DEDUP(BaseKey(DID = '0'),Vehicle_Incident_Id + fname + lname + name_suffix);
 */
-accidents_by_dow_slim := RECORD
-  string11 AgencyID;
-	STRING8  accident_date;
-  INTEGER  DayOfWeek;
-	string   report_code;
-	string   vehicle_incident_id;
-	INTEGER  AccidentCnt;
-	INTEGER  InjuryCnt;
-	INTEGER  FatalCnt;
-	INTEGER  InjuryUnkCnt;
-END;
-
-accidents_by_dow_slim slim({DedupedKey} L) := TRANSFORM
+Layout_PrepEcrashAnalyticKeys.accidents_by_dow_slim slim({DedupedKey} L) := TRANSFORM
   SELF.AGENCYID 			        := L.Jurisdiction_nbr;
 	SELF.accident_date 	        := L.accident_date;
   SELF.DayOfWeek			        := FLAccidents_Ecrash.Functions.DayOfWeek(L.accident_date);
@@ -272,7 +217,7 @@ dsRolled := ROLLUP(dsWithCounts,
 									 LEFT.report_code = RIGHT.report_code,
 									 RollAccidents(LEFT,RIGHT));
 
-inter_layout := RECORD
+by_dow_interim := RECORD
 	dsRolled.agencyid;
 	dsRolled.accident_date;
 	dsRolled.DayOfWeek;
@@ -281,8 +226,9 @@ inter_layout := RECORD
 	INTEGER FatalCnt  			:= SUM(GROUP, dsRolled.FatalCnt);
 	INTEGER UnknownCnt			:= SUM(GROUP, dsRolled.InjuryUnkCnt);
 END;
+t_DOW := TABLE(dsRolled, {by_dow_interim}, agencyid, Accident_date, DayOfWeek);
 
-EXPORT by_DOW := TABLE(dsRolled, {inter_layout}, agencyid, Accident_date, DayOfWeek);
+EXPORT by_DOW := PROJECT(t_DOW, TRANSFORM(dx_Ecrash.Layouts.BY_DOW, SELF := LEFT; SELF := [];)); 
 
 //***********************************************************************
 //                 Key_eCrash_ByHOD
@@ -290,19 +236,7 @@ EXPORT by_DOW := TABLE(dsRolled, {inter_layout}, agencyid, Accident_date, DayOfW
 /* Dedup1 := DEDUP(BaseKey(DID > '0'),DID + Vehicle_Incident_id);
    Dedup2 := DEDUP(BaseKey(DID = '0'),Vehicle_Incident_Id + fname + lname + name_suffix);
 */
-accidents_by_hod_slim := RECORD
-  string11 AgencyID;
-	STRING8  accident_date;
-	INTEGER  HourOfDay; //HH:MM:SS
-	string   report_code;
-	string   vehicle_incident_id;
-	INTEGER  AccidentCnt;
-	INTEGER  InjuryCnt;
-	INTEGER  FatalCnt;
-	INTEGER  InjuryUnkCnt;
-END;
-
-accidents_by_hod_slim slim({DedupedKey} L) := TRANSFORM
+Layout_PrepEcrashAnalyticKeys.accidents_by_hod_slim slim({DedupedKey} L) := TRANSFORM
   SELF.AGENCYID 			      := L.Jurisdiction_nbr;
 	SELF.accident_date 	      := L.accident_date;
 	SELF.HourOfDay  		      := IF(L.crash_time = '' OR L.crash_time[1..2] NOT BETWEEN '00' AND '23', 25, (INTEGER) L.crash_time[1..2] + 1);
@@ -333,7 +267,7 @@ dsRolled := ROLLUP(dsWithCounts,
 									 LEFT.report_code = RIGHT.report_code,
 									 RollAccidents(LEFT,RIGHT));
 
-inter_layout := RECORD
+by_hod_interim := RECORD
 	dsRolled.agencyid;
 	dsRolled.accident_date;
 	dsRolled.HourOfDay;
@@ -342,8 +276,10 @@ inter_layout := RECORD
 	INTEGER FatalCnt  			:= SUM(GROUP, dsRolled.FatalCnt);
 	INTEGER UnknownCnt			:= SUM(GROUP, dsRolled.InjuryUnkCnt);
 END;
+t_HOD := TABLE(dsRolled, {by_hod_interim}, agencyid, Accident_date, HourOfDay);
 
-EXPORT by_HOD := TABLE(dsRolled, {inter_layout}, agencyid, Accident_date, HourOfDay);
+EXPORT by_HOD := PROJECT(t_HOD, TRANSFORM(dx_Ecrash.Layouts.BY_HOD, SELF := LEFT; SELF := [];));
+
 //***********************************************************************
 //                 Key_eCrash_ByInter
 //***********************************************************************
@@ -358,26 +294,7 @@ Dedup2_ByInter := DEDUP(SORT(DISTRIBUTE(BaseKey_ByInter(DID = '0'), HASH32(Vehic
 														,Vehicle_Incident_Id , fname , lname , name_suffix , dob , driver_license_nbr, local );
 DedupedKey_ByInter := SORT(Dedup1_ByInter + Dedup2_ByInter, jurisdiction_nbr + Vehicle_Incident_id + Vehicle_unit_number);
 
-
-accidents_by_slim := RECORD
-  STRING11  AgencyID;
-	STRING8   accident_date;
-	INTEGER   DayOfWeek;
-	INTEGER   Tour;
-	STRING104 Intersection;
-	STRING    report_code;
-	STRING    vehicle_incident_id;
-	STRING    vehicle_unit_number;
-	STRING    Report_vehicle_body_type;
-	STRING    Report_first_harmful_event;
-	STRING    Report_Collision_Type;
-	INTEGER   AccidentCnt;
-	INTEGER 	FatalCnt;       //only fatals
-	INTEGER 	InjuryCnt;      //won't include fatals for the intersection report
-	INTEGER 	PropDmgCnt;     //count of accidents having property damage
-END;
-
-accidents_by_slim PerformSlim({DedupedKey_ByInter} L) := TRANSFORM
+Layout_PrepEcrashAnalyticKeys.accidents_by_slim PerformSlim({DedupedKey_ByInter} L) := TRANSFORM
   SELF.AGENCYID 					  := L.Jurisdiction_nbr;
 	SELF.DayOfWeek					 	:= FLAccidents_Ecrash.Functions.DayOfWeek(L.Accident_date);
 	SELF.Tour								  := FLAccidents_Ecrash.Functions.GetTour(L.crash_time);
@@ -410,38 +327,7 @@ dsVehiclesRolled := ROLLUP(dsSlimmed,
 														LEFT.vehicle_unit_number = RIGHT.vehicle_unit_number,
 						                RollVehicles(LEFT,RIGHT)); //,AgencyId, Accident_Date);
 
-accidents_by_slim2 := RECORD
-  STRING11 AgencyID;
-	STRING8  accident_date;
-	INTEGER  DayOfWeek;
-	INTEGER  Tour;
-	STRING   report_code;
-	STRING   vehicle_incident_id;
-	STRING   vehicle_unit_number;
-	STRING   Intersection;
-	INTEGER  AccidentCnt;
-	INTEGER  ATVehicle;            
-	INTEGER  ATPedestrian;
-	INTEGER  ATBicycle;
-	INTEGER  ATMotorcycle;
-	INTEGER  ATAnimal;
-	INTEGER  ATTrain;
-	INTEGER  ATUnknown;
-	INTEGER  CTFrontRear;
-	INTEGER  CTFrontFront;
-	INTEGER  CTAngle;
-	INTEGER  CTSideSwipeSame;
-	INTEGER  CTSideSwipeopposite;
-	INTEGER  CTRearSide;
-	INTEGER  CTRearRear;
-	INTEGER  CTOther;
-	INTEGER  CTUnknown;
-	INTEGER  InjuryCnt;
-	INTEGER  FatalCnt;
-	INTEGER  PropDmgCnt;
-END;
-
-accidents_by_slim2 PerformCounts({dsVehiclesRolled} L) := TRANSFORM
+Layout_PrepEcrashAnalyticKeys.accidents_by_slim2 PerformCounts({dsVehiclesRolled} L) := TRANSFORM
   NewBTString               := STD.Str.ToUpperCase(TRIM(L.Report_vehicle_body_type,LEFT,RIGHT));
   NewFHEString              := STD.Str.ToUpperCase(TRIM(L.Report_first_harmful_event,LEFT,RIGHT));
 	SELF.ATVehicle 						:= FLAccidents_Ecrash.Functions.KnownVT(NewBTString);
@@ -530,7 +416,7 @@ dsRolled := SORT(ROLLUP(dsCounted,
 END;
 dsSlimCounts := PROJECT(dsRolled, SlimCounts(LEFT));	 
 										 
-inter_layout := RECORD
+by_interim := RECORD
 	dsSlimCounts.agencyid;
 	dsSlimCounts.accident_date;
 	dsSlimCounts.DayOfWeek;
@@ -556,10 +442,10 @@ inter_layout := RECORD
 	INTEGER InjuryCnt						  := SUM(GROUP, dsSlimCounts.InjuryCnt);
 	INTEGER FatalCnt							:= SUM(GROUP, dsSlimCounts.FatalCnt);
 	INTEGER PropDmgCnt						:= SUM(GROUP, dsSlimCounts.PropDmgCnt);
-
 END;
+t_Inter := TABLE(dsSlimCounts, {by_interim}, agencyid, Accident_date, DayOfWeek, Tour, Intersection);
 
-EXPORT dsByInter := TABLE(dsSlimCounts, {inter_layout}, agencyid, Accident_date, DayOfWeek, Tour, Intersection);
+EXPORT dsByInter := PROJECT(t_Inter, TRANSFORM(dx_Ecrash.Layouts.BY_INTER, SELF := LEFT; SELF := [];)); 
 
 //***********************************************************************
 //                 Key_eCrash_byMOY
@@ -567,19 +453,7 @@ EXPORT dsByInter := TABLE(dsSlimCounts, {inter_layout}, agencyid, Accident_date,
 /* Dedup1 := DEDUP(BaseKey(DID > '0'),DID + Vehicle_Incident_id);
    Dedup2 := DEDUP(BaseKey(DID = '0'),Vehicle_Incident_Id + fname + lname + name_suffix);
 */
-accidents_by_moy_slim := RECORD
-  string11 AgencyID;
-	STRING8  accident_date;
-  STRING2  MonthOfYear;
-	string   report_code;
-	string   vehicle_incident_id;
-	INTEGER  AccidentCnt;
-	INTEGER  InjuryCnt;
-	INTEGER  FatalCnt;
-	INTEGER  InjuryUnkCnt;
-END;
-
-accidents_by_moy_slim slim({DedupedKey} L) := TRANSFORM
+Layout_PrepEcrashAnalyticKeys.accidents_by_moy_slim slim({DedupedKey} L) := TRANSFORM
   SELF.AGENCYID 			      := L.Jurisdiction_nbr;
 	SELF.accident_date       	:= L.accident_date;
 	SELF.MonthOfYear          := IF(L.Accident_date[5..6] BETWEEN '01' AND '12', L.Accident_date[5..6], '13');
@@ -610,8 +484,7 @@ dsRolled := ROLLUP(dsWithCounts,
 									 LEFT.report_code = RIGHT.report_code,
 									 RollAccidents(LEFT,RIGHT));
 
-
-inter_layout := RECORD
+by_moy_interim := RECORD
 	dsRolled.agencyid;
 	dsRolled.accident_date;
 	dsRolled.MonthOfYear;
@@ -620,7 +493,8 @@ inter_layout := RECORD
 	INTEGER FatalCnt  			:= SUM(GROUP, dsRolled.FatalCnt);
 	INTEGER UnknownCnt			:= SUM(GROUP, dsRolled.InjuryUnkCnt);
 END;
+t_MOY := TABLE(dsRolled, {by_moy_interim}, agencyid, Accident_date, MonthOfYear);
 
-EXPORT by_MOY := TABLE(dsRolled, {inter_layout}, agencyid, Accident_date, MonthOfYear);
+EXPORT by_MOY := PROJECT(t_MOY, TRANSFORM(dx_Ecrash.Layouts.BY_MOY, SELF := LEFT; SELF := [];)); 
 
 END;

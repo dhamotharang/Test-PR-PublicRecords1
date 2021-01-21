@@ -1,7 +1,5 @@
-﻿Import Data_Services, doxie;
-																			
-export key_EcrashV2_Unrestricted_accnbrv1 := index(mod_PrepEcrashKeys().Unrestricted_dep_accnbr_base,
-                  {string40 l_accnbr := accident_nbr, report_code,jurisdiction_state, jurisdiction},
+﻿export key_EcrashV2_Unrestricted_accnbrv1 := index(mod_PrepEcrashKeys().Unrestricted_dep_accnbr_base,
+                  {l_accnbr, report_code,jurisdiction_state, jurisdiction},
                   {
 								   orig_accnbr, 
 								   vehicle_incident_id,
@@ -164,8 +162,7 @@ export key_EcrashV2_Unrestricted_accnbrv1 := index(mod_PrepEcrashKeys().Unrestri
 									 Releasable,
 									 Date_Report_Submitted
 									 }
-							     ,Data_Services.Data_location.Prefix('ecrash')+'thor_data400::key::ecrashV2_unrestricted_accnbrv1_' + doxie.Version_SuperKey);
-							 		 // ,Data_Services.Data_location.Prefix('ecrash')+'thor_data400::key::PRUS::ecrashV2_unrestricted_accnbrv1_' + doxie.Version_SuperKey);
+							     ,Files_eCrash.FILE_KEY_UNRESTRICTED_ACCNBRV1_SF);
 										
 
 

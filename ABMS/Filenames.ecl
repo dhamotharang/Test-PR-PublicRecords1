@@ -1,4 +1,4 @@
-IMPORT tools;
+﻿IMPORT tools;
 
 EXPORT Filenames(STRING  pversion = '',
 	               BOOLEAN pUseOtherEnvironment = FALSE) := MODULE
@@ -22,18 +22,21 @@ EXPORT Filenames(STRING  pversion = '',
 		EXPORT Schools          := tools.mod_FilenamesInput(Template('Schools'), pversion);
 		EXPORT Specialty        := tools.mod_FilenamesInput(Template('Specialty'), pversion);
 		
+		EXPORT Raw_input				:= tools.mod_FilenamesInput(Template('Raw_Input'), pversion);
+		
 		EXPORT dAll_filenames := Address.dAll_filenames +
 			                       BIOG.dAll_filenames +
-			                       Career.dAll_filenames +
+			                       // Career.dAll_filenames +
 			                       Cert.dAll_filenames +
-			                       Contact.dAll_filenames +
+			                       // Contact.dAll_filenames +
 			                       Deceased.dAll_filenames +
 			                       Education.dAll_filenames +
-			                       Membership.dAll_filenames +
+			                       // Membership.dAll_filenames +
 			                       MOCParticipation.dAll_filenames +
-			                       TypeOfPractice.dAll_filenames +
-			                       Schools.dAll_filenames +
-			                       Specialty.dAll_filenames;
+			                       // TypeOfPractice.dAll_filenames +
+			                       // Schools.dAll_filenames +
+			                       // Specialty.dAll_filenames;
+														 Raw_input.dAll_filenames;
 	END;
 
 	//////////////////////////////////////////////////////////////////

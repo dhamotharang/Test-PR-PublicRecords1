@@ -10,7 +10,7 @@ export proc_fedex_build_keys2(string version_date, boolean isdelta) := function
 //**** Build the Payload Key and create the FakeID
 fedex_datasetStep1:=if(isdelta,fedex_datasetPre(version=version_date),fedex_datasetPre);
 fedex_dataset:=project(fedex_datasetStep1,transform(recordof(fedex_datasetStep1)-[version],self:=left;));
-PreviousKey:=index(fedex.key_fedex2_payload,'~thor_data400::key::fedex2::20201130::autokey::payload');
+PreviousKey:=index(fedex.key_fedex2_payload,'~thor_data400::key::fedex2::autokey::qa::payload');
 PrevMaxFID := if(isdelta,MAX(PreviousKey,fakeid),0);											
 autokey.mac_useFakeIDs
 	(fedex_dataset,

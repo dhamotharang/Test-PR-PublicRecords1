@@ -20,6 +20,10 @@ EXPORT CorteraTradeLineGrowth(destinationIP, destinationpath, emailContact = 'Da
   tradeline_data_in   := DI_Metrics.Monthly_Cortera_Tradeline_Metrics.Cortera_Tradeline_Key_LinkIds_alias;
   tradeline_data_filt := tradeline_data_in(status = '' and ar_date != '' and seleid != 0);
 
+  // For unit-testing, etc.:
+  // seleids_to_look_at := [46,51];
+  // tradeline_data_filt := tradeline_data_in(seleid IN seleids_to_look_at); 
+
   layout_tradeline_data_slim := RECORD
     UNSIGNED6 ultid;        //  ---- UltID, OrgID, and SeleID together identify 
     UNSIGNED6 orgid;        //  ---- a particular business at the Legal Entity
@@ -58,7 +62,7 @@ EXPORT CorteraTradeLineGrowth(destinationIP, destinationpath, emailContact = 'Da
   // then can we get an accurate count of Tradelines for each timePeriod.
 
   // Generate a table of timePeriods based on a small sample of the Tradelines file.
-  tradeline_data_small := CHOOSEN(tradeline_data_slim,100000); // ***** THIS MIGHT BE A PROBLEM; DEDUP THE ENTIRE RECORD INSTEAD. *****
+  tradeline_data_small := CHOOSEN(DISTRIBUTE(tradeline_data_slim, HASH32(RANDOM())),1000000);
   tbl_timePeriods      := SORT( TABLE( tradeline_data_small, {Date := timePeriod}, timePeriod ), Date );
 
   // 1.a. Get all Tradelines for each timePeriod by SeleID.
@@ -77,9 +81,45 @@ EXPORT CorteraTradeLineGrowth(destinationIP, destinationpath, emailContact = 'Da
       ultid, orgid, seleid, account_key
     );
 
+  // Add two years (per J. Bozik, Z. Fredenberg) to dt_vndr_last_rptd to account for those Tradelines 
+  // we haven't heard from in up to two years but may yet be still active.
+  YYYYMMDD := 8;
+  YYYYMM   := 6;
+  YYYY     := 4;
+  
+  tradeline_data_vendor_rptd_range_by_seleid_extended :=
+    PROJECT(
+      tradeline_data_vendor_rptd_range_by_seleid,
+      TRANSFORM( RECORDOF(tradeline_data_vendor_rptd_range_by_seleid),
+        SELF.dt_vndr_last_rptd :=
+          CASE( LENGTH((STRING)LEFT.dt_vndr_last_rptd),
+            YYYYMMDD => LEFT.dt_vndr_last_rptd + 20000,
+            YYYYMM   => LEFT.dt_vndr_last_rptd + 200,
+            YYYY     => LEFT.dt_vndr_last_rptd + 2,
+            LEFT.dt_vndr_last_rptd
+          ),
+        SELF := LEFT
+      )
+    );
+
+  tradeline_data_vendor_rptd_range_by_seleid_corrected :=
+    PROJECT(
+      tradeline_data_vendor_rptd_range_by_seleid_extended,
+      TRANSFORM( RECORDOF(tradeline_data_vendor_rptd_range_by_seleid),
+        SELF.dt_vndr_last_rptd :=
+          CASE( LENGTH((STRING)LEFT.dt_vndr_last_rptd),
+            YYYYMMDD => IF( LEFT.dt_vndr_last_rptd < (STD.Date.Today())          , LEFT.dt_vndr_last_rptd, STD.Date.Today() ),
+            YYYYMM   => IF( LEFT.dt_vndr_last_rptd < (STD.Date.Today() DIV 100)  , LEFT.dt_vndr_last_rptd, STD.Date.Today() DIV 100 ),
+            YYYY     => IF( LEFT.dt_vndr_last_rptd < (STD.Date.Today() DIV 10000), LEFT.dt_vndr_last_rptd, STD.Date.Today() DIV 10000 ),
+            LEFT.dt_vndr_last_rptd
+          ),
+        SELF := LEFT
+      )
+    );
+
   tradeline_data_with_missing_dates_by_seleid :=
     NORMALIZE(
-      tradeline_data_vendor_rptd_range_by_seleid,
+      tradeline_data_vendor_rptd_range_by_seleid_corrected,
       COUNT(tbl_timePeriods),
       TRANSFORM( RECORDOF(tradeline_data_vendor_rptd_range_by_seleid),
         SELF.Date := tbl_timePeriods[COUNTER].Date,
@@ -114,9 +154,39 @@ EXPORT CorteraTradeLineGrowth(destinationIP, destinationpath, emailContact = 'Da
       ultid, orgid, seleid, proxid, account_key
     );
 
+  tradeline_data_vendor_rptd_range_by_proxid_extended :=
+    PROJECT(
+      tradeline_data_vendor_rptd_range_by_proxid,
+      TRANSFORM( RECORDOF(tradeline_data_vendor_rptd_range_by_proxid),
+        SELF.dt_vndr_last_rptd :=
+          CASE( LENGTH((STRING)LEFT.dt_vndr_last_rptd),
+            YYYYMMDD => LEFT.dt_vndr_last_rptd + 20000,
+            YYYYMM   => LEFT.dt_vndr_last_rptd + 200,
+            YYYY     => LEFT.dt_vndr_last_rptd + 2,
+            LEFT.dt_vndr_last_rptd
+          ),
+        SELF := LEFT
+      )
+    );
+
+  tradeline_data_vendor_rptd_range_by_proxid_corrected :=
+    PROJECT(
+      tradeline_data_vendor_rptd_range_by_proxid_extended,
+      TRANSFORM( RECORDOF(tradeline_data_vendor_rptd_range_by_proxid),
+        SELF.dt_vndr_last_rptd :=
+          CASE( LENGTH((STRING)LEFT.dt_vndr_last_rptd),
+            YYYYMMDD => IF( LEFT.dt_vndr_last_rptd < (STD.Date.Today())          , LEFT.dt_vndr_last_rptd, STD.Date.Today() ),
+            YYYYMM   => IF( LEFT.dt_vndr_last_rptd < (STD.Date.Today() DIV 100)  , LEFT.dt_vndr_last_rptd, STD.Date.Today() DIV 100 ),
+            YYYY     => IF( LEFT.dt_vndr_last_rptd < (STD.Date.Today() DIV 10000), LEFT.dt_vndr_last_rptd, STD.Date.Today() DIV 10000 ),
+            LEFT.dt_vndr_last_rptd
+          ),
+        SELF := LEFT
+      )
+    );
+
   tradeline_data_with_missing_dates_by_proxid :=
     NORMALIZE(
-      tradeline_data_vendor_rptd_range_by_proxid,
+      tradeline_data_vendor_rptd_range_by_proxid_corrected,
       COUNT(tbl_timePeriods),
       TRANSFORM( RECORDOF(tradeline_data_vendor_rptd_range_by_proxid),
         SELF.Date := tbl_timePeriods[COUNTER].Date,
@@ -148,9 +218,39 @@ EXPORT CorteraTradeLineGrowth(destinationIP, destinationpath, emailContact = 'Da
       link_id, account_key
     );
 
+  tradeline_data_vendor_rptd_range_by_link_id_extended :=
+    PROJECT(
+      tradeline_data_vendor_rptd_range_by_link_id,
+      TRANSFORM( RECORDOF(tradeline_data_vendor_rptd_range_by_link_id),
+        SELF.dt_vndr_last_rptd :=
+          CASE( LENGTH((STRING)LEFT.dt_vndr_last_rptd),
+            YYYYMMDD => LEFT.dt_vndr_last_rptd + 20000,
+            YYYYMM   => LEFT.dt_vndr_last_rptd + 200,
+            YYYY     => LEFT.dt_vndr_last_rptd + 2,
+            LEFT.dt_vndr_last_rptd
+          ),
+        SELF := LEFT
+      )
+    );
+
+  tradeline_data_vendor_rptd_range_by_link_id_corrected :=
+    PROJECT(
+      tradeline_data_vendor_rptd_range_by_link_id_extended,
+      TRANSFORM( RECORDOF(tradeline_data_vendor_rptd_range_by_link_id),
+        SELF.dt_vndr_last_rptd :=
+          CASE( LENGTH((STRING)LEFT.dt_vndr_last_rptd),
+            YYYYMMDD => IF( LEFT.dt_vndr_last_rptd < (STD.Date.Today())          , LEFT.dt_vndr_last_rptd, STD.Date.Today() ),
+            YYYYMM   => IF( LEFT.dt_vndr_last_rptd < (STD.Date.Today() DIV 100)  , LEFT.dt_vndr_last_rptd, STD.Date.Today() DIV 100 ),
+            YYYY     => IF( LEFT.dt_vndr_last_rptd < (STD.Date.Today() DIV 10000), LEFT.dt_vndr_last_rptd, STD.Date.Today() DIV 10000 ),
+            LEFT.dt_vndr_last_rptd
+          ),
+        SELF := LEFT
+      )
+    );
+
   tradeline_data_with_missing_dates_by_link_id :=
     NORMALIZE(
-      tradeline_data_vendor_rptd_range_by_link_id,
+      tradeline_data_vendor_rptd_range_by_link_id_corrected,
       COUNT(tbl_timePeriods),
       TRANSFORM( RECORDOF(tradeline_data_vendor_rptd_range_by_link_id),
         SELF.Date := tbl_timePeriods[COUNTER].Date,

@@ -1,6 +1,6 @@
 ﻿EXPORT Layout_PrepEcrashKeys := MODULE
 
-EXPORT slim_layout := RECORD
+EXPORT dol_slim := RECORD
   string8 accident_date;
   string2 report_code;
   string2 jurisdiction_state;

@@ -50,7 +50,7 @@ EXPORT Lerg6Main_GenerationMod := MODULE(SALT311.iGenerationMod)
     + 'FIELDTYPE:Invalid_Num:ALLOW(0123456789 )\n'
     + 'FIELDTYPE:Invalid_RcTyCode:ENUM(Z|S|+| ) \n'
     + 'FIELDTYPE:Invalid_SccTypeCode:ALLOW(ABCIJMNORSTVWXZ8)\n'
-    + 'FIELDTYPE:Invalid_Src:ENUM(L6)\n'
+    + 'FIELDTYPE:Invalid_Src:ALLOW(L6)\n'
     + 'FIELDTYPE:Invalid_StatusCode:ENUM(E|M|D| )\n'
     + 'FIELDTYPE:Invalid_TBlockInd:ENUM(I|N|S|Y)\n'
     + 'FIELDTYPE:Invalid_TdCode:ALLOW(0123456789NA)\n'

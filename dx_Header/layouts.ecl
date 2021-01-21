@@ -569,6 +569,10 @@ end;
     head.did;
     integer8 cnt;
   END;
+	
+	SHARED perm_rec := RECORD
+		unsigned8 permissions;
+	END;
 
   EXPORT i_addr_ind_full := RECORD
     unsigned8 did;
@@ -612,8 +616,9 @@ end;
 		string5 addressstatus;
 		string3 addresstype;
 		unsigned8 locid;
-		unsigned8 permissions;
+		DATASET(perm_rec) permissions_ds;
   END;
+
 
   EXPORT i_first_ingest := RECORD
     unsigned6 rid;
