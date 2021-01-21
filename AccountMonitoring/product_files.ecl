@@ -6,7 +6,7 @@ IMPORT AccountMonitoring,BankruptcyV2, Business_Header, CellPhone, CourtLink, Co
 			 PhonesFeedback, Phonesplus, POE, Property, Risk_Indicators, ut, UtilFile, Watchdog, 
 			 hygenics_crim, business_header_ss, PhonesInfo, BIPV2_Best, 
 			 Business_Credit, Business_Credit_Scoring, UCCV2, SAM, Inquiry_AccLogs, Corp2,
-			 VehicleV2, FAA, Watercraft, Phonesplus_v2, dx_PhonesInfo;
+			 VehicleV2, FAA, Watercraft, Phonesplus_v2, dx_PhonesInfo, dx_Phone_TCPA;
 			 
 EXPORT product_files := MODULE
 
@@ -1188,6 +1188,22 @@ EXPORT product_files := MODULE
 				key_phones_transaction, 
 				HASH64(phone)
 			): INDEPENDENT;
+
+    EXPORT phones_WDNC_superfile  := 'thor_data400::key::tcpa::'+doxie.Version_SuperKey+'::phone_history';
+	  EXPORT phones_WDNC_for_superkey_monitor := 'monitor::Phones_WDNC';
+	  EXPORT phones_WDNC_superkeyname := AccountMonitoring.constants.MONITOR_KEY_CLUSTER + phones_WDNC_for_superkey_monitor + '_qa';
+	  
+	  EXPORT key_phones_WDNC := 
+	      PULL(INDEX(
+	        dx_Phone_TCPA.Key_TCPA_Phone_History(),  
+	        phones_WDNC_superkeyname
+	      ));
+	      
+	  EXPORT key_phones_WDNC_dist :=
+	      DISTRIBUTE(
+	        key_phones_WDNC, 
+	        HASH64(phone)
+	      ): INDEPENDENT;
 
 	END; //end of phone ownership
 	

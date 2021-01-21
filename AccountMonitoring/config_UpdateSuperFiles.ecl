@@ -126,6 +126,11 @@ end;
                       AccountMonitoring.product_files.PhoneOwnership.phones_transaction_superfile,
                       AccountMonitoring.product_files.PhoneOwnership.phones_transaction_for_superkey_monitor,
                       AccountMonitoring.types.productMask.phoneownership
+                    },
+                    {
+                      AccountMonitoring.product_files.PhoneOwnership.phones_WDNC_superfile,
+                      AccountMonitoring.product_files.PhoneOwnership.phones_WDNC_for_superkey_monitor,
+                      AccountMonitoring.types.productMask.phoneownership
                     }
                     ,{
                       AccountMonitoring.product_files.Property.Property_search_Roxiesuperfile, //(thor_data400::key::ln_propertyv2::qa::search.fid)
