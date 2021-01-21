@@ -1,8 +1,8 @@
 ﻿IMPORT tools,STD, FraudGovPlatform_Validation, FraudShared, ut,_Validate;
 EXPORT Build_Input_DisposableEmailDomains(
 	 string pversion
-	,dataset(Layouts.Input.DisposableEmailDomains) DisposableEmailDomains_Sprayed =  DATASET([], FraudGovPlatform.Layouts.Input.DisposableEmailDomains)
-	,dataset(Layouts.Input.DisposableEmailDomains) ByPassed_DisposableEmailDomains_Sprayed = DATASET([], FraudGovPlatform.Layouts.Input.DisposableEmailDomains)	
+	,dataset(Layouts.Input.DisposableEmailDomains) DisposableEmailDomains_Sprayed =  files().Input.DisposableEmailDomains.sprayed
+	,dataset(Layouts.Input.DisposableEmailDomains) ByPassed_DisposableEmailDomains_Sprayed = files().Input.ByPassed_DisposableEmailDomains.sprayed	
 ) :=
 module
 
@@ -19,10 +19,12 @@ module
 		
 		self.FileName := filename;		
 
-		fn := StringLib.SplitWords( StringLib.StringFindReplace(filename, '.dat',''), '_', true );
+		FileDate := StringLib.StringFindReplace(filename, '.dat','')[34..41];
+		self.domain:= ut.CleanSpacesAndUpper((STRING200)l.domain);
+		self.dispsblemail:= ut.CleanSpacesAndUpper((STRING200)l.dispsblemail);
 		self.Process_Date := (unsigned)pversion;
-		self.FileDate := (unsigned)fn[6];
-		self.FileTime := fn[7];
+		self.FileDate := (unsigned)FileDate;
+		self.FileTime := '';
 		self:=l;
 		self:=[];
 	end;
