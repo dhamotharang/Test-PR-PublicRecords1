@@ -4,7 +4,8 @@ export procPreProcess_CA(string filedate) := function
 
 dsDebtInput	   :=	UCCV2.File_CA_AllDebtors_In;
 dsSecPrtyInput :=	UCCV2.File_CA_AllSecuredParty_in;
-dsFileAdmInput :=	UCCV2.File_CA_FilingAmendments_in;
+//The vendor sends this file but currently it is not used in the process.  The data is a duplicate of what is in the Filings
+//dsFileAdmInput :=	UCCV2.File_CA_FilingAmendments_in;
 dsFileInput	   :=	UCCV2.File_CA_Filings_in;
 
 
@@ -140,7 +141,6 @@ AddSuperPersonSecuredpProcessed	:=	fileservices.addsuperfile('~thor_data400::in:
 
 retval := if (fileservices.getsuperfilesubcount(Cluster.Cluster_In + 'in::uccv2::CA::AllDebtors') > 0       and
               fileservices.getsuperfilesubcount(Cluster.Cluster_In + 'in::uccv2::CA::AllSecuredParty') > 0  and
-							fileservices.getsuperfilesubcount(Cluster.Cluster_In + 'in::uccv2::CA::FilingAmendments') > 0 and
 							fileservices.getsuperfilesubcount(Cluster.Cluster_In + 'in::uccv2::CA::Filings') > 0,
 								parallel(	sequential( FilingMaster
 																,AddSuperFiling

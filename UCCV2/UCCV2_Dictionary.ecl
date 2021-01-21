@@ -3,10 +3,8 @@
 export UCCV2_Dictionary := 
 dataset(
 [
-{'CA','ALL',0},
-{'CA','AllSecureParty',0},
+{'CA','AllSecuredParty',0},
 {'CA','AllDebtors',0},
-{'CA','FilingAmendments',0},
 {'CA','Filings',0},
 {'CA','BusinessDebtor',sizeof(UCCV2.Layout_File_CA_BusinessDebtor_in)},
 {'CA','BusinessSecuredP',sizeof(UCCV2.Layout_File_CA_BusinessSecuredParty_in)},
