@@ -91,17 +91,17 @@ end;
                     },
                     {
                       AccountMonitoring.product_files.Inquiry.inquiryLinkid_Roxie_SuperFile, //(thor_data400::key::inquiry_table::linkids_qa)
-                      AccountMonitoring.product_files.Inquiry.inquiryLinkid_superkey_monitor, //(batchr3::monitor::inquiry::linkids_qa)
+                      AccountMonitoring.product_files.Inquiry.inquiryLinkid_superkey_monitor, //(monitor::inquiry::linkids)
                       AccountMonitoring.types.productMask.Inquiry 
                     },
                     {
                       AccountMonitoring.product_files.Inquiry.inquiryUpdLinkid_Roxie_SuperFile, //(thor_data400::key::inquiry_table::qa::linkids_update)
-                      AccountMonitoring.product_files.Inquiry.inquiryUpdLinkid_superkey_monitor, //(batchr3::monitor::inquiry_table::linkids_qa)
+                      AccountMonitoring.product_files.Inquiry.inquiryUpdLinkid_superkey_monitor, //(monitor::inquiry_table::linkids_update)
                       AccountMonitoring.types.productMask.Inquiry 
                     },
                     {
                       AccountMonitoring.product_files.phonefeedback.phonefeedback_phone_keyname, //(thor_data400::key::phonesFeedback::qa::phone)
-                      AccountMonitoring.product_files.phonefeedback.PhonesFeedback_superkey, //(batchr3::monitor::PhonesFeedback::Phone_qa)
+                      AccountMonitoring.product_files.phonefeedback.PhonesFeedback_Phone_superkey_monitor, //(monitor::PhonesFeedback::Phone)
                       AccountMonitoring.types.productMask.phonefeedback
                     }
                     ,{
