@@ -21,7 +21,7 @@ module
 
 		FileDate := StringLib.StringFindReplace(filename, '.dat','')[34..41];
 		self.domain:= ut.CleanSpacesAndUpper((STRING200)l.domain);
-		self.dispsblemail:= ut.CleanSpacesAndUpper((STRING200)l.dispsblemail);
+		self.dispsblemail:= ut.CleanSpacesAndUpper((STRING1)l.dispsblemail);
 		self.Process_Date := (unsigned)pversion;
 		self.FileDate := (unsigned)FileDate;
 		self.FileTime := '';
