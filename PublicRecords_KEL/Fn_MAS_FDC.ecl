@@ -1391,8 +1391,8 @@ BIPV2.IDAppendLayouts.AppendInput PrepBIPInputprox(Layouts_FDC.Layout_FDC le) :=
 				JOIN(Input_FDC_RelativesLexids_HHIDLexids_Business_Contact_LexIDs, LN_PropertyV2.key_Property_did(Options.isFCRA),
 				Common.DoFDCJoin_PropertyV2__Key_Property_Did = TRUE AND 
 				LEFT.P_LexID > 0 AND
-				KEYED(LEFT.P_LexID = (UNSIGNED)RIGHT.s_did) AND
-					RIGHT.source_code_2 = 'P',
+				KEYED(LEFT.P_LexID = (UNSIGNED)RIGHT.s_did AND
+         RIGHT.source_code_2 = 'P'),
 				TRANSFORM(Layouts_FDC.Layout_PropertyV2_Data_Temp,
 					SELF.UIDAppend := LEFT.UIDAppend,
 					SELF.G_ProcUID := LEFT.G_ProcUID,
@@ -1441,11 +1441,11 @@ BIPV2.IDAppendLayouts.AppendInput PrepBIPInputprox(Layouts_FDC.Layout_FDC le) :=
 				KEYED(LEFT.PrimaryRange = RIGHT.prim_range AND
 					LEFT.Predirectional = RIGHT.predir AND
 					LEFT.PrimaryName = RIGHT.prim_name AND
-					LEFT.AddrSuffix = RIGHT.suffix AND 
+					LEFT.AddrSuffix = RIGHT.suffix AND
 					LEFT.Postdirectional = RIGHT.postdir AND
-					LEFT.SecondaryRange = RIGHT.sec_range AND 
-					LEFT.ZIP5 = RIGHT.zip) AND
-					RIGHT.source_code_2 = 'P',
+					LEFT.SecondaryRange = RIGHT.sec_range AND
+					LEFT.ZIP5 = RIGHT.zip AND
+					RIGHT.source_code_2 = 'P'),
 				TRANSFORM(Layouts_FDC.Layout_PropertyV2_Data_Temp,
 					SELF.UIDAppend := LEFT.UIDAppend,
 					SELF.G_ProcUID := LEFT.G_ProcUID,
