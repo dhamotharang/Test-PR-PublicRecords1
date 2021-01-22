@@ -23,8 +23,13 @@
    NOTE: After deduping there are always fewer... so added a dedup here prior to the CHOOSEN
    ********************************************************************
    Oct 2020 - odd, had to comment out the filter only orig_vehicle_type_code='P' because 99% of 2021 orig_types had "U"
-               checking on the 5 year search if it was only 2021 that was affected or not
-               yes - trying 2020 VIN years with only orig_vehicle_type_code='P' when vina_vehType="T" worked fine
+            checking on the 5 year search if it was only 2021 that was affected or not
+            yes - trying 2021 VIN years with this worked fine:
+                  vina_model_year IN yearsToPull AND vina_vin <>''
+                  AND (vina_veh_type IN ['P','M'] 
+                        OR (vina_veh_type = 'T' AND orig_vehicle_type_code IN ['P','U'] ) )
+                  AND (vina_make_desc <> '' OR vina_series_desc <> '') );
+             ALSO! - previous years we checked orig_year - that's broke for 2021, using vina_model_year                     
    *********************************************************************************************************** */
    IMPORT VehicleV2,STD,PRTE2_X_Ins_DataGathering,PromoteSupers,PRTE2_X_Ins_AlphaRemote;
 
