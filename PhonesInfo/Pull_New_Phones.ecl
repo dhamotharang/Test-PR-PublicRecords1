@@ -6,7 +6,7 @@
 	/*portV2: N = Use PMT or 
 						Y = Use Phone Type File*/
 
-EXPORT Pull_New_Phones(string version, string portV2) := FUNCTION
+EXPORT Pull_New_Phones(string version, string portV2, string contacts) := FUNCTION
  
 	///////////////////////////////////////////////////////////////////////////////
 	//Find New Phone Records Not in iConectiv Port File////////////////////////////
@@ -73,6 +73,16 @@ EXPORT Pull_New_Phones(string version, string portV2) := FUNCTION
 	
 	outFile					:= output(ddNewPhFile,, '~thor_data400::in::phones::new_phone_daily_' + version, __compressed__);
 	
-	RETURN outFile;
+	//Email Build Status	
+	emailDOps					:= contacts;
+	emailDev					:= ';judy.tao@lexisnexisrisk.com';
+	
+	emailTarget				:= contacts + emailDev;
+	emailBuildNotice 	:= if(count(ddNewPhFile(phone<>'')) > 0
+																,fileservices.SendEmail(emailTarget, 'Phones Metadata: New L6_Phones', 'Phones Metadata: New Phones File Is Now Available.  Please see: ' + 'http://uspr-prod-thor-esp.risk.regn.net:8010/WsWorkunits/WUInfo?Wuid='+ workunit + '&Widget=WUDetailsWidget#/stub/Results-DL/Grid')
+																,fileservices.SendEmail(emailTarget, 'Phones Metadata: No New L6', 'There Were No New Phones Records In This Build')
+																);
+																
+	RETURN sequential (outFile, emailBuildNotice);
 	
 END;

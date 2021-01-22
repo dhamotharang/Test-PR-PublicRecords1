@@ -1,6 +1,6 @@
 ﻿IMPORT _control, Std, ut;
 
-EXPORT Proc_Build_Deact_Gong_History_File(string version) := FUNCTION
+EXPORT Proc_Build_Deact_Gong_History_File(string version, string contacts) := FUNCTION
 
 	//This build uses the Gong.Key_History_Phone for the input.	
 	
@@ -24,10 +24,10 @@ EXPORT Proc_Build_Deact_Gong_History_File(string version) := FUNCTION
 																															'~thor_data400::base::phones::deact_gh_main_delete'], '~thor_data400::base::phones::deact_gh_main_'+version, true);																						
 
 	//Email Build Status	
-	emailDOps									:= ';darren.knowles@lexisnexisrisk.com; charlene.ros@lexisnexisrisk.com; gregory.rose@lexisnexisrisk.com';
+	emailDOps									:= contacts;
 	emailDev									:= ';judy.tao@lexisnexisrisk.com';
 	
-	emailTarget								:= _control.MyInfo.EmailAddressNotify + emailDev;
+	emailTarget								:= contacts + emailDev;
 	emailBuildNotice 					:= if(count(PhonesInfo.File_Deact_GH.Main(phone<>'')) > 0
 																				,fileservices.SendEmail(emailTarget, 'Phones Metadata: Deact Gong History File', 'Phones Metadata: Deact Gong History File Is Now Available.  Please see: ' + 'http://uspr-prod-thor-esp.risk.regn.net:8010/WsWorkunits/WUInfo?Wuid='+ workunit + '&Widget=WUDetailsWidget#/stub/Results-DL/Grid')
 																				,fileservices.SendEmail(emailTarget, 'Phones Metadata: No Deact Gong History File', 'There Were No Deact Gong History Records In This Build')

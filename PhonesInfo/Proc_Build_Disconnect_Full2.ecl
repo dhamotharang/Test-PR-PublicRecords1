@@ -1,6 +1,6 @@
 import _control, std, ut;
 
-EXPORT Proc_Build_Disconnect_Full2(string version, const varstring eclsourceip, string thor_name) := function
+EXPORT Proc_Build_Disconnect_Full2(string version, const varstring eclsourceip, string thor_name, string contacts) := function
 
 	sprayDaily 								:= PhonesInfo.Spray_Deact2_Daily(version, eclsourceip, thor_name);
 		
@@ -26,8 +26,8 @@ EXPORT Proc_Build_Disconnect_Full2(string version, const varstring eclsourceip, 
 																																																						'~thor_data400::base::phones::disconnect2_main_delete'], '~thor_data400::base::phones::disconnect2_main_'+version, true);																						
 					
 	emailNotice 							:= if(count(PhonesInfo.File_Deact.Main_Current2(phone<>'')) > 0
-																										,sequential(fileservices.SendEmail(_control.MyInfo.EmailAddressNotify + ';judy.tao@lexisnexisrisk.com' + ';gregory.rose@lexisnexisrisk.com' + ';darren.knowles@lexisnexisrisk.com', 'Phones Metadata: Phones Disconnect II File', 'Phones Metadata Disconnect II File Is Now Available.  Please see: '+'http://10.241.30.202:8010/?Wuid='+ workunit + '&Widget=WUDetailsWidget#/stub/Results-DL/Grid'))
-																																					,fileservices.SendEmail(_control.MyInfo.EmailAddressNotify + ';judy.tao@lexisnexisrisk.com' + ';gregory.rose@lexisnexisrisk.com' + ';darren.knowles@lexisnexisrisk.com', 'Phones Metadata: No Phones Disconnect II File', 'There Were No Phones Metadata Disconnect II Records in This Build')
+																										,sequential(fileservices.SendEmail(contacts, 'Phones Metadata: Phones Disconnect II File', 'Phones Metadata Disconnect II File Is Now Available.  Please see: '+'http://10.241.30.202:8010/?Wuid='+ workunit + '&Widget=WUDetailsWidget#/stub/Results-DL/Grid'))
+																																					,fileservices.SendEmail(contacts, 'Phones Metadata: No Phones Disconnect II File', 'There Were No Phones Metadata Disconnect II Records in This Build')
 																										);	
 																	
 	return sequential(sprayDaily,
