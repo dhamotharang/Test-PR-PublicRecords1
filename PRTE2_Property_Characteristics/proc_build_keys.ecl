@@ -29,16 +29,15 @@ PerformUpdate 			:= PRTE.UpdateVersion(constants.DATASET_NAME,		//	Package name
 																					
 key_validation 		 := output(dops.ValidatePRCTFileLayout(filedate, prte2.Constants.ipaddr_prod, prte2.Constants.ipaddr_roxie_nonfcra, constants.DATASET_NAME, 'N'), named(constants.dataset_name+ '_VALIDATION'));
 PerformUpdateOrNot := IF(doDOPS,PerformUpdate,NoUpdate);
-orbit_build			   := Orbit3.proc_Orbit3_CreateBuild('PRTE - PropertyInfo', filedate, 'N', true, true, false, _control.MyInfo.EmailAddressNormal);
+
 //--------------------------------------------------------------------------------------
 		
 		RETURN sequential(
 											parallel(bld_rid_key, bld_address_key),
 											parallel(mv_rid_key, mv_address_key),
 											parallel(mv_rid_QA, mv_address_QA),
-											key_validation
-											// ,
-											// PerformUpdateOrNot,
-											// orbit_build	
+											key_validation,
+											PerformUpdateOrNot,
+									    build_orbit(filedate)	
 											);
 		END;
