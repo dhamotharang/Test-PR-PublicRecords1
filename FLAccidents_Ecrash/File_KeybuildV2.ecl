@@ -1,4 +1,4 @@
-﻿IMPORT FLAccidents, ut, STD;
+﻿IMPORT FLAccidents, STD;
 
 EXPORT File_KeybuildV2 := MODULE
 
@@ -71,7 +71,7 @@ EXPORT File_KeybuildV2 := MODULE
 // ###########################################################################
 //  ALL Accidents report data for eCrash Keys / Queries
 // ###########################################################################																	
-	EXPORT out := PROJECT(eCrashAccidents, TRANSFORM(Layout_eCrash.Consolidation, SELF := LEFT;));
+	EXPORT out := PROJECT(eCrashAccidents, TRANSFORM(Layout_eCrash.Consolidation, SELF := LEFT;)):PERSIST('~thor_data400::persist::consolidation::ecrash_out');
 
 // ###########################################################################
 //  ALL Accidents report data for PR Keys / Queries
@@ -82,7 +82,7 @@ EXPORT File_KeybuildV2 := MODULE
 	SHARED EcrashAgencyExclusion := EcrashAgencyExclusionAgencyOri(STD.Str.ToUpperCase(TRIM(agency_ori, ALL)) NOT IN Agency_exclusion.Agency_ori_list AND
 																																 STD.Str.ToUpperCase(TRIM(agency_ori, ALL))[1..2] NOT IN Agency_exclusion.Agency_ori_jurisdiction_list
 																																 );
-	EXPORT prout := PROJECT(EcrashAgencyExclusion, TRANSFORM(Layout_eCrash.Consolidation, SELF := LEFT;));
+	EXPORT prout := PROJECT(EcrashAgencyExclusion, TRANSFORM(Layout_eCrash.Consolidation, SELF := LEFT;)):PERSIST('~thor_data400::persist::consolidation::ecrash_prout');
 
 // ###########################################################################
 //  ALL Accidents report data for eCrash Search Records
@@ -90,6 +90,6 @@ EXPORT File_KeybuildV2 := MODULE
 	SHARED SearchRecs := out(report_code IN ['EA', 'TM', 'TF'] AND 
 	                         work_type_id NOT IN ['2', '3'] AND 
 												   (TRIM(report_type_id, ALL) IN ['A', 'DE'] OR STD.str.ToUpperCase(TRIM(vendor_code, LEFT, RIGHT)) = 'CMPD'));
-	EXPORT eCrashSearchRecs := DISTRIBUTE(PROJECT(SearchRecs, Layouts.key_search_layout), HASH32(accident_nbr)):INDEPENDENT;
+	EXPORT eCrashSearchRecs := DISTRIBUTE(PROJECT(SearchRecs, Layouts.key_search_layout), HASH32(accident_nbr));
 	
 END; 

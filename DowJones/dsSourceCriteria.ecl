@@ -1966,7 +1966,27 @@ EXPORT dsSourceCriteria := DATASET([
 {'EC (CFSP) 2020/1700 Venezuela List','1953'},
 {'EC 2020/1696 Venezuela List','1954'},
 {'EC (CFSP) 2020/1748 Cyber-Attacks List','1955'},
-{'EC 2020/1744 Cyber-Attacks List','1956'}
+{'EC 2020/1744 Cyber-Attacks List','1956'},
+{'Corrupt Practices Investigation Bureau (CPIB) Singapore Press Release','1957'},
+{'Panama Canal Authority (ACP) Debarred Contractors List','1958'},
+{'EC 2020/1992 Banned Air Carriers List','1959'},
+{'Florida State Board of Administration Scrutinized Companies List','1960'},
+{'EC (CFSP) 2020/2033 Democratic Republic of the Congo List','1961'},
+{'EC 2020/2021 Democratic Republic of the Congo List','1962'},
+{'MGA (Malta) Enforcement Register','1963'},
+{'OFAC - Non-SDN Menu Based Sanctions List','1964'},
+{'BIS Military End User List','1965'},
+{'EC (CFSP) 2020/2130 Belarus List','1966'},
+{'EC (CFSP) 2020/2144 Democratic Republic of the Congo List','1967'},
+{'EC 2020/2129 Belarus List','1968'},
+{'EC 2020/2133 Democratic Republic of the Congo List','1969'},
+{'NACTA (Pakistan) Proscribed Organizations List','1970'},
+{'OFAC - Non-SDN Communist Chinese Military Companies List','1971'},
+{'FCDO (UK) Sanctions List - Asset Freeze','1972'},
+{'FCDO (UK) Sanctions List - Non Asset Freeze','1973'},
+{'South Korea Financial Supervisory Service (FSS) Accounting Supervision Enforcement Actions','1974'},
+{'EC 2021/29 Syria List','1975'},
+{'EC 2021/30 CFSP Syria List','1976'}
 
 ],r);
 

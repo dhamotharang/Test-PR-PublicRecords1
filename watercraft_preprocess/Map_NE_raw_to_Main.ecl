@@ -136,8 +136,8 @@ watercraft_color_desc(string3 code)
 
 file_NE_dedup := dedup(sort(watercraft_preprocess.file_NE_clean_in, reg_date, reg_num), reg_date, reg_num);
 
-Watercraft.Macro_Clean_Hull_ID(file_NE_dedup, watercraft.Layout_NE_20q1_new, hull_clean_in)
-watercraft.Macro_Is_hull_id_in_MIC(hull_clean_in, watercraft.Layout_NE_20q1_new, wDatasetwithflag)
+Watercraft.Macro_Clean_Hull_ID(file_NE_dedup, watercraft.Layout_NE, hull_clean_in)
+watercraft.Macro_Is_hull_id_in_MIC(hull_clean_in, watercraft.Layout_NE, wDatasetwithflag)
 
 watercraft.Layout_Watercraft_Main_Base main_mapping_format(wDatasetwithflag L) := TRANSFORM
 	// New watercraft_key logic to be implemented at a later date

@@ -1,58 +1,35 @@
-﻿Import Data_Services, doxie,FLAccidents, STD;
-
-Ecrash := FLAccidents_Ecrash.File_KeybuildV2.prout(report_code in ['EA','TM','TF']);//for ecrash iyetek they need report number displayed even no vin and name
-
-Filter_CRU := FLAccidents_Ecrash.File_KeybuildV2.prout(report_code not in ['EA','TM','TF']);
-
-crash_accnbr_base := 	Ecrash + Filter_CRU (vin+driver_license_nbr+tag_nbr+lname <>'') ; 
-						
-// normalize addl_report_number 
-
-NormAddlRpt := project(crash_accnbr_base(trim(addl_report_number,left,right) not in ['','0','UNK', 'UNKNOWN'] and report_code in ['TF','TM']), transform( {crash_accnbr_base}, 
-
-self.accident_nbr :=STD.Str.Filter(left.addl_report_number,'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789');
- self := left)); 
-
-crash_accnbr_base_norm := (crash_accnbr_base + NormAddlRpt) (trim(accident_nbr,left,right)<>'');
-											 
-dst_accnbr_base := distribute(crash_accnbr_base_norm, hash(orig_accnbr));
-srt_accnbr_base := sort(dst_accnbr_base, except did, except b_did, local);
-dep_accnbr_base := dedup(srt_accnbr_base, except did, except b_did, local);
-
-																				
-export key_EcrashV2_accnbr := index(dep_accnbr_base
-                                  ,{string40 l_accnbr := accident_nbr, report_code,jurisdiction_state, jurisdiction}
-
-								 ,{
-								   orig_accnbr, 
-								   vehicle_incident_id,
-									 vehicle_status,
-									 dt_first_seen,
-									 dt_last_seen,
-									 accident_date,
-									 did,
-									 title,fname,mname,lname,name_suffix,
-									 dob,
-									 b_did,
-									 cname,
-								   prim_range,predir,prim_name,addr_suffix,postdir,unit_desig,sec_range,v_city_name,st,zip,zip4,
-								   record_type,
-									 report_code_desc,
-									 report_category,
-									 vin,
-									 driver_license_nbr,
-									 dlnbr_st,
-									 tag_nbr,
-									 tagnbr_st,
-								   accident_location,accident_street,accident_cross_street,next_street, // new field 
-									 jurisdiction,jurisdiction_state,jurisdiction_nbr,
-									 IMAGE_HASH,
-									 AIRBAGS_DEPLOY,
-									 Policy_num,Policy_Effective_Date,Policy_Expiration_Date,
-									 Report_Has_Coversheet, 
-									 other_vin_indicator,
-									 vehicle_Unit_Number,
-									 vehicle_incident_city;
+﻿EXPORT key_EcrashV2_accnbr := INDEX(mod_PrepEcrashPRKeys().dep_accnbr_base
+,{l_accnbr, report_code,jurisdiction_state, jurisdiction}
+,{
+orig_accnbr, 
+vehicle_incident_id,
+vehicle_status,
+dt_first_seen,
+dt_last_seen,
+accident_date,
+did,
+title,fname,mname,lname,name_suffix,
+dob,
+b_did,
+cname,
+prim_range,predir,prim_name,addr_suffix,postdir,unit_desig,sec_range,v_city_name,st,zip,zip4,
+record_type,
+report_code_desc,
+report_category,
+vin,
+driver_license_nbr,
+dlnbr_st,
+tag_nbr,
+tagnbr_st,
+accident_location,accident_street,accident_cross_street,next_street, // new field 
+jurisdiction,jurisdiction_state,jurisdiction_nbr,
+IMAGE_HASH,
+AIRBAGS_DEPLOY,
+Policy_num,Policy_Effective_Date,Policy_Expiration_Date,
+Report_Has_Coversheet, 
+other_vin_indicator,
+vehicle_Unit_Number,
+vehicle_incident_city;
 vehicle_incident_st;
 carrier_name;
 client_type_id;
@@ -171,8 +148,8 @@ cru_order_id;
 cru_sequence_nbr;
 date_vendor_last_reported; 
 report_type_id;								 
-									 }
-							      ,Data_Services.Data_location.Prefix('ecrash')+'thor_data400::key::ecrashV2_accnbr_' + doxie.Version_SuperKey);
+}
+,Files_PR.FILE_KEY_ACCNBR_SF);
  
 
 

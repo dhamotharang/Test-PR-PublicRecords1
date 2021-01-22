@@ -4,8 +4,8 @@ IMPORT E_Address,E_Bank,E_Bank_Account,E_Customer,E_Person,E_Person_Bank_Account
 IMPORT * FROM KEL011.Null;
 EXPORT B_Person_Bank_Account := MODULE
   SHARED VIRTUAL TYPEOF(E_Person_Bank_Account.__Result) __E_Person_Bank_Account := E_Person_Bank_Account.__Result;
-  SHARED __EE3893751 := __E_Person_Bank_Account;
-  EXPORT __ST66814_Layout := RECORD
+  SHARED __EE4397625 := __E_Person_Bank_Account;
+  EXPORT __ST70035_Layout := RECORD
     KEL.typ.ntyp(E_Customer.Typ) _r_Customer_;
     KEL.typ.ntyp(E_Person.Typ) Subject_;
     KEL.typ.ntyp(E_Bank_Account.Typ) Account_;
@@ -16,16 +16,16 @@ EXPORT B_Person_Bank_Account := MODULE
     KEL.typ.epoch Date_Last_Seen_ := 0;
     KEL.typ.int __RecordCount := 0;
   END;
-  SHARED __ST66814_Layout __ND3893785__Project(E_Person_Bank_Account.Layout __PP3893646) := TRANSFORM
-    __EE3893684 := __PP3893646.Event_Dates_;
-    SELF.Dt_First_Seen_ := KEL.Aggregates.MinNN(__EE3893684,__T(__EE3893684).Event_Date_);
-    __EE3893713 := __PP3893646.Event_Dates_;
-    SELF.Dt_Last_Seen_ := KEL.Aggregates.MaxNN(__EE3893713,__T(__EE3893713).Event_Date_);
-    SELF := __PP3893646;
+  SHARED __ST70035_Layout __ND4397659__Project(E_Person_Bank_Account.Layout __PP4397520) := TRANSFORM
+    __EE4397558 := __PP4397520.Event_Dates_;
+    SELF.Dt_First_Seen_ := KEL.Aggregates.MinNN(__EE4397558,__T(__EE4397558).Event_Date_);
+    __EE4397587 := __PP4397520.Event_Dates_;
+    SELF.Dt_Last_Seen_ := KEL.Aggregates.MaxNN(__EE4397587,__T(__EE4397587).Event_Date_);
+    SELF := __PP4397520;
   END;
-  EXPORT __ENH_Person_Bank_Account := PROJECT(__EE3893751,__ND3893785__Project(LEFT)) : PERSIST('~fraudgov::temp::KEL::FraudgovKEL::Person_Bank_Account::Annotated',EXPIRE(7));
-  SHARED __EE4161472 := __ENH_Person_Bank_Account;
-  SHARED __IDX_Person_Bank_Account_Account__Filtered := __EE4161472(__NN(__EE4161472.Account_));
+  EXPORT __ENH_Person_Bank_Account := PROJECT(__EE4397625,__ND4397659__Project(LEFT)) : PERSIST('~fraudgov::temp::KEL::FraudgovKEL::Person_Bank_Account::Annotated',EXPIRE(7));
+  SHARED __EE4670389 := __ENH_Person_Bank_Account;
+  SHARED __IDX_Person_Bank_Account_Account__Filtered := __EE4670389(__NN(__EE4670389.Account_));
   SHARED IDX_Person_Bank_Account_Account__Layout := RECORD
     E_Bank_Account.Typ Account_;
     __IDX_Person_Bank_Account_Account__Filtered._r_Customer_;
@@ -41,7 +41,7 @@ EXPORT B_Person_Bank_Account := MODULE
   EXPORT IDX_Person_Bank_Account_Account__Name := '~key::KEL::FraudgovKEL::Person_Bank_Account::Account_';
   EXPORT IDX_Person_Bank_Account_Account_ := INDEX(IDX_Person_Bank_Account_Account__Projected,{Account_},{IDX_Person_Bank_Account_Account__Projected},IDX_Person_Bank_Account_Account__Name);
   EXPORT IDX_Person_Bank_Account_Account__Build := BUILD(IDX_Person_Bank_Account_Account_,OVERWRITE);
-  EXPORT __ST4161474_Layout := RECORDOF(IDX_Person_Bank_Account_Account_);
-  EXPORT IDX_Person_Bank_Account_Account__Wrapped := PROJECT(IDX_Person_Bank_Account_Account_,TRANSFORM(__ST66814_Layout,SELF.Account_ := __CN(LEFT.Account_),SELF:=LEFT));
+  EXPORT __ST4670391_Layout := RECORDOF(IDX_Person_Bank_Account_Account_);
+  EXPORT IDX_Person_Bank_Account_Account__Wrapped := PROJECT(IDX_Person_Bank_Account_Account_,TRANSFORM(__ST70035_Layout,SELF.Account_ := __CN(LEFT.Account_),SELF:=LEFT));
   EXPORT BuildAll := PARALLEL(IDX_Person_Bank_Account_Account__Build);
 END;

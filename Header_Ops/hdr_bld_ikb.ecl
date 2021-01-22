@@ -12,7 +12,10 @@ EXPORT hdr_bld_ikb(string filedate, unsigned1 status) := module
    wServer:= _control.ThisEnvironment.ESP_IPAddress;
    wLink := 'http://'+wServer+':8010/?Widget=WUDetailsWidget&Wuid='+wk+'#/stub/Summary';
 
-   CopyKeys := Header.Proc_Copy_From_Alpha_Incrementals().Refresh_copy(filedate);
+   CopyKeys := ORDERED(
+                       Header.Proc_Copy_From_Alpha_Incrementals().Refresh_copy(filedate);
+                       Header.Proc_Copy_From_Alpha_Incrementals().copy_insurance_best;
+                       );
 
    UpdateIncIdl := Header.Proc_Copy_From_Alpha_Incrementals().update_inc_idl(,filedate);
 

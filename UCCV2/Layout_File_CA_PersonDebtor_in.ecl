@@ -1,8 +1,6 @@
-export Layout_File_CA_PersonDebtor_in := record
+﻿export Layout_File_CA_PersonDebtor_in := record
 	string8     process_date;
-	string1     record_type;
 	string14    initial_filing_number;
-	string12    static;
 	string50    pd_last_name;
 	string50    pd_first_name;
 	string50    pd_middle_name;
@@ -12,7 +10,7 @@ export Layout_File_CA_PersonDebtor_in := record
 	string32    pd_state;
 	string15    pd_zip;
 	string6     pd_zip_extn;
-	string3     pd_country_code;
+	string25    pd_country;
 	string100		prep_addr_line1;
 	string50		prep_addr_last_line;						
 end;

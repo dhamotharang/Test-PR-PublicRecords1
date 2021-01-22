@@ -74,7 +74,6 @@ alpha_dependent := sequential(
                     FLAccidents_Ecrash.ConcatInput
 									  ,fn_ValidIn(false)
 			              ,Spray_ECrash
-			              ,FLAccidents_Ecrash.fn_Agency_DE
 		                ,FLAccidents_Ecrash.map_basefile(filedate)
 										) : failure ( if ( trim(spversion) <> trim(filedate), fileservices.sendemail(
 													                                                      Email_Notification_Lists.NOC,
@@ -99,8 +98,6 @@ build_key := sequential(
 			,OrbitCreateBuild
 			,FLAccidents_Ecrash.Sample_data.qa
 		  ,FLAccidents_Ecrash.strata(filedate)
-			,FLAccidents_Ecrash.Prod_Superid_Change_extract(filedate) 
-			,FLAccidents_Ecrash.Proc_TMafterTF_extract(filedate,timestamp)
 			,FLAccidents_Ecrash.proc_build_dupe_extract(filedate,timestamp)
 			,FLAccidents_Ecrash.Proc_build_Accident_watch(filedate,timestamp)
 			,FLAccidents_Ecrash.InFilesList

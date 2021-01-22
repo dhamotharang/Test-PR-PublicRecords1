@@ -22,7 +22,7 @@ Spray_ECrash := Sequential(FLAccidents_Ecrash.Spray_In(false), FLAccidents_Ecras
 build_all := sequential(
 			 Spray_ECrash
       ,FLAccidents_Ecrash.map_basefile(filedate)
-	  ,FLAccidents_Ecrash.Map_base_Iyetek(filedate)
+	  //,FLAccidents_Ecrash.Map_base_Iyetek(filedate)
 		//	,FLAccidents.map_basefile_inquiry(filedate)
 			) : success(Send_Email(filedate,'V2').buildsuccess), failure(Send_Email(filedate,'V1').buildfailure);
 

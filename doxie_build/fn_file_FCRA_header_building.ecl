@@ -49,7 +49,16 @@ remove_old_records := header.fn_remove_old_records(fix_addr_suffix);
 fix_dobs           := header.fn_patch_dob(remove_old_records);
 fix_name_suffix    := header.fn_name_suffix_corrections(fix_dobs)(fname<>'',lname<>'');
 
-Base_File_Append := header.prep_build.Prep_FCRA_Header(doxie_build.header_blocked_data(fix_name_suffix));
+fn_cleanup(string pIn) := function
+ pOut1 := trim(regexreplace('[!$^*<>?]',pIn,' '),left,right);
+ pOut  := trim(stringlib.stringfindreplace(pOut1,'\'',''),left,right);
+ return pOut;
+end;
+
+fix_sec_range := project(fix_name_suffix, transform({fix_name_suffix}, self.sec_range := fn_cleanup(left.sec_range), self := left;));
+
+
+Base_File_Append := header.prep_build.Prep_FCRA_Header(doxie_build.header_blocked_data(fix_sec_range));
 
 //correct phone areacode
 ut.mac_phone_areacode_corrections(Base_File_Append, correct_phone_areacode, phone)

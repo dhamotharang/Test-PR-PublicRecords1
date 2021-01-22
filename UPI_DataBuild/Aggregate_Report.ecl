@@ -8,7 +8,7 @@ EXPORT Aggregate_Report(boolean pUseProd, string gcid, string pHistMode, dataset
    d := dataset([{min_lexid_score, max_lexid_score, ave_lexid_score, cnt_lexid_change, pct_lexid_change, 
 									distinct_lexid_cnt, dup_lexid_cnt, cnt_crk_change, pct_crk_change, distinct_crk_cnt, 
 									dup_crk_cnt, cnt_new_crk, match_crk_cnt}],
-                  UPI_Databuild.Layouts_V2.aggregate_fields);       									
+                  UPI_DataBuild.Layouts_V2.aggregate_fields);       									
 
     return d;
 	endmacro;

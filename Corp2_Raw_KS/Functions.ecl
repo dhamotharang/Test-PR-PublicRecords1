@@ -1,4 +1,4 @@
-IMPORT corp2, corp2_mapping, corp2_raw_ks;
+﻿IMPORT corp2, corp2_mapping, corp2_raw_ks;
 
 EXPORT Functions := Module
 
@@ -138,7 +138,7 @@ EXPORT Functions := Module
 										  uc_s in ['MF'] 																		=> uc_s,
 										  uc_s in ['NP'] 																		=> uc_s,
 										  uc_s in ['PA','PL','PN'] 													=> uc_s,
-										  uc_s in ['SA'] 																		=> uc_s,
+										  uc_s in ['SA','SD'] 															=> uc_s,
 										  uc_s in ['TP'] 																		=> uc_s,
 										  uc_s in ['VD','VF','VL','VP'] 										=> uc_s,
 											'**|'+uc_s
@@ -183,6 +183,7 @@ EXPORT Functions := Module
 											 uc_s = 'PL' =>	'PROFESSIONAL LLC',
 											 uc_s = 'PN' =>	'PROFESSIONAL:NP CORPORATION',
 											 uc_s = 'SA' =>	'SERVICE AGENT',
+											 uc_s = 'SD' =>	'SERIES DOMESTIC',
 											 uc_s = 'TP' =>	'TOBACCO PRODUCTS',
 											 uc_s = 'VD' =>	'DOMESTIC VENTURE CAPITOL CORP.',
 											 uc_s = 'VF' =>	'FOREIGN VENTURE CAPITOL CORP.',

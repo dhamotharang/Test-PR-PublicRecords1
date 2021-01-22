@@ -6,7 +6,7 @@ ExtractFileName(string ilfn) := FUNCTION
 		return s1[n];
 END;
 
-EXPORT GetReports(DATASET($.Layouts2.rNac2Ex) nac2, string ilfn, BOOLEAN print_report_workunit = FALSE) := function
+EXPORT GetReports(DATASET($.Layouts2.rNac2Ex) nac2, string ilfn, BOOLEAN show_email_message = FALSE) := function
 
 		fn := ExtractFileName(ilfn);
 
@@ -81,7 +81,7 @@ EXPORT GetReports(DATASET($.Layouts2.rNac2Ex) nac2, string ilfn, BOOLEAN print_r
 	types := PROJECT(types01, transform_types(LEFT));
 
 
-		ncr := nac_v2.Print.NCR2_Report(fn, errs, total, nErrors, nWarnings, 'XX', ExcessiveInvalidRecordsFound, programs, types, print_report_workunit); 
+		ncr := nac_v2.Print.NCR2_Report(fn, errs, total, nErrors, nWarnings, 'XX', ExcessiveInvalidRecordsFound, programs, types, show_email_message); 
 
 		ncd := nac_v2.Print.NCD2_Report(fn, errs, total, nErrors, nWarnings, nWarned, nRejected, 'XX', ExcessiveInvalidRecordsFound);
 

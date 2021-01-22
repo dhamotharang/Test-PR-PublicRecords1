@@ -17,8 +17,9 @@ EXPORT Constants := module
 		export repl := 'replicate=1 ';
 		export action := 'action=copy ';
 		export wrap := 'wrap=1 ';
-		export transferbuffersize := 'transferbuffersize=100000 ';
-		export connect := 'connect=200 ';
+		export transferbuffersize := 'transferbuffersize=10000000 ';
+		export connect := 'connect=400 ';
+		export nocommon := 'noCommon=1 ';
 		export filename := fileservices.GetSuperFileSubName(superfilename,1);
 		export srcname := 'srcname=~'+filename + ' ';
 		export dstname := 'dstname=~'+filename + ' ';
@@ -29,6 +30,7 @@ EXPORT Constants := module
 		export no_of_files_to_keep := if ( superfilename <> '',thorbackup.SetDeleteFileCount(superfile = superfilename)[1].filecnt,2);
 		export destip := 'databuilddev01.risk.regn.net';
 		export destlocation := '/u/thor/filestodelete';
+		
 	end;
 	
 	export esp := module

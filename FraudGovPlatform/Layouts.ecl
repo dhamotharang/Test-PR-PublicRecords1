@@ -1425,6 +1425,36 @@ EXPORT Drivers_Batch := MODULE
   integer8 p20_aotdlkractinagcyolddtev;
   integer8 p20_aotdlkractinagcynewdtev;
   string t_inpclnaddrgeomatchecho;
+  integer8 p1_aotidkractshrdsrcagencycntev;
+  string p1_aotidkractshrdnewsrcagencydescev;
+  integer8 p1_aotidkrgenfrdactshrdsrcagencycntev;
+  string p1_aotidkrgenfrdactshrdnewsrcagencydescev;
+  integer8 p1_aotidkrstolidactshrdsrcagencycntev;
+  string p1_aotidkrstolidactshrdnewsrcagencydescev;
+  integer8 p1_aotidkrappfrdactshrdsrcagencycntev;
+  string p1_aotidkrappfrdactshrdnewsrcagencydescev;
+  integer8 p1_aotidkrothfrdactshrdsrcagencycntev;
+  string p1_aotidkrothfrdactshrdnewsrcagencydescev;
+  integer8 p9_aotaddrkractshrdsrcagencycntev;
+  string p9_aotaddrkractshrdnewsrcagencydescev;
+  integer8 p15_aotssnkractshrdsrcagencycntev;
+  string p15_aotssnkractshrdnewsrcagencydescev;
+  integer8 p16_aotphnkractshrdsrcagencycntev;
+  string p16_aotphnkractshrdnewsrcagencydescev;
+  integer8 p17_aotemailkractshrdsrcagencycntev;
+  string p17_aotemailkractshrdnewsrcagencydescev;
+  integer8 p18_aotipaddrkractshrdsrcagencycntev;
+  string p18_aotipaddrkractshrdnewsrcagencydescev;
+  integer8 p19_aotbnkacctkractshrdsrcagencycntev;
+  string p19_aotbnkacctkractshrdnewsrcagencydescev;
+  integer8 p20_aotdlkractshrdsrcagencycntev;
+  string p20_aotdlkractshrdnewsrcagencydescev;
+  string t18_ipaddrgeoloclat;
+  string t18_ipaddrgeoloclong;
+  string t_srcagencydesc;
+  string agencydesc;
+  string t_srcagencyprogdesc;
+  string t_srcagencyprogjurst;
   string t_addrstatusdesc;
   string t_bnkacctstatusdesc;
   string t_dlstatusdesc;
@@ -1450,7 +1480,7 @@ EXPORT Drivers_Batch := MODULE
   unsigned8 iscurrent;
   unsigned8 ishistorical;
  END;
- 
+
  EXPORT EntityRules	:=	RECORD
   unsigned8 customerid;
   unsigned8 industrytype;

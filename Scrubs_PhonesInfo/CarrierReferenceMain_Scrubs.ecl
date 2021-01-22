@@ -3,10 +3,10 @@ IMPORT Scrubs; // Import modules for FieldTypes attribute definitions
 EXPORT CarrierReferenceMain_Scrubs := MODULE
  
 // The module to handle the case where no scrubs exist
-  EXPORT NumRules := 34;
-  EXPORT NumRulesFromFieldType := 34;
+  EXPORT NumRules := 35;
+  EXPORT NumRulesFromFieldType := 35;
   EXPORT NumRulesFromRecordType := 0;
-  EXPORT NumFieldsWithRules := 32;
+  EXPORT NumFieldsWithRules := 31;
   EXPORT NumFieldsWithPossibleEdits := 0;
   EXPORT NumRulesWithPossibleEdits := 0;
   EXPORT Expanded_Layout := RECORD(CarrierReferenceMain_Layout_PhonesInfo)
@@ -16,7 +16,6 @@ EXPORT CarrierReferenceMain_Scrubs := MODULE
     UNSIGNED1 dt_end_Invalid;
     UNSIGNED1 ocn_Invalid;
     UNSIGNED1 carrier_name_Invalid;
-    UNSIGNED1 name_Invalid;
     UNSIGNED1 serv_Invalid;
     UNSIGNED1 line_Invalid;
     UNSIGNED1 prepaid_Invalid;
@@ -54,14 +53,13 @@ EXPORT CarrierReferenceMain_Scrubs := MODULE
           ,'dt_last_reported:Invalid_Date:CUSTOM'
           ,'dt_start:Invalid_Date:CUSTOM'
           ,'dt_end:Invalid_Date:CUSTOM'
-          ,'ocn:Invalid_Ocn_Name:ALLOW'
+          ,'ocn:Invalid_Ocn_Name:ALLOW','ocn:Invalid_Ocn_Name:LENGTHS'
           ,'carrier_name:Invalid_NotBlank:LENGTHS'
-          ,'name:Invalid_Ocn_Name:ALLOW'
           ,'serv:Invalid_Type:ALLOW','serv:Invalid_Type:LENGTHS'
           ,'line:Invalid_Type:ALLOW','line:Invalid_Type:LENGTHS'
           ,'prepaid:Invalid_Flag:ALLOW'
           ,'high_risk_indicator:Invalid_Flag:ALLOW'
-          ,'spid:Invalid_Ocn_Name:ALLOW'
+          ,'spid:Invalid_Ocn_Name:ALLOW','spid:Invalid_Ocn_Name:LENGTHS'
           ,'operator_full_name:Invalid_NotBlank:LENGTHS'
           ,'override_file:Invalid_Alpha:ALLOW'
           ,'data_type:Invalid_Alpha:ALLOW'
@@ -94,14 +92,13 @@ EXPORT CarrierReferenceMain_Scrubs := MODULE
           ,CarrierReferenceMain_Fields.InvalidMessage_dt_last_reported(1)
           ,CarrierReferenceMain_Fields.InvalidMessage_dt_start(1)
           ,CarrierReferenceMain_Fields.InvalidMessage_dt_end(1)
-          ,CarrierReferenceMain_Fields.InvalidMessage_ocn(1)
+          ,CarrierReferenceMain_Fields.InvalidMessage_ocn(1),CarrierReferenceMain_Fields.InvalidMessage_ocn(2)
           ,CarrierReferenceMain_Fields.InvalidMessage_carrier_name(1)
-          ,CarrierReferenceMain_Fields.InvalidMessage_name(1)
           ,CarrierReferenceMain_Fields.InvalidMessage_serv(1),CarrierReferenceMain_Fields.InvalidMessage_serv(2)
           ,CarrierReferenceMain_Fields.InvalidMessage_line(1),CarrierReferenceMain_Fields.InvalidMessage_line(2)
           ,CarrierReferenceMain_Fields.InvalidMessage_prepaid(1)
           ,CarrierReferenceMain_Fields.InvalidMessage_high_risk_indicator(1)
-          ,CarrierReferenceMain_Fields.InvalidMessage_spid(1)
+          ,CarrierReferenceMain_Fields.InvalidMessage_spid(1),CarrierReferenceMain_Fields.InvalidMessage_spid(2)
           ,CarrierReferenceMain_Fields.InvalidMessage_operator_full_name(1)
           ,CarrierReferenceMain_Fields.InvalidMessage_override_file(1)
           ,CarrierReferenceMain_Fields.InvalidMessage_data_type(1)
@@ -137,7 +134,6 @@ EXPORT FromNone(DATASET(CarrierReferenceMain_Layout_PhonesInfo) h) := MODULE
     SELF.dt_end_Invalid := CarrierReferenceMain_Fields.InValid_dt_end((SALT311.StrType)le.dt_end);
     SELF.ocn_Invalid := CarrierReferenceMain_Fields.InValid_ocn((SALT311.StrType)le.ocn);
     SELF.carrier_name_Invalid := CarrierReferenceMain_Fields.InValid_carrier_name((SALT311.StrType)le.carrier_name);
-    SELF.name_Invalid := CarrierReferenceMain_Fields.InValid_name((SALT311.StrType)le.name);
     SELF.serv_Invalid := CarrierReferenceMain_Fields.InValid_serv((SALT311.StrType)le.serv);
     SELF.line_Invalid := CarrierReferenceMain_Fields.InValid_line((SALT311.StrType)le.line);
     SELF.prepaid_Invalid := CarrierReferenceMain_Fields.InValid_prepaid((SALT311.StrType)le.prepaid);
@@ -168,7 +164,7 @@ EXPORT FromNone(DATASET(CarrierReferenceMain_Layout_PhonesInfo) h) := MODULE
   EXPORT ExpandedInfile := PROJECT(h,toExpanded(LEFT,FALSE));
   EXPORT ProcessedInfile := PROJECT(PROJECT(h,toExpanded(LEFT,TRUE)),CarrierReferenceMain_Layout_PhonesInfo);
   Bitmap_Layout Into(ExpandedInfile le) := TRANSFORM
-    SELF.ScrubsBits1 := ( le.dt_first_reported_Invalid << 0 ) + ( le.dt_last_reported_Invalid << 1 ) + ( le.dt_start_Invalid << 2 ) + ( le.dt_end_Invalid << 3 ) + ( le.ocn_Invalid << 4 ) + ( le.carrier_name_Invalid << 5 ) + ( le.name_Invalid << 6 ) + ( le.serv_Invalid << 7 ) + ( le.line_Invalid << 9 ) + ( le.prepaid_Invalid << 11 ) + ( le.high_risk_indicator_Invalid << 12 ) + ( le.spid_Invalid << 13 ) + ( le.operator_full_name_Invalid << 14 ) + ( le.override_file_Invalid << 15 ) + ( le.data_type_Invalid << 16 ) + ( le.ocn_state_Invalid << 17 ) + ( le.overall_ocn_Invalid << 18 ) + ( le.target_ocn_Invalid << 19 ) + ( le.overall_target_ocn_Invalid << 20 ) + ( le.rural_lec_indicator_Invalid << 21 ) + ( le.small_ilec_indicator_Invalid << 22 ) + ( le.category_Invalid << 23 ) + ( le.carrier_city_Invalid << 24 ) + ( le.carrier_state_Invalid << 25 ) + ( le.carrier_zip_Invalid << 26 ) + ( le.carrier_phone_Invalid << 27 ) + ( le.contact_city_Invalid << 28 ) + ( le.contact_state_Invalid << 29 ) + ( le.contact_zip_Invalid << 30 ) + ( le.contact_phone_Invalid << 31 ) + ( le.contact_fax_Invalid << 32 ) + ( le.contact_email_Invalid << 33 );
+    SELF.ScrubsBits1 := ( le.dt_first_reported_Invalid << 0 ) + ( le.dt_last_reported_Invalid << 1 ) + ( le.dt_start_Invalid << 2 ) + ( le.dt_end_Invalid << 3 ) + ( le.ocn_Invalid << 4 ) + ( le.carrier_name_Invalid << 6 ) + ( le.serv_Invalid << 7 ) + ( le.line_Invalid << 9 ) + ( le.prepaid_Invalid << 11 ) + ( le.high_risk_indicator_Invalid << 12 ) + ( le.spid_Invalid << 13 ) + ( le.operator_full_name_Invalid << 15 ) + ( le.override_file_Invalid << 16 ) + ( le.data_type_Invalid << 17 ) + ( le.ocn_state_Invalid << 18 ) + ( le.overall_ocn_Invalid << 19 ) + ( le.target_ocn_Invalid << 20 ) + ( le.overall_target_ocn_Invalid << 21 ) + ( le.rural_lec_indicator_Invalid << 22 ) + ( le.small_ilec_indicator_Invalid << 23 ) + ( le.category_Invalid << 24 ) + ( le.carrier_city_Invalid << 25 ) + ( le.carrier_state_Invalid << 26 ) + ( le.carrier_zip_Invalid << 27 ) + ( le.carrier_phone_Invalid << 28 ) + ( le.contact_city_Invalid << 29 ) + ( le.contact_state_Invalid << 30 ) + ( le.contact_zip_Invalid << 31 ) + ( le.contact_phone_Invalid << 32 ) + ( le.contact_fax_Invalid << 33 ) + ( le.contact_email_Invalid << 34 );
     SELF := le;
   END;
   EXPORT BitmapInfile := PROJECT(ExpandedInfile,Into(LEFT));
@@ -194,34 +190,33 @@ EXPORT FromBits(DATASET(Bitmap_Layout) h) := MODULE
     SELF.dt_last_reported_Invalid := (le.ScrubsBits1 >> 1) & 1;
     SELF.dt_start_Invalid := (le.ScrubsBits1 >> 2) & 1;
     SELF.dt_end_Invalid := (le.ScrubsBits1 >> 3) & 1;
-    SELF.ocn_Invalid := (le.ScrubsBits1 >> 4) & 1;
-    SELF.carrier_name_Invalid := (le.ScrubsBits1 >> 5) & 1;
-    SELF.name_Invalid := (le.ScrubsBits1 >> 6) & 1;
+    SELF.ocn_Invalid := (le.ScrubsBits1 >> 4) & 3;
+    SELF.carrier_name_Invalid := (le.ScrubsBits1 >> 6) & 1;
     SELF.serv_Invalid := (le.ScrubsBits1 >> 7) & 3;
     SELF.line_Invalid := (le.ScrubsBits1 >> 9) & 3;
     SELF.prepaid_Invalid := (le.ScrubsBits1 >> 11) & 1;
     SELF.high_risk_indicator_Invalid := (le.ScrubsBits1 >> 12) & 1;
-    SELF.spid_Invalid := (le.ScrubsBits1 >> 13) & 1;
-    SELF.operator_full_name_Invalid := (le.ScrubsBits1 >> 14) & 1;
-    SELF.override_file_Invalid := (le.ScrubsBits1 >> 15) & 1;
-    SELF.data_type_Invalid := (le.ScrubsBits1 >> 16) & 1;
-    SELF.ocn_state_Invalid := (le.ScrubsBits1 >> 17) & 1;
-    SELF.overall_ocn_Invalid := (le.ScrubsBits1 >> 18) & 1;
-    SELF.target_ocn_Invalid := (le.ScrubsBits1 >> 19) & 1;
-    SELF.overall_target_ocn_Invalid := (le.ScrubsBits1 >> 20) & 1;
-    SELF.rural_lec_indicator_Invalid := (le.ScrubsBits1 >> 21) & 1;
-    SELF.small_ilec_indicator_Invalid := (le.ScrubsBits1 >> 22) & 1;
-    SELF.category_Invalid := (le.ScrubsBits1 >> 23) & 1;
-    SELF.carrier_city_Invalid := (le.ScrubsBits1 >> 24) & 1;
-    SELF.carrier_state_Invalid := (le.ScrubsBits1 >> 25) & 1;
-    SELF.carrier_zip_Invalid := (le.ScrubsBits1 >> 26) & 1;
-    SELF.carrier_phone_Invalid := (le.ScrubsBits1 >> 27) & 1;
-    SELF.contact_city_Invalid := (le.ScrubsBits1 >> 28) & 1;
-    SELF.contact_state_Invalid := (le.ScrubsBits1 >> 29) & 1;
-    SELF.contact_zip_Invalid := (le.ScrubsBits1 >> 30) & 1;
-    SELF.contact_phone_Invalid := (le.ScrubsBits1 >> 31) & 1;
-    SELF.contact_fax_Invalid := (le.ScrubsBits1 >> 32) & 1;
-    SELF.contact_email_Invalid := (le.ScrubsBits1 >> 33) & 1;
+    SELF.spid_Invalid := (le.ScrubsBits1 >> 13) & 3;
+    SELF.operator_full_name_Invalid := (le.ScrubsBits1 >> 15) & 1;
+    SELF.override_file_Invalid := (le.ScrubsBits1 >> 16) & 1;
+    SELF.data_type_Invalid := (le.ScrubsBits1 >> 17) & 1;
+    SELF.ocn_state_Invalid := (le.ScrubsBits1 >> 18) & 1;
+    SELF.overall_ocn_Invalid := (le.ScrubsBits1 >> 19) & 1;
+    SELF.target_ocn_Invalid := (le.ScrubsBits1 >> 20) & 1;
+    SELF.overall_target_ocn_Invalid := (le.ScrubsBits1 >> 21) & 1;
+    SELF.rural_lec_indicator_Invalid := (le.ScrubsBits1 >> 22) & 1;
+    SELF.small_ilec_indicator_Invalid := (le.ScrubsBits1 >> 23) & 1;
+    SELF.category_Invalid := (le.ScrubsBits1 >> 24) & 1;
+    SELF.carrier_city_Invalid := (le.ScrubsBits1 >> 25) & 1;
+    SELF.carrier_state_Invalid := (le.ScrubsBits1 >> 26) & 1;
+    SELF.carrier_zip_Invalid := (le.ScrubsBits1 >> 27) & 1;
+    SELF.carrier_phone_Invalid := (le.ScrubsBits1 >> 28) & 1;
+    SELF.contact_city_Invalid := (le.ScrubsBits1 >> 29) & 1;
+    SELF.contact_state_Invalid := (le.ScrubsBits1 >> 30) & 1;
+    SELF.contact_zip_Invalid := (le.ScrubsBits1 >> 31) & 1;
+    SELF.contact_phone_Invalid := (le.ScrubsBits1 >> 32) & 1;
+    SELF.contact_fax_Invalid := (le.ScrubsBits1 >> 33) & 1;
+    SELF.contact_email_Invalid := (le.ScrubsBits1 >> 34) & 1;
     SELF := le;
   END;
   EXPORT ExpandedInfile := PROJECT(h,Into(LEFT));
@@ -235,8 +230,9 @@ EXPORT FromExpanded(DATASET(Expanded_Layout) h) := MODULE
     dt_start_CUSTOM_ErrorCount := COUNT(GROUP,h.dt_start_Invalid=1);
     dt_end_CUSTOM_ErrorCount := COUNT(GROUP,h.dt_end_Invalid=1);
     ocn_ALLOW_ErrorCount := COUNT(GROUP,h.ocn_Invalid=1);
+    ocn_LENGTHS_ErrorCount := COUNT(GROUP,h.ocn_Invalid=2);
+    ocn_Total_ErrorCount := COUNT(GROUP,h.ocn_Invalid>0);
     carrier_name_LENGTHS_ErrorCount := COUNT(GROUP,h.carrier_name_Invalid=1);
-    name_ALLOW_ErrorCount := COUNT(GROUP,h.name_Invalid=1);
     serv_ALLOW_ErrorCount := COUNT(GROUP,h.serv_Invalid=1);
     serv_LENGTHS_ErrorCount := COUNT(GROUP,h.serv_Invalid=2);
     serv_Total_ErrorCount := COUNT(GROUP,h.serv_Invalid>0);
@@ -246,6 +242,8 @@ EXPORT FromExpanded(DATASET(Expanded_Layout) h) := MODULE
     prepaid_ALLOW_ErrorCount := COUNT(GROUP,h.prepaid_Invalid=1);
     high_risk_indicator_ALLOW_ErrorCount := COUNT(GROUP,h.high_risk_indicator_Invalid=1);
     spid_ALLOW_ErrorCount := COUNT(GROUP,h.spid_Invalid=1);
+    spid_LENGTHS_ErrorCount := COUNT(GROUP,h.spid_Invalid=2);
+    spid_Total_ErrorCount := COUNT(GROUP,h.spid_Invalid>0);
     operator_full_name_LENGTHS_ErrorCount := COUNT(GROUP,h.operator_full_name_Invalid=1);
     override_file_ALLOW_ErrorCount := COUNT(GROUP,h.override_file_Invalid=1);
     data_type_ALLOW_ErrorCount := COUNT(GROUP,h.data_type_Invalid=1);
@@ -266,7 +264,7 @@ EXPORT FromExpanded(DATASET(Expanded_Layout) h) := MODULE
     contact_phone_ALLOW_ErrorCount := COUNT(GROUP,h.contact_phone_Invalid=1);
     contact_fax_ALLOW_ErrorCount := COUNT(GROUP,h.contact_fax_Invalid=1);
     contact_email_ALLOW_ErrorCount := COUNT(GROUP,h.contact_email_Invalid=1);
-    AnyRule_WithErrorsCount := COUNT(GROUP, h.dt_first_reported_Invalid > 0 OR h.dt_last_reported_Invalid > 0 OR h.dt_start_Invalid > 0 OR h.dt_end_Invalid > 0 OR h.ocn_Invalid > 0 OR h.carrier_name_Invalid > 0 OR h.name_Invalid > 0 OR h.serv_Invalid > 0 OR h.line_Invalid > 0 OR h.prepaid_Invalid > 0 OR h.high_risk_indicator_Invalid > 0 OR h.spid_Invalid > 0 OR h.operator_full_name_Invalid > 0 OR h.override_file_Invalid > 0 OR h.data_type_Invalid > 0 OR h.ocn_state_Invalid > 0 OR h.overall_ocn_Invalid > 0 OR h.target_ocn_Invalid > 0 OR h.overall_target_ocn_Invalid > 0 OR h.rural_lec_indicator_Invalid > 0 OR h.small_ilec_indicator_Invalid > 0 OR h.category_Invalid > 0 OR h.carrier_city_Invalid > 0 OR h.carrier_state_Invalid > 0 OR h.carrier_zip_Invalid > 0 OR h.carrier_phone_Invalid > 0 OR h.contact_city_Invalid > 0 OR h.contact_state_Invalid > 0 OR h.contact_zip_Invalid > 0 OR h.contact_phone_Invalid > 0 OR h.contact_fax_Invalid > 0 OR h.contact_email_Invalid > 0);
+    AnyRule_WithErrorsCount := COUNT(GROUP, h.dt_first_reported_Invalid > 0 OR h.dt_last_reported_Invalid > 0 OR h.dt_start_Invalid > 0 OR h.dt_end_Invalid > 0 OR h.ocn_Invalid > 0 OR h.carrier_name_Invalid > 0 OR h.serv_Invalid > 0 OR h.line_Invalid > 0 OR h.prepaid_Invalid > 0 OR h.high_risk_indicator_Invalid > 0 OR h.spid_Invalid > 0 OR h.operator_full_name_Invalid > 0 OR h.override_file_Invalid > 0 OR h.data_type_Invalid > 0 OR h.ocn_state_Invalid > 0 OR h.overall_ocn_Invalid > 0 OR h.target_ocn_Invalid > 0 OR h.overall_target_ocn_Invalid > 0 OR h.rural_lec_indicator_Invalid > 0 OR h.small_ilec_indicator_Invalid > 0 OR h.category_Invalid > 0 OR h.carrier_city_Invalid > 0 OR h.carrier_state_Invalid > 0 OR h.carrier_zip_Invalid > 0 OR h.carrier_phone_Invalid > 0 OR h.contact_city_Invalid > 0 OR h.contact_state_Invalid > 0 OR h.contact_zip_Invalid > 0 OR h.contact_phone_Invalid > 0 OR h.contact_fax_Invalid > 0 OR h.contact_email_Invalid > 0);
     FieldsChecked_WithErrors := 0;
     FieldsChecked_NoErrors := 0;
     Rules_WithErrors := 0;
@@ -274,9 +272,9 @@ EXPORT FromExpanded(DATASET(Expanded_Layout) h) := MODULE
   END;
   SummaryStats0 := TABLE(h,r);
   SummaryStats0 xAddErrSummary(SummaryStats0 le) := TRANSFORM
-    SELF.FieldsChecked_WithErrors := IF(le.dt_first_reported_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.dt_last_reported_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.dt_start_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.dt_end_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.ocn_ALLOW_ErrorCount > 0, 1, 0) + IF(le.carrier_name_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.name_ALLOW_ErrorCount > 0, 1, 0) + IF(le.serv_Total_ErrorCount > 0, 1, 0) + IF(le.line_Total_ErrorCount > 0, 1, 0) + IF(le.prepaid_ALLOW_ErrorCount > 0, 1, 0) + IF(le.high_risk_indicator_ALLOW_ErrorCount > 0, 1, 0) + IF(le.spid_ALLOW_ErrorCount > 0, 1, 0) + IF(le.operator_full_name_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.override_file_ALLOW_ErrorCount > 0, 1, 0) + IF(le.data_type_ALLOW_ErrorCount > 0, 1, 0) + IF(le.ocn_state_ALLOW_ErrorCount > 0, 1, 0) + IF(le.overall_ocn_ALLOW_ErrorCount > 0, 1, 0) + IF(le.target_ocn_ALLOW_ErrorCount > 0, 1, 0) + IF(le.overall_target_ocn_ALLOW_ErrorCount > 0, 1, 0) + IF(le.rural_lec_indicator_ALLOW_ErrorCount > 0, 1, 0) + IF(le.small_ilec_indicator_ALLOW_ErrorCount > 0, 1, 0) + IF(le.category_ALLOW_ErrorCount > 0, 1, 0) + IF(le.carrier_city_ALLOW_ErrorCount > 0, 1, 0) + IF(le.carrier_state_ALLOW_ErrorCount > 0, 1, 0) + IF(le.carrier_zip_ALLOW_ErrorCount > 0, 1, 0) + IF(le.carrier_phone_ALLOW_ErrorCount > 0, 1, 0) + IF(le.contact_city_ALLOW_ErrorCount > 0, 1, 0) + IF(le.contact_state_ALLOW_ErrorCount > 0, 1, 0) + IF(le.contact_zip_ALLOW_ErrorCount > 0, 1, 0) + IF(le.contact_phone_ALLOW_ErrorCount > 0, 1, 0) + IF(le.contact_fax_ALLOW_ErrorCount > 0, 1, 0) + IF(le.contact_email_ALLOW_ErrorCount > 0, 1, 0);
+    SELF.FieldsChecked_WithErrors := IF(le.dt_first_reported_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.dt_last_reported_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.dt_start_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.dt_end_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.ocn_Total_ErrorCount > 0, 1, 0) + IF(le.carrier_name_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.serv_Total_ErrorCount > 0, 1, 0) + IF(le.line_Total_ErrorCount > 0, 1, 0) + IF(le.prepaid_ALLOW_ErrorCount > 0, 1, 0) + IF(le.high_risk_indicator_ALLOW_ErrorCount > 0, 1, 0) + IF(le.spid_Total_ErrorCount > 0, 1, 0) + IF(le.operator_full_name_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.override_file_ALLOW_ErrorCount > 0, 1, 0) + IF(le.data_type_ALLOW_ErrorCount > 0, 1, 0) + IF(le.ocn_state_ALLOW_ErrorCount > 0, 1, 0) + IF(le.overall_ocn_ALLOW_ErrorCount > 0, 1, 0) + IF(le.target_ocn_ALLOW_ErrorCount > 0, 1, 0) + IF(le.overall_target_ocn_ALLOW_ErrorCount > 0, 1, 0) + IF(le.rural_lec_indicator_ALLOW_ErrorCount > 0, 1, 0) + IF(le.small_ilec_indicator_ALLOW_ErrorCount > 0, 1, 0) + IF(le.category_ALLOW_ErrorCount > 0, 1, 0) + IF(le.carrier_city_ALLOW_ErrorCount > 0, 1, 0) + IF(le.carrier_state_ALLOW_ErrorCount > 0, 1, 0) + IF(le.carrier_zip_ALLOW_ErrorCount > 0, 1, 0) + IF(le.carrier_phone_ALLOW_ErrorCount > 0, 1, 0) + IF(le.contact_city_ALLOW_ErrorCount > 0, 1, 0) + IF(le.contact_state_ALLOW_ErrorCount > 0, 1, 0) + IF(le.contact_zip_ALLOW_ErrorCount > 0, 1, 0) + IF(le.contact_phone_ALLOW_ErrorCount > 0, 1, 0) + IF(le.contact_fax_ALLOW_ErrorCount > 0, 1, 0) + IF(le.contact_email_ALLOW_ErrorCount > 0, 1, 0);
     SELF.FieldsChecked_NoErrors := NumFieldsWithRules - SELF.FieldsChecked_WithErrors;
-    SELF.Rules_WithErrors := IF(le.dt_first_reported_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.dt_last_reported_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.dt_start_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.dt_end_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.ocn_ALLOW_ErrorCount > 0, 1, 0) + IF(le.carrier_name_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.name_ALLOW_ErrorCount > 0, 1, 0) + IF(le.serv_ALLOW_ErrorCount > 0, 1, 0) + IF(le.serv_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.line_ALLOW_ErrorCount > 0, 1, 0) + IF(le.line_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.prepaid_ALLOW_ErrorCount > 0, 1, 0) + IF(le.high_risk_indicator_ALLOW_ErrorCount > 0, 1, 0) + IF(le.spid_ALLOW_ErrorCount > 0, 1, 0) + IF(le.operator_full_name_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.override_file_ALLOW_ErrorCount > 0, 1, 0) + IF(le.data_type_ALLOW_ErrorCount > 0, 1, 0) + IF(le.ocn_state_ALLOW_ErrorCount > 0, 1, 0) + IF(le.overall_ocn_ALLOW_ErrorCount > 0, 1, 0) + IF(le.target_ocn_ALLOW_ErrorCount > 0, 1, 0) + IF(le.overall_target_ocn_ALLOW_ErrorCount > 0, 1, 0) + IF(le.rural_lec_indicator_ALLOW_ErrorCount > 0, 1, 0) + IF(le.small_ilec_indicator_ALLOW_ErrorCount > 0, 1, 0) + IF(le.category_ALLOW_ErrorCount > 0, 1, 0) + IF(le.carrier_city_ALLOW_ErrorCount > 0, 1, 0) + IF(le.carrier_state_ALLOW_ErrorCount > 0, 1, 0) + IF(le.carrier_zip_ALLOW_ErrorCount > 0, 1, 0) + IF(le.carrier_phone_ALLOW_ErrorCount > 0, 1, 0) + IF(le.contact_city_ALLOW_ErrorCount > 0, 1, 0) + IF(le.contact_state_ALLOW_ErrorCount > 0, 1, 0) + IF(le.contact_zip_ALLOW_ErrorCount > 0, 1, 0) + IF(le.contact_phone_ALLOW_ErrorCount > 0, 1, 0) + IF(le.contact_fax_ALLOW_ErrorCount > 0, 1, 0) + IF(le.contact_email_ALLOW_ErrorCount > 0, 1, 0);
+    SELF.Rules_WithErrors := IF(le.dt_first_reported_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.dt_last_reported_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.dt_start_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.dt_end_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.ocn_ALLOW_ErrorCount > 0, 1, 0) + IF(le.ocn_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.carrier_name_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.serv_ALLOW_ErrorCount > 0, 1, 0) + IF(le.serv_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.line_ALLOW_ErrorCount > 0, 1, 0) + IF(le.line_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.prepaid_ALLOW_ErrorCount > 0, 1, 0) + IF(le.high_risk_indicator_ALLOW_ErrorCount > 0, 1, 0) + IF(le.spid_ALLOW_ErrorCount > 0, 1, 0) + IF(le.spid_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.operator_full_name_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.override_file_ALLOW_ErrorCount > 0, 1, 0) + IF(le.data_type_ALLOW_ErrorCount > 0, 1, 0) + IF(le.ocn_state_ALLOW_ErrorCount > 0, 1, 0) + IF(le.overall_ocn_ALLOW_ErrorCount > 0, 1, 0) + IF(le.target_ocn_ALLOW_ErrorCount > 0, 1, 0) + IF(le.overall_target_ocn_ALLOW_ErrorCount > 0, 1, 0) + IF(le.rural_lec_indicator_ALLOW_ErrorCount > 0, 1, 0) + IF(le.small_ilec_indicator_ALLOW_ErrorCount > 0, 1, 0) + IF(le.category_ALLOW_ErrorCount > 0, 1, 0) + IF(le.carrier_city_ALLOW_ErrorCount > 0, 1, 0) + IF(le.carrier_state_ALLOW_ErrorCount > 0, 1, 0) + IF(le.carrier_zip_ALLOW_ErrorCount > 0, 1, 0) + IF(le.carrier_phone_ALLOW_ErrorCount > 0, 1, 0) + IF(le.contact_city_ALLOW_ErrorCount > 0, 1, 0) + IF(le.contact_state_ALLOW_ErrorCount > 0, 1, 0) + IF(le.contact_zip_ALLOW_ErrorCount > 0, 1, 0) + IF(le.contact_phone_ALLOW_ErrorCount > 0, 1, 0) + IF(le.contact_fax_ALLOW_ErrorCount > 0, 1, 0) + IF(le.contact_email_ALLOW_ErrorCount > 0, 1, 0);
     SELF.Rules_NoErrors := NumRules - SELF.Rules_WithErrors;
     SELF := le;
   END;
@@ -291,21 +289,20 @@ EXPORT FromExpanded(DATASET(Expanded_Layout) h) := MODULE
   END;
   r into(h le,UNSIGNED c) := TRANSFORM
     SELF.Src :=  ''; // Source not provided
-    UNSIGNED1 ErrNum := CHOOSE(c,le.dt_first_reported_Invalid,le.dt_last_reported_Invalid,le.dt_start_Invalid,le.dt_end_Invalid,le.ocn_Invalid,le.carrier_name_Invalid,le.name_Invalid,le.serv_Invalid,le.line_Invalid,le.prepaid_Invalid,le.high_risk_indicator_Invalid,le.spid_Invalid,le.operator_full_name_Invalid,le.override_file_Invalid,le.data_type_Invalid,le.ocn_state_Invalid,le.overall_ocn_Invalid,le.target_ocn_Invalid,le.overall_target_ocn_Invalid,le.rural_lec_indicator_Invalid,le.small_ilec_indicator_Invalid,le.category_Invalid,le.carrier_city_Invalid,le.carrier_state_Invalid,le.carrier_zip_Invalid,le.carrier_phone_Invalid,le.contact_city_Invalid,le.contact_state_Invalid,le.contact_zip_Invalid,le.contact_phone_Invalid,le.contact_fax_Invalid,le.contact_email_Invalid,100);
-    SELF.ErrorMessage := IF ( ErrNum = 0, SKIP, CHOOSE(c,CarrierReferenceMain_Fields.InvalidMessage_dt_first_reported(le.dt_first_reported_Invalid),CarrierReferenceMain_Fields.InvalidMessage_dt_last_reported(le.dt_last_reported_Invalid),CarrierReferenceMain_Fields.InvalidMessage_dt_start(le.dt_start_Invalid),CarrierReferenceMain_Fields.InvalidMessage_dt_end(le.dt_end_Invalid),CarrierReferenceMain_Fields.InvalidMessage_ocn(le.ocn_Invalid),CarrierReferenceMain_Fields.InvalidMessage_carrier_name(le.carrier_name_Invalid),CarrierReferenceMain_Fields.InvalidMessage_name(le.name_Invalid),CarrierReferenceMain_Fields.InvalidMessage_serv(le.serv_Invalid),CarrierReferenceMain_Fields.InvalidMessage_line(le.line_Invalid),CarrierReferenceMain_Fields.InvalidMessage_prepaid(le.prepaid_Invalid),CarrierReferenceMain_Fields.InvalidMessage_high_risk_indicator(le.high_risk_indicator_Invalid),CarrierReferenceMain_Fields.InvalidMessage_spid(le.spid_Invalid),CarrierReferenceMain_Fields.InvalidMessage_operator_full_name(le.operator_full_name_Invalid),CarrierReferenceMain_Fields.InvalidMessage_override_file(le.override_file_Invalid),CarrierReferenceMain_Fields.InvalidMessage_data_type(le.data_type_Invalid),CarrierReferenceMain_Fields.InvalidMessage_ocn_state(le.ocn_state_Invalid),CarrierReferenceMain_Fields.InvalidMessage_overall_ocn(le.overall_ocn_Invalid),CarrierReferenceMain_Fields.InvalidMessage_target_ocn(le.target_ocn_Invalid),CarrierReferenceMain_Fields.InvalidMessage_overall_target_ocn(le.overall_target_ocn_Invalid),CarrierReferenceMain_Fields.InvalidMessage_rural_lec_indicator(le.rural_lec_indicator_Invalid),CarrierReferenceMain_Fields.InvalidMessage_small_ilec_indicator(le.small_ilec_indicator_Invalid),CarrierReferenceMain_Fields.InvalidMessage_category(le.category_Invalid),CarrierReferenceMain_Fields.InvalidMessage_carrier_city(le.carrier_city_Invalid),CarrierReferenceMain_Fields.InvalidMessage_carrier_state(le.carrier_state_Invalid),CarrierReferenceMain_Fields.InvalidMessage_carrier_zip(le.carrier_zip_Invalid),CarrierReferenceMain_Fields.InvalidMessage_carrier_phone(le.carrier_phone_Invalid),CarrierReferenceMain_Fields.InvalidMessage_contact_city(le.contact_city_Invalid),CarrierReferenceMain_Fields.InvalidMessage_contact_state(le.contact_state_Invalid),CarrierReferenceMain_Fields.InvalidMessage_contact_zip(le.contact_zip_Invalid),CarrierReferenceMain_Fields.InvalidMessage_contact_phone(le.contact_phone_Invalid),CarrierReferenceMain_Fields.InvalidMessage_contact_fax(le.contact_fax_Invalid),CarrierReferenceMain_Fields.InvalidMessage_contact_email(le.contact_email_Invalid),'UNKNOWN'));
+    UNSIGNED1 ErrNum := CHOOSE(c,le.dt_first_reported_Invalid,le.dt_last_reported_Invalid,le.dt_start_Invalid,le.dt_end_Invalid,le.ocn_Invalid,le.carrier_name_Invalid,le.serv_Invalid,le.line_Invalid,le.prepaid_Invalid,le.high_risk_indicator_Invalid,le.spid_Invalid,le.operator_full_name_Invalid,le.override_file_Invalid,le.data_type_Invalid,le.ocn_state_Invalid,le.overall_ocn_Invalid,le.target_ocn_Invalid,le.overall_target_ocn_Invalid,le.rural_lec_indicator_Invalid,le.small_ilec_indicator_Invalid,le.category_Invalid,le.carrier_city_Invalid,le.carrier_state_Invalid,le.carrier_zip_Invalid,le.carrier_phone_Invalid,le.contact_city_Invalid,le.contact_state_Invalid,le.contact_zip_Invalid,le.contact_phone_Invalid,le.contact_fax_Invalid,le.contact_email_Invalid,100);
+    SELF.ErrorMessage := IF ( ErrNum = 0, SKIP, CHOOSE(c,CarrierReferenceMain_Fields.InvalidMessage_dt_first_reported(le.dt_first_reported_Invalid),CarrierReferenceMain_Fields.InvalidMessage_dt_last_reported(le.dt_last_reported_Invalid),CarrierReferenceMain_Fields.InvalidMessage_dt_start(le.dt_start_Invalid),CarrierReferenceMain_Fields.InvalidMessage_dt_end(le.dt_end_Invalid),CarrierReferenceMain_Fields.InvalidMessage_ocn(le.ocn_Invalid),CarrierReferenceMain_Fields.InvalidMessage_carrier_name(le.carrier_name_Invalid),CarrierReferenceMain_Fields.InvalidMessage_serv(le.serv_Invalid),CarrierReferenceMain_Fields.InvalidMessage_line(le.line_Invalid),CarrierReferenceMain_Fields.InvalidMessage_prepaid(le.prepaid_Invalid),CarrierReferenceMain_Fields.InvalidMessage_high_risk_indicator(le.high_risk_indicator_Invalid),CarrierReferenceMain_Fields.InvalidMessage_spid(le.spid_Invalid),CarrierReferenceMain_Fields.InvalidMessage_operator_full_name(le.operator_full_name_Invalid),CarrierReferenceMain_Fields.InvalidMessage_override_file(le.override_file_Invalid),CarrierReferenceMain_Fields.InvalidMessage_data_type(le.data_type_Invalid),CarrierReferenceMain_Fields.InvalidMessage_ocn_state(le.ocn_state_Invalid),CarrierReferenceMain_Fields.InvalidMessage_overall_ocn(le.overall_ocn_Invalid),CarrierReferenceMain_Fields.InvalidMessage_target_ocn(le.target_ocn_Invalid),CarrierReferenceMain_Fields.InvalidMessage_overall_target_ocn(le.overall_target_ocn_Invalid),CarrierReferenceMain_Fields.InvalidMessage_rural_lec_indicator(le.rural_lec_indicator_Invalid),CarrierReferenceMain_Fields.InvalidMessage_small_ilec_indicator(le.small_ilec_indicator_Invalid),CarrierReferenceMain_Fields.InvalidMessage_category(le.category_Invalid),CarrierReferenceMain_Fields.InvalidMessage_carrier_city(le.carrier_city_Invalid),CarrierReferenceMain_Fields.InvalidMessage_carrier_state(le.carrier_state_Invalid),CarrierReferenceMain_Fields.InvalidMessage_carrier_zip(le.carrier_zip_Invalid),CarrierReferenceMain_Fields.InvalidMessage_carrier_phone(le.carrier_phone_Invalid),CarrierReferenceMain_Fields.InvalidMessage_contact_city(le.contact_city_Invalid),CarrierReferenceMain_Fields.InvalidMessage_contact_state(le.contact_state_Invalid),CarrierReferenceMain_Fields.InvalidMessage_contact_zip(le.contact_zip_Invalid),CarrierReferenceMain_Fields.InvalidMessage_contact_phone(le.contact_phone_Invalid),CarrierReferenceMain_Fields.InvalidMessage_contact_fax(le.contact_fax_Invalid),CarrierReferenceMain_Fields.InvalidMessage_contact_email(le.contact_email_Invalid),'UNKNOWN'));
     SELF.ErrorType := IF ( ErrNum = 0, SKIP, CHOOSE(c
           ,CHOOSE(le.dt_first_reported_Invalid,'CUSTOM','UNKNOWN')
           ,CHOOSE(le.dt_last_reported_Invalid,'CUSTOM','UNKNOWN')
           ,CHOOSE(le.dt_start_Invalid,'CUSTOM','UNKNOWN')
           ,CHOOSE(le.dt_end_Invalid,'CUSTOM','UNKNOWN')
-          ,CHOOSE(le.ocn_Invalid,'ALLOW','UNKNOWN')
+          ,CHOOSE(le.ocn_Invalid,'ALLOW','LENGTHS','UNKNOWN')
           ,CHOOSE(le.carrier_name_Invalid,'LENGTHS','UNKNOWN')
-          ,CHOOSE(le.name_Invalid,'ALLOW','UNKNOWN')
           ,CHOOSE(le.serv_Invalid,'ALLOW','LENGTHS','UNKNOWN')
           ,CHOOSE(le.line_Invalid,'ALLOW','LENGTHS','UNKNOWN')
           ,CHOOSE(le.prepaid_Invalid,'ALLOW','UNKNOWN')
           ,CHOOSE(le.high_risk_indicator_Invalid,'ALLOW','UNKNOWN')
-          ,CHOOSE(le.spid_Invalid,'ALLOW','UNKNOWN')
+          ,CHOOSE(le.spid_Invalid,'ALLOW','LENGTHS','UNKNOWN')
           ,CHOOSE(le.operator_full_name_Invalid,'LENGTHS','UNKNOWN')
           ,CHOOSE(le.override_file_Invalid,'ALLOW','UNKNOWN')
           ,CHOOSE(le.data_type_Invalid,'ALLOW','UNKNOWN')
@@ -326,11 +323,11 @@ EXPORT FromExpanded(DATASET(Expanded_Layout) h) := MODULE
           ,CHOOSE(le.contact_phone_Invalid,'ALLOW','UNKNOWN')
           ,CHOOSE(le.contact_fax_Invalid,'ALLOW','UNKNOWN')
           ,CHOOSE(le.contact_email_Invalid,'ALLOW','UNKNOWN'),'UNKNOWN'));
-    SELF.FieldName := CHOOSE(c,'dt_first_reported','dt_last_reported','dt_start','dt_end','ocn','carrier_name','name','serv','line','prepaid','high_risk_indicator','spid','operator_full_name','override_file','data_type','ocn_state','overall_ocn','target_ocn','overall_target_ocn','rural_lec_indicator','small_ilec_indicator','category','carrier_city','carrier_state','carrier_zip','carrier_phone','contact_city','contact_state','contact_zip','contact_phone','contact_fax','contact_email','UNKNOWN');
-    SELF.FieldType := CHOOSE(c,'Invalid_Date','Invalid_Date','Invalid_Date','Invalid_Date','Invalid_Ocn_Name','Invalid_NotBlank','Invalid_Ocn_Name','Invalid_Type','Invalid_Type','Invalid_Flag','Invalid_Flag','Invalid_Ocn_Name','Invalid_NotBlank','Invalid_Alpha','Invalid_Alpha','Invalid_Alpha','Invalid_AlphaNum','Invalid_AlphaNum','Invalid_AlphaNum','Invalid_Indicator','Invalid_Indicator','Invalid_Alpha','Invalid_Char','Invalid_Alpha','Invalid_AlphaNum','Invalid_Num','Invalid_Char','Invalid_Alpha','Invalid_AlphaNum','Invalid_Num','Invalid_Num','Invalid_Email','UNKNOWN');
-    SELF.FieldContents := CHOOSE(c,(SALT311.StrType)le.dt_first_reported,(SALT311.StrType)le.dt_last_reported,(SALT311.StrType)le.dt_start,(SALT311.StrType)le.dt_end,(SALT311.StrType)le.ocn,(SALT311.StrType)le.carrier_name,(SALT311.StrType)le.name,(SALT311.StrType)le.serv,(SALT311.StrType)le.line,(SALT311.StrType)le.prepaid,(SALT311.StrType)le.high_risk_indicator,(SALT311.StrType)le.spid,(SALT311.StrType)le.operator_full_name,(SALT311.StrType)le.override_file,(SALT311.StrType)le.data_type,(SALT311.StrType)le.ocn_state,(SALT311.StrType)le.overall_ocn,(SALT311.StrType)le.target_ocn,(SALT311.StrType)le.overall_target_ocn,(SALT311.StrType)le.rural_lec_indicator,(SALT311.StrType)le.small_ilec_indicator,(SALT311.StrType)le.category,(SALT311.StrType)le.carrier_city,(SALT311.StrType)le.carrier_state,(SALT311.StrType)le.carrier_zip,(SALT311.StrType)le.carrier_phone,(SALT311.StrType)le.contact_city,(SALT311.StrType)le.contact_state,(SALT311.StrType)le.contact_zip,(SALT311.StrType)le.contact_phone,(SALT311.StrType)le.contact_fax,(SALT311.StrType)le.contact_email,'***SALTBUG***');
+    SELF.FieldName := CHOOSE(c,'dt_first_reported','dt_last_reported','dt_start','dt_end','ocn','carrier_name','serv','line','prepaid','high_risk_indicator','spid','operator_full_name','override_file','data_type','ocn_state','overall_ocn','target_ocn','overall_target_ocn','rural_lec_indicator','small_ilec_indicator','category','carrier_city','carrier_state','carrier_zip','carrier_phone','contact_city','contact_state','contact_zip','contact_phone','contact_fax','contact_email','UNKNOWN');
+    SELF.FieldType := CHOOSE(c,'Invalid_Date','Invalid_Date','Invalid_Date','Invalid_Date','Invalid_Ocn_Name','Invalid_NotBlank','Invalid_Type','Invalid_Type','Invalid_Flag','Invalid_Flag','Invalid_Ocn_Name','Invalid_NotBlank','Invalid_Alpha','Invalid_Alpha','Invalid_Alpha','Invalid_AlphaNum','Invalid_AlphaNum','Invalid_AlphaNum','Invalid_Indicator','Invalid_Indicator','Invalid_Alpha','Invalid_Char','Invalid_Alpha','Invalid_AlphaNum','Invalid_Num','Invalid_Char','Invalid_Alpha','Invalid_AlphaNum','Invalid_Num','Invalid_Num','Invalid_Email','UNKNOWN');
+    SELF.FieldContents := CHOOSE(c,(SALT311.StrType)le.dt_first_reported,(SALT311.StrType)le.dt_last_reported,(SALT311.StrType)le.dt_start,(SALT311.StrType)le.dt_end,(SALT311.StrType)le.ocn,(SALT311.StrType)le.carrier_name,(SALT311.StrType)le.serv,(SALT311.StrType)le.line,(SALT311.StrType)le.prepaid,(SALT311.StrType)le.high_risk_indicator,(SALT311.StrType)le.spid,(SALT311.StrType)le.operator_full_name,(SALT311.StrType)le.override_file,(SALT311.StrType)le.data_type,(SALT311.StrType)le.ocn_state,(SALT311.StrType)le.overall_ocn,(SALT311.StrType)le.target_ocn,(SALT311.StrType)le.overall_target_ocn,(SALT311.StrType)le.rural_lec_indicator,(SALT311.StrType)le.small_ilec_indicator,(SALT311.StrType)le.category,(SALT311.StrType)le.carrier_city,(SALT311.StrType)le.carrier_state,(SALT311.StrType)le.carrier_zip,(SALT311.StrType)le.carrier_phone,(SALT311.StrType)le.contact_city,(SALT311.StrType)le.contact_state,(SALT311.StrType)le.contact_zip,(SALT311.StrType)le.contact_phone,(SALT311.StrType)le.contact_fax,(SALT311.StrType)le.contact_email,'***SALTBUG***');
   END;
-  EXPORT AllErrors := NORMALIZE(h,32,Into(LEFT,COUNTER));
+  EXPORT AllErrors := NORMALIZE(h,31,Into(LEFT,COUNTER));
    bv := TABLE(AllErrors,{FieldContents, FieldName, Cnt := COUNT(GROUP)},FieldContents, FieldName,MERGE);
   EXPORT BadValues := TOPN(bv,1000,-Cnt);
   // Particular form of stats required for Orbit
@@ -347,14 +344,13 @@ EXPORT FromExpanded(DATASET(Expanded_Layout) h) := MODULE
           ,le.dt_last_reported_CUSTOM_ErrorCount
           ,le.dt_start_CUSTOM_ErrorCount
           ,le.dt_end_CUSTOM_ErrorCount
-          ,le.ocn_ALLOW_ErrorCount
+          ,le.ocn_ALLOW_ErrorCount,le.ocn_LENGTHS_ErrorCount
           ,le.carrier_name_LENGTHS_ErrorCount
-          ,le.name_ALLOW_ErrorCount
           ,le.serv_ALLOW_ErrorCount,le.serv_LENGTHS_ErrorCount
           ,le.line_ALLOW_ErrorCount,le.line_LENGTHS_ErrorCount
           ,le.prepaid_ALLOW_ErrorCount
           ,le.high_risk_indicator_ALLOW_ErrorCount
-          ,le.spid_ALLOW_ErrorCount
+          ,le.spid_ALLOW_ErrorCount,le.spid_LENGTHS_ErrorCount
           ,le.operator_full_name_LENGTHS_ErrorCount
           ,le.override_file_ALLOW_ErrorCount
           ,le.data_type_ALLOW_ErrorCount
@@ -387,14 +383,13 @@ EXPORT FromExpanded(DATASET(Expanded_Layout) h) := MODULE
           ,le.dt_last_reported_CUSTOM_ErrorCount
           ,le.dt_start_CUSTOM_ErrorCount
           ,le.dt_end_CUSTOM_ErrorCount
-          ,le.ocn_ALLOW_ErrorCount
+          ,le.ocn_ALLOW_ErrorCount,le.ocn_LENGTHS_ErrorCount
           ,le.carrier_name_LENGTHS_ErrorCount
-          ,le.name_ALLOW_ErrorCount
           ,le.serv_ALLOW_ErrorCount,le.serv_LENGTHS_ErrorCount
           ,le.line_ALLOW_ErrorCount,le.line_LENGTHS_ErrorCount
           ,le.prepaid_ALLOW_ErrorCount
           ,le.high_risk_indicator_ALLOW_ErrorCount
-          ,le.spid_ALLOW_ErrorCount
+          ,le.spid_ALLOW_ErrorCount,le.spid_LENGTHS_ErrorCount
           ,le.operator_full_name_LENGTHS_ErrorCount
           ,le.override_file_ALLOW_ErrorCount
           ,le.data_type_ALLOW_ErrorCount
@@ -459,7 +454,6 @@ EXPORT FromExpanded(DATASET(Expanded_Layout) h) := MODULE
           ,'dt_end:' + getFieldTypeText(h.dt_end) + IF(TRIM(le.txt) > '', '_' + TRIM(le.txt), '') + ':' + suffix
           ,'ocn:' + getFieldTypeText(h.ocn) + IF(TRIM(le.txt) > '', '_' + TRIM(le.txt), '') + ':' + suffix
           ,'carrier_name:' + getFieldTypeText(h.carrier_name) + IF(TRIM(le.txt) > '', '_' + TRIM(le.txt), '') + ':' + suffix
-          ,'name:' + getFieldTypeText(h.name) + IF(TRIM(le.txt) > '', '_' + TRIM(le.txt), '') + ':' + suffix
           ,'serv:' + getFieldTypeText(h.serv) + IF(TRIM(le.txt) > '', '_' + TRIM(le.txt), '') + ':' + suffix
           ,'line:' + getFieldTypeText(h.line) + IF(TRIM(le.txt) > '', '_' + TRIM(le.txt), '') + ':' + suffix
           ,'prepaid:' + getFieldTypeText(h.prepaid) + IF(TRIM(le.txt) > '', '_' + TRIM(le.txt), '') + ':' + suffix
@@ -538,7 +532,6 @@ EXPORT FromExpanded(DATASET(Expanded_Layout) h) := MODULE
           ,le.populated_dt_end_cnt
           ,le.populated_ocn_cnt
           ,le.populated_carrier_name_cnt
-          ,le.populated_name_cnt
           ,le.populated_serv_cnt
           ,le.populated_line_cnt
           ,le.populated_prepaid_cnt
@@ -617,7 +610,6 @@ EXPORT FromExpanded(DATASET(Expanded_Layout) h) := MODULE
           ,le.populated_dt_end_pcnt
           ,le.populated_ocn_pcnt
           ,le.populated_carrier_name_pcnt
-          ,le.populated_name_pcnt
           ,le.populated_serv_pcnt
           ,le.populated_line_pcnt
           ,le.populated_prepaid_pcnt
@@ -691,7 +683,7 @@ EXPORT FromExpanded(DATASET(Expanded_Layout) h) := MODULE
           ,le.populated_privacy_indicator_pcnt,0);
       SELF.ErrorMessage := '';
     END;
-    FieldPopStats := NORMALIZE(hygiene_summaryStats,78,xNormHygieneStats(LEFT,COUNTER,'POP'));
+    FieldPopStats := NORMALIZE(hygiene_summaryStats,77,xNormHygieneStats(LEFT,COUNTER,'POP'));
  
   // record count stats
     SALT311.ScrubsOrbitLayout xTotalRecs(hygiene_summaryStats le, STRING inRuleDesc) := TRANSFORM
@@ -707,7 +699,7 @@ EXPORT FromExpanded(DATASET(Expanded_Layout) h) := MODULE
  
     mod_Delta := CarrierReferenceMain_Delta(prevDS, PROJECT(h, CarrierReferenceMain_Layout_PhonesInfo));
     deltaHygieneSummary := mod_Delta.DifferenceSummary;
-    DeltaFieldPopStats := NORMALIZE(deltaHygieneSummary(txt <> 'New'),78,xNormHygieneStats(LEFT,COUNTER,'DELTA'));
+    DeltaFieldPopStats := NORMALIZE(deltaHygieneSummary(txt <> 'New'),77,xNormHygieneStats(LEFT,COUNTER,'DELTA'));
     deltaStatName(STRING inTxt) := IF(STD.Str.Find(inTxt, 'Updates_') > 0,
                                       'Updates:count_Updates:DELTA',
                                       TRIM(inTxt) + ':count_' + TRIM(inTxt) + ':DELTA');

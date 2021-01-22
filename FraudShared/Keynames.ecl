@@ -29,23 +29,19 @@ module
 		export MbsFDNMasterID						:= tools.mod_FilenamesBuild(lTemplate('Gcid_2_MbsFDNMasterID'),pversion);
 		export MbsFDNMasterIDExcl				:= tools.mod_FilenamesBuild(lTemplate('MbsFDNMasterIDExclusion'),pversion);
 		export MbsFDNMasterIDIndTypIncl	:= tools.mod_FilenamesBuild(lTemplate('MbsFdnMasterIDIndTypeInclusion'),pversion);
-		export MbsVelocityRules					:= tools.mod_FilenamesBuild(lTemplate('MbsVelocityRules'),pversion);
 		export MbsFdnIndType						:= tools.mod_FilenamesBuild(lTemplate('MbsFdnIndType'),pversion);
-		export MbsDeltaBase							:= tools.mod_FilenamesBuild(lTemplate('MbsDeltaBase'),pversion);
 		export LinkIds									:= tools.mod_FilenamesBuild(lTemplate('LINKIDS'),pversion);
 		export DriversLicense						:= tools.mod_FilenamesBuild(lTemplate('DriversLicense'),pversion);
 		export BankAccount							:= tools.mod_FilenamesBuild(lTemplate('BankAccount'),pversion);
 		export CityState								:= tools.mod_FilenamesBuild(lTemplate('CityState'),pversion);
 		export Zip											:= tools.mod_FilenamesBuild(lTemplate('Zip'),pversion);
 		export CustomerID								:= tools.mod_FilenamesBuild(lTemplate('CustomerID'),pversion);
-		export County										:= tools.mod_FilenamesBuild(lTemplate('County'),pversion);
 		export ReportedDate							:= tools.mod_FilenamesBuild(lTemplate('ReportedDate'),pversion);
 		export SerialNumber							:= tools.mod_FilenamesBuild(lTemplate('SerialNumber'),pversion);
 		export MACAddress								:= tools.mod_FilenamesBuild(lTemplate('MACAddress'),pversion);
 		export Host											:= tools.mod_FilenamesBuild(lTemplate('Host'),pversion);
 		export User											:= tools.mod_FilenamesBuild(lTemplate('User'),pversion);
 		export HouseholdID							:= tools.mod_FilenamesBuild(lTemplate('HouseholdID'),pversion);
-		export CustomerProgram					:= tools.mod_FilenamesBuild(lTemplate('CustomerProgram'),pversion);
 		export AmountPaid								:= tools.mod_FilenamesBuild(lTemplate('AmountPaid'),pversion);
 		export BankRoutingNumber				:= tools.mod_FilenamesBuild(lTemplate('BankRoutingNumber'),pversion);
 		export BankName									:= tools.mod_FilenamesBuild(lTemplate('BankName'),pversion);
@@ -56,38 +52,34 @@ module
 		export dAll_filenames :=
 		    ID.dAll_filenames +
 			 	DID.dAll_filenames +
-				BDID.dAll_filenames +
+				If(Platform.Source <> 'FraudGov'  ,BDID.dAll_filenames) +
 				Email.dAll_filenames +
-				IP.dAll_filenames + 
-				ProfessionalID.dAll_filenames + 
+				If(Platform.Source <> 'FraudGov'  ,IP.dAll_filenames) + 
+				If(Platform.Source <> 'FraudGov'  ,ProfessionalID.dAll_filenames) + 
 				DeviceID.dAll_filenames + 
-				TIN.dAll_filenames + 
-				NPI.dAll_filenames + 
-				AppProviderID.dAll_filenames + 
-				LNPID.dAll_filenames + 
-				Mbs.dAll_filenames + 
+				If(Platform.Source <> 'FraudGov'  ,TIN.dAll_filenames) + 
+				If(Platform.Source <> 'FraudGov'  ,NPI.dAll_filenames) + 
+				If(Platform.Source <> 'FraudGov'  ,AppProviderID.dAll_filenames) + 
+				If(Platform.Source <> 'FraudGov'  ,LNPID.dAll_filenames) + 
+				If(Platform.Source <> 'FraudGov'  ,Mbs.dAll_filenames) + 
 				MbsIndTypeExclusion.dAll_filenames +
 				MbsProductInclude.dAll_filenames +
 				MbsFDNMasterID.dAll_filenames +
 				MbsFDNMasterIDExcl.dAll_filenames +
 				MbsFDNMasterIDIndTypIncl.dAll_filenames +
-				If(Platform.Source = 'FraudGov'  ,MbsVelocityRules.dAll_filenames) +
 				If(Platform.Source = 'FraudGov'  ,MbsFdnIndType.dAll_filenames) +
-				If(Platform.Source = 'FraudGov'  ,MbsDeltaBase.dAll_filenames) +				
 				DriversLicense.dAll_filenames +
 				BankAccount.dAll_filenames +
-				LinkIds.dAll_filenames +
+				If(Platform.Source <> 'FraudGov'  ,LinkIds.dAll_filenames) +
 				If(Platform.Source = 'FraudGov'  ,CityState.dAll_filenames) +
 				If(Platform.Source = 'FraudGov'  ,Zip.dAll_filenames) +
 				If(Platform.Source = 'FraudGov'  ,CustomerID.dAll_filenames) +
-				If(Platform.Source = 'FraudGov'  ,County.dAll_filenames) + 
 				If(Platform.Source = 'FraudGov'  ,ReportedDate.dAll_filenames) +
 				If(Platform.Source = 'FraudGov'  ,SerialNumber.dAll_filenames) +
 				If(Platform.Source = 'FraudGov'  ,MACAddress.dAll_filenames) + 
 				If(Platform.Source = 'FraudGov'  ,Host.dAll_filenames) + 
 				If(Platform.Source = 'FraudGov'  ,User.dAll_filenames) + 
 				If(Platform.Source = 'FraudGov'  ,HouseholdID.dAll_filenames) +
-				If(Platform.Source = 'FraudGov'  ,CustomerProgram.dAll_filenames) +
 				If(Platform.Source = 'FraudGov'  ,AmountPaid.dAll_filenames) +
 				If(Platform.Source = 'FraudGov'	 ,BankRoutingNumber.dAll_filenames) +
 				If(Platform.Source = 'FraudGov'	 ,BankName.dAll_filenames) +

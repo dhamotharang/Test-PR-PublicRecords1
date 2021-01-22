@@ -8,8 +8,8 @@
 //Step 4 after job finishes notify team that the OneMain is available on bctlpedata11
  
  NotifyListtemp := '';  //   add additional email addresses if needed, comma delimited similar ProfileBooster.Constants.ECL_Developers_Slim
- IPaddrTemp := '10.121.149.194';  //dev bctlpedata12 use this one for now
- // IPaddrTemp := '10.121.149.193';  //prod  bctlpedata11 
+ // IPaddrTemp := '10.121.149.194';  //dev bctlpedata12 
+ IPaddrTemp := '10.121.149.193';  //prod  bctlpedata11 use this one for now
 
 
 AbsolutePathtemp := '/data/Builds/builds/OneMain/data';  

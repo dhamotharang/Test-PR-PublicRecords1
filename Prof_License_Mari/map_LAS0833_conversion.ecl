@@ -89,6 +89,8 @@ EXPORT map_LAS0833_conversion(STRING pVersion) := FUNCTION
 																 tempRawType='APPRAISER TRAINEE' => 'TA',
 																 tempRawType='CERTIFIED GENERAL APPRAISER LICENSE' => 'CGAL',
 																 tempRawType='CERTIFIED RESIDENTIAL APPRAISER LICENSE' => 'CRAL',
+																 tempRawType='APPRAISAL MANAGEMENT COMPANY' => 'AT',
+																 tempRawType='TEMPORARY APPRAISER' => 'AT',
 																 ' ');														 
 		SELF.STD_LICENSE_TYPE := tempStdLicType;
 
