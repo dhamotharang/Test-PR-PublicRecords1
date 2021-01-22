@@ -15,8 +15,8 @@ IMPORT Business_Risk_BIP, LNSmallBusiness, Models, iESP, Risk_Indicators, RiskWi
  * roxieIP: IP Address of the non-FCRA roxie.                         *
  **********************************************************************/
  
-// recordsToRun := 0;
-recordsToRun := 10;
+recordsToRun := 0;
+// recordsToRun := 10;
 eyeball      := 5;
 threads      := 1;
 
@@ -35,7 +35,7 @@ outputFile := '~ScoringQA::out::NonSBFE::Small_Business_Analytics_SLBB1702_Attri
 // outputFile := '~ScoringQA::out::nonsbfe_append_service_general_bip_SLBB1809_attributes_'+ curr_date+'_1';
 // outputFile := '~ScoringQA::out::sbfe_append_service_general_bip_SBOM1601_attributes_1';
 
-output(curr_date);
+// output(curr_date);
 // Universally Set the History Date for ALL records. Set to 0 to use the History Date located on each record of the input file
 histDateYYYYMM := 0;
 histDate       := 0;
@@ -366,8 +366,8 @@ Passed := SmallBusinessAnalytics_attributes(TRIM(ErrorCode) = '');
 Insufficient_input_Failed := SmallBusinessAnalytics_attributes(Stringlib.StringFind(ErrorCode, MinimumInputErrorCode, 1) > 0) + inSufficientInput;
 Other_Failed := SmallBusinessAnalytics_attributes(TRIM(ErrorCode) <> '' AND Stringlib.StringFind(ErrorCode, MinimumInputErrorCode, 1) = 0);
 
-OUTPUT(COUNT(Passed), NAMED('SmallBusinessAnalytics_Total_Passed'));
-OUTPUT(CHOOSEN(Passed, eyeball), NAMED('SmallBusinessAnalytics_Results_Passed'));
+// OUTPUT(COUNT(Passed), NAMED('SmallBusinessAnalytics_Total_Passed_' + curr_date));
+// OUTPUT(CHOOSEN(Passed, eyeball), NAMED('SmallBusinessAnalytics_Results_Passed_' + curr_date));
 // OUTPUT(COUNT(Insufficient_input_Failed), NAMED('SmallBusinessAnalytics_Total_Insufficient_Input_Errors'));
 // OUTPUT(CHOOSEN(Insufficient_input_Failed, eyeball), NAMED('SmallBusinessAnalytics_Insufficient_Input_Errors'));
 // OUTPUT(COUNT(Other_Failed), NAMED('SmallBusinessAnalytics_Total_Other_Errors'));
@@ -706,16 +706,16 @@ Error_Inputs_seq := SORT(JOIN(DISTRIBUTE(f_with_seq, HASH64(AccountNumber)),
 		seq); 
 Error_Inputs := PROJECT(Error_Inputs_Seq, TRANSFORM({RECORDOF(LEFT) - seq}, SELF := LEFT));
 
-OUTPUT(CHOOSEN(flatResults, eyeball), NAMED('Sample_Final_Results'));
+// OUTPUT(CHOOSEN(flatResults, eyeball), NAMED('Sample_Final_Results_' + curr_date));
 // OUTPUT(CHOOSEN(failureResults, eyeball), NAMED('Sample_Failed_Results'));
 // OUTPUT(CHOOSEN(Error_Inputs, eyeball), NAMED('Sample_Failed_Inputs'));
 
-OUTPUT(flatResults,, outputFile, CSV(HEADING(single), QUOTE('"')), OVERWRITE);
-outputq1 := OUTPUT(COUNT(flatResults), NAMED('Total_Final_Results_Passed'));
+OUTPUT(flatResults,, outputFile, OVERWRITE):
+// outputq1 := OUTPUT(COUNT(flatResults), NAMED('Total_Final_Results_Passed_' + curr_date));
 // OUTPUT(failureResults,,outputFile+'_Errors', CSV(HEADING(single), QUOTE('"')), OVERWRITE);
 // OUTPUT(Error_Inputs,,outputFile+'_Error_Inputs', CSV(QUOTE('"')), OVERWRITE);
 
-SEQUENTIAL(outputq1;):
+// SEQUENTIAL(outputq1;):
 // :WHEN(CRON('55 19 23 3 *')), //
 SUCCESS(FileServices.SendEmail('Noah.Lahr@lexisnexisrisk.com;', 'SLBB1809_'+curr_date+'_1 Completed','The Completed workunit is:' + workunit)),
 FAILURE(FileServices.SendEmail('Noah.Lahr@lexisnexisrisk.com; ', 'SLBB1809_'+curr_date+'_1 Failed','The Failed workunit is:'   + workunit + FailMessage));

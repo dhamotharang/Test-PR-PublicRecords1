@@ -1,9 +1,9 @@
 ﻿/* RiskProcessing.BWR_Small_Business_Analytics_SBFE */
 
-#workunit('name','Small Business Analytics SBFE');
+#workunit('name','SmallBusinessAnalyticsSBFE_SBOM1601');
 #option ('hthorMemoryLimit', 1000);
 
-IMPORT Business_Risk_BIP, LNSmallBusiness, Models, iESP, Risk_Indicators, RiskWise, UT, Data_Services;
+IMPORT Business_Risk_BIP, LNSmallBusiness, Models, iESP, Risk_Indicators, RiskWise, UT, Data_Services, Std;
 
 /* ********************************************************************
  *                               OPTIONS                              *
@@ -14,11 +14,10 @@ IMPORT Business_Risk_BIP, LNSmallBusiness, Models, iESP, Risk_Indicators, RiskWi
  * roxieIP: IP Address of the non-FCRA roxie.                         *
  **********************************************************************/
  
-// recordsToRun := 0;
-recordsToRun := 10;
+recordsToRun := 0;
+// recordsToRun := 10;
 eyeball      := 5;
 threads      := 2;
-
 
 curr_date := (STRING8)Std.Date.Today();
 // RoxieIP := RiskWise.shortcuts.prod_batch_analytics_roxie;      // Production
@@ -331,12 +330,12 @@ Passed := SmallBusinessAnalytics_attributes(TRIM(ErrorCode) = '');
 Insufficient_input_Failed := SmallBusinessAnalytics_attributes(Stringlib.StringFind(ErrorCode, MinimumInputErrorCode, 1) > 0);
 Other_Failed := SmallBusinessAnalytics_attributes(TRIM(ErrorCode) <> '' AND Stringlib.StringFind(ErrorCode, MinimumInputErrorCode, 1) = 0);
 				
-OUTPUT(CHOOSEN(Passed, eyeball), NAMED('SmallBusinessAnalytics_Results_Passed'));
+// OUTPUT(CHOOSEN(Passed, eyeball), NAMED('SmallBusinessAnalytics_Results_Passed'));
 // OUTPUT(CHOOSEN(Insufficient_input_Failed, eyeball), NAMED('SmallBusinessAnalytics_Insufficient_Input_Errors'));
 // OUTPUT(CHOOSEN(Other_Failed, eyeball), NAMED('SmallBusinessAnalytics_Other_Errors'));
-OUTPUT(COUNT(Passed), NAMED('SmallBusinessAnalytics_Total_Passed'));
-OUTPUT(COUNT(Insufficient_input_Failed), NAMED('SmallBusinessAnalytics_Total_Insufficient_Input_Errors'));
-OUTPUT(COUNT(Other_Failed), NAMED('SmallBusinessAnalytics_Total_Other_Errors'));
+// OUTPUT(COUNT(Passed), NAMED('SmallBusinessAnalytics_Total_Passed_' + curr_date));
+// OUTPUT(COUNT(Insufficient_input_Failed), NAMED('SmallBusinessAnalytics_Total_Insufficient_Input_Errors_' + curr_date));
+// OUTPUT(COUNT(Other_Failed), NAMED('SmallBusinessAnalytics_Total_Other_Errors_' + curr_date));
 
 // Now transform the attributes and scores into a flat layout
 layout_flat_v1 := RECORD
@@ -1606,11 +1605,11 @@ failureResults := JOIN(DISTRIBUTE(SmallBusinessAnalytics_input, HASH64((UNSIGNED
 // Error_Inputs := JOIN(DISTRIBUTE(f, HASH64(AccountNumber)), DISTRIBUTE(flatResults, HASH64(AccountNumber)), LEFT.AccountNumber = RIGHT.AccountNumber, TRANSFORM(bus_in, SELF := LEFT), LEFT ONLY); 
 
 
-OUTPUT(CHOOSEN(flatResults, eyeball), NAMED('Sample_Final_Results'));
-OUTPUT(CHOOSEN(failureResults, eyeball), NAMED('Sample_Failed_Results'));
+// OUTPUT(CHOOSEN(flatResults, eyeball), NAMED('Sample_Final_Results_' + curr_date));
+// OUTPUT(CHOOSEN(failureResults, eyeball), NAMED('Sample_Failed_Results_' + curr_date));
 // OUTPUT(CHOOSEN(Error_Inputs, eyeball), NAMED('Sample_Failed_Inputs'));
 
-OUTPUT(COUNT(flatResults), NAMED('Total_Final_Results_Passed'));
-OUTPUT(flatResults,, outputFile, CSV(HEADING(single), QUOTE('"')), OVERWRITE);
+// OUTPUT(COUNT(flatResults), NAMED('Total_Final_Results_Passed_' + curr_date));
+OUTPUT(flatResults,, outputFile,  OVERWRITE);
 // OUTPUT(failureResults,,outputFile+'_Errors', CSV(HEADING(single), QUOTE('"')), OVERWRITE);
 // OUTPUT(Error_Inputs,,outputFile+'_Error_Inputs', CSV(HEADING(single), QUOTE('"')), OVERWRITE);
