@@ -88,7 +88,7 @@ OFAC_GW := IF(IncludeOFACGW, DATASET([TRANSFORM(Gateway.Layouts.Config,
 
 Input_Gateways := (OFAC_GW)(URL <> '');
 
-RecordsToRun := 0;
+RecordsToRun := 10;
 eyeball := 20;
 
 AllowedSources := ''; // Stubbing this out for use in settings output for now. To be used to turn on DNBDMI by setting to 'DNBDMI'
@@ -402,6 +402,8 @@ OUTPUT(CHOOSEN(Passed_with_Extras, eyeball), NAMED('Sample_Master_Layout'));
 OUTPUT(Passed_with_Extras,,OutputFile +'_MasterLayout.csv', CSV(HEADING(single), QUOTE('"')), expire(45));
 
 OUTPUT(Failed,,OutputFile+'errors', thor,  expire(20));
+
+Output(ave(Passed, time_ms), named('average_time_ms')); 
 
 Settings_Dataset := PublicRecords_KEL.ECL_Functions.fn_make_settings_dataset(Settings);
 		
