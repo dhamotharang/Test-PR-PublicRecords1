@@ -43,6 +43,10 @@ LOADXML('<xml/>');
 iesp.property_info.t_PropertyInformationReportBy SetReportBy (layouts.batch_in L) := transform
   Self.Name := iesp.ECL2ESP.SetName (L.first, L.middle, L.last, '', '', '');
   Self.NameID := ''; //string3 {xpath('NameID')};
+  Self.dob      := [];
+  Self.SSN      := '';
+  Self.DLNumber := '';
+  Self.DLState  := '';
   // take parts of address required for cleaning:
   Self.AddressInfo.City := L.City; 
   Self.AddressInfo.State := L.State;
