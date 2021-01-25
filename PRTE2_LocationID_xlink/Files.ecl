@@ -8,5 +8,8 @@ EXPORT Files := module
 	export refs_zip					:= dataset([], layouts.key_refs_zip);
 	export words						:= dataset([], layouts.key_words);
 	export sup_rid					:= dataset([], layouts.key_sup_rid);
+  export loc_id_map       :=dataset ([], layouts.key_loc_id_map);	
+	
+	
 	
 end;	

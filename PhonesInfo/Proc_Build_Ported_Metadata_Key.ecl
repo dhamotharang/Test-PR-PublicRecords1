@@ -36,25 +36,6 @@ EXPORT Proc_Build_Ported_Metadata_Key(string version):= function
 	PromoteSupers.Mac_SK_Move_v2('~thor_data400::key::phones_ported_metadata','Q',mvQAPhonesPortedmetadata,'4');
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////	
-//Build Carrier Reference Key////////////////////////////////////////////////////////////////////////////////
-/////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	RoxieKeyBuild.Mac_SK_BuildProcess_v3_local(dx_PhonesInfo.Key_Source_Reference.ocn_name
-																							,PhonesInfo.File_Source_Reference.Main
-																							,'~thor_data400::key::phonesmetadata::carrier_reference'
-																							,'~thor_data400::key::'+version+'::phonesmetadata::carrier_reference'
-																							,bkPhonesMetadataCarrierName
-																							);	
-
-	//Move Metadata Carrier Name Key to Built Superfile	
-	Roxiekeybuild.Mac_SK_Move_to_Built_v2('~thor_data400::key::phonesmetadata::carrier_reference'
-																							,'~thor_data400::key::'+version+'::phonesmetadata::carrier_reference'
-																							,mvBltPhonesMetadataCarrierName
-																							);
-	
-	//Move Metadata Carrier Name Key to QA Superfile
-	PromoteSupers.Mac_SK_Move_v2('~thor_data400::key::phonesmetadata::carrier_reference','Q',mvQAPhonesMetadataCarrierName,'3');
-
-/////////////////////////////////////////////////////////////////////////////////////////////////////////////	
 //Update DOps Page///////////////////////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	//dopsUpdate 		:= dops.updateversion('PhonesMetadataKeys', version, 'charlene.ros@lexisnexisrisk.com,judy.tao@lexisnexisrisk.com,gregory.rose@lexisnexisrisk.com,darren.knowles@lexisnexisrisk.com',,'N');
@@ -66,15 +47,13 @@ EXPORT Proc_Build_Ported_Metadata_Key(string version):= function
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////	
 //Run Strata Stats///////////////////////////////////////////////////////////////////////////////////////////
-/////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	PhonesInfo.Out_STRATA_Population_Stats(//PhonesInfo.File_TCPA.Main_Current, No Longer Used
-																										PhonesInfo.File_iConectiv.Main_Current,
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////	
+PhonesInfo.Out_STRATA_Population_Stats(PhonesInfo.File_iConectiv.Main_Current,
 																										PhonesInfo.File_iConectiv.Main_PortData_Validate,
 																										PhonesInfo.File_LIDB.Response_Processed,
 																										PhonesInfo.File_Deact_GH.Main_Current,
 																										PhonesInfo.File_Deact.Main_Current2,
 																										PhonesInfo.File_Metadata.PortedMetadata_Main,
-																										PhonesInfo.File_Source_Reference.Main,
 																										version,
 																										buildStrata
 																										);
@@ -103,12 +82,11 @@ EXPORT Proc_Build_Ported_Metadata_Key(string version):= function
 																											moveComBase, 
 																										BuildLogger.KeyStart(false), 
 																											bkPhonesPortedmetadata, mvBltPhonesPortedmetadata, mvQAPhonesPortedmetadata,
-																											bkPhonesMetadataCarrierName, mvBltPhonesMetadataCarrierName, mvQAPhonesMetadataCarrierName, 
 																										BuildLogger.KeyEnd(false),
 																										BuildLogger.PostStart(False),
 																											//dopsUpdate, 
 																											buildStrata, 
-																											Sample_PhonesMetadata, 
+																											PhonesInfo.Sample_PhonesMetadata, 
 																											ScrubsRuns,
 																										BuildLogger.PostEnd(False),
 																										BuildLogger.BuildEnd(false)):

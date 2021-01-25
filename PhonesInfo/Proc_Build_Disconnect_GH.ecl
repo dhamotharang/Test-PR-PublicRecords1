@@ -1,6 +1,6 @@
 ﻿import _control, std, ut;
 
-EXPORT Proc_Build_Disconnect_GH(string version, string thor_name) := function
+EXPORT Proc_Build_Disconnect_GH(string version, string thor_name, string contacts) := function
 
 //Clear Delete/Persist Files
 	clearDelete 							:= sequential(nothor(Fileservices.ClearSuperfile('~thor_data400::base::phones::disconnect_gh_main_delete', true)),
@@ -23,18 +23,18 @@ EXPORT Proc_Build_Disconnect_GH(string version, string thor_name) := function
 
 //Send Build Status	
 	emailProduct							:= ';jeffrey.dix@lexisnexisrisk.com; barbara.gress@lexisnexisrisk.com; tracy.l.smith@lexisnexisrisk.com';
-	emailDOps										:= ';darren.knowles@lexisnexisrisk.com; charlene.ros@lexisnexisrisk.com; gregory.rose@lexisnexisrisk.com';
+	emailDOps										:= contacts;
 	emailDev											:= ';judy.tao@lexisnexisrisk.com';
 	
-	emailTarget								:= _control.MyInfo.EmailAddressNotify + emailDops + emailDev;
+	emailTarget								:= emailDops + emailDev;
 	emailBuildNotice 		:= if(count(PhonesInfo.File_Deact_GH.Main_Current(phone<>'')) > 0
 																										,fileservices.SendEmail(emailTarget, 'Phones Metadata: Disconnect Gong History File', 'Phones Metadata: Disconnect Gong History File Is Now Available.  Please see: ' + 'http://uspr-prod-thor-esp.risk.regn.net:8010/WsWorkunits/WUInfo?Wuid='+ workunit + '&Widget=WUDetailsWidget#/stub/Results-DL/Grid')
 																										,fileservices.SendEmail(emailTarget, 'Phones Metadata: No Disconnect Gong History File', 'There Were No Disconnect Gong History Records in This Build')
 																										);	
 /*																	
 //Send Deact Gong History Flag Breakdown Notification
-	emailAttTarget					:= _control.MyInfo.EmailAddressNotify + emailProduct + emailDOps + emailDev; 
-	senderEmail								:= _control.MyInfo.EmailAddressNotify;
+	emailAttTarget					:= contact + emailProduct + emailDOps + emailDev; 
+	senderEmail								:= emailDev;
 	
 	attachment 								:= PhonesInfo.fn_Email_Attachment_Deact_GH(version);
 	mailFlagAttach 				:= FileServices.SendEmailAttachData(emailAttTarget

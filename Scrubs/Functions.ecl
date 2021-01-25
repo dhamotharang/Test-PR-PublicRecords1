@@ -461,4 +461,49 @@ END;
 //***************END BUSINESS SECTION**********************//
 //*********************************************************//
     
+    EXPORT fn_valid_email(string em) := FUNCTION
+
+    cleanEm         := TRIM(em,ALL);
+    rgxEmail        := '^[a-zA-Z0-9.!#$%&\'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$';
+    isValidEmail    := REGEXFIND(rgxEmail, cleanEm);
+    isBlank         := LENGTH(cleanEm) = 0;
+
+    RETURN if(
+                isValidEmail OR isBlank
+                ,1
+                ,0
+            );
+
+    END;
+
+    EXPORT fn_Valid_Phone2(string no) := FUNCTION 
+        cNo := TRIM(no,ALL);
+        isPhoneValid := LENGTH(STD.str.filter(cNo,'0123456789')) = 10
+                AND STD.str.findCount(cNo[LENGTH(cNo)-6..LENGTH(cNo)],cNo[LENGTH(cNo)-6]) < 7
+                AND cNo[LENGTH(cNo)-3..LENGTH(cNo)] NOT IN ['0000','9999']
+                AND cNo[LENGTH(cNo)-6] NOT IN ['0','1']
+                AND cNo[..3] NOT IN ['800','811','822','833','844','855','866','877','888','899'];
+        isBlank := no = '';
+
+        RETURN IF(
+            isPhoneValid OR isBlank,
+            1,
+            0
+        );
+
+    END;
+
+    EXPORT fn_valid_IP(string ip) := FUNCTION
+
+        cleanIp      := TRIM(ip,whitespace);
+        isIPV4      := STD.str.filterOut(cleanIp, '0123456789') = '...';
+        isMinMaxLength := LENGTH(cleanIp) > 6 AND LENGTH(cleanIP) < 16;
+        isBlank     := LENGTH(cleanIp) = 0;
+
+        RETURN if(
+                    (isIPV4 AND isMinMaxLength) or isBlank
+                    ,1
+                    ,0
+                );
+    END;
 END; //End Functions Module

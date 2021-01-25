@@ -1,4 +1,4 @@
-﻿import _Control, doxie_files,ut,doxie, liensv2, riskwise, property, bankruptcyv3, ProfileBooster, Risk_Indicators, MDR;
+﻿import _Control, doxie_files,ut,doxie, liensv2, riskwise, bankruptcyv3, ProfileBooster, Risk_Indicators, MDR, dx_Property;
 onThor := _Control.Environment.OnThor;
 
 //Note - this function mimics Bocashell derogs function with mods made specific to Profile Booster. 
@@ -11,8 +11,8 @@ bans_search := BankruptcyV3.key_bankruptcyv3_search_full_bip();
 kld			:= liensv2.key_liens_DID;
 klr_nonFCRA	:= liensv2.key_liens_party_id;
 koff_nonFCRA	:= doxie_files.key_offenders_risk;
-kford 		:= property.key_foreclosure_did;
-kforf		:= property.key_foreclosures_fid;
+kford 		:= dx_Property.key_foreclosure_did;
+kforf		:= dx_Property.key_foreclosures_fid;
 
 checkDays(string8 d1, string8 d2, unsigned2 days) := ut.DaysApart(d1,d2) <= days and d1>d2;
 

@@ -7,8 +7,6 @@
 /*2015-08-07T23:53:47Z (Srilatha Katukuri)
 #181860
 */
-import doxie, Data_Services;
-
 export Key_eCrashv2_Supplemental := index(mod_PrepEcrashKeys().ded_base
                                          ,{super_report_id}
 								                         ,{report_id
@@ -27,5 +25,5 @@ export Key_eCrashv2_Supplemental := index(mod_PrepEcrashKeys().ded_base
 																					 ,vendor_report_id
 																					 ,Page_Count 
 																					 }
-															           ,Data_Services.Data_location.Prefix('ecrash')+'thor_data400::key::ecrashV2_Supplemental_' + doxie.Version_SuperKey);
+															           ,Files_eCrash.FILE_KEY_SUPPLEMENTAL_SF);
                                   

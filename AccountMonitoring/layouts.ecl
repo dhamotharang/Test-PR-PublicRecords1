@@ -158,16 +158,16 @@ EXPORT layouts := MODULE
 			AccountMonitoring.product_files.people_at_work.base_file_b.company_name;
 		END;
 		SHARED property_documentid_record := RECORD
-			AccountMonitoring.product_files.property.layout_search_file_b.prim_range;
-			AccountMonitoring.product_files.property.layout_search_file_b.predir;
-			AccountMonitoring.product_files.property.layout_search_file_b.prim_name;
-			AccountMonitoring.product_files.property.layout_search_file_b.suffix;
-			AccountMonitoring.product_files.property.layout_search_file_b.postdir;
-			AccountMonitoring.product_files.property.layout_search_file_b.unit_desig;
-			AccountMonitoring.product_files.property.layout_search_file_b.sec_range;
-			AccountMonitoring.product_files.property.layout_search_file_b.p_city_name;
-			AccountMonitoring.product_files.property.layout_search_file_b.st;
-			AccountMonitoring.product_files.property.layout_search_file_b.zip;
+			AccountMonitoring.product_files.property.Property_search_key_sorted.prim_range;
+			AccountMonitoring.product_files.property.Property_search_key_sorted.predir;
+			AccountMonitoring.product_files.property.Property_search_key_sorted.prim_name;
+			AccountMonitoring.product_files.property.Property_search_key_sorted.suffix;
+			AccountMonitoring.product_files.property.Property_search_key_sorted.postdir;
+			AccountMonitoring.product_files.property.Property_search_key_sorted.unit_desig;
+			AccountMonitoring.product_files.property.Property_search_key_sorted.sec_range;
+			AccountMonitoring.product_files.property.Property_search_key_sorted.p_city_name;
+			AccountMonitoring.product_files.property.Property_search_key_sorted.st;
+			AccountMonitoring.product_files.property.Property_search_key_sorted.zip;
 		END;
 		SHARED litigiousdebtor_documentid_record := RECORD
 			AccountMonitoring.product_files.litigiousdebtor.litigiousdebtor_file_slim.courtstate;

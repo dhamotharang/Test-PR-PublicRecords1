@@ -1,11 +1,12 @@
-﻿EXPORT Layout_PrepEcrashFLAccidentPRKeys := MODULE
+﻿export Layout_PrepEcrashFLAccidentPRKeys := module
  
- EXPORT flc0_xpnd_layout := record
-       string2 report_code;
-       string25 report_category;
-       string65 report_code_desc;
+export flc0_interim := record
+       string2    report_code;
+       string25   report_category;
+       string65   report_code_desc;
 	     string1    rec_type_o,
-       string40    accident_nbr,
+       string40   accident_nbr,
+       string40   l_acc_nbr,
        string4    filler1,
        string11   microfilm_nbr,
        string1    st_road_accident,
@@ -64,14 +65,15 @@
        string1    accident_error,
 			 string40   orig_accnbr, 
        string8    filler4
-  end;
+end;
  
-  EXPORT flc1_xpnd_layout := record
-  string2 report_code;
-  string25 report_category;
-  string65 report_code_desc;
+export flc1_interim := record
+  string2   report_code;
+  string25  report_category;
+  string65  report_code_desc;
 	string1   rec_type_1,
-	string40   accident_nbr,
+	string40  accident_nbr,
+  string40  l_acc_nbr,
 	string4   filler1,
 	string1   day_week,
 	string2   hr_accident,
@@ -163,22 +165,23 @@
   string30   location_type_desc;
 	string40  orig_accnbr ; 
 	string64  filler4,
-  END;
+end;
 
-export flc2v_xpnd_layout := record
-    string2 report_code;
-    string25 report_category;
-    string65 report_code_desc;
+export flc2v_interim := record
+  string2 report_code;
+  string25 report_category;
+  string65 report_code_desc;
 	string25 vehicle_incident_city;
 	string2 vehicle_incident_st;
 	string40 carrier_name;
 	string5	client_type_id;
-  	string12 did,
+  string12 did,
 	unsigned1 did_score,
 	string12 b_did, 
-    unsigned1 b_did_score,
+  unsigned1 b_did_score,
 	string1   rec_type_2,
 	string40  accident_nbr,
+  string40   l_acc_nbr,
 	string2   section_nbr,
 	string2   filler1,
 	string1   vehicle_owner_driver_code,
@@ -340,14 +343,15 @@ export flc2v_xpnd_layout := record
 	string25  vehicle_type_desc,
 	string30  point_of_impact_desc, 
 	string30  vehicle_use_desc,
-  end;
+end;
 	
-	export flc3v_xpnd_layout := record
-    string2 report_code;
-    string25 report_category;
-    string65 report_code_desc;
-  	string1    rec_type_3,
+export flc3v_interim := record
+  string2 report_code;
+  string25 report_category;
+  string65 report_code_desc;
+  string1    rec_type_3,
 	string40   accident_nbr,
+  string40   l_acc_nbr,
 	string2    section_nbr,
 	string2    filler1,
 	string4    towed_trlr_veh_yr,
@@ -437,9 +441,9 @@ export flc2v_xpnd_layout := record
 	string2    motorcycle_type_of_bike,
 	string2    motorcycle_cylinder_coding,
 	string40   orig_accnbr; 
-  end;
+end;
 
-export flc4_xpnd_layout := record
+export flc4_interim := record
   string2 report_code;
   string25 report_category;
   string65 report_code_desc;
@@ -457,6 +461,7 @@ export flc4_xpnd_layout := record
 	unsigned1 did_score,
 	string1   rec_type_4,
 	string40  accident_nbr,
+  string40   l_acc_nbr,
 	string2   section_nbr,
 	string2   filler1,
 	string25  driver_full_name,
@@ -566,16 +571,17 @@ export flc4_xpnd_layout := record
 	string20 inquiry_mname,
 	string5 inquiry_zip5,
 	string4 inquiry_zip4*/
-  end;
+end;
 	
-	export flc5_xpnd_layout := record
-    string2 report_code;
-    string25 report_category;
-    string65 report_code_desc;
+export flc5_interim := record
+  string2 report_code;
+  string25 report_category;
+  string65 report_code_desc;
  	string12 did,
 	unsigned1 did_score,
 	string1   rec_type_5,
 	string40  accident_nbr,
+  string40   l_acc_nbr,
 	string2   section_nbr,
 	string2   passenger_nbr,
 	string25  passenger_full_name,
@@ -628,16 +634,17 @@ export flc4_xpnd_layout := record
 	string3   score,
 	string25  cname,
 	string40 orig_accnbr, 
-  end;
+end;
 	
-	export flc6_xpnd_layout := record
-    string2 report_code;
-    string25 report_category;
-    string65 report_code_desc;
+export flc6_interim := record
+  string2 report_code;
+  string25 report_category;
+  string65 report_code_desc;
 	string12 did,
 	unsigned1 did_score,
 	string1   rec_type_6,
 	string40  accident_nbr,
+  string40   l_acc_nbr,
 	string2   section_nbr,
 	string2   filler1,
 	string25  pedest_full_name,
@@ -726,18 +733,19 @@ export flc4_xpnd_layout := record
 	string40 orig_accnbr,
 	string25 ped_race_desc,
   string8 ped_sex_desc,
-  end;
+end;
 	
-	export flc7_xpnd_layout := record
-    string2 report_code;
-    string25 report_category;
-    string65 report_code_desc;
+export flc7_interim := record
+  string2 report_code;
+  string25 report_category;
+  string65 report_code_desc;
 	string12  did,
 	unsigned1 did_score,
 	string12  b_did, 
-    unsigned1 b_did_score,
+  unsigned1 b_did_score,
 	string1   rec_type_7,
 	string40  accident_nbr,
+  string40   l_acc_nbr,
 	string2   prop_damage_code,
 	string2   prop_damage_nbr,
 	string25  prop_damaged,
@@ -786,25 +794,26 @@ export flc4_xpnd_layout := record
 	string3   score,
 	string25  cname,
 	string40 orig_accnbr, 
-  end;
+end;
 	
-	export flc8_xpnd_layout := record
-    string2 report_code;
-    string25 report_category;
-    string65 report_code_desc;
-	string1 rec_type_8;
+export flc8_interim := record
+  string2  report_code;
+  string25 report_category;
+  string65 report_code_desc;
+	string1  rec_type_8;
 	string40 accident_nbr;
-	string2 section_no;
-	string2 filler;
+  string40 l_acc_nbr,
+	string2  section_no;
+	string2  filler;
 	string40 carrier_name;
 	string40 carrier_address;
 	string20 carrier_city;
-	string2 carrier_state;
-	string9 carrier_zip;
-	string8 us_dot_or_icc_id_nums;
-	string1 source_or_carrier_info;
+	string2  carrier_state;
+	string9  carrier_zip;
+	string8  us_dot_or_icc_id_nums;
+	string1  source_or_carrier_info;
 	string40 orig_accnbr, 
 	string266 filler3;
-  end;
+end;
 	
-END;
+end;

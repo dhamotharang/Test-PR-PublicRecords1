@@ -2,7 +2,7 @@
 
 //iConectiv Ported Phone File
 
-EXPORT Proc_Build_Combined_Port_Reformat_File(string version/*, string eclsourceip, string thor_name*/):= FUNCTION
+EXPORT Proc_Build_Combined_Port_Reformat_File(string version, string contacts/*, string eclsourceip, string thor_name*/):= FUNCTION
 	
 	//DF-28572: Stop Processing the Telo Files on 11/17/20; Keep Telo history as of 11/15/20. 		
 	/*
@@ -24,10 +24,10 @@ EXPORT Proc_Build_Combined_Port_Reformat_File(string version/*, string eclsource
 	buildPDVBase			:= PhonesInfo.Proc_Build_PortData_Valid_File(version);	
 	
 	//Email Build Status	
-	emailDOps					:= ';darren.knowles@lexisnexisrisk.com; charlene.ros@lexisnexisrisk.com; gregory.rose@lexisnexisrisk.com';
+	emailDOps					:= contacts;
 	emailDev					:= ';judy.tao@lexisnexisrisk.com';
 	
-	emailTarget				:= _control.MyInfo.EmailAddressNotify + emailDev;
+	emailTarget				:= contacts + emailDev;
 	emailBuildNotice 	:= if(count(PhonesInfo.File_iConectiv.Main(phone<>'')) > 0
 																,fileservices.SendEmail(emailTarget, 'Phones Metadata: iConectiv Ported Phone File', 'Phones Metadata: iConectiv Ported Phone File Is Now Available.  Please see: ' + 'http://uspr-prod-thor-esp.risk.regn.net:8010/WsWorkunits/WUInfo?Wuid='+ workunit + '&Widget=WUDetailsWidget#/stub/Results-DL/Grid')
 																,fileservices.SendEmail(emailTarget, 'Phones Metadata: No iConectiv Ported Phone File', 'There Were No iConectiv Ported Phone Records In This Build')

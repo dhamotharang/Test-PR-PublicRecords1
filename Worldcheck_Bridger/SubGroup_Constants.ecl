@@ -1285,6 +1285,17 @@
 		export string KEYWORD_USNDAA_889						:= '967';
 		export string KEYWORD_FRANJ									:= '968';
 		export string KEYWORD_UKSANC								:= '969';
+		export string KEYWORD_NS_CAATSA_RUSSIA			:= '970';
+		export string KEYWORD_EEPO									:= '971';
+		export string KEYWORD_IMHA_GN								:= '972';
+		export string KEYWORD_BXAMEU								:= '973';
+		export string KEYWORD_PLKAS_UG							:= '974';
+		export string KEYWORD_PHAMLC_TERR						:= '975';
+		export string KEYWORD_IRAN_IEI_SEC					:= '976';
+		export string KEYWORD_AFFINTRACA						:= '977';
+		export string KEYWORD_PTERS									:= '978';
+		export string KEYWORD_AMCBA_TERR						:= '979';
+		export string KEYWORD_UNSCPE_WC							:= '980';
 		
 		//When setting the keyword export use underscores for dashes (ex: For RBI-SANC, use RBI_SANC)	
 	end;

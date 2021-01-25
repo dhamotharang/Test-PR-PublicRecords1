@@ -1,7 +1,7 @@
-/*2011-03-02T15:18:41Z (Jesse Shaw)
+﻿/*2011-03-02T15:18:41Z (Jesse Shaw)
 
 */
-Import Data_Services, advo, doxie,addrfraud, LN_PropertyV2, property, std, Risk_Indicators;
+Import Data_Services, advo, doxie,addrfraud, LN_PropertyV2, property, std, Risk_Indicators, dx_property;
 
 //Data Declarations
 ADVO_BASE_GEOLINK := address_attributes.key_ADVO_Neighborhood_geolink;
@@ -294,7 +294,7 @@ End;
 Neighborhood_ADVO := project(ADVO_BASE_GEOLINK, addAdvoBase(Left));
 
 // Append Foreclosure Neighborhood Data limit to SFD
-foreclosures_sfd := property.key_foreclosures_addr(situs1_sec_range ='');
+foreclosures_sfd := dx_property.key_foreclosures_addr(situs1_sec_range ='');
 layout_Foreclosures_Geolink addNeighborhoodForeclosures(foreclosures_sfd l) := TRANSFORM
 	self.geolink := l.situs1_st + l.situs1_fipscounty + l.situs1_geo_blk;
 	self.NOD     := if( (unsigned4)l.recording_date between AddrFraud.Constants.oneYrAgo   and AddrFraud.Constants.today and l.Deed_Category IN ['L','N']    , 1, 0 );

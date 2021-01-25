@@ -2,7 +2,7 @@
 
 //#workunit('name','Get pphone_build_version');
 
-EXPORT Holiday_Rmv_Logical_From_Super (string build_version):= function
+EXPORT Holiday_Rmv_Logical_From_Super (string build_version, string contacts):= function
 
 string stripped_b_version := build_version[1..8];
 
@@ -58,7 +58,7 @@ updateSuperFile := sequential(
 																													);
 							  
 clear_super := if ( count(sup_2_clear) > 0, sequential (updateSuperfile,
-                                                        FileServices.SendEmail(_control.MyInfo.EmailAddressNotify + ';judy.tao@lexisnexisrisk.com' + ';darren.knowles@lexisnexisrisk.com', 'PhonesInfo Ported & Metadata Key Build Holiday Save Logical', workunit + ' Removing thor_data400::key::'+prod_version+'::phones_ported_metadata From Super')
+                                                        FileServices.SendEmail(contacts, 'PhonesInfo Ported & Metadata Key Build Holiday Save Logical', workunit + ' Removing thor_data400::key::'+prod_version+'::phones_ported_metadata From Super')
                                                         ));
 
 process_save_logical := sequential (output (stripped_b_version),

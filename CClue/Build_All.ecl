@@ -22,7 +22,7 @@ function
 		,Build_Strata			(pversion	,pOverwrite,,,	pIsTesting	)
 		,Promote().Inputfiles.using2used
 		,Promote().Buildfiles.Built2QA
-	  ,Orbit3.proc_Orbit3_CreateBuild_npf('CCLUE',pversion)
+	  ,Orbit3.proc_Orbit3_CreateBuild('CCLUE',pversion,is_npf:=true)
    ): success(Send_Emails(pversion,,not pIsTesting).BuildSuccess), failure(send_emails(pversion,,not pIsTesting).buildfailure);	
 	
 		
