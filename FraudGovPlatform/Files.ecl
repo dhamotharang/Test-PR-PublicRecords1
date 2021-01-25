@@ -31,6 +31,9 @@ module
 		export RDP := dataset(Filenames().Sprayed.RDP,
 											{string75 fn { virtual(logicalfilename)},Layouts.Sprayed.RDP},
 											CSV(heading(1),SEPARATOR([',','\t']),quote(['"','&quot;','\'']),TERMINATOR(['\n','\r\n','\n\r'])));																																
+		export DisposableEmailDomains := dataset(Filenames().Sprayed.DisposableEmailDomains,
+											{string75 fn { virtual(logicalfilename)},Layouts.Sprayed.DisposableEmailDomains},
+											CSV(heading(1),SEPARATOR([',','\t']),quote(['"','&quot;','\'']),TERMINATOR(['\n','\r\n','\n\r'])));	
 	end;
 	//////////////////////////////////////////////////////////////////
 	// -- Input File Versions
@@ -45,12 +48,15 @@ module
 		tools.mac_FilesInput(Filenames(pversion,pUseProd).Input.Deltabase,Layouts.Input.Deltabase,Deltabase);
 		tools.mac_FilesInput(Filenames(pversion,pUseProd).Input.ByPassed_Deltabase,Layouts.Input.Deltabase,ByPassed_Deltabase);
 
+		tools.mac_FilesInput(Filenames(pversion,pUseProd).Input.DisposableEmailDomains,Layouts.Input.DisposableEmailDomains,DisposableEmailDomains);
+		tools.mac_FilesInput(Filenames(pversion,pUseProd).Input.ByPassed_DisposableEmailDomains,Layouts.Input.DisposableEmailDomains,ByPassed_DisposableEmailDomains);
+
 		tools.mac_FilesInput(Filenames(pversion,pUseProd).Input.DemoData,FraudShared.Layouts.Base.Main,DemoData);
 		
 		tools.mac_FilesInput(Filenames(pversion,pUseProd).Input.ConfigRiskLevel,Layouts.Input.ConfigRiskLevel,ConfigRiskLevel,'CSV',,'\r\n',',',true);
 		tools.mac_FilesInput(Filenames(pversion,pUseProd).Input.ConfigAttributes,Layouts.Input.ConfigAttributes,ConfigAttributes,'CSV',,'\r\n',',',true);		
 		tools.mac_FilesInput(Filenames(pversion,pUseProd).Input.ConfigRules,Layouts.Input.ConfigRules,ConfigRules,'CSV',,'\r\n',',',true);
-		
+
 		tools.mac_FilesInput(Filenames(pversion,pUseProd).Input.MBSInclusionDemoData,FraudShared.Layouts.Input.MbsFdnMasterIDIndTypeInclusion,MBSInclusionDemoData,'CSV',,'|\n','|\t|');
 		
 		tools.mac_FilesInput(Filenames(pversion,pUseProd).Input.MBSDemoData,FraudShared.Layouts.Input.Mbs,MBSDemoData,'CSV',,'|\n','|\t|');
@@ -72,6 +78,7 @@ module
 		tools.mac_FilesBase(Filenames(pversion,pUseProd).Base.PrepaidPhone,Layouts.PrepaidPhone,PrepaidPhone);
 		tools.mac_FilesBase(Filenames(pversion,pUseProd).Base.BocaShell,Layouts.BocaShell,BocaShell);
 		tools.mac_FilesBase(Filenames(pversion,pUseProd).Base.AgencyActivityDate,Layouts.AgencyActivityDate,AgencyActivityDate);
+		tools.mac_FilesBase(Filenames(pversion,pUseProd).Base.DisposableEmailDomains,Layouts.Base.DisposableEmailDomains,DisposableEmailDomains);
 		
 		tools.mac_FilesBase(Filenames(pversion,pUseProd).Base.Main_Orig,FraudShared.Layouts.Base.Main,Main_Orig);
 		tools.mac_FilesBase(Filenames(pversion,pUseProd).Base.Main_Anon,FraudShared.Layouts.Base.Main,Main_Anon);
@@ -91,7 +98,6 @@ module
 		tools.mac_FilesBase(Filenames(pversion,pUseProd).Base.kel_EntityAttributes,Layouts.EntityAttributes, kel_EntityAttributes);
 		tools.mac_FilesBase(Filenames(pversion,pUseProd).Base.kel_GraphEdges,Layouts.GraphEdges, kel_GraphEdges);
 		tools.mac_FilesBase(Filenames(pversion,pUseProd).Base.kel_GraphVertices,Layouts.GraphVertices, kel_GraphVertices);
-		
 	end;
 
 	export CustomerSettings := dataset(Filenames().CustomerSettings,Layouts.CustomerSettings,thor,opt);

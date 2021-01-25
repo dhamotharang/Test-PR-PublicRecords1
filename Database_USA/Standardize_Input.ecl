@@ -109,17 +109,17 @@ EXPORT Standardize_Input := MODULE
 			self.Primary_2_Digit_SIC_Desc			:= 	ut.CleanSpacesAndUpper(l.Primary_2_Digit_SIC_Desc);
 			self.PrimarySIC4									:= 	ut.CleanSpacesAndUpper(l.PrimarySIC4);
 			self.Primary_4_Digit_SIC_Desc			:= 	ut.CleanSpacesAndUpper(l.Primary_4_Digit_SIC_Desc);
-			self.NAICS01											:= 	ut.CleanSpacesAndUpper(l.NAICS01);
+			self.NAICS01                      := If(ut.fn_NAICS_functions.fn_validate_NAICSCode(l.NAICS01) = 1,ut.CleanSpacesAndUpper(l.NAICS01),'');
+			self.NAICS02                      := If(ut.fn_NAICS_functions.fn_validate_NAICSCode(l.NAICS02) = 1,ut.CleanSpacesAndUpper(l.NAICS02),'');
+			self.NAICS03                      := If(ut.fn_NAICS_functions.fn_validate_NAICSCode(l.NAICS03) = 1,ut.CleanSpacesAndUpper(l.NAICS03),'');
+			self.NAICS04                      := If(ut.fn_NAICS_functions.fn_validate_NAICSCode(l.NAICS04) = 1,ut.CleanSpacesAndUpper(l.NAICS04),'');
+			self.NAICS05                      := If(ut.fn_NAICS_functions.fn_validate_NAICSCode(l.NAICS05) = 1,ut.CleanSpacesAndUpper(l.NAICS05),'');
+			self.NAICS06                      := If(ut.fn_NAICS_functions.fn_validate_NAICSCode(l.NAICS06) = 1,ut.CleanSpacesAndUpper(l.NAICS06),'');
 			self.NAICS01_Desc									:= 	ut.CleanSpacesAndUpper(l.NAICS01_Desc);
-			self.NAICS02											:= 	ut.CleanSpacesAndUpper(l.NAICS02);
 			self.NAICS02_Desc									:= 	ut.CleanSpacesAndUpper(l.NAICS02_Desc);
-			self.NAICS03											:= 	ut.CleanSpacesAndUpper(l.NAICS03);
 			self.NAICS03_Desc									:= 	ut.CleanSpacesAndUpper(l.NAICS03_Desc);
-			self.NAICS04											:= 	ut.CleanSpacesAndUpper(l.NAICS04);
 			self.NAICS04_Desc									:= 	ut.CleanSpacesAndUpper(l.NAICS04_Desc);
-			self.NAICS05											:= 	ut.CleanSpacesAndUpper(l.NAICS05);
 			self.NAICS05_Desc									:= 	ut.CleanSpacesAndUpper(l.NAICS05_Desc);
-			self.NAICS06											:= 	ut.CleanSpacesAndUpper(l.NAICS06);
 			self.NAICS06_Desc									:= 	ut.CleanSpacesAndUpper(l.NAICS06_Desc);
 			self.Location_Employees_Total			:= 	ut.CleanSpacesAndUpper(l.Location_Employees_Total);
 			self.Location_Employee_Code				:= 	ut.CleanSpacesAndUpper(l.Location_Employee_Code);
@@ -197,10 +197,7 @@ EXPORT Standardize_Input := MODULE
 			self.DB_Cons_age									:= 	ut.CleanSpacesAndUpper(l.DB_Cons_age);
 			self.DB_Cons_Age_Code_Desc				:= 	ut.CleanSpacesAndUpper(l.DB_Cons_Age_Code_Desc);
 			self.DB_Cons_Age_In_Two_Year_HH		:= 	ut.CleanSpacesAndUpper(l.DB_Cons_Age_In_Two_Year_HH);
-			self.DB_Cons_Ethnic_Code					:= 	if(	ut.CleanSpacesAndUpper(l.DB_Cons_Ethnic_Code)<>'ZZ',
-																									ut.CleanSpacesAndUpper(l.DB_Cons_Ethnic_Code),
-																									''
-																							 );
+			self.DB_Cons_Ethnic_Code					:= 	ut.CleanSpacesAndUpper(l.DB_Cons_Ethnic_Code);
 			self.DB_Cons_Religious_Affil			:= 	ut.CleanSpacesAndUpper(l.DB_Cons_Religious_Affil);
 			self.DB_Cons_Language_Pref				:= 	ut.CleanSpacesAndUpper(l.DB_Cons_Language_Pref);
 			self.DB_Cons_Phy_Addr_Std					:= 	ut.CleanSpacesAndUpper(l.DB_Cons_Phy_Addr_Std);
