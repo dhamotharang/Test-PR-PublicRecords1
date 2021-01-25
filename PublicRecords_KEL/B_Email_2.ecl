@@ -1,11 +1,11 @@
-﻿//HPCC Systems KEL Compiler Version 1.5.0
+﻿//HPCC Systems KEL Compiler Version 1.5.0rc1
 IMPORT KEL15 AS KEL;
 IMPORT CFG_Compile,E_Email,FN_Compile FROM PublicRecords_KEL;
 IMPORT * FROM KEL15.Null;
 EXPORT B_Email_2(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG_Compile __cfg = CFG_Compile) := MODULE
   SHARED VIRTUAL TYPEOF(E_Email(__in,__cfg).__Result) __E_Email := E_Email(__in,__cfg).__Result;
-  SHARED __EE1469852 := __E_Email;
-  EXPORT __ST203352_Layout := RECORD
+  SHARED __EE1469857 := __E_Email;
+  EXPORT __ST203357_Layout := RECORD
     KEL.typ.nuid UID;
     KEL.typ.nstr Email_Address_;
     KEL.typ.ndataset(E_Email(__in,__cfg).Email_Rec_Key_Layout) Email_Rec_Key_;
@@ -33,11 +33,11 @@ EXPORT B_Email_2(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG_Compi
     KEL.typ.epoch Vault_Date_Last_Seen_ := 0;
     KEL.typ.int __RecordCount := 0;
   END;
-  SHARED __ST203352_Layout __ND6435115__Project(E_Email(__in,__cfg).Layout __PP1469657) := TRANSFORM
-    __CC13013 := KEL.Routines.MinN(FN_Compile(__cfg).FN_G_E_T_B_U_I_L_D_D_A_T_E(__ECAST(KEL.typ.nstr,__CN('FCRA_email_build_version'))),__CN(__cfg.CurrentDate));
-    __CC31706 := 2556;
-    SELF.Emails7y_ := __OP2(FN_Compile(__cfg).FN_A_B_S_D_A_Y_S_B_E_T_W_E_E_N(__ECAST(KEL.typ.nkdate,__CC13013),__ECAST(KEL.typ.nkdate,KEL.era.ToDate(__PP1469657.Date_Last_Seen_))),<,__CN(__CC31706));
-    SELF := __PP1469657;
+  SHARED __ST203357_Layout __ND6435120__Project(E_Email(__in,__cfg).Layout __PP1469662) := TRANSFORM
+    __CC13018 := KEL.Routines.MinN(FN_Compile(__cfg).FN_G_E_T_B_U_I_L_D_D_A_T_E(__ECAST(KEL.typ.nstr,__CN('FCRA_email_build_version'))),__CN(__cfg.CurrentDate));
+    __CC31711 := 2556;
+    SELF.Emails7y_ := __OP2(FN_Compile(__cfg).FN_A_B_S_D_A_Y_S_B_E_T_W_E_E_N(__ECAST(KEL.typ.nkdate,__CC13018),__ECAST(KEL.typ.nkdate,KEL.era.ToDate(__PP1469662.Date_Last_Seen_))),<,__CN(__CC31711));
+    SELF := __PP1469662;
   END;
-  EXPORT __ENH_Email_2 := PROJECT(__EE1469852,__ND6435115__Project(LEFT));
+  EXPORT __ENH_Email_2 := PROJECT(__EE1469857,__ND6435120__Project(LEFT));
 END;

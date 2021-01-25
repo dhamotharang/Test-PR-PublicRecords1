@@ -1,11 +1,11 @@
-﻿//HPCC Systems KEL Compiler Version 1.5.0
+﻿//HPCC Systems KEL Compiler Version 1.5.0rc1
 IMPORT KEL15 AS KEL;
 IMPORT B_Professional_License_5,CFG_Compile,E_Professional_License,FN_Compile FROM PublicRecords_KEL;
 IMPORT * FROM KEL15.Null;
 EXPORT B_Professional_License_4(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG_Compile __cfg = CFG_Compile) := MODULE
   SHARED VIRTUAL TYPEOF(B_Professional_License_5(__in,__cfg).__ENH_Professional_License_5) __ENH_Professional_License_5 := B_Professional_License_5(__in,__cfg).__ENH_Professional_License_5;
-  SHARED __EE5125706 := __ENH_Professional_License_5;
-  EXPORT __ST235532_Layout := RECORD
+  SHARED __EE5125711 := __ENH_Professional_License_5;
+  EXPORT __ST235537_Layout := RECORD
     KEL.typ.nuid UID;
     KEL.typ.nstr License_Number_;
     KEL.typ.nstr License_State_;
@@ -28,11 +28,11 @@ EXPORT B_Professional_License_4(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDef
     KEL.typ.epoch Vault_Date_Last_Seen_ := 0;
     KEL.typ.int __RecordCount := 0;
   END;
-  SHARED __ST235532_Layout __ND5125878__Project(B_Professional_License_5(__in,__cfg).__ST241928_Layout __PP5125707) := TRANSFORM
-    __CC13061 := KEL.Routines.MinN(FN_Compile(__cfg).FN_G_E_T_B_U_I_L_D_D_A_T_E(__ECAST(KEL.typ.nstr,__CN('proflic_build_version'))),__CN(__cfg.CurrentDate));
-    SELF.Is_Active_ := __OP2(__PP5125707.Max_Expire_Date_,>,__CC13061);
-    SELF.Valid_Professional_License_ := __AND(__OP2(__PP5125707.License_Number_,<>,__CN('')),__OR(__OP2(__PP5125707.Max_Issue_Date_,<,__CC13061),__NT(__PP5125707.Max_Issue_Date_)));
-    SELF := __PP5125707;
+  SHARED __ST235537_Layout __ND5125883__Project(B_Professional_License_5(__in,__cfg).__ST241933_Layout __PP5125712) := TRANSFORM
+    __CC13066 := KEL.Routines.MinN(FN_Compile(__cfg).FN_G_E_T_B_U_I_L_D_D_A_T_E(__ECAST(KEL.typ.nstr,__CN('proflic_build_version'))),__CN(__cfg.CurrentDate));
+    SELF.Is_Active_ := __OP2(__PP5125712.Max_Expire_Date_,>,__CC13066);
+    SELF.Valid_Professional_License_ := __AND(__OP2(__PP5125712.License_Number_,<>,__CN('')),__OR(__OP2(__PP5125712.Max_Issue_Date_,<,__CC13066),__NT(__PP5125712.Max_Issue_Date_)));
+    SELF := __PP5125712;
   END;
-  EXPORT __ENH_Professional_License_4 := PROJECT(__EE5125706,__ND5125878__Project(LEFT));
+  EXPORT __ENH_Professional_License_4 := PROJECT(__EE5125711,__ND5125883__Project(LEFT));
 END;

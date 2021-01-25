@@ -1,4 +1,4 @@
-﻿//HPCC Systems KEL Compiler Version 1.5.0
+﻿//HPCC Systems KEL Compiler Version 1.5.0rc1
 IMPORT KEL15 AS KEL;
 IMPORT B_Inquiry_10,B_Inquiry_11,B_Inquiry_9,B_Person_Inquiry,B_Person_Inquiry_1,B_Person_Inquiry_2,B_Person_Inquiry_3,B_Person_Inquiry_4,B_Person_Inquiry_5,B_Person_Inquiry_6,B_Person_Inquiry_7,B_Person_Inquiry_8,CFG_Compile,E_Inquiry,E_Person,E_Person_Inquiry FROM PublicRecords_KEL;
 IMPORT * FROM KEL15.Null;
@@ -49,8 +49,8 @@ EXPORT Q_Inquiry_Entity(DATA57 __PPermitsValue, CFG_Compile.FDCDataset __in = CF
     SHARED TYPEOF(B_Person_Inquiry_1().__ENH_Person_Inquiry_1) __ENH_Person_Inquiry_1 := B_Person_Inquiry_1_Local.__ENH_Person_Inquiry_1;
   END;
   SHARED TYPEOF(B_Person_Inquiry(__in).__ENH_Person_Inquiry) __ENH_Person_Inquiry := B_Person_Inquiry_Local.__ENH_Person_Inquiry;
-  SHARED __EE11976919 := __ENH_Person_Inquiry;
-  EXPORT Res0 := __UNWRAP(__EE11976919);
+  SHARED __EE11976924 := __ENH_Person_Inquiry;
+  EXPORT Res0 := __UNWRAP(__EE11976924);
   EXPORT DBG_E_Inquiry_Result := __UNWRAP(E_Inquiry_Filtered.__Result);
   EXPORT DBG_E_Person_Inquiry_Result := __UNWRAP(E_Person_Inquiry_Filtered.__Result);
   EXPORT DBG_E_Inquiry_Intermediate_11 := __UNWRAP(B_Inquiry_11_Local.__ENH_Inquiry_11);
