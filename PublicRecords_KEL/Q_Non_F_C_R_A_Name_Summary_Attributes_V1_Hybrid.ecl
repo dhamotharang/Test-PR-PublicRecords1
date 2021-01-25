@@ -190,9 +190,9 @@ EXPORT Q_Non_F_C_R_A_Name_Summary_Attributes_V1_Hybrid(KEL.typ.str __PFirstName_
     SHARED TYPEOF(B_Name_Summary_1(__in,__cfg_Local).__ENH_Name_Summary_1) __ENH_Name_Summary_1 := B_Name_Summary_1_Local.__ENH_Name_Summary_1;
   END;
   SHARED TYPEOF(B_Name_Summary(__in,__cfg_Local).__ENH_Name_Summary) __ENH_Name_Summary := B_Name_Summary_Local.__ENH_Name_Summary;
-  SHARED __EE11578423 := __ENH_Name_Summary;
-  SHARED __EE11578503 := __EE11578423(__T(__AND(__OP2(__EE11578423.First_Name_,=,__CN(__PFirstName_in)),__AND(__OP2(__EE11578423.Last_Name_,=,__CN(__PLastName_in)),__OP2(__EE11578423.Date_Of_Birth_,=,__CN(__PDateOfBirth_in))))));
-  SHARED __ST120332_Layout := RECORD
+  SHARED __EE11576530 := __ENH_Name_Summary;
+  SHARED __EE11576610 := __EE11576530(__T(__AND(__OP2(__EE11576530.First_Name_,=,__CN(__PFirstName_in)),__AND(__OP2(__EE11576530.Last_Name_,=,__CN(__PLastName_in)),__OP2(__EE11576530.Date_Of_Birth_,=,__CN(__PDateOfBirth_in))))));
+  SHARED __ST120334_Layout := RECORD
     KEL.typ.nstr P___Inp_Cln_Name_First_;
     KEL.typ.nstr P___Inp_Cln_Name_Last_;
     KEL.typ.nkdate P___Inp_Cln_D_O_B_;
@@ -206,13 +206,13 @@ EXPORT Q_Non_F_C_R_A_Name_Summary_Attributes_V1_Hybrid(KEL.typ.str __PFirstName_
     KEL.typ.epoch Vault_Date_Last_Seen_ := 0;
     KEL.typ.int __RecordCount := 0;
   END;
-  SHARED __ST120332_Layout __ND11578508__Project(B_Name_Summary(__in,__cfg_Local).__ST152993_Layout __PP11578504) := TRANSFORM
-    SELF.P___Inp_Cln_Name_First_ := __PP11578504.First_Name_;
-    SELF.P___Inp_Cln_Name_Last_ := __PP11578504.Last_Name_;
-    SELF.P___Inp_Cln_D_O_B_ := __PP11578504.Date_Of_Birth_;
-    SELF := __PP11578504;
+  SHARED __ST120334_Layout __ND11576615__Project(B_Name_Summary(__in,__cfg_Local).__ST152995_Layout __PP11576611) := TRANSFORM
+    SELF.P___Inp_Cln_Name_First_ := __PP11576611.First_Name_;
+    SELF.P___Inp_Cln_Name_Last_ := __PP11576611.Last_Name_;
+    SELF.P___Inp_Cln_D_O_B_ := __PP11576611.Date_Of_Birth_;
+    SELF := __PP11576611;
   END;
-  EXPORT Res0 := __UNWRAP(PROJECT(TABLE(PROJECT(__EE11578503,__ND11578508__Project(LEFT)),{KEL.typ.int __RecordCount := SUM(GROUP,__RecordCount),KEL.typ.epoch Archive___Date_ := KEL.era.SimpleRoll(GROUP,Archive___Date_,MIN,FALSE),KEL.typ.epoch Date_First_Seen_ := KEL.era.SimpleRoll(GROUP,Date_First_Seen_,MIN,FALSE),KEL.typ.epoch Date_Last_Seen_ := KEL.era.SimpleRoll(GROUP,Date_Last_Seen_,MAX,FALSE),KEL.typ.epoch Hybrid_Archive_Date_ := KEL.era.SimpleRoll(GROUP,Hybrid_Archive_Date_,MIN,FALSE),KEL.typ.epoch Vault_Date_Last_Seen_ := KEL.era.SimpleRoll(GROUP,Vault_Date_Last_Seen_,MAX,NMAX),P___Inp_Cln_Name_First_,P___Inp_Cln_Name_Last_,P___Inp_Cln_D_O_B_,P_I___Src_W_Inp_F_L_D_List_Ev_,P_I___Src_W_Inp_F_L_D_Emrg_Dt_List_Ev_,P_I___Src_W_Inp_F_L_D_Last_Dt_List_Ev_},P___Inp_Cln_Name_First_,P___Inp_Cln_Name_Last_,P___Inp_Cln_D_O_B_,P_I___Src_W_Inp_F_L_D_List_Ev_,P_I___Src_W_Inp_F_L_D_Emrg_Dt_List_Ev_,P_I___Src_W_Inp_F_L_D_Last_Dt_List_Ev_,MERGE),__ST120332_Layout));
+  EXPORT Res0 := __UNWRAP(PROJECT(TABLE(PROJECT(__EE11576610,__ND11576615__Project(LEFT)),{KEL.typ.int __RecordCount := SUM(GROUP,__RecordCount),KEL.typ.epoch Archive___Date_ := KEL.era.SimpleRoll(GROUP,Archive___Date_,MIN,FALSE),KEL.typ.epoch Date_First_Seen_ := KEL.era.SimpleRoll(GROUP,Date_First_Seen_,MIN,FALSE),KEL.typ.epoch Date_Last_Seen_ := KEL.era.SimpleRoll(GROUP,Date_Last_Seen_,MAX,FALSE),KEL.typ.epoch Hybrid_Archive_Date_ := KEL.era.SimpleRoll(GROUP,Hybrid_Archive_Date_,MIN,FALSE),KEL.typ.epoch Vault_Date_Last_Seen_ := KEL.era.SimpleRoll(GROUP,Vault_Date_Last_Seen_,MAX,NMAX),P___Inp_Cln_Name_First_,P___Inp_Cln_Name_Last_,P___Inp_Cln_D_O_B_,P_I___Src_W_Inp_F_L_D_List_Ev_,P_I___Src_W_Inp_F_L_D_Emrg_Dt_List_Ev_,P_I___Src_W_Inp_F_L_D_Last_Dt_List_Ev_},P___Inp_Cln_Name_First_,P___Inp_Cln_Name_Last_,P___Inp_Cln_D_O_B_,P_I___Src_W_Inp_F_L_D_List_Ev_,P_I___Src_W_Inp_F_L_D_Emrg_Dt_List_Ev_,P_I___Src_W_Inp_F_L_D_Last_Dt_List_Ev_,MERGE),__ST120334_Layout));
   EXPORT DBG_E_Input_P_I_I_PreEntity := __UNWRAP(E_Input_P_I_I_Params(__in,__cfg_Local).InData);
   EXPORT DBG_E_Input_P_I_I_Result := __UNWRAP(E_Input_P_I_I_Filtered.__Result);
   EXPORT DBG_E_Address_Result := __UNWRAP(E_Address_Filtered.__Result);

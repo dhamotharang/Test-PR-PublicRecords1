@@ -1018,9 +1018,9 @@ EXPORT Q_Non_F_C_R_A_Business_Sele_I_D_No_Dates_Attributes_V1_Dynamic(KEL.typ.in
     SHARED TYPEOF(E_Zip_Code(__in,__cfg_Local).__Result) __E_Zip_Code := E_Zip_Code_Filtered.__Result;
   END;
   SHARED TYPEOF(B_Business_Sele(__in,__cfg_Local).__ENH_Business_Sele) __ENH_Business_Sele := B_Business_Sele_Local.__ENH_Business_Sele;
-  SHARED __EE11574936 := __ENH_Business_Sele;
-  SHARED __EE11576294 := __EE11574936(__T(__AND(__OP2(__EE11574936.Ult_I_D_,=,__CN(__PUltID_in)),__AND(__OP2(__EE11574936.Org_I_D_,=,__CN(__POrgID_in)),__OP2(__EE11574936.Sele_I_D_,=,__CN(__PSeleID_in))))));
-  SHARED __ST119370_Layout := RECORD
+  SHARED __EE11573043 := __ENH_Business_Sele;
+  SHARED __EE11574401 := __EE11573043(__T(__AND(__OP2(__EE11573043.Ult_I_D_,=,__CN(__PUltID_in)),__AND(__OP2(__EE11573043.Org_I_D_,=,__CN(__POrgID_in)),__OP2(__EE11573043.Sele_I_D_,=,__CN(__PSeleID_in))))));
+  SHARED __ST119372_Layout := RECORD
     KEL.typ.nint B___Lex_I_D_Ult_;
     KEL.typ.nint B___Lex_I_D_Org_;
     KEL.typ.nint B___Lex_I_D_Legal_;
@@ -1032,13 +1032,13 @@ EXPORT Q_Non_F_C_R_A_Business_Sele_I_D_No_Dates_Attributes_V1_Dynamic(KEL.typ.in
     KEL.typ.epoch Vault_Date_Last_Seen_ := 0;
     KEL.typ.int __RecordCount := 0;
   END;
-  SHARED __ST119370_Layout __ND11576299__Project(B_Business_Sele(__in,__cfg_Local).__ST144912_Layout __PP11576295) := TRANSFORM
-    SELF.B___Lex_I_D_Ult_ := __PP11576295.Ult_I_D_;
-    SELF.B___Lex_I_D_Org_ := __PP11576295.Org_I_D_;
-    SELF.B___Lex_I_D_Legal_ := __PP11576295.Sele_I_D_;
-    SELF := __PP11576295;
+  SHARED __ST119372_Layout __ND11574406__Project(B_Business_Sele(__in,__cfg_Local).__ST144914_Layout __PP11574402) := TRANSFORM
+    SELF.B___Lex_I_D_Ult_ := __PP11574402.Ult_I_D_;
+    SELF.B___Lex_I_D_Org_ := __PP11574402.Org_I_D_;
+    SELF.B___Lex_I_D_Legal_ := __PP11574402.Sele_I_D_;
+    SELF := __PP11574402;
   END;
-  EXPORT Res0 := __UNWRAP(PROJECT(TABLE(PROJECT(__EE11576294,__ND11576299__Project(LEFT)),{KEL.typ.int __RecordCount := SUM(GROUP,__RecordCount),KEL.typ.epoch Archive___Date_ := KEL.era.SimpleRoll(GROUP,Archive___Date_,MIN,FALSE),KEL.typ.epoch Date_First_Seen_ := KEL.era.SimpleRoll(GROUP,Date_First_Seen_,MIN,FALSE),KEL.typ.epoch Date_Last_Seen_ := KEL.era.SimpleRoll(GROUP,Date_Last_Seen_,MAX,FALSE),KEL.typ.epoch Hybrid_Archive_Date_ := KEL.era.SimpleRoll(GROUP,Hybrid_Archive_Date_,MIN,FALSE),KEL.typ.epoch Vault_Date_Last_Seen_ := KEL.era.SimpleRoll(GROUP,Vault_Date_Last_Seen_,MAX,NMAX),B___Lex_I_D_Ult_,B___Lex_I_D_Org_,B___Lex_I_D_Legal_,B___Lex_I_D_Legal_Rstd_Only_Flag_},B___Lex_I_D_Ult_,B___Lex_I_D_Org_,B___Lex_I_D_Legal_,B___Lex_I_D_Legal_Rstd_Only_Flag_,MERGE),__ST119370_Layout));
+  EXPORT Res0 := __UNWRAP(PROJECT(TABLE(PROJECT(__EE11574401,__ND11574406__Project(LEFT)),{KEL.typ.int __RecordCount := SUM(GROUP,__RecordCount),KEL.typ.epoch Archive___Date_ := KEL.era.SimpleRoll(GROUP,Archive___Date_,MIN,FALSE),KEL.typ.epoch Date_First_Seen_ := KEL.era.SimpleRoll(GROUP,Date_First_Seen_,MIN,FALSE),KEL.typ.epoch Date_Last_Seen_ := KEL.era.SimpleRoll(GROUP,Date_Last_Seen_,MAX,FALSE),KEL.typ.epoch Hybrid_Archive_Date_ := KEL.era.SimpleRoll(GROUP,Hybrid_Archive_Date_,MIN,FALSE),KEL.typ.epoch Vault_Date_Last_Seen_ := KEL.era.SimpleRoll(GROUP,Vault_Date_Last_Seen_,MAX,NMAX),B___Lex_I_D_Ult_,B___Lex_I_D_Org_,B___Lex_I_D_Legal_,B___Lex_I_D_Legal_Rstd_Only_Flag_},B___Lex_I_D_Ult_,B___Lex_I_D_Org_,B___Lex_I_D_Legal_,B___Lex_I_D_Legal_Rstd_Only_Flag_,MERGE),__ST119372_Layout));
   EXPORT DBG_E_Accident_Result := __UNWRAP(E_Accident_Filtered.__Result);
   EXPORT DBG_E_Address_Result := __UNWRAP(E_Address_Filtered.__Result);
   EXPORT DBG_E_Address_Inquiry_Result := __UNWRAP(E_Address_Inquiry_Filtered.__Result);

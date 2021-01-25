@@ -4,8 +4,8 @@ IMPORT B_U_C_C_10,B_U_C_C_11,CFG_Compile,E_U_C_C FROM PublicRecords_KEL;
 IMPORT * FROM KEL15.Null;
 EXPORT B_U_C_C_9(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG_Compile __cfg = CFG_Compile) := MODULE
   SHARED VIRTUAL TYPEOF(B_U_C_C_10(__in,__cfg).__ENH_U_C_C_10) __ENH_U_C_C_10 := B_U_C_C_10(__in,__cfg).__ENH_U_C_C_10;
-  SHARED __EE4801436 := __ENH_U_C_C_10;
-  EXPORT __ST254788_Layout := RECORD
+  SHARED __EE4800573 := __ENH_U_C_C_10;
+  EXPORT __ST254763_Layout := RECORD
     KEL.typ.nstr R_M_S_I_D_;
     KEL.typ.nstr Filing_Jurisdiction_;
     KEL.typ.nstr Filing_Number_;
@@ -36,14 +36,14 @@ EXPORT B_U_C_C_9(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG_Compi
     KEL.typ.epoch Vault_Date_Last_Seen_ := 0;
     KEL.typ.int __RecordCount := 0;
   END;
-  EXPORT __ST254784_Layout := RECORD
+  EXPORT __ST254759_Layout := RECORD
     KEL.typ.nuid UID;
     KEL.typ.nstr T_M_S_I_D_;
-    KEL.typ.ndataset(__ST254788_Layout) Sub_Filing_;
+    KEL.typ.ndataset(__ST254763_Layout) Sub_Filing_;
     KEL.typ.ndataset(E_U_C_C(__in,__cfg).Collateral_Layout) Collateral_;
     KEL.typ.ndataset(E_U_C_C(__in,__cfg).Data_Sources_Layout) Data_Sources_;
     KEL.typ.nstr Best_Child_R_M_S_I_D_;
-    KEL.typ.ndataset(B_U_C_C_10(__in,__cfg).__ST112717_Layout) Best_U_C_C_Child_Record_;
+    KEL.typ.ndataset(B_U_C_C_10(__in,__cfg).__ST112719_Layout) Best_U_C_C_Child_Record_;
     KEL.typ.epoch Archive___Date_ := 0;
     KEL.typ.epoch Date_First_Seen_ := 0;
     KEL.typ.epoch Date_Last_Seen_ := 0;
@@ -51,12 +51,12 @@ EXPORT B_U_C_C_9(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG_Compi
     KEL.typ.epoch Vault_Date_Last_Seen_ := 0;
     KEL.typ.int __RecordCount := 0;
   END;
-  SHARED __ST254784_Layout __ND4801399__Project(B_U_C_C_10(__in,__cfg).__ST256126_Layout __PP4801108) := TRANSFORM
-    __EE4801439 := __PP4801108.Sub_Filing_;
-    SELF.Sub_Filing_ := __BN(PROJECT(__T(__EE4801439),__ST254788_Layout),__NL(__EE4801439));
-    __EE4801394 := __PP4801108.Best_U_C_C_Child_Record_;
-    SELF.Best_Child_R_M_S_I_D_ := (__T(__EE4801394))[1].R_M_S_I_D_;
-    SELF := __PP4801108;
+  SHARED __ST254759_Layout __ND4800536__Project(B_U_C_C_10(__in,__cfg).__ST256101_Layout __PP4800245) := TRANSFORM
+    __EE4800576 := __PP4800245.Sub_Filing_;
+    SELF.Sub_Filing_ := __BN(PROJECT(__T(__EE4800576),__ST254763_Layout),__NL(__EE4800576));
+    __EE4800531 := __PP4800245.Best_U_C_C_Child_Record_;
+    SELF.Best_Child_R_M_S_I_D_ := (__T(__EE4800531))[1].R_M_S_I_D_;
+    SELF := __PP4800245;
   END;
-  EXPORT __ENH_U_C_C_9 := PROJECT(__EE4801436,__ND4801399__Project(LEFT));
+  EXPORT __ENH_U_C_C_9 := PROJECT(__EE4800573,__ND4800536__Project(LEFT));
 END;
