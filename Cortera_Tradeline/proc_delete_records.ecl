@@ -17,9 +17,10 @@ EXPORT proc_delete_records(string8 													pVersion   			 = '',
 		integer4 deldate := (integer4)pVersion;
 		
 		//*** Processing deletes on Delta/incremental build
+		//*** Staus field is not set to "D" for delta incremnal runs.
 		DeltaJ  := JOIN(t_curr, d, left.ACCOUNT_KEY=right.ACCOUNT_KEY and left.AR_DATE=right.AR_DATE,
 										TRANSFORM($.Layout_Tradeline_base,
-															self.status 								 := IF(left.ACCOUNT_KEY=right.ACCOUNT_KEY and left.AR_DATE=right.AR_DATE, 'D', left.status);
+															//self.status 								 := IF(left.ACCOUNT_KEY=right.ACCOUNT_KEY and left.AR_DATE=right.AR_DATE, 'D', left.status);
 															self.deletion_date 					 := IF(left.ACCOUNT_KEY=right.ACCOUNT_KEY and left.AR_DATE=right.AR_DATE, deldate, left.deletion_date);
 															self.dt_vendor_last_reported := IF(left.ACCOUNT_KEY=right.ACCOUNT_KEY and left.AR_DATE=right.AR_DATE, deldate, left.dt_vendor_last_reported);
 															self.dt_effective_last			 := IF(left.ACCOUNT_KEY=right.ACCOUNT_KEY and left.AR_DATE=right.AR_DATE, deldate, 0);
@@ -28,12 +29,12 @@ EXPORT proc_delete_records(string8 													pVersion   			 = '',
 									
 		DeltaJ2 := JOIN(t_prev, d, left.ACCOUNT_KEY=right.ACCOUNT_KEY and left.AR_DATE=right.AR_DATE,
 										TRANSFORM($.Layout_Tradeline_Base,
-															self.status										:= IF(left.ACCOUNT_KEY=right.ACCOUNT_KEY and left.AR_DATE=right.AR_DATE, 'D', left.status);
+															//self.status										:= IF(left.ACCOUNT_KEY=right.ACCOUNT_KEY and left.AR_DATE=right.AR_DATE, 'D', left.status);
 															self.deletion_date						:= IF(left.ACCOUNT_KEY=right.ACCOUNT_KEY and left.AR_DATE=right.AR_DATE, deldate, left.deletion_date);
 															self.dt_vendor_last_reported	:= IF(left.ACCOUNT_KEY=right.ACCOUNT_KEY and left.AR_DATE=right.AR_DATE, deldate, left.dt_vendor_last_reported);
 															self.dt_effective_first				:= left.filedate;
 															self.dt_effective_last				:= IF(left.ACCOUNT_KEY=right.ACCOUNT_KEY and left.AR_DATE=right.AR_DATE, deldate, 0);
-															self.delta_ind								:= 2;
+															self.delta_ind								:= 1;
 															self 													:= left;),
 										LOOKUP, LOCAL);
 										
