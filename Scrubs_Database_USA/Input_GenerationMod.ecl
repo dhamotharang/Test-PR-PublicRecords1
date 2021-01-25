@@ -1,6 +1,6 @@
 ﻿// Machine-readable versions of the spec file and subsets thereof
 IMPORT SALT311;
-EXPORT Base_GenerationMod := MODULE(SALT311.iGenerationMod)
+EXPORT Input_GenerationMod := MODULE(SALT311.iGenerationMod)
  
   // SALT Version info
   EXPORT salt_VERSION := 'V3.11.4';
@@ -9,7 +9,7 @@ EXPORT Base_GenerationMod := MODULE(SALT311.iGenerationMod)
  
   // Core module configuration values
   EXPORT spc_MODULE := 'Scrubs_Database_USA';
-  EXPORT spc_NAMESCOPE := 'Base';
+  EXPORT spc_NAMESCOPE := 'Input';
   EXPORT spc_PROCESS := '';
   EXPORT spc_PROCLAYOUTS := 'Process__Layouts';
   EXPORT spc_IDNAME := ''; // cluster id (input)
@@ -22,7 +22,7 @@ EXPORT Base_GenerationMod := MODULE(SALT311.iGenerationMod)
   EXPORT spc_FILENAME := 'Database_USA';
   EXPORT spc_INGESTSTATUS := '';
   EXPORT spc_EXTERNAL_MAPPING := 'UniqueID:';
-  EXPORT spc_EXTERNAL_BATCH_PARAM := ',/* MY_ */,dt_first_seen,dt_last_seen,dt_vendor_first_reported,dt_vendor_last_reported,process_date,record_type,accounting_expenses_code,advertising_expenses_code,bus_insurance_expense_code,business_status_code,business_status_desc,city_population_code,city_population_descr,company_name,corporate_employee_code,corporate_employee_desc,county_code,creditcode,credit_desc,credit_capacity_code,credit_capacity_desc,db_cons_age,db_cons_child_near_hs_grad,db_cons_children_present,db_cons_college_graduate,db_cons_credit_card_user,db_cons_date_of_birth_month,db_cons_date_of_birth_year,db_cons_discretincomecode,db_cons_discretincomedesc,db_cons_dnc,db_cons_donor_capacity_code,db_cons_donor_capacity_desc,db_cons_dwelling_type,db_cons_education_hh,db_cons_education_ind,db_cons_email,db_cons_ethnic_code,db_cons_full_name,db_cons_gender,db_cons_home_owner_renter,db_cons_home_property_type,db_cons_home_sqft_ranges,db_cons_home_value_code,db_cons_home_value_desc,db_cons_home_year_built,db_cons_income_code,db_cons_income_desc,db_cons_intend_purchase_veh,db_cons_language_pref,db_cons_length_of_res_code,db_cons_length_of_res_desc,db_cons_marital_status,db_cons_networthhomevalcode,db_cons_net_worth_desc,db_cons_new_parent,db_cons_new_teen_driver,db_cons_newlywed,db_cons_occupation_ind,db_cons_other_pet_owner,db_cons_phone,db_cons_poli_party_ind,db_cons_recent_divorce,db_cons_recent_home_buyer,db_cons_religious_affil,db_cons_scrubbed_phoneable,db_cons_time_zone_code,db_cons_time_zone_desc,db_cons_unsecuredcredcapcode,db_cons_unsecuredcredcapdesc,domestic_foreign_owner_flag,email,email_available_indicator,exec_type,executive_level,executive_title_rank,expense_accounting_desc,expense_advertising_desc,expense_bus_insurance_desc,expense_legal_desc,expense_office_equip_desc,expense_rent_desc,expense_technology_desc,expense_telecom_desc,expense_utilities_desc,female_owned,franchise_flag,franchise_type,full_name,gender,home_based_indicator,import_export,ind_frm_indicator,legal_expenses_code,location_employee_code,location_employee_desc,location_sales_code,location_sales_desc,mail_addr_state,mail_addr_zip,mail_score,manufacturing_location,minority_owned_flag,minority_type,naics01,naics02,naics03,naics04,naics05,naics06,nb_flag,non_profit_org,number_of_pcs_code,number_of_pcs_desc,office_equip_expenses_code,phone,phy_addr_state,phy_addr_zip,primary_exec_flag,primary_sic,primarysic2,primarysic4,public_indicator,rent_expenses_code,sic02,sic03,sic04,sic05,sic06,small_business_indicator,square_footage_code,square_footage_desc,standardized_title,technology_expenses_code,telecom_expenses_code,url,utilities_expenses_code,year_established,years_in_business_range';
+  EXPORT spc_EXTERNAL_BATCH_PARAM := ',/* MY_ */,accounting_expenses_code,advertising_expenses_code,bus_insurance_expense_code,business_status_code,business_status_desc,city_population_code,city_population_descr,company_name,corporate_employee_code,corporate_employee_desc,county_code,creditcode,credit_desc,credit_capacity_code,credit_capacity_desc,db_cons_age,db_cons_child_near_hs_grad,db_cons_children_present,db_cons_college_graduate,db_cons_credit_card_user,db_cons_date_of_birth_month,db_cons_date_of_birth_year,db_cons_discretincomecode,db_cons_discretincomedesc,db_cons_dnc,db_cons_donor_capacity_code,db_cons_donor_capacity_desc,db_cons_dwelling_type,db_cons_education_hh,db_cons_education_ind,db_cons_email,db_cons_ethnic_code,db_cons_full_name,db_cons_gender,db_cons_home_owner_renter,db_cons_home_property_type,db_cons_home_sqft_ranges,db_cons_home_value_code,db_cons_home_value_desc,db_cons_home_year_built,db_cons_income_code,db_cons_income_desc,db_cons_intend_purchase_veh,db_cons_language_pref,db_cons_length_of_res_code,db_cons_length_of_res_desc,db_cons_marital_status,db_cons_networthhomevalcode,db_cons_net_worth_desc,db_cons_new_parent,db_cons_new_teen_driver,db_cons_newlywed,db_cons_occupation_ind,db_cons_other_pet_owner,db_cons_phone,db_cons_poli_party_ind,db_cons_recent_divorce,db_cons_recent_home_buyer,db_cons_religious_affil,db_cons_scrubbed_phoneable,db_cons_time_zone_code,db_cons_time_zone_desc,db_cons_unsecuredcredcapcode,db_cons_unsecuredcredcapdesc,domestic_foreign_owner_flag,email,email_available_indicator,exec_type,executive_level,executive_title_rank,expense_accounting_desc,expense_advertising_desc,expense_bus_insurance_desc,expense_legal_desc,expense_office_equip_desc,expense_rent_desc,expense_technology_desc,expense_telecom_desc,expense_utilities_desc,female_owned,franchise_flag,franchise_type,full_name,gender,home_based_indicator,import_export,ind_frm_indicator,legal_expenses_code,location_employee_code,location_employee_desc,location_sales_code,location_sales_desc,mail_addr_state,mail_addr_zip,mail_score,manufacturing_location,minority_owned_flag,minority_type,naics01,naics02,naics03,naics04,naics05,naics06,nb_flag,non_profit_org,number_of_pcs_code,number_of_pcs_desc,office_equip_expenses_code,phone,phy_addr_state,phy_addr_zip,primary_exec_flag,primary_sic,primarysic2,primarysic4,public_indicator,rent_expenses_code,sic02,sic03,sic04,sic05,sic06,small_business_indicator,square_footage_code,square_footage_desc,standardized_title,technology_expenses_code,telecom_expenses_code,url,utilities_expenses_code,year_established,years_in_business_range';
   EXPORT spc_HAS_TWOSTEP := FALSE;
   EXPORT spc_HAS_PARTITION := FALSE;
   EXPORT spc_HAS_FIELDTYPES := TRUE;
@@ -41,7 +41,7 @@ EXPORT Base_GenerationMod := MODULE(SALT311.iGenerationMod)
     'OPTIONS:-gh\n'
     + 'MODULE:Scrubs_Database_USA\n'
     + 'FILENAME:Database_USA\n'
-    + 'NAMESCOPE:Base\n'
+    + 'NAMESCOPE:Input\n'
     + '\n'
     + 'FIELDTYPE:invalid_accounting_code:CUSTOM(Scrubs_Database_USA.Functions.fn_accounting_code > 0)\n'
     + 'FIELDTYPE:invalid_accounting_expenses:CUSTOM(Scrubs_Database_USA.Functions.fn_verify_accounting_expenses_desc >0, accounting_expenses_code)\n'
@@ -139,13 +139,6 @@ EXPORT Base_GenerationMod := MODULE(SALT311.iGenerationMod)
     + 'FIELDTYPE:invalid_year:CUSTOM(Scrubs_Database_USA.Functions.fn_dt_yyyy > 0)\n'
     + 'FIELDTYPE:invalid_years_in_business:CUSTOM(Scrubs_Database_USA.Functions.fn_verify_years_in_business_range >0)\n'
     + 'FIELDTYPE:invalid_zip5:CUSTOM(Scrubs_Database_USA.Functions.fn_numeric_or_blank > 0)\n'
-    + '\n'
-    + 'FIELD:dt_first_seen:TYPE(UNSIGNED4):LIKE(invalid_pastdate):0,0\n'
-    + 'FIELD:dt_last_seen:TYPE(UNSIGNED4):LIKE(invalid_pastdate):0,0\n'
-    + 'FIELD:dt_vendor_first_reported:TYPE(UNSIGNED4):LIKE(invalid_pastdate):0,0\n'
-    + 'FIELD:dt_vendor_last_reported:TYPE(UNSIGNED4):LIKE(invalid_pastdate):0,0\n'
-    + 'FIELD:process_date:TYPE(UNSIGNED4):LIKE(invalid_generaldate):0,0\n'
-    + 'FIELD:record_type:TYPE(STRING1):LIKE(invalid_record_type):0,0\n'
     + ' \n'
     + 'FIELD:accounting_expenses_code:TYPE(STRING):LIKE(invalid_accounting_code):0,0\n'
     + 'FIELD:advertising_expenses_code:TYPE(STRING):LIKE(invalid_advertising_code):0,0\n'
@@ -282,7 +275,15 @@ EXPORT Base_GenerationMod := MODULE(SALT311.iGenerationMod)
     + 'FIELD:url:TYPE(STRING):LIKE(invalid_url):0,0\n'
     + 'FIELD:utilities_expenses_code:TYPE(STRING):LIKE(invalid_utilities_code):0,0\n'
     + 'FIELD:year_established:TYPE(STRING):LIKE(invalid_year):0,0\n'
-    + 'FIELD:years_in_business_range:TYPE(STRING):LIKE(invalid_years_in_business):0,0'
+    + 'FIELD:years_in_business_range:TYPE(STRING):LIKE(invalid_years_in_business):0,0\n'
+    + '\n'
+    + '\n'
+    + '\n'
+    + '\n'
+    + '\n'
+    + '\n'
+    + '\n'
+    + '\n'
     ;
  
   // Structured values

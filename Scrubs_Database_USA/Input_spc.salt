@@ -1,7 +1,7 @@
 ﻿OPTIONS:-gh
 MODULE:Scrubs_Database_USA
 FILENAME:Database_USA
-NAMESCOPE:Base
+NAMESCOPE:Input
 
 FIELDTYPE:invalid_accounting_code:CUSTOM(Scrubs_Database_USA.Functions.fn_accounting_code > 0)
 FIELDTYPE:invalid_accounting_expenses:CUSTOM(Scrubs_Database_USA.Functions.fn_verify_accounting_expenses_desc >0, accounting_expenses_code)
@@ -99,13 +99,6 @@ FIELDTYPE:invalid_utilities_expenses:CUSTOM(Scrubs_Database_USA.Functions.fn_ver
 FIELDTYPE:invalid_year:CUSTOM(Scrubs_Database_USA.Functions.fn_dt_yyyy > 0)
 FIELDTYPE:invalid_years_in_business:CUSTOM(Scrubs_Database_USA.Functions.fn_verify_years_in_business_range >0)
 FIELDTYPE:invalid_zip5:CUSTOM(Scrubs_Database_USA.Functions.fn_numeric_or_blank > 0)
-
-FIELD:dt_first_seen:TYPE(UNSIGNED4):LIKE(invalid_pastdate):0,0
-FIELD:dt_last_seen:TYPE(UNSIGNED4):LIKE(invalid_pastdate):0,0
-FIELD:dt_vendor_first_reported:TYPE(UNSIGNED4):LIKE(invalid_pastdate):0,0
-FIELD:dt_vendor_last_reported:TYPE(UNSIGNED4):LIKE(invalid_pastdate):0,0
-FIELD:process_date:TYPE(UNSIGNED4):LIKE(invalid_generaldate):0,0
-FIELD:record_type:TYPE(STRING1):LIKE(invalid_record_type):0,0
  
 FIELD:accounting_expenses_code:TYPE(STRING):LIKE(invalid_accounting_code):0,0
 FIELD:advertising_expenses_code:TYPE(STRING):LIKE(invalid_advertising_code):0,0
@@ -243,3 +236,11 @@ FIELD:url:TYPE(STRING):LIKE(invalid_url):0,0
 FIELD:utilities_expenses_code:TYPE(STRING):LIKE(invalid_utilities_code):0,0
 FIELD:year_established:TYPE(STRING):LIKE(invalid_year):0,0
 FIELD:years_in_business_range:TYPE(STRING):LIKE(invalid_years_in_business):0,0
+
+
+
+
+
+
+
+

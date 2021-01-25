@@ -1,5 +1,5 @@
 ﻿ 
-EXPORT Base_MAC_PopulationStatistics(infile,Ref='',Input_dt_first_seen = '',Input_dt_last_seen = '',Input_dt_vendor_first_reported = '',Input_dt_vendor_last_reported = '',Input_process_date = '',Input_record_type = '',Input_accounting_expenses_code = '',Input_advertising_expenses_code = '',Input_bus_insurance_expense_code = '',Input_business_status_code = '',Input_business_status_desc = '',Input_city_population_code = '',Input_city_population_descr = '',Input_company_name = '',Input_corporate_employee_code = '',Input_corporate_employee_desc = '',Input_county_code = '',Input_creditcode = '',Input_credit_desc = '',Input_credit_capacity_code = '',Input_credit_capacity_desc = '',Input_db_cons_age = '',Input_db_cons_child_near_hs_grad = '',Input_db_cons_children_present = '',Input_db_cons_college_graduate = '',Input_db_cons_credit_card_user = '',Input_db_cons_date_of_birth_month = '',Input_db_cons_date_of_birth_year = '',Input_db_cons_discretincomecode = '',Input_db_cons_discretincomedesc = '',Input_db_cons_dnc = '',Input_db_cons_donor_capacity_code = '',Input_db_cons_donor_capacity_desc = '',Input_db_cons_dwelling_type = '',Input_db_cons_education_hh = '',Input_db_cons_education_ind = '',Input_db_cons_email = '',Input_db_cons_ethnic_code = '',Input_db_cons_full_name = '',Input_db_cons_gender = '',Input_db_cons_home_owner_renter = '',Input_db_cons_home_property_type = '',Input_db_cons_home_sqft_ranges = '',Input_db_cons_home_value_code = '',Input_db_cons_home_value_desc = '',Input_db_cons_home_year_built = '',Input_db_cons_income_code = '',Input_db_cons_income_desc = '',Input_db_cons_intend_purchase_veh = '',Input_db_cons_language_pref = '',Input_db_cons_length_of_res_code = '',Input_db_cons_length_of_res_desc = '',Input_db_cons_marital_status = '',Input_db_cons_networthhomevalcode = '',Input_db_cons_net_worth_desc = '',Input_db_cons_new_parent = '',Input_db_cons_new_teen_driver = '',Input_db_cons_newlywed = '',Input_db_cons_occupation_ind = '',Input_db_cons_other_pet_owner = '',Input_db_cons_phone = '',Input_db_cons_poli_party_ind = '',Input_db_cons_recent_divorce = '',Input_db_cons_recent_home_buyer = '',Input_db_cons_religious_affil = '',Input_db_cons_scrubbed_phoneable = '',Input_db_cons_time_zone_code = '',Input_db_cons_time_zone_desc = '',Input_db_cons_unsecuredcredcapcode = '',Input_db_cons_unsecuredcredcapdesc = '',Input_domestic_foreign_owner_flag = '',Input_email = '',Input_email_available_indicator = '',Input_exec_type = '',Input_executive_level = '',Input_executive_title_rank = '',Input_expense_accounting_desc = '',Input_expense_advertising_desc = '',Input_expense_bus_insurance_desc = '',Input_expense_legal_desc = '',Input_expense_office_equip_desc = '',Input_expense_rent_desc = '',Input_expense_technology_desc = '',Input_expense_telecom_desc = '',Input_expense_utilities_desc = '',Input_female_owned = '',Input_franchise_flag = '',Input_franchise_type = '',Input_full_name = '',Input_gender = '',Input_home_based_indicator = '',Input_import_export = '',Input_ind_frm_indicator = '',Input_legal_expenses_code = '',Input_location_employee_code = '',Input_location_employee_desc = '',Input_location_sales_code = '',Input_location_sales_desc = '',Input_mail_addr_state = '',Input_mail_addr_zip = '',Input_mail_score = '',Input_manufacturing_location = '',Input_minority_owned_flag = '',Input_minority_type = '',Input_naics01 = '',Input_naics02 = '',Input_naics03 = '',Input_naics04 = '',Input_naics05 = '',Input_naics06 = '',Input_nb_flag = '',Input_non_profit_org = '',Input_number_of_pcs_code = '',Input_number_of_pcs_desc = '',Input_office_equip_expenses_code = '',Input_phone = '',Input_phy_addr_state = '',Input_phy_addr_zip = '',Input_primary_exec_flag = '',Input_primary_sic = '',Input_primarysic2 = '',Input_primarysic4 = '',Input_public_indicator = '',Input_rent_expenses_code = '',Input_sic02 = '',Input_sic03 = '',Input_sic04 = '',Input_sic05 = '',Input_sic06 = '',Input_small_business_indicator = '',Input_square_footage_code = '',Input_square_footage_desc = '',Input_standardized_title = '',Input_technology_expenses_code = '',Input_telecom_expenses_code = '',Input_url = '',Input_utilities_expenses_code = '',Input_year_established = '',Input_years_in_business_range = '',OutFile) := MACRO
+EXPORT Input_MAC_PopulationStatistics(infile,Ref='',Input_accounting_expenses_code = '',Input_advertising_expenses_code = '',Input_bus_insurance_expense_code = '',Input_business_status_code = '',Input_business_status_desc = '',Input_city_population_code = '',Input_city_population_descr = '',Input_company_name = '',Input_corporate_employee_code = '',Input_corporate_employee_desc = '',Input_county_code = '',Input_creditcode = '',Input_credit_desc = '',Input_credit_capacity_code = '',Input_credit_capacity_desc = '',Input_db_cons_age = '',Input_db_cons_child_near_hs_grad = '',Input_db_cons_children_present = '',Input_db_cons_college_graduate = '',Input_db_cons_credit_card_user = '',Input_db_cons_date_of_birth_month = '',Input_db_cons_date_of_birth_year = '',Input_db_cons_discretincomecode = '',Input_db_cons_discretincomedesc = '',Input_db_cons_dnc = '',Input_db_cons_donor_capacity_code = '',Input_db_cons_donor_capacity_desc = '',Input_db_cons_dwelling_type = '',Input_db_cons_education_hh = '',Input_db_cons_education_ind = '',Input_db_cons_email = '',Input_db_cons_ethnic_code = '',Input_db_cons_full_name = '',Input_db_cons_gender = '',Input_db_cons_home_owner_renter = '',Input_db_cons_home_property_type = '',Input_db_cons_home_sqft_ranges = '',Input_db_cons_home_value_code = '',Input_db_cons_home_value_desc = '',Input_db_cons_home_year_built = '',Input_db_cons_income_code = '',Input_db_cons_income_desc = '',Input_db_cons_intend_purchase_veh = '',Input_db_cons_language_pref = '',Input_db_cons_length_of_res_code = '',Input_db_cons_length_of_res_desc = '',Input_db_cons_marital_status = '',Input_db_cons_networthhomevalcode = '',Input_db_cons_net_worth_desc = '',Input_db_cons_new_parent = '',Input_db_cons_new_teen_driver = '',Input_db_cons_newlywed = '',Input_db_cons_occupation_ind = '',Input_db_cons_other_pet_owner = '',Input_db_cons_phone = '',Input_db_cons_poli_party_ind = '',Input_db_cons_recent_divorce = '',Input_db_cons_recent_home_buyer = '',Input_db_cons_religious_affil = '',Input_db_cons_scrubbed_phoneable = '',Input_db_cons_time_zone_code = '',Input_db_cons_time_zone_desc = '',Input_db_cons_unsecuredcredcapcode = '',Input_db_cons_unsecuredcredcapdesc = '',Input_domestic_foreign_owner_flag = '',Input_email = '',Input_email_available_indicator = '',Input_exec_type = '',Input_executive_level = '',Input_executive_title_rank = '',Input_expense_accounting_desc = '',Input_expense_advertising_desc = '',Input_expense_bus_insurance_desc = '',Input_expense_legal_desc = '',Input_expense_office_equip_desc = '',Input_expense_rent_desc = '',Input_expense_technology_desc = '',Input_expense_telecom_desc = '',Input_expense_utilities_desc = '',Input_female_owned = '',Input_franchise_flag = '',Input_franchise_type = '',Input_full_name = '',Input_gender = '',Input_home_based_indicator = '',Input_import_export = '',Input_ind_frm_indicator = '',Input_legal_expenses_code = '',Input_location_employee_code = '',Input_location_employee_desc = '',Input_location_sales_code = '',Input_location_sales_desc = '',Input_mail_addr_state = '',Input_mail_addr_zip = '',Input_mail_score = '',Input_manufacturing_location = '',Input_minority_owned_flag = '',Input_minority_type = '',Input_naics01 = '',Input_naics02 = '',Input_naics03 = '',Input_naics04 = '',Input_naics05 = '',Input_naics06 = '',Input_nb_flag = '',Input_non_profit_org = '',Input_number_of_pcs_code = '',Input_number_of_pcs_desc = '',Input_office_equip_expenses_code = '',Input_phone = '',Input_phy_addr_state = '',Input_phy_addr_zip = '',Input_primary_exec_flag = '',Input_primary_sic = '',Input_primarysic2 = '',Input_primarysic4 = '',Input_public_indicator = '',Input_rent_expenses_code = '',Input_sic02 = '',Input_sic03 = '',Input_sic04 = '',Input_sic05 = '',Input_sic06 = '',Input_small_business_indicator = '',Input_square_footage_code = '',Input_square_footage_desc = '',Input_standardized_title = '',Input_technology_expenses_code = '',Input_telecom_expenses_code = '',Input_url = '',Input_utilities_expenses_code = '',Input_year_established = '',Input_years_in_business_range = '',OutFile) := MACRO
   IMPORT SALT311,Scrubs_Database_USA;
   #uniquename(of)
   %of% := RECORD
@@ -8,43 +8,7 @@ EXPORT Base_MAC_PopulationStatistics(infile,Ref='',Input_dt_first_seen = '',Inpu
   #uniquename(ot)
   %of% %ot%(infile le) := TRANSFORM
     SELF.fields :=
-    #IF( #TEXT(Input_dt_first_seen)='' )
-      '' 
-    #ELSE
-        IF( le.Input_dt_first_seen = (TYPEOF(le.Input_dt_first_seen))'','',':dt_first_seen')
-    #END
- 
-+    #IF( #TEXT(Input_dt_last_seen)='' )
-      '' 
-    #ELSE
-        IF( le.Input_dt_last_seen = (TYPEOF(le.Input_dt_last_seen))'','',':dt_last_seen')
-    #END
- 
-+    #IF( #TEXT(Input_dt_vendor_first_reported)='' )
-      '' 
-    #ELSE
-        IF( le.Input_dt_vendor_first_reported = (TYPEOF(le.Input_dt_vendor_first_reported))'','',':dt_vendor_first_reported')
-    #END
- 
-+    #IF( #TEXT(Input_dt_vendor_last_reported)='' )
-      '' 
-    #ELSE
-        IF( le.Input_dt_vendor_last_reported = (TYPEOF(le.Input_dt_vendor_last_reported))'','',':dt_vendor_last_reported')
-    #END
- 
-+    #IF( #TEXT(Input_process_date)='' )
-      '' 
-    #ELSE
-        IF( le.Input_process_date = (TYPEOF(le.Input_process_date))'','',':process_date')
-    #END
- 
-+    #IF( #TEXT(Input_record_type)='' )
-      '' 
-    #ELSE
-        IF( le.Input_record_type = (TYPEOF(le.Input_record_type))'','',':record_type')
-    #END
- 
-+    #IF( #TEXT(Input_accounting_expenses_code)='' )
+    #IF( #TEXT(Input_accounting_expenses_code)='' )
       '' 
     #ELSE
         IF( le.Input_accounting_expenses_code = (TYPEOF(le.Input_accounting_expenses_code))'','',':accounting_expenses_code')

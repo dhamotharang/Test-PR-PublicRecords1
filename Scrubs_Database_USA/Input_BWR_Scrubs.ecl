@@ -1,9 +1,9 @@
 ﻿//This is the code to execute in a builder window
 #OPTION('multiplePersistInstances', FALSE);
-#workunit('name','Scrubs_Database_USA.Base_BWR_Scrubs - Checking field validity in a file - SALT V3.11.4');
+#workunit('name','Scrubs_Database_USA.Input_BWR_Scrubs - Checking field validity in a file - SALT V3.11.4');
 IMPORT Scrubs_Database_USA,SALT311;
-infile := Scrubs_Database_USA.Base_In_Database_USA;
-mod_scrubs := Scrubs_Database_USA.Base_Scrubs;
+infile := Scrubs_Database_USA.Input_In_Database_USA;
+mod_scrubs := Scrubs_Database_USA.Input_Scrubs;
 expandedfile := mod_scrubs.FromNone(infile).ExpandedInfile;
 fromexpandedGlobal := mod_scrubs.FromExpanded(expandedfile);
 // Summary of errors found across all sources
