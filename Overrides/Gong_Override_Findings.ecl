@@ -172,7 +172,7 @@ EXPORT Gong_Override_Findings(DATASET(Override_Layouts.Layout_Get_Orphans) orpha
 
   orphan_layout  PayloadCheck(total_orphans l) := TRANSFORM
      		
-		payload_name_count_ds :=  payload_pii_ds(listed_name = l.listed_name,  prim_range = l.prim_name,
+		payload_name_count_ds :=  payload_pii_ds(listed_name = l.listed_name,  prim_range = l.prim_range,
 																			   prim_name = l.prim_name,  z5 = l.z5);		
 		payload_did_count_ds :=  payload_did_ds(did IN [l.did, l.persistent_record_id]);
 		payload_recid_count_ds := payload_recid_ds(persistent_record_id IN [l.did, l.persistent_record_id]);
