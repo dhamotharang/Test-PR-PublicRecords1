@@ -3757,7 +3757,6 @@ Risk_Indicators__Correlation_Risk__key_addr_dob_summary_Denorm :=
             TRANSFORM(Layouts_FDC.Layout_phone_addr_header_summary_key_records,
                 SELF.UIDAppend := LEFT.UIDAppend,
                 SELF.G_ProcUID := LEFT.G_ProcUID,
-                SELF.HeaderHitFlag := TRUE;
                 SELF := RIGHT,
                 SELF := LEFT,
                 SELF := []), 
@@ -3792,7 +3791,6 @@ Risk_Indicators__Correlation_Risk__key_addr_dob_summary_Denorm :=
             TRANSFORM(Layouts_FDC.Layout_phone_addr_summary_key_records,
                 SELF.UIDAppend := LEFT.UIDAppend,
                 SELF.G_ProcUID := LEFT.G_ProcUID,
-                SELF.HeaderHitFlag := FALSE;
                 SELF := RIGHT,
                 SELF := LEFT,
                 SELF := []), 
@@ -3825,7 +3823,6 @@ Risk_Indicators__Correlation_Risk__key_addr_dob_summary_Denorm :=
             TRANSFORM(Layouts_FDC.Layout_phone_lname_summary_key_records,
                 SELF.UIDAppend := LEFT.UIDAppend,
                 SELF.G_ProcUID := LEFT.G_ProcUID,
-                SELF.HeaderHitFlag := FALSE;
                 SELF := RIGHT,
                 SELF := LEFT,
                 SELF := []), 
@@ -3858,7 +3855,6 @@ Risk_Indicators__Correlation_Risk__key_addr_dob_summary_Denorm :=
             TRANSFORM(Layouts_FDC.Layout_phone_lname_header_summary_key_records,
                 SELF.UIDAppend := LEFT.UIDAppend,
                 SELF.G_ProcUID := LEFT.G_ProcUID,
-                SELF.HeaderHitFlag := TRUE;
                 SELF := RIGHT,
                 SELF := LEFT,
                 SELF := []), 
@@ -3891,7 +3887,6 @@ Risk_Indicators__Correlation_Risk__key_addr_dob_summary_Denorm :=
             TRANSFORM(Layouts_FDC.Layout_phone_dob_summary_key_records,
                 SELF.UIDAppend := LEFT.UIDAppend,
                 SELF.G_ProcUID := LEFT.G_ProcUID,
-                SELF.HeaderHitFlag := FALSE;
                 SELF := RIGHT,
                 SELF := LEFT,
                 SELF := []), 

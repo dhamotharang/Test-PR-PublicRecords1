@@ -1517,7 +1517,6 @@ SHARED unsigned1 iType := IF(Options.IsFCRA, data_services.data_env.iFCRA, data_
 		dpmtype;
         STRING2 src;
 		STRING Archive_Date;
-        BOOLEAN HeaderHitFlag;
 	END;
   
 	EXPORT Layout_phone_addr_header_summary_key_norm_records := RECORD
@@ -1531,7 +1530,6 @@ SHARED unsigned1 iType := IF(Options.IsFCRA, data_services.data_env.iFCRA, data_
 		dpmtype;
         STRING2 src;
 		STRING Archive_Date;
-        BOOLEAN HeaderHitFlag;
 	END;
   
 	EXPORT Layout_phone_addr_summary_key_norm_records := RECORD
@@ -1545,7 +1543,6 @@ SHARED unsigned1 iType := IF(Options.IsFCRA, data_services.data_env.iFCRA, data_
 		dpmtype;
         STRING2 src;
 		STRING Archive_Date;
-        BOOLEAN HeaderHitFlag;
 	END;
   
 	EXPORT Layout_phone_lname_summary_key_norm_records := RECORD
@@ -1559,7 +1556,6 @@ SHARED unsigned1 iType := IF(Options.IsFCRA, data_services.data_env.iFCRA, data_
 		dpmtype;
         STRING2 src;
 		STRING Archive_Date;
-        BOOLEAN HeaderHitFlag;
 	END;
   
 	EXPORT Layout_phone_lname_header_summary_key_norm_records := RECORD
@@ -1574,7 +1570,6 @@ SHARED unsigned1 iType := IF(Options.IsFCRA, data_services.data_env.iFCRA, data_
 		dpmtype;
         STRING2 src;
 		STRING Archive_Date;
-        BOOLEAN HeaderHitFlag;
 	END;
   
 	EXPORT Layout_phone_dob_summary_key_norm_records := RECORD
