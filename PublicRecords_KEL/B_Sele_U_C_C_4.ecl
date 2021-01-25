@@ -1,11 +1,11 @@
-﻿//HPCC Systems KEL Compiler Version 1.5.0
+﻿//HPCC Systems KEL Compiler Version 1.5.0rc1
 IMPORT KEL15 AS KEL;
 IMPORT B_Sele_U_C_C_5,B_Sele_U_C_C_9,CFG_Compile,E_Business_Org,E_Business_Sele,E_Business_Sele_Overflow,E_Business_Ult,E_Sele_U_C_C,E_U_C_C FROM PublicRecords_KEL;
 IMPORT * FROM KEL15.Null;
 EXPORT B_Sele_U_C_C_4(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG_Compile __cfg = CFG_Compile) := MODULE
   SHARED VIRTUAL TYPEOF(B_Sele_U_C_C_5(__in,__cfg).__ENH_Sele_U_C_C_5) __ENH_Sele_U_C_C_5 := B_Sele_U_C_C_5(__in,__cfg).__ENH_Sele_U_C_C_5;
-  SHARED __EE5134274 := __ENH_Sele_U_C_C_5;
-  EXPORT __ST236572_Layout := RECORD
+  SHARED __EE5134279 := __ENH_Sele_U_C_C_5;
+  EXPORT __ST236577_Layout := RECORD
     KEL.typ.nstr R_M_S_I_D_;
     KEL.typ.nstr Party_Type_;
     KEL.typ.int Party_Sort_List_ := 0;
@@ -16,16 +16,16 @@ EXPORT B_Sele_U_C_C_4(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG_
     KEL.typ.epoch Vault_Date_Last_Seen_ := 0;
     KEL.typ.int __RecordCount := 0;
   END;
-  EXPORT __ST236564_Layout := RECORD
+  EXPORT __ST236569_Layout := RECORD
     KEL.typ.ntyp(E_Business_Sele().Typ) Legal_;
     KEL.typ.nstr T_M_S_I_D_;
     KEL.typ.ntyp(E_U_C_C().Typ) Filing_;
     KEL.typ.nint Ult_I_D_;
     KEL.typ.nint Org_I_D_;
     KEL.typ.nint Sele_I_D_;
-    KEL.typ.ndataset(__ST236572_Layout) Sub_Filing_;
+    KEL.typ.ndataset(__ST236577_Layout) Sub_Filing_;
     KEL.typ.ndataset(E_Sele_U_C_C(__in,__cfg).Data_Sources_Layout) Data_Sources_;
-    KEL.typ.ndataset(B_Sele_U_C_C_9(__in,__cfg).__ST254574_Layout) Best_Party_Types_;
+    KEL.typ.ndataset(B_Sele_U_C_C_9(__in,__cfg).__ST254579_Layout) Best_Party_Types_;
     KEL.typ.nstr Filtered_Party_Type_;
     KEL.typ.bool Is_Creditor_ := FALSE;
     KEL.typ.bool Is_Debtor_ := FALSE;
@@ -37,10 +37,10 @@ EXPORT B_Sele_U_C_C_4(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG_
     KEL.typ.epoch Vault_Date_Last_Seen_ := 0;
     KEL.typ.int __RecordCount := 0;
   END;
-  SHARED __ST236564_Layout __ND5134279__Project(B_Sele_U_C_C_5(__in,__cfg).__ST242715_Layout __PP5134275) := TRANSFORM
-    __EE5134312 := __PP5134275.Sub_Filing_;
-    SELF.Sub_Filing_ := __BN(PROJECT(__T(__EE5134312),__ST236572_Layout),__NL(__EE5134312));
-    SELF := __PP5134275;
+  SHARED __ST236569_Layout __ND5134284__Project(B_Sele_U_C_C_5(__in,__cfg).__ST242720_Layout __PP5134280) := TRANSFORM
+    __EE5134317 := __PP5134280.Sub_Filing_;
+    SELF.Sub_Filing_ := __BN(PROJECT(__T(__EE5134317),__ST236577_Layout),__NL(__EE5134317));
+    SELF := __PP5134280;
   END;
-  EXPORT __ENH_Sele_U_C_C_4 := PROJECT(__EE5134274,__ND5134279__Project(LEFT));
+  EXPORT __ENH_Sele_U_C_C_4 := PROJECT(__EE5134279,__ND5134284__Project(LEFT));
 END;

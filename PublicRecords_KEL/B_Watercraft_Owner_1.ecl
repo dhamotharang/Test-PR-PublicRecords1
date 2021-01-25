@@ -1,11 +1,11 @@
-﻿//HPCC Systems KEL Compiler Version 1.5.0
+﻿//HPCC Systems KEL Compiler Version 1.5.0rc1
 IMPORT KEL15 AS KEL;
 IMPORT B_Watercraft_Owner_2,CFG_Compile,E_Person,E_Watercraft,E_Watercraft_Owner FROM PublicRecords_KEL;
 IMPORT * FROM KEL15.Null;
 EXPORT B_Watercraft_Owner_1(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG_Compile __cfg = CFG_Compile) := MODULE
   SHARED VIRTUAL TYPEOF(B_Watercraft_Owner_2(__in,__cfg).__ENH_Watercraft_Owner_2) __ENH_Watercraft_Owner_2 := B_Watercraft_Owner_2(__in,__cfg).__ENH_Watercraft_Owner_2;
-  SHARED __EE7954386 := __ENH_Watercraft_Owner_2;
-  EXPORT __ST194075_Layout := RECORD
+  SHARED __EE7954391 := __ENH_Watercraft_Owner_2;
+  EXPORT __ST194080_Layout := RECORD
     KEL.typ.ntyp(E_Watercraft().Typ) W_Craft_;
     KEL.typ.ntyp(E_Person().Typ) Owner_;
     KEL.typ.ndataset(E_Watercraft_Owner(__in,__cfg).Data_Sources_Layout) Data_Sources_;
@@ -17,5 +17,5 @@ EXPORT B_Watercraft_Owner_1(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault
     KEL.typ.epoch Vault_Date_Last_Seen_ := 0;
     KEL.typ.int __RecordCount := 0;
   END;
-  EXPORT __ENH_Watercraft_Owner_1 := PROJECT(__EE7954386,__ST194075_Layout);
+  EXPORT __ENH_Watercraft_Owner_1 := PROJECT(__EE7954391,__ST194080_Layout);
 END;

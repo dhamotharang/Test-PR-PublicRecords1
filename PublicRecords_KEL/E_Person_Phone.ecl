@@ -1,4 +1,4 @@
-﻿//HPCC Systems KEL Compiler Version 1.5.0
+﻿//HPCC Systems KEL Compiler Version 1.5.0rc1
 IMPORT KEL15 AS KEL;
 IMPORT PublicRecords_KEL;
 IMPORT CFG_Compile,E_Person,E_Phone FROM PublicRecords_KEL;
@@ -95,7 +95,7 @@ EXPORT E_Person_Phone(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG_
   SHARED __d7 := __SourceFilter(KEL.FromFlat.Convert(__d7_Prefiltered,InLayout,__Mapping7,'PublicRecords_KEL.ECL_Functions.Dataset_FDC'));
   SHARED __Mapping8 := 'rec.did(OVERRIDE:Subject_:0),rec.phone(OVERRIDE:Phone_Number_:0),ownerflag(DEFAULT:Owner_Flag_:0),phonequality(DEFAULT:Phone_Quality_:\'\'),tnt(DEFAULT:T_N_T_:\'\'),priorareacode(DEFAULT:Prior_Area_Code_:\'\'),currentflag(DEFAULT:Current_Flag_:\'\'),businessflag(DEFAULT:Business_Flag_:\'\'),publishcode(DEFAULT:Publish_Code_:\'\'),listingtype(DEFAULT:Listing_Type_:\'\'),isactive(DEFAULT:Is_Active_:\'\'),omitindicator(DEFAULT:Omit_Indicator_:\'\'),nosolicitcode(DEFAULT:No_Solicit_Code_:\'\'),recordtype(DEFAULT:Record_Type_:\'\'),phonetype(DEFAULT:Phone_Type_:\'\'),validationflag(DEFAULT:Validation_Flag_:\'\'),validationdate(DEFAULT:Validation_Date_:\'\'),confidencescore(DEFAULT:Confidence_Score_:0),iverindicator(DEFAULT:Iver_Indicator_:0),sourcefile(DEFAULT:Source_File_:0),src(OVERRIDE:Source_:\'\'),originalsource(DEFAULT:Original_Source_:\'\'),archive_date(DEFAULT:Archive___Date_:EPOCH),datefirstseen(DEFAULT:Date_First_Seen_:EPOCH),datelastseen(DEFAULT:Date_Last_Seen_:EPOCH),hybridarchivedate(DEFAULT:Hybrid_Archive_Date_:EPOCH),vaultdatelastseen(DEFAULT:Vault_Date_Last_Seen_:EPOCH),DPMBitmap(OVERRIDE:__Permits:PERMITS)';
   SHARED InLayout __Mapping8_Transform(InLayout __r) := TRANSFORM
-    SELF.Header_Hit_Flag_ := __CN(TRUE);
+    SELF.Header_Hit_Flag_ := __CN(FALSE);
     SELF := __r;
   END;
   SHARED __d8_Norm := NORMALIZE(__in,LEFT.Dataset_Best_Person__Key_Watchdog,TRANSFORM(RECORDOF(__in.Dataset_Best_Person__Key_Watchdog),SELF:=RIGHT));
@@ -104,7 +104,7 @@ EXPORT E_Person_Phone(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG_
   SHARED __d8 := __SourceFilter(PROJECT(KEL.FromFlat.Convert(__d8_Prefiltered,InLayout,__Mapping8,'PublicRecords_KEL.ECL_Functions.Dataset_FDC'),__Mapping8_Transform(LEFT)));
   SHARED __Mapping9 := 'did(OVERRIDE:Subject_:0),phone(OVERRIDE:Phone_Number_:0),ownerflag(DEFAULT:Owner_Flag_:0),phonequality(DEFAULT:Phone_Quality_:\'\'),tnt(DEFAULT:T_N_T_:\'\'),priorareacode(DEFAULT:Prior_Area_Code_:\'\'),currentflag(DEFAULT:Current_Flag_:\'\'),businessflag(DEFAULT:Business_Flag_:\'\'),publishcode(DEFAULT:Publish_Code_:\'\'),listingtype(DEFAULT:Listing_Type_:\'\'),isactive(DEFAULT:Is_Active_:\'\'),omitindicator(DEFAULT:Omit_Indicator_:\'\'),nosolicitcode(DEFAULT:No_Solicit_Code_:\'\'),recordtype(DEFAULT:Record_Type_:\'\'),phonetype(DEFAULT:Phone_Type_:\'\'),validationflag(DEFAULT:Validation_Flag_:\'\'),validationdate(DEFAULT:Validation_Date_:\'\'),confidencescore(DEFAULT:Confidence_Score_:0),iverindicator(DEFAULT:Iver_Indicator_:0),sourcefile(DEFAULT:Source_File_:0),src(OVERRIDE:Source_:\'\'),originalsource(DEFAULT:Original_Source_:\'\'),archive_date(DEFAULT:Archive___Date_:EPOCH),datefirstseen(DEFAULT:Date_First_Seen_:EPOCH),datelastseen(DEFAULT:Date_Last_Seen_:EPOCH),hybridarchivedate(DEFAULT:Hybrid_Archive_Date_:EPOCH),vaultdatelastseen(DEFAULT:Vault_Date_Last_Seen_:EPOCH),DPMBitmap(OVERRIDE:__Permits:PERMITS)';
   SHARED InLayout __Mapping9_Transform(InLayout __r) := TRANSFORM
-    SELF.Header_Hit_Flag_ := __CN(TRUE);
+    SELF.Header_Hit_Flag_ := __CN(FALSE);
     SELF := __r;
   END;
   SHARED __d9_Norm := NORMALIZE(__in,LEFT.Dataset_Best_Person__Key_Watchdog_FCRA_nonEN,TRANSFORM(RECORDOF(__in.Dataset_Best_Person__Key_Watchdog_FCRA_nonEN),SELF:=RIGHT));
@@ -113,7 +113,7 @@ EXPORT E_Person_Phone(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG_
   SHARED __d9 := __SourceFilter(PROJECT(KEL.FromFlat.Convert(__d9_Prefiltered,InLayout,__Mapping9,'PublicRecords_KEL.ECL_Functions.Dataset_FDC'),__Mapping9_Transform(LEFT)));
   SHARED __Mapping10 := 'did(OVERRIDE:Subject_:0),phone(OVERRIDE:Phone_Number_:0),ownerflag(DEFAULT:Owner_Flag_:0),phonequality(DEFAULT:Phone_Quality_:\'\'),tnt(DEFAULT:T_N_T_:\'\'),priorareacode(DEFAULT:Prior_Area_Code_:\'\'),currentflag(DEFAULT:Current_Flag_:\'\'),businessflag(DEFAULT:Business_Flag_:\'\'),publishcode(DEFAULT:Publish_Code_:\'\'),listingtype(DEFAULT:Listing_Type_:\'\'),isactive(DEFAULT:Is_Active_:\'\'),omitindicator(DEFAULT:Omit_Indicator_:\'\'),nosolicitcode(DEFAULT:No_Solicit_Code_:\'\'),recordtype(DEFAULT:Record_Type_:\'\'),phonetype(DEFAULT:Phone_Type_:\'\'),validationflag(DEFAULT:Validation_Flag_:\'\'),validationdate(DEFAULT:Validation_Date_:\'\'),confidencescore(DEFAULT:Confidence_Score_:0),iverindicator(DEFAULT:Iver_Indicator_:0),sourcefile(DEFAULT:Source_File_:0),src(OVERRIDE:Source_:\'\'),originalsource(DEFAULT:Original_Source_:\'\'),archive_date(DEFAULT:Archive___Date_:EPOCH),datefirstseen(DEFAULT:Date_First_Seen_:EPOCH),datelastseen(DEFAULT:Date_Last_Seen_:EPOCH),hybridarchivedate(DEFAULT:Hybrid_Archive_Date_:EPOCH),vaultdatelastseen(DEFAULT:Vault_Date_Last_Seen_:EPOCH),DPMBitmap(OVERRIDE:__Permits:PERMITS)';
   SHARED InLayout __Mapping10_Transform(InLayout __r) := TRANSFORM
-    SELF.Header_Hit_Flag_ := __CN(TRUE);
+    SELF.Header_Hit_Flag_ := __CN(FALSE);
     SELF := __r;
   END;
   SHARED __d10_Norm := NORMALIZE(__in,LEFT.Dataset_Best_Person__Key_Watchdog_FCRA_nonEQ,TRANSFORM(RECORDOF(__in.Dataset_Best_Person__Key_Watchdog_FCRA_nonEQ),SELF:=RIGHT));
