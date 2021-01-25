@@ -12,6 +12,7 @@
 			scopename = 'NAC' => STD.File.GetSuperFileSubName(FraudGovPlatform.Filenames(BuildDate).Sprayed.NAC,1),
 			scopename = 'RDP' => STD.File.GetSuperFileSubName(FraudGovPlatform.Filenames(BuildDate).Sprayed.RDP,1),
 			scopename = 'Deltabase' => STD.File.GetSuperFileSubName(FraudGovPlatform.Filenames(BuildDate).Sprayed.Deltabase,1),
+			scopename = 'DEDI' => STD.File.GetSuperFileSubName(FraudGovPlatform.Filenames(BuildDate).Sprayed.DisposableEmailDomains,1),
 			''
 			);
 	process_date := BuildDate;
@@ -20,6 +21,7 @@
 			scopename = 'NAC' => STD.Str.SplitWords(Filename, '_', FALSE)[6],
 			scopename = 'RDP' => STD.Str.SplitWords(Filename, '_', FALSE)[6],
 			scopename = 'Deltabase' => (STD.Str.SplitWords(Filename, '_', FALSE)[2])[1..8],
+			scopename = 'DEDI' => (STD.Str.SplitWords(Filename, '_', FALSE)[2])[1..8],
 			STD.Str.SplitWords(Filename, '::', FALSE)[3]
 		);
 
