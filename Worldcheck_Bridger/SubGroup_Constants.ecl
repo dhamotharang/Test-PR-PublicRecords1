@@ -1295,6 +1295,7 @@
 		export string KEYWORD_AFFINTRACA						:= '977';
 		export string KEYWORD_PTERS									:= '978';
 		export string KEYWORD_AMCBA_TERR						:= '979';
+		export string KEYWORD_UNSCPE_WC							:= '980';
 		
 		//When setting the keyword export use underscores for dashes (ex: For RBI-SANC, use RBI_SANC)	
 	end;
