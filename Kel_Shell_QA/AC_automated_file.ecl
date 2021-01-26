@@ -84,7 +84,7 @@ lay makeFatRecord(rules_appended_file L) := TRANSFORM
 															 (integer)REGEXFIND('^(.*),(.*),(.*)$', trim(python_func_custom_KS6701_op,left,right), 1) )) <6
 															  and (integer)REGEXFIND('^(.*),(.*),(.*)$', trim(python_func_custom_KS6701_op,left,right), 2) = -99998,
 															 'PASS',IF(abs(Std.Date.MonthsBetween((integer)std.date.today(),
-															 (integer)REGEXFIND('^(.*),(.*),(.*)$', trim(python_func_custom_KS6701_op,left,right), 1) )) >6
+															 (integer)REGEXFIND('^(.*),(.*),(.*)$', trim(python_func_custom_KS6701_op,left,right), 1) )) >=6
 															  and (integer)REGEXFIND('^(.*),(.*),(.*)$', trim(python_func_custom_KS6701_op,left,right), 2) != -99998,
 															 'PASS','FAIL')),python_func_custom_KS6701_op),
 															 
@@ -95,7 +95,7 @@ lay makeFatRecord(rules_appended_file L) := TRANSFORM
 															 (integer)REGEXFIND('^(.*),(.*),(.*)$', trim(python_func_custom_KS6701_op,left,right), 1) )) <1
 															 and (integer)REGEXFIND('^(.*),(.*),(.*)$', trim(python_func_custom_KS6701_op,left,right), 2) = -99998,
 															 'PASS',IF(abs(Std.Date.YearsBetween((integer)std.date.today(),
-															 (integer)REGEXFIND('^(.*),(.*),(.*)$', trim(python_func_custom_KS6701_op,left,right), 1) )) >1
+															 (integer)REGEXFIND('^(.*),(.*),(.*)$', trim(python_func_custom_KS6701_op,left,right), 1) )) >=1
 															 and (integer)REGEXFIND('^(.*),(.*),(.*)$', trim(python_func_custom_KS6701_op,left,right), 2) != -99998,
 															 'PASS','FAIL')),python_func_custom_KS6701_op),
 
@@ -105,7 +105,7 @@ lay makeFatRecord(rules_appended_file L) := TRANSFORM
 								IF(
 										abs(Std.Date.YearsBetween((integer)std.date.today(),(integer)REGEXFIND('^(.*),(.*),(.*)$', trim(python_func_custom_KS6701_op,left,right), 1) )) <2
 										and (integer)REGEXFIND('^(.*),(.*),(.*)$', trim(python_func_custom_KS6701_op,left,right), 2) = -99998,'PASS',IF(
-										abs(Std.Date.YearsBetween((integer)std.date.today(),(integer)REGEXFIND('^(.*),(.*),(.*)$', trim(python_func_custom_KS6701_op,left,right), 1) )) >2
+										abs(Std.Date.YearsBetween((integer)std.date.today(),(integer)REGEXFIND('^(.*),(.*),(.*)$', trim(python_func_custom_KS6701_op,left,right), 1) )) >=2
 										and (integer)REGEXFIND('^(.*),(.*),(.*)$', trim(python_func_custom_KS6701_op,left,right), 2) != -99998,'PASS','FAIL'
 										)),python_func_custom_KS6701_op),
 									
