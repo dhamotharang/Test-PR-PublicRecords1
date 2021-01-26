@@ -1260,6 +1260,7 @@ SHARED unsigned1 iType := IF(Options.IsFCRA, data_services.data_env.iFCRA, data_
 		PropertyV2_Key_Deed_Fid_Records.recording_date;
 		PropertyV2_Key_Deed_Fid_Records.sales_price;
 		PropertyV2_Key_Deed_Fid_Records.land_lot_size;
+		PropertyV2_Key_Deed_Fid_Records.vendor_source_flag;
 		BOOLEAN current_record;
 		BOOLEAN timeshare_flag;
 		BOOLEAN addl_name_flag;
@@ -1319,6 +1320,7 @@ SHARED unsigned1 iType := IF(Options.IsFCRA, data_services.data_env.iFCRA, data_
 		PropertyV2_Key_Search_Fid_Records.proxid;
 		PropertyV2_Key_Search_Fid_Records.powid;
 		PropertyV2_Key_Search_Fid_Records.persistent_record_id;//overrides & suppressions
+		PropertyV2_Key_Search_Fid_Records.vendor_source_flag;
 		BOOLEAN PartyIsBuyerOrOwner;
 		BOOLEAN PartyIsBorrower;
 		BOOLEAN PartyIsSeller;

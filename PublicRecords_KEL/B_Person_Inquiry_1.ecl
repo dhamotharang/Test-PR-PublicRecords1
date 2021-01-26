@@ -4,14 +4,14 @@ IMPORT B_Person_Inquiry_2,B_Person_Inquiry_3,CFG_Compile,E_Inquiry,E_Person,E_Pe
 IMPORT * FROM KEL15.Null;
 EXPORT B_Person_Inquiry_1(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG_Compile __cfg = CFG_Compile) := MODULE
   SHARED VIRTUAL TYPEOF(B_Person_Inquiry_2(__in,__cfg).__ENH_Person_Inquiry_2) __ENH_Person_Inquiry_2 := B_Person_Inquiry_2(__in,__cfg).__ENH_Person_Inquiry_2;
-  SHARED __EE7940150 := __ENH_Person_Inquiry_2;
-  EXPORT __ST191122_Layout := RECORD
+  SHARED __EE8054855 := __ENH_Person_Inquiry_2;
+  EXPORT __ST191467_Layout := RECORD
     KEL.typ.ntyp(E_Person().Typ) Subject_;
     KEL.typ.ntyp(E_Inquiry().Typ) Transaction_;
     KEL.typ.nstr Transaction_I_D_;
     KEL.typ.nstr Sequence_Number_;
     KEL.typ.ndataset(E_Person_Inquiry(__in,__cfg).Data_Sources_Layout) Data_Sources_;
-    KEL.typ.ndataset(B_Person_Inquiry_3(__in,__cfg).__ST1122523_Layout) Gather_Inquiries_;
+    KEL.typ.ndataset(B_Person_Inquiry_3(__in,__cfg).__ST1122872_Layout) Gather_Inquiries_;
     KEL.typ.timestamp Archive___Date_ := 0;
     KEL.typ.timestamp Date_First_Seen_ := 0;
     KEL.typ.timestamp Date_Last_Seen_ := 0;
@@ -19,5 +19,5 @@ EXPORT B_Person_Inquiry_1(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, 
     KEL.typ.epoch Vault_Date_Last_Seen_ := 0;
     KEL.typ.int __RecordCount := 0;
   END;
-  EXPORT __ENH_Person_Inquiry_1 := PROJECT(__EE7940150,__ST191122_Layout);
+  EXPORT __ENH_Person_Inquiry_1 := PROJECT(__EE8054855,__ST191467_Layout);
 END;

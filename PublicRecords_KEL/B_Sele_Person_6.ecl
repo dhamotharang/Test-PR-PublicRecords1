@@ -4,8 +4,8 @@ IMPORT B_Sele_Person_7,CFG_Compile,E_Business_Org,E_Business_Sele,E_Business_Sel
 IMPORT * FROM KEL15.Null;
 EXPORT B_Sele_Person_6(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG_Compile __cfg = CFG_Compile) := MODULE
   SHARED VIRTUAL TYPEOF(B_Sele_Person_7(__in,__cfg).__ENH_Sele_Person_7) __ENH_Sele_Person_7 := B_Sele_Person_7(__in,__cfg).__ENH_Sele_Person_7;
-  SHARED __EE4878914 := __ENH_Sele_Person_7;
-  EXPORT __ST247135_Layout := RECORD
+  SHARED __EE4994482 := __ENH_Sele_Person_7;
+  EXPORT __ST247686_Layout := RECORD
     KEL.typ.ntyp(E_Business_Sele().Typ) Legal_;
     KEL.typ.ntyp(E_Person().Typ) Contact_;
     KEL.typ.nint Ult_I_D_;
@@ -22,10 +22,10 @@ EXPORT B_Sele_Person_6(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG
     KEL.typ.epoch Vault_Date_Last_Seen_ := 0;
     KEL.typ.int __RecordCount := 0;
   END;
-  SHARED __ST247135_Layout __ND4878919__Project(B_Sele_Person_7(__in,__cfg).__ST250169_Layout __PP4878915) := TRANSFORM
-    __CC13210 := KEL.Routines.MinN(FN_Compile(__cfg).FN_G_E_T_B_U_I_L_D_D_A_T_E(__ECAST(KEL.typ.nstr,__CN('bip_build_version'))),__CN(__cfg.CurrentDate));
-    SELF.Age_In_Days_ := FN_Compile(__cfg).FN_A_B_S_D_A_Y_S_B_E_T_W_E_E_N(__ECAST(KEL.typ.nkdate,__PP4878915.Assoc_Date_),__ECAST(KEL.typ.nkdate,__CC13210));
-    SELF := __PP4878915;
+  SHARED __ST247686_Layout __ND4994487__Project(B_Sele_Person_7(__in,__cfg).__ST250720_Layout __PP4994483) := TRANSFORM
+    __CC13198 := KEL.Routines.MinN(FN_Compile(__cfg).FN_G_E_T_B_U_I_L_D_D_A_T_E(__ECAST(KEL.typ.nstr,__CN('bip_build_version'))),__CN(__cfg.CurrentDate));
+    SELF.Age_In_Days_ := FN_Compile(__cfg).FN_A_B_S_D_A_Y_S_B_E_T_W_E_E_N(__ECAST(KEL.typ.nkdate,__PP4994483.Assoc_Date_),__ECAST(KEL.typ.nkdate,__CC13198));
+    SELF := __PP4994483;
   END;
-  EXPORT __ENH_Sele_Person_6 := PROJECT(__EE4878914,__ND4878919__Project(LEFT));
+  EXPORT __ENH_Sele_Person_6 := PROJECT(__EE4994482,__ND4994487__Project(LEFT));
 END;
