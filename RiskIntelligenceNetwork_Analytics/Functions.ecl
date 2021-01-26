@@ -373,7 +373,7 @@ EXPORT Functions := MODULE
 																																															SELF.OttoPhoneId := (INTEGER)LEFT.batchin_rec.phoneno,
 																																															SELF.OttoBankAccountId := HASH64(TRIM(LEFT.batchin_rec.bank_routing_number, LEFT, RIGHT) + '|' + TRIM(LEFT.batchin_rec.bank_account_number, LEFT, RIGHT)),
 																																													 //SELF.OttoBankAccountId2 := HASH64(TRIM(LEFT.bank_routing_number_2, LEFT, RIGHT) + '|' + TRIM(LEFT.bank_account_number_2, LEFT, RIGHT)),
-																																													 SELF.OttoDriversLicenseId := HASH64(STD.Str.CleanSpaces(TRIM(LEFT.dl_appends[1].dl_number, LEFT, RIGHT)+ '|' + TRIM(LEFT.dl_appends[1].orig_state, LEFT, RIGHT))),                                                                                                                                                                                 
+																																													 SELF.OttoDriversLicenseId := HASH64(STD.Str.CleanSpaces(TRIM(LEFT.batchin_rec.dl_number, LEFT, RIGHT)+ '|' + TRIM(LEFT.batchin_rec.dl_state, LEFT, RIGHT))),                                                                                                                                                                                 
 																																													 SELF.entity_context_uid := _constants_EntityId.LEXID + (STRING)LEFT.batchin_rec.did,
 																																													 SELF.event_date := Std.Date.Today(),
 
@@ -723,7 +723,7 @@ EXPORT Functions := MODULE
 																																																															SELF.EntityStats := entityStats_final(acctno = LEFT.acctno AND indicatortype NOT IN ['KR','SF']),
 																																																															SELF.KrAttributes := entityStats_final(acctno = LEFT.acctno AND indicatortype='KR'),
 																																																															SELF.MostRecentActivityDate := IF(EXISTS(identityProfiles(acctno = LEFT.acctno)),identityProfiles(acctno = LEFT.acctno)[1].eventdate,Std.Date.Today()),
-																																																															SELF.TotalNumberOfIDActivities := IF(EXISTS(identityProfiles(acctno = LEFT.acctno)),identityProfiles(acctno = LEFT.acctno)[1].personeventcount,1),
+																																																															SELF.TotalNumberOfIDActivities := IF(EXISTS(identityProfiles(acctno = LEFT.acctno)),(INTEGER)identityProfiles(acctno = LEFT.acctno)[1].NVP(name='aotidactcntev')[1].value,1),
 																																																															SELF := LEFT));
 																																																															
 						// output(ds_in,named('analytics_ds_in'));
