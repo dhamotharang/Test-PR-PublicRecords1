@@ -21,7 +21,7 @@ module
             SELF := LEFT ),
         LOCAL );
 
-srt := sort(pSlimDisposableEmailDomains, domain);
+srt := sort(pSlimDisposableEmailDomains + Previous_Build, domain);
 ddp := dedup (srt, domain) ;
 
 valid_domains := distribute(ddp, hash32(domain));
