@@ -19,7 +19,8 @@ inut_file_records:= if(sample_size=0, choosen(input_file,all),choosen(input_file
 
  // get logical file layout and convert into set
  get_lay:=STD.File.GetLogicalFileAttribute(logical_file_name,'ECL');
- regex_replace:= regexreplace('[{RECORD ; END}]',get_lay,' ');
+ //regex_replace:= regexreplace('[{RECORD ; END}]',get_lay,' ');
+ regex_replace:= STD.Str.FindReplace(STD.Str.FindReplace(STD.Str.FindReplace(get_lay, 'RECORD',' ') , 'END',' '), ';',' ');
  filtered_lay:=nothor(STD.STr.SplitWords(trim(regex_replace,left,right),' ')); 
  // output(filtered_lay);
  

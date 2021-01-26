@@ -67,9 +67,50 @@ lay makeFatRecord(rules_appended_file L) := TRANSFORM
 									Years_between_python_func_op:= Kel_Shell_QA.Years_between_python_func(
 																									ROW(L, Base_Lay),
 																									trim(STD.Str.ToLowerCase(L.Acceptance_Criteria),left,right),
-																									(string)L.def_vals,Lay_para);	
+																									(string)L.def_vals,Lay_para);
 																									
-									self.Result:=MAP(STD.Str.Find(L.Raw_Acceptance_Criteria,'MIN(')>=1 and 
+									python_func_custom_KS6701_op:= Kel_Shell_QA.python_func_custom_KS6701(
+																									ROW(L, Base_Lay),
+																									trim(STD.Str.ToLowerCase(L.Acceptance_Criteria),left,right),
+																									(string)L.def_vals,Lay_para);
+																									
+									self.Result:=MAP(
+									
+																	 //*********** Custom test casesKS6701 **************
+																	 STD.Str.Find(L.Raw_Acceptance_Criteria,'MONTHSBETWEEN')>=1 and 
+									                 STD.Str.Find(L.case_Type,'custom_ks6701_AC09')>=1 =>
+					IF(python_func_custom_KS6701_op not in['PASS','FAIL','NA'],
+								IF(abs(Std.Date.MonthsBetween((integer)std.date.today(),
+															 (integer)REGEXFIND('^(.*),(.*),(.*)$', trim(python_func_custom_KS6701_op,left,right), 1) )) <6
+															  and (integer)REGEXFIND('^(.*),(.*),(.*)$', trim(python_func_custom_KS6701_op,left,right), 2) = -99998,
+															 'PASS',IF(abs(Std.Date.MonthsBetween((integer)std.date.today(),
+															 (integer)REGEXFIND('^(.*),(.*),(.*)$', trim(python_func_custom_KS6701_op,left,right), 1) )) >6
+															  and (integer)REGEXFIND('^(.*),(.*),(.*)$', trim(python_func_custom_KS6701_op,left,right), 2) != -99998,
+															 'PASS','FAIL')),python_func_custom_KS6701_op),
+															 
+															     STD.Str.Find(L.Raw_Acceptance_Criteria,'YEARSBETWEEN')>=1 and 
+									                 STD.Str.Find(L.case_Type,'custom_ks6701_AC10')>=1 =>
+					IF(python_func_custom_KS6701_op not in['PASS','FAIL','NA'],
+								IF(abs(Std.Date.YearsBetween((integer)std.date.today(),
+															 (integer)REGEXFIND('^(.*),(.*),(.*)$', trim(python_func_custom_KS6701_op,left,right), 1) )) <1
+															 and (integer)REGEXFIND('^(.*),(.*),(.*)$', trim(python_func_custom_KS6701_op,left,right), 2) = -99998,
+															 'PASS',IF(abs(Std.Date.YearsBetween((integer)std.date.today(),
+															 (integer)REGEXFIND('^(.*),(.*),(.*)$', trim(python_func_custom_KS6701_op,left,right), 1) )) >1
+															 and (integer)REGEXFIND('^(.*),(.*),(.*)$', trim(python_func_custom_KS6701_op,left,right), 2) != -99998,
+															 'PASS','FAIL')),python_func_custom_KS6701_op),
+
+																	 STD.Str.Find(L.Raw_Acceptance_Criteria,'YEARSBETWEEN')>=1 and 
+									                 STD.Str.Find(L.case_Type,'custom_ks6701_AC11')>=1 => 
+					IF(python_func_custom_KS6701_op not in['PASS','FAIL','NA'],
+								IF(
+										abs(Std.Date.YearsBetween((integer)std.date.today(),(integer)REGEXFIND('^(.*),(.*),(.*)$', trim(python_func_custom_KS6701_op,left,right), 1) )) <2
+										and (integer)REGEXFIND('^(.*),(.*),(.*)$', trim(python_func_custom_KS6701_op,left,right), 2) = -99998,'PASS',IF(
+										abs(Std.Date.YearsBetween((integer)std.date.today(),(integer)REGEXFIND('^(.*),(.*),(.*)$', trim(python_func_custom_KS6701_op,left,right), 1) )) >2
+										and (integer)REGEXFIND('^(.*),(.*),(.*)$', trim(python_func_custom_KS6701_op,left,right), 2) != -99998,'PASS','FAIL'
+										)),python_func_custom_KS6701_op),
+									
+									
+																	 STD.Str.Find(L.Raw_Acceptance_Criteria,'MIN(')>=1 and 
 									                 STD.Str.Find(L.case_Type,'custom')>=1 =>
 																														 Kel_Shell_QA.Months_between_python_func2(
 																																					ROW(L, Base_Lay),
@@ -81,16 +122,6 @@ lay makeFatRecord(rules_appended_file L) := TRANSFORM
 																																								ROW(L, Base_Lay),
 																																								trim(STD.Str.ToLowerCase(L.Acceptance_Criteria),left,right),
 																																								(string)L.def_vals,Lay_para),
-																							
-																	 Kel_Shell_QA.test(
-																								ROW(L, Base_Lay),
-																								trim(STD.Str.ToLowerCase(L.Acceptance_Criteria),left,right),
-																								(string)L.def_vals,Lay_para),
-
-																	// Kel_Shell_QA.Python_range_func(filtered_lay,
-																							// ROW(L, Base_Lay),
-																							// trim(STD.Str.ToLowerCase(L.Acceptance_Criteria),left,right),
-																							// (string)L.def_vals)
 																							
 														STD.Str.Find(L.Raw_Acceptance_Criteria,'and the last item in')>=1 and 
 									                 STD.Str.Find(L.case_Type,'custom')>=1 =>
@@ -114,7 +145,17 @@ lay makeFatRecord(rules_appended_file L) := TRANSFORM
 								IF((integer)REGEXFIND('^(.*),(.*),(.*)$', trim(Years_between_python_func_op,left,right), 1)=
 								 abs(Std.Date.YearsBetween((integer)REGEXFIND('^(.*),(.*),(.*)$', trim(Years_between_python_func_op,left,right), 2),
 															 (integer)REGEXFIND('^(.*),(.*),(.*)$', trim(Years_between_python_func_op,left,right), 3))),
-															 'PASS','FAIL'),Years_between_python_func_op)
+															 'PASS','FAIL'),Years_between_python_func_op),
+															 
+															  Kel_Shell_QA.test(
+																								ROW(L, Base_Lay),
+																								trim(STD.Str.ToLowerCase(L.Acceptance_Criteria),left,right),
+																								(string)L.def_vals,Lay_para)
+
+																	// Kel_Shell_QA.Python_range_func(filtered_lay,
+																							// ROW(L, Base_Lay),
+																							// trim(STD.Str.ToLowerCase(L.Acceptance_Criteria),left,right),
+																							// (string)L.def_vals)
 																			);
 																	
 							self:=L;
