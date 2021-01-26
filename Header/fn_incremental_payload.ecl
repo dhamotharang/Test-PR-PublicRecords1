@@ -75,13 +75,21 @@ Key := InsuranceHeader_xLink.Process_xIDL_Layouts().key;
                                    SELF.locid := 0;
                                    ),local) ; 
 
+hdr_base := Header.File_Headers;
 
-jnd_1 := join(distribute(Incpayload, hash(rid)),distribute(Header.File_Headers,hash(rid)),left.rid=right.rid, transform(t, self.valid_ssn := right.valid_ssn; self := left;),left outer,local);
-jnd_2 := join(distribute(jnd_1, hash(did)),distribute(header.ssn_validities,hash(did)),left.did=right.did and left.ssn = right.ssn,transform(t, self.valid_ssn := if(left.valid_ssn='',RIGHT.val,LEFT.valid_ssn); self := left;),left outer,keep(1), local);
+InsuranceHeader_xLink.layout_insuranceheader_payload DerivedFields(Incpayload L, hdr_base R) := TRANSFORM
+  self.valid_ssn  := R.valid_ssn;
+  self.tnt        := R.tnt;
+  self.jflag1     := R.jflag1;
+  self.jflag3     := R.jflag3;
+  self.pflag1     := R.pflag1;
+  self.pflag2     := R.pflag2;
+  self.pflag3     := R.pflag3;
+  self            := L;
+END;
 
-output(sort(table(Incpayload, {valid_ssn, cnt := count(group)}, valid_ssn), -cnt), named('valid_ssn_w_raw'));
-output(sort(table(jnd_1, {valid_ssn, cnt := count(group)}, valid_ssn), -cnt), named('valid_ssn_w_raw_base_header'));
-output(sort(table(jnd_2, {valid_ssn, cnt := count(group)}, valid_ssn), -cnt), named('valid_ssn_w_raw_base_header_ssn_validity'));
+jnd_1 := join(distribute(Incpayload, hash(rid)),distribute(hdr_base,hash(rid)),left.rid=right.rid, DerivedFields(left,right),left outer,local);
+jnd_2 := join(distribute(jnd_1, hash(did)),distribute(header.ssn_validities,hash(did)),left.did=right.did and left.ssn = right.ssn,transform(InsuranceHeader_xLink.layout_insuranceheader_payload, self.valid_ssn := if(left.valid_ssn='',RIGHT.val,LEFT.valid_ssn); self := left;),left outer,keep(1), local);
 
 return jnd_2;
 
