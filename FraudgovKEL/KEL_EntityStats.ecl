@@ -22,7 +22,7 @@ NicoleAttr := 't17_emaildomaindispflag,t18_ipaddrhostedflag,t18_ipaddrvpnflag,t1
 'p15_aotssnkractinagcyflagev,p16_aotphnkractinagcyflagev,p17_aotemailkractinagcyflagev,p18_aotipaddrkractinagcyflagev,p19_aotbnkacctkractinagcyflagev,p20_aotdlkractinagcyflagev';
 
   //EntityEventPivot := FraudgovKEL.KEL_EventPivot.EventPivotShell(AotCurrProfFlag=1); // only create entity stats for the last event per element/identity.
-  EntityEventPivot := FraudgovKEL.KEL_EventPivot.EventPivotShell(AotCurrProfFlag=1); // only create entity stats for the last event per element/identity.
+SHARED  EntityEventPivot := FraudgovKEL.KEL_EventPivot.EventPivotShell(AotCurrProfFlag=1); // only create entity stats for the last event per element/identity.
     
   EventStatsPrep := FraudGovPlatform_Analytics.macPivotOttoOutput(EntityEventPivot, 'customerid,industrytype,entitycontextuid,recordid', 
 'eventdate,' +
@@ -65,7 +65,7 @@ NicoleAttr
                             SELF.IndicatorDescription := RIGHT.IndicatorDescription,
                             SELF := LEFT), LOOKUP, LEFT OUTER);
 
-  WeightedResult := JOIN(WeightedResultDefault(Value != ''), CustomWeightingChartPrepped, 
+WeightedResult := JOIN(WeightedResultDefault(Value != ''), CustomWeightingChartPrepped, 
                            (UNSIGNED)LEFT.customerid = (UNSIGNED)RIGHT.customerid AND (UNSIGNED)LEFT.industrytype= (UNSIGNED)RIGHT.industrytype AND
                          LEFT.Field=RIGHT.Field AND ((INTEGER)LEFT.entitycontextuid[2..3] = RIGHT.EntityType OR (INTEGER)LEFT.entitycontextuid[2..3] = 1) AND
                          (
