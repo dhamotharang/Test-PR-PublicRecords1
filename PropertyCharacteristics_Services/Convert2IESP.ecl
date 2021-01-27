@@ -631,7 +631,7 @@ module
 	
 	// Property Data Report - only for report types 'K' and 'P'
 	// Format the results to the ESP layout
-	export iesp.property_info.t_PropertyDataItem	Convert2PropDataItem (PropertyCharacteristics_Services.Layouts.Payload	pInput, BOOLEAN IsOptedOut = FALSE)	:=
+	export iesp.property_info.t_PropertyDataItem	Convert2PropDataItem (PropertyCharacteristics_Services.Layouts.Payload	pInput, BOOLEAN IsOptedOut)	:=
 		transform
 			self.DataSource								:=	map(	pInput.vendor_source = 'D' AND pInMod.ResultOption IN [Constants.Default_Option, Constants.Default_Plus_Option]	=>	'A',	//FARES
 																							pInMod.ResultOption = Constants.Default_Plus_Option AND IsOptedOut => 'B DEFAULT PLUS NO HLD',

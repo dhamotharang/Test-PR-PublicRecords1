@@ -177,7 +177,7 @@ export records_batch (dataset(in_rec) indata, IParam.Report in_mod) := function
     // PropertyCharacteristics_Services.Functions.Mac_Remove_Default_Data(L.inhouse, inhouse_nodefault);
 
     ModPropInfo := PropertyCharacteristics_Services.Convert2IESP (in_mod, L.request);
-    Self.property := project (L.inhouse, ModPropInfo.Convert2PropDataItem (Left));
+    Self.property := project (L.inhouse, ModPropInfo.Convert2PropDataItem (Left, FALSE));
     // Self.ERC      := project (R.ERC, ModPropInfo.ConvertGatewayResponse2ITV (Left));
     // errors:
     // Self.general_err := R.general_err;
