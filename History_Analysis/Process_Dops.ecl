@@ -30,19 +30,24 @@ fn_format_date (string date) := Function
 					hour = 24 => '12',
 					hour = 23 => '11',
 					hour = 22 => '10',
-					hour = 21 => '09',
-					hour = 20 => '08',
-					hour = 19 => '07',
-					hour = 18 => '06',
-					hour = 17 => '05',
-					hour = 16 => '04',
-			        hour = 15 => '03', 
-					hour = 14 => '02', 
-					hour = 13 => '01', 
+					hour = 21 => '9',
+					hour = 20 => '8',
+					hour = 19 => '7',
+					hour = 18 => '6',
+					hour = 17 => '5',
+					hour = 16 => '4',
+			        hour = 15 => '3', 
+					hour = 14 => '2', 
+					hour = 13 => '1', 
 					hour < 13 => (string4) hour, '');
 	AMPM := if( hour > 11, ' PM', ' AM');
 	
-	return date[6..7] + '/' + date[9..10]  + '/' + date[1..4] + ' ' + trim(formatted_hour) + ':' + date[15..16] + ':' + date[18..19] +  AMPM;
+	finalDate := date[6..7] + '/' + date[9..10]  + '/' + date[1..4] + ' ' + trim(formatted_hour) + ':' + date[15..16] + ':' + date[18..19] +  AMPM;
+
+	filterFinal := if(date = 'NA', 'NA', finalDate);
+
+	return filterFinal;
+	
 End;
 
 
@@ -68,9 +73,9 @@ old_data := History_Analysis.Files(pVersion).keysizedhistory_rawdata;
 
 dd_dataset := (old_data + dops_service );
 
-dedup_dataset := dedup(dd_dataset, datasetname, buildversion, whenlive, clusterflag, updateflag, superkey, logicalkey, size, recordcount, statuscode, statusdescription, all );
+dedup_dataset := dedup(dd_dataset, datasetname, buildversion, whenqalive, whenprodlive, clusterflag, updateflag, superkey, logicalkey, size, recordcount, statuscode, statusdescription, all );
 
-sorted_dataset := sort(dedup_dataset(datasetname<>''), datasetname, superkey, whenlive );
+sorted_dataset := sort(dedup_dataset(datasetname<>''), datasetname, superkey, -buildversion, whenqalive, whenprodlive );
 
 PromoteSupers.Mac_SF_BuildProcess(sorted_dataset,'~thor_data400::history_analysis::in::raw_data', build_AggregateFile, 3,true,true);
 

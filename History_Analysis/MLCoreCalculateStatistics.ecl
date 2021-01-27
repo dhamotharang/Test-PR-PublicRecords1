@@ -4,7 +4,7 @@ export MLCoreCalculateStatistics(dataset(History_Analysis.Layouts.BaseRec) loadD
 
 WithRecID:=RECORD
     unsigned recid:=0;
-    History_Analysis.Layouts.BaseRec;
+    History_Analysis.Layouts.BaseRecprod;
 END;
 
 AddRecID:=project(loaddeltas,transform(withRecID,self:=left;));

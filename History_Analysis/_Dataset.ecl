@@ -1,9 +1,10 @@
 
 Import _control, Data_Services, VersionControl;
 
-Export _Dataset( boolean pUseProd = False ) := Module 
-  
-  Export deltas             := 'counted_deltas';
+Export _Dataset( boolean pUseProd = False ) := Module
+
+  Export deltasQA           := 'counted_deltascert';
+  Export deltasProd         := 'counted_deltasprod';
   Export statistics         := 'delta_statistics';
   Export standaloneDeltas   := 'standalone_deltas';
   Export standaloneStats    := 'standaloneStats';

@@ -17,7 +17,7 @@ Export build_1 := STD.File.SprayDelimited('10.121.149.194',
 
 // file from 2 year history 
 Export build_2 := STD.File.SprayDelimited('10.121.149.194',
-                                   '/data/data_build_4/tris_lnssi/dops_release_history/dops_keysizehistory_20200220.txt',
+                                   '/data/temp/venkatan/a.txt',
                                    ,,,,
                                    'thor400_dev01', // destination group
                                    '~thor_data400::history_analysis::in::dops_keysizedhistory', // Logical name
