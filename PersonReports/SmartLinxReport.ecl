@@ -41,7 +41,7 @@ EXPORT out_rec SmartLinxReport (dataset (doxie.layout_references) dids,
 		self.Phones := project(phones2use, iesp.dirassistwireless.t_DirAssistWirelessSearchRecord);      
 		self := best_rec_esdl;           
            self.Attributes := SmartRollup.fn_getAttributes(subject_did, mod_smartlinx);                               
-           SELF.PhonesV3 := IF (mod_smartlinx.IncludeProgressivePhone,PersonReports.functions.ProgressivePhoneResults(dids, mod_access, mod_smartlinx));                                                                                                                                                        
+           SELF.PhonesV3 := IF (mod_smartlinx.IncludeProgressivePhone, SmartRollup.fn_smart_getProgressivePhoneData.ProgressivePhoneResults(dids, mod_access, mod_smartlinx));
 		self := [];
 	end;
 
@@ -50,7 +50,7 @@ EXPORT out_rec SmartLinxReport (dataset (doxie.layout_references) dids,
                                       and mod_smartlinx.UsePremiumSourceA and 
                                       ~doxie.compliance.isPhoneMartRestricted(mod_smartlinx.DataRestrictionMask) and
                                       mod_access.isValidGLB(),
-                                  PersonReports.functions.CalculateBestSmartLinxRecPhoneRoyalties(best_rec_smart[1].PhonesV3, MDR.sourceTools.src_Equifax),                                           
+                                  SmartRollup.fn_smart_getProgressivePhoneData.CalculateBestSmartLinxRecPhoneRoyalties(best_rec_smart[1].PhonesV3, MDR.sourceTools.src_Equifax),                                           
                                 dataset([], Royalty.Layouts.Royalty));
 	subject_akas     := IF (mod_smartlinx.include_akas, project(pers.Akas,iesp.bps_share.t_BpsReportIdentity), dataset([],iesp.bps_share.t_BpsReportIdentity));
   s_akas           := SmartRollup.fn_smart_rollup_names(subject_akas);
@@ -111,12 +111,12 @@ EXPORT out_rec SmartLinxReport (dataset (doxie.layout_references) dids,
 			self := l;
 	end;
 	iesp.smartlinxreport.t_SLRAddressBpsSeq setSequence(iesp.bpsreport.t_BpsReportAddress l, integer c ) := transform
-	    self.addressSequence := c;  //
+	    self.addressSequence := c; 
 			self := l;
 	end;
 	//end of current indicator temp fix using TNT value.
 	//=======================================================================
-
+   
 	s_addresses := project(subject_addrs_TNT, setCurrent(LEFT));
 	s_addressesSequence := project(s_addresses, setSequence(LEFT,COUNTER));
 	s_addresses_current := s_addresses(verified=true);
@@ -165,7 +165,7 @@ EXPORT out_rec SmartLinxReport (dataset (doxie.layout_references) dids,
   prof      := IF (mod_smartlinx.include_proflicenses and count(profmod.proflicenses_v2) <= iesp.constants.SMART.MaxUnRolledRecords, profmod.proflicenses_v2,dataset([],iesp.proflicense.t_ProfessionalLicenseRecord));
   sanc      := IF (mod_smartlinx.include_proflicenses, personReports.sanctions_records (dids, PROJECT (mod_smartlinx, $.IParam.sanctions), IsFCRA),dataset([],iesp.proflicense.t_SanctionRecord));
   prov_recs := IF (mod_smartlinx.include_proflicenses, personReports.providers_records (dids, PROJECT (mod_smartlinx, $.IParam.providers), IsFCRA));
-  prov      := IF (mod_smartlinx.include_proflicenses and count(prov_recs) <= iesp.constants.SMART.MaxUnRolledRecords, prov_recs,dataset([],iesp.proflicense.t_ProviderRecord));
+  prov      :=  IF (mod_smartlinx.include_proflicenses and count(prov_recs) <= iesp.constants.SMART.MaxUnRolledRecords, prov_recs,dataset([],iesp.proflicense.t_ProviderRecord));
   s_profSancProv := SmartRollup.fn_smart_rollup_prof_lic(prof,prov,sanc);
   s_profSancProv_count := count(s_profSancProv);
   p_profSancProv := choosen (if (mod_smartlinx.Smart_rollup, s_profSancProv, dataset([],iesp.smartlinxreport.t_SLRProfLicenseAndSanctionAndProvider)), iesp.constants.SMART.MaxProfLic);
@@ -498,6 +498,5 @@ EXPORT out_rec SmartLinxReport (dataset (doxie.layout_references) dids,
 		self := [];
  END;
   individual := dataset ([Format ()]); // is supposed to produce one row only (usebestdid = true)
-  
 	return individual;
 END;

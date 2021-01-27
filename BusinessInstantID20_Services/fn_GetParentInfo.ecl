@@ -44,7 +44,7 @@
 			                                                     in_mod := linkingOptions,
 																													 IncludeStatus := TRUE,
 			                                                     JoinLimit := Business_Risk_BIP.Constants.Limit_Default,
-			                                                     JoinType := /* Options.KeepLargeBusinesses */ Business_Risk_BIP.Constants.DefaultJoinType)(proxid = 0);
+			                                                     JoinType := Options.KeepLargeBusinesses )(proxid = 0);
 
 				ds_UltParentInfoRaw := BIPV2_Best.Key_LinkIds.kFetch2(inputs := ds_ForUltParentLookup, 
 			                                                     Level  := Business_Risk_BIP.Common.SetLinkSearchLevel(Options.LinkSearchLevel), 
@@ -52,7 +52,7 @@
 			                                                     in_mod := linkingOptions,
 																													 IncludeStatus := TRUE,
 			                                                     JoinLimit := Business_Risk_BIP.Constants.Limit_Default,
-			                                                     JoinType := /* Options.KeepLargeBusinesses */ Business_Risk_BIP.Constants.DefaultJoinType)(proxid = 0);
+			                                                     JoinType := Options.KeepLargeBusinesses)(proxid = 0);
 
 				// Do a right-only join to see if there are any ultimate-parent records that will
 				// fill in a missing parent record.

@@ -1,3 +1,5 @@
+IMPORT ut;
+
 export corp_cont_fix_dates_function(dataset(Corp.Layout_Corp_Cont_Temp) cont_data) := FUNCTION
 
 fc := Corp.Corp_Updated_Corp;
@@ -26,21 +28,21 @@ boolean partial_dates :=
   (length(trim(l.cont_filing_date)) between 1 and 7) or
   (length(trim(l.cont_effective_date)) between 1 and 7) or
   (length(trim(l.cont_address_effective_date)) between 1 and 7);
-  
+
 // Calculate dates from current record
 dt_first_seen :=
-  ut.EarliestDate((unsigned4)CheckDate(l.cont_filing_date), 
-  ut.EarliestDate((unsigned4)CheckDate(l.cont_effective_date), 
+  ut.EarliestDate((unsigned4)CheckDate(l.cont_filing_date),
+  ut.EarliestDate((unsigned4)CheckDate(l.cont_effective_date),
   ut.EarliestDate((unsigned4)CheckDate(l.cont_address_effective_date), (unsigned4)CheckDate(l.corp_process_date))));
 dt_last_seen := if(
-  ut.LatestDate((unsigned4)CheckDate(l.cont_filing_date), 
+  ut.LatestDate((unsigned4)CheckDate(l.cont_filing_date),
   ut.LatestDate((unsigned4)CheckDate(l.cont_effective_date), (unsigned4)CheckDate(l.cont_address_effective_date))) <> 0,
-  ut.LatestDate((unsigned4)CheckDate(l.cont_filing_date), 
+  ut.LatestDate((unsigned4)CheckDate(l.cont_filing_date),
   ut.LatestDate((unsigned4)CheckDate(l.cont_effective_date), (unsigned4)CheckDate(l.cont_address_effective_date))),
   (unsigned4)CheckDate(l.corp_process_date));
-dt_vendor_first_reported := 
-  ut.EarliestDate((unsigned4)CheckDate(l.cont_filing_date), 
-  ut.EarliestDate((unsigned4)CheckDate(l.cont_effective_date), 
+dt_vendor_first_reported :=
+  ut.EarliestDate((unsigned4)CheckDate(l.cont_filing_date),
+  ut.EarliestDate((unsigned4)CheckDate(l.cont_effective_date),
   ut.EarliestDate((unsigned4)CheckDate(l.cont_address_effective_date), (unsigned4)CheckDate(l.corp_process_date))));
 
 self.dt_first_seen := if(dt_first_seen < l.dt_first_seen, dt_first_seen, l.dt_first_seen);
@@ -78,7 +80,7 @@ corp_cont_not_matched := join(corp_cont_init_dist,
 				    FixDates(left, right),
 				    left only,
 				    local);
-				    
+
 // join contacts not matched to corp dates and record type to current corp date record
 corp_cont_rematched := join(corp_cont_not_matched,
                         corp_dates_dedup,
@@ -123,7 +125,7 @@ cont_update_event := join(corp_cont_fixed_dist,
 					UpdateDates(left, right),
 					left outer,
 					local);
-					
-					
+
+
 return  cont_update_event;
 end;

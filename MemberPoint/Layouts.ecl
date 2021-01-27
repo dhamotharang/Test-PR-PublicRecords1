@@ -641,6 +641,9 @@ export Layouts := module
 		STRING8 email10_latest_orig_login_date:='';
 		UNSIGNED email10_num_email_per_did:=0;
 		UNSIGNED email10_num_did_per_email:=0;
+		STRING15   input_email_invalid;
+    	STRING50   input_email_invalid_reason;
+		
 end;
 	
 	
@@ -820,17 +823,25 @@ end;
     STRING8  latest_orig_login_date := '';
     UNSIGNED num_email_per_did := 0;
     UNSIGNED num_did_per_email := 0;
-     END;
+END;
+	
+  	export	EmailRecInvalidforV2:=record
+		STRING20 acctno := '';
+		STRING15 input_email_invalid;
+		STRING50 input_email_invalid_reason;
+	end;
 	
 	export EmailRecforv2 := record
-      BatchServices.Layouts.email.rec_results_raw	;
-			emailv2recs;
+      	BatchServices.Layouts.email.rec_results_raw	;
+		emailv2recs;
 	end;
 
 	
    export EmailRec := record
 		dataset(EmailRecforv2) Records;
+		dataset(EmailRecInvalidforV2) emailstatus;
 		dataset(Royalty.Layouts.RoyaltyForBatch) Royalties;
+		
 	end;
 
 	EXPORT PhoneFinderOutPhone:= RECORD

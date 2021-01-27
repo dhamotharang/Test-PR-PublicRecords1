@@ -12,4 +12,5 @@ EXPORT EchoService := MACRO
   OUTPUT(CHOOSEN(dx_fcra_opt_out.key_delta_rid, 10), named('dx_fcra_opt_out_Delta_rid'));
   OUTPUT(CHOOSEN(Suppress.Key_New_Suppression, 10), named('suppress_key_new_suppression'));
   OUTPUT(CHOOSEN(dx_Suppression.Key_Suppression(), 10), named('dx_suppression_key_suppression'));
+  OUTPUT(CHOOSEN(dx_InquiryHistory.Key_Group_RID_Encrypted(data_services.data_env.iFCRA), 5), named('dx_inquiryHistory_encrypted_data'));
 ENDMACRO;

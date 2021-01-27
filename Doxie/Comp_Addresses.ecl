@@ -89,7 +89,10 @@ Rels_Dn_ranked := Header.Mac_Append_addr_ind(Rels_Dn_pre, addr_ind, /*src*/, did
                                               , st, zip, predir, postdir, suffix, dt_first_seen, dt_last_seen, dt_vendor_first_reported
                                               , dt_vendor_last_reported /*,isTrusted,*/ /*isFCRA,*/ /*hitQH,*/ /*debug*/);
                                                        
-Rels_1 := if(do_address_hierarchy,project(Rels_Dn_ranked,Address_Format),Rels_Dn_pre);
+Rels_1 := if(do_address_hierarchy,project(Rels_Dn_ranked,
+                                    transform(Address_Format,
+                                     self.tnt :=  doxie.enhanceTNT(do_address_hierarchy, left.tnt, left.addr_ind, left.best_addr_rank),
+                                     self := left)),Rels_Dn_pre);
 
 Address_Format tra(Address_Format lef,Address_Format ref) := transform
   self.address_seq_no := if(lef.address_seq_no <=0,1,lef.address_seq_no +1);

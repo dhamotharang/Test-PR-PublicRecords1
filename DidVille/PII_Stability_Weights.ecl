@@ -1,4 +1,4 @@
-﻿IMPORT InsuranceHeader_xLink,UT,IDLExternalLinking;
+﻿IMPORT InsuranceHeader_xLink,UT,IDLExternalLinking, InsuranceHeader_PostProcess;
 
 /*
 This module is for the statistical analysis team to be able to run searches 
@@ -63,17 +63,27 @@ EXPORT PII_STABILITY_WEIGHTS := MODULE
 																						ssn4,
 																						dob, 
 																						phone10,
-																						,//DL_STATE,
-																						,//DL_NBR, 
+																						dl_state,
+																						dl_nbr,
 																						,// src
 																						,// src_rid
-																						,// fname2
-																						,// lname2
+																						relative_fname,
+																						relative_lname,
 																						,// vin
 																						outfile
 																						);			
-																						
-		RETURN NORMALIZE(outfile,LEFT.results,
-									TRANSFORM(PII_weight_output_layout,SELF:=RIGHT))(did<IDLExternalLinking.Constants.INSURANCE_LEXID);
+
+				// remove insurance LexIDs
+		resNorm := NORMALIZE(outfile,LEFT.results,
+									TRANSFORM(PII_weight_output_layout,SELF:=RIGHT));
+
+		resPR := JOIN(resNorm,InsuranceHeader_PostProcess.segmentation_keys.key_did_ind,
+                     KEYED(left.did = right.did),
+                        transform(RECORDOF(LEFT),
+                            lexID_type := right.lexID_type;
+														self.did := IF(LexID_type<>IDLExternalLinking.Constants.INSURANCE_LEXID_TYPE and
+																					left.did<IDLExternalLinking.Constants.INSURANCE_LEXID, left.did, 0);
+                            self := left), left outer, keep(1));
+		RETURN resPR(not(did=0 and weight>0));
 	END;
 END;

@@ -1,11 +1,11 @@
-import BIPV2,mdr, ut, header_slimsort, did_add, didville, _control;
+import BIPV2, ut;
 
 export file_firearms_explosives_keybase :=
 function
 
 	dATFBase := dataset('~thor_Data400::base::atf_firearms_explosives_BUILDING',layout_firearms_explosives_out_bip,flat);
-	
-	did_integer_lay := 
+
+	did_integer_lay :=
 	record
   bipv2.IDlayouts.l_xlink_ids;	//Added for BIP project
 	string2 source := ''; 				//Added for FCRA source project
@@ -113,9 +113,9 @@ function
 		string1 lf := '';
 		unsigned8 persistent_record_id := 0;
 	end;
-	
+
 	dIntegerDID := project(dATFBase, transform(did_integer_lay,self.did_out := (unsigned6)left.did_out, self := left));
-		
+
 	ut.mac_suppress_by_phonetype(dIntegerDID,Voice_Phone,premise_st,dWAPhoneSuppressed,true,did_out);
 
 	dBack2BaseLayout := project(dWAPhoneSuppressed
@@ -124,7 +124,7 @@ function
 			,self 				:= left;
 		)
 	);
-	
+
 	return dBack2BaseLayout;
-	
+
 end;

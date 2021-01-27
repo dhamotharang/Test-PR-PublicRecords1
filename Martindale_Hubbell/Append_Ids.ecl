@@ -1,5 +1,4 @@
-import Address, Ut, lib_stringlib, _Control, business_header,_Validate, 
-Header, Header_Slimsort, didville, ut, DID_Add,Business_Header_SS, MDR;
+import DID_Add, Business_Header_SS;
 
 export Append_Ids :=
 module
@@ -10,7 +9,7 @@ module
 	//////////////////////////////////////////////////////////////////////////////////////
 	export fAppendAffDid(dataset(Layouts.Base.Affiliated_Individuals) pDataset) :=
 	function
-		
+
 		//Add unique id
 		Layouts.Temporary.Affiliated_Individuals_uniqueid tAddUniqueId(Layouts.Base.Affiliated_Individuals l, unsigned8 cnt) :=
 		transform
@@ -20,8 +19,8 @@ module
 			self.did_score		:= 0		;
 			self							:= l		;
 
-		end;   
-		
+		end;
+
 		dAddUniqueId := project(pDataset, tAddUniqueId(left,counter));
 
 		//////////////////////////////////////////////////////////////////////////////////////
@@ -29,15 +28,15 @@ module
 		//////////////////////////////////////////////////////////////////////////////////////
 		Layouts.Temporary.DidSlim tSlimForDiding(Layouts.Temporary.Affiliated_Individuals_uniqueid l, unsigned2 cnt) :=
 		transform
-		
+
 			lcnt := cnt - 1;
 
 			phone := choose((lcnt % 5) + 1
-				,l.rawfields.CONTACT_FAXS_FAX_NUMBER										
-				,l.rawfields.CONTACT_PHONES_PHONE_NUMBER								
-				,l.rawfields.HEADER_AFF_INDIV_INDIV_CELL_PHONE_NUMBER		
-				,l.rawfields.HEADER_AFF_INDIV_INDIV_FAX_FAX_NUMBER			
-				,l.rawfields.HEADER_AFF_INDIV_INDIV_PHONE_PHONE_NUMBER	
+				,l.rawfields.CONTACT_FAXS_FAX_NUMBER
+				,l.rawfields.CONTACT_PHONES_PHONE_NUMBER
+				,l.rawfields.HEADER_AFF_INDIV_INDIV_CELL_PHONE_NUMBER
+				,l.rawfields.HEADER_AFF_INDIV_INDIV_FAX_FAX_NUMBER
+				,l.rawfields.HEADER_AFF_INDIV_INDIV_PHONE_PHONE_NUMBER
 			);
 
 			mail_addr := l.Clean_contact_mailing_address	;
@@ -50,7 +49,7 @@ module
 			sec_range		:= choose(addrcnt	,mail_addr.sec_range	,loc_addr.sec_range	);
 			zip					:= choose(addrcnt	,mail_addr.zip				,loc_addr.zip				);
 			st				 	:= choose(addrcnt	,mail_addr.st					,loc_addr.st				);
-			
+
 			self.fname				:= l.clean_contact_name.fname						;
 			self.mname				:= l.clean_contact_name.mname						;
 			self.lname				:= l.clean_contact_name.lname						;
@@ -66,13 +65,13 @@ module
 			self.dob					:= ''																		;
 			self							:= l																		;
 		end;
-		
+
 		dSlimForDiding	:= normalize(dAddUniqueId
 																,10
 																,tSlimForDiding(left,counter)
 																);
 		dSlimForDiding_dedup := dedup(dSlimForDiding, hash64(unique_id,prim_range,prim_name,sec_range,zip5,state,phone),all);
-		
+
 		// Match to Headers by Contact Name and Address and phone
 		Did_Matchset := ['A','P'];
 
@@ -96,17 +95,17 @@ module
 			,TRUE                     	// Does output record have the score
 			,did_score                	// did score field
 			,75                       	// score threshold
-			,dDidOut								  	// output dataset			
-		);                          
+			,dDidOut								  	// output dataset
+		);
 
 
 		dDidOut_dist			:= distribute	(dDidOut(did != 0)	,unique_id										);
 		dDidOut_sort			:= sort				(dDidOut_dist				,unique_id, -did_score	,local);
 		dDidOut_dedup			:= dedup			(dDidOut_sort				,unique_id							,local);
-		
+
 		dAddUniqueId_dist := distribute	(dAddUniqueId				,unique_id										);
 
-			 
+
 		Layouts.Base.Affiliated_Individuals tAssignDIDs(Layouts.Temporary.Affiliated_Individuals_uniqueid l, Layouts.Temporary.DidSlim r) :=
 		transform
 
@@ -124,7 +123,7 @@ module
 											,left outer
 											,local
 											);
-		
+
 		return dAssignDids;
 
 	end;
@@ -135,7 +134,7 @@ module
 	//////////////////////////////////////////////////////////////////////////////////////
 	export fAppendUnaffDid(dataset(Layouts.Base.Unaffiliated_Individuals) pDataset) :=
 	function
-		
+
 		//Add unique id
 		Layouts.Temporary.Unaffiliated_Individuals_uniqueid tAddUniqueId(Layouts.Base.Unaffiliated_Individuals l, unsigned8 cnt) :=
 		transform
@@ -145,8 +144,8 @@ module
 			self.did_score		:= 0		;
 			self							:= l		;
 
-		end;   
-		
+		end;
+
 		dAddUniqueId := project(pDataset, tAddUniqueId(left,counter));
 
 		//////////////////////////////////////////////////////////////////////////////////////
@@ -165,7 +164,7 @@ module
 			sec_range		:= choose(addrcnt,mail_addr.sec_range	,loc_addr.sec_range	);
 			zip					:= choose(addrcnt,mail_addr.zip				,loc_addr.zip				);
 			st				 	:= choose(addrcnt,mail_addr.st				,loc_addr.st				);
-			
+
 			self.fname				:= l.clean_contact_name.fname						;
 			self.mname				:= l.clean_contact_name.mname						;
 			self.lname				:= l.clean_contact_name.lname						;
@@ -181,13 +180,13 @@ module
 			self.dob					:= ''																		;
 			self							:= l																		;
 		end;
-		
+
 		dSlimForDiding	:= normalize(dAddUniqueId
 																,2
 																,tSlimForDiding(left,counter)
 																);
 		dSlimForDiding_dedup := dedup(dSlimForDiding, hash64(unique_id,prim_range,prim_name,sec_range,zip5,state,phone),all);
-		
+
 		// Match to Headers by Contact Name and Address and phone
 		Did_Matchset := ['A'];
 
@@ -211,17 +210,17 @@ module
 			,TRUE                     	// Does output record have the score
 			,did_score                	// did score field
 			,75                       	// score threshold
-			,dDidOut								  	// output dataset			
-		);                          
+			,dDidOut								  	// output dataset
+		);
 
 
 		dDidOut_dist			:= distribute	(dDidOut(did != 0)	,unique_id										);
 		dDidOut_sort			:= sort				(dDidOut_dist				,unique_id, -did_score	,local);
 		dDidOut_dedup			:= dedup			(dDidOut_sort				,unique_id							,local);
-		
+
 		dAddUniqueId_dist := distribute	(dAddUniqueId				,unique_id										);
 
-			 
+
 		Layouts.Base.Unaffiliated_Individuals tAssignDIDs(Layouts.Temporary.Unaffiliated_Individuals_uniqueid l, Layouts.Temporary.DidSlim r) :=
 		transform
 
@@ -239,7 +238,7 @@ module
 											,left outer
 											,local
 											);
-		
+
 		return dAssignDids;
 
 	end;
@@ -258,10 +257,10 @@ module
 			self.unique_id		:= cnt	;
 			self							:= l		;
 
-		end;   
-		
+		end;
+
 		dAddUniqueId := project(pDataset, tAddUniqueId(left,counter));
-																														
+
 		//////////////////////////////////////////////////////////////////////////////////////
 		// -- Slim record for Bdiding
 		//////////////////////////////////////////////////////////////////////////////////////
@@ -269,12 +268,12 @@ module
 		transform
 
 			lcnt := cnt - 1;
-			
+
 			phone := choose((lcnt % 4) + 1
-				,l.rawfields.CONTACT_FAXS_FAX_NUMBER									
-				,l.rawfields.CONTACT_PHONES_PHONE_NUMBER							
-				,l.rawfields.CONTACT_PHONES_PHONE_NUMBER							
-				,l.rawfields.CONTACT_FAXS_FAX_NUMBER									
+				,l.rawfields.CONTACT_FAXS_FAX_NUMBER
+				,l.rawfields.CONTACT_PHONES_PHONE_NUMBER
+				,l.rawfields.CONTACT_PHONES_PHONE_NUMBER
+				,l.rawfields.CONTACT_FAXS_FAX_NUMBER
 			);
 
 			mail_addr 	:= l.Clean_mailing_address					;
@@ -307,8 +306,8 @@ module
 			self.Contact_fname := l.clean_name.fname												;
 			self.Contact_mname := l.clean_name.mname												;
 			self.Contact_lname := l.clean_name.lname												;
-			
-		end;   
+
+		end;
 
 		dSlimForBdiding :=  normalize(dAddUniqueId
 																,16
@@ -319,24 +318,24 @@ module
 		BDID_Matchset := ['A','P'];
 
 		Business_Header_SS.MAC_Add_BDID_Flex(
-			 dSlimForBdiding_dedup								// Input Dataset						
-			,BDID_Matchset                        // BDID Matchset what fields to match on           
-			,company_name	                        // company_name	              
-			,prim_range		                        // prim_range		              
-			,prim_name		                        // prim_name		              
-			,zip5					                        // zip5					              
-			,sec_range		                        // sec_range		              
-			,state				                        // state				              
-			,phone				                        // phone				              
-			,fein_not_used                        // fein              
-			,bdid													        // bdid												
-			,Layouts.Temporary.BdidSlim           // Output Layout 
-			,true                                 // output layout has bdid score field?                       
-			,bdid_score                           // bdid_score                 
-			,dBdidOut                             // Output Dataset  
+			 dSlimForBdiding_dedup								// Input Dataset
+			,BDID_Matchset                        // BDID Matchset what fields to match on
+			,company_name	                        // company_name
+			,prim_range		                        // prim_range
+			,prim_name		                        // prim_name
+			,zip5					                        // zip5
+			,sec_range		                        // sec_range
+			,state				                        // state
+			,phone				                        // phone
+			,fein_not_used                        // fein
+			,bdid													        // bdid
+			,Layouts.Temporary.BdidSlim           // Output Layout
+			,true                                 // output layout has bdid score field?
+			,bdid_score                           // bdid_score
+			,dBdidOut                             // Output Dataset
 			,																			// deafult threshold
 			,																			// use prod version of superfiles
-			,																			// default is to hit prod from dataland, and on prod hit prod.		
+			,																			// default is to hit prod from dataland, and on prod hit prod.
 			,BIPV2.xlink_version_set							// Create BID Keys only
 			,URL																  // Url
 			,email 			    											// Email
@@ -344,15 +343,15 @@ module
 			,Contact_fname 												// fname
 			,Contact_mname												// mname
 			,Contact_lname 						);					// lname
-			                   
-                                    
+
+
 	  dBDidOut_dist			:= distribute	(dBDidOut(bdid!=0 or dotid!=0 or empid!=0 or powid!=0 or proxid!=0 or seleid!=0 or orgid!=0 or ultid!=0) ,unique_id										);
 		dBDidOut_sort			:= sort				(dBDidOut_dist	,unique_id, -bdid_score -dotscore	-empscore -powscore -proxscore -selescore -orgscore -ultscore,local);
 		dBDidOut_dedup		:= dedup			(dBDidOut_sort	,unique_id	,local);
 
 		dAddUniqueId_dist := distribute	(dAddUniqueId					,unique_id										);
 
-			 
+
 		Layouts.Base.Organizations tAssignBdids(Layouts.Temporary.Organizations_uniqueid l, Layouts.Temporary.BdidSlim r) :=
 		transform
 
@@ -378,7 +377,7 @@ module
 			self.OrgWeight	:= if(r.OrgWeight		<> 0, r.OrgWeight		, 0);
 			self.UltID			:= if(r.UltID				<> 0, r.UltID				, 0);
 			self.UltScore		:= if(r.UltScore		<> 0, r.UltScore		, 0);
-			self.UltWeight	:= if(r.UltWeight		<> 0, r.UltWeight		, 0);		
+			self.UltWeight	:= if(r.UltWeight		<> 0, r.UltWeight		, 0);
 			self 						:= l;
 
 		end;
@@ -391,9 +390,9 @@ module
 											,left outer
 											,local
 											);
-		
+
 		return dAssignBdids;
-		
+
 	end;
-	
+
 end;

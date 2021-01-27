@@ -24,8 +24,7 @@ EXPORT proc_GetRelationshipNeutral(DATASET(Layout_GetRelationship.DIDs_layout) D
                                    unsigned2 RelLookbackMonths                 = 0,
                                    Layout_GetRelationship.TransactionalFlags_layout txflag = notx,
                                    string    RelKeyFlag                        = '',
-                                   boolean   SecondDegreeFlag                  = FALSE,
-                                   boolean   ThirdDegreeFlag                   = FALSE) := MODULE
+                                   boolean addNthDegree = FALSE) := MODULE
 
 CurrentDate             := (unsigned4) stringlib.GetDateYYYYMMDD();
 shared LookbackDate     := std.date.AdjustDate(CurrentDate,,-RelLookbackMonths);
@@ -88,6 +87,7 @@ shared isTx   :=  txflag.VehicleFlag OR
                   txflag.CLUEFlag;
 
 shared relationship_key_qa           := Relationship.key_relatives_v3;
+shared nthDegree_Key                 := Relationship.key_relatives_Nth();
 shared relationship_Marketing_Filter := dx_BestRecords.Constants.PERM_TYPE.marketing;
 shared relationship_D2C_Filter       := dx_BestRecords.Constants.PERM_TYPE.glb_d2c_filtered;
 shared DID_ds_dist                   := distribute(DID_ds,hash(did));
@@ -121,17 +121,17 @@ shared layout_GetRelationship.interfaceOutputNeutral xform(relationship_key_qa r
   self := r;
 END;
 
-doJoin(relKey, joinOptions) := functionmacro
+shared doJoin(relKey, joinOptions) := functionmacro
   out := join(DID_ds, relKey, keyed(left.did=right.did1), xform(right),#EXPAND(joinOptions));
   return out;
 endmacro;
-doJoinThor(relKey, joinOptions) := functionmacro
+shared doJoinThor(relKey, joinOptions) := functionmacro
   relKeyJ := distribute(pull(relKey),hash(did1));
   out := join(DID_ds_dist, relKeyJ, left.did=right.did1, xform(right),#EXPAND(joinOptions), local);
   return out;
 endmacro;
 
-doFilteredJoin(relFilter, joinOptions) := functionmacro
+shared doFilteredJoin(relFilter, joinOptions) := functionmacro
   // Remove DID1s that need to be filtered
   filteredOutDID1 := dx_BestRecords.get(DID_ds,did,relFilter,Layout_GetRelationship.DIDs_layout); 
   // Get DID1 & DID2 pairs
@@ -142,7 +142,7 @@ doFilteredJoin(relFilter, joinOptions) := functionmacro
   out := JOIN(filteredOutDID2, getDID2, left.did=right.did2, TRANSFORM(RIGHT));
   return out;
 endmacro;
-doFilteredJoinThor(relFilter, joinOptions) := functionmacro
+shared doFilteredJoinThor(relFilter, joinOptions) := functionmacro
   // Remove DID1s that need to be filtered
   filteredOutDID1 := dx_BestRecords.get(DID_ds,did,relFilter,Layout_GetRelationship.DIDs_layout,TRUE);
   fullFilteredKey := distribute(pull(relationship_key_qa),hash(did1));
@@ -155,11 +155,11 @@ doFilteredJoinThor(relFilter, joinOptions) := functionmacro
   return out;
 endmacro;
 
-skipOption   := 'LIMIT(MaxCount,SKIP)';
-failOption   := 'LIMIT(MaxCount)';
-atmostOption := 'ATMOST(MaxCount)';
-allOption    := 'KEEP(20000),LIMIT(0)';
-thorOption   := atmostOption;
+shared skipOption   := 'LIMIT(MaxCount,SKIP)';
+shared failOption   := 'LIMIT(MaxCount)';
+shared atmostOption := 'ATMOST(MaxCount)';
+shared allOption    := 'KEEP(20000),LIMIT(0)';
+shared thorOption   := atmostOption;
 relsSkip         := MAP(RelKeyFlag='D2C'       => doFilteredJoin(relationship_D2C_Filter, skipOption),
                         RelKeyFlag='MARKETING' => doFilteredJoin(relationship_Marketing_Filter, skipOption),
                         doJoin(relationship_key_qa, skipOption));
@@ -267,8 +267,33 @@ shared selected := MAP(AllFlag => rels,
                        IF(txflag.CCFlag, CoCC) +
                        IF(txflag.CLUEFlag, CoCLUE));
 
-shared interimResult := sort(dedup(sort(selected,did1,did2),did1,did2),did1,-total_score,did2);
+ relsNthDegreeSkip			:= doJoin(nthDegree_Key, skipOption);
+ relsNthDegreeFail			:= doJoin(nthDegree_Key,failOption);
+ relsNthDegreeAtmost		:= doJoin(nthDegree_Key,atmostOption);
+ relsNthDegreeAll0			:= doJoin(nthDegree_Key,allOption);
+ relsNthDegreeAll			  := TOPN(relsNthDegreeAll0, 10000, -total_score, -total_cnt);
+ relsNthDegreeTHOR			:= doJoinThor(nthDegree_Key, thorOption);
 
-export result := IF(TopNCount>0,ungroup(topN(group(sort(interimResult,did1),did1),TopNCount,-total_score)),interimResult);
+ shared relsNthDegree	:= MAP(doThor                  => relsNthDegreeTHOR,
+                         doSkip                       => relsNthDegreeSkip,
+                         doFail                       => relsNthDegreeFail,
+                         doAtMost                     => relsNthDegreeAtmost,
+                         relsNthDegreeAll);
 
+removedSuppressed := Relationship.proc_suppressKey(selected).run;
+shared interimResult := sort(dedup(sort(removedSuppressed,did1,did2),did1,did2),did1,-total_score,did2);
+
+nthRemovedSuppressed := Relationship.proc_suppressKey(relsNthDegree).run;
+shared interimNthResult := IF(addNthDegree, nthRemovedSuppressed, dataset([], layout_GetRelationship.interfaceOutputNeutral));
+
+// output(rels, named('rels'));
+// output(selected, named('selected'));
+// output(SecondDegreeFlag, named('SecondDegreeFlag'));
+// output(ThirdDegreeFlag, named('ThirdDegreeFlag'));
+// output(nthFilter, named('nthFilter'));
+// output(relsNthDegree, named('relsNthDegree'));
+
+export result := IF(TopNCount>0,ungroup(topN(group(sort(interimResult,did1),did1),TopNCount,-total_score)) &
+                  ungroup(topN(group(sort(interimNthResult,did1),did1),TopNCount,-total_score)),
+                    interimResult & sort(interimNthResult, -total_score, did1, did2));
 END;

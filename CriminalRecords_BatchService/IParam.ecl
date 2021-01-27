@@ -2,27 +2,29 @@ IMPORT BatchShare, FCRA;
 
 EXPORT IParam := MODULE
 
-	EXPORT batch_params := interface (BatchShare.IParam.BatchParams, FCRA.iRules)
-		// PII Preferential matching:
-		EXPORT BOOLEAN MatchName     			:= FALSE;
-		EXPORT BOOLEAN MatchStrAddr  			:= FALSE;     
-		EXPORT BOOLEAN MatchCity     			:= FALSE;
-		EXPORT BOOLEAN MatchState    			:= FALSE;       
-		EXPORT BOOLEAN MatchZip      			:= FALSE;         
-		EXPORT BOOLEAN MatchSSN      			:= FALSE;  
-		EXPORT BOOLEAN MatchDOB						:= FALSE;
+  EXPORT batch_params := interface (BatchShare.IParam.BatchParams, FCRA.iRules)
+    // PII Preferential matching:
+    EXPORT BOOLEAN MatchName          := FALSE;
+    EXPORT BOOLEAN MatchStrAddr       := FALSE;
+    EXPORT BOOLEAN MatchCity          := FALSE;
+    EXPORT BOOLEAN MatchState         := FALSE;
+    EXPORT BOOLEAN MatchZip           := FALSE;
+    EXPORT BOOLEAN MatchSSN           := FALSE;
+    EXPORT BOOLEAN MatchDOB           := FALSE;
+    EXPORT BOOLEAN ReturnDocName      := FALSE;
+    EXPORT BOOLEAN ReturnSSN          := FALSE;
     // v---- 06/13/2017, offense categories filtering enhancement ----v
-	  // 45 booleans total;
-		//      1 for each of the 44 LN standard offense categories in hygenics_crim._functions.ctg_***,
-		// plus 1 extra to indicate if any 1 of the 44 were set on.
+    // 45 booleans total;
+    //      1 for each of the 44 LN standard offense categories in hygenics_crim._functions.ctg_***,
+    // plus 1 extra to indicate if any 1 of the 44 were set on.
     EXPORT BOOLEAN IncludeArson           := FALSE;
-	  EXPORT BOOLEAN IncludeAssaultAgg      := FALSE;
-    EXPORT BOOLEAN IncludeAssaultOther	  := FALSE;
+    EXPORT BOOLEAN IncludeAssaultAgg      := FALSE;
+    EXPORT BOOLEAN IncludeAssaultOther    := FALSE;
     EXPORT BOOLEAN IncludeBadChecks       := FALSE;
     EXPORT BOOLEAN IncludeBribery         := FALSE;
-    EXPORT BOOLEAN IncludeBurglaryComm    := FALSE;   
+    EXPORT BOOLEAN IncludeBurglaryComm    := FALSE;
     EXPORT BOOLEAN IncludeBurglaryRes     := FALSE;
-    EXPORT BOOLEAN IncludeBurglaryVeh     := FALSE; 
+    EXPORT BOOLEAN IncludeBurglaryVeh     := FALSE;
     EXPORT BOOLEAN IncludeComputer        := FALSE;
     EXPORT BOOLEAN IncludeCounterfeit     := FALSE;
     EXPORT BOOLEAN IncludeCurLoiVag       := FALSE;
@@ -56,28 +58,28 @@ EXPORT IParam := MODULE
     EXPORT BOOLEAN IncludeTrespass        := FALSE;
     EXPORT BOOLEAN IncludeWeaponLaw       := FALSE;
     EXPORT BOOLEAN IncludeOther           := FALSE;
-	  EXPORT BOOLEAN IncludeCannotClassify  := FALSE;
+    EXPORT BOOLEAN IncludeCannotClassify  := FALSE;
     EXPORT BOOLEAN IncludeWarrantFugitive := FALSE;
     EXPORT BOOLEAN IncludeObstructResist  := FALSE;
-		EXPORT BOOLEAN IncludeAtLeast1Offense := FALSE;
-	END;
+    EXPORT BOOLEAN IncludeAtLeast1Offense := FALSE;
+  END;
 
   // Function to initalize the batch params
-	EXPORT getBatchParams() :=	FUNCTION
-	
-	  BatchShareParams := BatchShare.IParam.getBatchParams();
-			
-		param_mod := MODULE(PROJECT(BatchShareParams,batch_params,OPT))
+  EXPORT getBatchParams() := FUNCTION
+
+    BatchShareParams := BatchShare.IParam.getBatchParams();
+
+    param_mod := MODULE(PROJECT(BatchShareParams,batch_params,OPT))
       EXPORT UNSIGNED2 MaxResults_val       := 50    : STORED('MaxResults');
-			
-		  EXPORT BOOLEAN IncludeArson           := FALSE : STORED('Includearson');        // #1
-	    EXPORT BOOLEAN IncludeAssaultAgg      := FALSE : STORED('Includeassaultagg');   // #2
-      EXPORT BOOLEAN IncludeAssaultOther	  := FALSE : STORED('Includeassaultother'); // ...
+
+      EXPORT BOOLEAN IncludeArson           := FALSE : STORED('Includearson');        // #1
+      EXPORT BOOLEAN IncludeAssaultAgg      := FALSE : STORED('Includeassaultagg');   // #2
+      EXPORT BOOLEAN IncludeAssaultOther    := FALSE : STORED('Includeassaultother'); // ...
       EXPORT BOOLEAN IncludeBadChecks       := FALSE : STORED('Includebadchecks');
       EXPORT BOOLEAN IncludeBribery         := FALSE : STORED('Includebribery');
-      EXPORT BOOLEAN IncludeBurglaryComm    := FALSE : STORED('Includeburglarycomm');   
+      EXPORT BOOLEAN IncludeBurglaryComm    := FALSE : STORED('Includeburglarycomm');
       EXPORT BOOLEAN IncludeBurglaryRes     := FALSE : STORED('Includeburglaryres');
-      EXPORT BOOLEAN IncludeBurglaryVeh     := FALSE : STORED('Includeburglaryveh'); 
+      EXPORT BOOLEAN IncludeBurglaryVeh     := FALSE : STORED('Includeburglaryveh');
       EXPORT BOOLEAN IncludeComputer        := FALSE : STORED('Includecomputer');
       EXPORT BOOLEAN IncludeCounterfeit     := FALSE : STORED('Includecounterfeit');
       EXPORT BOOLEAN IncludeCurLoiVag       := FALSE : STORED('Includecurloivag');
@@ -116,53 +118,53 @@ EXPORT IParam := MODULE
       EXPORT BOOLEAN IncludeObstructResist  := FALSE : STORED('Includeobstructresist');
 
       // Check if any of the 44 individual Include*** input switches were set on/requested
-      EXPORT BOOLEAN IncludeAtLeast1Offense := IncludeArson          or 
-	                                             IncludeAssaultAgg     or 
-                                               IncludeAssaultOther   or 
+      EXPORT BOOLEAN IncludeAtLeast1Offense := IncludeArson          or
+                                               IncludeAssaultAgg     or
+                                               IncludeAssaultOther   or
                                                IncludeBadChecks      or
                                                IncludeBribery        or
-                                               IncludeBurglaryComm   or    
+                                               IncludeBurglaryComm   or
                                                IncludeBurglaryRes    or
-                                               IncludeBurglaryVeh    or     
-                                               IncludeComputer       or             
-                                               IncludeCounterfeit    or      
-                                               IncludeCurLoiVag      or 
-                                               IncludeVandalism      or 
-                                               IncludeDisorderly     or          
-                                               IncludeDUI            or   
-																		           IncludeDrug           or 
-                                               IncludeDrunk          or                
-                                               IncludeFamilyOff      or   
-                                               IncludeFraud          or                      
-                                               IncludeGambling       or                   
-																		           IncludeHomicide       or 
-                                               IncludeHumanTraff     or           
-                                               IncludeIdTheft        or              
-                                               IncludeKidnapping     or        
-                                               IncludeLiquorLaw      or        
-                                               IncludeMVTheft        or          
-                                               IncludePeepingTom     or                 
-                                               IncludePornography    or 
-                                               IncludeProstitution   or               
-                                               IncludeRestraining    or 
-                                               IncludeRobberyComm    or          
-                                               IncludeRobberyRes     or         
-                                               IncludeSOForce        or        
-                                               IncludeSONonForce     or     
-                                               IncludeShoplift       or                
-                                               IncludeStolenProp     or 
-                                               IncludeTerrorist      or           
-                                               IncludeTheft          or                      
-																		           IncludeTraffic        or 
-                                               IncludeTrespass       or     
-                                               IncludeWeaponLaw      or        
-                                               IncludeOther          or                      
+                                               IncludeBurglaryVeh    or
+                                               IncludeComputer       or
+                                               IncludeCounterfeit    or
+                                               IncludeCurLoiVag      or
+                                               IncludeVandalism      or
+                                               IncludeDisorderly     or
+                                               IncludeDUI            or
+                                               IncludeDrug           or
+                                               IncludeDrunk          or
+                                               IncludeFamilyOff      or
+                                               IncludeFraud          or
+                                               IncludeGambling       or
+                                               IncludeHomicide       or
+                                               IncludeHumanTraff     or
+                                               IncludeIdTheft        or
+                                               IncludeKidnapping     or
+                                               IncludeLiquorLaw      or
+                                               IncludeMVTheft        or
+                                               IncludePeepingTom     or
+                                               IncludePornography    or
+                                               IncludeProstitution   or
+                                               IncludeRestraining    or
+                                               IncludeRobberyComm    or
+                                               IncludeRobberyRes     or
+                                               IncludeSOForce        or
+                                               IncludeSONonForce     or
+                                               IncludeShoplift       or
+                                               IncludeStolenProp     or
+                                               IncludeTerrorist      or
+                                               IncludeTheft          or
+                                               IncludeTraffic        or
+                                               IncludeTrespass       or
+                                               IncludeWeaponLaw      or
+                                               IncludeOther          or
                                                IncludeCannotClassify or
                                                IncludeWarrantFugitive or
                                                IncludeObstructResist;
-	  END;
-			
-		RETURN param_mod;
-	END;
+    END;
+
+    RETURN param_mod;
+  END;
 
 END;
