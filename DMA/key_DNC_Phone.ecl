@@ -1,6 +1,16 @@
-Import	Data_Services,Doxie,ut;
+Import	Data_Services,Doxie,ut, dx_DMA;
 
-export	key_DNC_Phone	:=	index(	DMA.file_suppressionTPS.Building,
+old_DNC_format := DMA.file_suppressionTPS.Building;
+dx_DMA.layouts.suppressionTPS.Building	tReformat2Delta(old_DNC_format	pInput)	:=
+transform
+    self.dt_effective_first := 0;
+    self.dt_effective_last := 0;
+    self.delta_ind := 0;
+    self	:=	pInput;
+end;
+
+dDNCDelta	:=	project(old_DNC_format,tReformat2Delta(left));
+export	key_DNC_Phone	:=	index(	dDNCDelta,
 																	{PhoneNumber},
 																	{PhoneNumber, dt_effective_first, dt_effective_last, delta_ind},
 																	Data_Services.Data_location.Prefix('NONAMEGIVEN')+'thor_data400::key::DNC::'+ Doxie.Version_SuperKey +'::phone'
