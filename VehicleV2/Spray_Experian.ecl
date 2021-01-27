@@ -125,6 +125,17 @@ FUNCTION
 		)
 	);
 
+	// Delete the files remote host following a successful spray
+	deleteFiles := NOTHOR(
+		APPLY(
+			dRemoteFiles_SprayInfo,
+			STD.File.DeleteExternalFile(
+				SourceIP,
+				SourceDir,
+			)	
+		)
+	);
+
 	rExperianRaw_layout := RECORD
 		VehicleV2.Layout_Experian.Layout_Experian_Raw;
 		STRING LogicalFileName {virtual(LogicalFileName)};
@@ -203,7 +214,8 @@ FUNCTION
 		addExpVinCandidates,
 		outExperianPrepped,
 		addExperianPreppedToSuper,
-		addExperianToBldg
+		addExperianToBldg,
+		deleteFiles
 	);
 
 END;
