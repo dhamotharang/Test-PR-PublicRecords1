@@ -1,4 +1,4 @@
-export UpdateRecords(FullData,NewData,recref,MatchFields,UpdateFields,DistSet='',isDist=false,isLookup=false):=functionmacro
+export UpdateRecords(FullData,NewData,recref,MatchFields,UpdateFields,process_date,DistSet='',isDist=false,isLookup=false):=functionmacro
 #Declare(CommandString);
 	#declare(CommaString);
 	#declare(MatchString);
@@ -58,10 +58,12 @@ export UpdateRecords(FullData,NewData,recref,MatchFields,UpdateFields,DistSet=''
 		RecordLayout;
 		boolean updated;
 	END;
-
+	effectivedate:=process_date;
     #append(CommandString,'RecordLayoutTemp tCreateUpdates(RecordLayout L, RecordLayout R):=TRANSFORM\n');
     #append(CommandString,'self.record_sid:=L.record_sid;\n');
 	#append(CommandString,%'UpdateString'%);
+	#append(CommandString,'self.dt_effective_first:=(UNSIGNED4)effectivedate;\n');
+	#append(CommandString,'self.delta_ind:=2;\n');
     #append(CommandString,'self:=R;\n');
     #append(CommandString,'end;\n');
 

@@ -60,7 +60,7 @@ export DeleteRecords(FullData,NewData,recref,MatchFields,DistSet='',process_date
 	#append(CommandString,'RecordLayout tCreateDeletes(RecordLayout L):=TRANSFORM\n');
     #append(CommandString,'self.dt_effective_last:=(UNSIGNED4)effectivedate;\n');
     #append(CommandString,'self.dt_effective_first:=(UNSIGNED4)effectivedate;\n');
-	#append(CommandString,'self.delta_ind:=1;\n');
+	#append(CommandString,'self.delta_ind:=3;\n');
     #append(CommandString,'self:=L;\n');
     #append(CommandString,'end;\n');
 
