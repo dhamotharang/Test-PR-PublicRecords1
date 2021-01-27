@@ -4,8 +4,8 @@ IMPORT B_Sele_Vehicle_2,CFG_Compile,E_Business_Org,E_Business_Sele,E_Business_Se
 IMPORT * FROM KEL15.Null;
 EXPORT B_Sele_Vehicle_1(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG_Compile __cfg = CFG_Compile) := MODULE
   SHARED VIRTUAL TYPEOF(B_Sele_Vehicle_2(__in,__cfg).__ENH_Sele_Vehicle_2) __ENH_Sele_Vehicle_2 := B_Sele_Vehicle_2(__in,__cfg).__ENH_Sele_Vehicle_2;
-  SHARED __EE7951790 := __ENH_Sele_Vehicle_2;
-  EXPORT __ST193470_Layout := RECORD
+  SHARED __EE8066598 := __ENH_Sele_Vehicle_2;
+  EXPORT __ST193960_Layout := RECORD
     KEL.typ.ntyp(E_Business_Sele().Typ) Legal_;
     KEL.typ.ntyp(E_Vehicle().Typ) Automobile_;
     KEL.typ.nint Ult_I_D_;
@@ -29,14 +29,14 @@ EXPORT B_Sele_Vehicle_1(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CF
     KEL.typ.epoch Vault_Date_Last_Seen_ := 0;
     KEL.typ.int __RecordCount := 0;
   END;
-  SHARED __ST193470_Layout __ND7951996__Project(B_Sele_Vehicle_2(__in,__cfg).__ST211776_Layout __PP7951791) := TRANSFORM
-    __CC13539 := ['AG','AR','CLG','CML','DE','DLR','EA','EMR','ENV','FGV','FNL','FOR','LGV','LIV','MFG','MIL','MUB','OFF','POL','SCB','SGV','TAX'];
-    SELF.Commercial_Type_ := __OP2(__PP7951791.Vehicle_Type_Code_,IN,__CN(__CC13539));
-    __CC13549 := ['BOT','EXT','MOT','OTH','TRL','UNK','VAN','XSR'];
-    SELF.Other_Type_ := __OR(__OR(__OP2(__PP7951791.Vehicle_Type_Code_,IN,__CN(__CC13549)),__OP2(__PP7951791.Vehicle_Type_Code_,=,__CN(''))),__NT(__PP7951791.Vehicle_Type_Code_));
-    __CC13515 := ['ANQ','DAV','HCP','MH','PRV'];
-    SELF.Private_Type_ := __OP2(__PP7951791.Vehicle_Type_Code_,IN,__CN(__CC13515));
-    SELF := __PP7951791;
+  SHARED __ST193960_Layout __ND8066804__Project(B_Sele_Vehicle_2(__in,__cfg).__ST212300_Layout __PP8066599) := TRANSFORM
+    __CC13527 := ['AG','AR','CLG','CML','DE','DLR','EA','EMR','ENV','FGV','FNL','FOR','LGV','LIV','MFG','MIL','MUB','OFF','POL','SCB','SGV','TAX'];
+    SELF.Commercial_Type_ := __OP2(__PP8066599.Vehicle_Type_Code_,IN,__CN(__CC13527));
+    __CC13537 := ['BOT','EXT','MOT','OTH','TRL','UNK','VAN','XSR'];
+    SELF.Other_Type_ := __OR(__OR(__OP2(__PP8066599.Vehicle_Type_Code_,IN,__CN(__CC13537)),__OP2(__PP8066599.Vehicle_Type_Code_,=,__CN(''))),__NT(__PP8066599.Vehicle_Type_Code_));
+    __CC13503 := ['ANQ','DAV','HCP','MH','PRV'];
+    SELF.Private_Type_ := __OP2(__PP8066599.Vehicle_Type_Code_,IN,__CN(__CC13503));
+    SELF := __PP8066599;
   END;
-  EXPORT __ENH_Sele_Vehicle_1 := PROJECT(__EE7951790,__ND7951996__Project(LEFT));
+  EXPORT __ENH_Sele_Vehicle_1 := PROJECT(__EE8066598,__ND8066804__Project(LEFT));
 END;

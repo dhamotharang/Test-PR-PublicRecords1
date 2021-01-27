@@ -4,6 +4,6 @@ IMPORT B_Person_Accident_5,B_Person_Accident_8,CFG_Compile,E_Accident,E_Person,E
 IMPORT * FROM KEL15.Null;
 EXPORT B_Person_Accident_4(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG_Compile __cfg = CFG_Compile) := MODULE
   SHARED VIRTUAL TYPEOF(B_Person_Accident_5(__in,__cfg).__ENH_Person_Accident_5) __ENH_Person_Accident_5 := B_Person_Accident_5(__in,__cfg).__ENH_Person_Accident_5;
-  SHARED __EE5115196 := __ENH_Person_Accident_5;
-  EXPORT __ENH_Person_Accident_4 := __EE5115196;
+  SHARED __EE5230764 := __ENH_Person_Accident_5;
+  EXPORT __ENH_Person_Accident_4 := __EE5230764;
 END;
