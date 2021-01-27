@@ -359,32 +359,6 @@ isWFS34 := Models.FP_models.Model_Check(Valid_requested_models, ['ain801_1']);
 model_name_1 := STD.STR.ToLowerCase(TRIM(Valid_requested_models[1].ModelOptions(STD.STR.ToLowerCase(TRIM(OptionName)) = 'custom')[1].OptionValue));
 model_name_2 := STD.STR.ToLowerCase(TRIM(Valid_requested_models[2].ModelOptions(STD.STR.ToLowerCase(TRIM(OptionName)) = 'custom')[1].OptionValue));
 
-Gateway.Layouts.Config gw_switch(gateways_in le) := transform  
-	self.servicename := map(Models.FP_models.Model_Check(Valid_requested_models, ['fd5609_2'])                                               => '', //turn off all gateways for fd5609_2
-                          Models.FP_models.Model_Check(Valid_requested_models, ['fp1303_1', 'fp1307_1']) and le.servicename = 'netacuity'  => '', //turn off netacuity gateway for fp1303_1
-                          le.servicename = 'bridgerwlc' and OFACVersion = 4 and Models.FP_models.Model_Check(Valid_requested_models, ['']) => le.servicename,
-                          le.servicename = 'bridgerwlc' and OFACVersion = 4 and
-                          Not Models.FP_models.Model_Check(Valid_requested_models, Risk_Indicators.iid_constants.FAXML_WatchlistModels)    => '',
-                          le.servicename in Models.FraudAdvisor_Constants.IDA_services and 
-													Not Models.FP_models.Model_Check(Valid_requested_models, Models.FraudAdvisor_Constants.IDA_models_set)           => '', //turn off IDA gateway if we don't need it
-                                                                                                                                              le.servicename);
-                                                                                                                                               
-	self.url := map(Models.FP_models.Model_Check(Valid_requested_models, ['fd5609_2'])                                               => '',
-                  Models.FP_models.Model_Check(Valid_requested_models, ['fp1303_1', 'fp1307_1']) and le.servicename = 'netacuity'  => '',
-                  le.servicename = 'bridgerwlc' and OFACVersion = 4 and Models.FP_models.Model_Check(Valid_requested_models, ['']) => le.url,
-                  le.servicename = 'bridgerwlc' and OFACVersion = 4 and
-                  Not Models.FP_models.Model_Check(Valid_requested_models, Risk_Indicators.iid_constants.FAXML_WatchlistModels)    => '',
-                  le.servicename in Models.FraudAdvisor_Constants.IDA_services and 
-									Not Models.FP_models.Model_Check(Valid_requested_models, Models.FraudAdvisor_Constants.IDA_models_set)           => '', //turn off IDA gateway if we don't need it
-                                                                                                                                      le.url); 
-  self := le;																																								
-end;
-
-gateways := project(gateways_in, gw_switch(left));
-
-if(OFACVersion = 4 and Models.FP_models.Model_Check(Valid_requested_models, Risk_Indicators.iid_constants.FAXML_WatchlistModels) and not exists(gateways(servicename = 'bridgerwlc')) , fail(Risk_Indicators.iid_constants.OFAC4_NoGateway)); 
-if(OFACVersion = 4 and Models.FP_models.Model_Check(Valid_requested_models, ['']) and not exists(gateways(servicename = 'bridgerwlc')) , fail(Risk_Indicators.iid_constants.OFAC4_NoGateway));
-
 r1 := record
 	unsigned4 seq;
 end;
@@ -480,13 +454,48 @@ prep2_temp := DATASET([into2]);
 prep2 := Models.FP_models.custom_field_replacement(prep2_temp, Valid_requested_models, 'fp1509_2', 'in_zipCode', 'retailzip', 'String');
 
 // New minimum input criteria for Fraud Intel models (i.e. IDA combo models)
-FraudIntel_minimum_check := Models.FP_models.Model_Check(Valid_requested_models, [Models.FraudAdvisor_Constants.IDA_models_set]) and
-                            ((trim(prep[1].fname)<>'' and trim(prep[1].lname)<>'' and 
-                            (trim(prep[1].in_streetAddress)<>'' and trim(prep[1].in_City)<>'' and trim(prep[1].in_State)<>''))
-                            or
-                            (trim(prep[1].fname)<>'' and trim(prep[1].lname)<>'' and trim(prep[1].dob)<>'')
-                            or
-                            (trim(prep[1].fname)<>'' and trim(prep[1].lname)<>'' and trim(prep[1].phone10)<>''));
+isFraudIntelModel := Models.FP_models.Model_Check(Valid_requested_models, [Models.FraudAdvisor_Constants.IDA_models_set]);
+passesFraudIntelMinimumCheck := ((trim(first_value)<>'' and trim(last_value)<>'' and
+                                (trim(addr_value)<>'' and trim(city_value)<>'' and trim(state_value)<>''))
+                                or
+                                (trim(first_value)<>'' and trim(last_value)<>'' and trim(dob_value)<>'')
+                                or
+                                (trim(first_value)<>'' and trim(last_value)<>'' and trim(hphone_value)<>''));
+hasOtherApplicationIdentifier3 := trim(OtherApplicationIdentifier3)<>'';
+passesFraudIntelTotalCheck := passesFraudIntelMinimumCheck AND hasOtherApplicationIdentifier3;
+canCallFraudIntel := isFraudIntelModel AND passesFraudIntelTotalCheck;
+
+Gateway.Layouts.Config gw_switch(gateways_in le) := transform
+
+  serviceNameLowerTrim := STD.STR.ToLowerCase(TRIM(le.servicename));
+  
+  self.servicename := map(Models.FP_models.Model_Check(Valid_requested_models, ['fd5609_2'])                                                                                  => '', //turn off all gateways for fd5609_2
+                          Models.FP_models.Model_Check(Valid_requested_models, ['fp1303_1', 'fp1307_1']) and serviceNameLowerTrim = Gateway.Constants.ServiceName.NetAcuity   => '', //turn off netacuity gateway for fp1303_1
+                          serviceNameLowerTrim = Gateway.Constants.ServiceName.bridgerwlc and OFACVersion = 4 and Models.FP_models.Model_Check(Valid_requested_models, [''])  => le.servicename,
+                          serviceNameLowerTrim = Gateway.Constants.ServiceName.bridgerwlc and OFACVersion = 4 and
+                          Not Models.FP_models.Model_Check(Valid_requested_models, Risk_Indicators.iid_constants.FAXML_WatchlistModels)                                       => '',
+                          serviceNameLowerTrim in Models.FraudAdvisor_Constants.IDA_services and 
+													(Not Models.FP_models.Model_Check(Valid_requested_models, Models.FraudAdvisor_Constants.IDA_models_set) OR
+                          passesFraudIntelTotalCheck = FALSE)                                                                                                                 => '', //turn off IDA gateway if we don't need it OR minimum input check fails
+                                                                                                                                                                                 le.servicename);
+                                                                                                                                               
+  self.url := map(Models.FP_models.Model_Check(Valid_requested_models, ['fd5609_2'])                                                                                          => '',
+                  Models.FP_models.Model_Check(Valid_requested_models, ['fp1303_1', 'fp1307_1']) and serviceNameLowerTrim = Gateway.Constants.ServiceName.NetAcuity           => '',
+                  serviceNameLowerTrim = Gateway.Constants.ServiceName.bridgerwlc and OFACVersion = 4 and Models.FP_models.Model_Check(Valid_requested_models, [''])          => le.url,
+                  serviceNameLowerTrim = Gateway.Constants.ServiceName.bridgerwlc and OFACVersion = 4 and
+                  Not Models.FP_models.Model_Check(Valid_requested_models, Risk_Indicators.iid_constants.FAXML_WatchlistModels)                                               => '',
+                  serviceNameLowerTrim in Models.FraudAdvisor_Constants.IDA_services and 
+									(Not Models.FP_models.Model_Check(Valid_requested_models, Models.FraudAdvisor_Constants.IDA_models_set) OR
+                  passesFraudIntelTotalCheck = FALSE)                                                                                                                         => '', //turn off IDA gateway if we don't need it OR minimum input check fails
+                                                                                                                                                                                 le.url); 
+  self := le;
+  
+end;
+
+gateways := project(gateways_in, gw_switch(left));
+
+if(OFACVersion = 4 and Models.FP_models.Model_Check(Valid_requested_models, Risk_Indicators.iid_constants.FAXML_WatchlistModels) and not exists(gateways(servicename = 'bridgerwlc')) , fail(Risk_Indicators.iid_constants.OFAC4_NoGateway)); 
+if(OFACVersion = 4 and Models.FP_models.Model_Check(Valid_requested_models, ['']) and not exists(gateways(servicename = 'bridgerwlc')) , fail(Risk_Indicators.iid_constants.OFAC4_NoGateway)); 
 
 // requirement 2.5 - minimum input required
 // a. Model is AVENGER and cmLexID is populated, and is the only thing populated
@@ -518,7 +527,7 @@ input_ok := if( (Models.FP_models.FP31604_0_check(Valid_requested_models, 'fp316
                   (trim(prep[1].fname)<>'' and trim(prep[1].lname)<>'' and 
                   (trim(prep[1].ssn)<>'' or (trim(prep[1].in_streetAddress)<>'' and trim(prep[1].in_zipCode)<>'')))
                    or
-                   FraudIntel_minimum_check
+                   canCallFraudIntel
                   ,
                   TRUE,
                   ERROR(301,doxie.ErrorCodes(301)));
@@ -904,11 +913,12 @@ IDA_input := PROJECT(iid, Transform(Risk_Indicators.layouts.layout_IDAFraud_in,
 
 //Call the IDA gateway if needed
 IDA_attributes_raw := Risk_Indicators.Prep_IDA_Fraud(ungroup(IDA_input), gateways, Valid_requested_models);
-
+  
 IDA_attributes := IF(Models.FP_models.Model_Check(Valid_requested_models, Models.FraudAdvisor_Constants.IDA_models_set), 
-                      IDA_attributes_raw,
-                      DATASET([],Risk_Indicators.layouts.layout_IDAFraud_out)
-                    );
+                     IDA_attributes_raw,
+                     DATASET([],Risk_Indicators.layouts.layout_IDAFraud_out)
+                     );
+
 
 // Get the Fraud Defender models
 ret  := Models.FD3510_0_0(clam, ofacSearching, isFCRA, inCalif, fdReasonsWith38, nugen, addtl_watchlists);

@@ -181,6 +181,7 @@ import iesp, OFAC_XG5, Risk_Indicators, Inquiry_AccLogs, AutoheaderV2, Risk_Repo
 
 export Identifier2_Service := MACRO
  
+  WSInput.MAC_identifier2_service_GovIdAttributes();
   #constant('SearchLibraryVersion', AutoheaderV2.Constants.LibVersion.SALT);
   ds_in := DATASET ([], iesp.mod_identifier2.t_Identifier2Request) : STORED ('Identifier2Request', FEW);
   first_row := ds_in[1] : independent;
@@ -395,9 +396,10 @@ export Identifier2_Service := MACRO
 	#stored( 'BSVersion', 51 );
   
   recs2 := Identifier2.Identifier2records : INDEPENDENT;
-	 recs := iesp.transform_identifier2(recs2);
+  recswGovId := Identifier2.getGovID(recs2,search_by,Options);
+  recs := iesp.transform_identifier2(recswGovId);
 	 
-	 dRoyalties := Project(recs2, transform(Royalty.Layouts.Royalty,
+	 dRoyalties := Project(recswGovId, transform(Royalty.Layouts.Royalty,
 																		self.royalty_type_code := left.royalty_type_code_targus,
                   self.royalty_type := left.royalty_type_targus,	
 																		self.royalty_count := left.royalty_count_targus,
@@ -415,7 +417,7 @@ export Identifier2_Service := MACRO
 	results := PROJECT (recs, SetResponse (Left));
   
   
-	Deltabase_Logging_prep := project(recs2, transform(Risk_Reporting.Layouts.LOG_Deltabase_Layout_Record,
+	Deltabase_Logging_prep := project(recswGovId, transform(Risk_Reporting.Layouts.LOG_Deltabase_Layout_Record,
                                   self.company_id := (Integer)CompanyID,
                                   self.login_id := _LoginID,
                                   self.product_id := Risk_Reporting.ProductID.Identifier2__Identifier2_Service,

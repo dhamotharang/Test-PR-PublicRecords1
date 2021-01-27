@@ -639,10 +639,11 @@ EXPORT getEmployeeSources(DATASET(Business_Risk_BIP.Layouts.Shell) Shell,
 
 	// ---------------- Equifax Business ------------------
 
-  equifaxBus_raw := dx_Equifax_business_data.key_LinkIds.kFetch(Business_Risk_BIP.Common.GetLinkIDs(Shell),
+  equifaxBus_raw := dx_Equifax_business_data.key_LinkIds.kFetch2(Business_Risk_BIP.Common.GetLinkIDs(Shell),
                                                         Business_Risk_BIP.Common.SetLinkSearchLevel(Options.LinkSearchLevel),
                                                         0, /*ScoreThreshold --> 0 = Give me everything*/
-                                                        Business_Risk_BIP.Constants.Limit_Default);
+                                                        Business_Risk_BIP.Constants.Limit_Default,
+																												Options.KeepLargeBusinesses);
 
 	Business_Risk_BIP.Common.AppendSeq(equifaxBus_raw, Shell, equifaxBus_seq, Options.LinkSearchLevel);
 	
@@ -873,10 +874,11 @@ EXPORT getEmployeeSources(DATASET(Business_Risk_BIP.Layouts.Shell) Shell,
 
 	// ---------------- Infutor NARB ------------------
 
-  infutorNARB_raw := dx_Infutor_NARB.Key_Linkids.Kfetch(Business_Risk_BIP.Common.GetLinkIDs(Shell),
+  infutorNARB_raw := dx_Infutor_NARB.Key_Linkids.Kfetch2(Business_Risk_BIP.Common.GetLinkIDs(Shell),
                                                         Business_Risk_BIP.Common.SetLinkSearchLevel(Options.LinkSearchLevel),
                                                         0, /*ScoreThreshold --> 0 = Give me everything*/
-                                                        Business_Risk_BIP.Constants.Limit_Default);
+                                                        Business_Risk_BIP.Constants.Limit_Default,
+																												Options.KeepLargeBusinesses);
     
 	Business_Risk_BIP.Common.AppendSeq(infutorNARB_raw, Shell, infutorNARB_seq, Options.LinkSearchLevel);
 	

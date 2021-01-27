@@ -1,12 +1,11 @@
-﻿IMPORT data_services,_Control,doxie; 
+﻿IMPORT InsuranceHeader_xLink;
+IMPORT Doxie;
+IMPORT _Control;
+IMPORT Data_Services;
 
-rm_score0  := doxie.header_pre_keybuild ; 
-
-rm_score := PROJECT(rm_score0, TRANSFORM({rm_score0 , UNSIGNED4 DT_EFFECTIVE_FIRST, UNSIGNED4	DT_EFFECTIVE_LAST := 0}, 
-                                 SELF.DT_EFFECTIVE_FIRST := 20160101, 
-                                 SELF := LEFT
-                                 )); 
-
-EXPORT Key_InsuranceHeader_DID := INDEX(rm_score, {unsigned6 s_did := did}, {rm_score}-_Control.Layout_KeyExclusions, 
-						                      data_services.Data_Location.person_header+'thor_data400::key::insuranceheader_xlink::' + doxie.Version_SuperKey + '::did' );
-
+EXPORT Key_InsuranceHeader_DID := INDEX(
+  DATASET([], InsuranceHeader_xLink.layout_insuranceheader_payload),
+  {UNSIGNED6 s_did := did}, 
+  {InsuranceHeader_xLink.layout_insuranceheader_payload}-_Control.Layout_KeyExclusions, 
+  Data_Services.Data_Location.person_header + 'thor_data400::key::insuranceheader_xlink::' + doxie.Version_SuperKey + '::did'
+);

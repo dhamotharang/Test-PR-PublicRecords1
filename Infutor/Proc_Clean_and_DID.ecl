@@ -1,4 +1,4 @@
-import infutor, ut, header_slimsort, did_add, didville;
+import infutor, ut, did_add;
 
 ds := infutor.File_Infutor;
 
@@ -28,10 +28,10 @@ r_slim := record
  string8  orig_dob_dd_appended;
  string1  orig_gender;
  string6  effective_dt;//Looks like it could be LOR
- 
+
  unsigned6 boca_id:=0;
  string1   infutor_or_mktg_ind;
- 
+
 end;
 
 r_slim t_slim(infutor.layout_in_fixed l, integer c) := transform
@@ -77,10 +77,10 @@ r_norm := record
  string8  orig_dob_dd_appended;
  string1  orig_gender;
  string6  effective_dt;
- 
+
  unsigned6 boca_id:=0;
  string1   infutor_or_mktg_ind;
- 
+
  string1 which_ssn:='';
 end;
 
@@ -112,14 +112,14 @@ invalid_prim_name := [
 ];
 
 infutor.Layout_DID t_clean(r_norm l) := transform
- 
+
  string73  v_pname      := addrcleanlib.cleanpersonfml73(l.orig_first_name+' '+l.orig_middle_name+' '+l.orig_last_name+' '+l.orig_name_suffix);
  string182 v_clean_addr := addrcleanlib.cleanaddress182(l.orig_addr_street_blob,l.orig_city+' '+l.orig_st+' '+l.orig_zip+if(l.orig_zip<>'',l.orig_zip4,''));
- 
+
  string28  v_prim_name := v_clean_addr[13..40];
  string5   v_zip       := v_clean_addr[117..121];
  string4   v_zip4      := v_clean_addr[122..125];
- 
+
  self.title       := v_pname[ 1.. 5];
  self.fname       := v_pname[ 6..25];
  self.mname       := v_pname[26..45];
@@ -155,7 +155,7 @@ infutor.Layout_DID t_clean(r_norm l) := transform
  self.geo_blk     := v_clean_addr[171..177];
  self.geo_match   := v_clean_addr[178..178];
  self.err_stat    := v_clean_addr[179..182];
- 
+
  self               := l;
 
 end;
@@ -168,13 +168,13 @@ d_clean_filt := d_clean(fname<>'',
 						(phone<>'' or (prim_range<>'' and prim_name<>'')),
 						~(stringlib.stringfind(prim_name,'PO BOX',1)>0 and trim(zip4)='')
 					   );
-					   
+
 matchset := ['A','P','Z','D','S'];
 
 did_add.MAC_Match_Flex
-	(d_clean_filt, matchset,					
-	 ssn, orig_dob_dd_appended, fname, mname, lname, name_suffix, 
-	 prim_range, prim_name, sec_range, zip, st, phone, 
+	(d_clean_filt, matchset,
+	 ssn, orig_dob_dd_appended, fname, mname, lname, name_suffix,
+	 prim_range, prim_name, sec_range, zip, st, phone,
 	 DID, infutor.Layout_DID, false, DID_Score_field,
 	 75, d_did)
 

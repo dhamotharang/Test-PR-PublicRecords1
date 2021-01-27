@@ -126,42 +126,40 @@ EXPORT ReportRecords (DATASET(FraudShared_Services.Layouts.BatchInExtended_rec) 
                          //Multiple LexIDs found in contributory or PR.
                          multiple_did_resolved AND (InputDidFoundInCR OR InputDidFoundInPR OR EXISTS(ds_dids_combined_dedup)) => _Constant.IDENTITY_FLAGS.MULTIPLE_IDENTITY,
                          '');
-                        
+ 
+ ds_RiskAttributes_sorted := SORT(ds_API_Assessment.entitystats, -risklevel, -(indicatortype = 'ID'), indicatortype, record);
+ ds_KnownRisks_sorted := SORT(ds_API_Assessment.KrAttributes, -risklevel, entitytype, record);
+ 
  iesp.identityriskreport.t_RINIdentityRiskReportRecord trans_API_Assessment(RiskIntelligenceNetwork_analytics.Layouts.LiveAssessmentScores L) := TRANSFORM
- //Following line Purposely commented and left here for quick debug. 
-//  iesp.identityriskreport.t_RINIdentityRiskReportRecord trans_API_Assessment() := TRANSFORM
-  
+
   SELF.RiskLevel := RiskIntelligenceNetwork_Services.Functions.GetRiskLevel(L.p1_idriskindx),
   SELF.IdentityResolved := IdentityResolved,
   SELF.UniqueId := (STRING)ds_in_w_did[1].did,                                                               
   SELF.MostRecentActivityDate := iesp.ECL2ESP.toDate(L.mostrecentactivitydate);
   SELF.TotalNumberIdentityActivities := L.totalnumberofidactivities;
   SELF.RiskAttributeCount := COUNT(L.entitystats);
-  SELF.RiskAttributes := CHOOSEN(PROJECT(L.entitystats, 
+  SELF.RiskAttributes := CHOOSEN(PROJECT(ds_RiskAttributes_sorted, 
                                   TRANSFORM(iesp.identityriskreport.t_RINApiRiskAttribute, 
                                     SELF.RiskAttributeCode := LEFT.indicatortype,
                                     SELF.RiskAttributeReason := LEFT.label)),
                                 iesp.Constants.RIN.MAX_RISK_ATTRIBUTE);
   SELF.KnownRiskCount := COUNT(L.KrAttributes);
-  SELF.KnownRisks := CHOOSEN(PROJECT(L.KrAttributes, 
+  SELF.KnownRisks := CHOOSEN(PROJECT(ds_KnownRisks_sorted, 
                               TRANSFORM(iesp.identityriskreport.t_RINKnownRisk, 
                                 SELF.ElementType := RiskIntelligenceNetwork_Services.Functions.GetElementType(LEFT.entitytype),
                                 SELF.KnownRiskCode := LEFT.indicatortype,
                                 SELF.KnownRiskReason := LEFT.Label,
                                 SELF.KnownRiskAgency := LEFT.agencydescription)),
                             iesp.Constants.RIN.MAX_COUNT_INDICATOR_ATTRIBUTE);
-  // SELF := [];
  END;
  
  result := PROJECT(ds_API_Assessment, trans_API_Assessment(LEFT));
-//  Following line Purposely commented and left here for quick debug. 
-//  result := DATASET([trans_API_Assessment()]);
- 
+
  // output LOG_Deltabase_Layout_Record
  deltabase_log := RiskIntelligenceNetwork_Services.Functions.GetDeltabaseLogDataSet(ds_in_w_did, in_params);
  OUTPUT(deltabase_log, NAMED('log_delta__fraudgov_delta__identity'));
  
-// Debug Outputs
+//  Debug Outputs
 //  OUTPUT(ds_in, named('ds_in'));
 //  OUTPUT(hasMinimunInputForRINID, named('hasMinimunInputForRINID'));
 //  OUTPUT(InputDidFoundInPR, named('InputDidFoundInPR'));
@@ -181,6 +179,8 @@ EXPORT ReportRecords (DATASET(FraudShared_Services.Layouts.BatchInExtended_rec) 
 //  OUTPUT(ds_pr_best_ungrp, named('ds_pr_best_ungrp'));
 //  OUTPUT(ds_pr_appends, named('ds_pr_appends'));
 //  OUTPUT(ds_API_Assessment, named('ds_API_Assessment')); 
+//  OUTPUT(ds_RiskAttributes_sorted, named('ds_RiskAttributes_sorted')); 
+//  OUTPUT(ds_KnownRisks_sorted, named('ds_KnownRisks_sorted')); 
 //  OUTPUT(IdentityResolved, named('IdentityResolved'));
 //  OUTPUT(result, named('result'));
  

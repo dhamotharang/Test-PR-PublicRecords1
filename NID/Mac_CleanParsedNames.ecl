@@ -19,6 +19,8 @@ normalizeDualNames=false,
 _chkpoint = 1
 ) := MACRO
 
+IMPORT Address;
+
 //#UNIQUENAME(nosuffix)
 //%nosuffix% := IF(#TEXT(namesuffix) = '\'\'', true, false);
 
@@ -40,7 +42,7 @@ _chkpoint = 1
 		string5		_suffix2 := '';
 		unsigned2	_name_ind;
 	END;
-	
+
 #UNIQUENAME(new_layout)
 	%new_layout% := {RecordOf(inFile) OR %cln_layout%};
 #UNIQUENAME(r)
@@ -55,7 +57,7 @@ END;
 		self.namType 	:= R.nametype;
 		self.nameid		:= R.NID;
 		self.fullname	:= R.name;
-		
+
 		self._title		:= R.cln_title;
 		self._fname		:= R.cln_fname;
 		self._mname		:= R.cln_mname;
@@ -69,10 +71,10 @@ END;
 
 		self._name_ind := R.nameind;
 //		self._name_ind := Nid.NameIndicators.fn_setNameIndicator(R.nametype,R.derivation,R.gender,Length(trim(R.cln_fname))=1);
-		
+
 		self := L;
 	END;
-	
+
 #UNIQUENAME(xform2)
 	//%new_layout% %xform2%(RECORDOF(inFile) L) := TRANSFORM
 	%new_layout% %xform2%(%new_layout% L) := TRANSFORM
@@ -98,9 +100,9 @@ END;
 		self._name_ind := Nid.NameIndicators.fn_setNameIndicator(ntype,0,
 						IF(ntype='P',Address.NameTester.genderEx(self._fname,self._mname),''),
 						IF(ntype='P',Length(trim(self._fname))=1,false));
-		
+
 		self := L;
-	END;	
+	END;
 
 #UNIQUENAME(src)
 #UNIQUENAME(matches)
@@ -108,11 +110,11 @@ END;
 #UNIQUENAME(dsin)
 %dsin% := DISTRIBUTE(
 			PROJECT(inFile(TRIM(firstname + middlename + lastname)<>''), TRANSFORM(%r%,
-				SELF.__nid := 
+				SELF.__nid :=
 					Nid.Common.fGetNIDParsed(LEFT.firstname,LEFT.middlename,LEFT.lastname,LEFT.namesuffix);
 				SELF := LEFT)),
 			__nid);
-					
+
 	%matches% := JOIN(%dsin%, Nid.NameRepository(derivation=0),
 					//Nid.Common.fGetNIDParsed(LEFT.firstname, LEFT.middlename, LEFT.lastname, LEFT.namesuffix)
 					LEFT.__nid	= RIGHT.Nid,
@@ -124,13 +126,13 @@ END;
 #UNIQUENAME(nomatchclean)
     %ds1% := SORT(%matches%(Nid=0),firstname,middlename,lastname,namesuffix, LOCAL) : INDEPENDENT;
 	%nomatchdedup% := DEDUP(%ds1%,firstname,middlename,lastname,namesuffix, LOCAL);
-	%nomatchclean% := PROJECT(%nomatchdedup%, %xform2%(LEFT)) : INDEPENDENT; 
+	%nomatchclean% := PROJECT(%nomatchdedup%, %xform2%(LEFT)) : INDEPENDENT;
 
 	%nomatches% := IF(EXISTS(%matches%(Nid=0)),
-					JOIN(%ds1%, %nomatchclean%, 
+					JOIN(%ds1%, %nomatchclean%,
 						    LEFT.firstname=RIGHT.firstname AND LEFT.middlename=RIGHT.middlename
 						AND LEFT.lastname=RIGHT.lastname AND LEFT.namesuffix=RIGHT.namesuffix,
-							TRANSFORM(%new_layout%, 
+							TRANSFORM(%new_layout%,
 									SELF.nameid := RIGHT.nameid;
 									self.namType := RIGHT.namType;
 									self.fullname := RIGHT.fullname;
@@ -147,12 +149,12 @@ END;
 									self._name_ind := RIGHT._name_ind;
 									SELF := LEFT;),
 								LOCAL, LEFT OUTER, KEEP(1))) : INDEPENDENT;
-								
-	
+
+
 #UNIQUENAME(tempout)
 	%tempout% := IF(EXISTS(%nomatches%), %matches%(NID<>0) + %nomatches%, %matches%) +
 				PROJECT(inFile(TRIM(firstname + middlename + lastname)=''),
-					TRANSFORM(%new_layout%, 
+					TRANSFORM(%new_layout%,
 							//SELF.nametype := '';
 							SELF.nameid := Nid.Common.BlankNid;
 							self._name_ind := Nid.NameIndicators.Blank;
@@ -160,7 +162,7 @@ END;
 							//SELF := [];
 							))
 				: INDEPENDENT;
-							
+
 #if(normalizeDualNames=true)
 
 #UNIQUENAME(xform_dual)
@@ -168,36 +170,36 @@ END;
 	%new_layout% %xform_dual%(%new_layout% L, integer c) := TRANSFORM
 		SELF.namType := IF(L.namType='D','P',SKIP);
 		self.nameid := NID.Common.fGetNIDParsed(L.firstname,L.middlename,L.lastname,L.namesuffix,c);
-		
+
 		SELF._title := IF(c=1,L._title, L._title2);
 		SELF._fname := IF(c=1,L._fname, L._fname2);
 		SELF._mname := IF(c=1,L._mname, L._mname2);
 		SELF._lname := IF(c=1,L._lname, L._lname2);
 		SELF._suffix := IF(c=1,L._suffix, L._suffix2);
-		
+
 		SELF._title2 := '';
 		SELF._fname2 := '';
 		SELF._mname2 := '';
 		SELF._lname2 := '';
 		SELF._suffix2 := '';
-		
+
 		self._name_ind := Nid.NameIndicators.fn_setNameIndicator('P',c,
 					Address.NameTester.GenderEx(SELF._fname,SELF._mname),
 					LENGTH(TRIM(SELF._fname))=1);
-				
+
 		SELF := L;
-	
+
 	END;
 
 #UNIQUENAME(dualnames)
-	%dualnames% := %tempout%(namType='D'); 
+	%dualnames% := %tempout%(namType='D');
 
 	outFile := IF(Exists(%dualnames%), %tempout%(namType<>'D') +
 					NORMALIZE(%dualnames%, 2, %xform_dual%(LEFT, COUNTER)),
-				%tempout%);	
+				%tempout%);
 #else
 	outFile := %tempout%;
-#end	
+#end
 
 
 #IF(includeInRepository=true)
@@ -215,7 +217,7 @@ Nid.MAC_IncludeInRepositoryParsed(%nomatchclean%,
 	_fname2,	// cleaned first name for name 2
 	_mname2,	// cleaned middle name for name 2
 	_lname2,	// cleaned last name for name 2
-	_suffix2		
+	_suffix2
 	);
 
 
