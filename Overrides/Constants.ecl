@@ -182,6 +182,8 @@ EXPORT Constants := MODULE
 		threshold_limit := CASE(datagroup 
 				,GONG 												=> '50'
 				,PAW 												=> '10'
+				
+				,STUDENT										=> '10'          
 				,statsAlert_threshold
 			);
 		RETURN threshold_limit;	
