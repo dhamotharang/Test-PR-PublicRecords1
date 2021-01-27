@@ -13,6 +13,7 @@ EXPORT fn_cgm_phoneownership (
 	phone_type_key := DISTRIBUTED(AccountMonitoring.product_files.Phone.key_phones_type_dist, HASH64(phone));
 	phone_lerg6_key := DISTRIBUTED(AccountMonitoring.product_files.Phone.key_Phones_Lerg6_dist, HASH64(npa,nxx,block_id));
 	phone_carrier_reference_key := DISTRIBUTED(AccountMonitoring.product_files.Phone.key_carrier_reference_dist, HASH64(ocn));
+	phone_WDNC_key := DISTRIBUTED(AccountMonitoring.product_files.PhoneOwnership.key_phones_WDNC_dist, HASH64(phone));
 
   temp_layout := RECORD
 		in_portfolio.pid;
@@ -112,8 +113,23 @@ EXPORT fn_cgm_phoneownership (
 
 //Lerg6 is a block file we hit only for phones we do not have a record in the phones type/transaction keys.Which is why we pull records for phones who do not have anything in type/transaction key. The latest records are in these keys.
 
-	metadata_ds := temp_join_phone_transaction(event_start_date != 0) & temp_join_phone_type(event_start_date != 0) & temp_join_phone_carrier_reference;
-																		
+ temp_join_phone_WDNC := JOIN(temp_phone_dist, phone_WDNC_key,
+		LEFT.phone = RIGHT.phone AND RIGHT.is_current = TRUE,
+		TRANSFORM(temp_layout_metadata,
+			SELF.pid 				:= LEFT.pid,
+			SELF.rid				:= LEFT.rid,
+			SELF.hid				:= 0,
+			SELF.save_did		:= LEFT.did,
+			SELF.save_bdid	:= LEFT.bdid,
+			SELF.phone			:= LEFT.phone,
+			SELF.event_start_date	:= RIGHT.dt_first_seen,
+			SELF.event_end_date	:= 0,
+			SELF.serv						:= RIGHT.phone_type,
+			SELF.line						:= RIGHT.phone_type,
+			SELF := []), LOCAL);		
+
+metadata_ds := temp_join_phone_transaction(event_start_date != 0) & temp_join_phone_type(event_start_date != 0) & temp_join_phone_carrier_reference & temp_join_phone_WDNC;
+
 	// Combine the possibilities from the various pivots (in this case just one)
 	temp_all_joins :=
 		metadata_ds;
