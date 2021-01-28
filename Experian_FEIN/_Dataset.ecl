@@ -1,20 +1,23 @@
-import _control, versioncontrol;
-export _Dataset(
+IMPORT VersionControl, STD, tools;
 
-	boolean	pUseProd = false
+EXPORT _Dataset(
+	BOOLEAN pUseProd = FALSE
+):= MODULE
 
-):= module
+	EXPORT Name := 'Experian_FEIN';
+	EXPORT thor_cluster_Files := IF(
+		pUseProd,
+		VersionControl.foreign_prod + 'thor_data400::',
+		'~thor_data400::'
+	);
 
-	export Name										:= 'Experian_FEIN' 	;
-	export thor_cluster_Files			:= 	if(pUseProd 
-																			,VersionControl.foreign_prod + 'thor_data400::'
-																			,'~thor_data400::'
-																		);
-	export thor_cluster_Persists	:= thor_cluster_Files		;
-	export max_record_size				:= 4096								;
+	EXPORT thor_cluster_Persists := thor_cluster_Files;
+	EXPORT max_record_size := 4096;
 
-	export Groupname	:= if(	_Control.ThisEnvironment.name		 = 'Dataland'	,'thor40_241'
-																																					,'thor400_20'
-											);
+	EXPORT Groupname := IF(
+		tools._Constants().IsDataland,
+		'thor40_241',
+		'thor400_20'
+	);
 
-end;
+END;
