@@ -4,7 +4,7 @@ EXPORT Spray_Experian(
 	STRING  pSourceIP,
 	STRING  pDirectory,
 	STRING  pVersion,
-	STRING pfileMask = 'LASP.R010.AIS.M.*.LDDP1150.*',
+	STRING pfileMask = 'LASP.R010.AIS.*.LDDP1150.*',
 	UNSIGNED pRecLength = 1151,
 	STRING  pGroupName = STD.System.Thorlib.Group(),
 	BOOLEAN pOverwrite = TRUE
@@ -125,6 +125,17 @@ FUNCTION
 		)
 	);
 
+	// Delete the files remote host following a successful spray
+	deleteFiles := NOTHOR(
+		APPLY(
+			dRemoteFiles_SprayInfo,
+			STD.File.DeleteExternalFile(
+				SourceIP,
+				SourceDir,
+			)	
+		)
+	);
+
 	rExperianRaw_layout := RECORD
 		VehicleV2.Layout_Experian.Layout_Experian_Raw;
 		STRING LogicalFileName {virtual(LogicalFileName)};
@@ -203,7 +214,8 @@ FUNCTION
 		addExpVinCandidates,
 		outExperianPrepped,
 		addExperianPreppedToSuper,
-		addExperianToBldg
+		addExperianToBldg,
+		deleteFiles
 	);
 
 END;

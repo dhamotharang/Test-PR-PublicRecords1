@@ -2,7 +2,7 @@
 
 	//DF-24397: Create Dx-Prefixed Keys
 	
-EXPORT Proc_Build_Phones_Type_Key(string version):= function
+EXPORT Proc_Build_Phones_Type_Key(string version, string contacts):= function
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////	
 //Create Phones Type Base File///////////////////////////////////////////////////////////////////////////////
@@ -45,8 +45,8 @@ EXPORT Proc_Build_Phones_Type_Key(string version):= function
 														clearDelete, 
 														moveComBase,
 														bkPhonesTransaction, mvBltPhonesTransaction, mvQAPhonesTransaction):
-														Success(FileServices.SendEmail(_control.MyInfo.EmailAddressNotify + ';judy.tao@lexisnexisrisk.com' /*+ ';gregory.rose@lexisnexisrisk.com' + ';darren.knowles@lexisnexisrisk.com'*/, 'PhonesInfo Phone Type Key Build Succeeded', workunit + ': Build complete.')),
-														Failure(FileServices.SendEmail(_control.MyInfo.EmailAddressNotify + ';judy.tao@lexisnexisrisk.com' /*+ ';gregory.rose@lexisnexisrisk.com' + ';darren.knowles@lexisnexisrisk.com'*/, 'PhonesInfo Phone Type Key Build Failed', workunit + '\n' + FAILMESSAGE)
+														Success(FileServices.SendEmail(contacts, 'PhonesInfo Phone Type Key Build Succeeded', workunit + ': Build complete.')),
+														Failure(FileServices.SendEmail(contacts, 'PhonesInfo Phone Type Key Build Failed', workunit + '\n' + FAILMESSAGE)
 														);
 	return sendEmail;														
 

@@ -1,4 +1,5 @@
-﻿IMPORT STD;
+﻿IMPORT STD, dx_Ecrash;
+
 EXPORT mod_PrepEcrashSearchKeys(DATASET(Layout_eCrash.Consolidation) EcrashIn = FLAccidents_Ecrash.File_KeybuildV2.out) := MODULE
 
 SearchRecs := EcrashIn(report_code IN ['EA', 'TM', 'TF'] AND 
@@ -11,7 +12,7 @@ EXPORT EcrashSearchRecsIn := eCrashSearchRecs:INDEPENDENT;
 //            key_ecrashV2_DlnNbrDLState
 //***************************************************************
 dsSlimDlnNbrDLState := PROJECT(EcrashSearchRecsIn(driver_license_nbr <> ''), 
-                               TRANSFORM(Layouts.key_slim_layout, SELF := LEFT)); 
+                               TRANSFORM(dx_Ecrash.Layouts.DLNNBRDLSTATE, SELF := LEFT)); 
 dSlimDlnNbrDLState := DISTRIBUTED(dsSlimDlnNbrDLState, HASH32(accident_nbr)); 
 sSlimDlnNbrDLState := SORT(dSlimDlnNbrDLState, accident_nbr, driver_license_nbr, dlnbr_st, report_code, jurisdiction_state, jurisdiction,
                            accident_date, report_type_id, LOCAL); 
@@ -21,7 +22,7 @@ EXPORT uSlimDlnNbrDLState := DEDUP(sSlimDlnNbrDLState, accident_nbr, driver_lice
 //***************************************************************
 //                 key_ecrashV2_VinNbr
 //***************************************************************
-dsSlimVinNbr := PROJECT(EcrashSearchRecsIn(vin <> ''), TRANSFORM(Layouts.key_slim_layout, SELF := LEFT)); 
+dsSlimVinNbr := PROJECT(EcrashSearchRecsIn(vin <> ''), TRANSFORM(dx_Ecrash.Layouts.VINNBR, SELF := LEFT)); 
 dSlimVinNbr := DISTRIBUTED(dsSlimVinNbr, HASH32(accident_nbr)); 
 sSlimVinNbr := SORT(dSlimVinNbr, accident_nbr, vin, report_code, jurisdiction_state, jurisdiction, accident_date, report_type_id, LOCAL);
 EXPORT uSlimVinNbr := DEDUP(sSlimVinNbr, accident_nbr, vin, report_code, jurisdiction_state, jurisdiction, accident_date, report_type_id, LOCAL);
@@ -29,7 +30,7 @@ EXPORT uSlimVinNbr := DEDUP(sSlimVinNbr, accident_nbr, vin, report_code, jurisdi
 //***************************************************************
 //             key_ecrashV2_LicensePlateNbr
 //***************************************************************
-dsSlimLicensePlateNbr := PROJECT(EcrashSearchRecsIn(tag_nbr <> ''), TRANSFORM(Layouts.key_slim_layout, SELF := LEFT)); 
+dsSlimLicensePlateNbr := PROJECT(EcrashSearchRecsIn(tag_nbr <> ''), TRANSFORM(dx_Ecrash.Layouts.LICENSEPLATENBR, SELF := LEFT)); 
 dSlimLicensePlateNbr := DISTRIBUTED(dsSlimLicensePlateNbr, HASH32(accident_nbr)); 
 sSlimLicensePlateNbr := SORT(dSlimLicensePlateNbr, accident_nbr, tag_nbr, tagnbr_st, report_code, jurisdiction_state, jurisdiction,
                              accident_date, report_type_id, LOCAL);
@@ -40,7 +41,7 @@ EXPORT uSlimLicensePlateNbr := DEDUP(sSlimLicensePlateNbr, accident_nbr, tag_nbr
 //             key_ecrashV2_OfficerBadgeNbr
 //***************************************************************
 dsSlimOfficerBadgeNbr := PROJECT(EcrashSearchRecsIn(officer_id <> ''), 
-                                 TRANSFORM(Layouts.key_slim_layout, SELF := LEFT));  
+                                 TRANSFORM(dx_Ecrash.Layouts.OFFICERBADGENBR, SELF := LEFT));  
 dSlimOfficerBadgeNbr := DISTRIBUTED(dsSlimOfficerBadgeNbr, HASH32(accident_nbr)); 
 sSlimOfficerBadgeNbr := SORT(dSlimOfficerBadgeNbr, accident_nbr, officer_id, report_code, jurisdiction_state, jurisdiction,
                              accident_date, report_type_id, LOCAL);
@@ -62,7 +63,7 @@ Layouts.key_search_layout tCopyNames(Layouts.key_search_layout L) := TRANSFORM
 END;
 pLastName := PROJECT(fLastName, tCopyNames(LEFT)); 
 
-Layouts.key_slim_layout	tModifyLayout(Layouts.key_search_layout L) := TRANSFORM
+dx_Ecrash.Layouts.LASTNAME	tModifyLayout(Layouts.key_search_layout L) := TRANSFORM
   SELF.lname := L.lname;
 	SELF.fname := L.fname;
 	SELF.mname := L.mname;
@@ -77,22 +78,13 @@ EXPORT uSlimLastName	:= DEDUP(sSlimLastName, accident_nbr, lname, report_code, j
 //***************************************************************
 //              Key_eCrashv2_PrefName_State
 //***************************************************************
-dsSlimPrefNameState := PROJECT(EcrashSearchRecsIn(fname <> ''), TRANSFORM(Layouts.key_slim_layout, SELF := LEFT));  
+dsSlimPrefNameState := PROJECT(EcrashSearchRecsIn(fname <> ''), TRANSFORM(dx_Ecrash.Layouts.PREFNAME, SELF := LEFT));  
 dSlimPrefNameState := DISTRIBUTED(dsSlimPrefNameState, HASH32(accident_nbr)); 
 sSlimPrefNameState := SORT(dSlimPrefNameState, accident_nbr, fname, report_code, jurisdiction_state, jurisdiction,
                            accident_date, report_type_id, LOCAL);
 EXPORT uSlimPrefNameState := DEDUP(sSlimPrefNameState, accident_nbr, fname, report_code, jurisdiction_state, jurisdiction, 
                                    accident_date, report_type_id, LOCAL); 
 													 
-//***************************************************************
-//               Key_eCrashv2_ReportLinkId
-//***************************************************************
-dsSlimReportLinkId := PROJECT(EcrashSearchRecsIn(reportlinkid <> ''), TRANSFORM(Layouts.key_slim_layout, SELF := LEFT)); 
-dSlimReportLinkId := DISTRIBUTED(dsSlimReportLinkId, HASH32(accident_nbr)); 
-sSlimReportLinkId := SORT(dSlimReportLinkId, accident_nbr, reportlinkid, accident_date, report_type_id, 
-                          report_id, jurisdiction_state, jurisdiction_nbr, agency_ori, LOCAL);
-EXPORT uSlimReportLinkId := DEDUP(sSlimReportLinkId, accident_nbr, reportlinkid, accident_date, report_type_id, 
-                                  report_id, jurisdiction_state, jurisdiction_nbr, agency_ori, LOCAL);	
 //***************************************************************
 //              Key_eCrashv2_StAndLocation
 //***************************************************************
@@ -202,7 +194,7 @@ Layout_PrepEcrashSearchKeys.InterimAccidentLocLayout tParseAccidentLocation(dsSt
 END;  
 ParseAccidentLocation := PROJECT(dsStAndLocation, tParseAccidentLocation(LEFT));
 
-Layout_PrepEcrashSearchKeys.SlimAccidentLocLayout tSlimLocation(Layout_PrepEcrashSearchKeys.InterimAccidentLocLayout L, INTEGER Cnt) := TRANSFORM
+dx_Ecrash.Layouts.STANDLOCATION tSlimLocation(Layout_PrepEcrashSearchKeys.InterimAccidentLocLayout L, INTEGER Cnt) := TRANSFORM
 	SELF := L;
 	SELF.Partial_Accident_Location := CHOOSE(Cnt, L.Alocation1,
 																					 L.Alocation2,
@@ -305,7 +297,7 @@ END;
 normAccidentLocation := NORMALIZE(ParseAccidentLocation, 97, tSlimLocation(LEFT, COUNTER));
 
 pAccidentLocation	:= PROJECT(normAccidentLocation(partial_accident_location <> ''),
-                             TRANSFORM(Layout_PrepEcrashSearchKeys.SlimAccidentLocLayout, 
+                             TRANSFORM(dx_Ecrash.Layouts.STANDLOCATION, 
                                        SELF.Partial_Accident_Location := IF(TRIM(LEFT.Partial_Accident_Location, LEFT, RIGHT) = '', 
 																													                  '', 
 																																						TRIM(LEFT.Partial_Accident_Location, LEFT, RIGHT));
@@ -319,9 +311,10 @@ EXPORT uAccidentLocation	:= DEDUP(sAccidentLocation, accident_nbr, Partial_Accid
 //***************************************************************
 //              Key_eCrashv2_agencyId_sentdate
 //***************************************************************
-dsSlimAgencyIdSentdate := PROJECT(EcrashSearchRecsIn, TRANSFORM(Layouts.key_slim_layout, SELF := LEFT));
-EXPORT tbSlimAgencyIdSentdate := TABLE(dsSlimAgencyIdSentdate, 
-                                       {jurisdiction_nbr, contrib_source, STRING8 MaxSent_to_hpcc_date := MAX(GROUP, date_vendor_last_reported)},
-													             jurisdiction_nbr, contrib_source);
+dsSlimAgencyIdSentdate := PROJECT(EcrashSearchRecsIn, TRANSFORM(dx_Ecrash.Layouts.SEARCH_KEYS, SELF := LEFT));
+t_SlimAgencyIdSentdate := TABLE(dsSlimAgencyIdSentdate, 
+                                {jurisdiction_nbr, contrib_source, STRING8 MaxSent_to_hpcc_date := MAX(GROUP, date_vendor_last_reported)},
+													      jurisdiction_nbr, contrib_source);
+EXPORT tbSlimAgencyIdSentdate := PROJECT(t_SlimAgencyIdSentdate, TRANSFORM(dx_Ecrash.Layouts.AGENCYID_SENTDATE, SELF := LEFT; SELF := [];));
 
 END;

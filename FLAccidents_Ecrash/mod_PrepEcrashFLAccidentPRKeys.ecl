@@ -1,10 +1,11 @@
-﻿import FLAccidents, STD;
-export mod_PrepEcrashFLAccidentPRKeys := module
+﻿IMPORT FLAccidents, STD, dx_Ecrash;
 
-shared ReadNtlFile := FLAccidents.BaseFile_NtlAccidents_Alpharetta;
-shared ReadInqFile := FLAccidents.File_CRU_inquiries;
-shared ReadEcrashFile := eCrashBaseAgencyExclusion;
-shared ReadEcrashBaseFile := FLAccidents_Ecrash.BaseFile;
+EXPORT mod_PrepEcrashFLAccidentPRKeys := MODULE
+
+SHARED ReadNtlFile := FLAccidents.BaseFile_NtlAccidents_Alpharetta;
+SHARED ReadInqFile := FLAccidents.File_CRU_inquiries;
+SHARED ReadEcrashFile := eCrashBaseAgencyExclusion;
+SHARED ReadEcrashBaseFile := FLAccidents_Ecrash.BaseFile;
 
 //***************************************************************
 //Ecrash0
@@ -12,96 +13,96 @@ shared ReadEcrashBaseFile := FLAccidents_Ecrash.BaseFile;
 //Expand Florida file 
 flc0 	:= FLAccidents.basefile_flcrash0;
 
-Layout_PrepEcrashFLAccidentPRKeys.flc0_interim xpndrecs(flc0 L) := transform
-self.report_code					:= 'FA';
-self.report_category		  := 'Auto Report';
-self.report_code_desc		  := 'Auto Accident';
+dx_Ecrash.Layouts.ECRASH0 xpndrecs(flc0 L) := TRANSFORM
+SELF.report_code					:= 'FA';
+SELF.report_category		  := 'Auto Report';
+SELF.report_code_desc		  := 'Auto Accident';
 accidentNumber            := STD.Str.Filter(l.accident_nbr,'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789');
-self.accident_nbr         := accidentNumber;
-self.l_acc_nbr             := accidentNumber;
-self.orig_accnbr          := l.accident_nbr; 
-self 								      := L;
-end;
-pflc0 := project(flc0,xpndrecs(left));
+SELF.accident_nbr         := accidentNumber;
+SELF.l_acc_nbr             := accidentNumber;
+SELF.orig_accnbr          := l.accident_nbr; 
+SELF 								      := L;
+END;
+pflc0 := PROJECT(flc0,xpndrecs(LEFT));
   
 //Slim National file
 ntlFile := ReadntlFile;
 
-pflc0 slimrec(ntlFile L) := transform
+pflc0 slimrec(ntlFile L) := TRANSFORM
 
 string8     fSlashedMDYtoCYMD(string pDateIn) :=
-								intformat((integer2)regexreplace('.*/.*/([0-9]+)',pDateIn,'$1'),4,1) 
-					+     intformat((integer1)regexreplace('([0-9]+)/.*/.*',pDateIn,'$1'),2,1)
-					+     intformat((integer1)regexreplace('.*/([0-9]+)/.*',pDateIn,'$1'),2,1);
+								INTFORMAT((integer2)REGEXREPLACE('.*/.*/([0-9]+)',pDateIn,'$1'),4,1) 
+					+     INTFORMAT((integer1)REGEXREPLACE('([0-9]+)/.*/.*',pDateIn,'$1'),2,1)
+					+     INTFORMAT((integer1)REGEXREPLACE('.*/([0-9]+)/.*',pDateIn,'$1'),2,1);
 
-self.rec_type_o 			    := '0';
+SELF.rec_type_o 			    := '0';
 t_accident_nbr 			      := (string40)((unsigned6)L.vehicle_incident_id+10000000000);
 t_scrub                   := STD.Str.Filter(t_accident_nbr,'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789');
-accidentNumber            := if(t_scrub in ['UNK', 'UNKNOWN'], 'UNK'+l.vehicle_incident_id,t_scrub);  
-self.accident_nbr         := accidentNumber;
-self.l_acc_nbr             := accidentNumber;
-self.orig_accnbr          := t_accident_nbr; 
-self.accident_date				:= fSlashedMDYtoCYMD(L.loss_date[1..10]);
-self.city_town_name 		  := stringlib.stringtouppercase(L.inc_city);
+accidentNumber            := IF(t_scrub in ['UNK', 'UNKNOWN'], 'UNK'+l.vehicle_incident_id,t_scrub);  
+SELF.accident_nbr         := accidentNumber;
+SELF.l_acc_nbr             := accidentNumber;
+SELF.orig_accnbr          := t_accident_nbr; 
+SELF.accident_date				:= fSlashedMDYtoCYMD(L.loss_date[1..10]);
+SELF.city_town_name 		  := stringlib.stringtouppercase(L.inc_city);
      
-self						          := L;
-self						          := [];
-end;
-pntl := project(ntlFile,slimrec(left));
+SELF						          := L;
+SELF						          := [];
+END;
+pntl := PROJECT(ntlFile,slimrec(LEFT));
 
 // inquiry file 
 inqFile := ReadInqFile; 
 
-pflc0 slimrecinq(inqFile L) := transform
+pflc0 slimrecinq(inqFile L) := TRANSFORM
 
 string8     fSlashedMDYtoCYMD(string pDateIn) :=
-intformat((integer2)regexreplace('.*/.*/([0-9]+)',pDateIn,'$1'),4,1) 
-+     intformat((integer1)regexreplace('([0-9]+)/.*/.*',pDateIn,'$1'),2,1)
-+     intformat((integer1)regexreplace('.*/([0-9]+)/.*',pDateIn,'$1'),2,1);
+INTFORMAT((integer2)REGEXREPLACE('.*/.*/([0-9]+)',pDateIn,'$1'),4,1) 
++     INTFORMAT((integer1)REGEXREPLACE('([0-9]+)/.*/.*',pDateIn,'$1'),2,1)
++     INTFORMAT((integer1)REGEXREPLACE('.*/([0-9]+)/.*',pDateIn,'$1'),2,1);
 
-self.rec_type_o 			    := '0';
-t_accident_nbr            := if(L.vehicle_incident_id[1..3] = 'OID',
+SELF.rec_type_o 			    := '0';
+t_accident_nbr            := IF(L.vehicle_incident_id[1..3] = 'OID',
 													      (string40)((unsigned6)L.vehicle_incident_id[4..11]+100000000000),
 													      (string40)((unsigned6)L.vehicle_incident_id+10000000000));
 t_scrub                   := STD.Str.Filter(t_accident_nbr,'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789');
-accidentNumber            := if(t_scrub in ['UNK', 'UNKNOWN'], 'UNK'+l.vehicle_incident_id,t_scrub);  
-self.accident_nbr         := accidentNumber;
-self.l_acc_nbr             := accidentNumber;
-self.orig_accnbr          := t_accident_nbr; 
-self.accident_date			  := fSlashedMDYtoCYMD(L.loss_date[1..10]);
-self.city_town_name 		  := STD.Str.ToUpperCase(L.city);
-self.report_code					:= 'I'+ L.report_code;
-self						          := L;
-self						          := [];
-end;
-pInq := project(inqFile,slimrecinq(left));
+accidentNumber            := IF(t_scrub in ['UNK', 'UNKNOWN'], 'UNK'+l.vehicle_incident_id,t_scrub);  
+SELF.accident_nbr         := accidentNumber;
+SELF.l_acc_nbr             := accidentNumber;
+SELF.orig_accnbr          := t_accident_nbr; 
+SELF.accident_date			  := fSlashedMDYtoCYMD(L.loss_date[1..10]);
+SELF.city_town_name 		  := STD.Str.ToUpperCase(L.city);
+SELF.report_code					:= 'I'+ L.report_code;
+SELF						          := L;
+SELF						          := [];
+END;
+pInq := PROJECT(inqFile,slimrecinq(LEFT));
 
 // ecrash 
 ecrashFile := ReadEcrashFile;
 
-pflc0 slimrececrash(ecrashFile L) := transform
+pflc0 slimrececrash(ecrashFile L) := TRANSFORM
 
-self.rec_type_o 			    := '0';
-t_accident_nbr 			      := if(l.source_id in['TM','TF'],L.state_report_number, L.case_identifier);
+SELF.rec_type_o 			    := '0';
+t_accident_nbr 			      := IF(l.source_id in['TM','TF'],L.state_report_number, L.case_identifier);
 t_scrub                   := STD.Str.Filter(t_accident_nbr,'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789');
-accidentNumber            := if(t_scrub in ['UNK', 'UNKNOWN'], 'UNK'+l.incident_id,t_scrub);
-self.accident_nbr         := accidentNumber;
-self.l_acc_nbr             := accidentNumber;
-self.orig_accnbr          := t_accident_nbr;
-self.accident_date 			  := if(L.incident_id[1..9] ='188188188','20100901',L.crash_date);
-self.city_town_name 		  := STD.Str.ToUpperCase(L.crash_city);
-self.county_name          := l.crash_county; 
-self.ft_miles_node        := l.distance_from_node_miles;
-self.dot_milepost         := l.milepost1;
-self.at_intersect_of      := l.intersection_related ; 
-self.st_road_hhwy_name    :=l.state_highway_related; 
-self.city_nbr             := l.city_code; 
-self						          := L;
-self						          := [];
-end;
-pecrash := project(ecrashFile,slimrececrash(left));
+accidentNumber            := IF(t_scrub in ['UNK', 'UNKNOWN'], 'UNK'+l.incident_id,t_scrub);
+SELF.accident_nbr         := accidentNumber;
+SELF.l_acc_nbr             := accidentNumber;
+SELF.orig_accnbr          := t_accident_nbr;
+SELF.accident_date 			  := IF(L.incident_id[1..9] ='188188188','20100901',L.crash_date);
+SELF.city_town_name 		  := STD.Str.ToUpperCase(L.crash_city);
+SELF.county_name          := l.crash_county; 
+SELF.ft_miles_node        := l.distance_from_node_miles;
+SELF.dot_milepost         := l.milepost1;
+SELF.at_intersect_of      := l.intersection_related ; 
+SELF.st_road_hhwy_name    := l.state_highway_related; 
+SELF.city_nbr             := l.city_code; 
+SELF						          := L;
+SELF						          := [];
+END;
+pecrash := PROJECT(ecrashFile,slimrececrash(LEFT));
 
-export flc0_allrecs := dedup(pflc0+pntl+pInq+pecrash,record,all);
+export flc0_allrecs := DEDUP(pflc0+pntl+pInq+pecrash,record,all);
                  
 //***************************************************************
 //Ecrash1
@@ -109,82 +110,82 @@ export flc0_allrecs := dedup(pflc0+pntl+pInq+pecrash,record,all);
 //Expand Florida file 
 flc1	:= FLAccidents.basefile_flcrash1;
 
-Layout_PrepEcrashFLAccidentPRKeys.flc1_interim xpndrecs(flc1 L) := transform
-self.report_code					:= 'FA';
-self.report_category		  := 'Auto Report';
-self.report_code_desc			:= 'Auto Accident';
+dx_Ecrash.Layouts.ECRASH1 xpndrecs(flc1 L) := TRANSFORM
+SELF.report_code					:= 'FA';
+SELF.report_category		  := 'Auto Report';
+SELF.report_code_desc			:= 'Auto Accident';
 accidentNumber            := STD.Str.Filter(l.accident_nbr,'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789');
-self.accident_nbr         := accidentNumber;
-self.l_acc_nbr             := accidentNumber;
-self.orig_accnbr          := l.accident_nbr; 
-self.invest_agency_desc   := trim(l.dept_name,left,right); 
-self 								      := L;
-self                      := []; 
-end;
-pflc1:= project(flc1,xpndrecs(left));
+SELF.accident_nbr         := accidentNumber;
+SELF.l_acc_nbr             := accidentNumber;
+SELF.orig_accnbr          := l.accident_nbr; 
+SELF.invest_agency_desc   := TRIM(l.dept_name,LEFT,RIGHT); 
+SELF 								      := L;
+SELF                      := []; 
+END;
+pflc1:= PROJECT(flc1,xpndrecs(LEFT));
   
 //ntlFile := ReadntlFile;
 //National file does not have information pertinent to this layout.  Therefore only passing FL records.
 
 ecrashfile := ReadEcrashFile; 
 
-Layout_PrepEcrashFLAccidentPRKeys.flc1_interim xpndecrash(ecrashfile L) := transform
+dx_Ecrash.Layouts.ECRASH1 xpndecrash(ecrashfile L) := TRANSFORM
 
-	self.rec_type_1 := '1'; 
-	t_accident_nbr := if(l.source_id in ['TM','TF'],L.state_report_number, L.case_identifier);
+	SELF.rec_type_1 := '1'; 
+	t_accident_nbr := IF(l.source_id in ['TM','TF'],L.state_report_number, L.case_identifier);
 	t_scrub := STD.Str.Filter(t_accident_nbr,'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789');
-  accidentNumber := if(t_scrub in ['UNK', 'UNKNOWN'], 'UNK'+l.incident_id,t_scrub); 
-	self.accident_nbr := accidentNumber;
-  self.l_acc_nbr := accidentNumber;
-  self.orig_accnbr := t_accident_nbr;
-	self.hr_off_notified :=l.time_notified[1..2];
-  self.min_off_notified:=l.time_notified[4..5];
-  self.hr_off_arrived:=l.officer_arrival_time[1..2];
-  self.min_off_arrived:=l.officer_arrival_time[4..5];
-	self.city_nbr := l.city_code; 
-	self.site_loc := ''; 
-	self.trafficway_char := ''; 
-	self.nbr_lanes := l.number_of_lanes; 
-	self.divided_undivided := ''; 
-	self.total_vehicle_damage := l.vehicle_damage_amount; 
-	self.total_nbr_vehicles := l.number_of_vehicles; 
-	self.total_nbr_fatalities := l.total_fatal_injuries; 
-	self.total_nbr_non_traffic_fatal := l.total_nonfatal_injuries;
-	self.invest_name := l.investigating_officer_name; 
-	self.invest_rank := l.officer_rank; 
-	self.dept_name:=l.officer_department;
-	self.report_date:=l.officer_report_date;
-	self.first_aid_name :=l.person_first_aid_party_type_description;
-	self.first_aid_person_type_desc:=l.person_first_aid_party_type;          //string1   first_aid_person_type,
-  self.accident_fault_code_desc := l.primary_fault_indicator;          //string1   accident_fault_code,  
-  self.alcohol_drug_desc  := l.alcohol_drug_use;                //string1   alcohol_drug,
-  self.accident_damage_severity_desc := l.Damaged_Areas_Severity1;   // string1   accident_damage_severity
-  self.invest_agency_desc  := l.agency_name;           //,	string1   invest_agency,
-  self.first_harmful_event_desc  := l.first_harmful_event;      //string2   first_harmful_event
-  self.light_condition_desc := l.light_condition1;           //string2   light_condition
-  self.weather_desc  := l.weather_condition1;                //string2  weather
-  self.rd_surface_type_desc := l.road_surface;         //, string2   rd_surface_type, 
-  self.type_shoulder_desc := l.shoulder_type;          //, string2   type_shoulder, 
-  self.rd_surface_condition_desc := l.road_surface_condition;   //, string2   rd_surface_condition, 
-  self.first_contrib_cause_desc := l.contributing_factors1;   //, string2   first_contrib_cause, 
-  self.second_contrib_cause_desc := l.contributing_factors2; //, string2   second_contrib_cause, 
-  self.first_contrib_envir_desc:= l.contributing_circumstances_environmental1;  // , string2   first_contrib_envir, 
-  self.second_contrib_envir_desc:= l.contributing_circumstances_environmental2;  // , string2   second_contrib_envir, 
-  self.first_traffic_control_desc:= l.traffic_control_type_at_intersection1;// , string2   first_traffic_control, 
-  self.second_traffic_control_desc:= l.traffic_control_type_at_intersection2;//, string2   second_traffic_control 
-	self.hr_ems_notified :=l.EMS_Notified_Time[1..2]; //currently this is blank
-	self.min_ems_notified:=l.EMS_Notified_Time[4..5];
-	self.hr_ems_arrived :=l.EMS_Arrival_Time[1..2];//currently this is blank not sure about the format
-	self.min_ems_arrived:=l.EMS_Arrival_Time[4..5];
-	self.day_week_desc  := l.day_of_week;
-	self.location_type_desc := l.location_type; 
-	self.location_type :='';
-  self := l ; 
-  self:=[];
- end; 
- pecrash := project(ecrashfile, xpndecrash(left)); 
+  accidentNumber := IF(t_scrub in ['UNK', 'UNKNOWN'], 'UNK'+l.incident_id,t_scrub); 
+	SELF.accident_nbr := accidentNumber;
+  SELF.l_acc_nbr := accidentNumber;
+  SELF.orig_accnbr := t_accident_nbr;
+	SELF.hr_off_notified :=l.time_notified[1..2];
+  SELF.min_off_notified:=l.time_notified[4..5];
+  SELF.hr_off_arrived:=l.officer_arrival_time[1..2];
+  SELF.min_off_arrived:=l.officer_arrival_time[4..5];
+	SELF.city_nbr := l.city_code; 
+	SELF.site_loc := ''; 
+	SELF.trafficway_char := ''; 
+	SELF.nbr_lanes := l.number_of_lanes; 
+	SELF.divided_undivided := ''; 
+	SELF.total_vehicle_damage := l.vehicle_damage_amount; 
+	SELF.total_nbr_vehicles := l.number_of_vehicles; 
+	SELF.total_nbr_fatalities := l.total_fatal_injuries; 
+	SELF.total_nbr_non_traffic_fatal := l.total_nonfatal_injuries;
+	SELF.invest_name := l.investigating_officer_name; 
+	SELF.invest_rank := l.officer_rank; 
+	SELF.dept_name:=l.officer_department;
+	SELF.report_date:=l.officer_report_date;
+	SELF.first_aid_name :=l.person_first_aid_party_type_description;
+	SELF.first_aid_person_type_desc:=l.person_first_aid_party_type;          //string1   first_aid_person_type,
+  SELF.accident_fault_code_desc := l.primary_fault_indicator;          //string1   accident_fault_code,  
+  SELF.alcohol_drug_desc  := l.alcohol_drug_use;                //string1   alcohol_drug,
+  SELF.accident_damage_severity_desc := l.Damaged_Areas_Severity1;   // string1   accident_damage_severity
+  SELF.invest_agency_desc  := l.agency_name;           //,	string1   invest_agency,
+  SELF.first_harmful_event_desc  := l.first_harmful_event;      //string2   first_harmful_event
+  SELF.light_condition_desc := l.light_condition1;           //string2   light_condition
+  SELF.weather_desc  := l.weather_condition1;                //string2  weather
+  SELF.rd_surface_type_desc := l.road_surface;         //, string2   rd_surface_type, 
+  SELF.type_shoulder_desc := l.shoulder_type;          //, string2   type_shoulder, 
+  SELF.rd_surface_condition_desc := l.road_surface_condition;   //, string2   rd_surface_condition, 
+  SELF.first_contrib_cause_desc := l.contributing_factors1;   //, string2   first_contrib_cause, 
+  SELF.second_contrib_cause_desc := l.contributing_factors2; //, string2   second_contrib_cause, 
+  SELF.first_contrib_envir_desc:= l.contributing_circumstances_environmental1;  // , string2   first_contrib_envir, 
+  SELF.second_contrib_envir_desc:= l.contributing_circumstances_environmental2;  // , string2   second_contrib_envir, 
+  SELF.first_traffic_control_desc:= l.traffic_control_type_at_intersection1;// , string2   first_traffic_control, 
+  SELF.second_traffic_control_desc:= l.traffic_control_type_at_intersection2;//, string2   second_traffic_control 
+	SELF.hr_ems_notified :=l.EMS_Notified_Time[1..2]; //currently this is blank
+	SELF.min_ems_notified:=l.EMS_Notified_Time[4..5];
+	SELF.hr_ems_arrived :=l.EMS_Arrival_Time[1..2];//currently this is blank not sure about the format
+	SELF.min_ems_arrived:=l.EMS_Arrival_Time[4..5];
+	SELF.day_week_desc  := l.day_of_week;
+	SELF.location_type_desc := l.location_type; 
+	SELF.location_type :='';
+  SELF := l ; 
+  SELF:=[];
+ END; 
+ pecrash := PROJECT(ecrashfile, xpndecrash(LEFT)); 
  
-export flc1_ptotal := dedup(pflc1+pecrash,all); 
+export flc1_ptotal := DEDUP(pflc1+pecrash,ALL); 
 
 //***************************************************************
 //Ecrash2v
@@ -192,251 +193,251 @@ export flc1_ptotal := dedup(pflc1+pecrash,all);
 //Expand Florida file 
 flc2v 	:= FLAccidents.basefile_flcrash2v;
 
-Layout_PrepEcrashFLAccidentPRKeys.flc2v_interim xpndrecs(flc2v L,FLAccidents.BaseFile_FLCrash0 R) := transform
-self.report_code					:= 'FA';
-self.report_category		  := 'Auto Report';
-self.report_code_desc			:= 'Auto Accident';
-self.vehicle_incident_city:= STD.Str.ToUpperCase(if(L.accident_nbr= R.accident_nbr,R.city_town_name,''));
-self.vehicle_incident_st  := 'FL';
-self.carrier_name         := l.ins_company_name;
-self.client_type_id			  := '';
+dx_Ecrash.Layouts.ECRASH2V xpndrecs(flc2v L,FLAccidents.BaseFile_FLCrash0 R) := TRANSFORM
+SELF.report_code					:= 'FA';
+SELF.report_category		  := 'Auto Report';
+SELF.report_code_desc			:= 'Auto Accident';
+SELF.vehicle_incident_city:= STD.Str.ToUpperCase(IF(L.accident_nbr= R.accident_nbr,R.city_town_name,''));
+SELF.vehicle_incident_st  := 'FL';
+SELF.carrier_name         := l.ins_company_name;
+SELF.client_type_id			  := '';
 accidentNumber            := stringlib.StringFilter(l.accident_nbr,'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789');
-self.accident_nbr         := accidentNumber;
-self.l_acc_nbr             := accidentNumber;
-self.orig_accnbr          := l.accident_nbr; 
-self.vehicle_owner_dob		:=l.vehicle_owner_dob[5..8]+l.vehicle_owner_dob[1..4] ; 
-self.direction_travel_desc:= ''; 
-self.vehicle_type_desc    := ''; 
-self.point_of_impact_desc := ''; 
-self.vehicle_use_desc     := ''; 
-self 								      := L;
-end;
+SELF.accident_nbr         := accidentNumber;
+SELF.l_acc_nbr             := accidentNumber;
+SELF.orig_accnbr          := l.accident_nbr; 
+SELF.vehicle_owner_dob		:=l.vehicle_owner_dob[5..8]+l.vehicle_owner_dob[1..4] ; 
+SELF.direction_travel_desc:= ''; 
+SELF.vehicle_type_desc    := ''; 
+SELF.point_of_impact_desc := ''; 
+SELF.vehicle_use_desc     := ''; 
+SELF 								      := L;
+END;
 
-pflc2v := join(distribute(flc2v,hash32(accident_nbr))
-			         ,distribute(FLAccidents.BaseFile_FLCrash0,hash32(accident_nbr))
-			         ,left.accident_nbr = right.accident_nbr,
-			         xpndrecs(left,right),left outer,local);
+pflc2v := JOIN(DISTRIBUTE(flc2v,HASH32(accident_nbr))
+			         ,DISTRIBUTE(FLAccidents.BaseFile_FLCrash0,HASH32(accident_nbr))
+			         ,LEFT.accident_nbr = RIGHT.accident_nbr,
+			         xpndrecs(LEFT,RIGHT),LEFT outer,LOCAL);
   
 //Slim National file 
 ntlFile := ReadntlFile(STD.Str.ToUpperCase(party_type) != 'DRIVER');
 
-pflc2v slimrec1(ntlFile L) := transform
-self.did							    := if(L.did = 0,'000000000000',intformat(L.did,12,1));
-self.b_did							  := if(L.bdid = 0,'',intformat(L.bdid,12,1)); 
-self.b_did_score					:= L.bdid_score;
-self.rec_type_2						:= '2';
+pflc2v slimrec1(ntlFile L) := TRANSFORM
+SELF.did							    := IF(L.did = 0,'000000000000',INTFORMAT(L.did,12,1));
+SELF.b_did							  := IF(L.bdid = 0,'',INTFORMAT(L.bdid,12,1)); 
+SELF.b_did_score					:= L.bdid_score;
+SELF.rec_type_2						:= '2';
 t_accident_nbr 			      := (string40)((unsigned6)L.vehicle_incident_id+10000000000);
 t_scrub                   := STD.Str.Filter(t_accident_nbr,'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789');
-accidentNumber            := if(t_scrub in ['UNK', 'UNKNOWN'], 'UNK'+l.vehicle_incident_id,t_scrub); 
-self.accident_nbr         := accidentNumber;
-self.l_acc_nbr             := accidentNumber; 
-self.orig_accnbr          := t_accident_nbr; 
-self.section_nbr					:= if(L.LAST_NAME+L.FIRST_NAME = L.LAST_NAME_1+L.FIRST_NAME_1,L.vehicle_nbr,'');;
-self.vehicle_tag_nbr			:= L.TAG;
-self.vehicle_reg_state	  := L.TAG_STATE;
+accidentNumber            := IF(t_scrub in ['UNK', 'UNKNOWN'], 'UNK'+l.vehicle_incident_id,t_scrub); 
+SELF.accident_nbr         := accidentNumber;
+SELF.l_acc_nbr             := accidentNumber; 
+SELF.orig_accnbr          := t_accident_nbr; 
+SELF.section_nbr					:= IF(L.LAST_NAME+L.FIRST_NAME = L.LAST_NAME_1+L.FIRST_NAME_1,L.vehicle_nbr,'');;
+SELF.vehicle_tag_nbr			:= L.TAG;
+SELF.vehicle_reg_state	  := L.TAG_STATE;
 //------------------------------------
 //used for mobileTrac
-self.vehicle_id_nbr				:= if(L.vehVin !=''
+SELF.vehicle_id_nbr				:= IF(L.vehVin !=''
 										            ,L.vehVin
-										            ,if(L.LAST_NAME+L.FIRST_NAME = L.LAST_NAME_1+L.FIRST_NAME_1,L.vin,''));
-self.vehicle_year					:=if(L.vehYear !=''
+										            ,IF(L.LAST_NAME+L.FIRST_NAME = L.LAST_NAME_1+L.FIRST_NAME_1,L.vin,''));
+SELF.vehicle_year					:=IF(L.vehYear !=''
 										           ,L.vehYear
-										           ,if(L.LAST_NAME+L.FIRST_NAME = L.LAST_NAME_1+L.FIRST_NAME_1,L.year,''));	
-self.vehicle_make					:=if(L.vehmake !=''
+										           ,IF(L.LAST_NAME+L.FIRST_NAME = L.LAST_NAME_1+L.FIRST_NAME_1,L.year,''));	
+SELF.vehicle_make					:=IF(L.vehmake !=''
 										           ,L.vehMake
-										           ,if(L.LAST_NAME+L.FIRST_NAME = L.LAST_NAME_1+L.FIRST_NAME_1,L.make,''));
-self.make_description     := if(L.make_description != '',L.make_description,L.vehMake);
-self.model_description    := if(L.model_description != '',L.model_description,L.vehModel);
-self.vehicle_incident_city:= STD.Str.ToUpperCase(L.inc_city);
-self.vehicle_incident_st  := STD.Str.ToUpperCase(L.state_abbr);
-self.point_of_impact      := '';
-self.point_of_impact_desc :=L.impact_location;
+										           ,IF(L.LAST_NAME+L.FIRST_NAME = L.LAST_NAME_1+L.FIRST_NAME_1,L.make,''));
+SELF.make_description     := IF(L.make_description != '',L.make_description,L.vehMake);
+SELF.model_description    := IF(L.model_description != '',L.model_description,L.vehModel);
+SELF.vehicle_incident_city:= STD.Str.ToUpperCase(L.inc_city);
+SELF.vehicle_incident_st  := STD.Str.ToUpperCase(L.state_abbr);
+SELF.point_of_impact      := '';
+SELF.point_of_impact_desc :=L.impact_location;
 //------------------------------------
-self.ins_company_name		  := L.LEGAL_NAME;
-self.ins_policy_nbr		   	:= L.POLICY_NBR;
-self.carrier_name         := L.LEGAL_NAME;
-self.vehicle_owner_name	  := map(L.LAST_NAME+L.FIRST_NAME = L.LAST_NAME_1+L.FIRST_NAME_1 => L.LAST_NAME  +' '+L.FIRST_NAME+' '+L.MIDDLE_NAME_1
+SELF.ins_company_name		  := L.LEGAL_NAME;
+SELF.ins_policy_nbr		   	:= L.POLICY_NBR;
+SELF.carrier_name         := L.LEGAL_NAME;
+SELF.vehicle_owner_name	  := MAP(L.LAST_NAME+L.FIRST_NAME = L.LAST_NAME_1+L.FIRST_NAME_1 => L.LAST_NAME  +' '+L.FIRST_NAME+' '+L.MIDDLE_NAME_1
 										             ,'');
-self.vehicle_owner_st_city:= if(L.LAST_NAME+L.FIRST_NAME = L.LAST_NAME_1+L.FIRST_NAME_1,L.city,'');
-self.vehicle_owner_st     := if(L.LAST_NAME+L.FIRST_NAME = L.LAST_NAME_1+L.FIRST_NAME_1,L.state,'');
-self.vehicle_owner_zip	 	:= if(L.LAST_NAME+L.FIRST_NAME = L.LAST_NAME_1+L.FIRST_NAME_1,L.zip5,'');
-self.vehicle_owner_dl_nbr := if(L.pty_drivers_license !=''
+SELF.vehicle_owner_st_city:= IF(L.LAST_NAME+L.FIRST_NAME = L.LAST_NAME_1+L.FIRST_NAME_1,L.city,'');
+SELF.vehicle_owner_st     := IF(L.LAST_NAME+L.FIRST_NAME = L.LAST_NAME_1+L.FIRST_NAME_1,L.state,'');
+SELF.vehicle_owner_zip	 	:= IF(L.LAST_NAME+L.FIRST_NAME = L.LAST_NAME_1+L.FIRST_NAME_1,L.zip5,'');
+SELF.vehicle_owner_dl_nbr := IF(L.pty_drivers_license !=''
 										            ,L.pty_drivers_license
-										            ,if(L.LAST_NAME+L.FIRST_NAME = L.LAST_NAME_1+L.FIRST_NAME_1,L.drivers_license,''));
-self.vehicle_owner_dob    := L.dob;
-self.vehicle_owner_sex    := if(L.LAST_NAME+L.FIRST_NAME = L.LAST_NAME_1+L.FIRST_NAME_1,L.gender_1[1],'');
-self.vehicle_fault_code   := map(L.LAST_NAME+L.FIRST_NAME = L.LAST_NAME_1+L.FIRST_NAME_1 => '1'
+										            ,IF(L.LAST_NAME+L.FIRST_NAME = L.LAST_NAME_1+L.FIRST_NAME_1,L.drivers_license,''));
+SELF.vehicle_owner_dob    := L.dob;
+SELF.vehicle_owner_sex    := IF(L.LAST_NAME+L.FIRST_NAME = L.LAST_NAME_1+L.FIRST_NAME_1,L.gender_1[1],'');
+SELF.vehicle_fault_code   := MAP(L.LAST_NAME+L.FIRST_NAME = L.LAST_NAME_1+L.FIRST_NAME_1 => '1'
 										             ,L.LAST_NAME+L.FIRST_NAME = L.LAST_NAME_2+L.FIRST_NAME_2 => '2'
 										             ,L.LAST_NAME+L.FIRST_NAME = L.LAST_NAME_3+L.FIRST_NAME_3 => '3'
 										             ,'');
-self.addr_suffix 					:= L.suffix;
-self.ace_fips_st					:= L.county_code[1..2];
-self.county							  := L.county_code[3..5];
-self.zip							    := L.zip5;
-self.score 							  := L.name_score;
-self.suffix 						  := L.name_suffix;
-self.cname							  := STD.Str.ToUpperCase(L.business_name);
+SELF.addr_suffix 					:= L.suffix;
+SELF.ace_fips_st					:= L.county_code[1..2];
+SELF.county							  := L.county_code[3..5];
+SELF.zip							    := L.zip5;
+SELF.score 							  := L.name_score;
+SELF.suffix 						  := L.name_suffix;
+SELF.cname							  := STD.Str.ToUpperCase(L.business_name);
 
-self								      := L;
-self								      := [];
-end;
-pntl := project(ntlFile,slimrec1(left)); 
+SELF								      := L;
+SELF								      := [];
+END;
+pntl := PROJECT(ntlFile,slimrec1(LEFT)); 
 
 // ecrash 
 ecrashFile := ReadEcrashFile(STD.Str.ToUpperCase(person_type) in ['OWNER','VEHICLE OWNER']); 
 
-pflc2v slimrec3(ecrashFile L, unsigned1 cnt) := transform
+pflc2v slimrec3(ecrashFile L, unsigned1 cnt) := TRANSFORM
 
-self.vehicle_incident_city	:= STD.Str.ToUpperCase(L.Crash_City);
-self.vehicle_incident_st		:= STD.Str.ToUpperCase(L.Loss_State_Abbr);
-self.carrier_name     := L.Insurance_Company;
-self.client_type_id 	:= '';
-self.rec_type_2  := '2'; 
-t_accident_nbr 			:= if(l.source_id in ['TF','TM'],L.state_report_number, L.case_identifier);
+SELF.vehicle_incident_city	:= STD.Str.ToUpperCase(L.Crash_City);
+SELF.vehicle_incident_st		:= STD.Str.ToUpperCase(L.Loss_State_Abbr);
+SELF.carrier_name     := L.Insurance_Company;
+SELF.client_type_id 	:= '';
+SELF.rec_type_2  := '2'; 
+t_accident_nbr 			:= IF(l.source_id in ['TF','TM'],L.state_report_number, L.case_identifier);
 t_scrub := STD.Str.Filter(t_accident_nbr,'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789');
-accidentNumber := if(t_scrub in ['UNK', 'UNKNOWN'], 'UNK'+l.incident_id,t_scrub);
-self.accident_nbr         := accidentNumber;
-self.l_acc_nbr             := accidentNumber; 
-self.orig_accnbr := t_accident_nbr;
-self.section_nbr := l.vehicle_unit_number; 
-self.vehicle_owner_driver_code := ''; 
-self.vehicle_driver_action := l.driver_actions_at_time_of_crash1; 
-self.vehicle_type_desc := l.vehicle_type ; 
-self.vehicle_type := ''; 
+accidentNumber := IF(t_scrub IN ['UNK', 'UNKNOWN'], 'UNK'+l.incident_id,t_scrub);
+SELF.accident_nbr         := accidentNumber;
+SELF.l_acc_nbr             := accidentNumber; 
+SELF.orig_accnbr := t_accident_nbr;
+SELF.section_nbr := l.vehicle_unit_number; 
+SELF.vehicle_owner_driver_code := ''; 
+SELF.vehicle_driver_action := l.driver_actions_at_time_of_crash1; 
+SELF.vehicle_type_desc := l.vehicle_type ; 
+SELF.vehicle_type := ''; 
 
-year					              := trim(if(L.Other_Unit_VIN !='',choose(cnt,if(L.model_year != '',L.model_year,L.model_yr),
+year					              := TRIM(IF(L.Other_Unit_VIN !='',CHOOSE(cnt,IF(L.model_year != '',L.model_year,L.model_yr),
 																														L.other_model_year),
-																														if(L.model_year != '',L.model_year,L.model_yr)),left,right);																														
-self.vehicle_year						:= map(length(year) = 2 and year>'50' => '19'+ year,
-																	 length(year) = 2 and year<='50' => '20'+ year,year);
-self.model_year 						:= map(length(year) = 2 and year>'50' => '19'+ year,
-																	 length(year) = 2 and year<='50' => '20'+ year,year);
+																														IF(L.model_year != '',L.model_year,L.model_yr)),LEFT,RIGHT);																														
+SELF.vehicle_year						:= MAP(LENGTH(year) = 2 and year>'50' => '19'+ year,
+																	 LENGTH(year) = 2 and year<='50' => '20'+ year,year);
+SELF.model_year 						:= MAP(LENGTH(year) = 2 and year>'50' => '19'+ year,
+																	 LENGTH(year) = 2 and year<='50' => '20'+ year,year);
 //------------------------------------------------------------	
-self.vehicle_make					  := if(L.Other_Unit_VIN !='',choose(cnt,if(L.make_description != '',L.make_description,L.make),
-																														if(L.other_make_description != '',L.other_make_description,L.Other_Unit_Make)),
-																														if(L.make_description != '',L.make_description,L.make));
+SELF.vehicle_make					  := IF(L.Other_Unit_VIN !='',CHOOSE(cnt,IF(L.make_description != '',L.make_description,L.make),
+																														IF(L.other_make_description != '',L.other_make_description,L.Other_Unit_Make)),
+																														IF(L.make_description != '',L.make_description,L.make));
 
-self.vehicle_tag_nbr := if(L.Other_Unit_VIN !='',choose(cnt,L.License_Plate,L.Other_Unit_License_Plate),L.License_Plate);
-self.vehicle_reg_state := if(L.Other_Unit_VIN !='',choose(cnt,L.Registration_State,L.Other_Unit_Registration_State),L.Registration_State);
-self.vehicle_id_nbr  := if(L.Other_Unit_VIN !='',choose(cnt,L.vin,L.Other_Unit_VIN),L.vin);
-self.vehicle_travel_on := '';//l.direction_of_travel_before_crash; 
-self.direction_travel := '';//
-self.direction_travel_desc := l.direction_of_travel; 
-self.est_vehicle_speed := l.estimated_speed ; 
-self.posted_speed :=  l.speed_limit_posted; 
-self.est_vehicle_damage := l.vehicle_damage_amount ; 
-self.damage_type := ''; 
-self.ins_company_name :=  L.Insurance_Company;
-self.ins_policy_nbr := L.Insurance_Policy_Number;  ; 
-self.vehicle_removed_by:= ''; 
-self.how_removed_code := ''; 
-self.vehicle_owner_name := trim(l.first_name,left,right)+' '+trim(l.middle_name,left,right) +' '+trim(l.last_name ,left,right);
-self.vehicle_owner_suffix :=if(trim(l.name_suffx,left,right) ='N','',l.name_suffx);  
-self.vehicle_owner_st_city := trim(l.address,left,right)  +' '+ trim(l.city,left,right); 
-self.vehicle_owner_st := l.state ; 
-self.vehicle_owner_zip := l.zip_code; 
-self.vehicle_owner_forge_asterisk := ''; 
-self.vehicle_owner_dl_nbr := l.drivers_license_number;
-self.vehicle_owner_dob := l.date_of_birth;
-self.vehicle_owner_sex := l.sex ; 
-self.vehicle_owner_race := l.race; 
-self.point_of_impact := l.impact_area1 ; 
-self.point_of_impact_desc				:='';
+SELF.vehicle_tag_nbr := IF(L.Other_Unit_VIN !='',CHOOSE(cnt,L.License_Plate,L.Other_Unit_License_Plate),L.License_Plate);
+SELF.vehicle_reg_state := IF(L.Other_Unit_VIN !='',CHOOSE(cnt,L.Registration_State,L.Other_Unit_Registration_State),L.Registration_State);
+SELF.vehicle_id_nbr  := IF(L.Other_Unit_VIN !='',CHOOSE(cnt,L.vin,L.Other_Unit_VIN),L.vin);
+SELF.vehicle_travel_on := '';//l.direction_of_travel_before_crash; 
+SELF.direction_travel := '';//
+SELF.direction_travel_desc := l.direction_of_travel; 
+SELF.est_vehicle_speed := l.estimated_speed ; 
+SELF.posted_speed :=  l.speed_limit_posted; 
+SELF.est_vehicle_damage := l.vehicle_damage_amount ; 
+SELF.damage_type := ''; 
+SELF.ins_company_name :=  L.Insurance_Company;
+SELF.ins_policy_nbr := L.Insurance_Policy_Number;  ; 
+SELF.vehicle_removed_by:= ''; 
+SELF.how_removed_code := ''; 
+SELF.vehicle_owner_name := TRIM(l.first_name,LEFT,RIGHT)+' '+TRIM(l.middle_name,LEFT,RIGHT) +' '+TRIM(l.last_name ,LEFT,RIGHT);
+SELF.vehicle_owner_suffix :=IF(TRIM(l.name_suffx,LEFT,RIGHT) ='N','',l.name_suffx);  
+SELF.vehicle_owner_st_city := TRIM(l.address,LEFT,RIGHT)  +' '+ TRIM(l.city,LEFT,RIGHT); 
+SELF.vehicle_owner_st := l.state ; 
+SELF.vehicle_owner_zip := l.zip_code; 
+SELF.vehicle_owner_forge_asterisk := ''; 
+SELF.vehicle_owner_dl_nbr := l.drivers_license_number;
+SELF.vehicle_owner_dob := l.date_of_birth;
+SELF.vehicle_owner_sex := l.sex ; 
+SELF.vehicle_owner_race := l.race; 
+SELF.point_of_impact := l.impact_area1 ; 
+SELF.point_of_impact_desc				:='';
 
-self.vehicle_movement:= '';
-self.vehicle_function:= '';
-self.vehs_first_defect:= '';
-self.vehs_second_defect:= '';
-self.vehicle_modified:= '';
-self.vehicle_roadway_loc:= '';
-self.hazard_material_transport:= '';
-self.total_occu_vehicle:= ''; 
-self.total_occu_saf_equip:= ''; 
-self.moving_violation:= ''; 
-self.vehicle_insur_code:= ''; 
-self.vehicle_fault_code := ''; 
-self.vehicle_cap_code:= ''; 
-self.vehicle_fr_code := ''; 
-self.placarded := ''; 
-self.dhsmv_vehicle_ind := ''; 
-self.addr_suffix 					:= L.addr_suffix;
-self.ace_fips_st					:= L.county_code[1..2];
-self.county							:= L.county_code[3..5];
-self.zip							:= L.z5;
-self.zip4								:= L.z4;
-self.score 							:= L.name_score;
-self.suffix 						:= L.suffix;  
-self.cname              := l.cname; 
-self.match_code := ''; 
-self.manufacturer_corporation := ''; 
-self.division_code := '';
-self.vehicle_group_code := ''; 
-self.vehicle_subgroup_code := ''; 
-self.vehicle_series_code := ''; 
-self.vehicle_abbreviation := ''; 
-self.assembly_country := ''; 
-self.headquarter_country:= ''; 
-self.number_of_doors := ''; 
-self.seating_capacity := '';//l.seating_position_seat; add when silverlight is live 
-self.number_of_cylinders := ''; 
-self.carburetion_type := ''; 
-self.number_of_barrels:= ''; 
-self.price_class_code := ''; 
-self.body_size_code := ''; 
-self.number_of_wheels_on_road:= ''; 
-self.drive_type := ''; 
-self.gvw_code := ''; 
-self.load_capacity_code :=''; 
-self.cab_type_code := ''; 
-self.bed_length := ''; 
-self.rim_size := ''; 
-self.manufacture_body_style :=  l.body_style_code; 
-self.vehicle_type_code := ''; 
-self.car_line_code := ''; 
-self.car_series_code :=''; 
-self.car_body_style_code := ''; 
-self.engine_cylinder_code := ''; 
-self.truck_make_abbreviation  := '';
-self.truck_body_style_abbreviation := ''; 
-self.motorcycle_make_abbreviation := ''; 
-self.reference_number := l.vendor_reference_number; 
-self.make_description				:= if(L.Other_Unit_VIN !='',choose(cnt,if(L.make_description != '',L.make_description,L.make),
-																														if(L.other_make_description != '',L.other_make_description,L.Other_Unit_Make)),
-																														if(L.make_description != '',L.make_description,L.make));
-self.model_description			:= if(L.Other_Unit_VIN !='',choose(cnt,if(L.model_description != '',L.model_description,L.model),
-																														if(L.other_model_description != '',L.other_model_description,L.other_unit_model)),
-																														if(L.model_description != '',L.model_description,L.model));
+SELF.vehicle_movement:= '';
+SELF.vehicle_function:= '';
+SELF.vehs_first_defect:= '';
+SELF.vehs_second_defect:= '';
+SELF.vehicle_modified:= '';
+SELF.vehicle_roadway_loc:= '';
+SELF.hazard_material_transport:= '';
+SELF.total_occu_vehicle:= ''; 
+SELF.total_occu_saf_equip:= ''; 
+SELF.moving_violation:= ''; 
+SELF.vehicle_insur_code:= ''; 
+SELF.vehicle_fault_code := ''; 
+SELF.vehicle_cap_code:= ''; 
+SELF.vehicle_fr_code := ''; 
+SELF.placarded := ''; 
+SELF.dhsmv_vehicle_ind := ''; 
+SELF.addr_suffix 					:= L.addr_suffix;
+SELF.ace_fips_st					:= L.county_code[1..2];
+SELF.county							:= L.county_code[3..5];
+SELF.zip							:= L.z5;
+SELF.zip4								:= L.z4;
+SELF.score 							:= L.name_score;
+SELF.suffix 						:= L.suffix;  
+SELF.cname              := l.cname; 
+SELF.match_code := ''; 
+SELF.manufacturer_corporation := ''; 
+SELF.division_code := '';
+SELF.vehicle_group_code := ''; 
+SELF.vehicle_subgroup_code := ''; 
+SELF.vehicle_series_code := ''; 
+SELF.vehicle_abbreviation := ''; 
+SELF.assembly_country := ''; 
+SELF.headquarter_country:= ''; 
+SELF.number_of_doors := ''; 
+SELF.seating_capacity := '';//l.seating_position_seat; add when silverlight is live 
+SELF.number_of_cylinders := ''; 
+SELF.carburetion_type := ''; 
+SELF.number_of_barrels:= ''; 
+SELF.price_class_code := ''; 
+SELF.body_size_code := ''; 
+SELF.number_of_wheels_on_road:= ''; 
+SELF.drive_type := ''; 
+SELF.gvw_code := ''; 
+SELF.load_capacity_code :=''; 
+SELF.cab_type_code := ''; 
+SELF.bed_length := ''; 
+SELF.rim_size := ''; 
+SELF.manufacture_body_style :=  l.body_style_code; 
+SELF.vehicle_type_code := ''; 
+SELF.car_line_code := ''; 
+SELF.car_series_code :=''; 
+SELF.car_body_style_code := ''; 
+SELF.engine_cylinder_code := ''; 
+SELF.truck_make_abbreviation  := '';
+SELF.truck_body_style_abbreviation := ''; 
+SELF.motorcycle_make_abbreviation := ''; 
+SELF.reference_number := l.vendor_reference_number; 
+SELF.make_description				:= IF(L.Other_Unit_VIN !='',CHOOSE(cnt,IF(L.make_description != '',L.make_description,L.make),
+																														IF(L.other_make_description != '',L.other_make_description,L.Other_Unit_Make)),
+																														IF(L.make_description != '',L.make_description,L.make));
+SELF.model_description			:= IF(L.Other_Unit_VIN !='',CHOOSE(cnt,IF(L.model_description != '',L.model_description,L.model),
+																														IF(L.other_model_description != '',L.other_model_description,L.other_unit_model)),
+																														IF(L.model_description != '',L.model_description,L.model));
 
-self.car_series:= ''; 
-self.car_body_style:= ''; 
-self.car_cid:= ''; 
-self.car_carburetion:= ''; 
-self.car_fuel_code:= ''; 
-self.truck_chassis_body_style:= ''; 
-self.truck_wheels_driving_wheels:= ''; 
-self.truck_cid:= ''; 
-self.truck_cylinders:= ''; 
-self.truck_fuel_code:= ''; 
-self.truck_manufacturers_gvw_code:= ''; 
-self.truck_ton_rating_code:= ''; 
-self.truck_series:= ''; 
-self.truck_model := ''; 
-self.motorcycle_model := ''; 
-self.motorcycle_engine_displacement := ''; 
-self.motorcycle_type_of_bike := ''; 
-self.motorcycle_cylinder_coding := ''; 
-self.b_did							:= if(L.bdid = 0,'',intformat(L.bdid,12,1)); 
-self.did								:= if(L.did = 0,'000000000000',intformat(L.did,12,1));	
-self.b_did_score := l.bdid_score; 
-self.vehicle_use_desc := l.vehicle_use; 
-self.vehicle_use := ''; 
-self:= l ; 
-self := []; 
-end; 
+SELF.car_series:= ''; 
+SELF.car_body_style:= ''; 
+SELF.car_cid:= ''; 
+SELF.car_carburetion:= ''; 
+SELF.car_fuel_code:= ''; 
+SELF.truck_chassis_body_style:= ''; 
+SELF.truck_wheels_driving_wheels:= ''; 
+SELF.truck_cid:= ''; 
+SELF.truck_cylinders:= ''; 
+SELF.truck_fuel_code:= ''; 
+SELF.truck_manufacturers_gvw_code:= ''; 
+SELF.truck_ton_rating_code:= ''; 
+SELF.truck_series:= ''; 
+SELF.truck_model := ''; 
+SELF.motorcycle_model := ''; 
+SELF.motorcycle_engine_displacement := ''; 
+SELF.motorcycle_type_of_bike := ''; 
+SELF.motorcycle_cylinder_coding := ''; 
+SELF.b_did							:= IF(L.bdid = 0,'',INTFORMAT(L.bdid,12,1)); 
+SELF.did								:= IF(L.did = 0,'000000000000',INTFORMAT(L.did,12,1));	
+SELF.b_did_score := l.bdid_score; 
+SELF.vehicle_use_desc := l.vehicle_use; 
+SELF.vehicle_use := ''; 
+SELF:= l ; 
+SELF := []; 
+END; 
 
-pecrash := normalize(ecrashFile,2,slimrec3(left,counter));
+pecrash := NORMALIZE(ecrashFile,2,slimrec3(LEFT,COUNTER));
 
-export flc2v_allrecs :=dedup(pflc2v+pntl+pecrash,record,all): persist('~thor_data400::persist::ecrash2v');
+export flc2v_allrecs :=DEDUP(pflc2v+pntl+pecrash,RECORD,ALL): persist('~thor_data400::persist::ecrash2v');
 
 //***************************************************************
 //Ecrash3v
@@ -444,17 +445,17 @@ export flc2v_allrecs :=dedup(pflc2v+pntl+pecrash,record,all): persist('~thor_dat
 //Expand Florida file 
 flc3v	:= FLAccidents.basefile_flcrash3v;
 
-Layout_PrepEcrashFLAccidentPRKeys.flc3v_interim xpndrecs(flc3v L) := transform
-self.report_code					:= 'FA';
-self.report_category			:= 'Auto Report';
-self.report_code_desc		  := 'Auto Accident';
+dx_Ecrash.Layouts.ECRASH3V xpndrecs(flc3v L) := TRANSFORM
+SELF.report_code					:= 'FA';
+SELF.report_category			:= 'Auto Report';
+SELF.report_code_desc		  := 'Auto Accident';
 accidentNumber            := STD.Str.Filter(l.accident_nbr,'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789');
-self.accident_nbr         := accidentNumber;
-self.l_acc_nbr             := accidentNumber; 
-self.orig_accnbr          := l.accident_nbr; 
-self 								      := L;
-end;
-export pflc3v:= project(flc3v,xpndrecs(left));
+SELF.accident_nbr         := accidentNumber;
+SELF.l_acc_nbr             := accidentNumber; 
+SELF.orig_accnbr          := l.accident_nbr; 
+SELF 								      := L;
+END;
+export pflc3v:= PROJECT(flc3v,xpndrecs(LEFT));
 //ntlFile := ReadntlFile;
 //National file does not have information pertinent to this layout.  Therefore only passing FL records.
 
@@ -465,265 +466,265 @@ export pflc3v:= project(flc3v,xpndrecs(left));
 flc4 := FLAccidents.flc4_Keybuild;
 flc0 := FLAccidents.basefile_flcrash0;
 //using flcrash input file where washington suppression are being removed.  National input file does not have driver phones.
-Layout_PrepEcrashFLAccidentPRKeys.flc4_interim xpndrecs(flc4 L, flc0 R) := transform
-self.report_code					:= 'FA';
-self.report_category			:= 'Auto Report';
-self.report_code_desc			:= 'Auto Accident';
-self.vehicle_id_nbr			  := '';
-self.vehicle_year					:= '';
-self.vehicle_make					:= '';
-self.make_description			:= '';
-self.model_description	  := '';
-self.vehicle_incident_city:= STD.Str.ToUpperCase(if(L.accident_nbr= R.accident_nbr,R.city_town_name,''));
-self.vehicle_incident_st 	:= 'FL';
-self.point_of_impact		  := '';
-self.carrier_name					:= '';
-self.client_type_id				:= '';
+dx_Ecrash.Layouts.ECRASH4 xpndrecs(flc4 L, flc0 R) := TRANSFORM
+SELF.report_code					:= 'FA';
+SELF.report_category			:= 'Auto Report';
+SELF.report_code_desc			:= 'Auto Accident';
+SELF.vehicle_id_nbr			  := '';
+SELF.vehicle_year					:= '';
+SELF.vehicle_make					:= '';
+SELF.make_description			:= '';
+SELF.model_description	  := '';
+SELF.vehicle_incident_city:= STD.Str.ToUpperCase(IF(L.accident_nbr= R.accident_nbr,R.city_town_name,''));
+SELF.vehicle_incident_st 	:= 'FL';
+SELF.point_of_impact		  := '';
+SELF.carrier_name					:= '';
+SELF.client_type_id				:= '';
 accidentNumber            := STD.Str.Filter(l.accident_nbr,'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789');  
-self.accident_nbr         := accidentNumber;
-self.l_acc_nbr             := accidentNumber; 
-self.orig_accnbr          := l.accident_nbr; 
+SELF.accident_nbr         := accidentNumber;
+SELF.l_acc_nbr             := accidentNumber; 
+SELF.orig_accnbr          := l.accident_nbr; 
 tdriver_dob               := TRIM(l.driver_dob, LEFT, RIGHT);
-self.driver_dob           := TRIM(TRIM(tdriver_dob[1..4], LEFT, RIGHT) + TRIM(tdriver_dob[5..8], LEFT, RIGHT), LEFT, RIGHT);
-self.driver_race_desc     :='';
-self.driver_sex_desc      :='';
-self.driver_residence_desc:='';
-self 								      := L;
-end;
+SELF.driver_dob           := TRIM(TRIM(tdriver_dob[1..4], LEFT, RIGHT) + TRIM(tdriver_dob[5..8], LEFT, RIGHT), LEFT, RIGHT);
+SELF.driver_race_desc     :='';
+SELF.driver_sex_desc      :='';
+SELF.driver_residence_desc:='';
+SELF 								      := L;
+END;
 
-pflc4 := join(distribute(flc4,hash32(accident_nbr)), distribute(flc0,hash32(accident_nbr))
-			        ,left.accident_nbr = right.accident_nbr,
-			        xpndrecs(left,right),left outer,local);
+pflc4 := JOIN(DISTRIBUTE(flc4,HASH32(accident_nbr)), DISTRIBUTE(flc0,HASH32(accident_nbr))
+			        ,LEFT.accident_nbr = RIGHT.accident_nbr,
+			        xpndrecs(LEFT,RIGHT),LEFT OUTER,LOCAL);
 							
 //Slim National file  
 ntlFile := ReadNtlFile;
 
-pflc4 slimrec(ntlFile L) := transform
-self.did					:= if(L.did = 0,'000000000000',intformat(L.did,12,1));
-self.rec_type_4 	:= '4';
+pflc4 slimrec(ntlFile L) := TRANSFORM
+SELF.did					:= IF(L.did = 0,'000000000000',INTFORMAT(L.did,12,1));
+SELF.rec_type_4 	:= '4';
 t_accident_nbr 		:= (string40)((unsigned6)L.vehicle_incident_id+10000000000);
 t_scrub           := STD.Str.Filter(t_accident_nbr,'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789');
-accidentNumber    := if(t_scrub in ['UNK', 'UNKNOWN'], 'UNK'+l.vehicle_incident_id,t_scrub);  
-self.accident_nbr := accidentNumber;
-self.l_acc_nbr     := accidentNumber; 
-self.orig_accnbr  := t_accident_nbr; 
+accidentNumber    := IF(t_scrub IN ['UNK', 'UNKNOWN'], 'UNK'+l.vehicle_incident_id,t_scrub);  
+SELF.accident_nbr := accidentNumber;
+SELF.l_acc_nbr     := accidentNumber; 
+SELF.orig_accnbr  := t_accident_nbr; 
 //------------------------------------
 //used for mobileTrac
-self.vehicle_id_nbr := if(L.vehVin !=''
+SELF.vehicle_id_nbr := IF(L.vehVin !=''
 										      ,L.vehVin
-										      ,if(L.LAST_NAME+L.FIRST_NAME = L.LAST_NAME_1+L.FIRST_NAME_1,L.vin,''));
-self.vehicle_year :=if(L.vehYear !=''
+										      ,IF(L.LAST_NAME+L.FIRST_NAME = L.LAST_NAME_1+L.FIRST_NAME_1,L.vin,''));
+SELF.vehicle_year :=IF(L.vehYear !=''
 										   ,L.vehYear
-										   ,if(L.LAST_NAME+L.FIRST_NAME = L.LAST_NAME_1+L.FIRST_NAME_1,L.year,''));	
-self.vehicle_make :=if(L.vehmake !=''
+										   ,IF(L.LAST_NAME+L.FIRST_NAME = L.LAST_NAME_1+L.FIRST_NAME_1,L.year,''));	
+SELF.vehicle_make :=IF(L.vehmake !=''
 										   ,L.vehMake
-										   ,if(L.LAST_NAME+L.FIRST_NAME = L.LAST_NAME_1+L.FIRST_NAME_1,L.make,''));
-self.make_description := if(L.make_description != '',L.make_description,L.vehMake);
-self.model_description := if(L.model_description != '',L.model_description,L.vehModel);
-self.vehicle_incident_city := L.inc_city;
-self.vehicle_incident_st := L.state_abbr;
-self.point_of_impact := L.impact_location;
+										   ,IF(L.LAST_NAME+L.FIRST_NAME = L.LAST_NAME_1+L.FIRST_NAME_1,L.make,''));
+SELF.make_description := IF(L.make_description != '',L.make_description,L.vehMake);
+SELF.model_description := IF(L.model_description != '',L.model_description,L.vehModel);
+SELF.vehicle_incident_city := L.inc_city;
+SELF.vehicle_incident_st := L.state_abbr;
+SELF.point_of_impact := L.impact_location;
 //------------------------------------
-self.section_nbr :=  L.vehicle_nbr;
-self.driver_full_name := map(L.LAST_NAME+L.FIRST_NAME = L.LAST_NAME_1+L.FIRST_NAME_1 => L.LAST_NAME  +' '+L.FIRST_NAME+' '+L.MIDDLE_NAME_1
+SELF.section_nbr :=  L.vehicle_nbr;
+SELF.driver_full_name := MAP(L.LAST_NAME+L.FIRST_NAME = L.LAST_NAME_1+L.FIRST_NAME_1 => L.LAST_NAME  +' '+L.FIRST_NAME+' '+L.MIDDLE_NAME_1
 										        ,L.LAST_NAME+L.FIRST_NAME = L.LAST_NAME_2+L.FIRST_NAME_2 => L.LAST_NAME  +' '+L.FIRST_NAME+' '+L.MIDDLE_NAME_2
 										        ,L.LAST_NAME+L.FIRST_NAME = L.LAST_NAME_3+L.FIRST_NAME_3 => L.LAST_NAME  +' '+L.FIRST_NAME+' '+L.MIDDLE_NAME_3
 										        ,'');
-self.driver_st_city := if(L.LAST_NAME+L.FIRST_NAME = L.LAST_NAME_1+L.FIRST_NAME_1,L.city,'');
+SELF.driver_st_city := IF(L.LAST_NAME+L.FIRST_NAME = L.LAST_NAME_1+L.FIRST_NAME_1,L.city,'');
 									
-self.driver_resident_state 	:= if(L.LAST_NAME+L.FIRST_NAME = L.LAST_NAME_1+L.FIRST_NAME_1,L.state,'');
-self.driver_zip := if(L.LAST_NAME+L.FIRST_NAME = L.LAST_NAME_1+L.FIRST_NAME_1,L.zip5,'');
-self.driver_dob := TRIM(L.dob, LEFT, RIGHT);
-self.driver_dl_nbr := if(L.pty_drivers_license !=''
+SELF.driver_resident_state 	:= IF(L.LAST_NAME+L.FIRST_NAME = L.LAST_NAME_1+L.FIRST_NAME_1,L.state,'');
+SELF.driver_zip := IF(L.LAST_NAME+L.FIRST_NAME = L.LAST_NAME_1+L.FIRST_NAME_1,L.zip5,'');
+SELF.driver_dob := TRIM(L.dob, LEFT, RIGHT);
+SELF.driver_dl_nbr := IF(L.pty_drivers_license !=''
 										     ,L.pty_drivers_license
-										     ,if(L.LAST_NAME+L.FIRST_NAME = L.LAST_NAME_1+L.FIRST_NAME_1,L.drivers_license,''));
-self.driver_lic_st := if(L.pty_drivers_license_st !=''
+										     ,IF(L.LAST_NAME+L.FIRST_NAME = L.LAST_NAME_1+L.FIRST_NAME_1,L.drivers_license,''));
+SELF.driver_lic_st := IF(L.pty_drivers_license_st !=''
 										     ,L.pty_drivers_license_st
-										     ,if(L.LAST_NAME+L.FIRST_NAME = L.LAST_NAME_1+L.FIRST_NAME_1,L.drivers_license_st,''));
-self.driver_sex := if(L.LAST_NAME+L.FIRST_NAME = L.LAST_NAME_1+L.FIRST_NAME_1,L.gender_1[1],'');
-self.addr_suffix := L.suffix;
-self.ace_fips_st := L.county_code[1..2];
-self.county := L.county_code[3..5];
-self.zip := L.zip5;
-self.score := L.name_score;
-self.suffix := L.name_suffix;
-self.cname := STD.Str.ToUpperCase(L.business_name);
-self.carrier_name := L.LEGAL_NAME;
-self.ins_company_name := L.LEGAL_NAME;
-self.ins_policy_nbr := L.POLICY_NBR;
-self := L;
-self := [];
-end;
+										     ,IF(L.LAST_NAME+L.FIRST_NAME = L.LAST_NAME_1+L.FIRST_NAME_1,L.drivers_license_st,''));
+SELF.driver_sex := IF(L.LAST_NAME+L.FIRST_NAME = L.LAST_NAME_1+L.FIRST_NAME_1,L.gender_1[1],'');
+SELF.addr_suffix := L.suffix;
+SELF.ace_fips_st := L.county_code[1..2];
+SELF.county := L.county_code[3..5];
+SELF.zip := L.zip5;
+SELF.score := L.name_score;
+SELF.suffix := L.name_suffix;
+SELF.cname := STD.Str.ToUpperCase(L.business_name);
+SELF.carrier_name := L.LEGAL_NAME;
+SELF.ins_company_name := L.LEGAL_NAME;
+SELF.ins_policy_nbr := L.POLICY_NBR;
+SELF := L;
+SELF := [];
+END;
 
-pntl := project(ntlFile(STD.Str.ToUpperCase(party_type) in ['DRIVER', 'VEHICLE DRIVER']),slimrec(left));
+pntl := PROJECT(ntlFile(STD.Str.ToUpperCase(party_type) IN ['DRIVER', 'VEHICLE DRIVER']),slimrec(LEFT));
 
 //Slim National inquiry file  
 inqFile := ReadInqFile;
 
-pflc4 slimrec3(inqFile L) := transform
-self.report_code					:= 'I'+ L.report_code;
-self.report_category				:= L.report_category;
-self.report_code_desc				:= L.report_code_desc;
-self.did					    := if(L.did = 0,'000000000000',intformat(L.did,12,1));
-self.rec_type_4 			:= '4';
-t_accident_nbr := if(L.vehicle_incident_id[1..3] = 'OID',
+pflc4 slimrec3(inqFile L) := TRANSFORM
+SELF.report_code					:= 'I'+ L.report_code;
+SELF.report_category				:= L.report_category;
+SELF.report_code_desc				:= L.report_code_desc;
+SELF.did					    := IF(L.did = 0,'000000000000',INTFORMAT(L.did,12,1));
+SELF.rec_type_4 			:= '4';
+t_accident_nbr := IF(L.vehicle_incident_id[1..3] = 'OID',
 													(string40)((unsigned6)L.vehicle_incident_id[4..11]+100000000000),
 													(string40)((unsigned6)L.vehicle_incident_id+10000000000));
 
 t_scrub := STD.Str.Filter(t_accident_nbr,'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789');
-accidentNumber        := if(t_scrub in ['UNK', 'UNKNOWN'], 'UNK'+l.vehicle_incident_id,t_scrub); 
-self.accident_nbr     := accidentNumber;
-self.l_acc_nbr         := accidentNumber;  
-self.orig_accnbr      := t_accident_nbr; 
-self.vehicle_id_nbr		:= L.Vin;
-self.vehicle_year			:= L.Year;
-self.vehicle_make			:= L.make;
-self.make_description				:= if(L.make_description != '',L.make_description,L.Make);
-self.model_description			:= if(L.model_description != '',L.model_description,L.Model);
-self.vehicle_incident_city	:= '';
-self.vehicle_incident_st		:= '';
-self.point_of_impact				:= '';
+accidentNumber        := IF(t_scrub IN ['UNK', 'UNKNOWN'], 'UNK'+l.vehicle_incident_id,t_scrub); 
+SELF.accident_nbr     := accidentNumber;
+SELF.l_acc_nbr         := accidentNumber;  
+SELF.orig_accnbr      := t_accident_nbr; 
+SELF.vehicle_id_nbr		:= L.Vin;
+SELF.vehicle_year			:= L.Year;
+SELF.vehicle_make			:= L.make;
+SELF.make_description				:= IF(L.make_description != '',L.make_description,L.Make);
+SELF.model_description			:= IF(L.model_description != '',L.model_description,L.Model);
+SELF.vehicle_incident_city	:= '';
+SELF.vehicle_incident_st		:= '';
+SELF.point_of_impact				:= '';
 //------------------------------------
-self.section_nbr			      := L.vehicle_nbr;
-self.driver_full_name       := L.LAST_NAME_1  +' '+L.FIRST_NAME_1+' '+L.MIDDLE_NAME_1;
-self.driver_st_city			    := L.city;
+SELF.section_nbr			      := L.vehicle_nbr;
+SELF.driver_full_name       := L.LAST_NAME_1  +' '+L.FIRST_NAME_1+' '+L.MIDDLE_NAME_1;
+SELF.driver_st_city			    := L.city;
 									
-self.driver_resident_state 	:= L.state;
-self.driver_zip  			  := L.zip5;
-self.driver_dob    			:= TRIM(L.dob_1, LEFT, RIGHT);
-self.driver_dl_nbr			:= L.drivers_license;
-self.driver_lic_st			:= L.drivers_license_st;
-self.driver_sex				:= L.gender_1[1];
-self.addr_suffix 			:= L.suffix;
-self.ace_fips_st			:= L.county_code[1..2];
-self.county					  := L.county_code[3..5];
-self.zip					    := L.zip5;
-self.score 					  := L.name_score;
-self.suffix 				  := L.name_suffix;
-self.cname					  := '';
-self.filler5 					:= L.claim_nbr;
-self.carrier_name     := L.legal_name;
-self.ins_company_name := L.LEGAL_NAME;
-self.ins_policy_nbr := '';
-self						:= L;
-self 						:= [];
-end;
+SELF.driver_resident_state 	:= L.state;
+SELF.driver_zip  			  := L.zip5;
+SELF.driver_dob    			:= TRIM(L.dob_1, LEFT, RIGHT);
+SELF.driver_dl_nbr			:= L.drivers_license;
+SELF.driver_lic_st			:= L.drivers_license_st;
+SELF.driver_sex				:= L.gender_1[1];
+SELF.addr_suffix 			:= L.suffix;
+SELF.ace_fips_st			:= L.county_code[1..2];
+SELF.county					  := L.county_code[3..5];
+SELF.zip					    := L.zip5;
+SELF.score 					  := L.name_score;
+SELF.suffix 				  := L.name_suffix;
+SELF.cname					  := '';
+SELF.filler5 					:= L.claim_nbr;
+SELF.carrier_name     := L.legal_name;
+SELF.ins_company_name := L.LEGAL_NAME;
+SELF.ins_policy_nbr := '';
+SELF						:= L;
+SELF 						:= [];
+END;
 
-pinq := project(inqFile,slimrec3(left));
+pinq := PROJECT(inqFile,slimrec3(LEFT));
 
 // ecrash 
-ecrashFile := ReadEcrashFile(STD.Str.ToUpperCase(person_type) in ['VEHICLE DRIVER', 'DRIVER']); 
+ecrashFile := ReadEcrashFile(STD.Str.ToUpperCase(person_type) IN ['VEHICLE DRIVER', 'DRIVER']); 
 
-pflc4 slimecrash(ecrashFile L, unsigned1 cnt) := transform
+pflc4 slimecrash(ecrashFile L, unsigned1 cnt) := TRANSFORM
 
-self.vehicle_id_nbr  := if(L.Other_Unit_VIN !='',choose(cnt,L.vin,L.Other_Unit_VIN),L.vin);
-year					              := trim(if(L.Other_Unit_VIN !='',choose(cnt,if(L.model_year != '',L.model_year,L.model_yr),
+SELF.vehicle_id_nbr  := IF(L.Other_Unit_VIN !='',CHOOSE(cnt,L.vin,L.Other_Unit_VIN),L.vin);
+year					              := TRIM(IF(L.Other_Unit_VIN !='',CHOOSE(cnt,IF(L.model_year != '',L.model_year,L.model_yr),
 																														L.other_model_year),
-																														if(L.model_year != '',L.model_year,L.model_yr)),left,right);																														
-self.vehicle_year						:= map(length(year) = 2 and year>'50' => '19'+ year,
-																	 length(year) = 2 and year<='50' => '20'+ year,year);
+																														IF(L.model_year != '',L.model_year,L.model_yr)),LEFT,RIGHT);																														
+SELF.vehicle_year						:= MAP(LENGTH(year) = 2 and year>'50' => '19'+ year,
+																	 LENGTH(year) = 2 and year<='50' => '20'+ year,year);
 //------------------------------------------------------------	
-self.vehicle_make					  := if(L.Other_Unit_VIN !='',choose(cnt,if(L.make_description != '',L.make_description,L.make),
-																														if(L.other_make_description != '',L.other_make_description,L.Other_Unit_Make)),
-																														if(L.make_description != '',L.make_description,L.make));
-self.make_description				:= if(L.Other_Unit_VIN !='',choose(cnt,if(L.make_description != '',L.make_description,L.make),
-																														if(L.other_make_description != '',L.other_make_description,L.Other_Unit_Make)),
-																														if(L.make_description != '',L.make_description,L.make));
-self.model_description			:= if(L.Other_Unit_VIN !='',choose(cnt,if(L.model_description != '',L.model_description,L.model),
-																														if(L.other_model_description != '',L.other_model_description,L.other_unit_model)),
-																														if(L.model_description != '',L.model_description,L.model));
-self.vehicle_incident_city	:= STD.Str.ToUpperCase(L.Crash_City);
-self.vehicle_incident_st		:= STD.Str.ToUpperCase(L.Loss_State_Abbr);
+SELF.vehicle_make					  := IF(L.Other_Unit_VIN !='',CHOOSE(cnt,IF(L.make_description != '',L.make_description,L.make),
+																														IF(L.other_make_description != '',L.other_make_description,L.Other_Unit_Make)),
+																														IF(L.make_description != '',L.make_description,L.make));
+SELF.make_description				:= IF(L.Other_Unit_VIN !='',CHOOSE(cnt,IF(L.make_description != '',L.make_description,L.make),
+																														IF(L.other_make_description != '',L.other_make_description,L.Other_Unit_Make)),
+																														IF(L.make_description != '',L.make_description,L.make));
+SELF.model_description			:= IF(L.Other_Unit_VIN !='',CHOOSE(cnt,IF(L.model_description != '',L.model_description,L.model),
+																														IF(L.other_model_description != '',L.other_model_description,L.other_unit_model)),
+																														IF(L.model_description != '',L.model_description,L.model));
+SELF.vehicle_incident_city	:= STD.Str.ToUpperCase(L.Crash_City);
+SELF.vehicle_incident_st		:= STD.Str.ToUpperCase(L.Loss_State_Abbr);
 
-self.point_of_impact := l.impact_area1 ; 
-self.carrier_name     := L.Insurance_Company;
-self.ins_company_name				:= L.Insurance_Company;
-self.ins_policy_nbr := L.Insurance_Policy_Number;   
-self.client_type_id := ''; 
-self.rec_type_4 := '4'; 
-t_accident_nbr 			:= if(l.source_id in ['TM','TF'],L.state_report_number, L.case_identifier);
+SELF.point_of_impact := l.impact_area1 ; 
+SELF.carrier_name     := L.Insurance_Company;
+SELF.ins_company_name				:= L.Insurance_Company;
+SELF.ins_policy_nbr := L.Insurance_Policy_Number;   
+SELF.client_type_id := ''; 
+SELF.rec_type_4 := '4'; 
+t_accident_nbr 			:= IF(l.source_id IN ['TM','TF'],L.state_report_number, L.case_identifier);
 t_scrub := STD.Str.Filter(t_accident_nbr,'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789');
-accidentNumber := if(t_scrub in ['UNK', 'UNKNOWN'], 'UNK'+l.incident_id,t_scrub);
-self.accident_nbr := accidentNumber;
-self.l_acc_nbr := accidentNumber; 
-self.orig_accnbr := t_accident_nbr;
-self.section_nbr := l.vehicle_unit_number; 
-self.driver_full_name := trim(l.first_name,left,right)+' '+trim(l.middle_name,left,right) +' '+trim(l.last_name ,left,right); 
-self.driver_name_suffix := if(l.name_suffx ='N', '',l.name_suffx) ;  
-self.driver_st_city := trim(l.address,left,right) +' '+trim( l.city,left,right); 
-self.driver_resident_state := l.state ;
-self.driver_zip := l.zip_code; 
-self.driver_dob := TRIM(l.date_of_birth, LEFT, RIGHT);
-self.driver_dl_force_asterisk := ''; 
-self.driver_dl_nbr := l.drivers_license_number;
-self.driver_lic_st := L.drivers_license_jurisdiction; 
-self.driver_lic_type :=''; 
-self.driver_bac_test_type :=''; 
-self.driver_bac_force_code :=''; 
-self.driver_bac_test_results :=''; 
-self.driver_alco_drug_code :=''; 
-self.driver_physical_defects :=''; 
-self.driver_residence :='';
-self.driver_race :=''; 
-self.driver_sex := '';
-self.driver_race_desc := l.race; 
-self.driver_sex_desc  := l.sex;
-self.driver_residence_desc := l.driver_residence; 
+accidentNumber := IF(t_scrub IN ['UNK', 'UNKNOWN'], 'UNK'+l.incident_id,t_scrub);
+SELF.accident_nbr := accidentNumber;
+SELF.l_acc_nbr := accidentNumber; 
+SELF.orig_accnbr := t_accident_nbr;
+SELF.section_nbr := l.vehicle_unit_number; 
+SELF.driver_full_name := TRIM(l.first_name,LEFT,RIGHT)+' '+TRIM(l.middle_name,LEFT,RIGHT) +' '+TRIM(l.last_name ,LEFT,RIGHT); 
+SELF.driver_name_suffix := IF(l.name_suffx ='N', '',l.name_suffx) ;  
+SELF.driver_st_city := TRIM(l.address,LEFT,RIGHT) +' '+TRIM( l.city,LEFT,RIGHT); 
+SELF.driver_resident_state := l.state ;
+SELF.driver_zip := l.zip_code; 
+SELF.driver_dob := TRIM(l.date_of_birth, LEFT, RIGHT);
+SELF.driver_dl_force_asterisk := ''; 
+SELF.driver_dl_nbr := l.drivers_license_number;
+SELF.driver_lic_st := L.drivers_license_jurisdiction; 
+SELF.driver_lic_type :=''; 
+SELF.driver_bac_test_type :=''; 
+SELF.driver_bac_force_code :=''; 
+SELF.driver_bac_test_results :=''; 
+SELF.driver_alco_drug_code :=''; 
+SELF.driver_physical_defects :=''; 
+SELF.driver_residence :='';
+SELF.driver_race :=''; 
+SELF.driver_sex := '';
+SELF.driver_race_desc := l.race; 
+SELF.driver_sex_desc  := l.sex;
+SELF.driver_residence_desc := l.driver_residence; 
 
-self.driver_injury_severity :='';
-self.first_driver_safety :='';
-self.second_driver_safety:='';
-self.driver_eject_code:='';
-self.recommand_reexam:='';
-self.driver_phone_nbr:='';
-self.first_contrib_cause:='';
-self.second_contrib_cause:='';
-self.third_contrib_cause:='';
-self.first_offense_charged:='';
-self.first_frdl_sys_charge_code :='';
-self.second_offense_charged :=''; 
-self.second_frdl_sys_charge_code:=''; 
-self.third_offense_charged :='';
-self.third_frdl_sys_charge_code :='';
-self.first_citation_nbr := l.citation_number1;
-self.second_citation_nbr := l.citation_number2;
-self.third_citation_nbr := '';
-self.driver_fr_injury_cap_code :='';
-self.dl_nbr_good_bad :='';
-self.fourth_offense_charged :='';
-self.fourth_frdl_sys_charge_code :='';
-self.fifth_offense_charged :='';
-self.fifth_frdl_sys_charge_code :='';
-self.sixth_offense_charged :=''; 
-self.sixth_frdl_sys_charge_code:=''; 
-self.seveth_offense_charged:=''; 
-self.seveth_frdl_sys_charge_code:=''; 
-self.eighth_offense_charged:=''; 
-self.eighth_frdl_sys_charge_code:=''; 
-self.fourth_citation_nbr:=''; 
-self.fifth_citation_nbr:='';
-self.sixth_citation_nbr:='';
-self.seventh_citation_nbr:='';
-self.eighth_citation_nbr:='';
-self.req_endorsement :=''; 
-self.oos_dl_nbr:=''; 
-self.addr_suffix := L.addr_suffix;
-self.ace_fips_st := L.county_code[1..2];
-self.county := L.county_code[3..5];
-self.zip := L.z5;
-self.zip4 := L.z4;
-self.score := L.name_score;
-self.suffix := L.suffix;  
-self.did := if(L.did = 0,'000000000000',intformat(L.did,12,1));	
-self.cname := l.cname; 
+SELF.driver_injury_severity :='';
+SELF.first_driver_safety :='';
+SELF.second_driver_safety:='';
+SELF.driver_eject_code:='';
+SELF.recommand_reexam:='';
+SELF.driver_phone_nbr:='';
+SELF.first_contrib_cause:='';
+SELF.second_contrib_cause:='';
+SELF.third_contrib_cause:='';
+SELF.first_offense_charged:='';
+SELF.first_frdl_sys_charge_code :='';
+SELF.second_offense_charged :=''; 
+SELF.second_frdl_sys_charge_code:=''; 
+SELF.third_offense_charged :='';
+SELF.third_frdl_sys_charge_code :='';
+SELF.first_citation_nbr := l.citation_number1;
+SELF.second_citation_nbr := l.citation_number2;
+SELF.third_citation_nbr := '';
+SELF.driver_fr_injury_cap_code :='';
+SELF.dl_nbr_good_bad :='';
+SELF.fourth_offense_charged :='';
+SELF.fourth_frdl_sys_charge_code :='';
+SELF.fifth_offense_charged :='';
+SELF.fifth_frdl_sys_charge_code :='';
+SELF.sixth_offense_charged :=''; 
+SELF.sixth_frdl_sys_charge_code:=''; 
+SELF.seveth_offense_charged:=''; 
+SELF.seveth_frdl_sys_charge_code:=''; 
+SELF.eighth_offense_charged:=''; 
+SELF.eighth_frdl_sys_charge_code:=''; 
+SELF.fourth_citation_nbr:=''; 
+SELF.fifth_citation_nbr:='';
+SELF.sixth_citation_nbr:='';
+SELF.seventh_citation_nbr:='';
+SELF.eighth_citation_nbr:='';
+SELF.req_endorsement :=''; 
+SELF.oos_dl_nbr:=''; 
+SELF.addr_suffix := L.addr_suffix;
+SELF.ace_fips_st := L.county_code[1..2];
+SELF.county := L.county_code[3..5];
+SELF.zip := L.z5;
+SELF.zip4 := L.z4;
+SELF.score := L.name_score;
+SELF.suffix := L.suffix;  
+SELF.did := IF(L.did = 0,'000000000000',INTFORMAT(L.did,12,1));	
+SELF.cname := l.cname; 
 
-self := l; 
-self := [];
-end; 
+SELF := l; 
+SELF := [];
+END; 
 
-pecrash := normalize(ecrashFile,2,slimecrash(left,counter));
+pecrash := NORMALIZE(ecrashFile,2,slimecrash(LEFT,COUNTER));
 
-export flc4_allrecs := dedup(pflc4+pntl+pinq+pecrash,record,all): persist('~thor_data400::persist::ecrash4');
+export flc4_allrecs := DEDUP(pflc4+pntl+pinq+pecrash,RECORD,ALL): persist('~thor_data400::persist::ecrash4');
 //***************************************************************
 //Ecrash5
 //***************************************************************
@@ -732,22 +733,22 @@ export flc4_allrecs := dedup(pflc4+pntl+pinq+pecrash,record,all): persist('~thor
 flc5 := FLAccidents.basefile_flcrash5;
 //using flcrash input file where washington suppression are being removed.  National input file does not have driver phones.
 
-Layout_PrepEcrashFLAccidentPRKeys.flc5_interim xpndrecs(flc5 L) := transform
-self.report_code					:= 'FA';
-self.report_category		  := 'Auto Report';
-self.report_code_desc		  := 'Auto Accident';
+dx_Ecrash.Layouts.ECRASH5 xpndrecs(flc5 L) := TRANSFORM
+SELF.report_code					:= 'FA';
+SELF.report_category		  := 'Auto Report';
+SELF.report_code_desc		  := 'Auto Accident';
 accidentNumber            := STD.Str.Filter(l.accident_nbr,'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789');
-self.accident_nbr         := accidentNumber;
-self.l_acc_nbr             := accidentNumber; 
-self.orig_accnbr          := l.accident_nbr; 
-self 								      := L;
-end;
+SELF.accident_nbr         := accidentNumber;
+SELF.l_acc_nbr             := accidentNumber; 
+SELF.orig_accnbr          := l.accident_nbr; 
+SELF 								      := L;
+END;
 
-pflc5:= project(flc5,xpndrecs(left));
+pflc5:= PROJECT(flc5,xpndrecs(LEFT));
 
 //ntlFile := ReadntlFile;
 //National file does not have information pertinent to this layout.  Therefore only passing FL records.
-ecrashFile := ReadEcrashFile(STD.Str.ToUpperCase(trim(person_type)) in ['\\PASSENGER',
+ecrashFile := ReadEcrashFile(STD.Str.ToUpperCase(TRIM(person_type)) IN ['\\PASSENGER',
 																																													 '3PASSENGER',
 																																													 'ÃƒÂ¢?Ã‚Â¢THEY ENTERED: PASSENGER',
 																																													 'BICYCLE',
@@ -785,46 +786,46 @@ ecrashFile := ReadEcrashFile(STD.Str.ToUpperCase(trim(person_type)) in ['\\PASSE
 																																													 'PASSENNGER',
 																																													 'PASSSENGER']); 
 
-Layout_PrepEcrashFLAccidentPRKeys.flc5_interim xpndecrash(ecrashFile L) := transform
+dx_Ecrash.Layouts.ECRASH5 xpndecrash(ecrashFile L) := TRANSFORM
 
-self.rec_type_5 := '5';
-t_accident_nbr 			:= if(l.source_id in ['TM','TF'],L.state_report_number, L.case_identifier);
+SELF.rec_type_5 := '5';
+t_accident_nbr 			:= IF(l.source_id IN ['TM','TF'],L.state_report_number, L.case_identifier);
 t_scrub := STD.Str.Filter(t_accident_nbr,'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789');
-accidentNumber := if(t_scrub in ['UNK', 'UNKNOWN'], 'UNK'+l.incident_id,t_scrub);
-self.accident_nbr := accidentNumber;
-self.l_acc_nbr := accidentNumber; 
-self.orig_accnbr := t_accident_nbr;
-self.did := if(L.did = 0,'000000000000',intformat(L.did,12,1));	
-self.section_nbr := l.vehicle_unit_number; 
-self.passenger_nbr := trim(l.passenger_number,left,right); 
-self.passenger_full_name := trim(l.first_name,left,right)+' '+trim(l.middle_name,left,right) +' '+trim(l.last_name ,left,right);
-self.passenger_name_suffix := if(trim(l.name_suffx,left,right) ='N','',l.name_suffx);
-self.passenger_st_city := trim(l.address,left,right) +' '+ trim(l.city,left,right); 
-self.passenger_state := l.state ; 
-self.passenger_zip := l.zip_code; 
-self.passenger_age := ''; 
-self.passenger_location := ''; 
-self.passenger_injury_sev := ''; 
-self.first_passenger_safe := ''; 
-self.second_passenger_safe := ''; 
-self.passenger_eject_code := ''; 
-self.passenger_fr_cap_code := ''; 
-self.addr_suffix := L.addr_suffix ;
-self.ace_fips_st := L.county_code[1..2];
-self.county := L.county_code[3..5];
-self.zip := L.z5;
-self.zip4 := L.z4;
-self.score := L.name_score;
-self.suffix := L.suffix;  
-self.cname := l.cname; 
+accidentNumber := IF(t_scrub IN ['UNK', 'UNKNOWN'], 'UNK'+l.incident_id,t_scrub);
+SELF.accident_nbr := accidentNumber;
+SELF.l_acc_nbr := accidentNumber; 
+SELF.orig_accnbr := t_accident_nbr;
+SELF.did := IF(L.did = 0,'000000000000',INTFORMAT(L.did,12,1));	
+SELF.section_nbr := l.vehicle_unit_number; 
+SELF.passenger_nbr := TRIM(l.passenger_number,LEFT,RIGHT); 
+SELF.passenger_full_name := TRIM(l.first_name,LEFT,RIGHT)+' '+TRIM(l.middle_name,LEFT,RIGHT) +' '+TRIM(l.last_name ,LEFT,RIGHT);
+SELF.passenger_name_suffix := IF(TRIM(l.name_suffx,LEFT,RIGHT) ='N','',l.name_suffx);
+SELF.passenger_st_city := TRIM(l.address,LEFT,RIGHT) +' '+ TRIM(l.city,LEFT,RIGHT); 
+SELF.passenger_state := l.state ; 
+SELF.passenger_zip := l.zip_code; 
+SELF.passenger_age := ''; 
+SELF.passenger_location := ''; 
+SELF.passenger_injury_sev := ''; 
+SELF.first_passenger_safe := ''; 
+SELF.second_passenger_safe := ''; 
+SELF.passenger_eject_code := ''; 
+SELF.passenger_fr_cap_code := ''; 
+SELF.addr_suffix := L.addr_suffix ;
+SELF.ace_fips_st := L.county_code[1..2];
+SELF.county := L.county_code[3..5];
+SELF.zip := L.z5;
+SELF.zip4 := L.z4;
+SELF.score := L.name_score;
+SELF.suffix := L.suffix;  
+SELF.cname := l.cname; 
 
-self := L;
-self := []; 
-end;
+SELF := L;
+SELF := []; 
+END;
 
-pecrash :=project(ecrashFile, xpndecrash(left)); 
+pecrash :=PROJECT(ecrashFile, xpndecrash(LEFT)); 
 
-export flc5_ptotal := dedup(pflc5+pecrash,all); 
+export flc5_ptotal := DEDUP(pflc5+pecrash,ALL); 
 //***************************************************************
 //Ecrash6
 //***************************************************************
@@ -833,61 +834,61 @@ export flc5_ptotal := dedup(pflc5+pecrash,all);
 flc6 := FLAccidents.basefile_flcrash6;
 //using flcrash input file where washington suppression are being removed.  National input file does not have driver phones.
 
-Layout_PrepEcrashFLAccidentPRKeys.flc6_interim xpndrecs(flc6 L) := transform
-self.report_code					:= 'FA';
-self.report_category		  := 'Auto Report';
-self.report_code_desc		  := 'Auto Accident';
+dx_Ecrash.Layouts.ECRASH6 xpndrecs(flc6 L) := TRANSFORM
+SELF.report_code					:= 'FA';
+SELF.report_category		  := 'Auto Report';
+SELF.report_code_desc		  := 'Auto Accident';
 accidentNumber            := STD.Str.Filter(l.accident_nbr,'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789');
-self.accident_nbr         := accidentNumber;
-self.l_acc_nbr             := accidentNumber; 
-self.orig_accnbr          := l.accident_nbr;
-self.ded_dob              := l.ded_dob[5..8]+l.ded_dob[1..4] ;
-self.ped_race_desc        := '';
-self.ped_sex_desc         := '';
-self 								      := L;
-end;
+SELF.accident_nbr         := accidentNumber;
+SELF.l_acc_nbr             := accidentNumber; 
+SELF.orig_accnbr          := l.accident_nbr;
+SELF.ded_dob              := l.ded_dob[5..8]+l.ded_dob[1..4] ;
+SELF.ped_race_desc        := '';
+SELF.ped_sex_desc         := '';
+SELF 								      := L;
+END;
 
-pflc6:= project(flc6,xpndrecs(left));
+pflc6:= PROJECT(flc6,xpndrecs(LEFT));
 
 //ecrash 
-ecrashFile := ReadEcrashFile(STD.Str.ToUpperCase(trim(person_type)) in ['PEDALCYCLIST',
+ecrashFile := ReadEcrashFile(STD.Str.ToUpperCase(TRIM(person_type)) IN ['PEDALCYCLIST',
 																																													 'PEDESTRIAN',
 																																								 					 'PEDETRIAN',
 																																													 'PEDISTRIAN']); 
-Layout_PrepEcrashFLAccidentPRKeys.flc6_interim xpndecrash(ecrashFile L) := transform
+dx_Ecrash.Layouts.ECRASH6 xpndecrash(ecrashFile L) := TRANSFORM
 
-  self.did							    := if(L.did = 0,'000000000000',intformat(L.did,12,1));
-  self.rec_type_6						:= '6';
-  t_accident_nbr 			      := if(l.source_id in ['TM','TF'],L.state_report_number, L.case_identifier);
+  SELF.did							    := IF(L.did = 0,'000000000000',INTFORMAT(L.did,12,1));
+  SELF.rec_type_6						:= '6';
+  t_accident_nbr 			      := IF(l.source_id IN ['TM','TF'],L.state_report_number, L.case_identifier);
   t_scrub                   := STD.Str.Filter(t_accident_nbr,'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789');
-  accidentNumber            := if(t_scrub in ['UNK', 'UNKNOWN'], 'UNK'+l.incident_id,t_scrub);
-	self.accident_nbr         := accidentNumber;
-  self.l_acc_nbr             := accidentNumber; 
-  self.orig_accnbr          := t_accident_nbr;
-  self.addr_suffix 				  := L.addr_suffix;
-  self.ace_fips_st				  := L.county_code[1..2];
-  self.county							  := L.county_code[3..5];
-  self.zip							    := L.z5;
-  self.zip4								  := L.z4;
-  self.score 							  := L.name_score;
-  self.suffix 						  := L.suffix;  
-  self.cname                := l.cname; 
-	self.pedest_full_name     := trim(l.first_name,left,right)+' '+trim(l.middle_name,left,right) +' '+trim(l.last_name ,left,right);
-	self.ped_name_suffix      := if(trim(l.name_suffx,left,right) in ['N','NUL','NU'], '', l.name_suffx);
-	self.ped_st_city          := trim(l.address,left,right)+' '+ trim(l.city,left,right); 
-	self.ped_state            := l.state ; 
-	self.ped_zip              := l.zip_code; 
-	self.ded_dob              := l.date_of_birth; 
-  self.ped_race_desc        := l.race;;
-  self.ped_sex_desc         := l.sex;
-	self.section_nbr          := if(l.vehicle_unit_number='NU','',l.vehicle_unit_number); 
-  self                      := l; 
-  self                      := []; 
-end; 
+  accidentNumber            := IF(t_scrub IN ['UNK', 'UNKNOWN'], 'UNK'+l.incident_id,t_scrub);
+	SELF.accident_nbr         := accidentNumber;
+  SELF.l_acc_nbr             := accidentNumber; 
+  SELF.orig_accnbr          := t_accident_nbr;
+  SELF.addr_suffix 				  := L.addr_suffix;
+  SELF.ace_fips_st				  := L.county_code[1..2];
+  SELF.county							  := L.county_code[3..5];
+  SELF.zip							    := L.z5;
+  SELF.zip4								  := L.z4;
+  SELF.score 							  := L.name_score;
+  SELF.suffix 						  := L.suffix;  
+  SELF.cname                := l.cname; 
+	SELF.pedest_full_name     := TRIM(l.first_name,LEFT,RIGHT)+' '+TRIM(l.middle_name,LEFT,RIGHT) +' '+TRIM(l.last_name ,LEFT,RIGHT);
+	SELF.ped_name_suffix      := IF(TRIM(l.name_suffx,LEFT,RIGHT) IN ['N','NUL','NU'], '', l.name_suffx);
+	SELF.ped_st_city          := TRIM(l.address,LEFT,RIGHT)+' '+ TRIM(l.city,LEFT,RIGHT); 
+	SELF.ped_state            := l.state ; 
+	SELF.ped_zip              := l.zip_code; 
+	SELF.ded_dob              := l.date_of_birth; 
+  SELF.ped_race_desc        := l.race;;
+  SELF.ped_sex_desc         := l.sex;
+	SELF.section_nbr          := IF(l.vehicle_unit_number='NU','',l.vehicle_unit_number); 
+  SELF                      := l; 
+  SELF                      := []; 
+END; 
 
-pecrash := project(ecrashFile,xpndecrash(left));  
+pecrash := PROJECT(ecrashFile,xpndecrash(LEFT));  
 
-export flc6_ptotal := dedup(pflc6+pecrash,all); 
+export flc6_ptotal := DEDUP(pflc6+pecrash,ALL); 
 //***************************************************************
 //Ecrash7
 //***************************************************************
@@ -895,102 +896,59 @@ export flc6_ptotal := dedup(pflc6+pecrash,all);
 flc7 := FLAccidents.basefile_flcrash7;
 //using flcrash input file where washington suppression are being removed.  National input file does not have driver phones.
 
-Layout_PrepEcrashFLAccidentPRKeys.flc7_interim xpndrecs(flc7 L) := transform
-self.report_code					:= 'FA';
-self.report_category		  := 'Auto Report';
-self.report_code_desc		  := 'Auto Accident';
+dx_Ecrash.Layouts.ECRASH7 xpndrecs(flc7 L) := TRANSFORM
+SELF.report_code					:= 'FA';
+SELF.report_category		  := 'Auto Report';
+SELF.report_code_desc		  := 'Auto Accident';
 accidentNumber            := STD.Str.Filter(l.accident_nbr,'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789');
-self.accident_nbr         := accidentNumber;
-self.l_acc_nbr             := accidentNumber; 
-self.orig_accnbr          := l.accident_nbr; 
-self 								      := L;
-end;
+SELF.accident_nbr         := accidentNumber;
+SELF.l_acc_nbr             := accidentNumber; 
+SELF.orig_accnbr          := l.accident_nbr; 
+SELF 								      := L;
+END;
 
-pflc7:= project(flc7,xpndrecs(left));
+pflc7:= PROJECT(flc7,xpndrecs(LEFT));
 
 //ecrash 
-pecrshFile := ReadEcrashFile( STD.Str.ToUpperCase(trim(person_type)) in ['PROPERTY DAMAGE OWNER','PROPERTY OWNER']); 
+pecrshFile := ReadEcrashFile( STD.Str.ToUpperCase(TRIM(person_type)) IN ['PROPERTY DAMAGE OWNER','PROPERTY OWNER']); 
 
-Layout_PrepEcrashFLAccidentPRKeys.flc7_interim xpndecrash(pecrshFile L) := transform
+dx_Ecrash.Layouts.ECRASH7 xpndecrash(pecrshFile L) := TRANSFORM
 
-self.rec_type_7 := '7';
-self.did := if(L.did = 0,'000000000000',intformat(L.did,12,1));
-self.b_did := if(L.bdid = 0,'',intformat(L.bdid,12,1)); 
-self.b_did_score := l.bdid_score ; 
-t_accident_nbr := if(l.source_id in ['TM','TF'],L.state_report_number, L.case_identifier);
+SELF.rec_type_7 := '7';
+SELF.did := IF(L.did = 0,'000000000000',INTFORMAT(L.did,12,1));
+SELF.b_did := IF(L.bdid = 0,'',INTFORMAT(L.bdid,12,1)); 
+SELF.b_did_score := l.bdid_score ; 
+t_accident_nbr := IF(l.source_id IN ['TM','TF'],L.state_report_number, L.case_identifier);
 t_scrub := STD.Str.Filter(t_accident_nbr,'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789');
-accidentNumber := if(t_scrub in ['UNK', 'UNKNOWN'], 'UNK'+l.incident_id,t_scrub);
-self.accident_nbr := accidentNumber;
-self.l_acc_nbr := accidentNumber; 
-self.orig_accnbr := t_accident_nbr;
-self.prop_damage_nbr := ''; // need to be populated after property damage file added in prod 
-self.prop_damaged := l.property_damage_description1;
-self.prop_damage_code := ''; 
-self.prop_damage_amount := l.property_damage_estimate1;
-self.prop_owner_name := trim(l.first_name,left,right)+' '+trim(l.middle_name,left,right) +' '+trim(l.last_name ,left,right);
-self.prop_owner_suffix := if(trim(l.name_suffx,left,right) = 'N', '', l.name_suffx);
-self.prop_owner_st_city := trim(l.address,left,right) + trim(l.city,left,right);
-self.prop_owner_state := l.state ; 
-self.prop_owner_zip := l.zip_code; 
+accidentNumber := IF(t_scrub IN ['UNK', 'UNKNOWN'], 'UNK'+l.incident_id,t_scrub);
+SELF.accident_nbr := accidentNumber;
+SELF.l_acc_nbr := accidentNumber; 
+SELF.orig_accnbr := t_accident_nbr;
+SELF.prop_damage_nbr := ''; // need to be populated after property damage file added IN prod 
+SELF.prop_damaged := l.property_damage_description1;
+SELF.prop_damage_code := ''; 
+SELF.prop_damage_amount := l.property_damage_estimate1;
+SELF.prop_owner_name := TRIM(l.first_name,LEFT,RIGHT)+' '+TRIM(l.middle_name,LEFT,RIGHT) +' '+TRIM(l.last_name ,LEFT,RIGHT);
+SELF.prop_owner_suffix := IF(TRIM(l.name_suffx,LEFT,RIGHT) = 'N', '', l.name_suffx);
+SELF.prop_owner_st_city := TRIM(l.address,LEFT,RIGHT) + TRIM(l.city,LEFT,RIGHT);
+SELF.prop_owner_state := l.state ; 
+SELF.prop_owner_zip := l.zip_code; 
 
-self.addr_suffix := L.addr_suffix;
-self.ace_fips_st := L.county_code[1..2];
-self.county := L.county_code[3..5];
-self.zip := L.z5;
-self.zip4 := L.z4;
-self.score := L.name_score;
-self.suffix := L.suffix;  
-self.cname := l.cname; 
+SELF.addr_suffix := L.addr_suffix;
+SELF.ace_fips_st := L.county_code[1..2];
+SELF.county := L.county_code[3..5];
+SELF.zip := L.z5;
+SELF.zip4 := L.z4;
+SELF.score := L.name_score;
+SELF.suffix := L.suffix;  
+SELF.cname := l.cname; 
 
-self := l; 
-self := [];
-end; 
+SELF := l; 
+SELF := [];
+END; 
 
-pecrash := project(pecrshFile, xpndecrash(left)); 
+pecrash := PROJECT(pecrshFile, xpndecrash(LEFT)); 
 
-export flc7_ptotal := dedup(pflc7+pecrash,all); 
-//***************************************************************
-//Ecrash8
-//***************************************************************
+export flc7_ptotal := DEDUP(pflc7+pecrash,ALL); 
 
-//Expand Florida file 
-flc8 := FLAccidents.basefile_flcrash8;
-//using flcrash input file where washington suppression are being removed.  National input file does not have driver phones.
-
-Layout_PrepEcrashFLAccidentPRKeys.flc8_interim xpndrecs(flc8 L) := transform
-self.report_code := 'FA';
-self.report_category := 'Auto Report';
-self.report_code_desc := 'Auto Accident';
-accidentNumber := STD.Str.Filter(l.accident_nbr,'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789');
-self.accident_nbr := accidentNumber;
-self.l_acc_nbr := accidentNumber; 
-self.orig_accnbr := l.accident_nbr; 
-self := L;
-end;
-
-pflc8:= project(flc8,xpndrecs(left));
-//ntlFile := ReadntlFile;
-//National file does not have information pertinent to this layout.  Therefore only passing FL records.
-
-ecrashBaseFile  := ReadEcrashBaseFile;
-
-Layout_PrepEcrashFLAccidentPRKeys.flc8_interim xpndecrash(ecrashBaseFile L) := transform
-
-self.rec_type_8 := '8';
-t_accident_nbr := if(l.source_id in ['TF','TM'],L.state_report_number, L.case_identifier);
-t_scrub := STD.Str.Filter(t_accident_nbr,'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789');
-accidentNumber := if(t_scrub in ['UNK', 'UNKNOWN'], 'UNK'+l.incident_id,t_scrub);
-self.accident_nbr := accidentNumber;
-self.l_acc_nbr := accidentNumber; 
-self.orig_accnbr := t_accident_nbr;
-self.carrier_name := L.Insurance_Company;
-
-self := l; 
-self := [];
-end; 
-
-pecrash := project(ecrashBaseFile, xpndecrash(left)); 
-
-export flc8_ptotal :=dedup(pflc8+pecrash,all); 
-
-end;
+END;

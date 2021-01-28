@@ -1392,6 +1392,12 @@
 				trim(kword, left, right) = 'BXAMEU' =>SubGroup_Constants.numKeywordsID.KEYWORD_BXAMEU,
 				trim(kword, left, right) = 'PLKAS-UG' =>SubGroup_Constants.numKeywordsID.KEYWORD_PLKAS_UG,
 				trim(kword, left, right) = 'PHAMLC-TERR' =>SubGroup_Constants.numKeywordsID.KEYWORD_PHAMLC_TERR,
+				trim(kword, left, right) = 'IRAN-IEI-SEC' =>SubGroup_Constants.numKeywordsID.KEYWORD_IRAN_IEI_SEC,
+				trim(kword, left, right) = 'AFFINTRACA' =>SubGroup_Constants.numKeywordsID.KEYWORD_AFFINTRACA,
+				trim(kword, left, right) = 'PTERS' =>SubGroup_Constants.numKeywordsID.KEYWORD_PTERS,
+				trim(kword, left, right) = 'AMCBA-TERR' =>SubGroup_Constants.numKeywordsID.KEYWORD_AMCBA_TERR,
+				trim(kword, left, right) = 'UNSCPE-WC' =>SubGroup_Constants.numKeywordsID.KEYWORD_UNSCPE_WC,
+				trim(kword, left, right) = 'UKHMT-DU' =>SubGroup_Constants.numKeywordsID.KEYWORD_UKHMT_DU,
 								
 				//When setting the keyword export use underscores for dashes (ex: For RBI-SANC, use RBI_SANC)	
 				

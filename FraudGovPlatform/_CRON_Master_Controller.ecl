@@ -61,6 +61,14 @@ d:=count(WorkunitServices.WorkunitList('',jobname:=wuname)(state in valid_state)
 ECL:='FraudGovPlatform_Validation._CRON_NACInputPrepSchedule;';
 Go:=sequential(wk_ut.CreateWuid(ECL,THOR,ESP),email(wuname));
 EXPORT CRON_NACInputPrepSchedule:=if(d=0,Go,noGo);
+
+//10AM
+wuname:='FraudGov DEDI Input Prep Schedule';
+d:=count(WorkunitServices.WorkunitList('',jobname:=wuname)(state in valid_state));
+ECL:='FraudGovPlatform_Validation._CRON_DEDIInputPrepSchedule;';
+Go:=sequential(wk_ut.CreateWuid(ECL,THOR,ESP),email(wuname));
+EXPORT CRON_DEDIInputPrepSchedule:=if(d=0,Go,noGo);
+
 //1AM
 wuname:='FraudGov Build Base Schedule';
 d:=count(WorkunitServices.WorkunitList('',jobname:=wuname)(state in valid_state));
@@ -82,6 +90,7 @@ ECL:='FraudGovPlatform._CRON_Refresh_ProdDashVersion';
 Go:=sequential(wk_ut.CreateWuid(ECL,THOR,ESP),email(wuname));
 EXPORT CRON_ProdDashboardVersion_Schedule:=if(d=0,Go,noGo);
 
+
 Go:=sequential(
 						 CRON_DeltabaseInputPrepSchedule
 						,CRON_InputPrepSchedule
@@ -89,6 +98,7 @@ Go:=sequential(
 						,CRON_RDPInputPrepSchedule
 						,CRON_MBSInputPrepSchedule
 						,CRON_NACInputPrepSchedule
+						,CRON_DEDIInputPrepSchedule
 						,CRON_Base_Schedule
 						,CRON_ProdDashboards_Schedule
 						,CRON_ProdDashboardVersion_Schedule

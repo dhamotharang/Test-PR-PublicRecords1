@@ -86,7 +86,7 @@ PhonesInfo.Out_STRATA_Population_Stats(PhonesInfo.File_iConectiv.Main_Current,
 																										BuildLogger.PostStart(False),
 																											//dopsUpdate, 
 																											buildStrata, 
-																											Sample_PhonesMetadata, 
+																											PhonesInfo.Sample_PhonesMetadata, 
 																											ScrubsRuns,
 																										BuildLogger.PostEnd(False),
 																										BuildLogger.BuildEnd(false)):

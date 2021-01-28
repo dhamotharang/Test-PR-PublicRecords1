@@ -1984,7 +1984,10 @@ EXPORT dsSourceCriteria := DATASET([
 {'OFAC - Non-SDN Communist Chinese Military Companies List','1971'},
 {'FCDO (UK) Sanctions List - Asset Freeze','1972'},
 {'FCDO (UK) Sanctions List - Non Asset Freeze','1973'},
-{'South Korea Financial Supervisory Service (FSS) Accounting Supervision Enforcement Actions','1974'}
-
+{'South Korea Financial Supervisory Service (FSS) Accounting Supervision Enforcement Actions','1974'},
+{'EC 2021/29 Syria List','1975'},
+{'EC 2021/30 CFSP Syria List','1976'},
+{'EC (CFSP) 2021/55 Tunisia List','1977'},
+{'EC 2021/30 CFSP Syria List','1978'}
 ],r);
 

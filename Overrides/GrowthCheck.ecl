@@ -24,12 +24,15 @@
 	orphans_ds_new_test := IF(COUNT(orphans_ds_new) < 1,  test_ds, orphans_ds_new); 
 	*/
 	
-	statsout_new := PROJECT(orphans_ds_new, TRANSFORM(Stats_Layout, 
+	statsout_raw := PROJECT(orphans_ds_new, TRANSFORM(Stats_Layout, 
 																						SELF.datagroup := in_datagroup,		
 																						SELF.CurrVersion := filedate, 
 																						SELF.CurrCount := (STRING) COUNT(orphans_ds_new),
 																						SELF := []));
 																						
+  statsout_new:= DEDUP(SORT(statsout_raw,currversion));																						
+	
+	
 	sc := NOTHOR(fileservices.superfilecontents(data_services.foreign_prod + 'thor_data400::lookup::override::orphans'))[1].name;
 								findex 	:= stringlib.stringfind(sc, '::', 3)+2;
 								lindex 	:= stringlib.stringfind(sc, '::', 4)-1;
@@ -37,12 +40,12 @@
 	father_filedate := sc[findex..lindex];
 	
 	stats_old_ds := orphans_ds_old(datagroup = in_datagroup);
-	statsout_old := PROJECT(stats_old_ds, TRANSFORM(Stats_Layout, 
-																						SELF.datagroup := in_datagroup,		
-																						SELF.CurrVersion := father_filedate, 
-																						SELF.PrevCount := (STRING) COUNT(stats_old_ds),
-																						SELF := []));										 
-
+  statsout_old := IF ( COUNT(stats_old_ds) > 0, PROJECT(stats_old_ds, TRANSFORM(Stats_Layout,
+																																										SELF.datagroup := in_datagroup,SELF.CurrVersion := father_filedate, 
+                                                                                    SELF.PrevCount := (STRING) COUNT(stats_old_ds),
+                                                                                    SELF := []))
+                                                                                    , DATASET([{in_datagroup, father_filedate, '', '0', '0', '', ''}], Stats_Layout));
+								 
 	// get threshold for datagroup
 	threshold_count := overrides.Constants.GetStatsThreshold(in_datagroup);
 

@@ -19,10 +19,13 @@ export Keys(
 																								,self.industrytype	:=(unsigned)left.industrytype
 																								,Self:=left));
 	shared Base_ConfigRules								:= PROJECT(Files().Input.ConfigRules.Sprayed,Transform(Layouts_Key.ConfigRules,Self:=left));
-																																																		
+	shared Base_DisposableEmailDomains 					:= PROJECT(Files().Base.DisposableEmailDomains.Built,
+	Transform(FraudGovPlatform.Layouts_Key.DisposableEmailDomains,	Self:=left	));
+
  export Main := module
 	tools.mac_FilesIndex('Base_EntityProfile,{customerid,industrytype,entitycontextuid},{Base_EntityProfile}',KeyNames(pversion).Main.EntityProfile,EntityProfile);
 	tools.mac_FilesIndex('Base_ConfigAttributes,{Field, EntityType, CustomerId, IndustryType,value},{Base_ConfigAttributes}',KeyNames(pversion).Main.ConfigAttributes,ConfigAttributes);
 	tools.mac_FilesIndex('Base_ConfigRules,{CustomerId, IndustryType, Field, EntityType,rulename},{Base_ConfigRules}',KeyNames(pversion).Main.ConfigRules,ConfigRules);
+	tools.mac_FilesIndex('Base_DisposableEmailDomains,{domain},{dispsblemail}',KeyNames(pversion).Main.DisposableEmailDomains,DisposableEmailDomains);
 	end; 	
 end;
