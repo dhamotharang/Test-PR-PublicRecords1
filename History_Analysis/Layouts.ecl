@@ -10,30 +10,33 @@ Export Layouts := Module
         String8  Scorecard;
     End;
 
+//datasetname,buildversion,whenqalive,whenprodlive,clusterflag,updateflag,superkey,templatelogicalkey,size,recordcoun
     Export layout_keysizedhistory := Record 
-        String25 datasetname;
-        String10 buildversion;
-        String25 whenlive;
-        String1  clusterflag;
-        String1  updateflag;
-        String60 superkey;
-        String60 templatelogicalkey;
-        String   size;
-        String   recordcount;
+        String    datasetname;
+        String10  buildversion;
+        String25  whenQAlive;
+        String25  whenProdLive;
+        String1   clusterflag;
+        String1   updateflag;
+        String    superkey;
+        String    templatelogicalkey;
+        String    size;
+        String    recordcount;
     End;
 
     Export layout_dopsservice := Record
-        String25 datasetname;
-        String1  clusterflag;
-        String25 whenlive;
-        String10 buildversion;
-        String60 superkey;
-        String60 logicalkey;
-        Integer8 size;
-        Integer8 recordcount;
-        String1  updateflag;
-        String   statuscode;
-        String   statusdescription;
+        String    datasetname;
+        String1   clusterflag;
+        String25  whenqalive;
+        string25  whenprodlive;
+        String10  buildversion;
+        String    superkey;
+        String    logicalkey;
+        Integer8  size;
+        Integer8  recordcount;
+        String1   updateflag;
+        String    statuscode;
+        String    statusdescription;
     END;
 
     Export layout_orbit_buildinstance := Record
@@ -51,14 +54,30 @@ Export Layouts := Module
         String20  date_updated;
         String15  master_build;
     End;
-
-    Export baseRec:= Record
-        String25   datasetname;
+    Export baseRecQA:= Record
+        String     datasetname;
         String10   prevbuild_version:= '';
         String10   buildversion;
-        String25   whenlive;
+        String25   whenqalive;
         String1    updateflag;
-        String60   superkey;
+        String     superkey;
+        Integer8   previous_size:=0;
+        Integer8   size;    
+        Integer8   delta_size:=0;
+        decimal5_2 delta_size_perc:=0;
+        Integer8   prevrecord_count:=0;
+        Integer8   recordcount;
+        Integer8   delta_count:=0;
+        Decimal5_2 delta_count_perc:=0;
+    End;
+
+    Export baseRecProd:= Record
+        String     datasetname;
+        String10   prevbuild_version:= '';
+        String10   buildversion;
+        String25   whenprodlive;
+        String1    updateflag;
+        String     superkey;
         Integer8   previous_size:=0;
         Integer8   size;    
         Integer8   delta_size:=0;
@@ -70,8 +89,8 @@ Export Layouts := Module
     End;
 
     Export statisticsRec := Record  
-        String25   datasetname;
-        String60   superkey;
+        String     datasetname;
+        String     superkey;
         String1    updateflag;
         Unsigned   numberofdeltas;
         Real       Min;

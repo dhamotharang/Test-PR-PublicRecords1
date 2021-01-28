@@ -13,11 +13,12 @@ Export Files(string pVersion, boolean pUseProd = False ) := Module
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     
     ////////////////////////////////////////////////// processed inputs including statistics////////////////////////////
-    Export counted_deltas := dataset(History_Analysis.Filenames(pVersion, pUseProd).BaseDeltas, History_Analysis.Layouts.BaseRec, csv(heading(single),separator(','),quote('"')), __compressed__ );
+    Export counted_deltasQA := dataset(History_Analysis.Filenames(pVersion, pUseProd).baseDeltasQA, History_Analysis.Layouts.BaseRecQA, csv(heading(single),separator(','),quote('"')), __compressed__ );
+    Export counted_deltasProd := dataset(History_Analysis.Filenames(pVersion, pUseProd).baseDeltasProd, History_Analysis.Layouts.BaseRecprod, csv(heading(single),separator(','),quote('"')), __compressed__ );
     Export delta_statistics := dataset(History_Analysis.Filenames(pVersion, pUseProd).BaseStatistics, History_Analysis.Layouts.StatisticsRec, csv(heading(single),separator(','),quote('"')), __compressed__ );
 
     ///////////////////////////////////////////////////// for standalone reports ///////////////////////////////////////
-    Export standaloneDeltas := dataset(History_Analysis.Filenames(pVersion, pUseProd).standaloneDeltas, History_Analysis.Layouts.BaseRec, csv(heading(single),separator(','),quote('"')), __compressed__ );
+    Export standaloneDeltas := dataset(History_Analysis.Filenames(pVersion, pUseProd).standaloneDeltas, History_Analysis.Layouts.BaseRecprod, csv(heading(single),separator(','),quote('"')), __compressed__ );
     Export standaloneStats := dataset(History_Analysis.Filenames(pVersion, pUseProd).standaloneStats, History_Analysis.Layouts.StatisticsRec, csv(heading(single),separator(','),quote('"')), __compressed__ );
 
     
