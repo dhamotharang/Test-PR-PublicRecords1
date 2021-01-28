@@ -1,6 +1,6 @@
 import History_Analysis,ML_Core, PromoteSupers, ut;
 
-export MLCoreCalculateStatistics(dataset(History_Analysis.Layouts.BaseRec) loadDeltas ):=function
+export MLCoreCalculateStatistics(dataset(History_Analysis.Layouts.BaseRecprod) loadDeltas ):=function
 
 WithRecID:=RECORD
     unsigned recid:=0;

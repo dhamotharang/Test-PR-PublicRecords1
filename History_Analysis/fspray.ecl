@@ -1,10 +1,10 @@
 Import STD, _control, dops, History_Analysis;
 
-Export fspray( string pVersion, string datasetname, string location, string cluster, string enviroment, string start_date, string end_date, string dopsenv ) :=  Module
+Export fspray( string pVersion, string datasetname, string location, string cluster, string fromdate, string todate, string dopsenv ) :=  Module
 
 // processed datatset in processed_dops file
-Shared standalonedops := History_Analysis.Process_Dops(pVersion, datasetname, location, cluster, enviroment, start_date, end_date, dopsenv).processed_dops;
-Shared processed_dops := History_Analysis.Process_Dops(pVersion, datasetname, location, cluster, enviroment, start_date, end_date, dopsenv).appendRawdata;
+Shared standalonedops := History_Analysis.Process_Dops(pVersion, datasetname, location, cluster, fromdate, todate, dopsenv ).processed_dops;
+Shared processed_dops := History_Analysis.Process_Dops(pVersion, datasetname, location, cluster, fromdate, todate, dopsenv ).appendRawdata;
 Shared orbit_new_file := History_Analysis.Filenames(pVersion).OrbitinputTemplate;
 Shared master_build_file := History_Analysis.Filenames(pVersion).MasterBuildTemplate;
 

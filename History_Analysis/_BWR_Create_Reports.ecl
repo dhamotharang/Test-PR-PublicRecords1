@@ -7,11 +7,7 @@ output(pVersion, named('workunit_version'));
 
 todays_date := (string)Std.Date.today():global;
 
-tomorrows_date := (string)Std.Date.AdjustDate((integer)todays_date,0,0,1):global;
-
 yesterdays_date := (string)Std.Date.AdjustDate((integer)todays_date,0,0,-1):global;
-
-todays_date:= (string)Std.Date.Today():global;
 
 tomorrows_date := (string)Std.Date.AdjustDate((integer)todays_date,0,0,1):global;
 
@@ -27,8 +23,4 @@ tomorrows_date := (string)Std.Date.AdjustDate((integer)todays_date,0,0,1):global
 // dopsenv = 'dev' or 'prod'; dev - points to dev or prod DOPS DB
 
 
-History_Analysis.Proc_Build_All(pVersion, '*', 'B','set for nonfcra and fcra (process_dops.ecl)','P', todays_date, tomorrows_date, 'prod');
-
-///////////////////////  For Standalone Reports ////////////////////////////////////////////
-
-//History_Analysis.CreateStandaloneReports(pVersion, '*', 'B', 'set for nonfcra and fcra (process_dops.ecl)', 'P', '20201130', '20201205', 'prod');
+History_Analysis.Proc_Build_All(pVersion, '*', 'B','set for nonfcra and fcra (process_dops.ecl)', yesterdays_date, tomorrows_date, 'prod');
