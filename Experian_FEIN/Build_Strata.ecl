@@ -6,9 +6,9 @@ EXPORT Build_Strata(
 	BOOLEAN pOverwrite = FALSE,
 	DATASET(Layouts.Base) pBaseFile = Files().Base.built,
 	STRING pfileversion = 'using',
-	BOOLEAN pUseOtherEnviron = tools._Constants().IsDataland,
+	BOOLEAN pUseOtherEnviron = tools._Constants.IsDataland,
 	DATASET(Layouts.Input.Sprayed) pSprayedFile = Files(pfileversion,pUseOtherEnviron).Input.logical,
-	BOOLEAN pIsTesting = tools._Constants.IsDataland,
+	BOOLEAN pIsTesting = tools._Constants.IsDataland
 ) := FUNCTION
 
 	dUpdate := Strata_stats(pBaseFile,pfileversion,pUseOtherEnviron,pSprayedFile);
