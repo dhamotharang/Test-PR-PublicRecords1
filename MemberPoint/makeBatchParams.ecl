@@ -16,7 +16,7 @@
 		BatchParams := MODULE(PROJECT(base_params, MemberPoint.IParam.BatchParams, OPT))
 		// Specefic to memberpoint
 			export string	DeceasedMatchCodes := optDeceasedMatchCodes;
-			export boolean UseDOBDeathMatch := MemberPoint.Util.binStrToBool(inOpts.UseDOBDeathMatch, MemberPoint.Constants.Defaults.UseDOBDeathMatch);
+			export boolean UseDOBDeathMatch := MemberPoint.Util.binStrToBool(inOpts.UseDOBDeathMatch, MemberPoint.Constants.Defaults.UseDOBDeathMatch_reportservice);
 			export boolean IncludeEmail := MemberPoint.Util.binStrToBool(inOpts.IncludeEmailProcess, MemberPoint.Constants.Defaults.rpt_IncludeEmail);
 			export boolean IncludePhone := MemberPoint.Util.binStrToBool(inOpts.IncludePhoneProcess, MemberPoint.Constants.Defaults.rpt_IncludePhone);
 			export boolean IncludeAddress := MemberPoint.Util.binStrToBool(inOpts.IncludeAddressProcess, MemberPoint.Constants.Defaults.rpt_IncludeAddress);
