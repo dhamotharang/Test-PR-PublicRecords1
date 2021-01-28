@@ -22,5 +22,7 @@ output(dsOut_candidates, NAMED('dsOut_candidates'));
 dsOut_C := DEDUP(dsOut_candidates(IsOverride and ~IsOverwritten), all);
 
 
-PAW_TrueOrphans := Overrides.American_Student_Override_Findings(dsOut_C(datagroup = 'STUDNET'), filedate);
-output(PAW_TrueOrphans, NAMED('PAW_TrueOrphans'));
+student_TrueOrphans := Overrides.American_Student_Override_Findings(dsOut_C(datagroup = 'STUDENT'), filedate);
+
+//NOTE:If student_TrueOrphans is blank the growthceck failed.
+output(student_TrueOrphans, NAMED('student_TrueOrphans'));
