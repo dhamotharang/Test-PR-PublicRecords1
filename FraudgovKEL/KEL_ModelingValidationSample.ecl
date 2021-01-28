@@ -5,7 +5,7 @@ import FraudGovPlatform_Analytics;
 IMPORT Std;
 
 ModelingAttributeOutput := FraudgovKEL.KEL_EventShell.ModelingStats;//(t_srcagencyuid = 20995239);
-//ModelingAttributeOutput := DATASET('~fraudgov::temp::modelingstats', RECORDOF(FraudgovKEL.KEL_EventShell.ModelingStats), THOR)(t_srcagencyuid = 20995239 and t_srcagencyprogtype = 1029);
+//ModelingAttributeOutput := DATASET('~fraudgov::temp::modelingstats', RECORDOF(FraudgovKEL.KEL_EventShell.ModelingStats), THOR);//(t_srcagencyuid = 20995239 and t_srcagencyprogtype = 1029);
 //output(ModelingAttributeOutput,,'~fraudgov::temp::modelingstats', overwrite);
 
 ModelingAttributeOutputCount := COUNT(ModelingAttributeOutput);
@@ -49,8 +49,6 @@ EventStatsPrep := FraudGovPlatform_Analytics.macPivotOttoOutput(ModelingAttribut
 'p9_aotaddrkractshrdnewsrcagencydescev,p15_aotssnkractshrdsrcagencycntev,p15_aotssnkractshrdnewsrcagencydescev,p16_aotphnkractshrdsrcagencycntev,p16_aotphnkractshrdnewsrcagencydescev,p17_aotemailkractshrdsrcagencycntev,' +
 'p17_aotemailkractshrdnewsrcagencydescev,p18_aotipaddrkractshrdsrcagencycntev,p18_aotipaddrkractshrdnewsrcagencydescev,p19_aotbnkacctkractshrdsrcagencycntev,p19_aotbnkacctkractshrdnewsrcagencydescev,p20_aotdlkractshrdsrcagencycntev,p20_aotdlkractshrdnewsrcagencydescev'
 );
-
-
 
 
 //EventStatsPrep;
