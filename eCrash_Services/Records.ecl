@@ -46,20 +46,20 @@ EXPORT Records(eCrash_Services.IParam.searchrecords in_mod) := MODULE
 				
 		EXPORT getKYRecords(DATASET(eCrash_Services.Layouts.KY_Response_incident) inrecs) := FUNCTION	
 
-
+            // to do.. cleanup below code to have better naming and flow
 			  	
 			  agency_validation_ds_1 := inrecs(state = eCrash_Services.Constants.KY_STATE_ABBR);
 				NONKY_Agency_ds_ref := inrecs(state <> eCrash_Services.Constants.KY_STATE_ABBR);
 				KY_Apriss_Agency_Ds :=  agency_validation_ds_1(TRIM(source_id) = eCrash_Services.Constants.KY_APPRISS_SOURCE_ID);
 				boolean appriss_agency 	 := TRIM(inrecs.source_id) = eCrash_Services.Constants.KY_APPRISS_SOURCE_ID;
 				
-				KY_Apriss_Agencies	 		 := PROJECT(inrecs(appriss_agency), 
+				KY_Apriss_Agencies	 		 := PROJECT(agency_validation_ds_1(appriss_agency), 
 																						 TRANSFORM(iesp.ecrash.t_ECrashSearchAgency,
 																											self.JurisdictionState := left.state;
 																											self.Jurisdiction := left.AgencyName;
 																											self  := left;));
 																											 
-				KY_Non_Apriss_Agencies	 := inrecs(NOT appriss_agency);
+				KY_Non_Apriss_Agencies	 := agency_validation_ds_1(NOT appriss_agency);
 				
 				IsSafeToPerformSoap  := in_mod.KY_SearchEspNAME <> '' AND in_mod.GatewayEspURL <> '' and COUNT(KY_Apriss_Agencies) > 0;
 								
