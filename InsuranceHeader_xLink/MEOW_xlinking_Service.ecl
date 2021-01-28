@@ -39,7 +39,7 @@ EXPORT MEOW_xlinking_Service() := MACRO
 	'</p><p>fields name, address1 and address2 are cleaned before using as input' + 
 	'</p><p>Debug option is always false, but if on it will show the outputs that follows the process to append a LexID'));/*HACK*/
 	
-  IMPORT SALT311,InsuranceHeader_xLink;
+  IMPORT SALT311,InsuranceHeader_xLink, InsuranceHeader_PostProcess;
 	
 	STRING Input_NAME := '' : STORED('NAME');
 	clean_n := address.CleanPersonFML73(Input_NAME);
@@ -190,6 +190,7 @@ EXPORT MEOW_xlinking_Service() := MACRO
 	LayoutScoredFetch := RECORD
 		InsuranceHeader_xLink.Process_xIDL_Layouts().LayoutScoredFetch.did;
 		STRING10 Segmentation;
+		STRING3 lexID_type;
 		INTEGER2 NAMEWEIGHT := 0;
 		INTEGER2 ADDRWEIGHT := 0;
 		INTEGER2 MAINNAMEWeight := 0;
@@ -222,16 +223,15 @@ END;
 			res := project(left.results, TRANSFORM(LayoutScoredFetch, 
 								best_didRec := segKey(DID=left.did)[1];
 								SELF.Segmentation := best_didRec.ind;
+								SELF.lexID_type := best_didRec.lexID_type;
 								self.best_ssn5 := InsuranceHeader_xLink.mod_SSNParse(best_didRec.ssn).ssn5,
 								self.best_ssn4 := InsuranceHeader_xLink.mod_SSNParse(best_didRec.ssn).ssn4,														
 								self.match_best_ssn := (left.ssn5_match_code=7 and left.ssn5 = self.best_ssn5 or left.ssn5weight=0) and 
 																	(left.ssn4_match_code=7 and left.ssn4=self.best_ssn4) ;																	
 								self.best_dob := best_didRec.dob;
 								SELF.keys_used_desc := InsuranceHeader_xLink.Process_xIDL_Layouts().KeysUsedToText(left.Keys_used);
-								self.did := IF ( (InsuranceHeader_xLink.Environment.isCurrentBoca 
-											AND LEFT.did > IDLExternalLinking.Constants.INSURANCE_LEXID) 
-											OR (
-													((LEFT.stweight > 7 and LEFT.stweight <=12 and ~(left.DOBweight>=15 or left.ssn5weight + left.ssn4weight >=20)) 
+								self.did := IF ( 
+													((LEFT.stweight > 7 and LEFT.stweight <=12 and ~(left.DOBweight>=15 or left.ssn5weight + left.ssn4weight >=20) 
 														OR LEFT.stweight>12)
 													AND LEFT.prim_nameweight=0 AND LEFT.prim_rangeweight=0),
 															skip, left.did);	

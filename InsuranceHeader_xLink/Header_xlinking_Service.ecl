@@ -174,6 +174,7 @@ EXPORT Header_xlinking_Service() := MACRO
 		ds1.results.did,
 		ds1.results.rid,
 		STRING Segmentation;
+		STRING lexID_type;
 		STRING KeysUsedDesc;
 		STRING KeysFailedDesc;
 	end;
@@ -187,7 +188,7 @@ EXPORT Header_xlinking_Service() := MACRO
 	
 	ds1Norm := Normalize(ds1, left.results, xResultsChildren(right));
 		
-	ds1Did := dataset([{Input_UniqueID, 0, 0, 0, e_DID, 0, segKey(DID=e_DID)[1].ind, '', ''}] , resTrimLayout);
+	ds1Did := dataset([{Input_UniqueID, 0, 0, 0, e_DID, 0, segKey(DID=e_DID)[1].ind, segKey(DID=e_DID)[1].LexID_type, '', ''}] , resTrimLayout);
 	didBatchLayout := {unsigned6 uid, unsigned8 did};
 	
 	dsNorm := IF(e_DID>0, ds1Did, ds1Norm);
