@@ -1,4 +1,4 @@
-IMPORT VersionControl, STD, tools;
+IMPORT Data_Services, STD, tools;
 
 EXPORT _Dataset(
 	BOOLEAN pUseProd = FALSE
@@ -7,7 +7,7 @@ EXPORT _Dataset(
 	EXPORT Name := 'Experian_FEIN';
 	EXPORT thor_cluster_Files := IF(
 		pUseProd,
-		VersionControl.foreign_prod + 'thor_data400::',
+		Data_Services.foreign_prod + 'thor_data400::',
 		'~thor_data400::'
 	);
 
@@ -15,7 +15,7 @@ EXPORT _Dataset(
 	EXPORT max_record_size := 4096;
 
 	EXPORT Groupname := IF(
-		tools._Constants().IsDataland,
+		tools._Constants.IsDataland,
 		'thor40_241',
 		'thor400_20'
 	);
