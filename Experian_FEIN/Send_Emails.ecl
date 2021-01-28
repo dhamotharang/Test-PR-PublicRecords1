@@ -7,12 +7,14 @@ EXPORT Send_Emails(
 ) := MODULE
 	SHARED addresses := STD.Str.SplitWords(pAddresses, ',');
 
+	EXPORT Get_Primary_Addresses := addresses[1];
+
 	EXPORT Call_Email_Notification := tools.mod_Email_Notification_Lists(
-		addresses[1],
-		addresses[1] + ';' + addresses[2] + ';',
-		addresses[1] + ';' + addresses[2] + ';',
-		addresses[1],,
-		addresses[1] + ';' + addresses[2] + ';' + addresses[3] + ';'
+		Get_Primary_Addresses,
+		Get_Primary_Addresses + ';' + addresses[2] + ';',
+		Get_Primary_Addresses + ';' + addresses[2] + ';',
+		Get_Primary_Addresses,,
+		Get_Primary_Addresses + ';' + addresses[2] + ';' + addresses[3] + ';'
 	);
 
 	EXPORT BuildSuccess := tools.fun_SendEmail(
