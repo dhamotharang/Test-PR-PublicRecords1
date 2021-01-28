@@ -1,6 +1,3 @@
-/*2014-12-09T19:10:02Z (aleida lima)
-DEAD Clusters with only 1 records are not considered good cluster in segmentation
-*/
 /**
   This macro selects a LexID based on segmentation rules
 		1. If results has more than Constants.GOOD_CANDIDATES_THESHOLD candidates within distance, 
