@@ -48,15 +48,16 @@
 								 
 	// get threshold for datagroup
 	threshold_count := overrides.Constants.GetStatsThreshold(in_datagroup);
-
+	
 	//scale count and also take into account new orphans from new datagroup
 	statsout_new tCalculateDelTaStats(statsout_new L ,statsout_old R) := TRANSFORM
                     SELF.DelTaResults := L.CurrCount;
                     SELF.CurrVersion := L.CurrVersion;
                     SELF.PrevVersion := R.CurrVersion;
-						 SELF.PrevCount := R.PrevCount;
-                    SELF.DelTaPassed := IF(SELF.DelTaResults < threshold_count, 'Y', 'N');
-                    SELF := L;
+						        SELF.PrevCount := R.PrevCount;
+                    SELF.DelTaPassed := IF((UNSIGNED)L.CurrCount <= (UNSIGNED) threshold_count, 'Y', 'N');
+										
+										SELF := L;
                 end;
 							
 	
