@@ -1,170 +1,182 @@
-﻿IMPORT Overrides,_Control,iesp;
+﻿IMPORT Overrides,_Control,iesp,fcra,Std;
 
 EXPORT American_Student_Override_Findings(DATASET(Override_Layouts.Layout_Get_Orphans) orphansIn, STRING filedate) :=  FUNCTION
 
-orphans_ds := orphansIn;
+	orphans_ds := orphansIn;
+	//OUTPUT(SORT(orphans_ds,did),NAMED('orphans_List'));
 
-OUTPUT(SORT(orphans_ds,did),NAMED('orphans_List'));
+	orphan_did_set := SET(orphans_ds, (UNSIGNED)did);
+	//Output(orphan_did_set);
 
-overrides.mac_orphans_evaluate(American_Student_new,'STUDENT',orphans_ds,dsout_student,,did,key,,,,fname,lname,prim_range,prim_name, z5);
-
-OUTPUT(dsout_student,NAMED('evaluated_students'));
-
-//qc
-overrides_did_set := SET(orphans_ds, (unsigned)did);
-payload_did_set := SET(dsout_student, (unsigned)did_payload);
-
-overrided_by_did := overrides.Keys.american_student_new(did IN overrides_did_set);
-payload_by_did := overrides.payload_keys.american_student_new(did IN payload_did_set + overrides_did_set);
-OUTPUT(payload_by_did,NAMED('payload_by_did'));
-
-student_overrides_keys_ds := Project(overrided_by_did, Transform(fcra.Layout_Override_Student_New or {string version},
-																						self.version := 'student_overrides_keys',
-																						self := left));
+	overrided_by_did := PULL(overrides.Keys.american_student_new(did IN orphan_did_set));
+	
+	payload_by_did := PULL(overrides.payload_keys.american_student_new(did IN orphan_did_set));
+	
+	
+	student_overrides_keys_ds := PROJECT(overrided_by_did, TRANSFORM(fcra.Layout_Override_Student_New OR {STRING version},
+																						SELF.version := 'student_overrides_keys',
+																						SELF := LEFT));
 																						
-student_payload_keys_ds := Project(payload_by_did, Transform(fcra.Layout_Override_Student_New or {string version},
-																						self.version := 'student_payload_keys',
-																						self.flag_file_id := '';
-                                            self := left));
+	student_payload_keys_ds := PROJECT(payload_by_did, TRANSFORM(fcra.Layout_Override_Student_New OR {STRING version},
+																						SELF.version := 'student_payload_keys',
+																						SELF.flag_file_id := '';
+                                            SELF := LEFT));
 
-cmbstudents := sort(student_overrides_keys_ds + student_payload_keys_ds, RECORD);
-OUTPUT(cmbstudents,NAMED('cmbstudents'));
-
-
-RecordOf(cmbstudents) xform(cmbstudents l) := Transform
-	self.version := 'both';
-	self := l;
-End;	
-
-cmbstudents_dist := distribute(cmbstudents, HASH32(key,did));
-
-combined_sorted := sort(cmbstudents_dist,key,did,local);
-
-rolled := Rollup(combined_sorted, xform(left), key,did,local);
-
-Output(rolled(version='both'), named('Both_Overrides_Payload'));
-
-Output(SORT(rolled(version='student_overrides_keys'),did), named('student_overrides_Only'));
-
-Output(SORT(rolled(version='student_payload_keys'),did), named('student_payload_keys_Only'));	
-
-overrides_students := rolled(version='student_overrides_keys');
-payload_qc := rolled(version='student_payload_keys');
-
-sorted_overrides := sort(overrides_students,key,did, ssn);
-
-deduped_overrides:= DEDUP(sorted_overrides,key,did,ssn);
-
-sorted_payload_qc := sort(payload_qc,key,did, ssn);
-
-deduped_sorted_payload_qc:= DEDUP(sorted_payload_qc,key,did, ssn);
-
-diff_layout := record
-	//overrides_students.did;
-	INTEGER payload_did;
-	INTEGER overrides_did;
-	STRING l_version;
-	STRING r_version;
-	INTEGER l_key;
-	INTEGER r_key;
-	STRING  l_ssn;
-	STRING  r_ssn;
-	//KEY FIELDS
-  STRING l_lastName;	
-  STRING r_lastName;	
-	STRING l_Name;
-	STRING r_Name;
-	STRING l_dob;
-	STRING r_dob;
-	STRING l_zip5;
-	STRING r_zip5;
+	cmbstudents := SORT(student_overrides_keys_ds + student_payload_keys_ds, RECORD);
 	
-	//key=pid fields
-	STRING l_FULL_NAME;
-  STRING r_FULL_NAME;	
-	STRING l_zip;
-	STRING r_zip;
-  STRING l_addr;	
-	STRING r_addr;
-	STRING l_addr1;	
-	STRING r_addr1;
-	STRING l_addr2;	
-	STRING r_addr2;
-	STRING l_LN_COLLEGE_NAME;
-	STRING r_LN_COLLEGE_NAME;
-	STRING l_COLLEGE_MAJOR;
-	STRING r_COLLEGE_MAJOR;
-	STRING l_telephone;
-	STRING r_telephone;
+	RECORDOF(cmbstudents) xform(cmbstudents l) := TRANSFORM
+		SELF.version := 'both';
+		SELF := l;
+	END;	
+
+	cmbstudents_dist := DISTRIBUTE(cmbstudents, HASH32(key,did));
+
+	combined_sorted := SORT(cmbstudents_dist,key,did,LOCAL);
+
+	rolled := ROLLUP(combined_sorted, xform(left), key,did,LOCAL);
+
+	overrides_students := rolled(version='student_overrides_keys');
+	payload_qc := rolled(version='student_payload_keys');
+
+	sorted_overrides := SORT(overrides_students,key,did, ssn);
+
+	deduped_overrides:= DEDUP(sorted_overrides,key,did,ssn);
+
+	sorted_payload_qc := SORT(payload_qc,key,did, ssn);
+
+	deduped_sorted_payload_qc:= DEDUP(sorted_payload_qc,key,did, ssn);
+
+	diff_layout := RECORD
+		//overrides_students.did;
+		INTEGER payload_did;
+		INTEGER overrides_did;
+		STRING l_version;
+		STRING r_version;
+		INTEGER l_key;
+		INTEGER r_key;
+		STRING  l_ssn;
+		STRING  r_ssn;
+		//KEY FIELDS
+		STRING l_lastName;	
+		STRING r_lastName;	
+		STRING l_Name;
+		STRING r_Name;
+		STRING l_dob;
+		STRING r_dob;
+		STRING l_zip5;
+		STRING r_zip5;
 	
-	STRING diff;
-End;
-
-diff_layout xform_diff(payload_qc l,overrides_students  r) := Transform
-	self.payload_did := l.did;
-	self.overrides_did := r.did;
-	self.l_version := l.version;
-	self.r_version := r.version;
-	self.l_key := l.key;
-	self.r_key := r.key;
-	self.l_ssn  := l.ssn;
-	self.r_ssn  := r.ssn;
-	//KEY FIELDS
-	self.l_Name     := l.first_Name;
-	self.l_lastName := l.last_name;
-	self.r_Name     := r.first_Name;;
-	self.r_lastName := r.last_name;;
-	self.l_dob      := l.dob_formatted;
-	self.r_dob      := r.dob_formatted;
-	self.l_zip5     := l.z5;
-	self.r_zip5     := r.z5;
+		//key=pid fields
+		STRING l_FULL_NAME;
+		STRING r_FULL_NAME;	
+		STRING l_zip;
+		STRING r_zip;
+		STRING l_addr;	
+		STRING r_addr;
+		STRING l_addr1;	
+		STRING r_addr1;
+		STRING l_addr2;	
+		STRING r_addr2;
+		STRING l_LN_COLLEGE_NAME;
+		STRING r_LN_COLLEGE_NAME;
+		STRING l_COLLEGE_MAJOR;
+		STRING r_COLLEGE_MAJOR;
+		STRING l_telephone;
+		STRING r_telephone;
 	
-	//key=pid fields
-	self.l_FULL_NAME := l.FULL_NAME;
-  self.r_FULL_NAME :=r.FULL_NAME;	
-	self.l_zip       :=l.zip;
-	self.r_zip       :=r.zip;
-  self.l_addr      :=Std.Str.CleanSpaces(l.Address_1 + ' ' + l.Address_2);
-	self.r_addr      :=Std.Str.CleanSpaces(r.Address_1 + ' ' + r.Address_2);
-	self.l_addr1     :=l.Address_1; 
-	self.r_addr1     :=r.Address_1;
-	self.l_addr2     :=l.Address_2; 
-	self.r_addr2     :=r.Address_2;
-	self.l_LN_COLLEGE_NAME :=l.LN_COLLEGE_NAME;
-	self.r_LN_COLLEGE_NAME :=r.LN_COLLEGE_NAME;
-	self.l_COLLEGE_MAJOR   :=l.COLLEGE_MAJOR;
-	self.r_COLLEGE_MAJOR   :=l.COLLEGE_MAJOR;
-	self.l_telephone       :=l.telephone;
-	self.r_telephone       := r.telephone;
+		STRING diff;
+	END;
+
+	diff_layout xform_diff(payload_qc l,overrides_students  r) := TRANSFORM
+		SELF.payload_did := l.did;
+		SELF.overrides_did := r.did;
+		SELF.l_version := l.version;
+		SELF.r_version := r.version;
+		SELF.l_key := l.key;
+		SELF.r_key := r.key;
+		SELF.l_ssn  := l.ssn;
+		SELF.r_ssn  := r.ssn;
+		//KEY FIELDS
+		SELF.l_Name     := l.first_Name;
+		SELF.l_lastName := l.last_name;
+		SELF.r_Name     := r.first_Name;;
+		SELF.r_lastName := r.last_name;;
+		SELF.l_dob      := l.dob_formatted;
+		SELF.r_dob      := r.dob_formatted;
+		SELF.l_zip5     := l.z5;
+		SELF.r_zip5     := r.z5;
 	
-	self.diff := ROWDIFF(L,R);
-End;
+		//key=pid fields
+		SELF.l_FULL_NAME := l.FULL_NAME;
+		SELF.r_FULL_NAME :=r.FULL_NAME;	
+		SELF.l_zip       :=l.zip;
+		SELF.r_zip       :=r.zip;
+		SELF.l_addr      :=Std.Str.CleanSpaces(l.Address_1 + ' ' + l.Address_2);
+		SELF.r_addr      :=Std.Str.CleanSpaces(r.Address_1 + ' ' + r.Address_2);
+		SELF.l_addr1     :=l.Address_1; 
+		SELF.r_addr1     :=r.Address_1;
+		SELF.l_addr2     :=l.Address_2; 
+		SELF.r_addr2     :=r.Address_2;
+		SELF.l_LN_COLLEGE_NAME :=l.LN_COLLEGE_NAME;
+		SELF.r_LN_COLLEGE_NAME :=r.LN_COLLEGE_NAME;
+		SELF.l_COLLEGE_MAJOR   :=l.COLLEGE_MAJOR;
+		SELF.r_COLLEGE_MAJOR   :=l.COLLEGE_MAJOR;
+		SELF.l_telephone       :=l.telephone;
+		SELF.r_telephone       := r.telephone;
+	
+		SELF.diff := ROWDIFF(L,R);
+	END;
 
-matched_dids := join(deduped_sorted_payload_qc,deduped_overrides, left.did = right.did and left.key != right.key,xform_diff(left,right));	
+	matched_dids := JOIN(deduped_sorted_payload_qc,deduped_overrides, LEFT.did = RIGHT.did AND LEFT.key != RIGHT.key,xform_diff(LEFT,RIGHT));	
 
-matched_keys := join(deduped_sorted_payload_qc,deduped_overrides, left.did != right.did and left.key = right.key,xform_diff(left,right));	
+	matched_keys := JOIN(deduped_sorted_payload_qc,deduped_overrides, LEFT.did != RIGHT.did AND LEFT.key = RIGHT.key,xform_diff(LEFT,RIGHT));	
 
-combined_output := matched_dids + matched_keys;
+	//todo maybe add pii data check heres
 
-orphan_layout := record
-	deduped_overrides;
-	string diff;
-End;
+	combined_output := matched_dids + matched_keys;
+
+	orphan_layout := RECORD
+		deduped_overrides;
+		STRING datagroup;
+		STRING recid;
+		BOOLEAN found_in_payload;
+		STRING diff
+	END;
 
 
-orphan_layout orphan_xform(combined_output  l, deduped_overrides r) := Transform
-	self.diff := l.diff;
-	self :=r;
-End;
+	orphan_layout orphan_xform(combined_output  l, deduped_overrides r) := TRANSFORM
+		SELF.datagroup := overrides.Constants.getfileid(overrides.Constants.STUDENT);
+		SELF.diff := l.diff;
+		SELF.recid := (STRING) r.key;
+		SELF.found_in_payload := FALSE;
+		SELF :=r;
+	END;
 
-true_orphans := join(combined_output,deduped_overrides, left.payload_did = right.did,orphan_xform(left,right),RIGHT ONLY);
+	 true_orphans := JOIN(combined_output,deduped_overrides, LEFT.payload_did = RIGHT.did,orphan_xform(LEFT,RIGHT),RIGHT ONLY);
 															 
-output(matched_dids, named('matched_dids'));
-output(matched_keys, named('matched_keys'));
-output(true_orphans, named('true_orphans'));
+	 output(true_orphans, named('true_orphans'));
 
-payload := overrides.payload_keys.american_student_new();
-							 
-result := join(payload,true_orphans, left.full_name=right.full_name and left.date_first_seen=right.date_first_seen);
-output(result, named('payload'));			
+	 #IF(overrides.Constants.GROWTH_CHECK_CALL)
 
+		Student_Orphans_GrowthCheck_ds := PROJECT(true_orphans, TRANSFORM(overrides.File_Override_Orphans.orphan_rec,
+														SELF.datagroup := Constants.STUDENT, SELF.did := (STRING) LEFT.did, SELF := LEFT));
+
+		call_gc := GrowthCheck(filedate, Constants.STUDENT, Student_Orphans_GrowthCheck_ds);														
+	
+		build_stats := call_gc.BuildStats;
+		//this forces an execute
+		build_stats;
+		stats_alerts := call_gc.StatsAlerts;
+	
+		sent_email := IF (stats_alerts, FileServices.sendemail(EmailNotification.orphan_alert_list
+												, 'American Student Override True Orphans COUNT is higher than threshold count ' +  overrides.Constants.GetStatsThreshold(Constants.STUDENT) 
+												, 'WU#: '+ workunit + '-' + failmessage));
+	
+		result_orphans := IF(~stats_alerts,true_orphans);
+		RETURN WHEN (result_orphans, sent_email);
+	#ELSE
+	
+		RETURN true_orphans;
+	#END
+	
+END;		
