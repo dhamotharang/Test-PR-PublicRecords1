@@ -1297,6 +1297,7 @@
 		export string KEYWORD_AMCBA_TERR						:= '979';
 		export string KEYWORD_UNSCPE_WC							:= '980';
 		export string KEYWORD_UKHMT_DU							:= '981';
+		export string KEYWORD_PTERSE								:= '982';
 		
 		//When setting the keyword export use underscores for dashes (ex: For RBI-SANC, use RBI_SANC)	
 	end;
