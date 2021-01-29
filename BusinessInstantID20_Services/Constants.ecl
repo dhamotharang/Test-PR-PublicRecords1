@@ -19,4 +19,8 @@ EXPORT Constants := MODULE
 	EXPORT MAX_OFAC_VERSION := 4;
 	
 	EXPORT SET_TARGUS_SERVICENAMES := ['targus','targuse3220'];
+
+  EXPORT OFAC := 'OFAC';
+
+  EXPORT OFC := 'OFC';
 END;
