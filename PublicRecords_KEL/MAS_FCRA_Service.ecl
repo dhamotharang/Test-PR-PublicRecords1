@@ -63,9 +63,7 @@ EXPORT MAS_FCRA_Service() := MACRO
 	BOOLEAN Append_PII := FALSE : STORED('AppendPII');//keep what we have on input
 		
 	// Nulling out stored variables to not propagate to Attributes.kel
-	#CONSTANT('GLBPurposeValue', 0);
-	#CONSTANT('DPPAPurposeValue', 0);
-	#CONSTANT('NetAcuityURL', '');
+	#CONSTANT('NetAcuityURL', ''); 
 	#CONSTANT('OFACURL', '');
 	#CONSTANT('Watchlists_RequestedValue', '');
 	#CONSTANT('IncludeOfacValue', FALSE);
@@ -81,6 +79,13 @@ EXPORT MAS_FCRA_Service() := MACRO
 
 	DATASET(Gateway.Layouts.Config) GatewaysClean := PROJECT(gateways_in, gw_switch(LEFT));
 
+	#STORED('GLBPurposeValue', GLBA);
+	#STORED('DPPAPurposeValue', DPPA);
+	#STORED('IsFCRAValue', TRUE);
+	
+	TargusGW := GatewaysClean(STD.Str.ToLowerCase(servicename) = 'targus')[1];
+	#STORED('TargusURL', TargusGW.url);
+	
 	// If allowed sources aren't passed in, use default list of allowed sources
 	SetAllowedSources := IF(COUNT(AllowedSourcesDataset) = 0, PublicRecords_KEL.ECL_Functions.Constants.DEFAULT_ALLOWED_SOURCES_FCRA, AllowedSourcesDataset);
 	// If a source is on the Exclude list, remove it from the allowed sources list. 

@@ -28,8 +28,8 @@ DPMDL =	0 //use_InsuranceDLData - bit 13
 GLBA 	= 0 
 DPPA 	= 0 
 */
-GLBA := 0; // FCRA isn't GLBA restricted
-DPPA := 0; // FCRA isn't DPPA restricted
+GLBA := 0  : STORED('GLBPurposeValue'); // FCRA isn't GLBA restricted
+DPPA := 0  : STORED('DPPAPurposeValue'); // FCRA isn't DPPA restricted
 DataPermissionMask := '0000000000000';  
 DataRestrictionMask := '1000010000000100000000000000000000000000000000000'; 
 Include_Minors := TRUE;
@@ -61,6 +61,28 @@ Output_SALT_Profile := TRUE;
 AllowedSourcesDataset := DATASET([],PublicRecords_KEL.ECL_Functions.Constants.Layout_Allowed_Sources);
 // Do not exclude any additional sources from allowed sources dataset.
 ExcludeSourcesDataset := DATASET([],PublicRecords_KEL.ECL_Functions.Constants.Layout_Allowed_Sources);
+
+IncludeTargusGW := FALSE;
+
+// Parameter needed to turn CCPA on for Targus -- has to use #STORED since IsFCRA isn't a parameter passed to the soapcall
+#STORED('IsFCRAValue', TRUE);
+
+NeutralRoxie_GW := DATASET([{'neutralroxie', NeutralRoxieIP}], Gateway.Layouts.Config);
+// SELF.Gateways := 	DATASET([{'neutralroxie', NeutralRoxieIP},
+									//	{'delta_personcontext', PCG_Dev}], Gateway.Layouts.Config);
+									
+Empty_GW := DATASET([TRANSFORM(Gateway.Layouts.Config, 
+							SELF.ServiceName := ''; 
+							SELF.URL := ''; 
+							SELF := [])]);
+
+Targus_GW := IF(IncludeTargusGW, DATASET([TRANSFORM(Gateway.Layouts.Config,
+							SELF.ServiceName := 'targus'; 
+							SELF.URL := 'HTTP://api_qa_gw_roxie:g0h3%40t2x@gatewaycertesp.sc.seisint.com:7726/WsGateway/?ver_=1.70'; 
+							SELF := [])]),
+							Empty_GW);  
+
+Input_Gateways := (NeutralRoxie_GW + Targus_GW)(URL <> '');
 
 RecordsToRun := 0;
 eyeball := 100;
@@ -145,10 +167,7 @@ soapLayout trans (pp le):= TRANSFORM
     SELF.input := PROJECT(le, TRANSFORM(PublicRecords_KEL.ECL_Functions.Input_Layout,
         SELF := LEFT;
         SELF := []));   
-    SELF.Gateways := 	DATASET([{'neutralroxie', NeutralRoxieIP}], Gateway.Layouts.Config);
-    // SELF.Gateways := 	DATASET([{'neutralroxie', NeutralRoxieIP},
-									//	{'delta_personcontext', PCG_Dev}], Gateway.Layouts.Config);
-		
+    SELF.Gateways := Input_Gateways;
     SELF.ScoreThreshold := Settings.LexIDThreshold;
     SELF.DataRestrictionMask := Settings.Data_Restriction_Mask;
     SELF.DataPermissionMask := Settings.Data_Permission_Mask;
@@ -157,10 +176,10 @@ soapLayout trans (pp le):= TRANSFORM
     SELF.IncludeMinors := Settings.IncludeMinors;
     SELF.IsMarketing := FALSE;
     SELF.OutputMasterResults := Output_Master_Results;
-		SELF.AllowedSourcesDataset := AllowedSourcesDataset;
-		SELF.ExcludeSourcesDataset := ExcludeSourcesDataset;
-		self.RetainInputLexid := Settings.RetainInputLexid;
-		self.appendpii := Settings.BestPIIAppend; //do not append best pii for running
+	SELF.AllowedSourcesDataset := AllowedSourcesDataset;
+	SELF.ExcludeSourcesDataset := ExcludeSourcesDataset;
+	SELF.RetainInputLexid := Settings.RetainInputLexid;
+	SELF.appendpii := Settings.BestPIIAppend; //do not append best pii for running
 END;
 
 soap_in := PROJECT(pp, trans(LEFT));

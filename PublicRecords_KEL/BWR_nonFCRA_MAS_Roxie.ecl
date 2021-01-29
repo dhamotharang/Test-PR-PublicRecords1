@@ -63,12 +63,16 @@ ExcludeSourcesDataset := DATASET([],PublicRecords_KEL.ECL_Functions.Constants.La
 IncludeDeltaBase := FALSE;
 IncludeNetAcuity := FALSE;
 IncludeOFACGW := FALSE;
+IncludeTargusGW := FALSE;
 
 // OFAC parameters
 include_ofac := TRUE : STORED('IncludeOfacValue'); // This is different than the param to turn off/on the gateway, this adds an OFAC watchlist in the gateway
 include_additional_watchlists  := TRUE : STORED('IncludeAdditionalWatchListsValue');
 Global_Watchlist_Threshold := Business_Risk_BIP.Constants.Default_Global_Watchlist_Threshold : STORED('Global_Watchlist_ThresholdValue');
 watchlists:= 'ALLV4' : STORED('Watchlists_RequestedValue'); // Returns all watchlists for OFAC Version 4
+
+// Parameter needed to turn CCPA on for Targus -- has to use #STORED since IsFCRA isn't a parameter passed to the soapcall
+#STORED('IsFCRAValue', FALSE);
 
 Empty_GW := DATASET([TRANSFORM(Gateway.Layouts.Config, 
 							SELF.ServiceName := ''; 
@@ -97,8 +101,14 @@ OFAC_GW := IF(IncludeOFACGW, DATASET([TRANSFORM(Gateway.Layouts.Config,
 							SELF.URL := 'http://bridger_batch_cert:Br1dg3rBAtchC3rt@172.16.70.19:7003/WsSearchCore/?ver_=1'; 
 							SELF := [])]),
 							Empty_GW);  
+							
+Targus_GW := IF(IncludeTargusGW, DATASET([TRANSFORM(Gateway.Layouts.Config,
+							SELF.ServiceName := 'targus'; 
+							SELF.URL := 'HTTP://api_qa_gw_roxie:g0h3%40t2x@gatewaycertesp.sc.seisint.com:7726/WsGateway/?ver_=1.70'; 
+							SELF := [])]),
+							Empty_GW);  
 			
-Input_Gateways := (DeltaBase_GW + NetAcuity_GW + OFAC_GW)(URL <> '');
+Input_Gateways := (DeltaBase_GW + NetAcuity_GW + OFAC_GW + Targus_GW)(URL <> '');
 
 RecordsToRun := 0;
 eyeball := 120;
