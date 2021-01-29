@@ -321,6 +321,11 @@ EXPORT Constants := MODULE
 		export unsigned2 MaxAKAs:= 200;
 	END;
 
+	export CriminalIncarceration := module
+		export unsigned2 MaxNames := 10;
+		export unsigned2 MaxSSNs := 10;
+	end;
+
 	// Criminal Search & Report
 	export CRIM := module
 		export unsigned2	MaxRawRecords			:= 2000;
