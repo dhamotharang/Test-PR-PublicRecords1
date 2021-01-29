@@ -8,7 +8,6 @@ output(pVersion, named('workunit_version'));
 todays_date := (string)Std.Date.today():global;
 
 yesterdays_date := (string)Std.Date.AdjustDate((integer)todays_date,0,0,-1):global;
-
 tomorrows_date := (string)Std.Date.AdjustDate((integer)todays_date,0,0,1):global;
 
 //This call will build all of the required files including spraying, delta calculations and statistics 
@@ -22,5 +21,8 @@ tomorrows_date := (string)Std.Date.AdjustDate((integer)todays_date,0,0,1):global
 // todate - format 'YYYYMMDD' (end date)
 // dopsenv = 'dev' or 'prod'; dev - points to dev or prod DOPS DB
 
+History_Analysis.Proc_Build_All(pVersion, '*', 'B', 'set for nonfcra and fcra (process_dops.ecl)', yesterdays_date, tomorrows_date, 'prod');
 
-History_Analysis.Proc_Build_All(pVersion, '*', 'B','set for nonfcra and fcra (process_dops.ecl)', yesterdays_date, tomorrows_date, 'prod');
+//History_Analysis.CreateStandaloneReports.StandaloneProdReport(pVersion,'*', 'B','set for nonfcra and fcra (process_dops.ecl)', 'enteradate', 'enteradate', 'prod');
+
+//History_Analysis.CreateStandaloneReports.StandaloneQAReport(pVersion,'*', 'B','set for nonfcra and fcra (process_dops.ecl)', 'enteradate', 'enteradate', 'prod');

@@ -12,31 +12,31 @@ Export Layouts := Module
 
 //datasetname,buildversion,whenqalive,whenprodlive,clusterflag,updateflag,superkey,templatelogicalkey,size,recordcoun
     Export layout_keysizedhistory := Record 
-        String    datasetname;
-        String10  buildversion;
-        String25  whenQAlive;
-        String25  whenProdLive;
-        String1   clusterflag;
-        String1   updateflag;
-        String    superkey;
-        String    templatelogicalkey;
-        String    size;
-        String    recordcount;
+        String   datasetname;
+        String10 buildversion;
+        String25 whenQAlive;
+        String25 whenProdLive;
+        String1  clusterflag;
+        String1  updateflag;
+        String   superkey;
+        String   templatelogicalkey;
+        String   size;
+        String   recordcount;
     End;
 
     Export layout_dopsservice := Record
-        String    datasetname;
-        String1   clusterflag;
-        String25  whenqalive;
-        string25  whenprodlive;
-        String10  buildversion;
-        String    superkey;
-        String    logicalkey;
-        Integer8  size;
-        Integer8  recordcount;
-        String1   updateflag;
-        String    statuscode;
-        String    statusdescription;
+        String   datasetname;
+        String1  clusterflag;
+        String25 whenqalive;
+        string25 whenprodlive;
+        String10 buildversion;
+        String   superkey;
+        String   logicalkey;
+        Integer8 size;
+        Integer8 recordcount;
+        String1  updateflag;
+        String   statuscode;
+        String   statusdescription;
     END;
 
     Export layout_orbit_buildinstance := Record
@@ -142,7 +142,7 @@ Export Layouts := Module
         Real       Q3_RecordCountPercent;//Q3_30
         Real       Max_RecordCountPercent;//Max_31
         Real       Mean_RecordCountPercent;//Mean_32
-        Real       Variance_RecordCountPercent;/Variance_33
+        Real       Variance_RecordCountPercent;//Variance_33
         Real       StDev_RecordCountPercent;//StDev_34
         Real       Plus2StDev_RecordCountPercent;//Plus2StDev_35
         Real       Minus2StDev_RecordCountPercent;//Minus2StDev_36
