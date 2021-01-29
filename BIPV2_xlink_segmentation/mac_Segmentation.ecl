@@ -17,7 +17,7 @@ import BizLinkFull, BIPV2_xlink_segmentation;
                                                                   self.results_seleid := sort(left.results_seleid,-Weight,-(seleid=LEFT.Results[1].seleid),-seleid);//same as Process_Biz_Layouts.CombineAllScores
 																																	self := left;));//sort by weight in descending order
 #UNIQUENAME(NewScoredOutput)																					
-SALT311.MAC_External_AddPcnt(%sortSeleResults%,BizLinkFull.Process_Biz_Layouts.LayoutScoredFetch,Results_seleid,RECORDOF(inputFile),27,%NewScoredOutput%);//re-calculate scores																																																																																														
+SALT44.MAC_External_AddPcnt(%sortSeleResults%,BizLinkFull.Process_Biz_Layouts.LayoutScoredFetch,Results_seleid,RECORDOF(inputFile),27,%NewScoredOutput%);//re-calculate scores																																																																																														
 return %NewScoredOutput%;
 endmacro;
 

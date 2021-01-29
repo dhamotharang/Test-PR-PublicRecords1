@@ -6,7 +6,7 @@
  
 EXPORT IDfunctions_Service() := MACRO
   IMPORT BIPV2.IDfunctions AS IDF;
-  IMPORT SALT311;
+  IMPORT SALT44;
   IMPORT BizLinkFull.Process_Biz_Layouts AS PBL;
   
   dsIn    := DATASET([], IDF.rec_SearchInput) : STORED('Search_Input', FORMAT(SEQUENCE(1)));
@@ -14,7 +14,7 @@ EXPORT IDfunctions_Service() := MACRO
   OUTPUT(dsIn,,NAMED('Input'));  
   
   rec := RECORD
-    {SALT311.UIDType uniqueid, INTEGER2 weight, UNSIGNED2 score} OR RECORDOF(RR2) OR {STRING50 KeysUsed_Desc};
+    {SALT44.UIDType uniqueid, INTEGER2 weight, UNSIGNED2 score} OR RECORDOF(RR2) OR {STRING50 KeysUsed_Desc};
   END;
   
   inrec := RECORD
@@ -27,7 +27,7 @@ EXPORT IDfunctions_Service() := MACRO
   
   RR3 := ROLLUP(GROUP(RR2,uniqueID),GROUP,Rollem(ROWS(LEFT)));
   
-  SALT311.MAC_External_AddPcnt(RR3,RECORDOF(inrec.results),results,RECORDOF(inrec),27,RR4);
+  SALT44.MAC_External_AddPcnt(RR3,RECORDOF(inrec.results),results,RECORDOF(inrec),27,RR4);
   
   RR5 := NORMALIZE(RR4,LEFT.results,TRANSFORM(RECORDOF(LEFT.results),SELF:=RIGHT;));
   

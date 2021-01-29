@@ -1,7 +1,7 @@
 ﻿//This is the code to execute in a builder window
 #OPTION('multiplePersistInstances', FALSE);
-#workunit('name','BizLinkFull.BWR_UseExternal - Using External Linking - SALT V3.11.8');
-IMPORT BizLinkFull,SALT311;
+#workunit('name','BizLinkFull.BWR_UseExternal - Using External Linking - SALT V4.4.1');
+IMPORT BizLinkFull,SALT44;
 // For any fields you have replace the /* */ 
  
 // This is the 'thor only' version (no roxie)
