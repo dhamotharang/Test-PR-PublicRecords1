@@ -15,7 +15,7 @@ EXPORT Strata_Population_Stats(
 		'Base',
 		pVersion,
 		pContacts,
-		FirstDataBasePopsOut,
+		dFirstDataBasePopsOut,
 		'View',
 		'Population',,
 		pIsTesting,
