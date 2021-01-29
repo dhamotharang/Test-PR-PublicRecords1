@@ -174,7 +174,7 @@ EXPORT Spray_Infutor_Vin(
 		)
 	);
 
-	odInfutorRaw := OUTPUT(dInfutorRaw);
+	odInfutorRaw := OUTPUT(CHOOSEN(dInfutorRaw, 100));
 
 	// Create Infutor_VIN VIN's only file
 	removeInfutorVinCandidates := IF(

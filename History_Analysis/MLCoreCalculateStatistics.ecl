@@ -1,15 +1,13 @@
-import History_Analysis,ML_Core, PromoteSupers;
+import History_Analysis,ML_Core, PromoteSupers, ut;
 
-export MLCoreCalculateStatistics( String pVersion ):=function
-
-loadfile:= History_Analysis.Files(pVersion).Counted_Deltas;
+export MLCoreCalculateStatistics(dataset(History_Analysis.Layouts.BaseRecprod) loadDeltas ):=function
 
 WithRecID:=RECORD
     unsigned recid:=0;
-    History_Analysis.Layouts.BaseRec;
+    History_Analysis.Layouts.BaseRecprod;
 END;
 
-AddRecID:=project(loadfile,transform(withRecID,self:=left;));
+AddRecID:=project(loaddeltas,transform(withRecID,self:=left;));
 
 WithRecID tAssignRecID(WithRecID L,WithRecID R, INTEGER C):=TRANSFORM
     Self.recid:=C;
@@ -31,9 +29,9 @@ CombinedRec:=RECORD
 END;
 
 CombinedRec tCombine(WithRecID L, ML_Core.Types.NumericField R):=TRANSFORM
-    Self.datasetname:=L.datasetname;
-    Self.superkey:=L.superkey;
-    Self.updateflag:=L.updateflag;
+    Self.datasetname:=trim(L.datasetname, right, whitespace );
+    Self.superkey:=trim(ut.fn_RemoveSpecialChars(L.superkey), right, whitespace );
+    Self.updateflag:=trim(L.updateflag, right, whitespace );
     Self.wi:=R.wi;
     Self.id:=R.id;
     Self.number:=R.number;
@@ -46,76 +44,73 @@ CombineMLWithData:=join(AssignRecID,MLReady,left.recid=right.id,tcombine(left,ri
 
     GroupFile:=group(SortFile,datasetname,superkey,updateflag);
 
-History_Analysis.Layouts.StatisticsRec tCalculate(CombinedRec L, dataset(CombinedRec) R):=TRANSFORM
+History_Analysis.Layouts.statisticsRec tCalculate(CombinedRec L, dataset(CombinedRec) R):=TRANSFORM
         ReduceToML:=project(R,transform(ML_Core.Types.NumericField,Self:=left;));
         SimpleStats:=sort(ML_Core.FieldAggregates(ReduceToML).simple,number);
         MedianStats:=sort(ML_Core.FieldAggregates(ReduceToML).medians,number);
         self.numberofdeltas:=count(R);
         
-        Self.FileSizeReal.Min:=SimpleStats[1].minval;
-        Self.FileSizeReal.Mean:=SimpleStats[1].mean;
-        Self.FileSizeReal.Max:=SimpleStats[1].maxval;
-        Self.FileSizeReal.Median:=MedianStats[1].median;
-        Self.FileSizeReal.Q1:=(self.FileSizeReal.Min+self.FileSizeReal.Median)/2;
-        Self.FileSizeReal.Q3:=(self.FileSizeReal.Max+self.FileSizeReal.Median)/2;
-        Self.FileSizeReal.Variance:=SimpleStats[1].var;
-        Self.FileSizeReal.StDev:=SimpleStats[1].sd;
-        Self.FileSizeReal.Plus2StDev:=Self.FileSizeReal.Mean+(2*Self.FileSizeReal.StDev);
-        Self.FileSizeReal.Minus2StDev:=Self.FileSizeReal.Mean-(2*Self.FileSizeReal.StDev);
-        self.FileSizeReal.NumLessThanQ1:=count(R(number=1 and value<Self.FileSizeReal.Q1));
-        self.FileSizeReal.BtwnQ1AndQ3:=count(R(number=1 and value>=Self.FileSizeReal.Q1 and value<=Self.FileSizeReal.Q3));
-        self.FileSizeReal.NumMoreThanQ3:=count(R(number=1 and value>Self.FileSizeReal.Q3));
+        Self.Min:=SimpleStats[1].minval;
+        Self.Mean:=SimpleStats[1].mean;
+        Self.Max:=SimpleStats[1].maxval;
+        Self.Median:=MedianStats[1].median;
+        Self.Q1:=(self.Min+self.Median)/2;
+        Self.Q3:=(self.Max+self.Median)/2;
+        Self.Variance:=SimpleStats[1].var;
+        Self.StDev:=SimpleStats[1].sd;
+        Self.Plus2StDev:=Self.Mean+(2*Self.StDev);
+        Self.Minus2StDev:=Self.Mean-(2*Self.StDev);
+        self.NumLessThanQ1:=count(R(number=1 and value<Self.Q1));
+        self.BtwnQ1AndQ3:=count(R(number=1 and value>=Self.Q1 and value<=Self.Q3));
+        self.NumMoreThanQ3:=count(R(number=1 and value>Self.Q3));
         //Percent
-        Self.FileSizePerc.Min:=SimpleStats[2].minval;
-        Self.FileSizePerc.Mean:=SimpleStats[2].mean;
-        Self.FileSizePerc.Max:=SimpleStats[2].maxval;
-        self.FileSizePerc.Median:=MedianStats[2].Median;
-        Self.FileSizePerc.Q1:=(self.FileSizePerc.Min+self.FileSizePerc.Median)/2;
-        Self.FileSizePerc.Q3:=(self.FileSizePerc.Max+self.FileSizePerc.Median)/2;
-        Self.FileSizePerc.Variance:=SimpleStats[2].var;
-        Self.FileSizePerc.StDev:=SimpleStats[2].sd;
-        Self.FileSizePerc.Plus2StDev:=Self.FileSizePerc.Mean+(2*Self.FileSizePerc.StDev);
-        Self.FileSizePerc.Minus2StDev:=Self.FileSizePerc.Mean-(2*Self.FileSizePerc.StDev);
-        self.FileSizePerc.NumLessThanQ1:=count(R(number=2 and value<Self.FileSizePerc.Q1));
-        self.FileSizePerc.BtwnQ1AndQ3:=count(R(number=2 and value>=Self.FileSizePerc.Q1 and value<=Self.FileSizePerc.Q3));
-        self.FileSizePerc.NumMoreThanQ3:=count(R(number=2 and value>Self.FileSizePerc.Q3));
+        Self.Min_1:=SimpleStats[2].minval;
+        Self.Mean_6:=SimpleStats[2].mean;
+        Self.Max_5:=SimpleStats[2].maxval;
+        self.Median_3:=MedianStats[2].Median;
+        Self.Q1_2:=(self.Min_1+self.Median_3)/2;
+        Self.Q3_4:=(self.Max_5+self.Median_3)/2;
+        Self.Variance_7:=SimpleStats[2].var;
+        Self.StDev_8:=SimpleStats[2].sd;
+        Self.Plus2StDev_9:=Self.Mean_6+(2*Self.StDev_8);
+        Self.Minus2StDev_10:=Self.Mean_6-(2*Self.StDev_8);
+        self.NumLessThanQ1_11:=count(R(number=2 and value<Self.Q1_2));
+        self.BtwnQ1AndQ3_12:=count(R(number=2 and value>=Self.Q1_2 and value<=Self.Q3_4));
+        self.NumMoreThanQ3_12:=count(R(number=2 and value>Self.Q3_4));
         //Record Count Calculations
         //Real
-        Self.NumberOfRecordsReal.Min:=SimpleStats[3].minval;
-        Self.NumberOfRecordsReal.Mean:=SimpleStats[3].mean;
-        Self.NumberOfRecordsReal.Max:=SimpleStats[3].maxval;
-        Self.NumberOfRecordsReal.median:=MedianStats[3].Median;
-        Self.NumberOfRecordsReal.Q1:=(self.NumberOfRecordsReal.Min+self.NumberOfRecordsReal.Median)/2;
-        Self.NumberOfRecordsReal.Q3:=(self.NumberOfRecordsReal.Max+self.NumberOfRecordsReal.Median)/2;
-        Self.NumberOfRecordsReal.Variance:=SimpleStats[3].var;
-        Self.NumberOfRecordsReal.StDev:=SimpleStats[3].sd;
-        Self.NumberOfRecordsReal.Plus2StDev:=Self.NumberOfRecordsReal.Mean+(2*Self.NumberOfRecordsReal.StDev);
-        Self.NumberOfRecordsReal.Minus2StDev:=Self.NumberOfRecordsReal.Mean-(2*Self.NumberOfRecordsReal.StDev);
-        self.NumberOfRecordsReal.NumLessThanQ1:=count(R(number=3 and value<Self.NumberOfRecordsReal.Q1));
-        self.NumberOfRecordsReal.BtwnQ1AndQ3:=count(R(number=3 and value>=Self.NumberOfRecordsReal.Q1 and value<=Self.NumberOfRecordsReal.Q3));
-        self.NumberOfRecordsReal.NumMoreThanQ3:=count(R(number=3 and value>Self.NumberOfRecordsReal.Q3));
+        Self.Min_14:=SimpleStats[3].minval;
+        Self.Mean_19:=SimpleStats[3].mean;
+        Self.Max_18:=SimpleStats[3].maxval;
+        Self.median_16:=MedianStats[3].Median;
+        Self.Q1_15:=(self.Min_14+self.Median_16)/2;
+        Self.Q3_17:=(self.Max_18+self.Median_16)/2;
+        Self.Variance_20:=SimpleStats[3].var;
+        Self.StDev_21:=SimpleStats[3].sd;
+        Self.Plus2StDev_22:=Self.Mean_19+(2*Self.StDev_21);
+        Self.Minus2StDev_23:=Self.Mean_19-(2*Self.StDev_21);
+        self.NumLessThanQ1_24:=count(R(number=3 and value<Self.Q1_15));
+        self.BtwnQ1AndQ3_25:=count(R(number=3 and value>=Self.Q1_15 and value<=Self.Q3_17));
+        self.NumMoreThanQ3_26:=count(R(number=3 and value>Self.Q3_17));
         //Perc
-        Self.NumberOfRecordsPerc.Min:=SimpleStats[4].minval;
-        Self.NumberOfRecordsPerc.Mean:=SimpleStats[4].mean;
-        Self.NumberOfRecordsPerc.Max:=SimpleStats[4].maxval;
-        Self.NumberOfRecordsPerc.Median:=MedianStats[4].Median;
-        Self.NumberOfRecordsPerc.Q1:=(self.NumberOfRecordsPerc.Min+self.NumberOfRecordsPerc.Median)/2;
-        Self.NumberOfRecordsPerc.Q3:=(self.NumberOfRecordsPerc.Max+self.NumberOfRecordsPerc.Median)/2;
-        Self.NumberOfRecordsPerc.Variance:=SimpleStats[4].var;
-        Self.NumberOfRecordsPerc.StDev:=SimpleStats[4].sd;
-        Self.NumberOfRecordsPerc.Plus2StDev:=Self.NumberOfRecordsPerc.Mean+(2*Self.NumberOfRecordsPerc.StDev);
-        Self.NumberOfRecordsPerc.Minus2StDev:=Self.NumberOfRecordsPerc.Mean-(2*Self.NumberOfRecordsPerc.StDev);
-        self.NumberOfRecordsPerc.NumLessThanQ1:=count(R(number=4 and value<Self.NumberOfRecordsPerc.Q1));
-        self.NumberOfRecordsPerc.BtwnQ1AndQ3:=count(R(number=4 and value>=Self.NumberOfRecordsPerc.Q1 and value<=Self.NumberOfRecordsPerc.Q3));
-        self.NumberOfRecordsPerc.NumMoreThanQ3:=count(R(number=4 and value>Self.NumberOfRecordsPerc.Q3));
+        Self.Min_27:=SimpleStats[4].minval;
+        Self.Mean_32:=SimpleStats[4].mean;
+        Self.Max_31:=SimpleStats[4].maxval;
+        Self.Median_29:=MedianStats[4].Median;
+        Self.Q1_28:=(self.Min_27+self.Median_29)/2;
+        Self.Q3_30:=(self.Max_31+self.Median_29)/2;
+        Self.Variance_33:=SimpleStats[4].var;
+        Self.StDev_34:=SimpleStats[4].sd;
+        Self.Plus2StDev_35:=Self.Mean_32+(2*Self.StDev_34);
+        Self.Minus2StDev_36:=Self.Mean_32-(2*Self.StDev_34);
+        self.NumLessThanQ1_37:=count(R(number=4 and value<Self.Q1_28));
+        self.BtwnQ1AndQ3_38:=count(R(number=4 and value>=Self.Q1_28 and value<=Self.Q3_30));
+        self.NumMoreThanQ3_39:=count(R(number=4 and value>Self.Q3_30));
         Self:=L;
     END;
 
  CalculateDelta:=rollup(GroupFile,GROUP,tCalculate(left,ROWS(left)));
 
-
-PromoteSupers.Mac_SF_BuildProcess(CalculateDelta, History_Analysis.Filenames(pVersion).BaseStatistics, dsResult, 3,, True);
-
-return dsResult;
+return CalculateDelta;
 
 end;
