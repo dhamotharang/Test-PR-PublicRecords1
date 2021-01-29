@@ -1,4 +1,4 @@
-import _control, VersionControl;
+import VersionControl;
 
 export _Flags :=
 module
