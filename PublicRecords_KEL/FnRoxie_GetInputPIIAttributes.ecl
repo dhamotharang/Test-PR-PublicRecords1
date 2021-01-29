@@ -83,6 +83,8 @@ EXPORT FnRoxie_GetInputPIIAttributes(DATASET(PublicRecords_KEL.ECL_Functions.Lay
 			SELF.IPaddr := (STRING)LEFT.IPaddr,
 			SELF.IPresponse := (STRING)LEFT.IPresponse,
 			SELF.NetAcuityRoyalty := (INTEGER4)LEFT.NetAcuityRoyalty,
+			SELF.TargusRoyalty := (INTEGER4)LEFT.TargusRoyalty,
+			SELF.TargusSrc := (STRING)LEFT.TargusSrc,
 			SELF := LEFT,
 			SELF := []));
 	

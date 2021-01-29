@@ -127,6 +127,7 @@ BOOLEAN Default_IncludeMinors := TRUE;
 	#STORED('IncludeAdditionalWatchListsValue', include_additional_watchlists);
 	#STORED('Watchlists_RequestedValue', watchlists);
 	#STORED('Global_Watchlist_ThresholdValue', Global_Watchlist_Threshold);
+	#STORED('IsFCRAValue', FALSE);
 
 	// If allowed sources aren't passed in, use default list of allowed sources
 	SetAllowedSources := IF(COUNT(AllowedSourcesDataset) = 0, PublicRecords_KEL.ECL_Functions.Constants.DEFAULT_ALLOWED_SOURCES_NONFCRA, AllowedSourcesDataset);

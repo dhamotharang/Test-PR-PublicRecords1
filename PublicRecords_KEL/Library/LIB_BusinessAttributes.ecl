@@ -11,6 +11,8 @@ EXPORT LIB_BusinessAttributes(DATASET(PublicRecords_KEL.ECL_Functions.Layouts.La
 	// Nulling out stored variables to not propagate to Attributes.kel
 	#CONSTANT('NetAcuityURL', '');
 	#CONSTANT('OFACURL', '');
+	#CONSTANT('TargusURL', '');
+	#CONSTANT('IsFCRAValue', FALSE);
 	#CONSTANT('GLBPurposeValue', 0);
 	#CONSTANT('DPPAPurposeValue', 0);
 	#CONSTANT('Watchlists_RequestedValue', '');

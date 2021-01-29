@@ -109,6 +109,9 @@ STRING100 Default_data_permission_mask := '';
 	#STORED('NetAcuityURL', NetAcuityGW.url);
 	#STORED('IsFCRAValue', FALSE);
 	
+	TargusGW := GatewaysClean(STD.Str.ToLowerCase(servicename) = 'targus')[1];
+	#STORED('TargusURL', TargusGW.url);
+
 	// If allowed sources aren't passed in, use default list of allowed sources
 	SetAllowedSources := IF(COUNT(AllowedSourcesDataset) = 0, PublicRecords_KEL.ECL_Functions.Constants.DEFAULT_ALLOWED_SOURCES_NONFCRA, AllowedSourcesDataset);
 	// If a source is on the Exclude list, remove it from the allowed sources list. 

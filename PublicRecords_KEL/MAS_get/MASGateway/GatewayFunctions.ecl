@@ -29,5 +29,10 @@
 			Result := 0.84 : STORED('Global_Watchlist_ThresholdValue');
 			RETURN Result;
 		ENDMACRO;
+		
+		EXPORT GrabIsFCRA(DummyVariable = '') := FUNCTIONMACRO
+			Result := FALSE : STORED('IsFCRAValue');
+			RETURN Result;
+		ENDMACRO;
 	
 END;
