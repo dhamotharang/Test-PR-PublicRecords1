@@ -1,5 +1,5 @@
 
-import dnb_feinv2,roxiekeybuild,ut,autokey,doxie, _control;
+import dnb_feinv2,roxiekeybuild,ut,autokey,doxie;
 
 export proc_build_keys(string filedate) := function
 
