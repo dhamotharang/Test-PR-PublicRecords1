@@ -1,64 +1,99 @@
-﻿import FirstData, VersionControl,_Control, tools, STD;
+﻿IMPORT FirstData, VersionControl, tools, STD;
 
-srcCSVseparator					:=	',';
-srcCSVterminator				:=	'\\n,\\r\\n';
-srcCSVquote							:=	'"';
+srcCSVseparator := ',';
+srcCSVterminator := '\\n,\\r\\n';
+srcCSVquote := '"';
 
 
 EXPORT fSprayFiles(
+	STRING  pVersionDate = (STRING)STD.Date.Today(),
+	STRING  pServer = Constants(pVersionDate).serverIP,
+	STRING  pDir = Constants(pVersionDate).Directory + pVersionDate + '/',
+	STRING  pFilename = '*csv',
+	STRING  pContacts,
+	STRING  pGroupName = _Dataset().pGroupname,
+	BOOLEAN pIsTesting = FALSE,
+	BOOLEAN pOverwrite = TRUE,
+	STRING  pNameOutput = 'FirstData Spray Info'
+) := FUNCTION
 
-	 STRING		pVersionDate	= (STRING)STD.Date.Today()
-	,string		pServer			= Constants(pVersionDate).serverIP
-	,string		pDir				= Constants(pVersionDate).Directory + pVersionDate + '/'
-	,STRING		pFilename			=	'*csv'
-	,string		pGroupName	=	_Dataset().pGroupname
-	,boolean	pIsTesting	= FALSE
-	,BOOLEAN	pOverwrite	= TRUE	
-	,STRING		pNameOutput	=  'FirstData Spray Info'
-) :=
-function
-
-	//FirstData
+	/*
+	 * SourceIP
+	 * SourceDirectory
+	 * directory_filter
+	 * FirstData
+	 * record_size
+	 * Thor_filename_template
+	 * dSuperfilenames
+	 * fun_Groupname
+	 * FileDate
+	 * date_regex
+	 * file_type
+	 * sourceRowTagXML
+	 * sourceMaxRecordSize
+	 * sourceCsvSeparate
+	 * sourceCsvTerminate
+	 * sourceCsvQuote
+	 * compress
+	 * shouldoverwrite
+	 * ShouldSprayZeroByteFiles
+	 * ShouldSprayMultipleFilesAs1
+	 */
 	spry_raw:=DATASET([
-
-		 {pServer																// SourceIP
-		 ,pDir							                   	// SourceDirectory
-		 ,'*csv'																// directory_filter
-		 ,0																			// record_size
-		 ,Filenames(pVersionDate).input.raw.new(pVersionDate)	// Thor_filename_template
-		 ,[ {Filenames(pVersionDate).input.raw.sprayed}	]					// dSuperfilenames
-		 ,pGroupName														// fun_Groupname
-		 ,pVersionDate													// FileDate
-		 ,'[0-9]{8}' 														// date_regex
-			,'VARIABLE' 													// file_type
-			,'' 																	// sourceRowTagXML
-			,_Dataset().pMaxRecordSize		 		    // sourceMaxRecordSize
-			,srcCSVseparator 											// sourceCsvSeparate
-			,srcCSVterminator 										// sourceCsvTerminate
-			,srcCSVquote 													// sourceCsvQuote
-			,TRUE 																// compress
-			,pOverwrite 													// shouldoverwrite
-			,FALSE 																// ShouldSprayZeroByteFiles
-			,FALSE  																// ShouldSprayMultipleFilesAs1
+		{
+			pServer,
+			pDir,
+			'*csv',
+			0,
+			Filenames(pVersionDate).input.raw.new(pVersionDate),
+			[ {Filenames(pVersionDate).input.raw.sprayed}],
+			pGroupName,
+			pVersionDate,
+			'[0-9]{8}',
+			'VARIABLE',
+			'',
+			_Dataset().pMaxRecordSize,
+			srcCSVseparator,
+			srcCSVterminator,
+			srcCSVquote,
+			TRUE,
+			pOverwrite,
+			FALSE,
+			FALSE
 		}
 	], tools.Layout_Sprays.Info);
-	
-RETURN tools.fun_Spray
-				( 
-					spry_raw			// pSprayInformation
-					, 						// pSprayInfoSuperfile
-					,							// pSprayInfoLogicalfile
-					,pOverwrite 	// pOverwrite
-					,							// pReplicate
-					,TRUE					// pAddCounter
-					,pIsTesting		// pIsTesting
-					,_control.MyInfo.EmailAddressNotify + ';xia.sheng@lexisnexis.com'				// pEmailNotificationList
-					,'FirstData spray' + ' ' + pVersionDate	// pEmailSubjectDataset
-					,pNameOutput 	// pOutputName
-					,TRUE 				// pShouldClearSuperfileFirst
-					,FALSE 				// pSplitEmails
-					,FALSE 				// pShouldSprayZeroByteFiles
-					,FALSE				// pShouldSprayMultipleFilesAs1
-				);
+
+	/*
+	 * pSprayInformation
+	 * pSprayInfoSuperfile
+	 * pSprayInfoLogicalfile
+	 * pOverwrite
+	 * pReplicate
+	 * pAddCounter
+	 * pIsTesting
+	 * pEmailNotificationList
+	 * pEmailSubjectDataset
+	 * pOutputName
+	 * pShouldClearSuperfileFirst
+	 * pSplitEmails
+	 * pShouldSprayZeroByteFiles
+	 * pShouldSprayMultipleFilesAs1
+	 */
+	RETURN tools.fun_Spray ( 
+		spry_raw,
+		,
+		,
+		pOverwrite,
+		,
+		TRUE,
+		pIsTesting,
+		pContacts,
+		'FirstData spray' + ' ' + pVersionDate,
+		pNameOutput,
+		TRUE,
+		FALSE,
+		FALSE,
+		FALSE
+	);
 
 END;
