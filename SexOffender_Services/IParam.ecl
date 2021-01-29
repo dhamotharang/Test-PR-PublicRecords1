@@ -2,36 +2,37 @@
 
 EXPORT IParam := MODULE
   
-  export ids_params := interface(AutoKeyI.AutoKeyStandardFetchBaseInterface,
-                                AutoStandardI.InterfaceTranslator.location_value.params,
-                                AutoStandardI.InterfaceTranslator.SearchAroundAddress_value.params)
-    export boolean workHard   := true;
-    export boolean noFail     := false;
-    export boolean isdeepDive := false;
-    export boolean noDeepDive      := false;
-    export unsigned2 MAX_DEEP_DIDS := 100;
-    export boolean zip_only_search := false;
-  end;
+  EXPORT ids_params := INTERFACE(
+    AutoKeyI.AutoKeyStandardFetchBaseInterface,
+    AutoStandardI.InterfaceTranslator.location_value.params,
+    AutoStandardI.InterfaceTranslator.SearchAroundAddress_value.params
+    )
+    EXPORT BOOLEAN workHard := TRUE;
+    EXPORT BOOLEAN noFail := FALSE;
+    EXPORT BOOLEAN isdeepDive := FALSE;
+    EXPORT BOOLEAN noDeepDive := FALSE;
+    EXPORT UNSIGNED2 MAX_DEEP_DIDS := 100;
+    EXPORT BOOLEAN zip_only_search := FALSE;
+  END;
   
   //should we keep this separated or merge it into search_params...?
-  export functions_params := interface
-    (
-    doxie.IDataAccess,      
+  EXPORT functions_params := INTERFACE(
+    doxie.IDataAccess,
     AutoStandardI.InterfaceTranslator.location_value.params
     )
-    export boolean include_regaddrs   := false;
-    export boolean include_unregaddrs := false;
-    export boolean include_histaddrs  := false;
-    export boolean include_assocaddrs := false;
-    export boolean include_offenses := false;
-    export boolean include_bestaddress := false;
-    export boolean include_wealsofound := false;
-    export string offenseCategory := '' ;
-    export boolean filterRecsByAltAddr := false;
-  end;
+    EXPORT BOOLEAN include_regaddrs := FALSE;
+    EXPORT BOOLEAN include_unregaddrs := FALSE;
+    EXPORT BOOLEAN include_histaddrs := FALSE;
+    EXPORT BOOLEAN include_assocaddrs := FALSE;
+    EXPORT BOOLEAN include_offenses := FALSE;
+    EXPORT BOOLEAN include_bestaddress := FALSE;
+    EXPORT BOOLEAN include_wealsofound := FALSE;
+    EXPORT STRING offenseCategory := '' ;
+    EXPORT BOOLEAN filterRecsByAltAddr := FALSE;
+  END;
   
-  export search := interface(
-    doxie.IDataAccess, //already included in functions_params, but I want it to be explicit
+  EXPORT search := INTERFACE(
+    doxie.IDataAccess, //already included IN functions_params, but I want it to be explicit
     ids_params,
     functions_params,
     AutoStandardI.LIBIN.PenaltyI_Indv.base,
@@ -39,22 +40,22 @@ EXPORT IParam := MODULE
     AutoStandardI.InterfaceTranslator.SearchAroundAddress_value.params,
     FCRA.iRules
     ) // FFD FCRA
-    EXPORT string DataPermissionMask := AutoStandardI.Constants.DataPermissionMask_default; //INTERFACES: different definitions in base modules
-    export boolean  Include_BestAddress  := false;
-    export STRING offenseCategory := '';
-    export STRING SmtWords := '';
-  end;
+    EXPORT STRING DataPermissionMask := AutoStandardI.Constants.DataPermissionMask_default; //INTERFACES: different definitions IN base modules
+    EXPORT BOOLEAN Include_BestAddress := FALSE;
+    EXPORT STRING offenseCategory := '';
+    EXPORT STRING SmtWords := '';
+  END;
       
-  export report := interface(
+  EXPORT report := INTERFACE(
     doxie.IDataAccess,
     FCRA.iRules) // FFD FCRA
-    export string60  Primary_Key  := '';
-    export string14 did;
-    export boolean AllowGraphicDescription := false;
-    export boolean Include_BestAddress := false;
-  end;
+    EXPORT STRING60 Primary_Key := '';
+    EXPORT STRING14 did;
+    EXPORT BOOLEAN AllowGraphicDescription := FALSE;
+    EXPORT BOOLEAN Include_BestAddress := FALSE;
+  END;
 
-  export batch_params := INTERFACE (BatchShare.IParam.BatchParams, FCRA.iRules)
-  end;
+  EXPORT batch_params := INTERFACE (BatchShare.IParam.BatchParams, FCRA.iRules)
+  END;
   
 END;

@@ -4,25 +4,25 @@
 // For the complete list of input parameters please check published WU.
 // Look at the history of this attribute for the old SOAP info.
 // =====================================================================
-import AutoStandardI, iesp, ut, Address, FFD, STD;
+IMPORT AutoStandardI, iesp, ut, Address, FFD, STD;
 
-export SearchServiceFCRA := macro
+EXPORT SearchServiceFCRA := MACRO
 
-  #onwarning(4207, ignore);
-  boolean isFCRA := true;
-  #constant('NoDeepDive', true);
-  #constant('DidOnly', true); // for picklist
+  #ONWARNING(4207, ignore);
+  BOOLEAN isFCRA := TRUE;
+  #CONSTANT('NoDeepDive', TRUE);
+  #CONSTANT('DidOnly', TRUE); // for picklist
 
   // Get XML input
   rec_in := iesp.sexualoffender_fcra.t_FcraSexOffenderSearchRequest;
   ds_in := DATASET ([], rec_in) : STORED ('FcraSexOffenderSearchRequest', FEW);
-  first_row := ds_in[1] : independent;
-  search_by := global (first_row.SearchBy);
+  first_row := ds_in[1] : INDEPENDENT;
+  search_by := GLOBAL (first_row.SearchBy);
 
   // This will set Name, Address, SSN, DID and DOB
   // NOTE: Even though the ECL2ESP function used below is named SetInputReportBy,
   // it can also be used to set certain search_by fields.
-  report_by := ROW (search_by, transform (iesp.bpsreport.t_BpsReportBy, Self := Left; Self := []));
+  report_by := ROW (search_by, TRANSFORM (iesp.bpsreport.t_BpsReportBy, SELF := LEFT; SELF := []));
   iesp.ECL2ESP.SetInputReportBy (report_by);
 
   // set options
@@ -30,11 +30,11 @@ export SearchServiceFCRA := macro
   iesp.ECL2ESP.Marshall.Mac_Set (first_row.Options);
 
   // set main search criteria:
-  iesp.ECL2ESP.SetInputSearchOptions (Project(first_row.options,TRANSFORM(iesp.share.t_BaseSearchOptionEx,SELF := LEFT)));
+  iesp.ECL2ESP.SetInputSearchOptions (PROJECT(first_row.options,TRANSFORM(iesp.share.t_BaseSearchOptionEx,SELF := LEFT)));
 
   // store search options not handled by iesp.ECL2ESP
-  search_options := global (first_row.Options);
-  #stored ('IncludeOffenses', search_options.IncludeOffenses);
+  search_options := GLOBAL (first_row.Options);
+  #STORED ('IncludeOffenses', search_options.IncludeOffenses);
   // NOTE: Input options fields for ReturnHashes and srch_hashvals only come in as SOAP
   // fields, not as part of the OffenderSearchRequest XML input dataset.
   // This is because that is how things are currently handled for other products with Alerts
@@ -54,44 +54,44 @@ export SearchServiceFCRA := macro
   input_params := AutoStandardI.GlobalModule(isFCRA);
   mod_access := doxie.compliance.GetGlobalDataAccessModuleTranslated(input_params);
 
-  tempmod := module(project(input_params,SexOffender_Services.IParam.search,opt));
+  tempmod := MODULE(PROJECT(input_params,SexOffender_Services.IParam.search,OPT));
     doxie.compliance.MAC_CopyModAccessValues(mod_access);
     // Store soap/xml input fields unique to SexOffender SearchService into unique
     // attribute names to be passed into SexOffender_Services.Search_Records, etc.
-    export boolean include_regaddrs     := false : stored('IncludeRegisteredAddresses');
-    export boolean include_unregaddrs   := false : stored('IncludeUnregisteredAddresses');
-    export boolean include_histaddrs    := false : stored('IncludeHistoricalAddresses');
-    export boolean include_assocaddrs   := false : stored('IncludeAssociatedAddresses');
-    export boolean include_offenses     := false : stored('IncludeOffenses');
-    export boolean include_bestaddress  := false : stored('IncludeBestAddress');
-    export boolean include_wealsofound  := false : stored('IncludeWeAlsoFound');
-    export STRING  offenseCategory      := '' : stored('OffenseCategory');
-    string smt                          := '' : stored('ScarsMarksTattoos');
-    export STRING  SmtWords             := STD.Str.ToUpperCase(smt);
-    EXPORT string14 did                 := rdid;
-    export boolean zip_only_search := false;
-    export integer8 FFDOptionsMask := FFD.FFDMask.Get(first_row.options.FFDOptionsMask);
-    export integer FCRAPurpose := FCRA.FCRAPurpose.Get(first_row.options.FCRAPurpose);
-  end;
+    EXPORT BOOLEAN include_regaddrs := FALSE : STORED('IncludeRegisteredAddresses');
+    EXPORT BOOLEAN include_unregaddrs := FALSE : STORED('IncludeUnregisteredAddresses');
+    EXPORT BOOLEAN include_histaddrs := FALSE : STORED('IncludeHistoricalAddresses');
+    EXPORT BOOLEAN include_assocaddrs := FALSE : STORED('IncludeAssociatedAddresses');
+    EXPORT BOOLEAN include_offenses := FALSE : STORED('IncludeOffenses');
+    EXPORT BOOLEAN include_bestaddress := FALSE : STORED('IncludeBestAddress');
+    EXPORT BOOLEAN include_wealsofound := FALSE : STORED('IncludeWeAlsoFound');
+    EXPORT STRING offenseCategory := '' : STORED('OffenseCategory');
+    STRING smt := '' : STORED('ScarsMarksTattoos');
+    EXPORT STRING SmtWords := STD.Str.ToUpperCase(smt);
+    EXPORT STRING14 did := rdid;
+    EXPORT BOOLEAN zip_only_search := FALSE;
+    EXPORT INTEGER8 FFDOptionsMask := FFD.FFDMask.Get(first_row.options.FFDOptionsMask);
+    EXPORT INTEGER FCRAPurpose := FCRA.FCRAPurpose.Get(first_row.options.FCRAPurpose);
+  END;
   tempresults := SexOffender_Services.Search_Records.fcra_val(tempmod);
 
-	input_consumer := FFD.MAC.PrepareConsumerRecord(rdid, true, search_by);
+  input_consumer := FFD.MAC.PrepareConsumerRecord(rdid, TRUE, search_by);
 
   // Determine center point of a radius search (when applicable)
-  lv := AutoStandardI.InterfaceTranslator.location_value.val(project(tempmod,AutoStandardI.InterfaceTranslator.location_value.params));
-  sv := AutoStandardI.InterfaceTranslator.SearchAroundAddress_value.val(project(tempmod,AutoStandardI.InterfaceTranslator.SearchAroundAddress_value.params));
-  dsSearchAround := if(
+  lv := AutoStandardI.InterfaceTranslator.location_value.val(PROJECT(tempmod,AutoStandardI.InterfaceTranslator.location_value.params));
+  sv := AutoStandardI.InterfaceTranslator.SearchAroundAddress_value.val(PROJECT(tempmod,AutoStandardI.InterfaceTranslator.SearchAroundAddress_value.params));
+  dsSearchAround := IF(
     sv,
-    dataset([{lv.latitude, lv.longitude, lv.geo_match, Address.geo_desc(lv.geo_match)}], iesp.share.t_GeoLocationMatch),
-    dataset([], iesp.share.t_GeoLocationMatch)
+    DATASET([{lv.latitude, lv.longitude, lv.geo_match, Address.geo_desc(lv.geo_match)}], iesp.share.t_GeoLocationMatch),
+    DATASET([], iesp.share.t_GeoLocationMatch)
   );
 
   // Convert to output layout, with pagination
   iesp.ECL2ESP.Marshall.MAC_Marshall_Results(tempresults.records, results, iesp.sexualoffender_fcra.t_FcraSexOffenderSearchResponse,
-                                             Records, false, RecordCount, SearchAroundInput, dsSearchAround);
+                                             Records, FALSE, RecordCount, SearchAroundInput, dsSearchAround);
 
   FFD.MAC.AppendConsumerAlertsAndStatements(results, out_results, tempresults.Statements, tempresults.ConsumerAlerts, input_consumer, iesp.sexualoffender_fcra.t_FcraSexOffenderSearchResponse);
 
-  output(out_results,named('Results'));
+  OUTPUT(out_results,NAMED('Results'));
 
-endmacro;
+ENDMACRO;
