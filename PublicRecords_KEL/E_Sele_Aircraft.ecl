@@ -3,7 +3,7 @@ IMPORT KEL15 AS KEL;
 IMPORT PublicRecords_KEL;
 IMPORT CFG_Compile,E_Aircraft,E_Business_Org,E_Business_Sele,E_Business_Sele_Overflow,E_Business_Ult FROM PublicRecords_KEL;
 IMPORT * FROM KEL15.Null;
-EXPORT E_Sele_Aircraft(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG_Compile __cfg = CFG_Compile) := MODULE
+EXPORT E_Sele_Aircraft(CFG_Compile __cfg = CFG_Compile) := MODULE
   EXPORT Typ := KEL.typ.uid;
   EXPORT InLayout := RECORD
     KEL.typ.ntyp(E_Business_Sele().Typ) Legal_;
@@ -29,24 +29,43 @@ EXPORT E_Sele_Aircraft(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG
   SHARED __Mapping := 'Legal_(DEFAULT:Legal_:0),Plane_(DEFAULT:Plane_:0),ultid(DEFAULT:Ult_I_D_:0),orgid(DEFAULT:Org_I_D_:0),seleid(DEFAULT:Sele_I_D_:0),nnumber(DEFAULT:N_Number_:\'\'),registranttype(DEFAULT:Registrant_Type_:0),fractionalowner(DEFAULT:Fractional_Owner_:\'\'),certificateissuedate(DEFAULT:Certificate_Issue_Date_:DATE),certification(DEFAULT:Certification_:\'\'),source(DEFAULT:Source_:\'\'),archive_date(DEFAULT:Archive___Date_:EPOCH),datefirstseen(DEFAULT:Date_First_Seen_:EPOCH),datelastseen(DEFAULT:Date_Last_Seen_:EPOCH),hybridarchivedate(DEFAULT:Hybrid_Archive_Date_:EPOCH),vaultdatelastseen(DEFAULT:Vault_Date_Last_Seen_:EPOCH)';
   SHARED Certificate_Issue_Date_0Rule(STRING a) := MAP(KEL.Routines.IsValidDate((KEL.typ.kdate)(a[1..8]))=>a[1..8],KEL.Routines.IsValidDate((KEL.typ.kdate)(a[1..6]+'01'))=>a[1..6]+'01',KEL.Routines.IsValidDate((KEL.typ.kdate)(a[1..4]+'0101'))=>a[1..4]+'0101','0');
   SHARED Date_Last_Seen_0Rule(STRING a) := MAP(KEL.Routines.IsValidDate((KEL.typ.kdate)(a[1..8]))=>a[1..8],KEL.Routines.IsValidDate((KEL.typ.kdate)(a[1..6]+'01'))=>a[1..6]+'01',KEL.Routines.IsValidDate((KEL.typ.kdate)(a[1..4]+'0101'))=>a[1..4]+'0101','0');
-  SHARED __Mapping0 := 'Legal_(DEFAULT:Legal_:0),Plane_(DEFAULT:Plane_:0),ultid(OVERRIDE:Ult_I_D_:0),orgid(OVERRIDE:Org_I_D_:0),seleid(OVERRIDE:Sele_I_D_:0),n_number(OVERRIDE:N_Number_:\'\'),type_registrant(OVERRIDE:Registrant_Type_:0),fract_owner(OVERRIDE:Fractional_Owner_:\'\'),cert_issue_date(OVERRIDE:Certificate_Issue_Date_:DATE:Certificate_Issue_Date_0Rule),certification(OVERRIDE:Certification_:\'\'),src(OVERRIDE:Source_:\'\'),archive_date(OVERRIDE:Archive___Date_:EPOCH),date_first_seen(OVERRIDE:Date_First_Seen_:EPOCH),date_last_seen(OVERRIDE:Date_Last_Seen_:EPOCH:Date_Last_Seen_0Rule),hybridarchivedate(DEFAULT:Hybrid_Archive_Date_:EPOCH),vaultdatelastseen(DEFAULT:Vault_Date_Last_Seen_:EPOCH),DPMBitmap(OVERRIDE:__Permits:PERMITS)';
-  SHARED __d0_Norm := NORMALIZE(__in,LEFT.Dataset_FAA__key_aircraft_linkids,TRANSFORM(RECORDOF(__in.Dataset_FAA__key_aircraft_linkids),SELF:=RIGHT));
-  EXPORT __d0_KELfiltered := __d0_Norm((UNSIGNED)ultid<>0 AND (UNSIGNED)orgid<>0 AND (UNSIGNED)seleid<>0);
+  SHARED Hybrid_Archive_Date_0Rule(STRING a) := MAP(KEL.Routines.IsValidDate((KEL.typ.kdate)(a[1..6]+'01'))=>a[1..6]+'01','0');
+  SHARED __Mapping0 := 'Legal_(DEFAULT:Legal_:0),Plane_(DEFAULT:Plane_:0),ultid(OVERRIDE:Ult_I_D_:0),orgid(OVERRIDE:Org_I_D_:0),seleid(OVERRIDE:Sele_I_D_:0),n_number(OVERRIDE:N_Number_:\'\'),type_registrant(OVERRIDE:Registrant_Type_:0),fract_owner(OVERRIDE:Fractional_Owner_:\'\'),cert_issue_date(OVERRIDE:Certificate_Issue_Date_:DATE:Certificate_Issue_Date_0Rule),certification(OVERRIDE:Certification_:\'\'),src(OVERRIDE:Source_:\'\'),archive_date(OVERRIDE:Archive___Date_:EPOCH),date_first_seen(OVERRIDE:Date_First_Seen_:EPOCH),date_last_seen(OVERRIDE:Date_Last_Seen_:EPOCH:Date_Last_Seen_0Rule),hybrid_archive_date(OVERRIDE:Hybrid_Archive_Date_:EPOCH:Hybrid_Archive_Date_0Rule),vaultdatelastseen(DEFAULT:Vault_Date_Last_Seen_:EPOCH),DPMBitmap(OVERRIDE:__Permits:PERMITS)';
+  EXPORT __d0_KELfiltered := PublicRecords_KEL.Files.NonFCRA.FAA__Key_Aircraft_Id_Vault((UNSIGNED)ultid<>0 AND (UNSIGNED)orgid<>0 AND (UNSIGNED)seleid<>0);
   SHARED __d0_Legal__Layout := RECORD
     RECORDOF(__d0_KELfiltered);
     KEL.typ.uid Legal_;
   END;
-  SHARED __d0_Missing_Legal__UIDComponents := KEL.Intake.ConstructMissingFieldList(__d0_KELfiltered,'ultid,orgid,seleid','__in');
-  SHARED __d0_Legal__Mapped := IF(__d0_Missing_Legal__UIDComponents = 'ultid,orgid,seleid',PROJECT(__d0_KELfiltered,TRANSFORM(__d0_Legal__Layout,SELF.Legal_:=0,SELF:=LEFT)),JOIN(KEL.Intake.AppendFields(__d0_KELfiltered,__d0_Missing_Legal__UIDComponents),E_Business_Sele(__in,__cfg).Lookup,TRIM((STRING)LEFT.ultid) + '|' + TRIM((STRING)LEFT.orgid) + '|' + TRIM((STRING)LEFT.seleid) = RIGHT.KeyVal,TRANSFORM(__d0_Legal__Layout,SELF.Legal_:=RIGHT.UID,SELF:=LEFT),LEFT OUTER,SMART));
+  SHARED __d0_Missing_Legal__UIDComponents := KEL.Intake.ConstructMissingFieldList(__d0_KELfiltered,'ultid,orgid,seleid','PublicRecords_KEL.Files.NonFCRA.FAA__Key_Aircraft_Id_Vault');
+  SHARED __d0_Legal__Mapped := IF(__d0_Missing_Legal__UIDComponents = 'ultid,orgid,seleid',PROJECT(__d0_KELfiltered,TRANSFORM(__d0_Legal__Layout,SELF.Legal_:=0,SELF:=LEFT)),JOIN(KEL.Intake.AppendFields(__d0_KELfiltered,__d0_Missing_Legal__UIDComponents),E_Business_Sele(__cfg).Lookup,TRIM((STRING)LEFT.ultid) + '|' + TRIM((STRING)LEFT.orgid) + '|' + TRIM((STRING)LEFT.seleid) = RIGHT.KeyVal,TRANSFORM(__d0_Legal__Layout,SELF.Legal_:=RIGHT.UID,SELF:=LEFT),LEFT OUTER,SMART));
   SHARED __d0_Plane__Layout := RECORD
     RECORDOF(__d0_Legal__Mapped);
     KEL.typ.uid Plane_;
   END;
-  SHARED __d0_Missing_Plane__UIDComponents := KEL.Intake.ConstructMissingFieldList(__d0_Legal__Mapped,'n_number','__in');
-  SHARED __d0_Plane__Mapped := IF(__d0_Missing_Plane__UIDComponents = 'n_number',PROJECT(__d0_Legal__Mapped,TRANSFORM(__d0_Plane__Layout,SELF.Plane_:=0,SELF:=LEFT)),JOIN(KEL.Intake.AppendFields(__d0_Legal__Mapped,__d0_Missing_Plane__UIDComponents),E_Aircraft(__in,__cfg).Lookup,TRIM((STRING)LEFT.n_number) = RIGHT.KeyVal,TRANSFORM(__d0_Plane__Layout,SELF.Plane_:=RIGHT.UID,SELF:=LEFT),LEFT OUTER,SMART));
+  SHARED __d0_Missing_Plane__UIDComponents := KEL.Intake.ConstructMissingFieldList(__d0_Legal__Mapped,'n_number','PublicRecords_KEL.Files.NonFCRA.FAA__Key_Aircraft_Id_Vault');
+  SHARED __d0_Plane__Mapped := IF(__d0_Missing_Plane__UIDComponents = 'n_number',PROJECT(__d0_Legal__Mapped,TRANSFORM(__d0_Plane__Layout,SELF.Plane_:=0,SELF:=LEFT)),JOIN(KEL.Intake.AppendFields(__d0_Legal__Mapped,__d0_Missing_Plane__UIDComponents),E_Aircraft(__cfg).Lookup,TRIM((STRING)LEFT.n_number) = RIGHT.KeyVal,TRANSFORM(__d0_Plane__Layout,SELF.Plane_:=RIGHT.UID,SELF:=LEFT),LEFT OUTER,SMART));
   SHARED __d0_Prefiltered := __d0_Plane__Mapped;
-  SHARED __d0 := __SourceFilter(KEL.FromFlat.Convert(__d0_Prefiltered,InLayout,__Mapping0,'PublicRecords_KEL.ECL_Functions.Dataset_FDC'));
-  EXPORT InData := __d0;
+  SHARED __d0 := __SourceFilter(KEL.FromFlat.Convert(__d0_Prefiltered,InLayout,__Mapping0,'PublicRecords_KEL.Files.NonFCRA.FAA__Key_Aircraft_Id_Vault'));
+  SHARED Certificate_Issue_Date_1Rule(STRING a) := MAP(KEL.Routines.IsValidDate((KEL.typ.kdate)(a[1..8]))=>a[1..8],KEL.Routines.IsValidDate((KEL.typ.kdate)(a[1..6]+'01'))=>a[1..6]+'01',KEL.Routines.IsValidDate((KEL.typ.kdate)(a[1..4]+'0101'))=>a[1..4]+'0101','0');
+  SHARED Date_Last_Seen_1Rule(STRING a) := MAP(KEL.Routines.IsValidDate((KEL.typ.kdate)(a[1..8]))=>a[1..8],KEL.Routines.IsValidDate((KEL.typ.kdate)(a[1..6]+'01'))=>a[1..6]+'01',KEL.Routines.IsValidDate((KEL.typ.kdate)(a[1..4]+'0101'))=>a[1..4]+'0101','0');
+  SHARED Hybrid_Archive_Date_1Rule(STRING a) := MAP(KEL.Routines.IsValidDate((KEL.typ.kdate)(a[1..6]+'01'))=>a[1..6]+'01','0');
+  SHARED __Mapping1 := 'Legal_(DEFAULT:Legal_:0),Plane_(DEFAULT:Plane_:0),ultid(OVERRIDE:Ult_I_D_:0),orgid(OVERRIDE:Org_I_D_:0),seleid(OVERRIDE:Sele_I_D_:0),n_number(OVERRIDE:N_Number_:\'\'),type_registrant(OVERRIDE:Registrant_Type_:0),fract_owner(OVERRIDE:Fractional_Owner_:\'\'),cert_issue_date(OVERRIDE:Certificate_Issue_Date_:DATE:Certificate_Issue_Date_1Rule),certification(OVERRIDE:Certification_:\'\'),src(OVERRIDE:Source_:\'\'),archive_date(OVERRIDE:Archive___Date_:EPOCH),date_first_seen(OVERRIDE:Date_First_Seen_:EPOCH),date_last_seen(OVERRIDE:Date_Last_Seen_:EPOCH:Date_Last_Seen_1Rule),hybrid_archive_date(OVERRIDE:Hybrid_Archive_Date_:EPOCH:Hybrid_Archive_Date_1Rule),vaultdatelastseen(DEFAULT:Vault_Date_Last_Seen_:EPOCH),DPMBitmap(OVERRIDE:__Permits:PERMITS)';
+  EXPORT __d1_KELfiltered := PublicRecords_KEL.Files.NonFCRA.FAA__key_aircraft_linkids_Vault((UNSIGNED)ultid<>0 AND (UNSIGNED)orgid<>0 AND (UNSIGNED)seleid<>0);
+  SHARED __d1_Legal__Layout := RECORD
+    RECORDOF(__d1_KELfiltered);
+    KEL.typ.uid Legal_;
+  END;
+  SHARED __d1_Missing_Legal__UIDComponents := KEL.Intake.ConstructMissingFieldList(__d1_KELfiltered,'ultid,orgid,seleid','PublicRecords_KEL.Files.NonFCRA.FAA__key_aircraft_linkids_Vault');
+  SHARED __d1_Legal__Mapped := IF(__d1_Missing_Legal__UIDComponents = 'ultid,orgid,seleid',PROJECT(__d1_KELfiltered,TRANSFORM(__d1_Legal__Layout,SELF.Legal_:=0,SELF:=LEFT)),JOIN(KEL.Intake.AppendFields(__d1_KELfiltered,__d1_Missing_Legal__UIDComponents),E_Business_Sele(__cfg).Lookup,TRIM((STRING)LEFT.ultid) + '|' + TRIM((STRING)LEFT.orgid) + '|' + TRIM((STRING)LEFT.seleid) = RIGHT.KeyVal,TRANSFORM(__d1_Legal__Layout,SELF.Legal_:=RIGHT.UID,SELF:=LEFT),LEFT OUTER,SMART));
+  SHARED __d1_Plane__Layout := RECORD
+    RECORDOF(__d1_Legal__Mapped);
+    KEL.typ.uid Plane_;
+  END;
+  SHARED __d1_Missing_Plane__UIDComponents := KEL.Intake.ConstructMissingFieldList(__d1_Legal__Mapped,'n_number','PublicRecords_KEL.Files.NonFCRA.FAA__key_aircraft_linkids_Vault');
+  SHARED __d1_Plane__Mapped := IF(__d1_Missing_Plane__UIDComponents = 'n_number',PROJECT(__d1_Legal__Mapped,TRANSFORM(__d1_Plane__Layout,SELF.Plane_:=0,SELF:=LEFT)),JOIN(KEL.Intake.AppendFields(__d1_Legal__Mapped,__d1_Missing_Plane__UIDComponents),E_Aircraft(__cfg).Lookup,TRIM((STRING)LEFT.n_number) = RIGHT.KeyVal,TRANSFORM(__d1_Plane__Layout,SELF.Plane_:=RIGHT.UID,SELF:=LEFT),LEFT OUTER,SMART));
+  SHARED __d1_Prefiltered := __d1_Plane__Mapped;
+  SHARED __d1 := __SourceFilter(KEL.FromFlat.Convert(__d1_Prefiltered,InLayout,__Mapping1,'PublicRecords_KEL.Files.NonFCRA.FAA__key_aircraft_linkids_Vault'));
+  EXPORT InData := __d0 + __d1;
   EXPORT Registration_Details_Layout := RECORD
     KEL.typ.nint Registrant_Type_;
     KEL.typ.nstr Fractional_Owner_;
@@ -111,25 +130,41 @@ EXPORT E_Sele_Aircraft(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG
   EXPORT __PreResult := ROLLUP(HAVING(Sele_Aircraft_Group,COUNT(ROWS(LEFT))=1),GROUP,Sele_Aircraft__Single_Rollup(LEFT)) + ROLLUP(HAVING(Sele_Aircraft_Group,COUNT(ROWS(LEFT))>1),GROUP,Sele_Aircraft__Rollup(LEFT, ROWS(LEFT)));
   EXPORT __Result := __CLEARFLAGS(__PreResult);
   EXPORT Result := __UNWRAP(__Result);
-  EXPORT Legal__Orphan := JOIN(InData(__NN(Legal_)),E_Business_Sele(__in,__cfg).__Result,__EEQP(LEFT.Legal_, RIGHT.UID),TRANSFORM(InLayout,SELF := LEFT,SELF:=[]),LEFT ONLY, HASH);
-  EXPORT Plane__Orphan := JOIN(InData(__NN(Plane_)),E_Aircraft(__in,__cfg).__Result,__EEQP(LEFT.Plane_, RIGHT.UID),TRANSFORM(InLayout,SELF := LEFT,SELF:=[]),LEFT ONLY, HASH);
+  EXPORT Legal__Orphan := JOIN(InData(__NN(Legal_)),E_Business_Sele(__cfg).__Result,__EEQP(LEFT.Legal_, RIGHT.UID),TRANSFORM(InLayout,SELF := LEFT,SELF:=[]),LEFT ONLY, HASH);
+  EXPORT Plane__Orphan := JOIN(InData(__NN(Plane_)),E_Aircraft(__cfg).__Result,__EEQP(LEFT.Plane_, RIGHT.UID),TRANSFORM(InLayout,SELF := LEFT,SELF:=[]),LEFT ONLY, HASH);
   EXPORT SanityCheck := DATASET([{COUNT(Legal__Orphan),COUNT(Plane__Orphan)}],{KEL.typ.int Legal__Orphan,KEL.typ.int Plane__Orphan});
   EXPORT NullCounts := DATASET([
-    {'SeleAircraft','PublicRecords_KEL.ECL_Functions.Dataset_FDC','Legal',COUNT(__d0(__NL(Legal_))),COUNT(__d0(__NN(Legal_)))},
-    {'SeleAircraft','PublicRecords_KEL.ECL_Functions.Dataset_FDC','Plane',COUNT(__d0(__NL(Plane_))),COUNT(__d0(__NN(Plane_)))},
-    {'SeleAircraft','PublicRecords_KEL.ECL_Functions.Dataset_FDC','ultid',COUNT(__d0(__NL(Ult_I_D_))),COUNT(__d0(__NN(Ult_I_D_)))},
-    {'SeleAircraft','PublicRecords_KEL.ECL_Functions.Dataset_FDC','orgid',COUNT(__d0(__NL(Org_I_D_))),COUNT(__d0(__NN(Org_I_D_)))},
-    {'SeleAircraft','PublicRecords_KEL.ECL_Functions.Dataset_FDC','seleid',COUNT(__d0(__NL(Sele_I_D_))),COUNT(__d0(__NN(Sele_I_D_)))},
-    {'SeleAircraft','PublicRecords_KEL.ECL_Functions.Dataset_FDC','n_number',COUNT(__d0(__NL(N_Number_))),COUNT(__d0(__NN(N_Number_)))},
-    {'SeleAircraft','PublicRecords_KEL.ECL_Functions.Dataset_FDC','type_registrant',COUNT(__d0(__NL(Registrant_Type_))),COUNT(__d0(__NN(Registrant_Type_)))},
-    {'SeleAircraft','PublicRecords_KEL.ECL_Functions.Dataset_FDC','fract_owner',COUNT(__d0(__NL(Fractional_Owner_))),COUNT(__d0(__NN(Fractional_Owner_)))},
-    {'SeleAircraft','PublicRecords_KEL.ECL_Functions.Dataset_FDC','cert_issue_date',COUNT(__d0(__NL(Certificate_Issue_Date_))),COUNT(__d0(__NN(Certificate_Issue_Date_)))},
-    {'SeleAircraft','PublicRecords_KEL.ECL_Functions.Dataset_FDC','certification',COUNT(__d0(__NL(Certification_))),COUNT(__d0(__NN(Certification_)))},
-    {'SeleAircraft','PublicRecords_KEL.ECL_Functions.Dataset_FDC','Src',COUNT(__d0(__NL(Source_))),COUNT(__d0(__NN(Source_)))},
-    {'SeleAircraft','PublicRecords_KEL.ECL_Functions.Dataset_FDC','Archive_Date',COUNT(__d0(Archive___Date_=0)),COUNT(__d0(Archive___Date_!=0))},
-    {'SeleAircraft','PublicRecords_KEL.ECL_Functions.Dataset_FDC','DateFirstSeen',COUNT(__d0(Date_First_Seen_=0)),COUNT(__d0(Date_First_Seen_!=0))},
-    {'SeleAircraft','PublicRecords_KEL.ECL_Functions.Dataset_FDC','DateLastSeen',COUNT(__d0(Date_Last_Seen_=0)),COUNT(__d0(Date_Last_Seen_!=0))},
-    {'SeleAircraft','PublicRecords_KEL.ECL_Functions.Dataset_FDC','HybridArchiveDate',COUNT(__d0(Hybrid_Archive_Date_=0)),COUNT(__d0(Hybrid_Archive_Date_!=0))},
-    {'SeleAircraft','PublicRecords_KEL.ECL_Functions.Dataset_FDC','VaultDateLastSeen',COUNT(__d0(Vault_Date_Last_Seen_=0)),COUNT(__d0(Vault_Date_Last_Seen_!=0))}]
+    {'SeleAircraft','PublicRecords_KEL.Files.NonFCRA.FAA__Key_Aircraft_Id_Vault','Legal',COUNT(__d0(__NL(Legal_))),COUNT(__d0(__NN(Legal_)))},
+    {'SeleAircraft','PublicRecords_KEL.Files.NonFCRA.FAA__Key_Aircraft_Id_Vault','Plane',COUNT(__d0(__NL(Plane_))),COUNT(__d0(__NN(Plane_)))},
+    {'SeleAircraft','PublicRecords_KEL.Files.NonFCRA.FAA__Key_Aircraft_Id_Vault','ultid',COUNT(__d0(__NL(Ult_I_D_))),COUNT(__d0(__NN(Ult_I_D_)))},
+    {'SeleAircraft','PublicRecords_KEL.Files.NonFCRA.FAA__Key_Aircraft_Id_Vault','orgid',COUNT(__d0(__NL(Org_I_D_))),COUNT(__d0(__NN(Org_I_D_)))},
+    {'SeleAircraft','PublicRecords_KEL.Files.NonFCRA.FAA__Key_Aircraft_Id_Vault','seleid',COUNT(__d0(__NL(Sele_I_D_))),COUNT(__d0(__NN(Sele_I_D_)))},
+    {'SeleAircraft','PublicRecords_KEL.Files.NonFCRA.FAA__Key_Aircraft_Id_Vault','n_number',COUNT(__d0(__NL(N_Number_))),COUNT(__d0(__NN(N_Number_)))},
+    {'SeleAircraft','PublicRecords_KEL.Files.NonFCRA.FAA__Key_Aircraft_Id_Vault','type_registrant',COUNT(__d0(__NL(Registrant_Type_))),COUNT(__d0(__NN(Registrant_Type_)))},
+    {'SeleAircraft','PublicRecords_KEL.Files.NonFCRA.FAA__Key_Aircraft_Id_Vault','fract_owner',COUNT(__d0(__NL(Fractional_Owner_))),COUNT(__d0(__NN(Fractional_Owner_)))},
+    {'SeleAircraft','PublicRecords_KEL.Files.NonFCRA.FAA__Key_Aircraft_Id_Vault','cert_issue_date',COUNT(__d0(__NL(Certificate_Issue_Date_))),COUNT(__d0(__NN(Certificate_Issue_Date_)))},
+    {'SeleAircraft','PublicRecords_KEL.Files.NonFCRA.FAA__Key_Aircraft_Id_Vault','certification',COUNT(__d0(__NL(Certification_))),COUNT(__d0(__NN(Certification_)))},
+    {'SeleAircraft','PublicRecords_KEL.Files.NonFCRA.FAA__Key_Aircraft_Id_Vault','Src',COUNT(__d0(__NL(Source_))),COUNT(__d0(__NN(Source_)))},
+    {'SeleAircraft','PublicRecords_KEL.Files.NonFCRA.FAA__Key_Aircraft_Id_Vault','Archive_Date',COUNT(__d0(Archive___Date_=0)),COUNT(__d0(Archive___Date_!=0))},
+    {'SeleAircraft','PublicRecords_KEL.Files.NonFCRA.FAA__Key_Aircraft_Id_Vault','DateFirstSeen',COUNT(__d0(Date_First_Seen_=0)),COUNT(__d0(Date_First_Seen_!=0))},
+    {'SeleAircraft','PublicRecords_KEL.Files.NonFCRA.FAA__Key_Aircraft_Id_Vault','DateLastSeen',COUNT(__d0(Date_Last_Seen_=0)),COUNT(__d0(Date_Last_Seen_!=0))},
+    {'SeleAircraft','PublicRecords_KEL.Files.NonFCRA.FAA__Key_Aircraft_Id_Vault','HybridArchiveDate',COUNT(__d0(Hybrid_Archive_Date_=0)),COUNT(__d0(Hybrid_Archive_Date_!=0))},
+    {'SeleAircraft','PublicRecords_KEL.Files.NonFCRA.FAA__Key_Aircraft_Id_Vault','VaultDateLastSeen',COUNT(__d0(Vault_Date_Last_Seen_=0)),COUNT(__d0(Vault_Date_Last_Seen_!=0))},
+    {'SeleAircraft','PublicRecords_KEL.Files.NonFCRA.FAA__key_aircraft_linkids_Vault','Legal',COUNT(__d1(__NL(Legal_))),COUNT(__d1(__NN(Legal_)))},
+    {'SeleAircraft','PublicRecords_KEL.Files.NonFCRA.FAA__key_aircraft_linkids_Vault','Plane',COUNT(__d1(__NL(Plane_))),COUNT(__d1(__NN(Plane_)))},
+    {'SeleAircraft','PublicRecords_KEL.Files.NonFCRA.FAA__key_aircraft_linkids_Vault','ultid',COUNT(__d1(__NL(Ult_I_D_))),COUNT(__d1(__NN(Ult_I_D_)))},
+    {'SeleAircraft','PublicRecords_KEL.Files.NonFCRA.FAA__key_aircraft_linkids_Vault','orgid',COUNT(__d1(__NL(Org_I_D_))),COUNT(__d1(__NN(Org_I_D_)))},
+    {'SeleAircraft','PublicRecords_KEL.Files.NonFCRA.FAA__key_aircraft_linkids_Vault','seleid',COUNT(__d1(__NL(Sele_I_D_))),COUNT(__d1(__NN(Sele_I_D_)))},
+    {'SeleAircraft','PublicRecords_KEL.Files.NonFCRA.FAA__key_aircraft_linkids_Vault','n_number',COUNT(__d1(__NL(N_Number_))),COUNT(__d1(__NN(N_Number_)))},
+    {'SeleAircraft','PublicRecords_KEL.Files.NonFCRA.FAA__key_aircraft_linkids_Vault','type_registrant',COUNT(__d1(__NL(Registrant_Type_))),COUNT(__d1(__NN(Registrant_Type_)))},
+    {'SeleAircraft','PublicRecords_KEL.Files.NonFCRA.FAA__key_aircraft_linkids_Vault','fract_owner',COUNT(__d1(__NL(Fractional_Owner_))),COUNT(__d1(__NN(Fractional_Owner_)))},
+    {'SeleAircraft','PublicRecords_KEL.Files.NonFCRA.FAA__key_aircraft_linkids_Vault','cert_issue_date',COUNT(__d1(__NL(Certificate_Issue_Date_))),COUNT(__d1(__NN(Certificate_Issue_Date_)))},
+    {'SeleAircraft','PublicRecords_KEL.Files.NonFCRA.FAA__key_aircraft_linkids_Vault','certification',COUNT(__d1(__NL(Certification_))),COUNT(__d1(__NN(Certification_)))},
+    {'SeleAircraft','PublicRecords_KEL.Files.NonFCRA.FAA__key_aircraft_linkids_Vault','Src',COUNT(__d1(__NL(Source_))),COUNT(__d1(__NN(Source_)))},
+    {'SeleAircraft','PublicRecords_KEL.Files.NonFCRA.FAA__key_aircraft_linkids_Vault','Archive_Date',COUNT(__d1(Archive___Date_=0)),COUNT(__d1(Archive___Date_!=0))},
+    {'SeleAircraft','PublicRecords_KEL.Files.NonFCRA.FAA__key_aircraft_linkids_Vault','DateFirstSeen',COUNT(__d1(Date_First_Seen_=0)),COUNT(__d1(Date_First_Seen_!=0))},
+    {'SeleAircraft','PublicRecords_KEL.Files.NonFCRA.FAA__key_aircraft_linkids_Vault','DateLastSeen',COUNT(__d1(Date_Last_Seen_=0)),COUNT(__d1(Date_Last_Seen_!=0))},
+    {'SeleAircraft','PublicRecords_KEL.Files.NonFCRA.FAA__key_aircraft_linkids_Vault','HybridArchiveDate',COUNT(__d1(Hybrid_Archive_Date_=0)),COUNT(__d1(Hybrid_Archive_Date_!=0))},
+    {'SeleAircraft','PublicRecords_KEL.Files.NonFCRA.FAA__key_aircraft_linkids_Vault','VaultDateLastSeen',COUNT(__d1(Vault_Date_Last_Seen_=0)),COUNT(__d1(Vault_Date_Last_Seen_!=0))}]
   ,{KEL.typ.str entity,KEL.typ.str fileName,KEL.typ.str fieldName,KEL.typ.int nullCount,KEL.typ.int notNullCount});
 END;

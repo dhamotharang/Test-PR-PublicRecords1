@@ -3,7 +3,7 @@ IMPORT KEL15 AS KEL;
 IMPORT PublicRecords_KEL;
 IMPORT CFG_Compile FROM PublicRecords_KEL;
 IMPORT * FROM KEL15.Null;
-EXPORT E_Business_Ult(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG_Compile __cfg = CFG_Compile) := MODULE
+EXPORT E_Business_Ult(CFG_Compile __cfg = CFG_Compile) := MODULE
   EXPORT Typ := KEL.typ.uid;
   EXPORT InLayout := RECORD
     KEL.typ.nuid UID;
@@ -20,15 +20,15 @@ EXPORT E_Business_Ult(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG_
   SHARED VIRTUAL __SourceFilter(DATASET(InLayout) __ds) := __ds;
   SHARED VIRTUAL __GroupedFilter(GROUPED DATASET(InLayout) __ds) := __ds;
   SHARED __Mapping := 'ultid(DEFAULT:UID),ultsegment(DEFAULT:Ult_Segment_:\'\'),headerhitflag(DEFAULT:Header_Hit_Flag_),source(DEFAULT:Source_:\'\'),archive_date(DEFAULT:Archive___Date_:EPOCH),datefirstseen(DEFAULT:Date_First_Seen_:EPOCH),datelastseen(DEFAULT:Date_Last_Seen_:EPOCH),hybridarchivedate(DEFAULT:Hybrid_Archive_Date_:EPOCH),vaultdatelastseen(DEFAULT:Vault_Date_Last_Seen_:EPOCH)';
-  SHARED __Mapping0 := 'ultid(OVERRIDE:UID),ult_seg(OVERRIDE:Ult_Segment_:\'\'),source(OVERRIDE:Source_:\'\'),archive_date(OVERRIDE:Archive___Date_:EPOCH),dt_first_seen(OVERRIDE:Date_First_Seen_:EPOCH),dt_last_seen(OVERRIDE:Date_Last_Seen_:EPOCH),hybridarchivedate(DEFAULT:Hybrid_Archive_Date_:EPOCH),vaultdatelastseen(DEFAULT:Vault_Date_Last_Seen_:EPOCH),DPMBitmap(OVERRIDE:__Permits:PERMITS)';
+  SHARED Hybrid_Archive_Date_0Rule(STRING a) := MAP(KEL.Routines.IsValidDate((KEL.typ.kdate)(a[1..6]+'01'))=>a[1..6]+'01','0');
+  SHARED __Mapping0 := 'ultid(OVERRIDE:UID),ult_seg(OVERRIDE:Ult_Segment_:\'\'),source(OVERRIDE:Source_:\'\'),archive_date(OVERRIDE:Archive___Date_:EPOCH),dt_first_seen(OVERRIDE:Date_First_Seen_:EPOCH),dt_last_seen(OVERRIDE:Date_Last_Seen_:EPOCH),hybrid_archive_date(OVERRIDE:Hybrid_Archive_Date_:EPOCH:Hybrid_Archive_Date_0Rule),vaultdatelastseen(DEFAULT:Vault_Date_Last_Seen_:EPOCH),DPMBitmap(OVERRIDE:__Permits:PERMITS)';
   SHARED InLayout __Mapping0_Transform(InLayout __r) := TRANSFORM
     SELF.Header_Hit_Flag_ := __CN(TRUE);
     SELF := __r;
   END;
-  SHARED __d0_Norm := NORMALIZE(__in,LEFT.Dataset_BIPV2__Key_BH_Linking_kfetch2,TRANSFORM(RECORDOF(__in.Dataset_BIPV2__Key_BH_Linking_kfetch2),SELF:=RIGHT));
-  EXPORT PublicRecords_KEL_ECL_Functions_Dataset_FDC_Dataset_BIPV2__Key_BH_Linking_kfetch2_Invalid := __d0_Norm((KEL.typ.uid)UltID = 0);
-  SHARED __d0_Prefiltered := __d0_Norm((KEL.typ.uid)UltID <> 0);
-  SHARED __d0 := __SourceFilter(PROJECT(KEL.FromFlat.Convert(__d0_Prefiltered,InLayout,__Mapping0,'PublicRecords_KEL.ECL_Functions.Dataset_FDC'),__Mapping0_Transform(LEFT)));
+  EXPORT PublicRecords_KEL_Files_NonFCRA_BIPV2__Key_BH_Linking_Ids_Vault__Key_Invalid := PublicRecords_KEL.Files.NonFCRA.BIPV2__Key_BH_Linking_Ids_Vault__Key((KEL.typ.uid)UltID = 0);
+  SHARED __d0_Prefiltered := PublicRecords_KEL.Files.NonFCRA.BIPV2__Key_BH_Linking_Ids_Vault__Key((KEL.typ.uid)UltID <> 0);
+  SHARED __d0 := __SourceFilter(PROJECT(KEL.FromFlat.Convert(__d0_Prefiltered,InLayout,__Mapping0,'PublicRecords_KEL.Files.NonFCRA.BIPV2__Key_BH_Linking_Ids_Vault__Key'),__Mapping0_Transform(LEFT)));
   EXPORT InData := __d0;
   EXPORT Data_Sources_Layout := RECORD
     KEL.typ.nbool Header_Hit_Flag_;
@@ -81,15 +81,15 @@ EXPORT E_Business_Ult(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG_
   EXPORT TopSourcedUIDs(KEL.typ.int n = 10) := TOPN(UIDSourceCounts,n,-Cnt);
   EXPORT UIDSourceDistribution := SORT(TABLE(UIDSourceCounts,{Cnt,KEL.typ.int uidCount := COUNT(GROUP),KEL.typ.uid rep := MIN(GROUP,UID)},Cnt),-Cnt);
   EXPORT Ult_Segment__SingleValue_Invalid := KEL.Intake.DetectMultipleValuesOnResult(Result,Ult_Segment_);
-  EXPORT SanityCheck := DATASET([{COUNT(PublicRecords_KEL_ECL_Functions_Dataset_FDC_Dataset_BIPV2__Key_BH_Linking_kfetch2_Invalid),COUNT(Ult_Segment__SingleValue_Invalid),TopSourcedUIDs(1)}],{KEL.typ.int PublicRecords_KEL_ECL_Functions_Dataset_FDC_Dataset_BIPV2__Key_BH_Linking_kfetch2_Invalid,KEL.typ.int Ult_Segment__SingleValue_Invalid,DATASET(RECORDOF(UIDSourceCounts)) topSourcedUID});
+  EXPORT SanityCheck := DATASET([{COUNT(PublicRecords_KEL_Files_NonFCRA_BIPV2__Key_BH_Linking_Ids_Vault__Key_Invalid),COUNT(Ult_Segment__SingleValue_Invalid),TopSourcedUIDs(1)}],{KEL.typ.int PublicRecords_KEL_Files_NonFCRA_BIPV2__Key_BH_Linking_Ids_Vault__Key_Invalid,KEL.typ.int Ult_Segment__SingleValue_Invalid,DATASET(RECORDOF(UIDSourceCounts)) topSourcedUID});
   EXPORT NullCounts := DATASET([
-    {'BusinessUlt','PublicRecords_KEL.ECL_Functions.Dataset_FDC','UID',COUNT(PublicRecords_KEL_ECL_Functions_Dataset_FDC_Dataset_BIPV2__Key_BH_Linking_kfetch2_Invalid),COUNT(__d0)},
-    {'BusinessUlt','PublicRecords_KEL.ECL_Functions.Dataset_FDC','ult_seg',COUNT(__d0(__NL(Ult_Segment_))),COUNT(__d0(__NN(Ult_Segment_)))},
-    {'BusinessUlt','PublicRecords_KEL.ECL_Functions.Dataset_FDC','source',COUNT(__d0(__NL(Source_))),COUNT(__d0(__NN(Source_)))},
-    {'BusinessUlt','PublicRecords_KEL.ECL_Functions.Dataset_FDC','Archive_Date',COUNT(__d0(Archive___Date_=0)),COUNT(__d0(Archive___Date_!=0))},
-    {'BusinessUlt','PublicRecords_KEL.ECL_Functions.Dataset_FDC','DateFirstSeen',COUNT(__d0(Date_First_Seen_=0)),COUNT(__d0(Date_First_Seen_!=0))},
-    {'BusinessUlt','PublicRecords_KEL.ECL_Functions.Dataset_FDC','DateLastSeen',COUNT(__d0(Date_Last_Seen_=0)),COUNT(__d0(Date_Last_Seen_!=0))},
-    {'BusinessUlt','PublicRecords_KEL.ECL_Functions.Dataset_FDC','HybridArchiveDate',COUNT(__d0(Hybrid_Archive_Date_=0)),COUNT(__d0(Hybrid_Archive_Date_!=0))},
-    {'BusinessUlt','PublicRecords_KEL.ECL_Functions.Dataset_FDC','VaultDateLastSeen',COUNT(__d0(Vault_Date_Last_Seen_=0)),COUNT(__d0(Vault_Date_Last_Seen_!=0))}]
+    {'BusinessUlt','PublicRecords_KEL.Files.NonFCRA.BIPV2__Key_BH_Linking_Ids_Vault__Key','UID',COUNT(PublicRecords_KEL_Files_NonFCRA_BIPV2__Key_BH_Linking_Ids_Vault__Key_Invalid),COUNT(__d0)},
+    {'BusinessUlt','PublicRecords_KEL.Files.NonFCRA.BIPV2__Key_BH_Linking_Ids_Vault__Key','ult_seg',COUNT(__d0(__NL(Ult_Segment_))),COUNT(__d0(__NN(Ult_Segment_)))},
+    {'BusinessUlt','PublicRecords_KEL.Files.NonFCRA.BIPV2__Key_BH_Linking_Ids_Vault__Key','source',COUNT(__d0(__NL(Source_))),COUNT(__d0(__NN(Source_)))},
+    {'BusinessUlt','PublicRecords_KEL.Files.NonFCRA.BIPV2__Key_BH_Linking_Ids_Vault__Key','Archive_Date',COUNT(__d0(Archive___Date_=0)),COUNT(__d0(Archive___Date_!=0))},
+    {'BusinessUlt','PublicRecords_KEL.Files.NonFCRA.BIPV2__Key_BH_Linking_Ids_Vault__Key','DateFirstSeen',COUNT(__d0(Date_First_Seen_=0)),COUNT(__d0(Date_First_Seen_!=0))},
+    {'BusinessUlt','PublicRecords_KEL.Files.NonFCRA.BIPV2__Key_BH_Linking_Ids_Vault__Key','DateLastSeen',COUNT(__d0(Date_Last_Seen_=0)),COUNT(__d0(Date_Last_Seen_!=0))},
+    {'BusinessUlt','PublicRecords_KEL.Files.NonFCRA.BIPV2__Key_BH_Linking_Ids_Vault__Key','HybridArchiveDate',COUNT(__d0(Hybrid_Archive_Date_=0)),COUNT(__d0(Hybrid_Archive_Date_!=0))},
+    {'BusinessUlt','PublicRecords_KEL.Files.NonFCRA.BIPV2__Key_BH_Linking_Ids_Vault__Key','VaultDateLastSeen',COUNT(__d0(Vault_Date_Last_Seen_=0)),COUNT(__d0(Vault_Date_Last_Seen_!=0))}]
   ,{KEL.typ.str entity,KEL.typ.str fileName,KEL.typ.str fieldName,KEL.typ.int nullCount,KEL.typ.int notNullCount});
 END;

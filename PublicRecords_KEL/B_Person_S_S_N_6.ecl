@@ -1,0 +1,96 @@
+﻿//HPCC Systems KEL Compiler Version 1.5.0rc1
+IMPORT KEL15 AS KEL;
+IMPORT B_Person_10,B_Person_7,B_Person_Accident_8,CFG_Compile,E_Accident,E_Address,E_Email,E_Geo_Link,E_Input_P_I_I,E_Person,E_Person_Accident,E_Person_S_S_N,E_Phone,E_Property,E_Social_Security_Number,E_Surname,E_Zip_Code,FN_Compile FROM PublicRecords_KEL;
+IMPORT * FROM KEL15.Null;
+EXPORT B_Person_S_S_N_6(CFG_Compile __cfg = CFG_Compile) := MODULE
+  SHARED VIRTUAL TYPEOF(B_Person_7(__cfg).__ENH_Person_7) __ENH_Person_7 := B_Person_7(__cfg).__ENH_Person_7;
+  SHARED VIRTUAL TYPEOF(E_Person_S_S_N(__cfg).__Result) __E_Person_S_S_N := E_Person_S_S_N(__cfg).__Result;
+  SHARED __EE489342 := __E_Person_S_S_N;
+  SHARED __EE5322627 := __ENH_Person_7;
+  SHARED __ST489416_Layout := RECORD
+    KEL.typ.ntyp(E_Person().Typ) Subject_;
+    KEL.typ.ntyp(E_Social_Security_Number().Typ) Social_;
+    KEL.typ.ndataset(E_Person_S_S_N(__cfg).Valid_S_S_N_Layout) Valid_S_S_N_;
+    KEL.typ.ndataset(E_Person_S_S_N(__cfg).Data_Sources_Layout) Data_Sources_;
+    KEL.typ.nuid UID;
+    KEL.typ.nstr Gender_;
+    KEL.typ.nstr Lex_I_D_Segment_;
+    KEL.typ.nstr Lex_I_D_Segment2_;
+    KEL.typ.ndataset(B_Person_7(__cfg).__ST269003_Layout) Full_Name_;
+    KEL.typ.ndataset(E_Person(__cfg).Reported_Dates_Of_Birth_Layout) Reported_Dates_Of_Birth_;
+    KEL.typ.ndataset(E_Person(__cfg).Reported_Dates_Of_Death_Layout) Reported_Dates_Of_Death_;
+    KEL.typ.nstr Race_;
+    KEL.typ.nstr Race_Description_;
+    KEL.typ.ndataset(B_Person_7(__cfg).__ST269031_Layout) Data_Sources__1_;
+    KEL.typ.ndataset(E_Person(__cfg).Dunn_Data_Layout) Dunn_Data_;
+    KEL.typ.ndataset(E_Person(__cfg).Conceal_Carry_Layout) Conceal_Carry_;
+    KEL.typ.ndataset(E_Person(__cfg).Hunt_Fish_Layout) Hunt_Fish_;
+    KEL.typ.ndataset(E_Person(__cfg).Consumer_Statement_Flags_Layout) Consumer_Statement_Flags_;
+    KEL.typ.ndataset(E_Person(__cfg).Thrive_Layout) Thrive_;
+    KEL.typ.ndataset(B_Person_Accident_8(__cfg).__ST260733_Layout) Accident_Recs_;
+    KEL.typ.ndataset(B_Person_10(__cfg).__ST89792_Layout) Address_Hierarchy_Set_;
+    KEL.typ.ndataset(B_Person_7(__cfg).__ST419945_Layout) All_Lien_Data_;
+    KEL.typ.nstr Curr_Addr_Full_;
+    KEL.typ.ndataset(B_Person_10(__cfg).__ST89792_Layout) Curr_Addr_Full_Set_;
+    KEL.typ.ntyp(E_Input_P_I_I().Typ) P_I_I_;
+    KEL.typ.nstr P___Inp_Cln_Name_First_Raw_;
+    KEL.typ.nstr P___Inp_Cln_Name_Last_Raw_;
+    KEL.typ.nstr P___Inp_Cln_S_S_N_;
+    KEL.typ.str P___Lex_I_D_Seen_Flag_ := '';
+    KEL.typ.ndataset(B_Person_10(__cfg).__ST89792_Layout) Recent_Addr_Full_Set_;
+    KEL.typ.epoch Archive___Date_ := 0;
+    KEL.typ.epoch Date_First_Seen_ := 0;
+    KEL.typ.epoch Date_Last_Seen_ := 0;
+    KEL.typ.epoch Hybrid_Archive_Date_ := 0;
+    KEL.typ.epoch Vault_Date_Last_Seen_ := 0;
+    KEL.typ.int __RecordCount := 0;
+  END;
+  __JC5322633(E_Person_S_S_N(__cfg).Layout __EE489342, B_Person_7(__cfg).__ST268997_Layout __EE5322627) := __EEQP(__EE489342.Subject_,__EE5322627.UID);
+  __ST489416_Layout __JT5322633(E_Person_S_S_N(__cfg).Layout __l, B_Person_7(__cfg).__ST268997_Layout __r) := TRANSFORM
+    SELF.Data_Sources__1_ := __r.Data_Sources_;
+    SELF := __l;
+    SELF := __r;
+  END;
+  SHARED __EE5322634 := JOIN(__EE489342,__EE5322627,__JC5322633(LEFT,RIGHT),__JT5322633(LEFT,RIGHT),LEFT OUTER,HASH);
+  EXPORT __ST254615_Layout := RECORD
+    KEL.typ.nstr Source_;
+    KEL.typ.nbool Header_Hit_Flag_;
+    KEL.typ.nbool F_D_N_Indicator_;
+    KEL.typ.nbool Death_Master_Flag_;
+    KEL.typ.nkdate My_Date_First_Seen_;
+    KEL.typ.nkdate My_Date_Last_Seen_;
+    KEL.typ.nstr Translated_Source_;
+    KEL.typ.epoch Archive___Date_ := 0;
+    KEL.typ.epoch Date_First_Seen_ := 0;
+    KEL.typ.epoch Date_Last_Seen_ := 0;
+    KEL.typ.epoch Hybrid_Archive_Date_ := 0;
+    KEL.typ.epoch Vault_Date_Last_Seen_ := 0;
+    KEL.typ.int __RecordCount := 0;
+  END;
+  EXPORT __ST254607_Layout := RECORD
+    KEL.typ.ntyp(E_Person().Typ) Subject_;
+    KEL.typ.ntyp(E_Social_Security_Number().Typ) Social_;
+    KEL.typ.ndataset(E_Person_S_S_N(__cfg).Valid_S_S_N_Layout) Valid_S_S_N_;
+    KEL.typ.ndataset(__ST254615_Layout) Data_Sources_;
+    KEL.typ.nbool Input_S_S_N_Match_;
+    KEL.typ.epoch Archive___Date_ := 0;
+    KEL.typ.epoch Date_First_Seen_ := 0;
+    KEL.typ.epoch Date_Last_Seen_ := 0;
+    KEL.typ.epoch Hybrid_Archive_Date_ := 0;
+    KEL.typ.epoch Vault_Date_Last_Seen_ := 0;
+    KEL.typ.int __RecordCount := 0;
+  END;
+  SHARED __ST254607_Layout __ND5323188__Project(__ST489416_Layout __PP5322635) := TRANSFORM
+    __EE5322898 := __PP5322635.Data_Sources_;
+    __ST254615_Layout __ND5322903__Project(E_Person_S_S_N(__cfg).Data_Sources_Layout __PP5322899) := TRANSFORM
+      SELF.My_Date_First_Seen_ := KEL.era.ToDate(__PP5322899.Date_First_Seen_);
+      SELF.My_Date_Last_Seen_ := KEL.era.ToDate(__PP5322899.Date_Last_Seen_);
+      SELF.Translated_Source_ := FN_Compile(__cfg).FN_Consumer_Source_Group(__ECAST(KEL.typ.nstr,__PP5322899.Source_));
+      SELF := __PP5322899;
+    END;
+    SELF.Data_Sources_ := __PROJECT(__EE5322898,__ND5322903__Project(LEFT));
+    SELF.Input_S_S_N_Match_ := FN_Compile(__cfg).FN_Edit_Distance_Within_Radius(__ECAST(KEL.typ.nstr,__PP5322635.Social_),__ECAST(KEL.typ.nstr,__PP5322635.P___Inp_Cln_S_S_N_),__ECAST(KEL.typ.nint,__CN(2)));
+    SELF := __PP5322635;
+  END;
+  EXPORT __ENH_Person_S_S_N_6 := PROJECT(__EE5322634,__ND5323188__Project(LEFT));
+END;

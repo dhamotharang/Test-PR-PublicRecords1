@@ -3,7 +3,7 @@ IMPORT KEL15 AS KEL;
 IMPORT PublicRecords_KEL;
 IMPORT CFG_Compile FROM PublicRecords_KEL;
 IMPORT * FROM KEL15.Null;
-EXPORT E_Address_Summary(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG_Compile __cfg = CFG_Compile) := MODULE
+EXPORT E_Address_Summary(CFG_Compile __cfg = CFG_Compile) := MODULE
   EXPORT Typ := KEL.typ.uid;
   EXPORT InLayout := RECORD
     KEL.typ.nuid UID;
@@ -30,8 +30,8 @@ EXPORT E_Address_Summary(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, C
   SHARED __Trimmed := RECORD, MAXLENGTH(5000)
     STRING KeyVal;
   END;
-  SHARED __d0_Trim := PROJECT(__in.Dataset_Risk_Indicators__Correlation_Risk__key_addr_name_summary,TRANSFORM(__Trimmed,SELF.KeyVal:=TRIM((STRING)LEFT.prim_name) + '|' + TRIM((STRING)LEFT.prim_range) + '|' + TRIM((STRING)LEFT.zip)));
-  SHARED __d1_Trim := PROJECT(__in.Dataset_Risk_Indicators__Correlation_Risk__key_addr_dob_summary,TRANSFORM(__Trimmed,SELF.KeyVal:=TRIM((STRING)LEFT.prim_name) + '|' + TRIM((STRING)LEFT.prim_range) + '|' + TRIM((STRING)LEFT.zip)));
+  SHARED __d0_Trim := PROJECT(PublicRecords_KEL.files.NonFCRA.Risk_Indicators__Correlation_Risk__key_addr_name_summary,TRANSFORM(__Trimmed,SELF.KeyVal:=TRIM((STRING)LEFT.prim_name) + '|' + TRIM((STRING)LEFT.prim_range) + '|' + TRIM((STRING)LEFT.zip)));
+  SHARED __d1_Trim := PROJECT(PublicRecords_KEL.files.NonFCRA.Risk_Indicators__Correlation_Risk__key_addr_dob_summary,TRANSFORM(__Trimmed,SELF.KeyVal:=TRIM((STRING)LEFT.prim_name) + '|' + TRIM((STRING)LEFT.prim_range) + '|' + TRIM((STRING)LEFT.zip)));
   EXPORT __All_Trim := __d0_Trim + __d1_Trim;
   SHARED __TabRec := RECORD, MAXLENGTH(5000)
     __All_Trim.KeyVal;
@@ -40,32 +40,36 @@ EXPORT E_Address_Summary(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, C
   END;
   EXPORT NullKeyVal := TRIM((STRING)'') + '|' + TRIM((STRING)'') + '|' + TRIM((STRING)'');
   SHARED __Table := TABLE(__All_Trim(KeyVal <> NullKeyVal),__TabRec,KeyVal,MERGE);
-  SHARED __SortedTable := SORT(__Table,KeyVal);
   SHARED NullLookupRec := DATASET([{NullKeyVal,1,0}],__TabRec);
-  EXPORT Lookup := NullLookupRec + PROJECT(__SortedTable,TRANSFORM(__TabRec,SELF.UID:=COUNTER,SELF:=LEFT));
+  EXPORT Lookup := NullLookupRec + PROJECT(__Table,TRANSFORM(__TabRec,SELF.UID:=COUNTER,SELF:=LEFT)) : PERSIST('~temp::KEL::PublicRecords_KEL::Address_Summary::UidLookup',EXPIRE(7));
+  EXPORT UID_IdToText := INDEX(Lookup,{UID},{Lookup},'~temp::KEL::IDtoT::PublicRecords_KEL::Address_Summary');
+  EXPORT UID_TextToId := INDEX(Lookup,{ht:=HASH32(KeyVal)},{Lookup},'~temp::KEL::TtoID::PublicRecords_KEL::Address_Summary');
+  EXPORT BuildAll := PARALLEL(BUILDINDEX(UID_IdToText,OVERWRITE),BUILDINDEX(UID_TextToId,OVERWRITE));
+  EXPORT GetText(KEL.typ.uid i) := UID_IdToText(UID=i)[1];
+  EXPORT GetId(STRING s) := UID_TextToId(ht=HASH32(s),KeyVal=s)[1];
   SHARED Date_Last_Seen_0Rule(STRING a) := MAP(KEL.Routines.IsValidDate((KEL.typ.kdate)(a[1..8]))=>a[1..8],KEL.Routines.IsValidDate((KEL.typ.kdate)(a[1..6]+'01'))=>a[1..6]+'01',KEL.Routines.IsValidDate((KEL.typ.kdate)(a[1..4]+'0101'))=>a[1..4]+'0101','0');
-  SHARED __Mapping0 := 'UID(DEFAULT:UID),prim_name(OVERRIDE:Primary_Name_:\'\'),prim_range(OVERRIDE:Primary_Range_:\'\'),zip(OVERRIDE:Zip_:\'\'),fname(OVERRIDE:Name_First_Name_:\'\'),lname(OVERRIDE:Name_Last_Name_:\'\'),src(OVERRIDE:Name_Source_:\'\'),record_count(OVERRIDE:Name_Record_Count_:0),dobdateofbirth(DEFAULT:Dob_Date_Of_Birth_:DATE),dobsource(DEFAULT:Dob_Source_:\'\'),dobrecordcount(DEFAULT:Dob_Record_Count_:0),archive_date(OVERRIDE:Archive___Date_:EPOCH),dt_first_seen(OVERRIDE:Date_First_Seen_:EPOCH),dt_last_seen(OVERRIDE:Date_Last_Seen_:EPOCH:Date_Last_Seen_0Rule),hybridarchivedate(DEFAULT:Hybrid_Archive_Date_:EPOCH),vaultdatelastseen(DEFAULT:Vault_Date_Last_Seen_:EPOCH),DPMBitmap(OVERRIDE:__Permits:PERMITS)';
-  SHARED __d0_Norm := NORMALIZE(__in,LEFT.Dataset_Risk_Indicators__Correlation_Risk__key_addr_name_summary,TRANSFORM(RECORDOF(__in.Dataset_Risk_Indicators__Correlation_Risk__key_addr_name_summary),SELF:=RIGHT));
+  SHARED Hybrid_Archive_Date_0Rule(STRING a) := MAP(KEL.Routines.IsValidDate((KEL.typ.kdate)(a[1..6]+'01'))=>a[1..6]+'01','0');
+  SHARED __Mapping0 := 'UID(DEFAULT:UID),prim_name(OVERRIDE:Primary_Name_:\'\'),prim_range(OVERRIDE:Primary_Range_:\'\'),zip(OVERRIDE:Zip_:\'\'),fname(OVERRIDE:Name_First_Name_:\'\'),lname(OVERRIDE:Name_Last_Name_:\'\'),src(OVERRIDE:Name_Source_:\'\'),record_count(OVERRIDE:Name_Record_Count_:0),dobdateofbirth(DEFAULT:Dob_Date_Of_Birth_:DATE),dobsource(DEFAULT:Dob_Source_:\'\'),dobrecordcount(DEFAULT:Dob_Record_Count_:0),archive_date(OVERRIDE:Archive___Date_:EPOCH),dt_first_seen(OVERRIDE:Date_First_Seen_:EPOCH),dt_last_seen(OVERRIDE:Date_Last_Seen_:EPOCH:Date_Last_Seen_0Rule),hybrid_archive_date(OVERRIDE:Hybrid_Archive_Date_:EPOCH:Hybrid_Archive_Date_0Rule),vaultdatelastseen(DEFAULT:Vault_Date_Last_Seen_:EPOCH),DPMBitmap(OVERRIDE:__Permits:PERMITS)';
   SHARED __d0_Out := RECORD
-    RECORDOF(PublicRecords_KEL.ECL_Functions.Dataset_FDC.Dataset_Risk_Indicators__Correlation_Risk__key_addr_name_summary);
+    RECORDOF(PublicRecords_KEL.files.NonFCRA.Risk_Indicators__Correlation_Risk__key_addr_name_summary);
     KEL.typ.uid UID := 0;
   END;
-  SHARED __d0_UID_Mapped := JOIN(__d0_Norm,Lookup,TRIM((STRING)LEFT.prim_name) + '|' + TRIM((STRING)LEFT.prim_range) + '|' + TRIM((STRING)LEFT.zip) = RIGHT.KeyVal,TRANSFORM(__d0_Out,SELF.UID:=RIGHT.UID,SELF:=LEFT),SMART);
-  EXPORT PublicRecords_KEL_ECL_Functions_Dataset_FDC_Dataset_Risk_Indicators__Correlation_Risk__key_addr_name_summary_Invalid := __d0_UID_Mapped(UID = 0);
+  SHARED __d0_UID_Mapped := JOIN(PublicRecords_KEL.files.NonFCRA.Risk_Indicators__Correlation_Risk__key_addr_name_summary,Lookup,TRIM((STRING)LEFT.prim_name) + '|' + TRIM((STRING)LEFT.prim_range) + '|' + TRIM((STRING)LEFT.zip) = RIGHT.KeyVal,TRANSFORM(__d0_Out,SELF.UID:=RIGHT.UID,SELF:=LEFT),SMART);
+  EXPORT PublicRecords_KEL_files_NonFCRA_Risk_Indicators__Correlation_Risk__key_addr_name_summary_Invalid := __d0_UID_Mapped(UID = 0);
   SHARED __d0_Prefiltered := __d0_UID_Mapped(UID <> 0);
-  SHARED __d0 := __SourceFilter(KEL.FromFlat.Convert(__d0_Prefiltered,InLayout,__Mapping0,'PublicRecords_KEL.ECL_Functions.Dataset_FDC'));
+  SHARED __d0 := __SourceFilter(KEL.FromFlat.Convert(__d0_Prefiltered,InLayout,__Mapping0,'PublicRecords_KEL.files.NonFCRA.Risk_Indicators__Correlation_Risk__key_addr_name_summary'));
   SHARED Dob_Date_Of_Birth_1Rule(STRING a) := MAP(KEL.Routines.IsValidDate((KEL.typ.kdate)(a[1..8]))=>a[1..8],KEL.Routines.IsValidDate((KEL.typ.kdate)(a[1..6]+'01'))=>a[1..6]+'01',KEL.Routines.IsValidDate((KEL.typ.kdate)(a[1..4]+'0101'))=>a[1..4]+'0101','0');
   SHARED Date_Last_Seen_1Rule(STRING a) := MAP(KEL.Routines.IsValidDate((KEL.typ.kdate)(a[1..8]))=>a[1..8],KEL.Routines.IsValidDate((KEL.typ.kdate)(a[1..6]+'01'))=>a[1..6]+'01',KEL.Routines.IsValidDate((KEL.typ.kdate)(a[1..4]+'0101'))=>a[1..4]+'0101','0');
-  SHARED __Mapping1 := 'UID(DEFAULT:UID),prim_name(OVERRIDE:Primary_Name_:\'\'),prim_range(OVERRIDE:Primary_Range_:\'\'),zip(OVERRIDE:Zip_:\'\'),namefirstname(DEFAULT:Name_First_Name_:\'\'),namelastname(DEFAULT:Name_Last_Name_:\'\'),namesource(DEFAULT:Name_Source_:\'\'),namerecordcount(DEFAULT:Name_Record_Count_:0),dob(OVERRIDE:Dob_Date_Of_Birth_:DATE:Dob_Date_Of_Birth_1Rule),src(OVERRIDE:Dob_Source_:\'\'),record_count(OVERRIDE:Dob_Record_Count_:0),archive_date(OVERRIDE:Archive___Date_:EPOCH),dt_first_seen(OVERRIDE:Date_First_Seen_:EPOCH),dt_last_seen(OVERRIDE:Date_Last_Seen_:EPOCH:Date_Last_Seen_1Rule),hybridarchivedate(DEFAULT:Hybrid_Archive_Date_:EPOCH),vaultdatelastseen(DEFAULT:Vault_Date_Last_Seen_:EPOCH),DPMBitmap(OVERRIDE:__Permits:PERMITS)';
-  SHARED __d1_Norm := NORMALIZE(__in,LEFT.Dataset_Risk_Indicators__Correlation_Risk__key_addr_dob_summary,TRANSFORM(RECORDOF(__in.Dataset_Risk_Indicators__Correlation_Risk__key_addr_dob_summary),SELF:=RIGHT));
+  SHARED Hybrid_Archive_Date_1Rule(STRING a) := MAP(KEL.Routines.IsValidDate((KEL.typ.kdate)(a[1..6]+'01'))=>a[1..6]+'01','0');
+  SHARED __Mapping1 := 'UID(DEFAULT:UID),prim_name(OVERRIDE:Primary_Name_:\'\'),prim_range(OVERRIDE:Primary_Range_:\'\'),zip(OVERRIDE:Zip_:\'\'),namefirstname(DEFAULT:Name_First_Name_:\'\'),namelastname(DEFAULT:Name_Last_Name_:\'\'),namesource(DEFAULT:Name_Source_:\'\'),namerecordcount(DEFAULT:Name_Record_Count_:0),dob(OVERRIDE:Dob_Date_Of_Birth_:DATE:Dob_Date_Of_Birth_1Rule),src(OVERRIDE:Dob_Source_:\'\'),record_count(OVERRIDE:Dob_Record_Count_:0),archive_date(OVERRIDE:Archive___Date_:EPOCH),dt_first_seen(OVERRIDE:Date_First_Seen_:EPOCH),dt_last_seen(OVERRIDE:Date_Last_Seen_:EPOCH:Date_Last_Seen_1Rule),hybrid_archive_date(OVERRIDE:Hybrid_Archive_Date_:EPOCH:Hybrid_Archive_Date_1Rule),vaultdatelastseen(DEFAULT:Vault_Date_Last_Seen_:EPOCH),DPMBitmap(OVERRIDE:__Permits:PERMITS)';
   SHARED __d1_Out := RECORD
-    RECORDOF(PublicRecords_KEL.ECL_Functions.Dataset_FDC.Dataset_Risk_Indicators__Correlation_Risk__key_addr_dob_summary);
+    RECORDOF(PublicRecords_KEL.files.NonFCRA.Risk_Indicators__Correlation_Risk__key_addr_dob_summary);
     KEL.typ.uid UID := 0;
   END;
-  SHARED __d1_UID_Mapped := JOIN(__d1_Norm,Lookup,TRIM((STRING)LEFT.prim_name) + '|' + TRIM((STRING)LEFT.prim_range) + '|' + TRIM((STRING)LEFT.zip) = RIGHT.KeyVal,TRANSFORM(__d1_Out,SELF.UID:=RIGHT.UID,SELF:=LEFT),SMART);
-  EXPORT PublicRecords_KEL_ECL_Functions_Dataset_FDC_Dataset_Risk_Indicators__Correlation_Risk__key_addr_dob_summary_Invalid := __d1_UID_Mapped(UID = 0);
+  SHARED __d1_UID_Mapped := JOIN(PublicRecords_KEL.files.NonFCRA.Risk_Indicators__Correlation_Risk__key_addr_dob_summary,Lookup,TRIM((STRING)LEFT.prim_name) + '|' + TRIM((STRING)LEFT.prim_range) + '|' + TRIM((STRING)LEFT.zip) = RIGHT.KeyVal,TRANSFORM(__d1_Out,SELF.UID:=RIGHT.UID,SELF:=LEFT),SMART);
+  EXPORT PublicRecords_KEL_files_NonFCRA_Risk_Indicators__Correlation_Risk__key_addr_dob_summary_Invalid := __d1_UID_Mapped(UID = 0);
   SHARED __d1_Prefiltered := __d1_UID_Mapped(UID <> 0);
-  SHARED __d1 := __SourceFilter(KEL.FromFlat.Convert(__d1_Prefiltered,InLayout,__Mapping1,'PublicRecords_KEL.ECL_Functions.Dataset_FDC'));
+  SHARED __d1 := __SourceFilter(KEL.FromFlat.Convert(__d1_Prefiltered,InLayout,__Mapping1,'PublicRecords_KEL.files.NonFCRA.Risk_Indicators__Correlation_Risk__key_addr_dob_summary'));
   EXPORT InData := __d0 + __d1;
   EXPORT Name_Summary_Layout := RECORD
     KEL.typ.nstr Name_First_Name_;
@@ -140,39 +144,39 @@ EXPORT E_Address_Summary(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, C
   EXPORT Primary_Name__SingleValue_Invalid := KEL.Intake.DetectMultipleValuesOnResult(Result,Primary_Name_);
   EXPORT Primary_Range__SingleValue_Invalid := KEL.Intake.DetectMultipleValuesOnResult(Result,Primary_Range_);
   EXPORT Zip__SingleValue_Invalid := KEL.Intake.DetectMultipleValuesOnResult(Result,Zip_);
-  EXPORT SanityCheck := DATASET([{COUNT(PublicRecords_KEL_ECL_Functions_Dataset_FDC_Dataset_Risk_Indicators__Correlation_Risk__key_addr_name_summary_Invalid),COUNT(PublicRecords_KEL_ECL_Functions_Dataset_FDC_Dataset_Risk_Indicators__Correlation_Risk__key_addr_dob_summary_Invalid),COUNT(Primary_Name__SingleValue_Invalid),COUNT(Primary_Range__SingleValue_Invalid),COUNT(Zip__SingleValue_Invalid),TopSourcedUIDs(1)}],{KEL.typ.int PublicRecords_KEL_ECL_Functions_Dataset_FDC_Dataset_Risk_Indicators__Correlation_Risk__key_addr_name_summary_Invalid,KEL.typ.int PublicRecords_KEL_ECL_Functions_Dataset_FDC_Dataset_Risk_Indicators__Correlation_Risk__key_addr_dob_summary_Invalid,KEL.typ.int Primary_Name__SingleValue_Invalid,KEL.typ.int Primary_Range__SingleValue_Invalid,KEL.typ.int Zip__SingleValue_Invalid,DATASET(RECORDOF(UIDSourceCounts)) topSourcedUID});
+  EXPORT SanityCheck := DATASET([{COUNT(PublicRecords_KEL_files_NonFCRA_Risk_Indicators__Correlation_Risk__key_addr_name_summary_Invalid),COUNT(PublicRecords_KEL_files_NonFCRA_Risk_Indicators__Correlation_Risk__key_addr_dob_summary_Invalid),COUNT(Primary_Name__SingleValue_Invalid),COUNT(Primary_Range__SingleValue_Invalid),COUNT(Zip__SingleValue_Invalid),TopSourcedUIDs(1)}],{KEL.typ.int PublicRecords_KEL_files_NonFCRA_Risk_Indicators__Correlation_Risk__key_addr_name_summary_Invalid,KEL.typ.int PublicRecords_KEL_files_NonFCRA_Risk_Indicators__Correlation_Risk__key_addr_dob_summary_Invalid,KEL.typ.int Primary_Name__SingleValue_Invalid,KEL.typ.int Primary_Range__SingleValue_Invalid,KEL.typ.int Zip__SingleValue_Invalid,DATASET(RECORDOF(UIDSourceCounts)) topSourcedUID});
   EXPORT NullCounts := DATASET([
-    {'AddressSummary','PublicRecords_KEL.ECL_Functions.Dataset_FDC','UID',COUNT(PublicRecords_KEL_ECL_Functions_Dataset_FDC_Dataset_Risk_Indicators__Correlation_Risk__key_addr_name_summary_Invalid),COUNT(__d0)},
-    {'AddressSummary','PublicRecords_KEL.ECL_Functions.Dataset_FDC','prim_name',COUNT(__d0(__NL(Primary_Name_))),COUNT(__d0(__NN(Primary_Name_)))},
-    {'AddressSummary','PublicRecords_KEL.ECL_Functions.Dataset_FDC','prim_range',COUNT(__d0(__NL(Primary_Range_))),COUNT(__d0(__NN(Primary_Range_)))},
-    {'AddressSummary','PublicRecords_KEL.ECL_Functions.Dataset_FDC','zip',COUNT(__d0(__NL(Zip_))),COUNT(__d0(__NN(Zip_)))},
-    {'AddressSummary','PublicRecords_KEL.ECL_Functions.Dataset_FDC','fname',COUNT(__d0(__NL(Name_First_Name_))),COUNT(__d0(__NN(Name_First_Name_)))},
-    {'AddressSummary','PublicRecords_KEL.ECL_Functions.Dataset_FDC','lname',COUNT(__d0(__NL(Name_Last_Name_))),COUNT(__d0(__NN(Name_Last_Name_)))},
-    {'AddressSummary','PublicRecords_KEL.ECL_Functions.Dataset_FDC','src',COUNT(__d0(__NL(Name_Source_))),COUNT(__d0(__NN(Name_Source_)))},
-    {'AddressSummary','PublicRecords_KEL.ECL_Functions.Dataset_FDC','record_count',COUNT(__d0(__NL(Name_Record_Count_))),COUNT(__d0(__NN(Name_Record_Count_)))},
-    {'AddressSummary','PublicRecords_KEL.ECL_Functions.Dataset_FDC','DobDateOfBirth',COUNT(__d0(__NL(Dob_Date_Of_Birth_))),COUNT(__d0(__NN(Dob_Date_Of_Birth_)))},
-    {'AddressSummary','PublicRecords_KEL.ECL_Functions.Dataset_FDC','DobSource',COUNT(__d0(__NL(Dob_Source_))),COUNT(__d0(__NN(Dob_Source_)))},
-    {'AddressSummary','PublicRecords_KEL.ECL_Functions.Dataset_FDC','DobRecordCount',COUNT(__d0(__NL(Dob_Record_Count_))),COUNT(__d0(__NN(Dob_Record_Count_)))},
-    {'AddressSummary','PublicRecords_KEL.ECL_Functions.Dataset_FDC','Archive_Date',COUNT(__d0(Archive___Date_=0)),COUNT(__d0(Archive___Date_!=0))},
-    {'AddressSummary','PublicRecords_KEL.ECL_Functions.Dataset_FDC','DateFirstSeen',COUNT(__d0(Date_First_Seen_=0)),COUNT(__d0(Date_First_Seen_!=0))},
-    {'AddressSummary','PublicRecords_KEL.ECL_Functions.Dataset_FDC','DateLastSeen',COUNT(__d0(Date_Last_Seen_=0)),COUNT(__d0(Date_Last_Seen_!=0))},
-    {'AddressSummary','PublicRecords_KEL.ECL_Functions.Dataset_FDC','HybridArchiveDate',COUNT(__d0(Hybrid_Archive_Date_=0)),COUNT(__d0(Hybrid_Archive_Date_!=0))},
-    {'AddressSummary','PublicRecords_KEL.ECL_Functions.Dataset_FDC','VaultDateLastSeen',COUNT(__d0(Vault_Date_Last_Seen_=0)),COUNT(__d0(Vault_Date_Last_Seen_!=0))},
-    {'AddressSummary','PublicRecords_KEL.ECL_Functions.Dataset_FDC','UID',COUNT(PublicRecords_KEL_ECL_Functions_Dataset_FDC_Dataset_Risk_Indicators__Correlation_Risk__key_addr_dob_summary_Invalid),COUNT(__d1)},
-    {'AddressSummary','PublicRecords_KEL.ECL_Functions.Dataset_FDC','prim_name',COUNT(__d1(__NL(Primary_Name_))),COUNT(__d1(__NN(Primary_Name_)))},
-    {'AddressSummary','PublicRecords_KEL.ECL_Functions.Dataset_FDC','prim_range',COUNT(__d1(__NL(Primary_Range_))),COUNT(__d1(__NN(Primary_Range_)))},
-    {'AddressSummary','PublicRecords_KEL.ECL_Functions.Dataset_FDC','zip',COUNT(__d1(__NL(Zip_))),COUNT(__d1(__NN(Zip_)))},
-    {'AddressSummary','PublicRecords_KEL.ECL_Functions.Dataset_FDC','NameFirstName',COUNT(__d1(__NL(Name_First_Name_))),COUNT(__d1(__NN(Name_First_Name_)))},
-    {'AddressSummary','PublicRecords_KEL.ECL_Functions.Dataset_FDC','NameLastName',COUNT(__d1(__NL(Name_Last_Name_))),COUNT(__d1(__NN(Name_Last_Name_)))},
-    {'AddressSummary','PublicRecords_KEL.ECL_Functions.Dataset_FDC','NameSource',COUNT(__d1(__NL(Name_Source_))),COUNT(__d1(__NN(Name_Source_)))},
-    {'AddressSummary','PublicRecords_KEL.ECL_Functions.Dataset_FDC','NameRecordCount',COUNT(__d1(__NL(Name_Record_Count_))),COUNT(__d1(__NN(Name_Record_Count_)))},
-    {'AddressSummary','PublicRecords_KEL.ECL_Functions.Dataset_FDC','dob',COUNT(__d1(__NL(Dob_Date_Of_Birth_))),COUNT(__d1(__NN(Dob_Date_Of_Birth_)))},
-    {'AddressSummary','PublicRecords_KEL.ECL_Functions.Dataset_FDC','src',COUNT(__d1(__NL(Dob_Source_))),COUNT(__d1(__NN(Dob_Source_)))},
-    {'AddressSummary','PublicRecords_KEL.ECL_Functions.Dataset_FDC','record_count',COUNT(__d1(__NL(Dob_Record_Count_))),COUNT(__d1(__NN(Dob_Record_Count_)))},
-    {'AddressSummary','PublicRecords_KEL.ECL_Functions.Dataset_FDC','Archive_Date',COUNT(__d1(Archive___Date_=0)),COUNT(__d1(Archive___Date_!=0))},
-    {'AddressSummary','PublicRecords_KEL.ECL_Functions.Dataset_FDC','DateFirstSeen',COUNT(__d1(Date_First_Seen_=0)),COUNT(__d1(Date_First_Seen_!=0))},
-    {'AddressSummary','PublicRecords_KEL.ECL_Functions.Dataset_FDC','DateLastSeen',COUNT(__d1(Date_Last_Seen_=0)),COUNT(__d1(Date_Last_Seen_!=0))},
-    {'AddressSummary','PublicRecords_KEL.ECL_Functions.Dataset_FDC','HybridArchiveDate',COUNT(__d1(Hybrid_Archive_Date_=0)),COUNT(__d1(Hybrid_Archive_Date_!=0))},
-    {'AddressSummary','PublicRecords_KEL.ECL_Functions.Dataset_FDC','VaultDateLastSeen',COUNT(__d1(Vault_Date_Last_Seen_=0)),COUNT(__d1(Vault_Date_Last_Seen_!=0))}]
+    {'AddressSummary','PublicRecords_KEL.files.NonFCRA.Risk_Indicators__Correlation_Risk__key_addr_name_summary','UID',COUNT(PublicRecords_KEL_files_NonFCRA_Risk_Indicators__Correlation_Risk__key_addr_name_summary_Invalid),COUNT(__d0)},
+    {'AddressSummary','PublicRecords_KEL.files.NonFCRA.Risk_Indicators__Correlation_Risk__key_addr_name_summary','prim_name',COUNT(__d0(__NL(Primary_Name_))),COUNT(__d0(__NN(Primary_Name_)))},
+    {'AddressSummary','PublicRecords_KEL.files.NonFCRA.Risk_Indicators__Correlation_Risk__key_addr_name_summary','prim_range',COUNT(__d0(__NL(Primary_Range_))),COUNT(__d0(__NN(Primary_Range_)))},
+    {'AddressSummary','PublicRecords_KEL.files.NonFCRA.Risk_Indicators__Correlation_Risk__key_addr_name_summary','zip',COUNT(__d0(__NL(Zip_))),COUNT(__d0(__NN(Zip_)))},
+    {'AddressSummary','PublicRecords_KEL.files.NonFCRA.Risk_Indicators__Correlation_Risk__key_addr_name_summary','fname',COUNT(__d0(__NL(Name_First_Name_))),COUNT(__d0(__NN(Name_First_Name_)))},
+    {'AddressSummary','PublicRecords_KEL.files.NonFCRA.Risk_Indicators__Correlation_Risk__key_addr_name_summary','lname',COUNT(__d0(__NL(Name_Last_Name_))),COUNT(__d0(__NN(Name_Last_Name_)))},
+    {'AddressSummary','PublicRecords_KEL.files.NonFCRA.Risk_Indicators__Correlation_Risk__key_addr_name_summary','src',COUNT(__d0(__NL(Name_Source_))),COUNT(__d0(__NN(Name_Source_)))},
+    {'AddressSummary','PublicRecords_KEL.files.NonFCRA.Risk_Indicators__Correlation_Risk__key_addr_name_summary','record_count',COUNT(__d0(__NL(Name_Record_Count_))),COUNT(__d0(__NN(Name_Record_Count_)))},
+    {'AddressSummary','PublicRecords_KEL.files.NonFCRA.Risk_Indicators__Correlation_Risk__key_addr_name_summary','DobDateOfBirth',COUNT(__d0(__NL(Dob_Date_Of_Birth_))),COUNT(__d0(__NN(Dob_Date_Of_Birth_)))},
+    {'AddressSummary','PublicRecords_KEL.files.NonFCRA.Risk_Indicators__Correlation_Risk__key_addr_name_summary','DobSource',COUNT(__d0(__NL(Dob_Source_))),COUNT(__d0(__NN(Dob_Source_)))},
+    {'AddressSummary','PublicRecords_KEL.files.NonFCRA.Risk_Indicators__Correlation_Risk__key_addr_name_summary','DobRecordCount',COUNT(__d0(__NL(Dob_Record_Count_))),COUNT(__d0(__NN(Dob_Record_Count_)))},
+    {'AddressSummary','PublicRecords_KEL.files.NonFCRA.Risk_Indicators__Correlation_Risk__key_addr_name_summary','Archive_Date',COUNT(__d0(Archive___Date_=0)),COUNT(__d0(Archive___Date_!=0))},
+    {'AddressSummary','PublicRecords_KEL.files.NonFCRA.Risk_Indicators__Correlation_Risk__key_addr_name_summary','DateFirstSeen',COUNT(__d0(Date_First_Seen_=0)),COUNT(__d0(Date_First_Seen_!=0))},
+    {'AddressSummary','PublicRecords_KEL.files.NonFCRA.Risk_Indicators__Correlation_Risk__key_addr_name_summary','DateLastSeen',COUNT(__d0(Date_Last_Seen_=0)),COUNT(__d0(Date_Last_Seen_!=0))},
+    {'AddressSummary','PublicRecords_KEL.files.NonFCRA.Risk_Indicators__Correlation_Risk__key_addr_name_summary','HybridArchiveDate',COUNT(__d0(Hybrid_Archive_Date_=0)),COUNT(__d0(Hybrid_Archive_Date_!=0))},
+    {'AddressSummary','PublicRecords_KEL.files.NonFCRA.Risk_Indicators__Correlation_Risk__key_addr_name_summary','VaultDateLastSeen',COUNT(__d0(Vault_Date_Last_Seen_=0)),COUNT(__d0(Vault_Date_Last_Seen_!=0))},
+    {'AddressSummary','PublicRecords_KEL.files.NonFCRA.Risk_Indicators__Correlation_Risk__key_addr_dob_summary','UID',COUNT(PublicRecords_KEL_files_NonFCRA_Risk_Indicators__Correlation_Risk__key_addr_dob_summary_Invalid),COUNT(__d1)},
+    {'AddressSummary','PublicRecords_KEL.files.NonFCRA.Risk_Indicators__Correlation_Risk__key_addr_dob_summary','prim_name',COUNT(__d1(__NL(Primary_Name_))),COUNT(__d1(__NN(Primary_Name_)))},
+    {'AddressSummary','PublicRecords_KEL.files.NonFCRA.Risk_Indicators__Correlation_Risk__key_addr_dob_summary','prim_range',COUNT(__d1(__NL(Primary_Range_))),COUNT(__d1(__NN(Primary_Range_)))},
+    {'AddressSummary','PublicRecords_KEL.files.NonFCRA.Risk_Indicators__Correlation_Risk__key_addr_dob_summary','zip',COUNT(__d1(__NL(Zip_))),COUNT(__d1(__NN(Zip_)))},
+    {'AddressSummary','PublicRecords_KEL.files.NonFCRA.Risk_Indicators__Correlation_Risk__key_addr_dob_summary','NameFirstName',COUNT(__d1(__NL(Name_First_Name_))),COUNT(__d1(__NN(Name_First_Name_)))},
+    {'AddressSummary','PublicRecords_KEL.files.NonFCRA.Risk_Indicators__Correlation_Risk__key_addr_dob_summary','NameLastName',COUNT(__d1(__NL(Name_Last_Name_))),COUNT(__d1(__NN(Name_Last_Name_)))},
+    {'AddressSummary','PublicRecords_KEL.files.NonFCRA.Risk_Indicators__Correlation_Risk__key_addr_dob_summary','NameSource',COUNT(__d1(__NL(Name_Source_))),COUNT(__d1(__NN(Name_Source_)))},
+    {'AddressSummary','PublicRecords_KEL.files.NonFCRA.Risk_Indicators__Correlation_Risk__key_addr_dob_summary','NameRecordCount',COUNT(__d1(__NL(Name_Record_Count_))),COUNT(__d1(__NN(Name_Record_Count_)))},
+    {'AddressSummary','PublicRecords_KEL.files.NonFCRA.Risk_Indicators__Correlation_Risk__key_addr_dob_summary','dob',COUNT(__d1(__NL(Dob_Date_Of_Birth_))),COUNT(__d1(__NN(Dob_Date_Of_Birth_)))},
+    {'AddressSummary','PublicRecords_KEL.files.NonFCRA.Risk_Indicators__Correlation_Risk__key_addr_dob_summary','src',COUNT(__d1(__NL(Dob_Source_))),COUNT(__d1(__NN(Dob_Source_)))},
+    {'AddressSummary','PublicRecords_KEL.files.NonFCRA.Risk_Indicators__Correlation_Risk__key_addr_dob_summary','record_count',COUNT(__d1(__NL(Dob_Record_Count_))),COUNT(__d1(__NN(Dob_Record_Count_)))},
+    {'AddressSummary','PublicRecords_KEL.files.NonFCRA.Risk_Indicators__Correlation_Risk__key_addr_dob_summary','Archive_Date',COUNT(__d1(Archive___Date_=0)),COUNT(__d1(Archive___Date_!=0))},
+    {'AddressSummary','PublicRecords_KEL.files.NonFCRA.Risk_Indicators__Correlation_Risk__key_addr_dob_summary','DateFirstSeen',COUNT(__d1(Date_First_Seen_=0)),COUNT(__d1(Date_First_Seen_!=0))},
+    {'AddressSummary','PublicRecords_KEL.files.NonFCRA.Risk_Indicators__Correlation_Risk__key_addr_dob_summary','DateLastSeen',COUNT(__d1(Date_Last_Seen_=0)),COUNT(__d1(Date_Last_Seen_!=0))},
+    {'AddressSummary','PublicRecords_KEL.files.NonFCRA.Risk_Indicators__Correlation_Risk__key_addr_dob_summary','HybridArchiveDate',COUNT(__d1(Hybrid_Archive_Date_=0)),COUNT(__d1(Hybrid_Archive_Date_!=0))},
+    {'AddressSummary','PublicRecords_KEL.files.NonFCRA.Risk_Indicators__Correlation_Risk__key_addr_dob_summary','VaultDateLastSeen',COUNT(__d1(Vault_Date_Last_Seen_=0)),COUNT(__d1(Vault_Date_Last_Seen_!=0))}]
   ,{KEL.typ.str entity,KEL.typ.str fileName,KEL.typ.str fieldName,KEL.typ.int nullCount,KEL.typ.int notNullCount});
 END;

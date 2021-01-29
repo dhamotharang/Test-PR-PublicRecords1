@@ -3,7 +3,7 @@ IMPORT KEL15 AS KEL;
 IMPORT PublicRecords_KEL;
 IMPORT CFG_Compile,E_Lien_Judgment,E_Person FROM PublicRecords_KEL;
 IMPORT * FROM KEL15.Null;
-EXPORT E_Person_Lien_Judgment(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG_Compile __cfg = CFG_Compile) := MODULE
+EXPORT E_Person_Lien_Judgment(CFG_Compile __cfg = CFG_Compile) := MODULE
   EXPORT Typ := KEL.typ.uid;
   EXPORT InLayout := RECORD
     KEL.typ.ntyp(E_Person().Typ) Subject_;
@@ -23,18 +23,29 @@ EXPORT E_Person_Lien_Judgment(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefau
   SHARED VIRTUAL __SourceFilter(DATASET(InLayout) __ds) := __ds;
   SHARED VIRTUAL __GroupedFilter(GROUPED DATASET(InLayout) __ds) := __ds;
   SHARED __Mapping := 'subject(DEFAULT:Subject_:0),Lien_(DEFAULT:Lien_:0),tmsid(DEFAULT:T_M_S_I_D_:\'\'),rmsid(DEFAULT:R_M_S_I_D_:\'\'),debtorplaintiff(DEFAULT:Debtor_Plaintiff_:\'\'),subjectsfullname(DEFAULT:Subjects_Full_Name_:\'\'),source(DEFAULT:Source_:\'\'),archive_date(DEFAULT:Archive___Date_:EPOCH),datefirstseen(DEFAULT:Date_First_Seen_:EPOCH),datelastseen(DEFAULT:Date_Last_Seen_:EPOCH),hybridarchivedate(DEFAULT:Hybrid_Archive_Date_:EPOCH),vaultdatelastseen(DEFAULT:Vault_Date_Last_Seen_:EPOCH)';
-  SHARED __Mapping0 := 'did(OVERRIDE:Subject_:0),Lien_(DEFAULT:Lien_:0),tmsid(OVERRIDE:T_M_S_I_D_:\'\'),rmsid(OVERRIDE:R_M_S_I_D_:\'\'),name_type(OVERRIDE:Debtor_Plaintiff_:\'\'),subjectsname(OVERRIDE:Subjects_Full_Name_:\'\'),src(OVERRIDE:Source_:\'\'),archive_date(OVERRIDE:Archive___Date_:EPOCH),date_first_seen(OVERRIDE:Date_First_Seen_:EPOCH),date_last_seen(OVERRIDE:Date_Last_Seen_:EPOCH),hybridarchivedate(DEFAULT:Hybrid_Archive_Date_:EPOCH),vaultdatelastseen(DEFAULT:Vault_Date_Last_Seen_:EPOCH),DPMBitmap(OVERRIDE:__Permits:PERMITS)';
-  SHARED __d0_Norm := NORMALIZE(__in,LEFT.Dataset_LiensV2_Key_Liens_Party_ID_Records,TRANSFORM(RECORDOF(__in.Dataset_LiensV2_Key_Liens_Party_ID_Records),SELF:=RIGHT));
-  EXPORT __d0_KELfiltered := __d0_Norm(name_type IN ['D', 'C']);
+  SHARED Hybrid_Archive_Date_0Rule(STRING a) := MAP(KEL.Routines.IsValidDate((KEL.typ.kdate)(a[1..6]+'01'))=>a[1..6]+'01','0');
+  SHARED __Mapping0 := 'did(OVERRIDE:Subject_:0),Lien_(DEFAULT:Lien_:0),tmsid(OVERRIDE:T_M_S_I_D_:\'\'),rmsid(OVERRIDE:R_M_S_I_D_:\'\'),name_type(OVERRIDE:Debtor_Plaintiff_:\'\'),subjectsname(OVERRIDE:Subjects_Full_Name_:\'\'),src(OVERRIDE:Source_:\'\'),archive_date(OVERRIDE:Archive___Date_:EPOCH),date_first_seen(OVERRIDE:Date_First_Seen_:EPOCH),date_last_seen(OVERRIDE:Date_Last_Seen_:EPOCH),hybrid_archive_date(OVERRIDE:Hybrid_Archive_Date_:EPOCH:Hybrid_Archive_Date_0Rule),vaultdatelastseen(DEFAULT:Vault_Date_Last_Seen_:EPOCH),DPMBitmap(OVERRIDE:__Permits:PERMITS)';
+  EXPORT __d0_KELfiltered := PublicRecords_KEL.Files.NonFCRA.LiensV2__Key_Liens_Party_ID_Vault(name_type IN ['D', 'C']);
   SHARED __d0_Lien__Layout := RECORD
     RECORDOF(__d0_KELfiltered);
     KEL.typ.uid Lien_;
   END;
-  SHARED __d0_Missing_Lien__UIDComponents := KEL.Intake.ConstructMissingFieldList(__d0_KELfiltered,'tmsid,rmsid','__in');
-  SHARED __d0_Lien__Mapped := IF(__d0_Missing_Lien__UIDComponents = 'tmsid,rmsid',PROJECT(__d0_KELfiltered,TRANSFORM(__d0_Lien__Layout,SELF.Lien_:=0,SELF:=LEFT)),JOIN(KEL.Intake.AppendFields(__d0_KELfiltered,__d0_Missing_Lien__UIDComponents),E_Lien_Judgment(__in,__cfg).Lookup,TRIM((STRING)LEFT.tmsid) + '|' + TRIM((STRING)LEFT.rmsid) = RIGHT.KeyVal,TRANSFORM(__d0_Lien__Layout,SELF.Lien_:=RIGHT.UID,SELF:=LEFT),LEFT OUTER,SMART));
+  SHARED __d0_Missing_Lien__UIDComponents := KEL.Intake.ConstructMissingFieldList(__d0_KELfiltered,'tmsid,rmsid','PublicRecords_KEL.Files.NonFCRA.LiensV2__Key_Liens_Party_ID_Vault');
+  SHARED __d0_Lien__Mapped := IF(__d0_Missing_Lien__UIDComponents = 'tmsid,rmsid',PROJECT(__d0_KELfiltered,TRANSFORM(__d0_Lien__Layout,SELF.Lien_:=0,SELF:=LEFT)),JOIN(KEL.Intake.AppendFields(__d0_KELfiltered,__d0_Missing_Lien__UIDComponents),E_Lien_Judgment(__cfg).Lookup,TRIM((STRING)LEFT.tmsid) + '|' + TRIM((STRING)LEFT.rmsid) = RIGHT.KeyVal,TRANSFORM(__d0_Lien__Layout,SELF.Lien_:=RIGHT.UID,SELF:=LEFT),LEFT OUTER,SMART));
   SHARED __d0_Prefiltered := __d0_Lien__Mapped;
-  SHARED __d0 := __SourceFilter(KEL.FromFlat.Convert(__d0_Prefiltered,InLayout,__Mapping0,'PublicRecords_KEL.ECL_Functions.Dataset_FDC'));
-  EXPORT InData := __d0;
+  SHARED __d0 := __SourceFilter(KEL.FromFlat.Convert(__d0_Prefiltered,InLayout,__Mapping0,'PublicRecords_KEL.Files.NonFCRA.LiensV2__Key_Liens_Party_ID_Vault'));
+  SHARED Hybrid_Archive_Date_1Rule(STRING a) := MAP(KEL.Routines.IsValidDate((KEL.typ.kdate)(a[1..6]+'01'))=>a[1..6]+'01','0');
+  SHARED __Mapping1 := 'did(OVERRIDE:Subject_:0),Lien_(DEFAULT:Lien_:0),tmsid(OVERRIDE:T_M_S_I_D_:\'\'),rmsid(OVERRIDE:R_M_S_I_D_:\'\'),name_type(OVERRIDE:Debtor_Plaintiff_:\'\'),subjectsname(OVERRIDE:Subjects_Full_Name_:\'\'),src(OVERRIDE:Source_:\'\'),archive_date(OVERRIDE:Archive___Date_:EPOCH),date_first_seen(OVERRIDE:Date_First_Seen_:EPOCH),date_last_seen(OVERRIDE:Date_Last_Seen_:EPOCH),hybrid_archive_date(OVERRIDE:Hybrid_Archive_Date_:EPOCH:Hybrid_Archive_Date_1Rule),vaultdatelastseen(DEFAULT:Vault_Date_Last_Seen_:EPOCH),DPMBitmap(OVERRIDE:__Permits:PERMITS)';
+  EXPORT __d1_KELfiltered := PublicRecords_KEL.Files.FCRA.LiensV2__Key_Liens_Party_ID_FCRA_Vault(name_type IN ['D', 'C']);
+  SHARED __d1_Lien__Layout := RECORD
+    RECORDOF(__d1_KELfiltered);
+    KEL.typ.uid Lien_;
+  END;
+  SHARED __d1_Missing_Lien__UIDComponents := KEL.Intake.ConstructMissingFieldList(__d1_KELfiltered,'tmsid,rmsid','PublicRecords_KEL.Files.FCRA.LiensV2__Key_Liens_Party_ID_FCRA_Vault');
+  SHARED __d1_Lien__Mapped := IF(__d1_Missing_Lien__UIDComponents = 'tmsid,rmsid',PROJECT(__d1_KELfiltered,TRANSFORM(__d1_Lien__Layout,SELF.Lien_:=0,SELF:=LEFT)),JOIN(KEL.Intake.AppendFields(__d1_KELfiltered,__d1_Missing_Lien__UIDComponents),E_Lien_Judgment(__cfg).Lookup,TRIM((STRING)LEFT.tmsid) + '|' + TRIM((STRING)LEFT.rmsid) = RIGHT.KeyVal,TRANSFORM(__d1_Lien__Layout,SELF.Lien_:=RIGHT.UID,SELF:=LEFT),LEFT OUTER,SMART));
+  SHARED __d1_Prefiltered := __d1_Lien__Mapped;
+  SHARED __d1 := __SourceFilter(KEL.FromFlat.Convert(__d1_Prefiltered,InLayout,__Mapping1,'PublicRecords_KEL.Files.FCRA.LiensV2__Key_Liens_Party_ID_FCRA_Vault'));
+  EXPORT InData := __d0 + __d1;
   EXPORT Details_Layout := RECORD
     KEL.typ.nstr Debtor_Plaintiff_;
     KEL.typ.nstr Subjects_Full_Name_;
@@ -95,21 +106,33 @@ EXPORT E_Person_Lien_Judgment(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefau
   EXPORT __PreResult := ROLLUP(HAVING(Person_Lien_Judgment_Group,COUNT(ROWS(LEFT))=1),GROUP,Person_Lien_Judgment__Single_Rollup(LEFT)) + ROLLUP(HAVING(Person_Lien_Judgment_Group,COUNT(ROWS(LEFT))>1),GROUP,Person_Lien_Judgment__Rollup(LEFT, ROWS(LEFT)));
   EXPORT __Result := __CLEARFLAGS(__PreResult);
   EXPORT Result := __UNWRAP(__Result);
-  EXPORT Subject__Orphan := JOIN(InData(__NN(Subject_)),E_Person(__in,__cfg).__Result,__EEQP(LEFT.Subject_, RIGHT.UID),TRANSFORM(InLayout,SELF := LEFT,SELF:=[]),LEFT ONLY, HASH);
-  EXPORT Lien__Orphan := JOIN(InData(__NN(Lien_)),E_Lien_Judgment(__in,__cfg).__Result,__EEQP(LEFT.Lien_, RIGHT.UID),TRANSFORM(InLayout,SELF := LEFT,SELF:=[]),LEFT ONLY, HASH);
+  EXPORT Subject__Orphan := JOIN(InData(__NN(Subject_)),E_Person(__cfg).__Result,__EEQP(LEFT.Subject_, RIGHT.UID),TRANSFORM(InLayout,SELF := LEFT,SELF:=[]),LEFT ONLY, HASH);
+  EXPORT Lien__Orphan := JOIN(InData(__NN(Lien_)),E_Lien_Judgment(__cfg).__Result,__EEQP(LEFT.Lien_, RIGHT.UID),TRANSFORM(InLayout,SELF := LEFT,SELF:=[]),LEFT ONLY, HASH);
   EXPORT SanityCheck := DATASET([{COUNT(Subject__Orphan),COUNT(Lien__Orphan)}],{KEL.typ.int Subject__Orphan,KEL.typ.int Lien__Orphan});
   EXPORT NullCounts := DATASET([
-    {'PersonLienJudgment','PublicRecords_KEL.ECL_Functions.Dataset_FDC','DID',COUNT(__d0(__NL(Subject_))),COUNT(__d0(__NN(Subject_)))},
-    {'PersonLienJudgment','PublicRecords_KEL.ECL_Functions.Dataset_FDC','Lien',COUNT(__d0(__NL(Lien_))),COUNT(__d0(__NN(Lien_)))},
-    {'PersonLienJudgment','PublicRecords_KEL.ECL_Functions.Dataset_FDC','tmsid',COUNT(__d0(__NL(T_M_S_I_D_))),COUNT(__d0(__NN(T_M_S_I_D_)))},
-    {'PersonLienJudgment','PublicRecords_KEL.ECL_Functions.Dataset_FDC','rmsid',COUNT(__d0(__NL(R_M_S_I_D_))),COUNT(__d0(__NN(R_M_S_I_D_)))},
-    {'PersonLienJudgment','PublicRecords_KEL.ECL_Functions.Dataset_FDC','name_type',COUNT(__d0(__NL(Debtor_Plaintiff_))),COUNT(__d0(__NN(Debtor_Plaintiff_)))},
-    {'PersonLienJudgment','PublicRecords_KEL.ECL_Functions.Dataset_FDC','SubjectsName',COUNT(__d0(__NL(Subjects_Full_Name_))),COUNT(__d0(__NN(Subjects_Full_Name_)))},
-    {'PersonLienJudgment','PublicRecords_KEL.ECL_Functions.Dataset_FDC','src',COUNT(__d0(__NL(Source_))),COUNT(__d0(__NN(Source_)))},
-    {'PersonLienJudgment','PublicRecords_KEL.ECL_Functions.Dataset_FDC','Archive_Date',COUNT(__d0(Archive___Date_=0)),COUNT(__d0(Archive___Date_!=0))},
-    {'PersonLienJudgment','PublicRecords_KEL.ECL_Functions.Dataset_FDC','DateFirstSeen',COUNT(__d0(Date_First_Seen_=0)),COUNT(__d0(Date_First_Seen_!=0))},
-    {'PersonLienJudgment','PublicRecords_KEL.ECL_Functions.Dataset_FDC','DateLastSeen',COUNT(__d0(Date_Last_Seen_=0)),COUNT(__d0(Date_Last_Seen_!=0))},
-    {'PersonLienJudgment','PublicRecords_KEL.ECL_Functions.Dataset_FDC','HybridArchiveDate',COUNT(__d0(Hybrid_Archive_Date_=0)),COUNT(__d0(Hybrid_Archive_Date_!=0))},
-    {'PersonLienJudgment','PublicRecords_KEL.ECL_Functions.Dataset_FDC','VaultDateLastSeen',COUNT(__d0(Vault_Date_Last_Seen_=0)),COUNT(__d0(Vault_Date_Last_Seen_!=0))}]
+    {'PersonLienJudgment','PublicRecords_KEL.Files.NonFCRA.LiensV2__Key_Liens_Party_ID_Vault','DID',COUNT(__d0(__NL(Subject_))),COUNT(__d0(__NN(Subject_)))},
+    {'PersonLienJudgment','PublicRecords_KEL.Files.NonFCRA.LiensV2__Key_Liens_Party_ID_Vault','Lien',COUNT(__d0(__NL(Lien_))),COUNT(__d0(__NN(Lien_)))},
+    {'PersonLienJudgment','PublicRecords_KEL.Files.NonFCRA.LiensV2__Key_Liens_Party_ID_Vault','tmsid',COUNT(__d0(__NL(T_M_S_I_D_))),COUNT(__d0(__NN(T_M_S_I_D_)))},
+    {'PersonLienJudgment','PublicRecords_KEL.Files.NonFCRA.LiensV2__Key_Liens_Party_ID_Vault','rmsid',COUNT(__d0(__NL(R_M_S_I_D_))),COUNT(__d0(__NN(R_M_S_I_D_)))},
+    {'PersonLienJudgment','PublicRecords_KEL.Files.NonFCRA.LiensV2__Key_Liens_Party_ID_Vault','name_type',COUNT(__d0(__NL(Debtor_Plaintiff_))),COUNT(__d0(__NN(Debtor_Plaintiff_)))},
+    {'PersonLienJudgment','PublicRecords_KEL.Files.NonFCRA.LiensV2__Key_Liens_Party_ID_Vault','SubjectsName',COUNT(__d0(__NL(Subjects_Full_Name_))),COUNT(__d0(__NN(Subjects_Full_Name_)))},
+    {'PersonLienJudgment','PublicRecords_KEL.Files.NonFCRA.LiensV2__Key_Liens_Party_ID_Vault','src',COUNT(__d0(__NL(Source_))),COUNT(__d0(__NN(Source_)))},
+    {'PersonLienJudgment','PublicRecords_KEL.Files.NonFCRA.LiensV2__Key_Liens_Party_ID_Vault','Archive_Date',COUNT(__d0(Archive___Date_=0)),COUNT(__d0(Archive___Date_!=0))},
+    {'PersonLienJudgment','PublicRecords_KEL.Files.NonFCRA.LiensV2__Key_Liens_Party_ID_Vault','DateFirstSeen',COUNT(__d0(Date_First_Seen_=0)),COUNT(__d0(Date_First_Seen_!=0))},
+    {'PersonLienJudgment','PublicRecords_KEL.Files.NonFCRA.LiensV2__Key_Liens_Party_ID_Vault','DateLastSeen',COUNT(__d0(Date_Last_Seen_=0)),COUNT(__d0(Date_Last_Seen_!=0))},
+    {'PersonLienJudgment','PublicRecords_KEL.Files.NonFCRA.LiensV2__Key_Liens_Party_ID_Vault','HybridArchiveDate',COUNT(__d0(Hybrid_Archive_Date_=0)),COUNT(__d0(Hybrid_Archive_Date_!=0))},
+    {'PersonLienJudgment','PublicRecords_KEL.Files.NonFCRA.LiensV2__Key_Liens_Party_ID_Vault','VaultDateLastSeen',COUNT(__d0(Vault_Date_Last_Seen_=0)),COUNT(__d0(Vault_Date_Last_Seen_!=0))},
+    {'PersonLienJudgment','PublicRecords_KEL.Files.FCRA.LiensV2__Key_Liens_Party_ID_FCRA_Vault','DID',COUNT(__d1(__NL(Subject_))),COUNT(__d1(__NN(Subject_)))},
+    {'PersonLienJudgment','PublicRecords_KEL.Files.FCRA.LiensV2__Key_Liens_Party_ID_FCRA_Vault','Lien',COUNT(__d1(__NL(Lien_))),COUNT(__d1(__NN(Lien_)))},
+    {'PersonLienJudgment','PublicRecords_KEL.Files.FCRA.LiensV2__Key_Liens_Party_ID_FCRA_Vault','tmsid',COUNT(__d1(__NL(T_M_S_I_D_))),COUNT(__d1(__NN(T_M_S_I_D_)))},
+    {'PersonLienJudgment','PublicRecords_KEL.Files.FCRA.LiensV2__Key_Liens_Party_ID_FCRA_Vault','rmsid',COUNT(__d1(__NL(R_M_S_I_D_))),COUNT(__d1(__NN(R_M_S_I_D_)))},
+    {'PersonLienJudgment','PublicRecords_KEL.Files.FCRA.LiensV2__Key_Liens_Party_ID_FCRA_Vault','name_type',COUNT(__d1(__NL(Debtor_Plaintiff_))),COUNT(__d1(__NN(Debtor_Plaintiff_)))},
+    {'PersonLienJudgment','PublicRecords_KEL.Files.FCRA.LiensV2__Key_Liens_Party_ID_FCRA_Vault','SubjectsName',COUNT(__d1(__NL(Subjects_Full_Name_))),COUNT(__d1(__NN(Subjects_Full_Name_)))},
+    {'PersonLienJudgment','PublicRecords_KEL.Files.FCRA.LiensV2__Key_Liens_Party_ID_FCRA_Vault','src',COUNT(__d1(__NL(Source_))),COUNT(__d1(__NN(Source_)))},
+    {'PersonLienJudgment','PublicRecords_KEL.Files.FCRA.LiensV2__Key_Liens_Party_ID_FCRA_Vault','Archive_Date',COUNT(__d1(Archive___Date_=0)),COUNT(__d1(Archive___Date_!=0))},
+    {'PersonLienJudgment','PublicRecords_KEL.Files.FCRA.LiensV2__Key_Liens_Party_ID_FCRA_Vault','DateFirstSeen',COUNT(__d1(Date_First_Seen_=0)),COUNT(__d1(Date_First_Seen_!=0))},
+    {'PersonLienJudgment','PublicRecords_KEL.Files.FCRA.LiensV2__Key_Liens_Party_ID_FCRA_Vault','DateLastSeen',COUNT(__d1(Date_Last_Seen_=0)),COUNT(__d1(Date_Last_Seen_!=0))},
+    {'PersonLienJudgment','PublicRecords_KEL.Files.FCRA.LiensV2__Key_Liens_Party_ID_FCRA_Vault','HybridArchiveDate',COUNT(__d1(Hybrid_Archive_Date_=0)),COUNT(__d1(Hybrid_Archive_Date_!=0))},
+    {'PersonLienJudgment','PublicRecords_KEL.Files.FCRA.LiensV2__Key_Liens_Party_ID_FCRA_Vault','VaultDateLastSeen',COUNT(__d1(Vault_Date_Last_Seen_=0)),COUNT(__d1(Vault_Date_Last_Seen_!=0))}]
   ,{KEL.typ.str entity,KEL.typ.str fileName,KEL.typ.str fieldName,KEL.typ.int nullCount,KEL.typ.int notNullCount});
 END;

@@ -3,7 +3,7 @@ IMPORT KEL15 AS KEL;
 IMPORT PublicRecords_KEL;
 IMPORT CFG_Compile,E_Business_Org,E_Business_Sele,E_Business_Sele_Overflow,E_Business_Ult,E_Property,E_Property_Event,E_Zip_Code FROM PublicRecords_KEL;
 IMPORT * FROM KEL15.Null;
-EXPORT E_Sele_Property_Event(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG_Compile __cfg = CFG_Compile) := MODULE
+EXPORT E_Sele_Property_Event(CFG_Compile __cfg = CFG_Compile) := MODULE
   EXPORT Typ := KEL.typ.uid;
   EXPORT InLayout := RECORD
     KEL.typ.ntyp(E_Business_Sele().Typ) Legal_;
@@ -30,23 +30,22 @@ EXPORT E_Sele_Property_Event(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefaul
   SHARED VIRTUAL __SourceFilter(DATASET(InLayout) __ds) := __ds;
   SHARED VIRTUAL __GroupedFilter(GROUPED DATASET(InLayout) __ds) := __ds;
   SHARED __Mapping := 'Legal_(DEFAULT:Legal_:0),Event_(DEFAULT:Event_:0),ultid(DEFAULT:Ult_I_D_:0),orgid(DEFAULT:Org_I_D_:0),seleid(DEFAULT:Sele_I_D_:0),lnfaresid(DEFAULT:L_N_Fares_I_D_:\'\'),personnumber(DEFAULT:Person_Number_:0),conjunctivenamesequence(DEFAULT:Conjunctive_Name_Sequence_:0),partyisbuyerorowner(DEFAULT:Party_Is_Buyer_Or_Owner_),partyisborrower(DEFAULT:Party_Is_Borrower_),partyisseller(DEFAULT:Party_Is_Seller_),partyiscareof(DEFAULT:Party_Is_Care_Of_),vendorsourcecode(DEFAULT:Vendor_Source_Code_:\'\'),source(DEFAULT:Source_:\'\'),archive_date(DEFAULT:Archive___Date_:EPOCH),datefirstseen(DEFAULT:Date_First_Seen_:EPOCH),datelastseen(DEFAULT:Date_Last_Seen_:EPOCH),hybridarchivedate(DEFAULT:Hybrid_Archive_Date_:EPOCH),vaultdatelastseen(DEFAULT:Vault_Date_Last_Seen_:EPOCH)';
-  SHARED __Mapping0 := 'Legal_(DEFAULT:Legal_:0),Event_(DEFAULT:Event_:0),ultid(OVERRIDE:Ult_I_D_:0),orgid(OVERRIDE:Org_I_D_:0),seleid(OVERRIDE:Sele_I_D_:0),ln_fares_id(OVERRIDE:L_N_Fares_I_D_:\'\'),personnumber(DEFAULT:Person_Number_:0),conjunctivenamesequence(DEFAULT:Conjunctive_Name_Sequence_:0),partyisbuyerorowner(OVERRIDE:Party_Is_Buyer_Or_Owner_),partyisborrower(OVERRIDE:Party_Is_Borrower_),partyisseller(OVERRIDE:Party_Is_Seller_),partyiscareof(OVERRIDE:Party_Is_Care_Of_),vendor_source_flag(OVERRIDE:Vendor_Source_Code_:\'\'),src(OVERRIDE:Source_:\'\'),archive_date(OVERRIDE:Archive___Date_:EPOCH),datefirstseen(DEFAULT:Date_First_Seen_:EPOCH),datelastseen(DEFAULT:Date_Last_Seen_:EPOCH),hybridarchivedate(DEFAULT:Hybrid_Archive_Date_:EPOCH),vaultdatelastseen(DEFAULT:Vault_Date_Last_Seen_:EPOCH),DPMBitmap(OVERRIDE:__Permits:PERMITS)';
-  SHARED __d0_Norm := NORMALIZE(__in,LEFT.Dataset_PropertyV2__Key_Search_Fid,TRANSFORM(RECORDOF(__in.Dataset_PropertyV2__Key_Search_Fid),SELF:=RIGHT));
-  EXPORT __d0_KELfiltered := __d0_Norm(ultid != 0 AND orgid != 0 AND seleid != 0 AND ln_fares_id != '');
+  SHARED __Mapping0 := 'Legal_(DEFAULT:Legal_:0),Event_(DEFAULT:Event_:0),ultid(OVERRIDE:Ult_I_D_:0),orgid(OVERRIDE:Org_I_D_:0),seleid(OVERRIDE:Sele_I_D_:0),ln_fares_id(OVERRIDE:L_N_Fares_I_D_:\'\'),which_orig(OVERRIDE:Person_Number_:0),conjunctive_name_seq(OVERRIDE:Conjunctive_Name_Sequence_:0),partyisbuyerorowner(OVERRIDE:Party_Is_Buyer_Or_Owner_),partyisborrower(OVERRIDE:Party_Is_Borrower_),partyisseller(OVERRIDE:Party_Is_Seller_),partyiscareof(OVERRIDE:Party_Is_Care_Of_),vendor_source_flag(OVERRIDE:Vendor_Source_Code_:\'\'),src(OVERRIDE:Source_:\'\'),archive_date(OVERRIDE:Archive___Date_:EPOCH),datefirstseen(DEFAULT:Date_First_Seen_:EPOCH),datelastseen(DEFAULT:Date_Last_Seen_:EPOCH),hybridarchivedate(DEFAULT:Hybrid_Archive_Date_:EPOCH),vaultdatelastseen(DEFAULT:Vault_Date_Last_Seen_:EPOCH),DPMBitmap(OVERRIDE:__Permits:PERMITS)';
+  EXPORT __d0_KELfiltered := PublicRecords_KEL.Files.NonFCRA.LN_PropertyV2__key_search_fid_vault(ultid != 0 AND orgid != 0 AND seleid != 0 AND ln_fares_id != '');
   SHARED __d0_Legal__Layout := RECORD
     RECORDOF(__d0_KELfiltered);
     KEL.typ.uid Legal_;
   END;
-  SHARED __d0_Missing_Legal__UIDComponents := KEL.Intake.ConstructMissingFieldList(__d0_KELfiltered,'ultid,orgid,seleid','__in');
-  SHARED __d0_Legal__Mapped := IF(__d0_Missing_Legal__UIDComponents = 'ultid,orgid,seleid',PROJECT(__d0_KELfiltered,TRANSFORM(__d0_Legal__Layout,SELF.Legal_:=0,SELF:=LEFT)),JOIN(KEL.Intake.AppendFields(__d0_KELfiltered,__d0_Missing_Legal__UIDComponents),E_Business_Sele(__in,__cfg).Lookup,TRIM((STRING)LEFT.ultid) + '|' + TRIM((STRING)LEFT.orgid) + '|' + TRIM((STRING)LEFT.seleid) = RIGHT.KeyVal,TRANSFORM(__d0_Legal__Layout,SELF.Legal_:=RIGHT.UID,SELF:=LEFT),LEFT OUTER,SMART));
+  SHARED __d0_Missing_Legal__UIDComponents := KEL.Intake.ConstructMissingFieldList(__d0_KELfiltered,'ultid,orgid,seleid','PublicRecords_KEL.Files.NonFCRA.LN_PropertyV2__key_search_fid_vault');
+  SHARED __d0_Legal__Mapped := IF(__d0_Missing_Legal__UIDComponents = 'ultid,orgid,seleid',PROJECT(__d0_KELfiltered,TRANSFORM(__d0_Legal__Layout,SELF.Legal_:=0,SELF:=LEFT)),JOIN(KEL.Intake.AppendFields(__d0_KELfiltered,__d0_Missing_Legal__UIDComponents),E_Business_Sele(__cfg).Lookup,TRIM((STRING)LEFT.ultid) + '|' + TRIM((STRING)LEFT.orgid) + '|' + TRIM((STRING)LEFT.seleid) = RIGHT.KeyVal,TRANSFORM(__d0_Legal__Layout,SELF.Legal_:=RIGHT.UID,SELF:=LEFT),LEFT OUTER,SMART));
   SHARED __d0_Event__Layout := RECORD
     RECORDOF(__d0_Legal__Mapped);
     KEL.typ.uid Event_;
   END;
-  SHARED __d0_Missing_Event__UIDComponents := KEL.Intake.ConstructMissingFieldList(__d0_Legal__Mapped,'ln_fares_id','__in');
-  SHARED __d0_Event__Mapped := IF(__d0_Missing_Event__UIDComponents = 'ln_fares_id',PROJECT(__d0_Legal__Mapped,TRANSFORM(__d0_Event__Layout,SELF.Event_:=0,SELF:=LEFT)),JOIN(KEL.Intake.AppendFields(__d0_Legal__Mapped,__d0_Missing_Event__UIDComponents),E_Property_Event(__in,__cfg).Lookup,TRIM((STRING)LEFT.ln_fares_id) = RIGHT.KeyVal,TRANSFORM(__d0_Event__Layout,SELF.Event_:=RIGHT.UID,SELF:=LEFT),LEFT OUTER,SMART));
+  SHARED __d0_Missing_Event__UIDComponents := KEL.Intake.ConstructMissingFieldList(__d0_Legal__Mapped,'ln_fares_id','PublicRecords_KEL.Files.NonFCRA.LN_PropertyV2__key_search_fid_vault');
+  SHARED __d0_Event__Mapped := IF(__d0_Missing_Event__UIDComponents = 'ln_fares_id',PROJECT(__d0_Legal__Mapped,TRANSFORM(__d0_Event__Layout,SELF.Event_:=0,SELF:=LEFT)),JOIN(KEL.Intake.AppendFields(__d0_Legal__Mapped,__d0_Missing_Event__UIDComponents),E_Property_Event(__cfg).Lookup,TRIM((STRING)LEFT.ln_fares_id) = RIGHT.KeyVal,TRANSFORM(__d0_Event__Layout,SELF.Event_:=RIGHT.UID,SELF:=LEFT),LEFT OUTER,SMART));
   SHARED __d0_Prefiltered := __d0_Event__Mapped;
-  SHARED __d0 := __SourceFilter(KEL.FromFlat.Convert(__d0_Prefiltered,InLayout,__Mapping0,'PublicRecords_KEL.ECL_Functions.Dataset_FDC'));
+  SHARED __d0 := __SourceFilter(KEL.FromFlat.Convert(__d0_Prefiltered,InLayout,__Mapping0,'PublicRecords_KEL.Files.NonFCRA.LN_PropertyV2__key_search_fid_vault'));
   EXPORT InData := __d0;
   EXPORT Party_Details_Layout := RECORD
     KEL.typ.nint Person_Number_;
@@ -126,28 +125,28 @@ EXPORT E_Sele_Property_Event(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefaul
   EXPORT __PreResult := ROLLUP(HAVING(Sele_Property_Event_Group,COUNT(ROWS(LEFT))=1),GROUP,Sele_Property_Event__Single_Rollup(LEFT)) + ROLLUP(HAVING(Sele_Property_Event_Group,COUNT(ROWS(LEFT))>1),GROUP,Sele_Property_Event__Rollup(LEFT, ROWS(LEFT)));
   EXPORT __Result := __CLEARFLAGS(__PreResult);
   EXPORT Result := __UNWRAP(__Result);
-  EXPORT Legal__Orphan := JOIN(InData(__NN(Legal_)),E_Business_Sele(__in,__cfg).__Result,__EEQP(LEFT.Legal_, RIGHT.UID),TRANSFORM(InLayout,SELF := LEFT,SELF:=[]),LEFT ONLY, HASH);
-  EXPORT Event__Orphan := JOIN(InData(__NN(Event_)),E_Property_Event(__in,__cfg).__Result,__EEQP(LEFT.Event_, RIGHT.UID),TRANSFORM(InLayout,SELF := LEFT,SELF:=[]),LEFT ONLY, HASH);
+  EXPORT Legal__Orphan := JOIN(InData(__NN(Legal_)),E_Business_Sele(__cfg).__Result,__EEQP(LEFT.Legal_, RIGHT.UID),TRANSFORM(InLayout,SELF := LEFT,SELF:=[]),LEFT ONLY, HASH);
+  EXPORT Event__Orphan := JOIN(InData(__NN(Event_)),E_Property_Event(__cfg).__Result,__EEQP(LEFT.Event_, RIGHT.UID),TRANSFORM(InLayout,SELF := LEFT,SELF:=[]),LEFT ONLY, HASH);
   EXPORT SanityCheck := DATASET([{COUNT(Legal__Orphan),COUNT(Event__Orphan)}],{KEL.typ.int Legal__Orphan,KEL.typ.int Event__Orphan});
   EXPORT NullCounts := DATASET([
-    {'SelePropertyEvent','PublicRecords_KEL.ECL_Functions.Dataset_FDC','Legal',COUNT(__d0(__NL(Legal_))),COUNT(__d0(__NN(Legal_)))},
-    {'SelePropertyEvent','PublicRecords_KEL.ECL_Functions.Dataset_FDC','Event',COUNT(__d0(__NL(Event_))),COUNT(__d0(__NN(Event_)))},
-    {'SelePropertyEvent','PublicRecords_KEL.ECL_Functions.Dataset_FDC','ultid',COUNT(__d0(__NL(Ult_I_D_))),COUNT(__d0(__NN(Ult_I_D_)))},
-    {'SelePropertyEvent','PublicRecords_KEL.ECL_Functions.Dataset_FDC','orgid',COUNT(__d0(__NL(Org_I_D_))),COUNT(__d0(__NN(Org_I_D_)))},
-    {'SelePropertyEvent','PublicRecords_KEL.ECL_Functions.Dataset_FDC','seleid',COUNT(__d0(__NL(Sele_I_D_))),COUNT(__d0(__NN(Sele_I_D_)))},
-    {'SelePropertyEvent','PublicRecords_KEL.ECL_Functions.Dataset_FDC','ln_fares_id',COUNT(__d0(__NL(L_N_Fares_I_D_))),COUNT(__d0(__NN(L_N_Fares_I_D_)))},
-    {'SelePropertyEvent','PublicRecords_KEL.ECL_Functions.Dataset_FDC','PersonNumber',COUNT(__d0(__NL(Person_Number_))),COUNT(__d0(__NN(Person_Number_)))},
-    {'SelePropertyEvent','PublicRecords_KEL.ECL_Functions.Dataset_FDC','ConjunctiveNameSequence',COUNT(__d0(__NL(Conjunctive_Name_Sequence_))),COUNT(__d0(__NN(Conjunctive_Name_Sequence_)))},
-    {'SelePropertyEvent','PublicRecords_KEL.ECL_Functions.Dataset_FDC','partyisbuyerorowner',COUNT(__d0(__NL(Party_Is_Buyer_Or_Owner_))),COUNT(__d0(__NN(Party_Is_Buyer_Or_Owner_)))},
-    {'SelePropertyEvent','PublicRecords_KEL.ECL_Functions.Dataset_FDC','partyisborrower',COUNT(__d0(__NL(Party_Is_Borrower_))),COUNT(__d0(__NN(Party_Is_Borrower_)))},
-    {'SelePropertyEvent','PublicRecords_KEL.ECL_Functions.Dataset_FDC','partyisseller',COUNT(__d0(__NL(Party_Is_Seller_))),COUNT(__d0(__NN(Party_Is_Seller_)))},
-    {'SelePropertyEvent','PublicRecords_KEL.ECL_Functions.Dataset_FDC','partyiscareof',COUNT(__d0(__NL(Party_Is_Care_Of_))),COUNT(__d0(__NN(Party_Is_Care_Of_)))},
-    {'SelePropertyEvent','PublicRecords_KEL.ECL_Functions.Dataset_FDC','vendor_source_flag',COUNT(__d0(__NL(Vendor_Source_Code_))),COUNT(__d0(__NN(Vendor_Source_Code_)))},
-    {'SelePropertyEvent','PublicRecords_KEL.ECL_Functions.Dataset_FDC','src',COUNT(__d0(__NL(Source_))),COUNT(__d0(__NN(Source_)))},
-    {'SelePropertyEvent','PublicRecords_KEL.ECL_Functions.Dataset_FDC','Archive_Date',COUNT(__d0(Archive___Date_=0)),COUNT(__d0(Archive___Date_!=0))},
-    {'SelePropertyEvent','PublicRecords_KEL.ECL_Functions.Dataset_FDC','DateFirstSeen',COUNT(__d0(Date_First_Seen_=0)),COUNT(__d0(Date_First_Seen_!=0))},
-    {'SelePropertyEvent','PublicRecords_KEL.ECL_Functions.Dataset_FDC','DateLastSeen',COUNT(__d0(Date_Last_Seen_=0)),COUNT(__d0(Date_Last_Seen_!=0))},
-    {'SelePropertyEvent','PublicRecords_KEL.ECL_Functions.Dataset_FDC','HybridArchiveDate',COUNT(__d0(Hybrid_Archive_Date_=0)),COUNT(__d0(Hybrid_Archive_Date_!=0))},
-    {'SelePropertyEvent','PublicRecords_KEL.ECL_Functions.Dataset_FDC','VaultDateLastSeen',COUNT(__d0(Vault_Date_Last_Seen_=0)),COUNT(__d0(Vault_Date_Last_Seen_!=0))}]
+    {'SelePropertyEvent','PublicRecords_KEL.Files.NonFCRA.LN_PropertyV2__key_search_fid_vault','Legal',COUNT(__d0(__NL(Legal_))),COUNT(__d0(__NN(Legal_)))},
+    {'SelePropertyEvent','PublicRecords_KEL.Files.NonFCRA.LN_PropertyV2__key_search_fid_vault','Event',COUNT(__d0(__NL(Event_))),COUNT(__d0(__NN(Event_)))},
+    {'SelePropertyEvent','PublicRecords_KEL.Files.NonFCRA.LN_PropertyV2__key_search_fid_vault','ultid',COUNT(__d0(__NL(Ult_I_D_))),COUNT(__d0(__NN(Ult_I_D_)))},
+    {'SelePropertyEvent','PublicRecords_KEL.Files.NonFCRA.LN_PropertyV2__key_search_fid_vault','orgid',COUNT(__d0(__NL(Org_I_D_))),COUNT(__d0(__NN(Org_I_D_)))},
+    {'SelePropertyEvent','PublicRecords_KEL.Files.NonFCRA.LN_PropertyV2__key_search_fid_vault','seleid',COUNT(__d0(__NL(Sele_I_D_))),COUNT(__d0(__NN(Sele_I_D_)))},
+    {'SelePropertyEvent','PublicRecords_KEL.Files.NonFCRA.LN_PropertyV2__key_search_fid_vault','ln_fares_id',COUNT(__d0(__NL(L_N_Fares_I_D_))),COUNT(__d0(__NN(L_N_Fares_I_D_)))},
+    {'SelePropertyEvent','PublicRecords_KEL.Files.NonFCRA.LN_PropertyV2__key_search_fid_vault','which_orig',COUNT(__d0(__NL(Person_Number_))),COUNT(__d0(__NN(Person_Number_)))},
+    {'SelePropertyEvent','PublicRecords_KEL.Files.NonFCRA.LN_PropertyV2__key_search_fid_vault','conjunctive_name_seq',COUNT(__d0(__NL(Conjunctive_Name_Sequence_))),COUNT(__d0(__NN(Conjunctive_Name_Sequence_)))},
+    {'SelePropertyEvent','PublicRecords_KEL.Files.NonFCRA.LN_PropertyV2__key_search_fid_vault','partyisbuyerorowner',COUNT(__d0(__NL(Party_Is_Buyer_Or_Owner_))),COUNT(__d0(__NN(Party_Is_Buyer_Or_Owner_)))},
+    {'SelePropertyEvent','PublicRecords_KEL.Files.NonFCRA.LN_PropertyV2__key_search_fid_vault','partyisborrower',COUNT(__d0(__NL(Party_Is_Borrower_))),COUNT(__d0(__NN(Party_Is_Borrower_)))},
+    {'SelePropertyEvent','PublicRecords_KEL.Files.NonFCRA.LN_PropertyV2__key_search_fid_vault','partyisseller',COUNT(__d0(__NL(Party_Is_Seller_))),COUNT(__d0(__NN(Party_Is_Seller_)))},
+    {'SelePropertyEvent','PublicRecords_KEL.Files.NonFCRA.LN_PropertyV2__key_search_fid_vault','partyiscareof',COUNT(__d0(__NL(Party_Is_Care_Of_))),COUNT(__d0(__NN(Party_Is_Care_Of_)))},
+    {'SelePropertyEvent','PublicRecords_KEL.Files.NonFCRA.LN_PropertyV2__key_search_fid_vault','vendor_source_flag',COUNT(__d0(__NL(Vendor_Source_Code_))),COUNT(__d0(__NN(Vendor_Source_Code_)))},
+    {'SelePropertyEvent','PublicRecords_KEL.Files.NonFCRA.LN_PropertyV2__key_search_fid_vault','src',COUNT(__d0(__NL(Source_))),COUNT(__d0(__NN(Source_)))},
+    {'SelePropertyEvent','PublicRecords_KEL.Files.NonFCRA.LN_PropertyV2__key_search_fid_vault','Archive_Date',COUNT(__d0(Archive___Date_=0)),COUNT(__d0(Archive___Date_!=0))},
+    {'SelePropertyEvent','PublicRecords_KEL.Files.NonFCRA.LN_PropertyV2__key_search_fid_vault','DateFirstSeen',COUNT(__d0(Date_First_Seen_=0)),COUNT(__d0(Date_First_Seen_!=0))},
+    {'SelePropertyEvent','PublicRecords_KEL.Files.NonFCRA.LN_PropertyV2__key_search_fid_vault','DateLastSeen',COUNT(__d0(Date_Last_Seen_=0)),COUNT(__d0(Date_Last_Seen_!=0))},
+    {'SelePropertyEvent','PublicRecords_KEL.Files.NonFCRA.LN_PropertyV2__key_search_fid_vault','HybridArchiveDate',COUNT(__d0(Hybrid_Archive_Date_=0)),COUNT(__d0(Hybrid_Archive_Date_!=0))},
+    {'SelePropertyEvent','PublicRecords_KEL.Files.NonFCRA.LN_PropertyV2__key_search_fid_vault','VaultDateLastSeen',COUNT(__d0(Vault_Date_Last_Seen_=0)),COUNT(__d0(Vault_Date_Last_Seen_!=0))}]
   ,{KEL.typ.str entity,KEL.typ.str fileName,KEL.typ.str fieldName,KEL.typ.int nullCount,KEL.typ.int notNullCount});
 END;
