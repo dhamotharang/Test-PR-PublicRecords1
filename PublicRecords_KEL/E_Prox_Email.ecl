@@ -3,7 +3,7 @@ IMPORT KEL15 AS KEL;
 IMPORT PublicRecords_KEL;
 IMPORT CFG_Compile,E_Business_Org,E_Business_Prox,E_Business_Sele,E_Business_Sele_Overflow,E_Business_Ult,E_Email FROM PublicRecords_KEL;
 IMPORT * FROM KEL15.Null;
-EXPORT E_Prox_Email(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG_Compile __cfg = CFG_Compile) := MODULE
+EXPORT E_Prox_Email(CFG_Compile __cfg = CFG_Compile) := MODULE
   EXPORT Typ := KEL.typ.uid;
   EXPORT InLayout := RECORD
     KEL.typ.ntyp(E_Business_Prox().Typ) Business_Location_;
@@ -27,27 +27,27 @@ EXPORT E_Prox_Email(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG_Co
   SHARED VIRTUAL __SourceFilter(DATASET(InLayout) __ds) := __ds;
   SHARED VIRTUAL __GroupedFilter(GROUPED DATASET(InLayout) __ds) := __ds;
   SHARED __Mapping := 'Business_Location_(DEFAULT:Business_Location_:0),Email_(DEFAULT:Email_:0),ultid(DEFAULT:Ult_I_D_:0),orgid(DEFAULT:Org_I_D_:0),seleid(DEFAULT:Sele_I_D_:0),proxid(DEFAULT:Prox_I_D_:0),emailaddress(DEFAULT:Email_Address_:\'\'),contactemailusername(DEFAULT:Contact_Email_Username_:\'\'),contactemaildomain(DEFAULT:Contact_Email_Domain_:\'\'),headerhitflag(DEFAULT:Header_Hit_Flag_),source(DEFAULT:Source_:\'\'),archive_date(DEFAULT:Archive___Date_:EPOCH),datefirstseen(DEFAULT:Date_First_Seen_:EPOCH),datelastseen(DEFAULT:Date_Last_Seen_:EPOCH),hybridarchivedate(DEFAULT:Hybrid_Archive_Date_:EPOCH),vaultdatelastseen(DEFAULT:Vault_Date_Last_Seen_:EPOCH)';
-  SHARED __Mapping0 := 'Business_Location_(DEFAULT:Business_Location_:0),Email_(DEFAULT:Email_:0),ultid(OVERRIDE:Ult_I_D_:0),orgid(OVERRIDE:Org_I_D_:0),seleid(OVERRIDE:Sele_I_D_:0),proxid(OVERRIDE:Prox_I_D_:0),contact_email(OVERRIDE:Email_Address_:\'\'),contact_email_username(OVERRIDE:Contact_Email_Username_:\'\'),contact_email_domain(OVERRIDE:Contact_Email_Domain_:\'\'),source(OVERRIDE:Source_:\'\'),archive_date(OVERRIDE:Archive___Date_:EPOCH),dt_first_seen_contact(OVERRIDE:Date_First_Seen_:EPOCH),dt_last_seen_contact(OVERRIDE:Date_Last_Seen_:EPOCH),hybridarchivedate(DEFAULT:Hybrid_Archive_Date_:EPOCH),vaultdatelastseen(DEFAULT:Vault_Date_Last_Seen_:EPOCH),DPMBitmap(OVERRIDE:__Permits:PERMITS)';
+  SHARED Hybrid_Archive_Date_0Rule(STRING a) := MAP(KEL.Routines.IsValidDate((KEL.typ.kdate)(a[1..6]+'01'))=>a[1..6]+'01','0');
+  SHARED __Mapping0 := 'Business_Location_(DEFAULT:Business_Location_:0),Email_(DEFAULT:Email_:0),ultid(OVERRIDE:Ult_I_D_:0),orgid(OVERRIDE:Org_I_D_:0),seleid(OVERRIDE:Sele_I_D_:0),proxid(OVERRIDE:Prox_I_D_:0),contact_email(OVERRIDE:Email_Address_:\'\'),contact_email_username(OVERRIDE:Contact_Email_Username_:\'\'),contact_email_domain(OVERRIDE:Contact_Email_Domain_:\'\'),source(OVERRIDE:Source_:\'\'),archive_date(OVERRIDE:Archive___Date_:EPOCH),dt_first_seen_contact(OVERRIDE:Date_First_Seen_:EPOCH),dt_last_seen_contact(OVERRIDE:Date_Last_Seen_:EPOCH),hybrid_archive_date(OVERRIDE:Hybrid_Archive_Date_:EPOCH:Hybrid_Archive_Date_0Rule),vaultdatelastseen(DEFAULT:Vault_Date_Last_Seen_:EPOCH),DPMBitmap(OVERRIDE:__Permits:PERMITS)';
   SHARED InLayout __Mapping0_Transform(InLayout __r) := TRANSFORM
     SELF.Header_Hit_Flag_ := __CN(TRUE);
     SELF := __r;
   END;
-  SHARED __d0_Norm := NORMALIZE(__in,LEFT.Dataset_BIPV2_Build__kfetch_contact_linkids,TRANSFORM(RECORDOF(__in.Dataset_BIPV2_Build__kfetch_contact_linkids),SELF:=RIGHT));
-  EXPORT __d0_KELfiltered := __d0_Norm(contact_email <> '' AND (UNSIGNED)proxid<>0);
+  EXPORT __d0_KELfiltered := PublicRecords_KEL.Files.NonFCRA.BIPV2_Build__key_contact_linkids_Vault(contact_email <> '' AND (UNSIGNED)proxid<>0);
   SHARED __d0_Business_Location__Layout := RECORD
     RECORDOF(__d0_KELfiltered);
     KEL.typ.uid Business_Location_;
   END;
-  SHARED __d0_Missing_Business_Location__UIDComponents := KEL.Intake.ConstructMissingFieldList(__d0_KELfiltered,'ultid,orgid,seleid,proxid','__in');
-  SHARED __d0_Business_Location__Mapped := IF(__d0_Missing_Business_Location__UIDComponents = 'ultid,orgid,seleid,proxid',PROJECT(__d0_KELfiltered,TRANSFORM(__d0_Business_Location__Layout,SELF.Business_Location_:=0,SELF:=LEFT)),JOIN(KEL.Intake.AppendFields(__d0_KELfiltered,__d0_Missing_Business_Location__UIDComponents),E_Business_Prox(__in,__cfg).Lookup,TRIM((STRING)LEFT.ultid) + '|' + TRIM((STRING)LEFT.orgid) + '|' + TRIM((STRING)LEFT.seleid) + '|' + TRIM((STRING)LEFT.proxid) = RIGHT.KeyVal,TRANSFORM(__d0_Business_Location__Layout,SELF.Business_Location_:=RIGHT.UID,SELF:=LEFT),LEFT OUTER,SMART));
+  SHARED __d0_Missing_Business_Location__UIDComponents := KEL.Intake.ConstructMissingFieldList(__d0_KELfiltered,'ultid,orgid,seleid,proxid','PublicRecords_KEL.Files.NonFCRA.BIPV2_Build__key_contact_linkids_Vault');
+  SHARED __d0_Business_Location__Mapped := IF(__d0_Missing_Business_Location__UIDComponents = 'ultid,orgid,seleid,proxid',PROJECT(__d0_KELfiltered,TRANSFORM(__d0_Business_Location__Layout,SELF.Business_Location_:=0,SELF:=LEFT)),JOIN(KEL.Intake.AppendFields(__d0_KELfiltered,__d0_Missing_Business_Location__UIDComponents),E_Business_Prox(__cfg).Lookup,TRIM((STRING)LEFT.ultid) + '|' + TRIM((STRING)LEFT.orgid) + '|' + TRIM((STRING)LEFT.seleid) + '|' + TRIM((STRING)LEFT.proxid) = RIGHT.KeyVal,TRANSFORM(__d0_Business_Location__Layout,SELF.Business_Location_:=RIGHT.UID,SELF:=LEFT),LEFT OUTER,SMART));
   SHARED __d0_Email__Layout := RECORD
     RECORDOF(__d0_Business_Location__Mapped);
     KEL.typ.uid Email_;
   END;
-  SHARED __d0_Missing_Email__UIDComponents := KEL.Intake.ConstructMissingFieldList(__d0_Business_Location__Mapped,'contact_email','__in');
-  SHARED __d0_Email__Mapped := IF(__d0_Missing_Email__UIDComponents = 'contact_email',PROJECT(__d0_Business_Location__Mapped,TRANSFORM(__d0_Email__Layout,SELF.Email_:=0,SELF:=LEFT)),JOIN(KEL.Intake.AppendFields(__d0_Business_Location__Mapped,__d0_Missing_Email__UIDComponents),E_Email(__in,__cfg).Lookup,TRIM((STRING)LEFT.contact_email) = RIGHT.KeyVal,TRANSFORM(__d0_Email__Layout,SELF.Email_:=RIGHT.UID,SELF:=LEFT),LEFT OUTER,SMART));
+  SHARED __d0_Missing_Email__UIDComponents := KEL.Intake.ConstructMissingFieldList(__d0_Business_Location__Mapped,'contact_email','PublicRecords_KEL.Files.NonFCRA.BIPV2_Build__key_contact_linkids_Vault');
+  SHARED __d0_Email__Mapped := IF(__d0_Missing_Email__UIDComponents = 'contact_email',PROJECT(__d0_Business_Location__Mapped,TRANSFORM(__d0_Email__Layout,SELF.Email_:=0,SELF:=LEFT)),JOIN(KEL.Intake.AppendFields(__d0_Business_Location__Mapped,__d0_Missing_Email__UIDComponents),E_Email(__cfg).Lookup,TRIM((STRING)LEFT.contact_email) = RIGHT.KeyVal,TRANSFORM(__d0_Email__Layout,SELF.Email_:=RIGHT.UID,SELF:=LEFT),LEFT OUTER,SMART));
   SHARED __d0_Prefiltered := __d0_Email__Mapped;
-  SHARED __d0 := __SourceFilter(PROJECT(KEL.FromFlat.Convert(__d0_Prefiltered,InLayout,__Mapping0,'PublicRecords_KEL.ECL_Functions.Dataset_FDC'),__Mapping0_Transform(LEFT)));
+  SHARED __d0 := __SourceFilter(PROJECT(KEL.FromFlat.Convert(__d0_Prefiltered,InLayout,__Mapping0,'PublicRecords_KEL.Files.NonFCRA.BIPV2_Build__key_contact_linkids_Vault'),__Mapping0_Transform(LEFT)));
   EXPORT InData := __d0;
   EXPORT Emails_Layout := RECORD
     KEL.typ.nstr Email_Address_;
@@ -115,24 +115,24 @@ EXPORT E_Prox_Email(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG_Co
   EXPORT __PreResult := ROLLUP(HAVING(Prox_Email_Group,COUNT(ROWS(LEFT))=1),GROUP,Prox_Email__Single_Rollup(LEFT)) + ROLLUP(HAVING(Prox_Email_Group,COUNT(ROWS(LEFT))>1),GROUP,Prox_Email__Rollup(LEFT, ROWS(LEFT)));
   EXPORT __Result := __CLEARFLAGS(__PreResult);
   EXPORT Result := __UNWRAP(__Result);
-  EXPORT Business_Location__Orphan := JOIN(InData(__NN(Business_Location_)),E_Business_Prox(__in,__cfg).__Result,__EEQP(LEFT.Business_Location_, RIGHT.UID),TRANSFORM(InLayout,SELF := LEFT,SELF:=[]),LEFT ONLY, HASH);
-  EXPORT Email__Orphan := JOIN(InData(__NN(Email_)),E_Email(__in,__cfg).__Result,__EEQP(LEFT.Email_, RIGHT.UID),TRANSFORM(InLayout,SELF := LEFT,SELF:=[]),LEFT ONLY, HASH);
+  EXPORT Business_Location__Orphan := JOIN(InData(__NN(Business_Location_)),E_Business_Prox(__cfg).__Result,__EEQP(LEFT.Business_Location_, RIGHT.UID),TRANSFORM(InLayout,SELF := LEFT,SELF:=[]),LEFT ONLY, HASH);
+  EXPORT Email__Orphan := JOIN(InData(__NN(Email_)),E_Email(__cfg).__Result,__EEQP(LEFT.Email_, RIGHT.UID),TRANSFORM(InLayout,SELF := LEFT,SELF:=[]),LEFT ONLY, HASH);
   EXPORT SanityCheck := DATASET([{COUNT(Business_Location__Orphan),COUNT(Email__Orphan)}],{KEL.typ.int Business_Location__Orphan,KEL.typ.int Email__Orphan});
   EXPORT NullCounts := DATASET([
-    {'ProxEmail','PublicRecords_KEL.ECL_Functions.Dataset_FDC','BusinessLocation',COUNT(__d0(__NL(Business_Location_))),COUNT(__d0(__NN(Business_Location_)))},
-    {'ProxEmail','PublicRecords_KEL.ECL_Functions.Dataset_FDC','Email',COUNT(__d0(__NL(Email_))),COUNT(__d0(__NN(Email_)))},
-    {'ProxEmail','PublicRecords_KEL.ECL_Functions.Dataset_FDC','ultid',COUNT(__d0(__NL(Ult_I_D_))),COUNT(__d0(__NN(Ult_I_D_)))},
-    {'ProxEmail','PublicRecords_KEL.ECL_Functions.Dataset_FDC','orgid',COUNT(__d0(__NL(Org_I_D_))),COUNT(__d0(__NN(Org_I_D_)))},
-    {'ProxEmail','PublicRecords_KEL.ECL_Functions.Dataset_FDC','seleid',COUNT(__d0(__NL(Sele_I_D_))),COUNT(__d0(__NN(Sele_I_D_)))},
-    {'ProxEmail','PublicRecords_KEL.ECL_Functions.Dataset_FDC','proxid',COUNT(__d0(__NL(Prox_I_D_))),COUNT(__d0(__NN(Prox_I_D_)))},
-    {'ProxEmail','PublicRecords_KEL.ECL_Functions.Dataset_FDC','contact_email',COUNT(__d0(__NL(Email_Address_))),COUNT(__d0(__NN(Email_Address_)))},
-    {'ProxEmail','PublicRecords_KEL.ECL_Functions.Dataset_FDC','contact_email_username',COUNT(__d0(__NL(Contact_Email_Username_))),COUNT(__d0(__NN(Contact_Email_Username_)))},
-    {'ProxEmail','PublicRecords_KEL.ECL_Functions.Dataset_FDC','contact_email_domain',COUNT(__d0(__NL(Contact_Email_Domain_))),COUNT(__d0(__NN(Contact_Email_Domain_)))},
-    {'ProxEmail','PublicRecords_KEL.ECL_Functions.Dataset_FDC','source',COUNT(__d0(__NL(Source_))),COUNT(__d0(__NN(Source_)))},
-    {'ProxEmail','PublicRecords_KEL.ECL_Functions.Dataset_FDC','Archive_Date',COUNT(__d0(Archive___Date_=0)),COUNT(__d0(Archive___Date_!=0))},
-    {'ProxEmail','PublicRecords_KEL.ECL_Functions.Dataset_FDC','DateFirstSeen',COUNT(__d0(Date_First_Seen_=0)),COUNT(__d0(Date_First_Seen_!=0))},
-    {'ProxEmail','PublicRecords_KEL.ECL_Functions.Dataset_FDC','DateLastSeen',COUNT(__d0(Date_Last_Seen_=0)),COUNT(__d0(Date_Last_Seen_!=0))},
-    {'ProxEmail','PublicRecords_KEL.ECL_Functions.Dataset_FDC','HybridArchiveDate',COUNT(__d0(Hybrid_Archive_Date_=0)),COUNT(__d0(Hybrid_Archive_Date_!=0))},
-    {'ProxEmail','PublicRecords_KEL.ECL_Functions.Dataset_FDC','VaultDateLastSeen',COUNT(__d0(Vault_Date_Last_Seen_=0)),COUNT(__d0(Vault_Date_Last_Seen_!=0))}]
+    {'ProxEmail','PublicRecords_KEL.Files.NonFCRA.BIPV2_Build__key_contact_linkids_Vault','BusinessLocation',COUNT(__d0(__NL(Business_Location_))),COUNT(__d0(__NN(Business_Location_)))},
+    {'ProxEmail','PublicRecords_KEL.Files.NonFCRA.BIPV2_Build__key_contact_linkids_Vault','Email',COUNT(__d0(__NL(Email_))),COUNT(__d0(__NN(Email_)))},
+    {'ProxEmail','PublicRecords_KEL.Files.NonFCRA.BIPV2_Build__key_contact_linkids_Vault','ultid',COUNT(__d0(__NL(Ult_I_D_))),COUNT(__d0(__NN(Ult_I_D_)))},
+    {'ProxEmail','PublicRecords_KEL.Files.NonFCRA.BIPV2_Build__key_contact_linkids_Vault','orgid',COUNT(__d0(__NL(Org_I_D_))),COUNT(__d0(__NN(Org_I_D_)))},
+    {'ProxEmail','PublicRecords_KEL.Files.NonFCRA.BIPV2_Build__key_contact_linkids_Vault','seleid',COUNT(__d0(__NL(Sele_I_D_))),COUNT(__d0(__NN(Sele_I_D_)))},
+    {'ProxEmail','PublicRecords_KEL.Files.NonFCRA.BIPV2_Build__key_contact_linkids_Vault','proxid',COUNT(__d0(__NL(Prox_I_D_))),COUNT(__d0(__NN(Prox_I_D_)))},
+    {'ProxEmail','PublicRecords_KEL.Files.NonFCRA.BIPV2_Build__key_contact_linkids_Vault','contact_email',COUNT(__d0(__NL(Email_Address_))),COUNT(__d0(__NN(Email_Address_)))},
+    {'ProxEmail','PublicRecords_KEL.Files.NonFCRA.BIPV2_Build__key_contact_linkids_Vault','contact_email_username',COUNT(__d0(__NL(Contact_Email_Username_))),COUNT(__d0(__NN(Contact_Email_Username_)))},
+    {'ProxEmail','PublicRecords_KEL.Files.NonFCRA.BIPV2_Build__key_contact_linkids_Vault','contact_email_domain',COUNT(__d0(__NL(Contact_Email_Domain_))),COUNT(__d0(__NN(Contact_Email_Domain_)))},
+    {'ProxEmail','PublicRecords_KEL.Files.NonFCRA.BIPV2_Build__key_contact_linkids_Vault','source',COUNT(__d0(__NL(Source_))),COUNT(__d0(__NN(Source_)))},
+    {'ProxEmail','PublicRecords_KEL.Files.NonFCRA.BIPV2_Build__key_contact_linkids_Vault','Archive_Date',COUNT(__d0(Archive___Date_=0)),COUNT(__d0(Archive___Date_!=0))},
+    {'ProxEmail','PublicRecords_KEL.Files.NonFCRA.BIPV2_Build__key_contact_linkids_Vault','DateFirstSeen',COUNT(__d0(Date_First_Seen_=0)),COUNT(__d0(Date_First_Seen_!=0))},
+    {'ProxEmail','PublicRecords_KEL.Files.NonFCRA.BIPV2_Build__key_contact_linkids_Vault','DateLastSeen',COUNT(__d0(Date_Last_Seen_=0)),COUNT(__d0(Date_Last_Seen_!=0))},
+    {'ProxEmail','PublicRecords_KEL.Files.NonFCRA.BIPV2_Build__key_contact_linkids_Vault','HybridArchiveDate',COUNT(__d0(Hybrid_Archive_Date_=0)),COUNT(__d0(Hybrid_Archive_Date_!=0))},
+    {'ProxEmail','PublicRecords_KEL.Files.NonFCRA.BIPV2_Build__key_contact_linkids_Vault','VaultDateLastSeen',COUNT(__d0(Vault_Date_Last_Seen_=0)),COUNT(__d0(Vault_Date_Last_Seen_!=0))}]
   ,{KEL.typ.str entity,KEL.typ.str fileName,KEL.typ.str fieldName,KEL.typ.int nullCount,KEL.typ.int notNullCount});
 END;

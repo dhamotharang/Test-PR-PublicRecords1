@@ -2,11 +2,11 @@
 IMPORT KEL15 AS KEL;
 IMPORT CFG_Compile,E_Accident,E_Person,E_Person_Accident FROM PublicRecords_KEL;
 IMPORT * FROM KEL15.Null;
-EXPORT B_Person_Accident_8(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG_Compile __cfg = CFG_Compile) := MODULE
-  SHARED VIRTUAL TYPEOF(E_Accident(__in,__cfg).__Result) __E_Accident := E_Accident(__in,__cfg).__Result;
-  SHARED VIRTUAL TYPEOF(E_Person_Accident(__in,__cfg).__Result) __E_Person_Accident := E_Person_Accident(__in,__cfg).__Result;
-  SHARED __EE351230 := __E_Person_Accident;
-  SHARED __ST351555_Layout := RECORD
+EXPORT B_Person_Accident_8(CFG_Compile __cfg = CFG_Compile) := MODULE
+  SHARED VIRTUAL TYPEOF(E_Accident(__cfg).__Result) __E_Accident := E_Accident(__cfg).__Result;
+  SHARED VIRTUAL TYPEOF(E_Person_Accident(__cfg).__Result) __E_Person_Accident := E_Person_Accident(__cfg).__Result;
+  SHARED __EE396999 := __E_Person_Accident;
+  SHARED __ST397324_Layout := RECORD
     KEL.typ.ntyp(E_Person().Typ) Subject_;
     KEL.typ.ntyp(E_Accident().Typ) Acc_;
     KEL.typ.nstr Point_Of_Impact_;
@@ -50,7 +50,7 @@ EXPORT B_Person_Accident_8(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault,
     KEL.typ.nint Moving_Violation_;
     KEL.typ.nint Vehicle_Fault_Code_;
     KEL.typ.nstr Vehicle_Insured_Code_;
-    KEL.typ.ndataset(E_Person_Accident(__in,__cfg).Data_Sources_Layout) Data_Sources_;
+    KEL.typ.ndataset(E_Person_Accident(__cfg).Data_Sources_Layout) Data_Sources_;
     KEL.typ.bool Acc__1_ := FALSE;
     KEL.typ.epoch Archive___Date_ := 0;
     KEL.typ.epoch Date_First_Seen_ := 0;
@@ -59,15 +59,15 @@ EXPORT B_Person_Accident_8(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault,
     KEL.typ.epoch Vault_Date_Last_Seen_ := 0;
     KEL.typ.int __RecordCount := 0;
   END;
-  SHARED __EE351144 := __E_Accident;
-  SHARED __EE351156 := __EE351144.Report_Codes_;
-  SHARED __CC13757 := ['FA','A','IA','EA','TF'];
-  __JC4927793(E_Accident(__in,__cfg).Report_Codes_Layout __EE351156) := __T(__OP2(__EE351156.Report_Code_,IN,__CN(__CC13757)));
-  SHARED __EE4927794 := __EE351144(EXISTS(__CHILDJOINFILTER(__EE351156,__JC4927793)));
-  __JC4927827(E_Person_Accident(__in,__cfg).Layout __EE351230, E_Accident(__in,__cfg).Layout __EE4927794) := __EEQP(__EE351230.Acc_,__EE4927794.UID);
-  __JF4927827(E_Accident(__in,__cfg).Layout __EE4927794) := __NN(__EE4927794.UID);
-  SHARED __EE4927876 := JOIN(__EE351230,__EE4927794,__JC4927827(LEFT,RIGHT),TRANSFORM(__ST351555_Layout,SELF:=LEFT,SELF.Acc__1_:=__JF4927827(RIGHT)),HASH,LEFT OUTER,KEEP(1));
-  EXPORT __ST253087_Layout := RECORD
+  SHARED __EE396913 := __E_Accident;
+  SHARED __EE396925 := __EE396913.Report_Codes_;
+  SHARED __CC15169 := ['FA','A','IA','EA','TF'];
+  __JC5242668(E_Accident(__cfg).Report_Codes_Layout __EE396925) := __T(__OP2(__EE396925.Report_Code_,IN,__CN(__CC15169)));
+  SHARED __EE5242669 := __EE396913(EXISTS(__CHILDJOINFILTER(__EE396925,__JC5242668)));
+  __JC5242702(E_Person_Accident(__cfg).Layout __EE396999, E_Accident(__cfg).Layout __EE5242669) := __EEQP(__EE396999.Acc_,__EE5242669.UID);
+  __JF5242702(E_Accident(__cfg).Layout __EE5242669) := __NN(__EE5242669.UID);
+  SHARED __EE5242751 := JOIN(__EE396999,__EE5242669,__JC5242702(LEFT,RIGHT),TRANSFORM(__ST397324_Layout,SELF:=LEFT,SELF.Acc__1_:=__JF5242702(RIGHT)),HASH,LEFT OUTER,KEEP(1));
+  EXPORT __ST260733_Layout := RECORD
     KEL.typ.ntyp(E_Person().Typ) Subject_;
     KEL.typ.ntyp(E_Accident().Typ) Acc_;
     KEL.typ.nstr Point_Of_Impact_;
@@ -111,7 +111,7 @@ EXPORT B_Person_Accident_8(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault,
     KEL.typ.nint Moving_Violation_;
     KEL.typ.nint Vehicle_Fault_Code_;
     KEL.typ.nstr Vehicle_Insured_Code_;
-    KEL.typ.ndataset(E_Person_Accident(__in,__cfg).Data_Sources_Layout) Data_Sources_;
+    KEL.typ.ndataset(E_Person_Accident(__cfg).Data_Sources_Layout) Data_Sources_;
     KEL.typ.bool Is_Accident_Record_ := FALSE;
     KEL.typ.epoch Archive___Date_ := 0;
     KEL.typ.epoch Date_First_Seen_ := 0;
@@ -120,5 +120,5 @@ EXPORT B_Person_Accident_8(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault,
     KEL.typ.epoch Vault_Date_Last_Seen_ := 0;
     KEL.typ.int __RecordCount := 0;
   END;
-  EXPORT __ENH_Person_Accident_8 := PROJECT(__EE4927876,TRANSFORM(__ST253087_Layout,SELF.Is_Accident_Record_ := LEFT.Acc__1_,SELF := LEFT));
+  EXPORT __ENH_Person_Accident_8 := PROJECT(__EE5242751,TRANSFORM(__ST260733_Layout,SELF.Is_Accident_Record_ := LEFT.Acc__1_,SELF := LEFT));
 END;

@@ -3,7 +3,7 @@ IMPORT KEL15 AS KEL;
 IMPORT PublicRecords_KEL;
 IMPORT CFG_Compile FROM PublicRecords_KEL;
 IMPORT * FROM KEL15.Null;
-EXPORT E_Accident(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG_Compile __cfg = CFG_Compile) := MODULE
+EXPORT E_Accident(CFG_Compile __cfg = CFG_Compile) := MODULE
   EXPORT Typ := KEL.typ.uid;
   EXPORT InLayout := RECORD
     KEL.typ.nuid UID;
@@ -39,9 +39,9 @@ EXPORT E_Accident(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG_Comp
   SHARED __Trimmed := RECORD, MAXLENGTH(5000)
     STRING KeyVal;
   END;
-  SHARED __d0_KELfiltered := __in.Dataset_FLAccidents_Ecrash__Key_ECrash4(l_acc_nbr NOT IN ['','0']);
+  SHARED __d0_KELfiltered := PublicRecords_KEL.Files.NonFCRA.FLAccidents_Ecrash__Key_ECrash4_Vault(l_acc_nbr NOT IN ['','0']);
   SHARED __d0_Trim := PROJECT(__d0_KELfiltered,TRANSFORM(__Trimmed,SELF.KeyVal:=TRIM((STRING)LEFT.l_acc_nbr)));
-  SHARED __d1_KELfiltered := __in.Dataset_FLAccidents_Ecrash__key_EcrashV2_accnbr(l_accnbr NOT IN ['','0']);
+  SHARED __d1_KELfiltered := PublicRecords_KEL.Files.NonFCRA.FLAccidents_Ecrash__key_EcrashV2_accnbr_Vault(l_accnbr NOT IN ['','0']);
   SHARED __d1_Trim := PROJECT(__d1_KELfiltered,TRANSFORM(__Trimmed,SELF.KeyVal:=TRIM((STRING)LEFT.l_accnbr)));
   EXPORT __All_Trim := __d0_Trim + __d1_Trim;
   SHARED __TabRec := RECORD, MAXLENGTH(5000)
@@ -51,29 +51,32 @@ EXPORT E_Accident(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG_Comp
   END;
   EXPORT NullKeyVal := TRIM((STRING)'');
   SHARED __Table := TABLE(__All_Trim(KeyVal <> NullKeyVal),__TabRec,KeyVal,MERGE);
-  SHARED __SortedTable := SORT(__Table,KeyVal);
   SHARED NullLookupRec := DATASET([{NullKeyVal,1,0}],__TabRec);
-  EXPORT Lookup := NullLookupRec + PROJECT(__SortedTable,TRANSFORM(__TabRec,SELF.UID:=COUNTER,SELF:=LEFT));
+  EXPORT Lookup := NullLookupRec + PROJECT(__Table,TRANSFORM(__TabRec,SELF.UID:=COUNTER,SELF:=LEFT)) : PERSIST('~temp::KEL::PublicRecords_KEL::Accident::UidLookup',EXPIRE(7));
+  EXPORT UID_IdToText := INDEX(Lookup,{UID},{Lookup},'~temp::KEL::IDtoT::PublicRecords_KEL::Accident');
+  EXPORT UID_TextToId := INDEX(Lookup,{ht:=HASH32(KeyVal)},{Lookup},'~temp::KEL::TtoID::PublicRecords_KEL::Accident');
+  EXPORT BuildAll := PARALLEL(BUILDINDEX(UID_IdToText,OVERWRITE),BUILDINDEX(UID_TextToId,OVERWRITE));
+  EXPORT GetText(KEL.typ.uid i) := UID_IdToText(UID=i)[1];
+  EXPORT GetId(STRING s) := UID_TextToId(ht=HASH32(s),KeyVal=s)[1];
   SHARED __Mapping0 := 'UID(DEFAULT:UID),l_acc_nbr(OVERRIDE:Accident_Number_:\'\'),accidentdate(DEFAULT:Accident_Date_:DATE),accidentlocation(DEFAULT:Accident_Location_:\'\'),accidentstreet(DEFAULT:Accident_Street_:\'\'),accidentcrossstreet(DEFAULT:Accident_Cross_Street_:\'\'),nextstreet(DEFAULT:Next_Street_:\'\'),vehicle_incident_city(OVERRIDE:Incident_City_:\'\'),vehicle_incident_st(OVERRIDE:Incident_State_:\'\'),jurisdictionstate(DEFAULT:Jurisdiction_State_:\'\'),jurisdiction(DEFAULT:Jurisdiction_:\'\'),jurisdictionnumber(DEFAULT:Jurisdiction_Number_:0),report_code(OVERRIDE:Report_Code_:\'\'),report_category(OVERRIDE:Report_Category_:\'\'),reporttypeid(DEFAULT:Report_Type_I_D_:\'\'),report_code_desc(OVERRIDE:Report_Code_Description_:\'\'),reporthascoversheet(DEFAULT:Report_Has_Cover_Sheet_),additionalreportnumber(DEFAULT:Additional_Report_Number_:\'\'),reportstatus(DEFAULT:Report_Status_:\'\'),src(OVERRIDE:Source_:\'\'),archive_date(OVERRIDE:Archive___Date_:EPOCH),datefirstseen(DEFAULT:Date_First_Seen_:EPOCH),datelastseen(DEFAULT:Date_Last_Seen_:EPOCH),hybridarchivedate(DEFAULT:Hybrid_Archive_Date_:EPOCH),vaultdatelastseen(DEFAULT:Vault_Date_Last_Seen_:EPOCH),DPMBitmap(OVERRIDE:__Permits:PERMITS)';
-  SHARED __d0_Norm := NORMALIZE(__in,LEFT.Dataset_FLAccidents_Ecrash__Key_ECrash4,TRANSFORM(RECORDOF(__in.Dataset_FLAccidents_Ecrash__Key_ECrash4),SELF:=RIGHT));
   SHARED __d0_Out := RECORD
-    RECORDOF(PublicRecords_KEL.ECL_Functions.Dataset_FDC.Dataset_FLAccidents_Ecrash__Key_ECrash4);
+    RECORDOF(PublicRecords_KEL.Files.NonFCRA.FLAccidents_Ecrash__Key_ECrash4_Vault);
     KEL.typ.uid UID := 0;
   END;
   SHARED __d0_UID_Mapped := JOIN(__d0_KELfiltered,Lookup,TRIM((STRING)LEFT.l_acc_nbr) = RIGHT.KeyVal,TRANSFORM(__d0_Out,SELF.UID:=RIGHT.UID,SELF:=LEFT),SMART);
-  EXPORT PublicRecords_KEL_ECL_Functions_Dataset_FDC_Dataset_FLAccidents_Ecrash__Key_ECrash4_Invalid := __d0_UID_Mapped(UID = 0);
+  EXPORT PublicRecords_KEL_Files_NonFCRA_FLAccidents_Ecrash__Key_ECrash4_Vault_Invalid := __d0_UID_Mapped(UID = 0);
   SHARED __d0_Prefiltered := __d0_UID_Mapped(UID <> 0);
-  SHARED __d0 := __SourceFilter(KEL.FromFlat.Convert(__d0_Prefiltered,InLayout,__Mapping0,'PublicRecords_KEL.ECL_Functions.Dataset_FDC'));
-  SHARED __Mapping1 := 'UID(DEFAULT:UID),l_accnbr(OVERRIDE:Accident_Number_:\'\'),accident_date(OVERRIDE:Accident_Date_:DATE),accident_location(OVERRIDE:Accident_Location_:\'\'),accident_street(OVERRIDE:Accident_Street_:\'\'),accident_cross_street(OVERRIDE:Accident_Cross_Street_:\'\'),next_street(OVERRIDE:Next_Street_:\'\'),vehicle_incident_city(OVERRIDE:Incident_City_:\'\'),vehicle_incident_st(OVERRIDE:Incident_State_:\'\'),jurisdiction_state(OVERRIDE:Jurisdiction_State_:\'\'),jurisdiction(OVERRIDE:Jurisdiction_:\'\'),jurisdiction_nbr(OVERRIDE:Jurisdiction_Number_:0),report_code(OVERRIDE:Report_Code_:\'\'),report_category(OVERRIDE:Report_Category_:\'\'),report_type_id(OVERRIDE:Report_Type_I_D_:\'\'),report_code_desc(OVERRIDE:Report_Code_Description_:\'\'),report_has_coversheet(OVERRIDE:Report_Has_Cover_Sheet_),addl_report_number(OVERRIDE:Additional_Report_Number_:\'\'),report_status(OVERRIDE:Report_Status_:\'\'),src(OVERRIDE:Source_:\'\'),archive_date(OVERRIDE:Archive___Date_:EPOCH),dt_first_seen(OVERRIDE:Date_First_Seen_:EPOCH),dt_last_seen(OVERRIDE:Date_Last_Seen_:EPOCH),hybridarchivedate(DEFAULT:Hybrid_Archive_Date_:EPOCH),vaultdatelastseen(DEFAULT:Vault_Date_Last_Seen_:EPOCH),DPMBitmap(OVERRIDE:__Permits:PERMITS)';
-  SHARED __d1_Norm := NORMALIZE(__in,LEFT.Dataset_FLAccidents_Ecrash__key_EcrashV2_accnbr,TRANSFORM(RECORDOF(__in.Dataset_FLAccidents_Ecrash__key_EcrashV2_accnbr),SELF:=RIGHT));
+  SHARED __d0 := __SourceFilter(KEL.FromFlat.Convert(__d0_Prefiltered,InLayout,__Mapping0,'PublicRecords_KEL.Files.NonFCRA.FLAccidents_Ecrash__Key_ECrash4_Vault'));
+  SHARED Hybrid_Archive_Date_1Rule(STRING a) := MAP(KEL.Routines.IsValidDate((KEL.typ.kdate)(a[1..6]+'01'))=>a[1..6]+'01','0');
+  SHARED __Mapping1 := 'UID(DEFAULT:UID),l_accnbr(OVERRIDE:Accident_Number_:\'\'),accident_date(OVERRIDE:Accident_Date_:DATE),accident_location(OVERRIDE:Accident_Location_:\'\'),accident_street(OVERRIDE:Accident_Street_:\'\'),accident_cross_street(OVERRIDE:Accident_Cross_Street_:\'\'),next_street(OVERRIDE:Next_Street_:\'\'),vehicle_incident_city(OVERRIDE:Incident_City_:\'\'),vehicle_incident_st(OVERRIDE:Incident_State_:\'\'),jurisdiction_state(OVERRIDE:Jurisdiction_State_:\'\'),jurisdiction(OVERRIDE:Jurisdiction_:\'\'),jurisdiction_nbr(OVERRIDE:Jurisdiction_Number_:0),report_code(OVERRIDE:Report_Code_:\'\'),report_category(OVERRIDE:Report_Category_:\'\'),report_type_id(OVERRIDE:Report_Type_I_D_:\'\'),report_code_desc(OVERRIDE:Report_Code_Description_:\'\'),report_has_coversheet(OVERRIDE:Report_Has_Cover_Sheet_),addl_report_number(OVERRIDE:Additional_Report_Number_:\'\'),report_status(OVERRIDE:Report_Status_:\'\'),src(OVERRIDE:Source_:\'\'),archive_date(OVERRIDE:Archive___Date_:EPOCH),dt_first_seen(OVERRIDE:Date_First_Seen_:EPOCH),dt_last_seen(OVERRIDE:Date_Last_Seen_:EPOCH),hybrid_archive_date(OVERRIDE:Hybrid_Archive_Date_:EPOCH:Hybrid_Archive_Date_1Rule),vaultdatelastseen(DEFAULT:Vault_Date_Last_Seen_:EPOCH),DPMBitmap(OVERRIDE:__Permits:PERMITS)';
   SHARED __d1_Out := RECORD
-    RECORDOF(PublicRecords_KEL.ECL_Functions.Dataset_FDC.Dataset_FLAccidents_Ecrash__key_EcrashV2_accnbr);
+    RECORDOF(PublicRecords_KEL.Files.NonFCRA.FLAccidents_Ecrash__key_EcrashV2_accnbr_Vault);
     KEL.typ.uid UID := 0;
   END;
   SHARED __d1_UID_Mapped := JOIN(__d1_KELfiltered,Lookup,TRIM((STRING)LEFT.l_accnbr) = RIGHT.KeyVal,TRANSFORM(__d1_Out,SELF.UID:=RIGHT.UID,SELF:=LEFT),SMART);
-  EXPORT PublicRecords_KEL_ECL_Functions_Dataset_FDC_Dataset_FLAccidents_Ecrash__key_EcrashV2_accnbr_Invalid := __d1_UID_Mapped(UID = 0);
+  EXPORT PublicRecords_KEL_Files_NonFCRA_FLAccidents_Ecrash__key_EcrashV2_accnbr_Vault_Invalid := __d1_UID_Mapped(UID = 0);
   SHARED __d1_Prefiltered := __d1_UID_Mapped(UID <> 0);
-  SHARED __d1 := __SourceFilter(KEL.FromFlat.Convert(__d1_Prefiltered,InLayout,__Mapping1,'PublicRecords_KEL.ECL_Functions.Dataset_FDC'));
+  SHARED __d1 := __SourceFilter(KEL.FromFlat.Convert(__d1_Prefiltered,InLayout,__Mapping1,'PublicRecords_KEL.Files.NonFCRA.FLAccidents_Ecrash__key_EcrashV2_accnbr_Vault'));
   EXPORT InData := __d0 + __d1;
   EXPORT Report_Codes_Layout := RECORD
     KEL.typ.nstr Report_Code_;
@@ -194,57 +197,57 @@ EXPORT E_Accident(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG_Comp
   EXPORT Report_Code_Description__SingleValue_Invalid := KEL.Intake.DetectMultipleValuesOnResult(Result,Report_Code_Description_);
   EXPORT Report_Has_Cover_Sheet__SingleValue_Invalid := KEL.Intake.DetectMultipleValuesOnResult(Result,Report_Has_Cover_Sheet_);
   EXPORT Additional_Report_Number__SingleValue_Invalid := KEL.Intake.DetectMultipleValuesOnResult(Result,Additional_Report_Number_);
-  EXPORT SanityCheck := DATASET([{COUNT(PublicRecords_KEL_ECL_Functions_Dataset_FDC_Dataset_FLAccidents_Ecrash__Key_ECrash4_Invalid),COUNT(PublicRecords_KEL_ECL_Functions_Dataset_FDC_Dataset_FLAccidents_Ecrash__key_EcrashV2_accnbr_Invalid),COUNT(Accident_Number__SingleValue_Invalid),COUNT(Accident_Date__SingleValue_Invalid),COUNT(Accident_Location__SingleValue_Invalid),COUNT(Accident_Street__SingleValue_Invalid),COUNT(Accident_Cross_Street__SingleValue_Invalid),COUNT(Next_Street__SingleValue_Invalid),COUNT(Incident_City__SingleValue_Invalid),COUNT(Incident_State__SingleValue_Invalid),COUNT(Jurisdiction_State__SingleValue_Invalid),COUNT(Jurisdiction__SingleValue_Invalid),COUNT(Jurisdiction_Number__SingleValue_Invalid),COUNT(Report_Category__SingleValue_Invalid),COUNT(Report_Type_I_D__SingleValue_Invalid),COUNT(Report_Code_Description__SingleValue_Invalid),COUNT(Report_Has_Cover_Sheet__SingleValue_Invalid),COUNT(Additional_Report_Number__SingleValue_Invalid),TopSourcedUIDs(1)}],{KEL.typ.int PublicRecords_KEL_ECL_Functions_Dataset_FDC_Dataset_FLAccidents_Ecrash__Key_ECrash4_Invalid,KEL.typ.int PublicRecords_KEL_ECL_Functions_Dataset_FDC_Dataset_FLAccidents_Ecrash__key_EcrashV2_accnbr_Invalid,KEL.typ.int Accident_Number__SingleValue_Invalid,KEL.typ.int Accident_Date__SingleValue_Invalid,KEL.typ.int Accident_Location__SingleValue_Invalid,KEL.typ.int Accident_Street__SingleValue_Invalid,KEL.typ.int Accident_Cross_Street__SingleValue_Invalid,KEL.typ.int Next_Street__SingleValue_Invalid,KEL.typ.int Incident_City__SingleValue_Invalid,KEL.typ.int Incident_State__SingleValue_Invalid,KEL.typ.int Jurisdiction_State__SingleValue_Invalid,KEL.typ.int Jurisdiction__SingleValue_Invalid,KEL.typ.int Jurisdiction_Number__SingleValue_Invalid,KEL.typ.int Report_Category__SingleValue_Invalid,KEL.typ.int Report_Type_I_D__SingleValue_Invalid,KEL.typ.int Report_Code_Description__SingleValue_Invalid,KEL.typ.int Report_Has_Cover_Sheet__SingleValue_Invalid,KEL.typ.int Additional_Report_Number__SingleValue_Invalid,DATASET(RECORDOF(UIDSourceCounts)) topSourcedUID});
+  EXPORT SanityCheck := DATASET([{COUNT(PublicRecords_KEL_Files_NonFCRA_FLAccidents_Ecrash__Key_ECrash4_Vault_Invalid),COUNT(PublicRecords_KEL_Files_NonFCRA_FLAccidents_Ecrash__key_EcrashV2_accnbr_Vault_Invalid),COUNT(Accident_Number__SingleValue_Invalid),COUNT(Accident_Date__SingleValue_Invalid),COUNT(Accident_Location__SingleValue_Invalid),COUNT(Accident_Street__SingleValue_Invalid),COUNT(Accident_Cross_Street__SingleValue_Invalid),COUNT(Next_Street__SingleValue_Invalid),COUNT(Incident_City__SingleValue_Invalid),COUNT(Incident_State__SingleValue_Invalid),COUNT(Jurisdiction_State__SingleValue_Invalid),COUNT(Jurisdiction__SingleValue_Invalid),COUNT(Jurisdiction_Number__SingleValue_Invalid),COUNT(Report_Category__SingleValue_Invalid),COUNT(Report_Type_I_D__SingleValue_Invalid),COUNT(Report_Code_Description__SingleValue_Invalid),COUNT(Report_Has_Cover_Sheet__SingleValue_Invalid),COUNT(Additional_Report_Number__SingleValue_Invalid),TopSourcedUIDs(1)}],{KEL.typ.int PublicRecords_KEL_Files_NonFCRA_FLAccidents_Ecrash__Key_ECrash4_Vault_Invalid,KEL.typ.int PublicRecords_KEL_Files_NonFCRA_FLAccidents_Ecrash__key_EcrashV2_accnbr_Vault_Invalid,KEL.typ.int Accident_Number__SingleValue_Invalid,KEL.typ.int Accident_Date__SingleValue_Invalid,KEL.typ.int Accident_Location__SingleValue_Invalid,KEL.typ.int Accident_Street__SingleValue_Invalid,KEL.typ.int Accident_Cross_Street__SingleValue_Invalid,KEL.typ.int Next_Street__SingleValue_Invalid,KEL.typ.int Incident_City__SingleValue_Invalid,KEL.typ.int Incident_State__SingleValue_Invalid,KEL.typ.int Jurisdiction_State__SingleValue_Invalid,KEL.typ.int Jurisdiction__SingleValue_Invalid,KEL.typ.int Jurisdiction_Number__SingleValue_Invalid,KEL.typ.int Report_Category__SingleValue_Invalid,KEL.typ.int Report_Type_I_D__SingleValue_Invalid,KEL.typ.int Report_Code_Description__SingleValue_Invalid,KEL.typ.int Report_Has_Cover_Sheet__SingleValue_Invalid,KEL.typ.int Additional_Report_Number__SingleValue_Invalid,DATASET(RECORDOF(UIDSourceCounts)) topSourcedUID});
   EXPORT NullCounts := DATASET([
-    {'Accident','PublicRecords_KEL.ECL_Functions.Dataset_FDC','UID',COUNT(PublicRecords_KEL_ECL_Functions_Dataset_FDC_Dataset_FLAccidents_Ecrash__Key_ECrash4_Invalid),COUNT(__d0)},
-    {'Accident','PublicRecords_KEL.ECL_Functions.Dataset_FDC','l_acc_nbr',COUNT(__d0(__NL(Accident_Number_))),COUNT(__d0(__NN(Accident_Number_)))},
-    {'Accident','PublicRecords_KEL.ECL_Functions.Dataset_FDC','AccidentDate',COUNT(__d0(__NL(Accident_Date_))),COUNT(__d0(__NN(Accident_Date_)))},
-    {'Accident','PublicRecords_KEL.ECL_Functions.Dataset_FDC','AccidentLocation',COUNT(__d0(__NL(Accident_Location_))),COUNT(__d0(__NN(Accident_Location_)))},
-    {'Accident','PublicRecords_KEL.ECL_Functions.Dataset_FDC','AccidentStreet',COUNT(__d0(__NL(Accident_Street_))),COUNT(__d0(__NN(Accident_Street_)))},
-    {'Accident','PublicRecords_KEL.ECL_Functions.Dataset_FDC','AccidentCrossStreet',COUNT(__d0(__NL(Accident_Cross_Street_))),COUNT(__d0(__NN(Accident_Cross_Street_)))},
-    {'Accident','PublicRecords_KEL.ECL_Functions.Dataset_FDC','NextStreet',COUNT(__d0(__NL(Next_Street_))),COUNT(__d0(__NN(Next_Street_)))},
-    {'Accident','PublicRecords_KEL.ECL_Functions.Dataset_FDC','vehicle_incident_city',COUNT(__d0(__NL(Incident_City_))),COUNT(__d0(__NN(Incident_City_)))},
-    {'Accident','PublicRecords_KEL.ECL_Functions.Dataset_FDC','vehicle_incident_st',COUNT(__d0(__NL(Incident_State_))),COUNT(__d0(__NN(Incident_State_)))},
-    {'Accident','PublicRecords_KEL.ECL_Functions.Dataset_FDC','JurisdictionState',COUNT(__d0(__NL(Jurisdiction_State_))),COUNT(__d0(__NN(Jurisdiction_State_)))},
-    {'Accident','PublicRecords_KEL.ECL_Functions.Dataset_FDC','Jurisdiction',COUNT(__d0(__NL(Jurisdiction_))),COUNT(__d0(__NN(Jurisdiction_)))},
-    {'Accident','PublicRecords_KEL.ECL_Functions.Dataset_FDC','JurisdictionNumber',COUNT(__d0(__NL(Jurisdiction_Number_))),COUNT(__d0(__NN(Jurisdiction_Number_)))},
-    {'Accident','PublicRecords_KEL.ECL_Functions.Dataset_FDC','report_code',COUNT(__d0(__NL(Report_Code_))),COUNT(__d0(__NN(Report_Code_)))},
-    {'Accident','PublicRecords_KEL.ECL_Functions.Dataset_FDC','report_category',COUNT(__d0(__NL(Report_Category_))),COUNT(__d0(__NN(Report_Category_)))},
-    {'Accident','PublicRecords_KEL.ECL_Functions.Dataset_FDC','ReportTypeID',COUNT(__d0(__NL(Report_Type_I_D_))),COUNT(__d0(__NN(Report_Type_I_D_)))},
-    {'Accident','PublicRecords_KEL.ECL_Functions.Dataset_FDC','report_code_desc',COUNT(__d0(__NL(Report_Code_Description_))),COUNT(__d0(__NN(Report_Code_Description_)))},
-    {'Accident','PublicRecords_KEL.ECL_Functions.Dataset_FDC','ReportHasCoverSheet',COUNT(__d0(__NL(Report_Has_Cover_Sheet_))),COUNT(__d0(__NN(Report_Has_Cover_Sheet_)))},
-    {'Accident','PublicRecords_KEL.ECL_Functions.Dataset_FDC','AdditionalReportNumber',COUNT(__d0(__NL(Additional_Report_Number_))),COUNT(__d0(__NN(Additional_Report_Number_)))},
-    {'Accident','PublicRecords_KEL.ECL_Functions.Dataset_FDC','ReportStatus',COUNT(__d0(__NL(Report_Status_))),COUNT(__d0(__NN(Report_Status_)))},
-    {'Accident','PublicRecords_KEL.ECL_Functions.Dataset_FDC','src',COUNT(__d0(__NL(Source_))),COUNT(__d0(__NN(Source_)))},
-    {'Accident','PublicRecords_KEL.ECL_Functions.Dataset_FDC','Archive_Date',COUNT(__d0(Archive___Date_=0)),COUNT(__d0(Archive___Date_!=0))},
-    {'Accident','PublicRecords_KEL.ECL_Functions.Dataset_FDC','DateFirstSeen',COUNT(__d0(Date_First_Seen_=0)),COUNT(__d0(Date_First_Seen_!=0))},
-    {'Accident','PublicRecords_KEL.ECL_Functions.Dataset_FDC','DateLastSeen',COUNT(__d0(Date_Last_Seen_=0)),COUNT(__d0(Date_Last_Seen_!=0))},
-    {'Accident','PublicRecords_KEL.ECL_Functions.Dataset_FDC','HybridArchiveDate',COUNT(__d0(Hybrid_Archive_Date_=0)),COUNT(__d0(Hybrid_Archive_Date_!=0))},
-    {'Accident','PublicRecords_KEL.ECL_Functions.Dataset_FDC','VaultDateLastSeen',COUNT(__d0(Vault_Date_Last_Seen_=0)),COUNT(__d0(Vault_Date_Last_Seen_!=0))},
-    {'Accident','PublicRecords_KEL.ECL_Functions.Dataset_FDC','UID',COUNT(PublicRecords_KEL_ECL_Functions_Dataset_FDC_Dataset_FLAccidents_Ecrash__key_EcrashV2_accnbr_Invalid),COUNT(__d1)},
-    {'Accident','PublicRecords_KEL.ECL_Functions.Dataset_FDC','l_accnbr',COUNT(__d1(__NL(Accident_Number_))),COUNT(__d1(__NN(Accident_Number_)))},
-    {'Accident','PublicRecords_KEL.ECL_Functions.Dataset_FDC','accident_date',COUNT(__d1(__NL(Accident_Date_))),COUNT(__d1(__NN(Accident_Date_)))},
-    {'Accident','PublicRecords_KEL.ECL_Functions.Dataset_FDC','accident_location',COUNT(__d1(__NL(Accident_Location_))),COUNT(__d1(__NN(Accident_Location_)))},
-    {'Accident','PublicRecords_KEL.ECL_Functions.Dataset_FDC','accident_street',COUNT(__d1(__NL(Accident_Street_))),COUNT(__d1(__NN(Accident_Street_)))},
-    {'Accident','PublicRecords_KEL.ECL_Functions.Dataset_FDC','accident_cross_street',COUNT(__d1(__NL(Accident_Cross_Street_))),COUNT(__d1(__NN(Accident_Cross_Street_)))},
-    {'Accident','PublicRecords_KEL.ECL_Functions.Dataset_FDC','next_street',COUNT(__d1(__NL(Next_Street_))),COUNT(__d1(__NN(Next_Street_)))},
-    {'Accident','PublicRecords_KEL.ECL_Functions.Dataset_FDC','vehicle_incident_city',COUNT(__d1(__NL(Incident_City_))),COUNT(__d1(__NN(Incident_City_)))},
-    {'Accident','PublicRecords_KEL.ECL_Functions.Dataset_FDC','vehicle_incident_st',COUNT(__d1(__NL(Incident_State_))),COUNT(__d1(__NN(Incident_State_)))},
-    {'Accident','PublicRecords_KEL.ECL_Functions.Dataset_FDC','jurisdiction_state',COUNT(__d1(__NL(Jurisdiction_State_))),COUNT(__d1(__NN(Jurisdiction_State_)))},
-    {'Accident','PublicRecords_KEL.ECL_Functions.Dataset_FDC','jurisdiction',COUNT(__d1(__NL(Jurisdiction_))),COUNT(__d1(__NN(Jurisdiction_)))},
-    {'Accident','PublicRecords_KEL.ECL_Functions.Dataset_FDC','jurisdiction_nbr',COUNT(__d1(__NL(Jurisdiction_Number_))),COUNT(__d1(__NN(Jurisdiction_Number_)))},
-    {'Accident','PublicRecords_KEL.ECL_Functions.Dataset_FDC','report_code',COUNT(__d1(__NL(Report_Code_))),COUNT(__d1(__NN(Report_Code_)))},
-    {'Accident','PublicRecords_KEL.ECL_Functions.Dataset_FDC','report_category',COUNT(__d1(__NL(Report_Category_))),COUNT(__d1(__NN(Report_Category_)))},
-    {'Accident','PublicRecords_KEL.ECL_Functions.Dataset_FDC','report_type_id',COUNT(__d1(__NL(Report_Type_I_D_))),COUNT(__d1(__NN(Report_Type_I_D_)))},
-    {'Accident','PublicRecords_KEL.ECL_Functions.Dataset_FDC','report_code_desc',COUNT(__d1(__NL(Report_Code_Description_))),COUNT(__d1(__NN(Report_Code_Description_)))},
-    {'Accident','PublicRecords_KEL.ECL_Functions.Dataset_FDC','report_has_coversheet',COUNT(__d1(__NL(Report_Has_Cover_Sheet_))),COUNT(__d1(__NN(Report_Has_Cover_Sheet_)))},
-    {'Accident','PublicRecords_KEL.ECL_Functions.Dataset_FDC','addl_report_number',COUNT(__d1(__NL(Additional_Report_Number_))),COUNT(__d1(__NN(Additional_Report_Number_)))},
-    {'Accident','PublicRecords_KEL.ECL_Functions.Dataset_FDC','report_status',COUNT(__d1(__NL(Report_Status_))),COUNT(__d1(__NN(Report_Status_)))},
-    {'Accident','PublicRecords_KEL.ECL_Functions.Dataset_FDC','src',COUNT(__d1(__NL(Source_))),COUNT(__d1(__NN(Source_)))},
-    {'Accident','PublicRecords_KEL.ECL_Functions.Dataset_FDC','Archive_Date',COUNT(__d1(Archive___Date_=0)),COUNT(__d1(Archive___Date_!=0))},
-    {'Accident','PublicRecords_KEL.ECL_Functions.Dataset_FDC','DateFirstSeen',COUNT(__d1(Date_First_Seen_=0)),COUNT(__d1(Date_First_Seen_!=0))},
-    {'Accident','PublicRecords_KEL.ECL_Functions.Dataset_FDC','DateLastSeen',COUNT(__d1(Date_Last_Seen_=0)),COUNT(__d1(Date_Last_Seen_!=0))},
-    {'Accident','PublicRecords_KEL.ECL_Functions.Dataset_FDC','HybridArchiveDate',COUNT(__d1(Hybrid_Archive_Date_=0)),COUNT(__d1(Hybrid_Archive_Date_!=0))},
-    {'Accident','PublicRecords_KEL.ECL_Functions.Dataset_FDC','VaultDateLastSeen',COUNT(__d1(Vault_Date_Last_Seen_=0)),COUNT(__d1(Vault_Date_Last_Seen_!=0))}]
+    {'Accident','PublicRecords_KEL.Files.NonFCRA.FLAccidents_Ecrash__Key_ECrash4_Vault','UID',COUNT(PublicRecords_KEL_Files_NonFCRA_FLAccidents_Ecrash__Key_ECrash4_Vault_Invalid),COUNT(__d0)},
+    {'Accident','PublicRecords_KEL.Files.NonFCRA.FLAccidents_Ecrash__Key_ECrash4_Vault','l_acc_nbr',COUNT(__d0(__NL(Accident_Number_))),COUNT(__d0(__NN(Accident_Number_)))},
+    {'Accident','PublicRecords_KEL.Files.NonFCRA.FLAccidents_Ecrash__Key_ECrash4_Vault','AccidentDate',COUNT(__d0(__NL(Accident_Date_))),COUNT(__d0(__NN(Accident_Date_)))},
+    {'Accident','PublicRecords_KEL.Files.NonFCRA.FLAccidents_Ecrash__Key_ECrash4_Vault','AccidentLocation',COUNT(__d0(__NL(Accident_Location_))),COUNT(__d0(__NN(Accident_Location_)))},
+    {'Accident','PublicRecords_KEL.Files.NonFCRA.FLAccidents_Ecrash__Key_ECrash4_Vault','AccidentStreet',COUNT(__d0(__NL(Accident_Street_))),COUNT(__d0(__NN(Accident_Street_)))},
+    {'Accident','PublicRecords_KEL.Files.NonFCRA.FLAccidents_Ecrash__Key_ECrash4_Vault','AccidentCrossStreet',COUNT(__d0(__NL(Accident_Cross_Street_))),COUNT(__d0(__NN(Accident_Cross_Street_)))},
+    {'Accident','PublicRecords_KEL.Files.NonFCRA.FLAccidents_Ecrash__Key_ECrash4_Vault','NextStreet',COUNT(__d0(__NL(Next_Street_))),COUNT(__d0(__NN(Next_Street_)))},
+    {'Accident','PublicRecords_KEL.Files.NonFCRA.FLAccidents_Ecrash__Key_ECrash4_Vault','vehicle_incident_city',COUNT(__d0(__NL(Incident_City_))),COUNT(__d0(__NN(Incident_City_)))},
+    {'Accident','PublicRecords_KEL.Files.NonFCRA.FLAccidents_Ecrash__Key_ECrash4_Vault','vehicle_incident_st',COUNT(__d0(__NL(Incident_State_))),COUNT(__d0(__NN(Incident_State_)))},
+    {'Accident','PublicRecords_KEL.Files.NonFCRA.FLAccidents_Ecrash__Key_ECrash4_Vault','JurisdictionState',COUNT(__d0(__NL(Jurisdiction_State_))),COUNT(__d0(__NN(Jurisdiction_State_)))},
+    {'Accident','PublicRecords_KEL.Files.NonFCRA.FLAccidents_Ecrash__Key_ECrash4_Vault','Jurisdiction',COUNT(__d0(__NL(Jurisdiction_))),COUNT(__d0(__NN(Jurisdiction_)))},
+    {'Accident','PublicRecords_KEL.Files.NonFCRA.FLAccidents_Ecrash__Key_ECrash4_Vault','JurisdictionNumber',COUNT(__d0(__NL(Jurisdiction_Number_))),COUNT(__d0(__NN(Jurisdiction_Number_)))},
+    {'Accident','PublicRecords_KEL.Files.NonFCRA.FLAccidents_Ecrash__Key_ECrash4_Vault','report_code',COUNT(__d0(__NL(Report_Code_))),COUNT(__d0(__NN(Report_Code_)))},
+    {'Accident','PublicRecords_KEL.Files.NonFCRA.FLAccidents_Ecrash__Key_ECrash4_Vault','report_category',COUNT(__d0(__NL(Report_Category_))),COUNT(__d0(__NN(Report_Category_)))},
+    {'Accident','PublicRecords_KEL.Files.NonFCRA.FLAccidents_Ecrash__Key_ECrash4_Vault','ReportTypeID',COUNT(__d0(__NL(Report_Type_I_D_))),COUNT(__d0(__NN(Report_Type_I_D_)))},
+    {'Accident','PublicRecords_KEL.Files.NonFCRA.FLAccidents_Ecrash__Key_ECrash4_Vault','report_code_desc',COUNT(__d0(__NL(Report_Code_Description_))),COUNT(__d0(__NN(Report_Code_Description_)))},
+    {'Accident','PublicRecords_KEL.Files.NonFCRA.FLAccidents_Ecrash__Key_ECrash4_Vault','ReportHasCoverSheet',COUNT(__d0(__NL(Report_Has_Cover_Sheet_))),COUNT(__d0(__NN(Report_Has_Cover_Sheet_)))},
+    {'Accident','PublicRecords_KEL.Files.NonFCRA.FLAccidents_Ecrash__Key_ECrash4_Vault','AdditionalReportNumber',COUNT(__d0(__NL(Additional_Report_Number_))),COUNT(__d0(__NN(Additional_Report_Number_)))},
+    {'Accident','PublicRecords_KEL.Files.NonFCRA.FLAccidents_Ecrash__Key_ECrash4_Vault','ReportStatus',COUNT(__d0(__NL(Report_Status_))),COUNT(__d0(__NN(Report_Status_)))},
+    {'Accident','PublicRecords_KEL.Files.NonFCRA.FLAccidents_Ecrash__Key_ECrash4_Vault','src',COUNT(__d0(__NL(Source_))),COUNT(__d0(__NN(Source_)))},
+    {'Accident','PublicRecords_KEL.Files.NonFCRA.FLAccidents_Ecrash__Key_ECrash4_Vault','Archive_Date',COUNT(__d0(Archive___Date_=0)),COUNT(__d0(Archive___Date_!=0))},
+    {'Accident','PublicRecords_KEL.Files.NonFCRA.FLAccidents_Ecrash__Key_ECrash4_Vault','DateFirstSeen',COUNT(__d0(Date_First_Seen_=0)),COUNT(__d0(Date_First_Seen_!=0))},
+    {'Accident','PublicRecords_KEL.Files.NonFCRA.FLAccidents_Ecrash__Key_ECrash4_Vault','DateLastSeen',COUNT(__d0(Date_Last_Seen_=0)),COUNT(__d0(Date_Last_Seen_!=0))},
+    {'Accident','PublicRecords_KEL.Files.NonFCRA.FLAccidents_Ecrash__Key_ECrash4_Vault','HybridArchiveDate',COUNT(__d0(Hybrid_Archive_Date_=0)),COUNT(__d0(Hybrid_Archive_Date_!=0))},
+    {'Accident','PublicRecords_KEL.Files.NonFCRA.FLAccidents_Ecrash__Key_ECrash4_Vault','VaultDateLastSeen',COUNT(__d0(Vault_Date_Last_Seen_=0)),COUNT(__d0(Vault_Date_Last_Seen_!=0))},
+    {'Accident','PublicRecords_KEL.Files.NonFCRA.FLAccidents_Ecrash__key_EcrashV2_accnbr_Vault','UID',COUNT(PublicRecords_KEL_Files_NonFCRA_FLAccidents_Ecrash__key_EcrashV2_accnbr_Vault_Invalid),COUNT(__d1)},
+    {'Accident','PublicRecords_KEL.Files.NonFCRA.FLAccidents_Ecrash__key_EcrashV2_accnbr_Vault','l_accnbr',COUNT(__d1(__NL(Accident_Number_))),COUNT(__d1(__NN(Accident_Number_)))},
+    {'Accident','PublicRecords_KEL.Files.NonFCRA.FLAccidents_Ecrash__key_EcrashV2_accnbr_Vault','accident_date',COUNT(__d1(__NL(Accident_Date_))),COUNT(__d1(__NN(Accident_Date_)))},
+    {'Accident','PublicRecords_KEL.Files.NonFCRA.FLAccidents_Ecrash__key_EcrashV2_accnbr_Vault','accident_location',COUNT(__d1(__NL(Accident_Location_))),COUNT(__d1(__NN(Accident_Location_)))},
+    {'Accident','PublicRecords_KEL.Files.NonFCRA.FLAccidents_Ecrash__key_EcrashV2_accnbr_Vault','accident_street',COUNT(__d1(__NL(Accident_Street_))),COUNT(__d1(__NN(Accident_Street_)))},
+    {'Accident','PublicRecords_KEL.Files.NonFCRA.FLAccidents_Ecrash__key_EcrashV2_accnbr_Vault','accident_cross_street',COUNT(__d1(__NL(Accident_Cross_Street_))),COUNT(__d1(__NN(Accident_Cross_Street_)))},
+    {'Accident','PublicRecords_KEL.Files.NonFCRA.FLAccidents_Ecrash__key_EcrashV2_accnbr_Vault','next_street',COUNT(__d1(__NL(Next_Street_))),COUNT(__d1(__NN(Next_Street_)))},
+    {'Accident','PublicRecords_KEL.Files.NonFCRA.FLAccidents_Ecrash__key_EcrashV2_accnbr_Vault','vehicle_incident_city',COUNT(__d1(__NL(Incident_City_))),COUNT(__d1(__NN(Incident_City_)))},
+    {'Accident','PublicRecords_KEL.Files.NonFCRA.FLAccidents_Ecrash__key_EcrashV2_accnbr_Vault','vehicle_incident_st',COUNT(__d1(__NL(Incident_State_))),COUNT(__d1(__NN(Incident_State_)))},
+    {'Accident','PublicRecords_KEL.Files.NonFCRA.FLAccidents_Ecrash__key_EcrashV2_accnbr_Vault','jurisdiction_state',COUNT(__d1(__NL(Jurisdiction_State_))),COUNT(__d1(__NN(Jurisdiction_State_)))},
+    {'Accident','PublicRecords_KEL.Files.NonFCRA.FLAccidents_Ecrash__key_EcrashV2_accnbr_Vault','jurisdiction',COUNT(__d1(__NL(Jurisdiction_))),COUNT(__d1(__NN(Jurisdiction_)))},
+    {'Accident','PublicRecords_KEL.Files.NonFCRA.FLAccidents_Ecrash__key_EcrashV2_accnbr_Vault','jurisdiction_nbr',COUNT(__d1(__NL(Jurisdiction_Number_))),COUNT(__d1(__NN(Jurisdiction_Number_)))},
+    {'Accident','PublicRecords_KEL.Files.NonFCRA.FLAccidents_Ecrash__key_EcrashV2_accnbr_Vault','report_code',COUNT(__d1(__NL(Report_Code_))),COUNT(__d1(__NN(Report_Code_)))},
+    {'Accident','PublicRecords_KEL.Files.NonFCRA.FLAccidents_Ecrash__key_EcrashV2_accnbr_Vault','report_category',COUNT(__d1(__NL(Report_Category_))),COUNT(__d1(__NN(Report_Category_)))},
+    {'Accident','PublicRecords_KEL.Files.NonFCRA.FLAccidents_Ecrash__key_EcrashV2_accnbr_Vault','report_type_id',COUNT(__d1(__NL(Report_Type_I_D_))),COUNT(__d1(__NN(Report_Type_I_D_)))},
+    {'Accident','PublicRecords_KEL.Files.NonFCRA.FLAccidents_Ecrash__key_EcrashV2_accnbr_Vault','report_code_desc',COUNT(__d1(__NL(Report_Code_Description_))),COUNT(__d1(__NN(Report_Code_Description_)))},
+    {'Accident','PublicRecords_KEL.Files.NonFCRA.FLAccidents_Ecrash__key_EcrashV2_accnbr_Vault','report_has_coversheet',COUNT(__d1(__NL(Report_Has_Cover_Sheet_))),COUNT(__d1(__NN(Report_Has_Cover_Sheet_)))},
+    {'Accident','PublicRecords_KEL.Files.NonFCRA.FLAccidents_Ecrash__key_EcrashV2_accnbr_Vault','addl_report_number',COUNT(__d1(__NL(Additional_Report_Number_))),COUNT(__d1(__NN(Additional_Report_Number_)))},
+    {'Accident','PublicRecords_KEL.Files.NonFCRA.FLAccidents_Ecrash__key_EcrashV2_accnbr_Vault','report_status',COUNT(__d1(__NL(Report_Status_))),COUNT(__d1(__NN(Report_Status_)))},
+    {'Accident','PublicRecords_KEL.Files.NonFCRA.FLAccidents_Ecrash__key_EcrashV2_accnbr_Vault','src',COUNT(__d1(__NL(Source_))),COUNT(__d1(__NN(Source_)))},
+    {'Accident','PublicRecords_KEL.Files.NonFCRA.FLAccidents_Ecrash__key_EcrashV2_accnbr_Vault','Archive_Date',COUNT(__d1(Archive___Date_=0)),COUNT(__d1(Archive___Date_!=0))},
+    {'Accident','PublicRecords_KEL.Files.NonFCRA.FLAccidents_Ecrash__key_EcrashV2_accnbr_Vault','DateFirstSeen',COUNT(__d1(Date_First_Seen_=0)),COUNT(__d1(Date_First_Seen_!=0))},
+    {'Accident','PublicRecords_KEL.Files.NonFCRA.FLAccidents_Ecrash__key_EcrashV2_accnbr_Vault','DateLastSeen',COUNT(__d1(Date_Last_Seen_=0)),COUNT(__d1(Date_Last_Seen_!=0))},
+    {'Accident','PublicRecords_KEL.Files.NonFCRA.FLAccidents_Ecrash__key_EcrashV2_accnbr_Vault','HybridArchiveDate',COUNT(__d1(Hybrid_Archive_Date_=0)),COUNT(__d1(Hybrid_Archive_Date_!=0))},
+    {'Accident','PublicRecords_KEL.Files.NonFCRA.FLAccidents_Ecrash__key_EcrashV2_accnbr_Vault','VaultDateLastSeen',COUNT(__d1(Vault_Date_Last_Seen_=0)),COUNT(__d1(Vault_Date_Last_Seen_!=0))}]
   ,{KEL.typ.str entity,KEL.typ.str fileName,KEL.typ.str fieldName,KEL.typ.int nullCount,KEL.typ.int notNullCount});
 END;

@@ -3,7 +3,7 @@ IMPORT KEL15 AS KEL;
 IMPORT PublicRecords_KEL;
 IMPORT CFG_Compile,E_Drivers_License,E_Person FROM PublicRecords_KEL;
 IMPORT * FROM KEL15.Null;
-EXPORT E_Person_Drivers_License(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG_Compile __cfg = CFG_Compile) := MODULE
+EXPORT E_Person_Drivers_License(CFG_Compile __cfg = CFG_Compile) := MODULE
   EXPORT Typ := KEL.typ.uid;
   EXPORT InLayout := RECORD
     KEL.typ.ntyp(E_Person().Typ) Subject_;
@@ -20,38 +20,39 @@ EXPORT E_Person_Drivers_License(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDef
   SHARED VIRTUAL __GroupedFilter(GROUPED DATASET(InLayout) __ds) := __ds;
   SHARED __Mapping := 'subject(DEFAULT:Subject_:0),License_(DEFAULT:License_:0),source(DEFAULT:Source_:\'\'),archive_date(DEFAULT:Archive___Date_:EPOCH),datefirstseen(DEFAULT:Date_First_Seen_:EPOCH),datelastseen(DEFAULT:Date_Last_Seen_:EPOCH),hybridarchivedate(DEFAULT:Hybrid_Archive_Date_:EPOCH),vaultdatelastseen(DEFAULT:Vault_Date_Last_Seen_:EPOCH)';
   SHARED Date_Last_Seen_0Rule(STRING a) := MAP(KEL.Routines.IsValidDate((KEL.typ.kdate)(a[1..6]+'01'))=>a[1..6]+'01','0');
-  SHARED __Mapping0 := 'did(OVERRIDE:Subject_:0),License_(DEFAULT:License_:0),source_code(OVERRIDE:Source_:\'\'),archive_date(OVERRIDE:Archive___Date_:EPOCH),dt_first_seen(OVERRIDE:Date_First_Seen_:EPOCH),dt_last_seen(OVERRIDE:Date_Last_Seen_:EPOCH:Date_Last_Seen_0Rule),hybridarchivedate(DEFAULT:Hybrid_Archive_Date_:EPOCH),vaultdatelastseen(DEFAULT:Vault_Date_Last_Seen_:EPOCH),DPMBitmap(OVERRIDE:__Permits:PERMITS)';
-  SHARED __d0_Norm := NORMALIZE(__in,LEFT.Dataset_DriversV2__Key_DL_DID,TRANSFORM(RECORDOF(__in.Dataset_DriversV2__Key_DL_DID),SELF:=RIGHT));
+  SHARED Hybrid_Archive_Date_0Rule(STRING a) := MAP(KEL.Routines.IsValidDate((KEL.typ.kdate)(a[1..6]+'01'))=>a[1..6]+'01','0');
+  SHARED __Mapping0 := 'did(OVERRIDE:Subject_:0),License_(DEFAULT:License_:0),source_code(OVERRIDE:Source_:\'\'),archive_date(OVERRIDE:Archive___Date_:EPOCH),dt_first_seen(OVERRIDE:Date_First_Seen_:EPOCH),dt_last_seen(OVERRIDE:Date_Last_Seen_:EPOCH:Date_Last_Seen_0Rule),hybrid_archive_date(OVERRIDE:Hybrid_Archive_Date_:EPOCH:Hybrid_Archive_Date_0Rule),vaultdatelastseen(DEFAULT:Vault_Date_Last_Seen_:EPOCH),DPMBitmap(OVERRIDE:__Permits:PERMITS)';
+  EXPORT __d0_KELfiltered := PublicRecords_KEL.Files.NonFCRA.DriversV2__Key_DL_DID_Vault(dl_number != '' AND orig_state != '' AND (UNSIGNED6)did > 0);
   SHARED __d0_License__Layout := RECORD
-    RECORDOF(__d0_Norm);
+    RECORDOF(__d0_KELfiltered);
     KEL.typ.uid License_;
   END;
-  SHARED __d0_Missing_License__UIDComponents := KEL.Intake.ConstructMissingFieldList(__d0_Norm,'dl_number,orig_state','__in');
-  SHARED __d0_License__Mapped := IF(__d0_Missing_License__UIDComponents = 'dl_number,orig_state',PROJECT(__d0_Norm,TRANSFORM(__d0_License__Layout,SELF.License_:=0,SELF:=LEFT)),JOIN(KEL.Intake.AppendFields(__d0_Norm,__d0_Missing_License__UIDComponents),E_Drivers_License(__in,__cfg).Lookup,TRIM((STRING)LEFT.dl_number) + '|' + TRIM((STRING)LEFT.orig_state) = RIGHT.KeyVal,TRANSFORM(__d0_License__Layout,SELF.License_:=RIGHT.UID,SELF:=LEFT),LEFT OUTER,SMART));
+  SHARED __d0_Missing_License__UIDComponents := KEL.Intake.ConstructMissingFieldList(__d0_KELfiltered,'dl_number,orig_state','PublicRecords_KEL.Files.NonFCRA.DriversV2__Key_DL_DID_Vault');
+  SHARED __d0_License__Mapped := IF(__d0_Missing_License__UIDComponents = 'dl_number,orig_state',PROJECT(__d0_KELfiltered,TRANSFORM(__d0_License__Layout,SELF.License_:=0,SELF:=LEFT)),JOIN(KEL.Intake.AppendFields(__d0_KELfiltered,__d0_Missing_License__UIDComponents),E_Drivers_License(__cfg).Lookup,TRIM((STRING)LEFT.dl_number) + '|' + TRIM((STRING)LEFT.orig_state) = RIGHT.KeyVal,TRANSFORM(__d0_License__Layout,SELF.License_:=RIGHT.UID,SELF:=LEFT),LEFT OUTER,SMART));
   SHARED __d0_Prefiltered := __d0_License__Mapped;
-  SHARED __d0 := __SourceFilter(KEL.FromFlat.Convert(__d0_Prefiltered,InLayout,__Mapping0,'PublicRecords_KEL.ECL_Functions.Dataset_FDC'));
+  SHARED __d0 := __SourceFilter(KEL.FromFlat.Convert(__d0_Prefiltered,InLayout,__Mapping0,'PublicRecords_KEL.Files.NonFCRA.DriversV2__Key_DL_DID_Vault'));
   SHARED Date_Last_Seen_1Rule(STRING a) := MAP(KEL.Routines.IsValidDate((KEL.typ.kdate)(a[1..6]+'01'))=>a[1..6]+'01','0');
-  SHARED __Mapping1 := 'did(OVERRIDE:Subject_:0),License_(DEFAULT:License_:0),source_code(OVERRIDE:Source_:\'\'),archive_date(OVERRIDE:Archive___Date_:EPOCH),dt_first_seen(OVERRIDE:Date_First_Seen_:EPOCH),dt_last_seen(OVERRIDE:Date_Last_Seen_:EPOCH:Date_Last_Seen_1Rule),hybridarchivedate(DEFAULT:Hybrid_Archive_Date_:EPOCH),vaultdatelastseen(DEFAULT:Vault_Date_Last_Seen_:EPOCH),DPMBitmap(OVERRIDE:__Permits:PERMITS)';
-  SHARED __d1_Norm := NORMALIZE(__in,LEFT.Dataset_DriversV2__Key_DL_Number,TRANSFORM(RECORDOF(__in.Dataset_DriversV2__Key_DL_Number),SELF:=RIGHT));
+  SHARED Hybrid_Archive_Date_1Rule(STRING a) := MAP(KEL.Routines.IsValidDate((KEL.typ.kdate)(a[1..6]+'01'))=>a[1..6]+'01','0');
+  SHARED __Mapping1 := 'did(OVERRIDE:Subject_:0),License_(DEFAULT:License_:0),source_code(OVERRIDE:Source_:\'\'),archive_date(OVERRIDE:Archive___Date_:EPOCH),dt_first_seen(OVERRIDE:Date_First_Seen_:EPOCH),dt_last_seen(OVERRIDE:Date_Last_Seen_:EPOCH:Date_Last_Seen_1Rule),hybrid_archive_date(OVERRIDE:Hybrid_Archive_Date_:EPOCH:Hybrid_Archive_Date_1Rule),vaultdatelastseen(DEFAULT:Vault_Date_Last_Seen_:EPOCH),DPMBitmap(OVERRIDE:__Permits:PERMITS)';
+  EXPORT __d1_KELfiltered := PublicRecords_KEL.Files.NonFCRA.DriversV2__Key_DL_Number_Vault(dl_number != '' AND orig_state != '' AND (UNSIGNED6)did > 0);
   SHARED __d1_License__Layout := RECORD
-    RECORDOF(__d1_Norm);
+    RECORDOF(__d1_KELfiltered);
     KEL.typ.uid License_;
   END;
-  SHARED __d1_Missing_License__UIDComponents := KEL.Intake.ConstructMissingFieldList(__d1_Norm,'dl_number,orig_state','__in');
-  SHARED __d1_License__Mapped := IF(__d1_Missing_License__UIDComponents = 'dl_number,orig_state',PROJECT(__d1_Norm,TRANSFORM(__d1_License__Layout,SELF.License_:=0,SELF:=LEFT)),JOIN(KEL.Intake.AppendFields(__d1_Norm,__d1_Missing_License__UIDComponents),E_Drivers_License(__in,__cfg).Lookup,TRIM((STRING)LEFT.dl_number) + '|' + TRIM((STRING)LEFT.orig_state) = RIGHT.KeyVal,TRANSFORM(__d1_License__Layout,SELF.License_:=RIGHT.UID,SELF:=LEFT),LEFT OUTER,SMART));
+  SHARED __d1_Missing_License__UIDComponents := KEL.Intake.ConstructMissingFieldList(__d1_KELfiltered,'dl_number,orig_state','PublicRecords_KEL.Files.NonFCRA.DriversV2__Key_DL_Number_Vault');
+  SHARED __d1_License__Mapped := IF(__d1_Missing_License__UIDComponents = 'dl_number,orig_state',PROJECT(__d1_KELfiltered,TRANSFORM(__d1_License__Layout,SELF.License_:=0,SELF:=LEFT)),JOIN(KEL.Intake.AppendFields(__d1_KELfiltered,__d1_Missing_License__UIDComponents),E_Drivers_License(__cfg).Lookup,TRIM((STRING)LEFT.dl_number) + '|' + TRIM((STRING)LEFT.orig_state) = RIGHT.KeyVal,TRANSFORM(__d1_License__Layout,SELF.License_:=RIGHT.UID,SELF:=LEFT),LEFT OUTER,SMART));
   SHARED __d1_Prefiltered := __d1_License__Mapped;
-  SHARED __d1 := __SourceFilter(KEL.FromFlat.Convert(__d1_Prefiltered,InLayout,__Mapping1,'PublicRecords_KEL.ECL_Functions.Dataset_FDC'));
+  SHARED __d1 := __SourceFilter(KEL.FromFlat.Convert(__d1_Prefiltered,InLayout,__Mapping1,'PublicRecords_KEL.Files.NonFCRA.DriversV2__Key_DL_Number_Vault'));
   SHARED __Mapping2 := 'did(OVERRIDE:Subject_:0),License_(DEFAULT:License_:0),source_code(OVERRIDE:Source_:\'\'),archive_date(OVERRIDE:Archive___Date_:EPOCH),datefirstseen(DEFAULT:Date_First_Seen_:EPOCH),datelastseen(DEFAULT:Date_Last_Seen_:EPOCH),hybridarchivedate(DEFAULT:Hybrid_Archive_Date_:EPOCH),vaultdatelastseen(DEFAULT:Vault_Date_Last_Seen_:EPOCH),DPMBitmap(OVERRIDE:__Permits:PERMITS)';
-  SHARED __d2_Norm := NORMALIZE(__in,LEFT.Dataset_Certegy__Key_Certegy_DID,TRANSFORM(RECORDOF(__in.Dataset_Certegy__Key_Certegy_DID),SELF:=RIGHT));
-  EXPORT __d2_KELfiltered := __d2_Norm(orig_dl_num != '' AND (UNSIGNED6)did > 0);
+  EXPORT __d2_KELfiltered := PublicRecords_KEL.Files.NonFCRA.Certegy__Key_Certegy_DID_Vault(orig_dl_num != '' AND (UNSIGNED6)did > 0);
   SHARED __d2_License__Layout := RECORD
     RECORDOF(__d2_KELfiltered);
     KEL.typ.uid License_;
   END;
-  SHARED __d2_Missing_License__UIDComponents := KEL.Intake.ConstructMissingFieldList(__d2_KELfiltered,'orig_dl_num,orig_dl_state','__in');
-  SHARED __d2_License__Mapped := IF(__d2_Missing_License__UIDComponents = 'orig_dl_num,orig_dl_state',PROJECT(__d2_KELfiltered,TRANSFORM(__d2_License__Layout,SELF.License_:=0,SELF:=LEFT)),JOIN(KEL.Intake.AppendFields(__d2_KELfiltered,__d2_Missing_License__UIDComponents),E_Drivers_License(__in,__cfg).Lookup,TRIM((STRING)LEFT.orig_dl_num) + '|' + TRIM((STRING)LEFT.orig_dl_state) = RIGHT.KeyVal,TRANSFORM(__d2_License__Layout,SELF.License_:=RIGHT.UID,SELF:=LEFT),LEFT OUTER,SMART));
+  SHARED __d2_Missing_License__UIDComponents := KEL.Intake.ConstructMissingFieldList(__d2_KELfiltered,'orig_dl_num,orig_dl_state','PublicRecords_KEL.Files.NonFCRA.Certegy__Key_Certegy_DID_Vault');
+  SHARED __d2_License__Mapped := IF(__d2_Missing_License__UIDComponents = 'orig_dl_num,orig_dl_state',PROJECT(__d2_KELfiltered,TRANSFORM(__d2_License__Layout,SELF.License_:=0,SELF:=LEFT)),JOIN(KEL.Intake.AppendFields(__d2_KELfiltered,__d2_Missing_License__UIDComponents),E_Drivers_License(__cfg).Lookup,TRIM((STRING)LEFT.orig_dl_num) + '|' + TRIM((STRING)LEFT.orig_dl_state) = RIGHT.KeyVal,TRANSFORM(__d2_License__Layout,SELF.License_:=RIGHT.UID,SELF:=LEFT),LEFT OUTER,SMART));
   SHARED __d2_Prefiltered := __d2_License__Mapped;
-  SHARED __d2 := __SourceFilter(KEL.FromFlat.Convert(__d2_Prefiltered,InLayout,__Mapping2,'PublicRecords_KEL.ECL_Functions.Dataset_FDC'));
+  SHARED __d2 := __SourceFilter(KEL.FromFlat.Convert(__d2_Prefiltered,InLayout,__Mapping2,'PublicRecords_KEL.Files.NonFCRA.Certegy__Key_Certegy_DID_Vault'));
   EXPORT InData := __d0 + __d1 + __d2;
   EXPORT Data_Sources_Layout := RECORD
     KEL.typ.nstr Source_;
@@ -98,33 +99,33 @@ EXPORT E_Person_Drivers_License(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDef
   EXPORT __PreResult := ROLLUP(HAVING(Person_Drivers_License_Group,COUNT(ROWS(LEFT))=1),GROUP,Person_Drivers_License__Single_Rollup(LEFT)) + ROLLUP(HAVING(Person_Drivers_License_Group,COUNT(ROWS(LEFT))>1),GROUP,Person_Drivers_License__Rollup(LEFT, ROWS(LEFT)));
   EXPORT __Result := __CLEARFLAGS(__PreResult);
   EXPORT Result := __UNWRAP(__Result);
-  EXPORT Subject__Orphan := JOIN(InData(__NN(Subject_)),E_Person(__in,__cfg).__Result,__EEQP(LEFT.Subject_, RIGHT.UID),TRANSFORM(InLayout,SELF := LEFT,SELF:=[]),LEFT ONLY, HASH);
-  EXPORT License__Orphan := JOIN(InData(__NN(License_)),E_Drivers_License(__in,__cfg).__Result,__EEQP(LEFT.License_, RIGHT.UID),TRANSFORM(InLayout,SELF := LEFT,SELF:=[]),LEFT ONLY, HASH);
+  EXPORT Subject__Orphan := JOIN(InData(__NN(Subject_)),E_Person(__cfg).__Result,__EEQP(LEFT.Subject_, RIGHT.UID),TRANSFORM(InLayout,SELF := LEFT,SELF:=[]),LEFT ONLY, HASH);
+  EXPORT License__Orphan := JOIN(InData(__NN(License_)),E_Drivers_License(__cfg).__Result,__EEQP(LEFT.License_, RIGHT.UID),TRANSFORM(InLayout,SELF := LEFT,SELF:=[]),LEFT ONLY, HASH);
   EXPORT SanityCheck := DATASET([{COUNT(Subject__Orphan),COUNT(License__Orphan)}],{KEL.typ.int Subject__Orphan,KEL.typ.int License__Orphan});
   EXPORT NullCounts := DATASET([
-    {'PersonDriversLicense','PublicRecords_KEL.ECL_Functions.Dataset_FDC','did',COUNT(__d0(__NL(Subject_))),COUNT(__d0(__NN(Subject_)))},
-    {'PersonDriversLicense','PublicRecords_KEL.ECL_Functions.Dataset_FDC','License',COUNT(__d0(__NL(License_))),COUNT(__d0(__NN(License_)))},
-    {'PersonDriversLicense','PublicRecords_KEL.ECL_Functions.Dataset_FDC','source_code',COUNT(__d0(__NL(Source_))),COUNT(__d0(__NN(Source_)))},
-    {'PersonDriversLicense','PublicRecords_KEL.ECL_Functions.Dataset_FDC','Archive_Date',COUNT(__d0(Archive___Date_=0)),COUNT(__d0(Archive___Date_!=0))},
-    {'PersonDriversLicense','PublicRecords_KEL.ECL_Functions.Dataset_FDC','DateFirstSeen',COUNT(__d0(Date_First_Seen_=0)),COUNT(__d0(Date_First_Seen_!=0))},
-    {'PersonDriversLicense','PublicRecords_KEL.ECL_Functions.Dataset_FDC','DateLastSeen',COUNT(__d0(Date_Last_Seen_=0)),COUNT(__d0(Date_Last_Seen_!=0))},
-    {'PersonDriversLicense','PublicRecords_KEL.ECL_Functions.Dataset_FDC','HybridArchiveDate',COUNT(__d0(Hybrid_Archive_Date_=0)),COUNT(__d0(Hybrid_Archive_Date_!=0))},
-    {'PersonDriversLicense','PublicRecords_KEL.ECL_Functions.Dataset_FDC','VaultDateLastSeen',COUNT(__d0(Vault_Date_Last_Seen_=0)),COUNT(__d0(Vault_Date_Last_Seen_!=0))},
-    {'PersonDriversLicense','PublicRecords_KEL.ECL_Functions.Dataset_FDC','did',COUNT(__d1(__NL(Subject_))),COUNT(__d1(__NN(Subject_)))},
-    {'PersonDriversLicense','PublicRecords_KEL.ECL_Functions.Dataset_FDC','License',COUNT(__d1(__NL(License_))),COUNT(__d1(__NN(License_)))},
-    {'PersonDriversLicense','PublicRecords_KEL.ECL_Functions.Dataset_FDC','source_code',COUNT(__d1(__NL(Source_))),COUNT(__d1(__NN(Source_)))},
-    {'PersonDriversLicense','PublicRecords_KEL.ECL_Functions.Dataset_FDC','Archive_Date',COUNT(__d1(Archive___Date_=0)),COUNT(__d1(Archive___Date_!=0))},
-    {'PersonDriversLicense','PublicRecords_KEL.ECL_Functions.Dataset_FDC','DateFirstSeen',COUNT(__d1(Date_First_Seen_=0)),COUNT(__d1(Date_First_Seen_!=0))},
-    {'PersonDriversLicense','PublicRecords_KEL.ECL_Functions.Dataset_FDC','DateLastSeen',COUNT(__d1(Date_Last_Seen_=0)),COUNT(__d1(Date_Last_Seen_!=0))},
-    {'PersonDriversLicense','PublicRecords_KEL.ECL_Functions.Dataset_FDC','HybridArchiveDate',COUNT(__d1(Hybrid_Archive_Date_=0)),COUNT(__d1(Hybrid_Archive_Date_!=0))},
-    {'PersonDriversLicense','PublicRecords_KEL.ECL_Functions.Dataset_FDC','VaultDateLastSeen',COUNT(__d1(Vault_Date_Last_Seen_=0)),COUNT(__d1(Vault_Date_Last_Seen_!=0))},
-    {'PersonDriversLicense','PublicRecords_KEL.ECL_Functions.Dataset_FDC','did',COUNT(__d2(__NL(Subject_))),COUNT(__d2(__NN(Subject_)))},
-    {'PersonDriversLicense','PublicRecords_KEL.ECL_Functions.Dataset_FDC','License',COUNT(__d2(__NL(License_))),COUNT(__d2(__NN(License_)))},
-    {'PersonDriversLicense','PublicRecords_KEL.ECL_Functions.Dataset_FDC','source_code',COUNT(__d2(__NL(Source_))),COUNT(__d2(__NN(Source_)))},
-    {'PersonDriversLicense','PublicRecords_KEL.ECL_Functions.Dataset_FDC','Archive_Date',COUNT(__d2(Archive___Date_=0)),COUNT(__d2(Archive___Date_!=0))},
-    {'PersonDriversLicense','PublicRecords_KEL.ECL_Functions.Dataset_FDC','DateFirstSeen',COUNT(__d2(Date_First_Seen_=0)),COUNT(__d2(Date_First_Seen_!=0))},
-    {'PersonDriversLicense','PublicRecords_KEL.ECL_Functions.Dataset_FDC','DateLastSeen',COUNT(__d2(Date_Last_Seen_=0)),COUNT(__d2(Date_Last_Seen_!=0))},
-    {'PersonDriversLicense','PublicRecords_KEL.ECL_Functions.Dataset_FDC','HybridArchiveDate',COUNT(__d2(Hybrid_Archive_Date_=0)),COUNT(__d2(Hybrid_Archive_Date_!=0))},
-    {'PersonDriversLicense','PublicRecords_KEL.ECL_Functions.Dataset_FDC','VaultDateLastSeen',COUNT(__d2(Vault_Date_Last_Seen_=0)),COUNT(__d2(Vault_Date_Last_Seen_!=0))}]
+    {'PersonDriversLicense','PublicRecords_KEL.Files.NonFCRA.DriversV2__Key_DL_DID_Vault','did',COUNT(__d0(__NL(Subject_))),COUNT(__d0(__NN(Subject_)))},
+    {'PersonDriversLicense','PublicRecords_KEL.Files.NonFCRA.DriversV2__Key_DL_DID_Vault','License',COUNT(__d0(__NL(License_))),COUNT(__d0(__NN(License_)))},
+    {'PersonDriversLicense','PublicRecords_KEL.Files.NonFCRA.DriversV2__Key_DL_DID_Vault','source_code',COUNT(__d0(__NL(Source_))),COUNT(__d0(__NN(Source_)))},
+    {'PersonDriversLicense','PublicRecords_KEL.Files.NonFCRA.DriversV2__Key_DL_DID_Vault','Archive_Date',COUNT(__d0(Archive___Date_=0)),COUNT(__d0(Archive___Date_!=0))},
+    {'PersonDriversLicense','PublicRecords_KEL.Files.NonFCRA.DriversV2__Key_DL_DID_Vault','DateFirstSeen',COUNT(__d0(Date_First_Seen_=0)),COUNT(__d0(Date_First_Seen_!=0))},
+    {'PersonDriversLicense','PublicRecords_KEL.Files.NonFCRA.DriversV2__Key_DL_DID_Vault','DateLastSeen',COUNT(__d0(Date_Last_Seen_=0)),COUNT(__d0(Date_Last_Seen_!=0))},
+    {'PersonDriversLicense','PublicRecords_KEL.Files.NonFCRA.DriversV2__Key_DL_DID_Vault','HybridArchiveDate',COUNT(__d0(Hybrid_Archive_Date_=0)),COUNT(__d0(Hybrid_Archive_Date_!=0))},
+    {'PersonDriversLicense','PublicRecords_KEL.Files.NonFCRA.DriversV2__Key_DL_DID_Vault','VaultDateLastSeen',COUNT(__d0(Vault_Date_Last_Seen_=0)),COUNT(__d0(Vault_Date_Last_Seen_!=0))},
+    {'PersonDriversLicense','PublicRecords_KEL.Files.NonFCRA.DriversV2__Key_DL_Number_Vault','did',COUNT(__d1(__NL(Subject_))),COUNT(__d1(__NN(Subject_)))},
+    {'PersonDriversLicense','PublicRecords_KEL.Files.NonFCRA.DriversV2__Key_DL_Number_Vault','License',COUNT(__d1(__NL(License_))),COUNT(__d1(__NN(License_)))},
+    {'PersonDriversLicense','PublicRecords_KEL.Files.NonFCRA.DriversV2__Key_DL_Number_Vault','source_code',COUNT(__d1(__NL(Source_))),COUNT(__d1(__NN(Source_)))},
+    {'PersonDriversLicense','PublicRecords_KEL.Files.NonFCRA.DriversV2__Key_DL_Number_Vault','Archive_Date',COUNT(__d1(Archive___Date_=0)),COUNT(__d1(Archive___Date_!=0))},
+    {'PersonDriversLicense','PublicRecords_KEL.Files.NonFCRA.DriversV2__Key_DL_Number_Vault','DateFirstSeen',COUNT(__d1(Date_First_Seen_=0)),COUNT(__d1(Date_First_Seen_!=0))},
+    {'PersonDriversLicense','PublicRecords_KEL.Files.NonFCRA.DriversV2__Key_DL_Number_Vault','DateLastSeen',COUNT(__d1(Date_Last_Seen_=0)),COUNT(__d1(Date_Last_Seen_!=0))},
+    {'PersonDriversLicense','PublicRecords_KEL.Files.NonFCRA.DriversV2__Key_DL_Number_Vault','HybridArchiveDate',COUNT(__d1(Hybrid_Archive_Date_=0)),COUNT(__d1(Hybrid_Archive_Date_!=0))},
+    {'PersonDriversLicense','PublicRecords_KEL.Files.NonFCRA.DriversV2__Key_DL_Number_Vault','VaultDateLastSeen',COUNT(__d1(Vault_Date_Last_Seen_=0)),COUNT(__d1(Vault_Date_Last_Seen_!=0))},
+    {'PersonDriversLicense','PublicRecords_KEL.Files.NonFCRA.Certegy__Key_Certegy_DID_Vault','did',COUNT(__d2(__NL(Subject_))),COUNT(__d2(__NN(Subject_)))},
+    {'PersonDriversLicense','PublicRecords_KEL.Files.NonFCRA.Certegy__Key_Certegy_DID_Vault','License',COUNT(__d2(__NL(License_))),COUNT(__d2(__NN(License_)))},
+    {'PersonDriversLicense','PublicRecords_KEL.Files.NonFCRA.Certegy__Key_Certegy_DID_Vault','source_code',COUNT(__d2(__NL(Source_))),COUNT(__d2(__NN(Source_)))},
+    {'PersonDriversLicense','PublicRecords_KEL.Files.NonFCRA.Certegy__Key_Certegy_DID_Vault','Archive_Date',COUNT(__d2(Archive___Date_=0)),COUNT(__d2(Archive___Date_!=0))},
+    {'PersonDriversLicense','PublicRecords_KEL.Files.NonFCRA.Certegy__Key_Certegy_DID_Vault','DateFirstSeen',COUNT(__d2(Date_First_Seen_=0)),COUNT(__d2(Date_First_Seen_!=0))},
+    {'PersonDriversLicense','PublicRecords_KEL.Files.NonFCRA.Certegy__Key_Certegy_DID_Vault','DateLastSeen',COUNT(__d2(Date_Last_Seen_=0)),COUNT(__d2(Date_Last_Seen_!=0))},
+    {'PersonDriversLicense','PublicRecords_KEL.Files.NonFCRA.Certegy__Key_Certegy_DID_Vault','HybridArchiveDate',COUNT(__d2(Hybrid_Archive_Date_=0)),COUNT(__d2(Hybrid_Archive_Date_!=0))},
+    {'PersonDriversLicense','PublicRecords_KEL.Files.NonFCRA.Certegy__Key_Certegy_DID_Vault','VaultDateLastSeen',COUNT(__d2(Vault_Date_Last_Seen_=0)),COUNT(__d2(Vault_Date_Last_Seen_!=0))}]
   ,{KEL.typ.str entity,KEL.typ.str fileName,KEL.typ.str fieldName,KEL.typ.int nullCount,KEL.typ.int notNullCount});
 END;

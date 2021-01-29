@@ -3,7 +3,7 @@ IMPORT KEL15 AS KEL;
 IMPORT PublicRecords_KEL;
 IMPORT CFG_Compile FROM PublicRecords_KEL;
 IMPORT * FROM KEL15.Null;
-EXPORT E_Surname(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG_Compile __cfg = CFG_Compile) := MODULE
+EXPORT E_Surname(CFG_Compile __cfg = CFG_Compile) := MODULE
   EXPORT Typ := KEL.typ.uid;
   EXPORT InLayout := RECORD
     KEL.typ.nuid UID;
@@ -33,8 +33,9 @@ EXPORT E_Surname(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG_Compi
   SHARED __Trimmed := RECORD, MAXLENGTH(5000)
     STRING KeyVal;
   END;
-  SHARED __d0_Trim := PROJECT(__in.Dataset_dx_CFPB_key_Census_Surnames,TRANSFORM(__Trimmed,SELF.KeyVal:=TRIM((STRING)LEFT.name)));
-  EXPORT __All_Trim := __d0_Trim;
+  SHARED __d0_Trim := PROJECT(PublicRecords_KEL.files.NonFCRA.DX_ConsumerFinancialProtectionBureau__Key_census_surnames_Vault,TRANSFORM(__Trimmed,SELF.KeyVal:=TRIM((STRING)LEFT.name)));
+  SHARED __d1_Trim := PROJECT(PublicRecords_KEL.files.FCRA.DX_ConsumerFinancialProtectionBureau__Key_census_surnames_Vault,TRANSFORM(__Trimmed,SELF.KeyVal:=TRIM((STRING)LEFT.name)));
+  EXPORT __All_Trim := __d0_Trim + __d1_Trim;
   SHARED __TabRec := RECORD, MAXLENGTH(5000)
     __All_Trim.KeyVal;
     UNSIGNED4 Cnt := COUNT(GROUP);
@@ -42,20 +43,32 @@ EXPORT E_Surname(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG_Compi
   END;
   EXPORT NullKeyVal := TRIM((STRING)'');
   SHARED __Table := TABLE(__All_Trim(KeyVal <> NullKeyVal),__TabRec,KeyVal,MERGE);
-  SHARED __SortedTable := SORT(__Table,KeyVal);
   SHARED NullLookupRec := DATASET([{NullKeyVal,1,0}],__TabRec);
-  EXPORT Lookup := NullLookupRec + PROJECT(__SortedTable,TRANSFORM(__TabRec,SELF.UID:=COUNTER,SELF:=LEFT));
+  EXPORT Lookup := NullLookupRec + PROJECT(__Table,TRANSFORM(__TabRec,SELF.UID:=COUNTER,SELF:=LEFT)) : PERSIST('~temp::KEL::PublicRecords_KEL::Surname::UidLookup',EXPIRE(7));
+  EXPORT UID_IdToText := INDEX(Lookup,{UID},{Lookup},'~temp::KEL::IDtoT::PublicRecords_KEL::Surname');
+  EXPORT UID_TextToId := INDEX(Lookup,{ht:=HASH32(KeyVal)},{Lookup},'~temp::KEL::TtoID::PublicRecords_KEL::Surname');
+  EXPORT BuildAll := PARALLEL(BUILDINDEX(UID_IdToText,OVERWRITE),BUILDINDEX(UID_TextToId,OVERWRITE));
+  EXPORT GetText(KEL.typ.uid i) := UID_IdToText(UID=i)[1];
+  EXPORT GetId(STRING s) := UID_TextToId(ht=HASH32(s),KeyVal=s)[1];
   SHARED __Mapping0 := 'UID(DEFAULT:UID),name(OVERRIDE:Surname_:\'\'),is_latest(OVERRIDE:Is_Latest_),name_rank(OVERRIDE:Name_Rank_:0),name_count(OVERRIDE:Name_Count_:0),prop100k(OVERRIDE:Prop100_K_:0.0),cum_prop100k(OVERRIDE:Cumulative_Prop100_K_:0.0),pctwhite(OVERRIDE:Percent_White_:0.0),pctblack(OVERRIDE:Percent_Black_:0.0),pctapi(OVERRIDE:Percent_Asian_Pacific_Islander_:0.0),pctaian(OVERRIDE:Percent_American_Indian_Alaska_Native_:0.0),pct2prace(OVERRIDE:Percent_Multiracial_:0.0),pcthispanic(OVERRIDE:Percent_Hispanic_:0.0),src(OVERRIDE:Source_:\'\'),archive_date(OVERRIDE:Archive___Date_:EPOCH),datefirstseen(DEFAULT:Date_First_Seen_:EPOCH),datelastseen(DEFAULT:Date_Last_Seen_:EPOCH),hybridarchivedate(DEFAULT:Hybrid_Archive_Date_:EPOCH),vaultdatelastseen(DEFAULT:Vault_Date_Last_Seen_:EPOCH),DPMBitmap(OVERRIDE:__Permits:PERMITS)';
-  SHARED __d0_Norm := NORMALIZE(__in,LEFT.Dataset_dx_CFPB_key_Census_Surnames,TRANSFORM(RECORDOF(__in.Dataset_dx_CFPB_key_Census_Surnames),SELF:=RIGHT));
   SHARED __d0_Out := RECORD
-    RECORDOF(PublicRecords_KEL.ECL_Functions.Dataset_FDC.Dataset_dx_CFPB_key_Census_Surnames);
+    RECORDOF(PublicRecords_KEL.files.NonFCRA.DX_ConsumerFinancialProtectionBureau__Key_census_surnames_Vault);
     KEL.typ.uid UID := 0;
   END;
-  SHARED __d0_UID_Mapped := JOIN(__d0_Norm,Lookup,TRIM((STRING)LEFT.name) = RIGHT.KeyVal,TRANSFORM(__d0_Out,SELF.UID:=RIGHT.UID,SELF:=LEFT),SMART);
-  EXPORT PublicRecords_KEL_ECL_Functions_Dataset_FDC_Dataset_dx_CFPB_key_Census_Surnames_Invalid := __d0_UID_Mapped(UID = 0);
+  SHARED __d0_UID_Mapped := JOIN(PublicRecords_KEL.files.NonFCRA.DX_ConsumerFinancialProtectionBureau__Key_census_surnames_Vault,Lookup,TRIM((STRING)LEFT.name) = RIGHT.KeyVal,TRANSFORM(__d0_Out,SELF.UID:=RIGHT.UID,SELF:=LEFT),SMART);
+  EXPORT PublicRecords_KEL_files_NonFCRA_DX_ConsumerFinancialProtectionBureau__Key_census_surnames_Vault_Invalid := __d0_UID_Mapped(UID = 0);
   SHARED __d0_Prefiltered := __d0_UID_Mapped(UID <> 0);
-  SHARED __d0 := __SourceFilter(KEL.FromFlat.Convert(__d0_Prefiltered,InLayout,__Mapping0,'PublicRecords_KEL.ECL_Functions.Dataset_FDC'));
-  EXPORT InData := __d0;
+  SHARED __d0 := __SourceFilter(KEL.FromFlat.Convert(__d0_Prefiltered,InLayout,__Mapping0,'PublicRecords_KEL.files.NonFCRA.DX_ConsumerFinancialProtectionBureau__Key_census_surnames_Vault'));
+  SHARED __Mapping1 := 'UID(DEFAULT:UID),name(OVERRIDE:Surname_:\'\'),is_latest(OVERRIDE:Is_Latest_),name_rank(OVERRIDE:Name_Rank_:0),name_count(OVERRIDE:Name_Count_:0),prop100k(OVERRIDE:Prop100_K_:0.0),cum_prop100k(OVERRIDE:Cumulative_Prop100_K_:0.0),pctwhite(OVERRIDE:Percent_White_:0.0),pctblack(OVERRIDE:Percent_Black_:0.0),pctapi(OVERRIDE:Percent_Asian_Pacific_Islander_:0.0),pctaian(OVERRIDE:Percent_American_Indian_Alaska_Native_:0.0),pct2prace(OVERRIDE:Percent_Multiracial_:0.0),pcthispanic(OVERRIDE:Percent_Hispanic_:0.0),src(OVERRIDE:Source_:\'\'),archive_date(OVERRIDE:Archive___Date_:EPOCH),datefirstseen(DEFAULT:Date_First_Seen_:EPOCH),datelastseen(DEFAULT:Date_Last_Seen_:EPOCH),hybridarchivedate(DEFAULT:Hybrid_Archive_Date_:EPOCH),vaultdatelastseen(DEFAULT:Vault_Date_Last_Seen_:EPOCH),DPMBitmap(OVERRIDE:__Permits:PERMITS)';
+  SHARED __d1_Out := RECORD
+    RECORDOF(PublicRecords_KEL.files.FCRA.DX_ConsumerFinancialProtectionBureau__Key_census_surnames_Vault);
+    KEL.typ.uid UID := 0;
+  END;
+  SHARED __d1_UID_Mapped := JOIN(PublicRecords_KEL.files.FCRA.DX_ConsumerFinancialProtectionBureau__Key_census_surnames_Vault,Lookup,TRIM((STRING)LEFT.name) = RIGHT.KeyVal,TRANSFORM(__d1_Out,SELF.UID:=RIGHT.UID,SELF:=LEFT),SMART);
+  EXPORT PublicRecords_KEL_files_FCRA_DX_ConsumerFinancialProtectionBureau__Key_census_surnames_Vault_Invalid := __d1_UID_Mapped(UID = 0);
+  SHARED __d1_Prefiltered := __d1_UID_Mapped(UID <> 0);
+  SHARED __d1 := __SourceFilter(KEL.FromFlat.Convert(__d1_Prefiltered,InLayout,__Mapping1,'PublicRecords_KEL.files.FCRA.DX_ConsumerFinancialProtectionBureau__Key_census_surnames_Vault'));
+  EXPORT InData := __d0 + __d1;
   EXPORT Data_Sources_Layout := RECORD
     KEL.typ.nstr Source_;
     KEL.typ.epoch Archive___Date_ := 0;
@@ -139,26 +152,45 @@ EXPORT E_Surname(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG_Compi
   EXPORT Percent_American_Indian_Alaska_Native__SingleValue_Invalid := KEL.Intake.DetectMultipleValuesOnResult(Result,Percent_American_Indian_Alaska_Native_);
   EXPORT Percent_Multiracial__SingleValue_Invalid := KEL.Intake.DetectMultipleValuesOnResult(Result,Percent_Multiracial_);
   EXPORT Percent_Hispanic__SingleValue_Invalid := KEL.Intake.DetectMultipleValuesOnResult(Result,Percent_Hispanic_);
-  EXPORT SanityCheck := DATASET([{COUNT(PublicRecords_KEL_ECL_Functions_Dataset_FDC_Dataset_dx_CFPB_key_Census_Surnames_Invalid),COUNT(Surname__SingleValue_Invalid),COUNT(Is_Latest__SingleValue_Invalid),COUNT(Name_Rank__SingleValue_Invalid),COUNT(Name_Count__SingleValue_Invalid),COUNT(Prop100_K__SingleValue_Invalid),COUNT(Cumulative_Prop100_K__SingleValue_Invalid),COUNT(Percent_White__SingleValue_Invalid),COUNT(Percent_Black__SingleValue_Invalid),COUNT(Percent_Asian_Pacific_Islander__SingleValue_Invalid),COUNT(Percent_American_Indian_Alaska_Native__SingleValue_Invalid),COUNT(Percent_Multiracial__SingleValue_Invalid),COUNT(Percent_Hispanic__SingleValue_Invalid),TopSourcedUIDs(1)}],{KEL.typ.int PublicRecords_KEL_ECL_Functions_Dataset_FDC_Dataset_dx_CFPB_key_Census_Surnames_Invalid,KEL.typ.int Surname__SingleValue_Invalid,KEL.typ.int Is_Latest__SingleValue_Invalid,KEL.typ.int Name_Rank__SingleValue_Invalid,KEL.typ.int Name_Count__SingleValue_Invalid,KEL.typ.int Prop100_K__SingleValue_Invalid,KEL.typ.int Cumulative_Prop100_K__SingleValue_Invalid,KEL.typ.int Percent_White__SingleValue_Invalid,KEL.typ.int Percent_Black__SingleValue_Invalid,KEL.typ.int Percent_Asian_Pacific_Islander__SingleValue_Invalid,KEL.typ.int Percent_American_Indian_Alaska_Native__SingleValue_Invalid,KEL.typ.int Percent_Multiracial__SingleValue_Invalid,KEL.typ.int Percent_Hispanic__SingleValue_Invalid,DATASET(RECORDOF(UIDSourceCounts)) topSourcedUID});
+  EXPORT SanityCheck := DATASET([{COUNT(PublicRecords_KEL_files_NonFCRA_DX_ConsumerFinancialProtectionBureau__Key_census_surnames_Vault_Invalid),COUNT(PublicRecords_KEL_files_FCRA_DX_ConsumerFinancialProtectionBureau__Key_census_surnames_Vault_Invalid),COUNT(Surname__SingleValue_Invalid),COUNT(Is_Latest__SingleValue_Invalid),COUNT(Name_Rank__SingleValue_Invalid),COUNT(Name_Count__SingleValue_Invalid),COUNT(Prop100_K__SingleValue_Invalid),COUNT(Cumulative_Prop100_K__SingleValue_Invalid),COUNT(Percent_White__SingleValue_Invalid),COUNT(Percent_Black__SingleValue_Invalid),COUNT(Percent_Asian_Pacific_Islander__SingleValue_Invalid),COUNT(Percent_American_Indian_Alaska_Native__SingleValue_Invalid),COUNT(Percent_Multiracial__SingleValue_Invalid),COUNT(Percent_Hispanic__SingleValue_Invalid),TopSourcedUIDs(1)}],{KEL.typ.int PublicRecords_KEL_files_NonFCRA_DX_ConsumerFinancialProtectionBureau__Key_census_surnames_Vault_Invalid,KEL.typ.int PublicRecords_KEL_files_FCRA_DX_ConsumerFinancialProtectionBureau__Key_census_surnames_Vault_Invalid,KEL.typ.int Surname__SingleValue_Invalid,KEL.typ.int Is_Latest__SingleValue_Invalid,KEL.typ.int Name_Rank__SingleValue_Invalid,KEL.typ.int Name_Count__SingleValue_Invalid,KEL.typ.int Prop100_K__SingleValue_Invalid,KEL.typ.int Cumulative_Prop100_K__SingleValue_Invalid,KEL.typ.int Percent_White__SingleValue_Invalid,KEL.typ.int Percent_Black__SingleValue_Invalid,KEL.typ.int Percent_Asian_Pacific_Islander__SingleValue_Invalid,KEL.typ.int Percent_American_Indian_Alaska_Native__SingleValue_Invalid,KEL.typ.int Percent_Multiracial__SingleValue_Invalid,KEL.typ.int Percent_Hispanic__SingleValue_Invalid,DATASET(RECORDOF(UIDSourceCounts)) topSourcedUID});
   EXPORT NullCounts := DATASET([
-    {'Surname','PublicRecords_KEL.ECL_Functions.Dataset_FDC','UID',COUNT(PublicRecords_KEL_ECL_Functions_Dataset_FDC_Dataset_dx_CFPB_key_Census_Surnames_Invalid),COUNT(__d0)},
-    {'Surname','PublicRecords_KEL.ECL_Functions.Dataset_FDC','name',COUNT(__d0(__NL(Surname_))),COUNT(__d0(__NN(Surname_)))},
-    {'Surname','PublicRecords_KEL.ECL_Functions.Dataset_FDC','is_latest',COUNT(__d0(__NL(Is_Latest_))),COUNT(__d0(__NN(Is_Latest_)))},
-    {'Surname','PublicRecords_KEL.ECL_Functions.Dataset_FDC','name_rank',COUNT(__d0(__NL(Name_Rank_))),COUNT(__d0(__NN(Name_Rank_)))},
-    {'Surname','PublicRecords_KEL.ECL_Functions.Dataset_FDC','name_count',COUNT(__d0(__NL(Name_Count_))),COUNT(__d0(__NN(Name_Count_)))},
-    {'Surname','PublicRecords_KEL.ECL_Functions.Dataset_FDC','prop100k',COUNT(__d0(__NL(Prop100_K_))),COUNT(__d0(__NN(Prop100_K_)))},
-    {'Surname','PublicRecords_KEL.ECL_Functions.Dataset_FDC','cum_prop100k',COUNT(__d0(__NL(Cumulative_Prop100_K_))),COUNT(__d0(__NN(Cumulative_Prop100_K_)))},
-    {'Surname','PublicRecords_KEL.ECL_Functions.Dataset_FDC','pctwhite',COUNT(__d0(__NL(Percent_White_))),COUNT(__d0(__NN(Percent_White_)))},
-    {'Surname','PublicRecords_KEL.ECL_Functions.Dataset_FDC','pctblack',COUNT(__d0(__NL(Percent_Black_))),COUNT(__d0(__NN(Percent_Black_)))},
-    {'Surname','PublicRecords_KEL.ECL_Functions.Dataset_FDC','pctapi',COUNT(__d0(__NL(Percent_Asian_Pacific_Islander_))),COUNT(__d0(__NN(Percent_Asian_Pacific_Islander_)))},
-    {'Surname','PublicRecords_KEL.ECL_Functions.Dataset_FDC','pctaian',COUNT(__d0(__NL(Percent_American_Indian_Alaska_Native_))),COUNT(__d0(__NN(Percent_American_Indian_Alaska_Native_)))},
-    {'Surname','PublicRecords_KEL.ECL_Functions.Dataset_FDC','pct2prace',COUNT(__d0(__NL(Percent_Multiracial_))),COUNT(__d0(__NN(Percent_Multiracial_)))},
-    {'Surname','PublicRecords_KEL.ECL_Functions.Dataset_FDC','pcthispanic',COUNT(__d0(__NL(Percent_Hispanic_))),COUNT(__d0(__NN(Percent_Hispanic_)))},
-    {'Surname','PublicRecords_KEL.ECL_Functions.Dataset_FDC','src',COUNT(__d0(__NL(Source_))),COUNT(__d0(__NN(Source_)))},
-    {'Surname','PublicRecords_KEL.ECL_Functions.Dataset_FDC','Archive_Date',COUNT(__d0(Archive___Date_=0)),COUNT(__d0(Archive___Date_!=0))},
-    {'Surname','PublicRecords_KEL.ECL_Functions.Dataset_FDC','DateFirstSeen',COUNT(__d0(Date_First_Seen_=0)),COUNT(__d0(Date_First_Seen_!=0))},
-    {'Surname','PublicRecords_KEL.ECL_Functions.Dataset_FDC','DateLastSeen',COUNT(__d0(Date_Last_Seen_=0)),COUNT(__d0(Date_Last_Seen_!=0))},
-    {'Surname','PublicRecords_KEL.ECL_Functions.Dataset_FDC','HybridArchiveDate',COUNT(__d0(Hybrid_Archive_Date_=0)),COUNT(__d0(Hybrid_Archive_Date_!=0))},
-    {'Surname','PublicRecords_KEL.ECL_Functions.Dataset_FDC','VaultDateLastSeen',COUNT(__d0(Vault_Date_Last_Seen_=0)),COUNT(__d0(Vault_Date_Last_Seen_!=0))}]
+    {'Surname','PublicRecords_KEL.files.NonFCRA.DX_ConsumerFinancialProtectionBureau__Key_census_surnames_Vault','UID',COUNT(PublicRecords_KEL_files_NonFCRA_DX_ConsumerFinancialProtectionBureau__Key_census_surnames_Vault_Invalid),COUNT(__d0)},
+    {'Surname','PublicRecords_KEL.files.NonFCRA.DX_ConsumerFinancialProtectionBureau__Key_census_surnames_Vault','name',COUNT(__d0(__NL(Surname_))),COUNT(__d0(__NN(Surname_)))},
+    {'Surname','PublicRecords_KEL.files.NonFCRA.DX_ConsumerFinancialProtectionBureau__Key_census_surnames_Vault','is_latest',COUNT(__d0(__NL(Is_Latest_))),COUNT(__d0(__NN(Is_Latest_)))},
+    {'Surname','PublicRecords_KEL.files.NonFCRA.DX_ConsumerFinancialProtectionBureau__Key_census_surnames_Vault','name_rank',COUNT(__d0(__NL(Name_Rank_))),COUNT(__d0(__NN(Name_Rank_)))},
+    {'Surname','PublicRecords_KEL.files.NonFCRA.DX_ConsumerFinancialProtectionBureau__Key_census_surnames_Vault','name_count',COUNT(__d0(__NL(Name_Count_))),COUNT(__d0(__NN(Name_Count_)))},
+    {'Surname','PublicRecords_KEL.files.NonFCRA.DX_ConsumerFinancialProtectionBureau__Key_census_surnames_Vault','prop100k',COUNT(__d0(__NL(Prop100_K_))),COUNT(__d0(__NN(Prop100_K_)))},
+    {'Surname','PublicRecords_KEL.files.NonFCRA.DX_ConsumerFinancialProtectionBureau__Key_census_surnames_Vault','cum_prop100k',COUNT(__d0(__NL(Cumulative_Prop100_K_))),COUNT(__d0(__NN(Cumulative_Prop100_K_)))},
+    {'Surname','PublicRecords_KEL.files.NonFCRA.DX_ConsumerFinancialProtectionBureau__Key_census_surnames_Vault','pctwhite',COUNT(__d0(__NL(Percent_White_))),COUNT(__d0(__NN(Percent_White_)))},
+    {'Surname','PublicRecords_KEL.files.NonFCRA.DX_ConsumerFinancialProtectionBureau__Key_census_surnames_Vault','pctblack',COUNT(__d0(__NL(Percent_Black_))),COUNT(__d0(__NN(Percent_Black_)))},
+    {'Surname','PublicRecords_KEL.files.NonFCRA.DX_ConsumerFinancialProtectionBureau__Key_census_surnames_Vault','pctapi',COUNT(__d0(__NL(Percent_Asian_Pacific_Islander_))),COUNT(__d0(__NN(Percent_Asian_Pacific_Islander_)))},
+    {'Surname','PublicRecords_KEL.files.NonFCRA.DX_ConsumerFinancialProtectionBureau__Key_census_surnames_Vault','pctaian',COUNT(__d0(__NL(Percent_American_Indian_Alaska_Native_))),COUNT(__d0(__NN(Percent_American_Indian_Alaska_Native_)))},
+    {'Surname','PublicRecords_KEL.files.NonFCRA.DX_ConsumerFinancialProtectionBureau__Key_census_surnames_Vault','pct2prace',COUNT(__d0(__NL(Percent_Multiracial_))),COUNT(__d0(__NN(Percent_Multiracial_)))},
+    {'Surname','PublicRecords_KEL.files.NonFCRA.DX_ConsumerFinancialProtectionBureau__Key_census_surnames_Vault','pcthispanic',COUNT(__d0(__NL(Percent_Hispanic_))),COUNT(__d0(__NN(Percent_Hispanic_)))},
+    {'Surname','PublicRecords_KEL.files.NonFCRA.DX_ConsumerFinancialProtectionBureau__Key_census_surnames_Vault','src',COUNT(__d0(__NL(Source_))),COUNT(__d0(__NN(Source_)))},
+    {'Surname','PublicRecords_KEL.files.NonFCRA.DX_ConsumerFinancialProtectionBureau__Key_census_surnames_Vault','Archive_Date',COUNT(__d0(Archive___Date_=0)),COUNT(__d0(Archive___Date_!=0))},
+    {'Surname','PublicRecords_KEL.files.NonFCRA.DX_ConsumerFinancialProtectionBureau__Key_census_surnames_Vault','DateFirstSeen',COUNT(__d0(Date_First_Seen_=0)),COUNT(__d0(Date_First_Seen_!=0))},
+    {'Surname','PublicRecords_KEL.files.NonFCRA.DX_ConsumerFinancialProtectionBureau__Key_census_surnames_Vault','DateLastSeen',COUNT(__d0(Date_Last_Seen_=0)),COUNT(__d0(Date_Last_Seen_!=0))},
+    {'Surname','PublicRecords_KEL.files.NonFCRA.DX_ConsumerFinancialProtectionBureau__Key_census_surnames_Vault','HybridArchiveDate',COUNT(__d0(Hybrid_Archive_Date_=0)),COUNT(__d0(Hybrid_Archive_Date_!=0))},
+    {'Surname','PublicRecords_KEL.files.NonFCRA.DX_ConsumerFinancialProtectionBureau__Key_census_surnames_Vault','VaultDateLastSeen',COUNT(__d0(Vault_Date_Last_Seen_=0)),COUNT(__d0(Vault_Date_Last_Seen_!=0))},
+    {'Surname','PublicRecords_KEL.files.FCRA.DX_ConsumerFinancialProtectionBureau__Key_census_surnames_Vault','UID',COUNT(PublicRecords_KEL_files_FCRA_DX_ConsumerFinancialProtectionBureau__Key_census_surnames_Vault_Invalid),COUNT(__d1)},
+    {'Surname','PublicRecords_KEL.files.FCRA.DX_ConsumerFinancialProtectionBureau__Key_census_surnames_Vault','name',COUNT(__d1(__NL(Surname_))),COUNT(__d1(__NN(Surname_)))},
+    {'Surname','PublicRecords_KEL.files.FCRA.DX_ConsumerFinancialProtectionBureau__Key_census_surnames_Vault','is_latest',COUNT(__d1(__NL(Is_Latest_))),COUNT(__d1(__NN(Is_Latest_)))},
+    {'Surname','PublicRecords_KEL.files.FCRA.DX_ConsumerFinancialProtectionBureau__Key_census_surnames_Vault','name_rank',COUNT(__d1(__NL(Name_Rank_))),COUNT(__d1(__NN(Name_Rank_)))},
+    {'Surname','PublicRecords_KEL.files.FCRA.DX_ConsumerFinancialProtectionBureau__Key_census_surnames_Vault','name_count',COUNT(__d1(__NL(Name_Count_))),COUNT(__d1(__NN(Name_Count_)))},
+    {'Surname','PublicRecords_KEL.files.FCRA.DX_ConsumerFinancialProtectionBureau__Key_census_surnames_Vault','prop100k',COUNT(__d1(__NL(Prop100_K_))),COUNT(__d1(__NN(Prop100_K_)))},
+    {'Surname','PublicRecords_KEL.files.FCRA.DX_ConsumerFinancialProtectionBureau__Key_census_surnames_Vault','cum_prop100k',COUNT(__d1(__NL(Cumulative_Prop100_K_))),COUNT(__d1(__NN(Cumulative_Prop100_K_)))},
+    {'Surname','PublicRecords_KEL.files.FCRA.DX_ConsumerFinancialProtectionBureau__Key_census_surnames_Vault','pctwhite',COUNT(__d1(__NL(Percent_White_))),COUNT(__d1(__NN(Percent_White_)))},
+    {'Surname','PublicRecords_KEL.files.FCRA.DX_ConsumerFinancialProtectionBureau__Key_census_surnames_Vault','pctblack',COUNT(__d1(__NL(Percent_Black_))),COUNT(__d1(__NN(Percent_Black_)))},
+    {'Surname','PublicRecords_KEL.files.FCRA.DX_ConsumerFinancialProtectionBureau__Key_census_surnames_Vault','pctapi',COUNT(__d1(__NL(Percent_Asian_Pacific_Islander_))),COUNT(__d1(__NN(Percent_Asian_Pacific_Islander_)))},
+    {'Surname','PublicRecords_KEL.files.FCRA.DX_ConsumerFinancialProtectionBureau__Key_census_surnames_Vault','pctaian',COUNT(__d1(__NL(Percent_American_Indian_Alaska_Native_))),COUNT(__d1(__NN(Percent_American_Indian_Alaska_Native_)))},
+    {'Surname','PublicRecords_KEL.files.FCRA.DX_ConsumerFinancialProtectionBureau__Key_census_surnames_Vault','pct2prace',COUNT(__d1(__NL(Percent_Multiracial_))),COUNT(__d1(__NN(Percent_Multiracial_)))},
+    {'Surname','PublicRecords_KEL.files.FCRA.DX_ConsumerFinancialProtectionBureau__Key_census_surnames_Vault','pcthispanic',COUNT(__d1(__NL(Percent_Hispanic_))),COUNT(__d1(__NN(Percent_Hispanic_)))},
+    {'Surname','PublicRecords_KEL.files.FCRA.DX_ConsumerFinancialProtectionBureau__Key_census_surnames_Vault','src',COUNT(__d1(__NL(Source_))),COUNT(__d1(__NN(Source_)))},
+    {'Surname','PublicRecords_KEL.files.FCRA.DX_ConsumerFinancialProtectionBureau__Key_census_surnames_Vault','Archive_Date',COUNT(__d1(Archive___Date_=0)),COUNT(__d1(Archive___Date_!=0))},
+    {'Surname','PublicRecords_KEL.files.FCRA.DX_ConsumerFinancialProtectionBureau__Key_census_surnames_Vault','DateFirstSeen',COUNT(__d1(Date_First_Seen_=0)),COUNT(__d1(Date_First_Seen_!=0))},
+    {'Surname','PublicRecords_KEL.files.FCRA.DX_ConsumerFinancialProtectionBureau__Key_census_surnames_Vault','DateLastSeen',COUNT(__d1(Date_Last_Seen_=0)),COUNT(__d1(Date_Last_Seen_!=0))},
+    {'Surname','PublicRecords_KEL.files.FCRA.DX_ConsumerFinancialProtectionBureau__Key_census_surnames_Vault','HybridArchiveDate',COUNT(__d1(Hybrid_Archive_Date_=0)),COUNT(__d1(Hybrid_Archive_Date_!=0))},
+    {'Surname','PublicRecords_KEL.files.FCRA.DX_ConsumerFinancialProtectionBureau__Key_census_surnames_Vault','VaultDateLastSeen',COUNT(__d1(Vault_Date_Last_Seen_=0)),COUNT(__d1(Vault_Date_Last_Seen_!=0))}]
   ,{KEL.typ.str entity,KEL.typ.str fileName,KEL.typ.str fieldName,KEL.typ.int nullCount,KEL.typ.int notNullCount});
 END;

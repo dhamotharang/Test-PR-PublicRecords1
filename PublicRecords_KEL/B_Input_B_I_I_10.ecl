@@ -2,10 +2,10 @@
 IMPORT KEL15 AS KEL;
 IMPORT CFG_Compile,E_Business_Org,E_Business_Sele,E_Business_Sele_Overflow,E_Business_Ult,E_Input_B_I_I,FN_Compile FROM PublicRecords_KEL;
 IMPORT * FROM KEL15.Null;
-EXPORT B_Input_B_I_I_10(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG_Compile __cfg = CFG_Compile) := MODULE
-  SHARED VIRTUAL TYPEOF(E_Input_B_I_I(__in,__cfg).__Result) __E_Input_B_I_I := E_Input_B_I_I(__in,__cfg).__Result;
-  SHARED __EE309968 := __E_Input_B_I_I;
-  EXPORT __ST255713_Layout := RECORD
+EXPORT B_Input_B_I_I_10(CFG_Compile __cfg = CFG_Compile) := MODULE
+  SHARED VIRTUAL TYPEOF(E_Input_B_I_I(__cfg).__Result) __E_Input_B_I_I := E_Input_B_I_I(__cfg).__Result;
+  SHARED __EE352098 := __E_Input_B_I_I;
+  EXPORT __ST263553_Layout := RECORD
     KEL.typ.nuid UID;
     KEL.typ.ntyp(E_Business_Sele().Typ) Legal_;
     KEL.typ.nint G___Proc_Bus_U_I_D_;
@@ -79,11 +79,11 @@ EXPORT B_Input_B_I_I_10(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CF
     KEL.typ.epoch Vault_Date_Last_Seen_ := 0;
     KEL.typ.int __RecordCount := 0;
   END;
-  SHARED __ST255713_Layout __ND4902105__Project(E_Input_B_I_I(__in,__cfg).Layout __PP309627) := TRANSFORM
-    __CC13326 := '-99999';
-    __CC13331 := '-99998';
-    SELF.Bus_Input_Name_Clean_Value_ := FN_Compile(__cfg).FN_Is_Blank2_Fields(__ECAST(KEL.typ.nstr,__PP309627.B___Inp_Name_),__ECAST(KEL.typ.nstr,__CN(__CC13326)),__ECAST(KEL.typ.nstr,__PP309627.B___Inp_Cln_Name_),__ECAST(KEL.typ.nstr,__CN(__CC13331)));
-    SELF := __PP309627;
+  SHARED __ST263553_Layout __ND5213925__Project(E_Input_B_I_I(__cfg).Layout __PP351757) := TRANSFORM
+    __CC14738 := '-99999';
+    __CC14743 := '-99998';
+    SELF.Bus_Input_Name_Clean_Value_ := FN_Compile(__cfg).FN_Is_Blank2_Fields(__ECAST(KEL.typ.nstr,__PP351757.B___Inp_Name_),__ECAST(KEL.typ.nstr,__CN(__CC14738)),__ECAST(KEL.typ.nstr,__PP351757.B___Inp_Cln_Name_),__ECAST(KEL.typ.nstr,__CN(__CC14743)));
+    SELF := __PP351757;
   END;
-  EXPORT __ENH_Input_B_I_I_10 := PROJECT(__EE309968,__ND4902105__Project(LEFT));
+  EXPORT __ENH_Input_B_I_I_10 := PROJECT(__EE352098,__ND5213925__Project(LEFT));
 END;

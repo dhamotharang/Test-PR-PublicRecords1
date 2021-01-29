@@ -3,7 +3,7 @@ IMPORT KEL15 AS KEL;
 IMPORT PublicRecords_KEL;
 IMPORT CFG_Compile FROM PublicRecords_KEL;
 IMPORT * FROM KEL15.Null;
-EXPORT E_Aircraft(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG_Compile __cfg = CFG_Compile) := MODULE
+EXPORT E_Aircraft(CFG_Compile __cfg = CFG_Compile) := MODULE
   EXPORT Typ := KEL.typ.uid;
   EXPORT InLayout := RECORD
     KEL.typ.nuid UID;
@@ -34,9 +34,10 @@ EXPORT E_Aircraft(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG_Comp
   SHARED __Trimmed := RECORD, MAXLENGTH(5000)
     STRING KeyVal;
   END;
-  SHARED __d0_Trim := PROJECT(__in.Dataset_FAA__Key_Aircraft_IDs,TRANSFORM(__Trimmed,SELF.KeyVal:=TRIM((STRING)LEFT.n_number)));
-  SHARED __d1_Trim := PROJECT(__in.Dataset_FAA__key_aircraft_linkids,TRANSFORM(__Trimmed,SELF.KeyVal:=TRIM((STRING)LEFT.n_number)));
-  EXPORT __All_Trim := __d0_Trim + __d1_Trim;
+  SHARED __d0_Trim := PROJECT(PublicRecords_KEL.Files.NonFCRA.FAA__Key_Aircraft_Id_Vault,TRANSFORM(__Trimmed,SELF.KeyVal:=TRIM((STRING)LEFT.n_number)));
+  SHARED __d1_Trim := PROJECT(PublicRecords_KEL.Files.NonFCRA.FAA__key_aircraft_linkids_Vault,TRANSFORM(__Trimmed,SELF.KeyVal:=TRIM((STRING)LEFT.n_number)));
+  SHARED __d2_Trim := PROJECT(PublicRecords_KEL.Files.FCRA.FAA__Key_Aircraft_Id_vault,TRANSFORM(__Trimmed,SELF.KeyVal:=TRIM((STRING)LEFT.n_number)));
+  EXPORT __All_Trim := __d0_Trim + __d1_Trim + __d2_Trim;
   SHARED __TabRec := RECORD, MAXLENGTH(5000)
     __All_Trim.KeyVal;
     UNSIGNED4 Cnt := COUNT(GROUP);
@@ -44,32 +45,46 @@ EXPORT E_Aircraft(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG_Comp
   END;
   EXPORT NullKeyVal := TRIM((STRING)'');
   SHARED __Table := TABLE(__All_Trim(KeyVal <> NullKeyVal),__TabRec,KeyVal,MERGE);
-  SHARED __SortedTable := SORT(__Table,KeyVal);
   SHARED NullLookupRec := DATASET([{NullKeyVal,1,0}],__TabRec);
-  EXPORT Lookup := NullLookupRec + PROJECT(__SortedTable,TRANSFORM(__TabRec,SELF.UID:=COUNTER,SELF:=LEFT));
-  SHARED __Mapping0 := 'UID(DEFAULT:UID),n_number(OVERRIDE:N_Number_:\'\'),serial_number(OVERRIDE:Serial_Number_:\'\'),mfr_mdl_code(OVERRIDE:Manufacturer_Model_Code_:\'\'),eng_mfr_mdl(OVERRIDE:Engine_Manufacturer_Model_Code_:\'\'),year_mfr(OVERRIDE:Year_Manufactured_:0),last_action_date(OVERRIDE:Last_Action_Date_:DATE),type_aircraft(OVERRIDE:Type_:0),type_engine(OVERRIDE:Type_Engine_:\'\'),status_code(OVERRIDE:Status_Code_:\'\'),mode_s_code(OVERRIDE:Transponder_Code_:\'\'),fract_owner(OVERRIDE:Fractional_Owner_:\'\'),aircraft_mfr_name(OVERRIDE:Manufacturer_Name_:\'\'),model_name(OVERRIDE:Model_Name_:\'\'),src(OVERRIDE:Source_:\'\'),archive_date(OVERRIDE:Archive___Date_:EPOCH),date_first_seen(OVERRIDE:Date_First_Seen_:EPOCH),date_last_seen(OVERRIDE:Date_Last_Seen_:EPOCH),hybridarchivedate(DEFAULT:Hybrid_Archive_Date_:EPOCH),vaultdatelastseen(DEFAULT:Vault_Date_Last_Seen_:EPOCH),DPMBitmap(OVERRIDE:__Permits:PERMITS)';
-  SHARED __d0_Norm := NORMALIZE(__in,LEFT.Dataset_FAA__Key_Aircraft_IDs,TRANSFORM(RECORDOF(__in.Dataset_FAA__Key_Aircraft_IDs),SELF:=RIGHT));
+  EXPORT Lookup := NullLookupRec + PROJECT(__Table,TRANSFORM(__TabRec,SELF.UID:=COUNTER,SELF:=LEFT)) : PERSIST('~temp::KEL::PublicRecords_KEL::Aircraft::UidLookup',EXPIRE(7));
+  EXPORT UID_IdToText := INDEX(Lookup,{UID},{Lookup},'~temp::KEL::IDtoT::PublicRecords_KEL::Aircraft');
+  EXPORT UID_TextToId := INDEX(Lookup,{ht:=HASH32(KeyVal)},{Lookup},'~temp::KEL::TtoID::PublicRecords_KEL::Aircraft');
+  EXPORT BuildAll := PARALLEL(BUILDINDEX(UID_IdToText,OVERWRITE),BUILDINDEX(UID_TextToId,OVERWRITE));
+  EXPORT GetText(KEL.typ.uid i) := UID_IdToText(UID=i)[1];
+  EXPORT GetId(STRING s) := UID_TextToId(ht=HASH32(s),KeyVal=s)[1];
+  SHARED Hybrid_Archive_Date_0Rule(STRING a) := MAP(KEL.Routines.IsValidDate((KEL.typ.kdate)(a[1..6]+'01'))=>a[1..6]+'01','0');
+  SHARED __Mapping0 := 'UID(DEFAULT:UID),n_number(OVERRIDE:N_Number_:\'\'),serial_number(OVERRIDE:Serial_Number_:\'\'),mfr_mdl_code(OVERRIDE:Manufacturer_Model_Code_:\'\'),eng_mfr_mdl(OVERRIDE:Engine_Manufacturer_Model_Code_:\'\'),year_mfr(OVERRIDE:Year_Manufactured_:0),last_action_date(OVERRIDE:Last_Action_Date_:DATE),type_aircraft(OVERRIDE:Type_:0),type_engine(OVERRIDE:Type_Engine_:\'\'),status_code(OVERRIDE:Status_Code_:\'\'),mode_s_code(OVERRIDE:Transponder_Code_:\'\'),fract_owner(OVERRIDE:Fractional_Owner_:\'\'),aircraft_mfr_name(OVERRIDE:Manufacturer_Name_:\'\'),model_name(OVERRIDE:Model_Name_:\'\'),src(OVERRIDE:Source_:\'\'),archive_date(OVERRIDE:Archive___Date_:EPOCH),date_first_seen(OVERRIDE:Date_First_Seen_:EPOCH),date_last_seen(OVERRIDE:Date_Last_Seen_:EPOCH),hybrid_archive_date(OVERRIDE:Hybrid_Archive_Date_:EPOCH:Hybrid_Archive_Date_0Rule),vaultdatelastseen(DEFAULT:Vault_Date_Last_Seen_:EPOCH),DPMBitmap(OVERRIDE:__Permits:PERMITS)';
   SHARED __d0_Out := RECORD
-    RECORDOF(PublicRecords_KEL.ECL_Functions.Dataset_FDC.Dataset_FAA__Key_Aircraft_IDs);
+    RECORDOF(PublicRecords_KEL.Files.NonFCRA.FAA__Key_Aircraft_Id_Vault);
     KEL.typ.uid UID := 0;
   END;
-  SHARED __d0_UID_Mapped := JOIN(__d0_Norm,Lookup,TRIM((STRING)LEFT.n_number) = RIGHT.KeyVal,TRANSFORM(__d0_Out,SELF.UID:=RIGHT.UID,SELF:=LEFT),SMART);
-  EXPORT PublicRecords_KEL_ECL_Functions_Dataset_FDC_Dataset_FAA__Key_Aircraft_IDs_Invalid := __d0_UID_Mapped(UID = 0);
+  SHARED __d0_UID_Mapped := JOIN(PublicRecords_KEL.Files.NonFCRA.FAA__Key_Aircraft_Id_Vault,Lookup,TRIM((STRING)LEFT.n_number) = RIGHT.KeyVal,TRANSFORM(__d0_Out,SELF.UID:=RIGHT.UID,SELF:=LEFT),SMART);
+  EXPORT PublicRecords_KEL_Files_NonFCRA_FAA__Key_Aircraft_Id_Vault_Invalid := __d0_UID_Mapped(UID = 0);
   SHARED __d0_Prefiltered := __d0_UID_Mapped(UID <> 0);
-  SHARED __d0 := __SourceFilter(KEL.FromFlat.Convert(__d0_Prefiltered,InLayout,__Mapping0,'PublicRecords_KEL.ECL_Functions.Dataset_FDC'));
+  SHARED __d0 := __SourceFilter(KEL.FromFlat.Convert(__d0_Prefiltered,InLayout,__Mapping0,'PublicRecords_KEL.Files.NonFCRA.FAA__Key_Aircraft_Id_Vault'));
   SHARED Last_Action_Date_1Rule(STRING a) := MAP(KEL.Routines.IsValidDate((KEL.typ.kdate)(a[1..8]))=>a[1..8],KEL.Routines.IsValidDate((KEL.typ.kdate)(a[1..6]+'01'))=>a[1..6]+'01',KEL.Routines.IsValidDate((KEL.typ.kdate)(a[1..4]+'0101'))=>a[1..4]+'0101','0');
   SHARED Date_Last_Seen_1Rule(STRING a) := MAP(KEL.Routines.IsValidDate((KEL.typ.kdate)(a[1..8]))=>a[1..8],KEL.Routines.IsValidDate((KEL.typ.kdate)(a[1..6]+'01'))=>a[1..6]+'01',KEL.Routines.IsValidDate((KEL.typ.kdate)(a[1..4]+'0101'))=>a[1..4]+'0101','0');
-  SHARED __Mapping1 := 'UID(DEFAULT:UID),n_number(OVERRIDE:N_Number_:\'\'),serial_number(OVERRIDE:Serial_Number_:\'\'),mfr_mdl_code(OVERRIDE:Manufacturer_Model_Code_:\'\'),eng_mfr_mdl(OVERRIDE:Engine_Manufacturer_Model_Code_:\'\'),year_mfr(OVERRIDE:Year_Manufactured_:0),last_action_date(OVERRIDE:Last_Action_Date_:DATE:Last_Action_Date_1Rule),type_aircraft(OVERRIDE:Type_:0),type_engine(OVERRIDE:Type_Engine_:\'\'),status_code(OVERRIDE:Status_Code_:\'\'),mode_s_code(OVERRIDE:Transponder_Code_:\'\'),fract_owner(OVERRIDE:Fractional_Owner_:\'\'),aircraft_mfr_name(OVERRIDE:Manufacturer_Name_:\'\'),model_name(OVERRIDE:Model_Name_:\'\'),src(OVERRIDE:Source_:\'\'),archive_date(OVERRIDE:Archive___Date_:EPOCH),date_first_seen(OVERRIDE:Date_First_Seen_:EPOCH),date_last_seen(OVERRIDE:Date_Last_Seen_:EPOCH:Date_Last_Seen_1Rule),hybridarchivedate(DEFAULT:Hybrid_Archive_Date_:EPOCH),vaultdatelastseen(DEFAULT:Vault_Date_Last_Seen_:EPOCH),DPMBitmap(OVERRIDE:__Permits:PERMITS)';
-  SHARED __d1_Norm := NORMALIZE(__in,LEFT.Dataset_FAA__key_aircraft_linkids,TRANSFORM(RECORDOF(__in.Dataset_FAA__key_aircraft_linkids),SELF:=RIGHT));
+  SHARED Hybrid_Archive_Date_1Rule(STRING a) := MAP(KEL.Routines.IsValidDate((KEL.typ.kdate)(a[1..6]+'01'))=>a[1..6]+'01','0');
+  SHARED __Mapping1 := 'UID(DEFAULT:UID),n_number(OVERRIDE:N_Number_:\'\'),serial_number(OVERRIDE:Serial_Number_:\'\'),mfr_mdl_code(OVERRIDE:Manufacturer_Model_Code_:\'\'),eng_mfr_mdl(OVERRIDE:Engine_Manufacturer_Model_Code_:\'\'),year_mfr(OVERRIDE:Year_Manufactured_:0),last_action_date(OVERRIDE:Last_Action_Date_:DATE:Last_Action_Date_1Rule),type_aircraft(OVERRIDE:Type_:0),type_engine(OVERRIDE:Type_Engine_:\'\'),status_code(OVERRIDE:Status_Code_:\'\'),mode_s_code(OVERRIDE:Transponder_Code_:\'\'),fract_owner(OVERRIDE:Fractional_Owner_:\'\'),aircraft_mfr_name(OVERRIDE:Manufacturer_Name_:\'\'),model_name(OVERRIDE:Model_Name_:\'\'),src(OVERRIDE:Source_:\'\'),archive_date(OVERRIDE:Archive___Date_:EPOCH),date_first_seen(OVERRIDE:Date_First_Seen_:EPOCH),date_last_seen(OVERRIDE:Date_Last_Seen_:EPOCH:Date_Last_Seen_1Rule),hybrid_archive_date(OVERRIDE:Hybrid_Archive_Date_:EPOCH:Hybrid_Archive_Date_1Rule),vaultdatelastseen(DEFAULT:Vault_Date_Last_Seen_:EPOCH),DPMBitmap(OVERRIDE:__Permits:PERMITS)';
   SHARED __d1_Out := RECORD
-    RECORDOF(PublicRecords_KEL.ECL_Functions.Dataset_FDC.Dataset_FAA__key_aircraft_linkids);
+    RECORDOF(PublicRecords_KEL.Files.NonFCRA.FAA__key_aircraft_linkids_Vault);
     KEL.typ.uid UID := 0;
   END;
-  SHARED __d1_UID_Mapped := JOIN(__d1_Norm,Lookup,TRIM((STRING)LEFT.n_number) = RIGHT.KeyVal,TRANSFORM(__d1_Out,SELF.UID:=RIGHT.UID,SELF:=LEFT),SMART);
-  EXPORT PublicRecords_KEL_ECL_Functions_Dataset_FDC_Dataset_FAA__key_aircraft_linkids_Invalid := __d1_UID_Mapped(UID = 0);
+  SHARED __d1_UID_Mapped := JOIN(PublicRecords_KEL.Files.NonFCRA.FAA__key_aircraft_linkids_Vault,Lookup,TRIM((STRING)LEFT.n_number) = RIGHT.KeyVal,TRANSFORM(__d1_Out,SELF.UID:=RIGHT.UID,SELF:=LEFT),SMART);
+  EXPORT PublicRecords_KEL_Files_NonFCRA_FAA__key_aircraft_linkids_Vault_Invalid := __d1_UID_Mapped(UID = 0);
   SHARED __d1_Prefiltered := __d1_UID_Mapped(UID <> 0);
-  SHARED __d1 := __SourceFilter(KEL.FromFlat.Convert(__d1_Prefiltered,InLayout,__Mapping1,'PublicRecords_KEL.ECL_Functions.Dataset_FDC'));
-  EXPORT InData := __d0 + __d1;
+  SHARED __d1 := __SourceFilter(KEL.FromFlat.Convert(__d1_Prefiltered,InLayout,__Mapping1,'PublicRecords_KEL.Files.NonFCRA.FAA__key_aircraft_linkids_Vault'));
+  SHARED Hybrid_Archive_Date_2Rule(STRING a) := MAP(KEL.Routines.IsValidDate((KEL.typ.kdate)(a[1..6]+'01'))=>a[1..6]+'01','0');
+  SHARED __Mapping2 := 'UID(DEFAULT:UID),n_number(OVERRIDE:N_Number_:\'\'),serial_number(OVERRIDE:Serial_Number_:\'\'),mfr_mdl_code(OVERRIDE:Manufacturer_Model_Code_:\'\'),eng_mfr_mdl(OVERRIDE:Engine_Manufacturer_Model_Code_:\'\'),year_mfr(OVERRIDE:Year_Manufactured_:0),last_action_date(OVERRIDE:Last_Action_Date_:DATE),type_aircraft(OVERRIDE:Type_:0),type_engine(OVERRIDE:Type_Engine_:\'\'),status_code(OVERRIDE:Status_Code_:\'\'),mode_s_code(OVERRIDE:Transponder_Code_:\'\'),fract_owner(OVERRIDE:Fractional_Owner_:\'\'),aircraft_mfr_name(OVERRIDE:Manufacturer_Name_:\'\'),model_name(OVERRIDE:Model_Name_:\'\'),src(OVERRIDE:Source_:\'\'),archive_date(OVERRIDE:Archive___Date_:EPOCH),date_first_seen(OVERRIDE:Date_First_Seen_:EPOCH),date_last_seen(OVERRIDE:Date_Last_Seen_:EPOCH),hybrid_archive_date(OVERRIDE:Hybrid_Archive_Date_:EPOCH:Hybrid_Archive_Date_2Rule),vaultdatelastseen(DEFAULT:Vault_Date_Last_Seen_:EPOCH),DPMBitmap(OVERRIDE:__Permits:PERMITS)';
+  SHARED __d2_Out := RECORD
+    RECORDOF(PublicRecords_KEL.Files.FCRA.FAA__Key_Aircraft_Id_vault);
+    KEL.typ.uid UID := 0;
+  END;
+  SHARED __d2_UID_Mapped := JOIN(PublicRecords_KEL.Files.FCRA.FAA__Key_Aircraft_Id_vault,Lookup,TRIM((STRING)LEFT.n_number) = RIGHT.KeyVal,TRANSFORM(__d2_Out,SELF.UID:=RIGHT.UID,SELF:=LEFT),SMART);
+  EXPORT PublicRecords_KEL_Files_FCRA_FAA__Key_Aircraft_Id_vault_Invalid := __d2_UID_Mapped(UID = 0);
+  SHARED __d2_Prefiltered := __d2_UID_Mapped(UID <> 0);
+  SHARED __d2 := __SourceFilter(KEL.FromFlat.Convert(__d2_Prefiltered,InLayout,__Mapping2,'PublicRecords_KEL.Files.FCRA.FAA__Key_Aircraft_Id_vault'));
+  EXPORT InData := __d0 + __d1 + __d2;
   EXPORT Ownership_Status_Layout := RECORD
     KEL.typ.nstr Status_Code_;
     KEL.typ.nstr Fractional_Owner_;
@@ -172,47 +187,67 @@ EXPORT E_Aircraft(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG_Comp
   EXPORT Manufacturer_Name__SingleValue_Invalid := KEL.Intake.DetectMultipleValuesOnResult(Result,Manufacturer_Name_);
   EXPORT Model_Name__SingleValue_Invalid := KEL.Intake.DetectMultipleValuesOnResult(Result,Model_Name_);
   EXPORT Transponder_Code__SingleValue_Invalid := KEL.Intake.DetectMultipleValuesOnResult(Result,Transponder_Code_);
-  EXPORT SanityCheck := DATASET([{COUNT(PublicRecords_KEL_ECL_Functions_Dataset_FDC_Dataset_FAA__Key_Aircraft_IDs_Invalid),COUNT(PublicRecords_KEL_ECL_Functions_Dataset_FDC_Dataset_FAA__key_aircraft_linkids_Invalid),COUNT(N_Number__SingleValue_Invalid),COUNT(Serial_Number__SingleValue_Invalid),COUNT(Manufacturer_Model_Code__SingleValue_Invalid),COUNT(Engine_Manufacturer_Model_Code__SingleValue_Invalid),COUNT(Year_Manufactured__SingleValue_Invalid),COUNT(Type__SingleValue_Invalid),COUNT(Type_Engine__SingleValue_Invalid),COUNT(Manufacturer_Name__SingleValue_Invalid),COUNT(Model_Name__SingleValue_Invalid),COUNT(Transponder_Code__SingleValue_Invalid),TopSourcedUIDs(1)}],{KEL.typ.int PublicRecords_KEL_ECL_Functions_Dataset_FDC_Dataset_FAA__Key_Aircraft_IDs_Invalid,KEL.typ.int PublicRecords_KEL_ECL_Functions_Dataset_FDC_Dataset_FAA__key_aircraft_linkids_Invalid,KEL.typ.int N_Number__SingleValue_Invalid,KEL.typ.int Serial_Number__SingleValue_Invalid,KEL.typ.int Manufacturer_Model_Code__SingleValue_Invalid,KEL.typ.int Engine_Manufacturer_Model_Code__SingleValue_Invalid,KEL.typ.int Year_Manufactured__SingleValue_Invalid,KEL.typ.int Type__SingleValue_Invalid,KEL.typ.int Type_Engine__SingleValue_Invalid,KEL.typ.int Manufacturer_Name__SingleValue_Invalid,KEL.typ.int Model_Name__SingleValue_Invalid,KEL.typ.int Transponder_Code__SingleValue_Invalid,DATASET(RECORDOF(UIDSourceCounts)) topSourcedUID});
+  EXPORT SanityCheck := DATASET([{COUNT(PublicRecords_KEL_Files_NonFCRA_FAA__Key_Aircraft_Id_Vault_Invalid),COUNT(PublicRecords_KEL_Files_NonFCRA_FAA__key_aircraft_linkids_Vault_Invalid),COUNT(PublicRecords_KEL_Files_FCRA_FAA__Key_Aircraft_Id_vault_Invalid),COUNT(N_Number__SingleValue_Invalid),COUNT(Serial_Number__SingleValue_Invalid),COUNT(Manufacturer_Model_Code__SingleValue_Invalid),COUNT(Engine_Manufacturer_Model_Code__SingleValue_Invalid),COUNT(Year_Manufactured__SingleValue_Invalid),COUNT(Type__SingleValue_Invalid),COUNT(Type_Engine__SingleValue_Invalid),COUNT(Manufacturer_Name__SingleValue_Invalid),COUNT(Model_Name__SingleValue_Invalid),COUNT(Transponder_Code__SingleValue_Invalid),TopSourcedUIDs(1)}],{KEL.typ.int PublicRecords_KEL_Files_NonFCRA_FAA__Key_Aircraft_Id_Vault_Invalid,KEL.typ.int PublicRecords_KEL_Files_NonFCRA_FAA__key_aircraft_linkids_Vault_Invalid,KEL.typ.int PublicRecords_KEL_Files_FCRA_FAA__Key_Aircraft_Id_vault_Invalid,KEL.typ.int N_Number__SingleValue_Invalid,KEL.typ.int Serial_Number__SingleValue_Invalid,KEL.typ.int Manufacturer_Model_Code__SingleValue_Invalid,KEL.typ.int Engine_Manufacturer_Model_Code__SingleValue_Invalid,KEL.typ.int Year_Manufactured__SingleValue_Invalid,KEL.typ.int Type__SingleValue_Invalid,KEL.typ.int Type_Engine__SingleValue_Invalid,KEL.typ.int Manufacturer_Name__SingleValue_Invalid,KEL.typ.int Model_Name__SingleValue_Invalid,KEL.typ.int Transponder_Code__SingleValue_Invalid,DATASET(RECORDOF(UIDSourceCounts)) topSourcedUID});
   EXPORT NullCounts := DATASET([
-    {'Aircraft','PublicRecords_KEL.ECL_Functions.Dataset_FDC','UID',COUNT(PublicRecords_KEL_ECL_Functions_Dataset_FDC_Dataset_FAA__Key_Aircraft_IDs_Invalid),COUNT(__d0)},
-    {'Aircraft','PublicRecords_KEL.ECL_Functions.Dataset_FDC','n_number',COUNT(__d0(__NL(N_Number_))),COUNT(__d0(__NN(N_Number_)))},
-    {'Aircraft','PublicRecords_KEL.ECL_Functions.Dataset_FDC','serial_number',COUNT(__d0(__NL(Serial_Number_))),COUNT(__d0(__NN(Serial_Number_)))},
-    {'Aircraft','PublicRecords_KEL.ECL_Functions.Dataset_FDC','mfr_mdl_code',COUNT(__d0(__NL(Manufacturer_Model_Code_))),COUNT(__d0(__NN(Manufacturer_Model_Code_)))},
-    {'Aircraft','PublicRecords_KEL.ECL_Functions.Dataset_FDC','eng_mfr_mdl',COUNT(__d0(__NL(Engine_Manufacturer_Model_Code_))),COUNT(__d0(__NN(Engine_Manufacturer_Model_Code_)))},
-    {'Aircraft','PublicRecords_KEL.ECL_Functions.Dataset_FDC','year_mfr',COUNT(__d0(__NL(Year_Manufactured_))),COUNT(__d0(__NN(Year_Manufactured_)))},
-    {'Aircraft','PublicRecords_KEL.ECL_Functions.Dataset_FDC','last_action_date',COUNT(__d0(__NL(Last_Action_Date_))),COUNT(__d0(__NN(Last_Action_Date_)))},
-    {'Aircraft','PublicRecords_KEL.ECL_Functions.Dataset_FDC','type_aircraft',COUNT(__d0(__NL(Type_))),COUNT(__d0(__NN(Type_)))},
-    {'Aircraft','PublicRecords_KEL.ECL_Functions.Dataset_FDC','type_engine',COUNT(__d0(__NL(Type_Engine_))),COUNT(__d0(__NN(Type_Engine_)))},
-    {'Aircraft','PublicRecords_KEL.ECL_Functions.Dataset_FDC','status_code',COUNT(__d0(__NL(Status_Code_))),COUNT(__d0(__NN(Status_Code_)))},
-    {'Aircraft','PublicRecords_KEL.ECL_Functions.Dataset_FDC','mode_s_code',COUNT(__d0(__NL(Transponder_Code_))),COUNT(__d0(__NN(Transponder_Code_)))},
-    {'Aircraft','PublicRecords_KEL.ECL_Functions.Dataset_FDC','fract_owner',COUNT(__d0(__NL(Fractional_Owner_))),COUNT(__d0(__NN(Fractional_Owner_)))},
-    {'Aircraft','PublicRecords_KEL.ECL_Functions.Dataset_FDC','aircraft_mfr_name',COUNT(__d0(__NL(Manufacturer_Name_))),COUNT(__d0(__NN(Manufacturer_Name_)))},
-    {'Aircraft','PublicRecords_KEL.ECL_Functions.Dataset_FDC','model_name',COUNT(__d0(__NL(Model_Name_))),COUNT(__d0(__NN(Model_Name_)))},
-    {'Aircraft','PublicRecords_KEL.ECL_Functions.Dataset_FDC','src',COUNT(__d0(__NL(Source_))),COUNT(__d0(__NN(Source_)))},
-    {'Aircraft','PublicRecords_KEL.ECL_Functions.Dataset_FDC','Archive_Date',COUNT(__d0(Archive___Date_=0)),COUNT(__d0(Archive___Date_!=0))},
-    {'Aircraft','PublicRecords_KEL.ECL_Functions.Dataset_FDC','DateFirstSeen',COUNT(__d0(Date_First_Seen_=0)),COUNT(__d0(Date_First_Seen_!=0))},
-    {'Aircraft','PublicRecords_KEL.ECL_Functions.Dataset_FDC','DateLastSeen',COUNT(__d0(Date_Last_Seen_=0)),COUNT(__d0(Date_Last_Seen_!=0))},
-    {'Aircraft','PublicRecords_KEL.ECL_Functions.Dataset_FDC','HybridArchiveDate',COUNT(__d0(Hybrid_Archive_Date_=0)),COUNT(__d0(Hybrid_Archive_Date_!=0))},
-    {'Aircraft','PublicRecords_KEL.ECL_Functions.Dataset_FDC','VaultDateLastSeen',COUNT(__d0(Vault_Date_Last_Seen_=0)),COUNT(__d0(Vault_Date_Last_Seen_!=0))},
-    {'Aircraft','PublicRecords_KEL.ECL_Functions.Dataset_FDC','UID',COUNT(PublicRecords_KEL_ECL_Functions_Dataset_FDC_Dataset_FAA__key_aircraft_linkids_Invalid),COUNT(__d1)},
-    {'Aircraft','PublicRecords_KEL.ECL_Functions.Dataset_FDC','n_number',COUNT(__d1(__NL(N_Number_))),COUNT(__d1(__NN(N_Number_)))},
-    {'Aircraft','PublicRecords_KEL.ECL_Functions.Dataset_FDC','serial_number',COUNT(__d1(__NL(Serial_Number_))),COUNT(__d1(__NN(Serial_Number_)))},
-    {'Aircraft','PublicRecords_KEL.ECL_Functions.Dataset_FDC','mfr_mdl_code',COUNT(__d1(__NL(Manufacturer_Model_Code_))),COUNT(__d1(__NN(Manufacturer_Model_Code_)))},
-    {'Aircraft','PublicRecords_KEL.ECL_Functions.Dataset_FDC','eng_mfr_mdl',COUNT(__d1(__NL(Engine_Manufacturer_Model_Code_))),COUNT(__d1(__NN(Engine_Manufacturer_Model_Code_)))},
-    {'Aircraft','PublicRecords_KEL.ECL_Functions.Dataset_FDC','year_mfr',COUNT(__d1(__NL(Year_Manufactured_))),COUNT(__d1(__NN(Year_Manufactured_)))},
-    {'Aircraft','PublicRecords_KEL.ECL_Functions.Dataset_FDC','last_action_date',COUNT(__d1(__NL(Last_Action_Date_))),COUNT(__d1(__NN(Last_Action_Date_)))},
-    {'Aircraft','PublicRecords_KEL.ECL_Functions.Dataset_FDC','type_aircraft',COUNT(__d1(__NL(Type_))),COUNT(__d1(__NN(Type_)))},
-    {'Aircraft','PublicRecords_KEL.ECL_Functions.Dataset_FDC','type_engine',COUNT(__d1(__NL(Type_Engine_))),COUNT(__d1(__NN(Type_Engine_)))},
-    {'Aircraft','PublicRecords_KEL.ECL_Functions.Dataset_FDC','status_code',COUNT(__d1(__NL(Status_Code_))),COUNT(__d1(__NN(Status_Code_)))},
-    {'Aircraft','PublicRecords_KEL.ECL_Functions.Dataset_FDC','mode_s_code',COUNT(__d1(__NL(Transponder_Code_))),COUNT(__d1(__NN(Transponder_Code_)))},
-    {'Aircraft','PublicRecords_KEL.ECL_Functions.Dataset_FDC','fract_owner',COUNT(__d1(__NL(Fractional_Owner_))),COUNT(__d1(__NN(Fractional_Owner_)))},
-    {'Aircraft','PublicRecords_KEL.ECL_Functions.Dataset_FDC','aircraft_mfr_name',COUNT(__d1(__NL(Manufacturer_Name_))),COUNT(__d1(__NN(Manufacturer_Name_)))},
-    {'Aircraft','PublicRecords_KEL.ECL_Functions.Dataset_FDC','model_name',COUNT(__d1(__NL(Model_Name_))),COUNT(__d1(__NN(Model_Name_)))},
-    {'Aircraft','PublicRecords_KEL.ECL_Functions.Dataset_FDC','src',COUNT(__d1(__NL(Source_))),COUNT(__d1(__NN(Source_)))},
-    {'Aircraft','PublicRecords_KEL.ECL_Functions.Dataset_FDC','Archive_Date',COUNT(__d1(Archive___Date_=0)),COUNT(__d1(Archive___Date_!=0))},
-    {'Aircraft','PublicRecords_KEL.ECL_Functions.Dataset_FDC','DateFirstSeen',COUNT(__d1(Date_First_Seen_=0)),COUNT(__d1(Date_First_Seen_!=0))},
-    {'Aircraft','PublicRecords_KEL.ECL_Functions.Dataset_FDC','DateLastSeen',COUNT(__d1(Date_Last_Seen_=0)),COUNT(__d1(Date_Last_Seen_!=0))},
-    {'Aircraft','PublicRecords_KEL.ECL_Functions.Dataset_FDC','HybridArchiveDate',COUNT(__d1(Hybrid_Archive_Date_=0)),COUNT(__d1(Hybrid_Archive_Date_!=0))},
-    {'Aircraft','PublicRecords_KEL.ECL_Functions.Dataset_FDC','VaultDateLastSeen',COUNT(__d1(Vault_Date_Last_Seen_=0)),COUNT(__d1(Vault_Date_Last_Seen_!=0))}]
+    {'Aircraft','PublicRecords_KEL.Files.NonFCRA.FAA__Key_Aircraft_Id_Vault','UID',COUNT(PublicRecords_KEL_Files_NonFCRA_FAA__Key_Aircraft_Id_Vault_Invalid),COUNT(__d0)},
+    {'Aircraft','PublicRecords_KEL.Files.NonFCRA.FAA__Key_Aircraft_Id_Vault','n_number',COUNT(__d0(__NL(N_Number_))),COUNT(__d0(__NN(N_Number_)))},
+    {'Aircraft','PublicRecords_KEL.Files.NonFCRA.FAA__Key_Aircraft_Id_Vault','serial_number',COUNT(__d0(__NL(Serial_Number_))),COUNT(__d0(__NN(Serial_Number_)))},
+    {'Aircraft','PublicRecords_KEL.Files.NonFCRA.FAA__Key_Aircraft_Id_Vault','mfr_mdl_code',COUNT(__d0(__NL(Manufacturer_Model_Code_))),COUNT(__d0(__NN(Manufacturer_Model_Code_)))},
+    {'Aircraft','PublicRecords_KEL.Files.NonFCRA.FAA__Key_Aircraft_Id_Vault','eng_mfr_mdl',COUNT(__d0(__NL(Engine_Manufacturer_Model_Code_))),COUNT(__d0(__NN(Engine_Manufacturer_Model_Code_)))},
+    {'Aircraft','PublicRecords_KEL.Files.NonFCRA.FAA__Key_Aircraft_Id_Vault','year_mfr',COUNT(__d0(__NL(Year_Manufactured_))),COUNT(__d0(__NN(Year_Manufactured_)))},
+    {'Aircraft','PublicRecords_KEL.Files.NonFCRA.FAA__Key_Aircraft_Id_Vault','last_action_date',COUNT(__d0(__NL(Last_Action_Date_))),COUNT(__d0(__NN(Last_Action_Date_)))},
+    {'Aircraft','PublicRecords_KEL.Files.NonFCRA.FAA__Key_Aircraft_Id_Vault','type_aircraft',COUNT(__d0(__NL(Type_))),COUNT(__d0(__NN(Type_)))},
+    {'Aircraft','PublicRecords_KEL.Files.NonFCRA.FAA__Key_Aircraft_Id_Vault','type_engine',COUNT(__d0(__NL(Type_Engine_))),COUNT(__d0(__NN(Type_Engine_)))},
+    {'Aircraft','PublicRecords_KEL.Files.NonFCRA.FAA__Key_Aircraft_Id_Vault','status_code',COUNT(__d0(__NL(Status_Code_))),COUNT(__d0(__NN(Status_Code_)))},
+    {'Aircraft','PublicRecords_KEL.Files.NonFCRA.FAA__Key_Aircraft_Id_Vault','mode_s_code',COUNT(__d0(__NL(Transponder_Code_))),COUNT(__d0(__NN(Transponder_Code_)))},
+    {'Aircraft','PublicRecords_KEL.Files.NonFCRA.FAA__Key_Aircraft_Id_Vault','fract_owner',COUNT(__d0(__NL(Fractional_Owner_))),COUNT(__d0(__NN(Fractional_Owner_)))},
+    {'Aircraft','PublicRecords_KEL.Files.NonFCRA.FAA__Key_Aircraft_Id_Vault','aircraft_mfr_name',COUNT(__d0(__NL(Manufacturer_Name_))),COUNT(__d0(__NN(Manufacturer_Name_)))},
+    {'Aircraft','PublicRecords_KEL.Files.NonFCRA.FAA__Key_Aircraft_Id_Vault','model_name',COUNT(__d0(__NL(Model_Name_))),COUNT(__d0(__NN(Model_Name_)))},
+    {'Aircraft','PublicRecords_KEL.Files.NonFCRA.FAA__Key_Aircraft_Id_Vault','src',COUNT(__d0(__NL(Source_))),COUNT(__d0(__NN(Source_)))},
+    {'Aircraft','PublicRecords_KEL.Files.NonFCRA.FAA__Key_Aircraft_Id_Vault','Archive_Date',COUNT(__d0(Archive___Date_=0)),COUNT(__d0(Archive___Date_!=0))},
+    {'Aircraft','PublicRecords_KEL.Files.NonFCRA.FAA__Key_Aircraft_Id_Vault','DateFirstSeen',COUNT(__d0(Date_First_Seen_=0)),COUNT(__d0(Date_First_Seen_!=0))},
+    {'Aircraft','PublicRecords_KEL.Files.NonFCRA.FAA__Key_Aircraft_Id_Vault','DateLastSeen',COUNT(__d0(Date_Last_Seen_=0)),COUNT(__d0(Date_Last_Seen_!=0))},
+    {'Aircraft','PublicRecords_KEL.Files.NonFCRA.FAA__Key_Aircraft_Id_Vault','HybridArchiveDate',COUNT(__d0(Hybrid_Archive_Date_=0)),COUNT(__d0(Hybrid_Archive_Date_!=0))},
+    {'Aircraft','PublicRecords_KEL.Files.NonFCRA.FAA__Key_Aircraft_Id_Vault','VaultDateLastSeen',COUNT(__d0(Vault_Date_Last_Seen_=0)),COUNT(__d0(Vault_Date_Last_Seen_!=0))},
+    {'Aircraft','PublicRecords_KEL.Files.NonFCRA.FAA__key_aircraft_linkids_Vault','UID',COUNT(PublicRecords_KEL_Files_NonFCRA_FAA__key_aircraft_linkids_Vault_Invalid),COUNT(__d1)},
+    {'Aircraft','PublicRecords_KEL.Files.NonFCRA.FAA__key_aircraft_linkids_Vault','n_number',COUNT(__d1(__NL(N_Number_))),COUNT(__d1(__NN(N_Number_)))},
+    {'Aircraft','PublicRecords_KEL.Files.NonFCRA.FAA__key_aircraft_linkids_Vault','serial_number',COUNT(__d1(__NL(Serial_Number_))),COUNT(__d1(__NN(Serial_Number_)))},
+    {'Aircraft','PublicRecords_KEL.Files.NonFCRA.FAA__key_aircraft_linkids_Vault','mfr_mdl_code',COUNT(__d1(__NL(Manufacturer_Model_Code_))),COUNT(__d1(__NN(Manufacturer_Model_Code_)))},
+    {'Aircraft','PublicRecords_KEL.Files.NonFCRA.FAA__key_aircraft_linkids_Vault','eng_mfr_mdl',COUNT(__d1(__NL(Engine_Manufacturer_Model_Code_))),COUNT(__d1(__NN(Engine_Manufacturer_Model_Code_)))},
+    {'Aircraft','PublicRecords_KEL.Files.NonFCRA.FAA__key_aircraft_linkids_Vault','year_mfr',COUNT(__d1(__NL(Year_Manufactured_))),COUNT(__d1(__NN(Year_Manufactured_)))},
+    {'Aircraft','PublicRecords_KEL.Files.NonFCRA.FAA__key_aircraft_linkids_Vault','last_action_date',COUNT(__d1(__NL(Last_Action_Date_))),COUNT(__d1(__NN(Last_Action_Date_)))},
+    {'Aircraft','PublicRecords_KEL.Files.NonFCRA.FAA__key_aircraft_linkids_Vault','type_aircraft',COUNT(__d1(__NL(Type_))),COUNT(__d1(__NN(Type_)))},
+    {'Aircraft','PublicRecords_KEL.Files.NonFCRA.FAA__key_aircraft_linkids_Vault','type_engine',COUNT(__d1(__NL(Type_Engine_))),COUNT(__d1(__NN(Type_Engine_)))},
+    {'Aircraft','PublicRecords_KEL.Files.NonFCRA.FAA__key_aircraft_linkids_Vault','status_code',COUNT(__d1(__NL(Status_Code_))),COUNT(__d1(__NN(Status_Code_)))},
+    {'Aircraft','PublicRecords_KEL.Files.NonFCRA.FAA__key_aircraft_linkids_Vault','mode_s_code',COUNT(__d1(__NL(Transponder_Code_))),COUNT(__d1(__NN(Transponder_Code_)))},
+    {'Aircraft','PublicRecords_KEL.Files.NonFCRA.FAA__key_aircraft_linkids_Vault','fract_owner',COUNT(__d1(__NL(Fractional_Owner_))),COUNT(__d1(__NN(Fractional_Owner_)))},
+    {'Aircraft','PublicRecords_KEL.Files.NonFCRA.FAA__key_aircraft_linkids_Vault','aircraft_mfr_name',COUNT(__d1(__NL(Manufacturer_Name_))),COUNT(__d1(__NN(Manufacturer_Name_)))},
+    {'Aircraft','PublicRecords_KEL.Files.NonFCRA.FAA__key_aircraft_linkids_Vault','model_name',COUNT(__d1(__NL(Model_Name_))),COUNT(__d1(__NN(Model_Name_)))},
+    {'Aircraft','PublicRecords_KEL.Files.NonFCRA.FAA__key_aircraft_linkids_Vault','src',COUNT(__d1(__NL(Source_))),COUNT(__d1(__NN(Source_)))},
+    {'Aircraft','PublicRecords_KEL.Files.NonFCRA.FAA__key_aircraft_linkids_Vault','Archive_Date',COUNT(__d1(Archive___Date_=0)),COUNT(__d1(Archive___Date_!=0))},
+    {'Aircraft','PublicRecords_KEL.Files.NonFCRA.FAA__key_aircraft_linkids_Vault','DateFirstSeen',COUNT(__d1(Date_First_Seen_=0)),COUNT(__d1(Date_First_Seen_!=0))},
+    {'Aircraft','PublicRecords_KEL.Files.NonFCRA.FAA__key_aircraft_linkids_Vault','DateLastSeen',COUNT(__d1(Date_Last_Seen_=0)),COUNT(__d1(Date_Last_Seen_!=0))},
+    {'Aircraft','PublicRecords_KEL.Files.NonFCRA.FAA__key_aircraft_linkids_Vault','HybridArchiveDate',COUNT(__d1(Hybrid_Archive_Date_=0)),COUNT(__d1(Hybrid_Archive_Date_!=0))},
+    {'Aircraft','PublicRecords_KEL.Files.NonFCRA.FAA__key_aircraft_linkids_Vault','VaultDateLastSeen',COUNT(__d1(Vault_Date_Last_Seen_=0)),COUNT(__d1(Vault_Date_Last_Seen_!=0))},
+    {'Aircraft','PublicRecords_KEL.Files.FCRA.FAA__Key_Aircraft_Id_vault','UID',COUNT(PublicRecords_KEL_Files_FCRA_FAA__Key_Aircraft_Id_vault_Invalid),COUNT(__d2)},
+    {'Aircraft','PublicRecords_KEL.Files.FCRA.FAA__Key_Aircraft_Id_vault','n_number',COUNT(__d2(__NL(N_Number_))),COUNT(__d2(__NN(N_Number_)))},
+    {'Aircraft','PublicRecords_KEL.Files.FCRA.FAA__Key_Aircraft_Id_vault','serial_number',COUNT(__d2(__NL(Serial_Number_))),COUNT(__d2(__NN(Serial_Number_)))},
+    {'Aircraft','PublicRecords_KEL.Files.FCRA.FAA__Key_Aircraft_Id_vault','mfr_mdl_code',COUNT(__d2(__NL(Manufacturer_Model_Code_))),COUNT(__d2(__NN(Manufacturer_Model_Code_)))},
+    {'Aircraft','PublicRecords_KEL.Files.FCRA.FAA__Key_Aircraft_Id_vault','eng_mfr_mdl',COUNT(__d2(__NL(Engine_Manufacturer_Model_Code_))),COUNT(__d2(__NN(Engine_Manufacturer_Model_Code_)))},
+    {'Aircraft','PublicRecords_KEL.Files.FCRA.FAA__Key_Aircraft_Id_vault','year_mfr',COUNT(__d2(__NL(Year_Manufactured_))),COUNT(__d2(__NN(Year_Manufactured_)))},
+    {'Aircraft','PublicRecords_KEL.Files.FCRA.FAA__Key_Aircraft_Id_vault','last_action_date',COUNT(__d2(__NL(Last_Action_Date_))),COUNT(__d2(__NN(Last_Action_Date_)))},
+    {'Aircraft','PublicRecords_KEL.Files.FCRA.FAA__Key_Aircraft_Id_vault','type_aircraft',COUNT(__d2(__NL(Type_))),COUNT(__d2(__NN(Type_)))},
+    {'Aircraft','PublicRecords_KEL.Files.FCRA.FAA__Key_Aircraft_Id_vault','type_engine',COUNT(__d2(__NL(Type_Engine_))),COUNT(__d2(__NN(Type_Engine_)))},
+    {'Aircraft','PublicRecords_KEL.Files.FCRA.FAA__Key_Aircraft_Id_vault','status_code',COUNT(__d2(__NL(Status_Code_))),COUNT(__d2(__NN(Status_Code_)))},
+    {'Aircraft','PublicRecords_KEL.Files.FCRA.FAA__Key_Aircraft_Id_vault','mode_s_code',COUNT(__d2(__NL(Transponder_Code_))),COUNT(__d2(__NN(Transponder_Code_)))},
+    {'Aircraft','PublicRecords_KEL.Files.FCRA.FAA__Key_Aircraft_Id_vault','fract_owner',COUNT(__d2(__NL(Fractional_Owner_))),COUNT(__d2(__NN(Fractional_Owner_)))},
+    {'Aircraft','PublicRecords_KEL.Files.FCRA.FAA__Key_Aircraft_Id_vault','aircraft_mfr_name',COUNT(__d2(__NL(Manufacturer_Name_))),COUNT(__d2(__NN(Manufacturer_Name_)))},
+    {'Aircraft','PublicRecords_KEL.Files.FCRA.FAA__Key_Aircraft_Id_vault','model_name',COUNT(__d2(__NL(Model_Name_))),COUNT(__d2(__NN(Model_Name_)))},
+    {'Aircraft','PublicRecords_KEL.Files.FCRA.FAA__Key_Aircraft_Id_vault','src',COUNT(__d2(__NL(Source_))),COUNT(__d2(__NN(Source_)))},
+    {'Aircraft','PublicRecords_KEL.Files.FCRA.FAA__Key_Aircraft_Id_vault','Archive_Date',COUNT(__d2(Archive___Date_=0)),COUNT(__d2(Archive___Date_!=0))},
+    {'Aircraft','PublicRecords_KEL.Files.FCRA.FAA__Key_Aircraft_Id_vault','DateFirstSeen',COUNT(__d2(Date_First_Seen_=0)),COUNT(__d2(Date_First_Seen_!=0))},
+    {'Aircraft','PublicRecords_KEL.Files.FCRA.FAA__Key_Aircraft_Id_vault','DateLastSeen',COUNT(__d2(Date_Last_Seen_=0)),COUNT(__d2(Date_Last_Seen_!=0))},
+    {'Aircraft','PublicRecords_KEL.Files.FCRA.FAA__Key_Aircraft_Id_vault','HybridArchiveDate',COUNT(__d2(Hybrid_Archive_Date_=0)),COUNT(__d2(Hybrid_Archive_Date_!=0))},
+    {'Aircraft','PublicRecords_KEL.Files.FCRA.FAA__Key_Aircraft_Id_vault','VaultDateLastSeen',COUNT(__d2(Vault_Date_Last_Seen_=0)),COUNT(__d2(Vault_Date_Last_Seen_!=0))}]
   ,{KEL.typ.str entity,KEL.typ.str fileName,KEL.typ.str fieldName,KEL.typ.int nullCount,KEL.typ.int notNullCount});
 END;

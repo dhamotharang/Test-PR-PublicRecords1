@@ -2,20 +2,20 @@
 IMPORT KEL15 AS KEL;
 IMPORT B_Address_4,B_Address_5,B_Input_P_I_I_4,B_Inquiry_4,B_Property_4,CFG_Compile,E_Address,E_Address_Inquiry,E_Email,E_Geo_Link,E_Inquiry,E_Person,E_Phone,E_Property,E_Social_Security_Number,E_Surname,E_Zip_Code,FN_Compile FROM PublicRecords_KEL;
 IMPORT * FROM KEL15.Null;
-EXPORT B_Input_P_I_I_3(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG_Compile __cfg = CFG_Compile) := MODULE
-  SHARED VIRTUAL TYPEOF(B_Address_4(__in,__cfg).__ENH_Address_4) __ENH_Address_4 := B_Address_4(__in,__cfg).__ENH_Address_4;
-  SHARED VIRTUAL TYPEOF(E_Address_Inquiry(__in,__cfg).__Result) __E_Address_Inquiry := E_Address_Inquiry(__in,__cfg).__Result;
-  SHARED VIRTUAL TYPEOF(B_Input_P_I_I_4(__in,__cfg).__ENH_Input_P_I_I_4) __ENH_Input_P_I_I_4 := B_Input_P_I_I_4(__in,__cfg).__ENH_Input_P_I_I_4;
-  SHARED VIRTUAL TYPEOF(B_Inquiry_4(__in,__cfg).__ENH_Inquiry_4) __ENH_Inquiry_4 := B_Inquiry_4(__in,__cfg).__ENH_Inquiry_4;
-  SHARED VIRTUAL TYPEOF(B_Property_4(__in,__cfg).__ENH_Property_4) __ENH_Property_4 := B_Property_4(__in,__cfg).__ENH_Property_4;
-  SHARED __EE5682166 := __ENH_Input_P_I_I_4;
-  SHARED __EE5682168 := __E_Address_Inquiry;
-  SHARED __EE5682348 := __EE5682168(__NN(__EE5682168.Transaction_));
-  __JC5682376(E_Address_Inquiry(__in,__cfg).Layout __EE5682348, B_Input_P_I_I_4(__in,__cfg).__ST233666_Layout __EE5682166) := __EEQP(__EE5682166.Location_,__EE5682348.Location_) AND __T(__AND(__EEQ(__EE5682166.Location_,__EE5682348.Location_),__CN(__NN(__EE5682166.Location_))));
-  SHARED __EE5682392 := JOIN(__EE5682348,__EE5682166,__JC5682376(LEFT,RIGHT),TRANSFORM(E_Address_Inquiry(__in,__cfg).Layout,SELF:=LEFT),SMART,KEEP(1));
-  SHARED __EE5682170 := __ENH_Inquiry_4;
-  SHARED __EE5682176 := __EE5682170(__T(__EE5682170.Is_Valid_Velocity_Inquiry_Non_F_C_R_A_));
-  SHARED __ST932986_Layout := RECORD
+EXPORT B_Input_P_I_I_3(CFG_Compile __cfg = CFG_Compile) := MODULE
+  SHARED VIRTUAL TYPEOF(B_Address_4(__cfg).__ENH_Address_4) __ENH_Address_4 := B_Address_4(__cfg).__ENH_Address_4;
+  SHARED VIRTUAL TYPEOF(E_Address_Inquiry(__cfg).__Result) __E_Address_Inquiry := E_Address_Inquiry(__cfg).__Result;
+  SHARED VIRTUAL TYPEOF(B_Input_P_I_I_4(__cfg).__ENH_Input_P_I_I_4) __ENH_Input_P_I_I_4 := B_Input_P_I_I_4(__cfg).__ENH_Input_P_I_I_4;
+  SHARED VIRTUAL TYPEOF(B_Inquiry_4(__cfg).__ENH_Inquiry_4) __ENH_Inquiry_4 := B_Inquiry_4(__cfg).__ENH_Inquiry_4;
+  SHARED VIRTUAL TYPEOF(B_Property_4(__cfg).__ENH_Property_4) __ENH_Property_4 := B_Property_4(__cfg).__ENH_Property_4;
+  SHARED __EE6021427 := __ENH_Input_P_I_I_4;
+  SHARED __EE6021429 := __E_Address_Inquiry;
+  SHARED __EE6021609 := __EE6021429(__NN(__EE6021429.Transaction_));
+  __JC6021637(E_Address_Inquiry(__cfg).Layout __EE6021609, B_Input_P_I_I_4(__cfg).__ST274346_Layout __EE6021427) := __EEQP(__EE6021427.Location_,__EE6021609.Location_) AND __T(__AND(__EEQ(__EE6021427.Location_,__EE6021609.Location_),__CN(__NN(__EE6021427.Location_))));
+  SHARED __EE6021653 := JOIN(__EE6021609,__EE6021427,__JC6021637(LEFT,RIGHT),TRANSFORM(E_Address_Inquiry(__cfg).Layout,SELF:=LEFT),SMART,KEEP(1));
+  SHARED __EE6021431 := __ENH_Inquiry_4;
+  SHARED __EE6021437 := __EE6021431(__T(__EE6021431.Is_Valid_Velocity_Inquiry_Non_F_C_R_A_));
+  SHARED __ST1004163_Layout := RECORD
     KEL.typ.ntyp(E_Inquiry().Typ) Transaction_;
     KEL.typ.ntyp(E_Address().Typ) Location_;
     KEL.typ.nstr Primary_Range_;
@@ -27,17 +27,17 @@ EXPORT B_Input_P_I_I_3(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG
     KEL.typ.nstr Secondary_Range_;
     KEL.typ.nstr Transaction_I_D_;
     KEL.typ.nstr Sequence_Number_;
-    KEL.typ.ndataset(E_Address_Inquiry(__in,__cfg).Data_Sources_Layout) Data_Sources_;
+    KEL.typ.ndataset(E_Address_Inquiry(__cfg).Data_Sources_Layout) Data_Sources_;
     KEL.typ.nuid UID;
     KEL.typ.nstr Transaction_I_D__1_;
     KEL.typ.nstr Sequence_Number__1_;
-    KEL.typ.ndataset(E_Inquiry(__in,__cfg).Search_Info_Layout) Search_Info_;
-    KEL.typ.ndataset(E_Inquiry(__in,__cfg).Permissions_Layout) Permissions_;
-    KEL.typ.ndataset(E_Inquiry(__in,__cfg).Bus_Intel_Layout) Bus_Intel_;
-    KEL.typ.ndataset(B_Inquiry_4(__in,__cfg).__ST233944_Layout) Person_Info_;
-    KEL.typ.ndataset(E_Inquiry(__in,__cfg).Business_Info_Layout) Business_Info_;
+    KEL.typ.ndataset(E_Inquiry(__cfg).Search_Info_Layout) Search_Info_;
+    KEL.typ.ndataset(E_Inquiry(__cfg).Permissions_Layout) Permissions_;
+    KEL.typ.ndataset(E_Inquiry(__cfg).Bus_Intel_Layout) Bus_Intel_;
+    KEL.typ.ndataset(B_Inquiry_4(__cfg).__ST240560_Layout) Person_Info_;
+    KEL.typ.ndataset(E_Inquiry(__cfg).Business_Info_Layout) Business_Info_;
     KEL.typ.nint Fraudpoint_Score_;
-    KEL.typ.ndataset(E_Inquiry(__in,__cfg).Data_Sources_Layout) Data_Sources__1_;
+    KEL.typ.ndataset(E_Inquiry(__cfg).Data_Sources_Layout) Data_Sources__1_;
     KEL.typ.nint Agein_Days_;
     KEL.typ.str Inquiry_Function_Description_ := '';
     KEL.typ.str Inquiry_Industry_ := '';
@@ -59,8 +59,8 @@ EXPORT B_Input_P_I_I_3(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG
     KEL.typ.epoch Vault_Date_Last_Seen_ := 0;
     KEL.typ.int __RecordCount := 0;
   END;
-  __JC5682401(E_Address_Inquiry(__in,__cfg).Layout __EE5682392, B_Inquiry_4(__in,__cfg).__ST233917_Layout __EE5682176) := __EEQP(__EE5682392.Transaction_,__EE5682176.UID);
-  __ST932986_Layout __JT5682401(E_Address_Inquiry(__in,__cfg).Layout __l, B_Inquiry_4(__in,__cfg).__ST233917_Layout __r) := TRANSFORM
+  __JC6021662(E_Address_Inquiry(__cfg).Layout __EE6021653, B_Inquiry_4(__cfg).__ST240533_Layout __EE6021437) := __EEQP(__EE6021653.Transaction_,__EE6021437.UID);
+  __ST1004163_Layout __JT6021662(E_Address_Inquiry(__cfg).Layout __l, B_Inquiry_4(__cfg).__ST240533_Layout __r) := TRANSFORM
     SELF.Transaction_I_D__1_ := __r.Transaction_I_D_;
     SELF.Sequence_Number__1_ := __r.Sequence_Number_;
     SELF.Data_Sources__1_ := __r.Data_Sources_;
@@ -72,11 +72,11 @@ EXPORT B_Input_P_I_I_3(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG
     SELF := __l;
     SELF := __r;
   END;
-  SHARED __EE5682497 := JOIN(__EE5682176,__EE5682392,__JC5682401(RIGHT,LEFT),__JT5682401(RIGHT,LEFT),INNER,SMART);
-  SHARED __ST5669253_Layout := RECORD
+  SHARED __EE6021758 := JOIN(__EE6021437,__EE6021653,__JC6021662(RIGHT,LEFT),__JT6021662(RIGHT,LEFT),INNER,SMART);
+  SHARED __ST6008508_Layout := RECORD
     KEL.typ.ntyp(E_Address().Typ) Location_;
     KEL.typ.nstr Transaction_I_D__1_;
-    KEL.typ.ndataset(B_Inquiry_4(__in,__cfg).__ST233944_Layout) Person_Info_;
+    KEL.typ.ndataset(B_Inquiry_4(__cfg).__ST240560_Layout) Person_Info_;
     KEL.typ.timestamp Archive___Date_ := 0;
     KEL.typ.timestamp Date_First_Seen_ := 0;
     KEL.typ.timestamp Date_Last_Seen_ := 0;
@@ -84,10 +84,10 @@ EXPORT B_Input_P_I_I_3(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG
     KEL.typ.epoch Vault_Date_Last_Seen_ := 0;
     KEL.typ.int __RecordCount := 0;
   END;
-  SHARED __ST5669253_Layout __ND5682502__Rollup(__ST5669253_Layout __r, DATASET(__ST5669253_Layout) __recs) := TRANSFORM
-    __recs_Person_Info_ := NORMALIZE(__recs,__T(LEFT.Person_Info_),TRANSFORM(B_Inquiry_4(__in,__cfg).__ST233944_Layout,SELF:=RIGHT));
+  SHARED __ST6008508_Layout __ND6021763__Rollup(__ST6008508_Layout __r, DATASET(__ST6008508_Layout) __recs) := TRANSFORM
+    __recs_Person_Info_ := NORMALIZE(__recs,__T(LEFT.Person_Info_),TRANSFORM(B_Inquiry_4(__cfg).__ST240560_Layout,SELF:=RIGHT));
     __recs_Person_Info__allnull := NOT EXISTS(__recs(__NN(Person_Info_)));
-    SELF.Person_Info_ := __BN(PROJECT(TABLE(__recs_Person_Info_,{KEL.typ.int __RecordCount := SUM(GROUP,__RecordCount),KEL.typ.timestamp Archive___Date_ := KEL.era.SimpleRollTimestamp(GROUP,Archive___Date_,MIN,FALSE),KEL.typ.timestamp Date_First_Seen_ := KEL.era.SimpleRollTimestamp(GROUP,Date_First_Seen_,MIN,FALSE),KEL.typ.timestamp Date_Last_Seen_ := KEL.era.SimpleRollTimestamp(GROUP,Date_Last_Seen_,MAX,FALSE),KEL.typ.timestamp Hybrid_Archive_Date_ := KEL.era.SimpleRollTimestamp(GROUP,Hybrid_Archive_Date_,MIN,FALSE),KEL.typ.epoch Vault_Date_Last_Seen_ := KEL.era.SimpleRoll(GROUP,Vault_Date_Last_Seen_,MAX,NMAX),Lex_I_D_,First_Name_,Last_Name_,Date_Of_Birth_,Primary_Range_,Predirectional_,Primary_Name_,Suffix_,Postdirectional_,Z_I_P5_,Secondary_Range_,S_S_N_,Appended_S_S_N_,Personal_Phone_Number_,Work_Phone_Number_,Email_Address_,Transaction_I_D_},Lex_I_D_,First_Name_,Last_Name_,Date_Of_Birth_,Primary_Range_,Predirectional_,Primary_Name_,Suffix_,Postdirectional_,Z_I_P5_,Secondary_Range_,S_S_N_,Appended_S_S_N_,Personal_Phone_Number_,Work_Phone_Number_,Email_Address_,Transaction_I_D_),B_Inquiry_4(__in,__cfg).__ST233944_Layout),__recs_Person_Info__allnull);
+    SELF.Person_Info_ := __BN(PROJECT(TABLE(__recs_Person_Info_,{KEL.typ.int __RecordCount := SUM(GROUP,__RecordCount),KEL.typ.timestamp Archive___Date_ := KEL.era.SimpleRollTimestamp(GROUP,Archive___Date_,MIN,FALSE),KEL.typ.timestamp Date_First_Seen_ := KEL.era.SimpleRollTimestamp(GROUP,Date_First_Seen_,MIN,FALSE),KEL.typ.timestamp Date_Last_Seen_ := KEL.era.SimpleRollTimestamp(GROUP,Date_Last_Seen_,MAX,FALSE),KEL.typ.timestamp Hybrid_Archive_Date_ := KEL.era.SimpleRollTimestamp(GROUP,Hybrid_Archive_Date_,MIN,FALSE),KEL.typ.epoch Vault_Date_Last_Seen_ := KEL.era.SimpleRoll(GROUP,Vault_Date_Last_Seen_,MAX,NMAX),Lex_I_D_,First_Name_,Last_Name_,Date_Of_Birth_,Primary_Range_,Predirectional_,Primary_Name_,Suffix_,Postdirectional_,Z_I_P5_,Secondary_Range_,S_S_N_,Appended_S_S_N_,Personal_Phone_Number_,Work_Phone_Number_,Email_Address_,Transaction_I_D_},Lex_I_D_,First_Name_,Last_Name_,Date_Of_Birth_,Primary_Range_,Predirectional_,Primary_Name_,Suffix_,Postdirectional_,Z_I_P5_,Secondary_Range_,S_S_N_,Appended_S_S_N_,Personal_Phone_Number_,Work_Phone_Number_,Email_Address_,Transaction_I_D_),B_Inquiry_4(__cfg).__ST240560_Layout),__recs_Person_Info__allnull);
     SELF.__RecordCount := SUM(__recs,__RecordCount);
     SELF.Archive___Date_ := KEL.era.SimpleRollTimestamp(__recs,Archive___Date_,MIN,FALSE);
     SELF.Date_First_Seen_ := KEL.era.SimpleRollTimestamp(__recs,Date_First_Seen_,MIN,FALSE);
@@ -96,8 +96,8 @@ EXPORT B_Input_P_I_I_3(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG
     SELF.Vault_Date_Last_Seen_ := KEL.era.SimpleRoll(__recs,Vault_Date_Last_Seen_,MAX,NMAX);
     SELF := __r;
   END;
-  SHARED __EE5682551 := ROLLUP(GROUP(KEL.Routines.SortAndAppendFilteredChildren(PROJECT(__EE5682497,__ST5669253_Layout),'Person_Info_','person_info_','clean','__recordcount,archive___date_,date_first_seen_,date_last_seen_,hybrid_archive_date_,vault_date_last_seen_'),Location_,Transaction_I_D__1_,Person_Info_Clean,ALL),GROUP,__ND5682502__Rollup(ROW(LEFT,__ST5669253_Layout), PROJECT(ROWS(LEFT),__ST5669253_Layout)));
-  SHARED __ST5669294_Layout := RECORD
+  SHARED __EE6021812 := ROLLUP(GROUP(KEL.Routines.SortAndAppendFilteredChildren(PROJECT(__EE6021758,__ST6008508_Layout),'Person_Info_','person_info_','clean','__recordcount,archive___date_,date_first_seen_,date_last_seen_,hybrid_archive_date_,vault_date_last_seen_'),Location_,Transaction_I_D__1_,Person_Info_Clean,ALL),GROUP,__ND6021763__Rollup(ROW(LEFT,__ST6008508_Layout), PROJECT(ROWS(LEFT),__ST6008508_Layout)));
+  SHARED __ST6008549_Layout := RECORD
     KEL.typ.nuid UID;
     KEL.typ.ntyp(E_Person().Typ) Subject_;
     KEL.typ.nstr P___Inp_Acct_;
@@ -193,6 +193,7 @@ EXPORT B_Input_P_I_I_3(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG
     KEL.typ.nstr Input_Pre_Direction_Clean_Value_;
     KEL.typ.nstr Input_Primary_Name_Clean_Value_;
     KEL.typ.nstr Input_Primary_Range_Clean_Value_;
+    KEL.typ.nstr Input_S_S_N_Clean_Value_;
     KEL.typ.nstr Input_Secondary_Range_Clean_Value_;
     KEL.typ.nstr Input_State_Clean_Value_;
     KEL.typ.nstr Input_Street_Clean_Value_;
@@ -206,7 +207,7 @@ EXPORT B_Input_P_I_I_3(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG
     KEL.typ.str P___Inp_Addr_Zip_Flag_Value_ := '';
     KEL.typ.nstr P___Inp_Cln_Addr_St_Flag_Value_;
     KEL.typ.str P___Inp_Val_Name_Bogus_Flag_ := '';
-    KEL.typ.ndataset(__ST5669253_Layout) Address_Inquiry_;
+    KEL.typ.ndataset(__ST6008508_Layout) Address_Inquiry_;
     KEL.typ.epoch Archive___Date_ := 0;
     KEL.typ.epoch Date_First_Seen_ := 0;
     KEL.typ.epoch Date_Last_Seen_ := 0;
@@ -214,14 +215,14 @@ EXPORT B_Input_P_I_I_3(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG
     KEL.typ.epoch Vault_Date_Last_Seen_ := 0;
     KEL.typ.int __RecordCount := 0;
   END;
-  __JC5682565(B_Input_P_I_I_4(__in,__cfg).__ST233666_Layout __EE5682166, __ST5669253_Layout __EE5682551) := __EEQP(__EE5682166.Location_,__EE5682551.Location_) AND __T(__AND(__EEQ(__EE5682166.Location_,__EE5682551.Location_),__CN(__NN(__EE5682166.Location_))));
-  __ST5669294_Layout __Join__ST5669294_Layout(B_Input_P_I_I_4(__in,__cfg).__ST233666_Layout __r, DATASET(__ST5669253_Layout) __recs) := TRANSFORM
+  __JC6021826(B_Input_P_I_I_4(__cfg).__ST274346_Layout __EE6021427, __ST6008508_Layout __EE6021812) := __EEQP(__EE6021427.Location_,__EE6021812.Location_) AND __T(__AND(__EEQ(__EE6021427.Location_,__EE6021812.Location_),__CN(__NN(__EE6021427.Location_))));
+  __ST6008549_Layout __Join__ST6008549_Layout(B_Input_P_I_I_4(__cfg).__ST274346_Layout __r, DATASET(__ST6008508_Layout) __recs) := TRANSFORM
     SELF := __r;
     SELF.Address_Inquiry_ := __CN(__recs);
   END;
-  SHARED __EE5682698 := DENORMALIZE(DISTRIBUTE(__EE5682166,HASH(Location_)),DISTRIBUTE(__EE5682551,HASH(Location_)),__JC5682565(LEFT,RIGHT),GROUP,__Join__ST5669294_Layout(LEFT,ROWS(RIGHT)),LOCAL,SMART);
-  SHARED __EE5682178 := __ENH_Property_4;
-  SHARED __ST5669445_Layout := RECORD
+  SHARED __EE6021960 := DENORMALIZE(DISTRIBUTE(__EE6021427,HASH(Location_)),DISTRIBUTE(__EE6021812,HASH(Location_)),__JC6021826(LEFT,RIGHT),GROUP,__Join__ST6008549_Layout(LEFT,ROWS(RIGHT)),LOCAL,SMART);
+  SHARED __EE6021439 := __ENH_Property_4;
+  SHARED __ST6008701_Layout := RECORD
     KEL.typ.ntyp(E_Property().Typ) Prop_;
     KEL.typ.ntyp(E_Address().Typ) Location_;
     KEL.typ.epoch Archive___Date_ := 0;
@@ -231,11 +232,11 @@ EXPORT B_Input_P_I_I_3(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG
     KEL.typ.epoch Vault_Date_Last_Seen_ := 0;
     KEL.typ.int __RecordCount := 0;
   END;
-  SHARED __EE5682362 := PROJECT(TABLE(PROJECT(__EE5682166,__ST5669445_Layout),{KEL.typ.int __RecordCount := SUM(GROUP,__RecordCount),KEL.typ.epoch Archive___Date_ := KEL.era.SimpleRoll(GROUP,Archive___Date_,MIN,FALSE),KEL.typ.epoch Date_First_Seen_ := KEL.era.SimpleRoll(GROUP,Date_First_Seen_,MIN,FALSE),KEL.typ.epoch Date_Last_Seen_ := KEL.era.SimpleRoll(GROUP,Date_Last_Seen_,MAX,FALSE),KEL.typ.epoch Hybrid_Archive_Date_ := KEL.era.SimpleRoll(GROUP,Hybrid_Archive_Date_,MIN,FALSE),KEL.typ.epoch Vault_Date_Last_Seen_ := KEL.era.SimpleRoll(GROUP,Vault_Date_Last_Seen_,MAX,NMAX),Prop_,Location_},Prop_,Location_,MERGE),__ST5669445_Layout);
-  SHARED __ST5669473_Layout := RECORD
+  SHARED __EE6021623 := PROJECT(TABLE(PROJECT(__EE6021427,__ST6008701_Layout),{KEL.typ.int __RecordCount := SUM(GROUP,__RecordCount),KEL.typ.epoch Archive___Date_ := KEL.era.SimpleRoll(GROUP,Archive___Date_,MIN,FALSE),KEL.typ.epoch Date_First_Seen_ := KEL.era.SimpleRoll(GROUP,Date_First_Seen_,MIN,FALSE),KEL.typ.epoch Date_Last_Seen_ := KEL.era.SimpleRoll(GROUP,Date_Last_Seen_,MAX,FALSE),KEL.typ.epoch Hybrid_Archive_Date_ := KEL.era.SimpleRoll(GROUP,Hybrid_Archive_Date_,MIN,FALSE),KEL.typ.epoch Vault_Date_Last_Seen_ := KEL.era.SimpleRoll(GROUP,Vault_Date_Last_Seen_,MAX,NMAX),Prop_,Location_},Prop_,Location_,MERGE),__ST6008701_Layout);
+  SHARED __ST6008729_Layout := RECORD
     KEL.typ.ntyp(E_Property().Typ) Prop_;
     KEL.typ.ntyp(E_Address().Typ) Location_;
-    KEL.typ.ndataset(__ST5669253_Layout) Address_Inquiry_;
+    KEL.typ.ndataset(__ST6008508_Layout) Address_Inquiry_;
     KEL.typ.epoch Archive___Date_ := 0;
     KEL.typ.epoch Date_First_Seen_ := 0;
     KEL.typ.epoch Date_Last_Seen_ := 0;
@@ -243,16 +244,16 @@ EXPORT B_Input_P_I_I_3(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG
     KEL.typ.epoch Vault_Date_Last_Seen_ := 0;
     KEL.typ.int __RecordCount := 0;
   END;
-  __JC5682712(__ST5669445_Layout __EE5682362, __ST5669253_Layout __EE5682551) := __EEQP(__EE5682362.Location_,__EE5682551.Location_) AND __T(__AND(__EEQ(__EE5682362.Location_,__EE5682551.Location_),__CN(__NN(__EE5682362.Location_))));
-  __ST5669473_Layout __Join__ST5669473_Layout(__ST5669445_Layout __r, DATASET(__ST5669253_Layout) __recs) := TRANSFORM
+  __JC6021974(__ST6008701_Layout __EE6021623, __ST6008508_Layout __EE6021812) := __EEQP(__EE6021623.Location_,__EE6021812.Location_) AND __T(__AND(__EEQ(__EE6021623.Location_,__EE6021812.Location_),__CN(__NN(__EE6021623.Location_))));
+  __ST6008729_Layout __Join__ST6008729_Layout(__ST6008701_Layout __r, DATASET(__ST6008508_Layout) __recs) := TRANSFORM
     SELF := __r;
     SELF.Address_Inquiry_ := __CN(__recs);
   END;
-  SHARED __EE5682739 := DENORMALIZE(DISTRIBUTE(__EE5682362,HASH(Location_)),DISTRIBUTE(__EE5682551,HASH(Location_)),__JC5682712(LEFT,RIGHT),GROUP,__Join__ST5669473_Layout(LEFT,ROWS(RIGHT)),LOCAL,SMART);
-  SHARED __EE5682746 := __EE5682739(__NN(__EE5682739.Prop_));
-  __JC5682755(B_Property_4(__in,__cfg).__ST236156_Layout __EE5682178, __ST5669473_Layout __EE5682746) := __EEQP(__EE5682746.Prop_,__EE5682178.UID);
-  SHARED __EE5682793 := JOIN(__EE5682178,__EE5682746,__JC5682755(LEFT,RIGHT),TRANSFORM(B_Property_4(__in,__cfg).__ST236156_Layout,SELF:=LEFT),SMART,KEEP(1));
-  SHARED __ST933177_Layout := RECORD
+  SHARED __EE6022001 := DENORMALIZE(DISTRIBUTE(__EE6021623,HASH(Location_)),DISTRIBUTE(__EE6021812,HASH(Location_)),__JC6021974(LEFT,RIGHT),GROUP,__Join__ST6008729_Layout(LEFT,ROWS(RIGHT)),LOCAL,SMART);
+  SHARED __EE6022008 := __EE6022001(__NN(__EE6022001.Prop_));
+  __JC6022017(B_Property_4(__cfg).__ST243104_Layout __EE6021439, __ST6008729_Layout __EE6022008) := __EEQP(__EE6022008.Prop_,__EE6021439.UID);
+  SHARED __EE6022055 := JOIN(__EE6021439,__EE6022008,__JC6022017(LEFT,RIGHT),TRANSFORM(B_Property_4(__cfg).__ST243104_Layout,SELF:=LEFT),SMART,KEEP(1));
+  SHARED __ST1004354_Layout := RECORD
     KEL.typ.nuid UID;
     KEL.typ.nstr Primary_Range_;
     KEL.typ.nstr Predirectional_;
@@ -261,9 +262,9 @@ EXPORT B_Input_P_I_I_3(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG
     KEL.typ.nstr Postdirectional_;
     KEL.typ.nstr Secondary_Range_;
     KEL.typ.ntyp(E_Zip_Code().Typ) Z_I_P5_;
-    KEL.typ.ndataset(E_Property(__in,__cfg).Address_Components_Layout) Address_Components_;
-    KEL.typ.ndataset(B_Property_4(__in,__cfg).__ST236174_Layout) Automated_Valuation_Model_;
-    KEL.typ.ndataset(E_Property(__in,__cfg).Data_Sources_Layout) Data_Sources_;
+    KEL.typ.ndataset(E_Property(__cfg).Address_Components_Layout) Address_Components_;
+    KEL.typ.ndataset(B_Property_4(__cfg).__ST243122_Layout) Automated_Valuation_Model_;
+    KEL.typ.ndataset(E_Property(__cfg).Data_Sources_Layout) Data_Sources_;
     KEL.typ.bool Is_Business_Address_ := FALSE;
     KEL.typ.nstr A_V_M_Unformatted_A_P_N_;
     KEL.typ.nint A_V_M_Land_Use_Code_;
@@ -287,8 +288,8 @@ EXPORT B_Input_P_I_I_3(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG
     KEL.typ.epoch Vault_Date_Last_Seen_ := 0;
     KEL.typ.int __RecordCount := 0;
   END;
-  __JC5682810(B_Property_4(__in,__cfg).__ST236156_Layout __EE5682793, B_Property_4(__in,__cfg).__ST236174_Layout __EE5682796) := __T(__OP2(__EE5682796.A_V_M_Years_,<=,__CN(1)));
-  __ST933177_Layout __JT5682810(B_Property_4(__in,__cfg).__ST236156_Layout __l, B_Property_4(__in,__cfg).__ST236174_Layout __r) := TRANSFORM, SKIP(NOT(__JC5682810(__l,__r)))
+  __JC6022072(B_Property_4(__cfg).__ST243104_Layout __EE6022055, B_Property_4(__cfg).__ST243122_Layout __EE6022058) := __T(__OP2(__EE6022058.A_V_M_Years_,<=,__CN(1)));
+  __ST1004354_Layout __JT6022072(B_Property_4(__cfg).__ST243104_Layout __l, B_Property_4(__cfg).__ST243122_Layout __r) := TRANSFORM, SKIP(NOT(__JC6022072(__l,__r)))
     SELF.Archive___Date_ := __r.Archive___Date_;
     SELF.Date_First_Seen_ := __r.Date_First_Seen_;
     SELF.Date_Last_Seen_ := __r.Date_Last_Seen_;
@@ -298,8 +299,8 @@ EXPORT B_Input_P_I_I_3(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG
     SELF := __l;
     SELF := __r;
   END;
-  SHARED __EE5682863 := NORMALIZE(__EE5682793,__T(LEFT.Automated_Valuation_Model_),__JT5682810(LEFT,RIGHT));
-  SHARED __ST5669961_Layout := RECORD
+  SHARED __EE6022125 := NORMALIZE(__EE6022055,__T(LEFT.Automated_Valuation_Model_),__JT6022072(LEFT,RIGHT));
+  SHARED __ST6009218_Layout := RECORD
     KEL.typ.nuid UID;
     KEL.typ.nstr Primary_Range_;
     KEL.typ.nstr Predirectional_;
@@ -308,9 +309,9 @@ EXPORT B_Input_P_I_I_3(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG
     KEL.typ.nstr Postdirectional_;
     KEL.typ.nstr Secondary_Range_;
     KEL.typ.ntyp(E_Zip_Code().Typ) Z_I_P5_;
-    KEL.typ.ndataset(E_Property(__in,__cfg).Address_Components_Layout) Address_Components_;
-    KEL.typ.ndataset(B_Property_4(__in,__cfg).__ST236174_Layout) Automated_Valuation_Model_;
-    KEL.typ.ndataset(E_Property(__in,__cfg).Data_Sources_Layout) Data_Sources_;
+    KEL.typ.ndataset(E_Property(__cfg).Address_Components_Layout) Address_Components_;
+    KEL.typ.ndataset(B_Property_4(__cfg).__ST243122_Layout) Automated_Valuation_Model_;
+    KEL.typ.ndataset(E_Property(__cfg).Data_Sources_Layout) Data_Sources_;
     KEL.typ.bool Is_Business_Address_ := FALSE;
     KEL.typ.nstr A_V_M_Unformatted_A_P_N_;
     KEL.typ.nint A_V_M_Land_Use_Code_;
@@ -334,8 +335,8 @@ EXPORT B_Input_P_I_I_3(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG
     KEL.typ.epoch Vault_Date_Last_Seen_ := 0;
     KEL.typ.int __RecordCount := 0;
   END;
-  SHARED __EE5683025 := PROJECT(__EE5682863,__ST5669961_Layout);
-  SHARED __ST5670081_Layout := RECORD
+  SHARED __EE6022287 := PROJECT(__EE6022125,__ST6009218_Layout);
+  SHARED __ST6009338_Layout := RECORD
     KEL.typ.nuid UID;
     KEL.typ.ntyp(E_Person().Typ) Subject_;
     KEL.typ.nstr P___Inp_Acct_;
@@ -431,6 +432,7 @@ EXPORT B_Input_P_I_I_3(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG
     KEL.typ.nstr Input_Pre_Direction_Clean_Value_;
     KEL.typ.nstr Input_Primary_Name_Clean_Value_;
     KEL.typ.nstr Input_Primary_Range_Clean_Value_;
+    KEL.typ.nstr Input_S_S_N_Clean_Value_;
     KEL.typ.nstr Input_Secondary_Range_Clean_Value_;
     KEL.typ.nstr Input_State_Clean_Value_;
     KEL.typ.nstr Input_Street_Clean_Value_;
@@ -444,8 +446,8 @@ EXPORT B_Input_P_I_I_3(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG
     KEL.typ.str P___Inp_Addr_Zip_Flag_Value_ := '';
     KEL.typ.nstr P___Inp_Cln_Addr_St_Flag_Value_;
     KEL.typ.str P___Inp_Val_Name_Bogus_Flag_ := '';
-    KEL.typ.ndataset(__ST5669253_Layout) Address_Inquiry_;
-    KEL.typ.ndataset(__ST5669961_Layout) Property_;
+    KEL.typ.ndataset(__ST6008508_Layout) Address_Inquiry_;
+    KEL.typ.ndataset(__ST6009218_Layout) Property_;
     KEL.typ.epoch Archive___Date_ := 0;
     KEL.typ.epoch Date_First_Seen_ := 0;
     KEL.typ.epoch Date_Last_Seen_ := 0;
@@ -453,14 +455,14 @@ EXPORT B_Input_P_I_I_3(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG
     KEL.typ.epoch Vault_Date_Last_Seen_ := 0;
     KEL.typ.int __RecordCount := 0;
   END;
-  __JC5683034(__ST5669294_Layout __EE5682698, __ST5669961_Layout __EE5683025) := __EEQP(__EE5682698.Prop_,__EE5683025.UID);
-  __ST5670081_Layout __Join__ST5670081_Layout(__ST5669294_Layout __r, DATASET(__ST5669961_Layout) __recs) := TRANSFORM
+  __JC6022296(__ST6008549_Layout __EE6021960, __ST6009218_Layout __EE6022287) := __EEQP(__EE6021960.Prop_,__EE6022287.UID);
+  __ST6009338_Layout __Join__ST6009338_Layout(__ST6008549_Layout __r, DATASET(__ST6009218_Layout) __recs) := TRANSFORM
     SELF := __r;
     SELF.Property_ := __CN(__recs);
   END;
-  SHARED __EE5683220 := DENORMALIZE(DISTRIBUTE(__EE5682698,HASH(Prop_)),DISTRIBUTE(__EE5683025,HASH(UID)),__JC5683034(LEFT,RIGHT),GROUP,__Join__ST5670081_Layout(LEFT,ROWS(RIGHT)),LOCAL,SMART);
-  SHARED __EE5682180 := __EE5682178;
-  SHARED __ST5670548_Layout := RECORD
+  SHARED __EE6022483 := DENORMALIZE(DISTRIBUTE(__EE6021960,HASH(Prop_)),DISTRIBUTE(__EE6022287,HASH(UID)),__JC6022296(LEFT,RIGHT),GROUP,__Join__ST6009338_Layout(LEFT,ROWS(RIGHT)),LOCAL,SMART);
+  SHARED __EE6021441 := __EE6021439;
+  SHARED __ST6009806_Layout := RECORD
     KEL.typ.ntyp(E_Property().Typ) Prop_;
     KEL.typ.epoch Archive___Date_ := 0;
     KEL.typ.epoch Date_First_Seen_ := 0;
@@ -469,10 +471,10 @@ EXPORT B_Input_P_I_I_3(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG
     KEL.typ.epoch Vault_Date_Last_Seen_ := 0;
     KEL.typ.int __RecordCount := 0;
   END;
-  SHARED __EE5683230 := PROJECT(TABLE(PROJECT(__EE5682739,__ST5670548_Layout),{KEL.typ.int __RecordCount := SUM(GROUP,__RecordCount),KEL.typ.epoch Archive___Date_ := KEL.era.SimpleRoll(GROUP,Archive___Date_,MIN,FALSE),KEL.typ.epoch Date_First_Seen_ := KEL.era.SimpleRoll(GROUP,Date_First_Seen_,MIN,FALSE),KEL.typ.epoch Date_Last_Seen_ := KEL.era.SimpleRoll(GROUP,Date_Last_Seen_,MAX,FALSE),KEL.typ.epoch Hybrid_Archive_Date_ := KEL.era.SimpleRoll(GROUP,Hybrid_Archive_Date_,MIN,FALSE),KEL.typ.epoch Vault_Date_Last_Seen_ := KEL.era.SimpleRoll(GROUP,Vault_Date_Last_Seen_,MAX,NMAX),Prop_},Prop_,MERGE),__ST5670548_Layout);
-  SHARED __ST5670619_Layout := RECORD
+  SHARED __EE6022493 := PROJECT(TABLE(PROJECT(__EE6022001,__ST6009806_Layout),{KEL.typ.int __RecordCount := SUM(GROUP,__RecordCount),KEL.typ.epoch Archive___Date_ := KEL.era.SimpleRoll(GROUP,Archive___Date_,MIN,FALSE),KEL.typ.epoch Date_First_Seen_ := KEL.era.SimpleRoll(GROUP,Date_First_Seen_,MIN,FALSE),KEL.typ.epoch Date_Last_Seen_ := KEL.era.SimpleRoll(GROUP,Date_Last_Seen_,MAX,FALSE),KEL.typ.epoch Hybrid_Archive_Date_ := KEL.era.SimpleRoll(GROUP,Hybrid_Archive_Date_,MIN,FALSE),KEL.typ.epoch Vault_Date_Last_Seen_ := KEL.era.SimpleRoll(GROUP,Vault_Date_Last_Seen_,MAX,NMAX),Prop_},Prop_,MERGE),__ST6009806_Layout);
+  SHARED __ST6009877_Layout := RECORD
     KEL.typ.ntyp(E_Property().Typ) Prop_;
-    KEL.typ.ndataset(__ST5669961_Layout) Property_;
+    KEL.typ.ndataset(__ST6009218_Layout) Property_;
     KEL.typ.epoch Archive___Date_ := 0;
     KEL.typ.epoch Date_First_Seen_ := 0;
     KEL.typ.epoch Date_Last_Seen_ := 0;
@@ -480,16 +482,16 @@ EXPORT B_Input_P_I_I_3(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG
     KEL.typ.epoch Vault_Date_Last_Seen_ := 0;
     KEL.typ.int __RecordCount := 0;
   END;
-  __JC5683239(__ST5670548_Layout __EE5683230, __ST5669961_Layout __EE5683025) := __EEQP(__EE5683230.Prop_,__EE5683025.UID);
-  __ST5670619_Layout __Join__ST5670619_Layout(__ST5670548_Layout __r, DATASET(__ST5669961_Layout) __recs) := TRANSFORM
+  __JC6022502(__ST6009806_Layout __EE6022493, __ST6009218_Layout __EE6022287) := __EEQP(__EE6022493.Prop_,__EE6022287.UID);
+  __ST6009877_Layout __Join__ST6009877_Layout(__ST6009806_Layout __r, DATASET(__ST6009218_Layout) __recs) := TRANSFORM
     SELF := __r;
     SELF.Property_ := __CN(__recs);
   END;
-  SHARED __EE5683295 := DENORMALIZE(DISTRIBUTE(__EE5683230,HASH(Prop_)),DISTRIBUTE(__EE5683025,HASH(UID)),__JC5683239(LEFT,RIGHT),GROUP,__Join__ST5670619_Layout(LEFT,ROWS(RIGHT)),LOCAL,SMART);
-  SHARED __EE5683302 := __EE5683295(__NN(__EE5683295.Prop_));
-  __JC5683311(B_Property_4(__in,__cfg).__ST236156_Layout __EE5682180, __ST5670619_Layout __EE5683302) := __EEQP(__EE5683302.Prop_,__EE5682180.UID);
-  SHARED __EE5683349 := JOIN(__EE5682180,__EE5683302,__JC5683311(LEFT,RIGHT),TRANSFORM(B_Property_4(__in,__cfg).__ST236156_Layout,SELF:=LEFT),SMART,KEEP(1));
-  SHARED __ST933265_Layout := RECORD
+  SHARED __EE6022558 := DENORMALIZE(DISTRIBUTE(__EE6022493,HASH(Prop_)),DISTRIBUTE(__EE6022287,HASH(UID)),__JC6022502(LEFT,RIGHT),GROUP,__Join__ST6009877_Layout(LEFT,ROWS(RIGHT)),LOCAL,SMART);
+  SHARED __EE6022565 := __EE6022558(__NN(__EE6022558.Prop_));
+  __JC6022574(B_Property_4(__cfg).__ST243104_Layout __EE6021441, __ST6009877_Layout __EE6022565) := __EEQP(__EE6022565.Prop_,__EE6021441.UID);
+  SHARED __EE6022612 := JOIN(__EE6021441,__EE6022565,__JC6022574(LEFT,RIGHT),TRANSFORM(B_Property_4(__cfg).__ST243104_Layout,SELF:=LEFT),SMART,KEEP(1));
+  SHARED __ST1004442_Layout := RECORD
     KEL.typ.nuid UID;
     KEL.typ.nstr Primary_Range_;
     KEL.typ.nstr Predirectional_;
@@ -498,9 +500,9 @@ EXPORT B_Input_P_I_I_3(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG
     KEL.typ.nstr Postdirectional_;
     KEL.typ.nstr Secondary_Range_;
     KEL.typ.ntyp(E_Zip_Code().Typ) Z_I_P5_;
-    KEL.typ.ndataset(E_Property(__in,__cfg).Address_Components_Layout) Address_Components_;
-    KEL.typ.ndataset(B_Property_4(__in,__cfg).__ST236174_Layout) Automated_Valuation_Model_;
-    KEL.typ.ndataset(E_Property(__in,__cfg).Data_Sources_Layout) Data_Sources_;
+    KEL.typ.ndataset(E_Property(__cfg).Address_Components_Layout) Address_Components_;
+    KEL.typ.ndataset(B_Property_4(__cfg).__ST243122_Layout) Automated_Valuation_Model_;
+    KEL.typ.ndataset(E_Property(__cfg).Data_Sources_Layout) Data_Sources_;
     KEL.typ.bool Is_Business_Address_ := FALSE;
     KEL.typ.nstr A_V_M_Unformatted_A_P_N_;
     KEL.typ.nint A_V_M_Land_Use_Code_;
@@ -524,8 +526,8 @@ EXPORT B_Input_P_I_I_3(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG
     KEL.typ.epoch Vault_Date_Last_Seen_ := 0;
     KEL.typ.int __RecordCount := 0;
   END;
-  __JC5683372(B_Property_4(__in,__cfg).__ST236156_Layout __EE5683349, B_Property_4(__in,__cfg).__ST236174_Layout __EE5683352) := __T(__AND(__OP2(__EE5683352.A_V_M_Years_,<,__CN(2)),__OP2(__EE5683352.A_V_M_Years_,>=,__CN(1))));
-  __ST933265_Layout __JT5683372(B_Property_4(__in,__cfg).__ST236156_Layout __l, B_Property_4(__in,__cfg).__ST236174_Layout __r) := TRANSFORM, SKIP(NOT(__JC5683372(__l,__r)))
+  __JC6022635(B_Property_4(__cfg).__ST243104_Layout __EE6022612, B_Property_4(__cfg).__ST243122_Layout __EE6022615) := __T(__AND(__OP2(__EE6022615.A_V_M_Years_,<,__CN(2)),__OP2(__EE6022615.A_V_M_Years_,>=,__CN(1))));
+  __ST1004442_Layout __JT6022635(B_Property_4(__cfg).__ST243104_Layout __l, B_Property_4(__cfg).__ST243122_Layout __r) := TRANSFORM, SKIP(NOT(__JC6022635(__l,__r)))
     SELF.Archive___Date_ := __r.Archive___Date_;
     SELF.Date_First_Seen_ := __r.Date_First_Seen_;
     SELF.Date_Last_Seen_ := __r.Date_Last_Seen_;
@@ -535,8 +537,8 @@ EXPORT B_Input_P_I_I_3(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG
     SELF := __l;
     SELF := __r;
   END;
-  SHARED __EE5683425 := NORMALIZE(__EE5683349,__T(LEFT.Automated_Valuation_Model_),__JT5683372(LEFT,RIGHT));
-  SHARED __ST5671195_Layout := RECORD
+  SHARED __EE6022688 := NORMALIZE(__EE6022612,__T(LEFT.Automated_Valuation_Model_),__JT6022635(LEFT,RIGHT));
+  SHARED __ST6010454_Layout := RECORD
     KEL.typ.nuid UID;
     KEL.typ.nstr Primary_Range_;
     KEL.typ.nstr Predirectional_;
@@ -545,9 +547,9 @@ EXPORT B_Input_P_I_I_3(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG
     KEL.typ.nstr Postdirectional_;
     KEL.typ.nstr Secondary_Range_;
     KEL.typ.ntyp(E_Zip_Code().Typ) Z_I_P5_;
-    KEL.typ.ndataset(E_Property(__in,__cfg).Address_Components_Layout) Address_Components_;
-    KEL.typ.ndataset(B_Property_4(__in,__cfg).__ST236174_Layout) Automated_Valuation_Model_;
-    KEL.typ.ndataset(E_Property(__in,__cfg).Data_Sources_Layout) Data_Sources_;
+    KEL.typ.ndataset(E_Property(__cfg).Address_Components_Layout) Address_Components_;
+    KEL.typ.ndataset(B_Property_4(__cfg).__ST243122_Layout) Automated_Valuation_Model_;
+    KEL.typ.ndataset(E_Property(__cfg).Data_Sources_Layout) Data_Sources_;
     KEL.typ.bool Is_Business_Address_ := FALSE;
     KEL.typ.nstr A_V_M_Unformatted_A_P_N_;
     KEL.typ.nint A_V_M_Land_Use_Code_;
@@ -571,8 +573,8 @@ EXPORT B_Input_P_I_I_3(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG
     KEL.typ.epoch Vault_Date_Last_Seen_ := 0;
     KEL.typ.int __RecordCount := 0;
   END;
-  SHARED __EE5683587 := PROJECT(__EE5683425,__ST5671195_Layout);
-  SHARED __ST5671315_Layout := RECORD
+  SHARED __EE6022850 := PROJECT(__EE6022688,__ST6010454_Layout);
+  SHARED __ST6010574_Layout := RECORD
     KEL.typ.nuid UID;
     KEL.typ.ntyp(E_Person().Typ) Subject_;
     KEL.typ.nstr P___Inp_Acct_;
@@ -668,6 +670,7 @@ EXPORT B_Input_P_I_I_3(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG
     KEL.typ.nstr Input_Pre_Direction_Clean_Value_;
     KEL.typ.nstr Input_Primary_Name_Clean_Value_;
     KEL.typ.nstr Input_Primary_Range_Clean_Value_;
+    KEL.typ.nstr Input_S_S_N_Clean_Value_;
     KEL.typ.nstr Input_Secondary_Range_Clean_Value_;
     KEL.typ.nstr Input_State_Clean_Value_;
     KEL.typ.nstr Input_Street_Clean_Value_;
@@ -681,9 +684,9 @@ EXPORT B_Input_P_I_I_3(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG
     KEL.typ.str P___Inp_Addr_Zip_Flag_Value_ := '';
     KEL.typ.nstr P___Inp_Cln_Addr_St_Flag_Value_;
     KEL.typ.str P___Inp_Val_Name_Bogus_Flag_ := '';
-    KEL.typ.ndataset(__ST5669253_Layout) Address_Inquiry_;
-    KEL.typ.ndataset(__ST5669961_Layout) Property_;
-    KEL.typ.ndataset(__ST5671195_Layout) Property__1_;
+    KEL.typ.ndataset(__ST6008508_Layout) Address_Inquiry_;
+    KEL.typ.ndataset(__ST6009218_Layout) Property_;
+    KEL.typ.ndataset(__ST6010454_Layout) Property__1_;
     KEL.typ.epoch Archive___Date_ := 0;
     KEL.typ.epoch Date_First_Seen_ := 0;
     KEL.typ.epoch Date_Last_Seen_ := 0;
@@ -691,18 +694,18 @@ EXPORT B_Input_P_I_I_3(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG
     KEL.typ.epoch Vault_Date_Last_Seen_ := 0;
     KEL.typ.int __RecordCount := 0;
   END;
-  __JC5683596(__ST5670081_Layout __EE5683220, __ST5671195_Layout __EE5683587) := __EEQP(__EE5683220.Prop_,__EE5683587.UID);
-  __ST5671315_Layout __Join__ST5671315_Layout(__ST5670081_Layout __r, DATASET(__ST5671195_Layout) __recs) := TRANSFORM
+  __JC6022859(__ST6009338_Layout __EE6022483, __ST6010454_Layout __EE6022850) := __EEQP(__EE6022483.Prop_,__EE6022850.UID);
+  __ST6010574_Layout __Join__ST6010574_Layout(__ST6009338_Layout __r, DATASET(__ST6010454_Layout) __recs) := TRANSFORM
     SELF := __r;
     SELF.Property__1_ := __CN(__recs);
   END;
-  SHARED __EE5683835 := DENORMALIZE(DISTRIBUTE(__EE5683220,HASH(Prop_)),DISTRIBUTE(__EE5683587,HASH(UID)),__JC5683596(LEFT,RIGHT),GROUP,__Join__ST5671315_Layout(LEFT,ROWS(RIGHT)),LOCAL,SMART);
-  SHARED __EE5683847 := __EE5682178;
-  SHARED __EE5683849 := __EE5682166;
-  SHARED __EE5683856 := __EE5683849(__NN(__EE5683849.Prop_));
-  __JC5683865(B_Property_4(__in,__cfg).__ST236156_Layout __EE5683847, B_Input_P_I_I_4(__in,__cfg).__ST233666_Layout __EE5683856) := __EEQP(__EE5683856.Prop_,__EE5683847.UID);
-  SHARED __EE5683903 := JOIN(__EE5683847,__EE5683856,__JC5683865(LEFT,RIGHT),TRANSFORM(B_Property_4(__in,__cfg).__ST236156_Layout,SELF:=LEFT),SMART,KEEP(1));
-  SHARED __ST933447_Layout := RECORD
+  SHARED __EE6023099 := DENORMALIZE(DISTRIBUTE(__EE6022483,HASH(Prop_)),DISTRIBUTE(__EE6022850,HASH(UID)),__JC6022859(LEFT,RIGHT),GROUP,__Join__ST6010574_Layout(LEFT,ROWS(RIGHT)),LOCAL,SMART);
+  SHARED __EE6023111 := __EE6021439;
+  SHARED __EE6023113 := __EE6021427;
+  SHARED __EE6023120 := __EE6023113(__NN(__EE6023113.Prop_));
+  __JC6023129(B_Property_4(__cfg).__ST243104_Layout __EE6023111, B_Input_P_I_I_4(__cfg).__ST274346_Layout __EE6023120) := __EEQP(__EE6023120.Prop_,__EE6023111.UID);
+  SHARED __EE6023167 := JOIN(__EE6023111,__EE6023120,__JC6023129(LEFT,RIGHT),TRANSFORM(B_Property_4(__cfg).__ST243104_Layout,SELF:=LEFT),SMART,KEEP(1));
+  SHARED __ST1004624_Layout := RECORD
     KEL.typ.nuid UID;
     KEL.typ.nstr Primary_Range_;
     KEL.typ.nstr Predirectional_;
@@ -711,9 +714,9 @@ EXPORT B_Input_P_I_I_3(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG
     KEL.typ.nstr Postdirectional_;
     KEL.typ.nstr Secondary_Range_;
     KEL.typ.ntyp(E_Zip_Code().Typ) Z_I_P5_;
-    KEL.typ.ndataset(E_Property(__in,__cfg).Address_Components_Layout) Address_Components_;
-    KEL.typ.ndataset(B_Property_4(__in,__cfg).__ST236174_Layout) Automated_Valuation_Model_;
-    KEL.typ.ndataset(E_Property(__in,__cfg).Data_Sources_Layout) Data_Sources_;
+    KEL.typ.ndataset(E_Property(__cfg).Address_Components_Layout) Address_Components_;
+    KEL.typ.ndataset(B_Property_4(__cfg).__ST243122_Layout) Automated_Valuation_Model_;
+    KEL.typ.ndataset(E_Property(__cfg).Data_Sources_Layout) Data_Sources_;
     KEL.typ.bool Is_Business_Address_ := FALSE;
     KEL.typ.nstr A_V_M_Unformatted_A_P_N_;
     KEL.typ.nint A_V_M_Land_Use_Code_;
@@ -737,8 +740,8 @@ EXPORT B_Input_P_I_I_3(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG
     KEL.typ.epoch Vault_Date_Last_Seen_ := 0;
     KEL.typ.int __RecordCount := 0;
   END;
-  __JC5683926(B_Property_4(__in,__cfg).__ST236156_Layout __EE5683903, B_Property_4(__in,__cfg).__ST236174_Layout __EE5683906) := __T(__AND(__OP2(__EE5683906.A_V_M_Years_,<,__CN(6)),__OP2(__EE5683906.A_V_M_Years_,>=,__CN(5))));
-  __ST933447_Layout __JT5683926(B_Property_4(__in,__cfg).__ST236156_Layout __l, B_Property_4(__in,__cfg).__ST236174_Layout __r) := TRANSFORM, SKIP(NOT(__JC5683926(__l,__r)))
+  __JC6023190(B_Property_4(__cfg).__ST243104_Layout __EE6023167, B_Property_4(__cfg).__ST243122_Layout __EE6023170) := __T(__AND(__OP2(__EE6023170.A_V_M_Years_,<,__CN(6)),__OP2(__EE6023170.A_V_M_Years_,>=,__CN(5))));
+  __ST1004624_Layout __JT6023190(B_Property_4(__cfg).__ST243104_Layout __l, B_Property_4(__cfg).__ST243122_Layout __r) := TRANSFORM, SKIP(NOT(__JC6023190(__l,__r)))
     SELF.Archive___Date_ := __r.Archive___Date_;
     SELF.Date_First_Seen_ := __r.Date_First_Seen_;
     SELF.Date_Last_Seen_ := __r.Date_Last_Seen_;
@@ -748,8 +751,8 @@ EXPORT B_Input_P_I_I_3(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG
     SELF := __l;
     SELF := __r;
   END;
-  SHARED __EE5683979 := NORMALIZE(__EE5683903,__T(LEFT.Automated_Valuation_Model_),__JT5683926(LEFT,RIGHT));
-  SHARED __ST932782_Layout := RECORD
+  SHARED __EE6023243 := NORMALIZE(__EE6023167,__T(LEFT.Automated_Valuation_Model_),__JT6023190(LEFT,RIGHT));
+  SHARED __ST1003959_Layout := RECORD
     KEL.typ.nuid ____grp___Prop_;
     KEL.typ.nint A_V_M_Automated_Valuation_;
     KEL.typ.nkdate A_V_M_Value_Date_;
@@ -761,10 +764,10 @@ EXPORT B_Input_P_I_I_3(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG
     KEL.typ.epoch Vault_Date_Last_Seen_ := 0;
     KEL.typ.int __RecordCount := 0;
   END;
-  SHARED __EE5684001 := PROJECT(TABLE(PROJECT(__EE5683979,TRANSFORM(__ST932782_Layout,SELF.____grp___Prop_ := LEFT.UID,SELF := LEFT)),{KEL.typ.int __RecordCount := SUM(GROUP,__RecordCount),KEL.typ.epoch Archive___Date_ := KEL.era.SimpleRoll(GROUP,Archive___Date_,MIN,FALSE),KEL.typ.epoch Date_First_Seen_ := KEL.era.SimpleRoll(GROUP,Date_First_Seen_,MIN,FALSE),KEL.typ.epoch Date_Last_Seen_ := KEL.era.SimpleRoll(GROUP,Date_Last_Seen_,MAX,FALSE),KEL.typ.epoch Hybrid_Archive_Date_ := KEL.era.SimpleRoll(GROUP,Hybrid_Archive_Date_,MIN,FALSE),KEL.typ.epoch Vault_Date_Last_Seen_ := KEL.era.SimpleRoll(GROUP,Vault_Date_Last_Seen_,MAX,NMAX),____grp___Prop_,A_V_M_Automated_Valuation_,A_V_M_Value_Date_,A_V_M_Confidence_Score_},____grp___Prop_,A_V_M_Automated_Valuation_,A_V_M_Value_Date_,A_V_M_Confidence_Score_,MERGE),__ST932782_Layout);
-  SHARED __EE5684012 := GROUP(__EE5684001,____grp___Prop_,ALL);
-  SHARED __EE5684016 := UNGROUP(TOPN(__EE5684012(__NN(__EE5684012.A_V_M_Value_Date_)),1, -__T(__EE5684012.A_V_M_Value_Date_),__T(____grp___Prop_),__T(A_V_M_Automated_Valuation_),__T(A_V_M_Confidence_Score_)));
-  SHARED __ST5671852_Layout := RECORD
+  SHARED __EE6023265 := PROJECT(TABLE(PROJECT(__EE6023243,TRANSFORM(__ST1003959_Layout,SELF.____grp___Prop_ := LEFT.UID,SELF := LEFT)),{KEL.typ.int __RecordCount := SUM(GROUP,__RecordCount),KEL.typ.epoch Archive___Date_ := KEL.era.SimpleRoll(GROUP,Archive___Date_,MIN,FALSE),KEL.typ.epoch Date_First_Seen_ := KEL.era.SimpleRoll(GROUP,Date_First_Seen_,MIN,FALSE),KEL.typ.epoch Date_Last_Seen_ := KEL.era.SimpleRoll(GROUP,Date_Last_Seen_,MAX,FALSE),KEL.typ.epoch Hybrid_Archive_Date_ := KEL.era.SimpleRoll(GROUP,Hybrid_Archive_Date_,MIN,FALSE),KEL.typ.epoch Vault_Date_Last_Seen_ := KEL.era.SimpleRoll(GROUP,Vault_Date_Last_Seen_,MAX,NMAX),____grp___Prop_,A_V_M_Automated_Valuation_,A_V_M_Value_Date_,A_V_M_Confidence_Score_},____grp___Prop_,A_V_M_Automated_Valuation_,A_V_M_Value_Date_,A_V_M_Confidence_Score_,MERGE),__ST1003959_Layout);
+  SHARED __EE6023276 := GROUP(__EE6023265,____grp___Prop_,ALL);
+  SHARED __EE6023280 := UNGROUP(TOPN(__EE6023276(__NN(__EE6023276.A_V_M_Value_Date_)),1, -__T(__EE6023276.A_V_M_Value_Date_),__T(____grp___Prop_),__T(A_V_M_Automated_Valuation_),__T(A_V_M_Confidence_Score_)));
+  SHARED __ST6011113_Layout := RECORD
     KEL.typ.ntyp(E_Property().Typ) ____grp___Prop_;
     KEL.typ.nint A_V_M_Automated_Valuation_;
     KEL.typ.nkdate A_V_M_Value_Date_;
@@ -776,8 +779,8 @@ EXPORT B_Input_P_I_I_3(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG
     KEL.typ.epoch Vault_Date_Last_Seen_ := 0;
     KEL.typ.int __RecordCount := 0;
   END;
-  SHARED __EE5684038 := PROJECT(__EE5684016,__ST5671852_Layout);
-  SHARED __ST5671876_Layout := RECORD
+  SHARED __EE6023302 := PROJECT(__EE6023280,__ST6011113_Layout);
+  SHARED __ST6011137_Layout := RECORD
     KEL.typ.nuid UID;
     KEL.typ.ntyp(E_Person().Typ) Subject_;
     KEL.typ.nstr P___Inp_Acct_;
@@ -873,6 +876,7 @@ EXPORT B_Input_P_I_I_3(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG
     KEL.typ.nstr Input_Pre_Direction_Clean_Value_;
     KEL.typ.nstr Input_Primary_Name_Clean_Value_;
     KEL.typ.nstr Input_Primary_Range_Clean_Value_;
+    KEL.typ.nstr Input_S_S_N_Clean_Value_;
     KEL.typ.nstr Input_Secondary_Range_Clean_Value_;
     KEL.typ.nstr Input_State_Clean_Value_;
     KEL.typ.nstr Input_Street_Clean_Value_;
@@ -886,10 +890,10 @@ EXPORT B_Input_P_I_I_3(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG
     KEL.typ.str P___Inp_Addr_Zip_Flag_Value_ := '';
     KEL.typ.nstr P___Inp_Cln_Addr_St_Flag_Value_;
     KEL.typ.str P___Inp_Val_Name_Bogus_Flag_ := '';
-    KEL.typ.ndataset(__ST5669253_Layout) Address_Inquiry_;
-    KEL.typ.ndataset(__ST5669961_Layout) Property_;
-    KEL.typ.ndataset(__ST5671195_Layout) Property__1_;
-    KEL.typ.ndataset(__ST5671852_Layout) Exp1_;
+    KEL.typ.ndataset(__ST6008508_Layout) Address_Inquiry_;
+    KEL.typ.ndataset(__ST6009218_Layout) Property_;
+    KEL.typ.ndataset(__ST6010454_Layout) Property__1_;
+    KEL.typ.ndataset(__ST6011113_Layout) Exp1_;
     KEL.typ.epoch Archive___Date_ := 0;
     KEL.typ.epoch Date_First_Seen_ := 0;
     KEL.typ.epoch Date_Last_Seen_ := 0;
@@ -897,13 +901,13 @@ EXPORT B_Input_P_I_I_3(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG
     KEL.typ.epoch Vault_Date_Last_Seen_ := 0;
     KEL.typ.int __RecordCount := 0;
   END;
-  __JC5684047(__ST5671315_Layout __EE5683835, __ST5671852_Layout __EE5684038) := __EEQP(__EE5683835.Prop_,__EE5684038.____grp___Prop_);
-  __ST5671876_Layout __Join__ST5671876_Layout(__ST5671315_Layout __r, DATASET(__ST5671852_Layout) __recs) := TRANSFORM
+  __JC6023311(__ST6010574_Layout __EE6023099, __ST6011113_Layout __EE6023302) := __EEQP(__EE6023099.Prop_,__EE6023302.____grp___Prop_);
+  __ST6011137_Layout __Join__ST6011137_Layout(__ST6010574_Layout __r, DATASET(__ST6011113_Layout) __recs) := TRANSFORM
     SELF := __r;
     SELF.Exp1_ := __CN(__recs);
   END;
-  SHARED __EE5684292 := DENORMALIZE(DISTRIBUTE(__EE5683835,HASH(Prop_)),DISTRIBUTE(__EE5684038,HASH(____grp___Prop_)),__JC5684047(LEFT,RIGHT),GROUP,__Join__ST5671876_Layout(LEFT,ROWS(RIGHT)),LOCAL,SMART);
-  SHARED __ST939378_Layout := RECORD
+  SHARED __EE6023557 := DENORMALIZE(DISTRIBUTE(__EE6023099,HASH(Prop_)),DISTRIBUTE(__EE6023302,HASH(____grp___Prop_)),__JC6023311(LEFT,RIGHT),GROUP,__Join__ST6011137_Layout(LEFT,ROWS(RIGHT)),LOCAL,SMART);
+  SHARED __ST1010551_Layout := RECORD
     KEL.typ.nuid UID;
     KEL.typ.ntyp(E_Person().Typ) Subject_;
     KEL.typ.nstr P___Inp_Acct_;
@@ -999,6 +1003,7 @@ EXPORT B_Input_P_I_I_3(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG
     KEL.typ.nstr Input_Pre_Direction_Clean_Value_;
     KEL.typ.nstr Input_Primary_Name_Clean_Value_;
     KEL.typ.nstr Input_Primary_Range_Clean_Value_;
+    KEL.typ.nstr Input_S_S_N_Clean_Value_;
     KEL.typ.nstr Input_Secondary_Range_Clean_Value_;
     KEL.typ.nstr Input_State_Clean_Value_;
     KEL.typ.nstr Input_Street_Clean_Value_;
@@ -1012,10 +1017,10 @@ EXPORT B_Input_P_I_I_3(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG
     KEL.typ.str P___Inp_Addr_Zip_Flag_Value_ := '';
     KEL.typ.nstr P___Inp_Cln_Addr_St_Flag_Value_;
     KEL.typ.str P___Inp_Val_Name_Bogus_Flag_ := '';
-    KEL.typ.ndataset(__ST5669253_Layout) Address_Inquiry_;
-    KEL.typ.ndataset(__ST5669961_Layout) Property_;
-    KEL.typ.ndataset(__ST5671195_Layout) Property__1_;
-    KEL.typ.ndataset(__ST5671852_Layout) Exp1_;
+    KEL.typ.ndataset(__ST6008508_Layout) Address_Inquiry_;
+    KEL.typ.ndataset(__ST6009218_Layout) Property_;
+    KEL.typ.ndataset(__ST6010454_Layout) Property__1_;
+    KEL.typ.ndataset(__ST6011113_Layout) Exp1_;
     KEL.typ.bool Address_ := FALSE;
     KEL.typ.epoch Archive___Date_ := 0;
     KEL.typ.epoch Date_First_Seen_ := 0;
@@ -1024,13 +1029,13 @@ EXPORT B_Input_P_I_I_3(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG
     KEL.typ.epoch Vault_Date_Last_Seen_ := 0;
     KEL.typ.int __RecordCount := 0;
   END;
-  SHARED __EE5682182 := __ENH_Address_4;
-  SHARED __EE5682190 := __EE5682182.Data_Sources_;
-  SHARED __EE5682341 := __EE5682182(EXISTS(__T(__EE5682190)));
-  __JC5684301(__ST5671876_Layout __EE5684292, B_Address_5(__in,__cfg).__ST237629_Layout __EE5682341) := __EEQP(__EE5684292.Location_,__EE5682341.UID);
-  __JF5684301(B_Address_5(__in,__cfg).__ST237629_Layout __EE5682341) := __NN(__EE5682341.UID);
-  SHARED __EE5684547 := JOIN(__EE5684292,__EE5682341,__JC5684301(LEFT,RIGHT),TRANSFORM(__ST939378_Layout,SELF:=LEFT,SELF.Address_:=__JF5684301(RIGHT)),HASH,LEFT OUTER,KEEP(1));
-  EXPORT __ST74817_Layout := RECORD
+  SHARED __EE6021443 := __ENH_Address_4;
+  SHARED __EE6021451 := __EE6021443.Data_Sources_;
+  SHARED __EE6021602 := __EE6021443(EXISTS(__T(__EE6021451)));
+  __JC6023566(__ST6011137_Layout __EE6023557, B_Address_5(__cfg).__ST244577_Layout __EE6021602) := __EEQP(__EE6023557.Location_,__EE6021602.UID);
+  __JF6023566(B_Address_5(__cfg).__ST244577_Layout __EE6021602) := __NN(__EE6021602.UID);
+  SHARED __EE6023813 := JOIN(__EE6023557,__EE6021602,__JC6023566(LEFT,RIGHT),TRANSFORM(__ST1010551_Layout,SELF:=LEFT,SELF.Address_:=__JF6023566(RIGHT)),HASH,LEFT OUTER,KEEP(1));
+  EXPORT __ST78009_Layout := RECORD
     KEL.typ.nstr Transaction_I_D_;
     KEL.typ.nstr S_S_N_;
     KEL.typ.nint Lex_I_D_;
@@ -1042,7 +1047,7 @@ EXPORT B_Input_P_I_I_3(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG
     KEL.typ.epoch Vault_Date_Last_Seen_ := 0;
     KEL.typ.int __RecordCount := 0;
   END;
-  EXPORT __ST73735_Layout := RECORD
+  EXPORT __ST76927_Layout := RECORD
     KEL.typ.nint A_V_M_Automated_Valuation_;
     KEL.typ.nkdate A_V_M_Value_Date_;
     KEL.typ.nint A_V_M_Confidence_Score_;
@@ -1053,7 +1058,7 @@ EXPORT B_Input_P_I_I_3(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG
     KEL.typ.epoch Vault_Date_Last_Seen_ := 0;
     KEL.typ.int __RecordCount := 0;
   END;
-  EXPORT __ST73786_Layout := RECORD
+  EXPORT __ST76978_Layout := RECORD
     KEL.typ.nint A_V_M_Automated_Valuation_;
     KEL.typ.nkdate A_V_M_Value_Date_;
     KEL.typ.nint A_V_M_Confidence_Score_;
@@ -1064,7 +1069,7 @@ EXPORT B_Input_P_I_I_3(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG
     KEL.typ.epoch Vault_Date_Last_Seen_ := 0;
     KEL.typ.int __RecordCount := 0;
   END;
-  SHARED __ST221282_Layout := RECORD
+  SHARED __ST227592_Layout := RECORD
     KEL.typ.nuid UID;
     KEL.typ.ntyp(E_Person().Typ) Subject_;
     KEL.typ.nstr P___Inp_Acct_;
@@ -1150,10 +1155,10 @@ EXPORT B_Input_P_I_I_3(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG
     KEL.typ.nstr Email_Domain_;
     KEL.typ.nstr Email_Username_;
     KEL.typ.nint G_L_B_Purpose_;
-    KEL.typ.ndataset(__ST74817_Layout) Good_Inquiries_Last_Year_For_Address_;
-    KEL.typ.ndataset(__ST73735_Layout) Input_Address_Property_Set_;
-    KEL.typ.ndataset(__ST73786_Layout) Input_Address_Property_Set1_Y_;
-    KEL.typ.ndataset(__ST5671852_Layout) Input_Address_Property_Set5_Y_;
+    KEL.typ.ndataset(__ST78009_Layout) Good_Inquiries_Last_Year_For_Address_;
+    KEL.typ.ndataset(__ST76927_Layout) Input_Address_Property_Set_;
+    KEL.typ.ndataset(__ST76978_Layout) Input_Address_Property_Set1_Y_;
+    KEL.typ.ndataset(__ST6011113_Layout) Input_Address_Property_Set5_Y_;
     KEL.typ.nstr Input_Address_Suffix_Clean_Value_;
     KEL.typ.bool Input_Addronfile_ := FALSE;
     KEL.typ.nstr Input_City_Clean_Value_;
@@ -1193,50 +1198,49 @@ EXPORT B_Input_P_I_I_3(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG
     KEL.typ.epoch Vault_Date_Last_Seen_ := 0;
     KEL.typ.int __RecordCount := 0;
   END;
-  SHARED __ST221282_Layout __ND5684564__Project(__ST939378_Layout __PP5684560) := TRANSFORM
+  SHARED __ST227592_Layout __ND6023830__Project(__ST1010551_Layout __PP6023826) := TRANSFORM
     SELF.D_P_P_A_Purpose_ := FN_Compile(__cfg).FN_G_E_T___S_T_O_R_E_D___D_P_P_A_P_U_R_P_O_S_E(__ECAST(KEL.typ.nstr,__CN('DummyValue')));
-    SELF.Email_Domain_ := __FN1(KEL.Routines.ToUpperCase,__FN3(KEL.Routines.SubStr2,__PP5684560.P___Inp_Email_,__OP2(__PP5684560.At_Position_,+,__CN(1)),__FN1(LENGTH,__PP5684560.P___Inp_Email_)));
-    SELF.Email_Username_ := __FN1(KEL.Routines.ToUpperCase,__FN3(KEL.Routines.SubStr2,__FN1(TRIM,__PP5684560.P___Inp_Email_),__CN(1),__OP2(__PP5684560.At_Position_,-,__CN(1))));
+    SELF.Email_Domain_ := __FN1(KEL.Routines.ToUpperCase,__FN3(KEL.Routines.SubStr2,__PP6023826.P___Inp_Email_,__OP2(__PP6023826.At_Position_,+,__CN(1)),__FN1(LENGTH,__PP6023826.P___Inp_Email_)));
+    SELF.Email_Username_ := __FN1(KEL.Routines.ToUpperCase,__FN3(KEL.Routines.SubStr2,__FN1(TRIM,__PP6023826.P___Inp_Email_),__CN(1),__OP2(__PP6023826.At_Position_,-,__CN(1))));
     SELF.G_L_B_Purpose_ := FN_Compile(__cfg).FN_G_E_T___S_T_O_R_E_D___G_L_B_P_U_R_P_O_S_E(__ECAST(KEL.typ.nstr,__CN('DummyValue')));
-    __EE5684550 := __PP5684560.Address_Inquiry_;
-    __ST74817_Layout __ND5684894__Project(__ST5669253_Layout __PP5684890) := TRANSFORM
-      SELF.Transaction_I_D_ := __PP5684890.Transaction_I_D__1_;
-      __EE5684918 := __PP5684890.Person_Info_;
-      __BS5684907 := __T(__EE5684918);
-      __EE5684922 := __BN(TOPN(__BS5684907(__NN(__T(__EE5684918).S_S_N_)),1, -__T(__T(__EE5684918).S_S_N_),__T(Lex_I_D_),__T(First_Name_),__T(Last_Name_),__T(Date_Of_Birth_),__T(Primary_Range_),__T(Predirectional_),__T(Primary_Name_),__T(Suffix_),__T(Postdirectional_),__T(Z_I_P5_),__T(Secondary_Range_),__T(Appended_S_S_N_),__T(Personal_Phone_Number_),__T(Work_Phone_Number_),__T(Email_Address_),__T(Transaction_I_D_)),__NL(__EE5684918));
-      SELF.S_S_N_ := (__T(__EE5684922))[1].S_S_N_;
-      __EE5684945 := __PP5684890.Person_Info_;
-      __BS5684934 := __T(__EE5684945);
-      __EE5684949 := __BN(TOPN(__BS5684934(__NN(__T(__EE5684945).Lex_I_D_)),1, -__T(__T(__EE5684945).Lex_I_D_),__T(First_Name_),__T(Last_Name_),__T(Date_Of_Birth_),__T(Primary_Range_),__T(Predirectional_),__T(Primary_Name_),__T(Suffix_),__T(Postdirectional_),__T(Z_I_P5_),__T(Secondary_Range_),__T(S_S_N_),__T(Appended_S_S_N_),__T(Personal_Phone_Number_),__T(Work_Phone_Number_),__T(Email_Address_),__T(Transaction_I_D_)),__NL(__EE5684945));
-      SELF.Lex_I_D_ := (__T(__EE5684949))[1].Lex_I_D_;
-      __EE5684972 := __PP5684890.Person_Info_;
-      __BS5684961 := __T(__EE5684972);
-      __EE5684976 := __BN(TOPN(__BS5684961(__NN(__T(__EE5684972).Last_Name_)),1, -__T(__T(__EE5684972).Last_Name_),__T(Lex_I_D_),__T(First_Name_),__T(Date_Of_Birth_),__T(Primary_Range_),__T(Predirectional_),__T(Primary_Name_),__T(Suffix_),__T(Postdirectional_),__T(Z_I_P5_),__T(Secondary_Range_),__T(S_S_N_),__T(Appended_S_S_N_),__T(Personal_Phone_Number_),__T(Work_Phone_Number_),__T(Email_Address_),__T(Transaction_I_D_)),__NL(__EE5684972));
-      SELF.Last_Name_ := (__T(__EE5684976))[1].Last_Name_;
-      SELF := __PP5684890;
+    __EE6023816 := __PP6023826.Address_Inquiry_;
+    __ST78009_Layout __ND6024160__Project(__ST6008508_Layout __PP6024156) := TRANSFORM
+      SELF.Transaction_I_D_ := __PP6024156.Transaction_I_D__1_;
+      __EE6024184 := __PP6024156.Person_Info_;
+      __BS6024173 := __T(__EE6024184);
+      __EE6024188 := __BN(TOPN(__BS6024173(__NN(__T(__EE6024184).S_S_N_)),1, -__T(__T(__EE6024184).S_S_N_),__T(Lex_I_D_),__T(First_Name_),__T(Last_Name_),__T(Date_Of_Birth_),__T(Primary_Range_),__T(Predirectional_),__T(Primary_Name_),__T(Suffix_),__T(Postdirectional_),__T(Z_I_P5_),__T(Secondary_Range_),__T(Appended_S_S_N_),__T(Personal_Phone_Number_),__T(Work_Phone_Number_),__T(Email_Address_),__T(Transaction_I_D_)),__NL(__EE6024184));
+      SELF.S_S_N_ := (__T(__EE6024188))[1].S_S_N_;
+      __EE6024211 := __PP6024156.Person_Info_;
+      __BS6024200 := __T(__EE6024211);
+      __EE6024215 := __BN(TOPN(__BS6024200(__NN(__T(__EE6024211).Lex_I_D_)),1, -__T(__T(__EE6024211).Lex_I_D_),__T(First_Name_),__T(Last_Name_),__T(Date_Of_Birth_),__T(Primary_Range_),__T(Predirectional_),__T(Primary_Name_),__T(Suffix_),__T(Postdirectional_),__T(Z_I_P5_),__T(Secondary_Range_),__T(S_S_N_),__T(Appended_S_S_N_),__T(Personal_Phone_Number_),__T(Work_Phone_Number_),__T(Email_Address_),__T(Transaction_I_D_)),__NL(__EE6024211));
+      SELF.Lex_I_D_ := (__T(__EE6024215))[1].Lex_I_D_;
+      __EE6024238 := __PP6024156.Person_Info_;
+      __BS6024227 := __T(__EE6024238);
+      __EE6024242 := __BN(TOPN(__BS6024227(__NN(__T(__EE6024238).Last_Name_)),1, -__T(__T(__EE6024238).Last_Name_),__T(Lex_I_D_),__T(First_Name_),__T(Date_Of_Birth_),__T(Primary_Range_),__T(Predirectional_),__T(Primary_Name_),__T(Suffix_),__T(Postdirectional_),__T(Z_I_P5_),__T(Secondary_Range_),__T(S_S_N_),__T(Appended_S_S_N_),__T(Personal_Phone_Number_),__T(Work_Phone_Number_),__T(Email_Address_),__T(Transaction_I_D_)),__NL(__EE6024238));
+      SELF.Last_Name_ := (__T(__EE6024242))[1].Last_Name_;
+      SELF := __PP6024156;
     END;
-    SELF.Good_Inquiries_Last_Year_For_Address_ := __BN(PROJECT(TABLE(PROJECT(__T(__EE5684550),__ND5684894__Project(LEFT))(__NN(Transaction_I_D_) OR __NN(S_S_N_) OR __NN(Lex_I_D_) OR __NN(Last_Name_)),{KEL.typ.int __RecordCount := SUM(GROUP,__RecordCount),KEL.typ.timestamp Archive___Date_ := KEL.era.SimpleRollTimestamp(GROUP,Archive___Date_,MIN,FALSE),KEL.typ.timestamp Date_First_Seen_ := KEL.era.SimpleRollTimestamp(GROUP,Date_First_Seen_,MIN,FALSE),KEL.typ.timestamp Date_Last_Seen_ := KEL.era.SimpleRollTimestamp(GROUP,Date_Last_Seen_,MAX,FALSE),KEL.typ.timestamp Hybrid_Archive_Date_ := KEL.era.SimpleRollTimestamp(GROUP,Hybrid_Archive_Date_,MIN,FALSE),KEL.typ.epoch Vault_Date_Last_Seen_ := KEL.era.SimpleRoll(GROUP,Vault_Date_Last_Seen_,MAX,NMAX),Transaction_I_D_,S_S_N_,Lex_I_D_,Last_Name_},Transaction_I_D_,S_S_N_,Lex_I_D_,Last_Name_,MERGE),__ST74817_Layout),__NL(__EE5684550));
-    __EE5684553 := __PP5684560.Property_;
-    __EE5685017 := PROJECT(TABLE(PROJECT(__T(__EE5684553),__ST73735_Layout),{KEL.typ.int __RecordCount := SUM(GROUP,__RecordCount),KEL.typ.epoch Archive___Date_ := KEL.era.SimpleRoll(GROUP,Archive___Date_,MIN,FALSE),KEL.typ.epoch Date_First_Seen_ := KEL.era.SimpleRoll(GROUP,Date_First_Seen_,MIN,FALSE),KEL.typ.epoch Date_Last_Seen_ := KEL.era.SimpleRoll(GROUP,Date_Last_Seen_,MAX,FALSE),KEL.typ.epoch Hybrid_Archive_Date_ := KEL.era.SimpleRoll(GROUP,Hybrid_Archive_Date_,MIN,FALSE),KEL.typ.epoch Vault_Date_Last_Seen_ := KEL.era.SimpleRoll(GROUP,Vault_Date_Last_Seen_,MAX,NMAX),A_V_M_Automated_Valuation_,A_V_M_Value_Date_,A_V_M_Confidence_Score_},A_V_M_Automated_Valuation_,A_V_M_Value_Date_,A_V_M_Confidence_Score_,MERGE),__ST73735_Layout);
-    __EE5685021 := TOPN(__EE5685017(__NN(__EE5685017.A_V_M_Value_Date_)),1, -__T(__EE5685017.A_V_M_Value_Date_),__T(A_V_M_Automated_Valuation_),__T(A_V_M_Confidence_Score_));
-    SELF.Input_Address_Property_Set_ := __CN(__EE5685021(__NN(A_V_M_Automated_Valuation_) OR __NN(A_V_M_Value_Date_) OR __NN(A_V_M_Confidence_Score_)));
-    __EE5684556 := __PP5684560.Property__1_;
-    __EE5685054 := PROJECT(TABLE(PROJECT(__T(__EE5684556),__ST73786_Layout),{KEL.typ.int __RecordCount := SUM(GROUP,__RecordCount),KEL.typ.epoch Archive___Date_ := KEL.era.SimpleRoll(GROUP,Archive___Date_,MIN,FALSE),KEL.typ.epoch Date_First_Seen_ := KEL.era.SimpleRoll(GROUP,Date_First_Seen_,MIN,FALSE),KEL.typ.epoch Date_Last_Seen_ := KEL.era.SimpleRoll(GROUP,Date_Last_Seen_,MAX,FALSE),KEL.typ.epoch Hybrid_Archive_Date_ := KEL.era.SimpleRoll(GROUP,Hybrid_Archive_Date_,MIN,FALSE),KEL.typ.epoch Vault_Date_Last_Seen_ := KEL.era.SimpleRoll(GROUP,Vault_Date_Last_Seen_,MAX,NMAX),A_V_M_Automated_Valuation_,A_V_M_Value_Date_,A_V_M_Confidence_Score_},A_V_M_Automated_Valuation_,A_V_M_Value_Date_,A_V_M_Confidence_Score_,MERGE),__ST73786_Layout);
-    __EE5685058 := TOPN(__EE5685054(__NN(__EE5685054.A_V_M_Value_Date_)),1, -__T(__EE5685054.A_V_M_Value_Date_),__T(A_V_M_Automated_Valuation_),__T(A_V_M_Confidence_Score_));
-    SELF.Input_Address_Property_Set1_Y_ := __CN(__EE5685058(__NN(A_V_M_Automated_Valuation_) OR __NN(A_V_M_Value_Date_) OR __NN(A_V_M_Confidence_Score_)));
-    __EE5684559 := __PP5684560.Exp1_;
-    SELF.Input_Address_Property_Set5_Y_ := __EE5684559;
-    SELF.Input_Addronfile_ := __PP5684560.Address_;
-    __CC13311 := '-99999';
-    __CC13316 := '-99998';
-    SELF.Input_Email_Clean_Value_ := FN_Compile(__cfg).FN_Is_Blank2_Fields(__ECAST(KEL.typ.nstr,__PP5684560.P___Inp_Email_),__ECAST(KEL.typ.nstr,__CN(__CC13311)),__ECAST(KEL.typ.nstr,__PP5684560.P___Inp_Cln_Email_),__ECAST(KEL.typ.nstr,__CN(__CC13316)));
-    SELF.Input_S_S_N_Clean_Value_ := FN_Compile(__cfg).FN_Is_Blank2_Fields(__ECAST(KEL.typ.nstr,__PP5684560.P___Inp_S_S_N_),__ECAST(KEL.typ.nstr,__CN(__CC13311)),__ECAST(KEL.typ.nstr,__PP5684560.P___Inp_Cln_S_S_N_),__ECAST(KEL.typ.nstr,__CN(__CC13316)));
+    SELF.Good_Inquiries_Last_Year_For_Address_ := __BN(PROJECT(TABLE(PROJECT(__T(__EE6023816),__ND6024160__Project(LEFT))(__NN(Transaction_I_D_) OR __NN(S_S_N_) OR __NN(Lex_I_D_) OR __NN(Last_Name_)),{KEL.typ.int __RecordCount := SUM(GROUP,__RecordCount),KEL.typ.timestamp Archive___Date_ := KEL.era.SimpleRollTimestamp(GROUP,Archive___Date_,MIN,FALSE),KEL.typ.timestamp Date_First_Seen_ := KEL.era.SimpleRollTimestamp(GROUP,Date_First_Seen_,MIN,FALSE),KEL.typ.timestamp Date_Last_Seen_ := KEL.era.SimpleRollTimestamp(GROUP,Date_Last_Seen_,MAX,FALSE),KEL.typ.timestamp Hybrid_Archive_Date_ := KEL.era.SimpleRollTimestamp(GROUP,Hybrid_Archive_Date_,MIN,FALSE),KEL.typ.epoch Vault_Date_Last_Seen_ := KEL.era.SimpleRoll(GROUP,Vault_Date_Last_Seen_,MAX,NMAX),Transaction_I_D_,S_S_N_,Lex_I_D_,Last_Name_},Transaction_I_D_,S_S_N_,Lex_I_D_,Last_Name_,MERGE),__ST78009_Layout),__NL(__EE6023816));
+    __EE6023819 := __PP6023826.Property_;
+    __EE6024283 := PROJECT(TABLE(PROJECT(__T(__EE6023819),__ST76927_Layout),{KEL.typ.int __RecordCount := SUM(GROUP,__RecordCount),KEL.typ.epoch Archive___Date_ := KEL.era.SimpleRoll(GROUP,Archive___Date_,MIN,FALSE),KEL.typ.epoch Date_First_Seen_ := KEL.era.SimpleRoll(GROUP,Date_First_Seen_,MIN,FALSE),KEL.typ.epoch Date_Last_Seen_ := KEL.era.SimpleRoll(GROUP,Date_Last_Seen_,MAX,FALSE),KEL.typ.epoch Hybrid_Archive_Date_ := KEL.era.SimpleRoll(GROUP,Hybrid_Archive_Date_,MIN,FALSE),KEL.typ.epoch Vault_Date_Last_Seen_ := KEL.era.SimpleRoll(GROUP,Vault_Date_Last_Seen_,MAX,NMAX),A_V_M_Automated_Valuation_,A_V_M_Value_Date_,A_V_M_Confidence_Score_},A_V_M_Automated_Valuation_,A_V_M_Value_Date_,A_V_M_Confidence_Score_,MERGE),__ST76927_Layout);
+    __EE6024287 := TOPN(__EE6024283(__NN(__EE6024283.A_V_M_Value_Date_)),1, -__T(__EE6024283.A_V_M_Value_Date_),__T(A_V_M_Automated_Valuation_),__T(A_V_M_Confidence_Score_));
+    SELF.Input_Address_Property_Set_ := __CN(__EE6024287(__NN(A_V_M_Automated_Valuation_) OR __NN(A_V_M_Value_Date_) OR __NN(A_V_M_Confidence_Score_)));
+    __EE6023822 := __PP6023826.Property__1_;
+    __EE6024320 := PROJECT(TABLE(PROJECT(__T(__EE6023822),__ST76978_Layout),{KEL.typ.int __RecordCount := SUM(GROUP,__RecordCount),KEL.typ.epoch Archive___Date_ := KEL.era.SimpleRoll(GROUP,Archive___Date_,MIN,FALSE),KEL.typ.epoch Date_First_Seen_ := KEL.era.SimpleRoll(GROUP,Date_First_Seen_,MIN,FALSE),KEL.typ.epoch Date_Last_Seen_ := KEL.era.SimpleRoll(GROUP,Date_Last_Seen_,MAX,FALSE),KEL.typ.epoch Hybrid_Archive_Date_ := KEL.era.SimpleRoll(GROUP,Hybrid_Archive_Date_,MIN,FALSE),KEL.typ.epoch Vault_Date_Last_Seen_ := KEL.era.SimpleRoll(GROUP,Vault_Date_Last_Seen_,MAX,NMAX),A_V_M_Automated_Valuation_,A_V_M_Value_Date_,A_V_M_Confidence_Score_},A_V_M_Automated_Valuation_,A_V_M_Value_Date_,A_V_M_Confidence_Score_,MERGE),__ST76978_Layout);
+    __EE6024324 := TOPN(__EE6024320(__NN(__EE6024320.A_V_M_Value_Date_)),1, -__T(__EE6024320.A_V_M_Value_Date_),__T(A_V_M_Automated_Valuation_),__T(A_V_M_Confidence_Score_));
+    SELF.Input_Address_Property_Set1_Y_ := __CN(__EE6024324(__NN(A_V_M_Automated_Valuation_) OR __NN(A_V_M_Value_Date_) OR __NN(A_V_M_Confidence_Score_)));
+    __EE6023825 := __PP6023826.Exp1_;
+    SELF.Input_Address_Property_Set5_Y_ := __EE6023825;
+    SELF.Input_Addronfile_ := __PP6023826.Address_;
+    __CC14723 := '-99999';
+    __CC14728 := '-99998';
+    SELF.Input_Email_Clean_Value_ := FN_Compile(__cfg).FN_Is_Blank2_Fields(__ECAST(KEL.typ.nstr,__PP6023826.P___Inp_Email_),__ECAST(KEL.typ.nstr,__CN(__CC14723)),__ECAST(KEL.typ.nstr,__PP6023826.P___Inp_Cln_Email_),__ECAST(KEL.typ.nstr,__CN(__CC14728)));
     SELF.Net_Acuity_Gateway_I_P_ := FN_Compile(__cfg).FN_G_E_T___N_E_T_A_C_U_I_T_Y___U_R_L(__ECAST(KEL.typ.nstr,__CN('DummyValue')));
-    SELF.P___Inp_Cln_Addr_Full_Flag_Value_ := FN_Compile(__cfg).FN_Is_Clean_Populated(__ECAST(KEL.typ.nstr,__PP5684560.Input_Full_Address_Clean_Value_),__ECAST(KEL.typ.nstr,__CN(__CC13311)),__ECAST(KEL.typ.nstr,__CN(__CC13316)));
-    SELF := __PP5684560;
+    SELF.P___Inp_Cln_Addr_Full_Flag_Value_ := FN_Compile(__cfg).FN_Is_Clean_Populated(__ECAST(KEL.typ.nstr,__PP6023826.Input_Full_Address_Clean_Value_),__ECAST(KEL.typ.nstr,__CN(__CC14723)),__ECAST(KEL.typ.nstr,__CN(__CC14728)));
+    SELF := __PP6023826;
   END;
-  SHARED __EE5685280 := PROJECT(PROJECT(__EE5684547,__ND5684564__Project(LEFT)),__ST221282_Layout);
-  EXPORT __ST73851_Layout := RECORD
+  SHARED __EE6024539 := PROJECT(PROJECT(__EE6023813,__ND6023830__Project(LEFT)),__ST227592_Layout);
+  EXPORT __ST77043_Layout := RECORD
     KEL.typ.nint A_V_M_Automated_Valuation_;
     KEL.typ.nkdate A_V_M_Value_Date_;
     KEL.typ.nint A_V_M_Confidence_Score_;
@@ -1247,7 +1251,7 @@ EXPORT B_Input_P_I_I_3(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG
     KEL.typ.epoch Vault_Date_Last_Seen_ := 0;
     KEL.typ.int __RecordCount := 0;
   END;
-  EXPORT __ST932617_Layout := RECORD
+  EXPORT __ST1003794_Layout := RECORD
     KEL.typ.nuid UID;
     KEL.typ.ntyp(E_Person().Typ) Subject_;
     KEL.typ.nstr P___Inp_Acct_;
@@ -1333,10 +1337,10 @@ EXPORT B_Input_P_I_I_3(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG
     KEL.typ.nstr Email_Domain_;
     KEL.typ.nstr Email_Username_;
     KEL.typ.nint G_L_B_Purpose_;
-    KEL.typ.ndataset(__ST74817_Layout) Good_Inquiries_Last_Year_For_Address_;
-    KEL.typ.ndataset(__ST73735_Layout) Input_Address_Property_Set_;
-    KEL.typ.ndataset(__ST73786_Layout) Input_Address_Property_Set1_Y_;
-    KEL.typ.ndataset(__ST73851_Layout) Input_Address_Property_Set5_Y_;
+    KEL.typ.ndataset(__ST78009_Layout) Good_Inquiries_Last_Year_For_Address_;
+    KEL.typ.ndataset(__ST76927_Layout) Input_Address_Property_Set_;
+    KEL.typ.ndataset(__ST76978_Layout) Input_Address_Property_Set1_Y_;
+    KEL.typ.ndataset(__ST77043_Layout) Input_Address_Property_Set5_Y_;
     KEL.typ.nstr Input_Address_Suffix_Clean_Value_;
     KEL.typ.bool Input_Addronfile_ := FALSE;
     KEL.typ.nstr Input_City_Clean_Value_;
@@ -1376,10 +1380,10 @@ EXPORT B_Input_P_I_I_3(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG
     KEL.typ.epoch Vault_Date_Last_Seen_ := 0;
     KEL.typ.int __RecordCount := 0;
   END;
-  SHARED __ST932617_Layout __ND5681636__Project(__ST221282_Layout __PP5681632) := TRANSFORM
-    __EE5685283 := __PP5681632.Input_Address_Property_Set5_Y_;
-    SELF.Input_Address_Property_Set5_Y_ := __PROJECT(__EE5685283,__ST73851_Layout);
-    SELF := __PP5681632;
+  SHARED __ST1003794_Layout __ND6020897__Project(__ST227592_Layout __PP6020893) := TRANSFORM
+    __EE6024542 := __PP6020893.Input_Address_Property_Set5_Y_;
+    SELF.Input_Address_Property_Set5_Y_ := __PROJECT(__EE6024542,__ST77043_Layout);
+    SELF := __PP6020893;
   END;
-  EXPORT __ENH_Input_P_I_I_3 := PROJECT(__EE5685280,__ND5681636__Project(LEFT));
+  EXPORT __ENH_Input_P_I_I_3 := PROJECT(__EE6024539,__ND6020897__Project(LEFT));
 END;
