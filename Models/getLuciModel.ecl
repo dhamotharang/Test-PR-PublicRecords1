@@ -4,7 +4,7 @@ EXPORT getLuciModel(models.FraudAdvisor_Constants.FP_model_params FP_mod) := MOD
 
   SHARED get_fib12010_0_model(DATASET(models.layouts.bs_with_ip) clam_ip,
                               DATASET(Models.Layout_FraudAttributes) FDattributes,
-                              DATASET(Risk_Indicators.layouts.layout_IDAFraud_out) IDAattributes
+                              DATASET(Risk_Indicators.layouts.layout_IDA_out) IDAattributes
                              ) := FUNCTION
     
     //Step1: Join the inputs together and transform them into the model validation layout
