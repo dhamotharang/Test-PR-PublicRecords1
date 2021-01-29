@@ -10,7 +10,6 @@ EXPORT fn_cgm_phoneownership (
 	//Key Files
 
 	phone_transactions_key := DISTRIBUTED(AccountMonitoring.product_files.PhoneOwnership.key_phones_transaction_dist, HASH64(phone));
-	phone_WDNC_key := DISTRIBUTED(AccountMonitoring.product_files.PhoneOwnership.key_phones_WDNC_dist, HASH64(phone));
 	phone_type_key := DISTRIBUTED(AccountMonitoring.product_files.Phone.key_phones_type_dist, HASH64(phone));
 	phone_lerg6_key := DISTRIBUTED(AccountMonitoring.product_files.Phone.key_Phones_Lerg6_dist, HASH64(npa,nxx,block_id));
 	phone_carrier_reference_key := DISTRIBUTED(AccountMonitoring.product_files.Phone.key_carrier_reference_dist, HASH64(ocn));
