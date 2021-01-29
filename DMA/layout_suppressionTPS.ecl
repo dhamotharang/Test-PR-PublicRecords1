@@ -11,5 +11,11 @@ module
 	record
 		string10	PhoneNumber;		
 	end;
-	
+	export Delta := 
+    record
+        string10	PhoneNumber;
+        UNSIGNED4 dt_effective_first;
+        UNSIGNED4 dt_effective_last;
+        UNSIGNED1 delta_ind; 
+    end;
 end;
