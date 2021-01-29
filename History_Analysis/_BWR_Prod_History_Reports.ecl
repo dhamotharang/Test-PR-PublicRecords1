@@ -1,6 +1,6 @@
 import wk_ut, History_Analysis;
 
-beforemidnight := cron('30 15 * * *'); // expressed in cordinated universal time (UTC)
+beforemidnight := cron('0 15 * * *'); // expressed in cordinated universal time (UTC)
 
 ecl_as_string:= 'import History_Analysis;\nHistory_Analysis._BWR_Create_Reports;';
 wk_ut.CreateWuid(ecl_as_string,
