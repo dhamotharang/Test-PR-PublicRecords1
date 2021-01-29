@@ -175,8 +175,7 @@ export FraudAdvisor_Service := MACRO
         '_GCID',
         '_CompanyID',
         '_LoginID',
-				'UseIngestDate',
-        'IDA_gateway_mode'
+        'UseIngestDate'
 
 	));
 
@@ -290,12 +289,6 @@ boolean SuppressCompromisedDLs := false : stored('SuppressCompromisedDLs');
 // Set to TRUE when running RiskProcessing scripts to include some intermediate boca shell outputs for modelers
 boolean IncludeQAOutputs := FALSE : stored('IncludeQAOutputs'); 
 boolean UseIngestDate    := FALSE : stored('UseIngestDate'); 
-
-//IDA gateway modes 
-// 0 = production mode
-// 1 = UAT mode
-// 2 = Retro mode
-unsigned1 IDA_gateway_mode := 0 : stored('IDA_gateway_mode');
 
 Boolean TrackInsuranceRoyalties := Risk_Indicators.iid_constants.InsuranceDL_ok(DataPermission);
 
@@ -933,7 +926,7 @@ attributeOut := Models.FP_models.custom_field_replacement(attributeOut_temp, Val
 
 
 //Make sure we are passing in the input PII not the cleaned PII to IDA
-IDA_input := PROJECT(iid, Transform(Risk_Indicators.layouts.layout_IDAFraud_in,
+IDA_input := PROJECT(iid, Transform(Risk_Indicators.layouts.layout_IDA_in,
                       SELF.seq := left.seq;
                       SELF.DID := left.did;
                       SELF.fname := first_value;
@@ -956,15 +949,8 @@ IDA_input := PROJECT(iid, Transform(Risk_Indicators.layouts.layout_IDAFraud_in,
                       SELF.historydate := IF(historyDateTimeStamp <> '', (UNSIGNED)historyDateTimeStamp[1..6], history_date);
                       SELF.historyDateTimeStamp := risk_indicators.iid_constants.mygetdateTimeStamp(historydateTimeStamp, history_date);
                       
-                      SELF.Client := Map(IDA_gateway_mode = 2 => Trim('ACC1357055'),
-                                         IDA_gateway_mode = 1 => Trim('ACC1357055'),
-                                         IDA_gateway_mode = 0 => Trim('ACC'+CompanyID),
-                                                                 '' //shouldn't happen
-                                        );
-                      SELF.Solution := Trim('Standard/MultiProduct'); 
-                      SELF.ProductName := ''; //Populated per model
-                      SELF.ProductID := ''; //Populated per model
                       SELF.App_ID := Trim(OtherApplicationIdentifier3);
+                      SELF.CompanyID := CompanyID;
                       SELF.ESPTransactionId := TransactionID;
                       SELF.Channel := Channel;
                       SELF := [];
@@ -977,7 +963,7 @@ IDA_attributes_raw := Risk_Indicators.Prep_IDA_Fraud(ungroup(IDA_input), gateway
   
 IDA_attributes := IF(Models.FP_models.Model_Check(Valid_requested_models, Models.FraudAdvisor_Constants.IDA_models_set), 
                      IDA_attributes_raw,
-                     DATASET([],Risk_Indicators.layouts.layout_IDAFraud_out)
+                     DATASET([],Risk_Indicators.layouts.layout_IDA_out)
                      );
 
 
@@ -995,7 +981,7 @@ FPMod_params := MODULE(models.FraudAdvisor_Constants.FP_model_params)
   EXPORT DATASET(riskwise.Layout_SkipTrace) _skiptrace := skiptrace;
   EXPORT DATASET(easi.layout_census) _easicensus := easi_census;
   EXPORT DATASET(Models.Layout_FraudAttributes) _FDattributes := attributes;
-  EXPORT DATASET(Risk_Indicators.layouts.layout_IDAFraud_out) IDAattributes := IDA_attributes;
+  EXPORT DATASET(Risk_Indicators.layouts.layout_IDA_out) IDAattributes := IDA_attributes;
 END;
 
 All_models := PROJECT(Valid_requested_models, transform(Models.layouts.Enhanced_layout_fp1109,
