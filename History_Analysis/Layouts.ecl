@@ -93,62 +93,64 @@ Export Layouts := Module
         String     superkey;
         String1    updateflag;
         Unsigned   numberofdeltas;
-        Real       Min;
-        Real       Q1;
-        Real       Median;
-        Real       Q3;
-        Real       Max;
-        Real       Mean;
-        Real       Variance;
-        Real       StDev;
-        Real       Plus2StDev;
-        Real       Minus2StDev;
-        Unsigned   NumLessThanQ1;
-        Unsigned   BtwnQ1AndQ3;
-        Unsigned   NumMoreThanQ3;
+        Real       Min_FilesizeReal;//Min
+        Real       Q1_FilesizeReal;//Q1
+        Real       Median_FilesizeReal;//Median
+        Real       Q3_FilesizeReal;//Q3
+        Real       Max_FilesizeReal;//Max
+        Real       Mean_FilesizeReal;//Mean
+        Real       Variance_FilesizeReal;//Variance
+        Real       StDev_FilesizeReal;//StDev
+        Real       Plus2StDev_FilesizeReal;//Plus2StDev
+        Real       Minus2StDev_FilesizeReal;//Minus2StDev
+        Unsigned   NumLessThanQ1_FilesizeReal;//NumLessThanQ1
+        Unsigned   BtwnQ1AndQ3_FilesizeReal;//BtwnQ1AndQ3
+        Unsigned   NumMoreThanQ3_FilesizeReal;//NumMoreThanQ3
         // percent 
-        Real       Min_1;   
-        Real       Q1_2;
-        Real       Median_3;
-        Real       Q3_4;
-        Real       Max_5;
-        Real       Mean_6;
-        Real       Variance_7;
-        Real       StDev_8;
-        Real       Plus2StDev_9;
-        Real       Minus2StDev_10;
-        Unsigned   NumLessThanQ1_11;
-        Unsigned   BtwnQ1AndQ3_12;
-        Unsigned   NumMoreThanQ3_12;
-        // Record Count Calculatins
+        Real       Min_FilesizePercent;//Min_1
+        Real       Q1_FilesizePercent;//Q1_2
+        Real       Median_FilesizePercent;//Median_3
+        Real       Q3_FilesizePercent;//Q3_4
+        Real       Max_FilesizePercent;//Max_5
+        Real       Mean_FilesizePercent;//Mean_6
+        Real       Variance_FilesizePercent;//Variance_7
+        Real       StDev_FilesizePercent;//StDev_8
+        Real       Plus2StDev_FilesizePercent;//Plus2StDev_9
+        Real       Minus2StDev_FilesizePercent;//Minus2StDev_10
+        Unsigned   NumLessThanQ1_FilesizePercent;//NumLessThanQ1_11
+        Unsigned   BtwnQ1AndQ3_FilesizePercent;//BtwnQ1AndQ3_12
+        Unsigned   NumMoreThanQ3_FilesizePercent;//NumMoreThanQ3_12
+        // Record Count Calculations
         // Real
-        Real       Min_14;   
-        Real       Q1_15;
-        Real       Median_16;
-        Real       Q3_17;
-        Real       Max_18;
-        Real       Mean_19;
-        Real       Variance_20;
-        Real       StDev_21;
-        Real       Plus2StDev_22;
-        Real       Minus2StDev_23;
-        Unsigned   NumLessThanQ1_24;
-        Unsigned   BtwnQ1AndQ3_25;
-        Unsigned   NumMoreThanQ3_26;
+        Real       Min_RecordCountReal;//Min_14
+        Real       Q1_RecordCountReal;//Q1_15
+        Real       Median_RecordCountReal;//Median_16
+        Real       Q3_RecordCountReal;//Q3_17
+        Real       Max_RecordCountReal;//Max_18
+        Real       Mean_RecordCountReal;//Mean_19
+        Real       Variance_RecordCountReal;//Variance_20
+        Real       StDev_RecordCountReal;//StDev_21
+        Real       Plus2StDev_RecordCountReal;//Plus2StDev_22
+        Real       Minus2StDev_RecordCountReal;//Minus2StDev_23
+        Unsigned   NumLessThanQ1_RecordCountReal;//NumLessThanQ1_24
+        Unsigned   BtwnQ1AndQ3_RecordCountReal;//BtwnQ1AndQ3_25
+        Unsigned   NumMoreThanQ3_RecordCountReal;//NumMoreThanQ3_26
         // Percent
-        Real       Min_27;   
-        Real       Q1_28;
-        Real       Median_29;
-        Real       Q3_30;
-        Real       Max_31;
-        Real       Mean_32;
-        Real       Variance_33;
-        Real       StDev_34;
-        Real       Plus2StDev_35;
-        Real       Minus2StDev_36;
-        Unsigned   NumLessThanQ1_37;
-        Unsigned   BtwnQ1AndQ3_38;
-        Unsigned   NumMoreThanQ3_39;
+        Real       Min_RecordCountPercent;//Min_27
+        Real       Q1_RecordCountPercent;//Q1_28
+        Real       Median_RecordCountPercent;//Median_29
+        Real       Q3_RecordCountPercent;//Q3_30
+        Real       Max_RecordCountPercent;//Max_31
+        Real       Mean_RecordCountPercent;//Mean_32
+        Real       Variance_RecordCountPercent;/Variance_33
+        Real       StDev_RecordCountPercent;//StDev_34
+        Real       Plus2StDev_RecordCountPercent;//Plus2StDev_35
+        Real       Minus2StDev_RecordCountPercent;//Minus2StDev_36
+        Real       MinThreshold;//New
+        Real       MaxThreshold;//New
+        Unsigned   NumLessThanMinThreshold;//NumLessThanQ1_37
+        Unsigned   BtwnMinThresholdAndMaxThreshold;//BtwnQ1AndQ3_38
+        Unsigned   NumMoreThanMaxThreshold;//NumMoreThanQ3_39
     End;
 
 End;
