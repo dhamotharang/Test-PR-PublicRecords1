@@ -1,5 +1,6 @@
 
 EXPORT layout_business_registration_records := RECORD
+  UNSIGNED1 level;
   UNSIGNED6 bdid;
   // UNSIGNED6 br_id; //Linking field to contact records
   // STRING8 dt_first_seen;
