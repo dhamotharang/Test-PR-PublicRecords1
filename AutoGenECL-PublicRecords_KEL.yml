@@ -1,0 +1,75 @@
+AutoGenECL-PublicRecords_KEL:
+  stage: build
+  script:
+    # Set up the location of the PublicRecords GIT Repository
+    - Repo="PublicRecords"
+    - Group="risk-engineering"
+    - URL="https://$ServiceAcctTokenUsername:$ServiceAcctTokenKey@gitlab.ins.risk.regn.net/$Group/$Repo.git"
+    - git --version
+    - date +"%A, %b %d, %Y %H:%M:%S"
+    # Clone the PublicRecords GIT Repository to a folder called PublicRecords
+    - echo "Intializing Vault $SourceBranch"
+    - git clone --single-branch --branch $SourceBranch $URL
+    - git remote rm origin
+    - git remote add origin $URL
+    - date +"%A, %b %d, %Y %H:%M:%S"
+    # Clone the KnowledgeUniverse Git Submodule to a folder called PublicRecords/KnowledgeUniverse
+    - echo "Initializing KnowledgeUniverse $KUSourceBranch"
+    - KURepo="KnowledgeUniverse"
+    - KUURL="https://$ServiceAcctTokenUsername:$ServiceAcctTokenKey@gitlab.ins.risk.regn.net/$Group/$KURepo.git"
+    - git submodule update --init
+    - cd KnowledgeUniverse
+    - git fetch
+    - git checkout $KUSourceBranch
+    - cd ../..
+    - date +"%A, %b %d, %Y %H:%M:%S"
+    # Download the KEL Compiler .jar file
+    - echo "Downloading KEL Compiler $CompilerVersion"
+    - CompilerURL="https://gitlab.ins.risk.regn.net/risk-engineering/Vault/wikis/Downloads/KEL$CompilerVersion.jar"
+    - wget $CompilerURL
+    - echo "Download Complete"
+    - date +"%A, %b %d, %Y %H:%M:%S"
+    # Run the KEL Compiler .jar file - Compile PublicRecords/PublicRecords_KEL/Compile.kel and output the results to the PublicRecords/PublicRecords_KEL folder as individual .ecl files (--pack dir)
+    - echo "Executing KEL Compiler"
+    - java -Xmx16G -jar ./KEL$CompilerVersion.jar --output ./PublicRecords/PublicRecords_KEL --importdir ./PublicRecords -O modulename:PublicRecords_KEL --pack dir ./PublicRecords/PublicRecords_KEL/Compile.kel
+    - echo "Compile Process Complete"
+    - date +"%A, %b %d, %Y %H:%M:%S"
+    - cd PublicRecords
+    # Patch the resulting ECL code with small hotfixes that haven't yet made their way to the KEL Compiler properly, these should be temporary
+    - echo "Patching Auto Gen Code"
+    - cd PublicRecords_KEL
+    - echo "Nothing to patch"
+    # - echo "Patching Q_Non_F_C_R_A_Business_Sele_I_D_Attributes_V1.ecl"
+    # - sed -i 's+__NNEQ(LEFT.T_M_S_I_D_,RIGHT.UID) AND+ LEFT.T_M_S_I_D_.v=(STRING)RIGHT.UID.v AND+g' Q_Non_F_C_R_A_Business_Sele_I_D_Attributes_V1.ecl
+    - echo "Patching Complete"
+    - date +"%A, %b %d, %Y %H:%M:%S"
+    - cd ..
+    # Create a new GIT Branch that we will commit the KEL Generated ECL to
+    - BranchDate=$(date +"%Y%m%d")
+    - BranchRandom=$(($RANDOM%99999))
+    - BranchDestination=$DestinationBranch
+    - BranchName="PublicRecords_KEL__AGE_$BranchDestination_$BranchDate_$BranchRandom"
+    - date +"%A, %b %d, %Y %H:%M:%S"
+    - echo "Creating a new branch $BranchName"
+    - git checkout -b $BranchName
+    # In order to push changes to GitLab there are some required configuration fields - set them
+    - echo "Setting up Git User Configuration"
+    - git config user.email "$ServiceAcctTokenUsername@lexisnexisrisk.com"
+    - git config user.name "$ServiceAcctTokenUsername"
+    # Commit the KEL Generated ECL changes to the new GIT Branch that we created above
+    - echo "Adding any new files generated to the Commit"
+    - git add PublicRecords_KEL
+    - git commit -m "KEL Generated ECL - KEL Compiler $CompilerVersion"
+    - date +"%A, %b %d, %Y %H:%M:%S"
+    # Push the new GIT Branch back up into GitLab and create a new Merge Request
+    - echo "Pushing to Branch $BranchName and Creating a New Merge Request"
+    - git push -o merge_request.create -o merge_request.target=$DestinationBranch -o merge_request.remove_source_branch -o merge_request.title="PublicRecords_KEL Generated ECL - KEL Compiler $CompilerVersion" -o merge_request.description="Merge Request containing Auto-Gen ECL from the latest PublicRecords_KEL Compile.kel code" origin $BranchName
+    - echo "Script Complete"
+    - date +"%A, %b %d, %Y %H:%M:%S"
+  only:
+    refs:
+      # Only run this Pipeline Job when triggered by a "Pipeline Schedule"
+      - schedules
+    variables:
+      # Only run this Pipeline Job if one of the Pipeline Variables called JobType contains the value specified below
+      - $JobType == "AutoGenECL-PublicRecords_KEL"
