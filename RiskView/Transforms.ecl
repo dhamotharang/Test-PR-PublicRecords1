@@ -4635,7 +4635,31 @@ EXPORT Models.RVG2005_0_1.z_layouts_Input xfm_RVG2005_RVAttrs_and_IDAattrs(riskv
       self := [];
     END;
 
-
+//RVA2008_1 model transform
+EXPORT Models.RVA2008_1_0.z_layouts_Input xfm_RVA2008_RVAttrs(riskview.layouts.attributes_internal_layout_noscore le) := TRANSFORM
+      Self.TransactionID := (String)le.seq;
+      //RV attributes
+      self.SUBJECTDECEASED                          := le.subjectdeceased;
+      self.CONFIRMATIONSUBJECTFOUND                 := le.confirmationsubjectfound;
+      self.CONFIRMATIONINPUTADDRESS                 := le.confirmationinputaddress;
+      self.SOURCECREDHEADERTIMEOLDEST               := le.sourcecredheadertimeoldest;
+      self.ASSETPROPEVERCOUNT                       := le.assetpropevercount;
+      self.DEROGTIMENEWEST                          := le.derogtimenewest;
+      self.CRIMINALFELONYCOUNT                      := le.criminalfelonycount;
+      self.EVICTIONCOUNT                            := le.evictioncount;
+      self.LIENJUDGMENTTAXCOUNT                     := le.lienjudgmenttaxcount;
+      self.INQUIRYAUTO12MONTH                       := le.inquiryauto12month;
+      self.INQUIRYBANKING12MONTH                    := le.inquirybanking12month;
+      self.INQUIRYSHORTTERM12MONTH                  := le.inquiryshortterm12month;
+      self.SSNSUBJECTCOUNT                          := le.ssnsubjectcount;
+      self.SSNDECEASED                              := le.ssndeceased;
+      self.ADDRINPUTMATCHINDEX                      := le.addrinputmatchindex;
+      self.ADDRINPUTSUBJECTOWNED                    := le.addrinputsubjectowned;
+      self.ADDRPREVIOUSTIMEOLDEST                   := le.addrprevioustimeoldest;
+      self.ADDRCHANGECOUNT03MONTH                   := le.addrchangecount03month;
+      
+      self := [];
+    END;
 
 // rv5 attribute transform
 EXPORT iesp.share.t_NameValuePair intoVersion5(riskview.layouts.layout_riskview5_search_results le, INTEGER c) := TRANSFORM
