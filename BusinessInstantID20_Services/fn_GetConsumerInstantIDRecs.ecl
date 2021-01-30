@@ -483,11 +483,6 @@ EXPORT fn_GetConsumerInstantIDRecs( DATASET(BusinessInstantID20_Services.layouts
                     
       END;
 
-  //Add watchlist info to the ID recs since we dont hit the watchlist.
-      // ret := JOIN(InstantIDResults, DenormAuthRepRecs , 
-      //             LastNumFunction(LEFT.seq) = RIGHT.seq,
-      //                   RetJoinTrans(LEFT,RIGHT), GROUPED           
-      //             );
 
          ret := JOIN(InstantIDResults, DenormAuthRepRecs , 
                   LEFT.seq = RIGHT.seq,
@@ -1078,7 +1073,7 @@ EXPORT fn_GetConsumerInstantIDRecs( DATASET(BusinessInstantID20_Services.layouts
       // OUTPUT( InstantID_records_pre, NAMED('InstantID_records_pre') );
       // OUTPUT( InstantID_records_srtd, NAMED('InstantID_records_srtd') );
         // OUTPUT( DenormAuthRepRecs, NAMED('DenormAuthRepRecs') );
-      //  OUTPUT(ret,NAMED('ret'));
+        //OUTPUT(ret,NAMED('ret'));
       //  OUTPUT(ret_temp2,NAMED('ret_temp2'));
       //  OUTPUT(ret_temp,NAMED('ret_temp'));
         // OUTPUT(InstantIDResults,NAMED('InstantIDResults'));

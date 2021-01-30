@@ -1,8 +1,13 @@
 ﻿IMPORT Risk_Indicators, STD;
 
-export cviScore(INTEGER1 p, INTEGER1 s, Risk_Indicators.Layout_Output l, STRING5 inTweak, STRING50 veraddr, STRING20 verlast, 
-							BOOLEAN OFAC=TRUE,
-                            Risk_Indicators.iid_constants.IOverrideOptions OverrideOptions = MODULE(Risk_Indicators.iid_constants.IOverrideOptions)END) := 
+export cviScore(INTEGER1 p, 
+                INTEGER1 s,  
+                Risk_Indicators.Layout_Output l, 
+                STRING5 inTweak, 
+                STRING50 veraddr, 
+                STRING20 verlast, 
+							  BOOLEAN OFAC=TRUE,
+                Risk_Indicators.iid_constants.IOverrideOptions OverrideOptions = MODULE(Risk_Indicators.iid_constants.IOverrideOptions)END) := 
 FUNCTION
 
 BOOLEAN isPOTS := l.isPOTS;
@@ -70,11 +75,10 @@ cvi := __COMMON__(CASE(p,
 	
 	// determine if we need to override to 10
 	override1 := __COMMON__(((	Risk_Indicators.rcSet.isCode02(l.decsflag) OR 
-									Risk_Indicators.rcSet.isCode03(l.socsdobflag) OR 
-									((Risk_Indicators.rcSet.isCode06(l.socsvalflag, l.ssn) OR Risk_Indicators.rcSet.isCodeIS(l.ssn, l.socsvalflag, l.socllowissue, l.socsRCISflag)) AND ~Risk_Indicators.rcSet.isCode29(l.socsmiskeyflag)) OR 
-									(Risk_Indicators.rcSet.isCode08(l.phonetype,l.phone10) AND Risk_Indicators.rcSet.isCode11(l.addrvalflag, l.in_streetAddress, l.in_city, l.in_state, l.in_zipCode) AND ~Risk_Indicators.rcSet.isCode30(l.addrmiskeyflag) AND ~Risk_Indicators.rcSet.isCode31(l.hphonemiskeyflag))) AND
-								cvi>'10') OR 
-								(OFAC and Risk_Indicators.rcSet.isCode32(l.watchlist_table, l.watchlist_record_number )));
+									            Risk_Indicators.rcSet.isCode03(l.socsdobflag) OR 
+									            ((Risk_Indicators.rcSet.isCode06(l.socsvalflag, l.ssn) OR Risk_Indicators.rcSet.isCodeIS(l.ssn, l.socsvalflag, l.socllowissue, l.socsRCISflag)) AND ~Risk_Indicators.rcSet.isCode29(l.socsmiskeyflag)) OR 
+									            (Risk_Indicators.rcSet.isCode08(l.phonetype,l.phone10) AND Risk_Indicators.rcSet.isCode11(l.addrvalflag, l.in_streetAddress, l.in_city, l.in_state, l.in_zipCode) AND ~Risk_Indicators.rcSet.isCode30(l.addrmiskeyflag) AND ~Risk_Indicators.rcSet.isCode31(l.hphonemiskeyflag))) AND	cvi>'10') OR 
+								              (OFAC and Risk_Indicators.rcSet.isCode32(l.watchlist_table, l.watchlist_record_number )));
 	
 				
 	cviAdj2 := __COMMON__(IF(override1,'10',cvi));
