@@ -4,6 +4,11 @@
 	Following Keys being used:
 			LN_PropertyV2.key_assessor_fid
 */
+
+
+//NO LONGER SHARED - business will no longer come through here but this will/should 
+//                   get cleaned when modularity for assets comes up.
+
 EXPORT getSharedProperty(DATASET(DueDiligence.LayoutsInternal.PropertySlimLayout) inProps,
                          BOOLEAN isPerson = FALSE) := FUNCTION
 
