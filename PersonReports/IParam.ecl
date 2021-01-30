@@ -269,6 +269,7 @@ EXPORT IParam := MODULE
     EXPORT boolean include_sources := FALSE;
     EXPORT boolean include_criminalindicators := FALSE;
     EXPORT boolean include_AddressSourceInfo  := FALSE; // Added 9/2019
+    EXPORT boolean IncludePersonRiskIndicatorSection := FALSE;
   END;
 
 
