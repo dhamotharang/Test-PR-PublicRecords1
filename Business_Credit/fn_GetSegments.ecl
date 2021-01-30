@@ -1,4 +1,5 @@
-IMPORT	Business_Credit, MDR, ut,Data_Services;
+﻿IMPORT	Business_Credit, MDR;
+
 EXPORT	fn_GetSegments	:=	MODULE
 
 	//SHARED	dValidRecords	:=	Business_Credit.Files().active;

@@ -88,6 +88,7 @@ IF(RunAll OR RunInvalidSingleValues,OUTPUT(E_Tradeline()._payment__interval__Sin
 IF(RunAll OR RunInvalidSingleValues,OUTPUT(E_Tradeline()._payment__status__category__SingleValue_Invalid,NAMED('E_Tradeline__payment__status__category__SingleValue_Invalid')));
 IF(RunAll OR RunInvalidSingleValues,OUTPUT(E_Tradeline().D_B_T___V5__SingleValue_Invalid,NAMED('E_Tradeline_D_B_T___V5__SingleValue_Invalid')));
 IF(RunAll OR RunInvalidSingleValues,OUTPUT(E_Tradeline()._raw__dbt__v5__SingleValue_Invalid,NAMED('E_Tradeline__raw__dbt__v5__SingleValue_Invalid')));
+IF(RunAll OR RunInvalidSingleValues,OUTPUT(E_Tradeline()._overall__file__format__version__SingleValue_Invalid,NAMED('E_Tradeline__overall__file__format__version__SingleValue_Invalid')));
 IF(RunAll OR RunInvalidSingleValues,OUTPUT(E_Tradeline()._term__of__account__in__months__SingleValue_Invalid,NAMED('E_Tradeline__term__of__account__in__months__SingleValue_Invalid')));
 IF(RunAll OR RunInvalidSingleValues,OUTPUT(E_Tradeline()._first__payment__due__date__SingleValue_Invalid,NAMED('E_Tradeline__first__payment__due__date__SingleValue_Invalid')));
 IF(RunAll OR RunInvalidSingleValues,OUTPUT(E_Tradeline()._final__pyament__due__date__SingleValue_Invalid,NAMED('E_Tradeline__final__pyament__due__date__SingleValue_Invalid')));
