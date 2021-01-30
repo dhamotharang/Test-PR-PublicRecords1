@@ -1,7 +1,7 @@
-Import	Data_Services,Doxie,ut, dx_DMA;
+Import	Data_Services,Doxie,ut, DMA;
 
 old_DNC_format := DMA.file_suppressionTPS.Building;
-dx_DMA.layouts.suppressionTPS.Building	tReformat2Delta(old_DNC_format	pInput)	:=
+DMA.layout_suppressionTPS.Delta	tReformat2Delta(old_DNC_format	pInput)	:=
 transform
     self.dt_effective_first := 0;
     self.dt_effective_last := 0;
