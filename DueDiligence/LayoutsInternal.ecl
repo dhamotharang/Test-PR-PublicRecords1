@@ -206,8 +206,8 @@ EXPORT LayoutsInternal := MODULE
 
   EXPORT PropertySlimLayout := RECORD
     InternalSeqAndIdentifiersLayout; 
-    STRING12  LNFaresId;
-    STRING2   sourceCode;
+    STRING12 LNFaresId;
+    STRING2 sourceCode;
     BOOLEAN isOwnership;
     BOOLEAN isCurrent;
 
@@ -221,6 +221,8 @@ EXPORT LayoutsInternal := MODULE
     UNSIGNED4 dateFirstSeen;
     UNSIGNED4 dateLastSeen;
     STRING120 ownerName;
+    STRING1 sourceObscure;
+    BOOLEAN isPropertyAddress;
 
     //used for report by both person/business
     UNSIGNED4 historyDate;
