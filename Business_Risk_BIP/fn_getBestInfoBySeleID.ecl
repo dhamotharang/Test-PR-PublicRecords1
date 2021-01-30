@@ -3,7 +3,7 @@
 // The following function takes any input records that have a seleid and (Scenario 1) if there's 
 // no BII it appends Best info as input_echo; or (2) if there IS BII, it attempts to resolve the 
 // BII to BIPIDs and then appends Best info as input_echo, filling in where there are blanks in 
-// the BII. See below the end of the function a full requirement description.
+// the BII. See below at the end of the function for full requirement description.
 EXPORT fn_getBestInfoBySeleID(DATASET(Business_Risk_BIP.Layouts.Input) InputOrig, 
 												 Business_Risk_BIP.LIB_Business_Shell_LIBIN Options,
 												 BIPV2.mod_sources.iParams linkingOptions,
@@ -77,16 +77,18 @@ EXPORT fn_getBestInfoBySeleID(DATASET(Business_Risk_BIP.Layouts.Input) InputOrig
 					SELF := []),
 					
 				LEFT OUTER, KEEP(1), ATMOST(100), FEW);
-
+				
 	// ---------------[ Scenario 2 ]---------------
 
 	withDID       := Business_Risk_BIP.fn_DIDAppend(cleanedInput, Options, mod_access);
 	prepBIPAppend := PROJECT(withDID, TRANSFORM(Business_Risk_BIP.Layouts.Input, SELF := LEFT.Clean_Input, SELF := []));
-	BIPAppendV31  := Business_Risk_BIP.BIP_LinkID_Append_NEW(prepBIPAppend, Options, linkingOptions);
-
+	BIPAppend  := IF(Options.UseUpdatedBipAppend,Business_Risk_BIP.BIP_LinkID_Append_NEW(prepBIPAppend, Options, linkingOptions),
+	                                                Business_Risk_BIP.BIP_LinkID_Append(prepBIPAppend, , Options.DoNotUseAuthRepInBIPAppend));
+	
+	
 	Shell_with_LinkIDs_2 := 
 			JOIN(
-				cleanedInput_having_seleid, BIPAppendV31, 
+				cleanedInput_having_seleid, BIPAppend, 
 				LEFT.Seq = RIGHT.Seq, 
 				TRANSFORM(Business_Risk_BIP.Layouts.Shell,
 					SELF.Seq := LEFT.Seq,
@@ -167,7 +169,7 @@ EXPORT fn_getBestInfoBySeleID(DATASET(Business_Risk_BIP.Layouts.Input) InputOrig
 	// OUTPUT( ds_linkIDs_deduped, NAMED('ds_linkIDs_deduped') );
 	// OUTPUT( withDID, NAMED('withDID') );
 	// OUTPUT( prepBIPAppend, NAMED('prepBIPAppend') );
-	// OUTPUT( BIPAppendV31, NAMED('BIPAppendV31') );
+	// OUTPUT( BIPAppend, NAMED('BIPAppend') );
 	// OUTPUT( Shell_with_LinkIDs, NAMED('Shell_with_LinkIDs') );
 	// OUTPUT( LinkIDs_with_BestInfo, NAMED('LinkIDs_with_BestInfo') );
 	// OUTPUT( input_repopulated, NAMED('input_repopulated') );
