@@ -4,8 +4,8 @@ IMPORT B_Tradeline_9,CFG_graph FROM Business_Credit_KEL;
 IMPORT * FROM KEL13.Null;
 EXPORT B_Tradeline_8(CFG_graph.FDCDataset __in = CFG_graph.FDCDefault, CFG_graph __cfg = CFG_graph) := MODULE
   SHARED VIRTUAL TYPEOF(B_Tradeline_9(__in,__cfg).__ENH_Tradeline_9) __ENH_Tradeline_9 := B_Tradeline_9(__in,__cfg).__ENH_Tradeline_9;
-  SHARED __EE9803184 := __ENH_Tradeline_9;
-  EXPORT __ST251903_Layout := RECORD
+  SHARED __EE9974673 := __ENH_Tradeline_9;
+  EXPORT __ST252542_Layout := RECORD
     KEL.typ.nuid UID;
     KEL.typ.nkdate _load__date_;
     KEL.typ.nstr _sbfe__contributor__number_;
@@ -37,6 +37,7 @@ EXPORT B_Tradeline_8(CFG_graph.FDCDataset __in = CFG_graph.FDCDefault, CFG_graph
     KEL.typ.nstr _payment__status__category_;
     KEL.typ.nint D_B_T___V5_;
     KEL.typ.nint _raw__dbt__v5_;
+    KEL.typ.nstr _overall__file__format__version_;
     KEL.typ.nunk _term__of__account__in__months_;
     KEL.typ.nkdate _first__payment__due__date_;
     KEL.typ.nkdate _final__pyament__due__date_;
@@ -101,10 +102,10 @@ EXPORT B_Tradeline_8(CFG_graph.FDCDataset __in = CFG_graph.FDCDefault, CFG_graph
     KEL.typ.nbool Shows_Closed_Account_;
     KEL.typ.int __RecordCount := 0;
   END;
-  SHARED __ST251903_Layout __ND9803590__Project(B_Tradeline_9(__in,__cfg).__ST252274_Layout __PP9803185) := TRANSFORM
+  SHARED __ST252542_Layout __ND9975083__Project(B_Tradeline_9(__in,__cfg).__ST252915_Layout __PP9974674) := TRANSFORM
     __CC785 := ['002','003','004','005','008','009','011','016','017','018','022','023','024','025','027','028','029','030','032'];
-    SELF.Is_Closed_ := __OR(__OR(__OR(__OR(__NOT(__NT(__PP9803185._date__account__closed_)),__OP2(__PP9803185._account__closure__basis_,<>,__CN(''))),__OP2(__PP9803185._account__status__1_,IN,__CN(__CC785))),__OP2(__PP9803185._account__status__2_,IN,__CN(__CC785))),__PP9803185.Is_Chargeoff_);
-    SELF := __PP9803185;
+    SELF.Is_Closed_ := __OR(__OR(__OR(__OR(__NOT(__NT(__PP9974674._date__account__closed_)),__OP2(__PP9974674._account__closure__basis_,<>,__CN(''))),__OP2(__PP9974674._account__status__1_,IN,__CN(__CC785))),__OP2(__PP9974674._account__status__2_,IN,__CN(__CC785))),__PP9974674.Is_Chargeoff_);
+    SELF := __PP9974674;
   END;
-  EXPORT __ENH_Tradeline_8 := PROJECT(__EE9803184,__ND9803590__Project(LEFT));
+  EXPORT __ENH_Tradeline_8 := PROJECT(__EE9974673,__ND9975083__Project(LEFT));
 END;
