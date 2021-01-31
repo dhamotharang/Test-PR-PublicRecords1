@@ -1988,6 +1988,6 @@ EXPORT dsSourceCriteria := DATASET([
 {'EC 2021/29 Syria List','1975'},
 {'EC 2021/30 CFSP Syria List','1976'},
 {'EC (CFSP) 2021/55 Tunisia List','1977'},
-{'EC 2021/30 CFSP Syria List','1978'}
+{'EC 2021/49 Tunisia List','1978'}
 ],r);
 
