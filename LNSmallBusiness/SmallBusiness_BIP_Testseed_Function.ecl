@@ -1,7 +1,7 @@
 ﻿/*2016-12-16T20:17:06Z (aleksandar tomovic)
 RR-10443 & RQ-13115
 */
-IMPORT Business_Risk_BIP, BusinessCredit_Services, Gateway, IESP, Models, Risk_Indicators, RiskWise, Seed_Files, UT, Royalty;
+IMPORT Business_Risk_BIP, BusinessCredit_Services, IESP, Seed_Files, LNSmallBusiness, STD;
 
 EXPORT SmallBusiness_BIP_Testseed_Function (
 											DATASET(LNSmallBusiness.BIP_Layouts.Input) Input,
@@ -2623,12 +2623,21 @@ EXPORT SmallBusiness_BIP_Testseed_Function (
 			RIGHT.modelname = BusinessCredit_Services.Constants.BLENDED_SCORE_BBFM_SBFEATTR, 
 			getModelKey(LEFT, RIGHT),ATMOST(100), INNER, KEEP(1)
 		); 
+    BBFM1906_1_0_results :=
+    JOIN(
+			Input, Seed_Files.key_SmallBusModels, 
+			KEYED(TestDataTableName = RIGHT.tablename AND 
+			EXISTS(ModelsRequested(ModelName = BusinessCredit_Services.Constants.BBFM1906_1_0)) AND 
+			getHashValue_for_models(LEFT) = RIGHT.HashValue) AND
+			RIGHT.modelname = BusinessCredit_Services.Constants.BBFM1906_1_0, 
+			getModelKey(LEFT, RIGHT),ATMOST(100), INNER, KEEP(1)
+		); 
     
 	Model_Results := 
 		SORT( 
-			(SBBM1601_0_0_results + SBOM1601_0_0_results + SLBO1702_0_2_results + SLBB1702_0_2_results + SLBO1809_0_0_results + SLBB1809_0_0_results + BBFM1808_1_0_results + BOFM1812_1_0_results + BBFM1811_1_0_results ), // Sort to the top the "real" model names.
+			(SBBM1601_0_0_results + SBOM1601_0_0_results + SLBO1702_0_2_results + SLBB1702_0_2_results + SLBO1809_0_0_results + SLBB1809_0_0_results + BBFM1808_1_0_results + BOFM1812_1_0_results + BBFM1811_1_0_results + BBFM1906_1_0_results), // Sort to the top the "real" model names.
 			seq,
-			IF( StringLib.StringFind(modelname,'1601_0_0',1) > 0, 0, 1 ), 
+			IF( STD.Str.Find(modelname,'1601_0_0',1) > 0, 0, 1 ), 
 			ModelName 
 		);
 
@@ -2686,8 +2695,8 @@ EXPORT SmallBusiness_BIP_Testseed_Function (
 		// self.BestInformation.BusinessIds.OrgID                  := rt.Best_Bus_OrgID                      ;
 		// self.BestInformation.BusinessIds.UltID                  := rt.Best_Bus_UltID                      ;
 
-	// OUTPUT( ModelsRequested, NAMED('ModelsRequested') );
-  // OUTPUT( Model_Results, NAMED('Model_Results') );
+	//  OUTPUT( ModelsRequested, NAMED('ModelsRequested') );
+  //  OUTPUT( Model_Results, NAMED('Model_Results') );
   
 	RETURN keyResults_plus_Scores;
 
