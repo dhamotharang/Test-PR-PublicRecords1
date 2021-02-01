@@ -3,8 +3,8 @@ IMPORT PhonesFeedback_Services, PhonesFeedback, STD;
 EXPORT ReportFunctions (DATASET(PhonesFeedback_Services.Layouts.Layout_PhonesFeedback_base) phone_recs_tmp) := FUNCTION
     
   EXPORT STRING30 contact_type_description(STRING type_code) := MAP(
-    type_code = '1'=>'RIGHT Party Contact',
-    type_code = '2'=>'Relative OR Associate Contact',
+    type_code = '1'=>'Right Party Contact',
+    type_code = '2'=>'Relative Or Associate Contact',
     type_code = '3'=>'Wrong Party Claim',
     type_code = '4'=>'Phone Disconnected',
     type_code = '7'=>'Alternate Phone entered',
@@ -13,7 +13,7 @@ EXPORT ReportFunctions (DATASET(PhonesFeedback_Services.Layouts.Layout_PhonesFee
   
   EXPORT STRING30 feedback_src_description(STRING feedback_src_code) := MAP(
     feedback_src_code = '1'=>'Person Search',
-    feedback_src_code = '2'=>'Advanced Person/Deep SKIP Search',
+    feedback_src_code = '2'=>'Advanced Person/Deep Skip Search',
     feedback_src_code = '3'=>'Phones Plus',
     feedback_src_code = '4'=>'Phones Basic Lookup',
     feedback_src_code = '5'=>'Phones Reverse Lookup',
