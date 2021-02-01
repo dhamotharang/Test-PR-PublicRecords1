@@ -1,6 +1,6 @@
-﻿IMPORT Advo, BIPv2, Business_Risk, Business_Risk_BIP, Drivers, DueDiligence, dx_Header, MDR, Risk_Indicators, UT, Doxie, Suppress;
+﻿IMPORT Advo, BIPv2, Business_Risk, Business_Risk_BIP, DueDiligence, dx_Header, MDR, Risk_Indicators, Doxie, Suppress;
 
-/* 
+/*
 	Following Keys being used:
 			Advo.Key_Addr1_history
 			dx_header.key_ssn
@@ -9,9 +9,10 @@
 */
 
 EXPORT getBusAsInd(DATASET(DueDiligence.Layouts.Busn_Internal) indata,
-                   Business_Risk_BIP.LIB_Business_Shell_LIBIN options,
-                   doxie.IDataAccess mod_access = MODULE (doxie.IDataAccess) END) := FUNCTION
-    
+                   Business_Risk_BIP.LIB_Business_Shell_LIBIN options) := FUNCTION
+
+    mod_access := PROJECT(Options, doxie.IDataAccess);
+
     //grab the operating locations
     operatingLocations := DueDiligence.CommonBusiness.GetChildAsInquired(indata, operatingLocations, DueDiligence.Constants.OPERATING_LOCATION);
 
@@ -20,7 +21,7 @@ EXPORT getBusAsInd(DATASET(DueDiligence.Layouts.Busn_Internal) indata,
 
     //Taken from Business_Risk_BIP.getBusinessHeader
     withAdvoRaw := JOIN(partiesToCheck, Advo.Key_Addr1_history,
-                        LEFT.Busn_info.address.zip5 != DueDiligence.Constants.EMPTY AND 
+                        LEFT.Busn_info.address.zip5 != DueDiligence.Constants.EMPTY AND
                         LEFT.Busn_info.address.prim_range != DueDiligence.Constants.EMPTY AND
                         KEYED(LEFT.Busn_info.address.zip5 = RIGHT.zip) AND
                         KEYED(LEFT.Busn_info.address.prim_range = RIGHT.prim_range) AND
@@ -39,7 +40,7 @@ EXPORT getBusAsInd(DATASET(DueDiligence.Layouts.Busn_Internal) indata,
                                   SELF.historyDate := LEFT.historyDate;
                                   SELF.partyIndicator := LEFT.relatedDegree;
                                   SELF := RIGHT;
-                                  SELF := [];), 
+                                  SELF := [];),
                         LEFT OUTER, ATMOST(DueDiligence.Constants.MAX_ATMOST_100));
 
     //Clean dates used in logic and/or attribute levels here so all comparisions flow through consistently
@@ -47,17 +48,17 @@ EXPORT getBusAsInd(DATASET(DueDiligence.Layouts.Busn_Internal) indata,
 
     // Filter out records after our history date.
     advoFilt := DueDiligence.CommonDate.FilterRecords(advoCleanRecs, date_first_seen, date_vendor_first_reported);
-                                    
-    advoOnInputAddrSort := SORT(advoFilt, seq, #EXPAND(BIPv2.IDmacros.mac_ListTop3Linkids()), partyIndicator, zip, prim_range,	prim_name, addr_suffix, predir, postdir, sec_range, -advoDtfirstseen); 
+
+    advoOnInputAddrSort := SORT(advoFilt, seq, #EXPAND(BIPv2.IDmacros.mac_ListTop3Linkids()), partyIndicator, zip, prim_range,	prim_name, addr_suffix, predir, postdir, sec_range, -advoDtfirstseen);
     advoDedup := DEDUP(advoOnInputAddrSort, seq, #EXPAND(BIPv2.IDmacros.mac_ListTop3Linkids()), partyIndicator, zip, prim_range, prim_name, addr_suffix, predir, postdir, sec_range);
-                                                    
+
     rollAdvo := ROLLUP(advoDedup,
                         #EXPAND(DueDiligence.Constants.mac_JOINLinkids_Results()) AND
-                        LEFT.partyIndicator = RIGHT.partyIndicator, 
+                        LEFT.partyIndicator = RIGHT.partyIndicator,
                         TRANSFORM(RECORDOF(LEFT),
                                   SELF.Residential_or_Business_Ind := IF(LEFT.Residential_or_Business_Ind = DueDiligence.Constants.EMPTY, RIGHT.Residential_or_Business_Ind, LEFT.Residential_or_Business_Ind);
                                   SELF := LEFT;));
-                                
+
     //add the address type to the operating locations
     initialOpLocations := DueDiligence.CommonBusiness.GetOperatingLocations(indata);
     addOpLocAddrType := JOIN(initialOpLocations, rollAdvo(partyIndicator = DueDiligence.Constants.OPERATING_LOCATION),
@@ -68,35 +69,35 @@ EXPORT getBusAsInd(DATASET(DueDiligence.Layouts.Busn_Internal) indata,
                                                                                 SELF := LEFT;)]);
                                         SELF := LEFT;),
                               LEFT OUTER);
-	
-										
-    //reAdd operating locations
-    addOperatingLocation := DueDiligence.CommonBusiness.readdOperatingLocations(indata, addOpLocAddrType, opLocations);                                
 
-                                  
+
+    //reAdd operating locations
+    addOperatingLocation := DueDiligence.CommonBusiness.readdOperatingLocations(indata, addOpLocAddrType, opLocations);
+
+
     addResidentialAddr := JOIN(addOperatingLocation, rollAdvo(partyIndicator = DueDiligence.Constants.INQUIRED_BUSINESS_DEGREE),
-                                #EXPAND(DueDiligence.Constants.mac_JOINLinkids_BusInternal()),	
+                                #EXPAND(DueDiligence.Constants.mac_JOINLinkids_BusInternal()),
                                 TRANSFORM(DueDiligence.Layouts.Busn_Internal,
                                           SELF.residentialAddr := RIGHT.Residential_or_Business_Ind;
                                           SELF.busIsSOHO := LEFT.busIsSOHO OR (RIGHT.Residential_or_Business_Ind = 'A' AND LEFT.SOSIncorporationDate > 0);
                                           SELF := LEFT;),
                                 LEFT OUTER);
-													
+
     //Taken from Business_Risk_BIP.getConsumerHeader
     //Grab all DID's associated with the business FEIN
     feinIsSSNWithDID := JOIN(indata, dx_header.key_ssn(), //Input Business FEIN Matches Header SSN
                               (INTEGER)LEFT.Busn_info.fein > 0 AND LENGTH(TRIM(LEFT.Busn_info.fein)) = 9 AND
-                              KEYED(LEFT.Busn_info.fein[1] = RIGHT.S1 AND 
-                                    LEFT.Busn_info.fein[2] = RIGHT.S2 AND 
-                                    LEFT.Busn_info.fein[3] = RIGHT.S3 AND 
-                                    LEFT.Busn_info.fein[4] = RIGHT.S4 AND 
-                                    LEFT.Busn_info.fein[5] = RIGHT.S5 AND 
-                                    LEFT.Busn_info.fein[6] = RIGHT.S6 AND 
-                                    LEFT.Busn_info.fein[7] = RIGHT.S7 AND 
-                                    LEFT.Busn_info.fein[8] = RIGHT.S8 AND 
+                              KEYED(LEFT.Busn_info.fein[1] = RIGHT.S1 AND
+                                    LEFT.Busn_info.fein[2] = RIGHT.S2 AND
+                                    LEFT.Busn_info.fein[3] = RIGHT.S3 AND
+                                    LEFT.Busn_info.fein[4] = RIGHT.S4 AND
+                                    LEFT.Busn_info.fein[5] = RIGHT.S5 AND
+                                    LEFT.Busn_info.fein[6] = RIGHT.S6 AND
+                                    LEFT.Busn_info.fein[7] = RIGHT.S7 AND
+                                    LEFT.Busn_info.fein[8] = RIGHT.S8 AND
                                     LEFT.Busn_info.fein[9] = RIGHT.S9),
-                              TRANSFORM({UNSIGNED4 seq, UNSIGNED6 ultID, UNSIGNED6 orgID, UNSIGNED6 seleID, UNSIGNED6 historyDate, BOOLEAN feinIsSSN, STRING fein, 
-                                                  STRING10 prim_range, STRING2  predir, STRING28 prim_name, STRING4  addr_suffix, STRING2  postdir, STRING10 unit_desig, 
+                              TRANSFORM({UNSIGNED4 seq, UNSIGNED6 ultID, UNSIGNED6 orgID, UNSIGNED6 seleID, UNSIGNED6 historyDate, BOOLEAN feinIsSSN, STRING fein,
+                                                  STRING10 prim_range, STRING2  predir, STRING28 prim_name, STRING4  addr_suffix, STRING2  postdir, STRING10 unit_desig,
                                                   STRING8  sec_range, STRING25 city, STRING2  state, STRING5  zip5, STRING4  zip4, STRING companyName, RECORDOF(RIGHT)},
                                         SELF.ultID := LEFT.Busn_info.BIP_IDs.UltID.LinkID;
                                         SELF.orgID := LEFT.Busn_info.BIP_IDs.OrgID.LinkID;
@@ -120,14 +121,14 @@ EXPORT getBusAsInd(DATASET(DueDiligence.Layouts.Busn_Internal) indata,
                                         SELF := RIGHT;
                                         SELF := [];),
                               ATMOST(Business_Risk_BIP.Constants.Limit_Default));
-																	
 
-    //The FEIN is assigned via IRS and SSN's are assigned via Social Security Administration 
+
+    //The FEIN is assigned via IRS and SSN's are assigned via Social Security Administration
     //The IRS does not intentionally assign a TIN that is the same as SSN
-    //but it does happen.  Attempt to find these cases through this logic	
+    //but it does happen.  Attempt to find these cases through this logic
 
     //grab the unique DIDs for the inquired business
-    uniqueDIDs := ROLLUP(SORT(feinIsSSNWithDID, seq, #EXPAND(BIPv2.IDmacros.mac_ListTop3Linkids()), did), 
+    uniqueDIDs := ROLLUP(SORT(feinIsSSNWithDID, seq, #EXPAND(BIPv2.IDmacros.mac_ListTop3Linkids()), did),
                           #EXPAND(DueDiligence.Constants.mac_JOINLinkids_Results()) AND
                           LEFT.did = RIGHT.did,
                           TRANSFORM({RECORDOF(LEFT)},
@@ -137,7 +138,7 @@ EXPORT getBusAsInd(DATASET(DueDiligence.Layouts.Busn_Internal) indata,
 
 
     //grab the execs from the inquired business
-    simpleBusinessExecutives := DueDiligence.CommonBusiness.getexecs(indata);   											
+    simpleBusinessExecutives := DueDiligence.CommonBusiness.getexecs(indata);
 
     //keep only rows where FEIN is an SSN AND SSN belongs to one of the Business Executives listed in the Inquired Business
     FEINisSSNofBEO := JOIN(simpleBusinessExecutives, uniqueDIDs,
@@ -145,24 +146,24 @@ EXPORT getBusAsInd(DATASET(DueDiligence.Layouts.Busn_Internal) indata,
                             LEFT.party.did = RIGHT.did,
                             TRANSFORM({RECORDOF(RIGHT), DueDiligence.Layouts.DIDAndName execInfo},
                                       SELF.execInfo := LEFT.party;
-                                      SELF := RIGHT;), 
-                            KEEP(1), 
-                            ATMOST(DueDiligence.Constants.MAX_ATMOST_1000));  
-                           
-                           
+                                      SELF := RIGHT;),
+                            KEEP(1),
+                            ATMOST(DueDiligence.Constants.MAX_1000));
+
+
 
     //If the FEIN is an SSN of a BEO then continue looking up information to determine if the business is a SOHO (Small Office/Home Office)
     consumerHeaderDidRaw_unsuppressed := JOIN(FEINisSSNofBEO, dx_Header.key_header(),
-                                  LEFT.did > 0 AND 
+                                  LEFT.did > 0 AND
                                   KEYED(LEFT.did = RIGHT.s_did) AND
-                                  ((INTEGER)LEFT.fein > 0 AND LEFT.fein = RIGHT.ssn) AND 
+                                  ((INTEGER)LEFT.fein > 0 AND LEFT.fein = RIGHT.ssn) AND
                                   // check permissions
-                                  ut.PermissionTools.glb.SrcOk(Options.GLBA_Purpose, RIGHT.src, RIGHT.dt_first_seen) AND
-                                  RIGHT.src NOT IN Risk_Indicators.iid_constants.masked_header_sources(Options.DataRestrictionMask, FALSE) AND
+                                  doxie.compliance.source_ok(mod_access.glb, mod_access.DataRestrictionMask, RIGHT.src, RIGHT.dt_first_seen) AND
+                                  RIGHT.src NOT IN Risk_Indicators.iid_constants.masked_header_sources(mod_access.DataRestrictionMask, FALSE) AND
                                   (MDR.Source_is_DPPA(RIGHT.src) = FALSE OR
-                                  (Risk_Indicators.iid_constants.DPPA_OK(Options.DPPA_Purpose, FALSE) AND Drivers.State_DPPA_OK(dx_Header.functions.translateSource(RIGHT.src), Options.DPPA_Purpose, RIGHT.src))) AND
+                                  (mod_access.isValidDppa() AND mod_access.isValidDppaState(dx_Header.functions.translateSource(RIGHT.src), RIGHT.src))) AND
                                   Risk_Indicators.iid_constants.filtered_source(RIGHT.src, RIGHT.st) = FALSE,
-                                  TRANSFORM({STRING fname, STRING mname, STRING lname, STRING name_suffix, STRING dt_first_seen, STRING dt_last_seen, 
+                                  TRANSFORM({STRING fname, STRING mname, STRING lname, STRING name_suffix, STRING dt_first_seen, STRING dt_last_seen,
                                                             INTEGER feinPersonAddrOverlap, UNSIGNED feinPersonNameMatchLevel, UNSIGNED4 global_sid, RECORDOF(LEFT)},
                                             SELF.global_sid := RIGHT.global_sid;
                                             isBusinessRecord := LEFT.feinIsSSN;
@@ -179,30 +180,30 @@ EXPORT getBusAsInd(DATASET(DueDiligence.Layouts.Busn_Internal) indata,
                                             zipScore := IF(feinMatched, Risk_Indicators.AddrScore.ZIP_Score(LEFT.Zip5, RIGHT.Zip), 255);
                                             cityStateScore := IF(feinMatched, Risk_Indicators.AddrScore.CityState_Score(LEFT.city, LEFT.state, RIGHT.city_name, RIGHT.st, DueDiligence.Constants.EMPTY), 255);
 
-                                            addressScore := Risk_Indicators.AddrScore.AddressScore(LEFT.prim_range, LEFT.prim_name, LEFT.sec_range, 
+                                            addressScore := Risk_Indicators.AddrScore.AddressScore(LEFT.prim_range, LEFT.prim_name, LEFT.sec_range,
                                             RIGHT.prim_range, RIGHT.prim_name, RIGHT.sec_range,
-                                            zipScore, cityStateScore);	
+                                            zipScore, cityStateScore);
                                             addressMatched := Risk_Indicators.iid_constants.ga(addressScore) AND addressPopulated AND feinMatched;
 
-                                            SELF.feinPersonAddrOverlap := MAP(feinMatched AND NOT addressPopulated => -1,		
+                                            SELF.feinPersonAddrOverlap := MAP(feinMatched AND NOT addressPopulated => -1,
                                                                               (INTEGER)LEFT.fein = DueDiligence.Constants.NUMERIC_ZERO OR NOT isBusinessRecord => -2, // -2s will be set to 0, but need something smaller than -1 since -1 should take precedence in MAX() in Rollup.
-                                                                              (INTEGER)RIGHT.did = DueDiligence.Constants.NUMERIC_ZERO OR NOT feinMatched AND addressPopulated => -2, 
+                                                                              (INTEGER)RIGHT.did = DueDiligence.Constants.NUMERIC_ZERO OR NOT feinMatched AND addressPopulated => -2,
                                                                               (INTEGER)RIGHT.did <> DueDiligence.Constants.NUMERIC_ZERO AND NOT addressMatched AND feinMatched AND addressPopulated => 1,
                                                                               (INTEGER)RIGHT.did <> DueDiligence.Constants.NUMERIC_ZERO AND addressMatched AND feinMatched AND addressPopulated => 2,
                                                                               -1);
 
-                                            SELF.feinPersonNameMatchLevel := IF((INTEGER)RIGHT.did <> DueDiligence.Constants.NUMERIC_ZERO AND nameSimilar AND feinMatched, 1, DueDiligence.Constants.NUMERIC_ZERO);																																						 
+                                            SELF.feinPersonNameMatchLevel := IF((INTEGER)RIGHT.did <> DueDiligence.Constants.NUMERIC_ZERO AND nameSimilar AND feinMatched, 1, DueDiligence.Constants.NUMERIC_ZERO);
 
                                             SELF.fname := RIGHT.fname;
                                             SELF.mname := RIGHT.mname;
                                             SELF.lname := RIGHT.lname;
                                             SELF.name_suffix := RIGHT.name_suffix;
-                                            
+
                                             SELF := LEFT;),
                                   ATMOST(Business_Risk_BIP.Constants.Limit_Default));
-                                  
+
     consumerHeaderDidRaw := Suppress.MAC_SuppressSource(consumerHeaderDidRaw_unsuppressed, mod_access);
-    
+
     //Clean dates used in logic and/or attribute levels here so all comparisions flow through consistently
     consumerHeaderCleanRecs := DueDiligence.Common.CleanDatasetDateFields(consumerHeaderDidRaw, 'dt_first_seen, dt_last_seen');
 
@@ -212,8 +213,8 @@ EXPORT getBusAsInd(DATASET(DueDiligence.Layouts.Busn_Internal) indata,
 
     //Determine max name match level and address overlap for the inquired business where
     //we found company FEIN matching a BEO's SSN
-    consumerHeaderDidCounts := ROLLUP(SORT(consumerHeaderDidFiltRecs, seq, #EXPAND(BIPv2.IDmacros.mac_ListTop3Linkids())), 
-                                      #EXPAND(DueDiligence.Constants.mac_JOINLinkids_Results()), 
+    consumerHeaderDidCounts := ROLLUP(SORT(consumerHeaderDidFiltRecs, seq, #EXPAND(BIPv2.IDmacros.mac_ListTop3Linkids())),
+                                      #EXPAND(DueDiligence.Constants.mac_JOINLinkids_Results()),
                                       TRANSFORM(RECORDOF(LEFT),
                                                 SELF.feinPersonAddrOverlap := MAX(LEFT.feinPersonAddrOverlap, RIGHT.feinPersonAddrOverlap);
                                                 SELF.feinPersonNameMatchLevel := MAX(LEFT.feinPersonNameMatchLevel, RIGHT.feinPersonNameMatchLevel);
@@ -223,15 +224,15 @@ EXPORT getBusAsInd(DATASET(DueDiligence.Layouts.Busn_Internal) indata,
                                   #EXPAND(DueDiligence.Constants.mac_JOINLinkids_BusInternal()),
                                   TRANSFORM(DueDiligence.Layouts.Busn_Internal,
                                             SELF.personNameSSN := RIGHT.feinPersonNameMatchLevel;
-                                            SELF.personAddrSSN := RIGHT.feinPersonAddrOverlap;																					
-                                            SELF.busIsSOHO := LEFT.busIsSOHO OR 
+                                            SELF.personAddrSSN := RIGHT.feinPersonAddrOverlap;
+                                            SELF.busIsSOHO := LEFT.busIsSOHO OR
                                                               (RIGHT.feinPersonAddrOverlap = 2 OR RIGHT.feinPersonNameMatchLevel = 1) AND LEFT.SOSIncorporationDate > DueDiligence.Constants.NUMERIC_ZERO;
                                             SELF := LEFT;),
                                   LEFT OUTER);
-   
-   
+
+
     //retrieve the BEOs associated with the business FEIN
-    sortAndGroupFEINisSSNBEOs := GROUP(SORT(FEINisSSNofBEO, seq, #EXPAND(BIPv2.IDmacros.mac_ListTop3Linkids()), did), seq, #EXPAND(BIPv2.IDmacros.mac_ListTop3Linkids())); 
+    sortAndGroupFEINisSSNBEOs := GROUP(SORT(FEINisSSNofBEO, seq, #EXPAND(BIPv2.IDmacros.mac_ListTop3Linkids()), did), seq, #EXPAND(BIPv2.IDmacros.mac_ListTop3Linkids()));
 
     maxFEINisSSNBEOs := DueDiligence.Common.GetMaxRecords(sortAndGroupFEINisSSNBEOs, DueDiligence.Constants.MAX_ASSOCIATED_FEIN_NAMES);
 
@@ -246,9 +247,9 @@ EXPORT getBusAsInd(DATASET(DueDiligence.Layouts.Busn_Internal) indata,
                                                                                                                   SELF := LEFT.execInfo;
                                                                                                                   SELF := [];)]);
                                                                     SELF := [];));
-  
 
-    //combine names for the same inquired business															
+
+    //combine names for the same inquired business
     rollIndvFormatNames := ROLLUP(SORT(newLayoutFEINisSSNBeos, seq, #EXPAND(BIPv2.IDmacros.mac_ListTop3Linkids())),
                                   #EXPAND(DueDiligence.Constants.mac_JOINLinkids_Results()),
                                   TRANSFORM(RECORDOF(LEFT),
@@ -276,7 +277,7 @@ EXPORT getBusAsInd(DATASET(DueDiligence.Layouts.Busn_Internal) indata,
                                       SELF.isSSN := IF(LEFT.busn_info.fein = DueDiligence.Constants.EMPTY, FALSE, LEFT.busn_info.fein = RIGHT.ssn);
                                       SELF := LEFT;),
                             LEFT OUTER, KEEP(100));
-													
+
     rollFeinCheck := ROLLUP(SORT(checkFeinIsSSN, seq, #EXPAND(DueDiligence.Constants.mac_ListTop3Linkids())),
                             LEFT.seq = RIGHT.seq AND
                             LEFT.Busn_info.BIP_IDS.UltID.LinkID = RIGHT.Busn_info.BIP_IDS.UltID.LinkID AND
@@ -295,11 +296,11 @@ EXPORT getBusAsInd(DATASET(DueDiligence.Layouts.Busn_Internal) indata,
                                     SELF.feinIsSSN := LEFT.feinIsSSN OR RIGHT.isSSN;
                                     SELF := LEFT;),
                           LEFT OUTER);
-	
 
-	
-	
-	
+
+
+
+
     // OUTPUT(indata, NAMED('indata'));
     // OUTPUT(partiesToCheck, NAMED('partiesToCheck'));
 

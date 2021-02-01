@@ -1,10 +1,11 @@
-﻿IMPORT BIPV2, Business_Risk_BIP, Doxie, Inquiry_AccLogs, Risk_Indicators, UT;
+﻿IMPORT Business_Risk_BIP, Doxie, Inquiry_AccLogs, Risk_Indicators, UT, STD;
 
 EXPORT getInquiries(DATASET(Business_Risk_BIP.Layouts.Shell) Shell_pre,
 											 Business_Risk_BIP.LIB_Business_Shell_LIBIN Options,
-											 SET OF STRING2 AllowedSourcesSet,
-                       Doxie.IDataAccess mod_access
+											 SET OF STRING2 AllowedSourcesSet
                        ) := FUNCTION
+
+	mod_access := PROJECT(Options, doxie.IDataAccess);
 
 	InqBuildDate := Risk_Indicators.get_Build_date('inquiry_update_build_version');
 
@@ -100,19 +101,19 @@ EXPORT getInquiries(DATASET(Business_Risk_BIP.Layouts.Shell) Shell_pre,
 	tempBusinessInquiry DetermineValidBusinessInquiry(InquiriesAll le) := TRANSFORM
 		SELF.Seq := le.Seq;
 
-		RawIndustry := StringLib.StringToUpperCase(TRIM(le.Bus_Intel.Industry, LEFT, RIGHT));
-		Vertical := StringLib.StringToUpperCase(TRIM(le.Bus_Intel.Vertical, LEFT, RIGHT));
-		SubMarket := StringLib.StringToUpperCase(TRIM(le.Bus_Intel.Sub_Market, LEFT, RIGHT));
-		FunctionDescription := StringLib.StringToUpperCase(TRIM(le.Search_Info.Function_Description, LEFT, RIGHT));
-		ProductCode := StringLib.StringToUpperCase(TRIM(le.Search_Info.Product_Code, LEFT, RIGHT));
-		BusUse := StringLib.StringToUpperCase(TRIM(le.Bus_Intel.Use, LEFT, RIGHT));
-		Method := StringLib.StringToUpperCase(TRIM(le.Search_Info.Method, LEFT, RIGHT));
+		RawIndustry := STD.Str.ToUpperCase(TRIM(le.Bus_Intel.Industry, LEFT, RIGHT));
+		Vertical := STD.Str.ToUpperCase(TRIM(le.Bus_Intel.Vertical, LEFT, RIGHT));
+		SubMarket := STD.Str.ToUpperCase(TRIM(le.Bus_Intel.Sub_Market, LEFT, RIGHT));
+		FunctionDescription := STD.Str.ToUpperCase(TRIM(le.Search_Info.Function_Description, LEFT, RIGHT));
+		ProductCode := STD.Str.ToUpperCase(TRIM(le.Search_Info.Product_Code, LEFT, RIGHT));
+		BusUse := STD.Str.ToUpperCase(TRIM(le.Bus_Intel.Use, LEFT, RIGHT));
+		Method := STD.Str.ToUpperCase(TRIM(le.Search_Info.Method, LEFT, RIGHT));
 
 		// Authorize Representative information is logged to the BusUser_Q section
-		FirstName := StringLib.StringToUpperCase(TRIM(le.BusUser_Q.FName, LEFT, RIGHT));
-		LastName := StringLib.StringToUpperCase(TRIM(le.BusUser_Q.LName, LEFT, RIGHT));
-		// FirstName := StringLib.StringToUpperCase(TRIM(le.Person_Q.First_Name, LEFT, RIGHT));
-		// LastName := StringLib.StringToUpperCase(TRIM(le.Person_Q.Last_Name, LEFT, RIGHT));
+		FirstName := STD.Str.ToUpperCase(TRIM(le.BusUser_Q.FName, LEFT, RIGHT));
+		LastName := STD.Str.ToUpperCase(TRIM(le.BusUser_Q.LName, LEFT, RIGHT));
+		// FirstName := STD.Str.ToUpperCase(TRIM(le.Person_Q.First_Name, LEFT, RIGHT));
+		// LastName := STD.Str.ToUpperCase(TRIM(le.Person_Q.Last_Name, LEFT, RIGHT));
 
 		FirstNameMatch := FirstName <> '' AND le.Rep_FirstName <> '' AND FirstName[1] = le.Rep_FirstName[1] AND Risk_Indicators.iid_constants.g(Risk_Indicators.FNameScore(FirstName, le.Rep_FirstName));
 		LastNameMatch := LastName <> '' AND le.Rep_LastName <> '' AND LastName[1] = le.Rep_LastName[1] AND Risk_Indicators.iid_constants.g(Risk_Indicators.LNameScore(LastName, le.Rep_LastName));
@@ -126,8 +127,8 @@ EXPORT getInquiries(DATASET(Business_Risk_BIP.Layouts.Shell) Shell_pre,
 		LastNameMatch3 := LastName <> '' AND le.Rep3_LastName <> '' AND LastName[1] = le.Rep3_LastName[1] AND Risk_Indicators.iid_constants.g(Risk_Indicators.LNameScore(LastName, le.Rep3_LastName));
 		NameMatch3 := FirstNameMatch3 AND LastNameMatch3;
 
-		Date := Business_Risk_BIP.Common.checkInvalidDate(TRIM(StringLib.StringFilter(le.search_info.datetime[1..8], '0123456789')), Business_Risk_BIP.Constants.MissingDate, le.HistoryDateTime);
-		Time := TRIM(StringLib.StringFilter(le.search_info.datetime[10..15], '0123456789'));
+		Date := Business_Risk_BIP.Common.checkInvalidDate(TRIM(STD.Str.Filter(le.search_info.datetime[1..8], '0123456789')), Business_Risk_BIP.Constants.MissingDate, le.HistoryDateTime);
+		Time := TRIM(STD.Str.Filter(le.search_info.datetime[10..15], '0123456789'));
 		LogDate := IF(LENGTH(Date) = 8, Date, ''); // Make sure we have a valid 8 byte date
 		LogTime := IF(LENGTH(Time) = 6, Time, ''); // Make sure we have a valid 6 byte time (HHMMSS)
 

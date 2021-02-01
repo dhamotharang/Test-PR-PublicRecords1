@@ -3,21 +3,21 @@
 EXPORT getBusExecResidency(DATASET(DueDiligence.Layouts.Busn_Internal) indata,
                             Business_Risk_BIP.LIB_Business_Shell_LIBIN options,
                             doxie.IDataAccess mod_access = MODULE (doxie.IDataAccess) END) := FUNCTION
-		
-		
-		
+
+
+
     INTEGER bsVersion := DueDiligence.ConstantsQuery.DEFAULT_BS_VERSION;
     UNSIGNED8 bsOptions := DueDiligence.ConstantsQuery.DEFAULT_BS_OPTIONS;
     BOOLEAN isFCRA := DueDiligence.Constants.DEFAULT_IS_FCRA;
 
-    UNSIGNED1 dppa := options.DPPA_Purpose;
-    UNSIGNED1 glba := options.GLBA_Purpose;
+    UNSIGNED1 dppa := options.dppa;
+    UNSIGNED1 glba := options.glb;
     STRING dataRestrictionMask := options.DataRestrictionMask;
 
 
     pullExecs := DueDiligence.CommonBusiness.getExecs(indata);
 
-      
+
     indLayout := PROJECT(pullExecs, TRANSFORM(DueDiligence.Layouts.Indv_Internal,
                                               SELF.seq := LEFT.seq;
                                               SELF.historyDate := DueDiligence.Common.GetMyDate(LEFT.historyDate);
@@ -42,8 +42,8 @@ EXPORT getBusExecResidency(DATASET(DueDiligence.Layouts.Busn_Internal) indata,
                           LEFT.seq = RIGHT.seq AND
                           LEFT.party.did = RIGHT.inquiredDID,
                           TRANSFORM(RECORDOF(LEFT),
-                                    
-                                    residencyRisk := DueDiligence.getIndKRIResidency(RIGHT);																																																	
+
+                                    residencyRisk := DueDiligence.getIndKRIResidency(RIGHT);
 
                                     SELF.party.usResidencyScore := residencyRisk.name;
                                     SELF.party.usResidencyFlags := residencyRisk.value;
@@ -96,7 +96,7 @@ EXPORT getBusExecResidency(DATASET(DueDiligence.Layouts.Busn_Internal) indata,
                             LEFT.seq = RIGHT.seq AND
                             LEFT.ultID = RIGHT.ultID AND
                             LEFT.orgID = RIGHT.orgID AND
-                            LEFT.seleID = RIGHT.seleID,	
+                            LEFT.seleID = RIGHT.seleID,
                             TRANSFORM(RECORDOF(LEFT),
                                       SELF.hitLevel9 := LEFT.hitLevel9 OR RIGHT.hitLevel9;
                                       SELF.hitLevel8 := LEFT.hitLevel8 OR RIGHT.hitLevel8;
@@ -113,7 +113,7 @@ EXPORT getBusExecResidency(DATASET(DueDiligence.Layouts.Busn_Internal) indata,
                           LEFT.seq = RIGHT.seq AND
                           LEFT.Busn_info.BIP_IDS.UltID.LinkID = RIGHT.ultID AND
                           LEFT.Busn_info.BIP_IDS.OrgID.LinkID = RIGHT.orgID AND
-                          LEFT.Busn_info.BIP_IDS.SeleID.LinkID = RIGHT.seleID,	
+                          LEFT.Busn_info.BIP_IDS.SeleID.LinkID = RIGHT.seleID,
                           TRANSFORM(DueDiligence.Layouts.Busn_Internal,
                                     SELF.atleastOneBEOInvalidSSN := RIGHT.hitLevel9;
                                     SELF.atleastOneBEOAssocITINOrImmigrantSSN := RIGHT.hitLevel8;
@@ -140,7 +140,7 @@ EXPORT getBusExecResidency(DATASET(DueDiligence.Layouts.Busn_Internal) indata,
     // OUTPUT(updtHitLevels, NAMED('updtHitLevels'));
     // OUTPUT(rollCombined, NAMED('rollCombined'));
     // OUTPUT(addResidency, NAMED('addResidency'));
-                  
-                    
-    RETURN addResidency;							
-END;										
+
+
+    RETURN addResidency;
+END;

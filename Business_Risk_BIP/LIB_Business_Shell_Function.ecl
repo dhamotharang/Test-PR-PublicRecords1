@@ -1,4 +1,4 @@
-﻿IMPORT _Control, Business_Risk_BIP, Cortera, Gateway, iesp;
+﻿IMPORT _Control, Business_Risk_BIP, Cortera, Gateway, iesp, STD;
 
 Use_Business_Shell_Library := NOT _Control.LibraryUse.ForceOff_Business_Risk_BIP__LIB_Business_Shell;
 
@@ -37,23 +37,24 @@ EXPORT LIB_Business_Shell_Function (
 
 options := MODULE(Business_Risk_BIP.LIB_Business_Shell_LIBIN)
 	// Clean up the Options and make sure that defaults are enforced
-	EXPORT UNSIGNED1	DPPA_Purpose 				:= DPPA_Purpose_In;
-	EXPORT UNSIGNED1	GLBA_Purpose 				:= GLBA_Purpose_In;
-	EXPORT STRING50		DataRestrictionMask	:= IF(DataRestrictionMask_In = '', 
-																							Business_Risk_BIP.Constants.Default_DataRestrictionMask, 
+	EXPORT UNSIGNED1	dppa 				:= DPPA_Purpose_In;
+	EXPORT UNSIGNED1	glb 				:= GLBA_Purpose_In;
+	EXPORT STRING			DataRestrictionMask	:= IF(DataRestrictionMask_In = '',
+																							Business_Risk_BIP.Constants.Default_DataRestrictionMask,
 																							DataRestrictionMask_In);
-	EXPORT STRING50		DataPermissionMask	:= IF(DataPermissionMask_In = '', 
-																							Business_Risk_BIP.Constants.Default_DataPermissionMask, 
+	EXPORT STRING			DataPermissionMask	:= IF(DataPermissionMask_In = '',
+																							Business_Risk_BIP.Constants.Default_DataPermissionMask,
 																							DataPermissionMask_In);
-	EXPORT STRING10		IndustryClass				:= IndustryClass_In;
-	EXPORT UNSIGNED1	LinkSearchLevel			:= IF(LinkSearchLevel_In BETWEEN Business_Risk_BIP.Constants.LinkSearch.Default AND Business_Risk_BIP.Constants.LinkSearch.UltID, 
-																							LinkSearchLevel_In, 
+	EXPORT STRING5		industry_class			:= IndustryClass_In;
+
+	EXPORT UNSIGNED1	LinkSearchLevel			:= IF(LinkSearchLevel_In BETWEEN Business_Risk_BIP.Constants.LinkSearch.Default AND Business_Risk_BIP.Constants.LinkSearch.UltID,
+																							LinkSearchLevel_In,
 																							Business_Risk_BIP.Constants.LinkSearch.Default);
-	EXPORT UNSIGNED1	BusShellVersion			:= IF(BusShellVersion_In > 0, 
-																							BusShellVersion_In, 
+	EXPORT UNSIGNED1	BusShellVersion			:= IF(BusShellVersion_In > 0,
+																							BusShellVersion_In,
 																							Business_Risk_BIP.Constants.Default_BusShellVersion);
 	EXPORT UNSIGNED1	MarketingMode				:= MAX(MIN(MarketingMode_In, 1), 0);
-	EXPORT STRING50		AllowedSources			:= StringLib.StringToUpperCase(AllowedSources_In);
+	EXPORT STRING50		AllowedSources			:= STD.Str.ToUpperCase(AllowedSources_In);
 	EXPORT UNSIGNED1	BIPBestAppend				:= IF(BIPBestAppend_In BETWEEN Business_Risk_BIP.Constants.BIPBestAppend.Default AND Business_Risk_BIP.Constants.BIPBestAppend.OverwriteWithBest,
 																							BIPBestAppend_In,
 																							Business_Risk_BIP.Constants.BIPBestAppend.Default);
@@ -64,17 +65,16 @@ options := MODULE(Business_Risk_BIP.LIB_Business_Shell_LIBIN)
 	EXPORT DATASET(iesp.Share.t_StringArrayItem) Watchlists_Requested := Watchlists_Requested_In;
 	EXPORT DATASET(Gateway.Layouts.Config) Gateways := Gateways_in;
 	EXPORT BOOLEAN    RunTargusGatewayAnywayForTesting := RunTargusGateway;
-	EXPORT BOOLEAN    OverrideExperianRestriction := OverrideExperianRestriction_In;	
+	EXPORT BOOLEAN    OverrideExperianRestriction := OverrideExperianRestriction_In;
 	EXPORT BOOLEAN    DoNotUseAuthRepInBIPAppend  := NOT IncludeAuthRepInBIPAppend;
 	EXPORT BOOLEAN		IsBIID20										:= IsBIID20_In;
 	EXPORT BOOLEAN    CorteraRetrotest            := CorteraRetrotest_In;
-	EXPORT UNSIGNED1	bus_LexIdSourceOptout := LexIdSourceOptout;
-	EXPORT STRING16 	bus_TransactionID := (string16)TransactionID;
-	EXPORT STRING16 	bus_BatchUID := (string16)BatchUID;
-	EXPORT UNSIGNED6 	bus_GlobalCompanyId := GlobalCompanyId;
-	EXPORT BOOLEAN  	UseUpdatedBipAppend := in_useUpdatedBipAppend;
-	EXPORT UNSIGNED1 	BIPAppend_ScoreThreshold := in_BIPAppend_ScoreThreshold;
-	EXPORT UNSIGNED1	BipAppend_WeightThreshold := in_BipAppend_WeightThreshold;
+	EXPORT BOOLEAN    UseUpdatedBipAppend := in_useUpdatedBipAppend;
+	EXPORT unsigned1  lexid_source_optout := LexIdSourceOptout;
+	EXPORT string     transaction_id := IF(TransactionID <> '', TransactionID, BatchUID);
+	EXPORT unsigned6  global_company_id := GlobalCompanyId;
+	EXPORT UNSIGNED1  BIPAppend_ScoreThreshold := in_BIPAppend_ScoreThreshold;
+	EXPORT UNSIGNED1  BipAppend_WeightThreshold := in_BipAppend_WeightThreshold;
 END;
 
 #if(Use_Business_Shell_Library)

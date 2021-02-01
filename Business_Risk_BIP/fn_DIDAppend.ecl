@@ -1,8 +1,9 @@
 ﻿IMPORT Business_Risk_BIP, Doxie, Gateway, Risk_Indicators;
 
 EXPORT fn_DIDAppend(DATASET(Business_Risk_BIP.Layouts.Shell) cleanedInput,
-                    Business_Risk_BIP.LIB_Business_Shell_LIBIN Options,
-										doxie.IDataAccess mod_access = MODULE (doxie.IDataAccess) END) := FUNCTION
+                    Business_Risk_BIP.LIB_Business_Shell_LIBIN Options) := FUNCTION
+
+	mod_access := PROJECT(Options, doxie.IDataAccess);
 
 	Risk_Indicators.Layout_Input prepForDIDAppend(Business_Risk_BIP.Layouts.Shell le) := TRANSFORM
 		SELF.Seq := le.Clean_Input.Seq;
@@ -43,15 +44,15 @@ EXPORT fn_DIDAppend(DATASET(Business_Risk_BIP.Layouts.Shell) cleanedInput,
 
 		SELF := [];
 	END;
-  
+
 	prepDIDAppend := PROJECT(cleanedInput, prepForDIDAppend(LEFT));
 
 	DIDAppend := Risk_Indicators.iid_getDID_prepOutput(prepDIDAppend,
-																										Options.DPPA_Purpose,
-																										Options.GLBA_Purpose,
+																										mod_access.dppa,
+																										mod_access.glb,
 																										FALSE, /*isFCRA*/
 																										50, /*BSVersion*/
-																										Options.DataRestrictionMask,
+																										mod_access.DataRestrictionMask,
 																										0, /*Append_Best*/
 																										DATASET([], Gateway.Layouts.Config), /*Gateways*/
 																										0 /*BSOptions*/,

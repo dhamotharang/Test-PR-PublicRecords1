@@ -1,19 +1,20 @@
 ﻿IMPORT BIPV2, Business_Risk_BIP, Corp2, EBR, MDR, Risk_Indicators, UT, riskwise, Doxie, STD;
 
-EXPORT getCorporateFilings(DATASET(Business_Risk_BIP.Layouts.Shell) Shell, 
+EXPORT getCorporateFilings(DATASET(Business_Risk_BIP.Layouts.Shell) Shell,
 											 Business_Risk_BIP.LIB_Business_Shell_LIBIN Options,
 											 BIPV2.mod_sources.iParams linkingOptions,
-											 SET OF STRING2 AllowedSourcesSet,
-											 doxie.IDataAccess mod_access = MODULE (doxie.IDataAccess) END) := FUNCTION
+											 SET OF STRING2 AllowedSourcesSet) := FUNCTION
+
+	mod_access := PROJECT(Options, doxie.IDataAccess);
 
 	STRING1 CURRENT := 'C';
 	STRING1 HISTORY := 'H';
 	STRING1 UNKNOWN := '0';
 
 	LinkIDs := Business_Risk_BIP.Common.GetLinkIDs(Shell);
-	
+
 	// ---------------[ EBR (Experian Business Report) -- for OwnershipType field only ]----------------
-	
+
 	// NOTE: owner_type_code--One of the following descriptions will be listed: 0 = Unknown; 1 = Public; 2 = Private; 3 = Foreign; 4 = Non-Profit
 
 	EBRRaw := EBR.Key_5600_Demographic_Data_linkids.kFetch2(LinkIDs, mod_access,
@@ -22,23 +23,23 @@ EXPORT getCorporateFilings(DATASET(Business_Risk_BIP.Layouts.Shell) Shell,
 																							linkingOptions,
 																							Business_Risk_BIP.Constants.Limit_Default,
 																							Options.KeepLargeBusinesses
-																							);																	
+																							);
 	// Add back our Seq numbers.
 	Business_Risk_BIP.Common.AppendSeq2(EBRRaw, Shell, EBRSeq);
-	
+
 	// Filter out records after our history date.
 	EBR_recs := Business_Risk_BIP.Common.FilterRecords(EBRSeq, date_first_seen, (UNSIGNED)Business_Risk_BIP.Constants.MissingDate, MDR.SourceTools.src_EBR, AllowedSourcesSet);
 
-  EBR_recs_temp := 
-    PROJECT( 
-      EBR_recs, 
-      TRANSFORM( {RECORDOF(EBR_recs), STRING EverPublic}, 
-        SELF.EverPublic := LEFT.owner_type_code, 
-        SELF := LEFT, 
-        SELF := [] 
-      ) 
+  EBR_recs_temp :=
+    PROJECT(
+      EBR_recs,
+      TRANSFORM( {RECORDOF(EBR_recs), STRING EverPublic},
+        SELF.EverPublic := LEFT.owner_type_code,
+        SELF := LEFT,
+        SELF := []
+      )
     );
-  
+
 	EBR_recs_rollup :=
 		ROLLUP(
 			SORT(	EBR_recs_temp, seq, UltID, OrgID, SeleID, ProxID, -(record_type = CURRENT), -process_date ),
@@ -49,9 +50,9 @@ EXPORT getCorporateFilings(DATASET(Business_Risk_BIP.Layouts.Shell) Shell,
 			),
 			seq, UltID, OrgID, SeleID, ProxID
 		);
-		
-	// ---------------[ Corporate Filings (SoS) Data ]----------------	
-	
+
+	// ---------------[ Corporate Filings (SoS) Data ]----------------
+
 	CorpFilings_raw := Corp2.Key_LinkIDs.Corp.kfetch2(LinkIDs,
 	                                         Business_Risk_BIP.Common.SetLinkSearchLevel(Options.LinkSearchLevel),
 	                                         0, // ScoreThreshold --> 0 = Give me everything
@@ -61,28 +62,28 @@ EXPORT getCorporateFilings(DATASET(Business_Risk_BIP.Layouts.Shell) Shell,
 
 	// Add back our Seq numbers.
 	Business_Risk_BIP.Common.AppendSeq2(CorpFilings_raw, Shell, CorpFilings_seq);
-	
+
 	// Figure out if the kFetch was successful
 	kFetchErrorCodes := Business_Risk_BIP.Common.GrabFetchErrorCode(CorpFilings_seq);
 
- // Calculate the source code by state to restrict records for Marketing properly. We'll 
+ // Calculate the source code by state to restrict records for Marketing properly. We'll
  // borrow corp_src_type for the state source code.
- CorpFilings_withSrcCode := 
+ CorpFilings_withSrcCode :=
   PROJECT(
     CorpFilings_seq,
-    TRANSFORM( RECORDOF(CorpFilings_seq), 
+    TRANSFORM( RECORDOF(CorpFilings_seq),
       SELF.corp_src_type := MDR.sourceTools.fCorpV2( LEFT.corp_key, LEFT.corp_state_origin ),
       SELF := LEFT
     ) );
-  
+
 	// Filter out records after our history date.
 	CorpFilings_recs := Business_Risk_BIP.Common.FilterRecords(CorpFilings_withSrcCode, dt_first_seen, dt_vendor_first_reported, corp_src_type, AllowedSourcesSet);
-	
-	// Filter out any companies (designated as such by corp_key) that have no Current corp filing 
+
+	// Filter out any companies (designated as such by corp_key) that have no Current corp filing
 	// records anywhere. Such companies no longer exist.
 	CorpFilings_recs_grpd := GROUP( SORT( CorpFilings_recs, corp_key ), seq, corp_key );
 	CorpFilings_recs_filt := CorpFilings_recs_grpd;    //HAVING( CorpFilings_recs_grpd, EXISTS(ROWS(LEFT)(record_type = CURRENT)) );
-	
+
 	// Inflate the corp filing record to include placeholders for derived, calculated data. Set
 	// the is_defunct flag, and borrow from corp_entity_desc (limiting to 20 chars), corp_ra_resign_date,
 	// corp_forgn_date, and corp_forgn_term_exist_cd if necessary. These will aid in rolling up later.
@@ -98,8 +99,8 @@ EXPORT getCorporateFilings(DATASET(Business_Risk_BIP.Layouts.Shell) Shell,
     BOOLEAN EverNonProfit     := FALSE;
 		DATASET({STRING TypeDesc}) OrigBus;
 		DATASET({STRING Term}) TermExist;
-		DATASET({STRING Standing}) SOSStandingBest;    
-		DATASET({STRING Standing}) SOSStandingWorst;    
+		DATASET({STRING Standing}) SOSStandingBest;
+		DATASET({STRING Standing}) SOSStandingWorst;
 		DATASET({STRING FilingDate, STRING FilingCD, STRING ForgnDomstcInd}) Filings;
 		DATASET({STRING FilingDate, STRING StatusCD, STRING StatusDesc, STRING RecordType}) FilingStatus;
 		DATASET({STRING IncDate, STRING IncState}) Incorporation;
@@ -112,7 +113,7 @@ EXPORT getCorporateFilings(DATASET(Business_Risk_BIP.Layouts.Shell) Shell,
 		DATASET({STRING TypeDesc}) Address1;
 	END;
 
-	fn_getSOSStanding(STRING record_type, STRING corp_status_cd, STRING corp_status_desc) := 
+	fn_getSOSStanding(STRING record_type, STRING corp_status_cd, STRING corp_status_desc) :=
     MAP(
       Business_Risk_BIP.Common.is_ActiveCorp(record_type, corp_status_cd, corp_status_desc)    => '3',
       STD.Str.Find(STD.Str.ToUpperCase(corp_status_desc), 'INACTIVE', 1) <> 0  => '2',
@@ -123,7 +124,7 @@ EXPORT getCorporateFilings(DATASET(Business_Risk_BIP.Layouts.Shell) Shell,
 			SOSStanding := fn_getSOSStanding(LEFT.record_type, LEFT.corp_status_cd, LEFT.corp_status_desc);
 			SELF.temp_corp_inc_date := IF( LEFT.corp_inc_date = '', '99999999', LEFT.corp_inc_date ),
 			SELF.temp_corp_forgn_date := IF( LEFT.corp_forgn_date = '', '99999999', LEFT.corp_forgn_date ),
-			SELF.SOSStanding := SOSStanding,			
+			SELF.SOSStanding := SOSStanding,
 			SELF.CurrDefunct := IF(STD.Str.ToUpperCase(LEFT.corp_status_desc) IN ['FORFEITED','TERMINATED','DISSOLVED'] and left.record_type = CURRENT, true, false);
 			SELF.everDefunct := IF(STD.Str.ToUpperCase(LEFT.corp_status_desc) IN ['FORFEITED','TERMINATED','DISSOLVED'], true, false);
 			SELF.PrivateOwnership := IF(TRIM(LEFT.corp_for_profit_ind) = 'Y', TRUE, FALSE);
@@ -143,22 +144,22 @@ EXPORT getCorporateFilings(DATASET(Business_Risk_BIP.Layouts.Shell) Shell,
           Business_Risk_BIP.Common.filterOutSpecialChars( STD.Str.ToUpperCase(TRIM(LEFT.corp_status_desc, LEFT, RIGHT)) ),
           LEFT.record_type
         }
-      ], 
+      ],
       {STRING FilingDate, STRING StatusCD, STRING StatusDesc, STRING RecordType}
     );
 
 			incDate := Business_Risk_BIP.Common.checkInvalidDate(LEFT.corp_inc_date, Business_Risk_BIP.Constants.MissingDate, LEFT.HistoryDate);
 
-			SELF.Incorporation := 
+			SELF.Incorporation :=
       DATASET(
-        [ { incDate, Business_Risk_BIP.Common.filterOutSpecialChars(STD.Str.ToUpperCase(TRIM(LEFT.corp_inc_state, LEFT, RIGHT)))} ], 
+        [ { incDate, Business_Risk_BIP.Common.filterOutSpecialChars(STD.Str.ToUpperCase(TRIM(LEFT.corp_inc_state, LEFT, RIGHT)))} ],
         {STRING IncDate, STRING IncState} );
 
 			ForgnIncDate := Business_Risk_BIP.Common.checkInvalidDate(LEFT.corp_forgn_date, Business_Risk_BIP.Constants.MissingDate, LEFT.HistoryDate);
 
-			SELF.ForgnIncorporation := 
+			SELF.ForgnIncorporation :=
       DATASET(
-        [ { ForgnIncDate, Business_Risk_BIP.Common.filterOutSpecialChars(STD.Str.ToUpperCase(TRIM(LEFT.corp_forgn_state_cd, LEFT, RIGHT)))} ], 
+        [ { ForgnIncDate, Business_Risk_BIP.Common.filterOutSpecialChars(STD.Str.ToUpperCase(TRIM(LEFT.corp_forgn_state_cd, LEFT, RIGHT)))} ],
         {STRING IncDate, STRING IncState} );
 
 			registeredAgentChanged := (INTEGER)LEFT.corp_ra_effective_date > 0 OR // We have a registered agent effective date or a registered agent name
@@ -171,19 +172,19 @@ EXPORT getCorporateFilings(DATASET(Business_Risk_BIP.Layouts.Shell) Shell,
 			SELF.ForeignState := DATASET([{Business_Risk_BIP.Common.filterOutSpecialChars(STD.Str.ToUpperCase(TRIM(LEFT.corp_forgn_state_cd, LEFT, RIGHT)))}], {STRING StateCD});
 			SELF.Address1 := DATASET([{Business_Risk_BIP.Common.filterOutSpecialChars(STD.Str.ToUpperCase(TRIM(LEFT.corp_address1_type_desc, LEFT, RIGHT)))}], {STRING TypeDesc});
 			SELF := LEFT));
-	
-	// Sort to the top the most recent, Current, Legal record for each corp_key. Among these, 
-	// we want the record to contain the oldest incorp date. 
+
+	// Sort to the top the most recent, Current, Legal record for each corp_key. Among these,
+	// we want the record to contain the oldest incorp date.
 	CorpFilings_recs_srtd :=
-		SORT( 
+		SORT(
 			UNGROUP(CorpFilingsCleaned),
 			seq,
 			-corp_key,
-			// -(record_type = CURRENT), 
-			record_type, 
-			-(corp_ln_name_type_desc = 'LEGAL'), 
+			// -(record_type = CURRENT),
+			record_type,
+			-(corp_ln_name_type_desc = 'LEGAL'),
 			MIN(temp_corp_inc_date, temp_corp_forgn_date),
-			-corp_process_date, 
+			-corp_process_date,
 			-dt_last_seen,
 			corp_ra_name
 		);
@@ -191,10 +192,10 @@ EXPORT getCorporateFilings(DATASET(Business_Risk_BIP.Layouts.Shell) Shell,
 	// Use a rollup to:
 	//   o   ...keep the most recent corp_orig_bus_type_desc value,
 	//   o   ...calculate whether the company was ever_defunct
-	//   o   ...the highest number of corp_amendments_filed ever, 
+	//   o   ...the highest number of corp_amendments_filed ever,
 	//   o   ...whether Registered Agents ever changed,
-	//   o   ...and the Registered Agent Date Change list, removing dupes and ignoring blanks. 
-	// The result of the rollup is the most recent record for each corp_key (per the Sort, above), 
+	//   o   ...and the Registered Agent Date Change list, removing dupes and ignoring blanks.
+	// The result of the rollup is the most recent record for each corp_key (per the Sort, above),
 	// plus the calculated values in the extra fields.
 	CorpFilingsRolled1 := ROLLUP(CorpFilings_recs_srtd, LEFT.Seq = RIGHT.Seq AND LEFT.Corp_Key = RIGHT.Corp_Key, TRANSFORM(layout_corpfilings_inflated,
 			SELF.SOSStanding := LEFT.SOSStanding;
@@ -217,7 +218,7 @@ EXPORT getCorporateFilings(DATASET(Business_Risk_BIP.Layouts.Shell) Shell,
 			SELF.ForeignState := LEFT.ForeignState + RIGHT.ForeignState;
 			SELF.Address1 := LEFT.Address1 + RIGHT.Address1;
 			SELF := LEFT));
-	
+
 	// Now remove Duplicate/Blank Datasets.
 	CorpFilingsRolledClean := PROJECT(CorpFilingsRolled1, TRANSFORM(layout_corpfilings_inflated,
 			SELF.OrigBus            := DEDUP(SORT(LEFT.OrigBus (TypeDesc <> ''), TypeDesc), TypeDesc);
@@ -235,7 +236,7 @@ EXPORT getCorporateFilings(DATASET(Business_Risk_BIP.Layouts.Shell) Shell,
 			SELF.ForeignState       := DEDUP(SORT(LEFT.ForeignState (StateCD <> ''), StateCD), StateCD);
 			SELF.Address1           := DEDUP(SORT(LEFT.Address1 (TypeDesc <> ''), TypeDesc), TypeDesc);
 			SELF := LEFT));
-      
+
 	// Finally roll everything up into Per Seq Datasets
 	CorpFilingsRolled := ROLLUP(SORT(CorpFilingsRolledClean, Seq), LEFT.Seq = RIGHT.Seq, TRANSFORM(layout_corpfilings_inflated,
 			// Use 'best' SOS standing -- if any corp key is reporting an active business, count SOS standing as active.
@@ -275,7 +276,7 @@ EXPORT getCorporateFilings(DATASET(Business_Risk_BIP.Layouts.Shell) Shell,
 				newestIncorporationDate := Business_Risk_BIP.Common.checkInvalidDate(newestIncorporation[1].IncDate, Business_Risk_BIP.Constants.MissingDate, LEFT.Clean_Input.HistoryDate);
 				oldestIncorporationDate := Business_Risk_BIP.Common.checkInvalidDate(oldestIncorporation[1].IncDate, Business_Risk_BIP.Constants.MissingDate, LEFT.Clean_Input.HistoryDate);
 				oldestNonZeroIncorporationDate := Business_Risk_BIP.Common.checkInvalidDate(oldestNonZeroIncorporation[1].IncDate, Business_Risk_BIP.Constants.MissingDate, LEFT.Clean_Input.HistoryDate);
-				
+
 				BHBuildDate := Risk_Indicators.get_Build_date('bip_build_version');
 				TodaysDate := Business_Risk_BIP.Common.todaysDate(BHBuildDate, LEFT.Clean_Input.HistoryDate);
 				regAgentChanged := PROJECT(RIGHT.RegAgentChanges, TRANSFORM({STRING AgentName, STRING AgentChangeDate, STRING AgentChanged},
@@ -289,11 +290,11 @@ EXPORT getCorporateFilings(DATASET(Business_Risk_BIP.Layouts.Shell) Shell,
 				oldestFiling := TOPN(RIGHT.Filings, 1, FilingDate);
 				recentAgentChangeDate := Business_Risk_BIP.Common.checkInvalidDate(sortedRegAgent[1].AgentChangeDate, Business_Risk_BIP.Constants.MissingDate, LEFT.Clean_Input.HistoryDate);
 				countStateList := COUNT(DEDUP(SORT(RIGHT.Incorporation(TRIM(IncState) <> ''), IncState), IncState));
-				combinedStateLists := PROJECT(RIGHT.Incorporation(TRIM(IncState) <> ''), TRANSFORM({STRING2 State}, SELF.State := LEFT.IncState)) + 
+				combinedStateLists := PROJECT(RIGHT.Incorporation(TRIM(IncState) <> ''), TRANSFORM({STRING2 State}, SELF.State := LEFT.IncState)) +
 															PROJECT(RIGHT.ForeignState(TRIM(StateCD) <> ''), TRANSFORM({STRING2 State}, SELF.State := LEFT.StateCD));
 
 				SELF.SOS.SOSStateCount := (STRING)Business_Risk_BIP.Common.CapNum(COUNT(DEDUP(SORT(combinedStateLists, State), State)), -1, 60);
-				SELF.SOS.SOSTimeIncorporation :=  (string)if(SOSRecExists, if((integer)oldestNonZeroIncorporationDate <> 0, Business_Risk_BIP.Common.capNum((INTEGER)ut.MonthsApart(oldestNonZeroIncorporationDate, TodaysDate), 1, 99999), 0), -1); 
+				SELF.SOS.SOSTimeIncorporation :=  (string)if(SOSRecExists, if((integer)oldestNonZeroIncorporationDate <> 0, Business_Risk_BIP.Common.capNum((INTEGER)ut.MonthsApart(oldestNonZeroIncorporationDate, TodaysDate), 1, 99999), 0), -1);
 				SELF.SOS.SOSDateOfIncorporationList := Business_Risk_BIP.Common.convertDelimited(RIGHT.Incorporation, IncDate, Business_Risk_BIP.Constants.FieldDelimiter);
 				SELF.SOS.SOSIncorporationCount := (STRING)Business_Risk_BIP.Common.CapNum(COUNT(RIGHT.Incorporation), -1, 999);
 				SELF.SOS.SOSIncorporationDateFirstSeen := oldestIncorporationDate;
@@ -324,7 +325,7 @@ EXPORT getCorporateFilings(DATASET(Business_Risk_BIP.Layouts.Shell) Shell,
 				SELF.SOS.SOSRegisterAgentChangeCount := IF(SOSRecExists, (STRING)Business_Risk_BIP.Common.CapNum(COUNT(sortedRegAgent), -1, 999), '-1');
 				SELF.SOS.SOSRegisterAgentChangeDateFirstSeen := Business_Risk_BIP.Common.checkInvalidDate(oldestRegAgent[1].AgentChangeDate, Business_Risk_BIP.Constants.MissingDate, LEFT.Clean_Input.HistoryDate);
 				SELF.SOS.SOSRegisterAgentChangeDateLastSeen := Business_Risk_BIP.Common.checkInvalidDate(newestRegAgent[1].AgentChangeDate, Business_Risk_BIP.Constants.MissingDate, LEFT.Clean_Input.HistoryDate);
-				SELF.SOS.SOSTimeAgentChange := (string)if(SOSRecExists, if((integer)recentAgentChangeDate <> 0, Business_Risk_BIP.Common.capNum((INTEGER)ut.MonthsApart(recentAgentChangeDate, TodaysDate), 1, 99999), 0), -1); 
+				SELF.SOS.SOSTimeAgentChange := (string)if(SOSRecExists, if((integer)recentAgentChangeDate <> 0, Business_Risk_BIP.Common.capNum((INTEGER)ut.MonthsApart(recentAgentChangeDate, TodaysDate), 1, 99999), 0), -1);
 				regAgent12Month := sortedRegAgent ((INTEGER)AgentChangeDate > 0 AND ut.DaysApart(AgentChangeDate, TodaysDate) <= Business_Risk_BIP.Constants.OneYear);
 				regAgent06Month := regAgent12Month ((INTEGER)AgentChangeDate > 0 AND ut.DaysApart(AgentChangeDate, TodaysDate) <= Business_Risk_BIP.Constants.SixMonths);
 				regAgent03Month := regAgent06Month ((INTEGER)AgentChangeDate > 0 AND ut.DaysApart(AgentChangeDate, TodaysDate) <= Business_Risk_BIP.Constants.ThreeMonths);
@@ -342,28 +343,28 @@ EXPORT getCorporateFilings(DATASET(Business_Risk_BIP.Layouts.Shell) Shell,
 
 
 	withCorpFilingsData_BIID20 := JOIN(withOwnership, CorpFilingsRolled, LEFT.Seq = RIGHT.Seq, TRANSFORM(Business_Risk_BIP.Layouts.Shell,
-                ds_Incorporation_Seq := 
+                ds_Incorporation_Seq :=
                 PROJECT(
                 RIGHT.Incorporation,
                 TRANSFORM( {INTEGER4 Seq, RECORDOF(RIGHT.Incorporation)},
                 SELF.Seq     := COUNTER,
                 SELF := LEFT
                 ) );
-                          
-                ds_FilingStatus_Seq := 
+
+                ds_FilingStatus_Seq :=
                 PROJECT(
                 RIGHT.FilingStatus,
                 TRANSFORM( {INTEGER4 Seq, RECORDOF(RIGHT.FilingStatus)},
                 SELF.Seq     := COUNTER,
                 SELF := LEFT
                 ) );
-                
+
                 Incorp_FilingStatus_Layout := RECORD
                 RECORDOF(ds_Incorporation_Seq);
                 RECORDOF(ds_FilingStatus_Seq) - Seq;
                 END;
-    
-                Joined_Incorp_FilingStatus_Domestic := JOIN(ds_Incorporation_Seq, ds_FilingStatus_Seq, 
+
+                Joined_Incorp_FilingStatus_Domestic := JOIN(ds_Incorporation_Seq, ds_FilingStatus_Seq,
                 LEFT.Seq = RIGHT.Seq, TRANSFORM(Incorp_FilingStatus_Layout,
                 SELF.Seq := LEFT.Seq;
                 SELF.filingdate := RIGHT.filingdate;
@@ -373,14 +374,14 @@ EXPORT getCorporateFilings(DATASET(Business_Risk_BIP.Layouts.Shell) Shell,
                 SELF.incdate := LEFT.incdate;
                 SELF.incstate := LEFT.incstate;
                 ), LEFT OUTER, ATMOST(riskwise.max_atmost));
-                
+
 				newestIncorporation := PROJECT(TOPN(Joined_Incorp_FilingStatus_Domestic, 1, StatusCD, -IncDate), TRANSFORM(RECORDOF(ds_Incorporation_Seq), SELF := LEFT));
 				oldestIncorporation := PROJECT(TOPN(Joined_Incorp_FilingStatus_Domestic, 1, StatusCD, IncDate), TRANSFORM(RECORDOF(ds_Incorporation_Seq), SELF := LEFT));
 				oldestNonZeroIncorporation := PROJECT(TOPN(Joined_Incorp_FilingStatus_Domestic, 1, StatusCD, (INTEGER)IncDate > 0), TRANSFORM(RECORDOF(ds_Incorporation_Seq), SELF := LEFT));
 				newestIncorporationDate := Business_Risk_BIP.Common.checkInvalidDate(newestIncorporation[1].IncDate, Business_Risk_BIP.Constants.MissingDate, LEFT.Clean_Input.HistoryDate);
 				oldestIncorporationDate := Business_Risk_BIP.Common.checkInvalidDate(oldestIncorporation[1].IncDate, Business_Risk_BIP.Constants.MissingDate, LEFT.Clean_Input.HistoryDate);
 				oldestNonZeroIncorporationDate := Business_Risk_BIP.Common.checkInvalidDate(oldestNonZeroIncorporation[1].IncDate, Business_Risk_BIP.Constants.MissingDate, LEFT.Clean_Input.HistoryDate);
-				
+
 				BHBuildDate := Risk_Indicators.get_Build_date('bip_build_version');
 				TodaysDate := Business_Risk_BIP.Common.todaysDate(BHBuildDate, LEFT.Clean_Input.HistoryDate);
 				regAgentChanged := PROJECT(RIGHT.RegAgentChanges, TRANSFORM({STRING AgentName, STRING AgentChangeDate, STRING AgentChanged},
@@ -394,11 +395,11 @@ EXPORT getCorporateFilings(DATASET(Business_Risk_BIP.Layouts.Shell) Shell,
 				oldestFiling := TOPN(RIGHT.Filings, 1, FilingDate);
 				recentAgentChangeDate := Business_Risk_BIP.Common.checkInvalidDate(sortedRegAgent[1].AgentChangeDate, Business_Risk_BIP.Constants.MissingDate, LEFT.Clean_Input.HistoryDate);
 				countStateList := COUNT(DEDUP(SORT(RIGHT.Incorporation(TRIM(IncState) <> ''), IncState), IncState));
-				combinedStateLists := PROJECT(RIGHT.Incorporation(TRIM(IncState) <> ''), TRANSFORM({STRING2 State}, SELF.State := LEFT.IncState)) + 
+				combinedStateLists := PROJECT(RIGHT.Incorporation(TRIM(IncState) <> ''), TRANSFORM({STRING2 State}, SELF.State := LEFT.IncState)) +
 															PROJECT(RIGHT.ForeignState(TRIM(StateCD) <> ''), TRANSFORM({STRING2 State}, SELF.State := LEFT.StateCD));
 
 				SELF.SOS.SOSStateCount := (STRING)Business_Risk_BIP.Common.CapNum(COUNT(DEDUP(SORT(combinedStateLists, State), State)), -1, 60);
-				SELF.SOS.SOSTimeIncorporation :=  (string)if(SOSRecExists, if((integer)oldestNonZeroIncorporationDate <> 0, Business_Risk_BIP.Common.capNum((INTEGER)ut.MonthsApart(oldestNonZeroIncorporationDate, TodaysDate), 1, 99999), 0), -1); 
+				SELF.SOS.SOSTimeIncorporation :=  (string)if(SOSRecExists, if((integer)oldestNonZeroIncorporationDate <> 0, Business_Risk_BIP.Common.capNum((INTEGER)ut.MonthsApart(oldestNonZeroIncorporationDate, TodaysDate), 1, 99999), 0), -1);
 				SELF.SOS.SOSDateOfIncorporationList := Business_Risk_BIP.Common.convertDelimited(RIGHT.Incorporation, IncDate, Business_Risk_BIP.Constants.FieldDelimiter);
 				SELF.SOS.SOSIncorporationCount := (STRING)Business_Risk_BIP.Common.CapNum(COUNT(RIGHT.Incorporation), -1, 999);
 				SELF.SOS.SOSIncorporationDateFirstSeen := oldestIncorporationDate;
@@ -429,7 +430,7 @@ EXPORT getCorporateFilings(DATASET(Business_Risk_BIP.Layouts.Shell) Shell,
 				SELF.SOS.SOSRegisterAgentChangeCount := IF(SOSRecExists, (STRING)Business_Risk_BIP.Common.CapNum(COUNT(sortedRegAgent), -1, 999), '-1');
 				SELF.SOS.SOSRegisterAgentChangeDateFirstSeen := Business_Risk_BIP.Common.checkInvalidDate(oldestRegAgent[1].AgentChangeDate, Business_Risk_BIP.Constants.MissingDate, LEFT.Clean_Input.HistoryDate);
 				SELF.SOS.SOSRegisterAgentChangeDateLastSeen := Business_Risk_BIP.Common.checkInvalidDate(newestRegAgent[1].AgentChangeDate, Business_Risk_BIP.Constants.MissingDate, LEFT.Clean_Input.HistoryDate);
-				SELF.SOS.SOSTimeAgentChange := (string)if(SOSRecExists, if((integer)recentAgentChangeDate <> 0, Business_Risk_BIP.Common.capNum((INTEGER)ut.MonthsApart(recentAgentChangeDate, TodaysDate), 1, 99999), 0), -1); 
+				SELF.SOS.SOSTimeAgentChange := (string)if(SOSRecExists, if((integer)recentAgentChangeDate <> 0, Business_Risk_BIP.Common.capNum((INTEGER)ut.MonthsApart(recentAgentChangeDate, TodaysDate), 1, 99999), 0), -1);
 				regAgent12Month := sortedRegAgent ((INTEGER)AgentChangeDate > 0 AND ut.DaysApart(AgentChangeDate, TodaysDate) <= Business_Risk_BIP.Constants.OneYear);
 				regAgent06Month := regAgent12Month ((INTEGER)AgentChangeDate > 0 AND ut.DaysApart(AgentChangeDate, TodaysDate) <= Business_Risk_BIP.Constants.SixMonths);
 				regAgent03Month := regAgent06Month ((INTEGER)AgentChangeDate > 0 AND ut.DaysApart(AgentChangeDate, TodaysDate) <= Business_Risk_BIP.Constants.ThreeMonths);
@@ -448,7 +449,7 @@ EXPORT getCorporateFilings(DATASET(Business_Risk_BIP.Layouts.Shell) Shell,
 	withCorpFilingsData_New := JOIN(withOwnership, CorpFilingsRolled, LEFT.Seq = RIGHT.Seq, TRANSFORM(Business_Risk_BIP.Layouts.Shell,
 				ds_Incorporation      := RIGHT.Incorporation(incdate NOT IN ['','0']);
 				ds_ForgnIncorporation := RIGHT.ForgnIncorporation(incdate NOT IN ['','0']);
-				
+
     ds_DomesticIncorpsAsFilings :=
         PROJECT(
           ds_Incorporation,
@@ -459,23 +460,23 @@ EXPORT getCorporateFilings(DATASET(Business_Risk_BIP.Layouts.Shell) Shell,
           ) );
 
 				ds_Filings := RIGHT.Filings(filingdate NOT IN ['','0']) + ds_DomesticIncorpsAsFilings;
-        
+
 				newestDomesticIncorporation := SORT(ds_Incorporation, -IncDate)[1];
     newestForeignIncorporation  := SORT(ds_ForgnIncorporation, -IncDate)[1];
     newestIncorporation         := SORT( (newestDomesticIncorporation + newestForeignIncorporation), -IncDate )[1];
 
 				oldestDomesticIncorporation := SORT(ds_Incorporation(IncDate NOT IN ['','0']), IncDate)[1];
     oldestForeignIncorporation  := SORT(ds_ForgnIncorporation(IncDate NOT IN ['','0']), IncDate)[1];
-    oldestIncorporation := 
+    oldestIncorporation :=
         IF(
           COUNT((oldestDomesticIncorporation + oldestForeignIncorporation)) > 0,
           SORT( (oldestDomesticIncorporation + oldestForeignIncorporation)(incdate NOT IN ['','0']), IncDate )[1],
           ROW( {'0',''}, {STRING IncDate, STRING IncState} )
         );
-        
+
 				newestIncorporationDate := Business_Risk_BIP.Common.checkInvalidDate(newestIncorporation.IncDate, Business_Risk_BIP.Constants.MissingDate, LEFT.Clean_Input.HistoryDate);
 				oldestIncorporationDate := Business_Risk_BIP.Common.checkInvalidDate(oldestIncorporation.IncDate, Business_Risk_BIP.Constants.MissingDate, LEFT.Clean_Input.HistoryDate);
-				
+
 				BHBuildDate := Risk_Indicators.get_Build_date('bip_build_version');
 
 				TodaysDate := Business_Risk_BIP.Common.todaysDate(BHBuildDate, LEFT.Clean_Input.HistoryDate);
@@ -483,22 +484,22 @@ EXPORT getCorporateFilings(DATASET(Business_Risk_BIP.Layouts.Shell) Shell,
 				regAgentChanged := PROJECT(RIGHT.RegAgentChanges, TRANSFORM({STRING AgentName, STRING AgentChangeDate, STRING AgentChanged},
 					SELF.AgentChanged := IF((INTEGER)LEFT.AgentChangeDate <> (INTEGER)oldestIncorporationDate, '1', '0');
 					SELF := LEFT));
-    
+
 				SOSRecExists   := COUNT(ds_Incorporation) >= 1 OR COUNT(ds_ForgnIncorporation) >= 1;             // Adding foreign incorporations should fix a lot of the fields below.
 
-				sortedRegAgent := SORT(regAgentChanged, -AgentChangeDate);        
+				sortedRegAgent := SORT(regAgentChanged, -AgentChangeDate);
 				newestRegAgent := sortedRegAgent[1];
 				oldestRegAgent := TOPN(regAgentChanged(AgentChangeDate NOT IN ['','0']), 1, AgentChangeDate);
-        
+
 				newestFiling   := TOPN(ds_Filings, 1, -FilingDate);
 				oldestFiling   := TOPN(ds_Filings(FilingDate NOT IN ['','0']), 1, FilingDate);
-				
+
 				recentAgentChangeDate := Business_Risk_BIP.Common.checkInvalidDate(sortedRegAgent[1].AgentChangeDate, Business_Risk_BIP.Constants.MissingDate, LEFT.Clean_Input.HistoryDate);
 
 				countStateList := COUNT(DEDUP(SORT(ds_Incorporation(TRIM(IncState) <> ''), IncState), IncState)) +
         COUNT(DEDUP(SORT(ds_ForgnIncorporation(TRIM(IncState) <> ''), IncState), IncState));
 
-    combinedStateLists := PROJECT(ds_Incorporation(TRIM(IncState) <> ''), TRANSFORM({STRING2 State}, SELF.State := LEFT.IncState)) + 
+    combinedStateLists := PROJECT(ds_Incorporation(TRIM(IncState) <> ''), TRANSFORM({STRING2 State}, SELF.State := LEFT.IncState)) +
                           PROJECT(ds_ForgnIncorporation(TRIM(IncState) <> ''), TRANSFORM({STRING2 State}, SELF.State := LEFT.IncState));
 
     nonZeroDomesticFilingDates := ds_Filings(ForgnDomstcInd = 'D' AND FilingDate NOT IN ['','0']);
@@ -509,14 +510,14 @@ EXPORT getCorporateFilings(DATASET(Business_Risk_BIP.Layouts.Shell) Shell,
 				regAgent03Month := regAgent06Month ((INTEGER)AgentChangeDate > 0 AND ut.DaysApart(AgentChangeDate, TodaysDate) <= Business_Risk_BIP.Constants.ThreeMonths);
 
     AllIncorporations := (ds_Incorporation + ds_ForgnIncorporation);
-    
+
 				SELF.SOS.SOSStateCount                       := (STRING)Business_Risk_BIP.Common.CapNum(COUNT(DEDUP(SORT(combinedStateLists, State), State)), -1, 60);
-				SELF.SOS.SOSTimeIncorporation                := (string)if(SOSRecExists, if((integer)oldestIncorporationDate <> 0, Business_Risk_BIP.Common.capNum((INTEGER)ut.MonthsApart(oldestIncorporationDate, TodaysDate), 1, 99999), 0), -1); 
+				SELF.SOS.SOSTimeIncorporation                := (string)if(SOSRecExists, if((integer)oldestIncorporationDate <> 0, Business_Risk_BIP.Common.capNum((INTEGER)ut.MonthsApart(oldestIncorporationDate, TodaysDate), 1, 99999), 0), -1);
 				SELF.SOS.SOSDateOfIncorporationList          := Business_Risk_BIP.Common.convertDelimited(AllIncorporations, IncDate, Business_Risk_BIP.Constants.FieldDelimiter);
 				SELF.SOS.SOSIncorporationCount               := (STRING)Business_Risk_BIP.Common.CapNum( (COUNT(AllIncorporations)), -1, 999);
 				SELF.SOS.SOSIncorporationDateFirstSeen       := oldestIncorporationDate;
 				SELF.SOS.SOSIncorporationDateLastSeen        := newestIncorporationDate;
-				SELF.SOS.SOSIncorporationStateFirst          := oldestIncorporation.IncState; 
+				SELF.SOS.SOSIncorporationStateFirst          := oldestIncorporation.IncState;
 				SELF.SOS.SOSIncorporationStateLast           := newestIncorporation.IncState;
 				SELF.SOS.SOSIncorporationStateInput          := If(SOSRecExists, Business_Risk_BIP.Common.SetBoolean( (COUNT(AllIncorporations(IncState = LEFT.Clean_Input.State))) > 0 ), '-1');
 				SELF.SOS.SOSStanding                         := IF(SOSRecExists, RIGHT.SOSStanding, '0');
@@ -528,7 +529,7 @@ EXPORT getCorporateFilings(DATASET(Business_Risk_BIP.Layouts.Shell) Shell,
 				SELF.SOS.SOSFilingCount                      := IF(SOSRecExists, (STRING)Business_Risk_BIP.Common.CapNum(COUNT(ds_Filings), -1, 999), '-1');
 				SELF.SOS.SOSFilingDateFirstSeen              := Business_Risk_BIP.Common.checkInvalidDate(oldestFiling[1].FilingDate, Business_Risk_BIP.Constants.MissingDate, LEFT.Clean_Input.HistoryDate);
 				SELF.SOS.SOSFilingDateLastSeen               := Business_Risk_BIP.Common.checkInvalidDate(newestFiling[1].FilingDate, Business_Risk_BIP.Constants.MissingDate, LEFT.Clean_Input.HistoryDate);
-				SELF.SOS.SOSDomesticCount                    := (STRING)Business_Risk_BIP.Common.capNum( COUNT( ds_Incorporation ), 0, 99999 ); // Number of domestic SOS incorporation filings 
+				SELF.SOS.SOSDomesticCount                    := (STRING)Business_Risk_BIP.Common.capNum( COUNT( ds_Incorporation ), 0, 99999 ); // Number of domestic SOS incorporation filings
 				SELF.SOS.SOSDomesticDateFirstSeen            := IF( COUNT( nonZeroDomesticFilingDates ) = 0, '0', SORT(nonZeroDomesticFilingDates, FilingDate)[1].FilingDate ); // Date of first domestic SOS incorporation filing
 				SELF.SOS.SOSDomesticDateLastSeen             := IF( COUNT( nonZeroDomesticFilingDates ) = 0, '0', SORT(nonZeroDomesticFilingDates, -FilingDate)[1].FilingDate ); // Date of most recent domestic SOS incorporation filing
 				SELF.SOS.SOSDomesticMosSinceFirstSeen        := IF( COUNT( nonZeroDomesticFilingDates ) = 0, '0', (STRING)ut.MonthsApart( SORT(nonZeroDomesticFilingDates, FilingDate)[1].FilingDate, TodaysDate) ); // Months since the first domestic SOS incorporation filing
@@ -552,7 +553,7 @@ EXPORT getCorporateFilings(DATASET(Business_Risk_BIP.Layouts.Shell) Shell,
 				SELF.SOS.SOSRegisterAgentChangeCount         := IF(SOSRecExists, (STRING)Business_Risk_BIP.Common.CapNum(COUNT(sortedRegAgent), -1, 999), '-1');
 				SELF.SOS.SOSRegisterAgentChangeDateFirstSeen := Business_Risk_BIP.Common.checkInvalidDate(oldestRegAgent[1].AgentChangeDate, Business_Risk_BIP.Constants.MissingDate, LEFT.Clean_Input.HistoryDate);
 				SELF.SOS.SOSRegisterAgentChangeDateLastSeen  := Business_Risk_BIP.Common.checkInvalidDate(newestRegAgent.AgentChangeDate, Business_Risk_BIP.Constants.MissingDate, LEFT.Clean_Input.HistoryDate);
-				SELF.SOS.SOSTimeAgentChange                  := (STRING)IF(SOSRecExists, IF((INTEGER)recentAgentChangeDate <> 0, Business_Risk_BIP.Common.capNum((INTEGER)ut.MonthsApart(recentAgentChangeDate, TodaysDate), 1, 99999), 0), -1); 
+				SELF.SOS.SOSTimeAgentChange                  := (STRING)IF(SOSRecExists, IF((INTEGER)recentAgentChangeDate <> 0, Business_Risk_BIP.Common.capNum((INTEGER)ut.MonthsApart(recentAgentChangeDate, TodaysDate), 1, 99999), 0), -1);
 				SELF.SOS.SOSRegisterAgentChangeCount12Month  := IF(SOSRecExists, (STRING)Business_Risk_BIP.Common.CapNum(COUNT(regAgent12Month), -1, 999), '-1');
 				SELF.SOS.SOSRegisterAgentChangeCount06Month  := IF(SOSRecExists, (STRING)Business_Risk_BIP.Common.CapNum(COUNT(regAgent06Month), -1, 999), '-1');
 				SELF.SOS.SOSRegisterAgentChangeCount03Month  := IF(SOSRecExists, (STRING)Business_Risk_BIP.Common.CapNum(COUNT(regAgent03Month), -1, 999), '-1');
@@ -563,16 +564,16 @@ EXPORT getCorporateFilings(DATASET(Business_Risk_BIP.Layouts.Shell) Shell,
 			),
 			LEFT OUTER, KEEP(1), ATMOST(100), FEW
 		);
-    
+
  withCorpFilingsData_NonBIID20 := IF( Options.BusShellVersion < Business_Risk_BIP.Constants.BusShellVersion_v30, withCorpFilingsData_Old, withCorpFilingsData_New );
  withCorpFilingsData := IF( Options.BusShellVersion < Business_Risk_BIP.Constants.BusShellVersion_v30 AND Options.IsBIID20 = TRUE, withCorpFilingsData_BIID20, withCorpFilingsData_NonBIID20);
- 
+
   // Get all unique NAIC Codes along with dates. For this data source, we only need the primary code.
 	tempLayout := RECORD
 		UNSIGNED4 Seq;
 		DATASET(Business_Risk_BIP.Layouts.LayoutSICNAIC) SICNAICSources;
 	END;
-  
+
   CorpFilingsNAIC := TABLE(CorpFilings_withSrcCode,
     {
       Seq,
@@ -587,9 +588,9 @@ EXPORT getCorporateFilings(DATASET(Business_Risk_BIP.Layouts.Shell) Shell,
     Seq, Business_Risk_BIP.Common.GetLinkSearchLevel(Options.LinkSearchLevel, SeleID), ((STRING)corp_naic_code)[1..6]
   );
 
-  CorpFilingsNAICTemp := 
+  CorpFilingsNAICTemp :=
     PROJECT(
-      CorpFilingsNAIC, 
+      CorpFilingsNAIC,
       TRANSFORM(tempLayout,
         SELF.Seq := LEFT.Seq;
         SELF.SICNAICSources := DATASET([{LEFT.Source, IF(LEFT.DateFirstSeen = Business_Risk_BIP.Constants.NinesDate, Business_Risk_BIP.Constants.MissingDate, LEFT.DateFirstSeen), LEFT.DateLastSeen, LEFT.RecordCount, '' /*SICCode*/, '' /*SICIndustry*/, LEFT.NAICCode, Business_Risk_BIP.Common.industryGroup(LEFT.NAICCode, Business_Risk_BIP.Constants.NAIC), LEFT.IsPrimary}], Business_Risk_BIP.Layouts.LayoutSICNAIC);
@@ -597,19 +598,19 @@ EXPORT getCorporateFilings(DATASET(Business_Risk_BIP.Layouts.Shell) Shell,
       )
     );
 
-  CorpFilingsNAICRolled := 
+  CorpFilingsNAICRolled :=
     ROLLUP(
-      CorpFilingsNAICTemp, 
-      LEFT.Seq = RIGHT.Seq, 
-      TRANSFORM( tempLayout, 
-        SELF.Seq := LEFT.Seq; 
-        SELF.SICNAICSources := LEFT.SICNAICSources + RIGHT.SICNAICSources; 
+      CorpFilingsNAICTemp,
+      LEFT.Seq = RIGHT.Seq,
+      TRANSFORM( tempLayout,
+        SELF.Seq := LEFT.Seq;
+        SELF.SICNAICSources := LEFT.SICNAICSources + RIGHT.SICNAICSources;
         SELF := LEFT
       )
     );
 
-  withCorpFilingsNAIC := 
-    JOIN(withCorpFilingsData, CorpFilingsNAICRolled, 
+  withCorpFilingsNAIC :=
+    JOIN(withCorpFilingsData, CorpFilingsNAICRolled,
       LEFT.Seq = RIGHT.Seq,
       TRANSFORM( Business_Risk_BIP.Layouts.Shell,
         SELF.SICNAICSources := LEFT.SICNAICSources + RIGHT.SICNAICSources;
@@ -617,7 +618,7 @@ EXPORT getCorporateFilings(DATASET(Business_Risk_BIP.Layouts.Shell) Shell,
       ),
       LEFT OUTER, KEEP(1), ATMOST(100), FEW
     );
-    
+
 	withErrorCodes := JOIN(withCorpFilingsNAIC, kFetchErrorCodes, LEFT.Seq = RIGHT.Seq,
 																	TRANSFORM(Business_Risk_BIP.Layouts.Shell,
 																							SELF.Data_Fetch_Indicators.FetchCodeCorporateFilings := (STRING)RIGHT.Fetch_Error_Code;
