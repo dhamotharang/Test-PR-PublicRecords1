@@ -116,7 +116,7 @@ EXPORT out_rec SmartLinxReport (dataset (doxie.layout_references) dids,
 	end;
 	//end of current indicator temp fix using TNT value.
 	//=======================================================================
-   
+
 	s_addresses := project(subject_addrs_TNT, setCurrent(LEFT));
 	s_addressesSequence := project(s_addresses, setSequence(LEFT,COUNTER));
 	s_addresses_current := s_addresses(verified=true);
@@ -383,6 +383,18 @@ EXPORT out_rec SmartLinxReport (dataset (doxie.layout_references) dids,
 
 		 p_worldcompliance := IF(mod_smartlinx.include_kris,PROJECT(s_kris.WorldCompRecs,TRANSFORM(iesp.smartlinxsearchcore.t_SLRResultMatch,SELF := LEFT)),
 																			dataset([],iesp.smartlinxsearchcore.t_SLRResultMatch));                                                              
+        
+           iesp.smartlinxReport.t_SLRPersonRiskIndicatorSection  testXform() := TRANSFORM                 
+                self.PersonIdentityRisks := //choosen(
+                                                                  dataset([{true,'P','Test'}]
+                                                                   , iesp.smartlinxreport.t_SLRPersonRiskIndicator);
+                //iesp.Constants.SMART.MaxPersonRiskIndicators);
+                self.personIdentityRiskStatus := 'P';
+            end;
+          
+            testDS := dataset( [testXform() ]);
+           p_personRiskIndicatorSection := if(mod_smartlinx.IncludePersonRiskIndicatorSection, testDS,                                                                          
+                                                                              dataset([],iesp.smartlinxReport.t_SLRPersonRiskIndicatorSection)); 
 //****************************************************************************************************
 //     OUTPUT TRANSFORM
 //****************************************************************************************************
@@ -391,9 +403,8 @@ EXPORT out_rec SmartLinxReport (dataset (doxie.layout_references) dids,
 //KEY INDICATORS *******************************************************************************************
 //Counts are based on number found prior to choosen() limit application.
      self.TotalCountsAvailable.Education                   := p_education_count;
-		 self.TotalCountsAvailable.Voters                      := s_voters_count;
-
-		 self.TotalCountsAvailable.AddressCurrent              := s_addresses_current_count;
+     self.TotalCountsAvailable.Voters                      := s_voters_count;
+     self.TotalCountsAvailable.AddressCurrent              := s_addresses_current_count;
      self.TotalCountsAvailable.AddressPrior                := s_addresses_prior_count;
      self.TotalCountsAvailable.Drivers                     := s_dls_count;
 
@@ -489,6 +500,9 @@ EXPORT out_rec SmartLinxReport (dataset (doxie.layout_references) dids,
    	 Self.CorporateAffiliations             := p_corp_aff;
    	 Self.PeopleAtWorks                     := p_paw;
   	 self.OtherAssociatedBusinesses         := p_other_busi_assoc;
+//// person Risk indicator section
+       self.PersonRiskIndicatorSection :=  p_personRiskIndicatorSection[1];
+         
 //// SOURCES *******************************************************************************************
 
 		Self.Sources :=     p_sources;

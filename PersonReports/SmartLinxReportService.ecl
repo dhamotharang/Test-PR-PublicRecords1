@@ -155,7 +155,6 @@ EXPORT SmartLinxReportService () := MACRO
   #stored('bankruptcyversion',2);
   #stored('IncludeSanctions',true);  //temporary fix until FUNCTIONS #stores..
   #stored('IncludeProviders',true);
-
   #constant('useOnlyBestDID',true); //
   #stored('DataRestrictionMask','0000000000'); // //intentionally has diff default behavior than doxie_ln version
   #CONSTANT('GONG_SEARCHTYPE','PERSON'); //
@@ -275,6 +274,7 @@ EXPORT SmartLinxReportService () := MACRO
     EXPORT STRING ScoreModel := first_row.options.ProgressivePhones.ScoreModel;
      EXPORT BOOLEAN UsePremiumSourceA := first_row.options.ProgressivePhones.UsePremiumSourceA;
      EXPORT UNSIGNED1 PremiumSourceAlimit := first_row.options.ProgressivePhones.PremiumSourceAlimit;
+     EXPORT BOOLEAN IncludePersonRiskIndicatorSection := first_row.options.IncludePersonRiskIndicatorSection;
   end;
 
 
@@ -285,6 +285,7 @@ EXPORT SmartLinxReportService () := MACRO
 
 	// main records
   //boolean includeVendorSourceB := first_row.options.IncludeVendorSourceB;
+
 
   Relationship.IParams.storeParams(first_row.Options.RelationshipOption);
   smartMod := Relationship.IParams.getParams(report_mod,PersonReports.IParam._smartlinxreport);

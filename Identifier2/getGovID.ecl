@@ -63,7 +63,7 @@ EXPORT getGovID(dataset(identifier2.layout_Identifier2) in_ds,
                           ,_GovIdConst.DisabledValue
                           );
 
-  SSNDeathMatchVerification := MAP(isCheck_SSNDeathMatchVerification AND ~EXISTS(in_rec.ri(hri in ['2','79'])) => _GovIdConst.PassValue
+  SSNDeathMatchVerification := MAP(isCheck_SSNDeathMatchVerification AND ~EXISTS(in_rec.ri(hri in ['02','79'])) => _GovIdConst.PassValue
                                    ,isCheck_SSNDeathMatchVerification => _GovIdConst.FailValue
                                    ,_GovIdConst.DisabledValue
                                     );
@@ -75,8 +75,7 @@ EXPORT getGovID(dataset(identifier2.layout_Identifier2) in_ds,
                    );
 
 
-  MultipleIdentitySSN := MAP(isCheck_MultipleIdentitySSN AND ~in_rec.additionalidentities.hasimposters 
-                            AND in_rec.additionalidentities.uniqueadlcount < Options.MaxIdentities
+  MultipleIdentitySSN := MAP(isCheck_MultipleIdentitySSN AND in_rec.additionalidentities.uniqueadlcount < Options.MaxIdentities
                             AND ~EXISTS(in_rec.ri(hri in ['CL','26','79']))   =>  _GovIdConst.PassValue
                             ,isCheck_MultipleIdentitySSN => _GovIdConst.FailValue
                             ,_GovIdConst.DisabledValue

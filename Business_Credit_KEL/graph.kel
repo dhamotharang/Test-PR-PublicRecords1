@@ -72,8 +72,9 @@ Tradeline := ENTITY(FLAT(
 							reporting_indicator_length,
 							STRING payment_interval=NULL(''),
 							STRING payment_status_category=NULL(''),
-              INTEGER DBT_V5=NULL(''), 
-              INTEGER raw_dbt_v5=NULL(''), 
+							INTEGER DBT_V5=NULL(''), 
+							INTEGER raw_dbt_v5=NULL(''), 
+							STRING overall_file_format_version=NULL(''),
 							term_of_account_in_months,
 							DATE first_payment_due_date=NULL(''),
 							DATE final_pyament_due_date=NULL(''),
@@ -228,7 +229,9 @@ Business: => BusinessNotOnFile := NOT EXISTS(BusinessAccount.acc);
 // $$$$$ which has the same value for each row.
 Business: NOT_ON_FILE := -99;
 Business: NO_DATA_AVAILABLE := -98;
-Business: UNKNOWN_DATA := -97; Account: UNKNOWN_DATA := -97; Tradeline: UNKNOWN_DATA := -97; Tradeline: CUTOFF_DATE := 20201001; Account: CUTOFF_DATE := 20201001;
+Business: UNKNOWN_DATA := -97; Account: UNKNOWN_DATA := -97; Tradeline: UNKNOWN_DATA := -97; 
+Tradeline: DOLLAR_ACCURACY_THRESHOLD := 7;
+
 
 //SBFE shell attributes
 Business: => DateFirstCycleAll := BusinessAccount.acc.AccountTradeline.trade.cycle_end_date$Min;
@@ -2602,8 +2605,10 @@ Account: => MaximumCreditUsed := MAX(AccountTradeline.trade, highest_credit_used
 Account: => HighestCreditUtilized := MAX(MaximumOriginalLimit, MaximumCurrrentLimit, MaximumCreditUsed);
 
 Account: => MostRecentTradelineLoadDate := MAX(AccountTradeline.trade, load_date);
-Account: => HighestCreditUsed := IF(INTEGERFROMDATE(MostRecentTradelineLoadDate) < CUTOFF_DATE, MaximumCreditUsed, HighestCreditUtilized);
 
+Tradeline: => IsV5 := overall_file_format_version = '0501';
+Account: => OldestTradelineDateV5 := MIN(AccountTradeline.trade(IsV5), load_date);
+Account: => HighestCreditUsed := IF(OldestTradelineDateV5:Null, MaximumCreditUsed, HighestCreditUtilized);
 
 Account: => HighestBalance := MAX(AccountTradeline.trade, remaining_balance);
 Account: => HighestUtilizedAmount := IF(HighestCreditUsed > HighestBalance,
@@ -2926,50 +2931,76 @@ Business: => Sbfeutilizationaveeveroline :=  MAP(BusinessNotOnFile => NOT_ON_FIL
 ** captured at the data level. Thus, this calculation is subject to change in the future.
 */
 
-Tradeline: => PastDueAmount := ABS(past_due_amount);
 
-Tradeline: =>PastDueAmountStatus := MAP(PastDueAmount = ABS(past_due_aging_amount_bucket_1)		=> 2,
-																				PastDueAmount = ABS(past_due_aging_amount_bucket_1) +
-																												ABS(past_due_aging_amount_bucket_2) 	=> 3,
-																				PastDueAmount = ABS(past_due_aging_amount_bucket_1) +
-																												ABS(past_due_aging_amount_bucket_2) +
-																												ABS(past_due_aging_amount_bucket_3) 	=> 4,
-																				PastDueAmount = ABS(past_due_aging_amount_bucket_1) +
-																												ABS(past_due_aging_amount_bucket_2) +
-																												ABS(past_due_aging_amount_bucket_3) +
-																												ABS(past_due_aging_amount_bucket_4) 	=>	5,
-																				PastDueAmount = ABS(past_due_aging_amount_bucket_1) +
-																												ABS(past_due_aging_amount_bucket_2) +
-																												ABS(past_due_aging_amount_bucket_3) +
-																												ABS(past_due_aging_amount_bucket_4) +
-																												ABS(past_due_aging_amount_bucket_5) 	=>	6,
-																				PastDueAmount = ABS(past_due_aging_amount_bucket_1) +
-																												ABS(past_due_aging_amount_bucket_2) +
-																												ABS(past_due_aging_amount_bucket_3) +
-																												ABS(past_due_aging_amount_bucket_4) +
-																												ABS(past_due_aging_amount_bucket_5) +
-																												ABS(past_due_aging_amount_bucket_6) 	=>	7,
-																				PastDueAmount = ABS(past_due_aging_amount_bucket_1) +
-																												ABS(past_due_aging_amount_bucket_2) +
-																												ABS(past_due_aging_amount_bucket_3) +
-																												ABS(past_due_aging_amount_bucket_4) +
-																												ABS(past_due_aging_amount_bucket_5) +
-																												ABS(past_due_aging_amount_bucket_6) +
-																												ABS(past_due_aging_amount_bucket_7) =>	8,
-																																																1);
+Tradeline: => PastDueAmount := ABS(past_due_amount); 
+Tradeline: => PastDueAmountWithoutAbs := past_due_amount;
 
-Tradeline: => PaymentStatusV4 := MAP(IsChargeoff 												      				  => 9,
-                                     payment_status_category:Null AND PastDueAmount > 0 => PastDueAmountStatus,
-                                     payment_status_category:Null AND PastDueAmount=0 	=> 0,
-                                     payment_status_category = '000' 										=> 0,
-                                     payment_status_category = '001' 										=> 2,
-                                     payment_status_category = '002' 										=> 3,
-                                     payment_status_category = '003' 										=> 4,
-                                     payment_status_category = '004' 										=> 5,
-                                     payment_status_category = '005' 										=> 6,
-                                     payment_status_category = '006' 										=> 7,
-                                     payment_status_category = '007' 										=> 8,
-                                                                                           UNKNOWN_DATA);
+Tradeline: => PastDueAmountBucket1WithoutAbs := IF(past_due_aging_amount_bucket_1:Null, 0, past_due_aging_amount_bucket_1);
+Tradeline: => PastDueAmountBucket2WithoutAbs := IF(past_due_aging_amount_bucket_2:Null, 0, past_due_aging_amount_bucket_2);
+Tradeline: => PastDueAmountBucket3WithoutAbs := IF(past_due_aging_amount_bucket_3:Null, 0, past_due_aging_amount_bucket_3);
+Tradeline: => PastDueAmountBucket4WithoutAbs := IF(past_due_aging_amount_bucket_4:Null, 0, past_due_aging_amount_bucket_4);
+Tradeline: => PastDueAmountBucket5WithoutAbs := IF(past_due_aging_amount_bucket_5:Null, 0, past_due_aging_amount_bucket_5);
+Tradeline: => PastDueAmountBucket6WithoutAbs := IF(past_due_aging_amount_bucket_6:Null, 0, past_due_aging_amount_bucket_6);
+Tradeline: => PastDueAmountBucket7WithoutAbs := IF(past_due_aging_amount_bucket_7:Null, 0, past_due_aging_amount_bucket_7);
+
+Tradeline: => HasBucketsPopulated := NOT past_due_aging_amount_bucket_1:Null OR
+                                     NOT past_due_aging_amount_bucket_2:Null OR
+                                     NOT past_due_aging_amount_bucket_3:Null OR
+                                     NOT past_due_aging_amount_bucket_4:Null OR
+                                     NOT past_due_aging_amount_bucket_5:Null OR
+                                     NOT past_due_aging_amount_bucket_6:Null OR
+                                     NOT past_due_aging_amount_bucket_7:Null;
+
+Tradeline: => PastDueAmountStatus := MAP(ABS(PastDueAmountWithoutAbs - (PastDueAmountBucket1WithoutAbs)) <= DOLLAR_ACCURACY_THRESHOLD	=> 2,
+                                                
+                                         ABS(PastDueAmountWithoutAbs - ((PastDueAmountBucket1WithoutAbs) +
+                                            (PastDueAmountBucket2WithoutAbs))) <= DOLLAR_ACCURACY_THRESHOLD => 3,
+                                            
+                                         ABS(PastDueAmountWithoutAbs - ((PastDueAmountBucket1WithoutAbs) +
+                                            (PastDueAmountBucket2WithoutAbs) +
+                                            (PastDueAmountBucket3WithoutAbs))) <= DOLLAR_ACCURACY_THRESHOLD => 4,
+                                            
+                                         ABS(PastDueAmountWithoutAbs - ((PastDueAmountBucket1WithoutAbs) +
+                                            (PastDueAmountBucket2WithoutAbs) +
+                                            (PastDueAmountBucket3WithoutAbs) +
+                                            (PastDueAmountBucket4WithoutAbs))) <= DOLLAR_ACCURACY_THRESHOLD => 5,
+                                            
+                                         ABS(PastDueAmountWithoutAbs - ((PastDueAmountBucket1WithoutAbs) +
+                                            (PastDueAmountBucket2WithoutAbs) +
+                                            (PastDueAmountBucket3WithoutAbs) +
+                                            (PastDueAmountBucket4WithoutAbs) +
+                                            (PastDueAmountBucket5WithoutAbs))) <= DOLLAR_ACCURACY_THRESHOLD => 6,
+                                             
+                                         ABS(PastDueAmountWithoutAbs - ((PastDueAmountBucket1WithoutAbs) +
+                                            (PastDueAmountBucket2WithoutAbs) +
+                                            (PastDueAmountBucket3WithoutAbs) +
+                                            (PastDueAmountBucket4WithoutAbs) +
+                                            (PastDueAmountBucket5WithoutAbs) +
+                                            (PastDueAmountBucket6WithoutAbs))) <= DOLLAR_ACCURACY_THRESHOLD => 7,
+                                             
+                                         ABS(PastDueAmountWithoutAbs - ((PastDueAmountBucket1WithoutAbs) +
+                                            (PastDueAmountBucket2WithoutAbs) +
+                                            (PastDueAmountBucket3WithoutAbs) +
+                                            (PastDueAmountBucket4WithoutAbs) +
+                                            (PastDueAmountBucket5WithoutAbs) +
+                                            (PastDueAmountBucket6WithoutAbs) +
+                                            (PastDueAmountBucket7WithoutAbs))) <= DOLLAR_ACCURACY_THRESHOLD => 8,
+                                                                                                               1); 
+
+Tradeline: => PaymentStatusV4 := MAP(IsChargeoff                                            => 9,
+                                     payment_status_category:Null AND PastDueAmount>0       => PastDueAmountStatus,
+                                     payment_status_category:Null AND PastDueAmount=0       => 0,
+                                     payment_status_category:Null AND HasBucketsPopulated   => 1,
+                                     payment_status_category = '000'                        => 0,
+                                     payment_status_category = '001'                        => 2,
+                                     payment_status_category = '002'                        => 3,
+                                     payment_status_category = '003'                        => 4,
+                                     payment_status_category = '004'                        => 5,
+                                     payment_status_category = '005'                        => 6,
+                                     payment_status_category = '006'                        => 7,
+                                     payment_status_category = '007'                        => 8,
+                                                                                            UNKNOWN_DATA);
+                                                                                           
 /* Check ln_delinquency_date to see whether it is an exceptional value (e.g.-1,-2,-3,-4)
 ** If so, we map it to 1 : unknown time frame. Decided by Product
 ** Both -5 and -97 exception values coming from raw_dbt_v5 are automatically mapped into UNKNOWN_DATA
@@ -2985,9 +3016,8 @@ Tradeline: => PaymentStatusV5 := MAP(IsChargeoff                                
                                      DBT_V5 > 150 AND DBT_V5 <= 180                        => 7,
                                      DBT_V5 > 180                                          => 8,
                                                                                            UNKNOWN_DATA);
-                                                                                
-Tradeline: => PaymentStatus := IF(INTEGERFROMDATE(load_date) < CUTOFF_DATE OR MonthsBetweenPayment = 1, PaymentStatusV4, PaymentStatusV5);
 
+Tradeline: => PaymentStatus := IF(overall_file_format_version = '0401' OR MonthsBetweenPayment = 1, PaymentStatusV4, PaymentStatusV5);
 
 Account: => MostRecentPaymentStatusDate := MAX(AccountTradeline.trade, load_date);
 Account: => CurrentPaymentStatus := MAX(AccountTradeline.trade(load_date = Account.MostRecentPaymentStatusDate), PaymentStatus);
@@ -6607,11 +6637,11 @@ Tradeline: => DPD121AmountV5  := MAP(MonthsBetweenPayment = 1/30 AND DBT_V5 > 12
                                     MonthsBetweenPayment = 12 AND DBT_V5 <= 120 => DPDOtherAmountAnualV5,
                                     DPD121AmountV4);                                    
                                     
-Tradeline: => DPD01Amount := IF(INTEGERFROMDATE(load_date) < CUTOFF_DATE, DPD01AmountV4, DPD01AmountV5);
-Tradeline: => DPD31Amount := IF(INTEGERFROMDATE(load_date) < CUTOFF_DATE, DPD31AmountV4, DPD31AmountV5);
-Tradeline: => DPD61Amount := IF(INTEGERFROMDATE(load_date) < CUTOFF_DATE, DPD61AmountV4, DPD61AmountV5);
-Tradeline: => DPD91Amount := IF(INTEGERFROMDATE(load_date) < CUTOFF_DATE, DPD91AmountV4, DPD91AmountV5);
-Tradeline: => DPD121Amount := IF(INTEGERFROMDATE(load_date) < CUTOFF_DATE, DPD121AmountV4, DPD121AmountV5);
+Tradeline: => DPD01Amount := IF(overall_file_format_version = '0401', DPD01AmountV4, DPD01AmountV5);
+Tradeline: => DPD31Amount := IF(overall_file_format_version = '0401', DPD31AmountV4, DPD31AmountV5);
+Tradeline: => DPD61Amount := IF(overall_file_format_version = '0401', DPD61AmountV4, DPD61AmountV5);
+Tradeline: => DPD91Amount := IF(overall_file_format_version = '0401', DPD91AmountV4, DPD91AmountV5);
+Tradeline: => DPD121Amount := IF(overall_file_format_version = '0401', DPD121AmountV4, DPD121AmountV5);
                             
                               
 /*
@@ -6880,15 +6910,15 @@ Tradeline: => UnknownDPD121AmountV5  := MAP(MonthsBetweenPayment = 1/30 AND DBT_
 
 
 
-Tradeline: => UnknownDPD01Amount := IF(INTEGERFROMDATE(load_date) < CUTOFF_DATE, UnknownDPD01AmountV4, UnknownDPD01AmountV5);
+Tradeline: => UnknownDPD01Amount := IF(overall_file_format_version = '0401', UnknownDPD01AmountV4, UnknownDPD01AmountV5);
 
-Tradeline: => UnknownDPD31Amount := IF(INTEGERFROMDATE(load_date) < CUTOFF_DATE, UnknownDPD31AmountV4, UnknownDPD31AmountV5);
+Tradeline: => UnknownDPD31Amount := IF(overall_file_format_version = '0401', UnknownDPD31AmountV4, UnknownDPD31AmountV5);
 
-Tradeline: => UnknownDPD61Amount := IF(INTEGERFROMDATE(load_date) < CUTOFF_DATE, UnknownDPD61AmountV4, UnknownDPD61AmountV5);
+Tradeline: => UnknownDPD61Amount := IF(overall_file_format_version = '0401', UnknownDPD61AmountV4, UnknownDPD61AmountV5);
 
-Tradeline: => UnknownDPD91Amount := IF(INTEGERFROMDATE(load_date) < CUTOFF_DATE, UnknownDPD91AmountV4, UnknownDPD91AmountV5);
+Tradeline: => UnknownDPD91Amount := IF(overall_file_format_version = '0401', UnknownDPD91AmountV4, UnknownDPD91AmountV5);
 
-Tradeline: => UnknownDPD121Amount := IF(INTEGERFROMDATE(load_date) < CUTOFF_DATE, UnknownDPD121AmountV4, UnknownDPD121AmountV5);
+Tradeline: => UnknownDPD121Amount := IF(overall_file_format_version = '0401', UnknownDPD121AmountV4, UnknownDPD121AmountV5);
 
 
 
@@ -9027,6 +9057,7 @@ Business: => Sbfeinternalobservedperf36 := MAP(NOT EXISTS(BusinessAccount.acc.Ac
 
 QUERY: Tradeline_dump <= Tradeline;
 
+
 QUERY: SBFE_Future_Shell <= Business{UID,
 															Sbfeinternalobservedperf06,
 															Sbfeinternalobservedperf12,
@@ -9891,8 +9922,8 @@ QUERY: SBFE_Shell <= Business{UID,
 															Sbfedelinquentcount84,
 															Sbfedelinquentcountever,
 															Sbfedelq61counteverttl,
-                              Sbfedelq91counteverttl, 
-                              Sbfedelq121counteverttl, 
+															Sbfedelq91counteverttl, 
+															Sbfedelq121counteverttl, 
 															Sbfedelinquentcountloan,
 															Sbfedelq61loancount03m,
 															Sbfedelinquentcountloan06,
@@ -9964,7 +9995,7 @@ QUERY: SBFE_Shell <= Business{UID,
 															Sbfedelq61revcountttl,
 															Sbfedelq61revcountttlchargeoff,
 															Sbfedelq91countttl,
-                              Sbfedelq121countttl, 
+															Sbfedelq121countttl, 
 															Sbfedelq91countttlchargeoff,
 															Sbfedpd91count,
 															Sbfedelq91count03m,

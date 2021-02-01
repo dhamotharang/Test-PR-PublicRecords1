@@ -1,7 +1,7 @@
 ﻿//This is the code to execute in a builder window
 #OPTION('multiplePersistInstances', FALSE);
-#workunit('name','BizLinkFull.BWR_TestExternal - Test External Linking - Precision and Recall - SALT V3.11.8');
-IMPORT BizLinkFull,SALT311;
+#workunit('name','BizLinkFull.BWR_TestExternal - Test External Linking - Precision and Recall - SALT V4.4.1');
+IMPORT BizLinkFull,SALT44;
 // This is the 'thor only' version (no roxie)
   SmallJob := FALSE;
   InUpdateIDs := FALSE;
@@ -10,7 +10,7 @@ IMPORT BizLinkFull,SALT311;
   DoClean := TRUE;
   Infile := BizLinkFull.File_BizHead; // You can make this a different file - but must be in 'as header' format
   Mapping := 'UniqueID:rcid,zip_cases:zip';
-  MyInfile := SALT311.FromFlat(InFile,BizLinkFull.Process_Biz_Layouts.InputLayout,Mapping);
+  MyInfile := SALT44.FromFlat(InFile,BizLinkFull.Process_Biz_Layouts.InputLayout,Mapping);
   BizLinkFull.MAC_Meow_Biz_Batch(myinfile,UniqueId,/* MY_proxid */,/* MY_seleid */,/* MY_orgid */,/* MY_ultid */,parent_proxid,sele_proxid,org_proxid,ultimate_proxid,has_lgid,empid,source,source_record_id,source_docid,company_name,company_name_prefix,cnp_name,cnp_number,cnp_btype,cnp_lowv,company_phone,company_phone_3,company_phone_3_ex,company_phone_7,company_fein,company_sic_code1,active_duns_number,prim_range,prim_name,sec_range,city,city_clean,st,zip_cases,company_url,isContact,contact_did,title,fname,fname_preferred,mname,lname,name_suffix,contact_ssn,contact_email,sele_flag,org_flag,ult_flag,fallback_value,CONTACTNAME,STREETADDRESS,MyOutFile,SmallJob,InUpdateIDs,Stats,GetAllScores,DisableForce,DoClean);
   Rec := { BOOLEAN Present; BOOLEAN Equal; BOOLEAN Resolved };
   Rec note(Infile le,MyOutFile ri) := TRANSFORM
@@ -24,3 +24,4 @@ IMPORT BizLinkFull,SALT311;
   Errors;
   MyOutFile;
   Stats;
+ 

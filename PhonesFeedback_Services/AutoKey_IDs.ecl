@@ -1,9 +1,9 @@
-import AutoKeyI;
+IMPORT AutoKeyI;
 
-export AutoKey_IDs := module
-	export params := interface(AutoKeyI.AutoKeyStandardFetchBaseInterface)
-		export boolean workHard := true;
-		export boolean noFail := false;
-		export boolean isdeepDive := false;
-	end;
-end;
+EXPORT AutoKey_IDs := MODULE
+  EXPORT params := INTERFACE(AutoKeyI.AutoKeyStandardFetchBaseInterface)
+    EXPORT BOOLEAN workHard := TRUE;
+    EXPORT BOOLEAN noFail := FALSE;
+    EXPORT BOOLEAN isdeepDive := FALSE;
+  END;
+END;

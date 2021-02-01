@@ -1,6 +1,6 @@
 ﻿//HPCC Systems KEL Compiler Version 1.3.0beta5
 IMPORT KEL13 AS KEL;
-IMPORT $,Email_Data,NID,PublicRecords_KEL,Risk_Indicators,Royalty,STD,address,header;
+IMPORT $,Email_Data,NID,PublicRecords_KEL,Risk_Indicators,STD,address,header;
 IMPORT CFG_Compile FROM PublicRecords_KEL_Queries.B2B_KEL;
 IMPORT * FROM KEL13.Null;
 EXPORT FN_Compile(CFG_Compile __cfg = CFG_Compile) := MODULE
@@ -133,9 +133,9 @@ EXPORT FN_Compile(CFG_Compile __cfg = CFG_Compile) := MODULE
     __Value := PublicRecords_KEL.ECL_Functions.Fn_STD_Str_FilterOut_ValidChars(Field);
     RETURN __BNT(__Value,__IsNull,KEL.typ.nstr);
   END;
-  SHARED __CC13316 := -99999;
+  SHARED __CC13305 := -99999;
   EXPORT KEL.typ.str FN_Validate_Flag(KEL.typ.nstr __PFieldToCheck) := FUNCTION
-    RETURN MAP(__T(__OR(__NT(__PFieldToCheck),__OP2(__PFieldToCheck,=,__CN(''))))=>(KEL.typ.str)__CC13316,__T(__OP2(FN__fn_Filter_Out_Valid_Chars(__ECAST(KEL.typ.nstr,__FN1(KEL.Routines.ToUpperCase,__FN1(KEL.Routines.TrimBoth,__PFieldToCheck)))),=,__CN('')))=>'0','1');
+    RETURN MAP(__T(__OR(__NT(__PFieldToCheck),__OP2(__PFieldToCheck,=,__CN(''))))=>(KEL.typ.str)__CC13305,__T(__OP2(FN__fn_Filter_Out_Valid_Chars(__ECAST(KEL.typ.nstr,__FN1(KEL.Routines.ToUpperCase,__FN1(KEL.Routines.TrimBoth,__PFieldToCheck)))),=,__CN('')))=>'0','1');
   END;
   EXPORT KEL.typ.nstr FN__fn_Bogus_Names(KEL.typ.nstr __PsNameFirst, KEL.typ.nstr __PsNameMid, KEL.typ.nstr __PsNameLast) := FUNCTION
     sNameFirst := __T(__PsNameFirst);
@@ -300,13 +300,6 @@ EXPORT FN_Compile(CFG_Compile __cfg = CFG_Compile) := MODULE
   EXPORT KEL.typ.nbool FN_Within_F1_Y(KEL.typ.nkdate __PInputDate, KEL.typ.nkdate __Preference) := FUNCTION
     RETURN __AND(__AND(__OP2(__PInputDate,<=,__FN4(KEL.Routines.AdjustCalendar,__Preference,__CN(-1),__CN(0),__CN(0))),__OP2(__PInputDate,>=,__FN4(KEL.Routines.AdjustCalendar,__Preference,__CN(-2),__CN(0),__CN(0)))),__FN1(KEL.Routines.IsValidDate,__PInputDate));
   END;
-  EXPORT KEL.typ.nstr FN_G_E_T___V_A_L_U_E(SET OF KEL.typ.str __PValues, KEL.typ.nint __PPosition) := FUNCTION
-    Values := __PValues;
-    Position := __T(__PPosition);
-    __IsNull := __NL(__PPosition);
-    __Value := Values[Position];
-    RETURN __BNT(__Value,__IsNull,KEL.typ.nstr);
-  END;
   EXPORT KEL.typ.nint FN_G_E_T___S_T_O_R_E_D___G_L_B_P_U_R_P_O_S_E(KEL.typ.nstr __PStoredName) := FUNCTION
     StoredName := __T(__PStoredName);
     __IsNull := __NL(__PStoredName);
@@ -317,28 +310,6 @@ EXPORT FN_Compile(CFG_Compile __cfg = CFG_Compile) := MODULE
     StoredName := __T(__PStoredName);
     __IsNull := __NL(__PStoredName);
     __Value := PublicRecords_KEL.MAS_get.Gateway.GatewayFunctions.GrabDPPAPurpose(StoredName);
-    RETURN __BNT(__Value,__IsNull,KEL.typ.nint);
-  END;
-  EXPORT KEL.typ.nstr FN_G_E_T___N_E_T_A_C_U_I_T_Y___U_R_L(KEL.typ.nstr __PStoredName) := FUNCTION
-    StoredName := __T(__PStoredName);
-    __IsNull := __NL(__PStoredName);
-    __Value := PublicRecords_KEL.MAS_get.Gateway.NetAcuityFunctions.GrabNetAcuityURL(StoredName);
-    RETURN __BNT(__Value,__IsNull,KEL.typ.nstr);
-  END;
-  EXPORT SET OF KEL.typ.str FN_G_A_T_E_W_A_Y___N_E_T_A_C_U_I_T_Y(KEL.typ.nstr __PIPAddress, KEL.typ.nstr __PLexID, KEL.typ.nstr __PGatewayURL, KEL.typ.nint __PDPPAPurpose, KEL.typ.nint __PGLBPurpose) := FUNCTION
-    IPAddress := __T(__PIPAddress);
-    LexID := __T(__PLexID);
-    GatewayURL := __T(__PGatewayURL);
-    DPPAPurpose := __T(__PDPPAPurpose);
-    GLBPurpose := __T(__PGLBPurpose);
-    __Value := PublicRecords_KEL.MAS_get.Gateway.NetAcuityFunctions.NetAcuityWrapper(IPAddress, LexID, GatewayURL, DPPAPurpose, GLBPurpose);
-    RETURN __Value;
-  END;
-  EXPORT KEL.typ.nint FN_G_E_T___N_E_T_A_C_U_I_T_Y___R_O_Y_A_L_T_I_E_S(KEL.typ.nstr __PIPAddress, KEL.typ.nstr __PIPType) := FUNCTION
-    IPAddress := __T(__PIPAddress);
-    IPType := __T(__PIPType);
-    __IsNull := __NL(__PIPAddress) OR __NL(__PIPType);
-    __Value := Royalty.RoyaltyNetAcuity.GetCount(TRIM(IPAddress), TRIM(IPType));
     RETURN __BNT(__Value,__IsNull,KEL.typ.nint);
   END;
   EXPORT KEL.typ.str FN__map_Filing_Type(KEL.typ.nstr __PfilingType) := FUNCTION

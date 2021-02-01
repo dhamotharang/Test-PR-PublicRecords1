@@ -1,4 +1,4 @@
-﻿IMPORT AutoKeyI, BIPV2, Business_Risk_BIP, Gateway, iesp, MDR, Risk_Indicators, UT;
+﻿IMPORT AutoKeyI, BIPV2, Gateway, iesp, MDR, Risk_Indicators;
 
 EXPORT Constants := MODULE
 	EXPORT LinkSearch := ENUM(
@@ -38,6 +38,8 @@ EXPORT Constants := MODULE
 	EXPORT Default_Gateways_Requested   := DATASET([], Gateway.Layouts.Config);
 	EXPORT Default_IndustryClass				:= ''; // UTILI indicates a Utility company, and Utility data must be blanked out
 	EXPORT STRING6 Default_SSNMask      := '';
+	EXPORT Default_BIPAppend_ScoreThreshold      := 75;
+	EXPORT Default_BipAppend_WeightThreshold     := 44;
   
 	EXPORT Default_BusShellVersion			:= 21; // Default Business Shell Version is v2.1: Business Shell with SBFE enhancement attributes. This is what SBA uses.
 	EXPORT BusShellVersion_v20					:= 20; // Business Shell v2.0: Original business shell and original SBFE attributes
