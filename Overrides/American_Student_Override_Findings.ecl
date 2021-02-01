@@ -131,8 +131,7 @@ EXPORT American_Student_Override_Findings(DATASET(Override_Layouts.Layout_Get_Or
 
 	matched_keys := JOIN(deduped_sorted_payload_qc,deduped_overrides, LEFT.did != RIGHT.did AND LEFT.key = RIGHT.key,xform_diff(LEFT,RIGHT));	
 
-	//todo maybe add pii data check heres
-
+	
 	combined_output := matched_dids + matched_keys;
 
 	orphan_layout := RECORD
