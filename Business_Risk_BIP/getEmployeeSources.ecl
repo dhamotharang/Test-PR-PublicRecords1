@@ -1,50 +1,54 @@
-﻿IMPORT BIPV2, Business_Risk, Business_Risk_BIP, BusReg, DCAV2, DNB_DMI, dx_DataBridge, 
+﻿IMPORT BIPV2, Business_Risk, Business_Risk_BIP, BusReg, DCAV2, DNB_DMI,
       dx_Equifax_business_data, dx_Infutor_NARB, InfoUSA, MDR, Risk_Indicators, Doxie, STD;
 
-EXPORT getEmployeeSources(DATASET(Business_Risk_BIP.Layouts.Shell) Shell, 
+EXPORT getEmployeeSources(DATASET(Business_Risk_BIP.Layouts.Shell) Shell,
 											 Business_Risk_BIP.LIB_Business_Shell_LIBIN Options,
 											 BIPV2.mod_sources.iParams linkingOptions,
-											 SET OF STRING2 AllowedSourcesSet,
-											 doxie.IDataAccess mod_access = MODULE (doxie.IDataAccess) END) := FUNCTION
+											 SET OF STRING2 AllowedSourcesSet) := FUNCTION
 
 	// ---------------- DNB DMI - Dunn Bradstreet DMI ------------------
   // NOTE! The decision whether to allow or restrict DNBDMI is now done further down in the code:
   // DNBDMI records must be used to calculate the best SIC code regardless of whether the source
 	// is allowed or not.
-  
+
+  mod_access := PROJECT(Options, doxie.IDataAccess);
+
+  link_search_level := Options.LinkSearchLevel;
+  shell_version := Options.BusShellVersion;
+
   // Only grab DNB DMI data if it is explicitly passed in as allowed
-  allowDNBDMI := IF(STD.Str.Find(Options.AllowedSources, Business_Risk_BIP.Constants.AllowDNBDMI, 1) > 0, TRUE, FALSE ); 
-  
+  allowDNBDMI := IF(STD.Str.Find(Options.AllowedSources, Business_Risk_BIP.Constants.AllowDNBDMI, 1) > 0, TRUE, FALSE );
+
 	DNBDMIRaw := DNB_DMI.Key_LinkIds.kFetch2(Business_Risk_BIP.Common.GetLinkIDs(Shell), mod_access,
-																						 Business_Risk_BIP.Common.SetLinkSearchLevel(Options.LinkSearchLevel),
+																						 Business_Risk_BIP.Common.SetLinkSearchLevel(link_search_level),
 																							0, /*ScoreThreshold --> 0 = Give me everything*/
 																							Business_Risk_BIP.Constants.Limit_Default,
 																							Options.KeepLargeBusinesses );
 
 	// Add back our Seq numbers
 	Business_Risk_BIP.Common.AppendSeq2(DNBDMIRaw, Shell, DNBDMISeq);
-	
+
 	// Figure out if the kFetch was successful
 	kFetchErrorCodesDNBDMI := Business_Risk_BIP.Common.GrabFetchErrorCode(DNBDMISeq);
-	
+
 	// Filter out records after our history date
 	DNBDMI := Business_Risk_BIP.Common.FilterRecords(DNBDMISeq, date_first_seen, date_vendor_first_reported, MDR.SourceTools.src_Dunn_Bradstreet, AllowedSourcesSet);
-	
+
 	// Figure out the first seen and last seen date per source for each Seq, by LinkID level
 	DNBDMIStats := TABLE(DNBDMI,
 			{Seq,
-			 LinkID := Business_Risk_BIP.Common.GetLinkSearchLevel(Options.LinkSearchLevel, SeleID),
+			 LinkID := Business_Risk_BIP.Common.GetLinkSearchLevel(link_search_level, SeleID),
 			 Source := MDR.SourceTools.src_Dunn_Bradstreet,
 			 STRING6 DateFirstSeen := Business_Risk_BIP.Common.groupMinDate6(date_first_seen, HistoryDate),
 			 STRING6 DateVendorFirstSeen := Business_Risk_BIP.Common.groupMinDate6(date_vendor_first_reported, HistoryDate),
 			 STRING6 DateLastSeen := Business_Risk_BIP.Common.groupMaxDate6(date_last_seen, HistoryDate),
 			 STRING6 DateVendorLastSeen := Business_Risk_BIP.Common.groupMaxDate6(date_vendor_last_reported, HistoryDate),
 			 UNSIGNED4 RecordCount := COUNT(GROUP),
-			 INTEGER FirmEmployeeCount := MAX(GROUP, IF(RawFields.Employees_Total = '' AND Options.BusShellVersion >= Business_Risk_BIP.Constants.BusShellVersion_v30, -1, 
+			 INTEGER FirmEmployeeCount := MAX(GROUP, IF(RawFields.Employees_Total = '' AND shell_version >= Business_Risk_BIP.Constants.BusShellVersion_v30, -1,
                                        (INTEGER)RawFields.Employees_Total)),
 			 INTEGER FinanceWorthOfBus := MAX(GROUP, (INTEGER)(STD.Str.Filter(RawFields.Net_Worth_Sign, '-') + (STRING)RawFields.Net_Worth))
 			 },
-			 Seq, Business_Risk_BIP.Common.GetLinkSearchLevel(Options.LinkSearchLevel, SeleID)
+			 Seq, Business_Risk_BIP.Common.GetLinkSearchLevel(link_search_level, SeleID)
 			 );
 
 	// Rollup the dates first/last seen into child datasets by Seq
@@ -60,31 +64,31 @@ EXPORT getEmployeeSources(DATASET(Business_Risk_BIP.Layouts.Shell) Shell,
 		DATASET(Business_Risk_BIP.Layouts.LayoutSICNAIC) SICNAICSources;
 		DATASET(Business_Risk_BIP.Layouts.LayoutSalesSources) SalesSources;
 	END;
-	
+
 	DNBDMIStatsTemp := PROJECT(DNBDMIStats, TRANSFORM(tempLayout,
 																				SELF.Seq := LEFT.Seq;
-																				SELF.Sources := DATASET([{LEFT.Source, 
-																																	IF(LEFT.DateFirstSeen = Business_Risk_BIP.Constants.NinesDate, Business_Risk_BIP.Constants.MissingDate, LEFT.DateFirstSeen), 
-																																	IF(LEFT.DateVendorFirstSeen = Business_Risk_BIP.Constants.NinesDate, Business_Risk_BIP.Constants.MissingDate, LEFT.DateVendorFirstSeen), 																																	
+																				SELF.Sources := DATASET([{LEFT.Source,
+																																	IF(LEFT.DateFirstSeen = Business_Risk_BIP.Constants.NinesDate, Business_Risk_BIP.Constants.MissingDate, LEFT.DateFirstSeen),
+																																	IF(LEFT.DateVendorFirstSeen = Business_Risk_BIP.Constants.NinesDate, Business_Risk_BIP.Constants.MissingDate, LEFT.DateVendorFirstSeen),
 																																	LEFT.DateLastSeen,
 																																	LEFT.DateVendorLastSeen,
 																																	LEFT.RecordCount}], Business_Risk_BIP.Layouts.LayoutSources);
-																				SELF.EmployeeSources := DATASET([{LEFT.Source, 
-																																					IF(LEFT.DateFirstSeen = Business_Risk_BIP.Constants.NinesDate, Business_Risk_BIP.Constants.MissingDate, LEFT.DateFirstSeen), 
-																																					IF(LEFT.DateVendorFirstSeen = Business_Risk_BIP.Constants.NinesDate, Business_Risk_BIP.Constants.MissingDate, LEFT.DateVendorFirstSeen), 																																	
+																				SELF.EmployeeSources := DATASET([{LEFT.Source,
+																																					IF(LEFT.DateFirstSeen = Business_Risk_BIP.Constants.NinesDate, Business_Risk_BIP.Constants.MissingDate, LEFT.DateFirstSeen),
+																																					IF(LEFT.DateVendorFirstSeen = Business_Risk_BIP.Constants.NinesDate, Business_Risk_BIP.Constants.MissingDate, LEFT.DateVendorFirstSeen),
 																																					LEFT.DateLastSeen,
 																																					LEFT.DateVendorLastSeen,
 																																	LEFT.FirmEmployeeCount}], Business_Risk_BIP.Layouts.LayoutSources);
 																				SELF.FinanceWorthOfBus := LEFT.FinanceWorthOfBus;
 																				SELF.RecordCount := LEFT.RecordCount;
 																				SELF := []));
-	DNBDMIStatsRolled := ROLLUP(DNBDMIStatsTemp, LEFT.Seq = RIGHT.Seq, TRANSFORM(tempLayout, SELF.Seq := LEFT.Seq; 
-																																		SELF.Sources := LEFT.Sources + RIGHT.Sources; 
-																																		SELF.EmployeeSources := LEFT.EmployeeSources + RIGHT.EmployeeSources; 
+	DNBDMIStatsRolled := ROLLUP(DNBDMIStatsTemp, LEFT.Seq = RIGHT.Seq, TRANSFORM(tempLayout, SELF.Seq := LEFT.Seq;
+																																		SELF.Sources := LEFT.Sources + RIGHT.Sources;
+																																		SELF.EmployeeSources := LEFT.EmployeeSources + RIGHT.EmployeeSources;
 																																		SELF.FinanceWorthOfBus := LEFT.FinanceWorthOfBus + RIGHT.FinanceWorthOfBus;
 																																		SELF.RecordCount := LEFT.RecordCount + RIGHT.RecordCount;
 																																		SELF := LEFT));
-	
+
 	withDNBDMIStats := JOIN(Shell, DNBDMIStatsRolled, LEFT.Seq = RIGHT.Seq,
 																	TRANSFORM(Business_Risk_BIP.Layouts.Shell,
 																							SELF.Sources := IF( allowDNBDMI, LEFT.Sources + RIGHT.Sources, LEFT.Sources );
@@ -92,12 +96,12 @@ EXPORT getEmployeeSources(DATASET(Business_Risk_BIP.Layouts.Shell) Shell,
 																							SELF.Firmographic.FinanceWorthOfBus := IF( allowDNBDMI, (STRING)Business_Risk_BIP.Common.capNum(IF(RIGHT.RecordCount > 0, RIGHT.FinanceWorthOfBus, -1), -1, 999999999), '' );
 																							SELF := LEFT),
 																	LEFT OUTER, KEEP(1), ATMOST(100), FEW);
-  
+
 	// Get all unique SIC Codes along with dates, for the primary and all 5 secondary SIC's
 	getDNBDMISIC(InputDataset, OutputTable, OutputTemp, OutputRolled, WithInput, WithOutput, SICField, PrimarySIC) := MACRO
 		OutputTable := TABLE(InputDataset,
 			{Seq,
-			 LinkID := Business_Risk_BIP.Common.GetLinkSearchLevel(Options.LinkSearchLevel, SeleID),
+			 LinkID := Business_Risk_BIP.Common.GetLinkSearchLevel(link_search_level, SeleID),
 			 Source := MDR.SourceTools.src_Dunn_Bradstreet,
 			 STRING6 DateFirstSeen := Business_Risk_BIP.Common.groupMinDate6(date_first_seen, HistoryDate),
 			 STRING6 DateLastSeen := Business_Risk_BIP.Common.groupMaxDate6(date_last_seen, HistoryDate),
@@ -105,15 +109,15 @@ EXPORT getEmployeeSources(DATASET(Business_Risk_BIP.Layouts.Shell) Shell,
 			 STRING10 SICCode := (STD.Str.Filter((STRING)SICField, '0123456789'))[1..4],
 			 BOOLEAN IsPrimary := PrimarySIC // SIC1 is the primary SIC in DNB DMI data, all others are not primary
 			 },
-			 Seq, Business_Risk_BIP.Common.GetLinkSearchLevel(Options.LinkSearchLevel, SeleID), ((STRING)SICField)[1..4]
+			 Seq, Business_Risk_BIP.Common.GetLinkSearchLevel(link_search_level, SeleID), ((STRING)SICField)[1..4]
 			 );
-		
+
 		OutputTemp := PROJECT(OutputTable, TRANSFORM(tempLayout,
 																				SELF.Seq := LEFT.Seq;
 																				SELF.SICNAICSources := DATASET([{LEFT.Source, IF(LEFT.DateFirstSeen = Business_Risk_BIP.Constants.NinesDate, Business_Risk_BIP.Constants.MissingDate, LEFT.DateFirstSeen), LEFT.DateLastSeen, LEFT.RecordCount, LEFT.SICCode, Business_Risk_BIP.Common.industryGroup(LEFT.SICCode, Business_Risk_BIP.Constants.SIC), '' /*NAICCode*/, '' /*NAICIndustry*/, LEFT.IsPrimary}], Business_Risk_BIP.Layouts.LayoutSICNAIC);
 																				SELF := []));
 		OutputRolled := ROLLUP(OutputTemp, LEFT.Seq = RIGHT.Seq, TRANSFORM(tempLayout, SELF.Seq := LEFT.Seq; SELF.SICNAICSources := LEFT.SICNAICSources + RIGHT.SICNAICSources; SELF := LEFT));
-	
+
 		WithOutput := JOIN(WithInput, OutputRolled, LEFT.Seq = RIGHT.Seq,
 																	TRANSFORM(Business_Risk_BIP.Layouts.Shell,
 																							SELF.SICNAICSources := LEFT.SICNAICSources + RIGHT.SICNAICSources;
@@ -130,50 +134,50 @@ EXPORT getEmployeeSources(DATASET(Business_Risk_BIP.Layouts.Shell) Shell,
 
 	// ---------------- BusReg - Business Registration ------------------
 	BusRegRaw := BusReg.key_busreg_company_linkids.kFetch2(Business_Risk_BIP.Common.GetLinkIDs(Shell),
-																						 Business_Risk_BIP.Common.SetLinkSearchLevel(Options.LinkSearchLevel),
+																						 Business_Risk_BIP.Common.SetLinkSearchLevel(link_search_level),
 																							0, /*ScoreThreshold --> 0 = Give me everything*/
 																							Business_Risk_BIP.Constants.Limit_Default,
 																							Options.KeepLargeBusinesses);
-	
+
 	Business_Risk_BIP.Common.AppendSeq2(BusRegRaw, Shell, BusRegSeq);
-	
+
 	// Figure out if the kFetch was successful
 	kFetchErrorCodesBusinessRegistration := Business_Risk_BIP.Common.GrabFetchErrorCode(BusRegSeq);
-	
+
 	BusReg := Business_Risk_BIP.Common.FilterRecords(BusRegSeq, dt_first_seen, dt_vendor_first_reported, MDR.SourceTools.src_Business_Registration, AllowedSourcesSet);
-	
+
 	BusRegStats := TABLE(BusReg,
 			{Seq,
-			 LinkID := Business_Risk_BIP.Common.GetLinkSearchLevel(Options.LinkSearchLevel, SeleID),
+			 LinkID := Business_Risk_BIP.Common.GetLinkSearchLevel(link_search_level, SeleID),
 			 Source := MDR.SourceTools.src_Business_Registration,
 			 STRING6 DateFirstSeen := Business_Risk_BIP.Common.groupMinDate6(dt_first_seen, HistoryDate),
 			 STRING6 DateVendorFirstSeen := Business_Risk_BIP.Common.groupMinDate6(dt_vendor_first_reported, HistoryDate),
 			 STRING6 DateLastSeen := Business_Risk_BIP.Common.groupMaxDate6(dt_last_seen, HistoryDate),
 			 STRING6 DateVendorLastSeen := Business_Risk_BIP.Common.groupMaxDate6(dt_vendor_last_reported, HistoryDate),
 			 UNSIGNED4 RecordCount := COUNT(GROUP),
-			 INTEGER FirmEmployeeCount := MAX(GROUP, IF(rawfields.emp_size = '' AND Options.BusShellVersion >= Business_Risk_BIP.Constants.BusShellVersion_v30, -1,  
+			 INTEGER FirmEmployeeCount := MAX(GROUP, IF(rawfields.emp_size = '' AND shell_version >= Business_Risk_BIP.Constants.BusShellVersion_v30, -1,
                                     (INTEGER)rawfields.emp_size))
 			 },
-			 Seq, Business_Risk_BIP.Common.GetLinkSearchLevel(Options.LinkSearchLevel, SeleID)
+			 Seq, Business_Risk_BIP.Common.GetLinkSearchLevel(link_search_level, SeleID)
 			 );
-	
+
 	BusRegStatsTemp := PROJECT(BusRegStats, TRANSFORM(tempLayout,
 																				SELF.Seq := LEFT.Seq;
-																				SELF.Sources := DATASET([{LEFT.Source, 
-																																	IF(LEFT.DateFirstSeen = Business_Risk_BIP.Constants.NinesDate, Business_Risk_BIP.Constants.MissingDate, LEFT.DateFirstSeen), 
-																																	IF(LEFT.DateVendorFirstSeen = Business_Risk_BIP.Constants.NinesDate, Business_Risk_BIP.Constants.MissingDate, LEFT.DateVendorFirstSeen), 																																	
+																				SELF.Sources := DATASET([{LEFT.Source,
+																																	IF(LEFT.DateFirstSeen = Business_Risk_BIP.Constants.NinesDate, Business_Risk_BIP.Constants.MissingDate, LEFT.DateFirstSeen),
+																																	IF(LEFT.DateVendorFirstSeen = Business_Risk_BIP.Constants.NinesDate, Business_Risk_BIP.Constants.MissingDate, LEFT.DateVendorFirstSeen),
 																																	LEFT.DateLastSeen,
 																																	LEFT.DateVendorLastSeen,
 																																	LEFT.RecordCount}], Business_Risk_BIP.Layouts.LayoutSources);
-																				SELF.EmployeeSources := DATASET([{LEFT.Source, 
-																																	IF(LEFT.DateFirstSeen = Business_Risk_BIP.Constants.NinesDate, Business_Risk_BIP.Constants.MissingDate, LEFT.DateFirstSeen), 
-																																	IF(LEFT.DateVendorFirstSeen = Business_Risk_BIP.Constants.NinesDate, Business_Risk_BIP.Constants.MissingDate, LEFT.DateVendorFirstSeen), 																																	
+																				SELF.EmployeeSources := DATASET([{LEFT.Source,
+																																	IF(LEFT.DateFirstSeen = Business_Risk_BIP.Constants.NinesDate, Business_Risk_BIP.Constants.MissingDate, LEFT.DateFirstSeen),
+																																	IF(LEFT.DateVendorFirstSeen = Business_Risk_BIP.Constants.NinesDate, Business_Risk_BIP.Constants.MissingDate, LEFT.DateVendorFirstSeen),
 																																	LEFT.DateLastSeen,
 																																	LEFT.DateVendorLastSeen,
 																																	LEFT.FirmEmployeeCount}], Business_Risk_BIP.Layouts.LayoutSources);
 																				SELF := []));
 	BusRegStatsRolled := ROLLUP(BusRegStatsTemp, LEFT.Seq = RIGHT.Seq, TRANSFORM(tempLayout, SELF.Seq := LEFT.Seq; SELF.Sources := LEFT.Sources + RIGHT.Sources; SELF.EmployeeSources := LEFT.EmployeeSources + RIGHT.EmployeeSources; SELF := LEFT));
-	
+
 	withBusRegStats := JOIN(withDNBDMI, BusRegStatsRolled, LEFT.Seq = RIGHT.Seq,
 																	TRANSFORM(Business_Risk_BIP.Layouts.Shell,
 																							SELF.Sources := LEFT.Sources + RIGHT.Sources;
@@ -183,7 +187,7 @@ EXPORT getEmployeeSources(DATASET(Business_Risk_BIP.Layouts.Shell) Shell,
 	// Get all unique SIC Codes along with dates
 	BusRegSIC := TABLE(BusReg,
 			{Seq,
-			 LinkID := Business_Risk_BIP.Common.GetLinkSearchLevel(Options.LinkSearchLevel, SeleID),
+			 LinkID := Business_Risk_BIP.Common.GetLinkSearchLevel(link_search_level, SeleID),
 			 Source := MDR.SourceTools.src_Business_Registration,
 			 STRING6 DateFirstSeen := Business_Risk_BIP.Common.groupMinDate6(dt_first_seen, HistoryDate),
 			 STRING6 DateLastSeen := Business_Risk_BIP.Common.groupMaxDate6(dt_last_seen, HistoryDate),
@@ -191,12 +195,12 @@ EXPORT getEmployeeSources(DATASET(Business_Risk_BIP.Layouts.Shell) Shell,
 			 STRING10 SICCode := (STD.Str.Filter((STRING)RawFields.SIC, '0123456789'))[1..4],
 			 BOOLEAN IsPrimary := TRUE // There is only 1 SIC field on this source, mark it as primary
 			 },
-			 Seq, Business_Risk_BIP.Common.GetLinkSearchLevel(Options.LinkSearchLevel, SeleID), ((STRING)RawFields.SIC)[1..4]
+			 Seq, Business_Risk_BIP.Common.GetLinkSearchLevel(link_search_level, SeleID), ((STRING)RawFields.SIC)[1..4]
 			 );
 	// Get all unique NAIC Codes along with dates
 	BusRegNAIC := TABLE(BusReg,
 			{Seq,
-			 LinkID := Business_Risk_BIP.Common.GetLinkSearchLevel(Options.LinkSearchLevel, SeleID),
+			 LinkID := Business_Risk_BIP.Common.GetLinkSearchLevel(link_search_level, SeleID),
 			 Source := MDR.SourceTools.src_Business_Registration,
 			 STRING6 DateFirstSeen := Business_Risk_BIP.Common.groupMinDate6(dt_first_seen, HistoryDate),
 			 STRING6 DateLastSeen := Business_Risk_BIP.Common.groupMaxDate6(dt_last_seen, HistoryDate),
@@ -204,7 +208,7 @@ EXPORT getEmployeeSources(DATASET(Business_Risk_BIP.Layouts.Shell) Shell,
 			 STRING10 NAICCode := (STD.Str.Filter((STRING)RawFields.NAICS, '0123456789'))[1..6],
 			 BOOLEAN IsPrimary := TRUE // There is only 1 NAIC field on this source, mark it as primary
 			 },
-			 Seq, Business_Risk_BIP.Common.GetLinkSearchLevel(Options.LinkSearchLevel, SeleID), ((STRING)RawFields.NAICS)[1..6]
+			 Seq, Business_Risk_BIP.Common.GetLinkSearchLevel(link_search_level, SeleID), ((STRING)RawFields.NAICS)[1..6]
 			 );
 	// Combine SIC and NAIC codes
 	BusRegSICTemp := PROJECT(BusRegSIC, TRANSFORM(tempLayout,
@@ -217,7 +221,7 @@ EXPORT getEmployeeSources(DATASET(Business_Risk_BIP.Layouts.Shell) Shell,
 																				SELF := []));
 	BusRegSICRolled := ROLLUP(BusRegSICTemp, LEFT.Seq = RIGHT.Seq, TRANSFORM(tempLayout, SELF.Seq := LEFT.Seq; SELF.SICNAICSources := LEFT.SICNAICSources + RIGHT.SICNAICSources; SELF := LEFT));
 	BusRegNAICRolled := ROLLUP(BusRegNAICTemp, LEFT.Seq = RIGHT.Seq, TRANSFORM(tempLayout, SELF.Seq := LEFT.Seq; SELF.SICNAICSources := LEFT.SICNAICSources + RIGHT.SICNAICSources; SELF := LEFT));
-	
+
 	withBusRegSIC := JOIN(withBusRegStats, BusRegSICRolled, LEFT.Seq = RIGHT.Seq,
 																	TRANSFORM(Business_Risk_BIP.Layouts.Shell,
 																							SELF.SICNAICSources := LEFT.SICNAICSources + RIGHT.SICNAICSources;
@@ -228,40 +232,40 @@ EXPORT getEmployeeSources(DATASET(Business_Risk_BIP.Layouts.Shell) Shell,
 																							SELF.SICNAICSources := LEFT.SICNAICSources + RIGHT.SICNAICSources;
 																							SELF := LEFT),
 																	LEFT OUTER, KEEP(1), ATMOST(100), FEW);
-	
+
 	// ---------------- DCA - Directory of Corporate Affiliations AKA LNCA ------------------
 	DCARaw := DCAV2.Key_LinkIds.kFetch2(Business_Risk_BIP.Common.GetLinkIDs(Shell), mod_access,
-																						 Business_Risk_BIP.Common.SetLinkSearchLevel(Options.LinkSearchLevel),
+																						 Business_Risk_BIP.Common.SetLinkSearchLevel(link_search_level),
 																							0, /*ScoreThreshold --> 0 = Give me everything*/
 																							Business_Risk_BIP.Constants.Limit_Default,
 																							Options.KeepLargeBusinesses);
-	
+
 	Business_Risk_BIP.Common.AppendSeq2(DCARaw, Shell, DCASeq);
-	
+
 	// Figure out if the kFetch was successful
 	kFetchErrorCodesDCA := Business_Risk_BIP.Common.GrabFetchErrorCode(DCASeq);
-	
+
 	DCA := Business_Risk_BIP.Common.FilterRecords(DCASeq, date_first_seen, date_vendor_first_reported, MDR.SourceTools.src_DCA, AllowedSourcesSet);
-	
+
 	DCAStats_pre_pre := TABLE(DCA,
 			{Seq,
-			 LinkID := Business_Risk_BIP.Common.GetLinkSearchLevel(Options.LinkSearchLevel, SeleID),
+			 LinkID := Business_Risk_BIP.Common.GetLinkSearchLevel(link_search_level, SeleID),
 			 Source := MDR.SourceTools.src_DCA,
 			 STRING6 DateFirstSeen := Business_Risk_BIP.Common.groupMinDate6(date_first_seen, HistoryDate),
 			 STRING6 DateVendorFirstSeen := Business_Risk_BIP.Common.groupMinDate6(date_vendor_first_reported, HistoryDate),
 			 STRING6 DateLastSeen := Business_Risk_BIP.Common.groupMaxDate6(date_last_seen, HistoryDate),
 			 STRING6 DateVendorLastSeen := Business_Risk_BIP.Common.groupMaxDate6(date_vendor_last_reported, HistoryDate),
-			 
+
 			 UNSIGNED4 RecordCount := COUNT(GROUP),
-			 INTEGER FirmEmployeeCount := MAX(GROUP, IF(RawFields.Emp_Num = '' AND Options.BusShellVersion >= Business_Risk_BIP.Constants.BusShellVersion_v30, -1,   
+			 INTEGER FirmEmployeeCount := MAX(GROUP, IF(RawFields.Emp_Num = '' AND shell_version >= Business_Risk_BIP.Constants.BusShellVersion_v30, -1,
                                         (INTEGER)RawFields.Emp_Num)),
        // For v30 and up, need to differentiate between 0 and '' for FirmReportedSales. Set missing records to -1.
-			 INTEGER FirmReportedSales := MAX(GROUP, IF(RawFields.Sales = '' AND Options.BusShellVersion >= Business_Risk_BIP.Constants.BusShellVersion_v30, -1, 
+			 INTEGER FirmReportedSales := MAX(GROUP, IF(RawFields.Sales = '' AND shell_version >= Business_Risk_BIP.Constants.BusShellVersion_v30, -1,
                                          (INTEGER)RawFields.Sales)),
 			 INTEGER FirmReportedEarnings := MAX(GROUP, (INTEGER)RawFields.Earnings),
 			 UNSIGNED8 FinanceWorthOfBus := MAX(GROUP, (INTEGER)RawFields.Net_Worth)
 			 },
-			 Seq, Business_Risk_BIP.Common.GetLinkSearchLevel(Options.LinkSearchLevel, SeleID)
+			 Seq, Business_Risk_BIP.Common.GetLinkSearchLevel(link_search_level, SeleID)
 			 );
 
   // If running Business Shell version 31 or higher, we'll need a dataset consisting of records that exist in the past 24 months
@@ -272,15 +276,15 @@ EXPORT getEmployeeSources(DATASET(Business_Risk_BIP.Layouts.Shell) Shell,
   tbl_FirmEmployeeCount_DCA := TABLE(
     DEDUP(SORT(DCA_past24Months(RawFields.Emp_Num != ''), Seq, RawFields.enterprise_num, -date_last_seen, -(INTEGER)RawFields.Emp_Num), Seq, RawFields.enterprise_num),
     {seq, FirmEmployeeCount := SUM( GROUP, (INTEGER)RawFields.Emp_Num )},
-    Seq, Business_Risk_BIP.Common.GetLinkSearchLevel(Options.LinkSearchLevel, SeleID) );  
+    Seq, Business_Risk_BIP.Common.GetLinkSearchLevel(link_search_level, SeleID) );
 
-  DCAStats_pre := 
+  DCAStats_pre :=
     JOIN(
-      DCAStats_pre_pre, tbl_FirmEmployeeCount_DCA, 
-      LEFT.seq = RIGHT.seq, 
+      DCAStats_pre_pre, tbl_FirmEmployeeCount_DCA,
+      LEFT.seq = RIGHT.seq,
       TRANSFORM( RECORDOF(DCAStats_pre_pre),
-        SELF.FirmEmployeeCount := 
-						IF( Options.BusShellVersion >= Business_Risk_BIP.Constants.BusShellVersion_v31, 
+        SELF.FirmEmployeeCount :=
+						IF( shell_version >= Business_Risk_BIP.Constants.BusShellVersion_v31,
 								IF( COUNT(tbl_FirmEmployeeCount_DCA(seq = LEFT.seq)) > 0, RIGHT.FirmEmployeeCount, -1 ),
 								LEFT.FirmEmployeeCount ),
         SELF := LEFT,
@@ -289,19 +293,19 @@ EXPORT getEmployeeSources(DATASET(Business_Risk_BIP.Layouts.Shell) Shell,
 			LEFT OUTER, FEW
     );
 
-  // Sum of all most recent, populated reported sales values among all unique data source company identifiers. 
+  // Sum of all most recent, populated reported sales values among all unique data source company identifiers.
   tbl_FirmReportedSales_DCA := TABLE(
     DEDUP(SORT(DCA_past24Months(RawFields.Sales != ''), Seq, RawFields.enterprise_num, -date_last_seen, -(INTEGER)RawFields.Sales), Seq, RawFields.enterprise_num),
     {seq, FirmReportedSales := SUM( GROUP, (INTEGER)RawFields.Sales )},
-    Seq, Business_Risk_BIP.Common.GetLinkSearchLevel(Options.LinkSearchLevel, SeleID) );  
+    Seq, Business_Risk_BIP.Common.GetLinkSearchLevel(link_search_level, SeleID) );
 
   DCAStats :=
     JOIN(
-      DCAStats_pre, tbl_FirmReportedSales_DCA, 
-      LEFT.Seq = RIGHT.Seq, 
+      DCAStats_pre, tbl_FirmReportedSales_DCA,
+      LEFT.Seq = RIGHT.Seq,
       TRANSFORM( RECORDOF(DCAStats_pre_pre),
         SELF.FirmReportedSales :=
-						IF( Options.BusShellVersion >= Business_Risk_BIP.Constants.BusShellVersion_v31, 
+						IF( shell_version >= Business_Risk_BIP.Constants.BusShellVersion_v31,
 								IF( COUNT(tbl_FirmReportedSales_DCA(seq = LEFT.seq)) > 0, RIGHT.FirmReportedSales, -1 ),
 								LEFT.FirmReportedSales ),
         SELF := LEFT,
@@ -312,21 +316,21 @@ EXPORT getEmployeeSources(DATASET(Business_Risk_BIP.Layouts.Shell) Shell,
 
 	DCAStatsTemp := PROJECT(DCAStats, TRANSFORM(tempLayout,
 																				SELF.Seq := LEFT.Seq;
-																				SELF.Sources := DATASET([{LEFT.Source, 
-																																	IF(LEFT.DateFirstSeen = Business_Risk_BIP.Constants.NinesDate, Business_Risk_BIP.Constants.MissingDate, LEFT.DateFirstSeen), 
-																																	IF(LEFT.DateVendorFirstSeen = Business_Risk_BIP.Constants.NinesDate, Business_Risk_BIP.Constants.MissingDate, LEFT.DateVendorFirstSeen), 																																	
+																				SELF.Sources := DATASET([{LEFT.Source,
+																																	IF(LEFT.DateFirstSeen = Business_Risk_BIP.Constants.NinesDate, Business_Risk_BIP.Constants.MissingDate, LEFT.DateFirstSeen),
+																																	IF(LEFT.DateVendorFirstSeen = Business_Risk_BIP.Constants.NinesDate, Business_Risk_BIP.Constants.MissingDate, LEFT.DateVendorFirstSeen),
 																																	LEFT.DateLastSeen,
 																																	LEFT.DateVendorLastSeen,
 																																	LEFT.RecordCount}], Business_Risk_BIP.Layouts.LayoutSources);
-																				SELF.EmployeeSources := DATASET([{LEFT.Source, 
-																																	IF(LEFT.DateFirstSeen = Business_Risk_BIP.Constants.NinesDate, Business_Risk_BIP.Constants.MissingDate, LEFT.DateFirstSeen), 
-																																	IF(LEFT.DateVendorFirstSeen = Business_Risk_BIP.Constants.NinesDate, Business_Risk_BIP.Constants.MissingDate, LEFT.DateVendorFirstSeen), 																																	
+																				SELF.EmployeeSources := DATASET([{LEFT.Source,
+																																	IF(LEFT.DateFirstSeen = Business_Risk_BIP.Constants.NinesDate, Business_Risk_BIP.Constants.MissingDate, LEFT.DateFirstSeen),
+																																	IF(LEFT.DateVendorFirstSeen = Business_Risk_BIP.Constants.NinesDate, Business_Risk_BIP.Constants.MissingDate, LEFT.DateVendorFirstSeen),
 																																	LEFT.DateLastSeen,
 																																	LEFT.DateVendorLastSeen,
 																																	LEFT.FirmEmployeeCount}], Business_Risk_BIP.Layouts.LayoutSources);
-																				SELF.SalesSources := DATASET([{LEFT.Source, 
-																																	IF(LEFT.DateFirstSeen = Business_Risk_BIP.Constants.NinesDate, Business_Risk_BIP.Constants.MissingDate, LEFT.DateFirstSeen), 
-																																	IF(LEFT.DateVendorFirstSeen = Business_Risk_BIP.Constants.NinesDate, Business_Risk_BIP.Constants.MissingDate, LEFT.DateVendorFirstSeen), 																																	
+																				SELF.SalesSources := DATASET([{LEFT.Source,
+																																	IF(LEFT.DateFirstSeen = Business_Risk_BIP.Constants.NinesDate, Business_Risk_BIP.Constants.MissingDate, LEFT.DateFirstSeen),
+																																	IF(LEFT.DateVendorFirstSeen = Business_Risk_BIP.Constants.NinesDate, Business_Risk_BIP.Constants.MissingDate, LEFT.DateVendorFirstSeen),
 																																	LEFT.DateLastSeen,
 																																	LEFT.DateVendorLastSeen,
 																																	LEFT.FirmReportedSales
@@ -336,15 +340,15 @@ EXPORT getEmployeeSources(DATASET(Business_Risk_BIP.Layouts.Shell) Shell,
 																				SELF.FinanceWorthOfBus := LEFT.FinanceWorthOfBus;
 																				SELF.RecordCount := LEFT.RecordCount;
 																				SELF := []));
-	DCAStatsRolled := ROLLUP(DCAStatsTemp, LEFT.Seq = RIGHT.Seq, TRANSFORM(tempLayout, SELF.Seq := LEFT.Seq; 
-																															SELF.Sources := LEFT.Sources + RIGHT.Sources; 
-																															SELF.EmployeeSources := LEFT.EmployeeSources + RIGHT.EmployeeSources; 
+	DCAStatsRolled := ROLLUP(DCAStatsTemp, LEFT.Seq = RIGHT.Seq, TRANSFORM(tempLayout, SELF.Seq := LEFT.Seq;
+																															SELF.Sources := LEFT.Sources + RIGHT.Sources;
+																															SELF.EmployeeSources := LEFT.EmployeeSources + RIGHT.EmployeeSources;
 																															SELF.SalesSources := LEFT.SalesSources + RIGHT.SalesSources;
-																															SELF.FirmReportedEarnings := LEFT.FirmReportedEarnings + RIGHT.FirmReportedEarnings; 
-																															SELF.FinanceWorthOfBus := LEFT.FinanceWorthOfBus + RIGHT.FinanceWorthOfBus; 
+																															SELF.FirmReportedEarnings := LEFT.FirmReportedEarnings + RIGHT.FirmReportedEarnings;
+																															SELF.FinanceWorthOfBus := LEFT.FinanceWorthOfBus + RIGHT.FinanceWorthOfBus;
 																															SELF.RecordCount := LEFT.RecordCount + RIGHT.RecordCount;
 																															SELF := LEFT));
-	
+
 	withDCAStats := JOIN(withBusReg, DCAStatsRolled, LEFT.Seq = RIGHT.Seq,
 																	TRANSFORM(Business_Risk_BIP.Layouts.Shell,
 																							SELF.Firmographic.FirmReportedSales := (STRING)Business_Risk_BIP.Common.capNum(IF(RIGHT.RecordCount > 0, RIGHT.FirmReportedSales, -1), -1, 99999999999);
@@ -359,7 +363,7 @@ EXPORT getEmployeeSources(DATASET(Business_Risk_BIP.Layouts.Shell) Shell,
 	getDCASIC(InputDataset, OutputTable, OutputTemp, OutputRolled, WithInput, WithOutput, SICField, PrimarySIC) := MACRO
 		OutputTable := TABLE(InputDataset,
 			{Seq,
-			 LinkID := Business_Risk_BIP.Common.GetLinkSearchLevel(Options.LinkSearchLevel, SeleID),
+			 LinkID := Business_Risk_BIP.Common.GetLinkSearchLevel(link_search_level, SeleID),
 			 Source := MDR.SourceTools.src_DCA,
 			 STRING6 DateFirstSeen := Business_Risk_BIP.Common.groupMinDate6(date_first_seen, HistoryDate),
 			 STRING6 DateLastSeen := Business_Risk_BIP.Common.groupMaxDate6(date_last_seen, HistoryDate),
@@ -367,15 +371,15 @@ EXPORT getEmployeeSources(DATASET(Business_Risk_BIP.Layouts.Shell) Shell,
 			 STRING10 SICCode := (STD.Str.Filter((STRING)SICField, '0123456789'))[1..4],
 			 BOOLEAN IsPrimary := PrimarySIC // SIC1 is the primary SIC in DCA data, all others are not primary
 			 },
-			 Seq, Business_Risk_BIP.Common.GetLinkSearchLevel(Options.LinkSearchLevel, SeleID), ((STRING)SICField)[1..4]
+			 Seq, Business_Risk_BIP.Common.GetLinkSearchLevel(link_search_level, SeleID), ((STRING)SICField)[1..4]
 			 );
-		
+
 		OutputTemp := PROJECT(OutputTable, TRANSFORM(tempLayout,
 																				SELF.Seq := LEFT.Seq;
 																				SELF.SICNAICSources := DATASET([{LEFT.Source, IF(LEFT.DateFirstSeen = Business_Risk_BIP.Constants.NinesDate, Business_Risk_BIP.Constants.MissingDate, LEFT.DateFirstSeen), LEFT.DateLastSeen, LEFT.RecordCount, LEFT.SICCode, Business_Risk_BIP.Common.industryGroup(LEFT.SICCode, Business_Risk_BIP.Constants.SIC), '' /*NAICCode*/, '' /*NAICIndustry*/, LEFT.IsPrimary}], Business_Risk_BIP.Layouts.LayoutSICNAIC);
 																				SELF := []));
 		OutputRolled := ROLLUP(OutputTemp, LEFT.Seq = RIGHT.Seq, TRANSFORM(tempLayout, SELF.Seq := LEFT.Seq; SELF.SICNAICSources := LEFT.SICNAICSources + RIGHT.SICNAICSources; SELF := LEFT));
-	
+
 		WithOutput := JOIN(WithInput, OutputRolled, LEFT.Seq = RIGHT.Seq,
 																	TRANSFORM(Business_Risk_BIP.Layouts.Shell,
 																							SELF.SICNAICSources := LEFT.SICNAICSources + RIGHT.SICNAICSources;
@@ -393,12 +397,12 @@ EXPORT getEmployeeSources(DATASET(Business_Risk_BIP.Layouts.Shell) Shell,
 	getDCASIC(DCA, DCASIC8, DCASIC8Temp, DCASIC8Rolled, withDCASIC7, withDCASIC8, RawFields.SIC8, FALSE);
 	getDCASIC(DCA, DCASIC9, DCASIC9Temp, DCASIC9Rolled, withDCASIC8, withDCASIC9, RawFields.SIC9, FALSE);
 	getDCASIC(DCA, DCASIC10, DCASIC10Temp, DCASIC10Rolled, withDCASIC9, withDCASIC10, RawFields.SIC10, FALSE);
-	
+
 	// Get all unique NAIC Codes along with dates, for the primary and all 9 secondary NAIC's
 	getDCANAIC(InputDataset, OutputTable, OutputTemp, OutputRolled, WithInput, WithOutput, NAICField, PrimaryNAIC) := MACRO
 		OutputTable := TABLE(InputDataset,
 			{Seq,
-			 LinkID := Business_Risk_BIP.Common.GetLinkSearchLevel(Options.LinkSearchLevel, SeleID),
+			 LinkID := Business_Risk_BIP.Common.GetLinkSearchLevel(link_search_level, SeleID),
 			 Source := MDR.SourceTools.src_DCA,
 			 STRING6 DateFirstSeen := Business_Risk_BIP.Common.groupMinDate6(date_first_seen, HistoryDate),
 			 STRING6 DateLastSeen := Business_Risk_BIP.Common.groupMaxDate6(date_last_seen, HistoryDate),
@@ -406,15 +410,15 @@ EXPORT getEmployeeSources(DATASET(Business_Risk_BIP.Layouts.Shell) Shell,
 			 STRING10 NAICCode := (STD.Str.Filter((STRING)NAICField, '0123456789'))[1..6],
 			 BOOLEAN IsPrimary := PrimaryNAIC // NAIC1 is the primary SIC in DCA data, all others are not primary
 			 },
-			 Seq, Business_Risk_BIP.Common.GetLinkSearchLevel(Options.LinkSearchLevel, SeleID), ((STRING)NAICField)[1..6]
+			 Seq, Business_Risk_BIP.Common.GetLinkSearchLevel(link_search_level, SeleID), ((STRING)NAICField)[1..6]
 			 );
-		
+
 		OutputTemp := PROJECT(OutputTable, TRANSFORM(tempLayout,
 																				SELF.Seq := LEFT.Seq;
 																				SELF.SICNAICSources := DATASET([{LEFT.Source, IF(LEFT.DateFirstSeen = Business_Risk_BIP.Constants.NinesDate, Business_Risk_BIP.Constants.MissingDate, LEFT.DateFirstSeen), LEFT.DateLastSeen, LEFT.RecordCount, '' /*SICCode*/, '' /*SICIndustry*/, LEFT.NAICCode, Business_Risk_BIP.Common.industryGroup(LEFT.NAICCode, Business_Risk_BIP.Constants.NAIC), LEFT.IsPrimary}], Business_Risk_BIP.Layouts.LayoutSICNAIC);
 																				SELF := []));
 		OutputRolled := ROLLUP(OutputTemp, LEFT.Seq = RIGHT.Seq, TRANSFORM(tempLayout, SELF.Seq := LEFT.Seq; SELF.SICNAICSources := LEFT.SICNAICSources + RIGHT.SICNAICSources; SELF := LEFT));
-	
+
 		WithOutput := JOIN(WithInput, OutputRolled, LEFT.Seq = RIGHT.Seq,
 																	TRANSFORM(Business_Risk_BIP.Layouts.Shell,
 																							SELF.SICNAICSources := LEFT.SICNAICSources + RIGHT.SICNAICSources;
@@ -434,23 +438,23 @@ EXPORT getEmployeeSources(DATASET(Business_Risk_BIP.Layouts.Shell) Shell,
 	getDCANAIC(DCA, DCANAIC10, DCANAIC10Temp, DCANAIC10Rolled, withDCANAIC9, withDCA, RawFields.NAICS10, FALSE);
 
 	// ---------------- DEADCO ------------------
-                                                                                                   
+
 	DEADCORaw := InfoUSA.Key_DEADCO_LinkIds.kFetch2(Business_Risk_BIP.Common.GetLinkIDs(Shell), mod_access,
-																						 Business_Risk_BIP.Common.SetLinkSearchLevel(Options.LinkSearchLevel),
+																						 Business_Risk_BIP.Common.SetLinkSearchLevel(link_search_level),
 																							0, /*ScoreThreshold --> 0 = Give me everything*/
 																							Business_Risk_BIP.Constants.Limit_Default,
 																							Options.KeepLargeBusinesses);
-	
+
 	Business_Risk_BIP.Common.AppendSeq2(DEADCORaw, Shell, DEADCOSeq);
-	
+
 	// Figure out if the kFetch was successful
 	kFetchErrorCodesDeadCo := Business_Risk_BIP.Common.GrabFetchErrorCode(DEADCOSeq);
-	
+
 	DEADCO := Business_Risk_BIP.Common.FilterRecords(DEADCOSeq, dt_first_seen, dt_vendor_first_reported, MDR.SourceTools.src_INFOUSA_DEAD_COMPANIES, AllowedSourcesSet);
-	
+
 	DEADCOStats := TABLE(DEADCO,
 			{Seq,
-			 LinkID := Business_Risk_BIP.Common.GetLinkSearchLevel(Options.LinkSearchLevel, SeleID),
+			 LinkID := Business_Risk_BIP.Common.GetLinkSearchLevel(link_search_level, SeleID),
 			 Source := MDR.SourceTools.src_INFOUSA_DEAD_COMPANIES,
 			 STRING6 DateFirstSeen := Business_Risk_BIP.Common.groupMinDate6(dt_first_seen, HistoryDate),
 			 STRING6 DateVendorFirstSeen := Business_Risk_BIP.Common.groupMinDate6(dt_vendor_first_reported, HistoryDate),
@@ -459,24 +463,24 @@ EXPORT getEmployeeSources(DATASET(Business_Risk_BIP.Layouts.Shell) Shell,
 			 UNSIGNED4 RecordCount := COUNT(GROUP),
 			 // For DEADCO there are two fields containing employee counts, keep whichever has the higher population amount
 			 INTEGER FirmEmployeeCount := MAX(
-                                        MAX(GROUP, IF(total_employees_actual = '' AND Options.BusShellVersion >= Business_Risk_BIP.Constants.BusShellVersion_v30, -1, (INTEGER)total_employees_actual)), 
-                                        MAX(GROUP, IF(num_employees_actual = '' AND Options.BusShellVersion >= Business_Risk_BIP.Constants.BusShellVersion_v30, -1, (INTEGER)num_employees_actual))
-                                       ) 
+                                        MAX(GROUP, IF(total_employees_actual = '' AND shell_version >= Business_Risk_BIP.Constants.BusShellVersion_v30, -1, (INTEGER)total_employees_actual)),
+                                        MAX(GROUP, IF(num_employees_actual = '' AND shell_version >= Business_Risk_BIP.Constants.BusShellVersion_v30, -1, (INTEGER)num_employees_actual))
+                                       )
 			 },
-			 Seq, Business_Risk_BIP.Common.GetLinkSearchLevel(Options.LinkSearchLevel, SeleID)
+			 Seq, Business_Risk_BIP.Common.GetLinkSearchLevel(link_search_level, SeleID)
 			 );
-			 
+
 	DEADCOStatsTemp := PROJECT(DEADCOStats, TRANSFORM(tempLayout,
 																				SELF.Seq := LEFT.Seq;
-																				SELF.Sources := DATASET([{LEFT.Source, 
-																																	IF(LEFT.DateFirstSeen = Business_Risk_BIP.Constants.NinesDate, Business_Risk_BIP.Constants.MissingDate, LEFT.DateFirstSeen), 
-																																	IF(LEFT.DateVendorFirstSeen = Business_Risk_BIP.Constants.NinesDate, Business_Risk_BIP.Constants.MissingDate, LEFT.DateVendorFirstSeen), 																																	
+																				SELF.Sources := DATASET([{LEFT.Source,
+																																	IF(LEFT.DateFirstSeen = Business_Risk_BIP.Constants.NinesDate, Business_Risk_BIP.Constants.MissingDate, LEFT.DateFirstSeen),
+																																	IF(LEFT.DateVendorFirstSeen = Business_Risk_BIP.Constants.NinesDate, Business_Risk_BIP.Constants.MissingDate, LEFT.DateVendorFirstSeen),
 																																	LEFT.DateLastSeen,
 																																	LEFT.DateVendorLastSeen,
 																																	LEFT.RecordCount}], Business_Risk_BIP.Layouts.LayoutSources);
-																				SELF.EmployeeSources := DATASET([{LEFT.Source, 
-																																	IF(LEFT.DateFirstSeen = Business_Risk_BIP.Constants.NinesDate, Business_Risk_BIP.Constants.MissingDate, LEFT.DateFirstSeen), 
-																																	IF(LEFT.DateVendorFirstSeen = Business_Risk_BIP.Constants.NinesDate, Business_Risk_BIP.Constants.MissingDate, LEFT.DateVendorFirstSeen), 																																	
+																				SELF.EmployeeSources := DATASET([{LEFT.Source,
+																																	IF(LEFT.DateFirstSeen = Business_Risk_BIP.Constants.NinesDate, Business_Risk_BIP.Constants.MissingDate, LEFT.DateFirstSeen),
+																																	IF(LEFT.DateVendorFirstSeen = Business_Risk_BIP.Constants.NinesDate, Business_Risk_BIP.Constants.MissingDate, LEFT.DateVendorFirstSeen),
 																																	LEFT.DateLastSeen,
 																																	LEFT.DateVendorLastSeen,
 																																	LEFT.FirmEmployeeCount}], Business_Risk_BIP.Layouts.LayoutSources);
@@ -492,21 +496,21 @@ EXPORT getEmployeeSources(DATASET(Business_Risk_BIP.Layouts.Shell) Shell,
     DATASET(Business_Risk_BIP.Layouts.LayoutSources) AddressVerSources;
     DATASET(Business_Risk_BIP.Layouts.LayoutSources) BestAddressSources;
   END;
-	
+
 	tempDEADCOCalc calcDEADCO(Business_Risk_BIP.Layouts.Shell le, DEADCO ri) := TRANSFORM
 		SELF.Seq := le.Seq;
-		
+
 		// In an effort to "short circuit" the fuzzy matching require that the first character match before doing the fuzzy comparison - this helps with latency
 		NamePopulated				:= TRIM(le.Clean_Input.CompanyName) <> '' AND TRIM(ri.company_name) <> '';
 		NameMatched					 := NamePopulated AND le.Clean_Input.CompanyName[1] = ri.company_name[1] AND Risk_Indicators.iid_constants.g(Business_Risk.CNameScore(le.Clean_Input.CompanyName, ri.company_name));
-		
+
 		NoScoreValue				 := 255;
 		AddressPopulated	:= TRIM(le.Clean_Input.Prim_Name) <> '' AND TRIM(le.Clean_Input.Zip) <> '' AND TRIM(ri.prim_name) <> '' AND TRIM(ri.Zip5) <> '';
 		ZIPScore						   := IF(le.Clean_Input.Zip <> '' AND ri.Zip5 <> '' AND le.Clean_Input.Zip[1] = ri.Zip5[1], Risk_Indicators.AddrScore.ZIP_Score(le.Clean_Input.Zip, ri.Zip5), NoScoreValue);
 		CityStateScore			:= IF(le.Clean_Input.City <> '' AND le.Clean_Input.State <> '' AND ri.p_city_name <> '' AND ri.St <> '' AND le.Clean_Input.State[1] = ri.St[1], Risk_Indicators.AddrScore.CityState_Score(le.Clean_Input.City, le.Clean_Input.State, ri.p_city_name, ri.St, ''), NoScoreValue);
 		CityStateZipMatched	:= Risk_Indicators.iid_constants.ga(ZIPScore) AND Risk_Indicators.iid_constants.ga(CityStateScore) AND AddressPopulated;
-		AddressMatched			:= AddressPopulated AND Risk_Indicators.iid_constants.ga(IF(ZIPScore = NoScoreValue AND CityStateScore = NoScoreValue, NoScoreValue, 
-																						Risk_Indicators.AddrScore.AddressScore(le.Clean_Input.Prim_Range, le.Clean_Input.Prim_Name, le.Clean_Input.Sec_Range, 
+		AddressMatched			:= AddressPopulated AND Risk_Indicators.iid_constants.ga(IF(ZIPScore = NoScoreValue AND CityStateScore = NoScoreValue, NoScoreValue,
+																						Risk_Indicators.AddrScore.AddressScore(le.Clean_Input.Prim_Range, le.Clean_Input.Prim_Name, le.Clean_Input.Sec_Range,
 																						ri.prim_range, ri.prim_name, ri.sec_range,
 																						ZIPScore, CityStateScore)));
 
@@ -514,40 +518,40 @@ EXPORT getEmployeeSources(DATASET(Business_Risk_BIP.Layouts.Shell) Shell,
 		BestZIPScore						   := IF(le.Best_Info.BestCompanyZip <> '' AND ri.Zip5 <> '' AND le.Best_Info.BestCompanyZip[1] = ri.Zip5[1], Risk_Indicators.AddrScore.ZIP_Score(le.Best_Info.BestCompanyZip, ri.Zip5), NoScoreValue);
 		BestCityStateScore			:= IF(le.Best_Info.BestCompanyCity <> '' AND le.Best_Info.BestCompanyState <> '' AND ri.p_city_name <> '' AND ri.St <> '' AND le.Best_Info.BestCompanyState[1] = ri.St[1], Risk_Indicators.AddrScore.CityState_Score(le.Best_Info.BestCompanyCity, le.Best_Info.BestCompanyState, ri.p_city_name, ri.St, ''), NoScoreValue);
 		BestCityStateZipMatched	:= Risk_Indicators.iid_constants.ga(BestZIPScore) AND Risk_Indicators.iid_constants.ga(BestCityStateScore) AND BestAddressPopulated;
-		BestAddressMatched			:= BestAddressPopulated AND Risk_Indicators.iid_constants.ga(IF(BestZIPScore = NoScoreValue AND BestCityStateScore = NoScoreValue, NoScoreValue, 
-																						Risk_Indicators.AddrScore.AddressScore(le.Best_Info.BestPrimRange, le.Best_Info.BestPrimName, le.Best_Info.BestSecRange, 
+		BestAddressMatched			:= BestAddressPopulated AND Risk_Indicators.iid_constants.ga(IF(BestZIPScore = NoScoreValue AND BestCityStateScore = NoScoreValue, NoScoreValue,
+																						Risk_Indicators.AddrScore.AddressScore(le.Best_Info.BestPrimRange, le.Best_Info.BestPrimName, le.Best_Info.BestSecRange,
 																						ri.prim_range, ri.prim_name, ri.sec_range,
 																						BestZIPScore, BestCityStateScore)));
-																						
+
 		PhonePopulated			:= TRIM(le.Clean_Input.Phone10) <> '' AND TRIM(ri.phone) <> '';
 		PhoneMatched				:= PhonePopulated AND (le.Clean_Input.Phone10[1] = ri.phone[1] OR le.Clean_Input.Phone10[4] = ri.phone[4] OR le.Clean_Input.Phone10[4] = ri.phone[1]) AND Risk_Indicators.iid_constants.gn(Risk_Indicators.PhoneScore(le.Clean_Input.Phone10, ri.phone));
-		
-		// This is also being calculated in Business_Risk_BIP.getBusinessHeader and Business_Risk_BIP.getEDA to help boost verification, 
-		// Only the levels that can be calculated with a phone match will be calculated here	
+
+		// This is also being calculated in Business_Risk_BIP.getBusinessHeader and Business_Risk_BIP.getEDA to help boost verification,
+		// Only the levels that can be calculated with a phone match will be calculated here
   BNAPCalc := Business_Risk_BIP.Common.calcBNAP_narrow(NameMatched, AddressMatched, PhoneMatched);
-		
+
 		DateFirstSeen       := Business_Risk_BIP.Common.checkInvalidDate((STRING)ri.dt_first_seen           , Business_Risk_BIP.Constants.MissingDate, le.Clean_Input.HistoryDate)[1..6];
 		DateVendorFirstSeen := Business_Risk_BIP.Common.checkInvalidDate((STRING)ri.dt_vendor_first_reported, Business_Risk_BIP.Constants.MissingDate, le.Clean_Input.HistoryDate)[1..6];
 		DateLastSeen        := Business_Risk_BIP.Common.checkInvalidDate((STRING)ri.dt_last_seen            , Business_Risk_BIP.Constants.MissingDate, le.Clean_Input.HistoryDate)[1..6];
 		DateVendorLastSeen  := Business_Risk_BIP.Common.checkInvalidDate((STRING)ri.dt_vendor_last_reported , Business_Risk_BIP.Constants.MissingDate, le.Clean_Input.HistoryDate)[1..6];
-		
-		temp_Sources := DATASET([{MDR.SourceTools.src_INFOUSA_DEAD_COMPANIES, 
-												 DateFirstSeen, 
-												 DateVendorFirstSeen, 
+
+		temp_Sources := DATASET([{MDR.SourceTools.src_INFOUSA_DEAD_COMPANIES,
+												 DateFirstSeen,
+												 DateVendorFirstSeen,
 												 DateLastSeen,
 												 DateVendorLastSeen,
-												 1}], Business_Risk_BIP.Layouts.LayoutSources); 
-												 
+												 1}], Business_Risk_BIP.Layouts.LayoutSources);
+
 		SELF.PhoneSources      := IF(                                  BNAPCalc IN ['4', '5', '8'], temp_Sources, DATASET([], Business_Risk_BIP.Layouts.LayoutSources));
-		SELF.NameSources       := IF(Options.BusShellVersion >= Business_Risk_BIP.Constants.BusShellVersion_v22 AND BNAPCalc IN ['5', '8'], temp_Sources, DATASET([], Business_Risk_BIP.Layouts.LayoutSources));																											
-		SELF.AddressVerSources := IF(Options.BusShellVersion >= Business_Risk_BIP.Constants.BusShellVersion_v22 AND BNAPCalc IN ['4', '8'], temp_Sources, DATASET([], Business_Risk_BIP.Layouts.LayoutSources));
-		SELF.BestAddressSources := IF(Options.BusShellVersion >= Business_Risk_BIP.Constants.BusShellVersion_v30 AND BestAddressMatched, temp_Sources, DATASET([], Business_Risk_BIP.Layouts.LayoutSources));					
+		SELF.NameSources       := IF(shell_version >= Business_Risk_BIP.Constants.BusShellVersion_v22 AND BNAPCalc IN ['5', '8'], temp_Sources, DATASET([], Business_Risk_BIP.Layouts.LayoutSources));
+		SELF.AddressVerSources := IF(shell_version >= Business_Risk_BIP.Constants.BusShellVersion_v22 AND BNAPCalc IN ['4', '8'], temp_Sources, DATASET([], Business_Risk_BIP.Layouts.LayoutSources));
+		SELF.BestAddressSources := IF(shell_version >= Business_Risk_BIP.Constants.BusShellVersion_v30 AND BestAddressMatched, temp_Sources, DATASET([], Business_Risk_BIP.Layouts.LayoutSources));
 
 	END;
-	
+
 	DEADCOBNAPRaw := JOIN(Shell, DEADCO, LEFT.Seq = RIGHT.Seq,
 																	calcDEADCO(LEFT, RIGHT), ATMOST(Business_Risk_BIP.Constants.Limit_Default));
-	
+
 	DEADCOBNAPRolled := ROLLUP(SORT(DEADCOBNAPRaw, Seq), LEFT.Seq = RIGHT.Seq, TRANSFORM(tempDEADCOCalc,
 																			SELF.NameSources       := LEFT.NameSources + RIGHT.NameSources;
 																			SELF.AddressVerSources := LEFT.AddressVerSources + RIGHT.AddressVerSources;
@@ -578,24 +582,24 @@ EXPORT getEmployeeSources(DATASET(Business_Risk_BIP.Layouts.Shell) Shell,
 											 SELF.EmployeeSources         := LEFT.EmployeeSources + RIGHT.EmployeeSources,
 											 SELF := LEFT),
 																	LEFT OUTER, KEEP(1), ATMOST(100), FEW);
-																	
+
 	// ---------------- ABIUS ------------------
 	ABIUSRaw := InfoUSA.Key_ABIUS_LinkIds.kFetch2(Business_Risk_BIP.Common.GetLinkIDs(Shell),
-																						 Business_Risk_BIP.Common.SetLinkSearchLevel(Options.LinkSearchLevel),
+																						 Business_Risk_BIP.Common.SetLinkSearchLevel(link_search_level),
 																							0, /*ScoreThreshold --> 0 = Give me everything*/
 																							Business_Risk_BIP.Constants.Limit_Default,
 																							Options.KeepLargeBusinesses);
-	
+
 	Business_Risk_BIP.Common.AppendSeq2(ABIUSRaw, Shell, ABIUSSeq);
-	
+
 	// Figure out if the kFetch was successful
 	kFetchErrorCodesABIUS := Business_Risk_BIP.Common.GrabFetchErrorCode(ABIUSSeq);
-	
+
 	ABIUS := Business_Risk_BIP.Common.FilterRecords(ABIUSSeq, date_added, process_date, MDR.SourceTools.src_INFOUSA_ABIUS_USABIZ, AllowedSourcesSet);
-	
+
 	ABIUSStats := TABLE(ABIUS,
 			{Seq,
-			 LinkID := Business_Risk_BIP.Common.GetLinkSearchLevel(Options.LinkSearchLevel, SeleID),
+			 LinkID := Business_Risk_BIP.Common.GetLinkSearchLevel(link_search_level, SeleID),
 			 Source := MDR.SourceTools.src_INFOUSA_ABIUS_USABIZ,
 			 STRING6 DateFirstSeen := Business_Risk_BIP.Common.groupMinDate6(date_added, HistoryDate),
 			 STRING6 DateVendorFirstSeen := Business_Risk_BIP.Common.groupMinDate6(process_date, HistoryDate),
@@ -604,31 +608,31 @@ EXPORT getEmployeeSources(DATASET(Business_Risk_BIP.Layouts.Shell) Shell,
 			 UNSIGNED4 RecordCount := COUNT(GROUP),
 			 // For DEADCO there are two fields containing employee counts, keep whichever has the higher population amount
 			 INTEGER FirmEmployeeCount := MAX(
-                                        MAX(GROUP, IF(total_employees_actual = '' AND Options.BusShellVersion >= Business_Risk_BIP.Constants.BusShellVersion_v30, -1, (INTEGER)total_employees_actual)), 
-                                        MAX(GROUP, IF(num_employees_actual = '' AND Options.BusShellVersion >= Business_Risk_BIP.Constants.BusShellVersion_v30, -1, (INTEGER)num_employees_actual))
-                                       ) 
+                                        MAX(GROUP, IF(total_employees_actual = '' AND shell_version >= Business_Risk_BIP.Constants.BusShellVersion_v30, -1, (INTEGER)total_employees_actual)),
+                                        MAX(GROUP, IF(num_employees_actual = '' AND shell_version >= Business_Risk_BIP.Constants.BusShellVersion_v30, -1, (INTEGER)num_employees_actual))
+                                       )
 			 },
-			 Seq, Business_Risk_BIP.Common.GetLinkSearchLevel(Options.LinkSearchLevel, SeleID)
+			 Seq, Business_Risk_BIP.Common.GetLinkSearchLevel(link_search_level, SeleID)
 			 );
 
-	
+
 	ABIUSStatsTemp := PROJECT(ABIUSStats, TRANSFORM(tempLayout,
 																				SELF.Seq := LEFT.Seq;
-																				SELF.Sources := DATASET([{LEFT.Source, 
-																																	IF(LEFT.DateFirstSeen = Business_Risk_BIP.Constants.NinesDate, Business_Risk_BIP.Constants.MissingDate, LEFT.DateFirstSeen), 
-																																	IF(LEFT.DateVendorFirstSeen = Business_Risk_BIP.Constants.NinesDate, Business_Risk_BIP.Constants.MissingDate, LEFT.DateVendorFirstSeen), 																																	
+																				SELF.Sources := DATASET([{LEFT.Source,
+																																	IF(LEFT.DateFirstSeen = Business_Risk_BIP.Constants.NinesDate, Business_Risk_BIP.Constants.MissingDate, LEFT.DateFirstSeen),
+																																	IF(LEFT.DateVendorFirstSeen = Business_Risk_BIP.Constants.NinesDate, Business_Risk_BIP.Constants.MissingDate, LEFT.DateVendorFirstSeen),
 																																	LEFT.DateLastSeen,
 																																	LEFT.DateVendorLastSeen,
 																																	LEFT.RecordCount}], Business_Risk_BIP.Layouts.LayoutSources);
-																				SELF.EmployeeSources := DATASET([{LEFT.Source, 
-																																	IF(LEFT.DateFirstSeen = Business_Risk_BIP.Constants.NinesDate, Business_Risk_BIP.Constants.MissingDate, LEFT.DateFirstSeen), 
-																																	IF(LEFT.DateVendorFirstSeen = Business_Risk_BIP.Constants.NinesDate, Business_Risk_BIP.Constants.MissingDate, LEFT.DateVendorFirstSeen), 																																	
+																				SELF.EmployeeSources := DATASET([{LEFT.Source,
+																																	IF(LEFT.DateFirstSeen = Business_Risk_BIP.Constants.NinesDate, Business_Risk_BIP.Constants.MissingDate, LEFT.DateFirstSeen),
+																																	IF(LEFT.DateVendorFirstSeen = Business_Risk_BIP.Constants.NinesDate, Business_Risk_BIP.Constants.MissingDate, LEFT.DateVendorFirstSeen),
 																																	LEFT.DateLastSeen,
 																																	LEFT.DateVendorLastSeen,
 																																	LEFT.FirmEmployeeCount}], Business_Risk_BIP.Layouts.LayoutSources);
 																				SELF := []));
 	ABIUSStatsRolled := ROLLUP(ABIUSStatsTemp, LEFT.Seq = RIGHT.Seq, TRANSFORM(tempLayout, SELF.Seq := LEFT.Seq; SELF.Sources := LEFT.Sources + RIGHT.Sources; SELF.EmployeeSources := LEFT.EmployeeSources + RIGHT.EmployeeSources; SELF := LEFT));
-	
+
 	withABIUS := JOIN(withDEADCO, ABIUSStatsRolled, LEFT.Seq = RIGHT.Seq,
 																	TRANSFORM(Business_Risk_BIP.Layouts.Shell,
 																							SELF.Sources := LEFT.Sources + RIGHT.Sources;
@@ -640,21 +644,21 @@ EXPORT getEmployeeSources(DATASET(Business_Risk_BIP.Layouts.Shell) Shell,
 	// ---------------- Equifax Business ------------------
 
   equifaxBus_raw := dx_Equifax_business_data.key_LinkIds.kFetch2(Business_Risk_BIP.Common.GetLinkIDs(Shell),
-                                                        Business_Risk_BIP.Common.SetLinkSearchLevel(Options.LinkSearchLevel),
+                                                        Business_Risk_BIP.Common.SetLinkSearchLevel(link_search_level),
                                                         0, /*ScoreThreshold --> 0 = Give me everything*/
                                                         Business_Risk_BIP.Constants.Limit_Default,
 																												Options.KeepLargeBusinesses);
 
-	Business_Risk_BIP.Common.AppendSeq(equifaxBus_raw, Shell, equifaxBus_seq, Options.LinkSearchLevel);
-	
+	Business_Risk_BIP.Common.AppendSeq(equifaxBus_raw, Shell, equifaxBus_seq, link_search_level);
+
 	// kFetchErrorCodesEquifaxBusiness := Business_Risk_BIP.Common.GrabFetchErrorCode(equifaxBus_seq);
-	
+
 	equifaxBus := Business_Risk_BIP.Common.FilterRecords(equifaxBus_seq, dt_first_seen, dt_vendor_first_reported, MDR.SourceTools.src_Equifax_Business_Data, AllowedSourcesSet);
 
 	equifaxBusStats_pre_pre := TABLE(equifaxBus,
         {
           Seq,
-          LinkID := Business_Risk_BIP.Common.GetLinkSearchLevel(Options.LinkSearchLevel, SeleID),
+          LinkID := Business_Risk_BIP.Common.GetLinkSearchLevel(link_search_level, SeleID),
           STRING2 Source              := MDR.SourceTools.src_Equifax_Business_Data,
           STRING6 DateFirstSeen       := Business_Risk_BIP.Common.groupMinDate6(dt_first_seen, HistoryDate),
           STRING6 DateVendorFirstSeen := Business_Risk_BIP.Common.groupMinDate6(dt_vendor_first_reported, HistoryDate),
@@ -666,8 +670,8 @@ EXPORT getEmployeeSources(DATASET(Business_Risk_BIP.Layouts.Shell) Shell,
           INTEGER FirmReportedSales   := -1,
           BOOLEAN EverNonProfit       := TRIM(efx_nonprofit) = 'Y'
         },
-        Seq, Business_Risk_BIP.Common.GetLinkSearchLevel(Options.LinkSearchLevel, SeleID)
-      );  
+        Seq, Business_Risk_BIP.Common.GetLinkSearchLevel(link_search_level, SeleID)
+      );
 
   // If running Business Shell version 31 or higher, we'll need a dataset consisting of records that exist in the past 24 months
   // to calculate FirmEmployeeCount and FirmReportedSales.
@@ -677,15 +681,15 @@ EXPORT getEmployeeSources(DATASET(Business_Risk_BIP.Layouts.Shell) Shell,
   tbl_FirmEmployeeCount_EFXBus := TABLE(
     DEDUP(SORT(equifaxBus_past24Months(efx_locempcnt != ''), Seq, efx_id, -dt_last_seen, -(INTEGER)efx_locempcnt), Seq, efx_id),
     {seq, FirmEmployeeCount := SUM( GROUP, (INTEGER)efx_locempcnt )},
-    Seq, Business_Risk_BIP.Common.GetLinkSearchLevel(Options.LinkSearchLevel, SeleID) );  
+    Seq, Business_Risk_BIP.Common.GetLinkSearchLevel(link_search_level, SeleID) );
 
-  equifaxBusStats_pre := 
+  equifaxBusStats_pre :=
     JOIN(
-      equifaxBusStats_pre_pre, tbl_FirmEmployeeCount_EFXBus, 
-      LEFT.seq = RIGHT.seq, 
+      equifaxBusStats_pre_pre, tbl_FirmEmployeeCount_EFXBus,
+      LEFT.seq = RIGHT.seq,
       TRANSFORM( RECORDOF(equifaxBusStats_pre_pre),
-        SELF.FirmEmployeeCount := 
-						IF( Options.BusShellVersion >= Business_Risk_BIP.Constants.BusShellVersion_v31, 
+        SELF.FirmEmployeeCount :=
+						IF( shell_version >= Business_Risk_BIP.Constants.BusShellVersion_v31,
 								IF( COUNT(tbl_FirmEmployeeCount_EFXBus(seq = LEFT.seq)) > 0, RIGHT.FirmEmployeeCount, -1 ),
 								LEFT.FirmEmployeeCount ),
         SELF := LEFT,
@@ -694,19 +698,19 @@ EXPORT getEmployeeSources(DATASET(Business_Risk_BIP.Layouts.Shell) Shell,
 			LEFT OUTER, FEW
     );
 
-  // Sum of all most recent, populated reported sales values among all unique data source company identifiers. 
+  // Sum of all most recent, populated reported sales values among all unique data source company identifiers.
   tbl_FirmReportedSales_EFXBus := TABLE(
       DEDUP(SORT(equifaxBus_past24Months(efx_locamount != ''), Seq, efx_id, -dt_last_seen, -(INTEGER)efx_locamount), Seq, efx_id),
       {seq, FirmReportedSales := SUM( GROUP, (INTEGER)efx_locamount*1000)},
-      Seq, Business_Risk_BIP.Common.GetLinkSearchLevel(Options.LinkSearchLevel, SeleID) );  
+      Seq, Business_Risk_BIP.Common.GetLinkSearchLevel(link_search_level, SeleID) );
 
   equifaxBusStats :=
     JOIN(
-      equifaxBusStats_pre, tbl_FirmReportedSales_EFXBus, 
-      LEFT.Seq = RIGHT.Seq, 
+      equifaxBusStats_pre, tbl_FirmReportedSales_EFXBus,
+      LEFT.Seq = RIGHT.Seq,
       TRANSFORM( RECORDOF(equifaxBusStats_pre_pre),
-        SELF.FirmReportedSales := 
-						IF( Options.BusShellVersion >= Business_Risk_BIP.Constants.BusShellVersion_v31, 
+        SELF.FirmReportedSales :=
+						IF( shell_version >= Business_Risk_BIP.Constants.BusShellVersion_v31,
 								IF( COUNT(tbl_FirmReportedSales_EFXBus(seq = LEFT.seq)) > 0, RIGHT.FirmReportedSales, -1 ),
 								LEFT.FirmReportedSales ),
         SELF := LEFT,
@@ -715,17 +719,17 @@ EXPORT getEmployeeSources(DATASET(Business_Risk_BIP.Layouts.Shell) Shell,
       LEFT OUTER, FEW
     );
 
-	equifaxTemp := 
+	equifaxTemp :=
       PROJECT(
-        equifaxBusStats, 
+        equifaxBusStats,
         TRANSFORM(tempLayout,
           SELF.Seq := LEFT.Seq;
           SELF.Sources := DATASET(
               [
                 {
-                  LEFT.Source, 
-                  IF(LEFT.DateFirstSeen = Business_Risk_BIP.Constants.NinesDate, Business_Risk_BIP.Constants.MissingDate, LEFT.DateFirstSeen), 
-                  IF(LEFT.DateVendorFirstSeen = Business_Risk_BIP.Constants.NinesDate, Business_Risk_BIP.Constants.MissingDate, LEFT.DateVendorFirstSeen), 																																	
+                  LEFT.Source,
+                  IF(LEFT.DateFirstSeen = Business_Risk_BIP.Constants.NinesDate, Business_Risk_BIP.Constants.MissingDate, LEFT.DateFirstSeen),
+                  IF(LEFT.DateVendorFirstSeen = Business_Risk_BIP.Constants.NinesDate, Business_Risk_BIP.Constants.MissingDate, LEFT.DateVendorFirstSeen),
                   LEFT.DateLastSeen,
                   LEFT.DateVendorLastSeen,
                   LEFT.RecordCount
@@ -734,9 +738,9 @@ EXPORT getEmployeeSources(DATASET(Business_Risk_BIP.Layouts.Shell) Shell,
           SELF.EmployeeSources := DATASET(
               [
                 {
-                  LEFT.Source, 
-                  IF(LEFT.DateFirstSeen = Business_Risk_BIP.Constants.NinesDate, Business_Risk_BIP.Constants.MissingDate, LEFT.DateFirstSeen), 
-                  IF(LEFT.DateVendorFirstSeen = Business_Risk_BIP.Constants.NinesDate, Business_Risk_BIP.Constants.MissingDate, LEFT.DateVendorFirstSeen), 																																	
+                  LEFT.Source,
+                  IF(LEFT.DateFirstSeen = Business_Risk_BIP.Constants.NinesDate, Business_Risk_BIP.Constants.MissingDate, LEFT.DateFirstSeen),
+                  IF(LEFT.DateVendorFirstSeen = Business_Risk_BIP.Constants.NinesDate, Business_Risk_BIP.Constants.MissingDate, LEFT.DateVendorFirstSeen),
                   LEFT.DateLastSeen,
                   LEFT.DateVendorLastSeen,
                   LEFT.FirmEmployeeCount
@@ -745,9 +749,9 @@ EXPORT getEmployeeSources(DATASET(Business_Risk_BIP.Layouts.Shell) Shell,
           SELF.SalesSources := DATASET(
               [
                 {
-                  LEFT.Source, 
-                  IF(LEFT.DateFirstSeen = Business_Risk_BIP.Constants.NinesDate, Business_Risk_BIP.Constants.MissingDate, LEFT.DateFirstSeen), 
-                  IF(LEFT.DateVendorFirstSeen = Business_Risk_BIP.Constants.NinesDate, Business_Risk_BIP.Constants.MissingDate, LEFT.DateVendorFirstSeen), 																																	
+                  LEFT.Source,
+                  IF(LEFT.DateFirstSeen = Business_Risk_BIP.Constants.NinesDate, Business_Risk_BIP.Constants.MissingDate, LEFT.DateFirstSeen),
+                  IF(LEFT.DateVendorFirstSeen = Business_Risk_BIP.Constants.NinesDate, Business_Risk_BIP.Constants.MissingDate, LEFT.DateVendorFirstSeen),
                   LEFT.DateLastSeen,
                   LEFT.DateVendorLastSeen,
                   LEFT.FirmReportedSales
@@ -756,21 +760,21 @@ EXPORT getEmployeeSources(DATASET(Business_Risk_BIP.Layouts.Shell) Shell,
           SELF.EverNonProfit := LEFT.EverNonProfit;
           SELF := []));
 
-	equifaxBusStatsRolled := 
+	equifaxBusStatsRolled :=
       ROLLUP(
-        equifaxTemp, 
-        LEFT.Seq = RIGHT.Seq, 
-        TRANSFORM(tempLayout, 
-          SELF.Seq := LEFT.Seq; 
-          SELF.Sources := LEFT.Sources + RIGHT.Sources; 
-          SELF.EmployeeSources := LEFT.EmployeeSources + RIGHT.EmployeeSources; 
+        equifaxTemp,
+        LEFT.Seq = RIGHT.Seq,
+        TRANSFORM(tempLayout,
+          SELF.Seq := LEFT.Seq;
+          SELF.Sources := LEFT.Sources + RIGHT.Sources;
+          SELF.EmployeeSources := LEFT.EmployeeSources + RIGHT.EmployeeSources;
 					SELF.SalesSources := LEFT.SalesSources + RIGHT.SalesSources;
           SELF.EverNonProfit := LEFT.EverNonProfit OR RIGHT.EverNonProfit;
           SELF := LEFT));
-	
-	withEquifaxBusStats := 
+
+	withEquifaxBusStats :=
       JOIN(
-        withABIUS, equifaxBusStatsRolled, 
+        withABIUS, equifaxBusStatsRolled,
         LEFT.Seq = RIGHT.Seq,
         TRANSFORM( Business_Risk_BIP.Layouts.Shell,
           SELF.Sources := LEFT.Sources + RIGHT.Sources;
@@ -784,7 +788,7 @@ EXPORT getEmployeeSources(DATASET(Business_Risk_BIP.Layouts.Shell) Shell,
   equifaxBusNAIC := TABLE(equifaxBus,
     {
       Seq,
-      LinkID := Business_Risk_BIP.Common.GetLinkSearchLevel(Options.LinkSearchLevel, SeleID),
+      LinkID := Business_Risk_BIP.Common.GetLinkSearchLevel(link_search_level, SeleID),
       STRING2 Source := MDR.SourceTools.src_Equifax_Business_Data,
       STRING6 DateFirstSeen := Business_Risk_BIP.Common.groupMinDate6(dt_first_seen, HistoryDate),
       STRING6 DateLastSeen := Business_Risk_BIP.Common.groupMaxDate6(dt_last_seen, HistoryDate),
@@ -792,12 +796,12 @@ EXPORT getEmployeeSources(DATASET(Business_Risk_BIP.Layouts.Shell) Shell,
       STRING10 NAICCode := (STD.Str.Filter((STRING)efx_primnaicscode, '0123456789'))[1..6],
       BOOLEAN IsPrimary := TRUE
     },
-    Seq, Business_Risk_BIP.Common.GetLinkSearchLevel(Options.LinkSearchLevel, SeleID), ((STRING)efx_primnaicscode)[1..6]
+    Seq, Business_Risk_BIP.Common.GetLinkSearchLevel(link_search_level, SeleID), ((STRING)efx_primnaicscode)[1..6]
   );
 
-  equifaxBusNAICTemp := 
+  equifaxBusNAICTemp :=
     PROJECT(
-      equifaxBusNAIC, 
+      equifaxBusNAIC,
       TRANSFORM(tempLayout,
         SELF.Seq := LEFT.Seq;
         SELF.SICNAICSources := DATASET([{LEFT.Source, IF(LEFT.DateFirstSeen = Business_Risk_BIP.Constants.NinesDate, Business_Risk_BIP.Constants.MissingDate, LEFT.DateFirstSeen), LEFT.DateLastSeen, LEFT.RecordCount, '' /*SICCode*/, '' /*SICIndustry*/, LEFT.NAICCode, Business_Risk_BIP.Common.industryGroup(LEFT.NAICCode, Business_Risk_BIP.Constants.NAIC), LEFT.IsPrimary}], Business_Risk_BIP.Layouts.LayoutSICNAIC);
@@ -805,19 +809,19 @@ EXPORT getEmployeeSources(DATASET(Business_Risk_BIP.Layouts.Shell) Shell,
       )
     );
 
-  equifaxBusNAICRolled := 
+  equifaxBusNAICRolled :=
     ROLLUP(
-      equifaxBusNAICTemp, 
-      LEFT.Seq = RIGHT.Seq, 
-      TRANSFORM( tempLayout, 
-        SELF.Seq := LEFT.Seq; 
-        SELF.SICNAICSources := LEFT.SICNAICSources + RIGHT.SICNAICSources; 
+      equifaxBusNAICTemp,
+      LEFT.Seq = RIGHT.Seq,
+      TRANSFORM( tempLayout,
+        SELF.Seq := LEFT.Seq;
+        SELF.SICNAICSources := LEFT.SICNAICSources + RIGHT.SICNAICSources;
         SELF := LEFT
       )
     );
 
-  withEquifaxBusNAIC := 
-    JOIN(withEquifaxBusStats, equifaxBusNAICRolled, 
+  withEquifaxBusNAIC :=
+    JOIN(withEquifaxBusStats, equifaxBusNAICRolled,
       LEFT.Seq = RIGHT.Seq,
       TRANSFORM( Business_Risk_BIP.Layouts.Shell,
         SELF.SICNAICSources := LEFT.SICNAICSources + RIGHT.SICNAICSources;
@@ -830,7 +834,7 @@ EXPORT getEmployeeSources(DATASET(Business_Risk_BIP.Layouts.Shell) Shell,
   equifaxBusSIC := TABLE(EquifaxBus,
     {
       Seq,
-      LinkID := Business_Risk_BIP.Common.GetLinkSearchLevel(Options.LinkSearchLevel, SeleID),
+      LinkID := Business_Risk_BIP.Common.GetLinkSearchLevel(link_search_level, SeleID),
       STRING2 Source := MDR.SourceTools.src_Equifax_Business_Data,
       STRING6 DateFirstSeen := Business_Risk_BIP.Common.groupMinDate6(dt_first_seen, HistoryDate),
       STRING6 DateLastSeen := Business_Risk_BIP.Common.groupMaxDate6(dt_last_seen, HistoryDate),
@@ -838,12 +842,12 @@ EXPORT getEmployeeSources(DATASET(Business_Risk_BIP.Layouts.Shell) Shell,
       STRING10 SICCode := (STD.Str.Filter((STRING)efx_primsic, '0123456789'))[1..4],
       BOOLEAN IsPrimary := TRUE // There is only 1 SIC field on this source, mark it as primary
     },
-    Seq, Business_Risk_BIP.Common.GetLinkSearchLevel(Options.LinkSearchLevel, SeleID), ((STRING)efx_primsic)[1..4]
+    Seq, Business_Risk_BIP.Common.GetLinkSearchLevel(link_search_level, SeleID), ((STRING)efx_primsic)[1..4]
   );
 
-  equifaxBusSICTemp := 
+  equifaxBusSICTemp :=
     PROJECT(
-      EquifaxBusSIC, 
+      EquifaxBusSIC,
       TRANSFORM( tempLayout,
         SELF.Seq := LEFT.Seq;
         SELF.SICNAICSources := DATASET([{LEFT.Source, IF(LEFT.DateFirstSeen = Business_Risk_BIP.Constants.NinesDate, Business_Risk_BIP.Constants.MissingDate, LEFT.DateFirstSeen), LEFT.DateLastSeen, LEFT.RecordCount, LEFT.SICCode, Business_Risk_BIP.Common.industryGroup(LEFT.SICCode, Business_Risk_BIP.Constants.SIC), '' /*NAICCode*/, '' /*NAICIndustry*/, LEFT.IsPrimary}], Business_Risk_BIP.Layouts.LayoutSICNAIC);
@@ -851,19 +855,19 @@ EXPORT getEmployeeSources(DATASET(Business_Risk_BIP.Layouts.Shell) Shell,
       )
     );
 
-  equifaxBusSICRolled := 
+  equifaxBusSICRolled :=
     ROLLUP(
-      equifaxBusSICTemp, 
-      LEFT.Seq = RIGHT.Seq, 
-      TRANSFORM( tempLayout, 
-        SELF.Seq := LEFT.Seq; 
-        SELF.SICNAICSources := LEFT.SICNAICSources + RIGHT.SICNAICSources; 
+      equifaxBusSICTemp,
+      LEFT.Seq = RIGHT.Seq,
+      TRANSFORM( tempLayout,
+        SELF.Seq := LEFT.Seq;
+        SELF.SICNAICSources := LEFT.SICNAICSources + RIGHT.SICNAICSources;
         SELF := LEFT
       )
     );
 
-  withEquifaxBus := 
-    JOIN(withEquifaxBusNAIC, equifaxBusSICRolled, 
+  withEquifaxBus :=
+    JOIN(withEquifaxBusNAIC, equifaxBusSICRolled,
       LEFT.Seq = RIGHT.Seq,
       TRANSFORM( Business_Risk_BIP.Layouts.Shell,
         SELF.SICNAICSources := LEFT.SICNAICSources + RIGHT.SICNAICSources;
@@ -875,26 +879,26 @@ EXPORT getEmployeeSources(DATASET(Business_Risk_BIP.Layouts.Shell) Shell,
 	// ---------------- Infutor NARB ------------------
 
   infutorNARB_raw := dx_Infutor_NARB.Key_Linkids.Kfetch2(Business_Risk_BIP.Common.GetLinkIDs(Shell),
-                                                        Business_Risk_BIP.Common.SetLinkSearchLevel(Options.LinkSearchLevel),
+                                                        Business_Risk_BIP.Common.SetLinkSearchLevel(link_search_level),
                                                         0, /*ScoreThreshold --> 0 = Give me everything*/
                                                         Business_Risk_BIP.Constants.Limit_Default,
 																												Options.KeepLargeBusinesses);
-    
-	Business_Risk_BIP.Common.AppendSeq(infutorNARB_raw, Shell, infutorNARB_seq, Options.LinkSearchLevel);
-	
+
+	Business_Risk_BIP.Common.AppendSeq(infutorNARB_raw, Shell, infutorNARB_seq, link_search_level);
+
 	// kFetchErrorCodesInfutorNARB := Business_Risk_BIP.Common.GrabFetchErrorCode(infutorNARB_seq);
-	
+
 	infutorNARB_pre := Business_Risk_BIP.Common.FilterRecords(infutorNARB_seq, dt_first_seen, dt_vendor_first_reported, MDR.SourceTools.src_Infutor_NARB, AllowedSourcesSet);
 
   // If running Business Shell version 31 or higher, keep records only from the past 24 months.
-  infutorNARB := IF( Options.BusShellVersion >= Business_Risk_BIP.Constants.BusShellVersion_v31, 
+  infutorNARB := IF( shell_version >= Business_Risk_BIP.Constants.BusShellVersion_v31,
           infutorNARB_pre( dt_last_seen >= STD.Date.AdjustDate( HistoryDate, year_delta := -2 ) ),
           infutorNARB_pre );
 
 	infutorNARBStats_pre_pre := TABLE(infutorNARB,
         {
           Seq,
-          LinkID := Business_Risk_BIP.Common.GetLinkSearchLevel(Options.LinkSearchLevel, SeleID),
+          LinkID := Business_Risk_BIP.Common.GetLinkSearchLevel(link_search_level, SeleID),
           STRING2 Source := MDR.SourceTools.src_Infutor_NARB,
           STRING6 DateFirstSeen       := Business_Risk_BIP.Common.groupMinDate6(dt_first_seen, HistoryDate),
           STRING6 DateVendorFirstSeen := Business_Risk_BIP.Common.groupMinDate6(dt_vendor_first_reported, HistoryDate),
@@ -903,10 +907,10 @@ EXPORT getEmployeeSources(DATASET(Business_Risk_BIP.Layouts.Shell) Shell,
           UNSIGNED4 RecordCount       := COUNT(GROUP),
           // For v30 and up, need to differentiate between 0 and '' for FirmReportedSales. Set missing records to -1.
           INTEGER FirmEmployeeCount   := -1,
-          INTEGER FirmReportedSales   := -1 
+          INTEGER FirmReportedSales   := -1
         },
-        Seq, Business_Risk_BIP.Common.GetLinkSearchLevel(Options.LinkSearchLevel, SeleID)
-      );    
+        Seq, Business_Risk_BIP.Common.GetLinkSearchLevel(link_search_level, SeleID)
+      );
 
   // If running Business Shell version 31 or higher, we'll need a dataset consisting of records that exist in the past 24 months
   // to calculate FirmEmployeeCount and FirmReportedSales.
@@ -925,19 +929,19 @@ EXPORT getEmployeeSources(DATASET(Business_Risk_BIP.Layouts.Shell) Shell,
       'H' => 999, // H = 500 to 999 use ""999""
       0 // default ( e.g. I = Over 1000 Ignore; Do not use.)
     );
-    
+
   tbl_FirmEmployeeCount_InfuNARB := TABLE(
       DEDUP(SORT(infutorNARB(employee_code != ''), Seq, record_id, -dt_last_seen, -infutorNARB_empl_ct(employee_code)), Seq, record_id),
       {seq, FirmEmployeeCount := SUM( GROUP, infutorNARB_empl_ct(employee_code) )},
-      Seq, Business_Risk_BIP.Common.GetLinkSearchLevel(Options.LinkSearchLevel, SeleID) );   
+      Seq, Business_Risk_BIP.Common.GetLinkSearchLevel(link_search_level, SeleID) );
 
-  infutorNARBStats_pre := 
+  infutorNARBStats_pre :=
     JOIN(
-      infutorNARBStats_pre_pre, tbl_FirmEmployeeCount_InfuNARB, 
-      LEFT.seq = RIGHT.seq, 
+      infutorNARBStats_pre_pre, tbl_FirmEmployeeCount_InfuNARB,
+      LEFT.seq = RIGHT.seq,
       TRANSFORM( RECORDOF(equifaxBusStats_pre_pre),
-        SELF.FirmEmployeeCount := 
-						IF( Options.BusShellVersion >= Business_Risk_BIP.Constants.BusShellVersion_v31, 
+        SELF.FirmEmployeeCount :=
+						IF( shell_version >= Business_Risk_BIP.Constants.BusShellVersion_v31,
 								IF( COUNT(tbl_FirmEmployeeCount_InfuNARB(seq = LEFT.seq)) > 0, RIGHT.FirmEmployeeCount, -1 ),
 								LEFT.FirmEmployeeCount ),
         SELF := LEFT,
@@ -946,7 +950,7 @@ EXPORT getEmployeeSources(DATASET(Business_Risk_BIP.Layouts.Shell) Shell,
 			LEFT OUTER, FEW
     );
 
-  // Sum of all most recent, populated reported sales values among all unique data source company identifiers. 
+  // Sum of all most recent, populated reported sales values among all unique data source company identifiers.
   infutorNARB_sales(STRING sales_code) :=
     CASE( TRIM(sales_code),
       'A' =>     499999, // A = Under $500 000
@@ -961,19 +965,19 @@ EXPORT getEmployeeSources(DATASET(Business_Risk_BIP.Layouts.Shell) Shell,
       'J' => 1000000000, // J = Over $1 000 000 000
       0 // default ( e.g. I = Over 1000 Ignore; Do not use.)
     );
-    
+
   tbl_FirmReportedSales_InfuNARB := TABLE(
       DEDUP(SORT(infutorNARB(sales_code != ''), Seq, record_id, -dt_last_seen, -infutorNARB_sales(sales_code)), Seq, record_id),
       {seq, FirmReportedSales := SUM( GROUP, infutorNARB_sales(sales_code) )},
-      Seq, Business_Risk_BIP.Common.GetLinkSearchLevel(Options.LinkSearchLevel, SeleID) ); 
+      Seq, Business_Risk_BIP.Common.GetLinkSearchLevel(link_search_level, SeleID) );
 
   infutorNARBStats :=
     JOIN(
-      infutorNARBStats_pre, tbl_FirmReportedSales_InfuNARB, 
-      LEFT.Seq = RIGHT.Seq, 
+      infutorNARBStats_pre, tbl_FirmReportedSales_InfuNARB,
+      LEFT.Seq = RIGHT.Seq,
       TRANSFORM( RECORDOF(equifaxBusStats_pre_pre),
-        SELF.FirmReportedSales := 
-						IF( Options.BusShellVersion >= Business_Risk_BIP.Constants.BusShellVersion_v31, 
+        SELF.FirmReportedSales :=
+						IF( shell_version >= Business_Risk_BIP.Constants.BusShellVersion_v31,
 								IF( COUNT(tbl_FirmReportedSales_InfuNARB(seq = LEFT.seq)) > 0, RIGHT.FirmReportedSales, -1 ),
 								LEFT.FirmReportedSales ),
         SELF := LEFT,
@@ -982,17 +986,17 @@ EXPORT getEmployeeSources(DATASET(Business_Risk_BIP.Layouts.Shell) Shell,
       LEFT OUTER, FEW
     );
 
-	infutorNARBTemp := 
+	infutorNARBTemp :=
       PROJECT(
-        infutorNARBStats, 
+        infutorNARBStats,
         TRANSFORM(tempLayout,
           SELF.Seq := LEFT.Seq;
           SELF.Sources := DATASET(
               [
                 {
-                  LEFT.Source, 
-                  IF(LEFT.DateFirstSeen = Business_Risk_BIP.Constants.NinesDate, Business_Risk_BIP.Constants.MissingDate, LEFT.DateFirstSeen), 
-                  IF(LEFT.DateVendorFirstSeen = Business_Risk_BIP.Constants.NinesDate, Business_Risk_BIP.Constants.MissingDate, LEFT.DateVendorFirstSeen), 																																	
+                  LEFT.Source,
+                  IF(LEFT.DateFirstSeen = Business_Risk_BIP.Constants.NinesDate, Business_Risk_BIP.Constants.MissingDate, LEFT.DateFirstSeen),
+                  IF(LEFT.DateVendorFirstSeen = Business_Risk_BIP.Constants.NinesDate, Business_Risk_BIP.Constants.MissingDate, LEFT.DateVendorFirstSeen),
                   LEFT.DateLastSeen,
                   LEFT.DateVendorLastSeen,
                   LEFT.RecordCount
@@ -1001,9 +1005,9 @@ EXPORT getEmployeeSources(DATASET(Business_Risk_BIP.Layouts.Shell) Shell,
           SELF.EmployeeSources := DATASET(
               [
                 {
-                  LEFT.Source, 
-                  IF(LEFT.DateFirstSeen = Business_Risk_BIP.Constants.NinesDate, Business_Risk_BIP.Constants.MissingDate, LEFT.DateFirstSeen), 
-                  IF(LEFT.DateVendorFirstSeen = Business_Risk_BIP.Constants.NinesDate, Business_Risk_BIP.Constants.MissingDate, LEFT.DateVendorFirstSeen), 																																	
+                  LEFT.Source,
+                  IF(LEFT.DateFirstSeen = Business_Risk_BIP.Constants.NinesDate, Business_Risk_BIP.Constants.MissingDate, LEFT.DateFirstSeen),
+                  IF(LEFT.DateVendorFirstSeen = Business_Risk_BIP.Constants.NinesDate, Business_Risk_BIP.Constants.MissingDate, LEFT.DateVendorFirstSeen),
                   LEFT.DateLastSeen,
                   LEFT.DateVendorLastSeen,
                   LEFT.FirmEmployeeCount
@@ -1012,9 +1016,9 @@ EXPORT getEmployeeSources(DATASET(Business_Risk_BIP.Layouts.Shell) Shell,
           SELF.SalesSources := DATASET(
               [
                 {
-                  LEFT.Source, 
-                  IF(LEFT.DateFirstSeen = Business_Risk_BIP.Constants.NinesDate, Business_Risk_BIP.Constants.MissingDate, LEFT.DateFirstSeen), 
-                  IF(LEFT.DateVendorFirstSeen = Business_Risk_BIP.Constants.NinesDate, Business_Risk_BIP.Constants.MissingDate, LEFT.DateVendorFirstSeen), 																																	
+                  LEFT.Source,
+                  IF(LEFT.DateFirstSeen = Business_Risk_BIP.Constants.NinesDate, Business_Risk_BIP.Constants.MissingDate, LEFT.DateFirstSeen),
+                  IF(LEFT.DateVendorFirstSeen = Business_Risk_BIP.Constants.NinesDate, Business_Risk_BIP.Constants.MissingDate, LEFT.DateVendorFirstSeen),
                   LEFT.DateLastSeen,
                   LEFT.DateVendorLastSeen,
                   LEFT.FirmReportedSales
@@ -1022,20 +1026,20 @@ EXPORT getEmployeeSources(DATASET(Business_Risk_BIP.Layouts.Shell) Shell,
               ], Business_Risk_BIP.Layouts.LayoutSalesSources);
           SELF := []));
 
-	infutorNARBStatsRolled := 
+	infutorNARBStatsRolled :=
       ROLLUP(
-        infutorNARBTemp, 
-        LEFT.Seq = RIGHT.Seq, 
-        TRANSFORM(tempLayout, 
-          SELF.Seq := LEFT.Seq; 
-          SELF.Sources := LEFT.Sources + RIGHT.Sources; 
-          SELF.EmployeeSources := LEFT.EmployeeSources + RIGHT.EmployeeSources; 
+        infutorNARBTemp,
+        LEFT.Seq = RIGHT.Seq,
+        TRANSFORM(tempLayout,
+          SELF.Seq := LEFT.Seq;
+          SELF.Sources := LEFT.Sources + RIGHT.Sources;
+          SELF.EmployeeSources := LEFT.EmployeeSources + RIGHT.EmployeeSources;
 					SELF.SalesSources := LEFT.SalesSources + RIGHT.SalesSources;
           SELF := LEFT));
-	
-	withInfutorNARBStats := 
+
+	withInfutorNARBStats :=
       JOIN(
-        withEquifaxBus, infutorNARBStatsRolled, 
+        withEquifaxBus, infutorNARBStatsRolled,
         LEFT.Seq = RIGHT.Seq,
         TRANSFORM( Business_Risk_BIP.Layouts.Shell,
           SELF.Sources := LEFT.Sources + RIGHT.Sources;
@@ -1048,7 +1052,7 @@ EXPORT getEmployeeSources(DATASET(Business_Risk_BIP.Layouts.Shell) Shell,
   infutorNARBSIC := TABLE(infutorNARB,
     {
       Seq,
-      LinkID := Business_Risk_BIP.Common.GetLinkSearchLevel(Options.LinkSearchLevel, SeleID),
+      LinkID := Business_Risk_BIP.Common.GetLinkSearchLevel(link_search_level, SeleID),
       STRING2 Source := MDR.SourceTools.src_Infutor_NARB,
       STRING6 DateFirstSeen := Business_Risk_BIP.Common.groupMinDate6( IF( dt_first_seen = 0, dt_vendor_first_reported, dt_first_seen ), HistoryDate),
       STRING6 DateLastSeen := Business_Risk_BIP.Common.groupMaxDate6( IF( dt_last_seen = 0, dt_vendor_last_reported, dt_last_seen ), HistoryDate),
@@ -1056,12 +1060,12 @@ EXPORT getEmployeeSources(DATASET(Business_Risk_BIP.Layouts.Shell) Shell,
       STRING10 SICCode := (STD.Str.Filter((STRING)sic1, '0123456789'))[1..4],
       BOOLEAN IsPrimary := TRUE // There is only 1 SIC field on this source, mark it as primary
     },
-    Seq, Business_Risk_BIP.Common.GetLinkSearchLevel(Options.LinkSearchLevel, SeleID), ((STRING)sic1)[1..4]
+    Seq, Business_Risk_BIP.Common.GetLinkSearchLevel(link_search_level, SeleID), ((STRING)sic1)[1..4]
   );
 
-  infutorNARBSICTemp := 
+  infutorNARBSICTemp :=
     PROJECT(
-      infutorNARBSIC, 
+      infutorNARBSIC,
       TRANSFORM( tempLayout,
         SELF.Seq := LEFT.Seq;
         SELF.SICNAICSources := DATASET([{LEFT.Source, IF(LEFT.DateFirstSeen = Business_Risk_BIP.Constants.NinesDate, Business_Risk_BIP.Constants.MissingDate, LEFT.DateFirstSeen), LEFT.DateLastSeen, LEFT.RecordCount, LEFT.SICCode, Business_Risk_BIP.Common.industryGroup(LEFT.SICCode, Business_Risk_BIP.Constants.SIC), '' /*NAICCode*/, '' /*NAICIndustry*/, LEFT.IsPrimary}], Business_Risk_BIP.Layouts.LayoutSICNAIC);
@@ -1069,19 +1073,19 @@ EXPORT getEmployeeSources(DATASET(Business_Risk_BIP.Layouts.Shell) Shell,
       )
     );
 
-  infutorNARBSICRolled := 
+  infutorNARBSICRolled :=
     ROLLUP(
-      infutorNARBSICTemp, 
-      LEFT.Seq = RIGHT.Seq, 
-      TRANSFORM( tempLayout, 
-        SELF.Seq := LEFT.Seq; 
-        SELF.SICNAICSources := LEFT.SICNAICSources + RIGHT.SICNAICSources; 
+      infutorNARBSICTemp,
+      LEFT.Seq = RIGHT.Seq,
+      TRANSFORM( tempLayout,
+        SELF.Seq := LEFT.Seq;
+        SELF.SICNAICSources := LEFT.SICNAICSources + RIGHT.SICNAICSources;
         SELF := LEFT
       )
     );
 
-  withInfutorNARB := 
-    JOIN(withInfutorNARBStats, infutorNARBSICRolled, 
+  withInfutorNARB :=
+    JOIN(withInfutorNARBStats, infutorNARBSICRolled,
       LEFT.Seq = RIGHT.Seq,
       TRANSFORM( Business_Risk_BIP.Layouts.Shell,
         SELF.SICNAICSources := LEFT.SICNAICSources + RIGHT.SICNAICSources;
@@ -1089,7 +1093,7 @@ EXPORT getEmployeeSources(DATASET(Business_Risk_BIP.Layouts.Shell) Shell,
       ),
       LEFT OUTER, KEEP(1), ATMOST(100), FEW
     );
-  
+
 // ----------------------------------------
 
 
@@ -1098,25 +1102,25 @@ EXPORT getEmployeeSources(DATASET(Business_Risk_BIP.Layouts.Shell) Shell,
 																							SELF.Data_Fetch_Indicators.FetchCodeDNBDMI := (STRING)RIGHT.Fetch_Error_Code;
 																							SELF := LEFT),
 																	LEFT OUTER, KEEP(1), ATMOST(100), PARALLEL, FEW);
-	
+
 	withErrorCodesBusinessRegistration := JOIN(withErrorCodesDNBDMI, kFetchErrorCodesBusinessRegistration, LEFT.Seq = RIGHT.Seq,
 																	TRANSFORM(Business_Risk_BIP.Layouts.Shell,
 																							SELF.Data_Fetch_Indicators.FetchCodeBusinessRegistration := (STRING)RIGHT.Fetch_Error_Code;
 																							SELF := LEFT),
 																	LEFT OUTER, KEEP(1), ATMOST(100), PARALLEL, FEW);
-	
+
 	withErrorCodesDCA := JOIN(withErrorCodesBusinessRegistration, kFetchErrorCodesDCA, LEFT.Seq = RIGHT.Seq,
 																	TRANSFORM(Business_Risk_BIP.Layouts.Shell,
 																							SELF.Data_Fetch_Indicators.FetchCodeDCA := (STRING)RIGHT.Fetch_Error_Code;
 																							SELF := LEFT),
 																	LEFT OUTER, KEEP(1), ATMOST(100), PARALLEL, FEW);
-	
+
 	withErrorCodesDeadCo := JOIN(withErrorCodesDCA, kFetchErrorCodesDeadCo, LEFT.Seq = RIGHT.Seq,
 																	TRANSFORM(Business_Risk_BIP.Layouts.Shell,
 																							SELF.Data_Fetch_Indicators.FetchCodeDeadCo := (STRING)RIGHT.Fetch_Error_Code;
 																							SELF := LEFT),
 																	LEFT OUTER, KEEP(1), ATMOST(100), PARALLEL, FEW);
-	
+
 	withErrorCodesABIUS := JOIN(withErrorCodesDeadCo, kFetchErrorCodesABIUS, LEFT.Seq = RIGHT.Seq,
 																	TRANSFORM(Business_Risk_BIP.Layouts.Shell,
 																							SELF.Data_Fetch_Indicators.FetchCodeABIUS := (STRING)RIGHT.Fetch_Error_Code;
@@ -1132,6 +1136,6 @@ EXPORT getEmployeeSources(DATASET(Business_Risk_BIP.Layouts.Shell) Shell,
   // OUTPUT( DEADCOBNAPRolled, NAMED('DEADCOBNAPRolled') );
   // OUTPUT( DEADCOStatsSources, NAMED('DEADCOStatsSources') );
   // OUTPUT( withDEADCO, NAMED('withDEADCO') );
-	
+
 	RETURN withErrorCodesABIUS;
 END;

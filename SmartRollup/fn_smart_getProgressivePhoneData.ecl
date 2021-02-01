@@ -70,7 +70,7 @@ EXPORT fn_smart_getProgressivePhoneData :=  MODULE
                                  SELF.hri_Phone := DATASET ([], Risk_Indicators.Layout_Desc);
                                  SELF := [];
                               END;   
-                              AddHRIPhoneIndicators := std.str.toUpperCase(LEFT.Meta_ServLine_Type) = 'LANDLINE';
+                              AddHRIPhoneIndicators := false; // std.str.toUpperCase(LEFT.Meta_ServLine_Type) = 'LANDLINE';
                               tmpPhoneHRI_Input  := IF (AddHriPhoneIndicators, DATASET([AddPhoneHRI()]),
                                                                       DATASET([],personReports.layouts.PhoneHRILayout));                                                                                                             
                                                                                              			                                                                                                      
@@ -81,8 +81,7 @@ EXPORT fn_smart_getProgressivePhoneData :=  MODULE
                                                                                                   SELF.Description:=LEFT.desc)),iesp.Constants.MaxCountHRI);                                                                                                                    
                    //note to reference   iesp.transform_progressive_phones to set particular fields.
                    SELF := [];
-                   )), iesp.Constants.BR.MaxPhonesPlus);
-                   // output(PHonesV3, named('PHonesV3'));
+                   )), iesp.Constants.BR.MaxPhonesPlus);                   
              return Phones;
          END;
          

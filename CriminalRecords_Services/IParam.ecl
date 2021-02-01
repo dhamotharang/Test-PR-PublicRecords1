@@ -47,6 +47,13 @@ EXPORT IParam := MODULE
     export boolean SkipPersonContextCall := true;
   end;
 
+  EXPORT incarceration_report := INTERFACE(doxie.IDataAccess, FCRA.iRules)
+    EXPORT UNSIGNED8 did := 0;
+    EXPORT BOOLEAN ReturnDocName := FALSE;
+    EXPORT BOOLEAN ReturnSSN := FALSE;
+    EXPORT DATASET(Gateway.Layouts.Config) gateways := DATASET([], Gateway.Layouts.Config);
+  END;
+
   // INITALIZE offense categories bitmap - bitwise OR all selected option bit values
   EXPORT getOffenseCategories(iesp.criminal.t_CrimSearchOption option) := FUNCTION
     RETURN

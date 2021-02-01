@@ -1,4 +1,4 @@
-IMPORT BIPV2, Business_Credit, Business_Risk_BIP, MDR, ut, std;
+﻿IMPORT Business_Credit_KEL, Business_Credit, Business_Risk_BIP, STD;
 
 EXPORT GLUE_fdc_append(DATASET(RECORDOF(Business_Credit_KEL.File_SBFE_temp.linkids)) linkid_recs) := MODULE
 	
@@ -47,6 +47,7 @@ EXPORT GLUE_fdc_append(DATASET(RECORDOF(Business_Credit_KEL.File_SBFE_temp.linki
 			SELF.load_dateYYYYMMDD := load_date[1..8]; 
 			SELF := le;
 		END;
+
 		with_loadDate := JOIN(fdc_bundle, Business_Credit.Key_ReleaseDates(), LEFT.original_version=RIGHT.version, addLoadDate(LEFT,RIGHT), LEFT OUTER, LIMIT(100));
 		with_loadDate_deduped := DEDUP(SORT(with_loadDate, seq_field, -original_version, -load_date), seq_field);	
 		
@@ -88,8 +89,13 @@ EXPORT GLUE_fdc_append(DATASET(RECORDOF(Business_Credit_KEL.File_SBFE_temp.linki
 	EXPORT FilterLinkIds := JOIN(LinkId_Recs, AddTradelines.Tradelines, LEFT.SBFE_Contributor_Number = RIGHT.SBFE_Contributor_Number AND LEFT.Contract_Account_Number = RIGHT.Contract_Account_Number AND LEFT.Account_Type_Reported = RIGHT.Account_Type_Reported,
 															 TRANSFORM(RECORDOF(Linkid_Recs), SELF := LEFT), LIMIT(Business_Risk_BIP.Constants.Limit_SBFE));
 	
-	EXPORT AddLinkIds := DENORMALIZE(AddTradelines,  FilterLinkIds, LEFT.seq = RIGHT.seq, GROUP, TRANSFORM(fdc_layout, SELF.seq := LEFT.seq, SELF.linkids := ROWS(RIGHT), SELF := LEFT, SELF := []));
+	EXPORT AddLinkIdsTemp := DENORMALIZE(AddTradelines,  FilterLinkIds, LEFT.seq = RIGHT.seq, GROUP, TRANSFORM(fdc_layout, SELF.seq := LEFT.seq, SELF.linkids := ROWS(RIGHT), SELF := LEFT, SELF := []));
 
+
+	EXPORT AddLinkIds := IF(EXISTS(AddLinkIdsTemp(((STRING)historyDateTime)[1..6] <> '999999')),
+                         Business_Credit_KEL.getDBT_V5ArchiveMode(AddLinkIdsTemp),
+                         AddLinkIdsTemp
+                         );
 
 
 	//EXPORT AddLinkIdsFuture := DENORMALIZE(AddTradelines,  LinkId_Recs, LEFT.seq = RIGHT.seq, GROUP, TRANSFORM(fdc_layout, SELF.seq := LEFT.seq, SELF.linkids := ROWS(RIGHT), SELF := LEFT, SELF := []));
@@ -240,4 +246,5 @@ EXPORT GLUE_fdc_append(DATASET(RECORDOF(Business_Credit_KEL.File_SBFE_temp.linki
 	//EXPORT SBFE_Result := AddIndividualOwner;
 	//EXPORT SBFE_raw := Business_Credit_KEL.Q_Tradeline__dump(AddIndividualOwner, CFG_append(AddIndividualOwner[1])).Res0;
 	//EXPORT SBFE_Result := Business_Credit_KEL.Q_Dump(AddIndividualOwner, CFG_append(AddIndividualOwner[1])).Res0; //shows raw data, for debugging
+
 END;

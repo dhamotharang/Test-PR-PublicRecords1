@@ -126,12 +126,12 @@ MODULE
     SELF.imei_ActivationDate     := r.imei_ActivationDate;
     SELF.loststolen              := r.loststolen;
     SELF.loststolen_date         := r.loststolen_date;
-    SELF.imsi_Tenure_MinDays     := IF(r.sim_Tenure_MinDays != 0, r.sim_Tenure_MinDays, r.imsi_Tenure_MinDays); //Temporary patch until the Gateway ESP is released with new changes.
-    SELF.imsi_Tenure_MaxDays     := IF(r.sim_Tenure_MaxDays != 0, r.sim_Tenure_MaxDays, r.imsi_Tenure_MaxDays);
+    SELF.imsi_Tenure_MinDays     := r.imsi_Tenure_MinDays;
+    SELF.imsi_Tenure_MaxDays     := r.imsi_Tenure_MaxDays;
     SELF.imei_Tenure_MinDays     := r.imei_Tenure_MinDays;
     SELF.imei_Tenure_MaxDays     := r.imei_Tenure_MaxDays;
-    SELF.sim_Tenure_MinDays      := IF(r.sim_Tenure_MinDays != 0, r.sim_Tenure_MinDays, r.imsi_Tenure_MinDays);
-    SELF.sim_Tenure_MaxDays      := IF(r.sim_Tenure_MaxDays != 0, r.sim_Tenure_MaxDays, r.imsi_Tenure_MaxDays);
+    SELF.sim_Tenure_MinDays      := r.sim_Tenure_MinDays;
+    SELF.sim_Tenure_MaxDays      := r.sim_Tenure_MaxDays;
 
     BOOLEAN IsValidated          := (r.first_name_score BETWEEN Phones.Constants.Zumigo_NameAddr_Validation_Threshold_MIN AND Phones.Constants.Zumigo_NameAddr_Validation_Threshold_MAX) AND
                                     (r.last_name_score BETWEEN Phones.Constants.Zumigo_NameAddr_Validation_Threshold_MIN AND Phones.Constants.Zumigo_NameAddr_Validation_Threshold_MAX);

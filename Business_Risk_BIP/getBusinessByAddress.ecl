@@ -1,10 +1,11 @@
-﻿IMPORT BIPV2, BizLinkFull, Risk_Indicators, SALT28, UT, Doxie, STD;
+﻿IMPORT Business_Risk_BIP, BIPV2, Risk_Indicators, SALT28, UT, Doxie, STD;
 
-EXPORT getBusinessByAddress(DATASET(Business_Risk_BIP.Layouts.Shell) Shell, 
+EXPORT getBusinessByAddress(DATASET(Business_Risk_BIP.Layouts.Shell) Shell,
 												 Business_Risk_BIP.LIB_Business_Shell_LIBIN Options,
 												 BIPV2.mod_sources.iParams linkingOptions,
-												 SET OF STRING2 AllowedSourcesSet,
-												 doxie.IDataAccess mod_access = MODULE (doxie.IDataAccess) END) := FUNCTION
+												 SET OF STRING2 AllowedSourcesSet) := FUNCTION
+
+	mod_access := PROJECT(Options, doxie.IDataAccess);
 
 	tempVerificationLayout := RECORD
 		UNSIGNED4 Seq,
@@ -26,7 +27,7 @@ EXPORT getBusinessByAddress(DATASET(Business_Risk_BIP.Layouts.Shell) Shell,
 		STRING TodaysDate;
 		STRING FEIN;
 	END;
-	
+
 	// ------- Get Address Matches across all businesses ------------- //
 	For_Address_Search := PROJECT(Shell, TRANSFORM(BIPV2.IDFunctions.rec_SearchInput,
 				SELF.acctno := (string)LEFT.Seq,
@@ -37,8 +38,8 @@ EXPORT getBusinessByAddress(DATASET(Business_Risk_BIP.Layouts.Shell) Shell,
 				SELF.city := LEFT.Clean_Input.City;
 				SELF.state := LEFT.Clean_Input.State;
 				SELF := []));
-				
-	Address_results_w_acct := PROJECT(BIPV2.IDfunctions.fn_IndexedSearchForXLinkIDs(For_Address_Search).uid_results_w_acct, 
+
+	Address_results_w_acct := PROJECT(BIPV2.IDfunctions.fn_IndexedSearchForXLinkIDs(For_Address_Search).uid_results_w_acct,
 																			TRANSFORM(BIPV2.IDlayouts.l_xlink_ids2,
 																								SELF.UniqueID := (UNSIGNED)LEFT.acctno,
 																								SELF.UltID := LEFT.UltID,
@@ -48,10 +49,10 @@ EXPORT getBusinessByAddress(DATASET(Business_Risk_BIP.Layouts.Shell) Shell,
 																								SELF.PowID := LEFT.PowID,
 																								SELF := []));
 
-																					
+
 	UniqueRawAddressMatches := DEDUP(SORT(Address_results_w_acct, UniqueID, UltID, OrgID, SeleID, ProxID, PowID),	UniqueID, UltID, OrgID, SeleID, ProxID, PowID);
-	
-	
+
+
 	BusinessHeaderRawAddress1 := BIPV2.Key_BH_Linking_Ids.kFetch2(UniqueRawAddressMatches,
 																						 Business_Risk_BIP.Common.SetLinkSearchLevel(Business_Risk_BIP.Constants.LinkSearch.Default), // Search at most restrictive level since we already know the full BIP ID set of the FEIN match
 																							0, /*ScoreThreshold --> 0 = Give me everything*/
@@ -61,23 +62,23 @@ EXPORT getBusinessByAddress(DATASET(Business_Risk_BIP.Layouts.Shell) Shell,
 																							TRUE, /* bypassContactSuppression */
 																							Options.KeepLargeBusinesses,
 																							mod_access := mod_access);
-																							
+
 	// clean up the business header before doing anything else
-  Business_Risk_BIP.Common.mac_slim_header(BusinessHeaderRawAddress1, BusinessHeaderRawAddress);																							
-											
+  Business_Risk_BIP.Common.mac_slim_header(BusinessHeaderRawAddress1, BusinessHeaderRawAddress);
+
 	// Add back our Seq numbers
 	Business_Risk_BIP.Common.AppendSeq2(BusinessHeaderRawAddress, Shell, BusinessHeaderAddressSeq);
-	
+
 
 	// Filter out records after our history date and sources that aren't allowed - pass in AllowedSources to possibly turn on DNB DMI data
 	BusinessHeaderAddress := GROUP(Business_Risk_BIP.Common.FilterRecords(BusinessHeaderAddressSeq, dt_first_seen, dt_vendor_first_reported, Source, AllowedSourcesSet), Seq);
-	
-	
+
+
 	tempVerificationLayout verifyAddresses(Shell le, BusinessHeaderAddress ri) := TRANSFORM
 		BHBuildDate := Risk_Indicators.get_Build_date('bip_build_version');
 		TodaysDate := Business_Risk_BIP.Common.todaysDate(BHBuildDate, le.Clean_Input.HistoryDate);
 		SELF.TodaysDate := TodaysDate;
-		
+
 		RawInputIDMatchStatus := MAP(Options.LinkSearchLevel = Business_Risk_BIP.Constants.LinkSearch.Default => ri.sele_seg,
 												Options.LinkSearchLevel = Business_Risk_BIP.Constants.LinkSearch.PowID 	=> ri.pow_seg,
 												Options.LinkSearchLevel = Business_Risk_BIP.Constants.LinkSearch.ProxID 	=> ri.prox_seg,
@@ -90,25 +91,25 @@ EXPORT getBusinessByAddress(DATASET(Business_Risk_BIP.Layouts.Shell) Shell,
 		NoScoreValue				:= 255; // This is what the various score functions return if blank is passed in
 		ZIPScore						:= IF(le.Clean_Input.Zip5 <> '' AND ri.Zip <> '' AND le.Clean_Input.Zip5[1] = ri.Zip[1], Risk_Indicators.AddrScore.ZIP_Score(le.Clean_Input.Zip5, ri.Zip), NoScoreValue);
 		StateMatched				:= STD.Str.ToUpperCase(le.Clean_Input.State) = STD.Str.ToUpperCase(ri.st);
-		CityStateScore			:= IF(le.Clean_Input.City <> '' AND le.Clean_Input.State <> '' AND ri.p_city_name <> '' AND ri.st <> '' AND StateMatched, 
+		CityStateScore			:= IF(le.Clean_Input.City <> '' AND le.Clean_Input.State <> '' AND ri.p_city_name <> '' AND ri.st <> '' AND StateMatched,
 															Risk_Indicators.AddrScore.CityState_Score(le.Clean_Input.City, le.Clean_Input.State, ri.p_city_name, ri.st, ''), NoScoreValue);
 		CityStateZipMatched	:= AddressPopulated AND Risk_Indicators.iid_constants.ga(ZIPScore) AND Risk_Indicators.iid_constants.ga(CityStateScore);
-		
+
 		AddressScore := MAP(NOT AddressPopulated => NoScoreValue,
 												AddressPopulated AND ZIPScore = NoScoreValue AND CityStateScore = NoScoreValue => NoScoreValue,
-																																		Risk_Indicators.AddrScore.AddressScore(le.Clean_Input.Prim_Range, le.Clean_Input.Prim_Name, le.Clean_Input.Sec_Range, 
+																																		Risk_Indicators.AddrScore.AddressScore(le.Clean_Input.Prim_Range, le.Clean_Input.Prim_Name, le.Clean_Input.Sec_Range,
 																																		ri.prim_range, ri.prim_name, ri.sec_range,
 																																		ZIPScore, CityStateScore));
 		AddressMatched			:= AddressPopulated AND Risk_Indicators.iid_constants.ga(AddressScore);
 		SELF.AddressMatched := AddressMatched;
 		SELF.DateFirstSeen			:= ri.dt_first_seen;
-		
+
 		SELF.Seq 							 := le.Seq;
 		SELF.UltID						 := ri.UltID;
 		SELF.OrgID						 := ri.OrgID;
 		SELF.SeleID						 := ri.SeleID;
 		SELF.FEIN							 := ri.company_FEIN;
-		
+
 		DaysApart := ut.DaysApart((STRING)ri.dt_last_seen, TodaysDate);
 
 		SELF.InputElementEntityCount := IF(AddressPopulated AND AddressMatched, 1, 0);
@@ -117,7 +118,7 @@ EXPORT getBusinessByAddress(DATASET(Business_Risk_BIP.Layouts.Shell) Shell,
 		SELF.InputElementEntityCount06Mos := IF(AddressPopulated AND AddressMatched AND (INTEGER)ri.dt_last_seen > 0 AND DaysApart <= Business_Risk_BIP.Constants.SixMonths, 1, 0);
 		SELF.InputElementEntityCount03Mos := IF(AddressPopulated AND AddressMatched AND (INTEGER)ri.dt_last_seen > 0 AND DaysApart <= Business_Risk_BIP.Constants.ThreeMonths, 1, 0);
 		SELF.InputElementEntityCount01Mos := IF(AddressPopulated AND AddressMatched AND (INTEGER)ri.dt_last_seen > 0 AND DaysApart <= Business_Risk_BIP.Constants.OneMonth, 1, 0);
-		
+
 		SELF.OrgAddrLegalEntityCountActive := IF(AddressPopulated AND AddressMatched AND RawInputIDMatchStatus IN ['3','2','1','T','E'], 1, 0);
 		SELF.OrgAddrLegalEntityCountInactive := IF(AddressPopulated AND AddressMatched AND RawInputIDMatchStatus = 'I', 1, 0);
 		SELF.OrgAddrLegalEntityCountDefunct := IF(AddressPopulated AND AddressMatched AND RawInputIDMatchStatus = 'D', 1, 0);
@@ -129,9 +130,9 @@ EXPORT getBusinessByAddress(DATASET(Business_Risk_BIP.Layouts.Shell) Shell,
 																	verifyAddresses(LEFT,RIGHT),
 																	LEFT OUTER, ATMOST(Business_Risk_BIP.Constants.Limit_BusHeader));
 	AddressVerificationMatched := AddressVerification(AddressMatched);
-  
+
   AddressVerificationSorted := SORT(AddressVerificationMatched, Seq, UltID, OrgID, SeleID, -InputElementEntityCount01Mos, -InputElementEntityCount03Mos, InputElementEntityCount06Mos, InputElementEntityCount12Mos, InputElementEntityCount24Mos);
-	AddressVerificationRolled := ROLLUP(AddressVerificationSorted, LEFT.Seq = RIGHT.Seq, 
+	AddressVerificationRolled := ROLLUP(AddressVerificationSorted, LEFT.Seq = RIGHT.Seq,
 																	TRANSFORM(tempVerificationLayout,
 																							SELF.Seq := LEFT.Seq;
 																							SELF.UltID := RIGHT.UltID;
@@ -151,11 +152,11 @@ EXPORT getBusinessByAddress(DATASET(Business_Risk_BIP.Layouts.Shell) Shell,
 																																						LEFT.InputElementEntityCount06Mos + RIGHT.InputElementEntityCount06Mos);
 																							SELF.InputElementEntityCount03Mos := IF(LEFT.UltID = RIGHT.UltID AND LEFT.OrgID = RIGHT.OrgID AND LEFT.SeleID = RIGHT.SeleID,
 																																						LEFT.InputElementEntityCount03Mos,
-																																						LEFT.InputElementEntityCount03Mos + RIGHT.InputElementEntityCount03Mos);																																						
+																																						LEFT.InputElementEntityCount03Mos + RIGHT.InputElementEntityCount03Mos);
 																							SELF.InputElementEntityCount01Mos := IF(LEFT.UltID = RIGHT.UltID AND LEFT.OrgID = RIGHT.OrgID AND LEFT.SeleID = RIGHT.SeleID,
 																																						LEFT.InputElementEntityCount01Mos,
 																																						LEFT.InputElementEntityCount01Mos + RIGHT.InputElementEntityCount01Mos);
-																																						
+
 																							SELF.OrgAddrLegalEntityCountActive := IF(LEFT.UltID = RIGHT.UltID AND LEFT.OrgID = RIGHT.OrgID AND LEFT.SeleID = RIGHT.SeleID,
 																																						LEFT.OrgAddrLegalEntityCountActive,
 																																						LEFT.OrgAddrLegalEntityCountActive + RIGHT.OrgAddrLegalEntityCountActive);
@@ -166,7 +167,7 @@ EXPORT getBusinessByAddress(DATASET(Business_Risk_BIP.Layouts.Shell) Shell,
 																																						LEFT.OrgAddrLegalEntityCountDefunct,
 																																						LEFT.OrgAddrLegalEntityCountDefunct + RIGHT.OrgAddrLegalEntityCountDefunct);
 																							SELF := []));
-																							
+
 	withAddressVerification := JOIN(Shell, AddressVerificationRolled, LEFT.Seq = RIGHT.Seq,
 																	TRANSFORM(Business_Risk_BIP.Layouts.Shell,
 																							AddressNotInput := LEFT.Input.InputCheckBusAddrZip = '0';
@@ -176,26 +177,26 @@ EXPORT getBusinessByAddress(DATASET(Business_Risk_BIP.Layouts.Shell) Shell,
 																							SELF.Organizational_Structure.OrgAddrLegalEntityCount06Mos := IF(AddressNotInput, '-1', (STRING)Business_Risk_BIP.Common.CapNum(RIGHT.InputElementEntityCount06Mos, -1, 50));
 																							SELF.Organizational_Structure.OrgAddrLegalEntityCount03Mos := IF(AddressNotInput, '-1', (STRING)Business_Risk_BIP.Common.CapNum(RIGHT.InputElementEntityCount03Mos, -1, 50));
 																							SELF.Organizational_Structure.OrgAddrLegalEntityCount01Mos := IF(AddressNotInput, '-1', (STRING)Business_Risk_BIP.Common.CapNum(RIGHT.InputElementEntityCount01Mos, -1, 50));
-																							
+
 																							SELF.Organizational_Structure.OrgAddrLegalEntityCountActive := IF(AddressNotInput, '-1', (STRING)Business_Risk_BIP.Common.CapNum(RIGHT.OrgAddrLegalEntityCountActive, -1, 50));
 																							SELF.Organizational_Structure.OrgAddrLegalEntityCountInactive := IF(AddressNotInput, '-1', (STRING)Business_Risk_BIP.Common.CapNum(RIGHT.OrgAddrLegalEntityCountInactive, -1, 50));
 																							SELF.Organizational_Structure.OrgAddrLegalEntityCountDefunct := IF(AddressNotInput, '-1', (STRING)Business_Risk_BIP.Common.CapNum(RIGHT.OrgAddrLegalEntityCountDefunct, -1, 50));
 
 																							SELF := LEFT),
 																	LEFT OUTER, KEEP(1), ATMOST(100), FEW);
-																	
+
 		EmergingAddressVerification := DEDUP(SORT(AddressVerification((UNSIGNED)DateFirstSeen <> 0), Seq, UltID, OrgID, SeleID, DateFirstSeen, -AddressMatched), Seq, UltID, OrgID, SeleID);
-		
+
 		GetEmergingAddressCounts := TABLE(EmergingAddressVerification,
-																			{Seq, 
-																			UNSIGNED EmergingAddressCount := COUNT(GROUP, AddressMatched), 
-																			UNSIGNED EmergingAddressCount24 := COUNT(GROUP, AddressMatched AND ut.DaysApart((STRING)DateFirstSeen, TodaysDate) <= ut.DaysInNYears(2)),  
-																			UNSIGNED EmergingAddressCount12 := COUNT(GROUP, AddressMatched AND ut.DaysApart((STRING)DateFirstSeen, TodaysDate) <= ut.DaysInNYears(1)),  
-																			UNSIGNED EmergingAddressCount06 := COUNT(GROUP, AddressMatched AND ut.DaysApart((STRING)DateFirstSeen, TodaysDate) <= Business_Risk_BIP.Constants.SixMonths),  
-																			UNSIGNED EmergingAddressCount03 := COUNT(GROUP, AddressMatched AND ut.DaysApart((STRING)DateFirstSeen, TodaysDate) <= Business_Risk_BIP.Constants.ThreeMonths), 
+																			{Seq,
+																			UNSIGNED EmergingAddressCount := COUNT(GROUP, AddressMatched),
+																			UNSIGNED EmergingAddressCount24 := COUNT(GROUP, AddressMatched AND ut.DaysApart((STRING)DateFirstSeen, TodaysDate) <= ut.DaysInNYears(2)),
+																			UNSIGNED EmergingAddressCount12 := COUNT(GROUP, AddressMatched AND ut.DaysApart((STRING)DateFirstSeen, TodaysDate) <= ut.DaysInNYears(1)),
+																			UNSIGNED EmergingAddressCount06 := COUNT(GROUP, AddressMatched AND ut.DaysApart((STRING)DateFirstSeen, TodaysDate) <= Business_Risk_BIP.Constants.SixMonths),
+																			UNSIGNED EmergingAddressCount03 := COUNT(GROUP, AddressMatched AND ut.DaysApart((STRING)DateFirstSeen, TodaysDate) <= Business_Risk_BIP.Constants.ThreeMonths),
 																			UNSIGNED EmergingAddressCount01 := COUNT(GROUP, AddressMatched AND ut.DaysApart((STRING)DateFirstSeen, TodaysDate) <= Business_Risk_BIP.Constants.OneMonth)},
 																			Seq);
-		withEmergingAddressCounts := JOIN(withAddressVerification, GetEmergingAddressCounts,	LEFT.Seq = RIGHT.Seq,													
+		withEmergingAddressCounts := JOIN(withAddressVerification, GetEmergingAddressCounts,	LEFT.Seq = RIGHT.Seq,
 																	TRANSFORM(Business_Risk_BIP.Layouts.Shell,
 																								AddressNotInput := LEFT.Input.InputCheckBusAddrZip = '0';
 																								SELF.Organizational_Structure.OrgAddrLegalEntityCountFirstSeenEver := IF(AddressNotInput, '-1', (STRING)Business_Risk_BIP.Common.CapNum(RIGHT.EmergingAddressCount, -1, 50));
@@ -206,25 +207,25 @@ EXPORT getBusinessByAddress(DATASET(Business_Risk_BIP.Layouts.Shell) Shell,
 																								SELF.Organizational_Structure.OrgAddrLegalEntityCountFirstSeen01Mos := IF(AddressNotInput, '-1', (STRING)Business_Risk_BIP.Common.CapNum(RIGHT.EmergingAddressCount01, -1, 50));
 																							SELF := LEFT),
 																	LEFT OUTER, KEEP(1), ATMOST(100), FEW);
-																	
-		AddressFEINVerification := TABLE(AddressVerificationMatched((UNSIGNED)FEIN>0), 
+
+		AddressFEINVerification := TABLE(AddressVerificationMatched((UNSIGNED)FEIN>0),
 																			{seq, FEIN, UNSIGNED RecordCount := COUNT(GROUP)}, seq, FEIN);
 
 		GetFEINsPerAddr := TABLE(AddressFEINVerification,
 																			{seq, UNSIGNED FEINCount := COUNT(GROUP, (INTEGER)FEIN > 0)}, seq);
-																		
+
 		withFEINsPerAddr := JOIN(withEmergingAddressCounts, GetFEINsPerAddr, LEFT.Seq = RIGHT.Seq,
 																	TRANSFORM(Business_Risk_BIP.Layouts.Shell,
 																								AddressNotInput := LEFT.Input.InputCheckBusAddrZip = '0';
 																								SELF.Input_Characteristics.InputAddrTINCount := IF(AddressNotInput, '-1', (STRING)Business_Risk_BIP.Common.CapNum(RIGHT.FEINCount, -1, 99999));
 																								SELF := LEFT),
 																	LEFT OUTER, KEEP(1), ATMOST(100), FEW);
-																	
-																	
+
+
 	// *********************
 	//   DEBUGGING OUTPUTS
 	// *********************
-	// OUTPUT(CHOOSEN(Shell, 100), NAMED('Sample_Shell'));	
+	// OUTPUT(CHOOSEN(Shell, 100), NAMED('Sample_Shell'));
 	// OUTPUT(CHOOSEN(For_Address_Search, 100), NAMED('Sample_For_Address_Search'));
 	// OUTPUT(CHOOSEN(Address_results_w_acct, 100), NAMED('Sample_Address_results_w_acct'));
 	// OUTPUT(CHOOSEN(UniqueRawAddressMatches, 100), NAMED('Sample_UniqueRawAddressMatches'));
@@ -239,6 +240,6 @@ EXPORT getBusinessByAddress(DATASET(Business_Risk_BIP.Layouts.Shell) Shell,
 	// OUTPUT(CHOOSEN(AddressFEINVerification, 100), NAMED('Sample_AddressFEINVerification'));
 	// OUTPUT(CHOOSEN(GetFEINsPerAddr, 100), NAMED('Sample_GetFEINsPerAddr'));
 	// OUTPUT(CHOOSEN(withFEINsPerAddr, 100), NAMED('Sample_withFEINsPerAddr'));
-	
+
 	RETURN withFEINsPerAddr;
-END;																														
+END;

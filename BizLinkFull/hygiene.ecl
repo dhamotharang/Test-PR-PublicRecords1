@@ -1,187 +1,187 @@
-﻿IMPORT SALT311,STD;
+﻿IMPORT SALT44,STD;
 EXPORT hygiene(dataset(layout_BizHead) h) := MODULE
  
 //A simple summary record
-EXPORT Summary(SALT311.Str30Type  txt) := FUNCTION
+EXPORT Summary(SALT44.Str30Type  txt) := FUNCTION
   SummaryLayout := RECORD
     txt;
     NumberOfRecords := COUNT(GROUP);
     populated_parent_proxid_cnt := COUNT(GROUP,h.parent_proxid <> (TYPEOF(h.parent_proxid))'');
     populated_parent_proxid_pcnt := AVE(GROUP,IF(h.parent_proxid = (TYPEOF(h.parent_proxid))'',0,100));
-    maxlength_parent_proxid := MAX(GROUP,LENGTH(TRIM((SALT311.StrType)h.parent_proxid)));
-    avelength_parent_proxid := AVE(GROUP,LENGTH(TRIM((SALT311.StrType)h.parent_proxid)),h.parent_proxid<>(typeof(h.parent_proxid))'');
+    maxlength_parent_proxid := MAX(GROUP,LENGTH(TRIM((SALT44.StrType)h.parent_proxid)));
+    avelength_parent_proxid := AVE(GROUP,LENGTH(TRIM((SALT44.StrType)h.parent_proxid)),h.parent_proxid<>(typeof(h.parent_proxid))'');
     populated_sele_proxid_cnt := COUNT(GROUP,h.sele_proxid <> (TYPEOF(h.sele_proxid))'');
     populated_sele_proxid_pcnt := AVE(GROUP,IF(h.sele_proxid = (TYPEOF(h.sele_proxid))'',0,100));
-    maxlength_sele_proxid := MAX(GROUP,LENGTH(TRIM((SALT311.StrType)h.sele_proxid)));
-    avelength_sele_proxid := AVE(GROUP,LENGTH(TRIM((SALT311.StrType)h.sele_proxid)),h.sele_proxid<>(typeof(h.sele_proxid))'');
+    maxlength_sele_proxid := MAX(GROUP,LENGTH(TRIM((SALT44.StrType)h.sele_proxid)));
+    avelength_sele_proxid := AVE(GROUP,LENGTH(TRIM((SALT44.StrType)h.sele_proxid)),h.sele_proxid<>(typeof(h.sele_proxid))'');
     populated_org_proxid_cnt := COUNT(GROUP,h.org_proxid <> (TYPEOF(h.org_proxid))'');
     populated_org_proxid_pcnt := AVE(GROUP,IF(h.org_proxid = (TYPEOF(h.org_proxid))'',0,100));
-    maxlength_org_proxid := MAX(GROUP,LENGTH(TRIM((SALT311.StrType)h.org_proxid)));
-    avelength_org_proxid := AVE(GROUP,LENGTH(TRIM((SALT311.StrType)h.org_proxid)),h.org_proxid<>(typeof(h.org_proxid))'');
+    maxlength_org_proxid := MAX(GROUP,LENGTH(TRIM((SALT44.StrType)h.org_proxid)));
+    avelength_org_proxid := AVE(GROUP,LENGTH(TRIM((SALT44.StrType)h.org_proxid)),h.org_proxid<>(typeof(h.org_proxid))'');
     populated_ultimate_proxid_cnt := COUNT(GROUP,h.ultimate_proxid <> (TYPEOF(h.ultimate_proxid))'');
     populated_ultimate_proxid_pcnt := AVE(GROUP,IF(h.ultimate_proxid = (TYPEOF(h.ultimate_proxid))'',0,100));
-    maxlength_ultimate_proxid := MAX(GROUP,LENGTH(TRIM((SALT311.StrType)h.ultimate_proxid)));
-    avelength_ultimate_proxid := AVE(GROUP,LENGTH(TRIM((SALT311.StrType)h.ultimate_proxid)),h.ultimate_proxid<>(typeof(h.ultimate_proxid))'');
+    maxlength_ultimate_proxid := MAX(GROUP,LENGTH(TRIM((SALT44.StrType)h.ultimate_proxid)));
+    avelength_ultimate_proxid := AVE(GROUP,LENGTH(TRIM((SALT44.StrType)h.ultimate_proxid)),h.ultimate_proxid<>(typeof(h.ultimate_proxid))'');
     populated_has_lgid_cnt := COUNT(GROUP,h.has_lgid <> (TYPEOF(h.has_lgid))'');
     populated_has_lgid_pcnt := AVE(GROUP,IF(h.has_lgid = (TYPEOF(h.has_lgid))'',0,100));
-    maxlength_has_lgid := MAX(GROUP,LENGTH(TRIM((SALT311.StrType)h.has_lgid)));
-    avelength_has_lgid := AVE(GROUP,LENGTH(TRIM((SALT311.StrType)h.has_lgid)),h.has_lgid<>(typeof(h.has_lgid))'');
+    maxlength_has_lgid := MAX(GROUP,LENGTH(TRIM((SALT44.StrType)h.has_lgid)));
+    avelength_has_lgid := AVE(GROUP,LENGTH(TRIM((SALT44.StrType)h.has_lgid)),h.has_lgid<>(typeof(h.has_lgid))'');
     populated_empid_cnt := COUNT(GROUP,h.empid <> (TYPEOF(h.empid))'');
     populated_empid_pcnt := AVE(GROUP,IF(h.empid = (TYPEOF(h.empid))'',0,100));
-    maxlength_empid := MAX(GROUP,LENGTH(TRIM((SALT311.StrType)h.empid)));
-    avelength_empid := AVE(GROUP,LENGTH(TRIM((SALT311.StrType)h.empid)),h.empid<>(typeof(h.empid))'');
+    maxlength_empid := MAX(GROUP,LENGTH(TRIM((SALT44.StrType)h.empid)));
+    avelength_empid := AVE(GROUP,LENGTH(TRIM((SALT44.StrType)h.empid)),h.empid<>(typeof(h.empid))'');
     populated_source_cnt := COUNT(GROUP,h.source <> (TYPEOF(h.source))'');
     populated_source_pcnt := AVE(GROUP,IF(h.source = (TYPEOF(h.source))'',0,100));
-    maxlength_source := MAX(GROUP,LENGTH(TRIM((SALT311.StrType)h.source)));
-    avelength_source := AVE(GROUP,LENGTH(TRIM((SALT311.StrType)h.source)),h.source<>(typeof(h.source))'');
+    maxlength_source := MAX(GROUP,LENGTH(TRIM((SALT44.StrType)h.source)));
+    avelength_source := AVE(GROUP,LENGTH(TRIM((SALT44.StrType)h.source)),h.source<>(typeof(h.source))'');
     populated_source_record_id_cnt := COUNT(GROUP,h.source_record_id <> (TYPEOF(h.source_record_id))'');
     populated_source_record_id_pcnt := AVE(GROUP,IF(h.source_record_id = (TYPEOF(h.source_record_id))'',0,100));
-    maxlength_source_record_id := MAX(GROUP,LENGTH(TRIM((SALT311.StrType)h.source_record_id)));
-    avelength_source_record_id := AVE(GROUP,LENGTH(TRIM((SALT311.StrType)h.source_record_id)),h.source_record_id<>(typeof(h.source_record_id))'');
+    maxlength_source_record_id := MAX(GROUP,LENGTH(TRIM((SALT44.StrType)h.source_record_id)));
+    avelength_source_record_id := AVE(GROUP,LENGTH(TRIM((SALT44.StrType)h.source_record_id)),h.source_record_id<>(typeof(h.source_record_id))'');
     populated_source_docid_cnt := COUNT(GROUP,h.source_docid <> (TYPEOF(h.source_docid))'');
     populated_source_docid_pcnt := AVE(GROUP,IF(h.source_docid = (TYPEOF(h.source_docid))'',0,100));
-    maxlength_source_docid := MAX(GROUP,LENGTH(TRIM((SALT311.StrType)h.source_docid)));
-    avelength_source_docid := AVE(GROUP,LENGTH(TRIM((SALT311.StrType)h.source_docid)),h.source_docid<>(typeof(h.source_docid))'');
+    maxlength_source_docid := MAX(GROUP,LENGTH(TRIM((SALT44.StrType)h.source_docid)));
+    avelength_source_docid := AVE(GROUP,LENGTH(TRIM((SALT44.StrType)h.source_docid)),h.source_docid<>(typeof(h.source_docid))'');
     populated_company_name_cnt := COUNT(GROUP,h.company_name <> (TYPEOF(h.company_name))'');
     populated_company_name_pcnt := AVE(GROUP,IF(h.company_name = (TYPEOF(h.company_name))'',0,100));
-    maxlength_company_name := MAX(GROUP,LENGTH(TRIM((SALT311.StrType)h.company_name)));
-    avelength_company_name := AVE(GROUP,LENGTH(TRIM((SALT311.StrType)h.company_name)),h.company_name<>(typeof(h.company_name))'');
+    maxlength_company_name := MAX(GROUP,LENGTH(TRIM((SALT44.StrType)h.company_name)));
+    avelength_company_name := AVE(GROUP,LENGTH(TRIM((SALT44.StrType)h.company_name)),h.company_name<>(typeof(h.company_name))'');
     populated_company_name_prefix_cnt := COUNT(GROUP,h.company_name_prefix <> (TYPEOF(h.company_name_prefix))'');
     populated_company_name_prefix_pcnt := AVE(GROUP,IF(h.company_name_prefix = (TYPEOF(h.company_name_prefix))'',0,100));
-    maxlength_company_name_prefix := MAX(GROUP,LENGTH(TRIM((SALT311.StrType)h.company_name_prefix)));
-    avelength_company_name_prefix := AVE(GROUP,LENGTH(TRIM((SALT311.StrType)h.company_name_prefix)),h.company_name_prefix<>(typeof(h.company_name_prefix))'');
+    maxlength_company_name_prefix := MAX(GROUP,LENGTH(TRIM((SALT44.StrType)h.company_name_prefix)));
+    avelength_company_name_prefix := AVE(GROUP,LENGTH(TRIM((SALT44.StrType)h.company_name_prefix)),h.company_name_prefix<>(typeof(h.company_name_prefix))'');
     populated_cnp_name_cnt := COUNT(GROUP,h.cnp_name <> (TYPEOF(h.cnp_name))'');
     populated_cnp_name_pcnt := AVE(GROUP,IF(h.cnp_name = (TYPEOF(h.cnp_name))'',0,100));
-    maxlength_cnp_name := MAX(GROUP,LENGTH(TRIM((SALT311.StrType)h.cnp_name)));
-    avelength_cnp_name := AVE(GROUP,LENGTH(TRIM((SALT311.StrType)h.cnp_name)),h.cnp_name<>(typeof(h.cnp_name))'');
+    maxlength_cnp_name := MAX(GROUP,LENGTH(TRIM((SALT44.StrType)h.cnp_name)));
+    avelength_cnp_name := AVE(GROUP,LENGTH(TRIM((SALT44.StrType)h.cnp_name)),h.cnp_name<>(typeof(h.cnp_name))'');
     populated_cnp_number_cnt := COUNT(GROUP,h.cnp_number <> (TYPEOF(h.cnp_number))'');
     populated_cnp_number_pcnt := AVE(GROUP,IF(h.cnp_number = (TYPEOF(h.cnp_number))'',0,100));
-    maxlength_cnp_number := MAX(GROUP,LENGTH(TRIM((SALT311.StrType)h.cnp_number)));
-    avelength_cnp_number := AVE(GROUP,LENGTH(TRIM((SALT311.StrType)h.cnp_number)),h.cnp_number<>(typeof(h.cnp_number))'');
+    maxlength_cnp_number := MAX(GROUP,LENGTH(TRIM((SALT44.StrType)h.cnp_number)));
+    avelength_cnp_number := AVE(GROUP,LENGTH(TRIM((SALT44.StrType)h.cnp_number)),h.cnp_number<>(typeof(h.cnp_number))'');
     populated_cnp_btype_cnt := COUNT(GROUP,h.cnp_btype <> (TYPEOF(h.cnp_btype))'');
     populated_cnp_btype_pcnt := AVE(GROUP,IF(h.cnp_btype = (TYPEOF(h.cnp_btype))'',0,100));
-    maxlength_cnp_btype := MAX(GROUP,LENGTH(TRIM((SALT311.StrType)h.cnp_btype)));
-    avelength_cnp_btype := AVE(GROUP,LENGTH(TRIM((SALT311.StrType)h.cnp_btype)),h.cnp_btype<>(typeof(h.cnp_btype))'');
+    maxlength_cnp_btype := MAX(GROUP,LENGTH(TRIM((SALT44.StrType)h.cnp_btype)));
+    avelength_cnp_btype := AVE(GROUP,LENGTH(TRIM((SALT44.StrType)h.cnp_btype)),h.cnp_btype<>(typeof(h.cnp_btype))'');
     populated_cnp_lowv_cnt := COUNT(GROUP,h.cnp_lowv <> (TYPEOF(h.cnp_lowv))'');
     populated_cnp_lowv_pcnt := AVE(GROUP,IF(h.cnp_lowv = (TYPEOF(h.cnp_lowv))'',0,100));
-    maxlength_cnp_lowv := MAX(GROUP,LENGTH(TRIM((SALT311.StrType)h.cnp_lowv)));
-    avelength_cnp_lowv := AVE(GROUP,LENGTH(TRIM((SALT311.StrType)h.cnp_lowv)),h.cnp_lowv<>(typeof(h.cnp_lowv))'');
+    maxlength_cnp_lowv := MAX(GROUP,LENGTH(TRIM((SALT44.StrType)h.cnp_lowv)));
+    avelength_cnp_lowv := AVE(GROUP,LENGTH(TRIM((SALT44.StrType)h.cnp_lowv)),h.cnp_lowv<>(typeof(h.cnp_lowv))'');
     populated_company_phone_cnt := COUNT(GROUP,h.company_phone <> (TYPEOF(h.company_phone))'');
     populated_company_phone_pcnt := AVE(GROUP,IF(h.company_phone = (TYPEOF(h.company_phone))'',0,100));
-    maxlength_company_phone := MAX(GROUP,LENGTH(TRIM((SALT311.StrType)h.company_phone)));
-    avelength_company_phone := AVE(GROUP,LENGTH(TRIM((SALT311.StrType)h.company_phone)),h.company_phone<>(typeof(h.company_phone))'');
+    maxlength_company_phone := MAX(GROUP,LENGTH(TRIM((SALT44.StrType)h.company_phone)));
+    avelength_company_phone := AVE(GROUP,LENGTH(TRIM((SALT44.StrType)h.company_phone)),h.company_phone<>(typeof(h.company_phone))'');
     populated_company_phone_3_cnt := COUNT(GROUP,h.company_phone_3 <> (TYPEOF(h.company_phone_3))'');
     populated_company_phone_3_pcnt := AVE(GROUP,IF(h.company_phone_3 = (TYPEOF(h.company_phone_3))'',0,100));
-    maxlength_company_phone_3 := MAX(GROUP,LENGTH(TRIM((SALT311.StrType)h.company_phone_3)));
-    avelength_company_phone_3 := AVE(GROUP,LENGTH(TRIM((SALT311.StrType)h.company_phone_3)),h.company_phone_3<>(typeof(h.company_phone_3))'');
+    maxlength_company_phone_3 := MAX(GROUP,LENGTH(TRIM((SALT44.StrType)h.company_phone_3)));
+    avelength_company_phone_3 := AVE(GROUP,LENGTH(TRIM((SALT44.StrType)h.company_phone_3)),h.company_phone_3<>(typeof(h.company_phone_3))'');
     populated_company_phone_3_ex_cnt := COUNT(GROUP,h.company_phone_3_ex <> (TYPEOF(h.company_phone_3_ex))'');
     populated_company_phone_3_ex_pcnt := AVE(GROUP,IF(h.company_phone_3_ex = (TYPEOF(h.company_phone_3_ex))'',0,100));
-    maxlength_company_phone_3_ex := MAX(GROUP,LENGTH(TRIM((SALT311.StrType)h.company_phone_3_ex)));
-    avelength_company_phone_3_ex := AVE(GROUP,LENGTH(TRIM((SALT311.StrType)h.company_phone_3_ex)),h.company_phone_3_ex<>(typeof(h.company_phone_3_ex))'');
+    maxlength_company_phone_3_ex := MAX(GROUP,LENGTH(TRIM((SALT44.StrType)h.company_phone_3_ex)));
+    avelength_company_phone_3_ex := AVE(GROUP,LENGTH(TRIM((SALT44.StrType)h.company_phone_3_ex)),h.company_phone_3_ex<>(typeof(h.company_phone_3_ex))'');
     populated_company_phone_7_cnt := COUNT(GROUP,h.company_phone_7 <> (TYPEOF(h.company_phone_7))'');
     populated_company_phone_7_pcnt := AVE(GROUP,IF(h.company_phone_7 = (TYPEOF(h.company_phone_7))'',0,100));
-    maxlength_company_phone_7 := MAX(GROUP,LENGTH(TRIM((SALT311.StrType)h.company_phone_7)));
-    avelength_company_phone_7 := AVE(GROUP,LENGTH(TRIM((SALT311.StrType)h.company_phone_7)),h.company_phone_7<>(typeof(h.company_phone_7))'');
+    maxlength_company_phone_7 := MAX(GROUP,LENGTH(TRIM((SALT44.StrType)h.company_phone_7)));
+    avelength_company_phone_7 := AVE(GROUP,LENGTH(TRIM((SALT44.StrType)h.company_phone_7)),h.company_phone_7<>(typeof(h.company_phone_7))'');
     populated_company_fein_cnt := COUNT(GROUP,h.company_fein <> (TYPEOF(h.company_fein))'');
     populated_company_fein_pcnt := AVE(GROUP,IF(h.company_fein = (TYPEOF(h.company_fein))'',0,100));
-    maxlength_company_fein := MAX(GROUP,LENGTH(TRIM((SALT311.StrType)h.company_fein)));
-    avelength_company_fein := AVE(GROUP,LENGTH(TRIM((SALT311.StrType)h.company_fein)),h.company_fein<>(typeof(h.company_fein))'');
+    maxlength_company_fein := MAX(GROUP,LENGTH(TRIM((SALT44.StrType)h.company_fein)));
+    avelength_company_fein := AVE(GROUP,LENGTH(TRIM((SALT44.StrType)h.company_fein)),h.company_fein<>(typeof(h.company_fein))'');
     populated_company_sic_code1_cnt := COUNT(GROUP,h.company_sic_code1 <> (TYPEOF(h.company_sic_code1))'');
     populated_company_sic_code1_pcnt := AVE(GROUP,IF(h.company_sic_code1 = (TYPEOF(h.company_sic_code1))'',0,100));
-    maxlength_company_sic_code1 := MAX(GROUP,LENGTH(TRIM((SALT311.StrType)h.company_sic_code1)));
-    avelength_company_sic_code1 := AVE(GROUP,LENGTH(TRIM((SALT311.StrType)h.company_sic_code1)),h.company_sic_code1<>(typeof(h.company_sic_code1))'');
+    maxlength_company_sic_code1 := MAX(GROUP,LENGTH(TRIM((SALT44.StrType)h.company_sic_code1)));
+    avelength_company_sic_code1 := AVE(GROUP,LENGTH(TRIM((SALT44.StrType)h.company_sic_code1)),h.company_sic_code1<>(typeof(h.company_sic_code1))'');
     populated_active_duns_number_cnt := COUNT(GROUP,h.active_duns_number <> (TYPEOF(h.active_duns_number))'');
     populated_active_duns_number_pcnt := AVE(GROUP,IF(h.active_duns_number = (TYPEOF(h.active_duns_number))'',0,100));
-    maxlength_active_duns_number := MAX(GROUP,LENGTH(TRIM((SALT311.StrType)h.active_duns_number)));
-    avelength_active_duns_number := AVE(GROUP,LENGTH(TRIM((SALT311.StrType)h.active_duns_number)),h.active_duns_number<>(typeof(h.active_duns_number))'');
+    maxlength_active_duns_number := MAX(GROUP,LENGTH(TRIM((SALT44.StrType)h.active_duns_number)));
+    avelength_active_duns_number := AVE(GROUP,LENGTH(TRIM((SALT44.StrType)h.active_duns_number)),h.active_duns_number<>(typeof(h.active_duns_number))'');
     populated_prim_range_cnt := COUNT(GROUP,h.prim_range <> (TYPEOF(h.prim_range))'');
     populated_prim_range_pcnt := AVE(GROUP,IF(h.prim_range = (TYPEOF(h.prim_range))'',0,100));
-    maxlength_prim_range := MAX(GROUP,LENGTH(TRIM((SALT311.StrType)h.prim_range)));
-    avelength_prim_range := AVE(GROUP,LENGTH(TRIM((SALT311.StrType)h.prim_range)),h.prim_range<>(typeof(h.prim_range))'');
+    maxlength_prim_range := MAX(GROUP,LENGTH(TRIM((SALT44.StrType)h.prim_range)));
+    avelength_prim_range := AVE(GROUP,LENGTH(TRIM((SALT44.StrType)h.prim_range)),h.prim_range<>(typeof(h.prim_range))'');
     populated_prim_name_cnt := COUNT(GROUP,h.prim_name <> (TYPEOF(h.prim_name))'');
     populated_prim_name_pcnt := AVE(GROUP,IF(h.prim_name = (TYPEOF(h.prim_name))'',0,100));
-    maxlength_prim_name := MAX(GROUP,LENGTH(TRIM((SALT311.StrType)h.prim_name)));
-    avelength_prim_name := AVE(GROUP,LENGTH(TRIM((SALT311.StrType)h.prim_name)),h.prim_name<>(typeof(h.prim_name))'');
+    maxlength_prim_name := MAX(GROUP,LENGTH(TRIM((SALT44.StrType)h.prim_name)));
+    avelength_prim_name := AVE(GROUP,LENGTH(TRIM((SALT44.StrType)h.prim_name)),h.prim_name<>(typeof(h.prim_name))'');
     populated_sec_range_cnt := COUNT(GROUP,h.sec_range <> (TYPEOF(h.sec_range))'');
     populated_sec_range_pcnt := AVE(GROUP,IF(h.sec_range = (TYPEOF(h.sec_range))'',0,100));
-    maxlength_sec_range := MAX(GROUP,LENGTH(TRIM((SALT311.StrType)h.sec_range)));
-    avelength_sec_range := AVE(GROUP,LENGTH(TRIM((SALT311.StrType)h.sec_range)),h.sec_range<>(typeof(h.sec_range))'');
+    maxlength_sec_range := MAX(GROUP,LENGTH(TRIM((SALT44.StrType)h.sec_range)));
+    avelength_sec_range := AVE(GROUP,LENGTH(TRIM((SALT44.StrType)h.sec_range)),h.sec_range<>(typeof(h.sec_range))'');
     populated_city_cnt := COUNT(GROUP,h.city <> (TYPEOF(h.city))'');
     populated_city_pcnt := AVE(GROUP,IF(h.city = (TYPEOF(h.city))'',0,100));
-    maxlength_city := MAX(GROUP,LENGTH(TRIM((SALT311.StrType)h.city)));
-    avelength_city := AVE(GROUP,LENGTH(TRIM((SALT311.StrType)h.city)),h.city<>(typeof(h.city))'');
+    maxlength_city := MAX(GROUP,LENGTH(TRIM((SALT44.StrType)h.city)));
+    avelength_city := AVE(GROUP,LENGTH(TRIM((SALT44.StrType)h.city)),h.city<>(typeof(h.city))'');
     populated_city_clean_cnt := COUNT(GROUP,h.city_clean <> (TYPEOF(h.city_clean))'');
     populated_city_clean_pcnt := AVE(GROUP,IF(h.city_clean = (TYPEOF(h.city_clean))'',0,100));
-    maxlength_city_clean := MAX(GROUP,LENGTH(TRIM((SALT311.StrType)h.city_clean)));
-    avelength_city_clean := AVE(GROUP,LENGTH(TRIM((SALT311.StrType)h.city_clean)),h.city_clean<>(typeof(h.city_clean))'');
+    maxlength_city_clean := MAX(GROUP,LENGTH(TRIM((SALT44.StrType)h.city_clean)));
+    avelength_city_clean := AVE(GROUP,LENGTH(TRIM((SALT44.StrType)h.city_clean)),h.city_clean<>(typeof(h.city_clean))'');
     populated_st_cnt := COUNT(GROUP,h.st <> (TYPEOF(h.st))'');
     populated_st_pcnt := AVE(GROUP,IF(h.st = (TYPEOF(h.st))'',0,100));
-    maxlength_st := MAX(GROUP,LENGTH(TRIM((SALT311.StrType)h.st)));
-    avelength_st := AVE(GROUP,LENGTH(TRIM((SALT311.StrType)h.st)),h.st<>(typeof(h.st))'');
+    maxlength_st := MAX(GROUP,LENGTH(TRIM((SALT44.StrType)h.st)));
+    avelength_st := AVE(GROUP,LENGTH(TRIM((SALT44.StrType)h.st)),h.st<>(typeof(h.st))'');
     populated_zip_cnt := COUNT(GROUP,h.zip <> (TYPEOF(h.zip))'');
     populated_zip_pcnt := AVE(GROUP,IF(h.zip = (TYPEOF(h.zip))'',0,100));
-    maxlength_zip := MAX(GROUP,LENGTH(TRIM((SALT311.StrType)h.zip)));
-    avelength_zip := AVE(GROUP,LENGTH(TRIM((SALT311.StrType)h.zip)),h.zip<>(typeof(h.zip))'');
+    maxlength_zip := MAX(GROUP,LENGTH(TRIM((SALT44.StrType)h.zip)));
+    avelength_zip := AVE(GROUP,LENGTH(TRIM((SALT44.StrType)h.zip)),h.zip<>(typeof(h.zip))'');
     populated_company_url_cnt := COUNT(GROUP,h.company_url <> (TYPEOF(h.company_url))'');
     populated_company_url_pcnt := AVE(GROUP,IF(h.company_url = (TYPEOF(h.company_url))'',0,100));
-    maxlength_company_url := MAX(GROUP,LENGTH(TRIM((SALT311.StrType)h.company_url)));
-    avelength_company_url := AVE(GROUP,LENGTH(TRIM((SALT311.StrType)h.company_url)),h.company_url<>(typeof(h.company_url))'');
+    maxlength_company_url := MAX(GROUP,LENGTH(TRIM((SALT44.StrType)h.company_url)));
+    avelength_company_url := AVE(GROUP,LENGTH(TRIM((SALT44.StrType)h.company_url)),h.company_url<>(typeof(h.company_url))'');
     populated_isContact_cnt := COUNT(GROUP,h.isContact <> (TYPEOF(h.isContact))'');
     populated_isContact_pcnt := AVE(GROUP,IF(h.isContact = (TYPEOF(h.isContact))'',0,100));
-    maxlength_isContact := MAX(GROUP,LENGTH(TRIM((SALT311.StrType)h.isContact)));
-    avelength_isContact := AVE(GROUP,LENGTH(TRIM((SALT311.StrType)h.isContact)),h.isContact<>(typeof(h.isContact))'');
+    maxlength_isContact := MAX(GROUP,LENGTH(TRIM((SALT44.StrType)h.isContact)));
+    avelength_isContact := AVE(GROUP,LENGTH(TRIM((SALT44.StrType)h.isContact)),h.isContact<>(typeof(h.isContact))'');
     populated_contact_did_cnt := COUNT(GROUP,h.contact_did <> (TYPEOF(h.contact_did))'');
     populated_contact_did_pcnt := AVE(GROUP,IF(h.contact_did = (TYPEOF(h.contact_did))'',0,100));
-    maxlength_contact_did := MAX(GROUP,LENGTH(TRIM((SALT311.StrType)h.contact_did)));
-    avelength_contact_did := AVE(GROUP,LENGTH(TRIM((SALT311.StrType)h.contact_did)),h.contact_did<>(typeof(h.contact_did))'');
+    maxlength_contact_did := MAX(GROUP,LENGTH(TRIM((SALT44.StrType)h.contact_did)));
+    avelength_contact_did := AVE(GROUP,LENGTH(TRIM((SALT44.StrType)h.contact_did)),h.contact_did<>(typeof(h.contact_did))'');
     populated_title_cnt := COUNT(GROUP,h.title <> (TYPEOF(h.title))'');
     populated_title_pcnt := AVE(GROUP,IF(h.title = (TYPEOF(h.title))'',0,100));
-    maxlength_title := MAX(GROUP,LENGTH(TRIM((SALT311.StrType)h.title)));
-    avelength_title := AVE(GROUP,LENGTH(TRIM((SALT311.StrType)h.title)),h.title<>(typeof(h.title))'');
+    maxlength_title := MAX(GROUP,LENGTH(TRIM((SALT44.StrType)h.title)));
+    avelength_title := AVE(GROUP,LENGTH(TRIM((SALT44.StrType)h.title)),h.title<>(typeof(h.title))'');
     populated_fname_cnt := COUNT(GROUP,h.fname <> (TYPEOF(h.fname))'');
     populated_fname_pcnt := AVE(GROUP,IF(h.fname = (TYPEOF(h.fname))'',0,100));
-    maxlength_fname := MAX(GROUP,LENGTH(TRIM((SALT311.StrType)h.fname)));
-    avelength_fname := AVE(GROUP,LENGTH(TRIM((SALT311.StrType)h.fname)),h.fname<>(typeof(h.fname))'');
+    maxlength_fname := MAX(GROUP,LENGTH(TRIM((SALT44.StrType)h.fname)));
+    avelength_fname := AVE(GROUP,LENGTH(TRIM((SALT44.StrType)h.fname)),h.fname<>(typeof(h.fname))'');
     populated_fname_preferred_cnt := COUNT(GROUP,h.fname_preferred <> (TYPEOF(h.fname_preferred))'');
     populated_fname_preferred_pcnt := AVE(GROUP,IF(h.fname_preferred = (TYPEOF(h.fname_preferred))'',0,100));
-    maxlength_fname_preferred := MAX(GROUP,LENGTH(TRIM((SALT311.StrType)h.fname_preferred)));
-    avelength_fname_preferred := AVE(GROUP,LENGTH(TRIM((SALT311.StrType)h.fname_preferred)),h.fname_preferred<>(typeof(h.fname_preferred))'');
+    maxlength_fname_preferred := MAX(GROUP,LENGTH(TRIM((SALT44.StrType)h.fname_preferred)));
+    avelength_fname_preferred := AVE(GROUP,LENGTH(TRIM((SALT44.StrType)h.fname_preferred)),h.fname_preferred<>(typeof(h.fname_preferred))'');
     populated_mname_cnt := COUNT(GROUP,h.mname <> (TYPEOF(h.mname))'');
     populated_mname_pcnt := AVE(GROUP,IF(h.mname = (TYPEOF(h.mname))'',0,100));
-    maxlength_mname := MAX(GROUP,LENGTH(TRIM((SALT311.StrType)h.mname)));
-    avelength_mname := AVE(GROUP,LENGTH(TRIM((SALT311.StrType)h.mname)),h.mname<>(typeof(h.mname))'');
+    maxlength_mname := MAX(GROUP,LENGTH(TRIM((SALT44.StrType)h.mname)));
+    avelength_mname := AVE(GROUP,LENGTH(TRIM((SALT44.StrType)h.mname)),h.mname<>(typeof(h.mname))'');
     populated_lname_cnt := COUNT(GROUP,h.lname <> (TYPEOF(h.lname))'');
     populated_lname_pcnt := AVE(GROUP,IF(h.lname = (TYPEOF(h.lname))'',0,100));
-    maxlength_lname := MAX(GROUP,LENGTH(TRIM((SALT311.StrType)h.lname)));
-    avelength_lname := AVE(GROUP,LENGTH(TRIM((SALT311.StrType)h.lname)),h.lname<>(typeof(h.lname))'');
+    maxlength_lname := MAX(GROUP,LENGTH(TRIM((SALT44.StrType)h.lname)));
+    avelength_lname := AVE(GROUP,LENGTH(TRIM((SALT44.StrType)h.lname)),h.lname<>(typeof(h.lname))'');
     populated_name_suffix_cnt := COUNT(GROUP,h.name_suffix <> (TYPEOF(h.name_suffix))'');
     populated_name_suffix_pcnt := AVE(GROUP,IF(h.name_suffix = (TYPEOF(h.name_suffix))'',0,100));
-    maxlength_name_suffix := MAX(GROUP,LENGTH(TRIM((SALT311.StrType)h.name_suffix)));
-    avelength_name_suffix := AVE(GROUP,LENGTH(TRIM((SALT311.StrType)h.name_suffix)),h.name_suffix<>(typeof(h.name_suffix))'');
+    maxlength_name_suffix := MAX(GROUP,LENGTH(TRIM((SALT44.StrType)h.name_suffix)));
+    avelength_name_suffix := AVE(GROUP,LENGTH(TRIM((SALT44.StrType)h.name_suffix)),h.name_suffix<>(typeof(h.name_suffix))'');
     populated_contact_ssn_cnt := COUNT(GROUP,h.contact_ssn <> (TYPEOF(h.contact_ssn))'');
     populated_contact_ssn_pcnt := AVE(GROUP,IF(h.contact_ssn = (TYPEOF(h.contact_ssn))'',0,100));
-    maxlength_contact_ssn := MAX(GROUP,LENGTH(TRIM((SALT311.StrType)h.contact_ssn)));
-    avelength_contact_ssn := AVE(GROUP,LENGTH(TRIM((SALT311.StrType)h.contact_ssn)),h.contact_ssn<>(typeof(h.contact_ssn))'');
+    maxlength_contact_ssn := MAX(GROUP,LENGTH(TRIM((SALT44.StrType)h.contact_ssn)));
+    avelength_contact_ssn := AVE(GROUP,LENGTH(TRIM((SALT44.StrType)h.contact_ssn)),h.contact_ssn<>(typeof(h.contact_ssn))'');
     populated_contact_email_cnt := COUNT(GROUP,h.contact_email <> (TYPEOF(h.contact_email))'');
     populated_contact_email_pcnt := AVE(GROUP,IF(h.contact_email = (TYPEOF(h.contact_email))'',0,100));
-    maxlength_contact_email := MAX(GROUP,LENGTH(TRIM((SALT311.StrType)h.contact_email)));
-    avelength_contact_email := AVE(GROUP,LENGTH(TRIM((SALT311.StrType)h.contact_email)),h.contact_email<>(typeof(h.contact_email))'');
+    maxlength_contact_email := MAX(GROUP,LENGTH(TRIM((SALT44.StrType)h.contact_email)));
+    avelength_contact_email := AVE(GROUP,LENGTH(TRIM((SALT44.StrType)h.contact_email)),h.contact_email<>(typeof(h.contact_email))'');
     populated_sele_flag_cnt := COUNT(GROUP,h.sele_flag <> (TYPEOF(h.sele_flag))'');
     populated_sele_flag_pcnt := AVE(GROUP,IF(h.sele_flag = (TYPEOF(h.sele_flag))'',0,100));
-    maxlength_sele_flag := MAX(GROUP,LENGTH(TRIM((SALT311.StrType)h.sele_flag)));
-    avelength_sele_flag := AVE(GROUP,LENGTH(TRIM((SALT311.StrType)h.sele_flag)),h.sele_flag<>(typeof(h.sele_flag))'');
+    maxlength_sele_flag := MAX(GROUP,LENGTH(TRIM((SALT44.StrType)h.sele_flag)));
+    avelength_sele_flag := AVE(GROUP,LENGTH(TRIM((SALT44.StrType)h.sele_flag)),h.sele_flag<>(typeof(h.sele_flag))'');
     populated_org_flag_cnt := COUNT(GROUP,h.org_flag <> (TYPEOF(h.org_flag))'');
     populated_org_flag_pcnt := AVE(GROUP,IF(h.org_flag = (TYPEOF(h.org_flag))'',0,100));
-    maxlength_org_flag := MAX(GROUP,LENGTH(TRIM((SALT311.StrType)h.org_flag)));
-    avelength_org_flag := AVE(GROUP,LENGTH(TRIM((SALT311.StrType)h.org_flag)),h.org_flag<>(typeof(h.org_flag))'');
+    maxlength_org_flag := MAX(GROUP,LENGTH(TRIM((SALT44.StrType)h.org_flag)));
+    avelength_org_flag := AVE(GROUP,LENGTH(TRIM((SALT44.StrType)h.org_flag)),h.org_flag<>(typeof(h.org_flag))'');
     populated_ult_flag_cnt := COUNT(GROUP,h.ult_flag <> (TYPEOF(h.ult_flag))'');
     populated_ult_flag_pcnt := AVE(GROUP,IF(h.ult_flag = (TYPEOF(h.ult_flag))'',0,100));
-    maxlength_ult_flag := MAX(GROUP,LENGTH(TRIM((SALT311.StrType)h.ult_flag)));
-    avelength_ult_flag := AVE(GROUP,LENGTH(TRIM((SALT311.StrType)h.ult_flag)),h.ult_flag<>(typeof(h.ult_flag))'');
+    maxlength_ult_flag := MAX(GROUP,LENGTH(TRIM((SALT44.StrType)h.ult_flag)));
+    avelength_ult_flag := AVE(GROUP,LENGTH(TRIM((SALT44.StrType)h.ult_flag)),h.ult_flag<>(typeof(h.ult_flag))'');
     populated_fallback_value_cnt := COUNT(GROUP,h.fallback_value <> (TYPEOF(h.fallback_value))'');
     populated_fallback_value_pcnt := AVE(GROUP,IF(h.fallback_value = (TYPEOF(h.fallback_value))'',0,100));
-    maxlength_fallback_value := MAX(GROUP,LENGTH(TRIM((SALT311.StrType)h.fallback_value)));
-    avelength_fallback_value := AVE(GROUP,LENGTH(TRIM((SALT311.StrType)h.fallback_value)),h.fallback_value<>(typeof(h.fallback_value))'');
+    maxlength_fallback_value := MAX(GROUP,LENGTH(TRIM((SALT44.StrType)h.fallback_value)));
+    avelength_fallback_value := AVE(GROUP,LENGTH(TRIM((SALT44.StrType)h.fallback_value)),h.fallback_value<>(typeof(h.fallback_value))'');
   END;
     T := TABLE(h,SummaryLayout);
   R1 := RECORD
@@ -194,7 +194,7 @@ END;
 summary0 := Summary('Summary');
   invRec := RECORD
   UNSIGNED  FldNo;
-  SALT311.StrType FieldName;
+  SALT44.StrType FieldName;
   UNSIGNED NumberOfRecords;
   REAL8  populated_pcnt;
   UNSIGNED  maxlength;
@@ -208,21 +208,22 @@ invRec invert(summary0 le, INTEGER C) := TRANSFORM
   SELF.maxlength := CHOOSE(C,le.maxlength_parent_proxid,le.maxlength_sele_proxid,le.maxlength_org_proxid,le.maxlength_ultimate_proxid,le.maxlength_has_lgid,le.maxlength_empid,le.maxlength_source,le.maxlength_source_record_id,le.maxlength_source_docid,le.maxlength_company_name,le.maxlength_company_name_prefix,le.maxlength_cnp_name,le.maxlength_cnp_number,le.maxlength_cnp_btype,le.maxlength_cnp_lowv,le.maxlength_company_phone,le.maxlength_company_phone_3,le.maxlength_company_phone_3_ex,le.maxlength_company_phone_7,le.maxlength_company_fein,le.maxlength_company_sic_code1,le.maxlength_active_duns_number,le.maxlength_prim_range,le.maxlength_prim_name,le.maxlength_sec_range,le.maxlength_city,le.maxlength_city_clean,le.maxlength_st,le.maxlength_zip,le.maxlength_company_url,le.maxlength_isContact,le.maxlength_contact_did,le.maxlength_title,le.maxlength_fname,le.maxlength_fname_preferred,le.maxlength_mname,le.maxlength_lname,le.maxlength_name_suffix,le.maxlength_contact_ssn,le.maxlength_contact_email,le.maxlength_sele_flag,le.maxlength_org_flag,le.maxlength_ult_flag,le.maxlength_fallback_value);
   SELF.avelength := CHOOSE(C,le.avelength_parent_proxid,le.avelength_sele_proxid,le.avelength_org_proxid,le.avelength_ultimate_proxid,le.avelength_has_lgid,le.avelength_empid,le.avelength_source,le.avelength_source_record_id,le.avelength_source_docid,le.avelength_company_name,le.avelength_company_name_prefix,le.avelength_cnp_name,le.avelength_cnp_number,le.avelength_cnp_btype,le.avelength_cnp_lowv,le.avelength_company_phone,le.avelength_company_phone_3,le.avelength_company_phone_3_ex,le.avelength_company_phone_7,le.avelength_company_fein,le.avelength_company_sic_code1,le.avelength_active_duns_number,le.avelength_prim_range,le.avelength_prim_name,le.avelength_sec_range,le.avelength_city,le.avelength_city_clean,le.avelength_st,le.avelength_zip,le.avelength_company_url,le.avelength_isContact,le.avelength_contact_did,le.avelength_title,le.avelength_fname,le.avelength_fname_preferred,le.avelength_mname,le.avelength_lname,le.avelength_name_suffix,le.avelength_contact_ssn,le.avelength_contact_email,le.avelength_sele_flag,le.avelength_org_flag,le.avelength_ult_flag,le.avelength_fallback_value);
 END;
+ 
 EXPORT invSummary := NORMALIZE(summary0, 44, invert(LEFT,COUNTER));
 // The character counts
 // Move everything into 'inverted list' form so processing can be done 'in library'
-SALT311.MAC_Character_Counts.X_Data_Layout Into(h le,unsigned C) := TRANSFORM
+SALT44.MAC_Character_Counts.X_Data_Layout Into(h le,unsigned C) := TRANSFORM
   SELF.id := le.proxid;
-  SELF.Fld := TRIM(CHOOSE(C,TRIM((SALT311.StrType)le.parent_proxid),TRIM((SALT311.StrType)le.sele_proxid),TRIM((SALT311.StrType)le.org_proxid),TRIM((SALT311.StrType)le.ultimate_proxid),TRIM((SALT311.StrType)le.has_lgid),TRIM((SALT311.StrType)le.empid),TRIM((SALT311.StrType)le.source),TRIM((SALT311.StrType)le.source_record_id),TRIM((SALT311.StrType)le.source_docid),TRIM((SALT311.StrType)le.company_name),TRIM((SALT311.StrType)le.company_name_prefix),TRIM((SALT311.StrType)le.cnp_name),TRIM((SALT311.StrType)le.cnp_number),TRIM((SALT311.StrType)le.cnp_btype),TRIM((SALT311.StrType)le.cnp_lowv),TRIM((SALT311.StrType)le.company_phone),TRIM((SALT311.StrType)le.company_phone_3),TRIM((SALT311.StrType)le.company_phone_3_ex),TRIM((SALT311.StrType)le.company_phone_7),TRIM((SALT311.StrType)le.company_fein),TRIM((SALT311.StrType)le.company_sic_code1),TRIM((SALT311.StrType)le.active_duns_number),TRIM((SALT311.StrType)le.prim_range),TRIM((SALT311.StrType)le.prim_name),TRIM((SALT311.StrType)le.sec_range),TRIM((SALT311.StrType)le.city),TRIM((SALT311.StrType)le.city_clean),TRIM((SALT311.StrType)le.st),TRIM((SALT311.StrType)le.zip),TRIM((SALT311.StrType)le.company_url),TRIM((SALT311.StrType)le.isContact),TRIM((SALT311.StrType)le.contact_did),TRIM((SALT311.StrType)le.title),TRIM((SALT311.StrType)le.fname),TRIM((SALT311.StrType)le.fname_preferred),TRIM((SALT311.StrType)le.mname),TRIM((SALT311.StrType)le.lname),TRIM((SALT311.StrType)le.name_suffix),TRIM((SALT311.StrType)le.contact_ssn),TRIM((SALT311.StrType)le.contact_email),TRIM((SALT311.StrType)le.sele_flag),TRIM((SALT311.StrType)le.org_flag),TRIM((SALT311.StrType)le.ult_flag),TRIM((SALT311.StrType)le.fallback_value)));
+  SELF.Fld := TRIM(CHOOSE(C,TRIM((SALT44.StrType)le.parent_proxid),TRIM((SALT44.StrType)le.sele_proxid),TRIM((SALT44.StrType)le.org_proxid),TRIM((SALT44.StrType)le.ultimate_proxid),TRIM((SALT44.StrType)le.has_lgid),TRIM((SALT44.StrType)le.empid),TRIM((SALT44.StrType)le.source),TRIM((SALT44.StrType)le.source_record_id),TRIM((SALT44.StrType)le.source_docid),TRIM((SALT44.StrType)le.company_name),TRIM((SALT44.StrType)le.company_name_prefix),TRIM((SALT44.StrType)le.cnp_name),TRIM((SALT44.StrType)le.cnp_number),TRIM((SALT44.StrType)le.cnp_btype),TRIM((SALT44.StrType)le.cnp_lowv),TRIM((SALT44.StrType)le.company_phone),TRIM((SALT44.StrType)le.company_phone_3),TRIM((SALT44.StrType)le.company_phone_3_ex),TRIM((SALT44.StrType)le.company_phone_7),TRIM((SALT44.StrType)le.company_fein),TRIM((SALT44.StrType)le.company_sic_code1),TRIM((SALT44.StrType)le.active_duns_number),TRIM((SALT44.StrType)le.prim_range),TRIM((SALT44.StrType)le.prim_name),TRIM((SALT44.StrType)le.sec_range),TRIM((SALT44.StrType)le.city),TRIM((SALT44.StrType)le.city_clean),TRIM((SALT44.StrType)le.st),TRIM((SALT44.StrType)le.zip),TRIM((SALT44.StrType)le.company_url),TRIM((SALT44.StrType)le.isContact),TRIM((SALT44.StrType)le.contact_did),TRIM((SALT44.StrType)le.title),TRIM((SALT44.StrType)le.fname),TRIM((SALT44.StrType)le.fname_preferred),TRIM((SALT44.StrType)le.mname),TRIM((SALT44.StrType)le.lname),TRIM((SALT44.StrType)le.name_suffix),TRIM((SALT44.StrType)le.contact_ssn),TRIM((SALT44.StrType)le.contact_email),TRIM((SALT44.StrType)le.sele_flag),TRIM((SALT44.StrType)le.org_flag),TRIM((SALT44.StrType)le.ult_flag),TRIM((SALT44.StrType)le.fallback_value)));
   SELF.FldNo := C;
 END;
 SHARED FldInv0 := NORMALIZE(h,44,Into(LEFT,COUNTER));
 // Move everything into 'pairs' form so processing can be done 'in library'
-SALT311.MAC_Correlate.Data_Layout IntoP(h le,UNSIGNED C) := TRANSFORM
+SALT44.MAC_Correlate.Data_Layout IntoP(h le,UNSIGNED C) := TRANSFORM
   SELF.FldNo1 := 1 + (C / 44);
   SELF.FldNo2 := 1 + (C % 44);
-  SELF.Fld1 := TRIM(CHOOSE(SELF.FldNo1,TRIM((SALT311.StrType)le.parent_proxid),TRIM((SALT311.StrType)le.sele_proxid),TRIM((SALT311.StrType)le.org_proxid),TRIM((SALT311.StrType)le.ultimate_proxid),TRIM((SALT311.StrType)le.has_lgid),TRIM((SALT311.StrType)le.empid),TRIM((SALT311.StrType)le.source),TRIM((SALT311.StrType)le.source_record_id),TRIM((SALT311.StrType)le.source_docid),TRIM((SALT311.StrType)le.company_name),TRIM((SALT311.StrType)le.company_name_prefix),TRIM((SALT311.StrType)le.cnp_name),TRIM((SALT311.StrType)le.cnp_number),TRIM((SALT311.StrType)le.cnp_btype),TRIM((SALT311.StrType)le.cnp_lowv),TRIM((SALT311.StrType)le.company_phone),TRIM((SALT311.StrType)le.company_phone_3),TRIM((SALT311.StrType)le.company_phone_3_ex),TRIM((SALT311.StrType)le.company_phone_7),TRIM((SALT311.StrType)le.company_fein),TRIM((SALT311.StrType)le.company_sic_code1),TRIM((SALT311.StrType)le.active_duns_number),TRIM((SALT311.StrType)le.prim_range),TRIM((SALT311.StrType)le.prim_name),TRIM((SALT311.StrType)le.sec_range),TRIM((SALT311.StrType)le.city),TRIM((SALT311.StrType)le.city_clean),TRIM((SALT311.StrType)le.st),TRIM((SALT311.StrType)le.zip),TRIM((SALT311.StrType)le.company_url),TRIM((SALT311.StrType)le.isContact),TRIM((SALT311.StrType)le.contact_did),TRIM((SALT311.StrType)le.title),TRIM((SALT311.StrType)le.fname),TRIM((SALT311.StrType)le.fname_preferred),TRIM((SALT311.StrType)le.mname),TRIM((SALT311.StrType)le.lname),TRIM((SALT311.StrType)le.name_suffix),TRIM((SALT311.StrType)le.contact_ssn),TRIM((SALT311.StrType)le.contact_email),TRIM((SALT311.StrType)le.sele_flag),TRIM((SALT311.StrType)le.org_flag),TRIM((SALT311.StrType)le.ult_flag),TRIM((SALT311.StrType)le.fallback_value)));
-  SELF.Fld2 := TRIM(CHOOSE(SELF.FldNo2,TRIM((SALT311.StrType)le.parent_proxid),TRIM((SALT311.StrType)le.sele_proxid),TRIM((SALT311.StrType)le.org_proxid),TRIM((SALT311.StrType)le.ultimate_proxid),TRIM((SALT311.StrType)le.has_lgid),TRIM((SALT311.StrType)le.empid),TRIM((SALT311.StrType)le.source),TRIM((SALT311.StrType)le.source_record_id),TRIM((SALT311.StrType)le.source_docid),TRIM((SALT311.StrType)le.company_name),TRIM((SALT311.StrType)le.company_name_prefix),TRIM((SALT311.StrType)le.cnp_name),TRIM((SALT311.StrType)le.cnp_number),TRIM((SALT311.StrType)le.cnp_btype),TRIM((SALT311.StrType)le.cnp_lowv),TRIM((SALT311.StrType)le.company_phone),TRIM((SALT311.StrType)le.company_phone_3),TRIM((SALT311.StrType)le.company_phone_3_ex),TRIM((SALT311.StrType)le.company_phone_7),TRIM((SALT311.StrType)le.company_fein),TRIM((SALT311.StrType)le.company_sic_code1),TRIM((SALT311.StrType)le.active_duns_number),TRIM((SALT311.StrType)le.prim_range),TRIM((SALT311.StrType)le.prim_name),TRIM((SALT311.StrType)le.sec_range),TRIM((SALT311.StrType)le.city),TRIM((SALT311.StrType)le.city_clean),TRIM((SALT311.StrType)le.st),TRIM((SALT311.StrType)le.zip),TRIM((SALT311.StrType)le.company_url),TRIM((SALT311.StrType)le.isContact),TRIM((SALT311.StrType)le.contact_did),TRIM((SALT311.StrType)le.title),TRIM((SALT311.StrType)le.fname),TRIM((SALT311.StrType)le.fname_preferred),TRIM((SALT311.StrType)le.mname),TRIM((SALT311.StrType)le.lname),TRIM((SALT311.StrType)le.name_suffix),TRIM((SALT311.StrType)le.contact_ssn),TRIM((SALT311.StrType)le.contact_email),TRIM((SALT311.StrType)le.sele_flag),TRIM((SALT311.StrType)le.org_flag),TRIM((SALT311.StrType)le.ult_flag),TRIM((SALT311.StrType)le.fallback_value)));
+  SELF.Fld1 := TRIM(CHOOSE(SELF.FldNo1,TRIM((SALT44.StrType)le.parent_proxid),TRIM((SALT44.StrType)le.sele_proxid),TRIM((SALT44.StrType)le.org_proxid),TRIM((SALT44.StrType)le.ultimate_proxid),TRIM((SALT44.StrType)le.has_lgid),TRIM((SALT44.StrType)le.empid),TRIM((SALT44.StrType)le.source),TRIM((SALT44.StrType)le.source_record_id),TRIM((SALT44.StrType)le.source_docid),TRIM((SALT44.StrType)le.company_name),TRIM((SALT44.StrType)le.company_name_prefix),TRIM((SALT44.StrType)le.cnp_name),TRIM((SALT44.StrType)le.cnp_number),TRIM((SALT44.StrType)le.cnp_btype),TRIM((SALT44.StrType)le.cnp_lowv),TRIM((SALT44.StrType)le.company_phone),TRIM((SALT44.StrType)le.company_phone_3),TRIM((SALT44.StrType)le.company_phone_3_ex),TRIM((SALT44.StrType)le.company_phone_7),TRIM((SALT44.StrType)le.company_fein),TRIM((SALT44.StrType)le.company_sic_code1),TRIM((SALT44.StrType)le.active_duns_number),TRIM((SALT44.StrType)le.prim_range),TRIM((SALT44.StrType)le.prim_name),TRIM((SALT44.StrType)le.sec_range),TRIM((SALT44.StrType)le.city),TRIM((SALT44.StrType)le.city_clean),TRIM((SALT44.StrType)le.st),TRIM((SALT44.StrType)le.zip),TRIM((SALT44.StrType)le.company_url),TRIM((SALT44.StrType)le.isContact),TRIM((SALT44.StrType)le.contact_did),TRIM((SALT44.StrType)le.title),TRIM((SALT44.StrType)le.fname),TRIM((SALT44.StrType)le.fname_preferred),TRIM((SALT44.StrType)le.mname),TRIM((SALT44.StrType)le.lname),TRIM((SALT44.StrType)le.name_suffix),TRIM((SALT44.StrType)le.contact_ssn),TRIM((SALT44.StrType)le.contact_email),TRIM((SALT44.StrType)le.sele_flag),TRIM((SALT44.StrType)le.org_flag),TRIM((SALT44.StrType)le.ult_flag),TRIM((SALT44.StrType)le.fallback_value)));
+  SELF.Fld2 := TRIM(CHOOSE(SELF.FldNo2,TRIM((SALT44.StrType)le.parent_proxid),TRIM((SALT44.StrType)le.sele_proxid),TRIM((SALT44.StrType)le.org_proxid),TRIM((SALT44.StrType)le.ultimate_proxid),TRIM((SALT44.StrType)le.has_lgid),TRIM((SALT44.StrType)le.empid),TRIM((SALT44.StrType)le.source),TRIM((SALT44.StrType)le.source_record_id),TRIM((SALT44.StrType)le.source_docid),TRIM((SALT44.StrType)le.company_name),TRIM((SALT44.StrType)le.company_name_prefix),TRIM((SALT44.StrType)le.cnp_name),TRIM((SALT44.StrType)le.cnp_number),TRIM((SALT44.StrType)le.cnp_btype),TRIM((SALT44.StrType)le.cnp_lowv),TRIM((SALT44.StrType)le.company_phone),TRIM((SALT44.StrType)le.company_phone_3),TRIM((SALT44.StrType)le.company_phone_3_ex),TRIM((SALT44.StrType)le.company_phone_7),TRIM((SALT44.StrType)le.company_fein),TRIM((SALT44.StrType)le.company_sic_code1),TRIM((SALT44.StrType)le.active_duns_number),TRIM((SALT44.StrType)le.prim_range),TRIM((SALT44.StrType)le.prim_name),TRIM((SALT44.StrType)le.sec_range),TRIM((SALT44.StrType)le.city),TRIM((SALT44.StrType)le.city_clean),TRIM((SALT44.StrType)le.st),TRIM((SALT44.StrType)le.zip),TRIM((SALT44.StrType)le.company_url),TRIM((SALT44.StrType)le.isContact),TRIM((SALT44.StrType)le.contact_did),TRIM((SALT44.StrType)le.title),TRIM((SALT44.StrType)le.fname),TRIM((SALT44.StrType)le.fname_preferred),TRIM((SALT44.StrType)le.mname),TRIM((SALT44.StrType)le.lname),TRIM((SALT44.StrType)le.name_suffix),TRIM((SALT44.StrType)le.contact_ssn),TRIM((SALT44.StrType)le.contact_email),TRIM((SALT44.StrType)le.sele_flag),TRIM((SALT44.StrType)le.org_flag),TRIM((SALT44.StrType)le.ult_flag),TRIM((SALT44.StrType)le.fallback_value)));
   END;
 SHARED Pairs0 := NORMALIZE(ENTH(h,Config_BIP.CorrelateSampleSize),44*44,IntoP(LEFT,COUNTER))(FldNo1<FldNo2);
 SHARED FldIds := DATASET([{1,'parent_proxid'}
@@ -268,12 +269,13 @@ SHARED FldIds := DATASET([{1,'parent_proxid'}
       ,{41,'sele_flag'}
       ,{42,'org_flag'}
       ,{43,'ult_flag'}
-      ,{44,'fallback_value'}],SALT311.MAC_Character_Counts.Field_Identification);
-EXPORT AllProfiles := SALT311.MAC_Character_Counts.FN_Profile(FldInv0,FldIds);
+      ,{44,'fallback_value'}],SALT44.MAC_Character_Counts.Field_Identification);
+EXPORT AllProfiles := SALT44.MAC_Character_Counts.FN_Profile(FldInv0,FldIds);
  
-EXPORT SrcProfiles := SALT311.MAC_Character_Counts.Src_Profile(FldInv0,FldIds);
+EXPORT SrcProfiles := SALT44.MAC_Character_Counts.Src_Profile(FldInv0,FldIds);
  
-EXPORT Correlations := SALT311.MAC_Correlate.Fn_Profile(Pairs0,FldIds);
+EXPORT Correlations := SALT44.MAC_Correlate.Fn_Profile(Pairs0,FldIds);
+ 
  
 ErrorRecord := RECORD
   UNSIGNED1 FieldNum;
@@ -281,52 +283,98 @@ ErrorRecord := RECORD
 END;
 ErrorRecord NoteErrors(h le,UNSIGNED1 c) := TRANSFORM
   SELF.ErrorNum := CHOOSE(c,
-    Fields.InValid_parent_proxid((SALT311.StrType)le.parent_proxid),
-    Fields.InValid_sele_proxid((SALT311.StrType)le.sele_proxid),
-    Fields.InValid_org_proxid((SALT311.StrType)le.org_proxid),
-    Fields.InValid_ultimate_proxid((SALT311.StrType)le.ultimate_proxid),
-    Fields.InValid_has_lgid((SALT311.StrType)le.has_lgid),
-    Fields.InValid_empid((SALT311.StrType)le.empid),
-    Fields.InValid_source((SALT311.StrType)le.source),
-    Fields.InValid_source_record_id((SALT311.StrType)le.source_record_id),
-    Fields.InValid_source_docid((SALT311.StrType)le.source_docid),
-    Fields.InValid_company_name((SALT311.StrType)le.company_name),
-    Fields.InValid_company_name_prefix((SALT311.StrType)le.company_name_prefix),
-    Fields.InValid_cnp_name((SALT311.StrType)le.cnp_name),
-    Fields.InValid_cnp_number((SALT311.StrType)le.cnp_number),
-    Fields.InValid_cnp_btype((SALT311.StrType)le.cnp_btype),
-    Fields.InValid_cnp_lowv((SALT311.StrType)le.cnp_lowv),
-    Fields.InValid_company_phone((SALT311.StrType)le.company_phone),
-    Fields.InValid_company_phone_3((SALT311.StrType)le.company_phone_3),
-    Fields.InValid_company_phone_3_ex((SALT311.StrType)le.company_phone_3_ex),
-    Fields.InValid_company_phone_7((SALT311.StrType)le.company_phone_7),
-    Fields.InValid_company_fein((SALT311.StrType)le.company_fein),
-    Fields.InValid_company_sic_code1((SALT311.StrType)le.company_sic_code1),
-    Fields.InValid_active_duns_number((SALT311.StrType)le.active_duns_number),
-    Fields.InValid_prim_range((SALT311.StrType)le.prim_range),
-    Fields.InValid_prim_name((SALT311.StrType)le.prim_name),
-    Fields.InValid_sec_range((SALT311.StrType)le.sec_range),
-    Fields.InValid_city((SALT311.StrType)le.city),
-    Fields.InValid_city_clean((SALT311.StrType)le.city_clean),
-    Fields.InValid_st((SALT311.StrType)le.st),
-    Fields.InValid_zip((SALT311.StrType)le.zip),
-    Fields.InValid_company_url((SALT311.StrType)le.company_url),
-    Fields.InValid_isContact((SALT311.StrType)le.isContact),
-    Fields.InValid_contact_did((SALT311.StrType)le.contact_did),
-    Fields.InValid_title((SALT311.StrType)le.title),
-    Fields.InValid_fname((SALT311.StrType)le.fname),
-    Fields.InValid_fname_preferred((SALT311.StrType)le.fname_preferred),
-    Fields.InValid_mname((SALT311.StrType)le.mname),
-    Fields.InValid_lname((SALT311.StrType)le.lname),
-    Fields.InValid_name_suffix((SALT311.StrType)le.name_suffix),
-    Fields.InValid_contact_ssn((SALT311.StrType)le.contact_ssn),
-    Fields.InValid_contact_email((SALT311.StrType)le.contact_email),
-    Fields.InValid_sele_flag((SALT311.StrType)le.sele_flag),
-    Fields.InValid_org_flag((SALT311.StrType)le.org_flag),
-    Fields.InValid_ult_flag((SALT311.StrType)le.ult_flag),
-    Fields.InValid_fallback_value((SALT311.StrType)le.fallback_value),
+    Fields.InValid_parent_proxid((SALT44.StrType)le.parent_proxid),
+ 
+    Fields.InValid_sele_proxid((SALT44.StrType)le.sele_proxid),
+ 
+    Fields.InValid_org_proxid((SALT44.StrType)le.org_proxid),
+ 
+    Fields.InValid_ultimate_proxid((SALT44.StrType)le.ultimate_proxid),
+ 
+    Fields.InValid_has_lgid((SALT44.StrType)le.has_lgid),
+ 
+    Fields.InValid_empid((SALT44.StrType)le.empid),
+ 
+    Fields.InValid_source((SALT44.StrType)le.source),
+ 
+    Fields.InValid_source_record_id((SALT44.StrType)le.source_record_id),
+ 
+    Fields.InValid_source_docid((SALT44.StrType)le.source_docid),
+ 
+    Fields.InValid_company_name((SALT44.StrType)le.company_name),
+ 
+    Fields.InValid_company_name_prefix((SALT44.StrType)le.company_name_prefix),
+ 
+    Fields.InValid_cnp_name((SALT44.StrType)le.cnp_name),
+ 
+    Fields.InValid_cnp_number((SALT44.StrType)le.cnp_number),
+ 
+    Fields.InValid_cnp_btype((SALT44.StrType)le.cnp_btype),
+ 
+    Fields.InValid_cnp_lowv((SALT44.StrType)le.cnp_lowv),
+ 
+    Fields.InValid_company_phone((SALT44.StrType)le.company_phone),
+ 
+    Fields.InValid_company_phone_3((SALT44.StrType)le.company_phone_3),
+ 
+    Fields.InValid_company_phone_3_ex((SALT44.StrType)le.company_phone_3_ex),
+ 
+    Fields.InValid_company_phone_7((SALT44.StrType)le.company_phone_7),
+ 
+    Fields.InValid_company_fein((SALT44.StrType)le.company_fein),
+ 
+    Fields.InValid_company_sic_code1((SALT44.StrType)le.company_sic_code1),
+ 
+    Fields.InValid_active_duns_number((SALT44.StrType)le.active_duns_number),
+ 
+    Fields.InValid_prim_range((SALT44.StrType)le.prim_range),
+ 
+    Fields.InValid_prim_name((SALT44.StrType)le.prim_name),
+ 
+    Fields.InValid_sec_range((SALT44.StrType)le.sec_range),
+ 
+    Fields.InValid_city((SALT44.StrType)le.city),
+ 
+    Fields.InValid_city_clean((SALT44.StrType)le.city_clean),
+ 
+    Fields.InValid_st((SALT44.StrType)le.st),
+ 
+    Fields.InValid_zip((SALT44.StrType)le.zip),
+ 
+    Fields.InValid_company_url((SALT44.StrType)le.company_url),
+ 
+    Fields.InValid_isContact((SALT44.StrType)le.isContact),
+ 
+    Fields.InValid_contact_did((SALT44.StrType)le.contact_did),
+ 
+    Fields.InValid_title((SALT44.StrType)le.title),
+ 
+    Fields.InValid_fname((SALT44.StrType)le.fname),
+ 
+    Fields.InValid_fname_preferred((SALT44.StrType)le.fname_preferred),
+ 
+    Fields.InValid_mname((SALT44.StrType)le.mname),
+ 
+    Fields.InValid_lname((SALT44.StrType)le.lname),
+ 
+    Fields.InValid_name_suffix((SALT44.StrType)le.name_suffix),
+ 
+    Fields.InValid_contact_ssn((SALT44.StrType)le.contact_ssn),
+ 
+    Fields.InValid_contact_email((SALT44.StrType)le.contact_email),
+ 
+    Fields.InValid_sele_flag((SALT44.StrType)le.sele_flag),
+ 
+    Fields.InValid_org_flag((SALT44.StrType)le.org_flag),
+ 
+    Fields.InValid_ult_flag((SALT44.StrType)le.ult_flag),
+ 
+    Fields.InValid_fallback_value((SALT44.StrType)le.fallback_value),
+ 
     0, // Uncleanable field
+ 
     0, // Uncleanable field
+ 
     0);
   SELF.FieldNum := IF(SELF.ErrorNum=0,SKIP,c); // Bail early to avoid creating record
 END;
@@ -346,16 +394,15 @@ END;
 ValErr := TABLE(TotalErrors,PrettyErrorTotals);
 EXPORT ValidityErrors := ValErr;
 //We have proxid specified - so we can compute statistics on the cluster counts
-EXPORT ClusterCounts := SALT311.MOD_ClusterStats.Counts(h,proxid);
+EXPORT ClusterCounts := SALT44.MOD_ClusterStats.Counts(h,proxid);
 EXPORT StandardStats(BOOLEAN doSummaryGlobal = TRUE, BOOLEAN doAllProfiles = TRUE) := FUNCTION
-  myTimeStamp := (UNSIGNED6)SALT311.Fn_Now('YYYYMMDDHHMMSS') : INDEPENDENT;
+  myTimeStamp := (UNSIGNED6)SALT44.Fn_Now('YYYYMMDDHHMMSS') : INDEPENDENT;
   fieldPopulationOverall := Summary('');
- 
-  SALT311.mod_StandardStatsTransforms.mac_hygieneSummaryTransform(BizLinkFull, Fields, 'RECORDOF(fieldPopulationOverall)', FALSE);
+  SALT44.mod_StandardStatsTransforms.mac_hygieneSummaryTransform(BizLinkFull, Fields, 'RECORDOF(fieldPopulationOverall)', FALSE);
  
   fieldPopulationOverall_Standard := IF(doSummaryGlobal, NORMALIZE(fieldPopulationOverall, COUNT(FldIds) * 6, xSummary(LEFT, COUNTER, myTimeStamp, 'all', 'all')));
-  fieldPopulationOverall_TotalRecs_Standard := IF(doSummaryGlobal, SALT311.mod_StandardStatsTransforms.mac_hygieneTotalRecs(fieldPopulationOverall, myTimeStamp, 'all', FALSE, 'all'));
-  allProfiles_Standard := IF(doAllProfiles, SALT311.mod_StandardStatsTransforms.hygieneAllProfiles(AllProfiles, myTimeStamp, 10, 'all'));
+  fieldPopulationOverall_TotalRecs_Standard := IF(doSummaryGlobal, SALT44.mod_StandardStatsTransforms.mac_hygieneTotalRecs(fieldPopulationOverall, myTimeStamp, 'all', FALSE, 'all'));
+  allProfiles_Standard := IF(doAllProfiles, SALT44.mod_StandardStatsTransforms.hygieneAllProfiles(AllProfiles, myTimeStamp, 10, 'all'));
  
   RETURN fieldPopulationOverall_Standard & fieldPopulationOverall_TotalRecs_Standard & allProfiles_Standard;
 END;

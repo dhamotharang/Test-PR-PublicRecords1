@@ -104,7 +104,7 @@ EXPORT FP_model_params := INTERFACE
   EXPORT Dataset(riskwise.Layout_SkipTrace) _skiptrace := Dataset([], riskwise.Layout_SkipTrace);
   EXPORT Dataset(easi.layout_census) _easicensus := Dataset([], easi.layout_census);
   EXPORT Dataset(Models.Layout_FraudAttributes) _FDattributes := Dataset([], Models.Layout_FraudAttributes);
-	EXPORT Dataset(Risk_Indicators.layouts.layout_IDAFraud_out) IDAattributes := Dataset([], Risk_Indicators.layouts.layout_IDAFraud_out);
+	EXPORT Dataset(Risk_Indicators.layouts.layout_IDA_out) IDAattributes := Dataset([], Risk_Indicators.layouts.layout_IDA_out);
 END;
 
 

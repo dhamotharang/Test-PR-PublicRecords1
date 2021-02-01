@@ -1,5 +1,5 @@
 IMPORT bankruptcyv2_services, bbb2, corp, corp2, corp2_services, dca, dnb, domains, doxie, doxie_cbrs, doxie_crs, 
-  iesp, LiensV2_Services, Prof_LicenseV2, uccv2_services;
+  iesp, LiensV2_Services, Prof_LicenseV2, uccv2_services, VehicleV2_Services, watercraftV2_Services;
 EXPORT layouts := MODULE
   
   EXPORT layout_base_rec := RECORD // doxie_cbrs.fn_getBaseRecs
@@ -66,6 +66,23 @@ EXPORT layouts := MODULE
     STRING25 corp_foreign_domestic_ind_decoded;
   END;
 
+  EXPORT registered_agent_record := RECORD // doxie_cbrs.registered_agents_records
+    corporation_filings_record.bdid;
+    corporation_filings_record.corp_ra_name;
+    corporation_filings_record.dt_last_seen;
+    QSTRING10 prim_range;
+    STRING2 predir;
+    QSTRING28 prim_name;
+    QSTRING4 addr_suffix;
+    STRING2 postdir;
+    QSTRING5 unit_desig;
+    QSTRING8 sec_range;
+    QSTRING25 city;
+    STRING2 state;
+    QSTRING5 zip;
+    QSTRING4 zip4;
+  END;
+
   EXPORT dnb_record := RECORD
     dnb.Layout_DNB_Base - [global_sid, record_sid]; // doxie_cbrs.dnb_records
     STRING15 structure_type_decoded;
@@ -87,6 +104,11 @@ EXPORT layouts := MODULE
     STRING18 county_name := '';
     STRING18 admin_county_name := '';
     STRING18 tech_county_name := '';
+  END;
+
+  EXPORT internet_domains_slim_record := RECORD
+    internet_domains_record.bdid;
+    internet_domains_record.domain_name;
   END;
   
   EXPORT proflic_record := RECORD
@@ -266,5 +288,21 @@ EXPORT layouts := MODULE
 
   EXPORT profile_record_v2 := corp2_services.layout_corp2_rollup; // doxie_cbrs.profile_records_v2
   
+  EXPORT mvr_record := RECORD, MAXLENGTH(doxie_crs.maxlength_mv) // doxie_cbrs.Motor_Vehicle_Records_trimmed -> .. -> Doxie_Raw.Veh_Raw
+    Doxie.Layout_VehicleSearch;
+  END;
+
+  EXPORT mvr_record_v2 := RECORD // doxie_cbrs.Motor_Vehicle_Records_trimmed_v2 -> .. -> VehicleV2_Services.Functions.GetVehicleReport
+    VehicleV2_Services.Layout_Report;
+  END;
+
+  EXPORT watercraft_record := RECORD, MAXLENGTH(doxie_crs.maxlength_wc) // doxie_cbrs.Watercraft_Records_trimmed -> .. -> Doxie_Raw.AirCraft_Raw
+    watercraftV2_Services.layouts.report_out;
+  END; 
+
+  EXPORT faa_record := RECORD, MAXLENGTH(doxie_crs.maxlength_ac) // doxie_cbrs.Aircraft_Records_trimmed
+    doxie_crs.layout_Faa_Aircraft_records;
+  END;
+
 END;
 

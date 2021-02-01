@@ -175,7 +175,7 @@
     SELF.phone_region_city := ri.phone_region_city;
     SELF.phone_region_st   := ri.phone_region_st;
     // for other phones keep metadata from transunion if we have it and we didn't find any in-house
-    SELF.coc_description   := IF(~isPrimaryPhone AND ri.coc_description = '', le.coc_description, ri.coc_description);
+    SELF.coc_description   := IF(ri.coc_description = '', le.coc_description, ri.coc_description);
     SELF.phonestatus       := ri.phonestatus;
     SELF.servicetype       := ri.servicetype;
     SELF.prepaid           := ri.prepaid;
