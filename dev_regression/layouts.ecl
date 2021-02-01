@@ -31,4 +31,16 @@ EXPORT layouts := MODULE
     STRING c;
   END;
 
+  EXPORT external := RECORD
+    STRING glbpurpose;
+    STRING dppapurpose;
+    STRING datapermissionmask;
+    STRING datarestrictionmask;
+    STRING industryclass;
+    STRING dlmask;
+    STRING ssnmask;
+    STRING dobmask;
+
+  END;
+
 END;

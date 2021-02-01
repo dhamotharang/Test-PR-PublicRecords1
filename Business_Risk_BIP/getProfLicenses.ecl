@@ -3,8 +3,9 @@
 EXPORT getProfLicenses(DATASET(Business_Risk_BIP.Layouts.Shell) Shell,
 											 Business_Risk_BIP.LIB_Business_Shell_LIBIN Options,
 											 BIPV2.mod_sources.iParams linkingOptions, // NOTE: not used here in getProfLicenses( )
-											 SET OF STRING2 AllowedSourcesSet,
-                       Doxie.IDataAccess mod_access) := FUNCTION
+											 SET OF STRING2 AllowedSourcesSet) := FUNCTION
+
+  mod_access := PROJECT(Options, doxie.IDataAccess);
 
 	// ---------------- Professional License Records ------------------
   searchLevel := Business_Risk_BIP.Common.SetLinkSearchLevel(Options.LinkSearchLevel); // e.g. 'S'
