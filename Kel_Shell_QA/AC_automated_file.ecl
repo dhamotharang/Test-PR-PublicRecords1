@@ -110,20 +110,7 @@ lay makeFatRecord(rules_appended_file L) := TRANSFORM
 										)),python_func_custom_KS6701_op),
 									
 									
-																	 STD.Str.Find(L.Raw_Acceptance_Criteria,'MIN(')>=1 and 
-									                 STD.Str.Find(L.case_Type,'custom')>=1 =>
-																														 Kel_Shell_QA.Months_between_python_func2(
-																																					ROW(L, Base_Lay),
-																																					trim(STD.Str.ToLowerCase(L.Acceptance_Criteria),left,right),
-																																					(string)L.def_vals,Lay_para),
-																								
-									                 STD.Str.Find(L.Raw_Acceptance_Criteria,'of months between')>=1 and 
-									                 STD.Str.Find(L.case_Type,'custom')>=1 =>Kel_Shell_QA.Months_between_python_func(
-																																								ROW(L, Base_Lay),
-																																								trim(STD.Str.ToLowerCase(L.Acceptance_Criteria),left,right),
-																																								(string)L.def_vals,Lay_para),
-																							
-														STD.Str.Find(L.Raw_Acceptance_Criteria,'and the last item in')>=1 and 
+																	 STD.Str.Find(L.Raw_Acceptance_Criteria,'and the last item in')>=1 and 
 									                 STD.Str.Find(L.case_Type,'custom')>=1 =>
 					IF(Months_between_python_func4_op not in['PASS','FAIL','NA'],
 								IF((integer)REGEXFIND('^(.*),(.*),(.*)$', trim(Months_between_python_func4_op,left,right), 3)=
@@ -138,6 +125,19 @@ lay makeFatRecord(rules_appended_file L) := TRANSFORM
 								 abs(Std.Date.MonthsBetween((integer)REGEXFIND('^(.*),(.*),(.*)$', trim(Months_between_python_func3_op,left,right), 1),
 															 (integer)REGEXFIND('^(.*),(.*),(.*)$', trim(Months_between_python_func3_op,left,right), 2))),
 															 'PASS','FAIL'),Months_between_python_func3_op),
+															 
+																	 STD.Str.Find(L.Raw_Acceptance_Criteria,'MIN(')>=1 and 
+									                 STD.Str.Find(L.case_Type,'custom')>=1 =>
+																														 Kel_Shell_QA.Months_between_python_func2(
+																																					ROW(L, Base_Lay),
+																																					trim(STD.Str.ToLowerCase(L.Acceptance_Criteria),left,right),
+																																					(string)L.def_vals,Lay_para),
+																								
+									                 STD.Str.Find(L.Raw_Acceptance_Criteria,'of months between')>=1 and 
+									                 STD.Str.Find(L.case_Type,'custom')>=1 =>Kel_Shell_QA.Months_between_python_func(
+																																								ROW(L, Base_Lay),
+																																								trim(STD.Str.ToLowerCase(L.Acceptance_Criteria),left,right),
+																																								(string)L.def_vals,Lay_para),
 									
 									STD.Str.Find(L.Raw_Acceptance_Criteria,'YEARSBETWEEN')>=1 and 
 									                 STD.Str.Find(L.case_Type,'custom')>=1 =>
