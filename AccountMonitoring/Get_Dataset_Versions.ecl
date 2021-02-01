@@ -461,12 +461,12 @@ EXPORT Get_Dataset_Versions(
 					LEFT.name,1,NOCASE)));
 
 		// Possible Litigious Debtors
-		PossLitDebt := PROJECT(FileServices.SuperFileContents(AccountMonitoring.product_files.litigiousdebtor.litigiousdebtor_filename),
+		PossLitDebt := PROJECT(FileServices.SuperFileContents(AccountMonitoring.product_files.litigiousdebtor.litigiousdebtor_superkey),
 			TRANSFORM(Final_Layout,
 				SELF.product := 'POSSLITDEBT',
 				SELF.subfile := '',
 				SELF.version := REGEXFIND(
-					'base::courtlink::(.*)::litdebt$',
+					'thor_data400::key::courtlink::(.*)::courtid_docket',
 					LEFT.name,1,NOCASE)));
 		
 		// Phones Feedback

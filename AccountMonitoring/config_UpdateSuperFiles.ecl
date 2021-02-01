@@ -147,6 +147,11 @@ end;
                       AccountMonitoring.product_files.Property.Property_SearchLinkid_keyname_monitor, //(monitor::LN_PropertyV2::search.linkids)
                       AccountMonitoring.types.productMask.property 
                     }
+                    ,{
+                      AccountMonitoring.product_files.litigiousdebtor.litigiousdebtor_Roxie_SuperFile, //(thor_data400::key::courtlink::qa::courtid_docket)
+                      AccountMonitoring.product_files.litigiousdebtor.litigiousdebtor_superkey_monitor, //(monitor::litigiousdebtor::courtid_docket)
+                      AccountMonitoring.types.productMask.litigiousdebtor
+                    }
             ],AccountMonitoring.layouts.UPDATE_SOURCE.roxie_monitor_superfile_layout);
                          
                               
