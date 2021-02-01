@@ -487,7 +487,7 @@ EXPORT fn_GetConsumerInstantIDRecs( DATASET(BusinessInstantID20_Services.layouts
          ret := JOIN(InstantIDResults, DenormAuthRepRecs , 
                   LEFT.seq = RIGHT.seq,
                         RetJoinTrans(LEFT,RIGHT), GROUPED           
-                  );
+                  , left outer);
 
 
 			targus := Royalty.RoyaltyTargus.GetOnlineRoyalties(UNGROUP(ret), src, TargusType, TRUE, FALSE, FALSE, TRUE);
