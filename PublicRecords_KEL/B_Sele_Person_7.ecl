@@ -1,18 +1,18 @@
-﻿//HPCC Systems KEL Compiler Version 1.5.0rc1
+//HPCC Systems KEL Compiler Version 1.5.0rc1
 IMPORT KEL15 AS KEL;
 IMPORT CFG_Compile,E_Business_Org,E_Business_Sele,E_Business_Sele_Overflow,E_Business_Ult,E_Person,E_Sele_Person,E_Surname,FN_Compile FROM PublicRecords_KEL;
 IMPORT * FROM KEL15.Null;
-EXPORT B_Sele_Person_7(CFG_Compile __cfg = CFG_Compile) := MODULE
-  SHARED VIRTUAL TYPEOF(E_Sele_Person(__cfg).__Result) __E_Sele_Person := E_Sele_Person(__cfg).__Result;
-  SHARED __EE5267866 := __E_Sele_Person;
-  EXPORT __ST258349_Layout := RECORD
+EXPORT B_Sele_Person_7(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG_Compile __cfg = CFG_Compile) := MODULE
+  SHARED VIRTUAL TYPEOF(E_Sele_Person(__in,__cfg).__Result) __E_Sele_Person := E_Sele_Person(__in,__cfg).__Result;
+  SHARED __EE5266649 := __E_Sele_Person;
+  EXPORT __ST256967_Layout := RECORD
     KEL.typ.ntyp(E_Business_Sele().Typ) Legal_;
     KEL.typ.ntyp(E_Person().Typ) Contact_;
     KEL.typ.nint Ult_I_D_;
     KEL.typ.nint Org_I_D_;
     KEL.typ.nint Sele_I_D_;
-    KEL.typ.ndataset(E_Sele_Person(__cfg).Contact_Info_Layout) Contact_Info_;
-    KEL.typ.ndataset(E_Sele_Person(__cfg).Data_Sources_Layout) Data_Sources_;
+    KEL.typ.ndataset(E_Sele_Person(__in,__cfg).Contact_Info_Layout) Contact_Info_;
+    KEL.typ.ndataset(E_Sele_Person(__in,__cfg).Data_Sources_Layout) Data_Sources_;
     KEL.typ.nkdate Assoc_Date_;
     KEL.typ.epoch Archive___Date_ := 0;
     KEL.typ.epoch Date_First_Seen_ := 0;
@@ -21,12 +21,12 @@ EXPORT B_Sele_Person_7(CFG_Compile __cfg = CFG_Compile) := MODULE
     KEL.typ.epoch Vault_Date_Last_Seen_ := 0;
     KEL.typ.int __RecordCount := 0;
   END;
-  SHARED __ST258349_Layout __ND5267830__Project(E_Sele_Person(__cfg).Layout __PP431169) := TRANSFORM
-    __EE5267805 := __PP431169.Contact_Info_;
-    __CC14610 := KEL.Routines.MinN(FN_Compile(__cfg).FN_G_E_T_B_U_I_L_D_D_A_T_E(__ECAST(KEL.typ.nstr,__CN('bip_build_version'))),__CN(__cfg.CurrentDate));
-    __EE5267825 := __PP431169.Contact_Info_;
-    SELF.Assoc_Date_ := IF(__T(__OP2(KEL.Aggregates.MaxNN(__EE5267805,KEL.era.ToDate(__T(__EE5267805).Date_Last_Seen_)),>,__CC14610)),__ECAST(KEL.typ.nkdate,__CC14610),__ECAST(KEL.typ.nkdate,KEL.Aggregates.MaxNN(__EE5267825,KEL.era.ToDate(__T(__EE5267825).Date_Last_Seen_))));
-    SELF := __PP431169;
+  SHARED __ST256967_Layout __ND5266613__Project(E_Sele_Person(__in,__cfg).Layout __PP429781) := TRANSFORM
+    __EE5266588 := __PP429781.Contact_Info_;
+    __CC13214 := KEL.Routines.MinN(FN_Compile(__cfg).FN_G_E_T_B_U_I_L_D_D_A_T_E(__ECAST(KEL.typ.nstr,__CN('bip_build_version'))),__CN(__cfg.CurrentDate));
+    __EE5266608 := __PP429781.Contact_Info_;
+    SELF.Assoc_Date_ := IF(__T(__OP2(KEL.Aggregates.MaxNN(__EE5266588,KEL.era.ToDate(__T(__EE5266588).Date_Last_Seen_)),>,__CC13214)),__ECAST(KEL.typ.nkdate,__CC13214),__ECAST(KEL.typ.nkdate,KEL.Aggregates.MaxNN(__EE5266608,KEL.era.ToDate(__T(__EE5266608).Date_Last_Seen_))));
+    SELF := __PP429781;
   END;
-  EXPORT __ENH_Sele_Person_7 := PROJECT(__EE5267866,__ND5267830__Project(LEFT));
+  EXPORT __ENH_Sele_Person_7 := PROJECT(__EE5266649,__ND5266613__Project(LEFT));
 END;

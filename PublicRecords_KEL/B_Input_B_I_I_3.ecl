@@ -1,11 +1,11 @@
-﻿//HPCC Systems KEL Compiler Version 1.5.0rc1
+//HPCC Systems KEL Compiler Version 1.5.0rc1
 IMPORT KEL15 AS KEL;
 IMPORT B_Input_B_I_I_4,CFG_Compile,E_Business_Org,E_Business_Sele,E_Business_Sele_Overflow,E_Business_Ult,FN_Compile FROM PublicRecords_KEL;
 IMPORT * FROM KEL15.Null;
-EXPORT B_Input_B_I_I_3(CFG_Compile __cfg = CFG_Compile) := MODULE
-  SHARED VIRTUAL TYPEOF(B_Input_B_I_I_4(__cfg).__ENH_Input_B_I_I_4) __ENH_Input_B_I_I_4 := B_Input_B_I_I_4(__cfg).__ENH_Input_B_I_I_4;
-  SHARED __EE5964941 := __ENH_Input_B_I_I_4;
-  EXPORT __ST226839_Layout := RECORD
+EXPORT B_Input_B_I_I_3(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG_Compile __cfg = CFG_Compile) := MODULE
+  SHARED VIRTUAL TYPEOF(B_Input_B_I_I_4(__in,__cfg).__ENH_Input_B_I_I_4) __ENH_Input_B_I_I_4 := B_Input_B_I_I_4(__in,__cfg).__ENH_Input_B_I_I_4;
+  SHARED __EE5963643 := __ENH_Input_B_I_I_4;
+  EXPORT __ST225496_Layout := RECORD
     KEL.typ.nuid UID;
     KEL.typ.ntyp(E_Business_Sele().Typ) Legal_;
     KEL.typ.nint G___Proc_Bus_U_I_D_;
@@ -106,13 +106,13 @@ EXPORT B_Input_B_I_I_3(CFG_Compile __cfg = CFG_Compile) := MODULE
     KEL.typ.epoch Vault_Date_Last_Seen_ := 0;
     KEL.typ.int __RecordCount := 0;
   END;
-  SHARED __ST226839_Layout __ND5965337__Project(B_Input_B_I_I_4(__cfg).__ST239649_Layout __PP5964942) := TRANSFORM
-    __CC14738 := '-99999';
-    __CC14743 := '-99998';
-    SELF.B___Inp_Cln_Addr_Full_Flag_Value_ := FN_Compile(__cfg).FN_Is_Clean_Populated(__ECAST(KEL.typ.nstr,__PP5964942.Bus_Input_Full_Address_Clean_Value_),__ECAST(KEL.typ.nstr,__CN(__CC14738)),__ECAST(KEL.typ.nstr,__CN(__CC14743)));
-    SELF.Email_Domain_ := __FN1(KEL.Routines.ToUpperCase,__FN3(KEL.Routines.SubStr2,__PP5964942.B___Inp_Email_,__OP2(__PP5964942.At_Position_,+,__CN(1)),__FN1(LENGTH,__PP5964942.B___Inp_Email_)));
-    SELF.Email_Username_ := __FN1(KEL.Routines.ToUpperCase,__FN3(KEL.Routines.SubStr2,__PP5964942.B___Inp_Email_,__CN(1),__OP2(__PP5964942.At_Position_,-,__CN(1))));
-    SELF := __PP5964942;
+  SHARED __ST225496_Layout __ND5964039__Project(B_Input_B_I_I_4(__in,__cfg).__ST238293_Layout __PP5963644) := TRANSFORM
+    __CC13342 := '-99999';
+    __CC13347 := '-99998';
+    SELF.B___Inp_Cln_Addr_Full_Flag_Value_ := FN_Compile(__cfg).FN_Is_Clean_Populated(__ECAST(KEL.typ.nstr,__PP5963644.Bus_Input_Full_Address_Clean_Value_),__ECAST(KEL.typ.nstr,__CN(__CC13342)),__ECAST(KEL.typ.nstr,__CN(__CC13347)));
+    SELF.Email_Domain_ := __FN1(KEL.Routines.ToUpperCase,__FN3(KEL.Routines.SubStr2,__PP5963644.B___Inp_Email_,__OP2(__PP5963644.At_Position_,+,__CN(1)),__FN1(LENGTH,__PP5963644.B___Inp_Email_)));
+    SELF.Email_Username_ := __FN1(KEL.Routines.ToUpperCase,__FN3(KEL.Routines.SubStr2,__PP5963644.B___Inp_Email_,__CN(1),__OP2(__PP5963644.At_Position_,-,__CN(1))));
+    SELF := __PP5963644;
   END;
-  EXPORT __ENH_Input_B_I_I_3 := PROJECT(__EE5964941,__ND5965337__Project(LEFT));
+  EXPORT __ENH_Input_B_I_I_3 := PROJECT(__EE5963643,__ND5964039__Project(LEFT));
 END;

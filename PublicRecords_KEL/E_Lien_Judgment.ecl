@@ -1,9 +1,9 @@
-﻿//HPCC Systems KEL Compiler Version 1.5.0rc1
+//HPCC Systems KEL Compiler Version 1.5.0rc1
 IMPORT KEL15 AS KEL;
 IMPORT PublicRecords_KEL;
 IMPORT CFG_Compile FROM PublicRecords_KEL;
 IMPORT * FROM KEL15.Null;
-EXPORT E_Lien_Judgment(CFG_Compile __cfg = CFG_Compile) := MODULE
+EXPORT E_Lien_Judgment(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG_Compile __cfg = CFG_Compile) := MODULE
   EXPORT Typ := KEL.typ.uid;
   EXPORT InLayout := RECORD
     KEL.typ.nuid UID;
@@ -48,40 +48,27 @@ EXPORT E_Lien_Judgment(CFG_Compile __cfg = CFG_Compile) := MODULE
   SHARED __Trimmed := RECORD, MAXLENGTH(5000)
     STRING KeyVal;
   END;
-  SHARED __d0_Trim := PROJECT(PublicRecords_KEL.Files.NonFCRA.LiensV2__Key_Liens_Main_ID_Vault,TRANSFORM(__Trimmed,SELF.KeyVal:=TRIM((STRING)LEFT.tmsid) + '|' + TRIM((STRING)LEFT.rmsid)));
-  SHARED __d1_Trim := PROJECT(PublicRecords_KEL.Files.FCRA.LiensV2__Key_Liens_Main_ID_FCRA_Vault,TRANSFORM(__Trimmed,SELF.KeyVal:=TRIM((STRING)LEFT.tmsid) + '|' + TRIM((STRING)LEFT.rmsid)));
-  EXPORT __All_Trim := __d0_Trim + __d1_Trim;
+  SHARED __d0_Trim := PROJECT(__in.Dataset_LiensV2_key_liens_main_ID_Records,TRANSFORM(__Trimmed,SELF.KeyVal:=TRIM((STRING)LEFT.tmsid) + '|' + TRIM((STRING)LEFT.rmsid)));
+  EXPORT __All_Trim := __d0_Trim;
   SHARED __TabRec := RECORD, MAXLENGTH(5000)
     __All_Trim.KeyVal;
     UNSIGNED4 Cnt := COUNT(GROUP);
     KEL.typ.uid UID := 0;
   END;
   SHARED __Table := TABLE(__All_Trim,__TabRec,KeyVal,MERGE);
-  EXPORT Lookup := PROJECT(__Table,TRANSFORM(__TabRec,SELF.UID:=COUNTER,SELF:=LEFT)) : PERSIST('~temp::KEL::PublicRecords_KEL::Lien_Judgment::UidLookup',EXPIRE(7));
-  EXPORT UID_IdToText := INDEX(Lookup,{UID},{Lookup},'~temp::KEL::IDtoT::PublicRecords_KEL::Lien_Judgment');
-  EXPORT UID_TextToId := INDEX(Lookup,{ht:=HASH32(KeyVal)},{Lookup},'~temp::KEL::TtoID::PublicRecords_KEL::Lien_Judgment');
-  EXPORT BuildAll := PARALLEL(BUILDINDEX(UID_IdToText,OVERWRITE),BUILDINDEX(UID_TextToId,OVERWRITE));
-  EXPORT GetText(KEL.typ.uid i) := UID_IdToText(UID=i)[1];
-  EXPORT GetId(STRING s) := UID_TextToId(ht=HASH32(s),KeyVal=s)[1];
+  SHARED __SortedTable := SORT(__Table,KeyVal);
+  EXPORT Lookup := PROJECT(__SortedTable,TRANSFORM(__TabRec,SELF.UID:=COUNTER,SELF:=LEFT));
   SHARED __Mapping0 := 'UID(DEFAULT:UID),tmsid(OVERRIDE:T_M_S_I_D_),rmsid(OVERRIDE:R_M_S_I_D_),filing_number(OVERRIDE:Filing_Number_:\'\'),orig_filing_number(OVERRIDE:Original_Filing_Number_:\'\'),filing_type_desc(OVERRIDE:Filing_Type_Description_:\'\'),amount(OVERRIDE:Amount_:\'\'),eviction(OVERRIDE:Landlord_Tenant_Dispute_Flag_:\'\'),certificate_number(OVERRIDE:Certificate_Number_:\'\'),irs_serial_number(OVERRIDE:I_R_S_Serial_Number_:\'\'),case_number(OVERRIDE:Case_Number_:\'\'),caselinkid(OVERRIDE:Case_Link_I_D_:\'\'),filing_book(OVERRIDE:Filing_Book_:\'\'),filing_page(OVERRIDE:Filing_Page_:\'\'),filing_state(OVERRIDE:Filing_State_:\'\'),filingstatusdescription(OVERRIDE:Filing_Status_Description_:\'\'),agencyid(OVERRIDE:Agency_I_D_:\'\'),agency(OVERRIDE:Agency_:\'\'),agency_county(OVERRIDE:Agency_County_:\'\'),agency_state(OVERRIDE:Agency_State_:\'\'),bcbflag(OVERRIDE:Sent_To_Credit_Bureau_Flag_),satisifaction_type(OVERRIDE:Satisfaction_Type_:\'\'),orig_filing_date(OVERRIDE:Original_Filing_Date_:DATE),collection_date(OVERRIDE:Collection_Date_:DATE),effective_date(OVERRIDE:Effective_Date_:DATE),expiration_date(OVERRIDE:Expiration_Date_:DATE),lapse_date(OVERRIDE:Lapse_Date_:0),process_date(OVERRIDE:Process_Date_:DATE),src(OVERRIDE:Source_:\'\'),archive_date(OVERRIDE:Archive___Date_:EPOCH),datefirstseen(DEFAULT:Date_First_Seen_:EPOCH),datelastseen(DEFAULT:Date_Last_Seen_:EPOCH),hybridarchivedate(DEFAULT:Hybrid_Archive_Date_:EPOCH),vaultdatelastseen(DEFAULT:Vault_Date_Last_Seen_:EPOCH),DPMBitmap(OVERRIDE:__Permits:PERMITS)';
+  SHARED __d0_Norm := NORMALIZE(__in,LEFT.Dataset_LiensV2_key_liens_main_ID_Records,TRANSFORM(RECORDOF(__in.Dataset_LiensV2_key_liens_main_ID_Records),SELF:=RIGHT));
   SHARED __d0_Out := RECORD
-    RECORDOF(PublicRecords_KEL.Files.NonFCRA.LiensV2__Key_Liens_Main_ID_Vault);
+    RECORDOF(PublicRecords_KEL.ECL_Functions.Dataset_FDC.Dataset_LiensV2_key_liens_main_ID_Records);
     KEL.typ.uid UID := 0;
   END;
-  SHARED __d0_UID_Mapped := JOIN(PublicRecords_KEL.Files.NonFCRA.LiensV2__Key_Liens_Main_ID_Vault,Lookup,TRIM((STRING)LEFT.tmsid) + '|' + TRIM((STRING)LEFT.rmsid) = RIGHT.KeyVal,TRANSFORM(__d0_Out,SELF.UID:=RIGHT.UID,SELF:=LEFT),SMART);
-  EXPORT PublicRecords_KEL_Files_NonFCRA_LiensV2__Key_Liens_Main_ID_Vault_Invalid := __d0_UID_Mapped(UID = 0);
+  SHARED __d0_UID_Mapped := JOIN(__d0_Norm,Lookup,TRIM((STRING)LEFT.tmsid) + '|' + TRIM((STRING)LEFT.rmsid) = RIGHT.KeyVal,TRANSFORM(__d0_Out,SELF.UID:=RIGHT.UID,SELF:=LEFT),SMART);
+  EXPORT PublicRecords_KEL_ECL_Functions_Dataset_FDC_Dataset_LiensV2_key_liens_main_ID_Records_Invalid := __d0_UID_Mapped(UID = 0);
   SHARED __d0_Prefiltered := __d0_UID_Mapped(UID <> 0);
-  SHARED __d0 := __SourceFilter(KEL.FromFlat.Convert(__d0_Prefiltered,InLayout,__Mapping0,'PublicRecords_KEL.Files.NonFCRA.LiensV2__Key_Liens_Main_ID_Vault'));
-  SHARED __Mapping1 := 'UID(DEFAULT:UID),tmsid(OVERRIDE:T_M_S_I_D_),rmsid(OVERRIDE:R_M_S_I_D_),filing_number(OVERRIDE:Filing_Number_:\'\'),orig_filing_number(OVERRIDE:Original_Filing_Number_:\'\'),filing_type_desc(OVERRIDE:Filing_Type_Description_:\'\'),amount(OVERRIDE:Amount_:\'\'),eviction(OVERRIDE:Landlord_Tenant_Dispute_Flag_:\'\'),certificate_number(OVERRIDE:Certificate_Number_:\'\'),irs_serial_number(OVERRIDE:I_R_S_Serial_Number_:\'\'),case_number(OVERRIDE:Case_Number_:\'\'),caselinkid(OVERRIDE:Case_Link_I_D_:\'\'),filing_book(OVERRIDE:Filing_Book_:\'\'),filing_page(OVERRIDE:Filing_Page_:\'\'),filing_state(OVERRIDE:Filing_State_:\'\'),filingstatusdescription(OVERRIDE:Filing_Status_Description_:\'\'),agencyid(OVERRIDE:Agency_I_D_:\'\'),agency(OVERRIDE:Agency_:\'\'),agency_county(OVERRIDE:Agency_County_:\'\'),agency_state(OVERRIDE:Agency_State_:\'\'),bcbflag(OVERRIDE:Sent_To_Credit_Bureau_Flag_),satisifaction_type(OVERRIDE:Satisfaction_Type_:\'\'),orig_filing_date(OVERRIDE:Original_Filing_Date_:DATE),collection_date(OVERRIDE:Collection_Date_:DATE),effective_date(OVERRIDE:Effective_Date_:DATE),expiration_date(OVERRIDE:Expiration_Date_:DATE),lapse_date(OVERRIDE:Lapse_Date_:0),process_date(OVERRIDE:Process_Date_:DATE),src(OVERRIDE:Source_:\'\'),archive_date(OVERRIDE:Archive___Date_:EPOCH),datefirstseen(DEFAULT:Date_First_Seen_:EPOCH),datelastseen(DEFAULT:Date_Last_Seen_:EPOCH),hybridarchivedate(DEFAULT:Hybrid_Archive_Date_:EPOCH),vaultdatelastseen(DEFAULT:Vault_Date_Last_Seen_:EPOCH),DPMBitmap(OVERRIDE:__Permits:PERMITS)';
-  SHARED __d1_Out := RECORD
-    RECORDOF(PublicRecords_KEL.Files.FCRA.LiensV2__Key_Liens_Main_ID_FCRA_Vault);
-    KEL.typ.uid UID := 0;
-  END;
-  SHARED __d1_UID_Mapped := JOIN(PublicRecords_KEL.Files.FCRA.LiensV2__Key_Liens_Main_ID_FCRA_Vault,Lookup,TRIM((STRING)LEFT.tmsid) + '|' + TRIM((STRING)LEFT.rmsid) = RIGHT.KeyVal,TRANSFORM(__d1_Out,SELF.UID:=RIGHT.UID,SELF:=LEFT),SMART);
-  EXPORT PublicRecords_KEL_Files_FCRA_LiensV2__Key_Liens_Main_ID_FCRA_Vault_Invalid := __d1_UID_Mapped(UID = 0);
-  SHARED __d1_Prefiltered := __d1_UID_Mapped(UID <> 0);
-  SHARED __d1 := __SourceFilter(KEL.FromFlat.Convert(__d1_Prefiltered,InLayout,__Mapping1,'PublicRecords_KEL.Files.FCRA.LiensV2__Key_Liens_Main_ID_FCRA_Vault'));
-  EXPORT InData := __d0 + __d1;
+  SHARED __d0 := __SourceFilter(KEL.FromFlat.Convert(__d0_Prefiltered,InLayout,__Mapping0,'PublicRecords_KEL.ECL_Functions.Dataset_FDC'));
+  EXPORT InData := __d0;
   EXPORT Filing_Layout := RECORD
     KEL.typ.nstr Filing_Number_;
     KEL.typ.nstr Original_Filing_Number_;
@@ -201,75 +188,41 @@ EXPORT E_Lien_Judgment(CFG_Compile __cfg = CFG_Compile) := MODULE
   EXPORT Case_Number__SingleValue_Invalid := KEL.Intake.DetectMultipleValuesOnResult(Result,Case_Number_);
   EXPORT Case_Link_I_D__SingleValue_Invalid := KEL.Intake.DetectMultipleValuesOnResult(Result,Case_Link_I_D_);
   EXPORT Certificate_Number__SingleValue_Invalid := KEL.Intake.DetectMultipleValuesOnResult(Result,Certificate_Number_);
-  EXPORT SanityCheck := DATASET([{COUNT(PublicRecords_KEL_Files_NonFCRA_LiensV2__Key_Liens_Main_ID_Vault_Invalid),COUNT(PublicRecords_KEL_Files_FCRA_LiensV2__Key_Liens_Main_ID_FCRA_Vault_Invalid),COUNT(T_M_S_I_D__SingleValue_Invalid),COUNT(R_M_S_I_D__SingleValue_Invalid),COUNT(Agency_I_D__SingleValue_Invalid),COUNT(Agency__SingleValue_Invalid),COUNT(Agency_County__SingleValue_Invalid),COUNT(Agency_State__SingleValue_Invalid),COUNT(Sent_To_Credit_Bureau_Flag__SingleValue_Invalid),COUNT(I_R_S_Serial_Number__SingleValue_Invalid),COUNT(Case_Number__SingleValue_Invalid),COUNT(Case_Link_I_D__SingleValue_Invalid),COUNT(Certificate_Number__SingleValue_Invalid),TopSourcedUIDs(1)}],{KEL.typ.int PublicRecords_KEL_Files_NonFCRA_LiensV2__Key_Liens_Main_ID_Vault_Invalid,KEL.typ.int PublicRecords_KEL_Files_FCRA_LiensV2__Key_Liens_Main_ID_FCRA_Vault_Invalid,KEL.typ.int T_M_S_I_D__SingleValue_Invalid,KEL.typ.int R_M_S_I_D__SingleValue_Invalid,KEL.typ.int Agency_I_D__SingleValue_Invalid,KEL.typ.int Agency__SingleValue_Invalid,KEL.typ.int Agency_County__SingleValue_Invalid,KEL.typ.int Agency_State__SingleValue_Invalid,KEL.typ.int Sent_To_Credit_Bureau_Flag__SingleValue_Invalid,KEL.typ.int I_R_S_Serial_Number__SingleValue_Invalid,KEL.typ.int Case_Number__SingleValue_Invalid,KEL.typ.int Case_Link_I_D__SingleValue_Invalid,KEL.typ.int Certificate_Number__SingleValue_Invalid,DATASET(RECORDOF(UIDSourceCounts)) topSourcedUID});
+  EXPORT SanityCheck := DATASET([{COUNT(PublicRecords_KEL_ECL_Functions_Dataset_FDC_Dataset_LiensV2_key_liens_main_ID_Records_Invalid),COUNT(T_M_S_I_D__SingleValue_Invalid),COUNT(R_M_S_I_D__SingleValue_Invalid),COUNT(Agency_I_D__SingleValue_Invalid),COUNT(Agency__SingleValue_Invalid),COUNT(Agency_County__SingleValue_Invalid),COUNT(Agency_State__SingleValue_Invalid),COUNT(Sent_To_Credit_Bureau_Flag__SingleValue_Invalid),COUNT(I_R_S_Serial_Number__SingleValue_Invalid),COUNT(Case_Number__SingleValue_Invalid),COUNT(Case_Link_I_D__SingleValue_Invalid),COUNT(Certificate_Number__SingleValue_Invalid),TopSourcedUIDs(1)}],{KEL.typ.int PublicRecords_KEL_ECL_Functions_Dataset_FDC_Dataset_LiensV2_key_liens_main_ID_Records_Invalid,KEL.typ.int T_M_S_I_D__SingleValue_Invalid,KEL.typ.int R_M_S_I_D__SingleValue_Invalid,KEL.typ.int Agency_I_D__SingleValue_Invalid,KEL.typ.int Agency__SingleValue_Invalid,KEL.typ.int Agency_County__SingleValue_Invalid,KEL.typ.int Agency_State__SingleValue_Invalid,KEL.typ.int Sent_To_Credit_Bureau_Flag__SingleValue_Invalid,KEL.typ.int I_R_S_Serial_Number__SingleValue_Invalid,KEL.typ.int Case_Number__SingleValue_Invalid,KEL.typ.int Case_Link_I_D__SingleValue_Invalid,KEL.typ.int Certificate_Number__SingleValue_Invalid,DATASET(RECORDOF(UIDSourceCounts)) topSourcedUID});
   EXPORT NullCounts := DATASET([
-    {'LienJudgment','PublicRecords_KEL.Files.NonFCRA.LiensV2__Key_Liens_Main_ID_Vault','UID',COUNT(PublicRecords_KEL_Files_NonFCRA_LiensV2__Key_Liens_Main_ID_Vault_Invalid),COUNT(__d0)},
-    {'LienJudgment','PublicRecords_KEL.Files.NonFCRA.LiensV2__Key_Liens_Main_ID_Vault','tmsid',COUNT(__d0(__NL(T_M_S_I_D_))),COUNT(__d0(__NN(T_M_S_I_D_)))},
-    {'LienJudgment','PublicRecords_KEL.Files.NonFCRA.LiensV2__Key_Liens_Main_ID_Vault','rmsid',COUNT(__d0(__NL(R_M_S_I_D_))),COUNT(__d0(__NN(R_M_S_I_D_)))},
-    {'LienJudgment','PublicRecords_KEL.Files.NonFCRA.LiensV2__Key_Liens_Main_ID_Vault','filing_number',COUNT(__d0(__NL(Filing_Number_))),COUNT(__d0(__NN(Filing_Number_)))},
-    {'LienJudgment','PublicRecords_KEL.Files.NonFCRA.LiensV2__Key_Liens_Main_ID_Vault','orig_filing_number',COUNT(__d0(__NL(Original_Filing_Number_))),COUNT(__d0(__NN(Original_Filing_Number_)))},
-    {'LienJudgment','PublicRecords_KEL.Files.NonFCRA.LiensV2__Key_Liens_Main_ID_Vault','filing_type_desc',COUNT(__d0(__NL(Filing_Type_Description_))),COUNT(__d0(__NN(Filing_Type_Description_)))},
-    {'LienJudgment','PublicRecords_KEL.Files.NonFCRA.LiensV2__Key_Liens_Main_ID_Vault','amount',COUNT(__d0(__NL(Amount_))),COUNT(__d0(__NN(Amount_)))},
-    {'LienJudgment','PublicRecords_KEL.Files.NonFCRA.LiensV2__Key_Liens_Main_ID_Vault','eviction',COUNT(__d0(__NL(Landlord_Tenant_Dispute_Flag_))),COUNT(__d0(__NN(Landlord_Tenant_Dispute_Flag_)))},
-    {'LienJudgment','PublicRecords_KEL.Files.NonFCRA.LiensV2__Key_Liens_Main_ID_Vault','certificate_number',COUNT(__d0(__NL(Certificate_Number_))),COUNT(__d0(__NN(Certificate_Number_)))},
-    {'LienJudgment','PublicRecords_KEL.Files.NonFCRA.LiensV2__Key_Liens_Main_ID_Vault','irs_serial_number',COUNT(__d0(__NL(I_R_S_Serial_Number_))),COUNT(__d0(__NN(I_R_S_Serial_Number_)))},
-    {'LienJudgment','PublicRecords_KEL.Files.NonFCRA.LiensV2__Key_Liens_Main_ID_Vault','case_number',COUNT(__d0(__NL(Case_Number_))),COUNT(__d0(__NN(Case_Number_)))},
-    {'LienJudgment','PublicRecords_KEL.Files.NonFCRA.LiensV2__Key_Liens_Main_ID_Vault','caselinkid',COUNT(__d0(__NL(Case_Link_I_D_))),COUNT(__d0(__NN(Case_Link_I_D_)))},
-    {'LienJudgment','PublicRecords_KEL.Files.NonFCRA.LiensV2__Key_Liens_Main_ID_Vault','filing_book',COUNT(__d0(__NL(Filing_Book_))),COUNT(__d0(__NN(Filing_Book_)))},
-    {'LienJudgment','PublicRecords_KEL.Files.NonFCRA.LiensV2__Key_Liens_Main_ID_Vault','filing_page',COUNT(__d0(__NL(Filing_Page_))),COUNT(__d0(__NN(Filing_Page_)))},
-    {'LienJudgment','PublicRecords_KEL.Files.NonFCRA.LiensV2__Key_Liens_Main_ID_Vault','filing_state',COUNT(__d0(__NL(Filing_State_))),COUNT(__d0(__NN(Filing_State_)))},
-    {'LienJudgment','PublicRecords_KEL.Files.NonFCRA.LiensV2__Key_Liens_Main_ID_Vault','filingstatusdescription',COUNT(__d0(__NL(Filing_Status_Description_))),COUNT(__d0(__NN(Filing_Status_Description_)))},
-    {'LienJudgment','PublicRecords_KEL.Files.NonFCRA.LiensV2__Key_Liens_Main_ID_Vault','agencyid',COUNT(__d0(__NL(Agency_I_D_))),COUNT(__d0(__NN(Agency_I_D_)))},
-    {'LienJudgment','PublicRecords_KEL.Files.NonFCRA.LiensV2__Key_Liens_Main_ID_Vault','agency',COUNT(__d0(__NL(Agency_))),COUNT(__d0(__NN(Agency_)))},
-    {'LienJudgment','PublicRecords_KEL.Files.NonFCRA.LiensV2__Key_Liens_Main_ID_Vault','agency_county',COUNT(__d0(__NL(Agency_County_))),COUNT(__d0(__NN(Agency_County_)))},
-    {'LienJudgment','PublicRecords_KEL.Files.NonFCRA.LiensV2__Key_Liens_Main_ID_Vault','agency_state',COUNT(__d0(__NL(Agency_State_))),COUNT(__d0(__NN(Agency_State_)))},
-    {'LienJudgment','PublicRecords_KEL.Files.NonFCRA.LiensV2__Key_Liens_Main_ID_Vault','bcbflag',COUNT(__d0(__NL(Sent_To_Credit_Bureau_Flag_))),COUNT(__d0(__NN(Sent_To_Credit_Bureau_Flag_)))},
-    {'LienJudgment','PublicRecords_KEL.Files.NonFCRA.LiensV2__Key_Liens_Main_ID_Vault','satisifaction_type',COUNT(__d0(__NL(Satisfaction_Type_))),COUNT(__d0(__NN(Satisfaction_Type_)))},
-    {'LienJudgment','PublicRecords_KEL.Files.NonFCRA.LiensV2__Key_Liens_Main_ID_Vault','orig_filing_date',COUNT(__d0(__NL(Original_Filing_Date_))),COUNT(__d0(__NN(Original_Filing_Date_)))},
-    {'LienJudgment','PublicRecords_KEL.Files.NonFCRA.LiensV2__Key_Liens_Main_ID_Vault','collection_date',COUNT(__d0(__NL(Collection_Date_))),COUNT(__d0(__NN(Collection_Date_)))},
-    {'LienJudgment','PublicRecords_KEL.Files.NonFCRA.LiensV2__Key_Liens_Main_ID_Vault','effective_date',COUNT(__d0(__NL(Effective_Date_))),COUNT(__d0(__NN(Effective_Date_)))},
-    {'LienJudgment','PublicRecords_KEL.Files.NonFCRA.LiensV2__Key_Liens_Main_ID_Vault','expiration_date',COUNT(__d0(__NL(Expiration_Date_))),COUNT(__d0(__NN(Expiration_Date_)))},
-    {'LienJudgment','PublicRecords_KEL.Files.NonFCRA.LiensV2__Key_Liens_Main_ID_Vault','lapse_date',COUNT(__d0(__NL(Lapse_Date_))),COUNT(__d0(__NN(Lapse_Date_)))},
-    {'LienJudgment','PublicRecords_KEL.Files.NonFCRA.LiensV2__Key_Liens_Main_ID_Vault','process_date',COUNT(__d0(__NL(Process_Date_))),COUNT(__d0(__NN(Process_Date_)))},
-    {'LienJudgment','PublicRecords_KEL.Files.NonFCRA.LiensV2__Key_Liens_Main_ID_Vault','src',COUNT(__d0(__NL(Source_))),COUNT(__d0(__NN(Source_)))},
-    {'LienJudgment','PublicRecords_KEL.Files.NonFCRA.LiensV2__Key_Liens_Main_ID_Vault','Archive_Date',COUNT(__d0(Archive___Date_=0)),COUNT(__d0(Archive___Date_!=0))},
-    {'LienJudgment','PublicRecords_KEL.Files.NonFCRA.LiensV2__Key_Liens_Main_ID_Vault','DateFirstSeen',COUNT(__d0(Date_First_Seen_=0)),COUNT(__d0(Date_First_Seen_!=0))},
-    {'LienJudgment','PublicRecords_KEL.Files.NonFCRA.LiensV2__Key_Liens_Main_ID_Vault','DateLastSeen',COUNT(__d0(Date_Last_Seen_=0)),COUNT(__d0(Date_Last_Seen_!=0))},
-    {'LienJudgment','PublicRecords_KEL.Files.NonFCRA.LiensV2__Key_Liens_Main_ID_Vault','HybridArchiveDate',COUNT(__d0(Hybrid_Archive_Date_=0)),COUNT(__d0(Hybrid_Archive_Date_!=0))},
-    {'LienJudgment','PublicRecords_KEL.Files.NonFCRA.LiensV2__Key_Liens_Main_ID_Vault','VaultDateLastSeen',COUNT(__d0(Vault_Date_Last_Seen_=0)),COUNT(__d0(Vault_Date_Last_Seen_!=0))},
-    {'LienJudgment','PublicRecords_KEL.Files.FCRA.LiensV2__Key_Liens_Main_ID_FCRA_Vault','UID',COUNT(PublicRecords_KEL_Files_FCRA_LiensV2__Key_Liens_Main_ID_FCRA_Vault_Invalid),COUNT(__d1)},
-    {'LienJudgment','PublicRecords_KEL.Files.FCRA.LiensV2__Key_Liens_Main_ID_FCRA_Vault','tmsid',COUNT(__d1(__NL(T_M_S_I_D_))),COUNT(__d1(__NN(T_M_S_I_D_)))},
-    {'LienJudgment','PublicRecords_KEL.Files.FCRA.LiensV2__Key_Liens_Main_ID_FCRA_Vault','rmsid',COUNT(__d1(__NL(R_M_S_I_D_))),COUNT(__d1(__NN(R_M_S_I_D_)))},
-    {'LienJudgment','PublicRecords_KEL.Files.FCRA.LiensV2__Key_Liens_Main_ID_FCRA_Vault','filing_number',COUNT(__d1(__NL(Filing_Number_))),COUNT(__d1(__NN(Filing_Number_)))},
-    {'LienJudgment','PublicRecords_KEL.Files.FCRA.LiensV2__Key_Liens_Main_ID_FCRA_Vault','orig_filing_number',COUNT(__d1(__NL(Original_Filing_Number_))),COUNT(__d1(__NN(Original_Filing_Number_)))},
-    {'LienJudgment','PublicRecords_KEL.Files.FCRA.LiensV2__Key_Liens_Main_ID_FCRA_Vault','filing_type_desc',COUNT(__d1(__NL(Filing_Type_Description_))),COUNT(__d1(__NN(Filing_Type_Description_)))},
-    {'LienJudgment','PublicRecords_KEL.Files.FCRA.LiensV2__Key_Liens_Main_ID_FCRA_Vault','amount',COUNT(__d1(__NL(Amount_))),COUNT(__d1(__NN(Amount_)))},
-    {'LienJudgment','PublicRecords_KEL.Files.FCRA.LiensV2__Key_Liens_Main_ID_FCRA_Vault','eviction',COUNT(__d1(__NL(Landlord_Tenant_Dispute_Flag_))),COUNT(__d1(__NN(Landlord_Tenant_Dispute_Flag_)))},
-    {'LienJudgment','PublicRecords_KEL.Files.FCRA.LiensV2__Key_Liens_Main_ID_FCRA_Vault','certificate_number',COUNT(__d1(__NL(Certificate_Number_))),COUNT(__d1(__NN(Certificate_Number_)))},
-    {'LienJudgment','PublicRecords_KEL.Files.FCRA.LiensV2__Key_Liens_Main_ID_FCRA_Vault','irs_serial_number',COUNT(__d1(__NL(I_R_S_Serial_Number_))),COUNT(__d1(__NN(I_R_S_Serial_Number_)))},
-    {'LienJudgment','PublicRecords_KEL.Files.FCRA.LiensV2__Key_Liens_Main_ID_FCRA_Vault','case_number',COUNT(__d1(__NL(Case_Number_))),COUNT(__d1(__NN(Case_Number_)))},
-    {'LienJudgment','PublicRecords_KEL.Files.FCRA.LiensV2__Key_Liens_Main_ID_FCRA_Vault','caselinkid',COUNT(__d1(__NL(Case_Link_I_D_))),COUNT(__d1(__NN(Case_Link_I_D_)))},
-    {'LienJudgment','PublicRecords_KEL.Files.FCRA.LiensV2__Key_Liens_Main_ID_FCRA_Vault','filing_book',COUNT(__d1(__NL(Filing_Book_))),COUNT(__d1(__NN(Filing_Book_)))},
-    {'LienJudgment','PublicRecords_KEL.Files.FCRA.LiensV2__Key_Liens_Main_ID_FCRA_Vault','filing_page',COUNT(__d1(__NL(Filing_Page_))),COUNT(__d1(__NN(Filing_Page_)))},
-    {'LienJudgment','PublicRecords_KEL.Files.FCRA.LiensV2__Key_Liens_Main_ID_FCRA_Vault','filing_state',COUNT(__d1(__NL(Filing_State_))),COUNT(__d1(__NN(Filing_State_)))},
-    {'LienJudgment','PublicRecords_KEL.Files.FCRA.LiensV2__Key_Liens_Main_ID_FCRA_Vault','filingstatusdescription',COUNT(__d1(__NL(Filing_Status_Description_))),COUNT(__d1(__NN(Filing_Status_Description_)))},
-    {'LienJudgment','PublicRecords_KEL.Files.FCRA.LiensV2__Key_Liens_Main_ID_FCRA_Vault','agencyid',COUNT(__d1(__NL(Agency_I_D_))),COUNT(__d1(__NN(Agency_I_D_)))},
-    {'LienJudgment','PublicRecords_KEL.Files.FCRA.LiensV2__Key_Liens_Main_ID_FCRA_Vault','agency',COUNT(__d1(__NL(Agency_))),COUNT(__d1(__NN(Agency_)))},
-    {'LienJudgment','PublicRecords_KEL.Files.FCRA.LiensV2__Key_Liens_Main_ID_FCRA_Vault','agency_county',COUNT(__d1(__NL(Agency_County_))),COUNT(__d1(__NN(Agency_County_)))},
-    {'LienJudgment','PublicRecords_KEL.Files.FCRA.LiensV2__Key_Liens_Main_ID_FCRA_Vault','agency_state',COUNT(__d1(__NL(Agency_State_))),COUNT(__d1(__NN(Agency_State_)))},
-    {'LienJudgment','PublicRecords_KEL.Files.FCRA.LiensV2__Key_Liens_Main_ID_FCRA_Vault','bcbflag',COUNT(__d1(__NL(Sent_To_Credit_Bureau_Flag_))),COUNT(__d1(__NN(Sent_To_Credit_Bureau_Flag_)))},
-    {'LienJudgment','PublicRecords_KEL.Files.FCRA.LiensV2__Key_Liens_Main_ID_FCRA_Vault','satisifaction_type',COUNT(__d1(__NL(Satisfaction_Type_))),COUNT(__d1(__NN(Satisfaction_Type_)))},
-    {'LienJudgment','PublicRecords_KEL.Files.FCRA.LiensV2__Key_Liens_Main_ID_FCRA_Vault','orig_filing_date',COUNT(__d1(__NL(Original_Filing_Date_))),COUNT(__d1(__NN(Original_Filing_Date_)))},
-    {'LienJudgment','PublicRecords_KEL.Files.FCRA.LiensV2__Key_Liens_Main_ID_FCRA_Vault','collection_date',COUNT(__d1(__NL(Collection_Date_))),COUNT(__d1(__NN(Collection_Date_)))},
-    {'LienJudgment','PublicRecords_KEL.Files.FCRA.LiensV2__Key_Liens_Main_ID_FCRA_Vault','effective_date',COUNT(__d1(__NL(Effective_Date_))),COUNT(__d1(__NN(Effective_Date_)))},
-    {'LienJudgment','PublicRecords_KEL.Files.FCRA.LiensV2__Key_Liens_Main_ID_FCRA_Vault','expiration_date',COUNT(__d1(__NL(Expiration_Date_))),COUNT(__d1(__NN(Expiration_Date_)))},
-    {'LienJudgment','PublicRecords_KEL.Files.FCRA.LiensV2__Key_Liens_Main_ID_FCRA_Vault','lapse_date',COUNT(__d1(__NL(Lapse_Date_))),COUNT(__d1(__NN(Lapse_Date_)))},
-    {'LienJudgment','PublicRecords_KEL.Files.FCRA.LiensV2__Key_Liens_Main_ID_FCRA_Vault','process_date',COUNT(__d1(__NL(Process_Date_))),COUNT(__d1(__NN(Process_Date_)))},
-    {'LienJudgment','PublicRecords_KEL.Files.FCRA.LiensV2__Key_Liens_Main_ID_FCRA_Vault','src',COUNT(__d1(__NL(Source_))),COUNT(__d1(__NN(Source_)))},
-    {'LienJudgment','PublicRecords_KEL.Files.FCRA.LiensV2__Key_Liens_Main_ID_FCRA_Vault','Archive_Date',COUNT(__d1(Archive___Date_=0)),COUNT(__d1(Archive___Date_!=0))},
-    {'LienJudgment','PublicRecords_KEL.Files.FCRA.LiensV2__Key_Liens_Main_ID_FCRA_Vault','DateFirstSeen',COUNT(__d1(Date_First_Seen_=0)),COUNT(__d1(Date_First_Seen_!=0))},
-    {'LienJudgment','PublicRecords_KEL.Files.FCRA.LiensV2__Key_Liens_Main_ID_FCRA_Vault','DateLastSeen',COUNT(__d1(Date_Last_Seen_=0)),COUNT(__d1(Date_Last_Seen_!=0))},
-    {'LienJudgment','PublicRecords_KEL.Files.FCRA.LiensV2__Key_Liens_Main_ID_FCRA_Vault','HybridArchiveDate',COUNT(__d1(Hybrid_Archive_Date_=0)),COUNT(__d1(Hybrid_Archive_Date_!=0))},
-    {'LienJudgment','PublicRecords_KEL.Files.FCRA.LiensV2__Key_Liens_Main_ID_FCRA_Vault','VaultDateLastSeen',COUNT(__d1(Vault_Date_Last_Seen_=0)),COUNT(__d1(Vault_Date_Last_Seen_!=0))}]
+    {'LienJudgment','PublicRecords_KEL.ECL_Functions.Dataset_FDC','UID',COUNT(PublicRecords_KEL_ECL_Functions_Dataset_FDC_Dataset_LiensV2_key_liens_main_ID_Records_Invalid),COUNT(__d0)},
+    {'LienJudgment','PublicRecords_KEL.ECL_Functions.Dataset_FDC','tmsid',COUNT(__d0(__NL(T_M_S_I_D_))),COUNT(__d0(__NN(T_M_S_I_D_)))},
+    {'LienJudgment','PublicRecords_KEL.ECL_Functions.Dataset_FDC','rmsid',COUNT(__d0(__NL(R_M_S_I_D_))),COUNT(__d0(__NN(R_M_S_I_D_)))},
+    {'LienJudgment','PublicRecords_KEL.ECL_Functions.Dataset_FDC','filing_number',COUNT(__d0(__NL(Filing_Number_))),COUNT(__d0(__NN(Filing_Number_)))},
+    {'LienJudgment','PublicRecords_KEL.ECL_Functions.Dataset_FDC','orig_filing_number',COUNT(__d0(__NL(Original_Filing_Number_))),COUNT(__d0(__NN(Original_Filing_Number_)))},
+    {'LienJudgment','PublicRecords_KEL.ECL_Functions.Dataset_FDC','filing_type_desc',COUNT(__d0(__NL(Filing_Type_Description_))),COUNT(__d0(__NN(Filing_Type_Description_)))},
+    {'LienJudgment','PublicRecords_KEL.ECL_Functions.Dataset_FDC','amount',COUNT(__d0(__NL(Amount_))),COUNT(__d0(__NN(Amount_)))},
+    {'LienJudgment','PublicRecords_KEL.ECL_Functions.Dataset_FDC','eviction',COUNT(__d0(__NL(Landlord_Tenant_Dispute_Flag_))),COUNT(__d0(__NN(Landlord_Tenant_Dispute_Flag_)))},
+    {'LienJudgment','PublicRecords_KEL.ECL_Functions.Dataset_FDC','certificate_number',COUNT(__d0(__NL(Certificate_Number_))),COUNT(__d0(__NN(Certificate_Number_)))},
+    {'LienJudgment','PublicRecords_KEL.ECL_Functions.Dataset_FDC','irs_serial_number',COUNT(__d0(__NL(I_R_S_Serial_Number_))),COUNT(__d0(__NN(I_R_S_Serial_Number_)))},
+    {'LienJudgment','PublicRecords_KEL.ECL_Functions.Dataset_FDC','case_number',COUNT(__d0(__NL(Case_Number_))),COUNT(__d0(__NN(Case_Number_)))},
+    {'LienJudgment','PublicRecords_KEL.ECL_Functions.Dataset_FDC','caselinkid',COUNT(__d0(__NL(Case_Link_I_D_))),COUNT(__d0(__NN(Case_Link_I_D_)))},
+    {'LienJudgment','PublicRecords_KEL.ECL_Functions.Dataset_FDC','filing_book',COUNT(__d0(__NL(Filing_Book_))),COUNT(__d0(__NN(Filing_Book_)))},
+    {'LienJudgment','PublicRecords_KEL.ECL_Functions.Dataset_FDC','filing_page',COUNT(__d0(__NL(Filing_Page_))),COUNT(__d0(__NN(Filing_Page_)))},
+    {'LienJudgment','PublicRecords_KEL.ECL_Functions.Dataset_FDC','filing_state',COUNT(__d0(__NL(Filing_State_))),COUNT(__d0(__NN(Filing_State_)))},
+    {'LienJudgment','PublicRecords_KEL.ECL_Functions.Dataset_FDC','filingstatusdescription',COUNT(__d0(__NL(Filing_Status_Description_))),COUNT(__d0(__NN(Filing_Status_Description_)))},
+    {'LienJudgment','PublicRecords_KEL.ECL_Functions.Dataset_FDC','agencyid',COUNT(__d0(__NL(Agency_I_D_))),COUNT(__d0(__NN(Agency_I_D_)))},
+    {'LienJudgment','PublicRecords_KEL.ECL_Functions.Dataset_FDC','agency',COUNT(__d0(__NL(Agency_))),COUNT(__d0(__NN(Agency_)))},
+    {'LienJudgment','PublicRecords_KEL.ECL_Functions.Dataset_FDC','agency_county',COUNT(__d0(__NL(Agency_County_))),COUNT(__d0(__NN(Agency_County_)))},
+    {'LienJudgment','PublicRecords_KEL.ECL_Functions.Dataset_FDC','agency_state',COUNT(__d0(__NL(Agency_State_))),COUNT(__d0(__NN(Agency_State_)))},
+    {'LienJudgment','PublicRecords_KEL.ECL_Functions.Dataset_FDC','bcbflag',COUNT(__d0(__NL(Sent_To_Credit_Bureau_Flag_))),COUNT(__d0(__NN(Sent_To_Credit_Bureau_Flag_)))},
+    {'LienJudgment','PublicRecords_KEL.ECL_Functions.Dataset_FDC','satisifaction_type',COUNT(__d0(__NL(Satisfaction_Type_))),COUNT(__d0(__NN(Satisfaction_Type_)))},
+    {'LienJudgment','PublicRecords_KEL.ECL_Functions.Dataset_FDC','orig_filing_date',COUNT(__d0(__NL(Original_Filing_Date_))),COUNT(__d0(__NN(Original_Filing_Date_)))},
+    {'LienJudgment','PublicRecords_KEL.ECL_Functions.Dataset_FDC','collection_date',COUNT(__d0(__NL(Collection_Date_))),COUNT(__d0(__NN(Collection_Date_)))},
+    {'LienJudgment','PublicRecords_KEL.ECL_Functions.Dataset_FDC','effective_date',COUNT(__d0(__NL(Effective_Date_))),COUNT(__d0(__NN(Effective_Date_)))},
+    {'LienJudgment','PublicRecords_KEL.ECL_Functions.Dataset_FDC','expiration_date',COUNT(__d0(__NL(Expiration_Date_))),COUNT(__d0(__NN(Expiration_Date_)))},
+    {'LienJudgment','PublicRecords_KEL.ECL_Functions.Dataset_FDC','lapse_date',COUNT(__d0(__NL(Lapse_Date_))),COUNT(__d0(__NN(Lapse_Date_)))},
+    {'LienJudgment','PublicRecords_KEL.ECL_Functions.Dataset_FDC','process_date',COUNT(__d0(__NL(Process_Date_))),COUNT(__d0(__NN(Process_Date_)))},
+    {'LienJudgment','PublicRecords_KEL.ECL_Functions.Dataset_FDC','src',COUNT(__d0(__NL(Source_))),COUNT(__d0(__NN(Source_)))},
+    {'LienJudgment','PublicRecords_KEL.ECL_Functions.Dataset_FDC','Archive_Date',COUNT(__d0(Archive___Date_=0)),COUNT(__d0(Archive___Date_!=0))},
+    {'LienJudgment','PublicRecords_KEL.ECL_Functions.Dataset_FDC','DateFirstSeen',COUNT(__d0(Date_First_Seen_=0)),COUNT(__d0(Date_First_Seen_!=0))},
+    {'LienJudgment','PublicRecords_KEL.ECL_Functions.Dataset_FDC','DateLastSeen',COUNT(__d0(Date_Last_Seen_=0)),COUNT(__d0(Date_Last_Seen_!=0))},
+    {'LienJudgment','PublicRecords_KEL.ECL_Functions.Dataset_FDC','HybridArchiveDate',COUNT(__d0(Hybrid_Archive_Date_=0)),COUNT(__d0(Hybrid_Archive_Date_!=0))},
+    {'LienJudgment','PublicRecords_KEL.ECL_Functions.Dataset_FDC','VaultDateLastSeen',COUNT(__d0(Vault_Date_Last_Seen_=0)),COUNT(__d0(Vault_Date_Last_Seen_!=0))}]
   ,{KEL.typ.str entity,KEL.typ.str fileName,KEL.typ.str fieldName,KEL.typ.int nullCount,KEL.typ.int notNullCount});
 END;

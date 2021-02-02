@@ -1,11 +1,11 @@
-﻿//HPCC Systems KEL Compiler Version 1.5.0rc1
+//HPCC Systems KEL Compiler Version 1.5.0rc1
 IMPORT KEL15 AS KEL;
 IMPORT B_U_C_C_10,B_U_C_C_11,B_U_C_C_2,CFG_Compile,E_U_C_C FROM PublicRecords_KEL;
 IMPORT * FROM KEL15.Null;
-EXPORT B_U_C_C_1(CFG_Compile __cfg = CFG_Compile) := MODULE
-  SHARED VIRTUAL TYPEOF(B_U_C_C_2(__cfg).__ENH_U_C_C_2) __ENH_U_C_C_2 := B_U_C_C_2(__cfg).__ENH_U_C_C_2;
-  SHARED __EE8527538 := __ENH_U_C_C_2;
-  EXPORT __ST327392_Layout := RECORD
+EXPORT B_U_C_C_1(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG_Compile __cfg = CFG_Compile) := MODULE
+  SHARED VIRTUAL TYPEOF(B_U_C_C_2(__in,__cfg).__ENH_U_C_C_2) __ENH_U_C_C_2 := B_U_C_C_2(__in,__cfg).__ENH_U_C_C_2;
+  SHARED __EE8525542 := __ENH_U_C_C_2;
+  EXPORT __ST326508_Layout := RECORD
     KEL.typ.nstr R_M_S_I_D_;
     KEL.typ.nstr Filing_Jurisdiction_;
     KEL.typ.nstr Filing_Number_;
@@ -36,16 +36,16 @@ EXPORT B_U_C_C_1(CFG_Compile __cfg = CFG_Compile) := MODULE
     KEL.typ.epoch Vault_Date_Last_Seen_ := 0;
     KEL.typ.int __RecordCount := 0;
   END;
-  EXPORT __ST327388_Layout := RECORD
+  EXPORT __ST326504_Layout := RECORD
     KEL.typ.nuid UID;
     KEL.typ.nstr T_M_S_I_D_;
-    KEL.typ.ndataset(__ST327392_Layout) Sub_Filing_;
-    KEL.typ.ndataset(E_U_C_C(__cfg).Collateral_Layout) Collateral_;
-    KEL.typ.ndataset(E_U_C_C(__cfg).Data_Sources_Layout) Data_Sources_;
+    KEL.typ.ndataset(__ST326508_Layout) Sub_Filing_;
+    KEL.typ.ndataset(E_U_C_C(__in,__cfg).Collateral_Layout) Collateral_;
+    KEL.typ.ndataset(E_U_C_C(__in,__cfg).Data_Sources_Layout) Data_Sources_;
     KEL.typ.nbool Active_Status_;
     KEL.typ.nstr Best_Child_R_M_S_I_D_;
     KEL.typ.nstr Best_Inferred_Status_;
-    KEL.typ.ndataset(B_U_C_C_10(__cfg).__ST117248_Layout) Best_U_C_C_Child_Record_;
+    KEL.typ.ndataset(B_U_C_C_10(__in,__cfg).__ST115918_Layout) Best_U_C_C_Child_Record_;
     KEL.typ.nbool Terminated_Filing_;
     KEL.typ.epoch Archive___Date_ := 0;
     KEL.typ.epoch Date_First_Seen_ := 0;
@@ -54,10 +54,10 @@ EXPORT B_U_C_C_1(CFG_Compile __cfg = CFG_Compile) := MODULE
     KEL.typ.epoch Vault_Date_Last_Seen_ := 0;
     KEL.typ.int __RecordCount := 0;
   END;
-  SHARED __ST327388_Layout __ND8527543__Project(B_U_C_C_2(__cfg).__ST327215_Layout __PP8527539) := TRANSFORM
-    __EE8527581 := __PP8527539.Sub_Filing_;
-    SELF.Sub_Filing_ := __BN(PROJECT(__T(__EE8527581),__ST327392_Layout),__NL(__EE8527581));
-    SELF := __PP8527539;
+  SHARED __ST326504_Layout __ND8525547__Project(B_U_C_C_2(__in,__cfg).__ST326331_Layout __PP8525543) := TRANSFORM
+    __EE8525585 := __PP8525543.Sub_Filing_;
+    SELF.Sub_Filing_ := __BN(PROJECT(__T(__EE8525585),__ST326508_Layout),__NL(__EE8525585));
+    SELF := __PP8525543;
   END;
-  EXPORT __ENH_U_C_C_1 := PROJECT(__EE8527538,__ND8527543__Project(LEFT));
+  EXPORT __ENH_U_C_C_1 := PROJECT(__EE8525542,__ND8525547__Project(LEFT));
 END;

@@ -1,9 +1,9 @@
-﻿//HPCC Systems KEL Compiler Version 1.5.0rc1
+//HPCC Systems KEL Compiler Version 1.5.0rc1
 IMPORT KEL15 AS KEL;
 IMPORT PublicRecords_KEL;
 IMPORT CFG_Compile FROM PublicRecords_KEL;
 IMPORT * FROM KEL15.Null;
-EXPORT E_Tradeline(CFG_Compile __cfg = CFG_Compile) := MODULE
+EXPORT E_Tradeline(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG_Compile __cfg = CFG_Compile) := MODULE
   EXPORT Typ := KEL.typ.uid;
   EXPORT InLayout := RECORD
     KEL.typ.nuid UID;
@@ -40,7 +40,7 @@ EXPORT E_Tradeline(CFG_Compile __cfg = CFG_Compile) := MODULE
   SHARED __Trimmed := RECORD, MAXLENGTH(5000)
     STRING KeyVal;
   END;
-  SHARED __d0_KELfiltered := PublicRecords_KEL.Files.NonFCRA.Cortera_Tradeline__Key_LinkIds_Vault(status NOT IN ['D', 'R']);
+  SHARED __d0_KELfiltered := __in.Dataset_Cortera_Tradeline__Key_LinkIds(status NOT IN ['D', 'R']);
   SHARED __d0_Trim := PROJECT(__d0_KELfiltered,TRANSFORM(__Trimmed,SELF.KeyVal:=TRIM((STRING)LEFT.ultid) + '|' + TRIM((STRING)LEFT.orgid) + '|' + TRIM((STRING)LEFT.seleid) + '|' + TRIM((STRING)LEFT.account_key)));
   EXPORT __All_Trim := __d0_Trim;
   SHARED __TabRec := RECORD, MAXLENGTH(5000)
@@ -50,23 +50,19 @@ EXPORT E_Tradeline(CFG_Compile __cfg = CFG_Compile) := MODULE
   END;
   EXPORT NullKeyVal := TRIM((STRING)0) + '|' + TRIM((STRING)0) + '|' + TRIM((STRING)0) + '|' + TRIM((STRING)'');
   SHARED __Table := TABLE(__All_Trim(KeyVal <> NullKeyVal),__TabRec,KeyVal,MERGE);
+  SHARED __SortedTable := SORT(__Table,KeyVal);
   SHARED NullLookupRec := DATASET([{NullKeyVal,1,0}],__TabRec);
-  EXPORT Lookup := NullLookupRec + PROJECT(__Table,TRANSFORM(__TabRec,SELF.UID:=COUNTER,SELF:=LEFT)) : PERSIST('~temp::KEL::PublicRecords_KEL::Tradeline::UidLookup',EXPIRE(7));
-  EXPORT UID_IdToText := INDEX(Lookup,{UID},{Lookup},'~temp::KEL::IDtoT::PublicRecords_KEL::Tradeline');
-  EXPORT UID_TextToId := INDEX(Lookup,{ht:=HASH32(KeyVal)},{Lookup},'~temp::KEL::TtoID::PublicRecords_KEL::Tradeline');
-  EXPORT BuildAll := PARALLEL(BUILDINDEX(UID_IdToText,OVERWRITE),BUILDINDEX(UID_TextToId,OVERWRITE));
-  EXPORT GetText(KEL.typ.uid i) := UID_IdToText(UID=i)[1];
-  EXPORT GetId(STRING s) := UID_TextToId(ht=HASH32(s),KeyVal=s)[1];
-  SHARED Hybrid_Archive_Date_0Rule(STRING a) := MAP(KEL.Routines.IsValidDate((KEL.typ.kdate)(a[1..6]+'01'))=>a[1..6]+'01','0');
-  SHARED __Mapping0 := 'UID(DEFAULT:UID),ultid(OVERRIDE:Ult_I_D_:0),orgid(OVERRIDE:Org_I_D_:0),seleid(OVERRIDE:Sele_I_D_:0),account_key(OVERRIDE:Account_Key_:\'\'),ar_date(OVERRIDE:A_R_Date_:DATE),status(OVERRIDE:Status_),total_ar(OVERRIDE:Total_A_R_:\'\'),current_ar(OVERRIDE:Current_A_R_:\'\'),aging_1to30(OVERRIDE:Aging1_To30_:\'\'),aging_31to60(OVERRIDE:Aging31_To60_:\'\'),aging_61to90(OVERRIDE:Aging61_To90_:\'\'),aging_91plus(OVERRIDE:Aging91_Plus_:\'\'),credit_limit(OVERRIDE:Credit_Limit_:\'\'),segment_id(OVERRIDE:Segment_I_D_:\'\'),dtvendorfirstreported(DEFAULT:Dt_Vendor_First_Reported_:DATE),dtvendorlastreported(DEFAULT:Dt_Vendor_Last_Reported_:DATE),filedate(OVERRIDE:File_Date_:DATE),first_sale_date(OVERRIDE:First_Sale_Date_:DATE),last_sale_date(OVERRIDE:Last_Sale_Date_:DATE),source(OVERRIDE:Source_:\'\'),archive_date(OVERRIDE:Archive___Date_:EPOCH),dt_first_seen(OVERRIDE:Date_First_Seen_:EPOCH),dt_last_seen(OVERRIDE:Date_Last_Seen_:EPOCH),hybrid_archive_date(OVERRIDE:Hybrid_Archive_Date_:EPOCH:Hybrid_Archive_Date_0Rule),vaultdatelastseen(DEFAULT:Vault_Date_Last_Seen_:EPOCH),DPMBitmap(OVERRIDE:__Permits:PERMITS)';
+  EXPORT Lookup := NullLookupRec + PROJECT(__SortedTable,TRANSFORM(__TabRec,SELF.UID:=COUNTER,SELF:=LEFT));
+  SHARED __Mapping0 := 'UID(DEFAULT:UID),ultid(OVERRIDE:Ult_I_D_:0),orgid(OVERRIDE:Org_I_D_:0),seleid(OVERRIDE:Sele_I_D_:0),account_key(OVERRIDE:Account_Key_:\'\'),ar_date(OVERRIDE:A_R_Date_:DATE),status(OVERRIDE:Status_),total_ar(OVERRIDE:Total_A_R_:\'\'),current_ar(OVERRIDE:Current_A_R_:\'\'),aging_1to30(OVERRIDE:Aging1_To30_:\'\'),aging_31to60(OVERRIDE:Aging31_To60_:\'\'),aging_61to90(OVERRIDE:Aging61_To90_:\'\'),aging_91plus(OVERRIDE:Aging91_Plus_:\'\'),credit_limit(OVERRIDE:Credit_Limit_:\'\'),segment_id(OVERRIDE:Segment_I_D_:\'\'),dtvendorfirstreported(DEFAULT:Dt_Vendor_First_Reported_:DATE),dtvendorlastreported(DEFAULT:Dt_Vendor_Last_Reported_:DATE),filedate(OVERRIDE:File_Date_:DATE),first_sale_date(OVERRIDE:First_Sale_Date_:DATE),last_sale_date(OVERRIDE:Last_Sale_Date_:DATE),source(OVERRIDE:Source_:\'\'),archive_date(OVERRIDE:Archive___Date_:EPOCH),dt_first_seen(OVERRIDE:Date_First_Seen_:EPOCH),dt_last_seen(OVERRIDE:Date_Last_Seen_:EPOCH),hybridarchivedate(DEFAULT:Hybrid_Archive_Date_:EPOCH),vaultdatelastseen(DEFAULT:Vault_Date_Last_Seen_:EPOCH),DPMBitmap(OVERRIDE:__Permits:PERMITS)';
+  SHARED __d0_Norm := NORMALIZE(__in,LEFT.Dataset_Cortera_Tradeline__Key_LinkIds,TRANSFORM(RECORDOF(__in.Dataset_Cortera_Tradeline__Key_LinkIds),SELF:=RIGHT));
   SHARED __d0_Out := RECORD
-    RECORDOF(PublicRecords_KEL.Files.NonFCRA.Cortera_Tradeline__Key_LinkIds_Vault);
+    RECORDOF(PublicRecords_KEL.ECL_Functions.Dataset_FDC.Dataset_Cortera_Tradeline__Key_LinkIds);
     KEL.typ.uid UID := 0;
   END;
   SHARED __d0_UID_Mapped := JOIN(__d0_KELfiltered,Lookup,TRIM((STRING)LEFT.ultid) + '|' + TRIM((STRING)LEFT.orgid) + '|' + TRIM((STRING)LEFT.seleid) + '|' + TRIM((STRING)LEFT.account_key) = RIGHT.KeyVal,TRANSFORM(__d0_Out,SELF.UID:=RIGHT.UID,SELF:=LEFT),SMART);
-  EXPORT PublicRecords_KEL_Files_NonFCRA_Cortera_Tradeline__Key_LinkIds_Vault_Invalid := __d0_UID_Mapped(UID = 0);
+  EXPORT PublicRecords_KEL_ECL_Functions_Dataset_FDC_Dataset_Cortera_Tradeline__Key_LinkIds_Invalid := __d0_UID_Mapped(UID = 0);
   SHARED __d0_Prefiltered := __d0_UID_Mapped(UID <> 0);
-  SHARED __d0 := __SourceFilter(KEL.FromFlat.Convert(__d0_Prefiltered,InLayout,__Mapping0,'PublicRecords_KEL.Files.NonFCRA.Cortera_Tradeline__Key_LinkIds_Vault'));
+  SHARED __d0 := __SourceFilter(KEL.FromFlat.Convert(__d0_Prefiltered,InLayout,__Mapping0,'PublicRecords_KEL.ECL_Functions.Dataset_FDC'));
   EXPORT InData := __d0;
   EXPORT Records_Layout := RECORD
     KEL.typ.nkdate A_R_Date_;
@@ -164,33 +160,33 @@ EXPORT E_Tradeline(CFG_Compile __cfg = CFG_Compile) := MODULE
   EXPORT Org_I_D__SingleValue_Invalid := KEL.Intake.DetectMultipleValuesOnResult(Result,Org_I_D_);
   EXPORT Sele_I_D__SingleValue_Invalid := KEL.Intake.DetectMultipleValuesOnResult(Result,Sele_I_D_);
   EXPORT Account_Key__SingleValue_Invalid := KEL.Intake.DetectMultipleValuesOnResult(Result,Account_Key_);
-  EXPORT SanityCheck := DATASET([{COUNT(PublicRecords_KEL_Files_NonFCRA_Cortera_Tradeline__Key_LinkIds_Vault_Invalid),COUNT(Ult_I_D__SingleValue_Invalid),COUNT(Org_I_D__SingleValue_Invalid),COUNT(Sele_I_D__SingleValue_Invalid),COUNT(Account_Key__SingleValue_Invalid),TopSourcedUIDs(1)}],{KEL.typ.int PublicRecords_KEL_Files_NonFCRA_Cortera_Tradeline__Key_LinkIds_Vault_Invalid,KEL.typ.int Ult_I_D__SingleValue_Invalid,KEL.typ.int Org_I_D__SingleValue_Invalid,KEL.typ.int Sele_I_D__SingleValue_Invalid,KEL.typ.int Account_Key__SingleValue_Invalid,DATASET(RECORDOF(UIDSourceCounts)) topSourcedUID});
+  EXPORT SanityCheck := DATASET([{COUNT(PublicRecords_KEL_ECL_Functions_Dataset_FDC_Dataset_Cortera_Tradeline__Key_LinkIds_Invalid),COUNT(Ult_I_D__SingleValue_Invalid),COUNT(Org_I_D__SingleValue_Invalid),COUNT(Sele_I_D__SingleValue_Invalid),COUNT(Account_Key__SingleValue_Invalid),TopSourcedUIDs(1)}],{KEL.typ.int PublicRecords_KEL_ECL_Functions_Dataset_FDC_Dataset_Cortera_Tradeline__Key_LinkIds_Invalid,KEL.typ.int Ult_I_D__SingleValue_Invalid,KEL.typ.int Org_I_D__SingleValue_Invalid,KEL.typ.int Sele_I_D__SingleValue_Invalid,KEL.typ.int Account_Key__SingleValue_Invalid,DATASET(RECORDOF(UIDSourceCounts)) topSourcedUID});
   EXPORT NullCounts := DATASET([
-    {'Tradeline','PublicRecords_KEL.Files.NonFCRA.Cortera_Tradeline__Key_LinkIds_Vault','UID',COUNT(PublicRecords_KEL_Files_NonFCRA_Cortera_Tradeline__Key_LinkIds_Vault_Invalid),COUNT(__d0)},
-    {'Tradeline','PublicRecords_KEL.Files.NonFCRA.Cortera_Tradeline__Key_LinkIds_Vault','ultid',COUNT(__d0(__NL(Ult_I_D_))),COUNT(__d0(__NN(Ult_I_D_)))},
-    {'Tradeline','PublicRecords_KEL.Files.NonFCRA.Cortera_Tradeline__Key_LinkIds_Vault','orgid',COUNT(__d0(__NL(Org_I_D_))),COUNT(__d0(__NN(Org_I_D_)))},
-    {'Tradeline','PublicRecords_KEL.Files.NonFCRA.Cortera_Tradeline__Key_LinkIds_Vault','seleid',COUNT(__d0(__NL(Sele_I_D_))),COUNT(__d0(__NN(Sele_I_D_)))},
-    {'Tradeline','PublicRecords_KEL.Files.NonFCRA.Cortera_Tradeline__Key_LinkIds_Vault','account_key',COUNT(__d0(__NL(Account_Key_))),COUNT(__d0(__NN(Account_Key_)))},
-    {'Tradeline','PublicRecords_KEL.Files.NonFCRA.Cortera_Tradeline__Key_LinkIds_Vault','ar_date',COUNT(__d0(__NL(A_R_Date_))),COUNT(__d0(__NN(A_R_Date_)))},
-    {'Tradeline','PublicRecords_KEL.Files.NonFCRA.Cortera_Tradeline__Key_LinkIds_Vault','status',COUNT(__d0(__NL(Status_))),COUNT(__d0(__NN(Status_)))},
-    {'Tradeline','PublicRecords_KEL.Files.NonFCRA.Cortera_Tradeline__Key_LinkIds_Vault','total_ar',COUNT(__d0(__NL(Total_A_R_))),COUNT(__d0(__NN(Total_A_R_)))},
-    {'Tradeline','PublicRecords_KEL.Files.NonFCRA.Cortera_Tradeline__Key_LinkIds_Vault','current_ar',COUNT(__d0(__NL(Current_A_R_))),COUNT(__d0(__NN(Current_A_R_)))},
-    {'Tradeline','PublicRecords_KEL.Files.NonFCRA.Cortera_Tradeline__Key_LinkIds_Vault','aging_1to30',COUNT(__d0(__NL(Aging1_To30_))),COUNT(__d0(__NN(Aging1_To30_)))},
-    {'Tradeline','PublicRecords_KEL.Files.NonFCRA.Cortera_Tradeline__Key_LinkIds_Vault','aging_31to60',COUNT(__d0(__NL(Aging31_To60_))),COUNT(__d0(__NN(Aging31_To60_)))},
-    {'Tradeline','PublicRecords_KEL.Files.NonFCRA.Cortera_Tradeline__Key_LinkIds_Vault','aging_61to90',COUNT(__d0(__NL(Aging61_To90_))),COUNT(__d0(__NN(Aging61_To90_)))},
-    {'Tradeline','PublicRecords_KEL.Files.NonFCRA.Cortera_Tradeline__Key_LinkIds_Vault','aging_91plus',COUNT(__d0(__NL(Aging91_Plus_))),COUNT(__d0(__NN(Aging91_Plus_)))},
-    {'Tradeline','PublicRecords_KEL.Files.NonFCRA.Cortera_Tradeline__Key_LinkIds_Vault','credit_limit',COUNT(__d0(__NL(Credit_Limit_))),COUNT(__d0(__NN(Credit_Limit_)))},
-    {'Tradeline','PublicRecords_KEL.Files.NonFCRA.Cortera_Tradeline__Key_LinkIds_Vault','segment_id',COUNT(__d0(__NL(Segment_I_D_))),COUNT(__d0(__NN(Segment_I_D_)))},
-    {'Tradeline','PublicRecords_KEL.Files.NonFCRA.Cortera_Tradeline__Key_LinkIds_Vault','DtVendorFirstReported',COUNT(__d0(__NL(Dt_Vendor_First_Reported_))),COUNT(__d0(__NN(Dt_Vendor_First_Reported_)))},
-    {'Tradeline','PublicRecords_KEL.Files.NonFCRA.Cortera_Tradeline__Key_LinkIds_Vault','DtVendorLastReported',COUNT(__d0(__NL(Dt_Vendor_Last_Reported_))),COUNT(__d0(__NN(Dt_Vendor_Last_Reported_)))},
-    {'Tradeline','PublicRecords_KEL.Files.NonFCRA.Cortera_Tradeline__Key_LinkIds_Vault','filedate',COUNT(__d0(__NL(File_Date_))),COUNT(__d0(__NN(File_Date_)))},
-    {'Tradeline','PublicRecords_KEL.Files.NonFCRA.Cortera_Tradeline__Key_LinkIds_Vault','first_sale_date',COUNT(__d0(__NL(First_Sale_Date_))),COUNT(__d0(__NN(First_Sale_Date_)))},
-    {'Tradeline','PublicRecords_KEL.Files.NonFCRA.Cortera_Tradeline__Key_LinkIds_Vault','last_sale_date',COUNT(__d0(__NL(Last_Sale_Date_))),COUNT(__d0(__NN(Last_Sale_Date_)))},
-    {'Tradeline','PublicRecords_KEL.Files.NonFCRA.Cortera_Tradeline__Key_LinkIds_Vault','source',COUNT(__d0(__NL(Source_))),COUNT(__d0(__NN(Source_)))},
-    {'Tradeline','PublicRecords_KEL.Files.NonFCRA.Cortera_Tradeline__Key_LinkIds_Vault','Archive_Date',COUNT(__d0(Archive___Date_=0)),COUNT(__d0(Archive___Date_!=0))},
-    {'Tradeline','PublicRecords_KEL.Files.NonFCRA.Cortera_Tradeline__Key_LinkIds_Vault','DateFirstSeen',COUNT(__d0(Date_First_Seen_=0)),COUNT(__d0(Date_First_Seen_!=0))},
-    {'Tradeline','PublicRecords_KEL.Files.NonFCRA.Cortera_Tradeline__Key_LinkIds_Vault','DateLastSeen',COUNT(__d0(Date_Last_Seen_=0)),COUNT(__d0(Date_Last_Seen_!=0))},
-    {'Tradeline','PublicRecords_KEL.Files.NonFCRA.Cortera_Tradeline__Key_LinkIds_Vault','HybridArchiveDate',COUNT(__d0(Hybrid_Archive_Date_=0)),COUNT(__d0(Hybrid_Archive_Date_!=0))},
-    {'Tradeline','PublicRecords_KEL.Files.NonFCRA.Cortera_Tradeline__Key_LinkIds_Vault','VaultDateLastSeen',COUNT(__d0(Vault_Date_Last_Seen_=0)),COUNT(__d0(Vault_Date_Last_Seen_!=0))}]
+    {'Tradeline','PublicRecords_KEL.ECL_Functions.Dataset_FDC','UID',COUNT(PublicRecords_KEL_ECL_Functions_Dataset_FDC_Dataset_Cortera_Tradeline__Key_LinkIds_Invalid),COUNT(__d0)},
+    {'Tradeline','PublicRecords_KEL.ECL_Functions.Dataset_FDC','ultid',COUNT(__d0(__NL(Ult_I_D_))),COUNT(__d0(__NN(Ult_I_D_)))},
+    {'Tradeline','PublicRecords_KEL.ECL_Functions.Dataset_FDC','orgid',COUNT(__d0(__NL(Org_I_D_))),COUNT(__d0(__NN(Org_I_D_)))},
+    {'Tradeline','PublicRecords_KEL.ECL_Functions.Dataset_FDC','seleid',COUNT(__d0(__NL(Sele_I_D_))),COUNT(__d0(__NN(Sele_I_D_)))},
+    {'Tradeline','PublicRecords_KEL.ECL_Functions.Dataset_FDC','account_key',COUNT(__d0(__NL(Account_Key_))),COUNT(__d0(__NN(Account_Key_)))},
+    {'Tradeline','PublicRecords_KEL.ECL_Functions.Dataset_FDC','ar_date',COUNT(__d0(__NL(A_R_Date_))),COUNT(__d0(__NN(A_R_Date_)))},
+    {'Tradeline','PublicRecords_KEL.ECL_Functions.Dataset_FDC','status',COUNT(__d0(__NL(Status_))),COUNT(__d0(__NN(Status_)))},
+    {'Tradeline','PublicRecords_KEL.ECL_Functions.Dataset_FDC','total_ar',COUNT(__d0(__NL(Total_A_R_))),COUNT(__d0(__NN(Total_A_R_)))},
+    {'Tradeline','PublicRecords_KEL.ECL_Functions.Dataset_FDC','current_ar',COUNT(__d0(__NL(Current_A_R_))),COUNT(__d0(__NN(Current_A_R_)))},
+    {'Tradeline','PublicRecords_KEL.ECL_Functions.Dataset_FDC','aging_1to30',COUNT(__d0(__NL(Aging1_To30_))),COUNT(__d0(__NN(Aging1_To30_)))},
+    {'Tradeline','PublicRecords_KEL.ECL_Functions.Dataset_FDC','aging_31to60',COUNT(__d0(__NL(Aging31_To60_))),COUNT(__d0(__NN(Aging31_To60_)))},
+    {'Tradeline','PublicRecords_KEL.ECL_Functions.Dataset_FDC','aging_61to90',COUNT(__d0(__NL(Aging61_To90_))),COUNT(__d0(__NN(Aging61_To90_)))},
+    {'Tradeline','PublicRecords_KEL.ECL_Functions.Dataset_FDC','aging_91plus',COUNT(__d0(__NL(Aging91_Plus_))),COUNT(__d0(__NN(Aging91_Plus_)))},
+    {'Tradeline','PublicRecords_KEL.ECL_Functions.Dataset_FDC','credit_limit',COUNT(__d0(__NL(Credit_Limit_))),COUNT(__d0(__NN(Credit_Limit_)))},
+    {'Tradeline','PublicRecords_KEL.ECL_Functions.Dataset_FDC','segment_id',COUNT(__d0(__NL(Segment_I_D_))),COUNT(__d0(__NN(Segment_I_D_)))},
+    {'Tradeline','PublicRecords_KEL.ECL_Functions.Dataset_FDC','DtVendorFirstReported',COUNT(__d0(__NL(Dt_Vendor_First_Reported_))),COUNT(__d0(__NN(Dt_Vendor_First_Reported_)))},
+    {'Tradeline','PublicRecords_KEL.ECL_Functions.Dataset_FDC','DtVendorLastReported',COUNT(__d0(__NL(Dt_Vendor_Last_Reported_))),COUNT(__d0(__NN(Dt_Vendor_Last_Reported_)))},
+    {'Tradeline','PublicRecords_KEL.ECL_Functions.Dataset_FDC','filedate',COUNT(__d0(__NL(File_Date_))),COUNT(__d0(__NN(File_Date_)))},
+    {'Tradeline','PublicRecords_KEL.ECL_Functions.Dataset_FDC','first_sale_date',COUNT(__d0(__NL(First_Sale_Date_))),COUNT(__d0(__NN(First_Sale_Date_)))},
+    {'Tradeline','PublicRecords_KEL.ECL_Functions.Dataset_FDC','last_sale_date',COUNT(__d0(__NL(Last_Sale_Date_))),COUNT(__d0(__NN(Last_Sale_Date_)))},
+    {'Tradeline','PublicRecords_KEL.ECL_Functions.Dataset_FDC','source',COUNT(__d0(__NL(Source_))),COUNT(__d0(__NN(Source_)))},
+    {'Tradeline','PublicRecords_KEL.ECL_Functions.Dataset_FDC','Archive_Date',COUNT(__d0(Archive___Date_=0)),COUNT(__d0(Archive___Date_!=0))},
+    {'Tradeline','PublicRecords_KEL.ECL_Functions.Dataset_FDC','DateFirstSeen',COUNT(__d0(Date_First_Seen_=0)),COUNT(__d0(Date_First_Seen_!=0))},
+    {'Tradeline','PublicRecords_KEL.ECL_Functions.Dataset_FDC','DateLastSeen',COUNT(__d0(Date_Last_Seen_=0)),COUNT(__d0(Date_Last_Seen_!=0))},
+    {'Tradeline','PublicRecords_KEL.ECL_Functions.Dataset_FDC','HybridArchiveDate',COUNT(__d0(Hybrid_Archive_Date_=0)),COUNT(__d0(Hybrid_Archive_Date_!=0))},
+    {'Tradeline','PublicRecords_KEL.ECL_Functions.Dataset_FDC','VaultDateLastSeen',COUNT(__d0(Vault_Date_Last_Seen_=0)),COUNT(__d0(Vault_Date_Last_Seen_!=0))}]
   ,{KEL.typ.str entity,KEL.typ.str fileName,KEL.typ.str fieldName,KEL.typ.int nullCount,KEL.typ.int notNullCount});
 END;

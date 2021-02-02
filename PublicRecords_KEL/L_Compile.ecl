@@ -1,4 +1,4 @@
-﻿//HPCC Systems KEL Compiler Version 1.5.0rc1
+//HPCC Systems KEL Compiler Version 1.5.0rc1
 IMPORT KEL15 AS KEL;
 IMPORT CFG_Compile FROM PublicRecords_KEL;
 IMPORT * FROM KEL15.Null;
@@ -218,6 +218,8 @@ EXPORT L_Compile := MODULE
     KEL.typ.nint Net_Acuity_Royalty_;
     KEL.typ.nstr P_I___Alrt_Inp_Name_Watchlist_Rec_Num_;
     KEL.typ.nstr P_I___Alrt_Inp_Name_On_Watchlist_Flag_;
+    KEL.typ.nstr Targus_Royalty_;
+    KEL.typ.nstr Targus_Src_;
     KEL.typ.epoch Archive___Date_ := 0;
     KEL.typ.epoch Date_First_Seen_ := 0;
     KEL.typ.epoch Date_Last_Seen_ := 0;
@@ -2921,6 +2923,8 @@ EXPORT L_Compile := MODULE
     KEL.typ.nint Net_Acuity_Royalty_;
     KEL.typ.nstr P_I___Alrt_Inp_Name_Watchlist_Rec_Num_;
     KEL.typ.nstr P_I___Alrt_Inp_Name_On_Watchlist_Flag_;
+    KEL.typ.nstr Targus_Royalty_;
+    KEL.typ.nstr Targus_Src_;
     KEL.typ.epoch Archive___Date_ := 0;
     KEL.typ.epoch Date_First_Seen_ := 0;
     KEL.typ.epoch Date_Last_Seen_ := 0;
@@ -13239,7 +13243,6 @@ EXPORT L_Compile := MODULE
     KEL.typ.nstr License_Description_;
     KEL.typ.nstr Occupation_;
     KEL.typ.nint License_Category_;
-    KEL.typ.nstr Source_;
     KEL.typ.epoch Archive___Date_ := 0;
     KEL.typ.epoch Date_First_Seen_ := 0;
     KEL.typ.epoch Date_Last_Seen_ := 0;
@@ -13293,7 +13296,6 @@ EXPORT L_Compile := MODULE
     KEL.typ.ndataset(Index_Build_Entity_Res25_Internal_Layout_Status_Layout) Status_;
     KEL.typ.ndataset(Index_Build_Entity_Res25_Internal_Layout_License_Description_Layout) License_Description_;
     KEL.typ.ndataset(Index_Build_Entity_Res25_Internal_Layout_Data_Sources_Layout) Data_Sources_;
-    KEL.typ.nkdate B_U_I_L_D___D_A_T_E_;
     KEL.typ.nbool Is_Active_;
     KEL.typ.nkdate Max_Expire_Date_;
     KEL.typ.nkdate Max_Issue_Date_;
@@ -36436,7 +36438,6 @@ EXPORT L_Compile := MODULE
     KEL.typ.nstr License_Description_;
     KEL.typ.nstr Occupation_;
     KEL.typ.nint License_Category_;
-    KEL.typ.nstr Source_;
     KEL.typ.epoch Archive___Date_ := 0;
     KEL.typ.epoch Date_First_Seen_ := 0;
     KEL.typ.epoch Date_Last_Seen_ := 0;
@@ -36490,7 +36491,6 @@ EXPORT L_Compile := MODULE
     KEL.typ.ndataset(Index_Build_Association_Res59_Internal_Layout_Status_Layout) Status_;
     KEL.typ.ndataset(Index_Build_Association_Res59_Internal_Layout_License_Description_Layout) License_Description_;
     KEL.typ.ndataset(Index_Build_Association_Res59_Internal_Layout_Data_Sources_Layout) Data_Sources_;
-    KEL.typ.nkdate B_U_I_L_D___D_A_T_E_;
     KEL.typ.nbool Is_Active_;
     KEL.typ.nkdate Max_Expire_Date_;
     KEL.typ.nkdate Max_Issue_Date_;

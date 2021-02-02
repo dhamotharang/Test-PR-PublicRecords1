@@ -1,9 +1,9 @@
-﻿//HPCC Systems KEL Compiler Version 1.5.0rc1
+//HPCC Systems KEL Compiler Version 1.5.0rc1
 IMPORT KEL15 AS KEL;
 IMPORT PublicRecords_KEL;
 IMPORT CFG_Compile FROM PublicRecords_KEL;
 IMPORT * FROM KEL15.Null;
-EXPORT E_Sex_Offender(CFG_Compile __cfg = CFG_Compile) := MODULE
+EXPORT E_Sex_Offender(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG_Compile __cfg = CFG_Compile) := MODULE
   EXPORT Typ := KEL.typ.uid;
   EXPORT InLayout := RECORD
     KEL.typ.nuid UID;
@@ -22,7 +22,7 @@ EXPORT E_Sex_Offender(CFG_Compile __cfg = CFG_Compile) := MODULE
   SHARED __Trimmed := RECORD, MAXLENGTH(5000)
     STRING KeyVal;
   END;
-  SHARED __d0_Trim := PROJECT(PublicRecords_KEL.files.FCRA.SexOffender__Key_SexOffender_SPK_Vault,TRANSFORM(__Trimmed,SELF.KeyVal:=TRIM((STRING)LEFT.sspk)));
+  SHARED __d0_Trim := PROJECT(__in.Dataset_SexOffender__Key_SexOffender_SPK,TRANSFORM(__Trimmed,SELF.KeyVal:=TRIM((STRING)LEFT.sspk)));
   EXPORT __All_Trim := __d0_Trim;
   SHARED __TabRec := RECORD, MAXLENGTH(5000)
     __All_Trim.KeyVal;
@@ -31,22 +31,19 @@ EXPORT E_Sex_Offender(CFG_Compile __cfg = CFG_Compile) := MODULE
   END;
   EXPORT NullKeyVal := TRIM((STRING)'');
   SHARED __Table := TABLE(__All_Trim(KeyVal <> NullKeyVal),__TabRec,KeyVal,MERGE);
+  SHARED __SortedTable := SORT(__Table,KeyVal);
   SHARED NullLookupRec := DATASET([{NullKeyVal,1,0}],__TabRec);
-  EXPORT Lookup := NullLookupRec + PROJECT(__Table,TRANSFORM(__TabRec,SELF.UID:=COUNTER,SELF:=LEFT)) : PERSIST('~temp::KEL::PublicRecords_KEL::Sex_Offender::UidLookup',EXPIRE(7));
-  EXPORT UID_IdToText := INDEX(Lookup,{UID},{Lookup},'~temp::KEL::IDtoT::PublicRecords_KEL::Sex_Offender');
-  EXPORT UID_TextToId := INDEX(Lookup,{ht:=HASH32(KeyVal)},{Lookup},'~temp::KEL::TtoID::PublicRecords_KEL::Sex_Offender');
-  EXPORT BuildAll := PARALLEL(BUILDINDEX(UID_IdToText,OVERWRITE),BUILDINDEX(UID_TextToId,OVERWRITE));
-  EXPORT GetText(KEL.typ.uid i) := UID_IdToText(UID=i)[1];
-  EXPORT GetId(STRING s) := UID_TextToId(ht=HASH32(s),KeyVal=s)[1];
+  EXPORT Lookup := NullLookupRec + PROJECT(__SortedTable,TRANSFORM(__TabRec,SELF.UID:=COUNTER,SELF:=LEFT));
   SHARED __Mapping0 := 'UID(DEFAULT:UID),sspk(OVERRIDE:Seisint_Primary_Key_:\'\'),src(OVERRIDE:Source_:\'\'),archive_date(OVERRIDE:Archive___Date_:EPOCH),dt_first_reported(OVERRIDE:Date_First_Seen_:EPOCH),dt_last_reported(OVERRIDE:Date_Last_Seen_:EPOCH),hybridarchivedate(DEFAULT:Hybrid_Archive_Date_:EPOCH),vaultdatelastseen(DEFAULT:Vault_Date_Last_Seen_:EPOCH),DPMBitmap(OVERRIDE:__Permits:PERMITS)';
+  SHARED __d0_Norm := NORMALIZE(__in,LEFT.Dataset_SexOffender__Key_SexOffender_SPK,TRANSFORM(RECORDOF(__in.Dataset_SexOffender__Key_SexOffender_SPK),SELF:=RIGHT));
   SHARED __d0_Out := RECORD
-    RECORDOF(PublicRecords_KEL.files.FCRA.SexOffender__Key_SexOffender_SPK_Vault);
+    RECORDOF(PublicRecords_KEL.ECL_Functions.Dataset_FDC.Dataset_SexOffender__Key_SexOffender_SPK);
     KEL.typ.uid UID := 0;
   END;
-  SHARED __d0_UID_Mapped := JOIN(PublicRecords_KEL.files.FCRA.SexOffender__Key_SexOffender_SPK_Vault,Lookup,TRIM((STRING)LEFT.sspk) = RIGHT.KeyVal,TRANSFORM(__d0_Out,SELF.UID:=RIGHT.UID,SELF:=LEFT),SMART);
-  EXPORT PublicRecords_KEL_files_FCRA_SexOffender__Key_SexOffender_SPK_Vault_Invalid := __d0_UID_Mapped(UID = 0);
+  SHARED __d0_UID_Mapped := JOIN(__d0_Norm,Lookup,TRIM((STRING)LEFT.sspk) = RIGHT.KeyVal,TRANSFORM(__d0_Out,SELF.UID:=RIGHT.UID,SELF:=LEFT),SMART);
+  EXPORT PublicRecords_KEL_ECL_Functions_Dataset_FDC_Dataset_SexOffender__Key_SexOffender_SPK_Invalid := __d0_UID_Mapped(UID = 0);
   SHARED __d0_Prefiltered := __d0_UID_Mapped(UID <> 0);
-  SHARED __d0 := __SourceFilter(KEL.FromFlat.Convert(__d0_Prefiltered,InLayout,__Mapping0,'PublicRecords_KEL.files.FCRA.SexOffender__Key_SexOffender_SPK_Vault'));
+  SHARED __d0 := __SourceFilter(KEL.FromFlat.Convert(__d0_Prefiltered,InLayout,__Mapping0,'PublicRecords_KEL.ECL_Functions.Dataset_FDC'));
   EXPORT InData := __d0;
   EXPORT Sources_Layout := RECORD
     KEL.typ.nstr Source_;
@@ -98,15 +95,15 @@ EXPORT E_Sex_Offender(CFG_Compile __cfg = CFG_Compile) := MODULE
   EXPORT TopSourcedUIDs(KEL.typ.int n = 10) := TOPN(UIDSourceCounts,n,-Cnt);
   EXPORT UIDSourceDistribution := SORT(TABLE(UIDSourceCounts,{Cnt,KEL.typ.int uidCount := COUNT(GROUP),KEL.typ.uid rep := MIN(GROUP,UID)},Cnt),-Cnt);
   EXPORT Seisint_Primary_Key__SingleValue_Invalid := KEL.Intake.DetectMultipleValuesOnResult(Result,Seisint_Primary_Key_);
-  EXPORT SanityCheck := DATASET([{COUNT(PublicRecords_KEL_files_FCRA_SexOffender__Key_SexOffender_SPK_Vault_Invalid),COUNT(Seisint_Primary_Key__SingleValue_Invalid),TopSourcedUIDs(1)}],{KEL.typ.int PublicRecords_KEL_files_FCRA_SexOffender__Key_SexOffender_SPK_Vault_Invalid,KEL.typ.int Seisint_Primary_Key__SingleValue_Invalid,DATASET(RECORDOF(UIDSourceCounts)) topSourcedUID});
+  EXPORT SanityCheck := DATASET([{COUNT(PublicRecords_KEL_ECL_Functions_Dataset_FDC_Dataset_SexOffender__Key_SexOffender_SPK_Invalid),COUNT(Seisint_Primary_Key__SingleValue_Invalid),TopSourcedUIDs(1)}],{KEL.typ.int PublicRecords_KEL_ECL_Functions_Dataset_FDC_Dataset_SexOffender__Key_SexOffender_SPK_Invalid,KEL.typ.int Seisint_Primary_Key__SingleValue_Invalid,DATASET(RECORDOF(UIDSourceCounts)) topSourcedUID});
   EXPORT NullCounts := DATASET([
-    {'SexOffender','PublicRecords_KEL.files.FCRA.SexOffender__Key_SexOffender_SPK_Vault','UID',COUNT(PublicRecords_KEL_files_FCRA_SexOffender__Key_SexOffender_SPK_Vault_Invalid),COUNT(__d0)},
-    {'SexOffender','PublicRecords_KEL.files.FCRA.SexOffender__Key_SexOffender_SPK_Vault','sspk',COUNT(__d0(__NL(Seisint_Primary_Key_))),COUNT(__d0(__NN(Seisint_Primary_Key_)))},
-    {'SexOffender','PublicRecords_KEL.files.FCRA.SexOffender__Key_SexOffender_SPK_Vault','src',COUNT(__d0(__NL(Source_))),COUNT(__d0(__NN(Source_)))},
-    {'SexOffender','PublicRecords_KEL.files.FCRA.SexOffender__Key_SexOffender_SPK_Vault','Archive_Date',COUNT(__d0(Archive___Date_=0)),COUNT(__d0(Archive___Date_!=0))},
-    {'SexOffender','PublicRecords_KEL.files.FCRA.SexOffender__Key_SexOffender_SPK_Vault','DateFirstSeen',COUNT(__d0(Date_First_Seen_=0)),COUNT(__d0(Date_First_Seen_!=0))},
-    {'SexOffender','PublicRecords_KEL.files.FCRA.SexOffender__Key_SexOffender_SPK_Vault','DateLastSeen',COUNT(__d0(Date_Last_Seen_=0)),COUNT(__d0(Date_Last_Seen_!=0))},
-    {'SexOffender','PublicRecords_KEL.files.FCRA.SexOffender__Key_SexOffender_SPK_Vault','HybridArchiveDate',COUNT(__d0(Hybrid_Archive_Date_=0)),COUNT(__d0(Hybrid_Archive_Date_!=0))},
-    {'SexOffender','PublicRecords_KEL.files.FCRA.SexOffender__Key_SexOffender_SPK_Vault','VaultDateLastSeen',COUNT(__d0(Vault_Date_Last_Seen_=0)),COUNT(__d0(Vault_Date_Last_Seen_!=0))}]
+    {'SexOffender','PublicRecords_KEL.ECL_Functions.Dataset_FDC','UID',COUNT(PublicRecords_KEL_ECL_Functions_Dataset_FDC_Dataset_SexOffender__Key_SexOffender_SPK_Invalid),COUNT(__d0)},
+    {'SexOffender','PublicRecords_KEL.ECL_Functions.Dataset_FDC','sspk',COUNT(__d0(__NL(Seisint_Primary_Key_))),COUNT(__d0(__NN(Seisint_Primary_Key_)))},
+    {'SexOffender','PublicRecords_KEL.ECL_Functions.Dataset_FDC','src',COUNT(__d0(__NL(Source_))),COUNT(__d0(__NN(Source_)))},
+    {'SexOffender','PublicRecords_KEL.ECL_Functions.Dataset_FDC','Archive_Date',COUNT(__d0(Archive___Date_=0)),COUNT(__d0(Archive___Date_!=0))},
+    {'SexOffender','PublicRecords_KEL.ECL_Functions.Dataset_FDC','DateFirstSeen',COUNT(__d0(Date_First_Seen_=0)),COUNT(__d0(Date_First_Seen_!=0))},
+    {'SexOffender','PublicRecords_KEL.ECL_Functions.Dataset_FDC','DateLastSeen',COUNT(__d0(Date_Last_Seen_=0)),COUNT(__d0(Date_Last_Seen_!=0))},
+    {'SexOffender','PublicRecords_KEL.ECL_Functions.Dataset_FDC','HybridArchiveDate',COUNT(__d0(Hybrid_Archive_Date_=0)),COUNT(__d0(Hybrid_Archive_Date_!=0))},
+    {'SexOffender','PublicRecords_KEL.ECL_Functions.Dataset_FDC','VaultDateLastSeen',COUNT(__d0(Vault_Date_Last_Seen_=0)),COUNT(__d0(Vault_Date_Last_Seen_!=0))}]
   ,{KEL.typ.str entity,KEL.typ.str fileName,KEL.typ.str fieldName,KEL.typ.int nullCount,KEL.typ.int notNullCount});
 END;

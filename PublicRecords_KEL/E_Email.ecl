@@ -1,9 +1,9 @@
-﻿//HPCC Systems KEL Compiler Version 1.5.0rc1
+//HPCC Systems KEL Compiler Version 1.5.0rc1
 IMPORT KEL15 AS KEL;
 IMPORT PublicRecords_KEL;
 IMPORT CFG_Compile FROM PublicRecords_KEL;
 IMPORT * FROM KEL15.Null;
-EXPORT E_Email(CFG_Compile __cfg = CFG_Compile) := MODULE
+EXPORT E_Email(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG_Compile __cfg = CFG_Compile) := MODULE
   EXPORT Typ := KEL.typ.uid;
   EXPORT InLayout := RECORD
     KEL.typ.nuid UID;
@@ -40,8 +40,8 @@ EXPORT E_Email(CFG_Compile __cfg = CFG_Compile) := MODULE
   SHARED __Trimmed := RECORD, MAXLENGTH(5000)
     STRING KeyVal;
   END;
-  SHARED __d0_Trim := PROJECT(PublicRecords_KEL.Files.NonFCRA.DX_Email__Key_Email_Payload_Vault,TRANSFORM(__Trimmed,SELF.KeyVal:=TRIM((STRING)LEFT.clean_email)));
-  SHARED __d1_Trim := PROJECT(PublicRecords_KEL.Files.FCRA.Email_Data__Key_DID_FCRA_Vault,TRANSFORM(__Trimmed,SELF.KeyVal:=TRIM((STRING)LEFT.clean_email)));
+  SHARED __d0_Trim := PROJECT(__in.Dataset_DX_Email__Key_Email_Payload,TRANSFORM(__Trimmed,SELF.KeyVal:=TRIM((STRING)LEFT.clean_email)));
+  SHARED __d1_Trim := PROJECT(__in.Dataset_Email_Data__Key_Did_FCRA,TRANSFORM(__Trimmed,SELF.KeyVal:=TRIM((STRING)LEFT.clean_email)));
   EXPORT __All_Trim := __d0_Trim + __d1_Trim;
   SHARED __TabRec := RECORD, MAXLENGTH(5000)
     __All_Trim.KeyVal;
@@ -50,33 +50,29 @@ EXPORT E_Email(CFG_Compile __cfg = CFG_Compile) := MODULE
   END;
   EXPORT NullKeyVal := TRIM((STRING)'');
   SHARED __Table := TABLE(__All_Trim(KeyVal <> NullKeyVal),__TabRec,KeyVal,MERGE);
+  SHARED __SortedTable := SORT(__Table,KeyVal);
   SHARED NullLookupRec := DATASET([{NullKeyVal,1,0}],__TabRec);
-  EXPORT Lookup := NullLookupRec + PROJECT(__Table,TRANSFORM(__TabRec,SELF.UID:=COUNTER,SELF:=LEFT)) : PERSIST('~temp::KEL::PublicRecords_KEL::Email::UidLookup',EXPIRE(7));
-  EXPORT UID_IdToText := INDEX(Lookup,{UID},{Lookup},'~temp::KEL::IDtoT::PublicRecords_KEL::Email');
-  EXPORT UID_TextToId := INDEX(Lookup,{ht:=HASH32(KeyVal)},{Lookup},'~temp::KEL::TtoID::PublicRecords_KEL::Email');
-  EXPORT BuildAll := PARALLEL(BUILDINDEX(UID_IdToText,OVERWRITE),BUILDINDEX(UID_TextToId,OVERWRITE));
-  EXPORT GetText(KEL.typ.uid i) := UID_IdToText(UID=i)[1];
-  EXPORT GetId(STRING s) := UID_TextToId(ht=HASH32(s),KeyVal=s)[1];
-  SHARED Hybrid_Archive_Date_0Rule(STRING a) := MAP(KEL.Routines.IsValidDate((KEL.typ.kdate)(a[1..6]+'01'))=>a[1..6]+'01','0');
-  SHARED __Mapping0 := 'UID(DEFAULT:UID),clean_email(OVERRIDE:Email_Address_:\'\'),email_rec_key(OVERRIDE:Email_Rec_Key_:0),rules(OVERRIDE:Rules_:0),append_email_username(OVERRIDE:User_Name_:\'\'),append_domain(OVERRIDE:Domain_Name_:\'\'),append_domain_type(OVERRIDE:Domain_Type_:\'\'),append_domain_root(OVERRIDE:Domain_Root_:\'\'),append_domain_ext(OVERRIDE:Domain_Extension_:\'\'),append_is_tld_state(OVERRIDE:Is_Top_Level_Domain_State_:0),append_is_tld_generic(OVERRIDE:Is_Top_Level_Domain_Generic_:0),append_is_tld_country(OVERRIDE:Is_Top_Level_Domain_Country_:0),orig_login_date(OVERRIDE:Orig_Login_Date_:DATE),orig_site(OVERRIDE:Orig_Site_:\'\'),orig_e360_id(OVERRIDE:E360_I_D_:\'\'),orig_teramedia_id(OVERRIDE:Teramedia_I_D_:\'\'),process_date(OVERRIDE:Process_Date_:DATE),activecode(OVERRIDE:Active_Code_:\'\'),cln_companyname(OVERRIDE:Company_Name_:\'\'),companytitle(OVERRIDE:Company_Title_:\'\'),email_src(OVERRIDE:Source_:\'\'),archive_date(OVERRIDE:Archive___Date_:EPOCH),date_first_seen(OVERRIDE:Date_First_Seen_:EPOCH),date_last_seen(OVERRIDE:Date_Last_Seen_:EPOCH),hybrid_archive_date(OVERRIDE:Hybrid_Archive_Date_:EPOCH:Hybrid_Archive_Date_0Rule),vaultdatelastseen(DEFAULT:Vault_Date_Last_Seen_:EPOCH),DPMBitmap(OVERRIDE:__Permits:PERMITS)';
+  EXPORT Lookup := NullLookupRec + PROJECT(__SortedTable,TRANSFORM(__TabRec,SELF.UID:=COUNTER,SELF:=LEFT));
+  SHARED __Mapping0 := 'UID(DEFAULT:UID),clean_email(OVERRIDE:Email_Address_:\'\'),email_rec_key(OVERRIDE:Email_Rec_Key_:0),rules(OVERRIDE:Rules_:0),append_email_username(OVERRIDE:User_Name_:\'\'),append_domain(OVERRIDE:Domain_Name_:\'\'),append_domain_type(OVERRIDE:Domain_Type_:\'\'),append_domain_root(OVERRIDE:Domain_Root_:\'\'),append_domain_ext(OVERRIDE:Domain_Extension_:\'\'),append_is_tld_state(OVERRIDE:Is_Top_Level_Domain_State_:0),append_is_tld_generic(OVERRIDE:Is_Top_Level_Domain_Generic_:0),append_is_tld_country(OVERRIDE:Is_Top_Level_Domain_Country_:0),orig_login_date(OVERRIDE:Orig_Login_Date_:DATE),orig_site(OVERRIDE:Orig_Site_:\'\'),orig_e360_id(OVERRIDE:E360_I_D_:\'\'),orig_teramedia_id(OVERRIDE:Teramedia_I_D_:\'\'),process_date(OVERRIDE:Process_Date_:DATE),activecode(OVERRIDE:Active_Code_:\'\'),cln_companyname(OVERRIDE:Company_Name_:\'\'),companytitle(OVERRIDE:Company_Title_:\'\'),email_src(OVERRIDE:Source_:\'\'),archive_date(OVERRIDE:Archive___Date_:EPOCH),date_first_seen(OVERRIDE:Date_First_Seen_:EPOCH),date_last_seen(OVERRIDE:Date_Last_Seen_:EPOCH),hybridarchivedate(DEFAULT:Hybrid_Archive_Date_:EPOCH),vaultdatelastseen(DEFAULT:Vault_Date_Last_Seen_:EPOCH),DPMBitmap(OVERRIDE:__Permits:PERMITS)';
+  SHARED __d0_Norm := NORMALIZE(__in,LEFT.Dataset_DX_Email__Key_Email_Payload,TRANSFORM(RECORDOF(__in.Dataset_DX_Email__Key_Email_Payload),SELF:=RIGHT));
   SHARED __d0_Out := RECORD
-    RECORDOF(PublicRecords_KEL.Files.NonFCRA.DX_Email__Key_Email_Payload_Vault);
+    RECORDOF(PublicRecords_KEL.ECL_Functions.Dataset_FDC.Dataset_DX_Email__Key_Email_Payload);
     KEL.typ.uid UID := 0;
   END;
-  SHARED __d0_UID_Mapped := JOIN(PublicRecords_KEL.Files.NonFCRA.DX_Email__Key_Email_Payload_Vault,Lookup,TRIM((STRING)LEFT.clean_email) = RIGHT.KeyVal,TRANSFORM(__d0_Out,SELF.UID:=RIGHT.UID,SELF:=LEFT),SMART);
-  EXPORT PublicRecords_KEL_Files_NonFCRA_DX_Email__Key_Email_Payload_Vault_Invalid := __d0_UID_Mapped(UID = 0);
+  SHARED __d0_UID_Mapped := JOIN(__d0_Norm,Lookup,TRIM((STRING)LEFT.clean_email) = RIGHT.KeyVal,TRANSFORM(__d0_Out,SELF.UID:=RIGHT.UID,SELF:=LEFT),SMART);
+  EXPORT PublicRecords_KEL_ECL_Functions_Dataset_FDC_Dataset_DX_Email__Key_Email_Payload_Invalid := __d0_UID_Mapped(UID = 0);
   SHARED __d0_Prefiltered := __d0_UID_Mapped(UID <> 0);
-  SHARED __d0 := __SourceFilter(KEL.FromFlat.Convert(__d0_Prefiltered,InLayout,__Mapping0,'PublicRecords_KEL.Files.NonFCRA.DX_Email__Key_Email_Payload_Vault'));
-  SHARED Hybrid_Archive_Date_1Rule(STRING a) := MAP(KEL.Routines.IsValidDate((KEL.typ.kdate)(a[1..6]+'01'))=>a[1..6]+'01','0');
-  SHARED __Mapping1 := 'UID(DEFAULT:UID),clean_email(OVERRIDE:Email_Address_:\'\'),email_rec_key(OVERRIDE:Email_Rec_Key_:0),rules(DEFAULT:Rules_:0),append_email_username(OVERRIDE:User_Name_:\'\'),append_domain(OVERRIDE:Domain_Name_:\'\'),append_domain_type(OVERRIDE:Domain_Type_:\'\'),append_domain_root(OVERRIDE:Domain_Root_:\'\'),append_domain_ext(OVERRIDE:Domain_Extension_:\'\'),append_is_tld_state(OVERRIDE:Is_Top_Level_Domain_State_:0),append_is_tld_generic(OVERRIDE:Is_Top_Level_Domain_Generic_:0),append_is_tld_country(OVERRIDE:Is_Top_Level_Domain_Country_:0),orig_login_date(OVERRIDE:Orig_Login_Date_:DATE),orig_site(OVERRIDE:Orig_Site_:\'\'),orig_e360_id(OVERRIDE:E360_I_D_:\'\'),orig_teramedia_id(OVERRIDE:Teramedia_I_D_:\'\'),process_date(OVERRIDE:Process_Date_:DATE),activecode(OVERRIDE:Active_Code_:\'\'),companyname(DEFAULT:Company_Name_:\'\'),companytitle(DEFAULT:Company_Title_:\'\'),email_src(OVERRIDE:Source_:\'\'),archive_date(OVERRIDE:Archive___Date_:EPOCH),date_first_seen(OVERRIDE:Date_First_Seen_:EPOCH),date_last_seen(OVERRIDE:Date_Last_Seen_:EPOCH),hybrid_archive_date(OVERRIDE:Hybrid_Archive_Date_:EPOCH:Hybrid_Archive_Date_1Rule),vaultdatelastseen(DEFAULT:Vault_Date_Last_Seen_:EPOCH),DPMBitmap(OVERRIDE:__Permits:PERMITS)';
+  SHARED __d0 := __SourceFilter(KEL.FromFlat.Convert(__d0_Prefiltered,InLayout,__Mapping0,'PublicRecords_KEL.ECL_Functions.Dataset_FDC'));
+  SHARED __Mapping1 := 'UID(DEFAULT:UID),clean_email(OVERRIDE:Email_Address_:\'\'),email_rec_key(OVERRIDE:Email_Rec_Key_:0),rules(DEFAULT:Rules_:0),append_email_username(OVERRIDE:User_Name_:\'\'),append_domain(OVERRIDE:Domain_Name_:\'\'),append_domain_type(OVERRIDE:Domain_Type_:\'\'),append_domain_root(OVERRIDE:Domain_Root_:\'\'),append_domain_ext(OVERRIDE:Domain_Extension_:\'\'),append_is_tld_state(OVERRIDE:Is_Top_Level_Domain_State_:0),append_is_tld_generic(OVERRIDE:Is_Top_Level_Domain_Generic_:0),append_is_tld_country(OVERRIDE:Is_Top_Level_Domain_Country_:0),orig_login_date(OVERRIDE:Orig_Login_Date_:DATE),orig_site(OVERRIDE:Orig_Site_:\'\'),orig_e360_id(OVERRIDE:E360_I_D_:\'\'),orig_teramedia_id(OVERRIDE:Teramedia_I_D_:\'\'),process_date(OVERRIDE:Process_Date_:DATE),activecode(OVERRIDE:Active_Code_:\'\'),companyname(DEFAULT:Company_Name_:\'\'),companytitle(DEFAULT:Company_Title_:\'\'),email_src(OVERRIDE:Source_:\'\'),archive_date(OVERRIDE:Archive___Date_:EPOCH),date_first_seen(OVERRIDE:Date_First_Seen_:EPOCH),date_last_seen(OVERRIDE:Date_Last_Seen_:EPOCH),hybridarchivedate(DEFAULT:Hybrid_Archive_Date_:EPOCH),vaultdatelastseen(DEFAULT:Vault_Date_Last_Seen_:EPOCH),DPMBitmap(OVERRIDE:__Permits:PERMITS)';
+  SHARED __d1_Norm := NORMALIZE(__in,LEFT.Dataset_Email_Data__Key_Did_FCRA,TRANSFORM(RECORDOF(__in.Dataset_Email_Data__Key_Did_FCRA),SELF:=RIGHT));
   SHARED __d1_Out := RECORD
-    RECORDOF(PublicRecords_KEL.Files.FCRA.Email_Data__Key_DID_FCRA_Vault);
+    RECORDOF(PublicRecords_KEL.ECL_Functions.Dataset_FDC.Dataset_Email_Data__Key_Did_FCRA);
     KEL.typ.uid UID := 0;
   END;
-  SHARED __d1_UID_Mapped := JOIN(PublicRecords_KEL.Files.FCRA.Email_Data__Key_DID_FCRA_Vault,Lookup,TRIM((STRING)LEFT.clean_email) = RIGHT.KeyVal,TRANSFORM(__d1_Out,SELF.UID:=RIGHT.UID,SELF:=LEFT),SMART);
-  EXPORT PublicRecords_KEL_Files_FCRA_Email_Data__Key_DID_FCRA_Vault_Invalid := __d1_UID_Mapped(UID = 0);
+  SHARED __d1_UID_Mapped := JOIN(__d1_Norm,Lookup,TRIM((STRING)LEFT.clean_email) = RIGHT.KeyVal,TRANSFORM(__d1_Out,SELF.UID:=RIGHT.UID,SELF:=LEFT),SMART);
+  EXPORT PublicRecords_KEL_ECL_Functions_Dataset_FDC_Dataset_Email_Data__Key_Did_FCRA_Invalid := __d1_UID_Mapped(UID = 0);
   SHARED __d1_Prefiltered := __d1_UID_Mapped(UID <> 0);
-  SHARED __d1 := __SourceFilter(KEL.FromFlat.Convert(__d1_Prefiltered,InLayout,__Mapping1,'PublicRecords_KEL.Files.FCRA.Email_Data__Key_DID_FCRA_Vault'));
+  SHARED __d1 := __SourceFilter(KEL.FromFlat.Convert(__d1_Prefiltered,InLayout,__Mapping1,'PublicRecords_KEL.ECL_Functions.Dataset_FDC'));
   EXPORT InData := __d0 + __d1;
   EXPORT Email_Rec_Key_Layout := RECORD
     KEL.typ.nint Email_Rec_Key_;
@@ -223,59 +219,59 @@ EXPORT E_Email(CFG_Compile __cfg = CFG_Compile) := MODULE
   EXPORT Is_Top_Level_Domain_Country__SingleValue_Invalid := KEL.Intake.DetectMultipleValuesOnResult(Result,Is_Top_Level_Domain_Country_);
   EXPORT E360_I_D__SingleValue_Invalid := KEL.Intake.DetectMultipleValuesOnResult(Result,E360_I_D_);
   EXPORT Teramedia_I_D__SingleValue_Invalid := KEL.Intake.DetectMultipleValuesOnResult(Result,Teramedia_I_D_);
-  EXPORT SanityCheck := DATASET([{COUNT(PublicRecords_KEL_Files_NonFCRA_DX_Email__Key_Email_Payload_Vault_Invalid),COUNT(PublicRecords_KEL_Files_FCRA_Email_Data__Key_DID_FCRA_Vault_Invalid),COUNT(Email_Address__SingleValue_Invalid),COUNT(Rules__SingleValue_Invalid),COUNT(User_Name__SingleValue_Invalid),COUNT(Domain_Name__SingleValue_Invalid),COUNT(Domain_Type__SingleValue_Invalid),COUNT(Domain_Root__SingleValue_Invalid),COUNT(Domain_Extension__SingleValue_Invalid),COUNT(Is_Top_Level_Domain_State__SingleValue_Invalid),COUNT(Is_Top_Level_Domain_Generic__SingleValue_Invalid),COUNT(Is_Top_Level_Domain_Country__SingleValue_Invalid),COUNT(E360_I_D__SingleValue_Invalid),COUNT(Teramedia_I_D__SingleValue_Invalid),TopSourcedUIDs(1)}],{KEL.typ.int PublicRecords_KEL_Files_NonFCRA_DX_Email__Key_Email_Payload_Vault_Invalid,KEL.typ.int PublicRecords_KEL_Files_FCRA_Email_Data__Key_DID_FCRA_Vault_Invalid,KEL.typ.int Email_Address__SingleValue_Invalid,KEL.typ.int Rules__SingleValue_Invalid,KEL.typ.int User_Name__SingleValue_Invalid,KEL.typ.int Domain_Name__SingleValue_Invalid,KEL.typ.int Domain_Type__SingleValue_Invalid,KEL.typ.int Domain_Root__SingleValue_Invalid,KEL.typ.int Domain_Extension__SingleValue_Invalid,KEL.typ.int Is_Top_Level_Domain_State__SingleValue_Invalid,KEL.typ.int Is_Top_Level_Domain_Generic__SingleValue_Invalid,KEL.typ.int Is_Top_Level_Domain_Country__SingleValue_Invalid,KEL.typ.int E360_I_D__SingleValue_Invalid,KEL.typ.int Teramedia_I_D__SingleValue_Invalid,DATASET(RECORDOF(UIDSourceCounts)) topSourcedUID});
+  EXPORT SanityCheck := DATASET([{COUNT(PublicRecords_KEL_ECL_Functions_Dataset_FDC_Dataset_DX_Email__Key_Email_Payload_Invalid),COUNT(PublicRecords_KEL_ECL_Functions_Dataset_FDC_Dataset_Email_Data__Key_Did_FCRA_Invalid),COUNT(Email_Address__SingleValue_Invalid),COUNT(Rules__SingleValue_Invalid),COUNT(User_Name__SingleValue_Invalid),COUNT(Domain_Name__SingleValue_Invalid),COUNT(Domain_Type__SingleValue_Invalid),COUNT(Domain_Root__SingleValue_Invalid),COUNT(Domain_Extension__SingleValue_Invalid),COUNT(Is_Top_Level_Domain_State__SingleValue_Invalid),COUNT(Is_Top_Level_Domain_Generic__SingleValue_Invalid),COUNT(Is_Top_Level_Domain_Country__SingleValue_Invalid),COUNT(E360_I_D__SingleValue_Invalid),COUNT(Teramedia_I_D__SingleValue_Invalid),TopSourcedUIDs(1)}],{KEL.typ.int PublicRecords_KEL_ECL_Functions_Dataset_FDC_Dataset_DX_Email__Key_Email_Payload_Invalid,KEL.typ.int PublicRecords_KEL_ECL_Functions_Dataset_FDC_Dataset_Email_Data__Key_Did_FCRA_Invalid,KEL.typ.int Email_Address__SingleValue_Invalid,KEL.typ.int Rules__SingleValue_Invalid,KEL.typ.int User_Name__SingleValue_Invalid,KEL.typ.int Domain_Name__SingleValue_Invalid,KEL.typ.int Domain_Type__SingleValue_Invalid,KEL.typ.int Domain_Root__SingleValue_Invalid,KEL.typ.int Domain_Extension__SingleValue_Invalid,KEL.typ.int Is_Top_Level_Domain_State__SingleValue_Invalid,KEL.typ.int Is_Top_Level_Domain_Generic__SingleValue_Invalid,KEL.typ.int Is_Top_Level_Domain_Country__SingleValue_Invalid,KEL.typ.int E360_I_D__SingleValue_Invalid,KEL.typ.int Teramedia_I_D__SingleValue_Invalid,DATASET(RECORDOF(UIDSourceCounts)) topSourcedUID});
   EXPORT NullCounts := DATASET([
-    {'Email','PublicRecords_KEL.Files.NonFCRA.DX_Email__Key_Email_Payload_Vault','UID',COUNT(PublicRecords_KEL_Files_NonFCRA_DX_Email__Key_Email_Payload_Vault_Invalid),COUNT(__d0)},
-    {'Email','PublicRecords_KEL.Files.NonFCRA.DX_Email__Key_Email_Payload_Vault','clean_email',COUNT(__d0(__NL(Email_Address_))),COUNT(__d0(__NN(Email_Address_)))},
-    {'Email','PublicRecords_KEL.Files.NonFCRA.DX_Email__Key_Email_Payload_Vault','email_rec_key',COUNT(__d0(__NL(Email_Rec_Key_))),COUNT(__d0(__NN(Email_Rec_Key_)))},
-    {'Email','PublicRecords_KEL.Files.NonFCRA.DX_Email__Key_Email_Payload_Vault','rules',COUNT(__d0(__NL(Rules_))),COUNT(__d0(__NN(Rules_)))},
-    {'Email','PublicRecords_KEL.Files.NonFCRA.DX_Email__Key_Email_Payload_Vault','append_email_username',COUNT(__d0(__NL(User_Name_))),COUNT(__d0(__NN(User_Name_)))},
-    {'Email','PublicRecords_KEL.Files.NonFCRA.DX_Email__Key_Email_Payload_Vault','append_domain',COUNT(__d0(__NL(Domain_Name_))),COUNT(__d0(__NN(Domain_Name_)))},
-    {'Email','PublicRecords_KEL.Files.NonFCRA.DX_Email__Key_Email_Payload_Vault','append_domain_type',COUNT(__d0(__NL(Domain_Type_))),COUNT(__d0(__NN(Domain_Type_)))},
-    {'Email','PublicRecords_KEL.Files.NonFCRA.DX_Email__Key_Email_Payload_Vault','append_domain_root',COUNT(__d0(__NL(Domain_Root_))),COUNT(__d0(__NN(Domain_Root_)))},
-    {'Email','PublicRecords_KEL.Files.NonFCRA.DX_Email__Key_Email_Payload_Vault','append_domain_ext',COUNT(__d0(__NL(Domain_Extension_))),COUNT(__d0(__NN(Domain_Extension_)))},
-    {'Email','PublicRecords_KEL.Files.NonFCRA.DX_Email__Key_Email_Payload_Vault','append_is_tld_state',COUNT(__d0(__NL(Is_Top_Level_Domain_State_))),COUNT(__d0(__NN(Is_Top_Level_Domain_State_)))},
-    {'Email','PublicRecords_KEL.Files.NonFCRA.DX_Email__Key_Email_Payload_Vault','append_is_tld_generic',COUNT(__d0(__NL(Is_Top_Level_Domain_Generic_))),COUNT(__d0(__NN(Is_Top_Level_Domain_Generic_)))},
-    {'Email','PublicRecords_KEL.Files.NonFCRA.DX_Email__Key_Email_Payload_Vault','append_is_tld_country',COUNT(__d0(__NL(Is_Top_Level_Domain_Country_))),COUNT(__d0(__NN(Is_Top_Level_Domain_Country_)))},
-    {'Email','PublicRecords_KEL.Files.NonFCRA.DX_Email__Key_Email_Payload_Vault','orig_login_date',COUNT(__d0(__NL(Orig_Login_Date_))),COUNT(__d0(__NN(Orig_Login_Date_)))},
-    {'Email','PublicRecords_KEL.Files.NonFCRA.DX_Email__Key_Email_Payload_Vault','orig_site',COUNT(__d0(__NL(Orig_Site_))),COUNT(__d0(__NN(Orig_Site_)))},
-    {'Email','PublicRecords_KEL.Files.NonFCRA.DX_Email__Key_Email_Payload_Vault','orig_e360_id',COUNT(__d0(__NL(E360_I_D_))),COUNT(__d0(__NN(E360_I_D_)))},
-    {'Email','PublicRecords_KEL.Files.NonFCRA.DX_Email__Key_Email_Payload_Vault','orig_teramedia_id',COUNT(__d0(__NL(Teramedia_I_D_))),COUNT(__d0(__NN(Teramedia_I_D_)))},
-    {'Email','PublicRecords_KEL.Files.NonFCRA.DX_Email__Key_Email_Payload_Vault','process_date',COUNT(__d0(__NL(Process_Date_))),COUNT(__d0(__NN(Process_Date_)))},
-    {'Email','PublicRecords_KEL.Files.NonFCRA.DX_Email__Key_Email_Payload_Vault','activecode',COUNT(__d0(__NL(Active_Code_))),COUNT(__d0(__NN(Active_Code_)))},
-    {'Email','PublicRecords_KEL.Files.NonFCRA.DX_Email__Key_Email_Payload_Vault','cln_companyname',COUNT(__d0(__NL(Company_Name_))),COUNT(__d0(__NN(Company_Name_)))},
-    {'Email','PublicRecords_KEL.Files.NonFCRA.DX_Email__Key_Email_Payload_Vault','companytitle',COUNT(__d0(__NL(Company_Title_))),COUNT(__d0(__NN(Company_Title_)))},
-    {'Email','PublicRecords_KEL.Files.NonFCRA.DX_Email__Key_Email_Payload_Vault','Email_Src',COUNT(__d0(__NL(Source_))),COUNT(__d0(__NN(Source_)))},
-    {'Email','PublicRecords_KEL.Files.NonFCRA.DX_Email__Key_Email_Payload_Vault','Archive_Date',COUNT(__d0(Archive___Date_=0)),COUNT(__d0(Archive___Date_!=0))},
-    {'Email','PublicRecords_KEL.Files.NonFCRA.DX_Email__Key_Email_Payload_Vault','DateFirstSeen',COUNT(__d0(Date_First_Seen_=0)),COUNT(__d0(Date_First_Seen_!=0))},
-    {'Email','PublicRecords_KEL.Files.NonFCRA.DX_Email__Key_Email_Payload_Vault','DateLastSeen',COUNT(__d0(Date_Last_Seen_=0)),COUNT(__d0(Date_Last_Seen_!=0))},
-    {'Email','PublicRecords_KEL.Files.NonFCRA.DX_Email__Key_Email_Payload_Vault','HybridArchiveDate',COUNT(__d0(Hybrid_Archive_Date_=0)),COUNT(__d0(Hybrid_Archive_Date_!=0))},
-    {'Email','PublicRecords_KEL.Files.NonFCRA.DX_Email__Key_Email_Payload_Vault','VaultDateLastSeen',COUNT(__d0(Vault_Date_Last_Seen_=0)),COUNT(__d0(Vault_Date_Last_Seen_!=0))},
-    {'Email','PublicRecords_KEL.Files.FCRA.Email_Data__Key_DID_FCRA_Vault','UID',COUNT(PublicRecords_KEL_Files_FCRA_Email_Data__Key_DID_FCRA_Vault_Invalid),COUNT(__d1)},
-    {'Email','PublicRecords_KEL.Files.FCRA.Email_Data__Key_DID_FCRA_Vault','clean_email',COUNT(__d1(__NL(Email_Address_))),COUNT(__d1(__NN(Email_Address_)))},
-    {'Email','PublicRecords_KEL.Files.FCRA.Email_Data__Key_DID_FCRA_Vault','email_rec_key',COUNT(__d1(__NL(Email_Rec_Key_))),COUNT(__d1(__NN(Email_Rec_Key_)))},
-    {'Email','PublicRecords_KEL.Files.FCRA.Email_Data__Key_DID_FCRA_Vault','Rules',COUNT(__d1(__NL(Rules_))),COUNT(__d1(__NN(Rules_)))},
-    {'Email','PublicRecords_KEL.Files.FCRA.Email_Data__Key_DID_FCRA_Vault','append_email_username',COUNT(__d1(__NL(User_Name_))),COUNT(__d1(__NN(User_Name_)))},
-    {'Email','PublicRecords_KEL.Files.FCRA.Email_Data__Key_DID_FCRA_Vault','append_domain',COUNT(__d1(__NL(Domain_Name_))),COUNT(__d1(__NN(Domain_Name_)))},
-    {'Email','PublicRecords_KEL.Files.FCRA.Email_Data__Key_DID_FCRA_Vault','append_domain_type',COUNT(__d1(__NL(Domain_Type_))),COUNT(__d1(__NN(Domain_Type_)))},
-    {'Email','PublicRecords_KEL.Files.FCRA.Email_Data__Key_DID_FCRA_Vault','append_domain_root',COUNT(__d1(__NL(Domain_Root_))),COUNT(__d1(__NN(Domain_Root_)))},
-    {'Email','PublicRecords_KEL.Files.FCRA.Email_Data__Key_DID_FCRA_Vault','append_domain_ext',COUNT(__d1(__NL(Domain_Extension_))),COUNT(__d1(__NN(Domain_Extension_)))},
-    {'Email','PublicRecords_KEL.Files.FCRA.Email_Data__Key_DID_FCRA_Vault','append_is_tld_state',COUNT(__d1(__NL(Is_Top_Level_Domain_State_))),COUNT(__d1(__NN(Is_Top_Level_Domain_State_)))},
-    {'Email','PublicRecords_KEL.Files.FCRA.Email_Data__Key_DID_FCRA_Vault','append_is_tld_generic',COUNT(__d1(__NL(Is_Top_Level_Domain_Generic_))),COUNT(__d1(__NN(Is_Top_Level_Domain_Generic_)))},
-    {'Email','PublicRecords_KEL.Files.FCRA.Email_Data__Key_DID_FCRA_Vault','append_is_tld_country',COUNT(__d1(__NL(Is_Top_Level_Domain_Country_))),COUNT(__d1(__NN(Is_Top_Level_Domain_Country_)))},
-    {'Email','PublicRecords_KEL.Files.FCRA.Email_Data__Key_DID_FCRA_Vault','orig_login_date',COUNT(__d1(__NL(Orig_Login_Date_))),COUNT(__d1(__NN(Orig_Login_Date_)))},
-    {'Email','PublicRecords_KEL.Files.FCRA.Email_Data__Key_DID_FCRA_Vault','orig_site',COUNT(__d1(__NL(Orig_Site_))),COUNT(__d1(__NN(Orig_Site_)))},
-    {'Email','PublicRecords_KEL.Files.FCRA.Email_Data__Key_DID_FCRA_Vault','orig_e360_id',COUNT(__d1(__NL(E360_I_D_))),COUNT(__d1(__NN(E360_I_D_)))},
-    {'Email','PublicRecords_KEL.Files.FCRA.Email_Data__Key_DID_FCRA_Vault','orig_teramedia_id',COUNT(__d1(__NL(Teramedia_I_D_))),COUNT(__d1(__NN(Teramedia_I_D_)))},
-    {'Email','PublicRecords_KEL.Files.FCRA.Email_Data__Key_DID_FCRA_Vault','process_date',COUNT(__d1(__NL(Process_Date_))),COUNT(__d1(__NN(Process_Date_)))},
-    {'Email','PublicRecords_KEL.Files.FCRA.Email_Data__Key_DID_FCRA_Vault','activecode',COUNT(__d1(__NL(Active_Code_))),COUNT(__d1(__NN(Active_Code_)))},
-    {'Email','PublicRecords_KEL.Files.FCRA.Email_Data__Key_DID_FCRA_Vault','CompanyName',COUNT(__d1(__NL(Company_Name_))),COUNT(__d1(__NN(Company_Name_)))},
-    {'Email','PublicRecords_KEL.Files.FCRA.Email_Data__Key_DID_FCRA_Vault','CompanyTitle',COUNT(__d1(__NL(Company_Title_))),COUNT(__d1(__NN(Company_Title_)))},
-    {'Email','PublicRecords_KEL.Files.FCRA.Email_Data__Key_DID_FCRA_Vault','Email_Src',COUNT(__d1(__NL(Source_))),COUNT(__d1(__NN(Source_)))},
-    {'Email','PublicRecords_KEL.Files.FCRA.Email_Data__Key_DID_FCRA_Vault','Archive_Date',COUNT(__d1(Archive___Date_=0)),COUNT(__d1(Archive___Date_!=0))},
-    {'Email','PublicRecords_KEL.Files.FCRA.Email_Data__Key_DID_FCRA_Vault','DateFirstSeen',COUNT(__d1(Date_First_Seen_=0)),COUNT(__d1(Date_First_Seen_!=0))},
-    {'Email','PublicRecords_KEL.Files.FCRA.Email_Data__Key_DID_FCRA_Vault','DateLastSeen',COUNT(__d1(Date_Last_Seen_=0)),COUNT(__d1(Date_Last_Seen_!=0))},
-    {'Email','PublicRecords_KEL.Files.FCRA.Email_Data__Key_DID_FCRA_Vault','HybridArchiveDate',COUNT(__d1(Hybrid_Archive_Date_=0)),COUNT(__d1(Hybrid_Archive_Date_!=0))},
-    {'Email','PublicRecords_KEL.Files.FCRA.Email_Data__Key_DID_FCRA_Vault','VaultDateLastSeen',COUNT(__d1(Vault_Date_Last_Seen_=0)),COUNT(__d1(Vault_Date_Last_Seen_!=0))}]
+    {'Email','PublicRecords_KEL.ECL_Functions.Dataset_FDC','UID',COUNT(PublicRecords_KEL_ECL_Functions_Dataset_FDC_Dataset_DX_Email__Key_Email_Payload_Invalid),COUNT(__d0)},
+    {'Email','PublicRecords_KEL.ECL_Functions.Dataset_FDC','clean_email',COUNT(__d0(__NL(Email_Address_))),COUNT(__d0(__NN(Email_Address_)))},
+    {'Email','PublicRecords_KEL.ECL_Functions.Dataset_FDC','email_rec_key',COUNT(__d0(__NL(Email_Rec_Key_))),COUNT(__d0(__NN(Email_Rec_Key_)))},
+    {'Email','PublicRecords_KEL.ECL_Functions.Dataset_FDC','rules',COUNT(__d0(__NL(Rules_))),COUNT(__d0(__NN(Rules_)))},
+    {'Email','PublicRecords_KEL.ECL_Functions.Dataset_FDC','append_email_username',COUNT(__d0(__NL(User_Name_))),COUNT(__d0(__NN(User_Name_)))},
+    {'Email','PublicRecords_KEL.ECL_Functions.Dataset_FDC','append_domain',COUNT(__d0(__NL(Domain_Name_))),COUNT(__d0(__NN(Domain_Name_)))},
+    {'Email','PublicRecords_KEL.ECL_Functions.Dataset_FDC','append_domain_type',COUNT(__d0(__NL(Domain_Type_))),COUNT(__d0(__NN(Domain_Type_)))},
+    {'Email','PublicRecords_KEL.ECL_Functions.Dataset_FDC','append_domain_root',COUNT(__d0(__NL(Domain_Root_))),COUNT(__d0(__NN(Domain_Root_)))},
+    {'Email','PublicRecords_KEL.ECL_Functions.Dataset_FDC','append_domain_ext',COUNT(__d0(__NL(Domain_Extension_))),COUNT(__d0(__NN(Domain_Extension_)))},
+    {'Email','PublicRecords_KEL.ECL_Functions.Dataset_FDC','append_is_tld_state',COUNT(__d0(__NL(Is_Top_Level_Domain_State_))),COUNT(__d0(__NN(Is_Top_Level_Domain_State_)))},
+    {'Email','PublicRecords_KEL.ECL_Functions.Dataset_FDC','append_is_tld_generic',COUNT(__d0(__NL(Is_Top_Level_Domain_Generic_))),COUNT(__d0(__NN(Is_Top_Level_Domain_Generic_)))},
+    {'Email','PublicRecords_KEL.ECL_Functions.Dataset_FDC','append_is_tld_country',COUNT(__d0(__NL(Is_Top_Level_Domain_Country_))),COUNT(__d0(__NN(Is_Top_Level_Domain_Country_)))},
+    {'Email','PublicRecords_KEL.ECL_Functions.Dataset_FDC','orig_login_date',COUNT(__d0(__NL(Orig_Login_Date_))),COUNT(__d0(__NN(Orig_Login_Date_)))},
+    {'Email','PublicRecords_KEL.ECL_Functions.Dataset_FDC','orig_site',COUNT(__d0(__NL(Orig_Site_))),COUNT(__d0(__NN(Orig_Site_)))},
+    {'Email','PublicRecords_KEL.ECL_Functions.Dataset_FDC','orig_e360_id',COUNT(__d0(__NL(E360_I_D_))),COUNT(__d0(__NN(E360_I_D_)))},
+    {'Email','PublicRecords_KEL.ECL_Functions.Dataset_FDC','orig_teramedia_id',COUNT(__d0(__NL(Teramedia_I_D_))),COUNT(__d0(__NN(Teramedia_I_D_)))},
+    {'Email','PublicRecords_KEL.ECL_Functions.Dataset_FDC','process_date',COUNT(__d0(__NL(Process_Date_))),COUNT(__d0(__NN(Process_Date_)))},
+    {'Email','PublicRecords_KEL.ECL_Functions.Dataset_FDC','activecode',COUNT(__d0(__NL(Active_Code_))),COUNT(__d0(__NN(Active_Code_)))},
+    {'Email','PublicRecords_KEL.ECL_Functions.Dataset_FDC','cln_companyname',COUNT(__d0(__NL(Company_Name_))),COUNT(__d0(__NN(Company_Name_)))},
+    {'Email','PublicRecords_KEL.ECL_Functions.Dataset_FDC','companytitle',COUNT(__d0(__NL(Company_Title_))),COUNT(__d0(__NN(Company_Title_)))},
+    {'Email','PublicRecords_KEL.ECL_Functions.Dataset_FDC','Email_Src',COUNT(__d0(__NL(Source_))),COUNT(__d0(__NN(Source_)))},
+    {'Email','PublicRecords_KEL.ECL_Functions.Dataset_FDC','Archive_Date',COUNT(__d0(Archive___Date_=0)),COUNT(__d0(Archive___Date_!=0))},
+    {'Email','PublicRecords_KEL.ECL_Functions.Dataset_FDC','DateFirstSeen',COUNT(__d0(Date_First_Seen_=0)),COUNT(__d0(Date_First_Seen_!=0))},
+    {'Email','PublicRecords_KEL.ECL_Functions.Dataset_FDC','DateLastSeen',COUNT(__d0(Date_Last_Seen_=0)),COUNT(__d0(Date_Last_Seen_!=0))},
+    {'Email','PublicRecords_KEL.ECL_Functions.Dataset_FDC','HybridArchiveDate',COUNT(__d0(Hybrid_Archive_Date_=0)),COUNT(__d0(Hybrid_Archive_Date_!=0))},
+    {'Email','PublicRecords_KEL.ECL_Functions.Dataset_FDC','VaultDateLastSeen',COUNT(__d0(Vault_Date_Last_Seen_=0)),COUNT(__d0(Vault_Date_Last_Seen_!=0))},
+    {'Email','PublicRecords_KEL.ECL_Functions.Dataset_FDC','UID',COUNT(PublicRecords_KEL_ECL_Functions_Dataset_FDC_Dataset_Email_Data__Key_Did_FCRA_Invalid),COUNT(__d1)},
+    {'Email','PublicRecords_KEL.ECL_Functions.Dataset_FDC','clean_email',COUNT(__d1(__NL(Email_Address_))),COUNT(__d1(__NN(Email_Address_)))},
+    {'Email','PublicRecords_KEL.ECL_Functions.Dataset_FDC','email_rec_key',COUNT(__d1(__NL(Email_Rec_Key_))),COUNT(__d1(__NN(Email_Rec_Key_)))},
+    {'Email','PublicRecords_KEL.ECL_Functions.Dataset_FDC','Rules',COUNT(__d1(__NL(Rules_))),COUNT(__d1(__NN(Rules_)))},
+    {'Email','PublicRecords_KEL.ECL_Functions.Dataset_FDC','append_email_username',COUNT(__d1(__NL(User_Name_))),COUNT(__d1(__NN(User_Name_)))},
+    {'Email','PublicRecords_KEL.ECL_Functions.Dataset_FDC','append_domain',COUNT(__d1(__NL(Domain_Name_))),COUNT(__d1(__NN(Domain_Name_)))},
+    {'Email','PublicRecords_KEL.ECL_Functions.Dataset_FDC','append_domain_type',COUNT(__d1(__NL(Domain_Type_))),COUNT(__d1(__NN(Domain_Type_)))},
+    {'Email','PublicRecords_KEL.ECL_Functions.Dataset_FDC','append_domain_root',COUNT(__d1(__NL(Domain_Root_))),COUNT(__d1(__NN(Domain_Root_)))},
+    {'Email','PublicRecords_KEL.ECL_Functions.Dataset_FDC','append_domain_ext',COUNT(__d1(__NL(Domain_Extension_))),COUNT(__d1(__NN(Domain_Extension_)))},
+    {'Email','PublicRecords_KEL.ECL_Functions.Dataset_FDC','append_is_tld_state',COUNT(__d1(__NL(Is_Top_Level_Domain_State_))),COUNT(__d1(__NN(Is_Top_Level_Domain_State_)))},
+    {'Email','PublicRecords_KEL.ECL_Functions.Dataset_FDC','append_is_tld_generic',COUNT(__d1(__NL(Is_Top_Level_Domain_Generic_))),COUNT(__d1(__NN(Is_Top_Level_Domain_Generic_)))},
+    {'Email','PublicRecords_KEL.ECL_Functions.Dataset_FDC','append_is_tld_country',COUNT(__d1(__NL(Is_Top_Level_Domain_Country_))),COUNT(__d1(__NN(Is_Top_Level_Domain_Country_)))},
+    {'Email','PublicRecords_KEL.ECL_Functions.Dataset_FDC','orig_login_date',COUNT(__d1(__NL(Orig_Login_Date_))),COUNT(__d1(__NN(Orig_Login_Date_)))},
+    {'Email','PublicRecords_KEL.ECL_Functions.Dataset_FDC','orig_site',COUNT(__d1(__NL(Orig_Site_))),COUNT(__d1(__NN(Orig_Site_)))},
+    {'Email','PublicRecords_KEL.ECL_Functions.Dataset_FDC','orig_e360_id',COUNT(__d1(__NL(E360_I_D_))),COUNT(__d1(__NN(E360_I_D_)))},
+    {'Email','PublicRecords_KEL.ECL_Functions.Dataset_FDC','orig_teramedia_id',COUNT(__d1(__NL(Teramedia_I_D_))),COUNT(__d1(__NN(Teramedia_I_D_)))},
+    {'Email','PublicRecords_KEL.ECL_Functions.Dataset_FDC','process_date',COUNT(__d1(__NL(Process_Date_))),COUNT(__d1(__NN(Process_Date_)))},
+    {'Email','PublicRecords_KEL.ECL_Functions.Dataset_FDC','activecode',COUNT(__d1(__NL(Active_Code_))),COUNT(__d1(__NN(Active_Code_)))},
+    {'Email','PublicRecords_KEL.ECL_Functions.Dataset_FDC','CompanyName',COUNT(__d1(__NL(Company_Name_))),COUNT(__d1(__NN(Company_Name_)))},
+    {'Email','PublicRecords_KEL.ECL_Functions.Dataset_FDC','CompanyTitle',COUNT(__d1(__NL(Company_Title_))),COUNT(__d1(__NN(Company_Title_)))},
+    {'Email','PublicRecords_KEL.ECL_Functions.Dataset_FDC','Email_Src',COUNT(__d1(__NL(Source_))),COUNT(__d1(__NN(Source_)))},
+    {'Email','PublicRecords_KEL.ECL_Functions.Dataset_FDC','Archive_Date',COUNT(__d1(Archive___Date_=0)),COUNT(__d1(Archive___Date_!=0))},
+    {'Email','PublicRecords_KEL.ECL_Functions.Dataset_FDC','DateFirstSeen',COUNT(__d1(Date_First_Seen_=0)),COUNT(__d1(Date_First_Seen_!=0))},
+    {'Email','PublicRecords_KEL.ECL_Functions.Dataset_FDC','DateLastSeen',COUNT(__d1(Date_Last_Seen_=0)),COUNT(__d1(Date_Last_Seen_!=0))},
+    {'Email','PublicRecords_KEL.ECL_Functions.Dataset_FDC','HybridArchiveDate',COUNT(__d1(Hybrid_Archive_Date_=0)),COUNT(__d1(Hybrid_Archive_Date_!=0))},
+    {'Email','PublicRecords_KEL.ECL_Functions.Dataset_FDC','VaultDateLastSeen',COUNT(__d1(Vault_Date_Last_Seen_=0)),COUNT(__d1(Vault_Date_Last_Seen_!=0))}]
   ,{KEL.typ.str entity,KEL.typ.str fileName,KEL.typ.str fieldName,KEL.typ.int nullCount,KEL.typ.int notNullCount});
 END;

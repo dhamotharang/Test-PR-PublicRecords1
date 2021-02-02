@@ -1,9 +1,9 @@
-﻿//HPCC Systems KEL Compiler Version 1.5.0rc1
+//HPCC Systems KEL Compiler Version 1.5.0rc1
 IMPORT KEL15 AS KEL;
 IMPORT PublicRecords_KEL;
 IMPORT CFG_Compile,E_Criminal_Offender,E_Criminal_Offense,E_Criminal_Punishment FROM PublicRecords_KEL;
 IMPORT * FROM KEL15.Null;
-EXPORT E_Criminal_Details(CFG_Compile __cfg = CFG_Compile) := MODULE
+EXPORT E_Criminal_Details(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG_Compile __cfg = CFG_Compile) := MODULE
   EXPORT Typ := KEL.typ.uid;
   EXPORT InLayout := RECORD
     KEL.typ.ntyp(E_Criminal_Offender().Typ) Offender_;
@@ -20,92 +20,102 @@ EXPORT E_Criminal_Details(CFG_Compile __cfg = CFG_Compile) := MODULE
   SHARED VIRTUAL __SourceFilter(DATASET(InLayout) __ds) := __ds;
   SHARED VIRTUAL __GroupedFilter(GROUPED DATASET(InLayout) __ds) := __ds;
   SHARED __Mapping := 'Offender_(DEFAULT:Offender_:0),Offense_(DEFAULT:Offense_:0),Punishment_(DEFAULT:Punishment_:0),source(DEFAULT:Source_:\'\'),archive_date(DEFAULT:Archive___Date_:EPOCH),datefirstseen(DEFAULT:Date_First_Seen_:EPOCH),datelastseen(DEFAULT:Date_Last_Seen_:EPOCH),hybridarchivedate(DEFAULT:Hybrid_Archive_Date_:EPOCH),vaultdatelastseen(DEFAULT:Vault_Date_Last_Seen_:EPOCH)';
-  SHARED Hybrid_Archive_Date_0Rule(STRING a) := MAP(KEL.Routines.IsValidDate((KEL.typ.kdate)(a[1..6]+'01'))=>a[1..6]+'01','0');
-  SHARED __Mapping0 := 'Offender_(DEFAULT:Offender_:0),Offense_(DEFAULT:Offense_:0),Punishment_(DEFAULT:Punishment_:0),src(OVERRIDE:Source_:\'\'),archive_date(OVERRIDE:Archive___Date_:EPOCH),event_dt(OVERRIDE:Date_First_Seen_:EPOCH),process_date(OVERRIDE:Date_Last_Seen_:EPOCH),hybrid_archive_date(OVERRIDE:Hybrid_Archive_Date_:EPOCH:Hybrid_Archive_Date_0Rule),vaultdatelastseen(DEFAULT:Vault_Date_Last_Seen_:EPOCH),DPMBitmap(OVERRIDE:__Permits:PERMITS)';
+  SHARED __Mapping0 := 'Offender_(DEFAULT:Offender_:0),Offense_(DEFAULT:Offense_:0),Punishment_(DEFAULT:Punishment_:0),archive_date(OVERRIDE:Archive___Date_:EPOCH),event_dt(OVERRIDE:Date_First_Seen_:EPOCH),process_date(OVERRIDE:Date_Last_Seen_:EPOCH),hybridarchivedate(DEFAULT:Hybrid_Archive_Date_:EPOCH),vaultdatelastseen(DEFAULT:Vault_Date_Last_Seen_:EPOCH),DPMBitmap(OVERRIDE:__Permits:PERMITS)';
+  SHARED InLayout __Mapping0_Transform(InLayout __r) := TRANSFORM
+    SELF.Source_ := __CN('DC');
+    SELF := __r;
+  END;
+  SHARED __d0_Norm := NORMALIZE(__in,LEFT.Dataset_Doxie_Files__Key_Punishment,TRANSFORM(RECORDOF(__in.Dataset_Doxie_Files__Key_Punishment),SELF:=RIGHT));
   SHARED __d0_Offender__Layout := RECORD
-    RECORDOF(PublicRecords_KEL.Files.NonFCRA.Doxie_Files__Key_Punishment_Vault);
+    RECORDOF(__d0_Norm);
     KEL.typ.uid Offender_;
   END;
-  SHARED __d0_Missing_Offender__UIDComponents := KEL.Intake.ConstructMissingFieldList(PublicRecords_KEL.Files.NonFCRA.Doxie_Files__Key_Punishment_Vault,'offender_key','PublicRecords_KEL.Files.NonFCRA.Doxie_Files__Key_Punishment_Vault');
-  SHARED __d0_Offender__Mapped := IF(__d0_Missing_Offender__UIDComponents = 'offender_key',PROJECT(PublicRecords_KEL.Files.NonFCRA.Doxie_Files__Key_Punishment_Vault,TRANSFORM(__d0_Offender__Layout,SELF.Offender_:=0,SELF:=LEFT)),JOIN(KEL.Intake.AppendFields(PublicRecords_KEL.Files.NonFCRA.Doxie_Files__Key_Punishment_Vault,__d0_Missing_Offender__UIDComponents),E_Criminal_Offender(__cfg).Lookup,TRIM((STRING)LEFT.offender_key) = RIGHT.KeyVal,TRANSFORM(__d0_Offender__Layout,SELF.Offender_:=RIGHT.UID,SELF:=LEFT),LEFT OUTER,SMART));
+  SHARED __d0_Missing_Offender__UIDComponents := KEL.Intake.ConstructMissingFieldList(__d0_Norm,'offender_key','__in');
+  SHARED __d0_Offender__Mapped := IF(__d0_Missing_Offender__UIDComponents = 'offender_key',PROJECT(__d0_Norm,TRANSFORM(__d0_Offender__Layout,SELF.Offender_:=0,SELF:=LEFT)),JOIN(KEL.Intake.AppendFields(__d0_Norm,__d0_Missing_Offender__UIDComponents),E_Criminal_Offender(__in,__cfg).Lookup,TRIM((STRING)LEFT.offender_key) = RIGHT.KeyVal,TRANSFORM(__d0_Offender__Layout,SELF.Offender_:=RIGHT.UID,SELF:=LEFT),LEFT OUTER,SMART));
   SHARED __d0_Offense__Layout := RECORD
     RECORDOF(__d0_Offender__Mapped);
     KEL.typ.uid Offense_;
   END;
-  SHARED __d0_Missing_Offense__UIDComponents := KEL.Intake.ConstructMissingFieldList(__d0_Offender__Mapped,'offender_key','PublicRecords_KEL.Files.NonFCRA.Doxie_Files__Key_Punishment_Vault');
-  SHARED __d0_Offense__Mapped := IF(__d0_Missing_Offense__UIDComponents = 'offender_key',PROJECT(__d0_Offender__Mapped,TRANSFORM(__d0_Offense__Layout,SELF.Offense_:=0,SELF:=LEFT)),JOIN(KEL.Intake.AppendFields(__d0_Offender__Mapped,__d0_Missing_Offense__UIDComponents),E_Criminal_Offense(__cfg).Lookup,TRIM((STRING)LEFT.offender_key) = RIGHT.KeyVal,TRANSFORM(__d0_Offense__Layout,SELF.Offense_:=RIGHT.UID,SELF:=LEFT),LEFT OUTER,SMART));
+  SHARED __d0_Missing_Offense__UIDComponents := KEL.Intake.ConstructMissingFieldList(__d0_Offender__Mapped,'offender_key','__in');
+  SHARED __d0_Offense__Mapped := IF(__d0_Missing_Offense__UIDComponents = 'offender_key',PROJECT(__d0_Offender__Mapped,TRANSFORM(__d0_Offense__Layout,SELF.Offense_:=0,SELF:=LEFT)),JOIN(KEL.Intake.AppendFields(__d0_Offender__Mapped,__d0_Missing_Offense__UIDComponents),E_Criminal_Offense(__in,__cfg).Lookup,TRIM((STRING)LEFT.offender_key) = RIGHT.KeyVal,TRANSFORM(__d0_Offense__Layout,SELF.Offense_:=RIGHT.UID,SELF:=LEFT),LEFT OUTER,SMART));
   SHARED __d0_Punishment__Layout := RECORD
     RECORDOF(__d0_Offense__Mapped);
     KEL.typ.uid Punishment_;
   END;
-  SHARED __d0_Missing_Punishment__UIDComponents := KEL.Intake.ConstructMissingFieldList(__d0_Offense__Mapped,'offender_key','PublicRecords_KEL.Files.NonFCRA.Doxie_Files__Key_Punishment_Vault');
-  SHARED __d0_Punishment__Mapped := IF(__d0_Missing_Punishment__UIDComponents = 'offender_key',PROJECT(__d0_Offense__Mapped,TRANSFORM(__d0_Punishment__Layout,SELF.Punishment_:=0,SELF:=LEFT)),JOIN(KEL.Intake.AppendFields(__d0_Offense__Mapped,__d0_Missing_Punishment__UIDComponents),E_Criminal_Punishment(__cfg).Lookup,TRIM((STRING)LEFT.offender_key) = RIGHT.KeyVal,TRANSFORM(__d0_Punishment__Layout,SELF.Punishment_:=RIGHT.UID,SELF:=LEFT),LEFT OUTER,SMART));
+  SHARED __d0_Missing_Punishment__UIDComponents := KEL.Intake.ConstructMissingFieldList(__d0_Offense__Mapped,'offender_key','__in');
+  SHARED __d0_Punishment__Mapped := IF(__d0_Missing_Punishment__UIDComponents = 'offender_key',PROJECT(__d0_Offense__Mapped,TRANSFORM(__d0_Punishment__Layout,SELF.Punishment_:=0,SELF:=LEFT)),JOIN(KEL.Intake.AppendFields(__d0_Offense__Mapped,__d0_Missing_Punishment__UIDComponents),E_Criminal_Punishment(__in,__cfg).Lookup,TRIM((STRING)LEFT.offender_key) = RIGHT.KeyVal,TRANSFORM(__d0_Punishment__Layout,SELF.Punishment_:=RIGHT.UID,SELF:=LEFT),LEFT OUTER,SMART));
   SHARED __d0_Prefiltered := __d0_Punishment__Mapped;
-  SHARED __d0 := __SourceFilter(KEL.FromFlat.Convert(__d0_Prefiltered,InLayout,__Mapping0,'PublicRecords_KEL.Files.NonFCRA.Doxie_Files__Key_Punishment_Vault'));
-  SHARED Hybrid_Archive_Date_1Rule(STRING a) := MAP(KEL.Routines.IsValidDate((KEL.typ.kdate)(a[1..6]+'01'))=>a[1..6]+'01','0');
-  SHARED __Mapping1 := 'Offender_(DEFAULT:Offender_:0),Offense_(DEFAULT:Offense_:0),Punishment_(DEFAULT:Punishment_:0),src(OVERRIDE:Source_:\'\'),archive_date(OVERRIDE:Archive___Date_:EPOCH),fcra_date(OVERRIDE:Date_First_Seen_:EPOCH),datelastseen(DEFAULT:Date_Last_Seen_:EPOCH),hybrid_archive_date(OVERRIDE:Hybrid_Archive_Date_:EPOCH:Hybrid_Archive_Date_1Rule),vaultdatelastseen(DEFAULT:Vault_Date_Last_Seen_:EPOCH),DPMBitmap(OVERRIDE:__Permits:PERMITS)';
+  SHARED __d0 := __SourceFilter(PROJECT(KEL.FromFlat.Convert(__d0_Prefiltered,InLayout,__Mapping0,'PublicRecords_KEL.ECL_Functions.Dataset_FDC'),__Mapping0_Transform(LEFT)));
+  SHARED __Mapping1 := 'Offender_(DEFAULT:Offender_:0),Offense_(DEFAULT:Offense_:0),Punishment_(DEFAULT:Punishment_:0),archive_date(OVERRIDE:Archive___Date_:EPOCH),datefirstseen(DEFAULT:Date_First_Seen_:EPOCH),datelastseen(DEFAULT:Date_Last_Seen_:EPOCH),hybridarchivedate(DEFAULT:Hybrid_Archive_Date_:EPOCH),vaultdatelastseen(DEFAULT:Vault_Date_Last_Seen_:EPOCH),DPMBitmap(OVERRIDE:__Permits:PERMITS)';
+  SHARED InLayout __Mapping1_Transform(InLayout __r) := TRANSFORM
+    SELF.Source_ := __CN('DC');
+    SELF := __r;
+  END;
+  SHARED __d1_Norm := NORMALIZE(__in,LEFT.Dataset_Doxie_Files__Key_Offenses,TRANSFORM(RECORDOF(__in.Dataset_Doxie_Files__Key_Offenses),SELF:=RIGHT));
   SHARED __d1_Offender__Layout := RECORD
-    RECORDOF(PublicRecords_KEL.Files.FCRA.Doxie_Files__Key_Offenders_FCRA_Vault);
+    RECORDOF(__d1_Norm);
     KEL.typ.uid Offender_;
   END;
-  SHARED __d1_Missing_Offender__UIDComponents := KEL.Intake.ConstructMissingFieldList(PublicRecords_KEL.Files.FCRA.Doxie_Files__Key_Offenders_FCRA_Vault,'offender_key','PublicRecords_KEL.Files.FCRA.Doxie_Files__Key_Offenders_FCRA_Vault');
-  SHARED __d1_Offender__Mapped := IF(__d1_Missing_Offender__UIDComponents = 'offender_key',PROJECT(PublicRecords_KEL.Files.FCRA.Doxie_Files__Key_Offenders_FCRA_Vault,TRANSFORM(__d1_Offender__Layout,SELF.Offender_:=0,SELF:=LEFT)),JOIN(KEL.Intake.AppendFields(PublicRecords_KEL.Files.FCRA.Doxie_Files__Key_Offenders_FCRA_Vault,__d1_Missing_Offender__UIDComponents),E_Criminal_Offender(__cfg).Lookup,TRIM((STRING)LEFT.offender_key) = RIGHT.KeyVal,TRANSFORM(__d1_Offender__Layout,SELF.Offender_:=RIGHT.UID,SELF:=LEFT),LEFT OUTER,SMART));
+  SHARED __d1_Missing_Offender__UIDComponents := KEL.Intake.ConstructMissingFieldList(__d1_Norm,'offender_key','__in');
+  SHARED __d1_Offender__Mapped := IF(__d1_Missing_Offender__UIDComponents = 'offender_key',PROJECT(__d1_Norm,TRANSFORM(__d1_Offender__Layout,SELF.Offender_:=0,SELF:=LEFT)),JOIN(KEL.Intake.AppendFields(__d1_Norm,__d1_Missing_Offender__UIDComponents),E_Criminal_Offender(__in,__cfg).Lookup,TRIM((STRING)LEFT.offender_key) = RIGHT.KeyVal,TRANSFORM(__d1_Offender__Layout,SELF.Offender_:=RIGHT.UID,SELF:=LEFT),LEFT OUTER,SMART));
   SHARED __d1_Offense__Layout := RECORD
     RECORDOF(__d1_Offender__Mapped);
     KEL.typ.uid Offense_;
   END;
-  SHARED __d1_Missing_Offense__UIDComponents := KEL.Intake.ConstructMissingFieldList(__d1_Offender__Mapped,'offender_key','PublicRecords_KEL.Files.FCRA.Doxie_Files__Key_Offenders_FCRA_Vault');
-  SHARED __d1_Offense__Mapped := IF(__d1_Missing_Offense__UIDComponents = 'offender_key',PROJECT(__d1_Offender__Mapped,TRANSFORM(__d1_Offense__Layout,SELF.Offense_:=0,SELF:=LEFT)),JOIN(KEL.Intake.AppendFields(__d1_Offender__Mapped,__d1_Missing_Offense__UIDComponents),E_Criminal_Offense(__cfg).Lookup,TRIM((STRING)LEFT.offender_key) = RIGHT.KeyVal,TRANSFORM(__d1_Offense__Layout,SELF.Offense_:=RIGHT.UID,SELF:=LEFT),LEFT OUTER,SMART));
+  SHARED __d1_Missing_Offense__UIDComponents := KEL.Intake.ConstructMissingFieldList(__d1_Offender__Mapped,'offender_key','__in');
+  SHARED __d1_Offense__Mapped := IF(__d1_Missing_Offense__UIDComponents = 'offender_key',PROJECT(__d1_Offender__Mapped,TRANSFORM(__d1_Offense__Layout,SELF.Offense_:=0,SELF:=LEFT)),JOIN(KEL.Intake.AppendFields(__d1_Offender__Mapped,__d1_Missing_Offense__UIDComponents),E_Criminal_Offense(__in,__cfg).Lookup,TRIM((STRING)LEFT.offender_key) = RIGHT.KeyVal,TRANSFORM(__d1_Offense__Layout,SELF.Offense_:=RIGHT.UID,SELF:=LEFT),LEFT OUTER,SMART));
   SHARED __d1_Punishment__Layout := RECORD
     RECORDOF(__d1_Offense__Mapped);
     KEL.typ.uid Punishment_;
   END;
-  SHARED __d1_Missing_Punishment__UIDComponents := KEL.Intake.ConstructMissingFieldList(__d1_Offense__Mapped,'offender_key','PublicRecords_KEL.Files.FCRA.Doxie_Files__Key_Offenders_FCRA_Vault');
-  SHARED __d1_Punishment__Mapped := IF(__d1_Missing_Punishment__UIDComponents = 'offender_key',PROJECT(__d1_Offense__Mapped,TRANSFORM(__d1_Punishment__Layout,SELF.Punishment_:=0,SELF:=LEFT)),JOIN(KEL.Intake.AppendFields(__d1_Offense__Mapped,__d1_Missing_Punishment__UIDComponents),E_Criminal_Punishment(__cfg).Lookup,TRIM((STRING)LEFT.offender_key) = RIGHT.KeyVal,TRANSFORM(__d1_Punishment__Layout,SELF.Punishment_:=RIGHT.UID,SELF:=LEFT),LEFT OUTER,SMART));
+  SHARED __d1_Missing_Punishment__UIDComponents := KEL.Intake.ConstructMissingFieldList(__d1_Offense__Mapped,'offender_key','__in');
+  SHARED __d1_Punishment__Mapped := IF(__d1_Missing_Punishment__UIDComponents = 'offender_key',PROJECT(__d1_Offense__Mapped,TRANSFORM(__d1_Punishment__Layout,SELF.Punishment_:=0,SELF:=LEFT)),JOIN(KEL.Intake.AppendFields(__d1_Offense__Mapped,__d1_Missing_Punishment__UIDComponents),E_Criminal_Punishment(__in,__cfg).Lookup,TRIM((STRING)LEFT.offender_key) = RIGHT.KeyVal,TRANSFORM(__d1_Punishment__Layout,SELF.Punishment_:=RIGHT.UID,SELF:=LEFT),LEFT OUTER,SMART));
   SHARED __d1_Prefiltered := __d1_Punishment__Mapped;
-  SHARED __d1 := __SourceFilter(KEL.FromFlat.Convert(__d1_Prefiltered,InLayout,__Mapping1,'PublicRecords_KEL.Files.FCRA.Doxie_Files__Key_Offenders_FCRA_Vault'));
-  SHARED __Mapping2 := 'Offender_(DEFAULT:Offender_:0),Offense_(DEFAULT:Offense_:0),Punishment_(DEFAULT:Punishment_:0),src(OVERRIDE:Source_:\'\'),archive_date(OVERRIDE:Archive___Date_:EPOCH),datefirstseen(DEFAULT:Date_First_Seen_:EPOCH),datelastseen(DEFAULT:Date_Last_Seen_:EPOCH),hybridarchivedate(DEFAULT:Hybrid_Archive_Date_:EPOCH),vaultdatelastseen(DEFAULT:Vault_Date_Last_Seen_:EPOCH),DPMBitmap(OVERRIDE:__Permits:PERMITS)';
+  SHARED __d1 := __SourceFilter(PROJECT(KEL.FromFlat.Convert(__d1_Prefiltered,InLayout,__Mapping1,'PublicRecords_KEL.ECL_Functions.Dataset_FDC'),__Mapping1_Transform(LEFT)));
+  SHARED __Mapping2 := 'Offender_(DEFAULT:Offender_:0),Offense_(DEFAULT:Offense_:0),Punishment_(DEFAULT:Punishment_:0),source(DEFAULT:Source_:\'\'),archive_date(OVERRIDE:Archive___Date_:EPOCH),datefirstseen(DEFAULT:Date_First_Seen_:EPOCH),datelastseen(DEFAULT:Date_Last_Seen_:EPOCH),hybridarchivedate(DEFAULT:Hybrid_Archive_Date_:EPOCH),vaultdatelastseen(DEFAULT:Vault_Date_Last_Seen_:EPOCH),DPMBitmap(OVERRIDE:__Permits:PERMITS)';
+  SHARED __d2_Norm := NORMALIZE(__in,LEFT.Dataset_Doxie_Files__Key_Court_Offenses,TRANSFORM(RECORDOF(__in.Dataset_Doxie_Files__Key_Court_Offenses),SELF:=RIGHT));
   SHARED __d2_Offender__Layout := RECORD
-    RECORDOF(PublicRecords_KEL.Files.FCRA.doxie_files__Key_Court_Offenses_Vault);
+    RECORDOF(__d2_Norm);
     KEL.typ.uid Offender_;
   END;
-  SHARED __d2_Missing_Offender__UIDComponents := KEL.Intake.ConstructMissingFieldList(PublicRecords_KEL.Files.FCRA.doxie_files__Key_Court_Offenses_Vault,'offender_key','PublicRecords_KEL.Files.FCRA.doxie_files__Key_Court_Offenses_Vault');
-  SHARED __d2_Offender__Mapped := IF(__d2_Missing_Offender__UIDComponents = 'offender_key',PROJECT(PublicRecords_KEL.Files.FCRA.doxie_files__Key_Court_Offenses_Vault,TRANSFORM(__d2_Offender__Layout,SELF.Offender_:=0,SELF:=LEFT)),JOIN(KEL.Intake.AppendFields(PublicRecords_KEL.Files.FCRA.doxie_files__Key_Court_Offenses_Vault,__d2_Missing_Offender__UIDComponents),E_Criminal_Offender(__cfg).Lookup,TRIM((STRING)LEFT.offender_key) = RIGHT.KeyVal,TRANSFORM(__d2_Offender__Layout,SELF.Offender_:=RIGHT.UID,SELF:=LEFT),LEFT OUTER,SMART));
+  SHARED __d2_Missing_Offender__UIDComponents := KEL.Intake.ConstructMissingFieldList(__d2_Norm,'offender_key','__in');
+  SHARED __d2_Offender__Mapped := IF(__d2_Missing_Offender__UIDComponents = 'offender_key',PROJECT(__d2_Norm,TRANSFORM(__d2_Offender__Layout,SELF.Offender_:=0,SELF:=LEFT)),JOIN(KEL.Intake.AppendFields(__d2_Norm,__d2_Missing_Offender__UIDComponents),E_Criminal_Offender(__in,__cfg).Lookup,TRIM((STRING)LEFT.offender_key) = RIGHT.KeyVal,TRANSFORM(__d2_Offender__Layout,SELF.Offender_:=RIGHT.UID,SELF:=LEFT),LEFT OUTER,SMART));
   SHARED __d2_Offense__Layout := RECORD
     RECORDOF(__d2_Offender__Mapped);
     KEL.typ.uid Offense_;
   END;
-  SHARED __d2_Missing_Offense__UIDComponents := KEL.Intake.ConstructMissingFieldList(__d2_Offender__Mapped,'offender_key','PublicRecords_KEL.Files.FCRA.doxie_files__Key_Court_Offenses_Vault');
-  SHARED __d2_Offense__Mapped := IF(__d2_Missing_Offense__UIDComponents = 'offender_key',PROJECT(__d2_Offender__Mapped,TRANSFORM(__d2_Offense__Layout,SELF.Offense_:=0,SELF:=LEFT)),JOIN(KEL.Intake.AppendFields(__d2_Offender__Mapped,__d2_Missing_Offense__UIDComponents),E_Criminal_Offense(__cfg).Lookup,TRIM((STRING)LEFT.offender_key) = RIGHT.KeyVal,TRANSFORM(__d2_Offense__Layout,SELF.Offense_:=RIGHT.UID,SELF:=LEFT),LEFT OUTER,SMART));
+  SHARED __d2_Missing_Offense__UIDComponents := KEL.Intake.ConstructMissingFieldList(__d2_Offender__Mapped,'offender_key','__in');
+  SHARED __d2_Offense__Mapped := IF(__d2_Missing_Offense__UIDComponents = 'offender_key',PROJECT(__d2_Offender__Mapped,TRANSFORM(__d2_Offense__Layout,SELF.Offense_:=0,SELF:=LEFT)),JOIN(KEL.Intake.AppendFields(__d2_Offender__Mapped,__d2_Missing_Offense__UIDComponents),E_Criminal_Offense(__in,__cfg).Lookup,TRIM((STRING)LEFT.offender_key) = RIGHT.KeyVal,TRANSFORM(__d2_Offense__Layout,SELF.Offense_:=RIGHT.UID,SELF:=LEFT),LEFT OUTER,SMART));
   SHARED __d2_Punishment__Layout := RECORD
     RECORDOF(__d2_Offense__Mapped);
     KEL.typ.uid Punishment_;
   END;
-  SHARED __d2_Missing_Punishment__UIDComponents := KEL.Intake.ConstructMissingFieldList(__d2_Offense__Mapped,'offender_key','PublicRecords_KEL.Files.FCRA.doxie_files__Key_Court_Offenses_Vault');
-  SHARED __d2_Punishment__Mapped := IF(__d2_Missing_Punishment__UIDComponents = 'offender_key',PROJECT(__d2_Offense__Mapped,TRANSFORM(__d2_Punishment__Layout,SELF.Punishment_:=0,SELF:=LEFT)),JOIN(KEL.Intake.AppendFields(__d2_Offense__Mapped,__d2_Missing_Punishment__UIDComponents),E_Criminal_Punishment(__cfg).Lookup,TRIM((STRING)LEFT.offender_key) = RIGHT.KeyVal,TRANSFORM(__d2_Punishment__Layout,SELF.Punishment_:=RIGHT.UID,SELF:=LEFT),LEFT OUTER,SMART));
+  SHARED __d2_Missing_Punishment__UIDComponents := KEL.Intake.ConstructMissingFieldList(__d2_Offense__Mapped,'offender_key','__in');
+  SHARED __d2_Punishment__Mapped := IF(__d2_Missing_Punishment__UIDComponents = 'offender_key',PROJECT(__d2_Offense__Mapped,TRANSFORM(__d2_Punishment__Layout,SELF.Punishment_:=0,SELF:=LEFT)),JOIN(KEL.Intake.AppendFields(__d2_Offense__Mapped,__d2_Missing_Punishment__UIDComponents),E_Criminal_Punishment(__in,__cfg).Lookup,TRIM((STRING)LEFT.offender_key) = RIGHT.KeyVal,TRANSFORM(__d2_Punishment__Layout,SELF.Punishment_:=RIGHT.UID,SELF:=LEFT),LEFT OUTER,SMART));
   SHARED __d2_Prefiltered := __d2_Punishment__Mapped;
-  SHARED __d2 := __SourceFilter(KEL.FromFlat.Convert(__d2_Prefiltered,InLayout,__Mapping2,'PublicRecords_KEL.Files.FCRA.doxie_files__Key_Court_Offenses_Vault'));
-  SHARED __Mapping3 := 'Offender_(DEFAULT:Offender_:0),Offense_(DEFAULT:Offense_:0),Punishment_(DEFAULT:Punishment_:0),src(OVERRIDE:Source_:\'\'),archive_date(OVERRIDE:Archive___Date_:EPOCH),datefirstseen(DEFAULT:Date_First_Seen_:EPOCH),datelastseen(DEFAULT:Date_Last_Seen_:EPOCH),hybridarchivedate(DEFAULT:Hybrid_Archive_Date_:EPOCH),vaultdatelastseen(DEFAULT:Vault_Date_Last_Seen_:EPOCH),DPMBitmap(OVERRIDE:__Permits:PERMITS)';
+  SHARED __d2 := __SourceFilter(KEL.FromFlat.Convert(__d2_Prefiltered,InLayout,__Mapping2,'PublicRecords_KEL.ECL_Functions.Dataset_FDC'));
+  SHARED __Mapping3 := 'Offender_(DEFAULT:Offender_:0),Offense_(DEFAULT:Offense_:0),Punishment_(DEFAULT:Punishment_:0),src(OVERRIDE:Source_:\'\'),archive_date(OVERRIDE:Archive___Date_:EPOCH),fcra_date(OVERRIDE:Date_First_Seen_:EPOCH),datelastseen(DEFAULT:Date_Last_Seen_:EPOCH),hybridarchivedate(DEFAULT:Hybrid_Archive_Date_:EPOCH),vaultdatelastseen(DEFAULT:Vault_Date_Last_Seen_:EPOCH),DPMBitmap(OVERRIDE:__Permits:PERMITS)';
+  SHARED __d3_Norm := NORMALIZE(__in,LEFT.Dataset_Doxie_Files__Key_Offenders,TRANSFORM(RECORDOF(__in.Dataset_Doxie_Files__Key_Offenders),SELF:=RIGHT));
   SHARED __d3_Offender__Layout := RECORD
-    RECORDOF(PublicRecords_KEL.Files.FCRA.doxie_files__Key_Offenses_Vault);
+    RECORDOF(__d3_Norm);
     KEL.typ.uid Offender_;
   END;
-  SHARED __d3_Missing_Offender__UIDComponents := KEL.Intake.ConstructMissingFieldList(PublicRecords_KEL.Files.FCRA.doxie_files__Key_Offenses_Vault,'offender_key','PublicRecords_KEL.Files.FCRA.doxie_files__Key_Offenses_Vault');
-  SHARED __d3_Offender__Mapped := IF(__d3_Missing_Offender__UIDComponents = 'offender_key',PROJECT(PublicRecords_KEL.Files.FCRA.doxie_files__Key_Offenses_Vault,TRANSFORM(__d3_Offender__Layout,SELF.Offender_:=0,SELF:=LEFT)),JOIN(KEL.Intake.AppendFields(PublicRecords_KEL.Files.FCRA.doxie_files__Key_Offenses_Vault,__d3_Missing_Offender__UIDComponents),E_Criminal_Offender(__cfg).Lookup,TRIM((STRING)LEFT.offender_key) = RIGHT.KeyVal,TRANSFORM(__d3_Offender__Layout,SELF.Offender_:=RIGHT.UID,SELF:=LEFT),LEFT OUTER,SMART));
+  SHARED __d3_Missing_Offender__UIDComponents := KEL.Intake.ConstructMissingFieldList(__d3_Norm,'offender_key','__in');
+  SHARED __d3_Offender__Mapped := IF(__d3_Missing_Offender__UIDComponents = 'offender_key',PROJECT(__d3_Norm,TRANSFORM(__d3_Offender__Layout,SELF.Offender_:=0,SELF:=LEFT)),JOIN(KEL.Intake.AppendFields(__d3_Norm,__d3_Missing_Offender__UIDComponents),E_Criminal_Offender(__in,__cfg).Lookup,TRIM((STRING)LEFT.offender_key) = RIGHT.KeyVal,TRANSFORM(__d3_Offender__Layout,SELF.Offender_:=RIGHT.UID,SELF:=LEFT),LEFT OUTER,SMART));
   SHARED __d3_Offense__Layout := RECORD
     RECORDOF(__d3_Offender__Mapped);
     KEL.typ.uid Offense_;
   END;
-  SHARED __d3_Missing_Offense__UIDComponents := KEL.Intake.ConstructMissingFieldList(__d3_Offender__Mapped,'offender_key','PublicRecords_KEL.Files.FCRA.doxie_files__Key_Offenses_Vault');
-  SHARED __d3_Offense__Mapped := IF(__d3_Missing_Offense__UIDComponents = 'offender_key',PROJECT(__d3_Offender__Mapped,TRANSFORM(__d3_Offense__Layout,SELF.Offense_:=0,SELF:=LEFT)),JOIN(KEL.Intake.AppendFields(__d3_Offender__Mapped,__d3_Missing_Offense__UIDComponents),E_Criminal_Offense(__cfg).Lookup,TRIM((STRING)LEFT.offender_key) = RIGHT.KeyVal,TRANSFORM(__d3_Offense__Layout,SELF.Offense_:=RIGHT.UID,SELF:=LEFT),LEFT OUTER,SMART));
+  SHARED __d3_Missing_Offense__UIDComponents := KEL.Intake.ConstructMissingFieldList(__d3_Offender__Mapped,'offender_key','__in');
+  SHARED __d3_Offense__Mapped := IF(__d3_Missing_Offense__UIDComponents = 'offender_key',PROJECT(__d3_Offender__Mapped,TRANSFORM(__d3_Offense__Layout,SELF.Offense_:=0,SELF:=LEFT)),JOIN(KEL.Intake.AppendFields(__d3_Offender__Mapped,__d3_Missing_Offense__UIDComponents),E_Criminal_Offense(__in,__cfg).Lookup,TRIM((STRING)LEFT.offender_key) = RIGHT.KeyVal,TRANSFORM(__d3_Offense__Layout,SELF.Offense_:=RIGHT.UID,SELF:=LEFT),LEFT OUTER,SMART));
   SHARED __d3_Punishment__Layout := RECORD
     RECORDOF(__d3_Offense__Mapped);
     KEL.typ.uid Punishment_;
   END;
-  SHARED __d3_Missing_Punishment__UIDComponents := KEL.Intake.ConstructMissingFieldList(__d3_Offense__Mapped,'offender_key','PublicRecords_KEL.Files.FCRA.doxie_files__Key_Offenses_Vault');
-  SHARED __d3_Punishment__Mapped := IF(__d3_Missing_Punishment__UIDComponents = 'offender_key',PROJECT(__d3_Offense__Mapped,TRANSFORM(__d3_Punishment__Layout,SELF.Punishment_:=0,SELF:=LEFT)),JOIN(KEL.Intake.AppendFields(__d3_Offense__Mapped,__d3_Missing_Punishment__UIDComponents),E_Criminal_Punishment(__cfg).Lookup,TRIM((STRING)LEFT.offender_key) = RIGHT.KeyVal,TRANSFORM(__d3_Punishment__Layout,SELF.Punishment_:=RIGHT.UID,SELF:=LEFT),LEFT OUTER,SMART));
+  SHARED __d3_Missing_Punishment__UIDComponents := KEL.Intake.ConstructMissingFieldList(__d3_Offense__Mapped,'offender_key','__in');
+  SHARED __d3_Punishment__Mapped := IF(__d3_Missing_Punishment__UIDComponents = 'offender_key',PROJECT(__d3_Offense__Mapped,TRANSFORM(__d3_Punishment__Layout,SELF.Punishment_:=0,SELF:=LEFT)),JOIN(KEL.Intake.AppendFields(__d3_Offense__Mapped,__d3_Missing_Punishment__UIDComponents),E_Criminal_Punishment(__in,__cfg).Lookup,TRIM((STRING)LEFT.offender_key) = RIGHT.KeyVal,TRANSFORM(__d3_Punishment__Layout,SELF.Punishment_:=RIGHT.UID,SELF:=LEFT),LEFT OUTER,SMART));
   SHARED __d3_Prefiltered := __d3_Punishment__Mapped;
-  SHARED __d3 := __SourceFilter(KEL.FromFlat.Convert(__d3_Prefiltered,InLayout,__Mapping3,'PublicRecords_KEL.Files.FCRA.doxie_files__Key_Offenses_Vault'));
+  SHARED __d3 := __SourceFilter(KEL.FromFlat.Convert(__d3_Prefiltered,InLayout,__Mapping3,'PublicRecords_KEL.ECL_Functions.Dataset_FDC'));
   EXPORT InData := __d0 + __d1 + __d2 + __d3;
   EXPORT Data_Sources_Layout := RECORD
     KEL.typ.nstr Source_;
@@ -153,46 +163,44 @@ EXPORT E_Criminal_Details(CFG_Compile __cfg = CFG_Compile) := MODULE
   EXPORT __PreResult := ROLLUP(HAVING(Criminal_Details_Group,COUNT(ROWS(LEFT))=1),GROUP,Criminal_Details__Single_Rollup(LEFT)) + ROLLUP(HAVING(Criminal_Details_Group,COUNT(ROWS(LEFT))>1),GROUP,Criminal_Details__Rollup(LEFT, ROWS(LEFT)));
   EXPORT __Result := __CLEARFLAGS(__PreResult);
   EXPORT Result := __UNWRAP(__Result);
-  EXPORT Offender__Orphan := JOIN(InData(__NN(Offender_)),E_Criminal_Offender(__cfg).__Result,__EEQP(LEFT.Offender_, RIGHT.UID),TRANSFORM(InLayout,SELF := LEFT,SELF:=[]),LEFT ONLY, HASH);
-  EXPORT Offense__Orphan := JOIN(InData(__NN(Offense_)),E_Criminal_Offense(__cfg).__Result,__EEQP(LEFT.Offense_, RIGHT.UID),TRANSFORM(InLayout,SELF := LEFT,SELF:=[]),LEFT ONLY, HASH);
-  EXPORT Punishment__Orphan := JOIN(InData(__NN(Punishment_)),E_Criminal_Punishment(__cfg).__Result,__EEQP(LEFT.Punishment_, RIGHT.UID),TRANSFORM(InLayout,SELF := LEFT,SELF:=[]),LEFT ONLY, HASH);
+  EXPORT Offender__Orphan := JOIN(InData(__NN(Offender_)),E_Criminal_Offender(__in,__cfg).__Result,__EEQP(LEFT.Offender_, RIGHT.UID),TRANSFORM(InLayout,SELF := LEFT,SELF:=[]),LEFT ONLY, HASH);
+  EXPORT Offense__Orphan := JOIN(InData(__NN(Offense_)),E_Criminal_Offense(__in,__cfg).__Result,__EEQP(LEFT.Offense_, RIGHT.UID),TRANSFORM(InLayout,SELF := LEFT,SELF:=[]),LEFT ONLY, HASH);
+  EXPORT Punishment__Orphan := JOIN(InData(__NN(Punishment_)),E_Criminal_Punishment(__in,__cfg).__Result,__EEQP(LEFT.Punishment_, RIGHT.UID),TRANSFORM(InLayout,SELF := LEFT,SELF:=[]),LEFT ONLY, HASH);
   EXPORT SanityCheck := DATASET([{COUNT(Offender__Orphan),COUNT(Offense__Orphan),COUNT(Punishment__Orphan)}],{KEL.typ.int Offender__Orphan,KEL.typ.int Offense__Orphan,KEL.typ.int Punishment__Orphan});
   EXPORT NullCounts := DATASET([
-    {'CriminalDetails','PublicRecords_KEL.Files.NonFCRA.Doxie_Files__Key_Punishment_Vault','Offender',COUNT(__d0(__NL(Offender_))),COUNT(__d0(__NN(Offender_)))},
-    {'CriminalDetails','PublicRecords_KEL.Files.NonFCRA.Doxie_Files__Key_Punishment_Vault','Offense',COUNT(__d0(__NL(Offense_))),COUNT(__d0(__NN(Offense_)))},
-    {'CriminalDetails','PublicRecords_KEL.Files.NonFCRA.Doxie_Files__Key_Punishment_Vault','Punishment',COUNT(__d0(__NL(Punishment_))),COUNT(__d0(__NN(Punishment_)))},
-    {'CriminalDetails','PublicRecords_KEL.Files.NonFCRA.Doxie_Files__Key_Punishment_Vault','src',COUNT(__d0(__NL(Source_))),COUNT(__d0(__NN(Source_)))},
-    {'CriminalDetails','PublicRecords_KEL.Files.NonFCRA.Doxie_Files__Key_Punishment_Vault','Archive_Date',COUNT(__d0(Archive___Date_=0)),COUNT(__d0(Archive___Date_!=0))},
-    {'CriminalDetails','PublicRecords_KEL.Files.NonFCRA.Doxie_Files__Key_Punishment_Vault','DateFirstSeen',COUNT(__d0(Date_First_Seen_=0)),COUNT(__d0(Date_First_Seen_!=0))},
-    {'CriminalDetails','PublicRecords_KEL.Files.NonFCRA.Doxie_Files__Key_Punishment_Vault','DateLastSeen',COUNT(__d0(Date_Last_Seen_=0)),COUNT(__d0(Date_Last_Seen_!=0))},
-    {'CriminalDetails','PublicRecords_KEL.Files.NonFCRA.Doxie_Files__Key_Punishment_Vault','HybridArchiveDate',COUNT(__d0(Hybrid_Archive_Date_=0)),COUNT(__d0(Hybrid_Archive_Date_!=0))},
-    {'CriminalDetails','PublicRecords_KEL.Files.NonFCRA.Doxie_Files__Key_Punishment_Vault','VaultDateLastSeen',COUNT(__d0(Vault_Date_Last_Seen_=0)),COUNT(__d0(Vault_Date_Last_Seen_!=0))},
-    {'CriminalDetails','PublicRecords_KEL.Files.FCRA.Doxie_Files__Key_Offenders_FCRA_Vault','Offender',COUNT(__d1(__NL(Offender_))),COUNT(__d1(__NN(Offender_)))},
-    {'CriminalDetails','PublicRecords_KEL.Files.FCRA.Doxie_Files__Key_Offenders_FCRA_Vault','Offense',COUNT(__d1(__NL(Offense_))),COUNT(__d1(__NN(Offense_)))},
-    {'CriminalDetails','PublicRecords_KEL.Files.FCRA.Doxie_Files__Key_Offenders_FCRA_Vault','Punishment',COUNT(__d1(__NL(Punishment_))),COUNT(__d1(__NN(Punishment_)))},
-    {'CriminalDetails','PublicRecords_KEL.Files.FCRA.Doxie_Files__Key_Offenders_FCRA_Vault','src',COUNT(__d1(__NL(Source_))),COUNT(__d1(__NN(Source_)))},
-    {'CriminalDetails','PublicRecords_KEL.Files.FCRA.Doxie_Files__Key_Offenders_FCRA_Vault','Archive_Date',COUNT(__d1(Archive___Date_=0)),COUNT(__d1(Archive___Date_!=0))},
-    {'CriminalDetails','PublicRecords_KEL.Files.FCRA.Doxie_Files__Key_Offenders_FCRA_Vault','DateFirstSeen',COUNT(__d1(Date_First_Seen_=0)),COUNT(__d1(Date_First_Seen_!=0))},
-    {'CriminalDetails','PublicRecords_KEL.Files.FCRA.Doxie_Files__Key_Offenders_FCRA_Vault','DateLastSeen',COUNT(__d1(Date_Last_Seen_=0)),COUNT(__d1(Date_Last_Seen_!=0))},
-    {'CriminalDetails','PublicRecords_KEL.Files.FCRA.Doxie_Files__Key_Offenders_FCRA_Vault','HybridArchiveDate',COUNT(__d1(Hybrid_Archive_Date_=0)),COUNT(__d1(Hybrid_Archive_Date_!=0))},
-    {'CriminalDetails','PublicRecords_KEL.Files.FCRA.Doxie_Files__Key_Offenders_FCRA_Vault','VaultDateLastSeen',COUNT(__d1(Vault_Date_Last_Seen_=0)),COUNT(__d1(Vault_Date_Last_Seen_!=0))},
-    {'CriminalDetails','PublicRecords_KEL.Files.FCRA.doxie_files__Key_Court_Offenses_Vault','Offender',COUNT(__d2(__NL(Offender_))),COUNT(__d2(__NN(Offender_)))},
-    {'CriminalDetails','PublicRecords_KEL.Files.FCRA.doxie_files__Key_Court_Offenses_Vault','Offense',COUNT(__d2(__NL(Offense_))),COUNT(__d2(__NN(Offense_)))},
-    {'CriminalDetails','PublicRecords_KEL.Files.FCRA.doxie_files__Key_Court_Offenses_Vault','Punishment',COUNT(__d2(__NL(Punishment_))),COUNT(__d2(__NN(Punishment_)))},
-    {'CriminalDetails','PublicRecords_KEL.Files.FCRA.doxie_files__Key_Court_Offenses_Vault','src',COUNT(__d2(__NL(Source_))),COUNT(__d2(__NN(Source_)))},
-    {'CriminalDetails','PublicRecords_KEL.Files.FCRA.doxie_files__Key_Court_Offenses_Vault','Archive_Date',COUNT(__d2(Archive___Date_=0)),COUNT(__d2(Archive___Date_!=0))},
-    {'CriminalDetails','PublicRecords_KEL.Files.FCRA.doxie_files__Key_Court_Offenses_Vault','DateFirstSeen',COUNT(__d2(Date_First_Seen_=0)),COUNT(__d2(Date_First_Seen_!=0))},
-    {'CriminalDetails','PublicRecords_KEL.Files.FCRA.doxie_files__Key_Court_Offenses_Vault','DateLastSeen',COUNT(__d2(Date_Last_Seen_=0)),COUNT(__d2(Date_Last_Seen_!=0))},
-    {'CriminalDetails','PublicRecords_KEL.Files.FCRA.doxie_files__Key_Court_Offenses_Vault','HybridArchiveDate',COUNT(__d2(Hybrid_Archive_Date_=0)),COUNT(__d2(Hybrid_Archive_Date_!=0))},
-    {'CriminalDetails','PublicRecords_KEL.Files.FCRA.doxie_files__Key_Court_Offenses_Vault','VaultDateLastSeen',COUNT(__d2(Vault_Date_Last_Seen_=0)),COUNT(__d2(Vault_Date_Last_Seen_!=0))},
-    {'CriminalDetails','PublicRecords_KEL.Files.FCRA.doxie_files__Key_Offenses_Vault','Offender',COUNT(__d3(__NL(Offender_))),COUNT(__d3(__NN(Offender_)))},
-    {'CriminalDetails','PublicRecords_KEL.Files.FCRA.doxie_files__Key_Offenses_Vault','Offense',COUNT(__d3(__NL(Offense_))),COUNT(__d3(__NN(Offense_)))},
-    {'CriminalDetails','PublicRecords_KEL.Files.FCRA.doxie_files__Key_Offenses_Vault','Punishment',COUNT(__d3(__NL(Punishment_))),COUNT(__d3(__NN(Punishment_)))},
-    {'CriminalDetails','PublicRecords_KEL.Files.FCRA.doxie_files__Key_Offenses_Vault','src',COUNT(__d3(__NL(Source_))),COUNT(__d3(__NN(Source_)))},
-    {'CriminalDetails','PublicRecords_KEL.Files.FCRA.doxie_files__Key_Offenses_Vault','Archive_Date',COUNT(__d3(Archive___Date_=0)),COUNT(__d3(Archive___Date_!=0))},
-    {'CriminalDetails','PublicRecords_KEL.Files.FCRA.doxie_files__Key_Offenses_Vault','DateFirstSeen',COUNT(__d3(Date_First_Seen_=0)),COUNT(__d3(Date_First_Seen_!=0))},
-    {'CriminalDetails','PublicRecords_KEL.Files.FCRA.doxie_files__Key_Offenses_Vault','DateLastSeen',COUNT(__d3(Date_Last_Seen_=0)),COUNT(__d3(Date_Last_Seen_!=0))},
-    {'CriminalDetails','PublicRecords_KEL.Files.FCRA.doxie_files__Key_Offenses_Vault','HybridArchiveDate',COUNT(__d3(Hybrid_Archive_Date_=0)),COUNT(__d3(Hybrid_Archive_Date_!=0))},
-    {'CriminalDetails','PublicRecords_KEL.Files.FCRA.doxie_files__Key_Offenses_Vault','VaultDateLastSeen',COUNT(__d3(Vault_Date_Last_Seen_=0)),COUNT(__d3(Vault_Date_Last_Seen_!=0))}]
+    {'CriminalDetails','PublicRecords_KEL.ECL_Functions.Dataset_FDC','Offender',COUNT(__d0(__NL(Offender_))),COUNT(__d0(__NN(Offender_)))},
+    {'CriminalDetails','PublicRecords_KEL.ECL_Functions.Dataset_FDC','Offense',COUNT(__d0(__NL(Offense_))),COUNT(__d0(__NN(Offense_)))},
+    {'CriminalDetails','PublicRecords_KEL.ECL_Functions.Dataset_FDC','Punishment',COUNT(__d0(__NL(Punishment_))),COUNT(__d0(__NN(Punishment_)))},
+    {'CriminalDetails','PublicRecords_KEL.ECL_Functions.Dataset_FDC','Archive_Date',COUNT(__d0(Archive___Date_=0)),COUNT(__d0(Archive___Date_!=0))},
+    {'CriminalDetails','PublicRecords_KEL.ECL_Functions.Dataset_FDC','DateFirstSeen',COUNT(__d0(Date_First_Seen_=0)),COUNT(__d0(Date_First_Seen_!=0))},
+    {'CriminalDetails','PublicRecords_KEL.ECL_Functions.Dataset_FDC','DateLastSeen',COUNT(__d0(Date_Last_Seen_=0)),COUNT(__d0(Date_Last_Seen_!=0))},
+    {'CriminalDetails','PublicRecords_KEL.ECL_Functions.Dataset_FDC','HybridArchiveDate',COUNT(__d0(Hybrid_Archive_Date_=0)),COUNT(__d0(Hybrid_Archive_Date_!=0))},
+    {'CriminalDetails','PublicRecords_KEL.ECL_Functions.Dataset_FDC','VaultDateLastSeen',COUNT(__d0(Vault_Date_Last_Seen_=0)),COUNT(__d0(Vault_Date_Last_Seen_!=0))},
+    {'CriminalDetails','PublicRecords_KEL.ECL_Functions.Dataset_FDC','Offender',COUNT(__d1(__NL(Offender_))),COUNT(__d1(__NN(Offender_)))},
+    {'CriminalDetails','PublicRecords_KEL.ECL_Functions.Dataset_FDC','Offense',COUNT(__d1(__NL(Offense_))),COUNT(__d1(__NN(Offense_)))},
+    {'CriminalDetails','PublicRecords_KEL.ECL_Functions.Dataset_FDC','Punishment',COUNT(__d1(__NL(Punishment_))),COUNT(__d1(__NN(Punishment_)))},
+    {'CriminalDetails','PublicRecords_KEL.ECL_Functions.Dataset_FDC','Archive_Date',COUNT(__d1(Archive___Date_=0)),COUNT(__d1(Archive___Date_!=0))},
+    {'CriminalDetails','PublicRecords_KEL.ECL_Functions.Dataset_FDC','DateFirstSeen',COUNT(__d1(Date_First_Seen_=0)),COUNT(__d1(Date_First_Seen_!=0))},
+    {'CriminalDetails','PublicRecords_KEL.ECL_Functions.Dataset_FDC','DateLastSeen',COUNT(__d1(Date_Last_Seen_=0)),COUNT(__d1(Date_Last_Seen_!=0))},
+    {'CriminalDetails','PublicRecords_KEL.ECL_Functions.Dataset_FDC','HybridArchiveDate',COUNT(__d1(Hybrid_Archive_Date_=0)),COUNT(__d1(Hybrid_Archive_Date_!=0))},
+    {'CriminalDetails','PublicRecords_KEL.ECL_Functions.Dataset_FDC','VaultDateLastSeen',COUNT(__d1(Vault_Date_Last_Seen_=0)),COUNT(__d1(Vault_Date_Last_Seen_!=0))},
+    {'CriminalDetails','PublicRecords_KEL.ECL_Functions.Dataset_FDC','Offender',COUNT(__d2(__NL(Offender_))),COUNT(__d2(__NN(Offender_)))},
+    {'CriminalDetails','PublicRecords_KEL.ECL_Functions.Dataset_FDC','Offense',COUNT(__d2(__NL(Offense_))),COUNT(__d2(__NN(Offense_)))},
+    {'CriminalDetails','PublicRecords_KEL.ECL_Functions.Dataset_FDC','Punishment',COUNT(__d2(__NL(Punishment_))),COUNT(__d2(__NN(Punishment_)))},
+    {'CriminalDetails','PublicRecords_KEL.ECL_Functions.Dataset_FDC','Source',COUNT(__d2(__NL(Source_))),COUNT(__d2(__NN(Source_)))},
+    {'CriminalDetails','PublicRecords_KEL.ECL_Functions.Dataset_FDC','Archive_Date',COUNT(__d2(Archive___Date_=0)),COUNT(__d2(Archive___Date_!=0))},
+    {'CriminalDetails','PublicRecords_KEL.ECL_Functions.Dataset_FDC','DateFirstSeen',COUNT(__d2(Date_First_Seen_=0)),COUNT(__d2(Date_First_Seen_!=0))},
+    {'CriminalDetails','PublicRecords_KEL.ECL_Functions.Dataset_FDC','DateLastSeen',COUNT(__d2(Date_Last_Seen_=0)),COUNT(__d2(Date_Last_Seen_!=0))},
+    {'CriminalDetails','PublicRecords_KEL.ECL_Functions.Dataset_FDC','HybridArchiveDate',COUNT(__d2(Hybrid_Archive_Date_=0)),COUNT(__d2(Hybrid_Archive_Date_!=0))},
+    {'CriminalDetails','PublicRecords_KEL.ECL_Functions.Dataset_FDC','VaultDateLastSeen',COUNT(__d2(Vault_Date_Last_Seen_=0)),COUNT(__d2(Vault_Date_Last_Seen_!=0))},
+    {'CriminalDetails','PublicRecords_KEL.ECL_Functions.Dataset_FDC','Offender',COUNT(__d3(__NL(Offender_))),COUNT(__d3(__NN(Offender_)))},
+    {'CriminalDetails','PublicRecords_KEL.ECL_Functions.Dataset_FDC','Offense',COUNT(__d3(__NL(Offense_))),COUNT(__d3(__NN(Offense_)))},
+    {'CriminalDetails','PublicRecords_KEL.ECL_Functions.Dataset_FDC','Punishment',COUNT(__d3(__NL(Punishment_))),COUNT(__d3(__NN(Punishment_)))},
+    {'CriminalDetails','PublicRecords_KEL.ECL_Functions.Dataset_FDC','src',COUNT(__d3(__NL(Source_))),COUNT(__d3(__NN(Source_)))},
+    {'CriminalDetails','PublicRecords_KEL.ECL_Functions.Dataset_FDC','Archive_Date',COUNT(__d3(Archive___Date_=0)),COUNT(__d3(Archive___Date_!=0))},
+    {'CriminalDetails','PublicRecords_KEL.ECL_Functions.Dataset_FDC','DateFirstSeen',COUNT(__d3(Date_First_Seen_=0)),COUNT(__d3(Date_First_Seen_!=0))},
+    {'CriminalDetails','PublicRecords_KEL.ECL_Functions.Dataset_FDC','DateLastSeen',COUNT(__d3(Date_Last_Seen_=0)),COUNT(__d3(Date_Last_Seen_!=0))},
+    {'CriminalDetails','PublicRecords_KEL.ECL_Functions.Dataset_FDC','HybridArchiveDate',COUNT(__d3(Hybrid_Archive_Date_=0)),COUNT(__d3(Hybrid_Archive_Date_!=0))},
+    {'CriminalDetails','PublicRecords_KEL.ECL_Functions.Dataset_FDC','VaultDateLastSeen',COUNT(__d3(Vault_Date_Last_Seen_=0)),COUNT(__d3(Vault_Date_Last_Seen_!=0))}]
   ,{KEL.typ.str entity,KEL.typ.str fileName,KEL.typ.str fieldName,KEL.typ.int nullCount,KEL.typ.int notNullCount});
 END;
