@@ -67,8 +67,8 @@ AttributesRequested :=
 		
 // Uncomment the models below that you wish to have returned
 
-// Model1RequestName := 'SBBM1601_0_0';
-Model1RequestName := 'SBOM1601_0_0';
+Model1RequestName := 'SBBM1601_0_0';
+// Model1RequestName := 'SBOM1601_0_0';
 // Model1RequestName := 'BBFM1811_1_0';
 
 

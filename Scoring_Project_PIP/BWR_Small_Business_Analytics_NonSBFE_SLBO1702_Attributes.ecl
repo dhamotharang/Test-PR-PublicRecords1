@@ -655,7 +655,7 @@ layout_flat_v1 flatten_v1(layout_soap le, SmallBusinessAnalyticsoutput ri) := TR
 																					le.smallbusinessanalyticsrequest[1].Searchby.AuthorizedRep1.Address.State = '')))));
 
 	// SELF.Model1Name := IF(includeBlendedModel, 'SLBB1702_0_2', Model1.Name);//can't mix 1702 with 1809 models
-	SELF.Model1Name := IF(includeBlendedModel, 'SLBO1702_0_0', Model1.Name);
+	SELF.Model1Name := IF(includeBlendedModel, 'SLBO1702_0_2', Model1.Name);
 	// SELF.Model1Name := IF(includeBlendedModel, 'BBFM1808_1_0', Model1.Name);
 	SELF.Model1Score := IF(SBBMMinInputRequirementsNotMet, '0', (STRING)Model1.Scores[1].Value);
 	SELF.Model1RC1 := IF(SBBMMinInputRequirementsNotMet, '', Model1.Scores[1].ScoreReasons[1].ReasonCode);

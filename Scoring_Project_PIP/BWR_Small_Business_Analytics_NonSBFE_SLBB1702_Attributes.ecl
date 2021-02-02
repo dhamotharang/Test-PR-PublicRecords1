@@ -65,7 +65,7 @@ AttributesRequested :=
 		
 // ModelsRequested are configured based on includeBusinessOnlyModel and includeBlendedModel.
 BusinessModelRequested := IF(includeBusinessOnlyModel,
-					DATASET([{'SLBB1809_0_2'}], iesp.share.t_StringArrayItem), // can't mix 1702 with 1809 models
+					DATASET([{'SLBB1702_0_2'}], iesp.share.t_StringArrayItem), // can't mix 1702 with 1809 models
 					// DATASET([{'SLBO1809_0_0'}], iesp.share.t_StringArrayItem), 
 					// DATASET([{'BOFM1812_1_0'}], iesp.share.t_StringArrayItem),
           DATASET([], iesp.share.t_StringArrayItem));
@@ -655,7 +655,7 @@ layout_flat_v1 flatten_v1(layout_soap le, SmallBusinessAnalyticsoutput ri) := TR
 																					le.smallbusinessanalyticsrequest[1].Searchby.AuthorizedRep1.Address.State = '')))));
 
 	// SELF.Model1Name := IF(includeBlendedModel, 'SLBB1702_0_2', Model1.Name);//can't mix 1702 with 1809 models
-	SELF.Model1Name := IF(includeBlendedModel, 'SLBB1809_0_0', Model1.Name);
+	SELF.Model1Name := IF(includeBlendedModel, 'SLBB1702_0_2', Model1.Name);
 	// SELF.Model1Name := IF(includeBlendedModel, 'BBFM1808_1_0', Model1.Name);
 	SELF.Model1Score := IF(SBBMMinInputRequirementsNotMet, '0', (STRING)Model1.Scores[1].Value);
 	SELF.Model1RC1 := IF(SBBMMinInputRequirementsNotMet, '', Model1.Scores[1].ScoreReasons[1].ReasonCode);
@@ -717,5 +717,5 @@ OUTPUT(flatResults,, outputFile, OVERWRITE):
 
 // SEQUENTIAL(outputq1;):
 // :WHEN(CRON('55 19 23 3 *')), //
-SUCCESS(FileServices.SendEmail('Noah.Lahr@lexisnexisrisk.com;', 'SLBB1809_'+curr_date+'_1 Completed','The Completed workunit is:' + workunit)),
-FAILURE(FileServices.SendEmail('Noah.Lahr@lexisnexisrisk.com; ', 'SLBB1809_'+curr_date+'_1 Failed','The Failed workunit is:'   + workunit + FailMessage));
+SUCCESS(FileServices.SendEmail('Noah.Lahr@lexisnexisrisk.com;', 'SLBB1702_'+curr_date+'_1 Completed','The Completed workunit is:' + workunit)),
+FAILURE(FileServices.SendEmail('Noah.Lahr@lexisnexisrisk.com; ', 'SLBB1702_'+curr_date+'_1 Failed','The Failed workunit is:'   + workunit + FailMessage));

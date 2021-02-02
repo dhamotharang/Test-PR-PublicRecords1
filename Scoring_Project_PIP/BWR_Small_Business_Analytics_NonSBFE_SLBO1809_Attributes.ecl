@@ -63,7 +63,7 @@ AttributesRequested :=
 		
 // ModelsRequested are configured based on includeBusinessOnlyModel and includeBlendedModel.
 BusinessModelRequested := IF(includeBusinessOnlyModel,
-					DATASET([{'SLBO1809_0_2'}], iesp.share.t_StringArrayItem), // can't mix 1702 with 1809 models
+					// DATASET([{'SLBO1809_0_0'}], iesp.share.t_StringArrayItem), // can't mix 1702 with 1809 models
 					// DATASET([{'SLBO1809_0_0'}], iesp.share.t_StringArrayItem), 
 					// DATASET([{'BOFM1812_1_0'}], iesp.share.t_StringArrayItem),
           DATASET([], iesp.share.t_StringArrayItem));
@@ -71,7 +71,7 @@ BusinessModelRequested := IF(includeBusinessOnlyModel,
 // Later on we will check we actually have to minimum inputs met to run this model.  
 BlendedModelRequested := IF(includeBlendedModel, 
 					// DATASET([{'SLBB1702_0_2'}], iesp.share.t_StringArrayItem),// can't mix 1702 with 1809 models
-					// DATASET([{'SLBO1809_0_0'}], iesp.share.t_StringArrayItem),
+					DATASET([{'SLBO1809_0_0'}], iesp.share.t_StringArrayItem),
 					// DATASET([{'BBFM1808_1_0'}], iesp.share.t_StringArrayItem),
      DATASET([], iesp.share.t_StringArrayItem)); 
      
