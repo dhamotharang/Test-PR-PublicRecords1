@@ -1,10 +1,10 @@
-//this program is to match the input records agaist the header files and driver's 
-//license file to indentify people and to get their latest addresses from watchdog.file_best 
-import addr_latest,address,business_header_ss,did_add,didville,doxie,drivers,header,header_slimsort,ut,watchdog;
+//this program is to match the input records agaist the header files and driver's
+//license file to indentify people and to get their latest addresses from watchdog.file_best
+import addr_latest,address,did_add,drivers,header,watchdog;
 
 //prevent dup and heading records mixed into the infile
-la_file_new := addr_latest.file_in(cubs<>''); 
-la_file_raw := distribute(la_file_new,hash(cubs)); 
+la_file_new := addr_latest.file_in(cubs<>'');
+la_file_raw := distribute(la_file_new,hash(cubs));
 la_file_in := dedup(sort(la_file_raw,cubs,local),cubs,local) : persist('per_la_file_in'); //do not remove
 
 layout_addr_in := record
@@ -13,8 +13,8 @@ layout_addr_in := record
 end;
 
 layout_addr_in get_addr2(la_file_in l) := transform
-	self.addr_line2 := trim(l.city) +  ',' + 
-				    trim(l.state) + ' ' + 
+	self.addr_line2 := trim(l.city) +  ',' +
+				    trim(l.state) + ' ' +
 				    trim(l.zip);
      self := l;
 end;
@@ -22,10 +22,10 @@ end;
 la_raw_addr := project(la_file_in, get_addr2(left));
 
 address.mac_address_clean(la_raw_addr,
-          	           addr_line1, 
+          	           addr_line1,
 			           addr_line2,
 			           true,
-			           la_clean_addr); 
+			           la_clean_addr);
 
 layout_addr_clean := record
 	la_file_in;
@@ -91,7 +91,7 @@ la_parse_addr := project(la_clean_addr, get_parsed_addr(left));
 
 layout_name_in := record
 	la_parse_addr;
-     string73 clean_name; 
+     string73 clean_name;
 end;
 
 layout_name_in get_clean_name(la_parse_addr l) := transform
@@ -113,7 +113,7 @@ end;
 
 integer clean_errorcode(la_clean_name L1) := (integer)(L1.clean_name[71..73]);
 
-layout_parse_name get_parsed_name(la_clean_name L2) := Transform	
+layout_parse_name get_parsed_name(la_clean_name L2) := Transform
   self.title := if(clean_errorcode(L2) < 70, '', L2.clean_name[1..5]);
   self.fname := if(clean_errorcode(L2) < 70, '', L2.clean_name[6..25]);
   self.mname := if(clean_errorcode(L2) < 70, '', L2.clean_name[26..45]);
@@ -136,7 +136,7 @@ end;
 la_did_rec get_better_dob(la_parse_name l) := transform
 	self.dob_better := l.dob[5..8] + l.dob[1..4];
 	self := l;
-end; 
+end;
 
 la_did_ready := project(la_parse_name,get_better_dob(left));
 
@@ -148,7 +148,7 @@ did_add.mac_match_flex(la_did_ready, matchset,
 				   did, la_did_rec,
                        true, did_score, 75,
 				   la_did_raw);
-				   
+
 addr_latest.Layout_File_Did get_slim_did(la_did_raw l) := transform
 	self.did := intformat(l.did, 12, 1);
 	self := l;
@@ -200,9 +200,9 @@ slim_in := project(in_file, get_slim_in(left));
 
 join_in := join(slim_in,in_header,(unsigned6)left.in_did=right.did, hash);
 
-//get the matched driver's license 
+//get the matched driver's license
 drl_in := join(slim_in(in_drl <>'', in_drl <>'NOL', in_drl<>'DRL'), in_driver,
-               (unsigned6)left.in_did=right.did and 
+               (unsigned6)left.in_did=right.did and
                trim(left.in_drl)= trim((string14)right.dl_number), hash);
 srt_drl := sort(drl_in, in_did, in_drl);
 dep_drl := dedup(srt_drl, in_did, in_drl);
@@ -266,53 +266,53 @@ match_rec match_them(join_in l, dep_drl r) := transform
 						l.in_mname[1] = l.mname[1] => 3,
 						1);
 	self.prange_match := if(l.in_prim_range = l.prim_range, 3, 1);
-	self.pname_match  := if(l.in_prim_name = l.prim_name, 3, 1);	
+	self.pname_match  := if(l.in_prim_name = l.prim_name, 3, 1);
 	self.srange_match  := map(l.in_sec_range = '' and l.sec_range = '' => 3,
 	                          l.in_sec_range = '' and l.sec_range <>'' => 1,
 					 	 l.in_sec_range <> '' and l.sec_range = '' => 2,
 						 l.in_sec_range = l.sec_range => 3,
 						 1);
-	self.zip_match := map(l.in_zipcode = '' => if(l.in_city <> '' and 
-	                                              l.in_st <> '' and 
-	                                              l.in_city = l.city_name and 
+	self.zip_match := map(l.in_zipcode = '' => if(l.in_city <> '' and
+	                                              l.in_st <> '' and
+	                                              l.in_city = l.city_name and
 	                                              l.in_st = l.st, 3, 1),
-                           l.in_zipcode = l.zip => 3, 
+                           l.in_zipcode = l.zip => 3,
                            1);
      self.dob_match := map(l.in_dob = '' => 0,
 	                      l.in_dob = (string8)l.dob => 3,
 					  l.in_dob[1..6] = ((string8)l.dob)[1..6] => 2,
-					  1); 
+					  1);
 	self.ssn_match := map(l.in_ssn = '' => 0,
 	                      l.in_ssn = l.ssn => 3,
-				       1);	
+				       1);
 	self.drl_match := map(l.in_drl = '' => 0,
 	                      l.in_drl = 'NOL' => 0,
                            l.in_drl = 'DRL' => 0,
-	                      r.dl_number = '' => 1, 
+	                      r.dl_number = '' => 1,
 					  3);
      self.drl_nbr := r.dl_number;
      self := l;
 end;
 
-f_match := join(join_in, dep_drl, 
-                left.in_did = right.in_did, 
-			 match_them(left, right), 
+f_match := join(join_in, dep_drl,
+                left.in_did = right.in_did,
+			 match_them(left, right),
                 left outer, hash);
 
 //get name and address match type
 match_rec get_na_match(f_match l) := transform
-	self.name_match := map(l.lname_match = 1  or l.fname_match = 1 or 
+	self.name_match := map(l.lname_match = 1  or l.fname_match = 1 or
 	                       l.mname_match = 1 => 1,
 					   l.mname_match = 2 => 2,
 					   3);
-	self.addr_match := map(l.prange_match = 1  or l.pname_match = 1 or 
-	                       l.srange_match = 1  or l.zip_match = 1 => 1,  
+	self.addr_match := map(l.prange_match = 1  or l.pname_match = 1 or
+	                       l.srange_match = 1  or l.zip_match = 1 => 1,
 					   l.srange_match = 2 => 2,
 					   3);
      self := l;
 end;
 
-f_match_ready := project(f_match, get_na_match(left)); 
+f_match_ready := project(f_match, get_na_match(left));
 
 f_match_sort := sort(f_match_ready, in_did);
 
@@ -351,7 +351,7 @@ end;
 f_match_best := rollup(f_match_sort, left.in_did = right.in_did, best_match(left, right));
 
 match_rec get_final_match(f_match_best l) := transform
-	self.final_match := map(l.name_match = 1 or l.addr_match = 1 or 
+	self.final_match := map(l.name_match = 1 or l.addr_match = 1 or
                              l.dob_match = 1 or l.ssn_match = 1 or
 					    l.drl_match = 1 => 1,
 					    l.name_match = 2 or l.addr_match = 2 or l.dob_match = 2 => 2,
@@ -370,7 +370,7 @@ best_addr_rec := record
 	string20   in_lname,
      string20   lname,
      string20   in_fname,
-     string20   fname, 
+     string20   fname,
 	string20   in_mname,
      string20   mname,
      string10   in_prim_range,
@@ -397,12 +397,12 @@ best_addr_rec := record
      string9    ssn,
 	string14   in_drl,
      string15   dl_number,
-     string4    name_match_type,   
+     string4    name_match_type,
      string4    addr_match_type,
 	string4    dob_match_type,
      string4    ssn_match_type,
      string4    drl_match_type,
-	string4    rec_match_type,    
+	string4    rec_match_type,
      string20   matched_last_name,
      string20   matched_mid_name,
      string20   matched_first_name,
@@ -456,39 +456,39 @@ best_addr_rec get_latest_addr(f_final_match l, in_best r) := transform
      self := l;
 end;
 
-f_latest_addr := join(f_final_match, in_best, 
+f_latest_addr := join(f_final_match, in_best,
                      (unsigned)left.in_did = right.did and left.final_match > 1,
-                      get_latest_addr(left, right), 
+                      get_latest_addr(left, right),
                       left outer, hash);
 
-//check if the address from the best file is a new address 
+//check if the address from the best file is a new address
 best_addr_rec check_new_addr(f_latest_addr l) := transform
 	self.new_addr_flag := map(l.in_zipcode <> '' and
-                               l.in_sec_range = '' and 
+                               l.in_sec_range = '' and
                                l.sec_range <> '' and
-                               l.in_prim_range = l.prim_range and 
+                               l.in_prim_range = l.prim_range and
                                l.in_prim_name = l.prim_name and
                                l.in_zipcode = l.zip5 => 'Y', //miss sec_range
-                                 
+
                                l.in_zipcode = '' and
-                               l.in_sec_range = '' and 
+                               l.in_sec_range = '' and
                                l.sec_range <> '' and
-                               l.in_prim_range = l.prim_range and 
+                               l.in_prim_range = l.prim_range and
                                l.in_prim_name = l.prim_name and
                                l.in_city = l.city_name and
                                l.in_st = l.st => 'Y',       //miss sec_range, zip
 
                                l.in_zipcode <> '' and
-                               l.in_prim_range = l.prim_range and 
+                               l.in_prim_range = l.prim_range and
                                l.in_prim_name = l.prim_name and
-                               l.in_zipcode = l.zip5 => 'N',//same addr 
+                               l.in_zipcode = l.zip5 => 'N',//same addr
 
                                l.in_zipcode = '' and
-                               l.in_prim_range = l.prim_range and 
+                               l.in_prim_range = l.prim_range and
                                l.in_prim_name = l.prim_name and
                                l.in_city = l.city_name and
                                l.in_st = l.st => 'N',       //no zip, same addr
-                                                              
+
                                l.prim_name <> '' and
                                l.zip5 <> '' => 'Y',         //new addr
                                '');
@@ -509,7 +509,7 @@ addr_latest.Layout_File_Out get_final_out(la_file_in l, f_new_addr r) := transfo
      self.st := if(r.new_addr_flag = 'Y', r.st, ''),
      self.zip5 := if(r.new_addr_flag = 'Y', r.zip5, ''),
      self.zip4 := if(r.new_addr_flag = 'Y', r.zip4, ''),
-     self.name_match_type := r.name_match_type,   
+     self.name_match_type := r.name_match_type,
      self.addr_match_type := r.addr_match_type,
 	self.dob_match_type := r.dob_match_type,
      self.ssn_match_type := r.ssn_match_type,
@@ -517,7 +517,7 @@ addr_latest.Layout_File_Out get_final_out(la_file_in l, f_new_addr r) := transfo
 	self.rec_match_type := r.rec_match_type,
      self.in_last_name := r.in_lname;
      self.matched_last_name := r.matched_last_name,
-     self.in_mid_name := r.in_mname, 
+     self.in_mid_name := r.in_mname,
      self.matched_mid_name := r.matched_mid_name,
      self.in_first_name := r.in_fname,
      self.matched_first_name := r.matched_first_name,
@@ -525,11 +525,11 @@ addr_latest.Layout_File_Out get_final_out(la_file_in l, f_new_addr r) := transfo
      self.matched_ssn := if(r.in_ssn <> '', r.matched_ssn, ''),
      self.in_birth_date := r.in_dob,
      self.matched_birth_date := if(r.in_dob <> '',r.matched_birth_date, ''),
-     self := l;    
+     self := l;
 end;
 
-f_out := join(la_file_in, f_new_addr, 
-              left.cubs = right.in_cubs, 
+f_out := join(la_file_in, f_new_addr,
+              left.cubs = right.in_cubs,
               get_final_out(left,right),
               left outer, hash);
 
@@ -545,4 +545,4 @@ f_stat := dataset([{count(la_file_in),count(dep_new_addr),hit_price,hit_price *c
 
 addr_latest.mac_csvsf_buildprocess(f_stat, '~thor_data400::base::linebarger_stat', write_stat, 'stat');
 
-export bwr_la_search := parallel(write_out, write_stat); 
+export bwr_la_search := parallel(write_out, write_stat);

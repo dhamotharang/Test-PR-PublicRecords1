@@ -15,11 +15,12 @@ EXPORT getMotorVehicles(DATASET(Business_Risk_BIP.Layouts.Shell) Shell,
   vehicles_are_turned_off := NOT(dppa_ok AND glba_ok);
   
   // --------------- Vehicles Data - Using Business IDs ----------------
-  VehiclesRaw := VehicleV2.Key_Vehicle_Linkids.kFetch(Business_Risk_BIP.Common.GetLinkIDs(Shell), mod_access,
+  VehiclesRaw := VehicleV2.Key_Vehicle_Linkids.kFetch2(Business_Risk_BIP.Common.GetLinkIDs(Shell), mod_access,
                              Business_Risk_BIP.Common.SetLinkSearchLevel(Options.LinkSearchLevel),
                              0, /*ScoreThreshold --> 0 = Give me everything*/
                              linkingOptions,
-                             Business_Risk_BIP.Constants.Limit_Default);
+                             Business_Risk_BIP.Constants.Limit_Default,
+														 Options.KeepLargeBusinesses);
 
   // Filter to ONLY include recs where the reported on company (set of input linkids) is 
   // either a Registrant(type=4) or Lessee(type=5) of the vehicle, but not any others 

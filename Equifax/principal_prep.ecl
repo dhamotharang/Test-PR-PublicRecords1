@@ -1,4 +1,4 @@
-import Address, ut, Business_Header, Business_Header_SS, did_add, didville, header_slimsort;
+import Business_Header_SS, did_add;
 
 // Clean input information
 layout_input_init := record
@@ -6,7 +6,7 @@ unsigned6 rid;
 unsigned6 did;
 unsigned6 bdid;
 Layout_Principal;
-string73  clean_name; 
+string73  clean_name;
 string182 clean_address;
 end;
 
@@ -68,15 +68,15 @@ principal_per := principal_fmt((first_name + middle_initial + last_name) <> '');
 // Did the Principal Persons
 did_matchset := ['A','S'];
 
-did_add.MAC_Match_Flex(principal_per, did_matchset,	
-	 ssn_taxid, dob_field, fname, mname,lname, name_suffix, 
-	 prim_range, prim_name, sec_range, zip, st, phone_field, 
-	 did,   			
-	 Layout_Principal_Clean, 
+did_add.MAC_Match_Flex(principal_per, did_matchset,
+	 ssn_taxid, dob_field, fname, mname,lname, name_suffix,
+	 prim_range, prim_name, sec_range, zip, st, phone_field,
+	 did,
+	 Layout_Principal_Clean,
 	 false, did_score_field,
 	 75,
 	 principal_did)
-	 
+
 // BDID the Principal Businesses
 bdid_matchset := ['A','F'];
 
@@ -89,7 +89,7 @@ Business_Header_SS.MAC_Add_BDID_Flex(principal_bus,
                                   bdid, Layout_Principal_Clean,
                                   FALSE, BDID_score_field,
                                   principal_bdid)
-								  
+
 principal_combined := principal_did + principal_bdid;
 principal_combined_sort := sort(principal_combined, rid);
 

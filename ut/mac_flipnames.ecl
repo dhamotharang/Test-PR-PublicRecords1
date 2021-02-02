@@ -1,6 +1,9 @@
 import idl_header;
 
 export mac_flipnames(file_in,fname_field,mname_field,lname_field,file_out) := MACRO
+
+IMPORT idl_header;
+
 #uniquename(input)
 #uniquename(idl_name)
 #uniquename(layout_score)
@@ -52,7 +55,7 @@ end;
 
 %layout_flags% := record
  %j_get_fname_as_fname_pct%;
- boolean rule1_name1; 
+ boolean rule1_name1;
  boolean rule2_name1:=false;
 
 end;
@@ -61,7 +64,7 @@ end;
 boolean %rule1_boolean%(decimal6_3 v_lname_as_fname_pct, decimal6_3 v_fname_as_fname_pct, string v_fn, string v_mn, string v_ln, integer v_lname_as_fname_cnt, integer v_fname_as_fname_cnt, integer v_fname_placement_cnt, integer v_lname_placement_cnt) := function
  is_rule1 :=    length(trim(v_fn))>1
             and length(trim(v_ln))>1
-			and length(trim(v_mn))<2 
+			and length(trim(v_mn))<2
 			//skip dual first names AND skip dual last names
 			and (v_lname_as_fname_pct>=.75 and v_fname_as_fname_pct>=.75)=false
 			and (v_lname_as_fname_pct<=.15 and v_fname_as_fname_pct<=.15)=false
@@ -75,21 +78,21 @@ boolean %rule1_boolean%(decimal6_3 v_lname_as_fname_pct, decimal6_3 v_fname_as_f
 				 or ((v_lname_as_fname_pct between .85 and .999) and (v_fname_as_fname_pct between .001 and .15) and v_lname_placement_cnt>15000 and v_fname_placement_cnt>15000)
 				)
 			;
-			
+
  return is_rule1;
 end;
 
 %layout_flags% %t_set_flag1%(%j_get_fname_as_fname_pct% le) := transform
-  
+
  //middle_name condition is so i don't flip records where possibly the first_name and middle_name are flipped
  boolean rule1_for_name1 := %rule1_boolean%(le.lname_as_fname, le.fname_as_fname,le.fname_field,le.mname_field,le.lname_field,le.lname_as_fname_cnt,le.fname_as_fname_cnt,le.fname_placement_cnt,le.lname_placement_cnt);
 
  self.lname_field := if(rule1_for_name1,le.fname_field,le.lname_field);
  self.fname_field := if(rule1_for_name1,le.lname_field,le.fname_field);
  self.mname_field := le.mname_field;
- 
+
  self.rule1_name1 := rule1_for_name1;
- 
+
  self := le;
 end;
 
@@ -103,26 +106,26 @@ end;
 //first_name=E
 //middle_name=<empty>
 boolean %rule2_boolean%(boolean passed_rule1, decimal6_3 v_lname_as_fname_pct, string v_fname, string v_mname) := function
- 
- is_rule2 := passed_rule1=false 
+
+ is_rule2 := passed_rule1=false
          and v_lname_as_fname_pct>.995
 		 and length(trim(v_fname))=1
 		 and trim(v_mname)='';
- 
+
  return is_rule2;
 end;
 
 
 
 %layout_flags% %t_set_flag2%(%p_set_flag1% le) := transform
- 
+
   rule2_for_name1 := %rule2_boolean%(le.rule1_name1,le.lname_as_fname,le.fname_field,le.mname_field);
-  
+
   self.lname_field := if(rule2_for_name1,'',le.lname_field);
   self.fname_field := if(rule2_for_name1,le.lname_field,le.fname_field);
   self.mname_field := if(rule2_for_name1,le.fname_field,le.mname_field);
-  
-  self.rule2_name1 := rule2_for_name1;  
+
+  self.rule2_name1 := rule2_for_name1;
   self := le;
 end;
 

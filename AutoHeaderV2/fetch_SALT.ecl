@@ -104,7 +104,7 @@ EXPORT fetch_SALT (dataset (AutoHeaderV2.layouts.search) ds_search, integer sear
 		result10 := IF(isAddrSecRangeStrict, result9(sec_range_match_code=SALT311.MatchCode.ExactMatch), result9);
 		
 		// remove insurance LexIDs
-		result := result10(DID<IDLExternalLinking.Constants.INSURANCE_LEXID and DID>0);
+		result := result10(DID>0);
 		// transform in search output		
 		resultfinal := project(result, 
 					transform (AutoheaderV2.layouts.search_out, 

@@ -287,7 +287,18 @@ Custom_model_name_array := SET(ucase_custom_models, model);
 		in_ExcludeStates := ExcludeStates,
 		in_ExcludeReportingSources := ExcludeReportingSources
 	);
-  
+
+Do_IDA := Auto_model_name in Riskview.Constants.valid_IDA_models or 
+          Bankcard_model_name in Riskview.Constants.valid_IDA_models or
+          Short_term_lending_model_name in Riskview.Constants.valid_IDA_models or
+          Telecommunications_model_name in Riskview.Constants.valid_IDA_models or
+          Crossindustry_model_name in Riskview.Constants.valid_IDA_models or
+          Custom_model_name in Riskview.Constants.valid_IDA_models or
+          Custom2_model_name in Riskview.Constants.valid_IDA_models or
+          Custom3_model_name in Riskview.Constants.valid_IDA_models or
+          Custom4_model_name in Riskview.Constants.valid_IDA_models or
+          Custom5_model_name in Riskview.Constants.valid_IDA_models;
+
 LN_IDA_input := UNGROUP(PROJECT(clam, TRANSFORM(Risk_Indicators.layouts.layout_IDA_in, 
                                       SELF.CompanyID := companyID,
                                       SELF.ESPTransactionID := TransactionID,
@@ -310,34 +321,24 @@ LN_IDA_input := UNGROUP(PROJECT(clam, TRANSFORM(Risk_Indicators.layouts.layout_I
                                       SELF := [];)));
 
 IDA_call := Risk_Indicators.Prep_IDA_Credit(LN_IDA_input,
-                                            gateways, 
+                                            gateways,
                                             FALSE, //indicates if we need Innovis attributes
                                             Intended_Purpose, 
                                             isCalifornia_in_person
                                             );
-
-Do_IDA := Auto_model_name in Riskview.Constants.valid_IDA_models or 
-          Bankcard_model_name in Riskview.Constants.valid_IDA_models or
-          Short_term_lending_model_name in Riskview.Constants.valid_IDA_models or
-          Telecommunications_model_name in Riskview.Constants.valid_IDA_models or
-          Crossindustry_model_name in Riskview.Constants.valid_IDA_models or
-          Custom_model_name in Riskview.Constants.valid_IDA_models or
-          Custom2_model_name in Riskview.Constants.valid_IDA_models or
-          Custom3_model_name in Riskview.Constants.valid_IDA_models or
-          Custom4_model_name in Riskview.Constants.valid_IDA_models or
-          Custom5_model_name in Riskview.Constants.valid_IDA_models;
 
 //Don't call the gateway unless a valid IDA model is being called...
 IDA_results := IF(Do_IDA, IDA_call, DATASET([],iesp.ida_report_response.t_IDAReportResponseEx));
 
 //We only need the attributes/Indicators for models, so slim it down
 IDASlim := JOIN(LN_IDA_input, IDA_results,
-              (string)LEFT.App_ID = RIGHT.response.outputrecord.AppID, //Using AppID as unique Identifier
+                (STRING)LEFT.App_ID = RIGHT.response.outputrecord.AppID, //Using AppID as unique Identifier
                 TRANSFORM(Risk_Indicators.layouts.layout_IDA_out,
                           SELF.Seq := LEFT.seq,
                           SELF.APP_ID := RIGHT.response.outputrecord.AppID,
                           SELF.Indicators := RIGHT.response.outputrecord.Indicators
-                          ));											
+                          ),
+                LEFT OUTER, ATMOST(RiskWise.max_atmost));
 	
 	returnedReportLayout := RECORD
 		unsigned4 Seq;

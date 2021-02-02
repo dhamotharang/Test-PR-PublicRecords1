@@ -34,9 +34,6 @@ EXPORT ImageSearchService() := FUNCTION
 		EXPORT STRING SqlSearchEspNAME := Gateway.Constants.ServiceName.DeltabaseSql;
   END;
 	
-	DeltaBaseService := eCrash_Services.DeltaBaseSoapCall(InModuleDeltaBase);
-	DeltaBaseSql := eCrash_Services.RawDeltaBaseSQL(InModuleDeltaBase);
-	
 	Gateway.Layouts.Config ImageSoapCallGatewaysStructure := TRANSFORM
 		SELF.ServiceName := Gateway.Constants.ServiceName.EcrashImageRetrieval;
 		SELF.Url := RequestImageRetrievalEspUrl;
