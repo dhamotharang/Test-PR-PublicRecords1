@@ -50,6 +50,14 @@ businessinstantid_batch_Chase:=Scoring_Project_Macros.Global_Output_Layouts.NONF
 RiskView_xml_generic_allflagships_attributes_v5:=Scoring_Project_Macros.Global_Output_Layouts.FCRA_RiskView_Generic_allflagships_Attributes_V5_Global_Layout;
 businessinstantidv2_xml_generic:=Scoring_Project_Macros.Global_Output_Layouts.NONFCRA_BusinessInstantIdv2_Layout;
 
+Small_Business_Analytics_SBOM1601_Attributes := Scoring_Project_Macros.Global_Output_Layouts.SBFE_SBBM_SBMO_Layout;
+Small_Business_Analytics_SBBM1601_Attributes := Scoring_Project_Macros.Global_Output_Layouts.SBFE_SBBM_SBMO_Layout;
+Small_Business_Analytics_SLBO1702_Attributes := Scoring_Project_Macros.Global_Output_Layouts.NonSBFE_SLBO_SLBB_Layout;
+Small_Business_Analytics_SLBB1702_Attributes := Scoring_Project_Macros.Global_Output_Layouts.NonSBFE_SLBO_SLBB_Layout; 
+Small_Business_Analytics_SLBO1809_Attributes := Scoring_Project_Macros.Global_Output_Layouts.NonSBFE_SLBO_SLBB_Layout;
+Small_Business_Analytics_SLBB1809_Attributes := Scoring_Project_Macros.Global_Output_Layouts.NonSBFE_SLBO_SLBB_Layout;
+
+
 
 scoring_project_ks.bwr_mac_get_score_details_test( 'fcra','RiskView_batch_generic_allflagships_v4', 'rv_score_auto', 		date_in, ret1);
 scoring_project_ks.bwr_mac_get_score_details_test( 'fcra','RiskView_batch_generic_allflagships_v4', 'rv_score_bank', 		date_in, ret2);
@@ -184,6 +192,13 @@ scoring_project_ks.bwr_mac_get_score_details_test( 'nonfcra','businessinstantidv
 scoring_project_ks.bwr_mac_get_score_details_test( 'nonfcra','businessinstantidv2_xml_generic', 'bus2exec_index_rep1', date_in , ret86);
 
 
+scoring_project_ks.bwr_mac_get_score_details_test( 'SBFE','Small_Business_Analytics_SBOM1601_Attributes', 'model1score', date_in , ret87);
+scoring_project_ks.bwr_mac_get_score_details_test( 'SBFE','Small_Business_Analytics_SBBM1601_Attributes', 'model1score', date_in , ret88);
+scoring_project_ks.bwr_mac_get_score_details_test( 'NonSBFE','Small_Business_Analytics_SLBO1702_Attributes', 'model1score', date_in , ret89);
+scoring_project_ks.bwr_mac_get_score_details_test( 'NonSBFE','Small_Business_Analytics_SLBB1702_Attributes', 'model1score', date_in , ret90);
+scoring_project_ks.bwr_mac_get_score_details_test( 'NonSBFE','Small_Business_Analytics_SLBO1809_Attributes', 'model1score', date_in , ret91);
+scoring_project_ks.bwr_mac_get_score_details_test( 'NonSBFE','Small_Business_Analytics_SLBB1809_Attributes', 'model1score', date_in , ret92);
+
 sequential( ret1  , ret2  , ret3  , ret4 ,ret5  , ret6  , ret7  , ret9  , ret10 ,
 				        ret11 , ret12 , ret13 , ret14 , ret15 ,  ret17 , ret18 ,  ret20 ,
 						    ret21 ,   ret30 ,
@@ -191,7 +206,8 @@ sequential( ret1  , ret2  , ret3  , ret4 ,ret5  , ret6  , ret7  , ret9  , ret10 
 				          ret43 , ret44 , ret45 , ret50, ret54 , ret55 , ret56 , ret57 , ret58 , ret59, ret60,
 								ret61, ret62, ret63, ret64 , ret65, ret66, ret67, ret68 , ret69 , ret70, ret71, ret72, ret73, ret74, ret75, 
 								ret76, ret77, ret78, ret79, ret80, ret81,ret82,ret83 ,
-								ret84 , ret85 , ret86
+								ret84 , ret85 , ret86,
+								ret87, ret88, ret89, ret90, ret91, ret92
 								);
 								
 			 

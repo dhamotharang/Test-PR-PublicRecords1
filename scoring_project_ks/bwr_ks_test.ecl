@@ -1,16 +1,31 @@
-﻿import ut,scoring_project_pip,Scoring_Project_Macros,Scoring_Project_DailyTracking;
+﻿import ut,std,scoring_project_pip,Scoring_Project_Macros,Scoring_Project_DailyTracking;
 
 rule_based_test := (real) 2.0;
 //
 // curr_date := ut.GetDate + '_1' ; //'20130908_1' ;
 // prev_date := (string) ((integer4)ut.GetDate -1)  + '_1' ;
 
-req_date := (integer) ut.GetDate ;
+req_date := (STRING8)Std.Date.Today();
 
 
 curr_date := req_date + '_1';
-prev_date := scoring_project_ks.get_past_date(req_date, 1) + '_1';
+// prev_date := scoring_project_ks.get_past_date(req_date, 1) + '_1';
 
+
+ds := 'scoringqa::bins::ks::';
+
+Filenames_data := nothor(STD.File.LogicalFileList(ds + '*' + '_1_data', , TRUE));
+Filenames_results := nothor(STD.File.LogicalFileList(ds + '*' + '_1_results', , TRUE));
+
+Data_filelist := sort(Filenames_data, -modified);
+Results_filelist := sort(Filenames_results, -modified);
+
+Data_prev_filename := Data_filelist[2].name;
+Results_prev_filename := Results_filelist[2].name;
+
+prev_run := Data_prev_filename[length(Data_prev_filename)-14.. Length(Data_prev_filename)-7];
+
+prev_date := prev_run + '_1';
 
 results_rec :=RECORD
   string9 get_score_bin;
@@ -40,18 +55,45 @@ end;
 
 oneline := record string1000 line; string2 eor := '\r\n'; end;
 
-result1 := dataset('~ScoringQA::bins::ks::' + prev_date + '_results', results_rec, CSV(heading(0), SEPARATOR('|'), QUOTE(''), TERMINATOR('\n')));
 
-result2 := dataset('~ScoringQA::bins::ks::' + curr_date + '_results', results_rec, CSV(heading(0), SEPARATOR('|'), QUOTE(''), TERMINATOR('\n')));
+
+
+
+
+
+
+
+
+
+// result1 := dataset('~ScoringQA::bins::ks::' + prev_date + '_results', results_rec, CSV(heading(0), SEPARATOR('|'), QUOTE(''), TERMINATOR('\n')));
+
+result1 := dataset('~' + ds + prev_run + '_1_results', results_rec, CSV(heading(0), SEPARATOR('|'), QUOTE(''), TERMINATOR('\n')));
+// result1 := dataset('~' + ds + '20210126_1_results', results_rec, CSV(heading(0), SEPARATOR('|'), QUOTE(''), TERMINATOR('\n')));
+
+result2 := dataset('~' + ds + req_date + '_1_results', results_rec, CSV(heading(0), SEPARATOR('|'), QUOTE(''), TERMINATOR('\n')));
+// result2 := dataset('~' + ds + '20210127_1_results', results_rec, CSV(heading(0), SEPARATOR('|'), QUOTE(''), TERMINATOR('\n')));
+
+
+
+
+score_data1 := distribute(dataset('~' + ds + prev_run + '_1_data', data_rec, CSV(heading(0), SEPARATOR('|'), QUOTE(''), TERMINATOR('\n'))),(integer)acctno);
+
+score_data2 := distribute(dataset('~' + ds + req_date + '_1_data', data_rec, CSV(heading(0), SEPARATOR('|'), QUOTE(''), TERMINATOR('\n'))),(integer)acctno);
+
+
+
+////////////result1 := dataset('~ScoringQA::bins::ks::' + prev_date + '_results', results_rec, CSV(heading(0), SEPARATOR('|'), QUOTE(''), TERMINATOR('\n')));
+
+////////////result2 := dataset('~ScoringQA::bins::ks::' + curr_date + '_results', results_rec, CSV(heading(0), SEPARATOR('|'), QUOTE(''), TERMINATOR('\n')));
 
 // result1 := result11(flagship not in ['RiskView_xml_T_mobile_RVT1210_1_v4','RiskView_xml_T_mobile_RVT1212_1_v4']);
 
 
-score_data1 := distribute(dataset('~ScoringQA::bins::ks::' + prev_date + '_data', data_rec, CSV(heading(0), SEPARATOR('|'), QUOTE(''), TERMINATOR('\n'))),(integer)acctno);
+////////////score_data1 := distribute(dataset('~ScoringQA::bins::ks::' + prev_date + '_data', data_rec, CSV(heading(0), SEPARATOR('|'), QUOTE(''), TERMINATOR('\n'))),(integer)acctno);
 
 // score_data1 := score_data11(flagship not in ['RiskView_xml_T_mobile_RVT1210_1_v4','RiskView_xml_T_mobile_RVT1212_1_v4']);
 
-score_data2 := distribute(dataset('~ScoringQA::bins::ks::' + curr_date + '_data', data_rec, CSV(heading(0), SEPARATOR('|'), QUOTE(''), TERMINATOR('\n'))),(integer)acctno);
+////////////score_data2 := distribute(dataset('~ScoringQA::bins::ks::' + curr_date + '_data', data_rec, CSV(heading(0), SEPARATOR('|'), QUOTE(''), TERMINATOR('\n'))),(integer)acctno);
 
 
 scores_project(ds,rec):=functionmacro
