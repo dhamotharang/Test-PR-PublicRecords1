@@ -27,11 +27,12 @@ EXPORT get_mas_build_dates(STRING variable_name) := FUNCTION
 	
 	// person header is from max date last seen key not env vars
 	// env var is based off of build date but that can be up to a month a head of max date last seen due to monthly updates of the normal header build
-	dk := choosen(dx_header.key_max_dt_last_seen(iType), 1);
-	max_last_seen := (string) dk[1].max_date_last_seen;
-	hdrBuildDate01 := max_last_seen[1..6]+'01';
-	personHeader := hdrBuildDate01;
-	
+	//dk := choosen(dx_header.key_max_dt_last_seen(iType), 1);
+	//max_last_seen := (string) dk[1].max_date_last_seen;
+	//hdrBuildDate01 := max_last_seen[1..6]+'01';
+	//personHeader := hdrBuildDate01;
+	personHeader :=  Risk_Indicators.get_build_date('header_build_version') : STORED('header_build_version'); 
+
 	Mari := Risk_Indicators.get_build_date('mari_build_version') : STORED('mari_build_version');
 	Proflic := Risk_Indicators.get_build_date('proflic_build_version') : STORED('proflic_build_version');
 	property := IF(IsFCRA, Risk_Indicators.get_build_date('FCRA_Property_Build_Version') , Risk_Indicators.get_build_date('Property_Build_Version')) : STORED('Property_Build_Version');
