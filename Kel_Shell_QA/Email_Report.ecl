@@ -1,4 +1,4 @@
-﻿﻿EXPORT Email_Report(logical_file_name, file_name, report_tag, file_tag, Tag) := FUNCTIONMACRO
+﻿EXPORT Email_Report(logical_file_name, file_name, report_tag, file_tag, Tag) := FUNCTIONMACRO
 
 		string out_file_layout := '';
 
@@ -31,10 +31,10 @@
 		
 		// XtabOut[no_of_RECORDs];
 	
-		// send_file := fileservices.SendEmailAttachText('karthik.reddy@lexisnexis.com',
-		send_file := fileservices.SENDEmailAttachText(Kel_Shell_QA.email_distribution.Success_list,
+		//send_file := fileservices.SendEmailAttachText('karthik.reddy@lexisnexis.com',
+		 send_file := fileservices.SENDEmailAttachText(Kel_Shell_QA.email_distribution.Success_list,
 							 ' '+ report_tag  +  'Test Results Direct From Thor ',
-																			 	 trim(Tag,left,right) + ' '+ '\n Please view attachment.' ,
+																			 	 trim(Tag,left,right) + ' '+ '\n Please view attachment. \n'  + 'Your WUID is ' + workunit + ' .' ,
 																			 XtabOut[no_of_records].line ,
 																			 'text/plain; charset=ISO-8859-3', 
 																				' ' +	file_tag + ' '+ trim(Tag,left,right) + ' '  + '.csv',

@@ -203,9 +203,20 @@ final_report_excel := Kel_Shell_QA.Email_Report(logical_file_name, '~kel_shell::
 
 final_report_summary:=output(distribute(op2,random()),,'~kel_shell::out::Acceptance_Criteria_results_Summary_'+ tag + Category_par, CSV(heading(single), quote('"')), overwrite, EXPIRE(15));
 
-final_report_summary_excel := Kel_Shell_QA.Email_Report(logical_file_name, '~kel_shell::out::Acceptance_Criteria_results_Summary_'+ tag + Category_par , ' Acceptance Criteria Report Summary ' , 'AC_Summary_Report ' + Category_par, Tag  );
+//final_report_summary_excel := Kel_Shell_QA.Email_Report(logical_file_name, '~kel_shell::out::Acceptance_Criteria_results_Summary_'+ tag + Category_par , ' Acceptance Criteria Report Summary ' , 'AC_Summary_Report ' + Category_par, Tag  );
 
-seq:=sequential(final_report, final_report_summary, final_report_excel, final_report_summary_excel);
+read_file_name:='~kel_shell::out::Acceptance_Criteria_results_Summary_'+ tag + Category_par;
+write_file_name:= REGEXREPLACE('~', read_file_name, '');
+LZ := '10.140.128.250';
+
+despray_summary:=STD.File.DeSpray(read_file_name,
+									LZ,
+										'/data/Kel_shell_qa_tools/' + write_file_name + '.csv',
+									-1,
+									'http://10.173.14.204:8010/FileSpray',
+									,
+									true);
+seq:=sequential(final_report, final_report_summary, final_report_excel, despray_summary);
 
 RETURN seq;
 	 
