@@ -1,6 +1,6 @@
-﻿//HPCC Systems KEL Compiler Version 1.5.0rc1
+//HPCC Systems KEL Compiler Version 1.5.0rc1
 IMPORT KEL15 AS KEL;
-IMPORT $,Email_Data,NID,PublicRecords_KEL,Risk_Indicators,Royalty,STD,address,header;
+IMPORT $,Email_Data,NID,PublicRecords_KEL,Royalty,STD,address,header;
 IMPORT CFG_Compile FROM PublicRecords_KEL;
 IMPORT * FROM KEL15.Null;
 EXPORT FN_Compile(CFG_Compile __cfg = CFG_Compile) := MODULE
@@ -40,7 +40,7 @@ EXPORT FN_Compile(CFG_Compile __cfg = CFG_Compile) := MODULE
   EXPORT KEL.typ.nkdate FN_G_E_T_B_U_I_L_D_D_A_T_E(KEL.typ.nstr __PvariableName) := FUNCTION
     variableName := __T(__PvariableName);
     __IsNull := __NL(__PvariableName);
-    __Value := (UNSIGNED8)Risk_Indicators.get_Build_date(variableName);
+    __Value := (UNSIGNED8)PublicRecords_KEL.ECL_Functions.get_mas_build_dates(variableName);
     RETURN __BNT(__Value,__IsNull,KEL.typ.nkdate);
   END;
   EXPORT KEL.typ.nint FN_Edit_Distance(KEL.typ.nstr __Pfield1, KEL.typ.nstr __Pfield2) := FUNCTION
@@ -133,9 +133,9 @@ EXPORT FN_Compile(CFG_Compile __cfg = CFG_Compile) := MODULE
     __Value := PublicRecords_KEL.ECL_Functions.Fn_STD_Str_FilterOut_ValidChars(Field);
     RETURN __BNT(__Value,__IsNull,KEL.typ.nstr);
   END;
-  SHARED __CC14741 := -99999;
+  SHARED __CC13345 := -99999;
   EXPORT KEL.typ.str FN_Validate_Flag(KEL.typ.nstr __PFieldToCheck) := FUNCTION
-    RETURN MAP(__T(__OR(__NT(__PFieldToCheck),__OP2(__PFieldToCheck,=,__CN(''))))=>(KEL.typ.str)__CC14741,__T(__OP2(FN__fn_Filter_Out_Valid_Chars(__ECAST(KEL.typ.nstr,__FN1(KEL.Routines.ToUpperCase,__FN1(KEL.Routines.TrimBoth,__PFieldToCheck)))),=,__CN('')))=>'0','1');
+    RETURN MAP(__T(__OR(__NT(__PFieldToCheck),__OP2(__PFieldToCheck,=,__CN(''))))=>(KEL.typ.str)__CC13345,__T(__OP2(FN__fn_Filter_Out_Valid_Chars(__ECAST(KEL.typ.nstr,__FN1(KEL.Routines.ToUpperCase,__FN1(KEL.Routines.TrimBoth,__PFieldToCheck)))),=,__CN('')))=>'0','1');
   END;
   EXPORT KEL.typ.nstr FN__fn_Bogus_Names(KEL.typ.nstr __PsNameFirst, KEL.typ.nstr __PsNameMid, KEL.typ.nstr __PsNameLast) := FUNCTION
     sNameFirst := __T(__PsNameFirst);
@@ -310,43 +310,49 @@ EXPORT FN_Compile(CFG_Compile __cfg = CFG_Compile) := MODULE
   EXPORT KEL.typ.nint FN_G_E_T___S_T_O_R_E_D___G_L_B_P_U_R_P_O_S_E(KEL.typ.nstr __PStoredName) := FUNCTION
     StoredName := __T(__PStoredName);
     __IsNull := __NL(__PStoredName);
-    __Value := PublicRecords_KEL.MAS_get.Gateway.GatewayFunctions.GrabGLBPurpose(StoredName);
+    __Value := PublicRecords_KEL.MAS_get.MASGateway.GatewayFunctions.GrabGLBPurpose(StoredName);
     RETURN __BNT(__Value,__IsNull,KEL.typ.nint);
   END;
   EXPORT KEL.typ.nint FN_G_E_T___S_T_O_R_E_D___D_P_P_A_P_U_R_P_O_S_E(KEL.typ.nstr __PStoredName) := FUNCTION
     StoredName := __T(__PStoredName);
     __IsNull := __NL(__PStoredName);
-    __Value := PublicRecords_KEL.MAS_get.Gateway.GatewayFunctions.GrabDPPAPurpose(StoredName);
+    __Value := PublicRecords_KEL.MAS_get.MASGateway.GatewayFunctions.GrabDPPAPurpose(StoredName);
     RETURN __BNT(__Value,__IsNull,KEL.typ.nint);
   END;
   EXPORT KEL.typ.nstr FN_G_E_T___S_T_O_R_E_D___W_A_T_C_H_L_I_S_T_S___R_E_Q_U_E_S_T_E_D(KEL.typ.nstr __PStoredName) := FUNCTION
     StoredName := __T(__PStoredName);
     __IsNull := __NL(__PStoredName);
-    __Value := PublicRecords_KEL.MAS_get.Gateway.GatewayFunctions.GrabWatchlistsRequested(StoredName);
+    __Value := PublicRecords_KEL.MAS_get.MASGateway.GatewayFunctions.GrabWatchlistsRequested(StoredName);
     RETURN __BNT(__Value,__IsNull,KEL.typ.nstr);
   END;
   EXPORT KEL.typ.nbool FN_G_E_T___S_T_O_R_E_D___I_N_C_L_U_D_E___O_F_A_C(KEL.typ.nstr __PStoredName) := FUNCTION
     StoredName := __T(__PStoredName);
     __IsNull := __NL(__PStoredName);
-    __Value := PublicRecords_KEL.MAS_get.Gateway.GatewayFunctions.GrabIncludeOFAC(StoredName);
+    __Value := PublicRecords_KEL.MAS_get.MASGateway.GatewayFunctions.GrabIncludeOFAC(StoredName);
     RETURN __BNT(__Value,__IsNull,KEL.typ.nbool);
   END;
   EXPORT KEL.typ.nbool FN_G_E_T___S_T_O_R_E_D___I_N_C_L_U_D_E___A_D_D_I_T_I_O_N_A_L___W_A_T_C_H_L_I_S_T_S(KEL.typ.nstr __PStoredName) := FUNCTION
     StoredName := __T(__PStoredName);
     __IsNull := __NL(__PStoredName);
-    __Value := PublicRecords_KEL.MAS_get.Gateway.GatewayFunctions.GrabIncludeAdditionalWatchlists(StoredName);
+    __Value := PublicRecords_KEL.MAS_get.MASGateway.GatewayFunctions.GrabIncludeAdditionalWatchlists(StoredName);
     RETURN __BNT(__Value,__IsNull,KEL.typ.nbool);
   END;
   EXPORT KEL.typ.nfloat FN_G_E_T___S_T_O_R_E_D___G_L_O_B_A_L___W_A_T_C_H_L_I_S_T___T_H_R_E_S_H_O_L_D(KEL.typ.nstr __PStoredName) := FUNCTION
     StoredName := __T(__PStoredName);
     __IsNull := __NL(__PStoredName);
-    __Value := PublicRecords_KEL.MAS_get.Gateway.GatewayFunctions.GrabGlobalWatchlistThreshold(StoredName);
+    __Value := PublicRecords_KEL.MAS_get.MASGateway.GatewayFunctions.GrabGlobalWatchlistThreshold(StoredName);
     RETURN __BNT(__Value,__IsNull,KEL.typ.nfloat);
+  END;
+  EXPORT KEL.typ.nbool FN_G_E_T___S_T_O_R_E_D___I_S___F_C_R_A(KEL.typ.nstr __PStoredName) := FUNCTION
+    StoredName := __T(__PStoredName);
+    __IsNull := __NL(__PStoredName);
+    __Value := PublicRecords_KEL.MAS_get.MASGateway.GatewayFunctions.GrabIsFCRA(StoredName);
+    RETURN __BNT(__Value,__IsNull,KEL.typ.nbool);
   END;
   EXPORT KEL.typ.nstr FN_G_E_T___N_E_T_A_C_U_I_T_Y___U_R_L(KEL.typ.nstr __PStoredName) := FUNCTION
     StoredName := __T(__PStoredName);
     __IsNull := __NL(__PStoredName);
-    __Value := PublicRecords_KEL.MAS_get.Gateway.NetAcuityFunctions.GrabNetAcuityURL(StoredName);
+    __Value := PublicRecords_KEL.MAS_get.MASGateway.NetAcuityFunctions.GrabNetAcuityURL(StoredName);
     RETURN __BNT(__Value,__IsNull,KEL.typ.nstr);
   END;
   EXPORT SET OF KEL.typ.str FN_G_A_T_E_W_A_Y___N_E_T_A_C_U_I_T_Y(KEL.typ.nstr __PIPAddress, KEL.typ.nstr __PLexID, KEL.typ.nstr __PGatewayURL, KEL.typ.nint __PDPPAPurpose, KEL.typ.nint __PGLBPurpose) := FUNCTION
@@ -355,7 +361,7 @@ EXPORT FN_Compile(CFG_Compile __cfg = CFG_Compile) := MODULE
     GatewayURL := __T(__PGatewayURL);
     DPPAPurpose := __T(__PDPPAPurpose);
     GLBPurpose := __T(__PGLBPurpose);
-    __Value := PublicRecords_KEL.MAS_get.Gateway.NetAcuityFunctions.NetAcuityWrapper(IPAddress, LexID, GatewayURL, DPPAPurpose, GLBPurpose);
+    __Value := PublicRecords_KEL.MAS_get.MASGateway.NetAcuityFunctions.NetAcuityWrapper(IPAddress, LexID, GatewayURL, DPPAPurpose, GLBPurpose);
     RETURN __Value;
   END;
   EXPORT KEL.typ.nint FN_G_E_T___N_E_T_A_C_U_I_T_Y___R_O_Y_A_L_T_I_E_S(KEL.typ.nstr __PIPAddress, KEL.typ.nstr __PIPType) := FUNCTION
@@ -368,7 +374,7 @@ EXPORT FN_Compile(CFG_Compile __cfg = CFG_Compile) := MODULE
   EXPORT KEL.typ.nstr FN_G_E_T___O_F_A_C___U_R_L(KEL.typ.nstr __PStoredName) := FUNCTION
     StoredName := __T(__PStoredName);
     __IsNull := __NL(__PStoredName);
-    __Value := PublicRecords_KEL.MAS_get.Gateway.OFACWatchlistsFunctions.GrabOFACURL(StoredName);
+    __Value := PublicRecords_KEL.MAS_get.MASGateway.OFACWatchlistsFunctions.GrabOFACURL(StoredName);
     RETURN __BNT(__Value,__IsNull,KEL.typ.nstr);
   END;
   EXPORT SET OF KEL.typ.str FN_G_A_T_E_W_A_Y___O_F_A_C(KEL.typ.nstr __PGatewayURL, KEL.typ.nstr __PFirstName, KEL.typ.nstr __PMiddleName, KEL.typ.nstr __PLastName, KEL.typ.nstr __PDateOfBirth, KEL.typ.nbool __PIncludeOFAC, KEL.typ.nbool __PIncludeAdditionalWatchlists, KEL.typ.nfloat __PGlobalWatchlistThreshold, KEL.typ.nstr __PWatchlistsRequested) := FUNCTION
@@ -381,7 +387,24 @@ EXPORT FN_Compile(CFG_Compile __cfg = CFG_Compile) := MODULE
     IncludeAdditionalWatchlists := __T(__PIncludeAdditionalWatchlists);
     GlobalWatchlistThreshold := __T(__PGlobalWatchlistThreshold);
     WatchlistsRequested := __T(__PWatchlistsRequested);
-    __Value := PublicRecords_KEL.MAS_get.Gateway.OFACWatchlistsFunctions.OFACWatchlistsWrapper(GatewayURL, FirstName, MiddleName, LastName, DateOfBirth, IncludeOFAC, IncludeAdditionalWatchlists, GlobalWatchlistThreshold, WatchlistsRequested);
+    __Value := PublicRecords_KEL.MAS_get.MASGateway.OFACWatchlistsFunctions.OFACWatchlistsWrapper(GatewayURL, FirstName, MiddleName, LastName, DateOfBirth, IncludeOFAC, IncludeAdditionalWatchlists, GlobalWatchlistThreshold, WatchlistsRequested);
+    RETURN __Value;
+  END;
+  EXPORT KEL.typ.nstr FN_G_E_T___T_A_R_G_U_S___U_R_L(KEL.typ.nstr __PStoredName) := FUNCTION
+    StoredName := __T(__PStoredName);
+    __IsNull := __NL(__PStoredName);
+    __Value := PublicRecords_KEL.MAS_get.MASGateway.TargusFunctions.GrabTargusURL(StoredName);
+    RETURN __BNT(__Value,__IsNull,KEL.typ.nstr);
+  END;
+  EXPORT SET OF KEL.typ.str FN_G_A_T_E_W_A_Y___T_A_R_G_U_S(KEL.typ.nstr __PGatewayURL, KEL.typ.nstr __PFirstName, KEL.typ.nstr __PLastName, KEL.typ.nstr __PPhone10, KEL.typ.nint __PDPPAPurpose, KEL.typ.nint __PGLBPurpose, KEL.typ.nbool __PIsFCRA) := FUNCTION
+    GatewayURL := __T(__PGatewayURL);
+    FirstName := __T(__PFirstName);
+    LastName := __T(__PLastName);
+    Phone10 := __T(__PPhone10);
+    DPPAPurpose := __T(__PDPPAPurpose);
+    GLBPurpose := __T(__PGLBPurpose);
+    IsFCRA := __T(__PIsFCRA);
+    __Value := PublicRecords_KEL.MAS_get.MASGateway.TargusFunctions.TargusWrapper(GatewayURL, FirstName, LastName, Phone10, DPPAPurpose, GLBPurpose, IsFCRA);
     RETURN __Value;
   END;
   EXPORT KEL.typ.str FN__map_Filing_Type(KEL.typ.nstr __PfilingType) := FUNCTION

@@ -1,9 +1,9 @@
-﻿//HPCC Systems KEL Compiler Version 1.5.0rc1
+//HPCC Systems KEL Compiler Version 1.5.0rc1
 IMPORT KEL15 AS KEL;
 IMPORT PublicRecords_KEL;
 IMPORT CFG_Compile,E_Address,E_Geo_Link,E_Property,E_Zip_Code FROM PublicRecords_KEL;
 IMPORT * FROM KEL15.Null;
-EXPORT E_Address_Property(CFG_Compile __cfg = CFG_Compile) := MODULE
+EXPORT E_Address_Property(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG_Compile __cfg = CFG_Compile) := MODULE
   EXPORT Typ := KEL.typ.uid;
   EXPORT InLayout := RECORD
     KEL.typ.ntyp(E_Property().Typ) Prop_;
@@ -32,38 +32,23 @@ EXPORT E_Address_Property(CFG_Compile __cfg = CFG_Compile) := MODULE
   SHARED VIRTUAL __GroupedFilter(GROUPED DATASET(InLayout) __ds) := __ds;
   SHARED __Mapping := 'Prop_(DEFAULT:Prop_:0),Location_(DEFAULT:Location_:0),primaryrange(DEFAULT:Primary_Range_:\'\'),predirectional(DEFAULT:Predirectional_:\'\'),primaryname(DEFAULT:Primary_Name_:\'\'),suffix(DEFAULT:Suffix_:\'\'),postdirectional(DEFAULT:Postdirectional_:\'\'),unitdesignation(DEFAULT:Unit_Designation_:\'\'),secondaryrange(DEFAULT:Secondary_Range_:\'\'),postalcity(DEFAULT:Postal_City_:\'\'),vanitycity(DEFAULT:Vanity_City_:\'\'),state(DEFAULT:State_:\'\'),zip5(DEFAULT:Z_I_P5_:0),vendorsourcecode(DEFAULT:Vendor_Source_Code_:\'\'),source(DEFAULT:Source_:\'\'),archive_date(DEFAULT:Archive___Date_:EPOCH),datefirstseen(DEFAULT:Date_First_Seen_:EPOCH),datelastseen(DEFAULT:Date_Last_Seen_:EPOCH),hybridarchivedate(DEFAULT:Hybrid_Archive_Date_:EPOCH),vaultdatelastseen(DEFAULT:Vault_Date_Last_Seen_:EPOCH)';
   SHARED __Mapping0 := 'Prop_(DEFAULT:Prop_:0),Location_(DEFAULT:Location_:0),prim_range(OVERRIDE:Primary_Range_:\'\'),predir(OVERRIDE:Predirectional_:\'\'),prim_name(OVERRIDE:Primary_Name_:\'\'),suffix(OVERRIDE:Suffix_:\'\'),postdir(OVERRIDE:Postdirectional_:\'\'),unit_desig(OVERRIDE:Unit_Designation_:\'\'),sec_range(OVERRIDE:Secondary_Range_:\'\'),p_city_name(OVERRIDE:Postal_City_:\'\'),v_city_name(OVERRIDE:Vanity_City_:\'\'),st(OVERRIDE:State_:\'\'),zip(OVERRIDE:Z_I_P5_:0),vendor_source_flag(OVERRIDE:Vendor_Source_Code_:\'\'),src(OVERRIDE:Source_:\'\'),archive_date(OVERRIDE:Archive___Date_:EPOCH),datefirstseen(DEFAULT:Date_First_Seen_:EPOCH),datelastseen(DEFAULT:Date_Last_Seen_:EPOCH),hybridarchivedate(DEFAULT:Hybrid_Archive_Date_:EPOCH),vaultdatelastseen(DEFAULT:Vault_Date_Last_Seen_:EPOCH),DPMBitmap(OVERRIDE:__Permits:PERMITS)';
-  EXPORT __d0_KELfiltered := PublicRecords_KEL.Files.NonFCRA.LN_PropertyV2__key_search_fid_vault(propertyaddress AND ln_fares_id != '' AND (STRING10)prim_range != '' AND (STRING28)prim_name != '' AND (UNSIGNED3)zip != 0);
+  SHARED __d0_Norm := NORMALIZE(__in,LEFT.Dataset_PropertyV2__Key_Search_Fid,TRANSFORM(RECORDOF(__in.Dataset_PropertyV2__Key_Search_Fid),SELF:=RIGHT));
+  EXPORT __d0_KELfiltered := __d0_Norm(propertyaddress AND ln_fares_id != '' AND (STRING10)prim_range != '' AND (STRING28)prim_name != '' AND (UNSIGNED3)zip != 0);
   SHARED __d0_Prop__Layout := RECORD
     RECORDOF(__d0_KELfiltered);
     KEL.typ.uid Prop_;
   END;
-  SHARED __d0_Missing_Prop__UIDComponents := KEL.Intake.ConstructMissingFieldList(__d0_KELfiltered,'prim_range,predir,prim_name,suffix,postdir,zip,sec_range','PublicRecords_KEL.Files.NonFCRA.LN_PropertyV2__key_search_fid_vault');
-  SHARED __d0_Prop__Mapped := IF(__d0_Missing_Prop__UIDComponents = 'prim_range,predir,prim_name,suffix,postdir,zip,sec_range',PROJECT(__d0_KELfiltered,TRANSFORM(__d0_Prop__Layout,SELF.Prop_:=0,SELF:=LEFT)),JOIN(KEL.Intake.AppendFields(__d0_KELfiltered,__d0_Missing_Prop__UIDComponents),E_Property(__cfg).Lookup,TRIM((STRING)LEFT.prim_range) + '|' + TRIM((STRING)LEFT.predir) + '|' + TRIM((STRING)LEFT.prim_name) + '|' + TRIM((STRING)LEFT.suffix) + '|' + TRIM((STRING)LEFT.postdir) + '|' + TRIM((STRING)LEFT.zip) + '|' + TRIM((STRING)LEFT.sec_range) = RIGHT.KeyVal,TRANSFORM(__d0_Prop__Layout,SELF.Prop_:=RIGHT.UID,SELF:=LEFT),LEFT OUTER,SMART));
+  SHARED __d0_Missing_Prop__UIDComponents := KEL.Intake.ConstructMissingFieldList(__d0_KELfiltered,'prim_range,predir,prim_name,suffix,postdir,zip,sec_range','__in');
+  SHARED __d0_Prop__Mapped := IF(__d0_Missing_Prop__UIDComponents = 'prim_range,predir,prim_name,suffix,postdir,zip,sec_range',PROJECT(__d0_KELfiltered,TRANSFORM(__d0_Prop__Layout,SELF.Prop_:=0,SELF:=LEFT)),JOIN(KEL.Intake.AppendFields(__d0_KELfiltered,__d0_Missing_Prop__UIDComponents),E_Property(__in,__cfg).Lookup,TRIM((STRING)LEFT.prim_range) + '|' + TRIM((STRING)LEFT.predir) + '|' + TRIM((STRING)LEFT.prim_name) + '|' + TRIM((STRING)LEFT.suffix) + '|' + TRIM((STRING)LEFT.postdir) + '|' + TRIM((STRING)LEFT.zip) + '|' + TRIM((STRING)LEFT.sec_range) = RIGHT.KeyVal,TRANSFORM(__d0_Prop__Layout,SELF.Prop_:=RIGHT.UID,SELF:=LEFT),LEFT OUTER,SMART));
   SHARED __d0_Location__Layout := RECORD
     RECORDOF(__d0_Prop__Mapped);
     KEL.typ.uid Location_;
   END;
-  SHARED __d0_Missing_Location__UIDComponents := KEL.Intake.ConstructMissingFieldList(__d0_Prop__Mapped,'prim_range,predir,prim_name,suffix,postdir,zip,sec_range','PublicRecords_KEL.Files.NonFCRA.LN_PropertyV2__key_search_fid_vault');
-  SHARED __d0_Location__Mapped := IF(__d0_Missing_Location__UIDComponents = 'prim_range,predir,prim_name,suffix,postdir,zip,sec_range',PROJECT(__d0_Prop__Mapped,TRANSFORM(__d0_Location__Layout,SELF.Location_:=0,SELF:=LEFT)),JOIN(KEL.Intake.AppendFields(__d0_Prop__Mapped,__d0_Missing_Location__UIDComponents),E_Address(__cfg).Lookup,TRIM((STRING)LEFT.prim_range) + '|' + TRIM((STRING)LEFT.predir) + '|' + TRIM((STRING)LEFT.prim_name) + '|' + TRIM((STRING)LEFT.suffix) + '|' + TRIM((STRING)LEFT.postdir) + '|' + TRIM((STRING)LEFT.zip) + '|' + TRIM((STRING)LEFT.sec_range) = RIGHT.KeyVal,TRANSFORM(__d0_Location__Layout,SELF.Location_:=RIGHT.UID,SELF:=LEFT),LEFT OUTER,SMART));
+  SHARED __d0_Missing_Location__UIDComponents := KEL.Intake.ConstructMissingFieldList(__d0_Prop__Mapped,'prim_range,predir,prim_name,suffix,postdir,zip,sec_range','__in');
+  SHARED __d0_Location__Mapped := IF(__d0_Missing_Location__UIDComponents = 'prim_range,predir,prim_name,suffix,postdir,zip,sec_range',PROJECT(__d0_Prop__Mapped,TRANSFORM(__d0_Location__Layout,SELF.Location_:=0,SELF:=LEFT)),JOIN(KEL.Intake.AppendFields(__d0_Prop__Mapped,__d0_Missing_Location__UIDComponents),E_Address(__in,__cfg).Lookup,TRIM((STRING)LEFT.prim_range) + '|' + TRIM((STRING)LEFT.predir) + '|' + TRIM((STRING)LEFT.prim_name) + '|' + TRIM((STRING)LEFT.suffix) + '|' + TRIM((STRING)LEFT.postdir) + '|' + TRIM((STRING)LEFT.zip) + '|' + TRIM((STRING)LEFT.sec_range) = RIGHT.KeyVal,TRANSFORM(__d0_Location__Layout,SELF.Location_:=RIGHT.UID,SELF:=LEFT),LEFT OUTER,SMART));
   SHARED __d0_Prefiltered := __d0_Location__Mapped;
-  SHARED __d0 := __SourceFilter(KEL.FromFlat.Convert(__d0_Prefiltered,InLayout,__Mapping0,'PublicRecords_KEL.Files.NonFCRA.LN_PropertyV2__key_search_fid_vault'));
-  SHARED __Mapping1 := 'Prop_(DEFAULT:Prop_:0),Location_(DEFAULT:Location_:0),prim_range(OVERRIDE:Primary_Range_:\'\'),predir(OVERRIDE:Predirectional_:\'\'),prim_name(OVERRIDE:Primary_Name_:\'\'),suffix(OVERRIDE:Suffix_:\'\'),postdir(OVERRIDE:Postdirectional_:\'\'),unit_desig(OVERRIDE:Unit_Designation_:\'\'),sec_range(OVERRIDE:Secondary_Range_:\'\'),p_city_name(OVERRIDE:Postal_City_:\'\'),v_city_name(OVERRIDE:Vanity_City_:\'\'),st(OVERRIDE:State_:\'\'),zip(OVERRIDE:Z_I_P5_:0),vendor_source_flag(OVERRIDE:Vendor_Source_Code_:\'\'),src(OVERRIDE:Source_:\'\'),archive_date(OVERRIDE:Archive___Date_:EPOCH),datefirstseen(DEFAULT:Date_First_Seen_:EPOCH),datelastseen(DEFAULT:Date_Last_Seen_:EPOCH),hybridarchivedate(DEFAULT:Hybrid_Archive_Date_:EPOCH),vaultdatelastseen(DEFAULT:Vault_Date_Last_Seen_:EPOCH),DPMBitmap(OVERRIDE:__Permits:PERMITS)';
-  EXPORT __d1_KELfiltered := PublicRecords_KEL.Files.FCRA.LN_PropertyV2__key_search_fid_vault(propertyaddress AND ln_fares_id != '' AND (STRING10)prim_range != '' AND (STRING28)prim_name != '' AND (UNSIGNED3)zip != 0);
-  SHARED __d1_Prop__Layout := RECORD
-    RECORDOF(__d1_KELfiltered);
-    KEL.typ.uid Prop_;
-  END;
-  SHARED __d1_Missing_Prop__UIDComponents := KEL.Intake.ConstructMissingFieldList(__d1_KELfiltered,'prim_range,predir,prim_name,suffix,postdir,zip,sec_range','PublicRecords_KEL.Files.FCRA.LN_PropertyV2__key_search_fid_vault');
-  SHARED __d1_Prop__Mapped := IF(__d1_Missing_Prop__UIDComponents = 'prim_range,predir,prim_name,suffix,postdir,zip,sec_range',PROJECT(__d1_KELfiltered,TRANSFORM(__d1_Prop__Layout,SELF.Prop_:=0,SELF:=LEFT)),JOIN(KEL.Intake.AppendFields(__d1_KELfiltered,__d1_Missing_Prop__UIDComponents),E_Property(__cfg).Lookup,TRIM((STRING)LEFT.prim_range) + '|' + TRIM((STRING)LEFT.predir) + '|' + TRIM((STRING)LEFT.prim_name) + '|' + TRIM((STRING)LEFT.suffix) + '|' + TRIM((STRING)LEFT.postdir) + '|' + TRIM((STRING)LEFT.zip) + '|' + TRIM((STRING)LEFT.sec_range) = RIGHT.KeyVal,TRANSFORM(__d1_Prop__Layout,SELF.Prop_:=RIGHT.UID,SELF:=LEFT),LEFT OUTER,SMART));
-  SHARED __d1_Location__Layout := RECORD
-    RECORDOF(__d1_Prop__Mapped);
-    KEL.typ.uid Location_;
-  END;
-  SHARED __d1_Missing_Location__UIDComponents := KEL.Intake.ConstructMissingFieldList(__d1_Prop__Mapped,'prim_range,predir,prim_name,suffix,postdir,zip,sec_range','PublicRecords_KEL.Files.FCRA.LN_PropertyV2__key_search_fid_vault');
-  SHARED __d1_Location__Mapped := IF(__d1_Missing_Location__UIDComponents = 'prim_range,predir,prim_name,suffix,postdir,zip,sec_range',PROJECT(__d1_Prop__Mapped,TRANSFORM(__d1_Location__Layout,SELF.Location_:=0,SELF:=LEFT)),JOIN(KEL.Intake.AppendFields(__d1_Prop__Mapped,__d1_Missing_Location__UIDComponents),E_Address(__cfg).Lookup,TRIM((STRING)LEFT.prim_range) + '|' + TRIM((STRING)LEFT.predir) + '|' + TRIM((STRING)LEFT.prim_name) + '|' + TRIM((STRING)LEFT.suffix) + '|' + TRIM((STRING)LEFT.postdir) + '|' + TRIM((STRING)LEFT.zip) + '|' + TRIM((STRING)LEFT.sec_range) = RIGHT.KeyVal,TRANSFORM(__d1_Location__Layout,SELF.Location_:=RIGHT.UID,SELF:=LEFT),LEFT OUTER,SMART));
-  SHARED __d1_Prefiltered := __d1_Location__Mapped;
-  SHARED __d1 := __SourceFilter(KEL.FromFlat.Convert(__d1_Prefiltered,InLayout,__Mapping1,'PublicRecords_KEL.Files.FCRA.LN_PropertyV2__key_search_fid_vault'));
-  EXPORT InData := __d0 + __d1;
+  SHARED __d0 := __SourceFilter(KEL.FromFlat.Convert(__d0_Prefiltered,InLayout,__Mapping0,'PublicRecords_KEL.ECL_Functions.Dataset_FDC'));
+  EXPORT InData := __d0;
   EXPORT Address_Components_Layout := RECORD
     KEL.typ.nstr Unit_Designation_;
     KEL.typ.nstr Postal_City_;
@@ -144,50 +129,30 @@ EXPORT E_Address_Property(CFG_Compile __cfg = CFG_Compile) := MODULE
   EXPORT __PreResult := ROLLUP(HAVING(Address_Property_Group,COUNT(ROWS(LEFT))=1),GROUP,Address_Property__Single_Rollup(LEFT)) + ROLLUP(HAVING(Address_Property_Group,COUNT(ROWS(LEFT))>1),GROUP,Address_Property__Rollup(LEFT, ROWS(LEFT)));
   EXPORT __Result := __CLEARFLAGS(__PreResult);
   EXPORT Result := __UNWRAP(__Result);
-  EXPORT Prop__Orphan := JOIN(InData(__NN(Prop_)),E_Property(__cfg).__Result,__EEQP(LEFT.Prop_, RIGHT.UID),TRANSFORM(InLayout,SELF := LEFT,SELF:=[]),LEFT ONLY, HASH);
-  EXPORT Location__Orphan := JOIN(InData(__NN(Location_)),E_Address(__cfg).__Result,__EEQP(LEFT.Location_, RIGHT.UID),TRANSFORM(InLayout,SELF := LEFT,SELF:=[]),LEFT ONLY, HASH);
-  EXPORT Z_I_P5__Orphan := JOIN(InData(__NN(Z_I_P5_)),E_Zip_Code(__cfg).__Result,__EEQP(LEFT.Z_I_P5_, RIGHT.UID),TRANSFORM(InLayout,SELF := LEFT,SELF:=[]),LEFT ONLY, HASH);
+  EXPORT Prop__Orphan := JOIN(InData(__NN(Prop_)),E_Property(__in,__cfg).__Result,__EEQP(LEFT.Prop_, RIGHT.UID),TRANSFORM(InLayout,SELF := LEFT,SELF:=[]),LEFT ONLY, HASH);
+  EXPORT Location__Orphan := JOIN(InData(__NN(Location_)),E_Address(__in,__cfg).__Result,__EEQP(LEFT.Location_, RIGHT.UID),TRANSFORM(InLayout,SELF := LEFT,SELF:=[]),LEFT ONLY, HASH);
+  EXPORT Z_I_P5__Orphan := JOIN(InData(__NN(Z_I_P5_)),E_Zip_Code(__in,__cfg).__Result,__EEQP(LEFT.Z_I_P5_, RIGHT.UID),TRANSFORM(InLayout,SELF := LEFT,SELF:=[]),LEFT ONLY, HASH);
   EXPORT SanityCheck := DATASET([{COUNT(Prop__Orphan),COUNT(Location__Orphan),COUNT(Z_I_P5__Orphan)}],{KEL.typ.int Prop__Orphan,KEL.typ.int Location__Orphan,KEL.typ.int Z_I_P5__Orphan});
   EXPORT NullCounts := DATASET([
-    {'AddressProperty','PublicRecords_KEL.Files.NonFCRA.LN_PropertyV2__key_search_fid_vault','Prop',COUNT(__d0(__NL(Prop_))),COUNT(__d0(__NN(Prop_)))},
-    {'AddressProperty','PublicRecords_KEL.Files.NonFCRA.LN_PropertyV2__key_search_fid_vault','Location',COUNT(__d0(__NL(Location_))),COUNT(__d0(__NN(Location_)))},
-    {'AddressProperty','PublicRecords_KEL.Files.NonFCRA.LN_PropertyV2__key_search_fid_vault','prim_range',COUNT(__d0(__NL(Primary_Range_))),COUNT(__d0(__NN(Primary_Range_)))},
-    {'AddressProperty','PublicRecords_KEL.Files.NonFCRA.LN_PropertyV2__key_search_fid_vault','predir',COUNT(__d0(__NL(Predirectional_))),COUNT(__d0(__NN(Predirectional_)))},
-    {'AddressProperty','PublicRecords_KEL.Files.NonFCRA.LN_PropertyV2__key_search_fid_vault','prim_name',COUNT(__d0(__NL(Primary_Name_))),COUNT(__d0(__NN(Primary_Name_)))},
-    {'AddressProperty','PublicRecords_KEL.Files.NonFCRA.LN_PropertyV2__key_search_fid_vault','suffix',COUNT(__d0(__NL(Suffix_))),COUNT(__d0(__NN(Suffix_)))},
-    {'AddressProperty','PublicRecords_KEL.Files.NonFCRA.LN_PropertyV2__key_search_fid_vault','postdir',COUNT(__d0(__NL(Postdirectional_))),COUNT(__d0(__NN(Postdirectional_)))},
-    {'AddressProperty','PublicRecords_KEL.Files.NonFCRA.LN_PropertyV2__key_search_fid_vault','unit_desig',COUNT(__d0(__NL(Unit_Designation_))),COUNT(__d0(__NN(Unit_Designation_)))},
-    {'AddressProperty','PublicRecords_KEL.Files.NonFCRA.LN_PropertyV2__key_search_fid_vault','sec_range',COUNT(__d0(__NL(Secondary_Range_))),COUNT(__d0(__NN(Secondary_Range_)))},
-    {'AddressProperty','PublicRecords_KEL.Files.NonFCRA.LN_PropertyV2__key_search_fid_vault','p_city_name',COUNT(__d0(__NL(Postal_City_))),COUNT(__d0(__NN(Postal_City_)))},
-    {'AddressProperty','PublicRecords_KEL.Files.NonFCRA.LN_PropertyV2__key_search_fid_vault','v_city_name',COUNT(__d0(__NL(Vanity_City_))),COUNT(__d0(__NN(Vanity_City_)))},
-    {'AddressProperty','PublicRecords_KEL.Files.NonFCRA.LN_PropertyV2__key_search_fid_vault','st',COUNT(__d0(__NL(State_))),COUNT(__d0(__NN(State_)))},
-    {'AddressProperty','PublicRecords_KEL.Files.NonFCRA.LN_PropertyV2__key_search_fid_vault','zip',COUNT(__d0(__NL(Z_I_P5_))),COUNT(__d0(__NN(Z_I_P5_)))},
-    {'AddressProperty','PublicRecords_KEL.Files.NonFCRA.LN_PropertyV2__key_search_fid_vault','vendor_source_flag',COUNT(__d0(__NL(Vendor_Source_Code_))),COUNT(__d0(__NN(Vendor_Source_Code_)))},
-    {'AddressProperty','PublicRecords_KEL.Files.NonFCRA.LN_PropertyV2__key_search_fid_vault','src',COUNT(__d0(__NL(Source_))),COUNT(__d0(__NN(Source_)))},
-    {'AddressProperty','PublicRecords_KEL.Files.NonFCRA.LN_PropertyV2__key_search_fid_vault','Archive_Date',COUNT(__d0(Archive___Date_=0)),COUNT(__d0(Archive___Date_!=0))},
-    {'AddressProperty','PublicRecords_KEL.Files.NonFCRA.LN_PropertyV2__key_search_fid_vault','DateFirstSeen',COUNT(__d0(Date_First_Seen_=0)),COUNT(__d0(Date_First_Seen_!=0))},
-    {'AddressProperty','PublicRecords_KEL.Files.NonFCRA.LN_PropertyV2__key_search_fid_vault','DateLastSeen',COUNT(__d0(Date_Last_Seen_=0)),COUNT(__d0(Date_Last_Seen_!=0))},
-    {'AddressProperty','PublicRecords_KEL.Files.NonFCRA.LN_PropertyV2__key_search_fid_vault','HybridArchiveDate',COUNT(__d0(Hybrid_Archive_Date_=0)),COUNT(__d0(Hybrid_Archive_Date_!=0))},
-    {'AddressProperty','PublicRecords_KEL.Files.NonFCRA.LN_PropertyV2__key_search_fid_vault','VaultDateLastSeen',COUNT(__d0(Vault_Date_Last_Seen_=0)),COUNT(__d0(Vault_Date_Last_Seen_!=0))},
-    {'AddressProperty','PublicRecords_KEL.Files.FCRA.LN_PropertyV2__key_search_fid_vault','Prop',COUNT(__d1(__NL(Prop_))),COUNT(__d1(__NN(Prop_)))},
-    {'AddressProperty','PublicRecords_KEL.Files.FCRA.LN_PropertyV2__key_search_fid_vault','Location',COUNT(__d1(__NL(Location_))),COUNT(__d1(__NN(Location_)))},
-    {'AddressProperty','PublicRecords_KEL.Files.FCRA.LN_PropertyV2__key_search_fid_vault','prim_range',COUNT(__d1(__NL(Primary_Range_))),COUNT(__d1(__NN(Primary_Range_)))},
-    {'AddressProperty','PublicRecords_KEL.Files.FCRA.LN_PropertyV2__key_search_fid_vault','predir',COUNT(__d1(__NL(Predirectional_))),COUNT(__d1(__NN(Predirectional_)))},
-    {'AddressProperty','PublicRecords_KEL.Files.FCRA.LN_PropertyV2__key_search_fid_vault','prim_name',COUNT(__d1(__NL(Primary_Name_))),COUNT(__d1(__NN(Primary_Name_)))},
-    {'AddressProperty','PublicRecords_KEL.Files.FCRA.LN_PropertyV2__key_search_fid_vault','suffix',COUNT(__d1(__NL(Suffix_))),COUNT(__d1(__NN(Suffix_)))},
-    {'AddressProperty','PublicRecords_KEL.Files.FCRA.LN_PropertyV2__key_search_fid_vault','postdir',COUNT(__d1(__NL(Postdirectional_))),COUNT(__d1(__NN(Postdirectional_)))},
-    {'AddressProperty','PublicRecords_KEL.Files.FCRA.LN_PropertyV2__key_search_fid_vault','unit_desig',COUNT(__d1(__NL(Unit_Designation_))),COUNT(__d1(__NN(Unit_Designation_)))},
-    {'AddressProperty','PublicRecords_KEL.Files.FCRA.LN_PropertyV2__key_search_fid_vault','sec_range',COUNT(__d1(__NL(Secondary_Range_))),COUNT(__d1(__NN(Secondary_Range_)))},
-    {'AddressProperty','PublicRecords_KEL.Files.FCRA.LN_PropertyV2__key_search_fid_vault','p_city_name',COUNT(__d1(__NL(Postal_City_))),COUNT(__d1(__NN(Postal_City_)))},
-    {'AddressProperty','PublicRecords_KEL.Files.FCRA.LN_PropertyV2__key_search_fid_vault','v_city_name',COUNT(__d1(__NL(Vanity_City_))),COUNT(__d1(__NN(Vanity_City_)))},
-    {'AddressProperty','PublicRecords_KEL.Files.FCRA.LN_PropertyV2__key_search_fid_vault','st',COUNT(__d1(__NL(State_))),COUNT(__d1(__NN(State_)))},
-    {'AddressProperty','PublicRecords_KEL.Files.FCRA.LN_PropertyV2__key_search_fid_vault','zip',COUNT(__d1(__NL(Z_I_P5_))),COUNT(__d1(__NN(Z_I_P5_)))},
-    {'AddressProperty','PublicRecords_KEL.Files.FCRA.LN_PropertyV2__key_search_fid_vault','vendor_source_flag',COUNT(__d1(__NL(Vendor_Source_Code_))),COUNT(__d1(__NN(Vendor_Source_Code_)))},
-    {'AddressProperty','PublicRecords_KEL.Files.FCRA.LN_PropertyV2__key_search_fid_vault','src',COUNT(__d1(__NL(Source_))),COUNT(__d1(__NN(Source_)))},
-    {'AddressProperty','PublicRecords_KEL.Files.FCRA.LN_PropertyV2__key_search_fid_vault','Archive_Date',COUNT(__d1(Archive___Date_=0)),COUNT(__d1(Archive___Date_!=0))},
-    {'AddressProperty','PublicRecords_KEL.Files.FCRA.LN_PropertyV2__key_search_fid_vault','DateFirstSeen',COUNT(__d1(Date_First_Seen_=0)),COUNT(__d1(Date_First_Seen_!=0))},
-    {'AddressProperty','PublicRecords_KEL.Files.FCRA.LN_PropertyV2__key_search_fid_vault','DateLastSeen',COUNT(__d1(Date_Last_Seen_=0)),COUNT(__d1(Date_Last_Seen_!=0))},
-    {'AddressProperty','PublicRecords_KEL.Files.FCRA.LN_PropertyV2__key_search_fid_vault','HybridArchiveDate',COUNT(__d1(Hybrid_Archive_Date_=0)),COUNT(__d1(Hybrid_Archive_Date_!=0))},
-    {'AddressProperty','PublicRecords_KEL.Files.FCRA.LN_PropertyV2__key_search_fid_vault','VaultDateLastSeen',COUNT(__d1(Vault_Date_Last_Seen_=0)),COUNT(__d1(Vault_Date_Last_Seen_!=0))}]
+    {'AddressProperty','PublicRecords_KEL.ECL_Functions.Dataset_FDC','Prop',COUNT(__d0(__NL(Prop_))),COUNT(__d0(__NN(Prop_)))},
+    {'AddressProperty','PublicRecords_KEL.ECL_Functions.Dataset_FDC','Location',COUNT(__d0(__NL(Location_))),COUNT(__d0(__NN(Location_)))},
+    {'AddressProperty','PublicRecords_KEL.ECL_Functions.Dataset_FDC','prim_range',COUNT(__d0(__NL(Primary_Range_))),COUNT(__d0(__NN(Primary_Range_)))},
+    {'AddressProperty','PublicRecords_KEL.ECL_Functions.Dataset_FDC','predir',COUNT(__d0(__NL(Predirectional_))),COUNT(__d0(__NN(Predirectional_)))},
+    {'AddressProperty','PublicRecords_KEL.ECL_Functions.Dataset_FDC','prim_name',COUNT(__d0(__NL(Primary_Name_))),COUNT(__d0(__NN(Primary_Name_)))},
+    {'AddressProperty','PublicRecords_KEL.ECL_Functions.Dataset_FDC','suffix',COUNT(__d0(__NL(Suffix_))),COUNT(__d0(__NN(Suffix_)))},
+    {'AddressProperty','PublicRecords_KEL.ECL_Functions.Dataset_FDC','postdir',COUNT(__d0(__NL(Postdirectional_))),COUNT(__d0(__NN(Postdirectional_)))},
+    {'AddressProperty','PublicRecords_KEL.ECL_Functions.Dataset_FDC','unit_desig',COUNT(__d0(__NL(Unit_Designation_))),COUNT(__d0(__NN(Unit_Designation_)))},
+    {'AddressProperty','PublicRecords_KEL.ECL_Functions.Dataset_FDC','sec_range',COUNT(__d0(__NL(Secondary_Range_))),COUNT(__d0(__NN(Secondary_Range_)))},
+    {'AddressProperty','PublicRecords_KEL.ECL_Functions.Dataset_FDC','p_city_name',COUNT(__d0(__NL(Postal_City_))),COUNT(__d0(__NN(Postal_City_)))},
+    {'AddressProperty','PublicRecords_KEL.ECL_Functions.Dataset_FDC','v_city_name',COUNT(__d0(__NL(Vanity_City_))),COUNT(__d0(__NN(Vanity_City_)))},
+    {'AddressProperty','PublicRecords_KEL.ECL_Functions.Dataset_FDC','st',COUNT(__d0(__NL(State_))),COUNT(__d0(__NN(State_)))},
+    {'AddressProperty','PublicRecords_KEL.ECL_Functions.Dataset_FDC','zip',COUNT(__d0(__NL(Z_I_P5_))),COUNT(__d0(__NN(Z_I_P5_)))},
+    {'AddressProperty','PublicRecords_KEL.ECL_Functions.Dataset_FDC','vendor_source_flag',COUNT(__d0(__NL(Vendor_Source_Code_))),COUNT(__d0(__NN(Vendor_Source_Code_)))},
+    {'AddressProperty','PublicRecords_KEL.ECL_Functions.Dataset_FDC','src',COUNT(__d0(__NL(Source_))),COUNT(__d0(__NN(Source_)))},
+    {'AddressProperty','PublicRecords_KEL.ECL_Functions.Dataset_FDC','Archive_Date',COUNT(__d0(Archive___Date_=0)),COUNT(__d0(Archive___Date_!=0))},
+    {'AddressProperty','PublicRecords_KEL.ECL_Functions.Dataset_FDC','DateFirstSeen',COUNT(__d0(Date_First_Seen_=0)),COUNT(__d0(Date_First_Seen_!=0))},
+    {'AddressProperty','PublicRecords_KEL.ECL_Functions.Dataset_FDC','DateLastSeen',COUNT(__d0(Date_Last_Seen_=0)),COUNT(__d0(Date_Last_Seen_!=0))},
+    {'AddressProperty','PublicRecords_KEL.ECL_Functions.Dataset_FDC','HybridArchiveDate',COUNT(__d0(Hybrid_Archive_Date_=0)),COUNT(__d0(Hybrid_Archive_Date_!=0))},
+    {'AddressProperty','PublicRecords_KEL.ECL_Functions.Dataset_FDC','VaultDateLastSeen',COUNT(__d0(Vault_Date_Last_Seen_=0)),COUNT(__d0(Vault_Date_Last_Seen_!=0))}]
   ,{KEL.typ.str entity,KEL.typ.str fileName,KEL.typ.str fieldName,KEL.typ.int nullCount,KEL.typ.int notNullCount});
 END;

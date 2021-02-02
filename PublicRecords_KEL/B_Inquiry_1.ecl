@@ -1,11 +1,11 @@
-﻿//HPCC Systems KEL Compiler Version 1.5.0rc1
+//HPCC Systems KEL Compiler Version 1.5.0rc1
 IMPORT KEL15 AS KEL;
 IMPORT B_Inquiry_2,CFG_Compile,E_Inquiry FROM PublicRecords_KEL;
 IMPORT * FROM KEL15.Null;
-EXPORT B_Inquiry_1(CFG_Compile __cfg = CFG_Compile) := MODULE
-  SHARED VIRTUAL TYPEOF(B_Inquiry_2(__cfg).__ENH_Inquiry_2) __ENH_Inquiry_2 := B_Inquiry_2(__cfg).__ENH_Inquiry_2;
-  SHARED __EE8154730 := __ENH_Inquiry_2;
-  EXPORT __ST298582_Layout := RECORD
+EXPORT B_Inquiry_1(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG_Compile __cfg = CFG_Compile) := MODULE
+  SHARED VIRTUAL TYPEOF(B_Inquiry_2(__in,__cfg).__ENH_Inquiry_2) __ENH_Inquiry_2 := B_Inquiry_2(__in,__cfg).__ENH_Inquiry_2;
+  SHARED __EE8152688 := __ENH_Inquiry_2;
+  EXPORT __ST310159_Layout := RECORD
     KEL.typ.nint Lex_I_D_;
     KEL.typ.nstr First_Name_;
     KEL.typ.nstr Last_Name_;
@@ -31,17 +31,17 @@ EXPORT B_Inquiry_1(CFG_Compile __cfg = CFG_Compile) := MODULE
     KEL.typ.epoch Vault_Date_Last_Seen_ := 0;
     KEL.typ.int __RecordCount := 0;
   END;
-  EXPORT __ST298555_Layout := RECORD
+  EXPORT __ST310132_Layout := RECORD
     KEL.typ.nuid UID;
     KEL.typ.nstr Transaction_I_D_;
     KEL.typ.nstr Sequence_Number_;
-    KEL.typ.ndataset(E_Inquiry(__cfg).Search_Info_Layout) Search_Info_;
-    KEL.typ.ndataset(E_Inquiry(__cfg).Permissions_Layout) Permissions_;
-    KEL.typ.ndataset(E_Inquiry(__cfg).Bus_Intel_Layout) Bus_Intel_;
-    KEL.typ.ndataset(__ST298582_Layout) Person_Info_;
-    KEL.typ.ndataset(E_Inquiry(__cfg).Business_Info_Layout) Business_Info_;
+    KEL.typ.ndataset(E_Inquiry(__in,__cfg).Search_Info_Layout) Search_Info_;
+    KEL.typ.ndataset(E_Inquiry(__in,__cfg).Permissions_Layout) Permissions_;
+    KEL.typ.ndataset(E_Inquiry(__in,__cfg).Bus_Intel_Layout) Bus_Intel_;
+    KEL.typ.ndataset(__ST310159_Layout) Person_Info_;
+    KEL.typ.ndataset(E_Inquiry(__in,__cfg).Business_Info_Layout) Business_Info_;
     KEL.typ.nint Fraudpoint_Score_;
-    KEL.typ.ndataset(E_Inquiry(__cfg).Data_Sources_Layout) Data_Sources_;
+    KEL.typ.ndataset(E_Inquiry(__in,__cfg).Data_Sources_Layout) Data_Sources_;
     KEL.typ.nint Agein_Days_;
     KEL.typ.str Inquiry_Function_Description_ := '';
     KEL.typ.str Inquiry_Industry_ := '';
@@ -63,10 +63,10 @@ EXPORT B_Inquiry_1(CFG_Compile __cfg = CFG_Compile) := MODULE
     KEL.typ.epoch Vault_Date_Last_Seen_ := 0;
     KEL.typ.int __RecordCount := 0;
   END;
-  SHARED __ST298555_Layout __ND8154735__Project(B_Inquiry_2(__cfg).__ST298323_Layout __PP8154731) := TRANSFORM
-    __EE8154805 := __PP8154731.Person_Info_;
-    SELF.Person_Info_ := __BN(PROJECT(__T(__EE8154805),__ST298582_Layout),__NL(__EE8154805));
-    SELF := __PP8154731;
+  SHARED __ST310132_Layout __ND8152693__Project(B_Inquiry_2(__in,__cfg).__ST309900_Layout __PP8152689) := TRANSFORM
+    __EE8152763 := __PP8152689.Person_Info_;
+    SELF.Person_Info_ := __BN(PROJECT(__T(__EE8152763),__ST310159_Layout),__NL(__EE8152763));
+    SELF := __PP8152689;
   END;
-  EXPORT __ENH_Inquiry_1 := PROJECT(__EE8154730,__ND8154735__Project(LEFT));
+  EXPORT __ENH_Inquiry_1 := PROJECT(__EE8152688,__ND8152693__Project(LEFT));
 END;

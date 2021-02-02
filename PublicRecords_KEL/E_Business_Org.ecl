@@ -1,9 +1,9 @@
-﻿//HPCC Systems KEL Compiler Version 1.5.0rc1
+//HPCC Systems KEL Compiler Version 1.5.0rc1
 IMPORT KEL15 AS KEL;
 IMPORT PublicRecords_KEL;
 IMPORT CFG_Compile,E_Business_Ult FROM PublicRecords_KEL;
 IMPORT * FROM KEL15.Null;
-EXPORT E_Business_Org(CFG_Compile __cfg = CFG_Compile) := MODULE
+EXPORT E_Business_Org(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG_Compile __cfg = CFG_Compile) := MODULE
   EXPORT Typ := KEL.typ.uid;
   EXPORT InLayout := RECORD
     KEL.typ.nuid UID;
@@ -28,7 +28,7 @@ EXPORT E_Business_Org(CFG_Compile __cfg = CFG_Compile) := MODULE
   SHARED __Trimmed := RECORD, MAXLENGTH(5000)
     STRING KeyVal;
   END;
-  SHARED __d0_Trim := PROJECT(PublicRecords_KEL.Files.NonFCRA.BIPV2__Key_BH_Linking_Ids_Vault__Key,TRANSFORM(__Trimmed,SELF.KeyVal:=TRIM((STRING)LEFT.ultid) + '|' + TRIM((STRING)LEFT.orgid)));
+  SHARED __d0_Trim := PROJECT(__in.Dataset_BIPV2__Key_BH_Linking_kfetch2,TRANSFORM(__Trimmed,SELF.KeyVal:=TRIM((STRING)LEFT.ultid) + '|' + TRIM((STRING)LEFT.orgid)));
   EXPORT __All_Trim := __d0_Trim;
   SHARED __TabRec := RECORD, MAXLENGTH(5000)
     __All_Trim.KeyVal;
@@ -37,27 +37,23 @@ EXPORT E_Business_Org(CFG_Compile __cfg = CFG_Compile) := MODULE
   END;
   EXPORT NullKeyVal := TRIM((STRING)0) + '|' + TRIM((STRING)0);
   SHARED __Table := TABLE(__All_Trim(KeyVal <> NullKeyVal),__TabRec,KeyVal,MERGE);
+  SHARED __SortedTable := SORT(__Table,KeyVal);
   SHARED NullLookupRec := DATASET([{NullKeyVal,1,0}],__TabRec);
-  EXPORT Lookup := NullLookupRec + PROJECT(__Table,TRANSFORM(__TabRec,SELF.UID:=COUNTER,SELF:=LEFT)) : PERSIST('~temp::KEL::PublicRecords_KEL::Business_Org::UidLookup',EXPIRE(7));
-  EXPORT UID_IdToText := INDEX(Lookup,{UID},{Lookup},'~temp::KEL::IDtoT::PublicRecords_KEL::Business_Org');
-  EXPORT UID_TextToId := INDEX(Lookup,{ht:=HASH32(KeyVal)},{Lookup},'~temp::KEL::TtoID::PublicRecords_KEL::Business_Org');
-  EXPORT BuildAll := PARALLEL(BUILDINDEX(UID_IdToText,OVERWRITE),BUILDINDEX(UID_TextToId,OVERWRITE));
-  EXPORT GetText(KEL.typ.uid i) := UID_IdToText(UID=i)[1];
-  EXPORT GetId(STRING s) := UID_TextToId(ht=HASH32(s),KeyVal=s)[1];
-  SHARED Hybrid_Archive_Date_0Rule(STRING a) := MAP(KEL.Routines.IsValidDate((KEL.typ.kdate)(a[1..6]+'01'))=>a[1..6]+'01','0');
-  SHARED __Mapping0 := 'UID(DEFAULT:UID),ultid(OVERRIDE:Ult_I_D_:0),orgid(OVERRIDE:Org_I_D_:0),orgult(DEFAULT:Org_Ult_:0),nodes_total(OVERRIDE:Nodes_Total_:0),org_seg(OVERRIDE:Org_Segment_:\'\'),vl_id(OVERRIDE:Source_Group_I_D_:\'\'),source(OVERRIDE:Source_:\'\'),archive_date(OVERRIDE:Archive___Date_:EPOCH),dt_first_seen(OVERRIDE:Date_First_Seen_:EPOCH),dt_last_seen(OVERRIDE:Date_Last_Seen_:EPOCH),hybrid_archive_date(OVERRIDE:Hybrid_Archive_Date_:EPOCH:Hybrid_Archive_Date_0Rule),vaultdatelastseen(DEFAULT:Vault_Date_Last_Seen_:EPOCH),DPMBitmap(OVERRIDE:__Permits:PERMITS)';
+  EXPORT Lookup := NullLookupRec + PROJECT(__SortedTable,TRANSFORM(__TabRec,SELF.UID:=COUNTER,SELF:=LEFT));
+  SHARED __Mapping0 := 'UID(DEFAULT:UID),ultid(OVERRIDE:Ult_I_D_:0),orgid(OVERRIDE:Org_I_D_:0),orgult(DEFAULT:Org_Ult_:0),nodes_total(OVERRIDE:Nodes_Total_:0),org_seg(OVERRIDE:Org_Segment_:\'\'),vl_id(OVERRIDE:Source_Group_I_D_:\'\'),source(OVERRIDE:Source_:\'\'),archive_date(OVERRIDE:Archive___Date_:EPOCH),dt_first_seen(OVERRIDE:Date_First_Seen_:EPOCH),dt_last_seen(OVERRIDE:Date_Last_Seen_:EPOCH),hybridarchivedate(DEFAULT:Hybrid_Archive_Date_:EPOCH),vaultdatelastseen(DEFAULT:Vault_Date_Last_Seen_:EPOCH),DPMBitmap(OVERRIDE:__Permits:PERMITS)';
   SHARED InLayout __Mapping0_Transform(InLayout __r) := TRANSFORM
     SELF.Header_Hit_Flag_ := __CN(TRUE);
     SELF := __r;
   END;
+  SHARED __d0_Norm := NORMALIZE(__in,LEFT.Dataset_BIPV2__Key_BH_Linking_kfetch2,TRANSFORM(RECORDOF(__in.Dataset_BIPV2__Key_BH_Linking_kfetch2),SELF:=RIGHT));
   SHARED __d0_Out := RECORD
-    RECORDOF(PublicRecords_KEL.Files.NonFCRA.BIPV2__Key_BH_Linking_Ids_Vault__Key);
+    RECORDOF(PublicRecords_KEL.ECL_Functions.Dataset_FDC.Dataset_BIPV2__Key_BH_Linking_kfetch2);
     KEL.typ.uid UID := 0;
   END;
-  SHARED __d0_UID_Mapped := JOIN(PublicRecords_KEL.Files.NonFCRA.BIPV2__Key_BH_Linking_Ids_Vault__Key,Lookup,TRIM((STRING)LEFT.ultid) + '|' + TRIM((STRING)LEFT.orgid) = RIGHT.KeyVal,TRANSFORM(__d0_Out,SELF.UID:=RIGHT.UID,SELF:=LEFT),SMART);
-  EXPORT PublicRecords_KEL_Files_NonFCRA_BIPV2__Key_BH_Linking_Ids_Vault__Key_Invalid := __d0_UID_Mapped(UID = 0);
+  SHARED __d0_UID_Mapped := JOIN(__d0_Norm,Lookup,TRIM((STRING)LEFT.ultid) + '|' + TRIM((STRING)LEFT.orgid) = RIGHT.KeyVal,TRANSFORM(__d0_Out,SELF.UID:=RIGHT.UID,SELF:=LEFT),SMART);
+  EXPORT PublicRecords_KEL_ECL_Functions_Dataset_FDC_Dataset_BIPV2__Key_BH_Linking_kfetch2_Invalid := __d0_UID_Mapped(UID = 0);
   SHARED __d0_Prefiltered := __d0_UID_Mapped(UID <> 0);
-  SHARED __d0 := __SourceFilter(PROJECT(KEL.FromFlat.Convert(__d0_Prefiltered,InLayout,__Mapping0,'PublicRecords_KEL.Files.NonFCRA.BIPV2__Key_BH_Linking_Ids_Vault__Key'),__Mapping0_Transform(LEFT)));
+  SHARED __d0 := __SourceFilter(PROJECT(KEL.FromFlat.Convert(__d0_Prefiltered,InLayout,__Mapping0,'PublicRecords_KEL.ECL_Functions.Dataset_FDC'),__Mapping0_Transform(LEFT)));
   EXPORT InData := __d0;
   EXPORT Data_Sources_Layout := RECORD
     KEL.typ.nbool Header_Hit_Flag_;
@@ -125,21 +121,21 @@ EXPORT E_Business_Org(CFG_Compile __cfg = CFG_Compile) := MODULE
   EXPORT Nodes_Total__SingleValue_Invalid := KEL.Intake.DetectMultipleValuesOnResult(Result,Nodes_Total_);
   EXPORT Source_Group_I_D__SingleValue_Invalid := KEL.Intake.DetectMultipleValuesOnResult(Result,Source_Group_I_D_);
   EXPORT Org_Segment__SingleValue_Invalid := KEL.Intake.DetectMultipleValuesOnResult(Result,Org_Segment_);
-  EXPORT Org_Ult__Orphan := JOIN(InData(__NN(Org_Ult_)),E_Business_Ult(__cfg).__Result,__EEQP(LEFT.Org_Ult_, RIGHT.UID),TRANSFORM(InLayout,SELF := LEFT,SELF:=[]),LEFT ONLY, HASH);
-  EXPORT SanityCheck := DATASET([{COUNT(Org_Ult__Orphan),COUNT(PublicRecords_KEL_Files_NonFCRA_BIPV2__Key_BH_Linking_Ids_Vault__Key_Invalid),COUNT(Ult_I_D__SingleValue_Invalid),COUNT(Org_I_D__SingleValue_Invalid),COUNT(Org_Ult__SingleValue_Invalid),COUNT(Nodes_Total__SingleValue_Invalid),COUNT(Source_Group_I_D__SingleValue_Invalid),COUNT(Org_Segment__SingleValue_Invalid),TopSourcedUIDs(1)}],{KEL.typ.int Org_Ult__Orphan,KEL.typ.int PublicRecords_KEL_Files_NonFCRA_BIPV2__Key_BH_Linking_Ids_Vault__Key_Invalid,KEL.typ.int Ult_I_D__SingleValue_Invalid,KEL.typ.int Org_I_D__SingleValue_Invalid,KEL.typ.int Org_Ult__SingleValue_Invalid,KEL.typ.int Nodes_Total__SingleValue_Invalid,KEL.typ.int Source_Group_I_D__SingleValue_Invalid,KEL.typ.int Org_Segment__SingleValue_Invalid,DATASET(RECORDOF(UIDSourceCounts)) topSourcedUID});
+  EXPORT Org_Ult__Orphan := JOIN(InData(__NN(Org_Ult_)),E_Business_Ult(__in,__cfg).__Result,__EEQP(LEFT.Org_Ult_, RIGHT.UID),TRANSFORM(InLayout,SELF := LEFT,SELF:=[]),LEFT ONLY, HASH);
+  EXPORT SanityCheck := DATASET([{COUNT(Org_Ult__Orphan),COUNT(PublicRecords_KEL_ECL_Functions_Dataset_FDC_Dataset_BIPV2__Key_BH_Linking_kfetch2_Invalid),COUNT(Ult_I_D__SingleValue_Invalid),COUNT(Org_I_D__SingleValue_Invalid),COUNT(Org_Ult__SingleValue_Invalid),COUNT(Nodes_Total__SingleValue_Invalid),COUNT(Source_Group_I_D__SingleValue_Invalid),COUNT(Org_Segment__SingleValue_Invalid),TopSourcedUIDs(1)}],{KEL.typ.int Org_Ult__Orphan,KEL.typ.int PublicRecords_KEL_ECL_Functions_Dataset_FDC_Dataset_BIPV2__Key_BH_Linking_kfetch2_Invalid,KEL.typ.int Ult_I_D__SingleValue_Invalid,KEL.typ.int Org_I_D__SingleValue_Invalid,KEL.typ.int Org_Ult__SingleValue_Invalid,KEL.typ.int Nodes_Total__SingleValue_Invalid,KEL.typ.int Source_Group_I_D__SingleValue_Invalid,KEL.typ.int Org_Segment__SingleValue_Invalid,DATASET(RECORDOF(UIDSourceCounts)) topSourcedUID});
   EXPORT NullCounts := DATASET([
-    {'BusinessOrg','PublicRecords_KEL.Files.NonFCRA.BIPV2__Key_BH_Linking_Ids_Vault__Key','UID',COUNT(PublicRecords_KEL_Files_NonFCRA_BIPV2__Key_BH_Linking_Ids_Vault__Key_Invalid),COUNT(__d0)},
-    {'BusinessOrg','PublicRecords_KEL.Files.NonFCRA.BIPV2__Key_BH_Linking_Ids_Vault__Key','ultid',COUNT(__d0(__NL(Ult_I_D_))),COUNT(__d0(__NN(Ult_I_D_)))},
-    {'BusinessOrg','PublicRecords_KEL.Files.NonFCRA.BIPV2__Key_BH_Linking_Ids_Vault__Key','orgid',COUNT(__d0(__NL(Org_I_D_))),COUNT(__d0(__NN(Org_I_D_)))},
-    {'BusinessOrg','PublicRecords_KEL.Files.NonFCRA.BIPV2__Key_BH_Linking_Ids_Vault__Key','OrgUlt',COUNT(__d0(__NL(Org_Ult_))),COUNT(__d0(__NN(Org_Ult_)))},
-    {'BusinessOrg','PublicRecords_KEL.Files.NonFCRA.BIPV2__Key_BH_Linking_Ids_Vault__Key','nodes_total',COUNT(__d0(__NL(Nodes_Total_))),COUNT(__d0(__NN(Nodes_Total_)))},
-    {'BusinessOrg','PublicRecords_KEL.Files.NonFCRA.BIPV2__Key_BH_Linking_Ids_Vault__Key','org_seg',COUNT(__d0(__NL(Org_Segment_))),COUNT(__d0(__NN(Org_Segment_)))},
-    {'BusinessOrg','PublicRecords_KEL.Files.NonFCRA.BIPV2__Key_BH_Linking_Ids_Vault__Key','vl_id',COUNT(__d0(__NL(Source_Group_I_D_))),COUNT(__d0(__NN(Source_Group_I_D_)))},
-    {'BusinessOrg','PublicRecords_KEL.Files.NonFCRA.BIPV2__Key_BH_Linking_Ids_Vault__Key','source',COUNT(__d0(__NL(Source_))),COUNT(__d0(__NN(Source_)))},
-    {'BusinessOrg','PublicRecords_KEL.Files.NonFCRA.BIPV2__Key_BH_Linking_Ids_Vault__Key','Archive_Date',COUNT(__d0(Archive___Date_=0)),COUNT(__d0(Archive___Date_!=0))},
-    {'BusinessOrg','PublicRecords_KEL.Files.NonFCRA.BIPV2__Key_BH_Linking_Ids_Vault__Key','DateFirstSeen',COUNT(__d0(Date_First_Seen_=0)),COUNT(__d0(Date_First_Seen_!=0))},
-    {'BusinessOrg','PublicRecords_KEL.Files.NonFCRA.BIPV2__Key_BH_Linking_Ids_Vault__Key','DateLastSeen',COUNT(__d0(Date_Last_Seen_=0)),COUNT(__d0(Date_Last_Seen_!=0))},
-    {'BusinessOrg','PublicRecords_KEL.Files.NonFCRA.BIPV2__Key_BH_Linking_Ids_Vault__Key','HybridArchiveDate',COUNT(__d0(Hybrid_Archive_Date_=0)),COUNT(__d0(Hybrid_Archive_Date_!=0))},
-    {'BusinessOrg','PublicRecords_KEL.Files.NonFCRA.BIPV2__Key_BH_Linking_Ids_Vault__Key','VaultDateLastSeen',COUNT(__d0(Vault_Date_Last_Seen_=0)),COUNT(__d0(Vault_Date_Last_Seen_!=0))}]
+    {'BusinessOrg','PublicRecords_KEL.ECL_Functions.Dataset_FDC','UID',COUNT(PublicRecords_KEL_ECL_Functions_Dataset_FDC_Dataset_BIPV2__Key_BH_Linking_kfetch2_Invalid),COUNT(__d0)},
+    {'BusinessOrg','PublicRecords_KEL.ECL_Functions.Dataset_FDC','ultid',COUNT(__d0(__NL(Ult_I_D_))),COUNT(__d0(__NN(Ult_I_D_)))},
+    {'BusinessOrg','PublicRecords_KEL.ECL_Functions.Dataset_FDC','orgid',COUNT(__d0(__NL(Org_I_D_))),COUNT(__d0(__NN(Org_I_D_)))},
+    {'BusinessOrg','PublicRecords_KEL.ECL_Functions.Dataset_FDC','OrgUlt',COUNT(__d0(__NL(Org_Ult_))),COUNT(__d0(__NN(Org_Ult_)))},
+    {'BusinessOrg','PublicRecords_KEL.ECL_Functions.Dataset_FDC','nodes_total',COUNT(__d0(__NL(Nodes_Total_))),COUNT(__d0(__NN(Nodes_Total_)))},
+    {'BusinessOrg','PublicRecords_KEL.ECL_Functions.Dataset_FDC','org_seg',COUNT(__d0(__NL(Org_Segment_))),COUNT(__d0(__NN(Org_Segment_)))},
+    {'BusinessOrg','PublicRecords_KEL.ECL_Functions.Dataset_FDC','vl_id',COUNT(__d0(__NL(Source_Group_I_D_))),COUNT(__d0(__NN(Source_Group_I_D_)))},
+    {'BusinessOrg','PublicRecords_KEL.ECL_Functions.Dataset_FDC','source',COUNT(__d0(__NL(Source_))),COUNT(__d0(__NN(Source_)))},
+    {'BusinessOrg','PublicRecords_KEL.ECL_Functions.Dataset_FDC','Archive_Date',COUNT(__d0(Archive___Date_=0)),COUNT(__d0(Archive___Date_!=0))},
+    {'BusinessOrg','PublicRecords_KEL.ECL_Functions.Dataset_FDC','DateFirstSeen',COUNT(__d0(Date_First_Seen_=0)),COUNT(__d0(Date_First_Seen_!=0))},
+    {'BusinessOrg','PublicRecords_KEL.ECL_Functions.Dataset_FDC','DateLastSeen',COUNT(__d0(Date_Last_Seen_=0)),COUNT(__d0(Date_Last_Seen_!=0))},
+    {'BusinessOrg','PublicRecords_KEL.ECL_Functions.Dataset_FDC','HybridArchiveDate',COUNT(__d0(Hybrid_Archive_Date_=0)),COUNT(__d0(Hybrid_Archive_Date_!=0))},
+    {'BusinessOrg','PublicRecords_KEL.ECL_Functions.Dataset_FDC','VaultDateLastSeen',COUNT(__d0(Vault_Date_Last_Seen_=0)),COUNT(__d0(Vault_Date_Last_Seen_!=0))}]
   ,{KEL.typ.str entity,KEL.typ.str fileName,KEL.typ.str fieldName,KEL.typ.int nullCount,KEL.typ.int notNullCount});
 END;

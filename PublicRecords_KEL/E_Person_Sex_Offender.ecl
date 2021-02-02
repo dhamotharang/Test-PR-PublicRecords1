@@ -1,9 +1,9 @@
-﻿//HPCC Systems KEL Compiler Version 1.5.0rc1
+//HPCC Systems KEL Compiler Version 1.5.0rc1
 IMPORT KEL15 AS KEL;
 IMPORT PublicRecords_KEL;
 IMPORT CFG_Compile,E_Person,E_Sex_Offender FROM PublicRecords_KEL;
 IMPORT * FROM KEL15.Null;
-EXPORT E_Person_Sex_Offender(CFG_Compile __cfg = CFG_Compile) := MODULE
+EXPORT E_Person_Sex_Offender(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG_Compile __cfg = CFG_Compile) := MODULE
   EXPORT Typ := KEL.typ.uid;
   EXPORT InLayout := RECORD
     KEL.typ.ntyp(E_Person().Typ) Subject_;
@@ -25,15 +25,16 @@ EXPORT E_Person_Sex_Offender(CFG_Compile __cfg = CFG_Compile) := MODULE
   SHARED VIRTUAL __GroupedFilter(GROUPED DATASET(InLayout) __ds) := __ds;
   SHARED __Mapping := 'subject(DEFAULT:Subject_:0),Offender_(DEFAULT:Offender_:0),seisintprimarykey(DEFAULT:Seisint_Primary_Key_:\'\'),fcradate(DEFAULT:F_C_R_A_Date_:DATE),fcraconvictionflag(DEFAULT:Fcra_Conviction_Flag_:\'\'),fcratrafficflag(DEFAULT:Fcra_Traffic_Flag_:\'\'),sexoffenderregistrynumber(DEFAULT:Sex_Offender_Registry_Number_:\'\'),source(DEFAULT:Source_:\'\'),archive_date(DEFAULT:Archive___Date_:EPOCH),datefirstseen(DEFAULT:Date_First_Seen_:EPOCH),datelastseen(DEFAULT:Date_Last_Seen_:EPOCH),hybridarchivedate(DEFAULT:Hybrid_Archive_Date_:EPOCH),vaultdatelastseen(DEFAULT:Vault_Date_Last_Seen_:EPOCH)';
   SHARED __Mapping0 := 'did(OVERRIDE:Subject_:0),Offender_(DEFAULT:Offender_:0),sspk(OVERRIDE:Seisint_Primary_Key_:\'\'),fcra_date(OVERRIDE:F_C_R_A_Date_:DATE),fcra_conviction_flag(OVERRIDE:Fcra_Conviction_Flag_:\'\'),fcra_traffic_flag(OVERRIDE:Fcra_Traffic_Flag_:\'\'),sor_number(OVERRIDE:Sex_Offender_Registry_Number_:\'\'),src(OVERRIDE:Source_:\'\'),archive_date(OVERRIDE:Archive___Date_:EPOCH),dt_first_reported(OVERRIDE:Date_First_Seen_:EPOCH),dt_last_reported(OVERRIDE:Date_Last_Seen_:EPOCH),hybridarchivedate(DEFAULT:Hybrid_Archive_Date_:EPOCH),vaultdatelastseen(DEFAULT:Vault_Date_Last_Seen_:EPOCH),DPMBitmap(OVERRIDE:__Permits:PERMITS)';
-  EXPORT __d0_KELfiltered := PublicRecords_KEL.files.FCRA.SexOffender__Key_SexOffender_SPK_Vault((UNSIGNED)did != 0);
+  SHARED __d0_Norm := NORMALIZE(__in,LEFT.Dataset_SexOffender__Key_SexOffender_SPK,TRANSFORM(RECORDOF(__in.Dataset_SexOffender__Key_SexOffender_SPK),SELF:=RIGHT));
+  EXPORT __d0_KELfiltered := __d0_Norm((UNSIGNED)did != 0);
   SHARED __d0_Offender__Layout := RECORD
     RECORDOF(__d0_KELfiltered);
     KEL.typ.uid Offender_;
   END;
-  SHARED __d0_Missing_Offender__UIDComponents := KEL.Intake.ConstructMissingFieldList(__d0_KELfiltered,'sspk','PublicRecords_KEL.files.FCRA.SexOffender__Key_SexOffender_SPK_Vault');
-  SHARED __d0_Offender__Mapped := IF(__d0_Missing_Offender__UIDComponents = 'sspk',PROJECT(__d0_KELfiltered,TRANSFORM(__d0_Offender__Layout,SELF.Offender_:=0,SELF:=LEFT)),JOIN(KEL.Intake.AppendFields(__d0_KELfiltered,__d0_Missing_Offender__UIDComponents),E_Sex_Offender(__cfg).Lookup,TRIM((STRING)LEFT.sspk) = RIGHT.KeyVal,TRANSFORM(__d0_Offender__Layout,SELF.Offender_:=RIGHT.UID,SELF:=LEFT),LEFT OUTER,SMART));
+  SHARED __d0_Missing_Offender__UIDComponents := KEL.Intake.ConstructMissingFieldList(__d0_KELfiltered,'sspk','__in');
+  SHARED __d0_Offender__Mapped := IF(__d0_Missing_Offender__UIDComponents = 'sspk',PROJECT(__d0_KELfiltered,TRANSFORM(__d0_Offender__Layout,SELF.Offender_:=0,SELF:=LEFT)),JOIN(KEL.Intake.AppendFields(__d0_KELfiltered,__d0_Missing_Offender__UIDComponents),E_Sex_Offender(__in,__cfg).Lookup,TRIM((STRING)LEFT.sspk) = RIGHT.KeyVal,TRANSFORM(__d0_Offender__Layout,SELF.Offender_:=RIGHT.UID,SELF:=LEFT),LEFT OUTER,SMART));
   SHARED __d0_Prefiltered := __d0_Offender__Mapped;
-  SHARED __d0 := __SourceFilter(KEL.FromFlat.Convert(__d0_Prefiltered,InLayout,__Mapping0,'PublicRecords_KEL.files.FCRA.SexOffender__Key_SexOffender_SPK_Vault'));
+  SHARED __d0 := __SourceFilter(KEL.FromFlat.Convert(__d0_Prefiltered,InLayout,__Mapping0,'PublicRecords_KEL.ECL_Functions.Dataset_FDC'));
   EXPORT InData := __d0;
   EXPORT Data_Sources_Layout := RECORD
     KEL.typ.nstr Source_;
@@ -85,22 +86,22 @@ EXPORT E_Person_Sex_Offender(CFG_Compile __cfg = CFG_Compile) := MODULE
   EXPORT __PreResult := ROLLUP(HAVING(Person_Sex_Offender_Group,COUNT(ROWS(LEFT))=1),GROUP,Person_Sex_Offender__Single_Rollup(LEFT)) + ROLLUP(HAVING(Person_Sex_Offender_Group,COUNT(ROWS(LEFT))>1),GROUP,Person_Sex_Offender__Rollup(LEFT, ROWS(LEFT)));
   EXPORT __Result := __CLEARFLAGS(__PreResult);
   EXPORT Result := __UNWRAP(__Result);
-  EXPORT Subject__Orphan := JOIN(InData(__NN(Subject_)),E_Person(__cfg).__Result,__EEQP(LEFT.Subject_, RIGHT.UID),TRANSFORM(InLayout,SELF := LEFT,SELF:=[]),LEFT ONLY, HASH);
-  EXPORT Offender__Orphan := JOIN(InData(__NN(Offender_)),E_Sex_Offender(__cfg).__Result,__EEQP(LEFT.Offender_, RIGHT.UID),TRANSFORM(InLayout,SELF := LEFT,SELF:=[]),LEFT ONLY, HASH);
+  EXPORT Subject__Orphan := JOIN(InData(__NN(Subject_)),E_Person(__in,__cfg).__Result,__EEQP(LEFT.Subject_, RIGHT.UID),TRANSFORM(InLayout,SELF := LEFT,SELF:=[]),LEFT ONLY, HASH);
+  EXPORT Offender__Orphan := JOIN(InData(__NN(Offender_)),E_Sex_Offender(__in,__cfg).__Result,__EEQP(LEFT.Offender_, RIGHT.UID),TRANSFORM(InLayout,SELF := LEFT,SELF:=[]),LEFT ONLY, HASH);
   EXPORT SanityCheck := DATASET([{COUNT(Subject__Orphan),COUNT(Offender__Orphan)}],{KEL.typ.int Subject__Orphan,KEL.typ.int Offender__Orphan});
   EXPORT NullCounts := DATASET([
-    {'PersonSexOffender','PublicRecords_KEL.files.FCRA.SexOffender__Key_SexOffender_SPK_Vault','did',COUNT(__d0(__NL(Subject_))),COUNT(__d0(__NN(Subject_)))},
-    {'PersonSexOffender','PublicRecords_KEL.files.FCRA.SexOffender__Key_SexOffender_SPK_Vault','Offender',COUNT(__d0(__NL(Offender_))),COUNT(__d0(__NN(Offender_)))},
-    {'PersonSexOffender','PublicRecords_KEL.files.FCRA.SexOffender__Key_SexOffender_SPK_Vault','sspk',COUNT(__d0(__NL(Seisint_Primary_Key_))),COUNT(__d0(__NN(Seisint_Primary_Key_)))},
-    {'PersonSexOffender','PublicRecords_KEL.files.FCRA.SexOffender__Key_SexOffender_SPK_Vault','fcra_date',COUNT(__d0(__NL(F_C_R_A_Date_))),COUNT(__d0(__NN(F_C_R_A_Date_)))},
-    {'PersonSexOffender','PublicRecords_KEL.files.FCRA.SexOffender__Key_SexOffender_SPK_Vault','fcra_conviction_flag',COUNT(__d0(__NL(Fcra_Conviction_Flag_))),COUNT(__d0(__NN(Fcra_Conviction_Flag_)))},
-    {'PersonSexOffender','PublicRecords_KEL.files.FCRA.SexOffender__Key_SexOffender_SPK_Vault','fcra_traffic_flag',COUNT(__d0(__NL(Fcra_Traffic_Flag_))),COUNT(__d0(__NN(Fcra_Traffic_Flag_)))},
-    {'PersonSexOffender','PublicRecords_KEL.files.FCRA.SexOffender__Key_SexOffender_SPK_Vault','sor_number',COUNT(__d0(__NL(Sex_Offender_Registry_Number_))),COUNT(__d0(__NN(Sex_Offender_Registry_Number_)))},
-    {'PersonSexOffender','PublicRecords_KEL.files.FCRA.SexOffender__Key_SexOffender_SPK_Vault','src',COUNT(__d0(__NL(Source_))),COUNT(__d0(__NN(Source_)))},
-    {'PersonSexOffender','PublicRecords_KEL.files.FCRA.SexOffender__Key_SexOffender_SPK_Vault','Archive_Date',COUNT(__d0(Archive___Date_=0)),COUNT(__d0(Archive___Date_!=0))},
-    {'PersonSexOffender','PublicRecords_KEL.files.FCRA.SexOffender__Key_SexOffender_SPK_Vault','DateFirstSeen',COUNT(__d0(Date_First_Seen_=0)),COUNT(__d0(Date_First_Seen_!=0))},
-    {'PersonSexOffender','PublicRecords_KEL.files.FCRA.SexOffender__Key_SexOffender_SPK_Vault','DateLastSeen',COUNT(__d0(Date_Last_Seen_=0)),COUNT(__d0(Date_Last_Seen_!=0))},
-    {'PersonSexOffender','PublicRecords_KEL.files.FCRA.SexOffender__Key_SexOffender_SPK_Vault','HybridArchiveDate',COUNT(__d0(Hybrid_Archive_Date_=0)),COUNT(__d0(Hybrid_Archive_Date_!=0))},
-    {'PersonSexOffender','PublicRecords_KEL.files.FCRA.SexOffender__Key_SexOffender_SPK_Vault','VaultDateLastSeen',COUNT(__d0(Vault_Date_Last_Seen_=0)),COUNT(__d0(Vault_Date_Last_Seen_!=0))}]
+    {'PersonSexOffender','PublicRecords_KEL.ECL_Functions.Dataset_FDC','did',COUNT(__d0(__NL(Subject_))),COUNT(__d0(__NN(Subject_)))},
+    {'PersonSexOffender','PublicRecords_KEL.ECL_Functions.Dataset_FDC','Offender',COUNT(__d0(__NL(Offender_))),COUNT(__d0(__NN(Offender_)))},
+    {'PersonSexOffender','PublicRecords_KEL.ECL_Functions.Dataset_FDC','sspk',COUNT(__d0(__NL(Seisint_Primary_Key_))),COUNT(__d0(__NN(Seisint_Primary_Key_)))},
+    {'PersonSexOffender','PublicRecords_KEL.ECL_Functions.Dataset_FDC','fcra_date',COUNT(__d0(__NL(F_C_R_A_Date_))),COUNT(__d0(__NN(F_C_R_A_Date_)))},
+    {'PersonSexOffender','PublicRecords_KEL.ECL_Functions.Dataset_FDC','fcra_conviction_flag',COUNT(__d0(__NL(Fcra_Conviction_Flag_))),COUNT(__d0(__NN(Fcra_Conviction_Flag_)))},
+    {'PersonSexOffender','PublicRecords_KEL.ECL_Functions.Dataset_FDC','fcra_traffic_flag',COUNT(__d0(__NL(Fcra_Traffic_Flag_))),COUNT(__d0(__NN(Fcra_Traffic_Flag_)))},
+    {'PersonSexOffender','PublicRecords_KEL.ECL_Functions.Dataset_FDC','sor_number',COUNT(__d0(__NL(Sex_Offender_Registry_Number_))),COUNT(__d0(__NN(Sex_Offender_Registry_Number_)))},
+    {'PersonSexOffender','PublicRecords_KEL.ECL_Functions.Dataset_FDC','src',COUNT(__d0(__NL(Source_))),COUNT(__d0(__NN(Source_)))},
+    {'PersonSexOffender','PublicRecords_KEL.ECL_Functions.Dataset_FDC','Archive_Date',COUNT(__d0(Archive___Date_=0)),COUNT(__d0(Archive___Date_!=0))},
+    {'PersonSexOffender','PublicRecords_KEL.ECL_Functions.Dataset_FDC','DateFirstSeen',COUNT(__d0(Date_First_Seen_=0)),COUNT(__d0(Date_First_Seen_!=0))},
+    {'PersonSexOffender','PublicRecords_KEL.ECL_Functions.Dataset_FDC','DateLastSeen',COUNT(__d0(Date_Last_Seen_=0)),COUNT(__d0(Date_Last_Seen_!=0))},
+    {'PersonSexOffender','PublicRecords_KEL.ECL_Functions.Dataset_FDC','HybridArchiveDate',COUNT(__d0(Hybrid_Archive_Date_=0)),COUNT(__d0(Hybrid_Archive_Date_!=0))},
+    {'PersonSexOffender','PublicRecords_KEL.ECL_Functions.Dataset_FDC','VaultDateLastSeen',COUNT(__d0(Vault_Date_Last_Seen_=0)),COUNT(__d0(Vault_Date_Last_Seen_!=0))}]
   ,{KEL.typ.str entity,KEL.typ.str fileName,KEL.typ.str fieldName,KEL.typ.int nullCount,KEL.typ.int notNullCount});
 END;

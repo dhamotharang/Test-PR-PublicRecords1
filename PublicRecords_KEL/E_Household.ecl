@@ -1,9 +1,9 @@
-﻿//HPCC Systems KEL Compiler Version 1.5.0rc1
+//HPCC Systems KEL Compiler Version 1.5.0rc1
 IMPORT KEL15 AS KEL;
 IMPORT PublicRecords_KEL;
 IMPORT CFG_Compile FROM PublicRecords_KEL;
 IMPORT * FROM KEL15.Null;
-EXPORT E_Household(CFG_Compile __cfg = CFG_Compile) := MODULE
+EXPORT E_Household(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG_Compile __cfg = CFG_Compile) := MODULE
   EXPORT Typ := KEL.typ.uid;
   EXPORT InLayout := RECORD
     KEL.typ.nuid UID;
@@ -19,9 +19,10 @@ EXPORT E_Household(CFG_Compile __cfg = CFG_Compile) := MODULE
   SHARED VIRTUAL __GroupedFilter(GROUPED DATASET(InLayout) __ds) := __ds;
   SHARED __Mapping := 'hhid(DEFAULT:UID),source(DEFAULT:Source_:\'\'),archive_date(DEFAULT:Archive___Date_:EPOCH),datefirstseen(DEFAULT:Date_First_Seen_:EPOCH),datelastseen(DEFAULT:Date_Last_Seen_:EPOCH),hybridarchivedate(DEFAULT:Hybrid_Archive_Date_:EPOCH),vaultdatelastseen(DEFAULT:Vault_Date_Last_Seen_:EPOCH)';
   SHARED __Mapping0 := 'hhid_relat(OVERRIDE:UID),src(OVERRIDE:Source_:\'\'),archive_date(OVERRIDE:Archive___Date_:EPOCH),datefirstseen(DEFAULT:Date_First_Seen_:EPOCH),datelastseen(DEFAULT:Date_Last_Seen_:EPOCH),hybridarchivedate(DEFAULT:Hybrid_Archive_Date_:EPOCH),vaultdatelastseen(DEFAULT:Vault_Date_Last_Seen_:EPOCH),DPMBitmap(OVERRIDE:__Permits:PERMITS)';
-  EXPORT PublicRecords_KEL_Files_NonFCRA_Doxie__Key_HHID_Did_Vault_Invalid := PublicRecords_KEL.Files.NonFCRA.Doxie__Key_HHID_Did_Vault((KEL.typ.uid)hhid_relat = 0);
-  SHARED __d0_Prefiltered := PublicRecords_KEL.Files.NonFCRA.Doxie__Key_HHID_Did_Vault((KEL.typ.uid)hhid_relat <> 0);
-  SHARED __d0 := __SourceFilter(KEL.FromFlat.Convert(__d0_Prefiltered,InLayout,__Mapping0,'PublicRecords_KEL.Files.NonFCRA.Doxie__Key_HHID_Did_Vault'));
+  SHARED __d0_Norm := NORMALIZE(__in,LEFT.Dataset_dx_Header__key_hhid_did,TRANSFORM(RECORDOF(__in.Dataset_dx_Header__key_hhid_did),SELF:=RIGHT));
+  EXPORT PublicRecords_KEL_ECL_Functions_Dataset_FDC_Dataset_dx_Header__key_hhid_did_Invalid := __d0_Norm((KEL.typ.uid)hhid_relat = 0);
+  SHARED __d0_Prefiltered := __d0_Norm((KEL.typ.uid)hhid_relat <> 0);
+  SHARED __d0 := __SourceFilter(KEL.FromFlat.Convert(__d0_Prefiltered,InLayout,__Mapping0,'PublicRecords_KEL.ECL_Functions.Dataset_FDC'));
   EXPORT InData := __d0;
   EXPORT Data_Sources_Layout := RECORD
     KEL.typ.nstr Source_;
@@ -70,14 +71,14 @@ EXPORT E_Household(CFG_Compile __cfg = CFG_Compile) := MODULE
   EXPORT UIDSourceCounts := TABLE(InData,{KEL.typ.uid UID := MIN(GROUP,__T(UID)),KEL.typ.int Cnt := COUNT(GROUP)},UID);
   EXPORT TopSourcedUIDs(KEL.typ.int n = 10) := TOPN(UIDSourceCounts,n,-Cnt);
   EXPORT UIDSourceDistribution := SORT(TABLE(UIDSourceCounts,{Cnt,KEL.typ.int uidCount := COUNT(GROUP),KEL.typ.uid rep := MIN(GROUP,UID)},Cnt),-Cnt);
-  EXPORT SanityCheck := DATASET([{COUNT(PublicRecords_KEL_Files_NonFCRA_Doxie__Key_HHID_Did_Vault_Invalid),TopSourcedUIDs(1)}],{KEL.typ.int PublicRecords_KEL_Files_NonFCRA_Doxie__Key_HHID_Did_Vault_Invalid,DATASET(RECORDOF(UIDSourceCounts)) topSourcedUID});
+  EXPORT SanityCheck := DATASET([{COUNT(PublicRecords_KEL_ECL_Functions_Dataset_FDC_Dataset_dx_Header__key_hhid_did_Invalid),TopSourcedUIDs(1)}],{KEL.typ.int PublicRecords_KEL_ECL_Functions_Dataset_FDC_Dataset_dx_Header__key_hhid_did_Invalid,DATASET(RECORDOF(UIDSourceCounts)) topSourcedUID});
   EXPORT NullCounts := DATASET([
-    {'Household','PublicRecords_KEL.Files.NonFCRA.Doxie__Key_HHID_Did_Vault','UID',COUNT(PublicRecords_KEL_Files_NonFCRA_Doxie__Key_HHID_Did_Vault_Invalid),COUNT(__d0)},
-    {'Household','PublicRecords_KEL.Files.NonFCRA.Doxie__Key_HHID_Did_Vault','src',COUNT(__d0(__NL(Source_))),COUNT(__d0(__NN(Source_)))},
-    {'Household','PublicRecords_KEL.Files.NonFCRA.Doxie__Key_HHID_Did_Vault','Archive_Date',COUNT(__d0(Archive___Date_=0)),COUNT(__d0(Archive___Date_!=0))},
-    {'Household','PublicRecords_KEL.Files.NonFCRA.Doxie__Key_HHID_Did_Vault','DateFirstSeen',COUNT(__d0(Date_First_Seen_=0)),COUNT(__d0(Date_First_Seen_!=0))},
-    {'Household','PublicRecords_KEL.Files.NonFCRA.Doxie__Key_HHID_Did_Vault','DateLastSeen',COUNT(__d0(Date_Last_Seen_=0)),COUNT(__d0(Date_Last_Seen_!=0))},
-    {'Household','PublicRecords_KEL.Files.NonFCRA.Doxie__Key_HHID_Did_Vault','HybridArchiveDate',COUNT(__d0(Hybrid_Archive_Date_=0)),COUNT(__d0(Hybrid_Archive_Date_!=0))},
-    {'Household','PublicRecords_KEL.Files.NonFCRA.Doxie__Key_HHID_Did_Vault','VaultDateLastSeen',COUNT(__d0(Vault_Date_Last_Seen_=0)),COUNT(__d0(Vault_Date_Last_Seen_!=0))}]
+    {'Household','PublicRecords_KEL.ECL_Functions.Dataset_FDC','UID',COUNT(PublicRecords_KEL_ECL_Functions_Dataset_FDC_Dataset_dx_Header__key_hhid_did_Invalid),COUNT(__d0)},
+    {'Household','PublicRecords_KEL.ECL_Functions.Dataset_FDC','src',COUNT(__d0(__NL(Source_))),COUNT(__d0(__NN(Source_)))},
+    {'Household','PublicRecords_KEL.ECL_Functions.Dataset_FDC','Archive_Date',COUNT(__d0(Archive___Date_=0)),COUNT(__d0(Archive___Date_!=0))},
+    {'Household','PublicRecords_KEL.ECL_Functions.Dataset_FDC','DateFirstSeen',COUNT(__d0(Date_First_Seen_=0)),COUNT(__d0(Date_First_Seen_!=0))},
+    {'Household','PublicRecords_KEL.ECL_Functions.Dataset_FDC','DateLastSeen',COUNT(__d0(Date_Last_Seen_=0)),COUNT(__d0(Date_Last_Seen_!=0))},
+    {'Household','PublicRecords_KEL.ECL_Functions.Dataset_FDC','HybridArchiveDate',COUNT(__d0(Hybrid_Archive_Date_=0)),COUNT(__d0(Hybrid_Archive_Date_!=0))},
+    {'Household','PublicRecords_KEL.ECL_Functions.Dataset_FDC','VaultDateLastSeen',COUNT(__d0(Vault_Date_Last_Seen_=0)),COUNT(__d0(Vault_Date_Last_Seen_!=0))}]
   ,{KEL.typ.str entity,KEL.typ.str fileName,KEL.typ.str fieldName,KEL.typ.int nullCount,KEL.typ.int notNullCount});
 END;

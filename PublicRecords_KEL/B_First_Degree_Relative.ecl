@@ -1,11 +1,11 @@
-﻿//HPCC Systems KEL Compiler Version 1.5.0rc1
+//HPCC Systems KEL Compiler Version 1.5.0rc1
 IMPORT KEL15 AS KEL;
 IMPORT B_First_Degree_Relative_1,CFG_Compile,E_Person FROM PublicRecords_KEL;
 IMPORT * FROM KEL15.Null;
-EXPORT B_First_Degree_Relative(CFG_Compile __cfg = CFG_Compile) := MODULE
-  SHARED VIRTUAL TYPEOF(B_First_Degree_Relative_1(__cfg).__ENH_First_Degree_Relative_1) __ENH_First_Degree_Relative_1 := B_First_Degree_Relative_1(__cfg).__ENH_First_Degree_Relative_1;
-  SHARED __EE9047946 := __ENH_First_Degree_Relative_1;
-  EXPORT __ST3708162_Layout := RECORD
+EXPORT B_First_Degree_Relative(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG_Compile __cfg = CFG_Compile) := MODULE
+  SHARED VIRTUAL TYPEOF(B_First_Degree_Relative_1(__in,__cfg).__ENH_First_Degree_Relative_1) __ENH_First_Degree_Relative_1 := B_First_Degree_Relative_1(__in,__cfg).__ENH_First_Degree_Relative_1;
+  SHARED __EE9045950 := __ENH_First_Degree_Relative_1;
+  EXPORT __ST3706558_Layout := RECORD
     KEL.typ.ntyp(E_Person().Typ) Subject_;
     KEL.typ.ntyp(E_Person().Typ) Relative_;
     KEL.typ.nint Title_;
@@ -23,5 +23,5 @@ EXPORT B_First_Degree_Relative(CFG_Compile __cfg = CFG_Compile) := MODULE
     KEL.typ.epoch Vault_Date_Last_Seen_ := 0;
     KEL.typ.int __RecordCount := 0;
   END;
-  EXPORT __ENH_First_Degree_Relative := PROJECT(__EE9047946,__ST3708162_Layout);
+  EXPORT __ENH_First_Degree_Relative := PROJECT(__EE9045950,__ST3706558_Layout);
 END;

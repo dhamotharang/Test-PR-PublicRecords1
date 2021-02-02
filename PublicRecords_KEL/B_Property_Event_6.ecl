@@ -1,11 +1,11 @@
-﻿//HPCC Systems KEL Compiler Version 1.5.0rc1
+//HPCC Systems KEL Compiler Version 1.5.0rc1
 IMPORT KEL15 AS KEL;
 IMPORT B_Property_Event_7,CFG_Compile,E_Property,E_Property_Event,E_Zip_Code,FN_Compile FROM PublicRecords_KEL;
 IMPORT * FROM KEL15.Null;
-EXPORT B_Property_Event_6(CFG_Compile __cfg = CFG_Compile) := MODULE
-  SHARED VIRTUAL TYPEOF(B_Property_Event_7(__cfg).__ENH_Property_Event_7) __ENH_Property_Event_7 := B_Property_Event_7(__cfg).__ENH_Property_Event_7;
-  SHARED __EE5323774 := __ENH_Property_Event_7;
-  EXPORT __ST254782_Layout := RECORD
+EXPORT B_Property_Event_6(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG_Compile __cfg = CFG_Compile) := MODULE
+  SHARED VIRTUAL TYPEOF(B_Property_Event_7(__in,__cfg).__ENH_Property_Event_7) __ENH_Property_Event_7 := B_Property_Event_7(__in,__cfg).__ENH_Property_Event_7;
+  SHARED __EE5322557 := __ENH_Property_Event_7;
+  EXPORT __ST253400_Layout := RECORD
     KEL.typ.nuid UID;
     KEL.typ.nstr L_N_Fares_I_D_;
     KEL.typ.nstr Primary_Range_;
@@ -66,7 +66,7 @@ EXPORT B_Property_Event_6(CFG_Compile __cfg = CFG_Compile) := MODULE
     KEL.typ.nbool Timeshare_Flag_;
     KEL.typ.nstr Land_Lot_Size_;
     KEL.typ.nbool Additional_Name_Flag_;
-    KEL.typ.ndataset(E_Property_Event(__cfg).Data_Sources_Layout) Data_Sources_;
+    KEL.typ.ndataset(E_Property_Event(__in,__cfg).Data_Sources_Layout) Data_Sources_;
     KEL.typ.nkdate Dt_First_Seen_;
     KEL.typ.nkdate Dt_Last_Seen_;
     KEL.typ.nbool Is_Current_Assessment_Record_;
@@ -77,10 +77,10 @@ EXPORT B_Property_Event_6(CFG_Compile __cfg = CFG_Compile) := MODULE
     KEL.typ.epoch Vault_Date_Last_Seen_ := 0;
     KEL.typ.int __RecordCount := 0;
   END;
-  SHARED __ST254782_Layout __ND5324114__Project(B_Property_Event_7(__cfg).__ST258258_Layout __PP5323775) := TRANSFORM
-    __CC14474 := KEL.Routines.MinN(FN_Compile(__cfg).FN_G_E_T_B_U_I_L_D_D_A_T_E(__ECAST(KEL.typ.nstr,__CN('property_build_version'))),__CN(__cfg.CurrentDate));
-    SELF.Is_Current_Assessment_Record_ := __AND(__PP5323775.Is_Assessment_,__OP2(FN_Compile(__cfg).FN_A_B_S_Y_E_A_R_S_B_E_T_W_E_E_N(__ECAST(KEL.typ.nkdate,KEL.era.ToDate(__PP5323775.Date_First_Seen_)),__ECAST(KEL.typ.nkdate,__CC14474)),<=,__CN(1)));
-    SELF := __PP5323775;
+  SHARED __ST253400_Layout __ND5322897__Project(B_Property_Event_7(__in,__cfg).__ST256876_Layout __PP5322558) := TRANSFORM
+    __CC13086 := KEL.Routines.MinN(FN_Compile(__cfg).FN_G_E_T_B_U_I_L_D_D_A_T_E(__ECAST(KEL.typ.nstr,__CN('property_build_version'))),__CN(__cfg.CurrentDate));
+    SELF.Is_Current_Assessment_Record_ := __AND(__PP5322558.Is_Assessment_,__OP2(FN_Compile(__cfg).FN_A_B_S_Y_E_A_R_S_B_E_T_W_E_E_N(__ECAST(KEL.typ.nkdate,KEL.era.ToDate(__PP5322558.Date_First_Seen_)),__ECAST(KEL.typ.nkdate,__CC13086)),<=,__CN(1)));
+    SELF := __PP5322558;
   END;
-  EXPORT __ENH_Property_Event_6 := PROJECT(__EE5323774,__ND5324114__Project(LEFT));
+  EXPORT __ENH_Property_Event_6 := PROJECT(__EE5322557,__ND5322897__Project(LEFT));
 END;

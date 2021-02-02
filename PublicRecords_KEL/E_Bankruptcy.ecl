@@ -1,9 +1,9 @@
-﻿//HPCC Systems KEL Compiler Version 1.5.0rc1
+//HPCC Systems KEL Compiler Version 1.5.0rc1
 IMPORT KEL15 AS KEL;
 IMPORT PublicRecords_KEL;
 IMPORT CFG_Compile FROM PublicRecords_KEL;
 IMPORT * FROM KEL15.Null;
-EXPORT E_Bankruptcy(CFG_Compile __cfg = CFG_Compile) := MODULE
+EXPORT E_Bankruptcy(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG_Compile __cfg = CFG_Compile) := MODULE
   EXPORT Typ := KEL.typ.uid;
   EXPORT InLayout := RECORD
     KEL.typ.nuid UID;
@@ -45,56 +45,44 @@ EXPORT E_Bankruptcy(CFG_Compile __cfg = CFG_Compile) := MODULE
   SHARED __Trimmed := RECORD, MAXLENGTH(5000)
     STRING KeyVal;
   END;
-  SHARED __d0_KELfiltered := PublicRecords_KEL.Files.NonFCRA.BankruptcyV3__Key_BankruptcyV3_Search_Full_BIP_Vault(name_type = 'D');
+  SHARED __d0_KELfiltered := __in.Dataset_Bankruptcy_Files__Key_Search(name_type = 'D');
   SHARED __d0_Trim := PROJECT(__d0_KELfiltered,TRANSFORM(__Trimmed,SELF.KeyVal:=TRIM((STRING)LEFT.TMSID) + '|' + TRIM((STRING)LEFT.Court_Code) + '|' + TRIM((STRING)LEFT.Case_Number) + '|' + TRIM((STRING)LEFT.did)));
-  SHARED __d1_KELfiltered := PublicRecords_KEL.Files.NonFCRA.BankruptcyV3__Key_BankruptcyV3_linkids_Vault(name_type = 'D');
+  SHARED __d1_KELfiltered := __in.Dataset_Bankruptcy_Files__Linkids_Key_Search(name_type = 'D');
   SHARED __d1_Trim := PROJECT(__d1_KELfiltered,TRANSFORM(__Trimmed,SELF.KeyVal:=TRIM((STRING)LEFT.TMSID) + '|' + TRIM((STRING)LEFT.Court_Code) + '|' + TRIM((STRING)LEFT.Case_Number) + '|' + TRIM((STRING)LEFT.did)));
-  SHARED __d2_KELfiltered := PublicRecords_KEL.Files.FCRA.BankruptcyV3__Key_BankruptcyV3_Search_Full_BIP_Vault(name_type = 'D');
-  SHARED __d2_Trim := PROJECT(__d2_KELfiltered,TRANSFORM(__Trimmed,SELF.KeyVal:=TRIM((STRING)LEFT.TMSID) + '|' + TRIM((STRING)LEFT.Court_Code) + '|' + TRIM((STRING)LEFT.Case_Number) + '|' + TRIM((STRING)LEFT.did)));
-  EXPORT __All_Trim := __d0_Trim + __d1_Trim + __d2_Trim;
+  EXPORT __All_Trim := __d0_Trim + __d1_Trim;
   SHARED __TabRec := RECORD, MAXLENGTH(5000)
     __All_Trim.KeyVal;
     UNSIGNED4 Cnt := COUNT(GROUP);
     KEL.typ.uid UID := 0;
   END;
   SHARED __Table := TABLE(__All_Trim,__TabRec,KeyVal,MERGE);
-  EXPORT Lookup := PROJECT(__Table,TRANSFORM(__TabRec,SELF.UID:=COUNTER,SELF:=LEFT)) : PERSIST('~temp::KEL::PublicRecords_KEL::Bankruptcy::UidLookup',EXPIRE(7));
-  EXPORT UID_IdToText := INDEX(Lookup,{UID},{Lookup},'~temp::KEL::IDtoT::PublicRecords_KEL::Bankruptcy');
-  EXPORT UID_TextToId := INDEX(Lookup,{ht:=HASH32(KeyVal)},{Lookup},'~temp::KEL::TtoID::PublicRecords_KEL::Bankruptcy');
-  EXPORT BuildAll := PARALLEL(BUILDINDEX(UID_IdToText,OVERWRITE),BUILDINDEX(UID_TextToId,OVERWRITE));
-  EXPORT GetText(KEL.typ.uid i) := UID_IdToText(UID=i)[1];
-  EXPORT GetId(STRING s) := UID_TextToId(ht=HASH32(s),KeyVal=s)[1];
-  SHARED Hybrid_Archive_Date_0Rule(STRING a) := MAP(KEL.Routines.IsValidDate((KEL.typ.kdate)(a[1..6]+'01'))=>a[1..6]+'01','0');
-  SHARED __Mapping0 := 'UID(DEFAULT:UID),tmsid(OVERRIDE:T_M_S_I_D_),court_code(OVERRIDE:Court_Code_),case_number(OVERRIDE:Case_Number_),orig_case_number(OVERRIDE:Original_Case_Number_:\'\'),srcdesc(OVERRIDE:Source_Description_:\'\'),chapter(OVERRIDE:Original_Chapter_:\'\'),filing_type(OVERRIDE:Filing_Type_:\'\'),business_flag(OVERRIDE:Business_Flag_:\'\'),corp_flag(OVERRIDE:Corporate_Flag_:\'\'),discharged(OVERRIDE:Discharged_Date_:DATE),disposition(OVERRIDE:Disposition_:\'\'),debtor_type(OVERRIDE:Debtor_Type_:\'\'),debtor_seq(OVERRIDE:Debtor_Sequence_:0),disptype(OVERRIDE:Disposition_Type_:0),dispreason(OVERRIDE:Disposition_Reason_:0),disptypedesc(OVERRIDE:Disposition_Type_Description_:\'\'),name_type(OVERRIDE:Name_Type_:\'\'),screendesc(OVERRIDE:Screen_Description_:\'\'),dcodedesc(OVERRIDE:Decoded_Description_:\'\'),date_filed(OVERRIDE:Date_Filed_:DATE),record_type(OVERRIDE:Record_Type_:\'\'),caseid(OVERRIDE:Case_I_D_:0),defendantid(OVERRIDE:Defendant_I_D_:0),statusdate(OVERRIDE:Last_Status_Update_:DATE),src(OVERRIDE:Source_:\'\'),archive_date(OVERRIDE:Archive___Date_:EPOCH),date_first_seen(OVERRIDE:Date_First_Seen_:EPOCH),date_last_seen(OVERRIDE:Date_Last_Seen_:EPOCH),hybrid_archive_date(OVERRIDE:Hybrid_Archive_Date_:EPOCH:Hybrid_Archive_Date_0Rule),vaultdatelastseen(DEFAULT:Vault_Date_Last_Seen_:EPOCH),DPMBitmap(OVERRIDE:__Permits:PERMITS)';
+  SHARED __SortedTable := SORT(__Table,KeyVal);
+  EXPORT Lookup := PROJECT(__SortedTable,TRANSFORM(__TabRec,SELF.UID:=COUNTER,SELF:=LEFT));
+  SHARED __Mapping0 := 'UID(DEFAULT:UID),tmsid(OVERRIDE:T_M_S_I_D_),court_code(OVERRIDE:Court_Code_),case_number(OVERRIDE:Case_Number_),orig_case_number(OVERRIDE:Original_Case_Number_:\'\'),srcdesc(OVERRIDE:Source_Description_:\'\'),chapter(OVERRIDE:Original_Chapter_:\'\'),filing_type(OVERRIDE:Filing_Type_:\'\'),business_flag(OVERRIDE:Business_Flag_:\'\'),corp_flag(OVERRIDE:Corporate_Flag_:\'\'),discharged(OVERRIDE:Discharged_Date_:DATE),disposition(OVERRIDE:Disposition_:\'\'),debtor_type(OVERRIDE:Debtor_Type_:\'\'),debtor_seq(OVERRIDE:Debtor_Sequence_:0),disptype(OVERRIDE:Disposition_Type_:0),dispreason(OVERRIDE:Disposition_Reason_:0),disptypedesc(OVERRIDE:Disposition_Type_Description_:\'\'),name_type(OVERRIDE:Name_Type_:\'\'),screendesc(OVERRIDE:Screen_Description_:\'\'),dcodedesc(OVERRIDE:Decoded_Description_:\'\'),date_filed(OVERRIDE:Date_Filed_:DATE),record_type(OVERRIDE:Record_Type_:\'\'),caseid(OVERRIDE:Case_I_D_:0),defendantid(OVERRIDE:Defendant_I_D_:0),statusdate(OVERRIDE:Last_Status_Update_:DATE),archive_date(OVERRIDE:Archive___Date_:EPOCH),date_first_seen(OVERRIDE:Date_First_Seen_:EPOCH),date_last_seen(OVERRIDE:Date_Last_Seen_:EPOCH),hybridarchivedate(DEFAULT:Hybrid_Archive_Date_:EPOCH),vaultdatelastseen(DEFAULT:Vault_Date_Last_Seen_:EPOCH),DPMBitmap(OVERRIDE:__Permits:PERMITS)';
+  SHARED InLayout __Mapping0_Transform(InLayout __r) := TRANSFORM
+    SELF.Source_ := __CN('BA');
+    SELF := __r;
+  END;
+  SHARED __d0_Norm := NORMALIZE(__in,LEFT.Dataset_Bankruptcy_Files__Key_Search,TRANSFORM(RECORDOF(__in.Dataset_Bankruptcy_Files__Key_Search),SELF:=RIGHT));
   SHARED __d0_Out := RECORD
-    RECORDOF(PublicRecords_KEL.Files.NonFCRA.BankruptcyV3__Key_BankruptcyV3_Search_Full_BIP_Vault);
+    RECORDOF(PublicRecords_KEL.ECL_Functions.Dataset_FDC.Dataset_Bankruptcy_Files__Key_Search);
     KEL.typ.uid UID := 0;
   END;
   SHARED __d0_UID_Mapped := JOIN(__d0_KELfiltered,Lookup,TRIM((STRING)LEFT.TMSID) + '|' + TRIM((STRING)LEFT.Court_Code) + '|' + TRIM((STRING)LEFT.Case_Number) + '|' + TRIM((STRING)LEFT.did) = RIGHT.KeyVal,TRANSFORM(__d0_Out,SELF.UID:=RIGHT.UID,SELF:=LEFT),SMART);
-  EXPORT PublicRecords_KEL_Files_NonFCRA_BankruptcyV3__Key_BankruptcyV3_Search_Full_BIP_Vault_Invalid := __d0_UID_Mapped(UID = 0);
+  EXPORT PublicRecords_KEL_ECL_Functions_Dataset_FDC_Dataset_Bankruptcy_Files__Key_Search_Invalid := __d0_UID_Mapped(UID = 0);
   SHARED __d0_Prefiltered := __d0_UID_Mapped(UID <> 0);
-  SHARED __d0 := __SourceFilter(KEL.FromFlat.Convert(__d0_Prefiltered,InLayout,__Mapping0,'PublicRecords_KEL.Files.NonFCRA.BankruptcyV3__Key_BankruptcyV3_Search_Full_BIP_Vault'));
-  SHARED Hybrid_Archive_Date_1Rule(STRING a) := MAP(KEL.Routines.IsValidDate((KEL.typ.kdate)(a[1..6]+'01'))=>a[1..6]+'01','0');
-  SHARED __Mapping1 := 'UID(DEFAULT:UID),tmsid(OVERRIDE:T_M_S_I_D_),court_code(OVERRIDE:Court_Code_),case_number(OVERRIDE:Case_Number_),orig_case_number(OVERRIDE:Original_Case_Number_:\'\'),srcdesc(OVERRIDE:Source_Description_:\'\'),chapter(OVERRIDE:Original_Chapter_:\'\'),filing_type(OVERRIDE:Filing_Type_:\'\'),business_flag(OVERRIDE:Business_Flag_:\'\'),corp_flag(OVERRIDE:Corporate_Flag_:\'\'),discharged(OVERRIDE:Discharged_Date_:DATE),disposition(OVERRIDE:Disposition_:\'\'),debtor_type(OVERRIDE:Debtor_Type_:\'\'),debtor_seq(OVERRIDE:Debtor_Sequence_:0),disptype(OVERRIDE:Disposition_Type_:0),dispreason(OVERRIDE:Disposition_Reason_:0),disptypedesc(OVERRIDE:Disposition_Type_Description_:\'\'),name_type(OVERRIDE:Name_Type_:\'\'),screendesc(OVERRIDE:Screen_Description_:\'\'),dcodedesc(OVERRIDE:Decoded_Description_:\'\'),date_filed(OVERRIDE:Date_Filed_:DATE),record_type(OVERRIDE:Record_Type_:\'\'),caseid(OVERRIDE:Case_I_D_:0),defendantid(OVERRIDE:Defendant_I_D_:0),statusdate(OVERRIDE:Last_Status_Update_:DATE),src(OVERRIDE:Source_:\'\'),archive_date(OVERRIDE:Archive___Date_:EPOCH),date_first_seen(OVERRIDE:Date_First_Seen_:EPOCH),date_last_seen(OVERRIDE:Date_Last_Seen_:EPOCH),hybrid_archive_date(OVERRIDE:Hybrid_Archive_Date_:EPOCH:Hybrid_Archive_Date_1Rule),vaultdatelastseen(DEFAULT:Vault_Date_Last_Seen_:EPOCH),DPMBitmap(OVERRIDE:__Permits:PERMITS)';
+  SHARED __d0 := __SourceFilter(PROJECT(KEL.FromFlat.Convert(__d0_Prefiltered,InLayout,__Mapping0,'PublicRecords_KEL.ECL_Functions.Dataset_FDC'),__Mapping0_Transform(LEFT)));
+  SHARED __Mapping1 := 'UID(DEFAULT:UID),tmsid(OVERRIDE:T_M_S_I_D_),court_code(OVERRIDE:Court_Code_),case_number(OVERRIDE:Case_Number_),orig_case_number(OVERRIDE:Original_Case_Number_:\'\'),srcdesc(OVERRIDE:Source_Description_:\'\'),chapter(OVERRIDE:Original_Chapter_:\'\'),filing_type(OVERRIDE:Filing_Type_:\'\'),business_flag(OVERRIDE:Business_Flag_:\'\'),corp_flag(OVERRIDE:Corporate_Flag_:\'\'),discharged(OVERRIDE:Discharged_Date_:DATE),disposition(OVERRIDE:Disposition_:\'\'),debtor_type(OVERRIDE:Debtor_Type_:\'\'),debtor_seq(OVERRIDE:Debtor_Sequence_:0),disptype(OVERRIDE:Disposition_Type_:0),dispreason(OVERRIDE:Disposition_Reason_:0),disptypedesc(OVERRIDE:Disposition_Type_Description_:\'\'),name_type(OVERRIDE:Name_Type_:\'\'),screendesc(OVERRIDE:Screen_Description_:\'\'),dcodedesc(OVERRIDE:Decoded_Description_:\'\'),date_filed(OVERRIDE:Date_Filed_:DATE),record_type(OVERRIDE:Record_Type_:\'\'),caseid(OVERRIDE:Case_I_D_:0),defendantid(OVERRIDE:Defendant_I_D_:0),statusdate(OVERRIDE:Last_Status_Update_:DATE),src(OVERRIDE:Source_:\'\'),archive_date(OVERRIDE:Archive___Date_:EPOCH),date_first_seen(OVERRIDE:Date_First_Seen_:EPOCH),date_last_seen(OVERRIDE:Date_Last_Seen_:EPOCH),hybridarchivedate(DEFAULT:Hybrid_Archive_Date_:EPOCH),vaultdatelastseen(DEFAULT:Vault_Date_Last_Seen_:EPOCH),DPMBitmap(OVERRIDE:__Permits:PERMITS)';
+  SHARED __d1_Norm := NORMALIZE(__in,LEFT.Dataset_Bankruptcy_Files__Linkids_Key_Search,TRANSFORM(RECORDOF(__in.Dataset_Bankruptcy_Files__Linkids_Key_Search),SELF:=RIGHT));
   SHARED __d1_Out := RECORD
-    RECORDOF(PublicRecords_KEL.Files.NonFCRA.BankruptcyV3__Key_BankruptcyV3_linkids_Vault);
+    RECORDOF(PublicRecords_KEL.ECL_Functions.Dataset_FDC.Dataset_Bankruptcy_Files__Linkids_Key_Search);
     KEL.typ.uid UID := 0;
   END;
   SHARED __d1_UID_Mapped := JOIN(__d1_KELfiltered,Lookup,TRIM((STRING)LEFT.TMSID) + '|' + TRIM((STRING)LEFT.Court_Code) + '|' + TRIM((STRING)LEFT.Case_Number) + '|' + TRIM((STRING)LEFT.did) = RIGHT.KeyVal,TRANSFORM(__d1_Out,SELF.UID:=RIGHT.UID,SELF:=LEFT),SMART);
-  EXPORT PublicRecords_KEL_Files_NonFCRA_BankruptcyV3__Key_BankruptcyV3_linkids_Vault_Invalid := __d1_UID_Mapped(UID = 0);
+  EXPORT PublicRecords_KEL_ECL_Functions_Dataset_FDC_Dataset_Bankruptcy_Files__Linkids_Key_Search_Invalid := __d1_UID_Mapped(UID = 0);
   SHARED __d1_Prefiltered := __d1_UID_Mapped(UID <> 0);
-  SHARED __d1 := __SourceFilter(KEL.FromFlat.Convert(__d1_Prefiltered,InLayout,__Mapping1,'PublicRecords_KEL.Files.NonFCRA.BankruptcyV3__Key_BankruptcyV3_linkids_Vault'));
-  SHARED Hybrid_Archive_Date_2Rule(STRING a) := MAP(KEL.Routines.IsValidDate((KEL.typ.kdate)(a[1..6]+'01'))=>a[1..6]+'01','0');
-  SHARED __Mapping2 := 'UID(DEFAULT:UID),tmsid(OVERRIDE:T_M_S_I_D_),court_code(OVERRIDE:Court_Code_),case_number(OVERRIDE:Case_Number_),orig_case_number(OVERRIDE:Original_Case_Number_:\'\'),srcdesc(OVERRIDE:Source_Description_:\'\'),chapter(OVERRIDE:Original_Chapter_:\'\'),filing_type(OVERRIDE:Filing_Type_:\'\'),business_flag(OVERRIDE:Business_Flag_:\'\'),corp_flag(OVERRIDE:Corporate_Flag_:\'\'),discharged(OVERRIDE:Discharged_Date_:DATE),disposition(OVERRIDE:Disposition_:\'\'),debtor_type(OVERRIDE:Debtor_Type_:\'\'),debtor_seq(OVERRIDE:Debtor_Sequence_:0),disptype(OVERRIDE:Disposition_Type_:0),dispreason(OVERRIDE:Disposition_Reason_:0),disptypedesc(OVERRIDE:Disposition_Type_Description_:\'\'),name_type(OVERRIDE:Name_Type_:\'\'),screendesc(OVERRIDE:Screen_Description_:\'\'),dcodedesc(OVERRIDE:Decoded_Description_:\'\'),date_filed(OVERRIDE:Date_Filed_:DATE),record_type(OVERRIDE:Record_Type_:\'\'),caseid(OVERRIDE:Case_I_D_:0),defendantid(OVERRIDE:Defendant_I_D_:0),statusdate(OVERRIDE:Last_Status_Update_:DATE),src(OVERRIDE:Source_:\'\'),archive_date(OVERRIDE:Archive___Date_:EPOCH),date_first_seen(OVERRIDE:Date_First_Seen_:EPOCH),date_last_seen(OVERRIDE:Date_Last_Seen_:EPOCH),hybrid_archive_date(OVERRIDE:Hybrid_Archive_Date_:EPOCH:Hybrid_Archive_Date_2Rule),vaultdatelastseen(DEFAULT:Vault_Date_Last_Seen_:EPOCH),DPMBitmap(OVERRIDE:__Permits:PERMITS)';
-  SHARED __d2_Out := RECORD
-    RECORDOF(PublicRecords_KEL.Files.FCRA.BankruptcyV3__Key_BankruptcyV3_Search_Full_BIP_Vault);
-    KEL.typ.uid UID := 0;
-  END;
-  SHARED __d2_UID_Mapped := JOIN(__d2_KELfiltered,Lookup,TRIM((STRING)LEFT.TMSID) + '|' + TRIM((STRING)LEFT.Court_Code) + '|' + TRIM((STRING)LEFT.Case_Number) + '|' + TRIM((STRING)LEFT.did) = RIGHT.KeyVal,TRANSFORM(__d2_Out,SELF.UID:=RIGHT.UID,SELF:=LEFT),SMART);
-  EXPORT PublicRecords_KEL_Files_FCRA_BankruptcyV3__Key_BankruptcyV3_Search_Full_BIP_Vault_Invalid := __d2_UID_Mapped(UID = 0);
-  SHARED __d2_Prefiltered := __d2_UID_Mapped(UID <> 0);
-  SHARED __d2 := __SourceFilter(KEL.FromFlat.Convert(__d2_Prefiltered,InLayout,__Mapping2,'PublicRecords_KEL.Files.FCRA.BankruptcyV3__Key_BankruptcyV3_Search_Full_BIP_Vault'));
-  EXPORT InData := __d0 + __d1 + __d2;
+  SHARED __d1 := __SourceFilter(KEL.FromFlat.Convert(__d1_Prefiltered,InLayout,__Mapping1,'PublicRecords_KEL.ECL_Functions.Dataset_FDC'));
+  EXPORT InData := __d0 + __d1;
   EXPORT Records_Layout := RECORD
     KEL.typ.nstr Source_Description_;
     KEL.typ.nstr Original_Chapter_;
@@ -196,100 +184,68 @@ EXPORT E_Bankruptcy(CFG_Compile __cfg = CFG_Compile) := MODULE
   EXPORT Court_Code__SingleValue_Invalid := KEL.Intake.DetectMultipleValuesOnResult(Result,Court_Code_);
   EXPORT Case_Number__SingleValue_Invalid := KEL.Intake.DetectMultipleValuesOnResult(Result,Case_Number_);
   EXPORT Original_Case_Number__SingleValue_Invalid := KEL.Intake.DetectMultipleValuesOnResult(Result,Original_Case_Number_);
-  EXPORT SanityCheck := DATASET([{COUNT(PublicRecords_KEL_Files_NonFCRA_BankruptcyV3__Key_BankruptcyV3_Search_Full_BIP_Vault_Invalid),COUNT(PublicRecords_KEL_Files_NonFCRA_BankruptcyV3__Key_BankruptcyV3_linkids_Vault_Invalid),COUNT(PublicRecords_KEL_Files_FCRA_BankruptcyV3__Key_BankruptcyV3_Search_Full_BIP_Vault_Invalid),COUNT(T_M_S_I_D__SingleValue_Invalid),COUNT(Court_Code__SingleValue_Invalid),COUNT(Case_Number__SingleValue_Invalid),COUNT(Original_Case_Number__SingleValue_Invalid),TopSourcedUIDs(1)}],{KEL.typ.int PublicRecords_KEL_Files_NonFCRA_BankruptcyV3__Key_BankruptcyV3_Search_Full_BIP_Vault_Invalid,KEL.typ.int PublicRecords_KEL_Files_NonFCRA_BankruptcyV3__Key_BankruptcyV3_linkids_Vault_Invalid,KEL.typ.int PublicRecords_KEL_Files_FCRA_BankruptcyV3__Key_BankruptcyV3_Search_Full_BIP_Vault_Invalid,KEL.typ.int T_M_S_I_D__SingleValue_Invalid,KEL.typ.int Court_Code__SingleValue_Invalid,KEL.typ.int Case_Number__SingleValue_Invalid,KEL.typ.int Original_Case_Number__SingleValue_Invalid,DATASET(RECORDOF(UIDSourceCounts)) topSourcedUID});
+  EXPORT SanityCheck := DATASET([{COUNT(PublicRecords_KEL_ECL_Functions_Dataset_FDC_Dataset_Bankruptcy_Files__Key_Search_Invalid),COUNT(PublicRecords_KEL_ECL_Functions_Dataset_FDC_Dataset_Bankruptcy_Files__Linkids_Key_Search_Invalid),COUNT(T_M_S_I_D__SingleValue_Invalid),COUNT(Court_Code__SingleValue_Invalid),COUNT(Case_Number__SingleValue_Invalid),COUNT(Original_Case_Number__SingleValue_Invalid),TopSourcedUIDs(1)}],{KEL.typ.int PublicRecords_KEL_ECL_Functions_Dataset_FDC_Dataset_Bankruptcy_Files__Key_Search_Invalid,KEL.typ.int PublicRecords_KEL_ECL_Functions_Dataset_FDC_Dataset_Bankruptcy_Files__Linkids_Key_Search_Invalid,KEL.typ.int T_M_S_I_D__SingleValue_Invalid,KEL.typ.int Court_Code__SingleValue_Invalid,KEL.typ.int Case_Number__SingleValue_Invalid,KEL.typ.int Original_Case_Number__SingleValue_Invalid,DATASET(RECORDOF(UIDSourceCounts)) topSourcedUID});
   EXPORT NullCounts := DATASET([
-    {'Bankruptcy','PublicRecords_KEL.Files.NonFCRA.BankruptcyV3__Key_BankruptcyV3_Search_Full_BIP_Vault','UID',COUNT(PublicRecords_KEL_Files_NonFCRA_BankruptcyV3__Key_BankruptcyV3_Search_Full_BIP_Vault_Invalid),COUNT(__d0)},
-    {'Bankruptcy','PublicRecords_KEL.Files.NonFCRA.BankruptcyV3__Key_BankruptcyV3_Search_Full_BIP_Vault','TMSID',COUNT(__d0(__NL(T_M_S_I_D_))),COUNT(__d0(__NN(T_M_S_I_D_)))},
-    {'Bankruptcy','PublicRecords_KEL.Files.NonFCRA.BankruptcyV3__Key_BankruptcyV3_Search_Full_BIP_Vault','Court_Code',COUNT(__d0(__NL(Court_Code_))),COUNT(__d0(__NN(Court_Code_)))},
-    {'Bankruptcy','PublicRecords_KEL.Files.NonFCRA.BankruptcyV3__Key_BankruptcyV3_Search_Full_BIP_Vault','Case_Number',COUNT(__d0(__NL(Case_Number_))),COUNT(__d0(__NN(Case_Number_)))},
-    {'Bankruptcy','PublicRecords_KEL.Files.NonFCRA.BankruptcyV3__Key_BankruptcyV3_Search_Full_BIP_Vault','orig_case_number',COUNT(__d0(__NL(Original_Case_Number_))),COUNT(__d0(__NN(Original_Case_Number_)))},
-    {'Bankruptcy','PublicRecords_KEL.Files.NonFCRA.BankruptcyV3__Key_BankruptcyV3_Search_Full_BIP_Vault','srcdesc',COUNT(__d0(__NL(Source_Description_))),COUNT(__d0(__NN(Source_Description_)))},
-    {'Bankruptcy','PublicRecords_KEL.Files.NonFCRA.BankruptcyV3__Key_BankruptcyV3_Search_Full_BIP_Vault','chapter',COUNT(__d0(__NL(Original_Chapter_))),COUNT(__d0(__NN(Original_Chapter_)))},
-    {'Bankruptcy','PublicRecords_KEL.Files.NonFCRA.BankruptcyV3__Key_BankruptcyV3_Search_Full_BIP_Vault','filing_type',COUNT(__d0(__NL(Filing_Type_))),COUNT(__d0(__NN(Filing_Type_)))},
-    {'Bankruptcy','PublicRecords_KEL.Files.NonFCRA.BankruptcyV3__Key_BankruptcyV3_Search_Full_BIP_Vault','business_flag',COUNT(__d0(__NL(Business_Flag_))),COUNT(__d0(__NN(Business_Flag_)))},
-    {'Bankruptcy','PublicRecords_KEL.Files.NonFCRA.BankruptcyV3__Key_BankruptcyV3_Search_Full_BIP_Vault','corp_flag',COUNT(__d0(__NL(Corporate_Flag_))),COUNT(__d0(__NN(Corporate_Flag_)))},
-    {'Bankruptcy','PublicRecords_KEL.Files.NonFCRA.BankruptcyV3__Key_BankruptcyV3_Search_Full_BIP_Vault','discharged',COUNT(__d0(__NL(Discharged_Date_))),COUNT(__d0(__NN(Discharged_Date_)))},
-    {'Bankruptcy','PublicRecords_KEL.Files.NonFCRA.BankruptcyV3__Key_BankruptcyV3_Search_Full_BIP_Vault','disposition',COUNT(__d0(__NL(Disposition_))),COUNT(__d0(__NN(Disposition_)))},
-    {'Bankruptcy','PublicRecords_KEL.Files.NonFCRA.BankruptcyV3__Key_BankruptcyV3_Search_Full_BIP_Vault','debtor_type',COUNT(__d0(__NL(Debtor_Type_))),COUNT(__d0(__NN(Debtor_Type_)))},
-    {'Bankruptcy','PublicRecords_KEL.Files.NonFCRA.BankruptcyV3__Key_BankruptcyV3_Search_Full_BIP_Vault','debtor_seq',COUNT(__d0(__NL(Debtor_Sequence_))),COUNT(__d0(__NN(Debtor_Sequence_)))},
-    {'Bankruptcy','PublicRecords_KEL.Files.NonFCRA.BankruptcyV3__Key_BankruptcyV3_Search_Full_BIP_Vault','disptype',COUNT(__d0(__NL(Disposition_Type_))),COUNT(__d0(__NN(Disposition_Type_)))},
-    {'Bankruptcy','PublicRecords_KEL.Files.NonFCRA.BankruptcyV3__Key_BankruptcyV3_Search_Full_BIP_Vault','dispreason',COUNT(__d0(__NL(Disposition_Reason_))),COUNT(__d0(__NN(Disposition_Reason_)))},
-    {'Bankruptcy','PublicRecords_KEL.Files.NonFCRA.BankruptcyV3__Key_BankruptcyV3_Search_Full_BIP_Vault','disptypedesc',COUNT(__d0(__NL(Disposition_Type_Description_))),COUNT(__d0(__NN(Disposition_Type_Description_)))},
-    {'Bankruptcy','PublicRecords_KEL.Files.NonFCRA.BankruptcyV3__Key_BankruptcyV3_Search_Full_BIP_Vault','name_type',COUNT(__d0(__NL(Name_Type_))),COUNT(__d0(__NN(Name_Type_)))},
-    {'Bankruptcy','PublicRecords_KEL.Files.NonFCRA.BankruptcyV3__Key_BankruptcyV3_Search_Full_BIP_Vault','screendesc',COUNT(__d0(__NL(Screen_Description_))),COUNT(__d0(__NN(Screen_Description_)))},
-    {'Bankruptcy','PublicRecords_KEL.Files.NonFCRA.BankruptcyV3__Key_BankruptcyV3_Search_Full_BIP_Vault','dcodedesc',COUNT(__d0(__NL(Decoded_Description_))),COUNT(__d0(__NN(Decoded_Description_)))},
-    {'Bankruptcy','PublicRecords_KEL.Files.NonFCRA.BankruptcyV3__Key_BankruptcyV3_Search_Full_BIP_Vault','date_filed',COUNT(__d0(__NL(Date_Filed_))),COUNT(__d0(__NN(Date_Filed_)))},
-    {'Bankruptcy','PublicRecords_KEL.Files.NonFCRA.BankruptcyV3__Key_BankruptcyV3_Search_Full_BIP_Vault','record_type',COUNT(__d0(__NL(Record_Type_))),COUNT(__d0(__NN(Record_Type_)))},
-    {'Bankruptcy','PublicRecords_KEL.Files.NonFCRA.BankruptcyV3__Key_BankruptcyV3_Search_Full_BIP_Vault','caseid',COUNT(__d0(__NL(Case_I_D_))),COUNT(__d0(__NN(Case_I_D_)))},
-    {'Bankruptcy','PublicRecords_KEL.Files.NonFCRA.BankruptcyV3__Key_BankruptcyV3_Search_Full_BIP_Vault','defendantid',COUNT(__d0(__NL(Defendant_I_D_))),COUNT(__d0(__NN(Defendant_I_D_)))},
-    {'Bankruptcy','PublicRecords_KEL.Files.NonFCRA.BankruptcyV3__Key_BankruptcyV3_Search_Full_BIP_Vault','statusdate',COUNT(__d0(__NL(Last_Status_Update_))),COUNT(__d0(__NN(Last_Status_Update_)))},
-    {'Bankruptcy','PublicRecords_KEL.Files.NonFCRA.BankruptcyV3__Key_BankruptcyV3_Search_Full_BIP_Vault','src',COUNT(__d0(__NL(Source_))),COUNT(__d0(__NN(Source_)))},
-    {'Bankruptcy','PublicRecords_KEL.Files.NonFCRA.BankruptcyV3__Key_BankruptcyV3_Search_Full_BIP_Vault','Archive_Date',COUNT(__d0(Archive___Date_=0)),COUNT(__d0(Archive___Date_!=0))},
-    {'Bankruptcy','PublicRecords_KEL.Files.NonFCRA.BankruptcyV3__Key_BankruptcyV3_Search_Full_BIP_Vault','DateFirstSeen',COUNT(__d0(Date_First_Seen_=0)),COUNT(__d0(Date_First_Seen_!=0))},
-    {'Bankruptcy','PublicRecords_KEL.Files.NonFCRA.BankruptcyV3__Key_BankruptcyV3_Search_Full_BIP_Vault','DateLastSeen',COUNT(__d0(Date_Last_Seen_=0)),COUNT(__d0(Date_Last_Seen_!=0))},
-    {'Bankruptcy','PublicRecords_KEL.Files.NonFCRA.BankruptcyV3__Key_BankruptcyV3_Search_Full_BIP_Vault','HybridArchiveDate',COUNT(__d0(Hybrid_Archive_Date_=0)),COUNT(__d0(Hybrid_Archive_Date_!=0))},
-    {'Bankruptcy','PublicRecords_KEL.Files.NonFCRA.BankruptcyV3__Key_BankruptcyV3_Search_Full_BIP_Vault','VaultDateLastSeen',COUNT(__d0(Vault_Date_Last_Seen_=0)),COUNT(__d0(Vault_Date_Last_Seen_!=0))},
-    {'Bankruptcy','PublicRecords_KEL.Files.NonFCRA.BankruptcyV3__Key_BankruptcyV3_linkids_Vault','UID',COUNT(PublicRecords_KEL_Files_NonFCRA_BankruptcyV3__Key_BankruptcyV3_linkids_Vault_Invalid),COUNT(__d1)},
-    {'Bankruptcy','PublicRecords_KEL.Files.NonFCRA.BankruptcyV3__Key_BankruptcyV3_linkids_Vault','TMSID',COUNT(__d1(__NL(T_M_S_I_D_))),COUNT(__d1(__NN(T_M_S_I_D_)))},
-    {'Bankruptcy','PublicRecords_KEL.Files.NonFCRA.BankruptcyV3__Key_BankruptcyV3_linkids_Vault','Court_Code',COUNT(__d1(__NL(Court_Code_))),COUNT(__d1(__NN(Court_Code_)))},
-    {'Bankruptcy','PublicRecords_KEL.Files.NonFCRA.BankruptcyV3__Key_BankruptcyV3_linkids_Vault','Case_Number',COUNT(__d1(__NL(Case_Number_))),COUNT(__d1(__NN(Case_Number_)))},
-    {'Bankruptcy','PublicRecords_KEL.Files.NonFCRA.BankruptcyV3__Key_BankruptcyV3_linkids_Vault','orig_case_number',COUNT(__d1(__NL(Original_Case_Number_))),COUNT(__d1(__NN(Original_Case_Number_)))},
-    {'Bankruptcy','PublicRecords_KEL.Files.NonFCRA.BankruptcyV3__Key_BankruptcyV3_linkids_Vault','srcdesc',COUNT(__d1(__NL(Source_Description_))),COUNT(__d1(__NN(Source_Description_)))},
-    {'Bankruptcy','PublicRecords_KEL.Files.NonFCRA.BankruptcyV3__Key_BankruptcyV3_linkids_Vault','chapter',COUNT(__d1(__NL(Original_Chapter_))),COUNT(__d1(__NN(Original_Chapter_)))},
-    {'Bankruptcy','PublicRecords_KEL.Files.NonFCRA.BankruptcyV3__Key_BankruptcyV3_linkids_Vault','filing_type',COUNT(__d1(__NL(Filing_Type_))),COUNT(__d1(__NN(Filing_Type_)))},
-    {'Bankruptcy','PublicRecords_KEL.Files.NonFCRA.BankruptcyV3__Key_BankruptcyV3_linkids_Vault','business_flag',COUNT(__d1(__NL(Business_Flag_))),COUNT(__d1(__NN(Business_Flag_)))},
-    {'Bankruptcy','PublicRecords_KEL.Files.NonFCRA.BankruptcyV3__Key_BankruptcyV3_linkids_Vault','corp_flag',COUNT(__d1(__NL(Corporate_Flag_))),COUNT(__d1(__NN(Corporate_Flag_)))},
-    {'Bankruptcy','PublicRecords_KEL.Files.NonFCRA.BankruptcyV3__Key_BankruptcyV3_linkids_Vault','discharged',COUNT(__d1(__NL(Discharged_Date_))),COUNT(__d1(__NN(Discharged_Date_)))},
-    {'Bankruptcy','PublicRecords_KEL.Files.NonFCRA.BankruptcyV3__Key_BankruptcyV3_linkids_Vault','disposition',COUNT(__d1(__NL(Disposition_))),COUNT(__d1(__NN(Disposition_)))},
-    {'Bankruptcy','PublicRecords_KEL.Files.NonFCRA.BankruptcyV3__Key_BankruptcyV3_linkids_Vault','debtor_type',COUNT(__d1(__NL(Debtor_Type_))),COUNT(__d1(__NN(Debtor_Type_)))},
-    {'Bankruptcy','PublicRecords_KEL.Files.NonFCRA.BankruptcyV3__Key_BankruptcyV3_linkids_Vault','debtor_seq',COUNT(__d1(__NL(Debtor_Sequence_))),COUNT(__d1(__NN(Debtor_Sequence_)))},
-    {'Bankruptcy','PublicRecords_KEL.Files.NonFCRA.BankruptcyV3__Key_BankruptcyV3_linkids_Vault','disptype',COUNT(__d1(__NL(Disposition_Type_))),COUNT(__d1(__NN(Disposition_Type_)))},
-    {'Bankruptcy','PublicRecords_KEL.Files.NonFCRA.BankruptcyV3__Key_BankruptcyV3_linkids_Vault','dispreason',COUNT(__d1(__NL(Disposition_Reason_))),COUNT(__d1(__NN(Disposition_Reason_)))},
-    {'Bankruptcy','PublicRecords_KEL.Files.NonFCRA.BankruptcyV3__Key_BankruptcyV3_linkids_Vault','disptypedesc',COUNT(__d1(__NL(Disposition_Type_Description_))),COUNT(__d1(__NN(Disposition_Type_Description_)))},
-    {'Bankruptcy','PublicRecords_KEL.Files.NonFCRA.BankruptcyV3__Key_BankruptcyV3_linkids_Vault','name_type',COUNT(__d1(__NL(Name_Type_))),COUNT(__d1(__NN(Name_Type_)))},
-    {'Bankruptcy','PublicRecords_KEL.Files.NonFCRA.BankruptcyV3__Key_BankruptcyV3_linkids_Vault','screendesc',COUNT(__d1(__NL(Screen_Description_))),COUNT(__d1(__NN(Screen_Description_)))},
-    {'Bankruptcy','PublicRecords_KEL.Files.NonFCRA.BankruptcyV3__Key_BankruptcyV3_linkids_Vault','dcodedesc',COUNT(__d1(__NL(Decoded_Description_))),COUNT(__d1(__NN(Decoded_Description_)))},
-    {'Bankruptcy','PublicRecords_KEL.Files.NonFCRA.BankruptcyV3__Key_BankruptcyV3_linkids_Vault','date_filed',COUNT(__d1(__NL(Date_Filed_))),COUNT(__d1(__NN(Date_Filed_)))},
-    {'Bankruptcy','PublicRecords_KEL.Files.NonFCRA.BankruptcyV3__Key_BankruptcyV3_linkids_Vault','record_type',COUNT(__d1(__NL(Record_Type_))),COUNT(__d1(__NN(Record_Type_)))},
-    {'Bankruptcy','PublicRecords_KEL.Files.NonFCRA.BankruptcyV3__Key_BankruptcyV3_linkids_Vault','caseid',COUNT(__d1(__NL(Case_I_D_))),COUNT(__d1(__NN(Case_I_D_)))},
-    {'Bankruptcy','PublicRecords_KEL.Files.NonFCRA.BankruptcyV3__Key_BankruptcyV3_linkids_Vault','defendantid',COUNT(__d1(__NL(Defendant_I_D_))),COUNT(__d1(__NN(Defendant_I_D_)))},
-    {'Bankruptcy','PublicRecords_KEL.Files.NonFCRA.BankruptcyV3__Key_BankruptcyV3_linkids_Vault','statusdate',COUNT(__d1(__NL(Last_Status_Update_))),COUNT(__d1(__NN(Last_Status_Update_)))},
-    {'Bankruptcy','PublicRecords_KEL.Files.NonFCRA.BankruptcyV3__Key_BankruptcyV3_linkids_Vault','src',COUNT(__d1(__NL(Source_))),COUNT(__d1(__NN(Source_)))},
-    {'Bankruptcy','PublicRecords_KEL.Files.NonFCRA.BankruptcyV3__Key_BankruptcyV3_linkids_Vault','Archive_Date',COUNT(__d1(Archive___Date_=0)),COUNT(__d1(Archive___Date_!=0))},
-    {'Bankruptcy','PublicRecords_KEL.Files.NonFCRA.BankruptcyV3__Key_BankruptcyV3_linkids_Vault','DateFirstSeen',COUNT(__d1(Date_First_Seen_=0)),COUNT(__d1(Date_First_Seen_!=0))},
-    {'Bankruptcy','PublicRecords_KEL.Files.NonFCRA.BankruptcyV3__Key_BankruptcyV3_linkids_Vault','DateLastSeen',COUNT(__d1(Date_Last_Seen_=0)),COUNT(__d1(Date_Last_Seen_!=0))},
-    {'Bankruptcy','PublicRecords_KEL.Files.NonFCRA.BankruptcyV3__Key_BankruptcyV3_linkids_Vault','HybridArchiveDate',COUNT(__d1(Hybrid_Archive_Date_=0)),COUNT(__d1(Hybrid_Archive_Date_!=0))},
-    {'Bankruptcy','PublicRecords_KEL.Files.NonFCRA.BankruptcyV3__Key_BankruptcyV3_linkids_Vault','VaultDateLastSeen',COUNT(__d1(Vault_Date_Last_Seen_=0)),COUNT(__d1(Vault_Date_Last_Seen_!=0))},
-    {'Bankruptcy','PublicRecords_KEL.Files.FCRA.BankruptcyV3__Key_BankruptcyV3_Search_Full_BIP_Vault','UID',COUNT(PublicRecords_KEL_Files_FCRA_BankruptcyV3__Key_BankruptcyV3_Search_Full_BIP_Vault_Invalid),COUNT(__d2)},
-    {'Bankruptcy','PublicRecords_KEL.Files.FCRA.BankruptcyV3__Key_BankruptcyV3_Search_Full_BIP_Vault','TMSID',COUNT(__d2(__NL(T_M_S_I_D_))),COUNT(__d2(__NN(T_M_S_I_D_)))},
-    {'Bankruptcy','PublicRecords_KEL.Files.FCRA.BankruptcyV3__Key_BankruptcyV3_Search_Full_BIP_Vault','Court_Code',COUNT(__d2(__NL(Court_Code_))),COUNT(__d2(__NN(Court_Code_)))},
-    {'Bankruptcy','PublicRecords_KEL.Files.FCRA.BankruptcyV3__Key_BankruptcyV3_Search_Full_BIP_Vault','Case_Number',COUNT(__d2(__NL(Case_Number_))),COUNT(__d2(__NN(Case_Number_)))},
-    {'Bankruptcy','PublicRecords_KEL.Files.FCRA.BankruptcyV3__Key_BankruptcyV3_Search_Full_BIP_Vault','orig_case_number',COUNT(__d2(__NL(Original_Case_Number_))),COUNT(__d2(__NN(Original_Case_Number_)))},
-    {'Bankruptcy','PublicRecords_KEL.Files.FCRA.BankruptcyV3__Key_BankruptcyV3_Search_Full_BIP_Vault','srcdesc',COUNT(__d2(__NL(Source_Description_))),COUNT(__d2(__NN(Source_Description_)))},
-    {'Bankruptcy','PublicRecords_KEL.Files.FCRA.BankruptcyV3__Key_BankruptcyV3_Search_Full_BIP_Vault','chapter',COUNT(__d2(__NL(Original_Chapter_))),COUNT(__d2(__NN(Original_Chapter_)))},
-    {'Bankruptcy','PublicRecords_KEL.Files.FCRA.BankruptcyV3__Key_BankruptcyV3_Search_Full_BIP_Vault','filing_type',COUNT(__d2(__NL(Filing_Type_))),COUNT(__d2(__NN(Filing_Type_)))},
-    {'Bankruptcy','PublicRecords_KEL.Files.FCRA.BankruptcyV3__Key_BankruptcyV3_Search_Full_BIP_Vault','business_flag',COUNT(__d2(__NL(Business_Flag_))),COUNT(__d2(__NN(Business_Flag_)))},
-    {'Bankruptcy','PublicRecords_KEL.Files.FCRA.BankruptcyV3__Key_BankruptcyV3_Search_Full_BIP_Vault','corp_flag',COUNT(__d2(__NL(Corporate_Flag_))),COUNT(__d2(__NN(Corporate_Flag_)))},
-    {'Bankruptcy','PublicRecords_KEL.Files.FCRA.BankruptcyV3__Key_BankruptcyV3_Search_Full_BIP_Vault','discharged',COUNT(__d2(__NL(Discharged_Date_))),COUNT(__d2(__NN(Discharged_Date_)))},
-    {'Bankruptcy','PublicRecords_KEL.Files.FCRA.BankruptcyV3__Key_BankruptcyV3_Search_Full_BIP_Vault','disposition',COUNT(__d2(__NL(Disposition_))),COUNT(__d2(__NN(Disposition_)))},
-    {'Bankruptcy','PublicRecords_KEL.Files.FCRA.BankruptcyV3__Key_BankruptcyV3_Search_Full_BIP_Vault','debtor_type',COUNT(__d2(__NL(Debtor_Type_))),COUNT(__d2(__NN(Debtor_Type_)))},
-    {'Bankruptcy','PublicRecords_KEL.Files.FCRA.BankruptcyV3__Key_BankruptcyV3_Search_Full_BIP_Vault','debtor_seq',COUNT(__d2(__NL(Debtor_Sequence_))),COUNT(__d2(__NN(Debtor_Sequence_)))},
-    {'Bankruptcy','PublicRecords_KEL.Files.FCRA.BankruptcyV3__Key_BankruptcyV3_Search_Full_BIP_Vault','disptype',COUNT(__d2(__NL(Disposition_Type_))),COUNT(__d2(__NN(Disposition_Type_)))},
-    {'Bankruptcy','PublicRecords_KEL.Files.FCRA.BankruptcyV3__Key_BankruptcyV3_Search_Full_BIP_Vault','dispreason',COUNT(__d2(__NL(Disposition_Reason_))),COUNT(__d2(__NN(Disposition_Reason_)))},
-    {'Bankruptcy','PublicRecords_KEL.Files.FCRA.BankruptcyV3__Key_BankruptcyV3_Search_Full_BIP_Vault','disptypedesc',COUNT(__d2(__NL(Disposition_Type_Description_))),COUNT(__d2(__NN(Disposition_Type_Description_)))},
-    {'Bankruptcy','PublicRecords_KEL.Files.FCRA.BankruptcyV3__Key_BankruptcyV3_Search_Full_BIP_Vault','name_type',COUNT(__d2(__NL(Name_Type_))),COUNT(__d2(__NN(Name_Type_)))},
-    {'Bankruptcy','PublicRecords_KEL.Files.FCRA.BankruptcyV3__Key_BankruptcyV3_Search_Full_BIP_Vault','screendesc',COUNT(__d2(__NL(Screen_Description_))),COUNT(__d2(__NN(Screen_Description_)))},
-    {'Bankruptcy','PublicRecords_KEL.Files.FCRA.BankruptcyV3__Key_BankruptcyV3_Search_Full_BIP_Vault','dcodedesc',COUNT(__d2(__NL(Decoded_Description_))),COUNT(__d2(__NN(Decoded_Description_)))},
-    {'Bankruptcy','PublicRecords_KEL.Files.FCRA.BankruptcyV3__Key_BankruptcyV3_Search_Full_BIP_Vault','date_filed',COUNT(__d2(__NL(Date_Filed_))),COUNT(__d2(__NN(Date_Filed_)))},
-    {'Bankruptcy','PublicRecords_KEL.Files.FCRA.BankruptcyV3__Key_BankruptcyV3_Search_Full_BIP_Vault','record_type',COUNT(__d2(__NL(Record_Type_))),COUNT(__d2(__NN(Record_Type_)))},
-    {'Bankruptcy','PublicRecords_KEL.Files.FCRA.BankruptcyV3__Key_BankruptcyV3_Search_Full_BIP_Vault','caseid',COUNT(__d2(__NL(Case_I_D_))),COUNT(__d2(__NN(Case_I_D_)))},
-    {'Bankruptcy','PublicRecords_KEL.Files.FCRA.BankruptcyV3__Key_BankruptcyV3_Search_Full_BIP_Vault','defendantid',COUNT(__d2(__NL(Defendant_I_D_))),COUNT(__d2(__NN(Defendant_I_D_)))},
-    {'Bankruptcy','PublicRecords_KEL.Files.FCRA.BankruptcyV3__Key_BankruptcyV3_Search_Full_BIP_Vault','statusdate',COUNT(__d2(__NL(Last_Status_Update_))),COUNT(__d2(__NN(Last_Status_Update_)))},
-    {'Bankruptcy','PublicRecords_KEL.Files.FCRA.BankruptcyV3__Key_BankruptcyV3_Search_Full_BIP_Vault','src',COUNT(__d2(__NL(Source_))),COUNT(__d2(__NN(Source_)))},
-    {'Bankruptcy','PublicRecords_KEL.Files.FCRA.BankruptcyV3__Key_BankruptcyV3_Search_Full_BIP_Vault','Archive_Date',COUNT(__d2(Archive___Date_=0)),COUNT(__d2(Archive___Date_!=0))},
-    {'Bankruptcy','PublicRecords_KEL.Files.FCRA.BankruptcyV3__Key_BankruptcyV3_Search_Full_BIP_Vault','DateFirstSeen',COUNT(__d2(Date_First_Seen_=0)),COUNT(__d2(Date_First_Seen_!=0))},
-    {'Bankruptcy','PublicRecords_KEL.Files.FCRA.BankruptcyV3__Key_BankruptcyV3_Search_Full_BIP_Vault','DateLastSeen',COUNT(__d2(Date_Last_Seen_=0)),COUNT(__d2(Date_Last_Seen_!=0))},
-    {'Bankruptcy','PublicRecords_KEL.Files.FCRA.BankruptcyV3__Key_BankruptcyV3_Search_Full_BIP_Vault','HybridArchiveDate',COUNT(__d2(Hybrid_Archive_Date_=0)),COUNT(__d2(Hybrid_Archive_Date_!=0))},
-    {'Bankruptcy','PublicRecords_KEL.Files.FCRA.BankruptcyV3__Key_BankruptcyV3_Search_Full_BIP_Vault','VaultDateLastSeen',COUNT(__d2(Vault_Date_Last_Seen_=0)),COUNT(__d2(Vault_Date_Last_Seen_!=0))}]
+    {'Bankruptcy','PublicRecords_KEL.ECL_Functions.Dataset_FDC','UID',COUNT(PublicRecords_KEL_ECL_Functions_Dataset_FDC_Dataset_Bankruptcy_Files__Key_Search_Invalid),COUNT(__d0)},
+    {'Bankruptcy','PublicRecords_KEL.ECL_Functions.Dataset_FDC','TMSID',COUNT(__d0(__NL(T_M_S_I_D_))),COUNT(__d0(__NN(T_M_S_I_D_)))},
+    {'Bankruptcy','PublicRecords_KEL.ECL_Functions.Dataset_FDC','Court_Code',COUNT(__d0(__NL(Court_Code_))),COUNT(__d0(__NN(Court_Code_)))},
+    {'Bankruptcy','PublicRecords_KEL.ECL_Functions.Dataset_FDC','Case_Number',COUNT(__d0(__NL(Case_Number_))),COUNT(__d0(__NN(Case_Number_)))},
+    {'Bankruptcy','PublicRecords_KEL.ECL_Functions.Dataset_FDC','orig_case_number',COUNT(__d0(__NL(Original_Case_Number_))),COUNT(__d0(__NN(Original_Case_Number_)))},
+    {'Bankruptcy','PublicRecords_KEL.ECL_Functions.Dataset_FDC','srcdesc',COUNT(__d0(__NL(Source_Description_))),COUNT(__d0(__NN(Source_Description_)))},
+    {'Bankruptcy','PublicRecords_KEL.ECL_Functions.Dataset_FDC','chapter',COUNT(__d0(__NL(Original_Chapter_))),COUNT(__d0(__NN(Original_Chapter_)))},
+    {'Bankruptcy','PublicRecords_KEL.ECL_Functions.Dataset_FDC','filing_type',COUNT(__d0(__NL(Filing_Type_))),COUNT(__d0(__NN(Filing_Type_)))},
+    {'Bankruptcy','PublicRecords_KEL.ECL_Functions.Dataset_FDC','business_flag',COUNT(__d0(__NL(Business_Flag_))),COUNT(__d0(__NN(Business_Flag_)))},
+    {'Bankruptcy','PublicRecords_KEL.ECL_Functions.Dataset_FDC','corp_flag',COUNT(__d0(__NL(Corporate_Flag_))),COUNT(__d0(__NN(Corporate_Flag_)))},
+    {'Bankruptcy','PublicRecords_KEL.ECL_Functions.Dataset_FDC','discharged',COUNT(__d0(__NL(Discharged_Date_))),COUNT(__d0(__NN(Discharged_Date_)))},
+    {'Bankruptcy','PublicRecords_KEL.ECL_Functions.Dataset_FDC','disposition',COUNT(__d0(__NL(Disposition_))),COUNT(__d0(__NN(Disposition_)))},
+    {'Bankruptcy','PublicRecords_KEL.ECL_Functions.Dataset_FDC','debtor_type',COUNT(__d0(__NL(Debtor_Type_))),COUNT(__d0(__NN(Debtor_Type_)))},
+    {'Bankruptcy','PublicRecords_KEL.ECL_Functions.Dataset_FDC','debtor_seq',COUNT(__d0(__NL(Debtor_Sequence_))),COUNT(__d0(__NN(Debtor_Sequence_)))},
+    {'Bankruptcy','PublicRecords_KEL.ECL_Functions.Dataset_FDC','disptype',COUNT(__d0(__NL(Disposition_Type_))),COUNT(__d0(__NN(Disposition_Type_)))},
+    {'Bankruptcy','PublicRecords_KEL.ECL_Functions.Dataset_FDC','dispreason',COUNT(__d0(__NL(Disposition_Reason_))),COUNT(__d0(__NN(Disposition_Reason_)))},
+    {'Bankruptcy','PublicRecords_KEL.ECL_Functions.Dataset_FDC','disptypedesc',COUNT(__d0(__NL(Disposition_Type_Description_))),COUNT(__d0(__NN(Disposition_Type_Description_)))},
+    {'Bankruptcy','PublicRecords_KEL.ECL_Functions.Dataset_FDC','name_type',COUNT(__d0(__NL(Name_Type_))),COUNT(__d0(__NN(Name_Type_)))},
+    {'Bankruptcy','PublicRecords_KEL.ECL_Functions.Dataset_FDC','screendesc',COUNT(__d0(__NL(Screen_Description_))),COUNT(__d0(__NN(Screen_Description_)))},
+    {'Bankruptcy','PublicRecords_KEL.ECL_Functions.Dataset_FDC','dcodedesc',COUNT(__d0(__NL(Decoded_Description_))),COUNT(__d0(__NN(Decoded_Description_)))},
+    {'Bankruptcy','PublicRecords_KEL.ECL_Functions.Dataset_FDC','date_filed',COUNT(__d0(__NL(Date_Filed_))),COUNT(__d0(__NN(Date_Filed_)))},
+    {'Bankruptcy','PublicRecords_KEL.ECL_Functions.Dataset_FDC','record_type',COUNT(__d0(__NL(Record_Type_))),COUNT(__d0(__NN(Record_Type_)))},
+    {'Bankruptcy','PublicRecords_KEL.ECL_Functions.Dataset_FDC','caseid',COUNT(__d0(__NL(Case_I_D_))),COUNT(__d0(__NN(Case_I_D_)))},
+    {'Bankruptcy','PublicRecords_KEL.ECL_Functions.Dataset_FDC','defendantid',COUNT(__d0(__NL(Defendant_I_D_))),COUNT(__d0(__NN(Defendant_I_D_)))},
+    {'Bankruptcy','PublicRecords_KEL.ECL_Functions.Dataset_FDC','statusdate',COUNT(__d0(__NL(Last_Status_Update_))),COUNT(__d0(__NN(Last_Status_Update_)))},
+    {'Bankruptcy','PublicRecords_KEL.ECL_Functions.Dataset_FDC','Archive_Date',COUNT(__d0(Archive___Date_=0)),COUNT(__d0(Archive___Date_!=0))},
+    {'Bankruptcy','PublicRecords_KEL.ECL_Functions.Dataset_FDC','DateFirstSeen',COUNT(__d0(Date_First_Seen_=0)),COUNT(__d0(Date_First_Seen_!=0))},
+    {'Bankruptcy','PublicRecords_KEL.ECL_Functions.Dataset_FDC','DateLastSeen',COUNT(__d0(Date_Last_Seen_=0)),COUNT(__d0(Date_Last_Seen_!=0))},
+    {'Bankruptcy','PublicRecords_KEL.ECL_Functions.Dataset_FDC','HybridArchiveDate',COUNT(__d0(Hybrid_Archive_Date_=0)),COUNT(__d0(Hybrid_Archive_Date_!=0))},
+    {'Bankruptcy','PublicRecords_KEL.ECL_Functions.Dataset_FDC','VaultDateLastSeen',COUNT(__d0(Vault_Date_Last_Seen_=0)),COUNT(__d0(Vault_Date_Last_Seen_!=0))},
+    {'Bankruptcy','PublicRecords_KEL.ECL_Functions.Dataset_FDC','UID',COUNT(PublicRecords_KEL_ECL_Functions_Dataset_FDC_Dataset_Bankruptcy_Files__Linkids_Key_Search_Invalid),COUNT(__d1)},
+    {'Bankruptcy','PublicRecords_KEL.ECL_Functions.Dataset_FDC','TMSID',COUNT(__d1(__NL(T_M_S_I_D_))),COUNT(__d1(__NN(T_M_S_I_D_)))},
+    {'Bankruptcy','PublicRecords_KEL.ECL_Functions.Dataset_FDC','Court_Code',COUNT(__d1(__NL(Court_Code_))),COUNT(__d1(__NN(Court_Code_)))},
+    {'Bankruptcy','PublicRecords_KEL.ECL_Functions.Dataset_FDC','Case_Number',COUNT(__d1(__NL(Case_Number_))),COUNT(__d1(__NN(Case_Number_)))},
+    {'Bankruptcy','PublicRecords_KEL.ECL_Functions.Dataset_FDC','orig_case_number',COUNT(__d1(__NL(Original_Case_Number_))),COUNT(__d1(__NN(Original_Case_Number_)))},
+    {'Bankruptcy','PublicRecords_KEL.ECL_Functions.Dataset_FDC','srcdesc',COUNT(__d1(__NL(Source_Description_))),COUNT(__d1(__NN(Source_Description_)))},
+    {'Bankruptcy','PublicRecords_KEL.ECL_Functions.Dataset_FDC','chapter',COUNT(__d1(__NL(Original_Chapter_))),COUNT(__d1(__NN(Original_Chapter_)))},
+    {'Bankruptcy','PublicRecords_KEL.ECL_Functions.Dataset_FDC','filing_type',COUNT(__d1(__NL(Filing_Type_))),COUNT(__d1(__NN(Filing_Type_)))},
+    {'Bankruptcy','PublicRecords_KEL.ECL_Functions.Dataset_FDC','business_flag',COUNT(__d1(__NL(Business_Flag_))),COUNT(__d1(__NN(Business_Flag_)))},
+    {'Bankruptcy','PublicRecords_KEL.ECL_Functions.Dataset_FDC','corp_flag',COUNT(__d1(__NL(Corporate_Flag_))),COUNT(__d1(__NN(Corporate_Flag_)))},
+    {'Bankruptcy','PublicRecords_KEL.ECL_Functions.Dataset_FDC','discharged',COUNT(__d1(__NL(Discharged_Date_))),COUNT(__d1(__NN(Discharged_Date_)))},
+    {'Bankruptcy','PublicRecords_KEL.ECL_Functions.Dataset_FDC','disposition',COUNT(__d1(__NL(Disposition_))),COUNT(__d1(__NN(Disposition_)))},
+    {'Bankruptcy','PublicRecords_KEL.ECL_Functions.Dataset_FDC','debtor_type',COUNT(__d1(__NL(Debtor_Type_))),COUNT(__d1(__NN(Debtor_Type_)))},
+    {'Bankruptcy','PublicRecords_KEL.ECL_Functions.Dataset_FDC','debtor_seq',COUNT(__d1(__NL(Debtor_Sequence_))),COUNT(__d1(__NN(Debtor_Sequence_)))},
+    {'Bankruptcy','PublicRecords_KEL.ECL_Functions.Dataset_FDC','disptype',COUNT(__d1(__NL(Disposition_Type_))),COUNT(__d1(__NN(Disposition_Type_)))},
+    {'Bankruptcy','PublicRecords_KEL.ECL_Functions.Dataset_FDC','dispreason',COUNT(__d1(__NL(Disposition_Reason_))),COUNT(__d1(__NN(Disposition_Reason_)))},
+    {'Bankruptcy','PublicRecords_KEL.ECL_Functions.Dataset_FDC','disptypedesc',COUNT(__d1(__NL(Disposition_Type_Description_))),COUNT(__d1(__NN(Disposition_Type_Description_)))},
+    {'Bankruptcy','PublicRecords_KEL.ECL_Functions.Dataset_FDC','name_type',COUNT(__d1(__NL(Name_Type_))),COUNT(__d1(__NN(Name_Type_)))},
+    {'Bankruptcy','PublicRecords_KEL.ECL_Functions.Dataset_FDC','screendesc',COUNT(__d1(__NL(Screen_Description_))),COUNT(__d1(__NN(Screen_Description_)))},
+    {'Bankruptcy','PublicRecords_KEL.ECL_Functions.Dataset_FDC','dcodedesc',COUNT(__d1(__NL(Decoded_Description_))),COUNT(__d1(__NN(Decoded_Description_)))},
+    {'Bankruptcy','PublicRecords_KEL.ECL_Functions.Dataset_FDC','date_filed',COUNT(__d1(__NL(Date_Filed_))),COUNT(__d1(__NN(Date_Filed_)))},
+    {'Bankruptcy','PublicRecords_KEL.ECL_Functions.Dataset_FDC','record_type',COUNT(__d1(__NL(Record_Type_))),COUNT(__d1(__NN(Record_Type_)))},
+    {'Bankruptcy','PublicRecords_KEL.ECL_Functions.Dataset_FDC','caseid',COUNT(__d1(__NL(Case_I_D_))),COUNT(__d1(__NN(Case_I_D_)))},
+    {'Bankruptcy','PublicRecords_KEL.ECL_Functions.Dataset_FDC','defendantid',COUNT(__d1(__NL(Defendant_I_D_))),COUNT(__d1(__NN(Defendant_I_D_)))},
+    {'Bankruptcy','PublicRecords_KEL.ECL_Functions.Dataset_FDC','statusdate',COUNT(__d1(__NL(Last_Status_Update_))),COUNT(__d1(__NN(Last_Status_Update_)))},
+    {'Bankruptcy','PublicRecords_KEL.ECL_Functions.Dataset_FDC','src',COUNT(__d1(__NL(Source_))),COUNT(__d1(__NN(Source_)))},
+    {'Bankruptcy','PublicRecords_KEL.ECL_Functions.Dataset_FDC','Archive_Date',COUNT(__d1(Archive___Date_=0)),COUNT(__d1(Archive___Date_!=0))},
+    {'Bankruptcy','PublicRecords_KEL.ECL_Functions.Dataset_FDC','DateFirstSeen',COUNT(__d1(Date_First_Seen_=0)),COUNT(__d1(Date_First_Seen_!=0))},
+    {'Bankruptcy','PublicRecords_KEL.ECL_Functions.Dataset_FDC','DateLastSeen',COUNT(__d1(Date_Last_Seen_=0)),COUNT(__d1(Date_Last_Seen_!=0))},
+    {'Bankruptcy','PublicRecords_KEL.ECL_Functions.Dataset_FDC','HybridArchiveDate',COUNT(__d1(Hybrid_Archive_Date_=0)),COUNT(__d1(Hybrid_Archive_Date_!=0))},
+    {'Bankruptcy','PublicRecords_KEL.ECL_Functions.Dataset_FDC','VaultDateLastSeen',COUNT(__d1(Vault_Date_Last_Seen_=0)),COUNT(__d1(Vault_Date_Last_Seen_!=0))}]
   ,{KEL.typ.str entity,KEL.typ.str fileName,KEL.typ.str fieldName,KEL.typ.int nullCount,KEL.typ.int notNullCount});
 END;

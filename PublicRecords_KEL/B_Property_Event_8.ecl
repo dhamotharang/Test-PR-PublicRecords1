@@ -1,11 +1,11 @@
-﻿//HPCC Systems KEL Compiler Version 1.5.0rc1
+//HPCC Systems KEL Compiler Version 1.5.0rc1
 IMPORT KEL15 AS KEL;
 IMPORT CFG_Compile,E_Property,E_Property_Event,E_Zip_Code FROM PublicRecords_KEL;
 IMPORT * FROM KEL15.Null;
-EXPORT B_Property_Event_8(CFG_Compile __cfg = CFG_Compile) := MODULE
-  SHARED VIRTUAL TYPEOF(E_Property_Event(__cfg).__Result) __E_Property_Event := E_Property_Event(__cfg).__Result;
-  SHARED __EE399531 := __E_Property_Event;
-  EXPORT __ST260955_Layout := RECORD
+EXPORT B_Property_Event_8(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG_Compile __cfg = CFG_Compile) := MODULE
+  SHARED VIRTUAL TYPEOF(E_Property_Event(__in,__cfg).__Result) __E_Property_Event := E_Property_Event(__in,__cfg).__Result;
+  SHARED __EE398149 := __E_Property_Event;
+  EXPORT __ST259573_Layout := RECORD
     KEL.typ.nuid UID;
     KEL.typ.nstr L_N_Fares_I_D_;
     KEL.typ.nstr Primary_Range_;
@@ -66,7 +66,7 @@ EXPORT B_Property_Event_8(CFG_Compile __cfg = CFG_Compile) := MODULE
     KEL.typ.nbool Timeshare_Flag_;
     KEL.typ.nstr Land_Lot_Size_;
     KEL.typ.nbool Additional_Name_Flag_;
-    KEL.typ.ndataset(E_Property_Event(__cfg).Data_Sources_Layout) Data_Sources_;
+    KEL.typ.ndataset(E_Property_Event(__in,__cfg).Data_Sources_Layout) Data_Sources_;
     KEL.typ.nkdate Dt_First_Seen_;
     KEL.typ.epoch Archive___Date_ := 0;
     KEL.typ.epoch Date_First_Seen_ := 0;
@@ -75,9 +75,9 @@ EXPORT B_Property_Event_8(CFG_Compile __cfg = CFG_Compile) := MODULE
     KEL.typ.epoch Vault_Date_Last_Seen_ := 0;
     KEL.typ.int __RecordCount := 0;
   END;
-  SHARED __ST260955_Layout __ND399598__Project(E_Property_Event(__cfg).Layout __PP399199) := TRANSFORM
-    SELF.Dt_First_Seen_ := KEL.era.ToDate(__PP399199.Date_First_Seen_);
-    SELF := __PP399199;
+  SHARED __ST259573_Layout __ND398216__Project(E_Property_Event(__in,__cfg).Layout __PP397817) := TRANSFORM
+    SELF.Dt_First_Seen_ := KEL.era.ToDate(__PP397817.Date_First_Seen_);
+    SELF := __PP397817;
   END;
-  EXPORT __ENH_Property_Event_8 := PROJECT(__EE399531,__ND399598__Project(LEFT));
+  EXPORT __ENH_Property_Event_8 := PROJECT(__EE398149,__ND398216__Project(LEFT));
 END;
