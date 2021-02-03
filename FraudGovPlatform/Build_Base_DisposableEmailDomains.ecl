@@ -31,7 +31,7 @@ tools.mac_WriteFile(Filenames(pversion).Base.DisposableEmailDomains.New,valid_do
 	export full_build :=
 		 sequential(
 			  Build_Base_File
-			// , Promote(pversion).buildfiles.New2Built
+			, Promote(pversion).buildfiles.New2Built
  
 		);
 		
