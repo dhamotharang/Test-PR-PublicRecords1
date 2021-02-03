@@ -81,6 +81,10 @@ EXPORT FnRoxie_GetPersonAttributes(DATASET(PublicRecords_KEL.ECL_Functions.Layou
 			P_LexIDSeenFlag := IF(ResultsFound,RIGHT.P_LexIDSeenFlag,'0');
 			LexIDNotOnFile := P_LexIDSeenFlag = '0';
 			SELF.P_LexIDSeenFlag := P_LexIDSeenFlag;
+			SELF.P_LexIDIsDeceased := IF(LexIDNotOnFile, PublicRecords_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA, RIGHT.P_LexIDIsDeceasedFlag);
+			SELF.PL_EmrgAge := MAP(LexIDNotOnFile => PublicRecords_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA_INT,
+								ResultsFound => (INTEGER)RIGHT.PL_EmrgAge,
+								PublicRecords_KEL.ECL_Functions.Constants.NO_DATA_FOUND_INT);
 			SELF.PL_AstVehAutoCntEv := MAP(
 								Options.IsFCRA => 0,
 								LexIDNotOnFile => PublicRecords_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA_INT, 
@@ -751,6 +755,15 @@ EXPORT FnRoxie_GetPersonAttributes(DATASET(PublicRecords_KEL.ECL_Functions.Layou
 								LexIDNotOnFile => PublicRecords_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA,
 								ResultsFound => (STRING)RIGHT.PL_CurrAddrIsBusinessFlag,
 								PublicRecords_KEL.ECL_Functions.Constants.NO_DATA_FOUND);
+			SELF.PL_CurrAddrIsMultiUnitFlag := MAP(
+								LexIDNotOnFile => PublicRecords_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA,
+								ResultsFound => (STRING)RIGHT.PL_CurrAddrIsMultiUnitFlag,
+								PublicRecords_KEL.ECL_Functions.Constants.NO_DATA_FOUND);
+			SELF.PL_CurrAddrIsAptFlag := MAP(
+								LexIDNotOnFile => PublicRecords_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA,
+								ResultsFound => (STRING)RIGHT.PL_CurrAddrIsAptFlag,
+								PublicRecords_KEL.ECL_Functions.Constants.NO_DATA_FOUND);
+
 			//Previous Address
 			SELF.PL_PrevAddrIsSimpAddrFlag := MAP(
 								LexIDNotOnFile => PublicRecords_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA,
@@ -1312,22 +1325,22 @@ EXPORT FnRoxie_GetPersonAttributes(DATASET(PublicRecords_KEL.ECL_Functions.Layou
 								LexIDNotOnFile => PublicRecords_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA_INT,
 								NOT Options.IsFCRA AND ResultsFound => (INTEGER)RIGHT.PL_SrchEmailPerLexIDCnt1Y, 
 								PublicRecords_KEL.ECL_Functions.Constants.NO_DATA_FOUND_INT);
-			// SELF.PL_SrchPerCurrAddrCnt1Y := MAP(Options.IsFCRA  => 0,
-								// LexIDNotOnFile => PublicRecords_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA_INT,
-								// NOT Options.IsFCRA AND ResultsFound => (INTEGER)RIGHT.PL_SrchPerCurrAddrCnt1Y, 
-								// PublicRecords_KEL.ECL_Functions.Constants.NO_DATA_FOUND_INT);
-			// SELF.PL_SrchLexIDPerCurrAddrCnt1Y := MAP(Options.IsFCRA  => 0,
-								// LexIDNotOnFile => PublicRecords_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA_INT,
-								// NOT Options.IsFCRA AND ResultsFound => (INTEGER)RIGHT.PL_SrchLexIDPerCurrAddrCnt1Y, 
-								// PublicRecords_KEL.ECL_Functions.Constants.NO_DATA_FOUND_INT);
-			// SELF.PL_SrchLNamePerCurrAddrCnt1Y := MAP(Options.IsFCRA  => 0,
-								// LexIDNotOnFile => PublicRecords_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA_INT,
-								// NOT Options.IsFCRA AND ResultsFound => (INTEGER)RIGHT.PL_SrchLNamePerCurrAddrCnt1Y, 
-								// PublicRecords_KEL.ECL_Functions.Constants.NO_DATA_FOUND_INT);
-			// SELF.PL_SrchSSNPerCurrAddrCnt1Y := MAP(Options.IsFCRA  => 0,
-								// LexIDNotOnFile => PublicRecords_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA_INT,
-								// NOT Options.IsFCRA AND ResultsFound => (INTEGER)RIGHT.PL_SrchSSNPerCurrAddrCnt1Y, 
-								// PublicRecords_KEL.ECL_Functions.Constants.NO_DATA_FOUND_INT);
+			SELF.PL_SrchPerCurrAddrCnt1Y := MAP(Options.IsFCRA  => 0,
+								LexIDNotOnFile => PublicRecords_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA_INT,
+								NOT Options.IsFCRA AND ResultsFound => (INTEGER)RIGHT.PL_SrchPerCurrAddrCnt1Y, 
+								PublicRecords_KEL.ECL_Functions.Constants.NO_DATA_FOUND_INT);
+			SELF.PL_SrchLexIDPerCurrAddrCnt1Y := MAP(Options.IsFCRA  => 0,
+								LexIDNotOnFile => PublicRecords_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA_INT,
+								NOT Options.IsFCRA AND ResultsFound => (INTEGER)RIGHT.PL_SrchLexIDPerCurrAddrCnt1Y, 
+								PublicRecords_KEL.ECL_Functions.Constants.NO_DATA_FOUND_INT);
+			SELF.PL_SrchLNamePerCurrAddrCnt1Y := MAP(Options.IsFCRA  => 0,
+								LexIDNotOnFile => PublicRecords_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA_INT,
+								NOT Options.IsFCRA AND ResultsFound => (INTEGER)RIGHT.PL_SrchLNamePerCurrAddrCnt1Y, 
+								PublicRecords_KEL.ECL_Functions.Constants.NO_DATA_FOUND_INT);
+			SELF.PL_SrchSSNPerCurrAddrCnt1Y := MAP(Options.IsFCRA  => 0,
+								LexIDNotOnFile => PublicRecords_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA_INT,
+								NOT Options.IsFCRA AND ResultsFound => (INTEGER)RIGHT.PL_SrchSSNPerCurrAddrCnt1Y, 
+								PublicRecords_KEL.ECL_Functions.Constants.NO_DATA_FOUND_INT);
 			// NonFCRA Inquiry PII Corroboration
 			SELF.PL_SrchPerLexIDWInpFLSCnt1Y := MAP(Options.IsFCRA  => 0,
 								LexIDNotOnFile => PublicRecords_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA_INT,
@@ -1471,22 +1484,22 @@ EXPORT FnRoxie_GetPersonAttributes(DATASET(PublicRecords_KEL.ECL_Functions.Layou
 								ResultsFound => RIGHT.PL_STLDtList5Y, 
 								PublicRecords_KEL.ECL_Functions.Constants.NO_DATA_FOUND);						
 			//Overall Derog
-			// SELF.PL_DrgCnt7Y := MAP(
-								// LexIDNotOnFile => PublicRecords_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA_INT,
-								// ResultsFound => (INTEGER)RIGHT.PL_DrgCnt7Y,
-								// PublicRecords_KEL.ECL_Functions.Constants.NO_DATA_FOUND_INT);
-			// SELF.PL_DrgDtList7Y := MAP(
-								// LexIDNotOnFile => PublicRecords_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA,
-								// RIGHT.PL_DrgCnt7Y = 0 => PublicRecords_KEL.ECL_Functions.Constants.NO_DATA_FOUND,
-								// Common_Functions.roll_list(SORT(RIGHT.PL_DrgCRDtList7YList + RIGHT.PL_DrgBkDtList7YList + RIGHT.PL_LnJList + RIGHT.PL_LTDList,OriginalFilingDate), OriginalFilingDate, '|'));
-			// SELF.PL_DrgOldMsnc7Y := MAP(
-								// LexIDNotOnFile => PublicRecords_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA_INT,
-								// ResultsFound => (INTEGER)RIGHT.PL_DrgOldMsnc7Y,
-								// PublicRecords_KEL.ECL_Functions.Constants.NO_DATA_FOUND_INT);
-			// SELF.PL_DrgNewMsnc7Y := MAP(
-								// LexIDNotOnFile => PublicRecords_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA_INT,
-								// ResultsFound => (INTEGER)RIGHT.PL_DrgNewMsnc7Y,
-								// PublicRecords_KEL.ECL_Functions.Constants.NO_DATA_FOUND_INT);				
+			SELF.PL_DrgCnt7Y := MAP(
+								LexIDNotOnFile => PublicRecords_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA_INT,
+								ResultsFound => (INTEGER)RIGHT.PL_DrgCnt7Y,
+								PublicRecords_KEL.ECL_Functions.Constants.NO_DATA_FOUND_INT);
+			SELF.PL_DrgDtList7Y := MAP(
+								LexIDNotOnFile => PublicRecords_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA,
+								RIGHT.PL_DrgCnt7Y = 0 => PublicRecords_KEL.ECL_Functions.Constants.NO_DATA_FOUND,
+								Common_Functions.roll_list(SORT(RIGHT.CrimList + RIGHT.BankoList + RIGHT.LnJ7YList + RIGHT.LTD7YList,OriginalFilingDate), OriginalFilingDate, '|'));
+			SELF.PL_DrgOldMsnc7Y := MAP(
+								LexIDNotOnFile => PublicRecords_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA_INT,
+								ResultsFound => (INTEGER)RIGHT.PL_DrgOldMsnc7Y,
+								PublicRecords_KEL.ECL_Functions.Constants.NO_DATA_FOUND_INT);
+			SELF.PL_DrgNewMsnc7Y := MAP(
+								LexIDNotOnFile => PublicRecords_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA_INT,
+								ResultsFound => (INTEGER)RIGHT.PL_DrgNewMsnc7Y,
+								PublicRecords_KEL.ECL_Functions.Constants.NO_DATA_FOUND_INT);				
 			SELF.P_LexIDCategory := MAP(Options.IsFCRA  => '',
 								LexIDNotOnFile => PublicRecords_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA,
 								ResultsFound => (STRING)RIGHT.P_LexIDCategory,
@@ -1499,6 +1512,15 @@ EXPORT FnRoxie_GetPersonAttributes(DATASET(PublicRecords_KEL.ECL_Functions.Layou
 								LexIDNotOnFile => PublicRecords_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA_INT,
 								ResultsFound => (integer)RIGHT.PL_HHMmbrCnt,
 								PublicRecords_KEL.ECL_Functions.Constants.NO_DATA_FOUND_INT);
+			SELF.PL_HHMmbrBureauOnlyCnt := MAP(Options.IsFCRA  => 0,
+								LexIDNotOnFile => PublicRecords_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA_INT,
+								ResultsFound => (integer)RIGHT.PL_HHMmbrBureauOnlyCnt,
+								PublicRecords_KEL.ECL_Functions.Constants.NO_DATA_FOUND_INT);				
+			SELF.PL_HHMmbrAge18uCnt := MAP(Options.IsFCRA  => 0,
+								LexIDNotOnFile => PublicRecords_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA_INT,
+								ResultsFound => (integer)RIGHT.PL_HHMmbrAge18uCnt,
+								PublicRecords_KEL.ECL_Functions.Constants.NO_DATA_FOUND_INT);
+
 			//Person Source Verification
 			/*SELF.PL_VerSrcCntEv := MAP(
 								LexIDNotOnFile => PublicRecords_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA_INT,
@@ -1555,6 +1577,8 @@ EXPORT FnRoxie_GetPersonAttributes(DATASET(PublicRecords_KEL.ECL_Functions.Layou
 	PersonAttributesWithoutLexID := PROJECT(RecordsWithoutLexID,
 		TRANSFORM(PublicRecords_KEL.ECL_Functions.Layouts.LayoutPerson,
 			SELF.P_LexIDSeenFlag := PublicRecords_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA;			
+			SELF.P_LexIDIsDeceased := PublicRecords_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA;
+			SELF.PL_EmrgAge := PublicRecords_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA_INT;			
 			SELF.PL_AstVehAutoCntEv := IF(Options.IsFCRA,0,PublicRecords_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA_INT);
 			SELF.PL_AstVehAutoEmrgDtListEv := IF(Options.IsFCRA, '',PublicRecords_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA);
 			SELF.PL_AstVehAutoLastDtListEv := IF(Options.IsFCRA, '',PublicRecords_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA);
@@ -1736,6 +1760,9 @@ EXPORT FnRoxie_GetPersonAttributes(DATASET(PublicRecords_KEL.ECL_Functions.Layou
 			SELF.PL_CurrAddrIsSimpAddrFlag := PublicRecords_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA;
 			SELF.PL_CurrAddrIsDropDeliveryFlag := PublicRecords_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA;
 			SELF.PL_CurrAddrIsBusinessFlag := PublicRecords_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA;
+			SELF.PL_CurrAddrIsMultiUnitFlag := PublicRecords_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA;
+			SELF.PL_CurrAddrIsAptFlag := PublicRecords_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA;
+
 			//Previous Address
 			SELF.PL_PrevAddrIsSimpAddrFlag := PublicRecords_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA;
 			SELF.PL_PrevAddrIsBusinessFlag := PublicRecords_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA;
@@ -1886,10 +1913,10 @@ EXPORT FnRoxie_GetPersonAttributes(DATASET(PublicRecords_KEL.ECL_Functions.Layou
 			SELF.PL_SrchPhonePerLexIDCnt1Y := IF(Options.IsFCRA, 0, PublicRecords_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA_INT);
 			SELF.PL_SrchDOBPerLexIDCnt1Y := IF(Options.IsFCRA, 0, PublicRecords_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA_INT);
 			SELF.PL_SrchEmailPerLexIDCnt1Y := IF(Options.IsFCRA, 0, PublicRecords_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA_INT);
-			// SELF.PL_SrchPerCurrAddrCnt1Y := IF(Options.IsFCRA, 0, PublicRecords_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA_INT);
-			// SELF.PL_SrchLexIDPerCurrAddrCnt1Y := IF(Options.IsFCRA, 0, PublicRecords_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA_INT);
-			// SELF.PL_SrchLNamePerCurrAddrCnt1Y := IF(Options.IsFCRA, 0, PublicRecords_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA_INT);
-			// SELF.PL_SrchSSNPerCurrAddrCnt1Y := IF(Options.IsFCRA, 0, PublicRecords_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA_INT);
+			SELF.PL_SrchPerCurrAddrCnt1Y := IF(Options.IsFCRA, 0, PublicRecords_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA_INT);
+			SELF.PL_SrchLexIDPerCurrAddrCnt1Y := IF(Options.IsFCRA, 0, PublicRecords_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA_INT);
+			SELF.PL_SrchLNamePerCurrAddrCnt1Y := IF(Options.IsFCRA, 0, PublicRecords_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA_INT);
+			SELF.PL_SrchSSNPerCurrAddrCnt1Y := IF(Options.IsFCRA, 0, PublicRecords_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA_INT);
 			// Inquiry PII Corroboration NonFCRA
 			SELF.PL_SrchPerLexIDWInpFLSCnt1Y := IF(Options.IsFCRA, 0, PublicRecords_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA_INT);
 			SELF.PL_SrchPerLexIDWInpASCnt1Y := IF(Options.IsFCRA, 0, PublicRecords_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA_INT);
@@ -1925,10 +1952,10 @@ EXPORT FnRoxie_GetPersonAttributes(DATASET(PublicRecords_KEL.ECL_Functions.Layou
 			SELF.PL_AccNewDmgAmtEv := IF(Options.IsFCRA,0,PublicRecords_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA_INT);
 			SELF.PL_AccCnt1Y := IF(Options.IsFCRA,0,PublicRecords_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA_INT);
 			//Overall Derog
-			// SELF.PL_DrgCnt7Y := PublicRecords_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA_INT;
-			// SELF.PL_DrgDtList7Y := PublicRecords_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA;
-			// SELF.PL_DrgOldMsnc7Y := PublicRecords_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA_INT;
-			// SELF.PL_DrgNewMsnc7Y := PublicRecords_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA_INT;
+			SELF.PL_DrgCnt7Y := PublicRecords_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA_INT;
+			SELF.PL_DrgDtList7Y := PublicRecords_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA;
+			SELF.PL_DrgOldMsnc7Y := PublicRecords_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA_INT;
+			SELF.PL_DrgNewMsnc7Y := PublicRecords_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA_INT;
 			//Short Term Lending
 			SELF.PL_STLCnt1Y := PublicRecords_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA_INT;
 			SELF.PL_STLCnt2Y := PublicRecords_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA_INT;
@@ -1937,6 +1964,9 @@ EXPORT FnRoxie_GetPersonAttributes(DATASET(PublicRecords_KEL.ECL_Functions.Layou
 			SELF.P_LexIDCategory := IF(Options.IsFCRA,'',PublicRecords_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA);				
 			SELF.PL_HHID := IF(Options.IsFCRA,0,PublicRecords_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA_INT);				
 			SELF.PL_HHMmbrCnt := IF(Options.IsFCRA,0,PublicRecords_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA_INT);
+			SELF.PL_HHMmbrBureauOnlyCnt := IF(Options.IsFCRA,0,PublicRecords_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA_INT);				
+			SELF.PL_HHMmbrAge18uCnt := IF(Options.IsFCRA,0,PublicRecords_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA_INT);
+
 			//Person Source Verification
 			/*SELF.PL_VerSrcCntEv := IF(Options.IsFCRA,0,PublicRecords_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA_INT);				
 			SELF.PL_VerSrcListEv := IF(Options.IsFCRA,'',PublicRecords_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA);				
