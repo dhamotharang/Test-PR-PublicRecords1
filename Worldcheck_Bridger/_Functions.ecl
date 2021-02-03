@@ -1399,6 +1399,7 @@
 				trim(kword, left, right) = 'UNSCPE-WC' =>SubGroup_Constants.numKeywordsID.KEYWORD_UNSCPE_WC,
 				trim(kword, left, right) = 'UKHMT-DU' =>SubGroup_Constants.numKeywordsID.KEYWORD_UKHMT_DU,
 				trim(kword, left, right) = 'PTERSE' =>SubGroup_Constants.numKeywordsID.KEYWORD_PTERSE,
+				trim(kword, left, right) = 'IDGAKKUM' =>SubGroup_Constants.numKeywordsID.KEYWORD_IDGAKKUM,
 								
 				//When setting the keyword export use underscores for dashes (ex: For RBI-SANC, use RBI_SANC)	
 				
