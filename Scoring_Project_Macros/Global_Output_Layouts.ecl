@@ -6192,7 +6192,7 @@ STRING errorcode;
    END;
 	 
 EXPORT SBFE_SBBM_SBMO_Layout := RECORD
-  string30 accountnumber;
+  string30 acctno;
   unsigned3 historydateyyyymm;
   string120 bus_company_name;
   unsigned6 powid;
@@ -6214,7 +6214,7 @@ EXPORT SBFE_SBBM_SBMO_Layout := RECORD
 
 	 
 EXPORT NonSBFE_SLBO_SLBB_Layout := RECORD
-  string30 accountnumber;
+  string30 acctno;
   unsigned3 historydateyyyymm;
   string120 bus_company_name;
   unsigned6 powid;
