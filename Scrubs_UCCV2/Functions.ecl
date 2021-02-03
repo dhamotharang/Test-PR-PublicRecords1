@@ -382,7 +382,7 @@ EXPORT Functions := MODULE
     tmsid_clean := ut.CleanSpacesAndUpper(tmsid);
     
 		  isValidLetter := IF(regexfind('CA', tmsid_clean[1..2]), TRUE, FALSE);
-		  isValidNumber := IF(Stringlib.StringFilterOut(tmsid_clean[3..], '0123456789') = '', TRUE, FALSE);
+		  isValidNumber := IF(Stringlib.StringFilterOut(tmsid_clean[3..], '0123456789U') = '', TRUE, FALSE);
     
     RETURN IF(tmsid_clean = '' OR (isValidLetter AND isValidNumber), 1, 0);
   END;
