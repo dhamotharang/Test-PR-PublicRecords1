@@ -142,7 +142,7 @@ Export Layouts := Module
         Real       Q3_RecordCountPercent;//Q3_30
         Real       Max_RecordCountPercent;//Max_31
         Real       Mean_RecordCountPercent;//Mean_32
-        Real       Variance_RecordCountPercent;/Variance_33
+        Real       Variance_RecordCountPercent;//Variance_33
         Real       StDev_RecordCountPercent;//StDev_34
         Real       Plus2StDev_RecordCountPercent;//Plus2StDev_35
         Real       Minus2StDev_RecordCountPercent;//Minus2StDev_36
