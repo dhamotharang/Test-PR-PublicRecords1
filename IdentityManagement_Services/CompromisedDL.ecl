@@ -1,12 +1,13 @@
 //This module contains functions related to checking the Compromised DL key for matching hash values
-IMPORT header, python, STD;
+IMPORT header, python3, STD;
 
 EXPORT CompromisedDL := MODULE
 
   //Function that returns SHA512 hash of a given value
-  string128 fn_hashValueSHA512(string s) := EMBED(Python)
+  string128 fn_hashValueSHA512(string s) := EMBED(python3)
       import hashlib
-      return hashlib.sha512(s).hexdigest()
+      encodedString = s.encode('utf-8')
+      return str(hashlib.sha512(encodedString).hexdigest())
   ENDEMBED;
 
   //This function hashes a last name, ssn, and salt value and checks for a match in a key of hashes.
