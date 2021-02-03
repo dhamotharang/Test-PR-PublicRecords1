@@ -1,10 +1,15 @@
 ﻿/*
   Overlinks:
-    BIPV2_BlockLink._BWR_LGID3_BlockLink        -- will do a blocklink on lgid3s.   This splits up the lgid3 into two, preventing it from coming back together.  Only use if cluster is two distinct entities.
-    BIPV2_BlockLink._BWR_Proxid_BlockLink       -- will do a blocklink on Proxids.  This splits up the Proxid into two, preventing it from coming back together.  Only use if cluster is two distinct entities.
-    BIPV2_Build._BWR_Reset_Overlinked_Clusters  -- use to reset clusters that are overlinked and consists of more than two entities.  if the cluster needs to be broken up into more than two, use this instead of blocklink.
-                                                   this has a transform that also allows you to blank out any offending fields that are causing the overlinking such as bad feins from D&B Fein.
-
+    BIPV2_BlockLink._BWR_LGID3_BlockLink                          -- will do a blocklink on lgid3s.   This splits up the lgid3 into two, preventing it from coming back together.  Only use if cluster is two distinct entities.
+    BIPV2_BlockLink._BWR_Proxid_BlockLink                         -- will do a blocklink on Proxids.  This splits up the Proxid into two, preventing it from coming back together.  Only use if cluster is two distinct entities.
+    BIPV2_Build._BWR_Reset_Overlinked_Clusters                    -- use to reset clusters that are overlinked and consists of more than two entities.  if the cluster needs to be broken up into more than two, use this instead of blocklink.
+                                                                     this has a transform that also allows you to blank out any offending fields that are causing the overlinking such as bad feins from D&B Fein.
+    BIPV2_Field_Suppression._BWR_Add_Candidates                   -- Add candidates to custom Suppression/Explosion file.  Will work for all clusters/fields.
+    BIPV2_Field_Suppression._BWR_Remove_Candidates                -- Remove Candidates from custome suppression/explosion file.
+    BIPV2_Field_Suppression._BWR_Initialize_Suppression_Counter   -- initialize suppression counter for suppression file to zero.  This make the next suppression call using this file explode the clusters too.
+    BIPV2_Field_Suppression._BWR_Increment_Suppression_Counter    -- increment the suppression counter in the suppression file + 1.  This will make the next suppression call not explode the clusters.
+    BIPV2_Field_Suppression.mac_Suppress                          -- Suppression macro call.  Will need to modify this to add fields/context/id fields if we add new fields to the suppression file.
+                                                                     Future improvement is to generate the code from the suppression file to call this macro.
   Underlinks:
     BIPV2.BWR_ManualUnderlinks                  -- force lgid3s or proxids together.  uses UnderLinks attribute file, so this will only work if both lgid3s/proxids are in the lgid3/proxid Match Candidates.
     BIPV2_ForceLink._BWR_Add_Candidates         -- Add Forcelink Candidates.  Outside of SALT.
@@ -14,6 +19,13 @@
   Suppression:
     BIPV2.BWR_ManualSuppression                 -- suppress records from output keys in the kfetch(example here: BIPV2_Suppression.BWR_Test).
     BIPV2_Suppression.BWR_ManualSuppression     -- same as BIPV2.ManualSuppression.addCandidates from BIPV2.BWR_ManualSuppression above.
+
+    BIPV2_Field_Suppression._BWR_Add_Candidates                   -- Add candidates to custom Suppression/Explosion file.  Will work for all clusters/fields.
+    BIPV2_Field_Suppression._BWR_Remove_Candidates                -- Remove Candidates from custome suppression/explosion file.
+    BIPV2_Field_Suppression._BWR_Initialize_Suppression_Counter   -- initialize suppression counter for suppression file to zero.  This make the next suppression call using this file explode the clusters too.
+    BIPV2_Field_Suppression._BWR_Increment_Suppression_Counter    -- increment the suppression counter in the suppression file + 1.  This will make the next suppression call not explode the clusters.
+    BIPV2_Field_Suppression.mac_Suppress                          -- Suppression macro call.  Will need to modify this to add fields/context/id fields if we add new fields to the suppression file.
+                                                                     Future improvement is to generate the code from the suppression file to call this macro.
     
   Thor Research Tools:
     BIPV2_Tools.mac_How_Did_This_Link           -- use to examine in detail a proxid/lgid3/seleid.  if a seleid consists of multiple lgid3s, then that seleid was set by hierarchy.

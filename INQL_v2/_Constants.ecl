@@ -6,7 +6,7 @@ EXPORT _Constants  := module
 	export NON_FCRA_ESP 			:= '10.173.50.42';//'10.240.32.16';
 	export FCRA_ESP		  			:= '10.173.52.3';//'10.241.21.32';
 	export FIDO_ESP						:= '10.194.93.1';
-	export PROD_ESP           := 'uspr-prod-thor-esp.risk.regn.net'; //'prod_esp.br.seisint.com';
+	export PROD_ESP           := 'prod_esp.br.seisint.com';
 	export LZ									:= _CONTROL.IPADDRESS.BCTLPEDATA10;
   export thisDaliIP         		:= _Control.ThisEnvironment.ThisDaliIp;
 	export foreign_fcra_logs  		:= Data_Services.foreign_fcra_logs;
@@ -65,7 +65,7 @@ EXPORT _Constants  := module
 	export FCRA_WEEKLY_KEYS_EVENTNAME								:= 'BLD_FCRA_WEEKLY_KEYS';	
 	export NON_FCRA_WEEKLY_KEYS_EVENTNAME						:= 'BLD_NONFCRA_WEEKLY_KEYS';
 
-	export SBFE_REPORT_BATCH_PROCESS_ID_FILTER  		:= ['306','311','49','375', '335'];
+	export SBFE_REPORT_BATCH_PROCESS_ID_FILTER  		:= ['306','311','49','375', '335', '434'];
 	export RISKWISE_ROXIE_IP              					:=  std.str.splitwords(RiskWise.shortcuts.prod_batch_analytics_roxie,'//')[2];
 	
 	
