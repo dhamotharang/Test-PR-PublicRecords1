@@ -9,9 +9,50 @@ head := dataset('~thor_data400::Base::FCRA_HeaderKey_Building', header.Layout_He
 ut.mac_suppress_by_phonetype(head,phone,st,phone_suppression,true,did);
 
 head_bldg0:=doxie_build.fn_file_FCRA_header_building(phone_suppression)(Header.Blocked_data_new());
-head_bldg := header.fn_block_records.filter(head_bldg0);
+head_bldg1 := header.fn_block_records.filter(head_bldg0);
 
-//
+vo_fcra := head_bldg1(src = 'VO');
+
+//ARMBS-415 - Remove Nebraska and Delaware Voters from FCRA Header
+vo_src := dataset('~thor_data400::in::SeqdHeaderSrc_VO',header.Layouts_SeqdSrc.VO_src_rec,flat);
+
+vo_fcra_dist := distribute(vo_fcra,hash(fname,lname,zip));
+vo_src_dist  := distribute(vo_src,hash(fname,lname,zip));
+
+j_vo_fcra := join(vo_fcra_dist
+		  ,vo_src_dist
+		  ,left.fname=right.fname
+		and left.lname=right.lname
+		and ut.nneq_date(left.dob, (unsigned8)right.dob)
+		and left.mname=right.mname
+		and	
+		((left.zip=right.mail_zip
+		and left.prim_range=right.mail_prim_range
+		and left.predir=right.mail_predir
+		and left.prim_name=right.mail_prim_name
+		and left.suffix=right.mail_addr_suffix
+		and left.postdir=right.mail_postdir
+		and	ut.NNEQ(left.sec_range, right.mail_sec_range)
+		and left.st=right.mail_st
+		) or
+		(left.zip=right.zip 
+		and left.prim_range=trim(right.prim_range)
+		and left.predir=trim(right.predir)
+		and left.prim_name=right.prim_name
+		and left.suffix=right.addr_suffix
+		and left.postdir=right.postdir
+		and	ut.NNEQ(left.sec_range, right.sec_range)
+		and left.st=right.st
+		))		
+		and	ut.NNEQ_Phone(left.phone,right.phone)
+		and ut.nneq_ssn(left.ssn, right.ssn)
+		and left.vendor_id = right.vendor_id, TRANSFORM({RECORDOF(LEFT),string source_state},SELF.source_state:=RIGHT.source_state,SELF:=LEFT)
+		,left outer
+		,keep(1)
+		,local);
+
+fcra_vo_filtered := project(j_vo_fcra(source_state not in ['DE', 'NE']), recordof(j_vo_fcra) - [source_state]);
+head_bldg := head_bldg1(src <> 'VO') + fcra_vo_filtered;
 
 header_services.Supplemental_Data.mac_verify('didaddress_sup.txt',header_services.Supplemental_Data.layout_in,supp_ds_func);
  
