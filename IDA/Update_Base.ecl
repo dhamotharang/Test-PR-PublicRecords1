@@ -91,11 +91,6 @@ END;
 
 cleanAdd_t := project(cleanAddr,tr(left));
 
-//Add to previous base
-// base_and_update := if(nothor(FileServices.GetSuperFileSubCount(IDA.Filenames(version, pUseProd).lBaseTemplate_built)) = 0
-											 // ,cleanAdd_t
-											 // ,cleanAdd_t + IDA.Files(version, pUseProd).base.built);
-
 new_base_d := distribute(cleanAdd_t, hash(orig_first_name,orig_last_name,orig_address1,orig_phone,orig_email,orig_dob));  
 new_base_s := sort(new_base_d,
  		              orig_first_name,
@@ -131,21 +126,6 @@ IDA.Layouts.base t_rollup (new_base_s  le, new_base_s ri) := transform
  self := le;
 end;
 
-// base_f := rollup(new_base_s,
-									// left.orig_first_name = right.orig_first_name and				
-									// left.orig_last_name = right.orig_last_name and						
-									// left.orig_Zip5 = right.orig_Zip5	 and					
-									// left.orig_address1 = right.orig_address1 and				
-									// left.orig_phone = right.orig_phone and														
-									// left.orig_email = right.orig_email and
-									// left.orig_dob = right.orig_dob and
-									// left.orig_address2 = right.orig_address2 and
-									// left.orig_city = right.orig_city and
-									// left.orig_state_province = right.orig_state_province and
-									// left.orig_zip4  = right.orig_zip4 
-																	// ,t_rollup(left, right)
-																	// ,local);
-
 //DID
 
 matchset := ['A','Z','D','P'];
@@ -161,12 +141,5 @@ Watchdog.Mac_append_ADL_ind(d_did, Updated_Base);
 
 daily_base:= Updated_Base;
 
-// accumulative_base := if(nothor(FileServices.GetSuperFileSubCount(IDA.Filenames(pversion, pUseProd).lBaseTemplate_built)) = 0
-// 											 ,Updated_Base
-// 											 ,Updated_Base + IDA.Files(pversion, pUseProd).base.built);
-	 
-// base_and_update := if(pdaily,daily_base,accumulative_base);
-									
-// return base_and_update;
 return daily_base;
 end;
