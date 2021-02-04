@@ -1,4 +1,4 @@
-import iesp;
+import iesp, LNSmallBusiness;
 
 export Helpers := MODULE
 	export unsigned1 DPPA_Purpose := 0;
@@ -83,9 +83,9 @@ export Helpers := MODULE
 	end;
 
 
-   	export HierarchicalOut2Testseed( dataset(Layouts.ResponseEx) hier ) := FUNCTION
+   	export HierarchicalOut2Testseed( dataset(LNSmallBusiness.Layouts.ResponseEx) hier ) := FUNCTION
    		// convert hierarchical output a flat layout for batch
-		Layouts.Testseeds toBatch( hier le ) := TRANSFORM
+		LNSmallBusiness.Layouts.Testseeds toBatch( hier le ) := TRANSFORM
 
 			/* INPUT ECHO */
 			self.seq                            := le.seq;

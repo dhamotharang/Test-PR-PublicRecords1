@@ -1,4 +1,4 @@
-﻿import iesp,LNSmallBusiness;
+﻿IMPORT iesp,LNSmallBusiness;
 
 export Layouts := MODULE
 	export Model_With_Seq := RECORD
@@ -103,55 +103,61 @@ export Layouts := MODULE
 
 	END;
 
-	export Testseeds := RECORD
-		STRING10 modelname;
-		STRING10 table_name;
+  EXPORT Testseeds := RECORD
+    STRING10 modelname;
+    STRING10 table_name;
 
-		Batch_In - HistoryDateYYYYMM;
+    Batch_In - HistoryDateYYYYMM;
+    STRING15 LNLexIDPOW;
+    STRING15 LNLexIDProx;
+    STRING15 LNLexIDSELE;
+    STRING15 LNLexIDORG;
+    STRING15 LNLexIDULT;
+    STRING12 LexId;
 		
-		string10  name1; // eg, RVS811_0
-		string60  ModelDescription1;
-		string10  type1;  // no clue what the 'type' field is intended for
-		string3   score1; // actual score (eg, 500-999)
-		string3   index1; // billing index; see Risk_Indicators.BillingIndex
-		string4   rep_rc11; // rep reason codes and descriptions
-		string150 rep_desc11;
-		string4   rep_rc21;
-		string150 rep_desc21;
-		string4   rep_rc31;
-		string150 rep_desc31;
-		string4   rep_rc41;
-		string150 rep_desc41;
-		string4   bus_rc11; // bus reason codes and descriptions
-		string150 bus_desc11;
-		string4   bus_rc21;
-		string150 bus_desc21;
-		string4   bus_rc31;
-		string150 bus_desc31;
-		string4   bus_rc41;
-		string150 bus_desc41;
+    STRING10  name1; // eg, RVS811_0
+    STRING60  ModelDescription1;
+    STRING10  type1;  // no clue what the 'type' field is intended for
+    STRING3   score1; // actual score (eg, 500-999)
+    STRING3   index1; // billing index; see Risk_Indicators.BillingIndex
+    STRING4   rep_rc11; // rep reason codes and descriptions
+    STRING150 rep_desc11;
+    STRING4   rep_rc21;
+    STRING150 rep_desc21;
+    STRING4   rep_rc31;
+    STRING150 rep_desc31;
+    STRING4   rep_rc41;
+    STRING150 rep_desc41;
+    STRING4   bus_rc11; // bus reason codes and descriptions
+    STRING150 bus_desc11;
+    STRING4   bus_rc21;
+    STRING150 bus_desc21;
+    STRING4   bus_rc31;
+    STRING150 bus_desc31;
+    STRING4   bus_rc41;
+    STRING150 bus_desc41;
 
-		string10  name2; // eg, RVS811_0
-		string60  ModelDescription2;
-		string10  type2;  // no clue what the 'type' field is intended for
-		string3   score2; // actual score (eg, 500-999)
-		string3   index2; // billing index; see Risk_Indicators.BillingIndex
-		string4   rep_rc12; // rep reason codes and descriptions
-		string150 rep_desc12;
-		string4   rep_rc22;
-		string150 rep_desc22;
-		string4   rep_rc32;
-		string150 rep_desc32;
-		string4   rep_rc42;
-		string150 rep_desc42;
-		string4   bus_rc12; // bus reason codes and descriptions
-		string150 bus_desc12;
-		string4   bus_rc22;
-		string150 bus_desc22;
-		string4   bus_rc32;
-		string150 bus_desc32;
-		string4   bus_rc42;
-		string150 bus_desc42;
+    STRING10  name2; // eg, RVS811_0
+    STRING60  ModelDescription2;
+    STRING10  type2;  // no clue what the 'type' field is intended for
+    STRING3   score2; // actual score (eg, 500-999)
+    STRING3   index2; // billing index; see Risk_Indicators.BillingIndex
+    STRING4   rep_rc12; // rep reason codes and descriptions
+    STRING150 rep_desc12;
+    STRING4   rep_rc22;
+    STRING150 rep_desc22;
+    STRING4   rep_rc32;
+    STRING150 rep_desc32;
+    STRING4   rep_rc42;
+    STRING150 rep_desc42;
+    STRING4   bus_rc12; // bus reason codes and descriptions
+    STRING150 bus_desc12;
+    STRING4   bus_rc22;
+    STRING150 bus_desc22;
+    STRING4   bus_rc32;
+    STRING150 bus_desc32;
+    STRING4   bus_rc42;
+    STRING150 bus_desc42;
 	END;
 
 	export RequestEx := RECORD
@@ -167,7 +173,7 @@ export Layouts := MODULE
 		string30  AcctNo;
 		iesp.ws_analytics.t_SmallBusinessRiskResponse;
 	END;
-  
+
   EXPORT ModelOptionsRec :=
     RECORD
       STRING OptionName; 

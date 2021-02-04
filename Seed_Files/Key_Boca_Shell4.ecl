@@ -1,13 +1,13 @@
-Import Data_Services, ut;
+﻿Import Data_Services, Seed_Files, STD;
 
-export Key_Boca_Shell4 (boolean IsFCRA = false) := function
+EXPORT Key_Boca_Shell4 (boolean IsFCRA = false) := function
   
-	d := if(IsFCRA, seed_files.file_boca_shell4_fcra, seed_files.file_boca_shell4);
+	d := if(IsFCRA, Seed_Files.file_boca_shell4_fcra, Seed_Files.file_boca_shell4);
 
 	newrec := record
 		data16 hashvalue := Hash_InstantID(
-													stringlib.stringtouppercase(d.fname), 
-													stringlib.stringtouppercase(d.lname), 
+													STD.Str.ToUpperCase(d.fname), 
+													STD.Str.ToUpperCase(d.lname), 
 													d.ssn, 
 													'', 
 													d.zip, 
