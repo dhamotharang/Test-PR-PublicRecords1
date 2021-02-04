@@ -1,4 +1,4 @@
-import  Risk_Indicators,data_services;
+import  data_services,Risk_Indicators,Seed_Files;
 
 
 d :=  seed_files.file_redflags;
@@ -16,4 +16,4 @@ newtable := table(d,newrec);
 
 export key_redflags := index(newtable,{dataset_name,hashvalue},
 																	{newtable},
-																	data_services.data_location.prefix() + 'thor_data400::key::testseed::qa::redflags');
+																	Data_Services.Data_location.Prefix('NONAMEGIVEN') + 'thor_data400::key::testseed::qa::redflags');

@@ -1,4 +1,4 @@
-import data_services;
+import data_services,Seed_Files;
 
 
 d :=  seed_files.file_BusinessDefender;
@@ -12,4 +12,4 @@ newtable := table(d,newrec);
 
 export key_BusinessDefender := index(newtable,{dataset_name,hashvalue},
 																	{newtable},
-																	data_services.data_location.prefix() + 'thor_data400::key::testseed::qa::businessdefender');
+																	Data_Services.Data_location.Prefix('NONAMEGIVEN') + 'thor_data400::key::testseed::qa::businessdefender');

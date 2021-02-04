@@ -432,10 +432,11 @@ EXPORT SmallBusiness_BIP_Service() := FUNCTION
 
 	 #ELSE
 	 SBA_Results := IF(TestDataEnabled = FALSE, SBA_Results_Temp,
-																	 /* else */ LNSmallBusiness.SmallBusiness_BIP_Testseed_Function(Input,
-																						  TestDataTableName,
-																						  DataPermissionMask,
-																						  ModelsRequested));
+                                   /* else */ LNSmallBusiness.SmallBusiness_BIP_Testseed_Function(Input,
+                                              TestDataTableName,
+                                              DataPermissionMask,
+                                              ModelsRequested,
+                                              AttributesRequested));
 
 	/* ************************************************************************
 	 * Transform the Small Business Attributes and Scores Results into IESP   *

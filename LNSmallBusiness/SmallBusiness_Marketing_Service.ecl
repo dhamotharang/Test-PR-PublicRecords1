@@ -368,18 +368,20 @@ EXPORT SmallBusiness_Marketing_Service() := FUNCTION
 																														);
 
 
-	SBA_Results_Temp := PROJECT( SBA_Results_Temp_with_PhoneSources, LNSmallBusiness.BIP_Layouts.IntermediateLayout );
+  SBA_Results_Temp := PROJECT( SBA_Results_Temp_with_PhoneSources, LNSmallBusiness.BIP_Layouts.IntermediateLayout );
 
-	#if(Models.LIB_BusinessRisk_Models().TurnOnValidation) // If TRUE, output the model results directly
+  #if(Models.LIB_BusinessRisk_Models().TurnOnValidation) // If TRUE, output the model results directly
 
-		RETURN OUTPUT(SBA_Results_Temp, NAMED('Results'));
+    RETURN OUTPUT(SBA_Results_Temp, NAMED('Results'));
 
-	#else
-		SBA_Results := IF(TestDataEnabled = FALSE, SBA_Results_Temp,
-																		/* else */ LNSmallBusiness.SmallBusiness_BIP_Testseed_Function(Input,
-																																																	 TestDataTableName,
-																																																	 DataPermissionMask,
-																																																	 ModelsRequested));
+  #else
+    SBA_Results := IF(TestDataEnabled = FALSE, 
+                      SBA_Results_Temp,
+                      LNSmallBusiness.SmallBusiness_BIP_Testseed_Function(Input,
+                                                                          TestDataTableName,
+                                                                          DataPermissionMask,
+                                                                          ModelsRequested,
+                                                                          AttributesRequested));
 
 		/* ************************************************************************
 		 * Transform the Small Business Attributes and Scores Results into IESP   *

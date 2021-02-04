@@ -1,4 +1,4 @@
-import data_services;
+import Data_Services,Seed_Files;
 
 
 ds_testseed := seed_files.File_identityreport;
@@ -14,4 +14,4 @@ end;
 newtable := TABLE (ds_slim, newrec);
 
 export key_identityreport := INDEX (newtable, {hashvalue}, {newtable},
-														data_services.data_location.prefix() + 'thor_data400::key::testseed::qa::identityreport');
+														Data_Services.Data_location.Prefix('NONAMEGIVEN') + 'thor_data400::key::testseed::qa::identityreport');
