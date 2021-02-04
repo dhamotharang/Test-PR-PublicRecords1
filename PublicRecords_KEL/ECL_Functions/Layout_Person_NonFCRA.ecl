@@ -130,6 +130,7 @@
 	STRING6 P_InpValDOBInvalidFlag,
 	STRING6 P_InpValEmailInvalidFlag,
 	STRING6 P_InpValArchDtInvalidFlag,
+	STRING6 P_InpSSNIs4Digits;
 	INTEGER4 PI_InpAddrAVMVal;
 	INTEGER4 PI_InpAddrAVMValA1Y;
 	DECIMAL7_2 PI_InpAddrAVMRatio1Y;
@@ -209,6 +210,7 @@
 	STRING10 G_BuildEmailDt;
 	STRING6	P_LexIDSeenFlag;
 	STRING12 P_LexIDCategory;
+	STRING6 P_LexIDIsDeceasedFlag;
 	INTEGER3 PL_AstVehAutoCntEv;
 	STRING	PL_AstVehAutoEmrgDtListEv;
 	STRING	PL_AstVehAutoLastDtListEv;
@@ -389,6 +391,9 @@
 	STRING6 PL_CurrAddrIsSimpAddrFlag;
 	STRING6 PL_CurrAddrIsDropDeliveryFlag;
 	STRING6 PL_CurrAddrIsBusinessFlag;
+	STRING6 PL_CurrAddrIsMultiUnitFlag;
+	STRING6 PL_CurrAddrIsAptFlag;
+
 	//Previous Address
 	STRING6 PL_PrevAddrIsSimpAddrFlag;
 	STRING6 PL_PrevAddrIsBusinessFlag;
@@ -443,10 +448,10 @@
 	//Email
 	INTEGER3 PL_EmailCntEv;
 	//Derog History
-	// INTEGER3 PL_DrgCnt7Y;
-	// STRING PL_DrgDtList7Y;
-	// INTEGER3 PL_DrgOldMsnc7Y;
-	// INTEGER3 PL_DrgNewMsnc7Y;		
+	INTEGER3 PL_DrgCnt7Y;
+	STRING PL_DrgDtList7Y;
+	INTEGER3 PL_DrgOldMsnc7Y;
+	INTEGER3 PL_DrgNewMsnc7Y;		
 	//Best PII
 	STRING20 PL_BestNameFirst;
 	STRING20 PL_BestNameMid;
@@ -456,6 +461,9 @@
 	INTEGER3 PL_BestDOBAge;
 	integer7 PL_HHID;
 	integer3 PL_HHMmbrCnt;
+	INTEGER3 PL_HHMmbrBureauOnlyCnt;
+	INTEGER3 PL_HHMmbrAge18uCnt;
+
 	//Inquiry
 	//Inquiry History
 	STRING10 G_BuildSrchDt;
@@ -552,10 +560,10 @@
 	INTEGER3 PL_SrchPhonePerLexIDCnt1Y;
 	INTEGER3 PL_SrchDOBPerLexIDCnt1Y;
 	INTEGER3 PL_SrchEmailPerLexIDCnt1Y;
-	// INTEGER3 PL_SrchPerCurrAddrCnt1Y;
-	// INTEGER3 PL_SrchLexIDPerCurrAddrCnt1Y;
-	// INTEGER3 PL_SrchLNamePerCurrAddrCnt1Y;
-	// INTEGER3 PL_SrchSSNPerCurrAddrCnt1Y;
+	INTEGER3 PL_SrchPerCurrAddrCnt1Y;
+	INTEGER3 PL_SrchLexIDPerCurrAddrCnt1Y;
+	INTEGER3 PL_SrchLNamePerCurrAddrCnt1Y;
+	INTEGER3 PL_SrchSSNPerCurrAddrCnt1Y;
 	// Inquiry PII Corroboration 
 	INTEGER3 PL_SrchPerLexIDWInpFLSCnt1Y;
 	INTEGER3 PL_SrchPerLexIDWInpASCnt1Y;

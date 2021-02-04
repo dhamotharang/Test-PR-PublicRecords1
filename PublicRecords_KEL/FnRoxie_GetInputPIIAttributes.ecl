@@ -1,4 +1,4 @@
-﻿IMPORT KEL13 AS KEL;
+﻿﻿IMPORT KEL13 AS KEL;
 
 EXPORT FnRoxie_GetInputPIIAttributes(DATASET(PublicRecords_KEL.ECL_Functions.Layouts.LayoutInputPII) RepInput,
             PublicRecords_KEL.Interface_Options Options,
@@ -37,6 +37,7 @@ EXPORT FnRoxie_GetInputPIIAttributes(DATASET(PublicRecords_KEL.ECL_Functions.Lay
 			SELF.P_InpValPhoneWorkBadLenFlag := (STRING)LEFT.P_InpValPhoneWorkBadLenFlag,
 			SELF.P_InpValPhoneWorkBogusFlag := (STRING)LEFT.P_InpValPhoneWorkBogusFlag,
 			// SELF.p_inpclnaddrlocid := (INTEGER)LEFT.p_inpclnaddrlocid, 
+			SELF.P_InpSSNIs4Digits := (STRING)LEFT.P_InpSSNIs4Digits,
 			// SELF.P_InpClnAddrPropertyUID := PublicRecords_KEL.E_Property(KEL_Settings).Lookup (KeyVal = TRIM((STRING)LEFT.P_InpClnAddrPrimRng) + '|' + 
 					// TRIM((STRING)LEFT.P_InpClnAddrPreDir) + '|' + 
 					// TRIM((STRING)LEFT.P_InpClnAddrPrimName) + '|' + 
