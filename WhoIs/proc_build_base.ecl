@@ -1,12 +1,11 @@
-﻿IMPORT	ut, AID, AID_Support, DID_Add, Business_Header_SS, address, NID, STD, PromoteSupers,
-							PRTE2, WhoIs; //using a cleaning functions in these repositories;
+﻿IMPORT	ut, AID, AID_Support, DID_Add, Business_Header_SS, address, NID, STD, PromoteSupers, PRTE2, WhoIs, BIPV2; //using a cleaning functions in these repositories;
 			
 EXPORT proc_build_base(STRING8 version) := FUNCTION
 
-	dsBase			:= WhoIs.Files.Base;
+	// dsBase			:= WhoIs.Files.Base;
 	IngestPrep	:= WhoIs.prep_ingest_file;
 
-	ingestMod		:= WhoIs.Ingest(,,dsBase,IngestPrep);
+	ingestMod		:= WhoIs.Ingest(,,/*dsBase*/,IngestPrep);
 	new_base		:= ingestMod.AllRecords;
 
 	//Populate current_rec based on whether or not record is in the new input file as this is a full replace
@@ -14,8 +13,11 @@ EXPORT proc_build_base(STRING8 version) := FUNCTION
 	PopCurrentRec	:= Project(new_base, TRANSFORM(WhoIs.Layouts.Base, SELF.current_rec := IF(LEFT.__Tpe in [2,3],FALSE,TRUE);
 																																				SELF := LEFT;
 																																				SELF:= [];));
-								
-	NID.Mac_CleanFullNames(PopCurrentRec, FileClnName, NAME
+	
+	ValidNamefile := PopCurrentRec(trim(Name,left,right)!= ''): persist('~thor_data400::in::WhoIs::ValidName');
+	InvNamefile   := PopCurrentRec(trim(Name,left,right) = ''): persist('~thor_data400::in::WhoIs::InvalidName');
+	
+	NID.Mac_CleanFullNames(ValidNameFile, FileClnName, NAME
 													,includeInRepository:=true, normalizeDualNames:=true, useV2 := true);
 	
 	//Name flags
@@ -23,7 +25,7 @@ EXPORT proc_build_base(STRING8 version) := FUNCTION
 	business_flags := ['B'];
 	InvName_flags	:= ['I'];
 		
-	InputFileClnName	:= PROJECT(FileClnName,TRANSFORM(WhoIs.Layouts.Base,
+	ValidClnName	:= Project(FileClnName,TRANSFORM(WhoIs.Layouts.Base,
 																					BOOLEAN IsName	:=	LEFT.nametype IN person_flags OR
 																														 (LEFT.nametype = 'U' AND trim(LEFT.cln_fname) != '' AND TRIM(LEFT.cln_lname) != ''); 
 																					SELF.clean_title				:=	IF(IsName, LEFT.cln_title, '');
@@ -36,12 +38,24 @@ EXPORT proc_build_base(STRING8 version) := FUNCTION
 																																				IF(LEFT.Organization != '',STD.Str.CleanSpaces(LEFT.Organization),''));
 																					SELF := LEFT));
 																					
-																					
+	InvClnName	:= Project(InvNamefile, TRANSFORM(WhoIs.Layouts.Base,
+																						SELF.clean_title				:=	'';
+																						SELF.clean_fname				:=	'';
+																						SELF.clean_mname				:=	'';
+																						SELF.clean_lname				:=	'';
+																						SELF.clean_name_suffix	:=	'';
+																						SELF.clean_cname				:=  LEFT.Organization;
+																						SELF := LEFT));
+	//Combine clean name files
+	rsCleanName := ValidClnName + InvClnName: persist('~thor_data400::in::WhoIs::CleanName');
+																						
 		//AID process
-	unsigned4 lAIDFlags := AID.Common.eReturnValues.RawAID | AID.Common.eReturnValues.ACECacheRecords;
-	
 	WhoIs.Layouts.Base tProjectAIDClean_prep(WhoIs.Layouts.Base pInput) := TRANSFORM
-	  clnFullAddr	:= STD.Str.CleanSpaces(TRIM(pInput.street1) +' '+TRIM(pInput.street2) +' '+TRIM(pInput.street3) +' '+TRIM(pInput.street4));
+	  FullAddr	  := STD.Str.CleanSpaces(TRIM(pInput.street1) +' '+TRIM(pInput.street2) +' '+TRIM(pInput.street3) +' '+TRIM(pInput.street4));
+    clnFullAddr	:= MAP(NOT REGEXFIND('[A-Z]',FullAddr)=> '',
+		                   NOT REGEXFIND('^(.*) (.*)',TRIM(FullAddr)) => '',
+											 LENGTH(TRIM(FullAddr,ALL)) < 5 => '',
+											 FullAddr);
 		self.Append_Prep_Address_Situs			:=	Address.fn_addr_clean_prep(clnFullAddr, 'first');
 		self.Append_Prep_Address_Last_Situs	:=	Address.fn_addr_clean_prep(pInput.city
 																							+	IF(pInput.city <> '',', ','') + pInput.state
@@ -49,13 +63,14 @@ EXPORT proc_build_base(STRING8 version) := FUNCTION
 		self := pInput;
 	END;
 
-	rsAIDCleanName	:= PROJECT(InputFileClnName ,tProjectAIDClean_prep(LEFT))(TRIM(EMAIL) <> ''); //removes invalid records
+	rsAIDCleanName	:= PROJECT(rsCleanName ,tProjectAIDClean_prep(LEFT)); 
 	
 	rsAID_NoAddr		:=	rsAIDCleanName(TRIM(Append_Prep_Address_Situs) = '' OR TRIM(Append_Prep_Address_Last_Situs) = '' 
 																			OR STD.Str.Find(Append_Prep_Address_Situs, '@', 1) > 0 OR LENGTH(postalCode)<5 OR TRIM(state) = '');
 	rsAID_Addr			:=	rsAIDCleanName(TRIM(Append_Prep_Address_Situs) != '' AND TRIM(Append_Prep_Address_Last_Situs) != ''
 																			AND STD.Str.Find(Append_Prep_Address_Situs, '@', 1) = 0 AND LENGTH(postalCode)>=5 AND TRIM(state) != '');
-	
+
+	unsigned4 lAIDFlags := AID.Common.eReturnValues.RawAID | AID.Common.eReturnValues.ACECacheRecords;	
 	AID.MacAppendFromRaw_2Line(rsAID_Addr,Append_Prep_Address_Situs, Append_Prep_Address_Last_Situs, RawAID,
 																											rsCleanAID, lAIDFlags);	
 	
@@ -124,7 +139,7 @@ EXPORT proc_build_base(STRING8 version) := FUNCTION
 	rsCleanAIDGoodAddr		:= PROJECT(rsCleanAID, tProjectClean(LEFT));
 	rsCleanAIDGoodNoAddr	:= PROJECT(rsAID_NoAddr, tProjectNoAddrClean(LEFT));
 	
-	rsCleanAIDGood	:=	rsCleanAIDGoodAddr + rsCleanAIDGoodNoAddr;																					
+	rsCleanAIDGood	:=	rsCleanAIDGoodAddr + rsCleanAIDGoodNoAddr: persist('~thor_data400::in::WhoIs::CleanAIDGood');																					
 
 	//Flip names before DID process
 	matchset :=['A','P','Z'];
@@ -150,10 +165,10 @@ EXPORT proc_build_base(STRING8 version) := FUNCTION
 													,75	  														// threshold 
 													,rsCleanAID_DID										// Output Dataset
 													);
-													
+	Input_BIP  := 	rsCleanAID_DID: persist('~thor_data400::in::WhoIs::CleanAID_DID');											
 		//Add BIP fields
 	bdid_matchset	:= ['A'];
-	Business_Header_SS.MAC_Add_BDID_Flex(rsCleanAID_DID												// Input Dataset
+	Business_Header_SS.MAC_Add_BDID_Flex(Input_BIP							    					// Input Dataset
 																			,bdid_matchset												// BDID Matchset what fields to match on
 																			,clean_cname													// company_name
 																			,prim_range       										// prim_range
@@ -183,9 +198,8 @@ EXPORT proc_build_base(STRING8 version) := FUNCTION
 																			,rcid																	// Source_Record_Id
 																			,																			// Src_Matching_is_priorty
 																			);
-												
+			
 	PromoteSupers.Mac_SF_BuildProcess(dsBIP_out,WhoIs.thor_cluster+'base::email::WhoIs_data',build_base,3,,true);
-
 	RETURN build_base;																				
 
 END;
