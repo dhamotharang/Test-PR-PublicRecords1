@@ -1,0 +1,4 @@
+﻿EXPORT test_GITPULL() := FUNCTIONMACRO
+
+RETURN 'fail';
+ENDMACRO;
