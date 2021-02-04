@@ -122,7 +122,7 @@ functionmacro
       #APPEND(EXPLODEIDS  ,'suppression_counter_' + %'CURRENTID'% + ' := get_ids_prep_' + %'CURRENTID'% + '[1].suppression_counter;\n')
 
       #APPEND(EXPLODEIDS  ,'self.' + %'CURRENTID'% + ' := map(\n')
-      #APPEND(EXPLODEIDS  ,'trim(self.fields_suppressed) = \'\' or suppression_counter_' + %'CURRENTID'% + ' > 0 or ~exists(get_ids_prep_' + %'CURRENTID'% + ') => left.' + %'CURRENTID'% + '  \n')
+      #APPEND(EXPLODEIDS  ,'left.' + %'CURRENTID'% + ' = 0 or trim(self.fields_suppressed) = \'\' or suppression_counter_' + %'CURRENTID'% + ' > 0 or ~exists(get_ids_prep_' + %'CURRENTID'% + ') => left.' + %'CURRENTID'% + '  \n')
 
       #APPEND(EXPLODEIDS  ,',exists(get_ids_prep_' + %'CURRENTID'% + ')              and suppression_counter_' + %'CURRENTID'% + ' < 1 => (typeof(left.' + %'CURRENTID'% + '))trim(get_field_value(get_ids_prep2_' + %'CURRENTID'% + ',left))\n')
        
@@ -132,7 +132,7 @@ functionmacro
 
       // ---------------------------------------------------------------------------------------------------------------------------------
       #APPEND(EXPLODEIDS  ,'self.didexplode_' + %'CURRENTID'% + ' := map(\n')
-      #APPEND(EXPLODEIDS  ,'trim(self.fields_suppressed) = \'\' or suppression_counter_' + %'CURRENTID'% + ' > 0 or ~exists(get_ids_prep_' + %'CURRENTID'% + ') => false \n')
+      #APPEND(EXPLODEIDS  ,'left.' + %'CURRENTID'% + ' = 0 or trim(self.fields_suppressed) = \'\' or suppression_counter_' + %'CURRENTID'% + ' > 0 or ~exists(get_ids_prep_' + %'CURRENTID'% + ') => false \n')
 
       #APPEND(EXPLODEIDS  ,',exists(get_ids_prep_' + %'CURRENTID'% + ')              and suppression_counter_' + %'CURRENTID'% + ' < 1 => true \n')
        
@@ -152,9 +152,9 @@ functionmacro
 
       
       #IF(%EXPLODECOUNTER% = 1)
-        #APPEND(PATCHIDS  ,'ds_proj_dist_'  + %'CURRENTID'% + '     := distribute(ds_proj ,orig.'  + %'CURRENTID'% + ');\n')
+        #APPEND(PATCHIDS  ,'ds_proj_dist_'  + %'CURRENTID'% + '     := distribute(ds_proj(orig.'  + %'CURRENTID'% + ' != 0) ,orig.'  + %'CURRENTID'% + ');\n')
       #ELSE
-        #APPEND(PATCHIDS  ,'ds_proj_dist_'  + %'CURRENTID'% + '     := distribute(group(ds_proj_iterate_'  + %'PREVIOUSID'% + '_) ,orig.'  + %'CURRENTID'% + ');\n')
+        #APPEND(PATCHIDS  ,'ds_proj_dist_'  + %'CURRENTID'% + '     := distribute(group(ds_proj_iterate_'  + %'PREVIOUSID'% + '_(orig.'  + %'CURRENTID'% + ' != 0)) ,orig.'  + %'CURRENTID'% + ');\n')
       #END
       
       #APPEND(PATCHIDS  ,'ds_proj_sort_'  + %'CURRENTID'% + '     := sort(ds_proj_dist_'  + %'CURRENTID'% + '  ,orig.'  + %'CURRENTID'% + ',if(didexplode_'  + %'CURRENTID'% + ' = true ,0,1),'  + %'PREVIOUSID'% + '  ,local);\n')
@@ -174,9 +174,9 @@ functionmacro
       #APPEND(PATCHIDS  ,'));\n')
       
       #IF(%EXPLODECOUNTER% = 1)
-        #APPEND(PATCHIDS  ,'ds_proj_iterate_'  + %'CURRENTID'% + '_ := map(exists(' + #TEXT(pSuppressionFile) + '(exists(IDs_To_Explode(trim(fieldname) = \''  + %'CURRENTID'% + '\')))) => group(ds_proj_iterate_'  + %'CURRENTID'% + ') ,ds_proj  );\n\n')
+        #APPEND(PATCHIDS  ,'ds_proj_iterate_'  + %'CURRENTID'% + '_ := map(exists(' + #TEXT(pSuppressionFile) + '(exists(IDs_To_Explode(trim(fieldname) = \''  + %'CURRENTID'% + '\')))) => group(ds_proj_iterate_'  + %'CURRENTID'% + ') + ds_proj(orig.'  + %'CURRENTID'% + ' = 0) ,ds_proj  );\n\n')
       #ELSE
-        #APPEND(PATCHIDS  ,'ds_proj_iterate_'  + %'CURRENTID'% + '_ := map(exists(' + #TEXT(pSuppressionFile) + '(exists(IDs_To_Explode(trim(fieldname) = \''  + %'CURRENTID'% + '\')))) => group(ds_proj_iterate_'  + %'CURRENTID'% + ') ,ds_proj_iterate_'  + %'PREVIOUSID'% + '_  );\n\n')
+        #APPEND(PATCHIDS  ,'ds_proj_iterate_'  + %'CURRENTID'% + '_ := map(exists(' + #TEXT(pSuppressionFile) + '(exists(IDs_To_Explode(trim(fieldname) = \''  + %'CURRENTID'% + '\')))) => group(ds_proj_iterate_'  + %'CURRENTID'% + ') + ds_proj_iterate_'  + %'PREVIOUSID'% + '_(orig.'  + %'CURRENTID'% + ' = 0)  ,ds_proj_iterate_'  + %'PREVIOUSID'% + '_  );\n\n')
       #END
 
 
