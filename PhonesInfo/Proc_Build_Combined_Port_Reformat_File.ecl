@@ -21,7 +21,7 @@ EXPORT Proc_Build_Combined_Port_Reformat_File(string version, string contacts/*,
 									 																															
 	//Build iConectiv PortData Validate File
 	//Start Processing the iConectiv PortData Validate Files on 11/17/20.  Begin using files from 11/16/20.	
-	buildPDVBase			:= PhonesInfo.Proc_Build_PortData_Valid_File(version);	
+	buildPDVBase			:= PhonesInfo.Proc_Build_PortData_Valid_File(version, contacts);	
 	
 	//Email Build Status	
 	emailDOps					:= contacts;
