@@ -5,8 +5,6 @@ export fSpray(boolean pUseProd = false) := MODULE
 
 version:=IDA._Constants(pUseProd).filesdate;
 
-// RD:=STD.File.RemoteDirectory(IDA._Constants(pUseProd).Source_IP,IDA._Constants(pUseProd).spray_path );
-// RDF:=RD[1];
 RD:=IDA._Constants(false).RD;
 RDF:=IDA._Constants(false).RDF;
 
