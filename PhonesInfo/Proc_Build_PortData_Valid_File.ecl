@@ -1,6 +1,6 @@
 ﻿IMPORT _control, Std;
 
-EXPORT Proc_Build_PortData_Valid_File(string version) := FUNCTION
+EXPORT Proc_Build_PortData_Valid_File(string version, string contacts) := FUNCTION
 
 	//Build Base
 	buildBase					:= output(PhonesInfo.Remap_Combined_PortData_Valid,,'~thor_data400::base::phones::portdata_valid_main_' + version, overwrite, __compressed__);
@@ -15,10 +15,10 @@ EXPORT Proc_Build_PortData_Valid_File(string version) := FUNCTION
 																											'~thor_data400::base::phones::portdata_valid_main_delete'], '~thor_data400::base::phones::portdata_valid_main_'+version, true);		
 										 																															
 	//Email Build Status	
-	emailDOps					:= ';darren.knowles@lexisnexisrisk.com; charlene.ros@lexisnexisrisk.com';
+	emailDOps					:= contacts;
 	emailDev					:= ';judy.tao@lexisnexisrisk.com';
 	
-	emailTarget				:= _control.MyInfo.EmailAddressNotify + emailDev;
+	emailTarget				:= contacts + emailDev;
 	emailBuildNotice 	:= if(count(PhonesInfo.File_iConectiv.Main(phone<>'')) > 0
 																,Fileservices.SendEmail(emailTarget, 'Phones Metadata: iConectiv PortData Validate Phone File', 'Phones Metadata: iConectiv PortData Validate Phone File Is Now Available.  Please see: ' + 'http://uspr-prod-thor-esp.risk.regn.net:8010/WsWorkunits/WUInfo?Wuid='+ workunit + '&Widget=WUDetailsWidget#/stub/Results-DL/Grid')
 																,Fileservices.SendEmail(emailTarget, 'Phones Metadata: No iConectiv PortData Validate Phone File', 'There Were No iConectiv PortData Validate Phone Records In This Build')
