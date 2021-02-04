@@ -1577,7 +1577,7 @@ EXPORT FnRoxie_GetPersonAttributes(DATASET(PublicRecords_KEL.ECL_Functions.Layou
 	PersonAttributesWithoutLexID := PROJECT(RecordsWithoutLexID,
 		TRANSFORM(PublicRecords_KEL.ECL_Functions.Layouts.LayoutPerson,
 			SELF.P_LexIDSeenFlag := PublicRecords_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA;			
-			SELF.P_LexIDIsDeceased := PublicRecords_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA;
+			SELF.P_LexIDIsDeceasedFlag := PublicRecords_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA;
 			SELF.PL_EmrgAge := PublicRecords_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA_INT;			
 			SELF.PL_AstVehAutoCntEv := IF(Options.IsFCRA,0,PublicRecords_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA_INT);
 			SELF.PL_AstVehAutoEmrgDtListEv := IF(Options.IsFCRA, '',PublicRecords_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA);
