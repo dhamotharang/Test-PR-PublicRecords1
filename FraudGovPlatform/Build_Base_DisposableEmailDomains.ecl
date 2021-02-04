@@ -21,10 +21,10 @@ module
             SELF := LEFT ),
         LOCAL );
 
-srt := sort(pSlimDisposableEmailDomains, domain);
+srt := sort(pSlimDisposableEmailDomains + Previous_Build, domain);
 ddp := dedup (srt, domain) ;
 
-valid_domains := distribute(ddp, hash32(domain));
+valid_domains := distribute( ddp(domain != '') , hash32(domain));
 tools.mac_WriteFile(Filenames(pversion).Base.DisposableEmailDomains.New,valid_domains,Build_Base_File,pCompress:=true,pHeading:=false,pOverwrite:=true);
 
 // Return

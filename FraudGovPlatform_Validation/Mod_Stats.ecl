@@ -279,15 +279,15 @@ END;
 
 				SHARED DS_IdentityData		:= dataset(FraudGovPlatform.Filenames().Sprayed.FileSprayed+'::'+ fname,
 												{string75 fn { virtual(logicalfilename)},FraudGovPlatform.Layouts.Sprayed.IdentityData},
-												CSV(separator([pSeparator]),quote(''),terminator(pTerminator)));
+												CSV(heading(1),separator([pSeparator]),quote(''),terminator(pTerminator)));
 
 				SHARED DS_KnownFraud		:= dataset(FraudGovPlatform.Filenames().Sprayed.FileSprayed+'::'+ fname,
 												{string75 fn { virtual(logicalfilename)},FraudGovPlatform.Layouts.Sprayed.KnownFraud},
-												CSV(separator([pSeparator]),quote(''),terminator(pTerminator)));
+												CSV(heading(1),separator([pSeparator]),quote(''),terminator(pTerminator)));
 
 				SHARED DS_SafeList			:= dataset(FraudGovPlatform.Filenames().Sprayed.FileSprayed+'::'+ fname,
 												{string75 fn { virtual(logicalfilename)},FraudGovPlatform.Layouts.Sprayed.SafeList},
-												CSV(separator([pSeparator]),quote(''),terminator(pTerminator)));
+												CSV(heading(1),separator([pSeparator]),quote(''),terminator(pTerminator)));
 																			
 				SHARED DS_DeltaBase			:= dataset(FraudGovPlatform.Filenames().Sprayed.FileSprayed+'::'+ fname,
 												{string75 fn { virtual(logicalfilename)},FraudGovPlatform.Layouts.Sprayed.Deltabase},

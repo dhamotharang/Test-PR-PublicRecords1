@@ -1986,7 +1986,10 @@ EXPORT dsSourceCriteria := DATASET([
 {'FCDO (UK) Sanctions List - Non Asset Freeze','1973'},
 {'South Korea Financial Supervisory Service (FSS) Accounting Supervision Enforcement Actions','1974'},
 {'EC 2021/29 Syria List','1975'},
-{'EC 2021/30 CFSP Syria List','1976'}
-
+{'EC 2021/30 CFSP Syria List','1976'},
+{'EC (CFSP) 2021/55 Tunisia List','1977'},
+{'EC 2021/49 Tunisia List','1978'}
 ],r);
+
+
 

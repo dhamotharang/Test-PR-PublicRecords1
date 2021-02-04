@@ -15,8 +15,8 @@ EXPORT PersistenceStats(base,father,rec_id,cluster_id,output_name = '',pDoOutput
 	local cnt_new_recs_tot := COUNT(base_ded);
 	local cnt_old_recs_tot := COUNT(father_ded);
 	
-	local base_dist_cluster := DISTRIBUTE(base,cluster_id);
-	local father_dist_cluster := DISTRIBUTE(father,cluster_id);
+	local base_dist_cluster := DISTRIBUTE(table(base  ,{rec_id,cluster_id}),cluster_id);
+	local father_dist_cluster := DISTRIBUTE(table(father  ,{rec_id,cluster_id}),cluster_id);
 
 	local base_cluster_tot := TABLE(base_dist_cluster,{cluster_id},cluster_id,LOCAL);
 	local father_cluster_tot := TABLE(father_dist_cluster,{cluster_id},cluster_id,LOCAL);
