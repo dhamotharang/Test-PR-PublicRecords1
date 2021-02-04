@@ -1,4 +1,4 @@
-﻿import BizLinkFull, BIPV2_Company_Names, ut, SALT311, BIPV2_Best, BIPV2_Suppression;
+﻿import BizLinkFull, BIPV2_Company_Names, ut, SALT44, BIPV2_Best, BIPV2_Suppression;
 import std.Str AS Str;
 import Doxie;
 import dx_Header;
@@ -47,8 +47,8 @@ SHARED SearchInputc:=PROJECT(SearchInput,TRANSFORM({SearchInput;UNSIGNED6 cntr;S
   dZips:=BIPV2.fn_get_zips_2(sNewCity,sNewState,LEFT.zip5,LEFT.zip_radius_miles);
   Input_zip_radius:=LEFT.zip_radius_miles;
   SELF.zip_cases:=IF(dZips[1].zip='',DATASET([],THISMODULE.Process_Biz_Layouts.layout_zip_cases),PROJECT(dZips,TRANSFORM(THISMODULE.Process_Biz_Layouts.layout_zip_cases,SELF.weight:=100-((LEFT.radius/Input_zip_radius)*80);SELF:=LEFT;)));
-  SELF.city:=dZips[1].city;
-  SELF.state:=dZips[1].state;
+  SELF.city:=if(dZips[1].city='', left.city, dZips[1].city);
+  SELF.state:=if(dZips[1].state='', left.state, dZips[1].state);
   SELF.company_phone_3:=IF(LENGTH(TRIM(LEFT.phone10))=10,LEFT.phone10[..3],'');
   SELF.company_phone_7:=IF(LENGTH(TRIM(LEFT.phone10))=10,LEFT.phone10[4..10],IF(LENGTH(TRIM(LEFT.phone10))=7,TRIM(LEFT.phone10),''));
   SELF.company_name_prefix:='';//LEFT.company_name[..5];
@@ -64,28 +64,28 @@ SHARED SearchInputcnp:=PROJECT(SearchInputcnp0,TRANSFORM(RECORDOF(LEFT),SELF.com
 SHARED Template:=DATASET([],THISMODULE.Process_Biz_Layouts.InputLayout);
 SHARED SALTInput2_:=PROJECT(SearchInputcnp,TRANSFORM({THISMODULE.Process_Biz_Layouts.InputLayout;STRING30 acctno;},
   SELF.UniqueID       := (TYPEOF(Template.UniqueID))LEFT.cntr;
-  SELF.company_name_prefix:=(TYPEOF(Template.company_name_prefix))THISMODULE.Fields.Make_company_name_prefix((SALT311.StrType)LEFT.company_name_prefix);
+  SELF.company_name_prefix:=(TYPEOF(Template.company_name_prefix))THISMODULE.Fields.Make_company_name_prefix((SALT44.StrType)LEFT.company_name_prefix);
   SELF.cnp_number     := (TYPEOF(Template.cnp_number))LEFT.cnp_number;
   SELF.cnp_btype      := (TYPEOF(Template.cnp_btype))LEFT.cnp_btype;
   SELF.cnp_lowv       := (TYPEOF(Template.cnp_lowv))LEFT.cnp_lowv;
-  SELF.cnp_name       := (TYPEOF(Template.cnp_name))THISMODULE.Fields.Make_cnp_name((SALT311.StrType)LEFT.cnp_name);
+  SELF.cnp_name       := (TYPEOF(Template.cnp_name))THISMODULE.Fields.Make_cnp_name((SALT44.StrType)LEFT.cnp_name);
   SELF.prim_range     := (TYPEOF(Template.prim_range))LEFT.prim_range;
-  SELF.prim_name      := (TYPEOF(Template.prim_name))THISMODULE.Fields.Make_prim_name((SALT311.StrType)LEFT.prim_name);
-  SELF.sec_range      := (TYPEOF(Template.sec_range))THISMODULE.Fields.Make_sec_range((SALT311.StrType)LEFT.sec_range);   
-  SELF.city           := (TYPEOF(Template.city))THISMODULE.Fields.Make_city((SALT311.StrType)LEFT.city);
-  SELF.st             := (TYPEOF(Template.st))THISMODULE.Fields.Make_st((SALT311.StrType)LEFT.state);
+  SELF.prim_name      := (TYPEOF(Template.prim_name))THISMODULE.Fields.Make_prim_name((SALT44.StrType)LEFT.prim_name);
+  SELF.sec_range      := (TYPEOF(Template.sec_range))THISMODULE.Fields.Make_sec_range((SALT44.StrType)LEFT.sec_range);   
+  SELF.city           := (TYPEOF(Template.city))THISMODULE.Fields.Make_city((SALT44.StrType)LEFT.city);
+  SELF.st             := (TYPEOF(Template.st))THISMODULE.Fields.Make_st((SALT44.StrType)LEFT.state);
   SELF.zip_cases      := LEFT.zip_cases;
   SELF.company_phone  := (TYPEOF(Template.company_phone))LEFT.phone10;
   SELF.company_phone_3:= IF(LEFT.allow7DigitMatch,'',(TYPEOF(Template.company_phone_3))LEFT.company_phone_3);
   SELF.company_phone_3_ex:= IF(LEFT.allow7DigitMatch,(TYPEOF(Template.company_phone_3))LEFT.company_phone_3,'');
   SELF.company_phone_7:= (TYPEOF(Template.company_phone_7))LEFT.company_phone_7;
   SELF.company_fein   := (TYPEOF(Template.company_fein))LEFT.fein;
-  SELF.company_url    := (TYPEOF(Template.company_url))THISMODULE.Fields.Make_company_url((SALT311.StrType)LEFT.url);
-  SELF.company_sic_code1:=(TYPEOF(Template.company_sic_code1))THISMODULE.Fields.Make_company_sic_code1((SALT311.StrType)LEFT.sic_code);
-  SELF.fname          := (TYPEOF(Template.fname))THISMODULE.Fields.Make_fname((SALT311.StrType)LEFT.contact_fname);
-  SELF.mname          := (TYPEOF(Template.mname))THISMODULE.Fields.Make_mname((SALT311.StrType)LEFT.contact_mname);
-  SELF.lname          := (TYPEOF(Template.lname))THISMODULE.Fields.Make_lname((SALT311.StrType)LEFT.contact_lname);
-  SELF.fname_preferred:= (TYPEOF(Template.fname_preferred))THISMODULE.Fields.Make_fname_preferred((SALT311.StrType)LEFT.fname_preferred);
+  SELF.company_url    := (TYPEOF(Template.company_url))THISMODULE.Fields.Make_company_url((SALT44.StrType)LEFT.url);
+  SELF.company_sic_code1:=(TYPEOF(Template.company_sic_code1))THISMODULE.Fields.Make_company_sic_code1((SALT44.StrType)LEFT.sic_code);
+  SELF.fname          := (TYPEOF(Template.fname))THISMODULE.Fields.Make_fname((SALT44.StrType)LEFT.contact_fname);
+  SELF.mname          := (TYPEOF(Template.mname))THISMODULE.Fields.Make_mname((SALT44.StrType)LEFT.contact_mname);
+  SELF.lname          := (TYPEOF(Template.lname))THISMODULE.Fields.Make_lname((SALT44.StrType)LEFT.contact_lname);
+  SELF.fname_preferred:= (TYPEOF(Template.fname_preferred))THISMODULE.Fields.Make_fname_preferred((SALT44.StrType)LEFT.fname_preferred);
   SELF.contact_email  := (TYPEOF(Template.contact_email))LEFT.Email;
   SELF.contact_ssn    := (TYPEOF(Template.contact_ssn))LEFT.contact_ssn;
   SELF.contact_did    := (TYPEOF(Template.contact_did))LEFT.contact_did;
@@ -99,6 +99,7 @@ SHARED SALTInput2_:=PROJECT(SearchInputcnp,TRANSFORM({THISMODULE.Process_Biz_Lay
   SELF := [];
 ));
 EXPORT SALTInput2:=PROJECT(SALTInput2_,THISMODULE.Process_Biz_Layouts.InputLayout);
+
 meowBizUidResults := THISMODULE.MEOW_Biz(SALTInput2).uid_results;
 // only seleid is in the input record
 passThruMissingIds := meowBizUidResults(ultid = 0 and seleid != 0);
@@ -112,6 +113,7 @@ passThru :=
 currentIds := meowBizUidResults(not (ultid = 0 and seleid != 0)) + passThru;
 
 EXPORT uid_results := BIPV2_Suppression.macSuppress(currentIds);  //Added this for BIPV2_xLink.fn_bdid_append (for BIPV2_xLink.MAC_BDID_Append for BIID and others)
+
 EXPORT uid_results_w_acct:=JOIN(uid_results,SearchInputc,LEFT.uniqueid=RIGHT.cntr,TRANSFORM({RECORDOF(LEFT);TYPEOF(RIGHT.acctno) acctno;},SELF.acctno:=RIGHT.acctno;SELF:=LEFT;));
 // EXPORT Raw_Results2 := THISMODULE.MEOW_Biz(SALTInput2).Raw_Results;  //Added this for BIPV2_xLink.fn_bdid_append (for BIPV2_xLink.MAC_BDID_Append for BIID and others)
 //EXPORT Data_Tmp := THISMODULE.MEOW_Biz(SALTInput2).Data_Tmp;  //This is where the magic happens
@@ -129,6 +131,7 @@ EXPORT SALTOutput2 := PROJECT(SALTOutput2_before_is_truncated,
 	SELF.is_truncated:= LEFT.istruncated; // JA 20190505 - SALT field named isTruncated, but some queries reference older hacked field is_truncated
 	SELF:=LEFT;
 ));
+
 EXPORT raw_data := THISMODULE.MEOW_Biz(SALTInput2).raw_data;  //For now, this just supports SeleBest work below
 
 SHARED outrec2:=RECORD
