@@ -1,14 +1,15 @@
 ﻿EXPORT Externals := MODULE
-  IMPORT SALT311,BizLinkFull;// Gather up the UID counts from each of the children - provides 'we also found' capability
+  IMPORT SALT44,BizLinkFull;// Gather up the UID counts from each of the children - provides 'we also found' capability
 SHARED AllEfr0 := Mod_Ext_Data().EFR;
  
 EXPORT EFRKeyName := '~'+'key::BizLinkFull::proxid::EFR';
+ 
 // Need to compute the 'rolled up' counts for parents in hierarchy
   R1 := RECORD
     AllEFR0.Child_Id;
     AllEFR0.ChildId_BMap;
     Cnt := SUM(GROUP,AllEFR0.Cnt);
-    SALT311.UIDType proxid := 0;
+    SALT44.UIDType proxid := 0;
     AllEFR0.seleid;
     AllEFR0.orgid;
     AllEFR0.ultid;
@@ -18,8 +19,8 @@ EXPORT EFRKeyName := '~'+'key::BizLinkFull::proxid::EFR';
     AllEFR1.Child_Id;
     AllEFR1.ChildId_BMap;
     Cnt := SUM(GROUP,AllEFR1.Cnt);
-    SALT311.UIDType proxid := 0;
-    SALT311.UIDType seleid := 0;
+    SALT44.UIDType proxid := 0;
+    SALT44.UIDType seleid := 0;
     AllEFR1.orgid;
     AllEFR1.ultid;
   END;
@@ -28,13 +29,14 @@ EXPORT EFRKeyName := '~'+'key::BizLinkFull::proxid::EFR';
     AllEFR2.Child_Id;
     AllEFR2.ChildId_BMap;
     Cnt := SUM(GROUP,AllEFR2.Cnt);
-    SALT311.UIDType proxid := 0;
-    SALT311.UIDType seleid := 0;
-    SALT311.UIDType orgid := 0;
+    SALT44.UIDType proxid := 0;
+    SALT44.UIDType seleid := 0;
+    SALT44.UIDType orgid := 0;
     AllEFR2.ultid;
   END;
   AllEFR3 := TABLE(AllEFR2,R3,ultid,Child_Id,ChildId_BMap,MERGE);
   AllEFR4 := AllEFR0 + PROJECT(AllEFR1,Ext_Layouts.EFRR_Layout) + PROJECT(AllEFR2,Ext_Layouts.EFRR_Layout) + PROJECT(AllEFR3,Ext_Layouts.EFRR_Layout);
+ 
   m := GROUP(AllEfr4(~(proxid = 0 AND seleid = 0 AND orgid = 0 AND ultid = 0)),ultid,orgid,seleid,proxid,ALL);
   r := ROLLUP(m,GROUP,TRANSFORM(Ext_Layouts.EFR_Layout,
         SELF.ChildID_BMap := ROLLUP(ROWS(LEFT),TRANSFORM(Ext_Layouts.EFRR_Layout,SELF.ChildId_BMap := LEFT.ChildID_BMap | RIGHT.ChildId_BMap,SELF := RIGHT),ultid,orgid,seleid,proxid)[1].ChildId_BMap,
@@ -45,7 +47,7 @@ EXPORT EFR := INDEX(r,{ultid,orgid,seleid,proxid},{r},EFRKeyName,OPT);
 EXPORT FetchEFR(DATASET(Process_Biz_Layouts.id_stream_layout) idstream) := FUNCTION
   Raw := JOIN(idstream,efr,(LEFT.ultid = RIGHT.ultid) AND (LEFT.orgid = 0 OR LEFT.orgid = RIGHT.orgid) AND (LEFT.seleid = 0 OR LEFT.seleid = RIGHT.seleid) AND (LEFT.proxid = 0 OR LEFT.proxid = RIGHT.proxid),LEFT OUTER);
   R := RECORD
-    SALT311.UIDType UniqueID;
+    SALT44.UIDType UniqueID;
     UNSIGNED2 Child_Id;
     UNSIGNED4 Cnt;
   END;
