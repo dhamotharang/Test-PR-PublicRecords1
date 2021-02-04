@@ -13,14 +13,7 @@ self.dbconsgenderdesc := map(l.db_cons_gender = 'U' =>	'UNSPECIFIED',
 															 l.db_cons_gender = 'M' =>	'MALE',
 															 l.db_cons_gender = 'F' => 'FEMALE',
 															 '**|'+ l.db_cons_gender);
-self.db_cons_time_zone_code := map(l.db_cons_time_zone_code = 'E'  => '5',
-										 l.db_cons_time_zone_code = 'C'  => '6',
-										 l.db_cons_time_zone_code = 'M'  => '7',
-										 l.db_cons_time_zone_code = 'P'  => '8',
-										 l.db_cons_time_zone_code = 'A'  => '9',
-										 l.db_cons_time_zone_code = 'H'  => '10',
-										 l.db_cons_time_zone_code = '' or l.db_cons_time_zone_code = ' ' => '',
-										 '**|'+ l.TimeZone);
+self.db_cons_time_zone_code := '';
 self.dbconsethnicdesc := map( l.db_cons_ethnic_code >=  'A1'  and l.db_cons_ethnic_code <= 'S5' => 'AFRICAN AMERICAN',
 								l.db_cons_ethnic_code >=  'U1'  and l.db_cons_ethnic_code <= 'U5' => 'AFRICAN AMERICAN',
 								l.db_cons_ethnic_code >=  'W1'  and l.db_cons_ethnic_code <= 'W5' => 'AFRICAN AMERICAN',
@@ -538,40 +531,41 @@ self.DB_Cons_Children_Present := map(l.DB_Cons_Children_Present = '1' => '1',
                                      l.DB_Cons_Children_Present = 'N' => '0',																		 
                                      l.DB_Cons_Children_Present = '' or l.DB_Cons_Children_Present = ' ' => '',
 																		 '**|'+ l.DB_Cons_Children_Present);
-self.DB_Cons_Donor_Capacity_Code := map(l.DB_Cons_Donor_Capacity_Code <= '499'                                               => 'A',
-																		    l.DB_Cons_Donor_Capacity_Code >= '500'  and l.DB_Cons_Donor_Capacity_Code <= '999'   => 'B',
-																		    l.DB_Cons_Donor_Capacity_Code >= '1000' and l.DB_Cons_Donor_Capacity_Code <= '2499'  => 'C',
-																		    l.DB_Cons_Donor_Capacity_Code >= '2500' and l.DB_Cons_Donor_Capacity_Code <= '4999'  => 'D',
-																		    l.DB_Cons_Donor_Capacity_Code >= '5000'                                              => 'E',
-																		    l.DB_Cons_Donor_Capacity_Code = '' or l.DB_Cons_Donor_Capacity_Code = ' '            => '',
-																		    '**|'+ l.DB_Cons_Donor_Capacity_Code);
-self.DB_Cons_Donor_Capacity_Desc := map(l.DB_Cons_Donor_Capacity_Code <= '499'                                               => 'Up to $499',
-																		    l.DB_Cons_Donor_Capacity_Code >= '500'  and l.DB_Cons_Donor_Capacity_Code <= '999'   => '$500 to $999',
-																		    l.DB_Cons_Donor_Capacity_Code >= '1000' and l.DB_Cons_Donor_Capacity_Code <= '2499'  => '$1,000 to $2,499',
-																		    l.DB_Cons_Donor_Capacity_Code >= '2500' and l.DB_Cons_Donor_Capacity_Code <= '4999'  => '$2,500 to $4,999',
-																		    l.DB_Cons_Donor_Capacity_Code >= '5000'                                              => 'Over $5,000',
-																		    l.DB_Cons_Donor_Capacity_Code = '' or l.DB_Cons_Donor_Capacity_Code = ' '            => '',
-																		    '**|'+ L.DB_Cons_Donor_Capacity_Code);
-self.DB_Cons_DiscretIncomeCode := map(l.DB_Cons_DiscretIncome <= '9999'                                           => 'A',
-																		  l.DB_Cons_DiscretIncome >= '10000'  and l.DB_Cons_DiscretIncome <= '29999'  => 'B',
-																		  l.DB_Cons_DiscretIncome >= '30000'  and l.DB_Cons_DiscretIncome <= '49999'  => 'C',
-																		  l.DB_Cons_DiscretIncome >= '50000'  and l.DB_Cons_DiscretIncome <= '69999'  => 'D',
-																		  l.DB_Cons_DiscretIncome >= '70000'  and l.DB_Cons_DiscretIncome <= '99999'  => 'E',
-																		  l.DB_Cons_DiscretIncome >= '100000' and l.DB_Cons_DiscretIncome <= '124999' => 'F',
-																		  l.DB_Cons_DiscretIncome >= '125000' and l.DB_Cons_DiscretIncome <= '149999' => 'G',
-																		  l.DB_Cons_DiscretIncome >= '150000'                                         => 'H',
+self.DB_Cons_Donor_Capacity_Code := map((INTEGER)l.DB_Cons_Donor_Capacity <= 499                                               => 'A',
+																		    (INTEGER)l.DB_Cons_Donor_Capacity >= 500  and (INTEGER)l.DB_Cons_Donor_Capacity <= 999   => 'B',
+																		    (INTEGER)l.DB_Cons_Donor_Capacity >= 1000 and (INTEGER)l.DB_Cons_Donor_Capacity <= 2499  => 'C',
+																		    (INTEGER)l.DB_Cons_Donor_Capacity >= 2500 and (INTEGER)l.DB_Cons_Donor_Capacity <= 4999  => 'D',
+																		    (INTEGER)l.DB_Cons_Donor_Capacity >= 5000                                              => 'E',
+																		    l.DB_Cons_Donor_Capacity = '' or l.DB_Cons_Donor_Capacity = ' '            => '',
+																		    '**|'+ l.DB_Cons_Donor_Capacity);
+self.DB_Cons_Donor_Capacity_Desc := map((INTEGER)l.DB_Cons_Donor_Capacity <= 499                                               => 'Up to $499',
+																		    (INTEGER)l.DB_Cons_Donor_Capacity >= 500 and (INTEGER)l.DB_Cons_Donor_Capacity <= 999   => '$500 to $999',
+																		    (INTEGER)l.DB_Cons_Donor_Capacity >= 1000 and (INTEGER)l.DB_Cons_Donor_Capacity <= 2499  => '$1,000 to $2,499',
+																		    (INTEGER)l.DB_Cons_Donor_Capacity >= 2500 and (INTEGER)l.DB_Cons_Donor_Capacity <= 4999  => '$2,500 to $4,999',
+																		    (INTEGER)l.DB_Cons_Donor_Capacity >= 5000                                              => 'Over $5,000',
+																		    l.DB_Cons_Donor_Capacity = '' or l.DB_Cons_Donor_Capacity_Code = ' '            => '',
+																		    '**|'+ L.DB_Cons_Donor_Capacity);	
+self.DB_Cons_DiscretIncomeCode := map((INTEGER)l.DB_Cons_DiscretIncome <= 9999                                           => 'A',
+																		  (INTEGER)l.DB_Cons_DiscretIncome >= 10000  and (INTEGER)l.DB_Cons_DiscretIncome <= 29999  => 'B',
+																		  (INTEGER)l.DB_Cons_DiscretIncome >= 30000  and (INTEGER)l.DB_Cons_DiscretIncome <= 49999  => 'C',
+																		  (INTEGER)l.DB_Cons_DiscretIncome >= 50000  and (INTEGER)l.DB_Cons_DiscretIncome <= 69999  => 'D',
+																		  (INTEGER)l.DB_Cons_DiscretIncome >= 70000  and (INTEGER)l.DB_Cons_DiscretIncome <= 99999  => 'E',
+																		  (INTEGER)l.DB_Cons_DiscretIncome >= 100000 and (INTEGER)l.DB_Cons_DiscretIncome <= 124999 => 'F',
+																		  (INTEGER)l.DB_Cons_DiscretIncome >= 125000 and (INTEGER)l.DB_Cons_DiscretIncome <= 149999 => 'G',
+																		  (INTEGER)l.DB_Cons_DiscretIncome >= 150000                                         => 'H',
 																		  l.DB_Cons_DiscretIncome = '' or l.DB_Cons_DiscretIncome = ' '               => '',
 																		  '**|'+ l.DB_Cons_DiscretIncome);
-self.DB_Cons_DiscretIncomeDesc:= map(l.DB_Cons_DiscretIncome  <= '9999'                                           => 'Up to $9,999',
-																		  l.DB_Cons_DiscretIncome >= '10000'  and l.DB_Cons_DiscretIncome <= '29999'  => '$10,000 to $29,000',
-																		  l.DB_Cons_DiscretIncome >= '30000'  and l.DB_Cons_DiscretIncome <= '49999'  => '$30,000 to $49,000',
-																		  l.DB_Cons_DiscretIncome >= '50000'  and l.DB_Cons_DiscretIncome <= '69999'  => '$50,000 to $69,000',
-																		  l.DB_Cons_DiscretIncome >= '70000'  and l.DB_Cons_DiscretIncome <= '99999'  => '$70,000 to $99,000',
-																		  l.DB_Cons_DiscretIncome >= '100000' and l.DB_Cons_DiscretIncome <= '124999' => '$100,000 to $124,000',
-																		  l.DB_Cons_DiscretIncome >= '125000' and l.DB_Cons_DiscretIncome <= '149999' => '$125,000 to $149,000',
-																		  l.DB_Cons_DiscretIncome >= '150000'                                         => 'Over $150,000',
+self.DB_Cons_DiscretIncomeDesc:= map((INTEGER)l.DB_Cons_DiscretIncome  <= 9999                                           => 'Up to $9,999',
+																		  (INTEGER)l.DB_Cons_DiscretIncome >= 10000  and (INTEGER)l.DB_Cons_DiscretIncome <= 29999  => '$10,000 to $29,000',
+																		  (INTEGER)l.DB_Cons_DiscretIncome >= 30000  and (INTEGER)l.DB_Cons_DiscretIncome <= 49999  => '$30,000 to $49,000',
+																		  (INTEGER)l.DB_Cons_DiscretIncome >= 50000  and (INTEGER)l.DB_Cons_DiscretIncome <= 69999  => '$50,000 to $69,000',
+																		  (INTEGER)l.DB_Cons_DiscretIncome >= 70000  and (INTEGER)l.DB_Cons_DiscretIncome <= 99999  => '$70,000 to $99,000',
+																		  (INTEGER)l.DB_Cons_DiscretIncome >= 100000 and (INTEGER)l.DB_Cons_DiscretIncome <= 124999 => '$100,000 to $124,000',
+																		  (INTEGER)l.DB_Cons_DiscretIncome >= 125000 and (INTEGER)l.DB_Cons_DiscretIncome <= 149999 => '$125,000 to $149,000',
+																		  (INTEGER)l.DB_Cons_DiscretIncome >= 150000                                         => 'Over $150,000',
 																		  l.DB_Cons_DiscretIncome = '' or l.DB_Cons_DiscretIncome = ' '               => '',
-																		  '**|'+ l.DB_Cons_DiscretIncome);
+																		  '**|'+ l.DB_Cons_DiscretIncome);																			
+																			
 self.DB_Cons_New_Teen_Driver := map(l.DB_Cons_New_Teen_Driver = 'A' => '1',
 																		l.DB_Cons_New_Teen_Driver = 'B' => '1',
 																		l.DB_Cons_New_Teen_Driver = ' ' or l.DB_Cons_New_Teen_Driver = '' => '',
@@ -594,20 +588,21 @@ self.DB_Cons_Education_Ind := map(l.DB_Cons_Education_Ind = '1' => 'A',
 																l.DB_Cons_Education_Ind   = '4' => 'D',
 																l.DB_Cons_Education_Ind   = '' or l.DB_Cons_Education_Ind = ' ' => '',
 																'**|'+l.DB_Cons_Education_Ind);	
-self.DB_Cons_UnsecuredCredCapCode := map(l.DB_Cons_UnsecuredCredCap < '5000'  => 'A',
-																						l.DB_Cons_UnsecuredCredCap >= '5000' AND l.DB_Cons_UnsecuredCredCap <= '9999'  => 'B',
-																						l.DB_Cons_UnsecuredCredCap >= '10000' AND l.DB_Cons_UnsecuredCredCap <= '24999' => 'C',
-																						l.DB_Cons_UnsecuredCredCap >= '25000' AND l.DB_Cons_UnsecuredCredCap <= '49999' => 'D',
-																						l.DB_Cons_UnsecuredCredCap >= '50000' AND l.DB_Cons_UnsecuredCredCap <= '99999' => '$50000 TO $99999',
-																						l.DB_Cons_UnsecuredCredCap > '99999'  => 'OVER $100000',
+self.DB_Cons_UnsecuredCredCapCode := map((INTEGER)l.DB_Cons_UnsecuredCredCap < 5000  => 'A',
+																						(INTEGER)l.DB_Cons_UnsecuredCredCap >= 5000 AND (INTEGER)l.DB_Cons_UnsecuredCredCap <= 9999  => 'B',
+																						(INTEGER)l.DB_Cons_UnsecuredCredCap >= 10000 AND (INTEGER)l.DB_Cons_UnsecuredCredCap <= 24999 => 'C',
+																						(INTEGER)l.DB_Cons_UnsecuredCredCap >= 25000 AND (INTEGER)l.DB_Cons_UnsecuredCredCap <= 49999 => 'D',
+																						(INTEGER)l.DB_Cons_UnsecuredCredCap >= 50000 AND (INTEGER)l.DB_Cons_UnsecuredCredCap <= 99999 => '$50000 TO $99999',
+																						(INTEGER)l.DB_Cons_UnsecuredCredCap > 99999  => 'OVER $100000',
 																            '**|'+l.DB_Cons_UnsecuredCredCap);												
-self.DB_Cons_UnsecuredCredCapDesc := map(l.DB_Cons_UnsecuredCredCap < '5000'  => 'UP TO $4999',
-																						l.DB_Cons_UnsecuredCredCap >= '5000' AND l.DB_Cons_UnsecuredCredCap <= '9999' => '$5000 TO $9999',
-																						l.DB_Cons_UnsecuredCredCap >= '10000' AND l.DB_Cons_UnsecuredCredCap <= '24999' => '$10000 TO $24999',
-																						l.DB_Cons_UnsecuredCredCap >= '25000' AND l.DB_Cons_UnsecuredCredCap <= '49999' => '$25000 TO $49999',
-																						l.DB_Cons_UnsecuredCredCap >= '50000' AND l.DB_Cons_UnsecuredCredCap <= '99999' => '$50000 TO $99999',
-																						l.DB_Cons_UnsecuredCredCap > '99999'  => 'OVER $100000',
-																            '**|'+l.DB_Cons_UnsecuredCredCap);													
+self.DB_Cons_UnsecuredCredCapDesc := map((INTEGER)l.DB_Cons_UnsecuredCredCap < 5000  => 'UP TO $4999',
+																						(INTEGER)l.DB_Cons_UnsecuredCredCap >= 5000 AND (INTEGER)l.DB_Cons_UnsecuredCredCap <= 9999 => '$5000 TO $9999',
+																						(INTEGER)l.DB_Cons_UnsecuredCredCap >= 10000 AND (INTEGER)l.DB_Cons_UnsecuredCredCap <= 24999 => '$10000 TO $24999',
+																						(INTEGER)l.DB_Cons_UnsecuredCredCap >= 25000 AND (INTEGER)l.DB_Cons_UnsecuredCredCap <= 49999 => '$25000 TO $49999',
+																						(INTEGER)l.DB_Cons_UnsecuredCredCap >= 50000 AND (INTEGER)l.DB_Cons_UnsecuredCredCap <= 99999 => '$50000 TO $99999',
+																						(INTEGER)l.DB_Cons_UnsecuredCredCap > 99999  => 'OVER $100000',
+																            '**|'+l.DB_Cons_UnsecuredCredCap);																							
+																						
 self.DB_Cons_Length_Of_Res_Code := map(l.DB_Cons_Length_Of_Res_Code = 'U' => '',
 																			 l.DB_Cons_Length_Of_Res_Code);															
 self.DB_Cons_Length_Of_Res_Desc := map(l.DB_Cons_Length_Of_Res_Desc = 'UNKNOWN' => '',
@@ -620,7 +615,6 @@ dPatchBase := project(Base_In_Database_USA, fPatchBase(LEFT));
 
 OUTPUT(dPatchBase,,'~thor_data400::base::database_usa::20200428::data::patched',overwrite,__compressed__,named('dPatchBase')); 
 	
-// newPatchedBase :=	DATASET('~thor_data400::base::database_usa::20200428::data::patched',Database_USA.Layouts.Base,THOR);
 newPatchedBase := dPatchBase;
 
 searchpattern := U8'\\u002A';
