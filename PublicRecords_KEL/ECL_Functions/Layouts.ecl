@@ -259,6 +259,7 @@ EXPORT LayoutAppendedAddresses := RECORD
 		STRING6 P_InpValDOBInvalidFlag,
 		STRING6 P_InpValEmailInvalidFlag,
 		STRING6 P_InpValArchDtInvalidFlag,
+		STRING6 P_InpSSNIs4Digits;
 		INTEGER4 PI_InpAddrAVMVal;
 		INTEGER4 PI_InpAddrAVMValA1Y;
 		DECIMAL7_2 PI_InpAddrAVMRatio1Y;
@@ -1034,7 +1035,7 @@ EXPORT LayoutAppendedAddresses := RECORD
 	SHARED LayoutPersonInternal := RECORD
 		STRING6	P_LexIDSeenFlag;
 		STRING12 P_LexIDCategory;
-		STRING6 P_LexIDIsDeceased;
+		STRING6 P_LexIDIsDeceasedFlag;
 		INTEGER3 PL_EmrgAge;
 		INTEGER3 PL_AstVehAutoCntEv;
 		STRING	PL_AstVehAutoEmrgDtListEv;
