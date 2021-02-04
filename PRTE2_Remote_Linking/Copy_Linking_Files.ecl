@@ -36,8 +36,6 @@ EXPORT fnCopyFromProd(STRING prev_version, STRING current_version, string dest_c
  CopyFiles1(data_services.foreign_prod + 'thor_data400::insuranceheader_remotelinking::did::word::locale::' + prev_version + '::publish','~prte::insuranceheader_remotelinking::did::word::locale::' + current_version + '::publish',dest_cluster); 
  CopyFiles1(data_services.foreign_prod + 'thor_data400::insuranceheader_remotelinking::did::word::address::' + prev_version + '::publish','~prte::insuranceheader_remotelinking::did::word::address::' + current_version + '::publish',dest_cluster); 
  CopyFiles1(data_services.foreign_prod + 'thor_data400::insuranceheader_remotelinking::did::word::fullname::' + prev_version + '::publish','~prte::insuranceheader_remotelinking::did::word::fullname::' + current_version + '::publish',dest_cluster); 
- CopyFiles1(data_services.foreign_prod + 'thor_data400::insuranceheader_remotelinking::did::word::dt_first_seen::' + prev_version + '::publish','~prte::insuranceheader_remotelinking::did::word::dt_first_seen::' + current_version + '::publish',dest_cluster); 
- CopyFiles1(data_services.foreign_prod + 'thor_data400::insuranceheader_remotelinking::did::word::dt_last_seen::' + prev_version + '::publish','~prte::insuranceheader_remotelinking::did::word::dt_last_seen::' + current_version + '::publish',dest_cluster); 
  CopyFiles1(data_services.foreign_prod + 'thor_data400::insuranceheader_remotelinking::did::word::specificities::' + prev_version + '::publish','~prte::insuranceheader_remotelinking::did::word::specificities::' + current_version + '::publish',dest_cluster); 
  
 
