@@ -1,6 +1,6 @@
 ﻿import Business_Header_SS,corp2,BIPV2,business_header,ut,AutoStandardI,tools
        ,acf,diversity_certification,govdata,gsa,insurance_certification,martindale_hubbell
-			 ,ncpdp,oig,one_click_data,poesfromemails,poesfromutilities,redbooks,saleschannel,sda_sdaa
+			 ,ncpdp,oig,one_click_data,poesfromemails,poesfromutilities,redbooks,saleschannel,sda_sdaa,Equifax_Business_Data
 			 ,teletrack,thrive,mdr,BIPV2_Suppression,bipv2_files,BIPV2_Tools,Suppress, Address;
 import BIPV2_Contacts;
 
@@ -27,6 +27,7 @@ module
 														+sda_sdaa.SDA_SDAA_As_Business_Linking_Contact()
 														//+teletrack.As_Business_Linking_Contact()				 //*** Removed teletrack as per bug# 132603.
 														//+thrive.As_Business_Linking_Contact()						 //*** Removed thrive as per bug# 132603.
+														+ Equifax_Business_Data.As_Business_Linking_Contact()
 														;
 
   didding_layout := {

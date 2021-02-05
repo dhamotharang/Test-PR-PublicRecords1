@@ -5,7 +5,12 @@ EXPORT Infiles := MODULE
 // ###########################################################################
 //                        MBS Agency Raw File
 // ###########################################################################	
-  EXPORT Agency := Files_MBSAgency.DS_BASE_AGENCY;	
+  EXPORT Agency := PROJECT(Files_MBSAgency.DS_BASE_AGENCY, TRANSFORM(Layout_Infiles_Fixed.agency, 
+	                                                          SELF.Agency_name := MAP(LEFT.agency_id = '1671327' => 'CHRISTIAN COUNTY CONST DIST 6',
+																														                        LEFT.agency_id = '1677717' => 'LINCOLN COUNTY CONSTABLE DIST3',
+																																										LEFT.Agency_name);
+																														SELF := LEFT));	
+	
 	SHARED AgencyInput := PROJECT(Agency, TRANSFORM(Layout_Infiles_Fixed.agency, 
                                 SELF.agency_id := IF(TRIM(LEFT.agency_id, LEFT, RIGHT) <> '', LEFT.agency_id, ERROR('agency file bad')),
                                 SELF := LEFT));
