@@ -4,8 +4,8 @@ IMPORT B_Inquiry_2,CFG_Compile,E_Inquiry FROM PublicRecords_KEL;
 IMPORT * FROM KEL15.Null;
 EXPORT B_Inquiry_1(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG_Compile __cfg = CFG_Compile) := MODULE
   SHARED VIRTUAL TYPEOF(B_Inquiry_2(__in,__cfg).__ENH_Inquiry_2) __ENH_Inquiry_2 := B_Inquiry_2(__in,__cfg).__ENH_Inquiry_2;
-  SHARED __EE8152688 := __ENH_Inquiry_2;
-  EXPORT __ST310159_Layout := RECORD
+  SHARED __EE8179779 := __ENH_Inquiry_2;
+  EXPORT __ST328086_Layout := RECORD
     KEL.typ.nint Lex_I_D_;
     KEL.typ.nstr First_Name_;
     KEL.typ.nstr Last_Name_;
@@ -31,14 +31,14 @@ EXPORT B_Inquiry_1(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG_Com
     KEL.typ.epoch Vault_Date_Last_Seen_ := 0;
     KEL.typ.int __RecordCount := 0;
   END;
-  EXPORT __ST310132_Layout := RECORD
+  EXPORT __ST328059_Layout := RECORD
     KEL.typ.nuid UID;
     KEL.typ.nstr Transaction_I_D_;
     KEL.typ.nstr Sequence_Number_;
     KEL.typ.ndataset(E_Inquiry(__in,__cfg).Search_Info_Layout) Search_Info_;
     KEL.typ.ndataset(E_Inquiry(__in,__cfg).Permissions_Layout) Permissions_;
     KEL.typ.ndataset(E_Inquiry(__in,__cfg).Bus_Intel_Layout) Bus_Intel_;
-    KEL.typ.ndataset(__ST310159_Layout) Person_Info_;
+    KEL.typ.ndataset(__ST328086_Layout) Person_Info_;
     KEL.typ.ndataset(E_Inquiry(__in,__cfg).Business_Info_Layout) Business_Info_;
     KEL.typ.nint Fraudpoint_Score_;
     KEL.typ.ndataset(E_Inquiry(__in,__cfg).Data_Sources_Layout) Data_Sources_;
@@ -63,10 +63,10 @@ EXPORT B_Inquiry_1(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG_Com
     KEL.typ.epoch Vault_Date_Last_Seen_ := 0;
     KEL.typ.int __RecordCount := 0;
   END;
-  SHARED __ST310132_Layout __ND8152693__Project(B_Inquiry_2(__in,__cfg).__ST309900_Layout __PP8152689) := TRANSFORM
-    __EE8152763 := __PP8152689.Person_Info_;
-    SELF.Person_Info_ := __BN(PROJECT(__T(__EE8152763),__ST310159_Layout),__NL(__EE8152763));
-    SELF := __PP8152689;
+  SHARED __ST328059_Layout __ND8179784__Project(B_Inquiry_2(__in,__cfg).__ST327827_Layout __PP8179780) := TRANSFORM
+    __EE8179854 := __PP8179780.Person_Info_;
+    SELF.Person_Info_ := __BN(PROJECT(__T(__EE8179854),__ST328086_Layout),__NL(__EE8179854));
+    SELF := __PP8179780;
   END;
-  EXPORT __ENH_Inquiry_1 := PROJECT(__EE8152688,__ND8152693__Project(LEFT));
+  EXPORT __ENH_Inquiry_1 := PROJECT(__EE8179779,__ND8179784__Project(LEFT));
 END;

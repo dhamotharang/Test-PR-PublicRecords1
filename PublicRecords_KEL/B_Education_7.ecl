@@ -4,8 +4,8 @@ IMPORT CFG_Compile,E_Education FROM PublicRecords_KEL;
 IMPORT * FROM KEL15.Null;
 EXPORT B_Education_7(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG_Compile __cfg = CFG_Compile) := MODULE
   SHARED VIRTUAL TYPEOF(E_Education(__in,__cfg).__Result) __E_Education := E_Education(__in,__cfg).__Result;
-  SHARED __EE416663 := __E_Education;
-  EXPORT __ST255140_Layout := RECORD
+  SHARED __EE418257 := __E_Education;
+  EXPORT __ST256551_Layout := RECORD
     KEL.typ.nuid UID;
     KEL.typ.nstr College_Name_;
     KEL.typ.nstr L_N_College_Name_;
@@ -22,10 +22,10 @@ EXPORT B_Education_7(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG_C
     KEL.typ.epoch Vault_Date_Last_Seen_ := 0;
     KEL.typ.int __RecordCount := 0;
   END;
-  SHARED __ST255140_Layout __ND5254201__Project(E_Education(__in,__cfg).Layout __PP416537) := TRANSFORM
-    __BS416613 := __T(__PP416537.College_Characteristics_);
-    SELF.Edu_Rec_Flag_ := EXISTS(__BS416613(__T(__OP2(__T(__PP416537.College_Characteristics_).File_Type_,IN,__CN(['M','C','H','O'])))));
-    SELF := __PP416537;
+  SHARED __ST256551_Layout __ND5281152__Project(E_Education(__in,__cfg).Layout __PP418131) := TRANSFORM
+    __BS418207 := __T(__PP418131.College_Characteristics_);
+    SELF.Edu_Rec_Flag_ := EXISTS(__BS418207(__T(__OP2(__T(__PP418131.College_Characteristics_).File_Type_,IN,__CN(['M','C','H','O'])))));
+    SELF := __PP418131;
   END;
-  EXPORT __ENH_Education_7 := PROJECT(__EE416663,__ND5254201__Project(LEFT));
+  EXPORT __ENH_Education_7 := PROJECT(__EE418257,__ND5281152__Project(LEFT));
 END;
