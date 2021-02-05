@@ -212,7 +212,8 @@ EXPORT SmallBusiness_BIP_Combined_Service_Records (LNSmallBusiness.IParam.LNSmal
         LNSmallBusiness.SmallBusiness_BIP_Testseed_Function(SmallBizCombined_inmod.ds_SBA_Input,
                                                             (STRING32)SmallBizCombined_inmod.TestDataTableName,
                                                             SmallBizCombined_inmod.DataPermissionMask,
-                                                            ds_CombinedModelsRequested));
+                                                            ds_CombinedModelsRequested,
+                                                            SmallBizCombined_inmod.AttributesRequested));
 
     ds_NewModels:=	if(EXISTS(ds_CombinedModelsRequested(ModelName = BusinessCredit_Services.Constants.BLENDED_SCORE_SLBB)),
 							BusinessCredit_Services.Constants.MODEL_NAME_SETS.BLENDED_SLBB, 

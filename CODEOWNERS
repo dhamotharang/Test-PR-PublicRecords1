@@ -8,7 +8,16 @@
 /BIPV2_Suppression/* @BentleLA @kayttaax @presserl @wilmotkx
 /BIPV2_xlink_segmentation/* @wilmotkx @SkaggsDX @SuffZa01 @kayttaax
 /BizLinkFull/* @wilmotkx @SkaggsDX @SuffZa01 @kayttaax
+
+# [ut] is shared between all teams/departments
+/ut/* @kayttaax @LogemaKX @MyullyVA @CampDa01
+
+# ---- Public records ----
 /Doxie/* @MyullyVA @SantosRD @GummadKK
 /ConsumerDisclosure/* @SantosRD @ChekMa01
-/ut/* @kayttaax @LogemaKX @MyullyVA @CampDa01
+
+# Royalty codes
+/Royalty/Master.ecl @DahaRa01 @SantosRD @GummadKK
+/Royalty/Constants.ecl @DahaRa01 @SantosRD @GummadKK
+
 CODEOWNERS @GummadKK @BuckTW @MyullyVA
