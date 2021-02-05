@@ -50,6 +50,7 @@ EXPORT mac_Suppress(
   ,pTurnOffExtraOutputs         = 'false'   //if true, it will not output anything else except for returning the suppressed dataset, false it will do the outputs
   ,pShouldIncrementFile         = 'true'    //if true, it will explode the clusters where suppression was applied.  false = turn off explosions
   ,pReturnDebugFields           = 'false'    //if true, it will keep the extra fields.  false = return same layout as supplied
+  ,pForceExplosion              = 'false'    //if true, it will force the suppressed clusters to be exploded even if they have already been.  false = normal explosion if necessary.
 ) :=
 functionmacro
   
@@ -66,7 +67,7 @@ functionmacro
   // #UNIQUENAME(ECL_CODE                 )
 
 
-  import tools,BIPV2_Strata,Workman;
+  import tools,BIPV2_Strata,Workman,std;
   lSuppressionFile := pSuppressionFile;
 
   // --------------------------------------------------------------------------------------------------------------------------
@@ -113,18 +114,22 @@ functionmacro
 
     #APPEND(LIDFIELDFILTER  ,pSetIDsFieldFilter[%MYCOUNTER%])
 
-    #SET(CURRENTID  ,pSetIDsFieldFilter[%MYCOUNTER%])
+    #SET(CURRENTID  ,STD.Str.ToLowerCase(pSetIDsFieldFilter[%MYCOUNTER%]))
 
     #IF(trim(STD.Str.ToUpperCase(%'CURRENTID'%)) != trim(STD.Str.ToUpperCase(#TEXT(pRidField))) )
-      #APPEND(EXPLODEIDS  ,'get_ids_prep_' + %'CURRENTID'% + '        := self.fields_and_values_suppressed(exists(IDs_To_Explode(trim(fieldname) = \'' + %'CURRENTID'% + '\')));\n')
+      #APPEND(EXPLODEIDS  ,'get_ids_prep_' + %'CURRENTID'% + '        := self.fields_and_values_suppressed(exists(IDs_To_Explode(STD.Str.ToLowerCase(trim(fieldname)) = \'' + %'CURRENTID'% + '\')));\n')
       
-      #APPEND(EXPLODEIDS  ,'get_ids_prep2_'       + %'CURRENTID'% + ' := get_ids_prep_' + %'CURRENTID'% + '[1].IDs_To_Explode[1].fieldvalue;\n')
+      #APPEND(EXPLODEIDS  ,'get_ids_prep2_'       + %'CURRENTID'% + ' := get_ids_prep_' + %'CURRENTID'% + '[1].IDs_To_Explode(STD.Str.ToLowerCase(trim(fieldname)) = \'' + %'CURRENTID'% + '\')[1].fieldvalue;\n')
       #APPEND(EXPLODEIDS  ,'suppression_counter_' + %'CURRENTID'% + ' := get_ids_prep_' + %'CURRENTID'% + '[1].suppression_counter;\n')
 
       #APPEND(EXPLODEIDS  ,'self.' + %'CURRENTID'% + ' := map(\n')
-      #APPEND(EXPLODEIDS  ,'left.' + %'CURRENTID'% + ' = 0 or trim(self.fields_suppressed) = \'\' or suppression_counter_' + %'CURRENTID'% + ' > 0 or ~exists(get_ids_prep_' + %'CURRENTID'% + ') => left.' + %'CURRENTID'% + '  \n')
-
-      #APPEND(EXPLODEIDS  ,',exists(get_ids_prep_' + %'CURRENTID'% + ')              and suppression_counter_' + %'CURRENTID'% + ' < 1 => (typeof(left.' + %'CURRENTID'% + '))trim(get_field_value(get_ids_prep2_' + %'CURRENTID'% + ',left))\n')
+      #IF(pForceExplosion = false)
+        #APPEND(EXPLODEIDS  ,'left.' + %'CURRENTID'% + ' = 0 or trim(self.fields_suppressed) = \'\' or suppression_counter_' + %'CURRENTID'% + ' > 0 or ~exists(get_ids_prep_' + %'CURRENTID'% + ') => left.' + %'CURRENTID'% + '  \n')
+        #APPEND(EXPLODEIDS  ,',exists(get_ids_prep_' + %'CURRENTID'% + ')              and suppression_counter_' + %'CURRENTID'% + ' < 1 => (typeof(left.' + %'CURRENTID'% + '))trim(get_field_value(get_ids_prep2_' + %'CURRENTID'% + ',left))\n')
+      #ELSE
+        #APPEND(EXPLODEIDS  ,'left.' + %'CURRENTID'% + ' = 0 or trim(self.fields_suppressed) = \'\' or ~exists(get_ids_prep_' + %'CURRENTID'% + ') => left.' + %'CURRENTID'% + '  \n')
+        #APPEND(EXPLODEIDS  ,',exists(get_ids_prep_' + %'CURRENTID'% + ')               => (typeof(left.' + %'CURRENTID'% + '))trim(get_field_value(get_ids_prep2_' + %'CURRENTID'% + ',left))\n')
+      #END
        
       #APPEND(EXPLODEIDS  ,',                                                                 left.' + %'CURRENTID'% + ' \n')
       #APPEND(EXPLODEIDS  ,');\n')
@@ -132,10 +137,14 @@ functionmacro
 
       // ---------------------------------------------------------------------------------------------------------------------------------
       #APPEND(EXPLODEIDS  ,'self.didexplode_' + %'CURRENTID'% + ' := map(\n')
-      #APPEND(EXPLODEIDS  ,'left.' + %'CURRENTID'% + ' = 0 or trim(self.fields_suppressed) = \'\' or suppression_counter_' + %'CURRENTID'% + ' > 0 or ~exists(get_ids_prep_' + %'CURRENTID'% + ') => false \n')
-
-      #APPEND(EXPLODEIDS  ,',exists(get_ids_prep_' + %'CURRENTID'% + ')              and suppression_counter_' + %'CURRENTID'% + ' < 1 => true \n')
-       
+      #IF(pForceExplosion = false)
+        #APPEND(EXPLODEIDS  ,'left.' + %'CURRENTID'% + ' = 0 or trim(self.fields_suppressed) = \'\' or suppression_counter_' + %'CURRENTID'% + ' > 0 or ~exists(get_ids_prep_' + %'CURRENTID'% + ') => false \n')
+        #APPEND(EXPLODEIDS  ,',exists(get_ids_prep_' + %'CURRENTID'% + ')              and suppression_counter_' + %'CURRENTID'% + ' < 1 => true \n')
+      #ELSE
+        #APPEND(EXPLODEIDS  ,'left.' + %'CURRENTID'% + ' = 0 or trim(self.fields_suppressed) = \'\' or ~exists(get_ids_prep_' + %'CURRENTID'% + ') => false \n')
+        #APPEND(EXPLODEIDS  ,',exists(get_ids_prep_' + %'CURRENTID'% + ')               => true \n')
+      #END
+      
       #APPEND(EXPLODEIDS  ,',                                                                 false\n')
       #APPEND(EXPLODEIDS  ,');\n')
 
@@ -162,8 +171,8 @@ functionmacro
 
       #APPEND(PATCHIDS  ,'ds_proj_iterate_'  + %'CURRENTID'% + '  := iterate(ds_proj_group_'  + %'CURRENTID'% + ' ,transform(recordof(left),\n')
       #APPEND(PATCHIDS  ,'\n')
-      #APPEND(PATCHIDS  ,'   get_ids_prep_'  + %'CURRENTID'% + '_        := if(left.orig.'  + %'CURRENTID'% + '  = 0  ,right.fields_and_values_suppressed(exists(IDs_To_Explode(trim(fieldname) = \''  + %'CURRENTID'% + '\'))) ,left.fields_and_values_suppressed(exists(IDs_To_Explode(trim(fieldname) = \''  + %'CURRENTID'% + '\'))));\n')
-      #APPEND(PATCHIDS  ,'   get_ids_prep2_'  + %'CURRENTID'% + '_       := get_ids_prep_'  + %'CURRENTID'% + '_[1].IDs_To_Explode[1].fieldvalue;\n')
+      #APPEND(PATCHIDS  ,'   get_ids_prep_'  + %'CURRENTID'% + '_        := if(left.orig.'  + %'CURRENTID'% + '  = 0  ,right.fields_and_values_suppressed(exists(IDs_To_Explode(STD.Str.ToLowerCase(trim(fieldname)) = \''  + %'CURRENTID'% + '\'))) ,left.fields_and_values_suppressed(exists(IDs_To_Explode(trim(fieldname) = \''  + %'CURRENTID'% + '\'))));\n')
+      #APPEND(PATCHIDS  ,'   get_ids_prep2_'  + %'CURRENTID'% + '_       := get_ids_prep_'  + %'CURRENTID'% + '_[1].IDs_To_Explode(STD.Str.ToLowerCase(trim(fieldname)) = \''  + %'CURRENTID'% + '\')[1].fieldvalue;\n')
       #APPEND(PATCHIDS  ,'   suppression_counter_'  + %'CURRENTID'% + '_ := get_ids_prep_'  + %'CURRENTID'% + '_[1].suppression_counter;                                            \n')
       #APPEND(PATCHIDS  ,'\n')
       #APPEND(PATCHIDS  ,'   self.didexplode_'  + %'CURRENTID'% + '   := if(left.orig.'  + %'CURRENTID'% + '  = 0     ,right.didexplode_'  + %'CURRENTID'% + '  ,left.didexplode_'  + %'CURRENTID'% + ' ); // if this cluster had a record that was suppressed, make this sticky throughout the cluster.  first record in cluster should be record(s) that are suppressed based on above sort\n')
