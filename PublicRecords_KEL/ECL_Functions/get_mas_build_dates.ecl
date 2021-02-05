@@ -2,7 +2,7 @@
 EXPORT get_mas_build_dates(STRING variable_name) := FUNCTION
 	
 	//this function is similar to vault Risk_Indicators.get_build_date.  
-	
+	//if you add a build date to this list you must add a constent to PublicRecords_KEL.Library.LIB_BusinessAttributes
 	IsFCRA := FALSE : STORED('isFCRA');	
 	 
 	unsigned1 iType := IF(IsFCRA, data_services.data_env.iFCRA, data_services.data_env.iNonFCRA);

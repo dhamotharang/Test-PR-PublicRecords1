@@ -103,7 +103,8 @@ STRING100 Default_data_permission_mask := '';
     #STORED('IncludeAdditionalWatchListsValue', include_additional_watchlists);
     #STORED('Watchlists_RequestedValue', watchlists);
     #STORED('Global_Watchlist_ThresholdValue', Global_Watchlist_Threshold);
-  
+		#CONSTANT('IsFCRA', FALSE);
+ 
     // NetAcuity parameters
 	NetAcuityGW := GatewaysClean(STD.Str.ToLowerCase(servicename) = 'netacuity')[1];
 	#STORED('NetAcuityURL', NetAcuityGW.url);
@@ -197,6 +198,7 @@ STRING100 Default_data_permission_mask := '';
 	END;	
 	
 	IF(options.RetainInputLexid = FALSE AND options.BestPIIAppend = TRUE, FAIL('Insufficient Input'));
+
 
 
 	ResultSet := PublicRecords_KEL.FnRoxie_GetAttrs(ds_input, Options);		
