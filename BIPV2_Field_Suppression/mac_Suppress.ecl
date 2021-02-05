@@ -17,6 +17,7 @@ EXPORT mac_Suppress(
   ,pDebug                       = 'false'                                                                     //if true, it will add a debug output so you can see the calculations
   ,pTurnOffExtraOutputs         = 'true'                                                                      //if true, it will not output anything else except for returning the suppressed dataset, false it will do the outputs
   ,pOutputGeneratedEcl          = 'false'
+  ,pForceExplosion              = 'false'    //if true, it will force the suppressed clusters to be exploded even if they have already been.  false = normal explosion if necessary.
   
 ) :=
 functionmacro
@@ -39,6 +40,7 @@ functionmacro
     ,pTurnOffExtraOutputs         
     ,pShouldIncrementFile    
     ,pReturnDebugFields
+    ,pForceExplosion
   );
 
   return do_suppression_explosion;
