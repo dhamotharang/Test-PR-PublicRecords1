@@ -65,7 +65,7 @@ EXPORT Base_GenerationMod := MODULE(SALT311.iGenerationMod)
     + 'FIELDTYPE:Invalid_Clientassigneduniquerecordid:LIKE(Invalid_Num):LENGTHS(15,16)\n'
     + 'FIELDTYPE:Invalid_Emailaddress:CUSTOM(Scrubs.Functions.fn_valid_email > 0)\n'
     + 'FIELDTYPE:Invalid_Ipaddress:CUSTOM(Scrubs.Functions.fn_valid_IP > 0)\n'
-    + 'FIELDTYPE:Invalid_NID:LIKE(Invalid_Num):LENGTHS(18,19,20)\n'
+    + 'FIELDTYPE:Invalid_NID:LIKE(Invalid_Num):LENGTHS(0,18,19,20)\n'
     + 'FIELDTYPE:Invalid_Dir:ALLOW(NESW):LENGTHS(0..2)\n'
     + 'FIELDTYPE:Invalid_Add:SPACES( ):LIKE(Invalid_AlphaNum):WORDS(0..3)\n'
     + 'FIELDTYPE:Invalid_Add_Suff:LIKE(Invalid_AlphaNum):LENGTHS(0,2..4)\n'
