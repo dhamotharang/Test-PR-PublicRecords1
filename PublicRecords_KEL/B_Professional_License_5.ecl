@@ -4,8 +4,8 @@ IMPORT CFG_Compile,E_Professional_License FROM PublicRecords_KEL;
 IMPORT * FROM KEL15.Null;
 EXPORT B_Professional_License_5(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG_Compile __cfg = CFG_Compile) := MODULE
   SHARED VIRTUAL TYPEOF(E_Professional_License(__in,__cfg).__Result) __E_Professional_License := E_Professional_License(__in,__cfg).__Result;
-  SHARED __EE5396503 := __E_Professional_License;
-  EXPORT __ST248304_Layout := RECORD
+  SHARED __EE5423502 := __E_Professional_License;
+  EXPORT __ST249711_Layout := RECORD
     KEL.typ.nuid UID;
     KEL.typ.nstr License_Number_;
     KEL.typ.nstr License_State_;
@@ -26,12 +26,12 @@ EXPORT B_Professional_License_5(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDef
     KEL.typ.epoch Vault_Date_Last_Seen_ := 0;
     KEL.typ.int __RecordCount := 0;
   END;
-  SHARED __ST248304_Layout __ND5396432__Project(E_Professional_License(__in,__cfg).Layout __PP576853) := TRANSFORM
-    __EE5396427 := __PP576853.License_Dates_;
-    SELF.Max_Expire_Date_ := KEL.Aggregates.MaxNN(__EE5396427,__T(__EE5396427).Date_Of_Expiration_);
-    __EE5396452 := __PP576853.License_Dates_;
-    SELF.Max_Issue_Date_ := KEL.Aggregates.MaxNN(__EE5396452,IF(__T(__OP2(__T(__EE5396452).Original_Date_Of_Issuance_,<,KEL.Routines.CastStringToDate(__CN('19000101')))),__ECAST(KEL.typ.nkdate,KEL.Routines.CastStringToDate(__CN(''))),__ECAST(KEL.typ.nkdate,__T(__EE5396452).Original_Date_Of_Issuance_)));
-    SELF := __PP576853;
+  SHARED __ST249711_Layout __ND5423431__Project(E_Professional_License(__in,__cfg).Layout __PP578494) := TRANSFORM
+    __EE5423426 := __PP578494.License_Dates_;
+    SELF.Max_Expire_Date_ := KEL.Aggregates.MaxNN(__EE5423426,__T(__EE5423426).Date_Of_Expiration_);
+    __EE5423451 := __PP578494.License_Dates_;
+    SELF.Max_Issue_Date_ := KEL.Aggregates.MaxNN(__EE5423451,IF(__T(__OP2(__T(__EE5423451).Original_Date_Of_Issuance_,<,KEL.Routines.CastStringToDate(__CN('19000101')))),__ECAST(KEL.typ.nkdate,KEL.Routines.CastStringToDate(__CN(''))),__ECAST(KEL.typ.nkdate,__T(__EE5423451).Original_Date_Of_Issuance_)));
+    SELF := __PP578494;
   END;
-  EXPORT __ENH_Professional_License_5 := PROJECT(__EE5396503,__ND5396432__Project(LEFT));
+  EXPORT __ENH_Professional_License_5 := PROJECT(__EE5423502,__ND5423431__Project(LEFT));
 END;

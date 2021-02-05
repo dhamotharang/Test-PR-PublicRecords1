@@ -43,9 +43,9 @@ EXPORT Q_Non_F_C_R_A_Business_Prox_I_D_Attributes_V1_Hybrid(KEL.typ.int __PUltID
     SHARED TYPEOF(B_Business_Prox_1(__in,__cfg_Local).__ENH_Business_Prox_1) __ENH_Business_Prox_1 := B_Business_Prox_1_Local.__ENH_Business_Prox_1;
   END;
   SHARED TYPEOF(B_Business_Prox(__in,__cfg_Local).__ENH_Business_Prox) __ENH_Business_Prox := B_Business_Prox_Local.__ENH_Business_Prox;
-  SHARED __EE11564126 := __ENH_Business_Prox;
-  SHARED __EE11564455 := __EE11564126(__T(__AND(__OP2(__EE11564126.Ult_I_D_,=,__CN(__PUltID_in)),__AND(__OP2(__EE11564126.Org_I_D_,=,__CN(__POrgID_in)),__AND(__OP2(__EE11564126.Sele_I_D_,=,__CN(__PSeleID_in)),__OP2(__EE11564126.Prox_I_D_,=,__CN(__PProxID_in)))))));
-  SHARED __ST125765_Layout := RECORD
+  SHARED __EE11598554 := __ENH_Business_Prox;
+  SHARED __EE11598883 := __EE11598554(__T(__AND(__OP2(__EE11598554.Ult_I_D_,=,__CN(__PUltID_in)),__AND(__OP2(__EE11598554.Org_I_D_,=,__CN(__POrgID_in)),__AND(__OP2(__EE11598554.Sele_I_D_,=,__CN(__PSeleID_in)),__OP2(__EE11598554.Prox_I_D_,=,__CN(__PProxID_in)))))));
+  SHARED __ST126586_Layout := RECORD
     KEL.typ.nint B___Lex_I_D_Ult_;
     KEL.typ.nint B___Lex_I_D_Org_;
     KEL.typ.nint B___Lex_I_D_Legal_;
@@ -67,14 +67,14 @@ EXPORT Q_Non_F_C_R_A_Business_Prox_I_D_Attributes_V1_Hybrid(KEL.typ.int __PUltID
     KEL.typ.epoch Vault_Date_Last_Seen_ := 0;
     KEL.typ.int __RecordCount := 0;
   END;
-  SHARED __ST125765_Layout __ND11564460__Project(B_Business_Prox(__in,__cfg_Local).__ST130253_Layout __PP11564456) := TRANSFORM
-    SELF.B___Lex_I_D_Ult_ := __PP11564456.Ult_I_D_;
-    SELF.B___Lex_I_D_Org_ := __PP11564456.Org_I_D_;
-    SELF.B___Lex_I_D_Legal_ := __PP11564456.Sele_I_D_;
-    SELF.B___Lex_I_D_Loc_ := __PP11564456.Prox_I_D_;
-    SELF := __PP11564456;
+  SHARED __ST126586_Layout __ND11598888__Project(B_Business_Prox(__in,__cfg_Local).__ST131078_Layout __PP11598884) := TRANSFORM
+    SELF.B___Lex_I_D_Ult_ := __PP11598884.Ult_I_D_;
+    SELF.B___Lex_I_D_Org_ := __PP11598884.Org_I_D_;
+    SELF.B___Lex_I_D_Legal_ := __PP11598884.Sele_I_D_;
+    SELF.B___Lex_I_D_Loc_ := __PP11598884.Prox_I_D_;
+    SELF := __PP11598884;
   END;
-  EXPORT Res0 := __UNWRAP(PROJECT(TABLE(PROJECT(__EE11564455,__ND11564460__Project(LEFT)),{KEL.typ.int __RecordCount := SUM(GROUP,__RecordCount),KEL.typ.epoch Archive___Date_ := KEL.era.SimpleRoll(GROUP,Archive___Date_,MIN,FALSE),KEL.typ.epoch Date_First_Seen_ := KEL.era.SimpleRoll(GROUP,Date_First_Seen_,MIN,FALSE),KEL.typ.epoch Date_Last_Seen_ := KEL.era.SimpleRoll(GROUP,Date_Last_Seen_,MAX,FALSE),KEL.typ.epoch Hybrid_Archive_Date_ := KEL.era.SimpleRoll(GROUP,Hybrid_Archive_Date_,MIN,FALSE),KEL.typ.epoch Vault_Date_Last_Seen_ := KEL.era.SimpleRoll(GROUP,Vault_Date_Last_Seen_,MAX,NMAX),B___Lex_I_D_Ult_,B___Lex_I_D_Org_,B___Lex_I_D_Legal_,B___Lex_I_D_Loc_,B___Lex_I_D_Loc_Seen_Flag_,B_P___Best_Name_,B_P___Best_Addr_Loc_I_D_,B_P___Best_Addr_St_,B_P___Best_Addr_City_,B_P___Best_Addr_City_Post_,B_P___Best_Addr_State_,B_P___Best_Addr_Zip_,B_P___Best_T_I_N_,B_P___Best_Phone_},B___Lex_I_D_Ult_,B___Lex_I_D_Org_,B___Lex_I_D_Legal_,B___Lex_I_D_Loc_,B___Lex_I_D_Loc_Seen_Flag_,B_P___Best_Name_,B_P___Best_Addr_Loc_I_D_,B_P___Best_Addr_St_,B_P___Best_Addr_City_,B_P___Best_Addr_City_Post_,B_P___Best_Addr_State_,B_P___Best_Addr_Zip_,B_P___Best_T_I_N_,B_P___Best_Phone_,MERGE),__ST125765_Layout));
+  EXPORT Res0 := __UNWRAP(PROJECT(TABLE(PROJECT(__EE11598883,__ND11598888__Project(LEFT)),{KEL.typ.int __RecordCount := SUM(GROUP,__RecordCount),KEL.typ.epoch Archive___Date_ := KEL.era.SimpleRoll(GROUP,Archive___Date_,MIN,FALSE),KEL.typ.epoch Date_First_Seen_ := KEL.era.SimpleRoll(GROUP,Date_First_Seen_,MIN,FALSE),KEL.typ.epoch Date_Last_Seen_ := KEL.era.SimpleRoll(GROUP,Date_Last_Seen_,MAX,FALSE),KEL.typ.epoch Hybrid_Archive_Date_ := KEL.era.SimpleRoll(GROUP,Hybrid_Archive_Date_,MIN,FALSE),KEL.typ.epoch Vault_Date_Last_Seen_ := KEL.era.SimpleRoll(GROUP,Vault_Date_Last_Seen_,MAX,NMAX),B___Lex_I_D_Ult_,B___Lex_I_D_Org_,B___Lex_I_D_Legal_,B___Lex_I_D_Loc_,B___Lex_I_D_Loc_Seen_Flag_,B_P___Best_Name_,B_P___Best_Addr_Loc_I_D_,B_P___Best_Addr_St_,B_P___Best_Addr_City_,B_P___Best_Addr_City_Post_,B_P___Best_Addr_State_,B_P___Best_Addr_Zip_,B_P___Best_T_I_N_,B_P___Best_Phone_},B___Lex_I_D_Ult_,B___Lex_I_D_Org_,B___Lex_I_D_Legal_,B___Lex_I_D_Loc_,B___Lex_I_D_Loc_Seen_Flag_,B_P___Best_Name_,B_P___Best_Addr_Loc_I_D_,B_P___Best_Addr_St_,B_P___Best_Addr_City_,B_P___Best_Addr_City_Post_,B_P___Best_Addr_State_,B_P___Best_Addr_Zip_,B_P___Best_T_I_N_,B_P___Best_Phone_,MERGE),__ST126586_Layout));
   EXPORT DBG_E_Business_Prox_Result := __UNWRAP(E_Business_Prox_Filtered.__Result);
   EXPORT DBG_E_Prox_Address_Result := __UNWRAP(E_Prox_Address_Filtered.__Result);
   EXPORT DBG_E_Prox_Phone_Number_Result := __UNWRAP(E_Prox_Phone_Number_Filtered.__Result);

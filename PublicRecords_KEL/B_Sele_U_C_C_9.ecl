@@ -4,8 +4,8 @@ IMPORT CFG_Compile,E_Business_Org,E_Business_Sele,E_Business_Sele_Overflow,E_Bus
 IMPORT * FROM KEL15.Null;
 EXPORT B_Sele_U_C_C_9(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG_Compile __cfg = CFG_Compile) := MODULE
   SHARED VIRTUAL TYPEOF(E_Sele_U_C_C(__in,__cfg).__Result) __E_Sele_U_C_C := E_Sele_U_C_C(__in,__cfg).__Result;
-  SHARED __EE373387 := __E_Sele_U_C_C;
-  EXPORT __ST261563_Layout := RECORD
+  SHARED __EE374981 := __E_Sele_U_C_C;
+  EXPORT __ST262974_Layout := RECORD
     KEL.typ.nstr R_M_S_I_D_;
     KEL.typ.nstr Party_Type_;
     KEL.typ.int Party_Sort_List_ := 0;
@@ -16,14 +16,14 @@ EXPORT B_Sele_U_C_C_9(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG_
     KEL.typ.epoch Vault_Date_Last_Seen_ := 0;
     KEL.typ.int __RecordCount := 0;
   END;
-  EXPORT __ST261555_Layout := RECORD
+  EXPORT __ST262966_Layout := RECORD
     KEL.typ.ntyp(E_Business_Sele().Typ) Legal_;
     KEL.typ.nstr T_M_S_I_D_;
     KEL.typ.ntyp(E_U_C_C().Typ) Filing_;
     KEL.typ.nint Ult_I_D_;
     KEL.typ.nint Org_I_D_;
     KEL.typ.nint Sele_I_D_;
-    KEL.typ.ndataset(__ST261563_Layout) Sub_Filing_;
+    KEL.typ.ndataset(__ST262974_Layout) Sub_Filing_;
     KEL.typ.ndataset(E_Sele_U_C_C(__in,__cfg).Data_Sources_Layout) Data_Sources_;
     KEL.typ.epoch Archive___Date_ := 0;
     KEL.typ.epoch Date_First_Seen_ := 0;
@@ -32,14 +32,14 @@ EXPORT B_Sele_U_C_C_9(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG_
     KEL.typ.epoch Vault_Date_Last_Seen_ := 0;
     KEL.typ.int __RecordCount := 0;
   END;
-  SHARED __ST261555_Layout __ND5227750__Project(E_Sele_U_C_C(__in,__cfg).Layout __PP373285) := TRANSFORM
-    __EE373324 := __PP373285.Sub_Filing_;
-    __ST261563_Layout __ND5227745__Project(E_Sele_U_C_C(__in,__cfg).Sub_Filing_Layout __PP373456) := TRANSFORM
-      SELF.Party_Sort_List_ := MAP(__T(__OP2(__FN1(KEL.Routines.ToUpperCase,__FN1(TRIM,__PP373456.Party_Type_)),=,__CN('D')))=>1,__T(__OP2(__FN1(KEL.Routines.ToUpperCase,__FN1(TRIM,__PP373456.Party_Type_)),IN,__CN(['S','C','A'])))=>2,3);
-      SELF := __PP373456;
+  SHARED __ST262966_Layout __ND5254701__Project(E_Sele_U_C_C(__in,__cfg).Layout __PP374879) := TRANSFORM
+    __EE374918 := __PP374879.Sub_Filing_;
+    __ST262974_Layout __ND5254696__Project(E_Sele_U_C_C(__in,__cfg).Sub_Filing_Layout __PP375050) := TRANSFORM
+      SELF.Party_Sort_List_ := MAP(__T(__OP2(__FN1(KEL.Routines.ToUpperCase,__FN1(TRIM,__PP375050.Party_Type_)),=,__CN('D')))=>1,__T(__OP2(__FN1(KEL.Routines.ToUpperCase,__FN1(TRIM,__PP375050.Party_Type_)),IN,__CN(['S','C','A'])))=>2,3);
+      SELF := __PP375050;
     END;
-    SELF.Sub_Filing_ := __PROJECT(__EE373324,__ND5227745__Project(LEFT));
-    SELF := __PP373285;
+    SELF.Sub_Filing_ := __PROJECT(__EE374918,__ND5254696__Project(LEFT));
+    SELF := __PP374879;
   END;
-  EXPORT __ENH_Sele_U_C_C_9 := PROJECT(__EE373387,__ND5227750__Project(LEFT));
+  EXPORT __ENH_Sele_U_C_C_9 := PROJECT(__EE374981,__ND5254701__Project(LEFT));
 END;

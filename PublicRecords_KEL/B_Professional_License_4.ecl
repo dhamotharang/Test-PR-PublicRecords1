@@ -4,8 +4,8 @@ IMPORT B_Professional_License_5,CFG_Compile,E_Professional_License,FN_Compile FR
 IMPORT * FROM KEL15.Null;
 EXPORT B_Professional_License_4(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG_Compile __cfg = CFG_Compile) := MODULE
   SHARED VIRTUAL TYPEOF(B_Professional_License_5(__in,__cfg).__ENH_Professional_License_5) __ENH_Professional_License_5 := B_Professional_License_5(__in,__cfg).__ENH_Professional_License_5;
-  SHARED __EE5578271 := __ENH_Professional_License_5;
-  EXPORT __ST241642_Layout := RECORD
+  SHARED __EE5605317 := __ENH_Professional_License_5;
+  EXPORT __ST243045_Layout := RECORD
     KEL.typ.nuid UID;
     KEL.typ.nstr License_Number_;
     KEL.typ.nstr License_State_;
@@ -28,11 +28,11 @@ EXPORT B_Professional_License_4(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDef
     KEL.typ.epoch Vault_Date_Last_Seen_ := 0;
     KEL.typ.int __RecordCount := 0;
   END;
-  SHARED __ST241642_Layout __ND5578443__Project(B_Professional_License_5(__in,__cfg).__ST248304_Layout __PP5578272) := TRANSFORM
+  SHARED __ST243045_Layout __ND5605489__Project(B_Professional_License_5(__in,__cfg).__ST249711_Layout __PP5605318) := TRANSFORM
     __CC13078 := KEL.Routines.MinN(FN_Compile(__cfg).FN_G_E_T_B_U_I_L_D_D_A_T_E(__ECAST(KEL.typ.nstr,__CN('proflic_build_version'))),__CN(__cfg.CurrentDate));
-    SELF.Is_Active_ := __OP2(__PP5578272.Max_Expire_Date_,>,__CC13078);
-    SELF.Valid_Professional_License_ := __AND(__OP2(__PP5578272.License_Number_,<>,__CN('')),__OR(__OP2(__PP5578272.Max_Issue_Date_,<,__CC13078),__NT(__PP5578272.Max_Issue_Date_)));
-    SELF := __PP5578272;
+    SELF.Is_Active_ := __OP2(__PP5605318.Max_Expire_Date_,>,__CC13078);
+    SELF.Valid_Professional_License_ := __AND(__OP2(__PP5605318.License_Number_,<>,__CN('')),__OR(__OP2(__PP5605318.Max_Issue_Date_,<,__CC13078),__NT(__PP5605318.Max_Issue_Date_)));
+    SELF := __PP5605318;
   END;
-  EXPORT __ENH_Professional_License_4 := PROJECT(__EE5578271,__ND5578443__Project(LEFT));
+  EXPORT __ENH_Professional_License_4 := PROJECT(__EE5605317,__ND5605489__Project(LEFT));
 END;
