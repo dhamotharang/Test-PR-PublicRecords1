@@ -69,6 +69,7 @@ EXPORT MAS_FCRA_Service() := MACRO
 	#CONSTANT('IncludeOfacValue', FALSE);
 	#CONSTANT('IncludeAdditionalWatchListsValue', FALSE);
 	#CONSTANT('Global_Watchlist_ThresholdValue', 0);
+	#CONSTANT('IsFCRA', TRUE);
 	
 	gateways_in := Gateway.Configuration.Get();
 	Gateway.Layouts.Config gw_switch(gateways_in le) := TRANSFORM
