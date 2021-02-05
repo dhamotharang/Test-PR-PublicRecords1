@@ -36,7 +36,7 @@ lECL1 :=
 #WORKUNIT('protect',true);
 #WORKUNIT('name', 'FraudGov DEDI Input Prep Schedule');
 
-d:=FileServices.RemoteDirectory(IP, RootDir+version+'/', '*.dat');
+d:=FileServices.RemoteDirectory(IP, RootDir+version+'/', '*.csv');
 SkipJob := FraudGovPlatform.Files().Flags.SkipModules[1].SkipDEDI;
 Run_ECL := if(SkipJob=false,lECL1, 'output(\'Spray DEDI Skipped\');\n' );
 if(exists(d),_Control.fSubmitNewWorkunit(Run_ECL, ThorName ),'NO FILES TO SPRAY' )
