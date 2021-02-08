@@ -1,6 +1,6 @@
-﻿IMPORT _control, Dops, Doxie, dx_PhonesInfo, PromoteSupers, RoxieKeyBuild, std, ut, Orbit3, Scrubs_PhonesInfo,buildLogger;
+﻿IMPORT Dops, Doxie, dx_PhonesInfo, PromoteSupers, RoxieKeyBuild, std, ut, Orbit3, Scrubs_PhonesInfo,buildLogger;
 
-EXPORT Proc_Build_Ported_Metadata_Key(string version):= function
+EXPORT Proc_Build_Ported_Metadata_Key(string version, string contacts):= function
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////	
 //Create Ported Metadata Base File///////////////////////////////////////////////////////////////////////////
@@ -61,12 +61,12 @@ PhonesInfo.Out_STRATA_Population_Stats(PhonesInfo.File_iConectiv.Main_Current,
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////	
 //Run Scrub Reports//////////////////////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////																				 
-	ScrubsRuns	:= sequential(Scrubs_PhonesInfo.RawFileScrubs(version, _control.MyInfo.EmailAddressNotify + ';judy.tao@lexisnexisrisk.com' + ';gregory.rose@lexisnexisrisk.com' + ';darren.knowles@lexisnexisrisk.com'), 
-																										Scrubs_PhonesInfo.IndividualBaseFileScrubs(version, _control.MyInfo.EmailAddressNotify + ';judy.tao@lexisnexisrisk.com' + ';gregory.rose@lexisnexisrisk.com' + ';darren.knowles@lexisnexisrisk.com'),
-																										Scrubs_PhonesInfo.PostBuildScrubs(version, _control.MyInfo.EmailAddressNotify + ';judy.tao@lexisnexisrisk.com' + ';gregory.rose@lexisnexisrisk.com' + ';darren.knowles@lexisnexisrisk.com'),
-																										//Scrubs_PhonesInfo.ScrubsProcessLIDB_Current(version, _control.MyInfo.EmailAddressNotify + ';judy.tao@lexisnexisrisk.com' + ';gregory.rose@lexisnexisrisk.com' + ';darren.knowles@lexisnexisrisk.com'), Historical LIDB No longer Updating
-																										//Scrubs_PhonesInfo.ScrubsProcessLIDB_Received(version, _control.MyInfo.EmailAddressNotify + ';judy.tao@lexisnexisrisk.com' + ';gregory.rose@lexisnexisrisk.com' + ';darren.knowles@lexisnexisrisk.com'),Historical LIDB No longer Updating
-																										Scrubs_PhonesInfo.ScrubsProcessLIDB_Processed(version, _control.MyInfo.EmailAddressNotify + ';judy.tao@lexisnexisrisk.com' + ';gregory.rose@lexisnexisrisk.com' + ';darren.knowles@lexisnexisrisk.com'),
+	ScrubsRuns	:= sequential(Scrubs_PhonesInfo.RawFileScrubs(version, contacts), 
+																										Scrubs_PhonesInfo.IndividualBaseFileScrubs(version, contacts),
+																										Scrubs_PhonesInfo.PostBuildScrubs(version, contacts),
+																										//Scrubs_PhonesInfo.ScrubsProcessLIDB_Current(version, contacts), Historical LIDB No longer Updating
+																										//Scrubs_PhonesInfo.ScrubsProcessLIDB_Received(version, contacts),Historical LIDB No longer Updating
+																										Scrubs_PhonesInfo.ScrubsProcessLIDB_Processed(version, contacts),
 																										);
 															
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////	
@@ -86,12 +86,12 @@ PhonesInfo.Out_STRATA_Population_Stats(PhonesInfo.File_iConectiv.Main_Current,
 																										BuildLogger.PostStart(False),
 																											//dopsUpdate, 
 																											buildStrata, 
-																											PhonesInfo.Sample_PhonesMetadata, 
+																											PhonesInfo.Sample_PhonesMetadata(contacts), 
 																											ScrubsRuns,
 																										BuildLogger.PostEnd(False),
 																										BuildLogger.BuildEnd(false)):
-																									Success(FileServices.SendEmail(_control.MyInfo.EmailAddressNotify + ';judy.tao@lexisnexisrisk.com' /*+ ';gregory.rose@lexisnexisrisk.com' + ';darren.knowles@lexisnexisrisk.com'*/, 'PhonesInfo Ported & Metadata Key Build Succeeded', workunit + ': Build complete.')),
-																									Failure(FileServices.SendEmail(_control.MyInfo.EmailAddressNotify + ';judy.tao@lexisnexisrisk.com' /*+ ';gregory.rose@lexisnexisrisk.com' + ';darren.knowles@lexisnexisrisk.com'*/, 'PhonesInfo Ported & Metadata Key Build Failed', workunit + '\n' + FAILMESSAGE)
+																									Success(FileServices.SendEmail(contacts, 'PhonesInfo Ported & Metadata Key Build Succeeded', workunit + ': Build complete.')),
+																									Failure(FileServices.SendEmail(contacts, 'PhonesInfo Ported & Metadata Key Build Failed', workunit + '\n' + FAILMESSAGE)
 																									);
 	return sendEmail;														
 

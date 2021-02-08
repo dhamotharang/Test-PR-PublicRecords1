@@ -1,5 +1,5 @@
 ﻿//Generate Samples for QA
-import _control;
+EXPORT Sample_PhonesMetadata(string contacts):= function
 
 	//DF-24394: Add L6 Samples to QA Test File
 
@@ -64,7 +64,9 @@ import _control;
 																,output(ds_all(source='PB'), all, named('PhonesMetadata_PB_QASamples'))
 																,output(ds_all(source='L6'), all, named('PhonesMetadata_L6_QASamples'))
 																,output(ds_all,,'~thor400_20::out::PhonesMetadata_QATest_Sample.csv',csv(heading('phone,source\n'), separator(','), quote('"'), terminator('\n')), overwrite, named('PhonesMetadata_QASamples_File'))
-																,fileservices.SendEmail(_control.MyInfo.EmailAddressNotify + ';qualityassurance@seisint.com;judy.tao@lexisnexis.com;gregory.rose@lexisnexisrisk.com;darren.knowles@lexisnexisrisk.com', 'Phones Metadata: QA Sample', 'Phones Metadata QA samples are now available.  Please see: '+'http://10.241.30.202:8010/?Wuid='+ workunit + '&Widget=WUDetailsWidget#/stub/Results-DL/Grid'))
-																,fileservices.SendEmail(_control.MyInfo.EmailAddressNotify + ';qualityassurance@seisint.com;judy.tao@lexisnexis.com;gregory.rose@lexisnexisrisk.com;darren.knowles@lexisnexisrisk.com', 'Phones Metadata: No QA Sample', 'There are no QA samples in this build'));
+																,fileservices.SendEmail(contacts + ';qualityassurance@seisint.com;', 'Phones Metadata: QA Sample', 'Phones Metadata QA samples are now available.  Please see: '+'http://10.241.30.202:8010/?Wuid='+ workunit + '&Widget=WUDetailsWidget#/stub/Results-DL/Grid'))
+																,fileservices.SendEmail(contacts + ';qualityassurance@seisint.com;', 'Phones Metadata: No QA Sample', 'There are no QA samples in this build'));
 
-EXPORT Sample_PhonesMetadata := email_notice;
+return email_notice;
+
+END;
