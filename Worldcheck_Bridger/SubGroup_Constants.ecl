@@ -1299,6 +1299,7 @@
 		export string KEYWORD_UKHMT_DU							:= '981';
 		export string KEYWORD_PTERSE								:= '982';
 		export string KEYWORD_IDGAKKUM							:= '983';
+		export string KEYWORD_IRISR_WC							:= '984';
 		
 		//When setting the keyword export use underscores for dashes (ex: For RBI-SANC, use RBI_SANC)	
 	end;
