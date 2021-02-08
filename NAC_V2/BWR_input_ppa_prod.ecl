@@ -20,7 +20,7 @@ ip := _Control.IPAddress.bctlpedata10;
 datadir := '/data/rin_ppa/';
 opsdir := '/data/rin_ppa/data_ops/ncf2/';
 
-files := STD.File.RemoteDirectory(ip, datadir, 'ncf2*.dat',true)(size>0);
+files := STD.File.RemoteDirectory(ip, datadir, 'ncf2*.dat',true);
 
 nac_V2.rNAC2Config	tNAC2ConfigForceLower(nac_V2.dNAC2Config pInput)	:=
 transform

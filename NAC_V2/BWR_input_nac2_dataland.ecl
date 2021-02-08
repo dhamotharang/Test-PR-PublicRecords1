@@ -25,7 +25,7 @@ opsdir := '/data/projects/nac2/';
 
 
 //Nac_V2.ProcessContributoryFile(ip, rootdir, lfn, ip2, root2, version);
-files := STD.File.RemoteDirectory(ip, datadir+'incoming', 'ncf2*.dat',true)(size>0);
+files := STD.File.RemoteDirectory(ip, datadir+'incoming', 'ncf2*.dat',true);
 
 nac_V2.rNAC2Config	tNAC2ConfigForceLower(nac_V2.dNAC2Config pInput)	:=
 transform
