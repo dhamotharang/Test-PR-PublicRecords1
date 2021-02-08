@@ -5,7 +5,7 @@ Default valid high year is 100 + the current year
 If SetDefault is TRUE and no value is passed in for InDate, we will set the datetimestamp to the current time (UTC).
 */
 
-IMPORT _Validate, PublicRecords_KEL, STD;
+IMPORT _Validate, PublicRecords_KEL, STD, ut;
 
 EXPORT Fn_Clean_Date (STRING InDate, 
 											INTEGER LowYear = PublicRecords_KEL.ECL_Functions.Constants.VALIDATE_DATE_RANGE_LOW_DEFAULT, 
@@ -13,7 +13,7 @@ EXPORT Fn_Clean_Date (STRING InDate,
 											BOOLEAN SetDefault = FALSE
 											) := FUNCTION
 
-	InDateWithDefault := IF(SetDefault AND TRIM(InDate) = '', STD.Date.SecondsToString(STD.Date.CurrentSeconds(TRUE), '%Y%m%d%T'), InDate);
+	InDateWithDefault := IF(SetDefault AND TRIM(InDate) = '', ut.now('%Y%m%d%T', FALSE), InDate);// we know this produces an ECL warning about ut.now being deprecated, but switching to STD.Date causes the ECL compiler to crash
 	FullInDateinNums := STD.Str.Filter(InDateWithDefault, '0123456789');
 	InDateinNums := (STRING8)FullInDateinNums[1..8];
 	
