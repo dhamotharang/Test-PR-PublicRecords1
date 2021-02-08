@@ -381,10 +381,11 @@ EXPORT Functions := MODULE
   EXPORT fn_ca_tmsid(STRING tmsid) := FUNCTION
     tmsid_clean := ut.CleanSpacesAndUpper(tmsid);
     
-		  isValidLetter := IF(regexfind('CA', tmsid_clean[1..2]), TRUE, FALSE);
-		  isValidNumber := IF(Stringlib.StringFilterOut(tmsid_clean[3..], '0123456789U') = '', TRUE, FALSE);
+		  isValidJurisdiction := IF(regexfind('CA', tmsid_clean[1..2]), TRUE, FALSE);
+		  isValidChar3        := IF(Stringlib.StringFilterOut(tmsid_clean[3], '0123456789U') = '', TRUE, FALSE);
+		  isValidChar4Forward := IF(Stringlib.StringFilterOut(tmsid_clean[4..], '0123456789') = '', TRUE, FALSE);
     
-    RETURN IF(tmsid_clean = '' OR (isValidLetter AND isValidNumber), 1, 0);
+    RETURN IF(tmsid_clean = '' OR (isValidJurisdiction AND isValidChar3 AND isValidChar4Forward), 1, 0);
   END;
 
   //****************************************************************************
