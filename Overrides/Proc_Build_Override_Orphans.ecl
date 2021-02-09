@@ -15,8 +15,6 @@ EXPORT Proc_Build_Override_Orphans(STRING filedate) := FUNCTION
 	Orphans := PROJECT(TrueOrphans_All, TRANSFORM(overrides.File_Override_Orphans.orphan_rec,
 								SELF.datagroup := STD.Str.ToUpperCase(LEFT.datagroup), SELF.did := (STRING) LEFT.did, SELF := LEFT));
 	
-   Orphans;	
-	
 	Orphan_Super_File := '~thor_data400::lookup::override::orphans';   
 	
 	Existing_Filtered_Orphans := Overrides.File_Override_Orphans.orphan_file;
@@ -32,13 +30,13 @@ EXPORT Proc_Build_Override_Orphans(STRING filedate) := FUNCTION
 	
 	build_orphans := OUTPUT(Filtered_Orphans_All,, Orphan_Super_SubFile, OVERWRITE, __COMPRESSED__);
 	
-	add_orphans := FILESERVICES.PROMOTESUPERFILELIST(['~thor_data400::lookup::override::orphans','~thor_data400::lookup::override::orphans::father','~thor_data400::lookup::override::orphans::grandfather'],
-						'~thor_data400::lookup::override::' + FileDate + '::orphans', true);
+	// add_orphans := FILESERVICES.PROMOTESUPERFILELIST(['~thor_data400::lookup::override::orphans','~thor_data400::lookup::override::orphans::father','~thor_data400::lookup::override::orphans::grandfather'],
+	// 					'~thor_data400::lookup::override::' + FileDate + '::orphans', true);
 						
-	// growth check needs to be added					
+	// // growth check needs to be added					
 	 
-	RETURN SEQUENTIAL(build_orphans, add_orphans);
-	
+	// RETURN SEQUENTIAL(build_orphans, add_orphans);
+	RETURN build_orphans;
 	
 END;
 

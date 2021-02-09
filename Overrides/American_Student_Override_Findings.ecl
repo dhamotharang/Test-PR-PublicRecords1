@@ -133,39 +133,24 @@ EXPORT American_Student_Override_Findings(DATASET(Override_Layouts.Layout_Get_Or
 
 	
 	combined_output := matched_dids + matched_keys;
-
-	orphan_layout := RECORD
-		deduped_overrides;
-		STRING datagroup;
-		STRING recid;
-		BOOLEAN found_in_payload;
-		STRING diff
-	END;
-
-
-	orphan_layout orphan_xform(combined_output  l, deduped_overrides r) := TRANSFORM
+	
+	File_Override_Orphans.orphan_rec orphan_xform(combined_output  l, deduped_overrides r) := TRANSFORM
 		SELF.datagroup := overrides.Constants.getfileid(overrides.Constants.STUDENT);
-		SELF.diff := l.diff;
+		SELF.did := (STRING)r.did;
 		SELF.recid := (STRING) r.key;
-		SELF.found_in_payload := FALSE;
+		SELF.flag_file_ID := r.flag_file_id;
 		SELF :=r;
 	END;
 
 	 true_orphans := JOIN(combined_output,deduped_overrides, LEFT.payload_did = RIGHT.did,orphan_xform(LEFT,RIGHT),RIGHT ONLY);
 															 
-	 output(true_orphans, named('true_orphans'));
+	 output(true_orphans, named('true_orphans_astudent'));
 
 	 #IF(overrides.Constants.GROWTH_CHECK_CALL)
-
-		Student_Orphans_GrowthCheck_ds := PROJECT(true_orphans, TRANSFORM(overrides.File_Override_Orphans.orphan_rec,
-														SELF.datagroup := Constants.STUDENT, SELF.did := (STRING) LEFT.did, SELF := LEFT));
-
-		call_gc := GrowthCheck(filedate, Constants.STUDENT, Student_Orphans_GrowthCheck_ds);														
-	
-		build_stats := call_gc.BuildStats;
-		//this forces an execute
-		build_stats;
-		stats_alerts := call_gc.StatsAlerts;
+		build_stats := IF (COUNT(true_orphans) > 0, GrowthCheck(Constants.STUDENT).BuildStats(filedate, true_orphans));
+		build_stats; // this forces the call
+        		
+		stats_alerts :=  GrowthCheck(Constants.STUDENT).StatsAlerts;
 	
 		sent_email := IF (stats_alerts, FileServices.sendemail(EmailNotification.orphan_alert_list
 												, 'American Student Override True Orphans COUNT is higher than threshold count ' +  overrides.Constants.GetStatsThreshold(Constants.STUDENT) 
@@ -174,7 +159,6 @@ EXPORT American_Student_Override_Findings(DATASET(Override_Layouts.Layout_Get_Or
 		result_orphans := IF(~stats_alerts,true_orphans);
 		RETURN WHEN (result_orphans, sent_email);
 	#ELSE
-	
 		RETURN true_orphans;
 	#END
 	
