@@ -1985,42 +1985,6 @@ BIPV2.IDAppendLayouts.AppendInput PrepBIPInputprox(Layouts_FDC.Layout_FDC le) :=
 	
 //end of section with 'extra' searchable datasets	
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-					
-						
-	// Doxie_Files.Key_BocaShell_Crim_FCRA -- FCRA only
-	Doxie_Files__Key_BocaShell_Crim_FCRA_Records :=	
-		 JOIN(Input_FDC, Doxie_Files.Key_BocaShell_Crim_FCRA,
-				Common.DoFDCJoin_Doxie_Files__Key_BocaShell_Crim_FCRA = TRUE AND
-				LEFT.P_LexID > 0 AND
-				KEYED(LEFT.P_LexID = RIGHT.DID),
-				TRANSFORM(Layouts_FDC.Layout_Doxie_Files__Key_BocaShell_Crim_FCRA_Denorm,
-					SELF.UIDAppend := LEFT.UIDAppend,
-					SELF.G_ProcUID := LEFT.G_ProcUID,
-					SELF.P_LexID := LEFT.P_LexID,
-					SELF.src := MDR.sourceTools.src_Accurint_DOC,
-					SELF.DPMBitmap := SetDPMBitmap( Source := MDR.sourceTools.src_Accurint_DOC, FCRA_Restricted := Options.isFCRA, GLBA_Restricted := NotRegulated, Pre_GLB_Restricted := NotRegulated, DPPA_Restricted := NotRegulated, DPPA_State := BlankString, KELPermissions := CFG_File),
-					SELF := RIGHT,
-					SELF := LEFT,
-					SELF := []), 
-				ATMOST(PublicRecords_KEL.ECL_Functions.Constants.Default_Atmost_100), KEEP(1));
-	
-	// Doxie_Files.Key_BocaShell_Crim_FCRA contains a child dataset so we need to add an extra step and NORMALIZE it before adding to the FDC bundle.
-	Doxie_Files__Key_BocaShell_Crim_FCRA_Records_Norm := NORMALIZE(Doxie_Files__Key_BocaShell_Crim_FCRA_Records, LEFT.criminal_count, 
-			TRANSFORM(Layouts_FDC.Layout_Doxie_Files__Key_BocaShell_Crim_FCRA,
-								SELF := LEFT,
-								SELF := RIGHT));
-					
-	With_Doxie_Files__Key_BocaShell_Crim_FCRA := DENORMALIZE(With_ADVO_History_Records, Doxie_Files__Key_BocaShell_Crim_FCRA_Records_Norm, 
-				LEFT.UIDAppend = RIGHT.UIDAppend AND 
-				ArchiveDate((string)right.date) <= LEFT.P_InpClnArchDt[1..8] and
-				LEFT.P_LexID = RIGHT.P_LexID, GROUP,
-				TRANSFORM(Layouts_FDC.Layout_FDC,
-						SELF.Dataset_Doxie_Files__Key_BocaShell_Crim_FCRA := project(ROWS(RIGHT),transform(Layouts_FDC.Layout_Doxie_Files__Key_BocaShell_Crim_FCRA,  
-																						self.Archive_Date :=  ArchiveDate((string)left.date);
-																						self := left, 
-																						self := []));
-						SELF := LEFT,
-						SELF := []));	
 						
 	// Doxie_Files.Key_Offenders(isFCRA) --	FCRA and NonFCRA	
 	Doxie_Files__Key_Offenders_Records := 
@@ -2055,7 +2019,7 @@ BIPV2.IDAppendLayouts.AppendInput PrepBIPInputprox(Layouts_FDC.Layout_FDC le) :=
 		WithCorrectionsCrimOffenders_filter := dedup(sort(WithSuppressionsCrimOffenders+GetOverrideCrimOffenders,offender_key, UIDAppend),offender_key, UIDAppend);
 
 		
-	With_Doxie_Files__Key_Offenders := DENORMALIZE(With_Doxie_Files__Key_BocaShell_Crim_FCRA, WithCorrectionsCrimOffenders,
+	With_Doxie_Files__Key_Offenders := DENORMALIZE(With_ADVO_History_Records, WithCorrectionsCrimOffenders,
 				LEFT.UIDAppend = RIGHT.UIDAppend, GROUP,
 				TRANSFORM(Layouts_FDC.Layout_FDC,
 						SELF.Dataset_Doxie_Files__Key_Offenders := ROWS(RIGHT),

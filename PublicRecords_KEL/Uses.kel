@@ -485,34 +485,6 @@ USE PublicRecords_KEL.ECL_Functions.Dataset_FDC(FDC,
 			HybridArchiveDate = FORMAT('YYYYMMDD'),
 			Archive_Date = FORMAT('YYYYMMDD')archive_date),
 		PERMITS(DPMBitmap)),
-			
-	Dataset_Doxie_Files__Key_BocaShell_Crim_FCRA(
-		PersonOffenses(FILTER((UNSIGNED)did != 0),
-			Subject = did,
-			OffenderKey = offender_key,
-			DateFirstSeen = FORMAT('YYYYMMDD'),
-			DateLastSeen = FORMAT('YYYYMMDD'),
-			HybridArchiveDate = FORMAT('YYYYMMDD'),
-			Archive_Date = FORMAT('YYYYMMDD')archive_date),
-		PersonOffender(
-			Subject = did,
-			OffenderKey = offender_key,
-			DateFirstSeen = FORMAT('YYYYMMDD'),
-			DateLastSeen = FORMAT('YYYYMMDD'),
-			HybridArchiveDate = FORMAT('YYYYMMDD'),
-			Archive_Date = FORMAT('YYYYMMDD')archive_date),
-		CriminalOffense(
-			OffenderKey = offender_key,
-			CaseDate = date,
-			CaseNumber = case_num,
-			ConvictionFlag = fcra_conviction_flag,
-			TrafficFlag = fcra_traffic_flag,
-			OffenseScore = offense_score,
-			DateFirstSeen = FORMAT('YYYYMMDD'),
-			DateLastSeen = FORMAT('YYYYMMDD'),
-			HybridArchiveDate = FORMAT('YYYYMMDD'),
-			Archive_Date = FORMAT('YYYYMMDD')archive_date),
-		PERMITS(DPMBitmap)),
 
 	Dataset_Doxie_Files__Key_Offenders(
 		CriminalOffender(
