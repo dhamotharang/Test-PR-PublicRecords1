@@ -1,10 +1,13 @@
-﻿IMPORT Address, AutoKey, Business_Risk, Data_Services, Business_Risk_BIP, DID_Add, Doxie, Drivers, dx_Gong, dx_header,
-       MDR, Phones, Phonesplus_v2, Risk_Indicators, Suppress, UT, Relationship;
+﻿IMPORT Address, AutoKey, Business_Risk, Data_Services, Business_Risk_BIP, DID_Add, Doxie, dx_Gong, dx_header,
+       MDR, Phones, Phonesplus_v2, Risk_Indicators, Suppress, UT, Relationship, STD;
 
 EXPORT getConsumerHeader(DATASET(Business_Risk_BIP.Layouts.Shell) Shell,
-											 Business_Risk_BIP.LIB_Business_Shell_LIBIN Options,
-											 doxie.IDataAccess mod_access,
+												 Business_Risk_BIP.LIB_Business_Shell_LIBIN Options,
 												 SET OF STRING2 AllowedSourcesSet) := FUNCTION
+
+	mod_access := PROJECT(Options, doxie.IDataAccess);
+	drm := Options.DataRestrictionMask;
+	shell_version := Options.BusShellVersion;
 
 	Shell_with_BIPIDs := Shell(BIP_IDs.PowID.LinkID <> 0 OR BIP_IDs.ProxID.LinkID <> 0 OR BIP_IDs.SeleID.LinkID <> 0 OR BIP_IDs.OrgID.LinkID <> 0 OR BIP_IDs.UltID.LinkID <> 0);
 
@@ -25,7 +28,7 @@ EXPORT getConsumerHeader(DATASET(Business_Risk_BIP.Layouts.Shell) Shell,
 		UNSIGNED8 fdid := 0; // Fake DID - used to search the full phones plus payload
 	END;
 
-	BusinessSearchRecords := PROJECT(IF(Options.BusShellVersion >= Business_Risk_BIP.Constants.BusShellVersion_v22, Shell, Shell_with_BIPIDs), TRANSFORM(ShellSearchLayout,
+	BusinessSearchRecords := PROJECT(IF(shell_version >= Business_Risk_BIP.Constants.BusShellVersion_v22, Shell, Shell_with_BIPIDs), TRANSFORM(ShellSearchLayout,
 		SELF.Seq := LEFT.Seq;
 		SELF.RecordType := 'B';
 		SELF.FEINSSN := LEFT.Clean_Input.FEIN;
@@ -165,14 +168,14 @@ EXPORT getConsumerHeader(DATASET(Business_Risk_BIP.Layouts.Shell) Shell,
 		// ----------------------- Compare results to business input ---------------------------------------- //
 
 		// Make sure the first and last name are at least 2 characters long so that we aren't comparing blank or 1 character names to the company name
-		fNameHit_old := BusinessAddrMatch AND LENGTH(TRIM(ri.fname)) >= 2 AND StringLib.StringFind(le.CompanyName, StringLib.StringToUpperCase(TRIM(ri.fname, LEFT, RIGHT)), 1) > 0;
-		lNameHit_old := BusinessAddrMatch AND LENGTH(TRIM(ri.lname)) >= 2 AND StringLib.StringFind(le.CompanyName, StringLib.StringToUpperCase(TRIM(ri.lname, LEFT, RIGHT)), 1) > 0;
+		fNameHit_old := BusinessAddrMatch AND LENGTH(TRIM(ri.fname)) >= 2 AND STD.Str.Find(le.CompanyName, STD.Str.ToUpperCase(TRIM(ri.fname, LEFT, RIGHT)), 1) > 0;
+		lNameHit_old := BusinessAddrMatch AND LENGTH(TRIM(ri.lname)) >= 2 AND STD.Str.Find(le.CompanyName, STD.Str.ToUpperCase(TRIM(ri.lname, LEFT, RIGHT)), 1) > 0;
 
 		fNameHit_new := BusinessAddrMatch AND Business_Risk_BIP.Common.fn_isFoundInCompanyName( le.CompanyName, ri.fname );
 		lNameHit_new := BusinessAddrMatch AND Business_Risk_BIP.Common.fn_isFoundInCompanyName( le.CompanyName, ri.lname );
 
-		fNameHit := IF( Options.BusShellVersion >= Business_Risk_BIP.Constants.BusShellVersion_v22, fNameHit_new, fNameHit_old );
-		lNameHit := IF( Options.BusShellVersion >= Business_Risk_BIP.Constants.BusShellVersion_v22, lNameHit_new, lNameHit_old );
+		fNameHit := IF( shell_version >= Business_Risk_BIP.Constants.BusShellVersion_v22, fNameHit_new, fNameHit_old );
+		lNameHit := IF( shell_version >= Business_Risk_BIP.Constants.BusShellVersion_v22, lNameHit_new, lNameHit_old );
 
 		DIDhit := BusinessAddrMatch AND ri.did <> 0;
 
@@ -198,7 +201,7 @@ EXPORT getConsumerHeader(DATASET(Business_Risk_BIP.Layouts.Shell) Shell,
 																			NOT DIDHit	AND BusinessAddrMatch																						 																								 => 0,  // No hit
 																			 NOT fNameHit AND NOT lNameHit AND BusinessAddrMatch														 																						 => 1,
 																			 fNameHit AND lNameHit AND BusinessAddrMatch	 														 																									 => 2, // Address linked to a person with the same first and last name as part of entered CompanyName
-																			 (fnameHit OR lNameHit) AND Options.BusShellVersion >= Business_Risk_BIP.Constants.BusShellVersion_v22 AND BusinessAddrMatch => 2, // In v2.2 and above, a first OR last name match constitutes a match
+																			 (fnameHit OR lNameHit) AND shell_version >= Business_Risk_BIP.Constants.BusShellVersion_v22 AND BusinessAddrMatch => 2, // In v2.2 and above, a first OR last name match constitutes a match
 																																																																																			0);
 		SELF.LexIDs := IF((INTEGER)ut.DaysApart(Business_Risk_BIP.Common.checkInvalidDate((STRING)ri.dt_last_seen, Business_Risk_BIP.Constants.MissingDate, le.HistoryDate),
 																						Business_Risk_BIP.Common.todaysDate(CHBuildDate, le.HistoryDate)) <= Business_Risk_BIP.Constants.TwoYear AND ri.DID > 0 AND BusinessAddrMatch,
@@ -222,10 +225,10 @@ EXPORT getConsumerHeader(DATASET(Business_Risk_BIP.Layouts.Shell) Shell,
 																		LEFT.PreDir = RIGHT.predir AND LEFT.PostDir = RIGHT.postdir AND
 																		UT.NNEQ(LEFT.Sec_Range, RIGHT.sec_range)) AND
 																	// check permissions
-																		ut.PermissionTools.glb.SrcOk(Options.GLBA_Purpose, right.src, right.dt_first_seen) and
-																		RIGHT.src NOT IN Risk_Indicators.iid_constants.masked_header_sources(Options.DataRestrictionMask, FALSE /*isFCRA*/) AND
+																		doxie.compliance.source_ok(mod_access.glb, mod_access.DataRestrictionMask, right.src, right.dt_first_seen) and
+																		RIGHT.src NOT IN Risk_Indicators.iid_constants.masked_header_sources(drm, FALSE /*isFCRA*/) AND
 																		(MDR.Source_is_DPPA(RIGHT.src) = FALSE OR
-																			(Risk_Indicators.iid_constants.DPPA_OK(Options.DPPA_Purpose, FALSE /*isFCRA*/) AND Drivers.State_DPPA_OK(dx_header.functions.TranslateSource(RIGHT.src), Options.DPPA_Purpose, RIGHT.src))) AND
+																			(mod_access.isValidDppa() AND mod_access.isValidDppaState(dx_header.functions.TranslateSource(RIGHT.src), RIGHT.src))) AND
 																		Risk_Indicators.iid_constants.filtered_source(RIGHT.src, RIGHT.st) = FALSE,
 																	getConsumerHeaderAddrAttributes(LEFT, RIGHT), ATMOST(Business_Risk_BIP.Constants.Limit_Default));
 	ConsumerHeaderAddrRaw:= Suppress.MAC_SuppressSource(ConsumerHeaderAddrRaw_all, mod_access, LexIDs[1].LexID); // There’s no more than one LexId here //
@@ -255,7 +258,7 @@ EXPORT getConsumerHeader(DATASET(Business_Risk_BIP.Layouts.Shell) Shell,
 																							SELF.Verification.BusAddrConsumerFullName := (STRING)RIGHT.BusAddrConsumerFullName;
 																							// If running business shell version 2.2 or above, make sure we're setting BusAddrPersonNameOverlap to -1 if input address or company name isn't populated.
 																							BusAddrPersonNameOverlap_v22 := IF(TRIM(LEFT.Clean_Input.Zip5) = '' OR TRIM(LEFT.Clean_Input.Prim_Name) = '' OR TRIM(LEFT.Clean_Input.CompanyName) = '', -1, RIGHT.BusAddrLinkPersonName);
-																							SELF.Business_To_Person_Link.BusAddrPersonNameOverlap := IF(Options.BusShellVersion >= Business_Risk_BIP.Constants.BusShellVersion_v22, (STRING)BusAddrPersonNameOverlap_v22, (STRING)RIGHT.BusAddrLinkPersonName);
+																							SELF.Business_To_Person_Link.BusAddrPersonNameOverlap := IF(shell_version >= Business_Risk_BIP.Constants.BusShellVersion_v22, (STRING)BusAddrPersonNameOverlap_v22, (STRING)RIGHT.BusAddrLinkPersonName);
 																							SELF.Verification.VerifiedConsumerName := RIGHT.VerifiedConsumerName;
                                               SELF.Verification.VerifiedConsumerAddress1 := RIGHT.VerifiedConsumerAddress1;
                                               SELF.Verification.VerifiedConsumerCity := RIGHT.VerifiedConsumerCity;
@@ -273,8 +276,8 @@ EXPORT getConsumerHeader(DATASET(Business_Risk_BIP.Layouts.Shell) Shell,
 	ConsumerHeaderRepAddrMatches := JOIN(seqContactInfo, ConsumerHeaderRepAddr, LEFT.Seq = RIGHT.Seq,
 																	TRANSFORM(tempConsumerHeaderAddrAttributes,
 																							SELF.Seq := LEFT.Seq,
-																							FirstNameMatched := TRIM(LEFT.FName) <> '' AND TRIM(RIGHT.FName) <> '' AND StringLib.StringFind(RIGHT.fname, LEFT.FName, 1) > 0;
-																							LastNameMatched := TRIM(LEFT.LName) <> '' AND TRIM(RIGHT.LName) <> '' AND StringLib.StringFind(RIGHT.lname, LEFT.LName, 1) > 0;
+																							FirstNameMatched := TRIM(LEFT.FName) <> '' AND TRIM(RIGHT.FName) <> '' AND STD.Str.Find(RIGHT.fname, LEFT.FName, 1) > 0;
+																							LastNameMatched := TRIM(LEFT.LName) <> '' AND TRIM(RIGHT.LName) <> '' AND STD.Str.Find(RIGHT.lname, LEFT.LName, 1) > 0;
 																							FullNameMatched	:= (FirstNameMatched AND LastNameMatched);
 																							SELF.AR2BRep1AddrAssociateCHeader := IF(RIGHT.Rep1AddrMatched AND FullNameMatched, 1, 0);
 																							SELF.AR2BRep2AddrAssociateCHeader := IF(RIGHT.Rep2AddrMatched AND FullNameMatched, 1, 0);
@@ -466,14 +469,14 @@ EXPORT getConsumerHeader(DATASET(Business_Risk_BIP.Layouts.Shell) Shell,
 		SELF.Rep5SSNMatched := Rep5SSNMatched;
 
 
-		fNameHit_old := FEINMatched AND LENGTH(TRIM(ri.fname)) >= 2 AND StringLib.StringFind(le.CompanyName, StringLib.StringToUpperCase(TRIM(ri.fname, LEFT, RIGHT)), 1) > 0;
-		lNameHit_old := FEINMatched AND LENGTH(TRIM(ri.lname)) >= 2 AND StringLib.StringFind(le.CompanyName, StringLib.StringToUpperCase(TRIM(ri.lname, LEFT, RIGHT)), 1) > 0;
+		fNameHit_old := FEINMatched AND LENGTH(TRIM(ri.fname)) >= 2 AND STD.Str.Find(le.CompanyName, STD.Str.ToUpperCase(TRIM(ri.fname, LEFT, RIGHT)), 1) > 0;
+		lNameHit_old := FEINMatched AND LENGTH(TRIM(ri.lname)) >= 2 AND STD.Str.Find(le.CompanyName, STD.Str.ToUpperCase(TRIM(ri.lname, LEFT, RIGHT)), 1) > 0;
 
 		fNameHit_new := FEINMatched AND Business_Risk_BIP.Common.fn_isFoundInCompanyName( le.CompanyName, ri.fname );
 		lNameHit_new := FEINMatched AND Business_Risk_BIP.Common.fn_isFoundInCompanyName( le.CompanyName, ri.lname );
 
-		fNameHit := IF( Options.BusShellVersion >= Business_Risk_BIP.Constants.BusShellVersion_v22, fNameHit_new, fNameHit_old );
-		lNameHit := IF( Options.BusShellVersion >= Business_Risk_BIP.Constants.BusShellVersion_v22, lNameHit_new, lNameHit_old );
+		fNameHit := IF( shell_version >= Business_Risk_BIP.Constants.BusShellVersion_v22, fNameHit_new, fNameHit_old );
+		lNameHit := IF( shell_version >= Business_Risk_BIP.Constants.BusShellVersion_v22, lNameHit_new, lNameHit_old );
 
 		NameSimilar 				:= fNameHit OR lNameHit;
 		NamePopulated 			:= TRIM(le.CompanyName) <> '';
@@ -539,10 +542,10 @@ EXPORT getConsumerHeader(DATASET(Business_Risk_BIP.Layouts.Shell) Shell,
 																			((INTEGER)LEFT.Rep4_SSN > 0 AND LEFT.Rep4_SSN = RIGHT.SSN) OR
 																			((INTEGER)LEFT.Rep5_SSN > 0 AND LEFT.Rep5_SSN = RIGHT.SSN)) AND // Only keep header records that match our input Rep SSN/Busienss FEIN
 																			// check permissions
-																			ut.PermissionTools.glb.SrcOk(Options.GLBA_Purpose, right.src, right.dt_first_seen) and
-																			RIGHT.src NOT IN Risk_Indicators.iid_constants.masked_header_sources(Options.DataRestrictionMask, FALSE /*isFCRA*/) AND
+																			doxie.compliance.source_ok(mod_access.glb, mod_access.DataRestrictionMask, right.src, right.dt_first_seen) and
+																			RIGHT.src NOT IN Risk_Indicators.iid_constants.masked_header_sources(drm, FALSE /*isFCRA*/) AND
 																			(MDR.Source_is_DPPA(RIGHT.src) = FALSE OR
-																				(Risk_Indicators.iid_constants.DPPA_OK(Options.DPPA_Purpose, FALSE /*isFCRA*/) AND Drivers.State_DPPA_OK(dx_header.functions.TranslateSource(RIGHT.src), Options.DPPA_Purpose, RIGHT.src))) AND
+																				(mod_access.isValidDppa() AND mod_access.isValidDppaState(dx_header.functions.TranslateSource(RIGHT.src), RIGHT.src))) AND
 																			Risk_Indicators.iid_constants.filtered_source(RIGHT.src, RIGHT.st) = FALSE,
 																	getConsumerHeaderDID(LEFT, RIGHT), ATMOST(Business_Risk_BIP.Constants.Limit_Default));
 
@@ -598,15 +601,15 @@ EXPORT getConsumerHeader(DATASET(Business_Risk_BIP.Layouts.Shell) Shell,
 																	TRANSFORM(Business_Risk_BIP.Layouts.Shell,
 																							//For business shell v22 and higher, only set BusFEINPersonOverlap to -1 if input FEIN not populated.
 																							BusFEINPersonOverlap_v22 := IF((INTEGER)LEFT.Clean_Input.FEIN=0, -1, MAX(RIGHT.BusFEINPersonOverlap, 0));
-																							SELF.Business_To_Person_Link.BusFEINPersonOverlap := IF(Options.BusShellVersion <= Business_Risk_BIP.Constants.BusShellVersion_v21, (STRING)RIGHT.BusFEINPersonOverlap, (STRING)BusFEINPersonOverlap_v22);
+																							SELF.Business_To_Person_Link.BusFEINPersonOverlap := IF(shell_version <= Business_Risk_BIP.Constants.BusShellVersion_v21, (STRING)RIGHT.BusFEINPersonOverlap, (STRING)BusFEINPersonOverlap_v22);
 																							//For business shell v22 and higher, only BusFEINPersonAddrOverlap to -1 if input FEIN or Address not populated.
 																							BusFEINPersonAddrOverlap_v22 := IF((INTEGER)LEFT.Clean_Input.FEIN=0 OR TRIM(LEFT.Clean_Input.Zip5)='' OR TRIM(LEFT.Clean_Input.Prim_Name)='', -1, MAX(RIGHT.BusFEINPersonAddrOverlap, 0));
-																							SELF.Business_To_Person_Link.BusFEINPersonAddrOverlap := MAP(Options.BusShellVersion >= Business_Risk_BIP.Constants.BusShellVersion_v22 => (STRING)BusFEINPersonAddrOverlap_v22,
+																							SELF.Business_To_Person_Link.BusFEINPersonAddrOverlap := MAP(shell_version >= Business_Risk_BIP.Constants.BusShellVersion_v22 => (STRING)BusFEINPersonAddrOverlap_v22,
 																																																					 RIGHT.BusFEINPersonAddrOverlap = -2 																			  => '0',
 																																																																																												 (STRING)RIGHT.BusFEINPersonAddrOverlap);
 																							//For business shell v22 and higher, only BusFEINPersonPhoneOverlap to -1 if input FEIN or Phone not populated.
 																							BusFEINPersonPhoneOverlap_v22 := IF((INTEGER)LEFT.Clean_Input.FEIN=0 OR TRIM(LEFT.Clean_Input.Phone10)='', -1, MAX(RIGHT.BusFEINPersonPhoneOverlap, 0));
-																							SELF.Business_To_Person_Link.BusFEINPersonPhoneOverlap := MAP(Options.BusShellVersion >= Business_Risk_BIP.Constants.BusShellVersion_v22 => (STRING)BusFEINPersonPhoneOverlap_v22,
+																							SELF.Business_To_Person_Link.BusFEINPersonPhoneOverlap := MAP(shell_version >= Business_Risk_BIP.Constants.BusShellVersion_v22 => (STRING)BusFEINPersonPhoneOverlap_v22,
 																																																						RIGHT.BusFEINPersonPhoneOverlap = -2 																			 => '0',
 																																																																																												  (STRING)RIGHT.BusFEINPersonPhoneOverlap);
 
@@ -631,16 +634,16 @@ EXPORT getConsumerHeader(DATASET(Business_Risk_BIP.Layouts.Shell) Shell,
 	Business_Risk_BIP.Layouts.Shell checkForDeceased(withConsumerHeaderDID le, Risk_Indicators.Key_SSN_Table_v4_2 ri) := TRANSFORM
 		dateCorrectionNeeded := Suppress.dateCorrect.DO(ri.SSN).Needed;
 		// Determine which header data in the table is permitted based on the data restriction mask
-		headerVersion := MAP(Options.DataRestrictionMask[Risk_Indicators.iid_constants.posExperianRestriction] = Risk_Indicators.iid_constants.sFalse AND
-												 Options.DataRestrictionMask[Risk_Indicators.iid_constants.posEquifaxRestriction] = Risk_Indicators.iid_constants.sFalse AND
-												 Options.DataRestrictionMask[Risk_Indicators.iid_constants.posTransUnionRestriction] = Risk_Indicators.iid_constants.sFalse		=> ri.Combo, // No data restricted credit sources
-												 Options.DataRestrictionMask[Risk_Indicators.iid_constants.posExperianRestriction] = Risk_Indicators.iid_constants.sFalse			=> ri.EN, // Experian not restricted
-												 Options.DataRestrictionMask[Risk_Indicators.iid_constants.posTransUnionRestriction] = Risk_Indicators.iid_constants.sFalse		=> ri.TN, // TransUnion not restricted
+		headerVersion := MAP(drm[Risk_Indicators.iid_constants.posExperianRestriction] = Risk_Indicators.iid_constants.sFalse AND
+												 drm[Risk_Indicators.iid_constants.posEquifaxRestriction] = Risk_Indicators.iid_constants.sFalse AND
+												 drm[Risk_Indicators.iid_constants.posTransUnionRestriction] = Risk_Indicators.iid_constants.sFalse		=> ri.Combo, // No data restricted credit sources
+												 drm[Risk_Indicators.iid_constants.posExperianRestriction] = Risk_Indicators.iid_constants.sFalse			=> ri.EN, // Experian not restricted
+												 drm[Risk_Indicators.iid_constants.posTransUnionRestriction] = Risk_Indicators.iid_constants.sFalse		=> ri.TN, // TransUnion not restricted
 																																																																												 ri.EQ); // Default to Equifax version
 
 		// EQ section are SSA death records only (Previously known as Death v2)
 		// EN and TN bureau records add additional data in their respective sections, use the appropriate data restriction
-		creditBureauDeceasedRecordsAllowed := Options.DataRestrictionMask[Risk_Indicators.iid_constants.posBureauDeceasedRestriction] = Risk_Indicators.iid_constants.sFalse;
+		creditBureauDeceasedRecordsAllowed := drm[Risk_Indicators.iid_constants.posBureauDeceasedRestriction] = Risk_Indicators.iid_constants.sFalse;
 		isDeceasedFlag := IF(creditBureauDeceasedRecordsAllowed, headerVersion.isDeceased, ri.EQ.isDeceased);
 		dateFirstDeceased := IF(creditBureauDeceasedRecordsAllowed, headerVersion.DT_First_Deceased, ri.EQ.DT_First_Deceased);
 
@@ -668,7 +671,7 @@ EXPORT getConsumerHeader(DATASET(Business_Risk_BIP.Layouts.Shell) Shell,
 																							SELF := []),
 																	ATMOST(100));
 
-		Doxie.Mac_Best_Records(SeqHeaderRelatives, DID, BestHeaderRelativesInfo, ut.DPPA_OK(Options.DPPA_Purpose), ut.GLB_OK(Options.GLBA_Purpose), FALSE/* UseNonBlankKey */, Options.DataRestrictionMask, (BOOLEAN)(Options.MarketingMode = 1));
+		Doxie.Mac_Best_Records(SeqHeaderRelatives, DID, BestHeaderRelativesInfo, mod_access.isValidDppa(), mod_access.isValidGlb(), FALSE/* UseNonBlankKey */, drm, (BOOLEAN)(Options.MarketingMode = 1));
 
 		SeqRelativeInfo := JOIN(SeqHeaderRelatives, BestHeaderRelativesInfo, LEFT.DID = RIGHT.DID,
 																	TRANSFORM(Business_Risk_BIP.Layouts.LayoutContacts,
@@ -686,7 +689,7 @@ EXPORT getConsumerHeader(DATASET(Business_Risk_BIP.Layouts.Shell) Shell,
 																							SELF := []),
 																	LEFT OUTER, ATMOST(Business_Risk_BIP.Constants.Limit_Default));
 
-		Doxie.Mac_Best_Records(HeaderHHID, DID, BestHeaderHHIDInfo, ut.DPPA_OK(Options.DPPA_Purpose), ut.GLB_OK(Options.GLBA_Purpose), FALSE/* UseNonBlankKey */, Options.DataRestrictionMask, (BOOLEAN)(Options.MarketingMode = 1));
+		Doxie.Mac_Best_Records(HeaderHHID, DID, BestHeaderHHIDInfo, mod_access.isValidDppa(), mod_access.isValidGlb(), FALSE/* UseNonBlankKey */, drm, (BOOLEAN)(Options.MarketingMode = 1));
 
 		SeqHouseholdInfo := JOIN(HeaderHHID, BestHeaderHHIDInfo, LEFT.DID = RIGHT.DID,
 																	TRANSFORM(Business_Risk_BIP.Layouts.LayoutContacts,
@@ -721,8 +724,8 @@ EXPORT getConsumerHeader(DATASET(Business_Risk_BIP.Layouts.Shell) Shell,
 		AssociateVerification := JOIN(SeqContactInfo, seqRelativeHHInfo, LEFT.Seq = RIGHT.Seq,
 																	TRANSFORM(TempAssociateVerificationLayout,
 																							SELF.Seq := LEFT.Seq,
-																							FNameMatched := Business_Risk_BIP.Common.SetBoolean(LEFT.FName <> '' AND RIGHT.fname <> '' AND StringLib.StringFind(RIGHT.fname, LEFT.FName, 1) > 0);
-																							LNameMatched := Business_Risk_BIP.Common.SetBoolean(LEFT.LName <> '' AND RIGHT.lname <> '' AND StringLib.StringFind(RIGHT.lname, LEFT.LName, 1) > 0);
+																							FNameMatched := Business_Risk_BIP.Common.SetBoolean(LEFT.FName <> '' AND RIGHT.fname <> '' AND STD.Str.Find(RIGHT.fname, LEFT.FName, 1) > 0);
+																							LNameMatched := Business_Risk_BIP.Common.SetBoolean(LEFT.LName <> '' AND RIGHT.lname <> '' AND STD.Str.Find(RIGHT.lname, LEFT.LName, 1) > 0);
 																							FullNamePopulated := TRIM(LEFT.FName) <> '' OR TRIM(LEFT.LName) <> ''; // Populated if first or last are sent in
 																							FullNameMatched := FNameMatched = '1' AND LNameMatched = '1';
 																							SELF.FEINRelativeSSNMatch  := MAP(RIGHT.Relationship = 'R' AND FullNamePopulated AND FullNameMatched => '2',
@@ -755,8 +758,8 @@ EXPORT getConsumerHeader(DATASET(Business_Risk_BIP.Layouts.Shell) Shell,
 		ContactVerification := JOIN(SeqContactInfo, ConsumerHeaderDID, LEFT.Seq = RIGHT.Seq,
 																	TRANSFORM(TempAssociateVerificationLayout,
 																							SELF.Seq := LEFT.Seq,
-																							FNameMatched := Business_Risk_BIP.Common.SetBoolean(LEFT.FName <> '' AND RIGHT.fname <> '' AND StringLib.StringFind(RIGHT.fname, LEFT.FName, 1) > 0);
-																							LNameMatched := Business_Risk_BIP.Common.SetBoolean(LEFT.LName <> '' AND RIGHT.lname <> '' AND StringLib.StringFind(RIGHT.lname, LEFT.LName, 1) > 0);
+																							FNameMatched := Business_Risk_BIP.Common.SetBoolean(LEFT.FName <> '' AND RIGHT.fname <> '' AND STD.Str.Find(RIGHT.fname, LEFT.FName, 1) > 0);
+																							LNameMatched := Business_Risk_BIP.Common.SetBoolean(LEFT.LName <> '' AND RIGHT.lname <> '' AND STD.Str.Find(RIGHT.lname, LEFT.LName, 1) > 0);
 																							FullNamePopulated := TRIM(LEFT.FName) <> '' OR TRIM(LEFT.LName) <> ''; // Populated if first or last are sent in
 																							FullNameMatched := FNameMatched = '1' AND LNameMatched = '1';
 
@@ -821,15 +824,15 @@ EXPORT getConsumerHeader(DATASET(Business_Risk_BIP.Layouts.Shell) Shell,
 																	ATMOST(Business_Risk_BIP.Constants.Limit_Default));
 
 	phonesPlusRaw_filter_srcall := phonesPlusRaw(Phones.Functions.IsPhoneRestricted(origstate,
-																																									Options.GLBA_Purpose,
-																																									Options.DPPA_Purpose,
-																																									Options.IndustryClass,
+																																									mod_access.glb,
+																																									mod_access.dppa,
+																																									mod_access.industry_class,
 																																									,
 																																									datefirstseen,
 																																									dt_nonglb_last_seen,
 																																									rules,
 																																									src_all,
-																																									Options.DataRestrictionMask
+																																									drm
 																																								) = FALSE);
 	// Filter out records after our history date
 	phonesPlus := Business_Risk_BIP.Common.FilterRecords(phonesPlusRaw_filter_srcall, datefirstseen, datevendorfirstreported, '', AllowedSourcesSet);
@@ -857,7 +860,7 @@ EXPORT getConsumerHeader(DATASET(Business_Risk_BIP.Layouts.Shell) Shell,
 		PhoneMatched				:= PhonePopulated AND (le.Clean_Input.Phone10[1] = ri.CellPhone[1] OR le.Clean_Input.Phone10[4] = ri.CellPhone[4] OR le.Clean_Input.Phone10[4] = ri.CellPhone[1]) AND Risk_Indicators.iid_constants.gn(Risk_Indicators.PhoneScore(le.Clean_Input.Phone10, ri.CellPhone));
 
 		PhoneNameMatchLevel := MAP((INTEGER)le.Clean_Input.Phone10 = 0 																				                                         => '-1', //Phone not input
-                                  Options.BusShellVersion >= Business_Risk_BIP.Constants.BusShellVersion_v30 AND
+                                  shell_version >= Business_Risk_BIP.Constants.BusShellVersion_v30 AND
                                   (TRIM(le.Clean_Input.CompanyName) = '' OR TRIM(le.Clean_Input.Prim_Name) = '' OR TRIM(le.Clean_Input.Zip5) = '') => '-1', //In version 3.0 and up, need name and address input to calculate
 																	NOT PhonePopulated AND (INTEGER)le.Clean_Input.Phone10 > 0 							                                         => '0',	//Phone not found on gong records
 																	PhoneMatched = TRUE AND NameMatched = FALSE AND AddressMatched = FALSE                                           => '1',
@@ -876,8 +879,8 @@ EXPORT getConsumerHeader(DATASET(Business_Risk_BIP.Layouts.Shell) Shell,
 	phonesPlusVerification := JOIN(SeqContactInfo, PhonesPlusRep, LEFT.Seq = RIGHT.Seq,
 																	TRANSFORM(TempAssociateVerificationLayout,
 																							SELF.Seq := LEFT.Seq,
-																							FNameMatched := Business_Risk_BIP.Common.SetBoolean(LEFT.FName <> '' AND RIGHT.fname <> '' AND StringLib.StringFind(RIGHT.fname, LEFT.FName, 1) > 0);
-																							LNameMatched := Business_Risk_BIP.Common.SetBoolean(LEFT.LName <> '' AND RIGHT.lname <> '' AND StringLib.StringFind(RIGHT.lname, LEFT.LName, 1) > 0);
+																							FNameMatched := Business_Risk_BIP.Common.SetBoolean(LEFT.FName <> '' AND RIGHT.fname <> '' AND STD.Str.Find(RIGHT.fname, LEFT.FName, 1) > 0);
+																							LNameMatched := Business_Risk_BIP.Common.SetBoolean(LEFT.LName <> '' AND RIGHT.lname <> '' AND STD.Str.Find(RIGHT.lname, LEFT.LName, 1) > 0);
 																							FullNamePopulated := TRIM(LEFT.FName) <> '' OR TRIM(LEFT.LName) <> ''; // Populated if first or last are sent in
 																							FullNameMatched := FNameMatched = '1' AND LNameMatched = '1';
 																							SELF.AR2BRep1PhoneAssociateCHeader := IF(FullNamePopulated AND FullNameMatched AND RIGHT.RecordType='1', '1', '0');
@@ -921,7 +924,7 @@ EXPORT getConsumerHeader(DATASET(Business_Risk_BIP.Layouts.Shell) Shell,
 		PhoneMatched				:= PhonePopulated AND (le.Clean_Input.Phone10[1] = ri.Phone10[1] OR le.Clean_Input.Phone10[4] = ri.Phone10[4] OR le.Clean_Input.Phone10[4] = ri.Phone10[1]) AND Risk_Indicators.iid_constants.gn(Risk_Indicators.PhoneScore(le.Clean_Input.Phone10, ri.Phone10));
 
 		PhoneNameMatchLevel := MAP((INTEGER)le.Clean_Input.Phone10 = 0 																			                                         => '-1', //Phone not input
-                                Options.BusShellVersion >= Business_Risk_BIP.Constants.BusShellVersion_v30 AND
+                                shell_version >= Business_Risk_BIP.Constants.BusShellVersion_v30 AND
                                 (TRIM(le.Clean_Input.CompanyName) = '' OR TRIM(le.Clean_Input.Prim_Name) = '' OR TRIM(le.Clean_Input.Zip5) = '') => '-1', //In version 3.0 and up, need name and address input to calculate
 																NOT PhonePopulated AND (INTEGER)le.Clean_Input.Phone10 > 0 							                                         => '0',	//Phone not found on gong records
 																PhoneMatched = TRUE AND NameMatched = FALSE AND AddressMatched = FALSE                                           => '1',
@@ -952,8 +955,8 @@ EXPORT getConsumerHeader(DATASET(Business_Risk_BIP.Layouts.Shell) Shell,
 	gongRawVerification := JOIN(SeqContactInfo, gongRawRep, LEFT.Seq = RIGHT.Seq,
 																	TRANSFORM(TempAssociateVerificationLayout,
 																							SELF.Seq := LEFT.Seq,
-																							FNameMatched := Business_Risk_BIP.Common.SetBoolean(LEFT.FName <> '' AND RIGHT.name_first <> '' AND StringLib.StringFind(RIGHT.name_first, LEFT.FName, 1) > 0);
-																							LNameMatched := Business_Risk_BIP.Common.SetBoolean(LEFT.LName <> '' AND RIGHT.name_last <> '' AND StringLib.StringFind(RIGHT.name_last, LEFT.LName, 1) > 0);
+																							FNameMatched := Business_Risk_BIP.Common.SetBoolean(LEFT.FName <> '' AND RIGHT.name_first <> '' AND STD.Str.Find(RIGHT.name_first, LEFT.FName, 1) > 0);
+																							LNameMatched := Business_Risk_BIP.Common.SetBoolean(LEFT.LName <> '' AND RIGHT.name_last <> '' AND STD.Str.Find(RIGHT.name_last, LEFT.LName, 1) > 0);
 																							FullNamePopulated := TRIM(LEFT.FName) <> '' OR TRIM(LEFT.LName) <> ''; // Populated if first or last are sent in
 																							FullNameMatched := FNameMatched = '1' AND LNameMatched = '1';
 																							SELF.AR2BRep1PhoneAssociateCHeader := IF(FullNamePopulated AND FullNameMatched AND RIGHT.RecordType='1', '1', '0');
@@ -1013,10 +1016,10 @@ EXPORT getConsumerHeader(DATASET(Business_Risk_BIP.Layouts.Shell) Shell,
 
 	ConsumerShellContactInfoRaw_all := JOIN(seqContactInfo, dx_header.key_header(), LEFT.DID > 0 AND KEYED(LEFT.DID = RIGHT.S_DID) AND
 																	// check permissions
-																	ut.PermissionTools.glb.SrcOk(Options.GLBA_Purpose, right.src, right.dt_first_seen) and
-																	RIGHT.src NOT IN Risk_Indicators.iid_constants.masked_header_sources(Options.DataRestrictionMask, FALSE /*isFCRA*/) AND
+																	doxie.compliance.source_ok(mod_access.glb, mod_access.DataRestrictionMask, right.src, right.dt_first_seen) and
+																	RIGHT.src NOT IN Risk_Indicators.iid_constants.masked_header_sources(drm, FALSE /*isFCRA*/) AND
 																	(MDR.Source_is_DPPA(RIGHT.src) = FALSE OR
-																		(Risk_Indicators.iid_constants.DPPA_OK(Options.DPPA_Purpose, FALSE /*isFCRA*/) AND Drivers.State_DPPA_OK(dx_header.functions.TranslateSource(RIGHT.src), Options.DPPA_Purpose, RIGHT.src))) AND
+																		(mod_access.isValidDppa() AND mod_access.isValidDppaState(dx_header.functions.TranslateSource(RIGHT.src), RIGHT.src))) AND
 																	Risk_Indicators.iid_constants.filtered_source(RIGHT.src, RIGHT.st) = FALSE,
 																	TRANSFORM({UNSIGNED4 Seq, UNSIGNED3 HistoryDate, RECORDOF(RIGHT)}, SELF.Seq := LEFT.Seq, SELF.HistoryDate := LEFT.HistoryDate, SELF := RIGHT),
 																	ATMOST(Business_Risk_BIP.Constants.Limit_Default));
@@ -1030,15 +1033,15 @@ EXPORT getConsumerHeader(DATASET(Business_Risk_BIP.Layouts.Shell) Shell,
 																							SELF.Seq := LEFT.Seq,
 																							// Verify with Rep1 elements
 																							RepInputNamePopulated 	  := TRIM(LEFT.Clean_Input.Rep_FirstName) <> '' OR TRIM(LEFT.Clean_Input.Rep_LastName) <> ''; // Populated if first or last are sent in
-																							RepAR2BFNameFile 				  := Business_Risk_BIP.Common.SetBoolean(LEFT.Clean_Input.Rep_FirstName <> '' AND StringLib.StringFind(RIGHT.fname, LEFT.Clean_Input.Rep_FirstName, 1) > 0);
-																							RepAR2BLNameFile 				  := Business_Risk_BIP.Common.SetBoolean(LEFT.Clean_Input.Rep_LastName <> '' AND StringLib.StringFind(RIGHT.lname, LEFT.Clean_Input.Rep_LastName, 1) > 0);
-																							RepAR2BPreferredNameFile  := Business_Risk_BIP.Common.SetBoolean(LEFT.Clean_Input.Rep_PreferredFirstName <> '' AND StringLib.StringFind(RIGHT.fname, LEFT.Clean_Input.Rep_PreferredFirstName, 1) > 0);
+																							RepAR2BFNameFile 				  := Business_Risk_BIP.Common.SetBoolean(LEFT.Clean_Input.Rep_FirstName <> '' AND STD.Str.Find(RIGHT.fname, LEFT.Clean_Input.Rep_FirstName, 1) > 0);
+																							RepAR2BLNameFile 				  := Business_Risk_BIP.Common.SetBoolean(LEFT.Clean_Input.Rep_LastName <> '' AND STD.Str.Find(RIGHT.lname, LEFT.Clean_Input.Rep_LastName, 1) > 0);
+																							RepAR2BPreferredNameFile  := Business_Risk_BIP.Common.SetBoolean(LEFT.Clean_Input.Rep_PreferredFirstName <> '' AND STD.Str.Find(RIGHT.fname, LEFT.Clean_Input.Rep_PreferredFirstName, 1) > 0);
 																							RepAR2BFullFile					  := Business_Risk_BIP.Common.SetBoolean((RepAR2BFNameFile = '1' AND RepAR2BLNameFile = '1') OR (RepAR2BPreferredNameFile = '1' AND RepAR2BLNameFile = '1'));
 
 																							RepInputAddrPopulated 	  := TRIM(LEFT.Clean_Input.Rep_Prim_Name) <> '' AND TRIM(LEFT.Clean_Input.Rep_Zip5) <> '';
 																							NoScoreValue						  := 255; // This is what the various score functions return if blank is passed in
 																							RepZIPScore							  := IF(LEFT.Clean_Input.Rep_Zip5 <> '' AND RIGHT.Zip <> '' AND LEFT.Clean_Input.Rep_Zip5[1] = RIGHT.Zip[1], Risk_Indicators.AddrScore.ZIP_Score(LEFT.Clean_Input.Rep_Zip5, RIGHT.Zip), NoScoreValue);
-																							RepStateMatched					  := StringLib.StringToUpperCase(LEFT.Clean_Input.Rep_State) = StringLib.StringToUpperCase(RIGHT.st);
+																							RepStateMatched					  := STD.Str.ToUpperCase(LEFT.Clean_Input.Rep_State) = STD.Str.ToUpperCase(RIGHT.st);
 																							RepCityStateScore				  := IF(LEFT.Clean_Input.Rep_City <> '' AND LEFT.Clean_Input.Rep_State <> '' AND RIGHT.city_name <> '' AND RIGHT.st <> '' AND RepStateMatched,
 																																			  	 Risk_Indicators.AddrScore.CityState_Score(LEFT.Clean_Input.Rep_City, LEFT.Clean_Input.Rep_State, RIGHT.city_name, RIGHT.st, ''), NoScoreValue);
 																							RepCityStateZipMatched	  := RepInputAddrPopulated AND Risk_Indicators.iid_constants.ga(RepZIPScore) AND Risk_Indicators.iid_constants.ga(RepCityStateScore);
@@ -1070,14 +1073,14 @@ EXPORT getConsumerHeader(DATASET(Business_Risk_BIP.Layouts.Shell) Shell,
 
 																							// Verify with Representative 2 elements
 																							Rep2InputNamePopulated 		:= TRIM(LEFT.Clean_Input.Rep2_FirstName) <> '' OR TRIM(LEFT.Clean_Input.Rep2_LastName) <> ''; // Populated if first or last are sent in
-																							Rep2AR2BFNameFile 				:= Business_Risk_BIP.Common.SetBoolean(LEFT.Clean_Input.Rep2_FirstName <> '' AND StringLib.StringFind(RIGHT.fname, LEFT.Clean_Input.Rep2_FirstName, 1) > 0);
-																							Rep2AR2BLNameFile 				:= Business_Risk_BIP.Common.SetBoolean(LEFT.Clean_Input.Rep2_LastName <> '' AND StringLib.StringFind(RIGHT.lname, LEFT.Clean_Input.Rep2_LastName, 1) > 0);
-																							Rep2AR2BPreferredNameFile := Business_Risk_BIP.Common.SetBoolean(LEFT.Clean_Input.Rep2_PreferredFirstName <> '' AND StringLib.StringFind(RIGHT.fname, LEFT.Clean_Input.Rep2_PreferredFirstName, 1) > 0);
+																							Rep2AR2BFNameFile 				:= Business_Risk_BIP.Common.SetBoolean(LEFT.Clean_Input.Rep2_FirstName <> '' AND STD.Str.Find(RIGHT.fname, LEFT.Clean_Input.Rep2_FirstName, 1) > 0);
+																							Rep2AR2BLNameFile 				:= Business_Risk_BIP.Common.SetBoolean(LEFT.Clean_Input.Rep2_LastName <> '' AND STD.Str.Find(RIGHT.lname, LEFT.Clean_Input.Rep2_LastName, 1) > 0);
+																							Rep2AR2BPreferredNameFile := Business_Risk_BIP.Common.SetBoolean(LEFT.Clean_Input.Rep2_PreferredFirstName <> '' AND STD.Str.Find(RIGHT.fname, LEFT.Clean_Input.Rep2_PreferredFirstName, 1) > 0);
 																							Rep2AR2BFullFile					:= Business_Risk_BIP.Common.SetBoolean((Rep2AR2BFNameFile = '1' AND Rep2AR2BLNameFile = '1') OR (Rep2AR2BPreferredNameFile = '1' AND Rep2AR2BLNameFile = '1'));
 
 																							Rep2InputAddrPopulated 		:= TRIM(LEFT.Clean_Input.Rep2_Prim_Name) <> '' AND TRIM(LEFT.Clean_Input.Rep2_Zip5) <> '';
 																							Rep2ZIPScore							:= IF(LEFT.Clean_Input.Rep2_Zip5 <> '' AND RIGHT.Zip <> '' AND LEFT.Clean_Input.Rep2_Zip5[1] = RIGHT.Zip[1], Risk_Indicators.AddrScore.ZIP_Score(LEFT.Clean_Input.Rep2_Zip5, RIGHT.Zip), NoScoreValue);
-																							Rep2StateMatched					:= StringLib.StringToUpperCase(LEFT.Clean_Input.Rep2_State) = StringLib.StringToUpperCase(RIGHT.st);
+																							Rep2StateMatched					:= STD.Str.ToUpperCase(LEFT.Clean_Input.Rep2_State) = STD.Str.ToUpperCase(RIGHT.st);
 																							Rep2CityStateScore				:= IF(LEFT.Clean_Input.Rep2_City <> '' AND LEFT.Clean_Input.Rep2_State <> '' AND RIGHT.city_name <> '' AND RIGHT.st <> '' AND Rep2StateMatched,
 																																					 Risk_Indicators.AddrScore.CityState_Score(LEFT.Clean_Input.Rep2_City, LEFT.Clean_Input.Rep2_State, RIGHT.city_name, RIGHT.st, ''), NoScoreValue);
 																							Rep2CityStateZipMatched		:= Rep2InputAddrPopulated AND Risk_Indicators.iid_constants.ga(Rep2ZIPScore) AND Risk_Indicators.iid_constants.ga(Rep2CityStateScore);
@@ -1109,14 +1112,14 @@ EXPORT getConsumerHeader(DATASET(Business_Risk_BIP.Layouts.Shell) Shell,
 																																																																					 '0');
 																							// Verify with Representative 3 elements
 																							Rep3InputNamePopulated 		:= TRIM(LEFT.Clean_Input.Rep3_FirstName) <> '' OR TRIM(LEFT.Clean_Input.Rep3_LastName) <> ''; // Populated if first or last are sent in
-																							Rep3AR2BFNameFile 				:= Business_Risk_BIP.Common.SetBoolean(LEFT.Clean_Input.Rep3_FirstName <> '' AND StringLib.StringFind(RIGHT.fname, LEFT.Clean_Input.Rep3_FirstName, 1) > 0);
-																							Rep3AR2BLNameFile 				:= Business_Risk_BIP.Common.SetBoolean(LEFT.Clean_Input.Rep3_LastName <> '' AND StringLib.StringFind(RIGHT.lname, LEFT.Clean_Input.Rep3_LastName, 1) > 0);
-																							Rep3AR2BPreferredNameFile := Business_Risk_BIP.Common.SetBoolean(LEFT.Clean_Input.Rep3_PreferredFirstName <> '' AND StringLib.StringFind(RIGHT.fname, LEFT.Clean_Input.Rep3_PreferredFirstName, 1) > 0);
+																							Rep3AR2BFNameFile 				:= Business_Risk_BIP.Common.SetBoolean(LEFT.Clean_Input.Rep3_FirstName <> '' AND STD.Str.Find(RIGHT.fname, LEFT.Clean_Input.Rep3_FirstName, 1) > 0);
+																							Rep3AR2BLNameFile 				:= Business_Risk_BIP.Common.SetBoolean(LEFT.Clean_Input.Rep3_LastName <> '' AND STD.Str.Find(RIGHT.lname, LEFT.Clean_Input.Rep3_LastName, 1) > 0);
+																							Rep3AR2BPreferredNameFile := Business_Risk_BIP.Common.SetBoolean(LEFT.Clean_Input.Rep3_PreferredFirstName <> '' AND STD.Str.Find(RIGHT.fname, LEFT.Clean_Input.Rep3_PreferredFirstName, 1) > 0);
 																							Rep3AR2BFullFile					:= Business_Risk_BIP.Common.SetBoolean((Rep3AR2BFNameFile = '1' AND Rep3AR2BLNameFile = '1') OR (Rep3AR2BPreferredNameFile = '1' AND Rep3AR2BLNameFile = '1'));
 
 																							Rep3InputAddrPopulated 		:= TRIM(LEFT.Clean_Input.Rep3_Prim_Name) <> '' AND TRIM(LEFT.Clean_Input.Rep3_Zip5) <> '';
 																							Rep3ZIPScore							:= IF(LEFT.Clean_Input.Rep3_Zip5 <> '' AND RIGHT.Zip <> '' AND LEFT.Clean_Input.Rep3_Zip5[1] = RIGHT.Zip[1], Risk_Indicators.AddrScore.ZIP_Score(LEFT.Clean_Input.Rep3_Zip5, RIGHT.Zip), NoScoreValue);
-																							Rep3StateMatched					:= StringLib.StringToUpperCase(LEFT.Clean_Input.Rep3_State) = StringLib.StringToUpperCase(RIGHT.st);
+																							Rep3StateMatched					:= STD.Str.ToUpperCase(LEFT.Clean_Input.Rep3_State) = STD.Str.ToUpperCase(RIGHT.st);
 																							Rep3CityStateScore				:= IF(LEFT.Clean_Input.Rep3_City <> '' AND LEFT.Clean_Input.Rep3_State <> '' AND RIGHT.city_name <> '' AND RIGHT.st <> '' AND Rep3StateMatched,
 																																					 Risk_Indicators.AddrScore.CityState_Score(LEFT.Clean_Input.Rep3_City, LEFT.Clean_Input.Rep3_State, RIGHT.city_name, RIGHT.st, ''), NoScoreValue);
 																							Rep3CityStateZipMatched		:= Rep3InputAddrPopulated AND Risk_Indicators.iid_constants.ga(Rep3ZIPScore) AND Risk_Indicators.iid_constants.ga(Rep3CityStateScore);
@@ -1149,14 +1152,14 @@ EXPORT getConsumerHeader(DATASET(Business_Risk_BIP.Layouts.Shell) Shell,
 
 																							// Verify with Representative 4 elements
 																							Rep4InputNamePopulated 		:= TRIM(LEFT.Clean_Input.Rep4_FirstName) <> '' OR TRIM(LEFT.Clean_Input.Rep4_LastName) <> ''; // Populated if first or last are sent in
-																							Rep4AR2BFNameFile 				:= Business_Risk_BIP.Common.SetBoolean(LEFT.Clean_Input.Rep4_FirstName <> '' AND StringLib.StringFind(RIGHT.fname, LEFT.Clean_Input.Rep4_FirstName, 1) > 0);
-																							Rep4AR2BLNameFile 				:= Business_Risk_BIP.Common.SetBoolean(LEFT.Clean_Input.Rep4_LastName <> '' AND StringLib.StringFind(RIGHT.lname, LEFT.Clean_Input.Rep4_LastName, 1) > 0);
-																							Rep4AR2BPreferredNameFile := Business_Risk_BIP.Common.SetBoolean(LEFT.Clean_Input.Rep4_PreferredFirstName <> '' AND StringLib.StringFind(RIGHT.fname, LEFT.Clean_Input.Rep4_PreferredFirstName, 1) > 0);
+																							Rep4AR2BFNameFile 				:= Business_Risk_BIP.Common.SetBoolean(LEFT.Clean_Input.Rep4_FirstName <> '' AND STD.Str.Find(RIGHT.fname, LEFT.Clean_Input.Rep4_FirstName, 1) > 0);
+																							Rep4AR2BLNameFile 				:= Business_Risk_BIP.Common.SetBoolean(LEFT.Clean_Input.Rep4_LastName <> '' AND STD.Str.Find(RIGHT.lname, LEFT.Clean_Input.Rep4_LastName, 1) > 0);
+																							Rep4AR2BPreferredNameFile := Business_Risk_BIP.Common.SetBoolean(LEFT.Clean_Input.Rep4_PreferredFirstName <> '' AND STD.Str.Find(RIGHT.fname, LEFT.Clean_Input.Rep4_PreferredFirstName, 1) > 0);
 																							Rep4AR2BFullFile					:= Business_Risk_BIP.Common.SetBoolean((Rep4AR2BFNameFile = '1' AND Rep4AR2BLNameFile = '1') OR (Rep4AR2BPreferredNameFile = '1' AND Rep4AR2BLNameFile = '1'));
 
 																							Rep4InputAddrPopulated 		:= TRIM(LEFT.Clean_Input.Rep4_Prim_Name) <> '' AND TRIM(LEFT.Clean_Input.Rep4_Zip5) <> '';
 																							Rep4ZIPScore							:= IF(LEFT.Clean_Input.Rep4_Zip5 <> '' AND RIGHT.Zip <> '' AND LEFT.Clean_Input.Rep4_Zip5[1] = RIGHT.Zip[1], Risk_Indicators.AddrScore.ZIP_Score(LEFT.Clean_Input.Rep4_Zip5, RIGHT.Zip), NoScoreValue);
-																							Rep4StateMatched					:= StringLib.StringToUpperCase(LEFT.Clean_Input.Rep4_State) = StringLib.StringToUpperCase(RIGHT.st);
+																							Rep4StateMatched					:= STD.Str.ToUpperCase(LEFT.Clean_Input.Rep4_State) = STD.Str.ToUpperCase(RIGHT.st);
 																							Rep4CityStateScore				:= IF(LEFT.Clean_Input.Rep4_City <> '' AND LEFT.Clean_Input.Rep4_State <> '' AND RIGHT.city_name <> '' AND RIGHT.st <> '' AND Rep4StateMatched,
 																																					 Risk_Indicators.AddrScore.CityState_Score(LEFT.Clean_Input.Rep4_City, LEFT.Clean_Input.Rep4_State, RIGHT.city_name, RIGHT.st, ''), NoScoreValue);
 																							Rep4CityStateZipMatched		:= Rep4InputAddrPopulated AND Risk_Indicators.iid_constants.ga(Rep4ZIPScore) AND Risk_Indicators.iid_constants.ga(Rep4CityStateScore);
@@ -1188,14 +1191,14 @@ EXPORT getConsumerHeader(DATASET(Business_Risk_BIP.Layouts.Shell) Shell,
 																																																																					 '0');
 																							// Verify with Representative 5 elements
 																							Rep5InputNamePopulated 		:= TRIM(LEFT.Clean_Input.Rep5_FirstName) <> '' OR TRIM(LEFT.Clean_Input.Rep5_LastName) <> ''; // Populated if first or last are sent in
-																							Rep5AR2BFNameFile 				:= Business_Risk_BIP.Common.SetBoolean(LEFT.Clean_Input.Rep5_FirstName <> '' AND StringLib.StringFind(RIGHT.fname, LEFT.Clean_Input.Rep5_FirstName, 1) > 0);
-																							Rep5AR2BLNameFile 				:= Business_Risk_BIP.Common.SetBoolean(LEFT.Clean_Input.Rep5_LastName <> '' AND StringLib.StringFind(RIGHT.lname, LEFT.Clean_Input.Rep5_LastName, 1) > 0);
-																							Rep5AR2BPreferredNameFile := Business_Risk_BIP.Common.SetBoolean(LEFT.Clean_Input.Rep5_PreferredFirstName <> '' AND StringLib.StringFind(RIGHT.fname, LEFT.Clean_Input.Rep5_PreferredFirstName, 1) > 0);
+																							Rep5AR2BFNameFile 				:= Business_Risk_BIP.Common.SetBoolean(LEFT.Clean_Input.Rep5_FirstName <> '' AND STD.Str.Find(RIGHT.fname, LEFT.Clean_Input.Rep5_FirstName, 1) > 0);
+																							Rep5AR2BLNameFile 				:= Business_Risk_BIP.Common.SetBoolean(LEFT.Clean_Input.Rep5_LastName <> '' AND STD.Str.Find(RIGHT.lname, LEFT.Clean_Input.Rep5_LastName, 1) > 0);
+																							Rep5AR2BPreferredNameFile := Business_Risk_BIP.Common.SetBoolean(LEFT.Clean_Input.Rep5_PreferredFirstName <> '' AND STD.Str.Find(RIGHT.fname, LEFT.Clean_Input.Rep5_PreferredFirstName, 1) > 0);
 																							Rep5AR2BFullFile					:= Business_Risk_BIP.Common.SetBoolean((Rep5AR2BFNameFile = '1' AND Rep5AR2BLNameFile = '1') OR (Rep5AR2BPreferredNameFile = '1' AND Rep5AR2BLNameFile = '1'));
 
 																							Rep5InputAddrPopulated 		:= TRIM(LEFT.Clean_Input.Rep5_Prim_Name) <> '' AND TRIM(LEFT.Clean_Input.Rep5_Zip5) <> '';
 																							Rep5ZIPScore							:= IF(LEFT.Clean_Input.Rep5_Zip5 <> '' AND RIGHT.Zip <> '' AND LEFT.Clean_Input.Rep5_Zip5[1] = RIGHT.Zip[1], Risk_Indicators.AddrScore.ZIP_Score(LEFT.Clean_Input.Rep5_Zip5, RIGHT.Zip), NoScoreValue);
-																							Rep5StateMatched					:= StringLib.StringToUpperCase(LEFT.Clean_Input.Rep5_State) = StringLib.StringToUpperCase(RIGHT.st);
+																							Rep5StateMatched					:= STD.Str.ToUpperCase(LEFT.Clean_Input.Rep5_State) = STD.Str.ToUpperCase(RIGHT.st);
 																							Rep5CityStateScore				:= IF(LEFT.Clean_Input.Rep5_City <> '' AND LEFT.Clean_Input.Rep5_State <> '' AND RIGHT.city_name <> '' AND RIGHT.st <> '' AND Rep5StateMatched,
 																																					 Risk_Indicators.AddrScore.CityState_Score(LEFT.Clean_Input.Rep5_City, LEFT.Clean_Input.Rep5_State, RIGHT.city_name, RIGHT.st, ''), NoScoreValue);
 																							Rep5CityStateZipMatched		:= Rep5InputAddrPopulated AND Risk_Indicators.iid_constants.ga(Rep5ZIPScore) AND Risk_Indicators.iid_constants.ga(Rep5CityStateScore);
@@ -1304,5 +1307,5 @@ EXPORT getConsumerHeader(DATASET(Business_Risk_BIP.Layouts.Shell) Shell,
 	// OUTPUT(CHOOSEN(ConsumerShellContactInfo, 100), NAMED('Sample_ConsumerShellContactInfo'));
 	// OUTPUT(CHOOSEN(ConsumerShellContactVerification, 100), NAMED('Sample_ConsumerShellContactVerification'));
   // OUTPUT(CHOOSEN(ConsumerShellContactVerificationRolled, 100), NAMED('Sample_ConsumerShellContactVerificationRolled'));
-	RETURN IF(Options.BusShellVersion <= Business_Risk_BIP.Constants.BusShellVersion_v21, withDeceasedFlag, withConsumerShellContactVerification);
+	RETURN IF(shell_version <= Business_Risk_BIP.Constants.BusShellVersion_v21, withDeceasedFlag, withConsumerShellContactVerification);
 END;

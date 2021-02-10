@@ -1,5 +1,5 @@
-﻿IMPORT Appriss, DCA, Doxie, LN_PropertyV2_Services, USAbizV2_Services, 
-       YellowPages, AutoKey_Batch, BankruptcyV3_Services, uccv2_services, courtLink, Entiera,
+﻿IMPORT DCA, Doxie, LN_PropertyV2_Services, USAbizV2_Services, 
+       YellowPages, AutoKey_Batch, BankruptcyV3_Services, uccv2_services, Entiera,
 			 DriversV2_Services, Corrections, BIPV2;
 
 EXPORT Layouts := MODULE
@@ -341,88 +341,6 @@ EXPORT Layouts := MODULE
 				layout_BIPLinkids;
 		end;	
 	end;
-	
-	export PLD := module
-	  EXPORT rec_results_raw := record, maxlength(155384)		 
-		  unsigned2 penalt;
-		  layout_batch_common_acct;
-			unsigned2 LitigiousDebtor_Flag;
-			CourtLink.Layouts.keybuild2;				 
-			string1 CaseTypeSearch_FDCPA;
-			string1 CaseTypeSearch_FCRA;
-			string1 CaseTypeSearch_TCPA;
-			string DAttorneyName;
-			string PAttorneyName;
-			string Defendant;
-			string Plaintiff;			
-			unsigned8 tmpAsOfDate;
-			unsigned2 match;
-			string AdditionalAttorneyName;
-	  end;
-		 
-		EXPORT rec_results_rawCount := record, maxlength(155384)	
-		  layout_batch_common_acct;
-	    integer CaseCount;
-		  unsigned2 LitigiousDebtor_Flag;
-		  CourtLink.Layouts.keybuild2;				 
-		  string1 CaseTypeSearch_FDCPA;
-		  string1 CaseTypeSearch_FCRA;
-		  string1 CaseTypeSearch_TCPA;
-			string DAttorneyName;
-			string PAttorneyName;
-			string Defendant;
-			string Plaintiff;		
-			unsigned8 tmpAsOfDate;
-			string AdditionalAttorneyName;
-	  end;		 		  
-		 
-	  export rec_results_autokey_plus := RECORD
-		  layout_batch_common_acct;
-			CourtLink.Layouts.keybuild;				
-		end;
-		export rec_results_autokey_plusExtra := RECORD
-		  unsigned2 penalt;
-		  layout_batch_common_acct;
-			CourtLink.Layouts.keybuild;				
-			unsigned2 LitigiousDebtor_Flag;
-			string1 CaseTypeSearch_FDCPA;
-			string1 CaseTypeSearch_FCRA;
-			string1 CaseTypeSearch_TCPA;
-		end;
-		 
-		export rec_batch_PLD_input := RECORD			
-		  unsigned8   seq := 0;
-			layout_batch_common_acct;	
-			layout_batch_common_name -name_suffix;
-			string4		 	max_results := '';
-			STRING120 comp_name     := '';
-			String2 CourtJurisdiction := '';		
-			String1 CaseTypeSearch_FDCPA := '';
-			String1 CaseTypeSearch_FCRA  := '';
-			String1 CaseTypeSearch_TCPA  := '';
-		end;
-		 
-		EXPORT Sample_layout_input_raw := RECORD
-			layout_batch_common_acct;
-			STRING20  name_last     := '';
-			STRING100 addr          := '';
-			STRING10  zip           := '';
-			STRING20  city          := '';
-			STRING2   state         := '';
-			STRING120 comp_name     := '';
-			STRING20  name_first    := '';
-			STRING14  filing_number := '';
-			STRING72  sic_code      := '';		
-			STRING9   fein          := '';
-			STRING9   ssn           := '';
-			UNSIGNED8 DOB           :=  0;
-			STRING20  name_middle   := '';
-			STRING2  CourtJurisdiction := '';
-			String1 CaseTypeSearch_FDCPA := '';
-			String1 CaseTypeSearch_FCRA  := '';
-			String1 CaseTypeSearch_TCPA  := '';			
-		END;
-  end;
 	
 	EXPORT Email := Module
 	  EXPORT rec_results_raw := record		 

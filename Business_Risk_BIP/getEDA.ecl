@@ -3,8 +3,11 @@
 EXPORT getEDA(DATASET(Business_Risk_BIP.Layouts.Shell) Shell,
 											 Business_Risk_BIP.LIB_Business_Shell_LIBIN Options,
 											 BIPV2.mod_sources.iParams linkingOptions,
-											 SET OF STRING2 AllowedSourcesSet,
-											 doxie.IDataAccess mod_access = MODULE (doxie.IDataAccess) END) := FUNCTION
+											 SET OF STRING2 AllowedSourcesSet) := FUNCTION
+
+	mod_access := PROJECT(Options, doxie.IDataAccess);
+
+	shell_version := Options.BusShellVersion;
 
 	// ---------------- Gong - EDA Phone Data ------------------
 	GongAddressSeq_unsuppressed := JOIN(Shell, dx_Gong.key_history_address(), TRIM(LEFT.Clean_Input.Prim_Range) <> '' AND TRIM(LEFT.Clean_Input.Prim_Name) <> '' AND TRIM(LEFT.Clean_Input.Zip5) <> '' AND
@@ -104,7 +107,7 @@ EXPORT getEDA(DATASET(Business_Risk_BIP.Layouts.Shell) Shell,
 		// A BNAP of 4, 5, or 8 should also update the PhoneMatch flag as we effectively have verified the input phone against the input Business Name AND/OR Business Address
 		SELF.PhoneMatch := Business_Risk_BIP.Common.SetBoolean(BNAPCalc IN ['4', '5', '8']);
 
-		Sources  := IF(Options.BusShellVersion >= Business_Risk_BIP.Constants.BusShellVersion_v31 AND Options.MarketingMode = 1,
+		Sources  := IF(shell_version >= Business_Risk_BIP.Constants.BusShellVersion_v31 AND Options.MarketingMode = 1,
                     DATASET([], Business_Risk_BIP.Layouts.LayoutSources),
                     DATASET([{MDR.SourceTools.src_Gong_History,
 													Business_Risk_BIP.Common.checkInvalidDate(((STRING)ri.dt_first_Seen), Business_Risk_BIP.Constants.MissingDate, le.Clean_Input.HistoryDate)[1..6],
@@ -114,8 +117,8 @@ EXPORT getEDA(DATASET(Business_Risk_BIP.Layouts.Shell) Shell,
 													1}], Business_Risk_BIP.Layouts.LayoutSources));
 
 		SELF.PhoneSources := IF(BNAPCalc IN ['4', '5', '8'], Sources, DATASET([], Business_Risk_BIP.Layouts.LayoutSources));
-		SELF.NameSources := IF(Options.BusShellVersion >= 22 AND BNAPCalc IN ['5', '8'], Sources, DATASET([], Business_Risk_BIP.Layouts.LayoutSources)); // Require Name and Phone match and Business shell version of 2.2 or higher to retain source
-		SELF.AddressVerSources := IF(Options.BusShellVersion >= 22 AND BNAPCalc IN ['4', '8'], Sources, DATASET([], Business_Risk_BIP.Layouts.LayoutSources));	// Require Address and Phone match and Business shell version of 2.2 or higher to retain source
+		SELF.NameSources := IF(shell_version >= 22 AND BNAPCalc IN ['5', '8'], Sources, DATASET([], Business_Risk_BIP.Layouts.LayoutSources)); // Require Name and Phone match and Business shell version of 2.2 or higher to retain source
+		SELF.AddressVerSources := IF(shell_version >= 22 AND BNAPCalc IN ['4', '8'], Sources, DATASET([], Business_Risk_BIP.Layouts.LayoutSources));	// Require Address and Phone match and Business shell version of 2.2 or higher to retain source
 
 		// For BNAP2 we want to rollup the various match elements across all header records to catch situations where FEIN verified on one record, but wasn't populated on the header record that Address verified.
 		SELF.NameMatched := NameMatched;
@@ -213,10 +216,10 @@ EXPORT getEDA(DATASET(Business_Risk_BIP.Layouts.Shell) Shell,
 																																										BestZIPScore, BestCityStateScore)));
 
 																				SELF.PhoneIdSources := IF(PhoneMatched, Sources, DATASET([], Business_Risk_BIP.Layouts.LayoutSources));
-																				SELF.NameSources := IF(Options.BusShellVersion >= 22 AND NameMatched, Sources, DATASET([], Business_Risk_BIP.Layouts.LayoutSources));
-																				SELF.AddressVerSources := IF(Options.BusShellVersion >= Business_Risk_BIP.Constants.BusShellVersion_v22 AND AddressMatched, Sources, DATASET([], Business_Risk_BIP.Layouts.LayoutSources));
-																				SELF.BestAddressSources := IF(Options.BusShellVersion >= Business_Risk_BIP.Constants.BusShellVersion_v30 AND BestAddressMatched, Sources, DATASET([], Business_Risk_BIP.Layouts.LayoutSources));
-																				SELF.BestAddrPhones := IF(Options.BusShellVersion >= Business_Risk_BIP.Constants.BusShellVersion_v30 AND BestAddressMatched AND TRIM(RIGHT.Phone10) <> '',
+																				SELF.NameSources := IF(shell_version >= 22 AND NameMatched, Sources, DATASET([], Business_Risk_BIP.Layouts.LayoutSources));
+																				SELF.AddressVerSources := IF(shell_version >= Business_Risk_BIP.Constants.BusShellVersion_v22 AND AddressMatched, Sources, DATASET([], Business_Risk_BIP.Layouts.LayoutSources));
+																				SELF.BestAddressSources := IF(shell_version >= Business_Risk_BIP.Constants.BusShellVersion_v30 AND BestAddressMatched, Sources, DATASET([], Business_Risk_BIP.Layouts.LayoutSources));
+																				SELF.BestAddrPhones := IF(shell_version >= Business_Risk_BIP.Constants.BusShellVersion_v30 AND BestAddressMatched AND TRIM(RIGHT.Phone10) <> '',
 																				DATASET([{RIGHT.Phone10}], Business_Risk_BIP.Layouts.LayoutBestAddrPhones), DATASET([], Business_Risk_BIP.Layouts.LayoutBestAddrPhones));
 
 																				SELF := []));

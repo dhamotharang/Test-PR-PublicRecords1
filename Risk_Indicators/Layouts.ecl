@@ -1472,25 +1472,6 @@ export layout_trustdefender_in := RECORD
   Risk_Indicators.Layout_Input;
  end;
 
-EXPORT layout_IDAFraud_in := RECORD
-  //starting with layout_input, add any other fields needed here.
-  Risk_Indicators.Layout_Input;
-  String Client;
-  String Solution;
-  String ProductName;
-  String ProductID;
-  String App_ID;
-  String ESPTransactionId;
-  String Channel;
-END;
-
-EXPORT layout_IDAFraud_out := RECORD
-  Unsigned4 seq;
-  String App_ID;
-  dataset(iesp.ida_report_response.t_IDAAttribute) Indicators {xpath('Indicators/Attribute'), MAXCOUNT(1)};
-
-END;
-
 EXPORT layout_IDA_in := RECORD
   //starting with layout_input, add any other fields needed here.
   Risk_Indicators.Layout_Input;

@@ -28,15 +28,33 @@ EXPORT getAllBocaShellData (
   dataset(iesp.share.t_StringArrayItem) ExcludeReportingSources = dataset([], iesp.share.t_StringArrayItem)
   ) := FUNCTION
 
-   mod_access := MODULE(Doxie.IDataAccess)
-      EXPORT glb := ^.glb;
-      EXPORT dppa := ^.dppa;
-      EXPORT DataRestrictionMask := DataRestriction;
-      EXPORT DataPermissionMask := DataPermission;
-      EXPORT unsigned1 lexid_source_optout := LexIdSourceOptout;
-      EXPORT string transaction_id := TransactionID; // esp transaction id or batch uid
-      EXPORT unsigned6 global_company_id := GlobalCompanyId; // mbs gcid
-    END;
+  //MS-71: add BIP header information to the shell
+  options := MODULE(Business_Risk_BIP.LIB_Business_Shell_LIBIN)
+    EXPORT UNSIGNED1  dppa                              := ^.dppa;
+    EXPORT UNSIGNED1  glb                               := ^.glb;
+    EXPORT STRING     DataRestrictionMask               := DataRestriction;
+    EXPORT STRING     DataPermissionMask                := DataPermission;
+    EXPORT STRING5    industry_class                    := '';
+    EXPORT UNSIGNED1  LinkSearchLevel                   := Business_Risk_BIP.Constants.LinkSearch.Default;
+    EXPORT UNSIGNED1  BusShellVersion                   := Business_Risk_BIP.Constants.Default_BusShellVersion;
+    EXPORT UNSIGNED1  MarketingMode                     := 0;
+    EXPORT STRING50   AllowedSources                    := Business_Risk_BIP.Constants.Default_AllowedSources;
+    EXPORT UNSIGNED1  BIPBestAppend                     := Business_Risk_BIP.Constants.BIPBestAppend.Default;
+    EXPORT UNSIGNED1  OFAC_Version                      := 0;
+    EXPORT REAL       Global_Watchlist_Threshold        := 0;
+    EXPORT UNSIGNED1  KeepLargeBusinesses               := 0;
+    EXPORT BOOLEAN    IncludeTargusGateway              := false;
+    EXPORT BOOLEAN    RunTargusGatewayAnywayForTesting  := false;
+    EXPORT BOOLEAN    OverrideExperianRestriction       := false;
+    EXPORT BOOLEAN    DoNotUseAuthRepInBIPAppend        := false;
+    EXPORT BOOLEAN    IsBIID20                          := false;
+    EXPORT unsigned1  lexid_source_optout := LexIdSourceOptout;
+    EXPORT string     transaction_id      := IF(TransactionID <> '', TransactionID, BatchUID); // esp transaction id or batch uid
+    EXPORT unsigned6  global_company_id   := GlobalCompanyId; // mbs gcid
+
+  END;
+
+   mod_access := PROJECT(options, Doxie.IDataAccess, OPT);
 
   // check the first record in the batch to determine if this a realtime transaction or an archive test
   // if the record is default_history_date or same month as today's date, run production_realtime_mode
@@ -47,7 +65,7 @@ EXPORT getAllBocaShellData (
   checkDays(string8 d1, string8 d2, unsigned2 days) := ut.DaysApart(d1,d2) <= days and d1>d2;
   IsAML  := (BSOptions & risk_indicators.iid_constants.BSOptions.IsAML) > 0;
   IsFIS  := (BSOptions & risk_indicators.iid_constants.BSOptions.IsFISattributes) > 0;
-  
+
   // =============== Get Property Info ===============
   risk_indicators.layout_PropertyRecord get_addresses(p le, integer c) := TRANSFORM
     SELF.fname := le.Shell_Input.fname;
@@ -171,7 +189,7 @@ includeRelativeInfoProperty := includeRelativeInfo and ~TurnOffRelativeProperty;
   #ELSE
     prop_common := prop_common_roxie;
   #END
-  
+
   //*** MS-158: take the owned/sold properties and search ADVO by address to identify if an address is a business address so they can be counted and rolled up seperately in new shell fields.
 
   Risk_Indicators.Layouts.Layout_Relat_Prop_Plus_BusInd tf_pre_ADVO(prop_common l, p r) := transform
@@ -254,7 +272,7 @@ includeRelativeInfoProperty := includeRelativeInfo and ~TurnOffRelativeProperty;
         BSversion >= 50             => prop_common,
                                        IF(production_realtime_mode, prop, prop_hist)
        );
-       
+
  single_property_fis := IF(IsFIS, IF(production_realtime_mode, prop, prop_hist), group(Dataset([],Risk_Indicators.Layouts.Layout_Relat_Prop_Plus_BusInd),seq));
 
 // AML
@@ -317,7 +335,7 @@ RelatRecProp := join(ids_wide,   single_property_relat,
   // Generate the totals
   Rel_Property_Rolled := Risk_Indicators.Roll_Relative_Property(Single_Property(property_status_family<>' '));
   Per_Property_Rolled := Risk_Indicators.Roll_Applicant_Property(Single_Property(property_status_applicant<>' '));
-  
+
   Per_Property_Rolled_FIS := Risk_Indicators.Roll_Applicant_Property(single_property_fis(property_status_applicant<>' '));
 
   // Apply the address specific information
@@ -494,9 +512,9 @@ RelatRecProp := join(ids_wide,   single_property_relat,
   History_2_Property_Added_a :=
     group (sort (denormalize (p2, single_property,  left.seq = right.seq, check_best (LEFT,RIGHT)),
                  seq), seq);
-         
+
   History_2_Property_added := History_2_Property_Added_a + group(sort(pullid_recs, seq),seq);
-   
+
   History_2_Property_Added_1_fis :=
     group (sort (denormalize (p2, single_property_fis,  left.seq = right.seq, check_best (LEFT,RIGHT)),
                  seq), seq);
@@ -533,7 +551,7 @@ vehicles_rolled := if (production_realtime_mode, vehicles, vehicles_hist);
 	watercraft_hist := IF(IsFCRA,
 										Risk_Indicators.Boca_Shell_Watercraft_Hist_FCRA (ids_only(~isrelat), isPreScreen, bsversion),
 										Risk_Indicators.Boca_Shell_Watercraft      (ids_only, bsVersion/*(~isrelat)*/, mod_access));
-										
+
 	watercraft_rolled := if (production_realtime_mode, watercraft, watercraft_hist);
 
   watercraft_relat := watercraft_rolled(isrelat);
@@ -1154,9 +1172,9 @@ per_prop_original := JOIN(relat_prop, Per_Property_Rolled, LEFT.seq=RIGHT.seq, a
 
 
   //join v5 and v3 to get the v3 prop owned count if FIS custom attributes are being requested
-  append_fis_prop_owned := join(per_prop_original, Per_Property_Rolled_FIS, 
+  append_fis_prop_owned := join(per_prop_original, Per_Property_Rolled_FIS,
                           left.seq = right.seq,
-                          Transform(Risk_Indicators.Layout_Boca_Shell, 
+                          Transform(Risk_Indicators.Layout_Boca_Shell,
                                     self.FIS.ambiguous_property_total := right.ambiguous.property_total,
                                     self.FIS.sold_property_purchase_count := right.sold.property_owned_purchase_count,
                                     self.FIS.sold_property_purchase_total := right.sold.property_owned_purchase_total,
@@ -1164,11 +1182,11 @@ per_prop_original := JOIN(relat_prop, Per_Property_Rolled, LEFT.seq=RIGHT.seq, a
                                     self.FIS.owned_assessed_total := right.owned.property_owned_assessed_total,
                                     self.FIS.owned_purchase_total := right.owned.property_owned_purchase_total,
                                     self.FIS.owned_property_total := right.owned.property_total,
-                                    self := left), 
+                                    self := left),
                           left outer, atmost(riskwise.max_atmost));
-                          
-                          
-                          
+
+
+
  //join to history2_fis
  append_fis_addr_hist := join(append_fis_prop_owned, History_2_Property_added_fis,
                            left.seq = right.seq,
@@ -1184,7 +1202,7 @@ per_prop_original := JOIN(relat_prop, Per_Property_Rolled, LEFT.seq=RIGHT.seq, a
                                      self.FIS.add3_purchase_amount := right.Address_Verification.Address_History_2.purchase_amount,
                                      self := left),
                            left outer, atmost(riskwise.max_atmost));
- 
+
  //Fis will never run on thor, extra joins not needed.
  #IF(onthor)
    per_prop := per_prop_original;
@@ -1845,37 +1863,16 @@ defaultOffset := project(final2,
 
 finalOffset := if(bsversion >= 53 and isFCRA, defaultOffset, final2);
 
-//MS-71: add BIP header information to the shell
-options := MODULE(Business_Risk_BIP.LIB_Business_Shell_LIBIN)
-  EXPORT UNSIGNED1  DPPA_Purpose                      := dppa;
-  EXPORT UNSIGNED1  GLBA_Purpose                      := glb;
-  EXPORT STRING50   DataRestrictionMask               := DataRestriction;
-  EXPORT STRING50   DataPermissionMask                := DataPermission;
-  EXPORT STRING10   IndustryClass                     := '';
-  EXPORT UNSIGNED1  LinkSearchLevel                   := Business_Risk_BIP.Constants.LinkSearch.Default;
-  EXPORT UNSIGNED1  BusShellVersion                   := Business_Risk_BIP.Constants.Default_BusShellVersion;
-  EXPORT UNSIGNED1  MarketingMode                     := 0;
-  EXPORT STRING50   AllowedSources                    := Business_Risk_BIP.Constants.Default_AllowedSources;
-  EXPORT UNSIGNED1  BIPBestAppend                     := Business_Risk_BIP.Constants.BIPBestAppend.Default;
-  EXPORT UNSIGNED1  OFAC_Version                      := 0;
-  EXPORT REAL       Global_Watchlist_Threshold        := 0;
-  EXPORT UNSIGNED1  KeepLargeBusinesses               := 0;
-  EXPORT BOOLEAN    IncludeTargusGateway              := false;
-  EXPORT BOOLEAN    RunTargusGatewayAnywayForTesting  := false;
-  EXPORT BOOLEAN    OverrideExperianRestriction       := false;
-  EXPORT BOOLEAN    DoNotUseAuthRepInBIPAppend        := false;
-  EXPORT BOOLEAN    IsBIID20                          := false;
-END;
 
 linkingOptions := MODULE(BIPV2.mod_sources.iParams)
-  EXPORT STRING DataRestrictionMask   := Options.DataRestrictionMask;
+  EXPORT STRING DataRestrictionMask   := mod_access.DataRestrictionMask;
   EXPORT BOOLEAN ignoreFares          := FALSE;
   EXPORT BOOLEAN ignoreFidelity       := FALSE;
   EXPORT BOOLEAN AllowAll             := IF(Options.AllowedSources = Business_Risk_BIP.Constants.AllowDNBDMI, TRUE, FALSE);
-  EXPORT BOOLEAN AllowGLB             := Risk_Indicators.iid_constants.GLB_OK(Options.GLBA_Purpose, FALSE );
-  EXPORT BOOLEAN AllowDPPA            := Risk_Indicators.iid_constants.DPPA_OK(Options.DPPA_Purpose, FALSE );
-  EXPORT UNSIGNED1 DPPAPurpose        := Options.DPPA_Purpose;
-  EXPORT UNSIGNED1 GLBPurpose         := Options.GLBA_Purpose;
+  EXPORT BOOLEAN AllowGLB             := mod_access.isValidGlb();
+  EXPORT BOOLEAN AllowDPPA            := mod_access.isValidDppa();
+  EXPORT UNSIGNED1 DPPAPurpose        := mod_access.dppa;
+  EXPORT UNSIGNED1 GLBPurpose         := mod_access.glb;
   EXPORT BOOLEAN IncludeMinors        := TRUE;
   EXPORT BOOLEAN LNBranded            := TRUE;
 END;

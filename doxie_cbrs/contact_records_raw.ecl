@@ -1,12 +1,11 @@
-IMPORT business_header, census_data, suppress, doxie, ut, doxie_cbrs_raw;
+IMPORT census_data, doxie_cbrs_raw;
 doxie_cbrs.mac_Selection_Declare()
 
 EXPORT contact_records_raw(DATASET(doxie_cbrs.layout_references) bdids) := FUNCTION
 
 outf1 := doxie_cbrs_raw.contacts(bdids,Include_AssociatedPeople_val OR Include_Executives_val,Max_AssociatedPeople_val,application_type_value).records;
        
-outlayout := doxie_cbrs.layout_contacts;
-
+outlayout := doxie_cbrs.layout_contact.raw_rec;
 
 outlayout into_out(outf1 L) := TRANSFORM
   SELF.record_type_decoded := MAP(L.record_type = 'C' => 'Current',

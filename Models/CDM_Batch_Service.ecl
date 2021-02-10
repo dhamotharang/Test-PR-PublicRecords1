@@ -9,49 +9,13 @@
 </message>
 */
 /*--INFO-- CDM Batch Service*/
-/*--HELP--
-<pre>
-&lt;dataset&gt;
-   &lt;row&gt;
-      &lt;seq&gt;&lt;/seq&gt;
-      &lt;AcctNo&gt;&lt;/AcctNo&gt;
-      &lt;ADL&gt;&lt;/ADL&gt;
-      &lt;ADLScore&gt;&lt;/ADLScore&gt;
-      &lt;Name_First&gt;&lt;/Name_First&gt;
-      &lt;Name_Middle&gt;&lt;/Name_Middle&gt;
-      &lt;Name_Last&gt;&lt;/Name_Last&gt;
-      &lt;Name_Suffix&gt;&lt;/Name_Suffix&gt;
-      &lt;unParsedFullName&gt;&lt;/unParsedFullName&gt;
-      &lt;Name_Company&gt;&lt;/Name_Company&gt;
-      &lt;SSN_TIN_FEIN&gt;&lt;/SSN_TIN_FEIN&gt;
-			&lt;SIC_Code&gt;&lt;/SIC_Code&gt;
-			&lt;NAICS_Code&gt;&lt;/NAICS_Code&gt;
-      &lt;street_addr&gt;&lt;/street_addr&gt;
-      &lt;street_addr_2&gt;&lt;/street_addr_2&gt;
-      &lt;p_City_name&gt;&lt;/p_City_name&gt;
-      &lt;St&gt;&lt;/St&gt;
-      &lt;Zip&gt;&lt;/Zip&gt;
-      &lt;DOB&gt;&lt;/DOB&gt;
-			&lt;Email&gt;&lt;/Email&gt;
-      &lt;Service_Request&gt;&lt;/Service_Request&gt;
-      &lt;Record_Type&gt;&lt;/Record_Type&gt;
-      &lt;Phone_1&gt;&lt;/Phone_1&gt;
-      &lt;Phone_2&gt;&lt;/Phone_2&gt;
-      &lt;Phone_3&gt;&lt;/Phone_3&gt;
-      &lt;Phone_4&gt;&lt;/Phone_4&gt;
-      &lt;Phone_5&gt;&lt;/Phone_5&gt;
-      &lt;HistoryDateYYYYMM&gt;&lt;/HistoryDateYYYYMM&gt;
-   &lt;/row&gt;
-&lt;/dataset&gt;
-</pre>
-*/
 
 import address, risk_indicators, models, riskwise, ut, doxie, BIPV2, Business_Risk_BIP, BizLinkFull, STD, DueDiligence, Codes, MDR, DeathV2_Services, dx_death_master;
 
 
 export CDM_Batch_Service := MACRO
 
-	// Can't have duplicate definitions of Stored with different default values, 
+	// Can't have duplicate definitions of Stored with different default values,
 	// so add the default to #stored to eliminate the assignment of a default value.
 	#stored('GLBPurpose',RiskWise.permittedUse.GLBA);
 	#stored('DataRestrictionMask',risk_indicators.iid_constants.default_DataRestriction);
@@ -69,26 +33,36 @@ export CDM_Batch_Service := MACRO
 	string DataRestriction := risk_indicators.iid_constants.default_DataRestriction : stored('DataRestrictionMask');
 	string DataPermission := Risk_Indicators.iid_constants.default_DataPermission : stored('DataPermissionMask');
 	unsigned3 history_date := 999999 		: stored('HistoryDateYYYYMM');
-  
+
     //CCPA fields
     unsigned1 LexIdSourceOptout := 1 : STORED ('LexIdSourceOptout');
     string TransactionID := '' : stored ('_TransactionId');
     string BatchUID := '' : stored('_BatchUID');
     unsigned6 GlobalCompanyId := 0 : stored('_GCID');
+    industry := IF(TRIM(industry_class_val) = DueDiligence.Constants.EMPTY, Business_Risk_BIP.Constants.Default_IndustryClass, industry_class_val);
 
 	unsigned1 dppa := prep_dppa;
 
     bsVersion := 41;
-     
-    mod_access := MODULE(Doxie.IDataAccess)
-      EXPORT glb := ^.GLB;
-      EXPORT dppa := ^.DPPA;
+
+    Options := MODULE(Business_Risk_BIP.LIB_Business_Shell_LIBIN)
+      // Clean up the Options and make sure that defaults are enforced
+      EXPORT UNSIGNED1 dppa := ^.dppa;
+      EXPORT UNSIGNED1 glb := ^.glb;
+      EXPORT STRING DataRestrictionMask	:= DataRestriction;
+      EXPORT STRING DataPermissionMask	:= TRIM(DataPermission);
+      EXPORT STRING5 industry_class := STD.Str.ToUpperCase(industry);
+      EXPORT UNSIGNED1 LinkSearchLevel := Business_Risk_BIP.Constants.LinkSearch.SeleID;
+      EXPORT UNSIGNED1 BusShellVersion := Business_Risk_BIP.Constants.Default_BusShellVersion;
+      EXPORT UNSIGNED1 MarketingMode := Business_Risk_BIP.Constants.Default_MarketingMode;
+      EXPORT STRING50 AllowedSources := Business_Risk_BIP.Constants.Default_AllowedSources;
+      EXPORT UNSIGNED1 BIPBestAppend := Business_Risk_BIP.Constants.BIPBestAppend.OverwriteWithBest;
       EXPORT unsigned1 lexid_source_optout := LexIdSourceOptout;
-      EXPORT string transaction_id := TransactionID; // esp transaction id or batch uid
+      EXPORT string transaction_id := IF(TransactionID <> '', TransactionID, BatchUID); // esp transaction id or batch uid
       EXPORT unsigned6 global_company_id := GlobalCompanyId; // mbs gcid
     END;
 
-    death_params := DeathV2_Services.IParam.GetRestrictions(mod_access);
+    death_params := DeathV2_Services.IParam.GetRestrictions(Options);
 
 	// add sequence to matchup later to add acctno to output
 	Models.layouts.Layout_CDM_Batch_In into_seq(batchin le, integer C) := TRANSFORM
@@ -101,43 +75,43 @@ export CDM_Batch_Service := MACRO
 
 	risk_indicators.Layout_Input into_in(batchinseq le) := TRANSFORM
 		SELF.did 	:= (integer)le.ADL;
-		SELF.score := (integer)le.ADLScore; 
+		SELF.score := (integer)le.ADLScore;
 
 		// clean up input
 		dob_val := riskwise.cleandob(le.dob);
 
-		SELF.seq := le.seq;	
+		SELF.seq := le.seq;
 		SELF.ssn := IF(le.SSN_TIN_FEIN='000000000','',le.SSN_TIN_FEIN);	// blank out social if it is all 0's
 		SELF.dob := dob_val;
 		SELF.age := if ((integer)dob_val != 0,(STRING3)ut.Age((integer)dob_val), '');
-		
+
 		/* got 5 phones to deal with... for now dropping all but 1
 		SELF.phone10 := le.Home_Phone;
 		SELF.wphone10 := le.Work_Phone;
 		*/
 		SELF.phone10 := le.phone_1;
-		
+
 		SELF.employer_name := le.name_company;
-		
+
 		// 4.3 orig req spreadsheet says if company name is populated then blank out the other name fields
-		
+
 		cleaned_name := address.CleanPerson73(le.UnParsedFullName);
 		boolean valid_cleaned := le.UnParsedFullName <> '';
-		
+
 		SELF.fname := if(le.name_company <> '','',STD.Str.toUpperCase(if(le.Name_First='' AND valid_cleaned, cleaned_name[6..25], le.Name_First)));
 		SELF.lname := if(le.name_company <> '','',STD.Str.toUpperCase(if(le.Name_Last='' AND valid_cleaned, cleaned_name[46..65], le.Name_Last)));
 		SELF.mname := if(le.name_company <> '','',STD.Str.toUpperCase(if(le.Name_Middle='' AND valid_cleaned, cleaned_name[26..45], le.Name_Middle)));
-		SELF.suffix := if(le.name_company <> '','',STD.Str.toUpperCase(if(le.Name_Suffix ='' AND valid_cleaned, cleaned_name[66..70], le.Name_Suffix)));	
+		SELF.suffix := if(le.name_company <> '','',STD.Str.toUpperCase(if(le.Name_Suffix ='' AND valid_cleaned, cleaned_name[66..70], le.Name_Suffix)));
 		SELF.title := if(le.name_company <> '','',STD.Str.toUpperCase(if(valid_cleaned, cleaned_name[1..5],'')));
 
 		street_address := trim(le.street_addr + ' ' + le.street_addr_2);
-		clean_addr := risk_indicators.MOD_AddressClean.clean_addr( street_address, le.p_City_name, le.St, le.Zip) ;											
+		clean_addr := risk_indicators.MOD_AddressClean.clean_addr( street_address, le.p_City_name, le.St, le.Zip) ;
 
 		SELF.in_streetAddress := street_address;
 		SELF.in_city := le.p_City_name;
 		SELF.in_state := le.St;
 		SELF.in_zipCode := le.Zip;
-			
+
 		SELF.prim_range := Address.CleanFields(clean_addr).prim_range;
 		SELF.predir := Address.CleanFields(clean_addr).predir;
 		SELF.prim_name := Address.CleanFields(clean_addr).prim_name;
@@ -155,7 +129,7 @@ export CDM_Batch_Service := MACRO
 		SELF.addr_status := Address.CleanFields(clean_addr).err_stat;
 		SELF.county := Address.CleanFields(clean_addr).county[3..5]; // we only want the county fips, not all 5.  first 2 are the state fips
 		SELF.geo_blk := Address.CleanFields(clean_addr).geo_blk;
-		
+
 		SELF.historydate := if(le.historydateYYYYMM=0, history_date, le.historydateYYYYMM);
 		SELF := [];
 	END;
@@ -175,15 +149,15 @@ export CDM_Batch_Service := MACRO
 	boolean   isFCRA := false;
 	boolean   fromIT1O := false;
 	boolean   doScore := false;
-	boolean   nugen := true;	
+	boolean   nugen := true;
 	BOOLEAN ofacSearching := false;
 	UNSIGNED1 ofacVersion := 0;
 	BOOLEAN includeAdditionalWatchlists := false;
-	BOOLEAN excludeWatchlists := true; 
+	BOOLEAN excludeWatchlists := true;
 	BOOLEAN filterOutFares := TRUE;
 	append_best := 0;
 
-	unsigned8 BSOptions := risk_indicators.iid_constants.BSOptions.IncludeDoNotMail + 
+	unsigned8 BSOptions := risk_indicators.iid_constants.BSOptions.IncludeDoNotMail +
 												 risk_indicators.iid_constants.BSOptions.IncludeFraudVelocity;
 
 	layout_decd := record
@@ -197,29 +171,29 @@ export CDM_Batch_Service := MACRO
 		/* ***************************************
 				*     Gather Boca Shell Results:      *
 			 *************************************** */
-		iid := Risk_Indicators.InstantID_Function(cleanIn, gateways, DPPA, GLB, isUtility, isLn, ofac_Only, 
+		iid := Risk_Indicators.InstantID_Function(cleanIn, gateways, DPPA, GLB, isUtility, isLn, ofac_Only,
 																							suppressNearDups, require2Ele, fromBIID, isFCRA, excludeWatchlists, fromIT1O, ofacVersion, ofacSearching, includeAdditionalWatchlists,
 																							in_BSversion := bsVersion, in_runDLverification:=IncludeDLverification, in_DataRestriction := DataRestriction, in_append_best := append_best, in_BSOptions := BSOptions, in_DataPermission := DataPermission,
-                                                                                            LexIdSourceOptout := LexIdSourceOptout, 
-                                                                                            TransactionID := TransactionID, 
-                                                                                            BatchUID := BatchUID, 
+                                                                                            LexIdSourceOptout := LexIdSourceOptout,
+                                                                                            TransactionID := TransactionID,
+                                                                                            BatchUID := BatchUID,
                                                                                             GlobalCompanyID := GlobalCompanyID);
 
-		clam := Risk_Indicators.Boca_Shell_Function(iid, gateways, DPPA, GLB, isUtility, isLn, doRelatives, doDL, 
+		clam := Risk_Indicators.Boca_Shell_Function(iid, gateways, DPPA, GLB, isUtility, isLn, doRelatives, doDL,
 																								doVehicle, doDerogs, bsVersion, doScore, nugen, filterOutFares, DataRestriction := DataRestriction,
 																								BSOptions := BSOptions, DataPermission := DataPermission,
-                                                                                                LexIdSourceOptout := LexIdSourceOptout, 
-                                                                                                TransactionID := TransactionID, 
-                                                                                                BatchUID := BatchUID, 
+                                                                                                LexIdSourceOptout := LexIdSourceOptout,
+                                                                                                TransactionID := TransactionID,
+                                                                                                BatchUID := BatchUID,
                                                                                                 GlobalCompanyID := GlobalCompanyID);
-																						 
-		//output(clam,named('clam'));		
+
+		//output(clam,named('clam'));
 
 		/* ***************************************
 				*     Gather Deceased Results:        *
 			 *************************************** */
 		deathSSNKey := Death_Master.key_ssn_ssa(isFCRA);
-		deathHDRKey := doxie.key_Header;   
+		deathHDRKey := doxie.key_Header;
 
 		layout_decd getSSNDecd(clam le, deathSSNkey ri) := transform
 		 SELF.decd_src1 := ri.src;
@@ -227,7 +201,7 @@ export CDM_Batch_Service := MACRO
 		 SELF.decd_firstseen_dts := ri.filedate;
 		 SELF := le;
 		END;
-    
+
 		layout_decd getHDRDecd(clam le, deathHDRKey ri) := transform
 		 SELF.decd_src1 := ri.src;
 		 SELF.decd_srcs := ri.src;
@@ -235,33 +209,33 @@ export CDM_Batch_Service := MACRO
 		 SELF := le;
 		END;
 
-		SSN_Decd := join(clam, deathssnkey, 
-											 length(left.shell_input.ssn)=9 and keyed(left.shell_input.ssn = right.ssn) 
-												 and (((integer)right.dod8 <> 0 and (UNSIGNED)(RIGHT.dod8[1..6]) < LEFT.historydate) 
-													or ((integer)right.filedate <> 0 and(UNSIGNED)(RIGHT.filedate[1..6]) < LEFT.historydate)) 
-												 AND (right.src <> MDR.sourceTools.src_Death_Restricted or 
-															Risk_Indicators.iid_constants.deathSSA_ok(DataPermission)), 
-										 getSSNDecd(left,right), left outer, 
+		SSN_Decd := join(clam, deathssnkey,
+											 length(left.shell_input.ssn)=9 and keyed(left.shell_input.ssn = right.ssn)
+												 and (((integer)right.dod8 <> 0 and (UNSIGNED)(RIGHT.dod8[1..6]) < LEFT.historydate)
+													or ((integer)right.filedate <> 0 and(UNSIGNED)(RIGHT.filedate[1..6]) < LEFT.historydate))
+												 AND (right.src <> MDR.sourceTools.src_Death_Restricted or
+															Risk_Indicators.iid_constants.deathSSA_ok(DataPermission)),
+										 getSSNDecd(left,right), left outer,
 										 atmost(riskwise.max_atmost)
 										);
 		//output(SSN_Decd,named('SSN_Deceased'));
 
         DID_Decd_unformatted := dx_death_master.Append.byDid(clam, did, death_params);
-                
+
         layout_decd getDIDDecd(clam le, DID_Decd_unformatted ri) := transform
 		 SELF.decd_src1 := ri.death.src;
 		 SELF.decd_srcs := ri.death.src;
 		 SELF.decd_firstseen_dts := ri.death.filedate;
 		 SELF := le;
 		END;
-    
-		DID_Decd := JOIN(clam, DID_Decd_unformatted, 
+
+		DID_Decd := JOIN(clam, DID_Decd_unformatted,
 																	 LEFT.did<>0 AND LEFT.did = RIGHT.did
-												 AND (((integer)right.death.dod8 <> 0 and (UNSIGNED)(RIGHT.death.dod8[1..6]) < LEFT.historydate) 
-													or ((integer)right.death.filedate <> 0 and (UNSIGNED)(RIGHT.death.filedate[1..6]) < LEFT.historydate)) 
-												 AND (Risk_Indicators.iid_constants.deathSSA_ok(DataPermission)), 
+												 AND (((integer)right.death.dod8 <> 0 and (UNSIGNED)(RIGHT.death.dod8[1..6]) < LEFT.historydate)
+													or ((integer)right.death.filedate <> 0 and (UNSIGNED)(RIGHT.death.filedate[1..6]) < LEFT.historydate))
+												 AND (Risk_Indicators.iid_constants.deathSSA_ok(DataPermission)),
 																 getDIDDecd(LEFT, RIGHT), LEFT OUTER, KEEP(100));
-                                 
+
 		HDR_Decd := JOIN(clam, deathhdrkey,
 											 left.did<>0 and keyed(left.did=right.s_did)
 												 and ((right.dod <> 0 and right.dod < left.historydate)
@@ -289,12 +263,12 @@ export CDM_Batch_Service := MACRO
 
 		rolldeceased := rollup(dedup_deceased, left.seq = right.seq, combine_decd(left, right));
 		//output(rolldeceased,named('Rolled_Deceased'));
-    
+
 		RETURN rolldeceased;
 	ENDMACRO;
 
 	rolldeceased := fn_getPersonAttributes(cleanInput(fname<>'' OR lname<>''));
-	
+
 	months_apart(unsigned3 system_yearmonth, unsigned some_yearmonth) := function
 		 days := ut.DaysApart((string)system_yearmonth + '01', (string)some_yearmonth + '01' );
 			days_in_a_month := 30.5;
@@ -302,13 +276,13 @@ export CDM_Batch_Service := MACRO
 			months := if(some_yearmonth=0, 0, calculated_months);
 			return round(months);
 		END;
-	// this function is for correcting months of 00 in header dates.  										
+	// this function is for correcting months of 00 in header dates.
 	unsigned3 fixYYYY00( unsigned YYYYMM ) := if( YYYYMM > 0 and YYYYMM % 100 = 0, YYYYMM + 1, YYYYMM );
 	// stolen from get leadintegrity attributes to calc months between dates
-		
+
 	//function to get Business Attributes
 	fn_getBusinessAttributes(batchinputseq) := FUNCTIONMACRO
-		
+
 		InputCompanyInfo := RECORD
 			STRING120 Name_Company;
 			STRING9   SSN_TIN_FEIN;
@@ -330,14 +304,14 @@ export CDM_Batch_Service := MACRO
 			STRING4  Zip4        := '';
 			STRING10 Lat         := '';
 			STRING11 Long        := '';
-			STRING1  Addr_Type   := ''; 
+			STRING1  Addr_Type   := '';
 			STRING4  Addr_Status := '';
 			STRING3  County      := '';
-			STRING7  Geo_Block   := '';	
+			STRING7  Geo_Block   := '';
 		END;
 		InputCompanyInfoClean := RECORD
 			UNSIGNED4		Seq := 0;
-			STRING30		AcctNo := '';		
+			STRING30		AcctNo := '';
 			UNSIGNED6		HistoryDate;
 			InputCompanyInfo;
 			CleanAddrFields;
@@ -346,14 +320,14 @@ export CDM_Batch_Service := MACRO
 			unsigned6		SELEID;
 		END;
 
-		// clean business input and add sequence to matchup later 
+		// clean business input and add sequence to matchup later
 		InputCompanyInfoClean bus_intoClean_seq(batchin le) := TRANSFORM
 			// Clean up the Company Name, Company Address, FEIN, and Company Phone.
-			_CompanyName   := IF(le.Name_Company <> '', BizLinkFull.Fields.Make_cnp_name(le.Name_Company),''); 
+			_CompanyName   := IF(le.Name_Company <> '', BizLinkFull.Fields.Make_cnp_name(le.Name_Company),'');
 			_Clean_FEIN    := STD.Str.Filter(le.SSN_TIN_FEIN, '0123456789');
 			_Clean_phone10 := RiskWise.CleanPhone(le.Phone_1);
 			_Address       := Risk_Indicators.MOD_AddressClean.street_address(le.street_addr + ' ' + le.street_addr_2);
-			_CleanAddr     := Risk_Indicators.MOD_AddressClean.clean_addr(_Address, le.p_City_name, le.St, le.Zip);											
+			_CleanAddr     := Risk_Indicators.MOD_AddressClean.clean_addr(_Address, le.p_City_name, le.St, le.Zip);
 			mod_Addr       := Address.CleanFields(_CleanAddr);
 
 			SELF.Seq            := le.Seq;
@@ -365,9 +339,9 @@ export CDM_Batch_Service := MACRO
 
 			SELF.SSN_TIN_FEIN   := IF( LENGTH(_Clean_FEIN) != 9 OR (INTEGER)_Clean_FEIN <= 0, '', _Clean_FEIN); // Filter out FEIN's that aren't 9-Bytes, or are repeating 0's
 			SELF.Phone10        := _Clean_phone10;
-		 
+
 			SELF:=le;
-			SELF := [];  
+			SELF := [];
 		END;
 
 		BIPV2.IDlayouts.l_xlink_ids2 grabLinkIDs(BIPV2.IdAppendLayouts.AppendOutput le) := TRANSFORM
@@ -376,24 +350,8 @@ export CDM_Batch_Service := MACRO
 			SELF := [];
 		END;
 
-		industry := IF(TRIM(industry_class_val) = DueDiligence.Constants.EMPTY, Business_Risk_BIP.Constants.Default_IndustryClass, industry_class_val);
-
-		Options := MODULE(Business_Risk_BIP.LIB_Business_Shell_LIBIN)
-					// Clean up the Options and make sure that defaults are enforced
-					EXPORT UNSIGNED1 DPPA_Purpose := dppa;
-					EXPORT UNSIGNED1 GLBA_Purpose := glb;
-					EXPORT STRING50 DataRestrictionMask	:= DataRestriction;
-					EXPORT STRING50 DataPermissionMask	:= TRIM(DataPermission);
-					EXPORT STRING10 IndustryClass := STD.Str.ToUpperCase(industry);
-					EXPORT UNSIGNED1 LinkSearchLevel := Business_Risk_BIP.Constants.LinkSearch.SeleID;
-					EXPORT UNSIGNED1 BusShellVersion := Business_Risk_BIP.Constants.Default_BusShellVersion;
-					EXPORT UNSIGNED1 MarketingMode := Business_Risk_BIP.Constants.Default_MarketingMode;
-					EXPORT STRING50 AllowedSources := Business_Risk_BIP.Constants.Default_AllowedSources;
-					EXPORT UNSIGNED1 BIPBestAppend := Business_Risk_BIP.Constants.BIPBestAppend.OverwriteWithBest;
-		END;
-
 		linkingOptions := MODULE(BIPV2.mod_sources.iParams)
-					EXPORT STRING DataRestrictionMask := DataRestriction; 
+					EXPORT STRING DataRestrictionMask := DataRestriction;
 					EXPORT BOOLEAN ignoreFares := FALSE; // From AutoStandardI.DataRestrictionI, this is a User Configurable Input Option to Ignore FARES data - default it to FALSE to always utilize whatever the DataRestrictionMask allows
 					EXPORT BOOLEAN ignoreFidelity := FALSE; // From AutoStandardI.DataRestrictionI, this is a User Configurable Input Option to Ignore Fidelity data - default it to FALSE to always utilize whatever the DataRestrictionMask allows
 					EXPORT BOOLEAN AllowAll := FALSE;
@@ -405,11 +363,11 @@ export CDM_Batch_Service := MACRO
 					EXPORT BOOLEAN LNBranded := TRUE; // Not entirely certain what effect this has
 		END;
 		ds_CleanedInput := project(batchinputseq, bus_intoClean_seq(left));
-		
-		prepBIPAppend := 
+
+		prepBIPAppend :=
 						PROJECT(
-							ds_CleanedInput, 
-							TRANSFORM( BIPV2.IdAppendLayouts.AppendInput, 
+							ds_CleanedInput,
+							TRANSFORM( BIPV2.IdAppendLayouts.AppendInput,
 								SELF.request_id     := LEFT.Seq,
 								SELF.ProxID         := LEFT.ProxID,
 								SELF.SeleID         := LEFT.SeleID,
@@ -433,11 +391,11 @@ export CDM_Batch_Service := MACRO
 																			reAppend := FALSE); //do not re-append so can retrieve best info
 		withBest := append.WithBest(fetchLevel := BIPV2.IdConstants.fetch_level_seleid);
 
-		 
-			 
-		ds_BIPIDs := PROJECT(withBest, grabLinkIDs(LEFT));    
+
+
+		ds_BIPIDs := PROJECT(withBest, grabLinkIDs(LEFT));
 		// ds_bus_best_info := BusinessInstantID20_Services.fn_GetBestBusinessInfo(ds_BIPIDs,Options,linkingOptions);
-		ds_BusinessHeaderRaw1 := 
+		ds_BusinessHeaderRaw1 :=
 							BIPV2.Key_BH_Linking_Ids.kFetch2(inputs                   := ds_BIPIDs,
 																							 Level                    := Business_Risk_BIP.Common.SetLinkSearchLevel(Business_Risk_BIP.Constants.LinkSearch.SeleID),
 																							 ScoreThreshold           := 0, // ScoreThreshold --> 0 = Give me everything
@@ -451,20 +409,20 @@ export CDM_Batch_Service := MACRO
 		Business_Risk_BIP.Common.mac_slim_header(ds_BusinessHeaderRaw1, ds_BusinessHeaderRaw);
 
 		//BEST_INFO
-		ds_BestInformationRaw := BIPV2_Best.Key_LinkIds.kFetch2(inputs := ds_BIPIDs, 
-																															 Level  := Business_Risk_BIP.Common.SetLinkSearchLevel(Business_Risk_BIP.Constants.LinkSearch.SeleID),//Business_Risk_BIP.Common.SetLinkSearchLevel(Options.LinkSearchLevel), 
+		ds_BestInformationRaw := BIPV2_Best.Key_LinkIds.kFetch2(inputs := ds_BIPIDs,
+																															 Level  := Business_Risk_BIP.Common.SetLinkSearchLevel(Business_Risk_BIP.Constants.LinkSearch.SeleID),//Business_Risk_BIP.Common.SetLinkSearchLevel(Options.LinkSearchLevel),
 																															 ScoreThreshold := 0, // ScoreThreshold --> 0 = Give me everything
 																															 in_mod := linkingOptions,
 																															 IncludeStatus := TRUE,
 																															 JoinLimit := Business_Risk_BIP.Constants.Limit_Default,
 																															 JoinType := /* Options.KeepLargeBusinesses */ Business_Risk_BIP.Constants.DefaultJoinType);
-		ds_BestBusinessHeaderRaw := ds_BestInformationRaw(proxid = 0);	
+		ds_BestBusinessHeaderRaw := ds_BestInformationRaw(proxid = 0);
 		BusinessInstantID20_Services.layouts.BestInfoLayout xfm_SelectBestInformation( RECORDOF(ds_BestBusinessHeaderRaw) le ) := TRANSFORM
 			bestCompanyName     := le.Company_Name[1];
 			bestCompanyAddress  := le.Company_Address[1];
 			bestSICCode         := le.sic_code[1].company_sic_code1[1..4];
 			bestNAICSCode       := le.naics_code[1].company_naics_code1[1..6];
-			
+
 			SELF.Seq                  := le.uniqueid;
 			SELF.isactive             := le.isactive;
 			SELF.isdefunct            := le.isdefunct;
@@ -477,7 +435,7 @@ export CDM_Batch_Service := MACRO
 			SELF.best_bus_addr_suffix := bestCompanyAddress.Company_Addr_Suffix;
 			SELF.best_bus_postdir     := bestCompanyAddress.Company_Postdir;
 			SELF.best_bus_unit_desig  := bestCompanyAddress.Company_Unit_Desig;
-			SELF.best_bus_sec_range   := bestCompanyAddress.Company_Sec_Range;			
+			SELF.best_bus_sec_range   := bestCompanyAddress.Company_Sec_Range;
 			SELF.best_bus_addr        := Address.Addr1FromComponents(bestCompanyAddress.Company_Prim_Range, bestCompanyAddress.Company_Predir, bestCompanyAddress.Company_Prim_Name, bestCompanyAddress.Company_Addr_Suffix, bestCompanyAddress.Company_Postdir, bestCompanyAddress.Company_Unit_Desig, bestCompanyAddress.Company_Sec_Range);
 			SELF.best_bus_city        := IF( bestCompanyAddress.company_p_city_name != '', bestCompanyAddress.company_p_city_name, bestCompanyAddress.address_v_city_name );
 			SELF.best_bus_state       := bestCompanyAddress.company_st;
@@ -492,7 +450,7 @@ export CDM_Batch_Service := MACRO
 			SELF.best_naics_desc      := UCase( Codes.Key_NAICS(KEYED(naics_code = bestNAICSCode))[1].naics_description );
 			SELF := [];
 		END;
-		ds_BestBusinessHeaderInfo := PROJECT( ds_BestBusinessHeaderRaw, xfm_SelectBestInformation(LEFT) );	
+		ds_BestBusinessHeaderInfo := PROJECT( ds_BestBusinessHeaderRaw, xfm_SelectBestInformation(LEFT) );
 
 		finalBusnHeaderLayout := RECORD
 			UNSIGNED4 		uniqueid;
@@ -500,35 +458,35 @@ export CDM_Batch_Service := MACRO
 			STRING2				source;
 			STRING8				dt_first_seen;
 		END;
-		ds_BusinessHeaderBestFein := 
-					JOIN( 
-						ds_BusinessHeaderRaw, ds_BestBusinessHeaderInfo, 
-						LEFT.uniqueid = RIGHT.seq AND LEFT.company_fein=RIGHT.best_bus_fein, 
+		ds_BusinessHeaderBestFein :=
+					JOIN(
+						ds_BusinessHeaderRaw, ds_BestBusinessHeaderInfo,
+						LEFT.uniqueid = RIGHT.seq AND LEFT.company_fein=RIGHT.best_bus_fein,
 						TRANSFORM(finalBusnHeaderLayout,
-							SELF.dt_first_seen:=(STRING)LEFT.dt_first_seen; 
-							SELF:=LEFT), 
+							SELF.dt_first_seen:=(STRING)LEFT.dt_first_seen;
+							SELF:=LEFT),
 						INNER );
-		ds_BusinessHeaderBestCompanyName :=  
-					JOIN( 
-						ds_BusinessHeaderRaw, ds_BestBusinessHeaderInfo, 
-						LEFT.uniqueid = RIGHT.seq AND LEFT.company_name=RIGHT.best_bus_name, 
+		ds_BusinessHeaderBestCompanyName :=
+					JOIN(
+						ds_BusinessHeaderRaw, ds_BestBusinessHeaderInfo,
+						LEFT.uniqueid = RIGHT.seq AND LEFT.company_name=RIGHT.best_bus_name,
 						TRANSFORM(finalBusnHeaderLayout,
-							SELF.dt_first_seen:=(STRING)LEFT.dt_first_seen; 
-							SELF:=LEFT), 
+							SELF.dt_first_seen:=(STRING)LEFT.dt_first_seen;
+							SELF:=LEFT),
 						INNER );
 
 		// BUSINESS
-		bus_credit_sources    := MDR.sourceTools.set_Business_Credit + MDR.sourceTools.set_Dunn_Bradstreet + MDR.sourceTools.set_Dunn_Bradstreet_Fein + 
+		bus_credit_sources    := MDR.sourceTools.set_Business_Credit + MDR.sourceTools.set_Dunn_Bradstreet + MDR.sourceTools.set_Dunn_Bradstreet_Fein +
 														 MDR.sourceTools.set_EBR + [MDR.sourceTools.src_Experian_CRDB] + MDR.sourceTools.set_Experian_FEIN + MDR.sourceTools.set_Cortera;
 		bus_credit_combo_sources := [];
 		bus_govt_sources      := MDR.sourceTools.set_Bk + MDR.sourceTools.set_CA_Sales_Tax + MDR.sourceTools.set_CorpV2 +
-														 MDR.sourceTools.set_DCA + MDR.sourceTools.set_Dea + MDR.sourceTools.set_FAA + MDR.sourceTools.set_fbnv2 + MDR.sourceTools.set_FDIC + 
+														 MDR.sourceTools.set_DCA + MDR.sourceTools.set_Dea + MDR.sourceTools.set_FAA + MDR.sourceTools.set_fbnv2 + MDR.sourceTools.set_FDIC +
 														 MDR.sourceTools.set_IRS_5500 + MDR.sourceTools.set_IRS_Non_Profit + MDR.sourceTools.set_Liens_v2 + MDR.sourceTools.set_lnpropertyV2 +
 														 MDR.sourceTools.set_TXBUS + MDR.sourceTools.set_UCCV2 + MDR.sourceTools.set_vehicles + MDR.sourceTools.set_WC + MDR.sourceTools.set_Workers_Compensation +
 														 MDR.sourceTools.set_INFOUSA_ABIUS_USABIZ ;
 		bus_govt_combo_srcs   := []; // note L2/LI count as 1
 		bus_behav_sources     := MDR.sourceTools.set_BBB_Member + MDR.sourceTools.set_BBB_Non_Member + MDR.sourceTools.set_CClue + MDR.sourceTools.set_Credit_Unions +
-														 MDR.sourceTools.set_Frandx + MDR.sourceTools.set_OSHAIR + MDR.sourceTools.set_Yellow_Pages + 
+														 MDR.sourceTools.set_Frandx + MDR.sourceTools.set_OSHAIR + MDR.sourceTools.set_Yellow_Pages +
 														 MDR.sourceTools.set_Business_Registration;
 		//Best FEIN
 		ds_BusinessHeaderDedupedBestFEIN := DEDUP(SORT(ds_BusinessHeaderBestFein,uniqueid,seleid,source,dt_first_seen),uniqueid,seleid,source);
@@ -574,12 +532,12 @@ export CDM_Batch_Service := MACRO
 			SELF := l;
 			SELF := r;
 			SELF := [];
-		END;	
+		END;
 		ds_BusinessHeaderGroupedCombined := JOIN(ds_BusinessHeaderGroupedBestFEIN,ds_BusinessHeaderGroupedBestCompanyName,
-																							LEFT.uniqueid = RIGHT.uniqueid, 
-																							xfm_final(LEFT,RIGHT), 
+																							LEFT.uniqueid = RIGHT.uniqueid,
+																							xfm_final(LEFT,RIGHT),
 																							FULL OUTER);
-		
+
 		ds_BusinessHeaderGroupedCombinedWithSeq := JOIN(ds_CleanedInput, ds_BusinessHeaderGroupedCombined,
 																									LEFT.seq=RIGHT.uniqueid,
 																									TRANSFORM(models.layouts.layout_CDM_Batch_Out,
@@ -622,8 +580,8 @@ export CDM_Batch_Service := MACRO
 	ENDMACRO;
 	batchInputseq := batchinseq(Name_Company<>'' AND SSN_TIN_FEIN<>'' AND Name_First='' AND Name_Last='' AND unParsedFullName='');
 	ds_BusinessHeaderGroupedCombinedWithSeq := fn_getBusinessAttributes(batchInputseq);
-	
-	
+
+
 	models.layouts.layout_CDM_Batch_Out get_clam(layout_decd le) := TRANSFORM
 		SELF.seq := le.seq;
 		system_yearmonth := if(le.historydate = risk_indicators.iid_constants.default_history_date, (INTEGER)((STRING8)Std.Date.Today())[1..6], le.historydate);
@@ -642,12 +600,12 @@ export CDM_Batch_Service := MACRO
 
 		govt_sources      := ['AK', 'AM', 'AR', 'BA', 'CG', 'DA', 'D',
 													'DS', 'DE', 'EB', 'EM', 'E1', 'E2', 'E3', 'E4',
-																		 'FE', 'FF', 'FR', 'MW', 'NT', 'P', 
+																		 'FE', 'FF', 'FR', 'MW', 'NT', 'P',
 																		 'V',  'VO', 'W'];
 		govt_combo_srcs   := ['L2', 'LI']; // note L2/LI count as 1
 		decd_govt_srcs    := ['D0', 'D2', 'D3', 'D7', 'D9', 'D$', 'D!', 'D@', 'D%',
 													'OP']; // death sources for states, and OP = OKC Probate
-													
+
 		allDL_sources     := ['CY', 'D'];
 		govtDL_sources    := ['D'];
 		nongovtDL_sources := ['CY'];
@@ -675,7 +633,7 @@ export CDM_Batch_Service := MACRO
 		// ssn - credit bureau
 		t_ssn_src := if(count(ssn_src_dts(str1 in credit_combo_srcs)) > 0,1,0);
 		SELF.IDVerSSNCreditBureauCount     := if(noSSNinput, '-1', (string)min(9, count(ssn_src_dts(str1 in credit_sources))+t_ssn_src) );
-		SELF.IDVerSSNCreditBureauMonthsSeen := map(le.did=0 => '-1', 
+		SELF.IDVerSSNCreditBureauMonthsSeen := map(le.did=0 => '-1',
 																						SELF.IDVerSSNCreditBureauCount = '0' => '-2',
 																						(integer)trim(ssn_src_dts(str1 in (credit_sources+credit_combo_srcs))[1].str2) = 0 => '-3',
 																						(string)min(9999, months_apart(system_yearmonth, fixYYYY00((integer)trim(ssn_src_dts(str1 in (credit_sources+credit_combo_srcs))[1].str2))))
@@ -829,7 +787,7 @@ export CDM_Batch_Service := MACRO
 																					(integer)trim(dob_src_dts(str1 in behav_sources)[1].str2) = 0 => '-3',
 																					(string)min(9999, months_apart(system_yearmonth, fixYYYY00((integer)trim(dob_src_dts(str1 in behav_sources)[1].str2))))
 																					);
-																					
+
 
 		// fname - credit bureau
 		t_fnm_src := if(count(fname_src_dts(str1 in credit_combo_srcs)) > 0,1,0);
@@ -855,7 +813,7 @@ export CDM_Batch_Service := MACRO
 																								(string)min(9999, months_apart(system_yearmonth, fixYYYY00((integer)trim(fname_src_dts(str1 in behav_sources)[1].str2))))
 																								);
 
-			 
+
 		// lname - credit bureau
 		t_lnm_src := if(count(lname_src_dts(str1 in credit_combo_srcs)) > 0,1,0);
 		SELF.IDVerLastNameCreditBureauCount     := if(noLNameinput, '-1', (string)min(9, count(lname_src_dts(str1 in credit_sources))+t_lnm_src) );
@@ -878,7 +836,7 @@ export CDM_Batch_Service := MACRO
 																								SELF.IDVerLastNameBehavioralCount = '0' => '-2',
 																								(integer)trim(lname_src_dts(str1 in behav_sources)[1].str2) = 0 => '-3',
 																								(string)min(9999, months_apart(system_yearmonth, fixYYYY00((integer)trim(lname_src_dts(str1 in behav_sources)[1].str2))))
-																								);   
+																								);
 
 
 		// deceased - credit bureau
@@ -907,7 +865,7 @@ export CDM_Batch_Service := MACRO
 		SELF := le;
 		SELF := [];
 	END;
-	
+
 	models.layouts.layout_CDM_Batch_Out get_busn(ds_BusinessHeaderGroupedCombinedWithSeq ri) := TRANSFORM
 		SELF.seq := ri.seq;
 		SELF.acctno := ri.acctno;
@@ -930,14 +888,14 @@ export CDM_Batch_Service := MACRO
 	clam_attrib := project( rolldeceased, get_clam(LEFT) );
 	busn_attrib := project( ds_BusinessHeaderGroupedCombinedWithSeq, get_busn(LEFT) );
 	merged_results := clam_attrib+busn_attrib;
-	merged_plus_acct := join( merged_results, batchinseq, 
-													LEFT.seq=RIGHT.seq, 
+	merged_plus_acct := join( merged_results, batchinseq,
+													LEFT.seq=RIGHT.seq,
 													TRANSFORM(models.layouts.layout_CDM_Batch_Out,SELF.acctno := RIGHT.acctno; SELF := LEFT),
 													FULL OUTER
 												);
-												
+
 	final := merged_plus_acct;
-	
+
 	// DEBUGGING...
 	// output(batchinseq,named('batchinseq'));
 	// output(batchinputseq,named('batchinputseq'));

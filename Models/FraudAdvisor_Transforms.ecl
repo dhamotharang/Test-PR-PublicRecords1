@@ -1853,7 +1853,7 @@ EXPORT Models.fib12010_0.z_layouts_Input xfm_fib12010_shell_and_FPattrs(models.l
       self := []; //blank out any fields not yet assigned
 END;
 
-EXPORT Models.fib12010_0.z_layouts_Input xfm_fib12010_IDAattrs(Models.fib12010_0.z_layouts_Input le, Risk_Indicators.layouts.layout_IDAFraud_out rt) := TRANSFORM
+EXPORT Models.fib12010_0.z_layouts_Input xfm_fib12010_IDAattrs(Models.fib12010_0.z_layouts_Input le, Risk_Indicators.layouts.layout_IDA_out rt) := TRANSFORM
       self.TransactionId := le.TransactionId;
       self.C_ID10_N1_USSN := (Real)rt.Indicators(name = 'C_ID10_N1_USSN')[1].value;
       self.C_ID10_P1_DEF := (Real)rt.Indicators(name = 'C_ID10_P1_DEF')[1].value;
