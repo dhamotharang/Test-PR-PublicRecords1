@@ -1,9 +1,18 @@
 ﻿#workunit('name', 'Business_Shell_V22');
 
-IMPORT Business_Risk_BIP, RiskProcessing, Risk_Indicators, RiskWise, UT;
+/* ***************************************************************************
+  IMPORTANT NOTES TO LOOK INTO BEFORE RUNNING THIS SCRIPT
+  - Look whether to run business shell for credit models or fraud models
+  - Unless run_Busshell_for_fraud and run_Busshell_for_credit are set correctly, this script will not produce results. 
+  - Experian off for credit but on for fraud unless SBFE is requested.
+  - Authrep off for credit but on for fraud
+  - UseUpdatedBipAppend on for Credit but off for fraud
+  - BIPAppend_ScoreThreshold & BIPAppend_WeightThreshold should be default for credit but 0 for fraud
+*******************************************************************************/
+
+IMPORT Business_Risk_BIP, RiskWise;
 
 eyeball := 100;
-
 Threads := 30;
 RecordsToRun := 0; // Set to 0 to run all, otherwise set to the number of records from the inputFile you wish to run
 
@@ -25,21 +34,43 @@ BIPBestAppend := Business_Risk_BIP.Constants.BIPBestAppend.Default; // Append No
 Marketing_Mode := 0; // This product is not being run for marketing, allow all normal sources
 // Marketing_Mode := 1; // This product IS being run for marketing, disable sources not allowed for marketing
 
-dataPermissionMask := ''; // Default - does not allow SBFE data
-// dataPermissionMask := '000000000001'; // Allow SBFE data
+/* Data Modeling need to specify whether to: 1.)run Fraud or Credit Option
+                                             2.)Turn ON or OFF SBFE Data. 
+IncludeExperian, Include_AuthRep_In_BIPAppend, UseUpdatedBipAppend, BipAppend_WeightThreshold, DataPermissionMask are handled based on above 2 options.*/
 
-IncludeExperian := FALSE; // By default, Experian data is not allowed
-// IncludeExperian := TRUE; // Override the Experian data restriction and include Experian in results 
+// run_Busshell_for_fraud:=  TRUE;       //Run Business Fraud Models
+run_Busshell_for_fraud := FALSE;  
+ 
+run_Busshell_for_credit := TRUE;       //Run Business Credit Models
+// run_Busshell_for_credit:= FALSE;
+
+Include_SBFE := FALSE;    // By Default, turn off SBFE data.
+// Include_SBFE := TRUE; //If TRUE, turn on the SBFE data.
+
+
+IF( run_Busshell_for_fraud = run_Busshell_for_credit,
+    FAIL('Error - Please choose whether to run for business shell for credit models or fraud models'));
+   
+IncludeExperian := IF(run_Busshell_for_fraud, IF(Include_SBFE,FALSE,TRUE), FALSE); //If TRUE,Override the Experian data restriction and include Experian in results 
+
+Include_AuthRep_In_BIPAppend := IF(run_Busshell_for_fraud, TRUE, FALSE); //If TRUE,Include Authorized Rep in determining BIP IDs for the company.
+
+UseUpdatedBipAppend := IF(run_Busshell_for_credit, TRUE, FALSE); // IF TRUE, run the new BIP append logic
+
+UNSIGNED1 Default_BIPAppend_ScoreThreshold := 75;
+BIPAppend_ScoreThreshold := IF(run_Busshell_for_fraud, 0, Default_BIPAppend_ScoreThreshold);
+
+UNSIGNED1 Default_BipAppend_WeightThreshold := 44;
+BipAppend_WeightThreshold := IF(run_Busshell_for_fraud, 0, Default_BipAppend_WeightThreshold);
+
+dataPermissionMask := IF(Include_SBFE, '00000000000100000000', '00000000000000000000'); // Default - does not allow SBFE data
 
 Allowed_Sources := Business_Risk_BIP.Constants.Default_AllowedSources; // By default, do NOT include DNB DMI data
 // Allowed_Sources := Business_Risk_BIP.Constants.AllowDNBDMI; // Include DNB DMI data. NO CUSTOMERS CAN USE THIS, FOR RESEARCH PURPOSES ONLY.
 
-Include_AuthRep_In_BIPAppend := FALSE; // Prevent the Authorized Rep from being used to determine the BIP IDs for the company.
-// Include_AuthRep_In_BIPAppend := TRUE; // Include the Authorized Rep in determining the BIP IDs for the company.
-
 RoxieIP := RiskWise.shortcuts.prod_batch_analytics_roxie;
 
-BusShellVersion := 22; //business shell version 22 is the most recent business shell version and should be the default version run (use bwr_business_shell_v2 for v2 by modeler request ONLY)
+BusShellVersion := 22; //business shell version 22 should be the default version run (use bwr_business_shell_v2 for v2 by modeler request ONLY)
 
 inputFileName := '~hmccarl::in::bshell_test_inputs';
 
@@ -89,89 +120,91 @@ OUTPUT(CHOOSEN(InputFile, eyeball), NAMED('Sample_Raw_Input'));
 OUTPUT(COUNT(InputFile), NAMED('Total_Raw_Input_Records'));
 
 SOAPLayout := RECORD
-	INTEGER Seq;
-	STRING AcctNo;
-	STRING CompanyName;
-	STRING AltCompanyName;
-	STRING StreetAddress1;
-	STRING StreetAddress2;
-	STRING City;
-	STRING State;
-	STRING Zip9;
-	STRING Prim_Range;
-	STRING PreDir;
-	STRING Prim_Name;
-	STRING Addr_Suffix;
-	STRING PostDir;
-	STRING Unit_Desig;
-	STRING Sec_Range;
-	STRING Zip5;
-	STRING Zip4;
-	STRING Lat;
-	STRING Long;
-	STRING Addr_Type; 
-	STRING Addr_Status;
-	STRING County;
-	STRING Geo_Block;
-	STRING FEIN;
-	STRING Phone10;
-	STRING IPAddr;
-	STRING CompanyURL;
-	STRING Rep_FullName;
-	STRING Rep_NameTitle;
-	STRING Rep_FirstName;
-	STRING Rep_MiddleName;
-	STRING Rep_LastName;
-	STRING Rep_NameSuffix;
-	STRING Rep_FormerLastName;
-	STRING Rep_StreetAddress1;
-	STRING Rep_StreetAddress2;
-	STRING Rep_City;
-	STRING Rep_State;
-	STRING Rep_Zip;
-	STRING Rep_Prim_Range;
-	STRING Rep_PreDir;
-	STRING Rep_Prim_Name;
-	STRING Rep_Addr_Suffix;
-	STRING Rep_PostDir;
-	STRING Rep_Unit_Desig;
-	STRING Rep_Sec_Range;
-	STRING Rep_Zip5;
-	STRING Rep_Zip4;
-	STRING Rep_Lat;
-	STRING Rep_Long;
-	STRING Rep_Addr_Type;
-	STRING Rep_Addr_Status;
-	STRING Rep_County;
-	STRING Rep_Geo_Block;
-	STRING Rep_SSN;
-	STRING Rep_DateOfBirth;
-	STRING Rep_Phone10;
-	STRING Rep_Age;
-	STRING Rep_DLNumber;
-	STRING Rep_DLState;
-	STRING Rep_Email;
-	INTEGER Rep_LexID;
-	INTEGER DPPA_Purpose;
-	INTEGER GLBA_Purpose;
-	STRING Data_Restriction_Mask;
-	STRING Data_Permission_Mask;
-	INTEGER MarketingMode;
-	INTEGER HistoryDate;
-	INTEGER LinkSearchLevel;
-	INTEGER BIPBestAppend;
-	STRING SIC_Code;
-	STRING NAIC_Code;
-	UNSIGNED1 BusShellVersion;
-	UNSIGNED6 PowID;
-	UNSIGNED6 ProxID;
-	UNSIGNED6 SeleID;
-	UNSIGNED6 OrgID;
-	UNSIGNED6 UltID;
-	BOOLEAN OverrideExperianRestriction;
-	STRING AllowedSources;
-	BOOLEAN IncludeAuthRepInBIPAppend;
-END;
+  INTEGER Seq;
+  STRING AcctNo;
+  STRING CompanyName;
+  STRING AltCompanyName;
+  STRING StreetAddress1;
+  STRING StreetAddress2;
+  STRING City;
+  STRING State;
+  STRING Zip9;
+  STRING Prim_Range;
+  STRING PreDir;
+  STRING Prim_Name;
+  STRING Addr_Suffix;
+  STRING PostDir;
+  STRING Unit_Desig;
+  STRING Sec_Range;
+  STRING Zip5;
+  STRING Zip4;
+  STRING Lat;
+  STRING Long;
+  STRING Addr_Type; 
+  STRING Addr_Status;
+  STRING County;
+  STRING Geo_Block;
+  STRING FEIN;
+  STRING Phone10;
+  STRING IPAddr;
+  STRING CompanyURL;
+  STRING Rep_FullName;
+  STRING Rep_NameTitle;
+  STRING Rep_FirstName;
+  STRING Rep_MiddleName;
+  STRING Rep_LastName;
+  STRING Rep_NameSuffix;
+  STRING Rep_FormerLastName;
+  STRING Rep_StreetAddress1;
+  STRING Rep_StreetAddress2;
+  STRING Rep_City;
+  STRING Rep_State;
+  STRING Rep_Zip;
+  STRING Rep_Prim_Range;
+  STRING Rep_PreDir;
+  STRING Rep_Prim_Name;
+  STRING Rep_Addr_Suffix;
+  STRING Rep_PostDir;
+  STRING Rep_Unit_Desig;
+  STRING Rep_Sec_Range;
+  STRING Rep_Zip5;
+  STRING Rep_Zip4;
+  STRING Rep_Lat;
+  STRING Rep_Long;
+  STRING Rep_Addr_Type;
+  STRING Rep_Addr_Status;
+  STRING Rep_County;
+  STRING Rep_Geo_Block;
+  STRING Rep_SSN;
+  STRING Rep_DateOfBirth;
+  STRING Rep_Phone10;
+  STRING Rep_Age;
+  STRING Rep_DLNumber;
+  STRING Rep_DLState;
+  STRING Rep_Email;
+  INTEGER Rep_LexID;
+  INTEGER DPPA_Purpose;
+  INTEGER GLBA_Purpose;
+  STRING Data_Restriction_Mask;
+  STRING Data_Permission_Mask;
+  INTEGER MarketingMode;
+  INTEGER HistoryDate;
+  INTEGER LinkSearchLevel;
+  INTEGER BIPBestAppend;
+  STRING SIC_Code;
+  STRING NAIC_Code;
+  UNSIGNED1 BusShellVersion;
+  UNSIGNED6 PowID;
+  UNSIGNED6 ProxID;
+  UNSIGNED6 SeleID;
+  UNSIGNED6 OrgID;
+  UNSIGNED6 UltID;
+  BOOLEAN OverrideExperianRestriction;
+  STRING AllowedSources;
+  BOOLEAN IncludeAuthRepInBIPAppend;
+  BOOLEAN Useupdatedbipappend;
+  UNSIGNED1 Bipappend_scorethreshold;
+  UNSIGNED1 Bipappend_weightthreshold;END;
 
 SOAPLayout intoSOAP(InputFile le) := TRANSFORM
 	SELF.AcctNo := le.AccountNumber;
@@ -255,6 +288,9 @@ SOAPLayout intoSOAP(InputFile le) := TRANSFORM
 	SELF.OverrideExperianRestriction := IncludeExperian;
 	SELF.AllowedSources := Allowed_Sources;
 	SELF.IncludeAuthRepInBIPAppend := Include_AuthRep_In_BIPAppend;
+	SELF.Useupdatedbipappend := Useupdatedbipappend;
+	SELF.Bipappend_scorethreshold := Bipappend_scorethreshold;
+	SELF.Bipappend_weightthreshold := Bipappend_weightthreshold;
 	SELF := [];
 END;
 
