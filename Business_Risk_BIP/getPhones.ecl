@@ -1,10 +1,11 @@
-﻿IMPORT BIPV2, Risk_Indicators, CellPhone, dx_Gong, Doxie, Suppress, ut;
+﻿IMPORT Business_Risk_BIP, BIPV2, Risk_Indicators, CellPhone, dx_Gong, Doxie, Suppress, ut;
 
 EXPORT getPhones(DATASET(Business_Risk_BIP.Layouts.Shell) Shell,
 											 Business_Risk_BIP.LIB_Business_Shell_LIBIN Options,
 											 BIPV2.mod_sources.iParams linkingOptions,
-											 SET OF STRING2 AllowedSourcesSet,
-											 doxie.IDataAccess mod_access = MODULE (doxie.IDataAccess) END) := FUNCTION
+											 SET OF STRING2 AllowedSourcesSet) := FUNCTION
+
+	mod_access := PROJECT(Options, doxie.IDataAccess);
 
 	calculateValueFor := Business_Risk_BIP.mod_BusinessShellVersionLogic(Options);
 

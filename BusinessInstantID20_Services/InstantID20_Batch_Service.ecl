@@ -1,7 +1,7 @@
 ﻿/*--SOAP--
 <message name="BusinessInstantID20_Batch_Service">
 	<part name="Batch_In" type="tns:XmlDataSet" cols="100" rows="25"/>
-	<!-- Option Fields --> 
+	<!-- Option Fields -->
 	<part name="DPPAPurpose" type="xsd:integer"/>
 	<part name="GLBPurpose" type="xsd:integer"/>
 	<part name="DataRestrictionMask" type="xsd:string"/>
@@ -52,7 +52,7 @@
 	<part name="IncludeDriverLicenseInCVI" type="xsd:boolean"/>
 	<part name="IncludeMIoverride" type="xsd:boolean"/>
 	<part name="IncludeMSoverride" type="xsd:boolean"/>
-	<part name="IncludeOfac" type="xsd:boolean"/> 
+	<part name="IncludeOfac" type="xsd:boolean"/>
 	<part name="IncludeTargusE3220Gateway" type="xsd:boolean"/>
 	<part name="IncludeBridgerXG5Gateway" type="xsd:boolean"/>
 	<part name="InstantIDVersion" type="xsd:string"/>
@@ -80,7 +80,7 @@
 	<part name="Include_SDT_Watchlist"  type="xsd:boolean"/>
 	<part name="Include_UNNT_Watchlist" type="xsd:boolean"/>
 	<part name="Include_WBIF_Watchlist" type="xsd:boolean"/>
-	
+
 	<!-- ----------[ Added for OFAC v. 4 ]---------- -->
 	<part name="Include_ADFA_Watchlist" type="xsd:boolean"/>
 	<part name="Include_FAJC_Watchlist" type="xsd:boolean"/>
@@ -197,7 +197,7 @@ EXPORT InstantID20_Batch_Service() := MACRO
 		'_TransactionId',
 		'_BatchUID',
 		'_GCID'
-		
+
 		));
 
 		/* ************************************************************************
@@ -274,7 +274,7 @@ EXPORT InstantID20_Batch_Service() := MACRO
 				if(Include_PMLJ_Watchlist, dataset([{patriot.constants.wlPMLJ}], iesp.share.t_StringArrayItem));
 
 		_Watchlists_Requested := dWL(value<>'');
-    
+
     Boolean ExcludeWatchLists := BusinessInstantID20_Services.Constants.EXCLUDEWATCHLISTS        : stored('ExcludeWatchLists');
 
 		// 2. Define DOB options.
@@ -286,8 +286,8 @@ EXPORT InstantID20_Batch_Service() := MACRO
 
 		// 3. Read the option params.
 		BusinessInstantID20_Services.Macros.mac_ReadOptionsBatch()
-			
-		// 4.  Load the Options and LinkingOptions modules.	
+
+		// 4.  Load the Options and LinkingOptions modules.
 		Gateway.Layouts.Config Options_gw_switch(iesp.businessinstantid20.t_BIID20Gateway le) := transform
 			self.servicename	:= if((le.servicename in BusinessInstantID20_Services.Constants.SET_TARGUS_SERVICENAMES AND NOT _DataPermissionMask[Risk_Indicators.iid_constants.posTargusPermission]='1'), '', le.servicename);
 			self.url 					:= if((le.servicename in BusinessInstantID20_Services.Constants.SET_TARGUS_SERVICENAMES AND NOT _DataPermissionMask[Risk_Indicators.iid_constants.posTargusPermission]='1'), '', le.url);
@@ -295,14 +295,17 @@ EXPORT InstantID20_Batch_Service() := MACRO
 			self 							:= [];
     end;
 		Options := MODULE(BusinessInstantID20_Services.iOptions)
-			// Clean up the Options and make sure that defaults are enforced. RULE: For this product, 
+			// Clean up the Options and make sure that defaults are enforced. RULE: For this product,
 			// if we're retrieving SBFE data (DPM[12] value set to '1'), then we cannot retrieve Experian
 			// data. Set OverRideExperianRestriction = TRUE/FALSE based on whether SBFE is allowed.
-			EXPORT UNSIGNED1	DPPA_Purpose 				 := _DPPA_Purpose;
-			EXPORT UNSIGNED1	GLBA_Purpose 				 := _GLBA_Purpose;
-			EXPORT STRING50		DataRestrictionMask	 := _DataRestrictionMask;
-			EXPORT STRING50		DataPermissionMask	 := _DataPermissionMask;
-			EXPORT STRING10		IndustryClass				 := _IndustryClass;
+			EXPORT UNSIGNED1	dppa 				 := _DPPA_Purpose;
+			EXPORT UNSIGNED1	glb 				 := _GLBA_Purpose;
+			EXPORT STRING			DataRestrictionMask	 := _DataRestrictionMask;
+			EXPORT STRING			DataPermissionMask	 := _DataPermissionMask;
+			EXPORT STRING5		industry_class			 := _IndustryClass;
+      EXPORT unsigned1  lexid_source_optout  := LexIdSourceOptout;
+      EXPORT string     transaction_id       := if(TransactionID <> '', TransactionID, BatchUID);
+      EXPORT unsigned6  global_company_id    := GlobalCompanyId;
 			EXPORT UNSIGNED1	LinkSearchLevel			 := IF(_LinkSearchLevel BETWEEN Business_Risk_BIP.Constants.LinkSearch.Default AND Business_Risk_BIP.Constants.LinkSearch.UltID, _LinkSearchLevel, Business_Risk_BIP.Constants.LinkSearch.Default);
 			EXPORT UNSIGNED1	BusShellVersion			 := MAX(Business_Risk_BIP.Constants.BusShellVersion_v22, _BusShellVersion);
 			EXPORT UNSIGNED1	MarketingMode				 := MAX(MIN(_MarketingMode, 1), 0);
@@ -325,88 +328,84 @@ EXPORT InstantID20_Batch_Service() := MACRO
   IF( Options.OFAC_Version != 4 AND OFAC_XG5.constants.wlALLV4 IN SET(Options.Watchlists_Requested, value),
       FAIL( OFAC_XG5.Constants.ErrorMsg_OFACversion ) );
 
-		// 5. Generate the linking parameters to be used in BIP's kFetch (Key Fetch) - These 
+		// 5. Generate the linking parameters to be used in BIP's kFetch (Key Fetch) - These
 		// parameters should be global so figure them out here and pass around appropriately.
 		linkingOptions := MODULE(BIPV2.mod_sources.iParams)
 			EXPORT STRING DataRestrictionMask		:= Options.DataRestrictionMask; // Note: Must unfortunately leave as undefined STRING length to match the module definition
 			EXPORT BOOLEAN ignoreFares					:= FALSE; // From AutoStandardI.DataRestrictionI, this is a User Configurable Input Option to Ignore FARES data - since the Business Shell doesn't accept this input default it to FALSE to always utilize whatever the DataRestrictionMask allows
 			EXPORT BOOLEAN ignoreFidelity				:= FALSE; // From AutoStandardI.DataRestrictionI, this is a User Configurable Input Option to Ignore Fidelity data - since the Business Shell doesn't accept this input default it to FALSE to always utilize whatever the DataRestrictionMask allows
 			EXPORT BOOLEAN AllowAll							:= IF(Options.AllowedSources = Business_Risk_BIP.Constants.AllowDNBDMI, TRUE, FALSE); // When TRUE this will unmask DNB DMI data - NO CUSTOMERS CAN USE THIS, FOR RESEARCH PURPOSES ONLY
-			EXPORT BOOLEAN AllowGLB							:= Risk_Indicators.iid_constants.GLB_OK(Options.GLBA_Purpose, FALSE /*isFCRA*/);
-			EXPORT BOOLEAN AllowDPPA						:= Risk_Indicators.iid_constants.DPPA_OK(Options.DPPA_Purpose, FALSE /*isFCRA*/);
-			EXPORT UNSIGNED1 DPPAPurpose				:= Options.DPPA_Purpose;
-			EXPORT UNSIGNED1 GLBPurpose					:= Options.GLBA_Purpose;
+			EXPORT BOOLEAN AllowGLB							:= Options.isValidGlb();
+			EXPORT BOOLEAN AllowDPPA						:= Options.isValidDppa();
+			EXPORT UNSIGNED1 DPPAPurpose				:= Options.dppa;
+			EXPORT UNSIGNED1 GLBPurpose					:= Options.glb;
 			EXPORT BOOLEAN IncludeMinors				:= TRUE; // Shouldn't really have an impact on business searches, set to TRUE for now
 			EXPORT BOOLEAN LNBranded						:= TRUE; // Not entirely certain what effect this has
 		END;
-		
-		// 6. Load the batch input.		
+
+		// 6. Load the batch input.
 		DATASET(BusinessInstantID20_Services.Layouts.BatchInput) ds_Input_pre := DATASET([], BusinessInstantID20_Services.Layouts.BatchInput) : STORED('Batch_In');
 
-		// 7. The flag "_ForRetroTesting" is set to TRUE for retro-testing purposes prior to going live, 
-		// so that customers can evaluate this product. In this case, only one record at a time is sent 
-		// to this service via SOAPCALL( ), even though it is a batch service; we'll therefore evaluate 
+		// 7. The flag "_ForRetroTesting" is set to TRUE for retro-testing purposes prior to going live,
+		// so that customers can evaluate this product. In this case, only one record at a time is sent
+		// to this service via SOAPCALL( ), even though it is a batch service; we'll therefore evaluate
 		// only the first record to determine whether minimum input criteria were met.
 		BOOLEAN _ForRetroTesting := FALSE : STORED('ForRetroTesting');
-		
+
 		firstRec := ROW(ds_Input_pre[1], BusinessInstantID20_Services.Layouts.BatchInput);
-		
-		MinimumInputMet := 
-				(firstRec.CompanyName != '' OR firstRec.AltCompanyName != '') AND 
-				(firstRec.StreetAddress1 != '' OR firstRec.StreetAddress2 != '') AND 
+
+		MinimumInputMet :=
+				(firstRec.CompanyName != '' OR firstRec.AltCompanyName != '') AND
+				(firstRec.StreetAddress1 != '' OR firstRec.StreetAddress2 != '') AND
 				(firstRec.Zip != '' OR (firstRec.City != '' AND firstRec.State != ''));
-			
+
 		IF( _ForRetroTesting AND NOT MinimumInputMet,
 			FAIL('Error - Minimum input fields required: please refer to your product manual for guidance.'));
 
-    IF( Options.OFAC_Version = 4 AND ExcludeWatchlists = FALSE AND NOT EXISTS(Options.Gateways(servicename = 'bridgerwlc')), 
-			FAIL(Risk_Indicators.iid_constants.OFAC4_NoGateway)); // Due to this RQ-14881 ExcludeWatchlists works with other versions of OFAC in this query. 
+    IF( Options.OFAC_Version = 4 AND ExcludeWatchlists = FALSE AND NOT EXISTS(Options.Gateways(servicename = 'bridgerwlc')),
+			FAIL(Risk_Indicators.iid_constants.OFAC4_NoGateway)); // Due to this RQ-14881 ExcludeWatchlists works with other versions of OFAC in this query.
                                                             // Please refer to the ticket if needing further details.
-    
+
 		ds_Input := PROJECT( ds_Input_pre, BusinessInstantID20_Services.Transforms(Options).xfm_LoadInput(LEFT,COUNTER) );
-	
+
 		// 8. Pass all input to BIID 2.0 logic.
-		ds_BIID_results := BusinessInstantID20_Services.InstantID20_Records(ds_Input, 
-                                                                        Options, 
-                                                                        linkingOptions, 
+		ds_BIID_results := BusinessInstantID20_Services.InstantID20_Records(ds_Input,
+                                                                        Options,
+                                                                        linkingOptions,
                                                                         ExcludeWatchlists,
-                                                                        LexIdSourceOptout := LexIdSourceOptout,
-                                                                        TransactionID := TransactionID,
-                                                                        BatchUID := BatchUID,
-                                                                        GlobalCompanyID := GlobalCompanyID,
                                                                         useUpdatedBipAppend := false);
-				
+
 		// 9. Product output:
 		results_batch := PROJECT( ds_BIID_results, BusinessInstantID20_Services.xfm_ToBatchLayout(LEFT, Options) );
 
 		// 10. Calculate Royalties
 
 		// For SBFE...:
-		ds_SBFEData := 
+		ds_SBFEData :=
 			PROJECT(
 				ds_BIID_results,
 				TRANSFORM( { STRING acctno, UNSIGNED1 SBFEAccountCount },
 					SELF.acctno := LEFT.InputEcho.acctno,
 					SELF.SBFEAccountCount :=
-						(INTEGER)( TRIM(LEFT.SBFEVerification.time_on_sbfe) != '' OR 
-						           TRIM(LEFT.SBFEVerification.last_seen_sbfe) != '' OR 
+						(INTEGER)( TRIM(LEFT.SBFEVerification.time_on_sbfe) != '' OR
+						           TRIM(LEFT.SBFEVerification.last_seen_sbfe) != '' OR
 						           TRIM(LEFT.SBFEVerification.count_of_trades_sbfe) != '' )
 				)
 			);
-			
+
 		SBFE_royalties := Royalty.RoyaltySBFE.GetBatchRoyaltiesByAcctno(ds_Input, ds_SBFEData);
 
-		// ...and for Targus Gateway. As of 2/2017 Targus is NOT being used by this product, 
-		// so we're returning zeroes: 
+		// ...and for Targus Gateway. As of 2/2017 Targus is NOT being used by this product,
+		// so we're returning zeroes:
 		layout_targus_temp := RECORD
 			STRING30 acctno;
-			Business_Risk_BIP.Layouts.LayoutSources;	
+			Business_Risk_BIP.Layouts.LayoutSources;
 			STRING5 TargusType;
 		END;
-		
+
 		targus_type := Phones.Constants.TargusType.WirelessConnectionSearch + Phones.Constants.TargusType.PhoneDataExpress;
-			
-		targus_data := 
+
+		targus_data :=
 			PROJECT(
 				ds_BIID_results,
 				TRANSFORM( layout_targus_temp,
@@ -418,15 +417,15 @@ EXPORT InstantID20_Batch_Service() := MACRO
 					SELF.TargusType    := ''
 				)
 			);
-		
+
 		Targus_royalties_pre := Royalty.RoyaltyTargus.GetBatchRoyaltiesByAcctno(ds_Input, targus_data, source, , acctno, acctno);
 		Targus_royalties := PROJECT( Targus_royalties_pre, TRANSFORM( Royalty.Layouts.RoyaltyForBatch, SELF.source_type := 'G', SELF := LEFT ) ); // 'G' = Gateway source
-		
+
 		total_royalties_pre := SORT( (SBFE_royalties + Targus_royalties), acctno, royalty_type_code );
 		total_royalties := Royalty.GetBatchRoyalties( total_royalties_pre, _ReturnDetailedRoyalties );
 
 		OUTPUT(total_royalties, NAMED('RoyaltySet'));
-		
+
 		// DEBUGs:
 		OUTPUT( results_batch, NAMED('Results') );
 ENDMACRO;

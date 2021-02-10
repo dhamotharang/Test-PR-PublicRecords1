@@ -197,7 +197,8 @@ export t_Text := record
   dataset(t_InputIDs) IDs {xpath('IDs/InputID'), MAXCOUNT(iesp.Constants.gwBridger.MaxItem)};
 end;
 
-export t_InputRecord := record
+export t_InputRecord := record  
+  integer RecordID {xpath('RecordID')};
   t_InputEntity Entity {xpath('Entity')};
 end;
 

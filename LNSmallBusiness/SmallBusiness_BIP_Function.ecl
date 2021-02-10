@@ -554,6 +554,7 @@ EXPORT SmallBusiness_BIP_Function (
 	layout_model_results_flat := RECORD
 		UNSIGNED4 seq;
 		STRING20 Model_Name; // e.g. 'SBBM1601_0_0' / BusinessCredit_Services.Constants.BLENDED_SCORE_MODEL
+    STRING20 Model_Type;
 		STRING3 Model_Score;
 		STRING5 Model_RC1;  // RC = Reason Code
 		STRING5 Model_RC2;
@@ -567,6 +568,7 @@ EXPORT SmallBusiness_BIP_Function (
 			TRANSFORM( layout_model_results_flat,
 				SELF.seq := LEFT.seq,
 				SELF.Model_Name  := LEFT.ModelName,
+				SELF.Model_Type  := '0-999',
 				SELF.Model_Score := LEFT.Score,
 				SELF.Model_RC1   := LEFT.ri[1].hri,
 				SELF.Model_RC2   := LEFT.ri[2].hri,
@@ -584,12 +586,14 @@ EXPORT SmallBusiness_BIP_Function (
 	LNSmallBusiness.BIP_Layouts.Business_Shell_Plus_Scores_Layout xfm_addScores(LNSmallBusiness.BIP_Layouts.Business_Shell_Plus_Scores_Layout le, DATASET(layout_model_results_flat) allRows) :=
 		TRANSFORM
 			SELF.Model_1_Name  := allRows[1].Model_Name;
+			SELF.Model_1_Type  := allRows[1].Model_type;
 			SELF.Model_1_Score := allRows[1].Model_Score;
 			SELF.Model_1_RC1   := allRows[1].Model_RC1;
 			SELF.Model_1_RC2   := allRows[1].Model_RC2;
 			SELF.Model_1_RC3   := allRows[1].Model_RC3;
 			SELF.Model_1_RC4   := allRows[1].Model_RC4;
 			SELF.Model_2_Name  := allRows[2].Model_Name;
+			SELF.Model_2_Type  := allRows[2].Model_Type;
 			SELF.Model_2_Score := allRows[2].Model_Score;
 			SELF.Model_2_RC1   := allRows[2].Model_RC1;
 			SELF.Model_2_RC2   := allRows[2].Model_RC2;
@@ -630,7 +634,7 @@ EXPORT SmallBusiness_BIP_Function (
 	
 	// Merge Attributes and Scores
 	iesp.smallbusinessanalytics.t_SBAScoreHRI getScoreResults(Layout_ModelOut_Plus le) := TRANSFORM
-		SELF._Type := '';
+		SELF._Type := '0-999';
 		SELF.Value := (INTEGER)le.Score;
 		SELF.ScoreReasons := 
 			PROJECT(

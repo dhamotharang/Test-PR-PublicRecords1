@@ -298,6 +298,17 @@ Do_IDA := Auto_model_name in Riskview.Constants.valid_IDA_models or
           Custom3_model_name in Riskview.Constants.valid_IDA_models or
           Custom4_model_name in Riskview.Constants.valid_IDA_models or
           Custom5_model_name in Riskview.Constants.valid_IDA_models;
+			
+Do_Attribute_Models := 	Auto_model_name in Riskview.Constants.attrv5_models or 
+          Bankcard_model_name in Riskview.Constants.attrv5_models or
+          Short_term_lending_model_name in Riskview.Constants.attrv5_models or
+          Telecommunications_model_name in Riskview.Constants.attrv5_models or
+          Crossindustry_model_name in Riskview.Constants.attrv5_models or
+          Custom_model_name in Riskview.Constants.attrv5_models or
+          Custom2_model_name in Riskview.Constants.attrv5_models or
+          Custom3_model_name in Riskview.Constants.attrv5_models or
+          Custom4_model_name in Riskview.Constants.attrv5_models or
+          Custom5_model_name in Riskview.Constants.attrv5_models;
 
 LN_IDA_input := UNGROUP(PROJECT(clam, TRANSFORM(Risk_Indicators.layouts.layout_IDA_in, 
                                       SELF.CompanyID := companyID,
@@ -398,7 +409,7 @@ isReportAlone := if(RiskviewReportRequest and
 		true, false);
 		
 // if valid attributes aren't requested, don't bother calling get_attributes_v5
-attrv5 := if(valid_attributes_requested or Do_IDA,
+attrv5 := if(valid_attributes_requested or Do_IDA or Do_Attribute_Models,
 							riskview.get_attributes_v5(attributes_clam, isPreScreenPurpose),
 							project(attributes_clam, transform(riskview.layouts.attributes_internal_layout_noscore, 
 							self := left, self := []))

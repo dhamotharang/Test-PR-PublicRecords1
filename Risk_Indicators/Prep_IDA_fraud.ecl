@@ -1,9 +1,10 @@
 ﻿IMPORT Models, Risk_Indicators, Gateway, STD;
 
-EXPORT Prep_IDA_fraud(DATASET(Risk_Indicators.layouts.layout_IDAFraud_in) indata, 
+EXPORT Prep_IDA_fraud(DATASET(Risk_Indicators.layouts.layout_IDA_in) indata, 
                       DATASET(Gateway.Layouts.Config) gateways,
                       DATASET(Models.Layouts.Layout_Model_Request_In) Model_requests,
-                      BOOLEAN Testing = FALSE,
+                      UNSIGNED1 Timeout_sec = 3,
+                      UNSIGNED1 Retries = 0,
                       BOOLEAN On_thor = FALSE
                      ) := FUNCTION
 
@@ -35,28 +36,28 @@ EXPORT Prep_IDA_fraud(DATASET(Risk_Indicators.layouts.layout_IDAFraud_in) indata
   //----------------------------------------------------------------------------
   
   //how to get Product Name into this function? pass in gateway info or by itself?
-  tempProductName := MAP(Testing                                                                    => 'AllAttributes',
-                         Models.FP_models.Model_Check(Model_requests, ['fibn12010_0', IDA_models])  => 'LNFraudAttributes',
+  tempProductName := MAP(Models.FP_models.Model_Check(Model_requests, ['fibn12010_0', IDA_models])  => 'LNFraudAttributes',
                          Models.FP_models.Model_Check(Model_requests, ['modeling_attribute_model']) => 'LNFraudAttributes', //This might need to change once we know what it is
                                                                                                        '' //Then IDA isn't needed
                      );
   //how to get productID into this function? pass in gateway info or as a passed parameter
-  tempProductID := MAP(Testing                                                                    => 'AA3.0',
-                       Models.FP_models.Model_Check(Model_requests, ['fibn12010_0'])              => 'LFB1.0',
+  tempProductID := MAP(Models.FP_models.Model_Check(Model_requests, ['fibn12010_0'])              => 'LFB1.0',
                        Models.FP_models.Model_Check(Model_requests, IDA_models)                   => 'LFSS1.0',
                        Models.FP_models.Model_Check(Model_requests, ['modeling_attribute_model']) => 'XA1.0',  //This will need to change once we know what it is
                                                                                                      '' //Then IDA isn't needed
                      );
   
   //populate ProductName and ID based on what's requested.
-  IDA_input := PROJECT(indata, TRANSFORM(Risk_Indicators.layouts.layout_IDAFraud_in,
+  IDA_input := PROJECT(indata, TRANSFORM(Risk_Indicators.layouts.layout_IDA_in,
+                               SELF.Solution := Risk_Indicators.iid_constants.idaStandardSolution;
+                               SELF.Client := TRIM((Risk_Indicators.iid_constants.idaFraudClienPrefix + TRIM(LEFT.CompanyID)), ALL);
                                SELF.ProductName := tempProductName,
                                SELF.ProductID := tempProductID,
-                               SELF.ESPTransactionId := IF(Gateway_mode != 0, 'ESPTestID'+LEFT.App_ID, LEFT.ESPTransactionId),
+                               SELF.ESPTransactionId := LEFT.ESPTransactionId,
                                SELF := LEFT
                        ));
   
-  FromIDA := Risk_Indicators.getIDAFraud(IDA_input, gateways_prep, Gateway_mode);
+  FromIDA := Risk_Indicators.getIDA_attributes(IDA_input, gateways_prep, Gateway_mode, Timeout_sec, Retries);
   
   //Fail the transaction if the IDA gateway call didn't work.
   //This check is for Fraudpoint/Fraud Intelligence, if a service ends up calling
@@ -68,7 +69,7 @@ EXPORT Prep_IDA_fraud(DATASET(Risk_Indicators.layouts.layout_IDAFraud_in) indata
   //Drop everything except the seq, AppID, and attributes
   Final := JOIN(indata, FromIDA,
                 LEFT.App_ID = RIGHT.response.outputrecord.AppID, //Using AppID as unique Identifier
-                  TRANSFORM(Risk_Indicators.layouts.layout_IDAFraud_out,
+                  TRANSFORM(Risk_Indicators.layouts.layout_IDA_out,
                             SELF.Seq := LEFT.seq,
                             SELF.APP_ID := LEFT.APP_ID,
                             SELF.Indicators := RIGHT.response.outputrecord.Indicators

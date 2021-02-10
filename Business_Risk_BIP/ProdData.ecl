@@ -123,8 +123,8 @@
 /*--INFO-- Prod Data Service - This is the XML Service utilizing BIP linking*/
 
 #option('expandSelectCreateRow', true);
-IMPORT Address, AutoStandardI, BIPV2, BizLinkFull, Business_Risk_BIP, Corp2, Doxie, dx_Email, EBR, EBR_Services, Gateway,
- iesp, LiensV2, LN_PropertyV2, MDR, NID, Risk_Indicators, RiskWise, UT, BIPV2_Build;
+IMPORT Address, BIPV2, BizLinkFull, Business_Risk_BIP, Corp2, Doxie, dx_Email, EBR, EBR_Services, Gateway,
+ iesp, LiensV2, LN_PropertyV2, MDR, NID, Risk_Indicators, RiskWise, UT, STD;
 
 EXPORT ProdData() := FUNCTION
 	/* ************************************************************************
@@ -288,7 +288,7 @@ EXPORT ProdData() := FUNCTION
 	UNSIGNED1	DPPA_Purpose_In      := Business_Risk_BIP.Constants.Default_DPPA : STORED('DPPA_Purpose');
 	UNSIGNED1	GLBA_Purpose_In      := Business_Risk_BIP.Constants.Default_GLBA : STORED('GLBA_Purpose');
 	STRING5	IndustryClass_Temp       := Business_Risk_BIP.Constants.Default_IndustryClass : STORED('IndustryClass');
-	IndustryClass_In := StringLib.StringToUpperCase(TRIM(IndustryClass_Temp, LEFT, RIGHT));
+	IndustryClass_In := STD.Str.ToUpperCase(TRIM(IndustryClass_Temp, LEFT, RIGHT));
 	STRING50	DataRestrictionMask_In:= Business_Risk_BIP.Constants.Default_DataRestrictionMask : STORED('Data_Restriction_Mask');
 	STRING50	DataPermissionMask_In:= Business_Risk_BIP.Constants.Default_DataPermissionMask : STORED('Data_Permission_Mask');
 	UNSIGNED6	HistoryDate          := 0  : STORED('HistoryDate');
@@ -344,23 +344,14 @@ layout_watchlists_temp := record
 
   gateways_in := Gateway.Configuration.Get();
 
-  mod_access := MODULE(Doxie.compliance.GetGlobalDataAccessModuleTranslated(AutoStandardI.GlobalModule()));
-    EXPORT dppa := DPPA_Purpose_In;
-    EXPORT glb := GLBA_Purpose_In;
-    EXPORT industry_class := IndustryClass_In;
-    EXPORT DataRestrictionMask := DataRestrictionMask_In;
-    EXPORT DataPermissionMask := DataPermissionMask_In;
-  END;
-
 	/* ************************************************************************
 	 *              Create the Appropriate Library Interface                  *
 	 ************************************************************************ */
 	// NOTE: If you change this you MUST redeploy the Library as the interface has changed.
-	emptyRecord := dataset([{1}], {unsigned a});
 
-	Business_Risk_BIP.Layouts.Input grabInput(emptyRecord le, UNSIGNED1 c) := TRANSFORM
-		SELF.Seq := c;
-		SELF.AcctNo := (STRING)c;
+	Business_Risk_BIP.Layouts.Input grabInput() := TRANSFORM
+		SELF.Seq := 1;
+		SELF.AcctNo := '1';
 		SELF.CompanyName := CompanyName;
 		SELF.AltCompanyName := AltCompanyName;
 		SELF.StreetAddress1 := StreetAddress1;
@@ -433,25 +424,25 @@ layout_watchlists_temp := record
 		SELF := [];
 	END;
 
-	Input := PROJECT(dataset([{1}], {unsigned a}), grabInput(LEFT, COUNTER));
+	Input := DATASET([grabInput()]);
 
 	options := MODULE(Business_Risk_BIP.LIB_Business_Shell_LIBIN)
 		// Clean up the Options and make sure that defaults are enforced
-		EXPORT UNSIGNED1	DPPA_Purpose 				:= DPPA_Purpose_In;
-		EXPORT UNSIGNED1	GLBA_Purpose 				:= GLBA_Purpose_In;
-		EXPORT STRING50		DataRestrictionMask	:= IF(DataRestrictionMask_In = '',
+		EXPORT UNSIGNED1	dppa 				:= DPPA_Purpose_In;
+		EXPORT UNSIGNED1	glb 				:= GLBA_Purpose_In;
+		EXPORT STRING			DataRestrictionMask	:= IF(DataRestrictionMask_In = '',
 																							Business_Risk_BIP.Constants.Default_DataRestrictionMask,
 																							DataRestrictionMask_In);
-		EXPORT STRING50		DataPermissionMask	:= IF(DataPermissionMask_In = '',
+		EXPORT STRING			DataPermissionMask	:= IF(DataPermissionMask_In = '',
 																							Business_Risk_BIP.Constants.Default_DataPermissionMask,
 																							DataPermissionMask_In);
-		EXPORT STRING10		IndustryClass				:= IndustryClass_In;
+		EXPORT STRING5		industry_class			:= IndustryClass_In;
 		EXPORT UNSIGNED1	LinkSearchLevel			:= IF(LinkSearchLevel_In BETWEEN Business_Risk_BIP.Constants.LinkSearch.Default AND Business_Risk_BIP.Constants.LinkSearch.UltID,
 																							LinkSearchLevel_In,
 																							Business_Risk_BIP.Constants.LinkSearch.Default);
 		EXPORT UNSIGNED1	BusShellVersion			:= Business_Risk_BIP.Constants.Default_BusShellVersion;
 		EXPORT UNSIGNED1	MarketingMode				:= MAX(MIN(MarketingMode_In, 1), 0);
-		EXPORT STRING50		AllowedSources			:= StringLib.StringToUpperCase(AllowedSources_In);
+		EXPORT STRING50		AllowedSources			:= STD.Str.ToUpperCase(AllowedSources_In);
 		EXPORT UNSIGNED1	BIPBestAppend				:= MAX(MIN(BIPBestAppend_In, Business_Risk_BIP.Constants.BIPBestAppend.OverwriteWithBest), Business_Risk_BIP.Constants.BIPBestAppend.Default);
 		EXPORT UNSIGNED1	OFAC_Version				:= MAX(MIN(OFAC_Version_In, 4), 0);
     EXPORT DATASET(Gateway.Layouts.Config) Gateways 									:= gateways_in;
@@ -461,6 +452,8 @@ layout_watchlists_temp := record
 		EXPORT BOOLEAN		OverrideExperianRestriction := OverrideExperianRestriction_In;
     EXPORT BOOLEAN 		Include_OFAC 																		:= if(OFAC_Version = 1, false, true);
 	END;
+
+  mod_access := PROJECT(options, doxie.IDataAccess);
 
 	// Define the default interface for output options
 	OutputInterface := INTERFACE
@@ -535,11 +528,11 @@ layout_watchlists_temp := record
 
 	// Generate the linking parameters to be used in BIP's kFetch (Key Fetch) - These parameters should be global so figure them out here and pass around appropriately
 	linkingOptions := MODULE(BIPV2.mod_sources.iParams)
-		EXPORT STRING DataRestrictionMask		:= Options.DataRestrictionMask; // Note: Must unfortunately leave as undefined STRING length to match the module definition
-		EXPORT UNSIGNED1 GLBPurpose					:= Options.GLBA_Purpose;
-		EXPORT BOOLEAN AllowGLB							:= Risk_Indicators.iid_constants.GLB_OK(Options.GLBA_Purpose, FALSE /*isFCRA*/);
-		EXPORT UNSIGNED1 DPPAPurpose				:= Options.DPPA_Purpose;
-		EXPORT BOOLEAN AllowDPPA						:= Risk_Indicators.iid_constants.DPPA_OK(Options.DPPA_Purpose, FALSE /*isFCRA*/);
+		EXPORT STRING DataRestrictionMask		:= mod_access.DataRestrictionMask; // Note: Must unfortunately leave as undefined STRING length to match the module definition
+		EXPORT UNSIGNED1 GLBPurpose					:= mod_access.glb;
+		EXPORT BOOLEAN AllowGLB							:= mod_access.isValidGlb();
+		EXPORT UNSIGNED1 DPPAPurpose				:= mod_access.dppa;
+		EXPORT BOOLEAN AllowDPPA						:= mod_access.isValidDppa();
 		EXPORT BOOLEAN AllowAll							:= IF(Options.AllowedSources = Business_Risk_BIP.Constants.AllowDNBDMI, TRUE, FALSE); // When TRUE this will unmask DNB DMI data - NO CUSTOMERS CAN USE THIS, FOR RESEARCH PURPOSES ONLY
 		EXPORT BOOLEAN ignoreFares					:= FALSE; // Include FARES data as appropriate
 		EXPORT BOOLEAN ignoreFidelity				:= FALSE; // Include Fidelity data as appropriate
@@ -564,7 +557,7 @@ layout_watchlists_temp := record
 		cleanedCompanyAddress := Address.CleanFields(companyCleanAddr);
 		SELF.Clean_Input.StreetAddress1 := Risk_Indicators.MOD_AddressClean.street_address('', cleanedCompanyAddress.Prim_Range, cleanedCompanyAddress.Predir, cleanedCompanyAddress.Prim_Name,
 																											cleanedCompanyAddress.Addr_Suffix, cleanedCompanyAddress.Postdir, cleanedCompanyAddress.Unit_Desig, cleanedCompanyAddress.Sec_Range);
-		SELF.Clean_Input.StreetAddress2 := TRIM(StringLib.StringToUppercase(le.StreetAddress2));
+		SELF.Clean_Input.StreetAddress2 := TRIM(STD.Str.ToUpperCase(le.StreetAddress2));
 		SELF.Clean_Input.Prim_Range := cleanedCompanyAddress.Prim_Range;
 		SELF.Clean_Input.Predir := cleanedCompanyAddress.Predir;
 		SELF.Clean_Input.Prim_Name := cleanedCompanyAddress.Prim_Name;
@@ -584,34 +577,34 @@ layout_watchlists_temp := record
 		SELF.Clean_Input.County := companyCleanAddr[143..145];  // Address.CleanFields(clean_addr).county returns the full 5 character fips, we only want the county fips
 		SELF.Clean_Input.Geo_Block := cleanedCompanyAddress.Geo_Blk;
 		// Company Other PII
-		filteredFEIN := StringLib.StringFilter(le.FEIN, '0123456789');
+		filteredFEIN := STD.Str.Filter(le.FEIN, '0123456789');
 		SELF.Clean_Input.FEIN := IF(LENGTH(filteredFEIN) != 9 OR (INTEGER)filteredFEIN <= 0, '', filteredFEIN); // Filter out FEIN's that aren't 9-Bytes, or are repeating 0's
 		BusPhone10 := RiskWise.CleanPhone(le.Phone10);
 		SELF.Clean_Input.Phone10 := BusPhone10;
-		SELF.Clean_Input.IPAddr := StringLib.StringFilter(le.IPAddr, '0123456789.');
+		SELF.Clean_Input.IPAddr := STD.Str.Filter(le.IPAddr, '0123456789.');
 		SELF.Clean_Input.CompanyURL := REGEXREPLACE('^WWW[. ]{0,1}',TRIM(REGEXREPLACE('[:/].*$',REGEXREPLACE('HTTP://',le.CompanyURL,'',NOCASE),''),LEFT,RIGHT),'',NOCASE);
 		// Authorized Representative Name Fields
 		cleanedName := Address.CleanPerson73(le.Rep_FullName);
 		cleanedRepName := Address.CleanNameFields(cleanedName);
 		BOOLEAN validCleaned := TRIM(le.Rep_FullName) <> '';
-		SELF.Clean_Input.Rep_FullName := StringLib.StringToUpperCase(le.Rep_FullName);
-		SELF.Clean_Input.Rep_NameTitle := TRIM(StringLib.StringToUppercase(IF(le.Rep_NameTitle = '' AND validCleaned,		cleanedRepName.Title, le.Rep_NameTitle)), LEFT, RIGHT);
-		RepFirstName := TRIM(StringLib.StringToUppercase(IF(le.Rep_FirstName = '' AND validCleaned,		cleanedRepName.FName, le.Rep_FirstName)), LEFT, RIGHT);
+		SELF.Clean_Input.Rep_FullName := STD.Str.ToUpperCase(le.Rep_FullName);
+		SELF.Clean_Input.Rep_NameTitle := TRIM(STD.Str.ToUpperCase(IF(le.Rep_NameTitle = '' AND validCleaned,		cleanedRepName.Title, le.Rep_NameTitle)), LEFT, RIGHT);
+		RepFirstName := TRIM(STD.Str.ToUpperCase(IF(le.Rep_FirstName = '' AND validCleaned,		cleanedRepName.FName, le.Rep_FirstName)), LEFT, RIGHT);
 		SELF.Clean_Input.Rep_FirstName := RepFirstName;
-		RepPreferredFirstName := StringLib.StringToUpperCase(NID.PreferredFirstNew(RepFirstName, TRUE /*UseNew*/));
+		RepPreferredFirstName := STD.Str.ToUpperCase(NID.PreferredFirstNew(RepFirstName, TRUE /*UseNew*/));
 		SELF.Clean_Input.Rep_PreferredFirstName := RepPreferredFirstName;
-		SELF.Clean_Input.Rep_MiddleName := TRIM(StringLib.StringToUppercase(IF(le.Rep_MiddleName = '' AND validCleaned,	cleanedRepName.MName, le.Rep_MiddleName)), LEFT, RIGHT);
-		RepLastName := TRIM(StringLib.StringToUppercase(IF(le.Rep_LastName = '' AND validCleaned,			cleanedRepName.LName, le.Rep_LastName)), LEFT, RIGHT);
+		SELF.Clean_Input.Rep_MiddleName := TRIM(STD.Str.ToUpperCase(IF(le.Rep_MiddleName = '' AND validCleaned,	cleanedRepName.MName, le.Rep_MiddleName)), LEFT, RIGHT);
+		RepLastName := TRIM(STD.Str.ToUpperCase(IF(le.Rep_LastName = '' AND validCleaned,			cleanedRepName.LName, le.Rep_LastName)), LEFT, RIGHT);
 		SELF.Clean_Input.Rep_LastName := RepLastName;
-		SELF.Clean_Input.Rep_NameSuffix := TRIM(StringLib.StringToUppercase(IF(le.Rep_NameSuffix = '' AND validCleaned,	cleanedRepName.Name_Suffix, le.Rep_NameSuffix)), LEFT, RIGHT);
-		SELF.Clean_Input.Rep_FormerLastName := TRIM(StringLib.StringToUppercase(le.Rep_FormerLastName), LEFT, RIGHT);
+		SELF.Clean_Input.Rep_NameSuffix := TRIM(STD.Str.ToUpperCase(IF(le.Rep_NameSuffix = '' AND validCleaned,	cleanedRepName.Name_Suffix, le.Rep_NameSuffix)), LEFT, RIGHT);
+		SELF.Clean_Input.Rep_FormerLastName := TRIM(STD.Str.ToUpperCase(le.Rep_FormerLastName), LEFT, RIGHT);
 		// Authorized Representative Address Fields
 		repAddress := Risk_Indicators.MOD_AddressClean.street_address(le.Rep_StreetAddress1 + ' ' + le.Rep_StreetAddress2, le.Rep_Prim_Range, le.Rep_Predir, le.Rep_Prim_Name, le.Rep_Addr_Suffix, le.Rep_Postdir, le.Rep_Unit_Desig, le.Rep_Sec_Range);
 		repCleanAddr := Risk_Indicators.MOD_AddressClean.clean_addr(companyAddress, le.Rep_City, le.Rep_State, le.Rep_Zip);
 		cleanedRepAddress := Address.CleanFields(repCleanAddr);
 		SELF.Clean_Input.Rep_StreetAddress1 := Risk_Indicators.MOD_AddressClean.street_address('', cleanedRepAddress.Prim_Range, cleanedRepAddress.Predir, cleanedRepAddress.Prim_Name,
 																											cleanedRepAddress.Addr_Suffix, cleanedRepAddress.Postdir, cleanedRepAddress.Unit_Desig, cleanedRepAddress.Sec_Range);
-		SELF.Clean_Input.Rep_StreetAddress2 := TRIM(StringLib.StringToUppercase(le.Rep_StreetAddress2));
+		SELF.Clean_Input.Rep_StreetAddress2 := TRIM(STD.Str.ToUpperCase(le.Rep_StreetAddress2));
 		SELF.Clean_Input.Rep_Prim_Range := cleanedRepAddress.Prim_Range;
 		SELF.Clean_Input.Rep_Predir := cleanedRepAddress.Predir;
 		SELF.Clean_Input.Rep_Prim_Name := cleanedRepAddress.Prim_Name;
@@ -631,15 +624,15 @@ layout_watchlists_temp := record
 		SELF.Clean_Input.Rep_County := repCleanAddr[143..145];  // Address.CleanFields(clean_addr).county returns the full 5 character fips, we only want the county fips
 		SELF.Clean_Input.Rep_Geo_Block := cleanedRepAddress.Geo_Blk;
 		// Authorized Representative Other PII
-		filteredSSN := StringLib.StringFilter(le.Rep_SSN, '0123456789');
+		filteredSSN := STD.Str.Filter(le.Rep_SSN, '0123456789');
 		SELF.Clean_Input.Rep_SSN := IF(LENGTH(filteredSSN) != 9 OR (INTEGER)filteredSSN <= 0, '', filteredSSN); // Filter out SSN's that aren't 9-Bytes, or are repeating 0's
 		SELF.Clean_Input.Rep_DateOfBirth := RiskWise.CleanDOB(le.Rep_DateOfBirth);
 		RepPhone10 := RiskWise.CleanPhone(le.Rep_Phone10);
 		SELF.Clean_Input.Rep_Phone10 := RepPhone10;
 		SELF.Clean_Input.Rep_Age := IF((INTEGER)le.Rep_Age = 0 AND (INTEGER)le.Rep_DateOfBirth != 0, (STRING3)ut.Age((INTEGER)le.Rep_DateOfBirth), (le.Rep_Age));
 		SELF.Clean_Input.Rep_DLNumber := RiskWise.CleanDL_Num(le.Rep_DLNumber);
-		SELF.Clean_Input.Rep_DLState := StringLib.StringToUpperCase(TRIM(le.Rep_DLState, LEFT, RIGHT));
-		SELF.Clean_Input.Rep_Email := StringLib.StringToUpperCase(TRIM(le.Rep_Email, LEFT, RIGHT));
+		SELF.Clean_Input.Rep_DLState := STD.Str.ToUpperCase(TRIM(le.Rep_DLState, LEFT, RIGHT));
+		SELF.Clean_Input.Rep_Email := STD.Str.ToUpperCase(TRIM(le.Rep_Email, LEFT, RIGHT));
 
 		SELF.Clean_Input.HistoryDate := IF(le.HistoryDate <= 0, (INTEGER)Business_Risk_BIP.Constants.NinesDate, le.HistoryDate); // If HistoryDate no populated run in "realtime" mode
 
@@ -664,7 +657,7 @@ layout_watchlists_temp := record
 					Business_Risk_BIP.Constants.AllowedSources(
 							(
 								Source <> MDR.SourceTools.src_Dunn_Bradstreet OR
-								StringLib.StringFind(Options.AllowedSources, Business_Risk_BIP.Constants.AllowDNBDMI, 1) > 0
+								STD.Str.Find(Options.AllowedSources, Business_Risk_BIP.Constants.AllowDNBDMI, 1) > 0
 							) AND
 							(
 								Options.MarketingMode = Business_Risk_BIP.Constants.Default_MarketingMode OR
@@ -721,11 +714,11 @@ layout_watchlists_temp := record
 	prepDIDAppend := PROJECT(cleanedInput, prepForDIDAppend(LEFT));
 
 	DIDAppend := Risk_Indicators.iid_getDID_prepOutput(prepDIDAppend,
-																										Options.DPPA_Purpose,
-																										Options.GLBA_Purpose,
+																										mod_access.dppa,
+																										mod_access.glb,
 																										FALSE, /*isFCRA*/
 																										50, /*BSVersion*/
-																										Options.DataRestrictionMask,
+																										mod_access.DataRestrictionMask,
 																										0, /*Append_Best*/
 																										DATASET([], Gateway.Layouts.Config), /*Gateways*/
 																										0 /*BSOptions*/);
@@ -977,9 +970,9 @@ layout_watchlists_temp := record
 	CorteraRecs := Cortera.CorteraRecs;
 	Cortera_Attribute_recs := Cortera.Cortera_Attribute_recs;
 	Cortera_Tradelines := Business_Risk_BIP.PD_Cortera_Tradelines(LinkIDsFound, kFetchLinkIDs, kFetchLinkSearchLevel, linkingOptions, options, AllowedSourcesSet);
-	
+
 	DataBridge := Business_Risk_BIP.PD_DataBridge(LinkIDsFound, kFetchLinkIDs, kFetchLinkSearchLevel, AllowedSourcesSet);
-  
+
 	EmailV2 := dx_Email.Key_LinkIds.kFetch(kFetchLinkIDs,
 																							kFetchLinkSearchLevel,
 																							0 // ScoreThreshold --> 0 = Give me everything
@@ -987,11 +980,11 @@ layout_watchlists_temp := record
 
 	// --------------- High risk codes ----------------
 	High_Risk_phones := Business_Risk_BIP.PD_High_Risk_Industries.Phone(cleanedInput);
-	
+
 	High_Risk_Address := Business_Risk_BIP.PD_High_Risk_Industries.Address(cleanedInput);
-	
+
 	High_Risk_Industries := Business_Risk_BIP.PD_High_Risk_Industries.Industries(kFetchLinkIDs);
-	
+
 	// Keep all of the outputs at the end so that we can keep them sorted more easily, and so that the function compiles
 	// Inputs/Options - By outputting these two here we are forcing OSS to display the fields on the form in an order that makes sense and that we control
 	OUTPUT(Input, NAMED('Raw_Input'));

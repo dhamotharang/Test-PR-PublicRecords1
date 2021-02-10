@@ -1,25 +1,15 @@
 ﻿IMPORT BIPV2, Business_Credit, Business_Credit_KEL,  Business_Risk,  Business_Risk_BIP, DID_Add, doxie, MDR, risk_indicators, STD;
 
-EXPORT getSBFE(DATASET(Business_Risk_BIP.Layouts.Shell) Shell_pre, 
+EXPORT getSBFE(DATASET(Business_Risk_BIP.Layouts.Shell) Shell_pre,
 											 Business_Risk_BIP.LIB_Business_Shell_LIBIN Options,
 											 BIPV2.mod_sources.iParams linkingOptions,
 											 SET OF STRING2 AllowedSourcesSet) := FUNCTION
 
-	mod_access :=
-    MODULE(doxie.compliance.GetGlobalDataAccessModuleTranslated(AutoStandardI.GlobalModule()))
-      EXPORT STRING DataRestrictionMask := linkingOptions.DataRestrictionMask;
-      EXPORT STRING DataPermissionMask := Options.DataPermissionMask;
-      EXPORT UNSIGNED1 glb := linkingOptions.GLBPurpose;
-      EXPORT UNSIGNED1 dppa := linkingOptions.DPPAPurpose;
-      EXPORT BOOLEAN show_minors := linkingOptions.IncludeMinors;
-      EXPORT UNSIGNED1 unrestricted := (UNSIGNED1)linkingOptions.AllowAll;
-      EXPORT BOOLEAN isPreGLBRestricted() := linkingOptions.restrictPreGLB;
-      EXPORT BOOLEAN ln_branded :=  linkingOptions.lnbranded;
-    END;
+	mod_access := PROJECT(Options, doxie.IDataAccess);
 
-  // Add fifteen minutes to the historydatetime to accommodate for delays in 
+  // Add fifteen minutes to the historydatetime to accommodate for delays in
 	// the real time database information being available in production runs
-	Shell := 
+	Shell :=
 		PROJECT(
 			Shell_pre,
 			TRANSFORM( Business_Risk_BIP.Layouts.Shell,
@@ -27,7 +17,7 @@ EXPORT getSBFE(DATASET(Business_Risk_BIP.Layouts.Shell) Shell_pre,
 				SELF := LEFT
 			)
 		);
-	
+
 	SBFERaw := Business_Credit.Key_LinkIds().kFetch2(Business_Risk_BIP.Common.GetLinkIDs(Shell),
 																		mod_access,
                                     Business_Risk_BIP.Common.SetLinkSearchLevel(Options.LinkSearchLevel),
@@ -35,26 +25,26 @@ EXPORT getSBFE(DATASET(Business_Risk_BIP.Layouts.Shell) Shell_pre,
 																		Business_Risk_BIP.Constants.Limit_SBFE_LinkIds,
 																		Options.KeepLargeBusinesses
 																		);
-	
-	// Restrict SBFE data here in getSBFE to shortcut a lengthy subroutine and so improve performance.
-	restrict_sbfe := Options.DataPermissionMask[12] IN ['0', ''];
-	
-  Business_Risk_BIP.Common.AppendSeq2(SBFERaw, Shell, SBFESeq);
-	
 
-	SBFEIDStatus := JOIN(Shell, SBFESeq, LEFT.Seq = RIGHT.Seq, 
+	// Restrict SBFE data here in getSBFE to shortcut a lengthy subroutine and so improve performance.
+	restrict_sbfe := mod_access.DataPermissionMask[12] IN ['0', ''];
+
+  Business_Risk_BIP.Common.AppendSeq2(SBFERaw, Shell, SBFESeq);
+
+
+	SBFEIDStatus := JOIN(Shell, SBFESeq, LEFT.Seq = RIGHT.Seq,
 															TRANSFORM(Business_Risk_BIP.Layouts.Shell,
 																			SBFEHit := TRIM(RIGHT.contract_account_number) <> '';
 																			SELF.Verification.InputIDMatchStatus := 'UNKNOWN';
 																			SELF.Verification.InputIDMatchCategory := IF(SBFEHit, Business_Risk_BIP.Constants.Category_SBFESingle, Business_Risk_BIP.Constants.Category_None);
 																			SELF := LEFT),
-															LEFT OUTER, KEEP(1), ATMOST(Business_Risk_BIP.Constants.Limit_SBFE_LinkIds));																			
+															LEFT OUTER, KEEP(1), ATMOST(Business_Risk_BIP.Constants.Limit_SBFE_LinkIds));
 
 		// Figure out if the kFetch was successful
 	kFetchErrorCodes := Business_Risk_BIP.Common.GrabFetchErrorCode(SBFESeq);
-	
+
 	// Build a unique acct_no based on a hash of record information.
-	RECORDOF(Business_Credit_KEL.File_SBFE_temp.linkids) getacctno_loaddate(SBFESeq le, RECORDOF(Business_Credit.Key_ReleaseDates()) ri) := TRANSFORM 
+	RECORDOF(Business_Credit_KEL.File_SBFE_temp.linkids) getacctno_loaddate(SBFESeq le, RECORDOF(Business_Credit.Key_ReleaseDates()) ri) := TRANSFORM
 		SELF.acct_no := HASH(le.seq, le.sbfe_contributor_number, le.contract_account_number, le.account_type_reported);
 		load_datetime := ri.prod_date + ri.prod_time;
 		load_Date := MAP(le.original_version < Business_Risk_BIP.Constants.FirstSBFELoadDate	 																					=> (STRING)le.dt_first_seen,
@@ -64,35 +54,35 @@ EXPORT getSBFE(DATASET(Business_Risk_BIP.Layouts.Shell) Shell_pre,
 		SELF.load_dateYYYYMMDD := load_date[1..8];
 		SELF := le;
 	END;
-	
-	linkid_recs_loaddate := JOIN(SBFESeq, Business_Credit.Key_ReleaseDates(), 
-	keyed(LEFT.original_version=RIGHT.version), getacctno_loaddate(LEFT,RIGHT), 
-	LEFT OUTER, 
+
+	linkid_recs_loaddate := JOIN(SBFESeq, Business_Credit.Key_ReleaseDates(),
+	keyed(LEFT.original_version=RIGHT.version), getacctno_loaddate(LEFT,RIGHT),
+	LEFT OUTER,
 	atmost(10));// shouldn't ever be more than 1, but using 10 just to remove the warning
-	
-	
+
+
 	linkid_recs_loaddate_dedup := DEDUP(SORT(linkid_recs_loaddate, seq, acct_no, original_version, -load_date), seq, acct_no);
 
   linkid_recs := Business_Risk_BIP.Common.FilterRecords2(linkid_recs_loaddate_dedup, load_date, MDR.SourceTools.src_Business_Credit, AllowedSourcesSet);
-	
+
 	// Instantiate module for easier reference below.
 	mod_SBFE := Business_Credit_KEL.GLUE_fdc_append(linkid_recs);
-	
+
 	// Get majority of SBFE data.
 	SBFE_data := mod_SBFE.SBFE_result;
 
 	// Get future Tradelines data.
 	linkid_recs_future := Business_Risk_BIP.Common.FilterRecordsFuture(linkid_recs_loaddate_dedup, dt_first_seen, MDR.SourceTools.src_Business_Credit, AllowedSourcesSet);
-	
-	
+
+
 	SBFE_data_future          := Business_Credit_KEL.GLUE_fdc_append(linkid_recs_future).SBFE_Result_Future;
 	SBFE_raw_data_future 			:= Business_Credit_KEL.GLUE_fdc_append(linkid_recs_future).AddLinkIdsFuture;
 	// Get BusinessIformation data separately to make work in the Transform below easier.
 	BusinessInformation_recs := mod_SBFE.AddBusinessClassification;
-	
+
 	Business_Risk_BIP.Layouts.Shell verifyElements(Business_Risk_BIP.Layouts.Shell le, BusinessInformation_recs ri) := TRANSFORM
 		NoScoreValue				:= 255; // This is what the various score functions return if blank is passed in
-		
+
 		NamePopulated				:= TRIM(le.Clean_Input.CompanyName) <> '';
 		// In an effort to "short-circuit" all of the fuzzy matching, we will require that the first letter match - if it doesn't match it bypasses the slow fuzzy matching which speeds up our query
 		NameMatched					:= NamePopulated AND le.Clean_Input.CompanyName[1] = ri.clean_business_name[1] AND Risk_Indicators.iid_constants.g(Business_Risk.CNameScore(le.Clean_Input.CompanyName, ri.clean_business_name));
@@ -104,24 +94,24 @@ EXPORT getSBFE(DATASET(Business_Risk_BIP.Layouts.Shell) Shell_pre,
 															Risk_Indicators.AddrScore.CityState_Score(le.Clean_Input.City, le.Clean_Input.State, ri.p_city_name, ri.st, ''), NoScoreValue);
 		CityStateZipMatched	:= Risk_Indicators.iid_constants.ga(ZIPScore) AND Risk_Indicators.iid_constants.ga(CityStateScore) AND AddressPopulated;
 		AddressMatched			:= AddressPopulated AND Risk_Indicators.iid_constants.ga(IF(ZIPScore = NoScoreValue AND CityStateScore = NoScoreValue, NoScoreValue,
-																				Risk_Indicators.AddrScore.AddressScore(le.Clean_Input.Prim_Range, le.Clean_Input.Prim_Name, le.Clean_Input.Sec_Range, 
+																				Risk_Indicators.AddrScore.AddressScore(le.Clean_Input.Prim_Range, le.Clean_Input.Prim_Name, le.Clean_Input.Sec_Range,
 																						ri.prim_range, ri.prim_name, ri.sec_range,
 																						ZIPScore, CityStateScore)));
 		PhonePopulated			:= (INTEGER)le.Clean_Input.Phone10 > 0;
-		PhoneMatched				:= PhonePopulated AND (le.Clean_Input.Phone10[1] = ri.Phone_Number[1] OR le.Clean_Input.Phone10[4] = ri.Phone_Number[4] OR le.Clean_Input.Phone10[4] = ri.Phone_Number[1]) AND Risk_Indicators.iid_constants.gn(Risk_Indicators.PhoneScore(le.Clean_Input.Phone10, ri.Phone_Number));		
+		PhoneMatched				:= PhonePopulated AND (le.Clean_Input.Phone10[1] = ri.Phone_Number[1] OR le.Clean_Input.Phone10[4] = ri.Phone_Number[4] OR le.Clean_Input.Phone10[4] = ri.Phone_Number[1]) AND Risk_Indicators.iid_constants.gn(Risk_Indicators.PhoneScore(le.Clean_Input.Phone10, ri.Phone_Number));
 		FEINPopulated				:= le.Input_Echo.FEIN <> '';
 		FEINLength 					:= LENGTH(TRIM(le.Input_Echo.FEIN));
 		FEINMatched					:= MAP(le.Input_Echo.FEIN = ''																					=> FALSE,
 															le.Input_Echo.FEIN[1] = ri.Federal_TaxId_SSN[IF(FEINLength = 4, 6, 1)]	=> Risk_Indicators.iid_constants.gn(DID_Add.SSN_Match_Score(le.Input_Echo.FEIN, ri.Federal_TaxId_SSN, FEINLength=4)),
 																																																		FALSE);
-		
+
 		tempIndustryCodeLayout := RECORD
 			UNSIGNED seq;
 			BOOLEAN IndustryCodePopulated;
 			BOOLEAN IndustryCodePartialMatch;
 			BOOLEAN IndustryCodeMatch;
 		END;
-		
+
 		tempIndustryCodeLayout verifyIndustryCodes(RECORDOF(ri.BusinessClassification) le, INTEGER sic, INTEGER naic, STRING groupCode_in) := TRANSFORM
 				SELF.seq := le.seq;
 				//SELF.IndustryCodePopulated := (INTEGER)le.classification_code >0 AND (INTEGER)le.classification_code_type >0;
@@ -131,28 +121,28 @@ EXPORT getSBFE(DATASET(Business_Risk_BIP.Layouts.Shell) Shell_pre,
 												 le.classification_code_type = '001' => Business_Risk_BIP.Common.IndustryGroup(le.classification_code, Business_Risk_BIP.Constants.SIC),
 																																'');
 				SELF.IndustryCodePartialMatch := groupCode_in = groupCode AND IndustryCodePopulated;
-				
+
 				SELF.IndustryCodeMatch := (le.classification_code_type = '001' AND (INTEGER)le.classification_code = sic OR
 																	le.classification_code_type = '002' AND (INTEGER)le.classification_code = naic) AND IndustryCodePopulated;
 		END;
-		
-		groupCode_in := IF((INTEGER)le.Clean_input.naic > 0, 
-										Business_Risk_BIP.Common.IndustryGroup(le.Clean_Input.naic, Business_Risk_BIP.Constants.NAIC), 
+
+		groupCode_in := IF((INTEGER)le.Clean_input.naic > 0,
+										Business_Risk_BIP.Common.IndustryGroup(le.Clean_Input.naic, Business_Risk_BIP.Constants.NAIC),
 										Business_Risk_BIP.Common.IndustryGroup(le.Clean_Input.sic, Business_Risk_BIP.Constants.SIC));
-										
+
 		IndustryCodes := PROJECT(ri.BusinessClassification, verifyIndustryCodes(LEFT,(INTEGER)le.Clean_Input.sic, (INTEGER)le.Clean_Input.naic, groupCode_in));
-		
-	
+
+
 		tempIndustryCodeLayout rollIndustryCodes(IndustryCodes le, IndustryCodes ri) := TRANSFORM
 			SELF.seq := le.seq;
 			SELF.IndustryCodePopulated := le.IndustryCodePopulated OR ri.IndustryCodePopulated;
 			SELF.IndustryCodePartialMatch := le.IndustryCodePartialMatch OR ri.IndustryCodePartialMatch;
 			SELF.IndustryCodeMatch	:= le.IndustryCodeMatch OR ri.IndustryCodeMatch;
 		END;
-																																				
+
 		IndustryCodesRolled := ROLLUP(IndustryCodes, LEFT.Seq = RIGHT.Seq, rollIndustryCodes(LEFT, RIGHT));
-		
-		
+
+
 		SBFEVerBusInputName := MAP(NameMatched AND (FEINMatched OR AddressMatched OR PhoneMatched) 	=> 1,
 																				 NamePopulated 																					=> 0,
 																																																 	-99);
@@ -163,64 +153,64 @@ EXPORT getSBFE(DATASET(Business_Risk_BIP.Layouts.Shell) Shell_pre,
 		SELF.SBFE.SBFENameMatchDateLastSeen := MAP(NOT NamePopulated 																=> '-99',
 																								NameMatched 																		=> Business_Risk_BIP.Common.checkInvalidDate((STRING)ri.dt_last_seen, '0', (UNSIGNED)((STRING)le.Clean_Input.HistoryDateTime)[1..8]),
 																																																	 '');
-		
-		
+
+
 		SBFEVerBusInputAddr	:= MAP(AddressMatched AND (FEINMatched OR PhoneMatched OR NameMatched)	  												=> 2,
 																AddressMatched OR (CityStateZipMatched AND (FEINMatched OR PhoneMatched OR NameMatched))  => 1,
 																AddressPopulated																																					=> 0,
 																																																														 -99);
 		SELF.SBFE.SBFEVerBusInputAddr := (STRING)SBFEVerBusInputAddr;
 		SELF.SBFE.SBFEAddrMatchDateFirstSeen := MAP(NOT AddressPopulated 														=> '-99',
-																								AddressMatched 																	=> (STRING)ri.dt_first_seen, 
+																								AddressMatched 																	=> (STRING)ri.dt_first_seen,
 																																																	 '');
 		SELF.SBFE.SBFEAddrMatchDateLastSeen := MAP(NOT AddressPopulated 														=> '-99',
 																								AddressMatched 																	=> Business_Risk_BIP.Common.checkInvalidDate((STRING)ri.dt_last_seen, '0', (UNSIGNED)((STRING)le.Clean_Input.HistoryDateTime)[1..8]),
 																																																	 '');
-		
-		
+
+
 
 		SBFEVerBusInputPhone := MAP(PhoneMatched AND AddressMatched AND NameMatched 								=> 2,
 																PhoneMatched AND (NameMatched OR AddressMatched) 								=> 1,
 																PhonePopulated																									=> 0,
-																																																	 -99); 
+																																																	 -99);
 		SELF.SBFE.SBFEVerBusInputPhone := (STRING)SBFEVerBusInputPhone;
 		SELF.SBFE.SBFEPhoneMatchDateFirstSeen := MAP(NOT PhonePopulated 														=> '-99',
-																								 PhoneMatched 																	=> (STRING)ri.dt_first_seen, 
+																								 PhoneMatched 																	=> (STRING)ri.dt_first_seen,
 																																																	 '');
 		SELF.SBFE.SBFEPhoneMatchDateLastSeen := MAP(NOT PhonePopulated 															=> '-99',
 																								 PhoneMatched  																	=> Business_Risk_BIP.Common.checkInvalidDate((STRING)ri.dt_last_seen, '0', (UNSIGNED)((STRING)le.Clean_Input.HistoryDateTime)[1..8]),
-																																																	 '');																																																
-																																																			
+																																																	 '');
+
 		SELF.SBFE.SBFEVerBusInputPhoneAddr := MAP(PhoneMatched AND AddressMatched	AND NameMatched		=> '2',
 																							AddressMatched AND PhonePopulated	AND NameMatched	=> '1',
 																							AddressPopulated AND PhonePopulated 							=> '0',
 																																																	 '-99');
-		
+
 		SBFEVerBusInputPhoneFEIN := MAP(FEINMatched AND AddressMatched AND NameMatched 			  			=> 2,
 																							FEINMatched AND (AddressMatched OR NameMatched) 	=> 1,
 																							FEINPopulated																			=> 0,
 																																																	 -99);
 		SELF.SBFE.SBFEVerBusInputPhoneFEIN := (STRING)SBFEVerBusInputPhoneFEIN;
 		SELF.SBFE.SBFEFEINMatchDateFirstSeen := MAP(NOT FEINPopulated 															=> '-99',
-																							 FEINMatched 																			=> (STRING)ri.dt_first_seen, 
+																							 FEINMatched 																			=> (STRING)ri.dt_first_seen,
 																																																	 '');
 		SELF.SBFE.SBFEFEINMatchDateLastSeen := MAP(NOT FEINPopulated 																=> '-99',
 																							 FEINMatched 																			=> Business_Risk_BIP.Common.checkInvalidDate((STRING)ri.dt_last_seen, '0', (UNSIGNED)((STRING)le.Clean_Input.HistoryDateTime)[1..8]),
 																																																	 '');
 
-																																																			 
+
 		SELF.SBFE.SBFEVerBusInputIndustryCode := MAP(IndustryCodesRolled[1].IndustryCodeMatch			   => '2',
 																								 IndustryCodesRolled[1].IndustryCodePartialMatch => '1',
 																								 IndustryCodesRolled[1].IndustryCodePopulated 	 => '0',
-																																																		'-99');																																																			 
+																																																		'-99');
 		SELF := le;
-	END;																								
-																						
-	SBFEVerification := SORT(JOIN(Shell, BusinessInformation_recs(record_type='AB'), LEFT.seq = RIGHT.Seq, 
+	END;
+
+	SBFEVerification := SORT(JOIN(Shell, BusinessInformation_recs(record_type='AB'), LEFT.seq = RIGHT.Seq,
 																			verifyElements(LEFT, RIGHT),
 																			LEFT OUTER, ATMOST(Business_Risk_BIP.Constants.Limit_BusHeader)), Seq);
-																			
-	Business_Risk_BIP.Layouts.Shell	rollSBFEVerification(SBFEVerification le, SBFEVerification ri) := TRANSFORM		
+
+	Business_Risk_BIP.Layouts.Shell	rollSBFEVerification(SBFEVerification le, SBFEVerification ri) := TRANSFORM
 		SELF.SBFE.SBFEVerBusInputName := (STRING)MAX((INTEGER)le.SBFE.SBFEVerBusInputName, (INTEGER)ri.SBFE.SBFEVerBusInputName );
 		SELF.SBFE.SBFENameMatchDateFirstSeen := MAP(le.SBFE.SBFENameMatchDateFirstSeen='' => ri.SBFE.SBFENameMatchDateFirstSeen,
 																								ri.SBFE.SBFENameMatchDateFirstSeen='' => le.SBFE.SBFENameMatchDateFirstSeen,
@@ -230,7 +220,7 @@ EXPORT getSBFE(DATASET(Business_Risk_BIP.Layouts.Shell) Shell_pre,
 		SELF.SBFE.SBFEAddrMatchDateFirstSeen := MAP(le.SBFE.SBFEAddrMatchDateFirstSeen='' => ri.SBFE.SBFEAddrMatchDateFirstSeen,
 																								ri.SBFE.SBFEAddrMatchDateFirstSeen='' => le.SBFE.SBFEAddrMatchDateFirstSeen,
 																																												 (STRING)MIN((INTEGER)le.SBFE.SBFEAddrMatchDateFirstSeen, (INTEGER)ri.SBFE.SBFEAddrMatchDateFirstSeen));
-		SELF.SBFE.SBFEAddrMatchDateLastSeen := (STRING)MAX(le.SBFE.SBFEAddrMatchDateLastSeen, ri.SBFE.SBFEAddrMatchDateLastSeen); 
+		SELF.SBFE.SBFEAddrMatchDateLastSeen := (STRING)MAX(le.SBFE.SBFEAddrMatchDateLastSeen, ri.SBFE.SBFEAddrMatchDateLastSeen);
 		SELF.SBFE.SBFEVerBusInputPhone := (STRING)MAX((INTEGER)le.SBFE.SBFEVerBusInputPhone, (INTEGER)ri.SBFE.SBFEVerBusInputPhone );
 		SELF.SBFE.SBFEPhoneMatchDateFirstSeen := MAP(le.SBFE.SBFEPhoneMatchDateFirstSeen='' => ri.SBFE.SBFEPhoneMatchDateFirstSeen,
 																								ri.SBFE.SBFEPhoneMatchDateFirstSeen='' => le.SBFE.SBFEPhoneMatchDateFirstSeen,
@@ -245,29 +235,29 @@ EXPORT getSBFE(DATASET(Business_Risk_BIP.Layouts.Shell) Shell_pre,
 		SELF.SBFE.SBFEVerBusInputIndustryCode := (STRING)MAX((INTEGER)le.SBFE.SBFEVerBusInputIndustryCode , (INTEGER)ri.SBFE.SBFEVerBusInputIndustryCode );
 		SELF := le;
 	END;
-	
+
 	SBFEVerificationRolled := ROLLUP(SBFEVerification, LEFT.Seq = RIGHT.Seq, rollSBFEVerification(LEFT, RIGHT));
-	
+
 	Business_Risk_BIP.Layouts.Shell verifyPersonElements(Business_Risk_BIP.Layouts.Shell le, BusinessInformation_recs ri) := TRANSFORM
 		NoScoreValue				:= 255;
 		RepOnFile := ri.record_type='IS'; //if there are no SBFE person records for the business record_type will be ''
-		
+
 		Rep1InputFNamePopulated := TRIM(le.Clean_Input.Rep_FirstName) <> '';
 		Rep1InputLNamePopulated := TRIM(le.Clean_Input.Rep_LastName) <> '';
 		Rep1InputNamePopulated := Rep1InputFNamePopulated OR Rep1InputLNamePopulated;
 		Rep2InputFNamePopulated := TRIM(le.Clean_Input.Rep2_FirstName) <> '';
 		Rep2InputLNamePopulated := TRIM(le.Clean_Input.Rep2_LastName) <> '';
-		Rep2InputNamePopulated := Rep2InputFNamePopulated OR Rep2InputLNamePopulated;	
+		Rep2InputNamePopulated := Rep2InputFNamePopulated OR Rep2InputLNamePopulated;
 		Rep3InputFNamePopulated := TRIM(le.Clean_Input.Rep3_FirstName) <> '';
 		Rep3InputLNamePopulated := TRIM(le.Clean_Input.Rep3_LastName) <> '';
 		Rep3InputNamePopulated := Rep3InputFNamePopulated OR Rep3InputLNamePopulated;
     Rep4InputFNamePopulated := TRIM(le.Clean_Input.Rep4_FirstName) <> '';
 		Rep4InputLNamePopulated := TRIM(le.Clean_Input.Rep4_LastName) <> '';
-		Rep4InputNamePopulated := Rep4InputFNamePopulated OR Rep4InputLNamePopulated;	
+		Rep4InputNamePopulated := Rep4InputFNamePopulated OR Rep4InputLNamePopulated;
 		Rep5InputFNamePopulated := TRIM(le.Clean_Input.Rep5_FirstName) <> '';
 		Rep5InputLNamePopulated := TRIM(le.Clean_Input.Rep5_LastName) <> '';
 		Rep5InputNamePopulated := Rep5InputFNamePopulated OR Rep5InputLNamePopulated;
-		
+
 		Rep1FNameMatched := Rep1InputFNamePopulated AND Business_Risk_BIP.Common.SetBoolean(STD.Str.Find(ri.clean_fname, le.Clean_Input.Rep_FirstName, 1) > 0)='1';
 		Rep1LNameMatched := Rep1InputLNamePopulated AND Business_Risk_BIP.Common.SetBoolean(STD.Str.Find(ri.clean_lname, le.Clean_Input.Rep_LastName, 1) > 0)='1';
 		Rep2FNameMatched := Rep2InputFNamePopulated AND Business_Risk_BIP.Common.SetBoolean(STD.Str.Find(ri.clean_fname, le.Clean_Input.Rep2_FirstName, 1) > 0)='1';
@@ -277,135 +267,135 @@ EXPORT getSBFE(DATASET(Business_Risk_BIP.Layouts.Shell) Shell_pre,
 		Rep4FNameMatched := Rep4InputFNamePopulated AND Business_Risk_BIP.Common.SetBoolean(STD.Str.Find(ri.clean_fname, le.Clean_Input.Rep4_FirstName, 1) > 0)='1';
 		Rep4LNameMatched := Rep4InputLNamePopulated AND Business_Risk_BIP.Common.SetBoolean(STD.Str.Find(ri.clean_lname, le.Clean_Input.Rep4_LastName, 1) > 0)='1';
 		Rep5FNameMatched := Rep5InputFNamePopulated AND Business_Risk_BIP.Common.SetBoolean(STD.Str.Find(ri.clean_fname, le.Clean_Input.Rep5_FirstName, 1) > 0)='1';
-		Rep5LNameMatched := Rep5InputLNamePopulated AND Business_Risk_BIP.Common.SetBoolean(STD.Str.Find(ri.clean_lname, le.Clean_Input.Rep5_LastName, 1) > 0)='1';	
-		
-		
+		Rep5LNameMatched := Rep5InputLNamePopulated AND Business_Risk_BIP.Common.SetBoolean(STD.Str.Find(ri.clean_lname, le.Clean_Input.Rep5_LastName, 1) > 0)='1';
+
+
 		SELF.SBFE.SBFEBusExecLinkRep1NameonFile := MAP(	Rep1FNameMatched AND Rep1LNameMatched 		=> '3',
 																										Rep1LNameMatched													=> '2',
 																										Rep1FNameMatched													=> '1',
 																										Rep1InputNamePopulated	AND RepOnFile			=> '0',
 																										Rep1InputNamePopulated AND NOT RepOnFile	=> '-98',
 																																																 '-99');
-																							
+
 		SELF.SBFE.SBFEBusExecLinkRep2NameonFile := MAP( Rep2FNameMatched AND Rep2LNameMatched 		=> '3',
 																										Rep2LNameMatched													=> '2',
 																										Rep2FNameMatched													=> '1',
 																										Rep2InputNamePopulated AND RepOnFile			=> '0',
 																										Rep2InputNamePopulated AND NOT RepOnFile 	=> '-98',
-																																																 '-99'); 
-			
+																																																 '-99');
+
 		SELF.SBFE.SBFEBusExecLinkRep3NameonFile := MAP( Rep3FNameMatched AND Rep3LNameMatched 		=> '3',
 																										Rep3LNameMatched													=> '2',
 																										Rep3FNameMatched													=> '1',
 																										Rep3InputNamePopulated	AND RepOnFile			=> '0',
 																										Rep3InputNamePopulated	AND NOT RepOnFile	=> '-98',
-																																																 '-99'); 
+																																																 '-99');
 		SELF.SBFE.SBFEBusExecLinkRep4NameonFile := MAP( Rep4FNameMatched AND Rep4LNameMatched 		=> '3',
 																										Rep4LNameMatched													=> '2',
 																										Rep4FNameMatched													=> '1',
 																										Rep4InputNamePopulated AND RepOnFile			=> '0',
 																										Rep4InputNamePopulated AND NOT RepOnFile 	=> '-98',
-																																																 '-99'); 
-			
+																																																 '-99');
+
 		SELF.SBFE.SBFEBusExecLinkRep5NameonFile := MAP( Rep5FNameMatched AND Rep5LNameMatched 		=> '3',
 																										Rep5LNameMatched													=> '2',
 																										Rep5FNameMatched													=> '1',
 																										Rep5InputNamePopulated	AND RepOnFile			=> '0',
 																										Rep5InputNamePopulated	AND NOT RepOnFile	=> '-98',
-																																																 '-99'); 																																														 
-																																																 
-																																													 
+																																																 '-99');
+
+
 		Rep1InputAddrNotPopulated := TRIM(le.Clean_Input.Rep_Prim_Name) = '' OR TRIM(le.Clean_Input.Rep_City) = '' OR TRIM(le.Clean_Input.Rep_State) = '' OR TRIM(le.Clean_Input.Rep_Zip5) = '';
 		Rep1ZIPScore					:= IF(le.Clean_Input.Rep_Zip5 <> '' AND ri.Zip <> '' AND le.Clean_Input.Rep_Zip5[1] = ri.Zip[1], Risk_Indicators.AddrScore.ZIP_Score(le.Clean_Input.Rep_Zip5, ri.Zip), NoScoreValue);
 		Rep1CityStateScore		:= IF(le.Clean_Input.Rep_City <> '' AND le.Clean_Input.Rep_State <> '' AND ri.v_city_name <> '' AND ri.st <> '' AND le.Clean_Input.Rep_State[1] = ri.st[1], Risk_Indicators.AddrScore.CityState_Score(le.Clean_Input.Rep_City, le.Clean_Input.Rep_State, ri.v_city_name, ri.st, ''), NoScoreValue);
 		Rep1InputAddrMatched := Risk_Indicators.iid_constants.ga(IF(Rep1ZIPScore = NoScoreValue AND Rep1CityStateScore = NoScoreValue, NoScoreValue,
-																				Risk_Indicators.AddrScore.AddressScore(le.Clean_Input.Rep_Prim_Range, le.Clean_Input.Rep_Prim_Name, le.Clean_Input.Rep_Sec_Range, 
+																				Risk_Indicators.AddrScore.AddressScore(le.Clean_Input.Rep_Prim_Range, le.Clean_Input.Rep_Prim_Name, le.Clean_Input.Rep_Sec_Range,
 																						ri.prim_range, ri.prim_name, ri.sec_range,
 																						Rep1ZIPScore, Rep1CityStateScore)));
-																						
+
 		SELF.SBFE.SBFEBusExecLinkRep1AddronFile	:= MAP( Rep1InputAddrMatched 														=> '1',
 																										NOT Rep1InputAddrNotPopulated AND RepOnFile 		=> '0',
 																										NOT Rep1InputAddrNotPopulated AND NOT RepOnFile => '-98',
 																																																			 '-99');
 
-																						
+
 		Rep2InputAddrNotPopulated := TRIM(le.Clean_Input.Rep2_Prim_Name) = '' OR TRIM(le.Clean_Input.Rep2_City) = '' OR TRIM(le.Clean_Input.Rep2_State) = '' OR TRIM(le.Clean_Input.Rep2_Zip5) = '';
 		Rep2ZIPScore					:= IF(le.Clean_Input.Rep2_Zip5 <> '' AND ri.Zip <> '' AND le.Clean_Input.Rep2_Zip5[1] = ri.Zip[1], Risk_Indicators.AddrScore.ZIP_Score(le.Clean_Input.Rep2_Zip5, ri.Zip), NoScoreValue);
 		Rep2CityStateScore		:= IF(le.Clean_Input.Rep2_City <> '' AND le.Clean_Input.Rep2_State <> '' AND ri.v_city_name <> '' AND ri.st <> '' AND le.Clean_Input.Rep2_State[1] = ri.st[1], Risk_Indicators.AddrScore.CityState_Score(le.Clean_Input.Rep2_City, le.Clean_Input.Rep2_State, ri.v_city_name, ri.st, ''), NoScoreValue);
 		Rep2InputAddrMatched := Risk_Indicators.iid_constants.ga(IF(Rep2ZIPScore = NoScoreValue AND Rep2CityStateScore = NoScoreValue, NoScoreValue,
-																				Risk_Indicators.AddrScore.AddressScore(le.Clean_Input.Rep2_Prim_Range, le.Clean_Input.Rep2_Prim_Name, le.Clean_Input.Rep2_Sec_Range, 
+																				Risk_Indicators.AddrScore.AddressScore(le.Clean_Input.Rep2_Prim_Range, le.Clean_Input.Rep2_Prim_Name, le.Clean_Input.Rep2_Sec_Range,
 																						ri.prim_range, ri.prim_name, ri.sec_range,
 																						Rep2ZIPScore, Rep2CityStateScore)));
-																						
+
 		SELF.SBFE.SBFEBusExecLinkRep2AddronFile	:= MAP( Rep2InputAddrMatched 														=> '1',
 																										NOT Rep2InputAddrNotPopulated AND RepOnFile 		=> '0',
 																										NOT Rep2InputAddrNotPopulated AND NOT RepOnFile => '-98',
-																																																			 '-99');																					
-		
+																																																			 '-99');
+
 		Rep3InputAddrNotPopulated := TRIM(le.Clean_Input.Rep3_Prim_Name) = '' OR TRIM(le.Clean_Input.Rep3_City) = '' OR TRIM(le.Clean_Input.Rep3_State) = '' OR TRIM(le.Clean_Input.Rep3_Zip5) = '';
 		Rep3ZIPScore					:= IF(le.Clean_Input.Rep3_Zip5 <> '' AND ri.Zip <> '' AND le.Clean_Input.Rep3_Zip5[1] = ri.Zip[1], Risk_Indicators.AddrScore.ZIP_Score(le.Clean_Input.Rep3_Zip5, ri.Zip), NoScoreValue);
 		Rep3CityStateScore		:= IF(le.Clean_Input.Rep3_City <> '' AND le.Clean_Input.Rep3_State <> '' AND ri.v_city_name <> '' AND ri.st <> '' AND le.Clean_Input.Rep3_State[1] = ri.st[1], Risk_Indicators.AddrScore.CityState_Score(le.Clean_Input.Rep3_City, le.Clean_Input.Rep3_State, ri.v_city_name, ri.st, ''), NoScoreValue);
 		Rep3InputAddrMatched := Risk_Indicators.iid_constants.ga(IF(Rep3ZIPScore = NoScoreValue AND Rep3CityStateScore = NoScoreValue, NoScoreValue,
-																				Risk_Indicators.AddrScore.AddressScore(le.Clean_Input.Rep3_Prim_Range, le.Clean_Input.Rep3_Prim_Name, le.Clean_Input.Rep3_Sec_Range, 
+																				Risk_Indicators.AddrScore.AddressScore(le.Clean_Input.Rep3_Prim_Range, le.Clean_Input.Rep3_Prim_Name, le.Clean_Input.Rep3_Sec_Range,
 																						ri.prim_range, ri.prim_name, ri.sec_range,
 																						Rep3ZIPScore, Rep3CityStateScore)));
-																						
+
 		SELF.SBFE.SBFEBusExecLinkRep3AddronFile	:= MAP( Rep3InputAddrMatched 														=> '1',
 																										NOT Rep3InputAddrNotPopulated AND RepOnFile 		=> '0',
 																										NOT Rep3InputAddrNotPopulated AND NOT RepOnFile => '-98',
-																																																			 '-99');																			
-	
+																																																			 '-99');
+
 		Rep4InputAddrNotPopulated := TRIM(le.Clean_Input.Rep4_Prim_Name) = '' OR TRIM(le.Clean_Input.Rep4_City) = '' OR TRIM(le.Clean_Input.Rep4_State) = '' OR TRIM(le.Clean_Input.Rep4_Zip5) = '';
 		Rep4ZIPScore					:= IF(le.Clean_Input.Rep4_Zip5 <> '' AND ri.Zip <> '' AND le.Clean_Input.Rep4_Zip5[1] = ri.Zip[1], Risk_Indicators.AddrScore.ZIP_Score(le.Clean_Input.Rep4_Zip5, ri.Zip), NoScoreValue);
 		Rep4CityStateScore		:= IF(le.Clean_Input.Rep4_City <> '' AND le.Clean_Input.Rep4_State <> '' AND ri.v_city_name <> '' AND ri.st <> '' AND le.Clean_Input.Rep4_State[1] = ri.st[1], Risk_Indicators.AddrScore.CityState_Score(le.Clean_Input.Rep4_City, le.Clean_Input.Rep4_State, ri.v_city_name, ri.st, ''), NoScoreValue);
 		Rep4InputAddrMatched := Risk_Indicators.iid_constants.ga(IF(Rep4ZIPScore = NoScoreValue AND Rep4CityStateScore = NoScoreValue, NoScoreValue,
-																				Risk_Indicators.AddrScore.AddressScore(le.Clean_Input.Rep4_Prim_Range, le.Clean_Input.Rep4_Prim_Name, le.Clean_Input.Rep4_Sec_Range, 
+																				Risk_Indicators.AddrScore.AddressScore(le.Clean_Input.Rep4_Prim_Range, le.Clean_Input.Rep4_Prim_Name, le.Clean_Input.Rep4_Sec_Range,
 																						ri.prim_range, ri.prim_name, ri.sec_range,
 																						Rep4ZIPScore, Rep4CityStateScore)));
-																						
+
 		SELF.SBFE.SBFEBusExecLinkRep4AddronFile	:= MAP( Rep4InputAddrMatched 														=> '1',
 																										NOT Rep4InputAddrNotPopulated AND RepOnFile 		=> '0',
 																										NOT Rep4InputAddrNotPopulated AND NOT RepOnFile => '-98',
-																																																			 '-99');																					
-		
+																																																			 '-99');
+
 		Rep5InputAddrNotPopulated := TRIM(le.Clean_Input.Rep5_Prim_Name) = '' OR TRIM(le.Clean_Input.Rep5_City) = '' OR TRIM(le.Clean_Input.Rep5_State) = '' OR TRIM(le.Clean_Input.Rep5_Zip5) = '';
 		Rep5ZIPScore					:= IF(le.Clean_Input.Rep5_Zip5 <> '' AND ri.Zip <> '' AND le.Clean_Input.Rep5_Zip5[1] = ri.Zip[1], Risk_Indicators.AddrScore.ZIP_Score(le.Clean_Input.Rep5_Zip5, ri.Zip), NoScoreValue);
 		Rep5CityStateScore		:= IF(le.Clean_Input.Rep5_City <> '' AND le.Clean_Input.Rep5_State <> '' AND ri.v_city_name <> '' AND ri.st <> '' AND le.Clean_Input.Rep5_State[1] = ri.st[1], Risk_Indicators.AddrScore.CityState_Score(le.Clean_Input.Rep5_City, le.Clean_Input.Rep5_State, ri.v_city_name, ri.st, ''), NoScoreValue);
 		Rep5InputAddrMatched := Risk_Indicators.iid_constants.ga(IF(Rep5ZIPScore = NoScoreValue AND Rep5CityStateScore = NoScoreValue, NoScoreValue,
-																				Risk_Indicators.AddrScore.AddressScore(le.Clean_Input.Rep5_Prim_Range, le.Clean_Input.Rep5_Prim_Name, le.Clean_Input.Rep5_Sec_Range, 
+																				Risk_Indicators.AddrScore.AddressScore(le.Clean_Input.Rep5_Prim_Range, le.Clean_Input.Rep5_Prim_Name, le.Clean_Input.Rep5_Sec_Range,
 																						ri.prim_range, ri.prim_name, ri.sec_range,
 																						Rep5ZIPScore, Rep5CityStateScore)));
-																						
+
 		SELF.SBFE.SBFEBusExecLinkRep5AddronFile	:= MAP( Rep5InputAddrMatched 														=> '1',
 																										NOT Rep5InputAddrNotPopulated AND RepOnFile 		=> '0',
 																										NOT Rep5InputAddrNotPopulated AND NOT RepOnFile => '-98',
-																																																			 '-99');		
+																																																			 '-99');
 
 
 
-		Rep1InputPhonePopulated := TRIM(le.Clean_Input.Rep_Phone10) <> ''; 
+		Rep1InputPhonePopulated := TRIM(le.Clean_Input.Rep_Phone10) <> '';
 		Rep2InputPhonePopulated := TRIM(le.Clean_Input.Rep2_Phone10) <> '';
 		Rep3InputPhonePopulated := TRIM(le.Clean_Input.Rep3_Phone10) <> '';
 		Rep4InputPhonePopulated := TRIM(le.Clean_Input.Rep4_Phone10) <> '';
 		Rep5InputPhonePopulated := TRIM(le.Clean_Input.Rep5_Phone10) <> '';
-		
-				
-		Rep1InputPhoneMatched := Rep1InputPhonePopulated AND (le.Clean_Input.Rep_Phone10[1] = ri.Phone_Number[1] OR le.Clean_Input.Rep_Phone10[4] = ri.Phone_Number[4] OR le.Clean_Input.Rep_Phone10[4] = ri.Phone_Number[1]) AND Risk_Indicators.iid_constants.gn(Risk_Indicators.PhoneScore(le.Clean_Input.Rep_Phone10, ri.Phone_Number));		
-		Rep2InputPhoneMatched := Rep2InputPhonePopulated AND (le.Clean_Input.Rep2_Phone10[1] = ri.Phone_Number[1] OR le.Clean_Input.Rep2_Phone10[4] = ri.Phone_Number[4] OR le.Clean_Input.Rep2_Phone10[4] = ri.Phone_Number[1]) AND Risk_Indicators.iid_constants.gn(Risk_Indicators.PhoneScore(le.Clean_Input.Rep2_Phone10, ri.Phone_Number));		
-		Rep3InputPhoneMatched := Rep3InputPhonePopulated AND (le.Clean_Input.Rep3_Phone10[1] = ri.Phone_Number[1] OR le.Clean_Input.Rep3_Phone10[4] = ri.Phone_Number[4] OR le.Clean_Input.Rep3_Phone10[4] = ri.Phone_Number[1]) AND Risk_Indicators.iid_constants.gn(Risk_Indicators.PhoneScore(le.Clean_Input.Rep3_Phone10, ri.Phone_Number));		
-		Rep4InputPhoneMatched := Rep4InputPhonePopulated AND (le.Clean_Input.Rep4_Phone10[1] = ri.Phone_Number[1] OR le.Clean_Input.Rep4_Phone10[4] = ri.Phone_Number[4] OR le.Clean_Input.Rep4_Phone10[4] = ri.Phone_Number[1]) AND Risk_Indicators.iid_constants.gn(Risk_Indicators.PhoneScore(le.Clean_Input.Rep4_Phone10, ri.Phone_Number));		
-		Rep5InputPhoneMatched := Rep5InputPhonePopulated AND (le.Clean_Input.Rep5_Phone10[1] = ri.Phone_Number[1] OR le.Clean_Input.Rep5_Phone10[4] = ri.Phone_Number[4] OR le.Clean_Input.Rep5_Phone10[4] = ri.Phone_Number[1]) AND Risk_Indicators.iid_constants.gn(Risk_Indicators.PhoneScore(le.Clean_Input.Rep5_Phone10, ri.Phone_Number));		
-		
+
+
+		Rep1InputPhoneMatched := Rep1InputPhonePopulated AND (le.Clean_Input.Rep_Phone10[1] = ri.Phone_Number[1] OR le.Clean_Input.Rep_Phone10[4] = ri.Phone_Number[4] OR le.Clean_Input.Rep_Phone10[4] = ri.Phone_Number[1]) AND Risk_Indicators.iid_constants.gn(Risk_Indicators.PhoneScore(le.Clean_Input.Rep_Phone10, ri.Phone_Number));
+		Rep2InputPhoneMatched := Rep2InputPhonePopulated AND (le.Clean_Input.Rep2_Phone10[1] = ri.Phone_Number[1] OR le.Clean_Input.Rep2_Phone10[4] = ri.Phone_Number[4] OR le.Clean_Input.Rep2_Phone10[4] = ri.Phone_Number[1]) AND Risk_Indicators.iid_constants.gn(Risk_Indicators.PhoneScore(le.Clean_Input.Rep2_Phone10, ri.Phone_Number));
+		Rep3InputPhoneMatched := Rep3InputPhonePopulated AND (le.Clean_Input.Rep3_Phone10[1] = ri.Phone_Number[1] OR le.Clean_Input.Rep3_Phone10[4] = ri.Phone_Number[4] OR le.Clean_Input.Rep3_Phone10[4] = ri.Phone_Number[1]) AND Risk_Indicators.iid_constants.gn(Risk_Indicators.PhoneScore(le.Clean_Input.Rep3_Phone10, ri.Phone_Number));
+		Rep4InputPhoneMatched := Rep4InputPhonePopulated AND (le.Clean_Input.Rep4_Phone10[1] = ri.Phone_Number[1] OR le.Clean_Input.Rep4_Phone10[4] = ri.Phone_Number[4] OR le.Clean_Input.Rep4_Phone10[4] = ri.Phone_Number[1]) AND Risk_Indicators.iid_constants.gn(Risk_Indicators.PhoneScore(le.Clean_Input.Rep4_Phone10, ri.Phone_Number));
+		Rep5InputPhoneMatched := Rep5InputPhonePopulated AND (le.Clean_Input.Rep5_Phone10[1] = ri.Phone_Number[1] OR le.Clean_Input.Rep5_Phone10[4] = ri.Phone_Number[4] OR le.Clean_Input.Rep5_Phone10[4] = ri.Phone_Number[1]) AND Risk_Indicators.iid_constants.gn(Risk_Indicators.PhoneScore(le.Clean_Input.Rep5_Phone10, ri.Phone_Number));
+
 		SELF.SBFE.SBFEBusExecLinkRep1PhoneonFile := MAP(Rep1InputPhoneMatched 										=> '1',
 																										Rep1InputPhonePopulated AND RepOnFile			=> '0',
 																										Rep1InputPhonePopulated AND NOT RepOnFile	=> '-98',
 																																																 '-99');
-																																									 
+
 		SELF.SBFE.SBFEBusExecLinkRep2PhoneonFile := MAP(Rep2InputPhoneMatched 										=> '1',
 																										Rep2InputPhonePopulated AND RepOnFile			=> '0',
 																										Rep2InputPhonePopulated AND NOT RepOnFile	=> '-98',
 																																																 '-99');
-																																									 
+
 		SELF.SBFE.SBFEBusExecLinkRep3PhoneonFile := MAP(Rep3InputPhoneMatched 										=> '1',
 																										Rep3InputPhonePopulated AND RepOnFile			=> '0',
 																										Rep3InputPhonePopulated AND NOT RepOnFile	=> '-98',
@@ -414,28 +404,28 @@ EXPORT getSBFE(DATASET(Business_Risk_BIP.Layouts.Shell) Shell_pre,
 																										Rep4InputPhonePopulated AND RepOnFile			=> '0',
 																										Rep4InputPhonePopulated AND NOT RepOnFile	=> '-98',
 																																																 '-99');
-																																									 
+
 		SELF.SBFE.SBFEBusExecLinkRep5PhoneonFile := MAP(Rep5InputPhoneMatched 										=> '1',
 																										Rep5InputPhonePopulated AND RepOnFile			=> '0',
 																										Rep5InputPhonePopulated AND NOT RepOnFile	=> '-98',
 																																																 '-99');
-		
-		
-		
+
+
+
 		Rep1InputSSNPopulated := (INTEGER)le.Clean_Input.rep_ssn > 0;
 		Rep2InputSSNPopulated := (INTEGER)le.Clean_Input.rep2_ssn > 0;
 		Rep3InputSSNPopulated := (INTEGER)le.Clean_Input.rep3_ssn > 0;
 		Rep4InputSSNPopulated := (INTEGER)le.Clean_Input.rep4_ssn > 0;
 		Rep5InputSSNPopulated := (INTEGER)le.Clean_Input.rep5_ssn > 0;
-		
-		
+
+
 		Rep1SSNLength := LENGTH(TRIM(le.Clean_Input.Rep_SSN));
 		Rep2SSNLength := LENGTH(TRIM(le.Clean_Input.Rep2_SSN));
 		Rep3SSNLength := LENGTH(TRIM(le.Clean_Input.Rep3_SSN));
 		Rep4SSNLength := LENGTH(TRIM(le.Clean_Input.Rep4_SSN));
 		Rep5SSNLength := LENGTH(TRIM(le.Clean_Input.Rep5_SSN));
-		
-		
+
+
 		Rep1InputSSNMatched := MAP(le.Clean_Input.Rep_SSN = ''																							=> FALSE,
 															le.Clean_Input.Rep_SSN[1] = ri.federal_taxid_ssn[IF(Rep1SSNLength = 4, 6, 1)]	=> Risk_Indicators.iid_constants.gn(DID_Add.SSN_Match_Score(le.Clean_Input.Rep_SSN, ri.federal_taxid_ssn, Rep1SSNLength=4)),
 																																																					FALSE);
@@ -444,33 +434,33 @@ EXPORT getSBFE(DATASET(Business_Risk_BIP.Layouts.Shell) Shell_pre,
 																																																					FALSE);
 		Rep3InputSSNMatched := MAP(le.Clean_Input.Rep3_SSN = ''																							=> FALSE,
 															le.Clean_Input.Rep3_SSN[1] = ri.federal_taxid_ssn[IF(Rep3SSNLength = 4, 6, 1)]	=> Risk_Indicators.iid_constants.gn(DID_Add.SSN_Match_Score(le.Clean_Input.Rep3_SSN, ri.federal_taxid_ssn, Rep3SSNLength=4)),
-																																																					FALSE); 
+																																																					FALSE);
 		Rep4InputSSNMatched := MAP(le.Clean_Input.Rep4_SSN = ''																							=> FALSE,
 															le.Clean_Input.Rep4_SSN[1] = ri.federal_taxid_ssn[IF(Rep4SSNLength = 4, 6, 1)]	=> Risk_Indicators.iid_constants.gn(DID_Add.SSN_Match_Score(le.Clean_Input.Rep4_SSN, ri.federal_taxid_ssn, Rep4SSNLength=4)),
 																																																					FALSE);
 		Rep5InputSSNMatched := MAP(le.Clean_Input.Rep5_SSN = ''																							=> FALSE,
 															le.Clean_Input.Rep5_SSN[1] = ri.federal_taxid_ssn[IF(Rep5SSNLength = 4, 6, 1)]	=> Risk_Indicators.iid_constants.gn(DID_Add.SSN_Match_Score(le.Clean_Input.Rep5_SSN, ri.federal_taxid_ssn, Rep5SSNLength=4)),
-																																																					FALSE); 
-		
+																																																					FALSE);
+
 		SELF.SBFE.SBFEBusExecLinkRep1SSNonFile := MAP( Rep1InputSSNMatched 			 								=> '1',
 																									 Rep1InputSSNPopulated AND RepOnFile 		 	=> '0',
 																									 Rep1InputSSNPopulated AND  NOT RepOnFile => '-98',
 																																															 '-99');
-																																															 
+
 		SELF.SBFE.SBFEBusExecLinkRep2SSNonFile := MAP( Rep2InputSSNMatched 			 								=> '1',
 																									 Rep2InputSSNPopulated AND RepOnFile 		 	=> '0',
 																									 Rep2InputSSNPopulated AND  NOT RepOnFile => '-98',
 																																															 '-99');
-																																															 
+
 		SELF.SBFE.SBFEBusExecLinkRep3SSNonFile := MAP( Rep3InputSSNMatched 			 								=> '1',
 																									 Rep3InputSSNPopulated AND RepOnFile 		 	=> '0',
 																									 Rep3InputSSNPopulated AND  NOT RepOnFile => '-98',
-																																															 '-99');	
+																																															 '-99');
 		SELF.SBFE.SBFEBusExecLinkRep4SSNonFile := MAP( Rep4InputSSNMatched 			 								=> '1',
 																									 Rep4InputSSNPopulated AND RepOnFile 		 	=> '0',
 																									 Rep4InputSSNPopulated AND  NOT RepOnFile => '-98',
 																																															 '-99');
-																																															 
+
 		SELF.SBFE.SBFEBusExecLinkRep5SSNonFile := MAP( Rep5InputSSNMatched 			 								=> '1',
 																									 Rep5InputSSNPopulated AND RepOnFile 		 	=> '0',
 																									 Rep5InputSSNPopulated AND  NOT RepOnFile => '-98',
@@ -478,48 +468,48 @@ EXPORT getSBFE(DATASET(Business_Risk_BIP.Layouts.Shell) Shell_pre,
 
 		SELF := le;
 	END;
-	
+
 	SBFEPersonVerification := SORT(JOIN(SBFEVerificationRolled, BusinessInformation_recs(record_type='IS'), LEFT.seq = RIGHT.seq,
 														verifyPersonElements(LEFT,RIGHT),
 														LEFT OUTER, ATMOST(Business_Risk_BIP.Constants.Limit_BusHeader)),Seq);
-													
-													
-	Business_Risk_BIP.Layouts.Shell	rollSBFEPersonVerification(SBFEPersonVerification le, SBFEPersonVerification ri) := TRANSFORM		
-		SELF.SBFE.SBFEBusExecLinkRep1NameonFile := (STRING)MAX((INTEGER)le.SBFE.SBFEBusExecLinkRep1NameonFile , (INTEGER)ri.SBFE.SBFEBusExecLinkRep1NameonFile );																													
+
+
+	Business_Risk_BIP.Layouts.Shell	rollSBFEPersonVerification(SBFEPersonVerification le, SBFEPersonVerification ri) := TRANSFORM
+		SELF.SBFE.SBFEBusExecLinkRep1NameonFile := (STRING)MAX((INTEGER)le.SBFE.SBFEBusExecLinkRep1NameonFile , (INTEGER)ri.SBFE.SBFEBusExecLinkRep1NameonFile );
 		SELF.SBFE.SBFEBusExecLinkRep1AddronFile	:= (STRING)MAX((INTEGER)le.SBFE.SBFEBusExecLinkRep1AddronFile , (INTEGER)ri.SBFE.SBFEBusExecLinkRep1AddronFile );
 		SELF.SBFE.SBFEBusExecLinkRep1PhoneonFile := (STRING)MAX((INTEGER)le.SBFE.SBFEBusExecLinkRep1PhoneonFile , (INTEGER)ri.SBFE.SBFEBusExecLinkRep1PhoneonFile );
 		SELF.SBFE.SBFEBusExecLinkRep1SSNonFile := (STRING)MAX((INTEGER)le.SBFE.SBFEBusExecLinkRep1SSNonFile , (INTEGER)ri.SBFE.SBFEBusExecLinkRep1SSNonFile );
-		
-		SELF.SBFE.SBFEBusExecLinkRep2NameonFile := (STRING)MAX((INTEGER)le.SBFE.SBFEBusExecLinkRep2NameonFile , (INTEGER)ri.SBFE.SBFEBusExecLinkRep2NameonFile );																													
+
+		SELF.SBFE.SBFEBusExecLinkRep2NameonFile := (STRING)MAX((INTEGER)le.SBFE.SBFEBusExecLinkRep2NameonFile , (INTEGER)ri.SBFE.SBFEBusExecLinkRep2NameonFile );
 		SELF.SBFE.SBFEBusExecLinkRep2AddronFile	:= (STRING)MAX((INTEGER)le.SBFE.SBFEBusExecLinkRep2AddronFile , (INTEGER)ri.SBFE.SBFEBusExecLinkRep2AddronFile );
 		SELF.SBFE.SBFEBusExecLinkRep2PhoneonFile := (STRING)MAX((INTEGER)le.SBFE.SBFEBusExecLinkRep2PhoneonFile , (INTEGER)ri.SBFE.SBFEBusExecLinkRep2PhoneonFile );
 		SELF.SBFE.SBFEBusExecLinkRep2SSNonFile := (STRING)MAX((INTEGER)le.SBFE.SBFEBusExecLinkRep2SSNonFile , (INTEGER)ri.SBFE.SBFEBusExecLinkRep2SSNonFile );
-		
-		SELF.SBFE.SBFEBusExecLinkRep3NameonFile := (STRING)MAX((INTEGER)le.SBFE.SBFEBusExecLinkRep3NameonFile , (INTEGER)ri.SBFE.SBFEBusExecLinkRep3NameonFile );																													
+
+		SELF.SBFE.SBFEBusExecLinkRep3NameonFile := (STRING)MAX((INTEGER)le.SBFE.SBFEBusExecLinkRep3NameonFile , (INTEGER)ri.SBFE.SBFEBusExecLinkRep3NameonFile );
 		SELF.SBFE.SBFEBusExecLinkRep3AddronFile	:= (STRING)MAX((INTEGER)le.SBFE.SBFEBusExecLinkRep3AddronFile , (INTEGER)ri.SBFE.SBFEBusExecLinkRep3AddronFile );
 		SELF.SBFE.SBFEBusExecLinkRep3PhoneonFile := (STRING)MAX((INTEGER)le.SBFE.SBFEBusExecLinkRep3PhoneonFile , (INTEGER)ri.SBFE.SBFEBusExecLinkRep3PhoneonFile );
 		SELF.SBFE.SBFEBusExecLinkRep3SSNonFile := (STRING)MAX((INTEGER)le.SBFE.SBFEBusExecLinkRep3SSNonFile , (INTEGER)ri.SBFE.SBFEBusExecLinkRep3SSNonFile );
-		
-		SELF.SBFE.SBFEBusExecLinkRep4NameonFile := (STRING)MAX((INTEGER)le.SBFE.SBFEBusExecLinkRep4NameonFile , (INTEGER)ri.SBFE.SBFEBusExecLinkRep4NameonFile );																													
+
+		SELF.SBFE.SBFEBusExecLinkRep4NameonFile := (STRING)MAX((INTEGER)le.SBFE.SBFEBusExecLinkRep4NameonFile , (INTEGER)ri.SBFE.SBFEBusExecLinkRep4NameonFile );
 		SELF.SBFE.SBFEBusExecLinkRep4AddronFile	:= (STRING)MAX((INTEGER)le.SBFE.SBFEBusExecLinkRep4AddronFile , (INTEGER)ri.SBFE.SBFEBusExecLinkRep4AddronFile );
 		SELF.SBFE.SBFEBusExecLinkRep4PhoneonFile := (STRING)MAX((INTEGER)le.SBFE.SBFEBusExecLinkRep4PhoneonFile , (INTEGER)ri.SBFE.SBFEBusExecLinkRep4PhoneonFile );
 		SELF.SBFE.SBFEBusExecLinkRep4SSNonFile := (STRING)MAX((INTEGER)le.SBFE.SBFEBusExecLinkRep4SSNonFile , (INTEGER)ri.SBFE.SBFEBusExecLinkRep4SSNonFile );
-		
-		SELF.SBFE.SBFEBusExecLinkRep5NameonFile := (STRING)MAX((INTEGER)le.SBFE.SBFEBusExecLinkRep5NameonFile , (INTEGER)ri.SBFE.SBFEBusExecLinkRep5NameonFile );																													
+
+		SELF.SBFE.SBFEBusExecLinkRep5NameonFile := (STRING)MAX((INTEGER)le.SBFE.SBFEBusExecLinkRep5NameonFile , (INTEGER)ri.SBFE.SBFEBusExecLinkRep5NameonFile );
 		SELF.SBFE.SBFEBusExecLinkRep5AddronFile	:= (STRING)MAX((INTEGER)le.SBFE.SBFEBusExecLinkRep5AddronFile , (INTEGER)ri.SBFE.SBFEBusExecLinkRep5AddronFile );
 		SELF.SBFE.SBFEBusExecLinkRep5PhoneonFile := (STRING)MAX((INTEGER)le.SBFE.SBFEBusExecLinkRep5PhoneonFile , (INTEGER)ri.SBFE.SBFEBusExecLinkRep5PhoneonFile );
 		SELF.SBFE.SBFEBusExecLinkRep5SSNonFile := (STRING)MAX((INTEGER)le.SBFE.SBFEBusExecLinkRep5SSNonFile , (INTEGER)ri.SBFE.SBFEBusExecLinkRep5SSNonFile );
 		SELF := le;
-		
-		
+
+
 	END;
 
-	SBFEPersonVerificationRolled := ROLLUP(SBFEPersonVerification, LEFT.Seq = RIGHT.Seq, rollSBFEPersonVerification(LEFT, RIGHT));																										
+	SBFEPersonVerificationRolled := ROLLUP(SBFEPersonVerification, LEFT.Seq = RIGHT.Seq, rollSBFEPersonVerification(LEFT, RIGHT));
 
 	capNum(field, maxNum) := MIN(field, maxNum);
-	
+
 	SBFE_recs_added :=
-		JOIN(SBFEPersonVerificationRolled, SBFE_data, 
+		JOIN(SBFEPersonVerificationRolled, SBFE_data,
 			LEFT.seq = RIGHT.UID,
 			TRANSFORM(Business_Risk_BIP.Layouts.Shell,
 				dateToday := IF(((STRING)LEFT.Clean_Input.HistoryDateTime)[1..6] = '999999', STD.Date.Today(), (UNSIGNED4)((((STRING)LEFT.Clean_Input.HistoryDateTime) + '01')[1..8]));
@@ -528,42 +518,42 @@ EXPORT getSBFE(DATASET(Business_Risk_BIP.Layouts.Shell) Shell_pre,
 				SELF.SBFE.SBFENameMatchDateFirstSeen := SBFENameMatchDateFirstSeen;
 				SBFENameMatchMonthsFirstSeen := IF((INTEGER)SBFENameMatchDateFirstSeen > 0, STD.DATE.MonthsBetween((UNSIGNED)SBFENameMatchDateFirstSeen, dateToday) + 1, (INTEGER)SBFENameMatchDateFirstSeen);
 				SELF.SBFE.SBFENameMatchMonthsFirstSeen := (STRING)capNum(SBFENameMatchMonthsFirstSeen, 600);
-				
+
 				SBFENameMatchDateLastSeen := IF(LEFT.SBFE.SBFENameMatchDateLastSeen ='', '-98', LEFT.SBFE.SBFENameMatchDateLastSeen);
 				SELF.SBFE.SBFENameMatchDateLastSeen := SBFENameMatchDateLastSeen;
 				SBFENameMatchMonthsLastSeen := IF((INTEGER)SBFENameMatchDateLastSeen > 0, STD.DATE.MonthsBetween((UNSIGNED)SBFENameMatchDateLastSeen, dateToday) + 1, (INTEGER)SBFENameMatchDateLastSeen);
 				SELF.SBFE.SBFENameMatchMonthsLastSeen := (STRING)capNum(SBFENameMatchMonthsLastSeen, 600);
-				
+
 				SBFEAddrMatchDateFirstSeen := IF(LEFT.SBFE.SBFEAddrMatchDateFirstSeen ='', '-98', LEFT.SBFE.SBFEAddrMatchDateFirstSeen);
 				SELF.SBFE.SBFEAddrMatchDateFirstSeen := SBFEAddrMatchDateFirstSeen;
 				SBFEAddrMatchMonthsFirstSeen := IF((INTEGER)SBFEAddrMatchDateFirstSeen > 0, STD.DATE.MonthsBetween((UNSIGNED)SBFEAddrMatchDateFirstSeen, dateToday) + 1, (INTEGER)SBFEAddrMatchDateFirstSeen);
 				SELF.SBFE.SBFEAddrMatchMonthsFirstSeen := (STRING)capNum(SBFEAddrMatchMonthsFirstSeen, 600);
-				
+
 				SBFEAddrMatchDateLastSeen := IF(LEFT.SBFE.SBFEAddrMatchDateLastSeen ='', '-98', LEFT.SBFE.SBFEAddrMatchDateLastSeen);
 				SELF.SBFE.SBFEAddrMatchDateLastSeen := SBFEAddrMatchDateLastSeen;
 				SBFEAddrMatchMonthsLastSeen := IF((INTEGER)SBFEAddrMatchDateLastSeen > 0, STD.DATE.MonthsBetween((UNSIGNED)SBFEAddrMatchDateLastSeen, dateToday) + 1, (INTEGER)SBFEAddrMatchDateLastSeen);
 				SELF.SBFE.SBFEAddrMatchMonthsLastSeen := (STRING)capNum(SBFEAddrMatchMonthsLastSeen, 600);
-				
+
 				SBFEPhoneMatchDateFirstSeen := IF(LEFT.SBFE.SBFEPhoneMatchDateFirstSeen ='', '-98', LEFT.SBFE.SBFEPhoneMatchDateFirstSeen);
 				SELF.SBFE.SBFEPhoneMatchDateFirstSeen := SBFEPhoneMatchDateFirstSeen;
 				SBFEPhoneMatchMonthsFirstSeen := IF((INTEGER)SBFEPhoneMatchDateFirstSeen > 0, STD.DATE.MonthsBetween((UNSIGNED)SBFEPhoneMatchDateFirstSeen, dateToday) + 1, (INTEGER)SBFEPhoneMatchDateFirstSeen);
 				SELF.SBFE.SBFEPhoneMatchMonthsFirstSeen := (STRING)capNum(SBFEPhoneMatchMonthsFirstSeen, 600);
-				
+
 				SBFEPhoneMatchDateLastSeen := IF(LEFT.SBFE.SBFEPhoneMatchDateLastSeen ='', '-98', LEFT.SBFE.SBFEPhoneMatchDateLastSeen);
 				SELF.SBFE.SBFEPhoneMatchDateLastSeen := IF(LEFT.SBFE.SBFEPhoneMatchDateLastSeen ='', '-98', LEFT.SBFE.SBFEPhoneMatchDateLastSeen);
 				SBFEPhoneMatchMonthsLastSeen := IF((INTEGER)SBFEPhoneMatchDateLastSeen > 0, STD.DATE.MonthsBetween((UNSIGNED)SBFEPhoneMatchDateLastSeen, dateToday) + 1, (INTEGER)SBFEPhoneMatchDateLastSeen);
 				SELF.SBFE.SBFEPhoneMatchMonthsLastSeen := (STRING)capNum(SBFEPhoneMatchMonthsLastSeen, 600);
-				
+
 				SBFEFEINMatchDateFirstSeen := IF(LEFT.SBFE.SBFEFEINMatchDateFirstSeen ='', '-98', LEFT.SBFE.SBFEFEINMatchDateFirstSeen);
 				SELF.SBFE.SBFEFEINMatchDateFirstSeen := SBFEFEINMatchDateFirstSeen;
 				SBFEFEINMatchMonthsFirstSeen := IF((INTEGER)SBFEFEINMatchDateFirstSeen > 0, STD.DATE.MonthsBetween((UNSIGNED)SBFEFEINMatchDateFirstSeen, dateToday) + 1, (INTEGER)SBFEFEINMatchDateFirstSeen);
 				SELF.SBFE.SBFEFEINMatchMonthsFirstSeen := (STRING)capNum(SBFEFEINMatchMonthsFirstSeen, 600);
-				
+
 				SBFEFEINMatchDateLastSeen := IF(LEFT.SBFE.SBFEFEINMatchDateLastSeen ='', '-98', LEFT.SBFE.SBFEFEINMatchDateLastSeen);
 				SELF.SBFE.SBFEFEINMatchDateLastSeen := SBFEFEINMatchDateLastSeen;
 				SBFEFEINMatchMonthsLastSeen := IF((INTEGER)SBFEFEINMatchDateLastSeen > 0, STD.DATE.MonthsBetween((UNSIGNED)SBFEFEINMatchDateLastSeen, dateToday) + 1, (INTEGER)SBFEFEINMatchDateLastSeen);
 				SELF.SBFE.SBFEFEINMatchMonthsLastSeen := (STRING)capNum(SBFEFEINMatchMonthsLastSeen, 600);
-			
+
 				SELF.SBFE.SBFEBusExecLinkRep1NameonFile := IF(LEFT.SBFE.SBFEBusExecLinkRep1NameonFile='', '-98', LEFT.SBFE.SBFEBusExecLinkRep1NameonFile);
 				SELF.SBFE.SBFEBusExecLinkRep1AddronFile := IF(LEFT.SBFE.SBFEBusExecLinkRep1AddronFile='', '-98', LEFT.SBFE.SBFEBusExecLinkRep1AddronFile);
 				SELF.SBFE.SBFEBusExecLinkRep1PhoneonFile := IF(LEFT.SBFE.SBFEBusExecLinkRep1PhoneonFile='', '-98', LEFT.SBFE.SBFEBusExecLinkRep1PhoneonFile);
@@ -584,15 +574,15 @@ EXPORT getSBFE(DATASET(Business_Risk_BIP.Layouts.Shell) Shell_pre,
 				SELF.SBFE.SBFEBusExecLinkRep5AddronFile := IF(LEFT.SBFE.SBFEBusExecLinkRep5AddronFile='', '-98', LEFT.SBFE.SBFEBusExecLinkRep5AddronFile);
 				SELF.SBFE.SBFEBusExecLinkRep5PhoneonFile := IF(LEFT.SBFE.SBFEBusExecLinkRep5PhoneonFile='', '-98', LEFT.SBFE.SBFEBusExecLinkRep5PhoneonFile);
 				SELF.SBFE.SBFEBusExecLinkRep5SSNonFile := IF(LEFT.SBFE.SBFEBusExecLinkRep5SSNonFile='','-98', LEFT.SBFE.SBFEBusExecLinkRep5SSNonFile);
-				
-				
-				
+
+
+
 				SELF.SBFE.SBFEDateFirstCycleAll := (STRING)RIGHT.SBFEDateFirstCycleAll_,
 				SELF.SBFE.SBFETimeOldestCycle := (STRING)capNum(RIGHT.SBFETimeOldestCycle_, 600);
 				SELF.SBFE.SBFEDateLastCycleAll := (STRING)RIGHT.SBFEDateLastCycleAll_,
 				SELF.SBFE.SBFETimeNewestCycle := (STRING)capNum(RIGHT.SBFETimeNewestCycle_, 600);
 				SELF.SBFE.SBFEAccountCount := (STRING)capNum(RIGHT.SBFEAccountCount_, 999),
-				SELF.SBFE.SBFEAccountCount12M := (STRING)capNum(RIGHT.SBFEAccountCount12M_, 999),				
+				SELF.SBFE.SBFEAccountCount12M := (STRING)capNum(RIGHT.SBFEAccountCount12M_, 999),
 				SELF.SBFE.SBFEOpenCount03M := (STRING)capNum(RIGHT.SBFEOpenCount03M_, 99);
 				SELF.SBFE.SBFEOpenCount06Month := (STRING)capNum(RIGHT.SBFEOpenCount06Month_, 99),
 				SELF.SBFE.SBFEOpenCount12Month := (STRING)capNum(RIGHT.SBFEOpenCount12Month_, 99),
@@ -1030,7 +1020,7 @@ EXPORT getSBFE(DATASET(Business_Risk_BIP.Layouts.Shell) Shell_pre,
 				SELF.SBFE.SBFEBalanceCard24Month := (STRING)RIGHT.SBFEBalanceCard24Month_,
 				SELF.SBFE.SBFEOriginalLimitInstallment := (STRING)capNum(RIGHT.SBFEOriginalLimitInstallment_, 99999999),
 				SELF.SBFE.SBFEOriginalLimitLoan := (STRING)capNum(RIGHT.SBFEOriginalLimitLoan_, 99999999),
-				SELF.SBFE.SBFEOriginalLimitLease := (STRING)capNum(RIGHT.SBFEOriginalLimitLease_, 99999999),				
+				SELF.SBFE.SBFEOriginalLimitLease := (STRING)capNum(RIGHT.SBFEOriginalLimitLease_, 99999999),
 				SELF.SBFE.SBFECurrentLimitRevolving := (STRING)capNum(RIGHT.SBFECurrentLimitRevolving_, 99999999),
 				SELF.SBFE.SBFELimitRevAmt03M := (STRING)capNum(RIGHT.SBFELimitRevAmt03M_, 99999999);
 				SELF.SBFE.SBFELimitRevAmt06M := (STRING)capNum(RIGHT.SBFELimitRevAmt06M_, 99999999);
@@ -1078,7 +1068,7 @@ EXPORT getSBFE(DATASET(Business_Risk_BIP.Layouts.Shell) Shell_pre,
 				SELF.SBFE.SBFEReceivedLease := (STRING)capNum(RIGHT.SBFEReceivedLease_, 999999),
 				SELF.SBFE.SBFEReceivedLetter := (STRING)capNum(RIGHT.SBFEReceivedLetter_, 999999),
 				SELF.SBFE.SBFEReceivedOLine := (STRING)capNum(RIGHT.SBFEReceivedOLine_, 999999),
-				SELF.SBFE.SBFEReceivedOther := (STRING)capNum(RIGHT.SBFEReceivedOther_, 999999),				
+				SELF.SBFE.SBFEReceivedOther := (STRING)capNum(RIGHT.SBFEReceivedOther_, 999999),
 				SELF.SBFE.SBFEUtilizationCurrentRevolving := (STRING)capNum(RIGHT.SBFEUtilizationCurrentRevolving_, 100),
 				SELF.SBFE.SBFEAvailableCurrentRevolving := (STRING)capNum(RIGHT.SBFEAvailableCurrentRevolving_, 100),
 				SELF.SBFE.SBFEUtilRevolving03M := (STRING)capNum(RIGHT.SBFEUtilRevolving03M_, 100);
@@ -1154,13 +1144,13 @@ EXPORT getSBFE(DATASET(Business_Risk_BIP.Layouts.Shell) Shell_pre,
 				SELF.SBFE.SBFEUtilizationAve36OLine := (STRING)capNum(RIGHT.Sbfeutilizationave36oline_, 100),
 				SELF.SBFE.SBFEUtilizationAve60OLine := (STRING)capNum(RIGHT.Sbfeutilizationave60oline_, 100),
 				SELF.SBFE.SBFEUtilizationAve84OLine := (STRING)capNum(RIGHT.Sbfeutilizationave84oline_, 100),
-				SELF.SBFE.SBFEUtilizationAveEverOLine := (STRING)capNum(RIGHT.Sbfeutilizationaveeveroline_, 100),				
+				SELF.SBFE.SBFEUtilizationAveEverOLine := (STRING)capNum(RIGHT.Sbfeutilizationaveeveroline_, 100),
 				SELF.SBFE.SBFEUtilizationHighRevolving := (STRING)capNum(RIGHT.SBFEUtilizationHighRevolving_, 99999999),
 				SELF.SBFE.SBFEUtilizationHighLine := (STRING)capNum(RIGHT.SBFEUtilizationHighLine_, 99999999),
 				SELF.SBFE.SBFEUtilizationHighCard := (STRING)capNum(RIGHT.SBFEUtilizationHighCard_, 99999999),
 				SELF.SBFE.SBFEUtilizationIndexCard12Month := (STRING)RIGHT.SBFEUtilizationIndexCard12Month_,
 				SELF.SBFE.SBFEUtilizationIndexCard24Month := (STRING)RIGHT.SBFEUtilizationIndexCard24Month_,
-				SELF.SBFE.SBFEUtiliztionHighOLine := (STRING)capNum(RIGHT.SBFEUtiliztionHighOLine_, 99999999),				
+				SELF.SBFE.SBFEUtiliztionHighOLine := (STRING)capNum(RIGHT.SBFEUtiliztionHighOLine_, 99999999),
 				SELF.SBFE.SBFEWorstOpen := (STRING)RIGHT.Sbfeworstopen_,
 				SELF.SBFE.SBFEHighDelq03M := (STRING)RIGHT.SBFEHighDelq03M_;
 				SELF.SBFE.SBFEWorst06 := (STRING)RIGHT.Sbfeworst06_,
@@ -1188,7 +1178,7 @@ EXPORT getSBFE(DATASET(Business_Risk_BIP.Layouts.Shell) Shell_pre,
 				SELF.SBFE.SBFEWorstLine60 := (STRING)RIGHT.Sbfeworstline60_,
 				SELF.SBFE.SBFEWorstLine84 := (STRING)RIGHT.Sbfeworstline84_,
 				SELF.SBFE.SBFEWorstLineEver := (STRING)RIGHT.Sbfeworstlineever_,
-				SELF.SBFE.SBFEWorstCard := (STRING)RIGHT.Sbfeworstcard_,		
+				SELF.SBFE.SBFEWorstCard := (STRING)RIGHT.Sbfeworstcard_,
 				SELF.SBFE.SBFEHighDelqCard03M := (STRING)RIGHT.SBFEHighDelqCard03M_;
 				SELF.SBFE.SBFEWorstCard06 := (STRING)RIGHT.Sbfeworstcard06_,
 				SELF.SBFE.SBFEWorstCard12 := (STRING)RIGHT.Sbfeworstcard12_,
@@ -1198,7 +1188,7 @@ EXPORT getSBFE(DATASET(Business_Risk_BIP.Layouts.Shell) Shell_pre,
 				SELF.SBFE.SBFEWorstCard84 := (STRING)RIGHT.Sbfeworstcard84_,
 				SELF.SBFE.SBFEWorstCardEver := (STRING)RIGHT.Sbfeworstcardever_,
 				SELF.SBFE.SBFEWorstLease := (STRING)RIGHT.Sbfeworstlease_,
-				SELF.SBFE.SBFEHighDelqLease03M := (STRING)RIGHT.SBFEHighDelqLease03M_;	
+				SELF.SBFE.SBFEHighDelqLease03M := (STRING)RIGHT.SBFEHighDelqLease03M_;
 				SELF.SBFE.SBFEWorstLease06 := (STRING)RIGHT.Sbfeworstlease06_,
 				SELF.SBFE.SBFEWorstLease12 := (STRING)RIGHT.Sbfeworstlease12_,
 				SELF.SBFE.SBFEWorstLease24 := (STRING)RIGHT.Sbfeworstlease24_,
@@ -1216,7 +1206,7 @@ EXPORT getSBFE(DATASET(Business_Risk_BIP.Layouts.Shell) Shell_pre,
 				SELF.SBFE.SBFEWorstLetter84 := (STRING)RIGHT.Sbfeworstletter84_,
 				SELF.SBFE.SBFEWorstLetterEver := (STRING)RIGHT.Sbfeworstletterever_,
 				SELF.SBFE.SBFEWorstOLine := (STRING)RIGHT.Sbfeworstoline_,
-				SELF.SBFE.SBFEHighDelqOELine03M := (STRING)RIGHT.SBFEHighDelqOELine03M_;	
+				SELF.SBFE.SBFEHighDelqOELine03M := (STRING)RIGHT.SBFEHighDelqOELine03M_;
 				SELF.SBFE.SBFEWorstOLine06 := (STRING)RIGHT.Sbfeworstoline06_,
 				SELF.SBFE.SBFEWorstOLine12 := (STRING)RIGHT.Sbfeworstoline12_,
 				SELF.SBFE.SBFEWorstOLine24 := (STRING)RIGHT.Sbfeworstoline24_,
@@ -1225,7 +1215,7 @@ EXPORT getSBFE(DATASET(Business_Risk_BIP.Layouts.Shell) Shell_pre,
 				SELF.SBFE.SBFEWorstOLine84 := (STRING)RIGHT.Sbfeworstoline84_,
 				SELF.SBFE.SBFEWorstOLineEver := (STRING)RIGHT.Sbfeworstolineever_,
 				SELF.SBFE.SBFEWorstOther := (STRING)RIGHT.Sbfeworstother_,
-				SELF.SBFE.SBFEHighDelqOther03M := (STRING)RIGHT.SBFEHighDelqOther03M_;	
+				SELF.SBFE.SBFEHighDelqOther03M := (STRING)RIGHT.SBFEHighDelqOther03M_;
 				SELF.SBFE.SBFEWorstOther06 := (STRING)RIGHT.Sbfeworstother06_,
 				SELF.SBFE.SBFEWorstOther12 := (STRING)RIGHT.Sbfeworstother12_,
 				SELF.SBFE.SBFEWorstOther24 := (STRING)RIGHT.Sbfeworstother24_,
@@ -1442,7 +1432,7 @@ EXPORT getSBFE(DATASET(Business_Risk_BIP.Layouts.Shell) Shell_pre,
 				SELF.SBFE.SBFEDelq61CountTtl := (STRING)capNum(RIGHT.SBFEDelq61CountTtl_, 99),
 				SELF.SBFE.SBFEDelq61CountTtlChargeoff := (STRING)capNum(RIGHT.SBFEDelq61CountTtlChargeoff_, 99),
 				SELF.SBFE.SBFEDelq61CountEverTtl := (STRING)capNum(RIGHT.SBFEDelq61CountEverTtl_, 99),
-				SELF.SBFE.SBFEDelq91CountEverTtl := (STRING)capNum(RIGHT.SBFEDelq91CountEverTtl_, 99), 
+				SELF.SBFE.SBFEDelq91CountEverTtl := (STRING)capNum(RIGHT.SBFEDelq91CountEverTtl_, 99),
 				SELF.SBFE.SBFEDelq121CountEverTtl := (STRING)capNum(RIGHT.SBFEDelq121CountEverTtl_, 99),
 				SELF.SBFE.SBFEDelinquentCountLoan := (STRING)capNum(RIGHT.Sbfedelinquentcountloan_, 99),
 				SELF.SBFE.SBFEDelq61LoanCount03M := (STRING)capNum(RIGHT.SBFEDelq61LoanCount03M_, 99);
@@ -1515,7 +1505,7 @@ EXPORT getSBFE(DATASET(Business_Risk_BIP.Layouts.Shell) Shell_pre,
 				SELF.SBFE.SBFEDelq61RevCountTtl := (STRING)capNum(RIGHT.SBFEDelq61RevCountTtl_, 99),
 				SELF.SBFE.SBFEDelq61RevCountTtlChargeoff := (STRING)capNum(RIGHT.SBFEDelq61RevCountTtlChargeoff_, 99),
 				SELF.SBFE.SBFEDelq91CountTtl := (STRING)capNum(RIGHT.SBFEDelq91CountTtl_, 99),
-				SELF.SBFE.SBFEDelq121CountTtl := (STRING)capNum(RIGHT.SBFEDelq121CountTtl_, 99), 
+				SELF.SBFE.SBFEDelq121CountTtl := (STRING)capNum(RIGHT.SBFEDelq121CountTtl_, 99),
 				SELF.SBFE.SBFEDelq91CountTtlChargeoff := (STRING)capNum(RIGHT.SBFEDelq91CountTtlChargeoff_, 99),
 				SELF.SBFE.SBFEDPD91Count := (STRING)capNum(RIGHT.Sbfedpd91count_, 99),
 				SELF.SBFE.SBFEDelq91Count03M := (STRING)capNum(RIGHT.SBFEDelq91Count03M_, 99);
@@ -2430,7 +2420,7 @@ EXPORT getSBFE(DATASET(Business_Risk_BIP.Layouts.Shell) Shell_pre,
 				SELF.SBFE.SBFEChargeoffLeaseAmount := (STRING)capNum(RIGHT.SBFEChargeoffLeaseAmount_, 99999999),
 				SELF.SBFE.SBFEChargeoffLetterAmount := (STRING)capNum(RIGHT.SBFEChargeoffLetterAmount_, 99999999),
 				SELF.SBFE.SBFEChargeoffOLineAmount := (STRING)capNum(RIGHT.SBFEChargeoffOLineAmount_, 99999999),
-				SELF.SBFE.SBFEChargeoffOtherAmount := (STRING)capNum(RIGHT.SBFEChargeoffOtherAmount_, 99999999),				
+				SELF.SBFE.SBFEChargeoffOtherAmount := (STRING)capNum(RIGHT.SBFEChargeoffOtherAmount_, 99999999),
 				SELF.SBFE.SBFEChargeoffDateLastSeen := (STRING)(RIGHT.Sbfechargeoffdatelastseen_),
 				SELF.SBFE.SBFETimeNewestChargeoff := (STRING)capNum(RIGHT.SBFETimeNewestChargeoff_, 600);
 				SELF.SBFE.SBFEBalloonCount := (STRING)capNum(RIGHT.Sbfeballooncount_, 99),
@@ -2448,14 +2438,14 @@ EXPORT getSBFE(DATASET(Business_Risk_BIP.Layouts.Shell) Shell_pre,
 				SELF.SBFE.SBFEPrincipalMaxCount := (STRING)capNum(RIGHT.Sbfeprincipalmaxcount_, 99),
 				SELF := LEFT,
 			/*	SELF := []*/), ATMOST(100), KEEP(1));
-			
-SBFE_recs_added_Shell := JOIN(SBFEIDStatus, SBFE_recs_added, LEFT.Seq = RIGHT.Seq, 
-															TRANSFORM(Business_Risk_BIP.Layouts.Shell, 
-																	SELF.Verification.InputIDMatchStatus := LEFT.Verification.InputIDMatchStatus, 
-																	SELF.Verification.InputIDMatchCategory := LEFT.Verification.InputIDMatchCategory, 
-																	SELF.SBFE := RIGHT.SBFE, 
-																	SELF := LEFT), 
-															LEFT OUTER, ATMOST(100), KEEP(1)); 
+
+SBFE_recs_added_Shell := JOIN(SBFEIDStatus, SBFE_recs_added, LEFT.Seq = RIGHT.Seq,
+															TRANSFORM(Business_Risk_BIP.Layouts.Shell,
+																	SELF.Verification.InputIDMatchStatus := LEFT.Verification.InputIDMatchStatus,
+																	SELF.Verification.InputIDMatchCategory := LEFT.Verification.InputIDMatchCategory,
+																	SELF.SBFE := RIGHT.SBFE,
+																	SELF := LEFT),
+															LEFT OUTER, ATMOST(100), KEEP(1));
 
 SBFE_Observed_Layout_temp := RECORD
 	UNSIGNED4 seq;
@@ -2464,8 +2454,8 @@ SBFE_Observed_Layout_temp := RECORD
 	STRING3 SBFEINTERNALObservedPerf18;
 	STRING3 SBFEINTERNALObservedPerf24;
 	STRING3 SBFEINTERNALObservedPerf36;
-END; 
-	
+END;
+
 	SBFE_Future_Recs_Added_Temp := JOIN(Shell, SBFE_data_future,
 			LEFT.seq = RIGHT.UID,
 			TRANSFORM(SBFE_Observed_Layout_temp,
@@ -2475,25 +2465,25 @@ END;
 				SELF.SBFEINTERNALObservedPerf18 := (STRING)RIGHT.Sbfeinternalobservedperf18_,
 				SELF.SBFEINTERNALObservedPerf24 := (STRING)RIGHT.Sbfeinternalobservedperf24_,
 				SELF.SBFEINTERNALObservedPerf36 := (STRING)RIGHT.Sbfeinternalobservedperf36_), ATMOST(100), KEEP(1));
-				
-	SBFE_Future_Recs_Added := JOIN(SBFE_recs_added_Shell, SBFE_Future_Recs_Added_Temp, 
+
+	SBFE_Future_Recs_Added := JOIN(SBFE_recs_added_Shell, SBFE_Future_Recs_Added_Temp,
 				LEFT.seq = RIGHT.seq,
-				TRANSFORM(Business_Risk_BIP.Layouts.Shell, 
+				TRANSFORM(Business_Risk_BIP.Layouts.Shell,
 				SELF.SBFE.SBFEINTERNALObservedPerf06 := RIGHT.SBFEINTERNALObservedPerf06,
 				SELF.SBFE.SBFEINTERNALObservedPerf12 := RIGHT.SBFEINTERNALObservedPerf12,
 				SELF.SBFE.SBFEINTERNALObservedPerf18 := RIGHT.SBFEINTERNALObservedPerf18,
 				SELF.SBFE.SBFEINTERNALObservedPerf24 := RIGHT.SBFEINTERNALObservedPerf24,
 				SELF.SBFE.SBFEINTERNALObservedPerf36 := RIGHT.SBFEINTERNALObservedPerf36,
 				SELF := LEFT,
-				SELF := []), LEFT OUTER, ATMOST(100), KEEP(1));			
-				
-	
+				SELF := []), LEFT OUTER, ATMOST(100), KEEP(1));
+
+
 	withErrorCodes := JOIN(SBFE_Future_Recs_Added, kFetchErrorCodes, LEFT.Seq = RIGHT.Seq,
 																	TRANSFORM(Business_Risk_BIP.Layouts.Shell,
 																							SELF.Data_Fetch_Indicators.FetchCodeSBFE := (STRING)RIGHT.Fetch_Error_Code;
 																							SELF := LEFT),
 																	LEFT OUTER, KEEP(1), ATMOST(100), PARALLEL, FEW);
-																	
+
 	// *********************
 	//   DEBUGGING OUTPUTS
 	// *********************
@@ -2507,8 +2497,8 @@ END;
 	// OUTPUT(SBFE_data_future, NAMED('KELFuture'));
 	// OUTPUT(SBFEVerification, NAMED('SBFEVerification'));
 	// OUTPUT(SBFEVerificationRolled, NAMED('SBFEVerificationRolled'));
-	// OUTPUT(mod_SBFE.AddBusinessClassification, NAMED('AddBusinessClassification')); 
+	// OUTPUT(mod_SBFE.AddBusinessClassification, NAMED('AddBusinessClassification'));
 	RETURN IF( restrict_sbfe, Shell_pre, withErrorCodes );
-	
 
-END; 
+
+END;
