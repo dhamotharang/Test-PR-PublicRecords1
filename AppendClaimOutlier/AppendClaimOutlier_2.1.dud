@@ -196,7 +196,7 @@ INPUTS
 END
 
 OUTPUTS
-    DATASET dsOutput(dsProvider):PREFIX(INPUTS.Prefix), APPEND
+    DATASET dsOutput(dsProvider):PREFIX(INPUTS.Prefix), APPEND		
 		INTEGER8 	ProviderClaimCount;
 		INTEGER8 	LNPIDClaimCount;
 		INTEGER8 	ProviderPatientCount;
@@ -281,6 +281,8 @@ OUTPUTS
 		INTEGER8	PatientDOD;
 		STRING50	ProviderPatientSharedAddress;
 		STRING50	LargePatientGroupAddress;	
+    		STRING1   	ProviderDeceasedFlag;
+    		STRING1   	ProviderLicenseExpiredFlag;
 		INTEGER8 	ActiveStateExclusionImpactAmount;
 		INTEGER8 	ActiveOIGExclusionImpactAmount;
 		INTEGER8 	ActiveOPMExclusionImpactAmount;
@@ -314,12 +316,12 @@ OUTPUTS
 		INTEGER8 	AddressImpactAmount;
 		INTEGER8 	AddressImpactClaimCount;
 		INTEGER8 	LNPIDImpactAmount;
-		INTEGER8    LNPIDImpactClaimCount;
+		INTEGER8    	LNPIDImpactClaimCount;
 		INTEGER1	ProviderImpactRange;
 		INTEGER1	ProviderImpactPercent;		
 		INTEGER4 	ClientSingleAddressCount;
 		STRING1  	ClientSingleAddressFlag;
-    END
+  END
 
     DATASET dsClaimStats:SIDE
 		STRING50 ProviderKey; 
