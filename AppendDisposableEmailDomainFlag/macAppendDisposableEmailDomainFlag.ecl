@@ -1,5 +1,5 @@
 ﻿EXPORT macAppendDisposableEmailDomainFlag(dIn, emailAddressField, appendPrefix = '\'\'', UseIndexThreshold=100000000)  := FUNCTIONMACRO
-	IMPORT AppendDisposableEmailDomainFlag, STD;
+	IMPORT FraudgovPlatform, STD;
 	LOCAL rWithDomain := RECORD
 		STRING emlDomain;	
 		INTEGER cntDomain;
@@ -25,14 +25,14 @@
 		RECORDOF(dWithDomainDup);
 		INTEGER isDisposableEmail;
 	END;
-	LOCAL dMoreThanTwoThatMatch := JOIN(dWithDomainDup(cntDomain > 2), AppendDisposableEmailDomainFlag.setDisposableEmailDomains,
+	LOCAL dMoreThanTwoThatMatch := JOIN(dWithDomainDup(cntDomain > 2), FraudgovPlatform.Key_DisposableEmailDomains,
 		fnGetLastTwo(LEFT.emlDomain) = RIGHT.domain,
 		TRANSFORM(rInt,
 			SELF.isDisposableEmail := (INTEGER)(RIGHT.domain <> ''),
 			SELF := LEFT), LOOKUP);
 
 	//check the other ones (less than 2 words)
-	LOCAL dDisposableEmail := JOIN(dWithDomainDup(cntDomain <= 2), AppendDisposableEmailDomainFlag.setDisposableEmailDomains,
+	LOCAL dDisposableEmail := JOIN(dWithDomainDup(cntDomain <= 2), FraudgovPlatform.Key_DisposableEmailDomains,
 		LEFT.emlDomain = RIGHT.domain, 
 		TRANSFORM(rInt,
 			SELF.isDisposableEmail := (INTEGER)(RIGHT.domain <> ''),

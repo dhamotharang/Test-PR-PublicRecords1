@@ -1,5 +1,5 @@
-import ut,address,idl_header,_validate, Header_Slimsort, AID,DID_Add,lib_stringlib,lib_date;
-						  
+import ut, address, _validate, AID, lib_stringlib, lib_date;
+
 TrimUpper(string s):= function
 		return trim(stringlib.StringToUppercase(s),left,right);
 end;
@@ -8,7 +8,7 @@ OIG.Layouts.Temp Trans_format(OIG.Layouts.Raw_OIG_Layout l) := transform
 		self.Append_Prep_Address1				:= 	if (trimUpper(l.ADDRESS1[1..3])='C/O', StringLib.StringCleanSpaces(trim(l.Address1[4..],left,right)),StringLib.StringCleanSpaces(trim(l.Address1,left,right)));
 		self.Append_Prep_AddressLast		:= 	if (l.City!='',StringLib.StringCleanSpaces(trim(l.City) + ', ' + trim(l.State) + ' ' + trim(l.ZIP5 )),
 																						StringLib.StringCleanSpaces(trim(l.State) + ' ' + trim(l.ZIP5 ))
-																						); 
+																						);
 		self.Append_RawAID							:=	0;
 		self	                        	:= 	l;
 		self														:=[];
@@ -68,8 +68,8 @@ OIG.Layouts.KeyBuild getCleanaddress(addresscleaned pInput) := transform
 		SELF.geo_match            := pInput.aidwork_acecache.geo_match;
 		SELF.err_stat             := pInput.aidwork_acecache.err_stat;
 		SELF                      :=pInput;
-		Self						  				:=[];	
-	
+		Self						  				:=[];
+
 end;
 
 AIDFormatFile :=project(addresscleaned,getcleanaddress(left));

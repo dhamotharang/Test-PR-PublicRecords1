@@ -1,11 +1,11 @@
-﻿//HPCC Systems KEL Compiler Version 1.2.1-dev
-IMPORT KEL12 AS KEL;
+﻿//HPCC Systems KEL Compiler Version 1.3.2
+IMPORT KEL13 AS KEL;
 IMPORT CFG_graph,E_Tradeline FROM Business_Credit_KEL;
-IMPORT * FROM KEL12.Null;
+IMPORT * FROM KEL13.Null;
 EXPORT B_Tradeline_11(CFG_graph.FDCDataset __in = CFG_graph.FDCDefault, CFG_graph __cfg = CFG_graph) := MODULE
   SHARED VIRTUAL TYPEOF(E_Tradeline(__in,__cfg).__Result) __E_Tradeline := E_Tradeline(__in,__cfg).__Result;
-  SHARED __EE272704 := __E_Tradeline;
-  EXPORT __ST252658_Layout := RECORD
+  SHARED __EE275987 := __E_Tradeline;
+  EXPORT __ST253342_Layout := RECORD
     KEL.typ.nuid UID;
     KEL.typ.nkdate _load__date_;
     KEL.typ.nstr _sbfe__contributor__number_;
@@ -36,7 +36,8 @@ EXPORT B_Tradeline_11(CFG_graph.FDCDataset __in = CFG_graph.FDCDefault, CFG_grap
     KEL.typ.nstr _payment__interval_;
     KEL.typ.nstr _payment__status__category_;
     KEL.typ.nint D_B_T___V5_;
-    KEL.typ.nstr _ln__delinquency__date_;
+    KEL.typ.nint _raw__dbt__v5_;
+    KEL.typ.nstr _overall__file__format__version_;
     KEL.typ.nunk _term__of__account__in__months_;
     KEL.typ.nkdate _first__payment__due__date_;
     KEL.typ.nkdate _final__pyament__due__date_;
@@ -98,9 +99,9 @@ EXPORT B_Tradeline_11(CFG_graph.FDCDataset __in = CFG_graph.FDCDefault, CFG_grap
     KEL.typ.nkdate Date_Reported_Closed_;
     KEL.typ.int __RecordCount := 0;
   END;
-  SHARED __ST252658_Layout __ND272702__Project(E_Tradeline(__in,__cfg).Layout __PP272240) := TRANSFORM
-    SELF.Date_Reported_Closed_ := IF(__T(__NT(__PP272240._date__account__closed_)),__ECAST(KEL.typ.nkdate,__PP272240._date__account__was__charged__off_),__ECAST(KEL.typ.nkdate,__PP272240._date__account__closed_));
-    SELF := __PP272240;
+  SHARED __ST253342_Layout __ND275985__Project(E_Tradeline(__in,__cfg).Layout __PP275518) := TRANSFORM
+    SELF.Date_Reported_Closed_ := IF(__T(__NT(__PP275518._date__account__closed_)),__ECAST(KEL.typ.nkdate,__PP275518._date__account__was__charged__off_),__ECAST(KEL.typ.nkdate,__PP275518._date__account__closed_));
+    SELF := __PP275518;
   END;
-  EXPORT __ENH_Tradeline_11 := PROJECT(__EE272704,__ND272702__Project(LEFT));
+  EXPORT __ENH_Tradeline_11 := PROJECT(__EE275987,__ND275985__Project(LEFT));
 END;

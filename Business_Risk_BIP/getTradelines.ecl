@@ -1,12 +1,12 @@
-﻿IMPORT BIPV2, Business_Risk_BIP, EBR, EBR_Services, MDR, TopBusiness_Services, UT, Doxie, STD;
+﻿IMPORT BIPV2, Business_Risk_BIP, EBR, EBR_Services, MDR, Doxie, STD;
 
-EXPORT getTradelines(DATASET(Business_Risk_BIP.Layouts.Shell) Shell, 
+EXPORT getTradelines(DATASET(Business_Risk_BIP.Layouts.Shell) Shell,
 											 Business_Risk_BIP.LIB_Business_Shell_LIBIN Options,
 											 BIPV2.mod_sources.iParams linkingOptions,
-											 SET OF STRING2 AllowedSourcesSet,
-											 doxie.IDataAccess mod_access = MODULE (doxie.IDataAccess) END) := FUNCTION
-	
+											 SET OF STRING2 AllowedSourcesSet) := FUNCTION
+
 	// linkids := Business_Risk_BIP.Common.GetLinkIDs(Shell); // For debugging only.
+	mod_access := PROJECT(Options, doxie.IDataAccess);
 
 	temp_LayoutTradeline := RECORD
 		UNSIGNED4 seq;
@@ -41,7 +41,7 @@ EXPORT getTradelines(DATASET(Business_Risk_BIP.Layouts.Shell) Shell,
 		REAL8 Trade61orMoreDPDCount;
 		REAL8 Trade91orMoreDPDCount;
 	END;
-	
+
 	// --------------- EBR Data ----------------
 	EBRRaw := EBR.Key_0010_Header_linkids.kFetch2(Business_Risk_BIP.Common.GetLinkIDs(Shell), mod_access,
 																						 Business_Risk_BIP.Common.SetLinkSearchLevel(Options.LinkSearchLevel),
@@ -51,13 +51,13 @@ EXPORT getTradelines(DATASET(Business_Risk_BIP.Layouts.Shell) Shell,
 																							Options.KeepLargeBusinesses);
 	// Add back our Seq numbers.
 	Business_Risk_BIP.Common.AppendSeq2(EBRRaw, Shell, EBRSeq);
-	
+
 	// Figure out if the kFetch was successful
 	kFetchErrorCodes := Business_Risk_BIP.Common.GrabFetchErrorCode(EBRSeq);
-	
+
 	// Filter out records after our history date.
 	EBR_recs := Business_Risk_BIP.Common.FilterRecords(EBRSeq, date_first_seen, process_date_first_seen,  MDR.SourceTools.src_EBR, AllowedSourcesSet);
-	
+
 	tempLayout := RECORD
 		UNSIGNED4 Seq;
 		DATASET(Business_Risk_BIP.Layouts.LayoutSources) Sources;
@@ -76,29 +76,29 @@ EXPORT getTradelines(DATASET(Business_Risk_BIP.Layouts.Shell) Shell,
 			 },
 			 Seq, Business_Risk_BIP.Common.GetLinkSearchLevel(Options.LinkSearchLevel, SeleID), SIC_Code
 			 );
-	
+
 	EBRSICTemp := PROJECT(EBRSIC, TRANSFORM(tempLayout,
 																				SELF.Seq := LEFT.Seq;
 																				SELF.SICNAICSources := DATASET([{LEFT.Source, IF(LEFT.DateFirstSeen = Business_Risk_BIP.Constants.NinesDate, Business_Risk_BIP.Constants.MissingDate, LEFT.DateFirstSeen), LEFT.DateLastSeen, LEFT.RecordCount, LEFT.SICCode, Business_Risk_BIP.Common.industryGroup(LEFT.SICCode, Business_Risk_BIP.Constants.SIC), '' /*NAICCode*/, '' /*NAICIndustry*/, LEFT.IsPrimary}], Business_Risk_BIP.Layouts.LayoutSICNAIC);
 																				SELF := []));
-	
+
 	EBRSICRolled := ROLLUP(EBRSICTemp, LEFT.Seq = RIGHT.Seq, TRANSFORM(tempLayout, SELF.Seq := LEFT.Seq; SELF.SICNAICSources := LEFT.SICNAICSources + RIGHT.SICNAICSources; SELF := LEFT));
-	
+
 	withEBRSIC := JOIN(Shell, EBRSICRolled, LEFT.Seq = RIGHT.Seq,
 																	TRANSFORM(Business_Risk_BIP.Layouts.Shell,
 																							SELF.SICNAICSources := LEFT.SICNAICSources + RIGHT.SICNAICSources;
 																							SELF := LEFT),
 																	LEFT OUTER, KEEP(1), ATMOST(100), FEW);
-	
-	// Get EBR filing numbers from linkids.		
-	ebr_filing_numbers_plus_seq := 
+
+	// Get EBR filing numbers from linkids.
+	ebr_filing_numbers_plus_seq :=
 		PROJECT( EBR_recs(file_number != ''), {UNSIGNED4 seq, EBR_Services.layout_file_number} );
-  
+
 	ebr_filing_numbers_plus_seq_ddpd := DEDUP(ebr_filing_numbers_plus_seq, ALL, HASH);
 
-	// Join to several EBR data sources to obtain the required data. The following joins 
+	// Join to several EBR data sources to obtain the required data. The following joins
 	// are adapted from EBR_Services.ebr_raw, lines 129-137.
-	
+
 	// Header records. We need the process_date_last_seen field for the first join below.
 	header_recs_pre :=
 		JOIN(
@@ -111,10 +111,10 @@ EXPORT getTradelines(DATASET(Business_Risk_BIP.Layouts.Shell) Shell,
 			INNER,
 			ATMOST(EBR_Services.constants.maxcounts.default)
 		);
-	
+
 	// Mimicking what is done in other business queries, we will keep 1 file_number per sequence.  To do this we will keep the most recently processed record, following by most recently last seen, and then lastly the smallest file_number to make it determinate
 	header_recs := GROUP(DEDUP(SORT(header_recs_pre, seq, -process_date_last_seen, -date_last_seen, file_number), Seq), seq);
-	
+
 	// Add Executives. (source: EBR-1000)
 	executive_recs_added :=
 		JOIN(
@@ -136,7 +136,7 @@ EXPORT getTradelines(DATASET(Business_Risk_BIP.Layouts.Shell) Shell,
 			LEFT OUTER, KEEP(1), // the 1000 file looks to be a 1-to-1 ratio to each corporate entity for a given process_date.
 			ATMOST(EBR_Services.constants.maxcounts.default), FEW
 		);
-		
+
 	// Add Trade Payment Records. (source: EBR-2015) NOTE: Among the fields listed in the Transform
 	// below, the relationships among NEW, REG, and COMBO is REG + NEW = COMBO
 	trade_payment_total_recs_added :=
@@ -244,8 +244,8 @@ EXPORT getTradelines(DATASET(Business_Risk_BIP.Layouts.Shell) Shell,
 				Trade91orMoreDPD						:= (STRING)Business_Risk_BIP.Common.capNum(ROUND((REAL)RIGHT.debt_91_plus_percent3), -1.0, 100.0);
 				SELF.Trade91orMoreDPD				:= Trade91orMoreDPD;
 				SELF.Trade91orMoreDPDCount	:= ((INTEGER)Trade91orMoreDPD / 100) * (INTEGER)TradeCount;
-				
-				
+
+
 				NewestTradeDPD										 := Business_Risk_BIP.Common.capNum((INTEGER)RIGHT.debt2, 0, 999);
 				SELF.TradeHighestDPDNew					 := MAP(NewestTradeDPD = 0								=> '0',
 																									NewestTradeDPD BETWEEN 1 AND 30		=> '1',
@@ -274,7 +274,7 @@ EXPORT getTradelines(DATASET(Business_Risk_BIP.Layouts.Shell) Shell,
 			LEFT OUTER, KEEP(1), // the 2015 file looks to be a 1-to-1 ratio to each corporate entity for each process date.
 			ATMOST(EBR_Services.constants.maxcounts.default), FEW
 		);
-	
+
 	temp_LayoutTradeline rollTradelines(temp_LayoutTradeline le, temp_LayoutTradeline ri) := TRANSFORM
 		TradeCount := Business_Risk_BIP.Common.capNum((INTEGER)le.TradeCount + (INTEGER)ri.TradeCount, -1, 999999);
 		TradeNewCount := Business_Risk_BIP.Common.capNum((INTEGER)le.TradeNewCount + (INTEGER)ri.TradeNewCount, -1, 999999);
@@ -295,7 +295,7 @@ EXPORT getTradelines(DATASET(Business_Risk_BIP.Layouts.Shell) Shell,
 		SELF.Trade06MonthHighBalance := (STRING)Business_Risk_BIP.Common.capNum(MAX((INTEGER)le.Trade06MonthHighBalance, (INTEGER)ri.Trade06MonthHighBalance), -1, 999999999);
 		SELF.Trade06MonthLowBalance := (STRING)Business_Risk_BIP.Common.capNum(MIN((INTEGER)le.Trade06MonthLowBalance, (INTEGER)ri.Trade06MonthLowBalance), -1, 999999999);
 		SELF.TradeMedianHighExtendedCredit := (STRING)Business_Risk_BIP.Common.capNum(MAX((INTEGER)le.TradeMedianHighExtendedCredit, (INTEGER)ri.TradeMedianHighExtendedCredit), -1, 999999999);
-		
+
 		SELF.TradeGoodStandingNewCount := le.TradeGoodStandingNewCount + ri.TradeGoodStandingNewCount;
 		SELF.TradeGoodStandingAgedCount := le.TradeGoodStandingAgedCount + ri.TradeGoodStandingAgedCount;
 		SELF.TradeGoodStandingCount := le.TradeGoodStandingCount + ri.TradeGoodStandingCount;
@@ -323,11 +323,11 @@ EXPORT getTradelines(DATASET(Business_Risk_BIP.Layouts.Shell) Shell,
 		SELF.Trade31orMoreDPDCount := le.Trade31orMoreDPDCount + ri.Trade31orMoreDPDCount;
 		SELF.Trade61orMoreDPDCount := le.Trade61orMoreDPDCount + ri.Trade61orMoreDPDCount;
 		SELF.Trade91orMoreDPDCount := le.Trade91orMoreDPDCount + ri.Trade91orMoreDPDCount;
-		
+
 		SELF := le;
 		SELF := [];
 	END;
-		
+
 	trade_payment_total_recs_rolled := ROLLUP(SORT(trade_payment_total_recs_added, Seq, File_Number, -Process_Date), LEFT.Seq = RIGHT.Seq, rollTradelines(LEFT, RIGHT));
 
 	temp_LayoutTradeline calculateTradelinePercentages(temp_LayoutTradeline le) := TRANSFORM
@@ -358,16 +358,16 @@ EXPORT getTradelines(DATASET(Business_Risk_BIP.Layouts.Shell) Shell,
 		SELF.Trade31orMoreDPD := (STRING)Business_Risk_BIP.Common.CapNum(ROUND((le.Trade31orMoreDPDCount / (REAL8)le.TradeCount) * 100), -1, 100);
 		SELF.Trade61orMoreDPD := (STRING)Business_Risk_BIP.Common.CapNum(ROUND((le.Trade61orMoreDPDCount / (REAL8)le.TradeCount) * 100), -1, 100);
 		SELF.Trade91orMoreDPD := (STRING)Business_Risk_BIP.Common.CapNum(ROUND((le.Trade91orMoreDPDCount / (REAL8)le.TradeCount) * 100), -1, 100);
-		
+
 		SELF := le;
 		SELF := [];
 	END;
 	trade_payment_total_recs_calculated := PROJECT(trade_payment_total_recs_rolled, calculateTradelinePercentages(LEFT));
-	
+
 	// Add to the Shell.
-	withTradelines := 
+	withTradelines :=
 		JOIN(
-			withEBRSIC, trade_payment_total_recs_calculated, 
+			withEBRSIC, trade_payment_total_recs_calculated,
 			LEFT.Seq = RIGHT.Seq,
 			TRANSFORM( Business_Risk_BIP.Layouts.Shell,
 				SELF.Tradeline := RIGHT,
@@ -376,13 +376,13 @@ EXPORT getTradelines(DATASET(Business_Risk_BIP.Layouts.Shell) Shell,
 			),
 			LEFT OUTER, KEEP(1), ATMOST(100), FEW
 		);
-	
+
 	withErrorCodes := JOIN(withTradelines, kFetchErrorCodes, LEFT.Seq = RIGHT.Seq,
 																	TRANSFORM(Business_Risk_BIP.Layouts.Shell,
 																							SELF.Data_Fetch_Indicators.FetchCodeTradelines := (STRING)RIGHT.Fetch_Error_Code;
 																							SELF := LEFT),
 																	LEFT OUTER, KEEP(1), ATMOST(100), PARALLEL, FEW);
-			
+
 	// *********************
 	//   DEBUGGING OUTPUTS
 	// *********************
@@ -395,7 +395,7 @@ EXPORT getTradelines(DATASET(Business_Risk_BIP.Layouts.Shell) Shell,
 	// OUTPUT( trade_payment_total_recs_added, NAMED('EBR_2015_added') );
 	// OUTPUT( trade_payment_total_recs_rolled, NAMED('EBR_2015_rolled') );
 	// OUTPUT( trade_payment_total_recs_calculated, NAMED('EBR_2015_calculated') );
-		
+
 	RETURN withErrorCodes;
 
 END;

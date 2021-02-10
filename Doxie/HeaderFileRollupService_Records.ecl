@@ -1,32 +1,67 @@
 ﻿IMPORT $, AddressFeedback, AddressFeedback_Services, BusinessCredit_Services, doxie, DriversV2, iesp,
-       PhonesFeedback, PhonesFeedback_Services, Suppress, ut, STD;
+       PhonesFeedback, PhonesFeedback_Services, Suppress, ut, STD, Header;
 
 
 EXPORT HeaderFileRollupService_Records :=
   MODULE
 
-    SHARED set_premium_phone_count(DATASET(doxie.Layout_Rollup.header_rolled) rolledRecsIn, doxie.IDataAccess mod_access) := FUNCTION
+    SHARED postProcessResults(DATASET(doxie.Layout_Rollup.header_rolled) rolledRecsIn, doxie.IDataAccess mod_access,
+                                             boolean do_address_hierarchy) := FUNCTION
 
       dids := DATASET([{(UNSIGNED6)rolledRecsIn[1].Results[1].did}],doxie.layout_references);
-      childAddrRecs  := NORMALIZE(rolledRecsIn[1].Results,LEFT.addrRecs,TRANSFORM(doxie.Layout_Rollup.AddrRec,SELF:=RIGHT));
+     
+//append did to every address record for Address Hierarchy sorting      
+      temp_rec := record(doxie.Layout_Rollup.AddrRec)
+        unsigned seq := 0; 
+        unsigned6 did;
+      end; 
+
+      childAddrRecs_legacy  := NORMALIZE(rolledRecsIn[1].Results,LEFT.addrRecs,TRANSFORM(temp_rec,SELF.DID := (integer)LEFT.DID,  SELF:=RIGHT,self := []));
+      
+// sorted based on addr_ind, best_addr_rank
+      childAddrRecs_AHSorted_pre  := Header.Mac_Append_addr_ind(childAddrRecs_legacy, addr_ind, /*src*/, did, prim_range, prim_name, sec_range, city_name
+                                                               , st, zip , predir, postdir, suffix, first_seen, last_seen, dt_vendor_first_reported
+                                                               , dt_vendor_last_reported /*,isTrusted,*/ /*isFCRA,*/ /*hitQH,*/ /*debug*/);
+
+                                                                                     
+      temp_rec overwriteTNT(childAddrRecs_AHSorted_pre l, UNSIGNED cnt) := transform
+          SELF.seq := cnt;
+          SELF.location_id := l.locid;
+          tnt := doxie.enhanceTNT(do_address_hierarchy,l.tnt, l.addr_ind, l.best_addr_rank); 
+          SELF.tnt := tnt;             
+          SELF.isCurrent := tnt in doxie.rollup_limits.TNT_CURRENT_SET;
+          SELF := l;
+      END;
+                                       
+      childAddrRecs_AHsorted := project(childAddrRecs_AHSorted_pre, overwriteTNT(LEFT,COUNTER));
+     
+      childAddrRecs := if(do_address_hierarchy,childAddrRecs_AHsorted,childAddrRecs_legacy);
+      
       childPhoneRecs := NORMALIZE(childAddrRecs,LEFT.phoneRecs,TRANSFORM(doxie.Layout_Rollup.PhoneRec,SELF:=RIGHT));
       dedup_phones   := PROJECT(childPhoneRecs,TRANSFORM(doxie.premium_phone.phone_rec,SELF.phone:=LEFT.phone));
 
       results := PROJECT(rolledRecsIn[1].Results,TRANSFORM(doxie.Layout_Rollup.KeyRec_Seq,
-        SELF.premium_phone_count:=doxie.premium_phone.get_count(dids,dedup_phones,mod_access,TRUE);
-        SELF:=LEFT));
+                   childAddrRecsForDid := childAddrRecs(did = (integer) Left.did);
+                   // Conditionally re-sort to preserve address hierarchy sort order
+                   childAddrRecsForDidSorted := if(do_address_hierarchy,sort(childAddrRecsForDid,seq),childAddrRecsForDid); 
+                   SELF.addrRecs :=  project(childAddrRecsForDidSorted, doxie.Layout_Rollup.AddrRec);  
+                   SELF.premium_phone_count:=doxie.premium_phone.get_count(dids,dedup_phones,mod_access,TRUE);
+                   SELF:=LEFT));
 
       doxie.Layout_Rollup.header_rolled rolledRecsOut() := TRANSFORM
         SELF.Results := results;
         SELF.Royalty := rolledRecsIn[1].Royalty;
         SELF.householdRecordsAvailable := rolledRecsIn[1].householdRecordsAvailable;
       END;
+      
+//output(childAddrRecs_legacy,named('legacy_sorted_records_original_tnt'));
+//output(childAddrRecs_AHSorted_pre,named('ah_sorted_records_original_tnt'));
+//output(childAddrRecs_AHSorted,named('ah_sorted_records_updated_tnt'));
 
       RETURN DATASET([rolledRecsOut()]);
     END;
 
-
-    EXPORT fn_get_ta1 (doxie.IDataAccess mod_access, doxie.HeaderFileRollupService_IParam.ta1 mod_ta1):=
+    EXPORT fn_get_ta1 (doxie.IDataAccess mod_access, doxie.HeaderFileRollupService_IParam.ta1 mod_ta1, boolean do_address_hierarchy = false):=
       FUNCTION
 
         //needed for MAC_Apply_DtSeen_Filter
@@ -53,8 +88,8 @@ EXPORT HeaderFileRollupService_Records :=
         presRecs := IF(mod_ta1.allow_date_seen AND mod_ta1.date_last_seen != 0 AND mod_ta1.pname != '', presRecs_filtered, presRecs_ready);
 
         // Rollup header records
-        tmpRecs := doxie.rollup_presentation(presRecs, mod_ta1.allow_wildcard);
-        ta1 := set_premium_phone_count(tmpRecs,mod_access)[1];
+        tmpRecs := doxie.rollup_presentation(presRecs, mod_ta1.allow_wildcard);        
+        ta1 := postProcessResults(tmpRecs,mod_access,do_address_hierarchy)[1];
 
       RETURN ta1;
     END; // fn_get_ta1

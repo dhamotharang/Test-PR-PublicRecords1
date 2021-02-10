@@ -1,16 +1,12 @@
-
-export ReportService_IDs := module
-	export params := interface(AutoKey_IDs.params)
-		export string15 Phone_number := '';
-		export string12 in_DID:='';
-
-	end;
-		export val(params in_mod) := function
-			Phone_number := dataset([{in_mod.Phone_number,in_mod.in_DID}],Layouts.rec_in_request);
-			
-			by_Phone_number := if(in_mod.Phone_number != '',PhonesFeedback_Services.Raw.byPhoneNumber(Phone_number));
-			
-			return by_Phone_number;
-		
-	end;
-end;
+IMPORT PhonesFeedback_Services;
+EXPORT ReportService_IDs := MODULE
+  EXPORT params := INTERFACE(PhonesFeedback_Services.AutoKey_IDs.params)
+    EXPORT STRING15 phone_number := '';
+    EXPORT STRING12 in_DID:='';
+  END;
+  EXPORT val(params in_mod) := FUNCTION
+    phone_number := DATASET([{in_mod.phone_number, in_mod.in_DID}], PhonesFeedback_Services.Layouts.rec_in_request);
+    by_phone_number := IF(in_mod.phone_number != '',PhonesFeedback_Services.Raw.byPhoneNumber(phone_number));
+    RETURN by_phone_number;
+  END;
+END;

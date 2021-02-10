@@ -43,6 +43,8 @@ EXPORT BusinessInsightSection := MODULE
          BOOLEAN  RIsk11_ExecHasDerog;
          DATASET ({STRING8 SicCode;}) Risk12_BusinessInHighRiskIndustrySic;
          DATASET ({STRING8 NaicsCode;}) Risk12_BusinessInHighRiskIndustryNaics;
+         BOOLEAN  Risk14_HighBusinessTurnoverAtAddress;
+         REAL     Risk14_HighBusinessTurnoverAtAddressReal;
          BOOLEAN  Risk15_LiensBipLinkidsHighCount;
          BOOLEAN  Risk16_BusinessHasB2BDelinquency;
          BOOLEAN  Risk17_NonExecHasDerog;
@@ -239,17 +241,40 @@ EXPORT BusinessInsightSection := MODULE
               SELF.Risk12_BusinessInHighRiskIndustrySic := SicCode;
               SELF.Risk12_BusinessInHighRiskIndustryNAICS :=  NaicsCode;
 
+              TopBusiness_Services.Layouts.busRiskDefunctAddressLayout CreateAddress() := TRANSFORM
+                                        SELF.UniqueId := 1;
+                                        SELF.company_prim_range := BestSectionIn.Address.StreetNumber;
+                                        SELF.company_predir := BestSectionIn.address.StreetPreDirection;
+                                        SELF.company_prim_name  := BestSectionIn.address.StreetName;
+                                        SELF.company_addr_suffix := BestSectionIn.address.StreetSuffix;
+                                        SELF.company_postdir := BestSectionIn.address.StreetPostDirection;
+                                        SELF.company_unit_desig := BestSectionIn.address.UnitDesignation;
+                                        SELF.company_sec_range := BestSectionIn.address.UnitNumber;
+                                        SELF.company_p_city_name := BestSectionIn.address.City;
+                                        SELF.company_st := BestSectionIn.address.State;
+                                        SELF.company_zip5 := BestSectionIn.address.zip5;
+                                        SELF.company_zip4 := BestSectionIn.address.zip4;
+                                        END;
+              AddressinRisk14 := dataset([CreateAddress()]);
+
+              resultDS := TopBusiness_Services.Fn_defunct_address.defunctsAtAddress(AddressinRisk14).result;   /// main function call to return results..
+              NumTotal := project(resultDS, transform({unsigned4 Numtotal;}, self.Numtotal := left.total))[1].NumTotal;
+              NumDefunct :=  project(resultDS, transform({unsigned4 NumDefunct;}, self.NumDefunct:= left.Defunct))[1].NumDefunct;
+
+              SELF.Risk14_HighBusinessTurnoverAtAddressReal := NumDefunct/NumTotal;
+              SELF.Risk14_HighBusinessTurnoverAtAddress := ((NumDefunct/NumTotal) * 100) > 80;
+
               // fill in later here
               SELF.Risk15_LiensBipLinkidsHighCount := LienCountOver5;
               SELF.Risk16_BusinessHasB2BDelinquency :=  IncludeBizToBizDelinquencyRiskIndicator AND
-                                                                                                       EXISTS(dx_Cortera_Tradeline.Key_LinkIds.kfetch2(
-                                                                                                                         PROJECT(biplinkids, TRANSFORM(BIPV2.IDlayouts.l_xlink_ids2,
-                                                                                                                           self  := LEFT; SELF := [];))
-                                                                                                                        ,in_options.BusinessReportFetchLevel
-                                                                                                                        , // take default
-                                                                                                                        ,TopBusiness_Services.Constants.SmallestKeepLimit// only need to find existence so use 1 for keep constant
-                                                                                                                            // take default on last param jointype
-                                                                                                                        )(total_ar <> current_ar));
+                                                                                                        EXISTS(dx_Cortera_Tradeline.Key_LinkIds.kfetch2(
+                                                                                                                          PROJECT(biplinkids, TRANSFORM(BIPV2.IDlayouts.l_xlink_ids2,
+                                                                                                                            self  := LEFT; SELF := [];))
+                                                                                                                         ,in_options.BusinessReportFetchLevel
+                                                                                                                         , // take default
+                                                                                                                         ,TopBusiness_Services.Constants.SmallestKeepLimit// only need to find existence so use 1 for keep constant
+                                                                                                                             // take default on last param jointype
+                                                                                                                         )(total_ar <> current_ar));
 
               SELF.Risk17_NonExecHasDerog :=  ContactNonExecHasDerog;
 
@@ -493,6 +518,11 @@ EXPORT BusinessInsightSection := MODULE
         BusinessRisk12 := DATASET([{val12,'M', 'Business is in a high risk industry'}],
                  iesp.topbusinessReport.T_topBusinessBusinessRiskIndicator);
 
+        //val14 := false;
+        val14 := Topbusiness_Services.BusinessInsightFunctions.HighBusTurnoverAtAddress(BusRiskIn.Risk14_HighBusinessTurnoverAtAddress);
+        BusinessRisk14 := DATASET([{val14,'M','High business turnover at address'}],
+                iesp.topbusinessReport.T_topBusinessBusinessRiskIndicator);
+
         // val15 := false;
         val15 :=  topbusiness_services.BusinessInsightFunctions.LiensBipLinkidsHighCount( BusRiskIn.Risk15_LiensBipLinkidsHighCount);
         BusinessRisk15 := DATASET([{val15,'M', 'High judgment or lien count '}],
@@ -588,14 +618,14 @@ EXPORT BusinessInsightSection := MODULE
 
            BusinessRisksNegativeIndicators  := BusinessRisk7 + BusinessRisk8
                   + BusinessRisk9 + BusinessRisk10  + BusinessRisk11
-                  + BusinessRisk12 + BusinessRisk15
+                  + BusinessRisk12 + BusinessRisk14 + BusinessRisk15
                   + BusinessRisk16 + BusinessRisk17 + BusinessRisk18 + BusinessRisk19
                   + BusinessRisk20 + BusinessRisk21 + BusinessRisk22 + BusinessRisk23
                   + BusinessRisk24 + BusinessRisk25;
 
             BusinessRisksAll :=   BusinessRisk7 + BusinessRisk8
                    + BusinessRisk9 + BusinessRisk10  + BusinessRisk11
-                   + BusinessRisk12+  BusinessRisk15
+                   + BusinessRisk12 + BusinessRisk14 + BusinessRisk15
                    + BusinessRisk16 + BusinessRisk17 + BusinessRisk18 + BusinessRisk19
                    + BusinessRisk20 + BusinessRisk21 + BusinessRisk22 + BusinessRisk23
                    + BusinessRisk24 + BusinessRisk25+ BusinessRisk26 + BusinessRisk27

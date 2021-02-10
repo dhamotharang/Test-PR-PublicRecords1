@@ -35,7 +35,7 @@ EXPORT service_GetRelationship() := FUNCTION
   'DID', 'Append_Names', 'Relatives_Only', 'Associates_Only', 'All', 'Transactional_Only', 'Total_Candidates', 'Count_Wanted',
   'Skip_On_Count_Exceeded', 'Atmost_On_Count_Exceeded', 'Fail_On_Count_Exceeded', 'Same_Lname_Only', 'Minimum_Score',
   'Recent_Relative_Date', 'Did2', 'Exclude_TransitiveClosure2', 'Exclude_Inactives', 'High_Confidence_Relatives', 'High_Confidence_Associates',
-  'Relationship_Lookback_Months', 'Relatives_Key', 'Second_Degree_Relationships', 'Third_Degree_Relationships', 'TransactionalFlags'
+  'Relationship_Lookback_Months', 'Relatives_Key', 'Additional_Degree_Relationships', 'TransactionalFlags'
   ),
   HELP(
   '<p>Relatives_Key:D2C|MARKETING|V3(Default)</p>'
@@ -63,8 +63,7 @@ EXPORT service_GetRelationship() := FUNCTION
 	boolean   HighConfidenceAssociates := FALSE  : stored('High_Confidence_Associates');
 	unsigned2 RelLookbackMonths := 0       : stored('Relationship_Lookback_Months');
 	string    RelKeyFlag               := ''     : stored('Relatives_Key');
-  boolean   SecondDegreeFlag         := FALSE  : stored('Second_Degree_Relationships');
-  boolean   ThirdDegreeFlag          := FALSE  : stored('Third_Degree_Relationships');
+  boolean NthRelationship := FALSE 				: STOREd('Additional_Degree_Relationships');
 	addlFlags  := DATASET([],Layout_GetRelationship.TransactionalFlags_layout)  : stored('TransactionalFlags');
 	didRec     := DATASET([{input_DID}],Layout_GetRelationship.DIDs_layout);
 	
@@ -74,7 +73,7 @@ EXPORT service_GetRelationship() := FUNCTION
 	result     := Relationship.Proc_GetRelationshipNeutral(didrec,Rel_Flag,Assoc_Flag,All_Flag,Tx_Flag,RecCount,NCount,doSkip,doFail,doAtmost,
 																												 sameLname,minScore,recentRel,person2,excludeTC2,excludeInactives,,
 																												 HighConfidenceRelatives,HighConfidenceAssociates,RelLookbackMonths,
-																												 addlFlags[1],RelKeyFlag,SecondDegreeFlag,ThirdDegreeFlag).Result;
+																												 addlFlags[1],RelKeyFlag,NthRelationship).Result;
 
 	nrec := record
 		string20 title_str;

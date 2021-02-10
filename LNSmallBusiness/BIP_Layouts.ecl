@@ -2934,12 +2934,14 @@ EXPORT BIP_Layouts := MODULE
 	
 	EXPORT BatchScoreData := RECORD
 		STRING20 Model_1_Name; // e.g. 'SBBM1601_0_0'
+		STRING20 Model_1_Type := ''; 
 		STRING3 Model_1_Score;
 		STRING5 Model_1_RC1;  // RC = Reason Code
 		STRING5 Model_1_RC2;
 		STRING5 Model_1_RC3;
 		STRING5 Model_1_RC4;
 		STRING20 Model_2_Name;
+		STRING20 Model_2_Type := '';
 		STRING3 Model_2_Score;
 		STRING5 Model_2_RC1;
 		STRING5 Model_2_RC2;

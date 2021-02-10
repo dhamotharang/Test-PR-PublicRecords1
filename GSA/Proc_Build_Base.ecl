@@ -8,11 +8,8 @@ import address,
 	     business_header_ss,
 	     did_add,
 		   SAM,
-	     ut,              //needed for BDID macro
-	     header_slimsort,
 			 //needed for DID  macro
-			 Health_Provider_Services,
-		   Worldcheck_Bridger;
+			 Health_Provider_Services;
 
 
 export Proc_Build_Base(string8 filedate) := function
@@ -39,7 +36,7 @@ export Layout_Clean_Name := record
 		string20        cln_fname2;
 		string20        cln_mname2;
 		string20        cln_lname2;
-		string5         cln_suffix2;	
+		string5         cln_suffix2;
 end;
 
 ds_slim_clean_gsa   := project(ds_Standardized_GSA_uniqueid,transform(Layout_Clean_Name, SELF:=LEFT, SELF := []));
@@ -56,9 +53,9 @@ Layout_Clean_Name trfNameInfo(Layout_Clean_Name l) := TRANSFORM
 		self.fname				:= IF (l.name_flag = 'P',StringLib.StringCleanSpaces(trim(StringLib.StringToUpperCase(l.cln_fname))),'');
 		self.mname				:= IF (l.name_flag = 'P',StringLib.StringCleanSpaces(trim(StringLib.StringToUpperCase(l.cln_mname))),'');
 		self.lname				:= IF (l.name_flag = 'P',StringLib.StringCleanSpaces(trim(StringLib.StringToUpperCase(l.cln_lname))),'');
-		self.name_suffix	:= IF (l.name_flag = 'P',StringLib.StringCleanSpaces(trim(StringLib.StringToUpperCase(l.cln_suffix))),'');																			
-		name_score 				:= Business_Header.CleanName(self.fname, self.mname, self.lname, self.name_suffix)[142];			
-		self.name_score 	:= name_score;	
+		self.name_suffix	:= IF (l.name_flag = 'P',StringLib.StringCleanSpaces(trim(StringLib.StringToUpperCase(l.cln_suffix))),'');
+		name_score 				:= Business_Header.CleanName(self.fname, self.mname, self.lname, self.name_suffix)[142];
+		self.name_score 	:= name_score;
 		self 							:= l;
 end;
 
@@ -70,36 +67,36 @@ ds_non_business := ds_clean_gsa(name_flag <> 'B');
 
 business_matchset := ['A','N'];
 
-Business_Header_SS.MAC_Add_BDID_Flex(																						
-			 ds_business		 									// Input Dataset													
-			,business_matchset                // BDID Matchset what fields to match on  
-			,name	                    				// company_name	                          
-			,prim_range		                    // prim_range		                          
-			,prim_name		                    // prim_name		                          
-			,zip					            				// zip5					                          
-			,sec_range		                    // sec_range		                          
-			,st				                				// state				                          
-			,foo				               				// phone				                          
-			,foo					                    // fein                                   
-			,bdid															// bdid												            
-			,layouts_gsa.slim_clean_gsa				// Output Layout                          
-			,false                            // output layout has bdid score field?                       
-			,score_field                      // bdid_score                             
+Business_Header_SS.MAC_Add_BDID_Flex(
+			 ds_business		 									// Input Dataset
+			,business_matchset                // BDID Matchset what fields to match on
+			,name	                    				// company_name
+			,prim_range		                    // prim_range
+			,prim_name		                    // prim_name
+			,zip					            				// zip5
+			,sec_range		                    // sec_range
+			,st				                				// state
+			,foo				               				// phone
+			,foo					                    // fein
+			,bdid															// bdid
+			,layouts_gsa.slim_clean_gsa				// Output Layout
+			,false                            // output layout has bdid score field?
+			,score_field                      // bdid_score
 			,dBdidOut                         // Output Dataset
 			,																	// default threscold
 			,																	// use prod version of superfiles
-			,																	// default is to hit prod from dataland, and on prod hit prod.		
+			,																	// default is to hit prod from dataland, and on prod hit prod.
 			,bipv2.xlink_version_set					// boolean indicator set to create bdid's & xlinkids
 			,																	// url
-			,																	// email 
+			,																	// email
 			,p_city_name											// city
 			,fname														// fname
 			,mname														// mname
-			,lname														// lname					
+			,lname														// lname
 );
 
 person_matchset := ['A'];
-			
+
 did_Add.MAC_Match_Flex(
 	ds_non_business,
 	person_matchset,
@@ -142,7 +139,7 @@ layouts_gsa.clean_gsa joinIDs(ds_dist_full_gsa L,ds_dist_slim_gsa R) := transfor
 	self.fname			:= r.fname;
 	self.mname			:= r.mname;
 	self.lname			:= r.lname;
-	self.name_suffix:= r.name_suffix;																
+	self.name_suffix:= r.name_suffix;
 	self.name_score := r.name_score;
 	self.name				:= r.name; //name contains only business names
 	self 						:= L;
@@ -183,11 +180,11 @@ Health_Provider_Services.mac_get_best_lnpid_on_thor (
 			,//SOURCE_RID
 			,out_final,false,38
 			);
-									 
+
 
 baseFile := project(out_final,transform(gsa.Layouts_GSA.layout_base, self := left, self := []));
 //baseFile := project(out_final,transform(gsa.Layouts_GSA.clean_gsa, self := left, self := []));
-			   				
+
 return baseFile;
 
 end;

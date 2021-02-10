@@ -1,4 +1,4 @@
-import ut, did_add, didville, header_slimsort, Business_Header;
+import ut, did_add, Business_Header;
 
 // Clean person names
 edgar_contacts := Edgar.File_Edgar_Contact_In;
@@ -59,11 +59,11 @@ edgar_contacts_filtered := edgar_contacts_combined(confidence in ['0','1'],
 
 edgar_matchset := ['A','P'];
 
-did_add.MAC_Match_Flex(edgar_contacts_filtered, edgar_matchset,						
-	 ssn_field, dob_field, fname, mname,lname, name_suffix, 
+did_add.MAC_Match_Flex(edgar_contacts_filtered, edgar_matchset,
+	 ssn_field, dob_field, fname, mname,lname, name_suffix,
 	 bus_prim_range, bus_prim_name, bus_sec_range, bus_zip, bus_st, bus_phone10,
-	 did,   			
-	 Edgar.Layout_Edgar_Contact_Base, 
+	 did,
+	 Edgar.Layout_Edgar_Contact_Base,
 	 false, DID_Score_field,	//these should default to zero in definition
 	 75,	//dids with a score below here will be dropped
 	 edgar_contacts_did)

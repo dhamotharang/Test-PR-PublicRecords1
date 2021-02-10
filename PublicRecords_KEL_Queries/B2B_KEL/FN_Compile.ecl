@@ -1,6 +1,6 @@
 ﻿//HPCC Systems KEL Compiler Version 1.3.0beta5
 IMPORT KEL13 AS KEL;
-IMPORT $,Email_Data,PublicRecords_KEL,Risk_Indicators,STD,address,header;
+IMPORT $,Email_Data,NID,PublicRecords_KEL,Risk_Indicators,STD,address,header;
 IMPORT CFG_Compile FROM PublicRecords_KEL_Queries.B2B_KEL;
 IMPORT * FROM KEL13.Null;
 EXPORT FN_Compile(CFG_Compile __cfg = CFG_Compile) := MODULE
@@ -133,9 +133,9 @@ EXPORT FN_Compile(CFG_Compile __cfg = CFG_Compile) := MODULE
     __Value := PublicRecords_KEL.ECL_Functions.Fn_STD_Str_FilterOut_ValidChars(Field);
     RETURN __BNT(__Value,__IsNull,KEL.typ.nstr);
   END;
-  SHARED __CC10567 := -99999;
+  SHARED __CC13305 := -99999;
   EXPORT KEL.typ.str FN_Validate_Flag(KEL.typ.nstr __PFieldToCheck) := FUNCTION
-    RETURN MAP(__T(__OR(__NT(__PFieldToCheck),__OP2(__PFieldToCheck,=,__CN(''))))=>(KEL.typ.str)__CC10567,__T(__OP2(FN__fn_Filter_Out_Valid_Chars(__ECAST(KEL.typ.nstr,__FN1(KEL.Routines.ToUpperCase,__FN1(KEL.Routines.TrimBoth,__PFieldToCheck)))),=,__CN('')))=>'0','1');
+    RETURN MAP(__T(__OR(__NT(__PFieldToCheck),__OP2(__PFieldToCheck,=,__CN(''))))=>(KEL.typ.str)__CC13305,__T(__OP2(FN__fn_Filter_Out_Valid_Chars(__ECAST(KEL.typ.nstr,__FN1(KEL.Routines.ToUpperCase,__FN1(KEL.Routines.TrimBoth,__PFieldToCheck)))),=,__CN('')))=>'0','1');
   END;
   EXPORT KEL.typ.nstr FN__fn_Bogus_Names(KEL.typ.nstr __PsNameFirst, KEL.typ.nstr __PsNameMid, KEL.typ.nstr __PsNameLast) := FUNCTION
     sNameFirst := __T(__PsNameFirst);
@@ -254,6 +254,63 @@ EXPORT FN_Compile(CFG_Compile __cfg = CFG_Compile) := MODULE
     __IsNull := __NL(__Pfield1);
     __Value := PublicRecords_KEL.ECL_Functions.Fn_IPValidate(field1);
     RETURN __BNT(__Value,__IsNull,KEL.typ.nstr);
+  END;
+  EXPORT KEL.typ.nbool FN_Is_Fcra_Inquiry(KEL.typ.nstr __PFunctionDescription) := FUNCTION
+    FunctionDescription := __T(__PFunctionDescription);
+    __IsNull := __NL(__PFunctionDescription);
+    __Value := PublicRecords_KEL.ECL_Functions.Common_Functions.IsFcra(FunctionDescription);
+    RETURN __BNT(__Value,__IsNull,KEL.typ.nbool);
+  END;
+  EXPORT KEL.typ.nbool FN_Is_Non_Fcra_Inquiry(KEL.typ.nstr __PFunctionDescription) := FUNCTION
+    FunctionDescription := __T(__PFunctionDescription);
+    __IsNull := __NL(__PFunctionDescription);
+    __Value := PublicRecords_KEL.ECL_Functions.Common_Functions.IsNonFcra(FunctionDescription);
+    RETURN __BNT(__Value,__IsNull,KEL.typ.nbool);
+  END;
+  EXPORT KEL.typ.nbool FN_Is_Inquiry_S_S_N_Match(KEL.typ.nstr __PSSN1, KEL.typ.nstr __PSSN2) := FUNCTION
+    RETURN __OP2(__PSSN1,=,__PSSN2);
+  END;
+  EXPORT KEL.typ.nbool FN_Is_Inquiry_Address_Match(KEL.typ.nint __Pzip51, KEL.typ.nstr __PPrimRange1, KEL.typ.nstr __PPrimName1, KEL.typ.nstr __PSecRange1, KEL.typ.nstr __PPreDir1, KEL.typ.nstr __PSuffix1, KEL.typ.nint __Pzip52, KEL.typ.nstr __PPrimRange2, KEL.typ.nstr __PPrimName2, KEL.typ.nstr __PSecRange2, KEL.typ.nstr __PPreDir2, KEL.typ.nstr __PSuffix2) := FUNCTION
+    RETURN __AND(__AND(__AND(__AND(__AND(__OP2(__Pzip51,=,__Pzip52),__CN(__DEFAULT(__PPrimRange1,'') = __DEFAULT(__PPrimRange2,''))),__CN(__DEFAULT(__PPrimName1,'') = __DEFAULT(__PPrimName2,''))),__CN(__DEFAULT(__PSecRange1,'') = __DEFAULT(__PSecRange2,''))),__CN(__DEFAULT(__PPreDir1,'') = __DEFAULT(__PPreDir2,''))),__CN(__DEFAULT(__PSuffix1,'') = __DEFAULT(__PSuffix2,'')));
+  END;
+  EXPORT KEL.typ.nbool FN_Is_Inquiry_Phone_Match(KEL.typ.nint __PPhone1, KEL.typ.nint __PPhone2) := FUNCTION
+    RETURN __OP2(__PPhone1,=,__PPhone2);
+  END;
+  EXPORT KEL.typ.nbool FN_Is_D_O_B_Match(KEL.typ.nkdate __PDOB1, KEL.typ.nkdate __PDOB2) := FUNCTION
+    RETURN __OP2(__PDOB1,=,__PDOB2);
+  END;
+  EXPORT KEL.typ.nkdate FN_Time_Stamp_To_Date(KEL.typ.ntimestamp __Px) := FUNCTION
+    x := __T(__Px);
+    __IsNull := __NL(__Px);
+    __Value := (STRING) x[..8];
+    RETURN __BNT(__Value,__IsNull,KEL.typ.nkdate);
+  END;
+  EXPORT KEL.typ.nstr FN_Standardize_Nickname(KEL.typ.nstr __PFirstName) := FUNCTION
+    FirstName := __T(__PFirstName);
+    __IsNull := __NL(__PFirstName);
+    __Value := NID.PreferredFirstNew(FirstName, TRUE);
+    RETURN __BNT(__Value,__IsNull,KEL.typ.nstr);
+  END;
+  EXPORT KEL.typ.bool FN_Is_First_Name_Match(KEL.typ.nstr __PFirstName1, KEL.typ.nstr __PFirstName2) := FUNCTION
+    RETURN MAP(__T(__OR(__NT(__PFirstName1),__NT(__PFirstName2)))=>FALSE,__T(__OP2(__PFirstName1,=,__PFirstName2))=>TRUE,__T(__OP2(FN_Standardize_Nickname(__ECAST(KEL.typ.nstr,__PFirstName1)),=,FN_Standardize_Nickname(__ECAST(KEL.typ.nstr,__PFirstName2))))=>TRUE,__T(__AND(__OP2(__FN1(LENGTH,__PFirstName1),=,__CN(1)),__FN2(KEL.Routines.StartsWith,__PFirstName2,__PFirstName1)))=>TRUE,__T(__AND(__AND(__OP2(__FN1(LENGTH,__PFirstName1),>,__CN(2)),__OP2(__FN1(LENGTH,__PFirstName2),>,__CN(2))),__OR(__OR(__OR(__FN2(KEL.Routines.EndsWith,__PFirstName1,__PFirstName2),__FN2(KEL.Routines.EndsWith,__PFirstName2,__PFirstName1)),__FN2(KEL.Routines.StartsWith,__PFirstName1,__PFirstName2)),__FN2(KEL.Routines.StartsWith,__PFirstName2,__PFirstName1))))=>TRUE,__T(__AND(__OR(__OP2(__FN1(LENGTH,__PFirstName1),>,__CN(4)),__OP2(__FN1(LENGTH,__PFirstName2),>,__CN(4))),__OP2(FN_Levenshtein_Similarity(__ECAST(KEL.typ.nstr,__PFirstName1),__ECAST(KEL.typ.nstr,__PFirstName2)),>,__CN(0.6))))=>TRUE,__T(__AND(__AND(__OP2(__FN1(LENGTH,__PFirstName1),<,__CN(5)),__OP2(__FN1(LENGTH,__PFirstName2),<,__CN(5))),__OP2(FN_Levenshtein_Similarity(__ECAST(KEL.typ.nstr,__PFirstName1),__ECAST(KEL.typ.nstr,__PFirstName2)),>,__CN(0.5))))=>TRUE,FALSE);
+  END;
+  EXPORT KEL.typ.bool FN_Is_Last_Name_Match(KEL.typ.nstr __PLastName1, KEL.typ.nstr __PLastName2) := FUNCTION
+    RETURN MAP(__T(__OR(__NT(__PLastName1),__NT(__PLastName2)))=>FALSE,__T(__OP2(__PLastName1,=,__PLastName2))=>TRUE,__T(__AND(__AND(__OP2(__FN1(LENGTH,__PLastName1),>,__CN(2)),__OP2(__FN1(LENGTH,__PLastName2),>,__CN(2))),__OR(__OR(__OR(__FN2(KEL.Routines.EndsWith,__PLastName1,__PLastName2),__FN2(KEL.Routines.EndsWith,__PLastName2,__PLastName1)),__FN2(KEL.Routines.StartsWith,__PLastName1,__PLastName2)),__FN2(KEL.Routines.StartsWith,__PLastName2,__PLastName1))))=>TRUE,__T(__AND(__OR(__OP2(__FN1(LENGTH,__PLastName1),>,__CN(4)),__OP2(__FN1(LENGTH,__PLastName2),>,__CN(4))),__OP2(FN_Levenshtein_Similarity(__ECAST(KEL.typ.nstr,__PLastName1),__ECAST(KEL.typ.nstr,__PLastName2)),>,__CN(0.6))))=>TRUE,__T(__AND(__AND(__OP2(__FN1(LENGTH,__PLastName1),<,__CN(5)),__OP2(__FN1(LENGTH,__PLastName2),<,__CN(5))),__OP2(FN_Levenshtein_Similarity(__ECAST(KEL.typ.nstr,__PLastName1),__ECAST(KEL.typ.nstr,__PLastName2)),>,__CN(0.5))))=>TRUE,FALSE);
+  END;
+  EXPORT KEL.typ.nbool FN_Within_F1_Y(KEL.typ.nkdate __PInputDate, KEL.typ.nkdate __Preference) := FUNCTION
+    RETURN __AND(__AND(__OP2(__PInputDate,<=,__FN4(KEL.Routines.AdjustCalendar,__Preference,__CN(-1),__CN(0),__CN(0))),__OP2(__PInputDate,>=,__FN4(KEL.Routines.AdjustCalendar,__Preference,__CN(-2),__CN(0),__CN(0)))),__FN1(KEL.Routines.IsValidDate,__PInputDate));
+  END;
+  EXPORT KEL.typ.nint FN_G_E_T___S_T_O_R_E_D___G_L_B_P_U_R_P_O_S_E(KEL.typ.nstr __PStoredName) := FUNCTION
+    StoredName := __T(__PStoredName);
+    __IsNull := __NL(__PStoredName);
+    __Value := PublicRecords_KEL.MAS_get.Gateway.GatewayFunctions.GrabGLBPurpose(StoredName);
+    RETURN __BNT(__Value,__IsNull,KEL.typ.nint);
+  END;
+  EXPORT KEL.typ.nint FN_G_E_T___S_T_O_R_E_D___D_P_P_A_P_U_R_P_O_S_E(KEL.typ.nstr __PStoredName) := FUNCTION
+    StoredName := __T(__PStoredName);
+    __IsNull := __NL(__PStoredName);
+    __Value := PublicRecords_KEL.MAS_get.Gateway.GatewayFunctions.GrabDPPAPurpose(StoredName);
+    RETURN __BNT(__Value,__IsNull,KEL.typ.nint);
   END;
   EXPORT KEL.typ.str FN__map_Filing_Type(KEL.typ.nstr __PfilingType) := FUNCTION
     RETURN MAP(__T(__OP2(__FN1(KEL.Routines.ToUpperCase,__FN1(TRIM,__PfilingType)),IN,__CN(['UCC-3 TERMINATION','TERMINATION','UCC3 TERMINATION'])))=>'1',__T(__OP2(__FN1(KEL.Routines.ToUpperCase,__FN1(TRIM,__PfilingType)),=,__CN('CORRECTION')))=>'2',__T(__OP2(__FN1(KEL.Routines.ToUpperCase,__FN1(TRIM,__PfilingType)),=,__CN('AMENDMENT')))=>'3',__T(__OP2(__FN1(KEL.Routines.ToUpperCase,__FN1(TRIM,__PfilingType)),=,__CN('ASSIGNMENT')))=>'4',__T(__OP2(__FN1(KEL.Routines.ToUpperCase,__FN1(TRIM,__PfilingType)),=,__CN('CONTINUATION')))=>'5',__T(__OP2(__FN1(KEL.Routines.ToUpperCase,__FN1(TRIM,__PfilingType)),=,__CN('FILING OFFICER STATEMENT')))=>'6',__T(__OP2(__FN1(KEL.Routines.ToUpperCase,__FN1(TRIM,__PfilingType)),=,__CN('INITIAL FILING')))=>'7','7');

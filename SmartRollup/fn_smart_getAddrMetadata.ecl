@@ -1,4 +1,4 @@
-﻿IMPORT doxie,Address,Advo,Advo_Services,iesp,PersonReports;
+﻿IMPORT doxie,Address,Advo,Advo_Services,iesp,PersonReports, smartRollup;
 
 EXPORT fn_smart_getAddrMetadata := MODULE
 	
@@ -130,7 +130,7 @@ EXPORT fn_smart_getAddrMetadata := MODULE
 											      self := [];
 												));
 											 	 
-		outAddrWSourceInfo		:=   PersonReports.functions.GetAddressIndicators(HeaderRecsDS,param);
+		outAddrWSourceInfo		:=  SmartRollup.fn_smart_getSourceCounts.GetAddressIndicators(HeaderRecsDS,param);               
 		addressesWithSourceInfo := join(addresses, outAddrWSourceInfo,
 		                                left.address.state = right.address.state and
 								 left.address.city = right.address.city and
@@ -148,6 +148,4 @@ EXPORT fn_smart_getAddrMetadata := MODULE
          FinalAddress :=   if ( param.include_AddressSourceInfo, addressesWithSourceInfo,  addresses);	
 		 return FinalAddress;
       END;
-
-
-END;
+  END;

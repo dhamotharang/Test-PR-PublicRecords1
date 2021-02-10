@@ -1,7 +1,7 @@
 ﻿//This is the code to execute in a builder window
 #OPTION('multiplePersistInstances', FALSE);
-#workunit('name','BizLinkFull.BWR_Scrubs - Checking field validity in a file - SALT V3.11.8');
-IMPORT BizLinkFull,SALT311;
+#workunit('name','BizLinkFull.BWR_Scrubs - Checking field validity in a file - SALT V4.4.1');
+IMPORT BizLinkFull,SALT44;
 infile := BizLinkFull.File_BizHead;
 mod_scrubs := BizLinkFull.Scrubs;
 expandedfile := mod_scrubs.FromNone(infile).ExpandedInfile;
@@ -16,3 +16,4 @@ PARALLEL(
          OUTPUT(ENTH(errsGlobal, 1000), ALL, NAMED('ScrubsErrs')),
          OUTPUT(standardStats, ALL, NAMED('StandardStats'))
         );
+ 

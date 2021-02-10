@@ -7,6 +7,7 @@ EXPORT layout_report := RECORDOF(doxie_cbrs.all_base_records_prs());
   WORK IN PROGRESS: WILL BE DELETED LATER.
 
   ----->>> DONE:
+
   recbesr := $.layouts.best_info_record; // doxie_cbrs.fn_best_information
   reccompverr := RECORDOF(iesp.share.t_CompanyVerification);
   recphonesumr := RECORDOF(iesp.phonesummary.t_PhoneSummaryRecord); //doxie.fn_get_phone_summary
@@ -23,124 +24,23 @@ EXPORT layout_report := RECORDOF(doxie_cbrs.all_base_records_prs());
   recljur := $.layouts.lj_ucc_record_slim;
   recljur_v2 := $.layouts.lj_ucc_record_slim_v2;
   recprfr := $.layouts.profile_record;
-  recprfr_v2 := $.layouts.profile_record_v2; // doxie_cbrs.profile_records_v2 -> doxie_cbrs.Corporation_Filings_records_v2q
-  
+  recprfr_v2 := $.layouts.profile_record_v2; // doxie_cbrs.profile_records_v2 -> doxie_cbrs.Corporation_Filings_records_v2
+  recragr := $.layouts.registered_agent_record; // doxie_cbrs.registered_agents_records
+  recbrer := doxie_cbrs.layout_business_registration_records; // doxie_cbrs.business_registration_records_prs_max -> .. -> doxie_cbrs_raw.business_registrations
+  recconr := doxie_cbrs.layout_contact.slim_rec_with_titles; // doxie_cbrs.contactrecords_prs_trimmed -> doxie_cbrs.contactrecords_standardized
+  recexer := doxie_cbrs.layout_contact.exec_with_titles_rec; // doxie_cbrs.executives_records -> doxie_cbrs.contact_records -> doxie_cbrs.contact_records_raw 
+  recpror := doxie_cbrs.layout_property_records; // doxie_cbrs.property_records
+  recpror_v2 := LN_PropertyV2_Services.layouts.out_wider; // doxie_cbrs.property_records_v2 -> LN_PropertyV2_Services.Embed_records
+  recnodr := doxie_cbrs.layouts.foreclosure_record; // doxie_cbrs.foreclosure_records
+  recforr := doxie_cbrs.layouts.foreclosure_record;  // doxie_cbrs.foreclosure_records
+  recmvrr := doxie_cbrs.layouts.mvr_record; // doxie_cbrs.Motor_Vehicle_Records_trimmed -> .. -> Doxie_Raw.Veh_Raw
+  recmvrr_v2 := doxie_cbrs.layouts.mvr_record_v2; // doxie_cbrs.Motor_Vehicle_Records_trimmed_v2 -> .. -> VehicleV2_Services.Functions.GetVehicleReport
+  recwctr := doxie_cbrs.layouts.watercraft_record; // doxie_cbrs.Watercraft_Records_trimmed 
+  recairr := doxie_cbrs.layouts.faa_record; // // doxie_cbrs.Aircraft_Records_trimmed
+  recidor :=doxie_cbrs.layouts.internet_domains_slim_record;// doxie_cbrs.Internet_Domains_records_trimmed
+  recsrcr := $.layout_report_src.source_counts; 
+
   ----->>> TO BE DONE:
-  recsrcr := $.layouts.souce_counts; 
-  
-  recbrer := RECORD // doxie_cbrs.business_registration_records_prs_max -> .. -> doxie_cbrs_raw.business_registrations
-    UNSIGNED1 level;
-    doxie_cbrs.layout_business_registration_records;
-  END;
-
-  recragr := RECORD // doxie_cbrs.registered_agents_records -> .. -> doxie_cbrs.Corporation_Filings_records
-    Corp.Layout_Corp_Base.bdid;
-    Corp.Layout_Corporate_Direct_Corp_In.corp_ra_name;
-    Corp.Layout_Corp_Base.dt_last_seen;
-    QSTRING10 prim_range;
-    STRING2 predir;
-    QSTRING28 prim_name;
-    QSTRING4 addr_suffix;
-    STRING2 postdir;
-    QSTRING5 unit_desig;
-    QSTRING8 sec_range;
-    QSTRING25 city;
-    STRING2 state;
-    QSTRING5 zip;
-    QSTRING4 zip4;
-  END;
-
-  contactrec := doxie_cbrs.layout_contacts_standardized;
-  company_title_rec := RECORD
-    contactrec.company_title;
-    contactrec.bdid;
-    contactrec.company_name;
-  END;
-  recconr := RECORD // doxie_cbrs.contactrecords_prs_trimmed -> doxie_cbrs.contactrecords_standardized
-    contactrec.bdid;
-    contactrec.did;
-    contactrec.dt_last_seen;
-    STRING9 ssn;
-    contactrec.fname;
-    contactrec.mname;
-    contactrec.lname;
-    contactrec.name_suffix;
-    contactrec.prim_range;
-    contactrec.predir;
-    contactrec.prim_name;
-    contactrec.addr_suffix;
-    contactrec.postdir;
-    contactrec.unit_desig;
-    contactrec.sec_range;
-    contactrec.city;
-    contactrec.state;
-    STRING5 zip;
-    STRING4 zip4;
-    DATASET(company_title_rec) company_titles {MAXCOUNT(25)};
-  END;
-
-  // safe to use doxie_cbrs.layout_contacts_standardized (instead of doxie_cbrs.layout_contacts) below.
-  // diff: zip, zip4, phone, company_zip, company_zip4, company_phone, company_fein
-
-  execrec := doxie_cbrs.layout_contacts;
-  exect_title_rec := RECORD
-    execrec.company_title;
-    execrec.bdid;
-    execrec.company_name;
-  END;
-  exec_record_base := RECORD
-    execrec.bdid;
-    execrec.did;
-    execrec.dt_last_seen;
-    execrec.fname;
-    execrec.mname;
-    execrec.lname;
-    execrec.name_suffix;
-  END;
-  recexer := RECORD // doxie_cbrs.executives_records -> doxie_cbrs.contact_records -> doxie_cbrs.contact_records_raw 
-    exec_record_base;
-    DATASET(exect_title_rec) company_titles {MAXCOUNT(25)};
-    UNSIGNED2 title_rank;
-  END;
-
-  recpror := RECORD // doxie_cbrs.property_records
-    doxie_cbrs.layout_property_records;
-  END;
-
-  recpror_v2 := RECORD // doxie_cbrs.property_records_v2 -> LN_PropertyV2_Services.Embed_records
-    LN_PropertyV2_Services.layouts.out_wider;
-  END;
-
-  recnodr := RECORD // doxie_cbrs.foreclosure_records
-    iesp.foreclosure.t_ForeclosureReportRecord;
-    BOOLEAN foreclosed;
-  END;
-
-  recforr := RECORD // doxie_cbrs.foreclosure_records
-    iesp.foreclosure.t_ForeclosureReportRecord;
-    BOOLEAN foreclosed;
-  END;
-
-  recmvrr := RECORD, MAXLENGTH(doxie_crs.maxlength_mv) // doxie_cbrs.Motor_Vehicle_Records_trimmed -> .. -> Doxie_Raw.Veh_Raw
-    Doxie.Layout_VehicleSearch;
-  END;
-  recmvrr_v2 := RECORD // doxie_cbrs.Motor_Vehicle_Records_trimmed_v2 -> .. -> VehicleV2_Services.Functions.GetVehicleReport
-    VehicleV2_Services.Layouts.Layout_Report_Batch_New;
-  END;
-
-  recwctr := RECORD, MAXLENGTH(doxie_crs.maxlength_wc) // doxie_cbrs.Watercraft_Records_trimmed -> .. -> Doxie_Raw.AirCraft_Raw
-    watercraftV2_Services.layouts.report_out;
-  END;
-
-  recairr := RECORD, MAXLENGTH(doxie_crs.maxlength_ac) // doxie_cbrs.Aircraft_Records_trimmed
-    doxie_crs.layout_Faa_Aircraft_records;
-  END;
-
-  intrec := domains.Layout_Whois_Base;
-  recidor := RECORD //  doxie_cbrs.Internet_Domains_records_trimmed
-    intrec.bdid;
-    intrec.domain_name;
-  END;
 
   plicrec := RECORD
     Prof_LicenseV2.Layouts_ProfLic.Layout_Base - [global_sid, record_sid];

@@ -1,1 +1,2 @@
-export file_CBDAttributes := dataset('~thor_data400::base::testseed_cbdattributes', Layout_CBDAttributes, csv(maxlength(8192)));
+﻿IMPORT Data_Services,Seed_Files;
+EXPORT file_CBDAttributes := DATASET(Data_Services.Data_location.Prefix('NONAMEGIVEN')+'~thor_data400::base::testseed_cbdattributes', Seed_Files.Layout_CBDAttributes, CSV(MAXLENGTH(20000), HEADING(1)));

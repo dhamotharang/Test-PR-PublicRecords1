@@ -54,7 +54,8 @@ module
 																															// iesp.property_value_report.t_PropertyValueReportResponseEx								pGatewayResponse,
 																															unsigned																																	combined_errors,
 																															boolean																																		pLNPropResultsExists	= false,
-																															boolean                                                                   isHomeGateway = false                            
+																															boolean                                                                   isHomeGateway = false,                            
+																															boolean                                                                   IsOptedOut = false                            
 																														)	:=
 	function	
 		boolean		valid_account		:=	pInsContext.Account.MBSId	=	''			or
@@ -77,11 +78,13 @@ module
 			self.ReceiptDate								:=	iesp.ECL2ESP.toDate((INTEGER)Std.Date.Today());
 			self.CompletionDate							:=	iesp.ECL2ESP.toDate((INTEGER)Std.Date.Today());
 			self.ProcessingStatus						:=	map(	valid_account																																		=>	'4',
+																								pLNPropResultsExists AND IsOptedOut	AND ~isHomeGateway          								=>	'6',
 																								pInMod.ReportType	not in	['K','L']	AND ~isHomeGateway          								=>	'7',
 			// TODO: there's slight change of logic in relation to "living square footage" here:
 																								combined_errors & required_input	>	0																						=>	'5',
 																								// exists(pGatewayResponse.Response._Header.Exceptions)														=>	'8',
 																								// pGatewayResponse.Response.Result.Report.Properties[1].Response.ErrorCode	=	'0'	=>	'1',
+                                                 isHomeGateway AND pLNPropResultsExists AND IsOptedOut                          =>  '9',
                                                  isHomeGateway AND pLNPropResultsExists                                         =>  '1',
 																								'2'
 																							);
@@ -89,6 +92,7 @@ module
 			                                          valid_account												=>	'4',
 																								pInMod.ReportType	not in	['I','K','P']	=>	'7',
 																								insufficient_address								=>	'5',
+																								pLNPropResultsExists AND IsOptedOut =>	'6',
 																								pLNPropResultsExists								=>	'1',
 																								'2'
 																							);
@@ -627,12 +631,15 @@ module
 	
 	// Property Data Report - only for report types 'K' and 'P'
 	// Format the results to the ESP layout
-	export iesp.property_info.t_PropertyDataItem	Convert2PropDataItem (PropertyCharacteristics_Services.Layouts.Payload	pInput)	:=
+	export iesp.property_info.t_PropertyDataItem	Convert2PropDataItem (PropertyCharacteristics_Services.Layouts.Payload	pInput, BOOLEAN IsOptedOut)	:=
 		transform
 			self.DataSource								:=	map(	pInput.vendor_source = 'D' AND pInMod.ResultOption IN [Constants.Default_Option, Constants.Default_Plus_Option]	=>	'A',	//FARES
-																							pInMod.ResultOption = Constants.Default_Plus_Option => 'B DEFAULT PLUS',
-																							pInMod.ResultOption = Constants.Selected_Source_Option => 'F SELECTED SOURCE',
+																							pInMod.ResultOption = Constants.Default_Plus_Option AND IsOptedOut => 'B DEFAULT PLUS NO HLD',
+																							pInMod.ResultOption = Constants.Default_Plus_Option => 'B DEFAULT PLUS',																							
+																							pInput.vendor_source =	'F' AND pInMod.ResultOption = Constants.Selected_Source_Option => 'F SELECTED SOURCE',
+																							pInput.vendor_source =	'G' AND pInMod.ResultOption = Constants.Selected_Source_Option => 'G SELECTED SRCE NO HLD',
 																							pInput.vendor_source =	'F' AND pInMod.ResultOption = Constants.Selected_Source_Plus_Option => 'F SELECTED SOURCE PLUS',
+																							pInput.vendor_source =	'G' AND pInMod.ResultOption = Constants.Selected_Source_Plus_Option => 'G SEL SRCE PLUS NO HLD',
 																							pInput.vendor_source =	'E' AND pInMod.ResultOption = Constants.Selected_Source_Plus_Option => 'E HOME LISTING DATA',
 																							pInput.vendor_source =	'D' AND pInMod.ResultOption = Constants.Selected_Source_Plus_Option => 'D PUBLIC RECORD SOURCE A',
 																							pInput.vendor_source =	'C' AND pInMod.ResultOption = Constants.Selected_Source_Plus_Option => 'C PUBLIC RECORD SOURCE B',

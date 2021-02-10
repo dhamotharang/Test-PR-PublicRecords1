@@ -53,6 +53,8 @@ export t_Identifier2Option := record (iesp.share.t_BaseSearchOption)
 	dataset(iesp.share.t_StringArrayItem) WatchLists {xpath('WatchLists/WatchList'), MAXCOUNT(Constants.MaxCountWatchLists)};
 	boolean UseDOBFilter {xpath('UseDOBFilter')};
 	integer DOBRadius {xpath('DOBRadius')};
+	integer AgeThreshold {xpath('AgeThreshold')};
+	integer CVIThreshold {xpath('CVIThreshold')};
 	boolean PoBoxCompliance {xpath('PoBoxCompliance')};
 	iesp.instantid.t_InstantIDModels IncludeModels {xpath('IncludeModels')};
 	string RedFlagsReport {xpath('RedFlagsReport')};
@@ -65,6 +67,7 @@ export t_Identifier2Option := record (iesp.share.t_BaseSearchOption)
 	boolean DiscoverDOB {xpath('DiscoverDOB')};
 	boolean ValidateDiscoveredDOBToSSN {xpath('ValidateDiscoveredDOBToSSN')};
 	boolean ReturnMultipleIdentities {xpath('ReturnMultipleIdentities')};
+	integer MaxIdentities {xpath('MaxIdentities')};
 	boolean VerifySSNExistsOnAnyAddress {xpath('VerifySSNExistsOnAnyAddress')};
 	t_VerifyInput VerifyInput {xpath('VerifyInput')};
 	t_VerifyInputAddressOccupancy VerifyInputAddressOccupancy {xpath('VerifyInputAddressOccupancy')};
@@ -82,7 +85,7 @@ export t_Identifier2Option := record (iesp.share.t_BaseSearchOption)
 	boolean IncludeAllRiskIndicators {xpath('IncludeAllRiskIndicators')};
 	string CustomDataFilter {xpath('CustomDataFilter')};
 	string VerifyInputAddressMatchesKnownBad {xpath('VerifyInputAddressMatchesKnownBad')};//hidden[internal]
-	integer OFACVersion {xpath('OFACVersion')};
+	integer OFACVersion {xpath('OFACVersion')};//hidden[internal]
 end;
 		
 export t_Identifier2SearchBy := record
@@ -102,6 +105,8 @@ export t_Identifier2SearchBy := record
 	iesp.instantid.t_Passport Passport {xpath('Passport')};
 	string Gender {xpath('Gender')};
 	string UniqueId {xpath('UniqueId')};
+	unsigned GovIdThreshold {xpath('GovIdThreshold')};
+	dataset(share.t_StringArrayItem) GovIdInAttributes {xpath('GovIdInAttributes/GovIdInAttribute'), MAXCOUNT(iesp.Constants.Identifier2c.MaxGovIdAttributes)};//values['1','2','3','4','5','6','7','8','9','10','11','12','13','14','15','16','17','18','19','20','21','22','23','24','25','26','27','28','29','30','31','32','33','34','35','36','37','38','39','40','41','42','']
 end;
 		
 export t_PropertyOwnership := record
@@ -208,6 +213,16 @@ export t_InputAddressRisk := record
 	boolean AddressIsNotABusiness {xpath('AddressIsNotABusiness')};
 end;
 		
+export t_GovIdAttributes := record
+	string Attribute {xpath('Attribute')};
+	unsigned Result {xpath('Result')};
+end;
+		
+export t_GovIdOutResult := record
+	boolean GovIdPass {xpath('GovIdPass')};
+	dataset(t_GovIdAttributes) GovIdAttributes {xpath('GovIdAttributes/GovIdAttribute'), MAXCOUNT(iesp.Constants.Identifier2c.MaxGovIdAttributes)};
+end;
+		
 export t_InstantIDResultNoEcho := record
 	string UniqueId {xpath('UniqueId')};
 	iesp.instantid.t_VerifiedInput VerifiedInput {xpath('VerifiedInput')};
@@ -260,6 +275,7 @@ export t_Identifier2Result := record (t_InstantIDResultNoEcho)
 	t_InputAddressCurrentOccupant InputAddressCurrentOccupant {xpath('InputAddressCurrentOccupant')};
 	t_InputAddressEverOccupant InputAddressEverOccupant {xpath('InputAddressEverOccupant')};
 	t_InputAddressRisk InputAddressRisk {xpath('InputAddressRisk')};
+	t_GovIdOutResult GovIdOutResult {xpath('GovIdOutResult')};
 end;
 		
 export t_Identifier2Response := record

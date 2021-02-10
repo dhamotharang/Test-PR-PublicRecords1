@@ -8,7 +8,7 @@ EXPORT Functions := MODULE
  SHARED _rin_Layout := RiskIntelligenceNetwork_Services.Layouts;
  SHARED _sharedLayout := FraudShared_Services.Layouts;
 
- EXPORT getPublicRecordsAppends(DATASET(FraudShared_Services.Layouts.BatchInExtended_rec) ds_in,
+ EXPORT getPublicRecordsAppends(DATASET(_sharedLayout.BatchInExtended_rec) ds_in,
                                 DATASET(DidVille.Layout_Did_OutBatch) ds_best_in,
                                 RiskIntelligenceNetwork_Services.IParam.Params params) := FUNCTION
 
@@ -20,29 +20,28 @@ EXPORT Functions := MODULE
   recs_dl := _PRAppends.GetDL();
   recs_boca_shell := _PRAppends.GetBocaShell();
   recs_ip_meta_data := _PRAppends.GetIPMetaData();
-
-  _rin_Layout.realtime_appends_rec xfm_Compilation(_sharedLayout.BatchInExtended_rec L) := TRANSFORM
-    SELF.batchin_rec := L;
-    SELF.crim_appends := recs_Criminal;
-    SELF.advo_appends := recs_advo;
-    SELF.pr_best_appends := ds_best_in;
-    SELF.prepaid_phone_appends := recs_prepaid_phone;
-    SELF.dl_appends := recs_dl;
-    SELF.boca_shell_appends := recs_boca_shell;
-    SELF.ip_meta_data := recs_ip_meta_data;
-  END;
-
-  final_recs := PROJECT(ds_in, xfm_Compilation(LEFT));
-
-  // output(ds_appends_in, named('ds_appends_in'));
+  
+  ds_in_w_appends := PROJECT(ds_in, TRANSFORM(_rin_Layout.realtime_appends_rec,
+                                     SELF.batchin_rec := LEFT,
+                                     SELF.crim_appends := recs_Criminal,
+                                     SELF.advo_appends := recs_advo,
+                                     SELF.pr_best_appends := ds_best_in,
+                                     SELF.prepaid_phone_appends := recs_prepaid_phone,
+                                     SELF.dl_appends := recs_dl,
+                                     SELF.boca_shell_appends := recs_boca_shell,
+                                     SELF.ip_meta_data := recs_ip_meta_data));
+  
+  // output(ds_in, named('ds_in'));
   // output(recs_Criminal, named('recs_Criminal'));
   // output(recs_advo, named('recs_advo'));
   // output(ds_best_in, named('ds_best_in'));
   // output(recs_prepaid_phone, named('recs_prepaid_phone'));
   // output(recs_dl, named('recs_dl'));
   // output(recs_boca_shell, named('recs_boca_shell'));
+  // output(recs_ip_meta_data, named('recs_ip_meta_data'));
+  // output(ds_in_w_appends, named('ds_in_w_appends'));
 
-  return final_recs;
+  return ds_in_w_appends;
  END;
  
  EXPORT getRealtimePRAppends(DATASET(DidVille.Layout_Did_OutBatch) ds_best_in,
@@ -231,7 +230,7 @@ EXPORT Functions := MODULE
               '');
  END;
  
- EXPORT GetDeltabaseLogDataSet (DATASET(FraudShared_Services.Layouts.BatchInExtended_rec) ds_in,
+ EXPORT GetDeltabaseLogDataSet (DATASET(_sharedLayout.BatchInExtended_rec) ds_in,
                                 RiskIntelligenceNetwork_Services.IParam.Params params) := FUNCTION
 
   today := STD.Date.CurrentDate(True);
@@ -313,5 +312,10 @@ EXPORT Functions := MODULE
               _Constants.EntityType.DLNUMBER => _Constants.Fragment_Types.DRIVERS_LICENSE_NUMBER_FRAGMENT,
               '');
  END;
+ 
+ EXPORT hasValue(string s1) := FUNCTION
+  RETURN s1 != '';
+ END;
+ 
 
 END;

@@ -1,15 +1,15 @@
-import seed_files,data_services;
+﻿IMPORT Data_Services,Seed_Files;
 
-d := dataset(data_services.data_location.prefix() + 'thor_data400::base::testseed_identifier2', seed_files.layout_identifier2, csv(quote('"')));
+d := DATASET(Data_Services.Data_location.Prefix('NONAMEGIVEN') + '~thor_data400::base::testseed_identifier2', Seed_Files.layout_identifier2, CSV(QUOTE('"'),HEADING(1)));
 
-newrec := record
-	data16 hashvalue := seed_files.Hash_InstantID(d.name_first,d.name_last,d.ssn,'',d.zip5,d.home_phone,'');
+newrec := RECORD
+	DATA16 hashvalue := seed_files.Hash_InstantID(d.name_first,d.name_last,d.ssn,'',d.zip5,d.home_phone,'');
 	d;
-end;
+END;
 
-newtable := table(d,newrec);
+newtable := TABLE(d,newrec);
 
-export Key_Identifier2 := index(newtable,{table_name,hashvalue},
+EXPORT Key_Identifier2 := INDEX(newtable,{table_name,hashvalue},
                                   {newtable},
-																	data_services.data_location.prefix() + 'thor_data400::key::testseed::qa::identifier2');
+																	Data_Services.Data_location.Prefix('NONAMEGIVEN') + '~thor_data400::key::testseed::qa::identifier2');
 																	

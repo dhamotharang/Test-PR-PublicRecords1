@@ -1,4 +1,4 @@
-﻿IMPORT Business_Risk_BIP, MDR, STD, BIPV2, Header, PublicRecords_KEL;
+﻿IMPORT Business_Risk_BIP, MDR, STD, BIPV2, Header, PublicRecords_KEL, risk_indicators;
 
 /*
 -99999: No LexID or input needed is not populated
@@ -13,28 +13,36 @@ EXPORT Constants := MODULE
 	EXPORT INTEGER MISSING_INPUT_DATA_INT := -99999;
 	EXPORT INTEGER NO_DATA_FOUND_INT := -99998;
   
-	EXPORT INTEGER DEFAULT_JOIN_LIMIT := 10000;
-	EXPORT INTEGER DEFAULT_JOIN_LIMIT_SLIM := 2000;
+	EXPORT INTEGER  BUSINESS_CONTACT_PROPERTY_LIMIT := 10000;
+	
 	EXPORT INTEGER BUSINESS_HEADER_LIMIT := 25000;
-	EXPORT INTEGER BUSINESS_HEADER_CONTACT_LIMIT := 20000;
-	EXPORT INTEGER CORTERA_TRADELINE_LIMIT := 25000;
-	EXPORT INTEGER UCC_JOIN_LIMIT := 1000;
-	EXPORT INTEGER PROPERTY_DID_JOIN_LIMIT := 2000;
-	EXPORT INTEGER PROPERTY_ADDRESS_JOIN_LIMIT := 7500;
+	EXPORT INTEGER PROPERTY_DID_JOIN_LIMIT := 1000;
+	EXPORT INTEGER PROPERTY_ADDRESS_JOIN_LIMIT := 1000;
+	EXPORT INTEGER PROPERTY_KFETCH_JOIN_LIMIT := 2000;
 	EXPORT INTEGER VEHICLE_JOIN_LIMIT := 5000;
-	EXPORT INTEGER REL_HHID_Join_LIMIT := 100;
-	EXPORT INTEGER Limit_Inquiries := 1000;
+	EXPORT INTEGER HHID_Join_LIMIT := 100;
 	EXPORT INTEGER Limit_Inquiries_Kfetch := 5000;
 	export INTEGER MAX_OVERRIDE_LIMIT := 1000;
 	export INTEGER MAX_OVERRIDE_LIMIT_SLIM := 100;
+	
+	EXPORT INTEGER Default_Atmost_1000 := 1000;
+	EXPORT INTEGER Default_Atmost_100 := 100;
+	EXPORT INTEGER Default_Atmost_2000 := 2000;
+	EXPORT INTEGER Default_Atmost_10000 := 10000;
+	
 
 	EXPORT INTEGER PROPERTY_JOIN_LIMIT := 10;
 	EXPORT INTEGER PROPERTY_SEARCH_FID_JOIN_LIMIT := 50;
 	
+	EXPORT STRING HouseHoldCORE := 'CORE';
+	EXPORT STRING HouseHoldCOREVNOSSN := 'COREVNOSSN';
+	
+
 	//These were made up by MAS
 	EXPORT CCW_Source_MAS :=	'CCW';//conceal carry
 	EXPORT Hunt_Fish_Source_MAS :=	'HFL'; //hunthing fishing license
 	EXPORT CityStateZip :=	'CSZ';
+	EXPORT ADL :=	'ADL';
 	EXPORT AVM :=	'AVM';
 	EXPORT CFBPSurname :=	'CFS';
 	EXPORT CFBPGeolinks :=	'CFG';
@@ -51,6 +59,11 @@ EXPORT Constants := MODULE
 	EXPORT src_Dunn_Data_Email := 'DX'; // This source appears in email data
 	EXPORT src_MA_Census := 'UM'; // This source appears in the person header 
 	
+	EXPORT Type_Set := ['PERSONAL','SSN ONLY','UCC','TRANS CLOSURE'];
+	EXPORT HIGH := 'HIGH';
+	
+	EXPORT 	rel_filter := '(right.Type IN PublicRecords_KEL.ECL_Functions.Constants.Type_Set AND right.Personal = TRUE AND right.Business = FALSE AND right.Confidence = PublicRecords_KEL.ECL_Functions.Constants.HIGH AND ((right.Title >= 1 AND right.Title < 43) OR (COUNT(RIGHT.rels) > 1 AND SUM(RIGHT.rels, Cnt) > 1 AND right.Title IN [43, 44])))';				
+
 	
 	// This is a set of the explicitly allowed Marketing Sources for use within the Analytic Library.  If a record doesn't belong to one of these sources, it will be blocked from usage in Marketing Products
 	EXPORT SET OF STRING3 ALLOWED_MARKETING_SOURCES :=	
@@ -96,6 +109,16 @@ EXPORT Constants := MODULE
 	EXPORT UltOrgIDSet := UltIDSet + [LinkSearch.OrgID];
 	EXPORT UltOrgSeleIDSet := UltOrgIDSet + [LinkSearch.SeleID, LinkSearch.Default];
 	EXPORT UltOrgSeleProxIDSet := UltOrgSeleIDSet + [LinkSearch.ProxID];					
+	
+	export masked_header_sources(string DataRestriction, boolean isFCRA) := function
+		en := if((~isFCRA and DataRestriction[risk_indicators.iid_constants.posExperianRestriction]=risk_indicators.iid_constants.sTrue) or (isFCRA and DataRestriction[risk_indicators.iid_constants.posExperianFCRARestriction] in [risk_indicators.iid_constants.sTrue,'']), ['EN'], []);
+		eq := if(DataRestriction[risk_indicators.iid_constants.posEquifaxRestriction]=risk_indicators.iid_constants.sTrue, ['EQ'], []);
+		cy := if(DataRestriction[risk_indicators.iid_constants.posCertegyRestriction]=risk_indicators.iid_constants.sTrue, ['CY'], []);
+		tn := if(DataRestriction[risk_indicators.iid_constants.posTransUnionRestriction]=risk_indicators.iid_constants.sTrue, ['TN'], []);
+		fares := if(DataRestriction[risk_indicators.iid_constants.posFaresRestriction]=risk_indicators.iid_constants.sTrue, [MDR.sourceTools.src_Fares_Deeds_from_Asrs, MDR.sourceTools.src_LnPropV2_Fares_Asrs, MDR.sourceTools.src_LnPropV2_Fares_Deeds], []);
+		all_restrictions := en + eq + cy + tn + fares;
+		return all_restrictions;
+end;
 	
 	EXPORT SetLinkSearchLevel (INTEGER LinkSearchLevel) := CASE(LinkSearchLevel,
 																							LinkSearch.PowID	=> FetchPowID,
@@ -722,12 +745,12 @@ EXPORT Constants := MODULE
 		{MDR.SourceTools.src_Phones_Plus},
 		// {MDR.SourceTools.src_Phones_Accudata_OCN_LNP},
 		// {MDR.SourceTools.src_Phones_Accudata_CNAM_CNM2},
-		// {MDR.SourceTools.src_Phones_Disconnect},
+		{MDR.SourceTools.src_Phones_Disconnect},
 		// {MDR.SourceTools.src_Phones_Gong_History_Disconnect},
 		// {MDR.SourceTools.src_PhonesPorted_TCPA_CL},
-		// {MDR.SourceTools.src_PhoneFraud_OTP},
+		{MDR.SourceTools.src_PhoneFraud_OTP},
 		// {MDR.SourceTools.src_Phones_Lerg6},
-		// {MDR.SourceTools.src_Phones_LIDB},
+		{MDR.SourceTools.src_Phones_LIDB},
 		// {MDR.SourceTools.src_PhonesPorted_TCPA},
 		// {MDR.SourceTools.src_PhonesPorted_iConectiv},
 		// {MDR.SourceTools.src_PhonesPorted_iConectiv_Rng},
@@ -915,7 +938,8 @@ EXPORT Constants := MODULE
 		{VehicleDI},
 		{CorrelationRiskGong},
 		{src_Dunn_Data_Email},
-		{src_MA_Census}
+		{src_MA_Census},
+		{ADL}
 	], Layout_Allowed_Sources);
 	
 	EXPORT DEFAULT_ALLOWED_SOURCES_NONFCRA := DATASET([
@@ -1274,7 +1298,8 @@ EXPORT Constants := MODULE
 		{MDR.SourceTools.src_Best_Business},
 		{MDR.SourceTools.src_FL_Veh},
 		{MDR.SourceTools.src_OKC_Students_List},
-		{MDR.SourceTools.src_GA_Experian_Veh}	
+		{MDR.SourceTools.src_GA_Experian_Veh},	
+		{ADL}
 	], Layout_Allowed_Sources);
 	
 	EXPORT DEFAULT_ALLOWED_SOURCES_FCRA := DATASET([
@@ -1299,6 +1324,12 @@ EXPORT Constants := MODULE
 		{CFBPGeolinks},
 		{MDR.SourceTools.src_MediaOne},
 		{MDR.SourceTools.src_Liens_v2},
+		{MDR.SourceTools.src_Liens_v2_MA},
+		{MDR.SourceTools.src_Liens_v2_Hogan},
+		{MDR.SourceTools.src_Liens_v2_Chicago_Law},
+		{MDR.SourceTools.src_Liens_v2_ILFDLN},
+		{MDR.SourceTools.src_Liens_v2_NYC},
+		{MDR.SourceTools.src_Liens_v2_NYFDLN}, 
 		{MDR.SourceTools.src_VA_Watercraft},
 		{MDR.SourceTools.src_KY_Watercraft},
 		{MDR.SourceTools.src_KS_Watercraft},

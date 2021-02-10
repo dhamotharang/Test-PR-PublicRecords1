@@ -1,6 +1,5 @@
-﻿IMPORT SALT311,STD;
+﻿IMPORT SALT44,STD;
 EXPORT Scrubs := MODULE
- 
 // The module to handle the case where no scrubs exist
   EXPORT NumRules := 32;
   EXPORT NumRulesFromFieldType := 32;
@@ -48,91 +47,149 @@ EXPORT Scrubs := MODULE
     UNSIGNED8 ScrubsBits1;
     UNSIGNED8 ScrubsCleanBits1;
   END;
+  EXPORT Rule_Layout := RECORD(Layout_BizHead)
+    STRING Rules {MAXLENGTH(1000)};
+  END;
+  SHARED toRuleDesc(UNSIGNED c) := CHOOSE(c
+          ,'company_name:T_ALPHANUM:CAPS','company_name:T_ALPHANUM:ALLOW'
+          ,'company_name_prefix:T_ALPHANUM:CAPS','company_name_prefix:T_ALPHANUM:ALLOW'
+          ,'cnp_name:T_ALPHANUM:CAPS','cnp_name:T_ALPHANUM:ALLOW'
+          ,'company_fein:T_FEIN:ALLOW','company_fein:T_FEIN:LENGTHS'
+          ,'prim_name:T_ALPHANUM:CAPS','prim_name:T_ALPHANUM:ALLOW'
+          ,'sec_range:T_ALPHANUM:CAPS','sec_range:T_ALPHANUM:ALLOW'
+          ,'city:T_ALPHANUM:CAPS','city:T_ALPHANUM:ALLOW'
+          ,'city_clean:T_ALPHANUM:CAPS','city_clean:T_ALPHANUM:ALLOW'
+          ,'st:T_ALPHA:CAPS','st:T_ALPHA:ALLOW'
+          ,'zip:T_NUMBER:ALLOW'
+          ,'company_url:T_ALPHANUM:CAPS','company_url:T_ALPHANUM:ALLOW'
+          ,'fname:T_ALPHANUM:CAPS','fname:T_ALPHANUM:ALLOW'
+          ,'fname_preferred:T_ALPHANUM:CAPS','fname_preferred:T_ALPHANUM:ALLOW'
+          ,'mname:T_ALPHANUM:CAPS','mname:T_ALPHANUM:ALLOW'
+          ,'lname:T_ALPHANUM:CAPS','lname:T_ALPHANUM:ALLOW'
+          ,'name_suffix:T_ALPHANUM:CAPS','name_suffix:T_ALPHANUM:ALLOW'
+          ,'contact_email:T_ALLCAPS:CAPS'
+          ,'field:Number_Errored_Fields:SUMMARY'
+          ,'field:Number_Perfect_Fields:SUMMARY'
+          ,'rule:Number_Errored_Rules:SUMMARY'
+          ,'rule:Number_Perfect_Rules:SUMMARY'
+          ,'rule:Number_OnFail_Rules:SUMMARY'
+          ,'record:Number_Errored_Records:SUMMARY'
+          ,'record:Number_Perfect_Records:SUMMARY'
+          ,'record:Number_Edited_Records:SUMMARY'
+          ,'rule:Number_Edited_Rules:SUMMARY','UNKNOWN');
+  SHARED toErrorMessage(UNSIGNED c) := CHOOSE(c
+          ,Fields.InvalidMessage_company_name(1),Fields.InvalidMessage_company_name(2)
+          ,Fields.InvalidMessage_company_name_prefix(1),Fields.InvalidMessage_company_name_prefix(2)
+          ,Fields.InvalidMessage_cnp_name(1),Fields.InvalidMessage_cnp_name(2)
+          ,Fields.InvalidMessage_company_fein(1),Fields.InvalidMessage_company_fein(2)
+          ,Fields.InvalidMessage_prim_name(1),Fields.InvalidMessage_prim_name(2)
+          ,Fields.InvalidMessage_sec_range(1),Fields.InvalidMessage_sec_range(2)
+          ,Fields.InvalidMessage_city(1),Fields.InvalidMessage_city(2)
+          ,Fields.InvalidMessage_city_clean(1),Fields.InvalidMessage_city_clean(2)
+          ,Fields.InvalidMessage_st(1),Fields.InvalidMessage_st(2)
+          ,Fields.InvalidMessage_zip(1)
+          ,Fields.InvalidMessage_company_url(1),Fields.InvalidMessage_company_url(2)
+          ,Fields.InvalidMessage_fname(1),Fields.InvalidMessage_fname(2)
+          ,Fields.InvalidMessage_fname_preferred(1),Fields.InvalidMessage_fname_preferred(2)
+          ,Fields.InvalidMessage_mname(1),Fields.InvalidMessage_mname(2)
+          ,Fields.InvalidMessage_lname(1),Fields.InvalidMessage_lname(2)
+          ,Fields.InvalidMessage_name_suffix(1),Fields.InvalidMessage_name_suffix(2)
+          ,Fields.InvalidMessage_contact_email(1)
+          ,'Fields with errors'
+          ,'Fields without errors'
+          ,'Rules with errors'
+          ,'Rules without errors'
+          ,'Rules with possible edits'
+          ,'Records with at least one error'
+          ,'Records without errors'
+          ,'Edited records'
+          ,'Rules leading to edits','UNKNOWN');
 EXPORT FromNone(DATASET(Layout_BizHead) h) := MODULE
   SHARED Expanded_Layout toExpanded(h le, BOOLEAN withOnfail) := TRANSFORM
-    SELF.company_name_Invalid := Fields.InValid_company_name((SALT311.StrType)le.company_name);
-    clean_company_name := (TYPEOF(le.company_name))Fields.Make_company_name((SALT311.StrType)le.company_name);
-    clean_company_name_Invalid := Fields.InValid_company_name((SALT311.StrType)clean_company_name);
+    SELF.company_name_Invalid := Fields.InValid_company_name((SALT44.StrType)le.company_name);
+    clean_company_name := (TYPEOF(le.company_name))Fields.Make_company_name((SALT44.StrType)le.company_name);
+    clean_company_name_Invalid := Fields.InValid_company_name((SALT44.StrType)clean_company_name);
     SELF.company_name := IF(withOnfail, clean_company_name, le.company_name); // ONFAIL(CLEAN)
-    SELF.company_name_wouldClean := TRIM((SALT311.StrType)le.company_name) <> TRIM((SALT311.StrType)clean_company_name);
-    SELF.company_name_prefix_Invalid := Fields.InValid_company_name_prefix((SALT311.StrType)le.company_name_prefix);
-    clean_company_name_prefix := (TYPEOF(le.company_name_prefix))Fields.Make_company_name_prefix((SALT311.StrType)le.company_name_prefix);
-    clean_company_name_prefix_Invalid := Fields.InValid_company_name_prefix((SALT311.StrType)clean_company_name_prefix);
+    SELF.company_name_wouldClean := TRIM((SALT44.StrType)le.company_name) <> TRIM((SALT44.StrType)clean_company_name);
+    SELF.company_name_prefix_Invalid := Fields.InValid_company_name_prefix((SALT44.StrType)le.company_name_prefix);
+    clean_company_name_prefix := (TYPEOF(le.company_name_prefix))Fields.Make_company_name_prefix((SALT44.StrType)le.company_name_prefix);
+    clean_company_name_prefix_Invalid := Fields.InValid_company_name_prefix((SALT44.StrType)clean_company_name_prefix);
     SELF.company_name_prefix := IF(withOnfail, clean_company_name_prefix, le.company_name_prefix); // ONFAIL(CLEAN)
-    SELF.company_name_prefix_wouldClean := TRIM((SALT311.StrType)le.company_name_prefix) <> TRIM((SALT311.StrType)clean_company_name_prefix);
-    SELF.cnp_name_Invalid := Fields.InValid_cnp_name((SALT311.StrType)le.cnp_name);
-    clean_cnp_name := (TYPEOF(le.cnp_name))Fields.Make_cnp_name((SALT311.StrType)le.cnp_name);
-    clean_cnp_name_Invalid := Fields.InValid_cnp_name((SALT311.StrType)clean_cnp_name);
+    SELF.company_name_prefix_wouldClean := TRIM((SALT44.StrType)le.company_name_prefix) <> TRIM((SALT44.StrType)clean_company_name_prefix);
+    SELF.cnp_name_Invalid := Fields.InValid_cnp_name((SALT44.StrType)le.cnp_name);
+    clean_cnp_name := (TYPEOF(le.cnp_name))Fields.Make_cnp_name((SALT44.StrType)le.cnp_name);
+    clean_cnp_name_Invalid := Fields.InValid_cnp_name((SALT44.StrType)clean_cnp_name);
     SELF.cnp_name := IF(withOnfail, clean_cnp_name, le.cnp_name); // ONFAIL(CLEAN)
-    SELF.cnp_name_wouldClean := TRIM((SALT311.StrType)le.cnp_name) <> TRIM((SALT311.StrType)clean_cnp_name);
-    SELF.company_fein_Invalid := Fields.InValid_company_fein((SALT311.StrType)le.company_fein);
+    SELF.cnp_name_wouldClean := TRIM((SALT44.StrType)le.cnp_name) <> TRIM((SALT44.StrType)clean_cnp_name);
+    SELF.company_fein_Invalid := Fields.InValid_company_fein((SALT44.StrType)le.company_fein);
     SELF.company_fein := IF(SELF.company_fein_Invalid=0 OR NOT withOnfail, le.company_fein, (TYPEOF(le.company_fein))''); // ONFAIL(BLANK)
     SELF.company_fein_wouldClean :=  SELF.company_fein_Invalid > 0;
-    SELF.prim_name_Invalid := Fields.InValid_prim_name((SALT311.StrType)le.prim_name);
-    clean_prim_name := (TYPEOF(le.prim_name))Fields.Make_prim_name((SALT311.StrType)le.prim_name);
-    clean_prim_name_Invalid := Fields.InValid_prim_name((SALT311.StrType)clean_prim_name);
+    SELF.prim_name_Invalid := Fields.InValid_prim_name((SALT44.StrType)le.prim_name);
+    clean_prim_name := (TYPEOF(le.prim_name))Fields.Make_prim_name((SALT44.StrType)le.prim_name);
+    clean_prim_name_Invalid := Fields.InValid_prim_name((SALT44.StrType)clean_prim_name);
     SELF.prim_name := IF(withOnfail, clean_prim_name, le.prim_name); // ONFAIL(CLEAN)
-    SELF.prim_name_wouldClean := TRIM((SALT311.StrType)le.prim_name) <> TRIM((SALT311.StrType)clean_prim_name);
-    SELF.sec_range_Invalid := Fields.InValid_sec_range((SALT311.StrType)le.sec_range);
-    clean_sec_range := (TYPEOF(le.sec_range))Fields.Make_sec_range((SALT311.StrType)le.sec_range);
-    clean_sec_range_Invalid := Fields.InValid_sec_range((SALT311.StrType)clean_sec_range);
+    SELF.prim_name_wouldClean := TRIM((SALT44.StrType)le.prim_name) <> TRIM((SALT44.StrType)clean_prim_name);
+    SELF.sec_range_Invalid := Fields.InValid_sec_range((SALT44.StrType)le.sec_range);
+    clean_sec_range := (TYPEOF(le.sec_range))Fields.Make_sec_range((SALT44.StrType)le.sec_range);
+    clean_sec_range_Invalid := Fields.InValid_sec_range((SALT44.StrType)clean_sec_range);
     SELF.sec_range := IF(withOnfail, clean_sec_range, le.sec_range); // ONFAIL(CLEAN)
-    SELF.sec_range_wouldClean := TRIM((SALT311.StrType)le.sec_range) <> TRIM((SALT311.StrType)clean_sec_range);
-    SELF.city_Invalid := Fields.InValid_city((SALT311.StrType)le.city);
-    clean_city := (TYPEOF(le.city))Fields.Make_city((SALT311.StrType)le.city);
-    clean_city_Invalid := Fields.InValid_city((SALT311.StrType)clean_city);
+    SELF.sec_range_wouldClean := TRIM((SALT44.StrType)le.sec_range) <> TRIM((SALT44.StrType)clean_sec_range);
+    SELF.city_Invalid := Fields.InValid_city((SALT44.StrType)le.city);
+    clean_city := (TYPEOF(le.city))Fields.Make_city((SALT44.StrType)le.city);
+    clean_city_Invalid := Fields.InValid_city((SALT44.StrType)clean_city);
     SELF.city := IF(withOnfail, clean_city, le.city); // ONFAIL(CLEAN)
-    SELF.city_wouldClean := TRIM((SALT311.StrType)le.city) <> TRIM((SALT311.StrType)clean_city);
-    SELF.city_clean_Invalid := Fields.InValid_city_clean((SALT311.StrType)le.city_clean);
-    clean_city_clean := (TYPEOF(le.city_clean))Fields.Make_city_clean((SALT311.StrType)le.city_clean);
-    clean_city_clean_Invalid := Fields.InValid_city_clean((SALT311.StrType)clean_city_clean);
+    SELF.city_wouldClean := TRIM((SALT44.StrType)le.city) <> TRIM((SALT44.StrType)clean_city);
+    SELF.city_clean_Invalid := Fields.InValid_city_clean((SALT44.StrType)le.city_clean);
+    clean_city_clean := (TYPEOF(le.city_clean))Fields.Make_city_clean((SALT44.StrType)le.city_clean);
+    clean_city_clean_Invalid := Fields.InValid_city_clean((SALT44.StrType)clean_city_clean);
     SELF.city_clean := IF(withOnfail, clean_city_clean, le.city_clean); // ONFAIL(CLEAN)
-    SELF.city_clean_wouldClean := TRIM((SALT311.StrType)le.city_clean) <> TRIM((SALT311.StrType)clean_city_clean);
-    SELF.st_Invalid := Fields.InValid_st((SALT311.StrType)le.st);
-    clean_st := (TYPEOF(le.st))Fields.Make_st((SALT311.StrType)le.st);
-    clean_st_Invalid := Fields.InValid_st((SALT311.StrType)clean_st);
+    SELF.city_clean_wouldClean := TRIM((SALT44.StrType)le.city_clean) <> TRIM((SALT44.StrType)clean_city_clean);
+    SELF.st_Invalid := Fields.InValid_st((SALT44.StrType)le.st);
+    clean_st := (TYPEOF(le.st))Fields.Make_st((SALT44.StrType)le.st);
+    clean_st_Invalid := Fields.InValid_st((SALT44.StrType)clean_st);
     SELF.st := IF(withOnfail, clean_st, le.st); // ONFAIL(CLEAN)
-    SELF.st_wouldClean := TRIM((SALT311.StrType)le.st) <> TRIM((SALT311.StrType)clean_st);
-    SELF.zip_Invalid := Fields.InValid_zip((SALT311.StrType)le.zip);
-    clean_zip := (TYPEOF(le.zip))Fields.Make_zip((SALT311.StrType)le.zip);
-    clean_zip_Invalid := Fields.InValid_zip((SALT311.StrType)clean_zip);
+    SELF.st_wouldClean := TRIM((SALT44.StrType)le.st) <> TRIM((SALT44.StrType)clean_st);
+    SELF.zip_Invalid := Fields.InValid_zip((SALT44.StrType)le.zip);
+    clean_zip := (TYPEOF(le.zip))Fields.Make_zip((SALT44.StrType)le.zip);
+    clean_zip_Invalid := Fields.InValid_zip((SALT44.StrType)clean_zip);
     SELF.zip := IF(withOnfail, clean_zip, le.zip); // ONFAIL(CLEAN)
-    SELF.zip_wouldClean := TRIM((SALT311.StrType)le.zip) <> TRIM((SALT311.StrType)clean_zip);
-    SELF.company_url_Invalid := Fields.InValid_company_url((SALT311.StrType)le.company_url);
-    clean_company_url := (TYPEOF(le.company_url))Fields.Make_company_url((SALT311.StrType)le.company_url);
-    clean_company_url_Invalid := Fields.InValid_company_url((SALT311.StrType)clean_company_url);
+    SELF.zip_wouldClean := TRIM((SALT44.StrType)le.zip) <> TRIM((SALT44.StrType)clean_zip);
+    SELF.company_url_Invalid := Fields.InValid_company_url((SALT44.StrType)le.company_url);
+    clean_company_url := (TYPEOF(le.company_url))Fields.Make_company_url((SALT44.StrType)le.company_url);
+    clean_company_url_Invalid := Fields.InValid_company_url((SALT44.StrType)clean_company_url);
     SELF.company_url := IF(withOnfail, clean_company_url, le.company_url); // ONFAIL(CLEAN)
-    SELF.company_url_wouldClean := TRIM((SALT311.StrType)le.company_url) <> TRIM((SALT311.StrType)clean_company_url);
-    SELF.fname_Invalid := Fields.InValid_fname((SALT311.StrType)le.fname);
-    clean_fname := (TYPEOF(le.fname))Fields.Make_fname((SALT311.StrType)le.fname);
-    clean_fname_Invalid := Fields.InValid_fname((SALT311.StrType)clean_fname);
+    SELF.company_url_wouldClean := TRIM((SALT44.StrType)le.company_url) <> TRIM((SALT44.StrType)clean_company_url);
+    SELF.fname_Invalid := Fields.InValid_fname((SALT44.StrType)le.fname);
+    clean_fname := (TYPEOF(le.fname))Fields.Make_fname((SALT44.StrType)le.fname);
+    clean_fname_Invalid := Fields.InValid_fname((SALT44.StrType)clean_fname);
     SELF.fname := IF(withOnfail, clean_fname, le.fname); // ONFAIL(CLEAN)
-    SELF.fname_wouldClean := TRIM((SALT311.StrType)le.fname) <> TRIM((SALT311.StrType)clean_fname);
-    SELF.fname_preferred_Invalid := Fields.InValid_fname_preferred((SALT311.StrType)le.fname_preferred);
-    clean_fname_preferred := (TYPEOF(le.fname_preferred))Fields.Make_fname_preferred((SALT311.StrType)le.fname_preferred);
-    clean_fname_preferred_Invalid := Fields.InValid_fname_preferred((SALT311.StrType)clean_fname_preferred);
+    SELF.fname_wouldClean := TRIM((SALT44.StrType)le.fname) <> TRIM((SALT44.StrType)clean_fname);
+    SELF.fname_preferred_Invalid := Fields.InValid_fname_preferred((SALT44.StrType)le.fname_preferred);
+    clean_fname_preferred := (TYPEOF(le.fname_preferred))Fields.Make_fname_preferred((SALT44.StrType)le.fname_preferred);
+    clean_fname_preferred_Invalid := Fields.InValid_fname_preferred((SALT44.StrType)clean_fname_preferred);
     SELF.fname_preferred := IF(withOnfail, clean_fname_preferred, le.fname_preferred); // ONFAIL(CLEAN)
-    SELF.fname_preferred_wouldClean := TRIM((SALT311.StrType)le.fname_preferred) <> TRIM((SALT311.StrType)clean_fname_preferred);
-    SELF.mname_Invalid := Fields.InValid_mname((SALT311.StrType)le.mname);
-    clean_mname := (TYPEOF(le.mname))Fields.Make_mname((SALT311.StrType)le.mname);
-    clean_mname_Invalid := Fields.InValid_mname((SALT311.StrType)clean_mname);
+    SELF.fname_preferred_wouldClean := TRIM((SALT44.StrType)le.fname_preferred) <> TRIM((SALT44.StrType)clean_fname_preferred);
+    SELF.mname_Invalid := Fields.InValid_mname((SALT44.StrType)le.mname);
+    clean_mname := (TYPEOF(le.mname))Fields.Make_mname((SALT44.StrType)le.mname);
+    clean_mname_Invalid := Fields.InValid_mname((SALT44.StrType)clean_mname);
     SELF.mname := IF(withOnfail, clean_mname, le.mname); // ONFAIL(CLEAN)
-    SELF.mname_wouldClean := TRIM((SALT311.StrType)le.mname) <> TRIM((SALT311.StrType)clean_mname);
-    SELF.lname_Invalid := Fields.InValid_lname((SALT311.StrType)le.lname);
-    clean_lname := (TYPEOF(le.lname))Fields.Make_lname((SALT311.StrType)le.lname);
-    clean_lname_Invalid := Fields.InValid_lname((SALT311.StrType)clean_lname);
+    SELF.mname_wouldClean := TRIM((SALT44.StrType)le.mname) <> TRIM((SALT44.StrType)clean_mname);
+    SELF.lname_Invalid := Fields.InValid_lname((SALT44.StrType)le.lname);
+    clean_lname := (TYPEOF(le.lname))Fields.Make_lname((SALT44.StrType)le.lname);
+    clean_lname_Invalid := Fields.InValid_lname((SALT44.StrType)clean_lname);
     SELF.lname := IF(withOnfail, clean_lname, le.lname); // ONFAIL(CLEAN)
-    SELF.lname_wouldClean := TRIM((SALT311.StrType)le.lname) <> TRIM((SALT311.StrType)clean_lname);
-    SELF.name_suffix_Invalid := Fields.InValid_name_suffix((SALT311.StrType)le.name_suffix);
-    clean_name_suffix := (TYPEOF(le.name_suffix))Fields.Make_name_suffix((SALT311.StrType)le.name_suffix);
-    clean_name_suffix_Invalid := Fields.InValid_name_suffix((SALT311.StrType)clean_name_suffix);
+    SELF.lname_wouldClean := TRIM((SALT44.StrType)le.lname) <> TRIM((SALT44.StrType)clean_lname);
+    SELF.name_suffix_Invalid := Fields.InValid_name_suffix((SALT44.StrType)le.name_suffix);
+    clean_name_suffix := (TYPEOF(le.name_suffix))Fields.Make_name_suffix((SALT44.StrType)le.name_suffix);
+    clean_name_suffix_Invalid := Fields.InValid_name_suffix((SALT44.StrType)clean_name_suffix);
     SELF.name_suffix := IF(withOnfail, clean_name_suffix, le.name_suffix); // ONFAIL(CLEAN)
-    SELF.name_suffix_wouldClean := TRIM((SALT311.StrType)le.name_suffix) <> TRIM((SALT311.StrType)clean_name_suffix);
-    SELF.contact_email_Invalid := Fields.InValid_contact_email((SALT311.StrType)le.contact_email);
-    clean_contact_email := (TYPEOF(le.contact_email))Fields.Make_contact_email((SALT311.StrType)le.contact_email);
-    clean_contact_email_Invalid := Fields.InValid_contact_email((SALT311.StrType)clean_contact_email);
+    SELF.name_suffix_wouldClean := TRIM((SALT44.StrType)le.name_suffix) <> TRIM((SALT44.StrType)clean_name_suffix);
+    SELF.contact_email_Invalid := Fields.InValid_contact_email((SALT44.StrType)le.contact_email);
+    clean_contact_email := (TYPEOF(le.contact_email))Fields.Make_contact_email((SALT44.StrType)le.contact_email);
+    clean_contact_email_Invalid := Fields.InValid_contact_email((SALT44.StrType)clean_contact_email);
     SELF.contact_email := IF(withOnfail, clean_contact_email, le.contact_email); // ONFAIL(CLEAN)
-    SELF.contact_email_wouldClean := TRIM((SALT311.StrType)le.contact_email) <> TRIM((SALT311.StrType)clean_contact_email);
+    SELF.contact_email_wouldClean := TRIM((SALT44.StrType)le.contact_email) <> TRIM((SALT44.StrType)clean_contact_email);
+ 
     SELF := le;
   END;
   EXPORT ExpandedInfile := PROJECT(h,toExpanded(LEFT,FALSE));
@@ -143,6 +200,19 @@ EXPORT FromNone(DATASET(Layout_BizHead) h) := MODULE
     SELF := le;
   END;
   EXPORT BitmapInfile := PROJECT(ExpandedInfile,Into(LEFT));
+  STRING escQuotes(STRING s) := STD.Str.FindReplace(s,'\'','\\\'');
+  Rule_Layout IntoRule(BitmapInfile le, UNSIGNED c) := TRANSFORM
+    mask := 1<<(c-1);
+    hasError := (mask&le.ScrubsBits1)>0;
+    SELF.Rules := IF(hasError,TRIM(toRuleDesc(c))+':\''+escQuotes(TRIM(toErrorMessage(c)))+'\'',IF(le.ScrubsBits1=0 AND c=1,'',SKIP));
+    SELF := le;
+  END;
+  unrolled := NORMALIZE(BitmapInfile,NumRules,IntoRule(LEFT,COUNTER));
+  Rule_Layout toRoll(Rule_Layout le,Rule_Layout ri) := TRANSFORM
+    SELF.Rules := TRIM(le.Rules) + IF(LENGTH(TRIM(le.Rules))>0 AND LENGTH(TRIM(ri.Rules))>0,',','') + TRIM(ri.Rules);
+    SELF := le;
+  END;
+  EXPORT RulesInfile := ROLLUP(unrolled,toRoll(LEFT,RIGHT),EXCEPT Rules);
 END;
 // Module to use if you already have a scrubs bitmap you wish to expand or compare
 EXPORT FromBits(DATASET(Bitmap_Layout) h) := MODULE
@@ -239,6 +309,7 @@ EXPORT FromExpanded(DATASET(Expanded_Layout) h) := MODULE
     st_Total_ErrorCount := COUNT(GROUP,h.st_Invalid>0);
     zip_ALLOW_ErrorCount := COUNT(GROUP,h.zip_Invalid=1);
     zip_ALLOW_WouldModifyCount := COUNT(GROUP,h.zip_Invalid=1 AND h.zip_wouldClean);
+ 
     company_url_CAPS_ErrorCount := COUNT(GROUP,h.company_url_Invalid=1);
     company_url_CAPS_WouldModifyCount := COUNT(GROUP,h.company_url_Invalid=1 AND h.company_url_wouldClean);
     company_url_ALLOW_ErrorCount := COUNT(GROUP,h.company_url_Invalid=2);
@@ -271,6 +342,7 @@ EXPORT FromExpanded(DATASET(Expanded_Layout) h) := MODULE
     name_suffix_Total_ErrorCount := COUNT(GROUP,h.name_suffix_Invalid>0);
     contact_email_CAPS_ErrorCount := COUNT(GROUP,h.contact_email_Invalid=1);
     contact_email_CAPS_WouldModifyCount := COUNT(GROUP,h.contact_email_Invalid=1 AND h.contact_email_wouldClean);
+ 
     AnyRule_WithErrorsCount := COUNT(GROUP, h.company_name_Invalid > 0 OR h.company_name_prefix_Invalid > 0 OR h.cnp_name_Invalid > 0 OR h.company_fein_Invalid > 0 OR h.prim_name_Invalid > 0 OR h.sec_range_Invalid > 0 OR h.city_Invalid > 0 OR h.city_clean_Invalid > 0 OR h.st_Invalid > 0 OR h.zip_Invalid > 0 OR h.company_url_Invalid > 0 OR h.fname_Invalid > 0 OR h.fname_preferred_Invalid > 0 OR h.mname_Invalid > 0 OR h.lname_Invalid > 0 OR h.name_suffix_Invalid > 0 OR h.contact_email_Invalid > 0);
     AnyRule_WithEditsCount := COUNT(GROUP, h.company_name_wouldClean OR h.company_name_prefix_wouldClean OR h.cnp_name_wouldClean OR h.company_fein_wouldClean OR h.prim_name_wouldClean OR h.sec_range_wouldClean OR h.city_wouldClean OR h.city_clean_wouldClean OR h.st_wouldClean OR h.zip_wouldClean OR h.company_url_wouldClean OR h.fname_wouldClean OR h.fname_preferred_wouldClean OR h.mname_wouldClean OR h.lname_wouldClean OR h.name_suffix_wouldClean OR h.contact_email_wouldClean);
     FieldsChecked_WithErrors := 0;
@@ -294,8 +366,8 @@ EXPORT FromExpanded(DATASET(Expanded_Layout) h) := MODULE
     STRING FieldName;
     STRING FieldType;
     STRING ErrorType;
-    SALT311.StrType ErrorMessage;
-    SALT311.StrType FieldContents;
+    SALT44.StrType ErrorMessage;
+    SALT44.StrType FieldContents;
   END;
   r into(h le,UNSIGNED c) := TRANSFORM
     SELF.Src :=  ''; // Source not provided
@@ -321,7 +393,7 @@ EXPORT FromExpanded(DATASET(Expanded_Layout) h) := MODULE
           ,CHOOSE(le.contact_email_Invalid,'CAPS','UNKNOWN'),'UNKNOWN'));
     SELF.FieldName := CHOOSE(c,'company_name','company_name_prefix','cnp_name','company_fein','prim_name','sec_range','city','city_clean','st','zip','company_url','fname','fname_preferred','mname','lname','name_suffix','contact_email','UNKNOWN');
     SELF.FieldType := CHOOSE(c,'T_ALPHANUM','T_ALPHANUM','T_ALPHANUM','T_FEIN','T_ALPHANUM','T_ALPHANUM','T_ALPHANUM','T_ALPHANUM','T_ALPHA','T_NUMBER','T_ALPHANUM','T_ALPHANUM','T_ALPHANUM','T_ALPHANUM','T_ALPHANUM','T_ALPHANUM','T_ALLCAPS','UNKNOWN');
-    SELF.FieldContents := CHOOSE(c,(SALT311.StrType)le.company_name,(SALT311.StrType)le.company_name_prefix,(SALT311.StrType)le.cnp_name,(SALT311.StrType)le.company_fein,(SALT311.StrType)le.prim_name,(SALT311.StrType)le.sec_range,(SALT311.StrType)le.city,(SALT311.StrType)le.city_clean,(SALT311.StrType)le.st,(SALT311.StrType)le.zip,(SALT311.StrType)le.company_url,(SALT311.StrType)le.fname,(SALT311.StrType)le.fname_preferred,(SALT311.StrType)le.mname,(SALT311.StrType)le.lname,(SALT311.StrType)le.name_suffix,(SALT311.StrType)le.contact_email,'***SALTBUG***');
+    SELF.FieldContents := CHOOSE(c,(SALT44.StrType)le.company_name,(SALT44.StrType)le.company_name_prefix,(SALT44.StrType)le.cnp_name,(SALT44.StrType)le.company_fein,(SALT44.StrType)le.prim_name,(SALT44.StrType)le.sec_range,(SALT44.StrType)le.city,(SALT44.StrType)le.city_clean,(SALT44.StrType)le.st,(SALT44.StrType)le.zip,(SALT44.StrType)le.company_url,(SALT44.StrType)le.fname,(SALT44.StrType)le.fname_preferred,(SALT44.StrType)le.mname,(SALT44.StrType)le.lname,(SALT44.StrType)le.name_suffix,(SALT44.StrType)le.contact_email,'***SALTBUG***');
   END;
   EXPORT AllErrors := NORMALIZE(h,17,Into(LEFT,COUNTER));
    bv := TABLE(AllErrors,{FieldContents, FieldName, Cnt := COUNT(GROUP)},FieldContents, FieldName,MERGE);
@@ -329,64 +401,12 @@ EXPORT FromExpanded(DATASET(Expanded_Layout) h) := MODULE
   // Particular form of stats required for Orbit
   EXPORT OrbitStats(UNSIGNED examples = 10, UNSIGNED Pdate=(UNSIGNED)StringLib.getdateYYYYMMDD(), DATASET(Layout_BizHead) prevDS = DATASET([], Layout_BizHead), STRING10 Src='UNK'):= FUNCTION
   // field error stats
-    SALT311.ScrubsOrbitLayout Into(SummaryStats le, UNSIGNED c) := TRANSFORM
+    SALT44.ScrubsOrbitLayout Into(SummaryStats le, UNSIGNED c) := TRANSFORM
       SELF.recordstotal := le.TotalCnt;
       SELF.processdate := Pdate;
       SELF.sourcecode := src;
-      SELF.ruledesc := CHOOSE(c
-          ,'company_name:T_ALPHANUM:CAPS','company_name:T_ALPHANUM:ALLOW'
-          ,'company_name_prefix:T_ALPHANUM:CAPS','company_name_prefix:T_ALPHANUM:ALLOW'
-          ,'cnp_name:T_ALPHANUM:CAPS','cnp_name:T_ALPHANUM:ALLOW'
-          ,'company_fein:T_FEIN:ALLOW','company_fein:T_FEIN:LENGTHS'
-          ,'prim_name:T_ALPHANUM:CAPS','prim_name:T_ALPHANUM:ALLOW'
-          ,'sec_range:T_ALPHANUM:CAPS','sec_range:T_ALPHANUM:ALLOW'
-          ,'city:T_ALPHANUM:CAPS','city:T_ALPHANUM:ALLOW'
-          ,'city_clean:T_ALPHANUM:CAPS','city_clean:T_ALPHANUM:ALLOW'
-          ,'st:T_ALPHA:CAPS','st:T_ALPHA:ALLOW'
-          ,'zip:T_NUMBER:ALLOW'
-          ,'company_url:T_ALPHANUM:CAPS','company_url:T_ALPHANUM:ALLOW'
-          ,'fname:T_ALPHANUM:CAPS','fname:T_ALPHANUM:ALLOW'
-          ,'fname_preferred:T_ALPHANUM:CAPS','fname_preferred:T_ALPHANUM:ALLOW'
-          ,'mname:T_ALPHANUM:CAPS','mname:T_ALPHANUM:ALLOW'
-          ,'lname:T_ALPHANUM:CAPS','lname:T_ALPHANUM:ALLOW'
-          ,'name_suffix:T_ALPHANUM:CAPS','name_suffix:T_ALPHANUM:ALLOW'
-          ,'contact_email:T_ALLCAPS:CAPS'
-          ,'field:Number_Errored_Fields:SUMMARY'
-          ,'field:Number_Perfect_Fields:SUMMARY'
-          ,'rule:Number_Errored_Rules:SUMMARY'
-          ,'rule:Number_Perfect_Rules:SUMMARY'
-          ,'rule:Number_OnFail_Rules:SUMMARY'
-          ,'record:Number_Errored_Records:SUMMARY'
-          ,'record:Number_Perfect_Records:SUMMARY'
-          ,'record:Number_Edited_Records:SUMMARY'
-          ,'rule:Number_Edited_Rules:SUMMARY','UNKNOWN');
-      SELF.ErrorMessage := CHOOSE(c
-          ,Fields.InvalidMessage_company_name(1),Fields.InvalidMessage_company_name(2)
-          ,Fields.InvalidMessage_company_name_prefix(1),Fields.InvalidMessage_company_name_prefix(2)
-          ,Fields.InvalidMessage_cnp_name(1),Fields.InvalidMessage_cnp_name(2)
-          ,Fields.InvalidMessage_company_fein(1),Fields.InvalidMessage_company_fein(2)
-          ,Fields.InvalidMessage_prim_name(1),Fields.InvalidMessage_prim_name(2)
-          ,Fields.InvalidMessage_sec_range(1),Fields.InvalidMessage_sec_range(2)
-          ,Fields.InvalidMessage_city(1),Fields.InvalidMessage_city(2)
-          ,Fields.InvalidMessage_city_clean(1),Fields.InvalidMessage_city_clean(2)
-          ,Fields.InvalidMessage_st(1),Fields.InvalidMessage_st(2)
-          ,Fields.InvalidMessage_zip(1)
-          ,Fields.InvalidMessage_company_url(1),Fields.InvalidMessage_company_url(2)
-          ,Fields.InvalidMessage_fname(1),Fields.InvalidMessage_fname(2)
-          ,Fields.InvalidMessage_fname_preferred(1),Fields.InvalidMessage_fname_preferred(2)
-          ,Fields.InvalidMessage_mname(1),Fields.InvalidMessage_mname(2)
-          ,Fields.InvalidMessage_lname(1),Fields.InvalidMessage_lname(2)
-          ,Fields.InvalidMessage_name_suffix(1),Fields.InvalidMessage_name_suffix(2)
-          ,Fields.InvalidMessage_contact_email(1)
-          ,'Fields with errors'
-          ,'Fields without errors'
-          ,'Rules with errors'
-          ,'Rules without errors'
-          ,'Rules with possible edits'
-          ,'Records with at least one error'
-          ,'Records without errors'
-          ,'Edited records'
-          ,'Rules leading to edits','UNKNOWN');
+      SELF.ruledesc := toRuleDesc(c);
+      SELF.ErrorMessage := toErrorMessage(c);
       SELF.rulecnt := CHOOSE(c
           ,le.company_name_CAPS_ErrorCount,le.company_name_ALLOW_ErrorCount
           ,le.company_name_prefix_CAPS_ErrorCount,le.company_name_prefix_ALLOW_ErrorCount
@@ -447,19 +467,18 @@ EXPORT FromExpanded(DATASET(Expanded_Layout) h) := MODULE
       AllErrors.Src;
       STRING RuleDesc := TRIM(AllErrors.FieldName)+':'+TRIM(AllErrors.FieldType)+':'+AllErrors.ErrorType;
       STRING ErrorMessage := TRIM(AllErrors.errormessage);
-      SALT311.StrType RawCodeMissing := AllErrors.FieldContents;
+      SALT44.StrType RawCodeMissing := AllErrors.FieldContents;
     END;
     tab := TABLE(AllErrors,orb_r);
     orb_sum := TABLE(tab,{src,ruledesc,ErrorMessage,rawcodemissing,rawcodemissingcnt := COUNT(GROUP)},src,ruledesc,ErrorMessage,rawcodemissing,MERGE);
     gt := GROUP(TOPN(GROUP(orb_sum,src,ruledesc,ALL),examples,-rawcodemissingcnt));
-    SALT311.ScrubsOrbitLayout jn(SummaryInfo le, gt ri) := TRANSFORM
+    SALT44.ScrubsOrbitLayout jn(SummaryInfo le, gt ri) := TRANSFORM
       SELF.rawcodemissing := ri.rawcodemissing;
       SELF.rawcodemissingcnt := ri.rawcodemissingcnt;
       SELF := le;
     END;
     j := JOIN(SummaryInfo,gt,LEFT.ruledesc=RIGHT.ruledesc,jn(LEFT,RIGHT),HASH,LEFT OUTER);
     FieldErrorStats := IF(examples>0,j,SummaryInfo);
- 
     // field population stats
     mod_hygiene := hygiene(PROJECT(h, Layout_BizHead));
     hygiene_summaryStats := mod_hygiene.Summary('');
@@ -467,7 +486,7 @@ EXPORT FromExpanded(DATASET(Expanded_Layout) h) := MODULE
       isNumField := (STRING)((TYPEOF(infield))'') = '0';
       RETURN IF(isNumField, 'nonzero', 'nonblank');
     ENDMACRO;
-    SALT311.ScrubsOrbitLayout xNormHygieneStats(hygiene_summaryStats le, UNSIGNED c, STRING suffix) := TRANSFORM
+    SALT44.ScrubsOrbitLayout xNormHygieneStats(hygiene_summaryStats le, UNSIGNED c, STRING suffix) := TRANSFORM
       SELF.recordstotal := le.NumberOfRecords;
       SELF.processdate := Pdate;
       SELF.sourcecode := src;
@@ -609,9 +628,8 @@ EXPORT FromExpanded(DATASET(Expanded_Layout) h) := MODULE
       SELF.ErrorMessage := '';
     END;
     FieldPopStats := NORMALIZE(hygiene_summaryStats,44,xNormHygieneStats(LEFT,COUNTER,'POP'));
- 
   // record count stats
-    SALT311.ScrubsOrbitLayout xTotalRecs(hygiene_summaryStats le, STRING inRuleDesc) := TRANSFORM
+    SALT44.ScrubsOrbitLayout xTotalRecs(hygiene_summaryStats le, STRING inRuleDesc) := TRANSFORM
       SELF.recordstotal := le.NumberOfRecords;
       SELF.processdate := Pdate;
       SELF.sourcecode := src;
@@ -621,7 +639,6 @@ EXPORT FromExpanded(DATASET(Expanded_Layout) h) := MODULE
       SELF.rulepcnt := 0;
     END;
     TotalRecsStats := PROJECT(hygiene_summaryStats, xTotalRecs(LEFT, 'records:total_records:POP'));
- 
     mod_Delta := Delta(prevDS, PROJECT(h, Layout_BizHead));
     deltaHygieneSummary := mod_Delta.DifferenceSummary;
     DeltaFieldPopStats := NORMALIZE(deltaHygieneSummary(txt <> 'New'),44,xNormHygieneStats(LEFT,COUNTER,'DELTA'));
@@ -630,33 +647,28 @@ EXPORT FromExpanded(DATASET(Expanded_Layout) h) := MODULE
                                       TRIM(inTxt) + ':count_' + TRIM(inTxt) + ':DELTA');
     DeltaTotalRecsStats := PROJECT(deltaHygieneSummary(txt <> 'Updates_OldFile'), xTotalRecs(LEFT, deltaStatName(LEFT.txt)));
     DeltaStats := IF(COUNT(prevDS) > 0, DeltaFieldPopStats + DeltaTotalRecsStats);
- 
     RETURN FieldErrorStats & FieldPopStats & TotalRecsStats & DeltaStats;
   END;
 END;
- 
 EXPORT StandardStats(DATASET(Layout_BizHead) inFile, BOOLEAN doErrorOverall = TRUE) := FUNCTION
-  myTimeStamp := (UNSIGNED6)SALT311.Fn_Now('YYYYMMDDHHMMSS') : INDEPENDENT;
+  myTimeStamp := (UNSIGNED6)SALT44.Fn_Now('YYYYMMDDHHMMSS') : INDEPENDENT;
   expandedFile := FromNone(inFile).ExpandedInfile;
   mod_fromexpandedOverall := FromExpanded(expandedFile);
   scrubsSummaryOverall := mod_fromexpandedOverall.SummaryStats;
- 
-  SALT311.mod_StandardStatsTransforms.mac_scrubsSummaryStatsFieldErrTransform(BizLinkFull, Fields, 'RECORDOF(scrubsSummaryOverall)', '');
+  SALT44.mod_StandardStatsTransforms.mac_scrubsSummaryStatsFieldErrTransform(BizLinkFull, Fields, 'RECORDOF(scrubsSummaryOverall)', '');
   scrubsSummaryOverall_Standard := NORMALIZE(scrubsSummaryOverall, (NumRulesFromFieldType + NumFieldsWithRules) * 4, xSummaryStats(LEFT, COUNTER, myTimeStamp, 'all', 'all'));
- 
   allErrsOverall := mod_fromexpandedOverall.AllErrors;
   tErrsOverall := TABLE(DISTRIBUTE(allErrsOverall, HASH(FieldName, ErrorType)), {FieldName, ErrorType, FieldContents, cntExamples := COUNT(GROUP)}, FieldName, ErrorType, FieldContents, LOCAL);
- 
   scrubsSummaryOverall_Standard_addErr   := IF(doErrorOverall,
                                                DENORMALIZE(SORT(DISTRIBUTE(scrubsSummaryOverall_Standard, HASH(field, ruletype)), field, ruletype, LOCAL),
   	                                                       SORT(tErrsOverall, FieldName, ErrorType, -cntExamples, FieldContents, LOCAL),
   	                                                       LEFT.field = RIGHT.FieldName AND LEFT.ruletype = RIGHT.ErrorType AND LEFT.MeasureType = 'CntRecs',
   	                                                       TRANSFORM(RECORDOF(LEFT),
-  	                                                       SELF.dsExamples := LEFT.dsExamples & DATASET([{RIGHT.FieldContents, RIGHT.cntExamples, IF(LEFT.StatValue > 0, RIGHT.cntExamples/LEFT.StatValue * 100, 0)}], SALT311.Layout_Stats_Standard.Examples);
+  	                                                       SELF.dsExamples := LEFT.dsExamples & DATASET([{RIGHT.FieldContents, RIGHT.cntExamples, IF(LEFT.StatValue > 0, RIGHT.cntExamples/LEFT.StatValue * 100, 0)}], SALT44.Layout_Stats_Standard.Examples);
   	                                                       SELF := LEFT),
   	                                                       KEEP(10), LEFT OUTER, LOCAL, NOSORT));
-  scrubsSummaryOverall_Standard_GeneralErrs := IF(doErrorOverall, SALT311.mod_StandardStatsTransforms.scrubsSummaryStatsGeneral(scrubsSummaryOverall,, myTimeStamp, 'all', 'all'));
- 
+  scrubsSummaryOverall_Standard_GeneralErrs := IF(doErrorOverall, SALT44.mod_StandardStatsTransforms.scrubsSummaryStatsGeneral(scrubsSummaryOverall,, myTimeStamp, 'all', 'all'));
   RETURN scrubsSummaryOverall_Standard_addErr & scrubsSummaryOverall_Standard_GeneralErrs;
 END;
 END;
+ 

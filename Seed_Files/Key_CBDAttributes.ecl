@@ -1,4 +1,4 @@
-import data_services;
+import data_services,Seed_Files;
 
 d := Seed_Files.file_CBDAttributes;
 
@@ -8,4 +8,4 @@ newrec := record
 end;
 newtable := table(d, newrec);
 
-export Key_CBDAttributes := index(newtable,{dataset_name,hashvalue}, {newtable}, data_services.data_location.prefix() + 'thor_data400::key::testseed::qa::cbdattributes');
+export Key_CBDAttributes := index(newtable,{dataset_name,hashvalue}, {newtable}, Data_Services.Data_location.Prefix('NONAMEGIVEN') + 'thor_data400::key::testseed::qa::cbdattributes');

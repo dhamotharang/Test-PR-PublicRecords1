@@ -1,4 +1,4 @@
-﻿import Address,iesp,InsuranceContext_iesp, PropertyCharacteristics_Services; 
+﻿import Address,iesp,InsuranceContext_iesp, PropertyCharacteristics_Services, Doxie; 
 
 export	Records(	PropertyCharacteristics_Services.IParam.SearchRecords											pInMod,
 									InsuranceContext_iesp.insurance_risk_context.t_PropertyInformationContext	pInsContext,
@@ -6,7 +6,7 @@ export	Records(	PropertyCharacteristics_Services.IParam.SearchRecords											
 									Address.ICleanAddress																											clean_addr
 								)	:=
 module
-
+  SHARED mod_access := Doxie.compliance.GetGlobalDataAccessModuleTranslated(AutoStandardI.GlobalModule());
   layouts.CleanAddressRec CreateBatchRecord () := transform
 		Self.acctno := ''; // this is a formality in case of a single-row request
 		Self.prim_range  := clean_addr.prim_range;
@@ -29,13 +29,23 @@ module
   // if address was successfully cleaned, get inhouse data
   shared dPropPayload := GetPropertyData (dataset ([CreateBatchRecord()]) (is_cleaned));
 	
+	//Obtain Lexid
+	SHARED Lexid				:= IF(pInMod.ResultOption <> Constants.Default_Option,
+                          Get_Lexid(pRequest.ReportBy.Name, pRequest.ReportBy.dob, pRequest.ReportBy.ssn, pRequest.ReportBy.DLNumber, pRequest.ReportBy.DLState, clean_addr),
+                          0);
+	//Determine if opted out under ccpa
+	SHARED IsOptedOut		:= IF(Lexid <> 0, PropertyCharacteristics_Services.Functions.isOptOut(Lexid, mod_access), FALSE);
+
   // Replicated the batch functionallity.  QB 5501
   dLNPropResultsFiltered := dPropPayload(
-    ((pInMod.ReportType = 'I') AND (pInMod.ResultOption IN [Constants.Default_Option, Constants.Default_Plus_Option]) AND (vendor_source = 'A')) OR 
-    ((pInMod.ReportType = 'P') AND pInMod.ResultOption = Constants.Default_Option AND (vendor_source IN ['B', 'D']) ) OR 
-    ((pInMod.ReportType = 'P') AND pInMod.ResultOption = Constants.Default_Plus_Option AND (vendor_source IN ['B', 'D', 'E']) ) OR 
-    ((pInMod.ResultOption = Constants.Selected_Source_Option) AND (vendor_source = 'F')) OR
-		((pInMod.ResultOption = Constants.Selected_Source_Plus_Option) AND (vendor_source IN ['F', 'E', 'D', 'C'])));	
+    ((pInMod.ReportType = Constants.Inspection_ReportType) AND (pInMod.ResultOption IN [Constants.Default_Option, Constants.Default_Plus_Option]) AND (vendor_source = Constants.Best_CoreLogic_Blacknight)) OR 
+    ((pInMod.ReportType = Constants.Property_ReportType) AND pInMod.ResultOption = Constants.Default_Option AND (vendor_source IN [Constants.Blacknight_LocalizedAverages, Constants.CoreLogic]) ) OR 
+    ((pInMod.ReportType = Constants.Property_ReportType) AND pInMod.ResultOption = Constants.Default_Plus_Option AND ~IsOptedOut AND (vendor_source IN [Constants.Blacknight_LocalizedAverages, Constants.CoreLogic, Constants.MLS]) ) OR 
+    ((pInMod.ReportType = Constants.Property_ReportType) AND pInMod.ResultOption = Constants.Default_Plus_Option AND IsOptedOut AND (vendor_source IN [Constants.Blacknight_LocalizedAverages, Constants.CoreLogic]) ) OR 
+    ((pInMod.ResultOption = Constants.Selected_Source_Option) AND ~IsOptedOut AND (vendor_source = Constants.Best_AllSources)) OR
+    ((pInMod.ResultOption = Constants.Selected_Source_Option) AND IsOptedOut AND (vendor_source = Constants.Best_All_NoMLS)) OR
+    ((pInMod.ResultOption = Constants.Selected_Source_Plus_Option) AND ~IsOptedOut AND (vendor_source IN [Constants.Best_AllSources, Constants.MLS, Constants.CoreLogic, Constants.Blacknight])) OR	
+    ((pInMod.ResultOption = Constants.Selected_Source_Plus_Option) AND IsOptedOut AND (vendor_source IN [Constants.Best_All_NoMLS, Constants.CoreLogic, Constants.Blacknight])));	
 	
 	// back to original layout: "payload" without cleaned address and batch-acctno
 	shared inhouse_results := project (dLNPropResultsFiltered, layouts.Payload);
@@ -78,8 +88,8 @@ module
 	
 	// Split out source B records from others.
 	shared ds_acctno 				:= project (dLNPropRemoveDefaultData, TRANSFORM(layouts.inhouse_layout, SELF.acctno := '', SELF := LEFT));
-	export dsFilterB				:= ds_acctno(vendor_source IN ['B', 'C']);
-	export dsFilterOthers		:= ds_acctno(vendor_source IN ['A', 'D', 'E']);
+	export dsFilterB				:= ds_acctno(vendor_source IN [Constants.Blacknight_LocalizedAverages, Constants.Blacknight]);
+	export dsFilterOthers		:= ds_acctno(vendor_source IN [Constants.Best_CoreLogic_Blacknight, Constants.CoreLogic, Constants.MLS]);
 
 	// JOIN B and A (and MLS E) records to clear B record DEFLT
 	export dsJoinBA := join(dsFilterB, dsFilterOthers, TRUE, PropertyCharacteristics_Services.Functions.xJoinAB(LEFT, RIGHT), left outer, ALL);
@@ -87,12 +97,13 @@ module
 	// Rollup source B records where you have move than one value for a field.
 	export dsRollB := rollup(dsJoinBA, TRUE, PropertyCharacteristics_Services.Functions.xRollUpB_Rec(LEFT, RIGHT));
 
-	// Combine source A and B (and MLS E + best of all F) records
-	export dsSourceAll := dsRollB + dsFilterOthers + PROJECT (inhouse_results(vendor_source = 'F'), TRANSFORM(layouts.inhouse_layout, SELF.acctno := '', SELF := LEFT));
+	// Combine source A and B (and MLS E + best of all F or G) records
+	export dsSourceAll := dsRollB + dsFilterOthers + PROJECT (inhouse_results(vendor_source in [Constants.Best_AllSources, Constants.Best_All_NoMLS]), TRANSFORM(layouts.inhouse_layout, SELF.acctno := '', SELF := LEFT));
 
 	//For Default Plus Option, combine B OKCITY and E MLS records, MLS has higher priority
-	shared DPO_BandE := JOIN(dsSourceAll(vendor_source = 'E'), dsSourceAll(vendor_source = 'B'), TRUE, PropertyCharacteristics_Services.Functions.DPOJOin (LEFT, RIGHT), LEFT OUTER, ALL);
-	SHARED ds_DPO := dsSourceAll(vendor_source = 'D') + DPO_BandE;
+  shared DPO_BandE := ROLLUP(dsSourceAll(vendor_source in [Constants.MLS, Constants.Blacknight_LocalizedAverages]), TRUE, PropertyCharacteristics_Services.Functions.DPOJOin (LEFT, RIGHT));
+	SHARED ds_DPO := dsSourceAll(vendor_source = Constants.CoreLogic) + DPO_BandE;
+
 	SHARED FinaldsSourceAll := IF (pInMod.ResultOption = Constants.Default_Plus_Option, ds_DPO, dsSourceAll);
 	shared ds_noacctno := project (FinaldsSourceAll, layouts.Payload);
 	
@@ -100,7 +111,7 @@ module
 	shared ModPropInfo	:=	PropertyCharacteristics_Services.Convert2IESP(pInMod,pRequest);
 	
 	// Build report dataset.
-	export dsReport := sort(project (ds_noacctno, ModPropInfo.Convert2PropDataItem(left)), Functions.DataSource_SortOrder(DataSource)); 
+	export dsReport := sort(project (ds_noacctno, ModPropInfo.Convert2PropDataItem(left, IsOptedOut)), Functions.DataSource_SortOrder(DataSource)); 
 
 	iesp.property_info.t_PropertyInformation	tCombineReportSections()	:= transform
 		self._Header													:=	row({0,'',pRequest.User.QueryId,pInsContext.Common.TransactionId,[],[]},iesp.share.t_ResponseHeader);
@@ -108,8 +119,9 @@ module
 		self.Report.ReportIdSection						:=	ModPropInfo.SetReportID(pInsContext
 																																			// ,dPropGatewayResponse
 																																			,combined_err
-																																			,exists (inhouse_results)
+																																			,exists (inhouse_results) OR (IsOptedOut AND COUNT(dPropPayload) = 2)
 																																			,pInMod.isHomegateway
+																																			,IsOptedOut
 																																			);
 		self.Report.Messages									:=	dCombinedErrorsSorted;
 		
@@ -129,7 +141,15 @@ module
 																																										,pInsContext
 																																										,PropInfoReport
 																																										// ,dPropGatewayResponse
-																																										,pInMod
+																																										,pInMod,
+                                                                                    mod_access
 																																										);
+																																										
+		// Transaction Logging
+	export	TransactionLogExtension	:=	IF(Lexid <> 0 AND EXISTS(ds_noacctno), 
+																				PropertyCharacteristics_Services.Get_Transaction_Log_Extension(pInsContext.Common.TransactionId
+																																										,Lexid
+																																										,ds_noacctno
+																																										));
 
 end;

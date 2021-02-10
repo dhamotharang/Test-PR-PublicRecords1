@@ -4,10 +4,16 @@
 	Following Keys being used:
 			LN_PropertyV2.key_assessor_fid
 */
-EXPORT getSharedProperty(DATASET(DueDiligence.LayoutsInternal.PropertySlimLayout) inProps) := FUNCTION
+
+
+//NO LONGER SHARED - business will no longer come through here but this will/should 
+//                   get cleaned when modularity for assets comes up.
+
+EXPORT getSharedProperty(DATASET(DueDiligence.LayoutsInternal.PropertySlimLayout) inProps,
+                         BOOLEAN isPerson = FALSE) := FUNCTION
 
     //we only care about sold and owned properties, so lets filter them to limit the amount of data to work with
-    soldOwnedProperty := inProps(sourceCode IN [DueDiligence.Constants.Owned_Property_code, DueDiligence.Constants.Sold_Property_code]);
+    soldOwnedProperty := inProps(sourceCode IN [DueDiligence.Constants.OWNED_PROPERTY_CODE, DueDiligence.Constants.SOLD_PROPERTY_CODE]);
  
     getUniquePropertyBySource(STRING2 propertySource) := FUNCTION
       filterProperty := soldOwnedProperty(sourceCode = propertySource);
@@ -19,12 +25,14 @@ EXPORT getSharedProperty(DATASET(DueDiligence.LayoutsInternal.PropertySlimLayout
 
 
     //select property records that were OWNED at some point
-    propOwnedAtSomePoint := getUniquePropertyBySource(DueDiligence.Constants.Owned_Property_code);
-  
-    //select property records that were SOLD at some point by this business                                                                                   ------
+    propOwnedAtSomePoint := getUniquePropertyBySource(DueDiligence.Constants.OWNED_PROPERTY_CODE);
+
+    //select property records that were SOLD at some point
     propertySold := getUniquePropertyBySource(DueDiligence.Constants.Sold_Property_code);                 
     uniqueSoldPropAddrs := DEDUP(SORT(propertySold, seq, #EXPAND(BIPv2.IDmacros.mac_ListTop3Linkids()), did, prim_range, prim_name[1..8], zip5, -dateLastSeen), seq, #EXPAND(BIPv2.IDmacros.mac_ListTop3Linkids()), did, prim_range, prim_name[1..8], zip5); 
   
+  
+    
   
     //select property records that are Currenty OWNED
     //that is if the records on right (SOLD) cancel out the records on the left 
@@ -42,9 +50,10 @@ EXPORT getSharedProperty(DATASET(DueDiligence.LayoutsInternal.PropertySlimLayout
                                     LEFT ONLY);
     
 	
+    propOwnedDataToUse := IF(isPerson, inProps(isCurrent), propertyCurrentlyOwned);
 		
     //Get the assessed value and other details for each property in the list														
-    propertyOwnedWithDetails := JOIN(propertyCurrentlyOwned, LN_PropertyV2.key_assessor_fid(), 
+    propertyOwnedWithDetails := JOIN(propOwnedDataToUse, LN_PropertyV2.key_assessor_fid(), 
                                       KEYED(left.LNFaresId = right.ln_fares_id),
                                       TRANSFORM(DueDiligence.LayoutsInternal.PropertySlimLayout,
                                                 SELF.seq := LEFT.seq;
@@ -97,10 +106,10 @@ EXPORT getSharedProperty(DATASET(DueDiligence.LayoutsInternal.PropertySlimLayout
                                                               
                                               SELF.assessedYear := assessed.assessedYear;
                                               SELF.assessedTotalValue := assessed.assessedTotalValue;
-                                              
+                                                                                            
                                               SELF := LEFT;)); 
                                               
-                                           
+                                          
                  
                  
     limitedProperties := DEDUP(SORT(propWithUniqueAddress, seq, #EXPAND(BIPv2.IDmacros.mac_ListTop3Linkids()), did, -assessedYear), seq, #EXPAND(BIPv2.IDmacros.mac_ListTop3Linkids()), did, KEEP(DueDiligence.Constants.MAX_PROPERTIES));
@@ -125,54 +134,55 @@ EXPORT getSharedProperty(DATASET(DueDiligence.LayoutsInternal.PropertySlimLayout
                         TRANSFORM(RECORDOF(LEFT),
                                   SELF.ownedProps := LEFT.ownedProps + RIGHT.ownedProps;
                                   SELF.totalSumAssessedValue := LEFT.totalSumAssessedValue + RIGHT.totalSumAssessedValue;
-                                  SELF := LEFT;));                                                          	
+                                  SELF := LEFT;));  
+                                  
+    
+    //grab unique individuals/businesses in the event there are no current properties
+    uniqueInputIDs := DEDUP(SORT(inProps, seq, #EXPAND(BIPv2.IDmacros.mac_ListTop3Linkids()), did), seq, #EXPAND(BIPv2.IDmacros.mac_ListTop3Linkids()), did); 
 		
     //addSummaryCounts
-    addOwnCounts := PROJECT(rollGroup, TRANSFORM(RECORDOF(LEFT),
-                                              SELF.ownPropCnt := COUNT(LEFT.ownedProps);
-                                              SELF := LEFT;));
+    addCounts := JOIN(uniqueInputIDs, rollGroup,
+                      #EXPAND(DueDiligence.Constants.mac_JOINLinkids_Results()) AND
+                      LEFT.did = RIGHT.did,
+                      TRANSFORM(RECORDOF(RIGHT),
+                                SELF.seq := LEFT.seq;
+                                SELF.ultID := LEFT.ultID;
+                                SELF.orgID := LEFT.orgID;
+                                SELF.seleID := LEFT.seleID;
+                                SELF.did := LEFT.did;
+                                SELF.ownPropCnt := COUNT(RIGHT.ownedProps);
+                                SELF.soldPropCnt := COUNT(uniqueSoldPropAddrs(ultID = LEFT.ultID AND
+                                                                              orgID = LEFT.orgID AND
+                                                                              seleID = LEFT.seleID AND
+                                                                              did = LEFT.did));
+                                SELF := RIGHT;),
+                     LEFT OUTER);
+                      
                                               
-    //Summarize the results to get the SOLD Property Count
-    summerizeSoldProps := TABLE(uniqueSoldPropAddrs, 
-	                              {seq, ultid, orgid, seleid, did,
-																SOLDPropCnt := COUNT(GROUP)}, 
-																seq, ultID, orgID, seleID, did);
-                                              
-    addSoldCounts := JOIN(addOwnCounts, summerizeSoldProps,
-                          #EXPAND(DueDiligence.Constants.mac_JOINLinkids_Results()) AND
-                          LEFT.did = RIGHT.did,
-                          TRANSFORM(RECORDOF(LEFT),
-                                    SELF.seq := IF(LEFT.seq = DueDiligence.Constants.NUMERIC_ZERO, RIGHT.seq, LEFT.seq);
-                                    SELF.ultID := IF(LEFT.ultID = DueDiligence.Constants.NUMERIC_ZERO, RIGHT.ultID, LEFT.ultID);
-                                    SELF.orgID := IF(LEFT.orgID = DueDiligence.Constants.NUMERIC_ZERO, RIGHT.orgID, LEFT.orgID);
-                                    SELF.seleID := IF(LEFT.seleID = DueDiligence.Constants.NUMERIC_ZERO, RIGHT.seleID, LEFT.seleID);
-                                    SELF.did := IF(LEFT.did = DueDiligence.Constants.NUMERIC_ZERO, RIGHT.did, LEFT.did);
-                                    SELF.soldPropCnt := RIGHT.SOLDPropCnt;
-                                    SELF := LEFT;),
-                          FULL OUTER);
+    
                       
 
 
 
 
 
+     // OUTPUT(inProps, NAMED('inProps'));
      // OUTPUT(propOwnedAtSomePoint, NAMED('propOwnedAtSomePoint'));
      // OUTPUT(propertySold, NAMED('propertySold'));
      // OUTPUT(uniqueSoldPropAddrs, NAMED('uniqueSoldPropAddrs'));
         
      // OUTPUT(propertyCurrentlyOwned, NAMED('propertyCurrentlyOwned'));
+     // OUTPUT(propOwnedDataToUse, NAMED('propOwnedDataToUse'));
      // OUTPUT(propertyOwnedWithDetails, NAMED('propertyOwnedWithDetails'));
      // OUTPUT(sortedProps, NAMED('sortedProps'));
      // OUTPUT(propWithUniqueAddress, NAMED('propWithUniqueAddress'));
      // OUTPUT(limitedProperties, NAMED('limitedProperties'));
      // OUTPUT(maxProperties, NAMED('maxProperties'));
      
-     // OUTPUT(groupProps, NAMED('groupProps'));
      // OUTPUT(rollGroup, NAMED('rollGroup'));
-     // OUTPUT(addOwnCounts, NAMED('addOwnCounts'));    
-     // OUTPUT(summerizeSoldProps, NAMED('summerizeSoldProps'));
-     // OUTPUT(addSoldCounts, NAMED('addSoldCounts'));
+     // OUTPUT(uniqueInputIDs, NAMED('uniqueInputIDs'));
+     // OUTPUT(addCounts, NAMED('addCounts'));    
 
 
-    RETURN addSoldCounts;
+    RETURN addCounts;
 END;

@@ -8,7 +8,7 @@ EXPORT getBocaShell(DATASET(DueDiligence.v3Layouts.DDInput.PersonSearch) inData,
 
     iid_ready := PROJECT(inData, TRANSFORM(Risk_Indicators.layout_input,
                                             
-                                            histDate := IF(LEFT.historyDateRaw = 0, DueDiligence.Constants.date8Nines, LEFT.historyDateRaw);
+                                            histDate := IF(LEFT.historyDateRaw = 0 OR LEFT.historyDateRaw = STD.Date.Today(), DueDiligence.Constants.date8Nines, LEFT.historyDateRaw);
     
                                             SELF.seq := LEFT.seq;
                                             SELF.historydate := (UNSIGNED3)((STRING)histDate)[..6];

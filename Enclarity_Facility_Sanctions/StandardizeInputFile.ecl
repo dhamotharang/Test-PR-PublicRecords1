@@ -1,5 +1,4 @@
-IMPORT  ut, mdr, tools,_validate, Address, Ut, lib_stringlib, _Control, business_header, Enclarity_Facility_Sanctions,
-Header, Header_Slimsort, didville, ut, DID_Add,Business_Header_SS, NID, AID;
+IMPORT  ut, _validate, lib_stringlib, Enclarity_Facility_Sanctions;
 
 EXPORT StandardizeInputFile (string pVersion, boolean pUseProd = false):= MODULE
 
@@ -38,22 +37,22 @@ EXPORT StandardizeInputFile (string pVersion, boolean pUseProd = false):= MODULE
 			prep_clia_end_date							:= TRIM(Stringlib.StringCleanSpaces(stringlib.stringfilterout(L.clia_end_date,'-&#.^!$+<>@=%?*/:;[]#\\')),LEFT, RIGHT);
 			prep_sanc1_order_date_ef				:= TRIM(Stringlib.StringCleanSpaces(stringlib.stringfilterout(L.sanc1_order_date_ef,'-&#.^!$+<>@=%?*/:;[]#\\')),LEFT, RIGHT);
 			prep_added_date_ef							:= TRIM(Stringlib.StringCleanSpaces(stringlib.stringfilterout(L.added_date_ef,'-&#.^!$+<>@=%?*/:;[]#\\')),LEFT, RIGHT);
-			SELF.clean_lic1_begin_date			:= _validate.date.fCorrectedDateString(prep_lic1_begin_date);        	
-			SELF.clean_lic1_end_date				:= _validate.date.fCorrectedDateString(prep_lic1_end_date);        	
-			SELF.clean_npi_deact_date				:= _validate.date.fCorrectedDateString(prep_npi_deact_date);          	
-			SELF.clean_last_update_date			:= _validate.date.fCorrectedDateString(prep_last_update_date);        	
-			SELF.clean_sanc1_date						:= _validate.date.fCorrectedDateString(prep_sanc1_date);             	
-			SELF.clean_sanc1_rein_date			:= _validate.date.fCorrectedDateString(prep_sanc1_rein_date);         	
-			SELF.clean_clia_cert_eff_date		:= _validate.date.fCorrectedDateString(prep_clia_cert_eff_date);     	
-			SELF.clean_clia_end_date				:= _validate.date.fCorrectedDateString(prep_clia_end_date);            	
-			SELF.clean_sanc1_order_date_ef	:= _validate.date.fCorrectedDateString(prep_sanc1_order_date_ef); 
+			SELF.clean_lic1_begin_date			:= _validate.date.fCorrectedDateString(prep_lic1_begin_date);
+			SELF.clean_lic1_end_date				:= _validate.date.fCorrectedDateString(prep_lic1_end_date);
+			SELF.clean_npi_deact_date				:= _validate.date.fCorrectedDateString(prep_npi_deact_date);
+			SELF.clean_last_update_date			:= _validate.date.fCorrectedDateString(prep_last_update_date);
+			SELF.clean_sanc1_date						:= _validate.date.fCorrectedDateString(prep_sanc1_date);
+			SELF.clean_sanc1_rein_date			:= _validate.date.fCorrectedDateString(prep_sanc1_rein_date);
+			SELF.clean_clia_cert_eff_date		:= _validate.date.fCorrectedDateString(prep_clia_cert_eff_date);
+			SELF.clean_clia_end_date				:= _validate.date.fCorrectedDateString(prep_clia_end_date);
+			SELF.clean_sanc1_order_date_ef	:= _validate.date.fCorrectedDateString(prep_sanc1_order_date_ef);
 			SELF.clean_added_date_ef				:= _validate.date.fCorrectedDateString(ut.ConvertDate(TRIM(L.added_date_ef),'%m/%d/%Y','%Y%m%d'));
 			SELF  													:=  L;
 			SELF  													:=  [];
 		END;
 
 		newBase	:= PROJECT(baseFile, tMapping(LEFT));
-														
-		RETURN newBase;	
-	END;	
+
+		RETURN newBase;
+	END;
 END;

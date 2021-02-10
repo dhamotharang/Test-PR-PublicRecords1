@@ -7129,18 +7129,27 @@ bbfm1906_1_0 :=   __common__( map(
   
   #else
      
-     reasonCodes := Models.BB_WarningCodes(le.clam, le.Busshell , num_reasons, business_only_check)[1].hris;
-  
-  
-  	 SELF.ri := PROJECT(reasonCodes, TRANSFORM(Risk_Indicators.Layout_Desc,
-																							SELF.hri := LEFT.hri,
-																							SELF.desc := Risk_Indicators.getHRIDesc(LEFT.hri)
-																					));
+      reasonCodes := Models.BB_WarningCodes(le.clam, le.Busshell , num_reasons, business_only_check)[1].hris;
+      
+      rCodes := DATASET([{'11B',Risk_Indicators.getHRIDesc('11B')}
+                        ], Risk_Indicators.Layout_Desc);
+                        
+      cScore := (STRING3)BBFM1906_1_0;
+      
+      SELF.ri := IF(cScore = '222',
+                    rCodes,
+                    PROJECT(reasonCodes, 
+                        TRANSFORM(Risk_Indicators.Layout_Desc,
+                            SELF.hri := LEFT.hri,
+                            SELF.desc := Risk_Indicators.getHRIDesc(LEFT.hri)
+                                 )
+                           )
+                   );
                                           
                                           
 
-		 SELF.score := (STRING3)BBFM1906_1_0;
-		SELF.seq := le.busshell.input_echo.seq;
+      SELF.score := cScore;
+      SELF.seq := le.busshell.input_echo.seq;
   
   #end   
   

@@ -1,4 +1,4 @@
-import ut, did_add, didville, header_slimsort;
+import ut, did_add;
 
 #workunit('name', 'D&B Contacts Reset DID ' + DNB.DNB_Reset_Date);
 
@@ -16,12 +16,12 @@ dnb_contacts_init := project(dnb_contacts, InitDNBContacts(left));
 
 // did the contacts
 did_add.MAC_Match_Flex(dnb_contacts_init, dnb_matchset,						//see above
-	 ssn_field, dob_field, fname, mname,lname, name_suffix, 
+	 ssn_field, dob_field, fname, mname,lname, name_suffix,
 	 company_prim_range, company_prim_name, company_sec_range, company_zip, company_st, company_phone10, //year_of_residence_field, not ready for release yet
-	 did,   			
-	 DNB.Layout_DNB_Contacts_Base, 
+	 did,
+	 DNB.Layout_DNB_Contacts_Base,
 	 false, DID_Score_field,	//these should default to zero in definition
-	 75,	//dids with a score below here will be dropped 
+	 75,	//dids with a score below here will be dropped
 	 dnb_contacts_did)
 
 //output(dnb_contacts_did,,'BASE::DNB_Contacts_' + DNB.DNB_Reset_Date, overwrite);

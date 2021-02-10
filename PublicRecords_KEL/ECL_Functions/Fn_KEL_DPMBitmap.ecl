@@ -1,4 +1,4 @@
-﻿IMPORT $.^.^.BIPV2, $.^.^.MDR, $.^.^.PublicRecords_KEL, $.^.^.Risk_Indicators, $.^.^.RiskVIew, $.^.^.dx_BestRecords, $.^.^.UT, STD;
+﻿IMPORT BIPV2, MDR, PublicRecords_KEL, Risk_Indicators, RiskVIew, dx_BestRecords, UT, STD;
 IMPORT KEL13 AS KEL;
 
 EXPORT Fn_KEL_DPMBitmap := MODULE
@@ -438,12 +438,12 @@ EXPORT Fn_KEL_DPMBitmap := MODULE
 				MDR.SourceTools.src_Phones_Plus => KELPermissions.Permit_Phones_Plus,
 				//MDR.SourceTools.src_Phones_Accudata_OCN_LNP => KELPermissions.Permit_Phones_Accudata_OCN_LNP,
 				//MDR.SourceTools.src_Phones_Accudata_CNAM_CNM2 => KELPermissions.Permit_Phones_Accudata_CNAM_CNM2,
-				//MDR.SourceTools.src_Phones_Disconnect => KELPermissions.Permit_Phones_Disconnect,
+				MDR.SourceTools.src_Phones_Disconnect => KELPermissions.Permit_Phones_Disconnect,
 				//MDR.SourceTools.src_Phones_Gong_History_Disconnect => KELPermissions.Permit_Phones_Gong_History_Disconnect,
 				//MDR.SourceTools.src_PhonesPorted_TCPA_CL => KELPermissions.Permit_PhonesPorted_TCPA_CL,
-				//MDR.SourceTools.src_PhoneFraud_OTP => KELPermissions.Permit_PhoneFraud_OTP,
+				MDR.SourceTools.src_PhoneFraud_OTP => KELPermissions.Permit_PhoneFraud_OTP,
 				//MDR.SourceTools.src_Phones_Lerg6 => KELPermissions.Permit_Phones_Lerg6,
-				//MDR.SourceTools.src_Phones_LIDB => KELPermissions.Permit_Phones_LIDB,
+				MDR.SourceTools.src_Phones_LIDB => KELPermissions.Permit_Phones_LIDB,
 				//MDR.SourceTools.src_PhonesPorted_TCPA => KELPermissions.Permit_PhonesPorted_TCPA,
 				//MDR.SourceTools.src_PhonesPorted_iConectiv => KELPermissions.Permit_PhonesPorted_iConectiv,
 				//MDR.SourceTools.src_PhonesPorted_iConectiv_Rng => KELPermissions.Permit_PhonesPorted_iConectiv_Rng,
@@ -632,6 +632,7 @@ EXPORT Fn_KEL_DPMBitmap := MODULE
 				PublicRecords_KEL.ECL_Functions.Constants.CorrelationRiskGong => KELPermissions.Permit_CorrelationRiskGong,
 				PublicRecords_KEL.ECL_Functions.Constants.src_Dunn_Data_Email => KELPermissions.Permit_Dunn_Data_Email,
 				PublicRecords_KEL.ECL_Functions.Constants.src_MA_Census => KELPermissions.Permit_MA_Census,			
+				PublicRecords_KEL.ECL_Functions.Constants.ADL => KELPermissions.Permit_ADL,			
 				KELPermissions.Permit__NONE),
 				
 			BitOr(IF(Source IN SET(PublicRecords_KEL.ECL_Functions.Constants.DEFAULT_ALLOWED_SOURCES, Source), KELPermissions.Permit_NoRestriction, KELPermissions.Permit_Restricted), // Don't allow new sources without explicitly adding them in MAS.
@@ -660,7 +661,7 @@ EXPORT Fn_KEL_DPMBitmap := MODULE
 			BitOr(IF(DataRestrictionMask[Risk_Indicators.iid_constants.posExperianRestriction] != '1', KELPermissions.Permit_Experian, KELPermissions.Permit__NONE) , // If Experian Source is NOT restricted in the DataRestrictionMask, allow its usage in KEL
 			BitOr(IF(DataRestrictionMask[Risk_Indicators.iid_constants.posCertegyRestriction] != '1', KELPermissions.Permit_Certegy, KELPermissions.Permit__NONE) , // If Certegy Source is NOT restricted in the DataRestrictionMask, allow its usage in KEL
 			BitOr(IF(DataRestrictionMask[Risk_Indicators.iid_constants.posEquifaxRestriction] != '1', KELPermissions.Permit_Equifax, KELPermissions.Permit_NonEquifax) , // If Equifax Source is NOT restricted in the DataRestrictionMask, allow its usage in KEL
-			BitOr(IF(DataRestrictionMask[Risk_Indicators.iid_constants.posTransUnionRestriction] != '1', KELPermissions.Permit_TU_CreditHeader, KELPermissions.Permit__NONE) , // If TransUnion Source is NOT restricted in the DataRestrictionMask, allow its usage in KEL
+			BitOr(IF(EXISTS(AllowedSources(Source = MDR.SourceTools.src_TU_CreditHeader)) AND DataRestrictionMask[Risk_Indicators.iid_constants.posTransUnionRestriction] != '1', KELPermissions.Permit_TU_CreditHeader, KELPermissions.Permit__NONE) , // If TransUnion Source is NOT restricted in the DataRestrictionMask, allow its usage in KEL
 			BitOr(IF(DataRestrictionMask[Risk_Indicators.iid_constants.posADVORestriction] != '1', KELPermissions.Permit_Advo, KELPermissions.Permit__NONE) , // If ADVO Source is NOT restricted in the DataRestrictionMask, allow its usage in KEL
 			BitOr(IF(DataRestrictionMask[Risk_Indicators.iid_constants.posExperianFCRARestriction] != '1', KELPermissions.Permit_ExperianFCRA, KELPermissions.Permit__NONE) , // If ExperianFCRA Source is NOT restricted in the DataRestrictionMask, allow its usage in KEL
 			BitOr(IF(DataRestrictionMask[Risk_Indicators.iid_constants.posExperianPhonesRestriction] != '1', KELPermissions.Permit_ExperianPhones, KELPermissions.Permit__NONE) , // If  Source is NOT restricted in the DataRestrictionMask, allow its usage in KEL
@@ -1008,12 +1009,12 @@ EXPORT Fn_KEL_DPMBitmap := MODULE
 			BitOr(IF(EXISTS(AllowedSources(Source = MDR.SourceTools.src_Phones_Plus)), KELPermissions.Permit_Phones_Plus, KELPermissions.Permit__NONE),
 			//BitOr(IF(EXISTS(AllowedSources(Source = MDR.SourceTools.src_Phones_Accudata_OCN_LNP)), KELPermissions.Permit_Phones_Accudata_OCN_LNP, KELPermissions.Permit__NONE),
 			//BitOr(IF(EXISTS(AllowedSources(Source = MDR.SourceTools.src_Phones_Accudata_CNAM_CNM2)), KELPermissions.Permit_Phones_Accudata_CNAM_CNM2, KELPermissions.Permit__NONE),
-			//BitOr(IF(EXISTS(AllowedSources(Source = MDR.SourceTools.src_Phones_Disconnect)), KELPermissions.Permit_Phones_Disconnect, KELPermissions.Permit__NONE),
+			BitOr(IF(EXISTS(AllowedSources(Source = MDR.SourceTools.src_Phones_Disconnect)), KELPermissions.Permit_Phones_Disconnect, KELPermissions.Permit__NONE),
 			//BitOr(IF(EXISTS(AllowedSources(Source = MDR.SourceTools.src_Phones_Gong_History_Disconnect)), KELPermissions.Permit_Phones_Gong_History_Disconnect, KELPermissions.Permit__NONE),
 			//BitOr(IF(EXISTS(AllowedSources(Source = MDR.SourceTools.src_PhonesPorted_TCPA_CL)), KELPermissions.Permit_PhonesPorted_TCPA_CL, KELPermissions.Permit__NONE),
-			//BitOr(IF(EXISTS(AllowedSources(Source = MDR.SourceTools.src_PhoneFraud_OTP)), KELPermissions.Permit_PhoneFraud_OTP, KELPermissions.Permit__NONE),
+			BitOr(IF(EXISTS(AllowedSources(Source = MDR.SourceTools.src_PhoneFraud_OTP)), KELPermissions.Permit_PhoneFraud_OTP, KELPermissions.Permit__NONE),
 			//BitOr(IF(EXISTS(AllowedSources(Source = MDR.SourceTools.src_Phones_Lerg6)), KELPermissions.Permit_Phones_Lerg6, KELPermissions.Permit__NONE),
-			//BitOr(IF(EXISTS(AllowedSources(Source = MDR.SourceTools.src_Phones_LIDB)), KELPermissions.Permit_Phones_LIDB, KELPermissions.Permit__NONE),
+			BitOr(IF(EXISTS(AllowedSources(Source = MDR.SourceTools.src_Phones_LIDB)), KELPermissions.Permit_Phones_LIDB, KELPermissions.Permit__NONE),
 			//BitOr(IF(EXISTS(AllowedSources(Source = MDR.SourceTools.src_PhonesPorted_TCPA)), KELPermissions.Permit_PhonesPorted_TCPA, KELPermissions.Permit__NONE),
 			//BitOr(IF(EXISTS(AllowedSources(Source = MDR.SourceTools.src_PhonesPorted_iConectiv)), KELPermissions.Permit_PhonesPorted_iConectiv, KELPermissions.Permit__NONE),
 			//BitOr(IF(EXISTS(AllowedSources(Source = MDR.SourceTools.src_PhonesPorted_iConectiv_Rng)), KELPermissions.Permit_PhonesPorted_iConectiv_Rng, KELPermissions.Permit__NONE),
@@ -1051,7 +1052,6 @@ EXPORT Fn_KEL_DPMBitmap := MODULE
 			//BitOr(IF(EXISTS(AllowedSources(Source = MDR.SourceTools.src_Thrive_PD_POE_Email)), KELPermissions.Permit_Thrive_PD_POE_Email, KELPermissions.Permit__NONE),
 			BitOr(IF(EXISTS(AllowedSources(Source = MDR.SourceTools.src_TransUnion)), KELPermissions.Permit_src_TransUnion, KELPermissions.Permit__NONE),
 			BitOr(IF(EXISTS(AllowedSources(Source = MDR.SourceTools.src_TUCS_Ptrack)), KELPermissions.Permit_TUCS_Ptrack, KELPermissions.Permit__NONE),
-			BitOr(IF(EXISTS(AllowedSources(Source = MDR.SourceTools.src_TU_CreditHeader)), KELPermissions.Permit_TU_CreditHeader, KELPermissions.Permit__NONE),
 			BitOr(IF(EXISTS(AllowedSources(Source = MDR.SourceTools.src_TXBUS)), KELPermissions.Permit_TXBUS, KELPermissions.Permit__NONE),
 			//BitOr(IF(EXISTS(AllowedSources(Source = MDR.SourceTools.src_UCC)), KELPermissions.Permit_UCC, KELPermissions.Permit__NONE),
 			BitOr(IF(EXISTS(AllowedSources(Source = MDR.SourceTools.src_UCCV2)), KELPermissions.Permit_UCCV2, KELPermissions.Permit__NONE),
@@ -1202,6 +1202,7 @@ EXPORT Fn_KEL_DPMBitmap := MODULE
 			BitOr(IF(EXISTS(AllowedSources(Source = PublicRecords_KEL.ECL_Functions.Constants.CorrelationRiskGong)), KELPermissions.Permit_CorrelationRiskGong, KELPermissions.Permit__NONE),
 			BitOr(IF(EXISTS(AllowedSources(Source = PublicRecords_KEL.ECL_Functions.Constants.src_Dunn_Data_Email)), KELPermissions.Permit_Dunn_Data_Email, KELPermissions.Permit__NONE),
 			BitOr(IF(EXISTS(AllowedSources(Source = PublicRecords_KEL.ECL_Functions.Constants.src_MA_Census)), KELPermissions.Permit_MA_Census, KELPermissions.Permit__NONE),
+			BitOr(IF(EXISTS(AllowedSources(Source = PublicRecords_KEL.ECL_Functions.Constants.ADL)), KELPermissions.Permit_ADL , KELPermissions.Permit__NONE),
 
 
 
@@ -1209,8 +1210,8 @@ EXPORT Fn_KEL_DPMBitmap := MODULE
 			KELPermissions.Permit_NoRestriction
 			)))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))
 			)))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))
-			)))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))
-			)))))))))))));
+			))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))
+			)))))))))))))))));
 
 		RETURN(Permissions);
 	END;
@@ -1639,12 +1640,12 @@ EXPORT Fn_KEL_DPMBitmap := MODULE
 			{'Permit_Phones_Plus', BitAnd(KELDPM, KELPermissions.Permit_Phones_Plus) <> KELPermissions.Permit__NONE},
 			//{'Permit_Phones_Accudata_OCN_LNP', BitAnd(KELDPM, KELPermissions.Permit_Phones_Accudata_OCN_LNP) <> KELPermissions.Permit__NONE},
 			//{'Permit_Phones_Accudata_CNAM_CNM2', BitAnd(KELDPM, KELPermissions.Permit_Phones_Accudata_CNAM_CNM2) <> KELPermissions.Permit__NONE},
-			//{'Permit_Phones_Disconnect', BitAnd(KELDPM, KELPermissions.Permit_Phones_Disconnect) <> KELPermissions.Permit__NONE},
+			{'Permit_Phones_Disconnect', BitAnd(KELDPM, KELPermissions.Permit_Phones_Disconnect) <> KELPermissions.Permit__NONE},
 			//{'Permit_Phones_Gong_History_Disconnect', BitAnd(KELDPM, KELPermissions.Permit_Phones_Gong_History_Disconnect) <> KELPermissions.Permit__NONE},
 			//{'Permit_PhonesPorted_TCPA_CL', BitAnd(KELDPM, KELPermissions.Permit_PhonesPorted_TCPA_CL) <> KELPermissions.Permit__NONE},
-			//{'Permit_PhoneFraud_OTP', BitAnd(KELDPM, KELPermissions.Permit_PhoneFraud_OTP) <> KELPermissions.Permit__NONE},
+			{'Permit_PhoneFraud_OTP', BitAnd(KELDPM, KELPermissions.Permit_PhoneFraud_OTP) <> KELPermissions.Permit__NONE},
 			//{'Permit_Phones_Lerg6', BitAnd(KELDPM, KELPermissions.Permit_Phones_Lerg6) <> KELPermissions.Permit__NONE},
-			//{'Permit_Phones_LIDB', BitAnd(KELDPM, KELPermissions.Permit_Phones_LIDB) <> KELPermissions.Permit__NONE},
+			{'Permit_Phones_LIDB', BitAnd(KELDPM, KELPermissions.Permit_Phones_LIDB) <> KELPermissions.Permit__NONE},
 			//{'Permit_PhonesPorted_TCPA', BitAnd(KELDPM, KELPermissions.Permit_PhonesPorted_TCPA) <> KELPermissions.Permit__NONE},
 			//{'Permit_PhonesPorted_iConectiv', BitAnd(KELDPM, KELPermissions.Permit_PhonesPorted_iConectiv) <> KELPermissions.Permit__NONE},
 			//{'Permit_PhonesPorted_iConectiv_Rng', BitAnd(KELDPM, KELPermissions.Permit_PhonesPorted_iConectiv_Rng) <> KELPermissions.Permit__NONE},
@@ -1832,7 +1833,8 @@ EXPORT Fn_KEL_DPMBitmap := MODULE
 			{'Permit_VehicleDI', BitAnd(KELDPM, KELPermissions.Permit_VehicleDI) <> KELPermissions.Permit__NONE},
 			{'Permit_CorrelationRiskGong', BitAnd(KELDPM, KELPermissions.Permit_CorrelationRiskGong) <> KELPermissions.Permit__NONE},
 			{'Permit_Dunn_Data_Email', BitAnd(KELDPM, KELPermissions.Permit_Dunn_Data_Email) <> KELPermissions.Permit__NONE},
-			{'Permit_MA_Census', BitAnd(KELDPM, KELPermissions.Permit_MA_Census) <> KELPermissions.Permit__NONE}
+			{'Permit_MA_Census', BitAnd(KELDPM, KELPermissions.Permit_MA_Census) <> KELPermissions.Permit__NONE},
+			{'Permit_ADL', BitAnd(KELDPM, KELPermissions.Permit_ADL) <> KELPermissions.Permit__NONE}
 			], {STRING40 Permits_Name, BOOLEAN Permits_Set}) (Permits_Name[1..17] != 'Permit_Unassigned');
 	
 		RETURN result;

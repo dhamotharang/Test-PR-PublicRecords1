@@ -196,6 +196,7 @@ export Comprehensive_Report_Service := MACRO
 #stored('DataRestrictionMask','00000000000000000000');  //intentionally has diff default behavior than doxie_ln version
 #CONSTANT('GONG_SEARCHTYPE','PERSON');
 #CONSTANT('IsCRS', true);
+#CONSTANT('UseAddressHierarchy', true);
 #constant('IncludeNonDMVSources', true);
 
 BOOLEAN in_getSSNBest := FALSE: STORED('GetSSNBest');
