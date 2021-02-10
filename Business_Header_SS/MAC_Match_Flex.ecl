@@ -31,10 +31,10 @@ EXPORT MAC_Match_Flex
 	,score_threshold				= '75'
 	,pFileVersion						= '\'prod\''														// default to use prod version of superfiles
 	,pUseOtherEnvironment		= business_header._Dataset().IsDataland	// default is to hit prod on dataland, and on prod hit prod.
-	,pSetLinkingVersions 		= BIPV2.IDconstants.xlink_versions_default	
+	,pSetLinkingVersions 		= BIPV2.IDconstants.xlink_versions_default
 	,pURL										=	''
 	,pEmail									=	''
-	,pCity									= ''	
+	,pCity									= ''
 	,pContact_fname					= ''
 	,pContact_mname					= ''
 	,pContact_lname					= ''
@@ -45,9 +45,9 @@ EXPORT MAC_Match_Flex
 ) :=
 MACRO
 
-import BIPV2,did_add;
+import ut, BIPV2, Business_Header, did_add;
 
-#uniquename(outfilebdid)	
+#uniquename(outfilebdid)
 #if(BIPV2.IDconstants.xlink_version_BDID in pSetLinkingVersions)
 
 	#uniquename(pBHFile						)
@@ -84,7 +84,7 @@ import BIPV2,did_add;
 
 	#uniquename(infile_seq)
 	ut.MAC_Sequence_Records(%infile_id_layout%, temp_id, %infile_seq%)
-	
+
 	//for thor route - decide whether a record is matchable
 	//SRC MATCH FILTER ISSUE:
 	//	when using bip mode, we are now passing already BDID'D (think src matching) records thru this macro (to pick up BIP IDS), so we have to route them around the BDID process
@@ -167,9 +167,9 @@ import BIPV2,did_add;
 		%infile_id_distinct%.BDID_field;
 		%infile_id_distinct%.%bdid_score%;
 		%infile_id_distinct%.%name_similar_score%;
-		%infile_id_distinct%.company_name_field; 
+		%infile_id_distinct%.company_name_field;
 	#if('F' in matchset)
-		%infile_id_distinct%.fein_field; 
+		%infile_id_distinct%.fein_field;
 	#end
 	#if('A' in matchset)
 		%infile_id_distinct%.prange_field;
@@ -212,13 +212,13 @@ import BIPV2,did_add;
 								,phone_field
 								,fein_field
 								,keep_count
-								,pFileVersion					
+								,pFileVersion
 								,pUseOtherEnvironment
 	//							,%pCnameAddressBase%
-	//							,%pCnameFeinBase%		
-	//							,%pCnamePhoneBase%		
+	//							,%pCnameFeinBase%
+	//							,%pCnamePhoneBase%
 								)
-								
+
 	%match_companyname_addr% := %pre_match_address%(bdid_field <> 0 AND %bdid_score% >= score_threshold);
 
 	#uniquename(match_address_init)
@@ -238,7 +238,7 @@ import BIPV2,did_add;
 							%match_address_select%(left, right),
 							right only,
 							local);
-													
+
 	#else
 	// Null companyname_addr set
 	%match_companyname_addr% := %infile_slim%;
@@ -260,13 +260,13 @@ import BIPV2,did_add;
 								,state_field
 								,zip_field
 								,keep_count
-								,pFileVersion					
+								,pFileVersion
 								,pUseOtherEnvironment
 	//							,%pCnameAddressBase%
 								)
-								
+
 	Business_Header_SS.MAC_Dedup_BDID_TEMPID(
-				%pre_match_address_partial%, %match_address_partial%, 
+				%pre_match_address_partial%, %match_address_partial%,
 				BDID_Field, %bdid_score%, %name_similar_score%)
 	#else
 	%match_address_partial% := %match_address%;
@@ -283,13 +283,13 @@ import BIPV2,did_add;
 								,%name_similar_score%
 								,company_name_field
 								,fein_field
-								,pFileVersion					
+								,pFileVersion
 								,pUseOtherEnvironment
 	//							,%pCnameFeinBase%
 								)
 
 	Business_Header_SS.MAC_Dedup_BDID_TEMPID(
-				%pre_match_fein%, %match_fein%, 
+				%pre_match_fein%, %match_fein%,
 				BDID_Field, %bdid_score%, %name_similar_score%)
 
 	#else
@@ -306,13 +306,13 @@ import BIPV2,did_add;
 								,%name_similar_score%
 								,company_name_field
 								,phone_field
-								,pFileVersion					
+								,pFileVersion
 								,pUseOtherEnvironment
 	//							,%pCnamePhoneBase%
 								)
 
 	Business_Header_SS.MAC_Dedup_BDID_TEMPID(
-				%pre_match_phone%, %match_phone%, 
+				%pre_match_phone%, %match_phone%,
 				BDID_Field, %bdid_score%, %name_similar_score%)
 
 	#else
@@ -327,7 +327,7 @@ import BIPV2,did_add;
 								,%bdid_score%
 								,%name_similar_score%
 								,company_name_field
-								,pFileVersion					
+								,pFileVersion
 								,pUseOtherEnvironment
 	//							,%pCnameBase%
 								)
@@ -342,12 +342,12 @@ import BIPV2,did_add;
 
 	#uniquename(match_all_tempid_bdid)
 	Business_Header_SS.MAC_Dedup_BDID_TEMPID(
-				%match_all_dist%, %match_all_tempid_bdid%, 
+				%match_all_dist%, %match_all_tempid_bdid%,
 				BDID_Field, %bdid_score%, %name_similar_score%)
 
 	#uniquename(bhb)
 	%bhb% := %pBHBFile%;
-								
+
 	#uniquename(match_full_best_layout)
 	#uniquename(best_prim_range)
 	#uniquename(best_prim_name)
@@ -385,14 +385,14 @@ import BIPV2,did_add;
 	%match_full_best_dist% := DISTRIBUTE(%match_full_best%, HASH(temp_id));
 
 	// Make sure that the same BDID doesn't appear multiple times
-	// for any temp id.  The company name match is not local, so 
+	// for any temp id.  The company name match is not local, so
 	// we need the above distribute before doing this for the
 	// last time.
 
 	#uniquename(match_all_sort)
 	// Note the BDID picked when the bdid_score and name_similar_score are equal can
 	// be improved by picking a BDID with a non-blank, non-PO BOX address
-	%match_all_sort% := SORT(%match_full_best_dist%, 
+	%match_all_sort% := SORT(%match_full_best_dist%,
 		temp_id, -%bdid_score%, -%name_similar_score%,
 						 map(%best_zip% <> 0 and %best_prim_name% <> '' and %best_prim_range% <> '' => 0,  // prefer full address (can't be a PO Box)
 							%best_zip% <> 0 and %best_prim_name% <> '' and %best_prim_name%[1..6] <> 'PO BOX' => 1, // allows RR but not PO BOX
@@ -403,7 +403,7 @@ import BIPV2,did_add;
 					 %best_city% <> '' and %best_state% <> '' => 6, // Anything with a city and state
 					 7),
 					BDID_field, LOCAL);
-					
+
 	#uniquename(match_all_dedup)
 	%match_all_dedup% := DEDUP(%match_all_sort%, temp_id, KEEP(keep_count), LOCAL);
 
@@ -425,7 +425,7 @@ import BIPV2,did_add;
 	#uniquename(bdids_assigned)
 	%bdids_assigned% := JOIN(
 		DISTRIBUTE(GROUP(%infile_groupid_assigned%), HASH(temp_id)),
-		%match_all_combined%, 
+		%match_all_combined%,
 		LEFT.temp_id = RIGHT.temp_id,
 		%assign_bdid%(LEFT, RIGHT), LOCAL);
 
@@ -440,9 +440,9 @@ import BIPV2,did_add;
 
 
 	#uniquename(outthor)
-	%outthor% := PROJECT(%bdids_assigned% + %infile_nonmatchable%, 
+	%outthor% := PROJECT(%bdids_assigned% + %infile_nonmatchable%,
 				%format_result%(LEFT));
-				
+
 	//*********************
 	//****** 		ROXIE route
 	//*********************
@@ -457,7 +457,7 @@ import BIPV2,did_add;
 		#if('A' in matchset)
 			self.prim_range := (qSTRING10)l.prange_field;
 			self.prim_name := (qSTRING28)l.pname_field;
-			self.sec_range := (qSTRING8)l.srange_field; 
+			self.sec_range := (qSTRING8)l.srange_field;
 			self.z5 := (qSTRING5)l.zip_field;
 			self.st := (qSTRING2)l.state_field;
 		#else
@@ -500,7 +500,7 @@ import BIPV2,did_add;
 	#uniquename(roxplus)
 	%roxplus% := join(%infile_seq%, %roxout%,
 					left.temp_id = right.seq,
-					%postrox%(left, right), 
+					%postrox%(left, right),
 					hash,local)
 					;
 // output(%infile_seq%, named('infile_seq'));
@@ -549,7 +549,7 @@ import BIPV2,did_add;
 
 
 /*
-//This is the version that should be checked in for the general dataland population for now.	
+//This is the version that should be checked in for the general dataland population for now.
 	outfile := //just a placeholder
 	project(
 		%outfilebdid%,
@@ -561,7 +561,7 @@ import BIPV2,did_add;
 	);
 */
 
-//This is for BIP2.0 xlink dev for now	
+//This is for BIP2.0 xlink dev for now
 Business_Header_SS.MAC_Match_Flex_V2
 (
 	 %outfilebdid%
@@ -581,21 +581,21 @@ Business_Header_SS.MAC_Match_Flex_V2
 	,outfile
 	,keep_count
 	,score_threshold
-	,pFileVersion	
+	,pFileVersion
 	,pUseOtherEnvironment
 	,pSetLinkingVersions  //allow this parameter to specify prod or dev bip version
 	,pURL
 	,pEmail
 	,pCity
 	,pContact_fname
-	,pContact_mname				
-	,pContact_lname					
+	,pContact_mname
+	,pContact_lname
   ,contact_ssn
   ,source
   ,source_record_id
   ,src_matching_is_priority
-)	
-	
+)
+
 #else
 	outfile := %outfilebdid%;
 #end
@@ -617,9 +617,9 @@ output(Inputfile, named('Inputfile'));
 NEW_outrec 							:= {dnb_dmi.Layouts.Temporary.BdidSlim, BIPV2.IDlayouts.l_xlink_ids};
 NEW_SetLinkingVersions 	:= BIPV2.IDconstants.xlink_versions_BDID_BIP;
 NEW_SRC_RID_field				:= BIPV2.IDconstants.SRC_RID_field_default;
-NEW_Inputfile := 
+NEW_Inputfile :=
 project(
-	Inputfile, 
+	Inputfile,
 	transform(
 		{Inputfile, BIPV2.IDlayouts.l_xlink_ids}
 		,self := left
@@ -647,34 +647,34 @@ transform
 	self.source_group := IF(l.active_duns_number = 'Y', l.rawfields.duns_number, 'D' + l.rawfields.duns_number + '-' + stringlib.stringtouppercase(l.rawfields.business_name));
 	self.fein					:= '';
 	BIPV2.IDmacros.mac_SetIDsZero()
-end;   
+end;
 
 dSlimForBdiding2 :=  project(NEW_Inputfile,tSlimForBdiding2(left));
 output(dSlimForBdiding2, named('dSlimForBdiding2'));
 
 Business_Header_SS.MAC_Add_BDID_Flex(
-	 dSlimForBdiding2											// Input Dataset						
-	,BDID_Matchset                        // BDID Matchset what fields to match on           
-	,company_name	                        // company_name	              
-	,prim_range		                        // prim_range		              
-	,prim_name		                        // prim_name		              
-	,zip5					                        // zip5					              
-	,sec_range		                        // sec_range		              
-	,state				                        // state				              
-	,phone				                        // phone				              
-	,fein_not_used                        // fein              
-	,bdid													        // bdid												
-	,NEW_outrec  													// Output Layout 
-	,true                                 // output layout has bdid score field?                       
-	,bdid_score                           // bdid_score                 
-	,dBdidFlexOut2                         // Output Dataset      
+	 dSlimForBdiding2											// Input Dataset
+	,BDID_Matchset                        // BDID Matchset what fields to match on
+	,company_name	                        // company_name
+	,prim_range		                        // prim_range
+	,prim_name		                        // prim_name
+	,zip5					                        // zip5
+	,sec_range		                        // sec_range
+	,state				                        // state
+	,phone				                        // phone
+	,fein_not_used                        // fein
+	,bdid													        // bdid
+	,NEW_outrec  													// Output Layout
+	,true                                 // output layout has bdid score field?
+	,bdid_score                           // bdid_score
+	,dBdidFlexOut2                         // Output Dataset
 	,1																		//threshold
-	,																		
+	,
 	,
 	// ,BIPV2.IDconstants.xlink_versions_BDID_BIP
 	// ,[BIPV2.IDconstants.xlink_version_BDID]
 	,[BIPV2.IDconstants.xlink_version_BIP]
-);   
+);
 
 output(dBdidFlexOut2, named('dBdidFlexOut2'));
 

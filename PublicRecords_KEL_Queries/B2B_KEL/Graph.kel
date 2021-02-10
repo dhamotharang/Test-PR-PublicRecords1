@@ -10,7 +10,7 @@ IMPORT PublicRecords_KEL.Uses;
 // --- Attributes Section ---
 IMPORT KnowledgeUniverse.PublicRecords_KEL.Attributes;
 
-QUERY: NonFCRABusinessSeleIDAttributesV1(INTEGER UltID_in, INTEGER OrgID_in, INTEGER SeleID_in,  
+QUERY: NonFCRABusinessSeleIDAttributesV1Dynamic(INTEGER UltID_in, INTEGER OrgID_in, INTEGER SeleID_in,  
 					DATASET OF PublicRecords_KEL.ECL_Functions.Layouts.LayoutInputPII InputPIIDataset,
 					DATASET OF PublicRecords_KEL.ECL_Functions.Layouts.LayoutInputBII InputBIIDataset, 
 					P_InpClnArchDt, 
@@ -193,7 +193,7 @@ QUERY: NonFCRABusinessSeleIDAttributesV1(INTEGER UltID_in, INTEGER OrgID_in, INT
 		BE_B2BOpsBalVol24Mc,
 		BE_B2BOthBalVol24Mc
 		}
-	ASOF ArchiveDated(P_InpClnArchDt) 
+	ASOF DynamicArchive(P_InpClnArchDt) 
 	USING DPM
 	USE InputPIIDataset(FLAT,
 			InputPII(UID = G_ProcUID),

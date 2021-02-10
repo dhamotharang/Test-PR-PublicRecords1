@@ -41,41 +41,40 @@ EXPORT Layouts := MODULE
       STRING email_addr;
       STRING ip_address;
       STRING perm_purp_inq_type;
-      
+
       STRING120 eu_company_name;
       STRING90 eu_addr_street;
       STRING25 eu_addr_city;
       STRING2 eu_addr_state;
       STRING5 eu_addr_zip5;
       STRING10 eu_phone_nbr;
-      
+
       STRING30 product_code;
       STRING1 transaction_type;
       STRING30 function_name;
       STRING20 customer_id;
       STRING20 company_id;
       STRING20 global_company_id;
-      STRING report_option:='';
-      
+
   END;
 
   EXPORT i_grouprid := RECORD
 
       UNSIGNED8 group_rid;
-      
+
       Inquiry -[product_id, transaction_id];
-      Inquiry_extended - report_option;
+      Inquiry_extended;
 
       STANDARD.NAME;
       STANDARD.ADDR;
-      
+
       STRING9 appended_ssn := '';
       UNSIGNED6 appended_did := 0;
 
       UNSIGNED4 global_sid := 0;
       UNSIGNED8 record_sid := 0;
       STRING report_options := '';
-      
+
   END;
 
   EXPORT i_lexid := RECORD
@@ -86,5 +85,15 @@ EXPORT Layouts := MODULE
       UNSIGNED8 group_rid;
   END;
 
+  EXPORT i_grouprid_encrypted :=record
+      UNSIGNED8 group_rid;
+      UNSIGNED2 key_version;
+      STRING30 key_group;
+      STRING key_encrypted;
+      STRING query_encrypted;
+      UNSIGNED4 global_sid   := 0;
+      UNSIGNED8 record_sid   := 0;
+      STRING    report_options:='';
+  END;
 
 END;

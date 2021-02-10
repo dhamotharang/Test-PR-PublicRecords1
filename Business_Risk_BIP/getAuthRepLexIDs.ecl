@@ -1,11 +1,12 @@
 ﻿IMPORT Business_Risk_BIP, Gateway, Risk_Indicators, doxie;
 
-	// The following function appends the LexID to each of the Authorized Reps. 
+	// The following function appends the LexID to each of the Authorized Reps.
 	EXPORT getAuthRepLexIDs( DATASET(Business_Risk_BIP.Layouts.Shell) Shell,
-	                        Business_Risk_BIP.LIB_Business_Shell_LIBIN Options,
-							doxie.IDataAccess mod_access = MODULE (doxie.IDataAccess) END) := 
+	                        Business_Risk_BIP.LIB_Business_Shell_LIBIN Options) :=
 		FUNCTION
-			
+
+			mod_access := PROJECT(Options, doxie.IDataAccess);
+
 			Risk_Indicators.Layout_Input prepForDIDAppend(Business_Risk_BIP.Layouts.Shell le, INTEGER whichAuthRep) := TRANSFORM
 				SELF.Seq              := le.Seq * 10 + CHOOSE( whichAuthRep, 1, 2, 3, 4, 5, 6, 0); // Preserve the original Seq value by shifting it over one position to the left; add the Nth AuthRep in the Ones position.
 				SELF.HistoryDate      := 999999;
@@ -44,58 +45,60 @@
 				SELF.Phone10          := CHOOSE( whichAuthRep, le.Clean_Input.Rep_Phone10       , le.Clean_Input.Rep2_Phone10       ,le.Clean_Input.Rep3_Phone10       ,le.Clean_Input.Rep4_Phone10       ,le.Clean_Input.Rep5_Phone10       ,le.Clean_Input.Phone10       ,'' );
 				SELF := [];
 			END;
-      
+
 			prepDIDAppend := NORMALIZE( Shell, 6, prepForDIDAppend(LEFT,COUNTER) );
-      
+
 			prepDIDAppend_valid := prepDIDAppend(trim(Phone10) <> '' or trim(DOB) <>'' or trim(ssn) <>'' or trim(Z5)<>'');  // try putting this filter in place so we don't send 30 records into DIDappend
-			
+
 			DIDAppend := Risk_Indicators.iid_getDID_prepOutput(prepDIDAppend_valid,
-																												Options.DPPA_Purpose,
-																												Options.GLBA_Purpose,
+																												mod_access.dppa,
+																												mod_access.glb,
 																												FALSE, // isFCRA
 																												50,    // BSVersion
-																												Options.DataRestrictionMask,
+																												mod_access.DataRestrictionMask,
 																												0,     // Append_Best
 																												DATASET([], Gateway.Layouts.Config), // Gateways
 																												0,      // BSOptions
 																											mod_access := mod_access);
-                               
+
    // OUTPUT( DIDAppend, NAMED('_DIDAppend') );
-																												
+
 			// Pick the DID with the highest score, in the event that multiple have the same score, choose the lowest value DID to make this deterministic
 			DIDKept := ROLLUP(SORT(UNGROUP(DIDAppend), Seq, -Score, DID), LEFT.Seq = RIGHT.Seq, TRANSFORM(LEFT));
-   
+
    // OUTPUT( DIDKept, NAMED('_DIDKept') );
-   
+
 			// Add LexIDs to the Shell. Decode the Seq value using a modulus to arrive at the correct DID.
    layout_DIDKept_slim := RECORD
      UNSIGNED4 orig_seq;
      UNSIGNED4 whichAuthRep;
      UNSIGNED6 did;
-   END;  
-  
+     unsigned1 did_score;
+   END;
+
    DIDKept_slim :=
-    PROJECT( 
-      DIDKept, 
+    PROJECT(
+      DIDKept,
       TRANSFORM( layout_DIDKept_slim,
         SELF.orig_seq     := LEFT.Seq DIV 10,
         SELF.whichAuthRep := LEFT.Seq % 10,
-        SELF.did          := LEFT.did
+        SELF.did          := LEFT.did,
+        self.did_score    := left.score
       )
     );
-  
-		// Use COMBINE( ) function to transform from normalized records to denormalized, repeating 
+
+		// Use COMBINE( ) function to transform from normalized records to denormalized, repeating
 		// fields in a single record.
-    
+
   // Define left Group.
 		layout_seq := {UNSIGNED4 orig_seq};
 
 		ds_seq      := PROJECT(DIDKept_slim, layout_seq);
 		ds_seq_grpd := GROUP(DEDUP(SORT(ds_seq, orig_seq), orig_seq), orig_seq);
-  
+
   // Define right Group.
   DIDKept_slim_grpd := GROUP( SORT(DIDKept_slim, orig_seq, whichAuthRep), orig_seq );
-  
+
   // Combine:
   layout_authRepLexIDs_temp := RECORD
     UNSIGNED4 seq;
@@ -105,9 +108,14 @@
     STRING15 BusExecLinkAuthRep4LexID;
     STRING15 BusExecLinkAuthRep5LexID;
     STRING15 BusPersonLexIDOverlap;
-  END; 
-  
-		layout_authRepLexIDs_temp xfm_ToCombineAuthRepLexIDs( layout_seq le, DATASET(RECORDOF(DIDKept_slim_grpd)) allRows ) := 
+    unsigned1 LexID_score;
+    unsigned1 LexID2_score;
+    unsigned1 LexID3_score;
+    unsigned1 LexID4_score;
+    unsigned1 LexID5_score;
+  END;
+
+		layout_authRepLexIDs_temp xfm_ToCombineAuthRepLexIDs( layout_seq le, DATASET(RECORDOF(DIDKept_slim_grpd)) allRows ) :=
 			TRANSFORM
 				SELF.seq := le.orig_seq;
 				SELF.BusExecLinkAuthRepLexID  := (STRING)(allRows(whichAuthRep = 1)[1].did);
@@ -116,44 +124,58 @@
 				SELF.BusExecLinkAuthRep4LexID := (STRING)(allRows(whichAuthRep = 4)[1].did);
 				SELF.BusExecLinkAuthRep5LexID := (STRING)(allRows(whichAuthRep = 5)[1].did);
         SELF.BusPersonLexIDOverlap    := (STRING)(allRows(whichAuthRep = 6)[1].did);
+
+        SELF.LexID_score  := (allRows(whichAuthRep = 1)[1].did_score);
+				SELF.LexID2_score := (allRows(whichAuthRep = 2)[1].did_score);
+				SELF.LexID3_score := (allRows(whichAuthRep = 3)[1].did_score);
+				SELF.LexID4_score := (allRows(whichAuthRep = 4)[1].did_score);
+				SELF.LexID5_score := (allRows(whichAuthRep = 5)[1].did_score);
 			END;
 
-		withLexIDs_combined := 
-			COMBINE( 
-				ds_seq_grpd, DIDKept_slim_grpd, 
-				GROUP, 
-				xfm_ToCombineAuthRepLexIDs(LEFT,ROWS(RIGHT)) 
+		withLexIDs_combined :=
+			COMBINE(
+				ds_seq_grpd, DIDKept_slim_grpd,
+				GROUP,
+				xfm_ToCombineAuthRepLexIDs(LEFT,ROWS(RIGHT))
 			);
-			
-			Shell_withLexIDs := 
+
+			Shell_withLexIDs :=
 				JOIN(
-					Shell, withLexIDs_combined, 
-					LEFT.Seq = RIGHT.Seq, 
-					TRANSFORM( Business_Risk_BIP.Layouts.Shell, 
+					Shell, withLexIDs_combined,
+					LEFT.Seq = RIGHT.Seq,
+					TRANSFORM( Business_Risk_BIP.Layouts.Shell,
 						SELF.Seq := LEFT.Seq,
+			SELF.Clean_Input.Rep_LexID := (UNSIGNED)RIGHT.BusExecLinkAuthRepLexID;
 			SELF.Clean_Input.Rep2_LexID := (UNSIGNED)RIGHT.BusExecLinkAuthRep2LexID;
 			SELF.Clean_Input.Rep3_LexID := (UNSIGNED)RIGHT.BusExecLinkAuthRep3LexID;
 			SELF.Clean_Input.Rep4_LexID := (UNSIGNED)RIGHT.BusExecLinkAuthRep4LexID;
 			SELF.Clean_Input.Rep5_LexID := (UNSIGNED)RIGHT.BusExecLinkAuthRep5LexID;
+
+			SELF.Clean_Input.Rep_LexIDscore := right.LexID_score;
+			SELF.Clean_Input.Rep2_LexIDscore := right.LexID2_score;
+			SELF.Clean_Input.Rep3_LexIDscore := right.LexID3_score;
+			SELF.Clean_Input.Rep4_LexIDscore := right.LexID4_score;
+			SELF.Clean_Input.Rep5_LexIDscore := right.LexID5_score;
+
       SELF.Business_To_Executive_Link.BusExecLinkAuthRepLexID  := IF( RIGHT.BusExecLinkAuthRepLexID  != '0', RIGHT.BusExecLinkAuthRepLexID, '' ),
       SELF.Business_To_Executive_Link.BusExecLinkAuthRep2LexID := IF( RIGHT.BusExecLinkAuthRep2LexID != '0', RIGHT.BusExecLinkAuthRep2LexID, '' ),
       SELF.Business_To_Executive_Link.BusExecLinkAuthRep3LexID := IF( RIGHT.BusExecLinkAuthRep3LexID != '0', RIGHT.BusExecLinkAuthRep3LexID, '' ),
       SELF.Business_To_Executive_Link.BusExecLinkAuthRep4LexID := IF( RIGHT.BusExecLinkAuthRep4LexID != '0', RIGHT.BusExecLinkAuthRep4LexID, '' ),
       SELF.Business_To_Executive_Link.BusExecLinkAuthRep5LexID := IF( RIGHT.BusExecLinkAuthRep5LexID != '0', RIGHT.BusExecLinkAuthRep5LexID, '' ),
       SELF.Business_To_Person_Link.BusPersonLexIDOverlap       := IF(RIGHT.BusPersonLexIDOverlap     != '0', RIGHT.BusPersonLexIDOverlap, '' );
-      
+
       BusinessInputsPopulated := TRIM(LEFT.Clean_Input.FEIN) != '' OR TRIM(LEFT.Clean_Input.Phone10) != '' OR (TRIM(LEFT.Clean_Input.Prim_Name)!= '' AND TRIM(LEFT.Clean_Input.Zip5) != '');
       SELF.Business_To_Person_Link.BusPersonOverlap := MAP((INTEGER)RIGHT.BusPersonLexIDOverlap > 0                              => '1',   // Business Inputs resolved to a LexID
                                                             BusinessInputsPopulated AND (INTEGER)RIGHT.BusPersonLexIDOverlap = 0 => '0',   // Business Inputs not resolved to a LexID
                                                                                                                                     '-1'); // Business Inputs not provided
       SELF := LEFT,
-						SELF := []
+
 					),
 					LEFT OUTER, KEEP(1), ATMOST(100), PARALLEL, FEW);
-			
+
    // DEBUGs:
 //   OUTPUT( DIDKept_slim_grpd, NAMED('_DIDKept_slim_grpd') );
-   
+
 			RETURN Shell_withLexIDs;
-			
+
 		END;

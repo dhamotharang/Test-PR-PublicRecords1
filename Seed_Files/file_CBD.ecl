@@ -1,1 +1,2 @@
-export file_CBD := dataset( '~thor_data400::base::testseed_cbd', layout_cbd, csv(quote('"')) );
+﻿IMPORT Data_Services,Seed_Files;
+EXPORT file_CBD := DATASET( Data_Services.Data_location.Prefix('NONAMEGIVEN')+'~thor_data400::base::testseed_cbd', Seed_Files.layout_cbd, CSV(QUOTE('"'), HEADING(1)) );

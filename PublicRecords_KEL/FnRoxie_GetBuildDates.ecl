@@ -15,8 +15,12 @@ EXPORT FnRoxie_GetBuildDates (DATASET(PublicRecords_KEL.ECL_Functions.Layouts.La
 		SELF.G_BuildAstVehWtrDt := Risk_Indicators.get_Build_date('watercraft_build_version');
 		SELF.G_BuildAstPropDt := Risk_Indicators.get_Build_date('Property_Build_Version');
 		SELF.G_BuildEduDt := Risk_Indicators.get_Build_date('asl_build_version');
+		SELF.G_BuildPIICorrDt  := Risk_Indicators.get_build_date('pii_corr_build_version');
+		SELF.G_BuildEmailDt := IF(Options.IsFCRA, Risk_Indicators.get_Build_date('FCRA_email_build_version'), Risk_Indicators.get_Build_date('email_build_version'));
 		SELF.G_BuildDrgBkDt := Risk_Indicators.get_Build_date('bankruptcy_daily'); 		
 		SELF.G_BuildProfLicDt := Risk_Indicators.get_Build_date('proflic_build_version');
+		SELF.G_BuildSrchDt :=Risk_Indicators.get_Build_date('inquiry_update_build_version');
+		SELF.G_BuildInqDt :=IF(Options.IsFCRA, Risk_Indicators.get_Build_date('inquiry_build_version'), Risk_Indicators.get_Build_date('inquiry_update_build_version'));
 		SELF := LEFT));
 		
 		RETURN SetBuildDates;

@@ -187,6 +187,7 @@ EXPORT Layouts := MODULE
 		STRING100 Email				  := '';
 		UNSIGNED6 LexID				  := 0;	
 		UNSIGNED1 SortOrder		  := 0;
+    UNSIGNED1	LexIDScore 		:= 0;
 	END;
 
 	EXPORT InputAuthRepInfoClean := RECORD

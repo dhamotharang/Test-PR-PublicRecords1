@@ -11,6 +11,7 @@ export t_SmartLinxReportOption := record (iesp.bpsreport.t_BpsReportOption)
 	boolean IncludeAddressSourceInfo {xpath('IncludeAddressSourceInfo')};
 	integer EmailVersion {xpath('EmailVersion')};//hidden[ecl_only]
 	boolean IncludeVendorSourceB {xpath('IncludeVendorSourceB')};//hidden[ecl_only]
+     boolean IncludePersonRiskIndicatorSection {xpath('IncludePersonRiskIndicatorSection')};              
 end;
 		
 export t_SmartLinxReportBy := record (iesp.bpsreport.t_BpsReportBy)
@@ -122,6 +123,7 @@ export t_SLRBestInfo := record
 	t_SLRAddressMetaData AddressCDS {xpath('AddressCDS')};
 	dataset(iesp.dirassistwireless.t_DirAssistWirelessSearchRecord) Phones {xpath('Phones/Phone'), MAXCOUNT(iesp.Constants.BR.MaxPhonesPlus)};
 	dataset(t_SLRBestPhone) PhonesV2 {xpath('PhonesV2/Phone'), MAXCOUNT(iesp.Constants.BR.MaxPhonesPlus)};
+     dataset(t_SLRBestPhone) PhonesV3 {xpath('PhonesV3/Phone'), MAXCOUNT(iesp.Constants.BR.MaxPhonesPlus)};     
 end;
 		
 export t_SLRKRIIndicators := record
@@ -332,7 +334,18 @@ export t_SLREntities := record
 	dataset(iesp.share.t_SSNInfoEx) SSNs {xpath('SSNs/SSN'), MAXCOUNT(iesp.Constants.SMART.MaxAKA)};
 	dataset(iesp.share.t_Date) DOBs {xpath('DOBs/DOB'), MAXCOUNT(iesp.Constants.SMART.MaxAKA)};
 end;
-		
+
+export t_SLRPersonRiskIndicator := record  
+     boolean PersonRiskFlag {xpath('PersonRiskFlag')}; 
+     string1 PersonRiskIndicatorFlag {xpath('PersonRiskIndicatorFlag')}; 
+     string100 PersonRiskIndicatorName {xpath('PersonRiskIndicatorName')}; 
+end;
+
+export t_SLRPersonRiskIndicatorSection := record  
+     dataset(t_SLRPersonRiskIndicator) PersonIdentityRisks {xpath('PersonIdentityRisks/PersonIdentityRisk'), MAXCount(iesp.Constants.SMART.MaxPersonRiskIndicators)};
+     string1  PersonIdentityRiskStatus  {xpath('PersonIdentityRiskStatus')};
+end;
+	
 export t_SmartLinxReportBaseIndividual := record
 	string12 UniqueId {xpath('UniqueId')};
 	t_TotalCountsAvailable TotalCountsAvailable {xpath('TotalCountsAvailable')};
@@ -373,6 +386,7 @@ export t_SmartLinxReportBaseIndividual := record
 	dataset(iesp.student.t_StudentRecord) Educations {xpath('Educations/Education'), MAXCOUNT(iesp.Constants.MaxCountASLSearch)};
 	dataset(iesp.share.t_SourceSection) Sources {xpath('Sources/Source'), MAXCOUNT(iesp.Constants.SMART.MaxSources)};
 	dataset(iesp.bpsreport.t_BpsReportEmailSearchRecord) Emails {xpath('Emails/Email'), MAXCOUNT(iesp.Constants.SMART.MaxEmails)};
+      t_SLRPersonRiskIndicatorSection PersonRiskIndicatorSection {xpath('PersonRiskIndicatorSection')};
 end;
 		
 export t_SmartLinxReportIndividual := record (t_SmartLinxReportBaseIndividual)

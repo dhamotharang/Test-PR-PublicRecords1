@@ -21,7 +21,7 @@
 </message>
 */
 
-IMPORT Std, PublicRecords_KEL;
+IMPORT Std, PublicRecords_KEL, RiskWise, Royalty;
 
 EXPORT MAS_nonFCRA_Service() := MACRO
 
@@ -61,7 +61,9 @@ STRING100 Default_data_permission_mask := '';
 	STRING DataRestrictionMask := '' : STORED('DataRestrictionMask');
 	STRING100 DataPermissionMask := Default_data_permission_mask : STORED('DataPermissionMask');
 	UNSIGNED1 GLBA := 0 : STORED('GLBPurpose');
+	#STORED('GLBPurposeValue', GLBA);
 	UNSIGNED1 DPPA := 0 : STORED('DPPAPurpose');
+	#STORED('DPPAPurposeValue', DPPA);
 	BOOLEAN Is_Marketing := FALSE : STORED('IsMarketing');
 	BOOLEAN Include_Minors := TRUE : STORED('IncludeMinors');
 	STRING5 Industry_Class := Default_Industry_Class : STORED('IndustryClass');
@@ -84,6 +86,9 @@ STRING100 Default_data_permission_mask := '';
 	END;
 
 	DATASET(Gateway.Layouts.Config) GatewaysClean := PROJECT(gateways_in, gw_switch(LEFT));
+	
+	NetAcuityGW := GatewaysClean(STD.Str.ToLowerCase(servicename) = 'netacuity')[1];
+	#STORED('NetAcuityURL', NetAcuityGW.url);
 	
 	// If allowed sources aren't passed in, use default list of allowed sources
 	SetAllowedSources := IF(COUNT(AllowedSourcesDataset) = 0, PublicRecords_KEL.ECL_Functions.Constants.DEFAULT_ALLOWED_SOURCES_NONFCRA, AllowedSourcesDataset);
@@ -150,6 +155,7 @@ STRING100 Default_data_permission_mask := '';
 		EXPORT BOOLEAN IncludeNameSummary := TRUE;
 		EXPORT BOOLEAN IncludePerson := TRUE;
 		EXPORT BOOLEAN IncludePhone := TRUE;
+		EXPORT BOOLEAN IncludePhoneSummary := TRUE;
 		EXPORT BOOLEAN IncludeProfessionalLicense := TRUE;
 		EXPORT BOOLEAN IncludeProperty := TRUE;
 		EXPORT BOOLEAN IncludePropertyEvent := TRUE;
@@ -176,6 +182,14 @@ STRING100 Default_data_permission_mask := '';
 	FinalResults := PROJECT(ResultSet, 
 		TRANSFORM(PublicRecords_KEL.ECL_Functions.Layout_Person_NonFCRA,
 			SELF := LEFT));
+	
+	// IF(COUNT(ResultSet(NetAcuityRoyalty <> 0)) > 0, 
+    // OUTPUT(DATASET([TRANSFORM(Royalty.Layouts.Royalty, 
+	// SELF.royalty_type_code := Royalty.Constants.RoyaltyCode.NETACUITY;
+	// SELF.royalty_type := Royalty.Constants.RoyaltyType.NETACUITY;
+	// SELF.royalty_count  := COUNT(ResultSet(NetAcuityRoyalty <> 0)); 
+	// SELF := [];
+	// )]), NAMED('RoyaltySet')));
 	
   OUTPUT( FinalResults, NAMED('Results') );
 

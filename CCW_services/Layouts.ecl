@@ -1,29 +1,27 @@
-import emerges,iesp, FFD;
-export Layouts := MODULE
-			export rawrec := record
-					recordof(emerges.key_CCW_rid);
-					boolean isDeepDive := false;
-					unsigned2 penalt := 0;
-					dataset(FFD.Layouts.StatementIdRec) StatementIds := dataset([],FFD.Layouts.StatementIdRec);
-					boolean isDisputed := false;
-			end;
-			 
-			 
-			export search_rid := record
-					unsigned6 rid;
-					boolean isDeepDive := false;
-			end;
-			
-		  export search_did := record
-					unsigned6 did;
-					boolean isDeepDive := false;
-		  end;			
-				
-		  export t_CCWRecordWithPenalty := record
-					iesp.concealedweapon.t_WeaponRecord;
-					boolean AlsoFound;
-					unsigned2 _penalty := 0;
-					boolean isDisputed := false;
-					dataset(FFD.Layouts.StatementIdRec) StatementIds := dataset([],FFD.Layouts.StatementIdRec);
-		  end;
-end;			 
+IMPORT emerges, iesp, FFD;
+EXPORT Layouts := MODULE
+  EXPORT rawrec := RECORD
+    RECORDOF(emerges.key_CCW_rid);
+    BOOLEAN isDeepDive := FALSE;
+    UNSIGNED2 penalt := 0;
+    DATASET(FFD.Layouts.StatementIdRec) StatementIds := DATASET([],FFD.Layouts.StatementIdRec);
+    BOOLEAN isDisputed := FALSE;
+  END;    
+  EXPORT search_rid := RECORD
+    UNSIGNED6 rid;
+    BOOLEAN isDeepDive := FALSE;
+  END;
+  
+  EXPORT search_did := RECORD
+    UNSIGNED6 did;
+    BOOLEAN isDeepDive := FALSE;
+  END;
+    
+  EXPORT t_CCWRecordWithPenalty := RECORD
+    iesp.concealedweapon.t_WeaponRecord;
+    BOOLEAN AlsoFound;
+    UNSIGNED2 _penalty := 0;
+    BOOLEAN isDisputed := FALSE;
+    DATASET(FFD.Layouts.StatementIdRec) StatementIds := DATASET([],FFD.Layouts.StatementIdRec);
+  END;
+END;

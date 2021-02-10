@@ -85,6 +85,20 @@ EXPORT IParam := MODULE
   EXPORT phones := INTERFACE
     EXPORT boolean indicate_restricted := FALSE; // will show "UNPUB"
     EXPORT boolean include_phonesfeedback := FALSE;
+    // new code
+    EXPORT boolean IncludeProgressivePhone := FALSE; // added Nov 2020    
+    EXPORT unsigned1 MaxNumAssociate         := 0;
+    EXPORT unsigned1 MaxNumAssociateOther    := 0;			
+    EXPORT unsigned1 MaxNumFamilyOther       := 0;			
+    EXPORT unsigned1 MaxNumFamilyClose       := 0;			
+    EXPORT  unsigned1 MaxNumParent            := 0;		
+    EXPORT unsigned1 MaxNumSpouse            := 0;		
+    EXPORT  unsigned1 MaxNumSubject           := 0;			
+    EXPORT  unsigned1 MaxNumNeighbor          := 0;			
+    EXPORT boolean ReturnPhoneScore	:= false;  
+    EXPORT  boolean UsePremiumSourceA :=  FALSE ;
+    EXPORT unsigned1 PremiumSourceAlimit := 0;                     
+    EXPORT STRING ScoreModel := '';     
   END;
 
   EXPORT phonesplus := INTERFACE (phones, _report, doxie.IDataAccess)
@@ -255,6 +269,7 @@ EXPORT IParam := MODULE
     EXPORT boolean include_sources := FALSE;
     EXPORT boolean include_criminalindicators := FALSE;
     EXPORT boolean include_AddressSourceInfo  := FALSE; // Added 9/2019
+    EXPORT boolean IncludePersonRiskIndicatorSection := FALSE;
   END;
 
 

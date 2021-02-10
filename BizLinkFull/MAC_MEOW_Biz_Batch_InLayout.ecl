@@ -1,6 +1,6 @@
 ﻿ 
 EXPORT MAC_MEOW_Biz_Batch_InLayout(infile,OutFile,AsIndex = 'true',In_UpdateIDs = 'false',Stats = '',In_bGetAllScores = 'true',In_disableForce = 'false',DoClean = 'true') := MACRO
-  IMPORT SALT311,BizLinkFull;
+  IMPORT SALT44,BizLinkFull;
   #UNIQUENAME(ToProcess)
   #UNIQUENAME(TPRec)
   %TPRec% := RECORD(BizLinkFull.Process_Biz_Layouts.InputLayout)
@@ -14,24 +14,26 @@ EXPORT MAC_MEOW_Biz_Batch_InLayout(infile,OutFile,AsIndex = 'true',In_UpdateIDs 
   #UNIQUENAME(fats)
   #UNIQUENAME(dups)
   // In case multiple copies of the same indicative are in there - remove them
-  SALT311.MAC_Dups_Note(%infile_clean%,%TPRec%,%fats%,%dups%,,BizLinkFull.Config_BIP.meow_dedup);
+  SALT44.MAC_Dups_Note(%infile_clean%,%TPRec%,%fats%,%dups%,,BizLinkFull.Config_BIP.meow_dedup);
+ 
   #UNIQUENAME(key_cnp_name)
   %key_cnp_name% := BizLinkFull.Specificities(BizLinkFull.file_BizHead).cnp_name_values_key;
   #UNIQUENAME(A_cnp_name)
-  %A_cnp_name% := SALT311.mac_wordbag_appendspecs_th(%fats%,cnp_name,cnp_name_wb,%key_cnp_name%,cnp_name,AsIndex);
+  %A_cnp_name% := SALT44.mac_wordbag_appendspecs_th(%fats%,cnp_name,cnp_name_wb,%key_cnp_name%,cnp_name,AsIndex);
   #UNIQUENAME(key_company_url)
   %key_company_url% := BizLinkFull.Specificities(BizLinkFull.file_BizHead).company_url_values_key;
   #UNIQUENAME(A_company_url)
-  %A_company_url% := SALT311.mac_wordbag_appendspecs_th(%A_cnp_name%,company_url,company_url_wb,%key_company_url%,company_url,AsIndex);
+  %A_company_url% := SALT44.mac_wordbag_appendspecs_th(%A_cnp_name%,company_url,company_url_wb,%key_company_url%,company_url,AsIndex);
+ 
   %ToProcess% := %A_company_url%(Entered_proxid = 0 AND Entered_seleid = 0 AND Entered_orgid = 0 AND Entered_ultid = 0);
-  #UNIQUENAME(OutputNewIDs)
-  #IF (#TEXT(Input_proxid) <> '' OR #TEXT(Input_seleid) <> '' OR #TEXT(Input_orgid) <> '' OR #TEXT(Input_ultid) <> '')
+    #UNIQUENAME(OutputNewIDs)
+    #IF (#TEXT(Input_proxid) <> '' OR #TEXT(Input_seleid) <> '' OR #TEXT(Input_orgid) <> '' OR #TEXT(Input_ultid) <> '')
     #UNIQUENAME(ToUpdate)
-    %ToUpdate% := %A_company_url%(~(Entered_proxid = 0 AND Entered_seleid = 0 AND Entered_orgid = 0 AND Entered_ultid = 0));
-    %OutputNewIDs% := BizLinkFull.Process_Biz_Layouts.UpdateIDs(%ToUpdate%);
-  #ELSE
-    %OutputNewIDs% := DATASET([],BizLinkFull.Process_Biz_Layouts.LayoutScoredFetch);
-  #END
+      %ToUpdate% := %A_company_url%(~(Entered_proxid = 0 AND Entered_seleid = 0 AND Entered_orgid = 0 AND Entered_ultid = 0));
+      %OutputNewIDs% := BizLinkFull.Process_Biz_Layouts.UpdateIDs(%ToUpdate%);
+    #ELSE
+      %OutputNewIDs% := DATASET([],BizLinkFull.Process_Biz_Layouts.LayoutScoredFetch);
+    #END
   #UNIQUENAME(OutputL_CNPNAME_ZIP)
   #IF(#TEXT(Input_cnp_name)<>'' AND #TEXT(Input_zip)<>'')
     #UNIQUENAME(HoldL_CNPNAME_ZIP)
@@ -165,7 +167,7 @@ EXPORT MAC_MEOW_Biz_Batch_InLayout(infile,OutFile,AsIndex = 'true',In_UpdateIDs 
   #UNIQUENAME(All)
   %All% := BizLinkFull.Process_Biz_Layouts.CombineAllScores(%AllRes%, In_bGetAllScores, In_disableForce);
   #UNIQUENAME(OutFile0)
-  SALT311.MAC_Dups_Restore(%All%,%dups%,%OutFile0%);
+  SALT44.MAC_Dups_Restore(%All%,%dups%,%OutFile0%);
   #UNIQUENAME(RestoreChildReference)
   TYPEOF(%OutFile0%) %RestoreChildReference%(%OutFile0% le) := TRANSFORM
     SELF.Results := PROJECT(le.Results, TRANSFORM(BizLinkFull.Process_Biz_Layouts.LayoutScoredFetch,SELF.Reference := le.Reference, SELF := LEFT));

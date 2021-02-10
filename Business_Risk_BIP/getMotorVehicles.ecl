@@ -1,40 +1,42 @@
-﻿IMPORT AutoStandardI, BIPV2, Doxie, MDR, STD, TopBusiness_Services, VehicleV2, Doxie;
+﻿IMPORT Business_Risk_BIP, BIPV2, Doxie, MDR, STD, TopBusiness_Services, VehicleV2;
 
-EXPORT getMotorVehicles(DATASET(Business_Risk_BIP.Layouts.Shell) Shell, 
+EXPORT getMotorVehicles(DATASET(Business_Risk_BIP.Layouts.Shell) Shell,
 											 Business_Risk_BIP.LIB_Business_Shell_LIBIN Options,
 											 BIPV2.mod_sources.iParams linkingOptions,
-											 SET OF STRING2 AllowedSourcesSet,
-											 doxie.IDataAccess mod_access = MODULE (doxie.IDataAccess) END) := FUNCTION
- 
+											 SET OF STRING2 AllowedSourcesSet) := FUNCTION
+
   // Look at GLBA and DPPA values in Options, and define an attribute that determines
   // whether the GLBA/DPPA values indicate absolutely no permissions to view Vehicles
   // data. This will be used to convert no-hits ('0') to "vehicles turned off" (-2).
-  dppa_ok  := AutoStandardI.PermissionI_Tools.val(linkingOptions).DPPA.ok(Options.DPPA_Purpose);
-  glba_ok  := AutoStandardI.PermissionI_Tools.val(linkingOptions).GLB.ok(Options.GLBA_Purpose);
-  
+  mod_access := PROJECT(Options, doxie.IDataAccess);
+
+  dppa_ok  := mod_access.isValidDppa();
+  glba_ok  := mod_access.isValidGlb();
+
   vehicles_are_turned_off := NOT(dppa_ok AND glba_ok);
-  
+
   // --------------- Vehicles Data - Using Business IDs ----------------
-  VehiclesRaw := VehicleV2.Key_Vehicle_Linkids.kFetch(Business_Risk_BIP.Common.GetLinkIDs(Shell), mod_access,
+  VehiclesRaw := VehicleV2.Key_Vehicle_Linkids.kFetch2(Business_Risk_BIP.Common.GetLinkIDs(Shell), mod_access,
                              Business_Risk_BIP.Common.SetLinkSearchLevel(Options.LinkSearchLevel),
                              0, /*ScoreThreshold --> 0 = Give me everything*/
                              linkingOptions,
-                             Business_Risk_BIP.Constants.Limit_Default);
+                             Business_Risk_BIP.Constants.Limit_Default,
+														 Options.KeepLargeBusinesses);
 
-  // Filter to ONLY include recs where the reported on company (set of input linkids) is 
-  // either a Registrant(type=4) or Lessee(type=5) of the vehicle, but not any others 
-  // like Owner(type=1), Lessor(type=2) or Lienholder(type=7). Then project linkids key 
+  // Filter to ONLY include recs where the reported on company (set of input linkids) is
+  // either a Registrant(type=4) or Lessee(type=5) of the vehicle, but not any others
+  // like Owner(type=1), Lessor(type=2) or Lienholder(type=7). Then project linkids key
   // data being used into a slimmed layout.
   //
   /*
      // INFO: Vehicle "party" key orig_name_type values
-     VEH_OWNER		 		 := '1'; 
+     VEH_OWNER		 		 := '1';
      VEH_LESSOR			  := '2';
      VEH_REGISTRANT := '4'; *
      VEH_LESSEE			  := '5'; *
      VEH_LIENHOLDER := '7';
   */
-  VehiclesRaw_filt := 
+  VehiclesRaw_filt :=
     PROJECT(
       VehiclesRaw( orig_name_type IN [ /*TopBusiness_Services.Constants.VEH_OWNER,*/ // We don't want Title info.
                                        TopBusiness_Services.Constants.VEH_REGISTRANT,
@@ -128,7 +130,7 @@ EXPORT getMotorVehicles(DATASET(Business_Risk_BIP.Layouts.Shell) Shell,
 
   set_commercial_vehicle_codes :=
     [
-      'AG',  // 'Agriculture',               
+      'AG',  // 'Agriculture',
       'AR',  // 'Amateur Radio'
       'CLG', // 'Clergy',
       'CML', // 'Commercial'
@@ -159,12 +161,12 @@ EXPORT getMotorVehicles(DATASET(Business_Risk_BIP.Layouts.Shell) Shell,
       'MOT', // 'Motorcycle'
       'OTH', // 'Other'
       'TRL', // 'Trailer',
-      'UNK', // '', 
+      'UNK', // '',
       'VAN', // 'Vanity'
       'XSR'  // NOTE: Reduced-fee registration and license plate; often used by non-profits in FL.
     ];
-    
-  VehiclesWithDetail := 
+
+  VehiclesWithDetail :=
     JOIN(
       tbl_Vehicles_srtd, VehicleV2.Key_Vehicle_Main_Key,
       keyed(left.vehicle_key = right.vehicle_key AND
@@ -181,7 +183,7 @@ EXPORT getMotorVehicles(DATASET(Business_Risk_BIP.Layouts.Shell) Shell,
     );
 
   VehiclesWithDetail_srtd := SORT( VehiclesWithDetail, seq, vehicle_key, -reg_latest_expiration_date );
-  
+
   VehiclesWithDetail_rolled_pre :=
     ROLLUP(
       VehiclesWithDetail_srtd,
@@ -191,7 +193,7 @@ EXPORT getMotorVehicles(DATASET(Business_Risk_BIP.Layouts.Shell) Shell,
         SELF.reg_latest_effective_date   := (STRING)MAX( (INTEGER)LEFT.reg_latest_effective_date, (INTEGER)RIGHT.reg_latest_effective_date ),
         SELF.reg_latest_expiration_date  := (STRING)MAX( (INTEGER)LEFT.reg_latest_expiration_date, (INTEGER)RIGHT.reg_latest_expiration_date ),
         SELF.vina_price                  := (STRING)MAX( (INTEGER)LEFT.vina_price, (INTEGER)RIGHT.vina_price ),
-        // The first '1' wins for judging the type of vehicle. Evaluate all three types in each row 
+        // The first '1' wins for judging the type of vehicle. Evaluate all three types in each row
         // by adding them together; they'll add up to 0 or 1. If they add up to 1, keep the row.
         SELF.isPrivate    := IF(LEFT.isPrivate + LEFT.isCommercial + LEFT.isUnknown = 1, LEFT.isPrivate, RIGHT.isPrivate),
         SELF.isCommercial := IF(LEFT.isPrivate + LEFT.isCommercial + LEFT.isUnknown = 1, LEFT.isCommercial, RIGHT.isCommercial),
@@ -204,15 +206,15 @@ EXPORT getMotorVehicles(DATASET(Business_Risk_BIP.Layouts.Shell) Shell,
       seq, vehicle_key
     );
 
-  // If we were unable to identify the vehicle type as Private or Commercial in the rollup above, 
-  // set it to isUnknown. Set also the registration minDate and maxDate so we can check for 
+  // If we were unable to identify the vehicle type as Private or Commercial in the rollup above,
+  // set it to isUnknown. Set also the registration minDate and maxDate so we can check for
   // the vehicle as being an asset to the business at the time of the archive date.
   VehiclesWithDetail_rolled :=
     PROJECT(
       VehiclesWithDetail_rolled_pre,
       TRANSFORM( layout_Vehicles_slim,
-        SELF.historyDateYYYYMMDD := 
-          MAP( 
+        SELF.historyDateYYYYMMDD :=
+          MAP(
             LEFT.historyDate IN [0,999999,99999999,999999999999] => (UNSIGNED4)(((STRING)STD.Date.Today())[1..8]),
             LENGTH( (STRING)LEFT.historyDate ) >= 8 => (UNSIGNED4)(((STRING)(LEFT.historyDate))[1..8]),
             LENGTH( (STRING)LEFT.historyDate )  = 6 => (UNSIGNED4)((STRING)(LEFT.historyDate) + '01'),
@@ -227,7 +229,7 @@ EXPORT getMotorVehicles(DATASET(Business_Risk_BIP.Layouts.Shell) Shell,
       )
     );
 
-  VehiclesWithDetail_filt := 
+  VehiclesWithDetail_filt :=
     VehiclesWithDetail_rolled( (historyDateYYYYMMDD BETWEEN minDate AND maxDate) );
 
   VehiclesWithDetail_rolled2 :=
@@ -243,7 +245,7 @@ EXPORT getMotorVehicles(DATASET(Business_Risk_BIP.Layouts.Shell) Shell,
       ),
       seq
     );
-  
+
   layout_asset_vehicles_temp := RECORD
     UNSIGNED4 seq;
     STRING7 asset_vehicle_count;      // Number of vehicles currently registered to the business.
@@ -251,7 +253,7 @@ EXPORT getMotorVehicles(DATASET(Business_Risk_BIP.Layouts.Shell) Shell,
     STRING7 asset_vehicle_count_comm; // Number of commercial vehicles currently registered to the business.
     STRING7 asset_vehicle_count_oth;  // Number of other/unknown vehicles currently registered to the business.
     STRING9 asset_vehicle_value;      // Total value of vehicles currently registered to the business.
-  END; 
+  END;
 
   Vehicles_unrestricted :=
     JOIN(
@@ -259,38 +261,38 @@ EXPORT getMotorVehicles(DATASET(Business_Risk_BIP.Layouts.Shell) Shell,
       LEFT.seq = RIGHT.seq,
       TRANSFORM( layout_asset_vehicles_temp,
         SELF.seq := LEFT.seq;
-        SELF.asset_vehicle_count      := IF( LEFT.seq = RIGHT.seq, (STRING)RIGHT.isAsset, '0' );          
-        SELF.asset_vehicle_count_pers := IF( LEFT.seq = RIGHT.seq, (STRING)RIGHT.isPrivate, '0' );     
-        SELF.asset_vehicle_count_comm := IF( LEFT.seq = RIGHT.seq, (STRING)RIGHT.isCommercial, '0' );     
-        SELF.asset_vehicle_count_oth  := IF( LEFT.seq = RIGHT.seq, (STRING)RIGHT.isUnknown, '0' );      
-        SELF.asset_vehicle_value      := IF( LEFT.seq = RIGHT.seq, (STRING)RIGHT.vehiclevalue, '0' );      
+        SELF.asset_vehicle_count      := IF( LEFT.seq = RIGHT.seq, (STRING)RIGHT.isAsset, '0' );
+        SELF.asset_vehicle_count_pers := IF( LEFT.seq = RIGHT.seq, (STRING)RIGHT.isPrivate, '0' );
+        SELF.asset_vehicle_count_comm := IF( LEFT.seq = RIGHT.seq, (STRING)RIGHT.isCommercial, '0' );
+        SELF.asset_vehicle_count_oth  := IF( LEFT.seq = RIGHT.seq, (STRING)RIGHT.isUnknown, '0' );
+        SELF.asset_vehicle_value      := IF( LEFT.seq = RIGHT.seq, (STRING)RIGHT.vehiclevalue, '0' );
       ),
       LEFT OUTER, KEEP(1)
     );
-    
-  // According to Legal, we must set a value of '-2' if Vehicles are "turned off", presumably 
-  // via DPPA value. 
+
+  // According to Legal, we must set a value of '-2' if Vehicles are "turned off", presumably
+  // via DPPA value.
   Vehicles_restricted :=
     JOIN(
       Shell, VehiclesWithDetail_rolled2,
       LEFT.seq = RIGHT.seq,
       TRANSFORM( layout_asset_vehicles_temp,
         SELF.seq := LEFT.seq;
-        SELF.asset_vehicle_count      := '-2';          
-        SELF.asset_vehicle_count_pers := '-2';     
-        SELF.asset_vehicle_count_comm := '-2';     
-        SELF.asset_vehicle_count_oth  := '-2';      
-        SELF.asset_vehicle_value      := '-2';      
+        SELF.asset_vehicle_count      := '-2';
+        SELF.asset_vehicle_count_pers := '-2';
+        SELF.asset_vehicle_count_comm := '-2';
+        SELF.asset_vehicle_count_oth  := '-2';
+        SELF.asset_vehicle_value      := '-2';
       ),
       LEFT OUTER, KEEP(1)
     );
 
   Vehicles_results :=
     IF( vehicles_are_turned_off, Vehicles_restricted, Vehicles_unrestricted );
-  
-  withVehicles := 
+
+  withVehicles :=
     JOIN(
-      Shell, Vehicles_results, 
+      Shell, Vehicles_results,
       LEFT.seq = RIGHT.seq,
       TRANSFORM( Business_Risk_BIP.Layouts.Shell,
         SELF.Asset_Information.AssetVehicleCount           := RIGHT.asset_vehicle_count,
@@ -303,7 +305,7 @@ EXPORT getMotorVehicles(DATASET(Business_Risk_BIP.Layouts.Shell) Shell,
       ),
       LEFT OUTER, KEEP(1)
     );
-  
+
   // RETURN DATASET( [], Business_Risk_BIP.Layouts.Shell );
   // OUTPUT( VehiclesRaw, NAMED('VehiclesRaw') );
   // OUTPUT( VehiclesRaw_filt, NAMED('VehiclesRaw_filt') );
@@ -318,10 +320,9 @@ EXPORT getMotorVehicles(DATASET(Business_Risk_BIP.Layouts.Shell) Shell,
   // OUTPUT( VehiclesWithDetail_rolled2, NAMED('VehiclesWithDetail_rolled2') );
   // OUTPUT( Vehicles_unrestricted, NAMED('Vehicles_unrestricted') );
   // OUTPUT( Vehicles_results, NAMED('Vehicles_results') );
-  
+
   RETURN withVehicles;
 END;
 
 
 // ------------[ JUNK, SPARE PARTS ]-------------
-

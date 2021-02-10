@@ -1,6 +1,6 @@
 export DL_History := MODULE
 
-import Address, DriversV2, header_slimsort, DID_Add, ut, lib_DataLib;
+import Address, DriversV2, DID_Add, ut, lib_DataLib;
 
 export rCompDLOut
  :=
@@ -59,13 +59,13 @@ export rCompDLOut
 	// string20	FULL_DL;
 	string5		KF_APT_NO_OV;
   end;
-  
-  
+
+
 export rCompDLOut tDLHistory(DL_Source.rCompDLIn src) :=
 TRANSFORM
 	id := 'D';		// source id to process
 	self.NAME_FULL := IF(regexfind(id, src.MATRIX_NAME), src.NAME_FULL, SKIP);
-	self.DL_NUMB := IF(regexfind(id, src.MATRIX_LIC), 
+	self.DL_NUMB := IF(regexfind(id, src.MATRIX_LIC),
 					StringLib.StringFilterOut(src.DL_NUMB, '#()-'), '');
 	self.SSN := IF(regexfind(id, src.MATRIX_SSN), src.SSN, '');
 	self.DATE_DOB := IF(regexfind(id, src.MATRIX_DOB), src.DATE_DOB, '');
@@ -105,7 +105,7 @@ TRANSFORM
 	self.name_suffix	    	 := cln_name[66..70];
 	self.cleaning_score			 := cln_name[71..73];
 	//
-	self.dl_number := IF(regexfind(id, src.MATRIX_LIC), 
+	self.dl_number := IF(regexfind(id, src.MATRIX_LIC),
 						StringLib.StringFilterOut(src.DL_NUMB, '(#'),
 						'');
 	//self.dl_number := IF(regexfind(id, src.MATRIX_LIC), src.DL_NUMB, '');
@@ -121,7 +121,7 @@ TRANSFORM
 	self.ZIP := IF(useaddr, src.ADR_ZIP, '');
 	// clean address
 	/*city := TRIM(StringLib.StringFilterOut(src.ADR_CITY,'#0123456789'),LEFT,RIGHT);
-	cln_adr := DataLib.AddressClean(src.ADR_ADDR, 
+	cln_adr := DataLib.AddressClean(src.ADR_ADDR,
 				city + ', ' + src.ADR_STATE + ' ' + src.ADR_ZIP);
 	self.prim_range := IF(useaddr, cln_adr[1..10], '');
 	self.predir := IF(useaddr, cln_adr[11..12], '');
@@ -171,7 +171,7 @@ TRANSFORM
 	self.geo_match 	  			 := cln_adr[178];
 	self.err_stat 	    		 := cln_adr[179..182];
 	self.addr_fix_flag           := '';
-	
+
 	// other fields
 	self.expiration_date := (unsigned4)src.DATE_CL_EXP;
 	self.lic_issue_date := (unsigned4)src.DATE_CL_ISS;
@@ -200,11 +200,11 @@ matchset := ['A','D','S'];
 
 did_add.MAC_Match_Flex
 	(dl_file_seq,	//_src,
-	  matchset,						
-	 ssn, dob, fname, mname, lname, name_suffix, 
+	  matchset,
+	 ssn, dob, fname, mname, lname, name_suffix,
 	 prim_range, prim_name, sec_range, zip5, st, JUNK,
 	 DID,
-	 DriversV2.Layout_DL, 
+	 DriversV2.Layout_DL,
 	 false, DID_Score_field,						//*if outrec has scores, these will always be zero
 	 75,
 	 res)
@@ -231,7 +231,7 @@ TRANSFORM
 	self.name_suffix	    	 := cln_name[66..70];
 	self.cleaning_score			 := cln_name[71..73];
 	//
-	self.dl_number := IF(regexfind(id, src.MATRIX_LIC), 
+	self.dl_number := IF(regexfind(id, src.MATRIX_LIC),
 						StringLib.StringFilterOut(src.DL_NUMB, '(#'),
 						'');
 	//self.dl_number := IF(regexfind(id, src.MATRIX_LIC), src.DL_NUMB, '');
@@ -247,7 +247,7 @@ TRANSFORM
 	self.ZIP := IF(useaddr, src.ADR_ZIP, '');
 	// clean address
 	/*city := TRIM(StringLib.StringFilterOut(src.ADR_CITY,'#0123456789'),LEFT,RIGHT);
-	cln_adr := DataLib.AddressClean(src.ADR_ADDR, 
+	cln_adr := DataLib.AddressClean(src.ADR_ADDR,
 				city + ', ' + src.ADR_STATE + ' ' + src.ADR_ZIP);
 	self.prim_range := IF(useaddr, cln_adr[1..10], '');
 	self.predir := IF(useaddr, cln_adr[11..12], '');
@@ -297,7 +297,7 @@ TRANSFORM
 	self.geo_match 	  			 := cln_adr[178];
 	self.err_stat 	    		 := cln_adr[179..182];
 	self.addr_fix_flag           := '';
-	
+
 	// other fields
 	self.expiration_date := (unsigned4)src.DATE_CL_EXP;
 	self.lic_issue_date := (unsigned4)src.DATE_CL_ISS;
@@ -352,7 +352,7 @@ TRANSFORM
 	self.ZIP := IF(useaddr, src.ADR_ZIP, '');
 	// clean address
 	/*city := TRIM(StringLib.StringFilterOut(src.ADR_CITY,'#0123456789'),LEFT,RIGHT);
-	cln_adr := DataLib.AddressClean(src.ADR_ADDR, 
+	cln_adr := DataLib.AddressClean(src.ADR_ADDR,
 				city + ', ' + src.ADR_STATE + ' ' + src.ADR_ZIP);
 	self.prim_range := IF(useaddr, cln_adr[1..10], '');
 	self.predir := IF(useaddr, cln_adr[11..12], '');
@@ -402,7 +402,7 @@ TRANSFORM
 	self.geo_match 	  			 := cln_adr[178];
 	self.err_stat 	    		 := cln_adr[179..182];
 	self.addr_fix_flag           := '';
-	
+
 	// other fields
 	self.expiration_date := (unsigned4)src.DATE_CL_EXP;
 	self.lic_issue_date := (unsigned4)src.DATE_CL_ISS;
@@ -433,11 +433,11 @@ matchset := ['A','D','S'];
 
 did_add.MAC_Match_Flex
 	(dl_file_seq,	//_src,
-	  matchset,						
-	 ssn, dob, fname, mname, lname, name_suffix, 
+	  matchset,
+	 ssn, dob, fname, mname, lname, name_suffix,
 	 prim_range, prim_name, sec_range, zip5, st, JUNK,
 	 DID,
-	 DriversV2.Layout_DL, 
+	 DriversV2.Layout_DL,
 	 false, DID_Score_field,						//*if outrec has scores, these will always be zero
 	 75,
 	 res)

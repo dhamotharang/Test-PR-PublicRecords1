@@ -1,17 +1,16 @@
 ﻿IMPORT BIPV2, Business_Risk_BIP, Doxie, DueDiligence;
-IMPORT Risk_Indicators;
 
 
 /*
 
 NOTE: Logic is currently being moved to DueDiligence.v3.getPerson
       where code can be executed modularly. While moving code, clean-up
-      is underway and will be marking 'old' code as deprecated. Once each 
+      is underway and will be marking 'old' code as deprecated. Once each
       attribute is converted over the deprecations will go away. This new
       function will be used by both DD and Internal customers to retrieve
       DD specific attributes/reports. So please excuse the mess while we
       transition. Eventually this function will also be deprecated and
-      removed. Think of this function as under construction :) 
+      removed. Think of this function as under construction :)
 
 */
 
@@ -20,40 +19,23 @@ EXPORT getIndAttributes(DATASET(DueDiligence.Layouts.Indv_Internal) inData,
                         BOOLEAN includeReport,
                         Business_Risk_BIP.LIB_Business_Shell_LIBIN options,
                         BIPV2.mod_sources.iParams linkingOptions,
-                        BOOLEAN debugMode = FALSE,
-                        unsigned1 LexIdSourceOptout = 1,
-                        string TransactionID = '',
-                        string BatchUID = '',
-                        unsigned6 GlobalCompanyId = 0) := FUNCTION
+                        BOOLEAN debugMode = FALSE) := FUNCTION
 
-																					 
-																						 
+    mod_access := PROJECT(options, Doxie.IDataAccess);
+
     INTEGER bsVersion := DueDiligence.ConstantsQuery.DEFAULT_BS_VERSION;
     UNSIGNED8 bsOptions := DueDiligence.ConstantsQuery.DEFAULT_BS_OPTIONS;
     BOOLEAN isFCRA := DueDiligence.Constants.DEFAULT_IS_FCRA;
-    
-    UNSIGNED1 dppa := options.DPPA_Purpose;
-    UNSIGNED1 glba := options.GLBA_Purpose;
+
+    UNSIGNED1 dppa := options.dppa;
+    UNSIGNED1 glba := options.glb;
     STRING dataRestrictionMask := options.DataRestrictionMask;
-    
-    mod_access := MODULE(Doxie.IDataAccess)
-      EXPORT glb := options.GLBA_Purpose;
-      EXPORT dppa := options.DPPA_Purpose;
-      EXPORT DataPermissionMask := options.DataPermissionMask;
-      EXPORT DataRestrictionMask := options.DataRestrictionMask;
-      EXPORT unsigned1 lexid_source_optout := LexIdSourceOptout;
-      EXPORT string transaction_id := TransactionID; // esp transaction id or batch uid
-      EXPORT unsigned6 global_company_id := GlobalCompanyId; // mbs gcid
-    END;
-    
-    
-    
- 
+
 
     //convert the incoming data to the DueDiligence.Layouts.Indv_Internal used
     //for processing an individual
     // inquiredInd := DueDiligence.getInd(inData);
-    
+
     didFound := inData(inquiredDID <> 0);
     noDIDFound := inData(inquiredDID = 0);
 
@@ -61,15 +43,15 @@ EXPORT getIndAttributes(DATASET(DueDiligence.Layouts.Indv_Internal) inData,
     //get estimated income
     indEstIncome := DueDiligence.getIndEstimatedIncome(didFound);
 
-    //get geographic risk of the inquired individual's address  
+    //get geographic risk of the inquired individual's address
     indGeoRisk := DueDiligence.getIndGeographicRisk(indEstIncome);
 
     //get proffessional license
     indProfLic := DueDiligence.getIndProfessionalData(indGeoRisk, mod_access);
 
-    //get relatives of the inquired individual  
+    //get relatives of the inquired individual
     indRelationships := DueDiligence.getIndRelationships(indProfLic, options, mod_access);
-    
+
     //get business associations
     indBusAssoc := DueDiligence.getIndBusAssoc(indRelationships, options, linkingOptions, mod_access);
 
@@ -96,10 +78,10 @@ EXPORT getIndAttributes(DATASET(DueDiligence.Layouts.Indv_Internal) inData,
 
     //get person associations
     indPerAssoc := DueDiligence.getIndPerAssoc(indCriminalData);
-    
+
     //get identity risk
     indIDRisk := DueDiligence.getIndIdentityRisk(indPerAssoc, dataRestrictionMask, dppa, glba, isFCRA, bsVersion, bsOptions, mod_access);
-    
+
     //populate the attributes and flags
     indKRI := DueDiligence.getIndKRI(indIDRisk);
 
@@ -111,16 +93,16 @@ EXPORT getIndAttributes(DATASET(DueDiligence.Layouts.Indv_Internal) inData,
 
     //add both did and didless individuals
     finalInd := SORT(indReportData + indNoDIDKRI, seq);
-    
-    
 
-    
+
+
+
 
     //debugging section
-    
-    
-    
-    
+
+
+
+
     IF(debugMode, OUTPUT(didFound, NAMED('didFound')));
     IF(debugMode, OUTPUT(noDIDFound, NAMED('noDIDFound')));
     IF(debugMode, OUTPUT(indEstIncome, NAMED('indEstIncome')));

@@ -5,11 +5,11 @@
 <part name="WheelThreshold" type="xsd:integer"/>
 </message>
 */
-IMPORT SALT311,BizLinkFull;
+IMPORT SALT44,BizLinkFull;
 EXPORT Wheel_city_clean_Service() := FUNCTION
-    SALT311.StrType Input_prefix := '' : STORED('prefix');
+    SALT44.StrType Input_prefix := '' : STORED('prefix');
     UNSIGNED Input_count := 1 : STORED('count');
     UNSIGNED Input_WheelThreshold := BizLinkFull.Config_BIP.city_clean_WheelThreshold : STORED('WheelThreshold');
-    results := BizLinkFull.Wheel.Fetch_city_clean(SALT311.StringToUppercase(Input_prefix), Input_count, Input_WheelThreshold);
+    results := BizLinkFull.Wheel.Fetch_city_clean(SALT44.StringToUppercase(Input_prefix), Input_count, Input_WheelThreshold);
     RETURN OUTPUT(results);
 END;

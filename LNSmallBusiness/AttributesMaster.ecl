@@ -1,5 +1,4 @@
 ﻿IMPORT Business_Risk_BIP;
-
 EXPORT AttributesMaster (Business_Risk_BIP.Layouts.Shell BusShell, UNSIGNED BusShellVersion) := MODULE
  SHARED SET_NO_HITS := ['-1', '0', ''];
  EXPORT UNSIGNED6 PowID := BusShell.BIP_IDs.PowID.LinkID;
@@ -143,18 +142,37 @@ EXPORT AttributesMaster (Business_Risk_BIP.Layouts.Shell BusShell, UNSIGNED BusS
  EXPORT STRING1 InputCheckAuthRep3Title := BusShell.Input.InputCheckAuthRep3Title;   
  EXPORT STRING1 InputCheckAuthRep3DL := BusShell.Input.InputCheckAuthRep3DL;
  EXPORT STRING1 InputCheckAuthRep3DLState := BusShell.Input.InputCheckAuthRep3DLState;
- EXPORT STRING2 VerificationBusInputName := IF(BusShellVersion < Business_Risk_BIP.Constants.BusShellVersion_v30, BusShell.Verification.VerificationBusInputName,
-				(STRING)Business_Risk_BIP.Common.capNum((INTEGER)BusShell.Verification.NameMatchSourceCount, -1, 1));
- EXPORT STRING2 VerificationBusInputAddr := IF(BusShellVersion < Business_Risk_BIP.Constants.BusShellVersion_v30, BusShell.Verification.VerificationBusInputAddr,
-				(STRING)Business_Risk_BIP.Common.capNum((INTEGER)BusShell.Verification.AddrVerificationSourceCount, -1, 1));
- EXPORT STRING2 VerificationBusInputPhone := IF(BusShellVersion < Business_Risk_BIP.Constants.BusShellVersion_v30, BusShell.Verification.VerificationBusInputPhone,
-				(STRING)Business_Risk_BIP.Common.capNum((INTEGER)BusShell.Verification.PhoneMatchSourceCountID, -1, 1));
+ 
+ // All these changes in these attributes are part of adding SAS patch in the code- RABS-4
+ 
+ EXPORT STRING2 VerificationBusInputName := MAP(
+                                   BusShellVersion = Business_Risk_BIP.Constants.BusShellVersion_v31  AND BusShell.Associates.associatecount = '-1' => '-1',
+                                   BusShellVersion < Business_Risk_BIP.Constants.BusShellVersion_v30                                                => BusShell.Verification.VerificationBusInputName,
+                                   (STRING)Business_Risk_BIP.Common.capNum((INTEGER)BusShell.Verification.NameMatchSourceCount, -1, 1));
+																	 
+ EXPORT STRING2 VerificationBusInputAddr := MAP(
+                                   BusShellVersion = Business_Risk_BIP.Constants.BusShellVersion_v31  AND (BusShell.Associates.associatecount = '-1' OR BusShell.Input.InputCheckBusAddr = '0') => '-1',
+                                   BusShellVersion < Business_Risk_BIP.Constants.BusShellVersion_v30                                                                                            => BusShell.Verification.VerificationBusInputAddr,
+                                   (STRING)Business_Risk_BIP.Common.capNum((INTEGER)BusShell.Verification.AddrVerificationSourceCount, -1, 1));
+																	 
+ EXPORT STRING2 VerificationBusInputPhone := MAP(
+                                   BusShellVersion = Business_Risk_BIP.Constants.BusShellVersion_v31  AND BusShell.Associates.associatecount = '-1'  => '-1',
+                                   BusShellVersion < Business_Risk_BIP.Constants.BusShellVersion_v30                                                 => BusShell.Verification.VerificationBusInputPhone,
+                                   (STRING)Business_Risk_BIP.Common.capNum((INTEGER)BusShell.Verification.PhoneMatchSourceCountID, -1, 1));
+																	 
+                                                            
+ 
  EXPORT STRING2 VerificationBusInputFEIN := IF(BusShellVersion < Business_Risk_BIP.Constants.BusShellVersion_v30, BusShell.Verification.VerificationBusInputFEIN,
-				(STRING)Business_Risk_BIP.Common.capNum((INTEGER)BusShell.Verification.FEINMatchSourceCount, -1, 1));
- EXPORT STRING2 VerificationBusInputTIN := IF(BusShellVersion < Business_Risk_BIP.Constants.BusShellVersion_v30, BusShell.Verification.VerificationBusInputFEIN,
-				(STRING)Business_Risk_BIP.Common.capNum((INTEGER)BusShell.Verification.FEINMatchSourceCount, -1, 1));
+				(STRING)Business_Risk_BIP.Common.capNum((INTEGER)BusShell.Verification.FEINMatchSourceCount, -1, 1));    
+ EXPORT STRING2 VerificationBusInputTIN := MAP(
+                                   BusShellVersion = Business_Risk_BIP.Constants.BusShellVersion_v31  AND (BusShell.Associates.associatecount = '-1' OR BusShell.Input.InputCheckBusFEIN = '0')  => '-1',
+                                   BusShellVersion < Business_Risk_BIP.Constants.BusShellVersion_v30                                                                                             => BusShell.Verification.VerificationBusInputFEIN,
+                                   (STRING)Business_Risk_BIP.Common.capNum((INTEGER)BusShell.Verification.FEINMatchSourceCount, -1, 1));
+																	 
+
  EXPORT STRING2 VerificationBusInputIndustry := BusShell.Verification.VerificationBusInputIndustry;
  EXPORT STRING5 BusinessRecordTimeOldest := IF(BusShellVersion < Business_Risk_BIP.Constants.BusShellVersion_v30, 
+ 
 				BusShell.Business_Activity.BusinessRecordTimeOldest, BusShell.Business_Activity.SourceBusinessRecordTimeOldestID);
  EXPORT STRING5 BusinessRecordTimeNewest := IF(BusShellVersion < Business_Risk_BIP.Constants.BusShellVersion_v30, 
 				BusShell.Business_Activity.BusinessRecordTimeNewest, BusShell.Business_Activity.SourceBusinessRecordTimeNewestID);
@@ -184,15 +202,18 @@ EXPORT AttributesMaster (Business_Risk_BIP.Layouts.Shell BusShell, UNSIGNED BusS
  EXPORT STRING5 OrgRelatedCount   := BusShell.Organizational_Structure.OrgRelatedCount;
  EXPORT STRING2 OrgParentCompany := IF(BusShell.Organizational_Structure.OrgRelatedCount <> '-1', Business_Risk_BIP.Common.SetBoolean((INTEGER)BusShell.Organizational_Structure.OrgRelatedCount = 1 OR 
 																																																																			BusShell.Verification.InputIDMatchSeleID = BusShell.Verification.InputIDMatchOrgID),
-																																																	'-1');
+																																																	'-1');                                                                                          
  EXPORT STRING5 OrgLegalEntityCount  := BusShell.Organizational_Structure.OrgLegalEntityCount;
  EXPORT STRING5 OrgAddrLegalEntityCount  := BusShell.Organizational_Structure.OrgAddrLegalEntityCount;
- EXPORT STRING2 OrgSingleLocation := IF((INTEGER)BusShell.Verification.InputIDMatchUltID <> 0, Business_Risk_BIP.Common.SetBoolean(BusShell.Verification.InputIDMatchPowID = BusShell.Verification.InputIDMatchProxID and
-																																																BusShell.Verification.InputIDMatchPowID = BusShell.Verification.InputIDMatchSeleID and
-																																																BusShell.Verification.InputIDMatchPowID = BusShell.Verification.InputIDMatchOrgID and
-																																																BusShell.Verification.InputIDMatchPowID = BusShell.Verification.InputIDMatchUltID AND 
-																																																(INTEGER)BusShell.Organizational_Structure.OrgLocationCount <= 1),
-																																															'-1');
+ OrgSingleLocation_pre := IF((INTEGER)BusShell.Verification.InputIDMatchUltID <> 0, 
+                              Business_Risk_BIP.Common.SetBoolean(BusShell.Verification.InputIDMatchPowID = BusShell.Verification.InputIDMatchProxID AND
+																				 BusShell.Verification.InputIDMatchPowID = BusShell.Verification.InputIDMatchSeleID AND
+																				 BusShell.Verification.InputIDMatchPowID = BusShell.Verification.InputIDMatchOrgID AND
+																				 BusShell.Verification.InputIDMatchPowID = BusShell.Verification.InputIDMatchUltID AND 
+																				 (INTEGER)BusShell.Organizational_Structure.OrgLocationCount <= 1),
+																					'-1');
+
+ EXPORT STRING5 OrgSingleLocation := IF(BusShellVersion = Business_Risk_BIP.Constants.BusShellVersion_v31 AND BusShell.Associates.associatecount = '-1', '-1',OrgSingleLocation_pre);
  EXPORT STRING5 SOSTimeIncorporation := BusShell.SOS.SOSTimeIncorporation;
  EXPORT STRING5 SOSTimeAgentChange := BusShell.SOS.SOSTimeAgentChange;
  EXPORT STRING2 SOSEverDefunct := BusShell.SOS.SOSEverDefunct;
@@ -221,8 +242,11 @@ EXPORT AttributesMaster (Business_Risk_BIP.Layouts.Shell BusShell, UNSIGNED BusS
  EXPORT STRING9 JudgmentDollarTotal := BusShell.Lien_And_Judgment.JudgmentDollarTotal;
  EXPORT STRING5 JudgmentCivilCourtCount := BusShell.Lien_And_Judgment.JudgmentFiledCJCount;
  EXPORT STRING9 JudgmentCivilCourtTotalAmount := BusShell.Lien_And_Judgment.JudgmentFiledCJTotalAmount;
- EXPORT STRING9 LienJudgmentDollarTotal :=  If((integer)BusShell.Lien_And_Judgment.LienCount <> 0 or (integer)BusShell.Lien_And_Judgment.JudgmentCount <> 0,
-                       (STRING)Business_Risk_BIP.Common.CapNum(sum((integer)BusShell.Lien_And_Judgment.JudgmentDollarTotal, (integer)BusShell.Lien_And_Judgment.LienDollarTotal), 0, 99999999), '-1');
+ EXPORT STRING9 LienJudgmentDollarTotal := MAP(
+                                               BusShellVersion = Business_Risk_BIP.Constants.BusShellVersion_v31 AND BusShell.Associates.associatecount = '-1' => '-1',
+                                               If((integer)BusShell.Lien_And_Judgment.LienCount <> 0 or (integer)BusShell.Lien_And_Judgment.JudgmentCount <> 0,
+																									            (STRING)Business_Risk_BIP.Common.CapNum(sum((integer)BusShell.Lien_And_Judgment.JudgmentDollarTotal, (integer)BusShell.Lien_And_Judgment.LienDollarTotal), 0, 99999999), 
+												                               '-1'));
  EXPORT STRING4 AssetPropertyCount := BusShell.Asset_Information.AssetPropertyCount;
  EXPORT STRING4 AssetPropertyStateCount := BusShell.Asset_Information.AssetPropertyStateCount;
  EXPORT STRING9 AssetPropertyLotSizeTotal := BusShell.Asset_Information.AssetPropertyLotSizeTotal;
@@ -370,11 +394,11 @@ EXPORT AttributesMaster (Business_Risk_BIP.Layouts.Shell BusShell, UNSIGNED BusS
 	// EXPORT STRING6 FirmEmployeeCount := BusShell.Firmographic.FirmEmployeeCount;
 	EXPORT STRING2 FirmOwnershipType := BusShell.Firmographic.OwnershipType;
 	// EXPORT STRING11 FirmReportedSales := BusShell.Firmographic.FirmReportedSales;
-	EXPORT STRING2 FirmParentCompanyInd := BusShell.Organizational_Structure.OrgParentCompany;
-  EXPORT STRING3 FirmAgeObserved := BusShell.Firmographic.busobservedageID;
+	EXPORT STRING2 FirmParentCompanyInd := BusShell.Organizational_Structure.OrgParentCompany; 
+	EXPORT STRING3 FirmAgeObserved := BusShell.Firmographic.busobservedageID;
 	EXPORT STRING2 SOSStateMatchInputState := BusShell.SOS.SOSIncorporationStateInput;
-  EXPORT STRING5 SOSIncorporationFilingsCount := BusShell.SOS.SOSIncorporationCount;
-  EXPORT STRING5 SOSIncorporationTimeOldest := BusShell.SOS.SOSTimeIncorporation;
+	EXPORT STRING5 SOSIncorporationFilingsCount := BusShell.SOS.SOSIncorporationCount;
+	EXPORT STRING5 SOSIncorporationTimeOldest := BusShell.SOS.SOSTimeIncorporation;
 	EXPORT STRING5 SOSDomesticCount := BusShell.SOS.SOSDomesticCount;
 	EXPORT STRING2 SOSStandingWorst := BusShell.SOS.SOSStandingWorst;
 	EXPORT STRING2 SOSStandingBest := BusShell.SOS.SOSStandingBest;

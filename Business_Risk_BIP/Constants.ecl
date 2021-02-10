@@ -1,4 +1,4 @@
-﻿IMPORT AutoKeyI, BIPV2, Business_Risk_BIP, Gateway, iesp, MDR, Risk_Indicators, UT;
+﻿IMPORT AutoKeyI, BIPV2, Gateway, iesp, MDR, Risk_Indicators;
 
 EXPORT Constants := MODULE
 	EXPORT LinkSearch := ENUM(
@@ -38,6 +38,8 @@ EXPORT Constants := MODULE
 	EXPORT Default_Gateways_Requested   := DATASET([], Gateway.Layouts.Config);
 	EXPORT Default_IndustryClass				:= ''; // UTILI indicates a Utility company, and Utility data must be blanked out
 	EXPORT STRING6 Default_SSNMask      := '';
+	EXPORT Default_BIPAppend_ScoreThreshold      := 75;
+	EXPORT Default_BipAppend_WeightThreshold     := 44;
   
 	EXPORT Default_BusShellVersion			:= 21; // Default Business Shell Version is v2.1: Business Shell with SBFE enhancement attributes. This is what SBA uses.
 	EXPORT BusShellVersion_v20					:= 20; // Business Shell v2.0: Original business shell and original SBFE attributes
@@ -67,8 +69,12 @@ EXPORT Constants := MODULE
 	EXPORT OneYear											:= 365;
 	EXPORT TwoYear											:= 731;
 	EXPORT FirstSBFELoadDate						:= '20151012';
-	
-  EXPORT MAX_OFAC_VERSION             := 4;
+	EXPORT MAX_OFAC_VERSION             := 4;
+	EXPORT MISSING_INPUT_DATA_INT := -99999;
+	EXPORT NO_DATA_FOUND_INT := -99998;
+	EXPORT MISSING_INPUT_DATA := '-99999';
+	EXPORT NO_DATA_FOUND := '-99998';
+
   
 	// Various JOIN condition limits
 	EXPORT Limit_BusHeader							:= 25000; // Default for Business Header kFetch

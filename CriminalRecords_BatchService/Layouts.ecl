@@ -59,9 +59,11 @@ export Layouts := MODULE
     string12 inquiry_lexid := '';
 	END;
 	
-	export batch_pii_out_pre := RECORD(batch_pii_out)
-		dataset (FFD.Layouts.ConsumerStatementBatch) StatementsAndDisputes;
-	end;
+  export batch_pii_out_pre := RECORD(batch_pii_out)
+    dataset (FFD.Layouts.ConsumerStatementBatch) StatementsAndDisputes;
+    FFD.Layouts.CommonRawRecordElements;
+    lookup_id_pii.offender_key;
+  end;
 	
 	
 	export batch_pii_int := RECORD

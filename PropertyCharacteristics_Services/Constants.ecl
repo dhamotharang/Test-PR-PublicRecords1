@@ -90,5 +90,26 @@ module
 	EXPORT Selected_Source_Plus_Option  := 'SSP';
 	
 	EXPORT MSL_Src  							:= 'MLS';
+	
+	EXPORT MLS_Global_Source_ID	:= 27621;
+	EXPORT log_extension_type		:= 52;
+	EXPORT DID_SCORE_THRESHOLD	:= 80;
+
+  /*Default Option (report type P) - Corelogic (D) and Blacknight (B)
+	Default Option (report type I) - Best of Corelogic and Blacknight (A)
+	Default Plus Option (report type P) - Corelogic (D) + best of Blacknight (B) and mls(E)
+	Default Plus Option (report type I) -  Best of Corelogic and Blacknight (A)
+	Selected Source - best of all sources (F)
+	Selected Source Plus – best of all sources (F) and all underlying source data -Corelogic (D), Blacknight (B) and mls(E)*/
+  EXPORT Property_ReportType          := 'P';
+  EXPORT Inspection_ReportType        := 'I';
+
+  EXPORT Best_CoreLogic_Blacknight    := 'A';
+  EXPORT Blacknight_LocalizedAverages := 'B';
+  EXPORT Blacknight                   := 'C';
+  EXPORT CoreLogic                    := 'D';
+  EXPORT MLS                          := 'E';
+  EXPORT Best_AllSources              := 'F';
+  EXPORT Best_All_NoMLS               := 'G';
 
 end;

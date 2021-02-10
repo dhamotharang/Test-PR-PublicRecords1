@@ -47,16 +47,6 @@ EXPORT Constants := MODULE
 		export BATCH_MAX_RESULTS := '500';
 	END;
 	
-	export PLD := MODULE
-		export JOIN_LIMIT := 10000;
-		export SEQ_MAX_LIMIT := 500;
-		export DEFENDANT := 'DEFENDANT';
-		export PLAINTIFF  := 'PLAINTIFF';
-		export FILTERVALUE := 10;
-		export PERSON_CHAR := 'P';
-		export COMPANY_CHAR :='C';
-	end;
-	
 	export Email := MODULE
 		export JOIN_LIMIT := 10000;
 		export SEQ_MAX_LIMIT := 500;

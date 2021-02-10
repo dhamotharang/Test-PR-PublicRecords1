@@ -1,30 +1,31 @@
 ﻿IMPORT Address, AutoStandardI, Business_Credit_Scoring, BusinessCredit_Services, Business_Risk_BIP, Doxie, iesp, LNSmallBusiness, std;
 
-EXPORT fn_getBusiness_CreditScore (BusinessCredit_Services.Iparam.reportrecords inmod,                                                                                              
+EXPORT fn_getBusiness_CreditScore (BusinessCredit_Services.Iparam.reportrecords inmod,
 																	     DATASET(BusinessCredit_Services.Layouts.TopBusiness_BestSection) bestRecs,
-																		DATASET(doxie.layout_best) AuthRepBestRec																																		
+																		DATASET(doxie.layout_best) AuthRepBestRec
 																		) := MODULE
 
 	SHARED BuzCreditScoringRecs := Business_Credit_Scoring.Key_ScoringIndex().kFetch2(inmod.BusinessIds,inmod.FetchLevel,,inmod.DataPermissionMask, BusinessCredit_Services.Constants.JOIN_LIMIT);
 
 	// Adding min input check for Business & AuthRep. we only wanted to suppliment information from best file to analytics fxn when below check is not satisfied in the search.
 	// this is done to fix Score Mismatch between CreditReport and Analytics Score service
-	MinimumInputForBizSearch := (inmod.CompanyName != '' AND  inmod.Tin != '') OR 
-															(inmod.CompanyName != '' AND  inmod.Company_StreetAddress1 != '' AND inmod.Company_Zip != '' ) OR 
+	MinimumInputForBizSearch := (inmod.CompanyName != '' AND  inmod.Tin != '') OR
+															(inmod.CompanyName != '' AND  inmod.Company_StreetAddress1 != '' AND inmod.Company_Zip != '' ) OR
 															(inmod.CompanyName != '' AND  inmod.Company_StreetAddress1 != '' AND inmod.Company_City != '' AND inmod.Company_State != '');
 
-	MinimumInputForAuthRep := (inmod.LastName != '' AND inmod.FirstName != '' AND inmod.SSN != '')  OR 
-														(inmod.LastName != '' AND inmod.FirstName != '' AND inmod.AuthRep_StreetAddress1 != '' AND inmod.AuthRep_Zip != '' ) OR 
-														(inmod.LastName != '' AND inmod.FirstName != '' AND inmod.AuthRep_StreetAddress1 != '' AND inmod.AuthRep_City != '' AND inmod.AuthRep_State != ''); 
+	MinimumInputForAuthRep := (inmod.LastName != '' AND inmod.FirstName != '' AND inmod.SSN != '')  OR
+														(inmod.LastName != '' AND inmod.FirstName != '' AND inmod.AuthRep_StreetAddress1 != '' AND inmod.AuthRep_Zip != '' ) OR
+														(inmod.LastName != '' AND inmod.FirstName != '' AND inmod.AuthRep_StreetAddress1 != '' AND inmod.AuthRep_City != '' AND inmod.AuthRep_State != '');
 
 	set_model := IF(inmod.did != '' OR MinimumInputForAuthRep, BusinessCredit_Services.Constants.MODEL_NAME_SETS.CREDIT_BLENDED, BusinessCredit_Services.Constants.MODEL_NAME_SETS.CREDIT);
 
 	input_options := MODULE(Business_Risk_BIP.LIB_Business_Shell_LIBIN)
-		EXPORT UNSIGNED1	DPPA_Purpose 								:= AutoStandardI.InterfaceTranslator.dppa_purpose.val(inmod);
-		EXPORT UNSIGNED1	GLBA_Purpose 								:= AutoStandardI.InterfaceTranslator.glb_purpose.val(inmod);
-		EXPORT STRING50		DataRestrictionMask					:= inmod.DataRestrictionMask;
-		EXPORT STRING50		DataPermissionMask					:= inmod.DataPermissionMask;
-		EXPORT STRING10		IndustryClass								:= Business_Risk_BIP.Constants.Default_IndustryClass;
+    //note: CCPA-relevant options are not initiated
+		EXPORT UNSIGNED1	dppa 												:= AutoStandardI.InterfaceTranslator.dppa_purpose.val(inmod);
+		EXPORT UNSIGNED1	glb					 								:= AutoStandardI.InterfaceTranslator.glb_purpose.val(inmod);
+		EXPORT STRING			DataRestrictionMask					:= inmod.DataRestrictionMask;
+		EXPORT STRING			DataPermissionMask					:= inmod.DataPermissionMask;
+		EXPORT STRING5		industry_class							:= Business_Risk_BIP.Constants.Default_IndustryClass;
 		EXPORT UNSIGNED1	LinkSearchLevel							:= Business_Risk_BIP.Constants.LinkSearch.Default;
 		EXPORT UNSIGNED1	BusShellVersion							:= Business_Risk_BIP.Constants.Default_BusShellVersion;
 		EXPORT UNSIGNED1	MarketingMode								:= Business_Risk_BIP.Constants.Default_MarketingMode;
@@ -34,12 +35,12 @@ EXPORT fn_getBusiness_CreditScore (BusinessCredit_Services.Iparam.reportrecords 
 		EXPORT REAL				Global_Watchlist_Threshold	:= Business_Risk_BIP.Constants.Default_Global_Watchlist_Threshold;
 		EXPORT BOOLEAN    DoNotUseAuthRepInBIPAppend  := TRUE;
 	END;
-	
+
 	Business_Risk_BIP.Layouts.Input prepare_input() := TRANSFORM
 		SELF.Seq            		:= 1;
 		SELF.AcctNo         		:= '1';
 		SELF.HistoryDate    		:= (INTEGER)Business_Risk_BIP.Constants.NinesDate;
-		SELF.HistoryDateTime		:= (INTEGER)Business_Risk_BIP.Constants.NinesDateTime;		
+		SELF.HistoryDateTime		:= (INTEGER)Business_Risk_BIP.Constants.NinesDateTime;
 		// new code:
 		SELF.CompanyName := IF(MinimumInputForBizSearch, inmod.CompanyName , bestrecs[1].BestSection.CompanyName);
 		SELF.Prim_Range 	:= IF(MinimumInputForBizSearch, inmod.Company_StreetNumber , bestrecs[1].BestSection.Address.StreetNumber);
@@ -52,8 +53,8 @@ EXPORT fn_getBusiness_CreditScore (BusinessCredit_Services.Iparam.reportrecords 
 		SELF.StreetAddress1	:= IF(MinimumInputForBizSearch, inmod.Company_StreetAddress1 , bestrecs[1].BestSection.Address.StreetAddress1);
 		SELF.City           		:= IF(MinimumInputForBizSearch, inmod.Company_City , bestrecs[1].BestSection.Address.City);
 		SELF.State         		:= IF(MinimumInputForBizSearch, inmod.Company_State , bestrecs[1].BestSection.Address.State);
-		SELF.Zip          			:= IF(MinimumInputForBizSearch, inmod.Company_Zip , bestrecs[1].BestSection.Address.Zip5);		
-		SELF.FEIN          		:= IF(MinimumInputForBizSearch, inmod.Tin , bestrecs[1].BestSection.Tin);		
+		SELF.Zip          			:= IF(MinimumInputForBizSearch, inmod.Company_Zip , bestrecs[1].BestSection.Address.Zip5);
+		SELF.FEIN          		:= IF(MinimumInputForBizSearch, inmod.Tin , bestrecs[1].BestSection.Tin);
 		SELF.Phone10    		:= IF(MinimumInputForBizSearch, inmod.Company_Phone, bestrecs[1].BestSection.PhoneInfo.Phone10);
 		//
 		SELF.SeleID  						:= inmod.BusinessIds[1].SeleID;
@@ -97,8 +98,8 @@ EXPORT fn_getBusiness_CreditScore (BusinessCredit_Services.Iparam.reportrecords 
 		SELF.StreetAddress1 		:= inmod.Company_StreetAddress1;
 		SELF.City           		:= inmod.Company_City;
 		SELF.State         			:= inmod.Company_State;
-		SELF.Zip          			:= inmod.Company_Zip;		
-		SELF.FEIN          			:= inmod.Tin;		
+		SELF.Zip          			:= inmod.Company_Zip;
+		SELF.FEIN          			:= inmod.Tin;
 		SELF.Phone10    				:= inmod.Company_Phone;
 		SELF.SeleID  						:= 0;
 		SELF.OrgID   						:= 0;
@@ -122,21 +123,21 @@ EXPORT fn_getBusiness_CreditScore (BusinessCredit_Services.Iparam.reportrecords 
 		SELF.Rep_Phone10 				:= (STRING)inmod.AuthRep_Phone;
 		SELF.Rep_DLNumber 			:= inmod.DLNumber;
 		SELF.Rep_DLState 				:= inmod.DLState;
-		SELF         						:= [];	
+		SELF         						:= [];
 	END;
 	//                                         this UseInputDataAsIs is defaulted to false in BusinessCredit_Services.Iparam.reportRecords
 	//                                        and set to true in the call from  LNSmallBusiness.SmallBusiness_BIP_Combined_Service
 	//
 	//                                        since that service also calls this attribute LNSmallBusiness.SmallBusiness_BIP_Combined_Service =>
-	 //                                       LNSmallBusiness.SmallBusiness_BIP_Combined_Service_Records ->  BusinessCredit_Services.CreditReport_Records 
+	 //                                       LNSmallBusiness.SmallBusiness_BIP_Combined_Service_Records ->  BusinessCredit_Services.CreditReport_Records
 	 //                                       -> BusinessCredit_Services.fn_getBusiness_CreditScore
 	input_rec				:= IF( inmod.UseInputDataAsIs, DATASET([prepare_input_for_Combined_service()]), DATASET([prepare_input()]) );
-	
+
 	SHARED results	:= LNSmallBusiness.fn_SmallBusiness_getScores(input_rec, input_options, set_model);
 
 	model_results	:= NORMALIZE(results, LEFT.modelresults, TRANSFORM(RIGHT));
-	
-	iesp.businesscreditreport.t_BusinessCreditScore score_trans(RECORDOF(model_results) L) := TRANSFORM  
+
+	iesp.businesscreditreport.t_BusinessCreditScore score_trans(RECORDOF(model_results) L) := TRANSFORM
 		SELF.ScoreType		 	:=	CASE(L.ModelName,
                                  BusinessCredit_Services.Constants.CREDIT_SCORE_MODEL	 => BusinessCredit_Services.Constants.SCORE_TYPE.CREDIT,
                                  BusinessCredit_Services.Constants.CREDIT_SCORE_SLBO	 => BusinessCredit_Services.Constants.SCORE_TYPE.CREDIT,
@@ -154,38 +155,38 @@ EXPORT fn_getBusiness_CreditScore (BusinessCredit_Services.Iparam.reportrecords 
 		SELF.MaxScoreRange 	:=	(integer)L.MaxRange;
 		SELF.Score					:= 	(integer)L.Score;
 		SELF.ScoreRiskLevel	:=	L.risklevel;
-		SELF.ScoreReasons		:=	CHOOSEN(PROJECT(L.reasoncodes, 
-																			TRANSFORM (iesp.businesscreditreport.t_BusinessCreditScoreReason, 
+		SELF.ScoreReasons		:=	CHOOSEN(PROJECT(L.reasoncodes,
+																			TRANSFORM (iesp.businesscreditreport.t_BusinessCreditScoreReason,
 																				SELF.Sequence 	 := (integer)LEFT.SeqNo,
 																				SELF.ReasonCode	 := LEFT.ReasonCode,
 																				SELF.Description := LEFT.ReasonCodeDesc )), BusinessCredit_Services.Constants.MAX_CREDIT_SCORE_REASON);
 		SELF := [];
 	END;
-	
+
 	_curr_Scores	:= PROJECT(model_results , score_trans(LEFT));
 
 	iesp.businesscreditreport.t_BusinessCreditScoring trans_CurrScores() := TRANSFORM
 		SELF.DateScored 									:= iesp.ECL2ESP.toDatestring8((STRING8)Std.Date.Today()),
 		SELF.CurrentPriorFlag 						:= LNSmallBusiness.Constants.CURRENT_FLAG,
-		SELF.Scores 											:= PROJECT(_curr_Scores , TRANSFORM(LEFT)), 
+		SELF.Scores 											:= PROJECT(_curr_Scores , TRANSFORM(LEFT)),
 		SELF															:= [];
 	END;
-	
+
 	curr_Scores := DATASET([trans_CurrScores()]);
 
 	//get current historical scores using index.
 	BuzCreditScoringRecs_srt := SORT(BuzCreditScoringRecs, UltID, OrgID, SeleID, -Version);
-	
-	hist_scores		:= CHOOSEN(PROJECT(BuzCreditScoringRecs_srt, 
+
+	hist_scores		:= CHOOSEN(PROJECT(BuzCreditScoringRecs_srt,
 														TRANSFORM(iesp.businesscreditreport.t_BusinessCreditScoring,
 															SELF.DateScored 									:= iesp.ECL2ESP.toDatestring8(LEFT.version),
 															SELF.CurrentPriorFlag							:= LNSmallBusiness.Constants.HISTORICAL_FLAG,
 															SELF.PrimaryIndustryCode					:= LEFT.Classification_Code,
 															SELF.PrimaryIndustryDescription		:= LEFT.Classification_Code_Description,
 															SELF.IndustryScore								:= (INTEGER)LEFT.Industry_Score_Avg,
-															SELF.Scores												:= CHOOSEN(PROJECT(LEFT.Scores , 
+															SELF.Scores												:= CHOOSEN(PROJECT(LEFT.Scores ,
 																																						TRANSFORM(iesp.businesscreditreport.t_BusinessCreditScore,
-																																							SELF.ScoreType		 	:=	LEFT.Score_Name; 
+																																							SELF.ScoreType		 	:=	LEFT.Score_Name;
 																																							SELF.MinScoreRange 	:=	LEFT.Min_Score_Range;
 																																							SELF.MaxScoreRange 	:=	LEFT.Max_Score_Range;
 																																							SELF.Score					:= 	LEFT.Score;

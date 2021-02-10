@@ -1,11 +1,11 @@
-﻿//HPCC Systems KEL Compiler Version 1.2.1-dev
-IMPORT KEL12 AS KEL;
+﻿//HPCC Systems KEL Compiler Version 1.3.2
+IMPORT KEL13 AS KEL;
 IMPORT B_Business,B_Business_1,CFG_graph FROM Business_Credit_KEL;
-IMPORT * FROM KEL12.Null;
+IMPORT * FROM KEL13.Null;
 EXPORT Q_S_B_F_E___Shell(CFG_graph.FDCDataset __in = CFG_graph.FDCDefault, CFG_graph __cfg = CFG_graph) := MODULE
   SHARED TYPEOF(B_Business(__in,__cfg).__ENH_Business) __ENH_Business := B_Business(__in,__cfg).__ENH_Business;
-  SHARED __EE10623622 := __ENH_Business;
-  SHARED __ST148462_Layout := RECORD
+  SHARED __EE11231882 := __ENH_Business;
+  SHARED __ST148601_Layout := RECORD
     KEL.typ.nuid UID;
     KEL.typ.nint Sbfedatefirstcycleall_;
     KEL.typ.nint Sbfetimeoldestcycle_;
@@ -1868,5 +1868,5 @@ EXPORT Q_S_B_F_E___Shell(CFG_graph.FDCDataset __in = CFG_graph.FDCDefault, CFG_g
     KEL.typ.nint Sbfeprincipalmaxcount_;
     KEL.typ.int __RecordCount := 0;
   END;
-  EXPORT Res0 := __UNWRAP(PROJECT(__EE10623622,__ST148462_Layout));
+  EXPORT Res0 := __UNWRAP(PROJECT(__EE11231882,__ST148601_Layout));
 END;

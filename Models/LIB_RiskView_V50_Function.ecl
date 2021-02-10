@@ -12,7 +12,9 @@ EXPORT LIB_RiskView_V50_Function (
 											STRING65 returnCode_in = '',
 											STRING65 payFrequency_in = '',
 											DATASET(RiskView.Layouts.Layout_Custom_Inputs) Custom_Inputs_in = DATASET([], RiskView.Layouts.Layout_Custom_Inputs),
-											DATASET(RiskView.Layouts.attributes_internal_layout_noscore) Attr_in = DATASET([], RiskView.Layouts.attributes_internal_layout_noscore)) := FUNCTION
+											GROUPED DATASET(RiskView.Layouts.attributes_internal_layout_noscore) Attr_in = GROUP(DATASET([], RiskView.Layouts.attributes_internal_layout_noscore), seq),
+											DATASET(Risk_Indicators.layouts.layout_IDA_out) IDA_Attr_in = DATASET([], Risk_Indicators.layouts.layout_IDA_out)
+                      ) := FUNCTION
 
 arguments := MODULE(Models.RV_LIBIN)
 	EXPORT STRING30 modelName := modelName_in;
@@ -23,7 +25,8 @@ arguments := MODULE(Models.RV_LIBIN)
 	EXPORT STRING65 returnCode := returnCode_in;
 	EXPORT STRING65 payFrequency := payFrequency_in;
 	EXPORT DATASET(RiskView.Layouts.Layout_Custom_Inputs) Custom_Inputs := Custom_Inputs_in;
-	EXPORT DATASET(RiskView.Layouts.attributes_internal_layout_noscore) Attr_in := Attr_in;
+	EXPORT GROUPED DATASET(RiskView.Layouts.attributes_internal_layout_noscore) v5_Attrs := Attr_in;
+	EXPORT DATASET(Risk_Indicators.layouts.layout_IDA_out) IDA_Attrs := IDA_Attr_in;
 END;
 
 #if(Use_RiskView_V50_Library)

@@ -244,15 +244,18 @@
 	<part name="UltID" type="xsd:integer"/>
 	<part name="AllowedSources" type="xsd:string"/>
 	<part name="BIPBestAppend" type="xsd:integer"/>
-  <part name="OFAC_Version" type="xsd:integer"/>
-  <part name="Global_Watchlist_Threshold" type="xsd:real"/>
-  <part name="Watchlists_Requested" type="tns:XmlDataSet" cols="90" rows="10"/>
-  <part name="KeepLargeBusinesses" type="xsd:integer"/>
+	<part name="OFAC_Version" type="xsd:integer"/>
+	<part name="Global_Watchlist_Threshold" type="xsd:real"/>
+	<part name="Watchlists_Requested" type="tns:XmlDataSet" cols="90" rows="10"/>
+	<part name="KeepLargeBusinesses" type="xsd:integer"/>
 	<part name="IncludeTargusGateway" type="xsd:boolean"/>
 	<part name="Gateways" type="tns:XmlDataSet" cols="100" rows="8"/>
 	<part name="RunTargusGatewayAnywayForTesting" type="xsd:boolean"/>
 	<part name="OverrideExperianRestriction" type="xsd:boolean"/>
 	<part name="IncludeAuthRepInBIPAppend" type="xsd:boolean"/>
+	<part name="UseUpdatedBipAppend" type="xsd:boolean"/>
+	<part name="BIPAppend_ScoreThreshold" type="xsd:integer"/>
+	<part name="BipAppend_WeightThreshold" type="xsd:integer"/>
 	<part name="CorteraRetrotest" type="xsd:boolean"/>
 </message>
 */
@@ -264,7 +267,7 @@
                                     // the service is large.
                                     // This service won't run on a 1-way.
 																		
-IMPORT Business_Risk_BIP, Cortera, Gateway, iesp, UT, Risk_Indicators, OFAC_XG5;
+IMPORT Business_Risk_BIP,Cortera, Gateway, iesp, Risk_Indicators, OFAC_XG5;
 
 EXPORT Business_Shell_Service() := FUNCTION
 	/* ************************************************************************
@@ -512,6 +515,9 @@ EXPORT Business_Shell_Service() := FUNCTION
 	'RunTargusGatewayAnywayForTesting',
 	'OverrideExperianRestriction',
 	'IncludeAuthRepInBIPAppend',
+	'UseUpdatedBipAppend',
+	'BIPAppend_ScoreThreshold',
+	'BipAppend_WeightThreshold',
 	'LexIdSourceOptout',
 	'_TransactionId',
 	'_BatchUID',
@@ -766,7 +772,7 @@ EXPORT Business_Shell_Service() := FUNCTION
 	UNSIGNED6	UltID                := 0  : STORED('UltID');
 	STRING50	AllowedSources       := Business_Risk_BIP.Constants.Default_AllowedSources : STORED('AllowedSources');
 	UNSIGNED1 BIPBestAppend				 := Business_Risk_BIP.Constants.BIPBestAppend.Default : STORED('BIPBestAppend');
-  UNSIGNED1 OFAC_Version		     := Business_Risk_BIP.Constants.Default_OFAC_Version : STORED('OFAC_Version');
+	UNSIGNED1 OFAC_Version		     := Business_Risk_BIP.Constants.Default_OFAC_Version : STORED('OFAC_Version');
 	REAL Global_Watchlist_Threshold	:= Business_Risk_BIP.Constants.Default_Global_Watchlist_Threshold : STORED('Global_Watchlist_Threshold');
 	UNSIGNED1 KeepLargeBusinesses  := Business_Risk_BIP.Constants.DefaultJoinType : STORED('KeepLargeBusinesses');
 	BOOLEAN IncludeTargusGateway   := FALSE : STORED('IncludeTargusGateway');
@@ -774,12 +780,15 @@ EXPORT Business_Shell_Service() := FUNCTION
 	BOOLEAN OverrideExperianRestriction := FALSE : STORED('OverrideExperianRestriction');
 	BOOLEAN IncludeAuthRepInBIPAppend := FALSE : STORED('IncludeAuthRepInBIPAppend');
 	BOOLEAN CorteraRetrotest := FALSE : STORED('CorteraRetrotest');
+	BOOLEAN UseUpdatedBipAppend := TRUE : STORED('UseUpdatedBipAppend');
+	UNSIGNED1 BIPAppend_ScoreThreshold := Business_Risk_BIP.Constants.Default_BIPAppend_ScoreThreshold : STORED('BIPAppend_ScoreThreshold');
+	UNSIGNED1 BipAppend_WeightThreshold := Business_Risk_BIP.Constants.Default_BipAppend_WeightThreshold : STORED('BipAppend_WeightThreshold');
 	
 	//CCPA fields
-	unsigned1 LexIdSourceOptout := 1 : STORED('LexIdSourceOptout');
-	string TransactionID := '' : STORED('_TransactionId');
-	string BatchUID := '' : STORED('_BatchUID');
-	unsigned6 GlobalCompanyId := 0 : STORED('_GCID');
+	UNSIGNED1 LexIdSourceOptout := 1 : STORED('LexIdSourceOptout');
+	STRING TransactionID := '' : STORED('_TransactionId');
+	STRING BatchUID := '' : STORED('_BatchUID');
+	UNSIGNED6 GlobalCompanyId := 0 : STORED('_GCID');
 
 	Gateways := Gateway.Configuration.Get();	// Gateways Coded in this Product: Targus
  
@@ -1059,7 +1068,10 @@ EXPORT Business_Shell_Service() := FUNCTION
 																																 LexIdSourceOptout := LexIdSourceOptout, 
 																																 TransactionID := TransactionID, 
 																																 BatchUID := BatchUID, 
-																																 GlobalCompanyID := GlobalCompanyID );
+																																 GlobalCompanyID := GlobalCompanyID,
+																																 in_useUpdatedBipAppend := UseUpdatedBipAppend,
+																																 in_BIPAppend_ScoreThreshold := BIPAppend_ScoreThreshold,
+																																 in_BipAppend_WeightThreshold := BipAppend_WeightThreshold);
 	
 	Final_Results := PROJECT(Shell_Results, TRANSFORM(Business_Risk_BIP.Layouts.OutputLayout, SELF := LEFT));
 

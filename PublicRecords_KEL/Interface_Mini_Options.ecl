@@ -21,7 +21,7 @@ EXPORT Interface_Mini_Options (PublicRecords_KEL.Interface_Options OptionsRaw) :
 	EXPORT BOOLEAN OutputMasterResults := OptionsRaw.OutputMasterResults;
 	EXPORT BOOLEAN IncludeMinors := OptionsRaw.IncludeMinors;
 	EXPORT INTEGER upperage := OptionsRaw.upperage;
-	
+	EXPORT STRING5 IndustryClass := OptionsRaw.IndustryClass;
 	EXPORT DATASET(Gateway.Layouts.Config) Gateways := OptionsRaw.Gateways;
 	
 	// BIP Append Options

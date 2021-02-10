@@ -1,4 +1,4 @@
-﻿IMPORT doxie, DidVille, BatchServices, Gateway, Phones, PhoneOwnership, Risk_Indicators, Royalty, STD, Suppress, ut;
+﻿IMPORT CourtLink_Services, doxie, DidVille, BatchServices, Gateway, Phones, PhoneOwnership, Risk_Indicators, Royalty, STD, Suppress, ut;
 
 EXPORT BatchRecords(DATASET(PhoneOwnership.Layouts.BatchIn) ds_batch_in,
 							PhoneOwnership.IParams.BatchParams inMod) := FUNCTION
@@ -292,13 +292,13 @@ EXPORT BatchRecords(DATASET(PhoneOwnership.Layouts.BatchIn) ds_batch_in,
 	
 	//************************Reports if identified owner might be involved in a litigation.**************************
 	dsContactRisk := IF(inMod.contactRiskFlag,
-							BatchServices.PossibleLitigiousDebtor_BatchService_Records(PROJECT(dsPhonesFinal,TRANSFORM(BatchServices.Layouts.PLD.rec_batch_PLD_input,
+							CourtLink_Services.Batch_Records(PROJECT(dsPhonesFinal,TRANSFORM(CourtLink_Services.Layouts.batch_input,
 																														SELF.acctno:=LEFT.acctno,
 																														SELF.name_first:=LEFT.appendedfirstname,
 																														SELF.name_middle:=LEFT.appendedmiddlename,
 																														SELF.name_last:=LEFT.appendedsurname,
 																														SELF.courtjurisdiction:=LEFT.appendedstatecode))),
-							DATASET([],BatchServices.Layout_PLD_Batch_out));
+							DATASET([],CourtLink_Services.Layouts.batch_out));
 	dsResults := JOIN(dsPhonesFinal,dsContactRisk,
 						LEFT.acctno=RIGHT.acctno,
 						TRANSFORM(PhoneOwnership.Layouts.BatchOut,

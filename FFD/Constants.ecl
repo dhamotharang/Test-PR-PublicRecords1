@@ -81,6 +81,12 @@ EXPORT Constants := MODULE
       DataGroups.CCW,
       DataGroups.PERSON
       ];
+    EXPORT Criminal_Incarceration := [
+      DataGroups.OFFENDERS,
+      DataGroups.OFFENDERS_PLUS,
+      DataGroups.PUNISHMENT,
+      DataGroups.PERSON
+      ];
     EXPORT Criminal_Offenders := [
       DataGroups.OFFENDERS,
       DataGroups.OFFENDERS_PLUS,

@@ -1,16 +1,12 @@
-﻿import Address, BusinessInstantID20_Services,AutoStandardI, Business_Risk_BIP, Census_Data, Codes, Gateway, iesp, Doxie,
+﻿import Address, BusinessInstantID20_Services, AutoStandardI, Business_Risk_BIP, Census_Data, Codes, Gateway, iesp,
        IntlIID, Models, Risk_Indicators, Riskwise, Royalty, Seed_Files, Suppress, STD;
 
-// The following function obtains Consumer InstantID data for the Authorized Reps passed in. 
+// The following function obtains Consumer InstantID data for the Authorized Reps passed in.
 // Logic is basically copied-n-pasted straight from Risk_Indicators.InstantID_records, but
 // modified a little to handle batch records.
 EXPORT fn_GetConsumerInstantIDRecs( DATASET(BusinessInstantID20_Services.layouts.InputCompanyAndAuthRepInfoClean) ds_CleanedInput,
 	                                  Business_Risk_BIP.LIB_Business_Shell_LIBIN Options,
                                     DATASET(BusinessInstantID20_Services.Layouts.OFACAndWatchlistLayoutFlat) watchlists,
-                                    unsigned1 LexIdSourceOptout = 1,
-                                    string    TransactionID     = '',
-                                    string    BatchUID          = '',
-                                    unsigned6 GlobalCompanyId   = 0,
                                     BusinessInstantID20_Services.iOptions TransformOptions) := FUNCTION
 
 			Risk_indicators.MAC_unparsedfullname(title_val,fname_val,mname_val,lname_val,suffix_val,'FirstName','MiddleName','LastName','NameSuffix')
@@ -24,10 +20,9 @@ EXPORT fn_GetConsumerInstantIDRecs( DATASET(BusinessInstantID20_Services.layouts
 			boolean IncludeDriverLicenseInCVI           := false : STORED('IncludeDriverLicenseInCVI');
 			boolean DisableInquiriesInCVI               := false : STORED('DisableCustomerNetworkOptionInCVI');
 
-			
 
 			// Per Product Mgmt guidance, turn off Gateway calls to Targus here in CIID.
-			boolean DisallowInsurancePhoneHeaderGateway := false : STORED('DisallowInsurancePhoneHeaderGateway');	
+			boolean DisallowInsurancePhoneHeaderGateway := false : STORED('DisallowInsurancePhoneHeaderGateway');
 			boolean IncludeTargus3220                   := false; // : STORED('IncludeTargusE3220Gateway');
 
 			boolean IIDVersionOverride                  := false : STORED('IIDVersionOverride');	// back office tag that, if true, allows a version lower than the lowestAllowedVersion
@@ -50,7 +45,7 @@ EXPORT fn_GetConsumerInstantIDRecs( DATASET(BusinessInstantID20_Services.layouts
 			string10 UnitDesignation := '' : STORED('UnitDesignation');
 			string8 SecRange         := AutoStandardI.GlobalModule().secrange;
 
-			addr_value := map( 
+			addr_value := map(
 													trim(addr2_val)!='' => addr2_val,
 													trim(addr1_val)!='' => addr1_val,
 													Address.Addr1FromComponents(PrimRange, PreDir, PrimName, AddrSuffix, PostDir, UnitDesignation, SecRange)
@@ -84,13 +79,13 @@ EXPORT fn_GetConsumerInstantIDRecs( DATASET(BusinessInstantID20_Services.layouts
 			// elsewhere in BIID 2.0.
 			boolean Test_Data_Enabled     := FALSE; // : stored('TestDataEnabled');
 			string20 Test_Data_Table_Name := ''; //  : stored('TestDataTableName');
-			
-			string DataRestriction        := Options.DataRestrictionMask; 
+
+			string DataRestriction        := Options.DataRestrictionMask;
 			string DataPermission         := Options.DataPermissionMask;
-			unsigned1 DPPA_Purpose        := Options.DPPA_Purpose;
-			unsigned1 GLB_Purpose         := Options.GLBA_Purpose;
-			STRING5 industry_class_val    := Options.IndustryClass;
-				isUtility := Doxie.Compliance.isUtilityRestricted(STD.Str.ToUpperCase(industry_class_val));
+			unsigned1 DPPA_Purpose        := Options.dppa;
+			unsigned1 GLB_Purpose         := Options.glb;
+			STRING5 industry_class_val    := Options.industry_class;
+				isUtility := Options.isUtility();
 
 			unsigned6	_HistoryDate         := 999999 : STORED('HistoryDate'); // Reads everything from YYYYMM to YYYYMMDDTTTT
 
@@ -101,7 +96,7 @@ EXPORT fn_GetConsumerInstantIDRecs( DATASET(BusinessInstantID20_Services.layouts
 			boolean ExcludeWatchLists      := false : stored('ExcludeWatchLists');
 			unsigned1 OFAC_version_temp    := Options.OFAC_Version;
 				OFAC_version := if(trim(STD.Str.tolowercase(LoginID)) in ['keyxml','keydevxml'], 4, OFAC_version_temp);	// temporary code for Key Bank
-			
+
 			boolean Include_Additional_watchlists := FALSE;//Options.include_additional_watchlists;
 			boolean Include_Ofac                  := FALSE;//Options.include_ofac;
 			real global_watchlist_threshold_temp  := Options.Global_Watchlist_Threshold;
@@ -116,7 +111,7 @@ EXPORT fn_GetConsumerInstantIDRecs( DATASET(BusinessInstantID20_Services.layouts
 
 			boolean IncludeAllRC     := false : stored('IncludeAllRiskIndicators');
 			unsigned1 NumReturnCodes := if(IncludeAllRC, 255, risk_indicators.iid_constants.DefaultNumCodes);
-			
+
 			boolean ExactFirstNameMatch               := false : stored('ExactFirstNameMatch');
 			boolean ExactLastNameMatch                := false : stored('ExactLastNameMatch');
 			boolean ExactAddrMatch                    := false : stored('ExactAddrMatch');
@@ -136,14 +131,14 @@ EXPORT fn_GetConsumerInstantIDRecs( DATASET(BusinessInstantID20_Services.layouts
 			unsigned3 LastSeenThresholdIn := IF( LastSeenThresholdIn_pre = 0, Risk_Indicators.iid_constants.oneyear, LastSeenThresholdIn_pre );
 
 			// they want this customizable, so instead of doing an incremental ranking, use 1 or 0 for each element
-				// everything defaulted to off would be '0000000'  
+				// everything defaulted to off would be '0000000'
 				// making this a string10 in case they decide to make it even more granular
 				// 8.29.16 supporting RR-10560 :: Adding a 9th bit as flag to be used to alter addrScoring to only score based on primRange & Zip5
-			string10 ExactMatchLevel := if(ExactFirstNameMatch, Risk_Indicators.iid_constants.sTrue, Risk_Indicators.iid_constants.sFalse) + 
-													if(ExactLastNameMatch, Risk_Indicators.iid_constants.sTrue, Risk_Indicators.iid_constants.sFalse) + 
-													if(ExactAddrMatch, Risk_Indicators.iid_constants.sTrue, Risk_Indicators.iid_constants.sFalse) + 
-													if(ExactPhoneMatch, Risk_Indicators.iid_constants.sTrue, Risk_Indicators.iid_constants.sFalse) + 
-													if(ExactSSNMatch, Risk_Indicators.iid_constants.sTrue, Risk_Indicators.iid_constants.sFalse) + 
+			string10 ExactMatchLevel := if(ExactFirstNameMatch, Risk_Indicators.iid_constants.sTrue, Risk_Indicators.iid_constants.sFalse) +
+													if(ExactLastNameMatch, Risk_Indicators.iid_constants.sTrue, Risk_Indicators.iid_constants.sFalse) +
+													if(ExactAddrMatch, Risk_Indicators.iid_constants.sTrue, Risk_Indicators.iid_constants.sFalse) +
+													if(ExactPhoneMatch, Risk_Indicators.iid_constants.sTrue, Risk_Indicators.iid_constants.sFalse) +
+													if(ExactSSNMatch, Risk_Indicators.iid_constants.sTrue, Risk_Indicators.iid_constants.sFalse) +
 													if(ExactDOBMatch, Risk_Indicators.iid_constants.sTrue, Risk_Indicators.iid_constants.sFalse) +
 													if(ExactFirstNameMatchAllowNicknames, Risk_Indicators.iid_constants.sTrue, Risk_Indicators.iid_constants.sFalse) +
 													if(ExactDriverLicenseMatch, Risk_Indicators.iid_constants.sTrue, Risk_Indicators.iid_constants.sFalse) +
@@ -194,9 +189,9 @@ EXPORT fn_GetConsumerInstantIDRecs( DATASET(BusinessInstantID20_Services.layouts
 			// DOB options
 			DOBMatchOptions_in_pre := DATASET([], iesp.businessinstantid20.t_BIID20DOBMatchOptions) : STORED('DOBMatchOptions',FEW);
 
-			DOBMatchOptions_in := 
+			DOBMatchOptions_in :=
 				PROJECT(
-					DOBMatchOptions_in_pre, 
+					DOBMatchOptions_in_pre,
 					TRANSFORM( risk_indicators.layouts.Layout_DOB_Match_Options,
 						SELF.DOBMatch           := LEFT.MatchType;
 						SELF.DOBMatchYearRadius := LEFT.MatchYearRadius;
@@ -213,8 +208,8 @@ EXPORT fn_GetConsumerInstantIDRecs( DATASET(BusinessInstantID20_Services.layouts
 			actualIIDVersion := map((unsigned)IIDVersion > maxAllowedVersion => 99,	// they asked for a version that doesn't exist
 															IIDVersionOverride = false => min(max((unsigned)IIDversion, lowestAllowedVersion), maxAllowedVersion),	// choose the higher of the allowed or asked for because they can't override lowestAllowedVersion, however, don't let them pick a version that is higher than the highest one we currently support
 															(unsigned)IIDversion); // they can override, give them whatever they asked for
-			
-			if(actualIIDVersion = 99, FAIL('Not an allowable InstantIDVersion.  Currently versions 0 and 1 are supported'));																			
+
+			if(actualIIDVersion = 99, FAIL('Not an allowable InstantIDVersion.  Currently versions 0 and 1 are supported'));
 
 			// NOTE: for BIID 2.0 we're not running any models here.
 /*
@@ -223,11 +218,11 @@ EXPORT fn_GetConsumerInstantIDRecs( DATASET(BusinessInstantID20_Services.layouts
 */
 			model_url := DATASET([], Models.Layout_Score_Chooser);
 
-      // Allow Gateway info for Bridger XG5 gateway and ONLY the Bridger gateway. UNTIL we 
+      // Allow Gateway info for Bridger XG5 gateway and ONLY the Bridger gateway. UNTIL we
       // get clarification from Product, turn off all other Gateway calls here in CIID.
-      // gateways := Options.Gateways; 
+      // gateways := Options.Gateways;
       gateways := DATASET( [], Gateway.Layouts.Config );
-			
+
 			rec := record
 				unsigned4 seq;
 				end;
@@ -275,7 +270,7 @@ EXPORT fn_GetConsumerInstantIDRecs( DATASET(BusinessInstantID20_Services.layouts
 				STRING4   bus_Zip4        := '';
 				STRING10  bus_Lat         := '';
 				STRING11  bus_Long        := '';
-				STRING1   bus_Addr_Type   := ''; 
+				STRING1   bus_Addr_Type   := '';
 				STRING4   bus_Addr_Status := '';
 				STRING3   bus_County      := '';
 				STRING25  bus_City        := '';
@@ -283,7 +278,7 @@ EXPORT fn_GetConsumerInstantIDRecs( DATASET(BusinessInstantID20_Services.layouts
 				STRING5   bus_Zip         := '';
 				BusinessInstantID20_Services.layouts.InputAuthRepInfoClean;
 			END;
-			
+
 			layout_temp xfm_NormAuthReps(BusinessInstantID20_Services.layouts.InputCompanyAndAuthRepInfoClean le, BusinessInstantID20_Services.layouts.InputAuthRepInfoClean ri) :=
 				TRANSFORM
 					SELF.OrigSeq            := le.Seq;
@@ -305,7 +300,7 @@ EXPORT fn_GetConsumerInstantIDRecs( DATASET(BusinessInstantID20_Services.layouts
 					SELF.bus_Zip4           := le.Zip4;
 					SELF.bus_Lat            := le.Lat;
 					SELF.bus_Long           := le.Long;
-					SELF.bus_Addr_Type      := le.Addr_Type; 
+					SELF.bus_Addr_Type      := le.Addr_Type;
 					SELF.bus_Addr_Status    := le.Addr_Status;
 					SELF.bus_County         := le.County;
 					SELF.bus_City           := le.City;  // input
@@ -313,7 +308,7 @@ EXPORT fn_GetConsumerInstantIDRecs( DATASET(BusinessInstantID20_Services.layouts
 					SELF.bus_Zip            := le.Zip;   // input
 					SELF                    := ri;
 				END;
-			
+
 			// Normalize the Auth Reps out of ds_CleanedInput.
 			ds_Normed := NORMALIZE( ds_CleanedInput, LEFT.AuthReps, xfm_NormAuthReps(LEFT,RIGHT) );
 
@@ -323,7 +318,7 @@ EXPORT fn_GetConsumerInstantIDRecs( DATASET(BusinessInstantID20_Services.layouts
 			risk_indicators.layout_input into_rep(layout_temp le) := transform
 				HistoryDate := (UNSIGNED3)(((STRING)le.HistoryDate)[1..6]);
 				useBusAddr := le.Prim_Name = '';
-				
+
 				self.seq			        := le.Seq;
 				self.historydate      := HistoryDate;
 				self.historyDateTimeStamp := risk_indicators.iid_constants.mygetdateTimeStamp('', HistoryDate);
@@ -364,10 +359,15 @@ EXPORT fn_GetConsumerInstantIDRecs( DATASET(BusinessInstantID20_Services.layouts
 				self.ip_address	      := '';
 				self.employer_name	  := ''; // We must avoid doing an OFAC/Watchlist on company name.
 				self.lname_prev	      := le.FormerLastName;
+
+        // pass these through to InstantID so we don't need to append them again when we get to IID
+				self.DID := le.lexid;
+				self.score := le.lexidscore;
+
 			end;
 
 			prep := project(ds_Normed, into_rep(LEFT));
-			
+
 			// Changed to default to version 2 in order to get back ADL info used in Red Flags.
 			unsigned1 BSversion := 51 : stored('BSVersion');
 			boolean runSSNCodes := true;
@@ -385,20 +385,20 @@ EXPORT fn_GetConsumerInstantIDRecs( DATASET(BusinessInstantID20_Services.layouts
 															if(~DisallowInsurancePhoneHeaderGateway and actualIIDVersion=1, risk_indicators.iid_constants.BSOptions.IncludeInsNAP, 0) +
 															if(actualIIDVersion=1, risk_indicators.iid_constants.BSOptions.IsInstantIDv1, 0) +  // check other products to make sure it is on and off appropriately, ID2 for example, BIID for example ********************************
 															if(AllowInsuranceDL, risk_indicators.iid_constants.BSOptions.AllowInsuranceDLInfo, 0) + //check to allow use of Insurance DL information
-															if(uniqueid<>0 and FromID2, Risk_Indicators.iid_constants.BSOptions.RetainInputDID,0) +
+															Risk_Indicators.iid_constants.BSOptions.RetainInputDID +  // always retain the input DID to speed things up
 															if(EnableEmergingID, Risk_Indicators.iid_constants.BSOptions.EnableEmergingID,0);
-																														
-			InstantIDResults := risk_indicators.InstantID_Function(prep, 
-					gateways, 
-					DPPA_Purpose, 
-					GLB_Purpose, 
-					isUtility, 
-					ln_branded, 
-					ofac_only, 
-					suppressNearDups, 
-					require2ele, 
-					fromBiid, 
-					isFCRA, 
+
+			InstantIDResults := risk_indicators.InstantID_Function(prep,
+					gateways,
+					DPPA_Purpose,
+					GLB_Purpose,
+					isUtility,
+					ln_branded,
+					ofac_only,
+					suppressNearDups,
+					require2ele,
+					fromBiid,
+					isFCRA,
 					ExcludeWatchLists,
 					fromIT1O,
 					ofac_version,
@@ -412,35 +412,35 @@ EXPORT fn_GetConsumerInstantIDRecs( DATASET(BusinessInstantID20_Services.layouts
 					runChronoPhone,
 					runAreaCodeSplit,
 					allowCellPhones,
-					ExactMatchLevel, 
-					DataRestriction, 
-					CustomDataFilter, 
-					IncludeDLverification, 
-					watchlists_request, 
-					DOBMatchOptions_in, 
-					EverOccupant_PastMonths, 
-					EverOccupant_StartDate, 
-					AppendBest, 
-					BSOptions, 
+					ExactMatchLevel,
+					DataRestriction,
+					CustomDataFilter,
+					IncludeDLverification,
+					watchlists_request,
+					DOBMatchOptions_in,
+					EverOccupant_PastMonths,
+					EverOccupant_StartDate,
+					AppendBest,
+					BSOptions,
 					LastSeenThreshold,
-					CompanyID, 
-					DataPermission, 
+					CompanyID,
+					DataPermission,
 					IncludeNAPData,
-					LexIdSourceOptout := LexIdSourceOptout, 
-					 TransactionID := TransactionID, 
-					 BatchUID := BatchUID, 
-					 GlobalCompanyID := GlobalCompanyID
+					LexIdSourceOptout := Options.lexid_source_optout,
+					 TransactionID := Options.transaction_id,
+					 BatchUID := Options.transaction_id,
+					 GlobalCompanyID := Options.global_company_id
 					);
 
-      LastNumFunction(unsigned in_num) := 
-      FUNCTION 
+      LastNumFunction(unsigned in_num) :=
+      FUNCTION
         lastnum := in_num % 10;
         Return((unsigned1) lastnum);
       END;
 
-      /* The next 4 lines of code will help us determin the number of loops we will need to complete, as well as the sequence numbers we need to 
-      match.  This nets us 3 gains, 1, it will limit the amount of times we need to build the denormed list, the existing transform that is used in fn_DenormAuthRepWatchlist that builds that list 
-      per rep actually builds all 5 reps but only allows you to assign one rep so its expensive in that reguard.  secondly it will add elasticity/adaptability to the code,  if in the future we decide to add 6 reps for 
+      /* The next 4 lines of code will help us determin the number of loops we will need to complete, as well as the sequence numbers we need to
+      match.  This nets us 3 gains, 1, it will limit the amount of times we need to build the denormed list, the existing transform that is used in fn_DenormAuthRepWatchlist that builds that list
+      per rep actually builds all 5 reps but only allows you to assign one rep so its expensive in that reguard.  secondly it will add elasticity/adaptability to the code,  if in the future we decide to add 6 reps for
       example, we will not need to address this code. */
 
       ds_SeqNums := project(ungroup(InstantIDResults), transform({Integer seq}, self.seq := LastNumFunction(left.seq);));
@@ -475,19 +475,14 @@ EXPORT fn_GetConsumerInstantIDRecs( DATASET(BusinessInstantID20_Services.layouts
                         SELF.Watchlist_contry := ri.repinfo[1].Watchlist_contry;
                         SELF.Watchlist_Entity_Name := ri.repinfo[1].Watchlist_Entity_Name;
                         SELF := LE;
-                    
+
       END;
 
-  //Add watchlist info to the ID recs since we dont hit the watchlist.
-      // ret := JOIN(InstantIDResults, DenormAuthRepRecs , 
-      //             LastNumFunction(LEFT.seq) = RIGHT.seq,
-      //                   RetJoinTrans(LEFT,RIGHT), GROUPED           
-      //             );
 
-         ret := JOIN(InstantIDResults, DenormAuthRepRecs , 
+         ret := JOIN(InstantIDResults, DenormAuthRepRecs ,
                   LEFT.seq = RIGHT.seq,
-                        RetJoinTrans(LEFT,RIGHT), GROUPED           
-                  );
+                        RetJoinTrans(LEFT,RIGHT), GROUPED
+                  , left outer);
 
 
 			targus := Royalty.RoyaltyTargus.GetOnlineRoyalties(UNGROUP(ret), src, TargusType, TRUE, FALSE, FALSE, TRUE);
@@ -496,15 +491,15 @@ EXPORT fn_GetConsumerInstantIDRecs( DATASET(BusinessInstantID20_Services.layouts
 			Boolean TrackInsuranceRoyalties := Risk_Indicators.iid_constants.InsuranceDL_ok(DataPermission);
 			insurance := If(TrackInsuranceRoyalties, Royalty.RoyaltyFDNDLDATA.GetWebRoyalties(UNGROUP(ret), did, insurance_dl_used, true));
 
-			royalties4us := if(test_data_enabled, DATASET([], Royalty.Layouts.Royalty), 
-				targus + insurance);	
-				
-			#stored('Royalties', royalties4us);	
-																				
+			royalties4us := if(test_data_enabled, DATASET([], Royalty.Layouts.Royalty),
+				targus + insurance);
+
+			#stored('Royalties', royalties4us);
+
 			ret_test_seed_un := risk_indicators.InstantID_Test_Function(Test_Data_Table_Name,fname_val,lname_val,ssn_value,zip_value,
 																			 phone_value,Account_value, NumReturnCodes);
-																															 
-			ret_test_seed := project(ret_test_seed_un,transform(risk_indicators.Layout_InstantID_NuGenPlus, 
+
+			ret_test_seed := project(ret_test_seed_un,transform(risk_indicators.Layout_InstantID_NuGenPlus,
 																													// strictly an inputecho of fields that are not mapped in the testseed function
 																													self.mname := mname_val;
 																													self.suffix := suffix_val;
@@ -517,7 +512,7 @@ EXPORT fn_GetConsumerInstantIDRecs( DATASET(BusinessInstantID20_Services.layouts
 																													SELF.dl_state := dl_state_value;
 																													self.PassportUpperLine := passportupperline ;
 																													self.PassportLowerLine := passportlowerline ;
-																													self.Gender := gender ; 
+																													self.Gender := gender ;
 																													self.InstantIDVersion := (string)actualIIDVersion;
 																													self := left));
 
@@ -531,7 +526,7 @@ EXPORT fn_GetConsumerInstantIDRecs( DATASET(BusinessInstantID20_Services.layouts
 				self := [];
 			end;
 
-			test_prep := PROJECT(ret_test_seed,into_test_prep(LEFT));																												 
+			test_prep := PROJECT(ret_test_seed,into_test_prep(LEFT));
 
 			tscore(UNSIGNED1 i) := IF(i=255,0,i);
 
@@ -545,9 +540,9 @@ EXPORT fn_GetConsumerInstantIDRecs( DATASET(BusinessInstantID20_Services.layouts
 				verlast := IF(le.combo_lastcount>0, le.combo_last, '');
 				self.verlast := verlast;
 				veraddr := IF(le.combo_addrcount>0, Risk_Indicators.MOD_AddressClean.street_address('',le.combo_prim_range,
-													le.combo_predir,le.combo_prim_name,le.combo_suffix,le.combo_postdir,le.combo_unit_desig,le.combo_sec_range),'');	
-				SELF.veraddr := veraddr;	
-				
+													le.combo_predir,le.combo_prim_name,le.combo_suffix,le.combo_postdir,le.combo_unit_desig,le.combo_sec_range),'');
+				SELF.veraddr := veraddr;
+
 				// clean the verified address to get the delivery point barcode information from the cleaner
 				clean_ver_address := risk_indicators.MOD_AddressClean.clean_addr( veraddr, le.combo_city, le.combo_state, le.combo_zip ) ;
 				// don't reference the clean fields unless the option to IncludeDPBC is turned on
@@ -555,7 +550,7 @@ EXPORT fn_GetConsumerInstantIDRecs( DATASET(BusinessInstantID20_Services.layouts
 				ver_zip4 := if(IncludeDPBC, clean_ver_address[122..125], le.combo_zip[6..9]);
 				// delivery point barcode = zip5 + zip5 + barcode + check_digit
 				ver_dpbc := ver_zip5 + ver_zip4 + clean_ver_address[136..138];  // include the 2 character code and 1 character check_digit
-				
+
 				// parsed verified address
 				SELF.VerPrimRange := IF(le.combo_addrcount>0, le.combo_prim_range, '');
 				SELF.VerPreDir := IF(le.combo_addrcount>0, le.combo_predir, '');
@@ -574,17 +569,17 @@ EXPORT fn_GetConsumerInstantIDRecs( DATASET(BusinessInstantID20_Services.layouts
 				SELF.verdob := IF(le.combo_dobcount>0, le.combo_dob, '');
 				SELF.verssn := IF(le.combo_ssncount>0 and le.combo_ssnscore between 90 and 100, le.combo_ssn, '');// i don't think we want to output the input social for level =1
 				SELF.verhphone := IF(le.combo_hphonecount>0, le.combo_hphone, '');
-				
+
 				SELF.verify_addr := IF(le.addrmultiple,'O','');
 				SELF.verify_dob := IF(le.combo_dobcount>0,'Y','N');
 				//new for Emerging Identities - a fake DID means we verified first, last and SSN in getDIDprepOutput so set NAS to 9
-				SELF.NAS_summary := If(le.DID = Risk_Indicators.iid_constants.EmailFakeIds, 9, le.socsverlevel); 
+				SELF.NAS_summary := If(le.DID = Risk_Indicators.iid_constants.EmailFakeIds, 9, le.socsverlevel);
 				SELF.NAP_summary := le.phoneverlevel;
 				SELF.NAP_Type    := le.nap_type;
 				SELF.NAP_Status  := le.nap_status;
 
 				SELF.valid_ssn := IF(le.socllowissue != '', 'G', '');
-					
+
 				SELF.corrected_lname := le.correctlast;
 				SELF.corrected_dob := le.correctdob;
 				SELF.corrected_phone := le.correcthphone;
@@ -602,10 +597,10 @@ EXPORT fn_GetConsumerInstantIDRecs( DATASET(BusinessInstantID20_Services.layouts
 				//
 				SELF.area_code_split := if(le.areacodesplitflag='Y', le.altareacode, '');
 				SELF.area_code_split_date := if(le.areacodesplitflag='Y', le.areacodesplitdate, '');
-				
+
 				SELF.additional_score1 := 0;
 				SELF.additional_score2 := 0;
-				
+
 				SELF.phone_fname := le.dirsfirst;
 				SELF.phone_lname := le.dirslast;
 				SELF.phone_address := Risk_Indicators.MOD_AddressClean.street_address('',le.dirs_prim_range,le.dirs_predir,le.dirs_prim_name,
@@ -622,27 +617,27 @@ EXPORT fn_GetConsumerInstantIDRecs( DATASET(BusinessInstantID20_Services.layouts
 				SELF.phone_city := le.dirscity;
 				SELF.phone_st := le.dirsstate;
 				SELF.phone_zip := le.dirszip;
-				
+
 				SELF.name_addr_phone := le.name_addr_phone;
-				
+
 				SELF.ssa_date_first := le.socllowissue;
 				SELF.ssa_date_last := le.soclhighissue;
 				SELF.ssa_state := le.soclstate;
 				SELF.ssa_state_name := Codes.GENERAL.STATE_LONG(le.soclstate);
-				
+
 				SELF.current_fname := le.verfirst;
 				SELF.current_lname := le.verlast;
-				
-				addr1 := Risk_Indicators.MOD_AddressClean.street_address('',le.chronoprim_range, le.chronopredir, 
+
+				addr1 := Risk_Indicators.MOD_AddressClean.street_address('',le.chronoprim_range, le.chronopredir,
 														 le.chronoprim_name, le.chronosuffix,
 														 le.chronopostdir, le.chronounit_desig, le.chronosec_range);
-				addr2 := Risk_Indicators.MOD_AddressClean.street_address('',le.chronoprim_range2, le.chronopredir2, 
+				addr2 := Risk_Indicators.MOD_AddressClean.street_address('',le.chronoprim_range2, le.chronopredir2,
 														 le.chronoprim_name2, le.chronosuffix2,
 														 le.chronopostdir2, le.chronounit_desig2, le.chronosec_range2);
-				addr3 := Risk_Indicators.MOD_AddressClean.street_address('',le.chronoprim_range3, le.chronopredir3, 
+				addr3 := Risk_Indicators.MOD_AddressClean.street_address('',le.chronoprim_range3, le.chronopredir3,
 														 le.chronoprim_name3, le.chronosuffix3,
 														 le.chronopostdir3, le.chronounit_desig3, le.chronosec_range3);
-				
+
 				// clean the chrono address1 to get the delivery point barcode information from the cleaner
 				clean_chrono_address1 := risk_indicators.MOD_AddressClean.clean_addr( addr1, le.chronocity, le.chronostate, le.chronozip ) ;
 				// don't reference the clean fields unless the option to IncludeDPBC is turned on
@@ -650,8 +645,8 @@ EXPORT fn_GetConsumerInstantIDRecs( DATASET(BusinessInstantID20_Services.layouts
 				chrono_zip4_1 := if(IncludeDPBC, clean_chrono_address1[122..125], le.chronozip4);
 				// delivery point barcode = zip5 + zip5 + barcode[136..137] + check_digit[138]
 				chrono1_dpbc := if(IncludeDPBC and chrono_zip4_1<>'', chrono_zipz5_1 + chrono_zip4_1 + clean_chrono_address1[136..138], '');  // include the 2 character code and 1 character check_digit
-				
-				
+
+
 				// clean the chrono address2 to get the delivery point barcode information from the cleaner
 				clean_chrono_address2 := risk_indicators.MOD_AddressClean.clean_addr( addr2, le.chronocity2, le.chronostate2, le.chronozip2 ) ;
 				// don't reference the clean fields unless the option to IncludeDPBC is turned on
@@ -659,7 +654,7 @@ EXPORT fn_GetConsumerInstantIDRecs( DATASET(BusinessInstantID20_Services.layouts
 				chrono_zip4_2 := if(IncludeDPBC, clean_chrono_address2[122..125], le.chronozip4_2);
 				// delivery point barcode = zip5 + zip5 + barcode[136..137] + check_digit[138]
 				chrono2_dpbc := if(IncludeDPBC and chrono_zip4_2<>'',chrono_zipz5_2 + chrono_zip4_2 + clean_chrono_address2[136..138], '');  // include the 2 character code and 1 character check_digit
-				
+
 				// clean the chrono address3 to get the delivery point barcode information from the cleaner
 				clean_chrono_address3 := risk_indicators.MOD_AddressClean.clean_addr( addr3, le.chronocity3, le.chronostate3, le.chronozip3 ) ;
 				// don't reference the clean fields unless the option to IncludeDPBC is turned on
@@ -667,24 +662,24 @@ EXPORT fn_GetConsumerInstantIDRecs( DATASET(BusinessInstantID20_Services.layouts
 				chrono_zip4_3 := if(IncludeDPBC, clean_chrono_address3[122..125], le.chronozip4_3);
 				// delivery point barcode = zip5 + zip5 + barcode[136..137] + check_digit[138]
 				chrono3_dpbc := if(IncludeDPBC and chrono_zip4_3<>'',chrono_zipz5_3 + chrono_zip4_3 + clean_chrono_address3[136..138], '');  // include the 2 character code and 1 character check_digit
-				
-				
-				
-				Chronology := DATASET([{1, addr1, le.chronoprim_range, le.chronopredir, le.chronoprim_name, le.chronosuffix, le.chronopostdir, le.chronounit_desig, le.chronosec_range, 
+
+
+
+				Chronology := DATASET([{1, addr1, le.chronoprim_range, le.chronopredir, le.chronoprim_name, le.chronosuffix, le.chronopostdir, le.chronounit_desig, le.chronosec_range,
 													le.chronocity, le.chronostate, le.chronozip, le.chronozip4, le.chronophone, le.chronodate_first, le.chronodate_last, le.chronoaddr_isbest, if(IncludeDPBC,chrono1_dpbc,'')},
-												{2, addr2, le.chronoprim_range2, le.chronopredir2, le.chronoprim_name2, le.chronosuffix2, le.chronopostdir2, le.chronounit_desig2, le.chronosec_range2, 
+												{2, addr2, le.chronoprim_range2, le.chronopredir2, le.chronoprim_name2, le.chronosuffix2, le.chronopostdir2, le.chronounit_desig2, le.chronosec_range2,
 														le.chronocity2, le.chronostate2, le.chronozip2, le.chronozip4_2, le.chronophone2, le.chronodate_first2, le.chronodate_last2, le.chronoaddr_isbest2, if(IncludeDPBC,chrono2_dpbc,'')},
-												{3, addr3, le.chronoprim_range3, le.chronopredir3, le.chronoprim_name3, le.chronosuffix3, le.chronopostdir3, le.chronounit_desig3, le.chronosec_range3, 
-														le.chronocity3, le.chronostate3, le.chronozip3, le.chronozip4_3, le.chronophone3, le.chronodate_first3, le.chronodate_last3, le.chronoaddr_isbest3, if(IncludeDPBC,chrono3_dpbc,'')}], 
+												{3, addr3, le.chronoprim_range3, le.chronopredir3, le.chronoprim_name3, le.chronosuffix3, le.chronopostdir3, le.chronounit_desig3, le.chronosec_range3,
+														le.chronocity3, le.chronostate3, le.chronozip3, le.chronozip4_3, le.chronophone3, le.chronodate_first3, le.chronodate_last3, le.chronoaddr_isbest3, if(IncludeDPBC,chrono3_dpbc,'')}],
 												Risk_Indicators.Layout_AddressHistory);
 				self.chronology := chronology(Address<>'');
-				
+
 				Additional_Lname := if(le.socsverlevel IN risk_indicators.iid_constants.ssn_name_match, DATASET([{le.altfirst,le.altlast,le.altlast_date},
 												{le.altfirst2,le.altlast2,le.altlast_date2},
-												{le.altfirst3,le.altlast3,le.altlast_date3}], Risk_Indicators.Layout_LastNames), 
+												{le.altfirst3,le.altlast3,le.altlast_date3}], Risk_Indicators.Layout_LastNames),
 											dataset([], Risk_Indicators.Layout_LastNames));
 				self.additional_lname := additional_lname(lname1<>'');
-				
+
 				SELF.Watchlist_Table := le.watchlist_table;
 				SELF.Watchlist_Program :=le.watchlist_program;
 				SELF.Watchlist_Record_Number := le.Watchlist_Record_Number;
@@ -706,7 +701,7 @@ EXPORT fn_GetConsumerInstantIDRecs( DATASET(BusinessInstantID20_Services.layouts
 				SELF.Watchlist_contry := le.Watchlist_contry;
 				SELF.Watchlist_Entity_Name := le.Watchlist_Entity_Name;
 
-      OverrideOptions := MODULE(Risk_Indicators.iid_constants.IOverrideOptions) 
+      OverrideOptions := MODULE(Risk_Indicators.iid_constants.IOverrideOptions)
       EXPORT isCodeDI := risk_indicators.rcSet.isCodeDI(le.DIDdeceased) AND actualIIDVersion=1;
       EXPORT isCodePO := IF(CustomCVIModelName = 'CCVI1909_1', risk_indicators.rcSet.isCodePO(le.addr_type), risk_indicators.rcSet.isCodePO(le.addr_type) AND IsPOBoxCompliant);
       EXPORT isCodeCL := risk_indicators.rcSet.isCodeCL(le.ssn, le.bestSSN, le.socsverlevel, le.combo_ssn) AND IncludeCLoverride;
@@ -716,18 +711,18 @@ EXPORT fn_GetConsumerInstantIDRecs( DATASET(BusinessInstantID20_Services.layouts
       EXPORT isCode72 := Risk_Indicators.rcSet.isCode72((STRING)le.socsverlevel, le.SSN, le.ssnExists, le.lastssnmatch2);
       END;
 
-    //chase wants their custom cvi mapped to the normal and custom cvi and reason codes. 
+    //chase wants their custom cvi mapped to the normal and custom cvi and reason codes.
      SELF.CVI := IF(actualIIDVersion=0, risk_indicators.cviScore(le.phoneverlevel,le.socsverlevel,le,customCVIvalue,veraddr,verlast, ,OverrideOptions),
                                 risk_indicators.cviScoreV1(le.phoneverlevel,le.socsverlevel,le,customCVIvalue,veraddr,verlast,OFAC,IncludeDOBinCVI,IncludeDriverLicenseInCVI,,, OverrideOptions));
-	
+
      // Chase custom score is calculated in SELF.CVI if it's requested, no need to call the attribute here too
      SELF.cviCustomScore := MAP(CustomCVIModelName = 'CCVI1501_1' => Models.CVI1501_1_0(le.phoneverlevel,le.socsverlevel,le,customCVIvalue,veraddr,verlast,OFAC,IncludeDOBinCVI,IncludeDriverLicenseInCVI,,, OverrideOptions),
                                                             CustomCVIModelName <> '' => SELF.CVI,
                                                             '');
-                                                            
+
 				self.SubjectSSNCount := if(risk_indicators.rcSet.isCodeMS(le.ssns_per_adl_seen_18months), (string)le.ssns_per_adl_seen_18months, '');
 				self.age := if (le.age = '***','',le.age);
-				
+
 				// if DID is flagged as deceased, use that information otherwise if ssn is verified and flagged as deceased, return the information about the deceased SSN
 				ssn_verified := le.socsverlevel IN risk_indicators.iid_constants.ssn_name_match;
 				isCode02 := risk_indicators.rcSet.isCode02(le.decsflag);
@@ -743,7 +738,7 @@ EXPORT fn_GetConsumerInstantIDRecs( DATASET(BusinessInstantID20_Services.layouts
 				self.deceasedLast := MAP(	ssn_verified and isCode02 => le.deceasedLast,
 																	OverrideOptions.isCodeDI => le.DIDdeceasedLast,
 																	'');
-				
+
 				risk_indicators.mac_add_sequence(le.watchlists, watchlists_with_seq);
 				self.watchlists := watchlists_with_seq;
 
@@ -753,26 +748,26 @@ EXPORT fn_GetConsumerInstantIDRecs( DATASET(BusinessInstantID20_Services.layouts
 				risk_indicators.mac_add_sequence(empty_reasons, empty_reasons_with_seq);
 				self.ri := reasons_with_seq(hri<>'');
 				SELF.fua := risk_indicators.getActionCodes(le, 4, SELF.NAS_summary, SELF.NAP_summary, ac_settings := actioncode_settings);
-				
+
 				self.cviCustomScore_name := if(Valid_CCVI, CustomCVIModelName, '');
 				self.cviCustomScore_ri  := if(CustomCVIModelName <> '', reasons_with_seq(hri<>''), empty_reasons_with_seq);
 				SELF.cviCustomScore_fua := if(CustomCVIModelName <> '', risk_indicators.getActionCodes(le, 4, SELF.NAS_summary, SELF.NAP_summary, ac_settings := actioncode_settings), empty_reasons);
-					
+
 				self.verdl := le.verified_dl;
-				
+
 				passportline := PassportUpperLine + PassportLowerLine;
 
 				self.passportValidated := if(IntlIID.ValidationFunctions().passportValidation(passportline, le.dob[3..8], gender), 'Y','N');
-				
+
 				// strictly an inputecho
 				self.PassportUpperLine := passportupperline ;
 				self.PassportLowerLine := passportlowerline ;
-				self.Gender := gender ;	
+				self.Gender := gender ;
 				self.dobmatchlevel := le.dobmatchlevel;
-				
+
 				// DL field (for IID Model)
 				self.DLValid :=  if(IncludeDLVerification, if(le.drlcvalflag = '0' and le.dl_state in Risk_Indicators.iid_constants.SetDLValidationStates, '1', '0'), '');
-				
+
 				// SSN deceased field for IID Model
 				self.SSNDeceased := le.decsflag='1';
 
@@ -786,22 +781,22 @@ EXPORT fn_GetConsumerInstantIDRecs( DATASET(BusinessInstantID20_Services.layouts
 				self.combo_ssn := le.combo_ssn;
 				self.addressPOBox := (Risk_Indicators.rcSet.isCode12(le.addr_type) or Risk_Indicators.rcSet.isCodePO(le.zipclass)) and (actualIIDVersion=1 or FromFlexID);
 				self.addressCMRA := (le.hrisksic in risk_indicators.iid_constants.setCRMA or le.ADVODropIndicator='C') and (actualIIDVersion=1 or FromFlexID);
-					
+
 				self.SSNFoundForLexID := Map (le.socsverlevel in [4,6,7,9,10,11,12] and actualIIDVersion=1 => TRUE,
                                                     le.header_summary.ssns_on_file <>'' and actualIIDVersion=1 => TRUE,
                                                       FALSE);
-				
+
 				self.ADVODoNotDeliver := le.ADVODoNotDeliver;
 				self.ADVODropIndicator := le.ADVODropIndicator;
 				self.ADVOAddressVacancyIndicator := le.ADVOAddressVacancyIndicator;
 				self.ADVOResidentialOrBusinessInd := le.ADVOResidentialOrBusinessInd;
 				self.USPISHotList := le.USPISHotList;
-				
+
 				self.InstantIDVersion := (string)actualIIDVersion;
 
 				//new for Emerging Identities
 				isEmergingID := Risk_Indicators.rcSet.isCodeEI(le.DID, le.socsverlevel, le.socsvalid) AND EnableEmergingID;
-				self.EmergingID := if(isEmergingID, true, false);  //a fake DID indicates an Emerging Identity	
+				self.EmergingID := if(isEmergingID, true, false);  //a fake DID indicates an Emerging Identity
 				isReasonCodeSR	:= exists(reasons_with_seq(hri='SR')); //check if reason code 'SR' is set
 				self.AddressSecondaryRangeMismatch := map(le.sec_range = '' and isReasonCodeSR															=> 'D',	 //no input sec range, but our data has one
 																									le.sec_range <> '' and ~isReasonCodeSR and self.versecrange = ''	=> 'I',	 //input sec range, but our data does not have one
@@ -812,7 +807,7 @@ EXPORT fn_GetConsumerInstantIDRecs( DATASET(BusinessInstantID20_Services.layouts
 				self.StreetAddress1 := address.Addr1FromComponents(le.prim_range,le.predir,le.prim_name,le.addr_suffix,le.postdir,le.unit_desig,le.sec_range);
 				self.StreetAddress2 := address.Addr2FromComponents(le.p_city_name,le.st,le.z5);
 				self.DID := if(le.DID = Risk_Indicators.iid_constants.EmailFakeIds, 0, le.DID); //if DID is fake, zero it out
-				
+
 				SELF := le;
 				SELF := [];  // default models and red flags datasets to empty
 			END;
@@ -820,10 +815,10 @@ EXPORT fn_GetConsumerInstantIDRecs( DATASET(BusinessInstantID20_Services.layouts
 			ret_temp2 := UNGROUP(PROJECT(ret, format_out(LEFT)));
 
 			//for Emerging Identities, return standardized county name
-			ret_temp := join(ret_temp2, census_data.Key_Fips2County, 
+			ret_temp := join(ret_temp2, census_data.Key_Fips2County,
 				keyed(left.st=right.state_code) and
 				keyed(left.county=right.county_fips),
-				transform(risk_indicators.Layout_InstantID_NuGenPlus, 
+				transform(risk_indicators.Layout_InstantID_NuGenPlus,
 					self.CountyName := right.county_name,
 					self := left),
 					left outer, KEEP(1), ATMOST(500));
@@ -831,13 +826,13 @@ EXPORT fn_GetConsumerInstantIDRecs( DATASET(BusinessInstantID20_Services.layouts
 
 			// Adapted from Business_Risk.InstantID_Function
 			with_SIC := JOIN(ret_temp, Risk_Indicators.Key_HRI_Address_To_SIC,
-							left.z5 != '' and 
+							left.z5 != '' and
 							left.prim_range != '' and
-							keyed(left.z5=right.z5) and 
-							keyed(left.prim_name=right.prim_name) and 
-							keyed(left.addr_suffix=right.suffix) and 
-							keyed(left.predir=right.predir) and 
-							keyed(left.postdir=right.postdir) and 
+							keyed(left.z5=right.z5) and
+							keyed(left.prim_name=right.prim_name) and
+							keyed(left.addr_suffix=right.suffix) and
+							keyed(left.predir=right.predir) and
+							keyed(left.postdir=right.postdir) and
 							keyed(left.prim_range=right.prim_range) and
 							keyed(left.sec_range=right.sec_range),
 							transform(Risk_Indicators.Layout_InstantID_NuGenPlus,
@@ -861,8 +856,8 @@ EXPORT fn_GetConsumerInstantIDRecs( DATASET(BusinessInstantID20_Services.layouts
 			student_params := project(model_url(STD.Str.ToLowerCase(name)='models.studentadvisor_service'), transform(models.layout_parameters, self := left.parameters[1]));
 			student_boolean := student_params[1].value='1';
 
-			ModelRequests1 := project(dataset([{1}], {unsigned a}), 
-				transform(models.layouts.Layout_Model_Request_In, 
+			ModelRequests1 := project(dataset([{1}], {unsigned a}),
+				transform(models.layouts.Layout_Model_Request_In,
 					self.ModelName := 'customfa_service',
 					self.ModelOptions := project(model_url[1].parameters, transform(Models.Layouts.Layout_Model_Options,
 												self.optionname := left.Name;
@@ -872,24 +867,24 @@ EXPORT fn_GetConsumerInstantIDRecs( DATASET(BusinessInstantID20_Services.layouts
 			//could be built using this second set of elements. It is a requirement to also pass in these fields through InstantID and FlexID.
 			//The decision was made to pass them in via the custom fields within the model request section, therefore there are no real changes
 			//needed here until a model is created that actually needs these fields. This is just a note/reminder that if/when these fields are
-			//needed by a custom model and that model is requestable via InstantID or FlexID, the model name needs to be added to this set below, 
-			//which will then automatically pass the custom model request section along from either InstantID or FlexID to FraudAdvisor_Service. 
+			//needed by a custom model and that model is requestable via InstantID or FlexID, the model name needs to be added to this set below,
+			//which will then automatically pass the custom model request section along from either InstantID or FlexID to FraudAdvisor_Service.
 			//FraudAdvisor_Service will then need to change at that time to look for these new custom fields.
-			set_custom_models_requiring_custom_params := ['FP31310_2', 'AIN801_1', 'FP1407_1', 'FP1407_2', 'FP1509_2'];			
-			modelRequests := if(customfraud_modelname in set_custom_models_requiring_custom_params, 
-				modelRequests1, 
+			set_custom_models_requiring_custom_params := ['FP31310_2', 'AIN801_1', 'FP1407_1', 'FP1407_2', 'FP1509_2'];
+			modelRequests := if(customfraud_modelname in set_custom_models_requiring_custom_params,
+				modelRequests1,
 				dataset([], models.layouts.Layout_Model_Request_In));
-				
+
 			fa_params := model_url(STD.Str.ToLowerCase(name)='models.fraudadvisor_service')[1].parameters;
 			model_version := trim(STD.Str.ToUppercase(fa_params(STD.Str.ToLowerCase(name)='version')[1].value));
 			custom_modelname := trim(STD.Str.ToUppercase(fa_params(STD.Str.ToLowerCase(name)='custom')[1].value));
 			modelname := if(model_version='', custom_modelname, model_version);
 			includeRiskIndices := fa_params(STD.Str.ToLowerCase(name)='includeriskindices')[1].value='1';
 
-			//Check to see if the FP model requested requires a valid GLB 
+			//Check to see if the FP model requested requires a valid GLB
 			FP3_models_requiring_GLB	:= ['FP31505_0', 'FP3FDN1505_0', 'FP31505_9', 'FP3FDN1505_9']; //these models require valid GLB, else fail
 			glb_ok 	:= Risk_Indicators.iid_constants.glb_ok(GLB_Purpose, isFCRA);
-			InvalidFP3GLBRequest := modelname in FP3_models_requiring_GLB and ~glb_ok; 
+			InvalidFP3GLBRequest := modelname in FP3_models_requiring_GLB and ~glb_ok;
 //			if(InvalidFP3GLBRequest, FAIL('Valid Gramm-Leach-Bliley Act (GLBA) purpose required'));
 
 			risk_indicators.Layout_Interactive_In scoredata(rec le) :=
@@ -902,19 +897,19 @@ EXPORT fn_GetConsumerInstantIDRecs( DATASET(BusinessInstantID20_Services.layouts
 				SELF.NameSuffix := suffix_val;
 
 				SELF.DateOfBirth := dob_value;
-				
+
 				SELF.StreetAddress := addr_value;
 				SELF.City := city_val;
 				SELF.State := state_val;
 				SELF.Zip := zip_value;
-				
+
 				SELF.Age := age_value;
 				SELF.DLNumber := dl_number_value;
 				SELF.DLState := dl_state_value;
-				
+
 				SELF.HomePhone := phone_value;
 				SELF.WorkPhone := wphone_value;
-				
+
 				SELF.DPPAPurpose := DPPA_Purpose;
 				SELF.GLBPurpose := GLB_Purpose;
 				SELF.IndustryClass := industry_class_val;
@@ -925,17 +920,17 @@ EXPORT fn_GetConsumerInstantIDRecs( DATASET(BusinessInstantID20_Services.layouts
 				self.isStudent := student_boolean;
 
 				self.gateways := gateways;
-				
+
 				self.IncludeAdditionalWatchlists := Include_Additional_Watchlists;
 
 				self.OFACVersion := OFAC_version;
-				
+
 				self.IncludeOFAC := Include_Ofac;
 				self.GlobalWatchListThreshold := global_watchlist_threshold;
 				self.UseDOBFilter := use_dob_filter;
 				self.DOBRadius    := dob_Radius;
 				self.customFraudModel := customfraud_modelname;
-				
+
 				self.ipaddress := ip_value;
 				self.email := email_value;
 				self.model := modelname;
@@ -943,7 +938,7 @@ EXPORT fn_GetConsumerInstantIDRecs( DATASET(BusinessInstantID20_Services.layouts
 				self.TestDataTableName := Test_Data_Table_Name;
 				self.DataRestrictionMask := DataRestriction;
 				self.DataPermissionMask := DataPermission;
-				
+
 				self.IncludeRiskIndices	:= includeRiskIndices;
 				self.Channel := Channel;
 				self.Income := Income;
@@ -954,7 +949,7 @@ EXPORT fn_GetConsumerInstantIDRecs( DATASET(BusinessInstantID20_Services.layouts
 				self.OtherApplicationIdentifier3 := OtherApplicationIdentifier3;
 				self.DateofApplication := DateofApplication;
 				self.TimeofApplication := TimeofApplication;
-				
+
 				self.ModelRequests := ModelRequests;
 
 				self := [];
@@ -965,8 +960,8 @@ EXPORT fn_GetConsumerInstantIDRecs( DATASET(BusinessInstantID20_Services.layouts
 
 			models.layouts.Layout_Score_IID_wFP limit_scores( models.layouts.Layout_Score_FP le ) := TRANSFORM
 				num_reasons := if( modelname in ['FP1109_0','FP1109_9', 'FP1310_1', 'FP1401_1', 'FP1307_1', 'FP31310_2', 'FP1307_2', 'FP1404_1', 'FP1407_1', 'FP1407_2', 'FP1403_2', 'FP31505_0', 'FP3FDN1505_0', 'FP31505_9', 'FP3FDN1505_9', 'FP1509_2', 'FP1510_2'], 6, 4); // FP version 2 and forward will get 6 reason codes, otherwise 4 like they used to
-				self.reason_codes := choosen( le.reason_codes, num_reasons ); 
-				self.risk_indices := if(includeRiskIndices or modelname in ['FP31310_2'], 
+				self.reason_codes := choosen( le.reason_codes, num_reasons );
+				self.risk_indices := if(includeRiskIndices or modelname in ['FP31310_2'],
 																dataset([{'StolenIdentityIndex', le.StolenIdentityIndex},
 																				 {'SyntheticIdentityIndex', le.SyntheticIdentityIndex},
 																				 {'ManipulatedIdentityIndex', le.ManipulatedIdentityIndex},
@@ -1009,12 +1004,12 @@ EXPORT fn_GetConsumerInstantIDRecs( DATASET(BusinessInstantID20_Services.layouts
 				SELF := le;
 			END;
 
-			scores_added := JOIN(iid, scores, 
+			scores_added := JOIN(iid, scores,
 													LEFT.AcctNo=RIGHT.AccountNumber, combo(LEFT,RIGHT), LEFT OUTER, PARALLEL);
 
 			red_flags := if(Test_Data_Enabled, seed_files.GetRedFlags(test_prep, Test_Data_Table_Name), risk_indicators.Red_Flags_Function(ret, reasoncode_settings));
 
-			with_red_flags := join(scores_added, red_flags, left.seq=right.seq, 
+			with_red_flags := join(scores_added, red_flags, left.seq=right.seq,
 														transform(risk_indicators.Layout_InstantID_NuGenPlus,
 																			self.Red_Flags := right, self := left), left outer);
 
@@ -1035,7 +1030,7 @@ EXPORT fn_GetConsumerInstantIDRecs( DATASET(BusinessInstantID20_Services.layouts
 			end;
 
 			post_dob_masking := project(post_ssn_mask2,mask_dobs(left));
-			
+
 			InstantID_records_pre :=
 				JOIN(
 					ds_Normed, post_dob_masking,
@@ -1050,7 +1045,7 @@ EXPORT fn_GetConsumerInstantIDRecs( DATASET(BusinessInstantID20_Services.layouts
 					INNER
 				);
 
-      // Sort explicity to ensure Auth Reps (identified by "seq") are still in the same 
+      // Sort explicity to ensure Auth Reps (identified by "seq") are still in the same
       // order as were input.
       InstantID_records_srtd := SORT( InstantID_records_pre, OrigSeq, seq );
 
@@ -1059,26 +1054,26 @@ EXPORT fn_GetConsumerInstantIDRecs( DATASET(BusinessInstantID20_Services.layouts
       InstantID_records :=
         PROJECT(
           InstantID_records_srtd,
-          TRANSFORM( BusinessInstantID20_Services.Layouts.ConsumerInstantIDLayout, 
+          TRANSFORM( BusinessInstantID20_Services.Layouts.ConsumerInstantIDLayout,
             SELF.seq := LEFT.OrigSeq,
             SELF.Rep_WhichOne := (STRING)(LEFT.seq % 10);
             SELF.Sequence := LEFT.Sequence,
 						SELF := LEFT,
           )
         );
-      
+
 			// OUTPUT( ds_Normed, NAMED('ds_Normed') );
 			// OUTPUT( prep, NAMED('prep') );
 			// OUTPUT( post_dob_masking, NAMED('post_dob_masking') );
       // OUTPUT( InstantID_records_pre, NAMED('InstantID_records_pre') );
       // OUTPUT( InstantID_records_srtd, NAMED('InstantID_records_srtd') );
         // OUTPUT( DenormAuthRepRecs, NAMED('DenormAuthRepRecs') );
-      //  OUTPUT(ret,NAMED('ret'));
+        //OUTPUT(ret,NAMED('ret'));
       //  OUTPUT(ret_temp2,NAMED('ret_temp2'));
       //  OUTPUT(ret_temp,NAMED('ret_temp'));
         // OUTPUT(InstantIDResults,NAMED('InstantIDResults'));
         // OUTPUT(watchlists,NAMED('watchlists'));
-    
+
       // OUTPUT(SeqSet,NAMED('SeqSet'));
       // OUTPUT(SeqDecending,NAMED('SeqDecending'));
       // OUTPUT(numOfLoops,NAMED('numOfLoops'));

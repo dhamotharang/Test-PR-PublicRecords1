@@ -1771,7 +1771,7 @@ EXPORT Models.fib12010_0.z_layouts_Input xfm_fib12010_shell_and_FPattrs(models.l
       self.ver_sources := le.bs.header_summary.ver_sources;
       self.LexID_deceased := (Integer)le.bs.iid.diddeceased;
       self.rc_decsflag := (Real)le.bs.iid.decsflag;
-      self.rc_ssndod := le.bs.iid.diddeceaseddate;
+      self.rc_ssndod := le.bs.ssn_verification.validation.deceaseddate;
       self.rc_ssndobflag := (Real)le.bs.iid.socsdobflag;
       self.rc_pwssndobflag := (Real)le.bs.iid.pwsocsdobflag;
       self.rc_ssnvalflag := (Real)le.bs.iid.socsvalflag;
@@ -1785,7 +1785,6 @@ EXPORT Models.fib12010_0.z_layouts_Input xfm_fib12010_shell_and_FPattrs(models.l
       self.rc_zipclass := le.bs.iid.zipclass;
       self.out_addr_type := le.bs.shell_input.addr_type;
       self.add_input_land_use_code := (Real)le.bs.address_verification.input_address_information.standardized_land_use_code;
-      // self.bus_addr_ver_sources_total := le.bs.bip_header54.bus_addr_ver_sources_total; // why is this here?
       self.add_input_advo_res_or_bus := le.bs.advo_input_addr.Residential_or_Business_Ind;
       self.add_input_advo_drop := le.bs.advo_input_addr.Drop_Indicator;
 
@@ -1854,7 +1853,7 @@ EXPORT Models.fib12010_0.z_layouts_Input xfm_fib12010_shell_and_FPattrs(models.l
       self := []; //blank out any fields not yet assigned
 END;
 
-EXPORT Models.fib12010_0.z_layouts_Input xfm_fib12010_IDAattrs(Models.fib12010_0.z_layouts_Input le, Risk_Indicators.layouts.layout_IDAFraud_out rt) := TRANSFORM
+EXPORT Models.fib12010_0.z_layouts_Input xfm_fib12010_IDAattrs(Models.fib12010_0.z_layouts_Input le, Risk_Indicators.layouts.layout_IDA_out rt) := TRANSFORM
       self.TransactionId := le.TransactionId;
       self.C_ID10_N1_USSN := (Real)rt.Indicators(name = 'C_ID10_N1_USSN')[1].value;
       self.C_ID10_P1_DEF := (Real)rt.Indicators(name = 'C_ID10_P1_DEF')[1].value;

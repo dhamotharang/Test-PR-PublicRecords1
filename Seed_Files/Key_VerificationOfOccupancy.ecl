@@ -1,4 +1,4 @@
-Import Data_Services;
+﻿IMPORT Data_Services, Seed_Files;
 
 d := Seed_Files.file_VerificationOfOccupancy;
 
@@ -8,5 +8,4 @@ newrec := record
 end;
 newtable := table(d, newrec);
 
-// export Key_VerificationOfOccupancy := index(newtable,{dataset_name,hashvalue}, {newtable}, Data_Services.foreign_dataland+'thor_data400::key::testseed::qa::verificationofoccupancy');
-export Key_VerificationOfOccupancy := index(newtable,{dataset_name,hashvalue}, {newtable}, Data_Services.Data_location.Prefix('NONAMEGIVEN')+'thor_data400::key::testseed::qa::verificationofoccupancy');
+EXPORT Key_VerificationOfOccupancy := index(newtable,{dataset_name,hashvalue}, {newtable}, Data_Services.Data_location.Prefix('NONAMEGIVEN')+'thor_data400::key::testseed::qa::verificationofoccupancy');

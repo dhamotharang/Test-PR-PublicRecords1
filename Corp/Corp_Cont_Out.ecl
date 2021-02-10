@@ -1,4 +1,4 @@
-IMPORT Header, Header_Slimsort, didville, ut, DID_Add, corp;
+IMPORT corp;
 
 // Referential integrity - Contacts must have corresponding corporate record
 cout := Corp.Corp_Out;
@@ -72,5 +72,5 @@ corp_cont_out_corp_addr := project(corp_cont_out_init(cont_prim_name = '' AND co
 
 corp_cont_out_all := corp_cont_out_init(not(cont_prim_name = '' AND cont_p_city_name = '')) +
                 corp_cont_out_corp_addr;
-				
+
 export Corp_Cont_Out := corp_cont_out_all : persist('TEMP::Corp_Cont_Out');

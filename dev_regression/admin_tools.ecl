@@ -18,16 +18,21 @@ EXPORT admin_tools(string logical_group = 'roxiedev') := MODULE
     );
   END;
 
-  EXPORT consolidate() := FUNCTION
+  // main routine to consolidate all sub-files into one.
+  EXPORT consolidate(boolean reset_ids = FALSE) := FUNCTION
     #WORKUNIT('name', '-- dev regression consolidate --');
 
     fconsolidated_temp := file.consolidated+'_tmp';
     fconsolidated_bkp := file.consolidated+'::backup::'+STD.Date.Today()+ut.getTime();
-    testcases := DATASET(file.current, $.layouts.testcase, THOR);
+    testcases_recs := DATASET(file.current, $.layouts.testcase, THOR);
+
+    testcases := PROJECT(testcases_recs,
+      TRANSFORM($.layouts.testcase, SELF.tid := IF(reset_ids, COUNTER, LEFT.tid);
+        SELF := LEFT));
 
     RETURN SEQUENTIAL(
-      OUTPUT(testcases,, fconsolidated_temp, OVERWRITE), // <- this will be renamed and added to new current
-      OUTPUT(testcases,, fconsolidated_bkp, OVERWRITE), // <- this will be kept as back up
+      OUTPUT(testcases, , fconsolidated_temp, OVERWRITE), // <- this will be renamed and added to new current
+      OUTPUT(testcases, , fconsolidated_bkp, OVERWRITE), // <- this will be kept as back up
       
       // delete all current files  
       STD.File.StartSuperFileTransaction(),
@@ -50,6 +55,17 @@ EXPORT admin_tools(string logical_group = 'roxiedev') := MODULE
     RETURN SEQUENTIAL(
       STD.File.DeleteSuperFile(file.current, TRUE), 
       OUTPUT('Regression bucket has been cleaned')
+    );
+  END;
+
+  // convenience for ad-hoc backups
+  EXPORT backup() := FUNCTION
+    #WORKUNIT('name', '-- dev regression - back up --');
+    testcases := DATASET(file.current, $.layouts.testcase, THOR);
+    backup_file := file.consolidated+'::backup::'+STD.Date.Today()+ut.getTime();
+    RETURN SEQUENTIAL(
+      OUTPUT(testcases,, backup_file, OVERWRITE),
+      OUTPUT('Back up created.')
     );
   END;
 

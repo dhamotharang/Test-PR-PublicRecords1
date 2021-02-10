@@ -1,4 +1,4 @@
-﻿IMPORT BIPV2, Business_Risk, Business_Risk_BIP, BusinessInstantID20_Services, Gateway, ut, OFAC_XG5, Patriot, iesp, GlobalWatchLists, Risk_Indicators, STD;
+﻿IMPORT Business_Risk_BIP, BusinessInstantID20_Services, Gateway, ut, OFAC_XG5, Patriot,  GlobalWatchLists, Risk_Indicators, STD;
 
 EXPORT fn_GetGlobalWatchlistInfo( DATASET(BusinessInstantID20_Services.layouts.InputCompanyAndAuthRepInfo) ds_input,
                                   Business_Risk_BIP.LIB_Business_Shell_LIBIN Options
@@ -449,12 +449,15 @@ EXPORT fn_GetGlobalWatchlistInfo( DATASET(BusinessInstantID20_Services.layouts.I
 		CurrentMatchesXG5_AuthRep4	:= fn_CurrentMatchesXG5(dedupRespXG5_AuthRep4, AddFileXG5_AuthRep4( TRIM(BestName) != '' ));
 		CurrentMatchesXG5_AuthRep5	:= fn_CurrentMatchesXG5(dedupRespXG5_AuthRep5, AddFileXG5_AuthRep5( TRIM(BestName) != '' ));  
 
+    
+
     CurrentMatchesXG5_Company_sorted  := SORT( CurrentMatchesXG5_Company, blockid, -entitymatchscore, EntityPartyKey, RECORD);
-    CurrentMatchesXG5_AuthRep1_sorted := SORT( CurrentMatchesXG5_AuthRep1, blockid, -entitydate, -publisheddate, -entitymatchscore, EntityPartyKey, RECORD);
-    CurrentMatchesXG5_AuthRep2_sorted := SORT( CurrentMatchesXG5_AuthRep2, blockid, -entitydate, -publisheddate, -entitymatchscore, EntityPartyKey, RECORD);
-    CurrentMatchesXG5_AuthRep3_sorted := SORT( CurrentMatchesXG5_AuthRep3, blockid, -entitydate, -publisheddate, -entitymatchscore, EntityPartyKey, RECORD);
-    CurrentMatchesXG5_AuthRep4_sorted := SORT( CurrentMatchesXG5_AuthRep4, blockid, -entitydate, -publisheddate, -entitymatchscore, EntityPartyKey, RECORD);
-    CurrentMatchesXG5_AuthRep5_sorted := SORT( CurrentMatchesXG5_AuthRep5, blockid, -entitydate, -publisheddate, -entitymatchscore, EntityPartyKey, RECORD);
+    //The unsigned in the sort below will let us sort off of a 1 or a 0, this is needed to pull ofac records to the top and allow us to modify the Consumer Verification Index as needed.
+    CurrentMatchesXG5_AuthRep1_sorted := SORT( CurrentMatchesXG5_AuthRep1, -(unsigned)(UCase(EntityPartyKey[1..4]) = BusinessInstantID20_Services.Constants.OFAC OR UCase(EntityPartyKey[1..4]) = BusinessInstantID20_Services.Constants.OFC OR  UCase(FileName[1..((length(FileName)) - 4)]) =  BusinessInstantID20_Services.Constants.OFC), blockid, -entitydate, -publisheddate, -entitymatchscore, EntityPartyKey, RECORD);
+    CurrentMatchesXG5_AuthRep2_sorted := SORT( CurrentMatchesXG5_AuthRep2, -(unsigned)(UCase(EntityPartyKey[1..4]) = BusinessInstantID20_Services.Constants.OFAC OR UCase(EntityPartyKey[1..4]) = BusinessInstantID20_Services.Constants.OFC OR  UCase(FileName[1..((length(FileName)) - 4)]) =  BusinessInstantID20_Services.Constants.OFC), blockid, -entitydate, -publisheddate, -entitymatchscore, EntityPartyKey, RECORD);
+    CurrentMatchesXG5_AuthRep3_sorted := SORT( CurrentMatchesXG5_AuthRep3, -(unsigned)(UCase(EntityPartyKey[1..4]) = BusinessInstantID20_Services.Constants.OFAC OR UCase(EntityPartyKey[1..4]) = BusinessInstantID20_Services.Constants.OFC OR  UCase(FileName[1..((length(FileName)) - 4)]) =  BusinessInstantID20_Services.Constants.OFC), blockid, -entitydate, -publisheddate, -entitymatchscore, EntityPartyKey, RECORD);
+    CurrentMatchesXG5_AuthRep4_sorted := SORT( CurrentMatchesXG5_AuthRep4, -(unsigned)(UCase(EntityPartyKey[1..4]) = BusinessInstantID20_Services.Constants.OFAC OR UCase(EntityPartyKey[1..4]) = BusinessInstantID20_Services.Constants.OFC OR  UCase(FileName[1..((length(FileName)) - 4)]) =  BusinessInstantID20_Services.Constants.OFC), blockid, -entitydate, -publisheddate, -entitymatchscore, EntityPartyKey, RECORD);
+    CurrentMatchesXG5_AuthRep5_sorted := SORT( CurrentMatchesXG5_AuthRep5, -(unsigned)(UCase(EntityPartyKey[1..4]) = BusinessInstantID20_Services.Constants.OFAC OR UCase(EntityPartyKey[1..4]) = BusinessInstantID20_Services.Constants.OFC OR  UCase(FileName[1..((length(FileName)) - 4)]) =  BusinessInstantID20_Services.Constants.OFC), blockid, -entitydate, -publisheddate, -entitymatchscore, EntityPartyKey, RECORD);
 
     // Transform data into what's needed for BIID 2.0. 
 		fn_XG5_recs(ds1) := FUNCTIONMACRO
@@ -1441,8 +1444,8 @@ EXPORT fn_GetGlobalWatchlistInfo( DATASET(BusinessInstantID20_Services.layouts.I
 		// OUTPUT( XG5_recs_AuthRep4, NAMED('XG5_recs_AuthRep4') );
 		// OUTPUT( XG5_recs_AuthRep5, NAMED('XG5_recs_AuthRep5') );
 		// OUTPUT( SearchOutXG5_pre, NAMED('SearchOutXG5_pre') );
-		// OUTPUT( SearchOutXG5_OFAC, NAMED('SearchOutXG5_OFAC') );
-		// OUTPUT( SearchOutXG5_AuthRep1, NAMED('SearchOutXG5_AuthRep1') );
+		//  OUTPUT( SearchOutXG5_OFAC, NAMED('SearchOutXG5_OFAC') );
+		//  OUTPUT( SearchOutXG5_AuthRep1, NAMED('SearchOutXG5_AuthRep1') );
 		// OUTPUT( SearchOutXG5_AuthRep2, NAMED('SearchOutXG5_AuthRep2') );
 		// OUTPUT( SearchOutXG5_AuthRep3, NAMED('SearchOutXG5_AuthRep3') );
 		// OUTPUT( SearchOutXG5_AuthRep4, NAMED('SearchOutXG5_AuthRep4') );

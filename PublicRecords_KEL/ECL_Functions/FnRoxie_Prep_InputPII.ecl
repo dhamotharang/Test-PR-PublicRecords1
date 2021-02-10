@@ -25,9 +25,13 @@ EXPORT FnRoxie_Prep_InputPII(DATASET(PublicRecords_KEL.ECL_Functions.Input_Layou
 	cleanInput := PublicRecords_KEL.ECL_Functions.Fn_CleanInput_Roxie( InputEcho);
 		
   // Append LexID
-  withLexID := IF(Options.isFCRA, 
+  withLexIDPre := IF(Options.isFCRA, 
 		PublicRecords_KEL.ECL_Functions.Neutral_Lexid_Soapcall(cleanInput, Options), //FCRA uses soapcall
 		PublicRecords_KEL.ECL_Functions.Fn_AppendLexid_Roxie( cleanInput, Options ));
+		
+	withLexID := withLexIDPre(PullIDFlag = False);
+	pullidlexids := withLexIDPre(PullIDFlag = true);
+		
 		
 	//only run if phone is on input, nonFCRA only
 	//this key is set up like this because we are not able to return PII from this key, we can only use it for phone verification
@@ -105,6 +109,6 @@ EXPORT FnRoxie_Prep_InputPII(DATASET(PublicRecords_KEL.ECL_Functions.Input_Layou
 			SELF.PI_InpDOBAgeIsMinorFlag  := IF(~options.IncludeMinors AND temp_age >= 0 AND temp_age <= options.upperage,TRUE, FALSE);//remove minors if Includeminors is FALSE
 			self := left));
 
- RETURN FinalPII;
+ RETURN FinalPII+pullidlexids;
  
  END;				
