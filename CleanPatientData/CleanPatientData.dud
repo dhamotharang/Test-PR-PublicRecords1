@@ -60,6 +60,7 @@ END
 
 OUTPUTS
     DATASET dsOutput(dsInput):PREFIX(INPUTS.Prefix), APPEND
+    		STRING50 PatientKey;
 		STRING20 FirstName;
 		STRING20 MiddleName;
 		STRING20 LastName;
