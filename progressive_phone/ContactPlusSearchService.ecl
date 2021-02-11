@@ -70,7 +70,7 @@
 */
 /*--INFO-- This service returns progressive phones with feedback.*/
 
-IMPORT progressive_phone, addrbest,iesp,PhonesFeedback_Services,ut,
+IMPORT progressive_phone, addrbest,iesp,PhonesFeedback_Services,ut,header,
 				doxie,PersonSearch_Services, AutoStandardi,EmailService,Suppress, Royalty;
 
 EXPORT ContactPlusSearchService := MACRO
@@ -287,7 +287,7 @@ EXPORT ContactPlusSearchService := MACRO
 				 self.AddressFeedback.LastFeedbackResult := la.address_feedback[1].Last_Feedback_Result;
 				 self.AddressFeedback.LastFeedbackResultProvided := (string8) la.address_feedback[1].Last_Feedback_Result_Provided;
 				 self.IsCurrent := la.tnt in iesp.Constants.TNT_CURRENT_SET;
-
+				 self.LocationID := (string)la.Location_ID;
 			end;
 
 			self.names := choosen(project(l.namerecs,tran_name(left)),iesp.Constants.Contact_Plus.MaxCountNameRecords);
@@ -301,7 +301,18 @@ EXPORT ContactPlusSearchService := MACRO
 																									 addrsFilteredWithFeedback,
 																									 Address_Feedback);
 
-			self.addresses := project(if(IncludeAddressFeedback, addrsFilteredWithFeedback, addrsFiltered), tran_addr(left));
+			addresses :=if(IncludeAddressFeedback, addrsFilteredWithFeedback, addrsFiltered);
+      // Sort based on address hierarchy
+      addresses_ranked_pre := header.MAC_Append_addr_ind(addresses, addr_ind, /*src*/ , did, prim_range, prim_name, sec_range,
+														city_name, st , zip, predir, postdir, suffix, first_seen, last_seen, dt_vendor_first_reported, dt_vendor_last_reported);
+                            
+      addresses_ranked := project(addresses_ranked_pre,
+                            transform(progressive_phone.layout_addr_connect_date,
+                                self.tnt := doxie.enhanceTNT(true, left.tnt, left.addr_ind, left.best_addr_rank),
+                                self.Location_ID := left.locid,
+                                self := left));
+                                
+      self.addresses := project(addresses_ranked, tran_addr(left));
 			self.ssns := choosen(project(l.ssnrecs,transform(iesp.share.t_StringArrayItem,self.value:=left.ssn)),iesp.Constants.Contact_Plus.MaxCountSSNRecords);
 
 			self.alsoFound.Properties := l.prop_count ;
