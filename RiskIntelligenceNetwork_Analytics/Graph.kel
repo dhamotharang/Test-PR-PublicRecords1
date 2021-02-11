@@ -807,6 +807,13 @@ Event: => T9_AddrIsCmraFlag := MAP(T9_AddrPopFlag=0 => -99999,
 																	 T9_AddrMailDropType=-99997 => -99997,
 																	 T9_AddrMailDropType = 'C' => 1, 0);
 																	 
+//Input Address Outside of Agency State
+Event: => T9_AddrNotInAgcyJurStFlag := MAP(T9_AddrPopFlag=0 => -99999,
+                                           T_SrcClassType < 4 => -99998,
+																					 T_InpClnAddrStEcho=-99999 => -99997,
+																					 T_InpClnAddrStEcho = AgencyProgJurSt => 0, 1);
+
+																	 
 Event: => T15_SsnPopFlag := MAP(T_InpClnSsnEcho <= -99997 OR LENGTH(T_InpClnSsnEcho) < 9 => 0, 1);
 
 Event: => T15_SsnValType := MAP(T15_SsnPopFlag=0 => -99999,
@@ -1398,6 +1405,7 @@ T17_EmailDomainDispFlag,
 T9_AddrPopFlag,
 T9_AddrType,
 T9_AddrStatus,
+T9_AddrNotInAgcyJurStFlag,
 T16_PhnPopFlag,
 T15_SsnPopFlag,
 T18_IpAddrPopFlag,
