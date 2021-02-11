@@ -51,6 +51,8 @@ EXPORT ProcessContributoryFile(string ip, string dataDir, string lfn, string mai
 		treshld_  := $.Mod_Sets.threshld;
 		
 		processed := $.PreprocessNCF2(ilfn);
+		IsEmptyFile:= NOT EXISTS(processed);
+
 		//base2 := $.fn_constructBase2FromNCFEx(processed, version);				
 		reports := $.GetReports(processed, ilfn, FALSE);
 		ExcessiveInvalidRecordsFound :=	reports.RejectFile;
@@ -81,9 +83,6 @@ EXPORT ProcessContributoryFile(string ip, string dataDir, string lfn, string mai
 					)
 				);
 
-dsFileList := STD.File.RemoteDirectory(ip, datadir+'incoming', 'ncf2*.dat',true);  
-IsEmptyFile:= dsFileList[1].size = 0;
-
 		doit :=  
 			sequential(
 					MoveReadyToSpraying
@@ -98,11 +97,8 @@ IsEmptyFile:= dsFileList[1].size = 0;
 					,despray_NCF_reports('ncx2')
 					,despray_NCF_reports('ncd2')
 					,despray_NCF_reports('ncr2')
-					,NAC_V2.Send_Email(fn := ilfn, groupid := '').FileValidationReport,
-					IF(IsEmptyFile, NAC_V2.Send_Email(fn := ilfn, groupid := lfn[6..9]).FileEmptyErrorAlert)
+					,NAC_V2.Send_Email(fn := ilfn, groupid := '').FileValidationReport
+					,IF(IsEmptyFile, NAC_V2.Send_Email(fn := ilfn, groupid := lfn[6..9]).FileEmptyErrorAlert)
 					);
 	return doit;
 END;
-
-
-
