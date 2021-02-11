@@ -798,20 +798,22 @@ EXPORT product_files := MODULE
 	END; // End Property Module
 	
 	EXPORT litigiousdebtor := MODULE
-		
-		EXPORT layout_search_file_b := RECORD
-			CourtLink.Layouts.Base.debtor_lname;
-			CourtLink.Layouts.Base.debtor_fname;
-			CourtLink.Layouts.Base.CourtState;
-			CourtLink.Layouts.Base.DocketNumber;
-		END;
-		
-		EXPORT litigiousdebtor_filename_raw    := 'thor_data400::base::courtlink::qa::litdebt';
-		EXPORT litigiousdebtor_filename        := AccountMonitoring.constants.DATA_LOCATION + litigiousdebtor_filename_raw;
-		EXPORT litigiousdebtor_file            := DATASET(litigiousdebtor_filename, CourtLink.Layouts.Base, THOR);
-		
-		EXPORT litigiousdebtor_file_slim := DISTRIBUTE(litigiousdebtor_file, HASH32(debtor_lname, debtor_fname, CourtState, DocketNumber)) 
-		                                    : INDEPENDENT; //PERSIST('acctmon::litigiousdebtor::search_file_slim');
+
+    EXPORT litigiousdebtor_Roxie_SuperFile := 'thor_data400::key::courtlink::qa::courtid_docket';
+    EXPORT litigiousdebtor_superkey_monitor := 'monitor::litigiousdebtor::courtid_docket';
+    EXPORT litigiousdebtor_superkey     := AccountMonitoring.constants.MONITOR_KEY_CLUSTER + litigiousdebtor_superkey_monitor + '_qa';
+
+    SHARED litigiousdebtor_key_undist := 
+        INDEX(
+              CourtLink.key_CourtID_Docket,
+              litigiousdebtor_superkey
+            );
+
+    EXPORT litigiousdebtor_key :=
+        DISTRIBUTE(
+                  litigiousdebtor_key_undist, 
+                  HASH32(debtor_lname, NID.PreferredFirstNew(debtor_fname), CourtState)
+                ): INDEPENDENT; //PERSIST('acctmon::litigiousdebtor::search_file_slim');
 	END;
 
 	EXPORT liens := MODULE
