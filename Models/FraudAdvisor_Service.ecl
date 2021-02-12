@@ -215,7 +215,7 @@ unsigned1 age_value := 0          : stored('Age');
 string20  drlc_value := ''        : stored('DLNumber');
 string2   drlcstate_value := ''   : stored('DLState');
 string50 	email_value := ''       : stored('Email');
-string45  ip_value := ''          : stored('IPAddress');
+string45  ip_value_pre := ''      : stored('IPAddress');
 string10  hphone_value := ''      : stored('HomePhone');
 string10  wphone_value := ''      : stored('WorkPhone');
 string100 cmpy_value := ''        : stored('EmployerName');
@@ -266,6 +266,7 @@ unsigned1 RedFlag_version 	:= 0 				: stored('RedFlag_version');
 string 	 	DataRestriction 	:= risk_indicators.iid_constants.default_DataRestriction : stored('DataRestrictionMask');
 string	 	DataPermission 		:= Risk_Indicators.iid_constants.default_DataPermission : stored('DataPermissionMask');
 boolean   Test_Data_Enabled := false  	: stored('TestDataEnabled');
+//boolean   Test_Data_Enabled := false ;
 string20  Test_Data_Table_Name := ''   	: stored('TestDataTableName');
  
 
@@ -286,9 +287,20 @@ string8 TimeofApplication            := '' : stored('TimeofApplication');
 string20  Model                := ''    : stored('Model');
 boolean   IncludeRiskIndices   := false : stored('IncludeRiskIndices');  // to include the 6 fraud indices that come back in fp1109_0
 boolean SuppressCompromisedDLs := false : stored('SuppressCompromisedDLs');
+//boolean SuppressCompromisedDLs := false;
 // Set to TRUE when running RiskProcessing scripts to include some intermediate boca shell outputs for modelers
 boolean IncludeQAOutputs := FALSE : stored('IncludeQAOutputs'); 
 boolean UseIngestDate    := FALSE : stored('UseIngestDate'); 
+
+//IDA gateway modes 
+// 0 = production mode
+// 1 = UAT mode
+// 2 = Retro mode
+unsigned1 IDA_gateway_mode := 0 : stored('IDA_gateway_mode');
+
+
+string45  ip_value := TRIM(STD.STr.SplitWords(ip_value_pre,',')[1]);//some customers send in multiple so we are selecting based on the comma
+
 
 Boolean TrackInsuranceRoyalties := Risk_Indicators.iid_constants.InsuranceDL_ok(DataPermission);
 
@@ -1331,6 +1343,7 @@ IF(~DisableOutcomeTracking and ~Test_Data_Enabled, OUTPUT(Deltabase_Logging, NAM
  // output(doAttributesVersion2, named('doAttributesVersion2'));
   //output(v2, named('v2'));
  // OUTPUT( clam_BtSt, NAMED('clam_BtSt') );
+ //OUTPUT(ip_value,NAMED('ip_value'));
 //============end of debug===========================
 
 ENDMACRO;
