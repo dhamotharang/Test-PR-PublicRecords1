@@ -357,7 +357,7 @@ EXPORT SmallBusiness_BIP_Batch_Service() := FUNCTION
 			LNSmallBusiness.Macros.mac_base_attrs()
 			LNSmallBusiness.Macros.mac_SBA_v2_attrs()
 			LNSmallBusiness.Macros.mac_SBFE_attrs()
-			LNSmallBusiness.Macros.mac_scoring_attrs()
+			LNSmallBusiness.Macros.mac_scoring_attrs()   
 			SELF := [];
 	END;
   
@@ -378,7 +378,7 @@ EXPORT SmallBusiness_BIP_Batch_Service() := FUNCTION
 				NOT allow_SBA_attrs AND NOT allow_SBFE_attrs AND allow_SBA_attrs101 AND NOT allow_SBA_V2_attrs AND NOT allow_SBA_V21_attrs     => PROJECT(Final_Results_pre, xfm_allow_SBA101_only(LEFT)),     //SBA 101
 				NOT allow_SBA_attrs AND NOT allow_SBFE_attrs AND NOT allow_SBA_attrs101 AND allow_SBA_V2_attrs AND NOT allow_SBA_V21_attrs     => PROJECT(Final_Results_pre, xfm_allow_SBA2_only(LEFT)),       //SBA 2
 				NOT allow_SBA_attrs AND NOT allow_SBFE_attrs AND NOT allow_SBA_attrs101 AND NOT allow_SBA_V2_attrs AND allow_SBA_V21_attrs     => PROJECT(Final_Results_pre, xfm_allow_SBA21_only(LEFT)),      //SBA 21
-				allow_SBA_attrs AND allow_SBFE_attrs AND NOT allow_SBA_attrs101 AND NOT allow_SBA_V2_attrs AND allow_SBA_V21_attrs             => PROJECT(Final_Results_pre, xfm_allow_SBA1_SBFE_only(LEFT)),  //SBA1 + SBFE 
+				allow_SBA_attrs AND allow_SBFE_attrs AND NOT allow_SBA_attrs101 AND NOT allow_SBA_V2_attrs AND NOT allow_SBA_V21_attrs         => PROJECT(Final_Results_pre, xfm_allow_SBA1_SBFE_only(LEFT)),  //SBA1 + SBFE 
 				NOT allow_SBA_attrs AND allow_SBA_attrs101 AND allow_SBFE_attrs AND NOT allow_SBA_V2_attrs AND NOT allow_SBA_V21_attrs         => PROJECT(Final_Results_pre, xfm_allow_SBA101SBFE_only(LEFT)), //SBA1010 + SBFE
 				NOT allow_SBA_attrs AND allow_SBFE_attrs AND NOT allow_SBA_attrs101 AND allow_SBA_V2_attrs AND NOT allow_SBA_V21_attrs         => PROJECT(Final_Results_pre, xfm_allow_SBA2_SBFE_only(LEFT)),  //SBA2 + SBFE
 				NOT allow_SBA_attrs AND allow_SBFE_attrs AND NOT allow_SBA_attrs101 AND NOT allow_SBA_V2_attrs AND allow_SBA_V21_attrs         => PROJECT(Final_Results_pre, xfm_allow_SBA21_SBFE_only(LEFT)), //SBA21 + SBFE
