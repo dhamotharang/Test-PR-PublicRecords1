@@ -2111,7 +2111,7 @@ Event: => P19_AotBnkAcctCurrProfFlag := MAP(T19_BnkAcctPopFlag=0 => -99999,
 //ID KR Attrs
 Event: => P1_AotIdKrActCntEv := MAP(T1_LexIdPopFlag=0 AND T1_RinIdPopFlag=0 => -99999,
 																		T_SrcClassType < 2 => -99998,
-																		ALL(PersonEvent.Transaction,T1_IdIsKrFlag=-99997) => -99997,
+																		ALL(Subject.PersonEvent.Transaction,T1_IdIsKrFlag=-99997) => -99997,
 																		Subject.AotIdKrActCntEv);
 Event: => P1_AotIdKrActFlagEv := MAP(T1_LexIdPopFlag=0 AND T1_RinIdPopFlag=0 => -99999,
 																		T_SrcClassType < 2 => -99998,
@@ -2119,7 +2119,7 @@ Event: => P1_AotIdKrActFlagEv := MAP(T1_LexIdPopFlag=0 AND T1_RinIdPopFlag=0 => 
 																		P1_AotIdKrActCntEv>0 => 1, 0);
 Event: => P1_AotIdKrActShrdCntEv := MAP(T1_LexIdPopFlag=0 AND T1_RinIdPopFlag=0 => -99999,
 																		T_SrcClassType < 2 => -99998,
-																		ALL(PersonEvent.Transaction,T1_IdIsKrFlag=-99997) => -99997,
+																		ALL(Subject.PersonEvent.Transaction,T1_IdIsKrFlag=-99997) => -99997,
 																		Subject.AotIdKrActShrdCntEv);
 Event: => P1_AotIdKrActShrdFlagEv := MAP(T1_LexIdPopFlag=0 AND T1_RinIdPopFlag=0 => -99999,
 																		 T_SrcClassType < 2 => -99998,
@@ -2127,24 +2127,24 @@ Event: => P1_AotIdKrActShrdFlagEv := MAP(T1_LexIdPopFlag=0 AND T1_RinIdPopFlag=0
 																		 P1_AotIdKrActShrdCntEv>0 => 1, 0);
 Event: => P1_AotIdKrActOldDtEv := MAP(T1_LexIdPopFlag=0 AND T1_RinIdPopFlag=0 => -99999,
 																		  T_SrcClassType <2 OR P1_AotIdKrActFlagEv=0 => -99998,
-																			ALL(PersonEvent.Transaction,T1_IdIsKrFlag=-99997) => -99997,
+																			ALL(Subject.PersonEvent.Transaction,T1_IdIsKrFlag=-99997) => -99997,
 																			INTEGER(Subject.AotIdKrActOldDtEv));
 Event: => P1_AotIdKrActNewDtEv := MAP(T1_LexIdPopFlag=0 AND T1_RinIdPopFlag=0 => -99999,
 																		  T_SrcClassType <2 OR P1_AotIdKrActFlagEv=0 => -99998,
-																			ALL(PersonEvent.Transaction,T1_IdIsKrFlag=-99997) => -99997,
+																			ALL(Subject.PersonEvent.Transaction,T1_IdIsKrFlag=-99997) => -99997,
 																			INTEGER(Subject.AotIdKrActNewDtEv));
 Event: => P1_AotIdKrActShrdOldDtEv := MAP(T1_LexIdPopFlag=0 AND T1_RinIdPopFlag=0 => -99999,
 																		  T_SrcClassType <2 OR P1_AotIdKrActShrdFlagEv=0 => -99998,
-																			ALL(PersonEvent.Transaction,T1_IdIsKrFlag=-99997) => -99997,																			
+																			ALL(Subject.PersonEvent.Transaction,T1_IdIsKrFlag=-99997) => -99997,																			
 																			INTEGER(Subject.AotIdKrActShrdOldDtEv));
 Event: => P1_AotIdKrActShrdNewDtEv := MAP(T1_LexIdPopFlag=0 AND T1_RinIdPopFlag=0 => -99999,
 																		  T_SrcClassType <2 OR P1_AotIdKrActShrdFlagEv=0 => -99998,
-																			ALL(PersonEvent.Transaction,T1_IdIsKrFlag=-99997) => -99997,
+																			ALL(Subject.PersonEvent.Transaction,T1_IdIsKrFlag=-99997) => -99997,
 																			INTEGER(Subject.AotIdKrActShrdNewDtEv));
 //ID KR App Fraud Attrs
 Event: => P1_AotIdKrAppFrdActCntEv := MAP(T1_LexIdPopFlag=0 AND T1_RinIdPopFlag=0 => -99999,
 																		  T_SrcClassType <2 => -99998,
-																			ALL(PersonEvent.Transaction,T1_IdIsKrAppFrdFlag=-99997) => -99997,
+																			ALL(Subject.PersonEvent.Transaction,T1_IdIsKrAppFrdFlag=-99997) => -99997,
 																			Subject.AotIdKrAppFrdActCntEv);																	
 Event: => P1_AotIdKrAppFrdActFlagEv := MAP(T1_LexIdPopFlag=0 AND T1_RinIdPopFlag=0 => -99999,
 																		   T_SrcClassType <2 => -99998,
@@ -2152,7 +2152,7 @@ Event: => P1_AotIdKrAppFrdActFlagEv := MAP(T1_LexIdPopFlag=0 AND T1_RinIdPopFlag
 																			 P1_AotIdKrAppFrdActCntEv>0 => 1, 0);
 Event: => P1_AotIdKrAppFrdActShrdCntEv := MAP(T1_LexIdPopFlag=0 AND T1_RinIdPopFlag=0 => -99999,
 																		      T_SrcClassType <2 => -99998,
-																			    ALL(PersonEvent.Transaction,T1_IdIsKrAppFrdFlag=-99997) => -99997,
+																			    ALL(Subject.PersonEvent.Transaction,T1_IdIsKrAppFrdFlag=-99997) => -99997,
 																			    Subject.AotIdKrAppFrdActShrdCntEv);
 Event: => P1_AotIdKrAppFrdActShrdFlagEv := MAP(T1_LexIdPopFlag=0 AND T1_RinIdPopFlag=0 => -99999,
 																		   T_SrcClassType <2 => -99998,
@@ -2160,24 +2160,24 @@ Event: => P1_AotIdKrAppFrdActShrdFlagEv := MAP(T1_LexIdPopFlag=0 AND T1_RinIdPop
 																			 P1_AotIdKrAppFrdActShrdCntEv>0 => 1, 0);
 Event: => P1_AotIdKrAppFrdActOldDtEv := MAP(T1_LexIdPopFlag=0 AND T1_RinIdPopFlag=0 => -99999,
 																		    T_SrcClassType <2 OR P1_AotIdKrAppFrdActFlagEv=0 => -99998,
-																		    ALL(PersonEvent.Transaction,T1_IdIsKrAppFrdFlag=-99997) => -99997,
+																		    ALL(Subject.PersonEvent.Transaction,T1_IdIsKrAppFrdFlag=-99997) => -99997,
 																				INTEGER(Subject.AotIdKrAppFrdActOldDtEv));
 Event: => P1_AotIdKrAppFrdActNewDtEv := MAP(T1_LexIdPopFlag=0 AND T1_RinIdPopFlag=0 => -99999,
 																		    T_SrcClassType <2 OR P1_AotIdKrAppFrdActFlagEv=0 => -99998,
-																		    ALL(PersonEvent.Transaction,T1_IdIsKrAppFrdFlag=-99997) => -99997,
+																		    ALL(Subject.PersonEvent.Transaction,T1_IdIsKrAppFrdFlag=-99997) => -99997,
 																				INTEGER(Subject.AotIdKrAppFrdActNewDtEv));
 Event: => P1_AotIdKrAppFrdActShrdOldDtEv := MAP(T1_LexIdPopFlag=0 AND T1_RinIdPopFlag=0 => -99999,
 																		    T_SrcClassType <2 OR P1_AotIdKrAppFrdActShrdFlagEv=0 => -99998,
-																		    ALL(PersonEvent.Transaction,P1_AotIdKrAppFrdActShrdFlagEv=-99997) => -99997,
+																		    ALL(Subject.PersonEvent.Transaction,P1_AotIdKrAppFrdActShrdFlagEv=-99997) => -99997,
 																				INTEGER(Subject.AotIdKrAppFrdActShrdOldDtEv));
 Event: => P1_AotIdKrAppFrdActShrdNewDtEv := MAP(T1_LexIdPopFlag=0 AND T1_RinIdPopFlag=0 => -99999,
 																		    T_SrcClassType <2 OR P1_AotIdKrAppFrdActShrdFlagEv=0 => -99998,
-																		    ALL(PersonEvent.Transaction,T1_IdIsKrAppFrdFlag=-99997) => -99997,
+																		    ALL(Subject.PersonEvent.Transaction,T1_IdIsKrAppFrdFlag=-99997) => -99997,
 																				INTEGER(Subject.AotIdKrAppFrdActShrdNewDtEv));	
 //ID KR General Fraud Attrs
 Event: => P1_AotIdKrGenFrdActCntEv := MAP(T1_LexIdPopFlag=0 AND T1_RinIdPopFlag=0 => -99999,
 																		    T_SrcClassType <2 => -99998,
-																		    ALL(PersonEvent.Transaction,T1_IdIsKrGenFrdFlag=-99997) => -99997,
+																		    ALL(Subject.PersonEvent.Transaction,T1_IdIsKrGenFrdFlag=-99997) => -99997,
 																				Subject.AotIdKrGenFrdActCntEv);				
 Event: => P1_AotIdKrGenFrdActFlagEv := MAP(T1_LexIdPopFlag=0 AND T1_RinIdPopFlag=0 => -99999,
 																		       T_SrcClassType <2 => -99998,
@@ -2185,7 +2185,7 @@ Event: => P1_AotIdKrGenFrdActFlagEv := MAP(T1_LexIdPopFlag=0 AND T1_RinIdPopFlag
 																					 P1_AotIdKrGenFrdActCntEv>0 => 1, 0);
 Event: => P1_AotIdKrGenFrdActShrdCntEv := MAP(T1_LexIdPopFlag=0 AND T1_RinIdPopFlag=0 => -99999,
 																		    T_SrcClassType <2 => -99998,
-																		    ALL(PersonEvent.Transaction,T1_IdIsKrGenFrdFlag=-99997) => -99997,
+																		    ALL(Subject.PersonEvent.Transaction,T1_IdIsKrGenFrdFlag=-99997) => -99997,
 																				Subject.AotIdKrGenFrdActShrdCntEv);	
 Event: => P1_AotIdKrGenFrdActShrdFlagEv := MAP(T1_LexIdPopFlag=0 AND T1_RinIdPopFlag=0 => -99999,
 																		       T_SrcClassType <2 => -99998,
@@ -2193,24 +2193,24 @@ Event: => P1_AotIdKrGenFrdActShrdFlagEv := MAP(T1_LexIdPopFlag=0 AND T1_RinIdPop
 																					 P1_AotIdKrGenFrdActShrdCntEv>0 => 1, 0);
 Event: => P1_AotIdKrGenFrdActOldDtEv := MAP(T1_LexIdPopFlag=0 AND T1_RinIdPopFlag=0 => -99999,
 																		        T_SrcClassType <2 OR P1_AotIdKrGenFrdActFlagEv=0 => -99998,
-																						ALL(PersonEvent.Transaction, T1_IdIsKrGenFrdFlag=-99997) => -99997,
+																						ALL(Subject.PersonEvent.Transaction, T1_IdIsKrGenFrdFlag=-99997) => -99997,
 																						INTEGER(Subject.AotIdKrGenFrdActOldDtEv));
 Event: => P1_AotIdKrGenFrdActNewDtEv := MAP(T1_LexIdPopFlag=0 AND T1_RinIdPopFlag=0 => -99999,
 																		            T_SrcClassType <2 OR P1_AotIdKrGenFrdActFlagEv=0 => -99998,
-																								ALL(PersonEvent.Transaction, T1_IdIsKrGenFrdFlag=-99997) => -99997,
+																								ALL(Subject.PersonEvent.Transaction, T1_IdIsKrGenFrdFlag=-99997) => -99997,
 																								INTEGER(Subject.AotIdKrGenFrdActNewDtEv));
 Event: => P1_AotIdKrGenFrdActShrdOldDtEv := MAP(T1_LexIdPopFlag=0 AND T1_RinIdPopFlag=0 => -99999,
 																		            T_SrcClassType <2 OR P1_AotIdKrGenFrdActShrdFlagEv=0 => -99998,
-																								ALL(PersonEvent.Transaction, T1_IdIsKrGenFrdFlag=-99997) => -99997,
+																								ALL(Subject.PersonEvent.Transaction, T1_IdIsKrGenFrdFlag=-99997) => -99997,
 																								INTEGER(Subject.AotIdKrGenFrdActShrdOldDtEv));
 Event: => P1_AotIdKrGenFrdActShrdNewDtEv := MAP(T1_LexIdPopFlag=0 AND T1_RinIdPopFlag=0 => -99999,
 																		            T_SrcClassType <2 OR P1_AotIdKrGenFrdActShrdFlagEv=0 => -99998,
-																								ALL(PersonEvent.Transaction, T1_IdIsKrGenFrdFlag=-99997) => -99997,
+																								ALL(Subject.PersonEvent.Transaction, T1_IdIsKrGenFrdFlag=-99997) => -99997,
 																								INTEGER(Subject.AotIdKrGenFrdActShrdNewDtEv));
 //ID KR Other Fraud Attrs
 Event: => P1_AotIdKrOthFrdActCntEv := MAP(T1_LexIdPopFlag=0 AND T1_RinIdPopFlag=0 => -99999,
 																		      T_SrcClassType <2 => -99998,
-																					ALL(PersonEvent.Transaction,T1_IdIsKrOthFrdFlag=-99997) => -99997,
+																					ALL(Subject.PersonEvent.Transaction,T1_IdIsKrOthFrdFlag=-99997) => -99997,
 																					Subject.AotIdKrOthFrdActCntEv);
 Event: => P1_AotIdKrOthFrdActFlagEv := MAP(T1_LexIdPopFlag=0 AND T1_RinIdPopFlag=0 => -99999,
 																		      T_SrcClassType <2 => -99998,
@@ -2218,7 +2218,7 @@ Event: => P1_AotIdKrOthFrdActFlagEv := MAP(T1_LexIdPopFlag=0 AND T1_RinIdPopFlag
 																					P1_AotIdKrOthFrdActCntEv>0 => 1, 0);
 Event: => P1_AotIdKrOthFrdActShrdCntEv := MAP(T1_LexIdPopFlag=0 AND T1_RinIdPopFlag=0 => -99999,
 																		      T_SrcClassType <2 => -99998,
-																					ALL(PersonEvent.Transaction,T1_IdIsKrOthFrdFlag=-99997) => -99997,
+																					ALL(Subject.PersonEvent.Transaction,T1_IdIsKrOthFrdFlag=-99997) => -99997,
 																					Subject.AotIdKrOthFrdActShrdCntEv);
 Event: => P1_AotIdKrOthFrdActShrdFlagEv := MAP(T1_LexIdPopFlag=0 AND T1_RinIdPopFlag=0 => -99999,
 																		      T_SrcClassType <2 => -99998,
@@ -2226,24 +2226,24 @@ Event: => P1_AotIdKrOthFrdActShrdFlagEv := MAP(T1_LexIdPopFlag=0 AND T1_RinIdPop
 																					P1_AotIdKrOthFrdActShrdCntEv>0 => 1, 0);
 Event: => P1_AotIdKrOthFrdActOldDtEv := MAP(T1_LexIdPopFlag=0 AND T1_RinIdPopFlag=0 => -99999,
 																		      T_SrcClassType <2 OR P1_AotIdKrOthFrdActFlagEv=0 => -99998,
-																					ALL(PersonEvent.Transaction,T1_IdIsKrOthFrdFlag=-99997) => -99997,
+																					ALL(Subject.PersonEvent.Transaction,T1_IdIsKrOthFrdFlag=-99997) => -99997,
 																					INTEGER(Subject.AotIdKrOthFrdActOldDtEv));
 Event: => P1_AotIdKrOthFrdActNewDtEv := MAP(T1_LexIdPopFlag=0 AND T1_RinIdPopFlag=0 => -99999,
 																		      T_SrcClassType <2 OR P1_AotIdKrOthFrdActFlagEv=0 => -99998,
-																					ALL(PersonEvent.Transaction,T1_IdIsKrOthFrdFlag=-99997) => -99997,
+																					ALL(Subject.PersonEvent.Transaction,T1_IdIsKrOthFrdFlag=-99997) => -99997,
 																					INTEGER(Subject.AotIdKrOthFrdActNewDtEv));
 Event: => P1_AotIdKrOthFrdActShrdOldDtEv := MAP(T1_LexIdPopFlag=0 AND T1_RinIdPopFlag=0 => -99999,
 																		      T_SrcClassType <2 OR P1_AotIdKrOthFrdActShrdFlagEv=0 => -99998,
-																					ALL(PersonEvent.Transaction,T1_IdIsKrOthFrdFlag=-99997) => -99997,
+																					ALL(Subject.PersonEvent.Transaction,T1_IdIsKrOthFrdFlag=-99997) => -99997,
 																					INTEGER(Subject.AotIdKrOthFrdActShrdOldDtEv));
 Event: => P1_AotIdKrOthFrdActShrdNewDtEv := MAP(T1_LexIdPopFlag=0 AND T1_RinIdPopFlag=0 => -99999,
 																		      T_SrcClassType <2 OR P1_AotIdKrOthFrdActShrdFlagEv=0 => -99998,
-																					ALL(PersonEvent.Transaction,T1_IdIsKrOthFrdFlag=-99997) => -99997,
+																					ALL(Subject.PersonEvent.Transaction,T1_IdIsKrOthFrdFlag=-99997) => -99997,
 																					INTEGER(Subject.AotIdKrOthFrdActShrdNewDtEv));
 //ID KR Stolen Identity Attrs
 Event: => P1_AotIdKrStolIdActCntEv := MAP(T1_LexIdPopFlag=0 AND T1_RinIdPopFlag=0 => -99999,
 																		      T_SrcClassType <2 => -99998,
-																					ALL(PersonEvent.Transaction,T1_IdIsKrStolIdFlag=-99997) => -99997,
+																					ALL(Subject.PersonEvent.Transaction,T1_IdIsKrStolIdFlag=-99997) => -99997,
 																					Subject.AotIdKrStolIdActCntEv);
 Event: => P1_AotIdKrStolIdActFlagEv := MAP(T1_LexIdPopFlag=0 AND T1_RinIdPopFlag=0 => -99999,
 																		      T_SrcClassType <2 => -99998,
@@ -2251,7 +2251,7 @@ Event: => P1_AotIdKrStolIdActFlagEv := MAP(T1_LexIdPopFlag=0 AND T1_RinIdPopFlag
 																					P1_AotIdKrStolIdActCntEv>0 => 1, 0);
 Event: => P1_AotIdKrStolIdActShrdCntEv := MAP(T1_LexIdPopFlag=0 AND T1_RinIdPopFlag=0 => -99999,
 																		      T_SrcClassType <2 => -99998,
-																					ALL(PersonEvent.Transaction,T1_IdIsKrStolIdFlag=-99997) => -99997,
+																					ALL(Subject.PersonEvent.Transaction,T1_IdIsKrStolIdFlag=-99997) => -99997,
 																					Subject.AotIdKrStolIdActShrdCntEv);
 Event: => P1_AotIdKrStolIdActShrdFlagEv := MAP(T1_LexIdPopFlag=0 AND T1_RinIdPopFlag=0 => -99999,
 																		      T_SrcClassType <2 => -99998,
@@ -2259,25 +2259,25 @@ Event: => P1_AotIdKrStolIdActShrdFlagEv := MAP(T1_LexIdPopFlag=0 AND T1_RinIdPop
 																					P1_AotIdKrStolIdActShrdCntEv>0 => 1, 0);
 Event: => P1_AotIdKrStolIdActOldDtEv := MAP(T1_LexIdPopFlag=0 AND T1_RinIdPopFlag=0 => -99999,
 																		      T_SrcClassType <2 OR P1_AotIdKrStolIdActFlagEv=0 => -99998,
-																					ALL(PersonEvent.Transaction,T1_IdIsKrStolIdFlag=-99997) => -99997,
+																					ALL(Subject.PersonEvent.Transaction,T1_IdIsKrStolIdFlag=-99997) => -99997,
 																					INTEGER(Subject.AotIdKrStolIdActOldDtEv));
 Event: => P1_AotIdKrStolIdActNewDtEv := MAP(T1_LexIdPopFlag=0 AND T1_RinIdPopFlag=0 => -99999,
 																		      T_SrcClassType <2 OR P1_AotIdKrStolIdActFlagEv=0 => -99998,
-																					ALL(PersonEvent.Transaction,T1_IdIsKrStolIdFlag=-99997) => -99997,
+																					ALL(Subject.PersonEvent.Transaction,T1_IdIsKrStolIdFlag=-99997) => -99997,
 																					INTEGER(Subject.AotIdKrStolIdActNewDtEv));
 Event: => P1_AotIdKrStolIdActShrdOldDtEv := MAP(T1_LexIdPopFlag=0 AND T1_RinIdPopFlag=0 => -99999,
 																		      T_SrcClassType <2 OR P1_AotIdKrStolIdActShrdFlagEv=0 => -99998,
-																					ALL(PersonEvent.Transaction,T1_IdIsKrStolIdFlag=-99997) => -99997,
+																					ALL(Subject.PersonEvent.Transaction,T1_IdIsKrStolIdFlag=-99997) => -99997,
 																					INTEGER(Subject.AotIdKrStolIdActShrdOldDtEv));
 Event: => P1_AotIdKrStolIdActShrdNewDtEv := MAP(T1_LexIdPopFlag=0 AND T1_RinIdPopFlag=0 => -99999,
 																		      T_SrcClassType <2 OR P1_AotIdKrStolIdActShrdFlagEv=0 => -99998,
-																					ALL(PersonEvent.Transaction,T1_IdIsKrStolIdFlag=-99997) => -99997,
+																					ALL(Subject.PersonEvent.Transaction,T1_IdIsKrStolIdFlag=-99997) => -99997,
 																					INTEGER(Subject.AotIdKrStolIdActShrdNewDtEv));
 
 //Address KR Attrs
 Event: => P9_AotAddrKrActCntEv := MAP(T9_AddrPopFlag=0 => -99999,
 																			T_SrcClassType < 2 => -99998,
-																			ALL(AddressEvent.Transaction,T9_AddrIsKrFlag=-99997) => -99997,
+																			ALL(Location.AddressEvent.Transaction,T9_AddrIsKrFlag=-99997) => -99997,
 																			Location.AotAddrKrActCntEv);
 Event: => P9_AotAddrKrActFlagEv := MAP(T9_AddrPopFlag=0 => -99999,
 																			T_SrcClassType <2 => -99998,
@@ -2285,7 +2285,7 @@ Event: => P9_AotAddrKrActFlagEv := MAP(T9_AddrPopFlag=0 => -99999,
 																			P9_AotAddrKrActCntEv>0 => 1, 0);
 Event: => P9_AotAddrKrActShrdCntEv := MAP(T9_AddrPopFlag=0 => -99999,
 																			T_SrcClassType <2 => -99998,
-																			ALL(AddressEvent.Transaction,T9_AddrIsKrFlag=-99997) => -99997,
+																			ALL(Location.AddressEvent.Transaction,T9_AddrIsKrFlag=-99997) => -99997,
 																			Location.AotAddrKrActShrdCntEv);
 Event: => P9_AotAddrKrActShrdFlagEv := MAP(T9_AddrPopFlag=0 => -99999,
 																			T_SrcClassType <2 => -99998,
@@ -2293,25 +2293,25 @@ Event: => P9_AotAddrKrActShrdFlagEv := MAP(T9_AddrPopFlag=0 => -99999,
 																			P9_AotAddrKrActShrdCntEv>0 => 1, 0);
 Event: => P9_AotAddrKrActOldDtEv := MAP(T9_AddrPopFlag=0 => -99999,
 																			T_SrcClassType <2 OR P9_AotAddrKrActFlagEv=0 => -99998,
-																			ALL(AddressEvent.Transaction,T9_AddrIsKrFlag=-99997) => -99997,
+																			ALL(Location.AddressEvent.Transaction,T9_AddrIsKrFlag=-99997) => -99997,
 																			INTEGER(Location.AotAddrKrActOldDtEv));
 Event: => P9_AotAddrKrActNewDtEv := MAP(T9_AddrPopFlag=0 => -99999,
 																			T_SrcClassType <2 OR P9_AotAddrKrActFlagEv=0 => -99998,
-																			ALL(AddressEvent.Transaction,T9_AddrIsKrFlag=-99997) => -99997,
+																			ALL(Location.AddressEvent.Transaction,T9_AddrIsKrFlag=-99997) => -99997,
 																			INTEGER(Location.AotAddrKrActNewDtEv));
 Event: => P9_AotAddrKrActShrdOldDtEv := MAP(T9_AddrPopFlag=0 => -99999,
 																			T_SrcClassType <2 OR P9_AotAddrKrActShrdFlagEv=0 => -99998,
-																			ALL(AddressEvent.Transaction,T9_AddrIsKrFlag=-99997) => -99997,
+																			ALL(Location.AddressEvent.Transaction,T9_AddrIsKrFlag=-99997) => -99997,
 																			INTEGER(Location.AotAddrKrActShrdOldDtEv));
 Event: => P9_AotAddrKrActShrdNewDtEv := MAP(T9_AddrPopFlag=0 => -99999,
 																			T_SrcClassType <2 OR P9_AotAddrKrActShrdFlagEv=0 => -99998,
-																			ALL(AddressEvent.Transaction,T9_AddrIsKrFlag=-99997) => -99997,
+																			ALL(Location.AddressEvent.Transaction,T9_AddrIsKrFlag=-99997) => -99997,
 																			INTEGER(Location.AotAddrKrActShrdNewDtEv));
 
 //SSN KR Attrs
 Event: => P15_AotSsnKrActCntEv := MAP(T15_SsnPopFlag=0 => -99999,
 																			T_SrcClassType <2 => -99998,
-																			ALL(SsnEvent.Transaction,T15_SsnIsKrFlag=-99997) => -99997,
+																			ALL(SocialSecurityNumber.SsnEvent.Transaction,T15_SsnIsKrFlag=-99997) => -99997,
 																			rSsn.AotSsnKrActCntEv);
 Event: => P15_AotSsnKrActFlagEv := MAP(T15_SsnPopFlag=0 => -99999,
 																			T_SrcClassType <2 => -99998,
@@ -2319,7 +2319,7 @@ Event: => P15_AotSsnKrActFlagEv := MAP(T15_SsnPopFlag=0 => -99999,
 																			P15_AotSsnKrActCntEv>0 => 1, 0);
 Event: => P15_AotSsnKrActShrdCntEv := MAP(T15_SsnPopFlag=0 => -99999,
 																			T_SrcClassType <2 => -99998,
-																			ALL(SsnEvent.Transaction,T15_SsnIsKrFlag=-99997) => -99997,
+																			ALL(rSsn.SsnEvent.Transaction,T15_SsnIsKrFlag=-99997) => -99997,
 																			rSsn.AotSsnKrActShrdCntEv);
 Event: => P15_AotSsnKrActShrdFlagEv := MAP(T15_SsnPopFlag=0 => -99999,
 																			T_SrcClassType <2 => -99998,
@@ -2327,25 +2327,25 @@ Event: => P15_AotSsnKrActShrdFlagEv := MAP(T15_SsnPopFlag=0 => -99999,
 																			P15_AotSsnKrActShrdCntEv>0 => 1, 0);
 Event: => P15_AotSsnKrActOldDtEv := MAP(T15_SsnPopFlag=0 => -99999,
 																			T_SrcClassType <2 OR P15_AotSsnKrActFlagEv=0 => -99998,
-																			ALL(SsnEvent.Transaction,T15_SsnIsKrFlag=-99997) => -99997,
+																			ALL(rSsn.SsnEvent.Transaction,T15_SsnIsKrFlag=-99997) => -99997,
 																			INTEGER(rSsn.AotSsnKrActOldDtEv));
 Event: => P15_AotSsnKrActNewDtEv := MAP(T15_SsnPopFlag=0 => -99999,
 																			T_SrcClassType <2 OR P15_AotSsnKrActFlagEv=0 => -99998,
-																			ALL(SsnEvent.Transaction,T15_SsnIsKrFlag=-99997) => -99997,
+																			ALL(rSsn.SsnEvent.Transaction,T15_SsnIsKrFlag=-99997) => -99997,
 																			INTEGER(rSsn.AotSsnKrActNewDtEv));
 Event: => P15_AotSsnKrActShrdOldDtEv := MAP(T15_SsnPopFlag=0 => -99999,
 																			T_SrcClassType <2 OR P15_AotSsnKrActShrdFlagEv=0 => -99998,
-																			ALL(SsnEvent.Transaction,T15_SsnIsKrFlag=-99997) => -99997,
+																			ALL(rSsn.SsnEvent.Transaction,T15_SsnIsKrFlag=-99997) => -99997,
 																			INTEGER(rSsn.AotSsnKrActShrdOldDtEv));
 Event: => P15_AotSsnKrActShrdNewDtEv := MAP(T15_SsnPopFlag=0 => -99999,
 																			T_SrcClassType <2 OR P15_AotSsnKrActShrdFlagEv=0 => -99998,
-																			ALL(SsnEvent.Transaction,T15_SsnIsKrFlag=-99997) => -99997,
+																			ALL(rSsn.SsnEvent.Transaction,T15_SsnIsKrFlag=-99997) => -99997,
 																			INTEGER(rSsn.AotSsnKrActShrdNewDtEv));
 
 //Phone KR Attrs
 Event: => P16_AotPhnKrActCntEv := MAP(T16_PhnPopFlag=0 => -99999,
 																			T_SrcClassType <2 => -99998,
-																			ALL(PhoneEvent.Transaction,T16_PhnIsKrFlag=-99997) => -99997,
+																			ALL(rPhone.PhoneEvent.Transaction,T16_PhnIsKrFlag=-99997) => -99997,
 																			rPhone.AotPhnKrActCntEv);
 Event: => P16_AotPhnKrActFlagEv := MAP(T16_PhnPopFlag=0 => -99999,
 																			T_SrcClassType <2 => -99998,
@@ -2353,7 +2353,7 @@ Event: => P16_AotPhnKrActFlagEv := MAP(T16_PhnPopFlag=0 => -99999,
 																			P16_AotPhnKrActCntEv>0 => 1, 0);
 Event: => P16_AotPhnKrActShrdCntEv := MAP(T16_PhnPopFlag=0 => -99999,
 																			T_SrcClassType <2 => -99998,
-																			ALL(PhoneEvent.Transaction,T16_PhnIsKrFlag=-99997) => -99997,
+																			ALL(rPhone.PhoneEvent.Transaction,T16_PhnIsKrFlag=-99997) => -99997,
 																			rPhone.AotPhnKrActShrdCntEv);
 Event: => P16_AotPhnKrActShrdFlagEv := MAP(T16_PhnPopFlag=0 => -99999,
 																			T_SrcClassType <2 => -99998,
@@ -2361,25 +2361,25 @@ Event: => P16_AotPhnKrActShrdFlagEv := MAP(T16_PhnPopFlag=0 => -99999,
 																			P16_AotPhnKrActShrdCntEv>0 => 1, 0);
 Event: => P16_AotPhnKrActOldDtEv := MAP(T16_PhnPopFlag=0 => -99999,
 																			T_SrcClassType <2 OR P16_AotPhnKrActFlagEv=0 => -99998,
-																			ALL(PhoneEvent.Transaction,T16_PhnIsKrFlag=-99997) => -99997,
+																			ALL(rPhone.PhoneEvent.Transaction,T16_PhnIsKrFlag=-99997) => -99997,
 																			INTEGER(rPhone.AotPhnKrActOldDtEv));
 Event: => P16_AotPhnKrActNewDtEv := MAP(T16_PhnPopFlag=0 => -99999,
 																			T_SrcClassType <2 OR P16_AotPhnKrActFlagEv=0 => -99998,
-																			ALL(PhoneEvent.Transaction,T16_PhnIsKrFlag=-99997) => -99997,
+																			ALL(rPhone.PhoneEvent.Transaction,T16_PhnIsKrFlag=-99997) => -99997,
 																			INTEGER(rPhone.AotPhnKrActNewDtEv));
 Event: => P16_AotPhnKrActShrdOldDtEv := MAP(T16_PhnPopFlag=0 => -99999,
 																			T_SrcClassType <2 OR P16_AotPhnKrActShrdFlagEv=0 => -99998,
-																			ALL(PhoneEvent.Transaction,T16_PhnIsKrFlag=-99997) => -99997,
+																			ALL(rPhone.PhoneEvent.Transaction,T16_PhnIsKrFlag=-99997) => -99997,
 																			INTEGER(rPhone.AotPhnKrActShrdOldDtEv));
 Event: => P16_AotPhnKrActShrdNewDtEv := MAP(T16_PhnPopFlag=0 => -99999,
 																			T_SrcClassType <2 OR P16_AotPhnKrActShrdFlagEv=0 => -99998,
-																			ALL(PhoneEvent.Transaction,T16_PhnIsKrFlag=-99997) => -99997,
+																			ALL(rPhone.PhoneEvent.Transaction,T16_PhnIsKrFlag=-99997) => -99997,
 																			INTEGER(rPhone.AotPhnKrActShrdNewDtEv));
 													
 //email KR Attrs													
 Event: => P17_AotEmailKrActCntEv := MAP(T17_EmailPopFlag=0 => -99999,
 																				T_SrcClassType <2 => -99998,
-																				ALL(EmailEvent.Transaction,T17_EmailIsKrFlag=-99997) => -99997,
+																				ALL(rEmail.EmailEvent.Transaction,T17_EmailIsKrFlag=-99997) => -99997,
 																				rEmail.AotEmailKrActCntEv);
 Event: => P17_AotEmailKrActFlagEv := MAP(T17_EmailPopFlag=0 => -99999,
 																				T_SrcClassType <2 => -99998,
@@ -2387,7 +2387,7 @@ Event: => P17_AotEmailKrActFlagEv := MAP(T17_EmailPopFlag=0 => -99999,
 																				P17_AotEmailKrActCntEv>0 => 1, 0);
 Event: => P17_AotEmailKrActShrdCntEv := MAP(T17_EmailPopFlag=0 => -99999,
 																				T_SrcClassType <2 => -99998,
-																				ALL(EmailEvent.Transaction,T17_EmailIsKrFlag=-99997) => -99997,
+																				ALL(rEmail.EmailEvent.Transaction,T17_EmailIsKrFlag=-99997) => -99997,
 																				rEmail.AotEmailKrActShrdCntEv);
 Event: => P17_AotEmailKrActShrdFlagEv := MAP(T17_EmailPopFlag=0 => -99999,
 																				T_SrcClassType <2 => -99998,
@@ -2395,25 +2395,25 @@ Event: => P17_AotEmailKrActShrdFlagEv := MAP(T17_EmailPopFlag=0 => -99999,
 																				P17_AotEmailKrActShrdCntEv>0 => 1, 0);
 Event: => P17_AotEmailKrActOldDtEv := MAP(T17_EmailPopFlag=0 => -99999,
 																				T_SrcClassType <2 OR P17_AotEmailKrActFlagEv=0 => -99998,
-																				ALL(EmailEvent.Transaction,T17_EmailIsKrFlag=-99997) => -99997,
+																				ALL(rEmail.EmailEvent.Transaction,T17_EmailIsKrFlag=-99997) => -99997,
 																				INTEGER(rEmail.AotEmailKrActOldDtEv));
 Event: => P17_AotEmailKrActNewDtEv := MAP(T17_EmailPopFlag=0 => -99999,
 																				T_SrcClassType <2 OR P17_AotEmailKrActFlagEv=0 => -99998,
-																				ALL(EmailEvent.Transaction,T17_EmailIsKrFlag=-99997) => -99997,
+																				ALL(rEmail.EmailEvent.Transaction,T17_EmailIsKrFlag=-99997) => -99997,
 																				INTEGER(rEmail.AotEmailKrActNewDtEv));
 Event: => P17_AotEmailKrActShrdOldDtEv := MAP(T17_EmailPopFlag=0 => -99999,
 																				T_SrcClassType <2 OR P17_AotEmailKrActShrdFlagEv=0 => -99998,
-																				ALL(EmailEvent.Transaction,T17_EmailIsKrFlag=-99997) => -99997,
+																				ALL(rEmail.EmailEvent.Transaction,T17_EmailIsKrFlag=-99997) => -99997,
 																				INTEGER(rEmail.AotEmailKrActShrdOldDtEv));
 Event: => P17_AotEmailKrActShrdNewDtEv := MAP(T17_EmailPopFlag=0 => -99999,
 																				T_SrcClassType <2 OR P17_AotEmailKrActShrdFlagEv=0 => -99998,
-																				ALL(EmailEvent.Transaction,T17_EmailIsKrFlag=-99997) => -99997,
+																				ALL(rEmail.EmailEvent.Transaction,T17_EmailIsKrFlag=-99997) => -99997,
 																				INTEGER(rEmail.AotEmailKrActShrdNewDtEv));
 								
 //IP Addr KR Attrs
 Event: => P18_AotIpAddrKrActCntEv := MAP(T18_IpAddrPopFlag=0 => -99999,
 																				 T_SrcClassType <2 => -99998,
-																				 ALL(InternetProtocolEvent.Transaction,T18_IpAddrIsKrFlag=-99997) => -99997,
+																				 ALL(rInternetProtocol.InternetProtocolEvent.Transaction,T18_IpAddrIsKrFlag=-99997) => -99997,
 																				 rInternetProtocol.AotIpAddrKrActCntEv);
 Event: => P18_AotIpAddrKrActFlagEv := MAP(T18_IpAddrPopFlag=0 => -99999,
 																				 T_SrcClassType <2 => -99998,
@@ -2421,7 +2421,7 @@ Event: => P18_AotIpAddrKrActFlagEv := MAP(T18_IpAddrPopFlag=0 => -99999,
 																				 P18_AotIpAddrKrActCntEv>0 => 1, 0);
 Event: => P18_AotIpAddrKrActShrdCntEv := MAP(T18_IpAddrPopFlag=0 => -99999,
 																				 T_SrcClassType <2 => -99998,
-																				 ALL(InternetProtocolEvent.Transaction,T18_IpAddrIsKrFlag=-99997) => -99997,
+																				 ALL(rInternetProtocol.InternetProtocolEvent.Transaction,T18_IpAddrIsKrFlag=-99997) => -99997,
 																				 rInternetProtocol.AotIpAddrKrActShrdCntEv);
 Event: => P18_AotIpAddrKrActShrdFlagEv := MAP(T18_IpAddrPopFlag=0 => -99999,
 																				 T_SrcClassType <2 => -99998,
@@ -2429,25 +2429,25 @@ Event: => P18_AotIpAddrKrActShrdFlagEv := MAP(T18_IpAddrPopFlag=0 => -99999,
 																				 P18_AotIpAddrKrActShrdCntEv>0 => 1, 0);
 Event: => P18_AotIpAddrKrActOldDtEv := MAP(T18_IpAddrPopFlag=0 => -99999,
 																				 T_SrcClassType <2 OR P18_AotIpAddrKrActFlagEv=0 => -99998,
-																				 ALL(InternetProtocolEvent.Transaction,T18_IpAddrIsKrFlag=-99997) => -99997,
+																				 ALL(rInternetProtocol.InternetProtocolEvent.Transaction,T18_IpAddrIsKrFlag=-99997) => -99997,
 																				 INTEGER(rInternetProtocol.AotIpAddrKrActOldDtEv));
 Event: => P18_AotIpAddrKrActNewDtEv := MAP(T18_IpAddrPopFlag=0 => -99999,
 																				 T_SrcClassType <2 OR P18_AotIpAddrKrActFlagEv=0 => -99998,
-																				 ALL(InternetProtocolEvent.Transaction,T18_IpAddrIsKrFlag=-99997) => -99997,
+																				 ALL(rInternetProtocol.InternetProtocolEvent.Transaction,T18_IpAddrIsKrFlag=-99997) => -99997,
 																				 INTEGER(rInternetProtocol.AotIpAddrKrActNewDtEv));
 Event: => P18_AotIpAddrKrActShrdOldDtEv := MAP(T18_IpAddrPopFlag=0 => -99999,
 																				 T_SrcClassType <2 OR P18_AotIpAddrKrActShrdFlagEv=0 => -99998,
-																				 ALL(InternetProtocolEvent.Transaction,T18_IpAddrIsKrFlag=-99997) => -99997,
+																				 ALL(rInternetProtocol.InternetProtocolEvent.Transaction,T18_IpAddrIsKrFlag=-99997) => -99997,
 																				 INTEGER(rInternetProtocol.AotIpAddrKrActShrdOldDtEv));
 Event: => P18_AotIpAddrKrActShrdNewDtEv := MAP(T18_IpAddrPopFlag=0 => -99999,
 																				 T_SrcClassType <2 OR P18_AotIpAddrKrActShrdFlagEv=0 => -99998,
-																				 ALL(InternetProtocolEvent.Transaction,T18_IpAddrIsKrFlag=-99997) => -99997,
+																				 ALL(rInternetProtocol.InternetProtocolEvent.Transaction,T18_IpAddrIsKrFlag=-99997) => -99997,
 																				 INTEGER(rInternetProtocol.AotIpAddrKrActShrdNewDtEv));
 
 //Bank KR Attrs
 Event: => P19_AotBnkAcctKrActCntEv := MAP(T19_BnkAcctPopFlag=0 => -99999,
 																					T_SrcClassType <2 => -99998,
-																					ALL(BankAccountEvent.Transaction,T19_BnkAcctIsKrFlag=-99997) => -99997,
+																					ALL(rBankAccount.BankAccountEvent.Transaction,T19_BnkAcctIsKrFlag=-99997) => -99997,
 																					rBankAccount.AotBnkAcctKrActCntEv);
 Event: => P19_AotBnkAcctKrActFlagEv := MAP(T19_BnkAcctPopFlag=0 => -99999,
 																					T_SrcClassType <2 => -99998,
@@ -2455,7 +2455,7 @@ Event: => P19_AotBnkAcctKrActFlagEv := MAP(T19_BnkAcctPopFlag=0 => -99999,
 																					P19_AotBnkAcctKrActCntEv>0 => 1, 0);	
 Event: => P19_AotBnkAcctKrActShrdCntEv := MAP(T19_BnkAcctPopFlag=0 => -99999,
 																					T_SrcClassType <2 => -99998,
-																					ALL(BankAccountEvent.Transaction,T19_BnkAcctIsKrFlag=-99997) => -99997,
+																					ALL(rBankAccount.BankAccountEvent.Transaction,T19_BnkAcctIsKrFlag=-99997) => -99997,
 																					rBankAccount.AotBnkAcctKrActShrdCntEv);
 Event: => P19_AotBnkAcctKrActShrdFlagEv := MAP(T19_BnkAcctPopFlag=0 => -99999,
 																					T_SrcClassType <2 => -99998,
@@ -2463,25 +2463,25 @@ Event: => P19_AotBnkAcctKrActShrdFlagEv := MAP(T19_BnkAcctPopFlag=0 => -99999,
 																					P19_AotBnkAcctKrActShrdCntEv>0 => 1, 0);
 Event: => P19_AotBnkAcctKrActOldDtEv := MAP(T19_BnkAcctPopFlag=0 => -99999,
 																					T_SrcClassType <2 OR P19_AotBnkAcctKrActFlagEv=0 => -99998,
-																					ALL(BankAccountEvent.Transaction,T19_BnkAcctIsKrFlag=-99997) => -99997,
+																					ALL(rBankAccount.BankAccountEvent.Transaction,T19_BnkAcctIsKrFlag=-99997) => -99997,
 																					INTEGER(rBankAccount.AotBnkAcctKrActOldDtEv));
 Event: => P19_AotBnkAcctKrActNewDtEv := MAP(T19_BnkAcctPopFlag=0 => -99999,
 																					T_SrcClassType <2 OR P19_AotBnkAcctKrActFlagEv=0 => -99998,
-																					ALL(BankAccountEvent.Transaction,T19_BnkAcctIsKrFlag=-99997) => -99997,
+																					ALL(rBankAccount.BankAccountEvent.Transaction,T19_BnkAcctIsKrFlag=-99997) => -99997,
 																					INTEGER(rBankAccount.AotBnkAcctKrActNewDtEv));
 Event: => P19_AotBnkAcctKrActShrdOldDtEv := MAP(T19_BnkAcctPopFlag=0 => -99999,
 																					T_SrcClassType <2 OR P19_AotBnkAcctKrActShrdFlagEv=0 => -99998,
-																					ALL(BankAccountEvent.Transaction,T19_BnkAcctIsKrFlag=-99997) => -99997,
+																					ALL(rBankAccount.BankAccountEvent.Transaction,T19_BnkAcctIsKrFlag=-99997) => -99997,
 																					INTEGER(rBankAccount.AotBnkAcctKrActShrdOldDtEv));
 Event: => P19_AotBnkAcctKrActShrdNewDtEv := MAP(T19_BnkAcctPopFlag=0 => -99999,
 																					T_SrcClassType <2 OR P19_AotBnkAcctKrActShrdFlagEv=0 => -99998,
-																					ALL(BankAccountEvent.Transaction,T19_BnkAcctIsKrFlag=-99997) => -99997,
+																					ALL(rBankAccount.BankAccountEvent.Transaction,T19_BnkAcctIsKrFlag=-99997) => -99997,
 																					INTEGER(rBankAccount.AotBnkAcctKrActShrdNewDtEv));
 
 //DL KR Attrs
 Event: => P20_AotDlKrActCntEv := MAP(T20_DlPopFlag=0 => -99999,
 																		 T_SrcClassType <2 => -99998,
-																		 ALL(DriversLicenseEvent.Transaction,T20_DlIsKrFlag=-99997) => -99997,
+																		 ALL(rDriversLicense.DriversLicenseEvent.Transaction,T20_DlIsKrFlag=-99997) => -99997,
 																		 rDriversLicense.AotDlKrActCntEv);
 Event: => P20_AotDlKrActFlagEv := MAP(T20_DlPopFlag=0 => -99999,
 																		 T_SrcClassType <2 => -99998,
@@ -2489,7 +2489,7 @@ Event: => P20_AotDlKrActFlagEv := MAP(T20_DlPopFlag=0 => -99999,
 																		 P20_AotDlKrActCntEv>0 => 1, 0);
 Event: => P20_AotDlKrActShrdCntEv := MAP(T20_DlPopFlag=0 => -99999,
 																		 T_SrcClassType <2 => -99998,
-																		 ALL(DriversLicenseEvent.Transaction,T20_DlIsKrFlag=-99997) => -99997,
+																		 ALL(rDriversLicense.DriversLicenseEvent.Transaction,T20_DlIsKrFlag=-99997) => -99997,
 																		 rDriversLicense.AotDlKrActShrdCntEv);
 Event: => P20_AotDlKrActShrdFlagEv := MAP(T20_DlPopFlag=0 => -99999,
 																		 T_SrcClassType <2 => -99998,
@@ -2497,19 +2497,19 @@ Event: => P20_AotDlKrActShrdFlagEv := MAP(T20_DlPopFlag=0 => -99999,
 																		 P20_AotDlKrActShrdCntEv>0 => 1, 0);
 Event: => P20_AotDlKrActOldDtEv := MAP(T20_DlPopFlag=0 => -99999,
 																		 T_SrcClassType <2 OR P20_AotDlKrActFlagEv=0 => -99998,
-																		 ALL(DriversLicenseEvent.Transaction,T20_DlIsKrFlag=-99997) => -99997,
+																		 ALL(rDriversLicense.DriversLicenseEvent.Transaction,T20_DlIsKrFlag=-99997) => -99997,
 																		 INTEGER(rDriversLicense.AotDlKrActOldDtEv));
 Event: => P20_AotDlKrActNewDtEv := MAP(T20_DlPopFlag=0 => -99999,
 																		 T_SrcClassType <2 OR P20_AotDlKrActFlagEv=0 => -99998,
-																		 ALL(DriversLicenseEvent.Transaction,T20_DlIsKrFlag=-99997) => -99997,
+																		 ALL(rDriversLicense.DriversLicenseEvent.Transaction,T20_DlIsKrFlag=-99997) => -99997,
 																		 INTEGER(rDriversLicense.AotDlKrActNewDtEv));
 Event: => P20_AotDlKrActShrdOldDtEv := MAP(T20_DlPopFlag=0 => -99999,
 																		 T_SrcClassType <2 OR P20_AotDlKrActShrdFlagEv=0 => -99998,
-																		 ALL(DriversLicenseEvent.Transaction,T20_DlIsKrFlag=-99997) => -99997,
+																		 ALL(rDriversLicense.DriversLicenseEvent.Transaction,T20_DlIsKrFlag=-99997) => -99997,
 																		 INTEGER(rDriversLicense.AotDlKrActShrdOldDtEv));
 Event: => P20_AotDlKrActShrdNewDtEv := MAP(T20_DlPopFlag=0 => -99999,
 																		 T_SrcClassType <2 OR P20_AotDlKrActShrdFlagEv=0 => -99998,
-																		 ALL(DriversLicenseEvent.Transaction,T20_DlIsKrFlag=-99997) => -99997,
+																		 ALL(rDriversLicense.DriversLicenseEvent.Transaction,T20_DlIsKrFlag=-99997) => -99997,
 																		 INTEGER(rDriversLicense.AotDlKrActShrdNewDtEv));
 
 //Safe List Attrs
@@ -2528,7 +2528,7 @@ Event: => T18_IpAddrIsSafeFlag := MAP(T18_IpAddrPopFlag=0 => -99999,
 //AOT addr Safe Attrs
 Event: => P9_AotAddrSafeActCntEv := MAP(T9_AddrPopFlag=0 => -99999,
 																				T_SrcClassType <2 => -99998,
-																				ALL(AddressEvent.Transaction,T9_AddrIsSafeFlag=-99997) => -99997,
+																				ALL(Location.AddressEvent.Transaction,T9_AddrIsSafeFlag=-99997) => -99997,
 																				Location.AotAddrSafeActCntEv);
 Event: => P9_AotAddrSafeActFlagEv := MAP(T9_AddrPopFlag=0 => -99999,
 																				T_SrcClassType <2 => -99998,
@@ -2536,16 +2536,16 @@ Event: => P9_AotAddrSafeActFlagEv := MAP(T9_AddrPopFlag=0 => -99999,
 																				P9_AotAddrSafeActCntEv > 0 => 1, 0);
 Event: => P9_AotAddrSafeActOldDtEv := MAP(T9_AddrPopFlag=0 => -99999,
 																				T_SrcClassType <2 OR P9_AotAddrSafeActFlagEv=0 => -99998,
-																				ALL(AddressEvent.Transaction,T9_AddrIsSafeFlag=-99997) => -99997,
+																				ALL(Location.AddressEvent.Transaction,T9_AddrIsSafeFlag=-99997) => -99997,
 																				INTEGER(Location.AotAddrSafeActOldDtEv));
 Event: => P9_AotAddrSafeActNewDtEv := MAP(T9_AddrPopFlag=0 => -99999,
 																				T_SrcClassType <2 OR P9_AotAddrSafeActFlagEv=0 => -99998,
-																				ALL(AddressEvent.Transaction,T9_AddrIsSafeFlag=-99997) => -99997,
+																				ALL(Location.AddressEvent.Transaction,T9_AddrIsSafeFlag=-99997) => -99997,
 																				INTEGER(Location.AotAddrSafeActNewDtEv));
 //AOT Phone Safe Attrs
 Event: => P16_AotPhnSafeActCntEv := MAP(T16_PhnPopFlag=0 => -99999,
 																				T_SrcClassType <2 => -99998,
-																				ALL(PhoneEvent.Transaction,T16_PhnIsSafeFlag=-99997) => -99997,
+																				ALL(rPhone.PhoneEvent.Transaction,T16_PhnIsSafeFlag=-99997) => -99997,
 																				rPhone.AotPhnSafeActCntEv);
 Event: => P16_AotPhnSafeActFlagEv := MAP(T16_PhnPopFlag=0 => -99999,
 																				T_SrcClassType <2 => -99998,
@@ -2553,16 +2553,16 @@ Event: => P16_AotPhnSafeActFlagEv := MAP(T16_PhnPopFlag=0 => -99999,
 																				P16_AotPhnSafeActCntEv>0 => 1, 0);
 Event: => P16_AotPhnSafeActOldDtEv := MAP(T16_PhnPopFlag=0 => -99999,
 																				T_SrcClassType <2 OR P16_AotPhnSafeActFlagEv=0 => -99998,
-																				ALL(PhoneEvent.Transaction,T16_PhnIsSafeFlag=-99997) => -99997,
+																				ALL(rPhone.PhoneEvent.Transaction,T16_PhnIsSafeFlag=-99997) => -99997,
 																				INTEGER(rPhone.AotPhnSafeActOldDtEv));
 Event: => P16_AotPhnSafeActNewDtEv := MAP(T16_PhnPopFlag=0 => -99999,
 																				T_SrcClassType <2 OR P16_AotPhnSafeActFlagEv=0 => -99998,
-																				ALL(PhoneEvent.Transaction,T16_PhnIsSafeFlag=-99997) => -99997,
+																				ALL(rPhone.PhoneEvent.Transaction,T16_PhnIsSafeFlag=-99997) => -99997,
 																				INTEGER(rPhone.AotPhnSafeActNewDtEv));								
 //AOT IP Addr Safe Attrs
 Event: => P18_AotIpAddrSafeActCntEv := MAP(T18_IpAddrPopFlag=0 => -99999,
 																					 T_SrcClassType <2 => -99998,
-																					 ALL(InternetProtocolEvent.Transaction,T18_IpAddrIsSafeFlag=-99997) => -99997,
+																					 ALL(rInternetProtocol.InternetProtocolEvent.Transaction,T18_IpAddrIsSafeFlag=-99997) => -99997,
 																					 rInternetProtocol.AotIpAddrSafeActCntEv);
 Event: => P18_AotIpAddrSafeActFlagEv := MAP(T18_IpAddrPopFlag=0 => -99999,
 																					 T_SrcClassType <2 => -99998,
@@ -2570,11 +2570,11 @@ Event: => P18_AotIpAddrSafeActFlagEv := MAP(T18_IpAddrPopFlag=0 => -99999,
 																					 P18_AotIpAddrSafeActCntEv>0 => 1, 0);
 Event: => P18_AotIpAddrSafeActOldDtEv := MAP(T18_IpAddrPopFlag=0 => -99999,
 																					 T_SrcClassType <2 OR P18_AotIpAddrSafeActFlagEv=0  => -99998,
-																					 ALL(InternetProtocolEvent.Transaction,T18_IpAddrIsSafeFlag=-99997) => -99997,
+																					 ALL(rInternetProtocol.InternetProtocolEvent.Transaction,T18_IpAddrIsSafeFlag=-99997) => -99997,
 																					 INTEGER(rInternetProtocol.AotIpAddrSafeActOldDtEv));
 Event: => P18_AotIpAddrSafeActNewDtEv := MAP(T18_IpAddrPopFlag=0 => -99999,
 																					 T_SrcClassType <2 OR P18_AotIpAddrSafeActFlagEv=0  => -99998,
-																					 ALL(InternetProtocolEvent.Transaction,T18_IpAddrIsSafeFlag=-99997) => -99997,
+																					 ALL(rInternetProtocol.InternetProtocolEvent.Transaction,T18_IpAddrIsSafeFlag=-99997) => -99997,
 																					 INTEGER(rInternetProtocol.AotIpAddrSafeActNewDtEv));
 
 //Identity Risk Attributes
@@ -3175,87 +3175,87 @@ Event: => P20_AotDlNewKrAftNonStActCntEv := MAP(T20_DlPopFlag=0 =>  -99999,
 																								rDriversLicense.AotDlNewKrAftNonStActCntEv);
 Event: => P9_AotIdCurrProfUsngAddrCntEv := MAP(T9_AddrPopFlag=0 => -99999,
                                                T_SrcClassType < 2 => -99998,
-																							 ALL(AddressEvent.Transaction,P1_AotIdCurrProfFlag < 0) => -99997,
+																							 ALL(Location.AddressEvent.Transaction,P1_AotIdCurrProfFlag < 0) => -99997,
 																							 Location.AotIdCurrProfUsngAddrCntEv);
 Event: => P15_AotIdCurrProfUsngSsnCntEv := MAP(T15_SsnPopFlag=0 => -99999,
                                                T_SrcClassType < 2 => -99998,
-																							 ALL(SsnEvent.Transaction,P1_AotIdCurrProfFlag < 0) => -99997,
+																							 ALL(rSsn.SsnEvent.Transaction,P1_AotIdCurrProfFlag < 0) => -99997,
 																							 rSsn.AotIdCurrProfUsngSsnCntEv);
 Event: => P16_AotIdCurrProfUsngPhnCntEv := MAP(T16_PhnPopFlag=0 => -99999,
                                                T_SrcClassType < 2 => -99998,
-																							 ALL(PhoneEvent.Transaction,P1_AotIdCurrProfFlag < 0) => -99997,
+																							 ALL(rPhone.PhoneEvent.Transaction,P1_AotIdCurrProfFlag < 0) => -99997,
 																							 rPhone.AotIdCurrProfUsngPhnCntEv);
 Event: => P17_AotIdCurrProfUsngEmlCntEv := MAP(T17_EmailPopFlag=0 => -99999,
                                                T_SrcClassType < 2 => -99998,
-																							 ALL(EmailEvent.Transaction,P1_AotIdCurrProfFlag < 0) => -99997,
+																							 ALL(rEmail.EmailEvent.Transaction,P1_AotIdCurrProfFlag < 0) => -99997,
 																							 rEmail.AotIdCurrProfUsngEmlCntEv);
 Event: => P18_AotIdCurrProfUsngIpCntEv := MAP(T18_IpAddrPopFlag=0 => -99999,
                                               T_SrcClassType < 2 => -99998,
-																							ALL(InternetProtocolEvent.Transaction,P1_AotIdCurrProfFlag < 0) => -99997,
+																							ALL(rInternetProtocol.InternetProtocolEvent.Transaction,P1_AotIdCurrProfFlag < 0) => -99997,
 																							rInternetProtocol.AotIdCurrProfUsngIpCntEv);
 Event: => P19_AotIdCurrProfUsngBkAcCntEv := MAP(T19_BnkAcctPopFlag=0 => -99999,
                                                 T_SrcClassType < 2 => -99998,
-																								ALL(BankAccountEvent.Transaction,P1_AotIdCurrProfFlag < 0) => -99997,
+																								ALL(rBankAccount.BankAccountEvent.Transaction,P1_AotIdCurrProfFlag < 0) => -99997,
 																								rBankAccount.AotIdCurrProfUsngBkAcCntEv);
 Event: => P20_AotIdCurrProfUsngDlCntEv := MAP(T20_DlPopFlag=0 => -99999,
                                               T_SrcClassType < 2 => -99998,
-																							ALL(DriversLicenseEvent.Transaction,P1_AotIdCurrProfFlag < 0) => -99997,
+																							ALL(rDriversLicense.DriversLicenseEvent.Transaction,P1_AotIdCurrProfFlag < 0) => -99997,
 																							rDriversLicense.AotIdCurrProfUsngDlCntEv);
 Event: => P9_AotIdHistProfUsngAddrCntEv := MAP(T9_AddrPopFlag=0 => -99999,
                                                T_SrcClassType < 2 => -99998,
-																							 ALL(AddressEvent.Transaction,P1_AotIdCurrProfFlag < 0)  => -99997,
+																							 ALL(Location.AddressEvent.Transaction,P1_AotIdCurrProfFlag < 0)  => -99997,
 																							 Location.AotIdHistProfUsngAddrCntEv);
 Event: => P15_AotIdHistProfUsngSsnCntEv := MAP(T15_SsnPopFlag=0 => -99999,
                                                T_SrcClassType < 2 => -99998,
-																							 ALL(SsnEvent.Transaction,P1_AotIdCurrProfFlag < 0) => -99997,
+																							 ALL(rSsn.SsnEvent.Transaction,P1_AotIdCurrProfFlag < 0) => -99997,
 																							 rSsn.AotIdHistProfUsngSsnCntEv);
 Event: => P16_AotIdHistProfUsngPhnCntEv := MAP(T16_PhnPopFlag=0 => -99999,
                                                T_SrcClassType < 2 => -99998,
-																							 ALL(PhoneEvent.Transaction,P1_AotIdCurrProfFlag < 0) => -99997,
+																							 ALL(rPhone.PhoneEvent.Transaction,P1_AotIdCurrProfFlag < 0) => -99997,
 																							 rPhone.AotIdHistProfUsngPhnCntEv);
 Event: => P17_AotIdHistProfUsngEmlCntEv := MAP(T17_EmailPopFlag=0 => -99999,
                                                T_SrcClassType < 2 => -99998,
-																							 ALL(EmailEvent.Transaction,P1_AotIdCurrProfFlag < 0) => -99997,
+																							 ALL(rEmail.EmailEvent.Transaction,P1_AotIdCurrProfFlag < 0) => -99997,
 																							 rEmail.AotIdHistProfUsngEmlCntEv);
 Event: => P18_AotIdHistProfUsngIpCntEv := MAP(T18_IpAddrPopFlag=0 => -99999,
                                               T_SrcClassType < 2 => -99998,
-																							ALL(InternetProtocolEvent.Transaction,P1_AotIdCurrProfFlag < 0) => -99997,
+																							ALL(rInternetProtocol.InternetProtocolEvent.Transaction,P1_AotIdCurrProfFlag < 0) => -99997,
 																							rInternetProtocol.AotIdHistProfUsngIpCntEv);
 Event: => P19_AotIdHistProfUsngBkAcCntEv := MAP(T19_BnkAcctPopFlag=0 => -99999,
                                             T_SrcClassType < 2 => -99998,
-																						ALL(BankAccountEvent.Transaction,P1_AotIdCurrProfFlag < 0) => -99997,
+																						ALL(rBankAccount.BankAccountEvent.Transaction,P1_AotIdCurrProfFlag < 0) => -99997,
 																						rBankAccount.AotIdHistProfUsngBkAcCntEv);
 Event: => P20_AotIdHistProfUsngDlCntEv := MAP(T20_DlPopFlag=0 => -99999,
                                               T_SrcClassType < 2 => -99998,
-																							ALL(DriversLicenseEvent.Transaction,P1_AotIdCurrProfFlag < 0) => -99997,
+																							ALL(rDriversLicense.DriversLicenseEvent.Transaction,P1_AotIdCurrProfFlag < 0) => -99997,
 																							rDriversLicense.AotIdHistProfUsngDlCntEv);
 Event: => P9_AotIdUsngAddrCntEv := MAP(T9_AddrPopFlag=0 => -99999,
                                        T_SrcClassType < 2 => -99998,
-																			 ALL(AddressEvent.Transaction,P1_AotIdCurrProfFlag < 0) => -99997,
+																			 ALL(Location.AddressEvent.Transaction,P1_AotIdCurrProfFlag < 0) => -99997,
 																			 Location.AotIdUsngAddrCntEv);
 Event: => P15_AotIdUsngSsnCntEv := MAP(T15_SsnPopFlag=0 => -99999,
                                        T_SrcClassType < 2 => -99998,
-																			 ALL(SsnEvent.Transaction,P1_AotIdCurrProfFlag < 0) => -99997,
+																			 ALL(rSsn.SsnEvent.Transaction,P1_AotIdCurrProfFlag < 0) => -99997,
 																			 rSsn.AotIdUsngSsnCntEv);
 Event: => P16_AotIdUsngPhnCntEv := MAP(T16_PhnPopFlag=0 => -99999,
                                        T_SrcClassType < 2 => -99998,
-																			 ALL(PhoneEvent.Transaction,P1_AotIdCurrProfFlag < 0) => -99997,
+																			 ALL(rPhone.PhoneEvent.Transaction,P1_AotIdCurrProfFlag < 0) => -99997,
 																			 rPhone.AotIdUsngPhnCntEv);
 Event: => P17_AotIdUsngEmailCntEv := MAP(T17_EmailPopFlag=0 => -99999,
                                          T_SrcClassType < 2 => -99998,
-																				 ALL(EmailEvent.Transaction,P1_AotIdCurrProfFlag < 0) => -99997,
+																				 ALL(rEmail.EmailEvent.Transaction,P1_AotIdCurrProfFlag < 0) => -99997,
 																				 rEmail.AotIdUsngEmailCntEv);
 Event: => P18_AotIdUsngIpAddrCntEv := MAP(T18_IpAddrPopFlag=0 => -99999,
                                           T_SrcClassType < 2 => -99998,
-																					ALL(InternetProtocolEvent.Transaction,P1_AotIdCurrProfFlag < 0) => -99997,
+																					ALL(rInternetProtocol.InternetProtocolEvent.Transaction,P1_AotIdCurrProfFlag < 0) => -99997,
 																					rInternetProtocol.AotIdUsngIpAddrCntEv);
 Event: => P19_AotIdUsngBnkAcctCntEv := MAP(T19_BnkAcctPopFlag=0 => -99999,
                                             T_SrcClassType < 2 => -99998,
-																						ALL(BankAccountEvent.Transaction,P1_AotIdCurrProfFlag < 0) => -99997,
+																						ALL(rBankAccount.BankAccountEvent.Transaction,P1_AotIdCurrProfFlag < 0) => -99997,
 																						rBankAccount.AotIdUsingBnkAcctCntEv);
 Event: => P20_AotIdUsngDlCntEv := MAP(T20_DlPopFlag=0 => -99999,
                                       T_SrcClassType < 2 => -99998,
-																			ALL(DriversLicenseEvent.Transaction,P1_AotIdCurrProfFlag < 0) => -99997,
+																			ALL(rDriversLicense.DriversLicenseEvent.Transaction,P1_AotIdCurrProfFlag < 0) => -99997,
 																			rDriversLicense.AotIdUsngDlCntEv);
 // Event: => P9_AotHiIdCurrProfUsngAddrCntEv := MAP(T9_AddrPopFlag=0 => -99999,
                                                  // T_SrcClassType < 2 OR P9_AotIdCurrProfUsngAddrCntEv < 1 => -99998,
@@ -3282,18 +3282,18 @@ Event: => P20_AotIdUsngDlCntEv := MAP(T20_DlPopFlag=0 => -99999,
 //Web NAC Collision Attribues
 Event: => P1_AotIdNacCollActCntEv := MAP(T1_LexIdPopFlag=0 AND T1_RinIdPopFlag=0 => -99999,
                                          T_SrcClassType < 2 => -99998,
-                                         ALL(PersonEvent.Transaction,T_SrcType=-99997) => -99997,
+                                         ALL(Subject.PersonEvent.Transaction,T_SrcType=-99997) => -99997,
 																				 Subject.AotIdNacCollActCntEv);
 Event: => P1_AotIdNacCollFlagEv := MAP(T1_LexIdPopFlag=0 AND T1_RinIdPopFlag=0 => -99999,
                                        T_SrcClassType < 2 => -99998,
-																			 ALL(PersonEvent.Transaction,T_SrcType=-99997)=>-99997,
+																			 ALL(Subject.PersonEvent.Transaction,T_SrcType=-99997)=>-99997,
 																			 P1_AotIdNacCollActCntEv > 0 => 1, 0);
 Event: => P1_AotIdNacCollNewDt := MAP(T1_LexIdPopFlag=0 AND T1_RinIdPopFlag=0 => -99999,
                                       T_SrcClassType < 2 OR P1_AotIdNacCollFlagEv < 1 => -99998,
 																			INTEGER(Subject.SrcType11.T_ActDtEcho));
 Event: => P1_AotIdNacCollNewType := MAP(T1_LexIdPopFlag=0 AND T1_RinIdPopFlag=0 => -99999,
                                         T_SrcClassType < 2 OR P1_AotIdNacCollFlagEv < 1 => -99998,
-																				ALL(PersonEvent.Transaction,T_InpReasonDescEcho=-99999) => -99997,
+																				ALL(Subject.PersonEvent.Transaction,T_InpReasonDescEcho=-99999) => -99997,
 																				Subject.SrcType11.T_InpReasonDescEcho = 'Identity associated with NAC level 1 collision' => 1,
 																				Subject.SrcType11.T_InpReasonDescEcho = 'Identity associated with NAC level 2 collision' => 2);
 
@@ -3426,7 +3426,7 @@ Event: => P20_IDActOldDt := MAP(T20_DlPopFlag=0 => -99999,
 //KR Data Sharing
 Event: => P1_AotIdKrActInAgcyCntEv := MAP(T1_LexIdPopFlag=0 AND T1_RinIdPopFlag=0 => -99999,
                                           T_SrcClassType < 2 => -99998,
-																					ALL(PersonEvent.Transaction,T1_IdIsKrFlag=-99997) => -99997,
+																					ALL(Subject.PersonEvent.Transaction,T1_IdIsKrFlag=-99997) => -99997,
 																					COUNT(Subject.PersonEvent.Transaction(T1_IdIsKrFlag=1 AND T_InAgencyFlag=1)));
 Event: => P1_AotIdKrActInAgcyFlagEv := MAP(T1_LexIdPopFlag=0 AND T1_RinIdPopFlag=0 => -99999,
                                            T_SrcClassType < 2 => -99998,
@@ -3434,15 +3434,15 @@ Event: => P1_AotIdKrActInAgcyFlagEv := MAP(T1_LexIdPopFlag=0 AND T1_RinIdPopFlag
 																					 P1_AotIdKrActInAgcyCntEv>0 => 1, 0);
 Event: => P1_AotIdKrActInAgcyOldDtEv := MAP(T1_LexIdPopFlag=0 AND T1_RinIdPopFlag=0 => -99999,
                                             T_SrcClassType <2 OR P1_AotIdKrActInAgcyFlagEv=0 => -99998,
-																						ALL(PersonEvent.Transaction,T1_IdIsKrFlag=-99997) => -99997,
+																						ALL(Subject.PersonEvent.Transaction,T1_IdIsKrFlag=-99997) => -99997,
 																						MIN(Subject.PersonEvent.Transaction(T1_IdIsKrFlag=1 AND T_InAgencyFlag=1),INTEGER(T_ActDtEcho)));
 Event: => P1_AotIdKrActInAgcyNewDtEv := MAP(T1_LexIdPopFlag=0 AND T1_RinIdPopFlag=0 => -99999,
                                             T_SrcClassType <2 OR P1_AotIdKrActInAgcyFlagEv=0 => -99998,
-																						ALL(PersonEvent.Transaction,T1_IdIsKrFlag=-99997) => -99997,
+																						ALL(Subject.PersonEvent.Transaction,T1_IdIsKrFlag=-99997) => -99997,
 																						MAX(Subject.PersonEvent.Transaction(T1_IdIsKrFlag=1 AND T_InAgencyFlag=1),INTEGER(T_ActDtEcho)));
 Event: => P1_AotIdKrAppFrdActInAgcyCntEv := MAP(T1_LexIdPopFlag=0 AND T1_RinIdPopFlag=0 => -99999,
                                                 T_SrcClassType <2 => -99998,
-																								ALL(PersonEvent.Transaction,T1_IdIsKrAppFrdFlag=-99997) => -99997,
+																								ALL(Subject.PersonEvent.Transaction,T1_IdIsKrAppFrdFlag=-99997) => -99997,
 																								COUNT(Subject.PersonEvent.Transaction(T1_IdIsKrAppFrdFlag=1 AND T_InAgencyFlag=1)));
 Event: => P1_AotIdKrAppFrdActInAgcyFlagEv := MAP(T1_LexIdPopFlag=0 AND T1_RinIdPopFlag=0 => -99999,
                                                  T_SrcClassType <2 => -99998,
@@ -3450,15 +3450,15 @@ Event: => P1_AotIdKrAppFrdActInAgcyFlagEv := MAP(T1_LexIdPopFlag=0 AND T1_RinIdP
 																								 P1_AotIdKrAppFrdActInAgcyCntEv>0	=> 1, 0);																							
 Event: => P1_AotIdKrAppFrdActInAgcyOldDtEv := MAP(T1_LexIdPopFlag=0 AND T1_RinIdPopFlag=0 => -99999,
                                                   T_SrcClassType <2 OR P1_AotIdKrAppFrdActInAgcyFlagEv=0 => -99998,
-																									ALL(PersonEvent.Transaction,T1_IdIsKrAppFrdFlag=-99997) => -99997,
+																									ALL(Subject.PersonEvent.Transaction,T1_IdIsKrAppFrdFlag=-99997) => -99997,
 																									MIN(Subject.PersonEvent.Transaction(T1_IdIsKrAppFrdFlag=1 AND T_InAgencyFlag=1),INTEGER(T_ActDtEcho)));
 Event: => P1_AotIdKrAppFrdActInAgcyNewDtEv := MAP(T1_LexIdPopFlag=0 AND T1_RinIdPopFlag=0 => -99999,
                                                   T_SrcClassType <2 OR P1_AotIdKrAppFrdActInAgcyFlagEv=0 => -99998,
-																									ALL(PersonEvent.Transaction,T1_IdIsKrAppFrdFlag=-99997) => -99997,
+																									ALL(Subject.PersonEvent.Transaction,T1_IdIsKrAppFrdFlag=-99997) => -99997,
 																									MAX(Subject.PersonEvent.Transaction(T1_IdIsKrAppFrdFlag=1 AND T_InAgencyFlag=1),INTEGER(T_ActDtEcho)));
 Event: => P1_AotIdKrGenFrdActInAgcyCntEv := MAP(T1_LexIdPopFlag=0 AND T1_RinIdPopFlag=0 => -99999,
                                                 T_SrcClassType <2 => -99998,
-																								ALL(PersonEvent.Transaction,T1_IdIsKrGenFrdFlag=-99997) => -99997,
+																								ALL(Subject.PersonEvent.Transaction,T1_IdIsKrGenFrdFlag=-99997) => -99997,
 																								COUNT(Subject.PersonEvent.Transaction(T1_IdIsKrGenFrdFlag=1 AND T_InAgencyFlag=1)));
 Event: => P1_AotIdKrGenFrdActInAgcyFlagEv := MAP(T1_LexIdPopFlag=0 AND T1_RinIdPopFlag=0 => -99999,
                                                  T_SrcClassType <2 => -99998,
@@ -3466,15 +3466,15 @@ Event: => P1_AotIdKrGenFrdActInAgcyFlagEv := MAP(T1_LexIdPopFlag=0 AND T1_RinIdP
 																								 P1_AotIdKrGenFrdActInAgcyCntEv>0 => 1, 0);
 Event: => P1_AotIdKrGenFrdActInAgcyOldDtEv := MAP(T1_LexIdPopFlag=0 AND T1_RinIdPopFlag=0 => -99999,
                                                   T_SrcClassType <2 OR P1_AotIdKrGenFrdActInAgcyFlagEv=0 => -99998,
-																									ALL(PersonEvent.Transaction,T1_IdIsKrGenFrdFlag=-99997) => -99997,
+																									ALL(Subject.PersonEvent.Transaction,T1_IdIsKrGenFrdFlag=-99997) => -99997,
 																									MIN(Subject.PersonEvent.Transaction(T1_IdIsKrGenFrdFlag=1 AND T_InAgencyFlag=1),INTEGER(T_ActDtEcho)));
 Event: => P1_AotIdKrGenFrdActInAgcyNewDtEv := MAP(T1_LexIdPopFlag=0 AND T1_RinIdPopFlag=0 => -99999,
                                                   T_SrcClassType <2 OR P1_AotIdKrGenFrdActInAgcyFlagEv=0 => -99998,
-																									ALL(PersonEvent.Transaction,T1_IdIsKrGenFrdFlag=-99997) => -99997,
+																									ALL(Subject.PersonEvent.Transaction,T1_IdIsKrGenFrdFlag=-99997) => -99997,
 																									MAX(Subject.PersonEvent.Transaction(T1_IdIsKrGenFrdFlag=1 AND T_InAgencyFlag=1),INTEGER(T_ActDtEcho)));
 Event: => P1_AotIdKrOthFrdActInAgcyCntEv := MAP(T1_LexIdPopFlag=0 AND T1_RinIdPopFlag=0 => -99999,
                                                 T_SrcClassType <2 => -99998,
-																								ALL(PersonEvent.Transaction,T1_IdIsKrOthFrdFlag=-99997) => -99997,
+																								ALL(Subject.PersonEvent.Transaction,T1_IdIsKrOthFrdFlag=-99997) => -99997,
 																								COUNT(Subject.PersonEvent.Transaction(T1_IdIsKrOthFrdFlag=1 AND T_InAgencyFlag=1)));
 Event: => P1_AotIdKrOthFrdActInAgcyFlagEv := MAP(T1_LexIdPopFlag=0 AND T1_RinIdPopFlag=0 => -99999,
                                                  T_SrcClassType <2 => -99998,
@@ -3482,15 +3482,15 @@ Event: => P1_AotIdKrOthFrdActInAgcyFlagEv := MAP(T1_LexIdPopFlag=0 AND T1_RinIdP
 																								 P1_AotIdKrOthFrdActInAgcyCntEv>0 => 1, 0);
 Event: => P1_AotIdKrOthFrdActInAgcyOldDtEv := MAP(T1_LexIdPopFlag=0 AND T1_RinIdPopFlag=0 => -99999,
                                                   T_SrcClassType <2 OR P1_AotIdKrOthFrdActInAgcyFlagEv=0 => -99998,
-																									ALL(PersonEvent.Transaction,T1_IdIsKrOthFrdFlag=-99997) => -99997,
+																									ALL(Subject.PersonEvent.Transaction,T1_IdIsKrOthFrdFlag=-99997) => -99997,
 																									MIN(Subject.PersonEvent.Transaction(T1_IdIsKrOthFrdFlag=1 AND T_InAgencyFlag=1),INTEGER(T_ActDtEcho)));
 Event: => P1_AotIdKrOthFrdActInAgcyNewDtEv := MAP(T1_LexIdPopFlag=0 AND T1_RinIdPopFlag=0 => -99999,
                                                   T_SrcClassType <2 OR P1_AotIdKrOthFrdActInAgcyFlagEv=0 => -99998,
-																									ALL(PersonEvent.Transaction,T1_IdIsKrOthFrdFlag=-99997) => -99997,
+																									ALL(Subject.PersonEvent.Transaction,T1_IdIsKrOthFrdFlag=-99997) => -99997,
 																									MAX(Subject.PersonEvent.Transaction(T1_IdIsKrOthFrdFlag=1 AND T_InAgencyFlag=1),INTEGER(T_ActDtEcho)));
 Event: => P1_AotIdKrStolIdActInAgcyCntEv := MAP(T1_LexIdPopFlag=0 AND T1_RinIdPopFlag=0 => -99999,
                                                 T_SrcClassType <2 => -99998,
-																								ALL(PersonEvent.Transaction,T1_IdIsKrStolIdFlag=-99997) => -99997,
+																								ALL(Subject.PersonEvent.Transaction,T1_IdIsKrStolIdFlag=-99997) => -99997,
 																								COUNT(Subject.PersonEvent.Transaction(T1_IdIsKrStolIdFlag=1 AND T_InAgencyFlag=1)));
 Event: => P1_AotIdKrStolIdActInAgcyFlagEv := MAP(T1_LexIdPopFlag=0 AND T1_RinIdPopFlag=0 => -99999,
                                                  T_SrcClassType <2 => -99998,
@@ -3498,15 +3498,15 @@ Event: => P1_AotIdKrStolIdActInAgcyFlagEv := MAP(T1_LexIdPopFlag=0 AND T1_RinIdP
 																								 P1_AotIdKrStolIdActInAgcyCntEv>0	=> 1, 0);
 Event: => P1_AotIdKrStolIdActInAgcyOldDtEv := MAP(T1_LexIdPopFlag=0 AND T1_RinIdPopFlag=0 => -99999,
                                                   T_SrcClassType <2 OR P1_AotIdKrStolIdActInAgcyFlagEv=0 => -99998,
-																									ALL(PersonEvent.Transaction,T1_IdIsKrStolIdFlag=-99997) => -99997,
+																									ALL(Subject.PersonEvent.Transaction,T1_IdIsKrStolIdFlag=-99997) => -99997,
 																									MIN(Subject.PersonEvent.Transaction(T1_IdIsKrStolIdFlag=1 AND T_InAgencyFlag=1),INTEGER(T_ActDtEcho)));
 Event: => P1_AotIdKrStolIdActInAgcyNewDtEv := MAP(T1_LexIdPopFlag=0 AND T1_RinIdPopFlag=0 => -99999,
                                                   T_SrcClassType <2 OR P1_AotIdKrStolIdActInAgcyFlagEv=0 => -99998,
-																									ALL(PersonEvent.Transaction,T1_IdIsKrStolIdFlag=-99997) => -99997,
+																									ALL(Subject.PersonEvent.Transaction,T1_IdIsKrStolIdFlag=-99997) => -99997,
 																									MAX(Subject.PersonEvent.Transaction(T1_IdIsKrStolIdFlag=1 AND T_InAgencyFlag=1),INTEGER(T_ActDtEcho)));
 Event: => P9_AotAddrKrActInAgcyCntEv := MAP(T9_AddrPopFlag=0 => -99999,
                                             T_SrcClassType <2 => -99998,
-																						ALL(AddressEvent.Transaction,T9_AddrIsKrFlag=-99997) => -99997,
+																						ALL(Location.AddressEvent.Transaction,T9_AddrIsKrFlag=-99997) => -99997,
 																						COUNT(Location.AddressEvent.Transaction(T9_AddrIsKrFlag=1 AND T_InAgencyFlag=1)));
 Event: => P9_AotAddrKrActInAgcyFlagEv := MAP(T9_AddrPopFlag=0 => -99999,
                                              T_SrcClassType<2 => -99998,
@@ -3514,15 +3514,15 @@ Event: => P9_AotAddrKrActInAgcyFlagEv := MAP(T9_AddrPopFlag=0 => -99999,
 																						 P9_AotAddrKrActInAgcyCntEv>0 => 1, 0);
 Event: => P9_AoTAddrKRActInAgcyOldDtEv := MAP(T9_AddrPopFlag=0 => -99999,
                                               T_SrcClassType <2 OR P9_AotAddrKrActInAgcyFlagEv=0 => -99998,
-																							ALL(AddressEvent.Transaction,T9_AddrIsKrFlag=-99997) => -99997,
+																							ALL(Location.AddressEvent.Transaction,T9_AddrIsKrFlag=-99997) => -99997,
 																							MIN(Location.AddressEvent.Transaction(T9_AddrIsKrFlag=1 AND T_InAgencyFlag=1),INTEGER(T_ActDtEcho)));
 Event: => P9_AoTAddrKRActInAgcyNewDtEv := MAP(T9_AddrPopFlag=0 => -99999,
                                               T_SrcClassType <2 OR P9_AotAddrKrActInAgcyFlagEv=0 => -99998,
-																							ALL(AddressEvent.Transaction,T9_AddrIsKrFlag=-99997) => -99997,
+																							ALL(Location.AddressEvent.Transaction,T9_AddrIsKrFlag=-99997) => -99997,
 																							MAX(Location.AddressEvent.Transaction(T9_AddrIsKrFlag=1 AND T_InAgencyFlag=1),INTEGER(T_ActDtEcho)));
 Event: => P15_AotSsnKrActInAgcyCntEv := MAP(T15_SsnPopFlag=0 => -99999,
                                             T_SrcClassType <2 => -99998,
-																						ALL(SsnEvent.Transaction,T15_SsnIsKrFlag=-99997) => -99997,
+																						ALL(rSsn.SsnEvent.Transaction,T15_SsnIsKrFlag=-99997) => -99997,
 																						COUNT(rSsn.SsnEvent.Transaction(T15_SsnIsKrFlag=1 AND T_InAgencyFlag=1)));
 Event: => P15_AotSsnKrActInAgcyFlagEv := MAP(T15_SsnPopFlag=0 => -99999,
                                              T_SrcClassType<2 => -99998,
@@ -3530,15 +3530,15 @@ Event: => P15_AotSsnKrActInAgcyFlagEv := MAP(T15_SsnPopFlag=0 => -99999,
 																						 P15_AotSsnKrActInAgcyCntEv>0 => 1, 0);
 Event: => P15_AotSsnKrActInAgcyOldDtEv := MAP(T15_SsnPopFlag=0 => -99999,
                                               T_SrcClassType <2 OR P15_AotSsnKrActInAgcyFlagEv=0 => -99998,
-																							ALL(SsnEvent.Transaction,T15_SsnIsKrFlag=-99997) => -99997,
+																							ALL(rSsn.SsnEvent.Transaction,T15_SsnIsKrFlag=-99997) => -99997,
 																							MIN(rSsn.SsnEvent.Transaction(T15_SsnIsKrFlag=1 AND T_InAgencyFlag=1),INTEGER(T_ActDtEcho)));
 Event: => P15_AotSsnKrActInAgcyNewDtEv := MAP(T15_SsnPopFlag=0 => -99999,
                                               T_SrcClassType <2 OR P15_AotSsnKrActInAgcyFlagEv=0 => -99998,
-																							ALL(SsnEvent.Transaction,T15_SsnIsKrFlag=-99997) => -99997,
+																							ALL(rSsn.SsnEvent.Transaction,T15_SsnIsKrFlag=-99997) => -99997,
 																							MAX(rSsn.SsnEvent.Transaction(T15_SsnIsKrFlag=1 AND T_InAgencyFlag=1),INTEGER(T_ActDtEcho)));
 Event: => P16_AotPhnKrActInAgcyCntEv := MAP(T16_PhnPopFlag=0 => -99999,
                                             T_SrcClassType <2 => -99998,
-																						ALL(PhoneEvent.Transaction,T16_PhnIsKrFlag=-99997) => -99997,
+																						ALL(rPhone.PhoneEvent.Transaction,T16_PhnIsKrFlag=-99997) => -99997,
 																						COUNT(rPhone.PhoneEvent.Transaction(T16_PhnIsKrFlag=1 AND T_InAgencyFlag=1)));
 Event: => P16_AotPhnKrActInAgcyFlagEv := MAP(T16_PhnPopFlag=0 => -99999,
                                              T_SrcClassType<2 => -99998,
@@ -3546,15 +3546,15 @@ Event: => P16_AotPhnKrActInAgcyFlagEv := MAP(T16_PhnPopFlag=0 => -99999,
 																						 P16_AotPhnKrActInAgcyCntEv>0 => 1, 0);
 Event: => P16_AotPhnKrActInAgcyOldDtEv := MAP(T16_PhnPopFlag=0 => -99999,
                                               T_SrcClassType <2 OR P16_AotPhnKrActInAgcyFlagEv=0 => -99998,
-																							ALL(PhoneEvent.Transaction,T16_PhnIsKrFlag=-99997) => -99997,
+																							ALL(rPhone.PhoneEvent.Transaction,T16_PhnIsKrFlag=-99997) => -99997,
 																							MIN(rPhone.PhoneEvent.Transaction(T16_PhnIsKrFlag=1 AND T_InAgencyFlag=1),INTEGER(T_ActDtEcho)));
 Event: => P16_AoTPhnKRActInAgcyNewDtEv := MAP(T16_PhnPopFlag=0 => -99999,
                                               T_SrcClassType <2 OR P16_AotPhnKrActInAgcyFlagEv=0 => -99998,
-																							ALL(PhoneEvent.Transaction,T16_PhnIsKrFlag=-99997) => -99997,
+																							ALL(rPhone.PhoneEvent.Transaction,T16_PhnIsKrFlag=-99997) => -99997,
 																							MAX(rPhone.PhoneEvent.Transaction(T16_PhnIsKrFlag=1 AND T_InAgencyFlag=1),INTEGER(T_ActDtEcho)));
 Event: => P17_AotEmailKrActInAgcyCntEv := MAP(T17_EmailPopFlag=0 => -99999,
                                               T_SrcClassType <2 => -99998,
-																							ALL(EmailEvent.Transaction,T17_EmailIsKrFlag=-99997) =>  -99997,
+																							ALL(rEmail.EmailEvent.Transaction,T17_EmailIsKrFlag=-99997) =>  -99997,
 																							COUNT(rEmail.EmailEvent.Transaction(T17_EmailIsKrFlag=1 AND T_InAgencyFlag=1)));
 Event: => P17_AotEmailKrActInAgcyFlagEv := MAP(T17_EmailPopFlag=0 => -99999,
                                                T_SrcClassType<2 => -99998,
@@ -3562,15 +3562,15 @@ Event: => P17_AotEmailKrActInAgcyFlagEv := MAP(T17_EmailPopFlag=0 => -99999,
 																							 P17_AotEmailKrActInAgcyCntEv>0 => 1, 0);
 Event: => P17_AotEmailKrActInAgcyOldDtEv := MAP(T17_EmailPopFlag=0 => -99999,
                                                 T_SrcClassType <2 OR P17_AotEmailKrActInAgcyFlagEv=0 => -99998,
-																								ALL(EmailEvent.Transaction,T17_EmailIsKrFlag=-99997) => -99997,
+																								ALL(rEmail.EmailEvent.Transaction,T17_EmailIsKrFlag=-99997) => -99997,
 																								MIN(rEmail.EmailEvent.Transaction(T17_EmailIsKrFlag=1 AND T_InAgencyFlag=1),INTEGER(T_ActDtEcho)));
 Event: => P17_AotEmailKrActInAgcyNewDtEv := MAP(T17_EmailPopFlag=0 => -99999,
                                                 T_SrcClassType <2 OR P17_AotEmailKrActInAgcyFlagEv=0 => -99998,
-																								ALL(EmailEvent.Transaction,T17_EmailIsKrFlag=-99997) => -99997,
+																								ALL(rEmail.EmailEvent.Transaction,T17_EmailIsKrFlag=-99997) => -99997,
 																								MAX(rEmail.EmailEvent.Transaction(T17_EmailIsKrFlag=1 AND T_InAgencyFlag=1),INTEGER(T_ActDtEcho)));
 Event: => P18_AotIpAddrKrActInAgcyCntEv := MAP(T18_IpAddrPopFlag=0 => -99999,
                                                T_SrcClassType <2 => -99998,
-																							 ALL(InternetProtocolEvent.Transaction,T18_IpAddrIsKrFlag=-99997) => -99997,
+																							 ALL(rInternetProtocol.InternetProtocolEvent.Transaction,T18_IpAddrIsKrFlag=-99997) => -99997,
 																							 COUNT(rInternetProtocol.InternetProtocolEvent.Transaction(T18_IpAddrIsKrFlag=1 AND T_InAgencyFlag=1)));
 Event: => P18_AotIpAddrKrActInAgcyFlagEv := MAP(T18_IpAddrPopFlag=0 => -99999,
                                                 T_SrcClassType<2 => -99998,
@@ -3578,15 +3578,15 @@ Event: => P18_AotIpAddrKrActInAgcyFlagEv := MAP(T18_IpAddrPopFlag=0 => -99999,
 																								P18_AotIpAddrKrActInAgcyCntEv>0 => 1, 0);
 Event: => P18_AotIpAddrKrActInAgcyOldDtEv := MAP(T18_IpAddrPopFlag=0 => -99999,
                                                  T_SrcClassType <2 OR P18_AotIpAddrKrActInAgcyFlagEv=0 => -99998,
-																								 ALL(InternetProtocolEvent.Transaction,T18_IpAddrIsKrFlag=-99997) => -99997,
+																								 ALL(rInternetProtocol.InternetProtocolEvent.Transaction,T18_IpAddrIsKrFlag=-99997) => -99997,
 																								 MIN(rInternetProtocol.InternetProtocolEvent.Transaction(T18_IpAddrIsKrFlag=1 AND T_InAgencyFlag=1),INTEGER(T_ActDtEcho)));
 Event: => P18_AotIpAddrKrActInAgcyNewDtEv := MAP(T18_IpAddrPopFlag=0 => -99999,
                                                  T_SrcClassType <2 OR P18_AotIpAddrKrActInAgcyFlagEv=0 => -99998,
-																								 ALL(InternetProtocolEvent.Transaction,T18_IpAddrIsKrFlag=-99997) => -99997,
+																								 ALL(rInternetProtocol.InternetProtocolEvent.Transaction,T18_IpAddrIsKrFlag=-99997) => -99997,
 																								 MAX(rInternetProtocol.InternetProtocolEvent.Transaction(T18_IpAddrIsKrFlag=1 AND T_InAgencyFlag=1),INTEGER(T_ActDtEcho)));
 Event: => P19_AotBnkAcctKrActInAgcyCntEv := MAP(T19_BnkAcctPopFlag=0 => -99999,
                                                 T_SrcClassType <2 => -99998,
-																								ALL(BankAccountEvent.Transaction,T19_BnkAcctIsKrFlag=-99997) => -99997,
+																								ALL(rBankAccount.BankAccountEvent.Transaction,T19_BnkAcctIsKrFlag=-99997) => -99997,
 																								COUNT(rBankAccount.BankAccountEvent.Transaction(T19_BnkAcctIsKrFlag=1 AND T_InAgencyFlag=1)));
 Event: => P19_AotBnkAcctKrActInAgcyFlagEv := MAP(T19_BnkAcctPopFlag=0 => -99999,
                                                  T_SrcClassType<2 => -99998,
@@ -3594,15 +3594,15 @@ Event: => P19_AotBnkAcctKrActInAgcyFlagEv := MAP(T19_BnkAcctPopFlag=0 => -99999,
 																								 P19_AotBnkAcctKrActInAgcyCntEv>0 => 1, 0);
 Event: => P19_AotBnkAcctKrActInAgcyOldDtEv := MAP(T19_BnkAcctPopFlag=0 => -99999,
                                                   T_SrcClassType <2 OR P19_AotBnkAcctKrActInAgcyFlagEv=0 => -99998,
-																									ALL(BankAccountEvent.Transaction,T19_BnkAcctIsKrFlag=-99997) => -99997,
+																									ALL(rBankAccount.BankAccountEvent.Transaction,T19_BnkAcctIsKrFlag=-99997) => -99997,
 																									MIN(rBankAccount.BankAccountEvent.Transaction(T19_BnkAcctIsKrFlag=1 AND T_InAgencyFlag=1),INTEGER(T_ActDtEcho)));
 Event: => P19_AotBnkAcctKrActInAgcyNewDtEv := MAP(T19_BnkAcctPopFlag=0 => -99999,
                                                   T_SrcClassType <2 OR P19_AotBnkAcctKrActInAgcyFlagEv=0 => -99998,
-																									ALL(BankAccountEvent.Transaction,T19_BnkAcctIsKrFlag=-99997) => -99997,
+																									ALL(rBankAccount.BankAccountEvent.Transaction,T19_BnkAcctIsKrFlag=-99997) => -99997,
 																									MAX(rBankAccount.BankAccountEvent.Transaction(T19_BnkAcctIsKrFlag=1 AND T_InAgencyFlag=1),INTEGER(T_ActDtEcho)));
 Event: => P20_AotDlKrActInAgcyCntEv := MAP(T20_DlPopFlag=0 => -99999,
                                            T_SrcClassType <2 => -99998,
-																					 ALL(DriversLicenseEvent.Transaction,T20_DlIsKrFlag=-99997) => -99997,
+																					 ALL(rDriversLicense.DriversLicenseEvent.Transaction,T20_DlIsKrFlag=-99997) => -99997,
 																					 COUNT(rDriversLicense.DriversLicenseEvent.Transaction(T20_DlIsKrFlag=1 AND T_InAgencyFlag=1)));
 Event: => P20_AotDlKrActInAgcyFlagEv := MAP(T20_DlPopFlag=0 => -99999,
                                            T_SrcClassType<2 => -99998,
@@ -3610,136 +3610,136 @@ Event: => P20_AotDlKrActInAgcyFlagEv := MAP(T20_DlPopFlag=0 => -99999,
 																					 P20_AotDlKrActInAgcyCntEv>0 => 1, 0);
 Event: => P20_AotDlKrActInAgcyOldDtEv := MAP(T20_DlPopFlag=0 => -99999,
                                              T_SrcClassType <2 OR P20_AotDlKrActInAgcyFlagEv=0 => -99998,
-																						 ALL(DriversLicenseEvent.Transaction,T20_DlIsKrFlag=-99997) => -99997,
+																						 ALL(rDriversLicense.DriversLicenseEvent.Transaction,T20_DlIsKrFlag=-99997) => -99997,
 																						 MIN(rDriversLicense.DriversLicenseEvent.Transaction(T20_DlIsKrFlag=1 AND T_InAgencyFlag=1),INTEGER(T_ActDtEcho)));
 Event: => P20_AotDlKrActInAgcyNewDtEv := MAP(T20_DlPopFlag=0 => -99999,
                                              T_SrcClassType <2 OR P20_AotDlKrActInAgcyFlagEv=0 => -99998,
-																						 ALL(DriversLicenseEvent.Transaction,T20_DlIsKrFlag=-99997) => -99997,
+																						 ALL(rDriversLicense.DriversLicenseEvent.Transaction,T20_DlIsKrFlag=-99997) => -99997,
 																						 MAX(rDriversLicense.DriversLicenseEvent.Transaction(T20_DlIsKrFlag=1 AND T_InAgencyFlag=1),INTEGER(T_ActDtEcho)));
 //KR shared agency attributes
 Event: => InAgengyIdIsKr := Subject.PersonEvent.Transaction(T1_IdIsKrFlag=1 AND T_InAgencyFlag=0){T_ActDtEcho,T_SrcAgencyDesc};
 
 Event: => P1_AotIdKrActShrdSrcAgencyCntEv := MAP(T1_LexIdPopFlag=0 AND T1_RinIdPopFlag=0 => -99999,
                                                            T_SrcClassType < 2 OR P1_AotIdKrActShrdFlagEv < 1 => -99998,
-                                                           ALL(PersonEvent.Transaction,T1_IdIsKrFlag=-99997) => -99997,
+                                                           ALL(Subject.PersonEvent.Transaction,T1_IdIsKrFlag=-99997) => -99997,
                                                            COUNT(InAgengyIdIsKr{T_SrcAgencyDesc}));
 
 Event: => P1_AotIdKrActShrdNewSrcAgencyDescEv := MAP(T1_LexIdPopFlag=0 AND T1_RinIdPopFlag=0 => -99999,
                                                            T_SrcClassType < 2 OR P1_AotIdKrActShrdFlagEv < 1 => -99998,
-                                                           ALL(PersonEvent.Transaction,T1_IdIsKrFlag=-99997) => -99997,
+                                                           ALL(Subject.PersonEvent.Transaction,T1_IdIsKrFlag=-99997) => -99997,
                                                            ONLY(TOPN(InAgengyIdIsKr,1,-T_ActDtEcho)).T_SrcAgencyDesc);
 
 Event: => NotInAgengyIdIsKrGenFrd := Subject.PersonEvent.Transaction(T_InAgencyFlag=0 AND T1_IdIsKrGenFrdFlag=1){T_ActDtEcho,T_SrcAgencyDesc};
                                                      
 Event: => P1_AotIdKrGenFrdActShrdSrcAgencyCntEv := MAP(T1_LexIdPopFlag=0 AND T1_RinIdPopFlag=0 => -99999,
                                                            T_SrcClassType < 2 OR P1_AotIdKrGenFrdActShrdFlagEv < 1 => -99998,
-                                                           ALL(PersonEvent.Transaction,T1_IdIsKrGenFrdFlag=-99997) => -99997,
+                                                           ALL(Subject.PersonEvent.Transaction,T1_IdIsKrGenFrdFlag=-99997) => -99997,
                                                            COUNT(NotInAgengyIdIsKrGenFrd{T_SrcAgencyDesc}));
 
 Event: => P1_AotIdKrGenFrdActShrdNewSrcAgencyDescEv := MAP(T1_LexIdPopFlag=0 AND T1_RinIdPopFlag=0 => -99999,
                                                            T_SrcClassType < 2 OR P1_AotIdKrGenFrdActShrdFlagEv < 1 => -99998,
-																													 ALL(PersonEvent.Transaction,T1_IdIsKrGenFrdFlag=-99997) => -99997,
+																													 ALL(Subject.PersonEvent.Transaction,T1_IdIsKrGenFrdFlag=-99997) => -99997,
                                                            ONLY(TOPN(NotInAgengyIdIsKrGenFrd,1,-T_ActDtEcho)).T_SrcAgencyDesc);
 
 Event: => NotInAgengyIdIsKrStolId := Subject.PersonEvent.Transaction(T_InAgencyFlag=0 AND T1_IdIsKrStolIdFlag=1){T_ActDtEcho,T_SrcAgencyDesc};          
 Event: => P1_AotIdKrStolIdActShrdSrcAgencyCntEv := MAP(T1_LexIdPopFlag=0 AND T1_RinIdPopFlag=0 => -99999,
                                                            T_SrcClassType < 2 OR P1_AotIdKrStolIdActShrdFlagEv < 1 => -99998,
-                                                           ALL(PersonEvent.Transaction,T1_IdIsKrStolIdFlag=-99997) => -99997,
+                                                           ALL(Subject.PersonEvent.Transaction,T1_IdIsKrStolIdFlag=-99997) => -99997,
                                                            COUNT(NotInAgengyIdIsKrStolId{T_SrcAgencyDesc}));
 Event: => P1_AotIdKrStolIdActShrdNewSrcAgencyDescEv := MAP(T1_LexIdPopFlag=0 AND T1_RinIdPopFlag=0 => -99999,
                                                            T_SrcClassType < 2 OR P1_AotIdKrStolIdActShrdFlagEv < 1 => -99998,
-																													 ALL(PersonEvent.Transaction,T1_IdIsKrStolIdFlag=-99997) => -99997,
+																													 ALL(Subject.PersonEvent.Transaction,T1_IdIsKrStolIdFlag=-99997) => -99997,
                                                            ONLY(TOPN(NotInAgengyIdIsKrStolId,1,-T_ActDtEcho)).T_SrcAgencyDesc);
                                                           
 Event: => NotInAgengyIdIsKrAppFrdFlag := Subject.PersonEvent.Transaction(T_InAgencyFlag=0 AND T1_IdIsKrAppFrdFlag=1){T_ActDtEcho,T_SrcAgencyDesc};          
 Event: => P1_AotIdKrAppFrdActShrdSrcAgencyCntEv := MAP(T1_LexIdPopFlag=0 AND T1_RinIdPopFlag=0 => -99999,
                                                            T_SrcClassType < 2 OR P1_AotIdKrAppFrdActShrdFlagEv < 1 => -99998,
-                                                           ALL(PersonEvent.Transaction,T1_IdIsKrAppFrdFlag=-99997) => -99997,
+                                                           ALL(Subject.PersonEvent.Transaction,T1_IdIsKrAppFrdFlag=-99997) => -99997,
                                                            COUNT(NotInAgengyIdIsKrAppFrdFlag{T_SrcAgencyDesc}));
 Event: => P1_AotIdKrAppFrdActShrdNewSrcAgencyDescEv := MAP(T1_LexIdPopFlag=0 AND T1_RinIdPopFlag=0 => -99999,
                                                            T_SrcClassType < 2 OR P1_AotIdKrAppFrdActShrdFlagEv < 1 => -99998,
-																													 ALL(PersonEvent.Transaction,T1_IdIsKrAppFrdFlag=-99997) => -99997,
+																													 ALL(Subject.PersonEvent.Transaction,T1_IdIsKrAppFrdFlag=-99997) => -99997,
                                                            ONLY(TOPN(NotInAgengyIdIsKrAppFrdFlag,1,-T_ActDtEcho)).T_SrcAgencyDesc);
                                                            
 Event: => NotInAgengyIdIsKrOthFrdFlag := Subject.PersonEvent.Transaction(T_InAgencyFlag=0 AND T1_IdIsKrOthFrdFlag=1){T_ActDtEcho,T_SrcAgencyDesc};                                                           
 Event: => P1_AotIdKrOthFrdActShrdSrcAgencyCntEv := MAP(T1_LexIdPopFlag=0 AND T1_RinIdPopFlag=0 => -99999,
                                                            T_SrcClassType < 2 OR P1_AotIdKrOthFrdActShrdFlagEv < 1 => -99998,
-                                                           ALL(PersonEvent.Transaction,T1_IdIsKrOthFrdFlag=-99997) => -99997,
+                                                           ALL(Subject.PersonEvent.Transaction,T1_IdIsKrOthFrdFlag=-99997) => -99997,
                                                            COUNT(NotInAgengyIdIsKrOthFrdFlag{T_SrcAgencyDesc}));
 Event: => P1_AotIdKrOthFrdActShrdNewSrcAgencyDescEv := MAP(T1_LexIdPopFlag=0 AND T1_RinIdPopFlag=0 => -99999,
                                                            T_SrcClassType < 2 OR P1_AotIdKrOthFrdActShrdFlagEv < 1 => -99998,
-                                                           ALL(PersonEvent.Transaction,T1_IdIsKrOthFrdFlag=-99997) => -99997,
+                                                           ALL(Subject.PersonEvent.Transaction,T1_IdIsKrOthFrdFlag=-99997) => -99997,
                                                            ONLY(TOPN(NotInAgengyIdIsKrAppFrdFlag,1,-T_ActDtEcho)).T_SrcAgencyDesc);
 
 // joey
 Event: => NotInAgengyAddrIsKrFlag := Location.AddressEvent.Transaction(T9_AddrIsKrFlag=1 AND T_InAgencyFlag=0){T_ActDtEcho,T_SrcAgencyDesc};                                                           
 Event: => P9_AotAddrKrActShrdSrcAgencyCntEv := MAP(T9_AddrPopFlag=0 => -99999,
                                                            T_SrcClassType < 2 OR P9_AotAddrKrActShrdFlagEv < 1 => -99998,
-                                                           ALL(AddressEvent.Transaction,T9_AddrIsKrFlag=-99997) => -99997,
+                                                           ALL(Location.AddressEvent.Transaction,T9_AddrIsKrFlag=-99997) => -99997,
                                                            COUNT(NotInAgengyAddrIsKrFlag{T_SrcAgencyDesc}));
 Event: => P9_AotAddrKrActShrdNewSrcAgencyDescEv := MAP(T9_AddrPopFlag=0 => -99999,
                                                            T_SrcClassType < 2 OR P9_AotAddrKrActShrdFlagEv < 1 => -99998,
-                                                           ALL(AddressEvent.Transaction,T9_AddrIsKrFlag=-99997) => -99997,
+                                                           ALL(Location.AddressEvent.Transaction,T9_AddrIsKrFlag=-99997) => -99997,
                                                            ONLY(TOPN(NotInAgengyAddrIsKrFlag,1,-T_ActDtEcho)).T_SrcAgencyDesc);
                                                    
 Event: => NotInAgengySsnIsKrFlag := rSsn.SsnEvent.Transaction(T_InAgencyFlag=0 AND T15_SsnIsKrFlag=1){T_ActDtEcho,T_SrcAgencyDesc};                                                           
 Event: => P15_AotSsnKrActShrdSrcAgencyCntEv := MAP(T15_SsnPopFlag=0 => -99999,
                                                            T_SrcClassType < 2 OR P15_AotSsnKrActShrdFlagEv < 1 => -99998,
-                                                           ALL(SsnEvent.Transaction,T15_SsnIsKrFlag=-99997) => -99997,
+                                                           ALL(rSsn.SsnEvent.Transaction,T15_SsnIsKrFlag=-99997) => -99997,
                                                            COUNT(NotInAgengySsnIsKrFlag{T_SrcAgencyDesc}));
 Event: => P15_AotSsnKrActShrdNewSrcAgencyDescEv := MAP(T15_SsnPopFlag=0 => -99999,
                                                            T_SrcClassType < 2 OR P15_AotSsnKrActShrdFlagEv < 1 => -99998,
-                                                           ALL(SsnEvent.Transaction,T15_SsnIsKrFlag=-99997) => -99997,
+                                                           ALL(rSsn.SsnEvent.Transaction,T15_SsnIsKrFlag=-99997) => -99997,
                                                            ONLY(TOPN(NotInAgengySsnIsKrFlag,1,-T_ActDtEcho)).T_SrcAgencyDesc);
 
 Event: => NotInAgengyPhnIsKrFlag := rPhone.PhoneEvent.Transaction(T16_PhnIsKrFlag=1 AND T_InAgencyFlag=0){T_ActDtEcho,T_SrcAgencyDesc};                                                           
 Event: => P16_AotPhnKrActShrdSrcAgencyCntEv := MAP(T16_PhnPopFlag=0 => -99999,
                                                            T_SrcClassType < 2 OR P16_AotPhnKrActShrdFlagEv < 1 => -99998,
-                                                           ALL(PhoneEvent.Transaction,T16_PhnIsKrFlag=-99997) => -99997,
+                                                           ALL(rPhone.PhoneEvent.Transaction,T16_PhnIsKrFlag=-99997) => -99997,
                                                            COUNT(NotInAgengyPhnIsKrFlag{T_SrcAgencyDesc}));
 Event: => P16_AotPhnKrActShrdNewSrcAgencyDescEv := MAP(T16_PhnPopFlag=0 => -99999,
                                                            T_SrcClassType < 2 OR P16_AotPhnKrActShrdFlagEv < 1 => -99998,
-                                                           ALL(PhoneEvent.Transaction,T16_PhnIsKrFlag=-99997) => -99997,
+                                                           ALL(rPhone.PhoneEvent.Transaction,T16_PhnIsKrFlag=-99997) => -99997,
                                                            ONLY(TOPN(NotInAgengyPhnIsKrFlag,1,-T_ActDtEcho)).T_SrcAgencyDesc);
 
 Event: => NotInAgengyEmailIsKrFlag := rEmail.EmailEvent.Transaction(T_InAgencyFlag=0 AND T17_EmailIsKrFlag=1){T_ActDtEcho,T_SrcAgencyDesc};                                                           
 Event: => P17_AoTEmailKRActShrdSrcAgencyCntEv := MAP(T17_EmailPopFlag=0 => -99999,
                                                            T_SrcClassType < 2 OR P17_AotEmailKrActShrdFlagEv < 1 => -99998,
-                                                           ALL(EmailEvent.Transaction,T17_EmailIsKrFlag=-99997) => -99997,
+                                                           ALL(rEmail.EmailEvent.Transaction,T17_EmailIsKrFlag=-99997) => -99997,
                                                            COUNT(NotInAgengyEmailIsKrFlag{T_SrcAgencyDesc}));
 Event: => P17_AoTEmailKRActShrdNewSrcAgencyDescEv := MAP(T17_EmailPopFlag=0 => -99999,
                                                            T_SrcClassType < 2 OR P17_AotEmailKrActShrdFlagEv < 1 => -99998,
-                                                           ALL(EmailEvent.Transaction,T17_EmailIsKrFlag=-99997) => -99997,
+                                                           ALL(rEmail.EmailEvent.Transaction,T17_EmailIsKrFlag=-99997) => -99997,
                                                            ONLY(TOPN(NotInAgengyEmailIsKrFlag,1,-T_ActDtEcho)).T_SrcAgencyDesc);
 
 Event: => NotInAgengyIpAddrIsKrFlag := rInternetProtocol.InternetProtocolEvent.Transaction(T_InAgencyFlag=0 AND T18_IpAddrIsKrFlag=1){T_ActDtEcho,T_SrcAgencyDesc};                                                           
 Event: => P18_AoTIPAddrKRActShrdSrcAgencyCntEv := MAP(T18_IpAddrPopFlag=0 => -99999,
                                                            T_SrcClassType < 2 OR P18_AotIpAddrKrActShrdFlagEv < 1 => -99998,
-                                                           ALL(InternetProtocolEvent.Transaction,T18_IpAddrIsKrFlag=-99997) => -99997,
+                                                           ALL(rInternetProtocol.InternetProtocolEvent.Transaction,T18_IpAddrIsKrFlag=-99997) => -99997,
                                                            COUNT(NotInAgengyIpAddrIsKrFlag{T_SrcAgencyDesc}));
 Event: => P18_AoTIPAddrKRActShrdNewSrcAgencyDescEv := MAP(T18_IpAddrPopFlag=0 => -99999,
                                                            T_SrcClassType < 2 OR P18_AotIpAddrKrActShrdFlagEv < 1 => -99998,
-                                                           ALL(InternetProtocolEvent.Transaction,T18_IpAddrIsKrFlag=-99997) => -99997,
+                                                           ALL(rInternetProtocol.InternetProtocolEvent.Transaction,T18_IpAddrIsKrFlag=-99997) => -99997,
                                                            ONLY(TOPN(NotInAgengyIpAddrIsKrFlag,1,-T_ActDtEcho)).T_SrcAgencyDesc);
 
 Event: => NotInAgengyBnkAcctIsKrFlag := rBankAccount.BankAccountEvent.Transaction(T_InAgencyFlag=0 AND T19_BnkAcctIsKrFlag=1){T_ActDtEcho,T_SrcAgencyDesc};                                                           
 Event: => P19_AoTBnkAcctKRActShrdSrcAgencyCntEv := MAP(T19_BnkAcctPopFlag=0 => -99999,
                                                            T_SrcClassType < 2 OR P19_AotBnkAcctKrActShrdFlagEv < 1 => -99998,
-                                                           ALL(BankAccountEvent.Transaction,T19_BnkAcctIsKrFlag=-99997) => -99997,
+                                                           ALL(rBankAccount.BankAccountEvent.Transaction,T19_BnkAcctIsKrFlag=-99997) => -99997,
                                                            COUNT(NotInAgengyBnkAcctIsKrFlag{T_SrcAgencyDesc}));
 Event: => P19_AoTBnkAcctKRActShrdNewSrcAgencyDescEv := MAP(T19_BnkAcctPopFlag=0 => -99999,
                                                            T_SrcClassType < 2 OR P19_AotBnkAcctKrActShrdFlagEv < 1 => -99998,
-                                                           ALL(BankAccountEvent.Transaction,T19_BnkAcctIsKrFlag=-99997) => -99997,
+                                                           ALL(rBankAccount.BankAccountEvent.Transaction,T19_BnkAcctIsKrFlag=-99997) => -99997,
                                                            ONLY(TOPN(NotInAgengyBnkAcctIsKrFlag,1,-T_ActDtEcho)).T_SrcAgencyDesc);
                                                            
 Event: => NotInAgengyDlIsKrFlag := rDriversLicense.DriversLicenseEvent.Transaction(T_InAgencyFlag=0 AND T20_DlIsKrFlag=1){T_ActDtEcho,T_SrcAgencyDesc};                                                           
 Event: => P20_AoTDLKRActShrdSrcAgencyCntEv := MAP(T20_DlPopFlag=0 => -99999,
                                                            T_SrcClassType < 2 OR P20_AotDlKrActShrdFlagEv < 1 => -99998,
-                                                           ALL(DriversLicenseEvent.Transaction,T20_DlIsKrFlag=-99997) => -99997,
+                                                           ALL(rDriversLicense.DriversLicenseEvent.Transaction,T20_DlIsKrFlag=-99997) => -99997,
                                                            COUNT(NotInAgengyDlIsKrFlag{T_SrcAgencyDesc}));
 Event: => P20_AoTDLKRActShrdNewSrcAgencyDescEv := MAP(T20_DlPopFlag=0 => -99999,
                                                            T_SrcClassType < 2 OR P20_AotDlKrActShrdFlagEv < 1 => -99998,
-                                                           ALL(DriversLicenseEvent.Transaction,T20_DlIsKrFlag=-99997) => -99997,
+                                                           ALL(rDriversLicense.DriversLicenseEvent.Transaction,T20_DlIsKrFlag=-99997) => -99997,
                                                            ONLY(TOPN(NotInAgengyDlIsKrFlag,1,-T_ActDtEcho)).T_SrcAgencyDesc);
 //Input Address Outside of Agency State
 Event: => T9_AddrNotInAgcyJurStFlag := MAP(T9_AddrPopFlag=0 => -99999,
