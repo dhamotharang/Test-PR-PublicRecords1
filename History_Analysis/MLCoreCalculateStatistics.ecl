@@ -112,10 +112,10 @@ History_Analysis.Layouts.statisticsRec tCalculate(CombinedRec L, dataset(Combine
             self.Q3_FilesizePercent-self.median_FilesizePercent
         );
         Self.MinThresholdSize:=if(truncate(Self.median_FilesizePercent-(2*Actual_Difference_Median_Q1_Size))>=0,-1,truncate(Self.median_FilesizePercent-(2*Actual_Difference_Median_Q1_Size)));
-        Self.MaxThresholdSize:=roundup(Self.median_FilesizePercent+(2*Actual_Difference_Q3_Median_Size));
-        self.NumLessThanMinThresholdSize:=count(R(number=2 and value<Self.MinThreshold));
-        self.BtwnThresholdSize:=count(R(number=2 and value>=Self.MinThreshold and value<=Self.MaxThreshold));
-        self.NumMoreThanMaxThresholdSize:=count(R(number=2 and value>Self.MaxThreshold));
+        Self.MaxThresholdSize:=if(roundup(Self.median_FilesizePercent+(2*Actual_Difference_Q3_Median_Size))<=0,1,roundup(Self.median_FilesizePercent+(2*Actual_Difference_Q3_Median_Size)));
+        self.NumLessThanMinThresholdSize:=count(R(number=2 and value<Self.MinThresholdSize));
+        self.BtwnThresholdSize:=count(R(number=2 and value>=Self.MinThresholdSize and value<=Self.MaxThresholdSize));
+        self.NumMoreThanMaxThresholdSize:=count(R(number=2 and value>Self.MaxThresholdSize));
         //Record Count Calculations
         //Real
         Self.Min_RecordCountReal:=SimpleStats[3].minval;
@@ -159,10 +159,10 @@ History_Analysis.Layouts.statisticsRec tCalculate(CombinedRec L, dataset(Combine
             self.Q3_RecordCountPercent-self.median_RecordCountPercent
         );
         Self.MinThresholdCount:=if(truncate(Self.median_RecordCountPercent-(2*Actual_Difference_Median_Q1_Count))>=0,-1,truncate(Self.median_RecordCountPercent-(2*Actual_Difference_Median_Q1_Count)));
-        Self.MaxThresholdCount:=roundup(Self.median_RecordCountPercent+(2*Actual_Difference_Q3_Median_Count));
-        self.NumLessThanMinThresholdCount:=count(R(number=4 and value<Self.MinThreshold));
-        self.BtwnThresholdCount:=count(R(number=4 and value>=Self.MinThreshold and value<=Self.MaxThreshold));
-        self.NumMoreThanMaxThresholdCount:=count(R(number=4 and value>Self.MaxThreshold));
+        Self.MaxThresholdCount:=if(roundup(Self.median_RecordCountPercent+(2*Actual_Difference_Q3_Median_Count))<=0,1,roundup(Self.median_RecordCountPercent+(2*Actual_Difference_Q3_Median_Count)));
+        self.NumLessThanMinThresholdCount:=count(R(number=4 and value<Self.MinThresholdCount));
+        self.BtwnThresholdCount:=count(R(number=4 and value>=Self.MinThresholdCount and value<=Self.MaxThresholdCount));
+        self.NumMoreThanMaxThresholdCount:=count(R(number=4 and value>Self.MaxThresholdCount));
         Self:=L;
     END;
 
