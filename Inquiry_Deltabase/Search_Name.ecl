@@ -1,4 +1,4 @@
-IMPORT Gateway, Inquiry_Deltabase, Inquiry_AccLogs, Risk_Indicators, RiskWise, Suspicious_Fraud_LN, UT;
+﻿IMPORT Gateway, Inquiry_Deltabase, Suspicious_Fraud_LN, std;
 
 EXPORT Inquiry_Deltabase.Layouts.Inquiry_Name Search_Name (DATASET(Inquiry_Deltabase.Layouts.Input_Deltabase_Name) SearchInput,
 																																SET OF STRING100 FunctionDescriptions, // Example: Inquiry_AccLogs.shell_constants.set_valid_nonfcra_functions
@@ -8,6 +8,7 @@ EXPORT Inquiry_Deltabase.Layouts.Inquiry_Name Search_Name (DATASET(Inquiry_Delta
 																																INTEGER gatewayRetries = 0):= FUNCTION
 	
 	SelectLimit := TRIM(SQLSelectLimit, ALL);
+	deltabase_cfg := gateways(servicename = Gateway.Constants.ServiceName.DeltaInquiry)[1];
 	
 	// We need to convert the Function Description SET into a DATASET so we can utilize the convertDelimited Function to get a giant string of Function Descriptions
 	FunctionDescriptionDataset := DATASET(FunctionDescriptions, Inquiry_Deltabase.Layouts.Function_Descriptions);
@@ -17,10 +18,11 @@ EXPORT Inquiry_Deltabase.Layouts.Inquiry_Name Search_Name (DATASET(Inquiry_Delta
 
 	// Generate the Deltabase SELECT statement
 	Inquiry_Deltabase.Layouts.Deltabase_Input generateSelects(Inquiry_Deltabase.Layouts.Input_Deltabase_Name le) := TRANSFORM
-		FirstName := TRIM(StringLib.StringToUpperCase(le.FirstName), LEFT, RIGHT);
-		MiddleName := TRIM(StringLib.StringToUpperCase(le.MiddleName), LEFT, RIGHT);
+		self.transactionID := deltabase_cfg.transactionid;	
+		FirstName := TRIM(std.str.ToUpperCase(le.FirstName), LEFT, RIGHT);
+		MiddleName := TRIM(std.str.ToUpperCase(le.MiddleName), LEFT, RIGHT);
 		MiddleInitial := MiddleName[1];
-		LastName := TRIM(StringLib.StringToUpperCase(le.LastName), LEFT, RIGHT);
+		LastName := TRIM(std.str.ToUpperCase(le.LastName), LEFT, RIGHT);
 		
 		SQLSelect := IF((INTEGER)SelectLimit <= 0, '10', SelectLimit); // Make sure that a valid Limit was set
 		
@@ -106,7 +108,7 @@ EXPORT Inquiry_Deltabase.Layouts.Inquiry_Name Search_Name (DATASET(Inquiry_Delta
 		SELF.Person_Q.Appended_SSN := le.SSN;
 		SELF.Person_Q.Appended_ADL := (INTEGER)le.Response_LexID;
 		// Need to reformat DateTime, as the Deltabase returns YYYY-MM-DD HH:MM:SS but the Inquiries Key is YYYYMMDD HHMMSSmm
-		CleanedDateTime := StringLib.StringFilter(le.DateTime, '0123456789');
+		CleanedDateTime := std.str.Filter(le.DateTime, '0123456789');
 		SELF.Search_Info.DateTime := IF(CleanedDateTime = '', '', CleanedDateTime[1..8] + ' ' + CleanedDateTime[9..14] + '01');
 		SELF.Search_Info.Transaction_ID := le.Transaction_ID;
 		SELF.Search_Info.Transaction_Type := le.Transaction_Type;
