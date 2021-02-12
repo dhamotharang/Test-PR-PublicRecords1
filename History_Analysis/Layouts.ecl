@@ -1,4 +1,4 @@
-Import dops, History_Analysis;
+﻿Import dops, History_Analysis;
 
 Export Layouts := Module
     Export layout_master_build := Record
@@ -117,9 +117,11 @@ Export Layouts := Module
         Real       StDev_FilesizePercent;//StDev_8
         Real       Plus2StDev_FilesizePercent;//Plus2StDev_9
         Real       Minus2StDev_FilesizePercent;//Minus2StDev_10
-        Unsigned   NumLessThanQ1_FilesizePercent;//NumLessThanQ1_11
-        Unsigned   BtwnQ1AndQ3_FilesizePercent;//BtwnQ1AndQ3_12
-        Unsigned   NumMoreThanQ3_FilesizePercent;//NumMoreThanQ3_12
+        Real       MinThresholdSize;//New
+        Real       MaxThresholdSize;//New
+        Unsigned   NumLessThanMinThresholdSize;//NumLessThanQ1_11
+        Unsigned   BtwnThresholdSize;//BtwnQ1AndQ3_12
+        Unsigned   NumMoreThanMaxThresholdSize;//NumMoreThanQ3_13
         // Record Count Calculations
         // Real
         Real       Min_RecordCountReal;//Min_14
@@ -146,11 +148,11 @@ Export Layouts := Module
         Real       StDev_RecordCountPercent;//StDev_34
         Real       Plus2StDev_RecordCountPercent;//Plus2StDev_35
         Real       Minus2StDev_RecordCountPercent;//Minus2StDev_36
-        Real       MinThreshold;//New
-        Real       MaxThreshold;//New
-        Unsigned   NumLessThanMinThreshold;//NumLessThanQ1_37
-        Unsigned   BtwnMinThresholdAndMaxThreshold;//BtwnQ1AndQ3_38
-        Unsigned   NumMoreThanMaxThreshold;//NumMoreThanQ3_39
+        Real       MinThresholdCount;//New
+        Real       MaxThresholdCount;//New
+        Unsigned   NumLessThanMinThresholdCount;//NumLessThanQ1_37
+        Unsigned   BtwnThresholdCount;//BtwnQ1AndQ3_38
+        Unsigned   NumMoreThanMaxThresholdCount;//NumMoreThanQ3_39
     End;
 
 End;
