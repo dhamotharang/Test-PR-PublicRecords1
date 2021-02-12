@@ -8,14 +8,14 @@ import Models, risk_indicators, riskwise, iesp, _control, std, doxie;
 //
 //*** A few options and settings that you may want to alter 
 //
-eyeball             := 30;
-Threads             := 2;
+eyeball             := 25;
+Threads             := 30;
 RecordsToRun        := 25; // Set to 0 to run all, otherwise set to the number of records from the inputFile you wish to run
-roxieIP             := RiskWise.shortcuts.prod_batch_fcra;  // roxiebatch
+roxieIP             := riskwise.shortcuts.prod_batch_analytics_roxie;
 DataRestrictionMask := '100001000100010000000000';
 inputFileName       :=  '~foreign::' + _control.IPAddress.prod_thor_dali + '::' +'jpyon::in::dm_8062_z23_p1_f_s_in.csv';
 // inputFileName       := '~jpyon::in::dm_8062_z23_p1_f_s_in.csv';
-outputFileName      := '~tfuerstenberg::out::prep_file_for_Innovis' + thorlib.wuid();
+outputFileName      := '~tfuerstenberg::out::prep_file_for_Innovis';
 
 //
 //*** From here on down, none of this code should ever need to be changed/altered
@@ -233,7 +233,7 @@ resu := soapcall(dist_dataset, roxieIP,
 				DATASET(xlayout),
 				RETRY(2), TIMEOUT(500), LITERAL,
 				XPATH('Risk_Indicators.FlexID_ServiceResponse/Results/Result/Dataset[@name=\'Results\']/Row'),
-				PARALLEL(30), onFail(myFail(LEFT)));		
+				PARALLEL(Threads), onFail(myFail(LEFT)));		
 output(CHOOSEN(resu, eyeball), NAMED('resu'));
 
 //define input layout with LexID appended

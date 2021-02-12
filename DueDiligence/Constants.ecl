@@ -25,6 +25,10 @@ EXPORT Constants := MODULE
     //GENERAL
     EXPORT EMPTY := '';
     
+    EXPORT MAX_0 := 0;
+    EXPORT MAX_1 := 1;
+    EXPORT MAX_5 := 5;
+    EXPORT MAX_10 := 10;
     EXPORT MAX_500 := 500;
     EXPORT MAX_1000 := 1000;
     EXPORT MAX_2000 := 2000;

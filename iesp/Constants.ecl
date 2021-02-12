@@ -321,6 +321,11 @@ EXPORT Constants := MODULE
 		export unsigned2 MaxAKAs:= 200;
 	END;
 
+	export CriminalIncarceration := module
+		export unsigned2 MaxNames := 10;
+		export unsigned2 MaxSSNs := 10;
+	end;
+
 	// Criminal Search & Report
 	export CRIM := module
 		export unsigned2	MaxRawRecords			:= 2000;
@@ -1636,6 +1641,7 @@ EXPORT Constants := MODULE
 		export unsigned1 MaxSexualOffenses := 50;
 		export unsigned1 MaxCrimRecords   := 100;
 		export unsigned1 MaxSources       := 100; //unlimited
+           export unsigned1 MaxPersonRiskIndicators := 50;
 
 		export string1 CURRENT      := 'C';
     export string1 PRIOR        := 'P';
@@ -1844,6 +1850,7 @@ EXPORT Constants := MODULE
 		export unsigned2 MAX_COUNT_CORTERA_RECORD   := 100;
 		export unsigned2 MAX_COUNT_CRASH_RECORD			:= 100;
     export unsigned2 MAX_COUNT_CU_RECORD        := 100; // max may need adjusted???
+    export unsigned  MAX_COUNT_DATABRIDGE_RECORD := 100; 
     export unsigned2 MAX_COUNT_DCA_RECORD       := 100; // max may need adjusted???
     export unsigned2 MAX_COUNT_DEA_RECORD       := 100; // max may need adjusted???
     export unsigned2 MAX_COUNT_DEAD_RECORD      := 100; // max may need adjusted???

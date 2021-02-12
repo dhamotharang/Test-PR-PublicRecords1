@@ -46,6 +46,7 @@
 			export INTEGER UniqueIdScoreThreshold_M :=  90;
 			export INTEGER UniqueIdScoreThreshold_H :=  100;
 			export boolean UseDOBDeathMatch := false;
+			export boolean UseDOBDeathMatch_reportservice := true;
 			export boolean IncludeEmail := false;
 			export boolean IncludePhone := true;
 			export boolean IncludeAddress := true;

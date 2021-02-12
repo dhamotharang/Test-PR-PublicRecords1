@@ -1,13 +1,13 @@
-IMPORT Business_Risk_BIP;
+IMPORT Business_Risk_BIP, BusinessInstantID20_Services;
 
 EXPORT fn_GetBusinessShell(DATASET(BusinessInstantID20_Services.layouts.InputCompanyAndAuthRepInfo) ds_input,
-                           Business_Risk_BIP.LIB_Business_Shell_LIBIN Options) := 
+                           Business_Risk_BIP.LIB_Business_Shell_LIBIN Options) :=
 	FUNCTION
 
 			Business_Risk_BIP.Layouts.Input convertToBusinessShellInput(RECORDOF(ds_input) le) := TRANSFORM
 				SELF.Seq                 := le.Seq;
 				SELF.AcctNo              := le.AcctNo;
-				SELF.HistoryDate         := (UNSIGNED3)((STRING12)le.HistoryDate[1..6]);
+				SELF.HistoryDate         := (UNSIGNED3)(((STRING12)le.HistoryDate)[1..6]);
 				SELF.HistoryDateTime     := le.HistoryDate;
 				SELF.CompanyName         := le.CompanyName;
 				SELF.AltCompanyName      := le.AltCompanyName;
@@ -109,20 +109,20 @@ EXPORT fn_GetBusinessShell(DATASET(BusinessInstantID20_Services.layouts.InputCom
 				SELF.Rep5_Age            := le.AuthReps[5].Age;
 				SELF.Rep5_DLNumber       := le.AuthReps[5].DLNumber;
 				SELF.Rep5_DLState        := le.AuthReps[5].DLState;
-				
+
 				SELF := le;
 				SELF := [];
 			END;
-			
+
 			Shell_Input := PROJECT(ds_input, convertToBusinessShellInput(LEFT));
-			 
+
 			// Grab Business Shell results. Layout is Business_Risk_BIP.Layouts.Shell .
 			Shell_Results := Business_Risk_BIP.LIB_Business_Shell_Function(Shell_Input,
-																																		 Options.DPPA_Purpose,
-																																		 Options.GLBA_Purpose,
+																																		 Options.dppa,
+																																		 Options.glb,
 																																		 Options.DataRestrictionMask,
 																																		 Options.DataPermissionMask,
-																																		 Options.IndustryClass,
+																																		 Options.industry_class,
 																																		 Options.LinkSearchLevel,
 																																		 Options.BusShellVersion,
 																																		 Options.MarketingMode,
@@ -131,14 +131,14 @@ EXPORT fn_GetBusinessShell(DATASET(BusinessInstantID20_Services.layouts.InputCom
 																																		 Options.OFAC_Version,
 																																		 Options.Global_Watchlist_Threshold,
 																																		 Options.Watchlists_Requested,
-																																		 Options.KeepLargeBusinesses, 
+																																		 Options.KeepLargeBusinesses,
 																																		 Options.IncludeTargusGateway,
 																																		 Options.Gateways,
-																																		 Options.RunTargusGatewayAnywayForTesting, /* for testing purposes only */
-																																		 Options.OverRideExperianRestriction);			
+																																		 Options.RunTargusGatewayAnywayForTesting, // for testing purposes only
+																																		 Options.OverRideExperianRestriction);
 			// DEBUGs:
 			// OUTPUT( ds_input, NAMED('_Input') );
 			// OUTPUT( Shell_Input, NAMED('_Shell_Input') );
-			
-			RETURN Shell_Results; 
+
+			RETURN Shell_Results;
 	END;

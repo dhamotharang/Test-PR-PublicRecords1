@@ -1,9 +1,18 @@
 ﻿#workunit('name', 'Business_Shell_V31');
 
+/* ***************************************************************************
+  IMPORTANT NOTES TO LOOK INTO BEFORE RUNNING THIS SCRIPT
+  - Look whether to run business shell for credit models or fraud models.
+  - Unless run_Busshell_for_fraud and run_Busshell_for_credit are set correctly, this script will not produce results. 
+  - Experian off for credit but on for fraud unless SBFE is requested.
+  - Authrep off for credit but on for fraud
+  - UseUpdatedBipAppend on for Credit but off for fraud
+  - BIPAppend_ScoreThreshold & BIPAppend_WeightThreshold should be default for credit but 0 for fraud
+*******************************************************************************/
+
 IMPORT Business_Risk_BIP, Cortera, Data_Services, RiskWise; 
 
 eyeball := 10;
-
 Threads := 30;
 RecordsToRun := ALL; // Set to ALL to run all, otherwise set to the number of records from the inputFile you wish to run
 
@@ -25,17 +34,39 @@ BIPBestAppend := Business_Risk_BIP.Constants.BIPBestAppend.Default; // Append No
 Marketing_Mode := 0; // This product is not being run for marketing, allow all normal sources
 // Marketing_Mode := 1; // This product IS being run for marketing, disable sources not allowed for marketing
 
-dataPermissionMask := '00000000000000000000'; // Default - does not allow SBFE data
-// dataPermissionMask := '00000000000100000000'; // Allow SBFE data
+/* Data Modeling need to specify whether to: 1.)run Fraud or Credit Option
+                                             2.)Turn ON or OFF SBFE Data. 
+IncludeExperian, Include_AuthRep_In_BIPAppend, UseUpdatedBipAppend, BipAppend_WeightThreshold, DataPermissionMask are handled based on above 2 options.*/
 
-IncludeExperian := FALSE; // By default, Experian data is not allowed
-// IncludeExperian := TRUE; // Override the Experian data restriction and include Experian in results 
+// run_Busshell_for_fraud:=  TRUE;       //Run Business Fraud Models
+run_Busshell_for_fraud := FALSE;  
+ 
+run_Busshell_for_credit := TRUE;       //Run Business Credit Models
+// run_Busshell_for_credit:= FALSE;
+
+Include_SBFE := FALSE;    // By Default, turn off SBFE data.
+// Include_SBFE := TRUE; //If TRUE, turn on the SBFE data.
+
+
+IF( run_Busshell_for_fraud = run_Busshell_for_credit,
+    FAIL('Error - Please choose whether to run for business shell for credit models or fraud models'));
+   
+IncludeExperian := IF(run_Busshell_for_fraud, IF(Include_SBFE,FALSE,TRUE), FALSE); //If TRUE,Override the Experian data restriction and include Experian in results 
+
+Include_AuthRep_In_BIPAppend := IF(run_Busshell_for_fraud, TRUE, FALSE); //If TRUE,Include Authorized Rep in determining BIP IDs for the company.
+
+UseUpdatedBipAppend := IF(run_Busshell_for_credit, TRUE, FALSE); // IF TRUE, run the new BIP append logic
+
+UNSIGNED1 Default_BIPAppend_ScoreThreshold := 75;
+BIPAppend_ScoreThreshold := IF(run_Busshell_for_fraud, 0, Default_BIPAppend_ScoreThreshold);
+
+UNSIGNED1 Default_BipAppend_WeightThreshold := 44;
+BipAppend_WeightThreshold := IF(run_Busshell_for_fraud, 0, Default_BipAppend_WeightThreshold);
+
+dataPermissionMask := IF(Include_SBFE, '00000000000100000000', '00000000000000000000'); // Default - does not allow SBFE data
 
 Allowed_Sources := Business_Risk_BIP.Constants.Default_AllowedSources; // By default, do NOT include DNB DMI data
 // Allowed_Sources := Business_Risk_BIP.Constants.AllowDNBDMI; // Include DNB DMI data. NO CUSTOMERS CAN USE THIS, FOR RESEARCH PURPOSES ONLY.
-
-Include_AuthRep_In_BIPAppend := FALSE; // Prevent the Authorized Rep from being used to determine the BIP IDs for the company.
-// Include_AuthRep_In_BIPAppend := TRUE; // Include the Authorized Rep in determining the BIP IDs for the company.
 
 RoxieIP := RiskWise.shortcuts.prod_batch_analytics_roxie;
 // RoxieIP := RiskWise.shortcuts.staging_neutral_roxieIP; 
@@ -54,8 +85,8 @@ ignore201705ArchiveDateThreshold := FALSE;
 inputFileName := Data_Services.foreign_prod + 'hmccarl::in::bshell_test_inputs';
 
 // Specify the Cortera Retrotest file, if applicable.
-InputRetrotestFile := '~thor::cortera::retrotester::results::lnretro_linkid_20170920_1_output.txt';
-// Set InputRetrotestFile := '' if we don't want to read from a Cortera Retrotest file.
+// InputRetrotestFile := '~thor::cortera::retrotester::results::lnretro_linkid_20170920_1_output.txt';
+InputRetrotestFile := ''; //if we don't want to read from a Cortera Retrotest file. 
 
 outputFile := '~modeling::out::business_shell_v31_results_' + ThorLib.wuid();
 
@@ -191,6 +222,9 @@ SOAPLayout := RECORD
 	BOOLEAN OverrideExperianRestriction;
 	STRING AllowedSources;
 	BOOLEAN IncludeAuthRepInBIPAppend;
+	BOOLEAN Useupdatedbipappend;
+	UNSIGNED1 Bipappend_scorethreshold;
+	UNSIGNED1 Bipappend_weightthreshold;
 	BOOLEAN CorteraRetrotest;
 	DATASET(Cortera.layout_Retrotest_raw) CorteraRetrotestRecords;
 END;
@@ -242,6 +276,9 @@ SOAPLayout intoSOAP(InputFile le) := TRANSFORM
 	SELF.OverrideExperianRestriction := IncludeExperian;
 	SELF.AllowedSources := Allowed_Sources;
 	SELF.IncludeAuthRepInBIPAppend := Include_AuthRep_In_BIPAppend;
+	SELF.Useupdatedbipappend := Useupdatedbipappend;
+	SELF.Bipappend_scorethreshold := Bipappend_scorethreshold;
+	SELF.Bipappend_weightthreshold := Bipappend_weightthreshold;
 	SELF.CorteraRetrotest := useRetrotestData AND ( ( le.historydate != 0 AND (INTEGER)(((STRING)le.historydate)[1..6]) < 201705 ) OR ignore201705ArchiveDateThreshold );
 	SELF.CorteraRetrotestRecords := DATASET([],Cortera.layout_Retrotest_raw); // Set as null for now.
 	SELF := [];

@@ -1,4 +1,4 @@
-﻿//HPCC Systems KEL Compiler Version 1.3.2
+//HPCC Systems KEL Compiler Version 1.3.2
 IMPORT KEL13 AS KEL;
 IMPORT Business_Credit_KEL;
 IMPORT * FROM KEL13.Null;

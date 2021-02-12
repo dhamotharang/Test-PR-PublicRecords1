@@ -9,7 +9,7 @@ EXPORT getAllIndAttrRpt(DATASET(DueDiligence.v3Layouts.Internal.PersonTemp) v3In
                         DueDiligence.DDInterface.iDDRegulatoryCompliance regulatoryAccess,
                         DueDiligence.DDInterface.iDDPersonOptions ddOptions,
                         BOOLEAN debugMode) := FUNCTION
-                        
+
 
 
     convertToOldSlimRelation(DATASET(DueDiligence.v3Layouts.Internal.SlimPerson) inSlim, STRING2 rawType) := FUNCTION
@@ -20,12 +20,12 @@ EXPORT getAllIndAttrRpt(DATASET(DueDiligence.v3Layouts.Internal.PersonTemp) v3In
                                           SELF := LEFT;
                                           SELF := [];));
     END;
-                        
-                        
+
+
     //temp code to get the other attributes/reports
     newInput := PROJECT(v3Input, TRANSFORM(DueDiligence.Layouts.Indv_Internal,
                                             SELF.seq := LEFT.seq;
-                                           
+
                                             SELF.historyDateRaw := LEFT.historyDateRaw;
                                             SELF.historyDate := LEFT.historyDate;
                                             SELF.indvType := DueDiligence.Constants.INQUIRED_INDIVIDUAL;
@@ -36,9 +36,9 @@ EXPORT getAllIndAttrRpt(DATASET(DueDiligence.v3Layouts.Internal.PersonTemp) v3In
                                             SELF.individual.ssn := LEFT.inquired.ssn;
                                             SELF.individual.dob := (UNSIGNED4)LEFT.inquired.dob;
                                             SELF.individual.phone := LEFT.inquired.phone;
-                                            
+
                                             SELF.individual.zip5 := LEFT.inquired.zip;
-                                            
+
                                             SELF.individual := LEFT.inquired;
 
                                             SELF.bestSSN := LEFT.bestData.ssn;
@@ -49,13 +49,13 @@ EXPORT getAllIndAttrRpt(DATASET(DueDiligence.v3Layouts.Internal.PersonTemp) v3In
                                             SELF.bestAddress.zip5 := LEFT.bestData.zip;
                                             SELF.bestAddress := LEFT.bestData;
                                             SELF.bestSSNDetails.ssn := LEFT.bestData.ssn;
-                                            
-                                            
-                                            
+
+
+
                                             // SELF.spouses := convertToOldSlimRelation(LEFT.spouses, DueDiligence.Constants.INQUIRED_INDIVIDUAL_SPOUSE);
                                             // SELF.parents := convertToOldSlimRelation(LEFT.parents, DueDiligence.Constants.INQUIRED_INDIVIDUAL_PARENT);
                                             // SELF.associates := convertToOldSlimRelation(LEFT.associations, DueDiligence.Constants.INQUIRED_INDIVIDUAL_OTHER_RELATION);
-                                        
+
 
 
                                             validDOB := DueDiligence.CommonDate.IsValidDate((UNSIGNED4)LEFT.bestData.dob);
@@ -63,10 +63,10 @@ EXPORT getAllIndAttrRpt(DATASET(DueDiligence.v3Layouts.Internal.PersonTemp) v3In
                                             validHistDate := STD.Date.IsValidDate(tempHistoryDate);
 
                                             SELF.estimatedAge := IF(validDOB AND validHistDate, ut.Age((UNSIGNED4)LEFT.bestData.dob, tempHistoryDate), 0);
-                                            
-                                            
+
+
                                             SELF := [];));
-                                                            
+
     addRawData := JOIN(newInput, personToSearchInput,
                        LEFT.seq = RIGHT.seq,
                        TRANSFORM(DueDiligence.Layouts.Indv_Internal,
@@ -80,22 +80,22 @@ EXPORT getAllIndAttrRpt(DATASET(DueDiligence.v3Layouts.Internal.PersonTemp) v3In
                                   SELF.indvRawInput.dob := (STRING8)RIGHT.rawData.dob;
                                   SELF.indvRawInput.cleanAddress.zip5 := RIGHT.searchBy.zip;
                                   SELF.indvRawInput.cleanAddress := RIGHT.searchBy;
-                                  
+
                                   SELF.inputSSNDetails.ssn := RIGHT.rawData.ssn;
-                                  
-                                  SELF.inputaddressprovided := RIGHT.rawData.streetAddress1 <> DueDiligence.Constants.EMPTY OR RIGHT.rawData.streetAddress2 <> DueDiligence.Constants.EMPTY OR RIGHT.rawData.prim_range <> DueDiligence.Constants.EMPTY OR RIGHT.rawData.predir <> DueDiligence.Constants.EMPTY OR 
-                                                                RIGHT.rawData.prim_name <> DueDiligence.Constants.EMPTY OR RIGHT.rawData.addr_suffix <> DueDiligence.Constants.EMPTY OR RIGHT.rawData.postdir <> DueDiligence.Constants.EMPTY OR RIGHT.rawData.unit_desig <> DueDiligence.Constants.EMPTY OR 
-                                                                RIGHT.rawData.sec_range <> DueDiligence.Constants.EMPTY OR RIGHT.rawData.city <> DueDiligence.Constants.EMPTY OR RIGHT.rawData.state <> DueDiligence.Constants.EMPTY OR RIGHT.rawData.zip <> DueDiligence.Constants.EMPTY;	
-                                                                        
-                                                          
+
+                                  SELF.inputaddressprovided := RIGHT.rawData.streetAddress1 <> DueDiligence.Constants.EMPTY OR RIGHT.rawData.streetAddress2 <> DueDiligence.Constants.EMPTY OR RIGHT.rawData.prim_range <> DueDiligence.Constants.EMPTY OR RIGHT.rawData.predir <> DueDiligence.Constants.EMPTY OR
+                                                                RIGHT.rawData.prim_name <> DueDiligence.Constants.EMPTY OR RIGHT.rawData.addr_suffix <> DueDiligence.Constants.EMPTY OR RIGHT.rawData.postdir <> DueDiligence.Constants.EMPTY OR RIGHT.rawData.unit_desig <> DueDiligence.Constants.EMPTY OR
+                                                                RIGHT.rawData.sec_range <> DueDiligence.Constants.EMPTY OR RIGHT.rawData.city <> DueDiligence.Constants.EMPTY OR RIGHT.rawData.state <> DueDiligence.Constants.EMPTY OR RIGHT.rawData.zip <> DueDiligence.Constants.EMPTY;
+
+
                                   SELF.fullinputaddressprovided := (RIGHT.searchBy.streetAddress1 <> DueDiligence.Constants.EMPTY OR RIGHT.searchBy.prim_name <> DueDiligence.Constants.EMPTY) AND RIGHT.searchBy.city <> DueDiligence.Constants.EMPTY AND RIGHT.searchBy.state <> DueDiligence.Constants.EMPTY AND RIGHT.searchBy.zip <> DueDiligence.Constants.EMPTY;
 
                                   SELF := LEFT;),
                        LEFT OUTER,
                        ATMOST(1));
-                       
-                       
-                       
+
+
+
     addBSData := JOIN(addRawData, bsData,
                       LEFT.seq = RIGHT.seq,
                       TRANSFORM(DueDiligence.Layouts.Indv_Internal,
@@ -110,16 +110,16 @@ EXPORT getAllIndAttrRpt(DATASET(DueDiligence.v3Layouts.Internal.PersonTemp) v3In
                                 SELF.bs_iidSocsValFlag := RIGHT.iid.socsvalflag;
                                 SELF.bs_iidPwSocsValFlag := RIGHT.iid.pwsocsvalflag;
                                 SELF.bs_inputSocsCharFlag := RIGHT.ssn_verification.validation.inputsocscharflag;
-                                
+
                                 //fields for the Identity Report
                                 SELF.inputSSNDetails.issuedLowDate := RIGHT.SSN_Verification.Validation.low_issue_date;
                                 SELF.inputSSNDetails.issuedHighDate := RIGHT.SSN_Verification.Validation.high_issue_date;
                                 SELF.inputSSNDetails.issuedState := RIGHT.SSN_Verification.Validation.issue_state;
                                 SELF.inputSSNDetails.randomized := Risk_Indicators.rcSet.isCodeRS(LEFT.indvRawInput.ssn, RIGHT.iid.socsvalflag, RIGHT.iid.socllowissue, RIGHT.iid.socsrcisflag);
-                                
+
                                 ssnOnFile := DueDiligence.Common.GetStringListAsDataset(RIGHT.header_summary.ssns_on_file);
                                 SELF.ssnOnFile := PROJECT(ssnOnFile(info <> DueDiligence.Constants.EMPTY), TRANSFORM({STRING9 ssn}, SELF.ssn := LEFT.info;));
-                                
+
                                 dobOnFile := DueDiligence.Common.GetStringListAsDataset(RIGHT.header_summary.dobs_on_file);
                                 SELF.dobOnFile := PROJECT(dobOnFile(info <> DueDiligence.Constants.EMPTY), TRANSFORM({STRING8 dob}, SELF.dob := LEFT.info;));
 
@@ -128,8 +128,8 @@ EXPORT getAllIndAttrRpt(DATASET(DueDiligence.v3Layouts.Internal.PersonTemp) v3In
                                 SELF := LEFT;),
                       LEFT OUTER,
                       ATMOST(1));
-                      
-                      
+
+
     addRIData := JOIN(addBSData, riskIndicators,
                       LEFT.seq = RIGHT.seq,
                       TRANSFORM(DueDiligence.Layouts.Indv_Internal,
@@ -148,34 +148,32 @@ EXPORT getAllIndAttrRpt(DATASET(DueDiligence.v3Layouts.Internal.PersonTemp) v3In
                                 SELF := LEFT;),
                       LEFT OUTER,
                       ATMOST(1));
-                                                           
-    
+
+
     busOptions := DueDiligence.v3Common.DDBusiness.GetBusinessShellOptions(regulatoryAccess);
     linkingOpts := DueDiligence.v3Common.DDBusiness.GetLinkingOptions(regulatoryAccess);
-               
-               
+
+
     oldSharedInput := DueDiligence.getIndAttributes(addRIData, ddOptions.ssnMask, ddOptions.includeReportData,
-                                                      busOptions, linkingOpts, debugMode, 
-                                                      regulatoryAccess.lexIDSourceOptOut, regulatoryAccess.transactionID, regulatoryAccess.batchUID,
-                                                      regulatoryAccess.globalCompanyID);
-                                                      
-                                                      
+                                                      busOptions, linkingOpts, debugMode);
+
+
     convertOld2New := PROJECT(oldSharedInput, TRANSFORM(DueDiligence.v3Layouts.InternalPerson.PersonResults,
                                                         SELF.seq := LEFT.seq;
                                                         SELF.lexID := LEFT.inquiredDID;
-                                                        
+
                                                         SELF.economicReportIncluded := ddOptions.includeReportData AND DueDiligence.v3Common.DDPerson.IsRequestedModuleBeingRequested(DueDiligence.ConstantsQuery.MODULE_ECONOMIC, attributesRequested);
                                                         SELF.geographicReportIncluded := ddOptions.includeReportData AND DueDiligence.v3Common.DDPerson.IsRequestedModuleBeingRequested(DueDiligence.ConstantsQuery.MODULE_GEOGRAPHIC, attributesRequested);
                                                         SELF.identityReportIncluded := ddOptions.includeReportData AND DueDiligence.v3Common.DDPerson.IsRequestedModuleBeingRequested(DueDiligence.ConstantsQuery.MODULE_IDENTITY, attributesRequested);
                                                         SELF.networkReportIncluded := ddOptions.includeReportData AND DueDiligence.v3Common.DDPerson.IsRequestedModuleBeingRequested(DueDiligence.ConstantsQuery.MODULE_NETWORK, attributesRequested);
-                                                        
+
                                                         SELF.personReport := LEFT.personReport;
-                                                        
+
                                                         SELF := LEFT;
                                                         SELF := [];));
- 
-                        
-                        
+
+
+
 
     // OUTPUT(newInput, NAMED('newInput'));
     // OUTPUT(addRawData, NAMED('addRawData'));
@@ -183,7 +181,7 @@ EXPORT getAllIndAttrRpt(DATASET(DueDiligence.v3Layouts.Internal.PersonTemp) v3In
     // OUTPUT(addRIData, NAMED('addRIData'));
     // OUTPUT(oldSharedInput, NAMED('oldSharedInput'));
     // OUTPUT(convertOld2New, NAMED('convertOld2New'));
-                        
-                        
+
+
     RETURN convertOld2New;
 END;

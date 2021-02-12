@@ -5,6 +5,7 @@ IMPORT Models, Risk_Indicators, RiskView, STD;
 // Including these blank defaults for retrieving the sets of Valid Models without having to pass in Boca Shell or Arguments
 // This way when creating a new model we only need to update one section of the code to plug the model in (Models.LIB_RiskView_Models)
 blankShell := GROUP(DATASET([], Risk_Indicators.Layout_Boca_Shell), Seq);
+blankIDA := DATASET([], Risk_Indicators.layouts.layout_IDA_out);
 blankArguments := MODULE(Models.RV_LIBIN)
 									END;
 
@@ -25,7 +26,7 @@ EXPORT LIB_RiskView_Models ( GROUPED DATASET(Risk_Indicators.Layout_Boca_Shell) 
   SHARED IDAattrs := arguments.IDA_Attrs;
 
 	// EXPORT ValidatingModel := Models.RVG1809_1_0(BocaShell); // Change this to the model you are tring to validate
-	EXPORT ValidatingModel := Models.getCreditLuciModels(BocaShell, attrv5, IDAattrs).RVG2005_0; // Change this to the model you are tring to validate
+	EXPORT ValidatingModel := Models.getCreditLuciModels(blankshell, attrv5, blankIDA).RVA2008_1; // Change this to the model you are tring to validate
 	
 	
 	// Version 4.0
@@ -100,7 +101,7 @@ EXPORT LIB_RiskView_Models ( GROUPED DATASET(Risk_Indicators.Layout_Boca_Shell) 
    *******************************************************************************
    * 1.) Add the new model to the set of ValidV50Models                          *
    *      calcIndex() should be set with the desired report_option of the model  *
-   *      calcIndex will return the actuall 'billing_index' which batch needs    *
+   *      calcIndex will return the actual 'billing_index' which batch needs    *
    * 2.) Add the new model to the V50Models                                      *
    ***************************************************************************** */
 
@@ -159,6 +160,7 @@ that is sent INTO calcindex for ECL.
                                     {'RVA1908_1', MType_A+'RVA1908_1', calcIndex( 80), '0-999', 0}, //SCUSA
                                     {'RVR1903_1', MType_G+'RVR1903_1', calcIndex( 82), '-1 - 2', 0}, //Sheffield Financial (non-standard score -1,0,1,2)
                                     {'RVG2005_0', MType_G+'RVG2005_0', calcIndex( 83), '0-999', 0}, //Riskview Credit Optics short term lending flagship
+                                    {'RVA2008_1', MType_A+'RVA2008_1', calcIndex( 84), '0-999', 0}, //Automobile Acceptance Corporation
 
                                     // ------------------- FAKE MODELS - STATIC SCORE AND REASON CODES ------------------
                                     {'RVA9999_9', MType_A+'RVA9999_9', 0, '0-999', 0},
@@ -217,6 +219,7 @@ that is sent INTO calcindex for ECL.
                       'RVA1908_1' => UNGROUP(Models.RVA1908_1_0(BocaShell)),	
                       'RVR1903_1' => UNGROUP(Models.RVR1903_1_0(attrv5)),
                       'RVG2005_0' => Models.getCreditLuciModels(BocaShell, attrv5, IDAattrs).RVG2005_0,
+                      'RVA2008_1' => Models.getCreditLuciModels(blankshell, attrv5, blankIDA).RVA2008_1,
                       // ----------------------------------------------------------------------------------
                       // ------------------- FAKE MODELS - STATIC SCORE AND REASON CODES ------------------
                       'RVA9999_9' => UNGROUP(Models.FAKE_0_0(BocaShell, 'RV50')),

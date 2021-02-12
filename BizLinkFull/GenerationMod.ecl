@@ -1,11 +1,11 @@
 ﻿// Machine-readable versions of the spec file and subsets thereof
-IMPORT SALT311;
-EXPORT GenerationMod := MODULE(SALT311.iGenerationMod)
+IMPORT SALT44;
+EXPORT GenerationMod := MODULE(SALT44.iGenerationMod)
  
   // SALT Version info
-  EXPORT salt_VERSION := 'V3.11.8';
-  EXPORT salt_MODULE := 'SALT311'; // Optional override by HACK:SALTMODULE
-  EXPORT salt_TOOLSMODULE := 'SALTTOOLS30'; // Optional override by HACK:SALTTOOLSMODULE
+  EXPORT salt_VERSION := 'V4.4.1';
+  EXPORT salt_MODULE := 'SALT44'; // Optional override by HACK:SALTMODULE
+  EXPORT salt_TOOLSMODULE := 'SALTTOOLS4'; // Optional override by HACK:SALTTOOLSMODULE
  
   // Core module configuration values
   EXPORT spc_MODULE := 'BizLinkFull';
@@ -153,4 +153,5 @@ EXPORT GenerationMod := MODULE(SALT311.iGenerationMod)
     ],{STRING linkpath;STRING compulsory;STRING optional;STRING bonus;STRING required;STRING search});
  
 END;
+ 
 

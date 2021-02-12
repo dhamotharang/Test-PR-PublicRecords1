@@ -1,6 +1,6 @@
-﻿IMPORT Address, BIPV2, Business_Risk_BIP, LN_PropertyV2, MDR, Risk_Indicators, UT;
+﻿IMPORT Address, BIPV2, Business_Risk_BIP, LN_PropertyV2, MDR, Risk_Indicators, STD;
 
-EXPORT getProperty(DATASET(Business_Risk_BIP.Layouts.Shell) Shell, 
+EXPORT getProperty(DATASET(Business_Risk_BIP.Layouts.Shell) Shell,
 											 Business_Risk_BIP.LIB_Business_Shell_LIBIN Options,
 											 BIPV2.mod_sources.iParams linkingOptions,
 											 SET OF STRING2 AllowedSourcesSet) := FUNCTION
@@ -14,18 +14,18 @@ EXPORT getProperty(DATASET(Business_Risk_BIP.Layouts.Shell) Shell,
 																							Options.KeepLargeBusinesses);
 	// Add back our Seq numbers
 	Business_Risk_BIP.Common.AppendSeq2(PropertyRaw, Shell, PropertySeq);
-	
+
 	// Figure out if the kFetch was successful
 	kFetchErrorCodes := Business_Risk_BIP.Common.GrabFetchErrorCode(PropertySeq);
-	
-	// Filter out records after our history date. Set sourceCode to null string for FilterRecords so all Property 
+
+	// Filter out records after our history date. Set sourceCode to null string for FilterRecords so all Property
 	// records return whether Marketing restriction is indicated or not.
 	Property_pre := Business_Risk_BIP.Common.FilterRecords(PropertySeq, dt_first_seen, dt_vendor_first_reported, '', AllowedSourcesSet);
 
 	// Under the most recent definition for source codes that are allowed for Marketing purposes, all Property
 	// are ALLOWED with the exception of the following states ['ID','IL','KS','NM','SC','WA', ''] when they are
 	// in records whose src type is src_LnPropV2_Lexis_Asrs or src_LnPropV2_Lexis_Deeds_Mtgs (i.e. 'LA','LP').
-	Property_with_src := 
+	Property_with_src :=
 		PROJECT(
 			Property_pre,
 			TRANSFORM( { RECORDOF(Property_pre), STRING src },
@@ -33,24 +33,24 @@ EXPORT getProperty(DATASET(Business_Risk_BIP.Layouts.Shell) Shell,
 				SELF := LEFT
 			)
 		);
-	
+
 	Property := IF( Options.MarketingMode = 1,
 			Property_with_src(src IN AllowedSourcesSet AND Business_Risk_BIP.Common.isMarketingAllowedProperty(src, st)),
 			Property_with_src);
-	
+
 	PropertyWithBest := JOIN(DEDUP(SORT(Property, Seq, LN_Fares_ID), Seq, LN_Fares_ID), Shell, LEFT.Seq = RIGHT.Seq,
 															TRANSFORM({RECORDOF(LEFT), BOOLEAN AddrIsBest},
 																	NoScoreValue := 255;
 																	BestAddressPopulated := TRIM(RIGHT.Best_Info.BestPrimName) <> '' AND TRIM(RIGHT.Best_Info.BestCompanyZip) <> '' AND TRIM(LEFT.prim_name) <> '' AND TRIM(LEFT.Zip) <> '';
 																	BestZIPScore						:= IF(RIGHT.Best_Info.BestCompanyZip <> '' AND LEFT.Zip <> '' AND RIGHT.Best_Info.BestCompanyZip[1] = LEFT.Zip[1], Risk_Indicators.AddrScore.ZIP_Score(RIGHT.Best_Info.BestCompanyZip, LEFT.Zip), NoScoreValue);
-																	BestStateMatched				:= StringLib.StringToUpperCase(RIGHT.Best_Info.BestCompanyState) = StringLib.StringToUpperCase(LEFT.st);
-																	BestCityStateScore			:= IF(RIGHT.Best_Info.BestCompanyCity <> '' AND RIGHT.Best_Info.BestCompanyState <> '' AND LEFT.p_city_name <> '' AND LEFT.st <> '' AND BestStateMatched, 
+																	BestStateMatched				:= STD.Str.ToUpperCase(RIGHT.Best_Info.BestCompanyState) = STD.Str.ToUpperCase(LEFT.st);
+																	BestCityStateScore			:= IF(RIGHT.Best_Info.BestCompanyCity <> '' AND RIGHT.Best_Info.BestCompanyState <> '' AND LEFT.p_city_name <> '' AND LEFT.st <> '' AND BestStateMatched,
 																													Risk_Indicators.AddrScore.CityState_Score(RIGHT.Best_Info.BestCompanyCity, RIGHT.Best_Info.BestCompanyState, LEFT.p_city_name, LEFT.st, ''), NoScoreValue);
 																	BestCityStateZipMatched	:= BestAddressPopulated AND Risk_Indicators.iid_constants.ga(BestZIPScore) AND Risk_Indicators.iid_constants.ga(BestCityStateScore);
-		
+
 																	BestAddressScore := MAP(NOT BestAddressPopulated => NoScoreValue,
 																	BestAddressPopulated AND BestZIPScore = NoScoreValue AND BestCityStateScore = NoScoreValue => NoScoreValue,
-																																		Risk_Indicators.AddrScore.AddressScore(RIGHT.Best_Info.BestPrimRange, RIGHT.Best_Info.BestPrimName, RIGHT.Best_Info.BestSecRange, 
+																																		Risk_Indicators.AddrScore.AddressScore(RIGHT.Best_Info.BestPrimRange, RIGHT.Best_Info.BestPrimName, RIGHT.Best_Info.BestSecRange,
 																																		LEFT.prim_range, LEFT.prim_name, LEFT.sec_range,
 																																		BestZIPScore, BestCityStateScore));
 																	BestAddressMatched			:= BestAddressPopulated AND Risk_Indicators.iid_constants.ga(BestAddressScore);
@@ -58,11 +58,11 @@ EXPORT getProperty(DATASET(Business_Risk_BIP.Layouts.Shell) Shell,
 																	SELF := LEFT),
 																ATMOST(Business_Risk_BIP.Constants.Limit_Default), KEEP(1), LEFT OUTER);
 
-	
+
 	PropertyDeeds := JOIN(PropertyWithBest, LN_PropertyV2.key_deed_fid(FALSE /*isFCRA*/), KEYED(LEFT.LN_Fares_ID = RIGHT.LN_Fares_ID),
 															TRANSFORM({RECORDOF(RIGHT), UNSIGNED4 Seq, BOOLEAN AddrIsBest}, SELF.Seq := LEFT.Seq; SELF.AddrIsBest := LEFT.AddrIsBest; SELF := RIGHT),
 															ATMOST(Business_Risk_BIP.Constants.Limit_Deeds));
-	
+
 	PropertyDeedsRep := JOIN(Shell, PropertyDeeds, LEFT.Seq = RIGHT.Seq, TRANSFORM({RECORDOF(RIGHT), INTEGER3 BusExecLinkPropertyOverlapCount, INTEGER3 BusExecLinkPropertyOverlapCount2, INTEGER3 BusExecLinkPropertyOverlapCount3,INTEGER3 BusExecLinkPropertyOverlapCount4, INTEGER3 BusExecLinkPropertyOverlapCount5, INTEGER1 BestOwnership},
 																	// Clean both names associated with the Deed to break it up into First and Last Name
 																	cleanName1 := Address.CleanNameFields(Address.CleanPerson73(RIGHT.name1));
@@ -99,8 +99,8 @@ EXPORT getProperty(DATASET(Business_Risk_BIP.Layouts.Shell) Shell,
 																	LastNameMatch2Rep3 := lname3InputPopulated AND LEFT.Clean_Input.Rep3_LastName[1] = cleanName2.LName[1] AND Risk_Indicators.iid_constants.g(Risk_Indicators.LNameScore(cleanName2.LName, LEFT.Clean_Input.Rep3_LastName));
 																	NameMatch2Rep3 := FirstNameMatch2Rep3 AND LastNameMatch2Rep3;
 																	NameMatchRep3 := NameMatch1Rep3 OR NameMatch2Rep3;
-																	SELF.BusExecLinkPropertyOverlapCount3 := IF(NameMatchRep3, 1, 0);		
-																	
+																	SELF.BusExecLinkPropertyOverlapCount3 := IF(NameMatchRep3, 1, 0);
+
 																		//rep 4
 																	fname4InputPopulated := TRIM(LEFT.Clean_Input.Rep4_FirstName) <> '';
 																	lname4InputPopulated := TRIM(LEFT.Clean_Input.Rep4_LastName) <> '';
@@ -123,12 +123,12 @@ EXPORT getProperty(DATASET(Business_Risk_BIP.Layouts.Shell) Shell,
 																	NameMatch2Rep5 := FirstNameMatch2Rep5 AND LastNameMatch2Rep5;
 																	NameMatchRep5 := NameMatch1Rep5 OR NameMatch2Rep5;
 																	SELF.BusExecLinkPropertyOverlapCount5 := IF(NameMatchRep5, 1, 0);
-																	
+
 																	SELF.BestOwnership := IF(RIGHT.AddrIsBest, 1, 0);
 																	SELF := RIGHT), ATMOST(Business_Risk_BIP.Constants.Limit_Deeds));
-																	
-																	
-																	
+
+
+
 	PropertyDeedsRepStats := TABLE(PropertyDeedsRep,
 			{Seq,
 			 LN_Fares_ID,
@@ -139,7 +139,7 @@ EXPORT getProperty(DATASET(Business_Risk_BIP.Layouts.Shell) Shell,
 			 MaxBusExecLinkPropertyOverlapCount5 := MAX(GROUP, BusExecLinkPropertyOverlapCount5),
 			 MaxBestOwnership := MAX(GROUP, BestOwnership)},
 			 Seq, LN_Fares_ID);
-			 
+
 	PropertyDeedsRepCounts := ROLLUP(SORT(PropertyDeedsRepStats, Seq), LEFT.Seq = RIGHT.Seq, TRANSFORM(RECORDOF(LEFT),
 																					SELF.MaxBusExecLinkPropertyOverlapCount := LEFT.MaxBusExecLinkPropertyOverlapCount + RIGHT.MaxBusExecLinkPropertyOverlapCount;
 																					SELF.MaxBusExecLinkPropertyOverlapCount2 := LEFT.MaxBusExecLinkPropertyOverlapCount2 + RIGHT.MaxBusExecLinkPropertyOverlapCount2;
@@ -161,14 +161,14 @@ EXPORT getProperty(DATASET(Business_Risk_BIP.Layouts.Shell) Shell,
 	END;
 	tempOwnershipRec getOwnership(Business_Risk_BIP.Layouts.Shell le, OwnershipKey ri) := TRANSFORM
 		SELF.Seq := le.Seq;
-		
+
 		NoScoreValue				:= 255;
 		AddressPopulated		:= TRIM(le.Clean_Input.Prim_Name) <> '' AND TRIM(le.Clean_Input.Zip5) <> '' AND TRIM(ri.prim_name) <> '' AND TRIM(ri.Zip) <> '';
 		ZIPScore						:= IF(le.Clean_Input.Zip5 <> '' AND ri.Zip <> '' AND le.Clean_Input.Zip5[1] = ri.Zip[1], Risk_Indicators.AddrScore.ZIP_Score(le.Clean_Input.Zip5, ri.Zip), NoScoreValue);
 		CityStateScore			:= IF(le.Clean_Input.City <> '' AND le.Clean_Input.State <> '' AND ri.p_city_name <> '' AND ri.st <> '' AND le.Clean_Input.State[1] = ri.st[1], Risk_Indicators.AddrScore.CityState_Score(le.Clean_Input.City, le.Clean_Input.State, ri.p_city_name, ri.st, ''), NoScoreValue);
 		CityStateZipMatched	:= Risk_Indicators.iid_constants.ga(ZIPScore) AND Risk_Indicators.iid_constants.ga(CityStateScore) AND AddressPopulated;
-		AddressMatched			:= AddressPopulated AND Risk_Indicators.iid_constants.ga(IF(ZIPScore = NoScoreValue AND CityStateScore = NoScoreValue, NoScoreValue, 
-																						Risk_Indicators.AddrScore.AddressScore(le.Clean_Input.Prim_Range, le.Clean_Input.Prim_Name, le.Clean_Input.Sec_Range, 
+		AddressMatched			:= AddressPopulated AND Risk_Indicators.iid_constants.ga(IF(ZIPScore = NoScoreValue AND CityStateScore = NoScoreValue, NoScoreValue,
+																						Risk_Indicators.AddrScore.AddressScore(le.Clean_Input.Prim_Range, le.Clean_Input.Prim_Name, le.Clean_Input.Sec_Range,
 																						ri.prim_range, ri.prim_name, ri.sec_range,
 																						ZIPScore, CityStateScore)));
 		Rep1Matched         := le.Clean_Input.Rep_LexID = ri.DID;
@@ -176,16 +176,16 @@ EXPORT getProperty(DATASET(Business_Risk_BIP.Layouts.Shell) Shell,
 		Rep3Matched         := le.Clean_Input.Rep3_LexID = ri.DID;
 		Rep4Matched         := le.Clean_Input.Rep4_LexID = ri.DID;
 		Rep5Matched         := le.Clean_Input.Rep5_LexID = ri.DID;
-		
+
 		SELF.BusExecLinkBusAddrAuthRepOwned := IF(AddressMatched and Rep1Matched, 1, 0);
 		SELF.BusExecLinkBusAddrAuthRep2Owned := IF(AddressMatched and Rep2Matched, 1, 0);
 		SELF.BusExecLinkBusAddrAuthRep3Owned := IF(AddressMatched and Rep3Matched, 1, 0);
 		SELF.BusExecLinkBusAddrAuthRep4Owned := IF(AddressMatched and Rep4Matched, 1, 0);
 		SELF.BusExecLinkBusAddrAuthRep5Owned := IF(AddressMatched and Rep5Matched, 1, 0);
-		
-		
+
+
 	END;
-  
+
 	RepPropertyOwned := JOIN(Shell, OwnershipKey, (LEFT.Clean_Input.Rep_LexID > 0 AND KEYED(LEFT.Clean_Input.Rep_LexID = RIGHT.DID) or
 																									LEFT.Clean_Input.Rep2_LexID > 0 AND KEYED(LEFT.Clean_Input.Rep2_LexID = RIGHT.DID) or
 																									LEFT.Clean_Input.Rep3_LexID > 0 AND KEYED(LEFT.Clean_Input.Rep3_LexID = RIGHT.DID) or
@@ -198,15 +198,15 @@ EXPORT getProperty(DATASET(Business_Risk_BIP.Layouts.Shell) Shell,
 																									LEFT.Clean_Input.Rep3_LexID > 0 AND KEYED(LEFT.Clean_Input.Rep3_LexID = RIGHT.DID) or
 																									LEFT.Clean_Input.Rep4_LexID > 0 AND KEYED(LEFT.Clean_Input.Rep4_LexID = RIGHT.DID) or
 																									LEFT.Clean_Input.Rep5_LexID > 0 AND KEYED(LEFT.Clean_Input.Rep5_LexID = RIGHT.DID)),Business_Risk_BIP.Constants.Limit_Default));
-	
+
 	RepPropertyOwnedCounts := ROLLUP(SORT(RepPropertyOwned, Seq), LEFT.Seq = RIGHT.Seq, TRANSFORM(RECORDOF(LEFT),
 																					SELF.BusExecLinkBusAddrAuthRepOwned := LEFT.BusExecLinkBusAddrAuthRepOwned + RIGHT.BusExecLinkBusAddrAuthRepOwned;
 																					SELF.BusExecLinkBusAddrAuthRep2Owned := LEFT.BusExecLinkBusAddrAuthRep2Owned + RIGHT.BusExecLinkBusAddrAuthRep2Owned;
 																					SELF.BusExecLinkBusAddrAuthRep3Owned := LEFT.BusExecLinkBusAddrAuthRep3Owned + RIGHT.BusExecLinkBusAddrAuthRep3Owned;
 																					SELF.BusExecLinkBusAddrAuthRep4Owned := LEFT.BusExecLinkBusAddrAuthRep4Owned + RIGHT.BusExecLinkBusAddrAuthRep4Owned;
-																					SELF.BusExecLinkBusAddrAuthRep5Owned := LEFT.BusExecLinkBusAddrAuthRep5Owned + RIGHT.BusExecLinkBusAddrAuthRep5Owned;																					
+																					SELF.BusExecLinkBusAddrAuthRep5Owned := LEFT.BusExecLinkBusAddrAuthRep5Owned + RIGHT.BusExecLinkBusAddrAuthRep5Owned;
 																					SELF := LEFT));
-															
+
 	// Figure out the first seen and last seen date per source for each Seq, by LinkID level
 	PropertyStats := TABLE(Property,
 			{Seq,
@@ -231,31 +231,31 @@ EXPORT getProperty(DATASET(Business_Risk_BIP.Layouts.Shell) Shell,
 	END;
 	PropertyStatsTemp := PROJECT(PropertyStats, TRANSFORM(tempLayout,
 																				SELF.Seq := LEFT.Seq;
-																				SELF.Sources := DATASET([{LEFT.Source, 
-																																	IF(LEFT.DateFirstSeen = Business_Risk_BIP.Constants.NinesDate, Business_Risk_BIP.Constants.MissingDate, LEFT.DateFirstSeen), 
-																																	IF(LEFT.DateVendorFirstSeen = Business_Risk_BIP.Constants.NinesDate, Business_Risk_BIP.Constants.MissingDate, LEFT.DateVendorFirstSeen), 																																	
+																				SELF.Sources := DATASET([{LEFT.Source,
+																																	IF(LEFT.DateFirstSeen = Business_Risk_BIP.Constants.NinesDate, Business_Risk_BIP.Constants.MissingDate, LEFT.DateFirstSeen),
+																																	IF(LEFT.DateVendorFirstSeen = Business_Risk_BIP.Constants.NinesDate, Business_Risk_BIP.Constants.MissingDate, LEFT.DateVendorFirstSeen),
 																																	LEFT.DateLastSeen,
 																																	LEFT.DateVendorLastSeen,
 																																	LEFT.RecordCount}], Business_Risk_BIP.Layouts.LayoutSources)));
 	PropertyStatsRolled := ROLLUP(PropertyStatsTemp, LEFT.Seq = RIGHT.Seq, TRANSFORM(tempLayout, SELF.Seq := LEFT.Seq; SELF.Sources := LEFT.Sources + RIGHT.Sources));
-	
+
 	withProperty := JOIN(Shell, PropertyStatsRolled, LEFT.Seq = RIGHT.Seq,
 																	TRANSFORM(Business_Risk_BIP.Layouts.Shell,
 																							SELF.Sources := RIGHT.Sources;
 																							SELF := LEFT),
 																	LEFT OUTER, KEEP(1), ATMOST(100), FEW);
-																	
+
 	withPropertyDeedsRep := JOIN(withProperty, PropertyDeedsRepCounts, LEFT.Seq = RIGHT.Seq,
 																	TRANSFORM(Business_Risk_BIP.Layouts.Shell,
 																							SELF.Business_To_Executive_Link.BusExecLinkPropertyOverlapCount := (STRING)Business_Risk_BIP.Common.capNum(RIGHT.MaxBusExecLinkPropertyOverlapCount, -1, 99999);
 																							SELF.Business_To_Executive_Link.BusExecLinkPropertyOverlapCount2 := (STRING)Business_Risk_BIP.Common.capNum(RIGHT.MaxBusExecLinkPropertyOverlapCount2, -1, 99999);
 																							SELF.Business_To_Executive_Link.BusExecLinkPropertyOverlapCount3 := (STRING)Business_Risk_BIP.Common.capNum(RIGHT.MaxBusExecLinkPropertyOverlapCount3, -1, 99999);
 																							SELF.Business_To_Executive_Link.BusExecLinkPropertyOverlapCount4 := (STRING)Business_Risk_BIP.Common.capNum(RIGHT.MaxBusExecLinkPropertyOverlapCount4, -1, 99999);
-																							SELF.Business_To_Executive_Link.BusExecLinkPropertyOverlapCount5 := (STRING)Business_Risk_BIP.Common.capNum(RIGHT.MaxBusExecLinkPropertyOverlapCount5, -1, 99999);																							
+																							SELF.Business_To_Executive_Link.BusExecLinkPropertyOverlapCount5 := (STRING)Business_Risk_BIP.Common.capNum(RIGHT.MaxBusExecLinkPropertyOverlapCount5, -1, 99999);
 																							SELF.Best_Info.BestOwnership := (STRING)Business_Risk_BIP.Common.capNum(RIGHT.MaxBestOwnership, -1, 1);
 																							SELF := LEFT),
 																	LEFT OUTER, KEEP(1), ATMOST(100), FEW);
-																	
+
 	withRepPropertyOwned := JOIN(withPropertyDeedsRep, RepPropertyOwnedCounts, LEFT.Seq = RIGHT.Seq,
 																	TRANSFORM(Business_Risk_BIP.Layouts.Shell,
 																							SELF.Business_To_Executive_Link.BusExecLinkBusAddrAuthRepOwned := (STRING)Business_Risk_BIP.Common.capNum(RIGHT.BusExecLinkBusAddrAuthRepOwned, -1, 99999);
@@ -265,15 +265,15 @@ EXPORT getProperty(DATASET(Business_Risk_BIP.Layouts.Shell) Shell,
 																							SELF.Business_To_Executive_Link.BusExecLinkBusAddrAuthRep5Owned := (STRING)Business_Risk_BIP.Common.capNum(RIGHT.BusExecLinkBusAddrAuthRep5Owned, -1, 99999);
 																							SELF := LEFT),
 																	LEFT OUTER, KEEP(1), ATMOST(100), FEW);
-																	
 
-	
+
+
 	withErrorCodes := JOIN(withRepPropertyOwned, kFetchErrorCodes, LEFT.Seq = RIGHT.Seq,
 																	TRANSFORM(Business_Risk_BIP.Layouts.Shell,
 																							SELF.Data_Fetch_Indicators.FetchCodeProperty := (STRING)RIGHT.Fetch_Error_Code;
 																							SELF := LEFT),
 																	LEFT OUTER, KEEP(1), ATMOST(100), PARALLEL, FEW);
-																	
+
 	// *********************
 	//   DEBUGGING OUTPUTS
 	// *********************
@@ -289,6 +289,6 @@ EXPORT getProperty(DATASET(Business_Risk_BIP.Layouts.Shell) Shell,
 	// OUTPUT(CHOOSEN(PropertyStats, 100), NAMED('Sample_PropertyStats'));
 	// OUTPUT(CHOOSEN(PropertyStatsTemp, 100), NAMED('Sample_PropertyStatsTemp'));
 	// OUTPUT(CHOOSEN(withProperty, 100), NAMED('Sample_withProperty'));
-	
+
 	RETURN withErrorCodes;
 END;
