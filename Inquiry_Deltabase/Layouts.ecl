@@ -11,6 +11,7 @@ EXPORT Layouts := MODULE
 	EXPORT Deltabase_Input := RECORD
 		STRING Select {XPATH('Select')};
 		DATASET(Deltabase_Parameters) Parameters {XPATH('Parameters')};
+		string transactionid := '';
 	END;
 	
 	// Deltabase Output Layouts
