@@ -1,4 +1,4 @@
-﻿import tools;
+﻿import tools, header;
 
 export Build_Base(
 
@@ -13,11 +13,9 @@ export Build_Base(
 ) :=
 function
 
-	BuildType := if (pDeltaRun, 1, 2);
-	
-	pPrevBaseFile := if(BuildType = Cortera_Tradeline._Flags.BuildType.DeltaBuild, 
-											pBaseFile,
-											Cortera_Tradeline.Rollup_Delta_Base(pBaseFile)
+	pPrevBaseFile := if(pDeltaRun, 
+											pBaseFile, // Though passing previous base file, but is not used in the delta run
+											Cortera_Tradeline.Rollup_Delta_Base(pBaseFile)  //Rolling the delta files with the full file in the full run.
 										 );
 	
 	allrecs        := Cortera_Tradeline.Ingest(pversion,pDeltaRun,pSprayedAddFile,,pPrevBaseFile).AllRecords_notag;
@@ -36,10 +34,14 @@ function
 				,OUTPUT(Cortera_Tradeline.Ingest(pversion,pDeltaRun,pSprayedAddFile,,pPrevBaseFile).StandardStats(), ALL, NAMED('StandardStats'))
 				,Cortera_Tradeline.Ingest(pversion,pDeltaRun,pSprayedAddFile,,pPrevBaseFile).DoStats
 				,Cortera_Tradeline.Ingest().ValidityStats
-				,if(BuildType = Cortera_Tradeline._Flags.BuildType.DeltaBuild, 
-						Promote(pversion,'base',,false,pDeltaRun).buildfiles.New2Built,
-						Promote(pversion,'base').buildfiles.New2Built
-					 )
+				,if (~pDeltaRun,
+						 sequential(
+								header.PostDID_HeaderVer_Update('cortera_tradeline','bip_build_version'),
+   							output('Full re-did was successful')
+						 ),
+						 output('Delta re-did was successful')
+				 )
+				,Cortera_Tradeline.Promote(pversion,'base',pIsDeltaBuild:=pDeltaRun).buildfiles.New2Built,
 			)		
 			,output('No Valid version parameter passed, skipping Cortera_Tradeline.Build_Base atribute') 
 		);

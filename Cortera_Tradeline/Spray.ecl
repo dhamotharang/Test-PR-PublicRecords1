@@ -8,7 +8,6 @@ EXPORT Spray(
 	,string		pFilenamehdr		= 'bugatti_incr_*output.dat'
 	,string		pFilenamestats	= 'bugatti_delete_*output.dat'
 	,string		pGroupName			= ThorLib.Group()
-	//,string		pGroupName			= 'thor400_sta01'
 	,boolean	pIsTesting			= false
 	,boolean	pOverwrite			= false
 	,boolean	pExistSprayed		= _Flags.ExistCurrentSprayed

@@ -24,7 +24,7 @@ EXPORT BuildKeys(string pversion=(string8)Std.Date.Today(), boolean pDeltaBuild 
 				BuildLinkIdsKey,
 				BuildTDelta_RidKey
 			),
-			$.Promote(pversion,'key',pIsDeltaBuild:=pDeltaBuild).BuildFiles.New2Built,
-			$.Promote(pversion,'key',pIsDeltaBuild:=pDeltaBuild).BuildFiles.Built2QA
+			$.Promote(pversion,'key',pIsDeltaBuild:=pDeltaBuild).BuildFiles.New2Built//,
+			//$.Promote(pversion,'key',pIsDeltaBuild:=pDeltaBuild).BuildFiles.Built2QA
 	);
 end;
