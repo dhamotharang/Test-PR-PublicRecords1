@@ -1,5 +1,5 @@
 ﻿/*
-Suppress.Key_New_Suppression is a replacement for doxie.Key_PullSSN
+key_suppression is a replacement for doxie.Key_PullSSN
 Usage: InFile = input file to be checked
 			 outFile = output file
 			 InApplicationType =  Request Application Type (see AutoStandardI.InterfaceTranslator	Global ApplicationType 'GOV' 'LE')
