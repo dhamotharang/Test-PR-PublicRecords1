@@ -1631,6 +1631,13 @@ string2 RVT2004_1_0_reason3 := '';
 string2 RVT2004_1_0_reason4 := '';
 string2 RVT2004_1_0_reason5 := '';
 
+String3 RVT2004_2_0_score := '';
+string2 RVT2004_2_0_reason1 := '';
+string2 RVT2004_2_0_reason2 := '';
+string2 RVT2004_2_0_reason3 := '';
+string2 RVT2004_2_0_reason4 := '';
+string2 RVT2004_2_0_reason5 := '';
+
 String3 TBN509_0_0_score := '';
 string2 TBN509_0_0_reason1 := '';
 string2 TBN509_0_0_reason2 := '';

@@ -4689,6 +4689,35 @@ EXPORT Models.RVT2004_1_0.z_layouts_Input xfm_RVT2004_1_RVAttrs(riskview.layouts
       self := [];
     END;    
 
+//RVT2004_2 model transform
+EXPORT Models.RVT2004_2_0.z_layouts_Input xfm_RVT2004_2_RVAttrs(riskview.layouts.attributes_internal_layout_noscore le) := TRANSFORM
+			self.TransactionID := (String)le.seq;
+			// RV Attributes
+	    self.SUBJECTRECORDTIMEOLDEST                  := le.subjectrecordtimeoldest;
+      self.SUBJECTDECEASED                          := le.subjectdeceased;
+      self.CONFIRMATIONSUBJECTFOUND                 := le.confirmationsubjectfound;
+      self.SOURCENONDEROGCOUNT                      := le.sourcenonderogcount;
+      self.SOURCENONDEROGCOUNT06MONTH               := le.sourcenonderogcount06month;
+      self.SSNDECEASED                              := le.ssndeceased;
+      self.ASSETPROPCURRENTCOUNT                    := le.assetpropcurrentcount;
+      self.ASSETPROPEVERSOLDCOUNT                   := le.assetpropeversoldcount;
+      self.EVICTIONCOUNT                            := le.evictioncount;
+      self.LIENJUDGMENTCOUNT                        := le.lienjudgmentcount;
+      self.LIENJUDGMENTSMALLCLAIMSCOUNT             := le.lienjudgmentsmallclaimscount;
+      self.BANKRUPTCYSTATUS                         := le.bankruptcystatus;
+      self.SHORTTERMLOANREQUEST                     := le.shorttermloanrequest;
+      self.INQUIRYAUTO12MONTH                       := le.inquiryauto12month;
+      self.INQUIRYBANKING12MONTH                    := le.inquirybanking12month;
+      self.INQUIRYSHORTTERM12MONTH                  := le.inquiryshortterm12month;
+      self.INQUIRYCOLLECTIONS12MONTH                := le.inquirycollections12month;
+      self.ADDRONFILECOUNT                          := le.addronfilecount;
+      self.ADDRCURRENTOWNERSHIPINDEX                := le.addrcurrentownershipindex;
+      self.ADDRPREVIOUSTIMEOLDEST                   := le.addrprevioustimeoldest;
+      self.ADDRCHANGECOUNT60MONTH                   := le.addrchangecount60month;
+      self.ALERTREGULATORYCONDITION                 := le.alertregulatorycondition;
+   
+      self := [];
+    END;
 // rv5 attribute transform
 EXPORT iesp.share.t_NameValuePair intoVersion5(riskview.layouts.layout_riskview5_search_results le, INTEGER c) := TRANSFORM
   SELF.name := MAP(
