@@ -1,4 +1,4 @@
-import Address,ut,_control; 
+﻿import Address,ut,_control; 
 
 EXPORT NAHDB_Batch_Run(string8 filedate/*, string customerName*/) := function 
 
@@ -34,7 +34,7 @@ fileClean := project(filein , transform(FLAccidents_Ecrash.Layout_Infiles.layout
  EA_natl_keyed_inquiry_set   := ['FA','EA','TM','TF','A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P','Q','R','S','T','U','V','W','X','Y','Z',
                                  'IA','IB','IC','ID','IE','IF','IG','IH','II','IJ','IK','IL','IM','IN','IO','IP','IQ','IR','IS','IT','IU','IV','IW','IX','IY','IZ'];
 
- accidents0:= FLAccidents_Ecrash.File_KeybuildV2.out(report_code in EA_natl_keyed_inquiry_set); 
+ accidents0:= Files_eCrash.Ds_Base_Consolidation_Ecrash(report_code in EA_natl_keyed_inquiry_set); 
 
  accidents := distribute(accidents0,hash((unsigned)did)); 
  accidentDedup := dedup(sort(accidents,did,vin,accident_date,jurisdiction_state,-date_vendor_last_reported,map(report_code in [ 'EA','TF','TM'] => 1,  report_code[1] = 'I' => 2,
