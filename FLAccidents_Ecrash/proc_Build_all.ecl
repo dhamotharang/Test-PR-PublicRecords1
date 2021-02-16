@@ -71,39 +71,40 @@ crudateds := dataset('~thor_data400::out::ecrash_spversion',{string10	processdat
 string10 spversion := crudateds[1].processdate;
 
 alpha_dependent := sequential( 
-                    FLAccidents_Ecrash.ConcatInput
-									  ,fn_ValidIn(false)
-			              ,Spray_ECrash
-		                ,FLAccidents_Ecrash.map_basefile(filedate)
-										) : failure ( if ( trim(spversion) <> trim(filedate), fileservices.sendemail(
-													                                                      Email_Notification_Lists.NOC,
-													                                                       '***ALERT*** ECRASH BUILD FAILURE , ENV: BOCA PROD, BUILD_DATE : '+filedate,
-													                                                      email_msg.NOC_MSG
-																			                                          ),
-																																								
-																																	fileservices.sendemail(
-													                                                      Email_Notification_Lists.buildsuccess,
-													                                                       'ECRASH BUILD , ENV: BOCA PROD, BUILD_DATE : '+filedate,
-													                                                      'ECRASH CRU Build Triggered For Build Date: '+filedate+'.All Base files completed and so Please comment out alpha_dependent part in the build process'
-																			                                          ) 
-																								
-																	));
+	FLAccidents_Ecrash.ConcatInput
+	,fn_ValidIn(false)
+	,Spray_ECrash,  
+	CreateSuperFiles, 
+	FLAccidents_Ecrash.map_basefile(filedate)
+	): failure ( if ( trim(spversion) <> trim(filedate), fileservices.sendemail(
+																															Email_Notification_Lists.NOC,
+																															 '***ALERT*** ECRASH BUILD FAILURE , ENV: BOCA PROD, BUILD_DATE : '+filedate,
+																															email_msg.NOC_MSG
+																															),
+																															
+																								fileservices.sendemail(
+																															Email_Notification_Lists.buildsuccess,
+																															 'ECRASH BUILD , ENV: BOCA PROD, BUILD_DATE : '+filedate,
+																															'ECRASH CRU Build Triggered For Build Date: '+filedate+'.All Base files completed and so Please comment out alpha_dependent part in the build process'
+																															) 
+															
+								));
 																	
 orbit_report.areport_Stats(nationalgetretval);
 
 build_key := sequential(
-			 FLAccidents_Ecrash.fn_Inputstats.sentemail
-			,FLAccidents_Ecrash.proc_build_EcrashV2_keys(filedate)
-			,verify_dops
-			,OrbitCreateBuild
-			,FLAccidents_Ecrash.Sample_data.qa
-		  ,FLAccidents_Ecrash.strata(filedate)
-			,FLAccidents_Ecrash.proc_build_dupe_extract(filedate,timestamp)
-			,FLAccidents_Ecrash.Proc_build_Accident_watch(filedate,timestamp)
-			,FLAccidents_Ecrash.InFilesList
-			,getretval
-			,nationalgetretval) : success(Send_Email(filedate,'V2').buildsuccess), failure(Send_Email(filedate,'V1').buildfailure);
+	FLAccidents_Ecrash.fn_Inputstats.sentemail
+	,FLAccidents_Ecrash.proc_build_EcrashV2_keys(filedate)
+	,verify_dops
+	,OrbitCreateBuild
+	,FLAccidents_Ecrash.Sample_data.qa
+	,FLAccidents_Ecrash.strata(filedate)
+	,FLAccidents_Ecrash.proc_build_dupe_extract(filedate,timestamp)
+	,FLAccidents_Ecrash.Proc_build_Accident_watch(filedate,timestamp)
+	,FLAccidents_Ecrash.InFilesList
+	,getretval
+	,nationalgetretval) : success(Send_Email(filedate,'V2').buildsuccess), failure(Send_Email(filedate,'V1').buildfailure);
+
 
 return if (ut.Weekday(orbit_date)  in [  'SATURDAY','SUNDAY' ]    and morning = 'no' ,Spray_ECrash, Sequential(alpha_dependent, build_key));
-
 end;	
