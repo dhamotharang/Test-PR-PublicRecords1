@@ -1,4 +1,4 @@
-import ut, Foreclosure_Vacancy;
+IMPORT  data_services,Foreclosure_Vacancy,Seed_Files;
 
 d := seed_files.file_FOVRenewal;
 
@@ -9,7 +9,7 @@ end;
 
 newtable := table(d,newrec);
 
-export key_FOVRenewal := index(newtable,{hashvalue,dataset_name},
+EXPORT key_FOVRenewal := index(newtable,{hashvalue,dataset_name},
 																	{newtable},
-																	'~thor_data400::key::testseed::qa::FOV_Renewal');
+																	Data_Services.Data_location.Prefix('NONAMEGIVEN') +'~thor_data400::key::testseed::qa::FOV_Renewal');
 
