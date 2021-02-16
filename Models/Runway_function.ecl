@@ -4262,7 +4262,6 @@ self := left), keep(1), left outer);
 RVT2004_1_0_score := Models.getCreditLuciModels( , attrv5).RVT2004_1;
 // output(RVT2004_1_0_score, named('RVT2004_1_0_score'));
 
-
 with_RVT2004_1_0 := join(with_RVT1705_1_0, RVT2004_1_0_score,
 left.seq=(unsigned)right.seq,
 transform(Models.layout_Runway,
@@ -4276,11 +4275,26 @@ self.RVT2004_1_0_reason5 := if(exclude_reasons, '',  right.ri[5].hri);
 self := left), keep(1), left outer);
 // output(with_RVT2004_1_0, named('with_RVT2004_1_0'));
 
+RVT2004_2_0_score := Models.getCreditLuciModels( , attrv5).RVT2004_2;
+// output(RVT2004_2_0_score, named('RVT2004_2_0_score'));
+
+with_RVT2004_2_0 := join(with_RVT2004_1_0, RVT2004_2_0_score,
+left.seq=(unsigned)right.seq,
+transform(Models.layout_Runway,
+self.RVT2004_2_0_score := right.score;
+self.RVT2004_2_0_reason1 := if(exclude_reasons, '',  right.ri[1].hri);
+self.RVT2004_2_0_reason2 := if(exclude_reasons, '',  right.ri[2].hri);
+self.RVT2004_2_0_reason3 := if(exclude_reasons, '',  right.ri[3].hri);
+self.RVT2004_2_0_reason4 := if(exclude_reasons, '',  right.ri[4].hri);
+self.RVT2004_2_0_reason5 := if(exclude_reasons, '',  right.ri[5].hri);
+
+self := left), keep(1), left outer);
+// output(with_RVT2004_2_0, named('with_RVT2004_2_0'));
 
 TBN509_0_0_score := Models.TBN509_0_0(clam);
 // output(TBN509_0_0_score, named('TBN509_0_0__score'));
                                         
-with_TBN509_0_0:= join(with_RVT2004_1_0, TBN509_0_0_score,
+with_TBN509_0_0:= join(with_RVT2004_2_0, TBN509_0_0_score,
 left.seq=(unsigned)right.seq,
 transform(Models.layout_Runway,
 self.TBN509_0_0_score := right.score;
@@ -6046,6 +6060,12 @@ self.RVT2004_1_0_reason2	:= if(model_environment in [1,2], left.RVT2004_1_0_reas
 self.RVT2004_1_0_reason3	:= if(model_environment in [1,2], left.RVT2004_1_0_reason3	, '');
 self.RVT2004_1_0_reason4	:= if(model_environment in [1,2], left.RVT2004_1_0_reason4	, '');
 self.RVT2004_1_0_reason5	:= if(model_environment in [1,2], left.RVT2004_1_0_reason5	, '');
+
+self.RVT2004_2_0_reason1	:= if(model_environment in [1,2], left.RVT2004_2_0_reason1	, '');
+self.RVT2004_2_0_reason2	:= if(model_environment in [1,2], left.RVT2004_2_0_reason2	, '');
+self.RVT2004_2_0_reason3	:= if(model_environment in [1,2], left.RVT2004_2_0_reason3	, '');
+self.RVT2004_2_0_reason4	:= if(model_environment in [1,2], left.RVT2004_2_0_reason4	, '');
+self.RVT2004_2_0_reason5	:= if(model_environment in [1,2], left.RVT2004_2_0_reason5	, '');
 
 self.TBN509_0_0_score	:= if(model_environment in [1,3], left.TBN509_0_0_score	, '');
 self.TBN509_0_0_reason1	:= if(model_environment in [1,3], left.TBN509_0_0_reason1	, '');
