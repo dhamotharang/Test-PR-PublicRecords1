@@ -1301,6 +1301,7 @@
 		export string KEYWORD_IDGAKKUM							:= '983';
 		export string KEYWORD_IRISR_WC							:= '984';
 		export string KEYWORD_SECO_DUSMG						:= '985';
+		export string KEYWORD_PLUODO								:= '986';
 		
 		//When setting the keyword export use underscores for dashes (ex: For RBI-SANC, use RBI_SANC)	
 	end;
