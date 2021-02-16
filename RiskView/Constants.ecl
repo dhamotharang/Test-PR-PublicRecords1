@@ -18,7 +18,7 @@ export valid_attributes := ['riskviewattrv5', 'insurview2attr', checking_indicat
 
 export valid_IDA_models := ['rvg2005_0'];
 
-export attrv5_models := ['rva2008_1']; // this allows attributes to be run even if not requested
+export attrv5_models := ['rva2008_1', 'rvt2004_1']; // this allows attributes to be run even if not requested
 
 //List of models that are using the next gen riskview reason codes, used in Riskview. Transforms
 //these need to be the output model names that the customer sees

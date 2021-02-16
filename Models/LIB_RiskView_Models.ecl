@@ -26,7 +26,7 @@ EXPORT LIB_RiskView_Models ( GROUPED DATASET(Risk_Indicators.Layout_Boca_Shell) 
   SHARED IDAattrs := arguments.IDA_Attrs;
 
 	// EXPORT ValidatingModel := Models.RVG1809_1_0(BocaShell); // Change this to the model you are tring to validate
-	EXPORT ValidatingModel := Models.getCreditLuciModels(blankshell, attrv5, blankIDA).RVA2008_1; // Change this to the model you are tring to validate
+	EXPORT ValidatingModel := Models.getCreditLuciModels(blankshell, attrv5, blankIDA).RVT2004_1; // Change this to the model you are tring to validate
 	
 	
 	// Version 4.0
@@ -161,6 +161,7 @@ that is sent INTO calcindex for ECL.
                                     {'RVR1903_1', MType_G+'RVR1903_1', calcIndex( 82), '-1 - 2', 0}, //Sheffield Financial (non-standard score -1,0,1,2)
                                     {'RVG2005_0', MType_G+'RVG2005_0', calcIndex( 83), '0-999', 0}, //Riskview Credit Optics short term lending flagship
                                     {'RVA2008_1', MType_A+'RVA2008_1', calcIndex( 84), '0-999', 0}, //Automobile Acceptance Corporation
+																		{'RVT2004_1', MType_T+'RVT2004_1', calcIndex( 85), '0-999', 0}, //T-Mobile Thin
 
                                     // ------------------- FAKE MODELS - STATIC SCORE AND REASON CODES ------------------
                                     {'RVA9999_9', MType_A+'RVA9999_9', 0, '0-999', 0},
@@ -220,6 +221,7 @@ that is sent INTO calcindex for ECL.
                       'RVR1903_1' => UNGROUP(Models.RVR1903_1_0(attrv5)),
                       'RVG2005_0' => Models.getCreditLuciModels(BocaShell, attrv5, IDAattrs).RVG2005_0,
                       'RVA2008_1' => Models.getCreditLuciModels(blankshell, attrv5, blankIDA).RVA2008_1,
+											'RVT2004_1' => Models.getCreditLuciModels(blankshell, attrv5, blankIDA).RVT2004_1,
                       // ----------------------------------------------------------------------------------
                       // ------------------- FAKE MODELS - STATIC SCORE AND REASON CODES ------------------
                       'RVA9999_9' => UNGROUP(Models.FAKE_0_0(BocaShell, 'RV50')),
