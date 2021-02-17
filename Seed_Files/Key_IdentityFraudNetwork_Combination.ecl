@@ -1,5 +1,5 @@
-/* Oct.2016 - IPAddress length expanded to 45 characters in queries */
-IMPORT Data_Services, UT;
+﻿/* Oct.2016 - IPAddress length expanded to 45 characters in queries */
+IMPORT Data_Services, Seed_Files;
 
 baseFile := Seed_Files.file_IdentityFraudNetwork;
 

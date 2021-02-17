@@ -1402,6 +1402,7 @@
 				trim(kword, left, right) = 'IDGAKKUM' =>SubGroup_Constants.numKeywordsID.KEYWORD_IDGAKKUM,
 				trim(kword, left, right) = 'IRISR-WC' =>SubGroup_Constants.numKeywordsID.KEYWORD_IRISR_WC,
 				trim(kword, left, right) = 'SECO-DUSMG' =>SubGroup_Constants.numKeywordsID.KEYWORD_SECO_DUSMG,
+				trim(kword, left, right) = 'PLUODO' =>SubGroup_Constants.numKeywordsID.KEYWORD_PLUODO,
 								
 				//When setting the keyword export use underscores for dashes (ex: For RBI-SANC, use RBI_SANC)	
 				
