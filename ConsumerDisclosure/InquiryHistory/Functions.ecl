@@ -130,7 +130,7 @@ EXPORT Functions := MODULE
   END;
 
   SHARED PerformKeyDecryptionCall (DATASET($.Layouts.EncryptionKeyRequest) Keys,
-                                    DATASET(Gateway.layouts.config) gateways) := FUNCTION
+                                    STRING GatewayURL) := FUNCTION
 
     key_decryption_request_layout  := iesp.ws_securelogaccess.t_KeyDecryptionRequest;
     key_decryption_response_layout := iesp.ws_securelogaccess.t_KeyDecryptionResponseEx;
@@ -150,10 +150,8 @@ EXPORT Functions := MODULE
       SELF := [];
     END;
 
-    URL := gateways(Gateway.Configuration.IsKeyDecryptionInquiryHistory(servicename))[1].URL;
-
     dsSoapRes := SOAPCALL(dsKeysRequest,
-                          URL,
+                          GatewayURL,
                           $.Constants.ESP_KeyDecryption_Method,
                           key_decryption_request_layout,
                           TRANSFORM(key_decryption_request_layout, SELF := LEFT),
@@ -195,24 +193,32 @@ EXPORT Functions := MODULE
                              SELF.KeyGroup := LEFT.key_group,
                              SELF.KeyVersion := LEFT.key_version));
 
+    KeyDecryptionSoapCallURL := in_gateways(Gateway.Configuration.IsKeyDecryptionInquiryHistory(servicename))[1].URL;
+    isSoapCallURLBlank := KeyDecryptionSoapCallURL = '';
+
     //SOAP call to ESP to get RSAKey
-    RSAKeys := PerformKeyDecryptionCall(ds_keys, in_gateways);
+    RSAKeys := PerformKeyDecryptionCall(ds_keys, KeyDecryptionSoapCallURL);
 
     $.Layouts.decrypted_keys decryptKeys($.Layouts.DecryptionEncryptionKeyResponse L) := TRANSFORM
       SELF.key_group := L.KeyGroup;
       SELF.key_version := L.KeyVersion;
       SELF.key_encrypted := L.EncryptionKey;
-      SELF.key_decrypted := $.DecryptionFunctions.PythonDecryptRsaPksc_OAEP(L.RSAProtectedKey); // python function to decrypt RSA key
+      isRSAKeyBlank := L.RSAProtectedKey = '';
+
+      // python function to decrypt RSA key
+      SELF.key_decrypted := IF(~isRSAKeyBlank, $.DecryptionFunctions.PythonDecryptRsaPksc_OAEP(L.RSAProtectedKey), '');
     END;
 
-    keysDecrypted := PROJECT(RSAKeys.Keys, decryptKeys(LEFT));
+    keysDecrypted := IF(~isSoapCallURLBlank, PROJECT(RSAKeys.Keys, decryptKeys(LEFT)));
 
     $.Layouts.decrypted_xml_rec decryptText(encrypted_key_layout L,$.Layouts.decrypted_keys R) := TRANSFORM
       SELF.group_rid := L.group_rid;
       SELF.report_options := L.report_options;
+      isKeyDecryptedBlank := R.key_decrypted = '';
+      isEncryptedQueryBlank := L.query_encrypted = '';
 
       // python function to decrypt the encrypted inquiry
-      decrypted_text := $.DecryptionFunctions.pythonDecryptAES(R.key_decrypted, L.query_encrypted);
+      decrypted_text := IF((~isKeyDecryptedBlank and ~isEncryptedQueryBlank), $.DecryptionFunctions.pythonDecryptAES(R.key_decrypted, L.query_encrypted), '');
       _row := IF(decrypted_text <> '', FROMXML($.Layouts.decrypted_xml_rec, decrypted_text));
       SELF := _row;
     END;
