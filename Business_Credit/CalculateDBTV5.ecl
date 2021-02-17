@@ -1,9 +1,9 @@
-import Business_Credit,std;
+﻿import Business_Credit, std;
 
-export CalculateDBTV5(dataset(Business_Credit.Layouts.rAccountBase) TradeLines):= function
+export CalculateDBTV5(dataset(Business_Credit.Layouts.rAccountBaseSeq) TradeLines):= function
 
     rAddRequiredFields:=RECORD
-        Business_Credit.Layouts.rAccountBase;
+        Business_Credit.Layouts.rAccountBaseSeq;
         integer     Cycle_Days_Diff;
         STRING      FunctionalPaymentInterval;        
         STRING      FunctionalDateAccountOpened;
@@ -23,7 +23,7 @@ export CalculateDBTV5(dataset(Business_Credit.Layouts.rAccountBase) TradeLines):
     END;
 
     rAddRequiredStringFields:=RECORD
-        Business_Credit.Layouts.rAccountBase;
+        Business_Credit.Layouts.rAccountBaseSeq;
         string     Raw_DBT_V5;
         string     DBT_V5;
     END;
@@ -251,10 +251,9 @@ export CalculateDBTV5(dataset(Business_Credit.Layouts.rAccountBase) TradeLines):
         self.DBT_V5:=if(self.Raw_DBT_V5<=0,'',(string)self.Raw_DBT_V5);
         self:=R;        
     end;
-    CalculateDBTV5:=iterate(Groupfile,tCalculateDBTV5(left,right,counter));
-    MakeEverythingString:=project(CalculateDBTV5,transform(rAddRequiredStringFields,
+    dbt_v5_calculation:=iterate(Groupfile,tCalculateDBTV5(left,right,counter));
+    MakeEverythingString:=project(dbt_v5_calculation,transform(rAddRequiredStringFields,
         self.Raw_DBT_V5:=(string)left.Raw_DBT_V5;
         self:=left;));
     return MakeEverythingString;
 end;
-
