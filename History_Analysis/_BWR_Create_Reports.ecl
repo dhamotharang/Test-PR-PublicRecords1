@@ -7,9 +7,8 @@ output(pVersion, named('workunit_version'));
 
 todays_date := (string)Std.Date.today():global;
 
-tomorrows_date := (string)Std.Date.AdjustDate((integer)todays_date,0,0,1):global;
-
 yesterdays_date := (string)Std.Date.AdjustDate((integer)todays_date,0,0,-1):global;
+tomorrows_date := (string)Std.Date.AdjustDate((integer)todays_date,0,0,1):global;
 
 //This call will build all of the required files including spraying, delta calculations and statistics 
 //////////////////////////////////////// processing dops daily input to a file in memory ////////////////////////////////////////////////

@@ -12,26 +12,26 @@ Export Layouts := Module
 
 //datasetname,buildversion,whenqalive,whenprodlive,clusterflag,updateflag,superkey,templatelogicalkey,size,recordcoun
     Export layout_keysizedhistory := Record 
-        String25 datasetname;
+        String   datasetname;
         String10 buildversion;
         String25 whenQAlive;
         String25 whenProdLive;
         String1  clusterflag;
         String1  updateflag;
-        String60 superkey;
-        String60 templatelogicalkey;
+        String   superkey;
+        String   templatelogicalkey;
         String   size;
         String   recordcount;
     End;
 
     Export layout_dopsservice := Record
-        String25 datasetname;
+        String   datasetname;
         String1  clusterflag;
         String25 whenqalive;
         string25 whenprodlive;
         String10 buildversion;
-        String60 superkey;
-        String60 logicalkey;
+        String   superkey;
+        String   logicalkey;
         Integer8 size;
         Integer8 recordcount;
         String1  updateflag;
@@ -55,12 +55,12 @@ Export Layouts := Module
         String15  master_build;
     End;
     Export baseRecQA:= Record
-        String25   datasetname;
+        String     datasetname;
         String10   prevbuild_version:= '';
         String10   buildversion;
         String25   whenqalive;
         String1    updateflag;
-        String60   superkey;
+        String     superkey;
         Integer8   previous_size:=0;
         Integer8   size;    
         Integer8   delta_size:=0;
@@ -72,12 +72,12 @@ Export Layouts := Module
     End;
 
     Export baseRecProd:= Record
-        String25   datasetname;
+        String     datasetname;
         String10   prevbuild_version:= '';
         String10   buildversion;
         String25   whenprodlive;
         String1    updateflag;
-        String60   superkey;
+        String     superkey;
         Integer8   previous_size:=0;
         Integer8   size;    
         Integer8   delta_size:=0;
@@ -89,8 +89,8 @@ Export Layouts := Module
     End;
 
     Export statisticsRec := Record  
-        String25   datasetname;
-        String60   superkey;
+        String     datasetname;
+        String     superkey;
         String1    updateflag;
         Unsigned   numberofdeltas;
         Real       Min_FilesizeReal;//Min
@@ -142,7 +142,7 @@ Export Layouts := Module
         Real       Q3_RecordCountPercent;//Q3_30
         Real       Max_RecordCountPercent;//Max_31
         Real       Mean_RecordCountPercent;//Mean_32
-        Real       Variance_RecordCountPercent;/Variance_33
+        Real       Variance_RecordCountPercent;//Variance_33
         Real       StDev_RecordCountPercent;//StDev_34
         Real       Plus2StDev_RecordCountPercent;//Plus2StDev_35
         Real       Minus2StDev_RecordCountPercent;//Minus2StDev_36
@@ -152,13 +152,5 @@ Export Layouts := Module
         Unsigned   BtwnMinThresholdAndMaxThreshold;//BtwnQ1AndQ3_38
         Unsigned   NumMoreThanMaxThreshold;//NumMoreThanQ3_39
     End;
-
-    Export validateDeltasRec := RECORD
-        String25 datasetname;
-        String10 buildversion;
-        String60 superkey;
-        Integer8 size;
-        Integer8 recordcount;
-    END;
 
 End;
