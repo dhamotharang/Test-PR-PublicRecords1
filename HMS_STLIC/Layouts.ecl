@@ -220,7 +220,8 @@ EXPORT layouts := MODULE
 				string10 		middle;
 				string50 		last;
 				string10 		suffix;
-				string25		typecode;
+				// string25		typecode;
+				string1			typecode := ''; // possible values: 'I', 'O', '' - stripped off for PR build - used in HC build
 				string25		position;
 				string10 		cred;
 				string6			gender;
@@ -228,6 +229,7 @@ EXPORT layouts := MODULE
 				string20 		dateofbirth;
 				string25		dateofdeath;
 				string50 		email;
+				string1			is_healthcare := ''; //possible values: 'Y', 'N' - stripped off for PR build - used in HC build
 		END;
 		
 		EXPORT language_layout := RECORD
@@ -289,15 +291,17 @@ EXPORT layouts := MODULE
 				string2 		state;
 				string 			class_type;
 				string25		subtype;
+				varstring		compact_type := ''; // stripped off for PR build
 				string 			number;
 				string 			status;
 				string25		sub_status;
+				string			disciplined; // moved from below - stripped off for PR build
 				string 			issue_date;
 				string25		effective_date;
 				string25		renewal_date;
 				string 			expiration_date;
 				string25		status_date;
-				string25		disciplined;
+				// string25		disciplined;
 				string 			qualifier1;
 				string 			qualifier2;
 				string 			qualifier3;
@@ -305,9 +309,11 @@ EXPORT layouts := MODULE
 				string 			qualifier5;
 				string 			rawclass;
 				string25		raw_subtype;
+				varstring		raw_compact_type; // stripped off for PR build
 				string25		raw_number;
 				string25		rawstatus;
 				string25		raw_sub_status;
+				varstring		raw_disciplined; // stripped off for PR build
 				string 			rawissue_date;
 				string25		raw_effective_date;
 				string25		rawrenewal_date;
