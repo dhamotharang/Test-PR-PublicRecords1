@@ -1,4 +1,4 @@
-import	DMA,RoxieKeyBuild,ut;
+import	DMA,RoxieKeyBuild,ut, Delta_Utilities;
 
 export	proc_build_tps_all(string	fileDate)	:=
 module
@@ -49,7 +49,8 @@ module
 		DMAPhone	:=	project(fileDMAIn,filterDMAPhone(left));
 		
 		baseFile	:=	fileTPSBaseNational+DMAPhone;
-		
+        baseFull := dataset('~thor_data400::base::suppression::tps'
+		Delta_Utilities.AddRecords( )
 		distDNC		:=	distribute(baseFile(PhoneNumber	!=	''	and	(unsigned)PhoneNumber	!=	0),hash32(PhoneNumber));
 		srtDNC		:=	sort(distDNC,record,local);
 		dedupDNC	:=	dedup(srtDNC,record,local);
