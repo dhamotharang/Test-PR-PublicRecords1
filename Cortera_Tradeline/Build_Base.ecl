@@ -39,7 +39,7 @@ function
 								header.PostDID_HeaderVer_Update('cortera_tradeline','bip_build_version'),
    							output('Full re-did was successful')
 						 ),
-						 output('Delta re-did was successful')
+						 output('Delta did was successful')
 				 )
 				,Cortera_Tradeline.Promote(pversion,'base',pIsDeltaBuild:=pDeltaRun).buildfiles.New2Built,
 			)		

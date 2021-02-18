@@ -17,12 +17,11 @@ END;
 
 EXPORT prep_ingest(string8 																		 pversion, 
 									 dataset(Cortera_Tradeline.Layout_Tradeline) AddsSprayedFile = $.Files().Input.Tradeline_Adds.Using,
-									 boolean																		 pIncremental
+									 boolean																		 pDeltaRun
 	) := FUNCTION
 
 	file_in := AddsSprayedFile;
-	//version := VersionControl.fGetFilenameVersion($.Files().Input.Tradeline_Adds.logical);
-	prepped := PROJECT(file_in, xBase(left, pversion, pIncremental));
+	prepped := PROJECT(file_in, xBase(left, pversion, pDeltaRun));
 	
 	return prepped;
 

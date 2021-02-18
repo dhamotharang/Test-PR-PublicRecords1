@@ -7,15 +7,16 @@ EXPORT proc_delete_records(string8 													pVersion   			 = '',
 													  
 := FUNCTION
 		
-		BuildType := if(pDeltaBuild, 1, 2);
-		d 		 		:= DISTRIBUTE(deletes, hash32(ACCOUNT_KEY, AR_DATE));
-		t_curr 		:= DISTRIBUTE(DeltaTradelines(status<>'D'), hash32(ACCOUNT_KEY, AR_DATE));
-		t_prev 		:= DISTRIBUTE(PrevTradelines(status<>'D'), hash32(ACCOUNT_KEY, AR_DATE));
+		BuildType 	:= if(pDeltaBuild, 1, 2);
+		d 		 			:= DISTRIBUTE(deletes, hash32(ACCOUNT_KEY, AR_DATE));
+		t_curr 			:= DISTRIBUTE(DeltaTradelines(status<>'D'), hash32(ACCOUNT_KEY, AR_DATE));
+		t_curr_dels := DeltaTradelines(status='D');
+		t_prev 			:= DISTRIBUTE(PrevTradelines(status<>'D'), hash32(ACCOUNT_KEY, AR_DATE));
 		
 		integer4 deldate := (integer4)pVersion;
 		
 		//*** Processing deletes on Delta/incremental build
-		//*** Status field is not set to "D" for delta incremental runs.
+		//*** Status field is not set to "D" in delta incremental runs.
 		DeltaJ  := JOIN(t_curr, d, left.ACCOUNT_KEY=right.ACCOUNT_KEY and left.AR_DATE=right.AR_DATE,
 										TRANSFORM($.Layout_Tradeline_base,
 															//self.status 								 := IF(left.ACCOUNT_KEY=right.ACCOUNT_KEY and left.AR_DATE=right.AR_DATE, 'D', left.status);
@@ -37,7 +38,7 @@ EXPORT proc_delete_records(string8 													pVersion   			 = '',
 															self 													:= left;),
 										LOOKUP, LOCAL);
 		
-		DeltaOutRecs := DeltaJ + t_curr(status='D') + DeltaJ2;
+		DeltaOutRecs := DeltaJ + t_curr_dels + DeltaJ2;
 		
 		//*** Processing deletes on Full build.
 		FullJ := JOIN(t_curr, d, left.ACCOUNT_KEY=right.ACCOUNT_KEY and left.AR_DATE=right.AR_DATE,
@@ -48,8 +49,8 @@ EXPORT proc_delete_records(string8 													pVersion   			 = '',
 											self 												 := left;),
 									LEFT OUTER, LOCAL);
 		
-		FullOutRecs := FullJ + t_curr(status='D');
-
+		FullOutRecs := FullJ + t_curr_dels;
+		
 		OutRecs := if (BuildType = Cortera_Tradeline._Flags.BuildType.DeltaBuild,
 									 DeltaOutRecs,
 									 FullOutRecs

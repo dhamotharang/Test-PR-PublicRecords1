@@ -3,7 +3,6 @@ EXPORT Ingest(
 	string8 pversion 																					= ''
 , BOOLEAN incremental																				= FALSE
 , DATASET(Layout_Tradeline) 							dsAddsSprayedFile = Files().input.Tradeline_Adds.Using
-, DATASET(Layout_Delete) 									dsDelsSprayedFile = Files().input.Tradeline_Dels.Using
 , DATASET(Layout_Tradeline_Base) 											Delta = DATASET([],Layout_Tradeline_Base)
 , DATASET(Layout_Tradeline_Base) 										 dsBase = Files().Base.Tradeline.Qa // Change IN_Tradeline_Base to change input to ingest process
 , DATASET(RECORDOF(Cortera_Tradeline.Prep_Ingest))	 infile = Cortera_Tradeline.Prep_Ingest(pversion, dsAddsSprayedFile, incremental)
@@ -47,25 +46,25 @@ EXPORT Ingest(
   SortIngest0 := SORT(DistIngest0,link_id,account_key,ar_date,total_ar,status, __Tpe, record_sid, LOCAL);
   GroupIngest0 := GROUP(SortIngest0,link_id,account_key,ar_date,total_ar,status, LOCAL, ORDERED, STABLE);
   SHARED AllIngestRecs0 := UNGROUP(ROLLUP(GroupIngest0,TRUE,MergeData(LEFT,RIGHT)));
-
+	
   // Existing Base: combine delta with base file
   DistBase0 := DISTRIBUTE(Base0+Delta0, HASH32(link_id,account_key,ar_date,total_ar,status));
   SortBase0 := SORT(DistBase0,link_id,account_key,ar_date,total_ar,status, __Tpe, record_sid, LOCAL);
   GroupBase0 := GROUP(SortBase0,link_id,account_key,ar_date,total_ar,status, LOCAL, ORDERED, STABLE);
   SHARED AllBaseRecs0 := UNGROUP(ROLLUP(GroupBase0,TRUE,MergeData(LEFT,RIGHT)));
-
+	
   // Everything: combine ingest and base recs
-  Sort0 := SORT(AllBaseRecs0+AllIngestRecs0,link_id,account_key,ar_date,total_ar,status, __Tpe,record_sid,LOCAL);
+  shared Sort0 := SORT(AllBaseRecs0+AllIngestRecs0,link_id,account_key,ar_date,total_ar,status, __Tpe,record_sid,LOCAL);
   Group0 := GROUP(Sort0,link_id,account_key,ar_date,total_ar,status,LOCAL, ORDERED, STABLE);
   SHARED AllRecs0 := UNGROUP(ROLLUP(Group0,TRUE,MergeData(LEFT,RIGHT)));
-
+	
   //Now need to update 'rid' numbers on new records
   //Base upon SALT311.utMac_Sequence_Records
   // Do not use PROJECT,COUNTER because it is very slow if any of the fields are not fixed length
   NR := AllRecs0(__Tpe=RecordType.New);
   ORe := AllRecs0(__Tpe<>RecordType.New);
   PrevBase := MAX(ORe,record_sid);
-  WithRT AddNewRid(WithRT le, WithRT ri) := TRANSFORM
+	WithRT AddNewRid(WithRT le, WithRT ri) := TRANSFORM
     SELF.record_sid := IF ( le.record_sid=0, PrevBase+1+thorlib.node(), le.record_sid+thorlib.nodes() );
     SELF := ri;
   END;

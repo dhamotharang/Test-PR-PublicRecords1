@@ -5,7 +5,7 @@ EXPORT proc_build_all ( string pversion, boolean pDeltaBuild = false, boolean pI
 	build_name := 'Cortera Tradeline';
 	DopsEmail  := 'Sudhir.Kasavajjala@lexisnexisrisk.com,Michael.Gould@lexisnexis.com,QualityAssurance@seisint.com,Charles.Salvo@lexisnexisrisk.com';
 	
-	boolean isnewheader := header.IsNewProdHeaderVersion('Utility','bip_build_version');
+	boolean isnewheader := header.IsNewProdHeaderVersion('cortera_tradeline','bip_build_version');
 		
 	BuildType := if(pDeltaBuild or ~isnewheader, 1, 2);
 	//BuildType := if(pDeltaBuild, 1, 2);
