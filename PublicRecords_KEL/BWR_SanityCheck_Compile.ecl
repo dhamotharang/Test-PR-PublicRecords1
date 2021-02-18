@@ -73,6 +73,8 @@ IF(RunAll OR RunInvalidSingleValues,OUTPUT(E_Phone().Cord_Cutter__SingleValue_In
 IF(RunAll OR RunInvalidSingleValues,OUTPUT(E_Phone().Activity_Status__SingleValue_Invalid,NAMED('E_Phone_Activity_Status__SingleValue_Invalid')));
 IF(RunAll OR RunInvalidSingleValues,OUTPUT(E_Phone().Prepaid__SingleValue_Invalid,NAMED('E_Phone_Prepaid__SingleValue_Invalid')));
 IF(RunAll OR RunInvalidSingleValues,OUTPUT(E_Phone().Global_S_I_D__SingleValue_Invalid,NAMED('E_Phone_Global_S_I_D__SingleValue_Invalid')));
+IF(RunAll OR RunInvalidSingleValues,OUTPUT(E_Phone().Serv__SingleValue_Invalid,NAMED('E_Phone_Serv__SingleValue_Invalid')));
+IF(RunAll OR RunInvalidSingleValues,OUTPUT(E_Phone().Line__SingleValue_Invalid,NAMED('E_Phone_Line__SingleValue_Invalid')));
 IF(RunAll OR RunFast OR RunUidSourceCounts,OUTPUT(E_Phone().UIDSourceCounts,NAMED('E_Phone_UIDSourceCounts')));
 IF(RunAll OR RunFast OR RunUidSourceCounts,OUTPUT(E_Phone().TopSourcedUIDs(TopNUids),NAMED('E_Phone_TopSourcedUIDs')));
 IF(RunAll OR RunFast OR RunUidSourceCounts,OUTPUT(E_Phone().UIDSourceDistribution,NAMED('E_Phone_UIDSourceDistribution')));
@@ -751,6 +753,10 @@ IF(RunAll OR RunInvalidSingleValues,OUTPUT(E_Input_P_I_I().C_O_C_Type__SingleVal
 IF(RunAll OR RunInvalidSingleValues,OUTPUT(E_Input_P_I_I().S_S_C__SingleValue_Invalid,NAMED('E_Input_P_I_I_S_S_C__SingleValue_Invalid')));
 IF(RunAll OR RunInvalidSingleValues,OUTPUT(E_Input_P_I_I().Wireless_Indicator__SingleValue_Invalid,NAMED('E_Input_P_I_I_Wireless_Indicator__SingleValue_Invalid')));
 IF(RunAll OR RunInvalidSingleValues,OUTPUT(E_Input_P_I_I().Rep_Number__SingleValue_Invalid,NAMED('E_Input_P_I_I_Rep_Number__SingleValue_Invalid')));
+IF(RunAll OR RunInvalidSingleValues,OUTPUT(E_Input_P_I_I().Social_Summary__SingleValue_Invalid,NAMED('E_Input_P_I_I_Social_Summary__SingleValue_Invalid')));
+IF(RunAll OR RunInvalidSingleValues,OUTPUT(E_Input_P_I_I().Name_Summ__SingleValue_Invalid,NAMED('E_Input_P_I_I_Name_Summ__SingleValue_Invalid')));
+IF(RunAll OR RunInvalidSingleValues,OUTPUT(E_Input_P_I_I().Telephone_Summary__SingleValue_Invalid,NAMED('E_Input_P_I_I_Telephone_Summary__SingleValue_Invalid')));
+IF(RunAll OR RunInvalidSingleValues,OUTPUT(E_Input_P_I_I().Location_Summary__SingleValue_Invalid,NAMED('E_Input_P_I_I_Location_Summary__SingleValue_Invalid')));
 IF(RunAll OR RunFast OR RunUidSourceCounts,OUTPUT(E_Input_P_I_I().UIDSourceCounts,NAMED('E_Input_P_I_I_UIDSourceCounts')));
 IF(RunAll OR RunFast OR RunUidSourceCounts,OUTPUT(E_Input_P_I_I().TopSourcedUIDs(TopNUids),NAMED('E_Input_P_I_I_TopSourcedUIDs')));
 IF(RunAll OR RunFast OR RunUidSourceCounts,OUTPUT(E_Input_P_I_I().UIDSourceDistribution,NAMED('E_Input_P_I_I_UIDSourceDistribution')));

@@ -49,8 +49,8 @@ EXPORT Q_Inquiry_Entity(DATA57 __PPermitsValue, CFG_Compile.FDCDataset __in = CF
     SHARED TYPEOF(B_Person_Inquiry_1().__ENH_Person_Inquiry_1) __ENH_Person_Inquiry_1 := B_Person_Inquiry_1_Local.__ENH_Person_Inquiry_1;
   END;
   SHARED TYPEOF(B_Person_Inquiry(__in).__ENH_Person_Inquiry) __ENH_Person_Inquiry := B_Person_Inquiry_Local.__ENH_Person_Inquiry;
-  SHARED __EE11995238 := __ENH_Person_Inquiry;
-  EXPORT Res0 := __UNWRAP(__EE11995238);
+  SHARED __EE11749528 := __ENH_Person_Inquiry;
+  EXPORT Res0 := __UNWRAP(__EE11749528);
   EXPORT DBG_E_Inquiry_Result := __UNWRAP(E_Inquiry_Filtered.__Result);
   EXPORT DBG_E_Person_Inquiry_Result := __UNWRAP(E_Person_Inquiry_Filtered.__Result);
   EXPORT DBG_E_Inquiry_Intermediate_11 := __UNWRAP(B_Inquiry_11_Local.__ENH_Inquiry_11);

@@ -4,8 +4,8 @@ IMPORT B_Sele_T_I_N_2,CFG_Compile,E_Business_Org,E_Business_Sele,E_Business_Sele
 IMPORT * FROM KEL15.Null;
 EXPORT B_Sele_T_I_N_1(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG_Compile __cfg = CFG_Compile) := MODULE
   SHARED VIRTUAL TYPEOF(B_Sele_T_I_N_2(__in,__cfg).__ENH_Sele_T_I_N_2) __ENH_Sele_T_I_N_2 := B_Sele_T_I_N_2(__in,__cfg).__ENH_Sele_T_I_N_2;
-  SHARED __EE8547344 := __ENH_Sele_T_I_N_2;
-  EXPORT __ST199875_Layout := RECORD
+  SHARED __EE8383474 := __ENH_Sele_T_I_N_2;
+  EXPORT __ST199417_Layout := RECORD
     KEL.typ.nbool Header_Hit_Flag_;
     KEL.typ.nstr Source_;
     KEL.typ.nkdate My_Date_First_Seen_;
@@ -18,7 +18,7 @@ EXPORT B_Sele_T_I_N_1(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG_
     KEL.typ.epoch Vault_Date_Last_Seen_ := 0;
     KEL.typ.int __RecordCount := 0;
   END;
-  EXPORT __ST199866_Layout := RECORD
+  EXPORT __ST199408_Layout := RECORD
     KEL.typ.ntyp(E_Business_Sele().Typ) Legal_;
     KEL.typ.ntyp(E_T_I_N().Typ) Tax_I_D_;
     KEL.typ.nint Ult_I_D_;
@@ -26,7 +26,7 @@ EXPORT B_Sele_T_I_N_1(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG_
     KEL.typ.nint Sele_I_D_;
     KEL.typ.nint Best_T_I_N_;
     KEL.typ.nint Best_T_I_N_Rank_;
-    KEL.typ.ndataset(__ST199875_Layout) Data_Sources_;
+    KEL.typ.ndataset(__ST199417_Layout) Data_Sources_;
     KEL.typ.nbool Input_T_I_N_Match_;
     KEL.typ.epoch Archive___Date_ := 0;
     KEL.typ.epoch Date_First_Seen_ := 0;
@@ -35,10 +35,10 @@ EXPORT B_Sele_T_I_N_1(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG_
     KEL.typ.epoch Vault_Date_Last_Seen_ := 0;
     KEL.typ.int __RecordCount := 0;
   END;
-  SHARED __ST199866_Layout __ND8547349__Project(B_Sele_T_I_N_2(__in,__cfg).__ST218504_Layout __PP8547345) := TRANSFORM
-    __EE8547374 := __PP8547345.Data_Sources_;
-    SELF.Data_Sources_ := __BN(PROJECT(__T(__EE8547374),__ST199875_Layout),__NL(__EE8547374));
-    SELF := __PP8547345;
+  SHARED __ST199408_Layout __ND8383479__Project(B_Sele_T_I_N_2(__in,__cfg).__ST217997_Layout __PP8383475) := TRANSFORM
+    __EE8383504 := __PP8383475.Data_Sources_;
+    SELF.Data_Sources_ := __BN(PROJECT(__T(__EE8383504),__ST199417_Layout),__NL(__EE8383504));
+    SELF := __PP8383475;
   END;
-  EXPORT __ENH_Sele_T_I_N_1 := PROJECT(__EE8547344,__ND8547349__Project(LEFT));
+  EXPORT __ENH_Sele_T_I_N_1 := PROJECT(__EE8383474,__ND8383479__Project(LEFT));
 END;
