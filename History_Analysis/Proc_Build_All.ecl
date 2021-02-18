@@ -1,10 +1,10 @@
 Import History_Analysis, STD, dops, PromoteSupers, _Control;
 
-Export Proc_Build_All( string pVersion, string datasetname, string location, string cluster,string fromdate, string todate, string dopsenv ) := Function 
+Export Proc_Build_All( string pVersion, string datasetname, string location, string cluster,string fromdate, string todate ) := Function 
     
 
     /////////////////////////////////////////// Input File for Prod and QA /////////////////////////////////////////////////////////
-    update_source := History_Analysis.fspray(pVersion, datasetname, location, cluster, fromdate, todate, dopsenv ).build_3; // params 
+    update_source := History_Analysis.fspray(pVersion, datasetname, location, cluster, fromdate, todate ).build_3; // params 
 
     dopsService := History_Analysis.Files(pVersion).keysizedhistory_service;
 
