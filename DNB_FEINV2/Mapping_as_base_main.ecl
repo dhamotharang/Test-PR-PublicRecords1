@@ -1,4 +1,4 @@
-import DNB_FEINv2, address, standard, ut, idl_header, aid;
+﻿import DNB_FEINv2, address, standard, ut, idl_header, aid;
 
 export Mapping_as_base_main(string process_date) := function
 
@@ -144,10 +144,10 @@ dBase_AID_Cleaned_Addr := project(dwithAID, tMapAidAddr(left))
 // Flip names that may have been wrongly parsed by the name cleaner.
 ut.mac_flipnames(dBase_AID_Cleaned_Addr, fname, mname, lname, DB_norm);
 
-//source_rec_id logic										 
-Update_Base		:= distribute(DB_norm,hash64(tmsid,raw_aid, company_name));  
-Previous_Base	:= distribute(DNB_FEINV2.File_DNB_Fein_base_main_new,hash64(tmsid,raw_aid, company_name));  
-	
+//source_rec_id logic	
+Update_Base		:= distribute(DB_norm,hash64(tmsid, company_name));  
+Previous_Base	:= distribute(DNB_FEINV2.File_DNB_Fein_base_main_new,hash64(tmsid, company_name)); 
+
 DNB_FEINV2.layout_DNB_fein_base_main_new	trans_recID(DNB_FEINV2.layout_DNB_fein_base_main_new l, DNB_FEINV2.layout_DNB_fein_base_main_new r):=transform
 		self.source_rec_id := r.source_rec_id;
 		self               := l;
@@ -178,7 +178,6 @@ persistent_recID_join  := join(Update_Base,Previous_Base,
 															 trim(left.sic_code,left,right)                      = trim(right.sic_code,left,right) and 
 															 trim(left.Telephone_Number,left,right)              = trim(right.Telephone_Number,left,right) and 
 															 stringlib.stringcleanspaces(left.Top_Contact_Name)  = stringlib.stringcleanspaces(right.Top_Contact_Name) and 
-															 trim(left.Top_Contact_Title,left,right)             = trim(right.Top_Contact_Title,left,right) and 
 															 trim(left.Hdqtr_Parent_Duns_Number,left,right)      = trim(right.Hdqtr_Parent_Duns_Number,left,right),
 													trans_recID(left,right),left outer,local);	
 							
