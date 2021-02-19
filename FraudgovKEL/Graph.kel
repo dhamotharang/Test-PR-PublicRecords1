@@ -2878,8 +2878,8 @@ Event: => T_InpClnMailingAddrZipEcho := MAP(MailingZip='' OR MailingZip:Null => 
 // 																			echo cleaned input: The reported street address 2 of cleaned input address for this transaction.
 
 Event: => T_InpPhnContactTypeEcho := MAP(Contact_Type= '' OR Contact_Type:Null => -99999, Contact_Type);
-Event: => T_InpClnCellPhnEcho := MAP(PhoneFormatted='' OR PhoneFormatted:Null => -99999, PhoneFormatted);
-Event: => T_InpClnWorkPhnEcho := MAP(CellPhoneFormatted='' OR CellPhoneFormatted:Null => -99999, CellPhoneFormatted);
+Event: => T_InpClnCellPhnEcho := MAP(CellPhoneFormatted='' OR CellPhoneFormatted:Null => -99999, CellPhoneFormatted);
+Event: => T_InpClnWorkPhnEcho := MAP(WorkPhoneFormatted='' OR WorkPhoneFormatted:Null => -99999, WorkPhoneFormatted);
 Event: => T_InpClnBnkAcct2Echo := MAP(AccountNumber2='' OR AccountNumber2:Null => -99999, AccountNumber2 );
 Event: => T_InpClnBnkAcctRtg2Echo := MAP(RoutingNumber2='' OR RoutingNumber2:Null => -99999, RoutingNumber2);
 Event: => T_InpEthnicityEcho := MAP(ethnicity='' OR ethnicity:Null => -99999, ethnicity);
