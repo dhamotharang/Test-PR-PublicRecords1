@@ -1,6 +1,6 @@
 ﻿OPTIONS:-gh 
-MODULE:Scrubs_Phonesinfo
-FILENAME:Phonesinfo
+MODULE:Scrubs_PhonesInfo
+FILENAME:PhonesInfo
 NAMESCOPE:DeactRaw2
 
 FIELDTYPE:Invalid_Num:ALLOW(0123456789 \n)

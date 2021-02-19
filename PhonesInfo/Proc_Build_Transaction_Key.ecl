@@ -1,4 +1,4 @@
-﻿IMPORT _control, Dops, Doxie, dx_PhonesInfo, PromoteSupers, RoxieKeyBuild, Std, Ut, Orbit3;
+﻿IMPORT _control, Dops, Doxie, dx_PhonesInfo, PromoteSupers, RoxieKeyBuild, Scrubs_PhonesInfo, Std, Ut, Orbit3;
 
 //DF-24397: Create Dx-Prefixed Keys
 
@@ -37,6 +37,13 @@ EXPORT Proc_Build_Transaction_Key(string version, string contacts):= function
 	
 	//Move Transaction Key to QA Superfile
 	PromoteSupers.Mac_SK_Move_v2('~thor_data400::key::phones_transaction','Q',mvQAPhonesTransaction,'4');																 
+
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////	
+//Run Scrub Reports//////////////////////////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////																				 
+	scrubsRun		:= sequential(Scrubs_PhonesInfo.RawFileScrubs(version, contacts), 
+														Scrubs_PhonesInfo.PostBuildScrubs(version, contacts)
+														);
 															
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////	
 //Run Build & Send Notification Emails///////////////////////////////////////////////////////////////////////
@@ -44,7 +51,8 @@ EXPORT Proc_Build_Transaction_Key(string version, string contacts):= function
 	sendEmail		:= sequential(buildComBase,
 														clearDelete, 
 														moveComBase,
-														bkPhonesTransaction, mvBltPhonesTransaction, mvQAPhonesTransaction):
+														bkPhonesTransaction, mvBltPhonesTransaction, mvQAPhonesTransaction,
+														scrubsRun):
 														Success(FileServices.SendEmail(contacts, 'PhonesInfo Transaction Key Build Succeeded', workunit + ': Build complete.')),
 														Failure(FileServices.SendEmail(contacts, 'PhonesInfo Transaction Key Build Failed', workunit + '\n' + FAILMESSAGE));
 	return sendEmail;														
