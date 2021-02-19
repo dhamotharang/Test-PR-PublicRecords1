@@ -60,7 +60,7 @@ outaction := parallel(proc_build_payload_key_AKB, AutokeyB2.Fn_Build.Do(mod_AKB,
  
 AutoKeyB2.MAC_AcceptSK_to_QA(ak_keyname, mymove)
 
-retval := sequential(outaction,if(NOT(isFast),mymove),LN_PropertyV2_Fast.verify_fakeid_are_unique);  // IIR-2644 check duplicate fakeID
+retval := sequential(outaction,if(NOT(isFast),mymove),LN_PropertyV2_Fast.verify_fakeid_are_unique,output('No Duplicate FakeID'));  // IIR-2644 check duplicate fakeID
 return retval;
 
 end;
