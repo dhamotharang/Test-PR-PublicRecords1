@@ -1,7 +1,4 @@
-﻿/*2019-06-19T17:11:54Z (Hennigar, Jennifer (RIS-BCT))
-CCPA-260
-*/
-IMPORT Address, BIPV2, AID, HMS_STLIC;
+﻿IMPORT Address, BIPV2, AID, HMS_STLIC;
 
 EXPORT layouts := MODULE
 
