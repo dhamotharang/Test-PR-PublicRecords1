@@ -1,2 +1,3 @@
-﻿import Phonesinfo;
-EXPORT DeactRaw2_in_Phonesinfo := PhonesInfo.File_Deact.Raw2;
+﻿IMPORT PhonesInfo;
+
+EXPORT DeactRaw2_In_Phonesinfo := PhonesInfo.File_Deact.Raw2;

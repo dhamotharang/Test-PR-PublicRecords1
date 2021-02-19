@@ -1,9 +1,9 @@
 ﻿ 
 EXPORT DeactRaw2_MAC_PopulationStatistics(infile,Ref='',Input_msisdn = '',Input_timestamp = '',Input_changeid = '',Input_operatorid = '',Input_msisdneid = '',Input_msisdnnew = '',Input_filename = '',OutFile) := MACRO
-  IMPORT SALT39,Scrubs_Phonesinfo;
+  IMPORT SALT311,Scrubs_PhonesInfo;
   #uniquename(of)
   %of% := RECORD
-    SALT39.Str512Type fields;
+    SALT311.Str512Type fields;
   END;
   #uniquename(ot)
   %of% %ot%(infile le) := TRANSFORM

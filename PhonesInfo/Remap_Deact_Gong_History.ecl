@@ -26,7 +26,7 @@ EXPORT Remap_Deact_Gong_History(string version) := FUNCTION
 	addAddr 					:= project(ds, addA(left));
 	
 	//Output History File (Input)
-	//ghHistoryFile := output(addAddr,,'~thor_data400::in::phones::deact_gh_history_'+version, overwrite, __compressed__);
+	ghHistoryFile := output(addAddr,,'~thor_data400::in::phones::deact_gh_history_'+version, overwrite, __compressed__);
 
 	//////////////////////////////////////////////////////////////////////////////////////////////////////////////	
 	//Dedup/Remap Gong History Records////////////////////////////////////////////////////////////////////////////
@@ -213,7 +213,7 @@ EXPORT Remap_Deact_Gong_History(string version) := FUNCTION
 
 	//Output Base File
 	ghFile 						:= output(filterDate,,'~thor_data400::base::phones::deact_gh_main_'+version, overwrite, __compressed__);
-	allFiles					:= sequential(/*ghHistoryFile, */ghFile, output(filterSameDayOut));
+	allFiles					:= sequential(ghHistoryFile, ghFile, output(filterSameDayOut));
 
 	RETURN allFiles;
 
