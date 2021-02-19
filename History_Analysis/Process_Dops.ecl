@@ -1,6 +1,6 @@
 Import STD, _control, dops, History_Analysis, PromoteSupers, ut;
 
-Export process_dops( string pVersion, string datasetname, string location, string cluster, string fromdate, string todate, string dopsenv ) := Module
+Export process_dops( string pVersion, string datasetname, string location, string cluster, string fromdate, string todate ) := Module
  
 // file from 2 year history 
 KeysizedHistory := History_Analysis.Files(pVersion).keysizedhistory_report;
@@ -11,9 +11,9 @@ KeysizedHistory := History_Analysis.Files(pVersion).keysizedhistory_report;
 // start date of ten day range
 // end date of ten day range
 // dopsenv = 'dev' or 'prod'; dev - points to dev or prod DOPS DB
-fcraData := dops.GetHistoricalKeyInfo(datasetname, location, 'F', fromdate, todate, dopsenv );
+fcraData := dops.GetHistoricalKeyInfo(datasetname, location, 'F', fromdate, todate );
 
-nonfcraData := dops.GetHistoricalKeyInfo(datasetname, location, 'N' , fromdate, todate, dopsenv );
+nonfcraData := dops.GetHistoricalKeyInfo(datasetname, location, 'N' , fromdate, todate );
 
 addBothInputs := (fcraData + nonfcraData );
 
