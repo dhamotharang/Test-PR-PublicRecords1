@@ -2,7 +2,7 @@ Import STD;
 
 Export Send_Email( string pVersion) := Module
 
-    Shared server           := 'http://dataland_esp.br.seisint.com:8010';
+    Shared server           := 'http://prod_esp.br.seisint.com:8010';
 
 	Shared subject          := 'Prod History Report Version:' + pVersion;
     

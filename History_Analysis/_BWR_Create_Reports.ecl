@@ -1,4 +1,4 @@
-Import STD, lib_stringlib, History_Analysis, wk_ut, dops,ut;
+Import STD, lib_stringlib, History_Analysis, wk_ut, dops,ut, Data_Services;
 
 pVersion := stringlib.getDateYYYYMMDD();
 output(pVersion, named('workunit_version'));
@@ -7,9 +7,8 @@ output(pVersion, named('workunit_version'));
 
 todays_date := (string)Std.Date.today():global;
 
-tomorrows_date := (string)Std.Date.AdjustDate((integer)todays_date,0,0,1):global;
-
 yesterdays_date := (string)Std.Date.AdjustDate((integer)todays_date,0,0,-1):global;
+tomorrows_date := (string)Std.Date.AdjustDate((integer)todays_date,0,0,1):global;
 
 //This call will build all of the required files including spraying, delta calculations and statistics 
 //////////////////////////////////////// processing dops daily input to a file in memory ////////////////////////////////////////////////
@@ -20,9 +19,9 @@ yesterdays_date := (string)Std.Date.AdjustDate((integer)todays_date,0,0,-1):glob
 // cluster = 'N' for nonfcra or 'F' for fcra or '' or '*' or 'S' - Customer Support or 'FS' - FCRA Customer Support or 'T' - Customer Test
 // fromdate - format 'YYYYMMDD' (start date)
 // todate - format 'YYYYMMDD' (end date)
-// dopsenv = 'dev' or 'prod'; dev - points to dev or prod DOPS DB
+// dopsenv = 'dev' or 'prod'; dev - points to dev or prod DOPS DB only for dataland
 
-History_Analysis.Proc_Build_All(pVersion, '*', 'B', 'set for nonfcra and fcra (process_dops.ecl)', yesterdays_date, tomorrows_date, 'prod');
+History_Analysis.Proc_Build_All(pVersion, '*', 'B', 'set for nonfcra and fcra (process_dops.ecl)', yesterdays_date, tomorrows_date );
 
 //History_Analysis.CreateStandaloneReports.StandaloneProdReport(pVersion,'*', 'B','set for nonfcra and fcra (process_dops.ecl)', 'enteradate', 'enteradate', 'prod');
 
