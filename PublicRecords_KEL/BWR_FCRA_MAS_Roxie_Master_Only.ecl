@@ -6,7 +6,7 @@ IMPORT PublicRecords_KEL, RiskWise, STD, Gateway, UT, SALT38, SALTRoutines;
 threads := 2;
 
 RoxieIP := RiskWise.shortcuts.Dev156;
-NeutralRoxieIP:= RiskWise.Shortcuts.Dev156;
+NeutralRoxieIP:= RiskWise.Shortcuts.staging_neutral_roxieIP;
 // PCG_Dev := 'http://delta_dempers_dev:g0n0l3s!@10.176.68.149:7720/WsSupport/?ver_=2.0'; //-- testing on DEV servers
 // PCG_Cert := 'http://ln_api_dempsey_dev:g0n0l3s!@10.176.68.149:7720/WsSupport/?ver_=2.0'; //-- testing on PROD servers DO NOT USE THIS UNLESS YOU NEED TO				
 

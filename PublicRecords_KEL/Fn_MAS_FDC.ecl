@@ -1781,7 +1781,7 @@ BIPV2.IDAppendLayouts.AppendInput PrepBIPInputprox(Layouts_FDC.Layout_FDC le) :=
 																									PublicRecords_KEL.ECL_Functions.Constants.SetLinkSearchLevel(PublicRecords_KEL.ECL_Functions.Constants.LinkSearch.PowID),
 																									0, /*ScoreThreshold --> 0 = Give me everything*/
 																									linkingOptions,
-																									PublicRecords_KEL.ECL_Functions.Constants.BUSINESS_CONTACT_PROPERTY_LIMIT,//we dropped down for memory limit errors attributes not built yet revisit later.  also old shell joins by sele we join by pow so we might be ok with lower limit
+																									PublicRecords_KEL.ECL_Functions.Constants.Default_Atmost_100,//we dropped down for memory limit errors was at 10k now at 5k, no attributes for these at this point.
 																									FALSE, /* dnbFullRemove */
 																									TRUE, /* bypassContactSuppression */
 																									BIPV2.IDconstants.JoinTypes.LimitTransformJoin,
@@ -4175,14 +4175,15 @@ Risk_Indicators__Correlation_Risk__key_addr_dob_summary_Denorm :=
 						self := right,
 						self := []));
 						
-	Vehicle_all := dedup(sort(Temp_Vehicle_linkids+Key_Vehicle_did_Records, vehicle_key, iteration_key,sequence_key,UIDappend),vehicle_key, iteration_key,sequence_key,UIDappend);			
-			
+	Vehicle_all := dedup(sort(Temp_Vehicle_linkids+Key_Vehicle_did_Records, vehicle_key, iteration_key,sequence_key ,P_LexID, B_LexIDUlt,B_LexIDOrg,B_LexIDLegal,UIDappend),vehicle_key, iteration_key,sequence_key,P_LexID, B_LexIDUlt,B_LexIDOrg,B_LexIDLegal,UIDappend);			
+	
 	Key_Vehicle_Party_Records_unsuppressed :=  
 		JOIN(Vehicle_all, VehicleV2.Key_Vehicle_Party_Key,
 		Common.DoFDCJoin_Vehicle_Files__VehicleV2__Vehicle_Party = TRUE AND
 				KEYED(LEFT.vehicle_key = RIGHT.vehicle_key AND 
 					LEFT.iteration_key = RIGHT.iteration_key AND
 					LEFT.sequence_key = RIGHT.sequence_key) and
+					((left.P_LexID = right.append_did) OR (left.B_LexIDUlt = right.ultid and left.B_LexIDOrg = right.orgid and left.B_LexIDLegal = right.seleid)) and
 					ArchiveDate((string)right.date_first_seen, (string)right.date_vendor_first_reported) <= LEFT.P_InpClnArchDt[1..8],
 				TRANSFORM(Layouts_FDC.Layout_VehicleV2__Key_Vehicle_Party_Key,
 					SELF.UIDAppend := LEFT.UIDAppend,
