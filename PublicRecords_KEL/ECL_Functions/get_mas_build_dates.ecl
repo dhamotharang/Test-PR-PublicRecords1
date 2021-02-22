@@ -2,7 +2,7 @@
 EXPORT get_mas_build_dates(STRING variable_name) := FUNCTION
 	
 	//this function is similar to vault Risk_Indicators.get_build_date.  
-	//if you add a build date to this list you must add a constent to PublicRecords_KEL.Library.LIB_BusinessAttributes
+	
 	IsFCRA := FALSE : STORED('isFCRA');	
 	 
 	unsigned1 iType := IF(IsFCRA, data_services.data_env.iFCRA, data_services.data_env.iNonFCRA);
@@ -27,11 +27,10 @@ EXPORT get_mas_build_dates(STRING variable_name) := FUNCTION
 	
 	// person header is from max date last seen key not env vars
 	// env var is based off of build date but that can be up to a month a head of max date last seen due to monthly updates of the normal header build
-	//dk := choosen(dx_header.key_max_dt_last_seen(iType), 1);
-	//max_last_seen := (string) dk[1].max_date_last_seen;
-	//hdrBuildDate01 := max_last_seen[1..6]+'01';
-	//personHeader := hdrBuildDate01;
-	personHeader :=  Risk_Indicators.get_build_date('header_build_version') : STORED('header_build_version'); 
+	dk := choosen(dx_header.key_max_dt_last_seen(iType), 1);
+	max_last_seen := (string) dk[1].max_date_last_seen;
+	hdrBuildDate01 := max_last_seen[1..6]+'01';
+	personHeader := hdrBuildDate01 : STORED('header_build_version');
 
 	Mari := Risk_Indicators.get_build_date('mari_build_version') : STORED('mari_build_version');
 	Proflic := Risk_Indicators.get_build_date('proflic_build_version') : STORED('proflic_build_version');
