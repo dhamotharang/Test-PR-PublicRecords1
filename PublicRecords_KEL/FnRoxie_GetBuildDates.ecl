@@ -24,10 +24,10 @@ EXPORT FnRoxie_GetBuildDates (DATASET(PublicRecords_KEL.ECL_Functions.Layouts.La
 		SELF.G_BuildPIICorrDt  := IF(~options.ISFCRA, PublicRecords_KEL.ECL_Functions.get_mas_build_dates('RiskTable_build_version'), '');
 		SELF.G_BuildEmailDt := PublicRecords_KEL.ECL_Functions.get_mas_build_dates('email_build_version');
 		SELF.G_BuildDrgBkDt :=  PublicRecords_KEL.ECL_Functions.get_mas_build_dates('Bankruptcy_daily'); 
-		SELF.G_BuildProfLicDt := PublicRecords_KEL.ECL_Functions.get_mas_build_dates('proflic_build_version');
+		SELF.G_BuildProfLicDt := MAX(PublicRecords_KEL.ECL_Functions.get_mas_build_dates('mari_build_version'), PublicRecords_KEL.ECL_Functions.get_mas_build_dates('proflic_build_version'));
 		SELF.G_BuildSrchDt :=  IF(~options.ISFCRA, PublicRecords_KEL.ECL_Functions.get_mas_build_dates('inquiry_build_version'), '');//nonFCRA name
 		SELF.G_BuildInqDt := PublicRecords_KEL.ECL_Functions.get_mas_build_dates('inquiry_build_version');		
-		// SELF.G_BuildHdrDt := PublicRecords_KEL.ECL_Functions.get_mas_build_dates('header_build_version');
+		SELF.G_BuildHdrDt := PublicRecords_KEL.ECL_Functions.get_mas_build_dates('header_build_version');
 		SELF := LEFT));
 
 		RETURN SetBuildDates;

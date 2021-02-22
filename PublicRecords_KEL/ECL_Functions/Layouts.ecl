@@ -2025,7 +2025,7 @@ EXPORT LayoutAppendedAddresses := RECORD
 		STRING10 G_BuildUCCDt;
 		STRING10 G_BuildSrchDt;
 		STRING10 G_BuildInqDt;		
-		// STRING10 G_BuildHdrDt;
+		STRING10 G_BuildHdrDt;
 	END;
 	
 	EXPORT LayoutBuildDates := RECORD
