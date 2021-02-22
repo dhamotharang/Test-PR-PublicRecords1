@@ -1,0 +1,103 @@
+//HPCC Systems KEL Compiler Version 1.5.0rc1
+IMPORT KEL15 AS KEL;
+IMPORT B_Address_Slim_3,B_Address_Slim_4,B_Input_P_I_I_3,B_Input_P_I_I_4,B_Inquiry_4,B_Person_10,B_Person_4,B_Person_5,B_Person_6,B_Person_Accident_8,B_Person_Inquiry_5,B_Property_4,CFG_Compile,E_Accident,E_Address,E_Address_Slim,E_Address_Summary,E_Email,E_Geo_Link,E_Household,E_Input_P_I_I,E_Inquiry,E_Name_Summary,E_Person,E_Person_Accident,E_Person_Inquiry,E_Phone,E_Phone_Summary,E_Property,E_S_S_N_Summary,E_Social_Security_Number,E_Surname,E_Utility,E_Zip_Code FROM PublicRecords_KEL;
+IMPORT * FROM KEL15.Null;
+EXPORT B_Address_Slim_2(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG_Compile __cfg = CFG_Compile) := MODULE
+  SHARED VIRTUAL TYPEOF(B_Address_Slim_3(__in,__cfg).__ENH_Address_Slim_3) __ENH_Address_Slim_3 := B_Address_Slim_3(__in,__cfg).__ENH_Address_Slim_3;
+  SHARED VIRTUAL TYPEOF(B_Input_P_I_I_3(__in,__cfg).__ENH_Input_P_I_I_3) __ENH_Input_P_I_I_3 := B_Input_P_I_I_3(__in,__cfg).__ENH_Input_P_I_I_3;
+  SHARED __EE6428004 := __ENH_Address_Slim_3;
+  SHARED __EE6428020 := __ENH_Input_P_I_I_3;
+  SHARED __EE6428027 := __EE6428020(__NN(__EE6428020.Slim_Location_));
+  SHARED __ST1199875_Layout := RECORD
+    KEL.typ.ntyp(E_Address_Slim().Typ) UID;
+    KEL.typ.nuid U_I_D__1_;
+    KEL.typ.epoch Archive___Date_ := 0;
+    KEL.typ.epoch Date_First_Seen_ := 0;
+    KEL.typ.epoch Date_Last_Seen_ := 0;
+    KEL.typ.epoch Hybrid_Archive_Date_ := 0;
+    KEL.typ.epoch Vault_Date_Last_Seen_ := 0;
+  END;
+  SHARED __ST1199875_Layout __ND6428009__Project(B_Input_P_I_I_3(__in,__cfg).__ST967824_Layout __PP6428005) := TRANSFORM
+    SELF.UID := __PP6428005.Slim_Location_;
+    SELF.U_I_D__1_ := __PP6428005.UID;
+    SELF := __PP6428005;
+  END;
+  SHARED __EE6428018 := PROJECT(__EE6428027,__ND6428009__Project(LEFT));
+  SHARED __ST1199903_Layout := RECORD
+    KEL.typ.ntyp(E_Address_Slim().Typ) UID;
+    KEL.typ.ntyp(E_Input_P_I_I().Typ) O_N_L_Y___U_I_D_;
+    KEL.typ.epoch Archive___Date_ := 0;
+    KEL.typ.epoch Date_First_Seen_ := 0;
+    KEL.typ.epoch Date_Last_Seen_ := 0;
+    KEL.typ.epoch Hybrid_Archive_Date_ := 0;
+    KEL.typ.epoch Vault_Date_Last_Seen_ := 0;
+  END;
+  SHARED __EE6428042 := PROJECT(__EE6428018,TRANSFORM(__ST1199903_Layout,SELF.O_N_L_Y___U_I_D_ := LEFT.U_I_D__1_,SELF := LEFT));
+  SHARED __ST1201083_Layout := RECORD
+    KEL.typ.nuid UID;
+    KEL.typ.nstr Primary_Range_;
+    KEL.typ.nstr Predirectional_;
+    KEL.typ.nstr Primary_Name_;
+    KEL.typ.nstr Suffix_;
+    KEL.typ.nstr Postdirectional_;
+    KEL.typ.ntyp(E_Zip_Code().Typ) Z_I_P5_;
+    KEL.typ.ndataset(E_Address_Slim(__in,__cfg).High_Risk_Address_Layout) High_Risk_Address_;
+    KEL.typ.ndataset(E_Address_Slim(__in,__cfg).Address_Type_Layout) Address_Type_;
+    KEL.typ.nstr Source_;
+    KEL.typ.ndataset(B_Address_Slim_3(__in,__cfg).__ST75774_Layout) Address_N_A_I_C_S_List_;
+    KEL.typ.ndataset(B_Address_Slim_4(__in,__cfg).__ST75751_Layout) Address_N_I_A_C_S_High_Risk_Pre_;
+    KEL.typ.ndataset(B_Address_Slim_4(__in,__cfg).__ST75645_Layout) Address_S_I_C_High_Risk_Pre_;
+    KEL.typ.ndataset(B_Address_Slim_3(__in,__cfg).__ST75681_Layout) Address_S_I_C_List_;
+    KEL.typ.ntyp(E_Address_Slim().Typ) U_I_D__1_;
+    KEL.typ.ntyp(E_Input_P_I_I().Typ) O_N_L_Y___U_I_D_;
+    KEL.typ.epoch Archive___Date_ := 0;
+    KEL.typ.epoch Date_First_Seen_ := 0;
+    KEL.typ.epoch Date_Last_Seen_ := 0;
+    KEL.typ.epoch Hybrid_Archive_Date_ := 0;
+    KEL.typ.epoch Vault_Date_Last_Seen_ := 0;
+    KEL.typ.int __RecordCount := 0;
+  END;
+  __JC6428094(B_Address_Slim_3(__in,__cfg).__ST220503_Layout __EE6428004, __ST1199903_Layout __EE6428042) := __EEQP(__EE6428004.UID,__EE6428042.UID);
+  __ST1201083_Layout __JT6428094(B_Address_Slim_3(__in,__cfg).__ST220503_Layout __l, __ST1199903_Layout __r) := TRANSFORM
+    SELF.U_I_D__1_ := __r.UID;
+    SELF := __l;
+    SELF := __r;
+  END;
+  SHARED __EE6428095 := JOIN(__EE6428004,__EE6428042,__JC6428094(LEFT,RIGHT),__JT6428094(LEFT,RIGHT),LEFT OUTER,SMART,KEEP(1));
+  EXPORT __ST201801_Layout := RECORD
+    KEL.typ.nuid UID;
+    KEL.typ.nstr Primary_Range_;
+    KEL.typ.nstr Predirectional_;
+    KEL.typ.nstr Primary_Name_;
+    KEL.typ.nstr Suffix_;
+    KEL.typ.nstr Postdirectional_;
+    KEL.typ.ntyp(E_Zip_Code().Typ) Z_I_P5_;
+    KEL.typ.ndataset(E_Address_Slim(__in,__cfg).High_Risk_Address_Layout) High_Risk_Address_;
+    KEL.typ.ndataset(E_Address_Slim(__in,__cfg).Address_Type_Layout) Address_Type_;
+    KEL.typ.nstr Source_;
+    KEL.typ.ndataset(B_Address_Slim_3(__in,__cfg).__ST75774_Layout) Address_N_A_I_C_S_List_;
+    KEL.typ.ndataset(B_Address_Slim_3(__in,__cfg).__ST75774_Layout) Address_N_A_I_C_S_Sorted_List_;
+    KEL.typ.ndataset(B_Address_Slim_3(__in,__cfg).__ST75681_Layout) Address_S_I_C_List_;
+    KEL.typ.ndataset(B_Address_Slim_3(__in,__cfg).__ST75681_Layout) Address_S_I_C_Sorted_List_;
+    KEL.typ.ntyp(E_Input_P_I_I().Typ) P_I_I_;
+    KEL.typ.epoch Archive___Date_ := 0;
+    KEL.typ.epoch Date_First_Seen_ := 0;
+    KEL.typ.epoch Date_Last_Seen_ := 0;
+    KEL.typ.epoch Hybrid_Archive_Date_ := 0;
+    KEL.typ.epoch Vault_Date_Last_Seen_ := 0;
+    KEL.typ.int __RecordCount := 0;
+  END;
+  SHARED __ST201801_Layout __ND6427936__Project(__ST1201083_Layout __PP6427736) := TRANSFORM
+    __EE6427930 := __PP6427736.Address_N_A_I_C_S_List_;
+    __BS6427918 := __T(__EE6427930);
+    __EE6427934 := __BN(TOPN(__BS6427918(__NN(__T(__EE6427930).Address_N_A_I_C_S_Date_First_Seen_) AND __NN(__T(__EE6427930).Address_N_A_I_C_S_Date_Last_Seen_)),1000,__T(__T(__EE6427930).Address_N_A_I_C_S_Date_First_Seen_),__T(__T(__EE6427930).Address_N_A_I_C_S_Date_Last_Seen_),__T(High_Risk_N_A_I_C_S_)),__NL(__EE6427930));
+    SELF.Address_N_A_I_C_S_Sorted_List_ := __EE6427934;
+    __EE6427955 := __PP6427736.Address_S_I_C_List_;
+    __BS6427943 := __T(__EE6427955);
+    __EE6427959 := __BN(TOPN(__BS6427943(__NN(__T(__EE6427955).Address_S_I_C_Date_First_Seen_) AND __NN(__T(__EE6427955).Address_S_I_C_Date_Last_Seen_)),1000,__T(__T(__EE6427955).Address_S_I_C_Date_First_Seen_),__T(__T(__EE6427955).Address_S_I_C_Date_Last_Seen_),__T(High_Risk_S_I_C_)),__NL(__EE6427955));
+    SELF.Address_S_I_C_Sorted_List_ := __EE6427959;
+    SELF.P_I_I_ := __PP6427736.O_N_L_Y___U_I_D_;
+    SELF := __PP6427736;
+  END;
+  EXPORT __ENH_Address_Slim_2 := PROJECT(__EE6428095,__ND6427936__Project(LEFT));
+END;

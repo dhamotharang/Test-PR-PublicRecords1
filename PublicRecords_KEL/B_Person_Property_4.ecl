@@ -4,8 +4,8 @@ IMPORT B_Person_Property_5,B_Person_Property_7,CFG_Compile,E_Person,E_Person_Pro
 IMPORT * FROM KEL15.Null;
 EXPORT B_Person_Property_4(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG_Compile __cfg = CFG_Compile) := MODULE
   SHARED VIRTUAL TYPEOF(B_Person_Property_5(__in,__cfg).__ENH_Person_Property_5) __ENH_Person_Property_5 := B_Person_Property_5(__in,__cfg).__ENH_Person_Property_5;
-  SHARED __EE5390007 := __ENH_Person_Property_5;
-  EXPORT __ST242051_Layout := RECORD
+  SHARED __EE5414669 := __ENH_Person_Property_5;
+  EXPORT __ST243691_Layout := RECORD
     KEL.typ.ntyp(E_Person().Typ) Subject_;
     KEL.typ.ntyp(E_Property().Typ) Prop_;
     KEL.typ.nstr Primary_Range_;
@@ -18,7 +18,7 @@ EXPORT B_Person_Property_4(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault,
     KEL.typ.ndataset(E_Person_Property(__in,__cfg).Address_Components_Layout) Address_Components_;
     KEL.typ.ndataset(E_Person_Property(__in,__cfg).Reported_Dates_Layout) Reported_Dates_;
     KEL.typ.ndataset(E_Person_Property(__in,__cfg).Data_Sources_Layout) Data_Sources_;
-    B_Person_Property_7(__in,__cfg).__ST93642_Layout Best_Property_Sale_Info_;
+    B_Person_Property_7(__in,__cfg).__ST94631_Layout Best_Property_Sale_Info_;
     KEL.typ.bool Is_Currently_Owned_ := FALSE;
     KEL.typ.bool Is_Ever_Owned_ := FALSE;
     KEL.typ.bool Property_Is_Owned_Assessment_ := FALSE;
@@ -28,7 +28,7 @@ EXPORT B_Person_Property_4(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault,
     KEL.typ.nkdate Property_Max_Date_Last_Seen_Uncapped_;
     KEL.typ.nkdate Property_Min_Date_First_Seen_;
     KEL.typ.nkdate Property_Sale_Date_;
-    KEL.typ.ndataset(B_Person_Property_7(__in,__cfg).__ST93642_Layout) Property_Sale_Info_;
+    KEL.typ.ndataset(B_Person_Property_7(__in,__cfg).__ST94631_Layout) Property_Sale_Info_;
     KEL.typ.nint Property_Sale_Price_;
     KEL.typ.epoch Archive___Date_ := 0;
     KEL.typ.epoch Date_First_Seen_ := 0;
@@ -37,9 +37,9 @@ EXPORT B_Person_Property_4(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault,
     KEL.typ.epoch Vault_Date_Last_Seen_ := 0;
     KEL.typ.int __RecordCount := 0;
   END;
-  SHARED __ST242051_Layout __ND5390012__Project(B_Person_Property_5(__in,__cfg).__ST248781_Layout __PP5390008) := TRANSFORM
-    SELF.Is_Currently_Owned_ := (__PP5390008.Property_Is_Owned_Assessment_ OR __PP5390008.Property_Is_Owned_Deed_) AND NOT (__PP5390008.Property_Is_Sold_);
-    SELF := __PP5390008;
+  SHARED __ST243691_Layout __ND5414674__Project(B_Person_Property_5(__in,__cfg).__ST250438_Layout __PP5414670) := TRANSFORM
+    SELF.Is_Currently_Owned_ := (__PP5414670.Property_Is_Owned_Assessment_ OR __PP5414670.Property_Is_Owned_Deed_) AND NOT (__PP5414670.Property_Is_Sold_);
+    SELF := __PP5414670;
   END;
-  EXPORT __ENH_Person_Property_4 := PROJECT(__EE5390007,__ND5390012__Project(LEFT));
+  EXPORT __ENH_Person_Property_4 := PROJECT(__EE5414669,__ND5414674__Project(LEFT));
 END;

@@ -21,6 +21,18 @@ EXPORT L_Compile := MODULE
     KEL.typ.int __RecordCount := 0;
   END;
   EXPORT Non_F_C_R_A_Phone_Summary_Attributes_V1_Dynamic_Res0_Layout := RECORDOF(__UNWRAP(DATASET([],Non_F_C_R_A_Phone_Summary_Attributes_V1_Dynamic_Res0_Internal_Layout)));
+  SHARED Address_High_Risk_Dynamic_Res0_Internal_Layout := RECORD
+    KEL.typ.nstr P_I___Inp_Addr_S_I_C_Code_H_R_List_;
+    KEL.typ.nstr P_I___Inp_Addr_N_A_I_C_S_Code_H_R_List_;
+    KEL.typ.str P_I___Inp_Addr_Is_H_R_Correct_Fac_Flag_ := '';
+    KEL.typ.epoch Archive___Date_ := 0;
+    KEL.typ.epoch Date_First_Seen_ := 0;
+    KEL.typ.epoch Date_Last_Seen_ := 0;
+    KEL.typ.epoch Hybrid_Archive_Date_ := 0;
+    KEL.typ.epoch Vault_Date_Last_Seen_ := 0;
+    KEL.typ.int __RecordCount := 0;
+  END;
+  EXPORT Address_High_Risk_Dynamic_Res0_Layout := RECORDOF(__UNWRAP(DATASET([],Address_High_Risk_Dynamic_Res0_Internal_Layout)));
   SHARED Input_Attributes_V1_Dynamic_Res0_Internal_Layout := RECORD
     KEL.typ.nuid G___Proc_U_I_D_;
     KEL.typ.nstr P___Inp_Acct_;
@@ -206,6 +218,8 @@ EXPORT L_Compile := MODULE
     KEL.typ.int P_I___Srch_S_S_N_Per_Inp_Addr_Cnt1_Y_ := 0;
     KEL.typ.int P_I___Srch_Per_Inp_Email_Cnt1_Y_ := 0;
     KEL.typ.int P_I___Srch_Lex_I_D_Per_Inp_Email_Cnt1_Y_ := 0;
+    KEL.typ.str P_I___Inp_Addr_Is_P_O_Box_Flag_ := '';
+    KEL.typ.str P_I___Inp_Addr_Is_Military_Flag_ := '';
     KEL.typ.int P_I___Srch_Per_Inp_Phone_Cnt1_Y_ := 0;
     KEL.typ.int P_I___Srch_Lex_I_D_Per_Inp_Phone_Cnt1_Y_ := 0;
     KEL.typ.nstr P_I___Inp_Addr_Old_Dt_;
@@ -2735,6 +2749,18 @@ EXPORT L_Compile := MODULE
     KEL.typ.int __RecordCount := 0;
   END;
   EXPORT Non_F_C_R_A_Phone_Summary_Attributes_V1_Hybrid_Res0_Layout := RECORDOF(__UNWRAP(DATASET([],Non_F_C_R_A_Phone_Summary_Attributes_V1_Hybrid_Res0_Internal_Layout)));
+  SHARED Address_High_Risk_Hybrid_Res0_Internal_Layout := RECORD
+    KEL.typ.nstr P_I___Inp_Addr_S_I_C_Code_H_R_List_;
+    KEL.typ.nstr P_I___Inp_Addr_N_A_I_C_S_Code_H_R_List_;
+    KEL.typ.str P_I___Inp_Addr_Is_H_R_Correct_Fac_Flag_ := '';
+    KEL.typ.epoch Archive___Date_ := 0;
+    KEL.typ.epoch Date_First_Seen_ := 0;
+    KEL.typ.epoch Date_Last_Seen_ := 0;
+    KEL.typ.epoch Hybrid_Archive_Date_ := 0;
+    KEL.typ.epoch Vault_Date_Last_Seen_ := 0;
+    KEL.typ.int __RecordCount := 0;
+  END;
+  EXPORT Address_High_Risk_Hybrid_Res0_Layout := RECORDOF(__UNWRAP(DATASET([],Address_High_Risk_Hybrid_Res0_Internal_Layout)));
   SHARED Input_Attributes_V1_Hybrid_Res0_Internal_Layout := RECORD
     KEL.typ.nuid G___Proc_U_I_D_;
     KEL.typ.nstr P___Inp_Acct_;
@@ -2920,6 +2946,8 @@ EXPORT L_Compile := MODULE
     KEL.typ.int P_I___Srch_S_S_N_Per_Inp_Addr_Cnt1_Y_ := 0;
     KEL.typ.int P_I___Srch_Per_Inp_Email_Cnt1_Y_ := 0;
     KEL.typ.int P_I___Srch_Lex_I_D_Per_Inp_Email_Cnt1_Y_ := 0;
+    KEL.typ.str P_I___Inp_Addr_Is_P_O_Box_Flag_ := '';
+    KEL.typ.str P_I___Inp_Addr_Is_Military_Flag_ := '';
     KEL.typ.int P_I___Srch_Per_Inp_Phone_Cnt1_Y_ := 0;
     KEL.typ.int P_I___Srch_Lex_I_D_Per_Inp_Phone_Cnt1_Y_ := 0;
     KEL.typ.nstr P_I___Inp_Addr_Old_Dt_;
@@ -13050,6 +13078,7 @@ EXPORT L_Compile := MODULE
     KEL.typ.nstr License_Description_;
     KEL.typ.nstr Occupation_;
     KEL.typ.nint License_Category_;
+    KEL.typ.nstr Source_;
     KEL.typ.epoch Archive___Date_ := 0;
     KEL.typ.epoch Date_First_Seen_ := 0;
     KEL.typ.epoch Date_Last_Seen_ := 0;
@@ -13103,6 +13132,7 @@ EXPORT L_Compile := MODULE
     KEL.typ.ndataset(Index_Build_Entity_Res25_Internal_Layout_Status_Layout) Status_;
     KEL.typ.ndataset(Index_Build_Entity_Res25_Internal_Layout_License_Description_Layout) License_Description_;
     KEL.typ.ndataset(Index_Build_Entity_Res25_Internal_Layout_Data_Sources_Layout) Data_Sources_;
+    KEL.typ.nkdate B_U_I_L_D___D_A_T_E_;
     KEL.typ.nbool Is_Active_;
     KEL.typ.nkdate Max_Expire_Date_;
     KEL.typ.nkdate Max_Issue_Date_;
@@ -35401,6 +35431,7 @@ EXPORT L_Compile := MODULE
     KEL.typ.nstr License_Description_;
     KEL.typ.nstr Occupation_;
     KEL.typ.nint License_Category_;
+    KEL.typ.nstr Source_;
     KEL.typ.epoch Archive___Date_ := 0;
     KEL.typ.epoch Date_First_Seen_ := 0;
     KEL.typ.epoch Date_Last_Seen_ := 0;
@@ -35454,6 +35485,7 @@ EXPORT L_Compile := MODULE
     KEL.typ.ndataset(Index_Build_Association_Res59_Internal_Layout_Status_Layout) Status_;
     KEL.typ.ndataset(Index_Build_Association_Res59_Internal_Layout_License_Description_Layout) License_Description_;
     KEL.typ.ndataset(Index_Build_Association_Res59_Internal_Layout_Data_Sources_Layout) Data_Sources_;
+    KEL.typ.nkdate B_U_I_L_D___D_A_T_E_;
     KEL.typ.nbool Is_Active_;
     KEL.typ.nkdate Max_Expire_Date_;
     KEL.typ.nkdate Max_Issue_Date_;
