@@ -7140,7 +7140,13 @@ Dataset_Header__key_ADL_segmentation(	//data is not archivable
 		DateLastSeen = FORMAT('YYYYMMDD'),
 		HybridArchiveDate = FORMAT('YYYYMMDD'),
 		Archive_Date = FORMAT('YYYYMMDD')archive_date),
-  PERMITS (DPMBitmap))	
+  PERMITS (DPMBitmap))	,
 	
+	
+AddressSlim(
+		DateFirstSeen = FORMAT('YYYYMMDD'),
+		DateLastSeen = FORMAT('YYYYMMDD'),
+		HybridArchiveDate = FORMAT('YYYYMMDD'),
+		Archive_Date = FORMAT('YYYYMMDD'))
     );    
 
