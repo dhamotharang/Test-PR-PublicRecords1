@@ -74,6 +74,11 @@ lay makeFatRecord(rules_appended_file L) := TRANSFORM
 																									trim(STD.Str.ToLowerCase(L.Acceptance_Criteria),left,right),
 																									(string)L.def_vals,Lay_para);
 																									
+									python_func_custom_KS6876_op:= Kel_Shell_QA.python_func_custom_KS6876(
+																									ROW(L, Base_Lay),
+																									trim(STD.Str.ToLowerCase(L.Acceptance_Criteria),left,right),
+																									(string)L.def_vals,Lay_para);
+																									
 									self.Result:=MAP(
 									
 																	 //*********** Custom test casesKS6701 **************
@@ -126,6 +131,14 @@ lay makeFatRecord(rules_appended_file L) := TRANSFORM
 															 (integer)REGEXFIND('^(.*),(.*),(.*)$', trim(Months_between_python_func3_op,left,right), 2))),
 															 'PASS','FAIL'),Months_between_python_func3_op),
 															 
+															 STD.Str.Find(L.Raw_Acceptance_Criteria,'months between')>=1 and 
+															 STD.Str.Find(L.case_Type,'custom_ks6876_AC22')>=1 =>
+															 IF(python_func_custom_KS6876_op not in['PASS','FAIL','NA'],
+																	 IF((integer)REGEXFIND('^(.*),(.*),(.*)$', trim(python_func_custom_KS6876_op,left,right), 1) = 1 and 
+																		 abs(std.Date.MonthsBetween((integer)REGEXFIND('^(.*),(.*),(.*)$', trim(python_func_custom_KS6876_op,left,right), 2),(integer)REGEXFIND('^(.*),(.*),(.*)$', trim(python_func_custom_KS6876_op,left,right), 3)))<25 and 
+																		 (integer)REGEXFIND('^(.*),(.*),(.*)$', trim(python_func_custom_KS6876_op,left,right), 4) = 2, 'PASS',IF((integer)REGEXFIND('^(.*),(.*),(.*)$', trim(python_func_custom_KS6876_op,left,right), 1) != 1 or abs(std.Date.MonthsBetween((integer)REGEXFIND('^(.*),(.*),(.*)$', trim(python_func_custom_KS6876_op,left,right), 2),(integer)REGEXFIND('^(.*),(.*),(.*)$', trim(python_func_custom_KS6876_op,left,right), 3)))>25, 'PASS','FAIL'))
+																 ,python_func_custom_KS6876_op),
+	
 																	 STD.Str.Find(L.Raw_Acceptance_Criteria,'MIN(')>=1 and 
 									                 STD.Str.Find(L.case_Type,'custom')>=1 =>
 																														 Kel_Shell_QA.Months_between_python_func2(
