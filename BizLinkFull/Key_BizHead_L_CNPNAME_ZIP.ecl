@@ -190,10 +190,7 @@ EXPORT RawFetch_server(TYPEOF(h.cnp_name) param_cnp_name = (TYPEOF(h.cnp_name))'
                 TRANSFORM(indexOutputRecord,
                           SELF.gss_word_weight := LEFT.gss_word_weight,
                           SELF := RIGHT),
-                LIMIT(Config_BIP.L_CNPNAME_ZIP_MAXBLOCKLIMIT,
-                      SKIP,
-                      TRANSFORM(indexOutputRecord, 
-                                SELF := ROW([],indexOutputRecord)))); /*HACK29f*/
+                LIMIT(Config_BIP.L_CNPNAME_ZIP_MAXBLOCKLIMIT,SKIP)); /*HACK29f*/
     RETURN IF(COUNT(param_zip)>600,DATASET([],indexOutputRecord),IF(SUM(wds,spec) > (5+ LOG(COUNT(param_zip))/LOG(2)+(LOG(COUNT(param_zip))/LOG(2))),res,IF(SUM(wds,spec) = 0,DATASET([],indexOutputRecord) ,DATASET(ROW([],indexOutputRecord)))))/*HACK14*/; // Ensure at least spc of specificity in gss portion
    END;
  

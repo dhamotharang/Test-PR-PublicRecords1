@@ -252,10 +252,7 @@ def dCnpNameOptimizations():
                 TRANSFORM(indexOutputRecord,
                           SELF.gss_word_weight := LEFT.gss_word_weight,
                           SELF := RIGHT),
-                LIMIT(Config_BIP.L_CNPNAME_MAXBLOCKLIMIT,
-                      SKIP,
-                      TRANSFORM(indexOutputRecord, 
-                                SELF := ROW([],indexOutputRecord)))); /*HACK25g*/''','Change the join in rawfetch_server code for Roxie'),
+                LIMIT(Config_BIP.L_CNPNAME_MAXBLOCKLIMIT,SKIP)); /*HACK25g*/''','Change the join in rawfetch_server code for Roxie'),
 			('Key_BizHead_L_CNPNAME', '(Returnable(.*?))<>.( OR.*?;)','HACK25h','\g<1>>1\g<3> /*HACK25h*/','Change fallback logic to actually work'),
 		]		
 		
@@ -347,10 +344,7 @@ def dAddCnpSlim():
                 TRANSFORM(indexOutputRecord,
                           SELF.gss_word_weight := LEFT.gss_word_weight,
                           SELF := RIGHT),
-                LIMIT(Config_BIP.L_CNPNAME_ST_MAXBLOCKLIMIT,
-                      SKIP,
-                      TRANSFORM(indexOutputRecord, 
-                                SELF := ROW([],indexOutputRecord)))); /*HACK29c*/''', 'Change Keyed join and add limit/skip logic'),      
+                LIMIT(Config_BIP.L_CNPNAME_ST_MAXBLOCKLIMIT,SKIP)); /*HACK29c*/''', 'Change Keyed join and add limit/skip logic'),      
         ('Key_BizHead_L_CNPNAME_ZIP', '(slimrec := {.*?;)', 'HACK29d', '\g<1>\n\tslimKeyRec := recordof(Key_BizHead_L_CNPNAME.SlimKey);/*HACK29d*/', 'Adding layout of slim key'),
         ('Key_BizHead_L_CNPNAME_ZIP', '(doIndexRead\(UNSIGNED4 search,UNSIGNED2 spc\) :=) .*?;', 'HACK29e', '''\g<1> STEPPED(LIMIT(Key_BizHead_L_CNPNAME.SlimKey( KEYED(GSS_hash = search) // ADDED LIMIT
                                                                       AND KEYED(GSS_Bloom = BloomF)
@@ -383,10 +377,7 @@ def dAddCnpSlim():
                 TRANSFORM(indexOutputRecord,
                           SELF.gss_word_weight := LEFT.gss_word_weight,
                           SELF := RIGHT),
-                LIMIT(Config_BIP.L_CNPNAME_ZIP_MAXBLOCKLIMIT,
-                      SKIP,
-                      TRANSFORM(indexOutputRecord, 
-                                SELF := ROW([],indexOutputRecord)))); /*HACK29f*/''', 'Change Keyed join and add limit/skip logic'),        
+                LIMIT(Config_BIP.L_CNPNAME_ZIP_MAXBLOCKLIMIT,SKIP)); /*HACK29f*/''', 'Change Keyed join and add limit/skip logic'),        
         ('Key_BizHead_L_URL', '(res := JOIN\( steppedmatches, Key, .*?)\);', 'HACK29g', '\g<1>,LIMIT(Config_BIP.L_URL_MAXBLOCKLIMIT,SKIP,TRANSFORM(indexOutputRecord, SELF := ROW([],indexOutputRecord)))); /*HACK29g*/', 'Adding limit to keyed join'),                                      
     ]
 
