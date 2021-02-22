@@ -4,8 +4,8 @@ IMPORT B_Sele_Vehicle_3,CFG_Compile,E_Business_Org,E_Business_Sele,E_Business_Se
 IMPORT * FROM KEL15.Null;
 EXPORT B_Sele_Vehicle_2(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG_Compile __cfg = CFG_Compile) := MODULE
   SHARED VIRTUAL TYPEOF(B_Sele_Vehicle_3(__in,__cfg).__ENH_Sele_Vehicle_3) __ENH_Sele_Vehicle_3 := B_Sele_Vehicle_3(__in,__cfg).__ENH_Sele_Vehicle_3;
-  SHARED __EE7574084 := __ENH_Sele_Vehicle_3;
-  EXPORT __ST218161_Layout := RECORD
+  SHARED __EE7603045 := __ENH_Sele_Vehicle_3;
+  EXPORT __ST219614_Layout := RECORD
     KEL.typ.ntyp(E_Business_Sele().Typ) Legal_;
     KEL.typ.ntyp(E_Vehicle().Typ) Automobile_;
     KEL.typ.nint Ult_I_D_;
@@ -29,17 +29,17 @@ EXPORT B_Sele_Vehicle_2(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CF
     KEL.typ.epoch Vault_Date_Last_Seen_ := 0;
     KEL.typ.int __RecordCount := 0;
   END;
-  SHARED __ST218161_Layout __ND7574025__Project(B_Sele_Vehicle_3(__in,__cfg).__ST232578_Layout __PP7573690) := TRANSFORM
-    __CC13148 := KEL.Routines.MinN(FN_Compile(__cfg).FN_G_E_T_B_U_I_L_D_D_A_T_E(__ECAST(KEL.typ.nstr,__CN('vehicle_build_version'))),__CN(__cfg.CurrentDate));
-    __CC13534 := 730;
-    SELF.Seen___In___Last___Two___Years_ := __OP2(__FN2(KEL.Routines.DaysBetween,__PP7573690.Date_Last_Seen_Capped_,__CC13148),<=,__CN(__CC13534));
-    __CC13530 := '-99997';
-    SELF.Vehicle_Min_Date_ := IF(__T(__FN1(KEL.Routines.IsValidDate,__PP7573690.Date_First_Seen_Capped_)),__ECAST(KEL.typ.nstr,__FN2(KEL.Routines.DateToString,__PP7573690.Date_First_Seen_Capped_,__CN('%Y%m%d'))),__ECAST(KEL.typ.nstr,__CN(__CC13530)));
-    __EE7574016 := __PP7573690.Registration_;
-    __BS7574003 := __T(__EE7574016);
-    __EE7574020 := __BN(TOPN(__BS7574003(__NN(KEL.era.ToDate(__T(__EE7574016).Date_Last_Seen_))),1, -__T(KEL.era.ToDate(__T(__EE7574016).Date_Last_Seen_)),__T(Registration_First_Date_),__T(Registration_Earliest_Effective_Date_),__T(Registration_Latest_Effective_Date_),__T(Registration_Latest_Expiratione_Date_),__T(Registration_Record_Count_),__T(Registration_Decal_Number_),__T(Registratoin_Decal_Year_),__T(Registration_Status_Code_),__T(Registration_Status_Description_),__T(Registration_True_License_Plate_),__T(Registration_License_Plate_),__T(Registration_License_State_),__T(Registration_License_Plate_Type_Code_),__T(Registration_License_Plate_Type_Description_),__T(Registration_Previous_License_State_),__T(Registration_Previous_License_Plate_)),__NL(__EE7574016));
-    SELF.Vehicle_Type_Code_ := (__T(__EE7574020))[1].Registration_License_Plate_Type_Code_;
-    SELF := __PP7573690;
+  SHARED __ST219614_Layout __ND7602986__Project(B_Sele_Vehicle_3(__in,__cfg).__ST234155_Layout __PP7602651) := TRANSFORM
+    __CC13183 := KEL.Routines.MinN(FN_Compile(__cfg).FN_G_E_T_B_U_I_L_D_D_A_T_E(__ECAST(KEL.typ.nstr,__CN('vehicle_build_version'))),__CN(__cfg.CurrentDate));
+    __CC13577 := 730;
+    SELF.Seen___In___Last___Two___Years_ := __OP2(__FN2(KEL.Routines.DaysBetween,__PP7602651.Date_Last_Seen_Capped_,__CC13183),<=,__CN(__CC13577));
+    __CC13573 := '-99997';
+    SELF.Vehicle_Min_Date_ := IF(__T(__FN1(KEL.Routines.IsValidDate,__PP7602651.Date_First_Seen_Capped_)),__ECAST(KEL.typ.nstr,__FN2(KEL.Routines.DateToString,__PP7602651.Date_First_Seen_Capped_,__CN('%Y%m%d'))),__ECAST(KEL.typ.nstr,__CN(__CC13573)));
+    __EE7602977 := __PP7602651.Registration_;
+    __BS7602964 := __T(__EE7602977);
+    __EE7602981 := __BN(TOPN(__BS7602964(__NN(KEL.era.ToDate(__T(__EE7602977).Date_Last_Seen_))),1, -__T(KEL.era.ToDate(__T(__EE7602977).Date_Last_Seen_)),__T(Registration_First_Date_),__T(Registration_Earliest_Effective_Date_),__T(Registration_Latest_Effective_Date_),__T(Registration_Latest_Expiratione_Date_),__T(Registration_Record_Count_),__T(Registration_Decal_Number_),__T(Registratoin_Decal_Year_),__T(Registration_Status_Code_),__T(Registration_Status_Description_),__T(Registration_True_License_Plate_),__T(Registration_License_Plate_),__T(Registration_License_State_),__T(Registration_License_Plate_Type_Code_),__T(Registration_License_Plate_Type_Description_),__T(Registration_Previous_License_State_),__T(Registration_Previous_License_Plate_)),__NL(__EE7602977));
+    SELF.Vehicle_Type_Code_ := (__T(__EE7602981))[1].Registration_License_Plate_Type_Code_;
+    SELF := __PP7602651;
   END;
-  EXPORT __ENH_Sele_Vehicle_2 := PROJECT(__EE7574084,__ND7574025__Project(LEFT));
+  EXPORT __ENH_Sele_Vehicle_2 := PROJECT(__EE7603045,__ND7602986__Project(LEFT));
 END;
