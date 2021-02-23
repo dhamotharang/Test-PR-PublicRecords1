@@ -229,7 +229,12 @@ EXPORT SmallBusiness_BIP_Function (
                                     ])
                                  ), TRUE, FALSE);
 
-   
+   //We need to use the old bipappend if we are running model BBFM1906_1_0
+    BBFM1906_1_0_Set := EXISTS(ModelsRequested(ModelName IN [BusinessCredit_Services.Constants.BBFM1906_1_0] ));
+    UseUpdatedBipAppend := IF(BBFM1906_1_0_Set, false, true);
+
+
+
 /* ************************************************************************
 	 *                      Grab Business Shell Results                     *
 	 ************************************************************************ */	
@@ -259,7 +264,8 @@ EXPORT SmallBusiness_BIP_Function (
 																																 LexIdSourceOptout := LexIdSourceOptout, 
 																																 TransactionID := TransactionID, 
 																																 BatchUID := BatchUID, 
-																																 GlobalCompanyID := GlobalCompanyID);
+																																 GlobalCompanyID := GlobalCompanyID,
+                                                                 in_useUpdatedBipAppend := UseUpdatedBipAppend);
 
   Shell_Results_nosbfe := 
 	  PROJECT(Shell_Results_pre, TRANSFORM(Business_Risk_BIP.Layouts.Shell, SELF.SBFE := [], SELF := LEFT));
