@@ -7086,8 +7086,24 @@ Dataset_BIPV2_Build__key_high_risk_industries_addr(
 		Source = src,
 		HybridArchiveDate = FORMAT('YYYYMMDD'),
 		Archive_Date = FORMAT('YYYYMMDD')archive_date),
+	AddressSlim(FILTER((STRING28)prim_name != '' AND (UNSIGNED3)zip5 != 0),//sic
+		PrimaryRange = prim_range,
+		Predirectional = predir,
+		PrimaryName = prim_name,
+		Suffix = addr_suffix,
+		Postdirectional = postdir,
+		ZIP5 = zip5,
+		HighRiskSIC = SIC_Code,
+		HighRiskNAICS = NAICS_Code,
+		DateFirstSeen = FORMAT('YYYYMMDD')dt_first_seen,
+		DateLastSeen = FORMAT('YYYYMMDD')dt_last_seen,
+		Source = src,
+		HybridArchiveDate = FORMAT('YYYYMMDD'),
+		Archive_Date = FORMAT('YYYYMMDD')archive_date),
 	PERMITS (DPMBitmap)),
-	
+
+
+
 Dataset_BIPV2_Build__key_high_risk_industries_phone(
 	Phone(FILTER((UNSIGNED)company_phone <> 0),
 		UID = company_phone,
@@ -7112,13 +7128,6 @@ Dataset_Header__key_ADL_segmentation(	//data is not archivable
 		DateLastSeen = FORMAT('YYYYMMDD'),
 		HybridArchiveDate = FORMAT('YYYYMMDD'),
 		Archive_Date = FORMAT('YYYYMMDD')archive_date),
-  PERMITS (DPMBitmap))	,
-	
-	
-AddressSlim(
-		DateFirstSeen = FORMAT('YYYYMMDD'),
-		DateLastSeen = FORMAT('YYYYMMDD'),
-		HybridArchiveDate = FORMAT('YYYYMMDD'),
-		Archive_Date = FORMAT('YYYYMMDD'))
-    );    
+  PERMITS (DPMBitmap)));	
+
 
