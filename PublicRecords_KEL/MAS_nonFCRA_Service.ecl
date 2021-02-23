@@ -112,6 +112,9 @@ STRING100 Default_data_permission_mask := '';
 	
 	TargusGW := GatewaysClean(STD.Str.ToLowerCase(servicename) = 'targus')[1];
 	#STORED('TargusURL', TargusGW.url);
+	
+	InsurancePhoneGW := GatewaysClean(STD.Str.ToLowerCase(servicename) = 'insurancephoneheader')[1];
+	#STORED('InsurancePhoneURL', InsurancePhoneGW.url);
 
 	// If allowed sources aren't passed in, use default list of allowed sources
 	SetAllowedSources := IF(COUNT(AllowedSourcesDataset) = 0, PublicRecords_KEL.ECL_Functions.Constants.DEFAULT_ALLOWED_SOURCES_NONFCRA, AllowedSourcesDataset);
@@ -207,13 +210,26 @@ STRING100 Default_data_permission_mask := '';
 		TRANSFORM(PublicRecords_KEL.ECL_Functions.Layout_Person_NonFCRA,
 			SELF := LEFT));
 	
-	IF(COUNT(ResultSet(NetAcuityRoyalty <> 0)) > 0, 
-    OUTPUT(DATASET([TRANSFORM(Royalty.Layouts.Royalty, 
-	SELF.royalty_type_code := Royalty.Constants.RoyaltyCode.NETACUITY;
-	SELF.royalty_type := Royalty.Constants.RoyaltyType.NETACUITY;
-	SELF.royalty_count  := COUNT(ResultSet(NetAcuityRoyalty <> 0)); 
-	SELF := [];
-	)]), NAMED('RoyaltySet')));
+
+	TargusRoyaltyCount := COUNT(ResultSet(TargusRoyalty <> 0));
+
+	TargusRoyaltyDS := DATASET([transform(Royalty.Layouts.Royalty,
+							SELF.royalty_type_code := Royalty.Constants.RoyaltyCode.TARGUS_PDE,
+							SELF.royalty_type := Royalty.Constants.RoyaltyType.TARGUS_PDE;
+							SELF.royalty_count := TargusRoyaltyCount; 
+							SELF := [];)]);
+							
+	NetAcuityRoyaltyCount := COUNT(ResultSet(NetAcuityRoyalty <> 0));
+
+	NetAcuityRoyaltyDS := DATASET([transform(Royalty.Layouts.Royalty,
+							SELF.royalty_type_code := Royalty.Constants.RoyaltyCode.NETACUITY,
+							SELF.royalty_type := Royalty.Constants.RoyaltyType.NETACUITY;
+							SELF.royalty_count := NetAcuityRoyaltyCount; 
+							SELF := [];)]);
+
+	RoyaltySet := TargusRoyaltyDS + NetAcuityRoyaltyDS;
+					
+	OUTPUT(RoyaltySet, NAMED('RoyaltySet'));
 	
   OUTPUT( FinalResults, NAMED('Results') );
 

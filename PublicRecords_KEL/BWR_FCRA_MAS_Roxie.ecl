@@ -81,7 +81,7 @@ Targus_GW := IF(IncludeTargusGW, DATASET([TRANSFORM(Gateway.Layouts.Config,
 							SELF.URL := 'HTTP://api_qa_gw_roxie:g0h3%40t2x@gatewaycertesp.sc.seisint.com:7726/WsGateway/?ver_=1.70'; 
 							SELF := [])]),
 							Empty_GW);  
-
+							
 Input_Gateways := (NeutralRoxie_GW + Targus_GW)(URL <> '');
 
 RecordsToRun := 0;

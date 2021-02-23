@@ -305,6 +305,8 @@ EXPORT LayoutAppendedAddresses := RECORD
 		INTEGER4 NetAcuityRoyalty;
 		INTEGER4 TargusRoyalty;
 		STRING3 TargusSrc;
+		INTEGER4 InsPhoneHit;
+		STRING3 InsPhoneSrc;
 	END;
 
 	SHARED LayoutAddrSummaryInternal := RECORD

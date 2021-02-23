@@ -65,6 +65,7 @@ IncludeDeltaBase := FALSE;
 IncludeNetAcuity := FALSE;
 IncludeOFACGW := FALSE;
 IncludeTargusGW := FALSE;
+IncludeInsurancePhoneGW := FALSE;
 
 // OFAC parameters
 include_ofac := TRUE : STORED('IncludeOfacValue'); // This is different than the param to turn off/on the gateway, this adds an OFAC watchlist in the gateway
@@ -108,8 +109,14 @@ Targus_GW := IF(IncludeTargusGW, DATASET([TRANSFORM(Gateway.Layouts.Config,
 							SELF.URL := 'HTTP://api_qa_gw_roxie:g0h3%40t2x@gatewaycertesp.sc.seisint.com:7726/WsGateway/?ver_=1.70'; 
 							SELF := [])]),
 							Empty_GW);  
+
+InsurancePhone_GW := IF(IncludeInsurancePhoneGW, DATASET([TRANSFORM(Gateway.Layouts.Config,
+							SELF.ServiceName := 'insurancephoneheader'; 
+							SELF.URL := 'HTTP://api_qa_gw_roxie:g0h3%40t2x@gatewaycertesp.sc.seisint.com:7726/WsGatewayEx/?ver_=1.87'; 
+							SELF := [])]),
+							Empty_GW);  
 							
-Input_Gateways := (DeltaBase_GW + NetAcuity_GW + OFAC_GW + Targus_GW)(URL <> '');
+Input_Gateways := (DeltaBase_GW + NetAcuity_GW + OFAC_GW + Targus_GW + InsurancePhone_GW)(URL <> '');
 
 RecordsToRun := 0;
 eyeball := 25;
