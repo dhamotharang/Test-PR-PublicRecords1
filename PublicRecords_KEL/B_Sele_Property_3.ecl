@@ -4,8 +4,8 @@ IMPORT B_Sele_Property_4,CFG_Compile,E_Business_Org,E_Business_Sele,E_Business_S
 IMPORT * FROM KEL15.Null;
 EXPORT B_Sele_Property_3(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG_Compile __cfg = CFG_Compile) := MODULE
   SHARED VIRTUAL TYPEOF(B_Sele_Property_4(__in,__cfg).__ENH_Sele_Property_4) __ENH_Sele_Property_4 := B_Sele_Property_4(__in,__cfg).__ENH_Sele_Property_4;
-  SHARED __EE6422957 := __ENH_Sele_Property_4;
-  EXPORT __ST233941_Layout := RECORD
+  SHARED __EE6433514 := __ENH_Sele_Property_4;
+  EXPORT __ST234326_Layout := RECORD
     KEL.typ.ntyp(E_Business_Sele().Typ) Legal_;
     KEL.typ.ntyp(E_Property().Typ) Prop_;
     KEL.typ.nint Ult_I_D_;
@@ -33,9 +33,9 @@ EXPORT B_Sele_Property_3(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, C
     KEL.typ.epoch Vault_Date_Last_Seen_ := 0;
     KEL.typ.int __RecordCount := 0;
   END;
-  SHARED __ST233941_Layout __ND6422962__Project(B_Sele_Property_4(__in,__cfg).__ST244851_Layout __PP6422958) := TRANSFORM
-    SELF.Is_Currently_Owned_ := (__PP6422958.Property_Is_Owned_Assessment_ OR __PP6422958.Property_Is_Owned_Deed_) AND NOT (__PP6422958.Property_Is_Sold_);
-    SELF := __PP6422958;
+  SHARED __ST234326_Layout __ND6433519__Project(B_Sele_Property_4(__in,__cfg).__ST245257_Layout __PP6433515) := TRANSFORM
+    SELF.Is_Currently_Owned_ := (__PP6433515.Property_Is_Owned_Assessment_ OR __PP6433515.Property_Is_Owned_Deed_) AND NOT (__PP6433515.Property_Is_Sold_);
+    SELF := __PP6433515;
   END;
-  EXPORT __ENH_Sele_Property_3 := PROJECT(__EE6422957,__ND6422962__Project(LEFT));
+  EXPORT __ENH_Sele_Property_3 := PROJECT(__EE6433514,__ND6433519__Project(LEFT));
 END;

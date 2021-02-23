@@ -4,8 +4,8 @@ IMPORT B_U_C_C_11,CFG_Compile,E_U_C_C,FN_Compile FROM PublicRecords_KEL;
 IMPORT * FROM KEL15.Null;
 EXPORT B_U_C_C_10(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG_Compile __cfg = CFG_Compile) := MODULE
   SHARED VIRTUAL TYPEOF(B_U_C_C_11(__in,__cfg).__ENH_U_C_C_11) __ENH_U_C_C_11 := B_U_C_C_11(__in,__cfg).__ENH_U_C_C_11;
-  SHARED __EE5053997 := __ENH_U_C_C_11;
-  EXPORT __ST265813_Layout := RECORD
+  SHARED __EE5061354 := __ENH_U_C_C_11;
+  EXPORT __ST266231_Layout := RECORD
     KEL.typ.nstr R_M_S_I_D_;
     KEL.typ.nstr Filing_Jurisdiction_;
     KEL.typ.nstr Filing_Number_;
@@ -36,7 +36,7 @@ EXPORT B_U_C_C_10(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG_Comp
     KEL.typ.epoch Vault_Date_Last_Seen_ := 0;
     KEL.typ.int __RecordCount := 0;
   END;
-  EXPORT __ST117537_Layout := RECORD
+  EXPORT __ST117728_Layout := RECORD
     KEL.typ.nstr R_M_S_I_D_;
     KEL.typ.nkdate Max_Filing_Date_;
     KEL.typ.nint Age_In_Days_;
@@ -60,13 +60,13 @@ EXPORT B_U_C_C_10(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG_Comp
     KEL.typ.epoch Vault_Date_Last_Seen_ := 0;
     KEL.typ.int __RecordCount := 0;
   END;
-  EXPORT __ST265809_Layout := RECORD
+  EXPORT __ST266227_Layout := RECORD
     KEL.typ.nuid UID;
     KEL.typ.nstr T_M_S_I_D_;
-    KEL.typ.ndataset(__ST265813_Layout) Sub_Filing_;
+    KEL.typ.ndataset(__ST266231_Layout) Sub_Filing_;
     KEL.typ.ndataset(E_U_C_C(__in,__cfg).Collateral_Layout) Collateral_;
     KEL.typ.ndataset(E_U_C_C(__in,__cfg).Data_Sources_Layout) Data_Sources_;
-    KEL.typ.ndataset(__ST117537_Layout) Best_U_C_C_Child_Record_;
+    KEL.typ.ndataset(__ST117728_Layout) Best_U_C_C_Child_Record_;
     KEL.typ.epoch Archive___Date_ := 0;
     KEL.typ.epoch Date_First_Seen_ := 0;
     KEL.typ.epoch Date_Last_Seen_ := 0;
@@ -74,25 +74,25 @@ EXPORT B_U_C_C_10(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG_Comp
     KEL.typ.epoch Vault_Date_Last_Seen_ := 0;
     KEL.typ.int __RecordCount := 0;
   END;
-  SHARED __ST265809_Layout __ND5053963__Project(B_U_C_C_11(__in,__cfg).__ST266287_Layout __PP5053322) := TRANSFORM
-    __EE5054000 := __PP5053322.Sub_Filing_;
-    SELF.Sub_Filing_ := __BN(PROJECT(__T(__EE5054000),__ST265813_Layout),__NL(__EE5054000));
-    __EE5053843 := __PP5053322.Sub_Filing_;
-    __CC13239 := KEL.Routines.MinN(FN_Compile(__cfg).FN_G_E_T_B_U_I_L_D_D_A_T_E(__ECAST(KEL.typ.nstr,__CN('ucc_build_version'))),__CN(__cfg.CurrentDate));
-    __BS5053844 := __T(__EE5053843);
-    __EE5053854 := __BS5053844(__T(__OP2(KEL.Routines.MaxN(__T(__EE5053843).Filing_Date_,__T(__EE5053843).Original_Filing_Date_),<,__CC13239)));
-    __ST117537_Layout __ND5053859__Project(B_U_C_C_11(__in,__cfg).__ST266291_Layout __PP5053855) := TRANSFORM
-      SELF.Max_Filing_Date_ := KEL.Routines.MaxN(__PP5053855.Filing_Date_,__PP5053855.Original_Filing_Date_);
-      SELF.Filing_Date_Non_Null_ := IF(__T(__NT(__PP5053855.Filing_Date_)),__ECAST(KEL.typ.nint,__CN(-99999)),__ECAST(KEL.typ.nint,KEL.Routines.NIntegerFromNDate(__PP5053855.Filing_Date_)));
-      SELF.Filing_Time_Non_Null_ := IF(__T(__NT(__PP5053855.Filing_Time_)),__ECAST(KEL.typ.nstr,__CAST(KEL.typ.str,__CN(-99999))),__ECAST(KEL.typ.nstr,__PP5053855.Filing_Time_));
-      SELF.Vendor_Entry_Date_Non_Null_ := IF(__T(__NT(__PP5053855.Vendor_Entry_Date_)),__ECAST(KEL.typ.nint,__CN(-99999)),__ECAST(KEL.typ.nint,KEL.Routines.NIntegerFromNDate(__PP5053855.Vendor_Entry_Date_)));
-      SELF.Filing_Number_Non_Null_ := IF(__T(__NT(__PP5053855.Filing_Number_)),__ECAST(KEL.typ.nstr,__CAST(KEL.typ.str,__CN(-99999))),__ECAST(KEL.typ.nstr,__PP5053855.Filing_Number_));
-      SELF := __PP5053855;
+  SHARED __ST266227_Layout __ND5061320__Project(B_U_C_C_11(__in,__cfg).__ST266705_Layout __PP5060679) := TRANSFORM
+    __EE5061357 := __PP5060679.Sub_Filing_;
+    SELF.Sub_Filing_ := __BN(PROJECT(__T(__EE5061357),__ST266231_Layout),__NL(__EE5061357));
+    __EE5061200 := __PP5060679.Sub_Filing_;
+    __CC13309 := KEL.Routines.MinN(FN_Compile(__cfg).FN_G_E_T_B_U_I_L_D_D_A_T_E(__ECAST(KEL.typ.nstr,__CN('ucc_build_version'))),__CN(__cfg.CurrentDate));
+    __BS5061201 := __T(__EE5061200);
+    __EE5061211 := __BS5061201(__T(__OP2(KEL.Routines.MaxN(__T(__EE5061200).Filing_Date_,__T(__EE5061200).Original_Filing_Date_),<,__CC13309)));
+    __ST117728_Layout __ND5061216__Project(B_U_C_C_11(__in,__cfg).__ST266709_Layout __PP5061212) := TRANSFORM
+      SELF.Max_Filing_Date_ := KEL.Routines.MaxN(__PP5061212.Filing_Date_,__PP5061212.Original_Filing_Date_);
+      SELF.Filing_Date_Non_Null_ := IF(__T(__NT(__PP5061212.Filing_Date_)),__ECAST(KEL.typ.nint,__CN(-99999)),__ECAST(KEL.typ.nint,KEL.Routines.NIntegerFromNDate(__PP5061212.Filing_Date_)));
+      SELF.Filing_Time_Non_Null_ := IF(__T(__NT(__PP5061212.Filing_Time_)),__ECAST(KEL.typ.nstr,__CAST(KEL.typ.str,__CN(-99999))),__ECAST(KEL.typ.nstr,__PP5061212.Filing_Time_));
+      SELF.Vendor_Entry_Date_Non_Null_ := IF(__T(__NT(__PP5061212.Vendor_Entry_Date_)),__ECAST(KEL.typ.nint,__CN(-99999)),__ECAST(KEL.typ.nint,KEL.Routines.NIntegerFromNDate(__PP5061212.Vendor_Entry_Date_)));
+      SELF.Filing_Number_Non_Null_ := IF(__T(__NT(__PP5061212.Filing_Number_)),__ECAST(KEL.typ.nstr,__CAST(KEL.typ.str,__CN(-99999))),__ECAST(KEL.typ.nstr,__PP5061212.Filing_Number_));
+      SELF := __PP5061212;
     END;
-    __EE5053957 := PROJECT(TABLE(PROJECT(__EE5053854,__ND5053859__Project(LEFT)),{KEL.typ.int __RecordCount := SUM(GROUP,__RecordCount),KEL.typ.epoch Archive___Date_ := KEL.era.SimpleRoll(GROUP,Archive___Date_,MIN,FALSE),KEL.typ.epoch Date_First_Seen_ := KEL.era.SimpleRoll(GROUP,Date_First_Seen_,MIN,FALSE),KEL.typ.epoch Date_Last_Seen_ := KEL.era.SimpleRoll(GROUP,Date_Last_Seen_,MAX,FALSE),KEL.typ.epoch Hybrid_Archive_Date_ := KEL.era.SimpleRoll(GROUP,Hybrid_Archive_Date_,MIN,FALSE),KEL.typ.epoch Vault_Date_Last_Seen_ := KEL.era.SimpleRoll(GROUP,Vault_Date_Last_Seen_,MAX,NMAX),R_M_S_I_D_,Max_Filing_Date_,Age_In_Days_,Filing_Type_Filtered_,Initial_Filing_,Status_Type_Filtered_,Inferred_Status_,Filing_Date_Non_Null_,Filing_Time_Non_Null_,Vendor_Entry_Date_Non_Null_,Filing_Number_Non_Null_,Filing_Type_,Filing_Date_,Original_Filing_Date_,Filing_Status_,Status_Type_},R_M_S_I_D_,Max_Filing_Date_,Age_In_Days_,Filing_Type_Filtered_,Initial_Filing_,Status_Type_Filtered_,Inferred_Status_,Filing_Date_Non_Null_,Filing_Time_Non_Null_,Vendor_Entry_Date_Non_Null_,Filing_Number_Non_Null_,Filing_Type_,Filing_Date_,Original_Filing_Date_,Filing_Status_,Status_Type_,MERGE),__ST117537_Layout);
-    __EE5053961 := TOPN(__EE5053957(__NN(__EE5053957.Filing_Date_Non_Null_) AND __NN(__EE5053957.Filing_Time_Non_Null_) AND __NN(__EE5053957.Vendor_Entry_Date_Non_Null_) AND __NN(__EE5053957.Filing_Number_Non_Null_) AND __NN(__EE5053957.R_M_S_I_D_)),1, -__T(__EE5053957.Filing_Date_Non_Null_), -__T(__EE5053957.Filing_Time_Non_Null_), -__T(__EE5053957.Vendor_Entry_Date_Non_Null_), -__T(__EE5053957.Filing_Number_Non_Null_), -__T(__EE5053957.R_M_S_I_D_),__T(Filing_Type_),__T(Filing_Date_),__T(Original_Filing_Date_),__T(Filing_Status_),__T(Status_Type_),__T(Max_Filing_Date_),__T(Age_In_Days_),Filing_Type_Filtered_,Initial_Filing_,Status_Type_Filtered_,Inferred_Status_);
-    SELF.Best_U_C_C_Child_Record_ := __CN(__EE5053961);
-    SELF := __PP5053322;
+    __EE5061314 := PROJECT(TABLE(PROJECT(__EE5061211,__ND5061216__Project(LEFT)),{KEL.typ.int __RecordCount := SUM(GROUP,__RecordCount),KEL.typ.epoch Archive___Date_ := KEL.era.SimpleRoll(GROUP,Archive___Date_,MIN,FALSE),KEL.typ.epoch Date_First_Seen_ := KEL.era.SimpleRoll(GROUP,Date_First_Seen_,MIN,FALSE),KEL.typ.epoch Date_Last_Seen_ := KEL.era.SimpleRoll(GROUP,Date_Last_Seen_,MAX,FALSE),KEL.typ.epoch Hybrid_Archive_Date_ := KEL.era.SimpleRoll(GROUP,Hybrid_Archive_Date_,MIN,FALSE),KEL.typ.epoch Vault_Date_Last_Seen_ := KEL.era.SimpleRoll(GROUP,Vault_Date_Last_Seen_,MAX,NMAX),R_M_S_I_D_,Max_Filing_Date_,Age_In_Days_,Filing_Type_Filtered_,Initial_Filing_,Status_Type_Filtered_,Inferred_Status_,Filing_Date_Non_Null_,Filing_Time_Non_Null_,Vendor_Entry_Date_Non_Null_,Filing_Number_Non_Null_,Filing_Type_,Filing_Date_,Original_Filing_Date_,Filing_Status_,Status_Type_},R_M_S_I_D_,Max_Filing_Date_,Age_In_Days_,Filing_Type_Filtered_,Initial_Filing_,Status_Type_Filtered_,Inferred_Status_,Filing_Date_Non_Null_,Filing_Time_Non_Null_,Vendor_Entry_Date_Non_Null_,Filing_Number_Non_Null_,Filing_Type_,Filing_Date_,Original_Filing_Date_,Filing_Status_,Status_Type_,MERGE),__ST117728_Layout);
+    __EE5061318 := TOPN(__EE5061314(__NN(__EE5061314.Filing_Date_Non_Null_) AND __NN(__EE5061314.Filing_Time_Non_Null_) AND __NN(__EE5061314.Vendor_Entry_Date_Non_Null_) AND __NN(__EE5061314.Filing_Number_Non_Null_) AND __NN(__EE5061314.R_M_S_I_D_)),1, -__T(__EE5061314.Filing_Date_Non_Null_), -__T(__EE5061314.Filing_Time_Non_Null_), -__T(__EE5061314.Vendor_Entry_Date_Non_Null_), -__T(__EE5061314.Filing_Number_Non_Null_), -__T(__EE5061314.R_M_S_I_D_),__T(Filing_Type_),__T(Filing_Date_),__T(Original_Filing_Date_),__T(Filing_Status_),__T(Status_Type_),__T(Max_Filing_Date_),__T(Age_In_Days_),Filing_Type_Filtered_,Initial_Filing_,Status_Type_Filtered_,Inferred_Status_);
+    SELF.Best_U_C_C_Child_Record_ := __CN(__EE5061318);
+    SELF := __PP5060679;
   END;
-  EXPORT __ENH_U_C_C_10 := PROJECT(__EE5053997,__ND5053963__Project(LEFT));
+  EXPORT __ENH_U_C_C_10 := PROJECT(__EE5061354,__ND5061320__Project(LEFT));
 END;

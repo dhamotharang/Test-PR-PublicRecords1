@@ -4,8 +4,8 @@ IMPORT B_Sele_Address_3,CFG_Compile,E_Address,E_Business_Org,E_Business_Sele,E_B
 IMPORT * FROM KEL15.Null;
 EXPORT B_Sele_Address_2(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG_Compile __cfg = CFG_Compile) := MODULE
   SHARED VIRTUAL TYPEOF(B_Sele_Address_3(__in,__cfg).__ENH_Sele_Address_3) __ENH_Sele_Address_3 := B_Sele_Address_3(__in,__cfg).__ENH_Sele_Address_3;
-  SHARED __EE7566905 := __ENH_Sele_Address_3;
-  EXPORT __ST218970_Layout := RECORD
+  SHARED __EE7578493 := __ENH_Sele_Address_3;
+  EXPORT __ST219329_Layout := RECORD
     KEL.typ.nbool Header_Hit_Flag_;
     KEL.typ.nstr Source_;
     KEL.typ.nkdate Date_First_Seen_Company_Address_;
@@ -20,7 +20,7 @@ EXPORT B_Sele_Address_2(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CF
     KEL.typ.epoch Vault_Date_Last_Seen_ := 0;
     KEL.typ.int __RecordCount := 0;
   END;
-  EXPORT __ST218914_Layout := RECORD
+  EXPORT __ST219273_Layout := RECORD
     KEL.typ.ntyp(E_Business_Sele().Typ) Legal_;
     KEL.typ.ntyp(E_Address().Typ) Location_;
     KEL.typ.nstr Primary_Range_;
@@ -36,10 +36,10 @@ EXPORT B_Sele_Address_2(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CF
     KEL.typ.ndataset(E_Sele_Address(__in,__cfg).S_I_C_Codes_Layout) S_I_C_Codes_;
     KEL.typ.ndataset(E_Sele_Address(__in,__cfg).N_A_I_C_S_Codes_Layout) N_A_I_C_S_Codes_;
     KEL.typ.ndataset(E_Sele_Address(__in,__cfg).Best_Addresses_Layout) Best_Addresses_;
-    KEL.typ.ndataset(__ST218970_Layout) Data_Sources_;
+    KEL.typ.ndataset(__ST219329_Layout) Data_Sources_;
     KEL.typ.nbool Input_Address_Match_;
     KEL.typ.nbool Matches_Is_Best_Helper_Attr_;
-    KEL.typ.ndataset(B_Sele_Address_3(__in,__cfg).__ST1183870_Layout) Rolled_Source_List_;
+    KEL.typ.ndataset(B_Sele_Address_3(__in,__cfg).__ST1189610_Layout) Rolled_Source_List_;
     KEL.typ.epoch Archive___Date_ := 0;
     KEL.typ.epoch Date_First_Seen_ := 0;
     KEL.typ.epoch Date_Last_Seen_ := 0;
@@ -47,10 +47,10 @@ EXPORT B_Sele_Address_2(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CF
     KEL.typ.epoch Vault_Date_Last_Seen_ := 0;
     KEL.typ.int __RecordCount := 0;
   END;
-  SHARED __ST218914_Layout __ND7566910__Project(B_Sele_Address_3(__in,__cfg).__ST233605_Layout __PP7566906) := TRANSFORM
-    __EE7567001 := __PP7566906.Data_Sources_;
-    SELF.Data_Sources_ := __BN(PROJECT(__T(__EE7567001),__ST218970_Layout),__NL(__EE7567001));
-    SELF := __PP7566906;
+  SHARED __ST219273_Layout __ND7578498__Project(B_Sele_Address_3(__in,__cfg).__ST233990_Layout __PP7578494) := TRANSFORM
+    __EE7578589 := __PP7578494.Data_Sources_;
+    SELF.Data_Sources_ := __BN(PROJECT(__T(__EE7578589),__ST219329_Layout),__NL(__EE7578589));
+    SELF := __PP7578494;
   END;
-  EXPORT __ENH_Sele_Address_2 := PROJECT(__EE7566905,__ND7566910__Project(LEFT));
+  EXPORT __ENH_Sele_Address_2 := PROJECT(__EE7578493,__ND7578498__Project(LEFT));
 END;

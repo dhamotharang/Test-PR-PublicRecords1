@@ -4,8 +4,8 @@ IMPORT B_Person_Inquiry_6,CFG_Compile,E_Inquiry,E_Person,E_Person_Inquiry FROM P
 IMPORT * FROM KEL15.Null;
 EXPORT B_Person_Inquiry_5(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG_Compile __cfg = CFG_Compile) := MODULE
   SHARED VIRTUAL TYPEOF(B_Person_Inquiry_6(__in,__cfg).__ENH_Person_Inquiry_6) __ENH_Person_Inquiry_6 := B_Person_Inquiry_6(__in,__cfg).__ENH_Person_Inquiry_6;
-  SHARED __EE5203186 := __ENH_Person_Inquiry_6;
-  EXPORT __ST522899_Layout := RECORD
+  SHARED __EE5210567 := __ENH_Person_Inquiry_6;
+  EXPORT __ST527632_Layout := RECORD
     KEL.typ.nstr Transaction_I_D_;
     KEL.typ.str Method_ := '';
     KEL.typ.nint Product_Code_;
@@ -42,13 +42,13 @@ EXPORT B_Person_Inquiry_5(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, 
     KEL.typ.epoch Vault_Date_Last_Seen_ := 0;
     KEL.typ.int __RecordCount := 0;
   END;
-  EXPORT __ST250241_Layout := RECORD
+  EXPORT __ST250659_Layout := RECORD
     KEL.typ.ntyp(E_Person().Typ) Subject_;
     KEL.typ.ntyp(E_Inquiry().Typ) Transaction_;
     KEL.typ.nstr Transaction_I_D_;
     KEL.typ.nstr Sequence_Number_;
     KEL.typ.ndataset(E_Person_Inquiry(__in,__cfg).Data_Sources_Layout) Data_Sources_;
-    KEL.typ.ndataset(__ST522899_Layout) Gather_Inquiries_;
+    KEL.typ.ndataset(__ST527632_Layout) Gather_Inquiries_;
     KEL.typ.timestamp Archive___Date_ := 0;
     KEL.typ.timestamp Date_First_Seen_ := 0;
     KEL.typ.timestamp Date_Last_Seen_ := 0;
@@ -56,33 +56,33 @@ EXPORT B_Person_Inquiry_5(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, 
     KEL.typ.epoch Vault_Date_Last_Seen_ := 0;
     KEL.typ.int __RecordCount := 0;
   END;
-  SHARED __ST250241_Layout __ND5203172__Project(B_Person_Inquiry_6(__in,__cfg).__ST255428_Layout __PP5202903) := TRANSFORM
-    __EE5203170 := __PP5202903.Gather_Inquiries_;
-    __ST522899_Layout __ND5203119__Project(B_Person_Inquiry_6(__in,__cfg).__ST445079_Layout __PP5202928) := TRANSFORM
-      __CC33882 := ['AUTO','AUTO - CAPTIVE'];
-      SELF.Is_Auto_Srch_ := KEL.Routines.ToUpperCase(TRIM(__PP5202928.Industry_)) IN __CC33882;
-      __CC33885 := ['MORTGAGE/REAL ESTATE'];
-      SELF.Is_Mortgage_ := KEL.Routines.ToUpperCase(TRIM(__PP5202928.Industry_)) IN __CC33885;
-      __CC33913 := ['PREPAID CARDS'];
-      SELF.Is_Prepaid_Card_ := KEL.Routines.ToUpperCase(TRIM(__PP5202928.Industry_)) IN __CC33913;
-      __CC33926 := ['QUIZ PROVIDER'];
-      SELF.Is_Quiz_Provider_ := KEL.Routines.ToUpperCase(TRIM(__PP5202928.Industry_)) IN __CC33926;
-      __CC33916 := ['RETAIL'];
-      SELF.Is_Retail_ := KEL.Routines.ToUpperCase(TRIM(__PP5202928.Industry_)) IN __CC33916;
-      __CC33919 := ['RETAIL PAYMENTS'];
-      SELF.Is_Retail_Payment_ := KEL.Routines.ToUpperCase(TRIM(__PP5202928.Industry_)) IN __CC33919;
-      __CC33929 := ['STUDENT LOANS'];
-      SELF.Is_Student_Loan_ := KEL.Routines.ToUpperCase(TRIM(__PP5202928.Industry_)) IN __CC33929;
-      __CC33923 := ['UTILITIES','CABLE/SATELLITE/INTERNET'];
-      SELF.Is_Utility_ := KEL.Routines.ToUpperCase(TRIM(__PP5202928.Industry_)) IN __CC33923;
-      __CC33858 := 1826;
-      SELF.Seen___In___Five___Years_ := __OP2(__PP5202928.Agein_Days_,<=,__CN(__CC33858));
-      SELF.Valid_Banking_ := __AND(__PP5202928.Valid_Inquiries_,__CN(__PP5202928.Is_Banking_));
-      SELF.Valid_Communications_ := __AND(__PP5202928.Valid_Inquiries_,__CN(__PP5202928.Is_Communications_));
-      SELF := __PP5202928;
+  SHARED __ST250659_Layout __ND5210553__Project(B_Person_Inquiry_6(__in,__cfg).__ST255846_Layout __PP5210284) := TRANSFORM
+    __EE5210551 := __PP5210284.Gather_Inquiries_;
+    __ST527632_Layout __ND5210500__Project(B_Person_Inquiry_6(__in,__cfg).__ST449788_Layout __PP5210309) := TRANSFORM
+      __CC34018 := ['AUTO','AUTO - CAPTIVE'];
+      SELF.Is_Auto_Srch_ := KEL.Routines.ToUpperCase(TRIM(__PP5210309.Industry_)) IN __CC34018;
+      __CC34021 := ['MORTGAGE/REAL ESTATE'];
+      SELF.Is_Mortgage_ := KEL.Routines.ToUpperCase(TRIM(__PP5210309.Industry_)) IN __CC34021;
+      __CC34049 := ['PREPAID CARDS'];
+      SELF.Is_Prepaid_Card_ := KEL.Routines.ToUpperCase(TRIM(__PP5210309.Industry_)) IN __CC34049;
+      __CC34062 := ['QUIZ PROVIDER'];
+      SELF.Is_Quiz_Provider_ := KEL.Routines.ToUpperCase(TRIM(__PP5210309.Industry_)) IN __CC34062;
+      __CC34052 := ['RETAIL'];
+      SELF.Is_Retail_ := KEL.Routines.ToUpperCase(TRIM(__PP5210309.Industry_)) IN __CC34052;
+      __CC34055 := ['RETAIL PAYMENTS'];
+      SELF.Is_Retail_Payment_ := KEL.Routines.ToUpperCase(TRIM(__PP5210309.Industry_)) IN __CC34055;
+      __CC34065 := ['STUDENT LOANS'];
+      SELF.Is_Student_Loan_ := KEL.Routines.ToUpperCase(TRIM(__PP5210309.Industry_)) IN __CC34065;
+      __CC34059 := ['UTILITIES','CABLE/SATELLITE/INTERNET'];
+      SELF.Is_Utility_ := KEL.Routines.ToUpperCase(TRIM(__PP5210309.Industry_)) IN __CC34059;
+      __CC33994 := 1826;
+      SELF.Seen___In___Five___Years_ := __OP2(__PP5210309.Agein_Days_,<=,__CN(__CC33994));
+      SELF.Valid_Banking_ := __AND(__PP5210309.Valid_Inquiries_,__CN(__PP5210309.Is_Banking_));
+      SELF.Valid_Communications_ := __AND(__PP5210309.Valid_Inquiries_,__CN(__PP5210309.Is_Communications_));
+      SELF := __PP5210309;
     END;
-    SELF.Gather_Inquiries_ := __PROJECT(__EE5203170,__ND5203119__Project(LEFT));
-    SELF := __PP5202903;
+    SELF.Gather_Inquiries_ := __PROJECT(__EE5210551,__ND5210500__Project(LEFT));
+    SELF := __PP5210284;
   END;
-  EXPORT __ENH_Person_Inquiry_5 := PROJECT(__EE5203186,__ND5203172__Project(LEFT));
+  EXPORT __ENH_Person_Inquiry_5 := PROJECT(__EE5210567,__ND5210553__Project(LEFT));
 END;

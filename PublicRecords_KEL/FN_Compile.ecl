@@ -133,9 +133,9 @@ EXPORT FN_Compile(CFG_Compile __cfg = CFG_Compile) := MODULE
     __Value := PublicRecords_KEL.ECL_Functions.Fn_STD_Str_FilterOut_ValidChars(Field);
     RETURN __BNT(__Value,__IsNull,KEL.typ.nstr);
   END;
-  SHARED __CC13410 := -99999;
+  SHARED __CC13480 := -99999;
   EXPORT KEL.typ.str FN_Validate_Flag(KEL.typ.nstr __PFieldToCheck) := FUNCTION
-    RETURN MAP(__T(__OR(__NT(__PFieldToCheck),__OP2(__PFieldToCheck,=,__CN(''))))=>(KEL.typ.str)__CC13410,__T(__OP2(FN__fn_Filter_Out_Valid_Chars(__ECAST(KEL.typ.nstr,__FN1(KEL.Routines.ToUpperCase,__FN1(KEL.Routines.TrimBoth,__PFieldToCheck)))),=,__CN('')))=>'0','1');
+    RETURN MAP(__T(__OR(__NT(__PFieldToCheck),__OP2(__PFieldToCheck,=,__CN(''))))=>(KEL.typ.str)__CC13480,__T(__OP2(FN__fn_Filter_Out_Valid_Chars(__ECAST(KEL.typ.nstr,__FN1(KEL.Routines.ToUpperCase,__FN1(KEL.Routines.TrimBoth,__PFieldToCheck)))),=,__CN('')))=>'0','1');
   END;
   EXPORT KEL.typ.nstr FN__fn_Bogus_Names(KEL.typ.nstr __PsNameFirst, KEL.typ.nstr __PsNameMid, KEL.typ.nstr __PsNameLast) := FUNCTION
     sNameFirst := __T(__PsNameFirst);
@@ -405,6 +405,26 @@ EXPORT FN_Compile(CFG_Compile __cfg = CFG_Compile) := MODULE
     GLBPurpose := __T(__PGLBPurpose);
     IsFCRA := __T(__PIsFCRA);
     __Value := PublicRecords_KEL.MAS_get.MASGateway.TargusFunctions.TargusWrapper(GatewayURL, FirstName, LastName, Phone10, DPPAPurpose, GLBPurpose, IsFCRA);
+    RETURN __Value;
+  END;
+  EXPORT KEL.typ.nstr FN_G_E_T___I_N_S_U_R_A_N_C_E___P_H_O_N_E___U_R_L(KEL.typ.nstr __PStoredName) := FUNCTION
+    StoredName := __T(__PStoredName);
+    __IsNull := __NL(__PStoredName);
+    __Value := PublicRecords_KEL.MAS_get.MASGateway.InsurancePhoneFunctions.GrabInsurancePhoneURL(StoredName);
+    RETURN __BNT(__Value,__IsNull,KEL.typ.nstr);
+  END;
+  EXPORT SET OF KEL.typ.str FN_G_A_T_E_W_A_Y___I_N_S_U_R_A_N_C_E___P_H_O_N_E(KEL.typ.nstr __PGatewayURL, KEL.typ.nstr __PFirstName, KEL.typ.nstr __PLastName, KEL.typ.nstr __PStreetAddress, KEL.typ.nstr __PCity, KEL.typ.nstr __PState, KEL.typ.nstr __PZip, KEL.typ.nstr __PPhone10, KEL.typ.nint __PGLBPurpose, KEL.typ.nbool __PIsFCRA) := FUNCTION
+    GatewayURL := __T(__PGatewayURL);
+    FirstName := __T(__PFirstName);
+    LastName := __T(__PLastName);
+    StreetAddress := __T(__PStreetAddress);
+    City := __T(__PCity);
+    State := __T(__PState);
+    Zip := __T(__PZip);
+    Phone10 := __T(__PPhone10);
+    GLBPurpose := __T(__PGLBPurpose);
+    IsFCRA := __T(__PIsFCRA);
+    __Value := PublicRecords_KEL.MAS_get.MASGateway.InsurancePhoneFunctions.InsurancePhoneWrapper(GatewayURL, FirstName, LastName, StreetAddress, City, State, Zip, Phone10, GLBPurpose, IsFCRA);
     RETURN __Value;
   END;
   EXPORT KEL.typ.str FN__map_Filing_Type(KEL.typ.nstr __PfilingType) := FUNCTION

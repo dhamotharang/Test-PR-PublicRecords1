@@ -4,8 +4,8 @@ IMPORT B_Inquiry_10,CFG_Compile,E_Inquiry,FN_Compile FROM PublicRecords_KEL;
 IMPORT * FROM KEL15.Null;
 EXPORT B_Inquiry_9(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG_Compile __cfg = CFG_Compile) := MODULE
   SHARED VIRTUAL TYPEOF(B_Inquiry_10(__in,__cfg).__ENH_Inquiry_10) __ENH_Inquiry_10 := B_Inquiry_10(__in,__cfg).__ENH_Inquiry_10;
-  SHARED __EE5058316 := __ENH_Inquiry_10;
-  EXPORT __ST263305_Layout := RECORD
+  SHARED __EE5065673 := __ENH_Inquiry_10;
+  EXPORT __ST263723_Layout := RECORD
     KEL.typ.nuid UID;
     KEL.typ.nstr Transaction_I_D_;
     KEL.typ.nstr Sequence_Number_;
@@ -35,19 +35,19 @@ EXPORT B_Inquiry_9(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG_Com
     KEL.typ.epoch Vault_Date_Last_Seen_ := 0;
     KEL.typ.int __RecordCount := 0;
   END;
-  SHARED __ST263305_Layout __ND5058199__Project(B_Inquiry_10(__in,__cfg).__ST264973_Layout __PP5057824) := TRANSFORM
-    __CC13079 := KEL.Routines.MinN(FN_Compile(__cfg).FN_G_E_T_B_U_I_L_D_D_A_T_E(__ECAST(KEL.typ.nstr,__CN('inquiry_build_version'))),__CN(__cfg.CurrentDate));
-    SELF.Agein_Days_ := FN_Compile(__cfg).FN_A_B_S_D_A_Y_S_B_E_T_W_E_E_N(__ECAST(KEL.typ.nkdate,FN_Compile(__cfg).FN_Time_Stamp_To_Date(__ECAST(KEL.typ.ntimestamp,KEL.era.EpochToNTimestamp(__PP5057824.Date_First_Seen_)))),__ECAST(KEL.typ.nkdate,__CC13079));
-    __EE5058194 := __PP5057824.Search_Info_;
-    SELF.Inquiry_Product_Code_ := (__T(__EE5058194))[1].Product_Code_;
-    __CC33862 := ['BATCH','MONITORING'];
-    SELF.Is_Batch_Monitoring_Method_ := KEL.Routines.ToUpperCase(TRIM(__PP5057824.Inquiry_Method_)) IN __CC33862;
-    __CC33870 := ['COLLECTIONS','COLLECTION','COLLECTION LAW FIRM','DEBT BUYER','FIRST PARTY','THIRD PARTY'];
-    __CC33876 := ['COLLECTIONS','RECEIVABLES MANAGEMENT','1PC','3PC'];
-    SELF.Is_Collection_ := KEL.Routines.ToUpperCase(TRIM(__PP5057824.Inquiry_Industry_)) IN __CC33870 OR KEL.Routines.ToUpperCase(TRIM(__PP5057824.Inquiry_Vertical_)) IN __CC33876 OR __PP5057824.Is_Length_Sub_Market_;
-    SELF.Is_Fcra_Ok_ := FN_Compile(__cfg).FN_Is_Fcra_Inquiry(__ECAST(KEL.typ.nstr,__CN(KEL.Routines.ToUpperCase(TRIM(__PP5057824.Inquiry_Function_Description_)))));
-    SELF.Is_Non_Fcra_Ok_ := FN_Compile(__cfg).FN_Is_Non_Fcra_Inquiry(__ECAST(KEL.typ.nstr,__CN(KEL.Routines.ToUpperCase(TRIM(__PP5057824.Inquiry_Function_Description_)))));
-    SELF := __PP5057824;
+  SHARED __ST263723_Layout __ND5065556__Project(B_Inquiry_10(__in,__cfg).__ST265391_Layout __PP5065181) := TRANSFORM
+    __CC13149 := KEL.Routines.MinN(FN_Compile(__cfg).FN_G_E_T_B_U_I_L_D_D_A_T_E(__ECAST(KEL.typ.nstr,__CN('inquiry_build_version'))),__CN(__cfg.CurrentDate));
+    SELF.Agein_Days_ := FN_Compile(__cfg).FN_A_B_S_D_A_Y_S_B_E_T_W_E_E_N(__ECAST(KEL.typ.nkdate,FN_Compile(__cfg).FN_Time_Stamp_To_Date(__ECAST(KEL.typ.ntimestamp,KEL.era.EpochToNTimestamp(__PP5065181.Date_First_Seen_)))),__ECAST(KEL.typ.nkdate,__CC13149));
+    __EE5065551 := __PP5065181.Search_Info_;
+    SELF.Inquiry_Product_Code_ := (__T(__EE5065551))[1].Product_Code_;
+    __CC33998 := ['BATCH','MONITORING'];
+    SELF.Is_Batch_Monitoring_Method_ := KEL.Routines.ToUpperCase(TRIM(__PP5065181.Inquiry_Method_)) IN __CC33998;
+    __CC34006 := ['COLLECTIONS','COLLECTION','COLLECTION LAW FIRM','DEBT BUYER','FIRST PARTY','THIRD PARTY'];
+    __CC34012 := ['COLLECTIONS','RECEIVABLES MANAGEMENT','1PC','3PC'];
+    SELF.Is_Collection_ := KEL.Routines.ToUpperCase(TRIM(__PP5065181.Inquiry_Industry_)) IN __CC34006 OR KEL.Routines.ToUpperCase(TRIM(__PP5065181.Inquiry_Vertical_)) IN __CC34012 OR __PP5065181.Is_Length_Sub_Market_;
+    SELF.Is_Fcra_Ok_ := FN_Compile(__cfg).FN_Is_Fcra_Inquiry(__ECAST(KEL.typ.nstr,__CN(KEL.Routines.ToUpperCase(TRIM(__PP5065181.Inquiry_Function_Description_)))));
+    SELF.Is_Non_Fcra_Ok_ := FN_Compile(__cfg).FN_Is_Non_Fcra_Inquiry(__ECAST(KEL.typ.nstr,__CN(KEL.Routines.ToUpperCase(TRIM(__PP5065181.Inquiry_Function_Description_)))));
+    SELF := __PP5065181;
   END;
-  EXPORT __ENH_Inquiry_9 := PROJECT(__EE5058316,__ND5058199__Project(LEFT));
+  EXPORT __ENH_Inquiry_9 := PROJECT(__EE5065673,__ND5065556__Project(LEFT));
 END;

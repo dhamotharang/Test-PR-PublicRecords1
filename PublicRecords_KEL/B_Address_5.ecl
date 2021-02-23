@@ -4,8 +4,8 @@ IMPORT B_Address_6,CFG_Compile,E_Address,E_Geo_Link,E_Zip_Code FROM PublicRecord
 IMPORT * FROM KEL15.Null;
 EXPORT B_Address_5(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG_Compile __cfg = CFG_Compile) := MODULE
   SHARED VIRTUAL TYPEOF(B_Address_6(__in,__cfg).__ENH_Address_6) __ENH_Address_6 := B_Address_6(__in,__cfg).__ENH_Address_6;
-  SHARED __EE5155784 := __ENH_Address_6;
-  EXPORT __ST245536_Layout := RECORD
+  SHARED __EE5163141 := __ENH_Address_6;
+  EXPORT __ST245942_Layout := RECORD
     KEL.typ.nuid UID;
     KEL.typ.nstr Primary_Range_;
     KEL.typ.nstr Predirectional_;
@@ -48,12 +48,12 @@ EXPORT B_Address_5(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG_Com
     KEL.typ.epoch Vault_Date_Last_Seen_ := 0;
     KEL.typ.int __RecordCount := 0;
   END;
-  SHARED __ST245536_Layout __ND5155618__Project(B_Address_6(__in,__cfg).__ST251891_Layout __PP5154931) := TRANSFORM
-    __EE5155613 := __PP5154931.Bestchild_Advo_;
-    SELF.Res_Bus_Flag_ := (__T(__EE5155613))[1].Residential_Or_Business_Indicator_;
-    __EE5155628 := __PP5154931.Bestchild_Advo_;
-    SELF.Vacant_Flag_ := (__T(__EE5155628))[1].Vacancy_Indicator_;
-    SELF := __PP5154931;
+  SHARED __ST245942_Layout __ND5162975__Project(B_Address_6(__in,__cfg).__ST252309_Layout __PP5162288) := TRANSFORM
+    __EE5162970 := __PP5162288.Bestchild_Advo_;
+    SELF.Res_Bus_Flag_ := (__T(__EE5162970))[1].Residential_Or_Business_Indicator_;
+    __EE5162985 := __PP5162288.Bestchild_Advo_;
+    SELF.Vacant_Flag_ := (__T(__EE5162985))[1].Vacancy_Indicator_;
+    SELF := __PP5162288;
   END;
-  EXPORT __ENH_Address_5 := PROJECT(__EE5155784,__ND5155618__Project(LEFT));
+  EXPORT __ENH_Address_5 := PROJECT(__EE5163141,__ND5162975__Project(LEFT));
 END;

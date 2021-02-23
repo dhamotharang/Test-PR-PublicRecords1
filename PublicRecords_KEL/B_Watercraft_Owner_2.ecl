@@ -4,8 +4,8 @@ IMPORT B_Watercraft_Owner_3,CFG_Compile,E_Person,E_Watercraft,E_Watercraft_Owner
 IMPORT * FROM KEL15.Null;
 EXPORT B_Watercraft_Owner_2(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG_Compile __cfg = CFG_Compile) := MODULE
   SHARED VIRTUAL TYPEOF(B_Watercraft_Owner_3(__in,__cfg).__ENH_Watercraft_Owner_3) __ENH_Watercraft_Owner_3 := B_Watercraft_Owner_3(__in,__cfg).__ENH_Watercraft_Owner_3;
-  SHARED __EE7604157 := __ENH_Watercraft_Owner_3;
-  EXPORT __ST220220_Layout := RECORD
+  SHARED __EE7615745 := __ENH_Watercraft_Owner_3;
+  EXPORT __ST220579_Layout := RECORD
     KEL.typ.ntyp(E_Watercraft().Typ) W_Craft_;
     KEL.typ.ntyp(E_Person().Typ) Owner_;
     KEL.typ.ndataset(E_Watercraft_Owner(__in,__cfg).Data_Sources_Layout) Data_Sources_;
@@ -18,10 +18,10 @@ EXPORT B_Watercraft_Owner_2(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault
     KEL.typ.epoch Vault_Date_Last_Seen_ := 0;
     KEL.typ.int __RecordCount := 0;
   END;
-  SHARED __ST220220_Layout __ND7604202__Project(B_Watercraft_Owner_3(__in,__cfg).__ST234723_Layout __PP7604158) := TRANSFORM
-    __CC13655 := '-99997';
-    SELF.Watercraft_Min_Date_ := IF(__T(__FN1(KEL.Routines.IsValidDate,__PP7604158.Date_First_Seen_Capped_)),__ECAST(KEL.typ.nstr,__FN2(KEL.Routines.DateToString,__PP7604158.Date_First_Seen_Capped_,__CN('%Y%m%d'))),__ECAST(KEL.typ.nstr,__CN(__CC13655)));
-    SELF := __PP7604158;
+  SHARED __ST220579_Layout __ND7615790__Project(B_Watercraft_Owner_3(__in,__cfg).__ST235108_Layout __PP7615746) := TRANSFORM
+    __CC13725 := '-99997';
+    SELF.Watercraft_Min_Date_ := IF(__T(__FN1(KEL.Routines.IsValidDate,__PP7615746.Date_First_Seen_Capped_)),__ECAST(KEL.typ.nstr,__FN2(KEL.Routines.DateToString,__PP7615746.Date_First_Seen_Capped_,__CN('%Y%m%d'))),__ECAST(KEL.typ.nstr,__CN(__CC13725)));
+    SELF := __PP7615746;
   END;
-  EXPORT __ENH_Watercraft_Owner_2 := PROJECT(__EE7604157,__ND7604202__Project(LEFT));
+  EXPORT __ENH_Watercraft_Owner_2 := PROJECT(__EE7615745,__ND7615790__Project(LEFT));
 END;
