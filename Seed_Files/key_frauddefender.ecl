@@ -1,4 +1,4 @@
-import Risk_Indicators,data_services;
+IMPORT data_services,Risk_Indicators,Seed_Files;
 
 
 d :=  seed_files.file_FraudDefender;
@@ -14,4 +14,4 @@ newtable := table(d,newrec);
 
 export key_frauddefender := index(newtable,{dataset_name,hashvalue},
 																	{newtable},
-																	data_services.data_location.prefix() + 'thor_data400::key::testseed::qa::frauddefender');
+																	Data_Services.Data_location.Prefix('NONAMEGIVEN') + 'thor_data400::key::testseed::qa::frauddefender');

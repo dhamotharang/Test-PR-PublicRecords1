@@ -1,4 +1,4 @@
-﻿IMPORT BIPV2, Business_Risk_BIP, EBR, EBR_Services, MDR, Doxie, STD;
+﻿IMPORT BIPV2, Business_Risk_BIP, dx_EBR, EBR, EBR_Services, MDR, Doxie, STD;
 
 EXPORT getTradelines(DATASET(Business_Risk_BIP.Layouts.Shell) Shell,
 											 Business_Risk_BIP.LIB_Business_Shell_LIBIN Options,
@@ -100,180 +100,171 @@ EXPORT getTradelines(DATASET(Business_Risk_BIP.Layouts.Shell) Shell,
 	// are adapted from EBR_Services.ebr_raw, lines 129-137.
 
 	// Header records. We need the process_date_last_seen field for the first join below.
-	header_recs_pre :=
-		JOIN(
-			ebr_filing_numbers_plus_seq_ddpd, EBR.Key_0010_Header_FILE_NUMBER,
-			KEYED( LEFT.file_number = RIGHT.file_number ),
-			TRANSFORM( {UNSIGNED4 seq, EBR.layout_0010_header_base},
-				SELF := RIGHT,
-				SELF := LEFT
-			),
-			INNER,
-			ATMOST(EBR_Services.constants.maxcounts.default)
-		);
+	header_recs_appended := dx_ebr.append.Header_0010_By_File_Number(ebr_filing_numbers_plus_seq_ddpd, atmost_number := EBR_Services.constants.maxcounts.default);
+	header_recs_pre := PROJECT(header_recs_appended, TRANSFORM({UNSIGNED4 seq, EBR.layout_0010_header_base},
+		SELF := LEFT.ebr_data,
+		SELF := LEFT));
 
 	// Mimicking what is done in other business queries, we will keep 1 file_number per sequence.  To do this we will keep the most recently processed record, following by most recently last seen, and then lastly the smallest file_number to make it determinate
 	header_recs := GROUP(DEDUP(SORT(header_recs_pre, seq, -process_date_last_seen, -date_last_seen, file_number), Seq), seq);
 
 	// Add Executives. (source: EBR-1000)
-	executive_recs_added :=
-		JOIN(
-			header_recs, ebr.Key_1000_Executive_Summary_FILE_NUMBER,
-			KEYED( LEFT.file_number = RIGHT.file_number ) AND
-			LEFT.process_date_last_seen = (UNSIGNED)RIGHT.process_date,
-			TRANSFORM( temp_LayoutTradeline,
-				SELF.seq                        := LEFT.seq,
-				SELF.process_date               := LEFT.process_date,
-				SELF.FILE_NUMBER                := LEFT.file_number,
-				SELF.TradeBalanceCurrent := (STRING)Business_Risk_BIP.Common.capNum((INTEGER)RIGHT.current_account_balance, -1, 999999999),
-				SELF.Trade06MonthHighBalance    := (STRING)Business_Risk_BIP.Common.capNum((INTEGER)RIGHT.high_balance, -1, 999999999),  // lowest balance amount in last 6 months
-				SELF.Trade06MonthLowBalance     := (STRING)Business_Risk_BIP.Common.capNum((INTEGER)RIGHT.low_balance, -1, 999999999), // highest balance amount in last 6 months
-				// Make sure that the HighExtendedCredit is at least as large as the MedianExtendedCredit.  Looks like there are a very small number of records in the data where this happens
-				SELF.TradeHighBalanceExtendCredit    := (STRING)Business_Risk_BIP.Common.capNum(MAX((INTEGER)RIGHT.high_credit_extended, (INTEGER)RIGHT.median_credit_extended), -1, 999999999),
-				SELF.TradeMedianBalanceExtendCredit  := (STRING)Business_Risk_BIP.Common.capNum((INTEGER)RIGHT.median_credit_extended, -1, 999999999),
-				SELF := []
-			),
-			LEFT OUTER, KEEP(1), // the 1000 file looks to be a 1-to-1 ratio to each corporate entity for a given process_date.
-			ATMOST(EBR_Services.constants.maxcounts.default), FEW
-		);
+	executive_recs_appended := dx_EBR.Append.Executive_Summary_1000_By_File_Number(header_recs,
+		match_process_dt_field := process_date_last_seen,
+		keep_number := 1,
+		atmost_number := EBR_Services.constants.maxcounts.default,
+		is_left_outer := TRUE,
+		is_few := TRUE);
+
+	// the 1000 file looks to be a 1-to-1 ratio to each corporate entity for a given process_date.
+	executive_recs_added := PROJECT(executive_recs_appended, TRANSFORM(temp_LayoutTradeline,
+		SELF.seq                        := LEFT.seq,
+		SELF.process_date               := LEFT.process_date,
+		SELF.FILE_NUMBER                := LEFT.file_number,
+		SELF.TradeBalanceCurrent := (STRING)Business_Risk_BIP.Common.capNum((INTEGER)LEFT.ebr_data.current_account_balance, -1, 999999999),
+		SELF.Trade06MonthHighBalance    := (STRING)Business_Risk_BIP.Common.capNum((INTEGER)LEFT.ebr_data.high_balance, -1, 999999999),  // lowest balance amount in last 6 months
+		SELF.Trade06MonthLowBalance     := (STRING)Business_Risk_BIP.Common.capNum((INTEGER)LEFT.ebr_data.low_balance, -1, 999999999), // highest balance amount in last 6 months
+		// Make sure that the HighExtendedCredit is at least as large as the MedianExtendedCredit.  Looks like there are a very small number of records in the data where this happens
+		SELF.TradeHighBalanceExtendCredit    := (STRING)Business_Risk_BIP.Common.capNum(MAX((INTEGER)LEFT.ebr_data.high_credit_extended, (INTEGER)LEFT.ebr_data.median_credit_extended), -1, 999999999),
+		SELF.TradeMedianBalanceExtendCredit  := (STRING)Business_Risk_BIP.Common.capNum((INTEGER)LEFT.ebr_data.median_credit_extended, -1, 999999999),
+		SELF := []));
 
 	// Add Trade Payment Records. (source: EBR-2015) NOTE: Among the fields listed in the Transform
 	// below, the relationships among NEW, REG, and COMBO is REG + NEW = COMBO
-	trade_payment_total_recs_added :=
-		JOIN(
-			executive_recs_added, ebr.Key_2015_Trade_Payment_Totals_FILE_NUMBER,
-			KEYED( LEFT.file_number = RIGHT.file_number ) AND
-			LEFT.process_date = RIGHT.process_date,
-			TRANSFORM( temp_LayoutTradeline,
-				TradeNewCount                 := (STRING)Business_Risk_BIP.Common.capNum((INTEGER)RIGHT.trade_count2, -1, 999999);
-				SELF.TradeNewCount            := TradeNewCount;
-				TradeAgedCount                := (STRING)Business_Risk_BIP.Common.capNum((INTEGER)RIGHT.trade_count1, -1, 999999);
-				SELF.TradeAgedCount           := TradeAgedCount;
-				TradeCount                    := (STRING)Business_Risk_BIP.Common.capNum((INTEGER)RIGHT.trade_count3, -1, 999999);
-				SELF.TradeCount               := TradeCount;
-				SELF.TradeHighBalanceExtendCredit			 := (STRING)Business_Risk_BIP.Common.capNum(MAX((INTEGER)LEFT.TradeHighBalanceExtendCredit, (INTEGER)RIGHT.highest_credit_median), -1, 999999999);
-				SELF.TradeMedianHighExtendedCredit := (STRING)Business_Risk_BIP.Common.capNum((INTEGER)RIGHT.highest_credit_median, -1, 999999999);
-				SELF.TradeHighBalanceNew    := (STRING)Business_Risk_BIP.Common.capNum((INTEGER)RIGHT.recent_high_credit2, -1, 999999999);
-				SELF.TradeHighBalanceAged    := (STRING)Business_Risk_BIP.Common.capNum((INTEGER)RIGHT.recent_high_credit1, -1, 999999999);
-				SELF.TradeHighBalance  := (STRING)Business_Risk_BIP.Common.capNum(MAX((INTEGER)RIGHT.recent_high_credit2, (INTEGER)RIGHT.recent_high_credit1), -1, 999999999);
-				SELF.TradeBalanceActive       := (STRING)Business_Risk_BIP.Common.capNum((INTEGER)RIGHT.masked_account_balance3, -1, 999999999);
-				// The way Experian calculates the percent good standing is based off of the total account balance in dollars.  However this means that if there is no more balance on the account that
-				// the percent of the account in good standing drops to 0 - when in reality it should be at 100% good balance as they owe nothing and thus are not past due on anything.  We will override
-				// these 0's to 100%'s when all Percent Days Past Due fields are 0's.
-				overrideNewGoodStanding		:= IF((INTEGER)RIGHT.masked_account_balance2 <= 0 AND (INTEGER)RIGHT.trade_count2 > 0 AND (REAL)RIGHT.debt_01_30_percent2 <= 0 AND (REAL)RIGHT.debt_31_60_percent2 <= 0 AND (REAL)RIGHT.debt_61_90_percent2 <= 0 AND (REAL)RIGHT.debt_91_plus_percent2 <= 0, TRUE, FALSE);
-				overrideRegGoodStanding		:= IF((INTEGER)RIGHT.masked_account_balance1 <= 0 AND (INTEGER)RIGHT.trade_count1 > 0 AND (REAL)RIGHT.debt_01_30_percent1 <= 0 AND (REAL)RIGHT.debt_31_60_percent1 <= 0 AND (REAL)RIGHT.debt_61_90_percent1 <= 0 AND (REAL)RIGHT.debt_91_plus_percent1 <= 0, TRUE, FALSE);
-				overrideComboGoodStanding	:= IF((INTEGER)RIGHT.masked_account_balance3 <= 0 AND (INTEGER)RIGHT.trade_count3 > 0 AND (REAL)RIGHT.debt_01_30_percent3 <= 0 AND (REAL)RIGHT.debt_31_60_percent3 <= 0 AND (REAL)RIGHT.debt_61_90_percent3 <= 0 AND (REAL)RIGHT.debt_91_plus_percent3 <= 0, TRUE, FALSE);
-				TradeGoodStandingNewPercent   := (STRING)Business_Risk_BIP.Common.capNum(IF(overrideNewGoodStanding, 100.0, (REAL)RIGHT.current_balance_percent2), -1.0, 100.0);
-				SELF.TradeGoodStandingNewPercent := TradeGoodStandingNewPercent;
-				SELF.TradeGoodStandingNewCount := ((INTEGER)TradeGoodStandingNewPercent / 100) * (INTEGER)TradeNewCount;
-				TradeGoodStandingAgedPercent   := (STRING)Business_Risk_BIP.Common.capNum(IF(overrideRegGoodStanding, 100.0, (REAL)RIGHT.current_balance_percent1), -1.0, 100.0);
-				SELF.TradeGoodStandingAgedPercent   := TradeGoodStandingAgedPercent;
-				SELF.TradeGoodStandingAgedCount   := ((INTEGER)TradeGoodStandingAgedPercent / 100) * (INTEGER)TradeAgedCount;
-				TradeGoodStandingPercent := (STRING)Business_Risk_BIP.Common.capNum(IF(overrideComboGoodStanding, 100.0, (REAL)RIGHT.current_balance_percent3), -1.0, 100.0);
-				SELF.TradeGoodStandingPercent := TradeGoodStandingPercent;
-				SELF.TradeGoodStandingCount := ((INTEGER)TradeGoodStandingPercent / 100) * (INTEGER)TradeCount;
-				TradeDPD01NewPercent       	:= (STRING)Business_Risk_BIP.Common.capNum(ROUND((REAL)RIGHT.debt_01_30_percent2), -1.0, 100.0);
-				SELF.TradeDPD01NewPercent   := TradeDPD01NewPercent;
-				SELF.TradeDPD01NewCount   	:= ((INTEGER)TradeDPD01NewPercent / 100) * (INTEGER)TradeNewCount;
-				TradeDPD31NewPercent      	:= (STRING)Business_Risk_BIP.Common.capNum(ROUND((REAL)RIGHT.debt_31_60_percent2), -1.0, 100.0);
-				SELF.TradeDPD31NewPercent   := TradeDPD31NewPercent;
-				SELF.TradeDPD31NewCount		  := ((INTEGER)TradeDPD31NewPercent / 100) * (INTEGER)TradeNewCount;
-				TradeDPD61NewPercent      	:= (STRING)Business_Risk_BIP.Common.capNum(ROUND((REAL)RIGHT.debt_61_90_percent2), -1.0, 100.0);
-				SELF.TradeDPD61NewPercent   := TradeDPD61NewPercent;
-				SELF.TradeDPD61NewCount   	:= ((INTEGER)TradeDPD61NewPercent / 100) * (INTEGER)TradeNewCount;
-				TradeDPD91NewPercent    		:= (STRING)Business_Risk_BIP.Common.capNum(ROUND((REAL)RIGHT.debt_91_plus_percent2), -1.0, 100.0);
-				SELF.TradeDPD91NewPercent   := TradeDPD91NewPercent;
-				SELF.TradeDPD91NewCount   	:= ((INTEGER)TradeDPD91NewPercent / 100) * (INTEGER)TradeNewCount;
-				TradeDPD01AgedPercent       := (STRING)Business_Risk_BIP.Common.capNum(ROUND((REAL)RIGHT.debt_01_30_percent1), -1.0, 100.0);
-				SELF.TradeDPD01AgedPercent  := TradeDPD01AgedPercent;
-				SELF.TradeDPD01AgedCount   	:= ((INTEGER)TradeDPD01AgedPercent / 100) * (INTEGER)TradeAgedCount;
-				TradeDPD31AgedPercent      	:= (STRING)Business_Risk_BIP.Common.capNum(ROUND((REAL)RIGHT.debt_31_60_percent1), -1.0, 100.0);
-				SELF.TradeDPD31AgedPercent  := TradeDPD31AgedPercent;
-				SELF.TradeDPD31AgedCount   	:= ((INTEGER)TradeDPD31AgedPercent / 100) * (INTEGER)TradeAgedCount;
-				TradeDPD61AgedPercent      	:= (STRING)Business_Risk_BIP.Common.capNum(ROUND((REAL)RIGHT.debt_61_90_percent1), -1.0, 100.0);
-				SELF.TradeDPD61AgedPercent  := TradeDPD61AgedPercent;
-				SELF.TradeDPD61AgedCount   	:= ((INTEGER)TradeDPD61AgedPercent / 100) * (INTEGER)TradeAgedCount;
-				TradeDPD91AgedPercent    		:= (STRING)Business_Risk_BIP.Common.capNum(ROUND((REAL)RIGHT.debt_91_plus_percent1), -1.0, 100.0);
-				SELF.TradeDPD91AgedPercent  := TradeDPD91AgedPercent;
-				SELF.TradeDPD91AgedCount   	:= ((INTEGER)TradeDPD91AgedPercent / 100) * (INTEGER)TradeAgedCount;
-				TradeDPD01Percent     			:= (STRING)Business_Risk_BIP.Common.capNum(ROUND((REAL)RIGHT.debt_01_30_percent3), -1.0, 100.0);
-				SELF.TradeDPD01Percent     	:= TradeDPD01Percent;
-				SELF.TradeDPD01Count   			:= ((INTEGER)TradeDPD01Percent / 100) * (INTEGER)TradeCount;
-				TradeDPD31Percent    				:= (STRING)Business_Risk_BIP.Common.capNum(ROUND((REAL)RIGHT.debt_31_60_percent3), -1.0, 100.0);
-				SELF.TradeDPD31Percent    	:= TradeDPD31Percent;
-				SELF.TradeDPD31Count   			:= ((INTEGER)TradeDPD31Percent / 100) * (INTEGER)TradeCount;
-				TradeDPD61Percent    				:= (STRING)Business_Risk_BIP.Common.capNum(ROUND((REAL)RIGHT.debt_61_90_percent3), -1.0, 100.0);
-				SELF.TradeDPD61Percent    	:= TradeDPD61Percent;
-				SELF.TradeDPD61Count   			:= ((INTEGER)TradeDPD61Percent / 100) * (INTEGER)TradeCount;
-				TradeDPD91Percent  					:= (STRING)Business_Risk_BIP.Common.capNum(ROUND((REAL)RIGHT.debt_91_plus_percent3), -1.0, 100.0);
-				SELF.TradeDPD91Percent  		:= TradeDPD91Percent;
-				SELF.TradeDPD91Count   			:= ((INTEGER)TradeDPD91Percent / 100) * (INTEGER)TradeCount;
-				TradeNEW1orMoreDPD					:= (STRING)Business_Risk_BIP.Common.capNum(ROUND((REAL)RIGHT.debt_91_plus_percent2 + (REAL)RIGHT.debt_61_90_percent2 + (REAL)RIGHT.debt_31_60_percent2 + (REAL)RIGHT.debt_01_30_percent2), -1.0, 100.0);
-				SELF.TradeNEW1orMoreDPD			:= TradeNEW1orMoreDPD;
-				SELF.TradeNEW1orMoreDPDCount:= ((INTEGER)TradeNEW1orMoreDPD / 100) * (INTEGER)TradeNewCount;
-				TradeNEW31orMoreDPD					:= (STRING)Business_Risk_BIP.Common.capNum(ROUND((REAL)RIGHT.debt_91_plus_percent2 + (REAL)RIGHT.debt_61_90_percent2 + (REAL)RIGHT.debt_31_60_percent2), -1.0, 100.0);
-				SELF.TradeNEW31orMoreDPD		:= TradeNEW31orMoreDPD;
-				SELF.TradeNEW31orMoreDPDCount:= ((INTEGER)TradeNEW31orMoreDPD / 100) * (INTEGER)TradeNewCount;
-				TradeNEW61orMoreDPD					:= (STRING)Business_Risk_BIP.Common.capNum(ROUND((REAL)RIGHT.debt_91_plus_percent2 + (REAL)RIGHT.debt_61_90_percent2), -1.0, 100.0);
-				SELF.TradeNEW61orMoreDPD		:= TradeNEW61orMoreDPD;
-				SELF.TradeNEW61orMoreDPDCount:= ((INTEGER)TradeNEW61orMoreDPD / 100) * (INTEGER)TradeNewCount;
-				TradeNEW91orMoreDPD					:= (STRING)Business_Risk_BIP.Common.capNum(ROUND((REAL)RIGHT.debt_91_plus_percent2), -1.0, 100.0);
-				SELF.TradeNEW91orMoreDPD		:= TradeNEW91orMoreDPD;
-				SELF.TradeNEW91orMoreDPDCount:= ((INTEGER)TradeNEW91orMoreDPD / 100) * (INTEGER)TradeNewCount;
-				TradeAged1orMoreDPD					:= (STRING)Business_Risk_BIP.Common.capNum(ROUND((REAL)RIGHT.debt_91_plus_percent1 + (REAL)RIGHT.debt_61_90_percent1 + (REAL)RIGHT.debt_31_60_percent1 + (REAL)RIGHT.debt_01_30_percent1), -1.0, 100.0);
-				SELF.TradeAged1orMoreDPD		:= TradeAged1orMoreDPD;
-				SELF.TradeAged1orMoreDPDCount:= ((INTEGER)TradeAged1orMoreDPD / 100) * (INTEGER)TradeAgedCount;
-				TradeAged31orMoreDPD				:= (STRING)Business_Risk_BIP.Common.capNum(ROUND((REAL)RIGHT.debt_91_plus_percent1 + (REAL)RIGHT.debt_61_90_percent1 + (REAL)RIGHT.debt_31_60_percent1), -1.0, 100.0);
-				SELF.TradeAged31orMoreDPD		:= TradeAged31orMoreDPD;
-				SELF.TradeAged31orMoreDPDCount:= ((INTEGER)TradeAged31orMoreDPD / 100) * (INTEGER)TradeAgedCount;
-				TradeAged61orMoreDPD				:= (STRING)Business_Risk_BIP.Common.capNum(ROUND((REAL)RIGHT.debt_91_plus_percent1 + (REAL)RIGHT.debt_61_90_percent1), -1.0, 100.0);
-				SELF.TradeAged61orMoreDPD		:= TradeAged61orMoreDPD;
-				SELF.TradeAged61orMoreDPDCount:= ((INTEGER)TradeAged61orMoreDPD / 100) * (INTEGER)TradeAgedCount;
-				TradeAged91orMoreDPD				:= (STRING)Business_Risk_BIP.Common.capNum(ROUND((REAL)RIGHT.debt_91_plus_percent1), -1.0, 100.0);
-				SELF.TradeAged91orMoreDPD		:= TradeAged91orMoreDPD;
-				SELF.TradeAged91orMoreDPDCount:= ((INTEGER)TradeAged91orMoreDPD / 100) * (INTEGER)TradeAgedCount;
-				Trade1orMoreDPD							:= (STRING)Business_Risk_BIP.Common.capNum(ROUND((REAL)RIGHT.debt_91_plus_percent3 + (REAL)RIGHT.debt_61_90_percent3 + (REAL)RIGHT.debt_31_60_percent3 + (REAL)RIGHT.debt_01_30_percent3), -1.0, 100.0);
-				SELF.Trade1orMoreDPD				:= Trade1orMoreDPD;
-				SELF.Trade1orMoreDPDCount		:= ((INTEGER)Trade1orMoreDPD / 100) * (INTEGER)TradeCount;
-				Trade31orMoreDPD						:= (STRING)Business_Risk_BIP.Common.capNum(ROUND((REAL)RIGHT.debt_91_plus_percent3 + (REAL)RIGHT.debt_61_90_percent3 + (REAL)RIGHT.debt_31_60_percent3), -1.0, 100.0);
-				SELF.Trade31orMoreDPD				:= Trade31orMoreDPD;
-				SELF.Trade31orMoreDPDCount	:= ((INTEGER)Trade31orMoreDPD / 100) * (INTEGER)TradeCount;
-				Trade61orMoreDPD						:= (STRING)Business_Risk_BIP.Common.capNum(ROUND((REAL)RIGHT.debt_91_plus_percent3 + (REAL)RIGHT.debt_61_90_percent3), -1.0, 100.0);
-				SELF.Trade61orMoreDPD				:= Trade61orMoreDPD;
-				SELF.Trade61orMoreDPDCount	:= ((INTEGER)Trade61orMoreDPD / 100) * (INTEGER)TradeCount;
-				Trade91orMoreDPD						:= (STRING)Business_Risk_BIP.Common.capNum(ROUND((REAL)RIGHT.debt_91_plus_percent3), -1.0, 100.0);
-				SELF.Trade91orMoreDPD				:= Trade91orMoreDPD;
-				SELF.Trade91orMoreDPDCount	:= ((INTEGER)Trade91orMoreDPD / 100) * (INTEGER)TradeCount;
+
+	trade_payment_total_recs_appended := dx_EBR.append.Trade_Payment_Totals_2015_By_File_Number(executive_recs_added,
+		keep_number := 1,
+		atmost_number := EBR_Services.constants.maxcounts.default,
+		is_left_outer := TRUE,
+		is_few := TRUE,
+		match_process_dt_field := process_date);
+
+	trade_payment_total_recs_added := PROJECT(trade_payment_total_recs_appended, TRANSFORM(temp_LayoutTradeline,
+		TradeNewCount                 := (STRING)Business_Risk_BIP.Common.capNum((INTEGER)LEFT.ebr_data.trade_count2, -1, 999999);
+		SELF.TradeNewCount            := TradeNewCount;
+		TradeAgedCount                := (STRING)Business_Risk_BIP.Common.capNum((INTEGER)LEFT.ebr_data.trade_count1, -1, 999999);
+		SELF.TradeAgedCount           := TradeAgedCount;
+		TradeCount                    := (STRING)Business_Risk_BIP.Common.capNum((INTEGER)LEFT.ebr_data.trade_count3, -1, 999999);
+		SELF.TradeCount               := TradeCount;
+		SELF.TradeHighBalanceExtendCredit			 := (STRING)Business_Risk_BIP.Common.capNum(MAX((INTEGER)LEFT.TradeHighBalanceExtendCredit, (INTEGER)LEFT.ebr_data.highest_credit_median), -1, 999999999);
+		SELF.TradeMedianHighExtendedCredit := (STRING)Business_Risk_BIP.Common.capNum((INTEGER)LEFT.ebr_data.highest_credit_median, -1, 999999999);
+		SELF.TradeHighBalanceNew    := (STRING)Business_Risk_BIP.Common.capNum((INTEGER)LEFT.ebr_data.recent_high_credit2, -1, 999999999);
+		SELF.TradeHighBalanceAged    := (STRING)Business_Risk_BIP.Common.capNum((INTEGER)LEFT.ebr_data.recent_high_credit1, -1, 999999999);
+		SELF.TradeHighBalance  := (STRING)Business_Risk_BIP.Common.capNum(MAX((INTEGER)LEFT.ebr_data.recent_high_credit2, (INTEGER)LEFT.ebr_data.recent_high_credit1), -1, 999999999);
+		SELF.TradeBalanceActive       := (STRING)Business_Risk_BIP.Common.capNum((INTEGER)LEFT.ebr_data.masked_account_balance3, -1, 999999999);
+		// The way Experian calculates the percent good standing is based off of the total account balance in dollars.  However this means that if there is no more balance on the account that
+		// the percent of the account in good standing drops to 0 - when in reality it should be at 100% good balance as they owe nothing and thus are not past due on anything.  We will override
+		// these 0's to 100%'s when all Percent Days Past Due fields are 0's.
+		overrideNewGoodStanding		:= IF((INTEGER)LEFT.ebr_data.masked_account_balance2 <= 0 AND (INTEGER)LEFT.ebr_data.trade_count2 > 0 AND (REAL)LEFT.ebr_data.debt_01_30_percent2 <= 0 AND (REAL)LEFT.ebr_data.debt_31_60_percent2 <= 0 AND (REAL)LEFT.ebr_data.debt_61_90_percent2 <= 0 AND (REAL)LEFT.ebr_data.debt_91_plus_percent2 <= 0, TRUE, FALSE);
+		overrideRegGoodStanding		:= IF((INTEGER)LEFT.ebr_data.masked_account_balance1 <= 0 AND (INTEGER)LEFT.ebr_data.trade_count1 > 0 AND (REAL)LEFT.ebr_data.debt_01_30_percent1 <= 0 AND (REAL)LEFT.ebr_data.debt_31_60_percent1 <= 0 AND (REAL)LEFT.ebr_data.debt_61_90_percent1 <= 0 AND (REAL)LEFT.ebr_data.debt_91_plus_percent1 <= 0, TRUE, FALSE);
+		overrideComboGoodStanding	:= IF((INTEGER)LEFT.ebr_data.masked_account_balance3 <= 0 AND (INTEGER)LEFT.ebr_data.trade_count3 > 0 AND (REAL)LEFT.ebr_data.debt_01_30_percent3 <= 0 AND (REAL)LEFT.ebr_data.debt_31_60_percent3 <= 0 AND (REAL)LEFT.ebr_data.debt_61_90_percent3 <= 0 AND (REAL)LEFT.ebr_data.debt_91_plus_percent3 <= 0, TRUE, FALSE);
+		TradeGoodStandingNewPercent   := (STRING)Business_Risk_BIP.Common.capNum(IF(overrideNewGoodStanding, 100.0, (REAL)LEFT.ebr_data.current_balance_percent2), -1.0, 100.0);
+		SELF.TradeGoodStandingNewPercent := TradeGoodStandingNewPercent;
+		SELF.TradeGoodStandingNewCount := ((INTEGER)TradeGoodStandingNewPercent / 100) * (INTEGER)TradeNewCount;
+		TradeGoodStandingAgedPercent   := (STRING)Business_Risk_BIP.Common.capNum(IF(overrideRegGoodStanding, 100.0, (REAL)LEFT.ebr_data.current_balance_percent1), -1.0, 100.0);
+		SELF.TradeGoodStandingAgedPercent   := TradeGoodStandingAgedPercent;
+		SELF.TradeGoodStandingAgedCount   := ((INTEGER)TradeGoodStandingAgedPercent / 100) * (INTEGER)TradeAgedCount;
+		TradeGoodStandingPercent := (STRING)Business_Risk_BIP.Common.capNum(IF(overrideComboGoodStanding, 100.0, (REAL)LEFT.ebr_data.current_balance_percent3), -1.0, 100.0);
+		SELF.TradeGoodStandingPercent := TradeGoodStandingPercent;
+		SELF.TradeGoodStandingCount := ((INTEGER)TradeGoodStandingPercent / 100) * (INTEGER)TradeCount;
+		TradeDPD01NewPercent       	:= (STRING)Business_Risk_BIP.Common.capNum(ROUND((REAL)LEFT.ebr_data.debt_01_30_percent2), -1.0, 100.0);
+		SELF.TradeDPD01NewPercent   := TradeDPD01NewPercent;
+		SELF.TradeDPD01NewCount   	:= ((INTEGER)TradeDPD01NewPercent / 100) * (INTEGER)TradeNewCount;
+		TradeDPD31NewPercent      	:= (STRING)Business_Risk_BIP.Common.capNum(ROUND((REAL)LEFT.ebr_data.debt_31_60_percent2), -1.0, 100.0);
+		SELF.TradeDPD31NewPercent   := TradeDPD31NewPercent;
+		SELF.TradeDPD31NewCount		  := ((INTEGER)TradeDPD31NewPercent / 100) * (INTEGER)TradeNewCount;
+		TradeDPD61NewPercent      	:= (STRING)Business_Risk_BIP.Common.capNum(ROUND((REAL)LEFT.ebr_data.debt_61_90_percent2), -1.0, 100.0);
+		SELF.TradeDPD61NewPercent   := TradeDPD61NewPercent;
+		SELF.TradeDPD61NewCount   	:= ((INTEGER)TradeDPD61NewPercent / 100) * (INTEGER)TradeNewCount;
+		TradeDPD91NewPercent    		:= (STRING)Business_Risk_BIP.Common.capNum(ROUND((REAL)LEFT.ebr_data.debt_91_plus_percent2), -1.0, 100.0);
+		SELF.TradeDPD91NewPercent   := TradeDPD91NewPercent;
+		SELF.TradeDPD91NewCount   	:= ((INTEGER)TradeDPD91NewPercent / 100) * (INTEGER)TradeNewCount;
+		TradeDPD01AgedPercent       := (STRING)Business_Risk_BIP.Common.capNum(ROUND((REAL)LEFT.ebr_data.debt_01_30_percent1), -1.0, 100.0);
+		SELF.TradeDPD01AgedPercent  := TradeDPD01AgedPercent;
+		SELF.TradeDPD01AgedCount   	:= ((INTEGER)TradeDPD01AgedPercent / 100) * (INTEGER)TradeAgedCount;
+		TradeDPD31AgedPercent      	:= (STRING)Business_Risk_BIP.Common.capNum(ROUND((REAL)LEFT.ebr_data.debt_31_60_percent1), -1.0, 100.0);
+		SELF.TradeDPD31AgedPercent  := TradeDPD31AgedPercent;
+		SELF.TradeDPD31AgedCount   	:= ((INTEGER)TradeDPD31AgedPercent / 100) * (INTEGER)TradeAgedCount;
+		TradeDPD61AgedPercent      	:= (STRING)Business_Risk_BIP.Common.capNum(ROUND((REAL)LEFT.ebr_data.debt_61_90_percent1), -1.0, 100.0);
+		SELF.TradeDPD61AgedPercent  := TradeDPD61AgedPercent;
+		SELF.TradeDPD61AgedCount   	:= ((INTEGER)TradeDPD61AgedPercent / 100) * (INTEGER)TradeAgedCount;
+		TradeDPD91AgedPercent    		:= (STRING)Business_Risk_BIP.Common.capNum(ROUND((REAL)LEFT.ebr_data.debt_91_plus_percent1), -1.0, 100.0);
+		SELF.TradeDPD91AgedPercent  := TradeDPD91AgedPercent;
+		SELF.TradeDPD91AgedCount   	:= ((INTEGER)TradeDPD91AgedPercent / 100) * (INTEGER)TradeAgedCount;
+		TradeDPD01Percent     			:= (STRING)Business_Risk_BIP.Common.capNum(ROUND((REAL)LEFT.ebr_data.debt_01_30_percent3), -1.0, 100.0);
+		SELF.TradeDPD01Percent     	:= TradeDPD01Percent;
+		SELF.TradeDPD01Count   			:= ((INTEGER)TradeDPD01Percent / 100) * (INTEGER)TradeCount;
+		TradeDPD31Percent    				:= (STRING)Business_Risk_BIP.Common.capNum(ROUND((REAL)LEFT.ebr_data.debt_31_60_percent3), -1.0, 100.0);
+		SELF.TradeDPD31Percent    	:= TradeDPD31Percent;
+		SELF.TradeDPD31Count   			:= ((INTEGER)TradeDPD31Percent / 100) * (INTEGER)TradeCount;
+		TradeDPD61Percent    				:= (STRING)Business_Risk_BIP.Common.capNum(ROUND((REAL)LEFT.ebr_data.debt_61_90_percent3), -1.0, 100.0);
+		SELF.TradeDPD61Percent    	:= TradeDPD61Percent;
+		SELF.TradeDPD61Count   			:= ((INTEGER)TradeDPD61Percent / 100) * (INTEGER)TradeCount;
+		TradeDPD91Percent  					:= (STRING)Business_Risk_BIP.Common.capNum(ROUND((REAL)LEFT.ebr_data.debt_91_plus_percent3), -1.0, 100.0);
+		SELF.TradeDPD91Percent  		:= TradeDPD91Percent;
+		SELF.TradeDPD91Count   			:= ((INTEGER)TradeDPD91Percent / 100) * (INTEGER)TradeCount;
+		TradeNEW1orMoreDPD					:= (STRING)Business_Risk_BIP.Common.capNum(ROUND((REAL)LEFT.ebr_data.debt_91_plus_percent2 + (REAL)LEFT.ebr_data.debt_61_90_percent2 + (REAL)LEFT.ebr_data.debt_31_60_percent2 + (REAL)LEFT.ebr_data.debt_01_30_percent2), -1.0, 100.0);
+		SELF.TradeNEW1orMoreDPD			:= TradeNEW1orMoreDPD;
+		SELF.TradeNEW1orMoreDPDCount:= ((INTEGER)TradeNEW1orMoreDPD / 100) * (INTEGER)TradeNewCount;
+		TradeNEW31orMoreDPD					:= (STRING)Business_Risk_BIP.Common.capNum(ROUND((REAL)LEFT.ebr_data.debt_91_plus_percent2 + (REAL)LEFT.ebr_data.debt_61_90_percent2 + (REAL)LEFT.ebr_data.debt_31_60_percent2), -1.0, 100.0);
+		SELF.TradeNEW31orMoreDPD		:= TradeNEW31orMoreDPD;
+		SELF.TradeNEW31orMoreDPDCount:= ((INTEGER)TradeNEW31orMoreDPD / 100) * (INTEGER)TradeNewCount;
+		TradeNEW61orMoreDPD					:= (STRING)Business_Risk_BIP.Common.capNum(ROUND((REAL)LEFT.ebr_data.debt_91_plus_percent2 + (REAL)LEFT.ebr_data.debt_61_90_percent2), -1.0, 100.0);
+		SELF.TradeNEW61orMoreDPD		:= TradeNEW61orMoreDPD;
+		SELF.TradeNEW61orMoreDPDCount:= ((INTEGER)TradeNEW61orMoreDPD / 100) * (INTEGER)TradeNewCount;
+		TradeNEW91orMoreDPD					:= (STRING)Business_Risk_BIP.Common.capNum(ROUND((REAL)LEFT.ebr_data.debt_91_plus_percent2), -1.0, 100.0);
+		SELF.TradeNEW91orMoreDPD		:= TradeNEW91orMoreDPD;
+		SELF.TradeNEW91orMoreDPDCount:= ((INTEGER)TradeNEW91orMoreDPD / 100) * (INTEGER)TradeNewCount;
+		TradeAged1orMoreDPD					:= (STRING)Business_Risk_BIP.Common.capNum(ROUND((REAL)LEFT.ebr_data.debt_91_plus_percent1 + (REAL)LEFT.ebr_data.debt_61_90_percent1 + (REAL)LEFT.ebr_data.debt_31_60_percent1 + (REAL)LEFT.ebr_data.debt_01_30_percent1), -1.0, 100.0);
+		SELF.TradeAged1orMoreDPD		:= TradeAged1orMoreDPD;
+		SELF.TradeAged1orMoreDPDCount:= ((INTEGER)TradeAged1orMoreDPD / 100) * (INTEGER)TradeAgedCount;
+		TradeAged31orMoreDPD				:= (STRING)Business_Risk_BIP.Common.capNum(ROUND((REAL)LEFT.ebr_data.debt_91_plus_percent1 + (REAL)LEFT.ebr_data.debt_61_90_percent1 + (REAL)LEFT.ebr_data.debt_31_60_percent1), -1.0, 100.0);
+		SELF.TradeAged31orMoreDPD		:= TradeAged31orMoreDPD;
+		SELF.TradeAged31orMoreDPDCount:= ((INTEGER)TradeAged31orMoreDPD / 100) * (INTEGER)TradeAgedCount;
+		TradeAged61orMoreDPD				:= (STRING)Business_Risk_BIP.Common.capNum(ROUND((REAL)LEFT.ebr_data.debt_91_plus_percent1 + (REAL)LEFT.ebr_data.debt_61_90_percent1), -1.0, 100.0);
+		SELF.TradeAged61orMoreDPD		:= TradeAged61orMoreDPD;
+		SELF.TradeAged61orMoreDPDCount:= ((INTEGER)TradeAged61orMoreDPD / 100) * (INTEGER)TradeAgedCount;
+		TradeAged91orMoreDPD				:= (STRING)Business_Risk_BIP.Common.capNum(ROUND((REAL)LEFT.ebr_data.debt_91_plus_percent1), -1.0, 100.0);
+		SELF.TradeAged91orMoreDPD		:= TradeAged91orMoreDPD;
+		SELF.TradeAged91orMoreDPDCount:= ((INTEGER)TradeAged91orMoreDPD / 100) * (INTEGER)TradeAgedCount;
+		Trade1orMoreDPD							:= (STRING)Business_Risk_BIP.Common.capNum(ROUND((REAL)LEFT.ebr_data.debt_91_plus_percent3 + (REAL)LEFT.ebr_data.debt_61_90_percent3 + (REAL)LEFT.ebr_data.debt_31_60_percent3 + (REAL)LEFT.ebr_data.debt_01_30_percent3), -1.0, 100.0);
+		SELF.Trade1orMoreDPD				:= Trade1orMoreDPD;
+		SELF.Trade1orMoreDPDCount		:= ((INTEGER)Trade1orMoreDPD / 100) * (INTEGER)TradeCount;
+		Trade31orMoreDPD						:= (STRING)Business_Risk_BIP.Common.capNum(ROUND((REAL)LEFT.ebr_data.debt_91_plus_percent3 + (REAL)LEFT.ebr_data.debt_61_90_percent3 + (REAL)LEFT.ebr_data.debt_31_60_percent3), -1.0, 100.0);
+		SELF.Trade31orMoreDPD				:= Trade31orMoreDPD;
+		SELF.Trade31orMoreDPDCount	:= ((INTEGER)Trade31orMoreDPD / 100) * (INTEGER)TradeCount;
+		Trade61orMoreDPD						:= (STRING)Business_Risk_BIP.Common.capNum(ROUND((REAL)LEFT.ebr_data.debt_91_plus_percent3 + (REAL)LEFT.ebr_data.debt_61_90_percent3), -1.0, 100.0);
+		SELF.Trade61orMoreDPD				:= Trade61orMoreDPD;
+		SELF.Trade61orMoreDPDCount	:= ((INTEGER)Trade61orMoreDPD / 100) * (INTEGER)TradeCount;
+		Trade91orMoreDPD						:= (STRING)Business_Risk_BIP.Common.capNum(ROUND((REAL)LEFT.ebr_data.debt_91_plus_percent3), -1.0, 100.0);
+		SELF.Trade91orMoreDPD				:= Trade91orMoreDPD;
+		SELF.Trade91orMoreDPDCount	:= ((INTEGER)Trade91orMoreDPD / 100) * (INTEGER)TradeCount;
 
 
-				NewestTradeDPD										 := Business_Risk_BIP.Common.capNum((INTEGER)RIGHT.debt2, 0, 999);
-				SELF.TradeHighestDPDNew					 := MAP(NewestTradeDPD = 0								=> '0',
-																									NewestTradeDPD BETWEEN 1 AND 30		=> '1',
-																									NewestTradeDPD BETWEEN 31 AND 60	=> '2',
-																									NewestTradeDPD BETWEEN 61 AND 90	=> '3',
-																									NewestTradeDPD >= 91							=> '4',
-																																											 '-1');
-				AgedTradeDPD											 := Business_Risk_BIP.Common.capNum((INTEGER)RIGHT.debt1, 0, 999);
-				SELF.TradeHighestDPDAged					 := MAP(AgedTradeDPD = 0								=> '0',
-																									AgedTradeDPD BETWEEN 1 AND 30		=> '1',
-																									AgedTradeDPD BETWEEN 31 AND 60	=> '2',
-																									AgedTradeDPD BETWEEN 61 AND 90	=> '3',
-																									AgedTradeDPD >= 91							=> '4',
-																																											 '-1');
-				TradeHighestDPD										 := Business_Risk_BIP.Common.capNum(MAX((INTEGER)RIGHT.debt1, (INTEGER)RIGHT.debt2), 0, 999);
-				SELF.TradeHighestDPD					     := MAP(TradeHighestDPD = 0								=> '0',
-																									TradeHighestDPD BETWEEN 1 AND 30	=> '1',
-																									TradeHighestDPD BETWEEN 31 AND 60	=> '2',
-																									TradeHighestDPD BETWEEN 61 AND 90	=> '3',
-																									TradeHighestDPD >= 91							=> '4',
-																																											 '-1');
+		NewestTradeDPD										 := Business_Risk_BIP.Common.capNum((INTEGER)LEFT.ebr_data.debt2, 0, 999);
+		SELF.TradeHighestDPDNew					 := MAP(NewestTradeDPD = 0								=> '0',
+																							NewestTradeDPD BETWEEN 1 AND 30		=> '1',
+																							NewestTradeDPD BETWEEN 31 AND 60	=> '2',
+																							NewestTradeDPD BETWEEN 61 AND 90	=> '3',
+																							NewestTradeDPD >= 91							=> '4',
+																																										'-1');
+		AgedTradeDPD											 := Business_Risk_BIP.Common.capNum((INTEGER)LEFT.ebr_data.debt1, 0, 999);
+		SELF.TradeHighestDPDAged					 := MAP(AgedTradeDPD = 0								=> '0',
+																							AgedTradeDPD BETWEEN 1 AND 30		=> '1',
+																							AgedTradeDPD BETWEEN 31 AND 60	=> '2',
+																							AgedTradeDPD BETWEEN 61 AND 90	=> '3',
+																							AgedTradeDPD >= 91							=> '4',
+																																										'-1');
+		TradeHighestDPD										 := Business_Risk_BIP.Common.capNum(MAX((INTEGER)LEFT.ebr_data.debt1, (INTEGER)LEFT.ebr_data.debt2), 0, 999);
+		SELF.TradeHighestDPD					     := MAP(TradeHighestDPD = 0								=> '0',
+																							TradeHighestDPD BETWEEN 1 AND 30	=> '1',
+																							TradeHighestDPD BETWEEN 31 AND 60	=> '2',
+																							TradeHighestDPD BETWEEN 61 AND 90	=> '3',
+																							TradeHighestDPD >= 91							=> '4',
+																																										'-1');
 
-				SELF := LEFT;
-				SELF := []
-			),
-			LEFT OUTER, KEEP(1), // the 2015 file looks to be a 1-to-1 ratio to each corporate entity for each process date.
-			ATMOST(EBR_Services.constants.maxcounts.default), FEW
-		);
+		SELF := LEFT;
+		SELF := []));
 
 	temp_LayoutTradeline rollTradelines(temp_LayoutTradeline le, temp_LayoutTradeline ri) := TRANSFORM
 		TradeCount := Business_Risk_BIP.Common.capNum((INTEGER)le.TradeCount + (INTEGER)ri.TradeCount, -1, 999999);

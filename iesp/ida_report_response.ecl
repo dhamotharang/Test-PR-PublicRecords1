@@ -56,9 +56,12 @@ export t_IDAOutputRecord := record
 	string Designation {xpath('Designation')};
 	string IDASequence {xpath('IDASequence')};
 	string IDATimeStamp {xpath('IDATimeStamp')};
-	string Score {xpath('Score')};
-	dataset(t_IDAConsumerStatement) ConsumerStatements {xpath('ConsumerStatements/ConsumerStatement'), MAXCOUNT(1)};
-	dataset(t_IDAMessage) Messages {xpath('Messages/Message'), MAXCOUNT(1)};
+	string IDScoreResultCode1 {xpath('IDScoreResultCode1')};
+	string IDScoreResultCode2 {xpath('IDScoreResultCode2')};
+	string IDScoreResultCode3 {xpath('IDScoreResultCode3')};
+	string IDScoreResultCode4 {xpath('IDScoreResultCode4')};
+	string IDScoreResultCode5 {xpath('IDScoreResultCode5')};
+	string IDScoreResultCode6 {xpath('IDScoreResultCode6')};
 	string PassThru1 {xpath('PassThru1')};
 	string PassThru2 {xpath('PassThru2')};
 	string PassThru3 {xpath('PassThru3')};

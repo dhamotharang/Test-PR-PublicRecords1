@@ -13,7 +13,7 @@
 </message>
 */
 
-IMPORT BatchShare;
+IMPORT BatchShare, BusinessCredit_Services;
 
 EXPORT CreditBatchService() := MACRO
 

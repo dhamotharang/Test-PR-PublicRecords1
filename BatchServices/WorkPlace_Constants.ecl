@@ -1,4 +1,4 @@
-﻿import MDR;
+﻿import MDR, Royalty;
 
 export WorkPlace_Constants := module
 
@@ -13,15 +13,7 @@ export WorkPlace_Constants := module
   end;
 
  // A set of all the royalty source codes.
- export WP_ROYALTY_SOURCE_SET := [
-                                  // MDR.sourceTools.src_One_Click_Data,
-                                  // As of 03/04/2020 (estd.), One Click Data is no longer a royalty
-                                  MDR.sourceTools.src_Teletrack,
-                                  MDR.sourceTools.src_SalesChannel,
-                                  MDR.sourceTools.src_Thrive_LT,
-                                  MDR.sourceTools.src_Thrive_PD,
-                                  MDR.sourceTools.src_Netwise
-                                 ];
+ export WP_ROYALTY_SOURCE_SET := Royalty.Constants.WORKPLACE_ROYALTY_SET;
 
   // For use when joining to corp key file Current records.
   export string1 CURRENT := 'C';
