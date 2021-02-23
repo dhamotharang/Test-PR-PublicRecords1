@@ -112,13 +112,6 @@ EXPORT Common(PublicRecords_KEL.Interface_Options Options) := MODULE
 			 Options.IncludeProxPerson OR 
 			 Options.IncludeSelePerson OR 
 			 Options.IncludePerson);
-		 			
-	// FCRA only
-	EXPORT DoFDCJoin_Doxie_Files__Key_BocaShell_Crim_FCRA := 
-		Options.isFCRA AND
-			(Options.IncludePersonOffenses OR 
-			 Options.IncludePersonOffender OR 
-			 Options.IncludeCriminalOffense);
 			
 	// FCRA and nonFCRA versions exist, but old boca shell uses FCRA only.
 	EXPORT DoFDCJoin_Doxie_files__Key_Court_Offenses := 

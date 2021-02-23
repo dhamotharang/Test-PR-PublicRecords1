@@ -162,22 +162,6 @@ SHARED unsigned1 iType := IF(Options.IsFCRA, data_services.data_env.iFCRA, data_
 
 	// --------------------[ Criminal ]--------------------
 	
-	EXPORT Layout_Doxie_Files__Key_BocaShell_Crim_FCRA_Denorm := RECORD
-		LayoutIDs;
-		RECORDOF(Doxie_Files.Key_BocaShell_Crim_FCRA);
-		STRING2 src;
-		dpmtype;
-		STRING Archive_Date;
-	END;
-	
-	EXPORT Layout_Doxie_Files__Key_BocaShell_Crim_FCRA := RECORD
-		LayoutIDs;
-		RECORDOF(Doxie_Files.Key_BocaShell_Crim_FCRA) - Criminal_Count; // Changing layout to normalize child dataset Criminal_Count
-		RECORDOF(Doxie_Files.Key_BocaShell_Crim_FCRA.Criminal_Count);
-		STRING2 src;
-		STRING Archive_Date;
-		dpmtype;
-	END;
 	
 	EXPORT Layout_Doxie_Files__Key_Offenders := RECORD
 		LayoutIDs;
@@ -2001,7 +1985,6 @@ SHARED Phone_Search_layout := BIPV2_Build.key_high_risk_industries.Phone_Search;
 		DATASET(Layout_DMA__Key_DNM_Name_Address) Dataset_DMA__Key_DNM_Name_Address;	
 
 		//DOC
-		DATASET(Layout_Doxie_Files__Key_BocaShell_Crim_FCRA) Dataset_Doxie_Files__Key_BocaShell_Crim_FCRA;		
 		DATASET(Layout_Doxie_Files__Key_Offenders) Dataset_Doxie_Files__Key_Offenders;		
 		DATASET(Layout_Doxie_files__Key_Court_Offenses) Dataset_Doxie_files__Key_Court_Offenses;		
 		DATASET(Layout_Doxie_Files__Key_Offenses) Dataset_Doxie_Files__Key_Offenses;		
