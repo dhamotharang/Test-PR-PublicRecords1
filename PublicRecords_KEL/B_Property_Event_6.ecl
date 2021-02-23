@@ -4,8 +4,8 @@ IMPORT B_Property_Event_7,CFG_Compile,E_Property,E_Property_Event,E_Zip_Code,FN_
 IMPORT * FROM KEL15.Null;
 EXPORT B_Property_Event_6(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG_Compile __cfg = CFG_Compile) := MODULE
   SHARED VIRTUAL TYPEOF(B_Property_Event_7(__in,__cfg).__ENH_Property_Event_7) __ENH_Property_Event_7 := B_Property_Event_7(__in,__cfg).__ENH_Property_Event_7;
-  SHARED __EE5155973 := __ENH_Property_Event_7;
-  EXPORT __ST256146_Layout := RECORD
+  SHARED __EE5155943 := __ENH_Property_Event_7;
+  EXPORT __ST256116_Layout := RECORD
     KEL.typ.nuid UID;
     KEL.typ.nstr L_N_Fares_I_D_;
     KEL.typ.nstr Primary_Range_;
@@ -77,10 +77,10 @@ EXPORT B_Property_Event_6(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, 
     KEL.typ.epoch Vault_Date_Last_Seen_ := 0;
     KEL.typ.int __RecordCount := 0;
   END;
-  SHARED __ST256146_Layout __ND5156313__Project(B_Property_Event_7(__in,__cfg).__ST259715_Layout __PP5155974) := TRANSFORM
-    __CC13205 := KEL.Routines.MinN(FN_Compile(__cfg).FN_G_E_T_B_U_I_L_D_D_A_T_E(__ECAST(KEL.typ.nstr,__CN('property_build_version'))),__CN(__cfg.CurrentDate));
-    SELF.Is_Current_Assessment_Record_ := __AND(__PP5155974.Is_Assessment_,__OP2(FN_Compile(__cfg).FN_A_B_S_Y_E_A_R_S_B_E_T_W_E_E_N(__ECAST(KEL.typ.nkdate,KEL.era.ToDate(__PP5155974.Date_First_Seen_)),__ECAST(KEL.typ.nkdate,__CC13205)),<=,__CN(1)));
-    SELF := __PP5155974;
+  SHARED __ST256116_Layout __ND5156283__Project(B_Property_Event_7(__in,__cfg).__ST259685_Layout __PP5155944) := TRANSFORM
+    __CC13175 := KEL.Routines.MinN(FN_Compile(__cfg).FN_G_E_T_B_U_I_L_D_D_A_T_E(__ECAST(KEL.typ.nstr,__CN('property_build_version'))),__CN(__cfg.CurrentDate));
+    SELF.Is_Current_Assessment_Record_ := __AND(__PP5155944.Is_Assessment_,__OP2(FN_Compile(__cfg).FN_A_B_S_Y_E_A_R_S_B_E_T_W_E_E_N(__ECAST(KEL.typ.nkdate,KEL.era.ToDate(__PP5155944.Date_First_Seen_)),__ECAST(KEL.typ.nkdate,__CC13175)),<=,__CN(1)));
+    SELF := __PP5155944;
   END;
-  EXPORT __ENH_Property_Event_6 := PROJECT(__EE5155973,__ND5156313__Project(LEFT));
+  EXPORT __ENH_Property_Event_6 := PROJECT(__EE5155943,__ND5156283__Project(LEFT));
 END;

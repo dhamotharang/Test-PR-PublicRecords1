@@ -4,8 +4,8 @@ IMPORT B_Inquiry_4,CFG_Compile,E_Inquiry FROM PublicRecords_KEL;
 IMPORT * FROM KEL15.Null;
 EXPORT B_Inquiry_3(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG_Compile __cfg = CFG_Compile) := MODULE
   SHARED VIRTUAL TYPEOF(B_Inquiry_4(__in,__cfg).__ENH_Inquiry_4) __ENH_Inquiry_4 := B_Inquiry_4(__in,__cfg).__ENH_Inquiry_4;
-  SHARED __EE5937227 := __ENH_Inquiry_4;
-  EXPORT __ST277643_Layout := RECORD
+  SHARED __EE5937197 := __ENH_Inquiry_4;
+  EXPORT __ST291424_Layout := RECORD
     KEL.typ.nint Lex_I_D_;
     KEL.typ.nstr First_Name_;
     KEL.typ.nstr Last_Name_;
@@ -31,14 +31,14 @@ EXPORT B_Inquiry_3(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG_Com
     KEL.typ.epoch Vault_Date_Last_Seen_ := 0;
     KEL.typ.int __RecordCount := 0;
   END;
-  EXPORT __ST277616_Layout := RECORD
+  EXPORT __ST291397_Layout := RECORD
     KEL.typ.nuid UID;
     KEL.typ.nstr Transaction_I_D_;
     KEL.typ.nstr Sequence_Number_;
     KEL.typ.ndataset(E_Inquiry(__in,__cfg).Search_Info_Layout) Search_Info_;
     KEL.typ.ndataset(E_Inquiry(__in,__cfg).Permissions_Layout) Permissions_;
     KEL.typ.ndataset(E_Inquiry(__in,__cfg).Bus_Intel_Layout) Bus_Intel_;
-    KEL.typ.ndataset(__ST277643_Layout) Person_Info_;
+    KEL.typ.ndataset(__ST291424_Layout) Person_Info_;
     KEL.typ.ndataset(E_Inquiry(__in,__cfg).Business_Info_Layout) Business_Info_;
     KEL.typ.nint Fraudpoint_Score_;
     KEL.typ.ndataset(E_Inquiry(__in,__cfg).Data_Sources_Layout) Data_Sources_;
@@ -63,14 +63,14 @@ EXPORT B_Inquiry_3(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG_Com
     KEL.typ.epoch Vault_Date_Last_Seen_ := 0;
     KEL.typ.int __RecordCount := 0;
   END;
-  SHARED __ST277616_Layout __ND5937232__Project(B_Inquiry_4(__in,__cfg).__ST242089_Layout __PP5937228) := TRANSFORM
-    __EE5937302 := __PP5937228.Person_Info_;
-    __ST277643_Layout __ND5937307__Project(B_Inquiry_4(__in,__cfg).__ST242116_Layout __PP5937303) := TRANSFORM
-      SELF.Combined_Address_ := __OP2(__OP2(__FN1(TRIM,__PP5937303.Primary_Name_),+,__FN1(TRIM,__PP5937303.Primary_Range_)),+,__FN1(TRIM,__PP5937303.Z_I_P5_));
-      SELF := __PP5937303;
+  SHARED __ST291397_Layout __ND5937202__Project(B_Inquiry_4(__in,__cfg).__ST242059_Layout __PP5937198) := TRANSFORM
+    __EE5937272 := __PP5937198.Person_Info_;
+    __ST291424_Layout __ND5937277__Project(B_Inquiry_4(__in,__cfg).__ST242086_Layout __PP5937273) := TRANSFORM
+      SELF.Combined_Address_ := __OP2(__OP2(__FN1(TRIM,__PP5937273.Primary_Name_),+,__FN1(TRIM,__PP5937273.Primary_Range_)),+,__FN1(TRIM,__PP5937273.Z_I_P5_));
+      SELF := __PP5937273;
     END;
-    SELF.Person_Info_ := __PROJECT(__EE5937302,__ND5937307__Project(LEFT));
-    SELF := __PP5937228;
+    SELF.Person_Info_ := __PROJECT(__EE5937272,__ND5937277__Project(LEFT));
+    SELF := __PP5937198;
   END;
-  EXPORT __ENH_Inquiry_3 := PROJECT(__EE5937227,__ND5937232__Project(LEFT));
+  EXPORT __ENH_Inquiry_3 := PROJECT(__EE5937197,__ND5937202__Project(LEFT));
 END;
