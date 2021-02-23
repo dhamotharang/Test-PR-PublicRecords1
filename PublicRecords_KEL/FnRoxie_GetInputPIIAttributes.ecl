@@ -85,7 +85,9 @@ EXPORT FnRoxie_GetInputPIIAttributes(DATASET(PublicRecords_KEL.ECL_Functions.Lay
 			SELF.IPresponse := (STRING)LEFT.IPresponse,
 			SELF.NetAcuityRoyalty := (INTEGER4)LEFT.NetAcuityRoyalty,
 			SELF.TargusRoyalty := (INTEGER4)LEFT.TargusRoyalty,
-			SELF.TargusSrc := (STRING)LEFT.TargusSrc,
+			SELF.TargusSrc := (STRING)LEFT.TargusSrc,			
+			SELF.InsPhoneHit := IF(Options.IsFCRA, 0, (INTEGER4)LEFT.InsPhoneHit),
+			SELF.InsPhoneSrc := IF(Options.IsFCRA, '', (STRING)LEFT.InsPhoneSrc),
 			SELF := LEFT,
 			SELF := []));
 	

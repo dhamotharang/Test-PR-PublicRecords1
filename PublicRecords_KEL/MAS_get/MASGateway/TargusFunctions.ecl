@@ -9,6 +9,7 @@ indata := DATASET([TRANSFORM(Risk_Indicators.Layout_Input,
 SELF.fname := InputFirstName;
 SELF.lname := InputLastName;
 SELF.phone10 := InputPhone10;
+SELF.seq := 99999; // 1 is returned by the gateway in event of a timeout so we need to set it to something different
 SELF := [];)]);
 
 applyOptOut := ~isFCRA; // Temporary variable to enable Targus opt out
@@ -51,7 +52,7 @@ riskwise.Layout_Dirs_Phone tran(indata le, gateway_result rt) := transform
 	history_date := risk_indicators.iid_constants.MonthRollback((STRING6)le.historydate, 1); // last/first seen is history date minus 1 month so it won't be filtered
 	effective_date := if(history_mode, (STRING6)history_date+'01', (STRING8)Std.Date.Today());
 	
-	SELF.targusgatewayused := if(rt.response.header.queryid!='',true, skip);
+	SELF.targusgatewayused := if(rt.response.header.queryid!='' AND rt.response.header.queryid!='1' ,true, skip);
 	SELF.targustype := if(hitPDE,Phones.Constants.TargusType.PhoneDataExpress, Phones.Constants.TargusType.NameVerification); 
 	SELF.phone10 := if(hitPDE, le.phone10, '');
 	SELF.area_code := if(hitPDE, le.phone10[1..3], '');

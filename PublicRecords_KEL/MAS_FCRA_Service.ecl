@@ -178,6 +178,18 @@ EXPORT MAS_FCRA_Service() := MACRO
 		TRANSFORM(PublicRecords_KEL.ECL_Functions.Layout_Person_FCRA,
 			SELF := LEFT));
 			
+	TargusRoyaltyCount := COUNT(ResultSet(TargusRoyalty <> 0));
+
+	TargusRoyaltyDS := DATASET([transform(Royalty.Layouts.Royalty,
+							SELF.royalty_type_code := Royalty.Constants.RoyaltyCode.TARGUS_PDE,
+							SELF.royalty_type := Royalty.Constants.RoyaltyType.TARGUS_PDE;
+							SELF.royalty_count := TargusRoyaltyCount; 
+							SELF := [];)]);
+							
+	RoyaltySet := TargusRoyaltyDS;
+					
+	OUTPUT(RoyaltySet, NAMED('RoyaltySet'));
+			
   OUTPUT( FinalResults, NAMED('Results') );
 
 ENDMACRO;
