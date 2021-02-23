@@ -247,6 +247,8 @@ EXPORT L_Compile := MODULE
     KEL.typ.nstr P_I___Alrt_Inp_Name_On_Watchlist_Flag_;
     KEL.typ.nstr Targus_Royalty_;
     KEL.typ.nstr Targus_Src_;
+    KEL.typ.nstr Ins_Phone_Hit_;
+    KEL.typ.nstr Ins_Phone_Src_;
     KEL.typ.epoch Archive___Date_ := 0;
     KEL.typ.epoch Date_First_Seen_ := 0;
     KEL.typ.epoch Date_Last_Seen_ := 0;
@@ -2975,6 +2977,8 @@ EXPORT L_Compile := MODULE
     KEL.typ.nstr P_I___Alrt_Inp_Name_On_Watchlist_Flag_;
     KEL.typ.nstr Targus_Royalty_;
     KEL.typ.nstr Targus_Src_;
+    KEL.typ.nstr Ins_Phone_Hit_;
+    KEL.typ.nstr Ins_Phone_Src_;
     KEL.typ.epoch Archive___Date_ := 0;
     KEL.typ.epoch Date_First_Seen_ := 0;
     KEL.typ.epoch Date_Last_Seen_ := 0;
