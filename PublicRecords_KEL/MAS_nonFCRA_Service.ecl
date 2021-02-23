@@ -1,5 +1,4 @@
-﻿﻿/*--SOAP--
-<message name="MAS_nonFCRA_Service">
+﻿/*<message name="MAS_nonFCRA_Service">
 	<part name="input" type="tns:XmlDataSet" cols="100" rows="8"/>
 	<part name="ScoreThreshold" type="xsd:integer"/> 
 	<part name="gateways" type="tns:XmlDataSet" cols="110" rows="10"/>
@@ -44,13 +43,9 @@ EXPORT MAS_nonFCRA_Service() := MACRO
 		'LexIdSourceOptout',
 		'RetainInputLexid',
 		'AppendPII',
-		'_TransactionId',
-		'_BatchUID',
-		'_GCID',
-		'Watchlists_Requested',
-		'IncludeOfac',
-		'IncludeAdditionalWatchLists',
-		'Global_Watchlist_Threshold'
+    '_TransactionId',
+    '_BatchUID',
+    '_GCID'
   ));
 
 STRING5 Default_Industry_Class := '';	
@@ -91,31 +86,9 @@ STRING100 Default_data_permission_mask := '';
 
 	DATASET(Gateway.Layouts.Config) GatewaysClean := PROJECT(gateways_in, gw_switch(LEFT));
 	
-	// OFAC parameters
-    BOOLEAN   include_ofac := FALSE : STORED('IncludeOfac');
-    BOOLEAN   include_additional_watchlists  := FALSE  : STORED('IncludeAdditionalWatchLists');
-    REAL Global_Watchlist_Threshold := Business_Risk_BIP.Constants.Default_Global_Watchlist_Threshold : STORED('Global_Watchlist_Threshold');
-    STRING watchlists := '' : STORED('Watchlists_Requested');
-    
-    OFACGW := GatewaysClean(STD.Str.ToLowerCase(servicename) = 'bridgerwlc')[1];
-	#STORED('OFACURL', OFACGW.url);
-    #STORED('IncludeOfacValue', include_ofac);
-    #STORED('IncludeAdditionalWatchListsValue', include_additional_watchlists);
-    #STORED('Watchlists_RequestedValue', watchlists);
-    #STORED('Global_Watchlist_ThresholdValue', Global_Watchlist_Threshold);
-		#CONSTANT('IsFCRA', FALSE);
- 
-    // NetAcuity parameters
 	NetAcuityGW := GatewaysClean(STD.Str.ToLowerCase(servicename) = 'netacuity')[1];
 	#STORED('NetAcuityURL', NetAcuityGW.url);
-	#STORED('IsFCRAValue', FALSE);
 	
-	TargusGW := GatewaysClean(STD.Str.ToLowerCase(servicename) = 'targus')[1];
-	#STORED('TargusURL', TargusGW.url);
-	
-	InsurancePhoneGW := GatewaysClean(STD.Str.ToLowerCase(servicename) = 'insurancephoneheader')[1];
-	#STORED('InsurancePhoneURL', InsurancePhoneGW.url);
-
 	// If allowed sources aren't passed in, use default list of allowed sources
 	SetAllowedSources := IF(COUNT(AllowedSourcesDataset) = 0, PublicRecords_KEL.ECL_Functions.Constants.DEFAULT_ALLOWED_SOURCES_NONFCRA, AllowedSourcesDataset);
 	// If a source is on the Exclude list, remove it from the allowed sources list. 
@@ -202,35 +175,53 @@ STRING100 Default_data_permission_mask := '';
 	
 	IF(options.RetainInputLexid = FALSE AND options.BestPIIAppend = TRUE, FAIL('Insufficient Input'));
 
+ds_input_slim := 
+    PROJECT(ds_input,
+      TRANSFORM( PublicRecords_KEL.ECL_Functions.Input_Layout_Slim,
+        SELF.G_ProcUID := COUNTER,
+        SELF := LEFT ));														
+								
+	VerifiedInputPIIPre := PublicRecords_KEL.ECL_Functions.FnRoxie_Prep_InputPII(ds_input, Options);
 
+	VerifiedInputPII := verifiedInputPIIPre(PullIDFlag = False);
+	pullidlexids := verifiedInputPIIPre(PullIDFlag = true);
+	
+	// 'mini' fdc fetching is to gather address hist data from rank key then pass this to the rest of the FDC after creating prev/curr/emerging address related attributes 
+	OptionsMini := PublicRecords_KEL.Interface_Mini_Options(Options);
 
-	ResultSet := PublicRecords_KEL.FnRoxie_GetAttrs(ds_input, Options);		
+	FDCDatasetMini := PublicRecords_KEL.Fn_MAS_FDC( VerifiedInputPII, OptionsMini);		
+
+	MiniAttributes := PublicRecords_KEL.FnRoxie_GetMiniFDCAttributes(VerifiedInputPII, FDCDatasetMini, OptionsMini, options.BestPIIAppend); 
+
+	FDCDataset := PublicRecords_KEL.Fn_MAS_FDC( MiniAttributes, Options , DATASET([], PublicRecords_KEL.ECL_Functions.Layouts.LayoutInputBII) ,FDCDatasetMini);
+
+	InputChooser := if(options.BestPIIAppend, MiniAttributes, VerifiedInputPII);
+
+			
+		resLayout := RECORDOF(PublicRecords_KEL.Q_Foreclosure_Dump(0, DATASET([], PublicRecords_KEL.ECL_Functions.Layouts.LayoutInputPII), 0, PublicRecords_KEL.CFG_Compile.Permit__NONE).res0);   
 		
-	FinalResults := PROJECT(ResultSet, 
-		TRANSFORM(PublicRecords_KEL.ECL_Functions.Layout_Person_NonFCRA,
-			SELF := LEFT));
+		Results := PROJECT(MiniAttributes(IsInputRec = TRUE), TRANSFORM({INTEGER G_ProcUID, resLayout},
+			SELF.G_ProcUID := LEFT.G_ProcUID;
+			NonFCRAPersonResults := PublicRecords_KEL.Q_Foreclosure_Dump(LEFT.P_LexID , DATASET(LEFT), (INTEGER)(LEFT.P_InpClnArchDt[1..8]), Options.KEL_Permissions_Mask, FDCDataset).res0;	
+			SELF := NonFCRAPersonResults[1],
+			SELF := []));	
+		resLayout2 := RECORDOF(PublicRecords_KEL.Q_Foreclosure_Dump(0, DATASET([], PublicRecords_KEL.ECL_Functions.Layouts.LayoutInputPII), 0, PublicRecords_KEL.CFG_Compile.Permit__NONE).res1);   
+		
+		Results2 := PROJECT(MiniAttributes(IsInputRec = TRUE), TRANSFORM({INTEGER G_ProcUID, resLayout},
+			SELF.G_ProcUID := LEFT.G_ProcUID;
+			NonFCRAPersonResults := PublicRecords_KEL.Q_Foreclosure_Dump(LEFT.P_LexID , DATASET(LEFT), (INTEGER)(LEFT.P_InpClnArchDt[1..8]), Options.KEL_Permissions_Mask, FDCDataset).res1;	
+			SELF := NonFCRAPersonResults[1],
+			SELF := []));
+		resLayout3 := RECORDOF(PublicRecords_KEL.Q_Foreclosure_Dump(0, DATASET([], PublicRecords_KEL.ECL_Functions.Layouts.LayoutInputPII), 0, PublicRecords_KEL.CFG_Compile.Permit__NONE).res2);   
+		
+		Results3 := PROJECT(MiniAttributes(IsInputRec = TRUE), TRANSFORM({INTEGER G_ProcUID, resLayout},
+			SELF.G_ProcUID := LEFT.G_ProcUID;
+			NonFCRAPersonResults := PublicRecords_KEL.Q_Foreclosure_Dump(LEFT.P_LexID , DATASET(LEFT), (INTEGER)(LEFT.P_InpClnArchDt[1..8]), Options.KEL_Permissions_Mask, FDCDataset).res2;	
+			SELF := NonFCRAPersonResults[1],
+			SELF := []));	
 	
-
-	TargusRoyaltyCount := COUNT(ResultSet(TargusRoyalty <> 0));
-
-	TargusRoyaltyDS := DATASET([transform(Royalty.Layouts.Royalty,
-							SELF.royalty_type_code := Royalty.Constants.RoyaltyCode.TARGUS_PDE,
-							SELF.royalty_type := Royalty.Constants.RoyaltyType.TARGUS_PDE;
-							SELF.royalty_count := TargusRoyaltyCount; 
-							SELF := [];)]);
-							
-	NetAcuityRoyaltyCount := COUNT(ResultSet(NetAcuityRoyalty <> 0));
-
-	NetAcuityRoyaltyDS := DATASET([transform(Royalty.Layouts.Royalty,
-							SELF.royalty_type_code := Royalty.Constants.RoyaltyCode.NETACUITY,
-							SELF.royalty_type := Royalty.Constants.RoyaltyType.NETACUITY;
-							SELF.royalty_count := NetAcuityRoyaltyCount; 
-							SELF := [];)]);
-
-	RoyaltySet := TargusRoyaltyDS + NetAcuityRoyaltyDS;
-					
-	OUTPUT(RoyaltySet, NAMED('RoyaltySet'));
-	
-  OUTPUT( FinalResults, NAMED('Results') );
-
+  OUTPUT(MiniAttributes,NAMED('MiniAttributes'));
+	OUTPUT(Results,NAMED('Results'));
+	OUTPUT(Results2,NAMED('Results2'));
+	// OUTPUT(Results3,NAMED('Results3'));
 ENDMACRO;
