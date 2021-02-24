@@ -1,6 +1,9 @@
-﻿import address, BIPV2;
+﻿IMPORT dx_Cortera, dx_common;
+
 EXPORT Layout_Executives := RECORD
-	Cortera.Layout_Header_Out;
+ dx_Cortera.Layouts.Layout_Executives;
+ /*
+ 	Cortera.Layout_Header_Out - dx_common.layout_metadata;
 	INTEGER1 	name_sequence;
 	string		Executive_Name {maxlength(250)};	//	VARCHAR2(250)	Executive Name
 	string	  Executive_Title {maxlength(250)};	//	VARCHAR2(250)	Executive Title
@@ -14,5 +17,6 @@ EXPORT Layout_Executives := RECORD
 	unsigned6	did := 0;
 	unsigned1	did_Score := 0;
   unsigned8 record_sid := 0;
-  unsigned4 global_sid := 0;	
+  unsigned4 global_sid := 0;
+*/
 END;
