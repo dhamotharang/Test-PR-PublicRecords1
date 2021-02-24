@@ -762,5 +762,8 @@ EXPORT DoFDCJoin_dx_CFPB__key_Census_Surnames :=
 		 Options.IncludeSexOffender OR
 		 Options.IncludePersonSexOffender);
 	EXPORT DoFDCJoin_Property__Key_Foreclosure_FID :=
-	true;
+		NOT Options.IsFCRA AND
+		(Options.IncludeForeclosure OR
+		 Options.IncludePersonForeclosure OR
+		 Options.IncludeForeclosureAddress);
 END;

@@ -174,6 +174,7 @@ STRING100 Default_data_permission_mask := '';
 		EXPORT BOOLEAN IncludeEBRTradeline := TRUE;
 		EXPORT BOOLEAN IncludeEmail := TRUE;
 		EXPORT BOOLEAN IncludeEmployment := TRUE;
+		EXPORT BOOLEAN IncludeForeclosure := TRUE;
 		EXPORT BOOLEAN IncludeGeolink := TRUE;
 		EXPORT BOOLEAN IncludeHousehold := TRUE;
 		EXPORT BOOLEAN IncludeInquiry := TRUE;
