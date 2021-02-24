@@ -57,14 +57,6 @@ oneline := record string1000 line; string2 eor := '\r\n'; end;
 
 
 
-
-
-
-
-
-
-
-
 // result1 := dataset('~ScoringQA::bins::ks::' + prev_date + '_results', results_rec, CSV(heading(0), SEPARATOR('|'), QUOTE(''), TERMINATOR('\n')));
 
 result1 := dataset('~' + ds + prev_run + '_1_results', results_rec, CSV(heading(0), SEPARATOR('|'), QUOTE(''), TERMINATOR('\n')));
@@ -79,21 +71,6 @@ result2 := dataset('~' + ds + req_date + '_1_results', results_rec, CSV(heading(
 score_data1 := distribute(dataset('~' + ds + prev_run + '_1_data', data_rec, CSV(heading(0), SEPARATOR('|'), QUOTE(''), TERMINATOR('\n'))),(integer)acctno);
 
 score_data2 := distribute(dataset('~' + ds + req_date + '_1_data', data_rec, CSV(heading(0), SEPARATOR('|'), QUOTE(''), TERMINATOR('\n'))),(integer)acctno);
-
-
-
-////////////result1 := dataset('~ScoringQA::bins::ks::' + prev_date + '_results', results_rec, CSV(heading(0), SEPARATOR('|'), QUOTE(''), TERMINATOR('\n')));
-
-////////////result2 := dataset('~ScoringQA::bins::ks::' + curr_date + '_results', results_rec, CSV(heading(0), SEPARATOR('|'), QUOTE(''), TERMINATOR('\n')));
-
-// result1 := result11(flagship not in ['RiskView_xml_T_mobile_RVT1210_1_v4','RiskView_xml_T_mobile_RVT1212_1_v4']);
-
-
-////////////score_data1 := distribute(dataset('~ScoringQA::bins::ks::' + prev_date + '_data', data_rec, CSV(heading(0), SEPARATOR('|'), QUOTE(''), TERMINATOR('\n'))),(integer)acctno);
-
-// score_data1 := score_data11(flagship not in ['RiskView_xml_T_mobile_RVT1210_1_v4','RiskView_xml_T_mobile_RVT1212_1_v4']);
-
-////////////score_data2 := distribute(dataset('~ScoringQA::bins::ks::' + curr_date + '_data', data_rec, CSV(heading(0), SEPARATOR('|'), QUOTE(''), TERMINATOR('\n'))),(integer)acctno);
 
 
 scores_project(ds,rec):=functionmacro
@@ -232,6 +209,15 @@ res:=project (ds, transform({  string80 product,string80 version, string80 proce
 														
 															// left.flagship  = 'RiskView_xml_enova_rvg1103_0_v4'  => 'RiskView' ,
 															
+															
+															left.flagship = 'Small_Business_Analytics_SBOM1601_Attributes' => 'Small_Business_Analytics',
+															left.flagship = 'Small_Business_Analytics_SBBM1601_Attributes' => 'Small_Business_Analytics',
+
+															left.flagship = 'Small_Business_Analytics_SLBO1702_Attributes' => 'Small_Business_Analytics',
+															left.flagship = 'Small_Business_Analytics_SLBB1702_Attributes' => 'Small_Business_Analytics',
+															left.flagship = 'Small_Business_Analytics_SLBO1809_Attributes' => 'Small_Business_Analytics',
+															left.flagship = 'Small_Business_Analytics_SLBB1809_Attributes' => 'Small_Business_Analytics',
+															
    													left.flagship  = 'businessinstantidv2_xml_generic'  and left.model = 'bvi'  	 => 'BusinessInstantIdv2' ,
 														left.flagship  = 'businessinstantidv2_xml_generic'  and left.model = 'rep1_cvi' 	 => 'BusinessInstantIdv2' ,
 														left.flagship  = 'businessinstantidv2_xml_generic'  and left.model = 'bus2exec_index_rep1'	 => 'BusinessInstantIdv2' ,
@@ -293,7 +279,13 @@ res:=project (ds, transform({  string80 product,string80 version, string80 proce
 														left.flagship  = 'fraudpoint_xml_generic_fp31505_0_v3_flas' => '3' ,
 	/* FP v3  */													
 													
-													
+														left.flagship = 'Small_Business_Analytics_SBOM1601_Attributes' => '',
+														left.flagship = 'Small_Business_Analytics_SBBM1601_Attributes' => '',
+
+														left.flagship = 'Small_Business_Analytics_SLBO1702_Attributes' => '',
+														left.flagship = 'Small_Business_Analytics_SLBB1702_Attributes' => '',
+														left.flagship = 'Small_Business_Analytics_SLBO1809_Attributes' => '',
+														left.flagship = 'Small_Business_Analytics_SLBB1809_Attributes' => '',
 													
 													
 													// left.flagship  = 'fraudpoint_batch_generic_fp1109_0_v2' => '2' ,
@@ -366,6 +358,16 @@ res:=project (ds, transform({  string80 product,string80 version, string80 proce
 														left.flagship  = 'fraudpoint_xml_generic_fp31505_0_v3_flas' => 'XML' ,
 		/* FP v3  */						
 		
+		
+		
+		
+														left.flagship = 'Small_Business_Analytics_SBOM1601_Attributes' => '',
+														left.flagship = 'Small_Business_Analytics_SBBM1601_Attributes' => '',
+
+														left.flagship = 'Small_Business_Analytics_SLBO1702_Attributes' => '',
+														left.flagship = 'Small_Business_Analytics_SLBB1702_Attributes' => '',
+														left.flagship = 'Small_Business_Analytics_SLBO1809_Attributes' => '',
+														left.flagship = 'Small_Business_Analytics_SLBB1809_Attributes' => '',
 		
 															// left.flagship  = 'fraudpoint_batch_generic_fp1109_0_v2' => 'Batch' ,
 																left.flagship  = 'IT61_xml_paro_MSN605_RSN804'    => 'XML' ,		
@@ -519,6 +521,14 @@ res:=project (ds, transform({  string80 product,string80 version, string80 proce
 														left.flagship  = 'businessinstantidv2_xml_generic'  and left.model = 'rep1_cvi'	 => 'Generic' ,
 														left.flagship  = 'businessinstantidv2_xml_generic'  and left.model = 'bus2exec_index_rep1'	 => 'Generic' ,
 		
+														left.flagship = 'Small_Business_Analytics_SBOM1601_Attributes' => 'Generic',
+														left.flagship = 'Small_Business_Analytics_SBBM1601_Attributes' => 'Generic',
+
+														left.flagship = 'Small_Business_Analytics_SLBO1702_Attributes' => 'Generic',
+														left.flagship = 'Small_Business_Analytics_SLBB1702_Attributes' => 'Generic',
+														left.flagship = 'Small_Business_Analytics_SLBO1809_Attributes' => 'Generic',
+														left.flagship = 'Small_Business_Analytics_SLBB1809_Attributes' => 'Generic',
+		
 												
 														left.flagship  = 'leadintegrity_xml_generic_msn1106_0_v4' => 'Generic'  , '' );
 														
@@ -565,7 +575,7 @@ res:=project (ds, transform({  string80 product,string80 version, string80 proce
 														left.flagship  = 'RiskView_xml_generic_allflagships_v3'  and left.model = 'rv_score_telecom'  => 'rvt1003_0' ,
 														// left.flagship  = 'RiskView_xml_generic_allflagships_v3'  and left.model = 'rv_score_prescreen'  => 'rvp1003_0' ,
 
-                            left.flagship  = 'RiskView_xml_generic_allflagships_attributes_v5'  and left.model = 'auto_score'  	 => 'RVA1503_0' ,
+														left.flagship  = 'RiskView_xml_generic_allflagships_attributes_v5'  and left.model = 'auto_score'  	 => 'RVA1503_0' ,
 														left.flagship  = 'RiskView_xml_generic_allflagships_attributes_v5'  and left.model = 'bankcard_score' 	 => 'RVB1503_0' ,
 														left.flagship  = 'RiskView_xml_generic_allflagships_attributes_v5'  and left.model = 'short_term_lending_score'	 => 'RVG1502_0' ,
 														left.flagship  = 'RiskView_xml_generic_allflagships_attributes_v5'  and left.model = 'telecommunications_score' 	 => 'RVT1503_0' ,
@@ -658,6 +668,15 @@ res:=project (ds, transform({  string80 product,string80 version, string80 proce
 														left.flagship  = 'businessinstantidv2_xml_generic'  and left.model = 'rep1_cvi' 	 => 'rep1_cvi' ,
 														left.flagship  = 'businessinstantidv2_xml_generic'  and left.model = 'bus2exec_index_rep1'	 => 'bus2exec_index_rep1' ,
 
+
+														left.flagship = 'Small_Business_Analytics_SBOM1601_Attributes' => 'SBOM1601',
+														left.flagship = 'Small_Business_Analytics_SBBM1601_Attributes' => 'SBBM1601',
+
+														left.flagship = 'Small_Business_Analytics_SLBO1702_Attributes' => 'SLBO1702',
+														left.flagship = 'Small_Business_Analytics_SLBB1702_Attributes' => 'SLBB1702',
+														left.flagship = 'Small_Business_Analytics_SLBO1809_Attributes' => 'SLBO1809',
+														left.flagship = 'Small_Business_Analytics_SLBB1809_Attributes' => 'SLBB1809',
+
 														
 														left.flagship  = 'leadintegrity_xml_generic_msn1106_0_v4' => 'msn1106_0'  , '' );
 														
@@ -689,7 +708,7 @@ score_data1_project:=score_data1_project_1(score<>'');
    end;
    											 
     	test:=  table(score_data1_project,test_rec,product,version,process1,customer,model1);
-   	
+   	output(test);
    	// test;
 
 					
@@ -863,6 +882,11 @@ score_data1_project_biidv2:=score_data1_project(product='BusinessInstantIdv2' an
 																															 
                                             );	
 																						
+																						
+score_data1_project_sba := score_data1_project(product='Small_Business_Analytics' and (decimal19_2)score not in [222] and (decimal19_2)score >0 and  (decimal19_2)score  <=900 
+
+											);
+																						
 score_data1_project_non_rv:=score_data1_project(product='IT60' or product='IT61' and (decimal19_2)score >=-1 and (decimal19_2)score  <=999);				
 																	
 
@@ -917,6 +941,10 @@ score_data2_project_biidv2:=score_data2_project(product='BusinessInstantIdv2' an
 score_data2_project_non_rv:=score_data2_project(product='IT60' or product='IT61' and (decimal19_2)score >=-1 and (decimal19_2)score  <=999);
 
 
+score_data2_project_sba := score_data2_project(product='Small_Business_Analytics' and (decimal19_2)score not in [222] and (decimal19_2)score >0 and  (decimal19_2)score  <=900 
+
+											);
+
 
 
 score_data1_project_rv_default:=score_data1_project(product='RiskView' and (decimal19_2)score  in [-2] );
@@ -940,10 +968,10 @@ score_data2_project_li_default:=score_data2_project(product='LeadIntegrity' and 
 
 		
 		dataset_prev:=score_data1_project_rv + score_data1_project_fp + score_data1_project_bnk4 + score_data1_project_pio2 + score_data1_project_cbbl + 
-		score_data1_project_li + score_data1_project_biid +score_data1_project_biid1 +  score_data1_project_iid +  score_data1_project_iid1 +  score_data1_project_non_rv + score_data1_project_biidv2;
+		score_data1_project_li + score_data1_project_biid +score_data1_project_biid1 +  score_data1_project_iid +  score_data1_project_iid1 +  score_data1_project_non_rv + score_data1_project_biidv2 + score_data1_project_sba;
 
 		dataset_curr:=score_data2_project_rv + score_data2_project_fp + score_data2_project_bnk4 + score_data2_project_pio2 + score_data2_project_cbbl +  score_data2_project_li + score_data2_project_biid + 			               
-		              score_data2_project_biid1 +  score_data2_project_iid +  score_data2_project_iid1 +  score_data2_project_non_rv + score_data2_project_biidv2;
+		              score_data2_project_biid1 +  score_data2_project_iid +  score_data2_project_iid1 +  score_data2_project_non_rv + score_data2_project_biidv2 + score_data2_project_sba;
 
 
 					// test_rec := record
@@ -2375,7 +2403,16 @@ end;
 																 {'RiskView','Generic','Batch','rvb1104_0','4',file_count_function(RV_V4_Generic_infile)},
 																 {'RiskView','Generic','Batch','rvg1103_0','4',file_count_function(RV_V4_Generic_infile)},
 																 {'RiskView','Generic','Batch','rvr1103_0','4',file_count_function(RV_V4_Generic_infile)},
-																 {'RiskView','Generic','Batch','rvt1104_0','4',file_count_function(RV_V4_Generic_infile)}	
+																 {'RiskView','Generic','Batch','rvt1104_0','4',file_count_function(RV_V4_Generic_infile)},
+																 
+																 
+																 
+																 {'Small_Business_Analytics','Generic','','SBOM1601','',15215},
+																 {'Small_Business_Analytics','Generic','','SBBM1601','',15215},
+																 {'Small_Business_Analytics','Generic','','SLBO1702','',15215},
+																 {'Small_Business_Analytics','Generic','','SLBB1702','',15215},
+																 {'Small_Business_Analytics','Generic','','SLBO1809','',15215},
+																 {'Small_Business_Analytics','Generic','','SLBB1809','',15215}
 																															 
 																       																		
       													 // {'RiskView','Enova','XML','rvg1103_0','2',file_count_function(RV_Scores_V4_XML_ENOVA_infile)}
