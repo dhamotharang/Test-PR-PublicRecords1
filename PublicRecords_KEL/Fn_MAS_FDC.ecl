@@ -135,7 +135,6 @@ return If(date1 = '', datechooser(datevalue2), date1);
 	
 end;	
 	
-	
 	FDCMiniPop := IF(IsMiniFDC, TRUE, FALSE);//Do we need to go get this data?
 
 	Input_pre_override := Input_all((INTEGER)p_inpclnarchdt > 0); //inputs without contacts
@@ -1987,12 +1986,12 @@ BIPV2.IDAppendLayouts.AppendInput PrepBIPInputprox(Layouts_FDC.Layout_FDC le) :=
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 						
 	// Doxie_Files.Key_Offenders(isFCRA) --	FCRA and NonFCRA	
-	Doxie_Files__Key_Offenders_Records := 
-		JOIN(Input_FDC_Business_Contact_LexIDs, Doxie_Files.Key_Offenders(Options.isFCRA),
-				Common.DoFDCJoin_Doxie_Files__Key_Offenders = TRUE AND
-				LEFT.P_LexID > 0 AND
-				KEYED(LEFT.P_LexID = (UNSIGNED)RIGHT.sdid) and
-				ArchiveDate((string)right.fcra_date) <= LEFT.P_InpClnArchDt[1..8],
+Doxie_Files__Key_Offenders_Records_Regular :=
+	JOIN(Input_FDC_Business_Contact_LexIDs, Doxie_Files.Key_Offenders(Options.isFCRA),
+		Common.DoFDCJoin_Doxie_Files__Key_Offenders = TRUE AND
+		LEFT.P_LexID > 0 AND
+		KEYED(LEFT.P_LexID = (UNSIGNED)RIGHT.sdid) and
+		ArchiveDate((string)right.fcra_date) <= LEFT.P_InpClnArchDt[1..8],
 				TRANSFORM(Layouts_FDC.Layout_Doxie_Files__Key_Offenders,
 					_src := Doxie_Files__Key_Offenders_Src(RIGHT.data_type);
 					SELF.UIDAppend := LEFT.UIDAppend,
@@ -2007,6 +2006,32 @@ BIPV2.IDAppendLayouts.AppendInput PrepBIPInputprox(Layouts_FDC.Layout_FDC le) :=
 					SELF := LEFT,
 					SELF := []), 
 				ATMOST(PublicRecords_KEL.ECL_Functions.Constants.Default_Atmost_1000), KEEP(100));
+				
+				
+Doxie_Files__Key_Offenders_Records_Inferred :=
+	JOIN(Input_FDC, Doxie_Files.Key_Offenders(Options.isFCRA),
+		Common.DoFDCJoin_Doxie_Files__Key_Offenders = TRUE AND
+		LEFT.P_LexID > 0 AND
+		KEYED(LEFT.P_LexID = (UNSIGNED)RIGHT.sdid) and                         
+		ArchiveDate((string)right.fcra_date) <= (STRING)STD.Date.AdjustDate((INTEGER)LEFT.P_InpClnArchDt[1..8],2,0,0) AND
+		ArchiveDate((string)right.fcra_date) >= LEFT.P_InpClnArchDt[1..8],
+				TRANSFORM(Layouts_FDC.Layout_Doxie_Files__Key_Offenders,
+					_src := Doxie_Files__Key_Offenders_Src(RIGHT.data_type);
+					SELF.UIDAppend := LEFT.UIDAppend,
+					SELF.G_ProcUID := LEFT.G_ProcUID,
+					SELF.P_LexID := LEFT.P_LexID,
+					SELF.data_type := IF( Options.isFCRA = TRUE, RIGHT.data_type, '' ), // populate only if using the FCRA key
+					SELF.src := _src,
+					SELF.DPMBitmap := SetDPMBitmap( Source := _src, FCRA_Restricted := Options.isFCRA, GLBA_Restricted := NotRegulated, Pre_GLB_Restricted := NotRegulated, DPPA_Restricted := NotRegulated, DPPA_State := BlankString, KELPermissions := CFG_File),
+					self.Archive_Date :=  ArchiveDate((string)right.fcra_date);
+					self.fcra_date :=   archivedate(right.fcra_date);
+					SELF := RIGHT,
+					SELF := LEFT,
+					SELF := []), 
+				ATMOST(PublicRecords_KEL.ECL_Functions.Constants.Default_Atmost_1000), KEEP(100));
+				
+			Doxie_Files__Key_Offenders_Records	:= Doxie_Files__Key_Offenders_Records_Regular + IF(Options.IncludeInferredPerformance and options.isFCRA,Doxie_Files__Key_Offenders_Records_Inferred,DATASET([],Layouts_FDC.Layout_Doxie_Files__Key_Offenders));
+				
 				
 		WithSuppressionsCrimOffenders := IF((unsigned)input[1].p_inpclnarchdt = (unsigned)(((string)risk_indicators.iid_constants.todaydate)[1..8]) and Options.isFCRA, 
 																				Doxie_Files__Key_Offenders_Records(offender_key NOT IN crim_correct_ofk), 
@@ -2028,7 +2053,7 @@ BIPV2.IDAppendLayouts.AppendInput PrepBIPInputprox(Layouts_FDC.Layout_FDC le) :=
 						
 	// Doxie_files.Key_Court_Offenses -- FCRA only (even though nonFCRA version of key exists)
 	// Doxie_files.Key_Court_Offenses does not contain a DID, so JOIN with Doxie_Files__Key_Offenders_FCRA_Records so we can join by offender key
-	Doxie_files__Key_Court_Offenses_Records := 
+	Doxie_files__Key_Court_Offenses_Records_Regular := 
 			JOIN(WithCorrectionsCrimOffenders_filter, Doxie_files.Key_Court_Offenses(isFCRA := Options.isFCRA),
 				Common.DoFDCJoin_Doxie_files__Key_Court_Offenses = TRUE AND
 				KEYED(LEFT.offender_key = RIGHT.ofk) and
@@ -2045,6 +2070,27 @@ BIPV2.IDAppendLayouts.AppendInput PrepBIPInputprox(Layouts_FDC.Layout_FDC le) :=
 					SELF := LEFT,
 					SELF := []), 
 				ATMOST(PublicRecords_KEL.ECL_Functions.Constants.Default_Atmost_100));
+
+Doxie_files__Key_Court_Offenses_Records_Inferred := 
+			JOIN(WithCorrectionsCrimOffenders_filter, Doxie_files.Key_Court_Offenses(isFCRA := Options.isFCRA),
+				Common.DoFDCJoin_Doxie_files__Key_Court_Offenses = TRUE AND
+				KEYED(LEFT.offender_key = RIGHT.ofk) and
+				ArchiveDate((string)right.fcra_date) <= (STRING)STD.Date.AdjustDate((INTEGER)LEFT.P_InpClnArchDt[1..8],2,0,0) AND
+				ArchiveDate((string)right.fcra_date) >= LEFT.P_InpClnArchDt[1..8],
+				TRANSFORM(Layouts_FDC.Layout_Doxie_files__Key_Court_Offenses,
+					SELF.UIDAppend := LEFT.UIDAppend,
+					SELF.G_ProcUID := LEFT.G_ProcUID,
+					SELF.P_LexID := LEFT.P_LexID,
+					SELF.Src := MDR.sourceTools.src_Accurint_Crim_Court,
+					SELF.DPMBitmap := SetDPMBitmap( Source := MDR.sourceTools.src_Accurint_Crim_Court, FCRA_Restricted := Options.isFCRA, GLBA_Restricted := NotRegulated, Pre_GLB_Restricted := NotRegulated, DPPA_Restricted := NotRegulated, DPPA_State := BlankString, KELPermissions := CFG_File),
+					self.Archive_Date := ArchiveDate((string)right.fcra_date);
+					self.fcra_date := archivedate( right.fcra_date);
+					SELF := RIGHT,
+					SELF := LEFT,
+					SELF := []), 
+				ATMOST(PublicRecords_KEL.ECL_Functions.Constants.Default_Atmost_100));
+				
+Doxie_files__Key_Court_Offenses_Records	:= Doxie_files__Key_Court_Offenses_Records_Regular + IF(Options.IncludeInferredPerformance and options.isFCRA,Doxie_files__Key_Court_Offenses_Records_Inferred,DATASET([],Layouts_FDC.Layout_Doxie_files__Key_Court_Offenses));			
 			
 		WithSuppressionsCrimCourt := IF((unsigned)input[1].p_inpclnarchdt = (unsigned)(((string)risk_indicators.iid_constants.todaydate)[1..8]) and Options.isFCRA, 
 																		Doxie_files__Key_Court_Offenses_Records(offender_key NOT IN crim_correct_ofk), 
@@ -2065,7 +2111,7 @@ BIPV2.IDAppendLayouts.AppendInput PrepBIPInputprox(Layouts_FDC.Layout_FDC le) :=
 						
 	// Doxie_Files.Key_Offenses -- FCRA only (even though nonFCRA version of key exists)
 	// Doxie_files.Key_Offenses does not contain a DID, so JOIN with Doxie_Files__Key_Offenders_Records so we can join by offender key
-	Doxie_Files__Key_Offenses_Records := 
+	Doxie_Files__Key_Offenses_Records_Regular := 
 			JOIN(WithCorrectionsCrimOffenders_filter, Doxie_Files.Key_Offenses(isFCRA := Options.isFCRA),
 				Common.DoFDCJoin_Doxie_Files__Key_Offenses = TRUE and				
 				KEYED(LEFT.offender_key = RIGHT.ok) and 
@@ -2082,7 +2128,27 @@ BIPV2.IDAppendLayouts.AppendInput PrepBIPInputprox(Layouts_FDC.Layout_FDC le) :=
 					SELF := LEFT,
 					SELF := []), 
 				ATMOST(PublicRecords_KEL.ECL_Functions.Constants.Default_Atmost_100));
+	Doxie_Files__Key_Offenses_Records_Inferred := 
+			JOIN(WithCorrectionsCrimOffenders_filter, Doxie_Files.Key_Offenses(isFCRA := Options.isFCRA),
+				Common.DoFDCJoin_Doxie_Files__Key_Offenses = TRUE and				
+				KEYED(LEFT.offender_key = RIGHT.ok) and 
+				ArchiveDate((string)right.fcra_date) <= (STRING)STD.Date.AdjustDate((INTEGER)LEFT.P_InpClnArchDt[1..8],2,0,0) AND
+				ArchiveDate((string)right.fcra_date) >= LEFT.P_InpClnArchDt[1..8],
+				TRANSFORM(Layouts_FDC.Layout_Doxie_Files__Key_Offenses,
+					SELF.UIDAppend := LEFT.UIDAppend,
+					SELF.G_ProcUID := LEFT.G_ProcUID,
+					SELF.P_LexID := LEFT.P_LexID,
+					SELF.Src := MDR.sourceTools.src_Accurint_DOC,
+					SELF.DPMBitmap := SetDPMBitmap( Source := MDR.sourceTools.src_Accurint_DOC, FCRA_Restricted := Options.isFCRA, GLBA_Restricted := NotRegulated, Pre_GLB_Restricted := NotRegulated, DPPA_Restricted := NotRegulated, DPPA_State := BlankString, KELPermissions := CFG_File),
+					self.Archive_Date := ArchiveDate((string)right.fcra_date);
+					self.fcra_date :=  archivedate(right.fcra_date);
+					SELF := RIGHT, 
+					SELF := LEFT,
+					SELF := []), 
+				ATMOST(PublicRecords_KEL.ECL_Functions.Constants.Default_Atmost_100));
 					
+Doxie_Files__Key_Offenses_Records	:= Doxie_Files__Key_Offenses_Records_Regular + IF(Options.IncludeInferredPerformance and options.isFCRA,Doxie_Files__Key_Offenses_Records_Inferred,DATASET([],Layouts_FDC.Layout_Doxie_Files__Key_Offenses));
+
 		WithSuppressionsCrimOffenses := IF((unsigned)input[1].p_inpclnarchdt = (unsigned)(((string)risk_indicators.iid_constants.todaydate)[1..8]) and Options.isFCRA, 
 																		Doxie_Files__Key_Offenses_Records(offender_key NOT IN crim_correct_ofk), 
 																		Doxie_Files__Key_Offenses_Records);
@@ -2174,7 +2240,7 @@ BIPV2.IDAppendLayouts.AppendInput PrepBIPInputprox(Layouts_FDC.Layout_FDC le) :=
 				ATMOST(PublicRecords_KEL.ECL_Functions.Constants.Default_Atmost_1000));
 
 	// BankruptcyV3.key_bankruptcyv3_search_full_bip has a parameter to say if FCRA or nonFCRA - same file layout		
-	Bankruptcy_Files__Key_Search_Records_pre := 
+	Bankruptcy_Files__Key_Search_Records_pre_Regular := 
 		JOIN(Bankruptcy_Files__Key_bankruptcy_did_Records, BankruptcyV3.key_bankruptcyv3_search_full_bip(Options.isFCRA),
 				Common.DoFDCJoin_Bankruptcy_Files__Bankruptcy__Key_Search = TRUE AND
 				KEYED(LEFT.TmsID != '' AND 
@@ -2182,7 +2248,7 @@ BIPV2.IDAppendLayouts.AppendInput PrepBIPInputprox(Layouts_FDC.Layout_FDC le) :=
 				LEFT.court_code = RIGHT.court_code AND
 				LEFT.case_number = RIGHT.case_number and
 				(integer)LEFT.did = (integer)RIGHT.did and
-				ArchiveDate((string)right.date_first_seen, (string)right.date_vendor_first_reported) <= LEFT.P_InpClnArchDt[1..8],//need to make date first seen 01 for this
+				ArchiveDate((string)right.date_first_seen, (string)right.date_vendor_first_reported) <= LEFT.P_InpClnArchDt[1..8],
 				TRANSFORM(Layouts_FDC.Layout_BankruptcyV3__key_bankruptcyv3_search,
 					SELF.UIDAppend := LEFT.UIDAppend,
 					SELF.G_ProcUID := LEFT.G_ProcUID,
@@ -2195,6 +2261,30 @@ BIPV2.IDAppendLayouts.AppendInput PrepBIPInputprox(Layouts_FDC.Layout_FDC le) :=
 					SELF := LEFT,
 					SELF := []), 
 				ATMOST(PublicRecords_KEL.ECL_Functions.Constants.Default_Atmost_1000),KEEP(100));
+	Bankruptcy_Files__Key_Search_Records_pre_Inferred := 
+		JOIN(Bankruptcy_Files__Key_bankruptcy_did_Records, BankruptcyV3.key_bankruptcyv3_search_full_bip(Options.isFCRA),
+				Common.DoFDCJoin_Bankruptcy_Files__Bankruptcy__Key_Search = TRUE AND
+				KEYED(LEFT.TmsID != '' AND 
+				LEFT.TmsID = RIGHT.TmsID) AND
+				LEFT.court_code = RIGHT.court_code AND
+				LEFT.case_number = RIGHT.case_number and
+				(integer)LEFT.did = (integer)RIGHT.did and
+				ArchiveDate((string)right.date_first_seen, (string)right.date_vendor_first_reported) <= (STRING)STD.Date.AdjustDate((INTEGER)LEFT.P_InpClnArchDt[1..8],2,0,0) AND
+				ArchiveDate((string)right.date_first_seen, (string)right.date_vendor_first_reported) >= LEFT.P_InpClnArchDt[1..8],
+				TRANSFORM(Layouts_FDC.Layout_BankruptcyV3__key_bankruptcyv3_search,
+					SELF.UIDAppend := LEFT.UIDAppend,
+					SELF.G_ProcUID := LEFT.G_ProcUID,
+					SELF.P_LexID := LEFT.P_LexID,
+					SELF.Src := MDR.sourceTools.src_Bankruptcy,
+					SELF.DPMBitmap := SetDPMBitmap( Source := MDR.sourceTools.src_Bankruptcy, FCRA_Restricted := Options.isFCRA, GLBA_Restricted := NotRegulated, Pre_GLB_Restricted := NotRegulated, DPPA_Restricted := NotRegulated, DPPA_State := BlankString, KELPermissions := CFG_File),
+					self.Archive_Date :=  ArchiveDate((string)right.date_first_seen, (string)right.date_vendor_first_reported);
+					self.date_first_seen :=  archivedate((string)right.date_first_seen);
+					SELF := RIGHT,
+					SELF := LEFT,
+					SELF := []), 
+				ATMOST(PublicRecords_KEL.ECL_Functions.Constants.Default_Atmost_1000),KEEP(100));
+				
+Bankruptcy_Files__Key_Search_Records_pre	:= Bankruptcy_Files__Key_Search_Records_pre_Regular + IF(Options.IncludeInferredPerformance and options.isFCRA,Bankruptcy_Files__Key_Search_Records_pre_Inferred,DATASET([],Layouts_FDC.Layout_BankruptcyV3__key_bankruptcyv3_search));
 
 	// Left Only join to the Bankruptcy Withdrawn key to remove all Withdrawn records.
 	Bankruptcy_Files__Key_Search_Records := 
@@ -5014,14 +5104,34 @@ LienJudgement_DID_Key := IF(Options.IsFCRA, liensv2.key_liens_did_FCRA, liensv2.
 	/* Key_Liens_Party_ID Keys have a parameter to say if FCRA or nonFCRA - same file layout*/
 	LiensV2_Key_Liens_Party_ID_Records_unsuppressed := IF( Options.isFCRA, LiensV2.Key_Liens_Party_ID_FCRA, LiensV2.Key_Liens_Party_ID	 );
 
-	Key_LiensV2_Key_Liens_Party_ID_Records_unsuppressed :=
+	Key_LiensV2_Key_Liens_Party_ID_Records_unsuppressed_Regular :=
 			JOIN(LienJudgement_DID_Records,LiensV2_Key_Liens_Party_ID_Records_unsuppressed,
 			Common.DoFDCJoin_LiensV2_key_liens_main_ID_Records =True AND
              KEYED(LEFT.tmsid = RIGHT.tmsid) AND
 							KEYED(LEFT.rmsid = RIGHT.rmsid) AND
 							left.did=(unsigned)right.did and
 							ArchiveDate((string)right.date_first_seen, (string)right.date_vendor_first_reported) <= LEFT.P_InpClnArchDt[1..8],//we only need to keep the records from party with a matching lexid, some are 0's. old shell does this too
-				TRANSFORM(Layouts_FDC.Layout_LiensV2_Key_Liens_Party_ID_Records,
+								TRANSFORM(Layouts_FDC.Layout_LiensV2_Key_Liens_Party_ID_Records,
+                    SELF.UIDAppend := LEFT.UIDAppend,
+                    SELF.G_ProcUID := LEFT.G_ProcUID,
+                    SELF.P_LexID := LEFT.P_LexID,
+                    self.Archive_Date :=  ArchiveDate((string)right.date_first_seen, (string)right.date_vendor_first_reported);
+                    self.date_first_seen :=  archivedate((string)right.date_first_seen);
+										SELF.Src :=  PublicRecords_KEL.ECL_Functions.Constants.Set_Liens_Sources(right.TMSID),//set marketing sources, else L2
+										SELF.DPMBitmap := SetDPMBitmap( Source := SELF.Src, FCRA_Restricted := Options.isFCRA, GLBA_Restricted := NotRegulated, Pre_GLB_Restricted := NotRegulated , DPPA_Restricted := NotRegulated, DPPA_State :='', KELPermissions := CFG_File),
+										SELF := RIGHT,
+                    SELF := LEFT,
+                    SELF := []),
+                    ATMOST(PublicRecords_KEL.ECL_Functions.Constants.Default_Atmost_1000));
+Key_LiensV2_Key_Liens_Party_ID_Records_unsuppressed_Inferred :=
+			JOIN(LienJudgement_DID_Records,LiensV2_Key_Liens_Party_ID_Records_unsuppressed,
+			Common.DoFDCJoin_LiensV2_key_liens_main_ID_Records =True AND
+							KEYED(LEFT.tmsid = RIGHT.tmsid) AND
+							KEYED(LEFT.rmsid = RIGHT.rmsid) AND
+							left.did=(unsigned)right.did and
+							ArchiveDate((string)right.date_first_seen, (string)right.date_vendor_first_reported) <= (STRING)STD.Date.AdjustDate((INTEGER)LEFT.P_InpClnArchDt[1..8],2,0,0) AND
+							ArchiveDate((string)right.date_first_seen, (string)right.date_vendor_first_reported) >= LEFT.P_InpClnArchDt[1..8],
+									TRANSFORM(Layouts_FDC.Layout_LiensV2_Key_Liens_Party_ID_Records,
                     SELF.UIDAppend := LEFT.UIDAppend,
                     SELF.G_ProcUID := LEFT.G_ProcUID,
                     SELF.P_LexID := LEFT.P_LexID,
@@ -5034,6 +5144,8 @@ LienJudgement_DID_Key := IF(Options.IsFCRA, liensv2.key_liens_did_FCRA, liensv2.
                     SELF := []),
                     ATMOST(PublicRecords_KEL.ECL_Functions.Constants.Default_Atmost_1000));
 
+	Key_LiensV2_Key_Liens_Party_ID_Records_unsuppressed	:= Key_LiensV2_Key_Liens_Party_ID_Records_unsuppressed_Regular + IF(Options.IncludeInferredPerformance and options.isFCRA,Key_LiensV2_Key_Liens_Party_ID_Records_unsuppressed_Inferred,DATASET([],Layouts_FDC.Layout_LiensV2_Key_Liens_Party_ID_Records));
+	
 	LiensV2_Key_Liens_Party_ID_Records:= Suppress.MAC_SuppressSource(Key_LiensV2_Key_Liens_Party_ID_Records_unsuppressed, mod_access, did_field := did, data_env := Environment);
 
 	//only drop suppression/correction records in FCRA current mode
@@ -5393,7 +5505,7 @@ Key_SexOffender_SPK := IF( Options.isFCRA, SexOffender.Key_SexOffender_SPK(TRUE)
 	
 	key_thrive_did := IF( Options.isFCRA, thrive.keys().Did_fcra.qa, thrive.keys().did.qa );//no ccpa as of 5/12/2020
 
-	thrive__keys__Did_qa := JOIN(input_FDC, key_thrive_did,
+	thrive__keys__Did_qa_Regular := JOIN(input_FDC, key_thrive_did,
 					Common.DoFDCJoin_Thrive__Key_did_QA = TRUE AND
 					LEFT.P_LexID <> 0 AND
 				KEYED(LEFT.P_LexID =RIGHT.did) and
@@ -5410,6 +5522,27 @@ Key_SexOffender_SPK := IF( Options.isFCRA, SexOffender.Key_SexOffender_SPK(TRUE)
 					SELF := LEFT,
 					SELF := []), 
 				ATMOST(PublicRecords_KEL.ECL_Functions.Constants.Default_Atmost_1000));
+	
+	thrive__keys__Did_qa_Inferred := JOIN(input_FDC, key_thrive_did,
+					Common.DoFDCJoin_Thrive__Key_did_QA = TRUE AND
+					LEFT.P_LexID <> 0 AND
+				KEYED(LEFT.P_LexID =RIGHT.did) and
+				ArchiveDate((string)right.dt_first_seen, (string)right.dt_vendor_first_reported) <= (STRING)STD.Date.AdjustDate((INTEGER)LEFT.P_InpClnArchDt[1..8],2,0,0) AND
+				ArchiveDate((string)right.dt_first_seen, (string)right.dt_vendor_first_reported) >= LEFT.P_InpClnArchDt[1..8],
+				TRANSFORM(Layouts_FDC.Layout_Thrive__Key___Did_QA,
+					SELF.UIDAppend := LEFT.UIDAppend,
+					SELF.G_ProcUID := LEFT.G_ProcUID,
+					SELF.P_LexID := LEFT.P_LexID,
+					self.src := right.src,
+					SELF.DPMBitmap := SetDPMBitmap( Source := SELF.Src, FCRA_Restricted := Options.isFCRA, GLBA_Restricted := NotRegulated, Pre_GLB_Restricted := NotRegulated, DPPA_Restricted := NotRegulated, DPPA_State := BlankString, KELPermissions := CFG_File),
+					self.Archive_Date :=  ArchiveDate((string)right.dt_first_seen, (string)right.dt_vendor_first_reported);
+					self.dt_first_seen :=  (integer)archivedate( (string)right.dt_first_seen);
+					SELF := RIGHT,
+					SELF := LEFT,
+					SELF := []), 
+				ATMOST(PublicRecords_KEL.ECL_Functions.Constants.Default_Atmost_1000));
+				
+		thrive__keys__Did_qa	:= thrive__keys__Did_qa_Regular + IF(Options.IncludeInferredPerformance and options.isFCRA,thrive__keys__Did_qa_Inferred,DATASET([],Layouts_FDC.Layout_Thrive__Key___Did_QA));	
 	
 		WithSuppressionsThrive := IF((unsigned)input[1].p_inpclnarchdt = (unsigned)(((string)risk_indicators.iid_constants.todaydate)[1..8]) and Options.isFCRA, 
 																				thrive__keys__Did_qa(persistent_record_id NOT IN thrive_correct_record_id), 
@@ -5503,13 +5636,13 @@ Key_AccLogs_FCRA_Address :=
 					SELF := LEFT,
 					SELF := []));				
 			
-		Key_AccLogs_FCRA_DID := 
+		Key_AccLogs_FCRA_DID_Regular := 
 			JOIN(Input_FDC, Inquiry_AccLogs.Key_FCRA_DID, 
 				Common.DoFDCJoin_Inquiry_AccLogs__Key_DID_FCRA = TRUE AND
 				options.Data_Restriction_Mask[risk_indicators.iid_constants.posInquiriesRestriction]<>risk_indicators.iid_constants.sTrue and
 				LEFT.P_LexID > 0 AND
 				KEYED(LEFT.P_LexID = RIGHT.appended_adl) AND
-				ArchiveDate((string)right.Search_Info.DateTime[1..8]) <= LEFT.P_InpClnArchDt[1..8] and
+				ArchiveDate((string)right.Search_Info.DateTime[1..8]) <= LEFT.P_InpClnArchDt[1..8] AND
 							//lets dump the inquiries we don't care about
 							((trim(std.str.ToUpperCase(RIGHT.search_info.function_description)) IN PublicRecords_KEL.ECL_Functions.AccLogs_Constants.FCRA_Functions)	AND 
 							(trim(RIGHT.bus_intel.use) = PublicRecords_KEL.ECL_Functions.AccLogs_Constants.Check_Bus_Intel_Uses) AND 
@@ -5527,6 +5660,34 @@ Key_AccLogs_FCRA_Address :=
 					SELF := LEFT,
 					SELF := []), 
 				ATMOST(PublicRecords_KEL.ECL_Functions.Constants.Default_Atmost_1000));
+
+		Key_AccLogs_FCRA_DID_Inferred :=
+			JOIN(Input_FDC, Inquiry_AccLogs.Key_FCRA_DID, 
+				Common.DoFDCJoin_Inquiry_AccLogs__Key_DID_FCRA = TRUE AND
+				options.Data_Restriction_Mask[risk_indicators.iid_constants.posInquiriesRestriction]<>risk_indicators.iid_constants.sTrue and
+				LEFT.P_LexID > 0 AND
+				KEYED(LEFT.P_LexID = RIGHT.appended_adl) AND
+				ArchiveDate((string)right.Search_Info.DateTime[1..8]) <= (STRING)STD.Date.AdjustDate((INTEGER)LEFT.P_InpClnArchDt[1..8],2,0,0) AND
+				ArchiveDate((string)right.Search_Info.DateTime[1..8]) >= LEFT.P_InpClnArchDt[1..8] AND
+							//lets dump the inquiries we don't care about
+							((trim(std.str.ToUpperCase(RIGHT.search_info.function_description)) IN PublicRecords_KEL.ECL_Functions.AccLogs_Constants.FCRA_Functions)	AND 
+							(trim(RIGHT.bus_intel.use) = PublicRecords_KEL.ECL_Functions.AccLogs_Constants.Check_Bus_Intel_Uses) AND 
+							(trim(RIGHT.search_info.product_code) IN PublicRecords_KEL.ECL_Functions.AccLogs_Constants.valid_product_codes) and
+							trim(right.search_info.transaction_id, left, right) not in left.inquiries_correct_record_id),  // don't include any records from raw data that have been corrected,,
+				TRANSFORM(Layouts_FDC.Layout_Inquiry_AccLogs__Key_FCRA_DID,
+					SELF.UIDAppend := LEFT.UIDAppend,
+					SELF.G_ProcUID := LEFT.G_ProcUID,
+					SELF.P_LexID := LEFT.P_LexID,
+					SELF.DateOfInquiry := RIGHT.Search_Info.DateTime[1..8] + RIGHT.Search_Info.DateTime[10..] + '0';
+					SELF.Src := MDR.sourceTools.src_InquiryAcclogs;
+					SELF.DPMBitmap := SetDPMBitmap( Source := MDR.sourceTools.src_InquiryAcclogs, FCRA_Restricted := Options.isFCRA, GLBA_Restricted := NotRegulated, Pre_GLB_Restricted := NotRegulated, DPPA_Restricted := NotRegulated, DPPA_State := BlankString, KELPermissions := CFG_File),
+					self.Archive_Date := ArchiveDate((string)SELF.DateOfInquiry);
+					SELF := RIGHT, 
+					SELF := LEFT,
+					SELF := []), 
+				ATMOST(PublicRecords_KEL.ECL_Functions.Constants.Default_Atmost_1000));
+
+Key_AccLogs_FCRA_DID	:= Key_AccLogs_FCRA_DID_Regular + IF(Options.IncludeInferredPerformance and options.isFCRA,Key_AccLogs_FCRA_DID_Inferred,DATASET([],Layouts_FDC.Layout_Inquiry_AccLogs__Key_FCRA_DID));
 
 	WithCorrectionsInquiryDid := Key_AccLogs_FCRA_DID+GetOverrideInquiry;	
 
