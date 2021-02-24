@@ -6101,7 +6101,7 @@ Key_AccLogs_FCRA_SSN :=
 				Common.DoFDCJoin_Property__Key_Foreclosure_FID = TRUE AND
 				KEYED(left.fid = RIGHT.fid) AND
 				ArchiveDate(RIGHT.recording_date) <= LEFT.P_InpClnArchDt[1..8],
-				TRANSFORM(Layouts_FDC.Layout_Property__Key_Foreclosures_FID_With_Did,
+				TRANSFORM(Layouts_FDC.Layout_DX_Property__Key_Foreclosures_FID_With_Did,
 					SELF.UIDAppend := LEFT.UIDAppend,
 					SELF.G_ProcUID := LEFT.G_ProcUID,
 					SELF.did := LEFT.did,
@@ -6119,7 +6119,7 @@ Key_AccLogs_FCRA_SSN :=
 		With_Property__Key_Foreclosures_FID_With_Did := DENORMALIZE(With_AccLogs_Inquiry_SSN_Records, Property__Key_Foreclosures_FID_With_Did_Suppressed,
 			LEFT.UIDAppend = RIGHT.UIDAppend, GROUP,
 			TRANSFORM(Layouts_FDC.Layout_FDC,
-					SELF.Dataset_Property__Key_Foreclosures_FID_With_Did := ROWS(RIGHT),
+					SELF.Dataset_DX_Property__Key_Foreclosures_FID_With_Did := ROWS(RIGHT),
 					SELF := LEFT,
 					SELF := []));
 	RETURN (With_Property__Key_Foreclosures_FID_With_Did+With_Header_Addr_Hist_Records_6threp);

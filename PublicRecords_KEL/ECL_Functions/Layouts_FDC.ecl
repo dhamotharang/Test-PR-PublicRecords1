@@ -1,8 +1,8 @@
 ﻿IMPORT AID_Build, ADVO, AlloyMedia_student_list,  American_student_list, AutoKey, AVM_V2, BankruptcyV3, BBB2, BIPV2, BIPV2_Best, BIPV2_Build, Business_Risk_BIP, BusReg, CalBus, CellPhone, Certegy, Corp2, 
 		Cortera, Data_Services, DCAV2, Death_Master,  Doxie, Doxie_Files, DriversV2, DMA, dx_BestRecords, dx_ConsumerFinancialProtectionBureau, dx_DataBridge, DX_Email, 
-		dx_Cortera_Tradeline, dx_Equifax_Business_Data, dx_Gong, dx_Header, dx_Infutor_NARB, dx_PhonesInfo, dx_PhonesPlus, dx_Relatives_v3, EBR, Email_Data, emerges, Experian_CRDB, FAA, FBNv2, FLAccidents_Ecrash, Fraudpoint3, Gong, 
+		dx_Cortera_Tradeline, dx_Equifax_Business_Data, dx_Gong, dx_Header, dx_Infutor_NARB, dx_PhonesInfo, dx_PhonesPlus, dx_Property, dx_Relatives_v3, EBR, Email_Data, emerges, Experian_CRDB, FAA, FBNv2, FLAccidents_Ecrash, Fraudpoint3, Gong, 
 		GovData, Header, Header_Quick, InfoUSA, IRS5500, InfutorCID, Inquiry_AccLogs, LiensV2, LN_PropertyV2, MDR, OSHAIR, Phonesplus_v2, PublicRecords_KEL, Prof_License_Mari, 
-		Prof_LicenseV2,Property, Relationship, Risk_Indicators, RiskView, RiskWise, SAM, SexOffender, STD, Suppress, Targus, thrive, USPIS_HotList, Utilfile, ut,
+		Prof_LicenseV2, Relationship, Risk_Indicators, RiskView, RiskWise, SAM, SexOffender, STD, Suppress, Targus, thrive, USPIS_HotList, Utilfile, ut,
 		VehicleV2, Watercraft, Watchdog, UCCV2, YellowPages, dx_OSHAIR;	
 	
 	EXPORT Layouts_FDC(PublicRecords_KEL.Interface_Options Options = PublicRecords_KEL.Interface_Options) := MODULE 
@@ -1885,7 +1885,7 @@ SHARED Phone_Search_layout := BIPV2_Build.key_high_risk_industries.Phone_Search;
 			string6 SIC_Code;
 			string6 NAICS_Code;
 	END;
-	EXPORT Layout_Property__Key_Foreclosures_FID_With_Did := RECORD
+	EXPORT Layout_DX_Property__Key_Foreclosures_FID_With_Did := RECORD
 		LayoutIDs;
 		dpmtype;
 		INTEGER did;
@@ -1893,7 +1893,7 @@ SHARED Phone_Search_layout := BIPV2_Build.key_high_risk_industries.Phone_Search;
 		STRING5 Zip5;
 		STRING4 Zip4;
 		STRING Archive_Date;
-		recordof(property.Key_Foreclosures_FID);
+		recordof(dx_Property.Key_Foreclosures_FID);
 	END;
 	
 	// ===================[ Composite Layout ]===================
@@ -2028,6 +2028,9 @@ SHARED Phone_Search_layout := BIPV2_Build.key_high_risk_industries.Phone_Search;
 		//fbn
 		DATASET(Layout_FBNv2__kfetch_LinkIds) Dataset_FBNv2__kfetch_LinkIds;
 
+		// Foreclosure
+		DATASET(Layout_DX_Property__Key_Foreclosures_FID_With_Did) Dataset_DX_Property__Key_Foreclosures_FID_With_Did;
+
 		//Fraudpoint3
 		DATASET(Layout_Fraudpoint3__Key_Address) Dataset_Fraudpoint3__Key_Address;		
 		DATASET(Layout_Fraudpoint3__Key_SSN) Dataset_Fraudpoint3__Key_SSN;		
@@ -2141,8 +2144,7 @@ SHARED Phone_Search_layout := BIPV2_Build.key_high_risk_industries.Phone_Search;
 
 		//yellow pages
 		DATASET(Layout_YellowPages__kfetch_yellowpages_linkids) Dataset_YellowPages__kfetch_yellowpages_linkids;
-		DATASET(Layout_Property__Key_Foreclosures_FID_With_Did) Dataset_Property__Key_Foreclosures_FID_With_Did;
-	
+			
 END;
 	
 END;

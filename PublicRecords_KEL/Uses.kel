@@ -7130,7 +7130,7 @@ Dataset_Header__key_ADL_segmentation(	//data is not archivable
 		Archive_Date = FORMAT('YYYYMMDD')archive_date),
   PERMITS (DPMBitmap)),	
 	
-Dataset_Property__Key_Foreclosures_FID_With_Did(
+Dataset_DX_Property__Key_Foreclosures_FID_With_Did(
 		Foreclosure(
 			ForeclosureID = fid,
 			RecordingDate = FORMAT('YYYYMMDD')recording_date,
