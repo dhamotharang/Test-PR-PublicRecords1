@@ -6099,8 +6099,8 @@ Key_AccLogs_FCRA_SSN :=
 	Property__Key_Foreclosures_FID_With_Did := 
 			JOIN(Property__Key_Foreclosures_DID,dx_property.Key_Foreclosures_FID,
 				Common.DoFDCJoin_Property__Key_Foreclosure_FID = TRUE AND
-				ArchiveDate(RIGHT.recording_date) <= LEFT.P_InpClnArchDt[1..8] AND
-				left.fid = RIGHT.fid,
+				KEYED(left.fid = RIGHT.fid) AND
+				ArchiveDate(RIGHT.recording_date) <= LEFT.P_InpClnArchDt[1..8],
 				TRANSFORM(Layouts_FDC.Layout_Property__Key_Foreclosures_FID_With_Did,
 					SELF.UIDAppend := LEFT.UIDAppend,
 					SELF.G_ProcUID := LEFT.G_ProcUID,
