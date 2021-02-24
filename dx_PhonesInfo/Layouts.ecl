@@ -104,6 +104,8 @@
 		string60 	carrier_name;
 		string10 	phone_swap;
 		string6		ocn;
+		string10  alt_spid;			//DF-28896
+		string10  lalt_spid;		//DF-28896
 		unsigned4 global_sid;		//CCPA Requirement
 		unsigned8 record_sid;		//CCPA Requirement
 	END;
