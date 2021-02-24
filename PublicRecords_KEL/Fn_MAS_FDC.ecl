@@ -1,8 +1,8 @@
 ﻿IMPORT AID_Build, ADVO, AlloyMedia_student_list,  American_student_list, AutoKey, AVM_V2, BankruptcyV3, BBB2, BIPV2, BIPV2_Best, BIPV2_Build, Business_Risk_BIP, BusReg, CalBus, CellPhone, Certegy, Corp2, 
 		Cortera, Cortera_Tradeline, Data_Services, DCAV2, Death_Master,  Doxie, Doxie_Files, DriversV2, DMA, dx_BestRecords, dx_ConsumerFinancialProtectionBureau, dx_DataBridge, DX_Email, 
-		dx_Cortera_Tradeline, dx_Equifax_Business_Data, dx_Gong, dx_Header, dx_Infutor_NARB, dx_PhonesInfo, dx_PhonesPlus, dx_Relatives_v3, EBR, Email_Data, emerges, Experian_CRDB, FAA, FBNv2, FLAccidents_Ecrash, Fraudpoint3, Gong, 
+		dx_Cortera_Tradeline, dx_Equifax_Business_Data, dx_Gong, dx_Header, dx_Infutor_NARB, dx_PhonesInfo, dx_PhonesPlus,dx_property, dx_Relatives_v3, EBR, Email_Data, emerges, Experian_CRDB, FAA, FBNv2, FLAccidents_Ecrash, Fraudpoint3, Gong, 
 		GovData, Header, Header_Quick, InfoUSA, IRS5500, InfutorCID, Inquiry_AccLogs, LiensV2, LN_PropertyV2, MDR, OSHAIR, Phonesplus_v2, Prof_License_Mari, 
-		Prof_LicenseV2, Property, Relationship, Risk_Indicators, RiskView, RiskWise, SAM, SexOffender, STD, Suppress, Targus, thrive, USPIS_HotList, Utilfile, ut,
+		Prof_LicenseV2, Relationship, Risk_Indicators, RiskView, RiskWise, SAM, SexOffender, STD, Suppress, Targus, thrive, USPIS_HotList, Utilfile, ut,
 		VehicleV2, Watercraft, Watchdog, UCCV2, YellowPages, dx_OSHAIR, drivers;
 
 	//These settings are in MAS_get deltabase_inquiry and FCRA_Overrides. You need to go there as well
@@ -6085,19 +6085,21 @@ Key_AccLogs_FCRA_SSN :=
 					
 
 	Property__Key_Foreclosures_DID := 
-			JOIN(Input_FDC, Property.Key_Foreclosure_DID, 
+			JOIN(Input_FDC, dx_property.Key_Foreclosure_DID, 
 				Common.DoFDCJoin_Property__Key_Foreclosure_FID = TRUE AND
 				LEFT.P_LexID > 0 AND
 				KEYED(LEFT.P_LexID = RIGHT.did),
 				TRANSFORM({RECORDOF(RIGHT),Layouts_FDC.LayoutIDs},
 					SELF.UIDAppend := LEFT.UIDAppend,
 					SELF.G_ProcUID := LEFT.G_ProcUID,
+					SELF.p_inpclnarchdt := LEFT.P_InpClnArchDt,
 					SELF := RIGHT,
 					SELF := []), 
-				ATMOST(PublicRecords_KEL.ECL_Functions.Constants.Default_Atmost_1000),keep(100));
+				ATMOST(PublicRecords_KEL.ECL_Functions.Constants.Default_Atmost_1000),keep(50));
 	Property__Key_Foreclosures_FID_With_Did := 
-			JOIN(Property__Key_Foreclosures_DID,Property.Key_Foreclosures_FID,
+			JOIN(Property__Key_Foreclosures_DID,dx_property.Key_Foreclosures_FID,
 				Common.DoFDCJoin_Property__Key_Foreclosure_FID = TRUE AND
+				ArchiveDate(RIGHT.recording_date) <= LEFT.P_InpClnArchDt[1..8] AND
 				left.fid = RIGHT.fid,
 				TRANSFORM(Layouts_FDC.Layout_Property__Key_Foreclosures_FID_With_Did,
 					SELF.UIDAppend := LEFT.UIDAppend,
@@ -6111,14 +6113,15 @@ Key_AccLogs_FCRA_SSN :=
 					SELF.Zip4 := RIGHT.property_address_zip_code_1[6..9];
 					SELF := RIGHT;
 					SELF := [];),
-				ATMOST(PublicRecords_KEL.ECL_Functions.Constants.Default_Atmost_1000),keep(100));
-		With_Property__Key_Foreclosures_FID_With_Did := DENORMALIZE(With_AccLogs_Inquiry_SSN_Records, Property__Key_Foreclosures_FID_With_Did,
+				ATMOST(PublicRecords_KEL.ECL_Functions.Constants.Default_Atmost_1000),keep(50));
+
+		Property__Key_Foreclosures_FID_With_Did_Suppressed := Suppress.MAC_SuppressSource(Property__Key_Foreclosures_FID_With_Did, mod_access, did_field := did, data_env := Environment);		
+		With_Property__Key_Foreclosures_FID_With_Did := DENORMALIZE(With_AccLogs_Inquiry_SSN_Records, Property__Key_Foreclosures_FID_With_Did_Suppressed,
 			LEFT.UIDAppend = RIGHT.UIDAppend, GROUP,
 			TRANSFORM(Layouts_FDC.Layout_FDC,
 					SELF.Dataset_Property__Key_Foreclosures_FID_With_Did := ROWS(RIGHT),
 					SELF := LEFT,
-					SELF := []));			
-
+					SELF := []));
 	RETURN (With_Property__Key_Foreclosures_FID_With_Did+With_Header_Addr_Hist_Records_6threp);
 	
 	END;
