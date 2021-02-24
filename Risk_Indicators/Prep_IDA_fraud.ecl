@@ -72,7 +72,8 @@ EXPORT Prep_IDA_fraud(DATASET(Risk_Indicators.layouts.layout_IDA_in) indata,
                   TRANSFORM(Risk_Indicators.layouts.layout_IDA_out,
                             SELF.Seq := LEFT.seq,
                             SELF.APP_ID := LEFT.APP_ID,
-                            SELF.Indicators := RIGHT.response.outputrecord.Indicators
+                            SELF.Indicators := RIGHT.response.outputrecord.Indicators,
+                            SELF := [] //Don't need the IDScoreResultCode fields in Fraud so blank them out.
                             ));
   
   // output(IDA_input, named('Prep_IDA_input'));

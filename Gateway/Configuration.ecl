@@ -105,6 +105,7 @@ export Configuration := module
   export IsPhoneMetadata(string40 svcName) := STD.Str.ToLowerCase(trim(svcName)) = Gateway.Constants.ServiceName.PhonesMetaData;
   export IsDeltaPersoncontext(string40 svcName) := STD.Str.ToLowerCase(trim(svcName)) = Gateway.Constants.ServiceName.delta_personcontext;
   export IsDeltaInquiryHistory(string40 svcName) := STD.Str.ToLowerCase(trim(svcName)) = Gateway.Constants.ServiceName.delta_inquiryhistory;
+  export IsKeyDecryptionInquiryHistory(string40 svcName) := STD.Str.ToLowerCase(trim(svcName)) = Gateway.Constants.ServiceName.key_decryption;
   export IsConsumerCreditReport(string40 svcName) := STD.Str.ToLowerCase(trim(svcName))=Gateway.Constants.ServiceName.ConsumerCreditReport;
   export IsBriteVerifyEmail(string40 svcName) := STD.Str.ToLowerCase(trim(svcName))=STD.Str.ToLowerCase(Gateway.Constants.ServiceName.BriteVerifyEmail);
   export IsEmailRisk(string40 svcName) := STD.Str.ToLowerCase(trim(svcName))=STD.Str.ToLowerCase(Gateway.Constants.ServiceName.EmailRisk);

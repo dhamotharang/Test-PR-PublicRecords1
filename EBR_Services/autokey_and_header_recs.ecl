@@ -1,4 +1,4 @@
-import business_header, autokeyb, doxie, dx_EBR, EBR, AutoKeyI, AutoStandardI, doxie_cbrs;
+import business_header, autokeyb, doxie, dx_common, dx_EBR, EBR, AutoKeyI, AutoStandardI, doxie_cbrs;
 
 export autokey_and_header_recs(boolean workhard = false, boolean nofail =false) :=
 Module
@@ -35,7 +35,8 @@ Module
   //***** are irrelevant, since the key has already been built (they need only be the right type
   //***** for the code to compile).
 
-  autokeyb.mac_get_payload(ak_ids,t,ds,outpl,ds.zero,ds.bdid, 'BC')
+  autokeyb.mac_get_payload(ak_ids,t,ds,outpl_pre,ds.zero,ds.bdid, 'BC');
+  outpl := dx_common.Incrementals.mac_Rollup(outpl_pre, dx_EBR.mod_delta_rid.key_autokey_payload_delta_rid);
 
   //***** RECORDs with Fake BDIDS
   shared byFakeID := project(outpl, transform(ebr.Layout_0010_Header_Base,self:=left));

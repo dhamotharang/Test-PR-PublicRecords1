@@ -42,5 +42,4 @@ EXPORT EchoService := MACRO
   OUTPUT(CHOOSEN(dx_ebr.mod_delta_rid.key_autokey_payload_delta_rid, 10), named('dx_ebr_key_autokey_payload_delta_rid'));
   OUTPUT(CHOOSEN(dx_Property.Key_Foreclosure_Delta_Rid, 10), named('dx_Property_Key_Foreclosure_Delta_Rid'));
   OUTPUT(CHOOSEN(dx_Property.Key_Normalized_Delta_Rid, 10), named('dx_Property_Key_Normalized_Delta_Rid'));
-  OUTPUT(CHOOSEN(Suppress.Key_New_Suppression, 10), named('suppress_key_new_suppression'));
 ENDMACRO;

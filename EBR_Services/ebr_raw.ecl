@@ -29,22 +29,20 @@ export ebr_raw := MODULE
 
     export by_file_number(DATASET(ebr_services.layout_file_number) fnums) :=
       FUNCTION
-        ebr_services.Layout_EBR_Search form(fnums le, ebr.Key_0010_Header_FILE_NUMBER ri) :=
+        ebr_services.Layout_EBR_Search form(ebr.Key_0010_Header_FILE_NUMBER le) :=
         TRANSFORM
           SELF.penalt := 0;
           SELF.timezone := '';
-          SELF := ri;
+          SELF := le;
           self := [];
         END;
-        p := JOIN(fnums, ebr.Key_0010_Header_FILE_NUMBER, keyed(LEFT.File_Number=RIGHT.File_Number), form(LEFT,RIGHT), KEEP(constants.maxcounts.default));
-        ut.getTimeZone(p,phone_number,timezone,p_w_tzone)
+
+        recs := dx_EBR.Get.Header_0010_By_File_Number(fnums, keep_number := ebr_services.constants.maxcounts.default);
+        p := PROJECT(recs, form(LEFT));
+        ut.getTimeZone(p,phone_number,timezone,p_w_tzone);
       RETURN p_w_tzone;
     END;
   END;
-
-
-
-
 
   export report_view := MODULE
 
@@ -96,9 +94,11 @@ export ebr_raw := MODULE
 
       ebr_services.Layout_EBR_Report get_header(fnums le) :=
       TRANSFORM
-            SELF.file_number := le.file_number;
-            SELF.Header_recs := SORT(CHOOSEN(PROJECT(ebr.Key_0010_Header_FILE_NUMBER(keyed(file_number=le.file_number)),add_header_county(LEFT)),constants.maxcounts.default),-process_date_last_seen)[1];
-            SELF :=[];
+        SELF.file_number := le.file_number;
+        ds_file_number := DATASET([{le.file_number}], {string file_number});
+        header_recs := dx_EBR.Get.Header_0010_By_File_Number(ds_file_number);
+        SELF.Header_recs := SORT(CHOOSEN(PROJECT(header_recs, add_header_county(LEFT)), ebr_services.constants.maxcounts.default), -process_date_last_seen)[1];
+        SELF :=[];
       END;
 
       ebr_services.Layout_1000_Executive_Summary_Expanded add_exec_summary(ebr.Key_1000_Executive_Summary_FILE_NUMBER le):=
@@ -125,36 +125,59 @@ export ebr_raw := MODULE
             // Show a different number of records, depending on what makes sense for that particular data
             // For trade-line type data, we only want to show the latest processed report
             m(ds,cn,os='-process_date') := macro
-                  CHOOSEN(SORT(CHOOSEN(ds((unsigned)process_date=dt),constants.maxcounts.default),sequence_number,os,RECORD),cn)
+                  CHOOSEN(SORT(CHOOSEN(ds((unsigned)process_date=dt), ebr_services.constants.maxcounts.default), sequence_number, os, RECORD), cn)
             ENDMACRO;
             m_all(ds,cn,os='-process_date') := macro
-                   CHOOSEN(SORT(CHOOSEN(ds,constants.maxcounts.default),sequence_number,os,RECORD),cn)
+                   CHOOSEN(SORT(CHOOSEN(ds, ebr_services.constants.maxcounts.default), sequence_number, os, RECORD), cn)
             ENDMACRO;
-            SELF.executive_summary_recs := m(PROJECT(ebr.Key_1000_Executive_Summary_FILE_NUMBER(keyed(file_number=le.file_number)),add_exec_summary(left)),constants.maxcounts.Executive_Summary);
-            SELF.trade_recs := m(PROJECT(ebr.Key_2000_Trade_FILE_NUMBER(keyed(file_number=le.file_number)),ebr.Layout_2000_Trade_In),constants.maxcounts.Trade,-date_reported);
-            SELF.trade_payment_total_recs := m(PROJECT(ebr.Key_2015_Trade_Payment_Totals_FILE_NUMBER(keyed(file_number=le.file_number)),ebr.Layout_2015_Trade_Payment_Totals_In),constants.maxcounts.Trade_Payment_Totals);
-            SELF.trade_payment_trend_recs := m(PROJECT(ebr.Key_2020_Trade_Payment_Trends_FILE_NUMBER(keyed(file_number=le.file_number)),ebr.Layout_2020_Trade_Payment_Trends_Base and not[global_sid,record_sid]),200,-(unsigned)(trend_yy+trend_mm));
-            SELF.trade_quarterly_average_recs := m(PROJECT(ebr.Key_2025_Trade_Quarterly_Averages_FILE_NUMBER(keyed(file_number=le.file_number)),ebr.Layout_2025_Trade_Quarterly_Averages_Base and not[global_sid,record_sid] ),constants.maxcounts.Trade_Payment_Trends,-(unsigned)(quarter_yy+quarter));
-            SELF.collateral_account_recs := m(PROJECT(ebr.Key_4500_Collateral_Accounts_FILE_NUMBER(keyed(file_number=le.file_number)),ebr.Layout_4500_Collateral_Accounts_In),constants.maxcounts.Collateral_Accounts);
-            self.bank_detail_recs := m(PROJECT(ebr.Key_5000_Bank_Details_FILE_NUMBER(keyed(file_number=le.file_number)),add_bank_details_county(LEFT)),constants.maxcounts.Bank_Details);
-            SELF.demographic_data_5600_recs := m(PROJECT(ebr.Key_5600_Demographic_Data_FILE_NUMBER(keyed(file_number=le.file_number)),
+            ds_file_number := DATASET([{le.file_number}], {string file_number});
+
+            exec_recs := dx_EBR.Get.Executive_Summary_1000_By_File_Number(ds_file_number);
+            SELF.executive_summary_recs := m(PROJECT(exec_recs, add_exec_summary(left)), ebr_services.constants.maxcounts.Executive_Summary);
+
+            trade_recs := dx_EBR.Get.Trade_2000_By_File_Number(ds_file_number);
+            SELF.trade_recs := m(PROJECT(trade_recs, ebr.Layout_2000_Trade_In),ebr_services.constants.maxcounts.Trade,-date_reported);
+
+            trade_payment_total_recs := dx_EBR.Get.Trade_Payment_Totals_2015_By_File_Number(ds_file_number);
+            SELF.trade_payment_total_recs := m(PROJECT(trade_payment_total_recs, ebr.Layout_2015_Trade_Payment_Totals_In),ebr_services.constants.maxcounts.Trade_Payment_Totals);
+
+            trade_payment_trend_recs := dx_EBR.Get.Trade_Payment_Trends_2020_By_File_Number(ds_file_number);
+            SELF.trade_payment_trend_recs := m(PROJECT(trade_payment_trend_recs,ebr.Layout_2020_Trade_Payment_Trends_Base and not[global_sid,record_sid]),200,-(unsigned)(trend_yy+trend_mm));
+
+            trade_quarterly_average_recs := dx_EBR.Get.Trade_Quarterly_Averages_2025_By_File_Number(ds_file_number);
+            SELF.trade_quarterly_average_recs := m(PROJECT(trade_quarterly_average_recs, ebr.Layout_2025_Trade_Quarterly_Averages_Base and not[global_sid,record_sid] ),ebr_services.constants.maxcounts.Trade_Payment_Trends,-(unsigned)(quarter_yy+quarter));
+
+            collateral_account_recs := dx_ebr.get.Collateral_Accounts_4500_by_File_Number(ds_file_number);
+            SELF.collateral_account_recs := m(PROJECT(collateral_account_recs, ebr.Layout_4500_Collateral_Accounts_In),ebr_services.constants.maxcounts.Collateral_Accounts);
+
+            bank_detail_recs := dx_EBR.Get.Bank_Details_5000_By_File_Number(ds_file_number);
+            SELF.bank_detail_recs := m(PROJECT(bank_detail_recs, add_bank_details_county(LEFT)),ebr_services.constants.maxcounts.Bank_Details);
+
+            demographic_data_5600_recs := dx_ebr.Get.Demographic_Data_5600_By_File_Number(ds_file_number);
+            SELF.demographic_data_5600_recs := m(PROJECT(demographic_data_5600_recs,
                                                    TRANSFORM(EBR_Services.Layouts.demographic_5600_output_rec,
                                                              SELF.SALES_ACTUAL := (STRING20)TopBusiness_Services.Functions.convert_EBR_sales(left.sales_actual),
-                                                             SELF := LEFT)),constants.maxcounts.Demographic_Data);
-           demographic_data_5610_recs_pre := PROJECT(ebr.Key_5610_Demographic_Data_FILE_NUMBER(keyed(file_number=le.file_number)),add_demographic_5610(left));
-           demographic_data_5610_recs_suppressed := suppress.MAC_SuppressSource(demographic_data_5610_recs_pre,mod_access);
-           demographic_data_5610_recs_slim := project(demographic_data_5610_recs_suppressed, ebr.Layout_5610_demographic_data_Out and not[global_sid,record_sid]);
+                                                             SELF := LEFT)),ebr_services.constants.maxcounts.Demographic_Data);
+            demographic_data_5610_recs := dx_EBR.Get.Demographic_Data_5610_By_File_Number(ds_file_number);
+            demographic_data_5610_recs_pre := PROJECT(demographic_data_5610_recs, add_demographic_5610(left));
+            demographic_data_5610_recs_suppressed := suppress.MAC_SuppressSource(demographic_data_5610_recs_pre, mod_access);
+            demographic_data_5610_recs_slim := PROJECT(demographic_data_5610_recs_suppressed, ebr.Layout_5610_demographic_data_Out and not [global_sid,record_sid]);
 
-            SELF.demographic_data_5610_recs := IF(current_demo5610,m(demographic_data_5610_recs_slim ,constants.maxcounts.Demographic_Data),
-                                                                     m_all(demographic_data_5610_recs_slim,constants.maxcounts.Demographic_Data));
-            SELF.government_trade_recs := m(PROJECT(ebr.Key_6500_Government_Trade_FILE_NUMBER(keyed(file_number=le.file_number)),ebr.Layout_6500_Government_Trade_In),constants.maxcounts.Government_Trade);
-            SELF.government_debarred_contractor_recs := m(PROJECT(ebr.Key_6510_Government_Debarred_Contractor_FILE_NUMBER(keyed(file_number=le.file_number)),add_gvt_debarred_county(LEFT)),constants.maxcounts.Government_Debarred_Contractor);
-            SELF.snp_data_recs := m(PROJECT(ebr.Key_7010_SNP_Data_FILE_NUMBER(keyed(file_number=le.file_number)),ebr.Layout_7010_SNP_Data_In),constants.maxcounts.SNP_Data);
+            SELF.demographic_data_5610_recs := IF(current_demo5610,m(demographic_data_5610_recs_slim ,ebr_services.constants.maxcounts.Demographic_Data),
+                                                                     m_all(demographic_data_5610_recs_slim,ebr_services.constants.maxcounts.Demographic_Data));
 
+            government_trade_recs := dx_EBR.Get.Government_Trade_6500_By_File_Number(ds_file_number);
+            SELF.government_trade_recs := m(PROJECT(government_trade_recs, ebr.Layout_6500_Government_Trade_In), ebr_services.constants.maxcounts.Government_Trade);
 
-            inquiry_recs := m(PROJECT(ebr.Key_6000_Inquiries_FILE_NUMBER(keyed(file_number=le.file_number)),ebr.Layout_6000_Inquiries_Base),constants.maxcounts.Inquiries, -(unsigned)(inq_yy+inq_mm+inq_count));
+            government_debarred_contractor_recs := dx_EBR.Get.Government_Debarred_Contractor_5610_By_File_Number(ds_file_number);
+            SELF.government_debarred_contractor_recs := m(PROJECT(government_debarred_contractor_recs, add_gvt_debarred_county(LEFT)),ebr_services.constants.maxcounts.Government_Debarred_Contractor);
 
-            SELF.inquiry_recs := format_inquiry_section(inquiry_recs);
+            snp_data_recs := dx_ebr.get.SNP_Data_7010_By_File_Number(ds_file_number);
+            SELF.snp_data_recs := m(PROJECT(snp_data_recs, ebr.Layout_7010_SNP_Data_In),ebr_services.constants.maxcounts.SNP_Data);
+
+            inquiry_recs_raw := dx_ebr.get.Inquiries_6000_By_File_Number(ds_file_number);
+            inquiry_recs := m(PROJECT(inquiry_recs_raw,ebr.Layout_6000_Inquiries_Base), ebr_services.constants.maxcounts.Inquiries, -(unsigned)(inq_yy+inq_mm+inq_count));
+            SELF.inquiry_recs := EBR_Services.format_inquiry_section(inquiry_recs);
 
             // public-records type data
             // An initial Choosen to protect against bad data
@@ -164,10 +187,19 @@ export ebr_raw := MODULE
             m_p(ds,cn) := macro
               CHOOSEN(SORT(dedup(CHOOSEN(ds,initial_choosen),record,except process_date,sequence_number,all),-date_filed,RECORD),cn)
             ENDMACRO;
-            SELF.bankruptcy_recs := m_p(PROJECT(ebr.Key_4010_Bankruptcy_FILE_NUMBER(keyed(file_number=le.file_number)),ebr.Layout_4010_Bankruptcy_In),constants.maxcounts.public_records);
-            SELF.tax_lien_recs := m_p(PROJECT(ebr.Key_4020_Tax_Liens_FILE_NUMBER(keyed(file_number=le.file_number)),ebr.Layout_4020_Tax_Liens_In),constants.maxcounts.public_records);
-            SELF.judgment_recs := m_p(PROJECT(ebr.Key_4030_Judgement_FILE_NUMBER(keyed(file_number=le.file_number)),ebr.Layout_4030_Judgement_In),constants.maxcounts.public_records);
-            SELF.ucc_filing_recs := m_p(PROJECT(ebr.Key_4510_UCC_Filings_FILE_NUMBER(keyed(file_number=le.file_number)),ebr.Layout_4510_UCC_Filings_In),constants.maxcounts.public_records);
+
+            bankruptcy_recs := dx_EBR.Get.Bankruptcy_4010_By_File_Number(ds_file_number);
+            SELF.bankruptcy_recs := m_p(PROJECT(bankruptcy_recs, ebr.Layout_4010_Bankruptcy_In),ebr_services.constants.maxcounts.public_records);
+
+            tax_lien_recs := dx_EBR.Get.Tax_Liens_4020_By_File_Number(ds_file_number);
+            SELF.tax_lien_recs := m_p(PROJECT(tax_lien_recs, ebr.Layout_4020_Tax_Liens_In),ebr_services.constants.maxcounts.public_records);
+
+            judgment_recs := dx_EBR.Get.Judgement_4030_By_File_Number(ds_file_number);
+            SELF.judgment_recs := m_p(PROJECT(judgment_recs, ebr.Layout_4030_Judgement_In),ebr_services.constants.maxcounts.public_records);
+
+            ucc_filing_recs := dx_ebr.get.UCC_Filings_4510_By_File_Number(ds_file_number);
+            SELF.ucc_filing_recs := m_p(PROJECT(ucc_filing_recs, ebr.Layout_4510_UCC_Filings_In),ebr_services.constants.maxcounts.public_records);
+
         END;
 
         p := PROJECT(p1, form(LEFT));
@@ -182,20 +214,17 @@ export ebr_raw := MODULE
       rpt_recs := report_view.by_file_number(fnums,false);
 
       // Capture all previous header records
-      ebr_services.Layout_EBR_Source add_historcial_header(ebr_services.Layout_EBR_Report l) :=	TRANSFORM
+      ebr_services.Layout_EBR_Source add_historical_header(ebr_services.Layout_EBR_Report l) :=	TRANSFORM
             SELF.curr_header_rec := l.header_recs;
-            SELF.historical_header_recs := SORT(
-                                              CHOOSEN(
-                                                  PROJECT(ebr.Key_0010_Header_FILE_NUMBER(keyed(file_number=l.file_number),record_type != 'C'),
-                                                              TRANSFORM(ebr_services.Layout_0010_Header_Base_Expanded,
-                                                                        SELF := LEFT,SELF:=[])),
-                                                  ebr_services.constants.maxcounts.Historical_Header),
-                                              -process_date_last_seen);
+            ds_file_number := DATASET([{l.file_number}], {string file_number});
+            historical_header_recs := dx_EBR.get.Header_0010_By_File_Number(ds_file_number, excluded_record_types := ['C']);
+            SELF.historical_header_recs := SORT(CHOOSEN(PROJECT(historical_header_recs, TRANSFORM(ebr_services.Layout_0010_Header_Base_Expanded, SELF := LEFT,SELF:=[])),
+              ebr_services.constants.maxcounts.Historical_Header),-process_date_last_seen);
             SELF := l;
             SELF :=[];
       END;
 
-      src_recs := PROJECT(rpt_recs,add_historcial_header(LEFT));
+      src_recs := PROJECT(rpt_recs,add_historical_header(LEFT));
       RETURN src_recs;
     END;
   END; /* source view */

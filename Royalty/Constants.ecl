@@ -223,15 +223,8 @@ export Constants := module
 
   export set of string2 LastResortRoyalty := [MDR.sourceTools.src_wired_Assets_Royalty];
 
-  export WORKPLACE_ROYALTY_SET := [
-    // MDR.sourceTools.src_One_Click_Data,
-    // As of 03/04/2020 (estd.), One Click Data is no longer a royalty
-    MDR.sourceTools.src_Teletrack,
-    MDR.sourceTools.src_SalesChannel,
-    MDR.sourceTools.src_Thrive_LT,
-    MDR.sourceTools.src_Thrive_PD,
-    MDR.sourceTools.src_Netwise
-    ];
+  base_workplace_tab := Codes.Key_Codes_V3(keyed(file_name = 'WPL_SOURCES'), keyed(field_name = 'ROYALTY'));
+  export WORKPLACE_ROYALTY_SET := set(base_workplace_tab, code);
 
   // Email Royalties: Ensure that removed providers are absent from FCRA/non-FCRA queries
   base_email_tab := Codes.Key_Codes_V3(keyed(file_name = 'EMAIL_SOURCES'), keyed(field_name = 'ROYALTY'));

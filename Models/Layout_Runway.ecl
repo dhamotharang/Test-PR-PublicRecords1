@@ -91,20 +91,17 @@ string2 BD5605_2_0_reason2 := '';
 string2 BD5605_2_0_reason3 := '';
 string2 BD5605_2_0_reason4 := '';
 
-
 String3 BD5605_3_0_score := '';
 string2 BD5605_3_0_reason1 := '';
 string2 BD5605_3_0_reason2 := '';
 string2 BD5605_3_0_reason3 := '';
 string2 BD5605_3_0_reason4 := '';
 
-
 String3 BD9605_0_0_score := '';
 string2 BD9605_0_0_reason1 := '';
 string2 BD9605_0_0_reason2 := '';
 string2 BD9605_0_0_reason3 := '';
 string2 BD9605_0_0_reason4 := '';
-
 
 String3 BD9605_1_0_score := '';
 string2 BD9605_1_0_reason1 := '';
@@ -194,13 +191,11 @@ string2 CDN604_2_0_reason2 := '';
 string2 CDN604_2_0_reason3 := '';
 string2 CDN604_2_0_reason4 := '';
 
-
 String3 CDN604_3_0_score := '';
 string2 CDN604_3_0_reason1 := '';
 string2 CDN604_3_0_reason2 := '';
 string2 CDN604_3_0_reason3 := '';
 string2 CDN604_3_0_reason4 := '';
-
 
 String3 CDN604_4_0_score := '';
 string2 CDN604_4_0_reason1 := '';
@@ -208,20 +203,17 @@ string2 CDN604_4_0_reason2 := '';
 string2 CDN604_4_0_reason3 := '';
 string2 CDN604_4_0_reason4 := '';
 
-
 String3 CDN605_1_0_score := '';
 string2 CDN605_1_0_reason1 := '';
 string2 CDN605_1_0_reason2 := '';
 string2 CDN605_1_0_reason3 := '';
 string2 CDN605_1_0_reason4 := '';
 
-
 String3 CDN606_2_0_score := '';
 string2 CDN606_2_0_reason1 := '';
 string2 CDN606_2_0_reason2 := '';
 string2 CDN606_2_0_reason3 := '';
 string2 CDN606_2_0_reason4 := '';
-
 
 String3 CDN706_1_0_score := '';
 string2 CDN706_1_0_bt_reason1 := '';
@@ -233,7 +225,6 @@ string2 CDN706_1_0_st_reason1 := '';
 string2 CDN706_1_0_st_reason2 := '';
 string2 CDN706_1_0_st_reason3 := '';
 string2 CDN706_1_0_st_reason4 := '';
-
  
 String3 CDN707_1_0_score := '';
 string2 CDN707_1_0_reason1 := '';
@@ -241,13 +232,11 @@ string2 CDN707_1_0_reason2 := '';
 string2 CDN707_1_0_reason3 := '';
 string2 CDN707_1_0_reason4 := '';
 
-
 String3 CDN712_0_0_score := '';
 string2 CDN712_0_0_reason1 := '';
 string2 CDN712_0_0_reason2 := '';
 string2 CDN712_0_0_reason3 := '';
 string2 CDN712_0_0_reason4 := '';
-
 
 String3 CDN806_1_0_score := '';
 string2 CDN806_1_0_reason1 := '';
@@ -261,7 +250,6 @@ string2 CDN908_1_0_reason2 := '';
 string2 CDN908_1_0_reason3 := '';
 string2 CDN908_1_0_reason4 := '';
 
-
 String3 CEN509_0_0_score := '';
 
 String3 CSN1007_0_0_score := '';
@@ -272,13 +260,11 @@ string2 FD3510_0_0_reason2 := '';
 string2 FD3510_0_0_reason3 := '';
 string2 FD3510_0_0_reason4 := '';
 
-
 String3 FD3606_0_0_score := '';
 string2 FD3606_0_0_reason1 := '';
 string2 FD3606_0_0_reason2 := '';
 string2 FD3606_0_0_reason3 := '';
 string2 FD3606_0_0_reason4 := '';
-
 
 String3 FD5510_0_0_score := '';
 string2 FD5510_0_0_reason1 := '';
@@ -298,13 +284,11 @@ string2 FD5603_2_0_reason2 := '';
 string2 FD5603_2_0_reason3 := '';
 string2 FD5603_2_0_reason4 := '';
 
-
 String3 FD5603_3_0_score := '';
 string2 FD5603_3_0_reason1 := '';
 string2 FD5603_3_0_reason2 := '';
 string2 FD5603_3_0_reason3 := '';
 string2 FD5603_3_0_reason4 := '';
-
 
 String3 FD5607_1_0_score := '';
 string2 FD5607_1_0_reason1 := '';
@@ -312,20 +296,17 @@ string2 FD5607_1_0_reason2 := '';
 string2 FD5607_1_0_reason3 := '';
 string2 FD5607_1_0_reason4 := '';
 
-
 String3 FD5609_1_0_score := '';
 string2 FD5609_1_0_reason1 := '';
 string2 FD5609_1_0_reason2 := '';
 string2 FD5609_1_0_reason3 := '';
 string2 FD5609_1_0_reason4 := '';
 
-
 String3 FD5609_2_0_score := '';
 string2 FD5609_2_0_reason1 := '';
 string2 FD5609_2_0_reason2 := '';
 string2 FD5609_2_0_reason3 := '';
 string2 FD5609_2_0_reason4 := '';
-
 
 String3 FD5709_1_0_score := '';
 string2 FD5709_1_0_reason1 := '';
@@ -363,13 +344,11 @@ string2 FD9603_4_0_reason2 := '';
 string2 FD9603_4_0_reason3 := '';
 string2 FD9603_4_0_reason4 := '';
 
-
 String3 FD9604_1_0_score := '';
 string2 FD9604_1_0_reason1 := '';
 string2 FD9604_1_0_reason2 := '';
 string2 FD9604_1_0_reason3 := '';
 string2 FD9604_1_0_reason4 := '';
-
 
 String3 FD9606_0_0_score := '';
 string2 FD9606_0_0_reason1 := '';
@@ -382,7 +361,6 @@ string2 FD9607_1_0_reason1 := '';
 string2 FD9607_1_0_reason2 := '';
 string2 FD9607_1_0_reason3 := '';
 string2 FD9607_1_0_reason4 := '';
-
 
 String3 FP1109_0_0_score := '';
 string2 FP1109_0_0_reason1 := '';
@@ -532,7 +510,6 @@ string3 FP1508_1_0_reason4 := '';
 string3 FP1508_1_0_reason5 := '';
 string3 FP1508_1_0_reason6 := '';
 
-
 String3 FP1606_1_0_score := '';
 string2 FP1606_1_0_reason1 := '';
 string2 FP1606_1_0_reason2 := '';
@@ -565,7 +542,6 @@ string2 FP1801_1_0_reason4 := '';
 string2 FP1801_1_0_reason5 := '';
 string2 FP1801_1_0_reason6 := '';
 
-
 String3 FP1610_2_0_score := '';
 string2 FP1610_2_0_reason1 := '';
 string2 FP1610_2_0_reason2 := '';
@@ -589,7 +565,6 @@ string2 FP1702_2_0_reason3 := '';
 string2 FP1702_2_0_reason4 := '';
 string2 FP1702_2_0_reason5 := '';
 string2 FP1702_2_0_reason6 := '';
-
 
 String3 FP1702_1_0_score := '';
 string2 FP1702_1_0_reason1 := '';
@@ -633,7 +608,6 @@ string2 FP1704_1_0_reason3 := '';
 string2 FP1704_1_0_reason4 := '';
 string2 FP1704_1_0_reason5 := '';
 string2 FP1704_1_0_reason6 := '';
-
 
 
 String3 FP1705_1_0_score := '';
@@ -766,20 +740,17 @@ string2 FP3710_0_0_reason2 := '';
 string2 FP3710_0_0_reason3 := '';
 string2 FP3710_0_0_reason4 := '';
 
-
 String3 FP3904_1_0_score := '';
 string2 FP3904_1_0_reason1 := '';
 string2 FP3904_1_0_reason2 := '';
 string2 FP3904_1_0_reason3 := '';
 string2 FP3904_1_0_reason4 := '';
 
-
 String3 FP3905_1_0_score := '';
 string2 FP3905_1_0_reason1 := '';
 string2 FP3905_1_0_reason2 := '';
 string2 FP3905_1_0_reason3 := '';
 string2 FP3905_1_0_reason4 := '';
-
 
 String3 FP5812_1_0_score := '';
 string2 FP5812_1_0_reason1 := '';
@@ -903,13 +874,11 @@ string2 RVA1007_1_0_reason2 := '';
 string2 RVA1007_1_0_reason3 := '';
 string2 RVA1007_1_0_reason4 := '';
 
-
 String3 RVA1007_2_0_score := '';
 string2 RVA1007_2_0_reason1 := '';
 string2 RVA1007_2_0_reason2 := '';
 string2 RVA1007_2_0_reason3 := '';
 string2 RVA1007_2_0_reason4 := '';
-
 
 String3 RVA1007_3_0_score := '';
 string2 RVA1007_3_0_reason1 := '';
@@ -917,13 +886,11 @@ string2 RVA1007_3_0_reason2 := '';
 string2 RVA1007_3_0_reason3 := '';
 string2 RVA1007_3_0_reason4 := '';
 
-
 String3 RVA1008_1_0_score := '';
 string2 RVA1008_1_0_reason1 := '';
 string2 RVA1008_1_0_reason2 := '';
 string2 RVA1008_1_0_reason3 := '';
 string2 RVA1008_1_0_reason4 := '';
-
 
 String3 RVA1008_2_0_score := '';
 string2 RVA1008_2_0_reason1 := '';
@@ -1087,6 +1054,13 @@ string3 RVA1811_1_0_reason2 := '';
 string3 RVA1811_1_0_reason3 := '';
 string3 RVA1811_1_0_reason4 := '';
 
+String3 RVA2008_1_0_score := '';
+string2 RVA2008_1_0_reason1 := '';
+string2 RVA2008_1_0_reason2 := '';
+string2 RVA2008_1_0_reason3 := '';
+string2 RVA2008_1_0_reason4 := '';
+string2 RVA2008_1_0_reason5 := '';
+
 String3 RVB1003_0_0_score := '';
 string2 RVB1003_0_0_reason1 := '';
 string2 RVB1003_0_0_reason2 := '';
@@ -1225,20 +1199,17 @@ string2 RVC1602_1_0_reason2 := '';
 string2 RVC1602_1_0_reason3 := '';
 string2 RVC1602_1_0_reason4 := '';
 
-
 String3 RVC1609_1_0_score := '';
 string2 RVC1609_1_0_reason1 := '';
 string2 RVC1609_1_0_reason2 := '';
 string2 RVC1609_1_0_reason3 := '';
 string2 RVC1609_1_0_reason4 := '';
 
-
 String3 RVC1703_1_0_score := '';
 string2 RVC1703_1_0_reason1 := '';
 string2 RVC1703_1_0_reason2 := '';
 string2 RVC1703_1_0_reason3 := '';
 string2 RVC1703_1_0_reason4 := '';
-
 
 String3 RVC1801_1_0_score := '';
 string2 RVC1801_1_0_reason1 := '';
@@ -1270,13 +1241,11 @@ string2 RVD1010_1_0_reason2 := '';
 string2 RVD1010_1_0_reason3 := '';
 string2 RVD1010_1_0_reason4 := '';
 
-
 String3 RVD1010_2_0_score := '';
 string2 RVD1010_2_0_reason1 := '';
 string2 RVD1010_2_0_reason2 := '';
 string2 RVD1010_2_0_reason3 := '';
 string2 RVD1010_2_0_reason4 := '';
-
 
 String3 RVD1110_1_0_score := '';
 string2 RVD1110_1_0_reason1 := '';
@@ -1305,13 +1274,11 @@ string2 RVG1003_0_0_reason2 := '';
 string2 RVG1003_0_0_reason3 := '';
 string2 RVG1003_0_0_reason4 := '';
 
-
 String3 RVG1103_0_0_score := '';
 string2 RVG1103_0_0_reason1 := '';
 string2 RVG1103_0_0_reason2 := '';
 string2 RVG1103_0_0_reason3 := '';
 string2 RVG1103_0_0_reason4 := '';
-
 
 String3 RVG1106_1_0_score := '';
 string2 RVG1106_1_0_reason1 := '';
@@ -1546,7 +1513,6 @@ string2 RVR803_1_0_reason2 := '';
 string2 RVR803_1_0_reason3 := '';
 string2 RVR803_1_0_reason4 := '';
 
-
 String3 RVS811_0_0_score := '';
 string2 RVS811_0_0_reason1 := '';
 string2 RVS811_0_0_reason2 := '';
@@ -1558,7 +1524,6 @@ string3 RVS1706_0_reason1 := '';
 string3 RVS1706_0_reason2 := '';
 string3 RVS1706_0_reason3 := '';
 string3 RVS1706_0_reason4 := '';
-
 
 String3 RVT1003_0_0_score := '';
 string2 RVT1003_0_0_reason1 := '';
@@ -1620,7 +1585,6 @@ string3 RVT1601_1_0_reason2 := '';
 string3 RVT1601_1_0_reason3 := '';
 string3 RVT1601_1_0_reason4 := '';
 
-
 String3 RVT711_1_0_score := '';
 string2 RVT711_1_0_reason1 := '';
 string2 RVT711_1_0_reason2 := '';
@@ -1660,19 +1624,31 @@ string2 RVT1705_1_0_reason3 := '';
 string2 RVT1705_1_0_reason4 := '';
 string2 RVT1705_1_0_reason5 := '';
 
+String3 RVT2004_1_0_score := '';
+string2 RVT2004_1_0_reason1 := '';
+string2 RVT2004_1_0_reason2 := '';
+string2 RVT2004_1_0_reason3 := '';
+string2 RVT2004_1_0_reason4 := '';
+string2 RVT2004_1_0_reason5 := '';
+
+String3 RVT2004_2_0_score := '';
+string2 RVT2004_2_0_reason1 := '';
+string2 RVT2004_2_0_reason2 := '';
+string2 RVT2004_2_0_reason3 := '';
+string2 RVT2004_2_0_reason4 := '';
+string2 RVT2004_2_0_reason5 := '';
+
 String3 TBN509_0_0_score := '';
 string2 TBN509_0_0_reason1 := '';
 string2 TBN509_0_0_reason2 := '';
 string2 TBN509_0_0_reason3 := '';
 string2 TBN509_0_0_reason4 := '';
 
-
 String3 TBN604_1_0_score := '';
 string2 TBN604_1_0_reason1 := '';
 string2 TBN604_1_0_reason2 := '';
 string2 TBN604_1_0_reason3 := '';
 string2 TBN604_1_0_reason4 := '';
-
 
 Unsigned3 WIN704_0_0_score := 0;
 

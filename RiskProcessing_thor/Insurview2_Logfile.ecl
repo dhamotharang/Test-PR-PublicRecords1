@@ -3,12 +3,12 @@
 EXPORT Insurview2_Logfile(BuildPeriod, inputFileName, OutputFileName, historyDate, 
 													inputFileCount, outputFileCount, errorCount) := FUNCTIONMACRO
 
-		STRING LogFile_Logical_Name		:= '~thor::base::ar::' + workunit + '::InsurView20RetroAttributes::auditlog';
+		STRING LogFile_Logical_Name		:= '~thor::base::ar::' + workunit + '::InsurView20Attributes::auditlog';
 			
 		LogDS := DATASET([{
 											(unsigned4)BuildPeriod,
 											inputFileName,
-											OutputFileName + workunit,
+											OutputFileName,
 											historyDate,
 											inputFileCount,
 											outputFileCount,		

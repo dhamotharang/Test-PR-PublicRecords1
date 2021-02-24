@@ -1,5 +1,6 @@
-IMPORT Data_Services;
-d := file_IntlIID_GG2(DatasetName!='Table_name');
+﻿IMPORT Data_Services, Seed_Files;
+
+d := Seed_Files.file_IntlIID_GG2(DatasetName!='Table_name');
 
 newRec := RECORD,MAXLENGTH(10000)
 	DATA16 hashvalue := Hash_IntlIID(d.hashFirstName,d.hashLastName,d.hashNationalID,d.hashPostalCode,d.hashTelephone);

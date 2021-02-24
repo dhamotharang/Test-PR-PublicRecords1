@@ -285,7 +285,7 @@ WriteOutputFile := IF(outputFormat = 'csv', OUTPUT(sort(all_results_transformed,
 												 OUTPUT(sort(all_results_transformed, acctno),, '~' + OutputFileName, thor));	
 
 
-STRING LogFile_Superfile_Name	:= '~thor::base::ar::prod::InsurView20RetroAttributes::auditlog';
+STRING LogFile_Superfile_Name	:= '~thor::base::ar::prod::InsurView20Attributes::auditlog';
 CreateSF := IF(~STD.File.FileExists (LogFile_Superfile_Name),STD.File.CreateSuperFile (LogFile_Superfile_Name));
 
 RETURN SEQUENTIAL(WriteOutputFile, CreateSF, RiskProcessing_thor.Insurview2_Logfile(BuildPeriod, inputFileName, OutputFileName, historyDate, COUNT(BatchIn), COUNT(all_results_transformed), COUNT(all_results_transformed(errorcode <> ''))));

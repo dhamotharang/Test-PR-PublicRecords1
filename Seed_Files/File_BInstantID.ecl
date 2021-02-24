@@ -1,1 +1,2 @@
-export File_BInstantID := dataset('~thor_data400::base::testseed_binstantid',seed_files.Layout_Bus_InstantID,csv(maxlength(15000), quote('"')) );
+﻿IMPORT Seed_Files;
+EXPORT File_BInstantID := DATASET('~thor_data400::base::testseed_binstantid',Seed_Files.Layout_Bus_InstantID,CSV(MAXLENGTH(15000), QUOTE('"'),HEADING(1)) );

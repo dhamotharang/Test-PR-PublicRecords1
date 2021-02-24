@@ -26,30 +26,30 @@ EXPORT bucket(string logical_group = 'roxiedev') := MODULE
   EXPORT add(DATASET($.layouts.testcase) test_cases, string in_suite = 'standard') := FUNCTION
 
     file := $.names(logical_group);
-    available_test_cases := DATASET(file.current, $.layouts.testcase, THOR);
-    n_available_test_cases := COUNT(available_test_cases);
+    sub_file := file.nextsubfile : INDEPENDENT; 
 
-    subfile_count := STD.File.GetSuperFileSubCount(file.current) : INDEPENDENT;
-    sub_fname := file.subfile(subfile_count);
+    available_test_cases := DATASET(file.current, $.layouts.testcase, THOR);
+    max_tid_in_use := MAX(available_test_cases, tid) : INDEPENDENT;
     
-    test_cases_ready := project(test_cases, transform($.layouts.testcase, 
-      SELF.tid := n_available_test_cases + COUNTER;
-      _suite := if(left.suite <> '', left.suite, in_suite);
+    test_cases_ready := PROJECT(test_cases, TRANSFORM($.layouts.testcase, 
+      SELF.tid := max_tid_in_use + COUNTER;
+      _suite := if(LEFT.suite <> '', LEFT.suite, in_suite);
       SELF.suite := STD.STR.ToLowerCase(_suite); 
-      SELF.query := STD.STR.ToLowerCase(left.query); 
-      SELF.request_xml := $.utils.wrapXML(left.request_xml); // xml MUST be surrounded by <Row></Row> or else fromxml will fail
+      SELF.query := STD.STR.ToLowerCase(LEFT.query); 
+      SELF.request_xml := $.utils.wrapXML(LEFT.request_xml); // xml MUST be surrounded by <Row></Row> or else fromxml will fail
       SELF.created_by := STD.System.Job.User();
       SELF.wuid := STD.System.Job.WUID();
       SELF := LEFT;
     ));
-
-    IF(~STD.File.FileExists(file.current), FAIL('ERROR: cannot add test cases. Bucket does not exist.'));
+    
+    IF(~STD.File.FileExists(file.current), FAIL('ERROR: Cannot add test cases. Bucket does not exist.'));
     RETURN SEQUENTIAL(
-      STD.File.StartSuperFileTransaction();
-      output(test_cases_ready,, sub_fname, OVERWRITE);
-      STD.File.AddSuperFile(file.current, sub_fname);    
-      STD.File.FinishSuperFileTransaction();
-      output('New test file added: ' + sub_fname);
+      STD.File.StartSuperFileTransaction(),
+      IF(STD.File.FileExists(sub_file), FAIL('ERROR: Cannot overwrite existing file.')), 
+      OUTPUT(test_cases_ready,, sub_file, OVERWRITE),
+      STD.File.AddSuperFile(file.current, sub_file),   
+      STD.File.FinishSuperFileTransaction(),
+      OUTPUT('New test file created successfully.')
     );
   END;
 
