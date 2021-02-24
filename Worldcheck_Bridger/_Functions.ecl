@@ -1404,6 +1404,10 @@
 				trim(kword, left, right) = 'SECO-DUSMG' =>SubGroup_Constants.numKeywordsID.KEYWORD_SECO_DUSMG,
 				trim(kword, left, right) = 'PLUODO' =>SubGroup_Constants.numKeywordsID.KEYWORD_PLUODO,
 				trim(kword, left, right) = 'OFAC-BM-EO' =>SubGroup_Constants.numKeywordsID.KEYWORD_OFAC_BM_EO,
+				trim(kword, left, right) = 'OFAC-PEESA' =>SubGroup_Constants.numKeywordsID.KEYWORD_OFAC_PEESA,
+				trim(kword, left, right) = 'KWCMA' =>SubGroup_Constants.numKeywordsID.KEYWORD_KWCMA,
+				trim(kword, left, right) = 'KWBK' =>SubGroup_Constants.numKeywordsID.KEYWORD_KWBK,
+				trim(kword, left, right) = 'OFAC-BM-EO14014' =>SubGroup_Constants.numKeywordsID.KEYWORD_OFAC_BM_EO14014,
 								
 				//When setting the keyword export use underscores for dashes (ex: For RBI-SANC, use RBI_SANC)	
 				
