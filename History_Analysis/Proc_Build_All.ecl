@@ -25,7 +25,7 @@ Export Proc_Build_All( string pVersion, string datasetname, string location, str
 
 
     ///////////////////////////////////////// The Despraying Process Begins ///////////////////////////////////////////////////////////////
-    destinationIP := _control.IPAddress.bctlpedata10;
+    destinationIP := _control.IPAddress.bctlpedata12;
 
     DeltaUpdateQA := History_Analysis.Filenames(pVersion).BaseDeltasQA;
 
@@ -33,7 +33,7 @@ Export Proc_Build_All( string pVersion, string datasetname, string location, str
 
     DeltasStats := History_Analysis.Filenames(pVersion).BaseStatistics;
     
-    destdirectory := '/data/Builds/builds/DataInsight_Dashboard/data/';
+    destdirectory := '/data/Builds/builds/Prod_History_Dashboard/data';
 
     desprayDeltaUpdateQA := STD.File.DeSpray(DeltaUpdateQA, destinationIP, destdirectory+'DeltaBase-UpdateQA.csv', allowoverwrite := true );
 
@@ -41,7 +41,7 @@ Export Proc_Build_All( string pVersion, string datasetname, string location, str
 
     desprayDeltaStats := STD.File.DeSpray(DeltasStats, destinationIP, destdirectory+'Deltas.csv', allowoverwrite := true );
 
-    path := 'Desprayed to the server bctlpedata10 in path: '+destdirectory+' (Dataland)';
+    path := 'Desprayed to the server bctlpedata12 in path: '+destdirectory+' (Production)';
 
     buildAll := ordered(update_source,
                                     writeDeltasQA,
