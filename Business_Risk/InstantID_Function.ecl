@@ -1952,20 +1952,17 @@ selected_bdid_with_county_name := join(selected_bdid, Census_Data.Key_Fips2Count
 // we could allow more than 1 record per vendor and add some logic to pick the one we want
 // for now, just use a keep(1) to avoid the need for rolling up sic codes
 
-// TODO: Update with a new append method to avoid extra joins.
-pre_with_ebr := dx_EBR.Get.Header_0010_By_Bdid(
+pre_with_ebr := dx_EBR.Append.Header_0010_By_Bdid(
   selected_bdid_with_county_name,
   keep_number := 1,
   atmost_number := riskwise.max_atmost,
-  excluded_sics := ['']);
+  excluded_sics := [''],
+  is_left_outer := TRUE);
 
-with_ebr := JOIN(selected_bdid_with_county_name, pre_with_ebr,
-  LEFT.bdid = RIGHT.bdid,
-  TRANSFORM(working_layout,
-    SELF.sic_code := RIGHT.sic_code,
-    SELF.business_description := RIGHT.business_desc,
-    SELF := LEFT),
-    LEFT OUTER, KEEP(1));
+with_ebr := PROJECT(pre_with_ebr, TRANSFORM(working_layout,
+  SELF.sic_code := LEFT.ebr_data.sic_code,
+  SELF.business_description := LEFT.ebr_data.business_desc,
+  SELF := LEFT));
 
 with_dca := join(with_ebr,
       DCA.Key_DCA_BDID,

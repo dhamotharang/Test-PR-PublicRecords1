@@ -1,4 +1,4 @@
-import iesp, risk_indicators;
+﻿import iesp, Gateway;
 
 EXPORT SoapCall_InsuranceNAP(dataset(iesp.phoneheaderscore.t_PhoneHeaderScoreRequest) df, 
 														 Gateway.Layouts.Config gateway_cfg,														 
@@ -10,7 +10,7 @@ EXPORT SoapCall_InsuranceNAP(dataset(iesp.phoneheaderscore.t_PhoneHeaderScoreReq
 
 	iesp.phoneheaderscore.t_PhoneHeaderScoreRequest into_input(iesp.phoneheaderscore.t_PhoneHeaderScoreRequest le) := TRANSFORM
 		SELF.seq := le.seq;
-		// SELF.User.ReferenceCode := gateway_cfg.TransactionId;
+		SELF.User.ReferenceCode := gateway_cfg.TransactionId;
 		SELF.Options.Blind := Gateway.Configuration.GetBlindOption(gateway_cfg);
 		SELF := le;
 		SELF := [];

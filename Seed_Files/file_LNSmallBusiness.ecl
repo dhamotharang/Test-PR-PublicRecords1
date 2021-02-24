@@ -1,2 +1,2 @@
-import LNSmallBusiness, ut;
-export file_LNSmallBusiness := dataset('~thor_data400::base::testseed_LNSmallBusiness', LNSmallBusiness.Layouts.Testseeds, csv);
+﻿IMPORT Data_Services,LNSmallBusiness;
+EXPORT file_LNSmallBusiness := DATASET(Data_Services.Data_location.Prefix('NONAMEGIVEN')+'~thor_data400::base::testseed_LNSmallBusiness', LNSmallBusiness.Layouts.Testseeds, CSV(HEADING(1)));

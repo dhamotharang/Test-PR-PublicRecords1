@@ -1,3 +1,3 @@
-import Foreclosure_Vacancy, ut;
+﻿IMPORT Data_Services,Foreclosure_Vacancy, Seed_Files;
 
-export file_FOVInteractive := dataset('~thor_data400::base::testseed_FOVInteractive', Foreclosure_Vacancy.layouts.Final_Interactive_seed, csv(heading(1), separator(',')) );
+EXPORT file_FOVInteractive := DATASET('~thor_data400::base::testseed_FOV_Interactive', Foreclosure_Vacancy.layouts.Final_Interactive_seed, CSV(HEADING(1), SEPARATOR(',')) );

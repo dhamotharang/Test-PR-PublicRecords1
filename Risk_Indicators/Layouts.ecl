@@ -1496,6 +1496,12 @@ END;
 EXPORT layout_IDA_out := RECORD
   Unsigned4 seq;
   String App_ID;
+  String3 IDScoreResultCode1;
+  String3 IDScoreResultCode2;
+  String3 IDScoreResultCode3;
+  String3 IDScoreResultCode4;
+  String3 IDScoreResultCode5;
+  String3 IDScoreResultCode6;
   dataset(iesp.ida_report_response.t_IDAAttribute) Indicators {xpath('Indicators/Attribute'), MAXCOUNT(1)};
 END;
 

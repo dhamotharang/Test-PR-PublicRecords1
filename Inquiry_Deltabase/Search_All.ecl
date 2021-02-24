@@ -7,9 +7,11 @@ EXPORT Inquiry_Deltabase.Layouts.Inquiry_All Search_All (DATASET(Inquiry_Deltaba
 																																INTEGER gatewayRetries = 0):= FUNCTION
 	
 	SelectLimit := TRIM(SQLSelectLimit, ALL);
+	deltabase_cfg := gateways(servicename = Gateway.Constants.ServiceName.DeltaInquiry)[1];
 
 	// Generate the Deltabase SELECT statement
 	Inquiry_Deltabase.Layouts.Deltabase_Input generateSelects(Inquiry_Deltabase.Layouts.Input_Deltabase_All le) := TRANSFORM
+		self.transactionID := deltabase_cfg.transactionid;
     //Address
     Zip5 := TRIM(le.Zip5, ALL);
 		Prim_Name := STD.str.ToUpperCase(TRIM(le.Prim_Name, LEFT, RIGHT));
@@ -184,13 +186,14 @@ EXPORT Inquiry_Deltabase.Layouts.Inquiry_All Search_All (DATASET(Inquiry_Deltaba
 		SELF.Search_Info.Product_Code := le.Product_Code;
 		SELF.Search_Info.Function_Description := le.Function_Description;
 		
+		self.mbs.company_id := le.company_id;
 		SELF.Seq := (INTEGER)le.Seq;
 		SELF := le;
 		SELF := [];
 	END;
   
 	DeltabaseResults := PROJECT(DeltabaseResponse.Response, intoKeyLayout(LEFT));
-	// OUTPUT(SelectStatements);
-	// OUTPUT(DeltabaseResponse);
-	RETURN(DeltabaseResults);
+	
+	return DeltabaseResults;
+	
 END;
