@@ -40,7 +40,8 @@ EXPORT MAS_FCRA_Service() := MACRO
 		'IncludeMinors',
 		'IntendedPurpose',
 		'AllowedSourcesDataset',
-		'ExcludeSourcesDataset'
+		'ExcludeSourcesDataset',
+		'AllowInferredPerformance'
 
   ));
 
@@ -61,6 +62,7 @@ EXPORT MAS_FCRA_Service() := MACRO
 	
 	BOOLEAN Retain_Input_Lexid := FALSE : STORED('RetainInputLexid');//keep what we have on input
 	BOOLEAN Append_PII := FALSE : STORED('AppendPII');//keep what we have on input
+	BOOLEAN Allow_Inferred_Performance := FALSE : STORED('AllowInferredPerformance');//keep what we have on input
 		
 	// Nulling out stored variables to not propagate to Attributes.kel
 	#CONSTANT('NetAcuityURL', ''); 
@@ -166,6 +168,7 @@ EXPORT MAS_FCRA_Service() := MACRO
 		EXPORT BOOLEAN IncludeUCC := TRUE;
 		EXPORT BOOLEAN IncludeMini := TRUE;
 		EXPORT BOOLEAN IncludeOverrides := TRUE;
+		EXPORT BOOLEAN IncludeInferredPerformance := Allow_Inferred_Performance;
 
 
 	END;

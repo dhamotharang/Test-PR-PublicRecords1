@@ -309,6 +309,20 @@ EXPORT LayoutAppendedAddresses := RECORD
 		STRING3 InsPhoneSrc;
 	END;
 
+	SHARED LayoutInferredAttributesInternal := RECORD
+		STRING10 P_InpClnArchDtF6M;
+		STRING10 P_InpClnArchDtF1Y;
+		STRING10 P_InpClnArchDtF2Y;
+		integer3 PL_DrgCrimFelCnt1YF1Y;
+		integer3 PL_DrgLienCnt1YF1Y;
+		integer3 PL_DrgBkCnt1YF1Y;
+		integer3 PL_DrgLTD1YF1Y;
+	END;
+	EXPORT LayoutInferredAttributes := RECORD
+		INTEGER G_ProcUID;
+		LayoutInferredAttributesInternal;
+	END;
+
 	SHARED LayoutAddrSummaryInternal := RECORD
 		STRING100 PI_SrcWInpFLAListEv;
 		STRING300 PI_SrcWInpFLAEmrgDtListEv;
@@ -2044,6 +2058,7 @@ EXPORT LayoutAppendedAddresses := RECORD
 		LayoutSSNSumInternal;
 		LayoutPhoneSumInternal;
 		LayoutAddrSummaryInternal;
+		LayoutInferredAttributesInternal;
 		STRING65 B_InpAcct;
 		INTEGER G_ProcBusUID;
 		LayoutInputBIIInternal - B_InpAcct;

@@ -36,6 +36,7 @@ EXPORT FnRoxie_GetAttrs(DATASET(PublicRecords_KEL.ECL_Functions.Input_Layout) In
 	ALLSummaryAttributesNonFCRA := PublicRecords_KEL.FnRoxie_GetSummaryAttributes(InputChooser, Options, FDCDataset);
 	ALLSummaryAttributes := IF(NOT Options.IsFCRA, ALLSummaryAttributesNonFCRA, DATASET([], PublicRecords_KEL.ECL_Functions.Layouts.LayoutALLSumAttributes));
 	
+	InferredPerformanceAttributes := IF(Options.IsFCRA, PublicRecords_KEL.FnRoxie_GetInferredPerformanceAttributes(MiniAttributes(IsInputRec = TRUE), Options, FDCDataset), DATASET([], PublicRecords_KEL.ECL_Functions.Layouts.LayoutInferredAttributes));
 	withPersonAttributes := JOIN(InputPIIAttributes, PersonAttributes, LEFT.G_ProcUID = RIGHT.G_ProcUID,
 		TRANSFORM(PublicRecords_KEL.ECL_Functions.Layouts.LayoutMaster,
 			SELF := RIGHT,
@@ -45,16 +46,23 @@ EXPORT FnRoxie_GetAttrs(DATASET(PublicRecords_KEL.ECL_Functions.Input_Layout) In
 
 	withPersonALLSummaryAttributes := JOIN(withPersonAttributes, ALLSummaryAttributes, LEFT.G_ProcUID = RIGHT.G_ProcUID,
 		TRANSFORM(PublicRecords_KEL.ECL_Functions.Layouts.LayoutMaster,
+			SELF.G_ProcUID := LEFT.G_procUID, //If right is empty this ensures that G_ProcUID is not blank
+			SELF := RIGHT,
+			SELF := LEFT,
+			SELF := []),
+		LEFT OUTER, KEEP(1), ATMOST(100));
+	withInferredPerformanceAttributes := JOIN(withPersonALLSummaryAttributes, InferredPerformanceAttributes, LEFT.G_ProcUID = RIGHT.G_ProcUID,
+		TRANSFORM(PublicRecords_KEL.ECL_Functions.Layouts.LayoutMaster,
+			SELF.G_ProcUID := LEFT.G_procUID,//If right is empty this ensures that G_ProcUID is not blank
 			SELF := RIGHT,
 			SELF := LEFT,
 			SELF := []),
 		LEFT OUTER, KEEP(1), ATMOST(100));	
 		
-
 	
 	FinalResultWithPullID := PublicRecords_KEL.FnRoxie_GetPullIDOverrides(pullidlexids, Options);
 
-	FinalResultWithBuildDates  := PublicRecords_KEL.FnRoxie_GetBuildDates(withPersonALLSummaryAttributes, Options);
+	FinalResultWithBuildDates  := PublicRecords_KEL.FnRoxie_GetBuildDates(IF(Options.IsFCRA,withInferredPerformanceAttributes,withPersonALLSummaryAttributes), Options);
 
 	MasterResults := SORT((FinalResultWithPullID+FinalResultWithBuildDates ), G_ProcUID);
 						
