@@ -1,4 +1,4 @@
-IMPORT Data_Services, ut,doxie, iesp, Seed_Files, BusinessInstantID20_Services;
+﻿IMPORT Data_Services, Seed_Files;
  
 EXPORT BIID20_files := MODULE
 	SHARED max15k := 15000;
@@ -13,27 +13,27 @@ EXPORT BIID20_files := MODULE
 //===           Layout section 1 part1              ===
 //==========================================================	
 	
-	export BIID2testseedspart1 := dataset('~thor_data400::base::testseed_part1_biid_v2', 
+	EXPORT BIID2testseedspart1 := DATASET(Data_Services.Data_location.Prefix('NONAMEGIVEN')+'~thor_data400::base::testseed_part1_biid_v2', 
         Seed_Files.Layouts_TestseedsBIID2.BIID20Testseedslayout1, 
-				CSV (heading(1), separator(','), QUOTE('"'), maxlength (max15k)));
+				CSV (HEADING(1), SEPARATOR(','), QUOTE('"'), MAXLENGTH (max15k)));
 
 
 //==========================================================
 //===        Layout section 2 part2              ===
 //==========================================================	
 	
-	export BIID2testseedspart2 := dataset('~thor_data400::base::testseed_part2_biid_v2', 
+	EXPORT BIID2testseedspart2 := DATASET(Data_Services.Data_location.Prefix('NONAMEGIVEN')+'~thor_data400::base::testseed_part2_biid_v2', 
         Seed_Files.Layouts_TestseedsBIID2.BIID20Testseedslayout2, 
-				CSV (heading(1), separator(','), QUOTE('"'), maxlength (max25k)));
+				CSV (HEADING(1), SEPARATOR(','), QUOTE('"'), MAXLENGTH (max25k)));
 
 
 //==========================================================
 //===            Layout section 3 part3              ===
 //==========================================================	
 	
-	export BIID2testseedspart3 := dataset('~thor_data400::base::testseed_part3_biid_v2', 
+	EXPORT BIID2testseedspart3 := DATASET(Data_Services.Data_location.Prefix('NONAMEGIVEN')+'~thor_data400::base::testseed_part3_biid_v2', 
         Seed_Files.Layouts_TestseedsBIID2.BIID20Testseedslayout3, 
-				CSV (heading(1), separator(','), QUOTE('"'), maxlength (max15k)));	
+				CSV (HEADING(1), SEPARATOR(','), QUOTE('"'), MAXLENGTH (max15k)));	
 	
 	
 END;

@@ -1,2 +1,2 @@
-IMPORT IESP;
-export file_boca_shell := dataset('~thor_data400::base::testseed_boca_shell', Layout_Boca_Shell, csv(maxlength(65536),heading(1)));
+IMPORT Data_Services,Seed_Files;
+EXPORT file_boca_shell := dataset(Data_Services.Data_location.Prefix('NONAMEGIVEN')+'~thor_data400::base::testseed_boca_shell', Layout_Boca_Shell, CSV(MAXLENGTH(65536),HEADING(1)));

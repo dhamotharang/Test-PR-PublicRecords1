@@ -310,26 +310,48 @@ Do_Attribute_Models := 	Auto_model_name in Riskview.Constants.attrv5_models or
           Custom4_model_name in Riskview.Constants.attrv5_models or
           Custom5_model_name in Riskview.Constants.attrv5_models;
 
-LN_IDA_input := UNGROUP(PROJECT(clam, TRANSFORM(Risk_Indicators.layouts.layout_IDA_in, 
-                                      SELF.CompanyID := companyID,
-                                      SELF.ESPTransactionID := TransactionID,
-                                      SELF.App_ID := IDA_AppID,
-                                      //Make sure to remove DOB zero filling as IDA gateway doesn't expect it
-                                        tempdob_year := LEFT.shell_input.dob[1..4];
-                                        tempdob_month := LEFT.shell_input.dob[5..6];
-                                        tempdob_day := LEFT.shell_input.dob[7..8];
-                                      SELF.DOB := IF(tempdob_year = '0000', '', tempdob_year) +
-                                                  IF(tempdob_month = '00', '', tempdob_month) +
-                                                  IF(tempdob_day = '00', '', tempdob_day);
-                                      SELF := LEFT.shell_input,
-                                      
-                                      // TODO:  when innovis attributes are ready, we can join to watchdog file to send in best fields here
-                                      // self.best_ssn := 's';
-                                      // self.best_dob := 'd';
-                                      // self.best_address := 'a';
-                                      // self.best_zip := 'z';
-                                      // self.best_phone := 'p';
-                                      SELF := [];)));
+
+Risk_Indicators.layouts.layout_IDA_in into_IDA(RiskView.Layouts.layout_riskview_input le, risk_indicators.Layout_Boca_Shell ri) := TRANSFORM   
+  
+  SELF.CompanyID := companyID,
+  SELF.ESPTransactionID := TransactionID,
+  SELF.App_ID := IDA_AppID,
+  
+  SELF.seq := le.seq;
+  SELF.DID := ri.did; // grab the did from the bocashell 
+
+  SELF.fname := le.Name_First ;
+  SELF.mname := le.Name_Middle ;
+  SELF.lname := le.Name_Last ;
+  SELF.suffix := le.Name_Suffix ;
+  SELF.in_streetAddress := le.street_addr ;
+  SELF.in_city := le.p_City_name ;
+  SELF.in_state := le.St ;
+  SELF.in_zipCode := le.Z5 ;
+  SELF.ssn := le.SSN ;
+  SELF.DOB := le.DOB;
+  SELF.dl_number := le.DL_Number ;
+  SELF.dl_state := le.DL_State ;
+  SELF.email_address := le.Email ;
+  SELF.ip_address := le.ip_addr ;
+  SELF.phone10 := le.Home_Phone ;
+  SELF.wphone10 := le.Work_Phone ;
+  SELF.historyDateTimeStamp := le.HistoryDateTimeStamp ;
+
+  // TODO:  when innovis attributes are ready, we can join to watchdog file to send in best fields here
+  // self.best_ssn := 's';
+  // self.best_dob := 'd';
+  // self.best_address := 'a';
+  // self.best_zip := 'z';
+  // self.best_phone := 'p';
+  SELF := [];
+END;
+
+
+LN_IDA_input := JOIN(riskview_input, clam,
+                     LEFT.seq = RIGHT.seq,
+                     into_IDA(LEFT, RIGHT),
+                     LEFT OUTER);
 
 IDA_call := Risk_Indicators.Prep_IDA_Credit(LN_IDA_input,
                                             gateways,
@@ -341,12 +363,18 @@ IDA_call := Risk_Indicators.Prep_IDA_Credit(LN_IDA_input,
 //Don't call the gateway unless a valid IDA model is being called...
 IDA_results := IF(Do_IDA, IDA_call, DATASET([],iesp.ida_report_response.t_IDAReportResponseEx));
 
-//We only need the attributes/Indicators for models, so slim it down
+//We only need the attributes/Indicators for models, and IDScore fields for alerts, so slim it down
 IDASlim := JOIN(LN_IDA_input, IDA_results,
                 (STRING)LEFT.App_ID = RIGHT.response.outputrecord.AppID, //Using AppID as unique Identifier
                 TRANSFORM(Risk_Indicators.layouts.layout_IDA_out,
                           SELF.Seq := LEFT.seq,
                           SELF.APP_ID := RIGHT.response.outputrecord.AppID,
+                          SELF.IDScoreResultCode1 := RIGHT.response.outputrecord.IDScoreResultCode1;
+                          SELF.IDScoreResultCode2 := RIGHT.response.outputrecord.IDScoreResultCode2;
+                          SELF.IDScoreResultCode3 := RIGHT.response.outputrecord.IDScoreResultCode3;
+                          SELF.IDScoreResultCode4 := RIGHT.response.outputrecord.IDScoreResultCode4;
+                          SELF.IDScoreResultCode5 := RIGHT.response.outputrecord.IDScoreResultCode5;
+                          SELF.IDScoreResultCode6 := RIGHT.response.outputrecord.IDScoreResultCode6;
                           SELF.Indicators := RIGHT.response.outputrecord.Indicators
                           ),
                 LEFT OUTER, ATMOST(RiskWise.max_atmost));
@@ -692,118 +720,135 @@ riskview5_score_search_results := JOIN(riskview5_score_custom4_results, custom5_
 		SELF.Custom5_reason5 := if(valid_custom5 AND NOT isPreScreenPurpose AND RIGHT.RI[5].HRI <> '00', RIGHT.RI[5].HRI, '');
 		SELF := LEFT), LEFT OUTER, KEEP(1), ATMOST(100));
 
-riskview.layouts.layout_riskview5_search_results apply_score_alert_filters(riskview.layouts.layout_riskview5_search_results le, clam rt) := transform
-	SELF.LexID := IF(rt.DID = 0, '', (STRING)rt.DID); // Return the LexID found for our input subject, if zero return blank
+
+alert_layout := RECORD
+  riskview.layouts.layout_riskview5_search_results;
+  STRING3 IDScoreResultCode1;
+  STRING3 IDScoreResultCode2;
+  STRING3 IDScoreResultCode3;
+  STRING3 IDScoreResultCode4;
+  STRING3 IDScoreResultCode5;
+  STRING3 IDScoreResultCode6;
+END;
+
+riskview.layouts.layout_riskview5_search_results apply_score_alert_filters(alert_layout le, Risk_Indicators.Layout_Boca_Shell rt) := TRANSFORM
+  SELF.LexID := IF(rt.DID = 0, '', (STRING)rt.DID); // Return the LexID found for our input subject, if zero return blank
 
 // ====================================================
 // 							Alerts
 // ====================================================
 
-	//security freeze, return alert code 100A
-	boolean hasSecurityFreeze := rt.consumerFlags.security_freeze;
-	
-	//security fraud alert, return alert code 100B
-	boolean hasSecurityFraudAlert := rt.consumerFlags.security_alert;
+  //security freeze, return alert code 100A
+  BOOLEAN hasSecurityFreeze := rt.consumerFlags.security_freeze;
 
-	//consumer statement alert, return alert code 100C
-	boolean hasConsumerStatement := rt.consumerFlags.consumer_statement_flag;
+  //security fraud alert, return alert code 100B
+  BOOLEAN hasSecurityFraudAlert := rt.consumerFlags.security_alert;
 
-	//California or Rhodes Island state exceptions, return alert code 100D
-	boolean isCaliforniaException := isCalifornia_in_person and 
-																	STD.Str.ToUpperCase(intended_purpose) = 'APPLICATION' and
-																	((integer)(boolean)rt.iid.combo_firstcount+(integer)(boolean)rt.iid.combo_lastcount
-																	+(integer)(boolean)rt.iid.combo_addrcount+(integer)(boolean)rt.iid.combo_hphonecount
-																	+(integer)(boolean)rt.iid.combo_ssncount+(integer)(boolean)rt.iid.combo_dobcount) < 3;
-	boolean isRhodeIslandException := rt.rhode_island_insufficient_verification;
-	boolean isStateException := (isCaliforniaException or isRhodeIslandException) OR 
-															// Also fail California In-Person Retail and Rhode Island Verification minimum input requirements for LexID Only input
-															(isCalifornia_in_person AND LexIDOnlyOnInput) OR 
-															(rt.shell_input.in_state = 'RI' AND LexIDOnlyOnInput);
-	
-	// Regulatory Condition 100E, too young for prescreening
-	ageDate := Risk_Indicators.iid_constants.myGetDate(rt.historydate);
-	BestReportedAge := ut.Age(rt.reported_dob, (unsigned)ageDate);
-	boolean tooYoungForPrescreen :=  isPreScreenPurpose and BestReportedAge between 1 and 20;
-	
-	// Regulatory Condition 100F, on the FCRA Prescreen OptOut File
-	boolean PrescreenOptOut :=  isPreScreenPurpose and risk_indicators.iid_constants.CheckFlag( risk_indicators.iid_constants.IIDFlag.IsPreScreen, rt.iid.iid_flags );
+  //consumer statement alert, return alert code 100C
+  BOOLEAN hasConsumerStatement := rt.consumerFlags.consumer_statement_flag;
+
+  //California or Rhodes Island state exceptions, return alert code 100D
+  BOOLEAN isCaliforniaException := IF(Do_IDA, 
+                                      isCalifornia_in_person AND le.IDScoreResultCode2 = '001',
+                                      isCalifornia_in_person) AND
+                                   STD.Str.ToUpperCase(intended_purpose) = 'APPLICATION' AND
+                                   ((INTEGER)(BOOLEAN)rt.iid.combo_firstcount+(INTEGER)(BOOLEAN)rt.iid.combo_lastcount
+                                   +(INTEGER)(BOOLEAN)rt.iid.combo_addrcount+(INTEGER)(BOOLEAN)rt.iid.combo_hphonecount
+                                   +(INTEGER)(BOOLEAN)rt.iid.combo_ssncount+(INTEGER)(BOOLEAN)rt.iid.combo_dobcount) < 3;
   
-	boolean hasLegalHold :=  rt.consumerflags.legal_hold_alert;  
-	boolean hasIdentityFraudAlert := rt.consumerflags.id_theft_flag  ;
-	  
+  BOOLEAN isRhodeIslandException := rt.rhode_island_insufficient_verification;
+  BOOLEAN isStateException := (isCaliforniaException OR isRhodeIslandException) OR 
+                               // Also fail California In-Person Retail and Rhode Island Verification minimum input requirements for LexID Only input
+                               (isCalifornia_in_person AND LexIDOnlyOnInput) OR 
+                               (rt.shell_input.in_state = 'RI' AND LexIDOnlyOnInput);
 
-	hasScore (STRING score) := le.Auto_score = score OR le.Bankcard_score = score OR le.Short_term_lending_Score = score OR le.Telecommunications_score = score OR le.Crossindustry_score = score OR le.Custom_score = score OR le.Custom2_score = score or le.Custom3_score = score or le.Custom4_score = score or le.Custom5_score = score;
+  // Regulatory Condition 100E, too young for prescreening
+  ageDate := Risk_Indicators.iid_constants.myGetDate(rt.historydate);
+  BestReportedAge := ut.Age(rt.reported_dob, (UNSIGNED)ageDate);
+  BOOLEAN tooYoungForPrescreen :=  isPreScreenPurpose AND BestReportedAge BETWEEN 1 AND 20;
+
+  BOOLEAN is_IDA_PrescreenOptOut := Do_IDA AND le.IDScoreResultCode3 = '001';
+
+  // Regulatory Condition 100F, on the FCRA Prescreen OptOut File or received OptOut indicator from IDA
+  BOOLEAN PrescreenOptOut := isPreScreenPurpose AND (is_IDA_PrescreenOptOut OR
+                             risk_indicators.iid_constants.CheckFlag( risk_indicators.iid_constants.IIDFlag.IsPreScreen, rt.iid.iid_flags ));
+
+  BOOLEAN hasLegalHold :=  rt.consumerflags.legal_hold_alert;  
+  BOOLEAN hasIdentityFraudAlert := rt.consumerflags.id_theft_flag  ;
+
+  hasScore (STRING score) := le.Auto_score = score OR le.Bankcard_score = score OR le.Short_term_lending_Score = score OR le.Telecommunications_score = score OR le.Crossindustry_score = score OR
+                             le.Custom_score = score OR le.Custom2_score = score OR le.Custom3_score = score OR le.Custom4_score = score OR le.Custom5_score = score;
 	
-	// instead of just using the le.SubjectDeceased, also calculate it here because sometimes attributes are not requested, and then the alert doesn't get triggered.
-	attr := models.Attributes_Master(rt, true);
-boolean Alerts200 := (le.SubjectDeceased='1' or attr.SubjectDeceased = '1') or (le.SSNDeceased='1' or attr.SSNDeceased='1') or hasScore('200');//checking iid.decsflag (ssa ssn), iid.diddeceased (ssa lexid) and header source DE and Score of 200
-	models_temp := model_info(Model_Name = 'RVC1602_1')[1];
-	temp2 := (string)models_temp.Output_Model_Name;
-	deceased_exception_models := [temp2]; //models that are not to have the new deceased logic per seth							
-	boolean has200Score := Alerts200 or hasScore('200') ;  //Alerts still need to be set for exception models
-	boolean has222Score := hasScore('222');
-	
-  boolean chapter7bankruptcy := '7' in set(rt.bk_chapters, chapter) AND (NOT isPreScreenPurpose and NOT isLnJRunningAlone);	
-	boolean chapter9bankruptcy := '9' in set(rt.bk_chapters, chapter) AND (NOT isPreScreenPurpose and NOT isLnJRunningAlone);
-	boolean chapter11bankruptcy := '11' in set(rt.bk_chapters, chapter) AND (NOT isPreScreenPurpose and NOT isLnJRunningAlone);
-	boolean chapter12bankruptcy := '12' in set(rt.bk_chapters, chapter) AND (NOT isPreScreenPurpose and NOT isLnJRunningAlone);	
-	boolean chapter13bankruptcy := '13' in set(rt.bk_chapters, chapter) AND (NOT isPreScreenPurpose and NOT isLnJRunningAlone);
-	boolean chapter15bankruptcy := (  '15' in set(rt.bk_chapters, chapter) or 
-                                   '304' in set(rt.bk_chapters, chapter)  ) AND (NOT isPreScreenPurpose and NOT isLnJRunningAlone);
-	
-	hasBankruptcyAlert := chapter7bankruptcy or chapter9bankruptcy or chapter11bankruptcy or chapter12bankruptcy or chapter13bankruptcy or chapter15bankruptcy;
-		
-	ds_alerts_temp1 := dataset([
-		{if(hasSecurityFreeze and isCollectionsPurpose, '100A', '')},  // only include securityFreeze alert in this dataset if the purpose is collections
-    {if(hasSecurityFraudAlert, '100B', '')},
-		{if(hasConsumerStatement, '100C', '')},
-		{if(hasIdentityFraudAlert, '100G', '')},
-		{if(has200Score, '200A', '')},
-		{if(chapter7bankruptcy, '300A', '')},
-		{if(chapter9bankruptcy, '300B', '')},
-		{if(chapter11bankruptcy, '300C', '')},
-		{if(chapter12bankruptcy, '300D', '')},
-		{if(chapter13bankruptcy, '300E', '')},
-		{if(chapter15bankruptcy, '300F', '')}
-	], {string4 alert_code})(alert_code<>'');
-	
-	// when confirmationSubjectFound = 0, the only alert to come back should be the 222A.  all other alert conditions are ignored
-	// when state exeption, just return a 100D and no other alerts
-	ds_alert_subject_not_found := dataset([{'222A'}],{string4 alert_code});
-  ds_alert_SecurityFreeze := dataset([{'100A'}],{string4 alert_code});  // comes back by itself if purpose is not collections
-  ds_alert_Security_Fraud := dataset([{'100B'}],{string4 alert_code});  
-	ds_alert_consumer_statement := dataset([{'100C'}],{string4 alert_code});
-	ds_alert_state_exception := dataset([{'100D'}],{string4 alert_code});
-	ds_alert_tooYoungForPrescreen := dataset([{'100E'}],{string4 alert_code});
-	ds_alert_PrescreenOptOut := dataset([{'100F'}],{string4 alert_code});
-  ds_alert_Legal_Hold := dataset([{'100H'}],{string4 alert_code}); 
- 			
-	ds_alerts_temp := map(isStateException 																=> ds_alert_state_exception,  // because the state exceptions are also coming through as 222, Brad wants to put this first in map so allert of 100D
+  // instead of just using the le.SubjectDeceased, also calculate it here because sometimes attributes are not requested, and then the alert doesn't get triggered.
+  attr := models.Attributes_Master(rt, TRUE);
+  BOOLEAN Alerts200 := (le.SubjectDeceased='1' OR attr.SubjectDeceased = '1') OR (le.SSNDeceased='1' or attr.SSNDeceased='1') OR hasScore('200');//checking iid.decsflag (ssa ssn), iid.diddeceased (ssa lexid) and header source DE and Score of 200
+  models_temp := model_info(Model_Name = 'RVC1602_1')[1];
+  temp2 := (STRING)models_temp.Output_Model_Name;
+  deceased_exception_models := [temp2]; //models that are not to have the new deceased logic per seth							
+  BOOLEAN has200Score := Alerts200 OR hasScore('200') ;  //Alerts still need to be set for exception models
+  BOOLEAN has222Score := hasScore('222');
+
+  BOOLEAN chapter7bankruptcy  :=  '7' IN SET(rt.bk_chapters, chapter) AND (NOT isPreScreenPurpose AND NOT isLnJRunningAlone);	
+  BOOLEAN chapter9bankruptcy  :=  '9' IN SET(rt.bk_chapters, chapter) AND (NOT isPreScreenPurpose AND NOT isLnJRunningAlone);
+  BOOLEAN chapter11bankruptcy := '11' IN SET(rt.bk_chapters, chapter) AND (NOT isPreScreenPurpose AND NOT isLnJRunningAlone);
+  BOOLEAN chapter12bankruptcy := '12' IN SET(rt.bk_chapters, chapter) AND (NOT isPreScreenPurpose AND NOT isLnJRunningAlone);	
+  BOOLEAN chapter13bankruptcy := '13' IN SET(rt.bk_chapters, chapter) AND (NOT isPreScreenPurpose AND NOT isLnJRunningAlone);
+  BOOLEAN chapter15bankruptcy := (  '15' IN SET(rt.bk_chapters, chapter) OR 
+                                   '304' IN SET(rt.bk_chapters, chapter)  ) AND (NOT isPreScreenPurpose and NOT isLnJRunningAlone);
+
+  hasBankruptcyAlert := chapter7bankruptcy OR chapter9bankruptcy OR chapter11bankruptcy OR chapter12bankruptcy OR chapter13bankruptcy OR chapter15bankruptcy;
+
+  ds_alerts_temp1 := DATASET([
+    {IF(hasSecurityFreeze AND isCollectionsPurpose, '100A', '')},  // only include securityFreeze alert in this dataset if the purpose is collections
+    {IF(hasSecurityFraudAlert, '100B', '')},
+    {IF(hasConsumerStatement, '100C', '')},
+    {IF(hasIdentityFraudAlert, '100G', '')},
+    {IF(has200Score, '200A', '')},
+    {IF(chapter7bankruptcy, '300A', '')},
+    {IF(chapter9bankruptcy, '300B', '')},
+    {IF(chapter11bankruptcy, '300C', '')},
+    {IF(chapter12bankruptcy, '300D', '')},
+    {IF(chapter13bankruptcy, '300E', '')},
+    {IF(chapter15bankruptcy, '300F', '')}
+  ], {STRING4 alert_code})(alert_code<>'');
+
+  // when confirmationSubjectFound = 0, the only alert to come back should be the 222A.  all other alert conditions are ignored
+  // when state exeption, just return a 100D and no other alerts
+  ds_alert_subject_not_found    := DATASET([{'222A'}],{STRING4 alert_code});
+  ds_alert_SecurityFreeze       := DATASET([{'100A'}],{STRING4 alert_code});  // comes back by itself if purpose is not collections
+  ds_alert_Security_Fraud       := DATASET([{'100B'}],{STRING4 alert_code});  
+  ds_alert_consumer_statement   := DATASET([{'100C'}],{STRING4 alert_code});
+  ds_alert_state_exception      := DATASET([{'100D'}],{STRING4 alert_code});
+  ds_alert_tooYoungForPrescreen := DATASET([{'100E'}],{STRING4 alert_code});
+  ds_alert_PrescreenOptOut      := DATASET([{'100F'}],{STRING4 alert_code});
+  ds_alert_Legal_Hold           := DATASET([{'100H'}],{STRING4 alert_code}); 
+
+  ds_alerts_temp := MAP(isStateException 																=> ds_alert_state_exception,  // because the state exceptions are also coming through as 222, Brad wants to put this first in map so alert of 100D
                         TooYoungForPrescreen														=> ds_alert_tooYoungForPrescreen,
                         PrescreenOptOut																	=> ds_alert_PrescreenOptOut,
                         hasLegalHold 	                                  => ds_alert_legal_hold, 
                         hasSecurityFreeze and ~isCollectionsPurpose			=> ds_alert_SecurityFreeze,
                         hasSecurityFraudAlert                           => ds_alert_security_fraud,
                         le.ConfirmationSubjectFound='0' or has222score 	=> ds_alert_subject_not_found,
-																																					 ds_alerts_temp1);
-	
-	// Only 100B, 100C, 200A, 222A alert codes allow for valid RiskView Scores to return, if it's the others override the score to a 100.  100A allows for a score to return if this is a collections purpose.
-	score_override_alert_returned := UT.Exists2(ds_alerts_temp (alert_code IN ['100D', '100E', '100F', '100H'])) OR (UT.Exists2(ds_alerts_temp (alert_code = '100A')) AND ~isCollectionsPurpose);
-	
-	// If the score is being overridden to a 100, don't return a 200 or 222 score alert code.
-	ds_alerts := IF(score_override_alert_returned, ds_alerts_temp (alert_code NOT IN ['200A', '222A']), ds_alerts_temp);
-	ReportSuppressAlerts := (UT.Exists2(ds_alerts (alert_code = '222A')) or UT.Exists2(ds_alerts (alert_code = '200A')));
-	
-	self.alert1 := ds_alerts[1].alert_code;
-	self.alert2 := ds_alerts[2].alert_code;
-	self.alert3 := ds_alerts[3].alert_code;
-	self.alert4 := ds_alerts[4].alert_code;
-	self.alert5 := ds_alerts[5].alert_code;
-	self.alert6 := ds_alerts[6].alert_code;
-	self.alert7 := ds_alerts[7].alert_code;
-	self.alert8 := ds_alerts[8].alert_code;
-	self.alert9 := ds_alerts[9].alert_code;
-	self.alert10 := ds_alerts[10].alert_code;
+                                                                           ds_alerts_temp1);
+
+  // Only 100B, 100C, 200A, 222A alert codes allow for valid RiskView Scores to return, if it's the others override the score to a 100.  100A allows for a score to return if this is a collections purpose.
+  score_override_alert_returned := UT.Exists2(ds_alerts_temp (alert_code IN ['100D', '100E', '100F', '100H'])) OR (UT.Exists2(ds_alerts_temp (alert_code = '100A')) AND ~isCollectionsPurpose);
+
+  // If the score is being overridden to a 100, don't return a 200 or 222 score alert code.
+  ds_alerts := IF(score_override_alert_returned, ds_alerts_temp (alert_code NOT IN ['200A', '222A']), ds_alerts_temp);
+  ReportSuppressAlerts := (UT.Exists2(ds_alerts (alert_code = '222A')) OR UT.Exists2(ds_alerts (alert_code = '200A')));
+
+  SELF.alert1 := ds_alerts[1].alert_code;
+  SELF.alert2 := ds_alerts[2].alert_code;
+  SELF.alert3 := ds_alerts[3].alert_code;
+  SELF.alert4 := ds_alerts[4].alert_code;
+  SELF.alert5 := ds_alerts[5].alert_code;
+  SELF.alert6 := ds_alerts[6].alert_code;
+  SELF.alert7 := ds_alerts[7].alert_code;
+  SELF.alert8 := ds_alerts[8].alert_code;
+  SELF.alert9 := ds_alerts[9].alert_code;
+  SELF.alert10 := ds_alerts[10].alert_code;
 	
 // ===========================================================================
 // Now, set the fields based on all the rules in the Riskview 5 requirements
@@ -1346,8 +1391,21 @@ end;
 riskview5_search_results_tmp := join(riskview5_score_search_results, Report_output, left.seq = right.seq, 
 		doReport(left, right),
 		 left outer);
-		 
-riskview5_search_results := join(riskview5_search_results_tmp, clam, 
+
+//Join the search results to the IDA results so that we have it all available for alert logic.
+rv5_search_plus_IDA := JOIN(riskview5_search_results_tmp, IDASlim, 
+                            LEFT.seq = RIGHT.seq,
+                            TRANSFORM(alert_layout,
+                                      SELF.IDScoreResultCode1 := RIGHT.IDScoreResultCode1,
+                                      SELF.IDScoreResultCode2 := RIGHT.IDScoreResultCode2,
+                                      SELF.IDScoreResultCode3 := RIGHT.IDScoreResultCode3,
+                                      SELF.IDScoreResultCode4 := RIGHT.IDScoreResultCode4,
+                                      SELF.IDScoreResultCode5 := RIGHT.IDScoreResultCode5,
+                                      SELF.IDScoreResultCode6 := RIGHT.IDScoreResultCode6,
+                                      SELF := LEFT),
+                            LEFT OUTER);
+
+riskview5_search_results := join(rv5_search_plus_IDA, clam, 
 		left.seq=right.seq, apply_score_alert_filters(left, right));
 
 //Military Lending Act - new as of September 2016 
@@ -1459,7 +1517,7 @@ riskview5_with_status_refresh := MAP( InvokeStatusRefresh => riskview_status_ref
 // OUTPUT(riskview5_score_short_term_lending_results, NAMED('riskview5_score_short_term_lending_results'));
 // OUTPUT(riskview5_score_telecommunications_results, NAMED('riskview5_score_telecommunications_results'));
 // OUTPUT(riskview5_score_Crossindustry_results, NAMED('riskview5_score_Crossindustry_results'));
-// OUTPUT(riskview5_score_search_results, NAMED('riskview5_score_search_results'));
+// OUTPUT(riskview5_search_results_tmp, NAMED('riskview5_search_results_tmp'));
 // output(intended_purpose, named('intended_purpose'));
 // output(AttributesVersionRequest, named('AttributesVersionRequest'));
 // output(prescreen_score_threshold, named('prescreen_score_threshold'));

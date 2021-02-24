@@ -134,7 +134,7 @@ export Plus_SearchService() := macro
                                              Max_Results);
 
   // Create the royalty count/info ("RoyaltySet") output dataset.
-  Royalty.MAC_RoyaltyWorkplace(CHOOSEN(ds_WPL_recs, Max_Results), ds_royalty_recs, SourceCode);
+  ds_royalty_recs := Royalty.RoyaltyWorkplace.GetRoyaltySet(CHOOSEN(ds_WPL_recs, Max_Results), SourceCode);
 
   // Debugs.
   // OUTPUT( ds_PAW_recs, NAMED('ds_PAW_recs') );
