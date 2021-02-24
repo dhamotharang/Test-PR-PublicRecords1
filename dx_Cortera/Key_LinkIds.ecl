@@ -1,5 +1,9 @@
 ﻿IMPORT $, BIPV2, doxie;
 
+// ---------------------------------------------------------------
+// For delta rollup logic use: $.Key_Delta_Rid_Hdr
+// ---------------------------------------------------------------
+
 EXPORT Key_LinkIds := MODULE
 
 	// DEFINE THE LinkIds INDEX

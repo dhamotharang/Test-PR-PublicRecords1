@@ -1,5 +1,9 @@
 ﻿IMPORT $, _control, doxie, data_services;
 
+// ---------------------------------------------------------------
+// For delta rollup logic use: $.Key_Delta_Rid_Executive
+// ---------------------------------------------------------------
+
 #IF(_control.environment.onThor and ~_control.Environment.onVault)
   InFile := $.Layouts.Layout_ExecLinkID;
 #ELSE
