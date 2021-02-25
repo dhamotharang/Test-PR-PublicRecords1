@@ -103,6 +103,8 @@
 			EXPORT INTEGER MaxPhoneCount:= MPD.MaxPhoneCount;
 			EXPORT BOOLEAN ReturnScore:= MPD.ReturnScore;
 			EXPORT BOOLEAN StrictAPSX:= MPD.StrictAPSX;
+			EXPORT BOOLEAN UsePremiumSource_A := MPD.UsePremiumSource_A;
+      		EXPORT INTEGER PremiumSource_A_limit := MPD.PremiumSource_A_limit;
 		end;
 
 		// **************************************************************************************
@@ -212,7 +214,7 @@
 				EXPORT UNSIGNED2 MaxNumParent:= MPD.MaxNumParent : STORED('MaxNumParent');
 				EXPORT UNSIGNED2 MaxNumSpouse:= MPD.MaxNumSpouse : STORED('MaxNumSpouse');
 				EXPORT UNSIGNED2 MaxNumSubject:= MPD.MaxNumSubject : STORED('MaxNumSubject');
-				EXPORT INTEGER MaxPhoneCount:= MPD.MaxPhoneCount : STORED('MaxPhoneCount');
+//				EXPORT INTEGER MaxPhoneCount:= MPD.MaxPhoneCount : STORED('MaxPhoneCount');
 				EXPORT BOOLEAN ReturnScore:= MPD.ReturnScore : STORED('ReturnScore');
 				EXPORT BOOLEAN StrictAPSX:= MPD.StrictAPSX : STORED('StrictAPSXMatch');
 				Export BOOLEAN KeepUndeliverableEmail := MPD.KeepUndeliverableEmail: STORED('KeepUndeliverableEmail');

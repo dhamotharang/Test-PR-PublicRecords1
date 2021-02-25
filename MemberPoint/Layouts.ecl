@@ -844,6 +844,11 @@ END;
 		
 	end;
 
+	EXPORT ProgressivePhoneRec := RECORD
+		dataset(progressive_phone.layout_progressive_phone_common) Records;
+		dataset(Royalty.Layouts.RoyaltyForBatch) Royalties;	
+	END;
+
 	EXPORT PhoneFinderOutPhone:= RECORD
 		STRING20 acctno;
 		UNSIGNED6 did;
