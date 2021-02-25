@@ -90,7 +90,7 @@ EXPORT PrepForYogurt(string location, string environment, string last_wuid = '')
 																				or regexfind('10.241.50.45',files,nocase)
 																				or regexfind('thor_data400::in::seq',files,nocase)
 																				or regexfind('^file::.*$',files,nocase)
-																				or regexfind('^scrub.*$',files,nocase)
+																				or regexfind('scrub',files,nocase)
 																				)) ,files),record);
 
 		fullset := record

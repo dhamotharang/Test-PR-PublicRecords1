@@ -256,6 +256,7 @@ export ArchiveFiles(string location, string environment, integer noofpartitions 
 		Layout_DeleteFiles := record
 			//string superfile;
 			string deletepattern;
+			integer files_to_keep;
 			dataset(files_layout) filematches;
 		end;
 		
@@ -264,10 +265,13 @@ export ArchiveFiles(string location, string environment, integer noofpartitions 
 			/*counttocompare := if (count(thorbackup.SetDeleteFileCount(trim(superfile,left,right)=trim(l.name,left,right))) > 0, // check if the superfile exists in the threshold setup list
 														thorbackup.constants.yogurt(l.name).no_of_files_to_keep, // if yes get the filecnt to keep from list
 															thorbackup.constants.yogurt().no_of_files_to_keep);*/
-												
+			no_of_files_to_keep := if (count(thorbackup.SetDeleteFileCount(trim(filepattern,left,right)=trim(l_pattern,left,right))) > 0, // check if the superfile exists in the threshold setup list
+														thorbackup.constants.yogurt(filepattern := l_pattern).no_of_files_to_keep, // if yes get the filecnt to keep from list
+															thorbackup.constants.yogurt().no_of_files_to_keep);									
 			//self.superfile := l.name;
 			self.deletepattern := l_pattern;
-			self.filematches := thorbackup.DeleteFiles(location, environment,'').GetFileList(trim(l_pattern,left,right),1);
+			self.files_to_keep := no_of_files_to_keep;
+			self.filematches := thorbackup.DeleteFiles(location, environment,'').GetFileList(trim(l_pattern,left,right),no_of_files_to_keep);
 		end;
 		
 		MatchedFiles := project(dFilesList,GetMatchedFiles(left));
@@ -287,9 +291,9 @@ export ArchiveFiles(string location, string environment, integer noofpartitions 
 		
 		GetFilesToDelete := normalize(MatchedFiles,left.filematches,FilesToDelete(left,right));
 		
-		return apply(GetFilesToDelete
+		return output(MatchedFiles);/*apply(GetFilesToDelete
 								,STD.File.DeleteLogicalFile('~'+name)
-								);
+								);*/
 	end;
 	
 	export CopyFiles := function
