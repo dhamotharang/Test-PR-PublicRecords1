@@ -125,10 +125,10 @@ SmallBusinessAnalyticsoutput := RECORD
 	STRING ErrorCode;
 END;
 
-f := IF(recordsToRun <= 0, DATASET(inputFile, bus_in, CSV(QUOTE('"'))), 
-                          CHOOSEN(DATASET(inputFile, bus_in, CSV(QUOTE('"'))), recordsToRun));
-													// f := IF(recordsToRun <= 0, DATASET(inputFile, bus_in, Thor), 
-                          // CHOOSEN(DATASET(inputFile, bus_in, Thor), recordsToRun));
+// f := IF(recordsToRun <= 0, DATASET(inputFile, bus_in, CSV(QUOTE('"'))), 
+                          // CHOOSEN(DATASET(inputFile, bus_in, CSV(QUOTE('"'))), recordsToRun));
+													f := IF(recordsToRun <= 0, DATASET(inputFile, bus_in, Thor), 
+                          CHOOSEN(DATASET(inputFile, bus_in, Thor), recordsToRun));
 													
 // output(f, NAMED('Total_Input')); 
 // output(count(f), NAMED('Total_Input_Cnt')); 
