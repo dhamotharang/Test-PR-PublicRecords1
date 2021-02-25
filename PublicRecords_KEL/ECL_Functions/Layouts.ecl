@@ -284,6 +284,11 @@ EXPORT LayoutAppendedAddresses := RECORD
 		STRING10 PI_InpSSNDeceasedDt;
 		STRING6 PI_InpAddrStateDLAvailFlag;
 		STRING6 PI_InpAddrStateVoterAvailFlag;
+		//STRING PI_InpPhoneSICCodeHRList;
+		//STRING PI_InpPhoneNAICSCodeHRList;
+		//STRING6 PI_InpPhoneIsHRCorrectFacFlag;
+		//STRING6 PI_InpPhoneType;
+		//STRING6 PI_InpPhoneIsBusPhoneFlag;
 		INTEGER3 PI_SrchPerInpSSNCnt1Y;
 		INTEGER3 PI_SrchLexIDPerInpSSNCnt1Y;
 		INTEGER3 PI_SrchLNamePerInpSSNCnt1Y;
@@ -295,6 +300,8 @@ EXPORT LayoutAppendedAddresses := RECORD
 		INTEGER3 PI_SrchSSNPerInpAddrCnt1Y;
 		INTEGER3 PI_SrchPerInpEmailCnt1Y;
 		INTEGER3 PI_SrchLexIDPerInpEmailCnt1Y;
+ 		//STRING6 PI_InpAddrIsPOBoxFlag;
+		//STRING6 PI_InpAddrIsMilitaryFlag;
 		INTEGER3 PI_SrchPerInpPhoneCnt1Y;
 		INTEGER3 PI_SrchLexIDPerInpPhoneCnt1Y;
 		STRING10 PI_AlrtInpNameWatchlistRecNum;
@@ -308,6 +315,16 @@ EXPORT LayoutAppendedAddresses := RECORD
 		INTEGER4 InsPhoneHit;
 		STRING3 InsPhoneSrc;
 	END;
+	
+	//SHARED LayoutHighRiskAddressInternal := RECORD
+		//STRING PI_InpAddrSICCodeHRList;
+		//STRING PI_InpAddrNAICSCodeHRList;
+		//STRING6 PI_InpAddrIsHRCorrectFacFlag;
+	//END;
+	//EXPORT LayoutHighRiskAddressAttributes := RECORD
+		//INTEGER G_ProcUID;
+		//LayoutHighRiskAddressInternal;
+	//END;
 
 	SHARED LayoutInferredAttributesInternal := RECORD
 		STRING10 P_InpClnArchDtF6M;
@@ -391,6 +408,7 @@ EXPORT LayoutAppendedAddresses := RECORD
 		LayoutSSNSumInternal;
 		LayoutPhoneSumInternal;
 		LayoutAddrSummaryInternal;
+		//LayoutHighRiskAddressInternal;
 	END;
 
 	SHARED LayoutInputBIIBusinessEchoInternal := RECORD
@@ -2059,6 +2077,7 @@ EXPORT LayoutAppendedAddresses := RECORD
 		LayoutPhoneSumInternal;
 		LayoutAddrSummaryInternal;
 		LayoutInferredAttributesInternal;
+		//LayoutHighRiskAddressInternal;
 		STRING65 B_InpAcct;
 		INTEGER G_ProcBusUID;
 		LayoutInputBIIInternal - B_InpAcct;
