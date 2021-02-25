@@ -933,6 +933,8 @@
     INTEGER  spoof_count;
     STRING32 last_spoof_date;
     STRING32 phone_forwarded;
+    UNSIGNED1 phone_verified;
+    STRING32 verification_type;
   END;
 
   EXPORT	delta_phones_rpt_otherphones:= RECORD
