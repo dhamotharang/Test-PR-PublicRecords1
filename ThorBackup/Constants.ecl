@@ -3,7 +3,8 @@ EXPORT Constants := module
 	shared dUserCreds := dataset('~hpccinternal::'+STD.System.Job.User()+'::userinfo'
 																,{string username, string password},thor);
 	export yogurt(string superfilename = ''
-								,boolean usecredentials = false) := module
+								,boolean usecredentials = false
+								,string filepattern = '') := module
 		//export startdate := '';
 		export enddate := ut.getdate;// : independent;
 		export l_time := ut.gettime();// : independent;
@@ -25,9 +26,9 @@ EXPORT Constants := module
 		export dstname := 'dstname=~'+filename + ' ';
 		export srcdali := 'srcdali='+_Control.Config.prod_dali+' '; // changing dali ip to dns
 		export copyfilecmd := serv + if (usecredentials,'username='+dUserCreds[1].username+' password='+dUserCreds[1].password+' ','') + over + repl + action + dstcluster + dstname + srcname + nsplit + wrap + srcdali + transferbuffersize;
-		export emailerrors := 'bocaroxiepackageteam@lexisnexis.com';
-		export senderemail := 'charlene.ros@lexisnexis.com';
-		export no_of_files_to_keep := if ( superfilename <> '',thorbackup.SetDeleteFileCount(superfile = superfilename)[1].filecnt,2);
+		export emailerrors := 'bocaroxiepackageteam@lexisnexis.com, sudhir.Kasavajjala@lexisnexisrisk.com';
+		export senderemail := 'sudhir.Kasavajjala@lexisnexisrisk.com';
+		export no_of_files_to_keep := if ( filepattern <> '',thorbackup.SetDeleteFileCount(filepattern = filepattern)[1].filecnt,1);
 		export destip := 'databuilddev01.risk.regn.net';
 		export destlocation := '/u/thor/filestodelete';
 		
