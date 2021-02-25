@@ -90,6 +90,7 @@ EXPORT PrepForYogurt(string location, string environment, string last_wuid = '')
 																				or regexfind('10.241.50.45',files,nocase)
 																				or regexfind('thor_data400::in::seq',files,nocase)
 																				or regexfind('^file::.*$',files,nocase)
+																				or regexfind('^scrub.*$',files,nocase)
 																				)) ,files),record);
 
 		fullset := record
@@ -282,6 +283,7 @@ EXPORT PrepForYogurt(string location, string environment, string last_wuid = '')
 		
 	end;
 	
+	/* DUS-655
 	export GetFilePatternstoDelete(string wuid = '') := function
 		ds := GetFileList(wuid)(~(regexfind('^file::',files)
 															or regexfind('insuranceheader:name_count',files)
@@ -331,7 +333,7 @@ EXPORT PrepForYogurt(string location, string environment, string last_wuid = '')
 		return dedup(sort(GetCPatternSetup,name,-hasmultiplesubs),name);
 		
 	end;
-	
+	*/
 	export CreateSupers := sequential(
 													if (~fileservices.superfileexists('~'+filestoprocess),
 														fileservices.createsuperfile('~'+filestoprocess)),
@@ -339,8 +341,8 @@ EXPORT PrepForYogurt(string location, string environment, string last_wuid = '')
 														fileservices.createsuperfile('~'+filestodelete)),
 													if (~fileservices.superfileexists('~'+firstgeneration),
 														fileservices.createsuperfile('~'+firstgeneration)),
-													if (~fileservices.superfileexists('~'+deletesuper),
-														fileservices.createsuperfile('~'+deletesuper))
+													/*DUS-655 if (~fileservices.superfileexists('~'+deletesuper),
+														fileservices.createsuperfile('~'+deletesuper))*/
 														);
 	
 	export MoveFiles := sequential(
@@ -350,8 +352,8 @@ EXPORT PrepForYogurt(string location, string environment, string last_wuid = '')
 													fileservices.addsuperfile('~'+firstgeneration,'~'+filestoprocess,,true),
 													fileservices.clearsuperfile('~'+filestoprocess),
 													fileservices.addsuperfile('~'+filestoprocess,'~'+basename+location+'::'+environment+'::'+filedate+'::filestocopy'),
-													fileservices.clearsuperfile('~'+filestodelete,true),
-													fileservices.addsuperfile('~'+filestodelete,'~'+basename+location+'::'+environment+'::'+filedate+'::filestodelete')
+													/*DUS-655 fileservices.clearsuperfile('~'+filestodelete,true),
+													fileservices.addsuperfile('~'+filestodelete,'~'+basename+location+'::'+environment+'::'+filedate+'::filestodelete')*/
 													);
 	
 
@@ -359,8 +361,9 @@ EXPORT PrepForYogurt(string location, string environment, string last_wuid = '')
 	export CreatePrepFile := sequential
 																		(
 																			CreateSupers,
-																			output(GetFileList()(~issuper),,'~'+basename+location+'::'+environment+'::'+filedate+'::filestocopy',overwrite),
-																			output(GetFilePatternstoDelete(),,'~'+basename+location+'::'+environment+'::'+filedate+'::filestodelete',overwrite)
+																			output(GetFileList()(~issuper),,'~'+basename+location+'::'+environment+'::'+filedate+'::filestocopy',overwrite)
+																			/*, DUS-655
+																			output(GetFilePatternstoDelete(),,'~'+basename+location+'::'+environment+'::'+filedate+'::filestodelete',overwrite)*/
 																		);
 	
 	
@@ -372,8 +375,9 @@ EXPORT PrepForYogurt(string location, string environment, string last_wuid = '')
 																	);
 																
 	export SendFileListToYogurtThor := sequential(
-																					STD.File.DfuPlusExec(thorbackup.constants.yogurt('~'+filestoprocess,true).copyfilecmd),
-																					STD.File.DfuPlusExec(thorbackup.constants.yogurt('~'+filestodelete,true).copyfilecmd)
+																					STD.File.DfuPlusExec(thorbackup.constants.yogurt('~'+filestoprocess,true).copyfilecmd)
+																					/*, DUS-655
+																					STD.File.DfuPlusExec(thorbackup.constants.yogurt('~'+filestodelete,true).copyfilecmd)*/
 																					);
 	
 	export ReSubmit() := function

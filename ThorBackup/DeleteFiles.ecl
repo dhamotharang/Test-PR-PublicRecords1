@@ -1,4 +1,4 @@
-import ut,lib_fileservices,STD;
+﻿import ut,lib_fileservices,STD;
 EXPORT DeleteFiles(string location, string environment, string deleteenv,boolean onlydbfiles = false) := module
 	export rundatetime := ut.GetTimeDate() : independent;
 	
