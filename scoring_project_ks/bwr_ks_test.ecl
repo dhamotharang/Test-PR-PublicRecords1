@@ -210,13 +210,13 @@ res:=project (ds, transform({  string80 product,string80 version, string80 proce
 															// left.flagship  = 'RiskView_xml_enova_rvg1103_0_v4'  => 'RiskView' ,
 															
 															
-															left.flagship = 'Small_Business_Analytics_SBOM1601_Attributes' => 'Small_Business_Analytics',
-															left.flagship = 'Small_Business_Analytics_SBBM1601_Attributes' => 'Small_Business_Analytics',
+															left.flagship = 'Small_Business_Analytics_SBOM1601_Attributes' => 'Small_Business_Analytics_SBFE',
+															left.flagship = 'Small_Business_Analytics_SBBM1601_Attributes' => 'Small_Business_Analytics_SBFE',
 
-															left.flagship = 'Small_Business_Analytics_SLBO1702_Attributes' => 'Small_Business_Analytics',
-															left.flagship = 'Small_Business_Analytics_SLBB1702_Attributes' => 'Small_Business_Analytics',
-															left.flagship = 'Small_Business_Analytics_SLBO1809_Attributes' => 'Small_Business_Analytics',
-															left.flagship = 'Small_Business_Analytics_SLBB1809_Attributes' => 'Small_Business_Analytics',
+															left.flagship = 'Small_Business_Analytics_SLBO1702_Attributes' => 'Small_Business_Analytics_NonSBFE',
+															left.flagship = 'Small_Business_Analytics_SLBB1702_Attributes' => 'Small_Business_Analytics_NonSBFE',
+															left.flagship = 'Small_Business_Analytics_SLBO1809_Attributes' => 'Small_Business_Analytics_NonSBFE',
+															left.flagship = 'Small_Business_Analytics_SLBB1809_Attributes' => 'Small_Business_Analytics_NonSBFE',
 															
    													left.flagship  = 'businessinstantidv2_xml_generic'  and left.model = 'bvi'  	 => 'BusinessInstantIdv2' ,
 														left.flagship  = 'businessinstantidv2_xml_generic'  and left.model = 'rep1_cvi' 	 => 'BusinessInstantIdv2' ,
@@ -883,7 +883,7 @@ score_data1_project_biidv2:=score_data1_project(product='BusinessInstantIdv2' an
                                             );	
 																						
 																						
-score_data1_project_sba := score_data1_project(product='Small_Business_Analytics' and (decimal19_2)score not in [222] and (decimal19_2)score >0 and  (decimal19_2)score  <=900 
+score_data1_project_sba := score_data1_project((product='Small_Business_Analytics_SBFE' or product='Small_Business_Analytics_NonSBFE') and (decimal19_2)score not in [222] and (decimal19_2)score >0 and  (decimal19_2)score  <=900 
 
 											);
 																						
@@ -941,7 +941,7 @@ score_data2_project_biidv2:=score_data2_project(product='BusinessInstantIdv2' an
 score_data2_project_non_rv:=score_data2_project(product='IT60' or product='IT61' and (decimal19_2)score >=-1 and (decimal19_2)score  <=999);
 
 
-score_data2_project_sba := score_data2_project(product='Small_Business_Analytics' and (decimal19_2)score not in [222] and (decimal19_2)score >0 and  (decimal19_2)score  <=900 
+score_data2_project_sba := score_data2_project((product='Small_Business_Analytics_SBFE' or product='Small_Business_Analytics_NonSBFE') and (decimal19_2)score not in [222] and (decimal19_2)score >0 and  (decimal19_2)score  <=900 
 
 											);
 
@@ -2407,12 +2407,12 @@ end;
 																 
 																 
 																 
-																 {'Small_Business_Analytics','Generic','','SBOM1601','',15215},
-																 {'Small_Business_Analytics','Generic','','SBBM1601','',15215},
-																 {'Small_Business_Analytics','Generic','','SLBO1702','',15215},
-																 {'Small_Business_Analytics','Generic','','SLBB1702','',15215},
-																 {'Small_Business_Analytics','Generic','','SLBO1809','',15215},
-																 {'Small_Business_Analytics','Generic','','SLBB1809','',15215}
+																 {'Small_Business_Analytics_SBFE','Generic','','SBOM1601','',15215},
+																 {'Small_Business_Analytics_SBFE','Generic','','SBBM1601','',15215},
+																 {'Small_Business_Analytics_NonSBFE','Generic','','SLBO1702','',15215},
+																 {'Small_Business_Analytics_NonSBFE','Generic','','SLBB1702','',15215},
+																 {'Small_Business_Analytics_NonSBFE','Generic','','SLBO1809','',15215},
+																 {'Small_Business_Analytics_NonSBFE','Generic','','SLBB1809','',15215}
 																															 
 																       																		
       													 // {'RiskView','Enova','XML','rvg1103_0','2',file_count_function(RV_Scores_V4_XML_ENOVA_infile)}
