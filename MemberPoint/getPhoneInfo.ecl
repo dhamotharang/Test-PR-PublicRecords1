@@ -1,5 +1,5 @@
 ﻿import progressive_phone,addrbest,Gateway,Std;
-import Royalty, iesp, MDR, Phone_Shell;
+import Royalty, MDR, Phone_Shell;
 
 /*
 Run the minor through WFV7 and only return a confirmed phone. 
@@ -108,7 +108,8 @@ EXPORT getPhoneInfo(dataset (MemberPoint.Layouts.BestExtended) dsBestE, MemberPo
 
 // ROYALTIES
 	ungroup_dsPhones := UNGROUP(dsPhones);
-	results_1 := progressive_phone.FN_BatchFinalAssignments(ungroup_dsPhones, Progressive_Phone.Layout_Progressive_phones.common_with_meta_rec, UsePremiumSource_A, scoreModel);
+	_f_out := progressive_phone.functions.UpdateWithMetadata(ungroup_dsPhones);
+	results_1 := progressive_phone.FN_BatchFinalAssignments(_f_out, Progressive_Phone.Layout_Progressive_phones.common_with_meta_rec, UsePremiumSource_A, scoreModel);
 
 	dRoyaltiesByAcctno_EQUIFAX := if(UsePremiumSource_A, Royalty.RoyaltyEFXDataMart.GetBatchRoyaltiesByAcctno(PhoneBatchIn, results_1,,,acctno));
 	dRoyalties := Royalty.GetBatchRoyalties(dRoyaltiesByAcctno_EQUIFAX, BParams.ReturnDetailedRoyalties);
