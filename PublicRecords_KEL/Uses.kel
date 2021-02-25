@@ -4729,6 +4729,8 @@ USE PublicRecords_KEL.ECL_Functions.Dataset_FDC(FDC,
 			Prepaid = prepaid,
 			GlobalSID = global_sid,
 			RecordSID = record_sid,
+			//Serv = serv,
+			//Line = line,
 			Source = Src,//source from dataset
 			OriginalSource = source,
 			DateFirstSeen = FORMAT('YYYYMMDD'),

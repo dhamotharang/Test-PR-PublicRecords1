@@ -1,4 +1,4 @@
-//HPCC Systems KEL Compiler Version 1.5.0rc1
+﻿//HPCC Systems KEL Compiler Version 1.5.0rc1
 IMPORT KEL15 AS KEL;
 IMPORT $,Email_Data,NID,PublicRecords_KEL,Royalty,STD,address,header;
 IMPORT CFG_Compile FROM PublicRecords_KEL;
