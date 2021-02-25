@@ -1,13 +1,12 @@
 ﻿IMPORT address, BIPV2, dx_common;
 
 EXPORT Layouts := MODULE
-	
+  
 	////////////////////////////////////////////////////////////////////////
 	// -- Input Layouts
 	////////////////////////////////////////////////////////////////////////
 	EXPORT Input := MODULE
-	
-    	EXPORT Layout_Header := RECORD
+      	EXPORT Layout_Header := RECORD
         integer4    LINK_ID;                	//	NUMBER(9)	9-digit unique number assigned by Cortera to a company in its database.
         string100   NAME;                    	//	VARCHAR2(100)	Business/Company name 
         string100   ALTERNATE_BUSINESS_NAME;	//	VARCHAR2(100)	Alternate name on file 
@@ -63,8 +62,8 @@ EXPORT Layouts := MODULE
         string1    	IS_CLOSED;                //	CHAR(1)	Possible Values: 'Y' - Yes
         string9    	CLOSED_DATE;
     	END;
-    	
-    	Number	:= string;
+      
+			Number	:= string;
     	Ratio   := string;
     	EXPORT Layout_Attributes := RECORD
         integer4  ULTIMATE_LINKID;
@@ -539,14 +538,14 @@ EXPORT Layouts := MODULE
     unsigned6 did := 0;
     unsigned1 did_Score := 0;
   END;
-	
+  
 	////////////////////////////////////////////////////////////////////////
   // -- Layout Key Delta RID
   ////////////////////////////////////////////////////////////////////////
   EXPORT Layout_Delta_Rid := RECORD
 		dx_common.layout_ridkey;
   END;
-	
+  
 	////////////////////////////////////////////////////////////////////////
   // -- Layout Key Build Version
   ////////////////////////////////////////////////////////////////////////
