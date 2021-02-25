@@ -170,8 +170,8 @@ EXPORT layouts := MODULE
 			AccountMonitoring.product_files.property.Property_search_key_sorted.zip;
 		END;
 		SHARED litigiousdebtor_documentid_record := RECORD
-			AccountMonitoring.product_files.litigiousdebtor.litigiousdebtor_file_slim.courtstate;
-			AccountMonitoring.product_files.litigiousdebtor.litigiousdebtor_file_slim.docketnumber;
+			AccountMonitoring.product_files.litigiousdebtor.litigiousdebtor_key.courtstate;
+			AccountMonitoring.product_files.litigiousdebtor.litigiousdebtor_key.docketnumber;
 		END;
 		SHARED liens_documentid_record := RECORD
 			AccountMonitoring.product_files.liens.main_file.tmsid;

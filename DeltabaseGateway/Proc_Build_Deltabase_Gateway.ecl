@@ -1,4 +1,4 @@
-IMPORT _control, Doxie, PromoteSupers, RoxieKeyBuild, std, ut;
+﻿IMPORT _control, Doxie, PromoteSupers, RoxieKeyBuild, std, ut;
 
 EXPORT Proc_Build_Deltabase_Gateway(string version, const varstring eclsourceip, string thor_name, string contacts):= FUNCTION
 	
@@ -41,7 +41,7 @@ EXPORT Proc_Build_Deltabase_Gateway(string version, const varstring eclsourceip,
 																												'~thor_data400::in::deltabase_gateway::historic_results_history_great_grandfather',
 																												'~thor_data400::in::deltabase_gateway::historic_results_history_delete'], '~thor_data400::in::deltabase_gateway::historic_results_history_'+version, true);	
 		
-	
+	/*
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	//Build Common PhonesInfo Keys///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -76,17 +76,17 @@ EXPORT Proc_Build_Deltabase_Gateway(string version, const varstring eclsourceip,
 		DeltabaseGateway.Out_Strata_Population_Stats(DeltabaseGateway.File_Deltabase_Gateway.Historic_Results_Base
 																									,version
 																									,buildStrata);
-	
+	*/
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	//Run Build & Provide Email on Build Status//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 		sendEmail				:= sequential(sprayDltGwy, 
 																	bldDltGwyBase, clrDltGwyDelete, mvDltGwyBase,
-																	catDltGwyHistory, mvDltGwyHistory,
+																	catDltGwyHistory, mvDltGwyHistory)
 																	//Only AT&T LIDB Deltabase is going to Prod for now; These records will be populated in the Phones Metadata Key
 																	//Strata and Scrubs will be updated, once the other sources go live.
-																	bkDltGwy, mvBltDltGwy, mvQADltGwy)/*, 
+																	/*bkDltGwy, mvBltDltGwy, mvQADltGwy), 
 																	dopsUpdate,
 																	buildStrata)*/:
 																	Success(FileServices.SendEmail(contacts, 'Deltabase Gateway Key Build Succeeded', workunit + ': Build completed.')),

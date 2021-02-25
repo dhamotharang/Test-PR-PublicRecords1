@@ -5,50 +5,6 @@ EXPORT proc_build_keys(string file_date, boolean skipDOPS=FALSE, string emailTo=
 	is_running_in_prod 	:= PRTE2_Common.Constants.is_running_in_prod;
 	doDOPS 	:= is_running_in_prod AND NOT skipDOPS;
 	
-	//phones_ported_metadata
-	RoxieKeyBuild.MAC_SK_BuildProcess_v2_local( Keys.key_phones_ported_metadata,
-		Constants.KeyName_phones + Constants.KeyName_phones_ported_metadata + '_@version@',
-		Constants.KeyName_phones  + file_date + '::' + Constants.KeyName_phones_ported_metadata, 
-		build_key_phones_ported_metadata);
-		
-	RoxieKeyBuild.MAC_SK_Move_To_Built_V2( Constants.KeyName_phones + Constants.KeyName_phones_ported_metadata + '_@version@', 
-		Constants.KeyName_phones  + file_date + '::' + Constants.KeyName_phones_ported_metadata, 
-		move_built_key_phones_ported_metadata);
-
-	RoxieKeyBuild.MAC_SK_Move_v2(Constants.KeyName_phones + Constants.KeyName_phones_ported_metadata + '_@version@', 
-		'Q', 
-		move_qa_key_phones_ported_metadata);
-
-	//carrier_reference
-	RoxieKeyBuild.MAC_SK_BuildProcess_v2_local( Keys.key_carrier_reference,
-		Constants.KeyName_phones + Constants.KeyName_carrier_reference + '_@version@',
-		Constants.KeyName_phones  + file_date + '::' + Constants.KeyName_carrier_reference, 
-		build_key_carrier_reference);
-		
-	RoxieKeyBuild.MAC_SK_Move_To_Built_V2( Constants.KeyName_phones + Constants.KeyName_carrier_reference + '_@version@', 
-		Constants.KeyName_phones  + file_date + '::' + Constants.KeyName_carrier_reference, 
-		move_built_key_carrier_reference);
-
-	RoxieKeyBuild.MAC_SK_Move_v2(Constants.KeyName_phones + Constants.KeyName_carrier_reference + '_@version@', 
-		'Q', 
-		move_qa_key_carrier_reference);
-
-//Lerg6Main
-RoxieKeyBuild.MAC_SK_BuildProcess_v2_local( Keys.key_Lerg6Main,
-		Constants.KeyName_phones + Constants.KeyName_lerg6 + '_@version@',
-		Constants.KeyName_phones  + file_date + '::' + Constants.KeyName_lerg6, 
-		build_key_lerg6);
-
-
-RoxieKeyBuild.MAC_SK_Move_To_Built_V2( Constants.KeyName_phones + Constants.KeyName_lerg6 + '_@version@', 
-		Constants.KeyName_phones  + file_date + '::' + Constants.KeyName_lerg6, 
-		move_built_key_lerg6);
-
-	RoxieKeyBuild.MAC_SK_Move_v2(Constants.KeyName_phones + Constants.KeyName_lerg6 + '_@version@', 
-		'Q', 
-		move_qa_key_lerg6);
-
-
 
 //---------- making DOPS optional and only in PROD build -------------------------------
 	notifyEmail					:= IF(emailTo<>'',emailTo,_control.MyInfo.EmailAddressNormal);
@@ -58,13 +14,10 @@ RoxieKeyBuild.MAC_SK_Move_To_Built_V2( Constants.KeyName_phones + Constants.KeyN
 	PerformUpdateOrNot	:= IF(doDOPS,PARALLEL(updatedops),NoUpdate);
 //---------------------------------------------------------------------------------------
   
-//Key Validation
-	key_validation :=  output(dops.ValidatePRCTFileLayout(file_date, prte2.Constants.ipaddr_prod, prte2.Constants.ipaddr_roxie_nonfcra,Constants.dops_name, 'N'), named(Constants.dops_name+'Validation'));
+ key_validation :=  output(dops.ValidatePRCTFileLayout(file_date, prte2.Constants.ipaddr_prod, prte2.Constants.ipaddr_roxie_nonfcra,Constants.dops_name, 'N'), named(Constants.dops_name+'Validation'));
 	
-	RETURN 		sequential(parallel(build_key_phones_ported_metadata, build_key_carrier_reference,build_key_lerg6), 
-											 parallel(move_built_key_phones_ported_metadata, move_built_key_carrier_reference, move_built_key_lerg6),
-											 parallel(move_qa_key_phones_ported_metadata,move_qa_key_carrier_reference,move_qa_key_lerg6),   
-											 copy_seeds(file_date),
+	
+	RETURN 		sequential(copy_seeds(file_date),
 											 PerformUpdateOrNot,
 											 key_validation
 											 );

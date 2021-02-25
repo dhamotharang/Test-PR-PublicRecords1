@@ -7,8 +7,16 @@ CreateSuperFile(STRING File) := IF (~FileServices.FileExists(File), FileServices
                        CreateSuperFile('~thor_data400::base::InseCrashSlim'),
                        CreateSuperFile('~thor_data400::base::InseCrashSlim_father'),
                        CreateSuperFile('~thor_data400::base::InseCrashSlim_grandfather'),
-                       CreateSuperFile('~thor_data400::base::InseCrashSlim_delete')
-											       );
+                       CreateSuperFile('~thor_data400::base::InseCrashSlim_delete'),
+											 CreateSuperFile('~thor::base::ecrash::qa::consolidation_ecrash'),
+                       CreateSuperFile('~thor::base::ecrash::father::consolidation_ecrash'),
+                       CreateSuperFile('~thor::base::ecrash::grandfather::consolidation_ecrash'),
+                       CreateSuperFile('~thor::base::ecrash::delete::consolidation_ecrash'),
+											 CreateSuperFile('~thor::base::ecrash::qa::consolidation_pr'),
+                       CreateSuperFile('~thor::base::ecrash::father::consolidation_pr'),
+                       CreateSuperFile('~thor::base::ecrash::grandfather::consolidation_pr'),
+                       CreateSuperFile('~thor::base::ecrash::delete::consolidation_pr')
+											  );
 
   CreateSFKeys := SEQUENTIAL(			
                        CreateSuperFile('~thor_data400::key::ecrashv2_dlnnbrdlstate_qa'),											 

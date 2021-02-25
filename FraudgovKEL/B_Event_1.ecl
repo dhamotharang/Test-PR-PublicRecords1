@@ -2345,7 +2345,38 @@ EXPORT B_Event_1 := MODULE
     SELF := __l;
     SELF := __r;
   END;
-  SHARED __EE1884826 := JOIN(__EE1884185,__EE1746281,__JC1884825(LEFT,RIGHT),__JT1884825(LEFT,RIGHT),LEFT OUTER,LOOKUP);
+  SHARED __EE1884826_1 := JOIN(__EE1884185(_r_Ssn_.v>0),__EE1746281,__JC1884825(LEFT,RIGHT),__JT1884825(LEFT,RIGHT),HASH);
+  __ST1610606_Layout __JT1884825_1(__ST1608425_Layout __l, __EE1884826_1 __r) := TRANSFORM
+    SELF.U_I_D__4_ := __r.U_I_D__4_;
+    SELF._r_Customer__3_ := __r._r_Customer__3_;
+    SELF.Source_Customers__2_ := __r.Source_Customers__2_;
+    SELF.Ssn__1_ := __r.Ssn__1_;
+    SELF.Otto_S_S_N_Id__1_ := __r.Otto_S_S_N_Id__1_;
+    SELF.Ssn_Formatted__1_ := __r.Ssn_Formatted__1_;
+    SELF.Deceased_Date__2_ := __r.Deceased_Date__2_;
+    SELF.Deceased_Date_Of_Birth__2_ := __r.Deceased_Date_Of_Birth__2_;
+    SELF.Deceased_First__2_ := __r.Deceased_First__2_;
+    SELF.Deceased_Middle__2_ := __r.Deceased_Middle__2_;
+    SELF.Deceased_Last__2_ := __r.Deceased_Last__2_;
+    SELF.Deceased_Match_Code__2_ := __r.Deceased_Match_Code__2_;
+    SELF._isdeepdive__2_ := __r._isdeepdive__2_;
+    SELF._county__death__2_ := __r._county__death__2_;
+    SELF.Deceased_Ssn__2_ := __r.Deceased_Ssn__2_;
+    SELF._state__death__flag__2_ := __r._state__death__flag__2_;
+    SELF._death__rec__src__2_ := __r._death__rec__src__2_;
+    SELF._state__death__id__2_ := __r._state__death__id__2_;
+    SELF.Aot_Act_Cnt_Ev__2_ := __r.Aot_Act_Cnt_Ev__2_;
+    SELF.Aot_Id_Act_Cnt_Ev__2_ := __r.Aot_Id_Act_Cnt_Ev__2_;
+    SELF.Aot_Src1_Act_Cnt_Ev__2_ := __r.Aot_Src1_Act_Cnt_Ev__2_;
+    SELF.Dt_Last_Seen__2_ := __r.Dt_Last_Seen__2_;
+    SELF.Id_Activity_Dt_Last_Seen__2_ := __r.Id_Activity_Dt_Last_Seen__2_;
+    SELF.Kr_Last_Event_Date__2_ := __r.Kr_Last_Event_Date__2_;
+    SELF.Last_Record_Id__2_ := __r.Last_Record_Id__2_;
+    SELF := __l;
+    SELF := __r;
+  END;
+  SHARED __EE1884826 := JOIN(__EE1884185,__EE1884826_1,LEFT.uid.v=RIGHT.uid.v,__JT1884825_1(LEFT,RIGHT),LEFT OUTER,HASH);
+  
   SHARED __EE1746280 := __ENH_Internet_Protocol_2;
   SHARED __ST1612842_Layout := RECORD
     KEL.typ.nuid UID;

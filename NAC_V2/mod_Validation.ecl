@@ -347,7 +347,7 @@ EXPORT mod_Validation := MODULE
 										INNER, KEEP(1), LOCAL);
 										
 					// find address records with no matching client id								
-					ad2 := DISTRIBUTE(j2(ClientId<>''), Hash32(ProgramCode, ProgramState, CaseId, ClientId));
+					ad2 := DISTRIBUTE(j2(ClientId<>''), Hash32(GroupId, ProgramCode, ProgramState, CaseId, ClientId));
 					j3 := JOIN(ad2, cl, left.GroupId=right.GroupId
 															AND left.ProgramCode=right.ProgramCode
 															AND left.ProgramState=right.ProgramState

@@ -461,12 +461,12 @@ EXPORT Get_Dataset_Versions(
 					LEFT.name,1,NOCASE)));
 
 		// Possible Litigious Debtors
-		PossLitDebt := PROJECT(FileServices.SuperFileContents(AccountMonitoring.product_files.litigiousdebtor.litigiousdebtor_filename),
+		PossLitDebt := PROJECT(FileServices.SuperFileContents(AccountMonitoring.product_files.litigiousdebtor.litigiousdebtor_superkey),
 			TRANSFORM(Final_Layout,
 				SELF.product := 'POSSLITDEBT',
 				SELF.subfile := '',
 				SELF.version := REGEXFIND(
-					'base::courtlink::(.*)::litdebt$',
+					'thor_data400::key::courtlink::(.*)::courtid_docket',
 					LEFT.name,1,NOCASE)));
 		
 		// Phones Feedback
@@ -560,11 +560,23 @@ EXPORT Get_Dataset_Versions(
 				'thor_data400::key::(.*)::phonesmetadata::carrier_reference',
 				LEFT.name,1,NOCASE)));
 
+		Phones_WDNC := PROJECT(FileServices.SuperFileContents(AccountMonitoring.product_files.PhoneOwnership.phones_WDNC_superkeyname),
+			TRANSFORM(Final_Layout,
+				SELF.product := 'PHONEOWNERSHIP',
+				SELF.subfile := 'Phone_TCPA',
+				SELF.version := REGEXFIND(
+				'thor_data400::key::tcpa::(.*)::phone_history',
+				LEFT.name,1,NOCASE)));
+
+
+
 		PhoneOwnership := 
 		PPhones_Type +
 		PPhones_Lerg6 +
 		Phones_transaction +
-		pcarrier_reference;
+		pcarrier_reference +
+		Phones_WDNC;
+
 
 		
 		// BipBest Update

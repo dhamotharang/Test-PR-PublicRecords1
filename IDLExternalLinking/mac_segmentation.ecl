@@ -1,3 +1,6 @@
+/*2014-12-09T19:10:02Z (aleida lima)
+DEAD Clusters with only 1 records are not considered good cluster in segmentation
+*/
 /**
   This macro selects a LexID based on segmentation rules
 		1. If results has more than Constants.GOOD_CANDIDATES_THESHOLD candidates within distance, 
@@ -13,45 +16,9 @@
 EXPORT mac_segmentation(trimRes, resOut, weight_score, distance) := MACRO;
 IMPORT InsuranceHeader_PostProcess;
  
-	#UNIQUENAME(normrec)
-	%normrec% := record  
-		RECORDOF(trimRes.results) res;
-		unsigned6 id;
-	end;
- 
-	#UNIQUENAME(seg)
-	%seg% := InsuranceHeader_PostProcess.segmentation_keys.key_did_ind;
-
-	#UNIQUENAME(trimResNorm)
-	%trimResNorm% := NORMALIZE(trimRes,left.results,TRANSFORM(%normrec%,self.id := left.reference, self.res := right));
-	#UNIQUENAME(trimReswSeg)
-														 
-	%trimReswSeg% := JOIN(%trimResNorm%,%seg%,
-                      KEYED(left.res.did = right.did),
-                       transform(RECORDOF(LEFT),
-														 string tempInd := TRIM(right.ind);                             
-														 self.res.cluster_cnt := right.cnt;
-														 self.res.ind := IF(tempInd = IDLExternalLinking.Constants.DEAD_IND and right.cnt=1, 'DEAD_SINGLETON', tempInd); // dead singleton is not good in the context.														 
-														 self.res.best_ssn5 := InsuranceHeader_xLink.mod_SSNParse(right.ssn).ssn5,
-														 self.res.best_ssn4 := InsuranceHeader_xLink.mod_SSNParse(right.ssn).ssn4,														
-														 self.res.match_best_ssn := (left.res.ssn5<>'' and left.res.ssn5=self.res.best_ssn5 or left.res.ssn5weight=0) and 
-																	(left.res.ssn4 <> '' and left.res.ssn4=self.res.best_ssn4) and left.res.ssn4weight>0 ;																	
-														 self.res.best_dob := right.dob,
-                             self.res := left.res,                             
-                             self := left), left outer, keep(1));
-
-	#UNIQUENAME(trimResParentOnly)
-	%trimResParentOnly% := PROJECT(trimRes,TRANSFORM(recordof(left),self.Results:=[],self:=left));
-	#UNIQUENAME(trimResDeNorm)
-	%trimResDeNorm% := DENORMALIZE(DISTRIBUTE(%trimResParentOnly%, reference),DISTRIBUTE(%trimReswSeg%, ID),
-											LEFT.reference = RIGHT.id, 
-													TRANSFORM(RECORDOF(LEFT),
-															self.results := LEFT.results + RIGHT.res,															
-															self := left), LOCAL);
- 
 	// for the requests that were NOT assigned a DID using distance, try segmentation
 	#UNIQUENAME(resultsSegmentation)
-	%resultsSegmentation% := PROJECT(%trimResDeNorm%,
+	%resultsSegmentation% := PROJECT(trimRes(results[1].weight>=weight_score),
              TRANSFORM(RECORDOF(LEFT), 
              resTemp := sort(LEFT.results, -weight);												
 						 integer withinWeightDist := resTemp[1].weight - distance;
@@ -87,7 +54,7 @@ IMPORT InsuranceHeader_PostProcess;
  		
                 self := left));         
               
-         resOut := %resultsSegmentation%;
+         resOut := %resultsSegmentation% & trimRes(results[1].weight<weight_score);
 				 // output(%trimReswSeg%, named('trimReswSeg'));
 				 // output(%trimResDeNorm%, named('trimResDeNorm'));
 				 

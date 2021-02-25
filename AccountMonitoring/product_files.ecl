@@ -6,7 +6,7 @@ IMPORT AccountMonitoring,BankruptcyV2, Business_Header, CellPhone, CourtLink, Co
 			 PhonesFeedback, Phonesplus, POE, Property, Risk_Indicators, ut, UtilFile, Watchdog, 
 			 hygenics_crim, business_header_ss, PhonesInfo, BIPV2_Best, 
 			 Business_Credit, Business_Credit_Scoring, UCCV2, SAM, Inquiry_AccLogs, Corp2,
-			 VehicleV2, FAA, Watercraft, Phonesplus_v2, dx_PhonesInfo;
+			 VehicleV2, FAA, Watercraft, Phonesplus_v2, dx_PhonesInfo, dx_Phone_TCPA;
 			 
 EXPORT product_files := MODULE
 
@@ -798,20 +798,22 @@ EXPORT product_files := MODULE
 	END; // End Property Module
 	
 	EXPORT litigiousdebtor := MODULE
-		
-		EXPORT layout_search_file_b := RECORD
-			CourtLink.Layouts.Base.debtor_lname;
-			CourtLink.Layouts.Base.debtor_fname;
-			CourtLink.Layouts.Base.CourtState;
-			CourtLink.Layouts.Base.DocketNumber;
-		END;
-		
-		EXPORT litigiousdebtor_filename_raw    := 'thor_data400::base::courtlink::qa::litdebt';
-		EXPORT litigiousdebtor_filename        := AccountMonitoring.constants.DATA_LOCATION + litigiousdebtor_filename_raw;
-		EXPORT litigiousdebtor_file            := DATASET(litigiousdebtor_filename, CourtLink.Layouts.Base, THOR);
-		
-		EXPORT litigiousdebtor_file_slim := DISTRIBUTE(litigiousdebtor_file, HASH32(debtor_lname, debtor_fname, CourtState, DocketNumber)) 
-		                                    : INDEPENDENT; //PERSIST('acctmon::litigiousdebtor::search_file_slim');
+
+    EXPORT litigiousdebtor_Roxie_SuperFile := 'thor_data400::key::courtlink::qa::courtid_docket';
+    EXPORT litigiousdebtor_superkey_monitor := 'monitor::litigiousdebtor::courtid_docket';
+    EXPORT litigiousdebtor_superkey     := AccountMonitoring.constants.MONITOR_KEY_CLUSTER + litigiousdebtor_superkey_monitor + '_qa';
+
+    SHARED litigiousdebtor_key_undist := 
+        INDEX(
+              CourtLink.key_CourtID_Docket,
+              litigiousdebtor_superkey
+            );
+
+    EXPORT litigiousdebtor_key :=
+        DISTRIBUTE(
+                  litigiousdebtor_key_undist, 
+                  HASH32(debtor_lname, NID.PreferredFirstNew(debtor_fname), CourtState)
+                ): INDEPENDENT; //PERSIST('acctmon::litigiousdebtor::search_file_slim');
 	END;
 
 	EXPORT liens := MODULE
@@ -1188,6 +1190,22 @@ EXPORT product_files := MODULE
 				key_phones_transaction, 
 				HASH64(phone)
 			): INDEPENDENT;
+
+    EXPORT phones_WDNC_superfile  := 'thor_data400::key::tcpa::'+doxie.Version_SuperKey+'::phone_history';
+	  EXPORT phones_WDNC_for_superkey_monitor := 'monitor::Phones_WDNC';
+	  EXPORT phones_WDNC_superkeyname := AccountMonitoring.constants.MONITOR_KEY_CLUSTER + phones_WDNC_for_superkey_monitor + '_qa';
+	  
+	  EXPORT key_phones_WDNC := 
+	      PULL(INDEX(
+	        dx_Phone_TCPA.Key_TCPA_Phone_History(),  
+	        phones_WDNC_superkeyname
+	      ));
+	      
+	  EXPORT key_phones_WDNC_dist :=
+	      DISTRIBUTE(
+	        key_phones_WDNC, 
+	        HASH64(phone)
+	      ): INDEPENDENT;
 
 	END; //end of phone ownership
 	

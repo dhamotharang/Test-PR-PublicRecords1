@@ -42,7 +42,8 @@ export mac_useFakeIDs
 			uniqueid = 'junk_uniqueid',
 	 moveToQA = true,
 	 isdelta=false,
-	 maxFID=0
+	 maxFID=0,
+	 forcePromotion=false
 	 )
 := MACRO
 import ut,RoxieKeyBuild;
@@ -133,7 +134,7 @@ outaction :=
 		sequential(
 			if(typestr = '', fail('must have valid typestr when useFakeIDs')),
 			%do_Payload_Key%, 
-			if(isdelta=false,%mv_Payload_Key%),
+			if(isdelta=false or forcePromotion=true,%mv_Payload_Key%),
 			if(moveToQA, %mvQA_Payload_Key%)
 		);
 	

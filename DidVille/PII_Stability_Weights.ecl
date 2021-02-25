@@ -1,4 +1,4 @@
-﻿IMPORT InsuranceHeader_xLink,UT,IDLExternalLinking;
+﻿IMPORT InsuranceHeader_xLink,UT,IDLExternalLinking, InsuranceHeader_PostProcess;
 
 /*
 This module is for the statistical analysis team to be able to run searches 
@@ -17,7 +17,8 @@ EXPORT PII_STABILITY_WEIGHTS := MODULE
 		UNSIGNED6 UniqueID;
 		STRING5 SSN5;
 		STRING4 SSN4;
-		DidVille.Layout_Did_InBatch;
+		DidVille.Layout_Did_InBatch_v2;
+		DATASET(InsuranceHeader_xLink.Process_xIDL_Layouts().layout_ZIP_cases) ZIP_cases;
 	END; 
 
 	EXPORT PII_weight_output_layout := RECORD
@@ -34,14 +35,16 @@ EXPORT PII_STABILITY_WEIGHTS := MODULE
 		INTEGER2 ssn5weight;
 	END; 
 	
-	EXPORT PII_STABILITY_WEIGHTS(DATASET(DidVille.Layout_Did_InBatch) INPUT) := FUNCTION 
+	EXPORT PII_STABILITY_WEIGHTS(DATASET(DidVille.Layout_Did_InBatch_v2) INPUT) := FUNCTION
 
 		//code for getting data W20161109-135923
 		//Example W20161216-103856
 		interm := PROJECT(INPUT,TRANSFORM(PII_weight_interm_layout,
 											SELF.UniqueID := LEFT.seq; SELF.SSN5 := LEFT.SSN[1..5]; 
-											SELF.SSN4 := LEFT.SSN[6..9]; SELF:= LEFT));
-											
+											SELF.SSN4 := LEFT.SSN[6..9]; 
+											SELF.ZIP_cases := Dataset([{LEFT.Z5, 100}],InsuranceHeader_xLink.Process_xIDL_layouts().layout_ZIP_cases) ;
+											SELF:= LEFT));
+
 		InsuranceHeader_xLink.MAC_MEOW_xIDL_Batch(interm, 
 																						UniqueID, 
 																						, // did
@@ -55,21 +58,33 @@ EXPORT PII_STABILITY_WEIGHTS := MODULE
 																						sec_range,
 																						p_city_name,
 																						st,
-																						z5,
+																						ZIP_cases,
 																						ssn5,
 																						ssn4,
 																						dob, 
 																						phone10,
-																						,//DL_STATE,
-																						,//DL_NBR, 
+																						dl_state,
+																						dl_nbr,
 																						,// src
 																						,// src_rid
-																						,// fname2
-																						,// lname2																						
+																						relative_fname,
+																						relative_lname,
+																						,// vin
 																						outfile
-																						);			
-																						
-		RETURN NORMALIZE(outfile,LEFT.results,
-									TRANSFORM(PII_weight_output_layout,SELF:=RIGHT))(did<IDLExternalLinking.Constants.INSURANCE_LEXID);
+																						);
+
+
+				// remove insurance LexIDs
+		resNorm := NORMALIZE(outfile,LEFT.results,
+									TRANSFORM(PII_weight_output_layout,SELF:=RIGHT));
+
+		resPR := JOIN(resNorm,InsuranceHeader_PostProcess.segmentation_keys.key_did_ind,
+                     KEYED(left.did = right.did),
+                        transform(RECORDOF(LEFT),
+                            lexID_type := right.lexID_type;
+														self.did := IF(LexID_type<>IDLExternalLinking.Constants.INSURANCE_LEXID_TYPE and
+																					left.did<IDLExternalLinking.Constants.INSURANCE_LEXID, left.did, 0);
+                            self := left), left outer, keep(1));
+		RETURN resPR(not(did=0 and weight>0));
 	END;
 END;

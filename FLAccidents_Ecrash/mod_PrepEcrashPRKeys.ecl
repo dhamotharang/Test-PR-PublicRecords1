@@ -1,6 +1,6 @@
 ﻿IMPORT STD, dx_Ecrash;
 
-EXPORT mod_PrepEcrashPRKeys(DATASET(Layout_eCrash.Consolidation) proutIn = FLAccidents_Ecrash.File_KeybuildV2.prout) := MODULE
+EXPORT mod_PrepEcrashPRKeys(DATASET(Layout_eCrash.Consolidation) proutIn = Files_eCrash.Ds_Base_Consolidation_PR) := MODULE
 
 //***********************************************************************
 //                 key_EcrashV2_accnbr
