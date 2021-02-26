@@ -11,6 +11,7 @@ export t_SmartLinxReportOption := record (iesp.bpsreport.t_BpsReportOption)
 	boolean IncludeAddressSourceInfo {xpath('IncludeAddressSourceInfo')};
 	integer EmailVersion {xpath('EmailVersion')};//hidden[ecl_only]
 	boolean IncludeVendorSourceB {xpath('IncludeVendorSourceB')};//hidden[ecl_only]
+  boolean IncludeAssignmentsAndReleases {xpath('IncludeAssignmentsAndReleases')};
      boolean IncludePersonRiskIndicatorSection {xpath('IncludePersonRiskIndicatorSection')};              
 end;
 		
