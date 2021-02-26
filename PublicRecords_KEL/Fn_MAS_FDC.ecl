@@ -1070,14 +1070,30 @@ Current_Address_Consumer_recs_Contacts := join(Current_Address_Consumer_recs, Cu
 					SELF := RIGHT, 
 					SELF := LEFT,
 					SELF := []), 
+				ATMOST(PublicRecords_KEL.ECL_Functions.Constants.Default_Atmost_1000));		
+		
+		//gather lexids from input phone
+		Key_wild_phone :=	//	No dates does not need DateSelector
+			JOIN(Input_Phone_Consumer_recs, dx_Header.key_wild_phone(iType),
+				Common.DoFDCJoin_Dx_Header__key_wild_phone = TRUE AND FDCMiniPop AND
+				(INTEGER)LEFT.Phone > 0 AND
+				KEYED(LEFT.Phone[4..10] = RIGHT.p7 AND
+							   LEFT.Phone[1..3] = RIGHT.p3),
+				TRANSFORM(Layouts_FDC.Layout_Header_key_wild_phone,
+					SELF.UIDAppend := LEFT.UIDAppend,
+					SELF.G_ProcUID := LEFT.G_ProcUID,
+					SELF.P_LexID := LEFT.P_LexID,
+					SELF := RIGHT, 
+					SELF := LEFT,
+					SELF := []), 
 				ATMOST(PublicRecords_KEL.ECL_Functions.Constants.Default_Atmost_1000));
 
 /*************************************************************************************************************/
 //for searching
 	temp_wild_SSN := project(Key_wild_SSN, transform(Layouts_FDC.Layout_FDC, self.P_LexID := left.did,  self := left, self := []));			
-	lexids_for_Header := temp_wild_SSN + Input_FDC_RelativesLexids_HHIDLexids_Business_Contact_LexIDs_Input6thRep;
+	temp_wild_phone := project(Key_wild_phone, transform(Layouts_FDC.Layout_FDC, self.P_LexID := left.did,  self := left, self := []));			
+	lexids_for_Header := temp_wild_phone + temp_wild_SSN + Input_FDC_RelativesLexids_HHIDLexids_Business_Contact_LexIDs_Input6thRep;
 	clean_Header := dedup(sort(lexids_for_Header, UIDAppend, P_LexID), UIDAppend, P_LexID);
-	
 
 /*************************************************************************************************************/
 
