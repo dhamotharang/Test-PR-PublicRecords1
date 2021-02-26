@@ -292,13 +292,6 @@ boolean SuppressCompromisedDLs := false : stored('SuppressCompromisedDLs');
 boolean IncludeQAOutputs := FALSE : stored('IncludeQAOutputs'); 
 boolean UseIngestDate    := FALSE : stored('UseIngestDate'); 
 
-//IDA gateway modes 
-// 0 = production mode
-// 1 = UAT mode
-// 2 = Retro mode
-unsigned1 IDA_gateway_mode := 0 : stored('IDA_gateway_mode');
-
-
 string45  ip_value := TRIM(STD.STr.SplitWords(ip_value_pre,',')[1]);//some customers send in multiple so we are selecting based on the comma
 
 
@@ -534,7 +527,8 @@ Gateway.Layouts.Config gw_switch(gateways_in le) := transform
                           serviceNameLowerTrim = Gateway.Constants.ServiceName.bridgerwlc and OFACVersion = 4 and
                           Not Models.FP_models.Model_Check(Valid_requested_models, Risk_Indicators.iid_constants.FAXML_WatchlistModels)                                       => '',
                           serviceNameLowerTrim in Models.FraudAdvisor_Constants.IDA_services and 
-													(Not Models.FP_models.Model_Check(Valid_requested_models, Models.FraudAdvisor_Constants.IDA_models_set) OR
+													((Not Models.FP_models.Model_Check(Valid_requested_models, Models.FraudAdvisor_Constants.IDA_models_set) and
+                            Not Models.FP_Models.Check_Valid_Attributes(attributesIn, [Models.FraudAdvisor_Constants.attrIDA])) or
                           passesFraudIntelTotalCheck = FALSE)                                                                                                                 => '', //turn off IDA gateway if we don't need it OR minimum input check fails
                                                                                                                                                                                  le.servicename);
                                                                                                                                                
@@ -544,8 +538,9 @@ Gateway.Layouts.Config gw_switch(gateways_in le) := transform
                   serviceNameLowerTrim = Gateway.Constants.ServiceName.bridgerwlc and OFACVersion = 4 and
                   Not Models.FP_models.Model_Check(Valid_requested_models, Risk_Indicators.iid_constants.FAXML_WatchlistModels)                                               => '',
                   serviceNameLowerTrim in Models.FraudAdvisor_Constants.IDA_services and 
-									(Not Models.FP_models.Model_Check(Valid_requested_models, Models.FraudAdvisor_Constants.IDA_models_set) OR
-                  passesFraudIntelTotalCheck = FALSE)                                                                                                                         => '', //turn off IDA gateway if we don't need it OR minimum input check fails
+									((Not Models.FP_models.Model_Check(Valid_requested_models, Models.FraudAdvisor_Constants.IDA_models_set) and
+                    Not Models.FP_Models.Check_Valid_Attributes(attributesIn, [Models.FraudAdvisor_Constants.attrIDA])) or
+                  passesFraudIntelTotalCheck = FALSE)                                                                                                                          => '', //turn off IDA gateway if we don't need it OR minimum input check fails
                                                                                                                                                                                  le.url); 
   self := le;
   
@@ -617,7 +612,7 @@ doAttributesVersion202 := (Models.FP_Models.Check_Valid_Attributes(attributesIn,
                           and input_ok;	  // output version202 if requested and minimum input entered
 doParoAttributes := Models.FP_Models.Check_Valid_Attributes(attributesIn, [Models.FraudAdvisor_Constants.attrvparo]) and input_ok;	      // output Paro attrs if requested and minimum input entered
 doTMXAttributes := Models.FP_Models.Check_Valid_Attributes(attributesIn, [Models.FraudAdvisor_Constants.attrvTMX]) and input_ok;	      // output TMX attrs if requested and minimum input entered
-
+doIDA_Attributes := Models.FP_Models.Check_Valid_Attributes(attributesIn, [Models.FraudAdvisor_Constants.attrIDA]) and input_ok; // output IDA attrs if requested and minimum input entered
 
 //Options copied over from targets np31 model to make it work the same in FraudAdvisor
 //These options are being hard coded to prevent target's fp1403_2 model from changing if FraudAdvisor settings change
@@ -660,7 +655,7 @@ IncludeDLverification := if(doAttributesVersion2, true, false);
 //=========================
 bsVersion := map(
   Models.FP_models.Model_Check(Valid_requested_models, ['di31906_0']) or doTMXAttributes => 55,
-  Models.FP_models.Model_Check(Valid_requested_models, ['fp1902_1', 'fp1908_1', 'fp1909_1', 'fp1909_2', 'fp1907_1', 'fp1907_2', 'fibn12010_0']) => 54,
+  Models.FP_models.Model_Check(Valid_requested_models, ['fp1902_1', 'fp1908_1', 'fp1909_1', 'fp1909_2', 'fp1907_1', 'fp1907_2', 'fibn12010_0']) or doIDA_Attributes => 54,
   Models.FP_models.Model_Check(Valid_requested_models, Models.FraudAdvisor_Constants.BS_Version53_List) or doParoAttributes or doAttributesVersion202 => 53,
 	Models.FP_models.Model_Check(Valid_requested_models, ['fp1706_1','fp1705_1','fp1704_1']) => 52,
 	Models.FP_models.Model_Check(Valid_requested_models, ['fp1506_1', 'fp31505_0', 'fp3fdn1505_0', 'fp31505_9', 'fp3fdn1505_9','fp1509_1', 
@@ -800,8 +795,48 @@ test_prep := PROJECT(d,into_test_prep(LEFT));
 
 model_indicator := IF(doParoAttributes, Models.FraudAdvisor_Constants.attrvparo, ''); //model names will now be passed in through the model request structure in getFDAttributes
 
+//Make sure we are passing in the input PII not the cleaned PII to IDA
+IDA_input := PROJECT(iid, Transform(Risk_Indicators.layouts.layout_IDA_in,
+                      SELF.seq := left.seq;
+                      SELF.DID := left.did;
+                      SELF.fname := first_value;
+                      SELF.mname := middle_value;
+                      SELF.lname := last_value;
+                      SELF.suffix := suffix_value;
+                      SELF.in_streetAddress := addr_value;
+                      SELF.in_city := city_value;
+                      SELF.in_state := state_value;
+                      SELF.in_zipCode := zip_value;
+                      SELF.in_country := country_value;
+                      SELF.ssn := ssn_FraudIntel;
+                      SELF.dob := dob_FraudIntel;
+                      SELF.phone10 := primaryPhone_FraudIntel;
+                      SELF.wphone10 := wphone_FraudIntel_Conditional;
+                      SELF.dl_number := drlc_value;
+                      SELF.dl_state := drlcstate_value;
+                      SELF.email_address := email_value;
+                      SELF.ip_address := ip_value;
+                      SELF.historydate := IF(historyDateTimeStamp <> '', (UNSIGNED)historyDateTimeStamp[1..6], history_date);
+                      SELF.historyDateTimeStamp := risk_indicators.iid_constants.mygetdateTimeStamp(historydateTimeStamp, history_date);
+                      
+                      SELF.App_ID := Trim(OtherApplicationIdentifier3);
+                      SELF.CompanyID := CompanyID;
+                      SELF.ESPTransactionId := TransactionID;
+                      SELF.Channel := Channel;
+                      SELF := [];
+
+                     ));
+
+//Call the IDA gateway if needed
+IDA_attributes_raw := Risk_Indicators.Prep_IDA_Fraud(ungroup(IDA_input), gateways, Valid_requested_models, doIDA_Attributes := doIDA_Attributes);
+  
+IDA_attributes := IF(Models.FP_models.Model_Check(Valid_requested_models, Models.FraudAdvisor_Constants.IDA_models_set) OR doIDA_Attributes, 
+                     IDA_attributes_raw,
+                     DATASET([],Risk_Indicators.layouts.layout_IDA_out)
+                     );
+
 // Get the attributes
-attributes := Models.getFDAttributes(clam, iid, account_value, ipdata, model_indicator, suppressCompromisedDLs, ModelRequests := Valid_requested_models, mod_access := mod_access);
+attributes := Models.getFDAttributes(clam, iid, account_value, ipdata, model_indicator, suppressCompromisedDLs, ModelRequests := Valid_requested_models, mod_access := mod_access, IDA_attributes := IDA_attributes);
 //For Paro update
 // attributes := Models.getFDAttributes(clam, iid, account_value, ipdata, model_indicator, suppressCompromisedDLs,
                                      // DPPA_Purpose, GLB_Purpose, DataRestriction, DataPermission, '', Valid_requested_models);
@@ -854,20 +889,23 @@ END;
 //Centralize the logic for getting the count for the attribute normalize's
 NormalizeCount := map( doAttributesVersion1                              => 162,
                        doTMXAttributes                                   => 538,
-                       doAttributesVersion202                            => 384,
+                       doAttributesVersion202 or doIDA_Attributes        => 384,  //IDA needs 202 attrs
                        doAttributesVersion201 and SuppressCompromisedDLs => 226,
                        doAttributesVersion201                            => 225,
                        doAttributesVersion2                              => 217,
                        doIDAttributes                                    => 105,
                        doParoAttributes                                  => 35,
-                                                                            0);//no attributes or invalid attributes requested
+                                                                            0);   //no attributes or invalid attributes requested
+
+//IDA needs its own NormalizeCount, need to add to 202 attrs later                                                                            
+NormalizeCount_IDA := IF(doIDA_Attributes, 689, 0);
 
 name_pairs :=  normalize(pick_attr, NormalizeCount, Models.FraudAdvisor_Transforms(suppressCompromisedDLs).intoVersion1(left, counter));
 v1 := project(name_pairs, transform(layout_attribute, self.attribute := left));
 
 v2_name_pairs :=  normalize(pick_attr, NormalizeCount, Models.FraudAdvisor_Transforms(suppressCompromisedDLs).intoVersion2(left, counter))(name<>'');
 v2 := project(v2_name_pairs, transform(layout_attribute, self.attribute := left));
-		
+
 layout_AttributeGroup formAttributes(Models.Layout_FraudAttributes le) := TRANSFORM
 	self.name := map( doTMXAttributes        => 'Version202_DI1',
                     doAttributesVersion202 => 'Version202',
@@ -897,8 +935,19 @@ Layout_AttributeGroup form_ParoAttributes(Models.Layout_FraudAttributes le) := T
 	self.Attributes := ungroup(Paro_attr);
 END;
 
+IDA_name_pairs :=  NORMALIZE(pick_attr, NormalizeCount_IDA, Models.FraudAdvisor_Transforms(suppressCompromisedDLs).intoIDA_Attributes(left, counter))(name<>'');
+IDA_attr := PROJECT(IDA_name_pairs, transform(layout_attribute, self.attribute := left));
+
+Layout_AttributeGroup form_IDA_Attributes(Models.Layout_FraudAttributes le) := TRANSFORM
+	self.name := 'IDA_Attributes';
+	self.index := if(doIDA_Attributes, '0', '');
+  
+  //IDA requires IDA attributes AND v2 attributes
+	self.Attributes := ungroup(v2) & ungroup(IDA_attr);
+END;
+
 layout_FDAttributesOut formAttributeGroup(Models.Layout_FraudAttributes le) := transform
-	self.accountnumber := if(doAttributesVersion1 or doAttributesVersion2 OR doIDAttributes or doParoAttributes or doTMXAttributes, account_value, '');
+	self.accountnumber := if(doAttributesVersion1 or doAttributesVersion2 OR doIDAttributes or doParoAttributes or doTMXAttributes or doIDA_Attributes, account_value, '');
 	self.input.grade := ''; // To mask wfs3/4 using Grade. Will be populated using the custom_field_replacement function below
 	self.input.Channel := Channel;
 	self.input.Income := Income;
@@ -927,6 +976,7 @@ layout_FDAttributesOut formAttributeGroup(Models.Layout_FraudAttributes le) := t
                              doTMXAttributes          => DATASET([formAttributes(le)]),
                              doIDAttributes           => DATASET([form_IDAttributes(le)]),
                              doParoAttributes         => DATASET([form_ParoAttributes(le)]),
+                             doIDA_Attributes         => DATASET([form_IDA_Attributes(le)]),
                                                          DATASET([], layout_AttributeGroup)
                             );
   self := [];
@@ -935,49 +985,6 @@ attributeOut_temp := PROJECT(pick_attr, formAttributeGroup(left));
 
 attributeOut := Models.FP_models.custom_field_replacement(attributeOut_temp, Valid_requested_models, '', 'input.grade', 'grade', 'string');
 // attributeOut := join(pick_attr,clam,  left.input.seq=right.seq, formAttributeGroup(LEFT,RIGHT));
-
-
-//Make sure we are passing in the input PII not the cleaned PII to IDA
-IDA_input := PROJECT(iid, Transform(Risk_Indicators.layouts.layout_IDA_in,
-                      SELF.seq := left.seq;
-                      SELF.DID := left.did;
-                      SELF.fname := first_value;
-                      SELF.mname := middle_value;
-                      SELF.lname := last_value;
-                      SELF.suffix := suffix_value;
-                      SELF.in_streetAddress := addr_value;
-                      SELF.in_city := city_value;
-                      SELF.in_state := state_value;
-                      SELF.in_zipCode := zip_value;
-                      SELF.in_country := country_value;
-                      SELF.ssn := ssn_FraudIntel;
-                      SELF.dob := dob_FraudIntel;
-                      SELF.phone10 := primaryPhone_FraudIntel;
-                      SELF.wphone10 := wphone_FraudIntel_Conditional;
-                      SELF.dl_number := drlc_value;
-                      SELF.dl_state := drlcstate_value;
-                      SELF.email_address := email_value;
-                      SELF.ip_address := ip_value;
-                      SELF.historydate := IF(historyDateTimeStamp <> '', (UNSIGNED)historyDateTimeStamp[1..6], history_date);
-                      SELF.historyDateTimeStamp := risk_indicators.iid_constants.mygetdateTimeStamp(historydateTimeStamp, history_date);
-                      
-                      SELF.App_ID := Trim(OtherApplicationIdentifier3);
-                      SELF.CompanyID := CompanyID;
-                      SELF.ESPTransactionId := TransactionID;
-                      SELF.Channel := Channel;
-                      SELF := [];
-
-                     ));
-
-
-//Call the IDA gateway if needed
-IDA_attributes_raw := Risk_Indicators.Prep_IDA_Fraud(ungroup(IDA_input), gateways, Valid_requested_models);
-  
-IDA_attributes := IF(Models.FP_models.Model_Check(Valid_requested_models, Models.FraudAdvisor_Constants.IDA_models_set), 
-                     IDA_attributes_raw,
-                     DATASET([],Risk_Indicators.layouts.layout_IDA_out)
-                     );
-
 
 // Get the Fraud Defender models
 ret  := Models.FD3510_0_0(clam, ofacSearching, isFCRA, inCalif, fdReasonsWith38, nugen, addtl_watchlists);
