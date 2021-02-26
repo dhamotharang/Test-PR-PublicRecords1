@@ -244,7 +244,7 @@ export t_SLRSources := record
 	string32 _Type {xpath('Type')};
 	integer Count {xpath('Count')};
 end;
-		
+
 export t_SLRAddressSourceInfo := record (iesp.share.t_AddressEx)
 	integer2 SourceCount {xpath('SourceCount')};
 	dataset(t_SLRSources) Sources {xpath('Sources/Source'), MAXCOUNT(iesp.Constants.SLR.MaxSourceTypes)};
@@ -332,20 +332,30 @@ export t_SLREntities := record
 	string12 UniqueId {xpath('UniqueId')};
 	dataset(iesp.share.t_Name) Names {xpath('Names/Name'), MAXCOUNT(iesp.Constants.SMART.MaxAKA)};
 	dataset(iesp.share.t_SSNInfoEx) SSNs {xpath('SSNs/SSN'), MAXCOUNT(iesp.Constants.SMART.MaxAKA)};
-	dataset(iesp.share.t_Date) DOBs {xpath('DOBs/DOB'), MAXCOUNT(iesp.Constants.SMART.MaxAKA)};
+	dataset(iesp.share.t_Date) DOBs {xpath('DOBs/DOB'), MAXCOUNT(iesp.Constants.SMART.MaxAKA)};   
 end;
 
-export t_SLRPersonRiskIndicator := record  
-     boolean PersonRiskFlag {xpath('PersonRiskFlag')}; 
-     string1 PersonRiskIndicatorFlag {xpath('PersonRiskIndicatorFlag')}; 
-     string100 PersonRiskIndicatorName {xpath('PersonRiskIndicatorName')}; 
+export t_SLRPersonRiskIndicator := record
+     boolean PersonRiskFlag {xpath('PersonRiskFlag')};
+     string1 PersonRiskIndicatorFlag {xpath('PersonRiskIndicatorFlag')};
+     string100 PersonRiskIndicatorName {xpath('PersonRiskIndicatorName')};
 end;
 
 export t_SLRPersonRiskIndicatorSection := record  
      dataset(t_SLRPersonRiskIndicator) PersonIdentityRisks {xpath('PersonIdentityRisks/PersonIdentityRisk'), MAXCount(iesp.Constants.SMART.MaxPersonRiskIndicators)};
      string1  PersonIdentityRiskStatus  {xpath('PersonIdentityRiskStatus')};
 end;
-	
+
+export t_SLRLinkId := record
+	integer2 SourceCount {xpath('SourceCount')};
+	dataset(t_SLRSources) Sources {xpath('Sources/Source'), MAXCOUNT(iesp.Constants.SLR.MaxSourceTypes)};
+	string12 UniqueId {xpath('UniqueId')};
+end;
+
+export  t_SLRPersonRiskIdentity  := record
+      t_SLRLinkId LinkIdInfo {xpath('LinkIdInfo')};
+end;	
+
 export t_SmartLinxReportBaseIndividual := record
 	string12 UniqueId {xpath('UniqueId')};
 	t_TotalCountsAvailable TotalCountsAvailable {xpath('TotalCountsAvailable')};
@@ -387,6 +397,7 @@ export t_SmartLinxReportBaseIndividual := record
 	dataset(iesp.share.t_SourceSection) Sources {xpath('Sources/Source'), MAXCOUNT(iesp.Constants.SMART.MaxSources)};
 	dataset(iesp.bpsreport.t_BpsReportEmailSearchRecord) Emails {xpath('Emails/Email'), MAXCOUNT(iesp.Constants.SMART.MaxEmails)};
       t_SLRPersonRiskIndicatorSection PersonRiskIndicatorSection {xpath('PersonRiskIndicatorSection')};
+      t_SLRPersonRiskIdentity PersonIdentity {xpath('PersonIdentity')};
 end;
 		
 export t_SmartLinxReportIndividual := record (t_SmartLinxReportBaseIndividual)
