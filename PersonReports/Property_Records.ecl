@@ -294,7 +294,7 @@ EXPORT property_records (
   // get the fids
 	export fids := LN_PropertyV2_Services.Raw.get_fids_from_dids (dids,isFCRA);
 	export all_records := LN_PropertyV2_Services.resultFmt.widest_view.get_by_fid(fids,,,in_params.non_subject_suppression,
-																																								isFCRA,slim_pc_recs,in_params.FFDOptionsMask, flagfile, in_params.IncludeVendorSourceB);
+																																								isFCRA,slim_pc_recs,in_params.FFDOptionsMask, flagfile, in_params.IncludeAssignmentsAndReleases);
 
   assess_ext format_assess_all (LN_PropertyV2_Services.layouts.combined.widest l) := TRANSFORM
     MAC_SetAssessments (true);
