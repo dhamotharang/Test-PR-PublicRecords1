@@ -14,7 +14,6 @@ module
 	export Main := module
 		export ID												:= tools.mod_FilenamesBuild(lTemplate('ID'),pversion);
 		export DID											:= tools.mod_FilenamesBuild(lTemplate('DID'),pversion);
-		export BDID											:= tools.mod_FilenamesBuild(lTemplate('BDID'),pversion);
 		export Email										:= tools.mod_FilenamesBuild(lTemplate('Email'),pversion);
 		export Ip												:= tools.mod_FilenamesBuild(lTemplate('IP'),pversion);
 		export ProfessionalID						:= tools.mod_FilenamesBuild(lTemplate('ProfessionalID'),pversion);
@@ -23,7 +22,6 @@ module
 		export NPI											:= tools.mod_FilenamesBuild(lTemplate('NPI'),pversion);
 		export AppProviderID						:= tools.mod_FilenamesBuild(lTemplate('AppProviderID'),pversion);
 		export LNPID										:= tools.mod_FilenamesBuild(lTemplate('LNPID'),pversion);
-		export Mbs											:= tools.mod_FilenamesBuild(lTemplate('Mbs'),pversion);
 		export MbsIndTypeExclusion			:= tools.mod_FilenamesBuild(lTemplate('MbsIndTypeExclusion'),pversion);
 		export MbsProductInclude				:= tools.mod_FilenamesBuild(lTemplate('MbsProductInclude'),pversion);
 		export MbsFDNMasterID						:= tools.mod_FilenamesBuild(lTemplate('Gcid_2_MbsFDNMasterID'),pversion);
@@ -52,7 +50,6 @@ module
 		export dAll_filenames :=
 		    ID.dAll_filenames +
 			 	DID.dAll_filenames +
-				If(Platform.Source <> 'FraudGov'  ,BDID.dAll_filenames) +
 				Email.dAll_filenames +
 				If(Platform.Source <> 'FraudGov'  ,IP.dAll_filenames) + 
 				If(Platform.Source <> 'FraudGov'  ,ProfessionalID.dAll_filenames) + 
@@ -61,7 +58,6 @@ module
 				If(Platform.Source <> 'FraudGov'  ,NPI.dAll_filenames) + 
 				If(Platform.Source <> 'FraudGov'  ,AppProviderID.dAll_filenames) + 
 				If(Platform.Source <> 'FraudGov'  ,LNPID.dAll_filenames) + 
-				If(Platform.Source <> 'FraudGov'  ,Mbs.dAll_filenames) + 
 				MbsIndTypeExclusion.dAll_filenames +
 				MbsProductInclude.dAll_filenames +
 				MbsFDNMasterID.dAll_filenames +
