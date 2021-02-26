@@ -63,7 +63,25 @@ export CleanAddress(string pcitystzip) := FUNCTION
                     step4
                    );
  return clnAddress;
-end;																 
+end;	
+
+export rightPadDate(string8 pdate) := FUNCTION  //added for DF-28911
+
+ trim_pdate := trim(pdate,left,right);
+ 
+ length_date := length(trim_pdate);
+ 
+ // length_date values: 0,1,2,3,4,5,6,7,8
+ pad_dates := map(length_date = 1 => trim_pdate+'0000000',
+                  length_date = 2 => trim_pdate+'000000',
+									length_date = 3 => trim_pdate+'00000',
+									length_date = 4 => trim_pdate+'0000',
+									length_date = 5 => trim_pdate+'000',
+									length_date = 6 => trim_pdate+'00',
+									length_date = 7 => trim_pdate+'0', pdate); 
+									
+ return pad_dates;
+ end;
 
 export statusToFilter := ['PLAINTIFF', 'JUVENILE CLASS: A','JUVENILE CLASS: N','JUVENILE CLASS: JA','JUVENILE CLASS: J'];
 
