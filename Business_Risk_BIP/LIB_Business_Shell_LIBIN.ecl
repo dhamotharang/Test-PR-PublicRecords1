@@ -1,4 +1,4 @@
-﻿IMPORT doxie, Business_Risk_BIP, Gateway, iesp;
+﻿IMPORT Business_Risk_BIP, Gateway, iesp, LNSmallBusiness, doxie;
 
 
 // NOTE: If you change this you MUST redeploy the Library as the interface has changed.
@@ -26,5 +26,6 @@ EXPORT LIB_Business_Shell_LIBIN := INTERFACE (doxie.IDataAccess)
 	EXPORT UNSIGNED1  BipAppend_WeightThreshold                       := 44;
 	EXPORT BOOLEAN    BIPAppend_primForce                             := FALSE;
 	EXPORT BOOLEAN    UseUpdatedBipAppend                             := TRUE;
+	EXPORT Dataset(LNSmallBusiness.Layouts.ModelNameRec)  ModelsRequested  := Dataset([],LNSmallBusiness.Layouts.ModelNameRec);
 
 END;

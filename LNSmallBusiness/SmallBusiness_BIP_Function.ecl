@@ -225,7 +225,9 @@ EXPORT SmallBusiness_BIP_Function (
   
     OverrideExperianRestriction := IF(EXISTS(ModelsRequested(ModelName IN [BusinessCredit_Services.Constants.MODEL_NAME_SETS.BLENDED_BBFM,
                                            BusinessCredit_Services.Constants.MODEL_NAME_SETS.CREDIT_BOFM,
-                                           BusinessCredit_Services.Constants.MODEL_NAME_SETS.BLENDED_BBFM_NSBFEWITHEXP
+                                           BusinessCredit_Services.Constants.MODEL_NAME_SETS.BLENDED_BBFM_NSBFEWITHEXP,
+                                           BusinessCredit_Services.Constants.MODEL_NAME_SETS.BBFM1906_1_0
+
                                     ])
                                  ), TRUE, FALSE);
 
