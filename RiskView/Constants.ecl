@@ -16,7 +16,7 @@ export FIS_custom_attr_request := 'riskviewattrv5fis';
 
 export valid_attributes := ['riskviewattrv5', 'insurview2attr', checking_indicators_attribute_request, FIS_custom_attr_request];
 
-export valid_IDA_models := ['rvg2005_0'];
+export valid_IDA_models := ['rvg2005_0', 'rvs2005_0'];
 
 export attrv5_models := ['rva2008_1', 'rvt2004_1', 'rvt2004_2']; // this allows attributes to be run even if not requested
 
