@@ -266,7 +266,8 @@ unsigned1 RedFlag_version 	:= 0 				: stored('RedFlag_version');
 string 	 	DataRestriction 	:= risk_indicators.iid_constants.default_DataRestriction : stored('DataRestrictionMask');
 string	 	DataPermission 		:= Risk_Indicators.iid_constants.default_DataPermission : stored('DataPermissionMask');
 boolean   Test_Data_Enabled := false  	: stored('TestDataEnabled');
-//boolean   Test_Data_Enabled := false ;
+// boolean   Test_Data_Enabled := false;
+// boolean   Test_Data_Enabled := true;
 string20  Test_Data_Table_Name := ''   	: stored('TestDataTableName');
  
 
@@ -528,7 +529,8 @@ Gateway.Layouts.Config gw_switch(gateways_in le) := transform
 
   serviceNameLowerTrim := STD.STR.ToLowerCase(TRIM(le.servicename));
   
-  self.servicename := map(Models.FP_models.Model_Check(Valid_requested_models, ['fd5609_2'])                                                                                  => '', //turn off all gateways for fd5609_2
+  self.servicename := map(Test_Data_Enabled                                                                                                                                   => '', //turn off gateway if we're using test seeds
+                          Models.FP_models.Model_Check(Valid_requested_models, ['fd5609_2'])                                                                                  => '', //turn off all gateways for fd5609_2
                           Models.FP_models.Model_Check(Valid_requested_models, ['fp1303_1', 'fp1307_1']) and serviceNameLowerTrim = Gateway.Constants.ServiceName.NetAcuity   => '', //turn off netacuity gateway for fp1303_1
                           serviceNameLowerTrim = Gateway.Constants.ServiceName.bridgerwlc and OFACVersion = 4 and Models.FP_models.Model_Check(Valid_requested_models, [''])  => le.servicename,
                           serviceNameLowerTrim = Gateway.Constants.ServiceName.bridgerwlc and OFACVersion = 4 and
@@ -538,7 +540,8 @@ Gateway.Layouts.Config gw_switch(gateways_in le) := transform
                           passesFraudIntelTotalCheck = FALSE)                                                                                                                 => '', //turn off IDA gateway if we don't need it OR minimum input check fails
                                                                                                                                                                                  le.servicename);
                                                                                                                                                
-  self.url := map(Models.FP_models.Model_Check(Valid_requested_models, ['fd5609_2'])                                                                                          => '',
+  self.url := map(Test_Data_Enabled                                                                                                                                           => '', //turn off gateway if we're using test seeds
+                  Models.FP_models.Model_Check(Valid_requested_models, ['fd5609_2'])                                                                                          => '',
                   Models.FP_models.Model_Check(Valid_requested_models, ['fp1303_1', 'fp1307_1']) and serviceNameLowerTrim = Gateway.Constants.ServiceName.NetAcuity           => '',
                   serviceNameLowerTrim = Gateway.Constants.ServiceName.bridgerwlc and OFACVersion = 4 and Models.FP_models.Model_Check(Valid_requested_models, [''])          => le.url,
                   serviceNameLowerTrim = Gateway.Constants.ServiceName.bridgerwlc and OFACVersion = 4 and
