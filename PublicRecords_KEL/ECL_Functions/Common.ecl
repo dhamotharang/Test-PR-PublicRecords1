@@ -33,6 +33,14 @@ EXPORT Common(PublicRecords_KEL.Interface_Options Options) := MODULE
 			Options.IncludePersonSSN OR 
 			Options.IncludeSocialSecurityNumber OR 
 			Options.IncludeSSNAddress OR
+			Options.IncludeSSNPhone);	
+			
+	EXPORT DoFDCJoin_Dx_Header__key_wild_phone := //header both
+			NOT Options.isFCRA AND
+			(Options.IncludeMini OR
+			Options.IncludePersonPhone OR 
+			Options.IncludePhone OR 
+			Options.IncludeAddressPhone OR
 			Options.IncludeSSNPhone);
 			 
 	EXPORT DoFDCJoin_dx_Header__key_did_hhid :=		

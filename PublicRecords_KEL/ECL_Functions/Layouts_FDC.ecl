@@ -158,6 +158,14 @@ SHARED unsigned1 iType := IF(Options.IsFCRA, data_services.data_env.iFCRA, data_
 		RECORDOF(Doxie__key_wild_SSN);
 		STRING Archive_Date;
 		PublicRecords_KEL.ECL_Functions.Layout_Overrides;//this will be needed
+	END;	  
+	
+    SHARED Header_key_wild_phone := dx_Header.key_wild_phone();
+	EXPORT Layout_Header_key_wild_phone := RECORD
+		LayoutIDs;
+		RECORDOF(Header_key_wild_phone);
+		STRING Archive_Date;
+		PublicRecords_KEL.ECL_Functions.Layout_Overrides;
 	END;	
 
 	// --------------------[ Criminal ]--------------------
