@@ -11,7 +11,7 @@ EXPORT FnRoxie_GetHighRiskAddress (DATASET(PublicRecords_KEL.ECL_Functions.Layou
 
 	HighRiskAddressAttributesLayout := RECORDOF(PublicRecords_KEL.Q_Address_High_Risk_Dynamic('','',0,'','','', DATASET([], PublicRecords_KEL.ECL_Functions.Layouts.LayoutInputPII), 0, PublicRecords_KEL.CFG_Compile.Permit__NONE).res0);
 			
-	RawResults := PROJECT(GoodInputOnly, TRANSFORM({INTEGER G_ProcUID, BOOLEAN ResultsFound, HighRiskAddressAttributesLayout},
+	RawResults := NOCOMBINE(PROJECT(GoodInputOnly, TRANSFORM({INTEGER G_ProcUID, BOOLEAN ResultsFound, HighRiskAddressAttributesLayout},
 		SELF.G_ProcUID := LEFT.G_ProcUID;
 		HighRiskResults := PublicRecords_KEL.Q_Address_High_Risk_Dynamic(
 																								(string)LEFT.P_InpClnAddrPrimRng,
@@ -25,7 +25,7 @@ EXPORT FnRoxie_GetHighRiskAddress (DATASET(PublicRecords_KEL.ECL_Functions.Layou
 																								Options.KEL_Permissions_Mask, 
 																								FDCDataset).res0;	
 		SELF := HighRiskResults[1];
-		SELF.ResultsFound := EXISTS(HighRiskResults)));	
+		SELF.ResultsFound := EXISTS(HighRiskResults))));	
 	
 	
 		AttributeResults := KEL.Clean(RawResults, TRUE, TRUE, TRUE);

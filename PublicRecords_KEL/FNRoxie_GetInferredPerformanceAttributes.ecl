@@ -13,7 +13,7 @@ EXPORT FNRoxie_GetInferredPerformanceAttributes (DATASET(PublicRecords_KEL.ECL_F
 		TYPEOF(KEL.clean(PublicRecords_KEL.Q_Inferred_Performance_Dynamic( 0, DATASET([], PublicRecords_KEL.ECL_Functions.Layouts.LayoutInputPII), 0, PublicRecords_KEL.CFG_Compile.Permit__NONE).res1,TRUE,TRUE,TRUE)) dates};
 
 	
-	InferredPerformanceAttributesRaw := JOIN( WithInputParms, FDCDataset, LEFT.G_ProcUID = RIGHT.G_ProcUID, TRANSFORM(LayoutInferredPerformanceAttributes,
+	InferredPerformanceAttributesRaw := NOCOMBINE(JOIN( WithInputParms, FDCDataset, LEFT.G_ProcUID = RIGHT.G_ProcUID, TRANSFORM(LayoutInferredPerformanceAttributes,
 		RawAttributes := PublicRecords_KEL.Q_Inferred_Performance_Dynamic(LEFT.P_LexID,DATASET(LEFT),(INTEGER) LEFT.P_InpClnArchDt[1..8],Options.KEL_Permissions_Mask,DATASET(RIGHT)).res0;
 		RawAttributesDates := PublicRecords_KEL.Q_Inferred_Performance_Dynamic(LEFT.P_LexID,DATASET(LEFT),(INTEGER) LEFT.P_InpClnArchDt[1..8],Options.KEL_Permissions_Mask,DATASET(RIGHT)).res1;
 		SELF.G_ProcUID := LEFT.G_ProcUID;				
@@ -21,7 +21,8 @@ EXPORT FNRoxie_GetInferredPerformanceAttributes (DATASET(PublicRecords_KEL.ECL_F
 		SELF.ResultsFoundDates := EXISTS(RawAttributesDates);
 		SELF.results := KEL.clean(RawAttributes,true,true,true)[1],
 		SELF.dates := KEL.clean(RawAttributesdates,true,true,true)[1]),
-		LEFT OUTER, ATMOST(100), KEEP(1));
+		LEFT OUTER, ATMOST(100), KEEP(1)));
+		
 	WithInputParmsInferredPerformanceAttributes :=
 		                  JOIN(WithInputParms,InferredPerformanceAttributesRaw, LEFT.G_ProcUID = RIGHT.G_ProcUID,
 											    TRANSFORM(PublicRecords_KEL.ECL_Functions.Layouts.LayoutInferredAttributes,

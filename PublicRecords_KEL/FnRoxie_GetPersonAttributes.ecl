@@ -37,13 +37,13 @@ EXPORT FnRoxie_GetPersonAttributes(DATASET(PublicRecords_KEL.ECL_Functions.Layou
 		string6 PL_AlrtIDTheftFlag;
 	END;	
 														
-	NonFCRAPersonAttributesRaw := PROJECT(RecordsWithLexID, TRANSFORM({INTEGER G_ProcUID, LayoutPersonAttributesRaw},
+	NonFCRAPersonAttributesRaw := NOCOMBINE(PROJECT(RecordsWithLexID, TRANSFORM({INTEGER G_ProcUID, LayoutPersonAttributesRaw},
 		SELF.G_ProcUID := LEFT.G_ProcUID;
 		NonFCRAPersonResults := PublicRecords_KEL.Q_Non_F_C_R_A_Person_Attributes_V1_Dynamic(LEFT.P_LexID , DATASET(LEFT), (INTEGER)(LEFT.P_InpClnArchDt[1..8]), Options.KEL_Permissions_Mask, FDCDataset).res0;	
 		SELF := NonFCRAPersonResults[1],
-		SELF := []));	
+		SELF := [])));	
 
-	FCRAPersonAttributesRaw := PROJECT(RecordsWithLexID, TRANSFORM({INTEGER G_ProcUID, LayoutPersonAttributesRaw},
+	FCRAPersonAttributesRaw := NOCOMBINE(PROJECT(RecordsWithLexID, TRANSFORM({INTEGER G_ProcUID, LayoutPersonAttributesRaw},
 		SELF.G_ProcUID := LEFT.G_ProcUID;
 		FCRAPersonResults := PublicRecords_KEL.Q_F_C_R_A_Person_Attributes_V1_Dynamic(LEFT.P_LexID , DATASET(LEFT), (INTEGER)(LEFT.P_InpClnArchDt[1..8]), Options.KEL_Permissions_Mask, FDCDataset).res0;	
 		SELF := FCRAPersonResults[1],
@@ -68,7 +68,7 @@ EXPORT FnRoxie_GetPersonAttributes(DATASET(PublicRecords_KEL.ECL_Functions.Layou
 		SELF.PL_AlrtSecurityFreezeFlag := FCRAPersonResults[1].P_L___Alrt_Security_Freeze_Flag_;
 		SELF.PL_AlrtSecurityAlertFlag := FCRAPersonResults[1].P_L___Alrt_Security_Alert_Flag_;
 		SELF.PL_AlrtIDTheftFlag := FCRAPersonResults[1].P_L___Alrt_I_D_Theft_Flag_;
-		SELF := []));	
+		SELF := [])));	
 		
 	PersonAttributesClean := IF(Options.IsFCRA, 
 															KEL.Clean(FCRAPersonAttributesRaw, TRUE, TRUE, TRUE),

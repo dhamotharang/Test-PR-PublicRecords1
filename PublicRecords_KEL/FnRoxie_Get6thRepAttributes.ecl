@@ -14,10 +14,10 @@ EXPORT FnRoxie_Get6thRepAttributes(DATASET(PublicRecords_KEL.ECL_Functions.Layou
 	LayoutNonFCRAPersonAttributes := RECORDOF(PublicRecords_KEL.Q_Non_F_C_R_A_Sixth_Rep_Attributes_V1_Dynamic(0, DATASET([], PublicRecords_KEL.ECL_Functions.Layouts.LayoutInputPII), 0, PublicRecords_KEL.CFG_Compile.Permit__NONE).res0);
 	
 	//update Q_* below
-	NonFCRAPersonAttributesRaw := PROJECT(RecordsWithLexID, TRANSFORM({INTEGER G_ProcUID, LayoutNonFCRAPersonAttributes},
+	NonFCRAPersonAttributesRaw := NOCOMBINE(PROJECT(RecordsWithLexID, TRANSFORM({INTEGER G_ProcUID, LayoutNonFCRAPersonAttributes},
 		SELF.G_ProcUID := LEFT.G_ProcUID;
 		NonFCRAPersonResults := PublicRecords_KEL.Q_Non_F_C_R_A_Sixth_Rep_Attributes_V1_Dynamic(LEFT.P_LexID , DATASET(LEFT), (INTEGER)(LEFT.P_InpClnArchDt[1..8]), Options.KEL_Permissions_Mask, FDCDataset).res0;	
-		SELF := NonFCRAPersonResults[1]));	
+		SELF := NonFCRAPersonResults[1])));	
 		
 	PersonAttributesClean := KEL.Clean(NonFCRAPersonAttributesRaw, TRUE, TRUE, TRUE);
 		
