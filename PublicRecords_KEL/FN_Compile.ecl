@@ -1,4 +1,4 @@
-﻿//HPCC Systems KEL Compiler Version 1.5.0rc1
+//HPCC Systems KEL Compiler Version 1.5.0rc1
 IMPORT KEL15 AS KEL;
 IMPORT $,Email_Data,NID,PublicRecords_KEL,Royalty,STD,address,header;
 IMPORT CFG_Compile FROM PublicRecords_KEL;
@@ -133,9 +133,9 @@ EXPORT FN_Compile(CFG_Compile __cfg = CFG_Compile) := MODULE
     __Value := PublicRecords_KEL.ECL_Functions.Fn_STD_Str_FilterOut_ValidChars(Field);
     RETURN __BNT(__Value,__IsNull,KEL.typ.nstr);
   END;
-  SHARED __CC13450 := -99999;
+  SHARED __CC13524 := -99999;
   EXPORT KEL.typ.str FN_Validate_Flag(KEL.typ.nstr __PFieldToCheck) := FUNCTION
-    RETURN MAP(__T(__OR(__NT(__PFieldToCheck),__OP2(__PFieldToCheck,=,__CN(''))))=>(KEL.typ.str)__CC13450,__T(__OP2(FN__fn_Filter_Out_Valid_Chars(__ECAST(KEL.typ.nstr,__FN1(KEL.Routines.ToUpperCase,__FN1(KEL.Routines.TrimBoth,__PFieldToCheck)))),=,__CN('')))=>'0','1');
+    RETURN MAP(__T(__OR(__NT(__PFieldToCheck),__OP2(__PFieldToCheck,=,__CN(''))))=>(KEL.typ.str)__CC13524,__T(__OP2(FN__fn_Filter_Out_Valid_Chars(__ECAST(KEL.typ.nstr,__FN1(KEL.Routines.ToUpperCase,__FN1(KEL.Routines.TrimBoth,__PFieldToCheck)))),=,__CN('')))=>'0','1');
   END;
   EXPORT KEL.typ.nstr FN__fn_Bogus_Names(KEL.typ.nstr __PsNameFirst, KEL.typ.nstr __PsNameMid, KEL.typ.nstr __PsNameLast) := FUNCTION
     sNameFirst := __T(__PsNameFirst);
@@ -265,6 +265,12 @@ EXPORT FN_Compile(CFG_Compile __cfg = CFG_Compile) := MODULE
     FunctionDescription := __T(__PFunctionDescription);
     __IsNull := __NL(__PFunctionDescription);
     __Value := PublicRecords_KEL.ECL_Functions.Common_Functions.IsNonFcra(FunctionDescription);
+    RETURN __BNT(__Value,__IsNull,KEL.typ.nbool);
+  END;
+  EXPORT KEL.typ.nbool FN_Is_Valid_Inquiry_Product_Code(KEL.typ.nint __PProductCode) := FUNCTION
+    ProductCode := __T(__PProductCode);
+    __IsNull := __NL(__PProductCode);
+    __Value := (STRING)ProductCode IN PublicRecords_KEL.ECL_Functions.AccLogs_Constants.valid_product_codes;
     RETURN __BNT(__Value,__IsNull,KEL.typ.nbool);
   END;
   EXPORT KEL.typ.nbool FN_Is_Inquiry_S_S_N_Match(KEL.typ.nstr __PSSN1, KEL.typ.nstr __PSSN2) := FUNCTION

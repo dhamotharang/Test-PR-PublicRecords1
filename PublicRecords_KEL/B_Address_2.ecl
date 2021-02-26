@@ -5,9 +5,9 @@ IMPORT * FROM KEL15.Null;
 EXPORT B_Address_2(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG_Compile __cfg = CFG_Compile) := MODULE
   SHARED VIRTUAL TYPEOF(B_Address_3(__in,__cfg).__ENH_Address_3) __ENH_Address_3 := B_Address_3(__in,__cfg).__ENH_Address_3;
   SHARED VIRTUAL TYPEOF(E_Zip_Code(__in,__cfg).__Result) __E_Zip_Code := E_Zip_Code(__in,__cfg).__Result;
-  SHARED __EE6437376 := __ENH_Address_3;
-  SHARED __EE6437378 := __E_Zip_Code;
-  SHARED __ST1199361_Layout := RECORD
+  SHARED __EE6848411 := __ENH_Address_3;
+  SHARED __EE6848413 := __E_Zip_Code;
+  SHARED __ST1276539_Layout := RECORD
     KEL.typ.nuid UID;
     KEL.typ.nstr Primary_Range_;
     KEL.typ.nstr Predirectional_;
@@ -57,15 +57,15 @@ EXPORT B_Address_2(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG_Com
     KEL.typ.epoch Vault_Date_Last_Seen_ := 0;
     KEL.typ.int __RecordCount := 0;
   END;
-  __JC6437387(B_Address_5(__in,__cfg).__ST245912_Layout __EE6437376, E_Zip_Code(__in,__cfg).Layout __EE6437378) := __EEQP(__EE6437376.Z_I_P5_,__EE6437378.UID);
-  __ST1199361_Layout __JT6437387(B_Address_5(__in,__cfg).__ST245912_Layout __l, E_Zip_Code(__in,__cfg).Layout __r) := TRANSFORM
+  __JC6848422(B_Address_5(__in,__cfg).__ST250782_Layout __EE6848411, E_Zip_Code(__in,__cfg).Layout __EE6848413) := __EEQP(__EE6848411.Z_I_P5_,__EE6848413.UID);
+  __ST1276539_Layout __JT6848422(B_Address_5(__in,__cfg).__ST250782_Layout __l, E_Zip_Code(__in,__cfg).Layout __r) := TRANSFORM
     SELF.U_I_D__1_ := __r.UID;
     SELF.Data_Sources__1_ := __r.Data_Sources_;
     SELF := __l;
     SELF := __r;
   END;
-  SHARED __EE6437548 := JOIN(__EE6437376,__EE6437378,__JC6437387(LEFT,RIGHT),__JT6437387(LEFT,RIGHT),LEFT OUTER,HASH);
-  EXPORT __ST201877_Layout := RECORD
+  SHARED __EE6848583 := JOIN(__EE6848411,__EE6848413,__JC6848422(LEFT,RIGHT),__JT6848422(LEFT,RIGHT),LEFT OUTER,HASH);
+  EXPORT __ST206005_Layout := RECORD
     KEL.typ.nuid UID;
     KEL.typ.nstr Primary_Range_;
     KEL.typ.nstr Predirectional_;
@@ -116,23 +116,23 @@ EXPORT B_Address_2(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG_Com
     KEL.typ.epoch Vault_Date_Last_Seen_ := 0;
     KEL.typ.int __RecordCount := 0;
   END;
-  SHARED __ST201877_Layout __ND6437125__Project(__ST1199361_Layout __PP6435645) := TRANSFORM
-    __EE6437120 := __PP6435645.Bestchild_Advo_;
-    SELF.College_Flag_ := (__T(__EE6437120))[1].College_Indicator_;
-    __EE6437135 := __PP6435645.Bestchild_Advo_;
-    SELF.Do_Not_Deliver_Flag_ := (__T(__EE6437135))[1].Do_Not_Deliver_Indicator_;
-    __EE6437149 := __PP6435645.Bestchild_Advo_;
-    SELF.Drop_Indicator_Flag_ := (__T(__EE6437149))[1].Drop_Indicator_;
-    __BS6437155 := __T(__PP6435645.Address_Type_);
-    SELF.Is_P_O_Box_A_D_V_O_ := EXISTS(__BS6437155(__T(__OP2(__T(__PP6435645.Address_Type_).Address_Type_Code_,=,__CN('9')))));
-    SELF.Is_P_O_Box_Zip_ := __OP2(__PP6435645.Zip_Class_,=,__CN('P'));
-    __EE6437182 := __PP6435645.Bestchild_Advo_;
-    SELF.Seasonal_Delivery_Flag_ := (__T(__EE6437182))[1].Seasonal_Delivery_Indicator_;
-    __EE6437196 := __PP6435645.Bestchild_Advo_;
-    SELF.Style_Flag_ := (__T(__EE6437196))[1].Style_Code_;
-    __EE6437210 := __PP6435645.Bestchild_Advo_;
-    SELF.Throw_Back_Flag_ := (__T(__EE6437210))[1].Throw_Back_Indicator_;
-    SELF := __PP6435645;
+  SHARED __ST206005_Layout __ND6848160__Project(__ST1276539_Layout __PP6846680) := TRANSFORM
+    __EE6848155 := __PP6846680.Bestchild_Advo_;
+    SELF.College_Flag_ := (__T(__EE6848155))[1].College_Indicator_;
+    __EE6848170 := __PP6846680.Bestchild_Advo_;
+    SELF.Do_Not_Deliver_Flag_ := (__T(__EE6848170))[1].Do_Not_Deliver_Indicator_;
+    __EE6848184 := __PP6846680.Bestchild_Advo_;
+    SELF.Drop_Indicator_Flag_ := (__T(__EE6848184))[1].Drop_Indicator_;
+    __BS6848190 := __T(__PP6846680.Address_Type_);
+    SELF.Is_P_O_Box_A_D_V_O_ := EXISTS(__BS6848190(__T(__OP2(__T(__PP6846680.Address_Type_).Address_Type_Code_,=,__CN('9')))));
+    SELF.Is_P_O_Box_Zip_ := __OP2(__PP6846680.Zip_Class_,=,__CN('P'));
+    __EE6848217 := __PP6846680.Bestchild_Advo_;
+    SELF.Seasonal_Delivery_Flag_ := (__T(__EE6848217))[1].Seasonal_Delivery_Indicator_;
+    __EE6848231 := __PP6846680.Bestchild_Advo_;
+    SELF.Style_Flag_ := (__T(__EE6848231))[1].Style_Code_;
+    __EE6848245 := __PP6846680.Bestchild_Advo_;
+    SELF.Throw_Back_Flag_ := (__T(__EE6848245))[1].Throw_Back_Indicator_;
+    SELF := __PP6846680;
   END;
-  EXPORT __ENH_Address_2 := PROJECT(__EE6437548,__ND6437125__Project(LEFT));
+  EXPORT __ENH_Address_2 := PROJECT(__EE6848583,__ND6848160__Project(LEFT));
 END;

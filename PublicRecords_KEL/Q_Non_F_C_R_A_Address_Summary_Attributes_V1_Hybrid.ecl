@@ -1,7 +1,7 @@
 //HPCC Systems KEL Compiler Version 1.5.0rc1
 IMPORT KEL15 AS KEL;
 IMPORT PublicRecords_KEL;
-IMPORT B_Address_5,B_Address_6,B_Address_Summary,B_Address_Summary_1,B_Address_Summary_2,B_Address_Summary_3,B_Address_Summary_4,B_Address_Summary_5,B_Bankruptcy_5,B_Bankruptcy_6,B_Bankruptcy_7,B_Bankruptcy_8,B_Education_7,B_Input_P_I_I_10,B_Input_P_I_I_3,B_Input_P_I_I_4,B_Input_P_I_I_5,B_Input_P_I_I_6,B_Input_P_I_I_7,B_Input_P_I_I_8,B_Input_P_I_I_9,B_Inquiry_10,B_Inquiry_11,B_Inquiry_4,B_Inquiry_5,B_Inquiry_6,B_Inquiry_7,B_Inquiry_8,B_Inquiry_9,B_Lien_Judgment_13,B_Person_10,B_Person_11,B_Person_4,B_Person_5,B_Person_6,B_Person_7,B_Person_8,B_Person_9,B_Person_Accident_8,B_Person_Inquiry_5,B_Person_Inquiry_6,B_Person_Inquiry_7,B_Person_Inquiry_8,B_Person_Lien_Judgment_12,B_Person_Property_5,B_Person_Property_6,B_Person_Property_7,B_Person_Property_8,B_Property_4,B_Property_5,B_Property_Event_6,B_Property_Event_7,B_Property_Event_8,CFG_Compile,E_Accident,E_Address,E_Address_Inquiry,E_Address_Property,E_Address_Slim,E_Address_Summary,E_Aircraft_Owner,E_Bankruptcy,E_Criminal_Offense,E_Education,E_Email,E_Email_Inquiry,E_First_Degree_Associations,E_First_Degree_Relative,E_Geo_Link,E_Household,E_Household_Member,E_Input_P_I_I,E_Inquiry,E_Lien_Judgment,E_Name_Summary,E_Person,E_Person_Accident,E_Person_Address,E_Person_Bankruptcy,E_Person_Education,E_Person_Email,E_Person_Inquiry,E_Person_Lien_Judgment,E_Person_Offenses,E_Person_Property,E_Person_Property_Event,E_Person_S_S_N,E_Person_Vehicle,E_Phone,E_Phone_Inquiry,E_Phone_Summary,E_Professional_License,E_Professional_License_Person,E_Property,E_Property_Event,E_S_S_N_Inquiry,E_S_S_N_Summary,E_Sele_Person,E_Social_Security_Number,E_Surname,E_Utility_Person,E_Watercraft_Owner,E_Zip_Code FROM PublicRecords_KEL;
+IMPORT B_Address_5,B_Address_6,B_Address_Summary,B_Address_Summary_1,B_Address_Summary_2,B_Address_Summary_3,B_Address_Summary_4,B_Address_Summary_5,B_Bankruptcy_5,B_Bankruptcy_6,B_Bankruptcy_7,B_Bankruptcy_8,B_Education_7,B_Input_P_I_I_10,B_Input_P_I_I_3,B_Input_P_I_I_4,B_Input_P_I_I_5,B_Input_P_I_I_6,B_Input_P_I_I_7,B_Input_P_I_I_8,B_Input_P_I_I_9,B_Inquiry_10,B_Inquiry_11,B_Inquiry_4,B_Inquiry_5,B_Inquiry_6,B_Inquiry_7,B_Inquiry_8,B_Inquiry_9,B_Lien_Judgment_13,B_Person_10,B_Person_11,B_Person_4,B_Person_5,B_Person_6,B_Person_7,B_Person_8,B_Person_9,B_Person_Accident_8,B_Person_Inquiry_5,B_Person_Inquiry_6,B_Person_Inquiry_7,B_Person_Inquiry_8,B_Person_Lien_Judgment_12,B_Person_Property_5,B_Person_Property_6,B_Person_Property_7,B_Person_Property_8,B_Person_S_S_N_6,B_Property_4,B_Property_5,B_Property_Event_6,B_Property_Event_7,B_Property_Event_8,CFG_Compile,E_Accident,E_Address,E_Address_Inquiry,E_Address_Property,E_Address_Slim,E_Address_Summary,E_Aircraft_Owner,E_Bankruptcy,E_Criminal_Offense,E_Education,E_Email,E_Email_Inquiry,E_First_Degree_Associations,E_First_Degree_Relative,E_Geo_Link,E_Household,E_Household_Member,E_Input_P_I_I,E_Inquiry,E_Lien_Judgment,E_Name_Summary,E_Person,E_Person_Accident,E_Person_Address,E_Person_Bankruptcy,E_Person_Education,E_Person_Email,E_Person_Inquiry,E_Person_Lien_Judgment,E_Person_Offenses,E_Person_Property,E_Person_Property_Event,E_Person_S_S_N,E_Person_Vehicle,E_Phone,E_Phone_Inquiry,E_Phone_Summary,E_Professional_License,E_Professional_License_Person,E_Property,E_Property_Event,E_S_S_N_Inquiry,E_S_S_N_Summary,E_Sele_Person,E_Social_Security_Number,E_Surname,E_Utility_Person,E_Watercraft_Owner,E_Zip_Code FROM PublicRecords_KEL;
 IMPORT * FROM KEL15.Null;
 EXPORT Q_Non_F_C_R_A_Address_Summary_Attributes_V1_Hybrid(KEL.typ.str __PPrimaryName_in, KEL.typ.str __PPrimaryRange_in, KEL.typ.str __PZIP5_in, DATASET(RECORDOF(PublicRecords_KEL.ECL_Functions.Layouts.LayoutInputPII)) __PInputPIIDataset, KEL.typ.kdate __PP_InpClnArchDt, DATA57 __PDPM, CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault) := MODULE
   SHARED __cfg_Local := MODULE(CFG_Compile)
@@ -307,6 +307,7 @@ EXPORT Q_Non_F_C_R_A_Address_Summary_Attributes_V1_Hybrid(KEL.typ.str __PPrimary
     SHARED TYPEOF(B_Inquiry_10(__in,__cfg_Local).__ENH_Inquiry_10) __ENH_Inquiry_10 := B_Inquiry_10_Local.__ENH_Inquiry_10;
   END;
   SHARED B_Person_9_Local := MODULE(B_Person_9(__in,__cfg_Local))
+    SHARED TYPEOF(B_Input_P_I_I_10(__in,__cfg_Local).__ENH_Input_P_I_I_10) __ENH_Input_P_I_I_10 := B_Input_P_I_I_10_Local.__ENH_Input_P_I_I_10;
     SHARED TYPEOF(B_Person_10(__in,__cfg_Local).__ENH_Person_10) __ENH_Person_10 := B_Person_10_Local.__ENH_Person_10;
   END;
   SHARED B_Bankruptcy_8_Local := MODULE(B_Bankruptcy_8(__in,__cfg_Local))
@@ -319,6 +320,7 @@ EXPORT Q_Non_F_C_R_A_Address_Summary_Attributes_V1_Hybrid(KEL.typ.str __PPrimary
     SHARED TYPEOF(B_Inquiry_9(__in,__cfg_Local).__ENH_Inquiry_9) __ENH_Inquiry_9 := B_Inquiry_9_Local.__ENH_Inquiry_9;
   END;
   SHARED B_Person_8_Local := MODULE(B_Person_8(__in,__cfg_Local))
+    SHARED TYPEOF(B_Input_P_I_I_9(__in,__cfg_Local).__ENH_Input_P_I_I_9) __ENH_Input_P_I_I_9 := B_Input_P_I_I_9_Local.__ENH_Input_P_I_I_9;
     SHARED TYPEOF(B_Person_9(__in,__cfg_Local).__ENH_Person_9) __ENH_Person_9 := B_Person_9_Local.__ENH_Person_9;
   END;
   SHARED B_Person_Accident_8_Local := MODULE(B_Person_Accident_8(__in,__cfg_Local))
@@ -350,6 +352,7 @@ EXPORT Q_Non_F_C_R_A_Address_Summary_Attributes_V1_Hybrid(KEL.typ.str __PPrimary
     SHARED TYPEOF(B_Inquiry_8(__in,__cfg_Local).__ENH_Inquiry_8) __ENH_Inquiry_8 := B_Inquiry_8_Local.__ENH_Inquiry_8;
   END;
   SHARED B_Person_7_Local := MODULE(B_Person_7(__in,__cfg_Local))
+    SHARED TYPEOF(B_Input_P_I_I_8(__in,__cfg_Local).__ENH_Input_P_I_I_8) __ENH_Input_P_I_I_8 := B_Input_P_I_I_8_Local.__ENH_Input_P_I_I_8;
     SHARED TYPEOF(B_Person_8(__in,__cfg_Local).__ENH_Person_8) __ENH_Person_8 := B_Person_8_Local.__ENH_Person_8;
     SHARED TYPEOF(B_Person_Accident_8(__in,__cfg_Local).__ENH_Person_Accident_8) __ENH_Person_Accident_8 := B_Person_Accident_8_Local.__ENH_Person_Accident_8;
   END;
@@ -391,6 +394,10 @@ EXPORT Q_Non_F_C_R_A_Address_Summary_Attributes_V1_Hybrid(KEL.typ.str __PPrimary
     SHARED TYPEOF(E_Property(__in,__cfg_Local).__Result) __E_Property := E_Property_Filtered.__Result;
     SHARED TYPEOF(B_Property_Event_7(__in,__cfg_Local).__ENH_Property_Event_7) __ENH_Property_Event_7 := B_Property_Event_7_Local.__ENH_Property_Event_7;
   END;
+  SHARED B_Person_S_S_N_6_Local := MODULE(B_Person_S_S_N_6(__in,__cfg_Local))
+    SHARED TYPEOF(B_Person_7(__in,__cfg_Local).__ENH_Person_7) __ENH_Person_7 := B_Person_7_Local.__ENH_Person_7;
+    SHARED TYPEOF(E_Person_S_S_N(__in,__cfg_Local).__Result) __E_Person_S_S_N := E_Person_S_S_N_Filtered.__Result;
+  END;
   SHARED B_Property_Event_6_Local := MODULE(B_Property_Event_6(__in,__cfg_Local))
     SHARED TYPEOF(B_Property_Event_7(__in,__cfg_Local).__ENH_Property_Event_7) __ENH_Property_Event_7 := B_Property_Event_7_Local.__ENH_Property_Event_7;
   END;
@@ -411,6 +418,7 @@ EXPORT Q_Non_F_C_R_A_Address_Summary_Attributes_V1_Hybrid(KEL.typ.str __PPrimary
   END;
   SHARED B_Person_5_Local := MODULE(B_Person_5(__in,__cfg_Local))
     SHARED TYPEOF(B_Person_6(__in,__cfg_Local).__ENH_Person_6) __ENH_Person_6 := B_Person_6_Local.__ENH_Person_6;
+    SHARED TYPEOF(B_Person_S_S_N_6(__in,__cfg_Local).__ENH_Person_S_S_N_6) __ENH_Person_S_S_N_6 := B_Person_S_S_N_6_Local.__ENH_Person_S_S_N_6;
   END;
   SHARED B_Person_Inquiry_5_Local := MODULE(B_Person_Inquiry_5(__in,__cfg_Local))
     SHARED TYPEOF(B_Person_Inquiry_6(__in,__cfg_Local).__ENH_Person_Inquiry_6) __ENH_Person_Inquiry_6 := B_Person_Inquiry_6_Local.__ENH_Person_Inquiry_6;
@@ -440,7 +448,6 @@ EXPORT Q_Non_F_C_R_A_Address_Summary_Attributes_V1_Hybrid(KEL.typ.str __PPrimary
     SHARED TYPEOF(B_Bankruptcy_5(__in,__cfg_Local).__ENH_Bankruptcy_5) __ENH_Bankruptcy_5 := B_Bankruptcy_5_Local.__ENH_Bankruptcy_5;
     SHARED TYPEOF(E_Household(__in,__cfg_Local).__Result) __E_Household := E_Household_Filtered.__Result;
     SHARED TYPEOF(E_Household_Member(__in,__cfg_Local).__Result) __E_Household_Member := E_Household_Member_Filtered.__Result;
-    SHARED TYPEOF(B_Input_P_I_I_5(__in,__cfg_Local).__ENH_Input_P_I_I_5) __ENH_Input_P_I_I_5 := B_Input_P_I_I_5_Local.__ENH_Input_P_I_I_5;
     SHARED TYPEOF(B_Person_5(__in,__cfg_Local).__ENH_Person_5) __ENH_Person_5 := B_Person_5_Local.__ENH_Person_5;
     SHARED TYPEOF(E_Person_Bankruptcy(__in,__cfg_Local).__Result) __E_Person_Bankruptcy := E_Person_Bankruptcy_Filtered.__Result;
     SHARED TYPEOF(B_Person_Inquiry_5(__in,__cfg_Local).__ENH_Person_Inquiry_5) __ENH_Person_Inquiry_5 := B_Person_Inquiry_5_Local.__ENH_Person_Inquiry_5;
@@ -474,9 +481,9 @@ EXPORT Q_Non_F_C_R_A_Address_Summary_Attributes_V1_Hybrid(KEL.typ.str __PPrimary
     SHARED TYPEOF(B_Address_Summary_1(__in,__cfg_Local).__ENH_Address_Summary_1) __ENH_Address_Summary_1 := B_Address_Summary_1_Local.__ENH_Address_Summary_1;
   END;
   SHARED TYPEOF(B_Address_Summary(__in,__cfg_Local).__ENH_Address_Summary) __ENH_Address_Summary := B_Address_Summary_Local.__ENH_Address_Summary;
-  SHARED __EE11431528 := __ENH_Address_Summary;
-  SHARED __EE11431640 := __EE11431528(__T(__AND(__OP2(__EE11431528.Primary_Name_,=,__CN(__PPrimaryName_in)),__AND(__OP2(__EE11431528.Primary_Range_,=,__CN(__PPrimaryRange_in)),__OP2(__EE11431528.Zip_,=,__CN(__PZIP5_in))))));
-  SHARED __ST125391_Layout := RECORD
+  SHARED __EE12122298 := __ENH_Address_Summary;
+  SHARED __EE12122410 := __EE12122298(__T(__AND(__OP2(__EE12122298.Primary_Name_,=,__CN(__PPrimaryName_in)),__AND(__OP2(__EE12122298.Primary_Range_,=,__CN(__PPrimaryRange_in)),__OP2(__EE12122298.Zip_,=,__CN(__PZIP5_in))))));
+  SHARED __ST128027_Layout := RECORD
     KEL.typ.nstr P_I___Src_W_Inp_F_L_A_List_Ev_;
     KEL.typ.nstr P_I___Src_W_Inp_F_L_A_Emrg_Dt_List_Ev_;
     KEL.typ.nstr P_I___Src_W_Inp_F_L_A_Last_Dt_List_Ev_;
@@ -490,7 +497,7 @@ EXPORT Q_Non_F_C_R_A_Address_Summary_Attributes_V1_Hybrid(KEL.typ.str __PPrimary
     KEL.typ.epoch Vault_Date_Last_Seen_ := 0;
     KEL.typ.int __RecordCount := 0;
   END;
-  EXPORT Res0 := __UNWRAP(PROJECT(TABLE(PROJECT(__EE11431640,__ST125391_Layout),{KEL.typ.int __RecordCount := SUM(GROUP,__RecordCount),KEL.typ.epoch Archive___Date_ := KEL.era.SimpleRoll(GROUP,Archive___Date_,MIN,FALSE),KEL.typ.epoch Date_First_Seen_ := KEL.era.SimpleRoll(GROUP,Date_First_Seen_,MIN,FALSE),KEL.typ.epoch Date_Last_Seen_ := KEL.era.SimpleRoll(GROUP,Date_Last_Seen_,MAX,FALSE),KEL.typ.epoch Hybrid_Archive_Date_ := KEL.era.SimpleRoll(GROUP,Hybrid_Archive_Date_,MIN,FALSE),KEL.typ.epoch Vault_Date_Last_Seen_ := KEL.era.SimpleRoll(GROUP,Vault_Date_Last_Seen_,MAX,NMAX),P_I___Src_W_Inp_F_L_A_List_Ev_,P_I___Src_W_Inp_F_L_A_Emrg_Dt_List_Ev_,P_I___Src_W_Inp_F_L_A_Last_Dt_List_Ev_,P_I___Src_W_Inp_A_D_List_Ev_,P_I___Src_W_Inp_A_D_Emrg_Dt_List_Ev_,P_I___Src_W_Inp_A_D_Last_Dt_List_Ev_},P_I___Src_W_Inp_F_L_A_List_Ev_,P_I___Src_W_Inp_F_L_A_Emrg_Dt_List_Ev_,P_I___Src_W_Inp_F_L_A_Last_Dt_List_Ev_,P_I___Src_W_Inp_A_D_List_Ev_,P_I___Src_W_Inp_A_D_Emrg_Dt_List_Ev_,P_I___Src_W_Inp_A_D_Last_Dt_List_Ev_,MERGE),__ST125391_Layout));
+  EXPORT Res0 := __UNWRAP(PROJECT(TABLE(PROJECT(__EE12122410,__ST128027_Layout),{KEL.typ.int __RecordCount := SUM(GROUP,__RecordCount),KEL.typ.epoch Archive___Date_ := KEL.era.SimpleRoll(GROUP,Archive___Date_,MIN,FALSE),KEL.typ.epoch Date_First_Seen_ := KEL.era.SimpleRoll(GROUP,Date_First_Seen_,MIN,FALSE),KEL.typ.epoch Date_Last_Seen_ := KEL.era.SimpleRoll(GROUP,Date_Last_Seen_,MAX,FALSE),KEL.typ.epoch Hybrid_Archive_Date_ := KEL.era.SimpleRoll(GROUP,Hybrid_Archive_Date_,MIN,FALSE),KEL.typ.epoch Vault_Date_Last_Seen_ := KEL.era.SimpleRoll(GROUP,Vault_Date_Last_Seen_,MAX,NMAX),P_I___Src_W_Inp_F_L_A_List_Ev_,P_I___Src_W_Inp_F_L_A_Emrg_Dt_List_Ev_,P_I___Src_W_Inp_F_L_A_Last_Dt_List_Ev_,P_I___Src_W_Inp_A_D_List_Ev_,P_I___Src_W_Inp_A_D_Emrg_Dt_List_Ev_,P_I___Src_W_Inp_A_D_Last_Dt_List_Ev_},P_I___Src_W_Inp_F_L_A_List_Ev_,P_I___Src_W_Inp_F_L_A_Emrg_Dt_List_Ev_,P_I___Src_W_Inp_F_L_A_Last_Dt_List_Ev_,P_I___Src_W_Inp_A_D_List_Ev_,P_I___Src_W_Inp_A_D_Emrg_Dt_List_Ev_,P_I___Src_W_Inp_A_D_Last_Dt_List_Ev_,MERGE),__ST128027_Layout));
   EXPORT DBG_E_Input_P_I_I_PreEntity := __UNWRAP(E_Input_P_I_I_Params(__in,__cfg_Local).InData);
   EXPORT DBG_E_Input_P_I_I_Result := __UNWRAP(E_Input_P_I_I_Filtered.__Result);
   EXPORT DBG_E_Accident_Result := __UNWRAP(E_Accident_Filtered.__Result);
@@ -568,6 +575,7 @@ EXPORT Q_Non_F_C_R_A_Address_Summary_Attributes_V1_Hybrid(KEL.typ.str __PPrimary
   EXPORT DBG_E_Person_Intermediate_6 := __UNWRAP(B_Person_6_Local.__ENH_Person_6);
   EXPORT DBG_E_Person_Inquiry_Intermediate_6 := __UNWRAP(B_Person_Inquiry_6_Local.__ENH_Person_Inquiry_6);
   EXPORT DBG_E_Person_Property_Intermediate_6 := __UNWRAP(B_Person_Property_6_Local.__ENH_Person_Property_6);
+  EXPORT DBG_E_Person_S_S_N_Intermediate_6 := __UNWRAP(B_Person_S_S_N_6_Local.__ENH_Person_S_S_N_6);
   EXPORT DBG_E_Property_Event_Intermediate_6 := __UNWRAP(B_Property_Event_6_Local.__ENH_Property_Event_6);
   EXPORT DBG_E_Address_Intermediate_5 := __UNWRAP(B_Address_5_Local.__ENH_Address_5);
   EXPORT DBG_E_Address_Summary_Intermediate_5 := __UNWRAP(B_Address_Summary_5_Local.__ENH_Address_Summary_5);
@@ -666,6 +674,7 @@ EXPORT Q_Non_F_C_R_A_Address_Summary_Attributes_V1_Hybrid(KEL.typ.str __PPrimary
     OUTPUT(DBG_E_Person_Intermediate_6,NAMED('DBG_E_Person_Intermediate_6_Q_Non_F_C_R_A_Address_Summary_Attributes_V1_Hybrid')),
     OUTPUT(DBG_E_Person_Inquiry_Intermediate_6,NAMED('DBG_E_Person_Inquiry_Intermediate_6_Q_Non_F_C_R_A_Address_Summary_Attributes_V1_Hybrid')),
     OUTPUT(DBG_E_Person_Property_Intermediate_6,NAMED('DBG_E_Person_Property_Intermediate_6_Q_Non_F_C_R_A_Address_Summary_Attributes_V1_Hybrid')),
+    OUTPUT(DBG_E_Person_S_S_N_Intermediate_6,NAMED('DBG_E_Person_S_S_N_Intermediate_6_Q_Non_F_C_R_A_Address_Summary_Attributes_V1_Hybrid')),
     OUTPUT(DBG_E_Property_Event_Intermediate_6,NAMED('DBG_E_Property_Event_Intermediate_6_Q_Non_F_C_R_A_Address_Summary_Attributes_V1_Hybrid')),
     OUTPUT(DBG_E_Address_Intermediate_5,NAMED('DBG_E_Address_Intermediate_5_Q_Non_F_C_R_A_Address_Summary_Attributes_V1_Hybrid')),
     OUTPUT(DBG_E_Address_Summary_Intermediate_5,NAMED('DBG_E_Address_Summary_Intermediate_5_Q_Non_F_C_R_A_Address_Summary_Attributes_V1_Hybrid')),
