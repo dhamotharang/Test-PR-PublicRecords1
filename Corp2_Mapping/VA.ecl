@@ -176,7 +176,7 @@ EXPORT VA := MODULE;
 																								);
 			Bar_pos         							      := StringLib.StringFind(trim(l.corps_industry_code,left,right),'-',1);//ex:20 - Banks And Credit Unions
 			SELF.corp_orig_bus_type_cd					:= if(Bar_pos<>0,corp2.t2u(l.corps_industry_code[1..Bar_pos-1]),trim(l.corps_industry_code,all));			
-			SELF.corp_orig_bus_type_desc   	   	:= if(Bar_pos<>0,corp2.t2u(l.corps_industry_code[Bar_pos+1..]),corp2_Raw_VA.Functions.CorpOrigBusTypeDesc(l.corps_industry_code)); 
+			SELF.corp_orig_bus_type_desc   	   	:= if(Bar_pos<>0,corp2_Raw_VA.Functions.CorpOrigBusTypeDesc(l.corps_industry_code[1..Bar_pos-1]),corp2_Raw_VA.Functions.CorpOrigBusTypeDesc(l.corps_industry_code)); 
 			//OVERLOADED - The assessment information is placed here since there is no specific field for it.
 			SELF.corp_ra_full_name							:= if(regexfind(RAInvalidNames,corp2.t2u(l.corps_ra_name),0)<>'','',Corp2_mapping.fCleanBusinessName(state_origin,state_desc,l.corps_ra_name).BusinessName);
 			SELF.corp_ra_effective_date					:= Corp2_Mapping.fValidateDate(l.corps_ra_eff_date,'CCYY-MM-DD').GeneralDate;
@@ -269,8 +269,8 @@ EXPORT VA := MODULE;
 			SELF.corp_forgn_date								:= IF(corp2.t2u(l.bt_incorp_state) <> state_origin,Corp2_Mapping.fValidateDate(l.bt_incorp_date,'CCYY-MM-DD').PastDate,'');
   		SELF.corp_orig_org_structure_desc 	:= 'BUSINESS TRUST';
 			Bar_pos         							      := StringLib.StringFind(trim(l.bt_industry_code,left,right),'-',1);//ex:20 - Banks And Credit Unions
-			SELF.corp_orig_bus_type_cd					:= if(Bar_pos<>0,corp2.t2u(l.bt_industry_code[1..Bar_pos-1]),trim(l.bt_industry_code,all));			
-			SELF.corp_orig_bus_type_desc   	   	:= if(Bar_pos<>0,corp2.t2u(l.bt_industry_code[Bar_pos+1..]),corp2_Raw_VA.Functions.CorpOrigBusTypeDesc(l.bt_industry_code)); 
+			SELF.corp_orig_bus_type_cd					:= if(Bar_pos<>0,corp2.t2u(l.bt_industry_code[1..Bar_pos-1]),trim(l.bt_industry_code,all));		
+			SELF.corp_orig_bus_type_desc   	   	:= if(Bar_pos<>0,corp2_Raw_VA.Functions.CorpOrigBusTypeDesc(l.bt_industry_code[1..Bar_pos-1]),corp2_Raw_VA.Functions.CorpOrigBusTypeDesc(l.bt_industry_code)); 		
 			//OVERLOADED - The assessment information is placed here since there is no specific field for it.
 			SELF.corp_addl_info									:= IF(corp2.t2u(l.bt_assess_ind) IN ['0','1','2','3','4'],'ASSESSMENT: ' + corp2_raw_va.functions.Corps_Assess_Ind_Translation(l.bt_assess_ind),'');
 			SELF.corp_ra_full_name							:= if(regexfind(RAInvalidNames,corp2.t2u(l.bt_ra_name),0)<>'','',Corp2_mapping.fCleanBusinessName(state_origin,state_desc,l.bt_ra_name).BusinessName);
@@ -353,8 +353,8 @@ EXPORT VA := MODULE;
 			SELF.corp_forgn_date								:= IF(corp2.t2u(l.lp_incorp_state) <> state_origin,Corp2_Mapping.fValidateDate(l.lp_incorp_date,'CCYY-MM-DD').PastDate,'');
 			SELF.corp_orig_org_structure_desc 	:= 'LIMITED PARTNERSHIP';
 			Bar_pos         							      := StringLib.StringFind(trim(l.lp_industry_code,left,right),'-',1);//ex:20 - Banks And Credit Unions
-			SELF.corp_orig_bus_type_cd					:= if(Bar_pos<>0,corp2.t2u(l.lp_industry_code[1..Bar_pos-1]),trim(l.lp_industry_code,all));			
-			SELF.corp_orig_bus_type_desc   	   	:= if(Bar_pos<>0,corp2.t2u(l.lp_industry_code[Bar_pos+1..]),corp2_Raw_VA.Functions.CorpOrigBusTypeDesc(l.lp_industry_code)); 
+			SELF.corp_orig_bus_type_cd					:= if(Bar_pos<>0,corp2.t2u(l.lp_industry_code[1..Bar_pos-1]),trim(l.lp_industry_code,all));				
+			SELF.corp_orig_bus_type_desc   	   	:= if(Bar_pos<>0,corp2_Raw_VA.Functions.CorpOrigBusTypeDesc(l.lp_industry_code[1..Bar_pos-1]),corp2_Raw_VA.Functions.CorpOrigBusTypeDesc(l.lp_industry_code));
 			//OVERLOADED - The assessment information is placed here since there is not  a specific field for it.
 			SELF.corp_addl_info									:= IF(corp2.t2u(l.lp_assess_ind) IN ['0','1','2','3','4'],'ASSESSMENT: ' + corp2_raw_va.functions.Corps_Assess_Ind_Translation(l.lp_assess_ind),'');
 			SELF.corp_ra_full_name							:= if(regexfind(RAInvalidNames,corp2.t2u(l.lp_ra_name),0)<>'','',Corp2_mapping.fCleanBusinessName(state_origin,state_desc,l.lp_ra_name).BusinessName);
@@ -445,8 +445,8 @@ EXPORT VA := MODULE;
 			SELF.corp_forgn_date								:= IF(corp2.t2u(l.gp_incorp_state) <> state_origin,Corp2_Mapping.fValidateDate(l.gp_PrinOffEff_Date,'CCYY-MM-DD').PastDate,'');
 			SELF.corp_orig_org_structure_desc 	:= 'GENERAL PARTNERSHIP';
 			Bar_pos         							      := StringLib.StringFind(trim(l.gp_industry_code,left,right),'-',1);//ex:20 - Banks And Credit Unions
-			SELF.corp_orig_bus_type_cd					:= if(Bar_pos<>0,corp2.t2u(l.gp_industry_code[1..Bar_pos-1]),trim(l.gp_industry_code,all));			
-			SELF.corp_orig_bus_type_desc   	   	:= if(Bar_pos<>0,corp2.t2u(l.gp_industry_code[Bar_pos+1..]),corp2_Raw_VA.Functions.CorpOrigBusTypeDesc(l.gp_industry_code)); 
+			SELF.corp_orig_bus_type_cd					:= if(Bar_pos<>0,corp2.t2u(l.gp_industry_code[1..Bar_pos-1]),trim(l.gp_industry_code,all));		
+			SELF.corp_orig_bus_type_desc   	   	:= if(Bar_pos<>0,corp2_Raw_VA.Functions.CorpOrigBusTypeDesc(l.gp_industry_code[1..Bar_pos-1]),corp2_Raw_VA.Functions.CorpOrigBusTypeDesc(l.gp_industry_code));		
 			//OVERLOADED - The assessment information is placed here since there is not  a specific field for it.
 			SELF.corp_addl_info									:= IF(corp2.t2u(l.gp_assess_ind) IN ['0','1','2','3','4'],'ASSESSMENT: ' + corp2_raw_va.functions.Corps_Assess_Ind_Translation(l.gp_assess_ind),'');
 			SELF.corp_ra_full_name							:= if(regexfind(RAInvalidNames,corp2.t2u(l.gp_ra_name),0)<>'','',Corp2_mapping.fCleanBusinessName(state_origin,state_desc,l.gp_ra_name).BusinessName);
@@ -531,8 +531,8 @@ EXPORT VA := MODULE;
 			SELF.corp_forgn_date								:= IF(corp2.t2u(l.llc_incorp_state) <> state_origin,Corp2_Mapping.fValidateDate(l.llc_incorp_date,'CCYY-MM-DD').PastDate,'');
 			SELF.corp_orig_org_structure_desc 	:= 'LIMITED LIABILITY COMPANY';
 			Bar_pos         							      := StringLib.StringFind(trim(l.llc_industry_code,left,right),'-',1);//ex:20 - Banks And Credit Unions
-			SELF.corp_orig_bus_type_cd					:= if(Bar_pos<>0,corp2.t2u(l.llc_industry_code[1..Bar_pos-1]),trim(l.llc_industry_code,all));			
-			SELF.corp_orig_bus_type_desc   	   	:= if(Bar_pos<>0,corp2.t2u(l.llc_industry_code[Bar_pos+1..]),corp2_Raw_VA.Functions.CorpOrigBusTypeDesc(l.llc_industry_code)); 
+			SELF.corp_orig_bus_type_cd					:= if(Bar_pos<>0,corp2.t2u(l.llc_industry_code[1..Bar_pos-1]),trim(l.llc_industry_code,all));	
+			SELF.corp_orig_bus_type_desc   	   	:= if(Bar_pos<>0,corp2_Raw_VA.Functions.CorpOrigBusTypeDesc(l.llc_industry_code[1..Bar_pos-1]),corp2_Raw_VA.Functions.CorpOrigBusTypeDesc(l.llc_industry_code));			
 			//OVERLOADED - The assessment information is placed here since there is no specific field for this information.
 			SELF.corp_addl_info									:= IF(corp2.t2u(l.llc_assess_ind) IN ['0','1','2','3','4'],'ASSESSMENT: ' + corp2_raw_va.functions.Corps_Assess_Ind_Translation(l.llc_assess_ind),'');
 			SELF.corp_ra_full_name							:= if(regexfind(RAInvalidNames,corp2.t2u(l.llc_ra_name),0)<>'','',Corp2_mapping.fCleanBusinessName(state_origin,state_desc,l.llc_ra_name).BusinessName);
@@ -623,8 +623,8 @@ EXPORT VA := MODULE;
 			SELF.corp_forgn_date								:= IF(corp2.t2u(l.psa_incorp_state) <> state_origin,Corp2_Mapping.fValidateDate(l.psa_incorp_date,'CCYY-MM-DD').PastDate,'');
 			SELF.corp_orig_org_structure_desc 	:= 'PUBLIC SERVICE AUTHORITY';
 			Bar_pos         							      := StringLib.StringFind(trim(l.psa_industry_code,left,right),'-',1);//ex:20 - Banks And Credit Unions
-			SELF.corp_orig_bus_type_cd					:= if(Bar_pos<>0,corp2.t2u(l.psa_industry_code[1..Bar_pos-1]),trim(l.psa_industry_code,all));			
-			SELF.corp_orig_bus_type_desc   	   	:= if(Bar_pos<>0,corp2.t2u(l.psa_industry_code[Bar_pos+1..]),corp2_Raw_VA.Functions.CorpOrigBusTypeDesc(l.psa_industry_code)); 
+			SELF.corp_orig_bus_type_cd					:= if(Bar_pos<>0,corp2.t2u(l.psa_industry_code[1..Bar_pos-1]),trim(l.psa_industry_code,all));				
+			SELF.corp_orig_bus_type_desc   	   	:= if(Bar_pos<>0,corp2_Raw_VA.Functions.CorpOrigBusTypeDesc(l.psa_industry_code[1..Bar_pos-1]),corp2_Raw_VA.Functions.CorpOrigBusTypeDesc(l.psa_industry_code));
 			//OVERLOADED - The assessment information is placed here since there is no specific field for this information.
 			SELF.corp_addl_info									:= IF(corp2.t2u(l.psa_assess_ind) IN ['0','1','2','3','4'],'ASSESSMENT: ' + corp2_raw_va.functions.Corps_Assess_Ind_Translation(l.psa_assess_ind),'');
 			SELF.corp_ra_full_name							:= if(regexfind(RAInvalidNames,corp2.t2u(l.psa_ra_name),0)<>'','',Corp2_mapping.fCleanBusinessName(state_origin,state_desc,l.psa_ra_name).BusinessName);
