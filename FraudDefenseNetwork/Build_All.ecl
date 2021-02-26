@@ -119,7 +119,7 @@ shared base_portion := sequential(
 //Create build automation -- 02/14/2017
 export create_build := Orbit3.proc_Orbit3_CreateBuild ('FDN', pversion);
 
-export dops_update := dops.updateversion('FDN',pversion,,,'N');
+export dops_update := dops.updateversion('FDN',pversion, Email_Notification_Lists().Roxie,,'N');
 
 
 
