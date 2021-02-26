@@ -1,7 +1,7 @@
 //HPCC Systems KEL Compiler Version 1.5.0rc1
 IMPORT KEL15 AS KEL;
 IMPORT PublicRecords_KEL;
-IMPORT B_Address_1,B_Address_2,B_Address_3,B_Address_4,B_Address_5,B_Address_6,B_Aircraft_Owner_2,B_Aircraft_Owner_3,B_Bankruptcy_2,B_Bankruptcy_3,B_Bankruptcy_4,B_Bankruptcy_5,B_Bankruptcy_6,B_Bankruptcy_7,B_Bankruptcy_8,B_Criminal_Offense_2,B_Criminal_Offense_3,B_Criminal_Offense_4,B_Criminal_Offense_5,B_Education_2,B_Education_3,B_Education_4,B_Education_5,B_Education_6,B_Education_7,B_Email_2,B_First_Degree_Relative_5,B_Input_P_I_I,B_Input_P_I_I_1,B_Input_P_I_I_10,B_Input_P_I_I_2,B_Input_P_I_I_3,B_Input_P_I_I_4,B_Input_P_I_I_5,B_Input_P_I_I_6,B_Input_P_I_I_7,B_Input_P_I_I_8,B_Input_P_I_I_9,B_Inquiry_10,B_Inquiry_11,B_Inquiry_3,B_Inquiry_4,B_Inquiry_5,B_Inquiry_6,B_Inquiry_7,B_Inquiry_8,B_Inquiry_9,B_Lien_Judgment_13,B_Person_1,B_Person_10,B_Person_11,B_Person_2,B_Person_3,B_Person_4,B_Person_5,B_Person_6,B_Person_7,B_Person_8,B_Person_9,B_Person_Accident_8,B_Person_Address_2,B_Person_Address_3,B_Person_Inquiry_3,B_Person_Inquiry_4,B_Person_Inquiry_5,B_Person_Inquiry_6,B_Person_Inquiry_7,B_Person_Inquiry_8,B_Person_Lien_Judgment_12,B_Person_Property_2,B_Person_Property_3,B_Person_Property_4,B_Person_Property_5,B_Person_Property_6,B_Person_Property_7,B_Person_Property_8,B_Person_S_S_N_2,B_Person_Vehicle_2,B_Person_Vehicle_3,B_Professional_License_2,B_Professional_License_3,B_Professional_License_4,B_Professional_License_5,B_Property_3,B_Property_4,B_Property_5,B_Property_Event_2,B_Property_Event_3,B_Property_Event_4,B_Property_Event_5,B_Property_Event_6,B_Property_Event_7,B_Property_Event_8,B_Sele_Person_3,B_Sele_Person_4,B_Sele_Person_5,B_Sele_Person_6,B_Sele_Person_7,B_Watercraft_Owner_2,B_Watercraft_Owner_3,CFG_Compile,E_Accident,E_Address,E_Address_Inquiry,E_Address_Property,E_Address_Slim,E_Address_Summary,E_Aircraft_Owner,E_Bankruptcy,E_Criminal_Offense,E_Education,E_Email,E_Email_Inquiry,E_First_Degree_Associations,E_First_Degree_Relative,E_Geo_Link,E_Household,E_Household_Member,E_Input_P_I_I,E_Inquiry,E_Lien_Judgment,E_Name_Summary,E_Person,E_Person_Accident,E_Person_Address,E_Person_Bankruptcy,E_Person_Education,E_Person_Email,E_Person_Inquiry,E_Person_Lien_Judgment,E_Person_Offenses,E_Person_Property,E_Person_Property_Event,E_Person_S_S_N,E_Person_Vehicle,E_Phone,E_Phone_Inquiry,E_Phone_Summary,E_Professional_License,E_Professional_License_Person,E_Property,E_Property_Event,E_S_S_N_Inquiry,E_S_S_N_Summary,E_Sele_Person,E_Social_Security_Number,E_Surname,E_Utility_Person,E_Watercraft_Owner,E_Zip_Code FROM PublicRecords_KEL;
+IMPORT B_Address_1,B_Address_2,B_Address_3,B_Address_4,B_Address_5,B_Address_6,B_Aircraft_Owner_2,B_Aircraft_Owner_3,B_Bankruptcy_2,B_Bankruptcy_3,B_Bankruptcy_4,B_Bankruptcy_5,B_Bankruptcy_6,B_Bankruptcy_7,B_Bankruptcy_8,B_Criminal_Offense_2,B_Criminal_Offense_3,B_Criminal_Offense_4,B_Criminal_Offense_5,B_Education_2,B_Education_3,B_Education_4,B_Education_5,B_Education_6,B_Education_7,B_Email_2,B_First_Degree_Relative_5,B_Input_P_I_I,B_Input_P_I_I_1,B_Input_P_I_I_10,B_Input_P_I_I_2,B_Input_P_I_I_3,B_Input_P_I_I_4,B_Input_P_I_I_5,B_Input_P_I_I_6,B_Input_P_I_I_7,B_Input_P_I_I_8,B_Input_P_I_I_9,B_Inquiry_10,B_Inquiry_11,B_Inquiry_3,B_Inquiry_4,B_Inquiry_5,B_Inquiry_6,B_Inquiry_7,B_Inquiry_8,B_Inquiry_9,B_Lien_Judgment_13,B_Person_1,B_Person_10,B_Person_11,B_Person_2,B_Person_3,B_Person_4,B_Person_5,B_Person_6,B_Person_7,B_Person_8,B_Person_9,B_Person_Accident_8,B_Person_Address_2,B_Person_Address_3,B_Person_Inquiry_3,B_Person_Inquiry_4,B_Person_Inquiry_5,B_Person_Inquiry_6,B_Person_Inquiry_7,B_Person_Inquiry_8,B_Person_Lien_Judgment_12,B_Person_Property_2,B_Person_Property_3,B_Person_Property_4,B_Person_Property_5,B_Person_Property_6,B_Person_Property_7,B_Person_Property_8,B_Person_S_S_N_2,B_Person_S_S_N_3,B_Person_S_S_N_4,B_Person_S_S_N_5,B_Person_S_S_N_6,B_Person_Vehicle_2,B_Person_Vehicle_3,B_Professional_License_2,B_Professional_License_3,B_Professional_License_4,B_Professional_License_5,B_Property_3,B_Property_4,B_Property_5,B_Property_Event_2,B_Property_Event_3,B_Property_Event_4,B_Property_Event_5,B_Property_Event_6,B_Property_Event_7,B_Property_Event_8,B_Sele_Person_3,B_Sele_Person_4,B_Sele_Person_5,B_Sele_Person_6,B_Sele_Person_7,B_Watercraft_Owner_2,B_Watercraft_Owner_3,CFG_Compile,E_Accident,E_Address,E_Address_Inquiry,E_Address_Property,E_Address_Slim,E_Address_Summary,E_Aircraft_Owner,E_Bankruptcy,E_Criminal_Offense,E_Education,E_Email,E_Email_Inquiry,E_First_Degree_Associations,E_First_Degree_Relative,E_Geo_Link,E_Household,E_Household_Member,E_Input_P_I_I,E_Inquiry,E_Lien_Judgment,E_Name_Summary,E_Person,E_Person_Accident,E_Person_Address,E_Person_Bankruptcy,E_Person_Education,E_Person_Email,E_Person_Inquiry,E_Person_Lien_Judgment,E_Person_Offenses,E_Person_Property,E_Person_Property_Event,E_Person_S_S_N,E_Person_Vehicle,E_Phone,E_Phone_Inquiry,E_Phone_Summary,E_Professional_License,E_Professional_License_Person,E_Property,E_Property_Event,E_S_S_N_Inquiry,E_S_S_N_Summary,E_Sele_Person,E_Social_Security_Number,E_Surname,E_Utility_Person,E_Watercraft_Owner,E_Zip_Code FROM PublicRecords_KEL;
 IMPORT * FROM KEL15.Null;
 EXPORT Q_Input_Attributes_V1_Hybrid(DATASET(RECORDOF(PublicRecords_KEL.ECL_Functions.Layouts.LayoutInputPII)) __PInputPIIDataset, KEL.typ.kdate __PP_InpClnArchDt, DATA57 __PDPM, KEL.typ.bool __PisFCRA, CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault) := MODULE
   SHARED __cfg_Local := MODULE(CFG_Compile)
@@ -302,6 +302,7 @@ EXPORT Q_Input_Attributes_V1_Hybrid(DATASET(RECORDOF(PublicRecords_KEL.ECL_Funct
     SHARED TYPEOF(B_Inquiry_10(__in,__cfg_Local).__ENH_Inquiry_10) __ENH_Inquiry_10 := B_Inquiry_10_Local.__ENH_Inquiry_10;
   END;
   SHARED B_Person_9_Local := MODULE(B_Person_9(__in,__cfg_Local))
+    SHARED TYPEOF(B_Input_P_I_I_10(__in,__cfg_Local).__ENH_Input_P_I_I_10) __ENH_Input_P_I_I_10 := B_Input_P_I_I_10_Local.__ENH_Input_P_I_I_10;
     SHARED TYPEOF(B_Person_10(__in,__cfg_Local).__ENH_Person_10) __ENH_Person_10 := B_Person_10_Local.__ENH_Person_10;
   END;
   SHARED B_Bankruptcy_8_Local := MODULE(B_Bankruptcy_8(__in,__cfg_Local))
@@ -314,6 +315,7 @@ EXPORT Q_Input_Attributes_V1_Hybrid(DATASET(RECORDOF(PublicRecords_KEL.ECL_Funct
     SHARED TYPEOF(B_Inquiry_9(__in,__cfg_Local).__ENH_Inquiry_9) __ENH_Inquiry_9 := B_Inquiry_9_Local.__ENH_Inquiry_9;
   END;
   SHARED B_Person_8_Local := MODULE(B_Person_8(__in,__cfg_Local))
+    SHARED TYPEOF(B_Input_P_I_I_9(__in,__cfg_Local).__ENH_Input_P_I_I_9) __ENH_Input_P_I_I_9 := B_Input_P_I_I_9_Local.__ENH_Input_P_I_I_9;
     SHARED TYPEOF(B_Person_9(__in,__cfg_Local).__ENH_Person_9) __ENH_Person_9 := B_Person_9_Local.__ENH_Person_9;
   END;
   SHARED B_Person_Accident_8_Local := MODULE(B_Person_Accident_8(__in,__cfg_Local))
@@ -345,6 +347,7 @@ EXPORT Q_Input_Attributes_V1_Hybrid(DATASET(RECORDOF(PublicRecords_KEL.ECL_Funct
     SHARED TYPEOF(B_Inquiry_8(__in,__cfg_Local).__ENH_Inquiry_8) __ENH_Inquiry_8 := B_Inquiry_8_Local.__ENH_Inquiry_8;
   END;
   SHARED B_Person_7_Local := MODULE(B_Person_7(__in,__cfg_Local))
+    SHARED TYPEOF(B_Input_P_I_I_8(__in,__cfg_Local).__ENH_Input_P_I_I_8) __ENH_Input_P_I_I_8 := B_Input_P_I_I_8_Local.__ENH_Input_P_I_I_8;
     SHARED TYPEOF(B_Person_8(__in,__cfg_Local).__ENH_Person_8) __ENH_Person_8 := B_Person_8_Local.__ENH_Person_8;
     SHARED TYPEOF(B_Person_Accident_8(__in,__cfg_Local).__ENH_Person_Accident_8) __ENH_Person_Accident_8 := B_Person_Accident_8_Local.__ENH_Person_Accident_8;
   END;
@@ -392,6 +395,10 @@ EXPORT Q_Input_Attributes_V1_Hybrid(DATASET(RECORDOF(PublicRecords_KEL.ECL_Funct
     SHARED TYPEOF(E_Property(__in,__cfg_Local).__Result) __E_Property := E_Property_Filtered.__Result;
     SHARED TYPEOF(B_Property_Event_7(__in,__cfg_Local).__ENH_Property_Event_7) __ENH_Property_Event_7 := B_Property_Event_7_Local.__ENH_Property_Event_7;
   END;
+  SHARED B_Person_S_S_N_6_Local := MODULE(B_Person_S_S_N_6(__in,__cfg_Local))
+    SHARED TYPEOF(B_Person_7(__in,__cfg_Local).__ENH_Person_7) __ENH_Person_7 := B_Person_7_Local.__ENH_Person_7;
+    SHARED TYPEOF(E_Person_S_S_N(__in,__cfg_Local).__Result) __E_Person_S_S_N := E_Person_S_S_N_Filtered.__Result;
+  END;
   SHARED B_Property_Event_6_Local := MODULE(B_Property_Event_6(__in,__cfg_Local))
     SHARED TYPEOF(B_Property_Event_7(__in,__cfg_Local).__ENH_Property_Event_7) __ENH_Property_Event_7 := B_Property_Event_7_Local.__ENH_Property_Event_7;
   END;
@@ -421,6 +428,7 @@ EXPORT Q_Input_Attributes_V1_Hybrid(DATASET(RECORDOF(PublicRecords_KEL.ECL_Funct
   END;
   SHARED B_Person_5_Local := MODULE(B_Person_5(__in,__cfg_Local))
     SHARED TYPEOF(B_Person_6(__in,__cfg_Local).__ENH_Person_6) __ENH_Person_6 := B_Person_6_Local.__ENH_Person_6;
+    SHARED TYPEOF(B_Person_S_S_N_6(__in,__cfg_Local).__ENH_Person_S_S_N_6) __ENH_Person_S_S_N_6 := B_Person_S_S_N_6_Local.__ENH_Person_S_S_N_6;
   END;
   SHARED B_Person_Inquiry_5_Local := MODULE(B_Person_Inquiry_5(__in,__cfg_Local))
     SHARED TYPEOF(B_Person_Inquiry_6(__in,__cfg_Local).__ENH_Person_Inquiry_6) __ENH_Person_Inquiry_6 := B_Person_Inquiry_6_Local.__ENH_Person_Inquiry_6;
@@ -430,6 +438,9 @@ EXPORT Q_Input_Attributes_V1_Hybrid(DATASET(RECORDOF(PublicRecords_KEL.ECL_Funct
     SHARED TYPEOF(E_Person_Property_Event(__in,__cfg_Local).__Result) __E_Person_Property_Event := E_Person_Property_Event_Filtered.__Result;
     SHARED TYPEOF(E_Property(__in,__cfg_Local).__Result) __E_Property := E_Property_Filtered.__Result;
     SHARED TYPEOF(B_Property_Event_6(__in,__cfg_Local).__ENH_Property_Event_6) __ENH_Property_Event_6 := B_Property_Event_6_Local.__ENH_Property_Event_6;
+  END;
+  SHARED B_Person_S_S_N_5_Local := MODULE(B_Person_S_S_N_5(__in,__cfg_Local))
+    SHARED TYPEOF(B_Person_S_S_N_6(__in,__cfg_Local).__ENH_Person_S_S_N_6) __ENH_Person_S_S_N_6 := B_Person_S_S_N_6_Local.__ENH_Person_S_S_N_6;
   END;
   SHARED B_Professional_License_5_Local := MODULE(B_Professional_License_5(__in,__cfg_Local))
     SHARED TYPEOF(E_Professional_License(__in,__cfg_Local).__Result) __E_Professional_License := E_Professional_License_Filtered.__Result;
@@ -467,7 +478,6 @@ EXPORT Q_Input_Attributes_V1_Hybrid(DATASET(RECORDOF(PublicRecords_KEL.ECL_Funct
     SHARED TYPEOF(B_Bankruptcy_5(__in,__cfg_Local).__ENH_Bankruptcy_5) __ENH_Bankruptcy_5 := B_Bankruptcy_5_Local.__ENH_Bankruptcy_5;
     SHARED TYPEOF(E_Household(__in,__cfg_Local).__Result) __E_Household := E_Household_Filtered.__Result;
     SHARED TYPEOF(E_Household_Member(__in,__cfg_Local).__Result) __E_Household_Member := E_Household_Member_Filtered.__Result;
-    SHARED TYPEOF(B_Input_P_I_I_5(__in,__cfg_Local).__ENH_Input_P_I_I_5) __ENH_Input_P_I_I_5 := B_Input_P_I_I_5_Local.__ENH_Input_P_I_I_5;
     SHARED TYPEOF(B_Person_5(__in,__cfg_Local).__ENH_Person_5) __ENH_Person_5 := B_Person_5_Local.__ENH_Person_5;
     SHARED TYPEOF(E_Person_Bankruptcy(__in,__cfg_Local).__Result) __E_Person_Bankruptcy := E_Person_Bankruptcy_Filtered.__Result;
     SHARED TYPEOF(B_Person_Inquiry_5(__in,__cfg_Local).__ENH_Person_Inquiry_5) __ENH_Person_Inquiry_5 := B_Person_Inquiry_5_Local.__ENH_Person_Inquiry_5;
@@ -479,6 +489,9 @@ EXPORT Q_Input_Attributes_V1_Hybrid(DATASET(RECORDOF(PublicRecords_KEL.ECL_Funct
   END;
   SHARED B_Person_Property_4_Local := MODULE(B_Person_Property_4(__in,__cfg_Local))
     SHARED TYPEOF(B_Person_Property_5(__in,__cfg_Local).__ENH_Person_Property_5) __ENH_Person_Property_5 := B_Person_Property_5_Local.__ENH_Person_Property_5;
+  END;
+  SHARED B_Person_S_S_N_4_Local := MODULE(B_Person_S_S_N_4(__in,__cfg_Local))
+    SHARED TYPEOF(B_Person_S_S_N_5(__in,__cfg_Local).__ENH_Person_S_S_N_5) __ENH_Person_S_S_N_5 := B_Person_S_S_N_5_Local.__ENH_Person_S_S_N_5;
   END;
   SHARED B_Professional_License_4_Local := MODULE(B_Professional_License_4(__in,__cfg_Local))
     SHARED TYPEOF(B_Professional_License_5(__in,__cfg_Local).__ENH_Professional_License_5) __ENH_Professional_License_5 := B_Professional_License_5_Local.__ENH_Professional_License_5;
@@ -545,6 +558,9 @@ EXPORT Q_Input_Attributes_V1_Hybrid(DATASET(RECORDOF(PublicRecords_KEL.ECL_Funct
     SHARED TYPEOF(B_Person_Property_4(__in,__cfg_Local).__ENH_Person_Property_4) __ENH_Person_Property_4 := B_Person_Property_4_Local.__ENH_Person_Property_4;
     SHARED TYPEOF(B_Property_4(__in,__cfg_Local).__ENH_Property_4) __ENH_Property_4 := B_Property_4_Local.__ENH_Property_4;
   END;
+  SHARED B_Person_S_S_N_3_Local := MODULE(B_Person_S_S_N_3(__in,__cfg_Local))
+    SHARED TYPEOF(B_Person_S_S_N_4(__in,__cfg_Local).__ENH_Person_S_S_N_4) __ENH_Person_S_S_N_4 := B_Person_S_S_N_4_Local.__ENH_Person_S_S_N_4;
+  END;
   SHARED B_Person_Vehicle_3_Local := MODULE(B_Person_Vehicle_3(__in,__cfg_Local))
     SHARED TYPEOF(E_Person_Vehicle(__in,__cfg_Local).__Result) __E_Person_Vehicle := E_Person_Vehicle_Filtered.__Result;
   END;
@@ -597,6 +613,7 @@ EXPORT Q_Input_Attributes_V1_Hybrid(DATASET(RECORDOF(PublicRecords_KEL.ECL_Funct
     SHARED TYPEOF(B_Bankruptcy_3(__in,__cfg_Local).__ENH_Bankruptcy_3) __ENH_Bankruptcy_3 := B_Bankruptcy_3_Local.__ENH_Bankruptcy_3;
     SHARED TYPEOF(B_Criminal_Offense_3(__in,__cfg_Local).__ENH_Criminal_Offense_3) __ENH_Criminal_Offense_3 := B_Criminal_Offense_3_Local.__ENH_Criminal_Offense_3;
     SHARED TYPEOF(B_Education_3(__in,__cfg_Local).__ENH_Education_3) __ENH_Education_3 := B_Education_3_Local.__ENH_Education_3;
+    SHARED TYPEOF(B_Input_P_I_I_3(__in,__cfg_Local).__ENH_Input_P_I_I_3) __ENH_Input_P_I_I_3 := B_Input_P_I_I_3_Local.__ENH_Input_P_I_I_3;
     SHARED TYPEOF(B_Inquiry_3(__in,__cfg_Local).__ENH_Inquiry_3) __ENH_Inquiry_3 := B_Inquiry_3_Local.__ENH_Inquiry_3;
     SHARED TYPEOF(B_Person_3(__in,__cfg_Local).__ENH_Person_3) __ENH_Person_3 := B_Person_3_Local.__ENH_Person_3;
     SHARED TYPEOF(B_Person_Address_3(__in,__cfg_Local).__ENH_Person_Address_3) __ENH_Person_Address_3 := B_Person_Address_3_Local.__ENH_Person_Address_3;
@@ -622,7 +639,7 @@ EXPORT Q_Input_Attributes_V1_Hybrid(DATASET(RECORDOF(PublicRecords_KEL.ECL_Funct
     SHARED TYPEOF(B_Property_Event_3(__in,__cfg_Local).__ENH_Property_Event_3) __ENH_Property_Event_3 := B_Property_Event_3_Local.__ENH_Property_Event_3;
   END;
   SHARED B_Person_S_S_N_2_Local := MODULE(B_Person_S_S_N_2(__in,__cfg_Local))
-    SHARED TYPEOF(E_Person_S_S_N(__in,__cfg_Local).__Result) __E_Person_S_S_N := E_Person_S_S_N_Filtered.__Result;
+    SHARED TYPEOF(B_Person_S_S_N_3(__in,__cfg_Local).__ENH_Person_S_S_N_3) __ENH_Person_S_S_N_3 := B_Person_S_S_N_3_Local.__ENH_Person_S_S_N_3;
   END;
   SHARED B_Person_Vehicle_2_Local := MODULE(B_Person_Vehicle_2(__in,__cfg_Local))
     SHARED TYPEOF(B_Person_Vehicle_3(__in,__cfg_Local).__ENH_Person_Vehicle_3) __ENH_Person_Vehicle_3 := B_Person_Vehicle_3_Local.__ENH_Person_Vehicle_3;
@@ -677,8 +694,8 @@ EXPORT Q_Input_Attributes_V1_Hybrid(DATASET(RECORDOF(PublicRecords_KEL.ECL_Funct
     SHARED TYPEOF(E_Zip_Code(__in,__cfg_Local).__Result) __E_Zip_Code := E_Zip_Code_Filtered.__Result;
   END;
   SHARED TYPEOF(B_Input_P_I_I(__in,__cfg_Local).__ENH_Input_P_I_I) __ENH_Input_P_I_I := B_Input_P_I_I_Local.__ENH_Input_P_I_I;
-  SHARED __EE11429902 := __ENH_Input_P_I_I;
-  SHARED __ST125080_Layout := RECORD
+  SHARED __EE12120673 := __ENH_Input_P_I_I;
+  SHARED __ST127716_Layout := RECORD
     KEL.typ.nuid G___Proc_U_I_D_;
     KEL.typ.nstr P___Inp_Acct_;
     KEL.typ.nint P___Inp_Lex_I_D_;
@@ -845,7 +862,7 @@ EXPORT Q_Input_Attributes_V1_Hybrid(DATASET(RECORDOF(PublicRecords_KEL.ECL_Funct
     KEL.typ.nint P_I___Inp_D_O_B_Age_;
     KEL.typ.int P_I___Inp_S_S_N_Is_Deceased_Flag_ := 0;
     KEL.typ.nint P_I___Inp_S_S_N_Deceased_Dt_;
-    KEL.typ.str P_I___Inp_Addr_State_D_L_Avail_Flag_ := '';
+    KEL.typ.int P_I___Inp_Addr_State_D_L_Avail_Flag_ := 0;
     KEL.typ.int P_I___Inp_Addr_State_Voter_Avail_Flag_ := 0;
     KEL.typ.nstr P_I___Inp_Phone_S_I_C_Code_H_R_List_;
     KEL.typ.nstr P_I___Inp_Phone_N_A_I_C_S_Code_H_R_List_;
@@ -901,135 +918,135 @@ EXPORT Q_Input_Attributes_V1_Hybrid(DATASET(RECORDOF(PublicRecords_KEL.ECL_Funct
     KEL.typ.epoch Vault_Date_Last_Seen_ := 0;
     KEL.typ.int __RecordCount := 0;
   END;
-  SHARED __ST125080_Layout __ND11429907__Project(B_Input_P_I_I(__in,__cfg_Local).__ST158054_Layout __PP11429903) := TRANSFORM
-    SELF.G___Proc_U_I_D_ := __PP11429903.UID;
-    SELF.P___Inp_Acct_ := __PP11429903.Input_Account_Value_;
-    SELF.P___Inp_Lex_I_D_ := __PP11429903.Input_Lex_I_D_Value_;
-    SELF.P___Inp_Name_First_ := __PP11429903.Input_First_Name_Value_;
-    SELF.P___Inp_Name_Mid_ := __PP11429903.Input_Middle_Name_Value_;
-    SELF.P___Inp_Name_Last_ := __PP11429903.Input_Last_Name_Value_;
-    SELF.P___Inp_Addr_Line1_ := __PP11429903.Input_Street_Value_;
-    SELF.P___Inp_Addr_Line2_ := __PP11429903.P___Inp_Addr_Line2_Value_;
-    SELF.P___Inp_Addr_City_ := __PP11429903.Input_City_Value_;
-    SELF.P___Inp_Addr_State_ := __PP11429903.Input_State_Value_;
-    SELF.P___Inp_Addr_Zip_ := __PP11429903.Input_Zip_Value_;
-    SELF.P___Inp_S_S_N_ := __PP11429903.Input_S_S_N_Value_;
-    SELF.P___Inp_D_O_B_ := __PP11429903.Input_D_O_B_Value_;
-    SELF.P___Inp_D_L_ := __PP11429903.Input_D_L_Value_;
-    SELF.P___Inp_D_L_State_ := __PP11429903.Input_D_L_State_Value_;
-    SELF.P___Inp_Phone_Home_ := __PP11429903.Input_Home_Phone_Value_;
-    SELF.P___Inp_Phone_Work_ := __PP11429903.Input_Work_Phone_Value_;
-    SELF.P___Inp_Email_ := __PP11429903.Input_Email_Value_;
-    SELF.P___Inp_I_P_Addr_ := __PP11429903.Input_I_P_Addr_Value_;
-    SELF.P___Inp_Arch_Dt_ := __PP11429903.Input_Archive_Date_Value_;
-    SELF.P___Inp_Acct_Flag_ := __PP11429903.P___Inp_Acct_Flag_Value_;
-    SELF.P___Inp_Lex_I_D_Flag_ := __PP11429903.P___Inp_Lex_I_D_Flag_Value_;
-    SELF.P___Inp_Name_First_Flag_ := __PP11429903.P___Inp_Name_First_Flag_Value_;
-    SELF.P___Inp_Name_Mid_Flag_ := __PP11429903.P___Inp_Name_Mid_Flag_Value_;
-    SELF.P___Inp_Name_Last_Flag_ := __PP11429903.P___Inp_Name_Last_Flag_Value_;
-    SELF.P___Inp_Addr_St_Flag_ := __PP11429903.P___Inp_Addr_St_Flag_Value_;
-    SELF.P___Inp_Addr_City_Flag_ := __PP11429903.P___Inp_Addr_City_Flag_Value_;
-    SELF.P___Inp_Addr_State_Flag_ := __PP11429903.P___Inp_Addr_State_Flag_Value_;
-    SELF.P___Inp_Addr_Zip_Flag_ := __PP11429903.P___Inp_Addr_Zip_Flag_Value_;
-    SELF.P___Inp_S_S_N_Flag_ := __PP11429903.P___Inp_S_S_N_Flag_Value_;
-    SELF.P___Inp_D_O_B_Flag_ := __PP11429903.P___Inp_D_O_B_Flag_Value_;
-    SELF.P___Inp_D_L_Flag_ := __PP11429903.P___Inp_D_L_Flag_Value_;
-    SELF.P___Inp_D_L_State_Flag_ := __PP11429903.P___Inp_D_L_State_Flag_Value_;
-    SELF.P___Inp_Phone_Home_Flag_ := __PP11429903.P___Inp_Phone_Home_Flag_Value_;
-    SELF.P___Inp_Phone_Work_Flag_ := __PP11429903.P___Inp_Phone_Work_Flag_Value_;
-    SELF.P___Inp_Email_Flag_ := __PP11429903.P___Inp_Email_Flag_Value_;
-    SELF.P___Inp_I_P_Addr_Flag_ := __PP11429903.P___Inp_I_P_Addr_Flag_Value_;
-    SELF.P___Inp_Arch_Dt_Flag_ := __PP11429903.P___Inp_Arch_Dt_Flag_Value_;
-    SELF.P___Inp_Cln_Name_Prfx_ := __PP11429903.Input_Prefix_Clean_Value_;
-    SELF.P___Inp_Cln_Name_First_ := __PP11429903.Input_First_Name_Clean_Value_;
-    SELF.P___Inp_Cln_Name_Mid_ := __PP11429903.Input_Middle_Name_Clean_Value_;
-    SELF.P___Inp_Cln_Name_Last_ := __PP11429903.Input_Last_Name_Clean_Value_;
-    SELF.P___Inp_Cln_Name_Sffx_ := __PP11429903.Input_Suffix_Clean_Value_;
-    SELF.P___Inp_Cln_Addr_Prim_Rng_ := __PP11429903.Input_Primary_Range_Clean_Value_;
-    SELF.P___Inp_Cln_Addr_Pre_Dir_ := __PP11429903.Input_Pre_Direction_Clean_Value_;
-    SELF.P___Inp_Cln_Addr_Prim_Name_ := __PP11429903.Input_Primary_Name_Clean_Value_;
-    SELF.P___Inp_Cln_Addr_Sffx_ := __PP11429903.Input_Address_Suffix_Clean_Value_;
-    SELF.P___Inp_Cln_Addr_Post_Dir_ := __PP11429903.Input_Post_Direction_Clean_Value_;
-    SELF.P___Inp_Cln_Addr_Unit_Desig_ := __PP11429903.Input_Unit_Desig_Clean_Value_;
-    SELF.P___Inp_Cln_Addr_Sec_Rng_ := __PP11429903.Input_Secondary_Range_Clean_Value_;
-    SELF.P___Inp_Cln_Addr_City_ := __PP11429903.Input_City_Clean_Value_;
-    SELF.P___Inp_Cln_Addr_City_Post_ := __PP11429903.Input_City_Post_Clean_Value_;
-    SELF.P___Inp_Cln_Addr_State_ := __PP11429903.Input_State_Clean_Value_;
-    SELF.P___Inp_Cln_Addr_Zip5_ := __PP11429903.Input_Zip5_Clean_Value_;
-    SELF.P___Inp_Cln_Addr_Zip4_ := __PP11429903.Input_Zip4_Clean_Value_;
-    SELF.P___Inp_Cln_Addr_St_ := __PP11429903.Input_Street_Clean_Value_;
-    SELF.P___Inp_Cln_Addr_Full_ := __PP11429903.Input_Full_Address_Clean_Value_;
-    SELF.P___Inp_Cln_Addr_Lat_ := __PP11429903.Input_Latitude_Clean_Value_;
-    SELF.P___Inp_Cln_Addr_Lng_ := __PP11429903.Input_Longitude_Clean_Value_;
-    SELF.P___Inp_Cln_Addr_State_Code_ := __PP11429903.Input_State_Code_Clean_Value_;
-    SELF.P___Inp_Cln_Addr_Cnty_ := __PP11429903.Input_County_Clean_Value_;
-    SELF.P___Inp_Cln_Addr_Geo_ := __PP11429903.Input_Geoblock_Clean_Value_;
-    SELF.P___Inp_Cln_Addr_Type_ := __PP11429903.Input_Address_Type_Clean_Value_;
-    SELF.P___Inp_Cln_Addr_Status_ := __PP11429903.Input_Address_Status_Clean_Value_;
-    SELF.P___Inp_Cln_S_S_N_ := __PP11429903.Input_S_S_N_Clean_Value_;
-    SELF.P___Inp_Cln_D_O_B_ := __PP11429903.Input_D_O_B_Clean_Value_;
-    SELF.P___Inp_Cln_D_L_ := __PP11429903.Input_D_L_Clean_Value_;
-    SELF.P___Inp_Cln_D_L_State_ := __PP11429903.Input_D_L_State_Clean_Value_;
-    SELF.P___Inp_Cln_Phone_Home_ := __PP11429903.Input_Home_Phone_Clean_Value_;
-    SELF.P___Inp_Cln_Phone_Work_ := __PP11429903.Input_Work_Phone_Clean_Value_;
-    SELF.P___Inp_Cln_Email_ := __PP11429903.Input_Email_Clean_Value_;
-    SELF.P___Inp_Cln_Arch_Dt_ := __PP11429903.Input_Archive_Date_Clean_Value_;
-    SELF.P___Inp_Cln_Name_Prfx_Flag_ := __PP11429903.P___Inp_Cln_Name_Prfx_Flag_Value_;
-    SELF.P___Inp_Cln_Name_First_Flag_ := __PP11429903.P___Inp_Cln_Name_First_Flag_Value_;
-    SELF.P___Inp_Cln_Name_Mid_Flag_ := __PP11429903.P___Inp_Cln_Name_Mid_Flag_Value_;
-    SELF.P___Inp_Cln_Name_Last_Flag_ := __PP11429903.P___Inp_Cln_Name_Last_Flag_Value_;
-    SELF.P___Inp_Cln_Name_Sffx_Flag_ := __PP11429903.P___Inp_Cln_Name_Sffx_Flag_Value_;
-    SELF.P___Inp_Cln_Addr_Prim_Rng_Flag_ := __PP11429903.P___Inp_Cln_Addr_Prim_Rng_Flag_Value_;
-    SELF.P___Inp_Cln_Addr_Pre_Dir_Flag_ := __PP11429903.P___Inp_Cln_Addr_Pre_Dir_Flag_Value_;
-    SELF.P___Inp_Cln_Addr_Prim_Name_Flag_ := __PP11429903.P___Inp_Cln_Addr_Prim_Name_Flag_Value_;
-    SELF.P___Inp_Cln_Addr_Sffx_Flag_ := __PP11429903.P___Inp_Cln_Addr_Sffx_Flag_Value_;
-    SELF.P___Inp_Cln_Addr_Post_Dir_Flag_ := __PP11429903.P___Inp_Cln_Addr_Post_Dir_Flag_Value_;
-    SELF.P___Inp_Cln_Addr_Unit_Desig_Flag_ := __PP11429903.P___Inp_Cln_Addr_Unit_Desig_Flag_Value_;
-    SELF.P___Inp_Cln_Addr_Sec_Rng_Flag_ := __PP11429903.P___Inp_Cln_Addr_Sec_Rng_Flag_Value_;
-    SELF.P___Inp_Cln_Addr_City_Flag_ := __PP11429903.P___Inp_Cln_Addr_City_Flag_Value_;
-    SELF.P___Inp_Cln_Addr_City_Post_Flag_ := __PP11429903.P___Inp_Cln_Addr_City_Post_Flag_Value_;
-    SELF.P___Inp_Cln_Addr_State_Flag_ := __PP11429903.P___Inp_Cln_Addr_State_Flag_Value_;
-    SELF.P___Inp_Cln_Addr_Zip5_Flag_ := __PP11429903.P___Inp_Cln_Addr_Zip5_Flag_Value_;
-    SELF.P___Inp_Cln_Addr_Zip4_Flag_ := __PP11429903.P___Inp_Cln_Addr_Zip4_Flag_Value_;
-    SELF.P___Inp_Val_Addr_Zip_Bad_Len_Flag_ := __PP11429903.P___Inp_Val_Addr_Zip_Bad_Len_Flag_Value_;
-    SELF.P___Inp_Val_Addr_Zip_All_Zero_Flag_ := __PP11429903.P___Inp_Val_Addr_Zip_All_Zero_Flag_Value_;
-    SELF.P___Inp_Val_Addr_State_Bad_Abbr_Flag_ := __PP11429903.P___Inp_Val_Addr_State_Bad_Abbr_Flag_Value_;
-    SELF.P___Inp_Cln_Addr_St_Flag_ := __PP11429903.P___Inp_Cln_Addr_St_Flag_Value_;
-    SELF.P___Inp_Cln_Addr_Full_Flag_ := __PP11429903.P___Inp_Cln_Addr_Full_Flag_Value_;
-    SELF.P___Inp_Cln_Addr_Lat_Flag_ := __PP11429903.P___Inp_Cln_Addr_Lat_Flag_Value_;
-    SELF.P___Inp_Cln_Addr_Lng_Flag_ := __PP11429903.P___Inp_Cln_Addr_Lng_Flag_Value_;
-    SELF.P___Inp_Cln_Addr_Cnty_Flag_ := __PP11429903.P___Inp_Cln_Addr_Cnty_Flag_Value_;
-    SELF.P___Inp_Cln_Addr_Geo_Flag_ := __PP11429903.P___Inp_Cln_Addr_Geo_Flag_Value_;
-    SELF.P___Inp_Cln_Addr_Type_Flag_ := __PP11429903.P___Inp_Cln_Addr_Type_Flag_Value_;
-    SELF.P___Inp_Cln_Addr_Status_Flag_ := __PP11429903.P___Inp_Cln_Addr_Status_Flag_Value_;
-    SELF.P___Inp_Cln_S_S_N_Flag_ := __PP11429903.P___Inp_Cln_S_S_N_Flag_Value_;
-    SELF.P___Inp_Val_S_S_N_Bad_Char_Flag_ := __PP11429903.P___Inp_Val_S_S_N_Bad_Char_Flag_Value_;
-    SELF.P___Inp_Val_S_S_N_Bad_Len_Flag_ := __PP11429903.P___Inp_Val_S_S_N_Bad_Len_Flag_Value_;
-    SELF.P___Inp_Val_S_S_N_Bogus_Flag_ := __PP11429903.P___Inp_Val_S_S_N_Bogus_Flag_Value_;
-    SELF.P___Inp_Val_S_S_N_Non_S_S_A_Flag_ := __PP11429903.P___Inp_Val_S_S_N_Non_S_S_A_Flag_Value_;
-    SELF.P___Inp_Val_S_S_N_Is_I_T_I_N_Flag_ := __PP11429903.P___Inp_Val_S_S_N_Is_I_T_I_N_Flag_Value_;
-    SELF.P___Inp_Cln_D_O_B_Flag_ := __PP11429903.P___Inp_Cln_D_O_B_Flag_Value_;
-    SELF.P___Inp_Cln_D_L_Flag_ := __PP11429903.P___Inp_Cln_D_L_Flag_Value_;
-    SELF.P___Inp_Cln_D_L_State_Flag_ := __PP11429903.P___Inp_Cln_D_L_State_Flag_Value_;
-    SELF.P___Inp_Cln_Phone_Home_Flag_ := __PP11429903.P___Inp_Cln_Phone_Home_Flag_Value_;
-    SELF.P___Inp_Cln_Phone_Work_Flag_ := __PP11429903.P___Inp_Cln_Phone_Work_Flag_Value_;
-    SELF.P___Inp_Cln_Email_Flag_ := __PP11429903.P___Inp_Cln_Email_Flag_Value_;
-    SELF.P___Inp_Cln_I_P_Addr_Flag_ := __PP11429903.P___Inp_Cln_I_P_Addr_Flag_Value_;
-    SELF.P___Inp_Val_Email_Bogus_Flag_ := __PP11429903.P___Inp_Val_Email_Bogus_Flag_Value_;
-    SELF.P___Inp_Val_Email_User_All_Zero_Flag_ := __PP11429903.P___Inp_Val_Email_User_All_Zero_Flag_Value_;
-    SELF.P___Inp_Val_Email_User_Bad_Char_Flag_ := __PP11429903.P___Inp_Val_Email_User_Bad_Char_Flag_Value_;
-    SELF.P___Inp_Val_Email_Dom_All_Zero_Flag_ := __PP11429903.P___Inp_Val_Email_Dom_All_Zero_Flag_Value_;
-    SELF.P___Inp_Val_Email_Dom_Bad_Char_Flag_ := __PP11429903.P___Inp_Val_Email_Dom_Bad_Char_Flag_Value_;
-    SELF.P___Inp_Cln_Arch_Dt_Flag_ := __PP11429903.P___Inp_Cln_Arch_Dt_Flag_Value_;
-    SELF.P_I___Inp_Addr_State_D_L_Avail_Flag_ := IF(__PisFCRA,'',(KEL.typ.str)(__PP11429903.P_I___Inp_Addr_State_D_L_Avail_Flag___Non_F_C_R_A_));
-    SELF.P_I___Inp_Addr_State_Voter_Avail_Flag_ := IF(__PisFCRA,__PP11429903.P_I___Inp_Addr_State_Voter_Avail_Flag___F_C_R_A_,__PP11429903.P_I___Inp_Addr_State_Voter_Avail_Flag___Non_F_C_R_A_);
-    SELF.Rep_Number_ := __PP11429903.I_Rep_Number_Value_;
-    SELF.I_Paddr_ := __PP11429903._ipaddr_;
-    SELF.I_Presponse_ := __PP11429903._ipresponse_;
-    SELF.Net_Acuity_Royalty_ := __PP11429903._netacuityroyalty_;
-    SELF := __PP11429903;
+  SHARED __ST127716_Layout __ND12120678__Project(B_Input_P_I_I(__in,__cfg_Local).__ST160728_Layout __PP12120674) := TRANSFORM
+    SELF.G___Proc_U_I_D_ := __PP12120674.UID;
+    SELF.P___Inp_Acct_ := __PP12120674.Input_Account_Value_;
+    SELF.P___Inp_Lex_I_D_ := __PP12120674.Input_Lex_I_D_Value_;
+    SELF.P___Inp_Name_First_ := __PP12120674.Input_First_Name_Value_;
+    SELF.P___Inp_Name_Mid_ := __PP12120674.Input_Middle_Name_Value_;
+    SELF.P___Inp_Name_Last_ := __PP12120674.Input_Last_Name_Value_;
+    SELF.P___Inp_Addr_Line1_ := __PP12120674.Input_Street_Value_;
+    SELF.P___Inp_Addr_Line2_ := __PP12120674.P___Inp_Addr_Line2_Value_;
+    SELF.P___Inp_Addr_City_ := __PP12120674.Input_City_Value_;
+    SELF.P___Inp_Addr_State_ := __PP12120674.Input_State_Value_;
+    SELF.P___Inp_Addr_Zip_ := __PP12120674.Input_Zip_Value_;
+    SELF.P___Inp_S_S_N_ := __PP12120674.Input_S_S_N_Value_;
+    SELF.P___Inp_D_O_B_ := __PP12120674.Input_D_O_B_Value_;
+    SELF.P___Inp_D_L_ := __PP12120674.Input_D_L_Value_;
+    SELF.P___Inp_D_L_State_ := __PP12120674.Input_D_L_State_Value_;
+    SELF.P___Inp_Phone_Home_ := __PP12120674.Input_Home_Phone_Value_;
+    SELF.P___Inp_Phone_Work_ := __PP12120674.Input_Work_Phone_Value_;
+    SELF.P___Inp_Email_ := __PP12120674.Input_Email_Value_;
+    SELF.P___Inp_I_P_Addr_ := __PP12120674.Input_I_P_Addr_Value_;
+    SELF.P___Inp_Arch_Dt_ := __PP12120674.Input_Archive_Date_Value_;
+    SELF.P___Inp_Acct_Flag_ := __PP12120674.P___Inp_Acct_Flag_Value_;
+    SELF.P___Inp_Lex_I_D_Flag_ := __PP12120674.P___Inp_Lex_I_D_Flag_Value_;
+    SELF.P___Inp_Name_First_Flag_ := __PP12120674.P___Inp_Name_First_Flag_Value_;
+    SELF.P___Inp_Name_Mid_Flag_ := __PP12120674.P___Inp_Name_Mid_Flag_Value_;
+    SELF.P___Inp_Name_Last_Flag_ := __PP12120674.P___Inp_Name_Last_Flag_Value_;
+    SELF.P___Inp_Addr_St_Flag_ := __PP12120674.P___Inp_Addr_St_Flag_Value_;
+    SELF.P___Inp_Addr_City_Flag_ := __PP12120674.P___Inp_Addr_City_Flag_Value_;
+    SELF.P___Inp_Addr_State_Flag_ := __PP12120674.P___Inp_Addr_State_Flag_Value_;
+    SELF.P___Inp_Addr_Zip_Flag_ := __PP12120674.P___Inp_Addr_Zip_Flag_Value_;
+    SELF.P___Inp_S_S_N_Flag_ := __PP12120674.P___Inp_S_S_N_Flag_Value_;
+    SELF.P___Inp_D_O_B_Flag_ := __PP12120674.P___Inp_D_O_B_Flag_Value_;
+    SELF.P___Inp_D_L_Flag_ := __PP12120674.P___Inp_D_L_Flag_Value_;
+    SELF.P___Inp_D_L_State_Flag_ := __PP12120674.P___Inp_D_L_State_Flag_Value_;
+    SELF.P___Inp_Phone_Home_Flag_ := __PP12120674.P___Inp_Phone_Home_Flag_Value_;
+    SELF.P___Inp_Phone_Work_Flag_ := __PP12120674.P___Inp_Phone_Work_Flag_Value_;
+    SELF.P___Inp_Email_Flag_ := __PP12120674.P___Inp_Email_Flag_Value_;
+    SELF.P___Inp_I_P_Addr_Flag_ := __PP12120674.P___Inp_I_P_Addr_Flag_Value_;
+    SELF.P___Inp_Arch_Dt_Flag_ := __PP12120674.P___Inp_Arch_Dt_Flag_Value_;
+    SELF.P___Inp_Cln_Name_Prfx_ := __PP12120674.Input_Prefix_Clean_Value_;
+    SELF.P___Inp_Cln_Name_First_ := __PP12120674.Input_First_Name_Clean_Value_;
+    SELF.P___Inp_Cln_Name_Mid_ := __PP12120674.Input_Middle_Name_Clean_Value_;
+    SELF.P___Inp_Cln_Name_Last_ := __PP12120674.Input_Last_Name_Clean_Value_;
+    SELF.P___Inp_Cln_Name_Sffx_ := __PP12120674.Input_Suffix_Clean_Value_;
+    SELF.P___Inp_Cln_Addr_Prim_Rng_ := __PP12120674.Input_Primary_Range_Clean_Value_;
+    SELF.P___Inp_Cln_Addr_Pre_Dir_ := __PP12120674.Input_Pre_Direction_Clean_Value_;
+    SELF.P___Inp_Cln_Addr_Prim_Name_ := __PP12120674.Input_Primary_Name_Clean_Value_;
+    SELF.P___Inp_Cln_Addr_Sffx_ := __PP12120674.Input_Address_Suffix_Clean_Value_;
+    SELF.P___Inp_Cln_Addr_Post_Dir_ := __PP12120674.Input_Post_Direction_Clean_Value_;
+    SELF.P___Inp_Cln_Addr_Unit_Desig_ := __PP12120674.Input_Unit_Desig_Clean_Value_;
+    SELF.P___Inp_Cln_Addr_Sec_Rng_ := __PP12120674.Input_Secondary_Range_Clean_Value_;
+    SELF.P___Inp_Cln_Addr_City_ := __PP12120674.Input_City_Clean_Value_;
+    SELF.P___Inp_Cln_Addr_City_Post_ := __PP12120674.Input_City_Post_Clean_Value_;
+    SELF.P___Inp_Cln_Addr_State_ := __PP12120674.Input_State_Clean_Value_;
+    SELF.P___Inp_Cln_Addr_Zip5_ := __PP12120674.Input_Zip5_Clean_Value_;
+    SELF.P___Inp_Cln_Addr_Zip4_ := __PP12120674.Input_Zip4_Clean_Value_;
+    SELF.P___Inp_Cln_Addr_St_ := __PP12120674.Input_Street_Clean_Value_;
+    SELF.P___Inp_Cln_Addr_Full_ := __PP12120674.Input_Full_Address_Clean_Value_;
+    SELF.P___Inp_Cln_Addr_Lat_ := __PP12120674.Input_Latitude_Clean_Value_;
+    SELF.P___Inp_Cln_Addr_Lng_ := __PP12120674.Input_Longitude_Clean_Value_;
+    SELF.P___Inp_Cln_Addr_State_Code_ := __PP12120674.Input_State_Code_Clean_Value_;
+    SELF.P___Inp_Cln_Addr_Cnty_ := __PP12120674.Input_County_Clean_Value_;
+    SELF.P___Inp_Cln_Addr_Geo_ := __PP12120674.Input_Geoblock_Clean_Value_;
+    SELF.P___Inp_Cln_Addr_Type_ := __PP12120674.Input_Address_Type_Clean_Value_;
+    SELF.P___Inp_Cln_Addr_Status_ := __PP12120674.Input_Address_Status_Clean_Value_;
+    SELF.P___Inp_Cln_S_S_N_ := __PP12120674.Input_S_S_N_Clean_Value_;
+    SELF.P___Inp_Cln_D_O_B_ := __PP12120674.Input_D_O_B_Clean_Value_;
+    SELF.P___Inp_Cln_D_L_ := __PP12120674.Input_D_L_Clean_Value_;
+    SELF.P___Inp_Cln_D_L_State_ := __PP12120674.Input_D_L_State_Clean_Value_;
+    SELF.P___Inp_Cln_Phone_Home_ := __PP12120674.Input_Home_Phone_Clean_Value_;
+    SELF.P___Inp_Cln_Phone_Work_ := __PP12120674.Input_Work_Phone_Clean_Value_;
+    SELF.P___Inp_Cln_Email_ := __PP12120674.Input_Email_Clean_Value_;
+    SELF.P___Inp_Cln_Arch_Dt_ := __PP12120674.Input_Archive_Date_Clean_Value_;
+    SELF.P___Inp_Cln_Name_Prfx_Flag_ := __PP12120674.P___Inp_Cln_Name_Prfx_Flag_Value_;
+    SELF.P___Inp_Cln_Name_First_Flag_ := __PP12120674.P___Inp_Cln_Name_First_Flag_Value_;
+    SELF.P___Inp_Cln_Name_Mid_Flag_ := __PP12120674.P___Inp_Cln_Name_Mid_Flag_Value_;
+    SELF.P___Inp_Cln_Name_Last_Flag_ := __PP12120674.P___Inp_Cln_Name_Last_Flag_Value_;
+    SELF.P___Inp_Cln_Name_Sffx_Flag_ := __PP12120674.P___Inp_Cln_Name_Sffx_Flag_Value_;
+    SELF.P___Inp_Cln_Addr_Prim_Rng_Flag_ := __PP12120674.P___Inp_Cln_Addr_Prim_Rng_Flag_Value_;
+    SELF.P___Inp_Cln_Addr_Pre_Dir_Flag_ := __PP12120674.P___Inp_Cln_Addr_Pre_Dir_Flag_Value_;
+    SELF.P___Inp_Cln_Addr_Prim_Name_Flag_ := __PP12120674.P___Inp_Cln_Addr_Prim_Name_Flag_Value_;
+    SELF.P___Inp_Cln_Addr_Sffx_Flag_ := __PP12120674.P___Inp_Cln_Addr_Sffx_Flag_Value_;
+    SELF.P___Inp_Cln_Addr_Post_Dir_Flag_ := __PP12120674.P___Inp_Cln_Addr_Post_Dir_Flag_Value_;
+    SELF.P___Inp_Cln_Addr_Unit_Desig_Flag_ := __PP12120674.P___Inp_Cln_Addr_Unit_Desig_Flag_Value_;
+    SELF.P___Inp_Cln_Addr_Sec_Rng_Flag_ := __PP12120674.P___Inp_Cln_Addr_Sec_Rng_Flag_Value_;
+    SELF.P___Inp_Cln_Addr_City_Flag_ := __PP12120674.P___Inp_Cln_Addr_City_Flag_Value_;
+    SELF.P___Inp_Cln_Addr_City_Post_Flag_ := __PP12120674.P___Inp_Cln_Addr_City_Post_Flag_Value_;
+    SELF.P___Inp_Cln_Addr_State_Flag_ := __PP12120674.P___Inp_Cln_Addr_State_Flag_Value_;
+    SELF.P___Inp_Cln_Addr_Zip5_Flag_ := __PP12120674.P___Inp_Cln_Addr_Zip5_Flag_Value_;
+    SELF.P___Inp_Cln_Addr_Zip4_Flag_ := __PP12120674.P___Inp_Cln_Addr_Zip4_Flag_Value_;
+    SELF.P___Inp_Val_Addr_Zip_Bad_Len_Flag_ := __PP12120674.P___Inp_Val_Addr_Zip_Bad_Len_Flag_Value_;
+    SELF.P___Inp_Val_Addr_Zip_All_Zero_Flag_ := __PP12120674.P___Inp_Val_Addr_Zip_All_Zero_Flag_Value_;
+    SELF.P___Inp_Val_Addr_State_Bad_Abbr_Flag_ := __PP12120674.P___Inp_Val_Addr_State_Bad_Abbr_Flag_Value_;
+    SELF.P___Inp_Cln_Addr_St_Flag_ := __PP12120674.P___Inp_Cln_Addr_St_Flag_Value_;
+    SELF.P___Inp_Cln_Addr_Full_Flag_ := __PP12120674.P___Inp_Cln_Addr_Full_Flag_Value_;
+    SELF.P___Inp_Cln_Addr_Lat_Flag_ := __PP12120674.P___Inp_Cln_Addr_Lat_Flag_Value_;
+    SELF.P___Inp_Cln_Addr_Lng_Flag_ := __PP12120674.P___Inp_Cln_Addr_Lng_Flag_Value_;
+    SELF.P___Inp_Cln_Addr_Cnty_Flag_ := __PP12120674.P___Inp_Cln_Addr_Cnty_Flag_Value_;
+    SELF.P___Inp_Cln_Addr_Geo_Flag_ := __PP12120674.P___Inp_Cln_Addr_Geo_Flag_Value_;
+    SELF.P___Inp_Cln_Addr_Type_Flag_ := __PP12120674.P___Inp_Cln_Addr_Type_Flag_Value_;
+    SELF.P___Inp_Cln_Addr_Status_Flag_ := __PP12120674.P___Inp_Cln_Addr_Status_Flag_Value_;
+    SELF.P___Inp_Cln_S_S_N_Flag_ := __PP12120674.P___Inp_Cln_S_S_N_Flag_Value_;
+    SELF.P___Inp_Val_S_S_N_Bad_Char_Flag_ := __PP12120674.P___Inp_Val_S_S_N_Bad_Char_Flag_Value_;
+    SELF.P___Inp_Val_S_S_N_Bad_Len_Flag_ := __PP12120674.P___Inp_Val_S_S_N_Bad_Len_Flag_Value_;
+    SELF.P___Inp_Val_S_S_N_Bogus_Flag_ := __PP12120674.P___Inp_Val_S_S_N_Bogus_Flag_Value_;
+    SELF.P___Inp_Val_S_S_N_Non_S_S_A_Flag_ := __PP12120674.P___Inp_Val_S_S_N_Non_S_S_A_Flag_Value_;
+    SELF.P___Inp_Val_S_S_N_Is_I_T_I_N_Flag_ := __PP12120674.P___Inp_Val_S_S_N_Is_I_T_I_N_Flag_Value_;
+    SELF.P___Inp_Cln_D_O_B_Flag_ := __PP12120674.P___Inp_Cln_D_O_B_Flag_Value_;
+    SELF.P___Inp_Cln_D_L_Flag_ := __PP12120674.P___Inp_Cln_D_L_Flag_Value_;
+    SELF.P___Inp_Cln_D_L_State_Flag_ := __PP12120674.P___Inp_Cln_D_L_State_Flag_Value_;
+    SELF.P___Inp_Cln_Phone_Home_Flag_ := __PP12120674.P___Inp_Cln_Phone_Home_Flag_Value_;
+    SELF.P___Inp_Cln_Phone_Work_Flag_ := __PP12120674.P___Inp_Cln_Phone_Work_Flag_Value_;
+    SELF.P___Inp_Cln_Email_Flag_ := __PP12120674.P___Inp_Cln_Email_Flag_Value_;
+    SELF.P___Inp_Cln_I_P_Addr_Flag_ := __PP12120674.P___Inp_Cln_I_P_Addr_Flag_Value_;
+    SELF.P___Inp_Val_Email_Bogus_Flag_ := __PP12120674.P___Inp_Val_Email_Bogus_Flag_Value_;
+    SELF.P___Inp_Val_Email_User_All_Zero_Flag_ := __PP12120674.P___Inp_Val_Email_User_All_Zero_Flag_Value_;
+    SELF.P___Inp_Val_Email_User_Bad_Char_Flag_ := __PP12120674.P___Inp_Val_Email_User_Bad_Char_Flag_Value_;
+    SELF.P___Inp_Val_Email_Dom_All_Zero_Flag_ := __PP12120674.P___Inp_Val_Email_Dom_All_Zero_Flag_Value_;
+    SELF.P___Inp_Val_Email_Dom_Bad_Char_Flag_ := __PP12120674.P___Inp_Val_Email_Dom_Bad_Char_Flag_Value_;
+    SELF.P___Inp_Cln_Arch_Dt_Flag_ := __PP12120674.P___Inp_Cln_Arch_Dt_Flag_Value_;
+    SELF.P_I___Inp_Addr_State_D_L_Avail_Flag_ := __PP12120674.P_I___Inp_Addr_State_D_L_Avail_Flag___Non_F_C_R_A_;
+    SELF.P_I___Inp_Addr_State_Voter_Avail_Flag_ := IF(__PisFCRA,__PP12120674.P_I___Inp_Addr_State_Voter_Avail_Flag___F_C_R_A_,__PP12120674.P_I___Inp_Addr_State_Voter_Avail_Flag___Non_F_C_R_A_);
+    SELF.Rep_Number_ := __PP12120674.I_Rep_Number_Value_;
+    SELF.I_Paddr_ := __PP12120674._ipaddr_;
+    SELF.I_Presponse_ := __PP12120674._ipresponse_;
+    SELF.Net_Acuity_Royalty_ := __PP12120674._netacuityroyalty_;
+    SELF := __PP12120674;
   END;
-  EXPORT Res0 := __UNWRAP(PROJECT(__EE11429902,__ND11429907__Project(LEFT)));
+  EXPORT Res0 := __UNWRAP(PROJECT(__EE12120673,__ND12120678__Project(LEFT)));
   EXPORT DBG_E_Input_P_I_I_PreEntity := __UNWRAP(E_Input_P_I_I_Params(__in,__cfg_Local).InData);
   EXPORT DBG_E_Input_P_I_I_Result := __UNWRAP(E_Input_P_I_I_Filtered.__Result);
   EXPORT DBG_E_Accident_Result := __UNWRAP(E_Accident_Filtered.__Result);
@@ -1108,6 +1125,7 @@ EXPORT Q_Input_Attributes_V1_Hybrid(DATASET(RECORDOF(PublicRecords_KEL.ECL_Funct
   EXPORT DBG_E_Person_Intermediate_6 := __UNWRAP(B_Person_6_Local.__ENH_Person_6);
   EXPORT DBG_E_Person_Inquiry_Intermediate_6 := __UNWRAP(B_Person_Inquiry_6_Local.__ENH_Person_Inquiry_6);
   EXPORT DBG_E_Person_Property_Intermediate_6 := __UNWRAP(B_Person_Property_6_Local.__ENH_Person_Property_6);
+  EXPORT DBG_E_Person_S_S_N_Intermediate_6 := __UNWRAP(B_Person_S_S_N_6_Local.__ENH_Person_S_S_N_6);
   EXPORT DBG_E_Property_Event_Intermediate_6 := __UNWRAP(B_Property_Event_6_Local.__ENH_Property_Event_6);
   EXPORT DBG_E_Sele_Person_Intermediate_6 := __UNWRAP(B_Sele_Person_6_Local.__ENH_Sele_Person_6);
   EXPORT DBG_E_Address_Intermediate_5 := __UNWRAP(B_Address_5_Local.__ENH_Address_5);
@@ -1120,6 +1138,7 @@ EXPORT Q_Input_Attributes_V1_Hybrid(DATASET(RECORDOF(PublicRecords_KEL.ECL_Funct
   EXPORT DBG_E_Person_Intermediate_5 := __UNWRAP(B_Person_5_Local.__ENH_Person_5);
   EXPORT DBG_E_Person_Inquiry_Intermediate_5 := __UNWRAP(B_Person_Inquiry_5_Local.__ENH_Person_Inquiry_5);
   EXPORT DBG_E_Person_Property_Intermediate_5 := __UNWRAP(B_Person_Property_5_Local.__ENH_Person_Property_5);
+  EXPORT DBG_E_Person_S_S_N_Intermediate_5 := __UNWRAP(B_Person_S_S_N_5_Local.__ENH_Person_S_S_N_5);
   EXPORT DBG_E_Professional_License_Intermediate_5 := __UNWRAP(B_Professional_License_5_Local.__ENH_Professional_License_5);
   EXPORT DBG_E_Property_Intermediate_5 := __UNWRAP(B_Property_5_Local.__ENH_Property_5);
   EXPORT DBG_E_Property_Event_Intermediate_5 := __UNWRAP(B_Property_Event_5_Local.__ENH_Property_Event_5);
@@ -1133,6 +1152,7 @@ EXPORT Q_Input_Attributes_V1_Hybrid(DATASET(RECORDOF(PublicRecords_KEL.ECL_Funct
   EXPORT DBG_E_Person_Intermediate_4 := __UNWRAP(B_Person_4_Local.__ENH_Person_4);
   EXPORT DBG_E_Person_Inquiry_Intermediate_4 := __UNWRAP(B_Person_Inquiry_4_Local.__ENH_Person_Inquiry_4);
   EXPORT DBG_E_Person_Property_Intermediate_4 := __UNWRAP(B_Person_Property_4_Local.__ENH_Person_Property_4);
+  EXPORT DBG_E_Person_S_S_N_Intermediate_4 := __UNWRAP(B_Person_S_S_N_4_Local.__ENH_Person_S_S_N_4);
   EXPORT DBG_E_Professional_License_Intermediate_4 := __UNWRAP(B_Professional_License_4_Local.__ENH_Professional_License_4);
   EXPORT DBG_E_Property_Intermediate_4 := __UNWRAP(B_Property_4_Local.__ENH_Property_4);
   EXPORT DBG_E_Property_Event_Intermediate_4 := __UNWRAP(B_Property_Event_4_Local.__ENH_Property_Event_4);
@@ -1148,6 +1168,7 @@ EXPORT Q_Input_Attributes_V1_Hybrid(DATASET(RECORDOF(PublicRecords_KEL.ECL_Funct
   EXPORT DBG_E_Person_Address_Intermediate_3 := __UNWRAP(B_Person_Address_3_Local.__ENH_Person_Address_3);
   EXPORT DBG_E_Person_Inquiry_Intermediate_3 := __UNWRAP(B_Person_Inquiry_3_Local.__ENH_Person_Inquiry_3);
   EXPORT DBG_E_Person_Property_Intermediate_3 := __UNWRAP(B_Person_Property_3_Local.__ENH_Person_Property_3);
+  EXPORT DBG_E_Person_S_S_N_Intermediate_3 := __UNWRAP(B_Person_S_S_N_3_Local.__ENH_Person_S_S_N_3);
   EXPORT DBG_E_Person_Vehicle_Intermediate_3 := __UNWRAP(B_Person_Vehicle_3_Local.__ENH_Person_Vehicle_3);
   EXPORT DBG_E_Professional_License_Intermediate_3 := __UNWRAP(B_Professional_License_3_Local.__ENH_Professional_License_3);
   EXPORT DBG_E_Property_Intermediate_3 := __UNWRAP(B_Property_3_Local.__ENH_Property_3);
@@ -1252,6 +1273,7 @@ EXPORT Q_Input_Attributes_V1_Hybrid(DATASET(RECORDOF(PublicRecords_KEL.ECL_Funct
     OUTPUT(DBG_E_Person_Intermediate_6,NAMED('DBG_E_Person_Intermediate_6_Q_Input_Attributes_V1_Hybrid')),
     OUTPUT(DBG_E_Person_Inquiry_Intermediate_6,NAMED('DBG_E_Person_Inquiry_Intermediate_6_Q_Input_Attributes_V1_Hybrid')),
     OUTPUT(DBG_E_Person_Property_Intermediate_6,NAMED('DBG_E_Person_Property_Intermediate_6_Q_Input_Attributes_V1_Hybrid')),
+    OUTPUT(DBG_E_Person_S_S_N_Intermediate_6,NAMED('DBG_E_Person_S_S_N_Intermediate_6_Q_Input_Attributes_V1_Hybrid')),
     OUTPUT(DBG_E_Property_Event_Intermediate_6,NAMED('DBG_E_Property_Event_Intermediate_6_Q_Input_Attributes_V1_Hybrid')),
     OUTPUT(DBG_E_Sele_Person_Intermediate_6,NAMED('DBG_E_Sele_Person_Intermediate_6_Q_Input_Attributes_V1_Hybrid')),
     OUTPUT(DBG_E_Address_Intermediate_5,NAMED('DBG_E_Address_Intermediate_5_Q_Input_Attributes_V1_Hybrid')),
@@ -1264,6 +1286,7 @@ EXPORT Q_Input_Attributes_V1_Hybrid(DATASET(RECORDOF(PublicRecords_KEL.ECL_Funct
     OUTPUT(DBG_E_Person_Intermediate_5,NAMED('DBG_E_Person_Intermediate_5_Q_Input_Attributes_V1_Hybrid')),
     OUTPUT(DBG_E_Person_Inquiry_Intermediate_5,NAMED('DBG_E_Person_Inquiry_Intermediate_5_Q_Input_Attributes_V1_Hybrid')),
     OUTPUT(DBG_E_Person_Property_Intermediate_5,NAMED('DBG_E_Person_Property_Intermediate_5_Q_Input_Attributes_V1_Hybrid')),
+    OUTPUT(DBG_E_Person_S_S_N_Intermediate_5,NAMED('DBG_E_Person_S_S_N_Intermediate_5_Q_Input_Attributes_V1_Hybrid')),
     OUTPUT(DBG_E_Professional_License_Intermediate_5,NAMED('DBG_E_Professional_License_Intermediate_5_Q_Input_Attributes_V1_Hybrid')),
     OUTPUT(DBG_E_Property_Intermediate_5,NAMED('DBG_E_Property_Intermediate_5_Q_Input_Attributes_V1_Hybrid')),
     OUTPUT(DBG_E_Property_Event_Intermediate_5,NAMED('DBG_E_Property_Event_Intermediate_5_Q_Input_Attributes_V1_Hybrid')),
@@ -1277,6 +1300,7 @@ EXPORT Q_Input_Attributes_V1_Hybrid(DATASET(RECORDOF(PublicRecords_KEL.ECL_Funct
     OUTPUT(DBG_E_Person_Intermediate_4,NAMED('DBG_E_Person_Intermediate_4_Q_Input_Attributes_V1_Hybrid')),
     OUTPUT(DBG_E_Person_Inquiry_Intermediate_4,NAMED('DBG_E_Person_Inquiry_Intermediate_4_Q_Input_Attributes_V1_Hybrid')),
     OUTPUT(DBG_E_Person_Property_Intermediate_4,NAMED('DBG_E_Person_Property_Intermediate_4_Q_Input_Attributes_V1_Hybrid')),
+    OUTPUT(DBG_E_Person_S_S_N_Intermediate_4,NAMED('DBG_E_Person_S_S_N_Intermediate_4_Q_Input_Attributes_V1_Hybrid')),
     OUTPUT(DBG_E_Professional_License_Intermediate_4,NAMED('DBG_E_Professional_License_Intermediate_4_Q_Input_Attributes_V1_Hybrid')),
     OUTPUT(DBG_E_Property_Intermediate_4,NAMED('DBG_E_Property_Intermediate_4_Q_Input_Attributes_V1_Hybrid')),
     OUTPUT(DBG_E_Property_Event_Intermediate_4,NAMED('DBG_E_Property_Event_Intermediate_4_Q_Input_Attributes_V1_Hybrid')),
@@ -1292,6 +1316,7 @@ EXPORT Q_Input_Attributes_V1_Hybrid(DATASET(RECORDOF(PublicRecords_KEL.ECL_Funct
     OUTPUT(DBG_E_Person_Address_Intermediate_3,NAMED('DBG_E_Person_Address_Intermediate_3_Q_Input_Attributes_V1_Hybrid')),
     OUTPUT(DBG_E_Person_Inquiry_Intermediate_3,NAMED('DBG_E_Person_Inquiry_Intermediate_3_Q_Input_Attributes_V1_Hybrid')),
     OUTPUT(DBG_E_Person_Property_Intermediate_3,NAMED('DBG_E_Person_Property_Intermediate_3_Q_Input_Attributes_V1_Hybrid')),
+    OUTPUT(DBG_E_Person_S_S_N_Intermediate_3,NAMED('DBG_E_Person_S_S_N_Intermediate_3_Q_Input_Attributes_V1_Hybrid')),
     OUTPUT(DBG_E_Person_Vehicle_Intermediate_3,NAMED('DBG_E_Person_Vehicle_Intermediate_3_Q_Input_Attributes_V1_Hybrid')),
     OUTPUT(DBG_E_Professional_License_Intermediate_3,NAMED('DBG_E_Professional_License_Intermediate_3_Q_Input_Attributes_V1_Hybrid')),
     OUTPUT(DBG_E_Property_Intermediate_3,NAMED('DBG_E_Property_Intermediate_3_Q_Input_Attributes_V1_Hybrid')),
