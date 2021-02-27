@@ -1990,7 +1990,12 @@ EXPORT dsSourceCriteria := DATASET([
 {'EC (CFSP) 2021/55 Tunisia List','1977'},
 {'EC 2021/49 Tunisia List','1978'},
 {'EC (CFSP) 2021/142 EU Terrorism List','1979'},
-{'EC 2021/138 Terrorism List','1980'}
+{'EC 2021/138 Terrorism List','1980'},
+{'EC (CFSP) 2021/258 Zimbabwe List','1981'},
+{'EC (CFSP) 2021/276 Venezuela List','1982'},
+{'EC 2021/275 Venezuela List','1983'},
+{'OFAC - Protecting Europe\'s Energy Security Act','1984'}
+
 ],r);
 
 

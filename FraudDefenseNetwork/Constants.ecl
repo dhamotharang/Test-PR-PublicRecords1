@@ -1,17 +1,26 @@
 ﻿IMPORT FraudShared;
 EXPORT Constants(BOOLEAN pUseOtherEnvironment	= true) := MODULE
 
-	EXPORT autokey_buildskipset := [];
+	EXPORT autokey_buildskipset := _Dataset().autokey_buildskipset;
 	/*
 		'C' -- skip person keys altogether
           'P' -- skip person phone key
 		      'S' -- skip ssn key
-
+		      'A' -- skip indv address key
+		      'I' -- skip indv citystname key
+		      'N' -- skip indv name key
+		      'T' -- skip indv stname key
+		      'Z' -- skip indv zip key
 		
 		'B' -- skip business keys altogether 
       		'Q' -- skip biz phone key
 		      'F' -- skip Fein key
-
+		      'D' -- skip biz address key
+		      'J' -- skip biz citystname key
+		      'M' -- skip biz name key
+		      'W' -- skip namewords key
+		      'U' -- skip biz stname key
+		      'Y' -- skip biz zip key
 */
   EXPORT TYPE_STR := 'AK';
 	
