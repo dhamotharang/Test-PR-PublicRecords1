@@ -71,12 +71,15 @@ EXPORT getSBFE(DATASET(Business_Risk_BIP.Layouts.Shell) Shell_pre,
 	// Get majority of SBFE data.
 	SBFE_data := mod_SBFE.SBFE_result;
 
+	// identify if this transaction is being run in production traffic to avoid some extra overhead of processing by historydate
+	production_realtime_mode := ((string)shell_pre[1].Clean_Input.HistoryDateTime)[1..6] = '999999';
+
 	// Get future Tradelines data.
 	linkid_recs_future := Business_Risk_BIP.Common.FilterRecordsFuture(linkid_recs_loaddate_dedup, dt_first_seen, MDR.SourceTools.src_Business_Credit, AllowedSourcesSet);
 
+	// when in production mode, we don't need to add 3 years to the historydate of 999999 
+	SBFE_data_future          := if(production_realtime_mode, mod_SBFE.SBFE_Result_Future_ProductionMode, Business_Credit_KEL.GLUE_fdc_append(linkid_recs_future).SBFE_Result_Future);
 
-	SBFE_data_future          := Business_Credit_KEL.GLUE_fdc_append(linkid_recs_future).SBFE_Result_Future;
-	SBFE_raw_data_future 			:= Business_Credit_KEL.GLUE_fdc_append(linkid_recs_future).AddLinkIdsFuture;
 	// Get BusinessIformation data separately to make work in the Transform below easier.
 	BusinessInformation_recs := mod_SBFE.AddBusinessClassification;
 
