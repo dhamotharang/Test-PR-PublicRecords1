@@ -37,7 +37,6 @@ EXPORT FnRoxie_GetAttrs(DATASET(PublicRecords_KEL.ECL_Functions.Input_Layout) In
 	ALLSummaryAttributes := IF(NOT Options.IsFCRA, ALLSummaryAttributesNonFCRA, DATASET([], PublicRecords_KEL.ECL_Functions.Layouts.LayoutALLSumAttributes));
 	
 	InferredPerformanceAttributes := IF(Options.IsFCRA, PublicRecords_KEL.FnRoxie_GetInferredPerformanceAttributes(MiniAttributes(IsInputRec = TRUE), Options, FDCDataset), DATASET([], PublicRecords_KEL.ECL_Functions.Layouts.LayoutInferredAttributes));
-	withPersonAttributes := JOIN(InputPIIAttributes, PersonAttributes, LEFT.G_ProcUID = RIGHT.G_ProcUID,
 	
 	// HighRiskAddressAttributesNonFCRA := PublicRecords_KEL.FnRoxie_GetHighRiskAddress(InputChooser, Options, FDCDataset);
 	// HighRiskAddressAttributes  := IF(NOT Options.IsFCRA, HighRiskAddressAttributesNonFCRA, DATASET([], PublicRecords_KEL.ECL_Functions.Layouts.LayoutHighRiskAddressAttributes));
