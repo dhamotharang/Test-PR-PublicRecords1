@@ -42,6 +42,7 @@ EXPORT _Constants(boolean pUseProd=false)  := module
 	export name                               := trim('thor_data400::base::ida::daily::*');	                                                                            	
     export rawFilesinThor                     := NOTHOR(STD.File.LogicalFileList(name,true,false,false));
     export monthlyversion                     := Max(rawFilesinThor,(string)std.str.splitwords(name,'::')[5][1..15]);
+	export despray_change_filename            :='IDA_LEXID_REFRESH_'+monthlyversion+'_response.txt';
 
 	
 END;
