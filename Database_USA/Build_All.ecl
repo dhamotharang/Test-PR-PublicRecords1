@@ -30,8 +30,8 @@ function
 		,Promote().Buildfiles.Built2QA
 		,QA_Records()
 		,Create_Orbit_Build(pversion)
-	): 	success(Send_Emails(pversion,pContact,pContact,,not pIsTesting).Roxie), 
-			failure(Send_Emails(pversion,pContact,pContact,,not pIsTesting).buildfailure);
+	): 	success(Send_Emails(pversion:= pversion,pEmailList:= pContact,pRoxieEmailList:= pContact,pShouldUpdateRoxiePage:= not pIsTesting).Roxie), 
+			failure(Send_Emails(pversion:= pversion,pEmailList:= pContact,pRoxieEmailList:= pContact,pShouldUpdateRoxiePage:= not pIsTesting).buildfailure);
 	
 	return
 		if(tools.fun_IsValidVersion(pversion)
