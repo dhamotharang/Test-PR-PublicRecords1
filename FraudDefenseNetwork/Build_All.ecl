@@ -114,7 +114,7 @@ shared base_portion := sequential(
                                                   pUpdateErieWatchListFile,
                                                   pUpdateErieWatchListflag
                                                 ).All, notify('FDN BASE FILES COMPLETE', '*');
-                                 ) : success(Send_Emails(pversion).Roxie), failure(Send_Emails(pversion).BuildFailure);
+                                 ) : success(Send_Emails(pversion).BuildSuccess), failure(Send_Emails(pversion).BuildFailure);
 
 //Create build automation -- 02/14/2017
 export create_build := Orbit3.proc_Orbit3_CreateBuild ('FDN', pversion);
@@ -139,7 +139,7 @@ export dops_update := dops.updateversion('FDNKeys',pversion, Email_Notification_
                                      QA_Records(),
                                      Strata_Population_Stats(pversion, pIsTesting, pOverwrite, pBaseMainBuilt).All,
                                      create_build,
-							dops_update) : success(Send_Emails(pversion).Roxie), failure(Send_Emails(pversion).BuildFailure
+							dops_update) : success(Send_Emails(pversion).BuildSuccess), failure(Send_Emails(pversion).BuildFailure
                                    );
 
  export full_build := sequential(
