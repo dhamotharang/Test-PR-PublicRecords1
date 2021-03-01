@@ -1,4 +1,4 @@
-IMPORT bipv2, bizlinkfull, Business_Header, canadianphones_v2, cortera, doxie, domains, dx_email, experian_crdb, FBNV2, 
+IMPORT bipv2, bizlinkfull, Business_Header, canadianphones_v2, doxie, domains, dx_Cortera, dx_email, experian_crdb, FBNV2, 
   midex_services, paw, patriot, sanctn, vehiclev2, STD;
 
 EXPORT Raw := MODULE
@@ -149,13 +149,11 @@ EXPORT Raw := MODULE
     doxie.IDataAccess mod_access, 
     UNSIGNED6 inlexID) 
   := FUNCTION
-    key_link_id := cortera.Key_LinkIds.Key;
-    key_exec_link_id := cortera.Key_Executive_Link_Id;
+    key_link_id := dx_Cortera.Key_LinkIds.Key;
+    key_exec_link_id := dx_Cortera.Key_Executive_Link_Id;
     l_cortera := RECORD
       key_link_id;
       key_exec_link_id.did;
-      key_exec_link_id.global_sid;
-      key_exec_link_id.record_sid;
     END;
     mac_blank_exec(cnt) := MACRO
       SELF.#EXPAND('executive_name' + cnt) := '';
