@@ -28,7 +28,7 @@ export Build_All(
 function
 	full_build :=
 	sequential(
-		 /*Create_Supers	(pKeyDatasetName)
+		 Create_Supers	(pKeyDatasetName)
 		,Spray					(pversion,pServerIP,pDirectory,pFilenameint,pFilenameprv,pFilenamepub,pFilenamepriv,pFilenamePeop,pFilenamePos,pFilenameBoard,pFilenameKill,pFilenameMA,pGroupName,not pShouldSpray,pOverwrite)
 		,Build_Base			(pversion,pIsTesting,pSprayedintFile,pSprayedprvFile,pSprayedpubFile,pSprayedPrivcoFile,pBaseCompaniesFile,pBaseContactsFile).doall
 		,Scrubs.ScrubsPlus('DCA','Scrubs_DCA','Scrubs_DCA_Base_Companies','Base_Companies',pversion,DCAV2.Email_Notification_Lists().ScrubsPlus,false)
@@ -41,7 +41,7 @@ function
 		,Promote(,'base').Buildfiles.Built2QA
 		,Promote(,'key',,,pKeyDatasetName).Buildfiles.Built2QA
 		,RoxieKeybuild.updateversion('DCAKeys', pversion,'melanie.jackson@lexisnexisrisk.com', , 'N')
-		,*/Orbit3.proc_Orbit3_CreateBuild_AddItem('DCA',(pversion),'N')
+		,Orbit3.proc_Orbit3_CreateBuild_AddItem('DCA',(pversion),'N')
 		
 		) : success(Send_Emails(pversion,,,pKeyDatasetName).roxie), failure(send_emails(pversion).buildfailure);
 	
