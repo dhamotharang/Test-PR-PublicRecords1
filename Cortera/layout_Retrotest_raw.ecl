@@ -1,4 +1,5 @@
-﻿
+/********* This attribute should be moved to dx_Cortera folder *********/
+
 // The following layout contains fieldnames as transmitted by Cortera in their processed 
 // Retrotest csv file, save for minor changes to make it ECL-compatible. Actual field
 // names from the Retrotest csv file are in comments.
