@@ -63,7 +63,7 @@ EXPORT FnRoxie_GetInputPIIAttributes(DATASET(PublicRecords_KEL.ECL_Functions.Lay
 			SELF.PI_InpDOBAge := (INTEGER)LEFT.PI_InpDOBAge,
 			SELF.PI_InpSSNIsDeceasedFlag := (STRING)LEFT.PI_InpSSNIsDeceasedFlag,
 			SELF.PI_InpSSNDeceasedDt := (STRING)LEFT.PI_InpSSNDeceasedDt,
-			SELF.PI_InpAddrStateDLAvailFlag := (STRING)LEFT.PI_InpAddrStateDLAvailFlag,
+			SELF.PI_InpAddrStateDLAvailFlag := IF(Options.IsFCRA, '', (STRING)LEFT.PI_InpAddrStateDLAvailFlag),
 			SELF.PI_InpAddrStateVoterAvailFlag := (STRING)LEFT.PI_InpAddrStateVoterAvailFlag,
 			// SELF.PI_InpPhoneSICCodeHRList := (STRING)LEFT.PI_InpPhoneSICCodeHRList,
 			// SELF.PI_InpPhoneNAICSCodeHRList := (STRING)LEFT.PI_InpPhoneNAICSCodeHRList,
