@@ -501,7 +501,9 @@ EXPORT Q_F_C_R_A_Mini_Attributes_V1_Thor_Hybrid(KEL.typ.uid __PLexID_in, KEL.typ
   END;
   SHARED B_Person_Property_3_Local := MODULE(B_Person_Property_3(__in,__cfg_Local))
     SHARED TYPEOF(B_Person_Property_4(__in,__cfg_Local).__ENH_Person_Property_4) __ENH_Person_Property_4 := B_Person_Property_4_Local.__ENH_Person_Property_4;
+    SHARED TYPEOF(E_Person_Property_Event(__in,__cfg_Local).__Result) __E_Person_Property_Event := E_Person_Property_Event_Filtered.__Result;
     SHARED TYPEOF(B_Property_4(__in,__cfg_Local).__ENH_Property_4) __ENH_Property_4 := B_Property_4_Local.__ENH_Property_4;
+    SHARED TYPEOF(B_Property_Event_4(__in,__cfg_Local).__ENH_Property_Event_4) __ENH_Property_Event_4 := B_Property_Event_4_Local.__ENH_Property_Event_4;
   END;
   SHARED B_Person_S_S_N_3_Local := MODULE(B_Person_S_S_N_3(__in,__cfg_Local))
     SHARED TYPEOF(B_Person_S_S_N_4(__in,__cfg_Local).__ENH_Person_S_S_N_4) __ENH_Person_S_S_N_4 := B_Person_S_S_N_4_Local.__ENH_Person_S_S_N_4;
@@ -676,9 +678,9 @@ EXPORT Q_F_C_R_A_Mini_Attributes_V1_Thor_Hybrid(KEL.typ.uid __PLexID_in, KEL.typ
     SHARED TYPEOF(B_Watercraft_Owner_1(__in,__cfg_Local).__ENH_Watercraft_Owner_1) __ENH_Watercraft_Owner_1 := B_Watercraft_Owner_1_Local.__ENH_Watercraft_Owner_1;
   END;
   SHARED TYPEOF(B_Person(__in,__cfg_Local).__ENH_Person) __ENH_Person := B_Person_Local.__ENH_Person;
-  SHARED __EE11932289 := __ENH_Person;
-  SHARED __EE11934348 := __EE11932289(__T(__OP2(__EE11932289.UID,=,__CN(__PLexID_in))));
-  SHARED __ST135070_Layout := RECORD
+  SHARED __EE12061470 := __ENH_Person;
+  SHARED __EE12063546 := __EE12061470(__T(__OP2(__EE12061470.UID,=,__CN(__PLexID_in))));
+  SHARED __ST135909_Layout := RECORD
     KEL.typ.nuid Lex_I_D_;
     KEL.typ.str P___Lex_I_D_Seen_Flag_ := '';
     KEL.typ.nstr Current_Addr_Prim_Rng_;
@@ -704,18 +706,18 @@ EXPORT Q_F_C_R_A_Mini_Attributes_V1_Thor_Hybrid(KEL.typ.uid __PLexID_in, KEL.typ
     KEL.typ.epoch Vault_Date_Last_Seen_ := 0;
     KEL.typ.int __RecordCount := 0;
   END;
-  SHARED __ST135070_Layout __ND11934353__Project(B_Person(__in,__cfg_Local).__ST179868_Layout __PP11934349) := TRANSFORM
-    SELF.Lex_I_D_ := __PP11934349.UID;
-    SELF.P___Lex_I_D_Seen_Flag_ := __PP11934349.P___Lex_I_D_Seen_Flag_F_C_R_A_;
-    __CC13918 := '-99999';
-    SELF.P_L___Best_Name_First_ := IF(__PP11934349.P___Lex_I_D_Seen_Flag_F_C_R_A_ = '0',__ECAST(KEL.typ.nstr,__CN(__CC13918)),__ECAST(KEL.typ.nstr,__PP11934349.P_L___Best_Name_First_));
-    SELF.P_L___Best_Name_Mid_ := IF(__PP11934349.P___Lex_I_D_Seen_Flag_F_C_R_A_ = '0',__ECAST(KEL.typ.nstr,__CN(__CC13918)),__ECAST(KEL.typ.nstr,__PP11934349.P_L___Best_Name_Mid_));
-    SELF.P_L___Best_Name_Last_ := IF(__PP11934349.P___Lex_I_D_Seen_Flag_F_C_R_A_ = '0',__ECAST(KEL.typ.nstr,__CN(__CC13918)),__ECAST(KEL.typ.nstr,__PP11934349.P_L___Best_Name_Last_));
-    SELF.P_L___Best_S_S_N_ := IF(__PP11934349.P___Lex_I_D_Seen_Flag_F_C_R_A_ = '0',__ECAST(KEL.typ.nstr,__CN(__CC13918)),__ECAST(KEL.typ.nstr,__PP11934349.P_L___Best_S_S_N_));
-    SELF.P_L___Best_D_O_B_ := IF(__PP11934349.P___Lex_I_D_Seen_Flag_F_C_R_A_ = '0',__ECAST(KEL.typ.nstr,__CN(__CC13918)),__ECAST(KEL.typ.nstr,__PP11934349.P_L___Best_D_O_B_));
-    SELF := __PP11934349;
+  SHARED __ST135909_Layout __ND12063551__Project(B_Person(__in,__cfg_Local).__ST180902_Layout __PP12063547) := TRANSFORM
+    SELF.Lex_I_D_ := __PP12063547.UID;
+    SELF.P___Lex_I_D_Seen_Flag_ := __PP12063547.P___Lex_I_D_Seen_Flag_F_C_R_A_;
+    __CC13921 := '-99999';
+    SELF.P_L___Best_Name_First_ := IF(__PP12063547.P___Lex_I_D_Seen_Flag_F_C_R_A_ = '0',__ECAST(KEL.typ.nstr,__CN(__CC13921)),__ECAST(KEL.typ.nstr,__PP12063547.P_L___Best_Name_First_));
+    SELF.P_L___Best_Name_Mid_ := IF(__PP12063547.P___Lex_I_D_Seen_Flag_F_C_R_A_ = '0',__ECAST(KEL.typ.nstr,__CN(__CC13921)),__ECAST(KEL.typ.nstr,__PP12063547.P_L___Best_Name_Mid_));
+    SELF.P_L___Best_Name_Last_ := IF(__PP12063547.P___Lex_I_D_Seen_Flag_F_C_R_A_ = '0',__ECAST(KEL.typ.nstr,__CN(__CC13921)),__ECAST(KEL.typ.nstr,__PP12063547.P_L___Best_Name_Last_));
+    SELF.P_L___Best_S_S_N_ := IF(__PP12063547.P___Lex_I_D_Seen_Flag_F_C_R_A_ = '0',__ECAST(KEL.typ.nstr,__CN(__CC13921)),__ECAST(KEL.typ.nstr,__PP12063547.P_L___Best_S_S_N_));
+    SELF.P_L___Best_D_O_B_ := IF(__PP12063547.P___Lex_I_D_Seen_Flag_F_C_R_A_ = '0',__ECAST(KEL.typ.nstr,__CN(__CC13921)),__ECAST(KEL.typ.nstr,__PP12063547.P_L___Best_D_O_B_));
+    SELF := __PP12063547;
   END;
-  EXPORT Res0 := __UNWRAP(PROJECT(__EE11934348,__ND11934353__Project(LEFT)));
+  EXPORT Res0 := __UNWRAP(PROJECT(__EE12063546,__ND12063551__Project(LEFT)));
   EXPORT DBG_E_Accident_Result := __UNWRAP(E_Accident_Filtered.__Result);
   EXPORT DBG_E_Address_Result := __UNWRAP(E_Address_Filtered.__Result);
   EXPORT DBG_E_Address_Inquiry_Result := __UNWRAP(E_Address_Inquiry_Filtered.__Result);

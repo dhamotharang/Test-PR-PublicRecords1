@@ -4,8 +4,8 @@ IMPORT B_Person_Vehicle_3,CFG_Compile,E_Person,E_Person_Vehicle,E_Vehicle,FN_Com
 IMPORT * FROM KEL15.Null;
 EXPORT B_Person_Vehicle_2(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG_Compile __cfg = CFG_Compile) := MODULE
   SHARED VIRTUAL TYPEOF(B_Person_Vehicle_3(__in,__cfg).__ENH_Person_Vehicle_3) __ENH_Person_Vehicle_3 := B_Person_Vehicle_3(__in,__cfg).__ENH_Person_Vehicle_3;
-  SHARED __EE8062066 := __ENH_Person_Vehicle_3;
-  EXPORT __ST227649_Layout := RECORD
+  SHARED __EE8171487 := __ENH_Person_Vehicle_3;
+  EXPORT __ST228906_Layout := RECORD
     KEL.typ.ntyp(E_Person().Typ) Subject_;
     KEL.typ.ntyp(E_Vehicle().Typ) Automobile_;
     KEL.typ.ndataset(E_Person_Vehicle(__in,__cfg).Registration_Layout) Registration_;
@@ -22,14 +22,14 @@ EXPORT B_Person_Vehicle_2(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, 
     KEL.typ.epoch Vault_Date_Last_Seen_ := 0;
     KEL.typ.int __RecordCount := 0;
   END;
-  SHARED __ST227649_Layout __ND8062005__Project(B_Person_Vehicle_3(__in,__cfg).__ST242782_Layout __PP8061736) := TRANSFORM
-    __EE8061980 := __PP8061736.Counts_Model_;
-    __CC13351 := KEL.Routines.MinN(FN_Compile(__cfg).FN_G_E_T_B_U_I_L_D_D_A_T_E(__ECAST(KEL.typ.nstr,__CN('vehicle_build_version'))),__CN(__cfg.CurrentDate));
-    __EE8062000 := __PP8061736.Counts_Model_;
-    SELF.Date_Last_Seen_Capped_ := IF(__T(__OP2(KEL.Aggregates.MaxNN(__EE8061980,KEL.era.ToDate(__T(__EE8061980).Date_Last_Seen_)),>,__CC13351)),__ECAST(KEL.typ.nkdate,__CC13351),__ECAST(KEL.typ.nkdate,KEL.Aggregates.MaxNN(__EE8062000,KEL.era.ToDate(__T(__EE8062000).Date_Last_Seen_))));
-    __CC13681 := '-99997';
-    SELF.Vehicle_Min_Date_ := IF(__T(__FN1(KEL.Routines.IsValidDate,__PP8061736.Date_First_Seen_Capped_)),__ECAST(KEL.typ.nstr,__FN2(KEL.Routines.DateToString,__PP8061736.Date_First_Seen_Capped_,__CN('%Y%m%d'))),__ECAST(KEL.typ.nstr,__CN(__CC13681)));
-    SELF := __PP8061736;
+  SHARED __ST228906_Layout __ND8171426__Project(B_Person_Vehicle_3(__in,__cfg).__ST244096_Layout __PP8171157) := TRANSFORM
+    __EE8171401 := __PP8171157.Counts_Model_;
+    __CC13354 := KEL.Routines.MinN(FN_Compile(__cfg).FN_G_E_T_B_U_I_L_D_D_A_T_E(__ECAST(KEL.typ.nstr,__CN('vehicle_build_version'))),__CN(__cfg.CurrentDate));
+    __EE8171421 := __PP8171157.Counts_Model_;
+    SELF.Date_Last_Seen_Capped_ := IF(__T(__OP2(KEL.Aggregates.MaxNN(__EE8171401,KEL.era.ToDate(__T(__EE8171401).Date_Last_Seen_)),>,__CC13354)),__ECAST(KEL.typ.nkdate,__CC13354),__ECAST(KEL.typ.nkdate,KEL.Aggregates.MaxNN(__EE8171421,KEL.era.ToDate(__T(__EE8171421).Date_Last_Seen_))));
+    __CC13684 := '-99997';
+    SELF.Vehicle_Min_Date_ := IF(__T(__FN1(KEL.Routines.IsValidDate,__PP8171157.Date_First_Seen_Capped_)),__ECAST(KEL.typ.nstr,__FN2(KEL.Routines.DateToString,__PP8171157.Date_First_Seen_Capped_,__CN('%Y%m%d'))),__ECAST(KEL.typ.nstr,__CN(__CC13684)));
+    SELF := __PP8171157;
   END;
-  EXPORT __ENH_Person_Vehicle_2 := PROJECT(__EE8062066,__ND8062005__Project(LEFT));
+  EXPORT __ENH_Person_Vehicle_2 := PROJECT(__EE8171487,__ND8171426__Project(LEFT));
 END;

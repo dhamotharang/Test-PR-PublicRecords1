@@ -4,6 +4,6 @@ IMPORT B_Professional_License_4,CFG_Compile,E_Professional_License FROM PublicRe
 IMPORT * FROM KEL15.Null;
 EXPORT B_Professional_License_3(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG_Compile __cfg = CFG_Compile) := MODULE
   SHARED VIRTUAL TYPEOF(B_Professional_License_4(__in,__cfg).__ENH_Professional_License_4) __ENH_Professional_License_4 := B_Professional_License_4(__in,__cfg).__ENH_Professional_License_4;
-  SHARED __EE6822128 := __ENH_Professional_License_4;
-  EXPORT __ENH_Professional_License_3 := __EE6822128;
+  SHARED __EE6896847 := __ENH_Professional_License_4;
+  EXPORT __ENH_Professional_License_3 := __EE6896847;
 END;
