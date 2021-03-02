@@ -69,8 +69,10 @@ EXPORT E_Inquiry(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG_Compi
   SHARED __d7_Trim := PROJECT(__in.Dataset_Inquiry_AccLogs__Inquiry_Table_EMAIL,TRANSFORM(__Trimmed,SELF.KeyVal:=TRIM((STRING)LEFT.search_info.transaction_id) + '|' + TRIM((STRING)LEFT.search_info.sequence_number)));
   SHARED __d8_Trim := PROJECT(__in.Dataset_Inquiry_AccLogs__Inquiry_Table_Phone,TRANSFORM(__Trimmed,SELF.KeyVal:=TRIM((STRING)LEFT.search_info.transaction_id) + '|' + TRIM((STRING)LEFT.search_info.sequence_number)));
   SHARED __d9_Trim := PROJECT(__in.Dataset_Inquiry_AccLogs__Inquiry_Table_FEIN,TRANSFORM(__Trimmed,SELF.KeyVal:=TRIM((STRING)LEFT.search_info.transaction_id) + '|' + TRIM((STRING)LEFT.search_info.sequence_number)));
-  SHARED __d10_Trim := PROJECT(__in.Dataset_Inquiry_AccLogs__Inquiry_Table_LinkIDs,TRANSFORM(__Trimmed,SELF.KeyVal:=TRIM((STRING)LEFT.search_info.transaction_id) + '|' + TRIM((STRING)LEFT.search_info.sequence_number)));
-  EXPORT __All_Trim := __d0_Trim + __d1_Trim + __d2_Trim + __d3_Trim + __d4_Trim + __d5_Trim + __d6_Trim + __d7_Trim + __d8_Trim + __d9_Trim + __d10_Trim;
+  SHARED __d10_Trim := PROJECT(__in.Dataset_Inquiry_AccLogs__Inquiry_Table_FEIN,TRANSFORM(__Trimmed,SELF.KeyVal:=TRIM((STRING)LEFT.search_info.transaction_id) + '|' + TRIM((STRING)LEFT.search_info.sequence_number)));
+  SHARED __d11_Trim := PROJECT(__in.Dataset_Inquiry_AccLogs__Inquiry_Table_LinkIDs,TRANSFORM(__Trimmed,SELF.KeyVal:=TRIM((STRING)LEFT.search_info.transaction_id) + '|' + TRIM((STRING)LEFT.search_info.sequence_number)));
+  SHARED __d12_Trim := PROJECT(__in.Dataset_Inquiry_AccLogs__Inquiry_Table_LinkIDs,TRANSFORM(__Trimmed,SELF.KeyVal:=TRIM((STRING)LEFT.search_info.transaction_id) + '|' + TRIM((STRING)LEFT.search_info.sequence_number)));
+  EXPORT __All_Trim := __d0_Trim + __d1_Trim + __d2_Trim + __d3_Trim + __d4_Trim + __d5_Trim + __d6_Trim + __d7_Trim + __d8_Trim + __d9_Trim + __d10_Trim + __d11_Trim + __d12_Trim;
   SHARED __TabRec := RECORD, MAXLENGTH(5000)
     __All_Trim.KeyVal;
     UNSIGNED4 Cnt := COUNT(GROUP);
@@ -208,23 +210,49 @@ EXPORT E_Inquiry(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG_Compi
     KEL.typ.uid UID := 0;
   END;
   SHARED __d9_UID_Mapped := JOIN(__d9_Norm,Lookup,TRIM((STRING)LEFT.search_info.transaction_id) + '|' + TRIM((STRING)LEFT.search_info.sequence_number) = RIGHT.KeyVal,TRANSFORM(__d9_Out,SELF.UID:=RIGHT.UID,SELF:=LEFT),SMART);
-  EXPORT PublicRecords_KEL_ECL_Functions_Dataset_FDC_Dataset_Inquiry_AccLogs__Inquiry_Table_FEIN_Invalid := __d9_UID_Mapped(UID = 0);
+  EXPORT PublicRecords_KEL_ECL_Functions_Dataset_FDC_Dataset_Inquiry_AccLogs__Inquiry_Table_FEIN_1_Invalid := __d9_UID_Mapped(UID = 0);
   SHARED __d9_Prefiltered := __d9_UID_Mapped(UID <> 0);
   SHARED __d9 := __SourceFilter(KEL.FromFlat.Convert(__d9_Prefiltered,InLayout,__Mapping9,'PublicRecords_KEL.ECL_Functions.Dataset_FDC'));
   SHARED Date_First_Seen_10Rule(STRING a) := MAP(KEL.Routines.IsValidTimestamp((KEL.typ.timestamp)(a[1..17]))=>a[1..17],KEL.Routines.IsValidTimestamp((KEL.typ.timestamp)(a[1..8]+'000000000'))=>a[1..8]+'000000000',KEL.Routines.IsValidTimestamp((KEL.typ.timestamp)(a[1..6]+'01000000000'))=>a[1..6]+'01000000000','0');
   SHARED Date_Last_Seen_10Rule(STRING a) := MAP(KEL.Routines.IsValidTimestamp((KEL.typ.timestamp)(a[1..17]))=>a[1..17],KEL.Routines.IsValidTimestamp((KEL.typ.timestamp)(a[1..8]+'000000000'))=>a[1..8]+'000000000',KEL.Routines.IsValidTimestamp((KEL.typ.timestamp)(a[1..6]+'01000000000'))=>a[1..6]+'01000000000','0');
   SHARED Archive___Date_10Rule(STRING a) := MAP(KEL.Routines.IsValidTimestamp((KEL.typ.timestamp)(a[1..17]))=>a[1..17],KEL.Routines.IsValidTimestamp((KEL.typ.timestamp)(a[1..8]+'000000000'))=>a[1..8]+'000000000','0');
-  SHARED __Mapping10 := 'UID(DEFAULT:UID),search_info.transaction_id(OVERRIDE:Transaction_I_D_:\'\'),search_info.sequence_number(OVERRIDE:Sequence_Number_:\'\'),search_info.method(OVERRIDE:Method_:\'\'),search_info.product_code(OVERRIDE:Product_Code_:0),search_info.function_description(OVERRIDE:Function_Description_:\'\'),permissions.glb_purpose(OVERRIDE:G_L_B_Purpose_:0),permissions.dppa_purpose(OVERRIDE:D_P_P_A_Purpose_:0),permissions.fcra_purpose(OVERRIDE:F_C_R_A_Purpose_:0),bus_intel.primary_market_code(OVERRIDE:Primary_Market_Code_:\'\'),bus_intel.secondary_market_code(OVERRIDE:Secondary_Market_Code_:\'\'),bus_intel.industry_1_code(OVERRIDE:Industry_Code1_:\'\'),bus_intel.industry_2_code(OVERRIDE:Industry_Code2_:\'\'),bus_intel.sub_market(OVERRIDE:Sub_Market_:\'\'),bus_intel.vertical(OVERRIDE:Vertical_:\'\'),bus_intel.industry(OVERRIDE:Industry_:\'\'),fraudpointscore(DEFAULT:Fraudpoint_Score_:0),bususer_q.fname(OVERRIDE:First_Name_:\'\'),bususer_q.lname(OVERRIDE:Last_Name_:\'\'),bususer_q.dob(OVERRIDE:Date_Of_Birth_:DATE),bususer_q.appended_adl(OVERRIDE:Lex_I_D_:0),bus_q.prim_range(OVERRIDE:Primary_Range_:\'\'),bus_q.predir(OVERRIDE:Predirectional_:\'\'),bus_q.prim_name(OVERRIDE:Primary_Name_:\'\'),bus_q.addr_suffix(OVERRIDE:Suffix_:\'\'),bus_q.postdir(OVERRIDE:Postdirectional_:\'\'),bus_q.sec_range(OVERRIDE:Secondary_Range_:\'\'),bus_q.zip5(OVERRIDE:Z_I_P5_:\'\'),bususer_q.ssn(OVERRIDE:S_S_N_:\'\'),bususer_q.appended_ssn(OVERRIDE:Appended_S_S_N_:\'\'),bususer_q.personal_phone(OVERRIDE:Personal_Phone_Number_:0),workphonenumber(DEFAULT:Work_Phone_Number_:0),emailaddress(DEFAULT:Email_Address_:\'\'),bus_q.cname(OVERRIDE:Company_Name_:\'\'),bus_q.company_phone(OVERRIDE:Company_Phone_:\'\'),bus_q.appended_ein(OVERRIDE:T_I_N_:0),ultid(OVERRIDE:Ult_I_D_:0),orgid(OVERRIDE:Org_I_D_:0),seleid(OVERRIDE:Sele_I_D_:0),src(OVERRIDE:Source_:\'\'),dateofinquiry(OVERRIDE:Date_First_Seen_:EPOCHTIMESTAMP:Date_First_Seen_10Rule|OVERRIDE:Date_Last_Seen_:EPOCHTIMESTAMP:Date_Last_Seen_10Rule),hybridarchivedate(DEFAULT:Hybrid_Archive_Date_:EPOCHTIMESTAMP),archive_date(OVERRIDE:Archive___Date_:EPOCHTIMESTAMP:Archive___Date_10Rule),vaultdatelastseen(DEFAULT:Vault_Date_Last_Seen_:EPOCH),DPMBitmap(OVERRIDE:__Permits:PERMITS)';
-  SHARED __d10_Norm := NORMALIZE(__in,LEFT.Dataset_Inquiry_AccLogs__Inquiry_Table_LinkIDs,TRANSFORM(RECORDOF(__in.Dataset_Inquiry_AccLogs__Inquiry_Table_LinkIDs),SELF:=RIGHT));
+  SHARED __Mapping10 := 'UID(DEFAULT:UID),search_info.transaction_id(OVERRIDE:Transaction_I_D_:\'\'),search_info.sequence_number(OVERRIDE:Sequence_Number_:\'\'),method(DEFAULT:Method_:\'\'),productcode(DEFAULT:Product_Code_:0),functiondescription(DEFAULT:Function_Description_:\'\'),glbpurpose(DEFAULT:G_L_B_Purpose_:0),dppapurpose(DEFAULT:D_P_P_A_Purpose_:0),fcrapurpose(DEFAULT:F_C_R_A_Purpose_:0),primarymarketcode(DEFAULT:Primary_Market_Code_:\'\'),secondarymarketcode(DEFAULT:Secondary_Market_Code_:\'\'),industrycode1(DEFAULT:Industry_Code1_:\'\'),industrycode2(DEFAULT:Industry_Code2_:\'\'),submarket(DEFAULT:Sub_Market_:\'\'),vertical(DEFAULT:Vertical_:\'\'),industry(DEFAULT:Industry_:\'\'),fraudpointscore(DEFAULT:Fraudpoint_Score_:0),firstname(DEFAULT:First_Name_:\'\'),lastname(DEFAULT:Last_Name_:\'\'),dateofbirth(DEFAULT:Date_Of_Birth_:DATE),lexid(DEFAULT:Lex_I_D_:0),bususer_q.prim_range(OVERRIDE:Primary_Range_:\'\'),bususer_q.predir(OVERRIDE:Predirectional_:\'\'),bususer_q.prim_name(OVERRIDE:Primary_Name_:\'\'),bususer_q.addr_suffix(OVERRIDE:Suffix_:\'\'),bususer_q.postdir(OVERRIDE:Postdirectional_:\'\'),bususer_q.sec_range(OVERRIDE:Secondary_Range_:\'\'),bususer_q.zip5(OVERRIDE:Z_I_P5_:\'\'),ssn(DEFAULT:S_S_N_:\'\'),appendedssn(DEFAULT:Appended_S_S_N_:\'\'),personalphonenumber(DEFAULT:Personal_Phone_Number_:0),workphonenumber(DEFAULT:Work_Phone_Number_:0),emailaddress(DEFAULT:Email_Address_:\'\'),companyname(DEFAULT:Company_Name_:\'\'),companyphone(DEFAULT:Company_Phone_:\'\'),tin(DEFAULT:T_I_N_:0),ultid(DEFAULT:Ult_I_D_:0),orgid(DEFAULT:Org_I_D_:0),seleid(DEFAULT:Sele_I_D_:0),source(DEFAULT:Source_:\'\'),dateofinquiry(OVERRIDE:Date_First_Seen_:EPOCHTIMESTAMP:Date_First_Seen_10Rule|OVERRIDE:Date_Last_Seen_:EPOCHTIMESTAMP:Date_Last_Seen_10Rule),hybridarchivedate(DEFAULT:Hybrid_Archive_Date_:EPOCHTIMESTAMP),archive_date(OVERRIDE:Archive___Date_:EPOCHTIMESTAMP:Archive___Date_10Rule),vaultdatelastseen(DEFAULT:Vault_Date_Last_Seen_:EPOCH),DPMBitmap(OVERRIDE:__Permits:PERMITS)';
+  SHARED __d10_Norm := NORMALIZE(__in,LEFT.Dataset_Inquiry_AccLogs__Inquiry_Table_FEIN,TRANSFORM(RECORDOF(__in.Dataset_Inquiry_AccLogs__Inquiry_Table_FEIN),SELF:=RIGHT));
   SHARED __d10_Out := RECORD
-    RECORDOF(PublicRecords_KEL.ECL_Functions.Dataset_FDC.Dataset_Inquiry_AccLogs__Inquiry_Table_LinkIDs);
+    RECORDOF(PublicRecords_KEL.ECL_Functions.Dataset_FDC.Dataset_Inquiry_AccLogs__Inquiry_Table_FEIN);
     KEL.typ.uid UID := 0;
   END;
   SHARED __d10_UID_Mapped := JOIN(__d10_Norm,Lookup,TRIM((STRING)LEFT.search_info.transaction_id) + '|' + TRIM((STRING)LEFT.search_info.sequence_number) = RIGHT.KeyVal,TRANSFORM(__d10_Out,SELF.UID:=RIGHT.UID,SELF:=LEFT),SMART);
-  EXPORT PublicRecords_KEL_ECL_Functions_Dataset_FDC_Dataset_Inquiry_AccLogs__Inquiry_Table_LinkIDs_Invalid := __d10_UID_Mapped(UID = 0);
+  EXPORT PublicRecords_KEL_ECL_Functions_Dataset_FDC_Dataset_Inquiry_AccLogs__Inquiry_Table_FEIN_2_Invalid := __d10_UID_Mapped(UID = 0);
   SHARED __d10_Prefiltered := __d10_UID_Mapped(UID <> 0);
   SHARED __d10 := __SourceFilter(KEL.FromFlat.Convert(__d10_Prefiltered,InLayout,__Mapping10,'PublicRecords_KEL.ECL_Functions.Dataset_FDC'));
-  EXPORT InData := __d0 + __d1 + __d2 + __d3 + __d4 + __d5 + __d6 + __d7 + __d8 + __d9 + __d10;
+  SHARED Date_First_Seen_11Rule(STRING a) := MAP(KEL.Routines.IsValidTimestamp((KEL.typ.timestamp)(a[1..17]))=>a[1..17],KEL.Routines.IsValidTimestamp((KEL.typ.timestamp)(a[1..8]+'000000000'))=>a[1..8]+'000000000',KEL.Routines.IsValidTimestamp((KEL.typ.timestamp)(a[1..6]+'01000000000'))=>a[1..6]+'01000000000','0');
+  SHARED Date_Last_Seen_11Rule(STRING a) := MAP(KEL.Routines.IsValidTimestamp((KEL.typ.timestamp)(a[1..17]))=>a[1..17],KEL.Routines.IsValidTimestamp((KEL.typ.timestamp)(a[1..8]+'000000000'))=>a[1..8]+'000000000',KEL.Routines.IsValidTimestamp((KEL.typ.timestamp)(a[1..6]+'01000000000'))=>a[1..6]+'01000000000','0');
+  SHARED Archive___Date_11Rule(STRING a) := MAP(KEL.Routines.IsValidTimestamp((KEL.typ.timestamp)(a[1..17]))=>a[1..17],KEL.Routines.IsValidTimestamp((KEL.typ.timestamp)(a[1..8]+'000000000'))=>a[1..8]+'000000000','0');
+  SHARED __Mapping11 := 'UID(DEFAULT:UID),search_info.transaction_id(OVERRIDE:Transaction_I_D_:\'\'),search_info.sequence_number(OVERRIDE:Sequence_Number_:\'\'),search_info.method(OVERRIDE:Method_:\'\'),search_info.product_code(OVERRIDE:Product_Code_:0),search_info.function_description(OVERRIDE:Function_Description_:\'\'),permissions.glb_purpose(OVERRIDE:G_L_B_Purpose_:0),permissions.dppa_purpose(OVERRIDE:D_P_P_A_Purpose_:0),permissions.fcra_purpose(OVERRIDE:F_C_R_A_Purpose_:0),bus_intel.primary_market_code(OVERRIDE:Primary_Market_Code_:\'\'),bus_intel.secondary_market_code(OVERRIDE:Secondary_Market_Code_:\'\'),bus_intel.industry_1_code(OVERRIDE:Industry_Code1_:\'\'),bus_intel.industry_2_code(OVERRIDE:Industry_Code2_:\'\'),bus_intel.sub_market(OVERRIDE:Sub_Market_:\'\'),bus_intel.vertical(OVERRIDE:Vertical_:\'\'),bus_intel.industry(OVERRIDE:Industry_:\'\'),fraudpointscore(DEFAULT:Fraudpoint_Score_:0),bususer_q.fname(OVERRIDE:First_Name_:\'\'),bususer_q.lname(OVERRIDE:Last_Name_:\'\'),bususer_q.dob(OVERRIDE:Date_Of_Birth_:DATE),bususer_q.appended_adl(OVERRIDE:Lex_I_D_:0),bus_q.prim_range(OVERRIDE:Primary_Range_:\'\'),bus_q.predir(OVERRIDE:Predirectional_:\'\'),bus_q.prim_name(OVERRIDE:Primary_Name_:\'\'),bus_q.addr_suffix(OVERRIDE:Suffix_:\'\'),bus_q.postdir(OVERRIDE:Postdirectional_:\'\'),bus_q.sec_range(OVERRIDE:Secondary_Range_:\'\'),bus_q.zip5(OVERRIDE:Z_I_P5_:\'\'),bususer_q.ssn(OVERRIDE:S_S_N_:\'\'),bususer_q.appended_ssn(OVERRIDE:Appended_S_S_N_:\'\'),bususer_q.personal_phone(OVERRIDE:Personal_Phone_Number_:0),workphonenumber(DEFAULT:Work_Phone_Number_:0),emailaddress(DEFAULT:Email_Address_:\'\'),bus_q.cname(OVERRIDE:Company_Name_:\'\'),bus_q.company_phone(OVERRIDE:Company_Phone_:\'\'),bus_q.appended_ein(OVERRIDE:T_I_N_:0),ultid(OVERRIDE:Ult_I_D_:0),orgid(OVERRIDE:Org_I_D_:0),seleid(OVERRIDE:Sele_I_D_:0),src(OVERRIDE:Source_:\'\'),dateofinquiry(OVERRIDE:Date_First_Seen_:EPOCHTIMESTAMP:Date_First_Seen_11Rule|OVERRIDE:Date_Last_Seen_:EPOCHTIMESTAMP:Date_Last_Seen_11Rule),hybridarchivedate(DEFAULT:Hybrid_Archive_Date_:EPOCHTIMESTAMP),archive_date(OVERRIDE:Archive___Date_:EPOCHTIMESTAMP:Archive___Date_11Rule),vaultdatelastseen(DEFAULT:Vault_Date_Last_Seen_:EPOCH),DPMBitmap(OVERRIDE:__Permits:PERMITS)';
+  SHARED __d11_Norm := NORMALIZE(__in,LEFT.Dataset_Inquiry_AccLogs__Inquiry_Table_LinkIDs,TRANSFORM(RECORDOF(__in.Dataset_Inquiry_AccLogs__Inquiry_Table_LinkIDs),SELF:=RIGHT));
+  SHARED __d11_Out := RECORD
+    RECORDOF(PublicRecords_KEL.ECL_Functions.Dataset_FDC.Dataset_Inquiry_AccLogs__Inquiry_Table_LinkIDs);
+    KEL.typ.uid UID := 0;
+  END;
+  SHARED __d11_UID_Mapped := JOIN(__d11_Norm,Lookup,TRIM((STRING)LEFT.search_info.transaction_id) + '|' + TRIM((STRING)LEFT.search_info.sequence_number) = RIGHT.KeyVal,TRANSFORM(__d11_Out,SELF.UID:=RIGHT.UID,SELF:=LEFT),SMART);
+  EXPORT PublicRecords_KEL_ECL_Functions_Dataset_FDC_Dataset_Inquiry_AccLogs__Inquiry_Table_LinkIDs_1_Invalid := __d11_UID_Mapped(UID = 0);
+  SHARED __d11_Prefiltered := __d11_UID_Mapped(UID <> 0);
+  SHARED __d11 := __SourceFilter(KEL.FromFlat.Convert(__d11_Prefiltered,InLayout,__Mapping11,'PublicRecords_KEL.ECL_Functions.Dataset_FDC'));
+  SHARED Date_First_Seen_12Rule(STRING a) := MAP(KEL.Routines.IsValidTimestamp((KEL.typ.timestamp)(a[1..17]))=>a[1..17],KEL.Routines.IsValidTimestamp((KEL.typ.timestamp)(a[1..8]+'000000000'))=>a[1..8]+'000000000',KEL.Routines.IsValidTimestamp((KEL.typ.timestamp)(a[1..6]+'01000000000'))=>a[1..6]+'01000000000','0');
+  SHARED Date_Last_Seen_12Rule(STRING a) := MAP(KEL.Routines.IsValidTimestamp((KEL.typ.timestamp)(a[1..17]))=>a[1..17],KEL.Routines.IsValidTimestamp((KEL.typ.timestamp)(a[1..8]+'000000000'))=>a[1..8]+'000000000',KEL.Routines.IsValidTimestamp((KEL.typ.timestamp)(a[1..6]+'01000000000'))=>a[1..6]+'01000000000','0');
+  SHARED Archive___Date_12Rule(STRING a) := MAP(KEL.Routines.IsValidTimestamp((KEL.typ.timestamp)(a[1..17]))=>a[1..17],KEL.Routines.IsValidTimestamp((KEL.typ.timestamp)(a[1..8]+'000000000'))=>a[1..8]+'000000000','0');
+  SHARED __Mapping12 := 'UID(DEFAULT:UID),search_info.transaction_id(OVERRIDE:Transaction_I_D_:\'\'),search_info.sequence_number(OVERRIDE:Sequence_Number_:\'\'),method(DEFAULT:Method_:\'\'),productcode(DEFAULT:Product_Code_:0),functiondescription(DEFAULT:Function_Description_:\'\'),glbpurpose(DEFAULT:G_L_B_Purpose_:0),dppapurpose(DEFAULT:D_P_P_A_Purpose_:0),fcrapurpose(DEFAULT:F_C_R_A_Purpose_:0),primarymarketcode(DEFAULT:Primary_Market_Code_:\'\'),secondarymarketcode(DEFAULT:Secondary_Market_Code_:\'\'),industrycode1(DEFAULT:Industry_Code1_:\'\'),industrycode2(DEFAULT:Industry_Code2_:\'\'),submarket(DEFAULT:Sub_Market_:\'\'),vertical(DEFAULT:Vertical_:\'\'),industry(DEFAULT:Industry_:\'\'),fraudpointscore(DEFAULT:Fraudpoint_Score_:0),firstname(DEFAULT:First_Name_:\'\'),lastname(DEFAULT:Last_Name_:\'\'),dateofbirth(DEFAULT:Date_Of_Birth_:DATE),lexid(DEFAULT:Lex_I_D_:0),bususer_q.prim_range(OVERRIDE:Primary_Range_:\'\'),bususer_q.predir(OVERRIDE:Predirectional_:\'\'),bususer_q.prim_name(OVERRIDE:Primary_Name_:\'\'),bususer_q.addr_suffix(OVERRIDE:Suffix_:\'\'),bususer_q.postdir(OVERRIDE:Postdirectional_:\'\'),bususer_q.sec_range(OVERRIDE:Secondary_Range_:\'\'),bususer_q.zip5(OVERRIDE:Z_I_P5_:\'\'),ssn(DEFAULT:S_S_N_:\'\'),appendedssn(DEFAULT:Appended_S_S_N_:\'\'),personalphonenumber(DEFAULT:Personal_Phone_Number_:0),workphonenumber(DEFAULT:Work_Phone_Number_:0),emailaddress(DEFAULT:Email_Address_:\'\'),companyname(DEFAULT:Company_Name_:\'\'),companyphone(DEFAULT:Company_Phone_:\'\'),tin(DEFAULT:T_I_N_:0),ultid(DEFAULT:Ult_I_D_:0),orgid(DEFAULT:Org_I_D_:0),seleid(DEFAULT:Sele_I_D_:0),source(DEFAULT:Source_:\'\'),dateofinquiry(OVERRIDE:Date_First_Seen_:EPOCHTIMESTAMP:Date_First_Seen_12Rule|OVERRIDE:Date_Last_Seen_:EPOCHTIMESTAMP:Date_Last_Seen_12Rule),hybridarchivedate(DEFAULT:Hybrid_Archive_Date_:EPOCHTIMESTAMP),archive_date(OVERRIDE:Archive___Date_:EPOCHTIMESTAMP:Archive___Date_12Rule),vaultdatelastseen(DEFAULT:Vault_Date_Last_Seen_:EPOCH),DPMBitmap(OVERRIDE:__Permits:PERMITS)';
+  SHARED __d12_Norm := NORMALIZE(__in,LEFT.Dataset_Inquiry_AccLogs__Inquiry_Table_LinkIDs,TRANSFORM(RECORDOF(__in.Dataset_Inquiry_AccLogs__Inquiry_Table_LinkIDs),SELF:=RIGHT));
+  SHARED __d12_Out := RECORD
+    RECORDOF(PublicRecords_KEL.ECL_Functions.Dataset_FDC.Dataset_Inquiry_AccLogs__Inquiry_Table_LinkIDs);
+    KEL.typ.uid UID := 0;
+  END;
+  SHARED __d12_UID_Mapped := JOIN(__d12_Norm,Lookup,TRIM((STRING)LEFT.search_info.transaction_id) + '|' + TRIM((STRING)LEFT.search_info.sequence_number) = RIGHT.KeyVal,TRANSFORM(__d12_Out,SELF.UID:=RIGHT.UID,SELF:=LEFT),SMART);
+  EXPORT PublicRecords_KEL_ECL_Functions_Dataset_FDC_Dataset_Inquiry_AccLogs__Inquiry_Table_LinkIDs_2_Invalid := __d12_UID_Mapped(UID = 0);
+  SHARED __d12_Prefiltered := __d12_UID_Mapped(UID <> 0);
+  SHARED __d12 := __SourceFilter(KEL.FromFlat.Convert(__d12_Prefiltered,InLayout,__Mapping12,'PublicRecords_KEL.ECL_Functions.Dataset_FDC'));
+  EXPORT InData := __d0 + __d1 + __d2 + __d3 + __d4 + __d5 + __d6 + __d7 + __d8 + __d9 + __d10 + __d11 + __d12;
   EXPORT Search_Info_Layout := RECORD
     KEL.typ.nstr Method_;
     KEL.typ.nint Product_Code_;
@@ -378,7 +406,7 @@ EXPORT E_Inquiry(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG_Compi
   EXPORT Transaction_I_D__SingleValue_Invalid := KEL.Intake.DetectMultipleValuesOnResult(Result,Transaction_I_D_);
   EXPORT Sequence_Number__SingleValue_Invalid := KEL.Intake.DetectMultipleValuesOnResult(Result,Sequence_Number_);
   EXPORT Fraudpoint_Score__SingleValue_Invalid := KEL.Intake.DetectMultipleValuesOnResult(Result,Fraudpoint_Score_);
-  EXPORT SanityCheck := DATASET([{COUNT(PublicRecords_KEL_ECL_Functions_Dataset_FDC_Dataset_Inquiry_AccLogs__Key_FCRA_DID_Invalid),COUNT(PublicRecords_KEL_ECL_Functions_Dataset_FDC_Dataset_Inquiry_AccLogs__Key_FCRA_Phone_Invalid),COUNT(PublicRecords_KEL_ECL_Functions_Dataset_FDC_Dataset_Inquiry_AccLogs__Key_FCRA_Address_Invalid),COUNT(PublicRecords_KEL_ECL_Functions_Dataset_FDC_Dataset_Inquiry_AccLogs__Key_FCRA_SSN_Invalid),COUNT(PublicRecords_KEL_ECL_Functions_Dataset_FDC_Dataset_Inquiry_AccLogs__Inquiry_Table_SSN_Invalid),COUNT(PublicRecords_KEL_ECL_Functions_Dataset_FDC_Dataset_Inquiry_AccLogs__Inquiry_Table_Address_Invalid),COUNT(PublicRecords_KEL_ECL_Functions_Dataset_FDC_Dataset_Inquiry_AccLogs__Inquiry_Table_DID_Invalid),COUNT(PublicRecords_KEL_ECL_Functions_Dataset_FDC_Dataset_Inquiry_AccLogs__Inquiry_Table_EMAIL_Invalid),COUNT(PublicRecords_KEL_ECL_Functions_Dataset_FDC_Dataset_Inquiry_AccLogs__Inquiry_Table_Phone_Invalid),COUNT(PublicRecords_KEL_ECL_Functions_Dataset_FDC_Dataset_Inquiry_AccLogs__Inquiry_Table_FEIN_Invalid),COUNT(PublicRecords_KEL_ECL_Functions_Dataset_FDC_Dataset_Inquiry_AccLogs__Inquiry_Table_LinkIDs_Invalid),COUNT(Transaction_I_D__SingleValue_Invalid),COUNT(Sequence_Number__SingleValue_Invalid),COUNT(Fraudpoint_Score__SingleValue_Invalid),TopSourcedUIDs(1)}],{KEL.typ.int PublicRecords_KEL_ECL_Functions_Dataset_FDC_Dataset_Inquiry_AccLogs__Key_FCRA_DID_Invalid,KEL.typ.int PublicRecords_KEL_ECL_Functions_Dataset_FDC_Dataset_Inquiry_AccLogs__Key_FCRA_Phone_Invalid,KEL.typ.int PublicRecords_KEL_ECL_Functions_Dataset_FDC_Dataset_Inquiry_AccLogs__Key_FCRA_Address_Invalid,KEL.typ.int PublicRecords_KEL_ECL_Functions_Dataset_FDC_Dataset_Inquiry_AccLogs__Key_FCRA_SSN_Invalid,KEL.typ.int PublicRecords_KEL_ECL_Functions_Dataset_FDC_Dataset_Inquiry_AccLogs__Inquiry_Table_SSN_Invalid,KEL.typ.int PublicRecords_KEL_ECL_Functions_Dataset_FDC_Dataset_Inquiry_AccLogs__Inquiry_Table_Address_Invalid,KEL.typ.int PublicRecords_KEL_ECL_Functions_Dataset_FDC_Dataset_Inquiry_AccLogs__Inquiry_Table_DID_Invalid,KEL.typ.int PublicRecords_KEL_ECL_Functions_Dataset_FDC_Dataset_Inquiry_AccLogs__Inquiry_Table_EMAIL_Invalid,KEL.typ.int PublicRecords_KEL_ECL_Functions_Dataset_FDC_Dataset_Inquiry_AccLogs__Inquiry_Table_Phone_Invalid,KEL.typ.int PublicRecords_KEL_ECL_Functions_Dataset_FDC_Dataset_Inquiry_AccLogs__Inquiry_Table_FEIN_Invalid,KEL.typ.int PublicRecords_KEL_ECL_Functions_Dataset_FDC_Dataset_Inquiry_AccLogs__Inquiry_Table_LinkIDs_Invalid,KEL.typ.int Transaction_I_D__SingleValue_Invalid,KEL.typ.int Sequence_Number__SingleValue_Invalid,KEL.typ.int Fraudpoint_Score__SingleValue_Invalid,DATASET(RECORDOF(UIDSourceCounts)) topSourcedUID});
+  EXPORT SanityCheck := DATASET([{COUNT(PublicRecords_KEL_ECL_Functions_Dataset_FDC_Dataset_Inquiry_AccLogs__Key_FCRA_DID_Invalid),COUNT(PublicRecords_KEL_ECL_Functions_Dataset_FDC_Dataset_Inquiry_AccLogs__Key_FCRA_Phone_Invalid),COUNT(PublicRecords_KEL_ECL_Functions_Dataset_FDC_Dataset_Inquiry_AccLogs__Key_FCRA_Address_Invalid),COUNT(PublicRecords_KEL_ECL_Functions_Dataset_FDC_Dataset_Inquiry_AccLogs__Key_FCRA_SSN_Invalid),COUNT(PublicRecords_KEL_ECL_Functions_Dataset_FDC_Dataset_Inquiry_AccLogs__Inquiry_Table_SSN_Invalid),COUNT(PublicRecords_KEL_ECL_Functions_Dataset_FDC_Dataset_Inquiry_AccLogs__Inquiry_Table_Address_Invalid),COUNT(PublicRecords_KEL_ECL_Functions_Dataset_FDC_Dataset_Inquiry_AccLogs__Inquiry_Table_DID_Invalid),COUNT(PublicRecords_KEL_ECL_Functions_Dataset_FDC_Dataset_Inquiry_AccLogs__Inquiry_Table_EMAIL_Invalid),COUNT(PublicRecords_KEL_ECL_Functions_Dataset_FDC_Dataset_Inquiry_AccLogs__Inquiry_Table_Phone_Invalid),COUNT(PublicRecords_KEL_ECL_Functions_Dataset_FDC_Dataset_Inquiry_AccLogs__Inquiry_Table_FEIN_1_Invalid),COUNT(PublicRecords_KEL_ECL_Functions_Dataset_FDC_Dataset_Inquiry_AccLogs__Inquiry_Table_FEIN_2_Invalid),COUNT(PublicRecords_KEL_ECL_Functions_Dataset_FDC_Dataset_Inquiry_AccLogs__Inquiry_Table_LinkIDs_1_Invalid),COUNT(PublicRecords_KEL_ECL_Functions_Dataset_FDC_Dataset_Inquiry_AccLogs__Inquiry_Table_LinkIDs_2_Invalid),COUNT(Transaction_I_D__SingleValue_Invalid),COUNT(Sequence_Number__SingleValue_Invalid),COUNT(Fraudpoint_Score__SingleValue_Invalid),TopSourcedUIDs(1)}],{KEL.typ.int PublicRecords_KEL_ECL_Functions_Dataset_FDC_Dataset_Inquiry_AccLogs__Key_FCRA_DID_Invalid,KEL.typ.int PublicRecords_KEL_ECL_Functions_Dataset_FDC_Dataset_Inquiry_AccLogs__Key_FCRA_Phone_Invalid,KEL.typ.int PublicRecords_KEL_ECL_Functions_Dataset_FDC_Dataset_Inquiry_AccLogs__Key_FCRA_Address_Invalid,KEL.typ.int PublicRecords_KEL_ECL_Functions_Dataset_FDC_Dataset_Inquiry_AccLogs__Key_FCRA_SSN_Invalid,KEL.typ.int PublicRecords_KEL_ECL_Functions_Dataset_FDC_Dataset_Inquiry_AccLogs__Inquiry_Table_SSN_Invalid,KEL.typ.int PublicRecords_KEL_ECL_Functions_Dataset_FDC_Dataset_Inquiry_AccLogs__Inquiry_Table_Address_Invalid,KEL.typ.int PublicRecords_KEL_ECL_Functions_Dataset_FDC_Dataset_Inquiry_AccLogs__Inquiry_Table_DID_Invalid,KEL.typ.int PublicRecords_KEL_ECL_Functions_Dataset_FDC_Dataset_Inquiry_AccLogs__Inquiry_Table_EMAIL_Invalid,KEL.typ.int PublicRecords_KEL_ECL_Functions_Dataset_FDC_Dataset_Inquiry_AccLogs__Inquiry_Table_Phone_Invalid,KEL.typ.int PublicRecords_KEL_ECL_Functions_Dataset_FDC_Dataset_Inquiry_AccLogs__Inquiry_Table_FEIN_1_Invalid,KEL.typ.int PublicRecords_KEL_ECL_Functions_Dataset_FDC_Dataset_Inquiry_AccLogs__Inquiry_Table_FEIN_2_Invalid,KEL.typ.int PublicRecords_KEL_ECL_Functions_Dataset_FDC_Dataset_Inquiry_AccLogs__Inquiry_Table_LinkIDs_1_Invalid,KEL.typ.int PublicRecords_KEL_ECL_Functions_Dataset_FDC_Dataset_Inquiry_AccLogs__Inquiry_Table_LinkIDs_2_Invalid,KEL.typ.int Transaction_I_D__SingleValue_Invalid,KEL.typ.int Sequence_Number__SingleValue_Invalid,KEL.typ.int Fraudpoint_Score__SingleValue_Invalid,DATASET(RECORDOF(UIDSourceCounts)) topSourcedUID});
   EXPORT NullCounts := DATASET([
     {'Inquiry','PublicRecords_KEL.ECL_Functions.Dataset_FDC','UID',COUNT(PublicRecords_KEL_ECL_Functions_Dataset_FDC_Dataset_Inquiry_AccLogs__Key_FCRA_DID_Invalid),COUNT(__d0)},
     {'Inquiry','PublicRecords_KEL.ECL_Functions.Dataset_FDC','search_info.transaction_id',COUNT(__d0(__NL(Transaction_I_D_))),COUNT(__d0(__NN(Transaction_I_D_)))},
@@ -785,7 +813,7 @@ EXPORT E_Inquiry(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG_Compi
     {'Inquiry','PublicRecords_KEL.ECL_Functions.Dataset_FDC','DateLastSeen',COUNT(__d8(Date_Last_Seen_=0)),COUNT(__d8(Date_Last_Seen_!=0))},
     {'Inquiry','PublicRecords_KEL.ECL_Functions.Dataset_FDC','HybridArchiveDate',COUNT(__d8(Hybrid_Archive_Date_=0)),COUNT(__d8(Hybrid_Archive_Date_!=0))},
     {'Inquiry','PublicRecords_KEL.ECL_Functions.Dataset_FDC','VaultDateLastSeen',COUNT(__d8(Vault_Date_Last_Seen_=0)),COUNT(__d8(Vault_Date_Last_Seen_!=0))},
-    {'Inquiry','PublicRecords_KEL.ECL_Functions.Dataset_FDC','UID',COUNT(PublicRecords_KEL_ECL_Functions_Dataset_FDC_Dataset_Inquiry_AccLogs__Inquiry_Table_FEIN_Invalid),COUNT(__d9)},
+    {'Inquiry','PublicRecords_KEL.ECL_Functions.Dataset_FDC','UID',COUNT(PublicRecords_KEL_ECL_Functions_Dataset_FDC_Dataset_Inquiry_AccLogs__Inquiry_Table_FEIN_1_Invalid),COUNT(__d9)},
     {'Inquiry','PublicRecords_KEL.ECL_Functions.Dataset_FDC','search_info.transaction_id',COUNT(__d9(__NL(Transaction_I_D_))),COUNT(__d9(__NN(Transaction_I_D_)))},
     {'Inquiry','PublicRecords_KEL.ECL_Functions.Dataset_FDC','search_info.sequence_number',COUNT(__d9(__NL(Sequence_Number_))),COUNT(__d9(__NN(Sequence_Number_)))},
     {'Inquiry','PublicRecords_KEL.ECL_Functions.Dataset_FDC','search_info.method',COUNT(__d9(__NL(Method_))),COUNT(__d9(__NN(Method_)))},
@@ -830,50 +858,140 @@ EXPORT E_Inquiry(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG_Compi
     {'Inquiry','PublicRecords_KEL.ECL_Functions.Dataset_FDC','DateLastSeen',COUNT(__d9(Date_Last_Seen_=0)),COUNT(__d9(Date_Last_Seen_!=0))},
     {'Inquiry','PublicRecords_KEL.ECL_Functions.Dataset_FDC','HybridArchiveDate',COUNT(__d9(Hybrid_Archive_Date_=0)),COUNT(__d9(Hybrid_Archive_Date_!=0))},
     {'Inquiry','PublicRecords_KEL.ECL_Functions.Dataset_FDC','VaultDateLastSeen',COUNT(__d9(Vault_Date_Last_Seen_=0)),COUNT(__d9(Vault_Date_Last_Seen_!=0))},
-    {'Inquiry','PublicRecords_KEL.ECL_Functions.Dataset_FDC','UID',COUNT(PublicRecords_KEL_ECL_Functions_Dataset_FDC_Dataset_Inquiry_AccLogs__Inquiry_Table_LinkIDs_Invalid),COUNT(__d10)},
+    {'Inquiry','PublicRecords_KEL.ECL_Functions.Dataset_FDC','UID',COUNT(PublicRecords_KEL_ECL_Functions_Dataset_FDC_Dataset_Inquiry_AccLogs__Inquiry_Table_FEIN_2_Invalid),COUNT(__d10)},
     {'Inquiry','PublicRecords_KEL.ECL_Functions.Dataset_FDC','search_info.transaction_id',COUNT(__d10(__NL(Transaction_I_D_))),COUNT(__d10(__NN(Transaction_I_D_)))},
     {'Inquiry','PublicRecords_KEL.ECL_Functions.Dataset_FDC','search_info.sequence_number',COUNT(__d10(__NL(Sequence_Number_))),COUNT(__d10(__NN(Sequence_Number_)))},
-    {'Inquiry','PublicRecords_KEL.ECL_Functions.Dataset_FDC','search_info.method',COUNT(__d10(__NL(Method_))),COUNT(__d10(__NN(Method_)))},
-    {'Inquiry','PublicRecords_KEL.ECL_Functions.Dataset_FDC','search_info.product_code',COUNT(__d10(__NL(Product_Code_))),COUNT(__d10(__NN(Product_Code_)))},
-    {'Inquiry','PublicRecords_KEL.ECL_Functions.Dataset_FDC','search_info.function_description',COUNT(__d10(__NL(Function_Description_))),COUNT(__d10(__NN(Function_Description_)))},
-    {'Inquiry','PublicRecords_KEL.ECL_Functions.Dataset_FDC','permissions.glb_purpose',COUNT(__d10(__NL(G_L_B_Purpose_))),COUNT(__d10(__NN(G_L_B_Purpose_)))},
-    {'Inquiry','PublicRecords_KEL.ECL_Functions.Dataset_FDC','permissions.dppa_purpose',COUNT(__d10(__NL(D_P_P_A_Purpose_))),COUNT(__d10(__NN(D_P_P_A_Purpose_)))},
-    {'Inquiry','PublicRecords_KEL.ECL_Functions.Dataset_FDC','permissions.fcra_purpose',COUNT(__d10(__NL(F_C_R_A_Purpose_))),COUNT(__d10(__NN(F_C_R_A_Purpose_)))},
-    {'Inquiry','PublicRecords_KEL.ECL_Functions.Dataset_FDC','bus_intel.primary_market_code',COUNT(__d10(__NL(Primary_Market_Code_))),COUNT(__d10(__NN(Primary_Market_Code_)))},
-    {'Inquiry','PublicRecords_KEL.ECL_Functions.Dataset_FDC','bus_intel.secondary_market_code',COUNT(__d10(__NL(Secondary_Market_Code_))),COUNT(__d10(__NN(Secondary_Market_Code_)))},
-    {'Inquiry','PublicRecords_KEL.ECL_Functions.Dataset_FDC','bus_intel.industry_1_code',COUNT(__d10(__NL(Industry_Code1_))),COUNT(__d10(__NN(Industry_Code1_)))},
-    {'Inquiry','PublicRecords_KEL.ECL_Functions.Dataset_FDC','bus_intel.industry_2_code',COUNT(__d10(__NL(Industry_Code2_))),COUNT(__d10(__NN(Industry_Code2_)))},
-    {'Inquiry','PublicRecords_KEL.ECL_Functions.Dataset_FDC','bus_intel.sub_market',COUNT(__d10(__NL(Sub_Market_))),COUNT(__d10(__NN(Sub_Market_)))},
-    {'Inquiry','PublicRecords_KEL.ECL_Functions.Dataset_FDC','bus_intel.vertical',COUNT(__d10(__NL(Vertical_))),COUNT(__d10(__NN(Vertical_)))},
-    {'Inquiry','PublicRecords_KEL.ECL_Functions.Dataset_FDC','bus_intel.industry',COUNT(__d10(__NL(Industry_))),COUNT(__d10(__NN(Industry_)))},
+    {'Inquiry','PublicRecords_KEL.ECL_Functions.Dataset_FDC','Method',COUNT(__d10(__NL(Method_))),COUNT(__d10(__NN(Method_)))},
+    {'Inquiry','PublicRecords_KEL.ECL_Functions.Dataset_FDC','ProductCode',COUNT(__d10(__NL(Product_Code_))),COUNT(__d10(__NN(Product_Code_)))},
+    {'Inquiry','PublicRecords_KEL.ECL_Functions.Dataset_FDC','FunctionDescription',COUNT(__d10(__NL(Function_Description_))),COUNT(__d10(__NN(Function_Description_)))},
+    {'Inquiry','PublicRecords_KEL.ECL_Functions.Dataset_FDC','GLBPurpose',COUNT(__d10(__NL(G_L_B_Purpose_))),COUNT(__d10(__NN(G_L_B_Purpose_)))},
+    {'Inquiry','PublicRecords_KEL.ECL_Functions.Dataset_FDC','DPPAPurpose',COUNT(__d10(__NL(D_P_P_A_Purpose_))),COUNT(__d10(__NN(D_P_P_A_Purpose_)))},
+    {'Inquiry','PublicRecords_KEL.ECL_Functions.Dataset_FDC','FCRAPurpose',COUNT(__d10(__NL(F_C_R_A_Purpose_))),COUNT(__d10(__NN(F_C_R_A_Purpose_)))},
+    {'Inquiry','PublicRecords_KEL.ECL_Functions.Dataset_FDC','PrimaryMarketCode',COUNT(__d10(__NL(Primary_Market_Code_))),COUNT(__d10(__NN(Primary_Market_Code_)))},
+    {'Inquiry','PublicRecords_KEL.ECL_Functions.Dataset_FDC','SecondaryMarketCode',COUNT(__d10(__NL(Secondary_Market_Code_))),COUNT(__d10(__NN(Secondary_Market_Code_)))},
+    {'Inquiry','PublicRecords_KEL.ECL_Functions.Dataset_FDC','IndustryCode1',COUNT(__d10(__NL(Industry_Code1_))),COUNT(__d10(__NN(Industry_Code1_)))},
+    {'Inquiry','PublicRecords_KEL.ECL_Functions.Dataset_FDC','IndustryCode2',COUNT(__d10(__NL(Industry_Code2_))),COUNT(__d10(__NN(Industry_Code2_)))},
+    {'Inquiry','PublicRecords_KEL.ECL_Functions.Dataset_FDC','SubMarket',COUNT(__d10(__NL(Sub_Market_))),COUNT(__d10(__NN(Sub_Market_)))},
+    {'Inquiry','PublicRecords_KEL.ECL_Functions.Dataset_FDC','Vertical',COUNT(__d10(__NL(Vertical_))),COUNT(__d10(__NN(Vertical_)))},
+    {'Inquiry','PublicRecords_KEL.ECL_Functions.Dataset_FDC','Industry',COUNT(__d10(__NL(Industry_))),COUNT(__d10(__NN(Industry_)))},
     {'Inquiry','PublicRecords_KEL.ECL_Functions.Dataset_FDC','FraudpointScore',COUNT(__d10(__NL(Fraudpoint_Score_))),COUNT(__d10(__NN(Fraudpoint_Score_)))},
-    {'Inquiry','PublicRecords_KEL.ECL_Functions.Dataset_FDC','bususer_q.fname',COUNT(__d10(__NL(First_Name_))),COUNT(__d10(__NN(First_Name_)))},
-    {'Inquiry','PublicRecords_KEL.ECL_Functions.Dataset_FDC','bususer_q.lname',COUNT(__d10(__NL(Last_Name_))),COUNT(__d10(__NN(Last_Name_)))},
-    {'Inquiry','PublicRecords_KEL.ECL_Functions.Dataset_FDC','bususer_q.dob',COUNT(__d10(__NL(Date_Of_Birth_))),COUNT(__d10(__NN(Date_Of_Birth_)))},
-    {'Inquiry','PublicRecords_KEL.ECL_Functions.Dataset_FDC','bususer_q.appended_adl',COUNT(__d10(__NL(Lex_I_D_))),COUNT(__d10(__NN(Lex_I_D_)))},
-    {'Inquiry','PublicRecords_KEL.ECL_Functions.Dataset_FDC','bus_q.prim_range',COUNT(__d10(__NL(Primary_Range_))),COUNT(__d10(__NN(Primary_Range_)))},
-    {'Inquiry','PublicRecords_KEL.ECL_Functions.Dataset_FDC','bus_q.predir',COUNT(__d10(__NL(Predirectional_))),COUNT(__d10(__NN(Predirectional_)))},
-    {'Inquiry','PublicRecords_KEL.ECL_Functions.Dataset_FDC','bus_q.prim_name',COUNT(__d10(__NL(Primary_Name_))),COUNT(__d10(__NN(Primary_Name_)))},
-    {'Inquiry','PublicRecords_KEL.ECL_Functions.Dataset_FDC','bus_q.addr_suffix',COUNT(__d10(__NL(Suffix_))),COUNT(__d10(__NN(Suffix_)))},
-    {'Inquiry','PublicRecords_KEL.ECL_Functions.Dataset_FDC','bus_q.postdir',COUNT(__d10(__NL(Postdirectional_))),COUNT(__d10(__NN(Postdirectional_)))},
-    {'Inquiry','PublicRecords_KEL.ECL_Functions.Dataset_FDC','bus_q.sec_range',COUNT(__d10(__NL(Secondary_Range_))),COUNT(__d10(__NN(Secondary_Range_)))},
-    {'Inquiry','PublicRecords_KEL.ECL_Functions.Dataset_FDC','bus_q.zip5',COUNT(__d10(__NL(Z_I_P5_))),COUNT(__d10(__NN(Z_I_P5_)))},
-    {'Inquiry','PublicRecords_KEL.ECL_Functions.Dataset_FDC','bususer_q.ssn',COUNT(__d10(__NL(S_S_N_))),COUNT(__d10(__NN(S_S_N_)))},
-    {'Inquiry','PublicRecords_KEL.ECL_Functions.Dataset_FDC','bususer_q.appended_ssn',COUNT(__d10(__NL(Appended_S_S_N_))),COUNT(__d10(__NN(Appended_S_S_N_)))},
-    {'Inquiry','PublicRecords_KEL.ECL_Functions.Dataset_FDC','bususer_q.personal_phone',COUNT(__d10(__NL(Personal_Phone_Number_))),COUNT(__d10(__NN(Personal_Phone_Number_)))},
+    {'Inquiry','PublicRecords_KEL.ECL_Functions.Dataset_FDC','FirstName',COUNT(__d10(__NL(First_Name_))),COUNT(__d10(__NN(First_Name_)))},
+    {'Inquiry','PublicRecords_KEL.ECL_Functions.Dataset_FDC','LastName',COUNT(__d10(__NL(Last_Name_))),COUNT(__d10(__NN(Last_Name_)))},
+    {'Inquiry','PublicRecords_KEL.ECL_Functions.Dataset_FDC','DateOfBirth',COUNT(__d10(__NL(Date_Of_Birth_))),COUNT(__d10(__NN(Date_Of_Birth_)))},
+    {'Inquiry','PublicRecords_KEL.ECL_Functions.Dataset_FDC','LexID',COUNT(__d10(__NL(Lex_I_D_))),COUNT(__d10(__NN(Lex_I_D_)))},
+    {'Inquiry','PublicRecords_KEL.ECL_Functions.Dataset_FDC','bususer_q.prim_range',COUNT(__d10(__NL(Primary_Range_))),COUNT(__d10(__NN(Primary_Range_)))},
+    {'Inquiry','PublicRecords_KEL.ECL_Functions.Dataset_FDC','bususer_q.predir',COUNT(__d10(__NL(Predirectional_))),COUNT(__d10(__NN(Predirectional_)))},
+    {'Inquiry','PublicRecords_KEL.ECL_Functions.Dataset_FDC','bususer_q.prim_name',COUNT(__d10(__NL(Primary_Name_))),COUNT(__d10(__NN(Primary_Name_)))},
+    {'Inquiry','PublicRecords_KEL.ECL_Functions.Dataset_FDC','bususer_q.addr_suffix',COUNT(__d10(__NL(Suffix_))),COUNT(__d10(__NN(Suffix_)))},
+    {'Inquiry','PublicRecords_KEL.ECL_Functions.Dataset_FDC','bususer_q.postdir',COUNT(__d10(__NL(Postdirectional_))),COUNT(__d10(__NN(Postdirectional_)))},
+    {'Inquiry','PublicRecords_KEL.ECL_Functions.Dataset_FDC','bususer_q.sec_range',COUNT(__d10(__NL(Secondary_Range_))),COUNT(__d10(__NN(Secondary_Range_)))},
+    {'Inquiry','PublicRecords_KEL.ECL_Functions.Dataset_FDC','bususer_q.zip5',COUNT(__d10(__NL(Z_I_P5_))),COUNT(__d10(__NN(Z_I_P5_)))},
+    {'Inquiry','PublicRecords_KEL.ECL_Functions.Dataset_FDC','SSN',COUNT(__d10(__NL(S_S_N_))),COUNT(__d10(__NN(S_S_N_)))},
+    {'Inquiry','PublicRecords_KEL.ECL_Functions.Dataset_FDC','AppendedSSN',COUNT(__d10(__NL(Appended_S_S_N_))),COUNT(__d10(__NN(Appended_S_S_N_)))},
+    {'Inquiry','PublicRecords_KEL.ECL_Functions.Dataset_FDC','PersonalPhoneNumber',COUNT(__d10(__NL(Personal_Phone_Number_))),COUNT(__d10(__NN(Personal_Phone_Number_)))},
     {'Inquiry','PublicRecords_KEL.ECL_Functions.Dataset_FDC','WorkPhoneNumber',COUNT(__d10(__NL(Work_Phone_Number_))),COUNT(__d10(__NN(Work_Phone_Number_)))},
     {'Inquiry','PublicRecords_KEL.ECL_Functions.Dataset_FDC','EmailAddress',COUNT(__d10(__NL(Email_Address_))),COUNT(__d10(__NN(Email_Address_)))},
-    {'Inquiry','PublicRecords_KEL.ECL_Functions.Dataset_FDC','bus_q.cname',COUNT(__d10(__NL(Company_Name_))),COUNT(__d10(__NN(Company_Name_)))},
-    {'Inquiry','PublicRecords_KEL.ECL_Functions.Dataset_FDC','bus_q.company_phone',COUNT(__d10(__NL(Company_Phone_))),COUNT(__d10(__NN(Company_Phone_)))},
-    {'Inquiry','PublicRecords_KEL.ECL_Functions.Dataset_FDC','bus_q.appended_ein',COUNT(__d10(__NL(T_I_N_))),COUNT(__d10(__NN(T_I_N_)))},
+    {'Inquiry','PublicRecords_KEL.ECL_Functions.Dataset_FDC','CompanyName',COUNT(__d10(__NL(Company_Name_))),COUNT(__d10(__NN(Company_Name_)))},
+    {'Inquiry','PublicRecords_KEL.ECL_Functions.Dataset_FDC','CompanyPhone',COUNT(__d10(__NL(Company_Phone_))),COUNT(__d10(__NN(Company_Phone_)))},
+    {'Inquiry','PublicRecords_KEL.ECL_Functions.Dataset_FDC','TIN',COUNT(__d10(__NL(T_I_N_))),COUNT(__d10(__NN(T_I_N_)))},
     {'Inquiry','PublicRecords_KEL.ECL_Functions.Dataset_FDC','UltID',COUNT(__d10(__NL(Ult_I_D_))),COUNT(__d10(__NN(Ult_I_D_)))},
     {'Inquiry','PublicRecords_KEL.ECL_Functions.Dataset_FDC','OrgID',COUNT(__d10(__NL(Org_I_D_))),COUNT(__d10(__NN(Org_I_D_)))},
     {'Inquiry','PublicRecords_KEL.ECL_Functions.Dataset_FDC','SeleID',COUNT(__d10(__NL(Sele_I_D_))),COUNT(__d10(__NN(Sele_I_D_)))},
-    {'Inquiry','PublicRecords_KEL.ECL_Functions.Dataset_FDC','Src',COUNT(__d10(__NL(Source_))),COUNT(__d10(__NN(Source_)))},
+    {'Inquiry','PublicRecords_KEL.ECL_Functions.Dataset_FDC','Source',COUNT(__d10(__NL(Source_))),COUNT(__d10(__NN(Source_)))},
     {'Inquiry','PublicRecords_KEL.ECL_Functions.Dataset_FDC','Archive_Date',COUNT(__d10(Archive___Date_=0)),COUNT(__d10(Archive___Date_!=0))},
     {'Inquiry','PublicRecords_KEL.ECL_Functions.Dataset_FDC','DateFirstSeen',COUNT(__d10(Date_First_Seen_=0)),COUNT(__d10(Date_First_Seen_!=0))},
     {'Inquiry','PublicRecords_KEL.ECL_Functions.Dataset_FDC','DateLastSeen',COUNT(__d10(Date_Last_Seen_=0)),COUNT(__d10(Date_Last_Seen_!=0))},
     {'Inquiry','PublicRecords_KEL.ECL_Functions.Dataset_FDC','HybridArchiveDate',COUNT(__d10(Hybrid_Archive_Date_=0)),COUNT(__d10(Hybrid_Archive_Date_!=0))},
-    {'Inquiry','PublicRecords_KEL.ECL_Functions.Dataset_FDC','VaultDateLastSeen',COUNT(__d10(Vault_Date_Last_Seen_=0)),COUNT(__d10(Vault_Date_Last_Seen_!=0))}]
+    {'Inquiry','PublicRecords_KEL.ECL_Functions.Dataset_FDC','VaultDateLastSeen',COUNT(__d10(Vault_Date_Last_Seen_=0)),COUNT(__d10(Vault_Date_Last_Seen_!=0))},
+    {'Inquiry','PublicRecords_KEL.ECL_Functions.Dataset_FDC','UID',COUNT(PublicRecords_KEL_ECL_Functions_Dataset_FDC_Dataset_Inquiry_AccLogs__Inquiry_Table_LinkIDs_1_Invalid),COUNT(__d11)},
+    {'Inquiry','PublicRecords_KEL.ECL_Functions.Dataset_FDC','search_info.transaction_id',COUNT(__d11(__NL(Transaction_I_D_))),COUNT(__d11(__NN(Transaction_I_D_)))},
+    {'Inquiry','PublicRecords_KEL.ECL_Functions.Dataset_FDC','search_info.sequence_number',COUNT(__d11(__NL(Sequence_Number_))),COUNT(__d11(__NN(Sequence_Number_)))},
+    {'Inquiry','PublicRecords_KEL.ECL_Functions.Dataset_FDC','search_info.method',COUNT(__d11(__NL(Method_))),COUNT(__d11(__NN(Method_)))},
+    {'Inquiry','PublicRecords_KEL.ECL_Functions.Dataset_FDC','search_info.product_code',COUNT(__d11(__NL(Product_Code_))),COUNT(__d11(__NN(Product_Code_)))},
+    {'Inquiry','PublicRecords_KEL.ECL_Functions.Dataset_FDC','search_info.function_description',COUNT(__d11(__NL(Function_Description_))),COUNT(__d11(__NN(Function_Description_)))},
+    {'Inquiry','PublicRecords_KEL.ECL_Functions.Dataset_FDC','permissions.glb_purpose',COUNT(__d11(__NL(G_L_B_Purpose_))),COUNT(__d11(__NN(G_L_B_Purpose_)))},
+    {'Inquiry','PublicRecords_KEL.ECL_Functions.Dataset_FDC','permissions.dppa_purpose',COUNT(__d11(__NL(D_P_P_A_Purpose_))),COUNT(__d11(__NN(D_P_P_A_Purpose_)))},
+    {'Inquiry','PublicRecords_KEL.ECL_Functions.Dataset_FDC','permissions.fcra_purpose',COUNT(__d11(__NL(F_C_R_A_Purpose_))),COUNT(__d11(__NN(F_C_R_A_Purpose_)))},
+    {'Inquiry','PublicRecords_KEL.ECL_Functions.Dataset_FDC','bus_intel.primary_market_code',COUNT(__d11(__NL(Primary_Market_Code_))),COUNT(__d11(__NN(Primary_Market_Code_)))},
+    {'Inquiry','PublicRecords_KEL.ECL_Functions.Dataset_FDC','bus_intel.secondary_market_code',COUNT(__d11(__NL(Secondary_Market_Code_))),COUNT(__d11(__NN(Secondary_Market_Code_)))},
+    {'Inquiry','PublicRecords_KEL.ECL_Functions.Dataset_FDC','bus_intel.industry_1_code',COUNT(__d11(__NL(Industry_Code1_))),COUNT(__d11(__NN(Industry_Code1_)))},
+    {'Inquiry','PublicRecords_KEL.ECL_Functions.Dataset_FDC','bus_intel.industry_2_code',COUNT(__d11(__NL(Industry_Code2_))),COUNT(__d11(__NN(Industry_Code2_)))},
+    {'Inquiry','PublicRecords_KEL.ECL_Functions.Dataset_FDC','bus_intel.sub_market',COUNT(__d11(__NL(Sub_Market_))),COUNT(__d11(__NN(Sub_Market_)))},
+    {'Inquiry','PublicRecords_KEL.ECL_Functions.Dataset_FDC','bus_intel.vertical',COUNT(__d11(__NL(Vertical_))),COUNT(__d11(__NN(Vertical_)))},
+    {'Inquiry','PublicRecords_KEL.ECL_Functions.Dataset_FDC','bus_intel.industry',COUNT(__d11(__NL(Industry_))),COUNT(__d11(__NN(Industry_)))},
+    {'Inquiry','PublicRecords_KEL.ECL_Functions.Dataset_FDC','FraudpointScore',COUNT(__d11(__NL(Fraudpoint_Score_))),COUNT(__d11(__NN(Fraudpoint_Score_)))},
+    {'Inquiry','PublicRecords_KEL.ECL_Functions.Dataset_FDC','bususer_q.fname',COUNT(__d11(__NL(First_Name_))),COUNT(__d11(__NN(First_Name_)))},
+    {'Inquiry','PublicRecords_KEL.ECL_Functions.Dataset_FDC','bususer_q.lname',COUNT(__d11(__NL(Last_Name_))),COUNT(__d11(__NN(Last_Name_)))},
+    {'Inquiry','PublicRecords_KEL.ECL_Functions.Dataset_FDC','bususer_q.dob',COUNT(__d11(__NL(Date_Of_Birth_))),COUNT(__d11(__NN(Date_Of_Birth_)))},
+    {'Inquiry','PublicRecords_KEL.ECL_Functions.Dataset_FDC','bususer_q.appended_adl',COUNT(__d11(__NL(Lex_I_D_))),COUNT(__d11(__NN(Lex_I_D_)))},
+    {'Inquiry','PublicRecords_KEL.ECL_Functions.Dataset_FDC','bus_q.prim_range',COUNT(__d11(__NL(Primary_Range_))),COUNT(__d11(__NN(Primary_Range_)))},
+    {'Inquiry','PublicRecords_KEL.ECL_Functions.Dataset_FDC','bus_q.predir',COUNT(__d11(__NL(Predirectional_))),COUNT(__d11(__NN(Predirectional_)))},
+    {'Inquiry','PublicRecords_KEL.ECL_Functions.Dataset_FDC','bus_q.prim_name',COUNT(__d11(__NL(Primary_Name_))),COUNT(__d11(__NN(Primary_Name_)))},
+    {'Inquiry','PublicRecords_KEL.ECL_Functions.Dataset_FDC','bus_q.addr_suffix',COUNT(__d11(__NL(Suffix_))),COUNT(__d11(__NN(Suffix_)))},
+    {'Inquiry','PublicRecords_KEL.ECL_Functions.Dataset_FDC','bus_q.postdir',COUNT(__d11(__NL(Postdirectional_))),COUNT(__d11(__NN(Postdirectional_)))},
+    {'Inquiry','PublicRecords_KEL.ECL_Functions.Dataset_FDC','bus_q.sec_range',COUNT(__d11(__NL(Secondary_Range_))),COUNT(__d11(__NN(Secondary_Range_)))},
+    {'Inquiry','PublicRecords_KEL.ECL_Functions.Dataset_FDC','bus_q.zip5',COUNT(__d11(__NL(Z_I_P5_))),COUNT(__d11(__NN(Z_I_P5_)))},
+    {'Inquiry','PublicRecords_KEL.ECL_Functions.Dataset_FDC','bususer_q.ssn',COUNT(__d11(__NL(S_S_N_))),COUNT(__d11(__NN(S_S_N_)))},
+    {'Inquiry','PublicRecords_KEL.ECL_Functions.Dataset_FDC','bususer_q.appended_ssn',COUNT(__d11(__NL(Appended_S_S_N_))),COUNT(__d11(__NN(Appended_S_S_N_)))},
+    {'Inquiry','PublicRecords_KEL.ECL_Functions.Dataset_FDC','bususer_q.personal_phone',COUNT(__d11(__NL(Personal_Phone_Number_))),COUNT(__d11(__NN(Personal_Phone_Number_)))},
+    {'Inquiry','PublicRecords_KEL.ECL_Functions.Dataset_FDC','WorkPhoneNumber',COUNT(__d11(__NL(Work_Phone_Number_))),COUNT(__d11(__NN(Work_Phone_Number_)))},
+    {'Inquiry','PublicRecords_KEL.ECL_Functions.Dataset_FDC','EmailAddress',COUNT(__d11(__NL(Email_Address_))),COUNT(__d11(__NN(Email_Address_)))},
+    {'Inquiry','PublicRecords_KEL.ECL_Functions.Dataset_FDC','bus_q.cname',COUNT(__d11(__NL(Company_Name_))),COUNT(__d11(__NN(Company_Name_)))},
+    {'Inquiry','PublicRecords_KEL.ECL_Functions.Dataset_FDC','bus_q.company_phone',COUNT(__d11(__NL(Company_Phone_))),COUNT(__d11(__NN(Company_Phone_)))},
+    {'Inquiry','PublicRecords_KEL.ECL_Functions.Dataset_FDC','bus_q.appended_ein',COUNT(__d11(__NL(T_I_N_))),COUNT(__d11(__NN(T_I_N_)))},
+    {'Inquiry','PublicRecords_KEL.ECL_Functions.Dataset_FDC','UltID',COUNT(__d11(__NL(Ult_I_D_))),COUNT(__d11(__NN(Ult_I_D_)))},
+    {'Inquiry','PublicRecords_KEL.ECL_Functions.Dataset_FDC','OrgID',COUNT(__d11(__NL(Org_I_D_))),COUNT(__d11(__NN(Org_I_D_)))},
+    {'Inquiry','PublicRecords_KEL.ECL_Functions.Dataset_FDC','SeleID',COUNT(__d11(__NL(Sele_I_D_))),COUNT(__d11(__NN(Sele_I_D_)))},
+    {'Inquiry','PublicRecords_KEL.ECL_Functions.Dataset_FDC','Src',COUNT(__d11(__NL(Source_))),COUNT(__d11(__NN(Source_)))},
+    {'Inquiry','PublicRecords_KEL.ECL_Functions.Dataset_FDC','Archive_Date',COUNT(__d11(Archive___Date_=0)),COUNT(__d11(Archive___Date_!=0))},
+    {'Inquiry','PublicRecords_KEL.ECL_Functions.Dataset_FDC','DateFirstSeen',COUNT(__d11(Date_First_Seen_=0)),COUNT(__d11(Date_First_Seen_!=0))},
+    {'Inquiry','PublicRecords_KEL.ECL_Functions.Dataset_FDC','DateLastSeen',COUNT(__d11(Date_Last_Seen_=0)),COUNT(__d11(Date_Last_Seen_!=0))},
+    {'Inquiry','PublicRecords_KEL.ECL_Functions.Dataset_FDC','HybridArchiveDate',COUNT(__d11(Hybrid_Archive_Date_=0)),COUNT(__d11(Hybrid_Archive_Date_!=0))},
+    {'Inquiry','PublicRecords_KEL.ECL_Functions.Dataset_FDC','VaultDateLastSeen',COUNT(__d11(Vault_Date_Last_Seen_=0)),COUNT(__d11(Vault_Date_Last_Seen_!=0))},
+    {'Inquiry','PublicRecords_KEL.ECL_Functions.Dataset_FDC','UID',COUNT(PublicRecords_KEL_ECL_Functions_Dataset_FDC_Dataset_Inquiry_AccLogs__Inquiry_Table_LinkIDs_2_Invalid),COUNT(__d12)},
+    {'Inquiry','PublicRecords_KEL.ECL_Functions.Dataset_FDC','search_info.transaction_id',COUNT(__d12(__NL(Transaction_I_D_))),COUNT(__d12(__NN(Transaction_I_D_)))},
+    {'Inquiry','PublicRecords_KEL.ECL_Functions.Dataset_FDC','search_info.sequence_number',COUNT(__d12(__NL(Sequence_Number_))),COUNT(__d12(__NN(Sequence_Number_)))},
+    {'Inquiry','PublicRecords_KEL.ECL_Functions.Dataset_FDC','Method',COUNT(__d12(__NL(Method_))),COUNT(__d12(__NN(Method_)))},
+    {'Inquiry','PublicRecords_KEL.ECL_Functions.Dataset_FDC','ProductCode',COUNT(__d12(__NL(Product_Code_))),COUNT(__d12(__NN(Product_Code_)))},
+    {'Inquiry','PublicRecords_KEL.ECL_Functions.Dataset_FDC','FunctionDescription',COUNT(__d12(__NL(Function_Description_))),COUNT(__d12(__NN(Function_Description_)))},
+    {'Inquiry','PublicRecords_KEL.ECL_Functions.Dataset_FDC','GLBPurpose',COUNT(__d12(__NL(G_L_B_Purpose_))),COUNT(__d12(__NN(G_L_B_Purpose_)))},
+    {'Inquiry','PublicRecords_KEL.ECL_Functions.Dataset_FDC','DPPAPurpose',COUNT(__d12(__NL(D_P_P_A_Purpose_))),COUNT(__d12(__NN(D_P_P_A_Purpose_)))},
+    {'Inquiry','PublicRecords_KEL.ECL_Functions.Dataset_FDC','FCRAPurpose',COUNT(__d12(__NL(F_C_R_A_Purpose_))),COUNT(__d12(__NN(F_C_R_A_Purpose_)))},
+    {'Inquiry','PublicRecords_KEL.ECL_Functions.Dataset_FDC','PrimaryMarketCode',COUNT(__d12(__NL(Primary_Market_Code_))),COUNT(__d12(__NN(Primary_Market_Code_)))},
+    {'Inquiry','PublicRecords_KEL.ECL_Functions.Dataset_FDC','SecondaryMarketCode',COUNT(__d12(__NL(Secondary_Market_Code_))),COUNT(__d12(__NN(Secondary_Market_Code_)))},
+    {'Inquiry','PublicRecords_KEL.ECL_Functions.Dataset_FDC','IndustryCode1',COUNT(__d12(__NL(Industry_Code1_))),COUNT(__d12(__NN(Industry_Code1_)))},
+    {'Inquiry','PublicRecords_KEL.ECL_Functions.Dataset_FDC','IndustryCode2',COUNT(__d12(__NL(Industry_Code2_))),COUNT(__d12(__NN(Industry_Code2_)))},
+    {'Inquiry','PublicRecords_KEL.ECL_Functions.Dataset_FDC','SubMarket',COUNT(__d12(__NL(Sub_Market_))),COUNT(__d12(__NN(Sub_Market_)))},
+    {'Inquiry','PublicRecords_KEL.ECL_Functions.Dataset_FDC','Vertical',COUNT(__d12(__NL(Vertical_))),COUNT(__d12(__NN(Vertical_)))},
+    {'Inquiry','PublicRecords_KEL.ECL_Functions.Dataset_FDC','Industry',COUNT(__d12(__NL(Industry_))),COUNT(__d12(__NN(Industry_)))},
+    {'Inquiry','PublicRecords_KEL.ECL_Functions.Dataset_FDC','FraudpointScore',COUNT(__d12(__NL(Fraudpoint_Score_))),COUNT(__d12(__NN(Fraudpoint_Score_)))},
+    {'Inquiry','PublicRecords_KEL.ECL_Functions.Dataset_FDC','FirstName',COUNT(__d12(__NL(First_Name_))),COUNT(__d12(__NN(First_Name_)))},
+    {'Inquiry','PublicRecords_KEL.ECL_Functions.Dataset_FDC','LastName',COUNT(__d12(__NL(Last_Name_))),COUNT(__d12(__NN(Last_Name_)))},
+    {'Inquiry','PublicRecords_KEL.ECL_Functions.Dataset_FDC','DateOfBirth',COUNT(__d12(__NL(Date_Of_Birth_))),COUNT(__d12(__NN(Date_Of_Birth_)))},
+    {'Inquiry','PublicRecords_KEL.ECL_Functions.Dataset_FDC','LexID',COUNT(__d12(__NL(Lex_I_D_))),COUNT(__d12(__NN(Lex_I_D_)))},
+    {'Inquiry','PublicRecords_KEL.ECL_Functions.Dataset_FDC','bususer_q.prim_range',COUNT(__d12(__NL(Primary_Range_))),COUNT(__d12(__NN(Primary_Range_)))},
+    {'Inquiry','PublicRecords_KEL.ECL_Functions.Dataset_FDC','bususer_q.predir',COUNT(__d12(__NL(Predirectional_))),COUNT(__d12(__NN(Predirectional_)))},
+    {'Inquiry','PublicRecords_KEL.ECL_Functions.Dataset_FDC','bususer_q.prim_name',COUNT(__d12(__NL(Primary_Name_))),COUNT(__d12(__NN(Primary_Name_)))},
+    {'Inquiry','PublicRecords_KEL.ECL_Functions.Dataset_FDC','bususer_q.addr_suffix',COUNT(__d12(__NL(Suffix_))),COUNT(__d12(__NN(Suffix_)))},
+    {'Inquiry','PublicRecords_KEL.ECL_Functions.Dataset_FDC','bususer_q.postdir',COUNT(__d12(__NL(Postdirectional_))),COUNT(__d12(__NN(Postdirectional_)))},
+    {'Inquiry','PublicRecords_KEL.ECL_Functions.Dataset_FDC','bususer_q.sec_range',COUNT(__d12(__NL(Secondary_Range_))),COUNT(__d12(__NN(Secondary_Range_)))},
+    {'Inquiry','PublicRecords_KEL.ECL_Functions.Dataset_FDC','bususer_q.zip5',COUNT(__d12(__NL(Z_I_P5_))),COUNT(__d12(__NN(Z_I_P5_)))},
+    {'Inquiry','PublicRecords_KEL.ECL_Functions.Dataset_FDC','SSN',COUNT(__d12(__NL(S_S_N_))),COUNT(__d12(__NN(S_S_N_)))},
+    {'Inquiry','PublicRecords_KEL.ECL_Functions.Dataset_FDC','AppendedSSN',COUNT(__d12(__NL(Appended_S_S_N_))),COUNT(__d12(__NN(Appended_S_S_N_)))},
+    {'Inquiry','PublicRecords_KEL.ECL_Functions.Dataset_FDC','PersonalPhoneNumber',COUNT(__d12(__NL(Personal_Phone_Number_))),COUNT(__d12(__NN(Personal_Phone_Number_)))},
+    {'Inquiry','PublicRecords_KEL.ECL_Functions.Dataset_FDC','WorkPhoneNumber',COUNT(__d12(__NL(Work_Phone_Number_))),COUNT(__d12(__NN(Work_Phone_Number_)))},
+    {'Inquiry','PublicRecords_KEL.ECL_Functions.Dataset_FDC','EmailAddress',COUNT(__d12(__NL(Email_Address_))),COUNT(__d12(__NN(Email_Address_)))},
+    {'Inquiry','PublicRecords_KEL.ECL_Functions.Dataset_FDC','CompanyName',COUNT(__d12(__NL(Company_Name_))),COUNT(__d12(__NN(Company_Name_)))},
+    {'Inquiry','PublicRecords_KEL.ECL_Functions.Dataset_FDC','CompanyPhone',COUNT(__d12(__NL(Company_Phone_))),COUNT(__d12(__NN(Company_Phone_)))},
+    {'Inquiry','PublicRecords_KEL.ECL_Functions.Dataset_FDC','TIN',COUNT(__d12(__NL(T_I_N_))),COUNT(__d12(__NN(T_I_N_)))},
+    {'Inquiry','PublicRecords_KEL.ECL_Functions.Dataset_FDC','UltID',COUNT(__d12(__NL(Ult_I_D_))),COUNT(__d12(__NN(Ult_I_D_)))},
+    {'Inquiry','PublicRecords_KEL.ECL_Functions.Dataset_FDC','OrgID',COUNT(__d12(__NL(Org_I_D_))),COUNT(__d12(__NN(Org_I_D_)))},
+    {'Inquiry','PublicRecords_KEL.ECL_Functions.Dataset_FDC','SeleID',COUNT(__d12(__NL(Sele_I_D_))),COUNT(__d12(__NN(Sele_I_D_)))},
+    {'Inquiry','PublicRecords_KEL.ECL_Functions.Dataset_FDC','Source',COUNT(__d12(__NL(Source_))),COUNT(__d12(__NN(Source_)))},
+    {'Inquiry','PublicRecords_KEL.ECL_Functions.Dataset_FDC','Archive_Date',COUNT(__d12(Archive___Date_=0)),COUNT(__d12(Archive___Date_!=0))},
+    {'Inquiry','PublicRecords_KEL.ECL_Functions.Dataset_FDC','DateFirstSeen',COUNT(__d12(Date_First_Seen_=0)),COUNT(__d12(Date_First_Seen_!=0))},
+    {'Inquiry','PublicRecords_KEL.ECL_Functions.Dataset_FDC','DateLastSeen',COUNT(__d12(Date_Last_Seen_=0)),COUNT(__d12(Date_Last_Seen_!=0))},
+    {'Inquiry','PublicRecords_KEL.ECL_Functions.Dataset_FDC','HybridArchiveDate',COUNT(__d12(Hybrid_Archive_Date_=0)),COUNT(__d12(Hybrid_Archive_Date_!=0))},
+    {'Inquiry','PublicRecords_KEL.ECL_Functions.Dataset_FDC','VaultDateLastSeen',COUNT(__d12(Vault_Date_Last_Seen_=0)),COUNT(__d12(Vault_Date_Last_Seen_!=0))}]
   ,{KEL.typ.str entity,KEL.typ.str fileName,KEL.typ.str fieldName,KEL.typ.int nullCount,KEL.typ.int notNullCount});
 END;

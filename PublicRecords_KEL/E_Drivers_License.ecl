@@ -72,7 +72,9 @@ EXPORT E_Drivers_License(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, C
   SHARED __d0_Trim := PROJECT(__d0_KELfiltered,TRANSFORM(__Trimmed,SELF.KeyVal:=TRIM((STRING)LEFT.dl_number) + '|' + TRIM((STRING)LEFT.orig_state)));
   SHARED __d1_KELfiltered := __in.Dataset_DriversV2__Key_DL_Number(orig_state != '');
   SHARED __d1_Trim := PROJECT(__d1_KELfiltered,TRANSFORM(__Trimmed,SELF.KeyVal:=TRIM((STRING)LEFT.dl_number) + '|' + TRIM((STRING)LEFT.orig_state)));
-  EXPORT __All_Trim := __d0_Trim + __d1_Trim;
+  SHARED __d2_KELfiltered := __in.Dataset_DriversV2__Key_DL_Number(orig_state != '');
+  SHARED __d2_Trim := PROJECT(__d2_KELfiltered,TRANSFORM(__Trimmed,SELF.KeyVal:=TRIM((STRING)LEFT.dl_number) + '|' + TRIM((STRING)LEFT.orig_state)));
+  EXPORT __All_Trim := __d0_Trim + __d1_Trim + __d2_Trim;
   SHARED __TabRec := RECORD, MAXLENGTH(5000)
     __All_Trim.KeyVal;
     UNSIGNED4 Cnt := COUNT(GROUP);
@@ -106,10 +108,23 @@ EXPORT E_Drivers_License(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, C
     KEL.typ.uid UID := 0;
   END;
   SHARED __d1_UID_Mapped := JOIN(__d1_KELfiltered,Lookup,TRIM((STRING)LEFT.dl_number) + '|' + TRIM((STRING)LEFT.orig_state) = RIGHT.KeyVal,TRANSFORM(__d1_Out,SELF.UID:=RIGHT.UID,SELF:=LEFT),SMART);
-  EXPORT PublicRecords_KEL_ECL_Functions_Dataset_FDC_Dataset_DriversV2__Key_DL_Number_Invalid := __d1_UID_Mapped(UID = 0);
+  EXPORT PublicRecords_KEL_ECL_Functions_Dataset_FDC_Dataset_DriversV2__Key_DL_Number_1_Invalid := __d1_UID_Mapped(UID = 0);
   SHARED __d1_Prefiltered := __d1_UID_Mapped(UID <> 0);
   SHARED __d1 := __SourceFilter(KEL.FromFlat.Convert(__d1_Prefiltered,InLayout,__Mapping1,'PublicRecords_KEL.ECL_Functions.Dataset_FDC'));
-  EXPORT InData := __d0 + __d1;
+  SHARED Active_Date_2Rule(STRING a) := MAP(KEL.Routines.IsValidDate((KEL.typ.kdate)(a[1..6]+'01'))=>a[1..6]+'01','0');
+  SHARED Inactive_Date_2Rule(STRING a) := MAP(KEL.Routines.IsValidDate((KEL.typ.kdate)(a[1..6]+'01'))=>a[1..6]+'01','0');
+  SHARED Date_Last_Seen_2Rule(STRING a) := MAP(KEL.Routines.IsValidDate((KEL.typ.kdate)(a[1..6]+'01'))=>a[1..6]+'01','0');
+  SHARED __Mapping2 := 'UID(DEFAULT:UID),dl_number(OVERRIDE:Drivers_License_Number_:\'\'),orig_state(OVERRIDE:Issuing_State_:\'\'),dl_seq(DEFAULT:Drivers_License_Sequence_:0),licenseclass(DEFAULT:License_Class_:\'\'),licensetype(DEFAULT:License_Type_:\'\'),moxielicensetype(DEFAULT:Moxie_License_Type_:\'\'),attention(DEFAULT:Attention_:\'\'),attentioncode(DEFAULT:Attention_Code_:\'\'),restrictions(DEFAULT:Restrictions_:\'\'),restrictionsdelimited(DEFAULT:Restrictions_Delimited_:\'\'),originalexpirationdate(DEFAULT:Original_Expiration_Date_:DATE),originalissuedate(DEFAULT:Original_Issue_Date_:DATE),issuedate(DEFAULT:Issue_Date_:DATE),expirationdate(DEFAULT:Expiration_Date_:DATE),activedate(DEFAULT:Active_Date_:DATE:Active_Date_2Rule),inactivedate(DEFAULT:Inactive_Date_:DATE:Inactive_Date_2Rule),endorsement(DEFAULT:Endorsement_:\'\'),motorcyclecode(DEFAULT:Motorcycle_Code_:\'\'),drivereducationcode(DEFAULT:Driver_Education_Code_:0),duplicatecount(DEFAULT:Duplicate_Count_:0),rcdstat(DEFAULT:R_C_D_Stat_:\'\'),oospreviousdriverslicensenumber(DEFAULT:O_O_S_Previous_Drivers_License_Number_:\'\'),previousstate(DEFAULT:Previous_State_:\'\'),previousdriverslicensenumber(DEFAULT:Previous_Drivers_License_Number_:\'\'),driverslicensekeynumber(DEFAULT:Drivers_License_Key_Number_:0),issuance(DEFAULT:Issuance_:\'\'),cdlstatus(DEFAULT:C_D_L_Status_:\'\'),county(DEFAULT:County_:\'\'),addresschange(DEFAULT:Address_Change_:\'\'),namechange(DEFAULT:Name_Change_:\'\'),dateofbirthchange(DEFAULT:Date_Of_Birth_Change_:\'\'),sexchange(DEFAULT:Sex_Change_:\'\'),height(DEFAULT:Height_:\'\'),weight(DEFAULT:Weight_:0),race(DEFAULT:Race_:\'\'),racecode(DEFAULT:Race_Code_:\'\'),sex(DEFAULT:Sex_:\'\'),sexcode(DEFAULT:Sex_Code_:\'\'),hair_color_name(OVERRIDE:Hair_Color_:\'\'),haircolorcode(DEFAULT:Hair_Color_Code_:\'\'),eye_color_name(OVERRIDE:Eye_Color_:\'\'),eyecolorcode(DEFAULT:Eye_Color_Code_:\'\'),statename(DEFAULT:State_Name_:\'\'),historyname(DEFAULT:History_Name_:\'\'),history(DEFAULT:History_:\'\'),source(DEFAULT:Source_:\'\'),archive_date(OVERRIDE:Archive___Date_:EPOCH),dt_first_seen(OVERRIDE:Date_First_Seen_:EPOCH),dt_last_seen(OVERRIDE:Date_Last_Seen_:EPOCH:Date_Last_Seen_2Rule),hybridarchivedate(DEFAULT:Hybrid_Archive_Date_:EPOCH),vaultdatelastseen(DEFAULT:Vault_Date_Last_Seen_:EPOCH),DPMBitmap(OVERRIDE:__Permits:PERMITS)';
+  SHARED __d2_Norm := NORMALIZE(__in,LEFT.Dataset_DriversV2__Key_DL_Number,TRANSFORM(RECORDOF(__in.Dataset_DriversV2__Key_DL_Number),SELF:=RIGHT));
+  SHARED __d2_Out := RECORD
+    RECORDOF(PublicRecords_KEL.ECL_Functions.Dataset_FDC.Dataset_DriversV2__Key_DL_Number);
+    KEL.typ.uid UID := 0;
+  END;
+  SHARED __d2_UID_Mapped := JOIN(__d2_KELfiltered,Lookup,TRIM((STRING)LEFT.dl_number) + '|' + TRIM((STRING)LEFT.orig_state) = RIGHT.KeyVal,TRANSFORM(__d2_Out,SELF.UID:=RIGHT.UID,SELF:=LEFT),SMART);
+  EXPORT PublicRecords_KEL_ECL_Functions_Dataset_FDC_Dataset_DriversV2__Key_DL_Number_2_Invalid := __d2_UID_Mapped(UID = 0);
+  SHARED __d2_Prefiltered := __d2_UID_Mapped(UID <> 0);
+  SHARED __d2 := __SourceFilter(KEL.FromFlat.Convert(__d2_Prefiltered,InLayout,__Mapping2,'PublicRecords_KEL.ECL_Functions.Dataset_FDC'));
+  EXPORT InData := __d0 + __d1 + __d2;
   EXPORT Previous_Layout := RECORD
     KEL.typ.nstr O_O_S_Previous_Drivers_License_Number_;
     KEL.typ.nstr Previous_State_;
@@ -289,7 +304,7 @@ EXPORT E_Drivers_License(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, C
   EXPORT County__SingleValue_Invalid := KEL.Intake.DetectMultipleValuesOnResult(Result,County_);
   EXPORT History_Name__SingleValue_Invalid := KEL.Intake.DetectMultipleValuesOnResult(Result,History_Name_);
   EXPORT History__SingleValue_Invalid := KEL.Intake.DetectMultipleValuesOnResult(Result,History_);
-  EXPORT SanityCheck := DATASET([{COUNT(PublicRecords_KEL_ECL_Functions_Dataset_FDC_Dataset_DriversV2__Key_DL_DID_Invalid),COUNT(PublicRecords_KEL_ECL_Functions_Dataset_FDC_Dataset_DriversV2__Key_DL_Number_Invalid),COUNT(Drivers_License_Number__SingleValue_Invalid),COUNT(Issuing_State__SingleValue_Invalid),COUNT(State_Name__SingleValue_Invalid),COUNT(Drivers_License_Sequence__SingleValue_Invalid),COUNT(License_Class__SingleValue_Invalid),COUNT(License_Type__SingleValue_Invalid),COUNT(Moxie_License_Type__SingleValue_Invalid),COUNT(Attention__SingleValue_Invalid),COUNT(Attention_Code__SingleValue_Invalid),COUNT(Restrictions__SingleValue_Invalid),COUNT(Restrictions_Delimited__SingleValue_Invalid),COUNT(Original_Expiration_Date__SingleValue_Invalid),COUNT(Original_Issue_Date__SingleValue_Invalid),COUNT(Issue_Date__SingleValue_Invalid),COUNT(Expiration_Date__SingleValue_Invalid),COUNT(Active_Date__SingleValue_Invalid),COUNT(Inactive_Date__SingleValue_Invalid),COUNT(Endorsement__SingleValue_Invalid),COUNT(Motorcycle_Code__SingleValue_Invalid),COUNT(Driver_Education_Code__SingleValue_Invalid),COUNT(Duplicate_Count__SingleValue_Invalid),COUNT(R_C_D_Stat__SingleValue_Invalid),COUNT(Issuance__SingleValue_Invalid),COUNT(C_D_L_Status__SingleValue_Invalid),COUNT(County__SingleValue_Invalid),COUNT(History_Name__SingleValue_Invalid),COUNT(History__SingleValue_Invalid),TopSourcedUIDs(1)}],{KEL.typ.int PublicRecords_KEL_ECL_Functions_Dataset_FDC_Dataset_DriversV2__Key_DL_DID_Invalid,KEL.typ.int PublicRecords_KEL_ECL_Functions_Dataset_FDC_Dataset_DriversV2__Key_DL_Number_Invalid,KEL.typ.int Drivers_License_Number__SingleValue_Invalid,KEL.typ.int Issuing_State__SingleValue_Invalid,KEL.typ.int State_Name__SingleValue_Invalid,KEL.typ.int Drivers_License_Sequence__SingleValue_Invalid,KEL.typ.int License_Class__SingleValue_Invalid,KEL.typ.int License_Type__SingleValue_Invalid,KEL.typ.int Moxie_License_Type__SingleValue_Invalid,KEL.typ.int Attention__SingleValue_Invalid,KEL.typ.int Attention_Code__SingleValue_Invalid,KEL.typ.int Restrictions__SingleValue_Invalid,KEL.typ.int Restrictions_Delimited__SingleValue_Invalid,KEL.typ.int Original_Expiration_Date__SingleValue_Invalid,KEL.typ.int Original_Issue_Date__SingleValue_Invalid,KEL.typ.int Issue_Date__SingleValue_Invalid,KEL.typ.int Expiration_Date__SingleValue_Invalid,KEL.typ.int Active_Date__SingleValue_Invalid,KEL.typ.int Inactive_Date__SingleValue_Invalid,KEL.typ.int Endorsement__SingleValue_Invalid,KEL.typ.int Motorcycle_Code__SingleValue_Invalid,KEL.typ.int Driver_Education_Code__SingleValue_Invalid,KEL.typ.int Duplicate_Count__SingleValue_Invalid,KEL.typ.int R_C_D_Stat__SingleValue_Invalid,KEL.typ.int Issuance__SingleValue_Invalid,KEL.typ.int C_D_L_Status__SingleValue_Invalid,KEL.typ.int County__SingleValue_Invalid,KEL.typ.int History_Name__SingleValue_Invalid,KEL.typ.int History__SingleValue_Invalid,DATASET(RECORDOF(UIDSourceCounts)) topSourcedUID});
+  EXPORT SanityCheck := DATASET([{COUNT(PublicRecords_KEL_ECL_Functions_Dataset_FDC_Dataset_DriversV2__Key_DL_DID_Invalid),COUNT(PublicRecords_KEL_ECL_Functions_Dataset_FDC_Dataset_DriversV2__Key_DL_Number_1_Invalid),COUNT(PublicRecords_KEL_ECL_Functions_Dataset_FDC_Dataset_DriversV2__Key_DL_Number_2_Invalid),COUNT(Drivers_License_Number__SingleValue_Invalid),COUNT(Issuing_State__SingleValue_Invalid),COUNT(State_Name__SingleValue_Invalid),COUNT(Drivers_License_Sequence__SingleValue_Invalid),COUNT(License_Class__SingleValue_Invalid),COUNT(License_Type__SingleValue_Invalid),COUNT(Moxie_License_Type__SingleValue_Invalid),COUNT(Attention__SingleValue_Invalid),COUNT(Attention_Code__SingleValue_Invalid),COUNT(Restrictions__SingleValue_Invalid),COUNT(Restrictions_Delimited__SingleValue_Invalid),COUNT(Original_Expiration_Date__SingleValue_Invalid),COUNT(Original_Issue_Date__SingleValue_Invalid),COUNT(Issue_Date__SingleValue_Invalid),COUNT(Expiration_Date__SingleValue_Invalid),COUNT(Active_Date__SingleValue_Invalid),COUNT(Inactive_Date__SingleValue_Invalid),COUNT(Endorsement__SingleValue_Invalid),COUNT(Motorcycle_Code__SingleValue_Invalid),COUNT(Driver_Education_Code__SingleValue_Invalid),COUNT(Duplicate_Count__SingleValue_Invalid),COUNT(R_C_D_Stat__SingleValue_Invalid),COUNT(Issuance__SingleValue_Invalid),COUNT(C_D_L_Status__SingleValue_Invalid),COUNT(County__SingleValue_Invalid),COUNT(History_Name__SingleValue_Invalid),COUNT(History__SingleValue_Invalid),TopSourcedUIDs(1)}],{KEL.typ.int PublicRecords_KEL_ECL_Functions_Dataset_FDC_Dataset_DriversV2__Key_DL_DID_Invalid,KEL.typ.int PublicRecords_KEL_ECL_Functions_Dataset_FDC_Dataset_DriversV2__Key_DL_Number_1_Invalid,KEL.typ.int PublicRecords_KEL_ECL_Functions_Dataset_FDC_Dataset_DriversV2__Key_DL_Number_2_Invalid,KEL.typ.int Drivers_License_Number__SingleValue_Invalid,KEL.typ.int Issuing_State__SingleValue_Invalid,KEL.typ.int State_Name__SingleValue_Invalid,KEL.typ.int Drivers_License_Sequence__SingleValue_Invalid,KEL.typ.int License_Class__SingleValue_Invalid,KEL.typ.int License_Type__SingleValue_Invalid,KEL.typ.int Moxie_License_Type__SingleValue_Invalid,KEL.typ.int Attention__SingleValue_Invalid,KEL.typ.int Attention_Code__SingleValue_Invalid,KEL.typ.int Restrictions__SingleValue_Invalid,KEL.typ.int Restrictions_Delimited__SingleValue_Invalid,KEL.typ.int Original_Expiration_Date__SingleValue_Invalid,KEL.typ.int Original_Issue_Date__SingleValue_Invalid,KEL.typ.int Issue_Date__SingleValue_Invalid,KEL.typ.int Expiration_Date__SingleValue_Invalid,KEL.typ.int Active_Date__SingleValue_Invalid,KEL.typ.int Inactive_Date__SingleValue_Invalid,KEL.typ.int Endorsement__SingleValue_Invalid,KEL.typ.int Motorcycle_Code__SingleValue_Invalid,KEL.typ.int Driver_Education_Code__SingleValue_Invalid,KEL.typ.int Duplicate_Count__SingleValue_Invalid,KEL.typ.int R_C_D_Stat__SingleValue_Invalid,KEL.typ.int Issuance__SingleValue_Invalid,KEL.typ.int C_D_L_Status__SingleValue_Invalid,KEL.typ.int County__SingleValue_Invalid,KEL.typ.int History_Name__SingleValue_Invalid,KEL.typ.int History__SingleValue_Invalid,DATASET(RECORDOF(UIDSourceCounts)) topSourcedUID});
   EXPORT NullCounts := DATASET([
     {'DriversLicense','PublicRecords_KEL.ECL_Functions.Dataset_FDC','UID',COUNT(PublicRecords_KEL_ECL_Functions_Dataset_FDC_Dataset_DriversV2__Key_DL_DID_Invalid),COUNT(__d0)},
     {'DriversLicense','PublicRecords_KEL.ECL_Functions.Dataset_FDC','dl_number',COUNT(__d0(__NL(Drivers_License_Number_))),COUNT(__d0(__NN(Drivers_License_Number_)))},
@@ -343,7 +358,7 @@ EXPORT E_Drivers_License(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, C
     {'DriversLicense','PublicRecords_KEL.ECL_Functions.Dataset_FDC','DateLastSeen',COUNT(__d0(Date_Last_Seen_=0)),COUNT(__d0(Date_Last_Seen_!=0))},
     {'DriversLicense','PublicRecords_KEL.ECL_Functions.Dataset_FDC','HybridArchiveDate',COUNT(__d0(Hybrid_Archive_Date_=0)),COUNT(__d0(Hybrid_Archive_Date_!=0))},
     {'DriversLicense','PublicRecords_KEL.ECL_Functions.Dataset_FDC','VaultDateLastSeen',COUNT(__d0(Vault_Date_Last_Seen_=0)),COUNT(__d0(Vault_Date_Last_Seen_!=0))},
-    {'DriversLicense','PublicRecords_KEL.ECL_Functions.Dataset_FDC','UID',COUNT(PublicRecords_KEL_ECL_Functions_Dataset_FDC_Dataset_DriversV2__Key_DL_Number_Invalid),COUNT(__d1)},
+    {'DriversLicense','PublicRecords_KEL.ECL_Functions.Dataset_FDC','UID',COUNT(PublicRecords_KEL_ECL_Functions_Dataset_FDC_Dataset_DriversV2__Key_DL_Number_1_Invalid),COUNT(__d1)},
     {'DriversLicense','PublicRecords_KEL.ECL_Functions.Dataset_FDC','dl_number',COUNT(__d1(__NL(Drivers_License_Number_))),COUNT(__d1(__NN(Drivers_License_Number_)))},
     {'DriversLicense','PublicRecords_KEL.ECL_Functions.Dataset_FDC','orig_state',COUNT(__d1(__NL(Issuing_State_))),COUNT(__d1(__NN(Issuing_State_)))},
     {'DriversLicense','PublicRecords_KEL.ECL_Functions.Dataset_FDC','dl_seq',COUNT(__d1(__NL(Drivers_License_Sequence_))),COUNT(__d1(__NN(Drivers_License_Sequence_)))},
@@ -394,6 +409,58 @@ EXPORT E_Drivers_License(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, C
     {'DriversLicense','PublicRecords_KEL.ECL_Functions.Dataset_FDC','DateFirstSeen',COUNT(__d1(Date_First_Seen_=0)),COUNT(__d1(Date_First_Seen_!=0))},
     {'DriversLicense','PublicRecords_KEL.ECL_Functions.Dataset_FDC','DateLastSeen',COUNT(__d1(Date_Last_Seen_=0)),COUNT(__d1(Date_Last_Seen_!=0))},
     {'DriversLicense','PublicRecords_KEL.ECL_Functions.Dataset_FDC','HybridArchiveDate',COUNT(__d1(Hybrid_Archive_Date_=0)),COUNT(__d1(Hybrid_Archive_Date_!=0))},
-    {'DriversLicense','PublicRecords_KEL.ECL_Functions.Dataset_FDC','VaultDateLastSeen',COUNT(__d1(Vault_Date_Last_Seen_=0)),COUNT(__d1(Vault_Date_Last_Seen_!=0))}]
+    {'DriversLicense','PublicRecords_KEL.ECL_Functions.Dataset_FDC','VaultDateLastSeen',COUNT(__d1(Vault_Date_Last_Seen_=0)),COUNT(__d1(Vault_Date_Last_Seen_!=0))},
+    {'DriversLicense','PublicRecords_KEL.ECL_Functions.Dataset_FDC','UID',COUNT(PublicRecords_KEL_ECL_Functions_Dataset_FDC_Dataset_DriversV2__Key_DL_Number_2_Invalid),COUNT(__d2)},
+    {'DriversLicense','PublicRecords_KEL.ECL_Functions.Dataset_FDC','dl_number',COUNT(__d2(__NL(Drivers_License_Number_))),COUNT(__d2(__NN(Drivers_License_Number_)))},
+    {'DriversLicense','PublicRecords_KEL.ECL_Functions.Dataset_FDC','orig_state',COUNT(__d2(__NL(Issuing_State_))),COUNT(__d2(__NN(Issuing_State_)))},
+    {'DriversLicense','PublicRecords_KEL.ECL_Functions.Dataset_FDC','dl_seq',COUNT(__d2(__NL(Drivers_License_Sequence_))),COUNT(__d2(__NN(Drivers_License_Sequence_)))},
+    {'DriversLicense','PublicRecords_KEL.ECL_Functions.Dataset_FDC','LicenseClass',COUNT(__d2(__NL(License_Class_))),COUNT(__d2(__NN(License_Class_)))},
+    {'DriversLicense','PublicRecords_KEL.ECL_Functions.Dataset_FDC','LicenseType',COUNT(__d2(__NL(License_Type_))),COUNT(__d2(__NN(License_Type_)))},
+    {'DriversLicense','PublicRecords_KEL.ECL_Functions.Dataset_FDC','MoxieLicenseType',COUNT(__d2(__NL(Moxie_License_Type_))),COUNT(__d2(__NN(Moxie_License_Type_)))},
+    {'DriversLicense','PublicRecords_KEL.ECL_Functions.Dataset_FDC','Attention',COUNT(__d2(__NL(Attention_))),COUNT(__d2(__NN(Attention_)))},
+    {'DriversLicense','PublicRecords_KEL.ECL_Functions.Dataset_FDC','AttentionCode',COUNT(__d2(__NL(Attention_Code_))),COUNT(__d2(__NN(Attention_Code_)))},
+    {'DriversLicense','PublicRecords_KEL.ECL_Functions.Dataset_FDC','Restrictions',COUNT(__d2(__NL(Restrictions_))),COUNT(__d2(__NN(Restrictions_)))},
+    {'DriversLicense','PublicRecords_KEL.ECL_Functions.Dataset_FDC','RestrictionsDelimited',COUNT(__d2(__NL(Restrictions_Delimited_))),COUNT(__d2(__NN(Restrictions_Delimited_)))},
+    {'DriversLicense','PublicRecords_KEL.ECL_Functions.Dataset_FDC','OriginalExpirationDate',COUNT(__d2(__NL(Original_Expiration_Date_))),COUNT(__d2(__NN(Original_Expiration_Date_)))},
+    {'DriversLicense','PublicRecords_KEL.ECL_Functions.Dataset_FDC','OriginalIssueDate',COUNT(__d2(__NL(Original_Issue_Date_))),COUNT(__d2(__NN(Original_Issue_Date_)))},
+    {'DriversLicense','PublicRecords_KEL.ECL_Functions.Dataset_FDC','IssueDate',COUNT(__d2(__NL(Issue_Date_))),COUNT(__d2(__NN(Issue_Date_)))},
+    {'DriversLicense','PublicRecords_KEL.ECL_Functions.Dataset_FDC','ExpirationDate',COUNT(__d2(__NL(Expiration_Date_))),COUNT(__d2(__NN(Expiration_Date_)))},
+    {'DriversLicense','PublicRecords_KEL.ECL_Functions.Dataset_FDC','ActiveDate',COUNT(__d2(__NL(Active_Date_))),COUNT(__d2(__NN(Active_Date_)))},
+    {'DriversLicense','PublicRecords_KEL.ECL_Functions.Dataset_FDC','InactiveDate',COUNT(__d2(__NL(Inactive_Date_))),COUNT(__d2(__NN(Inactive_Date_)))},
+    {'DriversLicense','PublicRecords_KEL.ECL_Functions.Dataset_FDC','Endorsement',COUNT(__d2(__NL(Endorsement_))),COUNT(__d2(__NN(Endorsement_)))},
+    {'DriversLicense','PublicRecords_KEL.ECL_Functions.Dataset_FDC','MotorcycleCode',COUNT(__d2(__NL(Motorcycle_Code_))),COUNT(__d2(__NN(Motorcycle_Code_)))},
+    {'DriversLicense','PublicRecords_KEL.ECL_Functions.Dataset_FDC','DriverEducationCode',COUNT(__d2(__NL(Driver_Education_Code_))),COUNT(__d2(__NN(Driver_Education_Code_)))},
+    {'DriversLicense','PublicRecords_KEL.ECL_Functions.Dataset_FDC','DuplicateCount',COUNT(__d2(__NL(Duplicate_Count_))),COUNT(__d2(__NN(Duplicate_Count_)))},
+    {'DriversLicense','PublicRecords_KEL.ECL_Functions.Dataset_FDC','RCDStat',COUNT(__d2(__NL(R_C_D_Stat_))),COUNT(__d2(__NN(R_C_D_Stat_)))},
+    {'DriversLicense','PublicRecords_KEL.ECL_Functions.Dataset_FDC','OOSPreviousDriversLicenseNumber',COUNT(__d2(__NL(O_O_S_Previous_Drivers_License_Number_))),COUNT(__d2(__NN(O_O_S_Previous_Drivers_License_Number_)))},
+    {'DriversLicense','PublicRecords_KEL.ECL_Functions.Dataset_FDC','PreviousState',COUNT(__d2(__NL(Previous_State_))),COUNT(__d2(__NN(Previous_State_)))},
+    {'DriversLicense','PublicRecords_KEL.ECL_Functions.Dataset_FDC','PreviousDriversLicenseNumber',COUNT(__d2(__NL(Previous_Drivers_License_Number_))),COUNT(__d2(__NN(Previous_Drivers_License_Number_)))},
+    {'DriversLicense','PublicRecords_KEL.ECL_Functions.Dataset_FDC','DriversLicenseKeyNumber',COUNT(__d2(__NL(Drivers_License_Key_Number_))),COUNT(__d2(__NN(Drivers_License_Key_Number_)))},
+    {'DriversLicense','PublicRecords_KEL.ECL_Functions.Dataset_FDC','Issuance',COUNT(__d2(__NL(Issuance_))),COUNT(__d2(__NN(Issuance_)))},
+    {'DriversLicense','PublicRecords_KEL.ECL_Functions.Dataset_FDC','CDLStatus',COUNT(__d2(__NL(C_D_L_Status_))),COUNT(__d2(__NN(C_D_L_Status_)))},
+    {'DriversLicense','PublicRecords_KEL.ECL_Functions.Dataset_FDC','County',COUNT(__d2(__NL(County_))),COUNT(__d2(__NN(County_)))},
+    {'DriversLicense','PublicRecords_KEL.ECL_Functions.Dataset_FDC','AddressChange',COUNT(__d2(__NL(Address_Change_))),COUNT(__d2(__NN(Address_Change_)))},
+    {'DriversLicense','PublicRecords_KEL.ECL_Functions.Dataset_FDC','NameChange',COUNT(__d2(__NL(Name_Change_))),COUNT(__d2(__NN(Name_Change_)))},
+    {'DriversLicense','PublicRecords_KEL.ECL_Functions.Dataset_FDC','DateOfBirthChange',COUNT(__d2(__NL(Date_Of_Birth_Change_))),COUNT(__d2(__NN(Date_Of_Birth_Change_)))},
+    {'DriversLicense','PublicRecords_KEL.ECL_Functions.Dataset_FDC','SexChange',COUNT(__d2(__NL(Sex_Change_))),COUNT(__d2(__NN(Sex_Change_)))},
+    {'DriversLicense','PublicRecords_KEL.ECL_Functions.Dataset_FDC','Height',COUNT(__d2(__NL(Height_))),COUNT(__d2(__NN(Height_)))},
+    {'DriversLicense','PublicRecords_KEL.ECL_Functions.Dataset_FDC','Weight',COUNT(__d2(__NL(Weight_))),COUNT(__d2(__NN(Weight_)))},
+    {'DriversLicense','PublicRecords_KEL.ECL_Functions.Dataset_FDC','Race',COUNT(__d2(__NL(Race_))),COUNT(__d2(__NN(Race_)))},
+    {'DriversLicense','PublicRecords_KEL.ECL_Functions.Dataset_FDC','RaceCode',COUNT(__d2(__NL(Race_Code_))),COUNT(__d2(__NN(Race_Code_)))},
+    {'DriversLicense','PublicRecords_KEL.ECL_Functions.Dataset_FDC','Sex',COUNT(__d2(__NL(Sex_))),COUNT(__d2(__NN(Sex_)))},
+    {'DriversLicense','PublicRecords_KEL.ECL_Functions.Dataset_FDC','SexCode',COUNT(__d2(__NL(Sex_Code_))),COUNT(__d2(__NN(Sex_Code_)))},
+    {'DriversLicense','PublicRecords_KEL.ECL_Functions.Dataset_FDC','hair_color_name',COUNT(__d2(__NL(Hair_Color_))),COUNT(__d2(__NN(Hair_Color_)))},
+    {'DriversLicense','PublicRecords_KEL.ECL_Functions.Dataset_FDC','HairColorCode',COUNT(__d2(__NL(Hair_Color_Code_))),COUNT(__d2(__NN(Hair_Color_Code_)))},
+    {'DriversLicense','PublicRecords_KEL.ECL_Functions.Dataset_FDC','eye_color_name',COUNT(__d2(__NL(Eye_Color_))),COUNT(__d2(__NN(Eye_Color_)))},
+    {'DriversLicense','PublicRecords_KEL.ECL_Functions.Dataset_FDC','EyeColorCode',COUNT(__d2(__NL(Eye_Color_Code_))),COUNT(__d2(__NN(Eye_Color_Code_)))},
+    {'DriversLicense','PublicRecords_KEL.ECL_Functions.Dataset_FDC','StateName',COUNT(__d2(__NL(State_Name_))),COUNT(__d2(__NN(State_Name_)))},
+    {'DriversLicense','PublicRecords_KEL.ECL_Functions.Dataset_FDC','HistoryName',COUNT(__d2(__NL(History_Name_))),COUNT(__d2(__NN(History_Name_)))},
+    {'DriversLicense','PublicRecords_KEL.ECL_Functions.Dataset_FDC','History',COUNT(__d2(__NL(History_))),COUNT(__d2(__NN(History_)))},
+    {'DriversLicense','PublicRecords_KEL.ECL_Functions.Dataset_FDC','Source',COUNT(__d2(__NL(Source_))),COUNT(__d2(__NN(Source_)))},
+    {'DriversLicense','PublicRecords_KEL.ECL_Functions.Dataset_FDC','Archive_Date',COUNT(__d2(Archive___Date_=0)),COUNT(__d2(Archive___Date_!=0))},
+    {'DriversLicense','PublicRecords_KEL.ECL_Functions.Dataset_FDC','DateFirstSeen',COUNT(__d2(Date_First_Seen_=0)),COUNT(__d2(Date_First_Seen_!=0))},
+    {'DriversLicense','PublicRecords_KEL.ECL_Functions.Dataset_FDC','DateLastSeen',COUNT(__d2(Date_Last_Seen_=0)),COUNT(__d2(Date_Last_Seen_!=0))},
+    {'DriversLicense','PublicRecords_KEL.ECL_Functions.Dataset_FDC','HybridArchiveDate',COUNT(__d2(Hybrid_Archive_Date_=0)),COUNT(__d2(Hybrid_Archive_Date_!=0))},
+    {'DriversLicense','PublicRecords_KEL.ECL_Functions.Dataset_FDC','VaultDateLastSeen',COUNT(__d2(Vault_Date_Last_Seen_=0)),COUNT(__d2(Vault_Date_Last_Seen_!=0))}]
   ,{KEL.typ.str entity,KEL.typ.str fileName,KEL.typ.str fieldName,KEL.typ.int nullCount,KEL.typ.int notNullCount});
 END;
