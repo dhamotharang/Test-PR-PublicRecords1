@@ -528,8 +528,10 @@ functionmacro
     #ELSE
       return when(ds_result 
         ,parallel(
-           output(ds_overall_stats                                                                                                                        ,named('LinkingTools_mac_Suppress_ds_overall_stats'                        ),all)
-          ,output(topn(ds_fields_suppressed_stats             ,300  ,-cnt                                                                               ) ,named('LinkingTools_mac_Suppress_ds_fields_suppressed_stats'            ),all)  
+          #IF(pShouldExplode = true)   
+           output(ds_overall_stats                                                                                                                        ,named('LinkingTools_mac_Suppress_ds_overall_stats'                        ),all),
+          #END
+           output(topn(ds_fields_suppressed_stats             ,300  ,-cnt                                                                               ) ,named('LinkingTools_mac_Suppress_ds_fields_suppressed_stats'            ),all)  
           ,output(topn(ds_fields_and_values_suppressed_stats  ,300  ,-cnt                                                                               ) ,named('LinkingTools_mac_Suppress_ds_fields_and_values_suppressed_stats' ),all)
           ,output(topn(ds_suppressionid_stats                 ,300  ,-cnt                                                                               ) ,named('LinkingTools_mac_Suppress_ds_suppressionid_stats'                ),all)
           // #IF(pShouldExplode = true and pShouldIncrementFile = true) 
