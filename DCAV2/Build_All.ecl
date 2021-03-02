@@ -1,4 +1,4 @@
-﻿import tools, _control, Scrubs, Scrubs_DCA, ut, std;
+﻿import tools, _control, Scrubs, Scrubs_DCA, ut, std, RoxieKeybuild, _control, tools, Orbit3;
 export Build_All(
 	 string														pversion
 	,string														pDirectory					= '/data/prod_data_build_13/eval_data/dca/build/'
@@ -40,7 +40,10 @@ function
 		,Promote().Inputfiles.using2used
 		,Promote(,'base').Buildfiles.Built2QA
 		,Promote(,'key',,,pKeyDatasetName).Buildfiles.Built2QA
-	) : success(Send_Emails(pversion,,,pKeyDatasetName).roxie), failure(send_emails(pversion).buildfailure);
+		,RoxieKeybuild.updateversion('DCAKeys', pversion,'melanie.jackson@lexisnexisrisk.com', , 'N')
+		,Orbit3.proc_Orbit3_CreateBuild_AddItem('DCA',(pversion),'N')
+		
+		) : success(Send_Emails(pversion,,,pKeyDatasetName).roxie), failure(send_emails(pversion).buildfailure);
 	
 	return
 		if(tools.fun_IsValidVersion(pversion)
