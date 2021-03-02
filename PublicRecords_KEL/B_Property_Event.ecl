@@ -4,6 +4,6 @@ IMPORT B_Property_Event_1,B_Property_Event_6,CFG_Compile,E_Property,E_Property_E
 IMPORT * FROM KEL15.Null;
 EXPORT B_Property_Event(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG_Compile __cfg = CFG_Compile) := MODULE
   SHARED VIRTUAL TYPEOF(B_Property_Event_1(__in,__cfg).__ENH_Property_Event_1) __ENH_Property_Event_1 := B_Property_Event_1(__in,__cfg).__ENH_Property_Event_1;
-  SHARED __EE12089025 := __ENH_Property_Event_1;
-  EXPORT __ENH_Property_Event := __EE12089025;
+  SHARED __EE11838233 := __ENH_Property_Event_1;
+  EXPORT __ENH_Property_Event := __EE11838233;
 END;

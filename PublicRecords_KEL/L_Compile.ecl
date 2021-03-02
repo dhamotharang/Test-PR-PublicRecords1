@@ -974,224 +974,6 @@ EXPORT L_Compile := MODULE
     KEL.typ.epoch Vault_Date_Last_Seen_ := 0;
     KEL.typ.int __RecordCount := 0;
   END;
-  SHARED Non_F_C_R_A_Person_Attributes_V1_Dynamic_Res0_Internal_Layout_P_L___Ast_Veh_Air_Emrg_Dt_List_Ev_Layout := RECORD
-    KEL.typ.ntyp(E_Aircraft().Typ) Plane_;
-    KEL.typ.nstr Aircraft_First_Seen_Date_;
-    KEL.typ.epoch Archive___Date_ := 0;
-    KEL.typ.epoch Date_First_Seen_ := 0;
-    KEL.typ.epoch Date_Last_Seen_ := 0;
-    KEL.typ.epoch Hybrid_Archive_Date_ := 0;
-    KEL.typ.epoch Vault_Date_Last_Seen_ := 0;
-    KEL.typ.int __RecordCount := 0;
-  END;
-  SHARED Non_F_C_R_A_Person_Attributes_V1_Dynamic_Res0_Internal_Layout_P_L___Ast_Veh_Wtr_Emrg_Dt_List_Ev_Layout := RECORD
-    KEL.typ.ntyp(E_Watercraft().Typ) W_Craft_;
-    KEL.typ.nstr Watercraft_First_Seen_Date_;
-    KEL.typ.epoch Archive___Date_ := 0;
-    KEL.typ.epoch Date_First_Seen_ := 0;
-    KEL.typ.epoch Date_Last_Seen_ := 0;
-    KEL.typ.epoch Hybrid_Archive_Date_ := 0;
-    KEL.typ.epoch Vault_Date_Last_Seen_ := 0;
-    KEL.typ.int __RecordCount := 0;
-  END;
-  SHARED Non_F_C_R_A_Person_Attributes_V1_Dynamic_Res0_Internal_Layout_P_L___Drg_Bk_Dt_List1_Y_Layout := RECORD
-    KEL.typ.nstr T_M_S_I_D_;
-    KEL.typ.nstr Case_Number_;
-    KEL.typ.nstr Court_Code_;
-    KEL.typ.nkdate Bankruptcy_Date_;
-    KEL.typ.nkdate Last_Status_Update_;
-    KEL.typ.nkdate Date_Filed_;
-    KEL.typ.epoch Archive___Date_ := 0;
-    KEL.typ.epoch Date_First_Seen_ := 0;
-    KEL.typ.epoch Date_Last_Seen_ := 0;
-    KEL.typ.epoch Hybrid_Archive_Date_ := 0;
-    KEL.typ.epoch Vault_Date_Last_Seen_ := 0;
-    KEL.typ.int __RecordCount := 0;
-  END;
-  SHARED Non_F_C_R_A_Person_Attributes_V1_Dynamic_Res0_Internal_Layout_P_L___Drg_Bk_Dt_List7_Y_Layout := RECORD
-    KEL.typ.nstr T_M_S_I_D_;
-    KEL.typ.nstr Case_Number_;
-    KEL.typ.nstr Court_Code_;
-    KEL.typ.nkdate Bankruptcy_Date_;
-    KEL.typ.nkdate Last_Status_Update_;
-    KEL.typ.nkdate Date_Filed_;
-    KEL.typ.epoch Archive___Date_ := 0;
-    KEL.typ.epoch Date_First_Seen_ := 0;
-    KEL.typ.epoch Date_Last_Seen_ := 0;
-    KEL.typ.epoch Hybrid_Archive_Date_ := 0;
-    KEL.typ.epoch Vault_Date_Last_Seen_ := 0;
-    KEL.typ.int __RecordCount := 0;
-  END;
-  SHARED Non_F_C_R_A_Person_Attributes_V1_Dynamic_Res0_Internal_Layout_P_L___Drg_Bk_Dt_List10_Y_Layout := RECORD
-    KEL.typ.nstr T_M_S_I_D_;
-    KEL.typ.nstr Case_Number_;
-    KEL.typ.nstr Court_Code_;
-    KEL.typ.nkdate Bankruptcy_Date_;
-    KEL.typ.nkdate Last_Status_Update_;
-    KEL.typ.nkdate Date_Filed_;
-    KEL.typ.epoch Archive___Date_ := 0;
-    KEL.typ.epoch Date_First_Seen_ := 0;
-    KEL.typ.epoch Date_Last_Seen_ := 0;
-    KEL.typ.epoch Hybrid_Archive_Date_ := 0;
-    KEL.typ.epoch Vault_Date_Last_Seen_ := 0;
-    KEL.typ.int __RecordCount := 0;
-  END;
-  SHARED Non_F_C_R_A_Person_Attributes_V1_Dynamic_Res0_Internal_Layout_P_L___Drg_Bk_Ch_List1_Y_Layout := RECORD
-    KEL.typ.nstr Original_Chapter_;
-    KEL.typ.nstr T_M_S_I_D_;
-    KEL.typ.nstr Case_Number_;
-    KEL.typ.nstr Court_Code_;
-    KEL.typ.nkdate Bankruptcy_Date_;
-    KEL.typ.nkdate Last_Status_Update_;
-    KEL.typ.nkdate Date_Filed_;
-    KEL.typ.epoch Archive___Date_ := 0;
-    KEL.typ.epoch Date_First_Seen_ := 0;
-    KEL.typ.epoch Date_Last_Seen_ := 0;
-    KEL.typ.epoch Hybrid_Archive_Date_ := 0;
-    KEL.typ.epoch Vault_Date_Last_Seen_ := 0;
-    KEL.typ.int __RecordCount := 0;
-  END;
-  SHARED Non_F_C_R_A_Person_Attributes_V1_Dynamic_Res0_Internal_Layout_P_L___Drg_Bk_Ch_List7_Y_Layout := RECORD
-    KEL.typ.nstr Original_Chapter_;
-    KEL.typ.nstr T_M_S_I_D_;
-    KEL.typ.nstr Case_Number_;
-    KEL.typ.nstr Court_Code_;
-    KEL.typ.nkdate Bankruptcy_Date_;
-    KEL.typ.nkdate Last_Status_Update_;
-    KEL.typ.nkdate Date_Filed_;
-    KEL.typ.epoch Archive___Date_ := 0;
-    KEL.typ.epoch Date_First_Seen_ := 0;
-    KEL.typ.epoch Date_Last_Seen_ := 0;
-    KEL.typ.epoch Hybrid_Archive_Date_ := 0;
-    KEL.typ.epoch Vault_Date_Last_Seen_ := 0;
-    KEL.typ.int __RecordCount := 0;
-  END;
-  SHARED Non_F_C_R_A_Person_Attributes_V1_Dynamic_Res0_Internal_Layout_P_L___Drg_Bk_Ch_List10_Y_Layout := RECORD
-    KEL.typ.nstr Original_Chapter_;
-    KEL.typ.nstr T_M_S_I_D_;
-    KEL.typ.nstr Case_Number_;
-    KEL.typ.nstr Court_Code_;
-    KEL.typ.nkdate Bankruptcy_Date_;
-    KEL.typ.nkdate Last_Status_Update_;
-    KEL.typ.nkdate Date_Filed_;
-    KEL.typ.epoch Archive___Date_ := 0;
-    KEL.typ.epoch Date_First_Seen_ := 0;
-    KEL.typ.epoch Date_Last_Seen_ := 0;
-    KEL.typ.epoch Hybrid_Archive_Date_ := 0;
-    KEL.typ.epoch Vault_Date_Last_Seen_ := 0;
-    KEL.typ.int __RecordCount := 0;
-  END;
-  SHARED Non_F_C_R_A_Person_Attributes_V1_Dynamic_Res0_Internal_Layout_P_L___Drg_Bk_Disp_List1_Y_Layout := RECORD
-    KEL.typ.nstr Disposition_;
-    KEL.typ.nstr T_M_S_I_D_;
-    KEL.typ.nstr Case_Number_;
-    KEL.typ.nstr Court_Code_;
-    KEL.typ.nkdate Bankruptcy_Date_;
-    KEL.typ.nkdate Last_Status_Update_;
-    KEL.typ.nkdate Date_Filed_;
-    KEL.typ.epoch Archive___Date_ := 0;
-    KEL.typ.epoch Date_First_Seen_ := 0;
-    KEL.typ.epoch Date_Last_Seen_ := 0;
-    KEL.typ.epoch Hybrid_Archive_Date_ := 0;
-    KEL.typ.epoch Vault_Date_Last_Seen_ := 0;
-    KEL.typ.int __RecordCount := 0;
-  END;
-  SHARED Non_F_C_R_A_Person_Attributes_V1_Dynamic_Res0_Internal_Layout_P_L___Drg_Bk_Disp_List7_Y_Layout := RECORD
-    KEL.typ.nstr Disposition_;
-    KEL.typ.nstr T_M_S_I_D_;
-    KEL.typ.nstr Case_Number_;
-    KEL.typ.nstr Court_Code_;
-    KEL.typ.nkdate Bankruptcy_Date_;
-    KEL.typ.nkdate Last_Status_Update_;
-    KEL.typ.nkdate Date_Filed_;
-    KEL.typ.epoch Archive___Date_ := 0;
-    KEL.typ.epoch Date_First_Seen_ := 0;
-    KEL.typ.epoch Date_Last_Seen_ := 0;
-    KEL.typ.epoch Hybrid_Archive_Date_ := 0;
-    KEL.typ.epoch Vault_Date_Last_Seen_ := 0;
-    KEL.typ.int __RecordCount := 0;
-  END;
-  SHARED Non_F_C_R_A_Person_Attributes_V1_Dynamic_Res0_Internal_Layout_P_L___Drg_Bk_Disp_List10_Y_Layout := RECORD
-    KEL.typ.nstr Disposition_;
-    KEL.typ.nstr T_M_S_I_D_;
-    KEL.typ.nstr Case_Number_;
-    KEL.typ.nstr Court_Code_;
-    KEL.typ.nkdate Bankruptcy_Date_;
-    KEL.typ.nkdate Last_Status_Update_;
-    KEL.typ.nkdate Date_Filed_;
-    KEL.typ.epoch Archive___Date_ := 0;
-    KEL.typ.epoch Date_First_Seen_ := 0;
-    KEL.typ.epoch Date_Last_Seen_ := 0;
-    KEL.typ.epoch Hybrid_Archive_Date_ := 0;
-    KEL.typ.epoch Vault_Date_Last_Seen_ := 0;
-    KEL.typ.int __RecordCount := 0;
-  END;
-  SHARED Non_F_C_R_A_Person_Attributes_V1_Dynamic_Res0_Internal_Layout_P_L___Drg_Bk_Type_List1_Y_Layout := RECORD
-    KEL.typ.nstr Filing_Type_;
-    KEL.typ.nkdate Bankruptcy_Date_;
-    KEL.typ.nkdate Last_Status_Update_;
-    KEL.typ.nkdate Date_Filed_;
-    KEL.typ.epoch Archive___Date_ := 0;
-    KEL.typ.epoch Date_First_Seen_ := 0;
-    KEL.typ.epoch Date_Last_Seen_ := 0;
-    KEL.typ.epoch Hybrid_Archive_Date_ := 0;
-    KEL.typ.epoch Vault_Date_Last_Seen_ := 0;
-    KEL.typ.int __RecordCount := 0;
-  END;
-  SHARED Non_F_C_R_A_Person_Attributes_V1_Dynamic_Res0_Internal_Layout_P_L___Drg_Bk_Type_List7_Y_Layout := RECORD
-    KEL.typ.nstr Filing_Type_;
-    KEL.typ.nkdate Bankruptcy_Date_;
-    KEL.typ.nkdate Last_Status_Update_;
-    KEL.typ.nkdate Date_Filed_;
-    KEL.typ.epoch Archive___Date_ := 0;
-    KEL.typ.epoch Date_First_Seen_ := 0;
-    KEL.typ.epoch Date_Last_Seen_ := 0;
-    KEL.typ.epoch Hybrid_Archive_Date_ := 0;
-    KEL.typ.epoch Vault_Date_Last_Seen_ := 0;
-    KEL.typ.int __RecordCount := 0;
-  END;
-  SHARED Non_F_C_R_A_Person_Attributes_V1_Dynamic_Res0_Internal_Layout_P_L___Drg_Bk_Type_List10_Y_Layout := RECORD
-    KEL.typ.nstr Filing_Type_;
-    KEL.typ.nkdate Bankruptcy_Date_;
-    KEL.typ.nkdate Last_Status_Update_;
-    KEL.typ.nkdate Date_Filed_;
-    KEL.typ.epoch Archive___Date_ := 0;
-    KEL.typ.epoch Date_First_Seen_ := 0;
-    KEL.typ.epoch Date_Last_Seen_ := 0;
-    KEL.typ.epoch Hybrid_Archive_Date_ := 0;
-    KEL.typ.epoch Vault_Date_Last_Seen_ := 0;
-    KEL.typ.int __RecordCount := 0;
-  END;
-  SHARED Non_F_C_R_A_Person_Attributes_V1_Dynamic_Res0_Internal_Layout_P_L___Prof_Lic_Issue_Dt_List_Ev_Layout := RECORD
-    KEL.typ.nuid Prof_Lic_U_I_D_;
-    KEL.typ.nstr Max_Issue_Date_;
-    KEL.typ.epoch Archive___Date_ := 0;
-    KEL.typ.epoch Date_First_Seen_ := 0;
-    KEL.typ.epoch Date_Last_Seen_ := 0;
-    KEL.typ.epoch Hybrid_Archive_Date_ := 0;
-    KEL.typ.epoch Vault_Date_Last_Seen_ := 0;
-    KEL.typ.int __RecordCount := 0;
-  END;
-  SHARED Non_F_C_R_A_Person_Attributes_V1_Dynamic_Res0_Internal_Layout_P_L___Prof_Lic_Exp_Dt_List_Ev_Layout := RECORD
-    KEL.typ.nuid Prof_Lic_U_I_D_;
-    KEL.typ.nstr Max_Expire_Date_;
-    KEL.typ.epoch Archive___Date_ := 0;
-    KEL.typ.epoch Date_First_Seen_ := 0;
-    KEL.typ.epoch Date_Last_Seen_ := 0;
-    KEL.typ.epoch Hybrid_Archive_Date_ := 0;
-    KEL.typ.epoch Vault_Date_Last_Seen_ := 0;
-    KEL.typ.int __RecordCount := 0;
-  END;
-  SHARED Non_F_C_R_A_Person_Attributes_V1_Dynamic_Res0_Internal_Layout_P_L___Prof_Lic_Indx_By_Lic_List_Ev_Layout := RECORD
-    KEL.typ.nuid Prof_Lic_U_I_D_;
-    KEL.typ.nstr License_Category_;
-    KEL.typ.epoch Archive___Date_ := 0;
-    KEL.typ.epoch Date_First_Seen_ := 0;
-    KEL.typ.epoch Date_Last_Seen_ := 0;
-    KEL.typ.epoch Hybrid_Archive_Date_ := 0;
-    KEL.typ.epoch Vault_Date_Last_Seen_ := 0;
-    KEL.typ.int __RecordCount := 0;
-  END;
   SHARED Non_F_C_R_A_Person_Attributes_V1_Dynamic_Res0_Internal_Layout_Crim_List_Layout := RECORD
     KEL.typ.nkdate Original_Filing_Date_;
     KEL.typ.nstr List_I_D_;
@@ -1247,13 +1029,13 @@ EXPORT L_Compile := MODULE
     KEL.typ.nint P_L___Ast_Veh_Auto_Emrg_New_Msnc_Ev_;
     KEL.typ.nint P_L___Ast_Veh_Auto_Emrg_Old_Msnc_Ev_;
     KEL.typ.int P_L___Ast_Veh_Air_Cnt_Ev_ := 0;
-    KEL.typ.ndataset(Non_F_C_R_A_Person_Attributes_V1_Dynamic_Res0_Internal_Layout_P_L___Ast_Veh_Air_Emrg_Dt_List_Ev_Layout) P_L___Ast_Veh_Air_Emrg_Dt_List_Ev_;
+    KEL.typ.nstr P_L___Ast_Veh_Air_Emrg_Dt_List_Ev_;
     KEL.typ.nstr P_L___Ast_Veh_Air_Emrg_New_Dt_Ev_;
     KEL.typ.nstr P_L___Ast_Veh_Air_Emrg_Old_Dt_Ev_;
     KEL.typ.nint P_L___Ast_Veh_Air_Emrg_New_Msnc_Ev_;
     KEL.typ.nint P_L___Ast_Veh_Air_Emrg_Old_Msnc_Ev_;
     KEL.typ.int P_L___Ast_Veh_Wtr_Cnt_Ev_ := 0;
-    KEL.typ.ndataset(Non_F_C_R_A_Person_Attributes_V1_Dynamic_Res0_Internal_Layout_P_L___Ast_Veh_Wtr_Emrg_Dt_List_Ev_Layout) P_L___Ast_Veh_Wtr_Emrg_Dt_List_Ev_;
+    KEL.typ.nstr P_L___Ast_Veh_Wtr_Emrg_Dt_List_Ev_;
     KEL.typ.nstr P_L___Ast_Veh_Wtr_Emrg_New_Dt_Ev_;
     KEL.typ.nstr P_L___Ast_Veh_Wtr_Emrg_Old_Dt_Ev_;
     KEL.typ.nint P_L___Ast_Veh_Wtr_Emrg_New_Msnc_Ev_;
@@ -1303,9 +1085,9 @@ EXPORT L_Compile := MODULE
     KEL.typ.int P_L___Drg_Bk_Cnt1_Y_ := 0;
     KEL.typ.int P_L___Drg_Bk_Cnt7_Y_ := 0;
     KEL.typ.int P_L___Drg_Bk_Cnt10_Y_ := 0;
-    KEL.typ.ndataset(Non_F_C_R_A_Person_Attributes_V1_Dynamic_Res0_Internal_Layout_P_L___Drg_Bk_Dt_List1_Y_Layout) P_L___Drg_Bk_Dt_List1_Y_;
-    KEL.typ.ndataset(Non_F_C_R_A_Person_Attributes_V1_Dynamic_Res0_Internal_Layout_P_L___Drg_Bk_Dt_List7_Y_Layout) P_L___Drg_Bk_Dt_List7_Y_;
-    KEL.typ.ndataset(Non_F_C_R_A_Person_Attributes_V1_Dynamic_Res0_Internal_Layout_P_L___Drg_Bk_Dt_List10_Y_Layout) P_L___Drg_Bk_Dt_List10_Y_;
+    KEL.typ.nstr P_L___Drg_Bk_Dt_List1_Y_;
+    KEL.typ.nstr P_L___Drg_Bk_Dt_List7_Y_;
+    KEL.typ.nstr P_L___Drg_Bk_Dt_List10_Y_;
     KEL.typ.nstr P_L___Drg_Bk_New_Dt1_Y_;
     KEL.typ.nstr P_L___Drg_Bk_New_Dt7_Y_;
     KEL.typ.nstr P_L___Drg_Bk_New_Dt10_Y_;
@@ -1318,9 +1100,9 @@ EXPORT L_Compile := MODULE
     KEL.typ.nint P_L___Drg_Bk_Old_Msnc1_Y_;
     KEL.typ.nint P_L___Drg_Bk_Old_Msnc7_Y_;
     KEL.typ.nint P_L___Drg_Bk_Old_Msnc10_Y_;
-    KEL.typ.ndataset(Non_F_C_R_A_Person_Attributes_V1_Dynamic_Res0_Internal_Layout_P_L___Drg_Bk_Ch_List1_Y_Layout) P_L___Drg_Bk_Ch_List1_Y_;
-    KEL.typ.ndataset(Non_F_C_R_A_Person_Attributes_V1_Dynamic_Res0_Internal_Layout_P_L___Drg_Bk_Ch_List7_Y_Layout) P_L___Drg_Bk_Ch_List7_Y_;
-    KEL.typ.ndataset(Non_F_C_R_A_Person_Attributes_V1_Dynamic_Res0_Internal_Layout_P_L___Drg_Bk_Ch_List10_Y_Layout) P_L___Drg_Bk_Ch_List10_Y_;
+    KEL.typ.nstr P_L___Drg_Bk_Ch_List1_Y_;
+    KEL.typ.nstr P_L___Drg_Bk_Ch_List7_Y_;
+    KEL.typ.nstr P_L___Drg_Bk_Ch_List10_Y_;
     KEL.typ.nstr P_L___Drg_Bk_New_Ch_Type1_Y_;
     KEL.typ.nstr P_L___Drg_Bk_New_Ch_Type7_Y_;
     KEL.typ.nstr P_L___Drg_Bk_New_Ch_Type10_Y_;
@@ -1336,9 +1118,9 @@ EXPORT L_Compile := MODULE
     KEL.typ.nstr P_L___Drg_Bk_Updt_New_Msnc1_Y_;
     KEL.typ.nstr P_L___Drg_Bk_Updt_New_Msnc7_Y_;
     KEL.typ.nstr P_L___Drg_Bk_Updt_New_Msnc10_Y_;
-    KEL.typ.ndataset(Non_F_C_R_A_Person_Attributes_V1_Dynamic_Res0_Internal_Layout_P_L___Drg_Bk_Disp_List1_Y_Layout) P_L___Drg_Bk_Disp_List1_Y_;
-    KEL.typ.ndataset(Non_F_C_R_A_Person_Attributes_V1_Dynamic_Res0_Internal_Layout_P_L___Drg_Bk_Disp_List7_Y_Layout) P_L___Drg_Bk_Disp_List7_Y_;
-    KEL.typ.ndataset(Non_F_C_R_A_Person_Attributes_V1_Dynamic_Res0_Internal_Layout_P_L___Drg_Bk_Disp_List10_Y_Layout) P_L___Drg_Bk_Disp_List10_Y_;
+    KEL.typ.nstr P_L___Drg_Bk_Disp_List1_Y_;
+    KEL.typ.nstr P_L___Drg_Bk_Disp_List7_Y_;
+    KEL.typ.nstr P_L___Drg_Bk_Disp_List10_Y_;
     KEL.typ.nstr P_L___Drg_Bk_New_Disp_Type1_Y_;
     KEL.typ.nstr P_L___Drg_Bk_New_Disp_Type7_Y_;
     KEL.typ.nstr P_L___Drg_Bk_New_Disp_Type10_Y_;
@@ -1357,17 +1139,17 @@ EXPORT L_Compile := MODULE
     KEL.typ.int P_L___Drg_Bk_Dsch_Cnt1_Y_ := 0;
     KEL.typ.int P_L___Drg_Bk_Dsch_Cnt7_Y_ := 0;
     KEL.typ.int P_L___Drg_Bk_Dsch_Cnt10_Y_ := 0;
-    KEL.typ.ndataset(Non_F_C_R_A_Person_Attributes_V1_Dynamic_Res0_Internal_Layout_P_L___Drg_Bk_Type_List1_Y_Layout) P_L___Drg_Bk_Type_List1_Y_;
-    KEL.typ.ndataset(Non_F_C_R_A_Person_Attributes_V1_Dynamic_Res0_Internal_Layout_P_L___Drg_Bk_Type_List7_Y_Layout) P_L___Drg_Bk_Type_List7_Y_;
-    KEL.typ.ndataset(Non_F_C_R_A_Person_Attributes_V1_Dynamic_Res0_Internal_Layout_P_L___Drg_Bk_Type_List10_Y_Layout) P_L___Drg_Bk_Type_List10_Y_;
+    KEL.typ.nstr P_L___Drg_Bk_Type_List1_Y_;
+    KEL.typ.nstr P_L___Drg_Bk_Type_List7_Y_;
+    KEL.typ.nstr P_L___Drg_Bk_Type_List10_Y_;
     KEL.typ.nstr P_L___Drg_Bk_Bus_Flag1_Y_;
     KEL.typ.nstr P_L___Drg_Bk_Bus_Flag7_Y_;
     KEL.typ.nstr P_L___Drg_Bk_Bus_Flag10_Y_;
     KEL.typ.str P_L___Drg_Bk_Severity_Indx10_Y_ := '';
     KEL.typ.str P_L___Prof_Lic_Flag_Ev_ := '';
-    KEL.typ.ndataset(Non_F_C_R_A_Person_Attributes_V1_Dynamic_Res0_Internal_Layout_P_L___Prof_Lic_Issue_Dt_List_Ev_Layout) P_L___Prof_Lic_Issue_Dt_List_Ev_;
-    KEL.typ.ndataset(Non_F_C_R_A_Person_Attributes_V1_Dynamic_Res0_Internal_Layout_P_L___Prof_Lic_Exp_Dt_List_Ev_Layout) P_L___Prof_Lic_Exp_Dt_List_Ev_;
-    KEL.typ.ndataset(Non_F_C_R_A_Person_Attributes_V1_Dynamic_Res0_Internal_Layout_P_L___Prof_Lic_Indx_By_Lic_List_Ev_Layout) P_L___Prof_Lic_Indx_By_Lic_List_Ev_;
+    KEL.typ.nstr P_L___Prof_Lic_Issue_Dt_List_Ev_;
+    KEL.typ.nstr P_L___Prof_Lic_Exp_Dt_List_Ev_;
+    KEL.typ.nstr P_L___Prof_Lic_Indx_By_Lic_List_Ev_;
     KEL.typ.str P_L___Prof_Lic_Actv_Flag_ := '';
     KEL.typ.nstr P_L___Prof_Lic_Actv_New_Issue_Dt_;
     KEL.typ.nstr P_L___Prof_Lic_Actv_New_Exp_Dt_;
@@ -1591,10 +1373,10 @@ EXPORT L_Compile := MODULE
     KEL.typ.nint P_L___Srch_Phone_Per_Lex_I_D_Cnt1_Y_;
     KEL.typ.nint P_L___Srch_D_O_B_Per_Lex_I_D_Cnt1_Y_;
     KEL.typ.nint P_L___Srch_Email_Per_Lex_I_D_Cnt1_Y_;
-    KEL.typ.nint P_L___Srch_Per_Curr_Addr_Cnt1_Y_;
-    KEL.typ.nint P_L___Srch_Lex_I_D_Per_Curr_Addr_Cnt1_Y_;
-    KEL.typ.nint P_L___Srch_L_Name_Per_Curr_Addr_Cnt1_Y_;
-    KEL.typ.nint P_L___Srch_S_S_N_Per_Curr_Addr_Cnt1_Y_;
+    KEL.typ.int P_L___Srch_Per_Curr_Addr_Cnt1_Y_ := 0;
+    KEL.typ.int P_L___Srch_Lex_I_D_Per_Curr_Addr_Cnt1_Y_ := 0;
+    KEL.typ.int P_L___Srch_L_Name_Per_Curr_Addr_Cnt1_Y_ := 0;
+    KEL.typ.int P_L___Srch_S_S_N_Per_Curr_Addr_Cnt1_Y_ := 0;
     KEL.typ.nint P_L___Srch_Per_Lex_I_D_W_Inp_F_L_S_Cnt1_Y_;
     KEL.typ.nint P_L___Srch_Per_Lex_I_D_W_Inp_A_S_Cnt1_Y_;
     KEL.typ.nint P_L___Srch_Per_Lex_I_D_W_Inp_S_D_Cnt1_Y_;
@@ -1647,224 +1429,6 @@ EXPORT L_Compile := MODULE
     KEL.typ.int __RecordCount := 0;
   END;
   EXPORT Non_F_C_R_A_Person_Attributes_V1_Dynamic_Res0_Layout := RECORDOF(__UNWRAP(DATASET([],Non_F_C_R_A_Person_Attributes_V1_Dynamic_Res0_Internal_Layout)));
-  SHARED F_C_R_A_Person_Attributes_V1_Dynamic_Res0_Internal_Layout_P_L___Ast_Veh_Air_Emrg_Dt_List_Ev_Layout := RECORD
-    KEL.typ.ntyp(E_Aircraft().Typ) Plane_;
-    KEL.typ.nstr Aircraft_First_Seen_Date_;
-    KEL.typ.epoch Archive___Date_ := 0;
-    KEL.typ.epoch Date_First_Seen_ := 0;
-    KEL.typ.epoch Date_Last_Seen_ := 0;
-    KEL.typ.epoch Hybrid_Archive_Date_ := 0;
-    KEL.typ.epoch Vault_Date_Last_Seen_ := 0;
-    KEL.typ.int __RecordCount := 0;
-  END;
-  SHARED F_C_R_A_Person_Attributes_V1_Dynamic_Res0_Internal_Layout_P_L___Ast_Veh_Wtr_Emrg_Dt_List_Ev_Layout := RECORD
-    KEL.typ.ntyp(E_Watercraft().Typ) W_Craft_;
-    KEL.typ.nstr Watercraft_First_Seen_Date_;
-    KEL.typ.epoch Archive___Date_ := 0;
-    KEL.typ.epoch Date_First_Seen_ := 0;
-    KEL.typ.epoch Date_Last_Seen_ := 0;
-    KEL.typ.epoch Hybrid_Archive_Date_ := 0;
-    KEL.typ.epoch Vault_Date_Last_Seen_ := 0;
-    KEL.typ.int __RecordCount := 0;
-  END;
-  SHARED F_C_R_A_Person_Attributes_V1_Dynamic_Res0_Internal_Layout_P_L___Drg_Bk_Dt_List1_Y_Layout := RECORD
-    KEL.typ.nstr T_M_S_I_D_;
-    KEL.typ.nstr Case_Number_;
-    KEL.typ.nstr Court_Code_;
-    KEL.typ.nkdate Bankruptcy_Date_;
-    KEL.typ.nkdate Last_Status_Update_;
-    KEL.typ.nkdate Date_Filed_;
-    KEL.typ.epoch Archive___Date_ := 0;
-    KEL.typ.epoch Date_First_Seen_ := 0;
-    KEL.typ.epoch Date_Last_Seen_ := 0;
-    KEL.typ.epoch Hybrid_Archive_Date_ := 0;
-    KEL.typ.epoch Vault_Date_Last_Seen_ := 0;
-    KEL.typ.int __RecordCount := 0;
-  END;
-  SHARED F_C_R_A_Person_Attributes_V1_Dynamic_Res0_Internal_Layout_P_L___Drg_Bk_Dt_List7_Y_Layout := RECORD
-    KEL.typ.nstr T_M_S_I_D_;
-    KEL.typ.nstr Case_Number_;
-    KEL.typ.nstr Court_Code_;
-    KEL.typ.nkdate Bankruptcy_Date_;
-    KEL.typ.nkdate Last_Status_Update_;
-    KEL.typ.nkdate Date_Filed_;
-    KEL.typ.epoch Archive___Date_ := 0;
-    KEL.typ.epoch Date_First_Seen_ := 0;
-    KEL.typ.epoch Date_Last_Seen_ := 0;
-    KEL.typ.epoch Hybrid_Archive_Date_ := 0;
-    KEL.typ.epoch Vault_Date_Last_Seen_ := 0;
-    KEL.typ.int __RecordCount := 0;
-  END;
-  SHARED F_C_R_A_Person_Attributes_V1_Dynamic_Res0_Internal_Layout_P_L___Drg_Bk_Dt_List10_Y_Layout := RECORD
-    KEL.typ.nstr T_M_S_I_D_;
-    KEL.typ.nstr Case_Number_;
-    KEL.typ.nstr Court_Code_;
-    KEL.typ.nkdate Bankruptcy_Date_;
-    KEL.typ.nkdate Last_Status_Update_;
-    KEL.typ.nkdate Date_Filed_;
-    KEL.typ.epoch Archive___Date_ := 0;
-    KEL.typ.epoch Date_First_Seen_ := 0;
-    KEL.typ.epoch Date_Last_Seen_ := 0;
-    KEL.typ.epoch Hybrid_Archive_Date_ := 0;
-    KEL.typ.epoch Vault_Date_Last_Seen_ := 0;
-    KEL.typ.int __RecordCount := 0;
-  END;
-  SHARED F_C_R_A_Person_Attributes_V1_Dynamic_Res0_Internal_Layout_P_L___Drg_Bk_Ch_List1_Y_Layout := RECORD
-    KEL.typ.nstr Original_Chapter_;
-    KEL.typ.nstr T_M_S_I_D_;
-    KEL.typ.nstr Case_Number_;
-    KEL.typ.nstr Court_Code_;
-    KEL.typ.nkdate Bankruptcy_Date_;
-    KEL.typ.nkdate Last_Status_Update_;
-    KEL.typ.nkdate Date_Filed_;
-    KEL.typ.epoch Archive___Date_ := 0;
-    KEL.typ.epoch Date_First_Seen_ := 0;
-    KEL.typ.epoch Date_Last_Seen_ := 0;
-    KEL.typ.epoch Hybrid_Archive_Date_ := 0;
-    KEL.typ.epoch Vault_Date_Last_Seen_ := 0;
-    KEL.typ.int __RecordCount := 0;
-  END;
-  SHARED F_C_R_A_Person_Attributes_V1_Dynamic_Res0_Internal_Layout_P_L___Drg_Bk_Ch_List7_Y_Layout := RECORD
-    KEL.typ.nstr Original_Chapter_;
-    KEL.typ.nstr T_M_S_I_D_;
-    KEL.typ.nstr Case_Number_;
-    KEL.typ.nstr Court_Code_;
-    KEL.typ.nkdate Bankruptcy_Date_;
-    KEL.typ.nkdate Last_Status_Update_;
-    KEL.typ.nkdate Date_Filed_;
-    KEL.typ.epoch Archive___Date_ := 0;
-    KEL.typ.epoch Date_First_Seen_ := 0;
-    KEL.typ.epoch Date_Last_Seen_ := 0;
-    KEL.typ.epoch Hybrid_Archive_Date_ := 0;
-    KEL.typ.epoch Vault_Date_Last_Seen_ := 0;
-    KEL.typ.int __RecordCount := 0;
-  END;
-  SHARED F_C_R_A_Person_Attributes_V1_Dynamic_Res0_Internal_Layout_P_L___Drg_Bk_Ch_List10_Y_Layout := RECORD
-    KEL.typ.nstr Original_Chapter_;
-    KEL.typ.nstr T_M_S_I_D_;
-    KEL.typ.nstr Case_Number_;
-    KEL.typ.nstr Court_Code_;
-    KEL.typ.nkdate Bankruptcy_Date_;
-    KEL.typ.nkdate Last_Status_Update_;
-    KEL.typ.nkdate Date_Filed_;
-    KEL.typ.epoch Archive___Date_ := 0;
-    KEL.typ.epoch Date_First_Seen_ := 0;
-    KEL.typ.epoch Date_Last_Seen_ := 0;
-    KEL.typ.epoch Hybrid_Archive_Date_ := 0;
-    KEL.typ.epoch Vault_Date_Last_Seen_ := 0;
-    KEL.typ.int __RecordCount := 0;
-  END;
-  SHARED F_C_R_A_Person_Attributes_V1_Dynamic_Res0_Internal_Layout_P_L___Drg_Bk_Disp_List1_Y_Layout := RECORD
-    KEL.typ.nstr Disposition_;
-    KEL.typ.nstr T_M_S_I_D_;
-    KEL.typ.nstr Case_Number_;
-    KEL.typ.nstr Court_Code_;
-    KEL.typ.nkdate Bankruptcy_Date_;
-    KEL.typ.nkdate Last_Status_Update_;
-    KEL.typ.nkdate Date_Filed_;
-    KEL.typ.epoch Archive___Date_ := 0;
-    KEL.typ.epoch Date_First_Seen_ := 0;
-    KEL.typ.epoch Date_Last_Seen_ := 0;
-    KEL.typ.epoch Hybrid_Archive_Date_ := 0;
-    KEL.typ.epoch Vault_Date_Last_Seen_ := 0;
-    KEL.typ.int __RecordCount := 0;
-  END;
-  SHARED F_C_R_A_Person_Attributes_V1_Dynamic_Res0_Internal_Layout_P_L___Drg_Bk_Disp_List7_Y_Layout := RECORD
-    KEL.typ.nstr Disposition_;
-    KEL.typ.nstr T_M_S_I_D_;
-    KEL.typ.nstr Case_Number_;
-    KEL.typ.nstr Court_Code_;
-    KEL.typ.nkdate Bankruptcy_Date_;
-    KEL.typ.nkdate Last_Status_Update_;
-    KEL.typ.nkdate Date_Filed_;
-    KEL.typ.epoch Archive___Date_ := 0;
-    KEL.typ.epoch Date_First_Seen_ := 0;
-    KEL.typ.epoch Date_Last_Seen_ := 0;
-    KEL.typ.epoch Hybrid_Archive_Date_ := 0;
-    KEL.typ.epoch Vault_Date_Last_Seen_ := 0;
-    KEL.typ.int __RecordCount := 0;
-  END;
-  SHARED F_C_R_A_Person_Attributes_V1_Dynamic_Res0_Internal_Layout_P_L___Drg_Bk_Disp_List10_Y_Layout := RECORD
-    KEL.typ.nstr Disposition_;
-    KEL.typ.nstr T_M_S_I_D_;
-    KEL.typ.nstr Case_Number_;
-    KEL.typ.nstr Court_Code_;
-    KEL.typ.nkdate Bankruptcy_Date_;
-    KEL.typ.nkdate Last_Status_Update_;
-    KEL.typ.nkdate Date_Filed_;
-    KEL.typ.epoch Archive___Date_ := 0;
-    KEL.typ.epoch Date_First_Seen_ := 0;
-    KEL.typ.epoch Date_Last_Seen_ := 0;
-    KEL.typ.epoch Hybrid_Archive_Date_ := 0;
-    KEL.typ.epoch Vault_Date_Last_Seen_ := 0;
-    KEL.typ.int __RecordCount := 0;
-  END;
-  SHARED F_C_R_A_Person_Attributes_V1_Dynamic_Res0_Internal_Layout_P_L___Drg_Bk_Type_List1_Y_Layout := RECORD
-    KEL.typ.nstr Filing_Type_;
-    KEL.typ.nkdate Bankruptcy_Date_;
-    KEL.typ.nkdate Last_Status_Update_;
-    KEL.typ.nkdate Date_Filed_;
-    KEL.typ.epoch Archive___Date_ := 0;
-    KEL.typ.epoch Date_First_Seen_ := 0;
-    KEL.typ.epoch Date_Last_Seen_ := 0;
-    KEL.typ.epoch Hybrid_Archive_Date_ := 0;
-    KEL.typ.epoch Vault_Date_Last_Seen_ := 0;
-    KEL.typ.int __RecordCount := 0;
-  END;
-  SHARED F_C_R_A_Person_Attributes_V1_Dynamic_Res0_Internal_Layout_P_L___Drg_Bk_Type_List7_Y_Layout := RECORD
-    KEL.typ.nstr Filing_Type_;
-    KEL.typ.nkdate Bankruptcy_Date_;
-    KEL.typ.nkdate Last_Status_Update_;
-    KEL.typ.nkdate Date_Filed_;
-    KEL.typ.epoch Archive___Date_ := 0;
-    KEL.typ.epoch Date_First_Seen_ := 0;
-    KEL.typ.epoch Date_Last_Seen_ := 0;
-    KEL.typ.epoch Hybrid_Archive_Date_ := 0;
-    KEL.typ.epoch Vault_Date_Last_Seen_ := 0;
-    KEL.typ.int __RecordCount := 0;
-  END;
-  SHARED F_C_R_A_Person_Attributes_V1_Dynamic_Res0_Internal_Layout_P_L___Drg_Bk_Type_List10_Y_Layout := RECORD
-    KEL.typ.nstr Filing_Type_;
-    KEL.typ.nkdate Bankruptcy_Date_;
-    KEL.typ.nkdate Last_Status_Update_;
-    KEL.typ.nkdate Date_Filed_;
-    KEL.typ.epoch Archive___Date_ := 0;
-    KEL.typ.epoch Date_First_Seen_ := 0;
-    KEL.typ.epoch Date_Last_Seen_ := 0;
-    KEL.typ.epoch Hybrid_Archive_Date_ := 0;
-    KEL.typ.epoch Vault_Date_Last_Seen_ := 0;
-    KEL.typ.int __RecordCount := 0;
-  END;
-  SHARED F_C_R_A_Person_Attributes_V1_Dynamic_Res0_Internal_Layout_P_L___Prof_Lic_Issue_Dt_List_Ev_Layout := RECORD
-    KEL.typ.nuid Prof_Lic_U_I_D_;
-    KEL.typ.nstr Max_Issue_Date_;
-    KEL.typ.epoch Archive___Date_ := 0;
-    KEL.typ.epoch Date_First_Seen_ := 0;
-    KEL.typ.epoch Date_Last_Seen_ := 0;
-    KEL.typ.epoch Hybrid_Archive_Date_ := 0;
-    KEL.typ.epoch Vault_Date_Last_Seen_ := 0;
-    KEL.typ.int __RecordCount := 0;
-  END;
-  SHARED F_C_R_A_Person_Attributes_V1_Dynamic_Res0_Internal_Layout_P_L___Prof_Lic_Exp_Dt_List_Ev_Layout := RECORD
-    KEL.typ.nuid Prof_Lic_U_I_D_;
-    KEL.typ.nstr Max_Expire_Date_;
-    KEL.typ.epoch Archive___Date_ := 0;
-    KEL.typ.epoch Date_First_Seen_ := 0;
-    KEL.typ.epoch Date_Last_Seen_ := 0;
-    KEL.typ.epoch Hybrid_Archive_Date_ := 0;
-    KEL.typ.epoch Vault_Date_Last_Seen_ := 0;
-    KEL.typ.int __RecordCount := 0;
-  END;
-  SHARED F_C_R_A_Person_Attributes_V1_Dynamic_Res0_Internal_Layout_P_L___Prof_Lic_Indx_By_Lic_List_Ev_Layout := RECORD
-    KEL.typ.nuid Prof_Lic_U_I_D_;
-    KEL.typ.nstr License_Category_;
-    KEL.typ.epoch Archive___Date_ := 0;
-    KEL.typ.epoch Date_First_Seen_ := 0;
-    KEL.typ.epoch Date_Last_Seen_ := 0;
-    KEL.typ.epoch Hybrid_Archive_Date_ := 0;
-    KEL.typ.epoch Vault_Date_Last_Seen_ := 0;
-    KEL.typ.int __RecordCount := 0;
-  END;
   SHARED F_C_R_A_Person_Attributes_V1_Dynamic_Res0_Internal_Layout_Crim_List_Layout := RECORD
     KEL.typ.nkdate Original_Filing_Date_;
     KEL.typ.nstr List_I_D_;
@@ -1910,13 +1474,13 @@ EXPORT L_Compile := MODULE
     KEL.typ.str P___Lex_I_D_Seen_Flag_ := '';
     KEL.typ.str P___Lex_I_D_Is_Deceased_Flag_ := '';
     KEL.typ.int P_L___Ast_Veh_Air_Cnt_Ev_ := 0;
-    KEL.typ.ndataset(F_C_R_A_Person_Attributes_V1_Dynamic_Res0_Internal_Layout_P_L___Ast_Veh_Air_Emrg_Dt_List_Ev_Layout) P_L___Ast_Veh_Air_Emrg_Dt_List_Ev_;
+    KEL.typ.nstr P_L___Ast_Veh_Air_Emrg_Dt_List_Ev_;
     KEL.typ.nstr P_L___Ast_Veh_Air_Emrg_New_Dt_Ev_;
     KEL.typ.nstr P_L___Ast_Veh_Air_Emrg_Old_Dt_Ev_;
     KEL.typ.nint P_L___Ast_Veh_Air_Emrg_New_Msnc_Ev_;
     KEL.typ.nint P_L___Ast_Veh_Air_Emrg_Old_Msnc_Ev_;
     KEL.typ.int P_L___Ast_Veh_Wtr_Cnt_Ev_ := 0;
-    KEL.typ.ndataset(F_C_R_A_Person_Attributes_V1_Dynamic_Res0_Internal_Layout_P_L___Ast_Veh_Wtr_Emrg_Dt_List_Ev_Layout) P_L___Ast_Veh_Wtr_Emrg_Dt_List_Ev_;
+    KEL.typ.nstr P_L___Ast_Veh_Wtr_Emrg_Dt_List_Ev_;
     KEL.typ.nstr P_L___Ast_Veh_Wtr_Emrg_New_Dt_Ev_;
     KEL.typ.nstr P_L___Ast_Veh_Wtr_Emrg_Old_Dt_Ev_;
     KEL.typ.nint P_L___Ast_Veh_Wtr_Emrg_New_Msnc_Ev_;
@@ -1956,9 +1520,9 @@ EXPORT L_Compile := MODULE
     KEL.typ.int P_L___Drg_Bk_Cnt1_Y_ := 0;
     KEL.typ.int P_L___Drg_Bk_Cnt7_Y_ := 0;
     KEL.typ.int P_L___Drg_Bk_Cnt10_Y_ := 0;
-    KEL.typ.ndataset(F_C_R_A_Person_Attributes_V1_Dynamic_Res0_Internal_Layout_P_L___Drg_Bk_Dt_List1_Y_Layout) P_L___Drg_Bk_Dt_List1_Y_;
-    KEL.typ.ndataset(F_C_R_A_Person_Attributes_V1_Dynamic_Res0_Internal_Layout_P_L___Drg_Bk_Dt_List7_Y_Layout) P_L___Drg_Bk_Dt_List7_Y_;
-    KEL.typ.ndataset(F_C_R_A_Person_Attributes_V1_Dynamic_Res0_Internal_Layout_P_L___Drg_Bk_Dt_List10_Y_Layout) P_L___Drg_Bk_Dt_List10_Y_;
+    KEL.typ.nstr P_L___Drg_Bk_Dt_List1_Y_;
+    KEL.typ.nstr P_L___Drg_Bk_Dt_List7_Y_;
+    KEL.typ.nstr P_L___Drg_Bk_Dt_List10_Y_;
     KEL.typ.nstr P_L___Drg_Bk_New_Dt1_Y_;
     KEL.typ.nstr P_L___Drg_Bk_New_Dt7_Y_;
     KEL.typ.nstr P_L___Drg_Bk_New_Dt10_Y_;
@@ -1971,9 +1535,9 @@ EXPORT L_Compile := MODULE
     KEL.typ.nint P_L___Drg_Bk_Old_Msnc1_Y_;
     KEL.typ.nint P_L___Drg_Bk_Old_Msnc7_Y_;
     KEL.typ.nint P_L___Drg_Bk_Old_Msnc10_Y_;
-    KEL.typ.ndataset(F_C_R_A_Person_Attributes_V1_Dynamic_Res0_Internal_Layout_P_L___Drg_Bk_Ch_List1_Y_Layout) P_L___Drg_Bk_Ch_List1_Y_;
-    KEL.typ.ndataset(F_C_R_A_Person_Attributes_V1_Dynamic_Res0_Internal_Layout_P_L___Drg_Bk_Ch_List7_Y_Layout) P_L___Drg_Bk_Ch_List7_Y_;
-    KEL.typ.ndataset(F_C_R_A_Person_Attributes_V1_Dynamic_Res0_Internal_Layout_P_L___Drg_Bk_Ch_List10_Y_Layout) P_L___Drg_Bk_Ch_List10_Y_;
+    KEL.typ.nstr P_L___Drg_Bk_Ch_List1_Y_;
+    KEL.typ.nstr P_L___Drg_Bk_Ch_List7_Y_;
+    KEL.typ.nstr P_L___Drg_Bk_Ch_List10_Y_;
     KEL.typ.nstr P_L___Drg_Bk_New_Ch_Type1_Y_;
     KEL.typ.nstr P_L___Drg_Bk_New_Ch_Type7_Y_;
     KEL.typ.nstr P_L___Drg_Bk_New_Ch_Type10_Y_;
@@ -1989,9 +1553,9 @@ EXPORT L_Compile := MODULE
     KEL.typ.nstr P_L___Drg_Bk_Updt_New_Msnc1_Y_;
     KEL.typ.nstr P_L___Drg_Bk_Updt_New_Msnc7_Y_;
     KEL.typ.nstr P_L___Drg_Bk_Updt_New_Msnc10_Y_;
-    KEL.typ.ndataset(F_C_R_A_Person_Attributes_V1_Dynamic_Res0_Internal_Layout_P_L___Drg_Bk_Disp_List1_Y_Layout) P_L___Drg_Bk_Disp_List1_Y_;
-    KEL.typ.ndataset(F_C_R_A_Person_Attributes_V1_Dynamic_Res0_Internal_Layout_P_L___Drg_Bk_Disp_List7_Y_Layout) P_L___Drg_Bk_Disp_List7_Y_;
-    KEL.typ.ndataset(F_C_R_A_Person_Attributes_V1_Dynamic_Res0_Internal_Layout_P_L___Drg_Bk_Disp_List10_Y_Layout) P_L___Drg_Bk_Disp_List10_Y_;
+    KEL.typ.nstr P_L___Drg_Bk_Disp_List1_Y_;
+    KEL.typ.nstr P_L___Drg_Bk_Disp_List7_Y_;
+    KEL.typ.nstr P_L___Drg_Bk_Disp_List10_Y_;
     KEL.typ.nstr P_L___Drg_Bk_New_Disp_Type1_Y_;
     KEL.typ.nstr P_L___Drg_Bk_New_Disp_Type7_Y_;
     KEL.typ.nstr P_L___Drg_Bk_New_Disp_Type10_Y_;
@@ -2010,17 +1574,17 @@ EXPORT L_Compile := MODULE
     KEL.typ.int P_L___Drg_Bk_Dsch_Cnt1_Y_ := 0;
     KEL.typ.int P_L___Drg_Bk_Dsch_Cnt7_Y_ := 0;
     KEL.typ.int P_L___Drg_Bk_Dsch_Cnt10_Y_ := 0;
-    KEL.typ.ndataset(F_C_R_A_Person_Attributes_V1_Dynamic_Res0_Internal_Layout_P_L___Drg_Bk_Type_List1_Y_Layout) P_L___Drg_Bk_Type_List1_Y_;
-    KEL.typ.ndataset(F_C_R_A_Person_Attributes_V1_Dynamic_Res0_Internal_Layout_P_L___Drg_Bk_Type_List7_Y_Layout) P_L___Drg_Bk_Type_List7_Y_;
-    KEL.typ.ndataset(F_C_R_A_Person_Attributes_V1_Dynamic_Res0_Internal_Layout_P_L___Drg_Bk_Type_List10_Y_Layout) P_L___Drg_Bk_Type_List10_Y_;
+    KEL.typ.nstr P_L___Drg_Bk_Type_List1_Y_;
+    KEL.typ.nstr P_L___Drg_Bk_Type_List7_Y_;
+    KEL.typ.nstr P_L___Drg_Bk_Type_List10_Y_;
     KEL.typ.nstr P_L___Drg_Bk_Bus_Flag1_Y_;
     KEL.typ.nstr P_L___Drg_Bk_Bus_Flag7_Y_;
     KEL.typ.nstr P_L___Drg_Bk_Bus_Flag10_Y_;
     KEL.typ.str P_L___Drg_Bk_Severity_Indx10_Y_ := '';
     KEL.typ.str P_L___Prof_Lic_Flag_Ev_ := '';
-    KEL.typ.ndataset(F_C_R_A_Person_Attributes_V1_Dynamic_Res0_Internal_Layout_P_L___Prof_Lic_Issue_Dt_List_Ev_Layout) P_L___Prof_Lic_Issue_Dt_List_Ev_;
-    KEL.typ.ndataset(F_C_R_A_Person_Attributes_V1_Dynamic_Res0_Internal_Layout_P_L___Prof_Lic_Exp_Dt_List_Ev_Layout) P_L___Prof_Lic_Exp_Dt_List_Ev_;
-    KEL.typ.ndataset(F_C_R_A_Person_Attributes_V1_Dynamic_Res0_Internal_Layout_P_L___Prof_Lic_Indx_By_Lic_List_Ev_Layout) P_L___Prof_Lic_Indx_By_Lic_List_Ev_;
+    KEL.typ.nstr P_L___Prof_Lic_Issue_Dt_List_Ev_;
+    KEL.typ.nstr P_L___Prof_Lic_Exp_Dt_List_Ev_;
+    KEL.typ.nstr P_L___Prof_Lic_Indx_By_Lic_List_Ev_;
     KEL.typ.str P_L___Prof_Lic_Actv_Flag_ := '';
     KEL.typ.nstr P_L___Prof_Lic_Actv_New_Issue_Dt_;
     KEL.typ.nstr P_L___Prof_Lic_Actv_New_Exp_Dt_;
@@ -2091,9 +1655,6 @@ EXPORT L_Compile := MODULE
     KEL.typ.int P_L___Drg_Suit_New_Msnc7_Y_ := 0;
     KEL.typ.int P_L___Drg_Suit_Old_Msnc7_Y_ := 0;
     KEL.typ.int P_L___Drg_Ln_J_Cnt7_Y_ := 0;
-    KEL.typ.int P_L___Drg_Ln_J_Cnt1_Y_ := 0;
-    KEL.typ.int P_L___Drg_Ln_J_Amt_Tot7_Y_ := 0;
-    KEL.typ.float P_L___Drg_Ln_J_Amt_Avg7_Y_ := 0.0;
     KEL.typ.nstr P_L___Drg_Ln_J_Amt_List7_Y_;
     KEL.typ.nstr P_L___Drg_Ln_J_Dt_List7_Y_;
     KEL.typ.nstr P_L___Drg_Ln_J_New_Dt7_Y_;
@@ -2161,25 +1722,6 @@ EXPORT L_Compile := MODULE
     KEL.typ.nint P_L___S_T_L_Cnt2_Y_;
     KEL.typ.nint P_L___S_T_L_Cnt5_Y_;
     KEL.typ.nstr P_L___S_T_L_Dt_List5_Y_;
-    KEL.typ.nint P_L___Ver_Src_Cnt_Ev_;
-    KEL.typ.nstr P_L___Ver_Src_List_Ev_;
-    KEL.typ.nstr P_L___Ver_Src_Emrg_Dt_List_Ev_;
-    KEL.typ.nstr P_L___Ver_Src_Last_Dt_List_Ev_;
-    KEL.typ.nstr P_L___Ver_Src_Old_Dt_Ev_;
-    KEL.typ.nstr P_L___Ver_Src_New_Dt_Ev_;
-    KEL.typ.str P___Lex_I_D_Rstd_Only_Flag_ := '';
-    KEL.typ.nint P_L___Ver_Name_First_Src_Cnt_Ev_;
-    KEL.typ.nstr P_L___Ver_Name_First_Src_List_Ev_;
-    KEL.typ.nstr P_L___Ver_Name_First_Src_Emrg_Dt_List_Ev_;
-    KEL.typ.nstr P_L___Ver_Name_First_Src_Last_Dt_List_Ev_;
-    KEL.typ.nint P_L___Ver_Name_Last_Src_Cnt_Ev_;
-    KEL.typ.nstr P_L___Ver_Name_Last_Src_List_Ev_;
-    KEL.typ.nstr P_L___Ver_Name_Last_Src_Emrg_Dt_List_Ev_;
-    KEL.typ.nstr P_L___Ver_Name_Last_Src_Last_Dt_List_Ev_;
-    KEL.typ.nint P_L___Ver_S_S_N_Src_Cnt_Ev_;
-    KEL.typ.nstr P_L___Ver_S_S_N_Src_List_Ev_;
-    KEL.typ.nstr P_L___Ver_S_S_N_Src_Emrg_Dt_List_Ev_;
-    KEL.typ.nstr P_L___Ver_S_S_N_Src_Last_Dt_List_Ev_;
     KEL.typ.str P_L___Alrt_Corrected_Flag_ := '';
     KEL.typ.str P_L___Alrt_Cons_Statement_Flag_ := '';
     KEL.typ.str P_L___Alrt_Dispute_Flag_ := '';
@@ -3742,224 +3284,6 @@ EXPORT L_Compile := MODULE
     KEL.typ.epoch Vault_Date_Last_Seen_ := 0;
     KEL.typ.int __RecordCount := 0;
   END;
-  SHARED Non_F_C_R_A_Person_Attributes_V1_Hybrid_Res0_Internal_Layout_P_L___Ast_Veh_Air_Emrg_Dt_List_Ev_Layout := RECORD
-    KEL.typ.ntyp(E_Aircraft().Typ) Plane_;
-    KEL.typ.nstr Aircraft_First_Seen_Date_;
-    KEL.typ.epoch Archive___Date_ := 0;
-    KEL.typ.epoch Date_First_Seen_ := 0;
-    KEL.typ.epoch Date_Last_Seen_ := 0;
-    KEL.typ.epoch Hybrid_Archive_Date_ := 0;
-    KEL.typ.epoch Vault_Date_Last_Seen_ := 0;
-    KEL.typ.int __RecordCount := 0;
-  END;
-  SHARED Non_F_C_R_A_Person_Attributes_V1_Hybrid_Res0_Internal_Layout_P_L___Ast_Veh_Wtr_Emrg_Dt_List_Ev_Layout := RECORD
-    KEL.typ.ntyp(E_Watercraft().Typ) W_Craft_;
-    KEL.typ.nstr Watercraft_First_Seen_Date_;
-    KEL.typ.epoch Archive___Date_ := 0;
-    KEL.typ.epoch Date_First_Seen_ := 0;
-    KEL.typ.epoch Date_Last_Seen_ := 0;
-    KEL.typ.epoch Hybrid_Archive_Date_ := 0;
-    KEL.typ.epoch Vault_Date_Last_Seen_ := 0;
-    KEL.typ.int __RecordCount := 0;
-  END;
-  SHARED Non_F_C_R_A_Person_Attributes_V1_Hybrid_Res0_Internal_Layout_P_L___Drg_Bk_Dt_List1_Y_Layout := RECORD
-    KEL.typ.nstr T_M_S_I_D_;
-    KEL.typ.nstr Case_Number_;
-    KEL.typ.nstr Court_Code_;
-    KEL.typ.nkdate Bankruptcy_Date_;
-    KEL.typ.nkdate Last_Status_Update_;
-    KEL.typ.nkdate Date_Filed_;
-    KEL.typ.epoch Archive___Date_ := 0;
-    KEL.typ.epoch Date_First_Seen_ := 0;
-    KEL.typ.epoch Date_Last_Seen_ := 0;
-    KEL.typ.epoch Hybrid_Archive_Date_ := 0;
-    KEL.typ.epoch Vault_Date_Last_Seen_ := 0;
-    KEL.typ.int __RecordCount := 0;
-  END;
-  SHARED Non_F_C_R_A_Person_Attributes_V1_Hybrid_Res0_Internal_Layout_P_L___Drg_Bk_Dt_List7_Y_Layout := RECORD
-    KEL.typ.nstr T_M_S_I_D_;
-    KEL.typ.nstr Case_Number_;
-    KEL.typ.nstr Court_Code_;
-    KEL.typ.nkdate Bankruptcy_Date_;
-    KEL.typ.nkdate Last_Status_Update_;
-    KEL.typ.nkdate Date_Filed_;
-    KEL.typ.epoch Archive___Date_ := 0;
-    KEL.typ.epoch Date_First_Seen_ := 0;
-    KEL.typ.epoch Date_Last_Seen_ := 0;
-    KEL.typ.epoch Hybrid_Archive_Date_ := 0;
-    KEL.typ.epoch Vault_Date_Last_Seen_ := 0;
-    KEL.typ.int __RecordCount := 0;
-  END;
-  SHARED Non_F_C_R_A_Person_Attributes_V1_Hybrid_Res0_Internal_Layout_P_L___Drg_Bk_Dt_List10_Y_Layout := RECORD
-    KEL.typ.nstr T_M_S_I_D_;
-    KEL.typ.nstr Case_Number_;
-    KEL.typ.nstr Court_Code_;
-    KEL.typ.nkdate Bankruptcy_Date_;
-    KEL.typ.nkdate Last_Status_Update_;
-    KEL.typ.nkdate Date_Filed_;
-    KEL.typ.epoch Archive___Date_ := 0;
-    KEL.typ.epoch Date_First_Seen_ := 0;
-    KEL.typ.epoch Date_Last_Seen_ := 0;
-    KEL.typ.epoch Hybrid_Archive_Date_ := 0;
-    KEL.typ.epoch Vault_Date_Last_Seen_ := 0;
-    KEL.typ.int __RecordCount := 0;
-  END;
-  SHARED Non_F_C_R_A_Person_Attributes_V1_Hybrid_Res0_Internal_Layout_P_L___Drg_Bk_Ch_List1_Y_Layout := RECORD
-    KEL.typ.nstr Original_Chapter_;
-    KEL.typ.nstr T_M_S_I_D_;
-    KEL.typ.nstr Case_Number_;
-    KEL.typ.nstr Court_Code_;
-    KEL.typ.nkdate Bankruptcy_Date_;
-    KEL.typ.nkdate Last_Status_Update_;
-    KEL.typ.nkdate Date_Filed_;
-    KEL.typ.epoch Archive___Date_ := 0;
-    KEL.typ.epoch Date_First_Seen_ := 0;
-    KEL.typ.epoch Date_Last_Seen_ := 0;
-    KEL.typ.epoch Hybrid_Archive_Date_ := 0;
-    KEL.typ.epoch Vault_Date_Last_Seen_ := 0;
-    KEL.typ.int __RecordCount := 0;
-  END;
-  SHARED Non_F_C_R_A_Person_Attributes_V1_Hybrid_Res0_Internal_Layout_P_L___Drg_Bk_Ch_List7_Y_Layout := RECORD
-    KEL.typ.nstr Original_Chapter_;
-    KEL.typ.nstr T_M_S_I_D_;
-    KEL.typ.nstr Case_Number_;
-    KEL.typ.nstr Court_Code_;
-    KEL.typ.nkdate Bankruptcy_Date_;
-    KEL.typ.nkdate Last_Status_Update_;
-    KEL.typ.nkdate Date_Filed_;
-    KEL.typ.epoch Archive___Date_ := 0;
-    KEL.typ.epoch Date_First_Seen_ := 0;
-    KEL.typ.epoch Date_Last_Seen_ := 0;
-    KEL.typ.epoch Hybrid_Archive_Date_ := 0;
-    KEL.typ.epoch Vault_Date_Last_Seen_ := 0;
-    KEL.typ.int __RecordCount := 0;
-  END;
-  SHARED Non_F_C_R_A_Person_Attributes_V1_Hybrid_Res0_Internal_Layout_P_L___Drg_Bk_Ch_List10_Y_Layout := RECORD
-    KEL.typ.nstr Original_Chapter_;
-    KEL.typ.nstr T_M_S_I_D_;
-    KEL.typ.nstr Case_Number_;
-    KEL.typ.nstr Court_Code_;
-    KEL.typ.nkdate Bankruptcy_Date_;
-    KEL.typ.nkdate Last_Status_Update_;
-    KEL.typ.nkdate Date_Filed_;
-    KEL.typ.epoch Archive___Date_ := 0;
-    KEL.typ.epoch Date_First_Seen_ := 0;
-    KEL.typ.epoch Date_Last_Seen_ := 0;
-    KEL.typ.epoch Hybrid_Archive_Date_ := 0;
-    KEL.typ.epoch Vault_Date_Last_Seen_ := 0;
-    KEL.typ.int __RecordCount := 0;
-  END;
-  SHARED Non_F_C_R_A_Person_Attributes_V1_Hybrid_Res0_Internal_Layout_P_L___Drg_Bk_Disp_List1_Y_Layout := RECORD
-    KEL.typ.nstr Disposition_;
-    KEL.typ.nstr T_M_S_I_D_;
-    KEL.typ.nstr Case_Number_;
-    KEL.typ.nstr Court_Code_;
-    KEL.typ.nkdate Bankruptcy_Date_;
-    KEL.typ.nkdate Last_Status_Update_;
-    KEL.typ.nkdate Date_Filed_;
-    KEL.typ.epoch Archive___Date_ := 0;
-    KEL.typ.epoch Date_First_Seen_ := 0;
-    KEL.typ.epoch Date_Last_Seen_ := 0;
-    KEL.typ.epoch Hybrid_Archive_Date_ := 0;
-    KEL.typ.epoch Vault_Date_Last_Seen_ := 0;
-    KEL.typ.int __RecordCount := 0;
-  END;
-  SHARED Non_F_C_R_A_Person_Attributes_V1_Hybrid_Res0_Internal_Layout_P_L___Drg_Bk_Disp_List7_Y_Layout := RECORD
-    KEL.typ.nstr Disposition_;
-    KEL.typ.nstr T_M_S_I_D_;
-    KEL.typ.nstr Case_Number_;
-    KEL.typ.nstr Court_Code_;
-    KEL.typ.nkdate Bankruptcy_Date_;
-    KEL.typ.nkdate Last_Status_Update_;
-    KEL.typ.nkdate Date_Filed_;
-    KEL.typ.epoch Archive___Date_ := 0;
-    KEL.typ.epoch Date_First_Seen_ := 0;
-    KEL.typ.epoch Date_Last_Seen_ := 0;
-    KEL.typ.epoch Hybrid_Archive_Date_ := 0;
-    KEL.typ.epoch Vault_Date_Last_Seen_ := 0;
-    KEL.typ.int __RecordCount := 0;
-  END;
-  SHARED Non_F_C_R_A_Person_Attributes_V1_Hybrid_Res0_Internal_Layout_P_L___Drg_Bk_Disp_List10_Y_Layout := RECORD
-    KEL.typ.nstr Disposition_;
-    KEL.typ.nstr T_M_S_I_D_;
-    KEL.typ.nstr Case_Number_;
-    KEL.typ.nstr Court_Code_;
-    KEL.typ.nkdate Bankruptcy_Date_;
-    KEL.typ.nkdate Last_Status_Update_;
-    KEL.typ.nkdate Date_Filed_;
-    KEL.typ.epoch Archive___Date_ := 0;
-    KEL.typ.epoch Date_First_Seen_ := 0;
-    KEL.typ.epoch Date_Last_Seen_ := 0;
-    KEL.typ.epoch Hybrid_Archive_Date_ := 0;
-    KEL.typ.epoch Vault_Date_Last_Seen_ := 0;
-    KEL.typ.int __RecordCount := 0;
-  END;
-  SHARED Non_F_C_R_A_Person_Attributes_V1_Hybrid_Res0_Internal_Layout_P_L___Drg_Bk_Type_List1_Y_Layout := RECORD
-    KEL.typ.nstr Filing_Type_;
-    KEL.typ.nkdate Bankruptcy_Date_;
-    KEL.typ.nkdate Last_Status_Update_;
-    KEL.typ.nkdate Date_Filed_;
-    KEL.typ.epoch Archive___Date_ := 0;
-    KEL.typ.epoch Date_First_Seen_ := 0;
-    KEL.typ.epoch Date_Last_Seen_ := 0;
-    KEL.typ.epoch Hybrid_Archive_Date_ := 0;
-    KEL.typ.epoch Vault_Date_Last_Seen_ := 0;
-    KEL.typ.int __RecordCount := 0;
-  END;
-  SHARED Non_F_C_R_A_Person_Attributes_V1_Hybrid_Res0_Internal_Layout_P_L___Drg_Bk_Type_List7_Y_Layout := RECORD
-    KEL.typ.nstr Filing_Type_;
-    KEL.typ.nkdate Bankruptcy_Date_;
-    KEL.typ.nkdate Last_Status_Update_;
-    KEL.typ.nkdate Date_Filed_;
-    KEL.typ.epoch Archive___Date_ := 0;
-    KEL.typ.epoch Date_First_Seen_ := 0;
-    KEL.typ.epoch Date_Last_Seen_ := 0;
-    KEL.typ.epoch Hybrid_Archive_Date_ := 0;
-    KEL.typ.epoch Vault_Date_Last_Seen_ := 0;
-    KEL.typ.int __RecordCount := 0;
-  END;
-  SHARED Non_F_C_R_A_Person_Attributes_V1_Hybrid_Res0_Internal_Layout_P_L___Drg_Bk_Type_List10_Y_Layout := RECORD
-    KEL.typ.nstr Filing_Type_;
-    KEL.typ.nkdate Bankruptcy_Date_;
-    KEL.typ.nkdate Last_Status_Update_;
-    KEL.typ.nkdate Date_Filed_;
-    KEL.typ.epoch Archive___Date_ := 0;
-    KEL.typ.epoch Date_First_Seen_ := 0;
-    KEL.typ.epoch Date_Last_Seen_ := 0;
-    KEL.typ.epoch Hybrid_Archive_Date_ := 0;
-    KEL.typ.epoch Vault_Date_Last_Seen_ := 0;
-    KEL.typ.int __RecordCount := 0;
-  END;
-  SHARED Non_F_C_R_A_Person_Attributes_V1_Hybrid_Res0_Internal_Layout_P_L___Prof_Lic_Issue_Dt_List_Ev_Layout := RECORD
-    KEL.typ.nuid Prof_Lic_U_I_D_;
-    KEL.typ.nstr Max_Issue_Date_;
-    KEL.typ.epoch Archive___Date_ := 0;
-    KEL.typ.epoch Date_First_Seen_ := 0;
-    KEL.typ.epoch Date_Last_Seen_ := 0;
-    KEL.typ.epoch Hybrid_Archive_Date_ := 0;
-    KEL.typ.epoch Vault_Date_Last_Seen_ := 0;
-    KEL.typ.int __RecordCount := 0;
-  END;
-  SHARED Non_F_C_R_A_Person_Attributes_V1_Hybrid_Res0_Internal_Layout_P_L___Prof_Lic_Exp_Dt_List_Ev_Layout := RECORD
-    KEL.typ.nuid Prof_Lic_U_I_D_;
-    KEL.typ.nstr Max_Expire_Date_;
-    KEL.typ.epoch Archive___Date_ := 0;
-    KEL.typ.epoch Date_First_Seen_ := 0;
-    KEL.typ.epoch Date_Last_Seen_ := 0;
-    KEL.typ.epoch Hybrid_Archive_Date_ := 0;
-    KEL.typ.epoch Vault_Date_Last_Seen_ := 0;
-    KEL.typ.int __RecordCount := 0;
-  END;
-  SHARED Non_F_C_R_A_Person_Attributes_V1_Hybrid_Res0_Internal_Layout_P_L___Prof_Lic_Indx_By_Lic_List_Ev_Layout := RECORD
-    KEL.typ.nuid Prof_Lic_U_I_D_;
-    KEL.typ.nstr License_Category_;
-    KEL.typ.epoch Archive___Date_ := 0;
-    KEL.typ.epoch Date_First_Seen_ := 0;
-    KEL.typ.epoch Date_Last_Seen_ := 0;
-    KEL.typ.epoch Hybrid_Archive_Date_ := 0;
-    KEL.typ.epoch Vault_Date_Last_Seen_ := 0;
-    KEL.typ.int __RecordCount := 0;
-  END;
   SHARED Non_F_C_R_A_Person_Attributes_V1_Hybrid_Res0_Internal_Layout_Crim_List_Layout := RECORD
     KEL.typ.nkdate Original_Filing_Date_;
     KEL.typ.nstr List_I_D_;
@@ -4015,13 +3339,13 @@ EXPORT L_Compile := MODULE
     KEL.typ.nint P_L___Ast_Veh_Auto_Emrg_New_Msnc_Ev_;
     KEL.typ.nint P_L___Ast_Veh_Auto_Emrg_Old_Msnc_Ev_;
     KEL.typ.int P_L___Ast_Veh_Air_Cnt_Ev_ := 0;
-    KEL.typ.ndataset(Non_F_C_R_A_Person_Attributes_V1_Hybrid_Res0_Internal_Layout_P_L___Ast_Veh_Air_Emrg_Dt_List_Ev_Layout) P_L___Ast_Veh_Air_Emrg_Dt_List_Ev_;
+    KEL.typ.nstr P_L___Ast_Veh_Air_Emrg_Dt_List_Ev_;
     KEL.typ.nstr P_L___Ast_Veh_Air_Emrg_New_Dt_Ev_;
     KEL.typ.nstr P_L___Ast_Veh_Air_Emrg_Old_Dt_Ev_;
     KEL.typ.nint P_L___Ast_Veh_Air_Emrg_New_Msnc_Ev_;
     KEL.typ.nint P_L___Ast_Veh_Air_Emrg_Old_Msnc_Ev_;
     KEL.typ.int P_L___Ast_Veh_Wtr_Cnt_Ev_ := 0;
-    KEL.typ.ndataset(Non_F_C_R_A_Person_Attributes_V1_Hybrid_Res0_Internal_Layout_P_L___Ast_Veh_Wtr_Emrg_Dt_List_Ev_Layout) P_L___Ast_Veh_Wtr_Emrg_Dt_List_Ev_;
+    KEL.typ.nstr P_L___Ast_Veh_Wtr_Emrg_Dt_List_Ev_;
     KEL.typ.nstr P_L___Ast_Veh_Wtr_Emrg_New_Dt_Ev_;
     KEL.typ.nstr P_L___Ast_Veh_Wtr_Emrg_Old_Dt_Ev_;
     KEL.typ.nint P_L___Ast_Veh_Wtr_Emrg_New_Msnc_Ev_;
@@ -4071,9 +3395,9 @@ EXPORT L_Compile := MODULE
     KEL.typ.int P_L___Drg_Bk_Cnt1_Y_ := 0;
     KEL.typ.int P_L___Drg_Bk_Cnt7_Y_ := 0;
     KEL.typ.int P_L___Drg_Bk_Cnt10_Y_ := 0;
-    KEL.typ.ndataset(Non_F_C_R_A_Person_Attributes_V1_Hybrid_Res0_Internal_Layout_P_L___Drg_Bk_Dt_List1_Y_Layout) P_L___Drg_Bk_Dt_List1_Y_;
-    KEL.typ.ndataset(Non_F_C_R_A_Person_Attributes_V1_Hybrid_Res0_Internal_Layout_P_L___Drg_Bk_Dt_List7_Y_Layout) P_L___Drg_Bk_Dt_List7_Y_;
-    KEL.typ.ndataset(Non_F_C_R_A_Person_Attributes_V1_Hybrid_Res0_Internal_Layout_P_L___Drg_Bk_Dt_List10_Y_Layout) P_L___Drg_Bk_Dt_List10_Y_;
+    KEL.typ.nstr P_L___Drg_Bk_Dt_List1_Y_;
+    KEL.typ.nstr P_L___Drg_Bk_Dt_List7_Y_;
+    KEL.typ.nstr P_L___Drg_Bk_Dt_List10_Y_;
     KEL.typ.nstr P_L___Drg_Bk_New_Dt1_Y_;
     KEL.typ.nstr P_L___Drg_Bk_New_Dt7_Y_;
     KEL.typ.nstr P_L___Drg_Bk_New_Dt10_Y_;
@@ -4086,9 +3410,9 @@ EXPORT L_Compile := MODULE
     KEL.typ.nint P_L___Drg_Bk_Old_Msnc1_Y_;
     KEL.typ.nint P_L___Drg_Bk_Old_Msnc7_Y_;
     KEL.typ.nint P_L___Drg_Bk_Old_Msnc10_Y_;
-    KEL.typ.ndataset(Non_F_C_R_A_Person_Attributes_V1_Hybrid_Res0_Internal_Layout_P_L___Drg_Bk_Ch_List1_Y_Layout) P_L___Drg_Bk_Ch_List1_Y_;
-    KEL.typ.ndataset(Non_F_C_R_A_Person_Attributes_V1_Hybrid_Res0_Internal_Layout_P_L___Drg_Bk_Ch_List7_Y_Layout) P_L___Drg_Bk_Ch_List7_Y_;
-    KEL.typ.ndataset(Non_F_C_R_A_Person_Attributes_V1_Hybrid_Res0_Internal_Layout_P_L___Drg_Bk_Ch_List10_Y_Layout) P_L___Drg_Bk_Ch_List10_Y_;
+    KEL.typ.nstr P_L___Drg_Bk_Ch_List1_Y_;
+    KEL.typ.nstr P_L___Drg_Bk_Ch_List7_Y_;
+    KEL.typ.nstr P_L___Drg_Bk_Ch_List10_Y_;
     KEL.typ.nstr P_L___Drg_Bk_New_Ch_Type1_Y_;
     KEL.typ.nstr P_L___Drg_Bk_New_Ch_Type7_Y_;
     KEL.typ.nstr P_L___Drg_Bk_New_Ch_Type10_Y_;
@@ -4104,9 +3428,9 @@ EXPORT L_Compile := MODULE
     KEL.typ.nstr P_L___Drg_Bk_Updt_New_Msnc1_Y_;
     KEL.typ.nstr P_L___Drg_Bk_Updt_New_Msnc7_Y_;
     KEL.typ.nstr P_L___Drg_Bk_Updt_New_Msnc10_Y_;
-    KEL.typ.ndataset(Non_F_C_R_A_Person_Attributes_V1_Hybrid_Res0_Internal_Layout_P_L___Drg_Bk_Disp_List1_Y_Layout) P_L___Drg_Bk_Disp_List1_Y_;
-    KEL.typ.ndataset(Non_F_C_R_A_Person_Attributes_V1_Hybrid_Res0_Internal_Layout_P_L___Drg_Bk_Disp_List7_Y_Layout) P_L___Drg_Bk_Disp_List7_Y_;
-    KEL.typ.ndataset(Non_F_C_R_A_Person_Attributes_V1_Hybrid_Res0_Internal_Layout_P_L___Drg_Bk_Disp_List10_Y_Layout) P_L___Drg_Bk_Disp_List10_Y_;
+    KEL.typ.nstr P_L___Drg_Bk_Disp_List1_Y_;
+    KEL.typ.nstr P_L___Drg_Bk_Disp_List7_Y_;
+    KEL.typ.nstr P_L___Drg_Bk_Disp_List10_Y_;
     KEL.typ.nstr P_L___Drg_Bk_New_Disp_Type1_Y_;
     KEL.typ.nstr P_L___Drg_Bk_New_Disp_Type7_Y_;
     KEL.typ.nstr P_L___Drg_Bk_New_Disp_Type10_Y_;
@@ -4125,17 +3449,17 @@ EXPORT L_Compile := MODULE
     KEL.typ.int P_L___Drg_Bk_Dsch_Cnt1_Y_ := 0;
     KEL.typ.int P_L___Drg_Bk_Dsch_Cnt7_Y_ := 0;
     KEL.typ.int P_L___Drg_Bk_Dsch_Cnt10_Y_ := 0;
-    KEL.typ.ndataset(Non_F_C_R_A_Person_Attributes_V1_Hybrid_Res0_Internal_Layout_P_L___Drg_Bk_Type_List1_Y_Layout) P_L___Drg_Bk_Type_List1_Y_;
-    KEL.typ.ndataset(Non_F_C_R_A_Person_Attributes_V1_Hybrid_Res0_Internal_Layout_P_L___Drg_Bk_Type_List7_Y_Layout) P_L___Drg_Bk_Type_List7_Y_;
-    KEL.typ.ndataset(Non_F_C_R_A_Person_Attributes_V1_Hybrid_Res0_Internal_Layout_P_L___Drg_Bk_Type_List10_Y_Layout) P_L___Drg_Bk_Type_List10_Y_;
+    KEL.typ.nstr P_L___Drg_Bk_Type_List1_Y_;
+    KEL.typ.nstr P_L___Drg_Bk_Type_List7_Y_;
+    KEL.typ.nstr P_L___Drg_Bk_Type_List10_Y_;
     KEL.typ.nstr P_L___Drg_Bk_Bus_Flag1_Y_;
     KEL.typ.nstr P_L___Drg_Bk_Bus_Flag7_Y_;
     KEL.typ.nstr P_L___Drg_Bk_Bus_Flag10_Y_;
     KEL.typ.str P_L___Drg_Bk_Severity_Indx10_Y_ := '';
     KEL.typ.str P_L___Prof_Lic_Flag_Ev_ := '';
-    KEL.typ.ndataset(Non_F_C_R_A_Person_Attributes_V1_Hybrid_Res0_Internal_Layout_P_L___Prof_Lic_Issue_Dt_List_Ev_Layout) P_L___Prof_Lic_Issue_Dt_List_Ev_;
-    KEL.typ.ndataset(Non_F_C_R_A_Person_Attributes_V1_Hybrid_Res0_Internal_Layout_P_L___Prof_Lic_Exp_Dt_List_Ev_Layout) P_L___Prof_Lic_Exp_Dt_List_Ev_;
-    KEL.typ.ndataset(Non_F_C_R_A_Person_Attributes_V1_Hybrid_Res0_Internal_Layout_P_L___Prof_Lic_Indx_By_Lic_List_Ev_Layout) P_L___Prof_Lic_Indx_By_Lic_List_Ev_;
+    KEL.typ.nstr P_L___Prof_Lic_Issue_Dt_List_Ev_;
+    KEL.typ.nstr P_L___Prof_Lic_Exp_Dt_List_Ev_;
+    KEL.typ.nstr P_L___Prof_Lic_Indx_By_Lic_List_Ev_;
     KEL.typ.str P_L___Prof_Lic_Actv_Flag_ := '';
     KEL.typ.nstr P_L___Prof_Lic_Actv_New_Issue_Dt_;
     KEL.typ.nstr P_L___Prof_Lic_Actv_New_Exp_Dt_;
@@ -4359,10 +3683,10 @@ EXPORT L_Compile := MODULE
     KEL.typ.nint P_L___Srch_Phone_Per_Lex_I_D_Cnt1_Y_;
     KEL.typ.nint P_L___Srch_D_O_B_Per_Lex_I_D_Cnt1_Y_;
     KEL.typ.nint P_L___Srch_Email_Per_Lex_I_D_Cnt1_Y_;
-    KEL.typ.nint P_L___Srch_Per_Curr_Addr_Cnt1_Y_;
-    KEL.typ.nint P_L___Srch_Lex_I_D_Per_Curr_Addr_Cnt1_Y_;
-    KEL.typ.nint P_L___Srch_L_Name_Per_Curr_Addr_Cnt1_Y_;
-    KEL.typ.nint P_L___Srch_S_S_N_Per_Curr_Addr_Cnt1_Y_;
+    KEL.typ.int P_L___Srch_Per_Curr_Addr_Cnt1_Y_ := 0;
+    KEL.typ.int P_L___Srch_Lex_I_D_Per_Curr_Addr_Cnt1_Y_ := 0;
+    KEL.typ.int P_L___Srch_L_Name_Per_Curr_Addr_Cnt1_Y_ := 0;
+    KEL.typ.int P_L___Srch_S_S_N_Per_Curr_Addr_Cnt1_Y_ := 0;
     KEL.typ.nint P_L___Srch_Per_Lex_I_D_W_Inp_F_L_S_Cnt1_Y_;
     KEL.typ.nint P_L___Srch_Per_Lex_I_D_W_Inp_A_S_Cnt1_Y_;
     KEL.typ.nint P_L___Srch_Per_Lex_I_D_W_Inp_S_D_Cnt1_Y_;
@@ -4415,224 +3739,6 @@ EXPORT L_Compile := MODULE
     KEL.typ.int __RecordCount := 0;
   END;
   EXPORT Non_F_C_R_A_Person_Attributes_V1_Hybrid_Res0_Layout := RECORDOF(__UNWRAP(DATASET([],Non_F_C_R_A_Person_Attributes_V1_Hybrid_Res0_Internal_Layout)));
-  SHARED F_C_R_A_Person_Attributes_V1_Hybrid_Res0_Internal_Layout_P_L___Ast_Veh_Air_Emrg_Dt_List_Ev_Layout := RECORD
-    KEL.typ.ntyp(E_Aircraft().Typ) Plane_;
-    KEL.typ.nstr Aircraft_First_Seen_Date_;
-    KEL.typ.epoch Archive___Date_ := 0;
-    KEL.typ.epoch Date_First_Seen_ := 0;
-    KEL.typ.epoch Date_Last_Seen_ := 0;
-    KEL.typ.epoch Hybrid_Archive_Date_ := 0;
-    KEL.typ.epoch Vault_Date_Last_Seen_ := 0;
-    KEL.typ.int __RecordCount := 0;
-  END;
-  SHARED F_C_R_A_Person_Attributes_V1_Hybrid_Res0_Internal_Layout_P_L___Ast_Veh_Wtr_Emrg_Dt_List_Ev_Layout := RECORD
-    KEL.typ.ntyp(E_Watercraft().Typ) W_Craft_;
-    KEL.typ.nstr Watercraft_First_Seen_Date_;
-    KEL.typ.epoch Archive___Date_ := 0;
-    KEL.typ.epoch Date_First_Seen_ := 0;
-    KEL.typ.epoch Date_Last_Seen_ := 0;
-    KEL.typ.epoch Hybrid_Archive_Date_ := 0;
-    KEL.typ.epoch Vault_Date_Last_Seen_ := 0;
-    KEL.typ.int __RecordCount := 0;
-  END;
-  SHARED F_C_R_A_Person_Attributes_V1_Hybrid_Res0_Internal_Layout_P_L___Drg_Bk_Dt_List1_Y_Layout := RECORD
-    KEL.typ.nstr T_M_S_I_D_;
-    KEL.typ.nstr Case_Number_;
-    KEL.typ.nstr Court_Code_;
-    KEL.typ.nkdate Bankruptcy_Date_;
-    KEL.typ.nkdate Last_Status_Update_;
-    KEL.typ.nkdate Date_Filed_;
-    KEL.typ.epoch Archive___Date_ := 0;
-    KEL.typ.epoch Date_First_Seen_ := 0;
-    KEL.typ.epoch Date_Last_Seen_ := 0;
-    KEL.typ.epoch Hybrid_Archive_Date_ := 0;
-    KEL.typ.epoch Vault_Date_Last_Seen_ := 0;
-    KEL.typ.int __RecordCount := 0;
-  END;
-  SHARED F_C_R_A_Person_Attributes_V1_Hybrid_Res0_Internal_Layout_P_L___Drg_Bk_Dt_List7_Y_Layout := RECORD
-    KEL.typ.nstr T_M_S_I_D_;
-    KEL.typ.nstr Case_Number_;
-    KEL.typ.nstr Court_Code_;
-    KEL.typ.nkdate Bankruptcy_Date_;
-    KEL.typ.nkdate Last_Status_Update_;
-    KEL.typ.nkdate Date_Filed_;
-    KEL.typ.epoch Archive___Date_ := 0;
-    KEL.typ.epoch Date_First_Seen_ := 0;
-    KEL.typ.epoch Date_Last_Seen_ := 0;
-    KEL.typ.epoch Hybrid_Archive_Date_ := 0;
-    KEL.typ.epoch Vault_Date_Last_Seen_ := 0;
-    KEL.typ.int __RecordCount := 0;
-  END;
-  SHARED F_C_R_A_Person_Attributes_V1_Hybrid_Res0_Internal_Layout_P_L___Drg_Bk_Dt_List10_Y_Layout := RECORD
-    KEL.typ.nstr T_M_S_I_D_;
-    KEL.typ.nstr Case_Number_;
-    KEL.typ.nstr Court_Code_;
-    KEL.typ.nkdate Bankruptcy_Date_;
-    KEL.typ.nkdate Last_Status_Update_;
-    KEL.typ.nkdate Date_Filed_;
-    KEL.typ.epoch Archive___Date_ := 0;
-    KEL.typ.epoch Date_First_Seen_ := 0;
-    KEL.typ.epoch Date_Last_Seen_ := 0;
-    KEL.typ.epoch Hybrid_Archive_Date_ := 0;
-    KEL.typ.epoch Vault_Date_Last_Seen_ := 0;
-    KEL.typ.int __RecordCount := 0;
-  END;
-  SHARED F_C_R_A_Person_Attributes_V1_Hybrid_Res0_Internal_Layout_P_L___Drg_Bk_Ch_List1_Y_Layout := RECORD
-    KEL.typ.nstr Original_Chapter_;
-    KEL.typ.nstr T_M_S_I_D_;
-    KEL.typ.nstr Case_Number_;
-    KEL.typ.nstr Court_Code_;
-    KEL.typ.nkdate Bankruptcy_Date_;
-    KEL.typ.nkdate Last_Status_Update_;
-    KEL.typ.nkdate Date_Filed_;
-    KEL.typ.epoch Archive___Date_ := 0;
-    KEL.typ.epoch Date_First_Seen_ := 0;
-    KEL.typ.epoch Date_Last_Seen_ := 0;
-    KEL.typ.epoch Hybrid_Archive_Date_ := 0;
-    KEL.typ.epoch Vault_Date_Last_Seen_ := 0;
-    KEL.typ.int __RecordCount := 0;
-  END;
-  SHARED F_C_R_A_Person_Attributes_V1_Hybrid_Res0_Internal_Layout_P_L___Drg_Bk_Ch_List7_Y_Layout := RECORD
-    KEL.typ.nstr Original_Chapter_;
-    KEL.typ.nstr T_M_S_I_D_;
-    KEL.typ.nstr Case_Number_;
-    KEL.typ.nstr Court_Code_;
-    KEL.typ.nkdate Bankruptcy_Date_;
-    KEL.typ.nkdate Last_Status_Update_;
-    KEL.typ.nkdate Date_Filed_;
-    KEL.typ.epoch Archive___Date_ := 0;
-    KEL.typ.epoch Date_First_Seen_ := 0;
-    KEL.typ.epoch Date_Last_Seen_ := 0;
-    KEL.typ.epoch Hybrid_Archive_Date_ := 0;
-    KEL.typ.epoch Vault_Date_Last_Seen_ := 0;
-    KEL.typ.int __RecordCount := 0;
-  END;
-  SHARED F_C_R_A_Person_Attributes_V1_Hybrid_Res0_Internal_Layout_P_L___Drg_Bk_Ch_List10_Y_Layout := RECORD
-    KEL.typ.nstr Original_Chapter_;
-    KEL.typ.nstr T_M_S_I_D_;
-    KEL.typ.nstr Case_Number_;
-    KEL.typ.nstr Court_Code_;
-    KEL.typ.nkdate Bankruptcy_Date_;
-    KEL.typ.nkdate Last_Status_Update_;
-    KEL.typ.nkdate Date_Filed_;
-    KEL.typ.epoch Archive___Date_ := 0;
-    KEL.typ.epoch Date_First_Seen_ := 0;
-    KEL.typ.epoch Date_Last_Seen_ := 0;
-    KEL.typ.epoch Hybrid_Archive_Date_ := 0;
-    KEL.typ.epoch Vault_Date_Last_Seen_ := 0;
-    KEL.typ.int __RecordCount := 0;
-  END;
-  SHARED F_C_R_A_Person_Attributes_V1_Hybrid_Res0_Internal_Layout_P_L___Drg_Bk_Disp_List1_Y_Layout := RECORD
-    KEL.typ.nstr Disposition_;
-    KEL.typ.nstr T_M_S_I_D_;
-    KEL.typ.nstr Case_Number_;
-    KEL.typ.nstr Court_Code_;
-    KEL.typ.nkdate Bankruptcy_Date_;
-    KEL.typ.nkdate Last_Status_Update_;
-    KEL.typ.nkdate Date_Filed_;
-    KEL.typ.epoch Archive___Date_ := 0;
-    KEL.typ.epoch Date_First_Seen_ := 0;
-    KEL.typ.epoch Date_Last_Seen_ := 0;
-    KEL.typ.epoch Hybrid_Archive_Date_ := 0;
-    KEL.typ.epoch Vault_Date_Last_Seen_ := 0;
-    KEL.typ.int __RecordCount := 0;
-  END;
-  SHARED F_C_R_A_Person_Attributes_V1_Hybrid_Res0_Internal_Layout_P_L___Drg_Bk_Disp_List7_Y_Layout := RECORD
-    KEL.typ.nstr Disposition_;
-    KEL.typ.nstr T_M_S_I_D_;
-    KEL.typ.nstr Case_Number_;
-    KEL.typ.nstr Court_Code_;
-    KEL.typ.nkdate Bankruptcy_Date_;
-    KEL.typ.nkdate Last_Status_Update_;
-    KEL.typ.nkdate Date_Filed_;
-    KEL.typ.epoch Archive___Date_ := 0;
-    KEL.typ.epoch Date_First_Seen_ := 0;
-    KEL.typ.epoch Date_Last_Seen_ := 0;
-    KEL.typ.epoch Hybrid_Archive_Date_ := 0;
-    KEL.typ.epoch Vault_Date_Last_Seen_ := 0;
-    KEL.typ.int __RecordCount := 0;
-  END;
-  SHARED F_C_R_A_Person_Attributes_V1_Hybrid_Res0_Internal_Layout_P_L___Drg_Bk_Disp_List10_Y_Layout := RECORD
-    KEL.typ.nstr Disposition_;
-    KEL.typ.nstr T_M_S_I_D_;
-    KEL.typ.nstr Case_Number_;
-    KEL.typ.nstr Court_Code_;
-    KEL.typ.nkdate Bankruptcy_Date_;
-    KEL.typ.nkdate Last_Status_Update_;
-    KEL.typ.nkdate Date_Filed_;
-    KEL.typ.epoch Archive___Date_ := 0;
-    KEL.typ.epoch Date_First_Seen_ := 0;
-    KEL.typ.epoch Date_Last_Seen_ := 0;
-    KEL.typ.epoch Hybrid_Archive_Date_ := 0;
-    KEL.typ.epoch Vault_Date_Last_Seen_ := 0;
-    KEL.typ.int __RecordCount := 0;
-  END;
-  SHARED F_C_R_A_Person_Attributes_V1_Hybrid_Res0_Internal_Layout_P_L___Drg_Bk_Type_List1_Y_Layout := RECORD
-    KEL.typ.nstr Filing_Type_;
-    KEL.typ.nkdate Bankruptcy_Date_;
-    KEL.typ.nkdate Last_Status_Update_;
-    KEL.typ.nkdate Date_Filed_;
-    KEL.typ.epoch Archive___Date_ := 0;
-    KEL.typ.epoch Date_First_Seen_ := 0;
-    KEL.typ.epoch Date_Last_Seen_ := 0;
-    KEL.typ.epoch Hybrid_Archive_Date_ := 0;
-    KEL.typ.epoch Vault_Date_Last_Seen_ := 0;
-    KEL.typ.int __RecordCount := 0;
-  END;
-  SHARED F_C_R_A_Person_Attributes_V1_Hybrid_Res0_Internal_Layout_P_L___Drg_Bk_Type_List7_Y_Layout := RECORD
-    KEL.typ.nstr Filing_Type_;
-    KEL.typ.nkdate Bankruptcy_Date_;
-    KEL.typ.nkdate Last_Status_Update_;
-    KEL.typ.nkdate Date_Filed_;
-    KEL.typ.epoch Archive___Date_ := 0;
-    KEL.typ.epoch Date_First_Seen_ := 0;
-    KEL.typ.epoch Date_Last_Seen_ := 0;
-    KEL.typ.epoch Hybrid_Archive_Date_ := 0;
-    KEL.typ.epoch Vault_Date_Last_Seen_ := 0;
-    KEL.typ.int __RecordCount := 0;
-  END;
-  SHARED F_C_R_A_Person_Attributes_V1_Hybrid_Res0_Internal_Layout_P_L___Drg_Bk_Type_List10_Y_Layout := RECORD
-    KEL.typ.nstr Filing_Type_;
-    KEL.typ.nkdate Bankruptcy_Date_;
-    KEL.typ.nkdate Last_Status_Update_;
-    KEL.typ.nkdate Date_Filed_;
-    KEL.typ.epoch Archive___Date_ := 0;
-    KEL.typ.epoch Date_First_Seen_ := 0;
-    KEL.typ.epoch Date_Last_Seen_ := 0;
-    KEL.typ.epoch Hybrid_Archive_Date_ := 0;
-    KEL.typ.epoch Vault_Date_Last_Seen_ := 0;
-    KEL.typ.int __RecordCount := 0;
-  END;
-  SHARED F_C_R_A_Person_Attributes_V1_Hybrid_Res0_Internal_Layout_P_L___Prof_Lic_Issue_Dt_List_Ev_Layout := RECORD
-    KEL.typ.nuid Prof_Lic_U_I_D_;
-    KEL.typ.nstr Max_Issue_Date_;
-    KEL.typ.epoch Archive___Date_ := 0;
-    KEL.typ.epoch Date_First_Seen_ := 0;
-    KEL.typ.epoch Date_Last_Seen_ := 0;
-    KEL.typ.epoch Hybrid_Archive_Date_ := 0;
-    KEL.typ.epoch Vault_Date_Last_Seen_ := 0;
-    KEL.typ.int __RecordCount := 0;
-  END;
-  SHARED F_C_R_A_Person_Attributes_V1_Hybrid_Res0_Internal_Layout_P_L___Prof_Lic_Exp_Dt_List_Ev_Layout := RECORD
-    KEL.typ.nuid Prof_Lic_U_I_D_;
-    KEL.typ.nstr Max_Expire_Date_;
-    KEL.typ.epoch Archive___Date_ := 0;
-    KEL.typ.epoch Date_First_Seen_ := 0;
-    KEL.typ.epoch Date_Last_Seen_ := 0;
-    KEL.typ.epoch Hybrid_Archive_Date_ := 0;
-    KEL.typ.epoch Vault_Date_Last_Seen_ := 0;
-    KEL.typ.int __RecordCount := 0;
-  END;
-  SHARED F_C_R_A_Person_Attributes_V1_Hybrid_Res0_Internal_Layout_P_L___Prof_Lic_Indx_By_Lic_List_Ev_Layout := RECORD
-    KEL.typ.nuid Prof_Lic_U_I_D_;
-    KEL.typ.nstr License_Category_;
-    KEL.typ.epoch Archive___Date_ := 0;
-    KEL.typ.epoch Date_First_Seen_ := 0;
-    KEL.typ.epoch Date_Last_Seen_ := 0;
-    KEL.typ.epoch Hybrid_Archive_Date_ := 0;
-    KEL.typ.epoch Vault_Date_Last_Seen_ := 0;
-    KEL.typ.int __RecordCount := 0;
-  END;
   SHARED F_C_R_A_Person_Attributes_V1_Hybrid_Res0_Internal_Layout_Crim_List_Layout := RECORD
     KEL.typ.nkdate Original_Filing_Date_;
     KEL.typ.nstr List_I_D_;
@@ -4678,13 +3784,13 @@ EXPORT L_Compile := MODULE
     KEL.typ.str P___Lex_I_D_Seen_Flag_ := '';
     KEL.typ.str P___Lex_I_D_Is_Deceased_Flag_ := '';
     KEL.typ.int P_L___Ast_Veh_Air_Cnt_Ev_ := 0;
-    KEL.typ.ndataset(F_C_R_A_Person_Attributes_V1_Hybrid_Res0_Internal_Layout_P_L___Ast_Veh_Air_Emrg_Dt_List_Ev_Layout) P_L___Ast_Veh_Air_Emrg_Dt_List_Ev_;
+    KEL.typ.nstr P_L___Ast_Veh_Air_Emrg_Dt_List_Ev_;
     KEL.typ.nstr P_L___Ast_Veh_Air_Emrg_New_Dt_Ev_;
     KEL.typ.nstr P_L___Ast_Veh_Air_Emrg_Old_Dt_Ev_;
     KEL.typ.nint P_L___Ast_Veh_Air_Emrg_New_Msnc_Ev_;
     KEL.typ.nint P_L___Ast_Veh_Air_Emrg_Old_Msnc_Ev_;
     KEL.typ.int P_L___Ast_Veh_Wtr_Cnt_Ev_ := 0;
-    KEL.typ.ndataset(F_C_R_A_Person_Attributes_V1_Hybrid_Res0_Internal_Layout_P_L___Ast_Veh_Wtr_Emrg_Dt_List_Ev_Layout) P_L___Ast_Veh_Wtr_Emrg_Dt_List_Ev_;
+    KEL.typ.nstr P_L___Ast_Veh_Wtr_Emrg_Dt_List_Ev_;
     KEL.typ.nstr P_L___Ast_Veh_Wtr_Emrg_New_Dt_Ev_;
     KEL.typ.nstr P_L___Ast_Veh_Wtr_Emrg_Old_Dt_Ev_;
     KEL.typ.nint P_L___Ast_Veh_Wtr_Emrg_New_Msnc_Ev_;
@@ -4724,9 +3830,9 @@ EXPORT L_Compile := MODULE
     KEL.typ.int P_L___Drg_Bk_Cnt1_Y_ := 0;
     KEL.typ.int P_L___Drg_Bk_Cnt7_Y_ := 0;
     KEL.typ.int P_L___Drg_Bk_Cnt10_Y_ := 0;
-    KEL.typ.ndataset(F_C_R_A_Person_Attributes_V1_Hybrid_Res0_Internal_Layout_P_L___Drg_Bk_Dt_List1_Y_Layout) P_L___Drg_Bk_Dt_List1_Y_;
-    KEL.typ.ndataset(F_C_R_A_Person_Attributes_V1_Hybrid_Res0_Internal_Layout_P_L___Drg_Bk_Dt_List7_Y_Layout) P_L___Drg_Bk_Dt_List7_Y_;
-    KEL.typ.ndataset(F_C_R_A_Person_Attributes_V1_Hybrid_Res0_Internal_Layout_P_L___Drg_Bk_Dt_List10_Y_Layout) P_L___Drg_Bk_Dt_List10_Y_;
+    KEL.typ.nstr P_L___Drg_Bk_Dt_List1_Y_;
+    KEL.typ.nstr P_L___Drg_Bk_Dt_List7_Y_;
+    KEL.typ.nstr P_L___Drg_Bk_Dt_List10_Y_;
     KEL.typ.nstr P_L___Drg_Bk_New_Dt1_Y_;
     KEL.typ.nstr P_L___Drg_Bk_New_Dt7_Y_;
     KEL.typ.nstr P_L___Drg_Bk_New_Dt10_Y_;
@@ -4739,9 +3845,9 @@ EXPORT L_Compile := MODULE
     KEL.typ.nint P_L___Drg_Bk_Old_Msnc1_Y_;
     KEL.typ.nint P_L___Drg_Bk_Old_Msnc7_Y_;
     KEL.typ.nint P_L___Drg_Bk_Old_Msnc10_Y_;
-    KEL.typ.ndataset(F_C_R_A_Person_Attributes_V1_Hybrid_Res0_Internal_Layout_P_L___Drg_Bk_Ch_List1_Y_Layout) P_L___Drg_Bk_Ch_List1_Y_;
-    KEL.typ.ndataset(F_C_R_A_Person_Attributes_V1_Hybrid_Res0_Internal_Layout_P_L___Drg_Bk_Ch_List7_Y_Layout) P_L___Drg_Bk_Ch_List7_Y_;
-    KEL.typ.ndataset(F_C_R_A_Person_Attributes_V1_Hybrid_Res0_Internal_Layout_P_L___Drg_Bk_Ch_List10_Y_Layout) P_L___Drg_Bk_Ch_List10_Y_;
+    KEL.typ.nstr P_L___Drg_Bk_Ch_List1_Y_;
+    KEL.typ.nstr P_L___Drg_Bk_Ch_List7_Y_;
+    KEL.typ.nstr P_L___Drg_Bk_Ch_List10_Y_;
     KEL.typ.nstr P_L___Drg_Bk_New_Ch_Type1_Y_;
     KEL.typ.nstr P_L___Drg_Bk_New_Ch_Type7_Y_;
     KEL.typ.nstr P_L___Drg_Bk_New_Ch_Type10_Y_;
@@ -4757,9 +3863,9 @@ EXPORT L_Compile := MODULE
     KEL.typ.nstr P_L___Drg_Bk_Updt_New_Msnc1_Y_;
     KEL.typ.nstr P_L___Drg_Bk_Updt_New_Msnc7_Y_;
     KEL.typ.nstr P_L___Drg_Bk_Updt_New_Msnc10_Y_;
-    KEL.typ.ndataset(F_C_R_A_Person_Attributes_V1_Hybrid_Res0_Internal_Layout_P_L___Drg_Bk_Disp_List1_Y_Layout) P_L___Drg_Bk_Disp_List1_Y_;
-    KEL.typ.ndataset(F_C_R_A_Person_Attributes_V1_Hybrid_Res0_Internal_Layout_P_L___Drg_Bk_Disp_List7_Y_Layout) P_L___Drg_Bk_Disp_List7_Y_;
-    KEL.typ.ndataset(F_C_R_A_Person_Attributes_V1_Hybrid_Res0_Internal_Layout_P_L___Drg_Bk_Disp_List10_Y_Layout) P_L___Drg_Bk_Disp_List10_Y_;
+    KEL.typ.nstr P_L___Drg_Bk_Disp_List1_Y_;
+    KEL.typ.nstr P_L___Drg_Bk_Disp_List7_Y_;
+    KEL.typ.nstr P_L___Drg_Bk_Disp_List10_Y_;
     KEL.typ.nstr P_L___Drg_Bk_New_Disp_Type1_Y_;
     KEL.typ.nstr P_L___Drg_Bk_New_Disp_Type7_Y_;
     KEL.typ.nstr P_L___Drg_Bk_New_Disp_Type10_Y_;
@@ -4778,17 +3884,17 @@ EXPORT L_Compile := MODULE
     KEL.typ.int P_L___Drg_Bk_Dsch_Cnt1_Y_ := 0;
     KEL.typ.int P_L___Drg_Bk_Dsch_Cnt7_Y_ := 0;
     KEL.typ.int P_L___Drg_Bk_Dsch_Cnt10_Y_ := 0;
-    KEL.typ.ndataset(F_C_R_A_Person_Attributes_V1_Hybrid_Res0_Internal_Layout_P_L___Drg_Bk_Type_List1_Y_Layout) P_L___Drg_Bk_Type_List1_Y_;
-    KEL.typ.ndataset(F_C_R_A_Person_Attributes_V1_Hybrid_Res0_Internal_Layout_P_L___Drg_Bk_Type_List7_Y_Layout) P_L___Drg_Bk_Type_List7_Y_;
-    KEL.typ.ndataset(F_C_R_A_Person_Attributes_V1_Hybrid_Res0_Internal_Layout_P_L___Drg_Bk_Type_List10_Y_Layout) P_L___Drg_Bk_Type_List10_Y_;
+    KEL.typ.nstr P_L___Drg_Bk_Type_List1_Y_;
+    KEL.typ.nstr P_L___Drg_Bk_Type_List7_Y_;
+    KEL.typ.nstr P_L___Drg_Bk_Type_List10_Y_;
     KEL.typ.nstr P_L___Drg_Bk_Bus_Flag1_Y_;
     KEL.typ.nstr P_L___Drg_Bk_Bus_Flag7_Y_;
     KEL.typ.nstr P_L___Drg_Bk_Bus_Flag10_Y_;
     KEL.typ.str P_L___Drg_Bk_Severity_Indx10_Y_ := '';
     KEL.typ.str P_L___Prof_Lic_Flag_Ev_ := '';
-    KEL.typ.ndataset(F_C_R_A_Person_Attributes_V1_Hybrid_Res0_Internal_Layout_P_L___Prof_Lic_Issue_Dt_List_Ev_Layout) P_L___Prof_Lic_Issue_Dt_List_Ev_;
-    KEL.typ.ndataset(F_C_R_A_Person_Attributes_V1_Hybrid_Res0_Internal_Layout_P_L___Prof_Lic_Exp_Dt_List_Ev_Layout) P_L___Prof_Lic_Exp_Dt_List_Ev_;
-    KEL.typ.ndataset(F_C_R_A_Person_Attributes_V1_Hybrid_Res0_Internal_Layout_P_L___Prof_Lic_Indx_By_Lic_List_Ev_Layout) P_L___Prof_Lic_Indx_By_Lic_List_Ev_;
+    KEL.typ.nstr P_L___Prof_Lic_Issue_Dt_List_Ev_;
+    KEL.typ.nstr P_L___Prof_Lic_Exp_Dt_List_Ev_;
+    KEL.typ.nstr P_L___Prof_Lic_Indx_By_Lic_List_Ev_;
     KEL.typ.str P_L___Prof_Lic_Actv_Flag_ := '';
     KEL.typ.nstr P_L___Prof_Lic_Actv_New_Issue_Dt_;
     KEL.typ.nstr P_L___Prof_Lic_Actv_New_Exp_Dt_;
@@ -4859,9 +3965,6 @@ EXPORT L_Compile := MODULE
     KEL.typ.int P_L___Drg_Suit_New_Msnc7_Y_ := 0;
     KEL.typ.int P_L___Drg_Suit_Old_Msnc7_Y_ := 0;
     KEL.typ.int P_L___Drg_Ln_J_Cnt7_Y_ := 0;
-    KEL.typ.int P_L___Drg_Ln_J_Cnt1_Y_ := 0;
-    KEL.typ.int P_L___Drg_Ln_J_Amt_Tot7_Y_ := 0;
-    KEL.typ.float P_L___Drg_Ln_J_Amt_Avg7_Y_ := 0.0;
     KEL.typ.nstr P_L___Drg_Ln_J_Amt_List7_Y_;
     KEL.typ.nstr P_L___Drg_Ln_J_Dt_List7_Y_;
     KEL.typ.nstr P_L___Drg_Ln_J_New_Dt7_Y_;
@@ -4948,6 +4051,12 @@ EXPORT L_Compile := MODULE
     KEL.typ.nstr P_L___Ver_S_S_N_Src_List_Ev_;
     KEL.typ.nstr P_L___Ver_S_S_N_Src_Emrg_Dt_List_Ev_;
     KEL.typ.nstr P_L___Ver_S_S_N_Src_Last_Dt_List_Ev_;
+    KEL.typ.str P_L___Alrt_Corrected_Flag_ := '';
+    KEL.typ.str P_L___Alrt_Cons_Statement_Flag_ := '';
+    KEL.typ.str P_L___Alrt_Dispute_Flag_ := '';
+    KEL.typ.str P_L___Alrt_Security_Freeze_Flag_ := '';
+    KEL.typ.str P_L___Alrt_Security_Alert_Flag_ := '';
+    KEL.typ.str P_L___Alrt_I_D_Theft_Flag_ := '';
     KEL.typ.nint P_L___Emrg_Age_;
     KEL.typ.epoch Archive___Date_ := 0;
     KEL.typ.epoch Date_First_Seen_ := 0;
@@ -5583,61 +4692,6 @@ EXPORT L_Compile := MODULE
     KEL.typ.int __RecordCount := 0;
   END;
   EXPORT Inferred_Performance_Hybrid_Res1_Layout := RECORDOF(__UNWRAP(DATASET([],Inferred_Performance_Hybrid_Res1_Internal_Layout)));
-  SHARED Non_F_C_R_A_Mini_Attributes_V1_Thor_Dynamic_Res0_Internal_Layout := RECORD
-    KEL.typ.nuid Lex_I_D_;
-    KEL.typ.str P___Lex_I_D_Seen_Flag_ := '';
-    KEL.typ.nstr Current_Addr_Prim_Rng_;
-    KEL.typ.nstr Current_Addr_Pre_Dir_;
-    KEL.typ.nstr Current_Addr_Prim_Name_;
-    KEL.typ.nstr Current_Postdirectional_;
-    KEL.typ.nstr Current_Addr_Sffx_;
-    KEL.typ.nstr Current_Addr_Sec_Rng_;
-    KEL.typ.nstr Current_Addr_State_;
-    KEL.typ.nstr Current_Addr_Zip5_;
-    KEL.typ.nstr Current_Addr_State_Code_;
-    KEL.typ.nstr Current_Addr_Cnty_;
-    KEL.typ.nstr Current_Addr_Geo_;
-    KEL.typ.nstr Current_Addr_City_;
-    KEL.typ.nstr P_L___Best_Name_First_;
-    KEL.typ.nstr P_L___Best_Name_Mid_;
-    KEL.typ.nstr P_L___Best_Name_Last_;
-    KEL.typ.nstr P_L___Best_S_S_N_;
-    KEL.typ.nstr P_L___Best_D_O_B_;
-    KEL.typ.epoch Archive___Date_ := 0;
-    KEL.typ.epoch Date_First_Seen_ := 0;
-    KEL.typ.epoch Date_Last_Seen_ := 0;
-    KEL.typ.epoch Hybrid_Archive_Date_ := 0;
-    KEL.typ.epoch Vault_Date_Last_Seen_ := 0;
-    KEL.typ.int __RecordCount := 0;
-  END;
-  EXPORT Non_F_C_R_A_Mini_Attributes_V1_Thor_Dynamic_Res0_Layout := RECORDOF(__UNWRAP(DATASET([],Non_F_C_R_A_Mini_Attributes_V1_Thor_Dynamic_Res0_Internal_Layout)));
-  SHARED F_C_R_A_Mini_Attributes_V1_Thor_Dynamic_Res0_Internal_Layout := RECORD
-    KEL.typ.nuid Lex_I_D_;
-    KEL.typ.str P___Lex_I_D_Seen_Flag_ := '';
-    KEL.typ.nstr Current_Addr_Prim_Rng_;
-    KEL.typ.nstr Current_Addr_Pre_Dir_;
-    KEL.typ.nstr Current_Addr_Prim_Name_;
-    KEL.typ.nstr Current_Postdirectional_;
-    KEL.typ.nstr Current_Addr_Sffx_;
-    KEL.typ.nstr Current_Addr_Sec_Rng_;
-    KEL.typ.nstr Current_Addr_State_;
-    KEL.typ.nstr Current_Addr_Zip5_;
-    KEL.typ.nstr Current_Addr_State_Code_;
-    KEL.typ.nstr Current_Addr_Cnty_;
-    KEL.typ.nstr Current_Addr_Geo_;
-    KEL.typ.nstr P_L___Best_Name_First_;
-    KEL.typ.nstr P_L___Best_Name_Mid_;
-    KEL.typ.nstr P_L___Best_Name_Last_;
-    KEL.typ.nstr P_L___Best_S_S_N_;
-    KEL.typ.nstr P_L___Best_D_O_B_;
-    KEL.typ.epoch Archive___Date_ := 0;
-    KEL.typ.epoch Date_First_Seen_ := 0;
-    KEL.typ.epoch Date_Last_Seen_ := 0;
-    KEL.typ.epoch Hybrid_Archive_Date_ := 0;
-    KEL.typ.epoch Vault_Date_Last_Seen_ := 0;
-    KEL.typ.int __RecordCount := 0;
-  END;
-  EXPORT F_C_R_A_Mini_Attributes_V1_Thor_Dynamic_Res0_Layout := RECORDOF(__UNWRAP(DATASET([],F_C_R_A_Mini_Attributes_V1_Thor_Dynamic_Res0_Internal_Layout)));
   SHARED Non_F_C_R_A_Mini_Attributes_V1_Thor_Hybrid_Res0_Internal_Layout := RECORD
     KEL.typ.nuid Lex_I_D_;
     KEL.typ.str P___Lex_I_D_Seen_Flag_ := '';
@@ -9938,6 +8992,7 @@ EXPORT L_Compile := MODULE
     KEL.typ.nstr Source_;
     KEL.typ.nbool Header_Hit_Flag_;
     KEL.typ.nbool F_D_N_Indicator_;
+    KEL.typ.nint Age_In_Days_;
     KEL.typ.nstr Translated_Source_Code_;
     KEL.typ.epoch Archive___Date_ := 0;
     KEL.typ.epoch Date_First_Seen_ := 0;
@@ -10764,7 +9819,7 @@ EXPORT L_Compile := MODULE
     KEL.typ.nbool Res_Bus_Flag_A_C_;
     KEL.typ.nbool Res_Bus_Flag_B_D_;
   END;
-  SHARED Index_Build_Entity_Res22_Internal_Layout_P_L___Ast_Veh_Air_Emrg_Dt_List_Ev_Layout := RECORD
+  SHARED Index_Build_Entity_Res22_Internal_Layout_P_L___Ast_Veh_Air_Emrg_Dt_List_Ev_Pre_Layout := RECORD
     KEL.typ.ntyp(E_Aircraft().Typ) Plane_;
     KEL.typ.nstr Aircraft_First_Seen_Date_;
     KEL.typ.epoch Archive___Date_ := 0;
@@ -10794,7 +9849,7 @@ EXPORT L_Compile := MODULE
     KEL.typ.epoch Vault_Date_Last_Seen_ := 0;
     KEL.typ.int __RecordCount := 0;
   END;
-  SHARED Index_Build_Entity_Res22_Internal_Layout_P_L___Ast_Veh_Wtr_Emrg_Dt_List_Ev_Layout := RECORD
+  SHARED Index_Build_Entity_Res22_Internal_Layout_P_L___Ast_Veh_Wtr_Emrg_Dt_List_Ev_Pre_Layout := RECORD
     KEL.typ.ntyp(E_Watercraft().Typ) W_Craft_;
     KEL.typ.nstr Watercraft_First_Seen_Date_;
     KEL.typ.epoch Archive___Date_ := 0;
@@ -10804,7 +9859,7 @@ EXPORT L_Compile := MODULE
     KEL.typ.epoch Vault_Date_Last_Seen_ := 0;
     KEL.typ.int __RecordCount := 0;
   END;
-  SHARED Index_Build_Entity_Res22_Internal_Layout_P_L___Drg_Bk_Ch_List10_Y_Layout := RECORD
+  SHARED Index_Build_Entity_Res22_Internal_Layout_P_L___Drg_Bk_Ch_List10_Y_Pre_Layout := RECORD
     KEL.typ.nstr Original_Chapter_;
     KEL.typ.nstr T_M_S_I_D_;
     KEL.typ.nstr Case_Number_;
@@ -10819,7 +9874,7 @@ EXPORT L_Compile := MODULE
     KEL.typ.epoch Vault_Date_Last_Seen_ := 0;
     KEL.typ.int __RecordCount := 0;
   END;
-  SHARED Index_Build_Entity_Res22_Internal_Layout_P_L___Drg_Bk_Ch_List1_Y_Layout := RECORD
+  SHARED Index_Build_Entity_Res22_Internal_Layout_P_L___Drg_Bk_Ch_List1_Y_Pre_Layout := RECORD
     KEL.typ.nstr Original_Chapter_;
     KEL.typ.nstr T_M_S_I_D_;
     KEL.typ.nstr Case_Number_;
@@ -10834,7 +9889,7 @@ EXPORT L_Compile := MODULE
     KEL.typ.epoch Vault_Date_Last_Seen_ := 0;
     KEL.typ.int __RecordCount := 0;
   END;
-  SHARED Index_Build_Entity_Res22_Internal_Layout_P_L___Drg_Bk_Ch_List7_Y_Layout := RECORD
+  SHARED Index_Build_Entity_Res22_Internal_Layout_P_L___Drg_Bk_Ch_List7_Y_Pre_Layout := RECORD
     KEL.typ.nstr Original_Chapter_;
     KEL.typ.nstr T_M_S_I_D_;
     KEL.typ.nstr Case_Number_;
@@ -10849,7 +9904,7 @@ EXPORT L_Compile := MODULE
     KEL.typ.epoch Vault_Date_Last_Seen_ := 0;
     KEL.typ.int __RecordCount := 0;
   END;
-  SHARED Index_Build_Entity_Res22_Internal_Layout_P_L___Drg_Bk_Disp_List10_Y_Layout := RECORD
+  SHARED Index_Build_Entity_Res22_Internal_Layout_P_L___Drg_Bk_Disp_List10_Y_Pre_Layout := RECORD
     KEL.typ.nstr Disposition_;
     KEL.typ.nstr T_M_S_I_D_;
     KEL.typ.nstr Case_Number_;
@@ -10864,7 +9919,7 @@ EXPORT L_Compile := MODULE
     KEL.typ.epoch Vault_Date_Last_Seen_ := 0;
     KEL.typ.int __RecordCount := 0;
   END;
-  SHARED Index_Build_Entity_Res22_Internal_Layout_P_L___Drg_Bk_Disp_List1_Y_Layout := RECORD
+  SHARED Index_Build_Entity_Res22_Internal_Layout_P_L___Drg_Bk_Disp_List1_Y_Pre_Layout := RECORD
     KEL.typ.nstr Disposition_;
     KEL.typ.nstr T_M_S_I_D_;
     KEL.typ.nstr Case_Number_;
@@ -10879,7 +9934,7 @@ EXPORT L_Compile := MODULE
     KEL.typ.epoch Vault_Date_Last_Seen_ := 0;
     KEL.typ.int __RecordCount := 0;
   END;
-  SHARED Index_Build_Entity_Res22_Internal_Layout_P_L___Drg_Bk_Disp_List7_Y_Layout := RECORD
+  SHARED Index_Build_Entity_Res22_Internal_Layout_P_L___Drg_Bk_Disp_List7_Y_Pre_Layout := RECORD
     KEL.typ.nstr Disposition_;
     KEL.typ.nstr T_M_S_I_D_;
     KEL.typ.nstr Case_Number_;
@@ -10894,7 +9949,7 @@ EXPORT L_Compile := MODULE
     KEL.typ.epoch Vault_Date_Last_Seen_ := 0;
     KEL.typ.int __RecordCount := 0;
   END;
-  SHARED Index_Build_Entity_Res22_Internal_Layout_P_L___Drg_Bk_Dt_List10_Y_Layout := RECORD
+  SHARED Index_Build_Entity_Res22_Internal_Layout_P_L___Drg_Bk_Dt_List10_Y_Pre_Layout := RECORD
     KEL.typ.nstr T_M_S_I_D_;
     KEL.typ.nstr Case_Number_;
     KEL.typ.nstr Court_Code_;
@@ -10908,7 +9963,7 @@ EXPORT L_Compile := MODULE
     KEL.typ.epoch Vault_Date_Last_Seen_ := 0;
     KEL.typ.int __RecordCount := 0;
   END;
-  SHARED Index_Build_Entity_Res22_Internal_Layout_P_L___Drg_Bk_Dt_List1_Y_Layout := RECORD
+  SHARED Index_Build_Entity_Res22_Internal_Layout_P_L___Drg_Bk_Dt_List1_Y_Pre_Layout := RECORD
     KEL.typ.nstr T_M_S_I_D_;
     KEL.typ.nstr Case_Number_;
     KEL.typ.nstr Court_Code_;
@@ -10922,7 +9977,7 @@ EXPORT L_Compile := MODULE
     KEL.typ.epoch Vault_Date_Last_Seen_ := 0;
     KEL.typ.int __RecordCount := 0;
   END;
-  SHARED Index_Build_Entity_Res22_Internal_Layout_P_L___Drg_Bk_Dt_List7_Y_Layout := RECORD
+  SHARED Index_Build_Entity_Res22_Internal_Layout_P_L___Drg_Bk_Dt_List7_Y_Pre_Layout := RECORD
     KEL.typ.nstr T_M_S_I_D_;
     KEL.typ.nstr Case_Number_;
     KEL.typ.nstr Court_Code_;
@@ -10936,7 +9991,7 @@ EXPORT L_Compile := MODULE
     KEL.typ.epoch Vault_Date_Last_Seen_ := 0;
     KEL.typ.int __RecordCount := 0;
   END;
-  SHARED Index_Build_Entity_Res22_Internal_Layout_P_L___Drg_Bk_Type_List10_Y_Layout := RECORD
+  SHARED Index_Build_Entity_Res22_Internal_Layout_P_L___Drg_Bk_Type_List10_Y_Pre_Layout := RECORD
     KEL.typ.nstr Filing_Type_;
     KEL.typ.nkdate Bankruptcy_Date_;
     KEL.typ.nkdate Last_Status_Update_;
@@ -10948,7 +10003,7 @@ EXPORT L_Compile := MODULE
     KEL.typ.epoch Vault_Date_Last_Seen_ := 0;
     KEL.typ.int __RecordCount := 0;
   END;
-  SHARED Index_Build_Entity_Res22_Internal_Layout_P_L___Drg_Bk_Type_List1_Y_Layout := RECORD
+  SHARED Index_Build_Entity_Res22_Internal_Layout_P_L___Drg_Bk_Type_List1_Y_Pre_Layout := RECORD
     KEL.typ.nstr Filing_Type_;
     KEL.typ.nkdate Bankruptcy_Date_;
     KEL.typ.nkdate Last_Status_Update_;
@@ -10960,7 +10015,7 @@ EXPORT L_Compile := MODULE
     KEL.typ.epoch Vault_Date_Last_Seen_ := 0;
     KEL.typ.int __RecordCount := 0;
   END;
-  SHARED Index_Build_Entity_Res22_Internal_Layout_P_L___Drg_Bk_Type_List7_Y_Layout := RECORD
+  SHARED Index_Build_Entity_Res22_Internal_Layout_P_L___Drg_Bk_Type_List7_Y_Pre_Layout := RECORD
     KEL.typ.nstr Filing_Type_;
     KEL.typ.nkdate Bankruptcy_Date_;
     KEL.typ.nkdate Last_Status_Update_;
@@ -10972,29 +10027,9 @@ EXPORT L_Compile := MODULE
     KEL.typ.epoch Vault_Date_Last_Seen_ := 0;
     KEL.typ.int __RecordCount := 0;
   END;
-  SHARED Index_Build_Entity_Res22_Internal_Layout_P_L___Prof_Lic_Exp_Dt_List_Ev_Layout := RECORD
-    KEL.typ.nuid Prof_Lic_U_I_D_;
-    KEL.typ.nstr Max_Expire_Date_;
-    KEL.typ.epoch Archive___Date_ := 0;
-    KEL.typ.epoch Date_First_Seen_ := 0;
-    KEL.typ.epoch Date_Last_Seen_ := 0;
-    KEL.typ.epoch Hybrid_Archive_Date_ := 0;
-    KEL.typ.epoch Vault_Date_Last_Seen_ := 0;
-    KEL.typ.int __RecordCount := 0;
-  END;
-  SHARED Index_Build_Entity_Res22_Internal_Layout_P_L___Prof_Lic_Indx_By_Lic_List_Ev_Layout := RECORD
+  SHARED Index_Build_Entity_Res22_Internal_Layout_P_L___Prof_Lic_Indx_By_Lic_List_Ev_Pre_Layout := RECORD
     KEL.typ.nuid Prof_Lic_U_I_D_;
     KEL.typ.nstr License_Category_;
-    KEL.typ.epoch Archive___Date_ := 0;
-    KEL.typ.epoch Date_First_Seen_ := 0;
-    KEL.typ.epoch Date_Last_Seen_ := 0;
-    KEL.typ.epoch Hybrid_Archive_Date_ := 0;
-    KEL.typ.epoch Vault_Date_Last_Seen_ := 0;
-    KEL.typ.int __RecordCount := 0;
-  END;
-  SHARED Index_Build_Entity_Res22_Internal_Layout_P_L___Prof_Lic_Issue_Dt_List_Ev_Layout := RECORD
-    KEL.typ.nuid Prof_Lic_U_I_D_;
-    KEL.typ.nstr Max_Issue_Date_;
     KEL.typ.epoch Archive___Date_ := 0;
     KEL.typ.epoch Date_First_Seen_ := 0;
     KEL.typ.epoch Date_Last_Seen_ := 0;
@@ -12547,7 +11582,8 @@ EXPORT L_Compile := MODULE
     KEL.typ.nint P_L___Ast_Prop_Sale_Old_Msnc_Ev_;
     KEL.typ.int P_L___Ast_Prop_Sale_Tot_Ev_ := 0;
     KEL.typ.int P_L___Ast_Veh_Air_Cnt_Ev_ := 0;
-    KEL.typ.ndataset(Index_Build_Entity_Res22_Internal_Layout_P_L___Ast_Veh_Air_Emrg_Dt_List_Ev_Layout) P_L___Ast_Veh_Air_Emrg_Dt_List_Ev_;
+    KEL.typ.nstr P_L___Ast_Veh_Air_Emrg_Dt_List_Ev_;
+    KEL.typ.ndataset(Index_Build_Entity_Res22_Internal_Layout_P_L___Ast_Veh_Air_Emrg_Dt_List_Ev_Pre_Layout) P_L___Ast_Veh_Air_Emrg_Dt_List_Ev_Pre_;
     KEL.typ.nstr P_L___Ast_Veh_Air_Emrg_New_Dt_Ev_;
     KEL.typ.nint P_L___Ast_Veh_Air_Emrg_New_Msnc_Ev_;
     KEL.typ.nstr P_L___Ast_Veh_Air_Emrg_Old_Dt_Ev_;
@@ -12562,7 +11598,8 @@ EXPORT L_Compile := MODULE
     KEL.typ.nint P_L___Ast_Veh_Auto_Emrg_Old_Msnc_Ev_;
     KEL.typ.ndataset(Index_Build_Entity_Res22_Internal_Layout_P_L___Ast_Veh_Auto_Last_Dt_List_Ev_Layout) P_L___Ast_Veh_Auto_Last_Dt_List_Ev_;
     KEL.typ.int P_L___Ast_Veh_Wtr_Cnt_Ev_ := 0;
-    KEL.typ.ndataset(Index_Build_Entity_Res22_Internal_Layout_P_L___Ast_Veh_Wtr_Emrg_Dt_List_Ev_Layout) P_L___Ast_Veh_Wtr_Emrg_Dt_List_Ev_;
+    KEL.typ.nstr P_L___Ast_Veh_Wtr_Emrg_Dt_List_Ev_;
+    KEL.typ.ndataset(Index_Build_Entity_Res22_Internal_Layout_P_L___Ast_Veh_Wtr_Emrg_Dt_List_Ev_Pre_Layout) P_L___Ast_Veh_Wtr_Emrg_Dt_List_Ev_Pre_;
     KEL.typ.nstr P_L___Ast_Veh_Wtr_Emrg_New_Dt_Ev_;
     KEL.typ.nint P_L___Ast_Veh_Wtr_Emrg_New_Msnc_Ev_;
     KEL.typ.nstr P_L___Ast_Veh_Wtr_Emrg_Old_Dt_Ev_;
@@ -12611,9 +11648,12 @@ EXPORT L_Compile := MODULE
     KEL.typ.int P_L___Drg_Bk_Ch7_Cnt10_Y_ := 0;
     KEL.typ.int P_L___Drg_Bk_Ch7_Cnt1_Y_ := 0;
     KEL.typ.int P_L___Drg_Bk_Ch7_Cnt7_Y_ := 0;
-    KEL.typ.ndataset(Index_Build_Entity_Res22_Internal_Layout_P_L___Drg_Bk_Ch_List10_Y_Layout) P_L___Drg_Bk_Ch_List10_Y_;
-    KEL.typ.ndataset(Index_Build_Entity_Res22_Internal_Layout_P_L___Drg_Bk_Ch_List1_Y_Layout) P_L___Drg_Bk_Ch_List1_Y_;
-    KEL.typ.ndataset(Index_Build_Entity_Res22_Internal_Layout_P_L___Drg_Bk_Ch_List7_Y_Layout) P_L___Drg_Bk_Ch_List7_Y_;
+    KEL.typ.nstr P_L___Drg_Bk_Ch_List10_Y_;
+    KEL.typ.ndataset(Index_Build_Entity_Res22_Internal_Layout_P_L___Drg_Bk_Ch_List10_Y_Pre_Layout) P_L___Drg_Bk_Ch_List10_Y_Pre_;
+    KEL.typ.nstr P_L___Drg_Bk_Ch_List1_Y_;
+    KEL.typ.ndataset(Index_Build_Entity_Res22_Internal_Layout_P_L___Drg_Bk_Ch_List1_Y_Pre_Layout) P_L___Drg_Bk_Ch_List1_Y_Pre_;
+    KEL.typ.nstr P_L___Drg_Bk_Ch_List7_Y_;
+    KEL.typ.ndataset(Index_Build_Entity_Res22_Internal_Layout_P_L___Drg_Bk_Ch_List7_Y_Pre_Layout) P_L___Drg_Bk_Ch_List7_Y_Pre_;
     KEL.typ.int P_L___Drg_Bk_Cnt10_Y_ := 0;
     KEL.typ.int P_L___Drg_Bk_Cnt1_Y_ := 0;
     KEL.typ.int P_L___Drg_Bk_Cnt1_Y_F1_Y_ := 0;
@@ -12621,18 +11661,24 @@ EXPORT L_Compile := MODULE
     KEL.typ.int P_L___Drg_Bk_Disp_Cnt10_Y_ := 0;
     KEL.typ.int P_L___Drg_Bk_Disp_Cnt1_Y_ := 0;
     KEL.typ.int P_L___Drg_Bk_Disp_Cnt7_Y_ := 0;
-    KEL.typ.ndataset(Index_Build_Entity_Res22_Internal_Layout_P_L___Drg_Bk_Disp_List10_Y_Layout) P_L___Drg_Bk_Disp_List10_Y_;
-    KEL.typ.ndataset(Index_Build_Entity_Res22_Internal_Layout_P_L___Drg_Bk_Disp_List1_Y_Layout) P_L___Drg_Bk_Disp_List1_Y_;
-    KEL.typ.ndataset(Index_Build_Entity_Res22_Internal_Layout_P_L___Drg_Bk_Disp_List7_Y_Layout) P_L___Drg_Bk_Disp_List7_Y_;
+    KEL.typ.nstr P_L___Drg_Bk_Disp_List10_Y_;
+    KEL.typ.ndataset(Index_Build_Entity_Res22_Internal_Layout_P_L___Drg_Bk_Disp_List10_Y_Pre_Layout) P_L___Drg_Bk_Disp_List10_Y_Pre_;
+    KEL.typ.nstr P_L___Drg_Bk_Disp_List1_Y_;
+    KEL.typ.ndataset(Index_Build_Entity_Res22_Internal_Layout_P_L___Drg_Bk_Disp_List1_Y_Pre_Layout) P_L___Drg_Bk_Disp_List1_Y_Pre_;
+    KEL.typ.nstr P_L___Drg_Bk_Disp_List7_Y_;
+    KEL.typ.ndataset(Index_Build_Entity_Res22_Internal_Layout_P_L___Drg_Bk_Disp_List7_Y_Pre_Layout) P_L___Drg_Bk_Disp_List7_Y_Pre_;
     KEL.typ.int P_L___Drg_Bk_Dsch_Cnt10_Y_ := 0;
     KEL.typ.int P_L___Drg_Bk_Dsch_Cnt1_Y_ := 0;
     KEL.typ.int P_L___Drg_Bk_Dsch_Cnt7_Y_ := 0;
     KEL.typ.int P_L___Drg_Bk_Dsms_Cnt10_Y_ := 0;
     KEL.typ.int P_L___Drg_Bk_Dsms_Cnt1_Y_ := 0;
     KEL.typ.int P_L___Drg_Bk_Dsms_Cnt7_Y_ := 0;
-    KEL.typ.ndataset(Index_Build_Entity_Res22_Internal_Layout_P_L___Drg_Bk_Dt_List10_Y_Layout) P_L___Drg_Bk_Dt_List10_Y_;
-    KEL.typ.ndataset(Index_Build_Entity_Res22_Internal_Layout_P_L___Drg_Bk_Dt_List1_Y_Layout) P_L___Drg_Bk_Dt_List1_Y_;
-    KEL.typ.ndataset(Index_Build_Entity_Res22_Internal_Layout_P_L___Drg_Bk_Dt_List7_Y_Layout) P_L___Drg_Bk_Dt_List7_Y_;
+    KEL.typ.nstr P_L___Drg_Bk_Dt_List10_Y_;
+    KEL.typ.ndataset(Index_Build_Entity_Res22_Internal_Layout_P_L___Drg_Bk_Dt_List10_Y_Pre_Layout) P_L___Drg_Bk_Dt_List10_Y_Pre_;
+    KEL.typ.nstr P_L___Drg_Bk_Dt_List1_Y_;
+    KEL.typ.ndataset(Index_Build_Entity_Res22_Internal_Layout_P_L___Drg_Bk_Dt_List1_Y_Pre_Layout) P_L___Drg_Bk_Dt_List1_Y_Pre_;
+    KEL.typ.nstr P_L___Drg_Bk_Dt_List7_Y_;
+    KEL.typ.ndataset(Index_Build_Entity_Res22_Internal_Layout_P_L___Drg_Bk_Dt_List7_Y_Pre_Layout) P_L___Drg_Bk_Dt_List7_Y_Pre_;
     KEL.typ.nstr P_L___Drg_Bk_New_Ch_Type10_Y_;
     KEL.typ.nstr P_L___Drg_Bk_New_Ch_Type1_Y_;
     KEL.typ.nstr P_L___Drg_Bk_New_Ch_Type7_Y_;
@@ -12658,9 +11704,12 @@ EXPORT L_Compile := MODULE
     KEL.typ.nint P_L___Drg_Bk_Old_Msnc1_Y_;
     KEL.typ.nint P_L___Drg_Bk_Old_Msnc7_Y_;
     KEL.typ.str P_L___Drg_Bk_Severity_Indx10_Y_ := '';
-    KEL.typ.ndataset(Index_Build_Entity_Res22_Internal_Layout_P_L___Drg_Bk_Type_List10_Y_Layout) P_L___Drg_Bk_Type_List10_Y_;
-    KEL.typ.ndataset(Index_Build_Entity_Res22_Internal_Layout_P_L___Drg_Bk_Type_List1_Y_Layout) P_L___Drg_Bk_Type_List1_Y_;
-    KEL.typ.ndataset(Index_Build_Entity_Res22_Internal_Layout_P_L___Drg_Bk_Type_List7_Y_Layout) P_L___Drg_Bk_Type_List7_Y_;
+    KEL.typ.nstr P_L___Drg_Bk_Type_List10_Y_;
+    KEL.typ.ndataset(Index_Build_Entity_Res22_Internal_Layout_P_L___Drg_Bk_Type_List10_Y_Pre_Layout) P_L___Drg_Bk_Type_List10_Y_Pre_;
+    KEL.typ.nstr P_L___Drg_Bk_Type_List1_Y_;
+    KEL.typ.ndataset(Index_Build_Entity_Res22_Internal_Layout_P_L___Drg_Bk_Type_List1_Y_Pre_Layout) P_L___Drg_Bk_Type_List1_Y_Pre_;
+    KEL.typ.nstr P_L___Drg_Bk_Type_List7_Y_;
+    KEL.typ.ndataset(Index_Build_Entity_Res22_Internal_Layout_P_L___Drg_Bk_Type_List7_Y_Pre_Layout) P_L___Drg_Bk_Type_List7_Y_Pre_;
     KEL.typ.nstr P_L___Drg_Bk_Updt_New_Dt10_Y_;
     KEL.typ.nstr P_L___Drg_Bk_Updt_New_Dt1_Y_;
     KEL.typ.nstr P_L___Drg_Bk_Updt_New_Dt7_Y_;
@@ -12793,10 +11842,11 @@ EXPORT L_Compile := MODULE
     KEL.typ.nstr P_L___Prof_Lic_Actv_New_Src_Type_;
     KEL.typ.nstr P_L___Prof_Lic_Actv_New_Title_Type_;
     KEL.typ.nstr P_L___Prof_Lic_Actv_New_Type_;
-    KEL.typ.ndataset(Index_Build_Entity_Res22_Internal_Layout_P_L___Prof_Lic_Exp_Dt_List_Ev_Layout) P_L___Prof_Lic_Exp_Dt_List_Ev_;
+    KEL.typ.nstr P_L___Prof_Lic_Exp_Dt_List_Ev_;
     KEL.typ.str P_L___Prof_Lic_Flag_Ev_ := '';
-    KEL.typ.ndataset(Index_Build_Entity_Res22_Internal_Layout_P_L___Prof_Lic_Indx_By_Lic_List_Ev_Layout) P_L___Prof_Lic_Indx_By_Lic_List_Ev_;
-    KEL.typ.ndataset(Index_Build_Entity_Res22_Internal_Layout_P_L___Prof_Lic_Issue_Dt_List_Ev_Layout) P_L___Prof_Lic_Issue_Dt_List_Ev_;
+    KEL.typ.nstr P_L___Prof_Lic_Indx_By_Lic_List_Ev_;
+    KEL.typ.ndataset(Index_Build_Entity_Res22_Internal_Layout_P_L___Prof_Lic_Indx_By_Lic_List_Ev_Pre_Layout) P_L___Prof_Lic_Indx_By_Lic_List_Ev_Pre_;
+    KEL.typ.nstr P_L___Prof_Lic_Issue_Dt_List_Ev_;
     KEL.typ.nint P_L___S_T_L_Cnt1_Y_;
     KEL.typ.nint P_L___S_T_L_Cnt2_Y_;
     KEL.typ.nint P_L___S_T_L_Cnt5_Y_;
@@ -12971,6 +12021,7 @@ EXPORT L_Compile := MODULE
     KEL.typ.str P___Lex_I_D_Rstd_Only_Flag_F_C_R_A_ := '';
     KEL.typ.str P___Lex_I_D_Rstd_Only_Flag_Non_F_C_R_A_ := '';
     KEL.typ.str P___Lex_I_D_Seen_Flag_ := '';
+    KEL.typ.str P___Lex_I_D_Seen_Flag_F_C_R_A_ := '';
     KEL.typ.str P___Lex_I_D_Seen_Flag_N_O_W_ := '';
     KEL.typ.nint Person_Address_Hierarchy_Valid_Cnt_;
     KEL.typ.nint Person_Curr_Addr_Loc_I_D_;
@@ -14889,6 +13940,7 @@ EXPORT L_Compile := MODULE
     KEL.typ.nstr Source_;
     KEL.typ.nbool Header_Hit_Flag_;
     KEL.typ.nbool F_D_N_Indicator_;
+    KEL.typ.nint Age_In_Days_;
     KEL.typ.nstr Translated_Source_Code_;
     KEL.typ.epoch Archive___Date_ := 0;
     KEL.typ.epoch Date_First_Seen_ := 0;
@@ -15715,7 +14767,7 @@ EXPORT L_Compile := MODULE
     KEL.typ.nbool Res_Bus_Flag_A_C_;
     KEL.typ.nbool Res_Bus_Flag_B_D_;
   END;
-  SHARED Index_Build_Association_Res4_Internal_Layout_P_L___Ast_Veh_Air_Emrg_Dt_List_Ev_Layout := RECORD
+  SHARED Index_Build_Association_Res4_Internal_Layout_P_L___Ast_Veh_Air_Emrg_Dt_List_Ev_Pre_Layout := RECORD
     KEL.typ.ntyp(E_Aircraft().Typ) Plane_;
     KEL.typ.nstr Aircraft_First_Seen_Date_;
     KEL.typ.epoch Archive___Date_ := 0;
@@ -15745,7 +14797,7 @@ EXPORT L_Compile := MODULE
     KEL.typ.epoch Vault_Date_Last_Seen_ := 0;
     KEL.typ.int __RecordCount := 0;
   END;
-  SHARED Index_Build_Association_Res4_Internal_Layout_P_L___Ast_Veh_Wtr_Emrg_Dt_List_Ev_Layout := RECORD
+  SHARED Index_Build_Association_Res4_Internal_Layout_P_L___Ast_Veh_Wtr_Emrg_Dt_List_Ev_Pre_Layout := RECORD
     KEL.typ.ntyp(E_Watercraft().Typ) W_Craft_;
     KEL.typ.nstr Watercraft_First_Seen_Date_;
     KEL.typ.epoch Archive___Date_ := 0;
@@ -15755,7 +14807,7 @@ EXPORT L_Compile := MODULE
     KEL.typ.epoch Vault_Date_Last_Seen_ := 0;
     KEL.typ.int __RecordCount := 0;
   END;
-  SHARED Index_Build_Association_Res4_Internal_Layout_P_L___Drg_Bk_Ch_List10_Y_Layout := RECORD
+  SHARED Index_Build_Association_Res4_Internal_Layout_P_L___Drg_Bk_Ch_List10_Y_Pre_Layout := RECORD
     KEL.typ.nstr Original_Chapter_;
     KEL.typ.nstr T_M_S_I_D_;
     KEL.typ.nstr Case_Number_;
@@ -15770,7 +14822,7 @@ EXPORT L_Compile := MODULE
     KEL.typ.epoch Vault_Date_Last_Seen_ := 0;
     KEL.typ.int __RecordCount := 0;
   END;
-  SHARED Index_Build_Association_Res4_Internal_Layout_P_L___Drg_Bk_Ch_List1_Y_Layout := RECORD
+  SHARED Index_Build_Association_Res4_Internal_Layout_P_L___Drg_Bk_Ch_List1_Y_Pre_Layout := RECORD
     KEL.typ.nstr Original_Chapter_;
     KEL.typ.nstr T_M_S_I_D_;
     KEL.typ.nstr Case_Number_;
@@ -15785,7 +14837,7 @@ EXPORT L_Compile := MODULE
     KEL.typ.epoch Vault_Date_Last_Seen_ := 0;
     KEL.typ.int __RecordCount := 0;
   END;
-  SHARED Index_Build_Association_Res4_Internal_Layout_P_L___Drg_Bk_Ch_List7_Y_Layout := RECORD
+  SHARED Index_Build_Association_Res4_Internal_Layout_P_L___Drg_Bk_Ch_List7_Y_Pre_Layout := RECORD
     KEL.typ.nstr Original_Chapter_;
     KEL.typ.nstr T_M_S_I_D_;
     KEL.typ.nstr Case_Number_;
@@ -15800,7 +14852,7 @@ EXPORT L_Compile := MODULE
     KEL.typ.epoch Vault_Date_Last_Seen_ := 0;
     KEL.typ.int __RecordCount := 0;
   END;
-  SHARED Index_Build_Association_Res4_Internal_Layout_P_L___Drg_Bk_Disp_List10_Y_Layout := RECORD
+  SHARED Index_Build_Association_Res4_Internal_Layout_P_L___Drg_Bk_Disp_List10_Y_Pre_Layout := RECORD
     KEL.typ.nstr Disposition_;
     KEL.typ.nstr T_M_S_I_D_;
     KEL.typ.nstr Case_Number_;
@@ -15815,7 +14867,7 @@ EXPORT L_Compile := MODULE
     KEL.typ.epoch Vault_Date_Last_Seen_ := 0;
     KEL.typ.int __RecordCount := 0;
   END;
-  SHARED Index_Build_Association_Res4_Internal_Layout_P_L___Drg_Bk_Disp_List1_Y_Layout := RECORD
+  SHARED Index_Build_Association_Res4_Internal_Layout_P_L___Drg_Bk_Disp_List1_Y_Pre_Layout := RECORD
     KEL.typ.nstr Disposition_;
     KEL.typ.nstr T_M_S_I_D_;
     KEL.typ.nstr Case_Number_;
@@ -15830,7 +14882,7 @@ EXPORT L_Compile := MODULE
     KEL.typ.epoch Vault_Date_Last_Seen_ := 0;
     KEL.typ.int __RecordCount := 0;
   END;
-  SHARED Index_Build_Association_Res4_Internal_Layout_P_L___Drg_Bk_Disp_List7_Y_Layout := RECORD
+  SHARED Index_Build_Association_Res4_Internal_Layout_P_L___Drg_Bk_Disp_List7_Y_Pre_Layout := RECORD
     KEL.typ.nstr Disposition_;
     KEL.typ.nstr T_M_S_I_D_;
     KEL.typ.nstr Case_Number_;
@@ -15845,7 +14897,7 @@ EXPORT L_Compile := MODULE
     KEL.typ.epoch Vault_Date_Last_Seen_ := 0;
     KEL.typ.int __RecordCount := 0;
   END;
-  SHARED Index_Build_Association_Res4_Internal_Layout_P_L___Drg_Bk_Dt_List10_Y_Layout := RECORD
+  SHARED Index_Build_Association_Res4_Internal_Layout_P_L___Drg_Bk_Dt_List10_Y_Pre_Layout := RECORD
     KEL.typ.nstr T_M_S_I_D_;
     KEL.typ.nstr Case_Number_;
     KEL.typ.nstr Court_Code_;
@@ -15859,7 +14911,7 @@ EXPORT L_Compile := MODULE
     KEL.typ.epoch Vault_Date_Last_Seen_ := 0;
     KEL.typ.int __RecordCount := 0;
   END;
-  SHARED Index_Build_Association_Res4_Internal_Layout_P_L___Drg_Bk_Dt_List1_Y_Layout := RECORD
+  SHARED Index_Build_Association_Res4_Internal_Layout_P_L___Drg_Bk_Dt_List1_Y_Pre_Layout := RECORD
     KEL.typ.nstr T_M_S_I_D_;
     KEL.typ.nstr Case_Number_;
     KEL.typ.nstr Court_Code_;
@@ -15873,7 +14925,7 @@ EXPORT L_Compile := MODULE
     KEL.typ.epoch Vault_Date_Last_Seen_ := 0;
     KEL.typ.int __RecordCount := 0;
   END;
-  SHARED Index_Build_Association_Res4_Internal_Layout_P_L___Drg_Bk_Dt_List7_Y_Layout := RECORD
+  SHARED Index_Build_Association_Res4_Internal_Layout_P_L___Drg_Bk_Dt_List7_Y_Pre_Layout := RECORD
     KEL.typ.nstr T_M_S_I_D_;
     KEL.typ.nstr Case_Number_;
     KEL.typ.nstr Court_Code_;
@@ -15887,7 +14939,7 @@ EXPORT L_Compile := MODULE
     KEL.typ.epoch Vault_Date_Last_Seen_ := 0;
     KEL.typ.int __RecordCount := 0;
   END;
-  SHARED Index_Build_Association_Res4_Internal_Layout_P_L___Drg_Bk_Type_List10_Y_Layout := RECORD
+  SHARED Index_Build_Association_Res4_Internal_Layout_P_L___Drg_Bk_Type_List10_Y_Pre_Layout := RECORD
     KEL.typ.nstr Filing_Type_;
     KEL.typ.nkdate Bankruptcy_Date_;
     KEL.typ.nkdate Last_Status_Update_;
@@ -15899,7 +14951,7 @@ EXPORT L_Compile := MODULE
     KEL.typ.epoch Vault_Date_Last_Seen_ := 0;
     KEL.typ.int __RecordCount := 0;
   END;
-  SHARED Index_Build_Association_Res4_Internal_Layout_P_L___Drg_Bk_Type_List1_Y_Layout := RECORD
+  SHARED Index_Build_Association_Res4_Internal_Layout_P_L___Drg_Bk_Type_List1_Y_Pre_Layout := RECORD
     KEL.typ.nstr Filing_Type_;
     KEL.typ.nkdate Bankruptcy_Date_;
     KEL.typ.nkdate Last_Status_Update_;
@@ -15911,7 +14963,7 @@ EXPORT L_Compile := MODULE
     KEL.typ.epoch Vault_Date_Last_Seen_ := 0;
     KEL.typ.int __RecordCount := 0;
   END;
-  SHARED Index_Build_Association_Res4_Internal_Layout_P_L___Drg_Bk_Type_List7_Y_Layout := RECORD
+  SHARED Index_Build_Association_Res4_Internal_Layout_P_L___Drg_Bk_Type_List7_Y_Pre_Layout := RECORD
     KEL.typ.nstr Filing_Type_;
     KEL.typ.nkdate Bankruptcy_Date_;
     KEL.typ.nkdate Last_Status_Update_;
@@ -15923,29 +14975,9 @@ EXPORT L_Compile := MODULE
     KEL.typ.epoch Vault_Date_Last_Seen_ := 0;
     KEL.typ.int __RecordCount := 0;
   END;
-  SHARED Index_Build_Association_Res4_Internal_Layout_P_L___Prof_Lic_Exp_Dt_List_Ev_Layout := RECORD
-    KEL.typ.nuid Prof_Lic_U_I_D_;
-    KEL.typ.nstr Max_Expire_Date_;
-    KEL.typ.epoch Archive___Date_ := 0;
-    KEL.typ.epoch Date_First_Seen_ := 0;
-    KEL.typ.epoch Date_Last_Seen_ := 0;
-    KEL.typ.epoch Hybrid_Archive_Date_ := 0;
-    KEL.typ.epoch Vault_Date_Last_Seen_ := 0;
-    KEL.typ.int __RecordCount := 0;
-  END;
-  SHARED Index_Build_Association_Res4_Internal_Layout_P_L___Prof_Lic_Indx_By_Lic_List_Ev_Layout := RECORD
+  SHARED Index_Build_Association_Res4_Internal_Layout_P_L___Prof_Lic_Indx_By_Lic_List_Ev_Pre_Layout := RECORD
     KEL.typ.nuid Prof_Lic_U_I_D_;
     KEL.typ.nstr License_Category_;
-    KEL.typ.epoch Archive___Date_ := 0;
-    KEL.typ.epoch Date_First_Seen_ := 0;
-    KEL.typ.epoch Date_Last_Seen_ := 0;
-    KEL.typ.epoch Hybrid_Archive_Date_ := 0;
-    KEL.typ.epoch Vault_Date_Last_Seen_ := 0;
-    KEL.typ.int __RecordCount := 0;
-  END;
-  SHARED Index_Build_Association_Res4_Internal_Layout_P_L___Prof_Lic_Issue_Dt_List_Ev_Layout := RECORD
-    KEL.typ.nuid Prof_Lic_U_I_D_;
-    KEL.typ.nstr Max_Issue_Date_;
     KEL.typ.epoch Archive___Date_ := 0;
     KEL.typ.epoch Date_First_Seen_ := 0;
     KEL.typ.epoch Date_Last_Seen_ := 0;
@@ -17498,7 +16530,8 @@ EXPORT L_Compile := MODULE
     KEL.typ.nint P_L___Ast_Prop_Sale_Old_Msnc_Ev_;
     KEL.typ.int P_L___Ast_Prop_Sale_Tot_Ev_ := 0;
     KEL.typ.int P_L___Ast_Veh_Air_Cnt_Ev_ := 0;
-    KEL.typ.ndataset(Index_Build_Association_Res4_Internal_Layout_P_L___Ast_Veh_Air_Emrg_Dt_List_Ev_Layout) P_L___Ast_Veh_Air_Emrg_Dt_List_Ev_;
+    KEL.typ.nstr P_L___Ast_Veh_Air_Emrg_Dt_List_Ev_;
+    KEL.typ.ndataset(Index_Build_Association_Res4_Internal_Layout_P_L___Ast_Veh_Air_Emrg_Dt_List_Ev_Pre_Layout) P_L___Ast_Veh_Air_Emrg_Dt_List_Ev_Pre_;
     KEL.typ.nstr P_L___Ast_Veh_Air_Emrg_New_Dt_Ev_;
     KEL.typ.nint P_L___Ast_Veh_Air_Emrg_New_Msnc_Ev_;
     KEL.typ.nstr P_L___Ast_Veh_Air_Emrg_Old_Dt_Ev_;
@@ -17513,7 +16546,8 @@ EXPORT L_Compile := MODULE
     KEL.typ.nint P_L___Ast_Veh_Auto_Emrg_Old_Msnc_Ev_;
     KEL.typ.ndataset(Index_Build_Association_Res4_Internal_Layout_P_L___Ast_Veh_Auto_Last_Dt_List_Ev_Layout) P_L___Ast_Veh_Auto_Last_Dt_List_Ev_;
     KEL.typ.int P_L___Ast_Veh_Wtr_Cnt_Ev_ := 0;
-    KEL.typ.ndataset(Index_Build_Association_Res4_Internal_Layout_P_L___Ast_Veh_Wtr_Emrg_Dt_List_Ev_Layout) P_L___Ast_Veh_Wtr_Emrg_Dt_List_Ev_;
+    KEL.typ.nstr P_L___Ast_Veh_Wtr_Emrg_Dt_List_Ev_;
+    KEL.typ.ndataset(Index_Build_Association_Res4_Internal_Layout_P_L___Ast_Veh_Wtr_Emrg_Dt_List_Ev_Pre_Layout) P_L___Ast_Veh_Wtr_Emrg_Dt_List_Ev_Pre_;
     KEL.typ.nstr P_L___Ast_Veh_Wtr_Emrg_New_Dt_Ev_;
     KEL.typ.nint P_L___Ast_Veh_Wtr_Emrg_New_Msnc_Ev_;
     KEL.typ.nstr P_L___Ast_Veh_Wtr_Emrg_Old_Dt_Ev_;
@@ -17562,9 +16596,12 @@ EXPORT L_Compile := MODULE
     KEL.typ.int P_L___Drg_Bk_Ch7_Cnt10_Y_ := 0;
     KEL.typ.int P_L___Drg_Bk_Ch7_Cnt1_Y_ := 0;
     KEL.typ.int P_L___Drg_Bk_Ch7_Cnt7_Y_ := 0;
-    KEL.typ.ndataset(Index_Build_Association_Res4_Internal_Layout_P_L___Drg_Bk_Ch_List10_Y_Layout) P_L___Drg_Bk_Ch_List10_Y_;
-    KEL.typ.ndataset(Index_Build_Association_Res4_Internal_Layout_P_L___Drg_Bk_Ch_List1_Y_Layout) P_L___Drg_Bk_Ch_List1_Y_;
-    KEL.typ.ndataset(Index_Build_Association_Res4_Internal_Layout_P_L___Drg_Bk_Ch_List7_Y_Layout) P_L___Drg_Bk_Ch_List7_Y_;
+    KEL.typ.nstr P_L___Drg_Bk_Ch_List10_Y_;
+    KEL.typ.ndataset(Index_Build_Association_Res4_Internal_Layout_P_L___Drg_Bk_Ch_List10_Y_Pre_Layout) P_L___Drg_Bk_Ch_List10_Y_Pre_;
+    KEL.typ.nstr P_L___Drg_Bk_Ch_List1_Y_;
+    KEL.typ.ndataset(Index_Build_Association_Res4_Internal_Layout_P_L___Drg_Bk_Ch_List1_Y_Pre_Layout) P_L___Drg_Bk_Ch_List1_Y_Pre_;
+    KEL.typ.nstr P_L___Drg_Bk_Ch_List7_Y_;
+    KEL.typ.ndataset(Index_Build_Association_Res4_Internal_Layout_P_L___Drg_Bk_Ch_List7_Y_Pre_Layout) P_L___Drg_Bk_Ch_List7_Y_Pre_;
     KEL.typ.int P_L___Drg_Bk_Cnt10_Y_ := 0;
     KEL.typ.int P_L___Drg_Bk_Cnt1_Y_ := 0;
     KEL.typ.int P_L___Drg_Bk_Cnt1_Y_F1_Y_ := 0;
@@ -17572,18 +16609,24 @@ EXPORT L_Compile := MODULE
     KEL.typ.int P_L___Drg_Bk_Disp_Cnt10_Y_ := 0;
     KEL.typ.int P_L___Drg_Bk_Disp_Cnt1_Y_ := 0;
     KEL.typ.int P_L___Drg_Bk_Disp_Cnt7_Y_ := 0;
-    KEL.typ.ndataset(Index_Build_Association_Res4_Internal_Layout_P_L___Drg_Bk_Disp_List10_Y_Layout) P_L___Drg_Bk_Disp_List10_Y_;
-    KEL.typ.ndataset(Index_Build_Association_Res4_Internal_Layout_P_L___Drg_Bk_Disp_List1_Y_Layout) P_L___Drg_Bk_Disp_List1_Y_;
-    KEL.typ.ndataset(Index_Build_Association_Res4_Internal_Layout_P_L___Drg_Bk_Disp_List7_Y_Layout) P_L___Drg_Bk_Disp_List7_Y_;
+    KEL.typ.nstr P_L___Drg_Bk_Disp_List10_Y_;
+    KEL.typ.ndataset(Index_Build_Association_Res4_Internal_Layout_P_L___Drg_Bk_Disp_List10_Y_Pre_Layout) P_L___Drg_Bk_Disp_List10_Y_Pre_;
+    KEL.typ.nstr P_L___Drg_Bk_Disp_List1_Y_;
+    KEL.typ.ndataset(Index_Build_Association_Res4_Internal_Layout_P_L___Drg_Bk_Disp_List1_Y_Pre_Layout) P_L___Drg_Bk_Disp_List1_Y_Pre_;
+    KEL.typ.nstr P_L___Drg_Bk_Disp_List7_Y_;
+    KEL.typ.ndataset(Index_Build_Association_Res4_Internal_Layout_P_L___Drg_Bk_Disp_List7_Y_Pre_Layout) P_L___Drg_Bk_Disp_List7_Y_Pre_;
     KEL.typ.int P_L___Drg_Bk_Dsch_Cnt10_Y_ := 0;
     KEL.typ.int P_L___Drg_Bk_Dsch_Cnt1_Y_ := 0;
     KEL.typ.int P_L___Drg_Bk_Dsch_Cnt7_Y_ := 0;
     KEL.typ.int P_L___Drg_Bk_Dsms_Cnt10_Y_ := 0;
     KEL.typ.int P_L___Drg_Bk_Dsms_Cnt1_Y_ := 0;
     KEL.typ.int P_L___Drg_Bk_Dsms_Cnt7_Y_ := 0;
-    KEL.typ.ndataset(Index_Build_Association_Res4_Internal_Layout_P_L___Drg_Bk_Dt_List10_Y_Layout) P_L___Drg_Bk_Dt_List10_Y_;
-    KEL.typ.ndataset(Index_Build_Association_Res4_Internal_Layout_P_L___Drg_Bk_Dt_List1_Y_Layout) P_L___Drg_Bk_Dt_List1_Y_;
-    KEL.typ.ndataset(Index_Build_Association_Res4_Internal_Layout_P_L___Drg_Bk_Dt_List7_Y_Layout) P_L___Drg_Bk_Dt_List7_Y_;
+    KEL.typ.nstr P_L___Drg_Bk_Dt_List10_Y_;
+    KEL.typ.ndataset(Index_Build_Association_Res4_Internal_Layout_P_L___Drg_Bk_Dt_List10_Y_Pre_Layout) P_L___Drg_Bk_Dt_List10_Y_Pre_;
+    KEL.typ.nstr P_L___Drg_Bk_Dt_List1_Y_;
+    KEL.typ.ndataset(Index_Build_Association_Res4_Internal_Layout_P_L___Drg_Bk_Dt_List1_Y_Pre_Layout) P_L___Drg_Bk_Dt_List1_Y_Pre_;
+    KEL.typ.nstr P_L___Drg_Bk_Dt_List7_Y_;
+    KEL.typ.ndataset(Index_Build_Association_Res4_Internal_Layout_P_L___Drg_Bk_Dt_List7_Y_Pre_Layout) P_L___Drg_Bk_Dt_List7_Y_Pre_;
     KEL.typ.nstr P_L___Drg_Bk_New_Ch_Type10_Y_;
     KEL.typ.nstr P_L___Drg_Bk_New_Ch_Type1_Y_;
     KEL.typ.nstr P_L___Drg_Bk_New_Ch_Type7_Y_;
@@ -17609,9 +16652,12 @@ EXPORT L_Compile := MODULE
     KEL.typ.nint P_L___Drg_Bk_Old_Msnc1_Y_;
     KEL.typ.nint P_L___Drg_Bk_Old_Msnc7_Y_;
     KEL.typ.str P_L___Drg_Bk_Severity_Indx10_Y_ := '';
-    KEL.typ.ndataset(Index_Build_Association_Res4_Internal_Layout_P_L___Drg_Bk_Type_List10_Y_Layout) P_L___Drg_Bk_Type_List10_Y_;
-    KEL.typ.ndataset(Index_Build_Association_Res4_Internal_Layout_P_L___Drg_Bk_Type_List1_Y_Layout) P_L___Drg_Bk_Type_List1_Y_;
-    KEL.typ.ndataset(Index_Build_Association_Res4_Internal_Layout_P_L___Drg_Bk_Type_List7_Y_Layout) P_L___Drg_Bk_Type_List7_Y_;
+    KEL.typ.nstr P_L___Drg_Bk_Type_List10_Y_;
+    KEL.typ.ndataset(Index_Build_Association_Res4_Internal_Layout_P_L___Drg_Bk_Type_List10_Y_Pre_Layout) P_L___Drg_Bk_Type_List10_Y_Pre_;
+    KEL.typ.nstr P_L___Drg_Bk_Type_List1_Y_;
+    KEL.typ.ndataset(Index_Build_Association_Res4_Internal_Layout_P_L___Drg_Bk_Type_List1_Y_Pre_Layout) P_L___Drg_Bk_Type_List1_Y_Pre_;
+    KEL.typ.nstr P_L___Drg_Bk_Type_List7_Y_;
+    KEL.typ.ndataset(Index_Build_Association_Res4_Internal_Layout_P_L___Drg_Bk_Type_List7_Y_Pre_Layout) P_L___Drg_Bk_Type_List7_Y_Pre_;
     KEL.typ.nstr P_L___Drg_Bk_Updt_New_Dt10_Y_;
     KEL.typ.nstr P_L___Drg_Bk_Updt_New_Dt1_Y_;
     KEL.typ.nstr P_L___Drg_Bk_Updt_New_Dt7_Y_;
@@ -17744,10 +16790,11 @@ EXPORT L_Compile := MODULE
     KEL.typ.nstr P_L___Prof_Lic_Actv_New_Src_Type_;
     KEL.typ.nstr P_L___Prof_Lic_Actv_New_Title_Type_;
     KEL.typ.nstr P_L___Prof_Lic_Actv_New_Type_;
-    KEL.typ.ndataset(Index_Build_Association_Res4_Internal_Layout_P_L___Prof_Lic_Exp_Dt_List_Ev_Layout) P_L___Prof_Lic_Exp_Dt_List_Ev_;
+    KEL.typ.nstr P_L___Prof_Lic_Exp_Dt_List_Ev_;
     KEL.typ.str P_L___Prof_Lic_Flag_Ev_ := '';
-    KEL.typ.ndataset(Index_Build_Association_Res4_Internal_Layout_P_L___Prof_Lic_Indx_By_Lic_List_Ev_Layout) P_L___Prof_Lic_Indx_By_Lic_List_Ev_;
-    KEL.typ.ndataset(Index_Build_Association_Res4_Internal_Layout_P_L___Prof_Lic_Issue_Dt_List_Ev_Layout) P_L___Prof_Lic_Issue_Dt_List_Ev_;
+    KEL.typ.nstr P_L___Prof_Lic_Indx_By_Lic_List_Ev_;
+    KEL.typ.ndataset(Index_Build_Association_Res4_Internal_Layout_P_L___Prof_Lic_Indx_By_Lic_List_Ev_Pre_Layout) P_L___Prof_Lic_Indx_By_Lic_List_Ev_Pre_;
+    KEL.typ.nstr P_L___Prof_Lic_Issue_Dt_List_Ev_;
     KEL.typ.nint P_L___S_T_L_Cnt1_Y_;
     KEL.typ.nint P_L___S_T_L_Cnt2_Y_;
     KEL.typ.nint P_L___S_T_L_Cnt5_Y_;
@@ -17922,6 +16969,7 @@ EXPORT L_Compile := MODULE
     KEL.typ.str P___Lex_I_D_Rstd_Only_Flag_F_C_R_A_ := '';
     KEL.typ.str P___Lex_I_D_Rstd_Only_Flag_Non_F_C_R_A_ := '';
     KEL.typ.str P___Lex_I_D_Seen_Flag_ := '';
+    KEL.typ.str P___Lex_I_D_Seen_Flag_F_C_R_A_ := '';
     KEL.typ.str P___Lex_I_D_Seen_Flag_N_O_W_ := '';
     KEL.typ.nint Person_Address_Hierarchy_Valid_Cnt_;
     KEL.typ.nint Person_Curr_Addr_Loc_I_D_;
@@ -20903,6 +19951,7 @@ EXPORT L_Compile := MODULE
     KEL.typ.nstr Source_;
     KEL.typ.nbool Header_Hit_Flag_;
     KEL.typ.nbool F_D_N_Indicator_;
+    KEL.typ.nint Age_In_Days_;
     KEL.typ.nstr Translated_Source_Code_;
     KEL.typ.epoch Archive___Date_ := 0;
     KEL.typ.epoch Date_First_Seen_ := 0;
@@ -21729,7 +20778,7 @@ EXPORT L_Compile := MODULE
     KEL.typ.nbool Res_Bus_Flag_A_C_;
     KEL.typ.nbool Res_Bus_Flag_B_D_;
   END;
-  SHARED Index_Build_Association_Res10_Internal_Layout_P_L___Ast_Veh_Air_Emrg_Dt_List_Ev_Layout := RECORD
+  SHARED Index_Build_Association_Res10_Internal_Layout_P_L___Ast_Veh_Air_Emrg_Dt_List_Ev_Pre_Layout := RECORD
     KEL.typ.ntyp(E_Aircraft().Typ) Plane_;
     KEL.typ.nstr Aircraft_First_Seen_Date_;
     KEL.typ.epoch Archive___Date_ := 0;
@@ -21759,7 +20808,7 @@ EXPORT L_Compile := MODULE
     KEL.typ.epoch Vault_Date_Last_Seen_ := 0;
     KEL.typ.int __RecordCount := 0;
   END;
-  SHARED Index_Build_Association_Res10_Internal_Layout_P_L___Ast_Veh_Wtr_Emrg_Dt_List_Ev_Layout := RECORD
+  SHARED Index_Build_Association_Res10_Internal_Layout_P_L___Ast_Veh_Wtr_Emrg_Dt_List_Ev_Pre_Layout := RECORD
     KEL.typ.ntyp(E_Watercraft().Typ) W_Craft_;
     KEL.typ.nstr Watercraft_First_Seen_Date_;
     KEL.typ.epoch Archive___Date_ := 0;
@@ -21769,7 +20818,7 @@ EXPORT L_Compile := MODULE
     KEL.typ.epoch Vault_Date_Last_Seen_ := 0;
     KEL.typ.int __RecordCount := 0;
   END;
-  SHARED Index_Build_Association_Res10_Internal_Layout_P_L___Drg_Bk_Ch_List10_Y_Layout := RECORD
+  SHARED Index_Build_Association_Res10_Internal_Layout_P_L___Drg_Bk_Ch_List10_Y_Pre_Layout := RECORD
     KEL.typ.nstr Original_Chapter_;
     KEL.typ.nstr T_M_S_I_D_;
     KEL.typ.nstr Case_Number_;
@@ -21784,7 +20833,7 @@ EXPORT L_Compile := MODULE
     KEL.typ.epoch Vault_Date_Last_Seen_ := 0;
     KEL.typ.int __RecordCount := 0;
   END;
-  SHARED Index_Build_Association_Res10_Internal_Layout_P_L___Drg_Bk_Ch_List1_Y_Layout := RECORD
+  SHARED Index_Build_Association_Res10_Internal_Layout_P_L___Drg_Bk_Ch_List1_Y_Pre_Layout := RECORD
     KEL.typ.nstr Original_Chapter_;
     KEL.typ.nstr T_M_S_I_D_;
     KEL.typ.nstr Case_Number_;
@@ -21799,7 +20848,7 @@ EXPORT L_Compile := MODULE
     KEL.typ.epoch Vault_Date_Last_Seen_ := 0;
     KEL.typ.int __RecordCount := 0;
   END;
-  SHARED Index_Build_Association_Res10_Internal_Layout_P_L___Drg_Bk_Ch_List7_Y_Layout := RECORD
+  SHARED Index_Build_Association_Res10_Internal_Layout_P_L___Drg_Bk_Ch_List7_Y_Pre_Layout := RECORD
     KEL.typ.nstr Original_Chapter_;
     KEL.typ.nstr T_M_S_I_D_;
     KEL.typ.nstr Case_Number_;
@@ -21814,7 +20863,7 @@ EXPORT L_Compile := MODULE
     KEL.typ.epoch Vault_Date_Last_Seen_ := 0;
     KEL.typ.int __RecordCount := 0;
   END;
-  SHARED Index_Build_Association_Res10_Internal_Layout_P_L___Drg_Bk_Disp_List10_Y_Layout := RECORD
+  SHARED Index_Build_Association_Res10_Internal_Layout_P_L___Drg_Bk_Disp_List10_Y_Pre_Layout := RECORD
     KEL.typ.nstr Disposition_;
     KEL.typ.nstr T_M_S_I_D_;
     KEL.typ.nstr Case_Number_;
@@ -21829,7 +20878,7 @@ EXPORT L_Compile := MODULE
     KEL.typ.epoch Vault_Date_Last_Seen_ := 0;
     KEL.typ.int __RecordCount := 0;
   END;
-  SHARED Index_Build_Association_Res10_Internal_Layout_P_L___Drg_Bk_Disp_List1_Y_Layout := RECORD
+  SHARED Index_Build_Association_Res10_Internal_Layout_P_L___Drg_Bk_Disp_List1_Y_Pre_Layout := RECORD
     KEL.typ.nstr Disposition_;
     KEL.typ.nstr T_M_S_I_D_;
     KEL.typ.nstr Case_Number_;
@@ -21844,7 +20893,7 @@ EXPORT L_Compile := MODULE
     KEL.typ.epoch Vault_Date_Last_Seen_ := 0;
     KEL.typ.int __RecordCount := 0;
   END;
-  SHARED Index_Build_Association_Res10_Internal_Layout_P_L___Drg_Bk_Disp_List7_Y_Layout := RECORD
+  SHARED Index_Build_Association_Res10_Internal_Layout_P_L___Drg_Bk_Disp_List7_Y_Pre_Layout := RECORD
     KEL.typ.nstr Disposition_;
     KEL.typ.nstr T_M_S_I_D_;
     KEL.typ.nstr Case_Number_;
@@ -21859,7 +20908,7 @@ EXPORT L_Compile := MODULE
     KEL.typ.epoch Vault_Date_Last_Seen_ := 0;
     KEL.typ.int __RecordCount := 0;
   END;
-  SHARED Index_Build_Association_Res10_Internal_Layout_P_L___Drg_Bk_Dt_List10_Y_Layout := RECORD
+  SHARED Index_Build_Association_Res10_Internal_Layout_P_L___Drg_Bk_Dt_List10_Y_Pre_Layout := RECORD
     KEL.typ.nstr T_M_S_I_D_;
     KEL.typ.nstr Case_Number_;
     KEL.typ.nstr Court_Code_;
@@ -21873,7 +20922,7 @@ EXPORT L_Compile := MODULE
     KEL.typ.epoch Vault_Date_Last_Seen_ := 0;
     KEL.typ.int __RecordCount := 0;
   END;
-  SHARED Index_Build_Association_Res10_Internal_Layout_P_L___Drg_Bk_Dt_List1_Y_Layout := RECORD
+  SHARED Index_Build_Association_Res10_Internal_Layout_P_L___Drg_Bk_Dt_List1_Y_Pre_Layout := RECORD
     KEL.typ.nstr T_M_S_I_D_;
     KEL.typ.nstr Case_Number_;
     KEL.typ.nstr Court_Code_;
@@ -21887,7 +20936,7 @@ EXPORT L_Compile := MODULE
     KEL.typ.epoch Vault_Date_Last_Seen_ := 0;
     KEL.typ.int __RecordCount := 0;
   END;
-  SHARED Index_Build_Association_Res10_Internal_Layout_P_L___Drg_Bk_Dt_List7_Y_Layout := RECORD
+  SHARED Index_Build_Association_Res10_Internal_Layout_P_L___Drg_Bk_Dt_List7_Y_Pre_Layout := RECORD
     KEL.typ.nstr T_M_S_I_D_;
     KEL.typ.nstr Case_Number_;
     KEL.typ.nstr Court_Code_;
@@ -21901,7 +20950,7 @@ EXPORT L_Compile := MODULE
     KEL.typ.epoch Vault_Date_Last_Seen_ := 0;
     KEL.typ.int __RecordCount := 0;
   END;
-  SHARED Index_Build_Association_Res10_Internal_Layout_P_L___Drg_Bk_Type_List10_Y_Layout := RECORD
+  SHARED Index_Build_Association_Res10_Internal_Layout_P_L___Drg_Bk_Type_List10_Y_Pre_Layout := RECORD
     KEL.typ.nstr Filing_Type_;
     KEL.typ.nkdate Bankruptcy_Date_;
     KEL.typ.nkdate Last_Status_Update_;
@@ -21913,7 +20962,7 @@ EXPORT L_Compile := MODULE
     KEL.typ.epoch Vault_Date_Last_Seen_ := 0;
     KEL.typ.int __RecordCount := 0;
   END;
-  SHARED Index_Build_Association_Res10_Internal_Layout_P_L___Drg_Bk_Type_List1_Y_Layout := RECORD
+  SHARED Index_Build_Association_Res10_Internal_Layout_P_L___Drg_Bk_Type_List1_Y_Pre_Layout := RECORD
     KEL.typ.nstr Filing_Type_;
     KEL.typ.nkdate Bankruptcy_Date_;
     KEL.typ.nkdate Last_Status_Update_;
@@ -21925,7 +20974,7 @@ EXPORT L_Compile := MODULE
     KEL.typ.epoch Vault_Date_Last_Seen_ := 0;
     KEL.typ.int __RecordCount := 0;
   END;
-  SHARED Index_Build_Association_Res10_Internal_Layout_P_L___Drg_Bk_Type_List7_Y_Layout := RECORD
+  SHARED Index_Build_Association_Res10_Internal_Layout_P_L___Drg_Bk_Type_List7_Y_Pre_Layout := RECORD
     KEL.typ.nstr Filing_Type_;
     KEL.typ.nkdate Bankruptcy_Date_;
     KEL.typ.nkdate Last_Status_Update_;
@@ -21937,29 +20986,9 @@ EXPORT L_Compile := MODULE
     KEL.typ.epoch Vault_Date_Last_Seen_ := 0;
     KEL.typ.int __RecordCount := 0;
   END;
-  SHARED Index_Build_Association_Res10_Internal_Layout_P_L___Prof_Lic_Exp_Dt_List_Ev_Layout := RECORD
-    KEL.typ.nuid Prof_Lic_U_I_D_;
-    KEL.typ.nstr Max_Expire_Date_;
-    KEL.typ.epoch Archive___Date_ := 0;
-    KEL.typ.epoch Date_First_Seen_ := 0;
-    KEL.typ.epoch Date_Last_Seen_ := 0;
-    KEL.typ.epoch Hybrid_Archive_Date_ := 0;
-    KEL.typ.epoch Vault_Date_Last_Seen_ := 0;
-    KEL.typ.int __RecordCount := 0;
-  END;
-  SHARED Index_Build_Association_Res10_Internal_Layout_P_L___Prof_Lic_Indx_By_Lic_List_Ev_Layout := RECORD
+  SHARED Index_Build_Association_Res10_Internal_Layout_P_L___Prof_Lic_Indx_By_Lic_List_Ev_Pre_Layout := RECORD
     KEL.typ.nuid Prof_Lic_U_I_D_;
     KEL.typ.nstr License_Category_;
-    KEL.typ.epoch Archive___Date_ := 0;
-    KEL.typ.epoch Date_First_Seen_ := 0;
-    KEL.typ.epoch Date_Last_Seen_ := 0;
-    KEL.typ.epoch Hybrid_Archive_Date_ := 0;
-    KEL.typ.epoch Vault_Date_Last_Seen_ := 0;
-    KEL.typ.int __RecordCount := 0;
-  END;
-  SHARED Index_Build_Association_Res10_Internal_Layout_P_L___Prof_Lic_Issue_Dt_List_Ev_Layout := RECORD
-    KEL.typ.nuid Prof_Lic_U_I_D_;
-    KEL.typ.nstr Max_Issue_Date_;
     KEL.typ.epoch Archive___Date_ := 0;
     KEL.typ.epoch Date_First_Seen_ := 0;
     KEL.typ.epoch Date_Last_Seen_ := 0;
@@ -23512,7 +22541,8 @@ EXPORT L_Compile := MODULE
     KEL.typ.nint P_L___Ast_Prop_Sale_Old_Msnc_Ev_;
     KEL.typ.int P_L___Ast_Prop_Sale_Tot_Ev_ := 0;
     KEL.typ.int P_L___Ast_Veh_Air_Cnt_Ev_ := 0;
-    KEL.typ.ndataset(Index_Build_Association_Res10_Internal_Layout_P_L___Ast_Veh_Air_Emrg_Dt_List_Ev_Layout) P_L___Ast_Veh_Air_Emrg_Dt_List_Ev_;
+    KEL.typ.nstr P_L___Ast_Veh_Air_Emrg_Dt_List_Ev_;
+    KEL.typ.ndataset(Index_Build_Association_Res10_Internal_Layout_P_L___Ast_Veh_Air_Emrg_Dt_List_Ev_Pre_Layout) P_L___Ast_Veh_Air_Emrg_Dt_List_Ev_Pre_;
     KEL.typ.nstr P_L___Ast_Veh_Air_Emrg_New_Dt_Ev_;
     KEL.typ.nint P_L___Ast_Veh_Air_Emrg_New_Msnc_Ev_;
     KEL.typ.nstr P_L___Ast_Veh_Air_Emrg_Old_Dt_Ev_;
@@ -23527,7 +22557,8 @@ EXPORT L_Compile := MODULE
     KEL.typ.nint P_L___Ast_Veh_Auto_Emrg_Old_Msnc_Ev_;
     KEL.typ.ndataset(Index_Build_Association_Res10_Internal_Layout_P_L___Ast_Veh_Auto_Last_Dt_List_Ev_Layout) P_L___Ast_Veh_Auto_Last_Dt_List_Ev_;
     KEL.typ.int P_L___Ast_Veh_Wtr_Cnt_Ev_ := 0;
-    KEL.typ.ndataset(Index_Build_Association_Res10_Internal_Layout_P_L___Ast_Veh_Wtr_Emrg_Dt_List_Ev_Layout) P_L___Ast_Veh_Wtr_Emrg_Dt_List_Ev_;
+    KEL.typ.nstr P_L___Ast_Veh_Wtr_Emrg_Dt_List_Ev_;
+    KEL.typ.ndataset(Index_Build_Association_Res10_Internal_Layout_P_L___Ast_Veh_Wtr_Emrg_Dt_List_Ev_Pre_Layout) P_L___Ast_Veh_Wtr_Emrg_Dt_List_Ev_Pre_;
     KEL.typ.nstr P_L___Ast_Veh_Wtr_Emrg_New_Dt_Ev_;
     KEL.typ.nint P_L___Ast_Veh_Wtr_Emrg_New_Msnc_Ev_;
     KEL.typ.nstr P_L___Ast_Veh_Wtr_Emrg_Old_Dt_Ev_;
@@ -23576,9 +22607,12 @@ EXPORT L_Compile := MODULE
     KEL.typ.int P_L___Drg_Bk_Ch7_Cnt10_Y_ := 0;
     KEL.typ.int P_L___Drg_Bk_Ch7_Cnt1_Y_ := 0;
     KEL.typ.int P_L___Drg_Bk_Ch7_Cnt7_Y_ := 0;
-    KEL.typ.ndataset(Index_Build_Association_Res10_Internal_Layout_P_L___Drg_Bk_Ch_List10_Y_Layout) P_L___Drg_Bk_Ch_List10_Y_;
-    KEL.typ.ndataset(Index_Build_Association_Res10_Internal_Layout_P_L___Drg_Bk_Ch_List1_Y_Layout) P_L___Drg_Bk_Ch_List1_Y_;
-    KEL.typ.ndataset(Index_Build_Association_Res10_Internal_Layout_P_L___Drg_Bk_Ch_List7_Y_Layout) P_L___Drg_Bk_Ch_List7_Y_;
+    KEL.typ.nstr P_L___Drg_Bk_Ch_List10_Y_;
+    KEL.typ.ndataset(Index_Build_Association_Res10_Internal_Layout_P_L___Drg_Bk_Ch_List10_Y_Pre_Layout) P_L___Drg_Bk_Ch_List10_Y_Pre_;
+    KEL.typ.nstr P_L___Drg_Bk_Ch_List1_Y_;
+    KEL.typ.ndataset(Index_Build_Association_Res10_Internal_Layout_P_L___Drg_Bk_Ch_List1_Y_Pre_Layout) P_L___Drg_Bk_Ch_List1_Y_Pre_;
+    KEL.typ.nstr P_L___Drg_Bk_Ch_List7_Y_;
+    KEL.typ.ndataset(Index_Build_Association_Res10_Internal_Layout_P_L___Drg_Bk_Ch_List7_Y_Pre_Layout) P_L___Drg_Bk_Ch_List7_Y_Pre_;
     KEL.typ.int P_L___Drg_Bk_Cnt10_Y_ := 0;
     KEL.typ.int P_L___Drg_Bk_Cnt1_Y_ := 0;
     KEL.typ.int P_L___Drg_Bk_Cnt1_Y_F1_Y_ := 0;
@@ -23586,18 +22620,24 @@ EXPORT L_Compile := MODULE
     KEL.typ.int P_L___Drg_Bk_Disp_Cnt10_Y_ := 0;
     KEL.typ.int P_L___Drg_Bk_Disp_Cnt1_Y_ := 0;
     KEL.typ.int P_L___Drg_Bk_Disp_Cnt7_Y_ := 0;
-    KEL.typ.ndataset(Index_Build_Association_Res10_Internal_Layout_P_L___Drg_Bk_Disp_List10_Y_Layout) P_L___Drg_Bk_Disp_List10_Y_;
-    KEL.typ.ndataset(Index_Build_Association_Res10_Internal_Layout_P_L___Drg_Bk_Disp_List1_Y_Layout) P_L___Drg_Bk_Disp_List1_Y_;
-    KEL.typ.ndataset(Index_Build_Association_Res10_Internal_Layout_P_L___Drg_Bk_Disp_List7_Y_Layout) P_L___Drg_Bk_Disp_List7_Y_;
+    KEL.typ.nstr P_L___Drg_Bk_Disp_List10_Y_;
+    KEL.typ.ndataset(Index_Build_Association_Res10_Internal_Layout_P_L___Drg_Bk_Disp_List10_Y_Pre_Layout) P_L___Drg_Bk_Disp_List10_Y_Pre_;
+    KEL.typ.nstr P_L___Drg_Bk_Disp_List1_Y_;
+    KEL.typ.ndataset(Index_Build_Association_Res10_Internal_Layout_P_L___Drg_Bk_Disp_List1_Y_Pre_Layout) P_L___Drg_Bk_Disp_List1_Y_Pre_;
+    KEL.typ.nstr P_L___Drg_Bk_Disp_List7_Y_;
+    KEL.typ.ndataset(Index_Build_Association_Res10_Internal_Layout_P_L___Drg_Bk_Disp_List7_Y_Pre_Layout) P_L___Drg_Bk_Disp_List7_Y_Pre_;
     KEL.typ.int P_L___Drg_Bk_Dsch_Cnt10_Y_ := 0;
     KEL.typ.int P_L___Drg_Bk_Dsch_Cnt1_Y_ := 0;
     KEL.typ.int P_L___Drg_Bk_Dsch_Cnt7_Y_ := 0;
     KEL.typ.int P_L___Drg_Bk_Dsms_Cnt10_Y_ := 0;
     KEL.typ.int P_L___Drg_Bk_Dsms_Cnt1_Y_ := 0;
     KEL.typ.int P_L___Drg_Bk_Dsms_Cnt7_Y_ := 0;
-    KEL.typ.ndataset(Index_Build_Association_Res10_Internal_Layout_P_L___Drg_Bk_Dt_List10_Y_Layout) P_L___Drg_Bk_Dt_List10_Y_;
-    KEL.typ.ndataset(Index_Build_Association_Res10_Internal_Layout_P_L___Drg_Bk_Dt_List1_Y_Layout) P_L___Drg_Bk_Dt_List1_Y_;
-    KEL.typ.ndataset(Index_Build_Association_Res10_Internal_Layout_P_L___Drg_Bk_Dt_List7_Y_Layout) P_L___Drg_Bk_Dt_List7_Y_;
+    KEL.typ.nstr P_L___Drg_Bk_Dt_List10_Y_;
+    KEL.typ.ndataset(Index_Build_Association_Res10_Internal_Layout_P_L___Drg_Bk_Dt_List10_Y_Pre_Layout) P_L___Drg_Bk_Dt_List10_Y_Pre_;
+    KEL.typ.nstr P_L___Drg_Bk_Dt_List1_Y_;
+    KEL.typ.ndataset(Index_Build_Association_Res10_Internal_Layout_P_L___Drg_Bk_Dt_List1_Y_Pre_Layout) P_L___Drg_Bk_Dt_List1_Y_Pre_;
+    KEL.typ.nstr P_L___Drg_Bk_Dt_List7_Y_;
+    KEL.typ.ndataset(Index_Build_Association_Res10_Internal_Layout_P_L___Drg_Bk_Dt_List7_Y_Pre_Layout) P_L___Drg_Bk_Dt_List7_Y_Pre_;
     KEL.typ.nstr P_L___Drg_Bk_New_Ch_Type10_Y_;
     KEL.typ.nstr P_L___Drg_Bk_New_Ch_Type1_Y_;
     KEL.typ.nstr P_L___Drg_Bk_New_Ch_Type7_Y_;
@@ -23623,9 +22663,12 @@ EXPORT L_Compile := MODULE
     KEL.typ.nint P_L___Drg_Bk_Old_Msnc1_Y_;
     KEL.typ.nint P_L___Drg_Bk_Old_Msnc7_Y_;
     KEL.typ.str P_L___Drg_Bk_Severity_Indx10_Y_ := '';
-    KEL.typ.ndataset(Index_Build_Association_Res10_Internal_Layout_P_L___Drg_Bk_Type_List10_Y_Layout) P_L___Drg_Bk_Type_List10_Y_;
-    KEL.typ.ndataset(Index_Build_Association_Res10_Internal_Layout_P_L___Drg_Bk_Type_List1_Y_Layout) P_L___Drg_Bk_Type_List1_Y_;
-    KEL.typ.ndataset(Index_Build_Association_Res10_Internal_Layout_P_L___Drg_Bk_Type_List7_Y_Layout) P_L___Drg_Bk_Type_List7_Y_;
+    KEL.typ.nstr P_L___Drg_Bk_Type_List10_Y_;
+    KEL.typ.ndataset(Index_Build_Association_Res10_Internal_Layout_P_L___Drg_Bk_Type_List10_Y_Pre_Layout) P_L___Drg_Bk_Type_List10_Y_Pre_;
+    KEL.typ.nstr P_L___Drg_Bk_Type_List1_Y_;
+    KEL.typ.ndataset(Index_Build_Association_Res10_Internal_Layout_P_L___Drg_Bk_Type_List1_Y_Pre_Layout) P_L___Drg_Bk_Type_List1_Y_Pre_;
+    KEL.typ.nstr P_L___Drg_Bk_Type_List7_Y_;
+    KEL.typ.ndataset(Index_Build_Association_Res10_Internal_Layout_P_L___Drg_Bk_Type_List7_Y_Pre_Layout) P_L___Drg_Bk_Type_List7_Y_Pre_;
     KEL.typ.nstr P_L___Drg_Bk_Updt_New_Dt10_Y_;
     KEL.typ.nstr P_L___Drg_Bk_Updt_New_Dt1_Y_;
     KEL.typ.nstr P_L___Drg_Bk_Updt_New_Dt7_Y_;
@@ -23758,10 +22801,11 @@ EXPORT L_Compile := MODULE
     KEL.typ.nstr P_L___Prof_Lic_Actv_New_Src_Type_;
     KEL.typ.nstr P_L___Prof_Lic_Actv_New_Title_Type_;
     KEL.typ.nstr P_L___Prof_Lic_Actv_New_Type_;
-    KEL.typ.ndataset(Index_Build_Association_Res10_Internal_Layout_P_L___Prof_Lic_Exp_Dt_List_Ev_Layout) P_L___Prof_Lic_Exp_Dt_List_Ev_;
+    KEL.typ.nstr P_L___Prof_Lic_Exp_Dt_List_Ev_;
     KEL.typ.str P_L___Prof_Lic_Flag_Ev_ := '';
-    KEL.typ.ndataset(Index_Build_Association_Res10_Internal_Layout_P_L___Prof_Lic_Indx_By_Lic_List_Ev_Layout) P_L___Prof_Lic_Indx_By_Lic_List_Ev_;
-    KEL.typ.ndataset(Index_Build_Association_Res10_Internal_Layout_P_L___Prof_Lic_Issue_Dt_List_Ev_Layout) P_L___Prof_Lic_Issue_Dt_List_Ev_;
+    KEL.typ.nstr P_L___Prof_Lic_Indx_By_Lic_List_Ev_;
+    KEL.typ.ndataset(Index_Build_Association_Res10_Internal_Layout_P_L___Prof_Lic_Indx_By_Lic_List_Ev_Pre_Layout) P_L___Prof_Lic_Indx_By_Lic_List_Ev_Pre_;
+    KEL.typ.nstr P_L___Prof_Lic_Issue_Dt_List_Ev_;
     KEL.typ.nint P_L___S_T_L_Cnt1_Y_;
     KEL.typ.nint P_L___S_T_L_Cnt2_Y_;
     KEL.typ.nint P_L___S_T_L_Cnt5_Y_;
@@ -23936,6 +22980,7 @@ EXPORT L_Compile := MODULE
     KEL.typ.str P___Lex_I_D_Rstd_Only_Flag_F_C_R_A_ := '';
     KEL.typ.str P___Lex_I_D_Rstd_Only_Flag_Non_F_C_R_A_ := '';
     KEL.typ.str P___Lex_I_D_Seen_Flag_ := '';
+    KEL.typ.str P___Lex_I_D_Seen_Flag_F_C_R_A_ := '';
     KEL.typ.str P___Lex_I_D_Seen_Flag_N_O_W_ := '';
     KEL.typ.nint Person_Address_Hierarchy_Valid_Cnt_;
     KEL.typ.nint Person_Curr_Addr_Loc_I_D_;
@@ -27071,6 +26116,7 @@ EXPORT L_Compile := MODULE
     KEL.typ.nstr Source_;
     KEL.typ.nbool Header_Hit_Flag_;
     KEL.typ.nbool F_D_N_Indicator_;
+    KEL.typ.nint Age_In_Days_;
     KEL.typ.nstr Translated_Source_Code_;
     KEL.typ.epoch Archive___Date_ := 0;
     KEL.typ.epoch Date_First_Seen_ := 0;
@@ -27897,7 +26943,7 @@ EXPORT L_Compile := MODULE
     KEL.typ.nbool Res_Bus_Flag_A_C_;
     KEL.typ.nbool Res_Bus_Flag_B_D_;
   END;
-  SHARED Index_Build_Association_Res22_Internal_Layout_P_L___Ast_Veh_Air_Emrg_Dt_List_Ev_Layout := RECORD
+  SHARED Index_Build_Association_Res22_Internal_Layout_P_L___Ast_Veh_Air_Emrg_Dt_List_Ev_Pre_Layout := RECORD
     KEL.typ.ntyp(E_Aircraft().Typ) Plane_;
     KEL.typ.nstr Aircraft_First_Seen_Date_;
     KEL.typ.epoch Archive___Date_ := 0;
@@ -27927,7 +26973,7 @@ EXPORT L_Compile := MODULE
     KEL.typ.epoch Vault_Date_Last_Seen_ := 0;
     KEL.typ.int __RecordCount := 0;
   END;
-  SHARED Index_Build_Association_Res22_Internal_Layout_P_L___Ast_Veh_Wtr_Emrg_Dt_List_Ev_Layout := RECORD
+  SHARED Index_Build_Association_Res22_Internal_Layout_P_L___Ast_Veh_Wtr_Emrg_Dt_List_Ev_Pre_Layout := RECORD
     KEL.typ.ntyp(E_Watercraft().Typ) W_Craft_;
     KEL.typ.nstr Watercraft_First_Seen_Date_;
     KEL.typ.epoch Archive___Date_ := 0;
@@ -27937,7 +26983,7 @@ EXPORT L_Compile := MODULE
     KEL.typ.epoch Vault_Date_Last_Seen_ := 0;
     KEL.typ.int __RecordCount := 0;
   END;
-  SHARED Index_Build_Association_Res22_Internal_Layout_P_L___Drg_Bk_Ch_List10_Y_Layout := RECORD
+  SHARED Index_Build_Association_Res22_Internal_Layout_P_L___Drg_Bk_Ch_List10_Y_Pre_Layout := RECORD
     KEL.typ.nstr Original_Chapter_;
     KEL.typ.nstr T_M_S_I_D_;
     KEL.typ.nstr Case_Number_;
@@ -27952,7 +26998,7 @@ EXPORT L_Compile := MODULE
     KEL.typ.epoch Vault_Date_Last_Seen_ := 0;
     KEL.typ.int __RecordCount := 0;
   END;
-  SHARED Index_Build_Association_Res22_Internal_Layout_P_L___Drg_Bk_Ch_List1_Y_Layout := RECORD
+  SHARED Index_Build_Association_Res22_Internal_Layout_P_L___Drg_Bk_Ch_List1_Y_Pre_Layout := RECORD
     KEL.typ.nstr Original_Chapter_;
     KEL.typ.nstr T_M_S_I_D_;
     KEL.typ.nstr Case_Number_;
@@ -27967,7 +27013,7 @@ EXPORT L_Compile := MODULE
     KEL.typ.epoch Vault_Date_Last_Seen_ := 0;
     KEL.typ.int __RecordCount := 0;
   END;
-  SHARED Index_Build_Association_Res22_Internal_Layout_P_L___Drg_Bk_Ch_List7_Y_Layout := RECORD
+  SHARED Index_Build_Association_Res22_Internal_Layout_P_L___Drg_Bk_Ch_List7_Y_Pre_Layout := RECORD
     KEL.typ.nstr Original_Chapter_;
     KEL.typ.nstr T_M_S_I_D_;
     KEL.typ.nstr Case_Number_;
@@ -27982,7 +27028,7 @@ EXPORT L_Compile := MODULE
     KEL.typ.epoch Vault_Date_Last_Seen_ := 0;
     KEL.typ.int __RecordCount := 0;
   END;
-  SHARED Index_Build_Association_Res22_Internal_Layout_P_L___Drg_Bk_Disp_List10_Y_Layout := RECORD
+  SHARED Index_Build_Association_Res22_Internal_Layout_P_L___Drg_Bk_Disp_List10_Y_Pre_Layout := RECORD
     KEL.typ.nstr Disposition_;
     KEL.typ.nstr T_M_S_I_D_;
     KEL.typ.nstr Case_Number_;
@@ -27997,7 +27043,7 @@ EXPORT L_Compile := MODULE
     KEL.typ.epoch Vault_Date_Last_Seen_ := 0;
     KEL.typ.int __RecordCount := 0;
   END;
-  SHARED Index_Build_Association_Res22_Internal_Layout_P_L___Drg_Bk_Disp_List1_Y_Layout := RECORD
+  SHARED Index_Build_Association_Res22_Internal_Layout_P_L___Drg_Bk_Disp_List1_Y_Pre_Layout := RECORD
     KEL.typ.nstr Disposition_;
     KEL.typ.nstr T_M_S_I_D_;
     KEL.typ.nstr Case_Number_;
@@ -28012,7 +27058,7 @@ EXPORT L_Compile := MODULE
     KEL.typ.epoch Vault_Date_Last_Seen_ := 0;
     KEL.typ.int __RecordCount := 0;
   END;
-  SHARED Index_Build_Association_Res22_Internal_Layout_P_L___Drg_Bk_Disp_List7_Y_Layout := RECORD
+  SHARED Index_Build_Association_Res22_Internal_Layout_P_L___Drg_Bk_Disp_List7_Y_Pre_Layout := RECORD
     KEL.typ.nstr Disposition_;
     KEL.typ.nstr T_M_S_I_D_;
     KEL.typ.nstr Case_Number_;
@@ -28027,7 +27073,7 @@ EXPORT L_Compile := MODULE
     KEL.typ.epoch Vault_Date_Last_Seen_ := 0;
     KEL.typ.int __RecordCount := 0;
   END;
-  SHARED Index_Build_Association_Res22_Internal_Layout_P_L___Drg_Bk_Dt_List10_Y_Layout := RECORD
+  SHARED Index_Build_Association_Res22_Internal_Layout_P_L___Drg_Bk_Dt_List10_Y_Pre_Layout := RECORD
     KEL.typ.nstr T_M_S_I_D_;
     KEL.typ.nstr Case_Number_;
     KEL.typ.nstr Court_Code_;
@@ -28041,7 +27087,7 @@ EXPORT L_Compile := MODULE
     KEL.typ.epoch Vault_Date_Last_Seen_ := 0;
     KEL.typ.int __RecordCount := 0;
   END;
-  SHARED Index_Build_Association_Res22_Internal_Layout_P_L___Drg_Bk_Dt_List1_Y_Layout := RECORD
+  SHARED Index_Build_Association_Res22_Internal_Layout_P_L___Drg_Bk_Dt_List1_Y_Pre_Layout := RECORD
     KEL.typ.nstr T_M_S_I_D_;
     KEL.typ.nstr Case_Number_;
     KEL.typ.nstr Court_Code_;
@@ -28055,7 +27101,7 @@ EXPORT L_Compile := MODULE
     KEL.typ.epoch Vault_Date_Last_Seen_ := 0;
     KEL.typ.int __RecordCount := 0;
   END;
-  SHARED Index_Build_Association_Res22_Internal_Layout_P_L___Drg_Bk_Dt_List7_Y_Layout := RECORD
+  SHARED Index_Build_Association_Res22_Internal_Layout_P_L___Drg_Bk_Dt_List7_Y_Pre_Layout := RECORD
     KEL.typ.nstr T_M_S_I_D_;
     KEL.typ.nstr Case_Number_;
     KEL.typ.nstr Court_Code_;
@@ -28069,7 +27115,7 @@ EXPORT L_Compile := MODULE
     KEL.typ.epoch Vault_Date_Last_Seen_ := 0;
     KEL.typ.int __RecordCount := 0;
   END;
-  SHARED Index_Build_Association_Res22_Internal_Layout_P_L___Drg_Bk_Type_List10_Y_Layout := RECORD
+  SHARED Index_Build_Association_Res22_Internal_Layout_P_L___Drg_Bk_Type_List10_Y_Pre_Layout := RECORD
     KEL.typ.nstr Filing_Type_;
     KEL.typ.nkdate Bankruptcy_Date_;
     KEL.typ.nkdate Last_Status_Update_;
@@ -28081,7 +27127,7 @@ EXPORT L_Compile := MODULE
     KEL.typ.epoch Vault_Date_Last_Seen_ := 0;
     KEL.typ.int __RecordCount := 0;
   END;
-  SHARED Index_Build_Association_Res22_Internal_Layout_P_L___Drg_Bk_Type_List1_Y_Layout := RECORD
+  SHARED Index_Build_Association_Res22_Internal_Layout_P_L___Drg_Bk_Type_List1_Y_Pre_Layout := RECORD
     KEL.typ.nstr Filing_Type_;
     KEL.typ.nkdate Bankruptcy_Date_;
     KEL.typ.nkdate Last_Status_Update_;
@@ -28093,7 +27139,7 @@ EXPORT L_Compile := MODULE
     KEL.typ.epoch Vault_Date_Last_Seen_ := 0;
     KEL.typ.int __RecordCount := 0;
   END;
-  SHARED Index_Build_Association_Res22_Internal_Layout_P_L___Drg_Bk_Type_List7_Y_Layout := RECORD
+  SHARED Index_Build_Association_Res22_Internal_Layout_P_L___Drg_Bk_Type_List7_Y_Pre_Layout := RECORD
     KEL.typ.nstr Filing_Type_;
     KEL.typ.nkdate Bankruptcy_Date_;
     KEL.typ.nkdate Last_Status_Update_;
@@ -28105,29 +27151,9 @@ EXPORT L_Compile := MODULE
     KEL.typ.epoch Vault_Date_Last_Seen_ := 0;
     KEL.typ.int __RecordCount := 0;
   END;
-  SHARED Index_Build_Association_Res22_Internal_Layout_P_L___Prof_Lic_Exp_Dt_List_Ev_Layout := RECORD
-    KEL.typ.nuid Prof_Lic_U_I_D_;
-    KEL.typ.nstr Max_Expire_Date_;
-    KEL.typ.epoch Archive___Date_ := 0;
-    KEL.typ.epoch Date_First_Seen_ := 0;
-    KEL.typ.epoch Date_Last_Seen_ := 0;
-    KEL.typ.epoch Hybrid_Archive_Date_ := 0;
-    KEL.typ.epoch Vault_Date_Last_Seen_ := 0;
-    KEL.typ.int __RecordCount := 0;
-  END;
-  SHARED Index_Build_Association_Res22_Internal_Layout_P_L___Prof_Lic_Indx_By_Lic_List_Ev_Layout := RECORD
+  SHARED Index_Build_Association_Res22_Internal_Layout_P_L___Prof_Lic_Indx_By_Lic_List_Ev_Pre_Layout := RECORD
     KEL.typ.nuid Prof_Lic_U_I_D_;
     KEL.typ.nstr License_Category_;
-    KEL.typ.epoch Archive___Date_ := 0;
-    KEL.typ.epoch Date_First_Seen_ := 0;
-    KEL.typ.epoch Date_Last_Seen_ := 0;
-    KEL.typ.epoch Hybrid_Archive_Date_ := 0;
-    KEL.typ.epoch Vault_Date_Last_Seen_ := 0;
-    KEL.typ.int __RecordCount := 0;
-  END;
-  SHARED Index_Build_Association_Res22_Internal_Layout_P_L___Prof_Lic_Issue_Dt_List_Ev_Layout := RECORD
-    KEL.typ.nuid Prof_Lic_U_I_D_;
-    KEL.typ.nstr Max_Issue_Date_;
     KEL.typ.epoch Archive___Date_ := 0;
     KEL.typ.epoch Date_First_Seen_ := 0;
     KEL.typ.epoch Date_Last_Seen_ := 0;
@@ -29680,7 +28706,8 @@ EXPORT L_Compile := MODULE
     KEL.typ.nint P_L___Ast_Prop_Sale_Old_Msnc_Ev_;
     KEL.typ.int P_L___Ast_Prop_Sale_Tot_Ev_ := 0;
     KEL.typ.int P_L___Ast_Veh_Air_Cnt_Ev_ := 0;
-    KEL.typ.ndataset(Index_Build_Association_Res22_Internal_Layout_P_L___Ast_Veh_Air_Emrg_Dt_List_Ev_Layout) P_L___Ast_Veh_Air_Emrg_Dt_List_Ev_;
+    KEL.typ.nstr P_L___Ast_Veh_Air_Emrg_Dt_List_Ev_;
+    KEL.typ.ndataset(Index_Build_Association_Res22_Internal_Layout_P_L___Ast_Veh_Air_Emrg_Dt_List_Ev_Pre_Layout) P_L___Ast_Veh_Air_Emrg_Dt_List_Ev_Pre_;
     KEL.typ.nstr P_L___Ast_Veh_Air_Emrg_New_Dt_Ev_;
     KEL.typ.nint P_L___Ast_Veh_Air_Emrg_New_Msnc_Ev_;
     KEL.typ.nstr P_L___Ast_Veh_Air_Emrg_Old_Dt_Ev_;
@@ -29695,7 +28722,8 @@ EXPORT L_Compile := MODULE
     KEL.typ.nint P_L___Ast_Veh_Auto_Emrg_Old_Msnc_Ev_;
     KEL.typ.ndataset(Index_Build_Association_Res22_Internal_Layout_P_L___Ast_Veh_Auto_Last_Dt_List_Ev_Layout) P_L___Ast_Veh_Auto_Last_Dt_List_Ev_;
     KEL.typ.int P_L___Ast_Veh_Wtr_Cnt_Ev_ := 0;
-    KEL.typ.ndataset(Index_Build_Association_Res22_Internal_Layout_P_L___Ast_Veh_Wtr_Emrg_Dt_List_Ev_Layout) P_L___Ast_Veh_Wtr_Emrg_Dt_List_Ev_;
+    KEL.typ.nstr P_L___Ast_Veh_Wtr_Emrg_Dt_List_Ev_;
+    KEL.typ.ndataset(Index_Build_Association_Res22_Internal_Layout_P_L___Ast_Veh_Wtr_Emrg_Dt_List_Ev_Pre_Layout) P_L___Ast_Veh_Wtr_Emrg_Dt_List_Ev_Pre_;
     KEL.typ.nstr P_L___Ast_Veh_Wtr_Emrg_New_Dt_Ev_;
     KEL.typ.nint P_L___Ast_Veh_Wtr_Emrg_New_Msnc_Ev_;
     KEL.typ.nstr P_L___Ast_Veh_Wtr_Emrg_Old_Dt_Ev_;
@@ -29744,9 +28772,12 @@ EXPORT L_Compile := MODULE
     KEL.typ.int P_L___Drg_Bk_Ch7_Cnt10_Y_ := 0;
     KEL.typ.int P_L___Drg_Bk_Ch7_Cnt1_Y_ := 0;
     KEL.typ.int P_L___Drg_Bk_Ch7_Cnt7_Y_ := 0;
-    KEL.typ.ndataset(Index_Build_Association_Res22_Internal_Layout_P_L___Drg_Bk_Ch_List10_Y_Layout) P_L___Drg_Bk_Ch_List10_Y_;
-    KEL.typ.ndataset(Index_Build_Association_Res22_Internal_Layout_P_L___Drg_Bk_Ch_List1_Y_Layout) P_L___Drg_Bk_Ch_List1_Y_;
-    KEL.typ.ndataset(Index_Build_Association_Res22_Internal_Layout_P_L___Drg_Bk_Ch_List7_Y_Layout) P_L___Drg_Bk_Ch_List7_Y_;
+    KEL.typ.nstr P_L___Drg_Bk_Ch_List10_Y_;
+    KEL.typ.ndataset(Index_Build_Association_Res22_Internal_Layout_P_L___Drg_Bk_Ch_List10_Y_Pre_Layout) P_L___Drg_Bk_Ch_List10_Y_Pre_;
+    KEL.typ.nstr P_L___Drg_Bk_Ch_List1_Y_;
+    KEL.typ.ndataset(Index_Build_Association_Res22_Internal_Layout_P_L___Drg_Bk_Ch_List1_Y_Pre_Layout) P_L___Drg_Bk_Ch_List1_Y_Pre_;
+    KEL.typ.nstr P_L___Drg_Bk_Ch_List7_Y_;
+    KEL.typ.ndataset(Index_Build_Association_Res22_Internal_Layout_P_L___Drg_Bk_Ch_List7_Y_Pre_Layout) P_L___Drg_Bk_Ch_List7_Y_Pre_;
     KEL.typ.int P_L___Drg_Bk_Cnt10_Y_ := 0;
     KEL.typ.int P_L___Drg_Bk_Cnt1_Y_ := 0;
     KEL.typ.int P_L___Drg_Bk_Cnt1_Y_F1_Y_ := 0;
@@ -29754,18 +28785,24 @@ EXPORT L_Compile := MODULE
     KEL.typ.int P_L___Drg_Bk_Disp_Cnt10_Y_ := 0;
     KEL.typ.int P_L___Drg_Bk_Disp_Cnt1_Y_ := 0;
     KEL.typ.int P_L___Drg_Bk_Disp_Cnt7_Y_ := 0;
-    KEL.typ.ndataset(Index_Build_Association_Res22_Internal_Layout_P_L___Drg_Bk_Disp_List10_Y_Layout) P_L___Drg_Bk_Disp_List10_Y_;
-    KEL.typ.ndataset(Index_Build_Association_Res22_Internal_Layout_P_L___Drg_Bk_Disp_List1_Y_Layout) P_L___Drg_Bk_Disp_List1_Y_;
-    KEL.typ.ndataset(Index_Build_Association_Res22_Internal_Layout_P_L___Drg_Bk_Disp_List7_Y_Layout) P_L___Drg_Bk_Disp_List7_Y_;
+    KEL.typ.nstr P_L___Drg_Bk_Disp_List10_Y_;
+    KEL.typ.ndataset(Index_Build_Association_Res22_Internal_Layout_P_L___Drg_Bk_Disp_List10_Y_Pre_Layout) P_L___Drg_Bk_Disp_List10_Y_Pre_;
+    KEL.typ.nstr P_L___Drg_Bk_Disp_List1_Y_;
+    KEL.typ.ndataset(Index_Build_Association_Res22_Internal_Layout_P_L___Drg_Bk_Disp_List1_Y_Pre_Layout) P_L___Drg_Bk_Disp_List1_Y_Pre_;
+    KEL.typ.nstr P_L___Drg_Bk_Disp_List7_Y_;
+    KEL.typ.ndataset(Index_Build_Association_Res22_Internal_Layout_P_L___Drg_Bk_Disp_List7_Y_Pre_Layout) P_L___Drg_Bk_Disp_List7_Y_Pre_;
     KEL.typ.int P_L___Drg_Bk_Dsch_Cnt10_Y_ := 0;
     KEL.typ.int P_L___Drg_Bk_Dsch_Cnt1_Y_ := 0;
     KEL.typ.int P_L___Drg_Bk_Dsch_Cnt7_Y_ := 0;
     KEL.typ.int P_L___Drg_Bk_Dsms_Cnt10_Y_ := 0;
     KEL.typ.int P_L___Drg_Bk_Dsms_Cnt1_Y_ := 0;
     KEL.typ.int P_L___Drg_Bk_Dsms_Cnt7_Y_ := 0;
-    KEL.typ.ndataset(Index_Build_Association_Res22_Internal_Layout_P_L___Drg_Bk_Dt_List10_Y_Layout) P_L___Drg_Bk_Dt_List10_Y_;
-    KEL.typ.ndataset(Index_Build_Association_Res22_Internal_Layout_P_L___Drg_Bk_Dt_List1_Y_Layout) P_L___Drg_Bk_Dt_List1_Y_;
-    KEL.typ.ndataset(Index_Build_Association_Res22_Internal_Layout_P_L___Drg_Bk_Dt_List7_Y_Layout) P_L___Drg_Bk_Dt_List7_Y_;
+    KEL.typ.nstr P_L___Drg_Bk_Dt_List10_Y_;
+    KEL.typ.ndataset(Index_Build_Association_Res22_Internal_Layout_P_L___Drg_Bk_Dt_List10_Y_Pre_Layout) P_L___Drg_Bk_Dt_List10_Y_Pre_;
+    KEL.typ.nstr P_L___Drg_Bk_Dt_List1_Y_;
+    KEL.typ.ndataset(Index_Build_Association_Res22_Internal_Layout_P_L___Drg_Bk_Dt_List1_Y_Pre_Layout) P_L___Drg_Bk_Dt_List1_Y_Pre_;
+    KEL.typ.nstr P_L___Drg_Bk_Dt_List7_Y_;
+    KEL.typ.ndataset(Index_Build_Association_Res22_Internal_Layout_P_L___Drg_Bk_Dt_List7_Y_Pre_Layout) P_L___Drg_Bk_Dt_List7_Y_Pre_;
     KEL.typ.nstr P_L___Drg_Bk_New_Ch_Type10_Y_;
     KEL.typ.nstr P_L___Drg_Bk_New_Ch_Type1_Y_;
     KEL.typ.nstr P_L___Drg_Bk_New_Ch_Type7_Y_;
@@ -29791,9 +28828,12 @@ EXPORT L_Compile := MODULE
     KEL.typ.nint P_L___Drg_Bk_Old_Msnc1_Y_;
     KEL.typ.nint P_L___Drg_Bk_Old_Msnc7_Y_;
     KEL.typ.str P_L___Drg_Bk_Severity_Indx10_Y_ := '';
-    KEL.typ.ndataset(Index_Build_Association_Res22_Internal_Layout_P_L___Drg_Bk_Type_List10_Y_Layout) P_L___Drg_Bk_Type_List10_Y_;
-    KEL.typ.ndataset(Index_Build_Association_Res22_Internal_Layout_P_L___Drg_Bk_Type_List1_Y_Layout) P_L___Drg_Bk_Type_List1_Y_;
-    KEL.typ.ndataset(Index_Build_Association_Res22_Internal_Layout_P_L___Drg_Bk_Type_List7_Y_Layout) P_L___Drg_Bk_Type_List7_Y_;
+    KEL.typ.nstr P_L___Drg_Bk_Type_List10_Y_;
+    KEL.typ.ndataset(Index_Build_Association_Res22_Internal_Layout_P_L___Drg_Bk_Type_List10_Y_Pre_Layout) P_L___Drg_Bk_Type_List10_Y_Pre_;
+    KEL.typ.nstr P_L___Drg_Bk_Type_List1_Y_;
+    KEL.typ.ndataset(Index_Build_Association_Res22_Internal_Layout_P_L___Drg_Bk_Type_List1_Y_Pre_Layout) P_L___Drg_Bk_Type_List1_Y_Pre_;
+    KEL.typ.nstr P_L___Drg_Bk_Type_List7_Y_;
+    KEL.typ.ndataset(Index_Build_Association_Res22_Internal_Layout_P_L___Drg_Bk_Type_List7_Y_Pre_Layout) P_L___Drg_Bk_Type_List7_Y_Pre_;
     KEL.typ.nstr P_L___Drg_Bk_Updt_New_Dt10_Y_;
     KEL.typ.nstr P_L___Drg_Bk_Updt_New_Dt1_Y_;
     KEL.typ.nstr P_L___Drg_Bk_Updt_New_Dt7_Y_;
@@ -29926,10 +28966,11 @@ EXPORT L_Compile := MODULE
     KEL.typ.nstr P_L___Prof_Lic_Actv_New_Src_Type_;
     KEL.typ.nstr P_L___Prof_Lic_Actv_New_Title_Type_;
     KEL.typ.nstr P_L___Prof_Lic_Actv_New_Type_;
-    KEL.typ.ndataset(Index_Build_Association_Res22_Internal_Layout_P_L___Prof_Lic_Exp_Dt_List_Ev_Layout) P_L___Prof_Lic_Exp_Dt_List_Ev_;
+    KEL.typ.nstr P_L___Prof_Lic_Exp_Dt_List_Ev_;
     KEL.typ.str P_L___Prof_Lic_Flag_Ev_ := '';
-    KEL.typ.ndataset(Index_Build_Association_Res22_Internal_Layout_P_L___Prof_Lic_Indx_By_Lic_List_Ev_Layout) P_L___Prof_Lic_Indx_By_Lic_List_Ev_;
-    KEL.typ.ndataset(Index_Build_Association_Res22_Internal_Layout_P_L___Prof_Lic_Issue_Dt_List_Ev_Layout) P_L___Prof_Lic_Issue_Dt_List_Ev_;
+    KEL.typ.nstr P_L___Prof_Lic_Indx_By_Lic_List_Ev_;
+    KEL.typ.ndataset(Index_Build_Association_Res22_Internal_Layout_P_L___Prof_Lic_Indx_By_Lic_List_Ev_Pre_Layout) P_L___Prof_Lic_Indx_By_Lic_List_Ev_Pre_;
+    KEL.typ.nstr P_L___Prof_Lic_Issue_Dt_List_Ev_;
     KEL.typ.nint P_L___S_T_L_Cnt1_Y_;
     KEL.typ.nint P_L___S_T_L_Cnt2_Y_;
     KEL.typ.nint P_L___S_T_L_Cnt5_Y_;
@@ -30104,6 +29145,7 @@ EXPORT L_Compile := MODULE
     KEL.typ.str P___Lex_I_D_Rstd_Only_Flag_F_C_R_A_ := '';
     KEL.typ.str P___Lex_I_D_Rstd_Only_Flag_Non_F_C_R_A_ := '';
     KEL.typ.str P___Lex_I_D_Seen_Flag_ := '';
+    KEL.typ.str P___Lex_I_D_Seen_Flag_F_C_R_A_ := '';
     KEL.typ.str P___Lex_I_D_Seen_Flag_N_O_W_ := '';
     KEL.typ.nint Person_Address_Hierarchy_Valid_Cnt_;
     KEL.typ.nint Person_Curr_Addr_Loc_I_D_;
@@ -32068,6 +31110,7 @@ EXPORT L_Compile := MODULE
     KEL.typ.nstr Source_;
     KEL.typ.nbool Header_Hit_Flag_;
     KEL.typ.nbool F_D_N_Indicator_;
+    KEL.typ.nint Age_In_Days_;
     KEL.typ.nstr Translated_Source_Code_;
     KEL.typ.epoch Archive___Date_ := 0;
     KEL.typ.epoch Date_First_Seen_ := 0;
@@ -32894,7 +31937,7 @@ EXPORT L_Compile := MODULE
     KEL.typ.nbool Res_Bus_Flag_A_C_;
     KEL.typ.nbool Res_Bus_Flag_B_D_;
   END;
-  SHARED Index_Build_Association_Res40_Internal_Layout_P_L___Ast_Veh_Air_Emrg_Dt_List_Ev_Layout := RECORD
+  SHARED Index_Build_Association_Res40_Internal_Layout_P_L___Ast_Veh_Air_Emrg_Dt_List_Ev_Pre_Layout := RECORD
     KEL.typ.ntyp(E_Aircraft().Typ) Plane_;
     KEL.typ.nstr Aircraft_First_Seen_Date_;
     KEL.typ.epoch Archive___Date_ := 0;
@@ -32924,7 +31967,7 @@ EXPORT L_Compile := MODULE
     KEL.typ.epoch Vault_Date_Last_Seen_ := 0;
     KEL.typ.int __RecordCount := 0;
   END;
-  SHARED Index_Build_Association_Res40_Internal_Layout_P_L___Ast_Veh_Wtr_Emrg_Dt_List_Ev_Layout := RECORD
+  SHARED Index_Build_Association_Res40_Internal_Layout_P_L___Ast_Veh_Wtr_Emrg_Dt_List_Ev_Pre_Layout := RECORD
     KEL.typ.ntyp(E_Watercraft().Typ) W_Craft_;
     KEL.typ.nstr Watercraft_First_Seen_Date_;
     KEL.typ.epoch Archive___Date_ := 0;
@@ -32934,7 +31977,7 @@ EXPORT L_Compile := MODULE
     KEL.typ.epoch Vault_Date_Last_Seen_ := 0;
     KEL.typ.int __RecordCount := 0;
   END;
-  SHARED Index_Build_Association_Res40_Internal_Layout_P_L___Drg_Bk_Ch_List10_Y_Layout := RECORD
+  SHARED Index_Build_Association_Res40_Internal_Layout_P_L___Drg_Bk_Ch_List10_Y_Pre_Layout := RECORD
     KEL.typ.nstr Original_Chapter_;
     KEL.typ.nstr T_M_S_I_D_;
     KEL.typ.nstr Case_Number_;
@@ -32949,7 +31992,7 @@ EXPORT L_Compile := MODULE
     KEL.typ.epoch Vault_Date_Last_Seen_ := 0;
     KEL.typ.int __RecordCount := 0;
   END;
-  SHARED Index_Build_Association_Res40_Internal_Layout_P_L___Drg_Bk_Ch_List1_Y_Layout := RECORD
+  SHARED Index_Build_Association_Res40_Internal_Layout_P_L___Drg_Bk_Ch_List1_Y_Pre_Layout := RECORD
     KEL.typ.nstr Original_Chapter_;
     KEL.typ.nstr T_M_S_I_D_;
     KEL.typ.nstr Case_Number_;
@@ -32964,7 +32007,7 @@ EXPORT L_Compile := MODULE
     KEL.typ.epoch Vault_Date_Last_Seen_ := 0;
     KEL.typ.int __RecordCount := 0;
   END;
-  SHARED Index_Build_Association_Res40_Internal_Layout_P_L___Drg_Bk_Ch_List7_Y_Layout := RECORD
+  SHARED Index_Build_Association_Res40_Internal_Layout_P_L___Drg_Bk_Ch_List7_Y_Pre_Layout := RECORD
     KEL.typ.nstr Original_Chapter_;
     KEL.typ.nstr T_M_S_I_D_;
     KEL.typ.nstr Case_Number_;
@@ -32979,7 +32022,7 @@ EXPORT L_Compile := MODULE
     KEL.typ.epoch Vault_Date_Last_Seen_ := 0;
     KEL.typ.int __RecordCount := 0;
   END;
-  SHARED Index_Build_Association_Res40_Internal_Layout_P_L___Drg_Bk_Disp_List10_Y_Layout := RECORD
+  SHARED Index_Build_Association_Res40_Internal_Layout_P_L___Drg_Bk_Disp_List10_Y_Pre_Layout := RECORD
     KEL.typ.nstr Disposition_;
     KEL.typ.nstr T_M_S_I_D_;
     KEL.typ.nstr Case_Number_;
@@ -32994,7 +32037,7 @@ EXPORT L_Compile := MODULE
     KEL.typ.epoch Vault_Date_Last_Seen_ := 0;
     KEL.typ.int __RecordCount := 0;
   END;
-  SHARED Index_Build_Association_Res40_Internal_Layout_P_L___Drg_Bk_Disp_List1_Y_Layout := RECORD
+  SHARED Index_Build_Association_Res40_Internal_Layout_P_L___Drg_Bk_Disp_List1_Y_Pre_Layout := RECORD
     KEL.typ.nstr Disposition_;
     KEL.typ.nstr T_M_S_I_D_;
     KEL.typ.nstr Case_Number_;
@@ -33009,7 +32052,7 @@ EXPORT L_Compile := MODULE
     KEL.typ.epoch Vault_Date_Last_Seen_ := 0;
     KEL.typ.int __RecordCount := 0;
   END;
-  SHARED Index_Build_Association_Res40_Internal_Layout_P_L___Drg_Bk_Disp_List7_Y_Layout := RECORD
+  SHARED Index_Build_Association_Res40_Internal_Layout_P_L___Drg_Bk_Disp_List7_Y_Pre_Layout := RECORD
     KEL.typ.nstr Disposition_;
     KEL.typ.nstr T_M_S_I_D_;
     KEL.typ.nstr Case_Number_;
@@ -33024,7 +32067,7 @@ EXPORT L_Compile := MODULE
     KEL.typ.epoch Vault_Date_Last_Seen_ := 0;
     KEL.typ.int __RecordCount := 0;
   END;
-  SHARED Index_Build_Association_Res40_Internal_Layout_P_L___Drg_Bk_Dt_List10_Y_Layout := RECORD
+  SHARED Index_Build_Association_Res40_Internal_Layout_P_L___Drg_Bk_Dt_List10_Y_Pre_Layout := RECORD
     KEL.typ.nstr T_M_S_I_D_;
     KEL.typ.nstr Case_Number_;
     KEL.typ.nstr Court_Code_;
@@ -33038,7 +32081,7 @@ EXPORT L_Compile := MODULE
     KEL.typ.epoch Vault_Date_Last_Seen_ := 0;
     KEL.typ.int __RecordCount := 0;
   END;
-  SHARED Index_Build_Association_Res40_Internal_Layout_P_L___Drg_Bk_Dt_List1_Y_Layout := RECORD
+  SHARED Index_Build_Association_Res40_Internal_Layout_P_L___Drg_Bk_Dt_List1_Y_Pre_Layout := RECORD
     KEL.typ.nstr T_M_S_I_D_;
     KEL.typ.nstr Case_Number_;
     KEL.typ.nstr Court_Code_;
@@ -33052,7 +32095,7 @@ EXPORT L_Compile := MODULE
     KEL.typ.epoch Vault_Date_Last_Seen_ := 0;
     KEL.typ.int __RecordCount := 0;
   END;
-  SHARED Index_Build_Association_Res40_Internal_Layout_P_L___Drg_Bk_Dt_List7_Y_Layout := RECORD
+  SHARED Index_Build_Association_Res40_Internal_Layout_P_L___Drg_Bk_Dt_List7_Y_Pre_Layout := RECORD
     KEL.typ.nstr T_M_S_I_D_;
     KEL.typ.nstr Case_Number_;
     KEL.typ.nstr Court_Code_;
@@ -33066,7 +32109,7 @@ EXPORT L_Compile := MODULE
     KEL.typ.epoch Vault_Date_Last_Seen_ := 0;
     KEL.typ.int __RecordCount := 0;
   END;
-  SHARED Index_Build_Association_Res40_Internal_Layout_P_L___Drg_Bk_Type_List10_Y_Layout := RECORD
+  SHARED Index_Build_Association_Res40_Internal_Layout_P_L___Drg_Bk_Type_List10_Y_Pre_Layout := RECORD
     KEL.typ.nstr Filing_Type_;
     KEL.typ.nkdate Bankruptcy_Date_;
     KEL.typ.nkdate Last_Status_Update_;
@@ -33078,7 +32121,7 @@ EXPORT L_Compile := MODULE
     KEL.typ.epoch Vault_Date_Last_Seen_ := 0;
     KEL.typ.int __RecordCount := 0;
   END;
-  SHARED Index_Build_Association_Res40_Internal_Layout_P_L___Drg_Bk_Type_List1_Y_Layout := RECORD
+  SHARED Index_Build_Association_Res40_Internal_Layout_P_L___Drg_Bk_Type_List1_Y_Pre_Layout := RECORD
     KEL.typ.nstr Filing_Type_;
     KEL.typ.nkdate Bankruptcy_Date_;
     KEL.typ.nkdate Last_Status_Update_;
@@ -33090,7 +32133,7 @@ EXPORT L_Compile := MODULE
     KEL.typ.epoch Vault_Date_Last_Seen_ := 0;
     KEL.typ.int __RecordCount := 0;
   END;
-  SHARED Index_Build_Association_Res40_Internal_Layout_P_L___Drg_Bk_Type_List7_Y_Layout := RECORD
+  SHARED Index_Build_Association_Res40_Internal_Layout_P_L___Drg_Bk_Type_List7_Y_Pre_Layout := RECORD
     KEL.typ.nstr Filing_Type_;
     KEL.typ.nkdate Bankruptcy_Date_;
     KEL.typ.nkdate Last_Status_Update_;
@@ -33102,29 +32145,9 @@ EXPORT L_Compile := MODULE
     KEL.typ.epoch Vault_Date_Last_Seen_ := 0;
     KEL.typ.int __RecordCount := 0;
   END;
-  SHARED Index_Build_Association_Res40_Internal_Layout_P_L___Prof_Lic_Exp_Dt_List_Ev_Layout := RECORD
-    KEL.typ.nuid Prof_Lic_U_I_D_;
-    KEL.typ.nstr Max_Expire_Date_;
-    KEL.typ.epoch Archive___Date_ := 0;
-    KEL.typ.epoch Date_First_Seen_ := 0;
-    KEL.typ.epoch Date_Last_Seen_ := 0;
-    KEL.typ.epoch Hybrid_Archive_Date_ := 0;
-    KEL.typ.epoch Vault_Date_Last_Seen_ := 0;
-    KEL.typ.int __RecordCount := 0;
-  END;
-  SHARED Index_Build_Association_Res40_Internal_Layout_P_L___Prof_Lic_Indx_By_Lic_List_Ev_Layout := RECORD
+  SHARED Index_Build_Association_Res40_Internal_Layout_P_L___Prof_Lic_Indx_By_Lic_List_Ev_Pre_Layout := RECORD
     KEL.typ.nuid Prof_Lic_U_I_D_;
     KEL.typ.nstr License_Category_;
-    KEL.typ.epoch Archive___Date_ := 0;
-    KEL.typ.epoch Date_First_Seen_ := 0;
-    KEL.typ.epoch Date_Last_Seen_ := 0;
-    KEL.typ.epoch Hybrid_Archive_Date_ := 0;
-    KEL.typ.epoch Vault_Date_Last_Seen_ := 0;
-    KEL.typ.int __RecordCount := 0;
-  END;
-  SHARED Index_Build_Association_Res40_Internal_Layout_P_L___Prof_Lic_Issue_Dt_List_Ev_Layout := RECORD
-    KEL.typ.nuid Prof_Lic_U_I_D_;
-    KEL.typ.nstr Max_Issue_Date_;
     KEL.typ.epoch Archive___Date_ := 0;
     KEL.typ.epoch Date_First_Seen_ := 0;
     KEL.typ.epoch Date_Last_Seen_ := 0;
@@ -34677,7 +33700,8 @@ EXPORT L_Compile := MODULE
     KEL.typ.nint P_L___Ast_Prop_Sale_Old_Msnc_Ev_;
     KEL.typ.int P_L___Ast_Prop_Sale_Tot_Ev_ := 0;
     KEL.typ.int P_L___Ast_Veh_Air_Cnt_Ev_ := 0;
-    KEL.typ.ndataset(Index_Build_Association_Res40_Internal_Layout_P_L___Ast_Veh_Air_Emrg_Dt_List_Ev_Layout) P_L___Ast_Veh_Air_Emrg_Dt_List_Ev_;
+    KEL.typ.nstr P_L___Ast_Veh_Air_Emrg_Dt_List_Ev_;
+    KEL.typ.ndataset(Index_Build_Association_Res40_Internal_Layout_P_L___Ast_Veh_Air_Emrg_Dt_List_Ev_Pre_Layout) P_L___Ast_Veh_Air_Emrg_Dt_List_Ev_Pre_;
     KEL.typ.nstr P_L___Ast_Veh_Air_Emrg_New_Dt_Ev_;
     KEL.typ.nint P_L___Ast_Veh_Air_Emrg_New_Msnc_Ev_;
     KEL.typ.nstr P_L___Ast_Veh_Air_Emrg_Old_Dt_Ev_;
@@ -34692,7 +33716,8 @@ EXPORT L_Compile := MODULE
     KEL.typ.nint P_L___Ast_Veh_Auto_Emrg_Old_Msnc_Ev_;
     KEL.typ.ndataset(Index_Build_Association_Res40_Internal_Layout_P_L___Ast_Veh_Auto_Last_Dt_List_Ev_Layout) P_L___Ast_Veh_Auto_Last_Dt_List_Ev_;
     KEL.typ.int P_L___Ast_Veh_Wtr_Cnt_Ev_ := 0;
-    KEL.typ.ndataset(Index_Build_Association_Res40_Internal_Layout_P_L___Ast_Veh_Wtr_Emrg_Dt_List_Ev_Layout) P_L___Ast_Veh_Wtr_Emrg_Dt_List_Ev_;
+    KEL.typ.nstr P_L___Ast_Veh_Wtr_Emrg_Dt_List_Ev_;
+    KEL.typ.ndataset(Index_Build_Association_Res40_Internal_Layout_P_L___Ast_Veh_Wtr_Emrg_Dt_List_Ev_Pre_Layout) P_L___Ast_Veh_Wtr_Emrg_Dt_List_Ev_Pre_;
     KEL.typ.nstr P_L___Ast_Veh_Wtr_Emrg_New_Dt_Ev_;
     KEL.typ.nint P_L___Ast_Veh_Wtr_Emrg_New_Msnc_Ev_;
     KEL.typ.nstr P_L___Ast_Veh_Wtr_Emrg_Old_Dt_Ev_;
@@ -34741,9 +33766,12 @@ EXPORT L_Compile := MODULE
     KEL.typ.int P_L___Drg_Bk_Ch7_Cnt10_Y_ := 0;
     KEL.typ.int P_L___Drg_Bk_Ch7_Cnt1_Y_ := 0;
     KEL.typ.int P_L___Drg_Bk_Ch7_Cnt7_Y_ := 0;
-    KEL.typ.ndataset(Index_Build_Association_Res40_Internal_Layout_P_L___Drg_Bk_Ch_List10_Y_Layout) P_L___Drg_Bk_Ch_List10_Y_;
-    KEL.typ.ndataset(Index_Build_Association_Res40_Internal_Layout_P_L___Drg_Bk_Ch_List1_Y_Layout) P_L___Drg_Bk_Ch_List1_Y_;
-    KEL.typ.ndataset(Index_Build_Association_Res40_Internal_Layout_P_L___Drg_Bk_Ch_List7_Y_Layout) P_L___Drg_Bk_Ch_List7_Y_;
+    KEL.typ.nstr P_L___Drg_Bk_Ch_List10_Y_;
+    KEL.typ.ndataset(Index_Build_Association_Res40_Internal_Layout_P_L___Drg_Bk_Ch_List10_Y_Pre_Layout) P_L___Drg_Bk_Ch_List10_Y_Pre_;
+    KEL.typ.nstr P_L___Drg_Bk_Ch_List1_Y_;
+    KEL.typ.ndataset(Index_Build_Association_Res40_Internal_Layout_P_L___Drg_Bk_Ch_List1_Y_Pre_Layout) P_L___Drg_Bk_Ch_List1_Y_Pre_;
+    KEL.typ.nstr P_L___Drg_Bk_Ch_List7_Y_;
+    KEL.typ.ndataset(Index_Build_Association_Res40_Internal_Layout_P_L___Drg_Bk_Ch_List7_Y_Pre_Layout) P_L___Drg_Bk_Ch_List7_Y_Pre_;
     KEL.typ.int P_L___Drg_Bk_Cnt10_Y_ := 0;
     KEL.typ.int P_L___Drg_Bk_Cnt1_Y_ := 0;
     KEL.typ.int P_L___Drg_Bk_Cnt1_Y_F1_Y_ := 0;
@@ -34751,18 +33779,24 @@ EXPORT L_Compile := MODULE
     KEL.typ.int P_L___Drg_Bk_Disp_Cnt10_Y_ := 0;
     KEL.typ.int P_L___Drg_Bk_Disp_Cnt1_Y_ := 0;
     KEL.typ.int P_L___Drg_Bk_Disp_Cnt7_Y_ := 0;
-    KEL.typ.ndataset(Index_Build_Association_Res40_Internal_Layout_P_L___Drg_Bk_Disp_List10_Y_Layout) P_L___Drg_Bk_Disp_List10_Y_;
-    KEL.typ.ndataset(Index_Build_Association_Res40_Internal_Layout_P_L___Drg_Bk_Disp_List1_Y_Layout) P_L___Drg_Bk_Disp_List1_Y_;
-    KEL.typ.ndataset(Index_Build_Association_Res40_Internal_Layout_P_L___Drg_Bk_Disp_List7_Y_Layout) P_L___Drg_Bk_Disp_List7_Y_;
+    KEL.typ.nstr P_L___Drg_Bk_Disp_List10_Y_;
+    KEL.typ.ndataset(Index_Build_Association_Res40_Internal_Layout_P_L___Drg_Bk_Disp_List10_Y_Pre_Layout) P_L___Drg_Bk_Disp_List10_Y_Pre_;
+    KEL.typ.nstr P_L___Drg_Bk_Disp_List1_Y_;
+    KEL.typ.ndataset(Index_Build_Association_Res40_Internal_Layout_P_L___Drg_Bk_Disp_List1_Y_Pre_Layout) P_L___Drg_Bk_Disp_List1_Y_Pre_;
+    KEL.typ.nstr P_L___Drg_Bk_Disp_List7_Y_;
+    KEL.typ.ndataset(Index_Build_Association_Res40_Internal_Layout_P_L___Drg_Bk_Disp_List7_Y_Pre_Layout) P_L___Drg_Bk_Disp_List7_Y_Pre_;
     KEL.typ.int P_L___Drg_Bk_Dsch_Cnt10_Y_ := 0;
     KEL.typ.int P_L___Drg_Bk_Dsch_Cnt1_Y_ := 0;
     KEL.typ.int P_L___Drg_Bk_Dsch_Cnt7_Y_ := 0;
     KEL.typ.int P_L___Drg_Bk_Dsms_Cnt10_Y_ := 0;
     KEL.typ.int P_L___Drg_Bk_Dsms_Cnt1_Y_ := 0;
     KEL.typ.int P_L___Drg_Bk_Dsms_Cnt7_Y_ := 0;
-    KEL.typ.ndataset(Index_Build_Association_Res40_Internal_Layout_P_L___Drg_Bk_Dt_List10_Y_Layout) P_L___Drg_Bk_Dt_List10_Y_;
-    KEL.typ.ndataset(Index_Build_Association_Res40_Internal_Layout_P_L___Drg_Bk_Dt_List1_Y_Layout) P_L___Drg_Bk_Dt_List1_Y_;
-    KEL.typ.ndataset(Index_Build_Association_Res40_Internal_Layout_P_L___Drg_Bk_Dt_List7_Y_Layout) P_L___Drg_Bk_Dt_List7_Y_;
+    KEL.typ.nstr P_L___Drg_Bk_Dt_List10_Y_;
+    KEL.typ.ndataset(Index_Build_Association_Res40_Internal_Layout_P_L___Drg_Bk_Dt_List10_Y_Pre_Layout) P_L___Drg_Bk_Dt_List10_Y_Pre_;
+    KEL.typ.nstr P_L___Drg_Bk_Dt_List1_Y_;
+    KEL.typ.ndataset(Index_Build_Association_Res40_Internal_Layout_P_L___Drg_Bk_Dt_List1_Y_Pre_Layout) P_L___Drg_Bk_Dt_List1_Y_Pre_;
+    KEL.typ.nstr P_L___Drg_Bk_Dt_List7_Y_;
+    KEL.typ.ndataset(Index_Build_Association_Res40_Internal_Layout_P_L___Drg_Bk_Dt_List7_Y_Pre_Layout) P_L___Drg_Bk_Dt_List7_Y_Pre_;
     KEL.typ.nstr P_L___Drg_Bk_New_Ch_Type10_Y_;
     KEL.typ.nstr P_L___Drg_Bk_New_Ch_Type1_Y_;
     KEL.typ.nstr P_L___Drg_Bk_New_Ch_Type7_Y_;
@@ -34788,9 +33822,12 @@ EXPORT L_Compile := MODULE
     KEL.typ.nint P_L___Drg_Bk_Old_Msnc1_Y_;
     KEL.typ.nint P_L___Drg_Bk_Old_Msnc7_Y_;
     KEL.typ.str P_L___Drg_Bk_Severity_Indx10_Y_ := '';
-    KEL.typ.ndataset(Index_Build_Association_Res40_Internal_Layout_P_L___Drg_Bk_Type_List10_Y_Layout) P_L___Drg_Bk_Type_List10_Y_;
-    KEL.typ.ndataset(Index_Build_Association_Res40_Internal_Layout_P_L___Drg_Bk_Type_List1_Y_Layout) P_L___Drg_Bk_Type_List1_Y_;
-    KEL.typ.ndataset(Index_Build_Association_Res40_Internal_Layout_P_L___Drg_Bk_Type_List7_Y_Layout) P_L___Drg_Bk_Type_List7_Y_;
+    KEL.typ.nstr P_L___Drg_Bk_Type_List10_Y_;
+    KEL.typ.ndataset(Index_Build_Association_Res40_Internal_Layout_P_L___Drg_Bk_Type_List10_Y_Pre_Layout) P_L___Drg_Bk_Type_List10_Y_Pre_;
+    KEL.typ.nstr P_L___Drg_Bk_Type_List1_Y_;
+    KEL.typ.ndataset(Index_Build_Association_Res40_Internal_Layout_P_L___Drg_Bk_Type_List1_Y_Pre_Layout) P_L___Drg_Bk_Type_List1_Y_Pre_;
+    KEL.typ.nstr P_L___Drg_Bk_Type_List7_Y_;
+    KEL.typ.ndataset(Index_Build_Association_Res40_Internal_Layout_P_L___Drg_Bk_Type_List7_Y_Pre_Layout) P_L___Drg_Bk_Type_List7_Y_Pre_;
     KEL.typ.nstr P_L___Drg_Bk_Updt_New_Dt10_Y_;
     KEL.typ.nstr P_L___Drg_Bk_Updt_New_Dt1_Y_;
     KEL.typ.nstr P_L___Drg_Bk_Updt_New_Dt7_Y_;
@@ -34923,10 +33960,11 @@ EXPORT L_Compile := MODULE
     KEL.typ.nstr P_L___Prof_Lic_Actv_New_Src_Type_;
     KEL.typ.nstr P_L___Prof_Lic_Actv_New_Title_Type_;
     KEL.typ.nstr P_L___Prof_Lic_Actv_New_Type_;
-    KEL.typ.ndataset(Index_Build_Association_Res40_Internal_Layout_P_L___Prof_Lic_Exp_Dt_List_Ev_Layout) P_L___Prof_Lic_Exp_Dt_List_Ev_;
+    KEL.typ.nstr P_L___Prof_Lic_Exp_Dt_List_Ev_;
     KEL.typ.str P_L___Prof_Lic_Flag_Ev_ := '';
-    KEL.typ.ndataset(Index_Build_Association_Res40_Internal_Layout_P_L___Prof_Lic_Indx_By_Lic_List_Ev_Layout) P_L___Prof_Lic_Indx_By_Lic_List_Ev_;
-    KEL.typ.ndataset(Index_Build_Association_Res40_Internal_Layout_P_L___Prof_Lic_Issue_Dt_List_Ev_Layout) P_L___Prof_Lic_Issue_Dt_List_Ev_;
+    KEL.typ.nstr P_L___Prof_Lic_Indx_By_Lic_List_Ev_;
+    KEL.typ.ndataset(Index_Build_Association_Res40_Internal_Layout_P_L___Prof_Lic_Indx_By_Lic_List_Ev_Pre_Layout) P_L___Prof_Lic_Indx_By_Lic_List_Ev_Pre_;
+    KEL.typ.nstr P_L___Prof_Lic_Issue_Dt_List_Ev_;
     KEL.typ.nint P_L___S_T_L_Cnt1_Y_;
     KEL.typ.nint P_L___S_T_L_Cnt2_Y_;
     KEL.typ.nint P_L___S_T_L_Cnt5_Y_;
@@ -35101,6 +34139,7 @@ EXPORT L_Compile := MODULE
     KEL.typ.str P___Lex_I_D_Rstd_Only_Flag_F_C_R_A_ := '';
     KEL.typ.str P___Lex_I_D_Rstd_Only_Flag_Non_F_C_R_A_ := '';
     KEL.typ.str P___Lex_I_D_Seen_Flag_ := '';
+    KEL.typ.str P___Lex_I_D_Seen_Flag_F_C_R_A_ := '';
     KEL.typ.str P___Lex_I_D_Seen_Flag_N_O_W_ := '';
     KEL.typ.nint Person_Address_Hierarchy_Valid_Cnt_;
     KEL.typ.nint Person_Curr_Addr_Loc_I_D_;
@@ -39934,6 +38973,7 @@ EXPORT L_Compile := MODULE
     KEL.typ.nstr Source_;
     KEL.typ.nbool Header_Hit_Flag_;
     KEL.typ.nbool F_D_N_Indicator_;
+    KEL.typ.nint Age_In_Days_;
     KEL.typ.nstr Translated_Source_Code_;
     KEL.typ.epoch Archive___Date_ := 0;
     KEL.typ.epoch Date_First_Seen_ := 0;
@@ -40760,7 +39800,7 @@ EXPORT L_Compile := MODULE
     KEL.typ.nbool Res_Bus_Flag_A_C_;
     KEL.typ.nbool Res_Bus_Flag_B_D_;
   END;
-  SHARED Index_Build_Association_Res67_Internal_Layout_P_L___Ast_Veh_Air_Emrg_Dt_List_Ev_Layout := RECORD
+  SHARED Index_Build_Association_Res67_Internal_Layout_P_L___Ast_Veh_Air_Emrg_Dt_List_Ev_Pre_Layout := RECORD
     KEL.typ.ntyp(E_Aircraft().Typ) Plane_;
     KEL.typ.nstr Aircraft_First_Seen_Date_;
     KEL.typ.epoch Archive___Date_ := 0;
@@ -40790,7 +39830,7 @@ EXPORT L_Compile := MODULE
     KEL.typ.epoch Vault_Date_Last_Seen_ := 0;
     KEL.typ.int __RecordCount := 0;
   END;
-  SHARED Index_Build_Association_Res67_Internal_Layout_P_L___Ast_Veh_Wtr_Emrg_Dt_List_Ev_Layout := RECORD
+  SHARED Index_Build_Association_Res67_Internal_Layout_P_L___Ast_Veh_Wtr_Emrg_Dt_List_Ev_Pre_Layout := RECORD
     KEL.typ.ntyp(E_Watercraft().Typ) W_Craft_;
     KEL.typ.nstr Watercraft_First_Seen_Date_;
     KEL.typ.epoch Archive___Date_ := 0;
@@ -40800,7 +39840,7 @@ EXPORT L_Compile := MODULE
     KEL.typ.epoch Vault_Date_Last_Seen_ := 0;
     KEL.typ.int __RecordCount := 0;
   END;
-  SHARED Index_Build_Association_Res67_Internal_Layout_P_L___Drg_Bk_Ch_List10_Y_Layout := RECORD
+  SHARED Index_Build_Association_Res67_Internal_Layout_P_L___Drg_Bk_Ch_List10_Y_Pre_Layout := RECORD
     KEL.typ.nstr Original_Chapter_;
     KEL.typ.nstr T_M_S_I_D_;
     KEL.typ.nstr Case_Number_;
@@ -40815,7 +39855,7 @@ EXPORT L_Compile := MODULE
     KEL.typ.epoch Vault_Date_Last_Seen_ := 0;
     KEL.typ.int __RecordCount := 0;
   END;
-  SHARED Index_Build_Association_Res67_Internal_Layout_P_L___Drg_Bk_Ch_List1_Y_Layout := RECORD
+  SHARED Index_Build_Association_Res67_Internal_Layout_P_L___Drg_Bk_Ch_List1_Y_Pre_Layout := RECORD
     KEL.typ.nstr Original_Chapter_;
     KEL.typ.nstr T_M_S_I_D_;
     KEL.typ.nstr Case_Number_;
@@ -40830,7 +39870,7 @@ EXPORT L_Compile := MODULE
     KEL.typ.epoch Vault_Date_Last_Seen_ := 0;
     KEL.typ.int __RecordCount := 0;
   END;
-  SHARED Index_Build_Association_Res67_Internal_Layout_P_L___Drg_Bk_Ch_List7_Y_Layout := RECORD
+  SHARED Index_Build_Association_Res67_Internal_Layout_P_L___Drg_Bk_Ch_List7_Y_Pre_Layout := RECORD
     KEL.typ.nstr Original_Chapter_;
     KEL.typ.nstr T_M_S_I_D_;
     KEL.typ.nstr Case_Number_;
@@ -40845,7 +39885,7 @@ EXPORT L_Compile := MODULE
     KEL.typ.epoch Vault_Date_Last_Seen_ := 0;
     KEL.typ.int __RecordCount := 0;
   END;
-  SHARED Index_Build_Association_Res67_Internal_Layout_P_L___Drg_Bk_Disp_List10_Y_Layout := RECORD
+  SHARED Index_Build_Association_Res67_Internal_Layout_P_L___Drg_Bk_Disp_List10_Y_Pre_Layout := RECORD
     KEL.typ.nstr Disposition_;
     KEL.typ.nstr T_M_S_I_D_;
     KEL.typ.nstr Case_Number_;
@@ -40860,7 +39900,7 @@ EXPORT L_Compile := MODULE
     KEL.typ.epoch Vault_Date_Last_Seen_ := 0;
     KEL.typ.int __RecordCount := 0;
   END;
-  SHARED Index_Build_Association_Res67_Internal_Layout_P_L___Drg_Bk_Disp_List1_Y_Layout := RECORD
+  SHARED Index_Build_Association_Res67_Internal_Layout_P_L___Drg_Bk_Disp_List1_Y_Pre_Layout := RECORD
     KEL.typ.nstr Disposition_;
     KEL.typ.nstr T_M_S_I_D_;
     KEL.typ.nstr Case_Number_;
@@ -40875,7 +39915,7 @@ EXPORT L_Compile := MODULE
     KEL.typ.epoch Vault_Date_Last_Seen_ := 0;
     KEL.typ.int __RecordCount := 0;
   END;
-  SHARED Index_Build_Association_Res67_Internal_Layout_P_L___Drg_Bk_Disp_List7_Y_Layout := RECORD
+  SHARED Index_Build_Association_Res67_Internal_Layout_P_L___Drg_Bk_Disp_List7_Y_Pre_Layout := RECORD
     KEL.typ.nstr Disposition_;
     KEL.typ.nstr T_M_S_I_D_;
     KEL.typ.nstr Case_Number_;
@@ -40890,7 +39930,7 @@ EXPORT L_Compile := MODULE
     KEL.typ.epoch Vault_Date_Last_Seen_ := 0;
     KEL.typ.int __RecordCount := 0;
   END;
-  SHARED Index_Build_Association_Res67_Internal_Layout_P_L___Drg_Bk_Dt_List10_Y_Layout := RECORD
+  SHARED Index_Build_Association_Res67_Internal_Layout_P_L___Drg_Bk_Dt_List10_Y_Pre_Layout := RECORD
     KEL.typ.nstr T_M_S_I_D_;
     KEL.typ.nstr Case_Number_;
     KEL.typ.nstr Court_Code_;
@@ -40904,7 +39944,7 @@ EXPORT L_Compile := MODULE
     KEL.typ.epoch Vault_Date_Last_Seen_ := 0;
     KEL.typ.int __RecordCount := 0;
   END;
-  SHARED Index_Build_Association_Res67_Internal_Layout_P_L___Drg_Bk_Dt_List1_Y_Layout := RECORD
+  SHARED Index_Build_Association_Res67_Internal_Layout_P_L___Drg_Bk_Dt_List1_Y_Pre_Layout := RECORD
     KEL.typ.nstr T_M_S_I_D_;
     KEL.typ.nstr Case_Number_;
     KEL.typ.nstr Court_Code_;
@@ -40918,7 +39958,7 @@ EXPORT L_Compile := MODULE
     KEL.typ.epoch Vault_Date_Last_Seen_ := 0;
     KEL.typ.int __RecordCount := 0;
   END;
-  SHARED Index_Build_Association_Res67_Internal_Layout_P_L___Drg_Bk_Dt_List7_Y_Layout := RECORD
+  SHARED Index_Build_Association_Res67_Internal_Layout_P_L___Drg_Bk_Dt_List7_Y_Pre_Layout := RECORD
     KEL.typ.nstr T_M_S_I_D_;
     KEL.typ.nstr Case_Number_;
     KEL.typ.nstr Court_Code_;
@@ -40932,7 +39972,7 @@ EXPORT L_Compile := MODULE
     KEL.typ.epoch Vault_Date_Last_Seen_ := 0;
     KEL.typ.int __RecordCount := 0;
   END;
-  SHARED Index_Build_Association_Res67_Internal_Layout_P_L___Drg_Bk_Type_List10_Y_Layout := RECORD
+  SHARED Index_Build_Association_Res67_Internal_Layout_P_L___Drg_Bk_Type_List10_Y_Pre_Layout := RECORD
     KEL.typ.nstr Filing_Type_;
     KEL.typ.nkdate Bankruptcy_Date_;
     KEL.typ.nkdate Last_Status_Update_;
@@ -40944,7 +39984,7 @@ EXPORT L_Compile := MODULE
     KEL.typ.epoch Vault_Date_Last_Seen_ := 0;
     KEL.typ.int __RecordCount := 0;
   END;
-  SHARED Index_Build_Association_Res67_Internal_Layout_P_L___Drg_Bk_Type_List1_Y_Layout := RECORD
+  SHARED Index_Build_Association_Res67_Internal_Layout_P_L___Drg_Bk_Type_List1_Y_Pre_Layout := RECORD
     KEL.typ.nstr Filing_Type_;
     KEL.typ.nkdate Bankruptcy_Date_;
     KEL.typ.nkdate Last_Status_Update_;
@@ -40956,7 +39996,7 @@ EXPORT L_Compile := MODULE
     KEL.typ.epoch Vault_Date_Last_Seen_ := 0;
     KEL.typ.int __RecordCount := 0;
   END;
-  SHARED Index_Build_Association_Res67_Internal_Layout_P_L___Drg_Bk_Type_List7_Y_Layout := RECORD
+  SHARED Index_Build_Association_Res67_Internal_Layout_P_L___Drg_Bk_Type_List7_Y_Pre_Layout := RECORD
     KEL.typ.nstr Filing_Type_;
     KEL.typ.nkdate Bankruptcy_Date_;
     KEL.typ.nkdate Last_Status_Update_;
@@ -40968,29 +40008,9 @@ EXPORT L_Compile := MODULE
     KEL.typ.epoch Vault_Date_Last_Seen_ := 0;
     KEL.typ.int __RecordCount := 0;
   END;
-  SHARED Index_Build_Association_Res67_Internal_Layout_P_L___Prof_Lic_Exp_Dt_List_Ev_Layout := RECORD
-    KEL.typ.nuid Prof_Lic_U_I_D_;
-    KEL.typ.nstr Max_Expire_Date_;
-    KEL.typ.epoch Archive___Date_ := 0;
-    KEL.typ.epoch Date_First_Seen_ := 0;
-    KEL.typ.epoch Date_Last_Seen_ := 0;
-    KEL.typ.epoch Hybrid_Archive_Date_ := 0;
-    KEL.typ.epoch Vault_Date_Last_Seen_ := 0;
-    KEL.typ.int __RecordCount := 0;
-  END;
-  SHARED Index_Build_Association_Res67_Internal_Layout_P_L___Prof_Lic_Indx_By_Lic_List_Ev_Layout := RECORD
+  SHARED Index_Build_Association_Res67_Internal_Layout_P_L___Prof_Lic_Indx_By_Lic_List_Ev_Pre_Layout := RECORD
     KEL.typ.nuid Prof_Lic_U_I_D_;
     KEL.typ.nstr License_Category_;
-    KEL.typ.epoch Archive___Date_ := 0;
-    KEL.typ.epoch Date_First_Seen_ := 0;
-    KEL.typ.epoch Date_Last_Seen_ := 0;
-    KEL.typ.epoch Hybrid_Archive_Date_ := 0;
-    KEL.typ.epoch Vault_Date_Last_Seen_ := 0;
-    KEL.typ.int __RecordCount := 0;
-  END;
-  SHARED Index_Build_Association_Res67_Internal_Layout_P_L___Prof_Lic_Issue_Dt_List_Ev_Layout := RECORD
-    KEL.typ.nuid Prof_Lic_U_I_D_;
-    KEL.typ.nstr Max_Issue_Date_;
     KEL.typ.epoch Archive___Date_ := 0;
     KEL.typ.epoch Date_First_Seen_ := 0;
     KEL.typ.epoch Date_Last_Seen_ := 0;
@@ -42543,7 +41563,8 @@ EXPORT L_Compile := MODULE
     KEL.typ.nint P_L___Ast_Prop_Sale_Old_Msnc_Ev_;
     KEL.typ.int P_L___Ast_Prop_Sale_Tot_Ev_ := 0;
     KEL.typ.int P_L___Ast_Veh_Air_Cnt_Ev_ := 0;
-    KEL.typ.ndataset(Index_Build_Association_Res67_Internal_Layout_P_L___Ast_Veh_Air_Emrg_Dt_List_Ev_Layout) P_L___Ast_Veh_Air_Emrg_Dt_List_Ev_;
+    KEL.typ.nstr P_L___Ast_Veh_Air_Emrg_Dt_List_Ev_;
+    KEL.typ.ndataset(Index_Build_Association_Res67_Internal_Layout_P_L___Ast_Veh_Air_Emrg_Dt_List_Ev_Pre_Layout) P_L___Ast_Veh_Air_Emrg_Dt_List_Ev_Pre_;
     KEL.typ.nstr P_L___Ast_Veh_Air_Emrg_New_Dt_Ev_;
     KEL.typ.nint P_L___Ast_Veh_Air_Emrg_New_Msnc_Ev_;
     KEL.typ.nstr P_L___Ast_Veh_Air_Emrg_Old_Dt_Ev_;
@@ -42558,7 +41579,8 @@ EXPORT L_Compile := MODULE
     KEL.typ.nint P_L___Ast_Veh_Auto_Emrg_Old_Msnc_Ev_;
     KEL.typ.ndataset(Index_Build_Association_Res67_Internal_Layout_P_L___Ast_Veh_Auto_Last_Dt_List_Ev_Layout) P_L___Ast_Veh_Auto_Last_Dt_List_Ev_;
     KEL.typ.int P_L___Ast_Veh_Wtr_Cnt_Ev_ := 0;
-    KEL.typ.ndataset(Index_Build_Association_Res67_Internal_Layout_P_L___Ast_Veh_Wtr_Emrg_Dt_List_Ev_Layout) P_L___Ast_Veh_Wtr_Emrg_Dt_List_Ev_;
+    KEL.typ.nstr P_L___Ast_Veh_Wtr_Emrg_Dt_List_Ev_;
+    KEL.typ.ndataset(Index_Build_Association_Res67_Internal_Layout_P_L___Ast_Veh_Wtr_Emrg_Dt_List_Ev_Pre_Layout) P_L___Ast_Veh_Wtr_Emrg_Dt_List_Ev_Pre_;
     KEL.typ.nstr P_L___Ast_Veh_Wtr_Emrg_New_Dt_Ev_;
     KEL.typ.nint P_L___Ast_Veh_Wtr_Emrg_New_Msnc_Ev_;
     KEL.typ.nstr P_L___Ast_Veh_Wtr_Emrg_Old_Dt_Ev_;
@@ -42607,9 +41629,12 @@ EXPORT L_Compile := MODULE
     KEL.typ.int P_L___Drg_Bk_Ch7_Cnt10_Y_ := 0;
     KEL.typ.int P_L___Drg_Bk_Ch7_Cnt1_Y_ := 0;
     KEL.typ.int P_L___Drg_Bk_Ch7_Cnt7_Y_ := 0;
-    KEL.typ.ndataset(Index_Build_Association_Res67_Internal_Layout_P_L___Drg_Bk_Ch_List10_Y_Layout) P_L___Drg_Bk_Ch_List10_Y_;
-    KEL.typ.ndataset(Index_Build_Association_Res67_Internal_Layout_P_L___Drg_Bk_Ch_List1_Y_Layout) P_L___Drg_Bk_Ch_List1_Y_;
-    KEL.typ.ndataset(Index_Build_Association_Res67_Internal_Layout_P_L___Drg_Bk_Ch_List7_Y_Layout) P_L___Drg_Bk_Ch_List7_Y_;
+    KEL.typ.nstr P_L___Drg_Bk_Ch_List10_Y_;
+    KEL.typ.ndataset(Index_Build_Association_Res67_Internal_Layout_P_L___Drg_Bk_Ch_List10_Y_Pre_Layout) P_L___Drg_Bk_Ch_List10_Y_Pre_;
+    KEL.typ.nstr P_L___Drg_Bk_Ch_List1_Y_;
+    KEL.typ.ndataset(Index_Build_Association_Res67_Internal_Layout_P_L___Drg_Bk_Ch_List1_Y_Pre_Layout) P_L___Drg_Bk_Ch_List1_Y_Pre_;
+    KEL.typ.nstr P_L___Drg_Bk_Ch_List7_Y_;
+    KEL.typ.ndataset(Index_Build_Association_Res67_Internal_Layout_P_L___Drg_Bk_Ch_List7_Y_Pre_Layout) P_L___Drg_Bk_Ch_List7_Y_Pre_;
     KEL.typ.int P_L___Drg_Bk_Cnt10_Y_ := 0;
     KEL.typ.int P_L___Drg_Bk_Cnt1_Y_ := 0;
     KEL.typ.int P_L___Drg_Bk_Cnt1_Y_F1_Y_ := 0;
@@ -42617,18 +41642,24 @@ EXPORT L_Compile := MODULE
     KEL.typ.int P_L___Drg_Bk_Disp_Cnt10_Y_ := 0;
     KEL.typ.int P_L___Drg_Bk_Disp_Cnt1_Y_ := 0;
     KEL.typ.int P_L___Drg_Bk_Disp_Cnt7_Y_ := 0;
-    KEL.typ.ndataset(Index_Build_Association_Res67_Internal_Layout_P_L___Drg_Bk_Disp_List10_Y_Layout) P_L___Drg_Bk_Disp_List10_Y_;
-    KEL.typ.ndataset(Index_Build_Association_Res67_Internal_Layout_P_L___Drg_Bk_Disp_List1_Y_Layout) P_L___Drg_Bk_Disp_List1_Y_;
-    KEL.typ.ndataset(Index_Build_Association_Res67_Internal_Layout_P_L___Drg_Bk_Disp_List7_Y_Layout) P_L___Drg_Bk_Disp_List7_Y_;
+    KEL.typ.nstr P_L___Drg_Bk_Disp_List10_Y_;
+    KEL.typ.ndataset(Index_Build_Association_Res67_Internal_Layout_P_L___Drg_Bk_Disp_List10_Y_Pre_Layout) P_L___Drg_Bk_Disp_List10_Y_Pre_;
+    KEL.typ.nstr P_L___Drg_Bk_Disp_List1_Y_;
+    KEL.typ.ndataset(Index_Build_Association_Res67_Internal_Layout_P_L___Drg_Bk_Disp_List1_Y_Pre_Layout) P_L___Drg_Bk_Disp_List1_Y_Pre_;
+    KEL.typ.nstr P_L___Drg_Bk_Disp_List7_Y_;
+    KEL.typ.ndataset(Index_Build_Association_Res67_Internal_Layout_P_L___Drg_Bk_Disp_List7_Y_Pre_Layout) P_L___Drg_Bk_Disp_List7_Y_Pre_;
     KEL.typ.int P_L___Drg_Bk_Dsch_Cnt10_Y_ := 0;
     KEL.typ.int P_L___Drg_Bk_Dsch_Cnt1_Y_ := 0;
     KEL.typ.int P_L___Drg_Bk_Dsch_Cnt7_Y_ := 0;
     KEL.typ.int P_L___Drg_Bk_Dsms_Cnt10_Y_ := 0;
     KEL.typ.int P_L___Drg_Bk_Dsms_Cnt1_Y_ := 0;
     KEL.typ.int P_L___Drg_Bk_Dsms_Cnt7_Y_ := 0;
-    KEL.typ.ndataset(Index_Build_Association_Res67_Internal_Layout_P_L___Drg_Bk_Dt_List10_Y_Layout) P_L___Drg_Bk_Dt_List10_Y_;
-    KEL.typ.ndataset(Index_Build_Association_Res67_Internal_Layout_P_L___Drg_Bk_Dt_List1_Y_Layout) P_L___Drg_Bk_Dt_List1_Y_;
-    KEL.typ.ndataset(Index_Build_Association_Res67_Internal_Layout_P_L___Drg_Bk_Dt_List7_Y_Layout) P_L___Drg_Bk_Dt_List7_Y_;
+    KEL.typ.nstr P_L___Drg_Bk_Dt_List10_Y_;
+    KEL.typ.ndataset(Index_Build_Association_Res67_Internal_Layout_P_L___Drg_Bk_Dt_List10_Y_Pre_Layout) P_L___Drg_Bk_Dt_List10_Y_Pre_;
+    KEL.typ.nstr P_L___Drg_Bk_Dt_List1_Y_;
+    KEL.typ.ndataset(Index_Build_Association_Res67_Internal_Layout_P_L___Drg_Bk_Dt_List1_Y_Pre_Layout) P_L___Drg_Bk_Dt_List1_Y_Pre_;
+    KEL.typ.nstr P_L___Drg_Bk_Dt_List7_Y_;
+    KEL.typ.ndataset(Index_Build_Association_Res67_Internal_Layout_P_L___Drg_Bk_Dt_List7_Y_Pre_Layout) P_L___Drg_Bk_Dt_List7_Y_Pre_;
     KEL.typ.nstr P_L___Drg_Bk_New_Ch_Type10_Y_;
     KEL.typ.nstr P_L___Drg_Bk_New_Ch_Type1_Y_;
     KEL.typ.nstr P_L___Drg_Bk_New_Ch_Type7_Y_;
@@ -42654,9 +41685,12 @@ EXPORT L_Compile := MODULE
     KEL.typ.nint P_L___Drg_Bk_Old_Msnc1_Y_;
     KEL.typ.nint P_L___Drg_Bk_Old_Msnc7_Y_;
     KEL.typ.str P_L___Drg_Bk_Severity_Indx10_Y_ := '';
-    KEL.typ.ndataset(Index_Build_Association_Res67_Internal_Layout_P_L___Drg_Bk_Type_List10_Y_Layout) P_L___Drg_Bk_Type_List10_Y_;
-    KEL.typ.ndataset(Index_Build_Association_Res67_Internal_Layout_P_L___Drg_Bk_Type_List1_Y_Layout) P_L___Drg_Bk_Type_List1_Y_;
-    KEL.typ.ndataset(Index_Build_Association_Res67_Internal_Layout_P_L___Drg_Bk_Type_List7_Y_Layout) P_L___Drg_Bk_Type_List7_Y_;
+    KEL.typ.nstr P_L___Drg_Bk_Type_List10_Y_;
+    KEL.typ.ndataset(Index_Build_Association_Res67_Internal_Layout_P_L___Drg_Bk_Type_List10_Y_Pre_Layout) P_L___Drg_Bk_Type_List10_Y_Pre_;
+    KEL.typ.nstr P_L___Drg_Bk_Type_List1_Y_;
+    KEL.typ.ndataset(Index_Build_Association_Res67_Internal_Layout_P_L___Drg_Bk_Type_List1_Y_Pre_Layout) P_L___Drg_Bk_Type_List1_Y_Pre_;
+    KEL.typ.nstr P_L___Drg_Bk_Type_List7_Y_;
+    KEL.typ.ndataset(Index_Build_Association_Res67_Internal_Layout_P_L___Drg_Bk_Type_List7_Y_Pre_Layout) P_L___Drg_Bk_Type_List7_Y_Pre_;
     KEL.typ.nstr P_L___Drg_Bk_Updt_New_Dt10_Y_;
     KEL.typ.nstr P_L___Drg_Bk_Updt_New_Dt1_Y_;
     KEL.typ.nstr P_L___Drg_Bk_Updt_New_Dt7_Y_;
@@ -42789,10 +41823,11 @@ EXPORT L_Compile := MODULE
     KEL.typ.nstr P_L___Prof_Lic_Actv_New_Src_Type_;
     KEL.typ.nstr P_L___Prof_Lic_Actv_New_Title_Type_;
     KEL.typ.nstr P_L___Prof_Lic_Actv_New_Type_;
-    KEL.typ.ndataset(Index_Build_Association_Res67_Internal_Layout_P_L___Prof_Lic_Exp_Dt_List_Ev_Layout) P_L___Prof_Lic_Exp_Dt_List_Ev_;
+    KEL.typ.nstr P_L___Prof_Lic_Exp_Dt_List_Ev_;
     KEL.typ.str P_L___Prof_Lic_Flag_Ev_ := '';
-    KEL.typ.ndataset(Index_Build_Association_Res67_Internal_Layout_P_L___Prof_Lic_Indx_By_Lic_List_Ev_Layout) P_L___Prof_Lic_Indx_By_Lic_List_Ev_;
-    KEL.typ.ndataset(Index_Build_Association_Res67_Internal_Layout_P_L___Prof_Lic_Issue_Dt_List_Ev_Layout) P_L___Prof_Lic_Issue_Dt_List_Ev_;
+    KEL.typ.nstr P_L___Prof_Lic_Indx_By_Lic_List_Ev_;
+    KEL.typ.ndataset(Index_Build_Association_Res67_Internal_Layout_P_L___Prof_Lic_Indx_By_Lic_List_Ev_Pre_Layout) P_L___Prof_Lic_Indx_By_Lic_List_Ev_Pre_;
+    KEL.typ.nstr P_L___Prof_Lic_Issue_Dt_List_Ev_;
     KEL.typ.nint P_L___S_T_L_Cnt1_Y_;
     KEL.typ.nint P_L___S_T_L_Cnt2_Y_;
     KEL.typ.nint P_L___S_T_L_Cnt5_Y_;
@@ -42967,6 +42002,7 @@ EXPORT L_Compile := MODULE
     KEL.typ.str P___Lex_I_D_Rstd_Only_Flag_F_C_R_A_ := '';
     KEL.typ.str P___Lex_I_D_Rstd_Only_Flag_Non_F_C_R_A_ := '';
     KEL.typ.str P___Lex_I_D_Seen_Flag_ := '';
+    KEL.typ.str P___Lex_I_D_Seen_Flag_F_C_R_A_ := '';
     KEL.typ.str P___Lex_I_D_Seen_Flag_N_O_W_ := '';
     KEL.typ.nint Person_Address_Hierarchy_Valid_Cnt_;
     KEL.typ.nint Person_Curr_Addr_Loc_I_D_;
@@ -43289,6 +42325,7 @@ EXPORT L_Compile := MODULE
     KEL.typ.nstr Source_;
     KEL.typ.nbool Header_Hit_Flag_;
     KEL.typ.nbool F_D_N_Indicator_;
+    KEL.typ.nint Age_In_Days_;
     KEL.typ.nstr Translated_Source_Code_;
     KEL.typ.epoch Archive___Date_ := 0;
     KEL.typ.epoch Date_First_Seen_ := 0;
@@ -44115,7 +43152,7 @@ EXPORT L_Compile := MODULE
     KEL.typ.nbool Res_Bus_Flag_A_C_;
     KEL.typ.nbool Res_Bus_Flag_B_D_;
   END;
-  SHARED Index_Build_Association_Res71_Internal_Layout_P_L___Ast_Veh_Air_Emrg_Dt_List_Ev_Layout := RECORD
+  SHARED Index_Build_Association_Res71_Internal_Layout_P_L___Ast_Veh_Air_Emrg_Dt_List_Ev_Pre_Layout := RECORD
     KEL.typ.ntyp(E_Aircraft().Typ) Plane_;
     KEL.typ.nstr Aircraft_First_Seen_Date_;
     KEL.typ.epoch Archive___Date_ := 0;
@@ -44145,7 +43182,7 @@ EXPORT L_Compile := MODULE
     KEL.typ.epoch Vault_Date_Last_Seen_ := 0;
     KEL.typ.int __RecordCount := 0;
   END;
-  SHARED Index_Build_Association_Res71_Internal_Layout_P_L___Ast_Veh_Wtr_Emrg_Dt_List_Ev_Layout := RECORD
+  SHARED Index_Build_Association_Res71_Internal_Layout_P_L___Ast_Veh_Wtr_Emrg_Dt_List_Ev_Pre_Layout := RECORD
     KEL.typ.ntyp(E_Watercraft().Typ) W_Craft_;
     KEL.typ.nstr Watercraft_First_Seen_Date_;
     KEL.typ.epoch Archive___Date_ := 0;
@@ -44155,7 +43192,7 @@ EXPORT L_Compile := MODULE
     KEL.typ.epoch Vault_Date_Last_Seen_ := 0;
     KEL.typ.int __RecordCount := 0;
   END;
-  SHARED Index_Build_Association_Res71_Internal_Layout_P_L___Drg_Bk_Ch_List10_Y_Layout := RECORD
+  SHARED Index_Build_Association_Res71_Internal_Layout_P_L___Drg_Bk_Ch_List10_Y_Pre_Layout := RECORD
     KEL.typ.nstr Original_Chapter_;
     KEL.typ.nstr T_M_S_I_D_;
     KEL.typ.nstr Case_Number_;
@@ -44170,7 +43207,7 @@ EXPORT L_Compile := MODULE
     KEL.typ.epoch Vault_Date_Last_Seen_ := 0;
     KEL.typ.int __RecordCount := 0;
   END;
-  SHARED Index_Build_Association_Res71_Internal_Layout_P_L___Drg_Bk_Ch_List1_Y_Layout := RECORD
+  SHARED Index_Build_Association_Res71_Internal_Layout_P_L___Drg_Bk_Ch_List1_Y_Pre_Layout := RECORD
     KEL.typ.nstr Original_Chapter_;
     KEL.typ.nstr T_M_S_I_D_;
     KEL.typ.nstr Case_Number_;
@@ -44185,7 +43222,7 @@ EXPORT L_Compile := MODULE
     KEL.typ.epoch Vault_Date_Last_Seen_ := 0;
     KEL.typ.int __RecordCount := 0;
   END;
-  SHARED Index_Build_Association_Res71_Internal_Layout_P_L___Drg_Bk_Ch_List7_Y_Layout := RECORD
+  SHARED Index_Build_Association_Res71_Internal_Layout_P_L___Drg_Bk_Ch_List7_Y_Pre_Layout := RECORD
     KEL.typ.nstr Original_Chapter_;
     KEL.typ.nstr T_M_S_I_D_;
     KEL.typ.nstr Case_Number_;
@@ -44200,7 +43237,7 @@ EXPORT L_Compile := MODULE
     KEL.typ.epoch Vault_Date_Last_Seen_ := 0;
     KEL.typ.int __RecordCount := 0;
   END;
-  SHARED Index_Build_Association_Res71_Internal_Layout_P_L___Drg_Bk_Disp_List10_Y_Layout := RECORD
+  SHARED Index_Build_Association_Res71_Internal_Layout_P_L___Drg_Bk_Disp_List10_Y_Pre_Layout := RECORD
     KEL.typ.nstr Disposition_;
     KEL.typ.nstr T_M_S_I_D_;
     KEL.typ.nstr Case_Number_;
@@ -44215,7 +43252,7 @@ EXPORT L_Compile := MODULE
     KEL.typ.epoch Vault_Date_Last_Seen_ := 0;
     KEL.typ.int __RecordCount := 0;
   END;
-  SHARED Index_Build_Association_Res71_Internal_Layout_P_L___Drg_Bk_Disp_List1_Y_Layout := RECORD
+  SHARED Index_Build_Association_Res71_Internal_Layout_P_L___Drg_Bk_Disp_List1_Y_Pre_Layout := RECORD
     KEL.typ.nstr Disposition_;
     KEL.typ.nstr T_M_S_I_D_;
     KEL.typ.nstr Case_Number_;
@@ -44230,7 +43267,7 @@ EXPORT L_Compile := MODULE
     KEL.typ.epoch Vault_Date_Last_Seen_ := 0;
     KEL.typ.int __RecordCount := 0;
   END;
-  SHARED Index_Build_Association_Res71_Internal_Layout_P_L___Drg_Bk_Disp_List7_Y_Layout := RECORD
+  SHARED Index_Build_Association_Res71_Internal_Layout_P_L___Drg_Bk_Disp_List7_Y_Pre_Layout := RECORD
     KEL.typ.nstr Disposition_;
     KEL.typ.nstr T_M_S_I_D_;
     KEL.typ.nstr Case_Number_;
@@ -44245,7 +43282,7 @@ EXPORT L_Compile := MODULE
     KEL.typ.epoch Vault_Date_Last_Seen_ := 0;
     KEL.typ.int __RecordCount := 0;
   END;
-  SHARED Index_Build_Association_Res71_Internal_Layout_P_L___Drg_Bk_Dt_List10_Y_Layout := RECORD
+  SHARED Index_Build_Association_Res71_Internal_Layout_P_L___Drg_Bk_Dt_List10_Y_Pre_Layout := RECORD
     KEL.typ.nstr T_M_S_I_D_;
     KEL.typ.nstr Case_Number_;
     KEL.typ.nstr Court_Code_;
@@ -44259,7 +43296,7 @@ EXPORT L_Compile := MODULE
     KEL.typ.epoch Vault_Date_Last_Seen_ := 0;
     KEL.typ.int __RecordCount := 0;
   END;
-  SHARED Index_Build_Association_Res71_Internal_Layout_P_L___Drg_Bk_Dt_List1_Y_Layout := RECORD
+  SHARED Index_Build_Association_Res71_Internal_Layout_P_L___Drg_Bk_Dt_List1_Y_Pre_Layout := RECORD
     KEL.typ.nstr T_M_S_I_D_;
     KEL.typ.nstr Case_Number_;
     KEL.typ.nstr Court_Code_;
@@ -44273,7 +43310,7 @@ EXPORT L_Compile := MODULE
     KEL.typ.epoch Vault_Date_Last_Seen_ := 0;
     KEL.typ.int __RecordCount := 0;
   END;
-  SHARED Index_Build_Association_Res71_Internal_Layout_P_L___Drg_Bk_Dt_List7_Y_Layout := RECORD
+  SHARED Index_Build_Association_Res71_Internal_Layout_P_L___Drg_Bk_Dt_List7_Y_Pre_Layout := RECORD
     KEL.typ.nstr T_M_S_I_D_;
     KEL.typ.nstr Case_Number_;
     KEL.typ.nstr Court_Code_;
@@ -44287,7 +43324,7 @@ EXPORT L_Compile := MODULE
     KEL.typ.epoch Vault_Date_Last_Seen_ := 0;
     KEL.typ.int __RecordCount := 0;
   END;
-  SHARED Index_Build_Association_Res71_Internal_Layout_P_L___Drg_Bk_Type_List10_Y_Layout := RECORD
+  SHARED Index_Build_Association_Res71_Internal_Layout_P_L___Drg_Bk_Type_List10_Y_Pre_Layout := RECORD
     KEL.typ.nstr Filing_Type_;
     KEL.typ.nkdate Bankruptcy_Date_;
     KEL.typ.nkdate Last_Status_Update_;
@@ -44299,7 +43336,7 @@ EXPORT L_Compile := MODULE
     KEL.typ.epoch Vault_Date_Last_Seen_ := 0;
     KEL.typ.int __RecordCount := 0;
   END;
-  SHARED Index_Build_Association_Res71_Internal_Layout_P_L___Drg_Bk_Type_List1_Y_Layout := RECORD
+  SHARED Index_Build_Association_Res71_Internal_Layout_P_L___Drg_Bk_Type_List1_Y_Pre_Layout := RECORD
     KEL.typ.nstr Filing_Type_;
     KEL.typ.nkdate Bankruptcy_Date_;
     KEL.typ.nkdate Last_Status_Update_;
@@ -44311,7 +43348,7 @@ EXPORT L_Compile := MODULE
     KEL.typ.epoch Vault_Date_Last_Seen_ := 0;
     KEL.typ.int __RecordCount := 0;
   END;
-  SHARED Index_Build_Association_Res71_Internal_Layout_P_L___Drg_Bk_Type_List7_Y_Layout := RECORD
+  SHARED Index_Build_Association_Res71_Internal_Layout_P_L___Drg_Bk_Type_List7_Y_Pre_Layout := RECORD
     KEL.typ.nstr Filing_Type_;
     KEL.typ.nkdate Bankruptcy_Date_;
     KEL.typ.nkdate Last_Status_Update_;
@@ -44323,29 +43360,9 @@ EXPORT L_Compile := MODULE
     KEL.typ.epoch Vault_Date_Last_Seen_ := 0;
     KEL.typ.int __RecordCount := 0;
   END;
-  SHARED Index_Build_Association_Res71_Internal_Layout_P_L___Prof_Lic_Exp_Dt_List_Ev_Layout := RECORD
-    KEL.typ.nuid Prof_Lic_U_I_D_;
-    KEL.typ.nstr Max_Expire_Date_;
-    KEL.typ.epoch Archive___Date_ := 0;
-    KEL.typ.epoch Date_First_Seen_ := 0;
-    KEL.typ.epoch Date_Last_Seen_ := 0;
-    KEL.typ.epoch Hybrid_Archive_Date_ := 0;
-    KEL.typ.epoch Vault_Date_Last_Seen_ := 0;
-    KEL.typ.int __RecordCount := 0;
-  END;
-  SHARED Index_Build_Association_Res71_Internal_Layout_P_L___Prof_Lic_Indx_By_Lic_List_Ev_Layout := RECORD
+  SHARED Index_Build_Association_Res71_Internal_Layout_P_L___Prof_Lic_Indx_By_Lic_List_Ev_Pre_Layout := RECORD
     KEL.typ.nuid Prof_Lic_U_I_D_;
     KEL.typ.nstr License_Category_;
-    KEL.typ.epoch Archive___Date_ := 0;
-    KEL.typ.epoch Date_First_Seen_ := 0;
-    KEL.typ.epoch Date_Last_Seen_ := 0;
-    KEL.typ.epoch Hybrid_Archive_Date_ := 0;
-    KEL.typ.epoch Vault_Date_Last_Seen_ := 0;
-    KEL.typ.int __RecordCount := 0;
-  END;
-  SHARED Index_Build_Association_Res71_Internal_Layout_P_L___Prof_Lic_Issue_Dt_List_Ev_Layout := RECORD
-    KEL.typ.nuid Prof_Lic_U_I_D_;
-    KEL.typ.nstr Max_Issue_Date_;
     KEL.typ.epoch Archive___Date_ := 0;
     KEL.typ.epoch Date_First_Seen_ := 0;
     KEL.typ.epoch Date_Last_Seen_ := 0;
@@ -45898,7 +44915,8 @@ EXPORT L_Compile := MODULE
     KEL.typ.nint P_L___Ast_Prop_Sale_Old_Msnc_Ev_;
     KEL.typ.int P_L___Ast_Prop_Sale_Tot_Ev_ := 0;
     KEL.typ.int P_L___Ast_Veh_Air_Cnt_Ev_ := 0;
-    KEL.typ.ndataset(Index_Build_Association_Res71_Internal_Layout_P_L___Ast_Veh_Air_Emrg_Dt_List_Ev_Layout) P_L___Ast_Veh_Air_Emrg_Dt_List_Ev_;
+    KEL.typ.nstr P_L___Ast_Veh_Air_Emrg_Dt_List_Ev_;
+    KEL.typ.ndataset(Index_Build_Association_Res71_Internal_Layout_P_L___Ast_Veh_Air_Emrg_Dt_List_Ev_Pre_Layout) P_L___Ast_Veh_Air_Emrg_Dt_List_Ev_Pre_;
     KEL.typ.nstr P_L___Ast_Veh_Air_Emrg_New_Dt_Ev_;
     KEL.typ.nint P_L___Ast_Veh_Air_Emrg_New_Msnc_Ev_;
     KEL.typ.nstr P_L___Ast_Veh_Air_Emrg_Old_Dt_Ev_;
@@ -45913,7 +44931,8 @@ EXPORT L_Compile := MODULE
     KEL.typ.nint P_L___Ast_Veh_Auto_Emrg_Old_Msnc_Ev_;
     KEL.typ.ndataset(Index_Build_Association_Res71_Internal_Layout_P_L___Ast_Veh_Auto_Last_Dt_List_Ev_Layout) P_L___Ast_Veh_Auto_Last_Dt_List_Ev_;
     KEL.typ.int P_L___Ast_Veh_Wtr_Cnt_Ev_ := 0;
-    KEL.typ.ndataset(Index_Build_Association_Res71_Internal_Layout_P_L___Ast_Veh_Wtr_Emrg_Dt_List_Ev_Layout) P_L___Ast_Veh_Wtr_Emrg_Dt_List_Ev_;
+    KEL.typ.nstr P_L___Ast_Veh_Wtr_Emrg_Dt_List_Ev_;
+    KEL.typ.ndataset(Index_Build_Association_Res71_Internal_Layout_P_L___Ast_Veh_Wtr_Emrg_Dt_List_Ev_Pre_Layout) P_L___Ast_Veh_Wtr_Emrg_Dt_List_Ev_Pre_;
     KEL.typ.nstr P_L___Ast_Veh_Wtr_Emrg_New_Dt_Ev_;
     KEL.typ.nint P_L___Ast_Veh_Wtr_Emrg_New_Msnc_Ev_;
     KEL.typ.nstr P_L___Ast_Veh_Wtr_Emrg_Old_Dt_Ev_;
@@ -45962,9 +44981,12 @@ EXPORT L_Compile := MODULE
     KEL.typ.int P_L___Drg_Bk_Ch7_Cnt10_Y_ := 0;
     KEL.typ.int P_L___Drg_Bk_Ch7_Cnt1_Y_ := 0;
     KEL.typ.int P_L___Drg_Bk_Ch7_Cnt7_Y_ := 0;
-    KEL.typ.ndataset(Index_Build_Association_Res71_Internal_Layout_P_L___Drg_Bk_Ch_List10_Y_Layout) P_L___Drg_Bk_Ch_List10_Y_;
-    KEL.typ.ndataset(Index_Build_Association_Res71_Internal_Layout_P_L___Drg_Bk_Ch_List1_Y_Layout) P_L___Drg_Bk_Ch_List1_Y_;
-    KEL.typ.ndataset(Index_Build_Association_Res71_Internal_Layout_P_L___Drg_Bk_Ch_List7_Y_Layout) P_L___Drg_Bk_Ch_List7_Y_;
+    KEL.typ.nstr P_L___Drg_Bk_Ch_List10_Y_;
+    KEL.typ.ndataset(Index_Build_Association_Res71_Internal_Layout_P_L___Drg_Bk_Ch_List10_Y_Pre_Layout) P_L___Drg_Bk_Ch_List10_Y_Pre_;
+    KEL.typ.nstr P_L___Drg_Bk_Ch_List1_Y_;
+    KEL.typ.ndataset(Index_Build_Association_Res71_Internal_Layout_P_L___Drg_Bk_Ch_List1_Y_Pre_Layout) P_L___Drg_Bk_Ch_List1_Y_Pre_;
+    KEL.typ.nstr P_L___Drg_Bk_Ch_List7_Y_;
+    KEL.typ.ndataset(Index_Build_Association_Res71_Internal_Layout_P_L___Drg_Bk_Ch_List7_Y_Pre_Layout) P_L___Drg_Bk_Ch_List7_Y_Pre_;
     KEL.typ.int P_L___Drg_Bk_Cnt10_Y_ := 0;
     KEL.typ.int P_L___Drg_Bk_Cnt1_Y_ := 0;
     KEL.typ.int P_L___Drg_Bk_Cnt1_Y_F1_Y_ := 0;
@@ -45972,18 +44994,24 @@ EXPORT L_Compile := MODULE
     KEL.typ.int P_L___Drg_Bk_Disp_Cnt10_Y_ := 0;
     KEL.typ.int P_L___Drg_Bk_Disp_Cnt1_Y_ := 0;
     KEL.typ.int P_L___Drg_Bk_Disp_Cnt7_Y_ := 0;
-    KEL.typ.ndataset(Index_Build_Association_Res71_Internal_Layout_P_L___Drg_Bk_Disp_List10_Y_Layout) P_L___Drg_Bk_Disp_List10_Y_;
-    KEL.typ.ndataset(Index_Build_Association_Res71_Internal_Layout_P_L___Drg_Bk_Disp_List1_Y_Layout) P_L___Drg_Bk_Disp_List1_Y_;
-    KEL.typ.ndataset(Index_Build_Association_Res71_Internal_Layout_P_L___Drg_Bk_Disp_List7_Y_Layout) P_L___Drg_Bk_Disp_List7_Y_;
+    KEL.typ.nstr P_L___Drg_Bk_Disp_List10_Y_;
+    KEL.typ.ndataset(Index_Build_Association_Res71_Internal_Layout_P_L___Drg_Bk_Disp_List10_Y_Pre_Layout) P_L___Drg_Bk_Disp_List10_Y_Pre_;
+    KEL.typ.nstr P_L___Drg_Bk_Disp_List1_Y_;
+    KEL.typ.ndataset(Index_Build_Association_Res71_Internal_Layout_P_L___Drg_Bk_Disp_List1_Y_Pre_Layout) P_L___Drg_Bk_Disp_List1_Y_Pre_;
+    KEL.typ.nstr P_L___Drg_Bk_Disp_List7_Y_;
+    KEL.typ.ndataset(Index_Build_Association_Res71_Internal_Layout_P_L___Drg_Bk_Disp_List7_Y_Pre_Layout) P_L___Drg_Bk_Disp_List7_Y_Pre_;
     KEL.typ.int P_L___Drg_Bk_Dsch_Cnt10_Y_ := 0;
     KEL.typ.int P_L___Drg_Bk_Dsch_Cnt1_Y_ := 0;
     KEL.typ.int P_L___Drg_Bk_Dsch_Cnt7_Y_ := 0;
     KEL.typ.int P_L___Drg_Bk_Dsms_Cnt10_Y_ := 0;
     KEL.typ.int P_L___Drg_Bk_Dsms_Cnt1_Y_ := 0;
     KEL.typ.int P_L___Drg_Bk_Dsms_Cnt7_Y_ := 0;
-    KEL.typ.ndataset(Index_Build_Association_Res71_Internal_Layout_P_L___Drg_Bk_Dt_List10_Y_Layout) P_L___Drg_Bk_Dt_List10_Y_;
-    KEL.typ.ndataset(Index_Build_Association_Res71_Internal_Layout_P_L___Drg_Bk_Dt_List1_Y_Layout) P_L___Drg_Bk_Dt_List1_Y_;
-    KEL.typ.ndataset(Index_Build_Association_Res71_Internal_Layout_P_L___Drg_Bk_Dt_List7_Y_Layout) P_L___Drg_Bk_Dt_List7_Y_;
+    KEL.typ.nstr P_L___Drg_Bk_Dt_List10_Y_;
+    KEL.typ.ndataset(Index_Build_Association_Res71_Internal_Layout_P_L___Drg_Bk_Dt_List10_Y_Pre_Layout) P_L___Drg_Bk_Dt_List10_Y_Pre_;
+    KEL.typ.nstr P_L___Drg_Bk_Dt_List1_Y_;
+    KEL.typ.ndataset(Index_Build_Association_Res71_Internal_Layout_P_L___Drg_Bk_Dt_List1_Y_Pre_Layout) P_L___Drg_Bk_Dt_List1_Y_Pre_;
+    KEL.typ.nstr P_L___Drg_Bk_Dt_List7_Y_;
+    KEL.typ.ndataset(Index_Build_Association_Res71_Internal_Layout_P_L___Drg_Bk_Dt_List7_Y_Pre_Layout) P_L___Drg_Bk_Dt_List7_Y_Pre_;
     KEL.typ.nstr P_L___Drg_Bk_New_Ch_Type10_Y_;
     KEL.typ.nstr P_L___Drg_Bk_New_Ch_Type1_Y_;
     KEL.typ.nstr P_L___Drg_Bk_New_Ch_Type7_Y_;
@@ -46009,9 +45037,12 @@ EXPORT L_Compile := MODULE
     KEL.typ.nint P_L___Drg_Bk_Old_Msnc1_Y_;
     KEL.typ.nint P_L___Drg_Bk_Old_Msnc7_Y_;
     KEL.typ.str P_L___Drg_Bk_Severity_Indx10_Y_ := '';
-    KEL.typ.ndataset(Index_Build_Association_Res71_Internal_Layout_P_L___Drg_Bk_Type_List10_Y_Layout) P_L___Drg_Bk_Type_List10_Y_;
-    KEL.typ.ndataset(Index_Build_Association_Res71_Internal_Layout_P_L___Drg_Bk_Type_List1_Y_Layout) P_L___Drg_Bk_Type_List1_Y_;
-    KEL.typ.ndataset(Index_Build_Association_Res71_Internal_Layout_P_L___Drg_Bk_Type_List7_Y_Layout) P_L___Drg_Bk_Type_List7_Y_;
+    KEL.typ.nstr P_L___Drg_Bk_Type_List10_Y_;
+    KEL.typ.ndataset(Index_Build_Association_Res71_Internal_Layout_P_L___Drg_Bk_Type_List10_Y_Pre_Layout) P_L___Drg_Bk_Type_List10_Y_Pre_;
+    KEL.typ.nstr P_L___Drg_Bk_Type_List1_Y_;
+    KEL.typ.ndataset(Index_Build_Association_Res71_Internal_Layout_P_L___Drg_Bk_Type_List1_Y_Pre_Layout) P_L___Drg_Bk_Type_List1_Y_Pre_;
+    KEL.typ.nstr P_L___Drg_Bk_Type_List7_Y_;
+    KEL.typ.ndataset(Index_Build_Association_Res71_Internal_Layout_P_L___Drg_Bk_Type_List7_Y_Pre_Layout) P_L___Drg_Bk_Type_List7_Y_Pre_;
     KEL.typ.nstr P_L___Drg_Bk_Updt_New_Dt10_Y_;
     KEL.typ.nstr P_L___Drg_Bk_Updt_New_Dt1_Y_;
     KEL.typ.nstr P_L___Drg_Bk_Updt_New_Dt7_Y_;
@@ -46144,10 +45175,11 @@ EXPORT L_Compile := MODULE
     KEL.typ.nstr P_L___Prof_Lic_Actv_New_Src_Type_;
     KEL.typ.nstr P_L___Prof_Lic_Actv_New_Title_Type_;
     KEL.typ.nstr P_L___Prof_Lic_Actv_New_Type_;
-    KEL.typ.ndataset(Index_Build_Association_Res71_Internal_Layout_P_L___Prof_Lic_Exp_Dt_List_Ev_Layout) P_L___Prof_Lic_Exp_Dt_List_Ev_;
+    KEL.typ.nstr P_L___Prof_Lic_Exp_Dt_List_Ev_;
     KEL.typ.str P_L___Prof_Lic_Flag_Ev_ := '';
-    KEL.typ.ndataset(Index_Build_Association_Res71_Internal_Layout_P_L___Prof_Lic_Indx_By_Lic_List_Ev_Layout) P_L___Prof_Lic_Indx_By_Lic_List_Ev_;
-    KEL.typ.ndataset(Index_Build_Association_Res71_Internal_Layout_P_L___Prof_Lic_Issue_Dt_List_Ev_Layout) P_L___Prof_Lic_Issue_Dt_List_Ev_;
+    KEL.typ.nstr P_L___Prof_Lic_Indx_By_Lic_List_Ev_;
+    KEL.typ.ndataset(Index_Build_Association_Res71_Internal_Layout_P_L___Prof_Lic_Indx_By_Lic_List_Ev_Pre_Layout) P_L___Prof_Lic_Indx_By_Lic_List_Ev_Pre_;
+    KEL.typ.nstr P_L___Prof_Lic_Issue_Dt_List_Ev_;
     KEL.typ.nint P_L___S_T_L_Cnt1_Y_;
     KEL.typ.nint P_L___S_T_L_Cnt2_Y_;
     KEL.typ.nint P_L___S_T_L_Cnt5_Y_;
@@ -46322,6 +45354,7 @@ EXPORT L_Compile := MODULE
     KEL.typ.str P___Lex_I_D_Rstd_Only_Flag_F_C_R_A_ := '';
     KEL.typ.str P___Lex_I_D_Rstd_Only_Flag_Non_F_C_R_A_ := '';
     KEL.typ.str P___Lex_I_D_Seen_Flag_ := '';
+    KEL.typ.str P___Lex_I_D_Seen_Flag_F_C_R_A_ := '';
     KEL.typ.str P___Lex_I_D_Seen_Flag_N_O_W_ := '';
     KEL.typ.nint Person_Address_Hierarchy_Valid_Cnt_;
     KEL.typ.nint Person_Curr_Addr_Loc_I_D_;
@@ -48469,6 +47502,7 @@ EXPORT L_Compile := MODULE
     KEL.typ.nstr Source_;
     KEL.typ.nbool Header_Hit_Flag_;
     KEL.typ.nbool F_D_N_Indicator_;
+    KEL.typ.nint Age_In_Days_;
     KEL.typ.nstr Translated_Source_Code_;
     KEL.typ.epoch Archive___Date_ := 0;
     KEL.typ.epoch Date_First_Seen_ := 0;
@@ -49295,7 +48329,7 @@ EXPORT L_Compile := MODULE
     KEL.typ.nbool Res_Bus_Flag_A_C_;
     KEL.typ.nbool Res_Bus_Flag_B_D_;
   END;
-  SHARED Index_Build_Association_Res73_Internal_Layout_P_L___Ast_Veh_Air_Emrg_Dt_List_Ev_Layout := RECORD
+  SHARED Index_Build_Association_Res73_Internal_Layout_P_L___Ast_Veh_Air_Emrg_Dt_List_Ev_Pre_Layout := RECORD
     KEL.typ.ntyp(E_Aircraft().Typ) Plane_;
     KEL.typ.nstr Aircraft_First_Seen_Date_;
     KEL.typ.epoch Archive___Date_ := 0;
@@ -49325,7 +48359,7 @@ EXPORT L_Compile := MODULE
     KEL.typ.epoch Vault_Date_Last_Seen_ := 0;
     KEL.typ.int __RecordCount := 0;
   END;
-  SHARED Index_Build_Association_Res73_Internal_Layout_P_L___Ast_Veh_Wtr_Emrg_Dt_List_Ev_Layout := RECORD
+  SHARED Index_Build_Association_Res73_Internal_Layout_P_L___Ast_Veh_Wtr_Emrg_Dt_List_Ev_Pre_Layout := RECORD
     KEL.typ.ntyp(E_Watercraft().Typ) W_Craft_;
     KEL.typ.nstr Watercraft_First_Seen_Date_;
     KEL.typ.epoch Archive___Date_ := 0;
@@ -49335,7 +48369,7 @@ EXPORT L_Compile := MODULE
     KEL.typ.epoch Vault_Date_Last_Seen_ := 0;
     KEL.typ.int __RecordCount := 0;
   END;
-  SHARED Index_Build_Association_Res73_Internal_Layout_P_L___Drg_Bk_Ch_List10_Y_Layout := RECORD
+  SHARED Index_Build_Association_Res73_Internal_Layout_P_L___Drg_Bk_Ch_List10_Y_Pre_Layout := RECORD
     KEL.typ.nstr Original_Chapter_;
     KEL.typ.nstr T_M_S_I_D_;
     KEL.typ.nstr Case_Number_;
@@ -49350,7 +48384,7 @@ EXPORT L_Compile := MODULE
     KEL.typ.epoch Vault_Date_Last_Seen_ := 0;
     KEL.typ.int __RecordCount := 0;
   END;
-  SHARED Index_Build_Association_Res73_Internal_Layout_P_L___Drg_Bk_Ch_List1_Y_Layout := RECORD
+  SHARED Index_Build_Association_Res73_Internal_Layout_P_L___Drg_Bk_Ch_List1_Y_Pre_Layout := RECORD
     KEL.typ.nstr Original_Chapter_;
     KEL.typ.nstr T_M_S_I_D_;
     KEL.typ.nstr Case_Number_;
@@ -49365,7 +48399,7 @@ EXPORT L_Compile := MODULE
     KEL.typ.epoch Vault_Date_Last_Seen_ := 0;
     KEL.typ.int __RecordCount := 0;
   END;
-  SHARED Index_Build_Association_Res73_Internal_Layout_P_L___Drg_Bk_Ch_List7_Y_Layout := RECORD
+  SHARED Index_Build_Association_Res73_Internal_Layout_P_L___Drg_Bk_Ch_List7_Y_Pre_Layout := RECORD
     KEL.typ.nstr Original_Chapter_;
     KEL.typ.nstr T_M_S_I_D_;
     KEL.typ.nstr Case_Number_;
@@ -49380,7 +48414,7 @@ EXPORT L_Compile := MODULE
     KEL.typ.epoch Vault_Date_Last_Seen_ := 0;
     KEL.typ.int __RecordCount := 0;
   END;
-  SHARED Index_Build_Association_Res73_Internal_Layout_P_L___Drg_Bk_Disp_List10_Y_Layout := RECORD
+  SHARED Index_Build_Association_Res73_Internal_Layout_P_L___Drg_Bk_Disp_List10_Y_Pre_Layout := RECORD
     KEL.typ.nstr Disposition_;
     KEL.typ.nstr T_M_S_I_D_;
     KEL.typ.nstr Case_Number_;
@@ -49395,7 +48429,7 @@ EXPORT L_Compile := MODULE
     KEL.typ.epoch Vault_Date_Last_Seen_ := 0;
     KEL.typ.int __RecordCount := 0;
   END;
-  SHARED Index_Build_Association_Res73_Internal_Layout_P_L___Drg_Bk_Disp_List1_Y_Layout := RECORD
+  SHARED Index_Build_Association_Res73_Internal_Layout_P_L___Drg_Bk_Disp_List1_Y_Pre_Layout := RECORD
     KEL.typ.nstr Disposition_;
     KEL.typ.nstr T_M_S_I_D_;
     KEL.typ.nstr Case_Number_;
@@ -49410,7 +48444,7 @@ EXPORT L_Compile := MODULE
     KEL.typ.epoch Vault_Date_Last_Seen_ := 0;
     KEL.typ.int __RecordCount := 0;
   END;
-  SHARED Index_Build_Association_Res73_Internal_Layout_P_L___Drg_Bk_Disp_List7_Y_Layout := RECORD
+  SHARED Index_Build_Association_Res73_Internal_Layout_P_L___Drg_Bk_Disp_List7_Y_Pre_Layout := RECORD
     KEL.typ.nstr Disposition_;
     KEL.typ.nstr T_M_S_I_D_;
     KEL.typ.nstr Case_Number_;
@@ -49425,7 +48459,7 @@ EXPORT L_Compile := MODULE
     KEL.typ.epoch Vault_Date_Last_Seen_ := 0;
     KEL.typ.int __RecordCount := 0;
   END;
-  SHARED Index_Build_Association_Res73_Internal_Layout_P_L___Drg_Bk_Dt_List10_Y_Layout := RECORD
+  SHARED Index_Build_Association_Res73_Internal_Layout_P_L___Drg_Bk_Dt_List10_Y_Pre_Layout := RECORD
     KEL.typ.nstr T_M_S_I_D_;
     KEL.typ.nstr Case_Number_;
     KEL.typ.nstr Court_Code_;
@@ -49439,7 +48473,7 @@ EXPORT L_Compile := MODULE
     KEL.typ.epoch Vault_Date_Last_Seen_ := 0;
     KEL.typ.int __RecordCount := 0;
   END;
-  SHARED Index_Build_Association_Res73_Internal_Layout_P_L___Drg_Bk_Dt_List1_Y_Layout := RECORD
+  SHARED Index_Build_Association_Res73_Internal_Layout_P_L___Drg_Bk_Dt_List1_Y_Pre_Layout := RECORD
     KEL.typ.nstr T_M_S_I_D_;
     KEL.typ.nstr Case_Number_;
     KEL.typ.nstr Court_Code_;
@@ -49453,7 +48487,7 @@ EXPORT L_Compile := MODULE
     KEL.typ.epoch Vault_Date_Last_Seen_ := 0;
     KEL.typ.int __RecordCount := 0;
   END;
-  SHARED Index_Build_Association_Res73_Internal_Layout_P_L___Drg_Bk_Dt_List7_Y_Layout := RECORD
+  SHARED Index_Build_Association_Res73_Internal_Layout_P_L___Drg_Bk_Dt_List7_Y_Pre_Layout := RECORD
     KEL.typ.nstr T_M_S_I_D_;
     KEL.typ.nstr Case_Number_;
     KEL.typ.nstr Court_Code_;
@@ -49467,7 +48501,7 @@ EXPORT L_Compile := MODULE
     KEL.typ.epoch Vault_Date_Last_Seen_ := 0;
     KEL.typ.int __RecordCount := 0;
   END;
-  SHARED Index_Build_Association_Res73_Internal_Layout_P_L___Drg_Bk_Type_List10_Y_Layout := RECORD
+  SHARED Index_Build_Association_Res73_Internal_Layout_P_L___Drg_Bk_Type_List10_Y_Pre_Layout := RECORD
     KEL.typ.nstr Filing_Type_;
     KEL.typ.nkdate Bankruptcy_Date_;
     KEL.typ.nkdate Last_Status_Update_;
@@ -49479,7 +48513,7 @@ EXPORT L_Compile := MODULE
     KEL.typ.epoch Vault_Date_Last_Seen_ := 0;
     KEL.typ.int __RecordCount := 0;
   END;
-  SHARED Index_Build_Association_Res73_Internal_Layout_P_L___Drg_Bk_Type_List1_Y_Layout := RECORD
+  SHARED Index_Build_Association_Res73_Internal_Layout_P_L___Drg_Bk_Type_List1_Y_Pre_Layout := RECORD
     KEL.typ.nstr Filing_Type_;
     KEL.typ.nkdate Bankruptcy_Date_;
     KEL.typ.nkdate Last_Status_Update_;
@@ -49491,7 +48525,7 @@ EXPORT L_Compile := MODULE
     KEL.typ.epoch Vault_Date_Last_Seen_ := 0;
     KEL.typ.int __RecordCount := 0;
   END;
-  SHARED Index_Build_Association_Res73_Internal_Layout_P_L___Drg_Bk_Type_List7_Y_Layout := RECORD
+  SHARED Index_Build_Association_Res73_Internal_Layout_P_L___Drg_Bk_Type_List7_Y_Pre_Layout := RECORD
     KEL.typ.nstr Filing_Type_;
     KEL.typ.nkdate Bankruptcy_Date_;
     KEL.typ.nkdate Last_Status_Update_;
@@ -49503,29 +48537,9 @@ EXPORT L_Compile := MODULE
     KEL.typ.epoch Vault_Date_Last_Seen_ := 0;
     KEL.typ.int __RecordCount := 0;
   END;
-  SHARED Index_Build_Association_Res73_Internal_Layout_P_L___Prof_Lic_Exp_Dt_List_Ev_Layout := RECORD
-    KEL.typ.nuid Prof_Lic_U_I_D_;
-    KEL.typ.nstr Max_Expire_Date_;
-    KEL.typ.epoch Archive___Date_ := 0;
-    KEL.typ.epoch Date_First_Seen_ := 0;
-    KEL.typ.epoch Date_Last_Seen_ := 0;
-    KEL.typ.epoch Hybrid_Archive_Date_ := 0;
-    KEL.typ.epoch Vault_Date_Last_Seen_ := 0;
-    KEL.typ.int __RecordCount := 0;
-  END;
-  SHARED Index_Build_Association_Res73_Internal_Layout_P_L___Prof_Lic_Indx_By_Lic_List_Ev_Layout := RECORD
+  SHARED Index_Build_Association_Res73_Internal_Layout_P_L___Prof_Lic_Indx_By_Lic_List_Ev_Pre_Layout := RECORD
     KEL.typ.nuid Prof_Lic_U_I_D_;
     KEL.typ.nstr License_Category_;
-    KEL.typ.epoch Archive___Date_ := 0;
-    KEL.typ.epoch Date_First_Seen_ := 0;
-    KEL.typ.epoch Date_Last_Seen_ := 0;
-    KEL.typ.epoch Hybrid_Archive_Date_ := 0;
-    KEL.typ.epoch Vault_Date_Last_Seen_ := 0;
-    KEL.typ.int __RecordCount := 0;
-  END;
-  SHARED Index_Build_Association_Res73_Internal_Layout_P_L___Prof_Lic_Issue_Dt_List_Ev_Layout := RECORD
-    KEL.typ.nuid Prof_Lic_U_I_D_;
-    KEL.typ.nstr Max_Issue_Date_;
     KEL.typ.epoch Archive___Date_ := 0;
     KEL.typ.epoch Date_First_Seen_ := 0;
     KEL.typ.epoch Date_Last_Seen_ := 0;
@@ -51078,7 +50092,8 @@ EXPORT L_Compile := MODULE
     KEL.typ.nint P_L___Ast_Prop_Sale_Old_Msnc_Ev_;
     KEL.typ.int P_L___Ast_Prop_Sale_Tot_Ev_ := 0;
     KEL.typ.int P_L___Ast_Veh_Air_Cnt_Ev_ := 0;
-    KEL.typ.ndataset(Index_Build_Association_Res73_Internal_Layout_P_L___Ast_Veh_Air_Emrg_Dt_List_Ev_Layout) P_L___Ast_Veh_Air_Emrg_Dt_List_Ev_;
+    KEL.typ.nstr P_L___Ast_Veh_Air_Emrg_Dt_List_Ev_;
+    KEL.typ.ndataset(Index_Build_Association_Res73_Internal_Layout_P_L___Ast_Veh_Air_Emrg_Dt_List_Ev_Pre_Layout) P_L___Ast_Veh_Air_Emrg_Dt_List_Ev_Pre_;
     KEL.typ.nstr P_L___Ast_Veh_Air_Emrg_New_Dt_Ev_;
     KEL.typ.nint P_L___Ast_Veh_Air_Emrg_New_Msnc_Ev_;
     KEL.typ.nstr P_L___Ast_Veh_Air_Emrg_Old_Dt_Ev_;
@@ -51093,7 +50108,8 @@ EXPORT L_Compile := MODULE
     KEL.typ.nint P_L___Ast_Veh_Auto_Emrg_Old_Msnc_Ev_;
     KEL.typ.ndataset(Index_Build_Association_Res73_Internal_Layout_P_L___Ast_Veh_Auto_Last_Dt_List_Ev_Layout) P_L___Ast_Veh_Auto_Last_Dt_List_Ev_;
     KEL.typ.int P_L___Ast_Veh_Wtr_Cnt_Ev_ := 0;
-    KEL.typ.ndataset(Index_Build_Association_Res73_Internal_Layout_P_L___Ast_Veh_Wtr_Emrg_Dt_List_Ev_Layout) P_L___Ast_Veh_Wtr_Emrg_Dt_List_Ev_;
+    KEL.typ.nstr P_L___Ast_Veh_Wtr_Emrg_Dt_List_Ev_;
+    KEL.typ.ndataset(Index_Build_Association_Res73_Internal_Layout_P_L___Ast_Veh_Wtr_Emrg_Dt_List_Ev_Pre_Layout) P_L___Ast_Veh_Wtr_Emrg_Dt_List_Ev_Pre_;
     KEL.typ.nstr P_L___Ast_Veh_Wtr_Emrg_New_Dt_Ev_;
     KEL.typ.nint P_L___Ast_Veh_Wtr_Emrg_New_Msnc_Ev_;
     KEL.typ.nstr P_L___Ast_Veh_Wtr_Emrg_Old_Dt_Ev_;
@@ -51142,9 +50158,12 @@ EXPORT L_Compile := MODULE
     KEL.typ.int P_L___Drg_Bk_Ch7_Cnt10_Y_ := 0;
     KEL.typ.int P_L___Drg_Bk_Ch7_Cnt1_Y_ := 0;
     KEL.typ.int P_L___Drg_Bk_Ch7_Cnt7_Y_ := 0;
-    KEL.typ.ndataset(Index_Build_Association_Res73_Internal_Layout_P_L___Drg_Bk_Ch_List10_Y_Layout) P_L___Drg_Bk_Ch_List10_Y_;
-    KEL.typ.ndataset(Index_Build_Association_Res73_Internal_Layout_P_L___Drg_Bk_Ch_List1_Y_Layout) P_L___Drg_Bk_Ch_List1_Y_;
-    KEL.typ.ndataset(Index_Build_Association_Res73_Internal_Layout_P_L___Drg_Bk_Ch_List7_Y_Layout) P_L___Drg_Bk_Ch_List7_Y_;
+    KEL.typ.nstr P_L___Drg_Bk_Ch_List10_Y_;
+    KEL.typ.ndataset(Index_Build_Association_Res73_Internal_Layout_P_L___Drg_Bk_Ch_List10_Y_Pre_Layout) P_L___Drg_Bk_Ch_List10_Y_Pre_;
+    KEL.typ.nstr P_L___Drg_Bk_Ch_List1_Y_;
+    KEL.typ.ndataset(Index_Build_Association_Res73_Internal_Layout_P_L___Drg_Bk_Ch_List1_Y_Pre_Layout) P_L___Drg_Bk_Ch_List1_Y_Pre_;
+    KEL.typ.nstr P_L___Drg_Bk_Ch_List7_Y_;
+    KEL.typ.ndataset(Index_Build_Association_Res73_Internal_Layout_P_L___Drg_Bk_Ch_List7_Y_Pre_Layout) P_L___Drg_Bk_Ch_List7_Y_Pre_;
     KEL.typ.int P_L___Drg_Bk_Cnt10_Y_ := 0;
     KEL.typ.int P_L___Drg_Bk_Cnt1_Y_ := 0;
     KEL.typ.int P_L___Drg_Bk_Cnt1_Y_F1_Y_ := 0;
@@ -51152,18 +50171,24 @@ EXPORT L_Compile := MODULE
     KEL.typ.int P_L___Drg_Bk_Disp_Cnt10_Y_ := 0;
     KEL.typ.int P_L___Drg_Bk_Disp_Cnt1_Y_ := 0;
     KEL.typ.int P_L___Drg_Bk_Disp_Cnt7_Y_ := 0;
-    KEL.typ.ndataset(Index_Build_Association_Res73_Internal_Layout_P_L___Drg_Bk_Disp_List10_Y_Layout) P_L___Drg_Bk_Disp_List10_Y_;
-    KEL.typ.ndataset(Index_Build_Association_Res73_Internal_Layout_P_L___Drg_Bk_Disp_List1_Y_Layout) P_L___Drg_Bk_Disp_List1_Y_;
-    KEL.typ.ndataset(Index_Build_Association_Res73_Internal_Layout_P_L___Drg_Bk_Disp_List7_Y_Layout) P_L___Drg_Bk_Disp_List7_Y_;
+    KEL.typ.nstr P_L___Drg_Bk_Disp_List10_Y_;
+    KEL.typ.ndataset(Index_Build_Association_Res73_Internal_Layout_P_L___Drg_Bk_Disp_List10_Y_Pre_Layout) P_L___Drg_Bk_Disp_List10_Y_Pre_;
+    KEL.typ.nstr P_L___Drg_Bk_Disp_List1_Y_;
+    KEL.typ.ndataset(Index_Build_Association_Res73_Internal_Layout_P_L___Drg_Bk_Disp_List1_Y_Pre_Layout) P_L___Drg_Bk_Disp_List1_Y_Pre_;
+    KEL.typ.nstr P_L___Drg_Bk_Disp_List7_Y_;
+    KEL.typ.ndataset(Index_Build_Association_Res73_Internal_Layout_P_L___Drg_Bk_Disp_List7_Y_Pre_Layout) P_L___Drg_Bk_Disp_List7_Y_Pre_;
     KEL.typ.int P_L___Drg_Bk_Dsch_Cnt10_Y_ := 0;
     KEL.typ.int P_L___Drg_Bk_Dsch_Cnt1_Y_ := 0;
     KEL.typ.int P_L___Drg_Bk_Dsch_Cnt7_Y_ := 0;
     KEL.typ.int P_L___Drg_Bk_Dsms_Cnt10_Y_ := 0;
     KEL.typ.int P_L___Drg_Bk_Dsms_Cnt1_Y_ := 0;
     KEL.typ.int P_L___Drg_Bk_Dsms_Cnt7_Y_ := 0;
-    KEL.typ.ndataset(Index_Build_Association_Res73_Internal_Layout_P_L___Drg_Bk_Dt_List10_Y_Layout) P_L___Drg_Bk_Dt_List10_Y_;
-    KEL.typ.ndataset(Index_Build_Association_Res73_Internal_Layout_P_L___Drg_Bk_Dt_List1_Y_Layout) P_L___Drg_Bk_Dt_List1_Y_;
-    KEL.typ.ndataset(Index_Build_Association_Res73_Internal_Layout_P_L___Drg_Bk_Dt_List7_Y_Layout) P_L___Drg_Bk_Dt_List7_Y_;
+    KEL.typ.nstr P_L___Drg_Bk_Dt_List10_Y_;
+    KEL.typ.ndataset(Index_Build_Association_Res73_Internal_Layout_P_L___Drg_Bk_Dt_List10_Y_Pre_Layout) P_L___Drg_Bk_Dt_List10_Y_Pre_;
+    KEL.typ.nstr P_L___Drg_Bk_Dt_List1_Y_;
+    KEL.typ.ndataset(Index_Build_Association_Res73_Internal_Layout_P_L___Drg_Bk_Dt_List1_Y_Pre_Layout) P_L___Drg_Bk_Dt_List1_Y_Pre_;
+    KEL.typ.nstr P_L___Drg_Bk_Dt_List7_Y_;
+    KEL.typ.ndataset(Index_Build_Association_Res73_Internal_Layout_P_L___Drg_Bk_Dt_List7_Y_Pre_Layout) P_L___Drg_Bk_Dt_List7_Y_Pre_;
     KEL.typ.nstr P_L___Drg_Bk_New_Ch_Type10_Y_;
     KEL.typ.nstr P_L___Drg_Bk_New_Ch_Type1_Y_;
     KEL.typ.nstr P_L___Drg_Bk_New_Ch_Type7_Y_;
@@ -51189,9 +50214,12 @@ EXPORT L_Compile := MODULE
     KEL.typ.nint P_L___Drg_Bk_Old_Msnc1_Y_;
     KEL.typ.nint P_L___Drg_Bk_Old_Msnc7_Y_;
     KEL.typ.str P_L___Drg_Bk_Severity_Indx10_Y_ := '';
-    KEL.typ.ndataset(Index_Build_Association_Res73_Internal_Layout_P_L___Drg_Bk_Type_List10_Y_Layout) P_L___Drg_Bk_Type_List10_Y_;
-    KEL.typ.ndataset(Index_Build_Association_Res73_Internal_Layout_P_L___Drg_Bk_Type_List1_Y_Layout) P_L___Drg_Bk_Type_List1_Y_;
-    KEL.typ.ndataset(Index_Build_Association_Res73_Internal_Layout_P_L___Drg_Bk_Type_List7_Y_Layout) P_L___Drg_Bk_Type_List7_Y_;
+    KEL.typ.nstr P_L___Drg_Bk_Type_List10_Y_;
+    KEL.typ.ndataset(Index_Build_Association_Res73_Internal_Layout_P_L___Drg_Bk_Type_List10_Y_Pre_Layout) P_L___Drg_Bk_Type_List10_Y_Pre_;
+    KEL.typ.nstr P_L___Drg_Bk_Type_List1_Y_;
+    KEL.typ.ndataset(Index_Build_Association_Res73_Internal_Layout_P_L___Drg_Bk_Type_List1_Y_Pre_Layout) P_L___Drg_Bk_Type_List1_Y_Pre_;
+    KEL.typ.nstr P_L___Drg_Bk_Type_List7_Y_;
+    KEL.typ.ndataset(Index_Build_Association_Res73_Internal_Layout_P_L___Drg_Bk_Type_List7_Y_Pre_Layout) P_L___Drg_Bk_Type_List7_Y_Pre_;
     KEL.typ.nstr P_L___Drg_Bk_Updt_New_Dt10_Y_;
     KEL.typ.nstr P_L___Drg_Bk_Updt_New_Dt1_Y_;
     KEL.typ.nstr P_L___Drg_Bk_Updt_New_Dt7_Y_;
@@ -51324,10 +50352,11 @@ EXPORT L_Compile := MODULE
     KEL.typ.nstr P_L___Prof_Lic_Actv_New_Src_Type_;
     KEL.typ.nstr P_L___Prof_Lic_Actv_New_Title_Type_;
     KEL.typ.nstr P_L___Prof_Lic_Actv_New_Type_;
-    KEL.typ.ndataset(Index_Build_Association_Res73_Internal_Layout_P_L___Prof_Lic_Exp_Dt_List_Ev_Layout) P_L___Prof_Lic_Exp_Dt_List_Ev_;
+    KEL.typ.nstr P_L___Prof_Lic_Exp_Dt_List_Ev_;
     KEL.typ.str P_L___Prof_Lic_Flag_Ev_ := '';
-    KEL.typ.ndataset(Index_Build_Association_Res73_Internal_Layout_P_L___Prof_Lic_Indx_By_Lic_List_Ev_Layout) P_L___Prof_Lic_Indx_By_Lic_List_Ev_;
-    KEL.typ.ndataset(Index_Build_Association_Res73_Internal_Layout_P_L___Prof_Lic_Issue_Dt_List_Ev_Layout) P_L___Prof_Lic_Issue_Dt_List_Ev_;
+    KEL.typ.nstr P_L___Prof_Lic_Indx_By_Lic_List_Ev_;
+    KEL.typ.ndataset(Index_Build_Association_Res73_Internal_Layout_P_L___Prof_Lic_Indx_By_Lic_List_Ev_Pre_Layout) P_L___Prof_Lic_Indx_By_Lic_List_Ev_Pre_;
+    KEL.typ.nstr P_L___Prof_Lic_Issue_Dt_List_Ev_;
     KEL.typ.nint P_L___S_T_L_Cnt1_Y_;
     KEL.typ.nint P_L___S_T_L_Cnt2_Y_;
     KEL.typ.nint P_L___S_T_L_Cnt5_Y_;
@@ -51502,6 +50531,7 @@ EXPORT L_Compile := MODULE
     KEL.typ.str P___Lex_I_D_Rstd_Only_Flag_F_C_R_A_ := '';
     KEL.typ.str P___Lex_I_D_Rstd_Only_Flag_Non_F_C_R_A_ := '';
     KEL.typ.str P___Lex_I_D_Seen_Flag_ := '';
+    KEL.typ.str P___Lex_I_D_Seen_Flag_F_C_R_A_ := '';
     KEL.typ.str P___Lex_I_D_Seen_Flag_N_O_W_ := '';
     KEL.typ.nint Person_Address_Hierarchy_Valid_Cnt_;
     KEL.typ.nint Person_Curr_Addr_Loc_I_D_;
@@ -52748,6 +51778,7 @@ EXPORT L_Compile := MODULE
     KEL.typ.nstr Source_;
     KEL.typ.nbool Header_Hit_Flag_;
     KEL.typ.nbool F_D_N_Indicator_;
+    KEL.typ.nint Age_In_Days_;
     KEL.typ.nstr Translated_Source_Code_;
     KEL.typ.epoch Archive___Date_ := 0;
     KEL.typ.epoch Date_First_Seen_ := 0;
@@ -53574,7 +52605,7 @@ EXPORT L_Compile := MODULE
     KEL.typ.nbool Res_Bus_Flag_A_C_;
     KEL.typ.nbool Res_Bus_Flag_B_D_;
   END;
-  SHARED Index_Build_Association_Res79_Internal_Layout_P_L___Ast_Veh_Air_Emrg_Dt_List_Ev_Layout := RECORD
+  SHARED Index_Build_Association_Res79_Internal_Layout_P_L___Ast_Veh_Air_Emrg_Dt_List_Ev_Pre_Layout := RECORD
     KEL.typ.ntyp(E_Aircraft().Typ) Plane_;
     KEL.typ.nstr Aircraft_First_Seen_Date_;
     KEL.typ.epoch Archive___Date_ := 0;
@@ -53604,7 +52635,7 @@ EXPORT L_Compile := MODULE
     KEL.typ.epoch Vault_Date_Last_Seen_ := 0;
     KEL.typ.int __RecordCount := 0;
   END;
-  SHARED Index_Build_Association_Res79_Internal_Layout_P_L___Ast_Veh_Wtr_Emrg_Dt_List_Ev_Layout := RECORD
+  SHARED Index_Build_Association_Res79_Internal_Layout_P_L___Ast_Veh_Wtr_Emrg_Dt_List_Ev_Pre_Layout := RECORD
     KEL.typ.ntyp(E_Watercraft().Typ) W_Craft_;
     KEL.typ.nstr Watercraft_First_Seen_Date_;
     KEL.typ.epoch Archive___Date_ := 0;
@@ -53614,7 +52645,7 @@ EXPORT L_Compile := MODULE
     KEL.typ.epoch Vault_Date_Last_Seen_ := 0;
     KEL.typ.int __RecordCount := 0;
   END;
-  SHARED Index_Build_Association_Res79_Internal_Layout_P_L___Drg_Bk_Ch_List10_Y_Layout := RECORD
+  SHARED Index_Build_Association_Res79_Internal_Layout_P_L___Drg_Bk_Ch_List10_Y_Pre_Layout := RECORD
     KEL.typ.nstr Original_Chapter_;
     KEL.typ.nstr T_M_S_I_D_;
     KEL.typ.nstr Case_Number_;
@@ -53629,7 +52660,7 @@ EXPORT L_Compile := MODULE
     KEL.typ.epoch Vault_Date_Last_Seen_ := 0;
     KEL.typ.int __RecordCount := 0;
   END;
-  SHARED Index_Build_Association_Res79_Internal_Layout_P_L___Drg_Bk_Ch_List1_Y_Layout := RECORD
+  SHARED Index_Build_Association_Res79_Internal_Layout_P_L___Drg_Bk_Ch_List1_Y_Pre_Layout := RECORD
     KEL.typ.nstr Original_Chapter_;
     KEL.typ.nstr T_M_S_I_D_;
     KEL.typ.nstr Case_Number_;
@@ -53644,7 +52675,7 @@ EXPORT L_Compile := MODULE
     KEL.typ.epoch Vault_Date_Last_Seen_ := 0;
     KEL.typ.int __RecordCount := 0;
   END;
-  SHARED Index_Build_Association_Res79_Internal_Layout_P_L___Drg_Bk_Ch_List7_Y_Layout := RECORD
+  SHARED Index_Build_Association_Res79_Internal_Layout_P_L___Drg_Bk_Ch_List7_Y_Pre_Layout := RECORD
     KEL.typ.nstr Original_Chapter_;
     KEL.typ.nstr T_M_S_I_D_;
     KEL.typ.nstr Case_Number_;
@@ -53659,7 +52690,7 @@ EXPORT L_Compile := MODULE
     KEL.typ.epoch Vault_Date_Last_Seen_ := 0;
     KEL.typ.int __RecordCount := 0;
   END;
-  SHARED Index_Build_Association_Res79_Internal_Layout_P_L___Drg_Bk_Disp_List10_Y_Layout := RECORD
+  SHARED Index_Build_Association_Res79_Internal_Layout_P_L___Drg_Bk_Disp_List10_Y_Pre_Layout := RECORD
     KEL.typ.nstr Disposition_;
     KEL.typ.nstr T_M_S_I_D_;
     KEL.typ.nstr Case_Number_;
@@ -53674,7 +52705,7 @@ EXPORT L_Compile := MODULE
     KEL.typ.epoch Vault_Date_Last_Seen_ := 0;
     KEL.typ.int __RecordCount := 0;
   END;
-  SHARED Index_Build_Association_Res79_Internal_Layout_P_L___Drg_Bk_Disp_List1_Y_Layout := RECORD
+  SHARED Index_Build_Association_Res79_Internal_Layout_P_L___Drg_Bk_Disp_List1_Y_Pre_Layout := RECORD
     KEL.typ.nstr Disposition_;
     KEL.typ.nstr T_M_S_I_D_;
     KEL.typ.nstr Case_Number_;
@@ -53689,7 +52720,7 @@ EXPORT L_Compile := MODULE
     KEL.typ.epoch Vault_Date_Last_Seen_ := 0;
     KEL.typ.int __RecordCount := 0;
   END;
-  SHARED Index_Build_Association_Res79_Internal_Layout_P_L___Drg_Bk_Disp_List7_Y_Layout := RECORD
+  SHARED Index_Build_Association_Res79_Internal_Layout_P_L___Drg_Bk_Disp_List7_Y_Pre_Layout := RECORD
     KEL.typ.nstr Disposition_;
     KEL.typ.nstr T_M_S_I_D_;
     KEL.typ.nstr Case_Number_;
@@ -53704,7 +52735,7 @@ EXPORT L_Compile := MODULE
     KEL.typ.epoch Vault_Date_Last_Seen_ := 0;
     KEL.typ.int __RecordCount := 0;
   END;
-  SHARED Index_Build_Association_Res79_Internal_Layout_P_L___Drg_Bk_Dt_List10_Y_Layout := RECORD
+  SHARED Index_Build_Association_Res79_Internal_Layout_P_L___Drg_Bk_Dt_List10_Y_Pre_Layout := RECORD
     KEL.typ.nstr T_M_S_I_D_;
     KEL.typ.nstr Case_Number_;
     KEL.typ.nstr Court_Code_;
@@ -53718,7 +52749,7 @@ EXPORT L_Compile := MODULE
     KEL.typ.epoch Vault_Date_Last_Seen_ := 0;
     KEL.typ.int __RecordCount := 0;
   END;
-  SHARED Index_Build_Association_Res79_Internal_Layout_P_L___Drg_Bk_Dt_List1_Y_Layout := RECORD
+  SHARED Index_Build_Association_Res79_Internal_Layout_P_L___Drg_Bk_Dt_List1_Y_Pre_Layout := RECORD
     KEL.typ.nstr T_M_S_I_D_;
     KEL.typ.nstr Case_Number_;
     KEL.typ.nstr Court_Code_;
@@ -53732,7 +52763,7 @@ EXPORT L_Compile := MODULE
     KEL.typ.epoch Vault_Date_Last_Seen_ := 0;
     KEL.typ.int __RecordCount := 0;
   END;
-  SHARED Index_Build_Association_Res79_Internal_Layout_P_L___Drg_Bk_Dt_List7_Y_Layout := RECORD
+  SHARED Index_Build_Association_Res79_Internal_Layout_P_L___Drg_Bk_Dt_List7_Y_Pre_Layout := RECORD
     KEL.typ.nstr T_M_S_I_D_;
     KEL.typ.nstr Case_Number_;
     KEL.typ.nstr Court_Code_;
@@ -53746,7 +52777,7 @@ EXPORT L_Compile := MODULE
     KEL.typ.epoch Vault_Date_Last_Seen_ := 0;
     KEL.typ.int __RecordCount := 0;
   END;
-  SHARED Index_Build_Association_Res79_Internal_Layout_P_L___Drg_Bk_Type_List10_Y_Layout := RECORD
+  SHARED Index_Build_Association_Res79_Internal_Layout_P_L___Drg_Bk_Type_List10_Y_Pre_Layout := RECORD
     KEL.typ.nstr Filing_Type_;
     KEL.typ.nkdate Bankruptcy_Date_;
     KEL.typ.nkdate Last_Status_Update_;
@@ -53758,7 +52789,7 @@ EXPORT L_Compile := MODULE
     KEL.typ.epoch Vault_Date_Last_Seen_ := 0;
     KEL.typ.int __RecordCount := 0;
   END;
-  SHARED Index_Build_Association_Res79_Internal_Layout_P_L___Drg_Bk_Type_List1_Y_Layout := RECORD
+  SHARED Index_Build_Association_Res79_Internal_Layout_P_L___Drg_Bk_Type_List1_Y_Pre_Layout := RECORD
     KEL.typ.nstr Filing_Type_;
     KEL.typ.nkdate Bankruptcy_Date_;
     KEL.typ.nkdate Last_Status_Update_;
@@ -53770,7 +52801,7 @@ EXPORT L_Compile := MODULE
     KEL.typ.epoch Vault_Date_Last_Seen_ := 0;
     KEL.typ.int __RecordCount := 0;
   END;
-  SHARED Index_Build_Association_Res79_Internal_Layout_P_L___Drg_Bk_Type_List7_Y_Layout := RECORD
+  SHARED Index_Build_Association_Res79_Internal_Layout_P_L___Drg_Bk_Type_List7_Y_Pre_Layout := RECORD
     KEL.typ.nstr Filing_Type_;
     KEL.typ.nkdate Bankruptcy_Date_;
     KEL.typ.nkdate Last_Status_Update_;
@@ -53782,29 +52813,9 @@ EXPORT L_Compile := MODULE
     KEL.typ.epoch Vault_Date_Last_Seen_ := 0;
     KEL.typ.int __RecordCount := 0;
   END;
-  SHARED Index_Build_Association_Res79_Internal_Layout_P_L___Prof_Lic_Exp_Dt_List_Ev_Layout := RECORD
-    KEL.typ.nuid Prof_Lic_U_I_D_;
-    KEL.typ.nstr Max_Expire_Date_;
-    KEL.typ.epoch Archive___Date_ := 0;
-    KEL.typ.epoch Date_First_Seen_ := 0;
-    KEL.typ.epoch Date_Last_Seen_ := 0;
-    KEL.typ.epoch Hybrid_Archive_Date_ := 0;
-    KEL.typ.epoch Vault_Date_Last_Seen_ := 0;
-    KEL.typ.int __RecordCount := 0;
-  END;
-  SHARED Index_Build_Association_Res79_Internal_Layout_P_L___Prof_Lic_Indx_By_Lic_List_Ev_Layout := RECORD
+  SHARED Index_Build_Association_Res79_Internal_Layout_P_L___Prof_Lic_Indx_By_Lic_List_Ev_Pre_Layout := RECORD
     KEL.typ.nuid Prof_Lic_U_I_D_;
     KEL.typ.nstr License_Category_;
-    KEL.typ.epoch Archive___Date_ := 0;
-    KEL.typ.epoch Date_First_Seen_ := 0;
-    KEL.typ.epoch Date_Last_Seen_ := 0;
-    KEL.typ.epoch Hybrid_Archive_Date_ := 0;
-    KEL.typ.epoch Vault_Date_Last_Seen_ := 0;
-    KEL.typ.int __RecordCount := 0;
-  END;
-  SHARED Index_Build_Association_Res79_Internal_Layout_P_L___Prof_Lic_Issue_Dt_List_Ev_Layout := RECORD
-    KEL.typ.nuid Prof_Lic_U_I_D_;
-    KEL.typ.nstr Max_Issue_Date_;
     KEL.typ.epoch Archive___Date_ := 0;
     KEL.typ.epoch Date_First_Seen_ := 0;
     KEL.typ.epoch Date_Last_Seen_ := 0;
@@ -55357,7 +54368,8 @@ EXPORT L_Compile := MODULE
     KEL.typ.nint P_L___Ast_Prop_Sale_Old_Msnc_Ev_;
     KEL.typ.int P_L___Ast_Prop_Sale_Tot_Ev_ := 0;
     KEL.typ.int P_L___Ast_Veh_Air_Cnt_Ev_ := 0;
-    KEL.typ.ndataset(Index_Build_Association_Res79_Internal_Layout_P_L___Ast_Veh_Air_Emrg_Dt_List_Ev_Layout) P_L___Ast_Veh_Air_Emrg_Dt_List_Ev_;
+    KEL.typ.nstr P_L___Ast_Veh_Air_Emrg_Dt_List_Ev_;
+    KEL.typ.ndataset(Index_Build_Association_Res79_Internal_Layout_P_L___Ast_Veh_Air_Emrg_Dt_List_Ev_Pre_Layout) P_L___Ast_Veh_Air_Emrg_Dt_List_Ev_Pre_;
     KEL.typ.nstr P_L___Ast_Veh_Air_Emrg_New_Dt_Ev_;
     KEL.typ.nint P_L___Ast_Veh_Air_Emrg_New_Msnc_Ev_;
     KEL.typ.nstr P_L___Ast_Veh_Air_Emrg_Old_Dt_Ev_;
@@ -55372,7 +54384,8 @@ EXPORT L_Compile := MODULE
     KEL.typ.nint P_L___Ast_Veh_Auto_Emrg_Old_Msnc_Ev_;
     KEL.typ.ndataset(Index_Build_Association_Res79_Internal_Layout_P_L___Ast_Veh_Auto_Last_Dt_List_Ev_Layout) P_L___Ast_Veh_Auto_Last_Dt_List_Ev_;
     KEL.typ.int P_L___Ast_Veh_Wtr_Cnt_Ev_ := 0;
-    KEL.typ.ndataset(Index_Build_Association_Res79_Internal_Layout_P_L___Ast_Veh_Wtr_Emrg_Dt_List_Ev_Layout) P_L___Ast_Veh_Wtr_Emrg_Dt_List_Ev_;
+    KEL.typ.nstr P_L___Ast_Veh_Wtr_Emrg_Dt_List_Ev_;
+    KEL.typ.ndataset(Index_Build_Association_Res79_Internal_Layout_P_L___Ast_Veh_Wtr_Emrg_Dt_List_Ev_Pre_Layout) P_L___Ast_Veh_Wtr_Emrg_Dt_List_Ev_Pre_;
     KEL.typ.nstr P_L___Ast_Veh_Wtr_Emrg_New_Dt_Ev_;
     KEL.typ.nint P_L___Ast_Veh_Wtr_Emrg_New_Msnc_Ev_;
     KEL.typ.nstr P_L___Ast_Veh_Wtr_Emrg_Old_Dt_Ev_;
@@ -55421,9 +54434,12 @@ EXPORT L_Compile := MODULE
     KEL.typ.int P_L___Drg_Bk_Ch7_Cnt10_Y_ := 0;
     KEL.typ.int P_L___Drg_Bk_Ch7_Cnt1_Y_ := 0;
     KEL.typ.int P_L___Drg_Bk_Ch7_Cnt7_Y_ := 0;
-    KEL.typ.ndataset(Index_Build_Association_Res79_Internal_Layout_P_L___Drg_Bk_Ch_List10_Y_Layout) P_L___Drg_Bk_Ch_List10_Y_;
-    KEL.typ.ndataset(Index_Build_Association_Res79_Internal_Layout_P_L___Drg_Bk_Ch_List1_Y_Layout) P_L___Drg_Bk_Ch_List1_Y_;
-    KEL.typ.ndataset(Index_Build_Association_Res79_Internal_Layout_P_L___Drg_Bk_Ch_List7_Y_Layout) P_L___Drg_Bk_Ch_List7_Y_;
+    KEL.typ.nstr P_L___Drg_Bk_Ch_List10_Y_;
+    KEL.typ.ndataset(Index_Build_Association_Res79_Internal_Layout_P_L___Drg_Bk_Ch_List10_Y_Pre_Layout) P_L___Drg_Bk_Ch_List10_Y_Pre_;
+    KEL.typ.nstr P_L___Drg_Bk_Ch_List1_Y_;
+    KEL.typ.ndataset(Index_Build_Association_Res79_Internal_Layout_P_L___Drg_Bk_Ch_List1_Y_Pre_Layout) P_L___Drg_Bk_Ch_List1_Y_Pre_;
+    KEL.typ.nstr P_L___Drg_Bk_Ch_List7_Y_;
+    KEL.typ.ndataset(Index_Build_Association_Res79_Internal_Layout_P_L___Drg_Bk_Ch_List7_Y_Pre_Layout) P_L___Drg_Bk_Ch_List7_Y_Pre_;
     KEL.typ.int P_L___Drg_Bk_Cnt10_Y_ := 0;
     KEL.typ.int P_L___Drg_Bk_Cnt1_Y_ := 0;
     KEL.typ.int P_L___Drg_Bk_Cnt1_Y_F1_Y_ := 0;
@@ -55431,18 +54447,24 @@ EXPORT L_Compile := MODULE
     KEL.typ.int P_L___Drg_Bk_Disp_Cnt10_Y_ := 0;
     KEL.typ.int P_L___Drg_Bk_Disp_Cnt1_Y_ := 0;
     KEL.typ.int P_L___Drg_Bk_Disp_Cnt7_Y_ := 0;
-    KEL.typ.ndataset(Index_Build_Association_Res79_Internal_Layout_P_L___Drg_Bk_Disp_List10_Y_Layout) P_L___Drg_Bk_Disp_List10_Y_;
-    KEL.typ.ndataset(Index_Build_Association_Res79_Internal_Layout_P_L___Drg_Bk_Disp_List1_Y_Layout) P_L___Drg_Bk_Disp_List1_Y_;
-    KEL.typ.ndataset(Index_Build_Association_Res79_Internal_Layout_P_L___Drg_Bk_Disp_List7_Y_Layout) P_L___Drg_Bk_Disp_List7_Y_;
+    KEL.typ.nstr P_L___Drg_Bk_Disp_List10_Y_;
+    KEL.typ.ndataset(Index_Build_Association_Res79_Internal_Layout_P_L___Drg_Bk_Disp_List10_Y_Pre_Layout) P_L___Drg_Bk_Disp_List10_Y_Pre_;
+    KEL.typ.nstr P_L___Drg_Bk_Disp_List1_Y_;
+    KEL.typ.ndataset(Index_Build_Association_Res79_Internal_Layout_P_L___Drg_Bk_Disp_List1_Y_Pre_Layout) P_L___Drg_Bk_Disp_List1_Y_Pre_;
+    KEL.typ.nstr P_L___Drg_Bk_Disp_List7_Y_;
+    KEL.typ.ndataset(Index_Build_Association_Res79_Internal_Layout_P_L___Drg_Bk_Disp_List7_Y_Pre_Layout) P_L___Drg_Bk_Disp_List7_Y_Pre_;
     KEL.typ.int P_L___Drg_Bk_Dsch_Cnt10_Y_ := 0;
     KEL.typ.int P_L___Drg_Bk_Dsch_Cnt1_Y_ := 0;
     KEL.typ.int P_L___Drg_Bk_Dsch_Cnt7_Y_ := 0;
     KEL.typ.int P_L___Drg_Bk_Dsms_Cnt10_Y_ := 0;
     KEL.typ.int P_L___Drg_Bk_Dsms_Cnt1_Y_ := 0;
     KEL.typ.int P_L___Drg_Bk_Dsms_Cnt7_Y_ := 0;
-    KEL.typ.ndataset(Index_Build_Association_Res79_Internal_Layout_P_L___Drg_Bk_Dt_List10_Y_Layout) P_L___Drg_Bk_Dt_List10_Y_;
-    KEL.typ.ndataset(Index_Build_Association_Res79_Internal_Layout_P_L___Drg_Bk_Dt_List1_Y_Layout) P_L___Drg_Bk_Dt_List1_Y_;
-    KEL.typ.ndataset(Index_Build_Association_Res79_Internal_Layout_P_L___Drg_Bk_Dt_List7_Y_Layout) P_L___Drg_Bk_Dt_List7_Y_;
+    KEL.typ.nstr P_L___Drg_Bk_Dt_List10_Y_;
+    KEL.typ.ndataset(Index_Build_Association_Res79_Internal_Layout_P_L___Drg_Bk_Dt_List10_Y_Pre_Layout) P_L___Drg_Bk_Dt_List10_Y_Pre_;
+    KEL.typ.nstr P_L___Drg_Bk_Dt_List1_Y_;
+    KEL.typ.ndataset(Index_Build_Association_Res79_Internal_Layout_P_L___Drg_Bk_Dt_List1_Y_Pre_Layout) P_L___Drg_Bk_Dt_List1_Y_Pre_;
+    KEL.typ.nstr P_L___Drg_Bk_Dt_List7_Y_;
+    KEL.typ.ndataset(Index_Build_Association_Res79_Internal_Layout_P_L___Drg_Bk_Dt_List7_Y_Pre_Layout) P_L___Drg_Bk_Dt_List7_Y_Pre_;
     KEL.typ.nstr P_L___Drg_Bk_New_Ch_Type10_Y_;
     KEL.typ.nstr P_L___Drg_Bk_New_Ch_Type1_Y_;
     KEL.typ.nstr P_L___Drg_Bk_New_Ch_Type7_Y_;
@@ -55468,9 +54490,12 @@ EXPORT L_Compile := MODULE
     KEL.typ.nint P_L___Drg_Bk_Old_Msnc1_Y_;
     KEL.typ.nint P_L___Drg_Bk_Old_Msnc7_Y_;
     KEL.typ.str P_L___Drg_Bk_Severity_Indx10_Y_ := '';
-    KEL.typ.ndataset(Index_Build_Association_Res79_Internal_Layout_P_L___Drg_Bk_Type_List10_Y_Layout) P_L___Drg_Bk_Type_List10_Y_;
-    KEL.typ.ndataset(Index_Build_Association_Res79_Internal_Layout_P_L___Drg_Bk_Type_List1_Y_Layout) P_L___Drg_Bk_Type_List1_Y_;
-    KEL.typ.ndataset(Index_Build_Association_Res79_Internal_Layout_P_L___Drg_Bk_Type_List7_Y_Layout) P_L___Drg_Bk_Type_List7_Y_;
+    KEL.typ.nstr P_L___Drg_Bk_Type_List10_Y_;
+    KEL.typ.ndataset(Index_Build_Association_Res79_Internal_Layout_P_L___Drg_Bk_Type_List10_Y_Pre_Layout) P_L___Drg_Bk_Type_List10_Y_Pre_;
+    KEL.typ.nstr P_L___Drg_Bk_Type_List1_Y_;
+    KEL.typ.ndataset(Index_Build_Association_Res79_Internal_Layout_P_L___Drg_Bk_Type_List1_Y_Pre_Layout) P_L___Drg_Bk_Type_List1_Y_Pre_;
+    KEL.typ.nstr P_L___Drg_Bk_Type_List7_Y_;
+    KEL.typ.ndataset(Index_Build_Association_Res79_Internal_Layout_P_L___Drg_Bk_Type_List7_Y_Pre_Layout) P_L___Drg_Bk_Type_List7_Y_Pre_;
     KEL.typ.nstr P_L___Drg_Bk_Updt_New_Dt10_Y_;
     KEL.typ.nstr P_L___Drg_Bk_Updt_New_Dt1_Y_;
     KEL.typ.nstr P_L___Drg_Bk_Updt_New_Dt7_Y_;
@@ -55603,10 +54628,11 @@ EXPORT L_Compile := MODULE
     KEL.typ.nstr P_L___Prof_Lic_Actv_New_Src_Type_;
     KEL.typ.nstr P_L___Prof_Lic_Actv_New_Title_Type_;
     KEL.typ.nstr P_L___Prof_Lic_Actv_New_Type_;
-    KEL.typ.ndataset(Index_Build_Association_Res79_Internal_Layout_P_L___Prof_Lic_Exp_Dt_List_Ev_Layout) P_L___Prof_Lic_Exp_Dt_List_Ev_;
+    KEL.typ.nstr P_L___Prof_Lic_Exp_Dt_List_Ev_;
     KEL.typ.str P_L___Prof_Lic_Flag_Ev_ := '';
-    KEL.typ.ndataset(Index_Build_Association_Res79_Internal_Layout_P_L___Prof_Lic_Indx_By_Lic_List_Ev_Layout) P_L___Prof_Lic_Indx_By_Lic_List_Ev_;
-    KEL.typ.ndataset(Index_Build_Association_Res79_Internal_Layout_P_L___Prof_Lic_Issue_Dt_List_Ev_Layout) P_L___Prof_Lic_Issue_Dt_List_Ev_;
+    KEL.typ.nstr P_L___Prof_Lic_Indx_By_Lic_List_Ev_;
+    KEL.typ.ndataset(Index_Build_Association_Res79_Internal_Layout_P_L___Prof_Lic_Indx_By_Lic_List_Ev_Pre_Layout) P_L___Prof_Lic_Indx_By_Lic_List_Ev_Pre_;
+    KEL.typ.nstr P_L___Prof_Lic_Issue_Dt_List_Ev_;
     KEL.typ.nint P_L___S_T_L_Cnt1_Y_;
     KEL.typ.nint P_L___S_T_L_Cnt2_Y_;
     KEL.typ.nint P_L___S_T_L_Cnt5_Y_;
@@ -55781,6 +54807,7 @@ EXPORT L_Compile := MODULE
     KEL.typ.str P___Lex_I_D_Rstd_Only_Flag_F_C_R_A_ := '';
     KEL.typ.str P___Lex_I_D_Rstd_Only_Flag_Non_F_C_R_A_ := '';
     KEL.typ.str P___Lex_I_D_Seen_Flag_ := '';
+    KEL.typ.str P___Lex_I_D_Seen_Flag_F_C_R_A_ := '';
     KEL.typ.str P___Lex_I_D_Seen_Flag_N_O_W_ := '';
     KEL.typ.nint Person_Address_Hierarchy_Valid_Cnt_;
     KEL.typ.nint Person_Curr_Addr_Loc_I_D_;
