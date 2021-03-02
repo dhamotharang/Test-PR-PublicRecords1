@@ -8,6 +8,8 @@ BuiltDespray:=IDA._Despray(version,pUseProd);
 
 Despray:=STD.File.DeSpray('~thor_data400::out::ida::despray::built',IDA._Constants(pUseProd).Source_IP,IDA._Constants(pUseProd).despray_path + IDA._Constants(pUseProd).despray_filename);
 
-return SEQUENTIAL(BuiltDespray,Despray);
+seq:=SEQUENTIAL(BuiltDespray,Despray): success(IDA.Send_Email(version,pUseProd).DespraySuccess), failure(IDA.send_email(version,pUseProd).DesprayFailure);
+
+return seq;
 
 end;
