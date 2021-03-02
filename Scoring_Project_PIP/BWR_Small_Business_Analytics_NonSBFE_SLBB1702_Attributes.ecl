@@ -18,7 +18,7 @@ IMPORT Business_Risk_BIP, LNSmallBusiness, Models, iESP, Risk_Indicators, RiskWi
 recordsToRun := 0;
 // recordsToRun := 10;
 eyeball      := 5;
-threads      := 1;
+threads      := 2;
 
 curr_date := (STRING8)Std.Date.Today();
 // RoxieIP := RiskWise.shortcuts.prod_batch_analytics_roxie;      // Production
@@ -26,7 +26,8 @@ RoxieIP := RiskWise.shortcuts.QA_neutral_roxieIP;                  // CERT
 // RoxieIP := RiskWise.shortcuts.Dev156;                  // Development Roxie 156
 
 // inputFile := ut.foreign_prod + 'jpyon::in::amex_8055_gcp_small_input_output1.csv';
-inputFile := '~wema::sbfe_append_service::in::general_bip.csv';
+// inputFile := '~wema::sbfe_append_service::in::general_bip.csv';
+inputFile := '~lahr::sbfe_append_service::in::general_bip';
 // outputFile := '~wema::out::sbfe_append_service_general_bip_nonSBFE_' + ThorLib.wuid() + '_SLBB1702_0_2_before';
 // outputFile := '~wema::out::sbfe_append_service_general_bip_nonSBFE_' + ThorLib.wuid() + '_SLBO1702_0_0_after';    //line 346
 
@@ -78,7 +79,7 @@ BlendedModelRequested := IF(includeBlendedModel,
      DATASET([], iesp.share.t_StringArrayItem)); 
      
 bus_in := record
-     string30  AccountNumber := '';
+     string30  acctno := '';
      string100 CompanyName := '';
 	   string100 AlternateCompanyName := '';
      string50  Addr := '';
@@ -124,8 +125,10 @@ SmallBusinessAnalyticsoutput := RECORD
 	STRING ErrorCode;
 END;
 
-f := IF(recordsToRun <= 0, DATASET(inputFile, bus_in, CSV(QUOTE('"'))), 
-                          CHOOSEN(DATASET(inputFile, bus_in, CSV(QUOTE('"'))), recordsToRun));
+// f := IF(recordsToRun <= 0, DATASET(inputFile, bus_in, CSV(QUOTE('"'))), 
+                          // CHOOSEN(DATASET(inputFile, bus_in, CSV(QUOTE('"'))), recordsToRun));
+													f := IF(recordsToRun <= 0, DATASET(inputFile, bus_in, Thor), 
+                          CHOOSEN(DATASET(inputFile, bus_in, Thor), recordsToRun));
 													
 // output(f, NAMED('Total_Input')); 
 // output(count(f), NAMED('Total_Input_Cnt')); 
@@ -171,7 +174,7 @@ f_with_seq := f_with_seq_Filtered_Rep;
 
 layout_soap := RECORD
 	STRING Seq;// Forcing this into the layout so that we have something to join the attribute results by to get the account number back
-	STRING AccountNumber;
+	STRING acctno;
 	DATASET(iesp.smallbusinessanalytics.t_SmallBusinessAnalyticsRequest) SmallBusinessAnalyticsRequest;
 	DATASET(Risk_Indicators.Layout_Gateways_In) Gateways;
 	DATASET(iesp.Share.t_StringArrayItem) Watchlists_Requested;
@@ -189,14 +192,14 @@ END;
 
 layout_soap transform_input_request(f_with_seq le, UNSIGNED8 ctr) := TRANSFORM
 	u := PROJECT(risk_indicators.iid_constants.ds_Record, TRANSFORM(iesp.share.t_User, 
-			SELF.AccountNumber := le.accountnumber; 
+			SELF.AccountNumber := le.acctno; 
 			SELF.DLPurpose := DPPA; 
 			SELF.GLBPurpose := GLBA; 
 			SELF.DataRestrictionMask := dataRestrictionMask_val; 
 			SELF.DataPermissionMask := dataPermissionMask_val; 
 			SELF := []));
 	o := PROJECT(risk_indicators.iid_constants.ds_Record, TRANSFORM(iesp.smallbusinessanalytics.t_SBAOptions, 
-			SELF.AttributesVersionRequest := AttributesRequested; 
+			// SELF.AttributesVersionRequest := AttributesRequested; 
    // To minimize errors, don't use blended model if the minimum input requirements aren't met.   
    AuthRepMinInputMet := (TRIM(le.Representativefirstname) <> '' AND TRIM(le.Representativelastname) <> '' AND TRIM(le.RepresentativeAddr) <> '' AND TRIM(le.RepresentativeCity) <> '' AND TRIM(le.RepresentativeState) <> '') OR 
 						(TRIM(le.Representativefirstname) <> '' AND TRIM(le.Representativelastname) <> '' AND TRIM(le.RepresentativeAddr) <> '' AND TRIM(le.RepresentativeZip) <> '') OR 
@@ -328,7 +331,7 @@ layout_soap transform_input_request(f_with_seq le, UNSIGNED8 ctr) := TRANSFORM
 	SELF.Global_Watchlist_Threshold := 0.84;
 
 	SELF.Seq := (STRING)le.seq;
-	SELF.AccountNumber := le.accountnumber;
+	SELF.acctno := le.acctno;
 	self.DisableBusinessShellLogging := true;  // turn off logging
 	SELF.DataPermissionMask := dataPermissionMask_val;
 
@@ -380,7 +383,7 @@ Other_Failed := SmallBusinessAnalytics_attributes(TRIM(ErrorCode) <> '' AND Stri
 // Now transform the attributes and scores into a flat layout
 layout_flat_v1 := RECORD
 		UNSIGNED6 seq;
-		STRING30 AccountNumber;
+		STRING30 acctno;
 		UNSIGNED3 HistoryDateYYYYMM;
 		STRING120 Bus_Company_Name;
 		UNSIGNED6 PowID;
@@ -414,7 +417,7 @@ END;
 
 layout_flat_v1 flatten_v1(layout_soap le, SmallBusinessAnalyticsoutput ri) := TRANSFORM
 	SELF.seq := (UNSIGNED)le.seq;
-	SELF.AccountNumber := le.AccountNumber;
+	SELF.acctno := le.acctno;
 	SELF.HistoryDateYYYYMM := le.HistoryDateYYYYMM;
 	SELF.Bus_Company_Name := ri.Result.InputEcho.Company.CompanyName;
 	SELF.PowID := ri.Result.BusinessID.PowID;
@@ -699,9 +702,9 @@ failureResults_seq := SORT(JOIN(DISTRIBUTE(SmallBusinessAnalytics_input, HASH64(
 				seq);
 failureResults := PROJECT(failureResults_seq, TRANSFORM({RECORDOF(LEFT) - seq}, SELF := LEFT));
 //This Returns any inputs that resulted in an error or whose result was dropped
-Error_Inputs_seq := SORT(JOIN(DISTRIBUTE(f_with_seq, HASH64(AccountNumber)), 
-		DISTRIBUTE(flatResults, HASH64(AccountNumber)), 
-		LEFT.AccountNumber = RIGHT.AccountNumber, 
+Error_Inputs_seq := SORT(JOIN(DISTRIBUTE(f_with_seq, HASH64(acctno)), 
+		DISTRIBUTE(flatResults, HASH64(acctno)), 
+		LEFT.acctno = RIGHT.acctno, 
 		TRANSFORM({UNSIGNED6 seq, bus_in}, SELF := LEFT), LEFT ONLY, LOCAL),
 		seq); 
 Error_Inputs := PROJECT(Error_Inputs_Seq, TRANSFORM({RECORDOF(LEFT) - seq}, SELF := LEFT));

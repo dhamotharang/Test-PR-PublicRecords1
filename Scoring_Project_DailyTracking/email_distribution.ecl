@@ -127,7 +127,7 @@ EXPORT Daily_Data_collections_fail_list :=
 					'Matthew.Ludewig@lexisnexisrisk.com;Isabel.Ma@lexisnexisrisk.com;apaar.sinha@lexisnexisrisk.com; Sheryl.Ramos@lexisnexisrisk.com;Daniel.Harkins@lexisnexisrisk.com; Noah.Lahr@lexisnexisrisk.com;Lucky.Mores@lexisnexisrisk.com;Vishesh.Dosaj@lexisnexisrisk.com';
 
 EXPORT KS_Success_list:=					 
-					'Matthew.Ludewig@lexisnexisrisk.com;Isabel.Ma@lexisnexisrisk.com; apaar.sinha@lexisnexisrisk.com;Vishesh.Dosaj@lexisnexisrisk.com; Sheryl.Ramos@lexisnexisrisk.com;Daniel.Harkins@lexisnexisrisk.com; Noah.Lahr@lexisnexisrisk.com;Lucky.Mores@lexisnexisrisk.com';				 
+					'Matthew.Ludewig@lexisnexisrisk.com;Isabel.Ma@lexisnexisrisk.com; apaar.sinha@lexisnexisrisk.com;Vishesh.Dosaj@lexisnexisrisk.com; Sheryl.Ramos@lexisnexisrisk.com;Crayton.Hudspeth@lexisnexisrisk.com;Daniel.Harkins@lexisnexisrisk.com; Noah.Lahr@lexisnexisrisk.com;Lucky.Mores@lexisnexisrisk.com';				 
 					 
 EXPORT BSS_Success_list:=						 
 					'Matthew.Ludewig@lexisnexisrisk.com;Isabel.Ma@lexisnexisrisk.com; apaar.sinha@lexisnexisrisk.com;Vishesh.Dosaj@lexisnexisrisk.com; Sheryl.Ramos@lexisnexisrisk.com;Daniel.Harkins@lexisnexisrisk.com; Noah.Lahr@lexisnexisrisk.com;Lucky.Mores@lexisnexisrisk.com';				 

@@ -1,6 +1,6 @@
 ﻿#workunit('name', 'RiskView_V5');
 
-IMPORT IESP, Models, Risk_Indicators, RiskWise, RiskProcessing, RiskView, ut, gateway;
+IMPORT IESP, RiskWise, RiskView, gateway, Data_Services;
 
 eyeball := 100;
 
@@ -12,7 +12,7 @@ threads := 2; // 1 - 30
 FCRARoxieIP := RiskWise.shortcuts.prod_batch_fcra;
 NeutralRoxieIP := RiskWise.shortcuts.prod_batch_neutral;
 	
-inputFile := ut.foreign_prod+'dvstemp::in::audit_input_file_w20140701-122932';
+inputFile := Data_Services.foreign_prod+'dvstemp::in::audit_input_file_w20140701-122932';
 outputFile := '~dvstemp::out::riskview_v5_' + thorlib.wuid();
 
 model1 := ''; // Populate this first, if only 1 model is being requested this will be the only model field populated
@@ -26,7 +26,8 @@ intendedPurpose := '';
 // intendedPurpose := 'PRESCREENING';
 // intendedPurpose := 'COLLECTIONS';
 
-attributesVersion := 'riskviewattrv5';
+attributesVersion := 'riskviewattrv5'; // standard request for RiskView 50 attributes
+// attributesVersion := 'riskviewattrv5FIS'; // standard RiskView 50 attributes with FIS attributes included
 
 DataRestrictionMask := '100001000100010000000000'; // to restrict fares, experian, transunion and experian FCRA 
 OverrideHistoryDate := 0; // Set to 0 or -1 to use the history date located on our inputFile, set to anything else to use this historydate
@@ -70,24 +71,24 @@ END;
 soapLayout intoSOAP(inputData le, UNSIGNED4 c) := TRANSFORM
 	self.filterLiens := false;  // temporary input option, RQ-12867
 	
-	name := PROJECT(ut.ds_oneRecord, TRANSFORM(iesp.share.t_Name,
+	name := DATASET([TRANSFORM(iesp.share.t_Name,
 						SELF.First := le.FirstName;
 						SELF.Middle := le.MiddleName;
 						SELF.Last := le.LastName;
-						SELF := []))[1];
-	address := PROJECT(ut.ds_oneRecord, TRANSFORM(iesp.share.t_Address,
+						SELF := [])])[1];
+	address := DATASET([TRANSFORM(iesp.share.t_Address,
 						SELF.StreetAddress1 := le.StreetAddress;
 						SELF.City := le.City;
 						SELF.State := le.State;
 						SELF.Zip5 := le.Zip;
-						SELF := []))[1];
-	dob := PROJECT(ut.ds_oneRecord, TRANSFORM(iesp.share.t_Date,
+						SELF := [])])[1];
+	dob := DATASET([TRANSFORM(iesp.share.t_Date,
 						SELF.Year := (integer)le.DateOfBirth[1..4];
 						SELF.Month := (integer)le.DateOfBirth[5..6];
 						SELF.Day := (integer)le.DateOfBirth[7..8];
-						SELF := []))[1];
+						SELF := [])])[1];
 	
-	search := PROJECT(ut.ds_oneRecord, TRANSFORM(iesp.riskview2.t_RiskView2SearchBy,
+	search := DATASET([TRANSFORM(iesp.riskview2.t_RiskView2SearchBy,
 						self.seq := le.AccountNumber;
 						SELF.Name := name;
 						SELF.Address := address;
@@ -97,39 +98,39 @@ soapLayout intoSOAP(inputData le, UNSIGNED4 c) := TRANSFORM
 						SELF.DriverLicenseState := le.DLState;
 						SELF.HomePhone := le.HomePhone;
 						SELF.WorkPhone := le.WorkPhone;
-						SELF := []));
+						SELF := [])]);
 	
-	models := PROJECT(ut.ds_oneRecord, TRANSFORM(iesp.riskview2.t_RiskView2Models,
+	models := DATASET([TRANSFORM(iesp.riskview2.t_RiskView2Models,
 						SELF.Names := IF(model1 <> '', DATASET([{model1}], iesp.share.t_StringArrayItem), DATASET([], iesp.share.t_StringArrayItem)) + 
 													IF(model2 <> '', DATASET([{model2}], iesp.share.t_StringArrayItem), DATASET([], iesp.share.t_StringArrayItem)) +
 													IF(model3 <> '', DATASET([{model3}], iesp.share.t_StringArrayItem), DATASET([], iesp.share.t_StringArrayItem)) +
 													IF(model4 <> '', DATASET([{model4}], iesp.share.t_StringArrayItem), DATASET([], iesp.share.t_StringArrayItem)) +
 													IF(model5 <> '', DATASET([{model5}], iesp.share.t_StringArrayItem), DATASET([], iesp.share.t_StringArrayItem));
 						SELF.ModelOptions := DATASET([], iesp.riskview_share.t_ModelOptionRV);
-						SELF := []));
-	option := PROJECT(ut.ds_oneRecord, TRANSFORM(iesp.riskview2.t_RiskView2Options,
+						SELF := [])]);
+	option := DATASET([TRANSFORM(iesp.riskview2.t_RiskView2Options,
 						SELF.IncludeModels := models[1];
 						SELF.AttributesVersionRequest := attributesVersion;
 						SELF.IncludeReport := FALSE; // Never request the Report
 						SELF.IntendedPurpose := intendedPurpose;
-						SELF := []));
+						SELF := [])]);
 	
-	users := PROJECT(ut.ds_oneRecord, TRANSFORM(iesp.share.t_User,
+	users := DATASET([TRANSFORM(iesp.share.t_User,
 						SELF.DataRestrictionMask := DataRestrictionMask;
 						SELF.AccountNumber := IF(le.AccountNumber <> '', le.AccountNumber, (STRING)c);
 						SELF.TestDataEnabled := FALSE;
 						SELF.OutcomeTrackingOptOut := TRUE;
-						SELF := []));
+						SELF := [])]);
 	
-	SELF.RiskView2Request := PROJECT(ut.ds_oneRecord, TRANSFORM(iesp.riskview2.t_RiskView2Request, 
+	SELF.RiskView2Request := DATASET([TRANSFORM(iesp.riskview2.t_RiskView2Request, 
 						SELF.SearchBy := search[1];
 						SELF.Options := option[1];
 						SELF.User := users[1];
-						SELF := []));
+						SELF := [])]);
 	
 	SELF.HistoryDateTimeStamp := '';
 
-	SELF.Gateways := PROJECT(ut.ds_oneRecord, TRANSFORM(Gateway.Layouts.Config, SELF.ServiceName := 'neutralroxie'; SELF.URL := NeutralRoxieIP; SELF := []));
+	SELF.Gateways := DATASET([TRANSFORM(Gateway.Layouts.Config, SELF.ServiceName := 'neutralroxie'; SELF.URL := NeutralRoxieIP; SELF := [])]);
 END;
 
 soapInput := DISTRIBUTE(PROJECT(inputData, intoSOAP(LEFT, COUNTER)), RANDOM());
@@ -420,6 +421,17 @@ flattened_result := project(soapResults, transform(roxie_output_layout,
 	self.PhoneInputSubjectCount := left.result.AttributesGroup.attributes(name='PhoneInputSubjectCount')[1].value;
 	self.PhoneInputMobile := left.result.AttributesGroup.attributes(name='PhoneInputMobile')[1].value;
 	self.AlertRegulatoryCondition := left.result.AttributesGroup.attributes(name='AlertRegulatoryCondition')[1].value;
+	// FIS Attributes
+	#IF(attributesVersion = 'riskviewattrv5FIS')
+	self.RV3SSNDeceased := left.result.AttributesGroup.attributes(name='RV3SSNDeceased')[1].value;
+	self.RV3ConfirmationSubjectFound := left.result.AttributesGroup.attributes(name='RV3ConfirmationSubjectFound')[1].value;
+	self.RV3SourceNonDerogCount := left.result.AttributesGroup.attributes(name='RV3SourceNonDerogCount')[1].value;
+	self.RV3AddrChangeCount12Month := left.result.AttributesGroup.attributes(name='RV3AddrChangeCount12Month')[1].value;
+	self.RV3AddrChangeCount60Month := left.result.AttributesGroup.attributes(name='RV3AddrChangeCount60Month')[1].value;
+	self.RV3AddrInputTimeOldest := left.result.AttributesGroup.attributes(name='RV3AddrInputTimeOldest')[1].value;
+	self.RV3AssetPropCurrentCount := left.result.AttributesGroup.attributes(name='RV3AssetPropCurrentCount')[1].value;
+	self.RV3AssetIndex := left.result.AttributesGroup.attributes(name='RV3AssetIndex')[1].value;
+	#END
 	
 	self.Alert1 := left.result.alerts[1].code;
 	self.Alert2 := left.result.alerts[2].code;
@@ -438,4 +450,4 @@ flattened_result := project(soapResults, transform(roxie_output_layout,
 	self := []));
 	
 output(choosen(flattened_result, eyeball), named('flattened_result'));
-output(flattened_result,,outfile_name, CSV(heading(single), quote('"')));
+output(flattened_result,,outputFile, CSV(heading(single), quote('"')));

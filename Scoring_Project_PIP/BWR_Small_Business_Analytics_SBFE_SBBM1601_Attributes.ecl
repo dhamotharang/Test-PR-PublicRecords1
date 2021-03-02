@@ -29,7 +29,8 @@ RoxieIP := RiskWise.shortcuts.QA_neutral_roxieIP;                  // CERT
 // RoxieIP := 'http://dev156vip.hpcc.risk.regn.net:9876';  // dev roxie 156
 
 // inputFile := Data_Services.foreign_prod + 'jpyon::in::compass_1190_bus_shell_in_in';
-inputFile := '~wema::sbfe_append_service::in::general_bip.csv';
+// inputFile := '~wema::sbfe_append_service::in::general_bip.csv';
+inputFile := '~lahr::sbfe_append_service::in::general_bip';
 // outputFile := '~wema::out::sbfe_append_service_general_bip_' + ThorLib.wuid() + '_BBFM1811_1_0_attributes_before';      
 // outputFile := '~wema::out::sbfe_append_service_general_bip_' + ThorLib.wuid() + '_SBBM1601_0_0_attributes_after';      
 // outputFile := '~wema::out::sbfe_append_service_general_bip_' + ThorLib.wuid() + '_BBFM1811_1_0_attributes_after';      //////////// line 313
@@ -39,8 +40,8 @@ outputFile := '~ScoringQA::out::SBFE::Small_Business_Analytics_SBBM1601_Attribut
 
 // //////////%file_table%  := dataset( '~ScoringQA::out::' + product_type +'::' + lay +'_' +date_in,  #expand(lay) ,thor );
 
-includeSBFE := TRUE;				// Return SBFE attributes and SBA attributes (Note: DataPermissionMask_val must be set to '00000000000100000000' to allow SBFE data)
-// includeSBFE := FALSE;		// Just return SBA attributes without SBFE attributes	
+// includeSBFE := TRUE;				// Return SBFE attributes and SBA attributes (Note: DataPermissionMask_val must be set to '00000000000100000000' to allow SBFE data)
+includeSBFE := FALSE;		// Just return SBA attributes without SBFE attributes	
 
 // Universally Set the History Date for ALL records. Set to 0 to use the History Date located on each record of the input file
 histDateYYYYMM := 0;
@@ -86,7 +87,7 @@ ModelsRequested :=
  
 // Input layout:
 bus_in := record
-     string30  AccountNumber := '';
+     string30  acctno := '';
      string100 CompanyName := '';
 	   string100 AlternateCompanyName := '';
      string50  Addr := '';
@@ -125,16 +126,28 @@ bus_in := record
 		 
 end;
 
-f := 
+// f := 
+	// IF(
+		// recordsToRun <= 0, 
+		// DATASET(inputFile, bus_in, CSV(QUOTE('"'))), 
+		// CHOOSEN( DATASET(inputFile, bus_in, CSV(QUOTE('"'))), recordsToRun )
+	// );
+	// f := 
+	// IF(
+		// recordsToRun <= 0, 
+		// DATASET(inputFile, bus_in, CSV(QUOTE('"'))), 
+		// CHOOSEN( DATASET(inputFile, bus_in, CSV(QUOTE('"'))), recordsToRun )
+	// );
+	f := 
 	IF(
 		recordsToRun <= 0, 
-		DATASET(inputFile, bus_in, CSV(QUOTE('"'))), 
-		CHOOSEN( DATASET(inputFile, bus_in, CSV(QUOTE('"'))), recordsToRun )
+		DATASET(inputFile, bus_in, Thor), 
+		CHOOSEN( DATASET(inputFile, bus_in, Thor), recordsToRun )
 	);
 
 layout_soap := RECORD
 	STRING Seq;// Forcing this into the layout so that we have something to join the attribute results by to get the account number back
-	STRING AccountNumber;
+	STRING acctno;
 	DATASET(iesp.smallbusinessanalytics.t_SmallBusinessAnalyticsRequest) SmallBusinessAnalyticsRequest;
 	DATASET(Risk_Indicators.Layout_Gateways_In) Gateways;
 	DATASET(iesp.Share.t_StringArrayItem) Watchlists_Requested;
@@ -152,14 +165,14 @@ END;
 
 layout_soap transform_input_request(f le, UNSIGNED8 ctr) := TRANSFORM
 	u := PROJECT(ut.ds_oneRecord, TRANSFORM(iesp.share.t_User, 
-			SELF.AccountNumber := le.accountnumber; 
+			SELF.AccountNumber := le.acctno; 
 			SELF.DLPurpose := '1'; 
 			SELF.GLBPurpose := '1'; 
 			SELF.DataRestrictionMask := dataRestrictionMask_val; 
 			SELF.DataPermissionMask := dataPermissionMask_val; 
 			SELF := []));
 	o := PROJECT(ut.ds_oneRecord, TRANSFORM(iesp.smallbusinessanalytics.t_SBAOptions, 
-			SELF.AttributesVersionRequest := AttributesRequested; 
+			// SELF.AttributesVersionRequest := AttributesRequested; 
 			SELF.IncludeModels.Names := ModelsRequested; 
 			SELF := []));
 	c := PROJECT(ut.ds_oneRecord, TRANSFORM(iesp.smallbusinessanalytics.t_SBACompany, 
@@ -286,7 +299,7 @@ layout_soap transform_input_request(f le, UNSIGNED8 ctr) := TRANSFORM
 	SELF.Global_Watchlist_Threshold := 0.84;
 
 	SELF.Seq := (STRING)ctr;
-	SELF.AccountNumber := le.accountnumber;
+	SELF.acctno := le.acctno;
 	SELF.OutcomeTrackingOptOut := TRUE;  // Turn off SCOUT logging
 	SELF.DataPermissionMask := dataPermissionMask_val;
 
@@ -339,7 +352,7 @@ Other_Failed := SmallBusinessAnalytics_attributes(TRIM(ErrorCode) <> '' AND Stri
 
 // Now transform the attributes and scores into a flat layout
 layout_flat_v1 := RECORD
-		STRING30 AccountNumber;
+		STRING30 acctno;
 		UNSIGNED3 HistoryDateYYYYMM;
 		STRING120 Bus_Company_Name;
 		UNSIGNED6 PowID;
@@ -376,7 +389,7 @@ getValue(DATASET(iesp.share.t_NameValuePair) AttributeResults, STRING AttributeN
 		AttributeResults(StringLib.StringToLowerCase(Name) = StringLib.StringToLowerCase(AttributeName))[1].Value;
 
 layout_flat_v1 flatten_v1(layout_soap le, SmallBusinessAnalyticsoutput ri) := TRANSFORM
-	SELF.AccountNumber := le.AccountNumber;
+	SELF.acctno := le.acctno;
 	SELF.HistoryDateYYYYMM := le.HistoryDateYYYYMM;
 	SELF.Bus_Company_Name := ri.Result.InputEcho.Company.CompanyName;
 	SELF.PowID := ri.Result.BusinessID.PowID;
