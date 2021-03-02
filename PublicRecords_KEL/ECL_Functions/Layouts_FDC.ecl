@@ -1196,6 +1196,7 @@ SHARED unsigned1 iType := IF(Options.IsFCRA, data_services.data_env.iFCRA, data_
 		PropertyV2_Key_Assessor_Fid_Records.recording_date;
 		PropertyV2_Key_Assessor_Fid_Records.sale_date;
 		PropertyV2_Key_Assessor_Fid_Records.sales_price;
+		PropertyV2_Key_Assessor_Fid_Records.document_type;
 		PropertyV2_Key_Assessor_Fid_Records.mortgage_loan_amount;
 		PropertyV2_Key_Assessor_Fid_Records.mortgage_loan_type_code;
 		PropertyV2_Key_Assessor_Fid_Records.prior_recording_date;
@@ -1251,6 +1252,7 @@ SHARED unsigned1 iType := IF(Options.IsFCRA, data_services.data_env.iFCRA, data_
 		PropertyV2_Key_Deed_Fid_Records.contract_date;
 		PropertyV2_Key_Deed_Fid_Records.recording_date;
 		PropertyV2_Key_Deed_Fid_Records.sales_price;
+		PropertyV2_Key_Deed_Fid_Records.document_type_code;
 		PropertyV2_Key_Deed_Fid_Records.land_lot_size;
 		PropertyV2_Key_Deed_Fid_Records.vendor_source_flag;
 		BOOLEAN current_record;
