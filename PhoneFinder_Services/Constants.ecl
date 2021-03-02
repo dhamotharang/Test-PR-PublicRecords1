@@ -176,12 +176,12 @@ MODULE
   END;
 
   EXPORT ThreatMetrixConstants := MODULE
-    EXPORT STRING20 OrgId    := 'ymyo6b64';
-    EXPORT STRING50 ApiKey   := 'ivdshxsu3m5xmoom';
+    EXPORT STRING20 OrgId    := '9hxmziuy';
+    EXPORT STRING50 ApiKey   := 'tmvy1fr36dfpqpq9';
     EXPORT STRING30 Policy   := 'Digital Insights';
     EXPORT STRING30 ApiType  := 'AttributeQuery';
     EXPORT STRING20 serviceType := 'all';
-    EXPORT BOOLEAN 	NoPIIPersistence := TRUE;
+    EXPORT BOOLEAN  NoPIIPersistence := TRUE;
   END;
 
   EXPORT ConsentLevels := MODULE

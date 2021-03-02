@@ -10,7 +10,8 @@ export death_id := record
 end;
 
 export search_ID := record(death_id)
-	boolean isDeepDive := false;
+  boolean isDeepDive := false;
+  unsigned1 SearchIndicator := 4;
 end;
 
 export search_ID_with_matchcode := record

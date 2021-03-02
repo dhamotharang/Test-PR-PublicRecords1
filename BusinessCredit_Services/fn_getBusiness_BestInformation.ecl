@@ -1,4 +1,4 @@
-﻿IMPORT Address, BIPV2, BIPV2_Best, BIPV2_Best_SBFE, Business_Credit, Codes, Cortera, DCAV2, Doxie, DX_Equifax_Business_Data,
+﻿IMPORT Address, BIPV2, BIPV2_Best, BIPV2_Best_SBFE, Business_Credit, Codes, DCAV2, Doxie, dx_Cortera, dx_Equifax_Business_Data,
        iesp, TopBusiness_Services;
 
 EXPORT fn_getBusiness_BestInformation (
@@ -107,7 +107,7 @@ EXPORT fn_getBusiness_BestInformation (
       SELF := LEFT; SELF := []));
            
     // get cortera header info
-    corteraLinkIdInfo := Cortera.Key_LinkIds.kfetch2(blink_ids,
+    corteraLinkIdInfo := dx_Cortera.Key_LinkIds.kfetch2(blink_ids,
                                                      inmod.fetchLevel,,
                                                      BusinessCredit_Services.Constants.KFETCH_MAX_LIMIT,,
                                                      mod_access);

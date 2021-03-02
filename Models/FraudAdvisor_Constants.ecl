@@ -17,6 +17,7 @@ EXPORT attrV202 := 'fraudpointattrv202';
 // EXPORT attrV203 := 'fraudpointattrv203';        //effectively removed, but leaving this here as a reminder
 EXPORT attrvparo := 'fraudpointattrvparo';
 EXPORT attrvTMX := 'fraudpointattrv202_diattrv1';
+EXPORT attrIDA := 'fraudintelattrv0.0';            //IDA Attributes (not to be confused with idattributes)
 
 //The ‘fraudpoint2_models’ set are models that return risk indicies and so need the expanded layout.
 EXPORT fraudpoint2_models := ['fp1109_0', 'fp1109_9', 'fp1307_2', 'fp1307_1', 'fp31310_2',

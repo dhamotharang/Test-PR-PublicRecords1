@@ -1,0 +1,17 @@
+{
+  "name": "ecl-scripts",
+  "version": "1.0.0",
+  "description": "scripts for running ecl queries",
+  "main": "",
+  "dependencies": {
+    "node-fetch": "^2.6.1",
+    "simple-crypto-js": "^2.5.0",
+    "xml-js": "^1.6.11"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": ""
+  },
+  "author": "collda01",
+  "license": ""
+}

@@ -80,6 +80,7 @@
   <part name="IncludeFirearmsAndExplosives" type="xsd:boolean"/>
   <part name="IncludeWeaponPermits" type="xsd:boolean"/>
   <part name="IncludeSexualOffenses" type="xsd:boolean"/>
+  <part name="IncludeRealTimePhones" type="xsd:boolean"/>
 
   <part name="IncludeInternetDomains" type="xsd:boolean"/>
 
@@ -182,7 +183,8 @@
 */
 /*--INFO-- This service searches all available datafiles.*/
 
-import AutoheaderV2, Gateway, doxie, CriminalRecords_Services, doxie_crs, doxie_raw, DriversV2_Services, images, Royalty, ut;
+import  AutoheaderV2, Gateway, doxie, CriminalRecords_Services, doxie_crs, doxie_raw, 
+        DriversV2_Services, images, Royalty, ut, Phones;
 
 export Comprehensive_Report_Service := MACRO
 #CONSTANT('SearchLibraryVersion', AutoheaderV2.Constants.LibVersion.SALT);
@@ -257,6 +259,28 @@ end;
 crmr := CriminalRecords_Services.ReportService_Records.val(crim_mod);
 docr2 := IF (CriminalRecordVersion = 2 and Include_CriminalRecords_val,crmr[1].CriminalRecords);
 
+// get realtime phones
+useRTP := Include_RealTimePhones and
+          doxie.Compliance.use_qsent(mod_access.DataPermissionMask) and
+          not doxie.Compliance.isQSentRestricted(mod_access.DataRestrictionMask);
+
+in_mod := MODULE(PROJECT(AutoStandardI.GlobalModule(),doxie.realTimePhonesParams.searchParams, OPT))
+    EXPORT STRING11   SSN := cent.best_information_children[1].ssn;
+    EXPORT STRING30   LastName := cent.best_information_children[1].lname;
+    EXPORT STRING     DataPermissionMask := mod_access.DataPermissionMask;
+    EXPORT STRING     DataRestrictionMask := mod_access.DataRestrictionMask;
+    EXPORT UNSIGNED1  DPPAPurpose :=  mod_access.DPPA;
+    EXPORT UNSIGNED1  GLBPurpose := mod_access.GLB;
+    EXPORT BOOLEAN    isFCRA_val := FALSE;
+		EXPORT DATASET(Gateway.Layouts.Config) Gateways := gateways_in;
+  END;
+
+rtpRecs := IF(useRTP,Doxie.get_realtime_phones_remote(in_mod));
+
+rtpRecs_filt := rtpRecs.Results(did =(STRING15)dids[1].did);
+
+rtpRecs_royalties := rtpRecs.RoyaltySet;
+
 
 //**** Full record def
 outrec := doxie_crs.layout_report;
@@ -273,6 +297,21 @@ outrec patch(cent l) := transform
   self.DOC2_children := global(docr2);
   self.TransactionHistory := global(transaction_hist);
   self.progressive_Phones := global(progressivePhones);
+
+  // typeflag is needed for sorting but is not needed in the final layout.
+  rtp_inhouse_filt := PROJECT(rtpRecs_filt(typeflag NOT IN [Phones.Constants.TypeFlag.DataSource_PV,Phones.Constants.TypeFlag.DataSource_iQ411]),
+                        TRANSFORM(Doxie.layout_realTimePhones.rtp_out_layout_final,
+                          SELF := LEFT));
+                  
+  rtp_gateway_filt := PROJECT(rtpRecs_filt(typeflag IN [Phones.Constants.TypeFlag.DataSource_PV,Phones.Constants.TypeFlag.DataSource_iQ411]),
+                        TRANSFORM(Doxie.layout_realTimePhones.rtp_out_layout_final,
+                          SELF := LEFT));
+
+  rtp_inhouse_filt_sort := SORT(rtp_inhouse_filt, -dt_last_seen, RECORD);
+  // gateways records don't have dt_last_seen.
+  rtp_gateway_filt_sort := SORT(rtp_gateway_filt, RECORD);
+  // move gateway records to the top.
+  self.realtime_phones_children := IF(Include_RealTimePhones, rtp_gateway_filt_sort & rtp_inhouse_filt_sort);
   self := l;
 end;
 
@@ -289,7 +328,7 @@ end;
 //***** SOURCE WORK *****
 
 // if u include a new entry into doxie.Source_counts
-//update the count below this transform in normalize
+// update the count below this transform in normalize
 layout_flag into_flags(src_recs L, integer C) := transform
   self.field_present := choose(C,
             if (L.atf_cnt != 0,'ATF', skip),
@@ -366,7 +405,7 @@ recflags2 := normalize(header_recs, 3, into_flags2(LEFT,COUNTER));
 
 recflags := if (not Exclude_Sources_val, dedup(recflags1 + recflags2,all));
 
-//***** ROYALTY WORK *****
+// ***** ROYALTY WORK *****
 
 doxie_crs.layout_property_ln property_child(doxie_crs.layout_property_ln l):= transform
 self := l;
@@ -395,13 +434,15 @@ Royalty.MAC_RoyaltyEmail(all_records.email_children, royalties_email,, false);
 Royalty.RoyaltyVehicles.MAC_ReportSet(all_records.RealTime_Vehicle_children, royalties_rtv, datasource, vehicleinfo.vin);
 Royalty.RoyaltyEFXDataMart.MAC_GetWebRoyalties(all_records.premium_phone_children,equifax_royalties,vendor,MDR.sourceTools.src_EQUIFAX);
 FDN_Royalties := Royalty.RoyaltyFDNCoRR.GetOnlineRoyalties(FDNrecords_table);
-//----------------------------------------
+// ----------------------------------------
 trackFares := not is_consumer and (Include_Properties_val or Include_PriorProperties or Include_foreclosures_val);
 royalties := if(trackFares,royalties_fares) +
              if(Include_Email_Addresses_val,if(EmailVersion=2, cent.EmailV2Royalties, royalties_email)) +
              if(IncludeRTVeh_val, royalties_rtv) +
              if(Include_PremiumPhones_val, equifax_royalties) +
+             if(Include_RealTimePhones, rtpRecs_royalties) +
              if(IncludeFDNSubjectOnly or IncludeFDNAllAssociations, FDN_Royalties);
+
 
 //***** ALERT WORK *****
 
@@ -419,10 +460,10 @@ DO_ALL :=
   parallel(
   IF(sendResults,
     parallel(
-      output(use_records,named('CRS_result')),
+      output(use_records,named('CRS_result'));
       output(src_recs,named('Source_Counts')),
       output(recflags,named('Source_Flags')),
-      output(royalties,named('RoyaltySet')))),
+      output(royalties,named('RoyaltySet'))));
   IF(sendHashes or versionChange,
     parallel(
       output(outputHashes,named('Hashes')),

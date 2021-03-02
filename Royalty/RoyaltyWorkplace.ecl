@@ -15,7 +15,39 @@
 	
 	RETURN dRoyaltiesByEmail;
 	ENDMACRO;		
-	
+
+  EXPORT GetRoyaltySet(dRecsIn, pSrcField='source') := FUNCTIONMACRO
+
+    royalty_set := Royalty.Constants.WORKPLACE_ROYALTY_SET;
+
+    Royalty.Layouts.Royalty xAddRoyalty(RECORDOF(dRecsIn) L) := TRANSFORM  
+      royalty_type_code      := Royalty.Functions.GetWorkplaceTypeCode(L.pSrcField);
+      royalty_type           := Royalty.Functions.GetRoyaltyType(royalty_type_code);
+      is_royalty             := L.pSrcField IN royalty_set;
+      is_valid_type_code     := royalty_type_code > 0;
+
+      SELF.royalty_type      := royalty_type;
+      SELF.royalty_type_code := IF(is_valid_type_code, royalty_type_code, SKIP);
+      SELF.royalty_count     := IF(is_royalty, 1, 0);
+      SELF.non_royalty_count := IF(is_royalty, 0, SKIP);
+    END;
+
+    royalties_sorted := sort(project(dRecsIn, xAddRoyalty(left)), Royalty_type_code);    
+    
+    Royalty.Layouts.Royalty xCombine(Royalty.Layouts.Royalty L, Royalty.Layouts.Royalty R) := transform
+      self.Royalty_type_code := L.Royalty_type_code;
+      self.Royalty_type := L.Royalty_type;
+      self.Royalty_count := L.Royalty_count + R.Royalty_count;
+      self.non_Royalty_count := L.non_Royalty_count + R.non_Royalty_count;
+      self.count_entity := L.count_entity + R.count_entity;
+    end;
+
+    combined_royalties := rollup(royalties_sorted, LEFT.Royalty_type_code = RIGHT.Royalty_type_code, xCombine(LEFT, RIGHT));
+
+    RETURN combined_royalties;
+
+  ENDMACRO;
+
 	export GetBatchRoyaltySet(dRecsOut, pSrcField='source', pReturnDetails = 'false', pSpouseSrcField='spouse_source',
 														pEmailSrc1= 'email_src1', pEmailSrc2= 'email_src2', pEmailSrc3= 'email_src3',
 														pEmailSrc_spouse1= 'spouse_email_src1', pEmailSrc_spouse2= 'spouse_email_src2', pEmailSrc_spouse3= 'spouse_email_src3'

@@ -38,4 +38,5 @@ EXPORT layout_progressive_phone_common := RECORD
   STRING60  Meta_Contact_Email := '';
   STRING10  Meta_Contact_Phone := '';
   STRING10  Meta_Contact_Fax   := '';
+  UNSIGNED1 Phone_StarRating   := 0;
 END;

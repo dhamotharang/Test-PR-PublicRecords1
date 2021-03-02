@@ -1,37 +1,29 @@
-﻿/*--SOAP--
-<message name="Possible_Incarceration_Indicator_Batch_ServiceFCRA" wuTimeout="300000">
-  <part name="Return_DOC_Name" type="xsd:boolean"/>
-  <part name="Return_SSN" type="xsd:boolean"/>
-  <part name="DPPAPurpose" type="xsd:unsignedInt"/>
-  <part name="GLBPurpose" type="xsd:unsignedInt"/>
-  <part name="DataRestrictionMask" type="xsd:string"/>
-  <part name="FFDOptionsMask" type="xsd:string"/>
-  <part name="FCRAPurpose" type="xsd:string"/>
-  <part name="batch_in"             type="tns:XmlDataSet" cols="70" rows="25"/>
-  <part name="Gateways" type="tns:XmlDataSet" cols="70" rows="8"/>
-</message>
-*/
+﻿// =====================================================================
+// ROXIE QUERY
+// -----------
+// For the complete list of input parameters please check published WU.
+// Look at the history of this attribute for the old SOAP info.
+// =====================================================================
 /*--INFO-- FCRA Incarceration Indicator.*/
-
 
 IMPORT AutoStandardI, BatchShare, CriminalRecords_BatchService,ut;
 
 EXPORT Possible_Incarceration_Indicator_Batch_ServiceFCRA() := MACRO
-  boolean isFCRA := true;
+  BOOLEAN isFCRA := TRUE;
 
   ds_xml_in := DATASET([], CriminalRecords_BatchService.Layouts.batch_pii_in) : STORED('batch_in', FEW);
   BOOLEAN Return_Doc_Name := FALSE : STORED('Return_DOC_Name');
   BOOLEAN Return_SSN := FALSE : STORED('Return_SSN');
 
   gm := AutoStandardI.GlobalModule(isFCRA);
-  batch_params		:= BatchShare.IParam.getBatchParams();
-  pii_batch_params := module(project(batch_params, CriminalRecords_BatchService.IParam.batch_params, opt))
-    export dataset (Gateway.layouts.config) gateways := Gateway.Configuration.Get();
-    export integer8 FFDOptionsMask := FFD.FFDMask.Get();
-    export integer FCRAPurpose := FCRA.FCRAPurpose.Get();
-    export ReturnDocName := Return_Doc_Name;
-    export ReturnSSN := Return_SSN;
-  end;
+  batch_params := BatchShare.IParam.getBatchParams();
+  pii_batch_params := MODULE(PROJECT(batch_params, CriminalRecords_BatchService.IParam.batch_params, OPT))
+    EXPORT DATASET (Gateway.layouts.config) gateways := Gateway.Configuration.Get();
+    EXPORT INTEGER8 FFDOptionsMask := FFD.FFDMask.Get();
+    EXPORT INTEGER FCRAPurpose := FCRA.FCRAPurpose.Get();
+    EXPORT ReturnDocName := Return_Doc_Name;
+    EXPORT ReturnSSN := Return_SSN;
+  END;
 
   // run input through some standard procedures
   BatchShare.MAC_SequenceInput(ds_xml_in, ds_sequenced);
@@ -43,11 +35,11 @@ EXPORT Possible_Incarceration_Indicator_Batch_ServiceFCRA() := MACRO
 
   crim_out:= CriminalRecords_BatchService.Possible_Incarceration_Indicator_Batch_Service_Records(pii_batch_params, ds_batch_did, isFCRA);
   ds_batch_out := crim_out.Records;
-  statements 	 := crim_out.Statements;
+  statements := crim_out.Statements;
 
   // Restore original acctno.
   BatchShare.MAC_RestoreAcctno(ds_batch_did, ds_batch_out, ds_batch_ready);
-  BatchShare.MAC_RestoreAcctno(ds_batch_did, statements, statements_ready, false, false);
+  BatchShare.MAC_RestoreAcctno(ds_batch_did, statements, statements_ready, FALSE, FALSE);
 
   ut.mac_TrimFields(ds_batch_ready, 'ds_batch_ready', results);
 

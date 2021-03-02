@@ -1,7 +1,7 @@
 ﻿// ================================================================================
 // ===== RETURNS Cortera Source Doc records in an ESP-COMPLIANT WAY ====
 // ================================================================================
-IMPORT BIPV2, Cortera, Doxie, iesp, MDR, TopBusiness_Services;
+IMPORT BIPV2, Doxie, dx_Cortera, iesp, MDR, TopBusiness_Services;
 
 EXPORT CorteraSource_Records (
   DATASET(TopBusiness_Services.Layouts.rec_input_ids_wSrc) in_docids,
@@ -26,13 +26,13 @@ EXPORT CorteraSource_Records (
   SHARED cortera_key_combined := in_docids(IdValue <> '') + ds_corterakeys;		
   SHARED cortera_key_combinedSlim := DEDUP(SORT(cortera_key_combined, idValue),idValue);
 																																													 									 
-  SHARED cortera_payload_all := JOIN(cortera_key_combinedSlim,Cortera.Key_Header_Link_Id,	                                     
+  SHARED cortera_payload_all := JOIN(cortera_key_combinedSlim,dx_Cortera.Key_Header_Link_Id,	                                     
                                      KEYED((INTEGER4)LEFT.IDValue = RIGHT.link_id),
                                      TRANSFORM(RIGHT),
                                      KEEP(1));
                                      // For cases in which a idvalue has multiple linkids;
 	
-  Cortera.MAC_Append_Contact(cortera_payload_all, SHARED cortera_payload, mod_access, /*append_contacts*/ TRUE);
+  dx_Cortera.mac_check_access(cortera_payload_all, SHARED cortera_payload, mod_access, /*append_contacts*/ TRUE);
 	       
    // name not cleaned into subpart so just using name last field for whole name														 
 	 iesp.topbusinessOtherSources.t_OtherContact xform_contacts(recordof(cortera_payload) L, INTEGER C) := TRANSFORM

@@ -5,7 +5,8 @@ EXPORT Prep_IDA_fraud(DATASET(Risk_Indicators.layouts.layout_IDA_in) indata,
                       DATASET(Models.Layouts.Layout_Model_Request_In) Model_requests,
                       UNSIGNED1 Timeout_sec = 3,
                       UNSIGNED1 Retries = 0,
-                      BOOLEAN On_thor = FALSE
+                      BOOLEAN On_thor = FALSE,
+                      BOOLEAN doIDA_Attributes = FALSE
                      ) := FUNCTION
 
   //Check to see how we should be running the IDA call
@@ -36,16 +37,20 @@ EXPORT Prep_IDA_fraud(DATASET(Risk_Indicators.layouts.layout_IDA_in) indata,
   //----------------------------------------------------------------------------
   
   //how to get Product Name into this function? pass in gateway info or by itself?
-  tempProductName := MAP(Models.FP_models.Model_Check(Model_requests, ['fibn12010_0', IDA_models])  => 'LNFraudAttributes',
-                         Models.FP_models.Model_Check(Model_requests, ['modeling_attribute_model']) => 'LNFraudAttributes', //This might need to change once we know what it is
-                                                                                                       '' //Then IDA isn't needed
+  tempProductName := MAP(Models.FP_models.Model_Check(Model_requests, ['fibn12010_0', IDA_models]) OR doIDA_Attributes  => 'LNFraudAttributes',
+                         Models.FP_models.Model_Check(Model_requests, ['modeling_attribute_model']) OR doIDA_Attributes => 'LNFraudAttributes', //This might need to change once we know what it is
+                                                                                                                           '' //Then IDA isn't needed
                      );
+                     
   //how to get productID into this function? pass in gateway info or as a passed parameter
-  tempProductID := MAP(Models.FP_models.Model_Check(Model_requests, ['fibn12010_0'])              => 'LFB1.0',
-                       Models.FP_models.Model_Check(Model_requests, IDA_models)                   => 'LFSS1.0',
-                       Models.FP_models.Model_Check(Model_requests, ['modeling_attribute_model']) => 'XA1.0',  //This will need to change once we know what it is
-                                                                                                     '' //Then IDA isn't needed
-                     );
+  // tempProductID := MAP(Models.FP_models.Model_Check(Model_requests, ['fibn12010_0'])              => 'LFB1.0',
+                       // Models.FP_models.Model_Check(Model_requests, IDA_models)                   => 'LFSS1.0',
+                       // Models.FP_models.Model_Check(Model_requests, ['modeling_attribute_model']) => 'XA1.0',  //This will need to change once we know what it is
+                                                                                                     // '' //Then IDA isn't needed
+                     // );
+                     
+  //Using LFSS1.0 (returns all attributes) for all IDA models, but keeping lines above in case we need to revert
+  tempProductID := 'LFSS1.0';
   
   //populate ProductName and ID based on what's requested.
   IDA_input := PROJECT(indata, TRANSFORM(Risk_Indicators.layouts.layout_IDA_in,
@@ -72,7 +77,8 @@ EXPORT Prep_IDA_fraud(DATASET(Risk_Indicators.layouts.layout_IDA_in) indata,
                   TRANSFORM(Risk_Indicators.layouts.layout_IDA_out,
                             SELF.Seq := LEFT.seq,
                             SELF.APP_ID := LEFT.APP_ID,
-                            SELF.Indicators := RIGHT.response.outputrecord.Indicators
+                            SELF.Indicators := RIGHT.response.outputrecord.Indicators,
+                            SELF := [] //Don't need the IDScoreResultCode fields in Fraud so blank them out.
                             ));
   
   // output(IDA_input, named('Prep_IDA_input'));
