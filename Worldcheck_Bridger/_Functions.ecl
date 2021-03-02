@@ -1401,6 +1401,15 @@
 				trim(kword, left, right) = 'PTERSE' =>SubGroup_Constants.numKeywordsID.KEYWORD_PTERSE,
 				trim(kword, left, right) = 'IDGAKKUM' =>SubGroup_Constants.numKeywordsID.KEYWORD_IDGAKKUM,
 				trim(kword, left, right) = 'IRISR-WC' =>SubGroup_Constants.numKeywordsID.KEYWORD_IRISR_WC,
+				trim(kword, left, right) = 'SECO-DUSMG' =>SubGroup_Constants.numKeywordsID.KEYWORD_SECO_DUSMG,
+				trim(kword, left, right) = 'PLUODO' =>SubGroup_Constants.numKeywordsID.KEYWORD_PLUODO,
+				trim(kword, left, right) = 'OFAC-BM-EO' =>SubGroup_Constants.numKeywordsID.KEYWORD_OFAC_BM_EO,
+				trim(kword, left, right) = 'OFAC-PEESA' =>SubGroup_Constants.numKeywordsID.KEYWORD_OFAC_PEESA,
+				trim(kword, left, right) = 'KWCMA' =>SubGroup_Constants.numKeywordsID.KEYWORD_KWCMA,
+				trim(kword, left, right) = 'KWBK' =>SubGroup_Constants.numKeywordsID.KEYWORD_KWBK,
+				trim(kword, left, right) = 'OFAC-BM-EO14014' =>SubGroup_Constants.numKeywordsID.KEYWORD_OFAC_BM_EO14014,
+				trim(kword, left, right) = 'USSLEA' =>SubGroup_Constants.numKeywordsID.KEYWORD_USSLEA,
+				trim(kword, left, right) = 'LUXOL-WC' =>SubGroup_Constants.numKeywordsID.KEYWORD_LUXOL_WC,
 								
 				//When setting the keyword export use underscores for dashes (ex: For RBI-SANC, use RBI_SANC)	
 				

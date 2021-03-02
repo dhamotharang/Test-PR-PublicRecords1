@@ -94,6 +94,7 @@ export proc_build_all(
   ,pSkipUpdateDOPS        = 'false'
   ,pSkipDOTSpecsPost      = 'false'
   ,pSkipSeleRelSpecsPost  = 'false'
+  ,pSkipUnderlinkReport   = 'false'
   ,pOmitDisposition       = '' // NOTE: Set to 'preserve' or 'ghost' to recover from a missing source in the ingest file
   // ,pOmitDisposition       = 'preserve' // temporary, until MO Corps and MS Corps problems are resolved  
 
@@ -197,6 +198,7 @@ functionmacro
       ,UpdateBIPV2WeeklyKeysDops
       ,copyFatherCommonBase2StorageThor
       ,Wait4PostProcessThreads
+      ,if(pSkipUnderlinkReport = false ,BIPV2_Build.proc_Underlink_Report    (pversion  ,pCompileTest))
       // ,if(pSkipDOTSpecsPost     = false ,BIPV2_Build.proc_dotid().runSpecs())
       // ,if(pSkipSeleRelSpecsPost = false ,BIPV2_Build.proc_Seleid_relatives     (pversion,true,false,false       ))
       

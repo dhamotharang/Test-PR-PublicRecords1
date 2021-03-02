@@ -54,8 +54,8 @@ EXPORT Files_eCrash := MODULE
   // #################################################################################
   //             Ecrash Suffixes for Accidents Consolidation Base Files
   // #################################################################################
-  EXPORT SUFFIX_NAME_CONSOLIDATION_ECRASH := 'ACCIDENTS_CONSOLIDATION_ECRASH';
-  EXPORT SUFFIX_NAME_CONSOLIDATION_PR := 'ACCIDENTS_CONSOLIDATION_PR';
+  EXPORT SUFFIX_NAME_CONSOLIDATION_ECRASH := 'CONSOLIDATION_ECRASH';
+  EXPORT SUFFIX_NAME_CONSOLIDATION_PR := 'CONSOLIDATION_PR';
 	
    // ###########################################################################
   //                 Ecrash Spray Super File Definitions
@@ -254,7 +254,7 @@ EXPORT Files_eCrash := MODULE
   // ###########################################################################   	
   EXPORT DS_BASE_CONSOLIDATION_ECRASH := DATASET(FILE_BASE_CONSOLIDATION_ECRASH_SF, Layout_eCrash.Consolidation, THOR, OPT);	
   EXPORT DS_BASE_CONSOLIDATION_PR := DATASET(FILE_BASE_CONSOLIDATION_PR_SF, Layout_eCrash.Consolidation, THOR, OPT);
- 
+
  	//Existing
 //***********************************************************************
 //                 	EcrashKeys

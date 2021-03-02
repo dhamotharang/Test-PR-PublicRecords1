@@ -5,8 +5,8 @@ IMPORT * FROM KEL011.Null;
 EXPORT Q__show_Customer_Drivers_License_Entities := MODULE
   SHARED TYPEOF(E_Customer.__Result) __E_Customer := E_Customer.__Result;
   SHARED TYPEOF(B_Drivers_License.__ENH_Drivers_License) __ENH_Drivers_License := B_Drivers_License.__ENH_Drivers_License;
-  SHARED __EE4603965 := __ENH_Drivers_License;
-  SHARED __ST4604291_Layout := RECORD
+  SHARED __EE4646276 := __ENH_Drivers_License;
+  SHARED __ST4646602_Layout := RECORD
     KEL.typ.ntyp(E_Customer.Typ) _r_Customer_;
     KEL.typ.nstr State_;
     KEL.typ.int Contributor_Safe_Flag_ := 0;
@@ -25,9 +25,9 @@ EXPORT Q__show_Customer_Drivers_License_Entities := MODULE
     KEL.typ.epoch Date_Last_Seen_ := 0;
     KEL.typ.int __RecordCount := 0;
   END;
-  SHARED __EE4604307 := PROJECT(TABLE(PROJECT(__EE4603965,__ST4604291_Layout),{KEL.typ.int __RecordCount := SUM(GROUP,__RecordCount),KEL.typ.epoch Date_First_Seen_ := KEL.era.SimpleRoll(GROUP,Date_First_Seen_,MIN,TRUE),KEL.typ.epoch Date_Last_Seen_ := KEL.era.SimpleRoll(GROUP,Date_Last_Seen_,MAX,FALSE),_r_Customer_,State_,Contributor_Safe_Flag_,Dt_First_Seen_,Dt_Last_Seen_,Entity_Context_Uid_,Entity_Type_,Identity_Count_,In_Customer_Population_,Kr_High_Risk_Flag_,Kr_Low_Risk_Flag_,Kr_Medium_Risk_Flag_,Label_,Safe_Flag_},_r_Customer_,State_,Contributor_Safe_Flag_,Dt_First_Seen_,Dt_Last_Seen_,Entity_Context_Uid_,Entity_Type_,Identity_Count_,In_Customer_Population_,Kr_High_Risk_Flag_,Kr_Low_Risk_Flag_,Kr_Medium_Risk_Flag_,Label_,Safe_Flag_,MERGE),__ST4604291_Layout);
-  SHARED __EE4603901 := __E_Customer;
-  SHARED __ST4604321_Layout := RECORD
+  SHARED __EE4646618 := PROJECT(TABLE(PROJECT(__EE4646276,__ST4646602_Layout),{KEL.typ.int __RecordCount := SUM(GROUP,__RecordCount),KEL.typ.epoch Date_First_Seen_ := KEL.era.SimpleRoll(GROUP,Date_First_Seen_,MIN,TRUE),KEL.typ.epoch Date_Last_Seen_ := KEL.era.SimpleRoll(GROUP,Date_Last_Seen_,MAX,FALSE),_r_Customer_,State_,Contributor_Safe_Flag_,Dt_First_Seen_,Dt_Last_Seen_,Entity_Context_Uid_,Entity_Type_,Identity_Count_,In_Customer_Population_,Kr_High_Risk_Flag_,Kr_Low_Risk_Flag_,Kr_Medium_Risk_Flag_,Label_,Safe_Flag_},_r_Customer_,State_,Contributor_Safe_Flag_,Dt_First_Seen_,Dt_Last_Seen_,Entity_Context_Uid_,Entity_Type_,Identity_Count_,In_Customer_Population_,Kr_High_Risk_Flag_,Kr_Low_Risk_Flag_,Kr_Medium_Risk_Flag_,Label_,Safe_Flag_,MERGE),__ST4646602_Layout);
+  SHARED __EE4646212 := __E_Customer;
+  SHARED __ST4646632_Layout := RECORD
     KEL.typ.nuid U_I_D__1_;
     KEL.typ.nint Customer_Id__1_;
     KEL.typ.nint Industry_Type__1_;
@@ -36,14 +36,14 @@ EXPORT Q__show_Customer_Drivers_License_Entities := MODULE
     KEL.typ.epoch Date_First_Seen_ := 0;
     KEL.typ.epoch Date_Last_Seen_ := 0;
   END;
-  SHARED __ST4604321_Layout __ND4604310__Project(E_Customer.Layout __PP4604309) := TRANSFORM
-    SELF.U_I_D__1_ := __PP4604309.UID;
-    SELF.Customer_Id__1_ := __PP4604309.Customer_Id_;
-    SELF.Industry_Type__1_ := __PP4604309.Industry_Type_;
-    SELF := __PP4604309;
+  SHARED __ST4646632_Layout __ND4646621__Project(E_Customer.Layout __PP4646620) := TRANSFORM
+    SELF.U_I_D__1_ := __PP4646620.UID;
+    SELF.Customer_Id__1_ := __PP4646620.Customer_Id_;
+    SELF.Industry_Type__1_ := __PP4646620.Industry_Type_;
+    SELF := __PP4646620;
   END;
-  SHARED __EE4604332 := PROJECT(__EE4603901,__ND4604310__Project(LEFT));
-  SHARED __ST4604367_Layout := RECORD
+  SHARED __EE4646643 := PROJECT(__EE4646212,__ND4646621__Project(LEFT));
+  SHARED __ST4646678_Layout := RECORD
     KEL.typ.ntyp(E_Customer.Typ) _r_Customer_;
     KEL.typ.nstr State_;
     KEL.typ.int Contributor_Safe_Flag_ := 0;
@@ -67,13 +67,13 @@ EXPORT Q__show_Customer_Drivers_License_Entities := MODULE
     KEL.typ.epoch Date_Last_Seen_ := 0;
     KEL.typ.int __RecordCount := 0;
   END;
-  __JC4604339(__ST4604291_Layout __EE4604307, __ST4604321_Layout __EE4604332) := __EEQP(__EE4604307._r_Customer_,__EE4604332.U_I_D__1_);
-  __ST4604367_Layout __JT4604339(__ST4604291_Layout __l, __ST4604321_Layout __r) := TRANSFORM
+  __JC4646650(__ST4646602_Layout __EE4646618, __ST4646632_Layout __EE4646643) := __EEQP(__EE4646618._r_Customer_,__EE4646643.U_I_D__1_);
+  __ST4646678_Layout __JT4646650(__ST4646602_Layout __l, __ST4646632_Layout __r) := TRANSFORM
     SELF := __l;
     SELF := __r;
   END;
-  SHARED __EE4604365 := JOIN(__EE4604307,__EE4604332,__JC4604339(LEFT,RIGHT),__JT4604339(LEFT,RIGHT),LEFT OUTER,HASH);
-  SHARED __ST46542_Layout := RECORD
+  SHARED __EE4646676 := JOIN(__EE4646618,__EE4646643,__JC4646650(LEFT,RIGHT),__JT4646650(LEFT,RIGHT),LEFT OUTER,HASH);
+  SHARED __ST45923_Layout := RECORD
     KEL.typ.ntyp(E_Customer.Typ) Source_Customer_;
     KEL.typ.nint Customer_Id_;
     KEL.typ.nint Industry_Type_;
@@ -97,16 +97,16 @@ EXPORT Q__show_Customer_Drivers_License_Entities := MODULE
     KEL.typ.epoch Date_Last_Seen_ := 0;
     KEL.typ.int __RecordCount := 0;
   END;
-  SHARED __ST46542_Layout __ND4604395__Project(__ST4604367_Layout __PP4604366) := TRANSFORM
-    SELF.Source_Customer_ := __PP4604366._r_Customer_;
-    SELF.Customer_Id_ := __PP4604366.Customer_Id__1_;
-    SELF.Industry_Type_ := __PP4604366.Industry_Type__1_;
-    SELF.Person_Count_ := __PP4604366.Identity_Count_;
-    SELF.License_State_ := __PP4604366.State_;
-    SELF.In_Customer_Population__1_ := __PP4604366.In_Customer_Population_;
-    SELF.Contributor_Safe_Flag__1_ := __PP4604366.Contributor_Safe_Flag_;
-    SELF.Safe_Flag__1_ := __PP4604366.Safe_Flag_;
-    SELF := __PP4604366;
+  SHARED __ST45923_Layout __ND4646706__Project(__ST4646678_Layout __PP4646677) := TRANSFORM
+    SELF.Source_Customer_ := __PP4646677._r_Customer_;
+    SELF.Customer_Id_ := __PP4646677.Customer_Id__1_;
+    SELF.Industry_Type_ := __PP4646677.Industry_Type__1_;
+    SELF.Person_Count_ := __PP4646677.Identity_Count_;
+    SELF.License_State_ := __PP4646677.State_;
+    SELF.In_Customer_Population__1_ := __PP4646677.In_Customer_Population_;
+    SELF.Contributor_Safe_Flag__1_ := __PP4646677.Contributor_Safe_Flag_;
+    SELF.Safe_Flag__1_ := __PP4646677.Safe_Flag_;
+    SELF := __PP4646677;
   END;
-  EXPORT Res0 := __UNWRAP(PROJECT(__EE4604365,__ND4604395__Project(LEFT)));
+  EXPORT Res0 := __UNWRAP(PROJECT(__EE4646676,__ND4646706__Project(LEFT)));
 END;

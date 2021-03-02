@@ -7,24 +7,24 @@ EXPORT DATASET(layouts.history) fn_cgm_litigiousdebtor(
 	) := 
 	FUNCTION
 			
-		// Grab base file.
-		base_file := AccountMonitoring.product_files.litigiousdebtor.litigiousdebtor_file_slim;
+		// Grab monitor_key file.
+		monitor_key := AccountMonitoring.product_files.litigiousdebtor.litigiousdebtor_key;
 		// Temporary Join Layout
 		temp_layout := record
 			in_portfolio.pid;
 			in_portfolio.rid;
 			unsigned6 did  := 0;
 			unsigned6 bdid := 0;
-			base_file.debtor_fname;
-			base_file.debtor_mname;
-			base_file.debtor_lname;
-			base_file.debtor_suffix;
-			base_file.docketnumber;
+			monitor_key.debtor_fname;
+			monitor_key.debtor_mname;
+			monitor_key.debtor_lname;
+			monitor_key.debtor_suffix;
+			monitor_key.docketnumber;
 		end;
 			
 		// Pivot on debtor_lname, debtor_fname, st, to get all docket numbers associated with portfolio records.
 		temp_port_dist_1 := DISTRIBUTE(in_portfolio(name_last != ''),HASH32(name_last,NID.PreferredFirstNew(name_first),st));
-		temp_srch_dist_1 := DEDUP(SORT( DISTRIBUTE(base_file, HASH32(debtor_lname,NID.PreferredFirstNew(debtor_fname),courtstate)),
+		temp_srch_dist_1 := DEDUP(SORT( DISTRIBUTED(monitor_key, HASH32(debtor_lname,NID.PreferredFirstNew(debtor_fname),courtstate)),
 																		debtor_lname, NID.PreferredFirstNew(debtor_fname), courtstate, docketnumber, LOCAL ),
 															debtor_lname, NID.PreferredFirstNew(debtor_fname), courtstate, docketnumber, LOCAL);
 		temp_join_1 := 

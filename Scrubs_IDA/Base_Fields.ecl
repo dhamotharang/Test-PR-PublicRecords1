@@ -33,8 +33,8 @@ EXPORT MakeFT_Invalid_Rec_ID(SALT311.StrType s0) := FUNCTION
   s1 := SALT311.stringfilter(s0,'0123456789_'); // Only allow valid symbols
   RETURN  s1;
 END;
-EXPORT InValidFT_Invalid_Rec_ID(SALT311.StrType s) := WHICH(LENGTH(TRIM(s))<>LENGTH(TRIM(SALT311.StringFilter(s,'0123456789_'))),~(LENGTH(TRIM(s)) = 18));
-EXPORT InValidMessageFT_Invalid_Rec_ID(UNSIGNED1 wh) := CHOOSE(wh,SALT311.HygieneErrors.NotInChars('0123456789_'),SALT311.HygieneErrors.NotLength('18'),SALT311.HygieneErrors.Good);
+EXPORT InValidFT_Invalid_Rec_ID(SALT311.StrType s) := WHICH(LENGTH(TRIM(s))<>LENGTH(TRIM(SALT311.StringFilter(s,'0123456789_'))),~(LENGTH(TRIM(s)) = 15));
+EXPORT InValidMessageFT_Invalid_Rec_ID(UNSIGNED1 wh) := CHOOSE(wh,SALT311.HygieneErrors.NotInChars('0123456789_'),SALT311.HygieneErrors.NotLength('15'),SALT311.HygieneErrors.Good);
 
 EXPORT MakeFT_Invalid_Date(SALT311.StrType s0) := FUNCTION
   RETURN  s0;

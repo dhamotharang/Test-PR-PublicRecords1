@@ -6,7 +6,7 @@ Bug# 200197 - last name modification
 */
 IMPORT standard,FLAccidents, std;
 
-base_file := FLAccidents_Ecrash.File_KeybuildV2.out;
+base_file := Files_eCrash.Ds_Base_Consolidation_Ecrash;
 
 Layout_eCrash.Consolidation copyNames(Layout_eCrash.Consolidation le) := TRANSFORM
 		SELF.fname := le.orig_fname;

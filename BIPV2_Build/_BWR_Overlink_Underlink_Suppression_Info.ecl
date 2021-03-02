@@ -8,6 +8,8 @@
     BIPV2_Field_Suppression._BWR_Remove_Candidates                -- Remove Candidates from custome suppression/explosion file.
     BIPV2_Field_Suppression._BWR_Initialize_Suppression_Counter   -- initialize suppression counter for suppression file to zero.  This make the next suppression call using this file explode the clusters too.
     BIPV2_Field_Suppression._BWR_Increment_Suppression_Counter    -- increment the suppression counter in the suppression file + 1.  This will make the next suppression call not explode the clusters.
+    BIPV2_Field_Suppression._BWR_Decrement_Suppression_Counter    -- decrement the suppression counter in the suppression file - 1.  This will basically return the suppression back to before the last call of it.  
+                                                                      Good for rollbacks where you need to rerun the code that calls the suppression.
     BIPV2_Field_Suppression.mac_Suppress                          -- Suppression macro call.  Will need to modify this to add fields/context/id fields if we add new fields to the suppression file.
                                                                      Future improvement is to generate the code from the suppression file to call this macro.
   Underlinks:
@@ -24,6 +26,8 @@
     BIPV2_Field_Suppression._BWR_Remove_Candidates                -- Remove Candidates from custome suppression/explosion file.
     BIPV2_Field_Suppression._BWR_Initialize_Suppression_Counter   -- initialize suppression counter for suppression file to zero.  This make the next suppression call using this file explode the clusters too.
     BIPV2_Field_Suppression._BWR_Increment_Suppression_Counter    -- increment the suppression counter in the suppression file + 1.  This will make the next suppression call not explode the clusters.
+    BIPV2_Field_Suppression._BWR_Decrement_Suppression_Counter    -- decrement the suppression counter in the suppression file - 1.  This will basically return the suppression back to before the last call of it.  
+                                                                      Good for rollbacks where you need to rerun the code that calls the suppression.
     BIPV2_Field_Suppression.mac_Suppress                          -- Suppression macro call.  Will need to modify this to add fields/context/id fields if we add new fields to the suppression file.
                                                                      Future improvement is to generate the code from the suppression file to call this macro.
     

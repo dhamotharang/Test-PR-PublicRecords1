@@ -180,7 +180,7 @@ EXPORT Constants := MODULE
 
 	EXPORT GetStatsThreshold(STRING datagroup) := FUNCTION
 		threshold_limit := CASE(datagroup 
-				,GONG 												=> '50'
+				,GONG 												=> '10'
 				,PAW 												=> '10'
 				
 				,STUDENT										=> '10'          

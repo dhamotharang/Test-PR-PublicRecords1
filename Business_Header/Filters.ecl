@@ -502,6 +502,9 @@ module
 				// -- JIRA - BH-915 Incorrect ROBERT HILL, possibly, associated to business
 				or  (mdr.sourceTools.sourceIsBusiness_Registration(pInput.source) and trim(pInput.company_source_group) in ['1855883 SHATTOS LLC','258208NORTH PARK TRUCK & EQUIPMENT'] and
 						 trim(pInput.lname) = 'HILL' and trim(pInput.prim_name) = 'PO BOX 705')
+				// -- JIRA - DF-28316 Remove More Accutrend (Src Code BR) Contact Records for LexID 562516533
+				or  (mdr.sourceTools.sourceIsBusiness_Registration(pInput.source) and trim(pInput.lname) = 'DAVIS' and trim(pInput.fname) = 'ROBERT' and
+						 trim(pInput.company_source_group) in ['200906210117RED BAR DYNAMICS LLC', '02-2124SALES MANAGEMENT ARCHITECTS', '03176344VIRTUAL DRIVER INTERACTIVE', '2007A0000143VITRUAL DRIVER INTERAC'])
 			;
 
 			boolean lFullFilter 		:= if(pFilterOut
@@ -720,7 +723,7 @@ module
 				// -- JIRA# DF-28031 - Remove TMSID DF204043915806782546018877941 from D&B FEIN
 				or	(MDR.sourceTools.SourceIsDunn_Bradstreet_Fein(pInput.source) and trim(pInput.vendor_id,left,right) = '018877941')
 				// -- JIRA# DF-26195 - Flush-n-fill the old historical SKA records from the basefiles and re-introduce them as new records again. Remove this code in the next run.
-				or	(MDR.sourceTools.SourceIsSKA(pInput.source))
+				//or	(MDR.sourceTools.SourceIsSKA(pInput.source))
 				;
 
 			boolean lFullFilter 		:= if(pFilterOut
@@ -1124,7 +1127,10 @@ module
 				or  (mdr.sourceTools.sourceIsBusiness_Registration(pInput.source) and trim(pInput.company_source_group) in ['1855883 SHATTOS LLC','258208NORTH PARK TRUCK & EQUIPMENT'] and
 						 trim(pInput.lname) = 'HILL' and trim(pInput.prim_name) = 'PO BOX 705')
 				// -- JIRA# DF-26195 - Flush-n-fill the old historical SKA records from the basefiles and re-introduce them as new records again. Remove this code in the next run.
-				or	(MDR.sourceTools.SourceIsSKA(pInput.source))
+				//or	(MDR.sourceTools.SourceIsSKA(pInput.source))
+				// -- JIRA - DF-28316 Remove More Accutrend (Src Code BR) Contact Records for LexID 562516533
+				or  (mdr.sourceTools.sourceIsBusiness_Registration(pInput.source) and trim(pInput.lname) = 'DAVIS' and trim(pInput.fname) = 'ROBERT' and
+						 trim(pInput.company_source_group) in ['200906210117RED BAR DYNAMICS LLC', '02-2124SALES MANAGEMENT ARCHITECTS', '03176344VIRTUAL DRIVER INTERACTIVE', '2007A0000143VITRUAL DRIVER INTERAC'])
 			;
 
 			boolean lFullFilter 		:= if(pFilterOut

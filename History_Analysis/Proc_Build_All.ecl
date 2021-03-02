@@ -1,10 +1,10 @@
 Import History_Analysis, STD, dops, PromoteSupers, _Control;
 
-Export Proc_Build_All( string pVersion, string datasetname, string location, string cluster,string fromdate, string todate, string dopsenv ) := Function 
+Export Proc_Build_All( string pVersion, string datasetname, string location, string cluster,string fromdate, string todate ) := Function 
     
 
     /////////////////////////////////////////// Input File for Prod and QA /////////////////////////////////////////////////////////
-    update_source := History_Analysis.fspray(pVersion, datasetname, location, cluster, fromdate, todate, dopsenv ).build_3; // params 
+    update_source := History_Analysis.fspray(pVersion, datasetname, location, cluster, fromdate, todate ).build_3; // params 
 
     dopsService := History_Analysis.Files(pVersion).keysizedhistory_service;
 
@@ -25,7 +25,7 @@ Export Proc_Build_All( string pVersion, string datasetname, string location, str
 
 
     ///////////////////////////////////////// The Despraying Process Begins ///////////////////////////////////////////////////////////////
-    destinationIP := _control.IPAddress.bctlpedata10;
+    destinationIP := _control.IPAddress.bctlpedata12;
 
     DeltaUpdateQA := History_Analysis.Filenames(pVersion).BaseDeltasQA;
 
@@ -33,25 +33,25 @@ Export Proc_Build_All( string pVersion, string datasetname, string location, str
 
     DeltasStats := History_Analysis.Filenames(pVersion).BaseStatistics;
     
-    destdirectory := '/data/Builds/builds/DataInsight_Dashboard/data/';
+    destdirectory := '/data/Builds/builds/Prod_History_Dashboard/data';
 
-    desprayDeltaUpdateQA := STD.File.DeSpray(DeltaUpdateQA, destinationIP, destdirectory+'DeltaBase-UpdateQA'+pVersion+'.csv', allowoverwrite := true );
+    desprayDeltaUpdateQA := STD.File.DeSpray(DeltaUpdateQA, destinationIP, destdirectory+'DeltaBase-UpdateQA.csv', allowoverwrite := true );
 
-    desprayDeltaUpdateProd := STD.File.DeSpray(DeltaUpdateProd, destinationIP, destdirectory+'DeltaBase-UpdateProd'+pVersion+'.csv', allowoverwrite := true );
+    desprayDeltaUpdateProd := STD.File.DeSpray(DeltaUpdateProd, destinationIP, destdirectory+'DeltaBase-UpdateProd.csv', allowoverwrite := true );
 
-    desprayDeltaStats := STD.File.DeSpray(DeltasStats, destinationIP, destdirectory+'Deltas'+Pversion+'.csv', allowoverwrite := true );
+    desprayDeltaStats := STD.File.DeSpray(DeltasStats, destinationIP, destdirectory+'Deltas.csv', allowoverwrite := true );
 
-    path := 'Desprayed to the server bctlpedata10 in path: '+destdirectory+' (Dataland)';
+    path := 'Desprayed to the server bctlpedata12 in path: '+destdirectory+' (Production)';
 
     buildAll := ordered(update_source,
-                                      writeDeltasQA,
-                                      writeDeltasProd,
-                                      writeStats,
-                                      output(dopsService, named('dops_service')),
-                                      desprayDeltaUpdateQA,
-                                      desprayDeltaUpdateProd,
-                                      desprayDeltaStats,
-                                      output(path, named('path_location')),
+                                    writeDeltasQA,
+                                    writeDeltasProd,
+                                    writeStats,
+                                    output(dopsService, named('dops_service')),
+                                    desprayDeltaUpdateQA,
+                                    desprayDeltaUpdateProd,
+                                    desprayDeltaStats,
+                                    output(path, named('path_location')),
                                   ):Success(Send_Email(pVersion).build_success), Failure(Send_Email(pVersion).build_failure);
 
     Return buildAll;
