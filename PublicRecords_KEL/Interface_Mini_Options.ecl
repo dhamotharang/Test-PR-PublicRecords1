@@ -76,8 +76,8 @@ EXPORT Interface_Mini_Options (PublicRecords_KEL.Interface_Options OptionsRaw) :
 	EXPORT BOOLEAN IncludeWatercraft := FALSE;
 	EXPORT BOOLEAN IncludeZipCode := FALSE;
 	EXPORT BOOLEAN IncludeUCC := FALSE;
-  EXPORT BOOLEAN IncludeNameSummary := FALSE;
-  EXPORT BOOLEAN IncludePhoneSummary := FALSE;
+	EXPORT BOOLEAN IncludeNameSummary := FALSE;
+	EXPORT BOOLEAN IncludePhoneSummary := FALSE;
 	EXPORT BOOLEAN IncludeSSNSummary := FALSE;
 	EXPORT BOOLEAN IncludeOverrides := TRUE;
 	EXPORT BOOLEAN IncludeMini := TRUE;

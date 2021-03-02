@@ -1718,7 +1718,7 @@ BIPV2.IDAppendLayouts.AppendInput PrepBIPInputprox(Layouts_FDC.Layout_FDC le) :=
 					SELF.Src := PublicRecords_KEL.ECL_Functions.Constants.AVM,
 					SELF.DPMBitmap := SetDPMBitmap( Source := PublicRecords_KEL.ECL_Functions.Constants.AVM, FCRA_Restricted := Options.isFCRA, GLBA_Restricted := NotRegulated, Pre_GLB_Restricted := NotRegulated, DPPA_Restricted := NotRegulated, DPPA_State := BlankString, KELPermissions := CFG_File),
 					SELF.avm_correct_ffid := LEFT.avm_correct_ffid,
-					SELF.avm_correct_RECORD_ID := LEFT.avm_correct_ffid,					
+					SELF.avm_correct_RECORD_ID := LEFT.avm_correct_RECORD_ID,					
 					SELF := RIGHT,
 					SELF := []), 
 					ATMOST(PublicRecords_KEL.ECL_Functions.Constants.Default_Atmost_100));
@@ -1766,23 +1766,35 @@ BIPV2.IDAppendLayouts.AppendInput PrepBIPInputprox(Layouts_FDC.Layout_FDC le) :=
 					SELF.G_ProcUID := LEFT.G_ProcUID,
 					SELF.Src := PublicRecords_KEL.ECL_Functions.Constants.AVM,
 					SELF.DPMBitmap := SetDPMBitmap( Source := PublicRecords_KEL.ECL_Functions.Constants.AVM, FCRA_Restricted := Options.isFCRA, GLBA_Restricted := NotRegulated, Pre_GLB_Restricted := NotRegulated, DPPA_Restricted := NotRegulated, DPPA_State := BlankString, KELPermissions := CFG_File),			
+					SELF.avm_medians_correct_ffid := LEFT.avm_medians_correct_ffid,
+					SELF.avm_medians_correct_RECORD_ID := LEFT.avm_medians_correct_RECORD_ID,				
 					SELF := RIGHT,
 					SELF := []), 
 					ATMOST(PublicRecords_KEL.ECL_Functions.Constants.Default_Atmost_1000));// boca shell is 1k will adjust later
 
 
-	AVM_V2__Key_AVM_Medians_Norm_Records := PROJECT(AVM_V2__Key_AVM_Medians, TRANSFORM(Layouts_FDC.Layout_AVM_V2_Key_AVM_Medians_Norm_Records, 
+	WithSuppressionsAVMMedians := IF((unsigned)input[1].p_inpclnarchdt = (unsigned)(((string)risk_indicators.iid_constants.todaydate)[1..8]) and Options.isFCRA, 
+												AVM_V2__Key_AVM_Medians((trim(fips_geo_12) not in avm_medians_correct_record_id)), 
+												AVM_V2__Key_AVM_Medians);
+												
+	GetOverrideAVMMedians := IF((unsigned)input[1].p_inpclnarchdt = (unsigned)(((string)risk_indicators.iid_constants.todaydate)[1..8]) and Options.isFCRA AND	Common.DoFDCJoin_AVM_V2__Key_AVM_Medians = TRUE,
+															PublicRecords_KEL.MAS_get.FCRA_Overrides(options).GetOverrideAVMMedians(Input_Address_Consumer_recs));//consumer only since FCRA only -- no business in FCRA
+
+
+
+	AVM_V2__Key_AVM_Medians_Norm_Records := PROJECT(WithSuppressionsAVMMedians, TRANSFORM(Layouts_FDC.Layout_AVM_V2_Key_AVM_Medians_Norm_Records, 
 				SELF.IsCurrent := TRUE, 
 				SELF := LEFT, 
 				SELF := [])) +
-			NORMALIZE(AVM_V2__Key_AVM_Medians, left.history, TRANSFORM(Layouts_FDC.Layout_AVM_V2_Key_AVM_Medians_Norm_Records, 
+			NORMALIZE(WithSuppressionsAVMMedians, left.history, TRANSFORM(Layouts_FDC.Layout_AVM_V2_Key_AVM_Medians_Norm_Records, 
 				SELF.IsCurrent := FALSE, 
 				SELF := RIGHT, 
 				SELF := LEFT, 
 				SELF := []));
 
+	WithOverrideAVMMedians := GetOverrideAVMMedians + AVM_V2__Key_AVM_Medians_Norm_Records;	
 
-	With_Key_AVM_Medians_Records := DENORMALIZE(With_AVM_V2_Key_AVM_Records, AVM_V2__Key_AVM_Medians_Norm_Records,
+	With_Key_AVM_Medians_Records := DENORMALIZE(With_AVM_V2_Key_AVM_Records, WithOverrideAVMMedians,
 			ArchiveDate(right.history_date) <= left.P_InpClnArchDt[1..8] and //the shell today does not look at avm dates in the join
 			LEFT.UIDAppend = RIGHT.UIDAppend, GROUP,
 			TRANSFORM(Layouts_FDC.Layout_FDC,
@@ -6289,6 +6301,7 @@ Key_AccLogs_FCRA_SSN :=
 					SELF := RIGHT,
 					SELF := []), 
 				ATMOST(PublicRecords_KEL.ECL_Functions.Constants.Default_Atmost_1000),keep(50));
+				
 	Property__Key_Foreclosures_FID_With_Did := 
 			JOIN(Property__Key_Foreclosures_DID,dx_property.Key_Foreclosures_FID,
 				Common.DoFDCJoin_Property__Key_Foreclosure_FID = TRUE AND
