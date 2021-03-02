@@ -55,7 +55,9 @@ EXPORT PD_SBFE(DATASET(Business_Risk_BIP.Layouts.Shell) Shell_pre,
 	
   SHARED linkid_recs := Business_Risk_BIP.Common.FilterRecords2(linkid_recs_loaddate, load_date, MDR.SourceTools.src_Business_Credit, AllowedSourcesSet);
 	
-	SHARED mod_SBFE := Business_Credit_KEL.GLUE_fdc_append(linkid_recs);
+	// identify if this transaction is being run in production traffic to avoid some extra overhead of processing by historydate
+	production_current_mode := ((string)shell_pre[1].Clean_Input.HistoryDateTime)[1..6] = '999999';
+	SHARED mod_SBFE := Business_Credit_KEL.GLUE_fdc_append(linkid_recs, production_current_mode);
 	
 	EXPORT SBFE_data_raw := mod_SBFE.AddIndividualOwner;
 	EXPORT SBFE_data_result := mod_SBFE.SBFE_Result;
