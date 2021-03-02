@@ -10,7 +10,10 @@ unsigned record_limit := 0;    //number of records to read from input file; 0 me
 unsigned1 parallel_calls := 30;  //number of parallel soap calls to make [1..30]
 unsigned1 eyeball := 100;
 string DataRestrictionMask := '10000100010001000000000000000000000000000'; // to restrict fares, experian and transunion -- returns liens and judgments
-// DataRestrictionMask := '10000100010001000000000000000000000000001';//to restrict fares, LIENS/Jdgmts, experian and transunion 
+// DataRestrictionMask := '10000100010001000000000000000000000000001';//to restrict fares, LIENS/Jdgmts, experian and transunion
+
+attributesversionrequest := 'riskviewattrv5'; // standard request for RiskView 50 attributes
+// attributesversionrequest := 'riskviewattrv5FIS'; // standard RiskView 50 attributes with FIS attributes included
 
 
 infile_name :=  '~jpyon::in::lend_7582_p2_coapp_f_s_in_junk_test_in';
@@ -123,7 +126,7 @@ soap_inrec t_f(ds_input le, integer c) := transform
 	// self.IntendedPurpose := 'PRESCREENING';	// to run in prescreen mode
 	// self.intendedpurpose := RiskView.Constants.directToConsumer; // which is 'WRITTEN CONSENT DIRECT TO CONSUMER';
 	self.intendedpurpose := 'APPLICATION';
-	self.attributesversionrequest := 'riskviewattrv5';
+	self.attributesversionrequest := attributesversionrequest; 
 	//LnJ Report options (Juli options - DOES NOT apply to the shell original liens and Judgments)
 	// self.IncludeLNJReport := true; //get the Juli report
 	// self.RetainInputDID := true; //retain the input lexid also uncomment line 167
@@ -189,7 +192,7 @@ end;
 soap_input := project(ds_input_distributed, t_f(left, counter));
 output(choosen(soap_input,eyeball), named('soap_input'));
 
-layout_checkingindicators_FIS_temp := record
+layout_checkingindicators := record
   string2 CheckProfileIndex;
   string3 CheckTimeOldest;
   string3 CheckTimeNewest;
@@ -201,6 +204,9 @@ layout_checkingindicators_FIS_temp := record
   string7 CheckAmountTotal;
   string7 CheckAmountTotalSinceNegPaid;
   string7 CheckAmountTotal03Month;
+end;
+
+layout_FIS := RECORD
 	STRING1 rv3ConfirmationSubjectFound;
   STRING3 rv3AddrChangeCount60Month;
   STRING3 rv3AddrChangeCount12Month;
@@ -209,11 +215,11 @@ layout_checkingindicators_FIS_temp := record
   STRING3 rv3AssetPropCurrentCount;
   STRING2 rv3SSNDeceased;
   STRING2 rv3AssetIndex;
-end;
+	END;
 
 roxie_output_layout := record
 	unsigned8 time_ms{xpath('_call_latency_ms')} := 0;  // picks up timing
-	riskview.layouts.layout_riskview5_batch_response -layout_checkingindicators_FIS_temp;// -layout_FIS_custom_attributes;
+	riskview.layouts.layout_riskview5_batch_response -layout_checkingindicators #IF (attributesversionrequest <> 'riskviewattrv5FIS') -layout_FIS #END;// -layout_FIS_custom_attributes;
 	STRING errorcode;
 END;
 
@@ -288,7 +294,7 @@ NoiBehavior := project(rv50, transform(roxie_output_layout,
 //LNJReport is the Juli name as this contains Juli/LNR report info in output WITH OUT the Juli Details - Liens and Judgments datasets included
 roxie_output_layout_noDetails := record
 	unsigned8 time_ms{xpath('_call_latency_ms')} := 0;  // picks up timing
-	riskview.layouts.layout_riskview5_batch_response -riskview.layouts.layout_riskview_lnj_batch - layout_checkingindicators_FIS_temp;
+	riskview.layouts.layout_riskview5_batch_response -riskview.layouts.layout_riskview_lnj_batch - layout_checkingindicators #IF (attributesversionrequest <> 'riskviewattrv5FIS') -layout_FIS #END;
 	STRING errorcode;
 END;
 
@@ -299,7 +305,8 @@ output(NoiBehavior_noLnJDetails(errorcode in valid_error_codes),,outfile_name+'_
 output(choosen(NoiBehavior_noLnJDetails, eyeball), named('LNJRreport'));
 
 //no Juli output will be the standard output name 
-noJuli := project(NoiBehavior, transform(RiskProcessing.bwr_LayoutsJuli.layout_riskview5_batch_responseNoJuli -layout_checkingindicators_FIS_temp, self := left));
+noJuli := project(NoiBehavior, transform({RiskProcessing.bwr_LayoutsJuli.layout_riskview5_batch_responseNoJuli #IF (attributesversionrequest = 'riskviewattrv5FIS') , layout_FIS #END}, 
+															self := left));
 output(noJuli(errorcode in valid_error_codes),,outfile_name, CSV(heading(single), quote('"')), named('file_RV50'));
 output(choosen(noJuli, eyeball), named('RV50'));
 
