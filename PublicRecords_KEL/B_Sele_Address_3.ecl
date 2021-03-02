@@ -4,8 +4,8 @@ IMPORT B_Sele_Address_4,CFG_Compile,E_Address,E_Business_Org,E_Business_Sele,E_B
 IMPORT * FROM KEL15.Null;
 EXPORT B_Sele_Address_3(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG_Compile __cfg = CFG_Compile) := MODULE
   SHARED VIRTUAL TYPEOF(B_Sele_Address_4(__in,__cfg).__ENH_Sele_Address_4) __ENH_Sele_Address_4 := B_Sele_Address_4(__in,__cfg).__ENH_Sele_Address_4;
-  SHARED __EE6824071 := __ENH_Sele_Address_4;
-  EXPORT __ST243925_Layout := RECORD
+  SHARED __EE6898790 := __ENH_Sele_Address_4;
+  EXPORT __ST245249_Layout := RECORD
     KEL.typ.nbool Header_Hit_Flag_;
     KEL.typ.nstr Source_;
     KEL.typ.nkdate Date_First_Seen_Company_Address_;
@@ -20,7 +20,7 @@ EXPORT B_Sele_Address_3(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CF
     KEL.typ.epoch Vault_Date_Last_Seen_ := 0;
     KEL.typ.int __RecordCount := 0;
   END;
-  EXPORT __ST1272370_Layout := RECORD
+  EXPORT __ST1282667_Layout := RECORD
     KEL.typ.nstr Source_;
     KEL.typ.nint Age_Helper_Attribute_;
     KEL.typ.nbool Age_Is_Not_Zero_Helper_;
@@ -34,7 +34,7 @@ EXPORT B_Sele_Address_3(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CF
     KEL.typ.epoch Vault_Date_Last_Seen_ := 0;
     KEL.typ.int __RecordCount := 0;
   END;
-  EXPORT __ST243869_Layout := RECORD
+  EXPORT __ST245193_Layout := RECORD
     KEL.typ.ntyp(E_Business_Sele().Typ) Legal_;
     KEL.typ.ntyp(E_Address().Typ) Location_;
     KEL.typ.nstr Primary_Range_;
@@ -50,10 +50,10 @@ EXPORT B_Sele_Address_3(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CF
     KEL.typ.ndataset(E_Sele_Address(__in,__cfg).S_I_C_Codes_Layout) S_I_C_Codes_;
     KEL.typ.ndataset(E_Sele_Address(__in,__cfg).N_A_I_C_S_Codes_Layout) N_A_I_C_S_Codes_;
     KEL.typ.ndataset(E_Sele_Address(__in,__cfg).Best_Addresses_Layout) Best_Addresses_;
-    KEL.typ.ndataset(__ST243925_Layout) Data_Sources_;
+    KEL.typ.ndataset(__ST245249_Layout) Data_Sources_;
     KEL.typ.nbool Input_Address_Match_;
     KEL.typ.nbool Matches_Is_Best_Helper_Attr_;
-    KEL.typ.ndataset(__ST1272370_Layout) Rolled_Source_List_;
+    KEL.typ.ndataset(__ST1282667_Layout) Rolled_Source_List_;
     KEL.typ.epoch Archive___Date_ := 0;
     KEL.typ.epoch Date_First_Seen_ := 0;
     KEL.typ.epoch Date_Last_Seen_ := 0;
@@ -61,16 +61,16 @@ EXPORT B_Sele_Address_3(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CF
     KEL.typ.epoch Vault_Date_Last_Seen_ := 0;
     KEL.typ.int __RecordCount := 0;
   END;
-  SHARED __ST243869_Layout __ND6824076__Project(B_Sele_Address_4(__in,__cfg).__ST255050_Layout __PP6824072) := TRANSFORM
-    __EE6824160 := __PP6824072.Data_Sources_;
-    SELF.Data_Sources_ := __BN(PROJECT(__T(__EE6824160),__ST243925_Layout),__NL(__EE6824160));
-    __EE6824200 := __PP6824072.Rolled_Source_List_;
-    __ST1272370_Layout __ND6824205__Project(B_Sele_Address_4(__in,__cfg).__ST793779_Layout __PP6824201) := TRANSFORM
-      SELF.My_Date_First_Seen_ := KEL.era.ToDate(__PP6824201.Date_First_Seen_);
-      SELF := __PP6824201;
+  SHARED __ST245193_Layout __ND6898795__Project(B_Sele_Address_4(__in,__cfg).__ST256408_Layout __PP6898791) := TRANSFORM
+    __EE6898879 := __PP6898791.Data_Sources_;
+    SELF.Data_Sources_ := __BN(PROJECT(__T(__EE6898879),__ST245249_Layout),__NL(__EE6898879));
+    __EE6898919 := __PP6898791.Rolled_Source_List_;
+    __ST1282667_Layout __ND6898924__Project(B_Sele_Address_4(__in,__cfg).__ST798007_Layout __PP6898920) := TRANSFORM
+      SELF.My_Date_First_Seen_ := KEL.era.ToDate(__PP6898920.Date_First_Seen_);
+      SELF := __PP6898920;
     END;
-    SELF.Rolled_Source_List_ := __PROJECT(__EE6824200,__ND6824205__Project(LEFT));
-    SELF := __PP6824072;
+    SELF.Rolled_Source_List_ := __PROJECT(__EE6898919,__ND6898924__Project(LEFT));
+    SELF := __PP6898791;
   END;
-  EXPORT __ENH_Sele_Address_3 := PROJECT(__EE6824071,__ND6824076__Project(LEFT));
+  EXPORT __ENH_Sele_Address_3 := PROJECT(__EE6898790,__ND6898795__Project(LEFT));
 END;

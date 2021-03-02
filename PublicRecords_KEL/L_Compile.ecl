@@ -1281,6 +1281,14 @@ EXPORT L_Compile := MODULE
     KEL.typ.nstr P_L___Ast_Prop_Sale_Old_Dt_Ev_;
     KEL.typ.nint P_L___Ast_Prop_Sale_New_Msnc_Ev_;
     KEL.typ.nint P_L___Ast_Prop_Sale_Old_Msnc_Ev_;
+    KEL.typ.int P_L___Ast_Prop_Purch_Cnt_Ev_ := 0;
+    KEL.typ.nstr P_L___Ast_Prop_Purch_Dt_List_Ev_;
+    KEL.typ.nstr P_L___Ast_Prop_Purch_New_Dt_Ev_;
+    KEL.typ.nstr P_L___Ast_Prop_Purch_Old_Dt_Ev_;
+    KEL.typ.nstr P_L___Ast_Prop_Purch_New_Msnc_Ev_;
+    KEL.typ.nstr P_L___Ast_Prop_Purch_Old_Msnc_Ev_;
+    KEL.typ.int P_L___Ast_Prop_Purch_Cnt1_Y_ := 0;
+    KEL.typ.int P_L___Ast_Prop_Purch_Cnt5_Y_ := 0;
     KEL.typ.nint P_L___Srch_Coll_Cnt5_Y_;
     KEL.typ.nstr P_L___Srch_Coll_Dt_List5_Y_;
     KEL.typ.nstr P_L___Srch_Coll_New_Dt5_Y_;
@@ -1696,6 +1704,22 @@ EXPORT L_Compile := MODULE
     KEL.typ.nstr P_L___Ast_Prop_Curr_A_V_M_Val_List_;
     KEL.typ.nint P_L___Ast_Prop_Curr_A_V_M_Val_Tot_;
     KEL.typ.nfloat P_L___Ast_Prop_Curr_A_V_M_Val_Avg_;
+    KEL.typ.int P_L___Ast_Prop_Sale_Cnt_Ev_ := 0;
+    KEL.typ.nstr P_L___Ast_Prop_Sale_Amt_List_Ev_;
+    KEL.typ.int P_L___Ast_Prop_Sale_Tot_Ev_ := 0;
+    KEL.typ.nstr P_L___Ast_Prop_Sale_Dt_List_Ev_;
+    KEL.typ.nstr P_L___Ast_Prop_Sale_New_Dt_Ev_;
+    KEL.typ.nstr P_L___Ast_Prop_Sale_Old_Dt_Ev_;
+    KEL.typ.nint P_L___Ast_Prop_Sale_New_Msnc_Ev_;
+    KEL.typ.nint P_L___Ast_Prop_Sale_Old_Msnc_Ev_;
+    KEL.typ.int P_L___Ast_Prop_Purch_Cnt_Ev_ := 0;
+    KEL.typ.nstr P_L___Ast_Prop_Purch_Dt_List_Ev_;
+    KEL.typ.nstr P_L___Ast_Prop_Purch_New_Dt_Ev_;
+    KEL.typ.nstr P_L___Ast_Prop_Purch_Old_Dt_Ev_;
+    KEL.typ.nstr P_L___Ast_Prop_Purch_New_Msnc_Ev_;
+    KEL.typ.nstr P_L___Ast_Prop_Purch_Old_Msnc_Ev_;
+    KEL.typ.int P_L___Ast_Prop_Purch_Cnt1_Y_ := 0;
+    KEL.typ.int P_L___Ast_Prop_Purch_Cnt5_Y_ := 0;
     KEL.typ.int P_L___Ast_Prop_Sale_Cnt_Ev_ := 0;
     KEL.typ.nstr P_L___Ast_Prop_Sale_Amt_List_Ev_;
     KEL.typ.int P_L___Ast_Prop_Sale_Tot_Ev_ := 0;
@@ -3591,6 +3615,14 @@ EXPORT L_Compile := MODULE
     KEL.typ.nstr P_L___Ast_Prop_Sale_Old_Dt_Ev_;
     KEL.typ.nint P_L___Ast_Prop_Sale_New_Msnc_Ev_;
     KEL.typ.nint P_L___Ast_Prop_Sale_Old_Msnc_Ev_;
+    KEL.typ.int P_L___Ast_Prop_Purch_Cnt_Ev_ := 0;
+    KEL.typ.nstr P_L___Ast_Prop_Purch_Dt_List_Ev_;
+    KEL.typ.nstr P_L___Ast_Prop_Purch_New_Dt_Ev_;
+    KEL.typ.nstr P_L___Ast_Prop_Purch_Old_Dt_Ev_;
+    KEL.typ.nstr P_L___Ast_Prop_Purch_New_Msnc_Ev_;
+    KEL.typ.nstr P_L___Ast_Prop_Purch_Old_Msnc_Ev_;
+    KEL.typ.int P_L___Ast_Prop_Purch_Cnt1_Y_ := 0;
+    KEL.typ.int P_L___Ast_Prop_Purch_Cnt5_Y_ := 0;
     KEL.typ.nint P_L___Srch_Coll_Cnt5_Y_;
     KEL.typ.nstr P_L___Srch_Coll_Dt_List5_Y_;
     KEL.typ.nstr P_L___Srch_Coll_New_Dt5_Y_;
@@ -4006,6 +4038,22 @@ EXPORT L_Compile := MODULE
     KEL.typ.nstr P_L___Ast_Prop_Curr_A_V_M_Val_List_;
     KEL.typ.nint P_L___Ast_Prop_Curr_A_V_M_Val_Tot_;
     KEL.typ.nfloat P_L___Ast_Prop_Curr_A_V_M_Val_Avg_;
+    KEL.typ.int P_L___Ast_Prop_Sale_Cnt_Ev_ := 0;
+    KEL.typ.nstr P_L___Ast_Prop_Sale_Amt_List_Ev_;
+    KEL.typ.int P_L___Ast_Prop_Sale_Tot_Ev_ := 0;
+    KEL.typ.nstr P_L___Ast_Prop_Sale_Dt_List_Ev_;
+    KEL.typ.nstr P_L___Ast_Prop_Sale_New_Dt_Ev_;
+    KEL.typ.nstr P_L___Ast_Prop_Sale_Old_Dt_Ev_;
+    KEL.typ.nint P_L___Ast_Prop_Sale_New_Msnc_Ev_;
+    KEL.typ.nint P_L___Ast_Prop_Sale_Old_Msnc_Ev_;
+    KEL.typ.int P_L___Ast_Prop_Purch_Cnt_Ev_ := 0;
+    KEL.typ.nstr P_L___Ast_Prop_Purch_Dt_List_Ev_;
+    KEL.typ.nstr P_L___Ast_Prop_Purch_New_Dt_Ev_;
+    KEL.typ.nstr P_L___Ast_Prop_Purch_Old_Dt_Ev_;
+    KEL.typ.nstr P_L___Ast_Prop_Purch_New_Msnc_Ev_;
+    KEL.typ.nstr P_L___Ast_Prop_Purch_Old_Msnc_Ev_;
+    KEL.typ.int P_L___Ast_Prop_Purch_Cnt1_Y_ := 0;
+    KEL.typ.int P_L___Ast_Prop_Purch_Cnt5_Y_ := 0;
     KEL.typ.int P_L___Ast_Prop_Sale_Cnt_Ev_ := 0;
     KEL.typ.nstr P_L___Ast_Prop_Sale_Amt_List_Ev_;
     KEL.typ.int P_L___Ast_Prop_Sale_Tot_Ev_ := 0;
@@ -10190,6 +10238,16 @@ EXPORT L_Compile := MODULE
     KEL.typ.epoch Vault_Date_Last_Seen_ := 0;
     KEL.typ.int __RecordCount := 0;
   END;
+  SHARED Index_Build_Entity_Res22_Internal_Layout_Purchase_Date_List_Sorted_Layout := RECORD
+    KEL.typ.nstr Property_Purchase_Date_First_Seen_;
+    KEL.typ.ntyp(E_Property().Typ) Prop_;
+    KEL.typ.epoch Archive___Date_ := 0;
+    KEL.typ.epoch Date_First_Seen_ := 0;
+    KEL.typ.epoch Date_Last_Seen_ := 0;
+    KEL.typ.epoch Hybrid_Archive_Date_ := 0;
+    KEL.typ.epoch Vault_Date_Last_Seen_ := 0;
+    KEL.typ.int __RecordCount := 0;
+  END;
   SHARED Index_Build_Entity_Res22_Internal_Layout_Recent_Addr_Full_Set_Layout := RECORD
     KEL.typ.nint Address_Rank_;
     KEL.typ.nstr Address_Type_;
@@ -11394,6 +11452,7 @@ EXPORT L_Compile := MODULE
     KEL.typ.nstr Current_Addr_Unit_Designation_;
     KEL.typ.nstr Current_Addr_Zip5_;
     KEL.typ.nstr Current_Postdirectional_;
+    KEL.typ.nstr Date_List_;
     KEL.typ.int Drg_Cnt_Contact_ := 0;
     KEL.typ.ndataset(Index_Build_Entity_Res22_Internal_Layout_Edu_Coll_Rec_Ver_Source_List_Layout) Edu_Coll_Rec_Ver_Source_List_;
     KEL.typ.ndataset(Index_Build_Entity_Res22_Internal_Layout_Edu_Coll_Rec_Ver_Source_List_Filtered_Layout) Edu_Coll_Rec_Ver_Source_List_Filtered_;
@@ -11573,6 +11632,14 @@ EXPORT L_Compile := MODULE
     KEL.typ.nstr P_L___Ast_Prop_New_Dt_List_Ev_;
     KEL.typ.nstr P_L___Ast_Prop_Old_Dt_List_Ev_;
     KEL.typ.nint P_L___Ast_Prop_Ownership_Indx_;
+    KEL.typ.int P_L___Ast_Prop_Purch_Cnt1_Y_ := 0;
+    KEL.typ.int P_L___Ast_Prop_Purch_Cnt5_Y_ := 0;
+    KEL.typ.int P_L___Ast_Prop_Purch_Cnt_Ev_ := 0;
+    KEL.typ.nstr P_L___Ast_Prop_Purch_Dt_List_Ev_;
+    KEL.typ.nstr P_L___Ast_Prop_Purch_New_Dt_Ev_;
+    KEL.typ.nstr P_L___Ast_Prop_Purch_New_Msnc_Ev_;
+    KEL.typ.nstr P_L___Ast_Prop_Purch_Old_Dt_Ev_;
+    KEL.typ.nstr P_L___Ast_Prop_Purch_Old_Msnc_Ev_;
     KEL.typ.nstr P_L___Ast_Prop_Sale_Amt_List_Ev_;
     KEL.typ.int P_L___Ast_Prop_Sale_Cnt_Ev_ := 0;
     KEL.typ.nstr P_L___Ast_Prop_Sale_Dt_List_Ev_;
@@ -12053,6 +12120,12 @@ EXPORT L_Compile := MODULE
     KEL.typ.ndataset(Index_Build_Entity_Res22_Internal_Layout_Property_Date_Last_Seen_Sorted_Layout) Property_Date_Last_Seen_Sorted_;
     KEL.typ.nstr Property_Min_Date_;
     KEL.typ.ndataset(Index_Build_Entity_Res22_Internal_Layout_Property_Sales_Sorted_Layout) Property_Sales_Sorted_;
+    KEL.typ.int Purchase1_Y_Count_ := 0;
+    KEL.typ.int Purchase5_Y_Count_ := 0;
+    KEL.typ.int Purchase_Count_Ever_ := 0;
+    KEL.typ.ndataset(Index_Build_Entity_Res22_Internal_Layout_Purchase_Date_List_Sorted_Layout) Purchase_Date_List_Sorted_;
+    KEL.typ.nstr Purchase_New_Date_Ev_;
+    KEL.typ.nstr Purchase_Old_Date_Ev_;
     KEL.typ.ndataset(Index_Build_Entity_Res22_Internal_Layout_Recent_Addr_Full_Set_Layout) Recent_Addr_Full_Set_;
     KEL.typ.ndataset(Index_Build_Entity_Res22_Internal_Layout_Retail_Inquiries5_Yrs_Layout) Retail_Inquiries5_Yrs_;
     KEL.typ.nkdate Select_Age_;
@@ -12655,6 +12728,7 @@ EXPORT L_Compile := MODULE
     KEL.typ.nbool Occupant_Owned_;
     KEL.typ.nkdate Recording_Date_;
     KEL.typ.nkdate Sale_Date_;
+    KEL.typ.nstr Document_Type_Code_;
     KEL.typ.nint Sale_Price_;
     KEL.typ.nint Mortgage_Amount_;
     KEL.typ.nstr Mortgage_Type_;
@@ -12697,6 +12771,7 @@ EXPORT L_Compile := MODULE
     KEL.typ.nkdate Dt_First_Seen_;
     KEL.typ.nkdate Dt_Last_Seen_;
     KEL.typ.nbool Is_Current_Assessment_Record_;
+    KEL.typ.nbool Property_Purchase_Record_;
     KEL.typ.epoch Archive___Date_ := 0;
     KEL.typ.epoch Date_First_Seen_ := 0;
     KEL.typ.epoch Date_Last_Seen_ := 0;
@@ -13842,6 +13917,7 @@ EXPORT L_Compile := MODULE
     KEL.typ.nbool Occupant_Owned_;
     KEL.typ.nkdate Recording_Date_;
     KEL.typ.nkdate Sale_Date_;
+    KEL.typ.nstr Document_Type_Code_;
     KEL.typ.nint Sale_Price_;
     KEL.typ.nint Mortgage_Amount_;
     KEL.typ.nstr Mortgage_Type_;
@@ -13884,6 +13960,7 @@ EXPORT L_Compile := MODULE
     KEL.typ.nkdate Dt_First_Seen_;
     KEL.typ.nkdate Dt_Last_Seen_;
     KEL.typ.nbool Is_Current_Assessment_Record_;
+    KEL.typ.nbool Property_Purchase_Record_;
     KEL.typ.epoch Archive___Date_ := 0;
     KEL.typ.epoch Date_First_Seen_ := 0;
     KEL.typ.epoch Date_Last_Seen_ := 0;
@@ -15138,6 +15215,16 @@ EXPORT L_Compile := MODULE
     KEL.typ.epoch Vault_Date_Last_Seen_ := 0;
     KEL.typ.int __RecordCount := 0;
   END;
+  SHARED Index_Build_Association_Res4_Internal_Layout_Purchase_Date_List_Sorted_Layout := RECORD
+    KEL.typ.nstr Property_Purchase_Date_First_Seen_;
+    KEL.typ.ntyp(E_Property().Typ) Prop_;
+    KEL.typ.epoch Archive___Date_ := 0;
+    KEL.typ.epoch Date_First_Seen_ := 0;
+    KEL.typ.epoch Date_Last_Seen_ := 0;
+    KEL.typ.epoch Hybrid_Archive_Date_ := 0;
+    KEL.typ.epoch Vault_Date_Last_Seen_ := 0;
+    KEL.typ.int __RecordCount := 0;
+  END;
   SHARED Index_Build_Association_Res4_Internal_Layout_Recent_Addr_Full_Set_Layout := RECORD
     KEL.typ.nint Address_Rank_;
     KEL.typ.nstr Address_Type_;
@@ -16342,6 +16429,7 @@ EXPORT L_Compile := MODULE
     KEL.typ.nstr Current_Addr_Unit_Designation_;
     KEL.typ.nstr Current_Addr_Zip5_;
     KEL.typ.nstr Current_Postdirectional_;
+    KEL.typ.nstr Date_List_;
     KEL.typ.int Drg_Cnt_Contact_ := 0;
     KEL.typ.ndataset(Index_Build_Association_Res4_Internal_Layout_Edu_Coll_Rec_Ver_Source_List_Layout) Edu_Coll_Rec_Ver_Source_List_;
     KEL.typ.ndataset(Index_Build_Association_Res4_Internal_Layout_Edu_Coll_Rec_Ver_Source_List_Filtered_Layout) Edu_Coll_Rec_Ver_Source_List_Filtered_;
@@ -16521,6 +16609,14 @@ EXPORT L_Compile := MODULE
     KEL.typ.nstr P_L___Ast_Prop_New_Dt_List_Ev_;
     KEL.typ.nstr P_L___Ast_Prop_Old_Dt_List_Ev_;
     KEL.typ.nint P_L___Ast_Prop_Ownership_Indx_;
+    KEL.typ.int P_L___Ast_Prop_Purch_Cnt1_Y_ := 0;
+    KEL.typ.int P_L___Ast_Prop_Purch_Cnt5_Y_ := 0;
+    KEL.typ.int P_L___Ast_Prop_Purch_Cnt_Ev_ := 0;
+    KEL.typ.nstr P_L___Ast_Prop_Purch_Dt_List_Ev_;
+    KEL.typ.nstr P_L___Ast_Prop_Purch_New_Dt_Ev_;
+    KEL.typ.nstr P_L___Ast_Prop_Purch_New_Msnc_Ev_;
+    KEL.typ.nstr P_L___Ast_Prop_Purch_Old_Dt_Ev_;
+    KEL.typ.nstr P_L___Ast_Prop_Purch_Old_Msnc_Ev_;
     KEL.typ.nstr P_L___Ast_Prop_Sale_Amt_List_Ev_;
     KEL.typ.int P_L___Ast_Prop_Sale_Cnt_Ev_ := 0;
     KEL.typ.nstr P_L___Ast_Prop_Sale_Dt_List_Ev_;
@@ -17001,6 +17097,12 @@ EXPORT L_Compile := MODULE
     KEL.typ.ndataset(Index_Build_Association_Res4_Internal_Layout_Property_Date_Last_Seen_Sorted_Layout) Property_Date_Last_Seen_Sorted_;
     KEL.typ.nstr Property_Min_Date_;
     KEL.typ.ndataset(Index_Build_Association_Res4_Internal_Layout_Property_Sales_Sorted_Layout) Property_Sales_Sorted_;
+    KEL.typ.int Purchase1_Y_Count_ := 0;
+    KEL.typ.int Purchase5_Y_Count_ := 0;
+    KEL.typ.int Purchase_Count_Ever_ := 0;
+    KEL.typ.ndataset(Index_Build_Association_Res4_Internal_Layout_Purchase_Date_List_Sorted_Layout) Purchase_Date_List_Sorted_;
+    KEL.typ.nstr Purchase_New_Date_Ev_;
+    KEL.typ.nstr Purchase_Old_Date_Ev_;
     KEL.typ.ndataset(Index_Build_Association_Res4_Internal_Layout_Recent_Addr_Full_Set_Layout) Recent_Addr_Full_Set_;
     KEL.typ.ndataset(Index_Build_Association_Res4_Internal_Layout_Retail_Inquiries5_Yrs_Layout) Retail_Inquiries5_Yrs_;
     KEL.typ.nkdate Select_Age_;
@@ -21149,6 +21251,16 @@ EXPORT L_Compile := MODULE
     KEL.typ.epoch Vault_Date_Last_Seen_ := 0;
     KEL.typ.int __RecordCount := 0;
   END;
+  SHARED Index_Build_Association_Res10_Internal_Layout_Purchase_Date_List_Sorted_Layout := RECORD
+    KEL.typ.nstr Property_Purchase_Date_First_Seen_;
+    KEL.typ.ntyp(E_Property().Typ) Prop_;
+    KEL.typ.epoch Archive___Date_ := 0;
+    KEL.typ.epoch Date_First_Seen_ := 0;
+    KEL.typ.epoch Date_Last_Seen_ := 0;
+    KEL.typ.epoch Hybrid_Archive_Date_ := 0;
+    KEL.typ.epoch Vault_Date_Last_Seen_ := 0;
+    KEL.typ.int __RecordCount := 0;
+  END;
   SHARED Index_Build_Association_Res10_Internal_Layout_Recent_Addr_Full_Set_Layout := RECORD
     KEL.typ.nint Address_Rank_;
     KEL.typ.nstr Address_Type_;
@@ -22353,6 +22465,7 @@ EXPORT L_Compile := MODULE
     KEL.typ.nstr Current_Addr_Unit_Designation_;
     KEL.typ.nstr Current_Addr_Zip5_;
     KEL.typ.nstr Current_Postdirectional_;
+    KEL.typ.nstr Date_List_;
     KEL.typ.int Drg_Cnt_Contact_ := 0;
     KEL.typ.ndataset(Index_Build_Association_Res10_Internal_Layout_Edu_Coll_Rec_Ver_Source_List_Layout) Edu_Coll_Rec_Ver_Source_List_;
     KEL.typ.ndataset(Index_Build_Association_Res10_Internal_Layout_Edu_Coll_Rec_Ver_Source_List_Filtered_Layout) Edu_Coll_Rec_Ver_Source_List_Filtered_;
@@ -22532,6 +22645,14 @@ EXPORT L_Compile := MODULE
     KEL.typ.nstr P_L___Ast_Prop_New_Dt_List_Ev_;
     KEL.typ.nstr P_L___Ast_Prop_Old_Dt_List_Ev_;
     KEL.typ.nint P_L___Ast_Prop_Ownership_Indx_;
+    KEL.typ.int P_L___Ast_Prop_Purch_Cnt1_Y_ := 0;
+    KEL.typ.int P_L___Ast_Prop_Purch_Cnt5_Y_ := 0;
+    KEL.typ.int P_L___Ast_Prop_Purch_Cnt_Ev_ := 0;
+    KEL.typ.nstr P_L___Ast_Prop_Purch_Dt_List_Ev_;
+    KEL.typ.nstr P_L___Ast_Prop_Purch_New_Dt_Ev_;
+    KEL.typ.nstr P_L___Ast_Prop_Purch_New_Msnc_Ev_;
+    KEL.typ.nstr P_L___Ast_Prop_Purch_Old_Dt_Ev_;
+    KEL.typ.nstr P_L___Ast_Prop_Purch_Old_Msnc_Ev_;
     KEL.typ.nstr P_L___Ast_Prop_Sale_Amt_List_Ev_;
     KEL.typ.int P_L___Ast_Prop_Sale_Cnt_Ev_ := 0;
     KEL.typ.nstr P_L___Ast_Prop_Sale_Dt_List_Ev_;
@@ -23012,6 +23133,12 @@ EXPORT L_Compile := MODULE
     KEL.typ.ndataset(Index_Build_Association_Res10_Internal_Layout_Property_Date_Last_Seen_Sorted_Layout) Property_Date_Last_Seen_Sorted_;
     KEL.typ.nstr Property_Min_Date_;
     KEL.typ.ndataset(Index_Build_Association_Res10_Internal_Layout_Property_Sales_Sorted_Layout) Property_Sales_Sorted_;
+    KEL.typ.int Purchase1_Y_Count_ := 0;
+    KEL.typ.int Purchase5_Y_Count_ := 0;
+    KEL.typ.int Purchase_Count_Ever_ := 0;
+    KEL.typ.ndataset(Index_Build_Association_Res10_Internal_Layout_Purchase_Date_List_Sorted_Layout) Purchase_Date_List_Sorted_;
+    KEL.typ.nstr Purchase_New_Date_Ev_;
+    KEL.typ.nstr Purchase_Old_Date_Ev_;
     KEL.typ.ndataset(Index_Build_Association_Res10_Internal_Layout_Recent_Addr_Full_Set_Layout) Recent_Addr_Full_Set_;
     KEL.typ.ndataset(Index_Build_Association_Res10_Internal_Layout_Retail_Inquiries5_Yrs_Layout) Retail_Inquiries5_Yrs_;
     KEL.typ.nkdate Select_Age_;
@@ -27314,6 +27441,16 @@ EXPORT L_Compile := MODULE
     KEL.typ.epoch Vault_Date_Last_Seen_ := 0;
     KEL.typ.int __RecordCount := 0;
   END;
+  SHARED Index_Build_Association_Res22_Internal_Layout_Purchase_Date_List_Sorted_Layout := RECORD
+    KEL.typ.nstr Property_Purchase_Date_First_Seen_;
+    KEL.typ.ntyp(E_Property().Typ) Prop_;
+    KEL.typ.epoch Archive___Date_ := 0;
+    KEL.typ.epoch Date_First_Seen_ := 0;
+    KEL.typ.epoch Date_Last_Seen_ := 0;
+    KEL.typ.epoch Hybrid_Archive_Date_ := 0;
+    KEL.typ.epoch Vault_Date_Last_Seen_ := 0;
+    KEL.typ.int __RecordCount := 0;
+  END;
   SHARED Index_Build_Association_Res22_Internal_Layout_Recent_Addr_Full_Set_Layout := RECORD
     KEL.typ.nint Address_Rank_;
     KEL.typ.nstr Address_Type_;
@@ -28518,6 +28655,7 @@ EXPORT L_Compile := MODULE
     KEL.typ.nstr Current_Addr_Unit_Designation_;
     KEL.typ.nstr Current_Addr_Zip5_;
     KEL.typ.nstr Current_Postdirectional_;
+    KEL.typ.nstr Date_List_;
     KEL.typ.int Drg_Cnt_Contact_ := 0;
     KEL.typ.ndataset(Index_Build_Association_Res22_Internal_Layout_Edu_Coll_Rec_Ver_Source_List_Layout) Edu_Coll_Rec_Ver_Source_List_;
     KEL.typ.ndataset(Index_Build_Association_Res22_Internal_Layout_Edu_Coll_Rec_Ver_Source_List_Filtered_Layout) Edu_Coll_Rec_Ver_Source_List_Filtered_;
@@ -28697,6 +28835,14 @@ EXPORT L_Compile := MODULE
     KEL.typ.nstr P_L___Ast_Prop_New_Dt_List_Ev_;
     KEL.typ.nstr P_L___Ast_Prop_Old_Dt_List_Ev_;
     KEL.typ.nint P_L___Ast_Prop_Ownership_Indx_;
+    KEL.typ.int P_L___Ast_Prop_Purch_Cnt1_Y_ := 0;
+    KEL.typ.int P_L___Ast_Prop_Purch_Cnt5_Y_ := 0;
+    KEL.typ.int P_L___Ast_Prop_Purch_Cnt_Ev_ := 0;
+    KEL.typ.nstr P_L___Ast_Prop_Purch_Dt_List_Ev_;
+    KEL.typ.nstr P_L___Ast_Prop_Purch_New_Dt_Ev_;
+    KEL.typ.nstr P_L___Ast_Prop_Purch_New_Msnc_Ev_;
+    KEL.typ.nstr P_L___Ast_Prop_Purch_Old_Dt_Ev_;
+    KEL.typ.nstr P_L___Ast_Prop_Purch_Old_Msnc_Ev_;
     KEL.typ.nstr P_L___Ast_Prop_Sale_Amt_List_Ev_;
     KEL.typ.int P_L___Ast_Prop_Sale_Cnt_Ev_ := 0;
     KEL.typ.nstr P_L___Ast_Prop_Sale_Dt_List_Ev_;
@@ -29177,6 +29323,12 @@ EXPORT L_Compile := MODULE
     KEL.typ.ndataset(Index_Build_Association_Res22_Internal_Layout_Property_Date_Last_Seen_Sorted_Layout) Property_Date_Last_Seen_Sorted_;
     KEL.typ.nstr Property_Min_Date_;
     KEL.typ.ndataset(Index_Build_Association_Res22_Internal_Layout_Property_Sales_Sorted_Layout) Property_Sales_Sorted_;
+    KEL.typ.int Purchase1_Y_Count_ := 0;
+    KEL.typ.int Purchase5_Y_Count_ := 0;
+    KEL.typ.int Purchase_Count_Ever_ := 0;
+    KEL.typ.ndataset(Index_Build_Association_Res22_Internal_Layout_Purchase_Date_List_Sorted_Layout) Purchase_Date_List_Sorted_;
+    KEL.typ.nstr Purchase_New_Date_Ev_;
+    KEL.typ.nstr Purchase_Old_Date_Ev_;
     KEL.typ.ndataset(Index_Build_Association_Res22_Internal_Layout_Recent_Addr_Full_Set_Layout) Recent_Addr_Full_Set_;
     KEL.typ.ndataset(Index_Build_Association_Res22_Internal_Layout_Retail_Inquiries5_Yrs_Layout) Retail_Inquiries5_Yrs_;
     KEL.typ.nkdate Select_Age_;
@@ -29508,6 +29660,7 @@ EXPORT L_Compile := MODULE
     KEL.typ.nbool Occupant_Owned_;
     KEL.typ.nkdate Recording_Date_;
     KEL.typ.nkdate Sale_Date_;
+    KEL.typ.nstr Document_Type_Code_;
     KEL.typ.nint Sale_Price_;
     KEL.typ.nint Mortgage_Amount_;
     KEL.typ.nstr Mortgage_Type_;
@@ -29550,6 +29703,7 @@ EXPORT L_Compile := MODULE
     KEL.typ.nkdate Dt_First_Seen_;
     KEL.typ.nkdate Dt_Last_Seen_;
     KEL.typ.nbool Is_Current_Assessment_Record_;
+    KEL.typ.nbool Property_Purchase_Record_;
     KEL.typ.epoch Archive___Date_ := 0;
     KEL.typ.epoch Date_First_Seen_ := 0;
     KEL.typ.epoch Date_Last_Seen_ := 0;
@@ -32308,6 +32462,16 @@ EXPORT L_Compile := MODULE
     KEL.typ.epoch Vault_Date_Last_Seen_ := 0;
     KEL.typ.int __RecordCount := 0;
   END;
+  SHARED Index_Build_Association_Res40_Internal_Layout_Purchase_Date_List_Sorted_Layout := RECORD
+    KEL.typ.nstr Property_Purchase_Date_First_Seen_;
+    KEL.typ.ntyp(E_Property().Typ) Prop_;
+    KEL.typ.epoch Archive___Date_ := 0;
+    KEL.typ.epoch Date_First_Seen_ := 0;
+    KEL.typ.epoch Date_Last_Seen_ := 0;
+    KEL.typ.epoch Hybrid_Archive_Date_ := 0;
+    KEL.typ.epoch Vault_Date_Last_Seen_ := 0;
+    KEL.typ.int __RecordCount := 0;
+  END;
   SHARED Index_Build_Association_Res40_Internal_Layout_Recent_Addr_Full_Set_Layout := RECORD
     KEL.typ.nint Address_Rank_;
     KEL.typ.nstr Address_Type_;
@@ -33512,6 +33676,7 @@ EXPORT L_Compile := MODULE
     KEL.typ.nstr Current_Addr_Unit_Designation_;
     KEL.typ.nstr Current_Addr_Zip5_;
     KEL.typ.nstr Current_Postdirectional_;
+    KEL.typ.nstr Date_List_;
     KEL.typ.int Drg_Cnt_Contact_ := 0;
     KEL.typ.ndataset(Index_Build_Association_Res40_Internal_Layout_Edu_Coll_Rec_Ver_Source_List_Layout) Edu_Coll_Rec_Ver_Source_List_;
     KEL.typ.ndataset(Index_Build_Association_Res40_Internal_Layout_Edu_Coll_Rec_Ver_Source_List_Filtered_Layout) Edu_Coll_Rec_Ver_Source_List_Filtered_;
@@ -33691,6 +33856,14 @@ EXPORT L_Compile := MODULE
     KEL.typ.nstr P_L___Ast_Prop_New_Dt_List_Ev_;
     KEL.typ.nstr P_L___Ast_Prop_Old_Dt_List_Ev_;
     KEL.typ.nint P_L___Ast_Prop_Ownership_Indx_;
+    KEL.typ.int P_L___Ast_Prop_Purch_Cnt1_Y_ := 0;
+    KEL.typ.int P_L___Ast_Prop_Purch_Cnt5_Y_ := 0;
+    KEL.typ.int P_L___Ast_Prop_Purch_Cnt_Ev_ := 0;
+    KEL.typ.nstr P_L___Ast_Prop_Purch_Dt_List_Ev_;
+    KEL.typ.nstr P_L___Ast_Prop_Purch_New_Dt_Ev_;
+    KEL.typ.nstr P_L___Ast_Prop_Purch_New_Msnc_Ev_;
+    KEL.typ.nstr P_L___Ast_Prop_Purch_Old_Dt_Ev_;
+    KEL.typ.nstr P_L___Ast_Prop_Purch_Old_Msnc_Ev_;
     KEL.typ.nstr P_L___Ast_Prop_Sale_Amt_List_Ev_;
     KEL.typ.int P_L___Ast_Prop_Sale_Cnt_Ev_ := 0;
     KEL.typ.nstr P_L___Ast_Prop_Sale_Dt_List_Ev_;
@@ -34171,6 +34344,12 @@ EXPORT L_Compile := MODULE
     KEL.typ.ndataset(Index_Build_Association_Res40_Internal_Layout_Property_Date_Last_Seen_Sorted_Layout) Property_Date_Last_Seen_Sorted_;
     KEL.typ.nstr Property_Min_Date_;
     KEL.typ.ndataset(Index_Build_Association_Res40_Internal_Layout_Property_Sales_Sorted_Layout) Property_Sales_Sorted_;
+    KEL.typ.int Purchase1_Y_Count_ := 0;
+    KEL.typ.int Purchase5_Y_Count_ := 0;
+    KEL.typ.int Purchase_Count_Ever_ := 0;
+    KEL.typ.ndataset(Index_Build_Association_Res40_Internal_Layout_Purchase_Date_List_Sorted_Layout) Purchase_Date_List_Sorted_;
+    KEL.typ.nstr Purchase_New_Date_Ev_;
+    KEL.typ.nstr Purchase_Old_Date_Ev_;
     KEL.typ.ndataset(Index_Build_Association_Res40_Internal_Layout_Recent_Addr_Full_Set_Layout) Recent_Addr_Full_Set_;
     KEL.typ.ndataset(Index_Build_Association_Res40_Internal_Layout_Retail_Inquiries5_Yrs_Layout) Retail_Inquiries5_Yrs_;
     KEL.typ.nkdate Select_Age_;
@@ -35701,6 +35880,7 @@ EXPORT L_Compile := MODULE
     KEL.typ.nbool Occupant_Owned_;
     KEL.typ.nkdate Recording_Date_;
     KEL.typ.nkdate Sale_Date_;
+    KEL.typ.nstr Document_Type_Code_;
     KEL.typ.nint Sale_Price_;
     KEL.typ.nint Mortgage_Amount_;
     KEL.typ.nstr Mortgage_Type_;
@@ -35743,6 +35923,7 @@ EXPORT L_Compile := MODULE
     KEL.typ.nkdate Dt_First_Seen_;
     KEL.typ.nkdate Dt_Last_Seen_;
     KEL.typ.nbool Is_Current_Assessment_Record_;
+    KEL.typ.nbool Property_Purchase_Record_;
     KEL.typ.epoch Archive___Date_ := 0;
     KEL.typ.epoch Date_First_Seen_ := 0;
     KEL.typ.epoch Date_Last_Seen_ := 0;
@@ -40171,6 +40352,16 @@ EXPORT L_Compile := MODULE
     KEL.typ.epoch Vault_Date_Last_Seen_ := 0;
     KEL.typ.int __RecordCount := 0;
   END;
+  SHARED Index_Build_Association_Res67_Internal_Layout_Purchase_Date_List_Sorted_Layout := RECORD
+    KEL.typ.nstr Property_Purchase_Date_First_Seen_;
+    KEL.typ.ntyp(E_Property().Typ) Prop_;
+    KEL.typ.epoch Archive___Date_ := 0;
+    KEL.typ.epoch Date_First_Seen_ := 0;
+    KEL.typ.epoch Date_Last_Seen_ := 0;
+    KEL.typ.epoch Hybrid_Archive_Date_ := 0;
+    KEL.typ.epoch Vault_Date_Last_Seen_ := 0;
+    KEL.typ.int __RecordCount := 0;
+  END;
   SHARED Index_Build_Association_Res67_Internal_Layout_Recent_Addr_Full_Set_Layout := RECORD
     KEL.typ.nint Address_Rank_;
     KEL.typ.nstr Address_Type_;
@@ -41375,6 +41566,7 @@ EXPORT L_Compile := MODULE
     KEL.typ.nstr Current_Addr_Unit_Designation_;
     KEL.typ.nstr Current_Addr_Zip5_;
     KEL.typ.nstr Current_Postdirectional_;
+    KEL.typ.nstr Date_List_;
     KEL.typ.int Drg_Cnt_Contact_ := 0;
     KEL.typ.ndataset(Index_Build_Association_Res67_Internal_Layout_Edu_Coll_Rec_Ver_Source_List_Layout) Edu_Coll_Rec_Ver_Source_List_;
     KEL.typ.ndataset(Index_Build_Association_Res67_Internal_Layout_Edu_Coll_Rec_Ver_Source_List_Filtered_Layout) Edu_Coll_Rec_Ver_Source_List_Filtered_;
@@ -41554,6 +41746,14 @@ EXPORT L_Compile := MODULE
     KEL.typ.nstr P_L___Ast_Prop_New_Dt_List_Ev_;
     KEL.typ.nstr P_L___Ast_Prop_Old_Dt_List_Ev_;
     KEL.typ.nint P_L___Ast_Prop_Ownership_Indx_;
+    KEL.typ.int P_L___Ast_Prop_Purch_Cnt1_Y_ := 0;
+    KEL.typ.int P_L___Ast_Prop_Purch_Cnt5_Y_ := 0;
+    KEL.typ.int P_L___Ast_Prop_Purch_Cnt_Ev_ := 0;
+    KEL.typ.nstr P_L___Ast_Prop_Purch_Dt_List_Ev_;
+    KEL.typ.nstr P_L___Ast_Prop_Purch_New_Dt_Ev_;
+    KEL.typ.nstr P_L___Ast_Prop_Purch_New_Msnc_Ev_;
+    KEL.typ.nstr P_L___Ast_Prop_Purch_Old_Dt_Ev_;
+    KEL.typ.nstr P_L___Ast_Prop_Purch_Old_Msnc_Ev_;
     KEL.typ.nstr P_L___Ast_Prop_Sale_Amt_List_Ev_;
     KEL.typ.int P_L___Ast_Prop_Sale_Cnt_Ev_ := 0;
     KEL.typ.nstr P_L___Ast_Prop_Sale_Dt_List_Ev_;
@@ -42034,6 +42234,12 @@ EXPORT L_Compile := MODULE
     KEL.typ.ndataset(Index_Build_Association_Res67_Internal_Layout_Property_Date_Last_Seen_Sorted_Layout) Property_Date_Last_Seen_Sorted_;
     KEL.typ.nstr Property_Min_Date_;
     KEL.typ.ndataset(Index_Build_Association_Res67_Internal_Layout_Property_Sales_Sorted_Layout) Property_Sales_Sorted_;
+    KEL.typ.int Purchase1_Y_Count_ := 0;
+    KEL.typ.int Purchase5_Y_Count_ := 0;
+    KEL.typ.int Purchase_Count_Ever_ := 0;
+    KEL.typ.ndataset(Index_Build_Association_Res67_Internal_Layout_Purchase_Date_List_Sorted_Layout) Purchase_Date_List_Sorted_;
+    KEL.typ.nstr Purchase_New_Date_Ev_;
+    KEL.typ.nstr Purchase_Old_Date_Ev_;
     KEL.typ.ndataset(Index_Build_Association_Res67_Internal_Layout_Recent_Addr_Full_Set_Layout) Recent_Addr_Full_Set_;
     KEL.typ.ndataset(Index_Build_Association_Res67_Internal_Layout_Retail_Inquiries5_Yrs_Layout) Retail_Inquiries5_Yrs_;
     KEL.typ.nkdate Select_Age_;
@@ -43523,6 +43729,16 @@ EXPORT L_Compile := MODULE
     KEL.typ.epoch Vault_Date_Last_Seen_ := 0;
     KEL.typ.int __RecordCount := 0;
   END;
+  SHARED Index_Build_Association_Res71_Internal_Layout_Purchase_Date_List_Sorted_Layout := RECORD
+    KEL.typ.nstr Property_Purchase_Date_First_Seen_;
+    KEL.typ.ntyp(E_Property().Typ) Prop_;
+    KEL.typ.epoch Archive___Date_ := 0;
+    KEL.typ.epoch Date_First_Seen_ := 0;
+    KEL.typ.epoch Date_Last_Seen_ := 0;
+    KEL.typ.epoch Hybrid_Archive_Date_ := 0;
+    KEL.typ.epoch Vault_Date_Last_Seen_ := 0;
+    KEL.typ.int __RecordCount := 0;
+  END;
   SHARED Index_Build_Association_Res71_Internal_Layout_Recent_Addr_Full_Set_Layout := RECORD
     KEL.typ.nint Address_Rank_;
     KEL.typ.nstr Address_Type_;
@@ -44727,6 +44943,7 @@ EXPORT L_Compile := MODULE
     KEL.typ.nstr Current_Addr_Unit_Designation_;
     KEL.typ.nstr Current_Addr_Zip5_;
     KEL.typ.nstr Current_Postdirectional_;
+    KEL.typ.nstr Date_List_;
     KEL.typ.int Drg_Cnt_Contact_ := 0;
     KEL.typ.ndataset(Index_Build_Association_Res71_Internal_Layout_Edu_Coll_Rec_Ver_Source_List_Layout) Edu_Coll_Rec_Ver_Source_List_;
     KEL.typ.ndataset(Index_Build_Association_Res71_Internal_Layout_Edu_Coll_Rec_Ver_Source_List_Filtered_Layout) Edu_Coll_Rec_Ver_Source_List_Filtered_;
@@ -44906,6 +45123,14 @@ EXPORT L_Compile := MODULE
     KEL.typ.nstr P_L___Ast_Prop_New_Dt_List_Ev_;
     KEL.typ.nstr P_L___Ast_Prop_Old_Dt_List_Ev_;
     KEL.typ.nint P_L___Ast_Prop_Ownership_Indx_;
+    KEL.typ.int P_L___Ast_Prop_Purch_Cnt1_Y_ := 0;
+    KEL.typ.int P_L___Ast_Prop_Purch_Cnt5_Y_ := 0;
+    KEL.typ.int P_L___Ast_Prop_Purch_Cnt_Ev_ := 0;
+    KEL.typ.nstr P_L___Ast_Prop_Purch_Dt_List_Ev_;
+    KEL.typ.nstr P_L___Ast_Prop_Purch_New_Dt_Ev_;
+    KEL.typ.nstr P_L___Ast_Prop_Purch_New_Msnc_Ev_;
+    KEL.typ.nstr P_L___Ast_Prop_Purch_Old_Dt_Ev_;
+    KEL.typ.nstr P_L___Ast_Prop_Purch_Old_Msnc_Ev_;
     KEL.typ.nstr P_L___Ast_Prop_Sale_Amt_List_Ev_;
     KEL.typ.int P_L___Ast_Prop_Sale_Cnt_Ev_ := 0;
     KEL.typ.nstr P_L___Ast_Prop_Sale_Dt_List_Ev_;
@@ -45386,6 +45611,12 @@ EXPORT L_Compile := MODULE
     KEL.typ.ndataset(Index_Build_Association_Res71_Internal_Layout_Property_Date_Last_Seen_Sorted_Layout) Property_Date_Last_Seen_Sorted_;
     KEL.typ.nstr Property_Min_Date_;
     KEL.typ.ndataset(Index_Build_Association_Res71_Internal_Layout_Property_Sales_Sorted_Layout) Property_Sales_Sorted_;
+    KEL.typ.int Purchase1_Y_Count_ := 0;
+    KEL.typ.int Purchase5_Y_Count_ := 0;
+    KEL.typ.int Purchase_Count_Ever_ := 0;
+    KEL.typ.ndataset(Index_Build_Association_Res71_Internal_Layout_Purchase_Date_List_Sorted_Layout) Purchase_Date_List_Sorted_;
+    KEL.typ.nstr Purchase_New_Date_Ev_;
+    KEL.typ.nstr Purchase_Old_Date_Ev_;
     KEL.typ.ndataset(Index_Build_Association_Res71_Internal_Layout_Recent_Addr_Full_Set_Layout) Recent_Addr_Full_Set_;
     KEL.typ.ndataset(Index_Build_Association_Res71_Internal_Layout_Retail_Inquiries5_Yrs_Layout) Retail_Inquiries5_Yrs_;
     KEL.typ.nkdate Select_Age_;
@@ -48700,6 +48931,16 @@ EXPORT L_Compile := MODULE
     KEL.typ.epoch Vault_Date_Last_Seen_ := 0;
     KEL.typ.int __RecordCount := 0;
   END;
+  SHARED Index_Build_Association_Res73_Internal_Layout_Purchase_Date_List_Sorted_Layout := RECORD
+    KEL.typ.nstr Property_Purchase_Date_First_Seen_;
+    KEL.typ.ntyp(E_Property().Typ) Prop_;
+    KEL.typ.epoch Archive___Date_ := 0;
+    KEL.typ.epoch Date_First_Seen_ := 0;
+    KEL.typ.epoch Date_Last_Seen_ := 0;
+    KEL.typ.epoch Hybrid_Archive_Date_ := 0;
+    KEL.typ.epoch Vault_Date_Last_Seen_ := 0;
+    KEL.typ.int __RecordCount := 0;
+  END;
   SHARED Index_Build_Association_Res73_Internal_Layout_Recent_Addr_Full_Set_Layout := RECORD
     KEL.typ.nint Address_Rank_;
     KEL.typ.nstr Address_Type_;
@@ -49904,6 +50145,7 @@ EXPORT L_Compile := MODULE
     KEL.typ.nstr Current_Addr_Unit_Designation_;
     KEL.typ.nstr Current_Addr_Zip5_;
     KEL.typ.nstr Current_Postdirectional_;
+    KEL.typ.nstr Date_List_;
     KEL.typ.int Drg_Cnt_Contact_ := 0;
     KEL.typ.ndataset(Index_Build_Association_Res73_Internal_Layout_Edu_Coll_Rec_Ver_Source_List_Layout) Edu_Coll_Rec_Ver_Source_List_;
     KEL.typ.ndataset(Index_Build_Association_Res73_Internal_Layout_Edu_Coll_Rec_Ver_Source_List_Filtered_Layout) Edu_Coll_Rec_Ver_Source_List_Filtered_;
@@ -50083,6 +50325,14 @@ EXPORT L_Compile := MODULE
     KEL.typ.nstr P_L___Ast_Prop_New_Dt_List_Ev_;
     KEL.typ.nstr P_L___Ast_Prop_Old_Dt_List_Ev_;
     KEL.typ.nint P_L___Ast_Prop_Ownership_Indx_;
+    KEL.typ.int P_L___Ast_Prop_Purch_Cnt1_Y_ := 0;
+    KEL.typ.int P_L___Ast_Prop_Purch_Cnt5_Y_ := 0;
+    KEL.typ.int P_L___Ast_Prop_Purch_Cnt_Ev_ := 0;
+    KEL.typ.nstr P_L___Ast_Prop_Purch_Dt_List_Ev_;
+    KEL.typ.nstr P_L___Ast_Prop_Purch_New_Dt_Ev_;
+    KEL.typ.nstr P_L___Ast_Prop_Purch_New_Msnc_Ev_;
+    KEL.typ.nstr P_L___Ast_Prop_Purch_Old_Dt_Ev_;
+    KEL.typ.nstr P_L___Ast_Prop_Purch_Old_Msnc_Ev_;
     KEL.typ.nstr P_L___Ast_Prop_Sale_Amt_List_Ev_;
     KEL.typ.int P_L___Ast_Prop_Sale_Cnt_Ev_ := 0;
     KEL.typ.nstr P_L___Ast_Prop_Sale_Dt_List_Ev_;
@@ -50563,6 +50813,12 @@ EXPORT L_Compile := MODULE
     KEL.typ.ndataset(Index_Build_Association_Res73_Internal_Layout_Property_Date_Last_Seen_Sorted_Layout) Property_Date_Last_Seen_Sorted_;
     KEL.typ.nstr Property_Min_Date_;
     KEL.typ.ndataset(Index_Build_Association_Res73_Internal_Layout_Property_Sales_Sorted_Layout) Property_Sales_Sorted_;
+    KEL.typ.int Purchase1_Y_Count_ := 0;
+    KEL.typ.int Purchase5_Y_Count_ := 0;
+    KEL.typ.int Purchase_Count_Ever_ := 0;
+    KEL.typ.ndataset(Index_Build_Association_Res73_Internal_Layout_Purchase_Date_List_Sorted_Layout) Purchase_Date_List_Sorted_;
+    KEL.typ.nstr Purchase_New_Date_Ev_;
+    KEL.typ.nstr Purchase_Old_Date_Ev_;
     KEL.typ.ndataset(Index_Build_Association_Res73_Internal_Layout_Recent_Addr_Full_Set_Layout) Recent_Addr_Full_Set_;
     KEL.typ.ndataset(Index_Build_Association_Res73_Internal_Layout_Retail_Inquiries5_Yrs_Layout) Retail_Inquiries5_Yrs_;
     KEL.typ.nkdate Select_Age_;
@@ -52976,6 +53232,16 @@ EXPORT L_Compile := MODULE
     KEL.typ.epoch Vault_Date_Last_Seen_ := 0;
     KEL.typ.int __RecordCount := 0;
   END;
+  SHARED Index_Build_Association_Res79_Internal_Layout_Purchase_Date_List_Sorted_Layout := RECORD
+    KEL.typ.nstr Property_Purchase_Date_First_Seen_;
+    KEL.typ.ntyp(E_Property().Typ) Prop_;
+    KEL.typ.epoch Archive___Date_ := 0;
+    KEL.typ.epoch Date_First_Seen_ := 0;
+    KEL.typ.epoch Date_Last_Seen_ := 0;
+    KEL.typ.epoch Hybrid_Archive_Date_ := 0;
+    KEL.typ.epoch Vault_Date_Last_Seen_ := 0;
+    KEL.typ.int __RecordCount := 0;
+  END;
   SHARED Index_Build_Association_Res79_Internal_Layout_Recent_Addr_Full_Set_Layout := RECORD
     KEL.typ.nint Address_Rank_;
     KEL.typ.nstr Address_Type_;
@@ -54180,6 +54446,7 @@ EXPORT L_Compile := MODULE
     KEL.typ.nstr Current_Addr_Unit_Designation_;
     KEL.typ.nstr Current_Addr_Zip5_;
     KEL.typ.nstr Current_Postdirectional_;
+    KEL.typ.nstr Date_List_;
     KEL.typ.int Drg_Cnt_Contact_ := 0;
     KEL.typ.ndataset(Index_Build_Association_Res79_Internal_Layout_Edu_Coll_Rec_Ver_Source_List_Layout) Edu_Coll_Rec_Ver_Source_List_;
     KEL.typ.ndataset(Index_Build_Association_Res79_Internal_Layout_Edu_Coll_Rec_Ver_Source_List_Filtered_Layout) Edu_Coll_Rec_Ver_Source_List_Filtered_;
@@ -54359,6 +54626,14 @@ EXPORT L_Compile := MODULE
     KEL.typ.nstr P_L___Ast_Prop_New_Dt_List_Ev_;
     KEL.typ.nstr P_L___Ast_Prop_Old_Dt_List_Ev_;
     KEL.typ.nint P_L___Ast_Prop_Ownership_Indx_;
+    KEL.typ.int P_L___Ast_Prop_Purch_Cnt1_Y_ := 0;
+    KEL.typ.int P_L___Ast_Prop_Purch_Cnt5_Y_ := 0;
+    KEL.typ.int P_L___Ast_Prop_Purch_Cnt_Ev_ := 0;
+    KEL.typ.nstr P_L___Ast_Prop_Purch_Dt_List_Ev_;
+    KEL.typ.nstr P_L___Ast_Prop_Purch_New_Dt_Ev_;
+    KEL.typ.nstr P_L___Ast_Prop_Purch_New_Msnc_Ev_;
+    KEL.typ.nstr P_L___Ast_Prop_Purch_Old_Dt_Ev_;
+    KEL.typ.nstr P_L___Ast_Prop_Purch_Old_Msnc_Ev_;
     KEL.typ.nstr P_L___Ast_Prop_Sale_Amt_List_Ev_;
     KEL.typ.int P_L___Ast_Prop_Sale_Cnt_Ev_ := 0;
     KEL.typ.nstr P_L___Ast_Prop_Sale_Dt_List_Ev_;
@@ -54839,6 +55114,12 @@ EXPORT L_Compile := MODULE
     KEL.typ.ndataset(Index_Build_Association_Res79_Internal_Layout_Property_Date_Last_Seen_Sorted_Layout) Property_Date_Last_Seen_Sorted_;
     KEL.typ.nstr Property_Min_Date_;
     KEL.typ.ndataset(Index_Build_Association_Res79_Internal_Layout_Property_Sales_Sorted_Layout) Property_Sales_Sorted_;
+    KEL.typ.int Purchase1_Y_Count_ := 0;
+    KEL.typ.int Purchase5_Y_Count_ := 0;
+    KEL.typ.int Purchase_Count_Ever_ := 0;
+    KEL.typ.ndataset(Index_Build_Association_Res79_Internal_Layout_Purchase_Date_List_Sorted_Layout) Purchase_Date_List_Sorted_;
+    KEL.typ.nstr Purchase_New_Date_Ev_;
+    KEL.typ.nstr Purchase_Old_Date_Ev_;
     KEL.typ.ndataset(Index_Build_Association_Res79_Internal_Layout_Recent_Addr_Full_Set_Layout) Recent_Addr_Full_Set_;
     KEL.typ.ndataset(Index_Build_Association_Res79_Internal_Layout_Retail_Inquiries5_Yrs_Layout) Retail_Inquiries5_Yrs_;
     KEL.typ.nkdate Select_Age_;

@@ -501,7 +501,9 @@ EXPORT Q_Non_F_C_R_A_Mini_Attributes_V1_Thor_Hybrid(KEL.typ.uid __PLexID_in, KEL
   END;
   SHARED B_Person_Property_3_Local := MODULE(B_Person_Property_3(__in,__cfg_Local))
     SHARED TYPEOF(B_Person_Property_4(__in,__cfg_Local).__ENH_Person_Property_4) __ENH_Person_Property_4 := B_Person_Property_4_Local.__ENH_Person_Property_4;
+    SHARED TYPEOF(E_Person_Property_Event(__in,__cfg_Local).__Result) __E_Person_Property_Event := E_Person_Property_Event_Filtered.__Result;
     SHARED TYPEOF(B_Property_4(__in,__cfg_Local).__ENH_Property_4) __ENH_Property_4 := B_Property_4_Local.__ENH_Property_4;
+    SHARED TYPEOF(B_Property_Event_4(__in,__cfg_Local).__ENH_Property_Event_4) __ENH_Property_Event_4 := B_Property_Event_4_Local.__ENH_Property_Event_4;
   END;
   SHARED B_Person_S_S_N_3_Local := MODULE(B_Person_S_S_N_3(__in,__cfg_Local))
     SHARED TYPEOF(B_Person_S_S_N_4(__in,__cfg_Local).__ENH_Person_S_S_N_4) __ENH_Person_S_S_N_4 := B_Person_S_S_N_4_Local.__ENH_Person_S_S_N_4;
@@ -676,9 +678,9 @@ EXPORT Q_Non_F_C_R_A_Mini_Attributes_V1_Thor_Hybrid(KEL.typ.uid __PLexID_in, KEL
     SHARED TYPEOF(B_Watercraft_Owner_1(__in,__cfg_Local).__ENH_Watercraft_Owner_1) __ENH_Watercraft_Owner_1 := B_Watercraft_Owner_1_Local.__ENH_Watercraft_Owner_1;
   END;
   SHARED TYPEOF(B_Person(__in,__cfg_Local).__ENH_Person) __ENH_Person := B_Person_Local.__ENH_Person;
-  SHARED __EE11930141 := __ENH_Person;
-  SHARED __EE11932184 := __EE11930141(__T(__OP2(__EE11930141.UID,=,__CN(__PLexID_in))));
-  SHARED __ST135016_Layout := RECORD
+  SHARED __EE12059305 := __ENH_Person;
+  SHARED __EE12061365 := __EE12059305(__T(__OP2(__EE12059305.UID,=,__CN(__PLexID_in))));
+  SHARED __ST135855_Layout := RECORD
     KEL.typ.nuid Lex_I_D_;
     KEL.typ.str P___Lex_I_D_Seen_Flag_ := '';
     KEL.typ.nstr Current_Addr_Prim_Rng_;
@@ -705,7 +707,7 @@ EXPORT Q_Non_F_C_R_A_Mini_Attributes_V1_Thor_Hybrid(KEL.typ.uid __PLexID_in, KEL
     KEL.typ.epoch Vault_Date_Last_Seen_ := 0;
     KEL.typ.int __RecordCount := 0;
   END;
-  EXPORT Res0 := __UNWRAP(PROJECT(__EE11932184,TRANSFORM(__ST135016_Layout,SELF.Lex_I_D_ := LEFT.UID,SELF := LEFT)));
+  EXPORT Res0 := __UNWRAP(PROJECT(__EE12061365,TRANSFORM(__ST135855_Layout,SELF.Lex_I_D_ := LEFT.UID,SELF := LEFT)));
   EXPORT DBG_E_Accident_Result := __UNWRAP(E_Accident_Filtered.__Result);
   EXPORT DBG_E_Address_Result := __UNWRAP(E_Address_Filtered.__Result);
   EXPORT DBG_E_Address_Inquiry_Result := __UNWRAP(E_Address_Inquiry_Filtered.__Result);

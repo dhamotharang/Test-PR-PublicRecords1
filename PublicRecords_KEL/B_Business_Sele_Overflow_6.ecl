@@ -4,8 +4,8 @@ IMPORT CFG_Compile,E_Business_Sele_Overflow FROM PublicRecords_KEL;
 IMPORT * FROM KEL15.Null;
 EXPORT B_Business_Sele_Overflow_6(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG_Compile __cfg = CFG_Compile) := MODULE
   SHARED VIRTUAL TYPEOF(E_Business_Sele_Overflow(__in,__cfg).__Result) __E_Business_Sele_Overflow := E_Business_Sele_Overflow(__in,__cfg).__Result;
-  SHARED __EE481587 := __E_Business_Sele_Overflow;
-  EXPORT __ST263956_Layout := RECORD
+  SHARED __EE483158 := __E_Business_Sele_Overflow;
+  EXPORT __ST265344_Layout := RECORD
     KEL.typ.nuid UID;
     KEL.typ.nint Ult_I_D_;
     KEL.typ.nint Org_I_D_;
@@ -31,16 +31,16 @@ EXPORT B_Business_Sele_Overflow_6(CFG_Compile.FDCDataset __in = CFG_Compile.FDCD
     KEL.typ.epoch Vault_Date_Last_Seen_ := 0;
     KEL.typ.int __RecordCount := 0;
   END;
-  SHARED __ST263956_Layout __ND5481662__Project(E_Business_Sele_Overflow(__in,__cfg).Layout __PP481119) := TRANSFORM
-    __EE481430 := __PP481119.S_O_S_Incorporation_Details_;
-    __BS482964 := __T(__EE481430);
-    __EE5481660 := __BS482964(__T(__AND(__AND(__NOT(__NT(__T(__EE481430).S_O_S_Incorporation_State_)),__OP2(__T(__EE481430).S_O_S_Incorporation_State_,<>,__CN(''))),__OP2(__T(__EE481430).S_O_S_Foreign_Domestic_Indicator_,=,__CN('D')))));
-    SELF.S_O_S_Domestic_Filing_ := __CN(__EE5481660);
-    __EE481461 := __PP481119.S_O_S_Incorporation_Details_;
-    __BS483166 := __T(__EE481461);
-    __EE5481670 := __BS483166(__T(__AND(__AND(__NOT(__NT(__T(__EE481461).S_O_S_Foreign_State_Code_)),__OP2(__T(__EE481461).S_O_S_Foreign_State_Code_,<>,__CN(''))),__OP2(__T(__EE481461).S_O_S_Foreign_Domestic_Indicator_,=,__CN('F')))));
-    SELF.S_O_S_Foreign_Filing_ := __CN(__EE5481670);
-    SELF := __PP481119;
+  SHARED __ST265344_Layout __ND5541799__Project(E_Business_Sele_Overflow(__in,__cfg).Layout __PP482690) := TRANSFORM
+    __EE483001 := __PP482690.S_O_S_Incorporation_Details_;
+    __BS484535 := __T(__EE483001);
+    __EE5541797 := __BS484535(__T(__AND(__AND(__NOT(__NT(__T(__EE483001).S_O_S_Incorporation_State_)),__OP2(__T(__EE483001).S_O_S_Incorporation_State_,<>,__CN(''))),__OP2(__T(__EE483001).S_O_S_Foreign_Domestic_Indicator_,=,__CN('D')))));
+    SELF.S_O_S_Domestic_Filing_ := __CN(__EE5541797);
+    __EE483032 := __PP482690.S_O_S_Incorporation_Details_;
+    __BS484737 := __T(__EE483032);
+    __EE5541807 := __BS484737(__T(__AND(__AND(__NOT(__NT(__T(__EE483032).S_O_S_Foreign_State_Code_)),__OP2(__T(__EE483032).S_O_S_Foreign_State_Code_,<>,__CN(''))),__OP2(__T(__EE483032).S_O_S_Foreign_Domestic_Indicator_,=,__CN('F')))));
+    SELF.S_O_S_Foreign_Filing_ := __CN(__EE5541807);
+    SELF := __PP482690;
   END;
-  EXPORT __ENH_Business_Sele_Overflow_6 := PROJECT(__EE481587,__ND5481662__Project(LEFT));
+  EXPORT __ENH_Business_Sele_Overflow_6 := PROJECT(__EE483158,__ND5541799__Project(LEFT));
 END;

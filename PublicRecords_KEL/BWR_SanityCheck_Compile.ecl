@@ -271,6 +271,7 @@ IF(RunAll OR RunInvalidSingleValues,OUTPUT(E_Property_Event().Standardized_Land_
 IF(RunAll OR RunInvalidSingleValues,OUTPUT(E_Property_Event().Occupant_Owned__SingleValue_Invalid,NAMED('E_Property_Event_Occupant_Owned__SingleValue_Invalid')));
 IF(RunAll OR RunInvalidSingleValues,OUTPUT(E_Property_Event().Recording_Date__SingleValue_Invalid,NAMED('E_Property_Event_Recording_Date__SingleValue_Invalid')));
 IF(RunAll OR RunInvalidSingleValues,OUTPUT(E_Property_Event().Sale_Date__SingleValue_Invalid,NAMED('E_Property_Event_Sale_Date__SingleValue_Invalid')));
+IF(RunAll OR RunInvalidSingleValues,OUTPUT(E_Property_Event().Document_Type_Code__SingleValue_Invalid,NAMED('E_Property_Event_Document_Type_Code__SingleValue_Invalid')));
 IF(RunAll OR RunInvalidSingleValues,OUTPUT(E_Property_Event().Sale_Price__SingleValue_Invalid,NAMED('E_Property_Event_Sale_Price__SingleValue_Invalid')));
 IF(RunAll OR RunInvalidSingleValues,OUTPUT(E_Property_Event().Mortgage_Amount__SingleValue_Invalid,NAMED('E_Property_Event_Mortgage_Amount__SingleValue_Invalid')));
 IF(RunAll OR RunInvalidSingleValues,OUTPUT(E_Property_Event().Mortgage_Type__SingleValue_Invalid,NAMED('E_Property_Event_Mortgage_Type__SingleValue_Invalid')));
