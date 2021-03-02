@@ -1,8 +1,9 @@
-IMPORT EmailV2_Services, Gateway, iesp, Royalty;
+﻿IMPORT EmailV2_Services, Gateway, iesp, Royalty;
 
 EXPORT emailv2_records (DATASET(doxie.layout_references) dids,
                         doxie.IDataAccess modAccess,
-                        BOOLEAN _keepRaw = FALSE) := FUNCTION
+                        BOOLEAN _keepRaw = FALSE,
+                        STRING default_SearchTier = EmailV2_Services.Constants.Basic) := FUNCTION
 
     email_params := MODULE(PROJECT(modAccess, EmailV2_Services.IParams.EmailParams, OPT))
       _MaxResultsPerAcct := 5 : STORED('MaxEmailResults');
@@ -12,7 +13,7 @@ EXPORT emailv2_records (DATASET(doxie.layout_references) dids,
       EXPORT BOOLEAN RequireLexidMatch := TRUE;
       EXPORT UNSIGNED1 EmailQualityRulesMask := EmailV2_Services.Constants.Defaults.EmailQualityRules;
       STRING _SearchTier := '' : STORED('EmailSearchTier');
-      SHARED STRING SearchTier := IF(EmailV2_Services.Constants.isValidTier(_SearchTier), _SearchTier, EmailV2_Services.Constants.Basic); // defaults to Basic
+      SHARED STRING SearchTier := IF(EmailV2_Services.Constants.isValidTier(_SearchTier), _SearchTier, default_SearchTier); // defaults to default_SearchTier
       _isBasicTier := EmailV2_Services.Constants.isBasic(SearchTier);
       EXPORT STRING   RestrictedUseCase := IF (_isBasicTier,
                                                EmailV2_Services.Constants.RestrictedUseCase.NoRoyaltySources,

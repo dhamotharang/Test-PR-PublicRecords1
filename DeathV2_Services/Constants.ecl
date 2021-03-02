@@ -30,4 +30,11 @@ EXPORT Constants := MODULE
     export Integer LegitimateBusinessPurpose := 2;
   END;
 
+  EXPORT SearchIndicators := MODULE
+    EXPORT UNSIGNED1 DEATH_ID := 0;
+    EXPORT UNSIGNED1 DID := 1;
+    EXPORT UNSIGNED1 DEEP_DIVE := 2;
+    EXPORT UNSIGNED1 OTHERS := 4;
+  END;
+
 END;

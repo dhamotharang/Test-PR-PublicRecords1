@@ -12,6 +12,7 @@ export SourceService_Layouts := module
 		string6 	ssn_mask;
 		string1		fetch_level;
     boolean   IncludeVendorSourceB;
+    boolean   IncludeAssignmentsAndReleases;
 	end;
 	
 	export OutputLayout := record

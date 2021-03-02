@@ -6,6 +6,7 @@ export PropertySection_layouts := MODULE
 		boolean internal_testing;
 		string1 businessReportFetchLevel;
     boolean IncludeVendorSourceB;
+    boolean IncludeAssignmentsAndReleases;
 	end;
 	
 	export rec_input := record

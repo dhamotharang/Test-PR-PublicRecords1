@@ -114,7 +114,8 @@ EXPORT IParam := MODULE
     // Probably, will be sparsely used (see #40087)
     EXPORT boolean sort_deeds_by_ownership := FALSE;
     EXPORT boolean include_aml_property := FALSE;
-    EXPORT boolean includeVendorSourceB := FALSE;
+    EXPORT boolean includeVendorSourceB := FALSE; // source B foreclosures
+    EXPORT boolean IncludeAssignmentsAndReleases := FALSE; // assignments and release (only available in source B deeds). 
   END;
 
   // health care providers

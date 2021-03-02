@@ -42,7 +42,7 @@ EXPORT getExecAssets(DATASET(DueDiligence.v3Layouts.Internal.BusinessTemp) inDat
     
     watercraftInfo := DueDiligence.getIndWatercraft(uniqueBEOs, modAccess);
     
-    vehicleInfo := DueDiligence.getIndVehicle(uniqueBEOs, regulatoryAccess.dppa, modAccess);
+    vehicleInfo := DueDiligence.getIndVehicle(uniqueBEOs, modAccess);
     
     aircraftInfo := DueDiligence.getIndAircraft(uniqueBEOs);
     

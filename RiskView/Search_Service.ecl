@@ -16,7 +16,7 @@
 */
 /*--INFO-- Contains RiskView Alerts, Scores, Attributes, Report version 5.0 and higher */
 
-IMPORT Risk_Reporting, iesp, gateway, risk_indicators, std, Inquiry_AccLogs, RiskView, Royalty, Address;
+IMPORT Risk_Reporting, iesp, gateway, risk_indicators, std, Inquiry_AccLogs, RiskView, Royalty, Address, Doxie;
 
 export Search_Service := MACRO
 
@@ -105,7 +105,7 @@ export Search_Service := MACRO
 	STRING15 DLNumber := search.DriverLicenseNumber;
 	STRING2 DLState := search.DriverLicenseState;
 	string12 LexID := search.UniqueId;
-	
+
 /* ***************************************
 	 *             Set Options:            *
    *************************************** */
@@ -229,24 +229,45 @@ export Search_Service := MACRO
   STRING20 CustomerNumber					:= context.MLAGatewayInfo.CustomerNumber ;
   STRING20 SecurityCode 					:= context.MLAGatewayInfo.SecurityCode  ;
 
+  // Check if any IDA models are requested.
+  IDA_model_check :=  auto_model_name IN RiskView.Constants.valid_IDA_models OR 
+                      bankcard_model_name IN RiskView.Constants.valid_IDA_models OR  
+                      Short_term_lending_model_name IN RiskView.Constants.valid_IDA_models OR  
+                      Telecommunications_model_name IN RiskView.Constants.valid_IDA_models OR  
+                      Crossindustry_model_name IN RiskView.Constants.valid_IDA_models OR  
+                      Custom_model_name IN RiskView.Constants.valid_IDA_models OR 
+                      Custom2_model_name IN RiskView.Constants.valid_IDA_models OR 
+                      Custom3_model_name IN RiskView.Constants.valid_IDA_models OR 
+                      Custom4_model_name IN RiskView.Constants.valid_IDA_models OR 
+                      Custom5_model_name IN RiskView.Constants.valid_IDA_models;
+
 /* ***************************************
 	 *           Package Input:            *
    *************************************** */
 	packagedInput := DATASET([TRANSFORM(riskview.layouts.layout_riskview_input,
-		SELF.Seq := (integer)search.seq;
+		
+    //Blank out certain PII elements if they are only partially filled for IDA since they can't accept partial data
+    is_proper_dob := Doxie.DOBTools((UNSIGNED)DateOfBirth).IsValidDOB;
+    
+    IDA_DOB := IF( Not(length(trim(DateOfBirth)) = 8 and is_proper_dob), '', DateOfBirth);
+    IDA_SSN := IF(length(trim(SSN)) <> 9, '', SSN);
+    IDA_Hphone := IF(length(trim(HomePhone)) <> 10, '', HomePhone);
+    IDA_Wphone := IF(length(trim(SSN)) <> 10, '', SSN);
+    
+    SELF.Seq := (integer)search.seq;
 		self.unparsedfullname := search.name.full;
 		SELF.Name_First := search.Name.First;
 		SELF.name_middle := search.Name.Middle;
 		SELF.name_last := search.Name.Last;
 		SELF.name_suffix := search.Name.Suffix;
-		SELF.street_addr   := streetAddr;
-		SELF.p_City_name  := City;
-		SELF.St        := State;
-		SELF.Z5          := Zip;
-		SELF.DOB := DateOfBirth;
-		SELF.SSN := SSN;
-		SELF.home_phone := HomePhone;
-		SELF.work_phone := WorkPhone;
+		SELF.street_addr := streetAddr;
+		SELF.p_City_name := City;
+		SELF.St := State;
+		SELF.Z5 := Zip;
+		SELF.DOB := IF(IDA_model_check, IDA_DOB, DateOfBirth);
+		SELF.SSN := IF(IDA_model_check, IDA_SSN, SSN);
+		SELF.home_phone := IF(IDA_model_check, IDA_Hphone, HomePhone);
+		SELF.work_phone := IF(IDA_model_check, IDA_Wphone, WorkPhone);
 		SELF.Email := Email;
 		SELF.DL_Number := DLNumber;
 		SELF.DL_State := DLState;
@@ -284,18 +305,6 @@ min_error_message          := 'Error - Minimum input fields required: First Name
 no_lexid_min_error_message := 'Error - Minimum input fields required: First Name, Last Name, Address, and Zip or City and State; or First Name, Last Name, and SSN';
 rpt_period_error_message   := 'Error - Input Value for ReportingPeriod must be 1 - 84 months.';
 attr_only_error_message    := 'Error - The AttributesOnly option cannot be selected with the ExcludeReleasedCases option.';
-
-// Check if any IDA models are requested.
-IDA_model_check :=  auto_model_name IN RiskView.Constants.valid_IDA_models OR 
-                    bankcard_model_name IN RiskView.Constants.valid_IDA_models OR  
-                    Short_term_lending_model_name IN RiskView.Constants.valid_IDA_models OR  
-                    Telecommunications_model_name IN RiskView.Constants.valid_IDA_models OR  
-                    Crossindustry_model_name IN RiskView.Constants.valid_IDA_models OR  
-                    Custom_model_name IN RiskView.Constants.valid_IDA_models OR 
-                    Custom2_model_name IN RiskView.Constants.valid_IDA_models OR 
-                    Custom3_model_name IN RiskView.Constants.valid_IDA_models OR 
-                    Custom4_model_name IN RiskView.Constants.valid_IDA_models OR 
-                    Custom5_model_name IN RiskView.Constants.valid_IDA_models;
 
 Standard_min_check := (((TRIM(packagedInput[1].name_first)<>'' AND TRIM(packagedInput[1].name_last)<>'') OR TRIM(packagedInput[1].unparsedfullname)<>'') AND  // name check
 							           (TRIM(packagedInput[1].ssn)<>'' OR                                                                                                   // ssn check

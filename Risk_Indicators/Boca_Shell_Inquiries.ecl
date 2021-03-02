@@ -98,18 +98,19 @@ layout_temp_ccpa := RECORD
 END;
 
 //can have multiple gateways so account for them
-deltabase_check := gateways(servicename = Gateway.Constants.ServiceName.DeltaInquiry)[1].url;
-deltabase_Name := gateways(servicename = Gateway.Constants.ServiceName.DeltaInquiry)[1].servicename;
+deltabase_cfg := gateways(servicename = Gateway.Constants.ServiceName.DeltaInquiry)[1];
+deltabase_check := deltabase_cfg.url;
 
 //MS-160
 deltabase_URL := if(bsversion >= 50 and 
 ( clam_pre_Inquiries[1].historydate=999999 or clam_pre_Inquiries [1].historydate = (unsigned)(((string)risk_indicators.iid_constants.todaydate)[1..6]) )
 and ~isFCRA, deltabase_check, '');
 
-DeltabaseGateway := DATASET ([TRANSFORM(Gateway.Layouts.Config, SELF.ServiceName := deltabase_Name;
+DeltabaseGateway := DATASET ([TRANSFORM(Gateway.Layouts.Config, SELF.ServiceName := deltabase_cfg.servicename;
 																																							 SELF.URL := deltabase_URL;
+																																							 self.transactionid := deltabase_cfg.transactionid;
 																																							 SELF := [])]);
-																										
+																																																			
 clam_pre_Inquiries_deltabase := ungroup(clam_pre_Inquiries);
 
 MAC_raw_did_transform (trans_name, key_did) := MACRO
@@ -2940,101 +2941,6 @@ with_billgroups := join(with_inquiries, billgroup_key,
 // skip the billgroups search if bsversion is prior to 50
 inquiry_summary := if(bsversion>=50, group(with_billgroups, seq), group(with_inquiries, seq) );
 
-// output(deltabase_URL, named('deltabase_URL'));
-// output(clam_pre_Inquiries, named('clam_pre_Inquiries'));
-// output(did_ds, named('did_ds'));
-// output(deltaBase_did_results, named('deltabase_did_results'));
-// output(deltaBase_did_results_old, named('deltaBase_did_results_old'));
-// output(deltaBase_ssn_results_old, named('deltaBase_ssn_results_old'));
-// output(deltaBase_ssn_results, named('deltaBase_ssn_results'));
-
-// output(deltaBase_all_results,named('deltaBase_all_results'));
-// output(deltaBase_email_results, named('deltaBase_email_results'));
-
-// output(Email_raw_base,named('Email_raw_base'));
-// output(Email_raw_updates,named('Email_raw_updates'));
-// output(Email_raw_deltabase, named('Email_raw_deltabase'));
-
-// output(Email_raw, named('Email_raw'));
-// output(grouped_Email_raw, named('grouped_Email_raw'));
-// output(with_email_velocities, named('with_email_velocities'));
-
-// output(j_raw_nonfcra_full, all, named('j_raw_nonfcra_full'));
-// output(j_raw_nonfcra_update, all, named('j_raw_nonfcra_update'));
-// output(j_raw_nonfcra_deltabase, all, named('j_raw_nonfcra_deltabase'));
-// output(j_raw_nonfcra1, all, named('j_raw_nonfcra1'));
-// output(j_raw, all, named('j_raw'));
-// output(grouped_raw, named('grouped_raw'));
-// output(rolled_raw, named('rolled_raw'));
-// output(deduped_Phones_per_adl, named('deduped_Phones_per_adl'));
-// output(slim_phones, named('slim_phones'));
-// output(substitutedPhones, named('substitutedPhones'));
-// output(rolledSubPhones, named('rolledSubPhones'));
-// output(deduped_Primrange_per_adl, named('deduped_Primrange_per_adl'));
-// output(slim_primrange, named('slim_primrange'));
-// output(substitutedPrimrange, named('substitutedPrimrange'));
-// output(rolledSubPrimrange, named('rolledSubPrimrange'));
-// output(deduped_fnames_per_adl, named('deduped_fnames_per_adl'));
-// output(slim_fnames, named('slim_fnames'));
-// output(substitutedFnames, named('substitutedFnames'));
-// output(rolledSubFnames, named('rolledSubFnames'));
-// output(deduped_SSN_per_adl, named('deduped_SSN_per_adl'));
-// output(slim_SSNs, named('slim_SSNs'));
-// output(substitutedSSNs, named('substitutedSSNs'));
-// output(rolledSubSSNs, named('rolledSubSSNs'));
-// output(deduped_DOBs_per_adl, named('deduped_DOBs_per_adl'));
-// output(slim_DOBs, named('slim_DOBs'));
-// output(substitutedDOBs, named('substitutedDOBs'));
-// output(rolledSubDOBs, named('rolledSubDOBs'));
-// output(deduped_lnames_per_adl, named('deduped_lnames_per_adl'));
-// output(slim_Lnames, named('slim_Lnames'));
-// output(substitutedLnames, named('substitutedLnames'));
-// output(rolledSubLnames, named('rolledSubLnames'));
-
-// output(with_SubPhones, named('with_SubPhones'));
-// output(with_addr_per_adl, named('with_addr_per_adl'));
-// output(with_Lnames_per_SSN, named('with_Lnames_per_SSN'));
-// output(with_Lnames_per_Addr, named('with_Lnames_per_Addr'));
-// output(with_emails_per_adl, named('with_emails_per_adl'));
-// output(ssn_raw, named('ssn_raw'));
-// output(rolled_ssn_raw, named('rolled_ssn_raw'));
-// output(addr_raw, named('addr_raw'));
-// output(rolled_addr_raw, named('rolled_addr_raw'));
-// output(phone_raw, named('phone_raw'));
-// output(addr_raw_base, named('addr_raw_base'));
-// output(addr_raw_updates, named('addr_raw_updates'));
-// output(addr_raw_deltabase, named('addr_raw_deltabase'));
-// output(addr_raw, named('addr_raw'));
-// output(sorted_SSNs_per_Addr, named('sorted_SSNs_per_Addr'));
-// output(rolled_SSNs_per_Addr, named('rolled_SSNs_per_Addr'));
-// output(deduped_SSN_per_addr, named('deduped_SSN_per_addr'));
-// output(slim_SSNsFromAddr, named('slim_SSNsFromAddr'));
-// output(SSNsFromAddr_1dig, named('SSNsFromAddr_1dig'));
-// output(rolledSSNsFromAddr_1dig, named('rolledSSNsFromAddr_1dig'));
-// output(with_SSNsFromAddr_1dig, named('with_SSNsFromAddr_1dig'));
-// output(rolled_addr_raw, named('rolled_addr_raw'));
-
-// output(with_ssn_velocity, named('with_ssn_velocity'));
-// output(with_address_velocities, named('with_address_velocities'));
-// output(with_phone_velocities, named('with_phone_velocities'));
-// output(with_email_velocities, named('with_email_velocities'));
-// output(with_inquiries, named('with_inquiries'));
-// output(with_billgroups, named('with_billgroups'));
-
-// output(rolled_addrs_per_adl, named('rolled_addrs_per_adl'));
-// output(deduped_SSN_per_adl, named('deduped_SSN_per_adl'));
-// output(slim_SSNs, named('slim_SSNs'));
-// output(substitutedSSNs, named('substitutedSSNs'));
-// output(rolledSubSSNs, named('rolledSubSSNs'));
-// output(slim_DOBs, named('slim_DOBs'));
-// output(substitutedDOBDay, named('substitutedDOBDay'));
-// output(rolledSubDOBDay, named('rolledSubDOBDay'));
-
-// output(inquiry_summary, named('inquiry_summary'));
-
-// output(did_ds,named('old'));
-// output(deltaBase_all_ds,named('new'));
- // output(deltaBase_all_results,named('deltaBase_all_results'));
 
 	return inquiry_summary;
 END;

@@ -271,6 +271,10 @@ EXPORT Constants := MODULE
 		export unsigned1 MaxCountSources := 100;
 	end;
 
+  export ContactRisk := module
+		export unsigned1 MAX_RECORDS := 6;
+	end;
+
 	// Civil Court
   export unsigned2 MAX_COUNT_CIVIL_COURT_SEARCH_RESPONSE_RECORDS := 2000; // need this to be lower since a higher number will
 	                                                                        // overflow and cause memory error.

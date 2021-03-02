@@ -187,6 +187,7 @@ EXPORT SourceSection := MODULE
 	 // v--- Addded 02/12/14 due to Keith's SourceService enhancement
    self.fetch_level := in_options.BusinessReportFetchLevel;
    self.IncludeVendorSourceB := in_options.IncludeVendorSourceB;
+   self.IncludeAssignmentsAndReleases := in_options.IncludeAssignmentsAndReleases;
 	end;
 	
 	rs_options := row(tf_options());
