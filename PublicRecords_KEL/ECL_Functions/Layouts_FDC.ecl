@@ -1354,6 +1354,8 @@ SHARED unsigned1 iType := IF(Options.IsFCRA, data_services.data_env.iFCRA, data_
 		dpmtype;
 		STRING3 src;
 		STRING Archive_Date;
+		PublicRecords_KEL.ECL_Functions.Layout_Overrides.avm_medians_correct_ffid;
+		PublicRecords_KEL.ECL_Functions.Layout_Overrides.avm_medians_correct_record_id;
 
 	END;
 	
