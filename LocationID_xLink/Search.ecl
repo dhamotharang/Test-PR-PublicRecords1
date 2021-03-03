@@ -13,7 +13,8 @@ export Search(inDs,
             outDs) := macro
 
      import STD;
-	
+	#uniquename(leadThreshold)
+	%leadThreshold% := 10;
     //Adds an uninitialized variable to receithref for index
 	#uniquename(RecWithRef)
 	%RecWithRef% := record
@@ -49,7 +50,7 @@ export Search(inDs,
 	                          self.prim_name_derived_append   := map(POBoxIndex and trim(left.prim_range_field)='' => 'PO BOX',
 	                                                                 RRIndex and trim(left.prim_range_field)=''    => 'RR',
 	                                                                 left.prim_name_field),
-	                          self.sec_range_derived_append   :=  if(left.sec_range_field='','',left.sec_range_field); 
+	                          self.sec_range_derived_append   :=  left.sec_range_field; 
 	                          self.err_stat_append            := 'S';
 	                          self                            := left));
 
@@ -109,7 +110,7 @@ export Search(inDs,
 	%groupNormweight%:= group(%sortNormweight%, reference, local);
 
 	%normweight% func(%normweight% le, %normweight% ri):= TRANSFORM,
-		skip(ri.weight<(le.maxv - 10) and le.maxv > 0)
+		skip(ri.weight<(le.maxv - %leadThreshold%) and le.maxv > 0)
 		self.maxv := if(le.maxv = 0, ri.weight, le.maxv);
 		self := ri;
 	END;
@@ -180,6 +181,6 @@ export Search(inDs,
 							self := left, self := right), left outer, hash);
 	// output(%finalresult%);
 	#uniquename(sortedRes)
-	%sortedRes% := sort(%finalresult%, inid);
+	%sortedRes% := sort(%finalresult%, inid, weight);
 	outDs          := %sortedRes%;
 endmacro;
