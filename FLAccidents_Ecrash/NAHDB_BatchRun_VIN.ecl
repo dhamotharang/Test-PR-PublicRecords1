@@ -133,10 +133,10 @@ vin_match:= dedup(join(accidentDedup, distribute(filein(vin <> ''),hash(vin)),
            self.vehicle_unit_number   :=  left.vehicle_unit_number    ;
            self.vendor_code           :=  left.vendor_code;
            self.work_type_id          :=  left.work_type_id;
-		   self.airbags_deploy   := map  ( left.airbags_deploy  = 0 =>  'false',
-		                                                           left.airbags_deploy  = 1 =>  'true', ' ' );
-		   self.towed   := map  ( left.towed  = 0 =>  'false',
-		                                                           left.towed  = 1 =>  'true', ' ' );
+		   self.airbags_deploy   := map  ( left.airbags_deploy  = '0' =>  'false',
+		                                                           left.airbags_deploy  = '1' =>  'true', ' ' );
+		   self.towed   := map  ( left.towed  = '0' =>  'false',
+		                                                           left.towed  = '1' =>  'true', ' ' );
 			self.impact_location := left.impact_location;
 		             
 					 self := right 
