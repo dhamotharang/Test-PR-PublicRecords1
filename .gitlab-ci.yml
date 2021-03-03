@@ -31,7 +31,7 @@ syntax_check:
     - git checkout $CI_COMMIT_BRANCH
     - git add $RES_FILE
     - git commit -m "Daily Query Syntax Check Results"
-    - git push https://${GitlabCIUser}:${GitlabCIToken}@${CI_REPOSITORY_URL#*@}
+    - git push https://${CIUser_Arqs}:${CIToken_Arqs}@${CI_REPOSITORY_URL#*@}
     - exit $checkres
     
 
