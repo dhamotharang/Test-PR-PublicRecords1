@@ -43,10 +43,10 @@ function
   ds_init           := BIPV2_Tools.initParentID(ds_hrchy, proxid, lgid3) : persist('~persist::BIPV2_LGID3::_Preprocess::ds_init');
 
   // -- patch lgid3 underlinks outside of salt
-  ds_patch_Underlinks := BIPV2_ForceLink.mac_ForceLink_Lgid3 (ds_init);
+  ds_patch_Underlinks := BIPV2_ForceLink.mac_ForceLink_Lgid3 (ds_init)  : persist('~persist::BIPV2_LGID3::_Preprocess::ds_patch_Underlinks');
 
   // -- Suppress overlinks.  turn off explosion(2nd param) because it has already been done in the proxid preprocess.
-  ds_suppress := BIPV2_Field_Suppression.mac_Suppress(ds_patch_Underlinks,false) ;
+  ds_suppress := BIPV2_Field_Suppression.mac_Suppress(ds_patch_Underlinks,false)  : persist('~persist::BIPV2_LGID3::_Preprocess::ds_suppress');
 
   preprocessResult  := PROJECT(ds_suppress,toBase(LEFT));	
   

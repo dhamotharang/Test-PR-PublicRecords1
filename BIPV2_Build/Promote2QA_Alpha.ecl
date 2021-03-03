@@ -2,6 +2,7 @@
 
 
 // -- promote all files and keys to qa versions
+// -- only keep 1 version of the keys in alpharetta(pnGenerations := 1 in the promote call at the bottom of this attribute).
 export Promote2QA_Alpha(
    pversion             = 'Bipv2.KeySuffix'
   ,pPerformCleanup      = 'true'
@@ -43,12 +44,12 @@ functionmacro
        outputAlpha_keys //check to make sure all keys are built and match the code first before promoting them to qa
       ,BIPV2_Build.Promote(pversion         ,pkeyfilter2AlphaProd   ,,,myfiles          ).new2Built  //just in case they weren't added to built
       ,BIPV2_Build.Promote(suppressversion  ,                       ,,,myfiles_suppress ).new2Built  //just in case they weren't added to built
-      ,BIPV2_Build.Promote(                 ,pkeyfilter2AlphaProd   ,,,myfiles          ).built2qa
+      ,BIPV2_Build.Promote(                 ,pkeyfilter2AlphaProd   ,,,myfiles          ,pnGenerations := 1).built2qa
       ,CheckBIPV2FullKeys_Alpha
       ,CheckBIPV2SuppressionKeys_Alpha
       ,Update_Orbit_BIPV2FullKeys_Alpha       
       ,Update_Orbit_BIPV2SuppressionKeys_Alpha
-      ,iff(pPerformCleanup = true  ,BIPV2_Build.Promote(,pkeyfilter2AlphaProd,true,,myfiles).Cleanup  )
+      ,iff(pPerformCleanup = true  ,BIPV2_Build.Promote(,pkeyfilter2AlphaProd,true,,myfiles,pnGenerations := 1).Cleanup  )
     );
 
 endmacro;

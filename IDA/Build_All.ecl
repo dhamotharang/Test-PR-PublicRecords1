@@ -11,7 +11,7 @@ export built := sequential(
 			                        ,IDA.Build_Strata(pversion,pUseProd).all
 									,Scrubs_IDA.Fn_RunScrubs_Base(pVersion,'vlad.petrokas@lexisnexisrisk.com')
 					                ,IDA._BWR_Despray(version,pUseProd)
-									,IDA._BWR_MoveToDone(pUseProd)
+									,IDA._BWR_MoveToDoneAndDelete(pUseProd)
 			                    ): success(IDA.Send_Email(version,pUseProd).BuildSuccess), failure(IDA.send_email(version,pUseProd).BuildFailure
 
 );

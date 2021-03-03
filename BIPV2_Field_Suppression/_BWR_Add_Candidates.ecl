@@ -1,28 +1,31 @@
 ﻿// -- Add field suppression candidates
-/*
-  export Suppression_field := {string fieldname ,string fieldvalue};
 
-  export Suppression_in := 
-    {
-       dataset(Suppression_field) suppressed_field_values  
-      ,string                     comment
-      ,dataset(Suppression_field) context                 := dataset([],Suppression_field)  //optional
-    };
-*/
+// -- SUPPRESSED FIELD VALUES
 ds_suppressed_field_values := dataset([
-  {'company_fein' ,'999999999'}
- ,{'company_fein' ,'000000000'}
- ,{'company_fein' ,'111111111'}
- ,{'company_fein' ,'123456789'}
+  {'company_fein*' ,'^(000000000|111111111|999999999)$'}
+ ,{'company_fein' ,'123456788'}
+ 
 ]  ,BIPV2_Field_Suppression.layouts.Suppression_field);
 
+// -- CONTEXT VALUES
 ds_context := dataset([
+  // {'source'    ,mdr.sourcetools.src_cortera }
+ // ,{'cnp_name*' ,'BERKOWITZ'                 }
   
 ]  ,BIPV2_Field_Suppression.layouts.Suppression_field);
 
+// -- ID VALUES
+ds_IDS := dataset([
+  {'proxid' ,'dotid'}
+ ,{'lgid3'  ,'proxid'}
+  
+]  ,BIPV2_Field_Suppression.layouts.Suppression_field);
+
+// -- CONSTRUCT SUPPRESSED RECORD
 ds_suppressions := 
   dataset([
-    { ds_suppressed_field_values   ,'BH-845 -- improve fein matching in lgid3' ,ds_context} // -- examples
+    { ds_suppressed_field_values   ,'BH-845 -- improve fein matching in lgid3. regex fein, explode proxid to dotid' ,'FSE'  ,ds_context ,ds_IDS} // -- examples
   ]  ,BIPV2_Field_Suppression.layouts.Suppression_in);  
-  
-BIPV2_ForceLink.Add_Candidates(ds_suppressions);
+
+// -- PERFORM SUPPRESSION
+BIPV2_Field_Suppression.Add_Candidates(ds_suppressions);

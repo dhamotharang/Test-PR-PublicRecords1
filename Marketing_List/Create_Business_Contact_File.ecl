@@ -97,8 +97,8 @@ functionmacro
     self.proxid               := left.proxid                            ;
     self.lexid                := left.contact_did                       ;
     self.empid                := left.empid                             ;
-    self.fname                := best_contact_name[1].fname             ;
-    self.lname                := best_contact_name[1].lname             ;
+    self.fname                := regexreplace('[^[:print:]]' ,best_contact_name[1].fname ,'' ,nocase)   ;
+    self.lname                := regexreplace('[^[:print:]]' ,best_contact_name[1].lname ,'' ,nocase)   ;
     self.src_name             := best_contact_name[1].source            ;
     self.title                := job_titles[1].job_title                ;
     self.title_dt_first_seen  := job_titles[1].dt_title_first_seen      ;

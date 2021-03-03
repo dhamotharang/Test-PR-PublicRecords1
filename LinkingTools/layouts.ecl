@@ -58,7 +58,7 @@ module
       ,string                     comment
       ,string                     operation                   //'FSE' field suppression + explosion, 'FS' = field suppression only  ,'E' Explosion only of cluster containing field values, 'RS' = record suppression
       ,dataset(Suppression_field) IDs_To_Explode              //field name is ID to explode, fieldvalue is the value to explode it to.  ''(blank means zero), 0 means zero, otherwise you can specify another field.  
-      ,unsigned                   suppression_counter         //set to zero when record is added to suppression file.  increments each time this suppression is performed.  if = 1, then perform explosion.  otherwise don't
+      ,unsigned                   suppression_counter         //set to zero when record is added to suppression file.  increments each time this suppression is performed.  if = 0, then perform explosion.  otherwise don't
 
       // -- these are for the future.
       // ,real8                      maintain_persistence_pct    // make sure to maintain this level of persistence.  do not explode too many/too large clusters that will cause persistence to drop below this number
