@@ -10,26 +10,28 @@ export Search(inDs,
             city_field, 
             state_field, 
             zip_field, 
+			leadThreshold = 10,
             outDs) := macro
 
      import STD;
-	#uniquename(leadThreshold)
-	%leadThreshold% := 10;
-    //Adds an uninitialized variable to receithref for index
+
+	//  leafThreshold := if(leadthreshold = 0, 10, leadthreshold);
+	
+   
 	#uniquename(RecWithRef)
 	%RecWithRef% := record
 		unsigned6 ref_append;
 		inDs;
 	end;
 
-	//Adds index to the records
+	
 	#uniquename(addRef)
 	%addRef% := project(inDs,
 	                    transform(%RecWithRef%,
 	                          self.ref_append  := ((counter - 1) * thorlib.nodes()) + thorlib.node(),
 	                          self             := left), local);	
 	
-    //Createnew record with addref and 4 new variables for locationID_Batch input
+    
 	#uniquename(InputRec)
 	%InputRec% := record
 	  %addRef%;
@@ -110,24 +112,12 @@ export Search(inDs,
 	%groupNormweight%:= group(%sortNormweight%, reference, local);
 
 	%normweight% func(%normweight% le, %normweight% ri):= TRANSFORM,
-		skip(ri.weight<(le.maxv - %leadThreshold%) and le.maxv > 0)
+		skip(ri.weight<(le.maxv - leadThreshold) and le.maxv > 0)
 		self.maxv := if(le.maxv = 0, ri.weight, le.maxv);
 		self := ri;
 	END;
 	#uniquename(removeLowWeight)
 	%removeLowWeight% := iterate(%groupNormweight%, func(left, right));
-								
-
-	// %removeLowWeight% := sort(ungroup(%removeLowWeight%), reference, -weight);
-	
-	
-    // integer Maxweight:= MAX(%flattends%,weight);
-    
-   
-
-	// #uniquename(resolvedDs)
-	// %resolvedDs% := dedup(%flattenDs%(resolved), reference);
-
 
 	#DECLARE(CONTAINS_LOCID)
      #SET(CONTAINS_LOCID,'false')
@@ -156,31 +146,19 @@ export Search(inDs,
 		integer weight := %removeLowWeight%.weight;
 	END;
 
-	
-
-	
-	// transform(%searchoutput%,
-								// self.locid := %removeLowWeight%.locid, 
-								// self.weight := %removeLowWeight%.weight);
-	
-
-
 	#uniquename(createOutput)
 	%createOutput% := join(%addRef%, %flattenDs%,
 	                       left.ref_append = right.reference,
 					   transform(%OutputRec%, self.locid := right.locid, self := left, self := right), left outer, hash);
 
-	// 		// ,skip( %Maxweight% - right.weight >10)				   
-	// output(%createoutput%);
-	// output(%addref%);
-	// output(%flattends%);
+	
 	#uniquename(finalresult)
 	%finalresult% := join(%createoutput%, %removeLowWeight%, 
 							left.locid = right.locid,
 							transform(%outputrec%,self.locid := right.locid, self.weight := right.weight,
 							self := left, self := right), left outer, hash);
-	// output(%finalresult%);
+
 	#uniquename(sortedRes)
-	%sortedRes% := sort(%finalresult%, inid, weight);
+	%sortedRes% := sort(%finalresult%, inid, -weight);
 	outDs          := %sortedRes%;
 endmacro;
