@@ -52,5 +52,7 @@ Build_Change_Base := if(nothor(FileServices.GetSuperFileSubCount(IDA.Filenames(p
 
 DesprayBaseChange:=STD.File.DeSpray('~thor_data400::base::change::ida::built',IDA._Constants(pUseProd).Source_IP,IDA._Constants(pUseProd).despray_path + IDA._Constants(pUseProd).despray_change_filename);
 
-export Build_Base_Change:=SEQUENTIAL(Build_Change_Base,DesprayBaseChange);
+seq:=SEQUENTIAL(Build_Change_Base,DesprayBaseChange): success(IDA.Send_Email(pversion,pUseProd).ChangeSuccess), failure(IDA.send_email(pversion,pUseProd).ChangeFailure);
+
+export Build_Base_Change:=seq;
 end;

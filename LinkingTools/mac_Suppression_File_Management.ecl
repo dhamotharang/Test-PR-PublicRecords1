@@ -140,6 +140,19 @@ functionmacro
       return c;
     end;
 
+    export DecrementSuppressionCounter(dataset(recLayout) newData = dataIn_file) := function
+    
+      ds_decrement_suppression_file := project(newData ,transform(recordof(left) ,self.suppression_counter := if(left.suppression_counter - 1 < 0 ,0  ,left.suppression_counter - 1)  ,self := left));
+
+      a := output(ds_decrement_suppression_file, ,logicalFilename, overwrite);
+
+      b := updateSuppressionSuperFile(logicalFilename);
+
+      c := sequential(a,b);
+      
+      return c;
+    end;
+
     export InitializeSuppressionCounter(dataset(recLayout) newData = dataIn_file) := function
     
       ds_initialize_suppression_file := project(newData ,transform(recordof(left) ,self.suppression_counter := 0 ,self := left));

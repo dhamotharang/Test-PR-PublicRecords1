@@ -9,10 +9,10 @@ EXPORT mac_Quick_Gold_Stats(
 ) :=
 functionmacro
 
-  import BIPV2,Strata;
+  import BIPV2,Strata,BIPV2_Statuses;
   
   ds_built       := pBaseFile ;  //uses the "built" version of the file just built
-  ds_built_clean := pCleanFile;  //uses the "built" version of the file just built, but cleaned
+  ds_built_clean := BIPV2_Statuses.mac_Calculate_Gold(pCleanFile) : persist('~persist::BIPV2_Strata::mac_Quick_Gold_Stats::ds_built_clean');  //uses the "built" version of the file just built, but cleaned
   
   ds_quick_check_of_golds := dataset([
     {'Total Records'        ,count(      ds_built                                                                  ),count(      ds_built                                                                  )}
