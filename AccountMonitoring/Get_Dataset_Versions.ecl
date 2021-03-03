@@ -479,13 +479,31 @@ EXPORT Get_Dataset_Versions(
 					LEFT.name,1,NOCASE)));
 
 		// Foreclosure
-		Foreclosure := PROJECT(FileServices.SuperFileContents(AccountMonitoring.product_files.foreclosure.base_filename),
+		Foreclosure_fid := PROJECT(FileServices.SuperFileContents(AccountMonitoring.product_files.foreclosure.Foreclosure_fid_superkeyname),
 			TRANSFORM(Final_Layout,
 				SELF.product := 'FORECLOSURE',
-				SELF.subfile := '',
+				SELF.subfile := 'FORECLOSURE_FID',
 				SELF.version := REGEXFIND(
-					AccountMonitoring.product_files.foreclosure.base_filename_raw + '_(.*)$',
+					'thor_data400::key::foreclosure::(.*)::fid',
 					LEFT.name,1,NOCASE)));
+					
+			Nod_fid := PROJECT(FileServices.SuperFileContents(AccountMonitoring.product_files.foreclosure.Nod_fid_superkeyname),
+			TRANSFORM(Final_Layout,
+				SELF.product := 'FORECLOSURE',
+				SELF.subfile := 'NOD_FID',
+				SELF.version := REGEXFIND(
+					'thor_data400::key::nod::(.*)::fid',
+					LEFT.name,1,NOCASE)));
+
+			Foreclosure_Delta_rid := PROJECT(FileServices.SuperFileContents(AccountMonitoring.product_files.foreclosure.Foreclosure_delta_rid_superkeyname),
+			TRANSFORM(Final_Layout,
+				SELF.product := 'FORECLOSURE',
+				SELF.subfile := 'DELTA_RID',
+				SELF.version := REGEXFIND(
+						'thor_data400::key::foreclosure::(.*)::delta_rid',
+					LEFT.name,1,NOCASE)));
+
+		Foreclosure := Foreclosure_fid + Nod_fid + Foreclosure_Delta_rid;
 					
 		// Workplace
 		Workplace := PROJECT(FileServices.SuperFileContents(AccountMonitoring.product_files.workplace.base_filename),
