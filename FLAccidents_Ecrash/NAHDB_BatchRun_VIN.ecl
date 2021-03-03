@@ -55,8 +55,10 @@ string Insurance_policy_Exp_Date,
 string source_id,	
 string report_code,	
 string match_flag,	
-string date_vendor_last_reported
-	
+string date_vendor_last_reported,
+string airbags_deploy,
+string towed,
+string impact_location	
 end; 
 filein := dedup(dataset('~thor_data::in::nahdb::vin', layoutNahdbBatchVin, CSV(Terminator (['\n','\r\n']), Heading(1), Quote('"'), Separator([',']))),all);
 
@@ -131,6 +133,12 @@ vin_match:= dedup(join(accidentDedup, distribute(filein(vin <> ''),hash(vin)),
            self.vehicle_unit_number   :=  left.vehicle_unit_number    ;
            self.vendor_code           :=  left.vendor_code;
            self.work_type_id          :=  left.work_type_id;
+		   self.airbags_deploy   := map  ( left.airbags_deploy  = 0 =>  'false',
+		                                                           left.airbags_deploy  = 1 =>  'true', ' ' );
+		   self.towed   := map  ( left.towed  = 0 =>  'false',
+		                                                           left.towed  = 1 =>  'true', ' ' );
+			self.impact_location := left.impact_location;
+		             
 					 self := right 
 				   ), right outer,local),all);
 
