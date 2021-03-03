@@ -1,17 +1,9 @@
-﻿
- 
- 
- 
- 
+﻿ 
+
+IMPORT PromoteSupers, NAC_V2, STD, ut;
+
 
 EXPORT MOD_InternalEmailsList := MODULE
-
-
-
-IMPORT $, PromoteSupers, NAC_V2, STD, ut;
-
-
-
 
 
 EXPORT fn_GetInternalRecipients
@@ -25,28 +17,18 @@ EXPORT fn_GetInternalRecipients
 		DATASET(Nac_V2.Constants.SuperFileName_Internal, NAC_V2.Layouts.rlInternalEmailFile, THOR, OPT) 
 					(IsRecipientInactive = 'N', EventType = pEventType, GroupID = STD.Str.ToUpperCase(pGroupID)); 
 	 
-	
-	
-	OUTPUT(PROJECT(dsFilteredInternalEmailsList, {LEFT.EventType,  LEFT.GroupID, LEFT.EmailAddress}), NAMED('partial_result'),OVERWRITE);
 	FilteredRecordset := PROJECT(dsFilteredInternalEmailsList, {LEFT.EmailAddress});
 
-
-	
-	rlEmail := 
-	RECORD
-		STRING	EmailAddress;
-	END;
-
-
-	rlEmail xcat(FilteredRecordset L, FilteredRecordset R) :=  
+	{STRING	EmailAddress} xcat(FilteredRecordset L, FilteredRecordset R) :=  
 	TRANSFORM
 		SELF.EmailAddress := TRIM(L.EmailAddress) + ';' + TRIM(R.EmailAddress); 
 	END;
+
+	Default_Address := 	PROJECT(DATASET(Nac_V2.Constants.SuperFileName_Internal, NAC_V2.Layouts.rlInternalEmailFile, THOR, OPT)(EventType = 'Default'), {LEFT.EmailAddress});
 	dsList := ROLLUP(FilteredRecordset, true, xcat(LEFT, RIGHT)); 
+	ds := IF(EXISTS(dsList), dsList, Default_Address);
 
-	RETURN dsList[1].EmailAddress;
-
-
+	RETURN ds[1].EmailAddress;
 
 END;
 
@@ -95,13 +77,7 @@ FUNCTION
 END;
 
 
-
-
-
 END;
-
-
-
 
 
 

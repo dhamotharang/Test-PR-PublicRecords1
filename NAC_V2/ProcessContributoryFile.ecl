@@ -97,8 +97,11 @@ EXPORT ProcessContributoryFile(string ip, string dataDir, string lfn, string mai
 					,despray_NCF_reports('ncx2')
 					,despray_NCF_reports('ncd2')
 					,despray_NCF_reports('ncr2')
-					,NAC_V2.Send_Email(fn := ilfn, groupid := '').FileValidationReport
+					,NAC_V2.Send_Email(fn := ilfn, groupid := lfn[6..9]).FileValidationReport
 					,IF(IsEmptyFile, NAC_V2.Send_Email(fn := ilfn, groupid := lfn[6..9]).FileEmptyErrorAlert)
 					);
 	return doit;
 END;
+
+
+

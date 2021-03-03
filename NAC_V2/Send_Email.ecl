@@ -71,15 +71,11 @@ EXPORT Send_Email(string filedate='',string fn='', string groupid='') := MODULE
 	EXPORT FileValidationReport
 						:=  
 						   SendMail(
-							 	NAC_V2.MOD_InternalEmailsList.fn_GetInternalRecipients('Validation', '')
+							 	NAC_V2.MOD_InternalEmailsList.fn_GetInternalRecipients('File Input Notifications', groupid)
 								,'NCF2 Contributory File Validation Report' 
 								,  NAC_V2.Print.NCR2_to_Text(NAC_V2.GetReports(NAC_V2.PreprocessNCF2(fn), fn, TRUE).dsNcr2)  
 							);
 
-
 END; 
-
-
-
 
 

@@ -42,6 +42,8 @@ dNAC2ConfigForceLower	:=	project(nac_V2.dNAC2Config, tNAC2ConfigForceLower(left)
 sGroupId	 :=	set(dNAC2ConfigForceLower, GroupID);
 dOKFiles	 :=	files(Name[6..9] in sGroupId);
 
+//fail_check := EXISTS(dNAC2ConfigForceLower(ProductCode <> 'n' OR IsProd <> '0'));
+
 
 r2 := RECORD
 	string		datadir;

@@ -44,6 +44,9 @@ sGroupId :=	SET(dNAC2ConfigForceLower, GroupID);
 dOKFiles :=	files(Name[6..9] in sGroupId);  //  ex.  ncf2_fl99_20190627_142000.dat
 
 
+//fail_check := EXISTS(dNAC2ConfigForceLower(ProductCode <> 'n' OR IsProd <> '1'));
+
+
 r2 := RECORD
 	STRING		datadir;
 	STRING		lfn;
