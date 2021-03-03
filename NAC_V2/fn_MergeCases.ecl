@@ -39,6 +39,7 @@ EXPORT fn_MergeCases(DATASET($.Layout_Base2) newbase, DATASET($.Layout_Base2) ba
 								self.NCF_FileTime := IF(RIGHT.NCF_FileTime='',LEFT.NCF_FileTime, right.NCF_FileTime);
 								//self.GroupId := IF(RIGHT.GroupId='',LEFT.GroupId,RIGHT.GroupId);
 								//*** Update addresses
+								self.addresstype := Coalesce(RIGHT.addresstype, LEFT.addresstype);
 								// Physical Address Fields
 								self.Physical_AddressCategory := Coalesce(RIGHT.Physical_AddressCategory, LEFT.Physical_AddressCategory);
 								self.Physical_Street1 := Coalesce(RIGHT.Physical_Street1, LEFT.Physical_Street1);
