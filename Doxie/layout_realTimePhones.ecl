@@ -1,4 +1,4 @@
-IMPORT Doxie_raw, Gateway, Risk_Indicators, Royalty;
+IMPORT Doxie_raw, Risk_Indicators, Royalty;
   EXPORT layout_realTimePhones := MODULE
   EXPORT rtp_in_layout := RECORD
     UNSIGNED1 DPPAPurpose;
@@ -18,7 +18,8 @@ IMPORT Doxie_raw, Gateway, Risk_Indicators, Royalty;
     STRING    IndustryClass;
     STRING    SSNMask;
     STRING    DOBMask;
-    DATASET(Gateway.Layouts.Config) Gateways := DATASET([], Gateway.Layouts.Config);
+    STRING    _TransactionId;
+    DATASET(Risk_Indicators.Layout_Gateways_In) Gateways := DATASET([], Risk_Indicators.Layout_Gateways_In);
   END;
 
   EXPORT layout_out1 := Royalty.Layouts.Royalty;
