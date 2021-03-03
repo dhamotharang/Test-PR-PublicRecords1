@@ -10,13 +10,9 @@ export Search(inDs,
             city_field, 
             state_field, 
             zip_field, 
-			leadThreshold = 10,
-            outDs) := macro
+			outDs, leadThreshold = 10) := macro
 
      import STD;
-
-	//  leafThreshold := if(leadthreshold = 0, 10, leadthreshold);
-	
    
 	#uniquename(RecWithRef)
 	%RecWithRef% := record
