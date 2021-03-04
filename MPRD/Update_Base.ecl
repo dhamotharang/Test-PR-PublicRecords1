@@ -1,6 +1,7 @@
+﻿//MPRD Update_Base
 IMPORT Address, Ut, lib_stringlib, _Control, business_header,_Validate, mdr,
 Header, Header_Slimsort, didville, DID_Add,Business_Header_SS, NID, AID,Health_Provider_Services, 
-Health_Facility_Services, HealthCareFacility, MPRD;
+Health_Facility_Services, HealthCareFacility, MPRD, BIPV2_Company_Names;
 
 EXPORT Update_Base (STRING filedate, BOOLEAN pUseProd = false) := MODULE
 
@@ -438,1058 +439,1058 @@ EXPORT Update_Base (STRING filedate, BOOLEAN pUseProd = false) := MODULE
 			,result,false,38
 			);
 
-		final_result:=MPRD.MAC_Derive_Sanctions(result,mprd.layouts.individual_base,sanc1_complaint,lic1_status);
+		final_result:=distribute(MPRD.MAC_Derive_Sanctions(result,mprd.layouts.individual_base,sanc1_complaint,lic1_status));
 		RETURN final_result; 
 	END;
 
-	EXPORT facility_base:=FUNCTION
-		base_file := Mark_history(MPRD.Files(filedate,pUseProd).facility_base.built(isTest = false), MPRD.layouts.facility_base);
+	// EXPORT facility_base:=FUNCTION
+		// base_file := Mark_history(MPRD.Files(filedate,pUseProd).facility_base.built(isTest = false), MPRD.layouts.facility_base);
 
-		std_input := MPRD.StandardizeInputFile(filedate, pUseProd).Facility;
+		// std_input := MPRD.StandardizeInputFile(filedate, pUseProd).Facility;
 																						
-		cleanAdd_t	:= Clean_addr(std_input,  MPRD.Layouts.facility_base):PERSIST('~thor_data400::persist::cleaned_practice_addr_fac');
+		// cleanAdd_t	:= Clean_addr(std_input,  MPRD.Layouts.facility_base):PERSIST('~thor_data400::persist::cleaned_practice_addr_fac');
 	
-		base_and_update := IF(nothor(FileServices.GetSuperFileSubCount(MPRD.Filenames(filedate, pUseProd).facility_lBaseTemplate_built)) = 0
-								 ,cleanAdd_t,cleanAdd_t + base_file);
+		// base_and_update := IF(nothor(FileServices.GetSuperFileSubCount(MPRD.Filenames(filedate, pUseProd).facility_lBaseTemplate_built)) = 0
+								 // ,cleanAdd_t,cleanAdd_t + base_file);
 
-		MPRD.layouts.facility_base GetSourceRID(base_and_update l):=TRANSFORM
-            SELF.source_rec_id		:= HASH64(hashmd5(
-																	       TRIM(l.prac_company1_name)+','
-																				+TRIM(l.prac_phone1)+','
-																				+TRIM(l.bill_phone1)+','
-																				+TRIM(l.prac_fax1)+','
-																				+TRIM(l.bill_fax1)+','
-																				+TRIM(l.email_addr)+','
-																				+TRIM(l.web_site)+','
-																				+TRIM(l.tin1)+','
-																				+TRIM(l.dea_num1)+','
-																				+TRIM(l.dea_num1_exp)+','	
-   		                                  +TRIM(l.dea_num1_sch)+','	
-   		                                  +TRIM(l.dea_num1_bus_act_ind)+','
-																				+TRIM(l.lic1_num_in)+','
-																			  +TRIM(l.lic1_state)+','
-																			  +TRIM(l.lic1_num)+','
-																			  +TRIM(l.lic1_type)+','
-																			  +TRIM(l.lic1_status)+','
-																			  +TRIM(l.lic1_begin_date)+','
-																			  +TRIM(l.lic1_end_date)+','
-																			  +TRIM(l.lic2_num_in)+','
-																			  +TRIM(l.lic2_state)+','
-																			  +TRIM(l.lic2_num)+','
-																			  +TRIM(l.lic2_type)+','
-																			  +TRIM(l.lic2_status)+','
-																			  +TRIM(l.lic2_begin_date)+','
-																			  +TRIM(l.lic2_end_date) +','
-																			  +TRIM(l.lic3_num_in)+','
-																			  +TRIM(l.lic3_state)+','
-																			  +TRIM(l.lic3_num)+','
-																			  +TRIM(l.lic3_type)+','
-																			  +TRIM(l.lic3_status)+','
-																			  +TRIM(l.lic3_begin_date)+','
-																			  +TRIM(l.lic3_end_date)+','
-																			  +TRIM(l.normed_addr_rec_type)+','
-																			  +TRIM(l.orig_adresss)+','
-																			  +TRIM(l.orig_state)+','
-																			  +TRIM(l.orig_city)+','
-																			  +TRIM(l.orig_zip)+','
-																				+TRIM(l.filecode)+','
-																				+TRIM(l.dept_code)+','
-																				+TRIM(l.provider_id)+','
-																				+TRIM(l.npi_num)+','
-																				+TRIM(l.medicare_fac_num)+','
-																				+TRIM(l.medicaid_fac_num)+','
-																				+TRIM(l.facility_type)+','
-																				+TRIM(l.taxonomy)+','
-																				+TRIM(l.ncpdp_id)+','
-																				+TRIM(l.sanc1_state)+','
-																				+TRIM(l.sanc1_date)+','
-				                                +TRIM(l.sanc1_case)+','	
-   		                                  +TRIM(l.sanc1_source)+','	
-																				+TRIM(l.sanc1_complaint)+','	   
- 																			  +TRIM(l.dba_name)+','	
-																				+TRIM(l.bill_company1_name)+','	
-																				+TRIM(l.taxonomy_primary_ind)+','	   	
-																				+TRIM(l.dea_num1_deact_date)+','	
-																				+TRIM(l.npi_deact_date)+','	
-																				+TRIM(l.sanc1_rein_date)+','	
-																				+TRIM(l.clia_num)+','	
-																				+TRIM(l.clia_status_code)+','	
-																				+TRIM(l.clia_cert_type_code)+','	
-																				+TRIM(l.clia_cert_eff_date)+','	
-																				+TRIM(l.clia_end_date)));
-			SELF											:= L;
-		END;											
+		// MPRD.layouts.facility_base GetSourceRID(base_and_update l):=TRANSFORM
+            // SELF.source_rec_id		:= HASH64(hashmd5(
+																	       // TRIM(l.prac_company1_name)+','
+																				// +TRIM(l.prac_phone1)+','
+																				// +TRIM(l.bill_phone1)+','
+																				// +TRIM(l.prac_fax1)+','
+																				// +TRIM(l.bill_fax1)+','
+																				// +TRIM(l.email_addr)+','
+																				// +TRIM(l.web_site)+','
+																				// +TRIM(l.tin1)+','
+																				// +TRIM(l.dea_num1)+','
+																				// +TRIM(l.dea_num1_exp)+','	
+   		                                  // +TRIM(l.dea_num1_sch)+','	
+   		                                  // +TRIM(l.dea_num1_bus_act_ind)+','
+																				// +TRIM(l.lic1_num_in)+','
+																			  // +TRIM(l.lic1_state)+','
+																			  // +TRIM(l.lic1_num)+','
+																			  // +TRIM(l.lic1_type)+','
+																			  // +TRIM(l.lic1_status)+','
+																			  // +TRIM(l.lic1_begin_date)+','
+																			  // +TRIM(l.lic1_end_date)+','
+																			  // +TRIM(l.lic2_num_in)+','
+																			  // +TRIM(l.lic2_state)+','
+																			  // +TRIM(l.lic2_num)+','
+																			  // +TRIM(l.lic2_type)+','
+																			  // +TRIM(l.lic2_status)+','
+																			  // +TRIM(l.lic2_begin_date)+','
+																			  // +TRIM(l.lic2_end_date) +','
+																			  // +TRIM(l.lic3_num_in)+','
+																			  // +TRIM(l.lic3_state)+','
+																			  // +TRIM(l.lic3_num)+','
+																			  // +TRIM(l.lic3_type)+','
+																			  // +TRIM(l.lic3_status)+','
+																			  // +TRIM(l.lic3_begin_date)+','
+																			  // +TRIM(l.lic3_end_date)+','
+																			  // +TRIM(l.normed_addr_rec_type)+','
+																			  // +TRIM(l.orig_adresss)+','
+																			  // +TRIM(l.orig_state)+','
+																			  // +TRIM(l.orig_city)+','
+																			  // +TRIM(l.orig_zip)+','
+																				// +TRIM(l.filecode)+','
+																				// +TRIM(l.dept_code)+','
+																				// +TRIM(l.provider_id)+','
+																				// +TRIM(l.npi_num)+','
+																				// +TRIM(l.medicare_fac_num)+','
+																				// +TRIM(l.medicaid_fac_num)+','
+																				// +TRIM(l.facility_type)+','
+																				// +TRIM(l.taxonomy)+','
+																				// +TRIM(l.ncpdp_id)+','
+																				// +TRIM(l.sanc1_state)+','
+																				// +TRIM(l.sanc1_date)+','
+				                                // +TRIM(l.sanc1_case)+','	
+   		                                  // +TRIM(l.sanc1_source)+','	
+																				// +TRIM(l.sanc1_complaint)+','	   
+ 																			  // +TRIM(l.dba_name)+','	
+																				// +TRIM(l.bill_company1_name)+','	
+																				// +TRIM(l.taxonomy_primary_ind)+','	   	
+																				// +TRIM(l.dea_num1_deact_date)+','	
+																				// +TRIM(l.npi_deact_date)+','	
+																				// +TRIM(l.sanc1_rein_date)+','	
+																				// +TRIM(l.clia_num)+','	
+																				// +TRIM(l.clia_status_code)+','	
+																				// +TRIM(l.clia_cert_type_code)+','	
+																				// +TRIM(l.clia_cert_eff_date)+','	
+																				// +TRIM(l.clia_end_date)));
+			// SELF											:= L;
+		// END;											
 
-		d_rid	:= PROJECT(base_and_update, GetSourceRID(LEFT));
+		// d_rid	:= PROJECT(base_and_update, GetSourceRID(LEFT));
 
-		new_base_d := DISTRIBUTE(d_rid, HASH( prac_company1_name,orig_adresss, orig_state,orig_city,orig_zip));  
-		new_base_s := SORT(new_base_d,
-	                    prac_company1_name,
-											orig_adresss,
-											orig_state,
-											orig_city,
-											orig_zip,
-											prac_phone1,
-											bill_phone1,
-											prac_fax1,
-											bill_fax1,
-											email_addr,
-											web_site,
-											tin1,
-											dea_num1,
-											dea_num1_exp,
-											dea_num1_sch,
-											dea_num1_bus_act_ind,
-											lic1_num_in,
-											lic1_state,
-											lic1_num,
-											lic1_type,
-											lic1_status,
-											lic1_begin_date,
-											lic1_end_date,
-											lic2_num_in,
-											lic2_state,
-											lic2_num,
-											lic2_type,
-											lic2_status,
-											lic2_begin_date,
-											lic2_end_date,
-											lic3_num_in,
-											lic3_state,
-											lic3_num,
-											lic3_type,
-											lic3_status,
-											lic3_begin_date,
-											lic3_end_date,
-											normed_addr_rec_type,
-											filecode,
-											dept_code,
-											provider_id,
-											npi_num,
-											medicare_fac_num,
-											medicare_fac_num_term_date,
-											medicaid_fac_num,
-											facility_type,
-											taxonomy,
-											ncpdp_id,
-											sanc1_state,
-											sanc1_date,
-											sanc1_case,
-											sanc1_source,
-											sanc1_complaint, 
-										  dba_name,
-											bill_company1_name,
-											taxonomy_primary_ind, 
-											dea_num1_deact_date,
-											npi_deact_date,
-											sanc1_rein_date,
-											clia_num,
-											clia_status_code,
-											clia_cert_type_code,
-											clia_cert_eff_date,
-											clia_end_date,
-											clia_test_vol_accredited,
-											clia_test_vol_annual,
-											clia_test_vol_ppm,
-											clia_test_vol_survey,
-											clia_test_vol_waived
-	                    ,LOCAL);
+		// new_base_d := DISTRIBUTE(d_rid, HASH( prac_company1_name,orig_adresss, orig_state,orig_city,orig_zip));  
+		// new_base_s := SORT(new_base_d,
+	                    // prac_company1_name,
+											// orig_adresss,
+											// orig_state,
+											// orig_city,
+											// orig_zip,
+											// prac_phone1,
+											// bill_phone1,
+											// prac_fax1,
+											// bill_fax1,
+											// email_addr,
+											// web_site,
+											// tin1,
+											// dea_num1,
+											// dea_num1_exp,
+											// dea_num1_sch,
+											// dea_num1_bus_act_ind,
+											// lic1_num_in,
+											// lic1_state,
+											// lic1_num,
+											// lic1_type,
+											// lic1_status,
+											// lic1_begin_date,
+											// lic1_end_date,
+											// lic2_num_in,
+											// lic2_state,
+											// lic2_num,
+											// lic2_type,
+											// lic2_status,
+											// lic2_begin_date,
+											// lic2_end_date,
+											// lic3_num_in,
+											// lic3_state,
+											// lic3_num,
+											// lic3_type,
+											// lic3_status,
+											// lic3_begin_date,
+											// lic3_end_date,
+											// normed_addr_rec_type,
+											// filecode,
+											// dept_code,
+											// provider_id,
+											// npi_num,
+											// medicare_fac_num,
+											// medicare_fac_num_term_date,
+											// medicaid_fac_num,
+											// facility_type,
+											// taxonomy,
+											// ncpdp_id,
+											// sanc1_state,
+											// sanc1_date,
+											// sanc1_case,
+											// sanc1_source,
+											// sanc1_complaint, 
+										  // dba_name,
+											// bill_company1_name,
+											// taxonomy_primary_ind, 
+											// dea_num1_deact_date,
+											// npi_deact_date,
+											// sanc1_rein_date,
+											// clia_num,
+											// clia_status_code,
+											// clia_cert_type_code,
+											// clia_cert_eff_date,
+											// clia_end_date,
+											// clia_test_vol_accredited,
+											// clia_test_vol_annual,
+											// clia_test_vol_ppm,
+											// clia_test_vol_survey,
+											// clia_test_vol_waived
+	                    // ,LOCAL);
 		
-		MPRD.Layouts.facility_base t_rollup (new_base_s  le, new_base_s ri) := TRANSFORM
-			SELF.date_first_seen             :=(STRING) ut.EarliestDate ((INTEGER)le.date_first_seen,(INTEGER) ri.date_first_seen);
-			SELF.date_last_seen              := (STRING)ut.LatestDate ((INTEGER)le.date_last_seen, (INTEGER)ri.date_last_seen);
-			SELF.date_vendor_first_reported  := ut.EarliestDate(le.date_vendor_first_reported, ri.date_vendor_first_reported);
-			SELF.date_vendor_last_reported   := ut.LatestDate(le.date_vendor_last_reported, ri.date_vendor_last_reported);
-			SELF.	source_rec_id              :=IF(le.date_vendor_first_reported <ri.date_vendor_first_reported,le.source_rec_id,ri.source_rec_id);
-			SELF						 							   := IF(Le.record_type = 'C', Le, Ri);
-		END;
+		// MPRD.Layouts.facility_base t_rollup (new_base_s  le, new_base_s ri) := TRANSFORM
+			// SELF.date_first_seen             :=(STRING) ut.EarliestDate ((INTEGER)le.date_first_seen,(INTEGER) ri.date_first_seen);
+			// SELF.date_last_seen              := (STRING)ut.LatestDate ((INTEGER)le.date_last_seen, (INTEGER)ri.date_last_seen);
+			// SELF.date_vendor_first_reported  := ut.EarliestDate(le.date_vendor_first_reported, ri.date_vendor_first_reported);
+			// SELF.date_vendor_last_reported   := ut.LatestDate(le.date_vendor_last_reported, ri.date_vendor_last_reported);
+			// SELF.	source_rec_id              :=IF(le.date_vendor_first_reported <ri.date_vendor_first_reported,le.source_rec_id,ri.source_rec_id);
+			// SELF						 							   := IF(Le.record_type = 'C', Le, Ri);
+		// END;
 
-		base_f := rollup(new_base_s,
-								LEFT.prac_company1_name		= RIGHT.prac_company1_name
-						AND LEFT.orig_adresss					= RIGHT.orig_adresss
-						AND LEFT.orig_state						= RIGHT.orig_state
-						AND LEFT.orig_city						= RIGHT.orig_city
-						AND LEFT.orig_zip							= RIGHT.orig_zip
-						AND LEFT.prac_phone1					= RIGHT.prac_phone1
-						AND LEFT.bill_phone1					= RIGHT.bill_phone1
-						AND LEFT.prac_fax1						= RIGHT.prac_fax1
-						AND LEFT.bill_fax1						= RIGHT.bill_fax1
-						AND LEFT.email_addr						= RIGHT.email_addr
-						AND LEFT.web_site							= RIGHT.web_site
-						AND LEFT.tin1									= RIGHT.tin1
-						AND LEFT.dea_num1							= RIGHT.dea_num1
-						AND LEFT.dea_num1_exp					= RIGHT.dea_num1_exp
-						AND LEFT.dea_num1_sch					= RIGHT.dea_num1_sch
-						AND LEFT.dea_num1_bus_act_ind = RIGHT.dea_num1_bus_act_ind
-						AND LEFT.lic1_num_in 					= RIGHT.lic1_num_in
-            AND LEFT.lic1_state						= RIGHT.lic1_state					  
-						AND LEFT.lic1_num							= RIGHT.lic1_num
-						AND LEFT.Lic1_Type						= RIGHT.Lic1_Type
-						AND LEFT.lic1_status					= RIGHT.lic1_status
-            AND LEFT.Lic1_begin_date			= RIGHT.Lic1_begin_date
-            AND LEFT.Lic1_End_date				= RIGHT.Lic1_End_date
-						AND LEFT.lic2_num_in 					= RIGHT.lic2_num_in
-            AND LEFT.lic2_state						= RIGHT.lic2_state					  
-						AND LEFT.lic2_num							= RIGHT.lic2_num
-						AND LEFT.Lic2_Type						= RIGHT.Lic2_Type
-						AND LEFT.lic2_status					= RIGHT.lic2_status
-            AND LEFT.Lic2_begin_date			= RIGHT.Lic2_begin_date
-            AND LEFT.Lic2_End_date				= RIGHT.Lic2_End_date
-						AND LEFT.lic3_num_in 					= RIGHT.lic3_num_in
-            AND LEFT.lic3_state						= RIGHT.lic3_state					  
-						AND LEFT.lic3_num							= RIGHT.lic3_num
-						AND LEFT.Lic3_Type						= RIGHT.Lic3_Type
-						AND LEFT.lic3_status					= RIGHT.lic3_status
-            AND LEFT.Lic3_begin_date			= RIGHT.Lic3_begin_date
-            AND LEFT.Lic3_End_date				= RIGHT.Lic3_End_date
-						AND LEFT.normed_addr_rec_type	= RIGHT.normed_addr_rec_type
-						AND LEFT.filecode							= RIGHT.filecode
-						AND LEFT.dept_code						= RIGHT.dept_code
-						AND LEFT.provider_id					= RIGHT.provider_id
-						AND LEFT.npi_num							= RIGHT.npi_num
-						AND LEFT.medicare_fac_num			= RIGHT.medicare_fac_num
-						AND LEFT.medicare_fac_num_term_date = RIGHT.medicare_fac_num_term_date
-						AND LEFT.medicaid_fac_num			= RIGHT.medicaid_fac_num
-						AND LEFT.facility_type				= RIGHT.facility_type
-						AND LEFT.taxonomy							= RIGHT.taxonomy
-						AND LEFT.ncpdp_id							= RIGHT.ncpdp_id
-						AND LEFT.sanc1_state					= RIGHT.sanc1_state
-						AND LEFT.sanc1_date						= RIGHT.sanc1_date
-            AND LEFT.sanc1_case						= RIGHT.sanc1_case
-            AND LEFT.sanc1_source					= RIGHT.sanc1_source
-						AND LEFT.sanc1_complaint 			= RIGHT.sanc1_complaint
-						AND LEFT.dba_name							= RIGHT.dba_name
-						AND LEFT.bill_company1_name		= RIGHT.bill_company1_name
-						AND LEFT.taxonomy_primary_ind	= RIGHT.taxonomy_primary_ind 
-						AND LEFT.dea_num1_deact_date	= RIGHT.dea_num1_deact_date
-						AND LEFT.npi_deact_date				= RIGHT.npi_deact_date
-						AND LEFT.sanc1_rein_date			= RIGHT.sanc1_rein_date						
-						AND LEFT.clia_num							= RIGHT.clia_num
-						AND LEFT.clia_status_code			= RIGHT.clia_status_code
-						AND LEFT.clia_cert_type_code	= RIGHT.clia_cert_type_code
-						AND LEFT.clia_cert_eff_date		= RIGHT.clia_cert_eff_date
-						AND LEFT.clia_end_date				= RIGHT.clia_end_date
-						AND LEFT.clia_test_vol_accredited = RIGHT.clia_test_vol_accredited
-						AND LEFT.clia_test_vol_annual = RIGHT.clia_test_vol_annual
-						AND LEFT.clia_test_vol_ppm	  = RIGHT.clia_test_vol_ppm
-						AND LEFT.clia_test_vol_survey = RIGHT.clia_test_vol_survey
-						AND LEFT.clia_test_vol_waived = RIGHT.clia_test_vol_waived
-						AND LEFT.surrogate_key				= RIGHT.surrogate_key
-						AND LEFT.isTest								= RIGHT.isTest
-						,t_rollup(LEFT, RIGHT),LOCAL);
+		// base_f := rollup(new_base_s,
+								// LEFT.prac_company1_name		= RIGHT.prac_company1_name
+						// AND LEFT.orig_adresss					= RIGHT.orig_adresss
+						// AND LEFT.orig_state						= RIGHT.orig_state
+						// AND LEFT.orig_city						= RIGHT.orig_city
+						// AND LEFT.orig_zip							= RIGHT.orig_zip
+						// AND LEFT.prac_phone1					= RIGHT.prac_phone1
+						// AND LEFT.bill_phone1					= RIGHT.bill_phone1
+						// AND LEFT.prac_fax1						= RIGHT.prac_fax1
+						// AND LEFT.bill_fax1						= RIGHT.bill_fax1
+						// AND LEFT.email_addr						= RIGHT.email_addr
+						// AND LEFT.web_site							= RIGHT.web_site
+						// AND LEFT.tin1									= RIGHT.tin1
+						// AND LEFT.dea_num1							= RIGHT.dea_num1
+						// AND LEFT.dea_num1_exp					= RIGHT.dea_num1_exp
+						// AND LEFT.dea_num1_sch					= RIGHT.dea_num1_sch
+						// AND LEFT.dea_num1_bus_act_ind = RIGHT.dea_num1_bus_act_ind
+						// AND LEFT.lic1_num_in 					= RIGHT.lic1_num_in
+            // AND LEFT.lic1_state						= RIGHT.lic1_state					  
+						// AND LEFT.lic1_num							= RIGHT.lic1_num
+						// AND LEFT.Lic1_Type						= RIGHT.Lic1_Type
+						// AND LEFT.lic1_status					= RIGHT.lic1_status
+            // AND LEFT.Lic1_begin_date			= RIGHT.Lic1_begin_date
+            // AND LEFT.Lic1_End_date				= RIGHT.Lic1_End_date
+						// AND LEFT.lic2_num_in 					= RIGHT.lic2_num_in
+            // AND LEFT.lic2_state						= RIGHT.lic2_state					  
+						// AND LEFT.lic2_num							= RIGHT.lic2_num
+						// AND LEFT.Lic2_Type						= RIGHT.Lic2_Type
+						// AND LEFT.lic2_status					= RIGHT.lic2_status
+            // AND LEFT.Lic2_begin_date			= RIGHT.Lic2_begin_date
+            // AND LEFT.Lic2_End_date				= RIGHT.Lic2_End_date
+						// AND LEFT.lic3_num_in 					= RIGHT.lic3_num_in
+            // AND LEFT.lic3_state						= RIGHT.lic3_state					  
+						// AND LEFT.lic3_num							= RIGHT.lic3_num
+						// AND LEFT.Lic3_Type						= RIGHT.Lic3_Type
+						// AND LEFT.lic3_status					= RIGHT.lic3_status
+            // AND LEFT.Lic3_begin_date			= RIGHT.Lic3_begin_date
+            // AND LEFT.Lic3_End_date				= RIGHT.Lic3_End_date
+						// AND LEFT.normed_addr_rec_type	= RIGHT.normed_addr_rec_type
+						// AND LEFT.filecode							= RIGHT.filecode
+						// AND LEFT.dept_code						= RIGHT.dept_code
+						// AND LEFT.provider_id					= RIGHT.provider_id
+						// AND LEFT.npi_num							= RIGHT.npi_num
+						// AND LEFT.medicare_fac_num			= RIGHT.medicare_fac_num
+						// AND LEFT.medicare_fac_num_term_date = RIGHT.medicare_fac_num_term_date
+						// AND LEFT.medicaid_fac_num			= RIGHT.medicaid_fac_num
+						// AND LEFT.facility_type				= RIGHT.facility_type
+						// AND LEFT.taxonomy							= RIGHT.taxonomy
+						// AND LEFT.ncpdp_id							= RIGHT.ncpdp_id
+						// AND LEFT.sanc1_state					= RIGHT.sanc1_state
+						// AND LEFT.sanc1_date						= RIGHT.sanc1_date
+            // AND LEFT.sanc1_case						= RIGHT.sanc1_case
+            // AND LEFT.sanc1_source					= RIGHT.sanc1_source
+						// AND LEFT.sanc1_complaint 			= RIGHT.sanc1_complaint
+						// AND LEFT.dba_name							= RIGHT.dba_name
+						// AND LEFT.bill_company1_name		= RIGHT.bill_company1_name
+						// AND LEFT.taxonomy_primary_ind	= RIGHT.taxonomy_primary_ind 
+						// AND LEFT.dea_num1_deact_date	= RIGHT.dea_num1_deact_date
+						// AND LEFT.npi_deact_date				= RIGHT.npi_deact_date
+						// AND LEFT.sanc1_rein_date			= RIGHT.sanc1_rein_date						
+						// AND LEFT.clia_num							= RIGHT.clia_num
+						// AND LEFT.clia_status_code			= RIGHT.clia_status_code
+						// AND LEFT.clia_cert_type_code	= RIGHT.clia_cert_type_code
+						// AND LEFT.clia_cert_eff_date		= RIGHT.clia_cert_eff_date
+						// AND LEFT.clia_end_date				= RIGHT.clia_end_date
+						// AND LEFT.clia_test_vol_accredited = RIGHT.clia_test_vol_accredited
+						// AND LEFT.clia_test_vol_annual = RIGHT.clia_test_vol_annual
+						// AND LEFT.clia_test_vol_ppm	  = RIGHT.clia_test_vol_ppm
+						// AND LEFT.clia_test_vol_survey = RIGHT.clia_test_vol_survey
+						// AND LEFT.clia_test_vol_waived = RIGHT.clia_test_vol_waived
+						// AND LEFT.surrogate_key				= RIGHT.surrogate_key
+						// AND LEFT.isTest								= RIGHT.isTest
+						// ,t_rollup(LEFT, RIGHT),LOCAL);
 														
-		bdid_matchset := ['A','P'];
-		Business_Header_SS.MAC_Add_BDID_Flex
-			(base_f
-			,bdid_matchset
-			,prac_company1_name
-			,clean_prim_range
-			,clean_prim_name
-			,clean_zip
-			,clean_sec_range
-			,clean_st
-			,clean_phone
-			,foo
-			,bdid
-			,mprd.layouts.facility_base
-			,true
-			,bdid_score
-			,d_bdid
-			,
-			,
-			,
-			,BIPV2.xlink_version_set
-			,
-			,
-			,
-			,
-			,
-			,
-			,
-			,src
-			,
-			,
-			);
+		// bdid_matchset := ['A','P'];
+		// Business_Header_SS.MAC_Add_BDID_Flex
+			// (base_f
+			// ,bdid_matchset
+			// ,prac_company1_name
+			// ,clean_prim_range
+			// ,clean_prim_name
+			// ,clean_zip
+			// ,clean_sec_range
+			// ,clean_st
+			// ,clean_phone
+			// ,foo
+			// ,bdid
+			// ,mprd.layouts.facility_base
+			// ,true
+			// ,bdid_score
+			// ,d_bdid
+			// ,
+			// ,
+			// ,
+			// ,BIPV2.xlink_version_set
+			// ,
+			// ,
+			// ,
+			// ,
+			// ,
+			// ,
+			// ,
+			// ,src
+			// ,
+			// ,
+			// );
 
-		Health_Provider_Services.mac_get_best_lnpid_on_thor (
-			d_bdid
-			,LNPID
-			,//First_name
-			,//Middle_name
-			,//Last_NAME
-			,//maturity_suffix
-			,//GENDER
-			,clean_prim_range
-			,clean_prim_name
-			,clean_sec_range
-			,clean_v_city_name
-			,clean_ST
-			,clean_ZIP
-			,//SSN
-			,//DOB
-			,clean_phone
-			,LIC1_STATE
-			,LIC1_num
-			,tin1
-			,DEA_NUM1
-			,group_key
-			,
-			,//UPIN
-			,DID
-			,BDID
-			,//SRC
-			,//SOURCE_RID
-			,result,false,38
-			);
+		// Health_Provider_Services.mac_get_best_lnpid_on_thor (
+			// d_bdid
+			// ,LNPID
+			// ,//First_name
+			// ,//Middle_name
+			// ,//Last_NAME
+			// ,//maturity_suffix
+			// ,//GENDER
+			// ,clean_prim_range
+			// ,clean_prim_name
+			// ,clean_sec_range
+			// ,clean_v_city_name
+			// ,clean_ST
+			// ,clean_ZIP
+			// ,//SSN
+			// ,//DOB
+			// ,clean_phone
+			// ,LIC1_STATE
+			// ,LIC1_num
+			// ,tin1
+			// ,DEA_NUM1
+			// ,group_key
+			// ,
+			// ,//UPIN
+			// ,DID
+			// ,BDID
+			// ,//SRC
+			// ,//SOURCE_RID
+			// ,result,false,38
+			// );
 		
-		final_result:=MPRD.MAC_Derive_Sanctions(result,mprd.layouts.facility_base,sanc1_complaint,lic1_status);	
+		// final_result:=MPRD.MAC_Derive_Sanctions(result,mprd.layouts.facility_base,sanc1_complaint,lic1_status);	
 
-		RETURN final_result;
-	END;
+		// RETURN final_result;
+	// END;
 
 	// choice pioint is called basc_cp
-	EXPORT choice_point_base:=FUNCTION
-		base_file := Mark_history(MPRD.Files(filedate,pUseProd).basc_cp_base.built(isTest = false), MPRD.layouts.choice_point_base);
+	// EXPORT choice_point_base:=FUNCTION
+		// base_file := Mark_history(MPRD.Files(filedate,pUseProd).basc_cp_base.built(isTest = false), MPRD.layouts.choice_point_base);
 
-		std_input := MPRD.StandardizeInputFile(filedate, pUseProd).choice_point;
+		// std_input := MPRD.StandardizeInputFile(filedate, pUseProd).choice_point;
 					
-		cleanNames := Clean_name(std_input, MPRD.Layouts.choice_point_base):PERSIST('~thor_data400::persist::mprd::choice_point_names');
+		// cleanNames := Clean_name(std_input, MPRD.Layouts.choice_point_base):PERSIST('~thor_data400::persist::mprd::choice_point_names');
 
-		cleanAdd_t	:= Clean_addr(cleanNames, MPRD.Layouts.choice_point_base):PERSIST('~thor_data400::persist::Choice_Point_cleaned_practice_addr_cp');
+		// cleanAdd_t	:= Clean_addr(cleanNames, MPRD.Layouts.choice_point_base):PERSIST('~thor_data400::persist::Choice_Point_cleaned_practice_addr_cp');
 
-		base_and_update := IF(nothor(FileServices.GetSuperFileSubCount(MPRD.Filenames(filedate, pUseProd).basc_cp_lBaseTemplate_built)) = 0
-								 ,cleanAdd_t,cleanAdd_t + base_file);
+		// base_and_update := IF(nothor(FileServices.GetSuperFileSubCount(MPRD.Filenames(filedate, pUseProd).basc_cp_lBaseTemplate_built)) = 0
+								 // ,cleanAdd_t,cleanAdd_t + base_file);
 											 
-		MPRD.layouts.choice_point_base  GetSourceRID(base_and_update L)	:= TRANSFORM
-			SELF.source_rec_id 					      := HASH64(hashmd5(
-																				TRIM(l.full_name)+','
-																			+TRIM(l.pre_name)+','
-																			+TRIM(l.first_name)+','
-																			+TRIM(l.middle_name)+','
-																			+TRIM(l.last_name)+','
-																			+TRIM(l.maturity_suffix)+','
-																			+TRIM(l.other_suffix)+','
-																			+TRIM(l.gender)+','
-																			+TRIM(l.prac_company1_name)+','
-																			+TRIM(l.birthdate)+','
-																			+TRIM(l.hashed_ssn)+','
-																			+TRIM(l.prac_phone1)+','
-																			+TRIM(l.prac_fax1)+','
-																			+TRIM(l.email_addr)+','
-																			+TRIM(l.web_site)+','
-																			+TRIM(l.upin)+','
-																			+TRIM(l.tin1)+','
-																			+TRIM(l.filecode)+','
-																			+TRIM(l.specialty1)+','
-																			+TRIM(l.specialty2)+','
-																			+TRIM(l.lic1_num_in)+','
-																			+TRIM(l.lic1_num)+','
-																			+(string)(l.lic1_st)+','
-																			+TRIM(l.Lic1_Type)+','
-																			+TRIM(l.Lic1_Status)+','
-																			+TRIM(l.Lic1_begin_date)+','
-																			+TRIM(l.Lic1_End_date)+','
-																			+TRIM(l.orig_adresss)+','
-																			+TRIM(l.orig_state)+','
-																			+TRIM(l.orig_city)+','
-																			+TRIM(l.orig_zip)+','
-																			+TRIM(l.npi_num)+','
-																			+TRIM(l.taxonomy)+','
-																			+TRIM(l.dea_num1)+','
-																			+TRIM(l.dea_num1_exp)+','
-																			+TRIM(l.Dea_num1_bus_Act_Ind)+','
-																			+TRIM(l.sanc1_date)+','
-																			+TRIM(l.sanc1_state)+','
-																			+TRIM(l.sanc1_rein_date)+','
-																			+TRIM(l.kil_code)+','
-																			+TRIM(l.provider_id)+','
-																			+TRIM(l.medschool1)));
-			SELF											:= L;
-		END;
+		// MPRD.layouts.choice_point_base  GetSourceRID(base_and_update L)	:= TRANSFORM
+			// SELF.source_rec_id 					      := HASH64(hashmd5(
+																				// TRIM(l.full_name)+','
+																			// +TRIM(l.pre_name)+','
+																			// +TRIM(l.first_name)+','
+																			// +TRIM(l.middle_name)+','
+																			// +TRIM(l.last_name)+','
+																			// +TRIM(l.maturity_suffix)+','
+																			// +TRIM(l.other_suffix)+','
+																			// +TRIM(l.gender)+','
+																			// +TRIM(l.prac_company1_name)+','
+																			// +TRIM(l.birthdate)+','
+																			// +TRIM(l.hashed_ssn)+','
+																			// +TRIM(l.prac_phone1)+','
+																			// +TRIM(l.prac_fax1)+','
+																			// +TRIM(l.email_addr)+','
+																			// +TRIM(l.web_site)+','
+																			// +TRIM(l.upin)+','
+																			// +TRIM(l.tin1)+','
+																			// +TRIM(l.filecode)+','
+																			// +TRIM(l.specialty1)+','
+																			// +TRIM(l.specialty2)+','
+																			// +TRIM(l.lic1_num_in)+','
+																			// +TRIM(l.lic1_num)+','
+																			// +(string)(l.lic1_st)+','
+																			// +TRIM(l.Lic1_Type)+','
+																			// +TRIM(l.Lic1_Status)+','
+																			// +TRIM(l.Lic1_begin_date)+','
+																			// +TRIM(l.Lic1_End_date)+','
+																			// +TRIM(l.orig_adresss)+','
+																			// +TRIM(l.orig_state)+','
+																			// +TRIM(l.orig_city)+','
+																			// +TRIM(l.orig_zip)+','
+																			// +TRIM(l.npi_num)+','
+																			// +TRIM(l.taxonomy)+','
+																			// +TRIM(l.dea_num1)+','
+																			// +TRIM(l.dea_num1_exp)+','
+																			// +TRIM(l.Dea_num1_bus_Act_Ind)+','
+																			// +TRIM(l.sanc1_date)+','
+																			// +TRIM(l.sanc1_state)+','
+																			// +TRIM(l.sanc1_rein_date)+','
+																			// +TRIM(l.kil_code)+','
+																			// +TRIM(l.provider_id)+','
+																			// +TRIM(l.medschool1)));
+			// SELF											:= L;
+		// END;
 			 			
-		d_rid:=PROJECT(base_and_update,GetSourceRID(LEFT));
+		// d_rid:=PROJECT(base_and_update,GetSourceRID(LEFT));
 
-		new_base_d := DISTRIBUTE(d_rid, HASH( TRIM(first_name),TRIM(middle_name),TRIM(last_name),orig_adresss,orig_state,orig_city,orig_zip));  
-		new_base_s := SORT(new_base_d,
-					full_name
-					,pre_name
-					,first_name
-					,middle_name
-					,last_name
-					,maturity_suffix
-					,other_suffix
-					,gender
-					,prac_company1_name
-					,birthdate
-					,hashed_ssn
-					,prac_phone1
-					,prac_fax1
-					,email_addr
-					,web_site
-					,upin
-					,tin1
-					,filecode
-					,specialty1
-					,specialty2
-					,lic1_num_in
-					,lic1_num
-					,lic1_st
-					,Lic1_Type
-					,Lic1_Status
-					,Lic1_begin_date
-					,Lic1_End_date
-					,orig_adresss
-					,orig_state
-					,orig_city
-					,orig_zip
-					,npi_num
-					,taxonomy
-					,dea_num1
-					,dea_num1_exp
-					,Dea_num1_bus_Act_Ind
-					,sanc1_date
-					,sanc1_state
-					,sanc1_rein_date
-					,kil_code
-					,provider_id
-					,medschool1
-					,LOCAL);
+		// new_base_d := DISTRIBUTE(d_rid, HASH( TRIM(first_name),TRIM(middle_name),TRIM(last_name),orig_adresss,orig_state,orig_city,orig_zip));  
+		// new_base_s := SORT(new_base_d,
+					// full_name
+					// ,pre_name
+					// ,first_name
+					// ,middle_name
+					// ,last_name
+					// ,maturity_suffix
+					// ,other_suffix
+					// ,gender
+					// ,prac_company1_name
+					// ,birthdate
+					// ,hashed_ssn
+					// ,prac_phone1
+					// ,prac_fax1
+					// ,email_addr
+					// ,web_site
+					// ,upin
+					// ,tin1
+					// ,filecode
+					// ,specialty1
+					// ,specialty2
+					// ,lic1_num_in
+					// ,lic1_num
+					// ,lic1_st
+					// ,Lic1_Type
+					// ,Lic1_Status
+					// ,Lic1_begin_date
+					// ,Lic1_End_date
+					// ,orig_adresss
+					// ,orig_state
+					// ,orig_city
+					// ,orig_zip
+					// ,npi_num
+					// ,taxonomy
+					// ,dea_num1
+					// ,dea_num1_exp
+					// ,Dea_num1_bus_Act_Ind
+					// ,sanc1_date
+					// ,sanc1_state
+					// ,sanc1_rein_date
+					// ,kil_code
+					// ,provider_id
+					// ,medschool1
+					// ,LOCAL);
 		
-		MPRD.Layouts.choice_point_base t_rollup (new_base_s  le, new_base_s ri) := TRANSFORM
-			SELF.date_first_seen            := (STRING) ut.EarliestDate ((INTEGER)le.date_first_seen,(INTEGER) ri.date_first_seen);
-			SELF.date_last_seen             := (STRING)ut.LatestDate ((INTEGER)le.date_last_seen, (INTEGER)ri.date_last_seen);
-			SELF.date_vendor_first_reported := ut.EarliestDate(le.date_vendor_first_reported, ri.date_vendor_first_reported);
-			SELF.date_vendor_last_reported  := ut.LatestDate(le.date_vendor_last_reported, ri.date_vendor_last_reported);
-			SELF.did := 0;
-			SELF.	source_rec_id              := IF(le.date_vendor_first_reported<ri.date_vendor_first_reported,le.source_rec_id,ri.source_rec_id);
-			SELF						 							   := IF(Le.record_type = 'C', Le, Ri);
-		END;
+		// MPRD.Layouts.choice_point_base t_rollup (new_base_s  le, new_base_s ri) := TRANSFORM
+			// SELF.date_first_seen            := (STRING) ut.EarliestDate ((INTEGER)le.date_first_seen,(INTEGER) ri.date_first_seen);
+			// SELF.date_last_seen             := (STRING)ut.LatestDate ((INTEGER)le.date_last_seen, (INTEGER)ri.date_last_seen);
+			// SELF.date_vendor_first_reported := ut.EarliestDate(le.date_vendor_first_reported, ri.date_vendor_first_reported);
+			// SELF.date_vendor_last_reported  := ut.LatestDate(le.date_vendor_last_reported, ri.date_vendor_last_reported);
+			// SELF.did := 0;
+			// SELF.	source_rec_id              := IF(le.date_vendor_first_reported<ri.date_vendor_first_reported,le.source_rec_id,ri.source_rec_id);
+			// SELF						 							   := IF(Le.record_type = 'C', Le, Ri);
+		// END;
 
-		base_f := rollup(new_base_s,	
-								LEFT.full_name						= RIGHT.full_name
-						AND LEFT.pre_name							= RIGHT.pre_name
-						AND LEFT.first_name						= RIGHT.first_name
-						AND LEFT.middle_name					= RIGHT.middle_name
-						AND LEFT.last_name						= RIGHT.last_name
-						AND LEFT.maturity_suffix			= RIGHT.maturity_suffix
-						AND LEFT.other_suffix					= RIGHT.other_suffix
-						AND LEFT.gender								= RIGHT.gender
-						AND LEFT.prac_company1_name		= RIGHT.prac_company1_name
-						AND LEFT.birthdate						= RIGHT.birthdate
-						AND LEFT.hashed_ssn						= RIGHT.hashed_ssn
-						AND LEFT.prac_phone1					= RIGHT.prac_phone1
-						AND LEFT.prac_fax1						= RIGHT.prac_fax1
-						AND LEFT.email_addr						= RIGHT.email_addr
-						AND LEFT.web_site							= RIGHT.web_site
-						AND LEFT.upin									= RIGHT.upin
-						AND LEFT.tin1									= RIGHT.tin1
-						AND LEFT.filecode							= RIGHT.filecode
-						AND LEFT.specialty1						= RIGHT.specialty1
-						AND LEFT.specialty2						= RIGHT.specialty2
-						AND LEFT.lic1_num_in					= RIGHT.lic1_num_in
-						AND LEFT.lic1_num							= RIGHT.lic1_num
-						AND LEFT.lic1_st							= RIGHT.lic1_st
-						AND LEFT.Lic1_Type						= RIGHT.Lic1_Type
-						AND LEFT.Lic1_Status					= RIGHT.Lic1_Status
-						AND LEFT.Lic1_begin_date			= RIGHT.Lic1_begin_date
-						AND LEFT.Lic1_End_date				= RIGHT.Lic1_End_date
-						AND LEFT.orig_adresss					= RIGHT.orig_adresss
-						AND LEFT.orig_state						= RIGHT.orig_state
-						AND LEFT.orig_city						= RIGHT.orig_city
-						AND LEFT.orig_zip							= RIGHT.orig_zip
-						AND LEFT.npi_num							= RIGHT.npi_num
-						AND LEFT.taxonomy							= RIGHT.taxonomy
-						AND LEFT.dea_num1							= RIGHT.dea_num1
-						AND LEFT.dea_num1_exp					= RIGHT.dea_num1_exp
-						AND LEFT.Dea_num1_bus_Act_Ind	= RIGHT.Dea_num1_bus_Act_Ind
-						AND LEFT.sanc1_date						= RIGHT.sanc1_date
-						AND LEFT.sanc1_state					= RIGHT.sanc1_state
-						AND LEFT.sanc1_rein_date			= RIGHT.sanc1_rein_date
-						AND LEFT.kil_code							= RIGHT.kil_code
-						AND LEFT.provider_id					= RIGHT.provider_id
-						AND LEFT.medschool1						= RIGHT.medschool1
-						AND LEFT.isTest								= RIGHT.isTest
-						,t_rollup(LEFT, RIGHT),LOCAL);
+		// base_f := rollup(new_base_s,	
+								// LEFT.full_name						= RIGHT.full_name
+						// AND LEFT.pre_name							= RIGHT.pre_name
+						// AND LEFT.first_name						= RIGHT.first_name
+						// AND LEFT.middle_name					= RIGHT.middle_name
+						// AND LEFT.last_name						= RIGHT.last_name
+						// AND LEFT.maturity_suffix			= RIGHT.maturity_suffix
+						// AND LEFT.other_suffix					= RIGHT.other_suffix
+						// AND LEFT.gender								= RIGHT.gender
+						// AND LEFT.prac_company1_name		= RIGHT.prac_company1_name
+						// AND LEFT.birthdate						= RIGHT.birthdate
+						// AND LEFT.hashed_ssn						= RIGHT.hashed_ssn
+						// AND LEFT.prac_phone1					= RIGHT.prac_phone1
+						// AND LEFT.prac_fax1						= RIGHT.prac_fax1
+						// AND LEFT.email_addr						= RIGHT.email_addr
+						// AND LEFT.web_site							= RIGHT.web_site
+						// AND LEFT.upin									= RIGHT.upin
+						// AND LEFT.tin1									= RIGHT.tin1
+						// AND LEFT.filecode							= RIGHT.filecode
+						// AND LEFT.specialty1						= RIGHT.specialty1
+						// AND LEFT.specialty2						= RIGHT.specialty2
+						// AND LEFT.lic1_num_in					= RIGHT.lic1_num_in
+						// AND LEFT.lic1_num							= RIGHT.lic1_num
+						// AND LEFT.lic1_st							= RIGHT.lic1_st
+						// AND LEFT.Lic1_Type						= RIGHT.Lic1_Type
+						// AND LEFT.Lic1_Status					= RIGHT.Lic1_Status
+						// AND LEFT.Lic1_begin_date			= RIGHT.Lic1_begin_date
+						// AND LEFT.Lic1_End_date				= RIGHT.Lic1_End_date
+						// AND LEFT.orig_adresss					= RIGHT.orig_adresss
+						// AND LEFT.orig_state						= RIGHT.orig_state
+						// AND LEFT.orig_city						= RIGHT.orig_city
+						// AND LEFT.orig_zip							= RIGHT.orig_zip
+						// AND LEFT.npi_num							= RIGHT.npi_num
+						// AND LEFT.taxonomy							= RIGHT.taxonomy
+						// AND LEFT.dea_num1							= RIGHT.dea_num1
+						// AND LEFT.dea_num1_exp					= RIGHT.dea_num1_exp
+						// AND LEFT.Dea_num1_bus_Act_Ind	= RIGHT.Dea_num1_bus_Act_Ind
+						// AND LEFT.sanc1_date						= RIGHT.sanc1_date
+						// AND LEFT.sanc1_state					= RIGHT.sanc1_state
+						// AND LEFT.sanc1_rein_date			= RIGHT.sanc1_rein_date
+						// AND LEFT.kil_code							= RIGHT.kil_code
+						// AND LEFT.provider_id					= RIGHT.provider_id
+						// AND LEFT.medschool1						= RIGHT.medschool1
+						// AND LEFT.isTest								= RIGHT.isTest
+						// ,t_rollup(LEFT, RIGHT),LOCAL);
 
-		//DID
-		matchset := ['A','Z','P'];
-		did_add.MAC_Match_Flex
-			(base_f, matchset,					
-			foo,foo1,first_name, middle_name, last_name, pre_name, 
-			clean_prim_range, clean_prim_name, clean_sec_range, clean_zip4, clean_st,clean_prac1_Phone, 
-			DID, mprd.layouts.choice_point_base , true, did_score,
-			75, d_did);
+		// DID
+		// matchset := ['A','Z','P'];
+		// did_add.MAC_Match_Flex
+			// (base_f, matchset,					
+			// foo,foo1,first_name, middle_name, last_name, pre_name, 
+			// clean_prim_range, clean_prim_name, clean_sec_range, clean_zip4, clean_st,clean_prac1_Phone, 
+			// DID, mprd.layouts.choice_point_base , true, did_score,
+			// 75, d_did);
 
-		bdid_matchset := ['A'];
-		Business_Header_SS.MAC_Add_BDID_Flex
-			(d_did
-			,bdid_matchset
-			,full_name
-			,clean_prim_range
-			,clean_prim_name
-			,clean_zip4
-			,clean_sec_range
-			,clean_st
-			,''
-			,foo
-			,bdid
-			,mprd.layouts.choice_point_base 
-			,true
-			,bdid_score
-			,d_bdid
-			,
-			,
-			,
-			,BIPV2.xlink_version_set
-			,
-			,
-			,
-			,
-			,
-			,
-			,
-			,src
-			,
-			,
-			);
+		// bdid_matchset := ['A'];
+		// Business_Header_SS.MAC_Add_BDID_Flex
+			// (d_did
+			// ,bdid_matchset
+			// ,full_name
+			// ,clean_prim_range
+			// ,clean_prim_name
+			// ,clean_zip4
+			// ,clean_sec_range
+			// ,clean_st
+			// ,''
+			// ,foo
+			// ,bdid
+			// ,mprd.layouts.choice_point_base 
+			// ,true
+			// ,bdid_score
+			// ,d_bdid
+			// ,
+			// ,
+			// ,
+			// ,BIPV2.xlink_version_set
+			// ,
+			// ,
+			// ,
+			// ,
+			// ,
+			// ,
+			// ,
+			// ,src
+			// ,
+			// ,
+			// );
 			
-		Health_Provider_Services.mac_get_best_lnpid_on_thor (
-			d_bdid
-			,LNPID
-			,first_name
-			,middle_name
-			,last_name
-			,maturity_suffix
-			,//GENDER
-			,clean_prim_range
-			,clean_prim_name
-			,clean_sec_range
-			,clean_v_city_name
-			,clean_st
-			,clean_zip
-			,//SSN
-			,//DOB
-			,clean_prac1_phone
-			,lic1_state
-			,lic1_num
-			,tin1
-			,dea_num1
-			,group_key
-			,
-			,upin
-			,did
-			,bdid
-			,//,SRC
-			,//SOURCE_RID
-			,result,false,38);
+		// Health_Provider_Services.mac_get_best_lnpid_on_thor (
+			// d_bdid
+			// ,LNPID
+			// ,first_name
+			// ,middle_name
+			// ,last_name
+			// ,maturity_suffix
+			// ,//GENDER
+			// ,clean_prim_range
+			// ,clean_prim_name
+			// ,clean_sec_range
+			// ,clean_v_city_name
+			// ,clean_st
+			// ,clean_zip
+			// ,//SSN
+			// ,//DOB
+			// ,clean_prac1_phone
+			// ,lic1_state
+			// ,lic1_num
+			// ,tin1
+			// ,dea_num1
+			// ,group_key
+			// ,
+			// ,upin
+			// ,did
+			// ,bdid
+			// ,//,SRC
+			// ,//SOURCE_RID
+			// ,result,false,38);
 			
-			RETURN result;
-	END;
+			// RETURN result;
+	// END;
 
-	EXPORT basc_claim_base:=FUNCTION
-		base_file := Mark_history(MPRD.Files(filedate,pUseProd).basc_claims_base.built(isTest = false), MPRD.layouts.basc_claims_base);
+	// EXPORT basc_claim_base:=FUNCTION
+		// base_file := Mark_history(MPRD.Files(filedate,pUseProd).basc_claims_base.built(isTest = false), MPRD.layouts.basc_claims_base);
 
-		std_input := MPRD.StandardizeInputFile(filedate, pUseProd).basc_claims;
+		// std_input := MPRD.StandardizeInputFile(filedate, pUseProd).basc_claims;
 				
-	 	cleanNames 	:= Clean_name(std_input, MPRD.Layouts.basc_claims_base):PERSIST('~thor_data400::persist::mprd::basc_claims_names');																			
+	 	// cleanNames 	:= Clean_name(std_input, MPRD.Layouts.basc_claims_base):PERSIST('~thor_data400::persist::mprd::basc_claims_names');																			
 		
-		cleanAdd_t	:= Clean_addr(cleanNames, MPRD.Layouts.basc_claims_base):PERSIST('~thor_data400::persist::cleaned_practice_addr_claims');
+		// cleanAdd_t	:= Clean_addr(cleanNames, MPRD.Layouts.basc_claims_base):PERSIST('~thor_data400::persist::cleaned_practice_addr_claims');
 	
-		base_and_update := IF(nothor(FileServices.GetSuperFileSubCount(MPRD.Filenames(filedate, pUseProd).basc_claims_lBaseTemplate_built )) = 0
-								        ,cleanAdd_t,cleanAdd_t + base_file);
+		// base_and_update := IF(nothor(FileServices.GetSuperFileSubCount(MPRD.Filenames(filedate, pUseProd).basc_claims_lBaseTemplate_built )) = 0
+								        // ,cleanAdd_t,cleanAdd_t + base_file);
 																						
-		MPRD.Layouts.basc_claims_base  GetSourceRID(base_and_update L)	:= TRANSFORM
-   			SELF.source_rec_id 					:= HASH64(hashmd5(
-																			TRIM(l.full_name)+','
-																			+TRIM(l.pre_name)+','
-																			+TRIM(l.first_name)+','
-																			+TRIM(l.middle_name)+','
-																			+TRIM(l.last_name)+','
-																			+TRIM(l.maturity_suffix)+','
-																			+TRIM(l.other_suffix)+','
-																			+TRIM(l.gender)+','
-																			+TRIM(l.preferred_name)+','
-																			+TRIM(l.prac_company1_name)+','
-																			+TRIM(l.normed_addr_rec_type)+','
-																			+TRIM(l.orig_adresss)+','
-			                                +TRIM(l.orig_state)+','
-																			+TRIM(l.orig_city)+','
-																			+TRIM(l.orig_zip)+','
-																			+TRIM(l.prac_phone1)+','
-																			+TRIM(l.prac_fax1)+','
-																			+TRIM(l.bill_phone1)+','
-																			+TRIM(l.bill_fax1)+','
-																			+TRIM(l.upin)+','
-																			+TRIM(l.tin1)+','
-																			+TRIM(l.lic1_num_in)+','
-																			+TRIM(l.lic1_state)+','
-																			+TRIM(l.lic1_num)+','
-																			+TRIM(l.lic1_type)+','
-																			+TRIM(l.lic1_status)+','
-																			+TRIM(l.lic1_begin_date)+','
-																			+TRIM(l.lic1_end_date)+','
-																			+TRIM(l.filecode)+','
-												  						+TRIM(l.npi_num)+','
-																			+TRIM(l.taxonomy)+','
-																			+TRIM(l.taxonomy_primary_ind)+','
-																			+TRIM(l.male_female)+','
-																			+TRIM(l.npi_deact_date)));
-   		SELF											:= L;
-   	END;
+		// MPRD.Layouts.basc_claims_base  GetSourceRID(base_and_update L)	:= TRANSFORM
+   			// SELF.source_rec_id 					:= HASH64(hashmd5(
+																			// TRIM(l.full_name)+','
+																			// +TRIM(l.pre_name)+','
+																			// +TRIM(l.first_name)+','
+																			// +TRIM(l.middle_name)+','
+																			// +TRIM(l.last_name)+','
+																			// +TRIM(l.maturity_suffix)+','
+																			// +TRIM(l.other_suffix)+','
+																			// +TRIM(l.gender)+','
+																			// +TRIM(l.preferred_name)+','
+																			// +TRIM(l.prac_company1_name)+','
+																			// +TRIM(l.normed_addr_rec_type)+','
+																			// +TRIM(l.orig_adresss)+','
+			                                // +TRIM(l.orig_state)+','
+																			// +TRIM(l.orig_city)+','
+																			// +TRIM(l.orig_zip)+','
+																			// +TRIM(l.prac_phone1)+','
+																			// +TRIM(l.prac_fax1)+','
+																			// +TRIM(l.bill_phone1)+','
+																			// +TRIM(l.bill_fax1)+','
+																			// +TRIM(l.upin)+','
+																			// +TRIM(l.tin1)+','
+																			// +TRIM(l.lic1_num_in)+','
+																			// +TRIM(l.lic1_state)+','
+																			// +TRIM(l.lic1_num)+','
+																			// +TRIM(l.lic1_type)+','
+																			// +TRIM(l.lic1_status)+','
+																			// +TRIM(l.lic1_begin_date)+','
+																			// +TRIM(l.lic1_end_date)+','
+																			// +TRIM(l.filecode)+','
+												  						// +TRIM(l.npi_num)+','
+																			// +TRIM(l.taxonomy)+','
+																			// +TRIM(l.taxonomy_primary_ind)+','
+																			// +TRIM(l.male_female)+','
+																			// +TRIM(l.npi_deact_date)));
+   		// SELF											:= L;
+   	// END;
    			
-		d_rid:=PROJECT(base_and_update,GetSourceRID(LEFT));
+		// d_rid:=PROJECT(base_and_update,GetSourceRID(LEFT));
 													
-		new_base_d := DISTRIBUTE(d_rid, HASH(TRIM(first_name),TRIM(middle_name),TRIM(last_name),orig_adresss,orig_state,orig_city,orig_zip));  
-		new_base_s := SORT(new_base_d,
-	                     full_name,
-											 pre_name,
-											 first_name,
-											 middle_name,
-											 last_name,
-											 maturity_suffix,
-											 other_suffix,
-											 gender,
-											 preferred_name,
-											 prac_company1_name,
-											 normed_addr_rec_type,
-											 orig_adresss,
-											 orig_state,
-											 orig_city,
-											 orig_zip,
-											 prac_phone1,
-											 prac_fax1,
-											 bill_phone1,
-											 bill_fax1,
-											 upin,
-											 tin1,
-											 lic1_num_in,
-											 lic1_state,
-											 lic1_num,
-											 lic1_type,
-											 lic1_status,
-											 lic1_begin_date,
-											 lic1_end_date,
-											 filecode,
-											 npi_num,
-											 taxonomy,
-											 taxonomy_primary_ind,
-											 male_female,
-											 npi_deact_date, LOCAL);
+		// new_base_d := DISTRIBUTE(d_rid, HASH(TRIM(first_name),TRIM(middle_name),TRIM(last_name),orig_adresss,orig_state,orig_city,orig_zip));  
+		// new_base_s := SORT(new_base_d,
+	                     // full_name,
+											 // pre_name,
+											 // first_name,
+											 // middle_name,
+											 // last_name,
+											 // maturity_suffix,
+											 // other_suffix,
+											 // gender,
+											 // preferred_name,
+											 // prac_company1_name,
+											 // normed_addr_rec_type,
+											 // orig_adresss,
+											 // orig_state,
+											 // orig_city,
+											 // orig_zip,
+											 // prac_phone1,
+											 // prac_fax1,
+											 // bill_phone1,
+											 // bill_fax1,
+											 // upin,
+											 // tin1,
+											 // lic1_num_in,
+											 // lic1_state,
+											 // lic1_num,
+											 // lic1_type,
+											 // lic1_status,
+											 // lic1_begin_date,
+											 // lic1_end_date,
+											 // filecode,
+											 // npi_num,
+											 // taxonomy,
+											 // taxonomy_primary_ind,
+											 // male_female,
+											 // npi_deact_date, LOCAL);
 		
-		MPRD.Layouts.basc_claims_base t_rollup (new_base_s  le, new_base_s ri) := TRANSFORM
-			SELF.date_first_seen            := (STRING) ut.EarliestDate ((INTEGER)le.date_first_seen,(INTEGER) ri.date_first_seen);
-			SELF.date_last_seen             := (STRING)ut.LatestDate ((INTEGER)le.date_last_seen, (INTEGER)ri.date_last_seen);
-			SELF.date_vendor_first_reported := ut.EarliestDate(le.date_vendor_first_reported, ri.date_vendor_first_reported);
-			SELF.date_vendor_last_reported  := ut.LatestDate(le.date_vendor_last_reported, ri.date_vendor_last_reported);
-			SELF.	source_rec_id             := IF(le.date_vendor_first_reported<ri.date_vendor_first_reported,le.source_rec_id,ri.source_rec_id);
-			SELF						 							  := IF(Le.record_type = 'C', Le, Ri);
-		END;
+		// MPRD.Layouts.basc_claims_base t_rollup (new_base_s  le, new_base_s ri) := TRANSFORM
+			// SELF.date_first_seen            := (STRING) ut.EarliestDate ((INTEGER)le.date_first_seen,(INTEGER) ri.date_first_seen);
+			// SELF.date_last_seen             := (STRING)ut.LatestDate ((INTEGER)le.date_last_seen, (INTEGER)ri.date_last_seen);
+			// SELF.date_vendor_first_reported := ut.EarliestDate(le.date_vendor_first_reported, ri.date_vendor_first_reported);
+			// SELF.date_vendor_last_reported  := ut.LatestDate(le.date_vendor_last_reported, ri.date_vendor_last_reported);
+			// SELF.	source_rec_id             := IF(le.date_vendor_first_reported<ri.date_vendor_first_reported,le.source_rec_id,ri.source_rec_id);
+			// SELF						 							  := IF(Le.record_type = 'C', Le, Ri);
+		// END;
 
-		base_f := rollup(new_base_s,
-								LEFT.full_name						= RIGHT.full_name
-            AND LEFT.pre_name 						= RIGHT.pre_name
-						AND LEFT.first_name 					= RIGHT.first_name 
-						and	LEFT.middle_name 					= RIGHT.middle_name 
-						and	LEFT.last_name 						= RIGHT.last_name 
-						and	LEFT.maturity_suffix 			= RIGHT.maturity_suffix 
-						and	LEFT.other_suffix 				= RIGHT.other_suffix 
-						AND LEFT.gender								= RIGHT.gender
-						AND LEFT.preferred_name 			= RIGHT.preferred_name
-						AND LEFT.prac_company1_name		= RIGHT.prac_company1_name
-						AND LEFT.normed_addr_rec_type	= RIGHT.normed_addr_rec_type
-						AND LEFT.orig_adresss					= RIGHT.orig_adresss
-						AND LEFT.orig_state						= RIGHT.orig_state
-						AND LEFT.orig_city						= RIGHT.orig_city
-						AND LEFT.orig_zip							= RIGHT.orig_zip
-						AND LEFT.prac_phone1					= RIGHT.prac_phone1
-						AND LEFT.prac_fax1						= RIGHT.prac_fax1
-						AND LEFT.bill_phone1					= RIGHT.bill_phone1
-						AND LEFT.bill_fax1						= RIGHT.bill_fax1
-						AND LEFT.upin									= RIGHT.upin
-						AND LEFT.tin1									= RIGHT.tin1
-						AND LEFT.lic1_num_in					= RIGHT.lic1_num_in
-						AND LEFT.lic1_state						= RIGHT.lic1_state
-						AND LEFT.lic1_num							= RIGHT.lic1_num
-						AND LEFT.Lic1_Type						= RIGHT.Lic1_Type
-						AND LEFT.Lic1_Status					= RIGHT.Lic1_Status
-						AND LEFT.Lic1_begin_date			= RIGHT.Lic1_begin_date
-						AND LEFT.Lic1_End_date				= RIGHT.Lic1_End_date
-						AND LEFT.filecode							= RIGHT.filecode
-						AND LEFT.npi_num							= RIGHT.npi_num
-						AND LEFT.taxonomy							= RIGHT.taxonomy
-						AND LEFT.taxonomy_primary_ind	= RIGHT.taxonomy_primary_ind
-            AND LEFT.male_female 					= RIGHT.male_female
-						AND LEFT.npi_deact_date 			= RIGHT.npi_deact_date
-						AND LEFT.isTest								= RIGHT.isTest
-						,t_rollup(LEFT, RIGHT),LOCAL);
+		// base_f := rollup(new_base_s,
+								// LEFT.full_name						= RIGHT.full_name
+            // AND LEFT.pre_name 						= RIGHT.pre_name
+						// AND LEFT.first_name 					= RIGHT.first_name 
+						// and	LEFT.middle_name 					= RIGHT.middle_name 
+						// and	LEFT.last_name 						= RIGHT.last_name 
+						// and	LEFT.maturity_suffix 			= RIGHT.maturity_suffix 
+						// and	LEFT.other_suffix 				= RIGHT.other_suffix 
+						// AND LEFT.gender								= RIGHT.gender
+						// AND LEFT.preferred_name 			= RIGHT.preferred_name
+						// AND LEFT.prac_company1_name		= RIGHT.prac_company1_name
+						// AND LEFT.normed_addr_rec_type	= RIGHT.normed_addr_rec_type
+						// AND LEFT.orig_adresss					= RIGHT.orig_adresss
+						// AND LEFT.orig_state						= RIGHT.orig_state
+						// AND LEFT.orig_city						= RIGHT.orig_city
+						// AND LEFT.orig_zip							= RIGHT.orig_zip
+						// AND LEFT.prac_phone1					= RIGHT.prac_phone1
+						// AND LEFT.prac_fax1						= RIGHT.prac_fax1
+						// AND LEFT.bill_phone1					= RIGHT.bill_phone1
+						// AND LEFT.bill_fax1						= RIGHT.bill_fax1
+						// AND LEFT.upin									= RIGHT.upin
+						// AND LEFT.tin1									= RIGHT.tin1
+						// AND LEFT.lic1_num_in					= RIGHT.lic1_num_in
+						// AND LEFT.lic1_state						= RIGHT.lic1_state
+						// AND LEFT.lic1_num							= RIGHT.lic1_num
+						// AND LEFT.Lic1_Type						= RIGHT.Lic1_Type
+						// AND LEFT.Lic1_Status					= RIGHT.Lic1_Status
+						// AND LEFT.Lic1_begin_date			= RIGHT.Lic1_begin_date
+						// AND LEFT.Lic1_End_date				= RIGHT.Lic1_End_date
+						// AND LEFT.filecode							= RIGHT.filecode
+						// AND LEFT.npi_num							= RIGHT.npi_num
+						// AND LEFT.taxonomy							= RIGHT.taxonomy
+						// AND LEFT.taxonomy_primary_ind	= RIGHT.taxonomy_primary_ind
+            // AND LEFT.male_female 					= RIGHT.male_female
+						// AND LEFT.npi_deact_date 			= RIGHT.npi_deact_date
+						// AND LEFT.isTest								= RIGHT.isTest
+						// ,t_rollup(LEFT, RIGHT),LOCAL);
 	// DID
-		matchset := ['A','Z','P'];
-		did_add.MAC_Match_Flex
-			(base_f, matchset,					
-			foo,foo1,first_name, middle_name, last_name, pre_name, 
-			clean_prim_range, clean_prim_name, clean_sec_range, clean_zip, clean_st,prac_phone1, 
-			DID, mprd.Layouts.basc_claims_base, true, did_score,75, d_did);
+		// matchset := ['A','Z','P'];
+		// did_add.MAC_Match_Flex
+			// (base_f, matchset,					
+			// foo,foo1,first_name, middle_name, last_name, pre_name, 
+			// clean_prim_range, clean_prim_name, clean_sec_range, clean_zip, clean_st,prac_phone1, 
+			// DID, mprd.Layouts.basc_claims_base, true, did_score,75, d_did);
 
-		bdid_matchset := ['A'];
-		Business_Header_SS.MAC_Add_BDID_Flex
-			(d_did
-			,bdid_matchset
-			,full_name
-			,clean_prim_range
-			,clean_prim_name
-			,clean_zip
-			,clean_sec_range
-			,clean_st
-			,''
-			,foo
-			,bdid
-			,mprd.Layouts.basc_claims_base
-			,true
-			,bdid_score
-			,d_bdid
-			,
-			,
-			,
-			,BIPV2.xlink_version_set
-			,
-			,
-			,
-			,
-			,
-			,
-			,
-			,src
-			,
-			,
-		);
+		// bdid_matchset := ['A'];
+		// Business_Header_SS.MAC_Add_BDID_Flex
+			// (d_did
+			// ,bdid_matchset
+			// ,full_name
+			// ,clean_prim_range
+			// ,clean_prim_name
+			// ,clean_zip
+			// ,clean_sec_range
+			// ,clean_st
+			// ,''
+			// ,foo
+			// ,bdid
+			// ,mprd.Layouts.basc_claims_base
+			// ,true
+			// ,bdid_score
+			// ,d_bdid
+			// ,
+			// ,
+			// ,
+			// ,BIPV2.xlink_version_set
+			// ,
+			// ,
+			// ,
+			// ,
+			// ,
+			// ,
+			// ,
+			// ,src
+			// ,
+			// ,
+		// );
 
-		Health_Provider_Services.mac_get_best_lnpid_on_thor (
-			d_bdid
-			,lnpid
-			,first_name
-			,middle_name
-			,last_name
-			,maturity_suffix
-			,//GENDER
-			,clean_prim_range
-			,clean_prim_name
-			,clean_sec_range
-			,clean_v_city_name
-			,clean_st
-			,clean_zip
-			,//SSN
-			,//DOB
-			,clean_prac_phone1
-			,lic1_state
-			,lic1_num
-			,tin1
-			,//DEA_NUM1
-			,//group_key
-			,//
-			,upin
-			,did
-			,bdid
-			,//SRC
-			,//SOURCE_RID
-			,result,false,38);
+		// Health_Provider_Services.mac_get_best_lnpid_on_thor (
+			// d_bdid
+			// ,lnpid
+			// ,first_name
+			// ,middle_name
+			// ,last_name
+			// ,maturity_suffix
+			// ,//GENDER
+			// ,clean_prim_range
+			// ,clean_prim_name
+			// ,clean_sec_range
+			// ,clean_v_city_name
+			// ,clean_st
+			// ,clean_zip
+			// ,//SSN
+			// ,//DOB
+			// ,clean_prac_phone1
+			// ,lic1_state
+			// ,lic1_num
+			// ,tin1
+			// ,//DEA_NUM1
+			// ,//group_key
+			// ,//
+			// ,upin
+			// ,did
+			// ,bdid
+			// ,//SRC
+			// ,//SOURCE_RID
+			// ,result,false,38);
 
-		RETURN result;
-	END;
+		// RETURN result;
+	// END;
 
-	EXPORT claims_address_master_base:=FUNCTION
-		base_file := Mark_history(MPRD.Files(filedate,pUseProd).claims_addr_master_base.built(isTest = false), MPRD.layouts.claims_address_master_base);
+	// EXPORT claims_address_master_base:=FUNCTION
+		// base_file := Mark_history(MPRD.Files(filedate,pUseProd).claims_addr_master_base.built(isTest = false), MPRD.layouts.claims_address_master_base);
 
-		std_input := MPRD.StandardizeInputFile(filedate, pUseProd).claims_address_master;
+		// std_input := MPRD.StandardizeInputFile(filedate, pUseProd).claims_address_master;
 				
-		cleanAdd_t	:= Clean_addr(std_input, MPRD.layouts.claims_address_master_base):PERSIST('~thor_data400::persist::cleaned_practice_addr_claims_addr_master');
+		// cleanAdd_t	:= Clean_addr(std_input, MPRD.layouts.claims_address_master_base):PERSIST('~thor_data400::persist::cleaned_practice_addr_claims_addr_master');
 	
-		base_and_update := IF(nothor(FileServices.GetSuperFileSubCount(MPRD.Filenames(filedate, pUseProd).claims_addr_master_lBaseTemplate_built)) = 0
-								       ,cleanAdd_t,cleanAdd_t + base_file);
+		// base_and_update := IF(nothor(FileServices.GetSuperFileSubCount(MPRD.Filenames(filedate, pUseProd).claims_addr_master_lBaseTemplate_built)) = 0
+								       // ,cleanAdd_t,cleanAdd_t + base_file);
 											 
-		MPRD.Layouts.claims_address_master_base  GetSourceRID(base_and_update L)	:= TRANSFORM
-   			SELF.source_rec_id 					:= HASH64(hashmd5(
-   																	 TRIM(l.service_company)+','
-                                     +TRIM(l.bill_npi)+','
-																		 +TRIM(l.orig_adresss)+','
-																		 +TRIM(l.orig_state)+','
-																		 +TRIM(l.orig_city)+','
-																		 +TRIM(l.orig_zip)+','
-																		 +TRIM(l.bill_tin)+','
-																		 + TRIM(l.rendering_npi)));
-   		SELF											:= L;
-   	END;
+		// MPRD.Layouts.claims_address_master_base  GetSourceRID(base_and_update L)	:= TRANSFORM
+   			// SELF.source_rec_id 					:= HASH64(hashmd5(
+   																	 // TRIM(l.service_company)+','
+                                     // +TRIM(l.bill_npi)+','
+																		 // +TRIM(l.orig_adresss)+','
+																		 // +TRIM(l.orig_state)+','
+																		 // +TRIM(l.orig_city)+','
+																		 // +TRIM(l.orig_zip)+','
+																		 // +TRIM(l.bill_tin)+','
+																		 // + TRIM(l.rendering_npi)));
+   		// SELF											:= L;
+   	// END;
    			
-		d_rid:=PROJECT(base_and_update,GetSourceRID(LEFT));
+		// d_rid:=PROJECT(base_and_update,GetSourceRID(LEFT));
 
-		new_base_d := DISTRIBUTE(d_rid, HASH(service_company,orig_adresss,orig_city,orig_state,orig_zip));  
-		new_base_s := SORT(new_base_d
-	                   ,service_company
-	                   ,bill_npi
-	                   ,orig_adresss
-										 ,orig_state
-										 ,orig_city
-										 ,orig_zip
-										 ,bill_tin
-										 ,rendering_npi
-										  ,LOCAL);
+		// new_base_d := DISTRIBUTE(d_rid, HASH(service_company,orig_adresss,orig_city,orig_state,orig_zip));  
+		// new_base_s := SORT(new_base_d
+	                   // ,service_company
+	                   // ,bill_npi
+	                   // ,orig_adresss
+										 // ,orig_state
+										 // ,orig_city
+										 // ,orig_zip
+										 // ,bill_tin
+										 // ,rendering_npi
+										  // ,LOCAL);
 		
-		MPRD.Layouts.claims_address_master_base t_rollup (new_base_s  le, new_base_s ri) := TRANSFORM
-			SELF.date_vendor_first_reported := ut.EarliestDate(le.date_vendor_first_reported, ri.date_vendor_first_reported);
-			SELF.date_vendor_last_reported  := ut.LatestDate(le.date_vendor_last_reported, ri.date_vendor_last_reported);
-			SELF.	source_rec_id             := IF(le.date_vendor_first_reported<ri.date_vendor_first_reported,le.source_rec_id,ri.source_rec_id);	
-			SELF						 							  := IF(Le.record_type = 'C', Le, Ri);
-		END;
+		// MPRD.Layouts.claims_address_master_base t_rollup (new_base_s  le, new_base_s ri) := TRANSFORM
+			// SELF.date_vendor_first_reported := ut.EarliestDate(le.date_vendor_first_reported, ri.date_vendor_first_reported);
+			// SELF.date_vendor_last_reported  := ut.LatestDate(le.date_vendor_last_reported, ri.date_vendor_last_reported);
+			// SELF.	source_rec_id             := IF(le.date_vendor_first_reported<ri.date_vendor_first_reported,le.source_rec_id,ri.source_rec_id);	
+			// SELF						 							  := IF(Le.record_type = 'C', Le, Ri);
+		// END;
 
-		base_f := rollup(new_base_s,
-								LEFT.service_company	= RIGHT.service_company 
-						AND LEFT.bill_npi					= RIGHT.bill_npi
-		        AND LEFT.bill_tin 				= RIGHT.bill_tin
-						AND LEFT.orig_adresss			= RIGHT.orig_adresss
-						AND LEFT.orig_state				= RIGHT.orig_state
-						AND LEFT.orig_city				= RIGHT.orig_city
-						AND LEFT.orig_zip					= RIGHT.orig_zip
-						AND LEFT.bill_tin					= RIGHT.bill_tin
-            AND LEFT.rendering_npi		= RIGHT.rendering_npi
-						AND LEFT.isTest						= RIGHT.isTest
-						,t_rollup(LEFT, RIGHT),LOCAL);
-		bdid_matchset := ['A'];
-		Business_Header_SS.MAC_Add_BDID_Flex
-			(base_f
-			,bdid_matchset
-			,service_company
-			,clean_prim_range
-			,clean_prim_name
-			,clean_zip
-			,clean_sec_range
-			,clean_st
-			,''
-			,foo
-			,bdid
-			,mprd.Layouts.claims_address_master_base
-			,true
-			,bdid_score
-			,d_bdid
-			,
-			,
-			,
-			,BIPV2.xlink_version_set
-			,
-			,
-			,
-			,
-			,
-			,
-			,
-			,src
-			,//source_rid
-			,
-		);
+		// base_f := rollup(new_base_s,
+								// LEFT.service_company	= RIGHT.service_company 
+						// AND LEFT.bill_npi					= RIGHT.bill_npi
+		        // AND LEFT.bill_tin 				= RIGHT.bill_tin
+						// AND LEFT.orig_adresss			= RIGHT.orig_adresss
+						// AND LEFT.orig_state				= RIGHT.orig_state
+						// AND LEFT.orig_city				= RIGHT.orig_city
+						// AND LEFT.orig_zip					= RIGHT.orig_zip
+						// AND LEFT.bill_tin					= RIGHT.bill_tin
+            // AND LEFT.rendering_npi		= RIGHT.rendering_npi
+						// AND LEFT.isTest						= RIGHT.isTest
+						// ,t_rollup(LEFT, RIGHT),LOCAL);
+		// bdid_matchset := ['A'];
+		// Business_Header_SS.MAC_Add_BDID_Flex
+			// (base_f
+			// ,bdid_matchset
+			// ,service_company
+			// ,clean_prim_range
+			// ,clean_prim_name
+			// ,clean_zip
+			// ,clean_sec_range
+			// ,clean_st
+			// ,''
+			// ,foo
+			// ,bdid
+			// ,mprd.Layouts.claims_address_master_base
+			// ,true
+			// ,bdid_score
+			// ,d_bdid
+			// ,
+			// ,
+			// ,
+			// ,BIPV2.xlink_version_set
+			// ,
+			// ,
+			// ,
+			// ,
+			// ,
+			// ,
+			// ,
+			// ,src
+			// ,//source_rid
+			// ,
+		// );
 
-		Health_Provider_Services.mac_get_best_lnpid_on_thor (
-			d_bdid
-			,lnpid
-			,//First_name
-			,//Middle_name
-			,//Last_NAME
-			,//maturity_suffix
-			,//GENDER
-			,clean_prim_range
-			,clean_prim_name
-			,clean_sec_range
-			,clean_v_city_name
-			,clean_st
-			,clean_zip
-			,//SSN
-			,//DOB
-			,//clean_prac_phone1
-			,//LIC1_STATE
-			,//LIC1_num
-			,bill_tin
-			,//DEA_NUM1
-			,//group_key
-			,//
-			,//UPIN
-			,did
-			,bdid
-			,//SRC
-			,//SOURCE_RID
-			,result,false,38);
+		// Health_Provider_Services.mac_get_best_lnpid_on_thor (
+			// d_bdid
+			// ,lnpid
+			// ,//First_name
+			// ,//Middle_name
+			// ,//Last_NAME
+			// ,//maturity_suffix
+			// ,//GENDER
+			// ,clean_prim_range
+			// ,clean_prim_name
+			// ,clean_sec_range
+			// ,clean_v_city_name
+			// ,clean_st
+			// ,clean_zip
+			// ,//SSN
+			// ,//DOB
+			// ,//clean_prac_phone1
+			// ,//LIC1_STATE
+			// ,//LIC1_num
+			// ,bill_tin
+			// ,//DEA_NUM1
+			// ,//group_key
+			// ,//
+			// ,//UPIN
+			// ,did
+			// ,bdid
+			// ,//SRC
+			// ,//SOURCE_RID
+			// ,result,false,38);
 
-		RETURN result;
-	END;	
+		// RETURN result;
+	// END;	
 
-	EXPORT npi_extension_base:=FUNCTION
-		base_file := Mark_history(MPRD.Files(filedate,pUseProd).npi_extension_base.built(isTest = false), MPRD.layouts.npi_extension_base);
+	// EXPORT npi_extension_base:=FUNCTION
+		// base_file := Mark_history(MPRD.Files(filedate,pUseProd).npi_extension_base.built(isTest = false), MPRD.layouts.npi_extension_base);
 
-		std_input := MPRD.StandardizeInputFile(filedate, pUseProd).npi_extension;
+		// std_input := MPRD.StandardizeInputFile(filedate, pUseProd).npi_extension;
 			 
-		cleanNames := Clean_name(std_input, MPRD.Layouts.npi_extension_base):PERSIST('~thor_data400::persist::mprd::npi_extension_names');
+		// cleanNames := Clean_name(std_input, MPRD.Layouts.npi_extension_base):PERSIST('~thor_data400::persist::mprd::npi_extension_names');
 																		
-		base_and_update := IF(nothor(FileServices.GetSuperFileSubCount(MPRD.Filenames(filedate, pUseProd).npi_extension_lBaseTemplate_built)) = 0
-								       ,cleanNames,cleanNames + base_file);
+		// base_and_update := IF(nothor(FileServices.GetSuperFileSubCount(MPRD.Filenames(filedate, pUseProd).npi_extension_lBaseTemplate_built)) = 0
+								       // ,cleanNames,cleanNames + base_file);
 											 
-		MPRD.Layouts.npi_extension_base  GetSourceRID(base_and_update L)	:= TRANSFORM
-			SELF.source_rec_id 					:= HASH64(hashmd5(
-   																	TRIM(l.npi_num)
-																		,TRIM(l.other_first_name)
-																		,TRIM(l.other_middle_name)
-																		,TRIM(l.other_last_name)
-																		,TRIM(l.authorized_first_name)
-																		,TRIM(l.authorized_middle_name)
-																		,TRIM(l.authorized_middle_name)
-																		,TRIM(l.taxonomy)));
-			SELF											:= L;
-		END;
+		// MPRD.Layouts.npi_extension_base  GetSourceRID(base_and_update L)	:= TRANSFORM
+			// SELF.source_rec_id 					:= HASH64(hashmd5(
+   																	// TRIM(l.npi_num)
+																		// ,TRIM(l.other_first_name)
+																		// ,TRIM(l.other_middle_name)
+																		// ,TRIM(l.other_last_name)
+																		// ,TRIM(l.authorized_first_name)
+																		// ,TRIM(l.authorized_middle_name)
+																		// ,TRIM(l.authorized_middle_name)
+																		// ,TRIM(l.taxonomy)));
+			// SELF											:= L;
+		// END;
    			
-		d_rid:=PROJECT(base_and_update,GetSourceRID(LEFT));
-		new_base_s := SORT(DISTRIBUTE(d_rid,HASH(npi_num))
-									,other_first_name
-									,other_middle_name
-									,other_last_name
-									,authorized_first_name
-									,authorized_middle_name
-									,authorized_last_name
-									,npi_num
-									,taxonomy
-									,LOCAL);
+		// d_rid:=PROJECT(base_and_update,GetSourceRID(LEFT));
+		// new_base_s := SORT(DISTRIBUTE(d_rid,HASH(npi_num))
+									// ,other_first_name
+									// ,other_middle_name
+									// ,other_last_name
+									// ,authorized_first_name
+									// ,authorized_middle_name
+									// ,authorized_last_name
+									// ,npi_num
+									// ,taxonomy
+									// ,LOCAL);
 														
-		MPRD.Layouts.npi_extension_base t_rollup (new_base_s  le, new_base_s ri) := TRANSFORM
-			SELF.date_vendor_first_reported := ut.EarliestDate(le.date_vendor_first_reported, ri.date_vendor_first_reported);
-			SELF.date_vendor_last_reported  := ut.LatestDate(le.date_vendor_last_reported, ri.date_vendor_last_reported);
-			SELF.	source_rec_id             := IF(le.date_vendor_first_reported<ri.date_vendor_first_reported,le.source_rec_id,ri.source_rec_id);	
-			SELF 														:= le;
-		END;
+		// MPRD.Layouts.npi_extension_base t_rollup (new_base_s  le, new_base_s ri) := TRANSFORM
+			// SELF.date_vendor_first_reported := ut.EarliestDate(le.date_vendor_first_reported, ri.date_vendor_first_reported);
+			// SELF.date_vendor_last_reported  := ut.LatestDate(le.date_vendor_last_reported, ri.date_vendor_last_reported);
+			// SELF.	source_rec_id             := IF(le.date_vendor_first_reported<ri.date_vendor_first_reported,le.source_rec_id,ri.source_rec_id);	
+			// SELF 														:= le;
+		// END;
 
-		base_f := rollup(new_base_s,
-								LEFT.other_first_name				= RIGHT.other_first_name
-						AND LEFT.other_middle_name 			= RIGHT.other_middle_name
-						AND LEFT.other_last_name				= RIGHT.other_last_name
-						AND LEFT.authorized_first_name	= RIGHT.authorized_first_name
-            AND LEFT.authorized_middle_name = RIGHT.authorized_middle_name
-						AND LEFT.authorized_middle_name	= RIGHT.authorized_last_name
-						AND LEFT.npi_num 								= RIGHT.npi_num
-						AND LEFT.taxonomy								= RIGHT.taxonomy
-						AND LEFT.isTest									= RIGHT.isTest
-						,t_rollup(LEFT, RIGHT),LOCAL);
+		// base_f := rollup(new_base_s,
+								// LEFT.other_first_name				= RIGHT.other_first_name
+						// AND LEFT.other_middle_name 			= RIGHT.other_middle_name
+						// AND LEFT.other_last_name				= RIGHT.other_last_name
+						// AND LEFT.authorized_first_name	= RIGHT.authorized_first_name
+            // AND LEFT.authorized_middle_name = RIGHT.authorized_middle_name
+						// AND LEFT.authorized_middle_name	= RIGHT.authorized_last_name
+						// AND LEFT.npi_num 								= RIGHT.npi_num
+						// AND LEFT.taxonomy								= RIGHT.taxonomy
+						// AND LEFT.isTest									= RIGHT.isTest
+						// ,t_rollup(LEFT, RIGHT),LOCAL);
 						
-		Health_Provider_Services.mac_get_best_lnpid_on_thor (
-			base_f
-			,lnpid
-			,other_first_name//authorized_first_name
-			,other_middle_name//authorized_middle_name
-			,other_last_name//authorized_last_name
-			,other_maturity_suffix//authorized_maturity_suffix
-			,other_gender//GENDER
-			,//clean_prim_range
-			,//clean_prim_name
-			,//clean_sec_range
-			,//clean_v_city_name
-			,//clean_ST
-			,//clean_ZIP
-			,//SSN
-			,//DOB
-			,//clean_prac_phone1
-			,LIC1_STATE
-			,LIC1_num
-			,npi_num
-			,//DEA_NUM1
-			,//group_key
-			,//
-			,//UPIN
-			,did
-			,bdid
-			,//SRC
-			,//SOURCE_RID
-			,result,false,38);
+		// Health_Provider_Services.mac_get_best_lnpid_on_thor (
+			// base_f
+			// ,lnpid
+			// ,other_first_name//authorized_first_name
+			// ,other_middle_name//authorized_middle_name
+			// ,other_last_name//authorized_last_name
+			// ,other_maturity_suffix//authorized_maturity_suffix
+			// ,other_gender//GENDER
+			// ,//clean_prim_range
+			// ,//clean_prim_name
+			// ,//clean_sec_range
+			// ,//clean_v_city_name
+			// ,//clean_ST
+			// ,//clean_ZIP
+			// ,//SSN
+			// ,//DOB
+			// ,//clean_prac_phone1
+			// ,LIC1_STATE
+			// ,LIC1_num
+			// ,npi_num
+			// ,//DEA_NUM1
+			// ,//group_key
+			// ,//
+			// ,//UPIN
+			// ,did
+			// ,bdid
+			// ,//SRC
+			// ,//SOURCE_RID
+			// ,result,false,38);
 
-		RETURN result;
-	END;	
+		// RETURN result;
+	// END;	
 	
-	EXPORT npi_extension_facility_base:=FUNCTION
-		base_file := Mark_history(MPRD.Files(filedate,pUseProd).npi_extension_facility_base.built(isTest = false), MPRD.layouts.npi_extension_facility_base);
+	// EXPORT npi_extension_facility_base:=FUNCTION
+		// base_file := Mark_history(MPRD.Files(filedate,pUseProd).npi_extension_facility_base.built(isTest = false), MPRD.layouts.npi_extension_facility_base);
 
-		std_input := MPRD.StandardizeInputFile(filedate, pUseProd).npi_extension_facility;
+		// std_input := MPRD.StandardizeInputFile(filedate, pUseProd).npi_extension_facility;
 		
-		cleanNames := Clean_name(std_input, MPRD.Layouts.npi_extension_facility_base):PERSIST('~thor_data400::persist::mprd::npi_extension_facility_names');
-		base_and_update := IF(nothor(FileServices.GetSuperFileSubCount(MPRD.Filenames(filedate, pUseProd).npi_extension_facility_lBaseTemplate_built)) = 0
-								       ,cleanNames,cleanNames + base_file);
+		// cleanNames := Clean_name(std_input, MPRD.Layouts.npi_extension_facility_base):PERSIST('~thor_data400::persist::mprd::npi_extension_facility_names');
+		// base_and_update := IF(nothor(FileServices.GetSuperFileSubCount(MPRD.Filenames(filedate, pUseProd).npi_extension_facility_lBaseTemplate_built)) = 0
+								       // ,cleanNames,cleanNames + base_file);
 											 
-		MPRD.Layouts.npi_extension_facility_base  GetSourceRID(base_and_update L)	:= TRANSFORM
-   		SELF.source_rec_id 					:= HASH64(hashmd5(
-   																	TRIM(l.npi_num)
-																		,TRIM(l.other_first_name)
-																		,TRIM(l.other_middle_name)
-																		,TRIM(l.other_last_name)
-																		,TRIM(l.authorized_first_name)
-																		,TRIM(l.authorized_middle_name)
-																		,TRIM(l.authorized_middle_name)
-																		,TRIM(l.taxonomy)));
-   		SELF											:= L;
-   	END;
+		// MPRD.Layouts.npi_extension_facility_base  GetSourceRID(base_and_update L)	:= TRANSFORM
+   		// SELF.source_rec_id 					:= HASH64(hashmd5(
+   																	// TRIM(l.npi_num)
+																		// ,TRIM(l.other_first_name)
+																		// ,TRIM(l.other_middle_name)
+																		// ,TRIM(l.other_last_name)
+																		// ,TRIM(l.authorized_first_name)
+																		// ,TRIM(l.authorized_middle_name)
+																		// ,TRIM(l.authorized_middle_name)
+																		// ,TRIM(l.taxonomy)));
+   		// SELF											:= L;
+   	// END;
    			
-		d_rid:=PROJECT(base_and_update,GetSourceRID(LEFT));											 
-		new_base_s := SORT(DISTRIBUTE(d_rid,HASH(npi_num))
-									,other_first_name
-									,other_middle_name
-									,other_last_name
-									,authorized_first_name
-									,authorized_middle_name
-									,authorized_last_name
-									,npi_num
-									,taxonomy
-									,LOCAL);
+		// d_rid:=PROJECT(base_and_update,GetSourceRID(LEFT));											 
+		// new_base_s := SORT(DISTRIBUTE(d_rid,HASH(npi_num))
+									// ,other_first_name
+									// ,other_middle_name
+									// ,other_last_name
+									// ,authorized_first_name
+									// ,authorized_middle_name
+									// ,authorized_last_name
+									// ,npi_num
+									// ,taxonomy
+									// ,LOCAL);
 		
-		MPRD.Layouts.npi_extension_facility_base t_rollup (new_base_s  le, new_base_s ri) := TRANSFORM
-			SELF.date_vendor_first_reported := ut.EarliestDate(le.date_vendor_first_reported, ri.date_vendor_first_reported);
-			SELF.date_vendor_last_reported  := ut.LatestDate(le.date_vendor_last_reported, ri.date_vendor_last_reported);
-			SELF.source_rec_id	            := IF(le.date_vendor_first_reported<ri.date_vendor_first_reported,le.source_rec_id,ri.source_rec_id);	
-			SELF 														:= le;
-		END;
+		// MPRD.Layouts.npi_extension_facility_base t_rollup (new_base_s  le, new_base_s ri) := TRANSFORM
+			// SELF.date_vendor_first_reported := ut.EarliestDate(le.date_vendor_first_reported, ri.date_vendor_first_reported);
+			// SELF.date_vendor_last_reported  := ut.LatestDate(le.date_vendor_last_reported, ri.date_vendor_last_reported);
+			// SELF.source_rec_id	            := IF(le.date_vendor_first_reported<ri.date_vendor_first_reported,le.source_rec_id,ri.source_rec_id);	
+			// SELF 														:= le;
+		// END;
 
-		base_f := rollup(new_base_s,
-								LEFT.other_first_name				= RIGHT.other_first_name
-						AND LEFT.other_middle_name 			= RIGHT.other_middle_name
-						AND LEFT.other_last_name				= RIGHT.other_last_name
-						AND LEFT.authorized_first_name	= RIGHT.authorized_first_name
-            AND LEFT.authorized_middle_name	= RIGHT.authorized_middle_name
-						AND LEFT.authorized_middle_name	= RIGHT.authorized_last_name
-						AND LEFT.npi_num 								= RIGHT.npi_num
-						AND LEFT.taxonomy								= RIGHT.taxonomy
-						AND LEFT.isTest									= RIGHT.isTest
-						,t_rollup(LEFT, RIGHT),LOCAL);
+		// base_f := rollup(new_base_s,
+								// LEFT.other_first_name				= RIGHT.other_first_name
+						// AND LEFT.other_middle_name 			= RIGHT.other_middle_name
+						// AND LEFT.other_last_name				= RIGHT.other_last_name
+						// AND LEFT.authorized_first_name	= RIGHT.authorized_first_name
+            // AND LEFT.authorized_middle_name	= RIGHT.authorized_middle_name
+						// AND LEFT.authorized_middle_name	= RIGHT.authorized_last_name
+						// AND LEFT.npi_num 								= RIGHT.npi_num
+						// AND LEFT.taxonomy								= RIGHT.taxonomy
+						// AND LEFT.isTest									= RIGHT.isTest
+						// ,t_rollup(LEFT, RIGHT),LOCAL);
 
-		Health_Provider_Services.mac_get_best_lnpid_on_thor (
-			base_f
-			,lnpid
-			,authorized_first_name
-			,authorized_middle_name
-			,authorized_last_name
-			,authorized_maturity_suffix
-			,//GENDER
-			,//clean_prim_range
-			,//clean_prim_name
-			,//clean_sec_range
-			,//clean_v_city_name
-			,//clean_ST
-			,//clean_ZIP
-			,//SSN
-			,//DOB
-			,//clean_prac_phone1
-			,LIC1_STATE
-			,LIC1_num
-			,npi_num
-			,//DEA_NUM1
-			,//group_key
-			,//
-			,//UPIN
-			,did
-			,bdid
-			,//SRC
-			,//SOURCE_RID
-			,result,false,38);
+		// Health_Provider_Services.mac_get_best_lnpid_on_thor (
+			// base_f
+			// ,lnpid
+			// ,authorized_first_name
+			// ,authorized_middle_name
+			// ,authorized_last_name
+			// ,authorized_maturity_suffix
+			// ,//GENDER
+			// ,//clean_prim_range
+			// ,//clean_prim_name
+			// ,//clean_sec_range
+			// ,//clean_v_city_name
+			// ,//clean_ST
+			// ,//clean_ZIP
+			// ,//SSN
+			// ,//DOB
+			// ,//clean_prac_phone1
+			// ,LIC1_STATE
+			// ,LIC1_num
+			// ,npi_num
+			// ,//DEA_NUM1
+			// ,//group_key
+			// ,//
+			// ,//UPIN
+			// ,did
+			// ,bdid
+			// ,//SRC
+			// ,//SOURCE_RID
+			// ,result,false,38);
 
-		RETURN result;
-	END;	
+		// RETURN result;
+	// END;	
 
  EXPORT taxonomy_equiv_base := FUNCTION
     
