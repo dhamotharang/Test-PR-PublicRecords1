@@ -3,7 +3,7 @@
 // determines the AID and DID information
 
 IMPORT Acquireweb_Email, ut, address, DID_Add, NID, AID, AID_Support,std, PromoteSupers;
-#WORKUNIT('name', 'Acquireweb Individual Email Build');
+
 // #CONSTANT(AID_Support.Constants.StoredWhichAIDCache, AID_Support.Constants.eCache.ForNonHeader);
 // #STORED('did_add_force','thor');
 
