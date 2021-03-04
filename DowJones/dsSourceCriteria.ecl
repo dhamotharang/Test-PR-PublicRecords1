@@ -1994,7 +1994,11 @@ EXPORT dsSourceCriteria := DATASET([
 {'EC (CFSP) 2021/258 Zimbabwe List','1981'},
 {'EC (CFSP) 2021/276 Venezuela List','1982'},
 {'EC 2021/275 Venezuela List','1983'},
-{'OFAC - Protecting Europe\'s Energy Security Act','1984'}
+{'OFAC - Protecting Europe\'s Energy Security Act','1984'},
+{'EC (CFSP) 2021/353 Belarus List','1985'},
+{'EC (CFSP) 2021/372 Human Rights Violations and Abuses List','1986'},
+{'EC 2021/339 Belarus List','1987'},
+{'EC 2021/371 Human Rights Violations and Abuses List','1988'}
 
 ],r);
 

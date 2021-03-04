@@ -10,11 +10,10 @@
 IMPORT _control,ut,RoxieKeyBuild,Orbit3,PromoteSupers, Acquireweb_Plus;
 
 EXPORT proc_build_all(STRING version,STRING torun='ALL') := FUNCTION
-  #workunit('name', 'Yogurt:Acquireweb build');
 	
   PromoteSupers.mac_sf_buildprocess(Acquireweb_Email.proc_build_base(version),'~thor_data200::base::acquireweb',buildnewbasefile,3,,true)
 
-	create_orbit_build:= Orbit3.Proc_Orbit3_CreateBuild_npf ('AcquireWeb',version);
+	create_orbit_build:= Orbit3.Proc_Orbit3_CreateBuild('AcquireWeb',version,is_npf:=true);
 	
   SEQUENTIAL
 	(

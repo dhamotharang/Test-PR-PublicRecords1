@@ -1309,6 +1309,7 @@
 		export string KEYWORD_OFAC_BM_EO14014				:= '991';
 		export string KEYWORD_USSLEA								:= '992';
 		export string KEYWORD_LUXOL_WC							:= '993';
+		export string KEYWORD_EU_HRVA								:= '994';
 		
 		//When setting the keyword export use underscores for dashes (ex: For RBI-SANC, use RBI_SANC)	
 	end;
