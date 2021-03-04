@@ -153,8 +153,10 @@ DNB_FEINV2.layout_DNB_fein_base_main_new	trans_recID(DNB_FEINV2.layout_DNB_fein_
 		self               := l;
 end;
 
- // Made changes to the "persistent_recID_join" and removed Raw_aid and Ace_aid fields and added all vendor Address fields!
+// Made changes to the "persistent_recID_join" and removed Raw_aid and Ace_aid fields and added all vendor Address fields!
 // Ace_aid are not persistentID's from build to build and it was causing an error in retaining source_rec_id's .
+// DNB_FEINV2 data source is a REPLACE EACH TIME & doesn’t maintain history!!
+// We are ONLY* using Previous Base file in this join "persistent_recID_join"  to retain OLD Source Rec Id’s !  
 persistent_recID_join  := join(Update_Base,Previous_Base,
 															 trim(left.tmsid,left,right)         		             = trim(right.tmsid,left,right)and
 															 stringlib.stringcleanspaces(left.company_name)   	 = stringlib.stringcleanspaces(right.company_name)and
