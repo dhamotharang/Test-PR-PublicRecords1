@@ -62,7 +62,7 @@ buildkeys := fcra_opt_out.proc_build_keys(filedate, isDeltaBuild);
 // dops update
 // DF-28230
 dops_update := IF(isDeltaBuild,
-					RoxieKeybuild.updateversion('FCRA_OptOutKeys',filedate,'abednego.escobal@lexisnexisrisk.com',,'D'),
+					RoxieKeybuild.updateversion('FCRA_OptOutKeys',filedate,'abednego.escobal@lexisnexisrisk.com',,'F',updateflag:='D'),
 					RoxieKeybuild.updateversion('FCRA_OptOutKeys',filedate,'abednego.escobal@lexisnexisrisk.com',,'F')
 );
 
@@ -87,13 +87,6 @@ retval := sequential(if (fileflag = 'B' or fileflag = 'E',spray_super_transact),
 						fileservices.clearsuperfile('~thor_data400::in::fcra::processed::alpharetta::opt_out')
 						)),*/
 					bld_file,
-					// add the respective super to main super which is used to build index
-					fileservices.clearsuperfile('~thor_data400::base::fcra::qa::optout'),
-					if (isfullreplace,
-						fileservices.addsuperfile('~thor_data400::base::fcra::qa::optout','~thor_data400::base::fcra::qa::optout_monthly'),
-						fileservices.addsuperfile('~thor_data400::base::fcra::qa::optout','~thor_data400::base::fcra::qa::optout_weekly')
-						),
-						
 					buildkeys,
 					Scrubs_FCRA_Opt_Out.fnRunScrubs(filedate,''),
 					dops_update,
