@@ -228,7 +228,7 @@ let main = async function() {
 		// record percent done
 		num++;
 		let prog = Math.round((num/len) * 100);
-		let pstr = (prog + '%').padStart(4, ' ');
+		let pstr = (num + '').padStart(3, ' ') + ' ' + (prog + '%').padStart(4, ' ');
 		
 		// ignore files that don't exist
 		if (!path) {
