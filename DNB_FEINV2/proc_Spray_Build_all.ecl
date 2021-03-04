@@ -1,5 +1,11 @@
 ﻿IMPORT STD, orbit_report, RoxieKeybuild, Scrubs, Scrubs_DNB_FEIN, tools, dops;
 
+/////////////////////////////////////////////////////////////
+//-- Quick Documentation
+//-- DNB_FEINV2 data source is a REPLACE EACH TIME & doesn’t maintain history of records 
+//-- Due to this we may lose some percentage of Source Rec Id’s 
+/////////////////////////////////////////////////////////////
+
 EXPORT proc_Spray_Build_all(
 	STRING  hostname,
 	STRING  absolutePath,
