@@ -47,6 +47,8 @@ export USE_LOCAL_ROXIE_BEST_KEYS := true; // Used if USE_LOCAL_KEYS is false
 export USE_LOCAL_THOR_SALT_KEYS := true; // Used if USE_LOCAL_KEYS is false
 export USE_LOCAL_THOR_BEST_KEYS := true; // Used if USE_LOCAL_KEYS is false
 
+export USE_DX_CONSUMER_BEST := false;
+
 export APPEND_WEIGHT_THRESHOLD_ROXIE := 44;
 export APPEND_WEIGHT_THRESHOLD_THOR := 37;
 
