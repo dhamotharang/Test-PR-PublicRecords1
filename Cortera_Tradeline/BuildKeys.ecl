@@ -9,7 +9,7 @@ EXPORT BuildKeys(string pversion=(string8)Std.Date.Today(), boolean pDeltaBuild 
 										 );
 		
 	RoxieKeyBuild.Mac_SK_BuildProcess_v3_local(dx_Cortera_Tradeline.Key_LinkIds.Key
-																						 ,dBase_Linkid
+																						 ,dBase_Linkid(ultid <> 0)
 																						 ,dx_Cortera_Tradeline.Keynames().LinkIds.QA
 																						 ,dx_Cortera_Tradeline.Keynames(pversion,false).LinkIds.New
 																						 ,BuildLinkIdsKey); 

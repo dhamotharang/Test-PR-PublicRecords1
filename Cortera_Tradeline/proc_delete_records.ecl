@@ -32,7 +32,7 @@ EXPORT proc_delete_records(string8 													pVersion   			 = '',
 															//self.status										:= IF(left.ACCOUNT_KEY=right.ACCOUNT_KEY and left.AR_DATE=right.AR_DATE, 'D', left.status);
 															self.deletion_date						:= IF(left.ACCOUNT_KEY=right.ACCOUNT_KEY and left.AR_DATE=right.AR_DATE, deldate, left.deletion_date);
 															self.dt_vendor_last_reported	:= IF(left.ACCOUNT_KEY=right.ACCOUNT_KEY and left.AR_DATE=right.AR_DATE, deldate, left.dt_vendor_last_reported);
-															self.dt_effective_first				:= left.filedate;
+															self.dt_effective_first				:= IF(left.ACCOUNT_KEY=right.ACCOUNT_KEY and left.AR_DATE=right.AR_DATE, deldate, left.dt_effective_first);
 															self.dt_effective_last				:= IF(left.ACCOUNT_KEY=right.ACCOUNT_KEY and left.AR_DATE=right.AR_DATE, deldate, 0);
 															self.delta_ind								:= 3;
 															self 													:= left;),
