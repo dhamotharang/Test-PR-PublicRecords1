@@ -1,79 +1,129 @@
-import	DMA,RoxieKeyBuild,ut, Delta_Utilities;
+import	DMA, dx_dma, RoxieKeyBuild,ut, Delta_Utilities, data_services, std;
 
-export	proc_build_tps_all(string	fileDate)	:=
+export	proc_build_tps_all(string	fileDate, boolean build_full = false)	:=
 module
 	
-	shared	fileTPSBaseNational	:=	DMA.File_suppressionTPS_National(PhoneNumber	!=	'');
-	
-	export	proc_build_base_national	:=
+    export	proc_build_base	:=
 	function
-		fileNationalIn			:=	DMA.File_In_SuppressionTPS_National(PhoneNumber	!=	'');
-		
-		fileNationalDeletes	:=	fileNationalIn(trim(Indicator)	=		'D');
-		fileNationalAdds		:=	fileNationalIn(trim(Indicator)	!=	'D');
-		
-		DMA.layout_suppressionTPS.Base	t_removeDeletes(fileTPSBaseNational	l,fileNationalDeletes	r)	:=
-		transform
-			self	:=	l;
-		end;
-		
-		removeDeletes	:=	join(	distribute(fileTPSBaseNational,hash32(phonenumber)),
-														distribute(fileNationalDeletes,hash32(phonenumber)),
-														left.phonenumber	=	right.phonenumber,
-														t_removeDeletes(left,right),
-														left only,
-														local
-													);
-		
-		DMA.layout_suppressionTPS.Base	filterNationalPhone(fileNationalAdds	l)	:=
-		transform
-			self.source				:=	'NTL';
-			self.phonenumber	:=	REGEXFIND('[0-9]{10}',l.PhoneNumber,0);
-		end;
-		
-		NationalPhone	:=	project(fileNationalAdds,filterNationalPhone(left));
-		
-		return	NationalPhone+removeDeletes;
-	end;
-	
-	export	proc_build_base	:=
-	function
-		fileDMAIn						:=	DMA.file_in_suppressionTPS_DMA(PhoneNumber	!=	'');
-		
-		DMA.layout_suppressionTPS.Base	filterDMAPhone(fileDMAIn l)	:=
+        
+		fileDMAIn						:=	
+        //dataset([],layout_in_suppressionTPS_DMA);
+        DMA.file_in_suppressionTPS_DMA(PhoneNumber	!=	'');
+		dx_dma.layouts.building	filterDMAPhone(fileDMAIn l)	:=
 		transform
 			self.source				:=	'DMA';
 			self.phonenumber	:=	REGEXFIND('[0-9]{10}',l.AreaCode+l.PhoneNumber,0);
+            self.record_sid := (unsigned)l.phonenumber;
+            self.dt_effective_first := (unsigned)filedate;
+            self.dt_effective_last := 0;
+            self.delta_ind:= 1;
 		end;
+        DMAPhone	:=	project(fileDMAIn,filterDMAPhone(left));
 
-		DMAPhone	:=	project(fileDMAIn,filterDMAPhone(left));
-		
-		baseFile	:=	fileTPSBaseNational+DMAPhone;
-        baseFull := dataset('~thor_data400::base::suppression::tps'
-		Delta_Utilities.AddRecords( )
-		distDNC		:=	distribute(baseFile(PhoneNumber	!=	''	and	(unsigned)PhoneNumber	!=	0),hash32(PhoneNumber));
-		srtDNC		:=	sort(distDNC,record,local);
-		dedupDNC	:=	dedup(srtDNC,record,local);
+        fileNationalIn			:=	
+        //dataset([],DMA.layout_in_suppressionTPS_National);
+        dataset(data_services.foreign_prod +'thor_data400::in::suppression::tps_national_20210302',DMA.layout_in_suppressionTPS_National,csv(separator(','),terminator('\n')) );
+        //dataset('~thor400::debug::in::suppression::tps_national_0223',DMA.layout_in_suppressionTPS_National,thor );
+        //DMA.File_In_SuppressionTPS_National(PhoneNumber	!=	'');
 
-		return	dedupDNC;
+        DMA.layout_in_suppressionTPS_National	filterNationalPhone(fileNationalIn	l)	:=
+		transform
+			self.phonenumber	:=	REGEXFIND('[0-9]{10}',l.PhoneNumber,0);
+            self := l;
+
+		end;
+        
+        fileNationalIn_filtered	:=	project(distribute(fileNationalIn(PhoneNumber	!=	''),hash32(phonenumber)),filterNationalPhone(left));
+        FISTPSN	:= fileNationalIn_filtered(phonenumber != '');
+        
+
+        DMA.layout_in_suppressionTPS_National	remove_same_day(dma.layout_in_suppressionTPS_National L, dma.layout_in_suppressionTPS_National R)	:=
+        transform
+            self := R;
+        end;
+        sort_FISTPSN := sort(distribute(FISTPSN,hash32(phonenumber)), phonenumber, requestdate);
+        new_data:= rollup(sort_FISTPSN,
+                        left.phonenumber = right.phonenumber and 
+                        left.RequestDate[1..10] = right.RequestDate[1..10],
+                        remove_same_day(left,right)
+                        );
+        
+        dx_dma.layouts.building	tReformat2Bldg(sort_FISTPSN //new_data 
+                                                    L)	:=
+        transform
+            self.source := 'NTL';
+            self.phonenumber	:=	L.phonenumber;
+            self.record_sid := (unsigned)L.phonenumber;
+            self.dt_effective_first := std.date.fromstringtodate(L.RequestDate[1..10],'%Y-%m-%d'); //change to filedate after first build
+            self.dt_effective_last := if( L.Indicator = 'A', 0, std.date.fromstringtodate(L.RequestDate[1..10],'%Y-%m-%d'));
+            self.delta_ind := if(L.Indicator = 'A', 1, 3);
+        end;
+
+        base_data :=  if (build_full, 
+                            project(FISTPSN,tReformat2Bldg(left))+DMAPhone(PhoneNumber	!=	'') + DMA.file_suppressionTPS_delta.base,
+                            project(FISTPSN,tReformat2Bldg(left))+DMAPhone(PhoneNumber	!=	'')
+                            );
+        sorted_new_data := sort(base_data(record_sid != 0), phonenumber, dt_effective_first, dt_effective_last);
+
+        dx_dma.layouts.building isolate_relevant(dx_dma.layouts.building L, dx_dma.layouts.building R) :=
+        TRANSFORM
+            SELF.dt_effective_first := if(L.delta_ind = 3 and R.delta_ind = 1,  R.dt_effective_first, L.dt_effective_first);
+            SELF.dt_effective_last := if(L.delta_ind = 3 and R.delta_ind = 3, L.dt_effective_last, R.dt_effective_last);
+            self := R;
+        END;
+
+
+        delta_base := rollup(sorted_new_data, left.phonenumber = right.phonenumber, isolate_relevant(left,right));
+        mvBase  := STD.File.PromoteSuperFileList([
+                                                    dx_dma.names.base,
+                                                    dx_dma.names.base_father,
+                                                    dx_dma.names.base_grandfather,
+                                                    dx_dma.names.base+'_delete'
+                                                    ], dx_dma.names.base +'_'+filedate, true);
+		return	sequential(
+                            output(if(build_full, delta_base(delta_ind = 1), delta_base),, dx_dma.names.base +'_'+filedate),
+                            if(build_full, mvBase, output('not full build'))
+                            );
 	end;
-	
+
 	export	proc_build_key	:=
-	function
-		RoxieKeyBuild.Mac_SK_BuildProcess_v2_local(	DMA.key_DNC_Phone,
-																								'~thor_data400::key::DNC::@version@::phone',
-																								'~thor_data400::key::DNC::'+fileDate+'::phone',
-																								DNCPhoneKeyOut
-																							);
-											
-		RoxieKeyBuild.Mac_SK_Move_to_Built_v2(	'~thor_data400::key::DNC::@version@::phone',
-																						'~thor_data400::key::DNC::'+fileDate+'::phone',
-																						mv_dnc
-																					);
-																				 
-		RoxieKeyBuild.Mac_SK_Move_V2('~thor_data400::key::DNC::@version@::phone','Q',mv_dnc_key);
-		
-		return	sequential(DNCPhoneKeyOut,mv_dnc,mv_dnc_key);
+	function        
+        key_adds := Delta_Utilities.AddRecords(
+                                                //dataset([],dx_dma.layouts.building),
+                                                DMA.file_suppressionTPS_delta.base,
+                                                dataset(dx_dma.names.base + '_' + filedate,dx_dma.layouts.building,flat),
+                                                'dx_dma.layouts.building',
+                                                ['phonenumber']
+                                                );
+        key_deletes := Delta_Utilities.DeleteRecords(
+                                                //dataset([],dx_dma.layouts.building),
+                                                DMA.file_suppressionTPS_delta.base,
+                                                dataset(dx_dma.names.base + '_' + filedate,dx_dma.layouts.building,flat),
+                                                'dx_dma.layouts.building',
+                                                ['phonenumber'],
+                                                ,
+                                                filedate
+                                                );
+        key_delta := if(build_full, dataset(dx_dma.names.base,dx_dma.layouts.building,flat) , key_adds + key_deletes);
+        
+        RoxieKeybuild.MAC_build_logical(dx_dma.key_DNC_Phone,key_delta,dx_dma.names.key_DNC,dx_dma.names.key_dnc_new(filedate),DNCPhoneKeyOut);
+        mvKey				:= STD.File.PromoteSuperFileList([
+                                                                dx_dma.names.key_DNC,
+                                                                dx_dma.names.key_DNC_father,
+                                                                dx_dma.names.key_DNC_grandfather,
+                                                                dx_dma.names.key_DNC+'_delete'
+                                                                ], dx_dma.names.key_dnc_new(filedate));		
+
+		return	sequential(
+                            DNCPhoneKeyOut,
+                            if(build_full, 
+                                mvKey,
+                                sequential(
+                                    fileservices.addsuperfile(dx_dma.names.base, dx_dma.names.base +'_'+filedate), 
+                                    fileservices.addsuperfile(dx_dma.names.key_DNC, dx_dma.names.key_dnc_new(filedate))
+                                    )
+                            )
+                            );
 	end;
 	
 end;
