@@ -551,8 +551,8 @@ end;
 
 gateways := project(gateways_in, gw_switch(left));
 
-if(OFACVersion = 4 and Models.FP_models.Model_Check(Valid_requested_models, Risk_Indicators.iid_constants.FAXML_WatchlistModels) and not exists(gateways(servicename = 'bridgerwlc')) , fail(Risk_Indicators.iid_constants.OFAC4_NoGateway)); 
-if(OFACVersion = 4 and Models.FP_models.Model_Check(Valid_requested_models, ['']) and not exists(gateways(servicename = 'bridgerwlc')) , fail(Risk_Indicators.iid_constants.OFAC4_NoGateway)); 
+if(OFACVersion = 4 and Models.FP_models.Model_Check(Valid_requested_models, Risk_Indicators.iid_constants.FAXML_WatchlistModels) and not exists(gateways(servicename = 'bridgerwlc')) and test_data_enabled = false, fail(Risk_Indicators.iid_constants.OFAC4_NoGateway)); 
+if(OFACVersion = 4 and Models.FP_models.Model_Check(Valid_requested_models, ['']) and not exists(gateways(servicename = 'bridgerwlc')) and test_data_enabled = false, fail(Risk_Indicators.iid_constants.OFAC4_NoGateway)); 
 
 // requirement 2.5 - minimum input required
 // a. Model is AVENGER and cmLexID is populated, and is the only thing populated
