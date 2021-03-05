@@ -22,12 +22,7 @@ ip := _Control.IPAddress.bctlpedata11;
 datadir := '/data/hds_180/nac2/ncf2/';
 opsdir := '/data/hds_180/nac2/ncf2/';
 
-
-
-
-//Nac_V2.ProcessContributoryFile(ip, rootdir, lfn, ip2, root2, version);
-files := STD.File.RemoteDirectory(ip, datadir+'incoming', 'ncf2*.dat',true); //  removed size filter  
-
+files := STD.File.RemoteDirectory(ip, datadir+'incoming', 'ncf2*.dat',true); 
 
 nac_V2.rNAC2Config	tNAC2ConfigForceLower(nac_V2.dNAC2Config pInput) :=
 TRANSFORM
@@ -39,19 +34,13 @@ TRANSFORM
 END;
 dNAC2ConfigForceLower	:=	PROJECT(nac_V2.dNAC2Config, tNAC2ConfigForceLower(left));
 
-
-sGroupId :=	SET(dNAC2ConfigForceLower, GroupID);
+sGroupId :=	SET(dNAC2ConfigForceLower(ProductCode='n' AND IsProd='1'), GroupID);
 dOKFiles :=	files(Name[6..9] in sGroupId);  //  ex.  ncf2_fl99_20190627_142000.dat
-
-
-//fail_check := EXISTS(dNAC2ConfigForceLower(ProductCode <> 'n' OR IsProd <> '1'));
-
 
 r2 := RECORD
 	STRING		datadir;
 	STRING		lfn;
 END;
-
 
 x := PROJECT(dOKFiles, TRANSFORM(r2,
 					parts := Std.Str.FindReplace(left.Name, '/', ' ');
@@ -62,15 +51,12 @@ x := PROJECT(dOKFiles, TRANSFORM(r2,
 					SELF.lfn := pieces[cnt];
 					));
 
-
 version := (string8)Std.Date.Today() : INDEPENDENT;
 #WORKUNIT('protect',true);
-
 
 // NOTE: System time is standard time + 5; therefore, Sunday at 10 PM is actually Monday 3 AM
 #WORKUNIT('name', 'NAC2 NCF2 Contributory File Scheduler');
 ThorName := 'thor400_44_sla_eclcc';		// for prod
-
 
 lECL1 :=
 envVars
@@ -80,5 +66,4 @@ every_10_min := '*/10 0-23 * * *';
 IF(EXISTS(x), EVALUATE(
 		_Control.fSubmitNewWorkunit(lECL1, ThorName)
 		)) : WHEN(CRON(every_10_min));
-
 

@@ -16,19 +16,14 @@ envVars :=
 +'#STORED (\'_Validate_Year_Range_Low\', \'1800\');\n'
 +'#STORED (\'_Validate_Year_Range_high\', ((string8)Std.Date.Today())[1..4]);\n'
 +'wuname := \'NAC2 PPA Contributory File Processor\';\n'
-+'#WORKUNIT(\'name\', wuname);\n'
-;
++'#WORKUNIT(\'name\', wuname);\n';
 
 
 ip := _Control.IPAddress.bctlpedata12;
 datadir := '/data/rin_ppa/';
 opsdir := '/data/rin_ppa/data_ops/ncf2/';  //  what about  MRR2 & MRX2?
 
-
-//Nac_V2.ProcessContributoryFile(ip, rootdir, lfn, ip2, root2, version);
-files := STD.File.RemoteDirectory(ip, datadir, 'ncf2*.dat',true);
-//  rin_ppa file types:  MRR2, MRX2, NCF2
-
+files := STD.File.RemoteDirectory(ip, datadir, 'ncf2*.dat',true);  //  rin_ppa file types:  MRR2, MRX2, NCF2
 
 nac_V2.rNAC2Config	tNAC2ConfigForceLower(nac_V2.dNAC2Config pInput)	:=
 transform
@@ -40,17 +35,13 @@ transform
 end;
 dNAC2ConfigForceLower	:=	project(nac_V2.dNAC2Config, tNAC2ConfigForceLower(left));
 
-
-sGroupId	 :=	set(dNAC2ConfigForceLower, GroupID);
+sGroupId :=	SET(dNAC2ConfigForceLower(ProductCode='p' AND IsProd='0'), GroupID);
 dOKFiles	 :=	files(Name[1..4] in sGroupId);
-
-//fail_check := EXISTS(dNAC2ConfigForceLower(ProductCode <> 'p' OR IsProd <> '0'));
 
 r2 := RECORD
 	string		datadir;
 	string		lfn;
 END;
-
 
 x := project(dOKFiles, TRANSFORM(r2,
 					parts := Std.Str.FindReplace(left.Name, '/', ' ');
@@ -61,14 +52,12 @@ x := project(dOKFiles, TRANSFORM(r2,
 					self.lfn := pieces[cnt];
 					));
 
-
 version := (string8)Std.Date.Today() : INDEPENDENT;
 #WORKUNIT('protect',true);
 
 // NOTE: System time is standard time + 5; therefore, Sunday at 10 PM is actually Monday 3 AM
 #WORKUNIT('name', 'NAC2 PPA Contributory File Scheduler');
 ThorName := 'thor400_sta_eclcc';		// for dataland
-
 
 lECL1 :=
 envVars
@@ -77,5 +66,4 @@ every_10_min := '*/10 0-23 * * *';
 IF(exists(x), EVALUATE(
 		_Control.fSubmitNewWorkunit(lECL1, ThorName)
 		)) : WHEN(CRON(every_10_min));
-
 

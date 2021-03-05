@@ -24,9 +24,9 @@ EXPORT fn_GetInternalRecipients
 		SELF.EmailAddress := TRIM(L.EmailAddress) + ';' + TRIM(R.EmailAddress); 
 	END;
 
-	Default_Address := 	PROJECT(DATASET(Nac_V2.Constants.SuperFileName_Internal, NAC_V2.Layouts.rlInternalEmailFile, THOR, OPT)(EventType = 'Default'), {LEFT.EmailAddress});
-	dsList := ROLLUP(FilteredRecordset, true, xcat(LEFT, RIGHT)); 
-	ds := IF(EXISTS(dsList), dsList, Default_Address);
+	Default_Address := PROJECT(DATASET(Nac_V2.Constants.SuperFileName_Internal, NAC_V2.Layouts.rlInternalEmailFile, THOR, OPT)(EventType = 'Default'), {LEFT.EmailAddress});
+	dsList := ROLLUP(FilteredRecordset, true, xcat(LEFT, RIGHT));
+	ds := IF(EXISTS(dsList), dsList, Default_Address); 
 
 	RETURN ds[1].EmailAddress;
 

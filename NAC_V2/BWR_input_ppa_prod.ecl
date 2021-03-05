@@ -6,14 +6,13 @@ envVars :=
  '#WORKUNIT(\'protect\',true);\n'
 +'#WORKUNIT(\'priority\',\'high\');\n'
 +'#WORKUNIT(\'priority\',11);\n'
-+'#OPTION(\'AllowedClusters\',\'thor400_sta_eclcc,thor400_dev_eclcc\');\n'
++'#OPTION(\'AllowedClusters\',\'thor400_44_sla_eclcc,thor400_44_eclcc\');\n'
 +'#OPTION(\'AllowAutoQueueSwitch\',\'1\');\n'
 +'#OPTION(\'MultiplePersistInstances\',\'false\');\n'
 +'#STORED (\'_Validate_Year_Range_Low\', \'1800\');\n'
 +'#STORED (\'_Validate_Year_Range_high\', ((string8)Std.Date.Today())[1..4]);\n'
 +'wuname := \'NAC2 PPA Contributory File Processor\';\n'
-+'#WORKUNIT(\'name\', wuname);\n'
-;
++'#WORKUNIT(\'name\', wuname);\n';
 
 
 ip := _Control.IPAddress.bctlpedata10;
@@ -32,11 +31,8 @@ transform
 end;
 dNAC2ConfigForceLower	:=	project(nac_V2.dNAC2Config, tNAC2ConfigForceLower(left));
 
-sGroupId	:=	set(dNAC2ConfigForceLower, GroupID);
+sGroupId :=	SET(dNAC2ConfigForceLower(ProductCode='p' AND IsProd='1'), GroupID);
 dOKFiles	:=	files(Name[1..4] in sGroupId);
-
-//fail_check := EXISTS(dNAC2ConfigForceLower(ProductCode <> 'p' OR IsProd <> '1'));
-
 
 r2 := RECORD
 	string		datadir;
