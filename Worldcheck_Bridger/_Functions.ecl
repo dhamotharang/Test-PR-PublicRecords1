@@ -1411,6 +1411,7 @@
 				trim(kword, left, right) = 'USSLEA' =>SubGroup_Constants.numKeywordsID.KEYWORD_USSLEA,
 				trim(kword, left, right) = 'LUXOL-WC' =>SubGroup_Constants.numKeywordsID.KEYWORD_LUXOL_WC,
 				trim(kword, left, right) = 'EU-HRVA' =>SubGroup_Constants.numKeywordsID.KEYWORD_EU_HRVA,
+				trim(kword, left, right) = 'MAAMMC' =>SubGroup_Constants.numKeywordsID.KEYWORD_MAAMMC,
 								
 				//When setting the keyword export use underscores for dashes (ex: For RBI-SANC, use RBI_SANC)	
 				
