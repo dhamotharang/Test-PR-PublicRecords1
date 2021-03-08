@@ -436,11 +436,13 @@ search_results_temp := ungroup(
 	 )
    );						
 
+  model_details := Models.LIB_RiskView_Models().ValidV50Models;
+
   // Convert Search Results to name/value pairs for ESDL:  
 	Riskviewattrs_namevaluePairs :=  RiskView.functions.Format_riskview_attrs(search_results, AttributesVersionRequest);  
 
   // Convert Model Results to ESDL:
-	modelResults := normalize(	search_results , 9, RiskView.Transforms.intoModel(LEFT, counter)	)(name<>'');
+	modelResults := normalize(	search_results , 10, RiskView.Transforms2(model_details).intoModel(LEFT, counter)	)(name<>'');
 	
   // Convert Search Results to alert code/description pairs for ESDL:
 	nameValuePairsAlerts :=  NORMALIZE(search_results, 10, RiskView.Transforms.norm_alerts(LEFT, COUNTER))(code<>'');
