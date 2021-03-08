@@ -6,7 +6,7 @@ export layout_NCS0841 := MODULE
 	string50   LASTNAME;
 	string30   FIRSTNAME;
 	string30   LICTYPE;
-	// string30   NR;
+	string30   NR;
 	string150  FIRMNAME;	
 	string100  ADDRESS;
 	string30   CITY;

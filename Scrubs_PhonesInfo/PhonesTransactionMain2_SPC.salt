@@ -1,0 +1,38 @@
+﻿OPTIONS:-gh
+MODULE:Scrubs_PhonesInfo
+FILENAME:PhonesInfo
+NAMESCOPE:PhonesTransactionMain2
+
+FIELDTYPE:Invalid_AlphaNum:ALLOW(ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789 )
+FIELDTYPE:Invalid_Char:ALLOW(ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-/' )
+FIELDTYPE:Invalid_CountryCode:ENUM(1| )
+FIELDTYPE:Invalid_CountryAbbr:ENUM(GU|MP|PR|US|VI| )
+FIELDTYPE:Invalid_DialTypeCode:ENUM(T| )
+FIELDTYPE:Invalid_Num:ALLOW(0123456789 )
+FIELDTYPE:Invalid_Src:ENUM(OT|P!|PG|PK|PX)
+FIELDTYPE:Invalid_TransCode:ENUM(AS|DE|RE|PA|PD|SA|SD|SU)
+
+FIELD:phone:LIKE(Invalid_Num):TYPE(STRING10):0,0
+FIELD:source:LIKE(Invalid_Src):TYPE(STRING5):0,0
+FIELD:transaction_code:LIKE(Invalid_TransCode):TYPE(STRING2):0,0
+FIELD:transaction_start_dt:LIKE(Invalid_Num):TYPE(UNSIGNED8):0,0
+FIELD:transaction_start_time:LIKE(Invalid_Num):TYPE(STRING6):0,0
+FIELD:transaction_end_dt:LIKE(Invalid_Num):TYPE(UNSIGNED8):0,0
+FIELD:transaction_end_time:LIKE(Invalid_Num):TYPE(STRING6):0,0
+FIELD:transaction_count:LIKE(Invalid_Num):TYPE(UNSIGNED8):0,0
+FIELD:vendor_first_reported_dt:LIKE(Invalid_Num):TYPE(UNSIGNED8):0,0
+FIELD:vendor_first_reported_time:LIKE(Invalid_Num):TYPE(STRING6):0,0
+FIELD:vendor_last_reported_dt:LIKE(Invalid_Num):TYPE(UNSIGNED8):0,0
+FIELD:vendor_last_reported_time:LIKE(Invalid_Num):TYPE(STRING6):0,0
+FIELD:country_code:LIKE(Invalid_CountryCode):TYPE(STRING3):0,0
+FIELD:country_abbr:LIKE(Invalid_CountryAbbr):TYPE(STRING2):0,0
+FIELD:routing_code:LIKE(Invalid_Num):TYPE(STRING10):0,0
+FIELD:dial_type:LIKE(Invalid_DialTypeCode):TYPE(STRING1):0,0
+FIELD:spid:LIKE(Invalid_AlphaNum):TYPE(STRING10):0,0
+FIELD:carrier_name:TYPE(STRING60):0,0
+FIELD:phone_swap:LIKE(Invalid_Num):TYPE(STRING10):0,0
+FIELD:ocn:LIKE(Invalid_AlphaNum):TYPE(STRING6):0,0
+FIELD:alt_spid:LIKE(Invalid_AlphaNum):TYPE(STRING10):0,0
+FIELD:lalt_spid:LIKE(Invalid_AlphaNum):TYPE(STRING10):0,0
+FIELD:global_sid:LIKE(Invalid_Num):TYPE(UNSIGNED4):0,0
+FIELD:record_sid:LIKE(Invalid_Num):TYPE(UNSIGNED8):0,0
