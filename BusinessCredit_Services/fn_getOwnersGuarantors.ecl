@@ -291,7 +291,9 @@ EXPORT fn_getOwnersGuarantors (	BusinessCredit_Services.Iparam.reportrecords inm
 	y_AccDetail_Recs := PROJECT(y_trades_dedup , trans_y_AccDetail(LEFT));
 
 	iesp.businesscreditreport.t_BusinessCreditOwnerGuarantor DenormThem (iesp.businesscreditreport.t_BusinessCreditOwnerGuarantor L, y_AccDetail_temp R) := TRANSFORM
-		SELF.AccountDetails := SORT(L.AccountDetails + R.AccountDetails, BusinessCredit_Services.Functions.fn_AccountStatus_sort_order(AccountStatus), RECORD);
+		SELF.AccountDetails := CHOOSEN(
+      SORT(L.AccountDetails + R.AccountDetails, BusinessCredit_Services.Functions.fn_AccountStatus_sort_order(AccountStatus), RECORD),
+      iesp.constants.BusinessCredit.MaxSection);
 		SELF := L;
 	END;
 
