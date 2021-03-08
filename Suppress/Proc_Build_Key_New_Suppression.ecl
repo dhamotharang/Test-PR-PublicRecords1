@@ -32,7 +32,7 @@ FUNCTION
 
 update_dops 					:= dops.updateversion('SuppressionKeys',pVersion,'Christopher.Brodeur@lexisnexisrisk.com,Abednego.Escobal@lexisnexisrisk.com',,'N|B');
 update_dops_fcra := dops.updateversion('FCRA_SuppressionKeys',pVersion,'Christopher.Brodeur@lexisnexisrisk.com,Abednego.Escobal@lexisnexisrisk.com',,'F');
-update_idops 				:= dops.updateversion('SuppressionKeys',pVersion,'Christopher.Brodeur@lexisnexisrisk.com,Abednego.Escobal@lexisnexisrisk.com',,'N',,,'A');
+// update_idops 				:= dops.updateversion('SuppressionKeys',pVersion,'Christopher.Brodeur@lexisnexisrisk.com,Abednego.Escobal@lexisnexisrisk.com',,'N',,,'A');
 
 update_orbit := sequential(Orbit3.proc_Orbit3_CreateBuild('Suppression',pVersion,'N|B'),
 								Orbit3.proc_Orbit3_CreateBuild('FCRA Suppression',pVersion,'F'));
@@ -50,7 +50,7 @@ RETURN Sequential(parallel(bld_key2,bld_key_fcra2),
 																            output('No need to update since its Saturday or Sunday')),
 																						
 																						if(ut.Weekday((integer)pVersion[1..8]) <> 'SATURDAY' and ut.Weekday((integer)pVersion[1..8]) <> 'SUNDAY',
-																						update_orbit,/*,update_idops,Suppress.Proc_OrbitI_CreateBuild(pVersion,'nonfcra')*/
+																						update_orbit,/*,Suppress.Proc_OrbitI_CreateBuild(pVersion,'nonfcra')*/
 																						output('No Orbit Entries Needed for weekend builds')),
 																						
 																		Samples,
