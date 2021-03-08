@@ -1,6 +1,52 @@
-export layouts := MODULE
+﻿export layouts := MODULE
 
 EXPORT
+newspaper_raw_xml	:= RECORD
+    STRING Obituary_ID               {xpath('Property[1]')};
+    STRING Obit_Date                 {xpath('Property[2]')};
+    STRING Updated_At                {xpath('Property[3]')};
+		STRING First_Name                {xpath('Property[4]')};
+    STRING Middle_Name               {xpath('Property[5]')};
+    STRING Last_Name                 {xpath('Property[6]')};
+    STRING Maiden_Name               {xpath('Property[7]')};
+    STRING Nick_Name                 {xpath('Property[8]')};
+    STRING DOB                       {xpath('Property[9]')};
+    STRING DoD                       {xpath('Property[10]')};
+    STRING Age                       {xpath('Property[11]')};
+    STRING Funeral_Service_in_City   {xpath('Property[12]')};
+    STRING Funeral_Service_in_State  {xpath('Property[13]')};
+    STRING Service_Location_Zip_Code {xpath('Property[14]')};
+    STRING Funeral_Service_Info      {xpath('Property[15]')};
+    STRING Obituary_Link             {xpath('Property[16]')};
+    STRING Newspaper_Source          {xpath('Property[17]')};
+    STRING Newspaper_City            {xpath('Property[18]')};
+    STRING Newspaper_Zip_Code        {xpath('Property[19]')};
+END;
+
+EXPORT
+newspaper_raw	:= RECORD
+    STRING Obituary_ID;
+    STRING Obit_Date;
+    STRING Updated_At;
+		STRING First_Name;
+    STRING Middle_Name;
+    STRING Last_Name;
+    STRING Maiden_Name;
+    STRING Nick_Name;
+    STRING DOB;
+    STRING DoD;
+    STRING Age;
+    STRING Funeral_Service_in_City;
+    STRING Funeral_Service_in_State;
+    STRING Service_Location_Zip_Code;
+    STRING Funeral_Service_Info;
+    STRING Obituary_Link;
+    STRING Newspaper_Source;
+    STRING Newspaper_City;
+    STRING Newspaper_Zip_Code;
+  END;
+	
+EXPORT	
 obit_xml_in	:= RECORD, MAXLENGTH(21000)
     STRING person_id{xpath('person_id')};
     STRING prefix{xpath('prefix')};
@@ -30,8 +76,8 @@ END;
 
 EXPORT
  obit_paragraph_rec := record, maxlength(4194304)
-   string ObitId;
-   string ObitParagraph;
+   STRING ObitId;
+   STRING ObitParagraph;
  END;
 
 EXPORT
@@ -44,8 +90,8 @@ EXPORT
 obitid_and_sentences_rec := RECORD
   unsigned seqno;
   unsigned sentno:=0;
-	string ObitId;
-  string sentence;
+	STRING ObitId;
+  STRING sentence;
 END;
 
 EXPORT
@@ -78,14 +124,18 @@ END;
 
 EXPORT
 layout_reor_tribute := RECORD, MAXLENGTH(21000)
-		 string8  filedate;
+		 STRING8  filedate;
      STRING person_id;
-		 string1 rec_type;
+		 STRING1 rec_type;
      STRING prefix;
      STRING fname;
      STRING mname;
      STRING lname;
      STRING name_suffix;
+		 // New fields from Newspaper
+     STRING Maiden_Name;
+     STRING Nick_Name;		 
+		 
      STRING gender;
      STRING age;
      STRING birth_month;
@@ -104,35 +154,53 @@ layout_reor_tribute := RECORD, MAXLENGTH(21000)
      STRING education_text;
      STRING military_text;
      STRING service_text;
+		 
+     // New fields from Newspaper
+     STRING Obit_Date;
+     STRING Updated_Date;
+     STRING Funeral_Service_in_City;
+     STRING Funeral_Service_in_State;
+     STRING Service_Location_Zip_Code;
+     STRING Obituary_Link;
+     STRING Newspaper_Source;
+     STRING Newspaper_City;
+     STRING Newspaper_Zip_Code;
+		
+		 // New fields from tribute history
+     STRING RowCreated_Date;
+		 STRING RowUpdated_Date;
+		 STRING RowDeleted_Date;
+		 STRING Salutation;
+		 STRING Associated_Funeral_Home;
 END;
 
 EXPORT
 tribute_obit_rec := RECORD,maxlength(21000)
-//  string obitfile_id;
-  string person_id;
-  string prefix;
-  string first;
-  string middle;
-  string last;
-  string suffix;
-  string gender;
-  string age;
-  string birth_month;
-  string birth_day;
-  string birth_year;
-  string death_month;
-  string death_day;
-  string death_year;
-  string location_city;
-  string location_state;
-  string spouses_name;
-  string spouses_living_status;
-  string companions_name;
-  string full_obit_text;
-  string donation_text;
-  string education_text;
-  string military_text;
-  string service_text;
+//  STRING obitfile_id;
+  STRING person_id;
+  STRING prefix;
+  STRING first;
+  STRING middle;
+  STRING last;
+  STRING suffix;
+  STRING gender;
+  STRING age;
+  STRING birth_month;
+  STRING birth_day;
+  STRING birth_year;
+  STRING death_month;
+  STRING death_day;
+  STRING death_year;
+  STRING location_city;
+  STRING location_state;
+  STRING spouses_name;
+  STRING spouses_living_status;
+  STRING companions_name;
+  STRING full_obit_text;
+  STRING donation_text;
+  STRING education_text;
+  STRING military_text;
+  STRING service_text;
  END;
 
 export hfs_out_rec := RECORD
@@ -152,7 +220,7 @@ export hfs_out_rec := RECORD
 	STRING dob;
 	STRING age;
   unsigned4 dod;
-	string1 deceased := 'U';
+	STRING1 deceased := 'U';
   unsigned1 dead_age;
   STRING1 death_code;
 	STRING ssn;
@@ -193,43 +261,43 @@ END;
 EXPORT
 qes_out_rec := record
 	unsigned6 did;
-  string fname;
-  string mname;
-  string lname;
-  string name_suffix;
-  string prim_range;
-  string predir;
-  string prim_name;
-  string suffix;
-  string postdir;
-  string unit_desig;
-  string sec_range;
-  string city_name;
-  string st;
-  string zip;
-  string zip4;
+  STRING fname;
+  STRING mname;
+  STRING lname;
+  STRING name_suffix;
+  STRING prim_range;
+  STRING predir;
+  STRING prim_name;
+  STRING suffix;
+  STRING postdir;
+  STRING unit_desig;
+  STRING sec_range;
+  STRING city_name;
+  STRING st;
+  STRING zip;
+  STRING zip4;
   unsigned2 t_score;
   end;
 
 EXPORT Obituary_raw_in := RECORD
-		string	person_id;  //Changed to reflect what Tributes uses for data processing purposes
-		string	lname;
-		string	fname;
-		string	mname;
-		string10	DateOfDeath;
-		string10	DateOfBirth;
-		string3	Age;
-		string	name_prefix;
-		string	name_suffix;
-		string	City_in;
-		string	State_in;
-		string10  create_dt;
-		string10  update_dt;
-		//string	ObituaryText;  --Vendor removed this field in updates
+		STRING	person_id;  //Changed to reflect what Tributes uses for data processing purposes
+		STRING	lname;
+		STRING	fname;
+		STRING	mname;
+		STRING10	DateOfDeath;
+		STRING10	DateOfBirth;
+		STRING3	Age;
+		STRING	name_prefix;
+		STRING	name_suffix;
+		STRING	City_in;
+		STRING	State_in;
+		STRING10  create_dt;
+		STRING10  update_dt;
+		//STRING	ObituaryText;  --Vendor removed this field in updates
 	END;
 	
 EXPORT Obituary_raw_base := RECORD
-		string8 filedate;
+		STRING8 filedate;
 		Obituary_raw_in;
 	END;
 	
