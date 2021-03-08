@@ -1069,11 +1069,12 @@ export shell_NoScore := record
 end;
 
 export Model_Constants := RECORD
-	STRING15 Model_Name := '';  // EX: 'RVA1403_0'
-	STRING30 Output_Model_Name := ''; // EX: 'AutoRVA1403_0'
-	UNSIGNED2 Billing_Index := 0; // EX: 1
-	STRING10 Model_Type := ''; // EX: '0-999'
-	UNSIGNED2 Billing_Index2 := 0; // This added specifically for MLA1608_0 which needs 2 billing indexes
+  STRING15 Model_Name := '';  // EX: 'RVA1403_0'
+  STRING30 Output_Model_Name := ''; // EX: 'AutoRVA1403_0'
+  UNSIGNED2 Billing_Index := 0; // EX: 1
+  STRING10 Model_Type := ''; // EX: '0-999'
+  UNSIGNED2 Billing_Index2 := 0; // This added specifically for MLA1608_0 which needs 2 billing indexes
+  BOOLEAN Next_Gen_Credit := FALSE; // This tells whether to use the next gen credit reason codes or not
 END;
 
 
