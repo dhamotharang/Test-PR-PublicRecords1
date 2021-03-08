@@ -1310,6 +1310,7 @@
 		export string KEYWORD_USSLEA								:= '992';
 		export string KEYWORD_LUXOL_WC							:= '993';
 		export string KEYWORD_EU_HRVA								:= '994';
+		export string KEYWORD_MAAMMC								:= '995';
 		
 		//When setting the keyword export use underscores for dashes (ex: For RBI-SANC, use RBI_SANC)	
 	end;
