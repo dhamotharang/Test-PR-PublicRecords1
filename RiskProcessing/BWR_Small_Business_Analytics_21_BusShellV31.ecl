@@ -54,7 +54,7 @@ inputFileName := Data_Services.foreign_prod + 'jpyon::in::amex_8055_gcp_small_in
   //Set model name arguement vals here
   ModelName1 := 'SLBB1702_0_2';
   ModelName2 := 'SLBO1702_0_2';
-  includeBusinessOnlyModel := FALSE;// set to FALSE since SBFE data is not included
+  includeBusinessOnlyModel := TRUE;// set to TRUE 
 
 #END
 
