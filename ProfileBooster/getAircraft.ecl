@@ -28,7 +28,7 @@ ACIds_thor := join(distribute(PBslim, did2),
 #ELSE
 	ACIds := ACIds_roxie;
 #END
-							
+output(	ACIds,named('ACIds'));						
 ACDetailsKey := faa.key_aircraft_id(false);
 
 ProfileBooster.Layouts.Layout_PB_Slim_aircraft	addAircraftDetails(ACIds le, ACDetailsKey ri) := transform
@@ -60,6 +60,7 @@ ACDetails_thor := join(distribute(ACIds, aircraft_id),
 	ACDetails := ACDetails_roxie;
 #END
 
+output(	ACDetails,named('ACDetails'));
 SortACdetails :=  sort(ACDetails, seq, did2, aircraft_id);
 
 ProfileBooster.Layouts.Layout_PB_Slim_aircraft rollAircrafts(ACDetails le, ACDetails ri) := TRANSFORM

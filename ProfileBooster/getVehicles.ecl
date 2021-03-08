@@ -26,12 +26,11 @@ vehRecs_thor :=  join(distribute(PBslim, did2),
 												 atmost(left.did2 = right.append_did, riskwise.max_atmost),
 												 local);
 
-#IF(onThor)
-	vehRecs := vehRecs_thor;
-#ELSE
+// #IF(onThor)
+	// vehRecs := vehRecs_thor;
+// #ELSE
 	vehRecs := vehRecs_roxie;
-#END
-
+// #END
 vehPartyKey := VehicleV2.Key_Vehicle_Party_Key;
 											
 {ProfileBooster.Layouts.Layout_PB_Slim_vehicles, UNSIGNED4 global_sid}  add_party(vehRecs le, vehPartyKey ri) := TRANSFORM
@@ -70,11 +69,11 @@ vehPartyRecs_thor_unsuppressed :=  join(distribute(vehRecs, hash64(vehicle_key, 
 											
 vehPartyRecs_thor := Suppress.Suppress_ReturnOldLayout(vehPartyRecs_thor_unsuppressed, mod_access, ProfileBooster.Layouts.Layout_PB_Slim_vehicles);											
 
-#IF(onThor)
-	vehPartyRecs := vehPartyRecs_thor;
-#ELSE
+// #IF(onThor)
+	// vehPartyRecs := vehPartyRecs_thor;
+// #ELSE
 	vehPartyRecs := vehPartyRecs_roxie;
-#END
+// #END
 
 {ProfileBooster.Layouts.Layout_PB_Slim_vehicles, UNSIGNED4 global_sid} add_Vehicles_main(vehPartyRecs le, VehicleV2.Key_Vehicle_Main_Key ri) := TRANSFORM
 	self.global_sid := ri.global_sid;
@@ -113,11 +112,11 @@ vehMainRecs_thor_unsuppressed := JOIN(distribute(vehPartyRecs, hash64(vehicle_ke
 										
 vehMainRecs_thor := Suppress.Suppress_ReturnOldLayout(vehMainRecs_thor_unsuppressed, mod_access, ProfileBooster.Layouts.Layout_PB_Slim_vehicles);
 
-#IF(onThor)
-	vehMainRecs := vehMainRecs_thor;
-#ELSE
+// #IF(onThor)
+	// vehMainRecs := vehMainRecs_thor;
+// #ELSE
 	vehMainRecs := vehMainRecs_roxie;
-#END
+// #END
 
 ProfileBooster.Layouts.Layout_PB_Slim_vehicles rollVins(vehMainRecs le, vehMainRecs ri) := TRANSFORM
 	self.months_first_reg	:= max(le.months_first_reg, ri.months_first_reg);	//save oldest registration
@@ -158,6 +157,9 @@ RolledVeh :=  rollup(vehSort, left.seq = right.seq and left.did2 = right.did2,
 // output(vehSort, named('vehSort'));
 // output(vehDedup, named('vehDedup'));
 // output(RolledVeh, named('RolledVeh'));
+// output(vehRecs,named('vehRecs'));
+// output(vehPartyRecs,named('vehPartyRecs'));
+// output(vehMainRecs,named('vehMainRecs2'));
 
 RETURN RolledVeh;
 

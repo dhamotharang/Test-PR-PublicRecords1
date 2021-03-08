@@ -671,6 +671,8 @@ wInfutorcid_roxie := PROJECT(wInfutorcid_roxie_flagged, TRANSFORM(ProfileBooster
 // OUTPUT(lname_counts, NAMED('lname_counts'));
 // OUTPUT(wAddrCounts, NAMED('wAddrCounts'));
 // OUTPUT(wLnameCounts, NAMED('wLnameCounts'));
+OUTPUT(with_hdr_addr_cache,,'~jfrancis::profilebooster10::getVerification_with_hdr_addr_cache_' + thorlib.wuid(),CSV(HEADING(single), QUOTE('"')));
+OUTPUT(wLnameCounts,,'~jfrancis::profilebooster10::getVerification_PB10_roxie_' + thorlib.wuid(),CSV(HEADING(single), QUOTE('"')));
 
 // output(filtered_reseqAddrs, named('reseqAddrs'));
 // output(with_hdr_addr_cache, named('with_hdr_addr_cache'));

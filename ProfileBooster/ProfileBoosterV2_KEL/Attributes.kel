@@ -1,0 +1,410 @@
+﻿IMPORT ProfileBooster.ProfileBoosterV2_KEL.Entities;
+IMPORT ProfileBooster.ProfileBoosterV2_KEL.Uses;
+
+IMPORT ProfileBooster.ProfileBoosterV2_KEL.KELGlobalFunctionLibrary;
+
+FUNCTION: IsBlank(STRING FieldToCheck, STRING DefaultVal) <= IF(FieldToCheck:Null OR FieldToCheck = '', DefaultVal, FieldToCheck);
+FUNCTION: IsZero(INTEGER FieldToCheck, INTEGER DefaultVal) <= IF(FieldToCheck:Null OR FieldToCheck = 0, DefaultVal, FieldToCheck);
+FUNCTION: IsBlank2Fields(STRING Field1ToCheck, STRING Default1Val, STRING Field2ToCheck, Default2Val) <=
+	MAP(Field1ToCheck:Null OR Field1ToCheck = '' => Default1Val,
+		Field2ToCheck:Null OR  Field2ToCheck = '' => Default2Val,
+		Field2ToCheck);
+FUNCTION: NameNotPopulatedCheck(STRING FnameToCheck, STRING MnameToCheck, STRING LnameToCheck) <= IF(
+					((FnameToCheck:Null OR FnameToCheck = '') AND (MnameToCheck:Null OR MnameToCheck = '') AND (LnameToCheck:Null OR LnameToCheck = '')), TRUE, FALSE);
+FUNCTION: IsNotEnoughToClean(STRING FieldToCheck) <= IF(FieldToCheck:Null OR FieldToCheck = '', TRUE, FALSE);
+FUNCTION: CityStateZipNotPopulatedCheck(STRING City, STRING State, STRING Zip) <= (Zip:Null OR Zip = '') AND ((City:Null OR City = '') OR (State:Null OR State = ''));
+//Input Echo return 0/1 if populated
+FUNCTION: IsEchoPopulated(STRING FieldToCheck) <= IF(FieldToCheck:Null OR FieldToCheck = '', '0', '1');
+FUNCTION: IsEchoPopulatedInteger(INTEGER FieldToCheck) <= IF(FieldToCheck:Null OR FieldToCheck = 0, '0', '1');
+//Input Cleaned returns -99999/0/1 if cleaned attributes are populated
+FUNCTION: IsCleanPopulated(STRING FieldToCheck, STRING DefaultVal1, STRING DefaultVal2) <= IF(FieldToCheck = DefaultVal1, DefaultVal1,
+					IF(FieldToCheck = DefaultVal2, '0', '1'));
+FUNCTION: GETBUILDDATE(STRING variableName) <= ECL((UNSIGNED8)Risk_Indicators.get_Build_date(variableName)) FROM Risk_Indicators RETURNS DATE;
+FUNCTION: EditDistance(STRING field1, STRING field2) <= ECL(STD.Str.EditDistance(field1, field2)) FROM STD RETURNS INTEGER;
+FUNCTION: FindCount(STRING source, STRING target) <= ECL(STD.Str.FindCount(source, target)) FROM STD RETURNS INTEGER;
+FUNCTION: SourceGroup(STRING RawSource) <= ECL(ProfileBoosterV2_KEL.ECL_Functions.Common_Functions.SourceGroup(RawSource)) FROM ProfileBoosterV2_KEL RETURNS STRING;
+FUNCTION: VehicleTypeGroup(STRING FieldToCheck) <= ECL(ProfileBoosterV2_KEL.ECL_Functions.Common_Functions.VehicleTypeGroup(FieldToCheck)) FROM ProfileBoosterV2_KEL RETURNS STRING;
+
+// Fetch our Build Dates, compare to the Archive Date, and determine which date to utilize for Age calculations
+Person: => CurrentDate := MIN(GETBUILDDATE('header_build_version'), CURRENTDATE());
+Vehicle: => CurrentDate :=  MIN(GETBUILDDATE('vehicle_build_version'), CURRENTDATE());
+PersonVehicle: => CurrentDate :=  MIN(GETBUILDDATE('vehicle_build_version'), CURRENTDATE());
+
+// Global Constant Definitions for MAS
+InputPII: MISSING_INPUT_DATA := '-99999';
+InputPII: MISSING_INPUT_DATA_INT := -99999;
+InputPII: NO_DATA_FOUND := '-99998';
+InputPII: NO_DATA_FOUND_INT := -99998;
+InputPII: RECS_AVAIL_BUT_CANNOT_CALCULATE := '-99997';
+
+InputPII: => AddrNotPopulated := IsNotEnoughToClean(P_InpAddrLine1);
+InputPII: => CityStateZipNotPopulated := CityStateZipNotPopulatedCheck(P_InpAddrCity, P_InpAddrState, P_InpAddrZip);
+InputPII: => CleanCityStateZipNotPopulated := CityStateZipNotPopulatedCheck(P_InpClnAddrCity, P_InpClnAddrState, P_InpClnAddrZip5);
+InputPII: => NameNotPopulated := IF(NameNotPopulatedCheck(P_InpNameFirst, P_InpNameMid, P_InpNameLast), TRUE, FALSE);
+
+Vehicle: MISSING_INPUT_DATA_INT := -99999;
+Vehicle: NO_DATA_FOUND_INT := -99998;
+Vehicle: MISSING_INPUT_DATA := '-99999';
+Vehicle: NO_DATA_FOUND := '-99998';
+Vehicle: REC_FOUND_BUT_INVALID :=  '-99997';
+Vehicle: REC_FOUND_BUT_INVALID_INT :=  -99997;
+
+Person: MISSING_INPUT_DATA_INT := -99999;
+Person: MISSING_INPUT_DATA := '-99999';
+Person: NO_DATA_FOUND_INT := -99998;
+Person: NO_DATA_FOUND := '-99998';
+Person: REC_FOUND_BUT_INVALID_INT := -99997;
+Person: REC_FOUND_BUT_INVALID := '-99997';
+
+PersonVehicle: MISSING_INPUT_DATA_INT := -99999;
+PersonVehicle: MISSING_INPUT_DATA := '-99999';
+PersonVehicle: NO_DATA_FOUND_INT := -99998;
+PersonVehicle: NO_DATA_FOUND := '-99998';
+PersonVehicle: REC_FOUND_BUT_INVALID_INT := -99997;
+PersonVehicle: REC_FOUND_BUT_INVALID := '-99997';
+PersonVehicle: TEN_YEARS_IN_DAYS := 3652;
+PersonVehicle: TWO_YEARS_IN_DAYS := 730;
+PersonVehicle: THREE_YEARS_IN_DAYS := 1095;
+
+   /////////////////////
+   //Person Attributes//
+   /////////////////////
+Person: => P_LexIDSeenFlag := IF(EXISTS(DataSources(HeaderHitFlag)), '1', '0');
+Person: => P_LexIDSeenDunnFlag := IF(EXISTS(DataSources(Source = 'A3')), '1', '0');
+
+//KS-395
+   /////////////////////////////
+   //Vehicle Helper Attributes//
+   /////////////////////////////
+Person: => VehicleBuildCurrentDate := ONLY(PersonVehicle,CurrentDate);
+PersonVehicle: => DateFirstSeenCapped := IF(MIN(CountsModel, SequenceKey:DateFirstSeen) > CurrentDate, CurrentDate, MIN(CountsModel, SequenceKey:DateFirstSeen));
+PersonVehicle: => VehicleMinDate := IF(ISVALIDDATE(DateFirstSeenCapped), DATETOSTRING(DateFirstSeenCapped,'%Y%m%d'), REC_FOUND_BUT_INVALID);
+PersonVehicle: => DateLastSeenCapped := IF(MAX(CountsModel, SequenceKey:DateLastSeen) > CurrentDate, CurrentDate, MAX(CountsModel, SequenceKey:DateLastSeen));
+PersonVehicle: => VehicleMaxDate := IF(ISVALIDDATE(DateLastSeenCapped), DATETOSTRING(DateLastSeenCapped,'%Y%m%d'), REC_FOUND_BUT_INVALID);
+PersonVehicle: => Seen_In_Last_Ten_Years := DAYSBETWEEN(DateLastSeenCapped, CurrentDate) <= TEN_YEARS_IN_DAYS;
+PersonVehicle: => Seen_In_Last_Three_Years := DAYSBETWEEN(DateLastSeenCapped, CurrentDate) <= THREE_YEARS_IN_DAYS;
+PersonVehicle: => Seen_In_Last_Two_Years := DAYSBETWEEN(DateLastSeenCapped, CurrentDate) <= TWO_YEARS_IN_DAYS;
+
+Person: => ValidVehicleMaxDate := ALL(PersonVehicle, VehicleMaxDate <> REC_FOUND_BUT_INVALID);
+Person: => InvalidVehicleMaxDate := ALL(PersonVehicle, VehicleMaxDate = REC_FOUND_BUT_INVALID);
+Person: => InvalidVehicleAutoMaxDate := ALL(PersonVehicle(Automobile.FlagAuto), VehicleMaxDate = REC_FOUND_BUT_INVALID);
+Person: => InvalidVehicleOtherMaxDate := ALL(PersonVehicle(Automobile.FlagOther), VehicleMaxDate = REC_FOUND_BUT_INVALID);
+Person: => ValidVehicleMinDate := ALL(PersonVehicle, VehicleMinDate <> REC_FOUND_BUT_INVALID);
+Person: => InvalidVehicleMinDate := ALL(PersonVehicle, VehicleMinDate = REC_FOUND_BUT_INVALID);
+Person: => InvalidVehicleAutoMinDate := ALL(PersonVehicle(Automobile.FlagAuto), VehicleMinDate = REC_FOUND_BUT_INVALID);
+Person: => InvalidVehicleOtherMinDate := ALL(PersonVehicle(Automobile.FlagOther), VehicleMinDate = REC_FOUND_BUT_INVALID);
+
+Vehicle: => FlagVinaMakeDesc := IsEchoPopulated(VinaMakeDescription);
+Vehicle: => FlagVinaModelYear := VinaModelYear >= 1900 AND VinaModelYear <= YEAR(CurrentDate)+1;
+Vehicle: => FlagVinaPrice := IsEchoPopulatedInteger(VinaPrice);
+Vehicle: => VinaBodyStyleVehicleType := TRIMBOTH(VinaBodyStyleDescription) + '-' + TRIMBOTH(VinaVehicleType);
+Vehicle: => VinaModelDate := STRING(DATEFROMPARTS((VinaModelYear-1), 1, 1));
+Vehicle: => VehicleType := VehicleTypeGroup(VinaBodyStyleVehicleType);
+Vehicle: SET_LUXURY_VINAMAKEDESC := ['Acura','Alfa Romeo','Audi','BMW','Cadillac','Genesis','Infiniti','Jaguar','Lexus','Lincoln','Mercedes-Benz','Porsche','Saab','Volvo'];
+Vehicle: SET_ELITE_VINAMAKEDESC := ['Aston Martin','Bentley','Bugatti','Ferrari','Koenigsegg','Lamborghini','Lotus','Maserati','McLaren','Noble','Pagani','Pininfarina','Rolls-Royce'];
+Vehicle: => FlagLuxuryBrand := FlagVinaMakeDesc = 1 AND VinaMakeDescription IN SET_LUXURY_VINAMAKEDESC;
+Vehicle: => FlagEliteBrand := FlagVinaMakeDesc = 1 AND VinaMakeDescription IN SET_ELITE_VINAMAKEDESC;
+Vehicle: => FlagAuto := VehicleType IN ['Car','SUV','Truck','Van'];
+Vehicle: => FlagOther := VehicleType IN ['Work Vehicle','ATV/Off Road Motorcycle/Side by Side','Scooter','Camper/Motorhome','Street/Racing Motorcycle'];
+PersonVehicle: => AgeAtFirstSeen := IF(Automobile.VinaModelDate <> REC_FOUND_BUT_INVALID AND ISVALIDDATE(DateFirstSeenCapped), DAYSBETWEEN(DATE(Automobile.VinaModelDate),DateFirstSeenCapped), 0);
+PersonVehicle: => AgeYearAtFirstSeen := AgeAtFirstSeen / 365.25;
+PersonVehicle: => DepreciatedPrice := BOUNDSFOLD(ROUND(
+																				MAP(AgeYearAtFirstSeen < 2 AND ISVALIDDATE(DateFirstSeenCapped)	=> Automobile.VinaPrice,
+																					AgeYearAtFirstSeen >= 2 OR AgeYearAtFirstSeen < 3		=> Automobile.VinaPrice * (0.75),
+																					AgeYearAtFirstSeen >= 3															=> Automobile.VinaPrice * (0.75) * POWER(0.85,(AgeYearAtFirstSeen - 2)),
+																					REC_FOUND_BUT_INVALID_INT
+																					)), REC_FOUND_BUT_INVALID_INT, 999999);																
+PersonVehicle: => FlagDepreciatedPrice := DepreciatedPrice >= 0;
+PersonVehicle: => FlagNewVIN := AgeAtFirstSeen < (365.25 * 3) AND AgeAtFirstSeen >= 0 AND Automobile.VinaModelDate <> REC_FOUND_BUT_INVALID AND ISVALIDDATE(DateFirstSeenCapped);
+// PB1.0 Attributes
+Person: => PL_AstVehAutoCntEv := IF(P_LexIDSeenFlag = '0', MISSING_INPUT_DATA_INT,
+			BOUNDSFOLD(COUNT(PersonVehicle(Automobile.FlagAuto)), 0, 999));
+Person: => PL_AstVehOtherCntEv := IF(P_LexIDSeenFlag = '0', MISSING_INPUT_DATA_INT,
+			BOUNDSFOLD(COUNT(PersonVehicle(Automobile.FlagOther)), 0, 99));
+Person: => PL_AstVehAutoEmrgDtListEv := TOPN(PersonVehicle(Automobile.FlagAuto){Automobile, VehicleFirstSeenDate := VehicleMinDate}, 999, -VehicleFirstSeenDate);
+Person: => PL_AstVehAutoLastDtListEv := TOPN(PersonVehicle(Automobile.FlagAuto){Automobile, VehicleLastSeenDate := VehicleMaxDate}, 999, -VehicleLastSeenDate);
+Person: => PL_AstVehAutoCnt10Y := MAP(
+			P_LexIDSeenFlag = '0' => MISSING_INPUT_DATA_INT,
+			PL_AstVehAutoCntEv > 0 AND InvalidVehicleAutoMaxDate => REC_FOUND_BUT_INVALID_INT,
+			BOUNDSFOLD(COUNT(PersonVehicle(Automobile.FlagAuto AND Seen_In_Last_Ten_Years)), 0, 999));
+Person: => PL_AstVehAutoCnt3Y := MAP(
+			P_LexIDSeenFlag = '0' => MISSING_INPUT_DATA_INT,
+			PL_AstVehAutoCntEv > 0 AND InvalidVehicleAutoMaxDate => REC_FOUND_BUT_INVALID_INT,
+			BOUNDSFOLD(COUNT(PersonVehicle(Automobile.FlagAuto AND Seen_In_Last_Three_Years)), 0, 999));
+Person: => PL_AstVehAutoCnt2Y := MAP(
+			P_LexIDSeenFlag = '0' => MISSING_INPUT_DATA_INT,
+			PL_AstVehAutoCntEv > 0 AND InvalidVehicleAutoMaxDate => REC_FOUND_BUT_INVALID_INT,
+			BOUNDSFOLD(COUNT(PersonVehicle(Automobile.FlagAuto AND Seen_In_Last_Two_Years)), 0, 999));
+Person: => PL_AstVehAutoEmrgNewDtEv := MAP(
+			P_LexIDSeenFlag = '0' => MISSING_INPUT_DATA,
+			PL_AstVehAutoCntEv = 0 => NO_DATA_FOUND,
+			PL_AstVehAutoCntEv > 0 AND InvalidVehicleAutoMinDate => REC_FOUND_BUT_INVALID,
+			DATETOSTRING(MAX(PersonVehicle(Automobile.FlagAuto AND VehicleMinDate != REC_FOUND_BUT_INVALID), DATE(VehicleMinDate)), '%Y%m%d' ));
+Person: => PL_AstVehAutoEmrgOldDtEv := MAP(
+			P_LexIDSeenFlag = '0' => MISSING_INPUT_DATA,
+			PL_AstVehAutoCntEv = 0 => NO_DATA_FOUND,
+			PL_AstVehAutoCntEv > 0 AND InvalidVehicleAutoMinDate => REC_FOUND_BUT_INVALID,
+			DATETOSTRING(MIN(PersonVehicle(Automobile.FlagAuto AND VehicleMinDate != REC_FOUND_BUT_INVALID), DATE(VehicleMinDate)), '%Y%m%d'));
+Person: => PL_AstVehAutoEmrgNewMsncEv := MAP(
+			P_LexIDSeenFlag = '0' => MISSING_INPUT_DATA_INT,
+			PL_AstVehAutoCntEv = 0 => NO_DATA_FOUND_INT,
+			PL_AstVehAutoEmrgNewDtEv = REC_FOUND_BUT_INVALID => REC_FOUND_BUT_INVALID_INT,
+			BOUNDSFOLD(MONTHSBETWEEN(DATE(PL_AstVehAutoEmrgNewDtEv), VehicleBuildCurrentDate), 0, 999));
+Person: => PL_AstVehAutoEmrgOldMsncEv := MAP(
+			P_LexIDSeenFlag = '0' => MISSING_INPUT_DATA_INT,
+			PL_AstVehAutoCntEv = 0 => NO_DATA_FOUND_INT,
+			PL_AstVehAutoEmrgOldDtEv = REC_FOUND_BUT_INVALID => REC_FOUND_BUT_INVALID_INT,
+			BOUNDSFOLD(MONTHSBETWEEN(DATE(PL_AstVehAutoEmrgOldDtEv),VehicleBuildCurrentDate), 0, 999));
+// PB2.0 Attributes
+Person: => PL_AstVehOtherEmrgNewDtEv := MAP(
+			P_LexIDSeenFlag = '0' => MISSING_INPUT_DATA,
+			PL_AstVehOtherCntEv = 0 => NO_DATA_FOUND,
+			PL_AstVehOtherCntEv > 0 AND InvalidVehicleOtherMinDate => REC_FOUND_BUT_INVALID,
+			DATETOSTRING(MAX(PersonVehicle(Automobile.FlagOther AND VehicleMinDate != REC_FOUND_BUT_INVALID), DATE(VehicleMinDate)), '%Y%m%d' ));
+Person: => PL_AstVehOtherEmrgNewMsncEv := MAP(
+			P_LexIDSeenFlag = '0' => MISSING_INPUT_DATA_INT,
+			PL_AstVehOtherCntEv = 0 => NO_DATA_FOUND_INT,
+			PL_AstVehOtherEmrgNewDtEv = REC_FOUND_BUT_INVALID => REC_FOUND_BUT_INVALID_INT,
+			BOUNDSFOLD(MONTHSBETWEEN(DATE(PL_AstVehOtherEmrgNewDtEv), VehicleBuildCurrentDate), 0, 999));
+Person: => NoPersonVehicleAutoFound := ALL(PersonVehicle.Automobile, FlagAuto = FALSE);
+Person: => NoPersonVehicleOtherFound := ALL(PersonVehicle.Automobile, FlagOther = FALSE);
+Person: => PL_AstVehAutoCarCntEv := MAP(
+			P_LexIDSeenFlag = '0' => MISSING_INPUT_DATA_INT,
+			BOUNDSFOLD(COUNT(PersonVehicle.Automobile(FlagAuto AND VehicleType = 'Car')), 0, 99));
+Person: => PL_AstVehAutoCntEvPB := MAP(
+			P_LexIDSeenFlag = '0' => MISSING_INPUT_DATA_INT,
+			BOUNDSFOLD(COUNT(PersonVehicle.Automobile(FlagAuto)), 0, 99));
+Person: => PL_AstVehAutoEliteCntEv := MAP(
+			P_LexIDSeenFlag = '0' => MISSING_INPUT_DATA_INT,
+			BOUNDSFOLD(COUNT(PersonVehicle.Automobile((FlagAuto AND (VinaPrice >= 100000 OR FlagEliteBrand)))), 0, 99));
+Person: => PL_AstVehAutoExpCntEv := MAP(
+			P_LexIDSeenFlag = '0' => MISSING_INPUT_DATA_INT,
+			BOUNDSFOLD(COUNT(PersonVehicle(DepreciatedPrice > 50000).Automobile(FlagAuto)), 0, 99));
+Person: => PL_AstVehAutoLuxuryCntEv := MAP(
+			P_LexIDSeenFlag = '0' => MISSING_INPUT_DATA_INT,
+			BOUNDSFOLD(COUNT(PersonVehicle.Automobile(FlagAuto AND ((FlagVinaPrice = 1 AND VinaPrice < 100000 AND FlagLuxuryBrand) OR (FlagVinaPrice = 0 AND FlagLuxuryBrand)))), 0, 99));
+Person: => PL_AstVehAutoMakeCntEv := MAP(
+			P_LexIDSeenFlag = '0' => MISSING_INPUT_DATA_INT,
+			BOUNDSFOLD(COUNT(PersonVehicle.Automobile(FlagAuto AND FlagVinaMakeDesc = 1){VinaMakeDescription}), 0, 99));
+Person: => PL_AstVehAutoOrigOwnCntEv := MAP(
+			P_LexIDSeenFlag = '0' => MISSING_INPUT_DATA_INT,
+			BOUNDSFOLD(COUNT(PersonVehicle(FlagNewVIN).Automobile(FlagAuto)), 0, 99));
+Person: => PL_AstVehAutoSUVCntEv := MAP(
+			P_LexIDSeenFlag = '0' => MISSING_INPUT_DATA_INT,
+			BOUNDSFOLD(COUNT(PersonVehicle.Automobile(FlagAuto AND VehicleType = 'SUV')), 0, 99));
+Person: => PL_AstVehAutoTruckCntEv := MAP(
+			P_LexIDSeenFlag = '0' => MISSING_INPUT_DATA_INT,
+			BOUNDSFOLD(COUNT(PersonVehicle.Automobile(FlagAuto AND VehicleType = 'Truck')), 0, 99));
+Person: => PL_AstVehAutoVanCntEv := MAP(
+			P_LexIDSeenFlag = '0' => MISSING_INPUT_DATA_INT,
+			BOUNDSFOLD(COUNT(PersonVehicle.Automobile(FlagAuto AND VehicleType = 'Van')), 0, 99));
+Person: => MostFrequentVinaMake := ONLY(TOPN(PersonVehicle.Automobile(FlagAuto AND FlagVinaMakeDesc = 1){VinaMakeDescription,VinaMakeCount:=COUNT(GROUP)},1,-VinaMakeCount),VinaMakeDescription);
+Person: => MostFrequentVinaMake2 := ONLY(TOPN(PersonVehicle.Automobile(FlagAuto AND FlagVinaMakeDesc = 1 AND VinaMakeDescription<>Person.MostFrequentVinaMake){VinaMakeDescription,VinaMakeCount:=COUNT(GROUP)},1,-VinaMakeCount),VinaMakeDescription);
+Person: => PL_AstVehAuto2ndFreqMake := MAP(
+			P_LexIDSeenFlag = '0' => MISSING_INPUT_DATA,
+			NoPersonVehicleAutoFound => NO_DATA_FOUND,
+			MostFrequentVinaMake2<>MostFrequentVinaMake => MostFrequentVinaMake2,
+			REC_FOUND_BUT_INVALID);
+Person: => PL_AstVehAutoFreqMake := MAP(
+			P_LexIDSeenFlag = '0' => MISSING_INPUT_DATA,
+			NoPersonVehicleAutoFound => NO_DATA_FOUND,
+			MostFrequentVinaMake);
+Person: => PL_AstVehAutoFreqMakeCntEv := MAP(
+			P_LexIDSeenFlag = '0' => MISSING_INPUT_DATA_INT,
+			BOUNDSFOLD(COUNT(PersonVehicle.Automobile(FlagAuto AND VinaMakeDescription=Person.PL_AstVehAutoFreqMake)),0,99));
+Person: => PL_AstVehAuto2ndFreqMakeCntEv := MAP(
+			P_LexIDSeenFlag = '0' => MISSING_INPUT_DATA_INT,
+			BOUNDSFOLD(COUNT(PersonVehicle.Automobile(FlagAuto AND VinaMakeDescription=Person.PL_AstVehAuto2ndFreqMake)),0,99));
+Person: => AstVehAutoNewType := TOPN(PersonVehicle(Automobile.FlagAuto AND VehicleMinDate=Person.PL_AstVehAutoEmrgNewDtEv){VinaVin:=Automobile.VinaVin, VehicleType:=Automobile.VehicleType, DateFirstSeenCapped,DateLastSeenCapped},1,-DateFirstSeenCapped,-DateLastSeenCapped);
+Person: => PL_AstVehAutoNewTypeIndx := MAP(
+			P_LexIDSeenFlag = '0' => MISSING_INPUT_DATA_INT,
+			NoPersonVehicleAutoFound	=> NO_DATA_FOUND_INT,
+			COUNT(AstVehAutoNewType) = 0 => REC_FOUND_BUT_INVALID_INT,
+			ONLY(AstVehAutoNewType,VehicleType) = 'Car'   => 1,
+			ONLY(AstVehAutoNewType,VehicleType) = 'SUV'		=> 2,
+			ONLY(AstVehAutoNewType,VehicleType) = 'Truck'	=> 3,
+			ONLY(AstVehAutoNewType,VehicleType) = 'Van'		=> 4,
+			REC_FOUND_BUT_INVALID_INT);
+Person: => PL_AstVehAutoEmrgPriceAvg := MAP(
+			P_LexIDSeenFlag = '0' => MISSING_INPUT_DATA_INT,
+			NoPersonVehicleAutoFound		=> NO_DATA_FOUND_INT,
+			PL_AstVehAutoCntEv > 0 AND InvalidVehicleAutoMinDate => REC_FOUND_BUT_INVALID,
+			BOUNDSFOLD(ROUND(AVE(PersonVehicle(Automobile.FlagAuto AND VehicleMinDate=Person.PL_AstVehAutoEmrgNewDtEv AND FlagDepreciatedPrice), DepreciatedPrice)), 0, 999999));
+Person: => AstVehAutoEmrgPriceSet			:= TOPN(PersonVehicle(VehicleMinDate=Person.PL_AstVehAutoEmrgNewDtEv AND Automobile.FlagAuto AND FlagDepreciatedPrice){VinaVin:=Automobile.VinaVin,DepreciatedPrice,DateFirstSeenCapped},1,-DateFirstSeenCapped);
+Person: => PL_AstVehAutoEmrgPrice1 		:= IF(ONLY(AstVehAutoEmrgPriceSet,DepreciatedPrice):Null,0,ONLY(AstVehAutoEmrgPriceSet,DepreciatedPrice));
+Person: => PL_AstVehAutoEmrgPrice1Vin := ONLY(AstVehAutoEmrgPriceSet,VinaVin);
+Person: => PL_AstVehAutoEmrgPriceSet2 := TOPN(PersonVehicle(Automobile.FlagAuto AND Automobile.VinaVin != Person.PL_AstVehAutoEmrgPrice1Vin  AND DATE(VehicleMinDate)<DATE(Person.PL_AstVehAutoEmrgNewDtEv) AND FlagDepreciatedPrice){VinaVin:=Automobile.VinaVin,DepreciatedPrice,DateFirstSeenCapped},1,-DateFirstSeenCapped);
+Person: => PL_AstVehAutoEmrgPrice2 		:= IF(ONLY(PL_AstVehAutoEmrgPriceSet2,DepreciatedPrice):Null,0,ONLY(PL_AstVehAutoEmrgPriceSet2,DepreciatedPrice));
+Person: => PL_AstVehAutoEmrgPrice2Vin := ONLY(PL_AstVehAutoEmrgPriceSet2,VinaVin);
+Person: => PL_AstVehAutoEmrgPriceDiff := MAP(
+			P_LexIDSeenFlag = '0' => MISSING_INPUT_DATA_INT,
+			NoPersonVehicleAutoFound => NO_DATA_FOUND_INT,
+			PL_AstVehAutoEmrgPrice1=0 => REC_FOUND_BUT_INVALID_INT,
+			PL_AstVehAutoEmrgPrice2=0 => REC_FOUND_BUT_INVALID_INT,
+			PL_AstVehAutoCntEv < 2 => REC_FOUND_BUT_INVALID_INT,
+			PL_AstVehAutoEmrgPrice1=PL_AstVehAutoEmrgPrice2 => REC_FOUND_BUT_INVALID_INT,
+			BOUNDSFOLD(INTEGER(PL_AstVehAutoEmrgPrice1-PL_AstVehAutoEmrgPrice2), -90000, 90000));
+Person: => PL_AstVehAutoEmrgPriceMax := MAP(
+			P_LexIDSeenFlag = '0' => MISSING_INPUT_DATA_INT,
+			NoPersonVehicleAutoFound => NO_DATA_FOUND_INT,
+			PL_AstVehAutoCntEv > 0 AND InvalidVehicleAutoMinDate => REC_FOUND_BUT_INVALID_INT,
+			BOUNDSFOLD(MAX(PersonVehicle(VehicleMinDate=Person.PL_AstVehAutoEmrgNewDtEv AND Automobile.FlagAuto AND FlagDepreciatedPrice), DepreciatedPrice), 0, 999999));
+Person: => PL_AstVehAutoEmrgPriceMin := MAP(
+			P_LexIDSeenFlag = '0' => MISSING_INPUT_DATA_INT,
+			PL_AstVehAutoCntEv = 0 => NO_DATA_FOUND_INT,
+			PL_AstVehAutoCntEv > 0 AND InvalidVehicleAutoMinDate => REC_FOUND_BUT_INVALID_INT,
+			BOUNDSFOLD(MIN(PersonVehicle(VehicleMinDate=Person.PL_AstVehAutoEmrgNewDtEv AND Automobile.FlagAuto AND FlagDepreciatedPrice),DepreciatedPrice), 0, 999999));			
+Person: => PL_AstVehAutoEmrgAgeAvg := MAP(
+			P_LexIDSeenFlag = '0' => MISSING_INPUT_DATA_INT,
+			NoPersonVehicleAutoFound => NO_DATA_FOUND_INT,
+			PL_AstVehAutoCntEv > 0 AND InvalidVehicleAutoMinDate => REC_FOUND_BUT_INVALID_INT,
+			BOUNDSFOLD(ROUND(AVE(PersonVehicle(Automobile.FlagAuto){VinaVin:=Automobile.VinaVin, VehAutoEmrgAge := ABSDAYSBETWEEN(DATE(Automobile.VinaModelDate), DateFirstSeenCapped)}, VehAutoEmrgAge)/30.44), 0, 480));
+Person: => PL_AstVehAutoEmrgAgeMax := MAP(
+			P_LexIDSeenFlag = '0' => MISSING_INPUT_DATA_INT,
+			NoPersonVehicleAutoFound => NO_DATA_FOUND_INT,
+			PL_AstVehAutoCntEv > 0 AND InvalidVehicleAutoMinDate => REC_FOUND_BUT_INVALID_INT,
+			BOUNDSFOLD(ROUND(MAX(PersonVehicle(Automobile.FlagAuto){VinaVin:=Automobile.VinaVin, VehAutoEmrgAge := ABSDAYSBETWEEN(DATE(Automobile.VinaModelDate), DateFirstSeenCapped)}, VehAutoEmrgAge)/30.44), 0, 480));
+Person: => PL_AstVehAutoEmrgAgeMin := MAP(
+			P_LexIDSeenFlag = '0' => MISSING_INPUT_DATA_INT,
+			NoPersonVehicleAutoFound => NO_DATA_FOUND_INT,
+			PL_AstVehAutoCntEv > 0 AND InvalidVehicleAutoMinDate => REC_FOUND_BUT_INVALID_INT,
+			BOUNDSFOLD(ROUND(MIN(PersonVehicle(Automobile.FlagAuto){VinaVin:=Automobile.VinaVin, VehAutoEmrgAge := ABSDAYSBETWEEN(DATE(Automobile.VinaModelDate), DateFirstSeenCapped)}, VehAutoEmrgAge)/30.44), 0, 480));
+Person: => PL_AstVehAutoEmrgSpanAvg := MAP(
+			P_LexIDSeenFlag = '0' => MISSING_INPUT_DATA_INT,
+			NoPersonVehicleAutoFound => NO_DATA_FOUND_INT,
+			PL_AstVehAutoCntEv < 2 => REC_FOUND_BUT_INVALID_INT,
+			PL_AstVehAutoCntEv > 0 AND InvalidVehicleAutoMinDate => REC_FOUND_BUT_INVALID_INT,
+			BOUNDSFOLD(
+					( ABSDAYSBETWEEN(DATE(MAX(PersonVehicle(Automobile.FlagAuto){VinaVin:=Automobile.VinaVin, DateFirstSeenCapped, VehAutoEmrgAge := ABSDAYSBETWEEN(DATE(Automobile.VinaModelDate), DateFirstSeenCapped)}, INTEGER(DateFirstSeenCapped))), 
+													 DATE(MIN(PersonVehicle(Automobile.FlagAuto){VinaVin:=Automobile.VinaVin, DateFirstSeenCapped, VehAutoEmrgAge := ABSDAYSBETWEEN(DATE(Automobile.VinaModelDate), DateFirstSeenCapped)}, INTEGER(DateFirstSeenCapped))))
+		      )
+					/
+					( (COUNT(PersonVehicle(Automobile.FlagAuto){VinaVin:=Automobile.VinaVin, DateFirstSeenCapped, VehAutoEmrgAge := ABSDAYSBETWEEN(DATE(Automobile.VinaModelDate), DateFirstSeenCapped)})-1) * 30.44)
+			, 0, 480));
+Person: => PL_AstVehAutoLastAgeAvg := MAP(
+			P_LexIDSeenFlag = '0' => MISSING_INPUT_DATA_INT,
+			NoPersonVehicleAutoFound => NO_DATA_FOUND_INT,
+			PL_AstVehAutoCntEv > 0 AND InvalidVehicleAutoMinDate => REC_FOUND_BUT_INVALID_INT,
+			BOUNDSFOLD(ROUND(AVE(PersonVehicle(Automobile.FlagAuto){VinaVin:=Automobile.VinaVin, VehAutoLastAge := ABSDAYSBETWEEN(DATE(Automobile.VinaModelDate), DateLastSeenCapped)}, VehAutoLastAge) / 30.44), 0, 480));
+Person: => PL_AstVehAutoLastAgeMax := MAP(
+			P_LexIDSeenFlag = '0' => MISSING_INPUT_DATA_INT,
+			NoPersonVehicleAutoFound => NO_DATA_FOUND_INT,
+			PL_AstVehAutoCntEv > 0 AND InvalidVehicleAutoMinDate => REC_FOUND_BUT_INVALID_INT,
+			BOUNDSFOLD(ROUND(MAX(PersonVehicle(Automobile.FlagAuto){VinaVin:=Automobile.VinaVin, VehAutoLastAge := ABSDAYSBETWEEN(DATE(Automobile.VinaModelDate), DateLastSeenCapped)}, VehAutoLastAge) / 30.44), 0, 480));
+Person: => PL_AstVehAutoLastAgeMin := MAP(
+			P_LexIDSeenFlag = '0' => MISSING_INPUT_DATA_INT,
+			NoPersonVehicleAutoFound => NO_DATA_FOUND_INT,
+			PL_AstVehAutoCntEv > 0 AND InvalidVehicleAutoMinDate => REC_FOUND_BUT_INVALID_INT,
+			BOUNDSFOLD(ROUND(MIN(PersonVehicle(Automobile.FlagAuto){VinaVin:=Automobile.VinaVin, VehAutoLastAge := ABSDAYSBETWEEN(DATE(Automobile.VinaModelDate), DateLastSeenCapped)}, VehAutoLastAge) / 30.44), 0, 480));
+Person: => PL_AstVehAutoNewMsnc := PL_AstVehAutoEmrgNewMsncEv;
+Person: => PL_AstVehAutoNewPrice := MAP(
+			P_LexIDSeenFlag = '0' => MISSING_INPUT_DATA_INT,
+			PL_AstVehAutoCntEv = 0 => NO_DATA_FOUND_INT,
+			PL_AstVehAutoCntEv > 0 AND InvalidVehicleAutoMinDate => REC_FOUND_BUT_INVALID_INT,
+			BOUNDSFOLD(ONLY(TOPN(PersonVehicle(Automobile.FlagAuto AND VehicleMinDate = Person.PL_AstVehAutoEmrgNewDtEv AND FlagDepreciatedPrice){VinaVin:=Automobile.VinaVin, DepreciatedPrice, VehicleMinDate:=DATE(VehicleMinDate), VehicleMaxDate:=DATE(VehicleMaxDate)},1,-VehicleMinDate),DepreciatedPrice), 0, 999999));
+Person: => PL_AstVehAutoTimeOwnSpanAvg := MAP(
+			P_LexIDSeenFlag = '0' => MISSING_INPUT_DATA_INT,
+			PL_AstVehAutoCntEv = 0 => NO_DATA_FOUND_INT,
+			PL_AstVehAutoCntEv > 0 AND InvalidVehicleAutoMinDate => REC_FOUND_BUT_INVALID_INT,
+			BOUNDSFOLD(ROUND(AVE(PersonVehicle(Automobile.FlagAuto AND VehicleMinDate != REC_FOUND_BUT_INVALID){VinaVin:=Automobile.VinaVin, VehAutoTimeOwnSpan := ABSDAYSBETWEEN(DateFirstSeenCapped, DateLastSeenCapped)}, VehAutoTimeOwnSpan) / 30.44), 0, 480));
+//PB-39
+Person: => PL_AstVehOtherATVCntEv := MAP(
+			P_LexIDSeenFlag = '0' => MISSING_INPUT_DATA_INT,
+			BOUNDSFOLD(COUNT(PersonVehicle.Automobile(FlagOther AND VehicleType = 'ATV/Off Road Motorcycle/Side by Side')), 0, 99));
+Person: => PL_AstVehOtherCamperCntEv := MAP(
+			P_LexIDSeenFlag = '0' => MISSING_INPUT_DATA_INT,
+			BOUNDSFOLD(COUNT(PersonVehicle.Automobile(FlagOther AND VehicleType = 'Camper/Motorhome')), 0, 99));
+Person: => PL_AstVehOtherCommCntEv := MAP(
+			P_LexIDSeenFlag = '0' => MISSING_INPUT_DATA_INT,
+			BOUNDSFOLD(COUNT(PersonVehicle.Automobile(FlagOther AND VehicleType = 'Work Vehicle')), 0, 99));
+Person: => PL_AstVehOtherMtrCntEv := MAP(
+			P_LexIDSeenFlag = '0' => MISSING_INPUT_DATA_INT,
+			BOUNDSFOLD(COUNT(PersonVehicle.Automobile(FlagOther AND VehicleType = 'Street/Racing Motorcycle')), 0, 99));
+Person: => PL_AstVehOtherOrigOwnCntEv := MAP(
+			P_LexIDSeenFlag = '0' => MISSING_INPUT_DATA_INT,
+			BOUNDSFOLD(COUNT(PersonVehicle(FlagNewVIN).Automobile(FlagOther)), 0, 99));
+Person: => PL_AstVehOtherScooterCntEv := MAP(
+			P_LexIDSeenFlag = '0' => MISSING_INPUT_DATA_INT,
+			BOUNDSFOLD(COUNT(PersonVehicle.Automobile(FlagOther AND VehicleType = 'Scooter')), 0, 99));
+//PB-40
+Person: => PL_AstVehOtherNewMsnc := PL_AstVehOtherEmrgNewMsncEv;
+Person: => PL_AstVehOtherNewType := ONLY(TOPN(PersonVehicle(Automobile.FlagOther AND VehicleMinDate=Person.PL_AstVehOtherEmrgNewDtEv){VinaVin:=Automobile.VinaVin, DateFirstSeenCapped, DateLastSeenCapped, VehicleType:=Automobile.VehicleType},1,-DateFirstSeenCapped,-DateLastSeenCapped),VehicleType);
+Person: => PL_AstVehOtherNewTypeIndx := MAP(
+			P_LexIDSeenFlag = '0' => MISSING_INPUT_DATA_INT,
+			PL_AstVehOtherCntEv = 0 => NO_DATA_FOUND_INT,
+			PL_AstVehOtherNewType = 'Street/Racing Motorcycle' => 1,
+			PL_AstVehOtherNewType = 'ATV/Off Road Motorcycle/Side by Side' => 2,
+			PL_AstVehOtherNewType = 'Scooter' => 3,
+			PL_AstVehOtherNewType = 'Work Vehicle' => 4,
+			PL_AstVehOtherNewType = 'Camper/Motorhome' => 5,
+			REC_FOUND_BUT_INVALID_INT);
+//PB-41
+Person: => PL_AstVehOtherNewPrice := MAP(
+			P_LexIDSeenFlag = '0' => MISSING_INPUT_DATA_INT,
+			PL_AstVehOtherCntEv = 0 => NO_DATA_FOUND_INT,
+			PL_AstVehOtherCntEv > 0 AND InvalidVehicleOtherMinDate => REC_FOUND_BUT_INVALID_INT,
+			BOUNDSFOLD(ONLY(TOPN(PersonVehicle(Automobile.FlagOther AND VehicleMinDate=Person.PL_AstVehOtherEmrgNewDtEv){VinaVin:=Automobile.VinaVin, VehicleMinDate:=DATE(VehicleMinDate), VehicleMaxDate:=DATE(VehicleMaxDate), VinaPrice:=Automobile.VinaPrice},1,-VehicleMinDate),VinaPrice), 0, 999999));
+Person: => PL_AstVehOtherPriceAvg := MAP(
+			P_LexIDSeenFlag = '0' => MISSING_INPUT_DATA_INT,
+			PL_AstVehOtherCntEv = 0 => NO_DATA_FOUND_INT,
+			PL_AstVehOtherCntEv > 0 AND InvalidVehicleOtherMinDate => REC_FOUND_BUT_INVALID_INT,
+			BOUNDSFOLD(AVE(PersonVehicle.Automobile(FlagOther), VinaPrice), 0, 999999));
+Person: => PL_AstVehOtherPriceMax := MAP(
+			P_LexIDSeenFlag = '0' => MISSING_INPUT_DATA_INT,
+			PL_AstVehOtherCntEv = 0 => NO_DATA_FOUND_INT,
+			PL_AstVehOtherCntEv > 0 AND InvalidVehicleOtherMinDate => REC_FOUND_BUT_INVALID_INT,
+			BOUNDSFOLD(MAX(PersonVehicle.Automobile(FlagOther), VinaPrice), 0, 999999));
+Person: => PL_AstVehOtherPriceMin := MAP(
+			P_LexIDSeenFlag = '0' => MISSING_INPUT_DATA_INT,
+			PL_AstVehOtherCntEv = 0 => NO_DATA_FOUND_INT,
+			PL_AstVehOtherCntEv > 0 AND InvalidVehicleOtherMinDate => REC_FOUND_BUT_INVALID_INT,
+			BOUNDSFOLD(MIN(PersonVehicle.Automobile(FlagOther), VinaPrice), 0, 999999));
+//PB-36
+// Create submodel that will only populate the best child.
+Person: => BestDunnData := ONLY(TOPN(DunnData, 1, -CurrentDate, -PurchProcessDate, -PurchCount, PurchNewAgeMonths));
+Person: => PL_PurchNewAmt :=  MAP(
+			P_LexIDSeenDunnFlag = '0' => MISSING_INPUT_DATA_INT,
+			BestDunnData.PurchNewAmt:Null => NO_DATA_FOUND_INT,
+			BOUNDSFOLD(BestDunnData.PurchNewAmt, 1, 999));
+Person: => PL_PurchTotEv := MAP(
+			P_LexIDSeenDunnFlag = '0' => MISSING_INPUT_DATA_INT,
+			BestDunnData.PurchTotal:Null => NO_DATA_FOUND_INT,
+			BOUNDSFOLD(MAX(BestDunnData.PurchNewAmt,BestDunnData.PurchTotal), 1, 9999));
+Person: => PL_PurchCntEv := MAP(
+			P_LexIDSeenDunnFlag = '0' => MISSING_INPUT_DATA_INT,
+			BOUNDSFOLD(BestDunnData.PurchCount, 0, 99));
+Person: => PL_PurchNewAgeMonths := MAP(
+			P_LexIDSeenDunnFlag = '0' => MISSING_INPUT_DATA_INT,
+			BestDunnData.PurchNewAgeMonths:Null => NO_DATA_FOUND_INT,
+			BOUNDSFOLD(BestDunnData.PurchNewAgeMonths, 0, 960));
+Person: => PL_PurchOldAgeMonths := MAP(
+			P_LexIDSeenDunnFlag = '0' => MISSING_INPUT_DATA_INT,
+			BestDunnData.PurchOldAgeMonths:Null => NO_DATA_FOUND_INT,
+			BOUNDSFOLD(BestDunnData.PurchOldAgeMonths, 0, 960));
+Person: => PL_PurchItemCntEv := MAP(
+			P_LexIDSeenDunnFlag = '0' => MISSING_INPUT_DATA_INT,
+			BOUNDSFOLD(BestDunnData.PurchItemCount, 0, 999));
+Person: => PL_PurchAmtAvg := MAP(
+			P_LexIDSeenDunnFlag = '0' => MISSING_INPUT_DATA_INT,
+			BestDunnData.PurchAmtAvg:Null => NO_DATA_FOUND_INT,
+			BOUNDSFOLD(BestDunnData.PurchAmtAvg, 1, 9999));
+Person: => PL_PurchAge := MAP(
+			P_LexIDSeenDunnFlag = '0' => MISSING_INPUT_DATA_INT,
+			BOUNDSFOLD(BestDunnData.PurchAge, 0, 999));
+Person: => PL_PurchDOB := MAP(
+			P_LexIDSeenDunnFlag = '0' => MISSING_INPUT_DATA,
+			STRING(BestDunnData.PurchDOB));
+Person: => PL_PurchMaritalStatus := MAP(
+			P_LexIDSeenDunnFlag = '0' => MISSING_INPUT_DATA,
+			BestDunnData.PurchMaritalStatus);      
+Person: => PL_PurchGender := MAP(
+			P_LexIDSeenDunnFlag = '0' => MISSING_INPUT_DATA,
+			BestDunnData.PurchGender);
+Person: => PL_PurchDateFirstSeenCapped := IF(MIN(DunnData, PurchCount:DateFirstSeen) > CurrentDate, CurrentDate, MIN(DunnData, PurchCount:DateFirstSeen));
+Person: => PL_PurchMinDate := IF(ISVALIDDATE(PL_PurchDateFirstSeenCapped), DATETOSTRING(PL_PurchDateFirstSeenCapped,'%Y%m%d'), REC_FOUND_BUT_INVALID);
+Person: => PL_PurchDateLastSeenCapped := IF(MIN(DunnData, PurchCount:DateLastSeen) > CurrentDate, CurrentDate, MIN(DunnData, PurchCount:DateLastSeen));
+Person: => PL_PurchMaxDate := IF(ISVALIDDATE(PL_PurchDateLastSeenCapped), DATETOSTRING(PL_PurchDateLastSeenCapped,'%Y%m%d'), REC_FOUND_BUT_INVALID);
+Person: => PL_VehicleMinDateCapped := IF(MIN(PersonVehicle, DateFirstSeenCapped) > CurrentDate, CurrentDate, MIN(PersonVehicle, DateFirstSeenCapped));
+Person: => PL_VehicleMinDate := IF(ISVALIDDATE(PL_VehicleMinDateCapped), DATETOSTRING(PL_VehicleMinDateCapped,'%Y%m%d'), REC_FOUND_BUT_INVALID);
+Person: => PL_VehicleMaxDateCapped := IF(MIN(PersonVehicle, DateLastSeenCapped) > CurrentDate, CurrentDate, MIN(PersonVehicle, DateLastSeenCapped));
+Person: => PL_VehicleMaxDate := IF(ISVALIDDATE(PL_VehicleMaxDateCapped), DATETOSTRING(PL_VehicleMaxDateCapped,'%Y%m%d'), REC_FOUND_BUT_INVALID);

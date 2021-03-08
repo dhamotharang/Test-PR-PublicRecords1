@@ -1,0 +1,354 @@
+﻿// Defining the ERA to allow for ASOF functionality
+ERA reportedby BEFORE(DateFirstSeen=NULL(KEEP ONLY));
+ERA reportedbetween BETWEEN(DateFirstSeen=NULL(KEEP ONLY), DateLastSeen=NULL(KEEP ONLY));
+
+// Defining the PERMITS to allow for USING functionality
+// When adding new permissions, replace the highest number "UnassignedNN" with your new permission - 
+// these are intended to be placeholders to represent how much available permissions space we have.  Also, do not reorganize these permissions.
+PERMITS Restricted, // 1
+		NoRestriction, // 2
+		FCRA, // 3
+		NonFCRA, // 4
+		GLBA, // 5
+		DPPA, // 6
+		Marketing, // 7
+		InsuranceProduct, // 8
+		Fares, // 9
+		Experian, // 10
+		ExperianFCRA, // 11
+		TransUnion, // 12
+		Equifax, // 13
+		Advo, // 14
+		Cortera, // 15
+		ExperianEBR, // 16
+		ExperianCRDB, // 17
+		SSNDeathMaster, // 18
+		FDN, // 19
+		InsuranceDL, // 20
+		SBFE, // 21
+		DNBDMI, // 22
+		Targus, // 23
+		Certegy, // 24
+		PreGLB, // 25
+		LiensJudgments, // 26
+		ExperianPhones, // 27
+		Inquiries, // 28
+		DPPAGroup1, // 29
+		DPPAGroup2, // 23
+		DPPAGroup3, // 31
+		DPPAGroup4, // 32
+		DPPAGroup5, // 33
+		DPPAGroup6, // 34
+		DPPAGroup7, // 35
+		DPPAGroup8, // 36
+		DPPAGroup9, // 37
+		DPPAGroup10, // 38
+		DPPAGroup11, // 39
+		DPPAGroup12, // 40
+		DPPAGroup13, // 41
+		DPPAGroup14, // 42
+		DPPAGroup15, // 43
+		DPPAGroup16, // 44
+		DPPAGroup17, // 45
+		DPPAGroup18, // 46
+		DPPAGroup19, // 47
+		DPPAGroup20, // 48
+		DPPAGroup21, // 49
+		DPPAGroup22, // 50
+		DPPAGroup23, // 51
+		DPPAGroup24, // 52
+		DPPAGroup25, // 53
+		DPPAGroup26, // 54
+		DPPAGroup27, // 55
+		DirectToConsumer, // 56
+		Utility, // 57
+		Fidelity, //58
+		NonEquifax, //59
+		WatchdogExperianRestricted, //60
+		WatchdogNonRestricted, // 61
+		WatchdogPreGLBA, //62
+		Unassigned2, 
+		Unassigned1;
+
+// Global Person Entity Definition
+Person := ENTITY(FLAT(UID=LexID,  
+		STRING Title=NULL(),
+		STRING FirstName=NULL(),
+		STRING MiddleName=NULL(),  
+		STRING LastName=NULL(),
+		STRING NameSuffix=NULL(),
+		STRING LexIDSegment,
+		DATE DateOfBirth,
+		DATE DateOfDeath,
+		STRING Gender,
+		STRING Race,
+		STRING RaceDescription,
+		BOOLEAN HeaderHitFlag,
+		STRING Source,
+		DATE PurchProcessDate,
+		STRING PurchHistoryFlag,
+		INTEGER PurchNewAmt=NULL(0),
+		INTEGER PurchTotal=NULL(0),
+		INTEGER PurchCount=NULL(0),
+		INTEGER PurchNewAgeMonths=NULL(0),
+		INTEGER PurchOldAgeMonths=NULL(0),
+		INTEGER PurchItemCount=NULL(0),
+		INTEGER PurchAmtAvg=NULL(0),
+    INTEGER PurchAge=NULL(0),
+    DATE PurchDOB,
+    STRING PurchMaritalStatus,
+    STRING PurchGender),
+	MODEL(UID, 
+		Gender, LexIDSegment,
+		FullName{Title, FirstName, MiddleName, LastName, NameSuffix, HeaderHitFlag}, 
+		ReportedDatesOfBirth{DateOfBirth, HeaderHitFlag},
+		ReportedDatesOfDeath{DateOfDeath},
+		Race, RaceDescription,
+		DataSources{Source, HeaderHitFlag},
+		DunnData{PurchProcessDate,PurchHistoryFlag,PurchNewAmt,PurchTotal,PurchCount,PurchNewAgeMonths,PurchOldAgeMonths,PurchItemCount,PurchAmtAvg,PurchAge,PurchDOB,PurchMaritalStatus,PurchGender}));
+
+Vehicle := ENTITY(FLAT(UID(VehicleKey),
+		STRING VehicleKey,
+		STRING OriginalVin,
+		INTEGER OriginalYearMake,
+		STRING OriginalMake,
+		STRING OriginalMakeDescription,
+		STRING OriginalSeries,
+		STRING OriginalSeriesDescription,
+		STRING OriginalModel,
+		STRING OriginalModelDescription,
+		STRING OriginalBody,
+		STRING OriginalBodyDescription,
+		INTEGER OriginalNetWeight,
+		INTEGER OriginalGrossWeight,
+		INTEGER OriginalNumberAxles,
+		STRING OriginalVehicleUse,
+		STRING OriginalVehicleUseDescription,
+		STRING OriginalVehicleType,
+		STRING OriginalVehicleTypeDescription,
+		STRING OriginalMajorColor,
+		STRING OriginalMajorColorDescription,
+		STRING OriginalMinorColor,
+		STRING OriginalMinorColorDescription,
+		STRING VinaVin,
+		STRING VinaVinPattern,
+		STRING VinaBypassCode,
+		STRING VinaVehicleType,
+		STRING VinaNCICMake,
+		INTEGER VinaModelYearYY,
+		STRING VinaRestraint,
+		STRING VinaMakeName,
+		INTEGER VinaYear,
+		STRING VinaVpSeries,
+		STRING VinaVpModel,
+		STRING VinaAirConditioning,
+		STRING VinaPowerSteering,
+		STRING VinaPowerBrakes,
+		STRING VinaPowerWindows,
+		STRING VinaTiltWheel,
+		INTEGER VinaRoof,
+		INTEGER VinaOptionalRoof1,
+		INTEGER VinaOptionalRoof2,
+		STRING VinaRadio,
+		STRING VinaOptionalRadio1,
+		STRING VinaOptionalRadio2,
+		STRING VinaTransmission,
+		STRING VinaOptionalTransmission1,
+		STRING VinaOptionalTransmission2,
+		INTEGER VinaALB,
+		STRING VinaFrontWD,
+		STRING VinaFourWD,
+		STRING VinaSecuritySystem,
+		STRING VinaDRL,
+		STRING VinaSeriesName,
+		INTEGER VinaModelYear,
+		STRING VinaSeries,
+		STRING VinaModel,
+		STRING VinaBodyStyle,
+		STRING VinaMakeDescription,
+		STRING VinaModelDescription,
+		STRING VinaSeriesDescription,
+		STRING VinaBodyStyleDescription,
+		INTEGER VinaCylinders,
+		INTEGER VinaEngineSize,
+		STRING VinaFuelCode,
+		INTEGER VinaPrice,
+		STRING BestMakeCode,
+		STRING BestSeriesCode,
+		STRING BestModelCode,
+		STRING BestBodyCode,
+		INTEGER BestModelYear,
+		STRING BestMajorColor,
+		STRING BestMinorColor,
+		STRING BrandedTitleFlag,
+		STRING BrandCode1,
+		DATE BrandDate1,
+		STRING BrandState1,
+		STRING BrandCode2,
+		DATE BrandDate2,
+		STRING BrandSate2,
+		STRING BrandCode3,
+		DATE BrandDate3,
+		STRING BrandSate3,
+		STRING BrandCode4,
+		DATE BrandDate4,
+		STRING BrandSate4,
+		STRING BrandCode5,
+		DATE BrandDate5,
+		STRING BrandSate5,
+		STRING TodFlag,
+		STRING ModelClassCode,
+		STRING ModelClass,
+		STRING MinDoorCount,
+		STRING SafetyType,
+		STRING AirbagDriver,
+		STRING AirbagFrontDriverSide,
+		STRING AirbagFrontHeadCurtain,
+		STRING AirbagFrontPassanger,
+		STRING AirbagFrontPassangerSide,
+		STRING Airbags,
+		STRING StateOfOrigin, 
+		STRING LatestVehicleFlag,
+		STRING LatestVehicleIterationFlag,
+		DATE DateVendorFirstReported, 
+		DATE DateVendorLastReported, 
+		DATE SourceFirstDate, 
+		DATE SourceLastDate,
+		STRING StandardLienholderName,
+		STRING Source),
+	MODEL(UID,
+		VehicleKey,
+		StateOfOrigin,
+		OriginalVin,OriginalYearMake,OriginalMake,OriginalMakeDescription,OriginalSeries,OriginalSeriesDescription,OriginalModel,OriginalModelDescription,OriginalBody,OriginalBodyDescription,OriginalNetWeight,OriginalGrossWeight,OriginalNumberAxles,OriginalVehicleUse,OriginalVehicleUseDescription,OriginalVehicleType,OriginalVehicleTypeDescription,OriginalMajorColor,OriginalMajorColorDescription,OriginalMinorColor,OriginalMinorColorDescription,
+		VinaVin,VinaVinPattern,VinaBypassCode,VinaVehicleType,VinaNCICMake,VinaModelYearYY,VinaRestraint,VinaMakeName,VinaYear,VinaVpSeries,VinaVpModel,VinaAirConditioning,VinaPowerSteering,VinaPowerBrakes,VinaPowerWindows,VinaTiltWheel,VinaRoof,VinaOptionalRoof1,VinaOptionalRoof2,VinaRadio,VinaOptionalRadio1,VinaOptionalRadio2,VinaTransmission,VinaOptionalTransmission1,VinaOptionalTransmission2,VinaALB,VinaFrontWD,VinaFourWD,VinaSecuritySystem,VinaDRL,VinaSeriesName,VinaModelYear,VinaSeries,VinaModel,VinaBodyStyle,VinaMakeDescription,VinaModelDescription,VinaSeriesDescription,VinaBodyStyleDescription,VinaCylinders,VinaEngineSize,VinaFuelCode,VinaPrice,
+		BestMakeCode,BestSeriesCode,BestModelCode,BestBodyCode,BestModelYear,BestMajorColor,BestMinorColor,
+		BrandedTitleFlag,BrandCode1,BrandDate1,BrandState1,BrandCode2,BrandDate2,BrandSate2,BrandCode3,BrandDate3,BrandSate3,BrandCode4,BrandDate4,BrandSate4,BrandCode5,BrandDate5,BrandSate5,
+		SafetyType,AirbagDriver,AirbagFrontDriverSide,AirbagFrontHeadCurtain,AirbagFrontPassanger,AirbagFrontPassangerSide,Airbags,
+		TodFlag,ModelClassCode,ModelClass,MinDoorCount,
+		LatestVehicleFlag,LatestVehicleIterationFlag,DateVendorFirstReported,DateVendorLastReported,
+		StandardLienholderName,
+		SourceFirstDate,SourceLastDate,
+		DataSources{Source}));
+
+InputPII := ENTITY(QUERY(UID=G_ProcUID,
+		Person Subject,
+		STRING P_InpAcct,
+		INTEGER P_InpLexID, 
+		STRING P_InpNameFirst,
+		STRING P_InpNameMid,
+		STRING P_InpNameLast,
+		STRING P_InpAddrLine1,
+		STRING P_InpAddrLine2,
+		STRING P_InpAddrCity, 
+		STRING P_InpAddrState,
+		STRING P_InpAddrZip,
+		STRING P_InpPhoneHome, 
+		STRING P_InpSSN,
+		STRING P_InpDOB,
+		STRING P_InpPhoneWork,
+		STRING InputIncomeEcho,
+		STRING P_InpDL,
+		STRING P_InpDLState,
+		STRING InputBalanceEcho,
+		STRING InputChargeOffdEcho,
+		STRING InputFormerNameEcho,
+		STRING P_InpEmail,
+		STRING InputEmploymentEcho,
+		STRING P_InpArchDt, //this is YYYYMMDD 00:00:00 
+		INTEGER P_LexID, 
+		INTEGER P_LexIDScore,	
+		STRING P_InpClnNamePrfx,
+		STRING P_InpClnNameFirst,
+		STRING P_InpClnNameMid,
+		STRING P_InpClnNameLast,
+		STRING P_InpClnNameSffx,
+		INTEGER P_InpClnAddrPropertyUID,
+		STRING P_InpClnAddrPrimRng,
+		STRING P_InpClnAddrPreDir,
+		STRING P_InpClnAddrPrimName,
+		STRING P_InpClnAddrSffx,
+		STRING P_InpClnAddrPostDir,
+		STRING P_InpClnAddrUnitDesig,
+		STRING P_InpClnAddrSecRng,
+		STRING P_InpClnAddrCity, 
+		STRING P_InpClnAddrState,
+		STRING P_InpClnAddrZip5, 
+		STRING P_InpClnAddrZip4,
+		STRING P_InpClnAddrLat,
+		STRING P_InpClnAddrLng,
+		STRING P_InpClnAddrCnty,
+		STRING P_InpClnAddrGeo,
+		STRING P_InpClnAddrType,
+		STRING P_InpClnAddrStatus,
+		STRING P_InpClnEmail,
+		STRING P_InpClnPhoneHome,
+		STRING P_InpClnPhoneWork,
+		STRING P_InpClnDL,
+		STRING P_InpClnDLState,
+		DATE P_InpClnDOB,
+		STRING P_InpClnSSN,
+		INTEGER P_InpClnArchDt,
+		INTEGER G_ProcBusUID,
+		STRING PhoneVerificationBureau,
+		STRING DialIndicator,
+		STRING PointID,
+		STRING NXXType,
+		BOOLEAN ZIPMatch,
+		STRING COCType,
+		STRING SSC,
+		STRING WirelessIndicator,
+		INTEGER RepNumber
+		),
+	MODEL(*));
+
+// Define a first degree and second degree associations
+FirstDegreeAssociations := ASSOCIATION(FLAT(Person Subject=LexID, Person FirstDegreeAssociation=LexID, INTEGER Title, STRING RelationshipType, STRING RelationshipConfidence, INTEGER RelationshipScore, STRING Generation, STRING RelationshipDateFirstSeen, STRING RelationshipDateLastSeen));
+SecondDegreeAssociations := ASSOCIATION(FLAT(Person FirstDegreeAssociation=LexID, Person SecondDegreeAssociation=LexID, INTEGER Title, STRING RelationshipType, STRING RelationshipConfidence, INTEGER RelationshipScore, STRING Generation, STRING RelationshipDateFirstSeen, STRING RelationshipDateLastSeen));
+FirstDegreeRelative := ASSOCIATION(FLAT(Person Subject=LexID, Person Relative=LexID, INTEGER Title, STRING RelationshipType, STRING RelationshipConfidence, INTEGER RelationshipScore, STRING Generation, STRING RelationshipDateFirstSeen, STRING RelationshipDateLastSeen));
+
+// Now make sure that I am not my own second degree relative (For example: I am my dad's relative)
+GLOBAL: FirstDegreeAssociations(#Subj, #FirstDegree), 
+		FirstDegreeAssociations(#FirstDegree, #SecondDegree, #Title2, #RelationshipType2, #RelationshipConfidence2, #RelationshipScore2, #Generation2, #RelationshipDateFirstSeen2, #RelationshipDateLastSeen2), 
+		#Subj<>#SecondDegree,
+		NOT FirstDegreeAssociations(#Subj, #SecondDegree) => 
+			SecondDegreeAssociations(#Subj, #SecondDegree, #Title2, #RelationshipType2, #RelationshipConfidence2, #RelationshipScore2, #Generation2, #RelationshipDateFirstSeen2, #RelationshipDateLastSeen2);
+GLOBAL: FirstDegreeAssociations(#Subj, #FirstDegree, #Title, #RelationshipType, #RelationshipConfidence, #RelationshipScore, #Generation, #RelationshipDateFirstSeen, #RelationshipDateLastSeen), 
+		#Title >= 1 AND #Title <= 45 =>
+		FirstDegreeRelative(#Subj, #FirstDegree, #Title, #RelationshipType, #RelationshipConfidence, #RelationshipScore, #Generation, #RelationshipDateFirstSeen, #RelationshipDateLastSeen);
+
+PersonVehicle := ASSOCIATION(FLAT(Person Subject, Vehicle Automobile=UID(VehicleKey),
+		DATE RegistrationFirstDate, 
+		DATE RegistrationEarliestEffectiveDate, 
+		DATE RegistrationLatestEffectiveDate, 
+		DATE RegistrationLatestExpirationeDate, 
+		INTEGER RegistrationRecordCount, 
+		STRING RegistrationDecalNumber, 
+		INTEGER RegistratoinDecalYear, 
+		STRING RegistrationStatusCode, 
+		STRING RegistrationStatusDescription, 
+		STRING RegistrationTrueLicensePlate, 
+		STRING RegistrationLicensePlate, 
+		STRING RegistrationLicenseState, 
+		STRING RegistrationLicensePlateTypeCode, 
+		STRING RegistrationLicensePlateTypeDescription, 
+		STRING RegistrationPreviousLicenseState, 
+		STRING RegistrationPreviousLicensePlate, 
+		STRING TitleNumber, 
+		DATE TitleEarliestIssueDate, 
+		DATE TitleLatestIssueDate, 
+		DATE TitlePreviousIssueDate, 
+		INTEGER TitleRecordCount, 
+		STRING TitleStatusCode, 
+		STRING TitleStatusDescription, 
+		INTEGER TitleOdometerMileage, 
+		STRING TitleOdometerStatusCode, 
+		STRING TitleOdometerStatusDescription, 
+		DATE TitleOdometerDate,
+		STRING SequenceKey,
+		STRING History,
+		BOOLEAN HistorySource, 
+		STRING Source),
+	MODEL(Subject,Automobile,
+		Registration{RegistrationFirstDate, RegistrationEarliestEffectiveDate, RegistrationLatestEffectiveDate, RegistrationLatestExpirationeDate, RegistrationRecordCount, RegistrationDecalNumber, RegistratoinDecalYear, RegistrationStatusCode, RegistrationStatusDescription, RegistrationTrueLicensePlate, RegistrationLicensePlate, RegistrationLicenseState, RegistrationLicensePlateTypeCode, RegistrationLicensePlateTypeDescription, RegistrationPreviousLicenseState,  RegistrationPreviousLicensePlate}, 
+		Title{TitleNumber, TitleEarliestIssueDate, TitleLatestIssueDate, TitlePreviousIssueDate, TitleRecordCount, TitleStatusCode, TitleStatusDescription, TitleOdometerMileage, TitleOdometerStatusCode,  TitleOdometerStatusDescription,  TitleOdometerDate},
+		CountsModel{SequenceKey,History,HistorySource}, DataSources{Source}));
