@@ -1,0 +1,14 @@
+﻿//ROXIE
+// #OPTION(querytypes, 'normal') //this is only for FDC mode - RoxieDev or RoxieProd
+// #OPTION(persist, 0) // Set to 0 to disable PERSIST functionality
+//THOR
+// #OPTION(persist, 0) // disable PERSIST functionality (used for updating/debugging attributes)
+// #OPTION(persist, 1) // Persist the ENTITY immediately after it's built (This is essentially the same as the KEL generated Roxie Indexes - it contains all the fields defined in the ENTITY)
+#OPTION(persist, 2) // PB2.0 Default - Default if ommitted - Persist level 1 plus Annotated ENTITY (Entity with logical properties all calculated - AKA the MODEL definition of the ENTITY)
+// #OPTION(persist, 3) // Persist level 1 + 2 + Intermediate steps when calculating runtime Attributes
+#OPTION(persistexpire, 28) // Number of days before PERSIST files are automatically deleted
+// #OPTION(persistexpire, 28) // Number of days before PERSIST files are automatically deleted
+
+#OPTION(keytemplate, '~key::kel::publicrecords_kel::{logicalfile=ProfileBooster20}{superfile=ProfileBooster20}::{keyname}') // Generates Roxie Index logical files such as 'key::kel::publicrecords_kel::Vault::Person::UID'
+
+IMPORT ProfileBooster.ProfileBoosterV2_KEL.Graph;

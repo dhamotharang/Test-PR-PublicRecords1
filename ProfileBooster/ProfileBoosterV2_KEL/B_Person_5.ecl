@@ -1,0 +1,112 @@
+﻿//HPCC Systems KEL Compiler Version 1.2.1-dev
+IMPORT KEL12 AS KEL;
+IMPORT B_Person_6,B_Person_Vehicle_6,B_Vehicle_6,B_Vehicle_7,CFG_Compile,E_Person,E_Person_Vehicle,E_Vehicle FROM ProfileBooster.ProfileBoosterV2_KEL;
+IMPORT * FROM KEL12.Null;
+EXPORT B_Person_5(CFG_Compile __cfg = CFG_Compile) := MODULE
+  SHARED VIRTUAL TYPEOF(B_Person_6(__cfg).__ENH_Person_6) __ENH_Person_6 := B_Person_6(__cfg).__ENH_Person_6;
+  SHARED VIRTUAL TYPEOF(B_Person_Vehicle_6(__cfg).__ENH_Person_Vehicle_6) __ENH_Person_Vehicle_6 := B_Person_Vehicle_6(__cfg).__ENH_Person_Vehicle_6;
+  SHARED VIRTUAL TYPEOF(B_Vehicle_6(__cfg).__ENH_Vehicle_6) __ENH_Vehicle_6 := B_Vehicle_6(__cfg).__ENH_Vehicle_6;
+  SHARED __EE26886 := __ENH_Person_6;
+  SHARED __EE26977 := __ENH_Person_Vehicle_6;
+  SHARED __CC1090 := '-99997';
+  SHARED __EE29373 := __EE26977(__T(__AND(__OP2(__EE26977.Vehicle_Min_Date_,<>,__CN(__CC1090)),__CN(__NN(__EE26977.Subject_) AND __NN(__EE26977.Automobile_)))));
+  SHARED __EE26979 := __ENH_Vehicle_6;
+  SHARED __EE27244 := __EE26979(__T(__EE26979.Flag_Auto_));
+  __JC29379(B_Person_Vehicle_6(__cfg).__ST11111_Layout __EE29373, B_Vehicle_7(__cfg).__ST11718_Layout __EE27244) := __EEQP(__EE29373.Automobile_,__EE27244.UID) AND __EE29373.__Part = __EE27244.__Part;
+  SHARED __EE29428 := JOIN(__EE29373,__EE27244,__JC29379(LEFT,RIGHT),TRANSFORM(B_Person_Vehicle_6(__cfg).__ST11111_Layout,SELF:=LEFT),HASH,KEEP(1));
+  SHARED __ST27033_Layout := RECORD
+    KEL.typ.ntyp(E_Person().Typ) UID;
+    KEL.typ.ntyp(E_Person().Typ) Subject_;
+    KEL.typ.ntyp(E_Vehicle().Typ) Automobile_;
+    KEL.typ.ndataset(E_Person_Vehicle(__cfg).Registration_Layout) Registration_;
+    KEL.typ.ndataset(E_Person_Vehicle(__cfg).Title_Layout) Title_;
+    KEL.typ.ndataset(E_Person_Vehicle(__cfg).Counts_Model_Layout) Counts_Model_;
+    KEL.typ.ndataset(E_Person_Vehicle(__cfg).Data_Sources_Layout) Data_Sources_;
+    KEL.typ.nint Age_At_First_Seen_;
+    KEL.typ.nfloat Age_Year_At_First_Seen_;
+    KEL.typ.nkdate Current_Date_;
+    KEL.typ.nkdate Date_First_Seen_Capped_;
+    KEL.typ.nint Depreciated_Price_;
+    KEL.typ.nstr Vehicle_Min_Date_;
+    KEL.typ.epoch Date_First_Seen_ := 0;
+    KEL.typ.epoch Date_Last_Seen_ := 0;
+    UNSIGNED4 __Part := 0;
+  END;
+  SHARED __EE29556 := PROJECT(__EE29428,TRANSFORM(__ST27033_Layout,SELF.UID := LEFT.Subject_,SELF := LEFT));
+  SHARED __ST27146_Layout := RECORD
+    KEL.typ.ntyp(E_Person().Typ) UID;
+    KEL.typ.nkdate Exp1_;
+    KEL.typ.epoch Date_First_Seen_ := 0;
+    KEL.typ.epoch Date_Last_Seen_ := 0;
+    UNSIGNED4 __Part := 0;
+  END;
+  SHARED __ST27146_Layout __ND29561__Project(__ST27033_Layout __PP29557) := TRANSFORM
+    SELF.Exp1_ := KEL.Routines.CastStringToDate(__PP29557.Vehicle_Min_Date_);
+    SELF := __PP29557;
+  END;
+  SHARED __EE29571 := PROJECT(__EE29556,__ND29561__Project(LEFT));
+  SHARED __ST27161_Layout := RECORD
+    KEL.typ.nkdate M_A_X___Exp1_;
+    KEL.typ.ntyp(E_Person().Typ) UID;
+    KEL.typ.epoch Date_First_Seen_ := 0;
+    KEL.typ.epoch Date_Last_Seen_ := 0;
+    UNSIGNED4 __Part := 0;
+  END;
+  SHARED __EE29587 := PROJECT(__CLEANANDDO(__EE29571,TABLE(__EE29571,{KEL.typ.epoch Date_First_Seen_ := KEL.era.SimpleRoll(GROUP,Date_First_Seen_,MIN,FALSE),KEL.typ.epoch Date_Last_Seen_ := KEL.era.SimpleRoll(GROUP,Date_Last_Seen_,MAX,FALSE),KEL.Aggregates.MaxNG(__EE29571.Exp1_) M_A_X___Exp1_,UID,__Part},UID,__Part,MERGE)),__ST27161_Layout);
+  SHARED __ST27959_Layout := RECORD
+    KEL.typ.nuid UID;
+    KEL.typ.nstr Gender_;
+    KEL.typ.nstr Lex_I_D_Segment_;
+    KEL.typ.ndataset(E_Person(__cfg).Full_Name_Layout) Full_Name_;
+    KEL.typ.ndataset(E_Person(__cfg).Reported_Dates_Of_Birth_Layout) Reported_Dates_Of_Birth_;
+    KEL.typ.ndataset(E_Person(__cfg).Reported_Dates_Of_Death_Layout) Reported_Dates_Of_Death_;
+    KEL.typ.nstr Race_;
+    KEL.typ.nstr Race_Description_;
+    KEL.typ.ndataset(E_Person(__cfg).Data_Sources_Layout) Data_Sources_;
+    KEL.typ.ndataset(E_Person(__cfg).Dunn_Data_Layout) Dunn_Data_;
+    KEL.typ.bool Invalid_Vehicle_Auto_Min_Date_ := FALSE;
+    KEL.typ.int P_L___Ast_Veh_Auto_Cnt_Ev_ := 0;
+    KEL.typ.str P___Lex_I_D_Seen_Flag_ := '';
+    KEL.typ.nkdate M_A_X___Exp1_;
+    KEL.typ.ntyp(E_Person().Typ) U_I_D__1_;
+    KEL.typ.epoch Date_First_Seen_ := 0;
+    KEL.typ.epoch Date_Last_Seen_ := 0;
+    KEL.typ.int __RecordCount := 0;
+    UNSIGNED4 __Part := 0;
+  END;
+  __JC29593(B_Person_6(__cfg).__ST10974_Layout __EE26886, __ST27161_Layout __EE29587) := __EEQP(__EE26886.UID,__EE29587.UID) AND __EE26886.__Part = __EE29587.__Part;
+  __ST27959_Layout __JT29593(B_Person_6(__cfg).__ST10974_Layout __l, __ST27161_Layout __r) := TRANSFORM
+    SELF.U_I_D__1_ := __r.UID;
+    SELF := __l;
+    SELF := __r;
+  END;
+  SHARED __EE29641 := JOIN(__EE26886,__EE29587,__JC29593(LEFT,RIGHT),__JT29593(LEFT,RIGHT),LEFT OUTER,HASH);
+  EXPORT __ST12617_Layout := RECORD
+    KEL.typ.nuid UID;
+    KEL.typ.nstr Gender_;
+    KEL.typ.nstr Lex_I_D_Segment_;
+    KEL.typ.ndataset(E_Person(__cfg).Full_Name_Layout) Full_Name_;
+    KEL.typ.ndataset(E_Person(__cfg).Reported_Dates_Of_Birth_Layout) Reported_Dates_Of_Birth_;
+    KEL.typ.ndataset(E_Person(__cfg).Reported_Dates_Of_Death_Layout) Reported_Dates_Of_Death_;
+    KEL.typ.nstr Race_;
+    KEL.typ.nstr Race_Description_;
+    KEL.typ.ndataset(E_Person(__cfg).Data_Sources_Layout) Data_Sources_;
+    KEL.typ.ndataset(E_Person(__cfg).Dunn_Data_Layout) Dunn_Data_;
+    KEL.typ.bool Invalid_Vehicle_Auto_Min_Date_ := FALSE;
+    KEL.typ.int P_L___Ast_Veh_Auto_Cnt_Ev_ := 0;
+    KEL.typ.nstr P_L___Ast_Veh_Auto_Emrg_New_Dt_Ev_;
+    KEL.typ.str P___Lex_I_D_Seen_Flag_ := '';
+    KEL.typ.epoch Date_First_Seen_ := 0;
+    KEL.typ.epoch Date_Last_Seen_ := 0;
+    KEL.typ.int __RecordCount := 0;
+    UNSIGNED4 __Part := 0;
+  END;
+  SHARED __ST12617_Layout __ND29646__Project(__ST27959_Layout __PP29642) := TRANSFORM
+    __CC1065 := '-99999';
+    __CC1070 := '-99998';
+    __CC1075 := '-99997';
+    SELF.P_L___Ast_Veh_Auto_Emrg_New_Dt_Ev_ := MAP(__PP29642.P___Lex_I_D_Seen_Flag_ = '0'=>__ECAST(KEL.typ.nstr,__CN(__CC1065)),__PP29642.P_L___Ast_Veh_Auto_Cnt_Ev_ = 0=>__ECAST(KEL.typ.nstr,__CN(__CC1070)),__PP29642.P_L___Ast_Veh_Auto_Cnt_Ev_ > 0 AND __PP29642.Invalid_Vehicle_Auto_Min_Date_=>__ECAST(KEL.typ.nstr,__CN(__CC1075)),__ECAST(KEL.typ.nstr,__FN2(KEL.Routines.DateToString,__PP29642.M_A_X___Exp1_,__CN('%Y%m%d'))));
+    SELF := __PP29642;
+  END;
+  EXPORT __ENH_Person_5 := PROJECT(__EE29641,__ND29646__Project(LEFT));
+END;

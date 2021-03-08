@@ -1,5 +1,4 @@
-//IMPORT:KEL13.Aggregates
-IMPORT KEL13 AS KEL;
+﻿IMPORT KEL13 AS KEL;
 IMPORT * FROM KEL13.Null;
 
 EXPORT Aggregates := MODULE
@@ -264,6 +263,8 @@ EXPORT Aggregates := MODULE
             LOCAL __extreme := #IF(minmax > 0) Kel.Typ.MININT #ELSE Kel.Typ.MAXINT #END;
         #ELSEIF(REGEXFIND('^string', #GETDATATYPE(__T(field)), NOCASE))
             LOCAL __extreme := #IF(minmax > 0) '\'\'' #ELSE #ERROR('Attempt to use filtered MIN(GROUP) on string value') #END;
+        #ELSEIF(REGEXFIND('^data', #GETDATATYPE(__T(field)), NOCASE))
+            LOCAL __extreme := #IF(minmax > 0) '(DATA16) x\'00000000000000000000000000000000\'' #ELSE (DATA16) '(DATA16) x\'FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF\'' #END;
         #ELSE
             LOCAL __extreme := #IF(minmax > 0) Kel.Typ.MINFLOAT #ELSE Kel.Typ.MAXFLOAT #END;
         #END
@@ -272,6 +273,8 @@ EXPORT Aggregates := MODULE
     EXPORT MinMaxNull(field) := FUNCTIONMACRO
         #IF(REGEXFIND('^string', #GETDATATYPE(__T(field)), NOCASE))
             RETURN '\'\'';
+		#ELSEIF(REGEXFIND('^data', #GETDATATYPE(__T(field)), NOCASE))
+            RETURN (DATA16) x'00000000000000000000000000000000';
         #ELSE
             RETURN 0;
         #END

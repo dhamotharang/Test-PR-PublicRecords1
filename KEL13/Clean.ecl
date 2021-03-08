@@ -1,5 +1,4 @@
-//IMPORT:KEL13.Clean
-/**
+﻿/**
  *Cleans the set of field names of a dataset by applying any combination of three alterations.
  *<p>
  *This function cleans a dataset in three possible ways, of which any combination may be applied.  The

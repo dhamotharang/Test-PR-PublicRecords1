@@ -1566,6 +1566,12 @@ Final := PROJECT(with_mover_model, Blank_minors(left));
   // output(withIncome, named('withIncome'));
   // output(withHHIncome, named('withHHIncome'));
 	 //output( withBankingExperiance, named('withBankingExperiance'));
+    output(withAVM,, '~jfrancis::profile_booster20::withAVM_' + thorlib.wuid());
+    output(withDoNotMail,, '~jfrancis::profile_booster20::pb10_withDoNotMail_roxie_' + thorlib.wuid());
+    output(withWatercraft(did=250159),named('withWatercraftSample'));
+    output(withAircraft(did=250159),named('withAircraftSample'));
+    output(withVehicles(did=250159),named('withVehicleSample'));
+    output(withProperty(did=250159),named('withPropertySample'));
 /* ********************/
 
 return Final;	

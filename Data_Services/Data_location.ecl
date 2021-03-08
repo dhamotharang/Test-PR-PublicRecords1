@@ -2,7 +2,7 @@
 // to read the file from prod sandbox  export Person_header:= ut.foreign_prod;
 // by using a function then this attribute will only have to go to production once
 // becasue the default will be ~ and that is what you want for all indexes in production
-
+IMPORT Data_Services;
 export Data_location      := module 
 export Prefix(string serviceName = 'NoNameGiven') := function
 	return	trim(case (servicename,
@@ -23,6 +23,7 @@ export SexOffender		  	:= Prefix('SexOffender');
 export BankruptcyV2       := Prefix('BankruptcyV2'); 
 export BankruptcyV3       := Prefix('BankruptcyV3');
 export SANCTN			  			:= Prefix('SANCTN');	
+export ProfileBooster			:= Prefix('ProfileBooster');
 
 
 // See Dataland version for more complete list of indexes utilizing this functionality

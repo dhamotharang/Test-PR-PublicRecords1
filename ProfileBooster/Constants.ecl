@@ -1,4 +1,4 @@
-EXPORT Constants := MODULE
+﻿EXPORT Constants := MODULE
 //these are states allowed
 EXPORT setWatercraftStates := [
 													'AL','AR','AZ','CO','CT','GA','IA','ME',
@@ -33,5 +33,6 @@ EXPORT recType := ENUM(
 											 
 											 
 EXPORT setValidAttributeVersions := ['PBATTRV1', 'PBATTRV1HHEIR'];
+EXPORT setValidAttributeVersionsV2 := ['PROFILEBOOSTERATTRV2'];
 
 END;

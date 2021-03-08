@@ -37,7 +37,7 @@ WatercraftKeys_thor :=  join(distribute(PBslim, did2),
 #ELSE
 	WatercraftKeys := WatercraftKeys_roxie;
 #END
-
+output(WatercraftKeys,named('WatercraftKeys'));
 WCDetailskey := watercraft.key_watercraft_sid(false);
 											
 {ProfileBooster.Layouts.Layout_PB_Slim_watercraft, UNSIGNED4 global_sid}  getWCDetails(WatercraftKeys le, WCDetailskey ri) := TRANSFORM
@@ -79,6 +79,7 @@ WatercraftDetails_thor := Suppress.Suppress_ReturnOldLayout(WatercraftDetails_th
 	WatercraftDetails := WatercraftDetails_roxie;
 #END
 
+output(WatercraftDetails,named('WatercraftDetails'));
 SortWCdetails :=  dedup(sort(WatercraftDetails, seq, did2, watercraft_key[1..10], -sequence_key),
 																								seq, did2, watercraft_key[1..10]);
 
