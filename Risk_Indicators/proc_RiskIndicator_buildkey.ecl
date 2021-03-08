@@ -197,7 +197,7 @@ RoxieKeyBuild.MAC_SK_Move_To_Built_v2('~thor_data400::key::death_master::fcra::@
 //No need to build indexes a9-a13
 //see https://jira.rsi.lexisnexis.com/browse/DF-28403									
 full1 := 	sequential(	parallel(a1,a2,a3,a4,a5,a7,/*a9,a10,a11,a12,a13,*/a14,a15,a16,a17,a18,a19,a20,a21,a22,a23,a24,a25,a26,a27),
-					  					parallel(b1,b2,b3,b4,b5,b7,b9,b10,b11,b12,b13,b14,b15,b16,b17,b18,b19,b20,b21,b22,b23,b24,b25,b26,b27)
+					  					parallel(b1,b2,b3,b4,b5,b7,/*b9,b10,b11,b12,b13,*/b14,b15,b16,b17,b18,b19,b20,b21,b22,b23,b24,b25,b26,b27)
 										);					
 
 	///////////////////////// Move Non-FCRA KEYS /////////////////////////
