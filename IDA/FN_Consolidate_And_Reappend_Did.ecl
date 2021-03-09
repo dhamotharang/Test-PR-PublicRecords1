@@ -4,7 +4,7 @@ Header, Header_Slimsort, didville, ut, DID_Add,Business_Header_SS, NID, AID,std,
 EXPORT FN_Consolidate_And_Reappend_Did(string pversion,boolean pUseProd=false,boolean pDaily=false):= MODULE
 
 EXPORT DailyBaseBuilt:=IDA.Files().Basedaily.Built;
-EXPORT  DailyBaseQA:=IDA.Files().Basedaily.QA;
+EXPORT DailyBaseQA:=if(nothor(FileServices.GetSuperFileSubCount(IDA.Filenames(pversion, pUseProd).lBaseTemplateDaily_qa)) <> 0,IDA.Files().Basedaily.QA);
 EXPORT FullDaily:= DailyBaseBuilt + DailyBaseQA;
 
 
