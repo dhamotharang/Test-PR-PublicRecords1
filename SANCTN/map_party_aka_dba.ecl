@@ -18,6 +18,7 @@ SANCTN.layout_SANCTN_aka_dba_in clean_SANCTN_aka_dba(SANCTN_aka_dba input) := TR
 	  self.AKA_DBA_TEXT       := if(input.COMPANY != '', ut.CleanSpacesAndUpper(input.COMPANY),
 																			STD.Str.CleanSpaces(TRIM(self.FIRST_NAME +' '+ self.MIDDLE_NAME+' '+self.LAST_NAME)));
 		self                     := input;
+		self:=[];
    
 end;
 

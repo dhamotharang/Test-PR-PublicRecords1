@@ -1,6 +1,7 @@
-﻿IMPORT standard, bipv2;
+﻿IMPORT standard, bipv2,dx_common;
 
 export layout_SANCTN_did := record
+  dx_common.layout_metadata;
   SANCTN.layout_SANCTN_party_clean_orig;
 	bipv2.IDlayouts.l_xlink_ids;	//Added for BIP project
 	unsigned8 source_rec_id := 0; //Added for BIP project
