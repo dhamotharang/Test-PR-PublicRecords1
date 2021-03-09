@@ -935,6 +935,7 @@ IF(RunAll OR RunSanityCheckSummary,OUTPUT(E_Name_Summary().SanityCheck,NAMED('E_
 IF(RunAll OR RunInvalidSingleValues,OUTPUT(E_Name_Summary().First_Name__SingleValue_Invalid,NAMED('E_Name_Summary_First_Name__SingleValue_Invalid')));
 IF(RunAll OR RunInvalidSingleValues,OUTPUT(E_Name_Summary().Last_Name__SingleValue_Invalid,NAMED('E_Name_Summary_Last_Name__SingleValue_Invalid')));
 IF(RunAll OR RunInvalidSingleValues,OUTPUT(E_Name_Summary().Date_Of_Birth__SingleValue_Invalid,NAMED('E_Name_Summary_Date_Of_Birth__SingleValue_Invalid')));
+IF(RunAll OR RunInvalidSingleValues,OUTPUT(E_Name_Summary().Date_Of_Birth_Padded__SingleValue_Invalid,NAMED('E_Name_Summary_Date_Of_Birth_Padded__SingleValue_Invalid')));
 IF(RunAll OR RunInvalidSingleValues,OUTPUT(E_Name_Summary().Record_Count__SingleValue_Invalid,NAMED('E_Name_Summary_Record_Count__SingleValue_Invalid')));
 IF(RunAll OR RunFast OR RunUidSourceCounts,OUTPUT(E_Name_Summary().UIDSourceCounts,NAMED('E_Name_Summary_UIDSourceCounts')));
 IF(RunAll OR RunFast OR RunUidSourceCounts,OUTPUT(E_Name_Summary().TopSourcedUIDs(TopNUids),NAMED('E_Name_Summary_TopSourcedUIDs')));
