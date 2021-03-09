@@ -364,9 +364,9 @@
 	STRING6 PL_DrgBkSeverityIndx10Y ;
 	STRING10 G_BuildProfLicDt;
 	STRING6 PL_ProfLicFlagEv;
-	STRING500 PL_ProfLicIssueDtListEv;
-	STRING500 PL_ProfLicExpDtListEv;
-	STRING100 PL_ProfLicIndxByLicListEv;
+	STRING PL_ProfLicIssueDtListEv;
+	STRING PL_ProfLicExpDtListEv;
+	STRING PL_ProfLicIndxByLicListEv;
 	STRING6 PL_ProfLicActvFlag;
 	STRING10 PL_ProfLicActvNewIssueDt;
 	STRING10 PL_ProfLicActvNewExpDt;
@@ -452,7 +452,7 @@
 	INTEGER4 PL_AstPropBusCurrTaxValTot;
 	//Utility
 	INTEGER3 PL_UtilCntEv;
-	STRING1000 PL_UtilOldDtListEv;
+	STRING PL_UtilOldDtListEv;
 	STRING8 PL_UtilOldDtEv;
 	INTEGER3 PL_UtilOldMsncEv;
 	//Email
