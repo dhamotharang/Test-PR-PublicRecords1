@@ -1147,6 +1147,7 @@ EXPORT L_Compile := MODULE
     KEL.typ.nstr P_L___Drg_Bk_Bus_Flag10_Y_;
     KEL.typ.str P_L___Drg_Bk_Severity_Indx10_Y_ := '';
     KEL.typ.str P_L___Prof_Lic_Flag_Ev_ := '';
+    KEL.typ.int P_L___Prof_Lic_Cnt_Ev_ := 0;
     KEL.typ.nstr P_L___Prof_Lic_Issue_Dt_List_Ev_;
     KEL.typ.nstr P_L___Prof_Lic_Exp_Dt_List_Ev_;
     KEL.typ.nstr P_L___Prof_Lic_Indx_By_Lic_List_Ev_;
@@ -1257,6 +1258,11 @@ EXPORT L_Compile := MODULE
     KEL.typ.nstr P_L___Util_Old_Dt_Ev_;
     KEL.typ.nint P_L___Util_Old_Msnc_Ev_;
     KEL.typ.int P_L___Email_Cnt_Ev_ := 0;
+    KEL.typ.nstr P_L___Email_Flag_Ev_;
+    KEL.typ.int P_L___Email_Free_Cnt_Ev_ := 0;
+    KEL.typ.int P_L___Email_I_S_P_Cnt_Ev_ := 0;
+    KEL.typ.int P_L___Email_Edu_Cnt_Ev_ := 0;
+    KEL.typ.int P_L___Email_Corp_Cnt_Ev_ := 0;
     KEL.typ.int P_L___Ast_Prop_Cnt_Ev_ := 0;
     KEL.typ.nstr P_L___Ast_Prop_New_Dt_List_Ev_;
     KEL.typ.nstr P_L___Ast_Prop_Old_Dt_List_Ev_;
@@ -1590,6 +1596,7 @@ EXPORT L_Compile := MODULE
     KEL.typ.nstr P_L___Drg_Bk_Bus_Flag10_Y_;
     KEL.typ.str P_L___Drg_Bk_Severity_Indx10_Y_ := '';
     KEL.typ.str P_L___Prof_Lic_Flag_Ev_ := '';
+    KEL.typ.int P_L___Prof_Lic_Cnt_Ev_ := 0;
     KEL.typ.nstr P_L___Prof_Lic_Issue_Dt_List_Ev_;
     KEL.typ.nstr P_L___Prof_Lic_Exp_Dt_List_Ev_;
     KEL.typ.nstr P_L___Prof_Lic_Indx_By_Lic_List_Ev_;
@@ -1688,6 +1695,11 @@ EXPORT L_Compile := MODULE
     KEL.typ.nstr P_L___Edu_Coll_Src_New_Rec_New_Msnc_Ev_;
     KEL.typ.nstr P_L___Edu_Coll_Rec_Span_Ev_;
     KEL.typ.int P_L___Email_Cnt_Ev_ := 0;
+    KEL.typ.nstr P_L___Email_Flag_Ev_;
+    KEL.typ.int P_L___Email_Free_Cnt_Ev_ := 0;
+    KEL.typ.int P_L___Email_I_S_P_Cnt_Ev_ := 0;
+    KEL.typ.int P_L___Email_Edu_Cnt_Ev_ := 0;
+    KEL.typ.int P_L___Email_Corp_Cnt_Ev_ := 0;
     KEL.typ.int P_L___Ast_Prop_Cnt_Ev_ := 0;
     KEL.typ.nstr P_L___Ast_Prop_New_Dt_List_Ev_;
     KEL.typ.nstr P_L___Ast_Prop_Old_Dt_List_Ev_;
@@ -1704,14 +1716,6 @@ EXPORT L_Compile := MODULE
     KEL.typ.nstr P_L___Ast_Prop_Curr_A_V_M_Val_List_;
     KEL.typ.nint P_L___Ast_Prop_Curr_A_V_M_Val_Tot_;
     KEL.typ.nfloat P_L___Ast_Prop_Curr_A_V_M_Val_Avg_;
-    KEL.typ.int P_L___Ast_Prop_Sale_Cnt_Ev_ := 0;
-    KEL.typ.nstr P_L___Ast_Prop_Sale_Amt_List_Ev_;
-    KEL.typ.int P_L___Ast_Prop_Sale_Tot_Ev_ := 0;
-    KEL.typ.nstr P_L___Ast_Prop_Sale_Dt_List_Ev_;
-    KEL.typ.nstr P_L___Ast_Prop_Sale_New_Dt_Ev_;
-    KEL.typ.nstr P_L___Ast_Prop_Sale_Old_Dt_Ev_;
-    KEL.typ.nint P_L___Ast_Prop_Sale_New_Msnc_Ev_;
-    KEL.typ.nint P_L___Ast_Prop_Sale_Old_Msnc_Ev_;
     KEL.typ.int P_L___Ast_Prop_Purch_Cnt_Ev_ := 0;
     KEL.typ.nstr P_L___Ast_Prop_Purch_Dt_List_Ev_;
     KEL.typ.nstr P_L___Ast_Prop_Purch_New_Dt_Ev_;
@@ -3481,6 +3485,7 @@ EXPORT L_Compile := MODULE
     KEL.typ.nstr P_L___Drg_Bk_Bus_Flag10_Y_;
     KEL.typ.str P_L___Drg_Bk_Severity_Indx10_Y_ := '';
     KEL.typ.str P_L___Prof_Lic_Flag_Ev_ := '';
+    KEL.typ.int P_L___Prof_Lic_Cnt_Ev_ := 0;
     KEL.typ.nstr P_L___Prof_Lic_Issue_Dt_List_Ev_;
     KEL.typ.nstr P_L___Prof_Lic_Exp_Dt_List_Ev_;
     KEL.typ.nstr P_L___Prof_Lic_Indx_By_Lic_List_Ev_;
@@ -3591,6 +3596,11 @@ EXPORT L_Compile := MODULE
     KEL.typ.nstr P_L___Util_Old_Dt_Ev_;
     KEL.typ.nint P_L___Util_Old_Msnc_Ev_;
     KEL.typ.int P_L___Email_Cnt_Ev_ := 0;
+    KEL.typ.nstr P_L___Email_Flag_Ev_;
+    KEL.typ.int P_L___Email_Free_Cnt_Ev_ := 0;
+    KEL.typ.int P_L___Email_I_S_P_Cnt_Ev_ := 0;
+    KEL.typ.int P_L___Email_Edu_Cnt_Ev_ := 0;
+    KEL.typ.int P_L___Email_Corp_Cnt_Ev_ := 0;
     KEL.typ.int P_L___Ast_Prop_Cnt_Ev_ := 0;
     KEL.typ.nstr P_L___Ast_Prop_New_Dt_List_Ev_;
     KEL.typ.nstr P_L___Ast_Prop_Old_Dt_List_Ev_;
@@ -3924,6 +3934,7 @@ EXPORT L_Compile := MODULE
     KEL.typ.nstr P_L___Drg_Bk_Bus_Flag10_Y_;
     KEL.typ.str P_L___Drg_Bk_Severity_Indx10_Y_ := '';
     KEL.typ.str P_L___Prof_Lic_Flag_Ev_ := '';
+    KEL.typ.int P_L___Prof_Lic_Cnt_Ev_ := 0;
     KEL.typ.nstr P_L___Prof_Lic_Issue_Dt_List_Ev_;
     KEL.typ.nstr P_L___Prof_Lic_Exp_Dt_List_Ev_;
     KEL.typ.nstr P_L___Prof_Lic_Indx_By_Lic_List_Ev_;
@@ -4022,6 +4033,11 @@ EXPORT L_Compile := MODULE
     KEL.typ.nstr P_L___Edu_Coll_Src_New_Rec_New_Msnc_Ev_;
     KEL.typ.nstr P_L___Edu_Coll_Rec_Span_Ev_;
     KEL.typ.int P_L___Email_Cnt_Ev_ := 0;
+    KEL.typ.nstr P_L___Email_Flag_Ev_;
+    KEL.typ.int P_L___Email_Free_Cnt_Ev_ := 0;
+    KEL.typ.int P_L___Email_I_S_P_Cnt_Ev_ := 0;
+    KEL.typ.int P_L___Email_Edu_Cnt_Ev_ := 0;
+    KEL.typ.int P_L___Email_Corp_Cnt_Ev_ := 0;
     KEL.typ.int P_L___Ast_Prop_Cnt_Ev_ := 0;
     KEL.typ.nstr P_L___Ast_Prop_New_Dt_List_Ev_;
     KEL.typ.nstr P_L___Ast_Prop_Old_Dt_List_Ev_;
@@ -4038,14 +4054,6 @@ EXPORT L_Compile := MODULE
     KEL.typ.nstr P_L___Ast_Prop_Curr_A_V_M_Val_List_;
     KEL.typ.nint P_L___Ast_Prop_Curr_A_V_M_Val_Tot_;
     KEL.typ.nfloat P_L___Ast_Prop_Curr_A_V_M_Val_Avg_;
-    KEL.typ.int P_L___Ast_Prop_Sale_Cnt_Ev_ := 0;
-    KEL.typ.nstr P_L___Ast_Prop_Sale_Amt_List_Ev_;
-    KEL.typ.int P_L___Ast_Prop_Sale_Tot_Ev_ := 0;
-    KEL.typ.nstr P_L___Ast_Prop_Sale_Dt_List_Ev_;
-    KEL.typ.nstr P_L___Ast_Prop_Sale_New_Dt_Ev_;
-    KEL.typ.nstr P_L___Ast_Prop_Sale_Old_Dt_Ev_;
-    KEL.typ.nint P_L___Ast_Prop_Sale_New_Msnc_Ev_;
-    KEL.typ.nint P_L___Ast_Prop_Sale_Old_Msnc_Ev_;
     KEL.typ.int P_L___Ast_Prop_Purch_Cnt_Ev_ := 0;
     KEL.typ.nstr P_L___Ast_Prop_Purch_Dt_List_Ev_;
     KEL.typ.nstr P_L___Ast_Prop_Purch_New_Dt_Ev_;
@@ -5306,6 +5314,7 @@ EXPORT L_Compile := MODULE
   END;
   SHARED Index_Build_Entity_Res2_Internal_Layout_Date_Of_Birth_Summary_Layout := RECORD
     KEL.typ.nkdate Dob_Date_Of_Birth_;
+    KEL.typ.nstr Dob_Date_Of_Birth_Padded_;
     KEL.typ.nstr Dob_Source_;
     KEL.typ.nint Dob_Record_Count_;
     KEL.typ.nstr D_O_B_Translated_Source_Code_;
@@ -8690,6 +8699,7 @@ EXPORT L_Compile := MODULE
     KEL.typ.nstr First_Name_;
     KEL.typ.nstr Last_Name_;
     KEL.typ.nkdate Date_Of_Birth_;
+    KEL.typ.nstr Date_Of_Birth_Padded_;
     KEL.typ.nstr Primary_Range_;
     KEL.typ.nstr Predirectional_;
     KEL.typ.nstr Primary_Name_;
@@ -8972,6 +8982,7 @@ EXPORT L_Compile := MODULE
     KEL.typ.nstr First_Name_;
     KEL.typ.nstr Last_Name_;
     KEL.typ.nkdate Date_Of_Birth_;
+    KEL.typ.nstr Date_Of_Birth_Padded_;
     KEL.typ.nint Record_Count_;
     KEL.typ.ndataset(Index_Build_Entity_Res21_Internal_Layout_Data_Sources_Layout) Data_Sources_;
     KEL.typ.ndataset(Index_Build_Entity_Res21_Internal_Layout_Name_Summary_Source_List_Layout) Name_Summary_Source_List_;
@@ -9015,6 +9026,7 @@ EXPORT L_Compile := MODULE
   END;
   SHARED Index_Build_Entity_Res22_Internal_Layout_Reported_Dates_Of_Birth_Layout := RECORD
     KEL.typ.nkdate Date_Of_Birth_;
+    KEL.typ.nstr Date_Of_Birth_Padded_;
     KEL.typ.nbool Header_Hit_Flag_;
     KEL.typ.nbool Best_;
     KEL.typ.nbool Best_D_O_B_Rec_;
@@ -11462,6 +11474,16 @@ EXPORT L_Compile := MODULE
     KEL.typ.ndataset(Index_Build_Entity_Res22_Internal_Layout_Edu_Rec_Ver_Source_List_Sorted_Layout) Edu_Rec_Ver_Source_List_Sorted_;
     KEL.typ.int Email_Cnt_Ev_F_C_R_A_ := 0;
     KEL.typ.int Email_Cnt_Ev_Non_F_C_R_A_ := 0;
+    KEL.typ.int Email_Corp_Cnt_Ev_F_C_R_A_ := 0;
+    KEL.typ.int Email_Corp_Cnt_Ev_Non_F_C_R_A_ := 0;
+    KEL.typ.int Email_Edu_Cnt_Ev_F_C_R_A_ := 0;
+    KEL.typ.int Email_Edu_Cnt_Ev_Non_F_C_R_A_ := 0;
+    KEL.typ.int Email_Free_Cnt_Ev_F_C_R_A_ := 0;
+    KEL.typ.int Email_Free_Cnt_Ev_Non_F_C_R_A_ := 0;
+    KEL.typ.int Email_I_S_P_Cnt_Ev_F_C_R_A_ := 0;
+    KEL.typ.int Email_I_S_P_Cnt_Ev_Non_F_C_R_A_ := 0;
+    KEL.typ.int Email_Unknown_Cnt_Ev_F_C_R_A_ := 0;
+    KEL.typ.int Email_Unknown_Cnt_Ev_Non_F_C_R_A_ := 0;
     Index_Build_Entity_Res22_Internal_Layout_Emerging_Layout Emerging_;
     KEL.typ.nstr Emerging_Addr_Cnty_;
     KEL.typ.nstr Emerging_Addr_Geo_;
@@ -11873,6 +11895,16 @@ EXPORT L_Compile := MODULE
     KEL.typ.nstr P_L___Edu_Src_List_Ev_;
     KEL.typ.int P_L___Email_Cnt_Ev_F_C_R_A_ := 0;
     KEL.typ.int P_L___Email_Cnt_Ev_Non_F_C_R_A_ := 0;
+    KEL.typ.int P_L___Email_Corp_Cnt_Ev_F_C_R_A_ := 0;
+    KEL.typ.int P_L___Email_Corp_Cnt_Ev_Non_F_C_R_A_ := 0;
+    KEL.typ.int P_L___Email_Edu_Cnt_Ev_F_C_R_A_ := 0;
+    KEL.typ.int P_L___Email_Edu_Cnt_Ev_Non_F_C_R_A_ := 0;
+    KEL.typ.nstr P_L___Email_Flag_Ev_F_C_R_A_;
+    KEL.typ.nstr P_L___Email_Flag_Ev_Non_F_C_R_A_;
+    KEL.typ.int P_L___Email_Free_Cnt_Ev_F_C_R_A_ := 0;
+    KEL.typ.int P_L___Email_Free_Cnt_Ev_Non_F_C_R_A_ := 0;
+    KEL.typ.int P_L___Email_I_S_P_Cnt_Ev_F_C_R_A_ := 0;
+    KEL.typ.int P_L___Email_I_S_P_Cnt_Ev_Non_F_C_R_A_ := 0;
     KEL.typ.nint P_L___Emrg_Age_;
     KEL.typ.ntyp(E_Household().Typ) P_L___H_H_I_D_;
     KEL.typ.int P_L___H_H_Mmbr_Age18u_Cnt_ := 0;
@@ -11909,6 +11941,7 @@ EXPORT L_Compile := MODULE
     KEL.typ.nstr P_L___Prof_Lic_Actv_New_Src_Type_;
     KEL.typ.nstr P_L___Prof_Lic_Actv_New_Title_Type_;
     KEL.typ.nstr P_L___Prof_Lic_Actv_New_Type_;
+    KEL.typ.int P_L___Prof_Lic_Cnt_Ev_ := 0;
     KEL.typ.nstr P_L___Prof_Lic_Exp_Dt_List_Ev_;
     KEL.typ.str P_L___Prof_Lic_Flag_Ev_ := '';
     KEL.typ.nstr P_L___Prof_Lic_Indx_By_Lic_List_Ev_;
@@ -12390,6 +12423,7 @@ EXPORT L_Compile := MODULE
   END;
   SHARED Index_Build_Entity_Res24_Internal_Layout_Date_Of_Birth_Summary_Layout := RECORD
     KEL.typ.nkdate Date_Of_Birth_;
+    KEL.typ.nstr Date_Of_Birth_Padded_;
     KEL.typ.nint Record_Count_;
     KEL.typ.nstr Source_;
     KEL.typ.nbool Header_Hit_Flag_;
@@ -12853,6 +12887,7 @@ EXPORT L_Compile := MODULE
   END;
   SHARED Index_Build_Entity_Res30_Internal_Layout_Date_Of_Birth_Summary_Layout := RECORD
     KEL.typ.nkdate Dob_Date_Of_Birth_;
+    KEL.typ.nstr Dob_Date_Of_Birth_Padded_;
     KEL.typ.nstr Dob_Source_;
     KEL.typ.nint Dob_Record_Count_;
     KEL.typ.nstr Translated_Source_Code_;
@@ -13587,6 +13622,7 @@ EXPORT L_Compile := MODULE
     KEL.typ.nstr First_Name_;
     KEL.typ.nstr Last_Name_;
     KEL.typ.nkdate Date_Of_Birth_;
+    KEL.typ.nstr Date_Of_Birth_Padded_;
     KEL.typ.nstr Primary_Range_;
     KEL.typ.nstr Predirectional_;
     KEL.typ.nstr Primary_Name_;
@@ -13992,6 +14028,7 @@ EXPORT L_Compile := MODULE
   END;
   SHARED Index_Build_Association_Res4_Internal_Layout_Reported_Dates_Of_Birth_Layout := RECORD
     KEL.typ.nkdate Date_Of_Birth_;
+    KEL.typ.nstr Date_Of_Birth_Padded_;
     KEL.typ.nbool Header_Hit_Flag_;
     KEL.typ.nbool Best_;
     KEL.typ.nbool Best_D_O_B_Rec_;
@@ -16439,6 +16476,16 @@ EXPORT L_Compile := MODULE
     KEL.typ.ndataset(Index_Build_Association_Res4_Internal_Layout_Edu_Rec_Ver_Source_List_Sorted_Layout) Edu_Rec_Ver_Source_List_Sorted_;
     KEL.typ.int Email_Cnt_Ev_F_C_R_A_ := 0;
     KEL.typ.int Email_Cnt_Ev_Non_F_C_R_A_ := 0;
+    KEL.typ.int Email_Corp_Cnt_Ev_F_C_R_A_ := 0;
+    KEL.typ.int Email_Corp_Cnt_Ev_Non_F_C_R_A_ := 0;
+    KEL.typ.int Email_Edu_Cnt_Ev_F_C_R_A_ := 0;
+    KEL.typ.int Email_Edu_Cnt_Ev_Non_F_C_R_A_ := 0;
+    KEL.typ.int Email_Free_Cnt_Ev_F_C_R_A_ := 0;
+    KEL.typ.int Email_Free_Cnt_Ev_Non_F_C_R_A_ := 0;
+    KEL.typ.int Email_I_S_P_Cnt_Ev_F_C_R_A_ := 0;
+    KEL.typ.int Email_I_S_P_Cnt_Ev_Non_F_C_R_A_ := 0;
+    KEL.typ.int Email_Unknown_Cnt_Ev_F_C_R_A_ := 0;
+    KEL.typ.int Email_Unknown_Cnt_Ev_Non_F_C_R_A_ := 0;
     Index_Build_Association_Res4_Internal_Layout_Emerging_Layout Emerging_;
     KEL.typ.nstr Emerging_Addr_Cnty_;
     KEL.typ.nstr Emerging_Addr_Geo_;
@@ -16850,6 +16897,16 @@ EXPORT L_Compile := MODULE
     KEL.typ.nstr P_L___Edu_Src_List_Ev_;
     KEL.typ.int P_L___Email_Cnt_Ev_F_C_R_A_ := 0;
     KEL.typ.int P_L___Email_Cnt_Ev_Non_F_C_R_A_ := 0;
+    KEL.typ.int P_L___Email_Corp_Cnt_Ev_F_C_R_A_ := 0;
+    KEL.typ.int P_L___Email_Corp_Cnt_Ev_Non_F_C_R_A_ := 0;
+    KEL.typ.int P_L___Email_Edu_Cnt_Ev_F_C_R_A_ := 0;
+    KEL.typ.int P_L___Email_Edu_Cnt_Ev_Non_F_C_R_A_ := 0;
+    KEL.typ.nstr P_L___Email_Flag_Ev_F_C_R_A_;
+    KEL.typ.nstr P_L___Email_Flag_Ev_Non_F_C_R_A_;
+    KEL.typ.int P_L___Email_Free_Cnt_Ev_F_C_R_A_ := 0;
+    KEL.typ.int P_L___Email_Free_Cnt_Ev_Non_F_C_R_A_ := 0;
+    KEL.typ.int P_L___Email_I_S_P_Cnt_Ev_F_C_R_A_ := 0;
+    KEL.typ.int P_L___Email_I_S_P_Cnt_Ev_Non_F_C_R_A_ := 0;
     KEL.typ.nint P_L___Emrg_Age_;
     KEL.typ.ntyp(E_Household().Typ) P_L___H_H_I_D_;
     KEL.typ.int P_L___H_H_Mmbr_Age18u_Cnt_ := 0;
@@ -16886,6 +16943,7 @@ EXPORT L_Compile := MODULE
     KEL.typ.nstr P_L___Prof_Lic_Actv_New_Src_Type_;
     KEL.typ.nstr P_L___Prof_Lic_Actv_New_Title_Type_;
     KEL.typ.nstr P_L___Prof_Lic_Actv_New_Type_;
+    KEL.typ.int P_L___Prof_Lic_Cnt_Ev_ := 0;
     KEL.typ.nstr P_L___Prof_Lic_Exp_Dt_List_Ev_;
     KEL.typ.str P_L___Prof_Lic_Flag_Ev_ := '';
     KEL.typ.nstr P_L___Prof_Lic_Indx_By_Lic_List_Ev_;
@@ -20028,6 +20086,7 @@ EXPORT L_Compile := MODULE
   END;
   SHARED Index_Build_Association_Res10_Internal_Layout_Reported_Dates_Of_Birth_Layout := RECORD
     KEL.typ.nkdate Date_Of_Birth_;
+    KEL.typ.nstr Date_Of_Birth_Padded_;
     KEL.typ.nbool Header_Hit_Flag_;
     KEL.typ.nbool Best_;
     KEL.typ.nbool Best_D_O_B_Rec_;
@@ -22475,6 +22534,16 @@ EXPORT L_Compile := MODULE
     KEL.typ.ndataset(Index_Build_Association_Res10_Internal_Layout_Edu_Rec_Ver_Source_List_Sorted_Layout) Edu_Rec_Ver_Source_List_Sorted_;
     KEL.typ.int Email_Cnt_Ev_F_C_R_A_ := 0;
     KEL.typ.int Email_Cnt_Ev_Non_F_C_R_A_ := 0;
+    KEL.typ.int Email_Corp_Cnt_Ev_F_C_R_A_ := 0;
+    KEL.typ.int Email_Corp_Cnt_Ev_Non_F_C_R_A_ := 0;
+    KEL.typ.int Email_Edu_Cnt_Ev_F_C_R_A_ := 0;
+    KEL.typ.int Email_Edu_Cnt_Ev_Non_F_C_R_A_ := 0;
+    KEL.typ.int Email_Free_Cnt_Ev_F_C_R_A_ := 0;
+    KEL.typ.int Email_Free_Cnt_Ev_Non_F_C_R_A_ := 0;
+    KEL.typ.int Email_I_S_P_Cnt_Ev_F_C_R_A_ := 0;
+    KEL.typ.int Email_I_S_P_Cnt_Ev_Non_F_C_R_A_ := 0;
+    KEL.typ.int Email_Unknown_Cnt_Ev_F_C_R_A_ := 0;
+    KEL.typ.int Email_Unknown_Cnt_Ev_Non_F_C_R_A_ := 0;
     Index_Build_Association_Res10_Internal_Layout_Emerging_Layout Emerging_;
     KEL.typ.nstr Emerging_Addr_Cnty_;
     KEL.typ.nstr Emerging_Addr_Geo_;
@@ -22886,6 +22955,16 @@ EXPORT L_Compile := MODULE
     KEL.typ.nstr P_L___Edu_Src_List_Ev_;
     KEL.typ.int P_L___Email_Cnt_Ev_F_C_R_A_ := 0;
     KEL.typ.int P_L___Email_Cnt_Ev_Non_F_C_R_A_ := 0;
+    KEL.typ.int P_L___Email_Corp_Cnt_Ev_F_C_R_A_ := 0;
+    KEL.typ.int P_L___Email_Corp_Cnt_Ev_Non_F_C_R_A_ := 0;
+    KEL.typ.int P_L___Email_Edu_Cnt_Ev_F_C_R_A_ := 0;
+    KEL.typ.int P_L___Email_Edu_Cnt_Ev_Non_F_C_R_A_ := 0;
+    KEL.typ.nstr P_L___Email_Flag_Ev_F_C_R_A_;
+    KEL.typ.nstr P_L___Email_Flag_Ev_Non_F_C_R_A_;
+    KEL.typ.int P_L___Email_Free_Cnt_Ev_F_C_R_A_ := 0;
+    KEL.typ.int P_L___Email_Free_Cnt_Ev_Non_F_C_R_A_ := 0;
+    KEL.typ.int P_L___Email_I_S_P_Cnt_Ev_F_C_R_A_ := 0;
+    KEL.typ.int P_L___Email_I_S_P_Cnt_Ev_Non_F_C_R_A_ := 0;
     KEL.typ.nint P_L___Emrg_Age_;
     KEL.typ.ntyp(E_Household().Typ) P_L___H_H_I_D_;
     KEL.typ.int P_L___H_H_Mmbr_Age18u_Cnt_ := 0;
@@ -22922,6 +23001,7 @@ EXPORT L_Compile := MODULE
     KEL.typ.nstr P_L___Prof_Lic_Actv_New_Src_Type_;
     KEL.typ.nstr P_L___Prof_Lic_Actv_New_Title_Type_;
     KEL.typ.nstr P_L___Prof_Lic_Actv_New_Type_;
+    KEL.typ.int P_L___Prof_Lic_Cnt_Ev_ := 0;
     KEL.typ.nstr P_L___Prof_Lic_Exp_Dt_List_Ev_;
     KEL.typ.str P_L___Prof_Lic_Flag_Ev_ := '';
     KEL.typ.nstr P_L___Prof_Lic_Indx_By_Lic_List_Ev_;
@@ -26218,6 +26298,7 @@ EXPORT L_Compile := MODULE
   END;
   SHARED Index_Build_Association_Res22_Internal_Layout_Reported_Dates_Of_Birth_Layout := RECORD
     KEL.typ.nkdate Date_Of_Birth_;
+    KEL.typ.nstr Date_Of_Birth_Padded_;
     KEL.typ.nbool Header_Hit_Flag_;
     KEL.typ.nbool Best_;
     KEL.typ.nbool Best_D_O_B_Rec_;
@@ -28665,6 +28746,16 @@ EXPORT L_Compile := MODULE
     KEL.typ.ndataset(Index_Build_Association_Res22_Internal_Layout_Edu_Rec_Ver_Source_List_Sorted_Layout) Edu_Rec_Ver_Source_List_Sorted_;
     KEL.typ.int Email_Cnt_Ev_F_C_R_A_ := 0;
     KEL.typ.int Email_Cnt_Ev_Non_F_C_R_A_ := 0;
+    KEL.typ.int Email_Corp_Cnt_Ev_F_C_R_A_ := 0;
+    KEL.typ.int Email_Corp_Cnt_Ev_Non_F_C_R_A_ := 0;
+    KEL.typ.int Email_Edu_Cnt_Ev_F_C_R_A_ := 0;
+    KEL.typ.int Email_Edu_Cnt_Ev_Non_F_C_R_A_ := 0;
+    KEL.typ.int Email_Free_Cnt_Ev_F_C_R_A_ := 0;
+    KEL.typ.int Email_Free_Cnt_Ev_Non_F_C_R_A_ := 0;
+    KEL.typ.int Email_I_S_P_Cnt_Ev_F_C_R_A_ := 0;
+    KEL.typ.int Email_I_S_P_Cnt_Ev_Non_F_C_R_A_ := 0;
+    KEL.typ.int Email_Unknown_Cnt_Ev_F_C_R_A_ := 0;
+    KEL.typ.int Email_Unknown_Cnt_Ev_Non_F_C_R_A_ := 0;
     Index_Build_Association_Res22_Internal_Layout_Emerging_Layout Emerging_;
     KEL.typ.nstr Emerging_Addr_Cnty_;
     KEL.typ.nstr Emerging_Addr_Geo_;
@@ -29076,6 +29167,16 @@ EXPORT L_Compile := MODULE
     KEL.typ.nstr P_L___Edu_Src_List_Ev_;
     KEL.typ.int P_L___Email_Cnt_Ev_F_C_R_A_ := 0;
     KEL.typ.int P_L___Email_Cnt_Ev_Non_F_C_R_A_ := 0;
+    KEL.typ.int P_L___Email_Corp_Cnt_Ev_F_C_R_A_ := 0;
+    KEL.typ.int P_L___Email_Corp_Cnt_Ev_Non_F_C_R_A_ := 0;
+    KEL.typ.int P_L___Email_Edu_Cnt_Ev_F_C_R_A_ := 0;
+    KEL.typ.int P_L___Email_Edu_Cnt_Ev_Non_F_C_R_A_ := 0;
+    KEL.typ.nstr P_L___Email_Flag_Ev_F_C_R_A_;
+    KEL.typ.nstr P_L___Email_Flag_Ev_Non_F_C_R_A_;
+    KEL.typ.int P_L___Email_Free_Cnt_Ev_F_C_R_A_ := 0;
+    KEL.typ.int P_L___Email_Free_Cnt_Ev_Non_F_C_R_A_ := 0;
+    KEL.typ.int P_L___Email_I_S_P_Cnt_Ev_F_C_R_A_ := 0;
+    KEL.typ.int P_L___Email_I_S_P_Cnt_Ev_Non_F_C_R_A_ := 0;
     KEL.typ.nint P_L___Emrg_Age_;
     KEL.typ.ntyp(E_Household().Typ) P_L___H_H_I_D_;
     KEL.typ.int P_L___H_H_Mmbr_Age18u_Cnt_ := 0;
@@ -29112,6 +29213,7 @@ EXPORT L_Compile := MODULE
     KEL.typ.nstr P_L___Prof_Lic_Actv_New_Src_Type_;
     KEL.typ.nstr P_L___Prof_Lic_Actv_New_Title_Type_;
     KEL.typ.nstr P_L___Prof_Lic_Actv_New_Type_;
+    KEL.typ.int P_L___Prof_Lic_Cnt_Ev_ := 0;
     KEL.typ.nstr P_L___Prof_Lic_Exp_Dt_List_Ev_;
     KEL.typ.str P_L___Prof_Lic_Flag_Ev_ := '';
     KEL.typ.nstr P_L___Prof_Lic_Indx_By_Lic_List_Ev_;
@@ -30129,6 +30231,7 @@ EXPORT L_Compile := MODULE
     KEL.typ.nstr First_Name_;
     KEL.typ.nstr Last_Name_;
     KEL.typ.nkdate Date_Of_Birth_;
+    KEL.typ.nstr Date_Of_Birth_Padded_;
     KEL.typ.nstr Primary_Range_;
     KEL.typ.nstr Predirectional_;
     KEL.typ.nstr Primary_Name_;
@@ -30946,6 +31049,7 @@ EXPORT L_Compile := MODULE
     KEL.typ.nstr First_Name_;
     KEL.typ.nstr Last_Name_;
     KEL.typ.nkdate Date_Of_Birth_;
+    KEL.typ.nstr Date_Of_Birth_Padded_;
     KEL.typ.nstr Primary_Range_;
     KEL.typ.nstr Predirectional_;
     KEL.typ.nstr Primary_Name_;
@@ -31239,6 +31343,7 @@ EXPORT L_Compile := MODULE
   END;
   SHARED Index_Build_Association_Res40_Internal_Layout_Reported_Dates_Of_Birth_Layout := RECORD
     KEL.typ.nkdate Date_Of_Birth_;
+    KEL.typ.nstr Date_Of_Birth_Padded_;
     KEL.typ.nbool Header_Hit_Flag_;
     KEL.typ.nbool Best_;
     KEL.typ.nbool Best_D_O_B_Rec_;
@@ -33686,6 +33791,16 @@ EXPORT L_Compile := MODULE
     KEL.typ.ndataset(Index_Build_Association_Res40_Internal_Layout_Edu_Rec_Ver_Source_List_Sorted_Layout) Edu_Rec_Ver_Source_List_Sorted_;
     KEL.typ.int Email_Cnt_Ev_F_C_R_A_ := 0;
     KEL.typ.int Email_Cnt_Ev_Non_F_C_R_A_ := 0;
+    KEL.typ.int Email_Corp_Cnt_Ev_F_C_R_A_ := 0;
+    KEL.typ.int Email_Corp_Cnt_Ev_Non_F_C_R_A_ := 0;
+    KEL.typ.int Email_Edu_Cnt_Ev_F_C_R_A_ := 0;
+    KEL.typ.int Email_Edu_Cnt_Ev_Non_F_C_R_A_ := 0;
+    KEL.typ.int Email_Free_Cnt_Ev_F_C_R_A_ := 0;
+    KEL.typ.int Email_Free_Cnt_Ev_Non_F_C_R_A_ := 0;
+    KEL.typ.int Email_I_S_P_Cnt_Ev_F_C_R_A_ := 0;
+    KEL.typ.int Email_I_S_P_Cnt_Ev_Non_F_C_R_A_ := 0;
+    KEL.typ.int Email_Unknown_Cnt_Ev_F_C_R_A_ := 0;
+    KEL.typ.int Email_Unknown_Cnt_Ev_Non_F_C_R_A_ := 0;
     Index_Build_Association_Res40_Internal_Layout_Emerging_Layout Emerging_;
     KEL.typ.nstr Emerging_Addr_Cnty_;
     KEL.typ.nstr Emerging_Addr_Geo_;
@@ -34097,6 +34212,16 @@ EXPORT L_Compile := MODULE
     KEL.typ.nstr P_L___Edu_Src_List_Ev_;
     KEL.typ.int P_L___Email_Cnt_Ev_F_C_R_A_ := 0;
     KEL.typ.int P_L___Email_Cnt_Ev_Non_F_C_R_A_ := 0;
+    KEL.typ.int P_L___Email_Corp_Cnt_Ev_F_C_R_A_ := 0;
+    KEL.typ.int P_L___Email_Corp_Cnt_Ev_Non_F_C_R_A_ := 0;
+    KEL.typ.int P_L___Email_Edu_Cnt_Ev_F_C_R_A_ := 0;
+    KEL.typ.int P_L___Email_Edu_Cnt_Ev_Non_F_C_R_A_ := 0;
+    KEL.typ.nstr P_L___Email_Flag_Ev_F_C_R_A_;
+    KEL.typ.nstr P_L___Email_Flag_Ev_Non_F_C_R_A_;
+    KEL.typ.int P_L___Email_Free_Cnt_Ev_F_C_R_A_ := 0;
+    KEL.typ.int P_L___Email_Free_Cnt_Ev_Non_F_C_R_A_ := 0;
+    KEL.typ.int P_L___Email_I_S_P_Cnt_Ev_F_C_R_A_ := 0;
+    KEL.typ.int P_L___Email_I_S_P_Cnt_Ev_Non_F_C_R_A_ := 0;
     KEL.typ.nint P_L___Emrg_Age_;
     KEL.typ.ntyp(E_Household().Typ) P_L___H_H_I_D_;
     KEL.typ.int P_L___H_H_Mmbr_Age18u_Cnt_ := 0;
@@ -34133,6 +34258,7 @@ EXPORT L_Compile := MODULE
     KEL.typ.nstr P_L___Prof_Lic_Actv_New_Src_Type_;
     KEL.typ.nstr P_L___Prof_Lic_Actv_New_Title_Type_;
     KEL.typ.nstr P_L___Prof_Lic_Actv_New_Type_;
+    KEL.typ.int P_L___Prof_Lic_Cnt_Ev_ := 0;
     KEL.typ.nstr P_L___Prof_Lic_Exp_Dt_List_Ev_;
     KEL.typ.str P_L___Prof_Lic_Flag_Ev_ := '';
     KEL.typ.nstr P_L___Prof_Lic_Indx_By_Lic_List_Ev_;
@@ -35287,6 +35413,7 @@ EXPORT L_Compile := MODULE
     KEL.typ.nstr First_Name_;
     KEL.typ.nstr Last_Name_;
     KEL.typ.nkdate Date_Of_Birth_;
+    KEL.typ.nstr Date_Of_Birth_Padded_;
     KEL.typ.nstr Primary_Range_;
     KEL.typ.nstr Predirectional_;
     KEL.typ.nstr Primary_Name_;
@@ -39129,6 +39256,7 @@ EXPORT L_Compile := MODULE
   END;
   SHARED Index_Build_Association_Res67_Internal_Layout_Reported_Dates_Of_Birth_Layout := RECORD
     KEL.typ.nkdate Date_Of_Birth_;
+    KEL.typ.nstr Date_Of_Birth_Padded_;
     KEL.typ.nbool Header_Hit_Flag_;
     KEL.typ.nbool Best_;
     KEL.typ.nbool Best_D_O_B_Rec_;
@@ -41576,6 +41704,16 @@ EXPORT L_Compile := MODULE
     KEL.typ.ndataset(Index_Build_Association_Res67_Internal_Layout_Edu_Rec_Ver_Source_List_Sorted_Layout) Edu_Rec_Ver_Source_List_Sorted_;
     KEL.typ.int Email_Cnt_Ev_F_C_R_A_ := 0;
     KEL.typ.int Email_Cnt_Ev_Non_F_C_R_A_ := 0;
+    KEL.typ.int Email_Corp_Cnt_Ev_F_C_R_A_ := 0;
+    KEL.typ.int Email_Corp_Cnt_Ev_Non_F_C_R_A_ := 0;
+    KEL.typ.int Email_Edu_Cnt_Ev_F_C_R_A_ := 0;
+    KEL.typ.int Email_Edu_Cnt_Ev_Non_F_C_R_A_ := 0;
+    KEL.typ.int Email_Free_Cnt_Ev_F_C_R_A_ := 0;
+    KEL.typ.int Email_Free_Cnt_Ev_Non_F_C_R_A_ := 0;
+    KEL.typ.int Email_I_S_P_Cnt_Ev_F_C_R_A_ := 0;
+    KEL.typ.int Email_I_S_P_Cnt_Ev_Non_F_C_R_A_ := 0;
+    KEL.typ.int Email_Unknown_Cnt_Ev_F_C_R_A_ := 0;
+    KEL.typ.int Email_Unknown_Cnt_Ev_Non_F_C_R_A_ := 0;
     Index_Build_Association_Res67_Internal_Layout_Emerging_Layout Emerging_;
     KEL.typ.nstr Emerging_Addr_Cnty_;
     KEL.typ.nstr Emerging_Addr_Geo_;
@@ -41987,6 +42125,16 @@ EXPORT L_Compile := MODULE
     KEL.typ.nstr P_L___Edu_Src_List_Ev_;
     KEL.typ.int P_L___Email_Cnt_Ev_F_C_R_A_ := 0;
     KEL.typ.int P_L___Email_Cnt_Ev_Non_F_C_R_A_ := 0;
+    KEL.typ.int P_L___Email_Corp_Cnt_Ev_F_C_R_A_ := 0;
+    KEL.typ.int P_L___Email_Corp_Cnt_Ev_Non_F_C_R_A_ := 0;
+    KEL.typ.int P_L___Email_Edu_Cnt_Ev_F_C_R_A_ := 0;
+    KEL.typ.int P_L___Email_Edu_Cnt_Ev_Non_F_C_R_A_ := 0;
+    KEL.typ.nstr P_L___Email_Flag_Ev_F_C_R_A_;
+    KEL.typ.nstr P_L___Email_Flag_Ev_Non_F_C_R_A_;
+    KEL.typ.int P_L___Email_Free_Cnt_Ev_F_C_R_A_ := 0;
+    KEL.typ.int P_L___Email_Free_Cnt_Ev_Non_F_C_R_A_ := 0;
+    KEL.typ.int P_L___Email_I_S_P_Cnt_Ev_F_C_R_A_ := 0;
+    KEL.typ.int P_L___Email_I_S_P_Cnt_Ev_Non_F_C_R_A_ := 0;
     KEL.typ.nint P_L___Emrg_Age_;
     KEL.typ.ntyp(E_Household().Typ) P_L___H_H_I_D_;
     KEL.typ.int P_L___H_H_Mmbr_Age18u_Cnt_ := 0;
@@ -42023,6 +42171,7 @@ EXPORT L_Compile := MODULE
     KEL.typ.nstr P_L___Prof_Lic_Actv_New_Src_Type_;
     KEL.typ.nstr P_L___Prof_Lic_Actv_New_Title_Type_;
     KEL.typ.nstr P_L___Prof_Lic_Actv_New_Type_;
+    KEL.typ.int P_L___Prof_Lic_Cnt_Ev_ := 0;
     KEL.typ.nstr P_L___Prof_Lic_Exp_Dt_List_Ev_;
     KEL.typ.str P_L___Prof_Lic_Flag_Ev_ := '';
     KEL.typ.nstr P_L___Prof_Lic_Indx_By_Lic_List_Ev_;
@@ -42368,6 +42517,7 @@ EXPORT L_Compile := MODULE
     KEL.typ.nstr First_Name_;
     KEL.typ.nstr Last_Name_;
     KEL.typ.nkdate Date_Of_Birth_;
+    KEL.typ.nstr Date_Of_Birth_Padded_;
     KEL.typ.nstr Primary_Range_;
     KEL.typ.nstr Predirectional_;
     KEL.typ.nstr Primary_Name_;
@@ -42506,6 +42656,7 @@ EXPORT L_Compile := MODULE
   END;
   SHARED Index_Build_Association_Res71_Internal_Layout_Reported_Dates_Of_Birth_Layout := RECORD
     KEL.typ.nkdate Date_Of_Birth_;
+    KEL.typ.nstr Date_Of_Birth_Padded_;
     KEL.typ.nbool Header_Hit_Flag_;
     KEL.typ.nbool Best_;
     KEL.typ.nbool Best_D_O_B_Rec_;
@@ -44953,6 +45104,16 @@ EXPORT L_Compile := MODULE
     KEL.typ.ndataset(Index_Build_Association_Res71_Internal_Layout_Edu_Rec_Ver_Source_List_Sorted_Layout) Edu_Rec_Ver_Source_List_Sorted_;
     KEL.typ.int Email_Cnt_Ev_F_C_R_A_ := 0;
     KEL.typ.int Email_Cnt_Ev_Non_F_C_R_A_ := 0;
+    KEL.typ.int Email_Corp_Cnt_Ev_F_C_R_A_ := 0;
+    KEL.typ.int Email_Corp_Cnt_Ev_Non_F_C_R_A_ := 0;
+    KEL.typ.int Email_Edu_Cnt_Ev_F_C_R_A_ := 0;
+    KEL.typ.int Email_Edu_Cnt_Ev_Non_F_C_R_A_ := 0;
+    KEL.typ.int Email_Free_Cnt_Ev_F_C_R_A_ := 0;
+    KEL.typ.int Email_Free_Cnt_Ev_Non_F_C_R_A_ := 0;
+    KEL.typ.int Email_I_S_P_Cnt_Ev_F_C_R_A_ := 0;
+    KEL.typ.int Email_I_S_P_Cnt_Ev_Non_F_C_R_A_ := 0;
+    KEL.typ.int Email_Unknown_Cnt_Ev_F_C_R_A_ := 0;
+    KEL.typ.int Email_Unknown_Cnt_Ev_Non_F_C_R_A_ := 0;
     Index_Build_Association_Res71_Internal_Layout_Emerging_Layout Emerging_;
     KEL.typ.nstr Emerging_Addr_Cnty_;
     KEL.typ.nstr Emerging_Addr_Geo_;
@@ -45364,6 +45525,16 @@ EXPORT L_Compile := MODULE
     KEL.typ.nstr P_L___Edu_Src_List_Ev_;
     KEL.typ.int P_L___Email_Cnt_Ev_F_C_R_A_ := 0;
     KEL.typ.int P_L___Email_Cnt_Ev_Non_F_C_R_A_ := 0;
+    KEL.typ.int P_L___Email_Corp_Cnt_Ev_F_C_R_A_ := 0;
+    KEL.typ.int P_L___Email_Corp_Cnt_Ev_Non_F_C_R_A_ := 0;
+    KEL.typ.int P_L___Email_Edu_Cnt_Ev_F_C_R_A_ := 0;
+    KEL.typ.int P_L___Email_Edu_Cnt_Ev_Non_F_C_R_A_ := 0;
+    KEL.typ.nstr P_L___Email_Flag_Ev_F_C_R_A_;
+    KEL.typ.nstr P_L___Email_Flag_Ev_Non_F_C_R_A_;
+    KEL.typ.int P_L___Email_Free_Cnt_Ev_F_C_R_A_ := 0;
+    KEL.typ.int P_L___Email_Free_Cnt_Ev_Non_F_C_R_A_ := 0;
+    KEL.typ.int P_L___Email_I_S_P_Cnt_Ev_F_C_R_A_ := 0;
+    KEL.typ.int P_L___Email_I_S_P_Cnt_Ev_Non_F_C_R_A_ := 0;
     KEL.typ.nint P_L___Emrg_Age_;
     KEL.typ.ntyp(E_Household().Typ) P_L___H_H_I_D_;
     KEL.typ.int P_L___H_H_Mmbr_Age18u_Cnt_ := 0;
@@ -45400,6 +45571,7 @@ EXPORT L_Compile := MODULE
     KEL.typ.nstr P_L___Prof_Lic_Actv_New_Src_Type_;
     KEL.typ.nstr P_L___Prof_Lic_Actv_New_Title_Type_;
     KEL.typ.nstr P_L___Prof_Lic_Actv_New_Type_;
+    KEL.typ.int P_L___Prof_Lic_Cnt_Ev_ := 0;
     KEL.typ.nstr P_L___Prof_Lic_Exp_Dt_List_Ev_;
     KEL.typ.str P_L___Prof_Lic_Flag_Ev_ := '';
     KEL.typ.nstr P_L___Prof_Lic_Indx_By_Lic_List_Ev_;
@@ -47708,6 +47880,7 @@ EXPORT L_Compile := MODULE
   END;
   SHARED Index_Build_Association_Res73_Internal_Layout_Reported_Dates_Of_Birth_Layout := RECORD
     KEL.typ.nkdate Date_Of_Birth_;
+    KEL.typ.nstr Date_Of_Birth_Padded_;
     KEL.typ.nbool Header_Hit_Flag_;
     KEL.typ.nbool Best_;
     KEL.typ.nbool Best_D_O_B_Rec_;
@@ -50155,6 +50328,16 @@ EXPORT L_Compile := MODULE
     KEL.typ.ndataset(Index_Build_Association_Res73_Internal_Layout_Edu_Rec_Ver_Source_List_Sorted_Layout) Edu_Rec_Ver_Source_List_Sorted_;
     KEL.typ.int Email_Cnt_Ev_F_C_R_A_ := 0;
     KEL.typ.int Email_Cnt_Ev_Non_F_C_R_A_ := 0;
+    KEL.typ.int Email_Corp_Cnt_Ev_F_C_R_A_ := 0;
+    KEL.typ.int Email_Corp_Cnt_Ev_Non_F_C_R_A_ := 0;
+    KEL.typ.int Email_Edu_Cnt_Ev_F_C_R_A_ := 0;
+    KEL.typ.int Email_Edu_Cnt_Ev_Non_F_C_R_A_ := 0;
+    KEL.typ.int Email_Free_Cnt_Ev_F_C_R_A_ := 0;
+    KEL.typ.int Email_Free_Cnt_Ev_Non_F_C_R_A_ := 0;
+    KEL.typ.int Email_I_S_P_Cnt_Ev_F_C_R_A_ := 0;
+    KEL.typ.int Email_I_S_P_Cnt_Ev_Non_F_C_R_A_ := 0;
+    KEL.typ.int Email_Unknown_Cnt_Ev_F_C_R_A_ := 0;
+    KEL.typ.int Email_Unknown_Cnt_Ev_Non_F_C_R_A_ := 0;
     Index_Build_Association_Res73_Internal_Layout_Emerging_Layout Emerging_;
     KEL.typ.nstr Emerging_Addr_Cnty_;
     KEL.typ.nstr Emerging_Addr_Geo_;
@@ -50566,6 +50749,16 @@ EXPORT L_Compile := MODULE
     KEL.typ.nstr P_L___Edu_Src_List_Ev_;
     KEL.typ.int P_L___Email_Cnt_Ev_F_C_R_A_ := 0;
     KEL.typ.int P_L___Email_Cnt_Ev_Non_F_C_R_A_ := 0;
+    KEL.typ.int P_L___Email_Corp_Cnt_Ev_F_C_R_A_ := 0;
+    KEL.typ.int P_L___Email_Corp_Cnt_Ev_Non_F_C_R_A_ := 0;
+    KEL.typ.int P_L___Email_Edu_Cnt_Ev_F_C_R_A_ := 0;
+    KEL.typ.int P_L___Email_Edu_Cnt_Ev_Non_F_C_R_A_ := 0;
+    KEL.typ.nstr P_L___Email_Flag_Ev_F_C_R_A_;
+    KEL.typ.nstr P_L___Email_Flag_Ev_Non_F_C_R_A_;
+    KEL.typ.int P_L___Email_Free_Cnt_Ev_F_C_R_A_ := 0;
+    KEL.typ.int P_L___Email_Free_Cnt_Ev_Non_F_C_R_A_ := 0;
+    KEL.typ.int P_L___Email_I_S_P_Cnt_Ev_F_C_R_A_ := 0;
+    KEL.typ.int P_L___Email_I_S_P_Cnt_Ev_Non_F_C_R_A_ := 0;
     KEL.typ.nint P_L___Emrg_Age_;
     KEL.typ.ntyp(E_Household().Typ) P_L___H_H_I_D_;
     KEL.typ.int P_L___H_H_Mmbr_Age18u_Cnt_ := 0;
@@ -50602,6 +50795,7 @@ EXPORT L_Compile := MODULE
     KEL.typ.nstr P_L___Prof_Lic_Actv_New_Src_Type_;
     KEL.typ.nstr P_L___Prof_Lic_Actv_New_Title_Type_;
     KEL.typ.nstr P_L___Prof_Lic_Actv_New_Type_;
+    KEL.typ.int P_L___Prof_Lic_Cnt_Ev_ := 0;
     KEL.typ.nstr P_L___Prof_Lic_Exp_Dt_List_Ev_;
     KEL.typ.str P_L___Prof_Lic_Flag_Ev_ := '';
     KEL.typ.nstr P_L___Prof_Lic_Indx_By_Lic_List_Ev_;
@@ -51287,6 +51481,7 @@ EXPORT L_Compile := MODULE
     KEL.typ.nstr First_Name_;
     KEL.typ.nstr Last_Name_;
     KEL.typ.nkdate Date_Of_Birth_;
+    KEL.typ.nstr Date_Of_Birth_Padded_;
     KEL.typ.nstr Primary_Range_;
     KEL.typ.nstr Predirectional_;
     KEL.typ.nstr Primary_Name_;
@@ -51414,6 +51609,7 @@ EXPORT L_Compile := MODULE
     KEL.typ.nstr First_Name_;
     KEL.typ.nstr Last_Name_;
     KEL.typ.nkdate Date_Of_Birth_;
+    KEL.typ.nstr Date_Of_Birth_Padded_;
     KEL.typ.nstr Primary_Range_;
     KEL.typ.nstr Predirectional_;
     KEL.typ.nstr Primary_Name_;
@@ -52009,6 +52205,7 @@ EXPORT L_Compile := MODULE
   END;
   SHARED Index_Build_Association_Res79_Internal_Layout_Reported_Dates_Of_Birth_Layout := RECORD
     KEL.typ.nkdate Date_Of_Birth_;
+    KEL.typ.nstr Date_Of_Birth_Padded_;
     KEL.typ.nbool Header_Hit_Flag_;
     KEL.typ.nbool Best_;
     KEL.typ.nbool Best_D_O_B_Rec_;
@@ -54456,6 +54653,16 @@ EXPORT L_Compile := MODULE
     KEL.typ.ndataset(Index_Build_Association_Res79_Internal_Layout_Edu_Rec_Ver_Source_List_Sorted_Layout) Edu_Rec_Ver_Source_List_Sorted_;
     KEL.typ.int Email_Cnt_Ev_F_C_R_A_ := 0;
     KEL.typ.int Email_Cnt_Ev_Non_F_C_R_A_ := 0;
+    KEL.typ.int Email_Corp_Cnt_Ev_F_C_R_A_ := 0;
+    KEL.typ.int Email_Corp_Cnt_Ev_Non_F_C_R_A_ := 0;
+    KEL.typ.int Email_Edu_Cnt_Ev_F_C_R_A_ := 0;
+    KEL.typ.int Email_Edu_Cnt_Ev_Non_F_C_R_A_ := 0;
+    KEL.typ.int Email_Free_Cnt_Ev_F_C_R_A_ := 0;
+    KEL.typ.int Email_Free_Cnt_Ev_Non_F_C_R_A_ := 0;
+    KEL.typ.int Email_I_S_P_Cnt_Ev_F_C_R_A_ := 0;
+    KEL.typ.int Email_I_S_P_Cnt_Ev_Non_F_C_R_A_ := 0;
+    KEL.typ.int Email_Unknown_Cnt_Ev_F_C_R_A_ := 0;
+    KEL.typ.int Email_Unknown_Cnt_Ev_Non_F_C_R_A_ := 0;
     Index_Build_Association_Res79_Internal_Layout_Emerging_Layout Emerging_;
     KEL.typ.nstr Emerging_Addr_Cnty_;
     KEL.typ.nstr Emerging_Addr_Geo_;
@@ -54867,6 +55074,16 @@ EXPORT L_Compile := MODULE
     KEL.typ.nstr P_L___Edu_Src_List_Ev_;
     KEL.typ.int P_L___Email_Cnt_Ev_F_C_R_A_ := 0;
     KEL.typ.int P_L___Email_Cnt_Ev_Non_F_C_R_A_ := 0;
+    KEL.typ.int P_L___Email_Corp_Cnt_Ev_F_C_R_A_ := 0;
+    KEL.typ.int P_L___Email_Corp_Cnt_Ev_Non_F_C_R_A_ := 0;
+    KEL.typ.int P_L___Email_Edu_Cnt_Ev_F_C_R_A_ := 0;
+    KEL.typ.int P_L___Email_Edu_Cnt_Ev_Non_F_C_R_A_ := 0;
+    KEL.typ.nstr P_L___Email_Flag_Ev_F_C_R_A_;
+    KEL.typ.nstr P_L___Email_Flag_Ev_Non_F_C_R_A_;
+    KEL.typ.int P_L___Email_Free_Cnt_Ev_F_C_R_A_ := 0;
+    KEL.typ.int P_L___Email_Free_Cnt_Ev_Non_F_C_R_A_ := 0;
+    KEL.typ.int P_L___Email_I_S_P_Cnt_Ev_F_C_R_A_ := 0;
+    KEL.typ.int P_L___Email_I_S_P_Cnt_Ev_Non_F_C_R_A_ := 0;
     KEL.typ.nint P_L___Emrg_Age_;
     KEL.typ.ntyp(E_Household().Typ) P_L___H_H_I_D_;
     KEL.typ.int P_L___H_H_Mmbr_Age18u_Cnt_ := 0;
@@ -54903,6 +55120,7 @@ EXPORT L_Compile := MODULE
     KEL.typ.nstr P_L___Prof_Lic_Actv_New_Src_Type_;
     KEL.typ.nstr P_L___Prof_Lic_Actv_New_Title_Type_;
     KEL.typ.nstr P_L___Prof_Lic_Actv_New_Type_;
+    KEL.typ.int P_L___Prof_Lic_Cnt_Ev_ := 0;
     KEL.typ.nstr P_L___Prof_Lic_Exp_Dt_List_Ev_;
     KEL.typ.str P_L___Prof_Lic_Flag_Ev_ := '';
     KEL.typ.nstr P_L___Prof_Lic_Indx_By_Lic_List_Ev_;
