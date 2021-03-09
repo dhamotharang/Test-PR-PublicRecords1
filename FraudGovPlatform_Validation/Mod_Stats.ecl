@@ -225,7 +225,7 @@ END;
 					,if(l.field3<>'','','E001') //Transaction_ID_Number
 					,if(l.field4<>'','','E001') //Reason_for_Transaction_Activity
 					,if(_Validate.Date.fIsValid(l.field5) and (unsigned)l.field5 <= (unsigned)(STRING8)Std.Date.Today(),'','E002') //Date_of_Transaction
-					,if(l.field6 in ['JR','SR','I','II','III','IV','V','VI','VII','VIII','IX','X',''],'','W001') //raw_Orig_Suffix
+					,if(l.field6 in ['JR','SR','JR.','SR.','I','II','III','IV','V','VI','VII','VIII','IX','X',''],'','W001') //raw_Orig_Suffix
 					);
 
 				err_KnownFraud:=choose(c
@@ -234,7 +234,7 @@ END;
 					,if(l.field3<>'','','E001') //reported_time
 					,if(l.field4<>'','','E001') //reported_by
 					,'' //field5
-					,if(l.field6 in ['JR','SR','I','II','III','IV','V','VI','VII','VIII','IX','X',''],'','W001') //raw_Orig_Suffix
+					,if(l.field6 in ['JR','SR','JR.','SR.','I','II','III','IV','V','VI','VII','VIII','IX','X',''],'','W001') //raw_Orig_Suffix
 					);			
 
 				err_Safelist:=choose(c
@@ -243,7 +243,7 @@ END;
 					,if(l.field3<>'','','E001') //reported_time
 					,if(l.field4<>'','','E001') //reported_by
 					,'' //field5
-					,if(l.field6 in ['JR','SR','I','II','III','IV','V','VI','VII','VIII','IX','X',''],'','W001') //raw_Orig_Suffix
+					,if(l.field6 in ['JR','SR','JR.','SR.','I','II','III','IV','V','VI','VII','VIII','IX','X',''],'','W001') //raw_Orig_Suffix
 					);		
 
 				err_Deltabase:=choose(c
@@ -252,7 +252,7 @@ END;
 					,if(l.field3<>'','','E001') //user_added
 					,'' //field4
 					,'' //field5
-					,if(l.field6 in ['JR','SR','I','II','III','IV','V','VI','VII','VIII','IX','X',''],'','W001') //raw_Orig_Suffix
+					,if(l.field6 in ['JR','SR','JR.','SR.','I','II','III','IV','V','VI','VII','VIII','IX','X',''],'','W001') //raw_Orig_Suffix
 					);											
 										
 				self.err :=	MAP (
