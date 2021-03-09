@@ -79,9 +79,9 @@ function
 																			'http://prod_esp:8010/WsWorkunits/WUInfo?Wuid='	+	workunit
 																		);
 	
-	return	sequential(	//sprayFileNational,
+	return	sequential(	sprayFileNational,
 											//addSuperNational,
-											//doDMA,
+											doDMA,
 											//buildNationalBase,
 											//buildBase,
                                             DMA.proc_build_tps_all(fileDate, build_full).proc_build_base,

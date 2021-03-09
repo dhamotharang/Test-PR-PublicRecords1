@@ -42,7 +42,7 @@ export stats(string filedate) := function
     return sequential(  
                         output(count(base_dev_dedup), named('dev_base_record_count')),
                         output(count(base_prod_dedup), named('prod_base_record_count')),
-                        output(extra_in_dev_base,, '~thor400::tps::base::extra_in_dev_base', overwrite),
+                         output(extra_in_dev_base,, '~thor400::tps::base::extra_in_dev_base', overwrite),
                         output(missing_from_dev_base,, '~thor400::tps::base::missing_from_dev_base', overwrite),
                         output(count(key_dev_dedup), named('dev_key_record_count')),
                         output(count(key_prod_dedup), named('prod_key_record_count')),
@@ -51,6 +51,6 @@ export stats(string filedate) := function
                         output(count(adds),named('new_delta_adds')),
                         output(count(deletes),named('new_delta_deletes')),
                         output(adds,named('adds_sample')),
-                        output(deletes,named('deletes_sample')),
+                        output(deletes,named('deletes_sample')), 
     );
 end;
