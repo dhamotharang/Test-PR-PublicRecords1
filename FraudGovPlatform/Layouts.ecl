@@ -267,6 +267,7 @@ EXPORT Layouts := MODULE
 			string	field3	:= '';
 			string 	field4	:= '';
 			string  field5	:= '';
+			string  field6	:= ''; //raw_Orig_Suffix
 		END;
 		
 		EXPORT DisposableEmailDomains := Record
