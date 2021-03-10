@@ -1,4 +1,4 @@
-﻿import official_records, lib_keylib,lib_fileservices,ut;
+﻿import official_records, lib_keylib,lib_fileservices,ut,std;
 
 // Party Full File
 
@@ -62,7 +62,7 @@ self.title1 :=  map(
 					l.entity_nm = 'AAA TIME SHARE RESALES' => '', l.title1);
 					
 
-	
+	self.doc_type_desc := trim(Std.Str.ToUpperCase(l.doc_type_desc),left,right); 
 	self := l;
 end;
 
@@ -190,7 +190,7 @@ self.prior_doc_file_num := if(l.prior_doc_file_num = '0000000000','',l.prior_doc
 self.prior_book_num := if(l.prior_book_num = '0000000000','',l.prior_book_num);
 self.prior_page_num := if(l.prior_page_num = '00000','',l.prior_page_num);
 self.execution_dt := if(l.execution_dt = '00000000','',l.execution_dt);
-self.doc_type_desc := if(l.doc_type_desc = 'DISSOULTION OF MARRIAGE','DISSOLUTION OF MARRIAGE',l.doc_type_desc);
+self.doc_type_desc := if(l.doc_type_desc = 'DISSOULTION OF MARRIAGE','DISSOLUTION OF MARRIAGE',trim(Std.Str.ToUpperCase(l.doc_type_desc),left,right)); 
 self := l;
 end;
 
