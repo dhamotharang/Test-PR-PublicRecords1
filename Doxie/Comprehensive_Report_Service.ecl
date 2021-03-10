@@ -80,6 +80,7 @@
   <part name="IncludeFirearmsAndExplosives" type="xsd:boolean"/>
   <part name="IncludeWeaponPermits" type="xsd:boolean"/>
   <part name="IncludeSexualOffenses" type="xsd:boolean"/>
+  <part name="IncludeRealTimePhones" type="xsd:boolean"/>
 
   <part name="IncludeInternetDomains" type="xsd:boolean"/>
 
@@ -182,7 +183,8 @@
 */
 /*--INFO-- This service searches all available datafiles.*/
 
-import AutoheaderV2, Gateway, doxie, CriminalRecords_Services, doxie_crs, doxie_raw, DriversV2_Services, images, Royalty, ut;
+import  AutoheaderV2, Gateway, doxie, CriminalRecords_Services, doxie_crs, doxie_raw, 
+        DriversV2_Services, images, Royalty, ut, Phones;
 
 export Comprehensive_Report_Service := MACRO
 #CONSTANT('SearchLibraryVersion', AutoheaderV2.Constants.LibVersion.SALT);
@@ -217,10 +219,15 @@ mod_access := doxie.compliance.GetGlobalDataAccessModule ();
 doxie.MAC_Selection_Declare();
 boolean is_consumer := mod_access.isConsumer();
 
+// get realtime phones
+useRTP := Include_RealTimePhones and
+          doxie.Compliance.use_qsent(mod_access.DataPermissionMask) and
+          not doxie.Compliance.isQSentRestricted(mod_access.DataRestrictionMask);
+
 // use non-remote header data; non-fcra;
 dids := doxie.get_dids();
 ds_header := doxie.central_header (dids, mod_access, false, false, in_getSSNBest);
-cent := doxie.central_records (ds_header, mod_access, false, 'D');
+cent := doxie.central_records (ds_header, mod_access, false, 'D', skipPhonesPlus := useRTP);
 
 //pick up the distributed records
 
@@ -229,8 +236,8 @@ vehi := if(VehicleVersion in [0,1],doxie.vehicle_search_records_crs);
 vehi2 := if(VehicleVersion in [0,2] and Include_MotorVehicles_val,doxie.vehicleV2_search_records_crs(dids, Use_CurrentlyOwnedVehicles_value));
 rt_cent := normalize (choosen (cent, 1), left.RealTime_Vehicle_children, transform(right));
 vehV2_geo := IF(~AppendRTVeh,vehi2,vehi2+doxie.vehicleV2_transform_records_crs(rt_cent));
-vehV2_nogeo := project(vehV2_geo, VehicleV2_Services.Functions.RemoveLatLong(left));
-vehV2 := if (includeGeoLocation, vehV2_geo, vehV2_nogeo);
+vehV2_nogeno := project(vehV2_geo, VehicleV2_Services.Functions.RemoveLatLong(left));
+vehV2 := if (includeGeoLocation, vehV2_geo, vehV2_nogeno);
 sexo := if (Include_SexualOffenses_val, dedup(doxie.sexoffender_search_records (),seisint_primary_key));
 dlsr := if(DlVersion in [0,1],doxie.dl_search_records);
 dlsr2 := if(DlVersion in [0,2] and Include_DriversLicenses_val,DriversV2_Services.DLEmbed_records(dids));
@@ -257,6 +264,24 @@ end;
 crmr := CriminalRecords_Services.ReportService_Records.val(crim_mod);
 docr2 := IF (CriminalRecordVersion = 2 and Include_CriminalRecords_val,crmr[1].CriminalRecords);
 
+in_mod := MODULE(doxie.realTimePhonesParams.searchParams)
+    doxie.compliance.MAC_CopyModAccessValues(mod_access);
+    EXPORT STRING11   SSN := ds_header[1].best_information_children[1].ssn;
+    EXPORT STRING30   LastName := ds_header[1].best_information_children[1].lname;
+		EXPORT DATASET(Gateway.Layouts.Config) Gateways := gateways_in;
+  END;
+
+rtprecs_remote := IF(useRTP, Doxie.get_realtime_phones_remote(in_mod, useRTP));
+rtprecs_results := rtprecs_remote.Results((UNSIGNED6)did=dids[1].did);
+
+inhouseRTP(STRING tflag) := tflag NOT IN [Phones.Constants.TypeFlag.DataSource_PV,Phones.Constants.TypeFlag.DataSource_iQ411];
+
+rtprecs := PROJECT(
+             //  gw records to the top, only inhouse records have dt last seen.
+             SORT(rtprecs_results, IF(inhouseRTP(typeflag), 1, 0), -dt_last_seen, RECORD),
+               TRANSFORM(Doxie.layout_realTimePhones.rtp_out_layout_final, SELF := LEFT));
+
+rtprecs_royalties := rtprecs_remote.RoyaltySet;
 
 //**** Full record def
 outrec := doxie_crs.layout_report;
@@ -273,6 +298,7 @@ outrec patch(cent l) := transform
   self.DOC2_children := global(docr2);
   self.TransactionHistory := global(transaction_hist);
   self.progressive_Phones := global(progressivePhones);
+  self.realtime_phones_children := IF(useRTP, global(rtpRecs));
   self := l;
 end;
 
@@ -289,7 +315,7 @@ end;
 //***** SOURCE WORK *****
 
 // if u include a new entry into doxie.Source_counts
-//update the count below this transform in normalize
+// update the count below this transform in normalize
 layout_flag into_flags(src_recs L, integer C) := transform
   self.field_present := choose(C,
             if (L.atf_cnt != 0,'ATF', skip),
@@ -366,7 +392,7 @@ recflags2 := normalize(header_recs, 3, into_flags2(LEFT,COUNTER));
 
 recflags := if (not Exclude_Sources_val, dedup(recflags1 + recflags2,all));
 
-//***** ROYALTY WORK *****
+// ***** ROYALTY WORK *****
 
 doxie_crs.layout_property_ln property_child(doxie_crs.layout_property_ln l):= transform
 self := l;
@@ -395,12 +421,13 @@ Royalty.MAC_RoyaltyEmail(all_records.email_children, royalties_email,, false);
 Royalty.RoyaltyVehicles.MAC_ReportSet(all_records.RealTime_Vehicle_children, royalties_rtv, datasource, vehicleinfo.vin);
 Royalty.RoyaltyEFXDataMart.MAC_GetWebRoyalties(all_records.premium_phone_children,equifax_royalties,vendor,MDR.sourceTools.src_EQUIFAX);
 FDN_Royalties := Royalty.RoyaltyFDNCoRR.GetOnlineRoyalties(FDNrecords_table);
-//----------------------------------------
+// ----------------------------------------
 trackFares := not is_consumer and (Include_Properties_val or Include_PriorProperties or Include_foreclosures_val);
 royalties := if(trackFares,royalties_fares) +
              if(Include_Email_Addresses_val,if(EmailVersion=2, cent.EmailV2Royalties, royalties_email)) +
              if(IncludeRTVeh_val, royalties_rtv) +
              if(Include_PremiumPhones_val, equifax_royalties) +
+             if(useRTP, rtpRecs_royalties) +
              if(IncludeFDNSubjectOnly or IncludeFDNAllAssociations, FDN_Royalties);
 
 //***** ALERT WORK *****
@@ -422,7 +449,7 @@ DO_ALL :=
       output(use_records,named('CRS_result')),
       output(src_recs,named('Source_Counts')),
       output(recflags,named('Source_Flags')),
-      output(royalties,named('RoyaltySet')))),
+      output(royalties,named('RoyaltySet'))));
   IF(sendHashes or versionChange,
     parallel(
       output(outputHashes,named('Hashes')),

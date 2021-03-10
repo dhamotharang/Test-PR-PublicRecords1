@@ -114,7 +114,7 @@ EXPORT out_rec SmartLinxReport (dataset (doxie.layout_references) dids,
 	    self.addressSequence := c; 
 			self := l;
 	end;
-	//end of current indicator temp fix using TNT value.
+	// end of current indicator temp fix using TNT value.
 	//=======================================================================
 
 	s_addresses := project(subject_addrs_TNT, setCurrent(LEFT));
@@ -133,14 +133,16 @@ EXPORT out_rec SmartLinxReport (dataset (doxie.layout_references) dids,
 	p_imposter_entities := choosen(SmartRollup.fn_smart_imposter_entities(subject_imposters),  iesp.Constants.SMART.MaxImposters);
 	s_imposters_count := count(s_imposters);
   p_imposters      := choosen (s_imposters,  iesp.Constants.SMART.MaxImposters);
+  
   s_relatives      := IF (mod_smartlinx.include_relatives, pers.RelativesSlim, dataset([],iesp.bpsreport.t_BpsReportRelativeSlim));
 	s_relatives_count := count(s_relatives);
 	relativesBase    := project(choosen (s_relatives,  iesp.constants.SMART.MaxRelatives),transform(iesp.smartlinxreport.t_SLRRelative, self.title := '', self.relativeofUniqueId := '', self := LEFT, self := []));;
 	relativesOf      := SmartRollup.fn_relativeOf(relativesBase,subject_did,mod_smartlinx);
 	relativesTitle   := relativesOf;  // now titles are taken directly from new relatives' index
 	p_relatives      := relativesTitle;
+     
 
-	//Neighbors only want for subjects "current/newest" address,  20 addresses (10up10down), 2 Residents
+	// Neighbors only want for subjects "current/newest" address,  20 addresses (10up10down), 2 Residents
 	s_neighbors      := IF (mod_smartlinx.include_neighbors, pers.NeighborsSlim, dataset([],iesp.bpsreport.t_NeighborSlim) );
 	s_neighbors_count := count(s_neighbors.NeighborAddresses);  //count children since rows are neighborhoods.
   p_neighbors      := choosen (s_neighbors, iesp.constants.SMART.MaxNeighbors);
@@ -160,7 +162,7 @@ EXPORT out_rec SmartLinxReport (dataset (doxie.layout_references) dids,
 	s_voters_count := count(s_voters);
   p_voters := choosen (if (mod_smartlinx.Smart_Rollup, s_voters, voters), iesp.Constants.SMART.MaxVoter);
 
-	//combine proflic,  medprov, medsanc
+	//// combine proflic,  medprov, medsanc
   profmod   := personReports.proflic_records (dids, PROJECT(mod_smartlinx, $.IParam.proflic), IsFCRA);
   prof      := IF (mod_smartlinx.include_proflicenses and count(profmod.proflicenses_v2) <= iesp.constants.SMART.MaxUnRolledRecords, profmod.proflicenses_v2,dataset([],iesp.proflicense.t_ProfessionalLicenseRecord));
   sanc      := IF (mod_smartlinx.include_proflicenses, personReports.sanctions_records (dids, PROJECT (mod_smartlinx, $.IParam.sanctions), IsFCRA),dataset([],iesp.proflicense.t_SanctionRecord));
@@ -342,7 +344,7 @@ EXPORT out_rec SmartLinxReport (dataset (doxie.layout_references) dids,
 //ASSOCIATIONS
   //INDIVIDUALS  relatives, neighbors are assigned above
 
-  //BUSINESS
+  //// BUSINESS
      pawRaw     := IF (mod_smartlinx.include_peopleatwork, PersonReports.peopleatwork_records (dids, PROJECT (mod_smartlinx, $.IParam.peopleatwork), IsFCRA),dataset([],iesp.peopleatwork.t_PeopleAtWorkRecord));
 		 pawMod     := SmartRollup.smart_paw(pawRaw);
 		 pawNonExec := SmartRollup.fn_smart_rollup_paw(pawMod.paw_nonExec);  //non-executives ONLY rolled up
@@ -365,7 +367,8 @@ EXPORT out_rec SmartLinxReport (dataset (doxie.layout_references) dids,
 		 associates       := IF (mod_smartlinx.include_associates,  pers.AssociatesSlim, dataset([],iesp.bpsreport.t_BpsReportAssociateSlim));
 		 s_associates     := SmartRollup.fn_smart_OtherPersonAssoc(associates,subject_did,mod_smartlinx);
 		 s_associates_count := count(s_associates);
-     p_associates     := choosen (s_associates, iesp.constants.SMART.MaxAssociates);
+     p_associates     := choosen (s_associates, iesp.constants.SMART.MaxAssociates);     
+     
      american_student_input := PROJECT (mod_smartlinx, American_Student_Services.IParam.reportParams);
 
 		 boolean onlyCurrent := true;  //request only current student records.
@@ -382,8 +385,9 @@ EXPORT out_rec SmartLinxReport (dataset (doxie.layout_references) dids,
 																			dataset([],iesp.smartlinxreport.t_SLRKeyRiskIndInfo));
 
 		 p_worldcompliance := IF(mod_smartlinx.include_kris,PROJECT(s_kris.WorldCompRecs,TRANSFORM(iesp.smartlinxsearchcore.t_SLRResultMatch,SELF := LEFT)),
-																			dataset([],iesp.smartlinxsearchcore.t_SLRResultMatch));                                                              
-        
+																			dataset([],iesp.smartlinxsearchcore.t_SLRResultMatch));                                                                          
+            
+                 p_personIdentityFinal :=  smartRollup.fn_getPersonIdentity(dids, Mod_smartLinx);                                                                  
            iesp.smartlinxReport.t_SLRPersonRiskIndicatorSection  testXform() := TRANSFORM                 
                 self.PersonIdentityRisks := //choosen(
                                                                   dataset([{true,'P','Test'}]
@@ -470,7 +474,7 @@ EXPORT out_rec SmartLinxReport (dataset (doxie.layout_references) dids,
      Self.HuntingFishingLicenses           := p_hunting;
 		 Self.FAACertifications                := p_faa_cert;
 
-////PROPERTY *******************************************************************************************
+//PROPERTY *******************************************************************************************
 
 		 Self.Properties.CurrentProperties     := p_prop_current;
      Self.Properties.PriorProperties       := p_prop_prior;
@@ -483,26 +487,27 @@ EXPORT out_rec SmartLinxReport (dataset (doxie.layout_references) dids,
 		 Self.Aircrafts.CurrentAircrafts       := p_aircrafts_current;
 		 Self.Aircrafts.PriorAircrafts         := p_aircrafts_prior;
 
-//// BLJ *******************************************************************************************
+// BLJ *******************************************************************************************
      Self.Bankruptcies.ActiveBankruptcies     := p_bankruptcy_active;
      Self.Bankruptcies.ClosedBankruptcies     := p_bankruptcy_closed;
      Self.LiensJudgments.ActiveLiensJudgments := p_liens_active;
      Self.LiensJudgments.ClosedLiensJudgments := p_liens_terminated;
      Self.UccFilings.DebtorUCCFilings         := p_uccs_debtor;
      Self.UccFilings.SecurerUCCFilings        := p_uccs_securer;
-//// ASSOCIATES *******************************************************************************************
-   //// PEOPLE ASSOCS
-
- 		 Self.Relatives                         := p_relatives;
-   	 Self.Associates                        := p_associates;
-     Self.Neighbors                         := p_neighbors;
-   	 // BUSINESS ASSOCS
+     
+     // ASSOCIATES *******************************************************************************************
+     // PEOPLE ASSOCS
+     
+      Self.Relatives                         := p_relatives;          
+      Self.Associates                        := p_associates;   
+      Self.Neighbors                         := p_neighbors;
+   	// BUSINESS ASSOCS
    	 Self.CorporateAffiliations             := p_corp_aff;
    	 Self.PeopleAtWorks                     := p_paw;
   	 self.OtherAssociatedBusinesses         := p_other_busi_assoc;
-//// person Risk indicator section
+// person Risk indicator section
        self.PersonRiskIndicatorSection :=  p_personRiskIndicatorSection[1];
-         
+       self.PersonIdentity :=  p_personIdentityFinal[1];
 //// SOURCES *******************************************************************************************
 
 		Self.Sources :=     p_sources;
@@ -512,5 +517,6 @@ EXPORT out_rec SmartLinxReport (dataset (doxie.layout_references) dids,
 		self := [];
  END;
   individual := dataset ([Format ()]); // is supposed to produce one row only (usebestdid = true)
+  // output(best_rec_smart, named('best_rec_smart'));
 	return individual;
 END;

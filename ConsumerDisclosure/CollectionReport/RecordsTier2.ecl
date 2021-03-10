@@ -1,4 +1,4 @@
-IMPORT $, BizLinkFull, bipv2, BIPV2_Build, business_credit, business_header, Cortera, dca, doxie, domains, dx_dca, fbnv2, experian_crdb, 
+IMPORT $, BizLinkFull, bipv2, BIPV2_Build, business_credit, business_header, dca, doxie, domains, dx_Cortera, dx_dca, fbnv2, experian_crdb, 
   sanctn, inquiry_acclogs, DCAV2;
 
 EXPORT RecordsTier2(UNSIGNED6 in_lexid, $.IParam.IReportParam in_mod) := FUNCTION
@@ -35,7 +35,7 @@ EXPORT RecordsTier2(UNSIGNED6 in_lexid, $.IParam.IReportParam in_mod) := FUNCTIO
   recs := 
       $.MAC.GetCollectionFromRaw(bip_recs, in_mod, $.Constants.Collection.BIP, BIPV2.Key_BH_Linking_Ids.Key,, dt_last_seen)
     + $.MAC.GetCollectionFromRaw(bus_header_recs, in_mod, $.Constants.Collection.BUSINESS_HEADER, Business_Header.Key_Business_Contacts_FP, fp, dt_last_seen)
-    + $.MAC.GetCollectionFromRaw(cortera_recs, in_mod, $.Constants.Collection.CORTERA, cortera.Key_LinkIds.Key, did, dt_last_seen)
+    + $.MAC.GetCollectionFromRaw(cortera_recs, in_mod, $.Constants.Collection.CORTERA, dx_Cortera.Key_LinkIds.Key, did, dt_last_seen)
     + $.MAC.GetCollectionFromRaw(dca_recs, in_mod, $.Constants.Collection.DCA, DCA.Key_DCA_BDID,, update_date)
     + $.MAC.GetCollectionFromRaw(exp_recs, in_mod, $.Constants.Collection.EXPERIAN_CRDB, experian_crdb.Key_LinkIDs.Key,, dt_vendor_last_reported)
     + $.MAC.GetCollectionFromRaw(fbn_contact_recs, in_mod, $.Constants.Collection.FBN_CONTACTS, fbnv2.Key_Rmsid_Contact, did, dt_last_seen)

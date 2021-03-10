@@ -68,7 +68,7 @@ EXPORT getIndAttributes(DATASET(DueDiligence.Layouts.Indv_Internal) inData,
     indWatercraft := DueDiligence.getIndWatercraft(indProperty, mod_access);
 
     //get vehicle information
-    indVehicle := DueDiligence.getIndVehicle(indWatercraft, dppa, mod_access);
+    indVehicle := DueDiligence.getIndVehicle(indWatercraft, mod_access);
 
     //get aircraft information
     indAircraft := DueDiligence.getIndAircraft(indVehicle);

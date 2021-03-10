@@ -28,13 +28,28 @@ EXPORT Constants := MODULE;
 		EXPORT Neighbor := ['NEIGHBOR'];
 	END;
 
- // Used in progressive_phone.functions.GetPhonesV3 for the new Meta_ServLine_Type field
+ // Used in progressive_phone.functions.GetPhonesV3 for the Meta_ServLine_Type field
  EXPORT ServLine_Types := MODULE
    EXPORT Landline := 'Landline';
    EXPORT Cable    := 'Cable';
    EXPORT Wireless := 'Possible Wireless';
    EXPORT VoIP     := 'Possible VoIP';
    EXPORT Unknown  := 'Other/Unknown';
+ END;
+ 
+ // Used in progressive_phone.functions.GetPhonesV3 for the new Star-Rating filter capability
+ // Thresholds here are the minimum model score for that star. The max for a star rating range is the next value up (minus 1)
+ // so a One-Star phone's score would be >= 0 (OneStar) and < 210 (TwoStar)
+ // Current model: Phone_Shell.PhoneModel_v30_1
+ // Thresholds for PhoneModel_v30_1 determined in PHZONE-260
+ // Since all products are on the same model, these thresholds represent the star ratings of that model ONLY (not past models)
+ // for consistency between products, we do *not* intend to ever allow products to choose older/different models; they will always all be on the same one.
+ EXPORT StarRating_Thresholds := MODULE
+   EXPORT OneStar   := 0;
+   EXPORT TwoStar   := 210;
+   EXPORT ThreeStar := 350;
+   EXPORT FourStar  := 420;
+   EXPORT FiveStar  := 540;
  END;
 
  EXPORT Switch_Type := MODULE

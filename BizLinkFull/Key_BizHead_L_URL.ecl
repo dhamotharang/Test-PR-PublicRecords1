@@ -170,7 +170,7 @@ EXPORT RawFetch_server(TYPEOF(h.company_url) param_company_url = (TYPEOF(h.compa
     doIndexRead(UNSIGNED4 search,UNSIGNED2 spc) := STEPPED(KEY( KEYED(GSS_hash = search) AND (GSS_bloom & BloomF) = BloomF
 AND ((param_st = (TYPEOF(st))'' OR st = (TYPEOF(st))'') OR (st = param_st))),ultid,orgid,seleid,proxid,PRIORITY(40-spc)); // Filter for each row of index fetch
     SALT44.MAC_collate_wordbag_matches4(wds,slimrec,doIndexRead,ultid,orgid,seleid,proxid,steppedmatches) // Perform N-way join
-    res := JOIN( steppedmatches, Key, KEYED(RIGHT.GSS_Hash = wds[1].hsh) AND KEYED(RIGHT.fallback_value >= param_fallback_value) AND KEYED(LEFT.proxid = RIGHT.proxid AND LEFT.seleid = RIGHT.seleid AND LEFT.orgid = RIGHT.orgid AND LEFT.ultid = RIGHT.ultid),TRANSFORM(indexOutputRecord,SELF.gss_word_weight := LEFT.gss_word_weight,SELF := RIGHT));
+    res := JOIN( steppedmatches, Key, KEYED(RIGHT.GSS_Hash = wds[1].hsh) AND KEYED(RIGHT.fallback_value >= param_fallback_value) AND KEYED(LEFT.proxid = RIGHT.proxid AND LEFT.seleid = RIGHT.seleid AND LEFT.orgid = RIGHT.orgid AND LEFT.ultid = RIGHT.ultid),TRANSFORM(indexOutputRecord,SELF.gss_word_weight := LEFT.gss_word_weight,SELF := RIGHT),LIMIT(Config_BIP.L_URL_MAXBLOCKLIMIT,SKIP)); /*HACK29g*/
     RETURN IF(SUM(wds,spec) > 19,res,IF(SUM(wds,spec) = 0,DATASET([],indexOutputRecord) ,DATASET(ROW([],indexOutputRecord)))); // Ensure at least spc of specificity in gss portion
    END;
  

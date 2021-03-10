@@ -1,0 +1,37 @@
+default:
+  tags:
+    - icboca
+    - boca-dev
+    - linux
+    
+syntax_check:
+  image: gitlab.ins.risk.regn.net:4567/collda01/publicrecords/roxie-ci-clienttools
+  stage: build
+  only:
+    # only run the job at scheduled times
+    refs:
+      - schedules
+  script:
+    - RES_FILE="query_check_results.txt"
+    - echo "Begin Query Syntax Check:"
+    - cd .ci_root
+    - echo "Pulling Node Packages"
+    - npm install
+    - echo "Run Script"
+    - |
+      if node full_syntax_check.js | tee syn_check.log
+      then checkres=0
+      else checkres=1
+      fi
+    - cat eclcc.log syn_check.log > $RES_FILE
+    # commit and push results to repo
+    - echo "Pushing Query Check Results"
+    - git config --global user.email "${GITLAB_USER_EMAIL}"
+    - git config --global user.name "${GITLAB_USER_NAME}"
+    - git checkout $CI_COMMIT_BRANCH
+    - git add $RES_FILE
+    - git commit -m "Daily Query Syntax Check Results"
+    - git push https://${CIUser_Arqs}:${CIToken_Arqs}@${CI_REPOSITORY_URL#*@}
+    - exit $checkres
+    
+

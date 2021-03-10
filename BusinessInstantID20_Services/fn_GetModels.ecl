@@ -198,11 +198,13 @@ EXPORT fn_GetModels(DATASET(LNSmallBusiness.BIP_Layouts.Input) Input,
     IncludeVeh          := TRUE;
     IncludeDerog        := TRUE;
 
-    bsversion := MAP(EXISTS(Options.ModelsRequested(ModelName IN
-                                                    [BusinessCredit_Services.Constants.BLENDED_SCORE_BBFM_NSBFEWITHEXP,
-                                                    BusinessCredit_Services.Constants.BLENDED_SCORE_BBFM])) => 54, Options.BusShellVersion = Business_Risk_BIP.Constants.BusShellVersion_v22 => 51 , 50);
+    bsversion := MAP(EXISTS(Options.ModelsRequested(ModelName IN 
+                                                    [BusinessCredit_Services.Constants.BLENDED_SCORE_BBFM_NSBFEWITHEXP, 
+                                                    BusinessCredit_Services.Constants.BLENDED_SCORE_BBFM,
+                                                    BusinessCredit_Services.Constants.BBFM1906_1_0] )) => 54, 
+                    Options.BusShellVersion = Business_Risk_BIP.Constants.BusShellVersion_v22 => 51,
+                    50);
 
-    //BSVersion           := if(BusShellVersion = Business_Risk_BIP.Constants.BusShellVersion_v22, 51, 50);
     IsFCRA              := FALSE;
     LN_Branded          := FALSE;
     OFAC_Only           := TRUE;
@@ -355,38 +357,53 @@ EXPORT fn_GetModels(DATASET(LNSmallBusiness.BIP_Layouts.Input) Input,
       IF( EXISTS(Options.ModelsRequested(ModelName = 'SBOM9999_9')),
           setModelName('SBOM9999_9', Models.LIB_BusinessRisk_Function(shell_res_grpd, 'SBOM9999_9')) ) +
       // Actual model names:
-      IF( EXISTS(Options.ModelsRequested(ModelName = BusinessCredit_Services.Constants.BLENDED_SCORE_MODEL)),
-          setModelName(BusinessCredit_Services.Constants.BLENDED_SCORE_MODEL, Models.LIB_BusinessRisk_Function(shell_res_grpd, BusinessCredit_Services.Constants.BLENDED_SCORE_MODEL, boca_shell_grouped)) ) +
-      IF( EXISTS(Options.ModelsRequested(ModelName = BusinessCredit_Services.Constants.CREDIT_SCORE_MODEL)),
-          setModelName(BusinessCredit_Services.Constants.CREDIT_SCORE_MODEL, Models.LIB_BusinessRisk_Function(shell_res_grpd, BusinessCredit_Services.Constants.CREDIT_SCORE_MODEL)) ) +
-      IF( EXISTS(Options.ModelsRequested(ModelName = BusinessCredit_Services.Constants.BLENDED_SCORE_SLBB)),
-          setModelName(BusinessCredit_Services.Constants.BLENDED_SCORE_SLBB, Models.LIB_BusinessRisk_Function(shell_res_grpd, BusinessCredit_Services.Constants.BLENDED_SCORE_SLBB, boca_shell_grouped)) ) +
-      IF( EXISTS(Options.ModelsRequested(ModelName = BusinessCredit_Services.Constants.BLENDED_SCORE_BBFM)),
-          setModelName(BusinessCredit_Services.Constants.BLENDED_SCORE_BBFM, Models.LIB_BusinessRisk_Function(shell_res_grpd, BusinessCredit_Services.Constants.BLENDED_SCORE_BBFM, boca_shell_grouped)) ) +
-      IF( EXISTS(Options.ModelsRequested(ModelName = BusinessCredit_Services.Constants.BLENDED_SCORE_BBFM_NSBFEWITHEXP)),
-        setModelName(BusinessCredit_Services.Constants.BLENDED_SCORE_BBFM_NSBFEWITHEXP, Models.LIB_BusinessRisk_Function(shell_res_grpd, BusinessCredit_Services.Constants.BLENDED_SCORE_BBFM_NSBFEWITHEXP, boca_shell_grouped)) ) +
-      IF( EXISTS(Options.ModelsRequested(ModelName = BusinessCredit_Services.Constants.CREDIT_SCORE_SLBO)),
-          setModelName(BusinessCredit_Services.Constants.CREDIT_SCORE_SLBO, Models.LIB_BusinessRisk_Function(shell_res_grpd, BusinessCredit_Services.Constants.CREDIT_SCORE_SLBO)) ) +
-      IF( EXISTS(Options.ModelsRequested(ModelName = BusinessCredit_Services.Constants.BLENDED_SCORE_SLBBNFEL)),
-          setModelName(BusinessCredit_Services.Constants.BLENDED_SCORE_SLBBNFEL, Models.LIB_BusinessRisk_Function(shell_res_grpd, BusinessCredit_Services.Constants.BLENDED_SCORE_SLBBNFEL, boca_shell_grouped)) ) +
-      IF( EXISTS(Options.ModelsRequested(ModelName = BusinessCredit_Services.Constants.CREDIT_SCORE_SLBONFEL)),
-          setModelName(BusinessCredit_Services.Constants.CREDIT_SCORE_SLBONFEL, Models.LIB_BusinessRisk_Function(shell_res_grpd, BusinessCredit_Services.Constants.CREDIT_SCORE_SLBONFEL)) ) +
+      IF( EXISTS(Options.ModelsRequested(ModelName = BusinessCredit_Services.Constants.BLENDED_SCORE_MODEL)), 
+          setModelName(BusinessCredit_Services.Constants.BLENDED_SCORE_MODEL, Models.LIB_BusinessRisk_Function(shell_res_grpd, BusinessCredit_Services.Constants.BLENDED_SCORE_MODEL, boca_shell_grouped)) ) + 
+      
+      IF( EXISTS(Options.ModelsRequested(ModelName = BusinessCredit_Services.Constants.BBFM1906_1_0)), 
+          setModelName(BusinessCredit_Services.Constants.BBFM1906_1_0, Models.LIB_BusinessRisk_Function(shell_res_grpd, BusinessCredit_Services.Constants.BBFM1906_1_0, boca_shell_grouped)) ) + 
+    
+      IF( EXISTS(Options.ModelsRequested(ModelName = BusinessCredit_Services.Constants.CREDIT_SCORE_MODEL)), 
+          setModelName(BusinessCredit_Services.Constants.CREDIT_SCORE_MODEL, Models.LIB_BusinessRisk_Function(shell_res_grpd, BusinessCredit_Services.Constants.CREDIT_SCORE_MODEL)) ) + 		
+      
+      IF( EXISTS(Options.ModelsRequested(ModelName = BusinessCredit_Services.Constants.BLENDED_SCORE_SLBB)), 
+          setModelName(BusinessCredit_Services.Constants.BLENDED_SCORE_SLBB, Models.LIB_BusinessRisk_Function(shell_res_grpd, BusinessCredit_Services.Constants.BLENDED_SCORE_SLBB, boca_shell_grouped)) ) + 
+      
+      IF( EXISTS(Options.ModelsRequested(ModelName = BusinessCredit_Services.Constants.BLENDED_SCORE_BBFM)), 
+          setModelName(BusinessCredit_Services.Constants.BLENDED_SCORE_BBFM, Models.LIB_BusinessRisk_Function(shell_res_grpd, BusinessCredit_Services.Constants.BLENDED_SCORE_BBFM, boca_shell_grouped)) ) + 
+      
+      IF( EXISTS(Options.ModelsRequested(ModelName = BusinessCredit_Services.Constants.BLENDED_SCORE_BBFM_NSBFEWITHEXP)), 
+        setModelName(BusinessCredit_Services.Constants.BLENDED_SCORE_BBFM_NSBFEWITHEXP, Models.LIB_BusinessRisk_Function(shell_res_grpd, BusinessCredit_Services.Constants.BLENDED_SCORE_BBFM_NSBFEWITHEXP, boca_shell_grouped)) ) +    
+      
+      IF( EXISTS(Options.ModelsRequested(ModelName = BusinessCredit_Services.Constants.CREDIT_SCORE_SLBO)), 
+          setModelName(BusinessCredit_Services.Constants.CREDIT_SCORE_SLBO, Models.LIB_BusinessRisk_Function(shell_res_grpd, BusinessCredit_Services.Constants.CREDIT_SCORE_SLBO)) ) + 		
+      
+      IF( EXISTS(Options.ModelsRequested(ModelName = BusinessCredit_Services.Constants.BLENDED_SCORE_SLBBNFEL)), 
+          setModelName(BusinessCredit_Services.Constants.BLENDED_SCORE_SLBBNFEL, Models.LIB_BusinessRisk_Function(shell_res_grpd, BusinessCredit_Services.Constants.BLENDED_SCORE_SLBBNFEL, boca_shell_grouped)) ) + 		
+      
+      IF( EXISTS(Options.ModelsRequested(ModelName = BusinessCredit_Services.Constants.CREDIT_SCORE_SLBONFEL)), 
+          setModelName(BusinessCredit_Services.Constants.CREDIT_SCORE_SLBONFEL, Models.LIB_BusinessRisk_Function(shell_res_grpd, BusinessCredit_Services.Constants.CREDIT_SCORE_SLBONFEL)) ) + 		
 
 
       DATASET([], Layout_ModelOut_Plus);
 
     // If no rep info is input, but a blended model is requested, set the score to 0 and blank out the reason codes since there isn't enough info to calculate.
-
-
-
-      Model_Results_Good_Inputs := JOIN(Model_Results_unsorted, ds_input, LEFT.Seq = RIGHT.Seq, TRANSFORM(RECORDOF(LEFT),
-        Invalid_Blended_Request := LEFT.ModelName IN BusinessCredit_Services.Constants.MODEL_NAME_SETS.BLENDED_ALL AND
-                                                            (TRIM(RIGHT.AuthReps[1].FullName) = '' AND TRIM(RIGHT.AuthReps[1].FirstName) = '' AND TRIM(RIGHT.AuthReps[1].LastName) = '');
-        SELF.Score := IF(Invalid_Blended_Request, '0', LEFT.Score);
-        SELF.ri := IF(Invalid_Blended_Request, DATASET([],	Risk_Indicators.Layout_Desc), LEFT.ri);
-        SELF := LEFT),
-        LEFT OUTER, KEEP(1));
-
+    //Unless the model is BBFM1906_1_0, then use the score
+  
+      Model_Results_Good_Inputs := JOIN(Model_Results_unsorted, ds_input, 
+                                        LEFT.Seq = RIGHT.Seq, 
+                                        TRANSFORM(RECORDOF(LEFT),
+                                                  Invalid_Blended_Request := LEFT.ModelName IN BusinessCredit_Services.Constants.MODEL_NAME_SETS.BLENDED_ALL 
+                                                    AND (TRIM(RIGHT.AuthReps[1].FullName) = '' 
+                                                    AND TRIM(RIGHT.AuthReps[1].FirstName) = ''
+                                                    AND TRIM(RIGHT.AuthReps[1].LastName)  = ''
+                                                    AND LEFT.ModelName != BusinessCredit_Services.Constants.BBFM1906_1_0);
+                                                  SELF.Score := IF(Invalid_Blended_Request, '0', LEFT.Score);
+                                                  SELF.ri := IF(Invalid_Blended_Request, DATASET([],	Risk_Indicators.Layout_Desc), LEFT.ri);
+                                                  SELF := LEFT), 
+                                        LEFT OUTER, 
+                                        KEEP(1)); 
+ 
 
 
     Model_Results_sorted :=

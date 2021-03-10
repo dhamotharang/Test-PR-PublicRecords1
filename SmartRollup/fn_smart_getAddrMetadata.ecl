@@ -130,7 +130,7 @@ EXPORT fn_smart_getAddrMetadata := MODULE
 											      self := [];
 												));
 											 	 
-		outAddrWSourceInfo		:=  SmartRollup.fn_smart_getSourceCounts.GetAddressIndicators(HeaderRecsDS,param);               
+		outAddrWSourceInfo		:=  SmartRollup.fn_smart_getSourceCounts.GetAddressIndicators(HeaderRecsDS,param).Addresses;        
 		addressesWithSourceInfo := join(addresses, outAddrWSourceInfo,
 		                                left.address.state = right.address.state and
 								 left.address.city = right.address.city and
@@ -148,4 +148,4 @@ EXPORT fn_smart_getAddrMetadata := MODULE
          FinalAddress :=   if ( param.include_AddressSourceInfo, addressesWithSourceInfo,  addresses);	
 		 return FinalAddress;
       END;
-  END;
+END;
