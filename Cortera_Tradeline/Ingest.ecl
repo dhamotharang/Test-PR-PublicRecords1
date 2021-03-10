@@ -1,8 +1,11 @@
 ﻿IMPORT _control, MDR, STD, SALT311;
-EXPORT Ingest(BOOLEAN incremental=FALSE
-, DATASET(Layout_Tradeline_Base) Delta = DATASET([],Layout_Tradeline_Base)
-, DATASET(Layout_Tradeline_Base) dsBase = In_Tradeline_Base // Change IN_Tradeline_Base to change input to ingest process
-, DATASET(RECORDOF(Cortera_Tradeline.Prep_Ingest))  infile = Cortera_Tradeline.Prep_Ingest
+EXPORT Ingest(
+	string8 pversion 																					= ''
+, BOOLEAN incremental																				= FALSE
+, DATASET(Layout_Tradeline) 							dsAddsSprayedFile = Files().input.Tradeline_Adds.Using
+, DATASET(Layout_Tradeline_Base) 											Delta = DATASET([],Layout_Tradeline_Base)
+, DATASET(Layout_Tradeline_Base) 										 dsBase = Files().Base.Tradeline.Qa // Change IN_Tradeline_Base to change input to ingest process
+, DATASET(RECORDOF(Cortera_Tradeline.Prep_Ingest))	 infile = Cortera_Tradeline.Prep_Ingest(pversion, dsAddsSprayedFile, incremental)
 ) := MODULE
   SHARED NullFile := DATASET([],Layout_Tradeline_Base); // Use to replace files you wish to remove
 
@@ -43,30 +46,30 @@ EXPORT Ingest(BOOLEAN incremental=FALSE
   SortIngest0 := SORT(DistIngest0,link_id,account_key,ar_date,total_ar,status, __Tpe, record_sid, LOCAL);
   GroupIngest0 := GROUP(SortIngest0,link_id,account_key,ar_date,total_ar,status, LOCAL, ORDERED, STABLE);
   SHARED AllIngestRecs0 := UNGROUP(ROLLUP(GroupIngest0,TRUE,MergeData(LEFT,RIGHT)));
-
+	
   // Existing Base: combine delta with base file
   DistBase0 := DISTRIBUTE(Base0+Delta0, HASH32(link_id,account_key,ar_date,total_ar,status));
   SortBase0 := SORT(DistBase0,link_id,account_key,ar_date,total_ar,status, __Tpe, record_sid, LOCAL);
   GroupBase0 := GROUP(SortBase0,link_id,account_key,ar_date,total_ar,status, LOCAL, ORDERED, STABLE);
   SHARED AllBaseRecs0 := UNGROUP(ROLLUP(GroupBase0,TRUE,MergeData(LEFT,RIGHT)));
-
+	
   // Everything: combine ingest and base recs
-  Sort0 := SORT(AllBaseRecs0+AllIngestRecs0,link_id,account_key,ar_date,total_ar,status, __Tpe,record_sid,LOCAL);
+  shared Sort0 := SORT(AllBaseRecs0+AllIngestRecs0,link_id,account_key,ar_date,total_ar,status, __Tpe,record_sid,LOCAL);
   Group0 := GROUP(Sort0,link_id,account_key,ar_date,total_ar,status,LOCAL, ORDERED, STABLE);
   SHARED AllRecs0 := UNGROUP(ROLLUP(Group0,TRUE,MergeData(LEFT,RIGHT)));
-
+	
   //Now need to update 'rid' numbers on new records
   //Base upon SALT311.utMac_Sequence_Records
   // Do not use PROJECT,COUNTER because it is very slow if any of the fields are not fixed length
   NR := AllRecs0(__Tpe=RecordType.New);
   ORe := AllRecs0(__Tpe<>RecordType.New);
   PrevBase := MAX(ORe,record_sid);
-  WithRT AddNewRid(WithRT le, WithRT ri) := TRANSFORM
+	WithRT AddNewRid(WithRT le, WithRT ri) := TRANSFORM
     SELF.record_sid := IF ( le.record_sid=0, PrevBase+1+thorlib.node(), le.record_sid+thorlib.nodes() );
     SELF := ri;
   END;
   NR1 := ITERATE(NR(record_sid=0),AddNewRid(LEFT,RIGHT),LOCAL);
-  SHARED AllRecs := ORe+NR1+NR(record_sid<>0) : PERSIST('~temp::Cortera_Tradeline::Ingest_Cache',EXPIRE(Cortera_Tradeline.Config.PersistExpire));
+  SHARED AllRecs := ORe+NR1+NR(record_sid<>0) :PERSIST('~thor_data400::persist::Cortera_Tradeline::Ingest_Cache',EXPIRE(Cortera_Tradeline.Config.PersistExpire));
   SHARED UpdateStatsFull := SORT(TABLE(AllRecs, {__Tpe,SALT311.StrType INGESTSTATUS:=RTToText(AllRecs.__Tpe),UNSIGNED Cnt:=COUNT(GROUP)}, __Tpe, FEW),__Tpe, FEW);
   SHARED UpdateStatsInc := SORT(UpdateStatsFull(__Tpe = RecordType.New), __Tpe, INGESTSTATUS, FEW);
   EXPORT UpdateStats := IF(incremental, UpdateStatsInc, UpdateStatsFull);
@@ -84,11 +87,11 @@ EXPORT Ingest(BOOLEAN incremental=FALSE
 	EXPORT AddGlobalSIDS := MDR.macGetGlobalSid(allRecords,'CorteraTradeline','','global_sid');
   EXPORT AllRecords_NoTag := PROJECT(AddGlobalSIDS,Layout_Tradeline_Base); // Records in 'pure' format
 
-f := TABLE(dsBase,{record_sid}) : GLOBAL;
-rcid_clusters := SALT311.MOD_ClusterStats.Counts(f,record_sid);
-DuplicateRids0 := COUNT(dsBase) - SUM(rcid_clusters,NumberOfClusters); // Should be zero
-d := DATASET([{DuplicateRids0}],{UNSIGNED2 DuplicateRids0});
-EXPORT ValidityStats := OUTPUT(d,NAMED('ValidityStatistics'));
+	f := TABLE(dsBase,{record_sid}) : GLOBAL;
+	rcid_clusters := SALT311.MOD_ClusterStats.Counts(f,record_sid);
+	DuplicateRids0 := COUNT(dsBase) - SUM(rcid_clusters,NumberOfClusters); // Should be zero
+	d := DATASET([{DuplicateRids0}],{UNSIGNED2 DuplicateRids0});
+	EXPORT ValidityStats := OUTPUT(d,NAMED('ValidityStatistics'));
   EXPORT DoStats := S0;
 
   EXPORT StandardStats(BOOLEAN doInfileOverallCnt = TRUE, BOOLEAN doStatusOverallCnt = TRUE) := FUNCTION

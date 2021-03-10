@@ -267,6 +267,7 @@ EXPORT Layouts := MODULE
 			string	field3	:= '';
 			string 	field4	:= '';
 			string  field5	:= '';
+			string  field6	:= ''; //raw_Orig_Suffix
 		END;
 		
 		EXPORT DisposableEmailDomains := Record
@@ -1345,6 +1346,7 @@ EXPORT Drivers_Batch := MODULE
   integer8 t9_addrisvacantflag;
   integer8 t9_addrisinvalidflag;
   integer8 t9_addriscmraflag;
+  integer8 t9_addrnotinagcyjurstflag;
   integer8 t15_ssnmultcurridflagev;
   integer8 t15_ssnisinvalidflag;
   integer8 t20_dlmultcurridflagev;
@@ -1565,6 +1567,7 @@ EXPORT Drivers_Batch := MODULE
   integer8 t9_addrisinvalidflag;
   integer8 t9_addriscmraflag;
   integer8 t9_addrpoboxmultcurridflagev;
+  integer8 t9_addrnotinagcyjurstflag;
   integer8 t15_ssnisinvalidflag;
   integer8 t15_ssnmultcurridflagev;
   integer8 t16_phnisinvalidflag;
