@@ -88,9 +88,8 @@ function
                                             //qaRecs,
 											buildKey,
                                             dma.stats(filedate),
-											//updateVersion,
-											//create_orbit_build,
-											//qaEmail,
+											create_orbit_build,
+											qaEmail,
 											//Scrubs_DoNotCall.fnRunScrubs(fileDate,'')
 										);
 	
