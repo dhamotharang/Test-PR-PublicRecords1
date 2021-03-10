@@ -34,13 +34,16 @@ ExcessiveInvalidRecordsFound:=exists(dAllRecords(err[1]='E',RecWithErrors/Record
 																	 ,regexfind( 'Identity',fname,	nocase ) and stringlib.stringtouppercase(left.field[1..34]) ='FIELD3' => 'Transaction_ID_Number'
 																	 ,regexfind( 'Identity',fname,	nocase ) and stringlib.stringtouppercase(left.field[1..34]) ='FIELD4' => 'Reason_for_Transaction_Activity'
 																	 ,regexfind( 'Identity',fname,	nocase ) and stringlib.stringtouppercase(left.field[1..34]) ='FIELD5' => 'Date_of_Transaction'
+																	 ,regexfind( 'Identity',fname,	nocase ) and stringlib.stringtouppercase(left.field[1..34]) ='FIELD6' => 'raw_Orig_Suffix'
 																	 ,regexfind( 'KnownRisk|SafeList',fname,	nocase ) and stringlib.stringtouppercase(left.field[1..34]) ='FIELD1'	=>'customer_event_id'
 																	 ,regexfind( 'KnownRisk|SafeList',fname,	nocase ) and stringlib.stringtouppercase(left.field[1..34]) ='FIELD2' => 'reported_date'
 																	 ,regexfind( 'KnownRisk|SafeList',fname,	nocase ) and stringlib.stringtouppercase(left.field[1..34]) ='FIELD3' => 'reported_time'
 																	 ,regexfind( 'KnownRisk|SafeList',fname,	nocase ) and stringlib.stringtouppercase(left.field[1..34]) ='FIELD4' => 'reported_by'
+																	 ,regexfind( 'KnownRisk|SafeList',fname,	nocase ) and stringlib.stringtouppercase(left.field[1..34]) ='FIELD6' => 'raw_Orig_Suffix'
 																	 ,regexfind( 'Delta',fname,	nocase ) and stringlib.stringtouppercase(left.field[1..34]) ='FIELD1'	=>'InqLog_ID'
 																	 ,regexfind( 'Delta',fname,	nocase ) and stringlib.stringtouppercase(left.field[1..34]) ='FIELD2' => 'reported_date'
 																	 ,regexfind( 'Delta',fname,	nocase ) and stringlib.stringtouppercase(left.field[1..34]) ='FIELD3' => 'user_added'
+																	 ,regexfind( 'Delta',fname,	nocase ) and stringlib.stringtouppercase(left.field[1..34]) ='FIELD6' => 'raw_Orig_Suffix'
 																	 ,stringlib.stringtouppercase(left.field[1..34]))
 															+ (string20)left.value[1..19]
 															+ (string10)left.err
@@ -117,7 +120,8 @@ ExcessiveInvalidRecordsFound:=exists(dAllRecords(err[1]='E',RecWithErrors/Record
 											'LEGEND\n'
 										+ '======\n'
 										+ 'E001 = ERROR - BLANK\n'
-										+ 'E002 = ERROR - INVALID DATE\n'										
+										+ 'E002 = ERROR - INVALID DATE\n'
+										+ 'W001 = WARNING - NAME SUFFIX NOT IN [\'JR\',\'SR\',\'I\',\'II\',\'III\',\'IV\',\'V\',\'VI\',\'VII\',\'VIII\',\'IX\',\'X\',\'\']\n'										
 										;
 
 EXPORT BODY := if(regexfind('inquirylog',fname,nocase),regexreplace('\\_[a-z0-9]*',fname,'',nocase),fname)
