@@ -62,6 +62,7 @@ boolean IncludeImages := false : stored('IncludeImages');
 boolean IncludeStudentInformation := false : stored('IncludeStudentInformation');
 boolean IncludeTransactionHistory := false : stored('IncludeTransactionHistory');
 boolean IncludeCriminalIndicators := false : stored('IncludeCriminalIndicators');
+boolean Include_RealTimePhones := false : stored('IncludeRealTimePhones');
 
 // Infutor non regulated source
 boolean IncludeNonRegulatedVehicleSources := false : stored('IncludeNonRegulatedVehicleSources');

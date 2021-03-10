@@ -1,7 +1,8 @@
 ﻿IMPORT AutoStandardI, BIPV2, doxie, MIDEX_Services, TopBusiness_Services;
 EXPORT TopBusiness_Sections( dataset(BIPV2.IDlayouts.l_xlink_ids) in_linkid,
                              doxie.IDataAccess mod_access, 
-                             STRING1  BusinessIDFetchLevel, boolean IncludeVendorSourceB=false) :=
+                             STRING1  BusinessIDFetchLevel, BOOLEAN IncludeVendorSourceB,
+                             BOOLEAN IncludeAssignmentsAndReleases) :=
 	FUNCTION
 	
 	in_topbusiness_ds := PROJECT(in_linkid, 
@@ -24,6 +25,7 @@ EXPORT TopBusiness_Sections( dataset(BIPV2.IDlayouts.l_xlink_ids) in_linkid,
     SELF.BusinessReportFetchLevel 		:= BusinessIDFetchLevel;
     SELF.ApplicationType							:= mod_access.Application_Type;
     SELF.IncludeVendorSourceB         := IncludeVendorSourceB;
+    SELF.IncludeAssignmentsAndReleases := IncludeAssignmentsAndReleases;
     SELF 															:= [];
   END;
 	in_topbusiness_options 	:= row(xform_topbusiness_options());

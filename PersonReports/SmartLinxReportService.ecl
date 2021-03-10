@@ -268,6 +268,7 @@ EXPORT SmartLinxReportService () := MACRO
     export boolean Include_NonRegulated_WatercraftSources := false : stored ('IncludeNonRegulatedWatercraftSources');
     export boolean include_AddressSourceInfo := false : stored('IncludeAddressSourceInfo');
     export boolean includeVendorSourceB := first_row.options.IncludeVendorSourceB;
+    export boolean IncludeAssignmentsAndReleases := first_row.options.IncludeAssignmentsAndReleases;
     // new additions nov 2020
     export boolean IncludeProgressivePhone := first_row.options.ProgressivePhones.IncludeProgressivePhone;
     EXPORT unsigned1 MaxNumSubject  := first_row.options.ProgressivePhones.MaxNumSubject;
@@ -283,8 +284,6 @@ EXPORT SmartLinxReportService () := MACRO
   did_value := AutoStandardI.InterfaceTranslator.did_value.val(project(search_mod,AutoStandardI.InterfaceTranslator.did_value.params));
   dids := dataset ([(unsigned6) did_value], doxie.layout_references);
 
-	// main records
-  //boolean includeVendorSourceB := first_row.options.IncludeVendorSourceB;
 
 
   Relationship.IParams.storeParams(first_row.Options.RelationshipOption);

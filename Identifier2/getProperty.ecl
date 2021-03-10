@@ -1,4 +1,4 @@
-﻿import LN_PropertyV2_Services, iesp, doxie, riskwise, risk_indicators, ut, LN_PropertyV2, std;
+﻿import LN_PropertyV2_Services, iesp, riskwise, risk_indicators, ut, LN_PropertyV2, std, address;
 
 export getProperty(dataset(identifier2.layout_Identifier2) indata, 
 								boolean owned_any_property=false,
@@ -71,6 +71,8 @@ export getProperty(dataset(identifier2.layout_Identifier2) indata,
 	;
 	with_fids := dedup( sort( with_fids_dupes, ln_fares_id ), ln_fares_id );
 
+
+
 	mkRI( string code ) := dataset([iesp.ECL2ESP.setRiskIndicator(code,Identifier2.getRiskStatusDesc(code))],iesp.share.t_RiskIndicator);
 	blankRI := dataset([],iesp.share.t_RiskIndicator);
 
@@ -128,13 +130,14 @@ export getProperty(dataset(identifier2.layout_Identifier2) indata,
 		atmost(riskwise.max_atmost)
 	);
 
+
 	// DEED SECTION
 	deeds := join( addr_filtered, LN_PropertyV2.key_deed_fid(false),
 			keyed(left.ln_fares_id=right.ln_fares_id)
 			AND not LN_PropertyV2.fn_isAssignmentAndReleaseRecord(right.record_type,right.state,right.document_type_code),//Assignments and Releases codes excluded
 		iesp.transform_property.deed_assess.format_deed_all(left,right), atmost(riskwise.max_atmost) );
 
-	iesp.transform_property.working_layout populateDeeds( iesp.transform_property.working_layout le ) := TRANSFORM
+	iesp.transform_property.working_layout populateDeeds( deeds le ) := TRANSFORM
 		isLeCurrentOwner := le.isAddressMatch and le.isOwner;
 		ownedAny       := le.isDIDMatch or le.deed.IsSubjectOwned;
 		everOwned      := le.isAddressMatch and (le.isOwner or le.deed.IsSubjectOwned)
@@ -158,6 +161,7 @@ export getProperty(dataset(identifier2.layout_Identifier2) indata,
 		self := le;
 	END;
 	deeds_populated := project( deeds, populateDeeds(left) );
+
 
 	boolean takeLeft( string le_lnfares, string ri_lnfares, unsigned3 le_datelast, unsigned3 ri_datelast ) :=
 		(le_lnfares != '' and ri_lnfares  = '')                                   // take the left if it's the only one populated
@@ -197,11 +201,65 @@ export getProperty(dataset(identifier2.layout_Identifier2) indata,
 
 
 	// ASSESSOR SECTION
-	assessors := join( addr_filtered, LN_PropertyV2.key_assessor_fid(false),
+	assessors1 := join( addr_filtered, LN_PropertyV2.key_assessor_fid(false),
 			keyed(left.ln_fares_id=right.ln_fares_id),
       iesp.transform_property.deed_assess.format_assess_all(left,right), atmost(riskwise.max_atmost) );
 
-	iesp.transform_property.working_layout populateAssessors( iesp.transform_property.working_layout le ) := TRANSFORM
+  addrs_prepped  := project(assessors1, transform(iesp.transform_property.layout_clean_addr, 
+                             self.property_full_street_address := left.property_full_street_address, 
+                             self.property_unit_number := left.property_unit_number,
+                             self.property_city_state_zip := left.property_city_state_zip,
+                             self := []));
+
+  addrs_prepped_deduped := dedup(sort(addrs_prepped, property_full_street_address, property_unit_number, property_city_state_zip), property_full_street_address, property_unit_number, property_city_state_zip);
+
+  iesp.transform_property.layout_clean_addr clean_addrs(iesp.transform_property.layout_clean_addr le) := transform
+      clean182:= Address.CleanAddress182( le.property_full_street_address + ' ' + le.property_unit_number, le.property_city_state_zip );
+      cleaned := Address.CleanFields(clean182);
+      self.prim_range     := cleaned.prim_range;
+      self.predir         := cleaned.predir;
+      self.prim_name      := cleaned.prim_name;
+      self.addr_suffix    := cleaned.addr_suffix;
+      self.postdir        := cleaned.postdir;
+      self.unit_desig     := cleaned.unit_desig;
+      self.sec_range      := cleaned.sec_range;
+      self.v_city_name    := cleaned.v_city_name;
+      self.st             := cleaned.st;
+      self.z5             := cleaned.zip;
+      self.zip4           := cleaned.zip4;
+      self.County         := cleaned.county;
+      self := le;
+   end;
+   
+  addrs_cleaned := project(addrs_prepped_deduped, clean_addrs(left)); 
+
+    iesp.transform_property.working_layout populateCleanedAddress( assessors1 le, addrs_cleaned rt ) := TRANSFORM
+      self.assess.PropertyAddress.StreetNumber        := rt.prim_range;
+      self.assess.PropertyAddress.StreetPreDirection  := rt.predir;
+      self.assess.PropertyAddress.StreetName          := rt.prim_name;
+      self.assess.PropertyAddress.StreetSuffix        := rt.addr_suffix;
+      self.assess.PropertyAddress.StreetPostDirection := rt.postdir;
+      self.assess.PropertyAddress.UnitDesignation     := rt.unit_desig;
+      self.assess.PropertyAddress.UnitNumber          := rt.sec_range;
+      self.assess.PropertyAddress.StreetAddress1      := rt.property_full_street_address;
+      self.assess.PropertyAddress.StreetAddress2      := rt.property_unit_number;
+      self.assess.PropertyAddress.City                := rt.v_city_name;
+      self.assess.PropertyAddress.State               := rt.st;
+      self.assess.PropertyAddress.Zip5                := rt.z5;
+      self.assess.PropertyAddress.Zip4                := rt.zip4;
+      self.assess.PropertyAddress.County              := rt.county;
+      self.assess.PropertyAddress.PostalCode          := '';
+      self.assess.PropertyAddress.StateCityZip        := '';
+      self := le;
+    END;
+    
+  assessors := join(assessors1, addrs_cleaned,  
+                             left.property_full_street_address = right.property_full_street_address and
+                             left.property_unit_number = right.property_unit_number and
+                             left.property_city_state_zip = right.property_city_state_zip,
+                             populateCleanedAddress(left, right), lookup);
+                           
+	iesp.transform_property.working_layout populateAssessors( assessors le ) := TRANSFORM
 		ownedAny       := owned_any_property and (le.isDIDMatch or le.assess.IsSubjectOwned); // only poulate the OwnedAnyProperty if it's requested
 		everOwned      := le.isAddressMatch and (le.isOwner or le.assess.IsSubjectOwned)
 			and (
@@ -213,7 +271,7 @@ export getProperty(dataset(identifier2.layout_Identifier2) indata,
 					(integer)Std.Date.Today()) < Ever_Owned_Input_Property_InPastNumberOfYears
 				)
 		;
-		
+    
 		self.EverOwnedInputProperty.Assessment        := if( ever_owned_input_property and everOwned, le.assess );
 		self.CurrentlyOwnInputProperty.Assessment     := if( currently_own_input_property and le.isAddressMatch, le.assess ); // copy all assessments forward, but they must be the input property
 		self.isCurrentAssessorOwner                   := currently_own_input_property and (le.isOwner or le.assess.IsSubjectOwned) and le.isAddressMatch;
@@ -233,8 +291,6 @@ export getProperty(dataset(identifier2.layout_Identifier2) indata,
 			and le.prim_name=ri.assess.PropertyAddress.streetname
 			and le.prim_range=ri.assess.PropertyAddress.streetnumber
 			and le.sec_range=ri.assess.PropertyAddress.unitnumber;
-
-		
 
 		curr_takeLeft := takeleft( le.CurrentlyOwnInputProperty.assessment.SourcePropertyRecordId, ri.CurrentlyOwnInputProperty.assessment.SourcePropertyRecordId, le.dt_last_seen, ri.dt_last_seen ) /*or le.isOwner and not ri.isOwner*/; 
 		self.CurrentlyOwnInputProperty := if( curr_takeLeft, le.CurrentlyOwnInputProperty, ri.CurrentlyOwnInputProperty );
@@ -346,22 +402,7 @@ export getProperty(dataset(identifier2.layout_Identifier2) indata,
 
 	slimmed := project( combined, identifier2.layout_Identifier2 );
  
-  // output(owned_any_property, named('owned_any_property'));
-  // output(ever_owned_input_property, named('ever_owned_input_property'));
-  // output(currently_own_input_property, named('currently_own_input_property'));
-  // output(Ever_Owned_Input_Property_InPastNumberOfYears, named('Ever_Owned_Input_Property_InPastNumberOfYears'));
-  // output(fids_byAddr_fares, named('fids_byAddr_fares'));
-  // output(fids_byAddr_nofares, named('fids_byAddr_nofares'));
-  // output(fids_byAddr, named('fids_byAddr'));
-  // output(fids_byAddr_normed, named('fids_byAddr_normed'));
-  // output(fids_byDid, named('fids_byDid'));
-  // output(with_fids_dupes, named('with_fids_dupes'));
-  // output(with_fids, named('with_fids'));
-  // output(addr_filtered, named('addr_filtered'));
-  // output(deeds_sorted, named('deeds_sorted'));
-  // output(deeds_rolled, named('deeds_rolled'));  
-  // output(assessors_sorted, named('assessors_sorted'));
-  // output(assessors_rolled, named('assessors_rolled'));
-
 	return slimmed;
+
+
 end;

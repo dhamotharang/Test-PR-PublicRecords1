@@ -1,4 +1,4 @@
-import ContactCard, doxie_raw, doxie, ut;
+﻿import ContactCard, doxie_raw, doxie, ut, EmailV2_Services;
 
 con := contactcard.constants;
 rec := contactcard.layouts;
@@ -103,7 +103,7 @@ akas t_akas(akas l) := transform
 end;
 l_akas := project(akas,t_akas(left));
 
-email_v2 := Doxie.emailv2_records(dids, mod_access);
+email_v2 := Doxie.emailv2_records(dids, mod_access,,EmailV2_Services.Constants.Premium);
 
 prop_count := doxie.Fn_comp_prop_count(dids[1].did,0,mod_access.dppa,mod_access.glb,mod_access.ln_branded,mod_access.probation_override);
 

@@ -10,10 +10,12 @@ recdocr := recordof(doxie.doc_search_records);
 recimar := recordof(images.image_fullrecords);
 recdocr2 := iesp.criminal_fcra.t_FcraCrimReportRecord;
 transhist :=	iesp.transactionhistory.t_TransactionHistoryRecord;
+recRTP := Doxie.layout_realTimePhones.rtp_out_layout_final;
 
 export layout_report := record, maxlength(doxie_crs.maxlength_report)
 	doxie.layout_central_records - [EmailV2Royalties];
 	dataset(recvehi) vehicle_children;
+	dataset(recRTP) realtime_phones_children;
 	dataset(recvehi2) vehicle2_children;
 	dataset(recsexo) sex_offenses_children;
 	dataset(recdlsr) drivers_licenses_children;
