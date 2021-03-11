@@ -74,7 +74,7 @@ new_records_sample_for_qa	:= output(choosen(fcra_opt_out.file_infile_appended(da
 
 // orbit creation
 
-orbit_update := Orbit3.proc_Orbit3_CreateBuild_AddItem('FCRA OptOut',(string)filedate,'F');
+orbit_update := Orbit3.proc_Orbit3_CreateBuild_AddItem('FCRA Opt-out',(string)filedate,'F');
 
 // Actions
 
