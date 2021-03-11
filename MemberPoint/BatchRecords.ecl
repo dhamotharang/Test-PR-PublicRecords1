@@ -357,7 +357,9 @@
 		// Phone Info (Waterfall Phones)
 		wfResult_pre	:= MemberPoint.getPhoneInfo(dsBestGood, BParams);
 		wfResult 		:= wfResult_pre.Records;
-		wfResult_royalties 	:= 	wfResult_pre.royalties;
+		wfResult_royalties 	:= if(isIncludePhone AND EXISTS(wfResult), 
+									wfResult_pre.royalties, 
+									DATASET([],Royalty.Layouts.RoyaltyForBatch) );	
 
 		dsPhonesPre	:= map ( BParams.PhonesReturnCutoff = 'H' => wfResult((UNSIGNED)phone_score >= MemberPoint.Constants.PhoneScore.HighMin), 
 							 BParams.PhonesReturnCutoff = 'L' => wfResult((UNSIGNED)phone_score >= MemberPoint.Constants.PhoneScore.LowMin),
