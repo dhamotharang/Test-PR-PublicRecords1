@@ -1,9 +1,16 @@
-﻿IMPORT $;
+﻿IMPORT $, Phones;
 
 EXPORT GetIdentitiesCount(DATASET($.Layouts.PhoneFinder.Final) dIn) :=
 FUNCTION
-  dInDedup := DEDUP(SORT(dIn(did != 0 OR lname != ''), acctno, phone, did, fname, lname), acctno, phone, IF(did != 0, (STRING)did, TRIM(fname) + ' ' + TRIM(lname)));
 
+  dIn_filter := dIn(did != 0 OR lname != '' OR listed_name != '' OR typeflag != Phones.Constants.TypeFlag.DataSource_PV);
+  dInDedup_did := DEDUP(SORT(dIn_filter(did != 0), acctno, phone, did), 
+                        acctno, phone, did );
+
+  dInDedup_nodid := DEDUP(SORT(dIn_filter((did = 0)), acctno, phone, fname, lname, listed_name, prim_range, prim_name, predir, suffix, postdir, unit_desig, sec_range, city_name, st, zip), 
+                        acctno, phone, fname, lname, listed_name, prim_range, prim_name, predir, suffix, postdir, unit_desig, sec_range,city_name, st, zip);                      
+  
+  dInDedup := SORT(dInDedup_did & dInDedup_nodid, acctno, phone);
   rCntIdentity_Layout :=
   RECORD
     dInDedup.acctno;
@@ -26,7 +33,7 @@ FUNCTION
     OUTPUT(dInDedup, NAMED('dInDedup'));
     OUTPUT(dCntIdentities, NAMED('dCntIdentities'));
     OUTPUT(dAppendCntIds, NAMED('dAppendCntIds'));
-  #END
 
+  #END
   RETURN dAppendCntIds;
 END;
