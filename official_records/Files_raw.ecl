@@ -76,7 +76,7 @@ end;
    end;
 	 
    export Martin := module
-	 export File_in_raw := dataset('~thor_200::in::official_records::fl::martin',Layouts_Martin.raw,csv(separator('\t'),terminator(['\n','\r\n']),quote('')));
+	 export File_in_raw := dataset('~thor_200::in::official_records::fl::martin',Layouts_Martin.raw,csv(separator('|'),terminator(['\n','\r\n']),quote('')));
    end;
 	 
 	 export MiamiDade := module
