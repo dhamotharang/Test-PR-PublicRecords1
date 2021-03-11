@@ -1,7 +1,8 @@
-IMPORT MDR,progressive_phone,Royalty,Phone_Shell;
 
 EXPORT BatchFinalAssignments(infile, outlayout, UsePremiumSource_A=FALSE, scoreModel='\'\'', MaxPhoneCount=3) := FUNCTIONMACRO
- 
+	
+	IMPORT MDR,progressive_phone,Royalty,Phone_Shell;
+
 	//get the running version of waterfall phones / Contact plus
 	pHF         := progressive_phone.HelperFunctions;
 	PPC         := progressive_phone.Constants;
