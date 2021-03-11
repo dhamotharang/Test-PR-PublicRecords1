@@ -55,7 +55,7 @@
 			export boolean IncludeDOB := true;
 			export boolean IncludeSSN := true;
 			export boolean IncludeGender := true;
-			export string25 Phones_Score_Model := 'CollectionScore_v3';
+			export string25 Phones_Score_Model := 'COMMON_SCORE';
 			export string1	AddressConfidenceThreshold := 'M';
 			export string1	PhonesReturnCutoff := 'M';
 			
