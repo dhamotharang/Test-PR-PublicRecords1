@@ -324,8 +324,15 @@ OUTPUT(CHOOSEN(inDataReady, eyeball), NAMED('Raw_input'));
 OUTPUT( ResultSet, NAMED('Results') );
 
 
-Passed := ResultSet(TRIM(Results.B_InpAcct) <> '');
-Failed := ResultSet(TRIM(Results.B_InpAcct) = ''); 
+results_temp := project(ResultSet, transform(layout_MAS_Business_Service_output, 	
+													self.Results.B_InpAcct := if(left.Results.B_InpAcct = '', left.Results.P_InpAcct, left.Results.B_InpAcct);
+													self.MasterResults.B_InpAcct := if(left.MasterResults.B_InpAcct = '', left.MasterResults.P_InpAcct, left.MasterResults.B_InpAcct);
+													self.Results := left.Results;
+													self.MasterResults := left.MasterResults;
+													));
+
+Passed := results_temp(TRIM(Results.B_InpAcct) <> '');
+Failed := results_temp(TRIM(Results.B_InpAcct) = '' ); 
 
 OUTPUT( CHOOSEN(Passed,eyeball), NAMED('bwr_results_Passed') );
 OUTPUT( CHOOSEN(Failed,eyeball), NAMED('bwr_results_Failed') );
