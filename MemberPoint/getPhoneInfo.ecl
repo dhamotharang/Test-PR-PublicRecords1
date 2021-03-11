@@ -1,5 +1,4 @@
-﻿import progressive_phone,addrbest,Gateway,Std;
-import Royalty, MDR, Phone_Shell;
+﻿import progressive_phone,addrbest,Gateway,Std,Royalty;
 
 /*
 Run the minor through WFV7 and only return a confirmed phone. 
