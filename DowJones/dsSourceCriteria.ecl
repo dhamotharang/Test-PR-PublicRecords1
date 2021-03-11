@@ -1998,7 +1998,12 @@ EXPORT dsSourceCriteria := DATASET([
 {'EC (CFSP) 2021/353 Belarus List','1985'},
 {'EC (CFSP) 2021/372 Human Rights Violations and Abuses List','1986'},
 {'EC 2021/339 Belarus List','1987'},
-{'EC 2021/371 Human Rights Violations and Abuses List','1988'}
+{'EC 2021/371 Human Rights Violations and Abuses List','1988'},
+{'EC (CFSP) 2021/394 Ukraine List','1989'},
+{'EC (CFSP) 2021/398 Yemen List','1990'},
+{'EC 2021/391 Ukraine List','1991'},
+{'EC 2021/397 Yemen List','1992'},
+{'NBCTF (Israel) Seizure Orders','1993'}
 
 ],r);
 
