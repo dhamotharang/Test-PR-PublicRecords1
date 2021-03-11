@@ -1,4 +1,4 @@
-import lib_stringlib;
+﻿import lib_stringlib;
 export mapping_fl_miami_dade(string filedate) := function
 
 
@@ -13,7 +13,7 @@ self.process_date                             := filedate;
   self.vendor                                 := '07';
   self.state_origin                           := 'FL';
   self.county_name                            := 'MIAMI DADE';
-  self.official_record_key                    := '07' + trim(l.cfn_year,left,right) + trim(l.cfn_sequence_char,left,right) + trim(l.group_id,left,right) + trim(l.recording_book,left,right) + trim(l.recording_page,left,right);
+  self.official_record_key                    := '07' + trim(l.cfn_year,left,right) + trim(l.cfn_sequence_char,left,right) + trim(l.group_id,left,right) + trim(intformat((integer)l.recording_book,14,0),left,right) + trim(intformat((integer)l.recording_page,5,0),left,right);
   self.fips_st                                := '12';
   self.fips_county                            := '086';
   self.doc_instrument_or_clerk_filing_num     := l.cfn_sequence_char;
