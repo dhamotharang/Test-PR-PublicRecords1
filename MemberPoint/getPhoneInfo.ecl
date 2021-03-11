@@ -109,11 +109,14 @@ EXPORT getPhoneInfo(dataset (MemberPoint.Layouts.BestExtended) dsBestE, MemberPo
 // ROYALTIES
 	ungroup_dsPhones := UNGROUP(dsPhones);
 	_f_out := progressive_phone.functions.UpdateWithMetadata(ungroup_dsPhones);
-	results_1 := progressive_phone.FN_BatchFinalAssignments(_f_out, Progressive_Phone.Layout_Progressive_phones.common_with_meta_rec, UsePremiumSource_A, scoreModel);
-
+	results_1 := BatchFinalAssignments(_f_out, Progressive_Phone.Layout_Progressive_phones.common_with_meta_rec, UsePremiumSource_A, scoreModel, BParams.MaxPhoneCount);
 	dRoyaltiesByAcctno_EQUIFAX := if(UsePremiumSource_A, Royalty.RoyaltyEFXDataMart.GetBatchRoyaltiesByAcctno(PhoneBatchIn, results_1,,,acctno));
 	dRoyalties := Royalty.GetBatchRoyalties(dRoyaltiesByAcctno_EQUIFAX, BParams.ReturnDetailedRoyalties);
 
-	dsPhones_final := dataset([{dsPhones,dRoyalties}],MemberPoint.Layouts.ProgressivePhoneRec);
+	Phone_results := project(results_1, TRANSFORM(progressive_phone.layout_progressive_phone_common,
+							SELF := LEFT,
+							SELF := []
+	));
+	dsPhones_final := dataset([{Phone_results,dRoyalties}],MemberPoint.Layouts.ProgressivePhoneRec);
 	return(dsPhones_final);
 end;
