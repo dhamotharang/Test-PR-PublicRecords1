@@ -80,6 +80,7 @@ export MAS_nonFCRA_FDC_Proddata_Service() := MACRO
 		'IncludeEducation',
 		'IncludeEmail',
 		'IncludeEmployment',
+		'IncludeForeclosure',
 		'IncludeGeolink',
 		'IncludeHousehold',
 		'IncludeInquiry',
@@ -194,6 +195,7 @@ export MAS_nonFCRA_FDC_Proddata_Service() := MACRO
 		EXPORT BOOLEAN IncludeEducation := TRUE: STORED('IncludeEducation');
 		EXPORT BOOLEAN IncludeEmail := TRUE: STORED('IncludeEmail');
 		EXPORT BOOLEAN IncludeEmployment := TRUE: STORED('IncludeEmployment');
+		EXPORT BOOLEAN IncludeForeclosure := TRUE: STORED('IncludeForeclosure');
 		EXPORT BOOLEAN IncludeGeolink := TRUE: STORED('IncludeGeolink');
 		EXPORT BOOLEAN IncludeHousehold := TRUE: STORED('IncludeHousehold');
 		EXPORT BOOLEAN IncludeInquiry := TRUE: STORED('IncludeInquiry');

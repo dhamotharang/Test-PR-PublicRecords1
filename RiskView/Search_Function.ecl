@@ -1,4 +1,4 @@
-﻿import _Control, AID, gateway, risk_indicators, address, riskwise, ut, Models, iesp, personcontext, STD, RiskView, Risk_Reporting;
+﻿import _Control, AID, gateway, risk_indicators, address, riskwise, ut, Models, iesp, personcontext, STD, RiskView;
 onThor := _Control.Environment.OnThor;
 
 EXPORT Search_Function(
@@ -363,6 +363,16 @@ IDA_call := Risk_Indicators.Prep_IDA_Credit(LN_IDA_input,
 //Don't call the gateway unless a valid IDA model is being called...
 IDA_results := IF(Do_IDA, IDA_call, DATASET([],iesp.ida_report_response.t_IDAReportResponseEx));
 
+//There is no way to join back to the input if an error happens so map the error here.
+IDA_error_code := MAP(IDA_results[1].response.ErrorRecord.Code = Riskview.Constants.LNRS          => Riskview.Constants.LN_Soft_Error,
+                      IDA_results[1].response.ErrorRecord.Code IN [Riskview.Constants.IDA_USER,
+                                                                   Riskview.Constants.IDA_SYSTEM] => Riskview.Constants.IDA_Soft_Error,
+                      IDA_results[1].response.ErrorRecord.Code = Riskview.Constants.LNRS_NETWORK  => Riskview.Constants.IDA_GW_Hard_Error,
+                      IDA_results[1].response._Header.Status != 0                                 => Riskview.Constants.IDA_GW_Hard_Error,
+                                                                                                     ''
+                     );
+
+
 //We only need the attributes/Indicators for models, and IDScore fields for alerts, so slim it down
 IDASlim := JOIN(LN_IDA_input, IDA_results,
                 (STRING)LEFT.App_ID = RIGHT.response.outputrecord.AppID, //Using AppID as unique Identifier
@@ -375,7 +385,8 @@ IDASlim := JOIN(LN_IDA_input, IDA_results,
                           SELF.IDScoreResultCode4 := RIGHT.response.outputrecord.IDScoreResultCode4;
                           SELF.IDScoreResultCode5 := RIGHT.response.outputrecord.IDScoreResultCode5;
                           SELF.IDScoreResultCode6 := RIGHT.response.outputrecord.IDScoreResultCode6;
-                          SELF.Indicators := RIGHT.response.outputrecord.Indicators
+                          SELF.Indicators := RIGHT.response.outputrecord.Indicators;
+                          SELF.Exception_code := IDA_error_code;
                           ),
                 LEFT OUTER, ATMOST(RiskWise.max_atmost));
 	
@@ -1388,9 +1399,10 @@ riskview.layouts.layout_riskview5_search_results doReport(riskview.layouts.layou
 	self := le;
 end;
 
-riskview5_search_results_tmp := join(riskview5_score_search_results, Report_output, left.seq = right.seq, 
-		doReport(left, right),
-		 left outer);
+riskview5_search_results_tmp := JOIN(riskview5_score_search_results, Report_output,
+                                     LEFT.seq = RIGHT.seq, 
+                                     doReport(LEFT, RIGHT),
+                                     LEFT OUTER);
 
 //Join the search results to the IDA results so that we have it all available for alert logic.
 rv5_search_plus_IDA := JOIN(riskview5_search_results_tmp, IDASlim, 
@@ -1402,11 +1414,12 @@ rv5_search_plus_IDA := JOIN(riskview5_search_results_tmp, IDASlim,
                                       SELF.IDScoreResultCode4 := RIGHT.IDScoreResultCode4,
                                       SELF.IDScoreResultCode5 := RIGHT.IDScoreResultCode5,
                                       SELF.IDScoreResultCode6 := RIGHT.IDScoreResultCode6,
+                                      SELF.Exception_code := RIGHT.Exception_code,
                                       SELF := LEFT),
                             LEFT OUTER);
 
-riskview5_search_results := join(rv5_search_plus_IDA, clam, 
-		left.seq=right.seq, apply_score_alert_filters(left, right));
+riskview5_search_results := JOIN(rv5_search_plus_IDA, clam, 
+                            LEFT.seq=RIGHT.seq, apply_score_alert_filters(LEFT, RIGHT));
 
 //Military Lending Act - new as of September 2016 
 layout_preMLA := record

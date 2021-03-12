@@ -51,6 +51,7 @@ EXPORT  fn_getAddressHistory(DATASET(Address_Rank.Layouts.Bestrec) hdr_recs,
 	topAddrs	:= PROJECT(topAddrs_raw,
                        TRANSFORM(Address_Rank.Layouts.bestrec,
                          self.address_history_seq := (unsigned4) left.addr_ind; //store interface out addr_ind field in existing field name
+                         self.location_id := left.locid;
                          self := left;));
 	
   // Uncomment as needed for debugging, BUT NOTE:

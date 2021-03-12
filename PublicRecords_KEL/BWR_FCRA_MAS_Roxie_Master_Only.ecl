@@ -1,16 +1,16 @@
 ﻿// EXPORT BWR_FCRA_MAS_Roxie_Master_Only := 'todo';
 
-#workunit('name','MAS FCRA Consumer dev156 2 thread');
+#workunit('name','MAS FCRA Consumer dev156 1 thread');
 IMPORT PublicRecords_KEL, RiskWise, STD, Gateway, UT, SALT38, SALTRoutines;
 /* PublicRecords_KEL.BWR_FCRA_MAS_Roxie */
-threads := 2;
+threads := 1;
 
 RoxieIP := RiskWise.shortcuts.Dev156;
-NeutralRoxieIP:= RiskWise.Shortcuts.Dev156;
+NeutralRoxieIP:= RiskWise.Shortcuts.staging_neutral_roxieIP;
 // PCG_Dev := 'http://delta_dempers_dev:g0n0l3s!@10.176.68.149:7720/WsSupport/?ver_=2.0'; //-- testing on DEV servers
 // PCG_Cert := 'http://ln_api_dempsey_dev:g0n0l3s!@10.176.68.149:7720/WsSupport/?ver_=2.0'; //-- testing on PROD servers DO NOT USE THIS UNLESS YOU NEED TO				
 
-// InputFile := '~mas::uatsamples::consumer_fcra_100k_07102019.csv';
+//InputFile := '~mas::uatsamples::consumer_fcra_100k_07102019.csv';
 InputFile := '~mas::uat::mas_fcra_10k_sample_20200707.csv';
 // InputFile := '~mas::uatsamples::consumer_fcra_1m_07092019.csv';
 // InputFile := '~mas::uatsamples::consumer_nonfcra_iptest_04232020.csv'; //Samesample as NonFCRA only testing IP validation
@@ -28,8 +28,8 @@ DPMDL =	0 //use_InsuranceDLData - bit 13
 GLBA 	= 0 
 DPPA 	= 0 
 */
-GLBA := 0; // FCRA isn't GLBA restricted
-DPPA := 0; // FCRA isn't DPPA restricted
+GLBA := 0  : STORED('GLBPurposeValue'); // FCRA isn't GLBA restricted
+DPPA := 0  : STORED('DPPAPurposeValue'); // FCRA isn't DPPA restricted
 DataPermissionMask := '0000000000000';  
 DataRestrictionMask := '1000010000000100000000000000000000000000000000000'; 
 Include_Minors := TRUE;
@@ -41,9 +41,9 @@ Intended_Purpose := '';
 // Intended_Purpose := 'PRESCREENING'; 
 
 // Universally Set the History Date YYYYMMDD for ALL records. Set to 0 to use the History Date located on each record of the input file
-histDate := '0';
+// histDate := '0';
 // histDate := '20190116'; 
-// histDate := (STRING)STD.Date.Today(); // Run with today's date
+histDate := (STRING)STD.Date.Today(); // Run with today's date
 
 Score_threshold := 80;
 // Score_threshold := 90;
@@ -61,10 +61,32 @@ AllowedSourcesDataset := DATASET([],PublicRecords_KEL.ECL_Functions.Constants.La
 // Do not exclude any additional sources from allowed sources dataset.
 ExcludeSourcesDataset := DATASET([],PublicRecords_KEL.ECL_Functions.Constants.Layout_Allowed_Sources);
 
+IncludeTargusGW := FALSE;
+
+// Parameter needed to turn CCPA on for Targus -- has to use #STORED since IsFCRA isn't a parameter passed to the soapcall
+#STORED('IsFCRAValue', TRUE);
+
+NeutralRoxie_GW := DATASET([{'neutralroxie', NeutralRoxieIP}], Gateway.Layouts.Config);
+// SELF.Gateways := 	DATASET([{'neutralroxie', NeutralRoxieIP},
+									//	{'delta_personcontext', PCG_Dev}], Gateway.Layouts.Config);
+									
+Empty_GW := DATASET([TRANSFORM(Gateway.Layouts.Config, 
+							SELF.ServiceName := ''; 
+							SELF.URL := ''; 
+							SELF := [])]);
+
+Targus_GW := IF(IncludeTargusGW, DATASET([TRANSFORM(Gateway.Layouts.Config,
+							SELF.ServiceName := 'targus'; 
+							SELF.URL := 'HTTP://api_qa_gw_roxie:g0h3%40t2x@gatewaycertesp.sc.seisint.com:7726/WsGateway/?ver_=1.70'; 
+							SELF := [])]),
+							Empty_GW);  
+
+Input_Gateways := (NeutralRoxie_GW + Targus_GW)(URL <> '');
+
 RecordsToRun := 0;
 eyeball := 25;
 
-OutputFile := '~bbraaten::out::PersonFCRA_Roxie_100k_archive_atmost_test_'+ ThorLib.wuid();
+OutputFile := '~akoenen::out::PersonFCRA_Roxie_100k_archive_KS6961_after_'+ ThorLib.wuid();
 
 prii_layout := RECORD
     STRING Account             ;
@@ -101,7 +123,6 @@ p := IF (RecordsToRun = 0, P_IN, CHOOSEN (P_IN, RecordsToRun));
 //p := p2(Account in ['TMOBSEP7088-158349', 'TMOBSEP7088-87504','TARG4547-221442', 'TMOBJUN7088-196571','AAAA7833-104166']); 
 PP := PROJECT(P(Account != 'Account'), TRANSFORM(PublicRecords_KEL.ECL_Functions.Input_Layout, 
 SELF.historydate := if(histDate = '0', LEFT.historydate, histDate);
-self.IPAddress := '';
 SELF := LEFT));
 
 soapLayout := RECORD
@@ -145,10 +166,7 @@ soapLayout trans (pp le):= TRANSFORM
     SELF.input := PROJECT(le, TRANSFORM(PublicRecords_KEL.ECL_Functions.Input_Layout,
         SELF := LEFT;
         SELF := []));   
-    SELF.Gateways := 	DATASET([{'neutralroxie', NeutralRoxieIP}], Gateway.Layouts.Config);
-    // SELF.Gateways := 	DATASET([{'neutralroxie', NeutralRoxieIP},
-									//	{'delta_personcontext', PCG_Dev}], Gateway.Layouts.Config);
-		
+    SELF.Gateways := Input_Gateways;
     SELF.ScoreThreshold := Settings.LexIDThreshold;
     SELF.DataRestrictionMask := Settings.Data_Restriction_Mask;
     SELF.DataPermissionMask := Settings.Data_Permission_Mask;
@@ -190,7 +208,7 @@ END;
 bwr_results := 
 				SOAPCALL(soap_in, 
 				RoxieIP,
-				'publicrecords_kel.MAS_FCRA_Service',
+				'publicrecords_kel.MAS_FCRA_Service', 
 				{soap_in}, 
 				DATASET(layout_MAS_Test_Service_output),
 				// XPATH('*'),
@@ -238,6 +256,8 @@ OUTPUT(Error_Inputs,,OutputFile+'_Error_Inputs', CSV (QUOTE('"')), OVERWRITE, ex
 OUTPUT(CHOOSEN(Passed_with_Extras, eyeball), NAMED('Sample_Master_Layout'));
 
 OUTPUT(Passed_with_Extras,,OutputFile +'_MasterLayout.csv', CSV(HEADING(single), QUOTE('"')), expire(45));
+
+Output(ave(Passed, time_ms), named('average_time_ms')); 
 
 OUTPUT(Failed,,OutputFile+'errors', thor,  expire(20));
 

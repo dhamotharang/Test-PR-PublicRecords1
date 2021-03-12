@@ -134,7 +134,7 @@ EXPORT getInputBestData(DATASET(DueDiligence.v3Layouts.Internal.BusinessTemp) in
     bestDataByLexID := bestData.SearchWithLexID(transUniqueBusinesses);
     
     updateInquiredBest := JOIN(inData, bestDataByLexID,
-                               LEFT.inquiredBusiness.seleID = RIGHT.seleID,
+                               LEFT.seq = RIGHT.seq,
                                TRANSFORM(DueDiligence.v3Layouts.Internal.BusinessTemp,
                                          SELF.seq := LEFT.seq;
                                          

@@ -1,10 +1,10 @@
-﻿#workunit('name','MAS Busienss dev156 1 thread 10k');
-IMPORT PublicRecords_KEL, RiskWise, SALT38, SALTRoutines, STD, Gateway, ut;
+﻿#workunit('name','MAS Business dev156 1 thread 100k');
+IMPORT PublicRecords_KEL, RiskWise, SALT38, SALTRoutines, STD, Gateway, ut, Business_Risk_BIP;
 Threads := 1;
 
 RoxieIP := RiskWise.shortcuts.dev156;
 
-// InputFile := '~mas::uatsamples::business_nfcra_100k_07102019.csv'; //100k file
+//InputFile := '~mas::uatsamples::business_nfcra_100k_07102019.csv'; //100k file
 InputFile := '~mas::uat::mas_brm_regression_10ktestsample.csv';//for weekly regression testing
 // InputFile := '~mas::uatsamples::business_nfcra_1m_07092019.csv'; //1m file
 // InputFile := '~mas::uatsamples::business_nfcra_iptest_04232020.csv'; 
@@ -58,8 +58,8 @@ BIPAppend_Include_AuthRep := FALSE; // Determines whether Auth Rep data is used 
 Output_Master_Results := TRUE; 
 
 // Toggle to include/exclude SALT profile of results file
-// Output_SALT_Profile := FALSE;
-Output_SALT_Profile := TRUE;
+Output_SALT_Profile := FALSE;
+// Output_SALT_Profile := TRUE;
 
 Exclude_Consumer_Attributes := FALSE; //if TRUE, bypasses consumer logic and sets all consumer shell fields to blank/0.
 
@@ -68,13 +68,33 @@ AllowedSourcesDataset := DATASET([],PublicRecords_KEL.ECL_Functions.Constants.La
 // Do not exclude any additional sources from allowed sources dataset.
 ExcludeSourcesDataset := DATASET([],PublicRecords_KEL.ECL_Functions.Constants.Layout_Allowed_Sources);
 
+// OFAC parameters
+IncludeOFACGW := FALSE;
+include_ofac := TRUE : STORED('IncludeOfacValue'); // This is different than the param to turn off/on the gateway, this adds an OFAC watchlist in the gateway
+include_additional_watchlists  := TRUE : STORED('IncludeAdditionalWatchListsValue');
+Global_Watchlist_Threshold := Business_Risk_BIP.Constants.Default_Global_Watchlist_Threshold : STORED('Global_Watchlist_ThresholdValue');
+watchlists:= 'ALLV4' : STORED('Watchlists_RequestedValue'); // Returns all watchlists for OFAC Version 4
+
+Empty_GW := DATASET([TRANSFORM(Gateway.Layouts.Config, 
+							SELF.ServiceName := ''; 
+							SELF.URL := ''; 
+							SELF := [])]);
+              
+OFAC_GW := IF(IncludeOFACGW, DATASET([TRANSFORM(Gateway.Layouts.Config,
+							SELF.ServiceName := 'bridgerwlc'; 
+							SELF.URL := 'http://bridger_batch_cert:Br1dg3rBAtchC3rt@172.16.70.19:7003/WsSearchCore/?ver_=1'; 
+							SELF := [])]),
+							Empty_GW);    
+
+Input_Gateways := (OFAC_GW)(URL <> '');
+
 RecordsToRun := 0;
 eyeball := 20;
 
 AllowedSources := ''; // Stubbing this out for use in settings output for now. To be used to turn on DNBDMI by setting to 'DNBDMI'
 OverrideExperianRestriction := FALSE; // Stubbing this out for use in settings output for now. To be used to control whether Experian Business Data (EBR and CRDB) is returned.
 
-OutputFile := '~lweiner::out::Business_Roxie_100k_Current_'+ ThorLib.wuid();
+OutputFile := '~akoenen::out::Business_Roxie_100k_Current_ks-6961_after_'+ ThorLib.wuid();
 
 prii_layout := RECORD
 	STRING AccountNumber;
@@ -212,6 +232,7 @@ soapLayout := RECORD
 	// STRING CustomerId; // This is used only for failed transactions here; it's ignored by the ECL service.
 	DATASET(PublicRecords_KEL.ECL_Functions.Input_Bus_Layout) input;
 	INTEGER ScoreThreshold;
+	DATASET(Gateway.Layouts.Config) gateways := DATASET([], Gateway.Layouts.Config);
 	STRING DataRestrictionMask;
 	STRING DataPermissionMask;
 	UNSIGNED1 GLBPurpose;
@@ -228,12 +249,17 @@ soapLayout := RECORD
 	BOOLEAN BIPAppendPrimForce;
 	BOOLEAN BIPAppendReAppend;
 	BOOLEAN BIPAppendIncludeAuthRep;
-  BOOLEAN OverrideExperianRestriction;
-	
+	BOOLEAN OverrideExperianRestriction;
+
 	UNSIGNED1 LexIdSourceOptout;
-  STRING _TransactionId;
-  STRING _BatchUID;
-  UNSIGNED6 _GCID;
+	STRING _TransactionId;
+	STRING _BatchUID;
+	UNSIGNED6 _GCID;
+
+	BOOLEAN IncludeOfac;
+	BOOLEAN IncludeAdditionalWatchLists;
+	REAL Global_Watchlist_Threshold;
+	STRING Watchlists_Requested;
 end;
 
 Settings := MODULE(PublicRecords_KEL.Interface_BWR_Settings)
@@ -278,7 +304,8 @@ soapLayout trans (inDataReadyDist le):= TRANSFORM
 	SELF.input := PROJECT(le, TRANSFORM(PublicRecords_KEL.ECL_Functions.Input_Bus_Layout,
 		SELF := LEFT;
 		SELF := []));
-	SELF.ScoreThreshold := Settings.LexIDThreshold;		
+	SELF.ScoreThreshold := Settings.LexIDThreshold;	
+	SELF.gateways := Input_Gateways;
 	SELF.DataRestrictionMask := Settings.Data_Restriction_Mask;
 	SELF.DataPermissionMask := Settings.Data_Permission_Mask;
 	SELF.GLBPurpose := Settings.GLBAPurpose;
@@ -299,6 +326,10 @@ soapLayout trans (inDataReadyDist le):= TRANSFORM
 	SELF._TransactionId := TransactionId;
 	SELF._BatchUID := BatchUID;
 	SELF._GCID := GCID;	
+	SELF.IncludeOfac := include_ofac;
+	SELF.IncludeAdditionalWatchLists := include_additional_watchlists;
+	SELF.Global_Watchlist_Threshold := Global_Watchlist_Threshold;
+	SELF.Watchlists_Requested := watchlists;
 END;
 
 soap_in := PROJECT(inDataReadyDist, trans(LEFT));
@@ -327,8 +358,13 @@ OUTPUT(CHOOSEN(inDataReady, eyeball), NAMED('Raw_input'));
 OUTPUT( ResultSet, NAMED('Results') );
 
 
-Passed := ResultSet(TRIM(B_InpAcct) <> '');
-Failed := ResultSet(TRIM(B_InpAcct) = ''); 
+results_temp := project(resultset, transform(layout_MAS_Business_Service_output, 	
+													self.B_InpAcct := if(TRIM(left.B_InpAcct) = '', left.P_InpAcct, left.B_InpAcct);
+													self := left;
+													));
+
+Passed := results_temp(TRIM(B_InpAcct) <> '');
+Failed := results_temp(TRIM(B_InpAcct) = ''); 
 
 OUTPUT( CHOOSEN(Passed,eyeball), NAMED('bwr_results_Passed') );
 OUTPUT( CHOOSEN(Failed,eyeball), NAMED('bwr_results_Failed') );
@@ -366,6 +402,8 @@ OUTPUT(CHOOSEN(Passed_with_Extras, eyeball), NAMED('Sample_Master_Layout'));
 OUTPUT(Passed_with_Extras,,OutputFile +'_MasterLayout.csv', CSV(HEADING(single), QUOTE('"')), expire(45));
 
 OUTPUT(Failed,,OutputFile+'errors', thor,  expire(20));
+
+Output(ave(Passed, time_ms), named('average_time_ms')); 
 
 Settings_Dataset := PublicRecords_KEL.ECL_Functions.fn_make_settings_dataset(Settings);
 		

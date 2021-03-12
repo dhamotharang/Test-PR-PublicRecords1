@@ -11,7 +11,7 @@ deduped_indata := DEDUP(sort_indata, did, ipaddr, seq);
 
 gw_mod_access := Gateway.IParam.GetGatewayModAccess(glb, dppa);
 
-pre_netacuity_in := IF(applyOptOut = TRUE, dx_gateway.parser_netacuity.NetAcuityOptOuts(deduped_indata, gw_mod_access), deduped_indata);
+pre_netacuity_in := IF(applyOptOut = TRUE, dx_gateway.parser_netacuity.NetAcuityOptOuts(deduped_indata, gw_mod_access, TRUE), deduped_indata);
 
 // added a skip to remove records that don't have an input IP present so that it doesn't call netacuity unless it's there
 netacuity.Layout_NA_In prep(pre_netacuity_in le) := transform

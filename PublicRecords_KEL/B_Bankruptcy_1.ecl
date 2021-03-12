@@ -4,8 +4,8 @@ IMPORT B_Bankruptcy_2,CFG_Compile,E_Bankruptcy FROM PublicRecords_KEL;
 IMPORT * FROM KEL15.Null;
 EXPORT B_Bankruptcy_1(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG_Compile __cfg = CFG_Compile) := MODULE
   SHARED VIRTUAL TYPEOF(B_Bankruptcy_2(__in,__cfg).__ENH_Bankruptcy_2) __ENH_Bankruptcy_2 := B_Bankruptcy_2(__in,__cfg).__ENH_Bankruptcy_2;
-  SHARED __EE7241919 := __ENH_Bankruptcy_2;
-  EXPORT __ST168573_Layout := RECORD
+  SHARED __EE6954427 := __ENH_Bankruptcy_2;
+  EXPORT __ST172652_Layout := RECORD
     KEL.typ.nstr Source_Description_;
     KEL.typ.nstr Original_Chapter_;
     KEL.typ.nstr Filing_Type_;
@@ -32,16 +32,16 @@ EXPORT B_Bankruptcy_1(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG_
     KEL.typ.epoch Vault_Date_Last_Seen_ := 0;
     KEL.typ.int __RecordCount := 0;
   END;
-  EXPORT __ST168566_Layout := RECORD
+  EXPORT __ST172645_Layout := RECORD
     KEL.typ.nuid UID;
     KEL.typ.nstr T_M_S_I_D_;
     KEL.typ.nstr Court_Code_;
     KEL.typ.nstr Case_Number_;
     KEL.typ.nstr Original_Case_Number_;
-    KEL.typ.ndataset(__ST168573_Layout) Records_;
+    KEL.typ.ndataset(__ST172652_Layout) Records_;
     KEL.typ.ndataset(E_Bankruptcy(__in,__cfg).Case_Details_Layout) Case_Details_;
     KEL.typ.ndataset(E_Bankruptcy(__in,__cfg).Data_Sources_Layout) Data_Sources_;
-    KEL.typ.ndataset(B_Bankruptcy_2(__in,__cfg).__ST1152174_Layout) Best_Child_Record_;
+    KEL.typ.ndataset(B_Bankruptcy_2(__in,__cfg).__ST1136104_Layout) Best_Child_Record_;
     KEL.typ.nbool Has_Case_Number_;
     KEL.typ.epoch Archive___Date_ := 0;
     KEL.typ.epoch Date_First_Seen_ := 0;
@@ -50,10 +50,10 @@ EXPORT B_Bankruptcy_1(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG_
     KEL.typ.epoch Vault_Date_Last_Seen_ := 0;
     KEL.typ.int __RecordCount := 0;
   END;
-  SHARED __ST168566_Layout __ND7241924__Project(B_Bankruptcy_2(__in,__cfg).__ST194336_Layout __PP7241920) := TRANSFORM
-    __EE7241994 := __PP7241920.Records_;
-    SELF.Records_ := __BN(PROJECT(__T(__EE7241994),__ST168573_Layout),__NL(__EE7241994));
-    SELF := __PP7241920;
+  SHARED __ST172645_Layout __ND6954432__Project(B_Bankruptcy_2(__in,__cfg).__ST198784_Layout __PP6954428) := TRANSFORM
+    __EE6954502 := __PP6954428.Records_;
+    SELF.Records_ := __BN(PROJECT(__T(__EE6954502),__ST172652_Layout),__NL(__EE6954502));
+    SELF := __PP6954428;
   END;
-  EXPORT __ENH_Bankruptcy_1 := PROJECT(__EE7241919,__ND7241924__Project(LEFT));
+  EXPORT __ENH_Bankruptcy_1 := PROJECT(__EE6954427,__ND6954432__Project(LEFT));
 END;

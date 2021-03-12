@@ -143,8 +143,7 @@ EXPORT getBestData(DueDiligence.DDInterface.iDDRegulatoryCompliance regulatoryAc
         bestData := fn_getBestData(linkLayout);
         
         updateData := JOIN(inData, bestData,
-                            LEFT.seq = RIGHT.seq AND
-                            LEFT.seleID = RIGHT.seleID,
+                            LEFT.seq = RIGHT.seq,
                             TRANSFORM(DueDiligence.v3Layouts.InternalBusiness.SlimBestSearch,
                                       SELF := RIGHT;
                                       SELF := LEFT;),

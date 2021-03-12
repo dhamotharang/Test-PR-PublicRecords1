@@ -119,25 +119,24 @@ EXPORT RealtimeAssessmentReportRecords(DATASET(FraudShared_Services.Layouts.Batc
  
  ds_RiskAttribute := PROJECT(ds_RiskAssessment[1].EntityStats, 
                        TRANSFORM(iesp.identityreport.t_RINRiskAttribute, 
-                         SELF.ElementType := CASE(LEFT.entitytype,
-                                                  _Constants.EntityType.LEXID => _Constants.Fragment_Types.PERSON_FRAGMENT,
-                                                  _Constants.EntityType.PHYSICAL_ADDRESS => _Constants.Fragment_Types.PHYSICAL_ADDRESS_FRAGMENT,
-                                                  _Constants.EntityType.SSN => _Constants.Fragment_Types.SSN_FRAGMENT,
-                                                  _Constants.EntityType.PHONENO => _Constants.Fragment_Types.PHONE_FRAGMENT,
-                                                  _Constants.EntityType.EMAIL => _Constants.Fragment_Types.EMAIL_FRAGMENT,
-                                                  _Constants.EntityType.IPADDRESS => _Constants.Fragment_Types.IP_ADDRESS_FRAGMENT,
-                                                  _Constants.EntityType.BANKACCOUNT => _Constants.Fragment_Types.BANK_ACCOUNT_NUMBER_FRAGMENT,
-                                                  _Constants.EntityType.DLNUMBER => _Constants.Fragment_Types.DRIVERS_LICENSE_NUMBER_FRAGMENT,
-                                                  ''),                                                  
+                         SELF.ElementType := RiskIntelligenceNetwork_Services.Functions.GetElementType(LEFT.entitytype);
                          SELF.KnownRiskCode := LEFT.indicatortype,
                          SELF.KnownRiskDescription := LEFT.label,
                          SELF.RiskLevel := (string) LEFT.risklevel,
                          SELF.NVPs := []));
  
+ ds_RulesMatched := PROJECT(ds_RiskAssessment[1].RulesFlagsMatched,
+                      TRANSFORM(iesp.identityreport.t_RINRiskRulesMatched,
+                         SELF.ElementType := RiskIntelligenceNetwork_Services.Functions.GetElementType(LEFT.entitytype);
+                         SELF.RuleName := LEFT.rulename,
+                         SELF.Description := LEFT.description,
+                         SELF.RiskLevel := (string) LEFT.risklevel));
+
  iesp.identityreport.t_RINIdentityReportRecord trans_reportrecords() := TRANSFORM
   SELF.IdentityProfile := ROW(ds_realtime_profile[1], iesp.identityreport.t_RINIdentityProfile);
   SELF.RiskLevel := (string) ds_RiskAssessment[1].P1_IDRiskIndx;
   SELF.RiskAttributes := ds_RiskAttribute;
+  SELF.RulesMatched := ds_RulesMatched;
   SELF := []
  END;
 

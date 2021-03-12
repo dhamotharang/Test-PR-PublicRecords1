@@ -256,7 +256,10 @@ EXPORT Common_Functions := MODULE;
 		MDR.sourceTools.src_TX_Watercraft => PublicRecords_KEL.ECL_Functions.Constants.SourceGroup_Watercraft,
 		MDR.sourceTools.src_Targus_White_pages => PublicRecords_KEL.ECL_Functions.Constants.SourceGroup_Targus_White_pages,
 		MDR.sourceTools.src_Professional_License => PublicRecords_KEL.ECL_Functions.Constants.SourceGroup_Professional_License,
+		MDR.sourceTools.src_InfutorCID => RawSource,
+		'GH' => RawSource, // GH Doesn't exist in MDR SourceTools
 		'');
+
 
 	EXPORT GetLinkIDs(DATASET(PublicRecords_KEL.ECL_Functions.Layouts_FDC(PublicRecords_KEL.Interface_Options).Layout_FDC) shell) := FUNCTION
 		

@@ -4,8 +4,8 @@ IMPORT B_Property_Event_6,CFG_Compile,E_Property,E_Property_Event,E_Zip_Code FRO
 IMPORT * FROM KEL15.Null;
 EXPORT B_Property_Event_5(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG_Compile __cfg = CFG_Compile) := MODULE
   SHARED VIRTUAL TYPEOF(B_Property_Event_6(__in,__cfg).__ENH_Property_Event_6) __ENH_Property_Event_6 := B_Property_Event_6(__in,__cfg).__ENH_Property_Event_6;
-  SHARED __EE4936699 := __ENH_Property_Event_6;
-  EXPORT __ST241640_Layout := RECORD
+  SHARED __EE4781165 := __ENH_Property_Event_6;
+  EXPORT __ST245943_Layout := RECORD
     KEL.typ.nuid UID;
     KEL.typ.nstr L_N_Fares_I_D_;
     KEL.typ.nstr Primary_Range_;
@@ -28,6 +28,7 @@ EXPORT B_Property_Event_5(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, 
     KEL.typ.nbool Occupant_Owned_;
     KEL.typ.nkdate Recording_Date_;
     KEL.typ.nkdate Sale_Date_;
+    KEL.typ.nstr Document_Type_Code_;
     KEL.typ.nint Sale_Price_;
     KEL.typ.nint Mortgage_Amount_;
     KEL.typ.nstr Mortgage_Type_;
@@ -77,9 +78,9 @@ EXPORT B_Property_Event_5(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, 
     KEL.typ.epoch Vault_Date_Last_Seen_ := 0;
     KEL.typ.int __RecordCount := 0;
   END;
-  SHARED __ST241640_Layout __ND4936704__Project(B_Property_Event_6(__in,__cfg).__ST246388_Layout __PP4936700) := TRANSFORM
-    SELF.Dt_Last_Seen_ := KEL.era.ToDate(__PP4936700.Date_Last_Seen_);
-    SELF := __PP4936700;
+  SHARED __ST245943_Layout __ND4781170__Project(B_Property_Event_6(__in,__cfg).__ST250704_Layout __PP4781166) := TRANSFORM
+    SELF.Dt_Last_Seen_ := KEL.era.ToDate(__PP4781166.Date_Last_Seen_);
+    SELF := __PP4781166;
   END;
-  EXPORT __ENH_Property_Event_5 := PROJECT(__EE4936699,__ND4936704__Project(LEFT));
+  EXPORT __ENH_Property_Event_5 := PROJECT(__EE4781165,__ND4781170__Project(LEFT));
 END;

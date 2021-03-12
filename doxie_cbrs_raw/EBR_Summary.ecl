@@ -5,10 +5,9 @@ export EBR_Summary(
   unsigned3 Max_val = 0
 ) := MODULE
 
-  //TODO: Convert this direct join to a dx get pattern.
-
   shared k := ebr.Key_1000_Executive_Summary_BDID;
   nn := Max_val * 2;
+  bdids_set := SET(bdids(bdid > 0), bdid);
 
   outrec := {unsigned1 level, recordof(k)};
   outrec makeit(k l) := transform
@@ -16,11 +15,14 @@ export EBR_Summary(
     self := l;
   end;
 
-  pre_outf1 := project(k(bdid > 0 and bdid in SET(bdids,bdid)), makeit(left));
-  outf1 := dx_common.Incrementals.mac_Rollup(pre_outf1, dx_EBR.mod_delta_rid.key_1000_delta_rid);
-  shared out_f := choosen(sort(outf1,bdid,file_number,-process_date),nn);
+  recs := dx_EBR.Read.Executive_Summary_1000_By_Bdid(bdids_set, nn);
+  outf1 := project(recs, TRANSFORM(outrec, self.level := 0, self := left));
+
+  shared out_f := sort(outf1,bdid,file_number,-process_date);
 
   shared simple_count :=
+    // Leaving this as is since it's only interested in counts.
+    // Passing this data to the incremental macro without a choosen limit could lead to issues otherwise.
     count(k(keyed(bdid in SET(bdids, bdid))));
 
     export records := out_f;
