@@ -357,7 +357,7 @@
 		// Phone Info (Waterfall Phones)
 		wfResult_pre	:= MemberPoint.getPhoneInfo(dsBestGood, BParams);
 		wfResult 		:= wfResult_pre.Records;
-		wfResult_royalties 	:= if(isIncludePhone AND EXISTS(wfResult), 
+		wfResult_royalties 	:= if(isIncludePhone AND EXISTS(wfResult) AND ~isPhoneInfoAlternative, 
 									wfResult_pre.royalties, 
 									DATASET([],Royalty.Layouts.RoyaltyForBatch) );	
 
