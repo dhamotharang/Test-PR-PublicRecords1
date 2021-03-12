@@ -1,6 +1,6 @@
 ﻿IMPORT AID_Build, ADVO, AlloyMedia_student_list,  American_student_list, AutoKey, AVM_V2, BankruptcyV3, BBB2, BIPV2, BIPV2_Best, BIPV2_Build, Business_Risk_BIP, BusReg, CalBus, CellPhone, Certegy, Corp2, 
 		 Data_Services, DCAV2, Death_Master,  Doxie, Doxie_Files, DriversV2, DMA, dx_BestRecords, dx_ConsumerFinancialProtectionBureau, dx_Cortera, dx_DataBridge, DX_Email, 
-		dx_Cortera_Tradeline, dx_Equifax_Business_Data, dx_Gong, dx_Header, dx_Infutor_NARB, dx_PhonesInfo, dx_PhonesPlus, dx_Relatives_v3, EBR, Email_Data, emerges, Experian_CRDB, FAA, FBNv2, FLAccidents_Ecrash, Fraudpoint3, Gong, 
+		dx_Cortera_Tradeline, dx_Equifax_Business_Data, dx_Gong, dx_Header, dx_Infutor_NARB, dx_PhonesInfo, dx_PhonesPlus, dx_Property, dx_Relatives_v3, EBR, Email_Data, emerges, Experian_CRDB, FAA, FBNv2, FLAccidents_Ecrash, Fraudpoint3, Gong, 
 		GovData, Header, Header_Quick, InfoUSA, IRS5500, InfutorCID, Inquiry_AccLogs, LiensV2, LN_PropertyV2, MDR, OSHAIR, Phonesplus_v2, PublicRecords_KEL, Prof_License_Mari, 
 		Prof_LicenseV2, Relationship, Risk_Indicators, RiskView, RiskWise, SAM, SexOffender, STD, Suppress, Targus, thrive, USPIS_HotList, Utilfile, ut,
 		VehicleV2, Watercraft, Watchdog, UCCV2, YellowPages, dx_OSHAIR;	
@@ -158,26 +158,18 @@ SHARED unsigned1 iType := IF(Options.IsFCRA, data_services.data_env.iFCRA, data_
 		RECORDOF(Doxie__key_wild_SSN);
 		STRING Archive_Date;
 		PublicRecords_KEL.ECL_Functions.Layout_Overrides;//this will be needed
+	END;	  
+	
+    SHARED Header_key_wild_phone := dx_Header.key_wild_phone();
+	EXPORT Layout_Header_key_wild_phone := RECORD
+		LayoutIDs;
+		RECORDOF(Header_key_wild_phone);
+		STRING Archive_Date;
+		PublicRecords_KEL.ECL_Functions.Layout_Overrides;
 	END;	
 
 	// --------------------[ Criminal ]--------------------
 	
-	EXPORT Layout_Doxie_Files__Key_BocaShell_Crim_FCRA_Denorm := RECORD
-		LayoutIDs;
-		RECORDOF(Doxie_Files.Key_BocaShell_Crim_FCRA);
-		STRING2 src;
-		dpmtype;
-		STRING Archive_Date;
-	END;
-	
-	EXPORT Layout_Doxie_Files__Key_BocaShell_Crim_FCRA := RECORD
-		LayoutIDs;
-		RECORDOF(Doxie_Files.Key_BocaShell_Crim_FCRA) - Criminal_Count; // Changing layout to normalize child dataset Criminal_Count
-		RECORDOF(Doxie_Files.Key_BocaShell_Crim_FCRA.Criminal_Count);
-		STRING2 src;
-		STRING Archive_Date;
-		dpmtype;
-	END;
 	
 	EXPORT Layout_Doxie_Files__Key_Offenders := RECORD
 		LayoutIDs;
@@ -1204,6 +1196,7 @@ SHARED unsigned1 iType := IF(Options.IsFCRA, data_services.data_env.iFCRA, data_
 		PropertyV2_Key_Assessor_Fid_Records.recording_date;
 		PropertyV2_Key_Assessor_Fid_Records.sale_date;
 		PropertyV2_Key_Assessor_Fid_Records.sales_price;
+		PropertyV2_Key_Assessor_Fid_Records.document_type;
 		PropertyV2_Key_Assessor_Fid_Records.mortgage_loan_amount;
 		PropertyV2_Key_Assessor_Fid_Records.mortgage_loan_type_code;
 		PropertyV2_Key_Assessor_Fid_Records.prior_recording_date;
@@ -1259,7 +1252,9 @@ SHARED unsigned1 iType := IF(Options.IsFCRA, data_services.data_env.iFCRA, data_
 		PropertyV2_Key_Deed_Fid_Records.contract_date;
 		PropertyV2_Key_Deed_Fid_Records.recording_date;
 		PropertyV2_Key_Deed_Fid_Records.sales_price;
+		PropertyV2_Key_Deed_Fid_Records.document_type_code;
 		PropertyV2_Key_Deed_Fid_Records.land_lot_size;
+		PropertyV2_Key_Deed_Fid_Records.vendor_source_flag;
 		BOOLEAN current_record;
 		BOOLEAN timeshare_flag;
 		BOOLEAN addl_name_flag;
@@ -1319,6 +1314,7 @@ SHARED unsigned1 iType := IF(Options.IsFCRA, data_services.data_env.iFCRA, data_
 		PropertyV2_Key_Search_Fid_Records.proxid;
 		PropertyV2_Key_Search_Fid_Records.powid;
 		PropertyV2_Key_Search_Fid_Records.persistent_record_id;//overrides & suppressions
+		PropertyV2_Key_Search_Fid_Records.vendor_source_flag;
 		BOOLEAN PartyIsBuyerOrOwner;
 		BOOLEAN PartyIsBorrower;
 		BOOLEAN PartyIsSeller;
@@ -1360,6 +1356,8 @@ SHARED unsigned1 iType := IF(Options.IsFCRA, data_services.data_env.iFCRA, data_
 		dpmtype;
 		STRING3 src;
 		STRING Archive_Date;
+		PublicRecords_KEL.ECL_Functions.Layout_Overrides.avm_medians_correct_ffid;
+		PublicRecords_KEL.ECL_Functions.Layout_Overrides.avm_medians_correct_record_id;
 
 	END;
 	
@@ -1517,7 +1515,6 @@ SHARED unsigned1 iType := IF(Options.IsFCRA, data_services.data_env.iFCRA, data_
 		dpmtype;
         STRING2 src;
 		STRING Archive_Date;
-        BOOLEAN HeaderHitFlag;
 	END;
   
 	EXPORT Layout_phone_addr_header_summary_key_norm_records := RECORD
@@ -1531,7 +1528,6 @@ SHARED unsigned1 iType := IF(Options.IsFCRA, data_services.data_env.iFCRA, data_
 		dpmtype;
         STRING2 src;
 		STRING Archive_Date;
-        BOOLEAN HeaderHitFlag;
 	END;
   
 	EXPORT Layout_phone_addr_summary_key_norm_records := RECORD
@@ -1545,7 +1541,6 @@ SHARED unsigned1 iType := IF(Options.IsFCRA, data_services.data_env.iFCRA, data_
 		dpmtype;
         STRING2 src;
 		STRING Archive_Date;
-        BOOLEAN HeaderHitFlag;
 	END;
   
 	EXPORT Layout_phone_lname_summary_key_norm_records := RECORD
@@ -1559,7 +1554,6 @@ SHARED unsigned1 iType := IF(Options.IsFCRA, data_services.data_env.iFCRA, data_
 		dpmtype;
         STRING2 src;
 		STRING Archive_Date;
-        BOOLEAN HeaderHitFlag;
 	END;
   
 	EXPORT Layout_phone_lname_header_summary_key_norm_records := RECORD
@@ -1574,7 +1568,6 @@ SHARED unsigned1 iType := IF(Options.IsFCRA, data_services.data_env.iFCRA, data_
 		dpmtype;
         STRING2 src;
 		STRING Archive_Date;
-        BOOLEAN HeaderHitFlag;
 	END;
   
 	EXPORT Layout_phone_dob_summary_key_norm_records := RECORD
@@ -1903,7 +1896,17 @@ SHARED Phone_Search_layout := BIPV2_Build.key_high_risk_industries.Phone_Search;
 			STRING Archive_Date;
 			string6 SIC_Code;
 			string6 NAICS_Code;
-	END;			
+	END;
+	EXPORT Layout_DX_Property__Key_Foreclosures_FID_With_Did := RECORD
+		LayoutIDs;
+		dpmtype;
+		INTEGER did;
+		string2 src;
+		STRING5 Zip5;
+		STRING4 Zip4;
+		STRING Archive_Date;
+		recordof(dx_Property.Key_Foreclosures_FID);
+	END;
 	
 	// ===================[ Composite Layout ]===================
   
@@ -2004,7 +2007,6 @@ SHARED Phone_Search_layout := BIPV2_Build.key_high_risk_industries.Phone_Search;
 		DATASET(Layout_DMA__Key_DNM_Name_Address) Dataset_DMA__Key_DNM_Name_Address;	
 
 		//DOC
-		DATASET(Layout_Doxie_Files__Key_BocaShell_Crim_FCRA) Dataset_Doxie_Files__Key_BocaShell_Crim_FCRA;		
 		DATASET(Layout_Doxie_Files__Key_Offenders) Dataset_Doxie_Files__Key_Offenders;		
 		DATASET(Layout_Doxie_files__Key_Court_Offenses) Dataset_Doxie_files__Key_Court_Offenses;		
 		DATASET(Layout_Doxie_Files__Key_Offenses) Dataset_Doxie_Files__Key_Offenses;		
@@ -2037,6 +2039,9 @@ SHARED Phone_Search_layout := BIPV2_Build.key_high_risk_industries.Phone_Search;
 
 		//fbn
 		DATASET(Layout_FBNv2__kfetch_LinkIds) Dataset_FBNv2__kfetch_LinkIds;
+
+		// Foreclosure
+		DATASET(Layout_DX_Property__Key_Foreclosures_FID_With_Did) Dataset_DX_Property__Key_Foreclosures_FID_With_Did;
 
 		//Fraudpoint3
 		DATASET(Layout_Fraudpoint3__Key_Address) Dataset_Fraudpoint3__Key_Address;		
@@ -2151,7 +2156,7 @@ SHARED Phone_Search_layout := BIPV2_Build.key_high_risk_industries.Phone_Search;
 
 		//yellow pages
 		DATASET(Layout_YellowPages__kfetch_yellowpages_linkids) Dataset_YellowPages__kfetch_yellowpages_linkids;
-	
+			
 END;
 	
 END;

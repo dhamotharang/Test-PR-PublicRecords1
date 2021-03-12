@@ -1,213 +1,203 @@
 ﻿//HPCC Systems KEL Compiler Version 1.5.0rc1
 IMPORT KEL15 AS KEL;
-IMPORT B_Address_2,B_Address_3,B_Address_4,B_Address_5,B_Address_6,B_Aircraft_Owner_1,B_Aircraft_Owner_2,B_Aircraft_Owner_3,B_Bankruptcy_1,B_Bankruptcy_2,B_Bankruptcy_3,B_Bankruptcy_4,B_Bankruptcy_5,B_Bankruptcy_6,B_Bankruptcy_7,B_Bankruptcy_8,B_Criminal_Offense_1,B_Criminal_Offense_2,B_Criminal_Offense_3,B_Criminal_Offense_4,B_Criminal_Offense_5,B_Education_1,B_Education_2,B_Education_3,B_Education_4,B_Education_5,B_Education_6,B_Education_7,B_Email_2,B_First_Degree_Relative_5,B_Input_P_I_I_1,B_Input_P_I_I_2,B_Input_P_I_I_3,B_Input_P_I_I_4,B_Input_P_I_I_5,B_Input_P_I_I_6,B_Input_P_I_I_7,B_Input_P_I_I_8,B_Input_P_I_I_9,B_Inquiry_10,B_Inquiry_11,B_Inquiry_3,B_Inquiry_4,B_Inquiry_5,B_Inquiry_6,B_Inquiry_7,B_Inquiry_8,B_Inquiry_9,B_Lien_Judgment_13,B_Person,B_Person_1,B_Person_10,B_Person_11,B_Person_2,B_Person_3,B_Person_4,B_Person_5,B_Person_6,B_Person_7,B_Person_8,B_Person_9,B_Person_Accident_8,B_Person_Address_2,B_Person_Address_3,B_Person_Inquiry_3,B_Person_Inquiry_4,B_Person_Inquiry_5,B_Person_Inquiry_6,B_Person_Inquiry_7,B_Person_Inquiry_8,B_Person_Lien_Judgment_12,B_Person_Property_1,B_Person_Property_2,B_Person_Property_3,B_Person_Property_4,B_Person_Property_5,B_Person_Property_6,B_Person_S_S_N_1,B_Person_S_S_N_2,B_Person_Vehicle_1,B_Person_Vehicle_2,B_Person_Vehicle_3,B_Professional_License_1,B_Professional_License_2,B_Professional_License_3,B_Professional_License_4,B_Professional_License_5,B_Property_2,B_Property_3,B_Property_4,B_Property_5,B_Property_Event_1,B_Property_Event_2,B_Property_Event_3,B_Property_Event_4,B_Property_Event_5,B_Property_Event_6,B_Sele_Person_3,B_Sele_Person_4,B_Sele_Person_5,B_Sele_Person_6,B_Sele_Person_7,B_Watercraft_Owner_1,B_Watercraft_Owner_2,B_Watercraft_Owner_3,CFG_Compile,E_Accident,E_Address,E_Address_Inquiry,E_Address_Property,E_Aircraft,E_Aircraft_Owner,E_Bankruptcy,E_Criminal_Offense,E_Education,E_Email,E_Email_Inquiry,E_First_Degree_Associations,E_First_Degree_Relative,E_Geo_Link,E_Household,E_Household_Member,E_Input_P_I_I,E_Inquiry,E_Lien_Judgment,E_Person,E_Person_Accident,E_Person_Address,E_Person_Bankruptcy,E_Person_Education,E_Person_Email,E_Person_Inquiry,E_Person_Lien_Judgment,E_Person_Offenses,E_Person_Property,E_Person_Property_Event,E_Person_S_S_N,E_Person_Vehicle,E_Phone,E_Phone_Inquiry,E_Professional_License,E_Professional_License_Person,E_Property,E_Property_Event,E_S_S_N_Inquiry,E_Sele_Person,E_Social_Security_Number,E_Surname,E_Utility,E_Utility_Person,E_Vehicle,E_Watercraft,E_Watercraft_Owner,E_Zip_Code FROM PublicRecords_KEL;
+IMPORT B_Address_2,B_Address_3,B_Address_4,B_Address_5,B_Address_6,B_Aircraft_Owner_1,B_Aircraft_Owner_2,B_Aircraft_Owner_3,B_Bankruptcy_1,B_Bankruptcy_2,B_Bankruptcy_3,B_Bankruptcy_4,B_Bankruptcy_5,B_Bankruptcy_6,B_Bankruptcy_7,B_Bankruptcy_8,B_Criminal_Offense_1,B_Criminal_Offense_2,B_Criminal_Offense_3,B_Criminal_Offense_4,B_Criminal_Offense_5,B_Education_1,B_Education_2,B_Education_3,B_Education_4,B_Education_5,B_Education_6,B_Education_7,B_Email_2,B_First_Degree_Relative_5,B_Input_P_I_I_1,B_Input_P_I_I_2,B_Input_P_I_I_3,B_Input_P_I_I_4,B_Input_P_I_I_5,B_Input_P_I_I_6,B_Input_P_I_I_7,B_Input_P_I_I_8,B_Input_P_I_I_9,B_Inquiry_10,B_Inquiry_11,B_Inquiry_3,B_Inquiry_4,B_Inquiry_5,B_Inquiry_6,B_Inquiry_7,B_Inquiry_8,B_Inquiry_9,B_Lien_Judgment_13,B_Person,B_Person_1,B_Person_10,B_Person_11,B_Person_2,B_Person_3,B_Person_4,B_Person_5,B_Person_6,B_Person_7,B_Person_8,B_Person_9,B_Person_Accident_8,B_Person_Address_2,B_Person_Address_3,B_Person_Inquiry_3,B_Person_Inquiry_4,B_Person_Inquiry_5,B_Person_Inquiry_6,B_Person_Inquiry_7,B_Person_Inquiry_8,B_Person_Lien_Judgment_12,B_Person_Property_1,B_Person_Property_2,B_Person_Property_3,B_Person_Property_4,B_Person_Property_5,B_Person_Property_6,B_Person_S_S_N_1,B_Person_S_S_N_2,B_Person_Vehicle_1,B_Person_Vehicle_2,B_Person_Vehicle_3,B_Professional_License_2,B_Professional_License_3,B_Professional_License_4,B_Professional_License_5,B_Property_2,B_Property_3,B_Property_4,B_Property_5,B_Property_Event_1,B_Property_Event_2,B_Property_Event_3,B_Property_Event_4,B_Property_Event_5,B_Property_Event_6,B_Sele_Person_3,B_Sele_Person_4,B_Sele_Person_5,B_Sele_Person_6,B_Sele_Person_7,B_Watercraft_Owner_1,B_Watercraft_Owner_2,B_Watercraft_Owner_3,CFG_Compile,E_Accident,E_Address,E_Address_Inquiry,E_Address_Property,E_Address_Slim,E_Address_Summary,E_Aircraft,E_Aircraft_Owner,E_Bankruptcy,E_Criminal_Offense,E_Education,E_Email,E_Email_Inquiry,E_First_Degree_Associations,E_First_Degree_Relative,E_Geo_Link,E_Input_P_I_I,E_Inquiry,E_Lien_Judgment,E_Name_Summary,E_Person,E_Person_Accident,E_Person_Address,E_Person_Bankruptcy,E_Person_Education,E_Person_Email,E_Person_Inquiry,E_Person_Lien_Judgment,E_Person_Offenses,E_Person_Property,E_Person_Property_Event,E_Person_S_S_N,E_Person_Vehicle,E_Phone,E_Phone_Inquiry,E_Phone_Summary,E_Professional_License,E_Professional_License_Person,E_Property,E_Property_Event,E_S_S_N_Inquiry,E_S_S_N_Summary,E_Sele_Person,E_Social_Security_Number,E_Surname,E_Utility,E_Utility_Person,E_Vehicle,E_Watercraft,E_Watercraft_Owner,E_Zip_Code FROM PublicRecords_KEL;
 IMPORT * FROM KEL15.Null;
-EXPORT Q_F_C_R_A_Mini_Attributes_V1_Thor_Hybrid(KEL.typ.uid __PLexID_in, KEL.typ.kdate __PP_InpClnArchDt, DATA57 __PDPM, CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault) := MODULE
+EXPORT Q_F_C_R_A_Mini_Attributes_V1_Thor_Hybrid(KEL.typ.uid __PLexID_in, KEL.typ.kdate __PP_InpClnArchDt, KEL.typ.kdate __PRunDateToMimic, DATA57 __PDPM, CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault) := MODULE
   SHARED __cfg_Local := MODULE(CFG_Compile)
     EXPORT KEL.typ.kdate CurrentDate := __PP_InpClnArchDt;
   END;
   SHARED E_Accident_Filtered := MODULE(E_Accident(__in,__cfg_Local))
-    SHARED __AsofFitler(DATASET(InLayout) __ds) := __ds(__T(__OP2(KEL.era.ToDateMinNull(__ds.Hybrid_Archive_Date_),<=,__CN(__PP_InpClnArchDt))));
+    SHARED __AsofFitler(DATASET(InLayout) __ds) := __ds(__T(__OP2(__OP2(KEL.era.ToDateMinNull(__ds.Hybrid_Archive_Date_),<=,__CN(__PRunDateToMimic)),AND,__OP2(KEL.era.ToDateMaxNull(__ds.Vault_Date_Last_Seen_),>=,__CN(__PRunDateToMimic)))) AND __T(__OP2(KEL.era.ToDateMinNull(__ds.Hybrid_Archive_Date_),<=,__CN(__PP_InpClnArchDt))));
     SHARED __UsingFitler(DATASET(InLayout) __ds) := __ds(KEL.Permits.BitAnd(__ds.__Permits,__PDPM) = __ds.__Permits);
     SHARED __SourceFilter(DATASET(InLayout) __ds) := __UsingFitler(__AsofFitler(__ds));
   END;
   SHARED E_Address_Filtered := MODULE(E_Address(__in,__cfg_Local))
-    SHARED __AsofFitler(DATASET(InLayout) __ds) := __ds(__T(__OP2(KEL.era.ToDateMinNull(__ds.Hybrid_Archive_Date_),<=,__CN(__PP_InpClnArchDt))));
+    SHARED __AsofFitler(DATASET(InLayout) __ds) := __ds(__T(__OP2(__OP2(KEL.era.ToDateMinNull(__ds.Hybrid_Archive_Date_),<=,__CN(__PRunDateToMimic)),AND,__OP2(KEL.era.ToDateMaxNull(__ds.Vault_Date_Last_Seen_),>=,__CN(__PRunDateToMimic)))) AND __T(__OP2(KEL.era.ToDateMinNull(__ds.Hybrid_Archive_Date_),<=,__CN(__PP_InpClnArchDt))));
     SHARED __UsingFitler(DATASET(InLayout) __ds) := __ds(KEL.Permits.BitAnd(__ds.__Permits,__PDPM) = __ds.__Permits);
     SHARED __SourceFilter(DATASET(InLayout) __ds) := __UsingFitler(__AsofFitler(__ds));
   END;
   SHARED E_Address_Inquiry_Filtered := MODULE(E_Address_Inquiry(__in,__cfg_Local))
-    SHARED __AsofFitler(DATASET(InLayout) __ds) := __ds(__T(__OP2(KEL.Era.nkdateFromNtimestamp(KEL.era.ToTimestampMinNull(__ds.Hybrid_Archive_Date_)),<=,__CN(__PP_InpClnArchDt))));
+    SHARED __AsofFitler(DATASET(InLayout) __ds) := __ds(__T(__OP2(__OP2(KEL.Era.nkdateFromNtimestamp(KEL.era.ToTimestampMinNull(__ds.Hybrid_Archive_Date_)),<=,__CN(__PRunDateToMimic)),AND,__OP2(KEL.era.ToDateMaxNull(__ds.Vault_Date_Last_Seen_),>=,__CN(__PRunDateToMimic)))) AND __T(__OP2(KEL.Era.nkdateFromNtimestamp(KEL.era.ToTimestampMinNull(__ds.Hybrid_Archive_Date_)),<=,__CN(__PP_InpClnArchDt))));
     SHARED __UsingFitler(DATASET(InLayout) __ds) := __ds(KEL.Permits.BitAnd(__ds.__Permits,__PDPM) = __ds.__Permits);
     SHARED __SourceFilter(DATASET(InLayout) __ds) := __UsingFitler(__AsofFitler(__ds));
   END;
   SHARED E_Address_Property_Filtered := MODULE(E_Address_Property(__in,__cfg_Local))
-    SHARED __AsofFitler(DATASET(InLayout) __ds) := __ds(__T(__OP2(KEL.era.ToDateMinNull(__ds.Hybrid_Archive_Date_),<=,__CN(__PP_InpClnArchDt))));
+    SHARED __AsofFitler(DATASET(InLayout) __ds) := __ds(__T(__OP2(__OP2(KEL.era.ToDateMinNull(__ds.Hybrid_Archive_Date_),<=,__CN(__PRunDateToMimic)),AND,__OP2(KEL.era.ToDateMaxNull(__ds.Vault_Date_Last_Seen_),>=,__CN(__PRunDateToMimic)))) AND __T(__OP2(KEL.era.ToDateMinNull(__ds.Hybrid_Archive_Date_),<=,__CN(__PP_InpClnArchDt))));
     SHARED __UsingFitler(DATASET(InLayout) __ds) := __ds(KEL.Permits.BitAnd(__ds.__Permits,__PDPM) = __ds.__Permits);
     SHARED __SourceFilter(DATASET(InLayout) __ds) := __UsingFitler(__AsofFitler(__ds));
   END;
   SHARED E_Aircraft_Owner_Filtered := MODULE(E_Aircraft_Owner(__in,__cfg_Local))
-    SHARED __AsofFitler(DATASET(InLayout) __ds) := __ds(__T(__OP2(KEL.era.ToDateMinNull(__ds.Hybrid_Archive_Date_),<=,__CN(__PP_InpClnArchDt))));
+    SHARED __AsofFitler(DATASET(InLayout) __ds) := __ds(__T(__OP2(__OP2(KEL.era.ToDateMinNull(__ds.Hybrid_Archive_Date_),<=,__CN(__PRunDateToMimic)),AND,__OP2(KEL.era.ToDateMaxNull(__ds.Vault_Date_Last_Seen_),>=,__CN(__PRunDateToMimic)))) AND __T(__OP2(KEL.era.ToDateMinNull(__ds.Hybrid_Archive_Date_),<=,__CN(__PP_InpClnArchDt))));
     SHARED __UsingFitler(DATASET(InLayout) __ds) := __ds(KEL.Permits.BitAnd(__ds.__Permits,__PDPM) = __ds.__Permits);
     SHARED __SourceFilter(DATASET(InLayout) __ds) := __UsingFitler(__AsofFitler(__ds));
   END;
   SHARED E_Bankruptcy_Filtered := MODULE(E_Bankruptcy(__in,__cfg_Local))
-    SHARED __AsofFitler(DATASET(InLayout) __ds) := __ds(__T(__OP2(KEL.era.ToDateMinNull(__ds.Hybrid_Archive_Date_),<=,__CN(__PP_InpClnArchDt))));
+    SHARED __AsofFitler(DATASET(InLayout) __ds) := __ds(__T(__OP2(__OP2(KEL.era.ToDateMinNull(__ds.Hybrid_Archive_Date_),<=,__CN(__PRunDateToMimic)),AND,__OP2(KEL.era.ToDateMaxNull(__ds.Vault_Date_Last_Seen_),>=,__CN(__PRunDateToMimic)))) AND __T(__OP2(KEL.era.ToDateMinNull(__ds.Hybrid_Archive_Date_),<=,__CN(__PP_InpClnArchDt))));
     SHARED __UsingFitler(DATASET(InLayout) __ds) := __ds(KEL.Permits.BitAnd(__ds.__Permits,__PDPM) = __ds.__Permits);
     SHARED __SourceFilter(DATASET(InLayout) __ds) := __UsingFitler(__AsofFitler(__ds));
   END;
   SHARED E_Criminal_Offense_Filtered := MODULE(E_Criminal_Offense(__in,__cfg_Local))
-    SHARED __AsofFitler(DATASET(InLayout) __ds) := __ds(__T(__OP2(KEL.era.ToDateMinNull(__ds.Hybrid_Archive_Date_),<=,__CN(__PP_InpClnArchDt))));
+    SHARED __AsofFitler(DATASET(InLayout) __ds) := __ds(__T(__OP2(__OP2(KEL.era.ToDateMinNull(__ds.Hybrid_Archive_Date_),<=,__CN(__PRunDateToMimic)),AND,__OP2(KEL.era.ToDateMaxNull(__ds.Vault_Date_Last_Seen_),>=,__CN(__PRunDateToMimic)))) AND __T(__OP2(KEL.era.ToDateMinNull(__ds.Hybrid_Archive_Date_),<=,__CN(__PP_InpClnArchDt))));
     SHARED __UsingFitler(DATASET(InLayout) __ds) := __ds(KEL.Permits.BitAnd(__ds.__Permits,__PDPM) = __ds.__Permits);
     SHARED __SourceFilter(DATASET(InLayout) __ds) := __UsingFitler(__AsofFitler(__ds));
   END;
   SHARED E_Education_Filtered := MODULE(E_Education(__in,__cfg_Local))
-    SHARED __AsofFitler(DATASET(InLayout) __ds) := __ds(__T(__OP2(KEL.era.ToDateMinNull(__ds.Hybrid_Archive_Date_),<=,__CN(__PP_InpClnArchDt))));
+    SHARED __AsofFitler(DATASET(InLayout) __ds) := __ds(__T(__OP2(__OP2(KEL.era.ToDateMinNull(__ds.Hybrid_Archive_Date_),<=,__CN(__PRunDateToMimic)),AND,__OP2(KEL.era.ToDateMaxNull(__ds.Vault_Date_Last_Seen_),>=,__CN(__PRunDateToMimic)))) AND __T(__OP2(KEL.era.ToDateMinNull(__ds.Hybrid_Archive_Date_),<=,__CN(__PP_InpClnArchDt))));
     SHARED __UsingFitler(DATASET(InLayout) __ds) := __ds(KEL.Permits.BitAnd(__ds.__Permits,__PDPM) = __ds.__Permits);
     SHARED __SourceFilter(DATASET(InLayout) __ds) := __UsingFitler(__AsofFitler(__ds));
   END;
   SHARED E_Email_Filtered := MODULE(E_Email(__in,__cfg_Local))
-    SHARED __AsofFitler(DATASET(InLayout) __ds) := __ds(__T(__OP2(KEL.era.ToDateMinNull(__ds.Hybrid_Archive_Date_),<=,__CN(__PP_InpClnArchDt))));
+    SHARED __AsofFitler(DATASET(InLayout) __ds) := __ds(__T(__OP2(__OP2(KEL.era.ToDateMinNull(__ds.Hybrid_Archive_Date_),<=,__CN(__PRunDateToMimic)),AND,__OP2(KEL.era.ToDateMaxNull(__ds.Vault_Date_Last_Seen_),>=,__CN(__PRunDateToMimic)))) AND __T(__OP2(KEL.era.ToDateMinNull(__ds.Hybrid_Archive_Date_),<=,__CN(__PP_InpClnArchDt))));
     SHARED __UsingFitler(DATASET(InLayout) __ds) := __ds(KEL.Permits.BitAnd(__ds.__Permits,__PDPM) = __ds.__Permits);
     SHARED __SourceFilter(DATASET(InLayout) __ds) := __UsingFitler(__AsofFitler(__ds));
   END;
   SHARED E_Email_Inquiry_Filtered := MODULE(E_Email_Inquiry(__in,__cfg_Local))
-    SHARED __AsofFitler(DATASET(InLayout) __ds) := __ds(__T(__OP2(KEL.Era.nkdateFromNtimestamp(KEL.era.ToTimestampMinNull(__ds.Hybrid_Archive_Date_)),<=,__CN(__PP_InpClnArchDt))));
+    SHARED __AsofFitler(DATASET(InLayout) __ds) := __ds(__T(__OP2(__OP2(KEL.Era.nkdateFromNtimestamp(KEL.era.ToTimestampMinNull(__ds.Hybrid_Archive_Date_)),<=,__CN(__PRunDateToMimic)),AND,__OP2(KEL.era.ToDateMaxNull(__ds.Vault_Date_Last_Seen_),>=,__CN(__PRunDateToMimic)))) AND __T(__OP2(KEL.Era.nkdateFromNtimestamp(KEL.era.ToTimestampMinNull(__ds.Hybrid_Archive_Date_)),<=,__CN(__PP_InpClnArchDt))));
     SHARED __UsingFitler(DATASET(InLayout) __ds) := __ds(KEL.Permits.BitAnd(__ds.__Permits,__PDPM) = __ds.__Permits);
     SHARED __SourceFilter(DATASET(InLayout) __ds) := __UsingFitler(__AsofFitler(__ds));
   END;
   SHARED E_First_Degree_Associations_Filtered := MODULE(E_First_Degree_Associations(__in,__cfg_Local))
-    SHARED __AsofFitler(DATASET(InLayout) __ds) := __ds(__T(__OP2(KEL.era.ToDateMinNull(__ds.Hybrid_Archive_Date_),<=,__CN(__PP_InpClnArchDt))));
+    SHARED __AsofFitler(DATASET(InLayout) __ds) := __ds(__T(__OP2(__OP2(KEL.era.ToDateMinNull(__ds.Hybrid_Archive_Date_),<=,__CN(__PRunDateToMimic)),AND,__OP2(KEL.era.ToDateMaxNull(__ds.Vault_Date_Last_Seen_),>=,__CN(__PRunDateToMimic)))) AND __T(__OP2(KEL.era.ToDateMinNull(__ds.Hybrid_Archive_Date_),<=,__CN(__PP_InpClnArchDt))));
     SHARED __UsingFitler(DATASET(InLayout) __ds) := __ds(KEL.Permits.BitAnd(__ds.__Permits,__PDPM) = __ds.__Permits);
     SHARED __SourceFilter(DATASET(InLayout) __ds) := __UsingFitler(__AsofFitler(__ds));
   END;
   SHARED E_First_Degree_Relative_Filtered := MODULE(E_First_Degree_Relative(__in,__cfg_Local))
-    SHARED __AsofFitler(DATASET(InLayout) __ds) := __ds(__T(__OP2(KEL.era.ToDateMinNull(__ds.Hybrid_Archive_Date_),<=,__CN(__PP_InpClnArchDt))));
-    SHARED __UsingFitler(DATASET(InLayout) __ds) := __ds(KEL.Permits.BitAnd(__ds.__Permits,__PDPM) = __ds.__Permits);
-    SHARED __SourceFilter(DATASET(InLayout) __ds) := __UsingFitler(__AsofFitler(__ds));
-  END;
-  SHARED E_Household_Filtered := MODULE(E_Household(__in,__cfg_Local))
-    SHARED __AsofFitler(DATASET(InLayout) __ds) := __ds(__T(__OP2(KEL.era.ToDateMinNull(__ds.Hybrid_Archive_Date_),<=,__CN(__PP_InpClnArchDt))));
-    SHARED __UsingFitler(DATASET(InLayout) __ds) := __ds(KEL.Permits.BitAnd(__ds.__Permits,__PDPM) = __ds.__Permits);
-    SHARED __SourceFilter(DATASET(InLayout) __ds) := __UsingFitler(__AsofFitler(__ds));
-  END;
-  SHARED E_Household_Member_Filtered := MODULE(E_Household_Member(__in,__cfg_Local))
-    SHARED __AsofFitler(DATASET(InLayout) __ds) := __ds(__T(__OP2(KEL.era.ToDateMinNull(__ds.Hybrid_Archive_Date_),<=,__CN(__PP_InpClnArchDt))));
+    SHARED __AsofFitler(DATASET(InLayout) __ds) := __ds(__T(__OP2(__OP2(KEL.era.ToDateMinNull(__ds.Hybrid_Archive_Date_),<=,__CN(__PRunDateToMimic)),AND,__OP2(KEL.era.ToDateMaxNull(__ds.Vault_Date_Last_Seen_),>=,__CN(__PRunDateToMimic)))) AND __T(__OP2(KEL.era.ToDateMinNull(__ds.Hybrid_Archive_Date_),<=,__CN(__PP_InpClnArchDt))));
     SHARED __UsingFitler(DATASET(InLayout) __ds) := __ds(KEL.Permits.BitAnd(__ds.__Permits,__PDPM) = __ds.__Permits);
     SHARED __SourceFilter(DATASET(InLayout) __ds) := __UsingFitler(__AsofFitler(__ds));
   END;
   SHARED E_Input_P_I_I_Filtered := MODULE(E_Input_P_I_I(__in,__cfg_Local))
-    SHARED __AsofFitler(DATASET(InLayout) __ds) := __ds(__T(__OP2(KEL.era.ToDateMinNull(__ds.Hybrid_Archive_Date_),<=,__CN(__PP_InpClnArchDt))));
+    SHARED __AsofFitler(DATASET(InLayout) __ds) := __ds(__T(__OP2(__OP2(KEL.era.ToDateMinNull(__ds.Hybrid_Archive_Date_),<=,__CN(__PRunDateToMimic)),AND,__OP2(KEL.era.ToDateMaxNull(__ds.Vault_Date_Last_Seen_),>=,__CN(__PRunDateToMimic)))) AND __T(__OP2(KEL.era.ToDateMinNull(__ds.Hybrid_Archive_Date_),<=,__CN(__PP_InpClnArchDt))));
     SHARED __UsingFitler(DATASET(InLayout) __ds) := __ds(KEL.Permits.BitAnd(__ds.__Permits,__PDPM) = __ds.__Permits);
     SHARED __SourceFilter(DATASET(InLayout) __ds) := __UsingFitler(__AsofFitler(__ds));
   END;
   SHARED E_Inquiry_Filtered := MODULE(E_Inquiry(__in,__cfg_Local))
-    SHARED __AsofFitler(DATASET(InLayout) __ds) := __ds(__T(__OP2(KEL.Era.nkdateFromNtimestamp(KEL.era.ToTimestampMinNull(__ds.Hybrid_Archive_Date_)),<=,__CN(__PP_InpClnArchDt))));
+    SHARED __AsofFitler(DATASET(InLayout) __ds) := __ds(__T(__OP2(__OP2(KEL.Era.nkdateFromNtimestamp(KEL.era.ToTimestampMinNull(__ds.Hybrid_Archive_Date_)),<=,__CN(__PRunDateToMimic)),AND,__OP2(KEL.era.ToDateMaxNull(__ds.Vault_Date_Last_Seen_),>=,__CN(__PRunDateToMimic)))) AND __T(__OP2(KEL.Era.nkdateFromNtimestamp(KEL.era.ToTimestampMinNull(__ds.Hybrid_Archive_Date_)),<=,__CN(__PP_InpClnArchDt))));
     SHARED __UsingFitler(DATASET(InLayout) __ds) := __ds(KEL.Permits.BitAnd(__ds.__Permits,__PDPM) = __ds.__Permits);
     SHARED __SourceFilter(DATASET(InLayout) __ds) := __UsingFitler(__AsofFitler(__ds));
   END;
   SHARED E_Lien_Judgment_Filtered := MODULE(E_Lien_Judgment(__in,__cfg_Local))
-    SHARED __AsofFitler(DATASET(InLayout) __ds) := __ds(__T(__OP2(KEL.era.ToDateMinNull(__ds.Hybrid_Archive_Date_),<=,__CN(__PP_InpClnArchDt))));
+    SHARED __AsofFitler(DATASET(InLayout) __ds) := __ds(__T(__OP2(__OP2(KEL.era.ToDateMinNull(__ds.Hybrid_Archive_Date_),<=,__CN(__PRunDateToMimic)),AND,__OP2(KEL.era.ToDateMaxNull(__ds.Vault_Date_Last_Seen_),>=,__CN(__PRunDateToMimic)))) AND __T(__OP2(KEL.era.ToDateMinNull(__ds.Hybrid_Archive_Date_),<=,__CN(__PP_InpClnArchDt))));
     SHARED __UsingFitler(DATASET(InLayout) __ds) := __ds(KEL.Permits.BitAnd(__ds.__Permits,__PDPM) = __ds.__Permits);
     SHARED __SourceFilter(DATASET(InLayout) __ds) := __UsingFitler(__AsofFitler(__ds));
   END;
   SHARED E_Person_Filtered := MODULE(E_Person(__in,__cfg_Local))
-    SHARED __AsofFitler(DATASET(InLayout) __ds) := __ds(__T(__OP2(KEL.era.ToDateMinNull(__ds.Hybrid_Archive_Date_),<=,__CN(__PP_InpClnArchDt))));
+    SHARED __AsofFitler(DATASET(InLayout) __ds) := __ds(__T(__OP2(__OP2(KEL.era.ToDateMinNull(__ds.Hybrid_Archive_Date_),<=,__CN(__PRunDateToMimic)),AND,__OP2(KEL.era.ToDateMaxNull(__ds.Vault_Date_Last_Seen_),>=,__CN(__PRunDateToMimic)))) AND __T(__OP2(KEL.era.ToDateMinNull(__ds.Hybrid_Archive_Date_),<=,__CN(__PP_InpClnArchDt))));
     SHARED __UsingFitler(DATASET(InLayout) __ds) := __ds(KEL.Permits.BitAnd(__ds.__Permits,__PDPM) = __ds.__Permits);
     SHARED __SourceFilter(DATASET(InLayout) __ds) := __UsingFitler(__AsofFitler(__ds));
   END;
   SHARED E_Person_Accident_Filtered := MODULE(E_Person_Accident(__in,__cfg_Local))
-    SHARED __AsofFitler(DATASET(InLayout) __ds) := __ds(__T(__OP2(KEL.era.ToDateMinNull(__ds.Hybrid_Archive_Date_),<=,__CN(__PP_InpClnArchDt))));
+    SHARED __AsofFitler(DATASET(InLayout) __ds) := __ds(__T(__OP2(__OP2(KEL.era.ToDateMinNull(__ds.Hybrid_Archive_Date_),<=,__CN(__PRunDateToMimic)),AND,__OP2(KEL.era.ToDateMaxNull(__ds.Vault_Date_Last_Seen_),>=,__CN(__PRunDateToMimic)))) AND __T(__OP2(KEL.era.ToDateMinNull(__ds.Hybrid_Archive_Date_),<=,__CN(__PP_InpClnArchDt))));
     SHARED __UsingFitler(DATASET(InLayout) __ds) := __ds(KEL.Permits.BitAnd(__ds.__Permits,__PDPM) = __ds.__Permits);
     SHARED __SourceFilter(DATASET(InLayout) __ds) := __UsingFitler(__AsofFitler(__ds));
   END;
   SHARED E_Person_Address_Filtered := MODULE(E_Person_Address(__in,__cfg_Local))
-    SHARED __AsofFitler(DATASET(InLayout) __ds) := __ds(__T(__OP2(KEL.era.ToDateMinNull(__ds.Hybrid_Archive_Date_),<=,__CN(__PP_InpClnArchDt))));
+    SHARED __AsofFitler(DATASET(InLayout) __ds) := __ds(__T(__OP2(__OP2(KEL.era.ToDateMinNull(__ds.Hybrid_Archive_Date_),<=,__CN(__PRunDateToMimic)),AND,__OP2(KEL.era.ToDateMaxNull(__ds.Vault_Date_Last_Seen_),>=,__CN(__PRunDateToMimic)))) AND __T(__OP2(KEL.era.ToDateMinNull(__ds.Hybrid_Archive_Date_),<=,__CN(__PP_InpClnArchDt))));
     SHARED __UsingFitler(DATASET(InLayout) __ds) := __ds(KEL.Permits.BitAnd(__ds.__Permits,__PDPM) = __ds.__Permits);
     SHARED __SourceFilter(DATASET(InLayout) __ds) := __UsingFitler(__AsofFitler(__ds));
   END;
   SHARED E_Person_Bankruptcy_Filtered := MODULE(E_Person_Bankruptcy(__in,__cfg_Local))
-    SHARED __AsofFitler(DATASET(InLayout) __ds) := __ds(__T(__OP2(KEL.era.ToDateMinNull(__ds.Hybrid_Archive_Date_),<=,__CN(__PP_InpClnArchDt))));
+    SHARED __AsofFitler(DATASET(InLayout) __ds) := __ds(__T(__OP2(__OP2(KEL.era.ToDateMinNull(__ds.Hybrid_Archive_Date_),<=,__CN(__PRunDateToMimic)),AND,__OP2(KEL.era.ToDateMaxNull(__ds.Vault_Date_Last_Seen_),>=,__CN(__PRunDateToMimic)))) AND __T(__OP2(KEL.era.ToDateMinNull(__ds.Hybrid_Archive_Date_),<=,__CN(__PP_InpClnArchDt))));
     SHARED __UsingFitler(DATASET(InLayout) __ds) := __ds(KEL.Permits.BitAnd(__ds.__Permits,__PDPM) = __ds.__Permits);
     SHARED __SourceFilter(DATASET(InLayout) __ds) := __UsingFitler(__AsofFitler(__ds));
   END;
   SHARED E_Person_Education_Filtered := MODULE(E_Person_Education(__in,__cfg_Local))
-    SHARED __AsofFitler(DATASET(InLayout) __ds) := __ds(__T(__OP2(KEL.era.ToDateMinNull(__ds.Hybrid_Archive_Date_),<=,__CN(__PP_InpClnArchDt))));
+    SHARED __AsofFitler(DATASET(InLayout) __ds) := __ds(__T(__OP2(__OP2(KEL.era.ToDateMinNull(__ds.Hybrid_Archive_Date_),<=,__CN(__PRunDateToMimic)),AND,__OP2(KEL.era.ToDateMaxNull(__ds.Vault_Date_Last_Seen_),>=,__CN(__PRunDateToMimic)))) AND __T(__OP2(KEL.era.ToDateMinNull(__ds.Hybrid_Archive_Date_),<=,__CN(__PP_InpClnArchDt))));
     SHARED __UsingFitler(DATASET(InLayout) __ds) := __ds(KEL.Permits.BitAnd(__ds.__Permits,__PDPM) = __ds.__Permits);
     SHARED __SourceFilter(DATASET(InLayout) __ds) := __UsingFitler(__AsofFitler(__ds));
   END;
   SHARED E_Person_Email_Filtered := MODULE(E_Person_Email(__in,__cfg_Local))
-    SHARED __AsofFitler(DATASET(InLayout) __ds) := __ds(__T(__OP2(KEL.era.ToDateMinNull(__ds.Hybrid_Archive_Date_),<=,__CN(__PP_InpClnArchDt))));
+    SHARED __AsofFitler(DATASET(InLayout) __ds) := __ds(__T(__OP2(__OP2(KEL.era.ToDateMinNull(__ds.Hybrid_Archive_Date_),<=,__CN(__PRunDateToMimic)),AND,__OP2(KEL.era.ToDateMaxNull(__ds.Vault_Date_Last_Seen_),>=,__CN(__PRunDateToMimic)))) AND __T(__OP2(KEL.era.ToDateMinNull(__ds.Hybrid_Archive_Date_),<=,__CN(__PP_InpClnArchDt))));
     SHARED __UsingFitler(DATASET(InLayout) __ds) := __ds(KEL.Permits.BitAnd(__ds.__Permits,__PDPM) = __ds.__Permits);
     SHARED __SourceFilter(DATASET(InLayout) __ds) := __UsingFitler(__AsofFitler(__ds));
   END;
   SHARED E_Person_Inquiry_Filtered := MODULE(E_Person_Inquiry(__in,__cfg_Local))
-    SHARED __AsofFitler(DATASET(InLayout) __ds) := __ds(__T(__OP2(KEL.Era.nkdateFromNtimestamp(KEL.era.ToTimestampMinNull(__ds.Hybrid_Archive_Date_)),<=,__CN(__PP_InpClnArchDt))));
+    SHARED __AsofFitler(DATASET(InLayout) __ds) := __ds(__T(__OP2(__OP2(KEL.Era.nkdateFromNtimestamp(KEL.era.ToTimestampMinNull(__ds.Hybrid_Archive_Date_)),<=,__CN(__PRunDateToMimic)),AND,__OP2(KEL.era.ToDateMaxNull(__ds.Vault_Date_Last_Seen_),>=,__CN(__PRunDateToMimic)))) AND __T(__OP2(KEL.Era.nkdateFromNtimestamp(KEL.era.ToTimestampMinNull(__ds.Hybrid_Archive_Date_)),<=,__CN(__PP_InpClnArchDt))));
     SHARED __UsingFitler(DATASET(InLayout) __ds) := __ds(KEL.Permits.BitAnd(__ds.__Permits,__PDPM) = __ds.__Permits);
     SHARED __SourceFilter(DATASET(InLayout) __ds) := __UsingFitler(__AsofFitler(__ds));
   END;
   SHARED E_Person_Lien_Judgment_Filtered := MODULE(E_Person_Lien_Judgment(__in,__cfg_Local))
-    SHARED __AsofFitler(DATASET(InLayout) __ds) := __ds(__T(__OP2(KEL.era.ToDateMinNull(__ds.Hybrid_Archive_Date_),<=,__CN(__PP_InpClnArchDt))));
+    SHARED __AsofFitler(DATASET(InLayout) __ds) := __ds(__T(__OP2(__OP2(KEL.era.ToDateMinNull(__ds.Hybrid_Archive_Date_),<=,__CN(__PRunDateToMimic)),AND,__OP2(KEL.era.ToDateMaxNull(__ds.Vault_Date_Last_Seen_),>=,__CN(__PRunDateToMimic)))) AND __T(__OP2(KEL.era.ToDateMinNull(__ds.Hybrid_Archive_Date_),<=,__CN(__PP_InpClnArchDt))));
     SHARED __UsingFitler(DATASET(InLayout) __ds) := __ds(KEL.Permits.BitAnd(__ds.__Permits,__PDPM) = __ds.__Permits);
     SHARED __SourceFilter(DATASET(InLayout) __ds) := __UsingFitler(__AsofFitler(__ds));
   END;
   SHARED E_Person_Offenses_Filtered := MODULE(E_Person_Offenses(__in,__cfg_Local))
-    SHARED __AsofFitler(DATASET(InLayout) __ds) := __ds(__T(__OP2(KEL.era.ToDateMinNull(__ds.Hybrid_Archive_Date_),<=,__CN(__PP_InpClnArchDt))));
+    SHARED __AsofFitler(DATASET(InLayout) __ds) := __ds(__T(__OP2(__OP2(KEL.era.ToDateMinNull(__ds.Hybrid_Archive_Date_),<=,__CN(__PRunDateToMimic)),AND,__OP2(KEL.era.ToDateMaxNull(__ds.Vault_Date_Last_Seen_),>=,__CN(__PRunDateToMimic)))) AND __T(__OP2(KEL.era.ToDateMinNull(__ds.Hybrid_Archive_Date_),<=,__CN(__PP_InpClnArchDt))));
     SHARED __UsingFitler(DATASET(InLayout) __ds) := __ds(KEL.Permits.BitAnd(__ds.__Permits,__PDPM) = __ds.__Permits);
     SHARED __SourceFilter(DATASET(InLayout) __ds) := __UsingFitler(__AsofFitler(__ds));
   END;
   SHARED E_Person_Property_Filtered := MODULE(E_Person_Property(__in,__cfg_Local))
-    SHARED __AsofFitler(DATASET(InLayout) __ds) := __ds(__T(__OP2(KEL.era.ToDateMinNull(__ds.Hybrid_Archive_Date_),<=,__CN(__PP_InpClnArchDt))));
+    SHARED __AsofFitler(DATASET(InLayout) __ds) := __ds(__T(__OP2(__OP2(KEL.era.ToDateMinNull(__ds.Hybrid_Archive_Date_),<=,__CN(__PRunDateToMimic)),AND,__OP2(KEL.era.ToDateMaxNull(__ds.Vault_Date_Last_Seen_),>=,__CN(__PRunDateToMimic)))) AND __T(__OP2(KEL.era.ToDateMinNull(__ds.Hybrid_Archive_Date_),<=,__CN(__PP_InpClnArchDt))));
     SHARED __UsingFitler(DATASET(InLayout) __ds) := __ds(KEL.Permits.BitAnd(__ds.__Permits,__PDPM) = __ds.__Permits);
     SHARED __SourceFilter(DATASET(InLayout) __ds) := __UsingFitler(__AsofFitler(__ds));
   END;
   SHARED E_Person_Property_Event_Filtered := MODULE(E_Person_Property_Event(__in,__cfg_Local))
-    SHARED __AsofFitler(DATASET(InLayout) __ds) := __ds(__T(__OP2(KEL.era.ToDateMinNull(__ds.Hybrid_Archive_Date_),<=,__CN(__PP_InpClnArchDt))));
+    SHARED __AsofFitler(DATASET(InLayout) __ds) := __ds(__T(__OP2(__OP2(KEL.era.ToDateMinNull(__ds.Hybrid_Archive_Date_),<=,__CN(__PRunDateToMimic)),AND,__OP2(KEL.era.ToDateMaxNull(__ds.Vault_Date_Last_Seen_),>=,__CN(__PRunDateToMimic)))) AND __T(__OP2(KEL.era.ToDateMinNull(__ds.Hybrid_Archive_Date_),<=,__CN(__PP_InpClnArchDt))));
     SHARED __UsingFitler(DATASET(InLayout) __ds) := __ds(KEL.Permits.BitAnd(__ds.__Permits,__PDPM) = __ds.__Permits);
     SHARED __SourceFilter(DATASET(InLayout) __ds) := __UsingFitler(__AsofFitler(__ds));
   END;
   SHARED E_Person_S_S_N_Filtered := MODULE(E_Person_S_S_N(__in,__cfg_Local))
-    SHARED __AsofFitler(DATASET(InLayout) __ds) := __ds(__T(__OP2(KEL.era.ToDateMinNull(__ds.Hybrid_Archive_Date_),<=,__CN(__PP_InpClnArchDt))));
+    SHARED __AsofFitler(DATASET(InLayout) __ds) := __ds(__T(__OP2(__OP2(KEL.era.ToDateMinNull(__ds.Hybrid_Archive_Date_),<=,__CN(__PRunDateToMimic)),AND,__OP2(KEL.era.ToDateMaxNull(__ds.Vault_Date_Last_Seen_),>=,__CN(__PRunDateToMimic)))) AND __T(__OP2(KEL.era.ToDateMinNull(__ds.Hybrid_Archive_Date_),<=,__CN(__PP_InpClnArchDt))));
     SHARED __UsingFitler(DATASET(InLayout) __ds) := __ds(KEL.Permits.BitAnd(__ds.__Permits,__PDPM) = __ds.__Permits);
     SHARED __SourceFilter(DATASET(InLayout) __ds) := __UsingFitler(__AsofFitler(__ds));
   END;
   SHARED E_Person_Vehicle_Filtered := MODULE(E_Person_Vehicle(__in,__cfg_Local))
-    SHARED __AsofFitler(DATASET(InLayout) __ds) := __ds(__T(__OP2(KEL.era.ToDateMinNull(__ds.Hybrid_Archive_Date_),<=,__CN(__PP_InpClnArchDt))));
+    SHARED __AsofFitler(DATASET(InLayout) __ds) := __ds(__T(__OP2(__OP2(KEL.era.ToDateMinNull(__ds.Hybrid_Archive_Date_),<=,__CN(__PRunDateToMimic)),AND,__OP2(KEL.era.ToDateMaxNull(__ds.Vault_Date_Last_Seen_),>=,__CN(__PRunDateToMimic)))) AND __T(__OP2(KEL.era.ToDateMinNull(__ds.Hybrid_Archive_Date_),<=,__CN(__PP_InpClnArchDt))));
     SHARED __UsingFitler(DATASET(InLayout) __ds) := __ds(KEL.Permits.BitAnd(__ds.__Permits,__PDPM) = __ds.__Permits);
     SHARED __SourceFilter(DATASET(InLayout) __ds) := __UsingFitler(__AsofFitler(__ds));
   END;
   SHARED E_Phone_Inquiry_Filtered := MODULE(E_Phone_Inquiry(__in,__cfg_Local))
-    SHARED __AsofFitler(DATASET(InLayout) __ds) := __ds(__T(__OP2(KEL.Era.nkdateFromNtimestamp(KEL.era.ToTimestampMinNull(__ds.Hybrid_Archive_Date_)),<=,__CN(__PP_InpClnArchDt))));
+    SHARED __AsofFitler(DATASET(InLayout) __ds) := __ds(__T(__OP2(__OP2(KEL.Era.nkdateFromNtimestamp(KEL.era.ToTimestampMinNull(__ds.Hybrid_Archive_Date_)),<=,__CN(__PRunDateToMimic)),AND,__OP2(KEL.era.ToDateMaxNull(__ds.Vault_Date_Last_Seen_),>=,__CN(__PRunDateToMimic)))) AND __T(__OP2(KEL.Era.nkdateFromNtimestamp(KEL.era.ToTimestampMinNull(__ds.Hybrid_Archive_Date_)),<=,__CN(__PP_InpClnArchDt))));
     SHARED __UsingFitler(DATASET(InLayout) __ds) := __ds(KEL.Permits.BitAnd(__ds.__Permits,__PDPM) = __ds.__Permits);
     SHARED __SourceFilter(DATASET(InLayout) __ds) := __UsingFitler(__AsofFitler(__ds));
   END;
   SHARED E_Professional_License_Filtered := MODULE(E_Professional_License(__in,__cfg_Local))
-    SHARED __AsofFitler(DATASET(InLayout) __ds) := __ds(__T(__OP2(KEL.era.ToDateMinNull(__ds.Hybrid_Archive_Date_),<=,__CN(__PP_InpClnArchDt))));
+    SHARED __AsofFitler(DATASET(InLayout) __ds) := __ds(__T(__OP2(__OP2(KEL.era.ToDateMinNull(__ds.Hybrid_Archive_Date_),<=,__CN(__PRunDateToMimic)),AND,__OP2(KEL.era.ToDateMaxNull(__ds.Vault_Date_Last_Seen_),>=,__CN(__PRunDateToMimic)))) AND __T(__OP2(KEL.era.ToDateMinNull(__ds.Hybrid_Archive_Date_),<=,__CN(__PP_InpClnArchDt))));
     SHARED __UsingFitler(DATASET(InLayout) __ds) := __ds(KEL.Permits.BitAnd(__ds.__Permits,__PDPM) = __ds.__Permits);
     SHARED __SourceFilter(DATASET(InLayout) __ds) := __UsingFitler(__AsofFitler(__ds));
   END;
   SHARED E_Professional_License_Person_Filtered := MODULE(E_Professional_License_Person(__in,__cfg_Local))
-    SHARED __AsofFitler(DATASET(InLayout) __ds) := __ds(__T(__OP2(KEL.era.ToDateMinNull(__ds.Hybrid_Archive_Date_),<=,__CN(__PP_InpClnArchDt))));
+    SHARED __AsofFitler(DATASET(InLayout) __ds) := __ds(__T(__OP2(__OP2(KEL.era.ToDateMinNull(__ds.Hybrid_Archive_Date_),<=,__CN(__PRunDateToMimic)),AND,__OP2(KEL.era.ToDateMaxNull(__ds.Vault_Date_Last_Seen_),>=,__CN(__PRunDateToMimic)))) AND __T(__OP2(KEL.era.ToDateMinNull(__ds.Hybrid_Archive_Date_),<=,__CN(__PP_InpClnArchDt))));
     SHARED __UsingFitler(DATASET(InLayout) __ds) := __ds(KEL.Permits.BitAnd(__ds.__Permits,__PDPM) = __ds.__Permits);
     SHARED __SourceFilter(DATASET(InLayout) __ds) := __UsingFitler(__AsofFitler(__ds));
   END;
   SHARED E_Property_Filtered := MODULE(E_Property(__in,__cfg_Local))
-    SHARED __AsofFitler(DATASET(InLayout) __ds) := __ds(__T(__OP2(KEL.era.ToDateMinNull(__ds.Hybrid_Archive_Date_),<=,__CN(__PP_InpClnArchDt))));
+    SHARED __AsofFitler(DATASET(InLayout) __ds) := __ds(__T(__OP2(__OP2(KEL.era.ToDateMinNull(__ds.Hybrid_Archive_Date_),<=,__CN(__PRunDateToMimic)),AND,__OP2(KEL.era.ToDateMaxNull(__ds.Vault_Date_Last_Seen_),>=,__CN(__PRunDateToMimic)))) AND __T(__OP2(KEL.era.ToDateMinNull(__ds.Hybrid_Archive_Date_),<=,__CN(__PP_InpClnArchDt))));
     SHARED __UsingFitler(DATASET(InLayout) __ds) := __ds(KEL.Permits.BitAnd(__ds.__Permits,__PDPM) = __ds.__Permits);
     SHARED __SourceFilter(DATASET(InLayout) __ds) := __UsingFitler(__AsofFitler(__ds));
   END;
   SHARED E_Property_Event_Filtered := MODULE(E_Property_Event(__in,__cfg_Local))
-    SHARED __AsofFitler(DATASET(InLayout) __ds) := __ds(__T(__OP2(KEL.era.ToDateMinNull(__ds.Hybrid_Archive_Date_),<=,__CN(__PP_InpClnArchDt))));
+    SHARED __AsofFitler(DATASET(InLayout) __ds) := __ds(__T(__OP2(__OP2(KEL.era.ToDateMinNull(__ds.Hybrid_Archive_Date_),<=,__CN(__PRunDateToMimic)),AND,__OP2(KEL.era.ToDateMaxNull(__ds.Vault_Date_Last_Seen_),>=,__CN(__PRunDateToMimic)))) AND __T(__OP2(KEL.era.ToDateMinNull(__ds.Hybrid_Archive_Date_),<=,__CN(__PP_InpClnArchDt))));
     SHARED __UsingFitler(DATASET(InLayout) __ds) := __ds(KEL.Permits.BitAnd(__ds.__Permits,__PDPM) = __ds.__Permits);
     SHARED __SourceFilter(DATASET(InLayout) __ds) := __UsingFitler(__AsofFitler(__ds));
   END;
   SHARED E_S_S_N_Inquiry_Filtered := MODULE(E_S_S_N_Inquiry(__in,__cfg_Local))
-    SHARED __AsofFitler(DATASET(InLayout) __ds) := __ds(__T(__OP2(KEL.Era.nkdateFromNtimestamp(KEL.era.ToTimestampMinNull(__ds.Hybrid_Archive_Date_)),<=,__CN(__PP_InpClnArchDt))));
+    SHARED __AsofFitler(DATASET(InLayout) __ds) := __ds(__T(__OP2(__OP2(KEL.Era.nkdateFromNtimestamp(KEL.era.ToTimestampMinNull(__ds.Hybrid_Archive_Date_)),<=,__CN(__PRunDateToMimic)),AND,__OP2(KEL.era.ToDateMaxNull(__ds.Vault_Date_Last_Seen_),>=,__CN(__PRunDateToMimic)))) AND __T(__OP2(KEL.Era.nkdateFromNtimestamp(KEL.era.ToTimestampMinNull(__ds.Hybrid_Archive_Date_)),<=,__CN(__PP_InpClnArchDt))));
     SHARED __UsingFitler(DATASET(InLayout) __ds) := __ds(KEL.Permits.BitAnd(__ds.__Permits,__PDPM) = __ds.__Permits);
     SHARED __SourceFilter(DATASET(InLayout) __ds) := __UsingFitler(__AsofFitler(__ds));
   END;
   SHARED E_Sele_Person_Filtered := MODULE(E_Sele_Person(__in,__cfg_Local))
-    SHARED __AsofFitler(DATASET(InLayout) __ds) := __ds(__T(__OP2(KEL.era.ToDateMinNull(__ds.Hybrid_Archive_Date_),<=,__CN(__PP_InpClnArchDt))));
+    SHARED __AsofFitler(DATASET(InLayout) __ds) := __ds(__T(__OP2(__OP2(KEL.era.ToDateMinNull(__ds.Hybrid_Archive_Date_),<=,__CN(__PRunDateToMimic)),AND,__OP2(KEL.era.ToDateMaxNull(__ds.Vault_Date_Last_Seen_),>=,__CN(__PRunDateToMimic)))) AND __T(__OP2(KEL.era.ToDateMinNull(__ds.Hybrid_Archive_Date_),<=,__CN(__PP_InpClnArchDt))));
     SHARED __UsingFitler(DATASET(InLayout) __ds) := __ds(KEL.Permits.BitAnd(__ds.__Permits,__PDPM) = __ds.__Permits);
     SHARED __SourceFilter(DATASET(InLayout) __ds) := __UsingFitler(__AsofFitler(__ds));
   END;
   SHARED E_Social_Security_Number_Filtered := MODULE(E_Social_Security_Number(__in,__cfg_Local))
-    SHARED __AsofFitler(DATASET(InLayout) __ds) := __ds(__T(__OP2(KEL.era.ToDateMinNull(__ds.Hybrid_Archive_Date_),<=,__CN(__PP_InpClnArchDt))));
+    SHARED __AsofFitler(DATASET(InLayout) __ds) := __ds(__T(__OP2(__OP2(KEL.era.ToDateMinNull(__ds.Hybrid_Archive_Date_),<=,__CN(__PRunDateToMimic)),AND,__OP2(KEL.era.ToDateMaxNull(__ds.Vault_Date_Last_Seen_),>=,__CN(__PRunDateToMimic)))) AND __T(__OP2(KEL.era.ToDateMinNull(__ds.Hybrid_Archive_Date_),<=,__CN(__PP_InpClnArchDt))));
     SHARED __UsingFitler(DATASET(InLayout) __ds) := __ds(KEL.Permits.BitAnd(__ds.__Permits,__PDPM) = __ds.__Permits);
     SHARED __SourceFilter(DATASET(InLayout) __ds) := __UsingFitler(__AsofFitler(__ds));
   END;
   SHARED E_Utility_Person_Filtered := MODULE(E_Utility_Person(__in,__cfg_Local))
-    SHARED __AsofFitler(DATASET(InLayout) __ds) := __ds(__T(__OP2(KEL.era.ToDateMinNull(__ds.Hybrid_Archive_Date_),<=,__CN(__PP_InpClnArchDt))));
+    SHARED __AsofFitler(DATASET(InLayout) __ds) := __ds(__T(__OP2(__OP2(KEL.era.ToDateMinNull(__ds.Hybrid_Archive_Date_),<=,__CN(__PRunDateToMimic)),AND,__OP2(KEL.era.ToDateMaxNull(__ds.Vault_Date_Last_Seen_),>=,__CN(__PRunDateToMimic)))) AND __T(__OP2(KEL.era.ToDateMinNull(__ds.Hybrid_Archive_Date_),<=,__CN(__PP_InpClnArchDt))));
     SHARED __UsingFitler(DATASET(InLayout) __ds) := __ds(KEL.Permits.BitAnd(__ds.__Permits,__PDPM) = __ds.__Permits);
     SHARED __SourceFilter(DATASET(InLayout) __ds) := __UsingFitler(__AsofFitler(__ds));
   END;
   SHARED E_Watercraft_Owner_Filtered := MODULE(E_Watercraft_Owner(__in,__cfg_Local))
-    SHARED __AsofFitler(DATASET(InLayout) __ds) := __ds(__T(__OP2(KEL.era.ToDateMinNull(__ds.Hybrid_Archive_Date_),<=,__CN(__PP_InpClnArchDt))));
+    SHARED __AsofFitler(DATASET(InLayout) __ds) := __ds(__T(__OP2(__OP2(KEL.era.ToDateMinNull(__ds.Hybrid_Archive_Date_),<=,__CN(__PRunDateToMimic)),AND,__OP2(KEL.era.ToDateMaxNull(__ds.Vault_Date_Last_Seen_),>=,__CN(__PRunDateToMimic)))) AND __T(__OP2(KEL.era.ToDateMinNull(__ds.Hybrid_Archive_Date_),<=,__CN(__PP_InpClnArchDt))));
     SHARED __UsingFitler(DATASET(InLayout) __ds) := __ds(KEL.Permits.BitAnd(__ds.__Permits,__PDPM) = __ds.__Permits);
     SHARED __SourceFilter(DATASET(InLayout) __ds) := __UsingFitler(__AsofFitler(__ds));
   END;
   SHARED E_Zip_Code_Filtered := MODULE(E_Zip_Code(__in,__cfg_Local))
-    SHARED __AsofFitler(DATASET(InLayout) __ds) := __ds(__T(__OP2(KEL.era.ToDateMinNull(__ds.Hybrid_Archive_Date_),<=,__CN(__PP_InpClnArchDt))));
+    SHARED __AsofFitler(DATASET(InLayout) __ds) := __ds(__T(__OP2(__OP2(KEL.era.ToDateMinNull(__ds.Hybrid_Archive_Date_),<=,__CN(__PRunDateToMimic)),AND,__OP2(KEL.era.ToDateMaxNull(__ds.Vault_Date_Last_Seen_),>=,__CN(__PRunDateToMimic)))) AND __T(__OP2(KEL.era.ToDateMinNull(__ds.Hybrid_Archive_Date_),<=,__CN(__PP_InpClnArchDt))));
     SHARED __UsingFitler(DATASET(InLayout) __ds) := __ds(KEL.Permits.BitAnd(__ds.__Permits,__PDPM) = __ds.__Permits);
     SHARED __SourceFilter(DATASET(InLayout) __ds) := __UsingFitler(__AsofFitler(__ds));
   END;
@@ -382,8 +372,6 @@ EXPORT Q_F_C_R_A_Mini_Attributes_V1_Thor_Hybrid(KEL.typ.uid __PLexID_in, KEL.typ
   END;
   SHARED B_Person_4_Local := MODULE(B_Person_4(__in,__cfg_Local))
     SHARED TYPEOF(B_Bankruptcy_5(__in,__cfg_Local).__ENH_Bankruptcy_5) __ENH_Bankruptcy_5 := B_Bankruptcy_5_Local.__ENH_Bankruptcy_5;
-    SHARED TYPEOF(E_Household(__in,__cfg_Local).__Result) __E_Household := E_Household_Filtered.__Result;
-    SHARED TYPEOF(E_Household_Member(__in,__cfg_Local).__Result) __E_Household_Member := E_Household_Member_Filtered.__Result;
     SHARED TYPEOF(B_Input_P_I_I_5(__in,__cfg_Local).__ENH_Input_P_I_I_5) __ENH_Input_P_I_I_5 := B_Input_P_I_I_5_Local.__ENH_Input_P_I_I_5;
     SHARED TYPEOF(B_Person_5(__in,__cfg_Local).__ENH_Person_5) __ENH_Person_5 := B_Person_5_Local.__ENH_Person_5;
     SHARED TYPEOF(E_Person_Bankruptcy(__in,__cfg_Local).__Result) __E_Person_Bankruptcy := E_Person_Bankruptcy_Filtered.__Result;
@@ -442,7 +430,6 @@ EXPORT Q_F_C_R_A_Mini_Attributes_V1_Thor_Hybrid(KEL.typ.uid __PLexID_in, KEL.typ
   SHARED B_Person_3_Local := MODULE(B_Person_3(__in,__cfg_Local))
     SHARED TYPEOF(B_Bankruptcy_4(__in,__cfg_Local).__ENH_Bankruptcy_4) __ENH_Bankruptcy_4 := B_Bankruptcy_4_Local.__ENH_Bankruptcy_4;
     SHARED TYPEOF(B_Criminal_Offense_4(__in,__cfg_Local).__ENH_Criminal_Offense_4) __ENH_Criminal_Offense_4 := B_Criminal_Offense_4_Local.__ENH_Criminal_Offense_4;
-    SHARED TYPEOF(E_Household_Member(__in,__cfg_Local).__Result) __E_Household_Member := E_Household_Member_Filtered.__Result;
     SHARED TYPEOF(B_Input_P_I_I_4(__in,__cfg_Local).__ENH_Input_P_I_I_4) __ENH_Input_P_I_I_4 := B_Input_P_I_I_4_Local.__ENH_Input_P_I_I_4;
     SHARED TYPEOF(B_Inquiry_4(__in,__cfg_Local).__ENH_Inquiry_4) __ENH_Inquiry_4 := B_Inquiry_4_Local.__ENH_Inquiry_4;
     SHARED TYPEOF(B_Person_4(__in,__cfg_Local).__ENH_Person_4) __ENH_Person_4 := B_Person_4_Local.__ENH_Person_4;
@@ -607,9 +594,6 @@ EXPORT Q_F_C_R_A_Mini_Attributes_V1_Thor_Hybrid(KEL.typ.uid __PLexID_in, KEL.typ
   SHARED B_Person_Vehicle_1_Local := MODULE(B_Person_Vehicle_1(__in,__cfg_Local))
     SHARED TYPEOF(B_Person_Vehicle_2(__in,__cfg_Local).__ENH_Person_Vehicle_2) __ENH_Person_Vehicle_2 := B_Person_Vehicle_2_Local.__ENH_Person_Vehicle_2;
   END;
-  SHARED B_Professional_License_1_Local := MODULE(B_Professional_License_1(__in,__cfg_Local))
-    SHARED TYPEOF(B_Professional_License_2(__in,__cfg_Local).__ENH_Professional_License_2) __ENH_Professional_License_2 := B_Professional_License_2_Local.__ENH_Professional_License_2;
-  END;
   SHARED B_Property_Event_1_Local := MODULE(B_Property_Event_1(__in,__cfg_Local))
     SHARED TYPEOF(B_Property_Event_2(__in,__cfg_Local).__ENH_Property_Event_2) __ENH_Property_Event_2 := B_Property_Event_2_Local.__ENH_Property_Event_2;
   END;
@@ -629,15 +613,13 @@ EXPORT Q_F_C_R_A_Mini_Attributes_V1_Thor_Hybrid(KEL.typ.uid __PLexID_in, KEL.typ
     SHARED TYPEOF(B_Person_Property_1(__in,__cfg_Local).__ENH_Person_Property_1) __ENH_Person_Property_1 := B_Person_Property_1_Local.__ENH_Person_Property_1;
     SHARED TYPEOF(B_Person_S_S_N_1(__in,__cfg_Local).__ENH_Person_S_S_N_1) __ENH_Person_S_S_N_1 := B_Person_S_S_N_1_Local.__ENH_Person_S_S_N_1;
     SHARED TYPEOF(B_Person_Vehicle_1(__in,__cfg_Local).__ENH_Person_Vehicle_1) __ENH_Person_Vehicle_1 := B_Person_Vehicle_1_Local.__ENH_Person_Vehicle_1;
-    SHARED TYPEOF(B_Professional_License_1(__in,__cfg_Local).__ENH_Professional_License_1) __ENH_Professional_License_1 := B_Professional_License_1_Local.__ENH_Professional_License_1;
-    SHARED TYPEOF(E_Professional_License_Person(__in,__cfg_Local).__Result) __E_Professional_License_Person := E_Professional_License_Person_Filtered.__Result;
     SHARED TYPEOF(B_Property_Event_1(__in,__cfg_Local).__ENH_Property_Event_1) __ENH_Property_Event_1 := B_Property_Event_1_Local.__ENH_Property_Event_1;
     SHARED TYPEOF(B_Watercraft_Owner_1(__in,__cfg_Local).__ENH_Watercraft_Owner_1) __ENH_Watercraft_Owner_1 := B_Watercraft_Owner_1_Local.__ENH_Watercraft_Owner_1;
   END;
   SHARED TYPEOF(B_Person(__in,__cfg_Local).__ENH_Person) __ENH_Person := B_Person_Local.__ENH_Person;
-  SHARED __EE11602197 := __ENH_Person;
-  SHARED __EE11603993 := __EE11602197(__T(__OP2(__EE11602197.UID,=,__CN(__PLexID_in))));
-  SHARED __ST122534_Layout := RECORD
+  SHARED __EE9662997 := __ENH_Person;
+  SHARED __EE9664792 := __EE9662997(__T(__OP2(__EE9662997.UID,=,__CN(__PLexID_in))));
+  SHARED __ST126025_Layout := RECORD
     KEL.typ.nuid Lex_I_D_;
     KEL.typ.str P___Lex_I_D_Seen_Flag_ := '';
     KEL.typ.nstr Current_Addr_Prim_Rng_;
@@ -663,7 +645,18 @@ EXPORT Q_F_C_R_A_Mini_Attributes_V1_Thor_Hybrid(KEL.typ.uid __PLexID_in, KEL.typ
     KEL.typ.epoch Vault_Date_Last_Seen_ := 0;
     KEL.typ.int __RecordCount := 0;
   END;
-  EXPORT Res0 := __UNWRAP(PROJECT(__EE11603993,TRANSFORM(__ST122534_Layout,SELF.Lex_I_D_ := LEFT.UID,SELF := LEFT)));
+  SHARED __ST126025_Layout __ND9664797__Project(B_Person(__in,__cfg_Local).__ST168221_Layout __PP9664793) := TRANSFORM
+    SELF.Lex_I_D_ := __PP9664793.UID;
+    SELF.P___Lex_I_D_Seen_Flag_ := __PP9664793.P___Lex_I_D_Seen_Flag_F_C_R_A_;
+    __CC13921 := '-99999';
+    SELF.P_L___Best_Name_First_ := IF(__PP9664793.P___Lex_I_D_Seen_Flag_F_C_R_A_ = '0',__ECAST(KEL.typ.nstr,__CN(__CC13921)),__ECAST(KEL.typ.nstr,__PP9664793.P_L___Best_Name_First_));
+    SELF.P_L___Best_Name_Mid_ := IF(__PP9664793.P___Lex_I_D_Seen_Flag_F_C_R_A_ = '0',__ECAST(KEL.typ.nstr,__CN(__CC13921)),__ECAST(KEL.typ.nstr,__PP9664793.P_L___Best_Name_Mid_));
+    SELF.P_L___Best_Name_Last_ := IF(__PP9664793.P___Lex_I_D_Seen_Flag_F_C_R_A_ = '0',__ECAST(KEL.typ.nstr,__CN(__CC13921)),__ECAST(KEL.typ.nstr,__PP9664793.P_L___Best_Name_Last_));
+    SELF.P_L___Best_S_S_N_ := IF(__PP9664793.P___Lex_I_D_Seen_Flag_F_C_R_A_ = '0',__ECAST(KEL.typ.nstr,__CN(__CC13921)),__ECAST(KEL.typ.nstr,__PP9664793.P_L___Best_S_S_N_));
+    SELF.P_L___Best_D_O_B_ := IF(__PP9664793.P___Lex_I_D_Seen_Flag_F_C_R_A_ = '0',__ECAST(KEL.typ.nstr,__CN(__CC13921)),__ECAST(KEL.typ.nstr,__PP9664793.P_L___Best_D_O_B_));
+    SELF := __PP9664793;
+  END;
+  EXPORT Res0 := __UNWRAP(PROJECT(__EE9664792,__ND9664797__Project(LEFT)));
   EXPORT DBG_E_Accident_Result := __UNWRAP(E_Accident_Filtered.__Result);
   EXPORT DBG_E_Address_Result := __UNWRAP(E_Address_Filtered.__Result);
   EXPORT DBG_E_Address_Inquiry_Result := __UNWRAP(E_Address_Inquiry_Filtered.__Result);
@@ -676,8 +669,6 @@ EXPORT Q_F_C_R_A_Mini_Attributes_V1_Thor_Hybrid(KEL.typ.uid __PLexID_in, KEL.typ
   EXPORT DBG_E_Email_Inquiry_Result := __UNWRAP(E_Email_Inquiry_Filtered.__Result);
   EXPORT DBG_E_First_Degree_Associations_Result := __UNWRAP(E_First_Degree_Associations_Filtered.__Result);
   EXPORT DBG_E_First_Degree_Relative_Result := __UNWRAP(E_First_Degree_Relative_Filtered.__Result);
-  EXPORT DBG_E_Household_Result := __UNWRAP(E_Household_Filtered.__Result);
-  EXPORT DBG_E_Household_Member_Result := __UNWRAP(E_Household_Member_Filtered.__Result);
   EXPORT DBG_E_Input_P_I_I_Result := __UNWRAP(E_Input_P_I_I_Filtered.__Result);
   EXPORT DBG_E_Inquiry_Result := __UNWRAP(E_Inquiry_Filtered.__Result);
   EXPORT DBG_E_Lien_Judgment_Result := __UNWRAP(E_Lien_Judgment_Filtered.__Result);
@@ -806,7 +797,6 @@ EXPORT Q_F_C_R_A_Mini_Attributes_V1_Thor_Hybrid(KEL.typ.uid __PLexID_in, KEL.typ
   EXPORT DBG_E_Person_Property_Intermediate_1 := __UNWRAP(B_Person_Property_1_Local.__ENH_Person_Property_1);
   EXPORT DBG_E_Person_S_S_N_Intermediate_1 := __UNWRAP(B_Person_S_S_N_1_Local.__ENH_Person_S_S_N_1);
   EXPORT DBG_E_Person_Vehicle_Intermediate_1 := __UNWRAP(B_Person_Vehicle_1_Local.__ENH_Person_Vehicle_1);
-  EXPORT DBG_E_Professional_License_Intermediate_1 := __UNWRAP(B_Professional_License_1_Local.__ENH_Professional_License_1);
   EXPORT DBG_E_Property_Event_Intermediate_1 := __UNWRAP(B_Property_Event_1_Local.__ENH_Property_Event_1);
   EXPORT DBG_E_Watercraft_Owner_Intermediate_1 := __UNWRAP(B_Watercraft_Owner_1_Local.__ENH_Watercraft_Owner_1);
   EXPORT DBG_E_Person_Annotated := __UNWRAP(B_Person_Local.__ENH_Person);
@@ -823,8 +813,6 @@ EXPORT Q_F_C_R_A_Mini_Attributes_V1_Thor_Hybrid(KEL.typ.uid __PLexID_in, KEL.typ
     OUTPUT(DBG_E_Email_Inquiry_Result,NAMED('DBG_E_Email_Inquiry_Result_Q_F_C_R_A_Mini_Attributes_V1_Thor_Hybrid')),
     OUTPUT(DBG_E_First_Degree_Associations_Result,NAMED('DBG_E_First_Degree_Associations_Result_Q_F_C_R_A_Mini_Attributes_V1_Thor_Hybrid')),
     OUTPUT(DBG_E_First_Degree_Relative_Result,NAMED('DBG_E_First_Degree_Relative_Result_Q_F_C_R_A_Mini_Attributes_V1_Thor_Hybrid')),
-    OUTPUT(DBG_E_Household_Result,NAMED('DBG_E_Household_Result_Q_F_C_R_A_Mini_Attributes_V1_Thor_Hybrid')),
-    OUTPUT(DBG_E_Household_Member_Result,NAMED('DBG_E_Household_Member_Result_Q_F_C_R_A_Mini_Attributes_V1_Thor_Hybrid')),
     OUTPUT(DBG_E_Input_P_I_I_Result,NAMED('DBG_E_Input_P_I_I_Result_Q_F_C_R_A_Mini_Attributes_V1_Thor_Hybrid')),
     OUTPUT(DBG_E_Inquiry_Result,NAMED('DBG_E_Inquiry_Result_Q_F_C_R_A_Mini_Attributes_V1_Thor_Hybrid')),
     OUTPUT(DBG_E_Lien_Judgment_Result,NAMED('DBG_E_Lien_Judgment_Result_Q_F_C_R_A_Mini_Attributes_V1_Thor_Hybrid')),
@@ -953,7 +941,6 @@ EXPORT Q_F_C_R_A_Mini_Attributes_V1_Thor_Hybrid(KEL.typ.uid __PLexID_in, KEL.typ
     OUTPUT(DBG_E_Person_Property_Intermediate_1,NAMED('DBG_E_Person_Property_Intermediate_1_Q_F_C_R_A_Mini_Attributes_V1_Thor_Hybrid')),
     OUTPUT(DBG_E_Person_S_S_N_Intermediate_1,NAMED('DBG_E_Person_S_S_N_Intermediate_1_Q_F_C_R_A_Mini_Attributes_V1_Thor_Hybrid')),
     OUTPUT(DBG_E_Person_Vehicle_Intermediate_1,NAMED('DBG_E_Person_Vehicle_Intermediate_1_Q_F_C_R_A_Mini_Attributes_V1_Thor_Hybrid')),
-    OUTPUT(DBG_E_Professional_License_Intermediate_1,NAMED('DBG_E_Professional_License_Intermediate_1_Q_F_C_R_A_Mini_Attributes_V1_Thor_Hybrid')),
     OUTPUT(DBG_E_Property_Event_Intermediate_1,NAMED('DBG_E_Property_Event_Intermediate_1_Q_F_C_R_A_Mini_Attributes_V1_Thor_Hybrid')),
     OUTPUT(DBG_E_Watercraft_Owner_Intermediate_1,NAMED('DBG_E_Watercraft_Owner_Intermediate_1_Q_F_C_R_A_Mini_Attributes_V1_Thor_Hybrid')),
     OUTPUT(DBG_E_Person_Annotated,NAMED('DBG_E_Person_Annotated_Q_F_C_R_A_Mini_Attributes_V1_Thor_Hybrid'))

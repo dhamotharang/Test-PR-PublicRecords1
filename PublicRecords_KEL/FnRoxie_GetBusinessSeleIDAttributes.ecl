@@ -32,7 +32,7 @@ LayoutBIIAndPII := RECORD
 			SELF.RepInput := ROWS(RIGHT),
 			SELF.InputData := LEFT));
 					
-	BusinessSeleAttributes_Results := PROJECT(BusinessSeleAttributesInput, TRANSFORM({INTEGER G_ProcBusUID, LayoutBusinessSeleIDAttributes},
+	BusinessSeleAttributes_Results := NOCOMBINE(PROJECT(BusinessSeleAttributesInput, TRANSFORM({INTEGER G_ProcBusUID, LayoutBusinessSeleIDAttributes},
 		SELF.G_ProcBusUID := LEFT.InputData.G_ProcBusUID;
 		NonFCRABusinessSeleIDResults := PublicRecords_KEL.Q_Non_F_C_R_A_Business_Sele_I_D_Attributes_V1_Dynamic(
 				LEFT.InputData.B_LexIDUlt,
@@ -43,7 +43,7 @@ LayoutBIIAndPII := RECORD
 				(INTEGER)LEFT.InputData.B_InpClnArchDt[1..8],
 				Options.KEL_Permissions_Mask, 
 				FDCDataset).res0;
-		SELF := NonFCRABusinessSeleIDResults[1]));
+		SELF := NonFCRABusinessSeleIDResults[1])));
 
 
 	BusinessSeleIDAttributesRaw := KEL.Clean(BusinessSeleAttributes_Results, true, true, true);
@@ -56,7 +56,7 @@ LayoutBIIAndPII := RECORD
 																	PublicRecords_KEL.CFG_Compile.Permit__NONE).res0); //DPM	
 
 	BusinessSeleAttributes_NoDates_Results := IF(Options.OutputMasterResults,
-		PROJECT(InputData, TRANSFORM({INTEGER G_ProcBusUID, LayoutBusinessSeleIDNoDatesAttributes},
+		NOCOMBINE(PROJECT(InputData, TRANSFORM({INTEGER G_ProcBusUID, LayoutBusinessSeleIDNoDatesAttributes},
 			SELF.G_ProcBusUID := LEFT.G_ProcBusUID;
 			NonFCRABusinessSeleIDResults := PublicRecords_KEL.Q_Non_F_C_R_A_Business_Sele_I_D_No_Dates_Attributes_V1_Dynamic(
 				LEFT.B_LexIDUlt,
@@ -65,7 +65,7 @@ LayoutBIIAndPII := RECORD
 				STD.Date.Today(), 
 				Options.KEL_Permissions_Mask, 				
 				FDCDataset).res0;
-			SELF := NonFCRABusinessSeleIDResults[1])),
+			SELF := NonFCRABusinessSeleIDResults[1]))),
 		DATASET([],{INTEGER G_ProcBusUID, LayoutBusinessSeleIDNoDatesAttributes}));
 	
 	BusinessSeleIDNoDatesAttributesRaw := KEL.Clean(BusinessSeleAttributes_NoDates_Results, TRUE, TRUE, TRUE);

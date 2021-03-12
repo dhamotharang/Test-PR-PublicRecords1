@@ -1,4 +1,4 @@
-﻿import PublicRecords_KEL, risk_indicators, fcra, MDR, faa, doxie_files, std, SexOffender, Prof_License_Mari, doxie, watercraft, bankruptcyv2, ln_propertyv2, RiskView;
+﻿import PublicRecords_KEL, risk_indicators, fcra, MDR, faa, doxie_files, std, SexOffender, Prof_License_Mari, doxie, watercraft, bankruptcyv2, ln_propertyv2, RiskView, AVM_V2;
 IMPORT KEL13 AS KEL;
 
 //please note
@@ -72,7 +72,10 @@ EXPORT GetOverrideFlags(DATASET(PublicRecords_KEL.ECL_Functions.Layouts.LayoutIn
 	SELF.air_correct_RECORD_ID          := SET(flagrecs(file_id = FCRA.FILE_ID.AIRCRAFT),record_id) + le.air_correct_RECORD_ID ;
 	
 	SELF.avm_correct_ffid               := SET(flagrecs(file_id = FCRA.FILE_ID.AVM),flag_file_id);
-	SELF.avm_correct_RECORD_ID          := SET(flagrecs(file_id = FCRA.FILE_ID.AVM),record_id) + le.avm_correct_RECORD_ID ;
+	SELF.avm_correct_RECORD_ID          := SET(flagrecs(file_id = FCRA.FILE_ID.AVM),record_id) + le.avm_correct_RECORD_ID ;	
+	
+	SELF.avm_medians_correct_ffid               := SET(flagrecs(file_id = FCRA.FILE_ID.avm_medians),flag_file_id);
+	SELF.avm_medians_correct_RECORD_ID          := SET(flagrecs(file_id = FCRA.FILE_ID.avm_medians),record_id) + le.avm_medians_correct_RECORD_ID ;
 	
 	SELF.bankrupt_correct_ffid          := SET(flagrecs(file_id = FCRA.FILE_ID.BANKRUPTCY),flag_file_id);
 	SELF.bankrupt_correct_cccn          :=  le.bankrupt_correct_cccn ;//the way we find suppression records is different than corrected
@@ -287,6 +290,39 @@ EXPORT GetOverrideAVM(DATASET( Layouts_FDC.LayoutAddressGeneric_inputs) shell) :
 					SELF := []));		
 	
 	return avm_corr_data_clean;	
+
+end;
+
+EXPORT GetOverrideAVMMedians(DATASET( Layouts_FDC.LayoutAddressGeneric_inputs) shell) := function
+ 
+ avm_medians_rec := RECORD
+		INTEGER UIDAppend;
+		INTEGER G_ProcUID;
+		INTEGER P_lexid;
+    AVM_V2.layouts.Layout_Override_AVM_Medians;
+		PublicRecords_KEL.ECL_Functions.Layout_Overrides.avm_medians_correct_ffid;
+		PublicRecords_KEL.ECL_Functions.Layout_Overrides.avm_medians_correct_record_id;
+		string history_date;
+  end;
+	
+	avm_medians_corr := join(shell, FCRA.Key_Override_AVM.avm_medians,
+										keyed(right.flag_file_id in left.avm_medians_correct_ffid),
+											TRANSFORM(avm_medians_rec,
+												self := right,
+												SELF := left,
+												SELF := []), 
+											atmost(PublicRecords_KEL.ECL_Functions.Constants.MAX_OVERRIDE_LIMIT_SLIM));
+		
+		
+	avm_medians_corr_data_clean := project(avm_medians_corr, transform(Layouts_FDC.Layout_AVM_V2_Key_AVM_Medians_Norm_Records,
+					SELF.Src := PublicRecords_KEL.ECL_Functions.Constants.AVM,
+					SELF.DPMBitmap := SetDPMBitmap( Source := PublicRecords_KEL.ECL_Functions.Constants.AVM, FCRA_Restricted := Options.isFCRA, GLBA_Restricted := NotRegulated, Pre_GLB_Restricted := NotRegulated, DPPA_Restricted := NotRegulated, DPPA_State := BlankString, KELPermissions := CFG_File),
+					SELF.history_date :=  ArchiveDate((STRING)STD.Date.Today()),// doing this so our avm overrides have some kind of date to get past the asof statement, not ideal but without it kel will drop these on the floor
+					self.Archive_Date := '';									
+					SELF := left,
+					SELF := []));		
+	
+	return avm_medians_corr_data_clean;	
 
 end;
 

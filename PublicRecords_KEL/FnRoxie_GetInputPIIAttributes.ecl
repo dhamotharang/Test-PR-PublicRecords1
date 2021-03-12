@@ -1,4 +1,4 @@
-﻿IMPORT KEL13 AS KEL;
+﻿﻿IMPORT KEL13 AS KEL;
 
 EXPORT FnRoxie_GetInputPIIAttributes(DATASET(PublicRecords_KEL.ECL_Functions.Layouts.LayoutInputPII) RepInput,
             PublicRecords_KEL.Interface_Options Options,
@@ -7,10 +7,10 @@ EXPORT FnRoxie_GetInputPIIAttributes(DATASET(PublicRecords_KEL.ECL_Functions.Lay
 	LayoutInputPIIAttributes := RECORDOF(PublicRecords_KEL.Q_Input_Attributes_V1_Dynamic(DATASET([], PublicRecords_KEL.ECL_Functions.Layouts.LayoutInputPII), 0, PublicRecords_KEL.CFG_Compile.Permit__NONE, Options.isFCRA,).res0);
 
 	
-	InputPIIAttributesResults := JOIN(RepInput, FDCDataset, LEFT.G_ProcUID = RIGHT.G_ProcUID, TRANSFORM(LayoutInputPIIAttributes,
+	InputPIIAttributesResults := NOCOMBINE(JOIN(RepInput, FDCDataset, LEFT.G_ProcUID = RIGHT.G_ProcUID, TRANSFORM(LayoutInputPIIAttributes,
 		PIIAttributes := PublicRecords_KEL.Q_Input_Attributes_V1_Dynamic(DATASET(LEFT), (INTEGER) LEFT.P_InpClnArchDt[1..8], Options.KEL_Permissions_Mask, Options.isFCRA, DATASET(RIGHT)).Res0;
 		SELF := PIIAttributes[1]), 
-	LEFT OUTER, ATMOST(100), KEEP(1));
+	LEFT OUTER, ATMOST(100), KEEP(1)));
 		
 	InputPIIAttributes := KEL.Clean(InputPIIAttributesResults, TRUE, TRUE, TRUE);		
 	
@@ -37,6 +37,7 @@ EXPORT FnRoxie_GetInputPIIAttributes(DATASET(PublicRecords_KEL.ECL_Functions.Lay
 			SELF.P_InpValPhoneWorkBadLenFlag := (STRING)LEFT.P_InpValPhoneWorkBadLenFlag,
 			SELF.P_InpValPhoneWorkBogusFlag := (STRING)LEFT.P_InpValPhoneWorkBogusFlag,
 			// SELF.p_inpclnaddrlocid := (INTEGER)LEFT.p_inpclnaddrlocid, 
+			// SELF.P_InpSSNIs4Digits := (STRING)LEFT.P_InpSSNIs4Digits,
 			// SELF.P_InpClnAddrPropertyUID := PublicRecords_KEL.E_Property(KEL_Settings).Lookup (KeyVal = TRIM((STRING)LEFT.P_InpClnAddrPrimRng) + '|' + 
 					// TRIM((STRING)LEFT.P_InpClnAddrPreDir) + '|' + 
 					// TRIM((STRING)LEFT.P_InpClnAddrPrimName) + '|' + 
@@ -62,8 +63,15 @@ EXPORT FnRoxie_GetInputPIIAttributes(DATASET(PublicRecords_KEL.ECL_Functions.Lay
 			SELF.PI_InpDOBAge := (INTEGER)LEFT.PI_InpDOBAge,
 			SELF.PI_InpSSNIsDeceasedFlag := (STRING)LEFT.PI_InpSSNIsDeceasedFlag,
 			SELF.PI_InpSSNDeceasedDt := (STRING)LEFT.PI_InpSSNDeceasedDt,
-			SELF.PI_InpAddrStateDLAvailFlag := (STRING)LEFT.PI_InpAddrStateDLAvailFlag,
+			SELF.PI_InpAddrStateDLAvailFlag := IF(Options.IsFCRA, '', (STRING)LEFT.PI_InpAddrStateDLAvailFlag),
 			SELF.PI_InpAddrStateVoterAvailFlag := (STRING)LEFT.PI_InpAddrStateVoterAvailFlag,
+			// SELF.PI_InpPhoneSICCodeHRList := (STRING)LEFT.PI_InpPhoneSICCodeHRList,
+			// SELF.PI_InpPhoneNAICSCodeHRList := (STRING)LEFT.PI_InpPhoneNAICSCodeHRList,
+			// SELF.PI_InpPhoneIsHRCorrectFacFlag := (STRING)LEFT.PI_InpPhoneIsHRCorrectFacFlag,
+			// SELF.PI_InpPhoneType := (STRING)LEFT.PI_InpPhoneType,
+			// SELF.PI_InpPhoneIsBusPhoneFlag := (STRING)LEFT.PI_InpPhoneIsBusPhoneFlag,
+			// SELF.PI_InpAddrIsPOBoxFlag := (STRING)LEFT.PI_InpAddrIsPOBoxFlag,
+			// SELF.PI_InpAddrIsMilitaryFlag := (STRING)LEFT.PI_InpAddrIsMilitaryFlag,
 			SELF.PI_SrchPerInpSSNCnt1Y := IF(Options.IsFCRA,0,(INTEGER)LEFT.PI_SrchPerInpSSNCnt1Y),
 			SELF.PI_SrchLexIDPerInpSSNCnt1Y := IF(Options.IsFCRA,0,(INTEGER)LEFT.PI_SrchLexIDPerInpSSNCnt1Y),
 			SELF.PI_SrchLNamePerInpSSNCnt1Y := IF(Options.IsFCRA,0,(INTEGER)LEFT.PI_SrchLNamePerInpSSNCnt1Y),
@@ -78,12 +86,15 @@ EXPORT FnRoxie_GetInputPIIAttributes(DATASET(PublicRecords_KEL.ECL_Functions.Lay
 			SELF.PI_SrchPerInpPhoneCnt1Y := IF(Options.IsFCRA,0,(INTEGER)LEFT.PI_SrchPerInpPhoneCnt1Y),
 			SELF.PI_SrchLexIDPerInpPhoneCnt1Y := IF(Options.IsFCRA,0,(INTEGER)LEFT.PI_SrchLexIDPerInpPhoneCnt1Y),
 			SELF.BestDataAppended := Options.BestPIIAppend,
-			SELF.IPaddr := '',
-			SELF.IPresponse := '',
-			SELF.NetAcuityRoyalty := 0,		
-			// SELF.IPaddr := (STRING)LEFT.IPaddr,
-			// SELF.IPresponse := (STRING)LEFT.IPresponse,
-			// SELF.NetAcuityRoyalty := (INTEGER4)LEFT.NetAcuityRoyalty,
+			SELF.PI_AlrtInpNameWatchlistRecNum := IF(Options.IsFCRA, '', (STRING)LEFT.PI_AlrtInpNameWatchlistRecNum),
+      SELF.PI_AlrtInpNameOnWatchlistFlag := IF(Options.IsFCRA, '', (STRING)LEFT.PI_AlrtInpNameOnWatchlistFlag),
+			SELF.IPaddr := (STRING)LEFT.IPaddr,
+			SELF.IPresponse := (STRING)LEFT.IPresponse,
+			SELF.NetAcuityRoyalty := (INTEGER4)LEFT.NetAcuityRoyalty,
+			SELF.TargusRoyalty := (INTEGER4)LEFT.TargusRoyalty,
+			SELF.TargusSrc := (STRING)LEFT.TargusSrc,			
+			SELF.InsPhoneHit := IF(Options.IsFCRA, 0, (INTEGER4)LEFT.InsPhoneHit),
+			SELF.InsPhoneSrc := IF(Options.IsFCRA, '', (STRING)LEFT.InsPhoneSrc),
 			SELF := LEFT,
 			SELF := []));
 	

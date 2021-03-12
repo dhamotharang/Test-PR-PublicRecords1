@@ -8,7 +8,10 @@
 	SET OF STRING100 air_correct_record_id {maxlength(10100)} := [];
 	
 	SET OF STRING20 avm_correct_ffid {maxlength(2100)} := [];
-	SET OF STRING100 avm_correct_record_id {maxlength(10100)} := [];
+	SET OF STRING100 avm_correct_record_id {maxlength(10100)} := [];	
+	
+	SET OF STRING20 avm_medians_correct_ffid {maxlength(2100)} := [];
+	SET OF STRING100 avm_medians_correct_record_id {maxlength(10100)} := [];
 	
 	SET OF STRING55	bankrupt_correct_cccn {maxlength(5600)} := [];
 	SET OF STRING55	bankrupt_correct_RECORD_ID {maxlength(5600)} := [];
