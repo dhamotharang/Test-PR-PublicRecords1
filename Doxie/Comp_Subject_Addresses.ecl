@@ -57,7 +57,8 @@ Main_Dn_ranked_pre := Header.Mac_Append_addr_ind(Main_Dn, addr_ind , /*src*/, di
 Main_Dn_ranked := project(Main_Dn_ranked_pre,
                     transform(Layout_Comp_Addresses,
                        self.tnt := doxie.enhanceTNT(do_address_hierarchy, left.tnt, left.addr_ind, left.best_addr_rank),
-                               self := left));
+                       self.location_id := left.locid,
+                       self := left));
 
 //****** Push infile through transform above
 Main_Dn_U := iterate(if(do_address_hierarchy,Main_Dn_ranked,Main_Dn), tra(left, right));
