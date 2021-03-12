@@ -51,18 +51,6 @@ EXPORT Prep_IDA_Credit( DATASET(Risk_Indicators.layouts.layout_IDA_in) indata,
 			));
   
   FromIDA := Risk_Indicators.getIDA_attributes(IDA_input, gateways_prep, Gateway_mode, Timeout_sec, Retries);
-  
-  //Fail the transaction if the IDA gateway call didn't work.
-  //This check is for IDA combined models, if a service ends up calling
-  //IDA and they don't want the transaction to fail, will need to modify this logic
-  IDA_error_check := (FromIDA[1].response._Header.Status != 0) OR 
-                       (FromIDA[1].response.ErrorRecord.Code != '' AND FromIDA[1].response.ErrorRecord.Message != '');
-
-  IF(IDA_error_check, 
-    IF(TRIM(STD.STR.ToUpperCase(FromIDA[1].response.ErrorRecord.Code)) = 'USER', 
-      FAIL('Gateway ' + TRIM(FromIDA[1].response.ErrorRecord.Code) + ' error: ' + FromIDA[1].response.ErrorRecord.Message),
-      FAIL('503 Service Unavailable: The service was unavailable due to temporary overload or maintenance.')
-    )); 
 
   //Don't want IDA gateway running in batch yet
   #IF(_control.Environment.OnThor)
