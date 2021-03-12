@@ -1,4 +1,4 @@
-EXPORT Log_IParam := module
+﻿EXPORT Log_IParam := module
   EXPORT params := INTERFACE
 		EXPORT STRING20 company_ID;
 		EXPORT STRING2  Transaction_Type; 
@@ -83,7 +83,7 @@ EXPORT Log_IParam := module
 		EXPORT STRING25 city_8;  
 		EXPORT STRING2  state_8; 
 		EXPORT STRING5  zip_8; 		
-		EXPORT STRING company_name;
+		EXPORT STRING120 company_name;
 		EXPORT STRING120 company_address;
 		EXPORT STRING25 company_city;
 		EXPORT STRING2 company_state;
