@@ -26,6 +26,9 @@ EXPORT Interface_Mini_Options (PublicRecords_KEL.Interface_Options OptionsRaw) :
 		
 	EXPORT BOOLEAN isBRM_Marketing := OptionsRaw.isBRM_Marketing;
 
+	EXPORT BOOLEAN TurnOffRelatives := OptionsRaw.TurnOffRelatives;
+	EXPORT BOOLEAN TurnOffHouseHolds := OptionsRaw.TurnOffHouseHolds;
+
 	// BIP Append Options
 	EXPORT UNSIGNED BIPAppendScoreThreshold := OptionsRaw.BIPAppendScoreThreshold;
 	EXPORT UNSIGNED BIPAppendWeightThreshold := OptionsRaw.BIPAppendWeightThreshold;

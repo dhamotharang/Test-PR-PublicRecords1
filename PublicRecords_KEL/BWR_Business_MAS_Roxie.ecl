@@ -64,6 +64,11 @@ Output_SALT_Profile := TRUE;
 
 Exclude_Consumer_Attributes := FALSE; //if TRUE, bypasses consumer logic and sets all consumer shell fields to blank/0.
 
+// TurnOffHouseHolds := TRUE;
+TurnOffHouseHolds := FALSE;
+// TurnOffRelatives := TRUE;
+TurnOffRelatives := FALSE;
+
 // Use default list of allowed sources
 AllowedSourcesDataset := DATASET([],PublicRecords_KEL.ECL_Functions.Constants.Layout_Allowed_Sources);
 // Do not exclude any additional sources from allowed sources dataset.
@@ -241,6 +246,8 @@ soapLayout := RECORD
 	BOOLEAN OutputMasterResults;
 	BOOLEAN ExcludeConsumerAttributes;
 	BOOLEAN IsMarketing;
+	BOOLEAN TurnOffHouseHolds;
+	BOOLEAN TurnOffRelatives;
 	BOOLEAN IncludeMinors;
 	DATASET(PublicRecords_KEL.ECL_Functions.Constants.Layout_Allowed_Sources) AllowedSourcesDataset := DATASET([], PublicRecords_KEL.ECL_Functions.Constants.Layout_Allowed_Sources);
 	DATASET(PublicRecords_KEL.ECL_Functions.Constants.Layout_Allowed_Sources) ExcludeSourcesDataset := DATASET([], PublicRecords_KEL.ECL_Functions.Constants.Layout_Allowed_Sources);
@@ -314,6 +321,8 @@ soapLayout trans (inDataReadyDist le):= TRANSFORM
 	SELF.IncludeMinors := Settings.IncludeMinors;
 	SELF.OverrideExperianRestriction := Settings.Override_Experian_Restriction;
 	SELF.IsMarketing := FALSE;
+	SELF.TurnOffHouseHolds := TurnOffHouseHolds;
+	SELF.TurnOffRelatives := TurnOffRelatives;
 	SELF.OutputMasterResults := Output_Master_Results;
 	SELF.AllowedSourcesDataset := AllowedSourcesDataset;
 	SELF.ExcludeSourcesDataset := ExcludeSourcesDataset;

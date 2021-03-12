@@ -681,27 +681,30 @@ Current_Address_Consumer_recs_Contacts := join(Current_Address_Consumer_recs, Cu
 						SELF.Dataset_dx_Header__key_hhid_did := ROWS(RIGHT),
 						SELF := LEFT,
 						SELF := []));		
-						         
-// Person - Relatives					
-	Key_Relatives__Key_Relatives_V3_Unsuppressed := 
-			JOIN(Input_FDC_Business_Contact_LexIDs, Relationship.key_relatives_v3, 
-				Common.DoFDCJoin_Relatives__Key_Relatives_v3 = TRUE AND FDCMiniPop and  NOT options.isBRM_Marketing and
-				LEFT.P_LexID > 0 AND
-				KEYED(LEFT.P_LexID = RIGHT.did1) and
-				#expand(PublicRecords_KEL.ECL_Functions.Constants.rel_filter),
-				TRANSFORM(Layouts_FDC.Layout_Relatives__Key_Relatives_V3,
-					SELF.UIDAppend := LEFT.UIDAppend,
-					SELF.g_procuid := LEFT.g_procuid,
-					SELF.P_LexID := LEFT.P_LexID,
-					SELF.Src := MDR.sourceTools.src_Relatives_Data; 
-					SELF.DPMBitmap := SetDPMBitmap( Source := self.src, FCRA_Restricted := Options.isFCRA, GLBA_Restricted := NotRegulated, Pre_GLB_Restricted := NotRegulated, DPPA_Restricted := NotRegulated, DPPA_State := BlankString, KELPermissions := CFG_File),
-					self.Archive_Date :=  '';		//not archivable.						
-					SELF.CoSourceCount := COUNT(RIGHT.rels);
-					SELF.CoSourceSum := SUM(RIGHT.rels, Cnt);
-					SELF := RIGHT, 
-					SELF := LEFT,
-					SELF := []), 
-				ATMOST(PublicRecords_KEL.ECL_Functions.Constants.Default_Atmost_1000), KEEP(100));
+
+		ismarketing := if(Options.isMarketing,'MARKETING','');
+		sourcecoderelatives := if(Options.isMarketing,MDR.sourceTools.src_Marketing_Relatives_Data,MDR.sourceTools.src_Relatives_Data);
+		HeaderRelatives :=  IF(Common.DoFDCJoin_Relatives__Key_Relatives_v3 = TRUE AND FDCMiniPop and  NOT options.isBRM_Marketing, Relationship.proc_GetRelationshipNeutral(PROJECT(Input_FDC_Business_Contact_LexIDs, TRANSFORM(Relationship.layout_GetRelationship.DIDs_layout, SELF.DID := LEFT.P_Lexid)),
+																	TopNCount:=100,
+																	RelativeFlag :=TRUE,AssociateFlag:=TRUE,
+																	doAtmost:=TRUE,MaxCount:=PublicRecords_KEL.ECL_Functions.Constants.Default_Atmost_1000, RelKeyFlag:= ismarketing).result);
+																	
+																	
+		Key_Relatives__Key_Relatives_V3_Unsuppressed := Join(Input_FDC_Business_Contact_LexIDs,HeaderRelatives, 
+																				LEFT.P_Lexid = RIGHT.DID1 and
+																				#expand(PublicRecords_KEL.ECL_Functions.Constants.rel_filter),
+																			TRANSFORM(Layouts_FDC.Layout_Relatives__Key_Relatives_V3,
+																					SELF.UIDAppend := LEFT.UIDAppend,
+																					SELF.g_procuid := LEFT.g_procuid,
+																					SELF.P_LexID := LEFT.P_LexID,
+																					SELF.Src := sourcecoderelatives; 
+																					SELF.DPMBitmap := SetDPMBitmap( Source := self.src, FCRA_Restricted := Options.isFCRA, GLBA_Restricted := NotRegulated, Pre_GLB_Restricted := NotRegulated, DPPA_Restricted := NotRegulated, DPPA_State := BlankString, KELPermissions := CFG_File),
+																					self.Archive_Date :=  '';		//not archivable.						
+																					SELF.CoSourceCount := COUNT(RIGHT.rels);
+																					SELF.CoSourceSum := SUM(RIGHT.rels, Cnt);
+																					SELF := RIGHT, 
+																					SELF := LEFT,
+																					SELF := []));
 		
 	Key_Relatives__Key_Relatives_V3 := Suppress.MAC_SuppressSource(Key_Relatives__Key_Relatives_V3_Unsuppressed, mod_access, did_field := did1, data_env := Environment);	
 	
@@ -717,48 +720,11 @@ Current_Address_Consumer_recs_Contacts := join(Current_Address_Consumer_recs, Cu
 					SELF.Dataset_Relatives__Key_Relatives_V3 := ROWS(RIGHT),
 					SELF := LEFT,
 					SELF := []));			
-					
-// Person - Relatives	marketing			
-	Key_Relatives_Marketing__dx_Relatives_v3_Unsuppressed := 
-			JOIN(Input_FDC_Business_Contact_LexIDs, dx_Relatives_v3.Key_Marketing_Header_Relatives(), 
-				Common.DoFDCJoin_Marketing_Relatives__Key_Relatives_v3 = TRUE AND FDCMiniPop and  NOT options.isBRM_Marketing and
-				LEFT.P_LexID > 0 AND
-				KEYED(LEFT.P_LexID = RIGHT.did1) and
-				#expand(PublicRecords_KEL.ECL_Functions.Constants.rel_filter),
-				TRANSFORM(Layouts_FDC.Layout_Relatives__Key_Marketing_Header_Relatives,
-					SELF.UIDAppend := LEFT.UIDAppend,
-					SELF.g_procuid := LEFT.g_procuid,
-					SELF.P_LexID := LEFT.P_LexID,
-					SELF.Src := MDR.sourceTools.src_Marketing_Relatives_Data; 
-					SELF.DPMBitmap := SetDPMBitmap( Source := self.src, FCRA_Restricted := Options.isFCRA, GLBA_Restricted := NotRegulated, Pre_GLB_Restricted := NotRegulated, DPPA_Restricted := NotRegulated, DPPA_State := BlankString, KELPermissions := CFG_File),
-					self.Archive_Date :=  '';		//not archivable.						
-					SELF.CoSourceCount := COUNT(RIGHT.rels);
-					SELF.CoSourceSum := SUM(RIGHT.rels, Cnt);
-					SELF := RIGHT, 
-					SELF := LEFT,
-					SELF := []), 
-				ATMOST(PublicRecords_KEL.ECL_Functions.Constants.Default_Atmost_1000), KEEP(100));
-		
-	Key_Relatives_Marketing__dx_Relatives_v3 := Suppress.MAC_SuppressSource(Key_Relatives_Marketing__dx_Relatives_v3_Unsuppressed, mod_access, did_field := did1, data_env := Environment);	
-
-	norm_Key_Relatives_V3_Marketing := NORMALIZE(FDCDataset_Mini, LEFT.Dataset_Relatives__Key_Marketing_Header_Relatives3, TRANSFORM(RECORDOF(RIGHT), SELF.P_LexID := LEFT.P_LexID, SELF := RIGHT));
-
-	//choose if we want minifdc version or go get this data now
-	Key_Relatives_V3_MarketingChooser := if(FDCMiniPop, Key_Relatives_Marketing__dx_Relatives_v3, norm_Key_Relatives_V3_Marketing);		
-
-	With_Key_Relatives_Marketing_Records := 
-		DENORMALIZE(With_Key_Relatives_V3_Records, Key_Relatives_V3_MarketingChooser,
-			LEFT.UIDAppend = RIGHT.UIDAppend, GROUP,
-			TRANSFORM(Layouts_FDC.Layout_FDC,
-					SELF.Dataset_Relatives__Key_Marketing_Header_Relatives3 := ROWS(RIGHT),
-					SELF := LEFT,
-					SELF := []));						
-
-
+	
 
 
 /*************************************************************************************************************/
-	All_Relatives := (Key_Relatives_V3Chooser+ Key_Relatives_V3_MarketingChooser);//both marketing and non marketing relatives.
+	All_Relatives := (Key_Relatives_V3Chooser);//both marketing and non marketing relatives.
 	
 	Seperate_relatives := All_Relatives(did1 IN InputLexids);//we only want input lexid relatives NOT contact relatives
 
@@ -807,7 +773,7 @@ Current_Address_Consumer_recs_Contacts := join(Current_Address_Consumer_recs, Cu
   HHIDLexids := PROJECT(HHIDs_ADLs_Good_Lexids, TRANSFORM(Layouts_FDC.Layout_FDC, SELF.P_LexID := LEFT.did; SELF := LEFT; SELF := []));
 
 
-	With_Header__key_ADL_segmentation_Records_original := DENORMALIZE(With_Key_Relatives_Marketing_Records, (HHIDs_ADLs_Good_Lexids+Input_ADL_Lexids),
+	With_Header__key_ADL_segmentation_Records_original := DENORMALIZE(With_Key_Relatives_V3_Records, (HHIDs_ADLs_Good_Lexids+Input_ADL_Lexids),
 				LEFT.UIDAppend = RIGHT.UIDAppend and 
 				left.g_procuid = right.g_procuid, GROUP,
 				TRANSFORM(Layouts_FDC.Layout_FDC,

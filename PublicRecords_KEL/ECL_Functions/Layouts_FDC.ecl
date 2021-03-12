@@ -685,10 +685,9 @@ SHARED unsigned1 iType := IF(Options.IsFCRA, data_services.data_env.iFCRA, data_
 
 	
 // --------------------[ Relatives ]--------------------
-	SHARED Relatives__Key_Relatives_V3 := Relationship.key_relatives_v3;
 	EXPORT Layout_Relatives__Key_Relatives_V3 := RECORD
 		LayoutIDs;
-		RECORDOF(Relatives__Key_Relatives_V3);
+		Relationship.layout_GetRelationship.interfaceOutputNeutral;
 		UNSIGNED1 CoSourceCount;
 		UNSIGNED1 CoSourceSum;
 		STRING2 src;
@@ -696,18 +695,6 @@ SHARED unsigned1 iType := IF(Options.IsFCRA, data_services.data_env.iFCRA, data_
 		dpmtype;
 	END;
 	
-	//Marketing
-	SHARED Relatives__Key_Marketing_Header_Relatives := dx_Relatives_v3.Key_Marketing_Header_Relatives();
-	EXPORT Layout_Relatives__Key_Marketing_Header_Relatives := RECORD
-		LayoutIDs;
-		RECORDOF(Relatives__Key_Marketing_Header_Relatives);
-		UNSIGNED1 CoSourceCount;
-		UNSIGNED1 CoSourceSum;
-		STRING2 src;
-		STRING Archive_Date;
-		dpmtype;
-	END;	
-
 	SHARED BBB2__kfetch_BBB_LinkIds := BBB2.Key_BBB_LinkIds.Kfetch2;
 	EXPORT Layout_BBB2__kfetch_BBB_LinkIds := RECORD
 		LayoutIDs;
@@ -1922,7 +1909,6 @@ SHARED Phone_Search_layout := BIPV2_Build.key_high_risk_industries.Phone_Search;
 		DATASET(Layout_dx_Header__key_did_hhid) Dataset_dx_Header__key_did_hhid;
 		DATASET(Layout_dx_Header__key_hhid_did) Dataset_dx_Header__key_hhid_did;	
 		DATASET(Layout_Relatives__Key_Relatives_V3) Dataset_Relatives__Key_Relatives_V3;
-		DATASET(Layout_Relatives__Key_Marketing_Header_Relatives) Dataset_Relatives__Key_Marketing_Header_Relatives3;		
 		DATASET(Layout_Header__key_ADL_segmentation) Dataset_Header__key_ADL_segmentation;		
 		DATASET(Layout_Doxie__Key_Header) Dataset_Doxie__Key_Header;		
 		DATASET(Layout_Header_Quick__Key_Did) Dataset_Header_Quick__Key_Did;	
