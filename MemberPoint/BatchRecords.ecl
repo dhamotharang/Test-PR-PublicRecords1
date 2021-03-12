@@ -467,8 +467,8 @@
 			isDerived:= adultsOrGuardians.LN_search_name_type = MemberPoint.Constants.LNSearchNameType.Derived;
 			isPartial:= (LENGTH(TRIM(adultsOrGuardians.SSN)) < 5);
       		SELF.name_score:= map(	isDerived =>'',
-			                      	isIncludeGender=true and rowBest.verify_best_name=0 and StringLib.StringToUpperCase(batchin.name_first[1..3])=StringLib.StringToUpperCase(rowBest.best_fname[1..3]) and StringLib.StringToUpperCase(batchIn.name_last)!=StringLib.StringToUpperCase(rowBest.best_lname) and StringLib.StringToUpperCase(rowBest.gender)='M'=>'30',
-                            	   	isIncludeGender=true  and rowBest.verify_best_name=0 and StringLib.StringToUpperCase(batchin.name_first[1..3])=StringLib.StringToUpperCase(rowBest.best_fname[1..3]) and StringLib.StringToUpperCase(batchin.name_last)!=StringLib.StringToUpperCase(rowBest.best_lname) and StringLib.StringToUpperCase(rowBest.gender)='F'=>'40',
+			                      	isIncludeGender=true and rowBest.verify_best_name=0 and STD.Str.ToUpperCase(batchin.name_first[1..3])=STD.Str.ToUpperCase(rowBest.best_fname[1..3]) and STD.Str.ToUpperCase(batchIn.name_last)!=STD.Str.ToUpperCase(rowBest.best_lname) and STD.Str.ToUpperCase(rowBest.gender)='M'=>'30',
+                            	   	isIncludeGender=true  and rowBest.verify_best_name=0 and STD.Str.ToUpperCase(batchin.name_first[1..3])=STD.Str.ToUpperCase(rowBest.best_fname[1..3]) and STD.Str.ToUpperCase(batchin.name_last)!=STD.Str.ToUpperCase(rowBest.best_lname) and STD.Str.ToUpperCase(rowBest.gender)='F'=>'40',
 								            (string) rowBest.verify_best_name);
 			SELF.ssn_score:= IF(~isPartial AND isIncludeSSN AND ~isDerived, (STRING)rowBest.verify_best_ssn, '');
 			SELF.dob_score:= IF(~isDerived AND isIncludeDOB, (STRING)rowBest.verify_best_dob, '');
