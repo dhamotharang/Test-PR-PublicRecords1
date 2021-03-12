@@ -4,7 +4,11 @@ EXPORT getCreditLuciModels(GROUPED DATASET(risk_indicators.Layout_Boca_Shell) cl
                            GROUPED DATASET(riskview.layouts.attributes_internal_layout_noscore) RV_attributes = GROUP( DATASET([], riskview.layouts.attributes_internal_layout_noscore), seq), 
                            DATASET(Risk_Indicators.layouts.layout_IDA_out) IDAattributes = DATASET([], Risk_Indicators.layouts.layout_IDA_out)
                            ) := MODULE
-  
+
+  //check if IDA attributes are present or had a gateway error
+  SHARED IDA_attr_present := Exists(IDAattributes.Indicators);
+  SHARED has_IDA_error := Exists(IDAattributes(trim(exception_code) != ''));
+
   //Declare the shared get_MODEL functions
   SHARED get_RVG2005_0(GROUPED DATASET(riskview.layouts.attributes_internal_layout_noscore) RV_attrs,
                        DATASET(Risk_Indicators.layouts.layout_IDA_out) IDA_attrs
@@ -21,7 +25,7 @@ EXPORT getCreditLuciModels(GROUPED DATASET(risk_indicators.Layout_Boca_Shell) cl
     RVG2005_0 := Models.RVG2005_0_1.AsResults(RVG2005_input).Base();
     
     //Step3: Tranform back into normal model layout
-    RVG2005_0_final := PROJECT(RVG2005_0, TRANSFORM(Models.Layout_ModelOut,
+    RVG2005_0_result := PROJECT(RVG2005_0, TRANSFORM(Models.Layout_ModelOut,
                                                           SELF.seq := (INTEGER)LEFT.TransactionId,
                                                           SELF.score := LEFT.score;
                                                           // grab the 5 reason codes and populate the reason code descriptions
@@ -39,9 +43,13 @@ EXPORT getCreditLuciModels(GROUPED DATASET(risk_indicators.Layout_Boca_Shell) cl
     //Use this to get the "debug" layout of the LUCI model it has all of the intermediate variables
     //it can be used to easily transform the results back into the validation file (model input) layout 
     //which is found in Models.MODELNAME.z_layouts_Input
-    RVG2005_0_final := Models.RVG2005_0_1.AsResults(RVG2005_input).ValidationF;
+    RVG2005_0_result := Models.RVG2005_0_1.AsResults(RVG2005_input).ValidationF;
     
     #END
+    
+    RVG2005_0_final := IF(~IDA_attr_present OR has_IDA_error, 
+                        PROJECT(RVG2005_0, TRANSFORM(Models.Layout_ModelOut,SELF.seq := (INTEGER)LEFT.TransactionId, SELF := [])),
+                        RVG2005_0_result);
 
     RETURN RVG2005_0_final;
     
@@ -175,7 +183,7 @@ EXPORT getCreditLuciModels(GROUPED DATASET(risk_indicators.Layout_Boca_Shell) cl
     RVS2005_0 := Models.RVS2005_0_1.AsResults(RVS2005_input).Base();
     
     //Step3: Tranform back into normal model layout
-    RVS2005_0_final := PROJECT(RVS2005_0, TRANSFORM(Models.Layout_ModelOut,
+    RVS2005_0_result := PROJECT(RVS2005_0, TRANSFORM(Models.Layout_ModelOut,
                                                           SELF.seq := (INTEGER)LEFT.TransactionId,
                                                           SELF.score := LEFT.score;
                                                           // grab the 5 reason codes and populate the reason code descriptions
@@ -192,15 +200,19 @@ EXPORT getCreditLuciModels(GROUPED DATASET(risk_indicators.Layout_Boca_Shell) cl
     //Use this to get the "debug" layout of the LUCI model it has all of the intermediate variables
     //it can be used to easily transform the results back into the validation file (model input) layout 
     //which is found in Models.MODELNAME.z_layouts_Input
-    RVS2005_0_final := Models.RVS2005_0_1.AsResults(RVS2005_input).ValidationF;
+    RVS2005_0_result := Models.RVS2005_0_1.AsResults(RVS2005_input).ValidationF;
     #END
-
+    
+    RVS2005_0_final := IF(~IDA_attr_present OR has_IDA_error, 
+                            PROJECT(RVS2005_0, TRANSFORM(Models.Layout_ModelOut,SELF.seq := (INTEGER)LEFT.TransactionId, SELF := [])),
+                            RVS2005_0_result);
+    
     RETURN RVS2005_0_final;
   
   END;
   
   //Export the LUCI model results
-  
+
   EXPORT RVG2005_0 := get_RVG2005_0(RV_attributes, IDAattributes);
   EXPORT RVS2005_0 := get_RVS2005_0(RV_attributes, IDAattributes);
   EXPORT RVA2008_1 := get_RVA2008_1(RV_attributes);

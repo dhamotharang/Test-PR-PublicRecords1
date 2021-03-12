@@ -439,16 +439,16 @@ search_results_temp := ungroup(
   model_details := Models.LIB_RiskView_Models().ValidV50Models;
 
   // Convert Search Results to name/value pairs for ESDL:  
-	Riskviewattrs_namevaluePairs :=  RiskView.functions.Format_riskview_attrs(search_results, AttributesVersionRequest);  
+  Riskviewattrs_namevaluePairs :=  RiskView.functions.Format_riskview_attrs(search_results, AttributesVersionRequest);  
 
   // Convert Model Results to ESDL:
-	modelResults := normalize(	search_results , 10, RiskView.Transforms2(model_details).intoModel(LEFT, counter)	)(name<>'');
-	
+  modelResults := normalize( search_results , 9, RiskView.Transforms2(model_details).intoModel(LEFT, COUNTER) )(name<>'');
+
   // Convert Search Results to alert code/description pairs for ESDL:
-	nameValuePairsAlerts :=  NORMALIZE(search_results, 10, RiskView.Transforms.norm_alerts(LEFT, COUNTER))(code<>'');
+  nameValuePairsAlerts :=  NORMALIZE(search_results, 10, RiskView.Transforms.norm_alerts(LEFT, COUNTER))(code<>'');
 
   // Convert Search Results to Lien/Judgement name/value pairs for ESDL:
-	LnJReport := NORMALIZE(search_results, 27, RiskView.Transforms.norm_LnJ(LEFT, COUNTER))(trim(value)<>'');
+  LnJReport := NORMALIZE(search_results, 27, RiskView.Transforms.norm_LnJ(LEFT, COUNTER))(trim(value)<>'');
 
 
 	LnJ_liens := project(search_results[1].LnJliens, 
@@ -483,65 +483,71 @@ search_results_temp := ungroup(
 		));
 	
 	valid_riskview_xml_response := project(search_results,
-		transform(iesp.riskview2.t_RiskView2Response,
-                suppress_condition := IF((STD.Str.ToLowerCase(LEFT.Message) = STD.Str.ToLowerCase(Riskview.Constants.Deferred_request_desc) OR STD.Str.ToLowerCase(LEFT.Exception_Code) = STD.Str.ToLowerCase(Riskview.Constants.DTEError) OR STD.Str.ToLowerCase(LEFT.Exception_Code) = STD.Str.ToLowerCase(Riskview.Constants.OKCError)) AND ExcludeStatusRefresh = FALSE AND IncludeStatusRefreshChecks = TRUE, TRUE, FALSE);
-				self.Result.UniqueId := IF(~suppress_condition, LEFT.LexID, '');
-				self.Result.InputEcho := search;
-				self.Result.Models := IF(~suppress_condition, modelResults);
-                self.Result.AttributesGroup.name := STD.Str.ToUpperCase(AttributesVersionRequest);
-                self.Result.AttributesGroup.attributes := IF(~suppress_condition, Riskviewattrs_namevaluePairs);
-				self.Result.Alerts := nameValuePairsAlerts;
-				// self.Result.Report.ConsumerStatement := left.ConsumerStatementText;
-				self.Result.LiensJudgmentsReports.Summary := IF(IncludeLNJ AND ~AttributesOnly AND ~suppress_condition, left.report.summary);
-				self.Result.Report := IF(run_riskview_report AND ~suppress_condition, left.report);
-				
-				self.Result.ConsumerStatements := if(OutputConsumerStatements AND ~suppress_condition, left.ConsumerStatements);
-				self.Result.LiensJudgmentsReports.Liens := IF(~AttributesOnly AND ~suppress_condition, LnJ_liens);
-				self.Result.LiensJudgmentsReports.Judgments := IF(~AttributesOnly AND ~suppress_condition, LnJ_jdgmts);
-				self.Result.LiensJudgmentsReports.LnJAttributes := IF(~suppress_condition, LnJReport);
+  transform(iesp.riskview2.t_RiskView2Response,
+        suppress_condition := IF((STD.Str.ToLowerCase(LEFT.Message) = STD.Str.ToLowerCase(Riskview.Constants.Deferred_request_desc) OR STD.Str.ToLowerCase(LEFT.Exception_Code) = STD.Str.ToLowerCase(Riskview.Constants.DTEError) OR STD.Str.ToLowerCase(LEFT.Exception_Code) = STD.Str.ToLowerCase(Riskview.Constants.OKCError)) AND ExcludeStatusRefresh = FALSE AND IncludeStatusRefreshChecks = TRUE, TRUE, FALSE);
+        self.Result.UniqueId := IF(~suppress_condition, LEFT.LexID, '');
+        self.Result.InputEcho := search;
+        self.Result.Models := IF(~suppress_condition, modelResults);
+        self.Result.AttributesGroup.name := STD.Str.ToUpperCase(AttributesVersionRequest);
+        self.Result.AttributesGroup.attributes := IF(~suppress_condition, Riskviewattrs_namevaluePairs);
+        self.Result.Alerts := nameValuePairsAlerts;
+        // self.Result.Report.ConsumerStatement := left.ConsumerStatementText;
+        self.Result.LiensJudgmentsReports.Summary := IF(IncludeLNJ AND ~AttributesOnly AND ~suppress_condition, left.report.summary);
+        self.Result.Report := IF(run_riskview_report AND ~suppress_condition, left.report);
+
+        self.Result.ConsumerStatements := if(OutputConsumerStatements AND ~suppress_condition, left.ConsumerStatements);
+        self.Result.LiensJudgmentsReports.Liens := IF(~AttributesOnly AND ~suppress_condition, LnJ_liens);
+        self.Result.LiensJudgmentsReports.Judgments := IF(~AttributesOnly AND ~suppress_condition, LnJ_jdgmts);
+        self.Result.LiensJudgmentsReports.LnJAttributes := IF(~suppress_condition, LnJReport);
         // for inquiry logging, populate the consumer section with the DID and input fields
         // don't log the lexid if the person got a noscore
-                self.Result.Consumer.LexID := if(riskview.constants.noScoreAlert in [left.Alert1,left.Alert2,left.Alert3,left.Alert4,left.Alert5,left.Alert6,left.Alert7,left.Alert8,left.Alert9,left.Alert10] OR suppress_condition, '', left.LexID);
-                searchDOB := iesp.ECL2ESP.t_DateToString8(search.DOB);
-                SELF.Result.Consumer.Inquiry.DOB := IF((UNSIGNED)searchDOB > 0 AND ~suppress_condition, searchDOB, '');
-                self.Result.Consumer.Inquiry.Phone10 := IF(~suppress_condition, search.HomePhone, '');
-                self.Result.Consumer.Inquiry := IF(~suppress_condition, search);      
+        self.Result.Consumer.LexID := if(riskview.constants.noScoreAlert in [left.Alert1,left.Alert2,left.Alert3,left.Alert4,left.Alert5,left.Alert6,left.Alert7,left.Alert8,left.Alert9,left.Alert10] OR suppress_condition, '', left.LexID);
+        searchDOB := iesp.ECL2ESP.t_DateToString8(search.DOB);
+        SELF.Result.Consumer.Inquiry.DOB := IF((UNSIGNED)searchDOB > 0 AND ~suppress_condition, searchDOB, '');
+        self.Result.Consumer.Inquiry.Phone10 := IF(~suppress_condition, search.HomePhone, '');
+        self.Result.Consumer.Inquiry := IF(~suppress_condition, search);      
 
-				//For MLA, we need to populate the exception area of the result if there was an error flagged in the MLA process.  The
-				//Exception_code field will contain the error code...use it to look up the description and format the exception record.
-			   ds_excep_blank := DATASET([], iesp.share.t_WsException); 
+        //For MLA, we need to populate the exception area of the result if there was an error flagged in the MLA process.  The
+        //Exception_code field will contain the error code...use it to look up the description and format the exception record.
+        ds_excep_blank := DATASET([], iesp.share.t_WsException); 
 				
-			   ds_excep := DATASET([{'Roxie', 
-															 left.Exception_code,  
-															 '', 									
-															 RiskView.Constants.MLA_error_desc(left.Exception_code)}], iesp.share.t_WsException);
-                               
-               ds_excep_Checking_Indicators:= DATASET([{'Roxie', 
-															 left.Exception_code,  
-															 '', 									
-															 RiskView.Constants.Checking_Indicator_error_desc(left.Exception_code)}], iesp.share.t_WsException);
-                               
-               ds_excep_status_refresh := DATASET([{'Roxie', 
-                                                             IF(left.Exception_code = Riskview.Constants.OKCError, '22', left.Exception_code),
-                                                             '', 									
-                                                             RiskView.Constants.StatusRefresh_error_desc}], iesp.share.t_WsException); 
-               ds_excep_DTE := DATASET([{'Roxie', 
-                                                             IF(left.Exception_code = Riskview.Constants.DTEError, '41', left.Exception_code),
-                                                             '', 									
-                                                             RiskView.Constants.DTE_error_desc}], iesp.share.t_WsException);
+        ds_excep := DATASET([{'Roxie', 
+                              left.Exception_code,  
+                              '', 									
+                              RiskView.Constants.get_error_desc(left.Exception_code)}], iesp.share.t_WsException);
 
-              SELF._Header.Exceptions := map((custom_model_name  = 'mla1608_0' or custom2_model_name = 'mla1608_0' or 
-																			  custom3_model_name = 'mla1608_0' or custom4_model_name = 'mla1608_0' or 
-																			  custom5_model_name = 'mla1608_0') and left.Exception_code <> '' => ds_excep,
+        ds_excep_Checking_Indicators:= DATASET([{'Roxie', 
+                                                 left.Exception_code,  
+                                                 '', 									
+                                                 RiskView.Constants.get_error_desc(left.Exception_code)}], iesp.share.t_WsException);
+
+        ds_excep_status_refresh := DATASET([{'Roxie', 
+                                             IF(left.Exception_code = Riskview.Constants.OKCError, '22', left.Exception_code),
+                                             '', 									
+                                             RiskView.Constants.get_error_desc(RiskView.Constants.OKCError)}], iesp.share.t_WsException); 
+        ds_excep_DTE := DATASET([{'Roxie', 
+                                  IF(left.Exception_code = Riskview.Constants.DTEError, '41', left.Exception_code),
+                                  '', 									
+                                  RiskView.Constants.get_error_desc(RiskView.Constants.DTEError)}], iesp.share.t_WsException);
+                                  
+        ds_IDA_exception := DATASET([{'Roxie', 
+                                      IF(left.Exception_code IN Riskview.Constants.IDA_GW_ERRORS, left.Exception_code, ''),
+                                      '', 									
+                                      RiskView.Constants.get_error_desc(TRIM(LEFT.Exception_Code))}], iesp.share.t_WsException);
+
+        SELF._Header.Exceptions := map((custom_model_name  = 'mla1608_0' or custom2_model_name = 'mla1608_0' or 
+                                        custom3_model_name = 'mla1608_0' or custom4_model_name = 'mla1608_0' or 
+                                        custom5_model_name = 'mla1608_0') and left.Exception_code <> '' => ds_excep,
                                         STD.Str.ToLowerCase(AttributesVersionRequest) = RiskView.Constants.checking_indicators_attribute_request and left.Exception_code <> '' => ds_excep_Checking_Indicators,
-                                        IncludeStatusRefreshChecks = TRUE AND COUNT(DeferredTransactionIDs) = 0 AND LEFT.Exception_Code <> '' => ds_excep_status_refresh,
+                                        IncludeStatusRefreshChecks = TRUE AND COUNT(DeferredTransactionIDs) = 0 AND LEFT.Exception_Code <> ''  => ds_excep_status_refresh,
                                         IncludeStatusRefreshChecks = TRUE AND COUNT(DeferredTransactionIDs) <> 0 AND LEFT.Exception_Code <> '' => ds_excep_DTE,
-																			  ds_excep_blank);
-              SELF.result.fdcheckingindicator := left.FDGatewayCalled;
-              SELF._Header.Status := (INTEGER)left.Status_Code;
-              SELF._Header.Message := left.Message;
-              SELF._Header.TransactionID := left.TransactionID;
-              SELF._Header := [];
+                                        IDA_model_check AND TRIM(LEFT.Exception_Code) <> ''                                                    => ds_IDA_exception,
+                                                                                                                                                  ds_excep_blank);
+        SELF.result.fdcheckingindicator := left.FDGatewayCalled;
+        SELF._Header.Status := (INTEGER)left.Status_Code;
+        SELF._Header.Message := left.Message;
+        SELF._Header.TransactionID := left.TransactionID;
+        SELF._Header := [];
 	));
 
 invalid_input_xml_response := project(search_results,
@@ -576,63 +582,63 @@ OUTPUT(FinalRoyalties, NAMED('RoyaltySet'));
 
 //Log to Deltabase
 Deltabase_Logging_prep := project(riskview_xml, transform(Risk_Reporting.Layouts.LOG_Deltabase_Layout_Record,
-																												 self.company_id := (Integer)CompanyID,
-																												 self.login_id := _LoginID,
-																												 self.product_id := Risk_Reporting.ProductID.RiskView__Search_Service,
-																												 self.function_name := FunctionName,
-																												 self.esp_method := ESPMethod,
-																												 self.interface_version := InterfaceVersion,
-																												 self.delivery_method := DeliveryMethod,
-																												 self.date_added := (STRING8)Std.Date.Today(),
-																												 self.death_master_purpose := DeathMasterPurpose,
-																												 self.ssn_mask := SSNMask,
-																												 self.dob_mask := DOBMask,
-																												 self.dl_mask := (String)(Integer)DLMask,
-																												 self.exclude_dmv_pii := (String)(Integer)ExcludeDMVPII,
-																												 self.scout_opt_out := (String)(Integer)DisableOutcomeTracking,
-																												 self.archive_opt_in := (String)(Integer)ArchiveOptIn,
-                                                         self.glb := (Integer)users.GLBPurpose,
-                                                         self.dppa := (Integer)users.DLPurpose,
-																												 self.data_restriction_mask := DataRestriction,
-																												 self.data_permission_mask := DataPermission,
-																												 self.industry := Industry_Search[1].Industry,
-																												 self.i_attributes_name := AttributesVersionRequest,
-																												 self.i_ssn := search.SSN,
-                                                         self.i_dob := DateOfBirth,
-                                                         self.i_name_full := search.Name.Full,
-																												 self.i_name_first := search.Name.First,
-																												 self.i_name_last := search.Name.Last,
-																												 self.i_lexid := (Integer)search.UniqueId, 
-																												 self.i_address := streetAddr,
-																												 self.i_city := search.Address.City,
-																												 self.i_state := search.Address.State,
-																												 self.i_zip := search.Address.Zip5,
-																												 self.i_dl := search.DriverLicenseNumber,
-																												 self.i_dl_state := search.DriverLicenseState,
-                                                         self.i_home_phone := HomePhone,
-                                                         self.i_work_phone := WorkPhone,
-																												 model_count := count(option.IncludeModels.Names);
-																												 self.i_model_name_1 := if(model_count >= 1, option.IncludeModels.Names[1].value, ''),
-																												 //Check to see if there were models requested
-																												 extra_score := model_count > 1;
-																												 self.i_model_name_2 := IF(extra_score, option.IncludeModels.Names[2].value, ''),
-																												 self.o_score_1    := IF(model_count != 0, (String)left.Result.Models[1].Scores[1].Value, ''),
-																												 self.o_reason_1_1 := IF(model_count != 0, left.Result.Models[1].Scores[1].ScoreReasons[1].ReasonCode, ''),
-																												 self.o_reason_1_2 := IF(model_count != 0, left.Result.Models[1].Scores[1].ScoreReasons[2].ReasonCode, ''),
-																												 self.o_reason_1_3 := IF(model_count != 0, left.Result.Models[1].Scores[1].ScoreReasons[3].ReasonCode, ''),
-																												 self.o_reason_1_4 := IF(model_count != 0, left.Result.Models[1].Scores[1].ScoreReasons[4].ReasonCode, ''),
-																												 self.o_reason_1_5 := IF(model_count != 0, left.Result.Models[1].Scores[1].ScoreReasons[5].ReasonCode, ''),
-																												 self.o_reason_1_6 := IF(model_count != 0, left.Result.Models[1].Scores[1].ScoreReasons[6].ReasonCode, ''),
-																												 self.o_score_2    := IF(extra_score, (String)left.Result.Models[2].Scores[1].Value, ''),
-																												 self.o_reason_2_1 := IF(extra_score, left.Result.Models[2].Scores[1].ScoreReasons[1].ReasonCode, ''),
-																												 self.o_reason_2_2 := IF(extra_score, left.Result.Models[2].Scores[1].ScoreReasons[2].ReasonCode, ''),
-																												 self.o_reason_2_3 := IF(extra_score, left.Result.Models[2].Scores[1].ScoreReasons[3].ReasonCode, ''),
-																												 self.o_reason_2_4 := IF(extra_score, left.Result.Models[2].Scores[1].ScoreReasons[4].ReasonCode, ''),
-																												 self.o_reason_2_5 := IF(extra_score, left.Result.Models[2].Scores[1].ScoreReasons[5].ReasonCode, ''),
-																												 self.o_reason_2_6 := IF(extra_score, left.Result.Models[2].Scores[1].ScoreReasons[6].ReasonCode, ''),
-																												 self.o_lexid      := (Integer)left.Result.UniqueId,
-																												 self := left,
-																												 self := [] ));
+                                                self.company_id := (Integer)CompanyID,
+                                                self.login_id := _LoginID,
+                                                self.product_id := Risk_Reporting.ProductID.RiskView__Search_Service,
+                                                self.function_name := FunctionName,
+                                                self.esp_method := ESPMethod,
+                                                self.interface_version := InterfaceVersion,
+                                                self.delivery_method := DeliveryMethod,
+                                                self.date_added := (STRING8)Std.Date.Today(),
+                                                self.death_master_purpose := DeathMasterPurpose,
+                                                self.ssn_mask := SSNMask,
+                                                self.dob_mask := DOBMask,
+                                                self.dl_mask := (String)(Integer)DLMask,
+                                                self.exclude_dmv_pii := (String)(Integer)ExcludeDMVPII,
+                                                self.scout_opt_out := (String)(Integer)DisableOutcomeTracking,
+                                                self.archive_opt_in := (String)(Integer)ArchiveOptIn,
+                                                self.glb := (Integer)users.GLBPurpose,
+                                                self.dppa := (Integer)users.DLPurpose,
+                                                self.data_restriction_mask := DataRestriction,
+                                                self.data_permission_mask := DataPermission,
+                                                self.industry := Industry_Search[1].Industry,
+                                                self.i_attributes_name := AttributesVersionRequest,
+                                                self.i_ssn := search.SSN,
+                                                self.i_dob := DateOfBirth,
+                                                self.i_name_full := search.Name.Full,
+                                                self.i_name_first := search.Name.First,
+                                                self.i_name_last := search.Name.Last,
+                                                self.i_lexid := (Integer)search.UniqueId, 
+                                                self.i_address := streetAddr,
+                                                self.i_city := search.Address.City,
+                                                self.i_state := search.Address.State,
+                                                self.i_zip := search.Address.Zip5,
+                                                self.i_dl := search.DriverLicenseNumber,
+                                                self.i_dl_state := search.DriverLicenseState,
+                                                self.i_home_phone := HomePhone,
+                                                self.i_work_phone := WorkPhone,
+                                                model_count := count(option.IncludeModels.Names);
+                                                self.i_model_name_1 := if(model_count >= 1, option.IncludeModels.Names[1].value, ''),
+                                                //Check to see if there were models requested
+                                                extra_score := model_count > 1;
+                                                self.i_model_name_2 := IF(extra_score, option.IncludeModels.Names[2].value, ''),
+                                                self.o_score_1    := IF(model_count != 0, (String)left.Result.Models[1].Scores[1].Value, ''),
+                                                self.o_reason_1_1 := IF(model_count != 0, left.Result.Models[1].Scores[1].ScoreReasons[1].ReasonCode, ''),
+                                                self.o_reason_1_2 := IF(model_count != 0, left.Result.Models[1].Scores[1].ScoreReasons[2].ReasonCode, ''),
+                                                self.o_reason_1_3 := IF(model_count != 0, left.Result.Models[1].Scores[1].ScoreReasons[3].ReasonCode, ''),
+                                                self.o_reason_1_4 := IF(model_count != 0, left.Result.Models[1].Scores[1].ScoreReasons[4].ReasonCode, ''),
+                                                self.o_reason_1_5 := IF(model_count != 0, left.Result.Models[1].Scores[1].ScoreReasons[5].ReasonCode, ''),
+                                                self.o_reason_1_6 := IF(model_count != 0, left.Result.Models[1].Scores[1].ScoreReasons[6].ReasonCode, ''),
+                                                self.o_score_2    := IF(extra_score, (String)left.Result.Models[2].Scores[1].Value, ''),
+                                                self.o_reason_2_1 := IF(extra_score, left.Result.Models[2].Scores[1].ScoreReasons[1].ReasonCode, ''),
+                                                self.o_reason_2_2 := IF(extra_score, left.Result.Models[2].Scores[1].ScoreReasons[2].ReasonCode, ''),
+                                                self.o_reason_2_3 := IF(extra_score, left.Result.Models[2].Scores[1].ScoreReasons[3].ReasonCode, ''),
+                                                self.o_reason_2_4 := IF(extra_score, left.Result.Models[2].Scores[1].ScoreReasons[4].ReasonCode, ''),
+                                                self.o_reason_2_5 := IF(extra_score, left.Result.Models[2].Scores[1].ScoreReasons[5].ReasonCode, ''),
+                                                self.o_reason_2_6 := IF(extra_score, left.Result.Models[2].Scores[1].ScoreReasons[6].ReasonCode, ''),
+                                                self.o_lexid      := (Integer)left.Result.UniqueId,
+                                                self := left,
+                                                self := [] ));
 Deltabase_Logging := DATASET([{Deltabase_Logging_prep}], Risk_Reporting.Layouts.LOG_Deltabase_Layout);
 // #stored('Deltabase_Log', Deltabase_Logging);
 
