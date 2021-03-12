@@ -1,5 +1,5 @@
 ﻿IMPORT Address, ut, progressive_phone, Royalty,
-       PhoneFinder_Services, MemberPoint, Std,iesp,risk_indicators,Gateway,riskwise,patriot,OFAC_XG5,doxie,AutoStandardI;
+       PhoneFinder_Services, MemberPoint, Std,iesp,risk_indicators,riskwise,OFAC_XG5,doxie;
 
 	export BatchRecords(dataset(MemberPoint.Layouts.batchIn) rawBatchIn, MemberPoint.IParam.BatchParams BParams) := function
 		//------------------------------------------------------------------------------------------------//
