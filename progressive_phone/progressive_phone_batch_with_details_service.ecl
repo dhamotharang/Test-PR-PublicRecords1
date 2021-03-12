@@ -1,4 +1,4 @@
-/*--SOAP--
+﻿/*--SOAP--
 <message name="Progressive_Phone_Batch_With_Details_Service" wuTimeout="300000">
   <part name="batch_in" type="tns:XmlDataSet" cols="70" rows="25"/>
   <part name="DPPAPurpose" type="xsd:unsignedInt"/>
@@ -123,39 +123,39 @@
 
 //************** This service was not updated part of Waterfall phones V8/Contact plus V3 project because it is a R0 service so batch doesn't update their plugins for it on Version 7/8
 //This is because it is currently running WFP V6 / CP V1
-import progressive_phone, didville, risk_indicators, ut, addrbest, doxie, header, mdr,
-  BatchServices, Gateway, Royalty, BatchShare;
+IMPORT progressive_phone, ut, addrBest, doxie,
+       BatchServices, Gateway, Royalty, BatchShare;
 
-export progressive_phone_batch_with_details_service := macro
+EXPORT progressive_phone_batch_with_details_service := MACRO
 
   gateways_in := Gateway.Configuration.Get();
 
   // Options for phone_shell WFP v7
-  STRING25 scoreModel := ''	: STORED('Phone_Score_Model');
+  STRING25 scoreModel := '' : STORED('Phone_Score_Model');
   UNSIGNED2 MaxNumAssociate := 0 : STORED('MaxNumAssociate');
   UNSIGNED2 MaxNumAssociateOther := 0 : STORED('MaxNumAssociateOther');
   UNSIGNED2 MaxNumFamilyOther := 0 : STORED('MaxNumFamilyOther');
   UNSIGNED2 MaxNumFamilyClose := 0 : STORED('MaxNumFamilyClose');
-  UNSIGNED2 MaxNumParent := 0 : STORED('MaxNumParent');
-  UNSIGNED2 MaxNumSpouse := 0 : STORED('MaxNumSpouse');
-  UNSIGNED2 MaxNumSubject := 0 : STORED('MaxNumSubject');
+  UNSIGNED2 MaxNumParent   := 0 : STORED('MaxNumParent');
+  UNSIGNED2 MaxNumSpouse   := 0 : STORED('MaxNumSpouse');
+  UNSIGNED2 MaxNumSubject  := 0 : STORED('MaxNumSubject');
   UNSIGNED2 MaxNumNeighbor := 0 : STORED('MaxNumNeighbor');
 
   in_mod := BatchShare.IParam.getBatchParams();
   mod_access := PROJECT(in_mod, doxie.IDataAccess);
 
-  f_in_raw := dataset([],progressive_phone.layout_progressive_batch_in) : stored('batch_in',few);
+  f_in_raw := DATASET([], progressive_phone.layout_progressive_batch_in) : STORED('batch_in', FEW);
 
-  wf_recs := AddrBest.Progressive_phone_common(
+  wf_recs := addrBest.Progressive_phone_common(
     f_in_raw,
-    ,
-    ,
+    , // progressive_phone.waterfall_phones_options
+    , // rs_dedup_phones = empty dataset
     gateways_in,
-    ,
-    ,
-    ,
-    ,
-    scoreModel,
+    , // type_a_with_did = FALSE
+    , // useNeustar = TRUE
+    , // default_sx_match_limit = FALSE
+    , // isPFR = FALSE
+    scoreModel, // this is what determines whether the Phone Shell is called (Send COMMON_SCORE or deprecated PHONESCORE_V2 or COLLECTIONSCORE_V3 to call Phone Shell)
     MaxNumAssociate,
     MaxNumAssociateOther,
     MaxNumFamilyOther,
@@ -169,28 +169,28 @@ export progressive_phone_batch_with_details_service := macro
   header_recs_w_ssn := progressive_phone.fn_addSSN(f_out);
 
   /*--- Join back to original result, conserving main method for populating fields ---*/
-  Progressive_Phone.Layout_Progressive_phones.common_with_meta_rec addssn(Progressive_Phone.Layout_Progressive_phones.common_with_meta_rec l, header_recs_w_ssn r) := transform
+  Progressive_Phone.Layout_Progressive_phones.batch_out_plus addssn(Progressive_Phone.Layout_Progressive_phones.batch_out_plus l, header_recs_w_ssn r) := TRANSFORM
     ut.MAC_ds_to_string(r.SSNRec, ssn, ssn_string);
-    self.ssn := ssn_string;
+    SELF.ssn := ssn_string;
     ds_city := ut.ZipToCities(l.zip5).records;
     ut.MAC_ds_to_string(ds_city, city, outstring);
-    self.vanityCities := outstring;
-    self := l;
-  end;
+    SELF.vanityCities := outstring;
+    SELF := l;
+  END;
 
-  f_out_ssn := join(f_out, header_recs_w_ssn,
-    left.p_did = right.did and left.acctno = right.acctno,
-    addssn(left, right),
-    limit(0), keep(1),
-    left outer);
+  f_out_ssn := JOIN(f_out, header_recs_w_ssn,
+    LEFT.p_did = RIGHT.did AND LEFT.acctno = RIGHT.acctno,
+    addssn(LEFT, RIGHT),
+    LIMIT(0), KEEP(1),
+    LEFT OUTER);
 
   // WITHOUT QSENT
-  results_without_qsent := project(f_out_ssn,
-                                transform(progressive_phone.layout_progressive_phone_batch_with_details_out,
-                                          self.did := intformat(left.did,12,1),
-                                          self.p_did := intformat(left.p_did,12,1),
-                                          self := left,
-                                          self := []));
+  results_without_qsent := PROJECT(f_out_ssn,
+                              TRANSFORM(progressive_phone.layout_progressive_phone_batch_with_details_out,
+                                        SELF.did := INTFORMAT(LEFT.did,12,1),
+                                        SELF.p_did := INTFORMAT(LEFT.p_did,12,1),
+                                        SELF := LEFT,
+                                        SELF := []));
 
   // WITH QSENT
   STRING QSentV2_SearchType := '' : STORED('QSentV2_SearchType');
@@ -201,7 +201,7 @@ export progressive_phone_batch_with_details_service := macro
 
   // RESULTS - WITH OR WITHOUT QSENT
   results_temp := IF((DO_QSENTV2_NAME_ADDR OR DO_QSENTV2_NAME_SSN) AND COUNT(QSENTV2_GW) > 0,
-    ungroup(results_with_qsent),
+    UNGROUP(results_with_qsent),
     results_without_qsent);
 
   // RESULTS - Unless ReturnScore is TRUE - blank out the Phone Score values
@@ -214,13 +214,13 @@ export progressive_phone_batch_with_details_service := macro
   results_final := progressive_phone.FN_BatchFinalAssignments(results_trimmed, progressive_phone.layout_progressive_phone_batch_with_details_out);
 
   // ROYALTIES
-  boolean ReturnDetailedRoyalties := false : STORED('ReturnDetailedRoyalties');
-  ds_qsroyalties := dedup(sort(results,acctno,royalty_type),acctno,royalty_type); // only one royalty count per accnt no per type.. royalties are per request
-  dRoyaltiesQSent	:= Royalty.RoyaltyQSent.GetBatchRoyaltiesByAcctno(f_in_raw, ds_qsroyalties,,,,acctno);
+  BOOLEAN ReturnDetailedRoyalties := FALSE : STORED('ReturnDetailedRoyalties');
+  ds_qsroyalties := DEDUP(SORT(results, acctno, royalty_type), acctno, royalty_type); // only one royalty count per acctno per type.. royalties are per request
+  dRoyaltiesQSent := Royalty.RoyaltyQSent.GetBatchRoyaltiesByAcctno(f_in_raw, ds_qsroyalties, , , , acctno);
   dRoyaltiesByAcctno := dRoyaltiesQSent;
   dRoyalties := Royalty.GetBatchRoyalties(dRoyaltiesByAcctno, ReturnDetailedRoyalties);
 
-  output(dRoyalties,named('RoyaltySet'));
-  output(results_final, named('Results'));
+  OUTPUT(dRoyalties, NAMED('RoyaltySet'));
+  OUTPUT(results_final, NAMED('Results'));
 
-endmacro;
+ENDMACRO;

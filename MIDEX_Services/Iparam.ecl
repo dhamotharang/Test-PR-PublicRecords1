@@ -91,6 +91,8 @@ EXPORT IParam := MODULE
 		EXPORT BOOLEAN	IncludeCorporateAffiliations 		:= FALSE;
 		EXPORT BOOLEAN	IncludeNoticeOfDefault 					:= FALSE;
 		EXPORT BOOLEAN	IncludeForeclosures 						:= FALSE;
+    EXPORT BOOLEAN includeVendorSourceB             := FALSE;  
+    EXPORT BOOLEAN IncludeAssignmentsAndReleases    := FALSE; 
 	END;
 	
 	EXPORT reportrecords := INTERFACE(
@@ -112,7 +114,7 @@ EXPORT IParam := MODULE
     EXPORT BOOLEAN  includeLicRptsFromNMLS := TRUE; // defaulting to TRUE so the comp report can return multiple 
                                                     // license reports with the same/associated NMLS id and 
                                                     // is not impacted by this change.
-    EXPORT BOOLEAN includeVendorSourceB := FALSE;  
+ 
   END;
 
   

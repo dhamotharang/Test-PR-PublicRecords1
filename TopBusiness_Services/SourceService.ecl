@@ -103,6 +103,8 @@ export SourceService() := macro
 		self.ssn_mask  		:= AutoStandardI.GlobalModule().ssnmask;
 		self.fetch_level 	:= topbusiness_services.functions.fn_fetchLevel(options_by.SourceDocFetchLevel);
     self.IncludeVendorSourceB := false;
+    self.IncludeAssignmentsAndReleases := false;
+    
     
 	end;
 

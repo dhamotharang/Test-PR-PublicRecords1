@@ -933,6 +933,16 @@ EXPORT GetPhonesV3(DATASET(progressive_phone.layout_progressive_batch_in) f_in_r
                                      m_serv = '2' and m_line in ['2',''] => Progressive_Phone.Constants.ServLine_Types.VoIP,
                                      m_serv = '3' and m_line in ['3',''] => Progressive_Phone.Constants.ServLine_Types.Unknown,
                                                                             Progressive_Phone.Constants.ServLine_Types.Unknown);
+      // calculate star rating of the phone, based on phone score returned from the model, so products may choose to filter by star rating
+      // note that model results are already limited by score threshold when the model is called above, so products will never get phones
+      // with star ratings whose score falls below the model score threshold. The threshold is usually in the middle of 3-stars.
+      SELF.Phone_StarRating := MAP((INTEGER)le.phone_shell.phone_model_score >= progressive_phone.Constants.StarRating_Thresholds.FiveStar  => 5,
+                                   (INTEGER)le.phone_shell.phone_model_score >= progressive_phone.Constants.StarRating_Thresholds.FourStar  => 4,
+                                   (INTEGER)le.phone_shell.phone_model_score >= progressive_phone.Constants.StarRating_Thresholds.ThreeStar => 3,
+                                   (INTEGER)le.phone_shell.phone_model_score >= progressive_phone.Constants.StarRating_Thresholds.TwoStar   => 2,
+                                   (INTEGER)le.phone_shell.phone_model_score >= progressive_phone.Constants.StarRating_Thresholds.OneStar   => 1,
+                                                                                                                                               0);
+     
      //END
       SELF := [];
     END;
@@ -977,7 +987,7 @@ EXPORT GetPhonesV3(DATASET(progressive_phone.layout_progressive_batch_in) f_in_r
 		// output(phones_out_temp,named('phones_out_temp'));
 		// output(phones_out1_TN,named('phones_out1_TN'));
 
-  //  output(choosen( PROJECT(phones_out1_TN, progressive_phone.layout_progressive_phone_common) , 100),named('getphonesv3_output'));
+  // output(choosen( PROJECT(phones_out1_TN, progressive_phone.layout_progressive_phone_common) , 100),named('getphonesv3_output'));
 
 		RETURN PROJECT(phones_out1_TN, progressive_phone.layout_progressive_phone_common);
 
@@ -1010,7 +1020,7 @@ EXPORT GetPhonesV3(DATASET(progressive_phone.layout_progressive_batch_in) f_in_r
   EXPORT UpdateWithMetadata (DATASET(progressive_phone.layout_progressive_phone_common) ds_in)
    := FUNCTION
 
-    Progressive_Phone.Layout_Progressive_phones.common_with_meta_rec xformMeta(progressive_phone.layout_progressive_phone_common ll) := TRANSFORM
+    Progressive_Phone.Layout_Progressive_phones.batch_out_plus xformMeta(progressive_phone.layout_progressive_phone_common ll) := TRANSFORM
       // we update switch type to be in sync with phone_line_type_desc
       SELF.switch_type := CASE(ll.Meta_Serv,
                                '0' => $.Constants.Switch_Type.Landline,

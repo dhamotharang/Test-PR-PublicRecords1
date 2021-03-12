@@ -92,7 +92,7 @@ EXPORT Functions := MODULE
 																						't1_phnnotverflag,t1l_ssnwaddrnotverflag,t1_ssnpriordobflag,t1l_ssnnotverflag,t1l_curraddrnotinagcyjurstflag,t1l_bestdlnotinagcyjurstflag,t1l_hdrsrccatcntlwflag,t1l_iddeceasedflag,t1l_idcurrincarcflag,' +
 																						't1l_iddtofdeathaftidactflagev,p1_aotidkrstolidactflagev,p1_aotidkrgenfrdactflagev,p1_aotidkrappfrdactflagev,p1_aotidkrothfrdactflagev,' +
 																						't15_ssnpopflag, t1_lexidpopflag, p1_idriskunscrbleflag, p9_addrriskunscrbleflag, p15_ssnriskunscrbleflag, p16_phnriskunscrbleflag, p17_emailriskunscrbleflag, p18_ipaddrriskunscrbleflag,' +
-																						'p19_bnkacctriskunscrbleflag, p20_dlriskunscrbleflag,t9_addrnotinagcyjurstflag';
+																						'p19_bnkacctriskunscrbleflag, p20_dlriskunscrbleflag';
 
 						EventStatsPrep := FraudGovPlatform_Analytics.macPivotOttoOutput(AttrClean, 'entitycontextuid,t_actuid',//,recordid', 
 					NicoleAttr
@@ -458,7 +458,7 @@ EXPORT Functions := MODULE
 																							't1_phnnotverflag,t1l_ssnwaddrnotverflag,t1_ssnpriordobflag,t1l_ssnnotverflag,t1l_curraddrnotinagcyjurstflag,t1l_bestdlnotinagcyjurstflag,t1l_hdrsrccatcntlwflag,t1l_iddeceasedflag,t1l_idcurrincarcflag,' +
 																							't1l_iddtofdeathaftidactflagev,t16_phnisinvalidflag,p1_aotidkrstolidactflagev,p1_aotidkrgenfrdactflagev,p1_aotidkrappfrdactflagev,p1_aotidkrothfrdactflagev,' +
 																							't15_ssnpopflag, t1_lexidpopflag, p1_idriskunscrbleflag, p9_addrriskunscrbleflag, p15_ssnriskunscrbleflag, p16_phnriskunscrbleflag, p17_emailriskunscrbleflag, p18_ipaddrriskunscrbleflag,' +
-																							'p19_bnkacctriskunscrbleflag, p20_dlriskunscrbleflag, t9_addrnotinagcyjurstflag';
+																							'p19_bnkacctriskunscrbleflag, p20_dlriskunscrbleflag';
 
 						EventStatsPrep := FraudGovPlatform_Analytics.macPivotOttoOutput(AttrClean, 'entitycontextuid,t_actuid',//,recordid', 
 					NicoleAttr
@@ -493,7 +493,7 @@ EXPORT Functions := MODULE
 																																																																	SELF.value :=(STRING)LEFT.aotkractflagev,
 																																																																	SELF.entitycontextuid := LEFT.id_entity_context_uid,
 																																																																	SELF.t_actuid := LEFT.acctno,
-																																																																	SELF.entityhash := LEFT.id_entity_context_uid + '|' + LEFT.acctno,
+																																																																	SELF.entityhash := IF(LEFT.id_entity_context_uid = '_010','',LEFT.id_entity_context_uid) + '|' + LEFT.acctno,
 																																																																	SELF := []));
 																																																																	
 								/*KnownRiskIDProfileAttributes := IF(EXISTS(identityProfiles),
@@ -518,7 +518,7 @@ EXPORT Functions := MODULE
 																																																																	SELF.value :=(STRING)LEFT.aotsafeactflagev,
 																																																																	SELF.entitycontextuid := LEFT.id_entity_context_uid,
 																																																																	SELF.t_actuid := LEFT.acctno,
-																																																																	SELF.entityhash := LEFT.id_entity_context_uid + '|' + LEFT.acctno,
+																																																																	SELF.entityhash := IF(LEFT.id_entity_context_uid = '_010','',LEFT.id_entity_context_uid) + '|' + LEFT.acctno,
 																																																																	SELF := []));
 																																																																	
 									MultiIdProfileAttributes := PROJECT(elementProfiles(entitytype IN [9, 15, 19, 20]),TRANSFORM(RECORDOF(EventStatsPrep),
@@ -534,7 +534,7 @@ EXPORT Functions := MODULE
 																																																																																						LEFT.entitytype = 20 => (STRING)LEFT.NVP(name='t20_dlmultcurridflagev')[1].value,''),
 																																																																	SELF.entitycontextuid := LEFT.id_entity_context_uid,
 																																																																	SELF.t_actuid := LEFT.acctno,
-																																																																	SELF.entityhash := LEFT.id_entity_context_uid + '|' + LEFT.acctno,
+																																																																	SELF.entityhash := IF(LEFT.id_entity_context_uid = '_010','',LEFT.id_entity_context_uid) + '|' + LEFT.acctno,
 																																																																	SELF := []));
 																																																																		
 						EventStatsPrepWithKr := EventStatsPrep + KnownRiskElementProfileAttributes + SafeListProfileAttributes + MultiIdProfileAttributes + KnownRiskIDProfileAttributes;
@@ -562,9 +562,10 @@ EXPORT Functions := MODULE
 																			SELF.RiskLevel := MAP(RIGHT.Field != '' => RIGHT.RiskLevel, -1), // If there is no specific configuration for a field assign the risk level to -1 so it can be hidden.
 																			SELF.Label := MAP(TRIM(RIGHT.UiDescription) != '' => Std.Str.FindReplace(RIGHT.UiDescription, '{value}', LEFT.Value), LEFT.Label);
 																			SELF.field := LEFT.field,
-																																								SELF.EntityType := RIGHT.EntityType,														
-																																								SELF.IndicatorType := RIGHT.IndicatorType,
-																																								SELF.IndicatorDescription := RIGHT.IndicatorDescription,
+																			SELF.EntityType := RIGHT.EntityType,														
+																			SELF.IndicatorType := RIGHT.IndicatorType,
+																			SELF.IndicatorDescription := RIGHT.IndicatorDescription,
+																			SELF.entitycontextuid := IF(LEFT.entitycontextuid = '_010','',LEFT.entitycontextuid),
 																			SELF := LEFT), KEYED, LEFT OUTER);
 
 					WeightedResult := JOIN(WeightedResultDefault(Value != ''), FraudGovPlatform.Key_ConfigAttributes, 
@@ -594,6 +595,7 @@ EXPORT Functions := MODULE
 																			SELF.EntityType := MAP(RIGHT.EntityType != 0 => RIGHT.EntityType, LEFT.EntityType),
 																			SELF.IndicatorType := MAP(RIGHT.IndicatorType != '' => RIGHT.IndicatorType, LEFT.IndicatorType);
 																			SELF.IndicatorDescription := MAP(RIGHT.IndicatorDescription != '' => RIGHT.IndicatorDescription, LEFT.IndicatorDescription);
+																			SELF.entitycontextuid := IF(LEFT.entitycontextuid = '_010','',LEFT.entitycontextuid);
 																			SELF := LEFT), KEYED, LEFT OUTER);
 
 					/* 
@@ -626,10 +628,11 @@ EXPORT Functions := MODULE
 																			//SELF.Weight := MAP(RIGHT.Field != '' => RIGHT.Weight, 0),
 																			SELF.RiskLevel := MAP(RIGHT.Field != '' => RIGHT.RiskLevel, -1), // If there is no specific configuration for a field assign the risk level to -1 so it can be hidden.
 																			SELF.field := LEFT.field,
-																																								SELF.RuleName := RIGHT.RuleName,
-																																								SELF.EntityType := RIGHT.EntityType,
-																																								SELF.Description := RIGHT.Description,
-																																								SELF.Default := (INTEGER1)(RIGHT.customerid = 0),
+																			SELF.RuleName := RIGHT.RuleName,
+																			SELF.EntityType := RIGHT.EntityType,
+																			SELF.Description := RIGHT.Description,
+																			SELF.Default := (INTEGER1)(RIGHT.customerid = 0),
+																			SELF.entitycontextuid := IF(LEFT.entitycontextuid = '_010','',LEFT.entitycontextuid),
 																			SELF := LEFT), MANY LOOKUP, LEFT OUTER)(RiskLevel>0);
 																		
 
@@ -656,7 +659,7 @@ EXPORT Functions := MODULE
 					EntityEventAssessment := TABLE(RulesFlagsMatched, 
 															{t_actuid, entitycontextuid,
 															entitytype, INTEGER1 risklevel := MAX(GROUP, risklevel)}, 
-															entitycontextuid, entitytype, MERGE);
+															t_actuid, entitycontextuid, entitytype, MERGE);
 
 
 					rAssessment := RECORD
@@ -731,7 +734,6 @@ EXPORT Functions := MODULE
 						// output(raw_Attributes,named('analytics_raw_Attributes'));
 						// output(AttrClean,named('analytics_AttrClean'));
 						// output(EventStatsPrep,named('analytics_EventStatsPrep'));
-						// output(elementEntityContextUids,named('analytics_elementEntityContextUids'));
 						// output(elementProfiles,named('analytics_elementProfiles'));
 						// output(KnownRiskElementProfileAttributes,named('analytics_KnownRiskElementProfileAttributes'));
 						// output(KnownRiskIDProfileAttributes,named('analytics_KnownRiskIDProfileAttributes'));

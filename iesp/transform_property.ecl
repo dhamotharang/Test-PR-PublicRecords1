@@ -1,4 +1,4 @@
-﻿import LN_PropertyV2, LN_PropertyV2_Services, doxie, risk_indicators, address, identifier2, codes;
+﻿import LN_PropertyV2, LN_PropertyV2_Services, risk_indicators, address, identifier2, codes;
 					  
 export transform_property := MODULE	
 
@@ -56,8 +56,7 @@ export transform_property := MODULE
 	shared iesp.share.t_StringArrayItem make_array( LN_PropertyV2_Services.layouts.parties.orig le ) := TRANSFORM
 		self.value := le.orig_name;
 	END;
-
-
+  
 	export working_layout := record
 		identifier2.layout_Identifier2;
 		
@@ -80,6 +79,25 @@ export transform_property := MODULE
 		unsigned3 dt_last_seen;
 		set of string ln_fares_ids;
 	end;
+
+  export layout_clean_addr := record
+    string property_full_street_address;
+    string property_unit_number;
+    string property_city_state_zip;
+    
+    STRING10 prim_range;
+    STRING2  predir;
+    STRING28 prim_name;
+    STRING4  addr_suffix;
+    STRING2  postdir;
+    STRING10 unit_desig;
+    STRING8  sec_range;
+    STRING25 v_city_name;
+    STRING2  st;
+    STRING5  z5;
+    STRING4  zip4;
+    string5 county;
+  end;
 
 	shared clean( in_addr, in_unit_num, in_csz, out_section ) := MACRO
 
@@ -105,6 +123,12 @@ export transform_property := MODULE
 		out_section.StateCityZip        := '';
 	ENDMACRO;
 
+export working_layout_temp := record
+  working_layout;
+  string property_full_street_address;
+  string property_unit_number;
+  string property_city_state_zip;
+end;
 
 	export deed_assess := module
 		export working_layout format_deed_all (working_layout L, recordof(LN_PropertyV2.key_deed_fid()) R) := TRANSFORM
@@ -152,10 +176,13 @@ export transform_property := MODULE
 			self.deed.SaleDate               := iesp.ECL2ESP.toDate (sale_date);
 			self.deed.RecordingDate          := iesp.ECL2ESP.toDate ((unsigned4) R.recording_date);
 
-
-			clean( R.seller_mailing_full_street_address, R.seller_mailing_address_unit_number, R.seller_mailing_address_citystatezip, self.deed.SellerAddress );
-			clean( R.property_full_street_address, R.property_address_unit_number, R.property_address_citystatezip, self.deed.PropertyAddress );
-			clean( R.mailing_street, R.mailing_unit_number, R.mailing_csz, self.deed.OwnerAddress );
+// don't run the cleaner on every record here, we'll dedup those addresses first, send them to the cleaner, then join back to the cleaned result
+    // self.property_full_street_address := r.property_full_street_address;
+    // self.property_unit_number := r.property_address_unit_number;
+    // self.property_city_state_zip := r.property_address_citystatezip;
+    clean( R.property_full_street_address, R.property_address_unit_number, R.property_address_citystatezip, self.deed.PropertyAddress );
+    clean( R.seller_mailing_full_street_address, R.seller_mailing_address_unit_number, R.seller_mailing_address_citystatezip, self.deed.SellerAddress );
+    clean( R.mailing_street, R.mailing_unit_number, R.mailing_csz, self.deed.OwnerAddress );
 
 			self.deed.BriefDescription       := R.legal_brief_description;
 
@@ -191,22 +218,24 @@ export transform_property := MODULE
 			self.deed.IsSubjectOwned         := isOwner;
 
       //move owner names from the deed record to the Owners2 section of the layout so we can compare the deed owner names to the assessment owner names later when they are joined together
-      deedName1 := project(Risk_Indicators.iid_constants.ds_Record, 
-                                 transform(iesp.property.t_Property2Name, 
+      deedName1 := dataset([transform(iesp.property.t_Property2Name, 
                                            self.First  := fname1_clean,
                                            self.Last   := lname1_clean,
-                                           self        := []));
-      deedName2 := project(Risk_Indicators.iid_constants.ds_Record, 
-                                 transform(iesp.property.t_Property2Name, 
+                                           self        := [])]);
+      deedName2 := dataset([transform(iesp.property.t_Property2Name, 
                                            self.First  := fname2_clean,
                                            self.Last   := lname2_clean,
-                                           self        := []));
+                                           self        := [])]);
       self.deed.Owners2.Names   := deedName1 + deedName2;
       
 			self := L;
 		END;
 
-		export working_layout format_assess_all (working_layout L, recordof(LN_PropertyV2.key_assessor_fid()) R) := TRANSFORM
+
+
+   
+    // export working_layout format_assess_all (working_layout L, recordof(LN_PropertyV2.key_assessor_fid()) R) := TRANSFORM
+    export working_layout_temp format_assess_all (working_layout L, recordof(LN_PropertyV2.key_assessor_fid()) R) := TRANSFORM
 			self.vendor_source_flag             := R.vendor_source_flag; // copied along to allow codes.mac_getpropertycode to play nicely
 			self.assess.DataSource              := R.vendor_source_flag;
 			self.assess.SourcePropertyRecordId  := R.ln_fares_id;
@@ -250,8 +279,12 @@ export transform_property := MODULE
 			self.assess.SaleDate                := iesp.ECL2ESP.toDate ((unsigned4) R.sale_date);
 			self.assess.RecordingDate           := iesp.ECL2ESP.toDate ((unsigned4) R.recording_date);
 
-			clean( R.property_full_street_address, R.property_unit_number, R.property_city_state_zip, self.assess.PropertyAddress );
-
+// don't run the cleaner on every record here, we'll dedup those addresses first, send them to the cleaner, then join back to the cleaned result
+			// clean( R.property_full_street_address, R.property_unit_number, R.property_city_state_zip, self.assess.PropertyAddress );
+  self.property_full_street_address := r.property_full_street_address;
+  self.property_unit_number := r.property_unit_number;
+  self.property_city_state_zip := r.property_city_state_zip;
+  
 			self.assess.Owner1Name             := R.assessee_name;
 			self.assess.Owner2Name             := R.second_assessee_name;
 
@@ -284,16 +317,14 @@ export transform_property := MODULE
 			self.assess.srt_date                := (unsigned4) if (R.sale_date != '', R.sale_date, R.recording_date);
 
       //move owner names from the assess record to the Owners2 section of the layout so we can compare the assessment owner names to the deed owner names later when they are joined together
-      assessName1 := project(Risk_Indicators.iid_constants.ds_Record, 
-                                 transform(iesp.property.t_Property2Name, 
+      assessName1 := dataset([transform(iesp.property.t_Property2Name, 
                                            self.First  := fname1_clean,
                                            self.Last   := lname1_clean,
-                                           self        := []));
-      assessName2 := project(Risk_Indicators.iid_constants.ds_Record, 
-                                 transform(iesp.property.t_Property2Name, 
+                                           self        := [])]);
+      assessName2 := dataset([transform(iesp.property.t_Property2Name, 
                                            self.First  := fname2_clean,
                                            self.Last   := lname2_clean,
-                                           self        := []));
+                                           self        := [])]);
       self.assess.Owners2.Names   := assessName1 + assessName2;
 			
 			// codes

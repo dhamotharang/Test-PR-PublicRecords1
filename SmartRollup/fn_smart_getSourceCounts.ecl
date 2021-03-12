@@ -10,7 +10,7 @@ SHARED address_did_rec :=   record
 
  SHARED	Source_rec := iesp.smartlinxreport.t_SLRSources;
 
- SHARED	source_rec GetSources (dataset ( PersonReports.layouts.header_recPlusSource) header_recDS) := function
+ EXPORT	source_rec GetSources (dataset ( PersonReports.layouts.header_recPlusSource) header_recDS) := function
 
     _src := dedup (group (sort (header_recDS, _type, src), _type), src);
     src_categories:=rollup (_src, group, transform (Source_rec, Self._Type := Left._Type, Self.Count := count (rows (left))));
@@ -22,8 +22,7 @@ SHARED address_did_rec :=   record
 export  GetAddressIndicators (
   dataset(PersonReports.layouts.header_recPlusSource) Tmpheader_ext,
   PersonReports.IParam._smartlinxreport Mod_smartLinx
-  ) := FUNCTION
-
+  ) := MODULE
   ValDID :=  tmpHeader_ext[1].did;
   // START of getting header recs ********************************************
   input_dids := dataset([{ValDid}], doxie.layout_references);
@@ -61,7 +60,7 @@ export  GetAddressIndicators (
 
   // header_all is the set of recs that has a src code in it.
   //
-  header_ext := JOIN (header_all, data_categories,
+   EXPORT header_ext := JOIN (header_all, data_categories,
                            Left.src = Right.code,
                            AssignCategory (Left, Right),
                            left outer, LOOKUP);
@@ -145,13 +144,11 @@ export  GetAddressIndicators (
       Self.SourceCount :=  count (dedup (R, src, all));
     end;
 
-   addresses  := project( header_addresses, setAssociatedAddresses(left));
+   addressesTmp  := project( header_addresses, setAssociatedAddresses(left));
 
    // output(header_all, named('header_all'));
   // output(did_grouped, named('did_grouped'));
-  return addresses;
-  
-  END;   
-  
-  END;
+  export Addresses := AddressesTmp;
+  END;   // module
+  END; // outer module
   

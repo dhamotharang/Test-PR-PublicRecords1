@@ -54,6 +54,7 @@ EXPORT EBRSection := MODULE;
 		self.ssn_mask  := AutoStandardI.GlobalModule().ssnmask;
 		self.fetch_level := FETCH_LEVEL;
     self.IncludeVendorsourceB := in_options.IncludeVendorsourceB;
+    self.includeassignmentsandreleases :=  in_options.IncludeAssignmentsAndReleases;
 	end;
 	
 	row_in_options := row(tf_options());

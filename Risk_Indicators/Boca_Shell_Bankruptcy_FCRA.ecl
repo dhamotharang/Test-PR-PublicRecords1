@@ -1,4 +1,4 @@
-﻿﻿import _Control, doxie_files, FCRA, ut, BankruptcyV3, riskwise, Risk_Indicators, STD;
+﻿﻿import _Control, FCRA, ut, BankruptcyV3, riskwise, Risk_Indicators;
 onThor := _Control.Environment.OnThor;
 
 EXPORT Boca_Shell_Bankruptcy_FCRA(integer bsVersion, unsigned8 BSOptions=0, 
@@ -203,38 +203,40 @@ EXPORT Boca_Shell_Bankruptcy_FCRA(integer bsVersion, unsigned8 BSOptions=0,
 
 
 	Risk_Indicators.Layouts_Derog_Info.layout_derog_process_plus correct_bk(Risk_Indicators.Layouts_Derog_Info.layout_derog_process_plus le) :=	TRANSFORM
-	// choose between current or correction as latest bankruptcy; if same date, then we can choose
-	// between preserving "type", "disposition" or override "supremacy" (former implemented).
-			last_corr := le.bk_corrections[1]; //latest correction, they're already sorted by date.
-			last_seen_corr := MAX((INTEGER) last_corr.date_filed, (INTEGER)last_corr.disposed_date);
-			boolean takeCorrection := (last_seen_corr > le.BJL.date_last_seen);
+    // choose between current or correction as latest bankruptcy; if same date, then we can choose
+    // between preserving "type", "disposition" or override "supremacy" (former implemented).
+    last_corr := le.bk_corrections[1]; //latest correction, they're already sorted by date.
+    last_seen_corr := MAX((INTEGER) last_corr.date_filed, (INTEGER)last_corr.disposed_date);
+    boolean takeCorrection := (last_seen_corr > le.BJL.date_last_seen);
 
-			SELF.BJL.bankrupt := IF (takeCorrection, TRUE, le.BJL.bankrupt);
-			SELF.BJL.date_last_seen:= IF (takeCorrection, last_seen_corr, le.BJL.date_last_seen);
-			SELF.BJL.filing_type := IF (takeCorrection, last_corr.filing_type, le.BJL.filing_type);
-			SELF.BJL.disposition := IF (takeCorrection, last_corr.disposition, le.BJL.disposition);
+    SELF.BJL.bankrupt := IF (takeCorrection, TRUE, le.BJL.bankrupt);
+    SELF.BJL.date_last_seen:= IF (takeCorrection, last_seen_corr, le.BJL.date_last_seen);
+    SELF.BJL.filing_type := IF (takeCorrection, last_corr.filing_type, le.BJL.filing_type);
+    SELF.BJL.disposition := IF (takeCorrection, last_corr.disposition, le.BJL.disposition);
 
-			// add aggregates from corrections
-			SELF.BJL.filing_count    := le.BJL.filing_count    + COUNT(le.bk_corrections);
-			SELF.BJL.filing_count120 := le.BJL.filing_count120 + COUNT(le.bk_corrections);	
-			SELF.BJL.bk_recent_count := le.BJL.bk_recent_count + COUNT (le.bk_corrections (disposition=''));
-			SELF.BJL.bk_disposed_recent_count     := le.BJL.bk_disposed_recent_count + 
+    // add aggregates from corrections
+    SELF.BJL.filing_count    := le.BJL.filing_count    + COUNT(le.bk_corrections);
+    SELF.BJL.filing_count120 := le.BJL.filing_count120 + COUNT(le.bk_corrections);	
+    SELF.BJL.bk_recent_count := le.BJL.bk_recent_count + COUNT (le.bk_corrections (disposition=''));
+    SELF.BJL.bk_disposed_recent_count     := le.BJL.bk_disposed_recent_count + 
 																							 COUNT(le.bk_corrections (disposition<>'' AND (ut.DaysApart(disposed_date,todaysdate)<365*2+1)));
-			SELF.BJL.bk_disposed_historical_count := le.BJL.bk_disposed_historical_count + 
+    SELF.BJL.bk_disposed_historical_count := le.BJL.bk_disposed_historical_count + 
 																							 COUNT(le.bk_corrections(disposition<>'' AND (ut.DaysApart(disposed_date,todaysdate)>365*2)));
-			SELF.BJL.bk_disposed_historical_cnt120 := le.BJL.bk_disposed_historical_cnt120 + 
+    SELF.BJL.bk_disposed_historical_cnt120 := le.BJL.bk_disposed_historical_cnt120 + 
 																							 COUNT(le.bk_corrections(disposition<>'' AND (ut.DaysApart(disposed_date,todaysdate)>365*2)));
-			SELF.BJL.bk_dismissed_recent_count     := le.BJL.bk_dismissed_recent_count + 
+    SELF.BJL.bk_dismissed_recent_count     := le.BJL.bk_dismissed_recent_count + 
 																							 COUNT(le.bk_corrections (StringLib.StringToUpperCase(disposition)='DISMISSED' AND (ut.DaysApart(disposed_date,todaysdate)<365*2+1)));
-			SELF.BJL.bk_dismissed_historical_count := le.BJL.bk_dismissed_historical_count + 
+    SELF.BJL.bk_dismissed_historical_count := le.BJL.bk_dismissed_historical_count + 
 																							 COUNT(le.bk_corrections(StringLib.StringToUpperCase(disposition)='DISMISSED' AND (ut.DaysApart(disposed_date,todaysdate)>365*2)));
-			SELF.BJL.bk_dismissed_historical_cnt120 := le.BJL.bk_dismissed_historical_cnt120 + 
+    SELF.BJL.bk_dismissed_historical_cnt120 := le.BJL.bk_dismissed_historical_cnt120 + 
 																							 COUNT(le.bk_corrections(StringLib.StringToUpperCase(disposition)='DISMISSED' AND (ut.DaysApart(disposed_date,todaysdate)>365*2)));
-			self.BJL.bk_chapter := IF (takeCorrection, last_corr.chapter, le.BJL.bk_chapter);	
-			self := le;
-		END;
-		w_bk_correct := PROJECT(w_bk, correct_bk(LEFT));
-		    
-		RETURN w_bk_correct;
+    SELF.BJL.bk_chapter := IF (takeCorrection, last_corr.chapter, le.BJL.bk_chapter);	      
+    //adding back chapters from bankruptcy corrections. 
+    all_chapters := le.bk_chapters + PROJECT(le.bk_corrections, TRANSFORM(risk_indicators.Layouts_Derog_Info.layout_bk_chapter, SELF.chapter := LEFT.chapter, SELF := []));
+    SELF.bk_chapters := DEDUP(SORT(all_chapters(chapter<>''), chapter));
+    SELF := le;
+    END;
+    w_bk_correct := PROJECT(w_bk, correct_bk(LEFT)); 
+    RETURN w_bk_correct;
 END;
 		

@@ -16,13 +16,9 @@ export FIS_custom_attr_request := 'riskviewattrv5fis';
 
 export valid_attributes := ['riskviewattrv5', 'insurview2attr', checking_indicators_attribute_request, FIS_custom_attr_request];
 
-export valid_IDA_models := ['rvg2005_0'];
+export valid_IDA_models := ['rvg2005_0', 'rvs2005_0'];
 
 export attrv5_models := ['rva2008_1', 'rvt2004_1', 'rvt2004_2']; // this allows attributes to be run even if not requested
-
-//List of models that are using the next gen riskview reason codes, used in Riskview. Transforms
-//these need to be the output model names that the customer sees
-export next_gen_models := ['ShortTermLendingRVG2005_0'];
 
 /* Model Validation -- Use this when trying to validate a new model through the RiskView.Search_Service */
 EXPORT TurnOnValidation := FALSE;

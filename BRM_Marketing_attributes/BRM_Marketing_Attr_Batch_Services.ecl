@@ -102,6 +102,7 @@ EXPORT BRM_Marketing_Attr_Batch_Services() := MACRO
 		EXPORT UNSIGNED GLBAPurpose := GLBA;
 		EXPORT UNSIGNED DPPAPurpose := DPPA;
 		EXPORT BOOLEAN isFCRA := is_FCRA;
+    EXPORT BOOLEAN isMarketing := Is_Marketing;
 		EXPORT STRING100 Allowed_Sources := AllowedSources;
 		EXPORT STRING5 IndustryClass := Industry_Class; // When set to UTILI or DRMKT this restricts Utility data
 		EXPORT BOOLEAN Override_Experian_Restriction := OverrideExperianRestriction;
@@ -111,7 +112,7 @@ EXPORT BRM_Marketing_Attr_Batch_Services() := MACRO
 			GLBA, 
 			DPPA, 
 			FALSE,//isfcra
-			TRUE, //ismarketing
+			Is_Marketing, //ismarketing
 			0, //Allow_DNBDMI
 			Override_Experian_Restriction,//OverrideExperianRestriction
 			'',//PermissiblePurpose - For FCRA Products Only

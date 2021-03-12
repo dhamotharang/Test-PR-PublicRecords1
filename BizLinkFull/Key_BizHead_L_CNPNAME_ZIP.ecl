@@ -156,15 +156,41 @@ EXPORT RawFetch_server(TYPEOF(h.cnp_name) param_cnp_name = (TYPEOF(h.cnp_name))'
     wds := SALT44.fn_string_to_wordstream(param_cnp_name);
     indexOutputRecord := RECORDOF(Key);
     slimrec := { Key.gss_word_weight, Key.proxid, Key.seleid, Key.orgid, Key.ultid };
+	slimKeyRec := recordof(Key_BizHead_L_CNPNAME.SlimKey);/*HACK29d*/
     BloomF := SALT44.Fn_Wordbag_To_Bloom(param_cnp_name); // Use for extra index filtering
-    doIndexRead(UNSIGNED4 search,UNSIGNED2 spc) := STEPPED(LIMIT(KEY( KEYED(GSS_hash = search) AND (GSS_bloom & BloomF) = BloomF
-AND KEYED((zip IN SET(param_zip,zip)))
-AND ((param_prim_name = (TYPEOF(prim_name))'' OR prim_name = (TYPEOF(prim_name))'') OR (prim_name = param_prim_name) OR ((Config_BIP.WithinEditN(prim_name,prim_name_len,param_prim_name,param_prim_name_len,1, 0))))
- 
-AND ((param_st = (TYPEOF(st))'' OR st = (TYPEOF(st))'') OR (st = param_st))),Config_BIP.L_CNPNAME_ZIP_MAXBLOCKLIMIT,ONFAIL(TRANSFORM(KeyRec,SELF := ROW([],KeyRec))),KEYED),ultid,orgid,seleid,proxid,PRIORITY(40-spc)); // Filter for each row of index fetch
+    doIndexRead(UNSIGNED4 search,UNSIGNED2 spc) := STEPPED(LIMIT(Key_BizHead_L_CNPNAME.SlimKey( KEYED(GSS_hash = search) // ADDED LIMIT
+                                                                      AND KEYED(GSS_Bloom = BloomF)
+                                                                      AND Keyed(fallback_value >= param_fallback_value)
+                                                                      
+                                                                  ),
+                                                                  Config_BIP.L_CNPNAME_MAXBLOCKLIMIT,
+                                                                  ONFAIL(TRANSFORM(SlimKeyRec, 
+                                                                                   SELF := ROW([],SlimKeyRec))),
+                                                                  keyed),
+                                                           ultid,
+                                                           orgid,
+                                                           seleid,
+                                                           proxid,
+                                                           PRIORITY(40-spc)); /*HACK29e*/ // Filter for each row of index fetch
     SALT44.MAC_collate_wordbag_matches4(wds,slimrec,doIndexRead,ultid,orgid,seleid,proxid,steppedmatches) // Perform N-way join
-    res := JOIN( steppedmatches, Key, KEYED(RIGHT.GSS_Hash = wds[1].hsh)
-AND KEYED((RIGHT.zip IN SET(param_zip,zip))) AND KEYED(RIGHT.fallback_value >= param_fallback_value) AND KEYED(LEFT.proxid = RIGHT.proxid AND LEFT.seleid = RIGHT.seleid AND LEFT.orgid = RIGHT.orgid AND LEFT.ultid = RIGHT.ultid),TRANSFORM(indexOutputRecord,SELF.gss_word_weight := LEFT.gss_word_weight,SELF := RIGHT));
+    res := JOIN( steppedmatches, Key,KEYED(RIGHT.GSS_Hash = wds[1].hsh)
+                AND KEYED((RIGHT.zip IN SET(param_zip,zip))) 
+                AND KEYED(RIGHT.fallback_value >= param_fallback_value) 
+                AND KEYED(LEFT.proxid = RIGHT.proxid 
+                    AND LEFT.seleid = RIGHT.seleid 
+                    AND LEFT.orgid = RIGHT.orgid 
+                    AND LEFT.ultid = RIGHT.ultid)
+                AND ((param_prim_name = (TYPEOF(RIGHT.prim_name))'' 
+                    OR RIGHT.prim_name = (TYPEOF(RIGHT.prim_name))'') 
+                    OR (RIGHT.prim_name = param_prim_name) 
+                    OR ((Config_BIP.WithinEditN(RIGHT.prim_name,RIGHT.prim_name_len,param_prim_name,param_prim_name_len,1, 0))))
+                AND ((param_st = (TYPEOF(RIGHT.st))'' 
+                    OR RIGHT.st = (TYPEOF(RIGHT.st))'') 
+                    OR (RIGHT.st = param_st)),
+                TRANSFORM(indexOutputRecord,
+                          SELF.gss_word_weight := LEFT.gss_word_weight,
+                          SELF := RIGHT),
+                LIMIT(Config_BIP.L_CNPNAME_ZIP_MAXBLOCKLIMIT, SKIP)); /*HACK29f*/
     RETURN IF(COUNT(param_zip)>600,DATASET([],indexOutputRecord),IF(SUM(wds,spec) > (5+ LOG(COUNT(param_zip))/LOG(2)+(LOG(COUNT(param_zip))/LOG(2))),res,IF(SUM(wds,spec) = 0,DATASET([],indexOutputRecord) ,DATASET(ROW([],indexOutputRecord)))))/*HACK14*/; // Ensure at least spc of specificity in gss portion
    END;
  

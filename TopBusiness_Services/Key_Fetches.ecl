@@ -18,8 +18,8 @@
 
   // 2. Add other common BIP linkids keys, i.e. BusHdr, Directories, Best, others???
 
-IMPORT AMS, ATF, AutoStandardI, BankruptcyV3, BIPV2, BIPV2_Contacts, BusReg, Corp2, Cortera, DCAV2, DEA, DNB_FEINV2,
-       Doxie, dx_Equifax_business_data, dx_OSHAIR, dx_Infutor_NARB,
+IMPORT AMS, ATF, AutoStandardI, BankruptcyV3, BIPV2, BIPV2_Contacts, BusReg, Corp2, DCAV2, DEA, DNB_FEINV2,
+       Doxie, dx_Cortera, dx_Equifax_business_data, dx_OSHAIR, dx_Infutor_NARB,
        EBR, Experian_CRDB, Experian_FEIN, faa, FBNV2, FCC, Frandx, dx_Gong, LiensV2,
        LN_PropertyV2, Prof_LicenseV2, dx_Property, Sheila_Greco, TopBusiness_BIPV2, UCCV2, VehicleV2,
        Watercraft, YellowPages;
@@ -77,7 +77,7 @@ EXPORT Key_Fetches(dataset(BIPV2.IDlayouts.l_xlink_ids) ds_in_linkids
                                                                                FETCH_LEVEL,,FETCH_LIMIT);
 
   // *** Key fetch to get cortera Linkids key records
-  EXPORT ds_cortera_linkidskey_recs := Cortera.Key_LinkIds.kFetch2(PROJECT(ds_in_linkids,
+  EXPORT ds_cortera_linkidskey_recs := dx_Cortera.Key_LinkIds.kFetch2(PROJECT(ds_in_linkids,
                                                                    TRANSFORM(BIPV2.IDlayouts.l_xlink_ids2,
                                                                              SELF := LEFT, SELF := [])),
                                                                              FETCH_LEVEL,,FETCH_LIMIT,,mod_access,/*append_contact*/ TRUE);
