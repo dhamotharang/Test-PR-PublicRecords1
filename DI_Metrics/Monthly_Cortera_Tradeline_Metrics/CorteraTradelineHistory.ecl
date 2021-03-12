@@ -13,9 +13,9 @@
 // See below end of this macro for requirements.
 IMPORT DI_Metrics, STD;
 
-EXPORT CorteraTradeLineHistory(destinationIP, destinationpath, emailContact = 'DataInsightAutomation@lexisnexisrisk.com', timePeriod) := FUNCTIONMACRO
+EXPORT CorteraTradeLineHistory(destinationIP, destinationpath, emailContact = 'DataInsightAutomation@lexisnexisrisk.com', timePeriod, today) := FUNCTIONMACRO
 
-  filedate := (STRING8)Std.Date.Today();
+  filedate := (STRING8)today;
 
   // tradeline_data_in   := PULL(Cortera_Tradeline.Key_LinkIds.Key);
   tradeline_data_in   := DI_Metrics.Monthly_Cortera_Tradeline_Metrics.Cortera_Tradeline_Key_LinkIds_alias;
@@ -49,9 +49,9 @@ EXPORT CorteraTradeLineHistory(destinationIP, destinationpath, emailContact = 'D
         SELF.ar_date      := LEFT.ar_date,
         SELF.current_ar   := (INTEGER)TRIM(LEFT.current_ar,LEFT,RIGHT),
         SELF.aging_91plus := (INTEGER)TRIM(LEFT.aging_91plus,LEFT,RIGHT),
-        SELF.weekly       := LEFT.dt_vendor_first_reported,
-        SELF.monthly      := LEFT.dt_vendor_first_reported DIV 100,
-        SELF.yearly       := LEFT.dt_vendor_first_reported DIV 10000
+        SELF.weekly       := (UNSIGNED4)LEFT.ar_date,
+        SELF.monthly      := (UNSIGNED4)LEFT.ar_date DIV 100,
+        SELF.yearly       := (UNSIGNED4)LEFT.ar_date DIV 10000
       )
     );
 
