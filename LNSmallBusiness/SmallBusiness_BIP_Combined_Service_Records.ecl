@@ -452,7 +452,7 @@ EXPORT SmallBusiness_BIP_Combined_Service_Records (LNSmallBusiness.IParam.LNSmal
     ds_curr_Scores := DATASET([xfm_CurrScores_toIESP_Layout()]);
 
    /* ****************************************************************************
-    *  Business Credit Report: get historical scores using index       *
+    *  Business Credit Report: get historical scores using index                 *
     ******************************************************************************/ 	
 	
     ds_CreditReportCurAndHistScores := SORT(ds_curr_Scores + ds_hist_scores, -(CurrentPriorFlag = LNSmallBusiness.Constants.CURRENT_FLAG), -DateScored);
@@ -483,10 +483,11 @@ EXPORT SmallBusiness_BIP_Combined_Service_Records (LNSmallBusiness.IParam.LNSmal
                         SELF.B2BTradeData := if(use_b2b_results, ds_b2bTrade_results_nohit[1]), 
                         SELF := []
               ));
-
+    // RR-21039 Returning the Header when test seeds are requested so the TransactionId, automatically generated 
+    // by the ESP, can be passed back to the user (Key Bank) to give LN support when the logs are needed for debug purposes 
     LNSmallBusiness.Layouts.SmallBusinessBipCombinedReportIntermediateResponse xfm_transform_SmallBusinessBipCombinedReportResponse() := 
       TRANSFORM
-        SELF._Header := IF( ~SmallBizCombined_inmod.TestDataEnabled, iesp.ECL2ESP.GetHeaderRow()); //Don't populate the header row if testseeds are requested.
+        SELF._Header := iesp.ECL2ESP.GetHeaderRow();
         SELF.InputEcho := ROW([],iesp.smallbusinessbipcombinedreport.t_SmallBusinessBipCombinedReportSearchBy); 
         SELF.BillingHit := (INTEGER)SBA_Results[1].BillingHit;
         SELF.SmallBusinessAnalyticsResults := ROW([],iesp.smallbusinessbipcombinedreport.t_SmallBusinessAnalyticsIDsModelsAttributes);
@@ -500,9 +501,11 @@ EXPORT SmallBusiness_BIP_Combined_Service_Records (LNSmallBusiness.IParam.LNSmal
     
     ds_results_Hit := DATASET([xfm_transform_SmallBusinessBipCombinedReportResponse()]) ;
  
+    // RR-21039 Returning the Header when test seeds are requested so the TransactionId, automatically generated 
+    // by the ESP, can be passed back to the user (Key Bank) to give LN support when the logs are needed for debug purposes 
     LNSmallBusiness.Layouts.SmallBusinessBipCombinedReportIntermediateResponse xfm_transform_NoHit() := 
       TRANSFORM
-        SELF._Header := IF( ~SmallBizCombined_inmod.TestDataEnabled, iesp.ECL2ESP.GetHeaderRow()); //Don't populate the header row if testseeds are requested.
+        SELF._Header := iesp.ECL2ESP.GetHeaderRow();
         SELF.InputEcho := ROW([],iesp.smallbusinessbipcombinedreport.t_SmallBusinessBipCombinedReportSearchBy);
         SELF.BillingHit := (INTEGER)SBA_Results[1].BillingHit;
         SELF.SmallBusinessAnalyticsResults := ROW([],iesp.smallbusinessbipcombinedreport.t_SmallBusinessAnalyticsIDsModelsAttributes);
