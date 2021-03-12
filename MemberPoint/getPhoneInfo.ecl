@@ -108,7 +108,7 @@ EXPORT getPhoneInfo(dataset (MemberPoint.Layouts.BestExtended) dsBestE, MemberPo
 // ROYALTIES
 	ungroup_dsPhones := UNGROUP(dsPhones);
 	_f_out := progressive_phone.functions.UpdateWithMetadata(ungroup_dsPhones);
-	results_1 := BatchFinalAssignments(_f_out, Progressive_Phone.Layout_Progressive_phones.batch_out_plus, UsePremiumSource_A, scoreModel, BParams.MaxPhoneCount);
+	results_1 := MemberPoint.FinalizePhoneBatchResults(_f_out, Progressive_Phone.Layout_Progressive_phones.batch_out_plus, UsePremiumSource_A, scoreModel, BParams.MaxPhoneCount);
 	dRoyaltiesByAcctno_EQUIFAX := if(UsePremiumSource_A, Royalty.RoyaltyEFXDataMart.GetBatchRoyaltiesByAcctno(PhoneBatchIn, results_1,,,acctno));
 	dRoyalties := Royalty.GetBatchRoyalties(dRoyaltiesByAcctno_EQUIFAX, BParams.ReturnDetailedRoyalties);
 
