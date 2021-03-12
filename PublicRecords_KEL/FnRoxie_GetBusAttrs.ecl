@@ -73,7 +73,9 @@ EXPORT FnRoxie_GetBusAttrs(DATASET(PublicRecords_KEL.ECL_Functions.Input_Bus_Lay
 	Rep1PersonAttributes := PublicRecords_KEL.FnRoxie_GetPersonAttributes(MiniAttributes(RepNumber = 1), FDCDataset, Options);
 
 	Rep1ALLSummaryAttributes := PublicRecords_KEL.FnRoxie_GetSummaryAttributes(Rep1Input, Options, FDCDataset);
-
+	
+	//Rep1HighRiskAddressAttributes := PublicRecords_KEL.FnRoxie_GetHighRiskAddress(Rep1Input, Options, FDCDataset);
+	
 	// Rep6PersonAttributes :=  PublicRecords_KEL.FnRoxie_Get6thRepAttributes(MiniAttributes(RepNumber = 6), FDCDataset, Options);
 
 	// Join Consumer Results back in with business results
@@ -99,7 +101,17 @@ EXPORT FnRoxie_GetBusAttrs(DATASET(PublicRecords_KEL.ECL_Functions.Input_Bus_Lay
 			SELF := []),
 		LEFT OUTER, KEEP(1), ATMOST(100));
 		
-		// withRep6PersonAttributes := JOIN(withRep1PersonAttributes, Rep6PersonAttributes, LEFT.G_ProcUID  = RIGHT.G_ProcUID,
+	// withRep1HighRiskAddressAttributes := JOIN(withRep1ALLSummaryAttributes, Rep1HighRiskAddressAttributes, 
+	// LEFT.G_ProcUID = RIGHT.G_ProcUID,
+		// TRANSFORM(PublicRecords_KEL.ECL_Functions.Layouts.LayoutMaster,
+			// SELF := RIGHT,
+			// SELF := LEFT,
+			// SELF := []),
+		// LEFT OUTER, KEEP(1), ATMOST(100));
+		
+		
+		// withRep6PersonAttributes := JOIN(withRep1PersonAttributes, Rep6PersonAttributes, 
+		// LEFT.G_ProcUID  = RIGHT.G_ProcUID,
 		// TRANSFORM(PublicRecords_KEL.ECL_Functions.Layouts.LayoutMaster,
 			// SELF := RIGHT,
 			// SELF := LEFT,

@@ -8,6 +8,7 @@
 // 
 EXPORT Common(PublicRecords_KEL.Interface_Options Options) := MODULE
 
+
 //IncludeMini
 	EXPORT DoFDCJoin_Doxie__Key_Header := 
 			Options.IncludeMini OR
@@ -19,12 +20,27 @@ EXPORT Common(PublicRecords_KEL.Interface_Options Options) := MODULE
 			Options.IncludeSSNAddress OR
 			Options.IncludeSSNPhone;
 				
-	EXPORT DoFDCJoin_Dx_Header__key_wild_SSN := 
+	EXPORT DoFDCJoin_Quick_Header__key_wild_SSN := //quick header nonFCRA only
 			NOT Options.isFCRA AND
 			(Options.IncludeMini OR
 			Options.IncludePersonSSN OR 
 			Options.IncludeSocialSecurityNumber OR 
 			Options.IncludeSSNAddress OR
+			Options.IncludeSSNPhone);
+			
+	EXPORT DoFDCJoin_Dx_Header__key_wild_SSN := //header both
+			(Options.IncludeMini OR
+			Options.IncludePersonSSN OR 
+			Options.IncludeSocialSecurityNumber OR 
+			Options.IncludeSSNAddress OR
+			Options.IncludeSSNPhone);	
+			
+	EXPORT DoFDCJoin_Dx_Header__key_wild_phone := //header both
+			NOT Options.isFCRA AND
+			(Options.IncludeMini OR
+			Options.IncludePersonPhone OR 
+			Options.IncludePhone OR 
+			Options.IncludeAddressPhone OR
 			Options.IncludeSSNPhone);
 			 
 	EXPORT DoFDCJoin_dx_Header__key_did_hhid :=		
@@ -104,13 +120,6 @@ EXPORT Common(PublicRecords_KEL.Interface_Options Options) := MODULE
 			 Options.IncludeProxPerson OR 
 			 Options.IncludeSelePerson OR 
 			 Options.IncludePerson);
-		 			
-	// FCRA only
-	EXPORT DoFDCJoin_Doxie_Files__Key_BocaShell_Crim_FCRA := 
-		Options.isFCRA AND
-			(Options.IncludePersonOffenses OR 
-			 Options.IncludePersonOffender OR 
-			 Options.IncludeCriminalOffense);
 			
 	// FCRA and nonFCRA versions exist, but old boca shell uses FCRA only.
 	EXPORT DoFDCJoin_Doxie_files__Key_Court_Offenses := 
@@ -760,4 +769,9 @@ EXPORT DoFDCJoin_dx_CFPB__key_Census_Surnames :=
 		Options.IsFCRA AND (
 		 Options.IncludeSexOffender OR
 		 Options.IncludePersonSexOffender);
+	EXPORT DoFDCJoin_Property__Key_Foreclosure_FID :=
+		NOT Options.IsFCRA AND
+		(Options.IncludeForeclosure OR
+		 Options.IncludePersonForeclosure OR
+		 Options.IncludeForeclosureAddress);
 END;

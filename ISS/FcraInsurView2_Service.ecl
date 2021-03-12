@@ -8,7 +8,7 @@
 </message>
 */
 
-IMPORT Risk_Reporting, iesp, gateway, risk_indicators, std, ut, ffd, Inquiry_AccLogs, Risk_Reporting;
+IMPORT Risk_Reporting, iesp, gateway, risk_indicators, std, Inquiry_AccLogs, Risk_Reporting;
 
 export FcraInsurView2_Service := MACRO
 
@@ -548,7 +548,7 @@ input_ok := if(((
 				ds_excep := DATASET([{'Roxie', 
 															 left.Exception_code,  
 															 '', 									
-															 RiskView.Constants.MLA_error_desc(left.Exception_code)}], iesp.share.t_WsException); 
+															 RiskView.Constants.get_error_desc(left.Exception_code)}], iesp.share.t_WsException); 
 
 				SELF._Header.Exceptions := ds_excep_blank;
 

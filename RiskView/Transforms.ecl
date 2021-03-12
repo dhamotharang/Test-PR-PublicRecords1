@@ -108,9 +108,9 @@ BOOLEAN ExcludeStatusRefresh = FALSE) := TRANSFORM
                                ri.Exception_Code IN Riskview.Constants.DTEErrorCodes => '41',
                                ri.Status_Code = '801' => ri.Status_Code,
                                '');
-    SELF.Exception_Message := MAP(ri.Exception_Code = Riskview.Constants.OKCError => RiskView.Constants.StatusRefresh_error_desc,
-                                  ri.Exception_Code IN Riskview.Constants.generalErrorCodes => RiskView.Constants.MLA_error_desc(ri.Exception_Code),
-                                  ri.Exception_Code IN Riskview.Constants.DTEErrorCodes  => RiskView.Constants.DTE_error_desc,
+    SELF.Exception_Message := MAP(ri.Exception_Code = Riskview.Constants.OKCError => RiskView.Constants.get_error_desc(RiskView.Constants.OKCError),
+                                  ri.Exception_Code IN Riskview.Constants.generalErrorCodes => RiskView.Constants.get_error_desc(ri.Exception_Code),
+                                  ri.Exception_Code IN Riskview.Constants.DTEErrorCodes  => RiskView.Constants.get_error_desc(RiskView.Constants.DTEError),
                                   ri.Status_Code = '801' => RiskView.Constants.Deferred_request_desc,
                                   '');
     SELF.Liens1_Seq:= IF(~suppress_condition, ri.LnJliens[1].Seq, '');

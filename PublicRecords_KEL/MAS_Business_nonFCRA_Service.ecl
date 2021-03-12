@@ -34,6 +34,7 @@ EXPORT MAS_Business_nonFCRA_Service() := MACRO
   #WEBSERVICE(FIELDS(
         'input',
         'ScoreThreshold',
+		'Gateways',
         'ExcludeConsumerAttributes',
         'OutputMasterResults',
         'BIPAppendScoreThreshold',
@@ -50,12 +51,16 @@ EXPORT MAS_Business_nonFCRA_Service() := MACRO
         'IncludeMinors',
         'AllowedSources',
         'OverrideExperianRestriction',
-				'AllowedSourcesDataset',
-				'ExcludeSourcesDataset',
-        'LexIdSourceOptout',
-        '_TransactionId',
-        '_BatchUID',
-        '_GCID'
+		'AllowedSourcesDataset',
+		'ExcludeSourcesDataset',
+		'LexIdSourceOptout',
+		'_TransactionId',
+		'_BatchUID',
+		'_GCID',
+		'Watchlists_Requested',
+		'IncludeOfac',
+		'IncludeAdditionalWatchLists',
+		'Global_Watchlist_Threshold'
   ));
 
 STRING5 Default_Industry_Class := '';	
@@ -110,6 +115,21 @@ BOOLEAN Default_IncludeMinors := TRUE;
 	END;
 	DATASET(Gateway.Layouts.Config) GatewaysClean := PROJECT(gateways_in, gw_switch(LEFT));	
 	
+	// OFAC parameters
+	BOOLEAN   include_ofac := FALSE : STORED('IncludeOfac');
+	BOOLEAN   include_additional_watchlists  := FALSE  : STORED('IncludeAdditionalWatchLists');
+	REAL Global_Watchlist_Threshold := Business_Risk_BIP.Constants.Default_Global_Watchlist_Threshold : STORED('Global_Watchlist_Threshold');
+	STRING watchlists := '' : STORED('Watchlists_Requested');
+
+	OFACGW := GatewaysClean(STD.Str.ToLowerCase(servicename) = 'bridgerwlc')[1];
+	#STORED('OFACURL', OFACGW.url);
+	#STORED('IncludeOfacValue', include_ofac);
+	#STORED('IncludeAdditionalWatchListsValue', include_additional_watchlists);
+	#STORED('Watchlists_RequestedValue', watchlists);
+	#STORED('Global_Watchlist_ThresholdValue', Global_Watchlist_Threshold);
+	#STORED('IsFCRAValue', FALSE);
+	#CONSTANT('IsFCRA', FALSE);
+
 	// If allowed sources aren't passed in, use default list of allowed sources
 	SetAllowedSources := IF(COUNT(AllowedSourcesDataset) = 0, PublicRecords_KEL.ECL_Functions.Constants.DEFAULT_ALLOWED_SOURCES_NONFCRA, AllowedSourcesDataset);
 	// If a source is on the Exclude list, remove it from the allowed sources list. 
@@ -179,6 +199,7 @@ BOOLEAN Default_IncludeMinors := TRUE;
 		EXPORT BOOLEAN IncludeEBRTradeline := TRUE;
 		EXPORT BOOLEAN IncludeEmail := TRUE;
 		EXPORT BOOLEAN IncludeEmployment := TRUE;
+		EXPORT BOOLEAN IncludeForeclosure := TRUE;
 		EXPORT BOOLEAN IncludeGeolink := TRUE;
 		EXPORT BOOLEAN IncludeHousehold := TRUE;
 		EXPORT BOOLEAN IncludeInquiry := TRUE;
@@ -209,7 +230,8 @@ BOOLEAN Default_IncludeMinors := TRUE;
 	
 	FinalResults := PROJECT(ResultSet, 
 		TRANSFORM(PublicRecords_KEL.ECL_Functions.Layout_Business_NonFCRA,
-			SELF := LEFT));
+			SELF := LEFT,
+			self := []));
 	
 	OUTPUT( FinalResults, NAMED('Results') );
 

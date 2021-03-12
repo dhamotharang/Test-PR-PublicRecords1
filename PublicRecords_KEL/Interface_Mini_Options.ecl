@@ -23,7 +23,9 @@ EXPORT Interface_Mini_Options (PublicRecords_KEL.Interface_Options OptionsRaw) :
 	EXPORT INTEGER upperage := OptionsRaw.upperage;
 	EXPORT STRING5 IndustryClass := OptionsRaw.IndustryClass;
 	EXPORT DATASET(Gateway.Layouts.Config) Gateways := OptionsRaw.Gateways;
-	
+		
+	EXPORT BOOLEAN isBRM_Marketing := OptionsRaw.isBRM_Marketing;
+
 	// BIP Append Options
 	EXPORT UNSIGNED BIPAppendScoreThreshold := OptionsRaw.BIPAppendScoreThreshold;
 	EXPORT UNSIGNED BIPAppendWeightThreshold := OptionsRaw.BIPAppendWeightThreshold;
@@ -54,6 +56,7 @@ EXPORT Interface_Mini_Options (PublicRecords_KEL.Interface_Options OptionsRaw) :
 	EXPORT BOOLEAN IncludeEmail := FALSE;
 	EXPORT BOOLEAN IncludeEBRTradeline := TRUE;
 	EXPORT BOOLEAN IncludeEmployment := FALSE;
+	EXPORT BOOLEAN IncludeForeclosure := FALSE;
 	EXPORT BOOLEAN IncludeGeolink := FALSE;
 	EXPORT BOOLEAN IncludeHousehold := FALSE;
 	EXPORT BOOLEAN IncludeInquiry := FALSE;
@@ -73,8 +76,8 @@ EXPORT Interface_Mini_Options (PublicRecords_KEL.Interface_Options OptionsRaw) :
 	EXPORT BOOLEAN IncludeWatercraft := FALSE;
 	EXPORT BOOLEAN IncludeZipCode := FALSE;
 	EXPORT BOOLEAN IncludeUCC := FALSE;
-  EXPORT BOOLEAN IncludeNameSummary := FALSE;
-  EXPORT BOOLEAN IncludePhoneSummary := FALSE;
+	EXPORT BOOLEAN IncludeNameSummary := FALSE;
+	EXPORT BOOLEAN IncludePhoneSummary := FALSE;
 	EXPORT BOOLEAN IncludeSSNSummary := FALSE;
 	EXPORT BOOLEAN IncludeOverrides := TRUE;
 	EXPORT BOOLEAN IncludeMini := TRUE;
@@ -98,6 +101,7 @@ EXPORT Interface_Mini_Options (PublicRecords_KEL.Interface_Options OptionsRaw) :
 	EXPORT BOOLEAN IncludeEmploymentBusinessAddress := IncludeEmployment AND IncludeAddress;
 	EXPORT BOOLEAN IncludeEmploymentPerson := IncludeEmployment AND IncludePerson;
 	EXPORT BOOLEAN IncludeFirstDegreeAssociations := IncludePerson;
+	EXPORT BOOLEAN IncludeForeclosureAddress := IncludeForeclosure AND IncludeAddress;
 	EXPORT BOOLEAN IncludeHouseholdMember := IncludePerson;
 	EXPORT BOOLEAN IncludeHouseholdPhone := IncludeHousehold AND IncludePhone;
 	EXPORT BOOLEAN IncludeOffenderAddress := IncludeCriminalOffender AND IncludeAddress;
@@ -108,6 +112,7 @@ EXPORT Interface_Mini_Options (PublicRecords_KEL.Interface_Options OptionsRaw) :
 	EXPORT BOOLEAN IncludePersonEducation := IncludePerson AND IncludeEducation;
 	EXPORT BOOLEAN IncludePersonEmail := IncludePerson AND IncludeEmail;
 	EXPORT BOOLEAN IncludePersonEmailPhoneAddress := IncludePerson AND IncludeEmail AND IncludeAddress AND IncludePhone;
+	EXPORT BOOLEAN IncludePersonForeclosure := IncludePerson AND IncludeForeclosure;
 	EXPORT BOOLEAN IncludePersonInquiry := IncludePerson AND IncludeInquiry;
 	EXPORT BOOLEAN IncludePersonOffender := IncludePerson AND IncludeCriminalOffender;
 	EXPORT BOOLEAN IncludePersonOffenses := IncludePerson AND IncludeCriminalOffense;
@@ -158,6 +163,6 @@ EXPORT Interface_Mini_Options (PublicRecords_KEL.Interface_Options OptionsRaw) :
 	EXPORT BOOLEAN IncludeSeleLienJudgment := IncludeBusinessSele AND IncludeLienJudgment;
  	EXPORT BOOLEAN IncludeSelePersonSurname := IncludeBusinessSele AND IncludeSurname AND IncludeSelePerson; 	
 	EXPORT BOOLEAN IncludeProxPersonSurname := IncludeBusinessProx AND IncludeSurname AND IncludeProxPerson; 
-
+	EXPORT BOOLEAN IncludeInferredPerformance := FALSE;
 
 END;	

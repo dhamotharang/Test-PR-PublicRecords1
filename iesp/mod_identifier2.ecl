@@ -213,16 +213,6 @@ export t_InputAddressRisk := record
 	boolean AddressIsNotABusiness {xpath('AddressIsNotABusiness')};
 end;
 		
-export t_GovIdAttributes := record
-	string Attribute {xpath('Attribute')};
-	unsigned Result {xpath('Result')};
-end;
-		
-export t_GovIdOutResult := record
-	boolean GovIdPass {xpath('GovIdPass')};
-	dataset(t_GovIdAttributes) GovIdAttributes {xpath('GovIdAttributes/GovIdAttribute'), MAXCOUNT(iesp.Constants.Identifier2c.MaxGovIdAttributes)};
-end;
-		
 export t_InstantIDResultNoEcho := record
 	string UniqueId {xpath('UniqueId')};
 	iesp.instantid.t_VerifiedInput VerifiedInput {xpath('VerifiedInput')};
@@ -275,7 +265,7 @@ export t_Identifier2Result := record (t_InstantIDResultNoEcho)
 	t_InputAddressCurrentOccupant InputAddressCurrentOccupant {xpath('InputAddressCurrentOccupant')};
 	t_InputAddressEverOccupant InputAddressEverOccupant {xpath('InputAddressEverOccupant')};
 	t_InputAddressRisk InputAddressRisk {xpath('InputAddressRisk')};
-	t_GovIdOutResult GovIdOutResult {xpath('GovIdOutResult')};
+	string GovIdOutResult {xpath('GovIdOutResult')};
 end;
 		
 export t_Identifier2Response := record

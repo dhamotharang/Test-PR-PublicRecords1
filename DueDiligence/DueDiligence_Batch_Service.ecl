@@ -130,7 +130,7 @@ EXPORT DueDiligence_Batch_Service() := FUNCTION
                                                                               SELF.altCompanyName := TRIM(LEFT.altCompanyName);
                                                                               SELF.address := address_in[1];
                                                                               SELF.taxID := TRIM(LEFT.taxID);
-                                                                              SELF := [];,)]),
+                                                                              SELF := [];)]),
                                                           DATASET([], DueDiligence.Layouts.BusInput));
                                                                     
                                                                       
@@ -192,6 +192,12 @@ EXPORT DueDiligence_Batch_Service() := FUNCTION
                                    SELF.FIAdditionalCodes3 := LEFT.FIAdditionalCodes3;
                                    SELF.FIAdditionalCodes4 := LEFT.FIAdditionalCodes4;
                                    SELF.FIAdditionalCodes5 := LEFT.FIAdditionalCodes5;
+                                   
+                                   lexIDToUse := TRIM(IF(RIGHT.perLexID = DueDiligence.Constants.EMPTY, RIGHT.busLexID, RIGHT.perLexID));
+                                   
+                                   SELF.lexIDChanged := TRIM(LEFT.lexID) <> DueDiligence.Constants.EMPTY AND 
+                                                        lexIDToUse <> DueDiligence.Constants.EMPTY AND
+                                                        TRIM(LEFT.lexID) <> lexIDToUse;
                                    SELF := RIGHT;)); 
   
   final := SORT(withFIFields, seq, acctNo);
