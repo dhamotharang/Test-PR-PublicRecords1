@@ -130,6 +130,7 @@
 	STRING6 P_InpValDOBInvalidFlag,
 	STRING6 P_InpValEmailInvalidFlag,
 	STRING6 P_InpValArchDtInvalidFlag,
+	STRING6 P_InpSSNIs4Digits;
 	INTEGER4 PI_InpAddrAVMVal;
 	INTEGER4 PI_InpAddrAVMValA1Y;
 	DECIMAL7_2 PI_InpAddrAVMRatio1Y;
@@ -149,10 +150,20 @@
 	STRING6 PI_InpAddrOWGMFlag;
 	STRING6 PI_InpAddrIsMultiUnitFlag;
 	STRING6 PI_InpAddrIsAptFlag;
+	//STRING6 PI_InpAddrIsPOBoxFlag;
+	//STRING6 PI_InpAddrIsMilitaryFlag;
+	//STRING PI_InpAddrSICCodeHRList;
+	//STRING PI_InpAddrNAICSCodeHRList;
+	//STRING6 PI_InpAddrIsHRCorrectFacFlag;
 	INTEGER PI_InpDOBAge;
 	STRING6 PI_InpSSNIsDeceasedFlag;
 	STRING10 PI_InpSSNDeceasedDt;
 	STRING6 PI_InpAddrStateVoterAvailFlag;
+	//STRING PI_InpPhoneSICCodeHRList;
+	//STRING PI_InpPhoneNAICSCodeHRList;
+	//STRING6 PI_InpPhoneIsHRCorrectFacFlag;
+	//STRING6 PI_InpPhoneType;
+	//STRING6 PI_InpPhoneIsBusPhoneFlag;
 	STRING10 G_BuildDrgCrimDt;
 	STRING10 G_BuildAstVehAirDt;
 	STRING10 G_BuildAstVehWtrDt;
@@ -160,6 +171,7 @@
 	STRING10 G_BuildEduDt;
 	STRING10 G_BuildEmailDt;
 	STRING6	P_LexIDSeenFlag;
+	STRING6 P_LexIDIsDeceasedFlag;
 	INTEGER3 PL_AstVehAirCntEv;
 	STRING PL_AstVehAirEmrgDtListEv;
 	STRING10 PL_AstVehAirEmrgNewDtEv; 		
@@ -321,6 +333,8 @@
 	STRING6 PL_CurrAddrIsSimpAddrFlag;
 	STRING6 PL_CurrAddrIsDropDeliveryFlag;
 	STRING6 PL_CurrAddrIsBusinessFlag;
+	STRING6 PL_CurrAddrIsMultiUnitFlag;
+	STRING6 PL_CurrAddrIsAptFlag;
 	//Previous Address
 	STRING6 PL_PrevAddrIsSimpAddrFlag;
 	STRING6 PL_PrevAddrIsBusinessFlag;
@@ -363,10 +377,10 @@
 	//Email
 	INTEGER3 PL_EmailCntEv;
 	//Derog History
-	// INTEGER3 PL_DrgCnt7Y;
-	// STRING PL_DrgDtList7Y;
-	// INTEGER3 PL_DrgOldMsnc7Y;
-	// INTEGER3 PL_DrgNewMsnc7Y;		
+	INTEGER3 PL_DrgCnt7Y;
+	STRING PL_DrgDtList7Y;
+	INTEGER3 PL_DrgOldMsnc7Y;
+	INTEGER3 PL_DrgNewMsnc7Y;		
 	//Best PII
 	STRING20 PL_BestNameFirst;
 	STRING20 PL_BestNameMid;

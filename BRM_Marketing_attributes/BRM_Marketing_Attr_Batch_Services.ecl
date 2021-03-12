@@ -94,7 +94,7 @@ EXPORT BRM_Marketing_Attr_Batch_Services() := MACRO
 
 	BOOLEAN Allow_DNBDMI := STD.Str.Find( AllowedSources, Business_Risk_BIP.Constants.AllowDNBDMI, 1 ) > 0; // When TRUE this will unmask DNB DMI data - NO CUSTOMERS CAN USE THIS, FOR RESEARCH PURPOSES ONLY
 	#STORED('AllowAll', Allow_DNBDMI); // If DNBDMI is allowed, set AllowAll to TRUE for Business Best test
-
+    #CONSTANT('IsFCRA', FALSE);
 	Options := MODULE(PublicRecords_KEL.Interface_Options)
 		EXPORT INTEGER ScoreThreshold := Score_threshold;
 		EXPORT STRING100 Data_Restriction_Mask := DataRestrictionMask;
@@ -102,7 +102,8 @@ EXPORT BRM_Marketing_Attr_Batch_Services() := MACRO
 		EXPORT UNSIGNED GLBAPurpose := GLBA;
 		EXPORT UNSIGNED DPPAPurpose := DPPA;
 		EXPORT BOOLEAN isFCRA := is_FCRA;
-    EXPORT BOOLEAN isMarketing := Is_Marketing;
+		EXPORT BOOLEAN isMarketing := Is_Marketing;	  
+		EXPORT BOOLEAN isBRM_Marketing := TRUE;  //this is used in the FDC code to turn off specific keys that are not needed for attributes but are still included in the below entity boolean groups
 		EXPORT STRING100 Allowed_Sources := AllowedSources;
 		EXPORT STRING5 IndustryClass := Industry_Class; // When set to UTILI or DRMKT this restricts Utility data
 		EXPORT BOOLEAN Override_Experian_Restriction := OverrideExperianRestriction;

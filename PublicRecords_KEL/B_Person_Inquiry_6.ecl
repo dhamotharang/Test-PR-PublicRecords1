@@ -4,11 +4,10 @@ IMPORT B_Person_Inquiry_7,CFG_Compile,E_Inquiry,E_Person,E_Person_Inquiry FROM P
 IMPORT * FROM KEL15.Null;
 EXPORT B_Person_Inquiry_6(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG_Compile __cfg = CFG_Compile) := MODULE
   SHARED VIRTUAL TYPEOF(B_Person_Inquiry_7(__in,__cfg).__ENH_Person_Inquiry_7) __ENH_Person_Inquiry_7 := B_Person_Inquiry_7(__in,__cfg).__ENH_Person_Inquiry_7;
-  SHARED __EE4872797 := __ENH_Person_Inquiry_7;
-  EXPORT __ST429075_Layout := RECORD
+  SHARED __EE4717096 := __ENH_Person_Inquiry_7;
+  EXPORT __ST437585_Layout := RECORD
     KEL.typ.nstr Transaction_I_D_;
     KEL.typ.str Method_ := '';
-    KEL.typ.nint Product_Code_;
     KEL.typ.str Function_Description_ := '';
     KEL.typ.str Sub_Market_ := '';
     KEL.typ.str Vertical_ := '';
@@ -18,6 +17,7 @@ EXPORT B_Person_Inquiry_6(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, 
     KEL.typ.nbool Is_Fcra_Ok_;
     KEL.typ.bool Is_Collection_ := FALSE;
     KEL.typ.bool Is_Batch_Monitoring_Method_ := FALSE;
+    KEL.typ.nbool Is_Product_Code_Ok_;
     KEL.typ.nint Agein_Days_;
     KEL.typ.bool Exclude_Function_Description_ := FALSE;
     KEL.typ.bool Is_Banking_ := FALSE;
@@ -31,13 +31,13 @@ EXPORT B_Person_Inquiry_6(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, 
     KEL.typ.epoch Vault_Date_Last_Seen_ := 0;
     KEL.typ.int __RecordCount := 0;
   END;
-  EXPORT __ST246148_Layout := RECORD
+  EXPORT __ST250463_Layout := RECORD
     KEL.typ.ntyp(E_Person().Typ) Subject_;
     KEL.typ.ntyp(E_Inquiry().Typ) Transaction_;
     KEL.typ.nstr Transaction_I_D_;
     KEL.typ.nstr Sequence_Number_;
     KEL.typ.ndataset(E_Person_Inquiry(__in,__cfg).Data_Sources_Layout) Data_Sources_;
-    KEL.typ.ndataset(__ST429075_Layout) Gather_Inquiries_;
+    KEL.typ.ndataset(__ST437585_Layout) Gather_Inquiries_;
     KEL.typ.timestamp Archive___Date_ := 0;
     KEL.typ.timestamp Date_First_Seen_ := 0;
     KEL.typ.timestamp Date_Last_Seen_ := 0;
@@ -45,18 +45,18 @@ EXPORT B_Person_Inquiry_6(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, 
     KEL.typ.epoch Vault_Date_Last_Seen_ := 0;
     KEL.typ.int __RecordCount := 0;
   END;
-  SHARED __ST246148_Layout __ND4872783__Project(B_Person_Inquiry_7(__in,__cfg).__ST249655_Layout __PP4872580) := TRANSFORM
-    __EE4872781 := __PP4872580.Gather_Inquiries_;
-    __ST429075_Layout __ND4872745__Project(B_Person_Inquiry_7(__in,__cfg).__ST378146_Layout __PP4872605) := TRANSFORM
-      __CC31595 := ['BANKING','CARDS','CREDIT DECISIONING','CREDIT MONITORING','CREDIT UNION','FINANCE COMPANY','FS SERVICES PROVIDER','INVESTMENTS/SECURITIES','COMMERCIAL LENDING'];
-      SELF.Is_Banking_ := KEL.Routines.ToUpperCase(TRIM(__PP4872605.Industry_)) IN __CC31595;
-      __CC31598 := ['COMMUNICATIONS'];
-      SELF.Is_Communications_ := KEL.Routines.ToUpperCase(TRIM(__PP4872605.Industry_)) IN __CC31598;
-      SELF.Valid_Inquiries_ := __AND(__AND(__AND(__AND(__PP4872605.Is_Non_Fcra_Ok_,__CN(NOT (__PP4872605.Is_Batch_Monitoring_Method_))),__CN(__PP4872605.Exclude_Function_Description_)),__CN(NOT (__PP4872605.Is_Collection_))),__CN(NOT (__PP4872605.Is_High_Risk_)));
-      SELF := __PP4872605;
+  SHARED __ST250463_Layout __ND4717082__Project(B_Person_Inquiry_7(__in,__cfg).__ST253998_Layout __PP4716879) := TRANSFORM
+    __EE4717080 := __PP4716879.Gather_Inquiries_;
+    __ST437585_Layout __ND4717044__Project(B_Person_Inquiry_7(__in,__cfg).__ST386666_Layout __PP4716904) := TRANSFORM
+      __CC32795 := ['BANKING','CARDS','CREDIT DECISIONING','CREDIT MONITORING','CREDIT UNION','FINANCE COMPANY','FS SERVICES PROVIDER','INVESTMENTS/SECURITIES','COMMERCIAL LENDING'];
+      SELF.Is_Banking_ := KEL.Routines.ToUpperCase(TRIM(__PP4716904.Industry_)) IN __CC32795;
+      __CC32798 := ['COMMUNICATIONS'];
+      SELF.Is_Communications_ := KEL.Routines.ToUpperCase(TRIM(__PP4716904.Industry_)) IN __CC32798;
+      SELF.Valid_Inquiries_ := __AND(__AND(__AND(__AND(__PP4716904.Is_Non_Fcra_Ok_,__CN(NOT (__PP4716904.Is_Batch_Monitoring_Method_))),__CN(__PP4716904.Exclude_Function_Description_)),__CN(NOT (__PP4716904.Is_Collection_))),__CN(NOT (__PP4716904.Is_High_Risk_)));
+      SELF := __PP4716904;
     END;
-    SELF.Gather_Inquiries_ := __PROJECT(__EE4872781,__ND4872745__Project(LEFT));
-    SELF := __PP4872580;
+    SELF.Gather_Inquiries_ := __PROJECT(__EE4717080,__ND4717044__Project(LEFT));
+    SELF := __PP4716879;
   END;
-  EXPORT __ENH_Person_Inquiry_6 := PROJECT(__EE4872797,__ND4872783__Project(LEFT));
+  EXPORT __ENH_Person_Inquiry_6 := PROJECT(__EE4717096,__ND4717082__Project(LEFT));
 END;

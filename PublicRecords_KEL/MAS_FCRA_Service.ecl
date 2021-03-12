@@ -40,7 +40,8 @@ EXPORT MAS_FCRA_Service() := MACRO
 		'IncludeMinors',
 		'IntendedPurpose',
 		'AllowedSourcesDataset',
-		'ExcludeSourcesDataset'
+		'ExcludeSourcesDataset',
+		'AllowInferredPerformance'
 
   ));
 
@@ -61,8 +62,16 @@ EXPORT MAS_FCRA_Service() := MACRO
 	
 	BOOLEAN Retain_Input_Lexid := FALSE : STORED('RetainInputLexid');//keep what we have on input
 	BOOLEAN Append_PII := FALSE : STORED('AppendPII');//keep what we have on input
-	
-	
+	BOOLEAN Allow_Inferred_Performance := FALSE : STORED('AllowInferredPerformance');//keep what we have on input
+		
+	// Nulling out stored variables to not propagate to Attributes.kel
+	#CONSTANT('NetAcuityURL', ''); 
+	#CONSTANT('OFACURL', '');
+	#CONSTANT('Watchlists_RequestedValue', '');
+	#CONSTANT('IncludeOfacValue', FALSE);
+	#CONSTANT('IncludeAdditionalWatchListsValue', FALSE);
+	#CONSTANT('Global_Watchlist_ThresholdValue', 0);
+	#CONSTANT('IsFCRA', TRUE);
 	
 	gateways_in := Gateway.Configuration.Get();
 	Gateway.Layouts.Config gw_switch(gateways_in le) := TRANSFORM
@@ -73,6 +82,13 @@ EXPORT MAS_FCRA_Service() := MACRO
 
 	DATASET(Gateway.Layouts.Config) GatewaysClean := PROJECT(gateways_in, gw_switch(LEFT));
 
+	#STORED('GLBPurposeValue', GLBA);
+	#STORED('DPPAPurposeValue', DPPA);
+	#STORED('IsFCRAValue', TRUE);
+	
+	TargusGW := GatewaysClean(STD.Str.ToLowerCase(servicename) = 'targus')[1];
+	#STORED('TargusURL', TargusGW.url);
+	
 	// If allowed sources aren't passed in, use default list of allowed sources
 	SetAllowedSources := IF(COUNT(AllowedSourcesDataset) = 0, PublicRecords_KEL.ECL_Functions.Constants.DEFAULT_ALLOWED_SOURCES_FCRA, AllowedSourcesDataset);
 	// If a source is on the Exclude list, remove it from the allowed sources list. 
@@ -128,6 +144,7 @@ EXPORT MAS_FCRA_Service() := MACRO
 		EXPORT BOOLEAN IncludeEBRTradeline := TRUE;
 		EXPORT BOOLEAN IncludeEmail := TRUE;
 		EXPORT BOOLEAN IncludeEmployment := TRUE;
+		EXPORT BOOLEAN IncludeForeclosure := TRUE;
 		EXPORT BOOLEAN IncludeGeolink := TRUE;
 		EXPORT BOOLEAN IncludeHousehold := TRUE;
 		EXPORT BOOLEAN IncludeInquiry := TRUE;
@@ -139,6 +156,7 @@ EXPORT MAS_FCRA_Service() := MACRO
 		EXPORT BOOLEAN IncludeProfessionalLicense := TRUE;
 		EXPORT BOOLEAN IncludeProperty := TRUE;
 		EXPORT BOOLEAN IncludePropertyEvent := TRUE;
+		EXPORT BOOLEAN IncludeSexOffender := TRUE;
 		EXPORT BOOLEAN IncludeSocialSecurityNumber := TRUE;
 		EXPORT BOOLEAN IncludeSSNSummary := TRUE;
 		EXPORT BOOLEAN IncludeSurname := TRUE;
@@ -151,6 +169,7 @@ EXPORT MAS_FCRA_Service() := MACRO
 		EXPORT BOOLEAN IncludeUCC := TRUE;
 		EXPORT BOOLEAN IncludeMini := TRUE;
 		EXPORT BOOLEAN IncludeOverrides := TRUE;
+		EXPORT BOOLEAN IncludeInferredPerformance := Allow_Inferred_Performance;
 
 
 	END;
@@ -161,7 +180,20 @@ EXPORT MAS_FCRA_Service() := MACRO
 
 	FinalResults := PROJECT(ResultSet, 
 		TRANSFORM(PublicRecords_KEL.ECL_Functions.Layout_Person_FCRA,
-			SELF := LEFT));
+			SELF := LEFT,
+			SELF := []));
+			
+	TargusRoyaltyCount := COUNT(ResultSet(TargusRoyalty <> 0));
+
+	TargusRoyaltyDS := DATASET([transform(Royalty.Layouts.Royalty,
+							SELF.royalty_type_code := Royalty.Constants.RoyaltyCode.TARGUS_PDE,
+							SELF.royalty_type := Royalty.Constants.RoyaltyType.TARGUS_PDE;
+							SELF.royalty_count := TargusRoyaltyCount; 
+							SELF := [];)]);
+							
+	RoyaltySet := TargusRoyaltyDS;
+					
+	OUTPUT(RoyaltySet, NAMED('RoyaltySet'));
 			
   OUTPUT( FinalResults, NAMED('Results') );
 

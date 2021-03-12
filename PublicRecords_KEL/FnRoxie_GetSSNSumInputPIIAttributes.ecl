@@ -10,7 +10,7 @@ EXPORT FnRoxie_GetSSNSumInputPIIAttributes (DATASET(PublicRecords_KEL.ECL_Functi
 	
 	LayoutSSNSumAttributes := {UNSIGNED G_ProcUID, BOOLEAN ResultsFound, RECORDOF(PublicRecords_KEL.Q_Non_F_C_R_A_S_S_N_Summary_Attributes_V1_Dynamic('', DATASET([], PublicRecords_KEL.ECL_Functions.Layouts.LayoutInputPII), 0, PublicRecords_KEL.CFG_Compile.Permit__NONE).res0)};
 
-	SSNSumInputPIIAttributesRaw := JOIN(WithInputParms, FDCDataset,  LEFT.G_ProcUID = RIGHT.G_ProcUID, TRANSFORM(LayoutSSNSumAttributes,
+	SSNSumInputPIIAttributesRaw := NOCOMBINE(JOIN(WithInputParms, FDCDataset,  LEFT.G_ProcUID = RIGHT.G_ProcUID, TRANSFORM(LayoutSSNSumAttributes,
 		SSNSummaryAttrs := PublicRecords_KEL.Q_Non_F_C_R_A_S_S_N_Summary_Attributes_V1_Dynamic(
 																		LEFT.P_InpClnSSN,
 																		DATASET(LEFT), 
@@ -20,7 +20,7 @@ EXPORT FnRoxie_GetSSNSumInputPIIAttributes (DATASET(PublicRecords_KEL.ECL_Functi
 		SELF.G_ProcUID := LEFT.G_ProcUID,				
 		SELF.ResultsFound := EXISTS(SSNSummaryAttrs);
 		SELF := SSNSummaryAttrs[1]
-	), LEFT OUTER, ATMOST(100), KEEP(1));
+	), LEFT OUTER, ATMOST(100), KEEP(1)));
 	
 	SSNSumInputPIIAttributeResults := KEL.Clean(SSNSumInputPIIAttributesRaw, TRUE, TRUE, TRUE);
 	
