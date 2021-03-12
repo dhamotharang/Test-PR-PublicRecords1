@@ -4,8 +4,8 @@ IMPORT B_U_C_C_12,CFG_Compile,E_U_C_C,FN_Compile FROM PublicRecords_KEL;
 IMPORT * FROM KEL15.Null;
 EXPORT B_U_C_C_11(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG_Compile __cfg = CFG_Compile) := MODULE
   SHARED VIRTUAL TYPEOF(B_U_C_C_12(__in,__cfg).__ENH_U_C_C_12) __ENH_U_C_C_12 := B_U_C_C_12(__in,__cfg).__ENH_U_C_C_12;
-  SHARED __EE5549026 := __ENH_U_C_C_12;
-  EXPORT __ST280209_Layout := RECORD
+  SHARED __EE5517219 := __ENH_U_C_C_12;
+  EXPORT __ST280188_Layout := RECORD
     KEL.typ.nstr R_M_S_I_D_;
     KEL.typ.nstr Filing_Jurisdiction_;
     KEL.typ.nstr Filing_Number_;
@@ -36,10 +36,10 @@ EXPORT B_U_C_C_11(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG_Comp
     KEL.typ.epoch Vault_Date_Last_Seen_ := 0;
     KEL.typ.int __RecordCount := 0;
   END;
-  EXPORT __ST280205_Layout := RECORD
+  EXPORT __ST280184_Layout := RECORD
     KEL.typ.nuid UID;
     KEL.typ.nstr T_M_S_I_D_;
-    KEL.typ.ndataset(__ST280209_Layout) Sub_Filing_;
+    KEL.typ.ndataset(__ST280188_Layout) Sub_Filing_;
     KEL.typ.ndataset(E_U_C_C(__in,__cfg).Collateral_Layout) Collateral_;
     KEL.typ.ndataset(E_U_C_C(__in,__cfg).Data_Sources_Layout) Data_Sources_;
     KEL.typ.epoch Archive___Date_ := 0;
@@ -49,16 +49,16 @@ EXPORT B_U_C_C_11(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG_Comp
     KEL.typ.epoch Vault_Date_Last_Seen_ := 0;
     KEL.typ.int __RecordCount := 0;
   END;
-  SHARED __ST280205_Layout __ND5549243__Project(B_U_C_C_12(__in,__cfg).__ST280405_Layout __PP5549027) := TRANSFORM
-    __EE5549047 := __PP5549027.Sub_Filing_;
-    __ST280209_Layout __ND5549218__Project(B_U_C_C_12(__in,__cfg).__ST280409_Layout __PP5549048) := TRANSFORM
-      __CC55044 := 2191;
-      SELF.Inferred_Status_ := MAP(__PP5549048.Filing_Type_Filtered_ = '1'=>'3',__T(__AND(__OP2(__PP5549048.Status_Type_,=,__CN('ACTIVE')),__OP2(__PP5549048.Age_In_Days_,>,__CN(__CC55044))))=>'8',__T(__OP2(__PP5549048.Status_Type_,<>,__CN('')))=>__PP5549048.Status_Type_Filtered_,FN_Compile(__cfg).FN__map_Inferred_Status(__ECAST(KEL.typ.nstr,__CN(__PP5549048.Filing_Type_Filtered_))));
-      SELF.Initial_Filing_ := __PP5549048.Filing_Type_Filtered_ = '7';
-      SELF := __PP5549048;
+  SHARED __ST280184_Layout __ND5517436__Project(B_U_C_C_12(__in,__cfg).__ST280384_Layout __PP5517220) := TRANSFORM
+    __EE5517240 := __PP5517220.Sub_Filing_;
+    __ST280188_Layout __ND5517411__Project(B_U_C_C_12(__in,__cfg).__ST280388_Layout __PP5517241) := TRANSFORM
+      __CC55023 := 2191;
+      SELF.Inferred_Status_ := MAP(__PP5517241.Filing_Type_Filtered_ = '1'=>'3',__T(__AND(__OP2(__PP5517241.Status_Type_,=,__CN('ACTIVE')),__OP2(__PP5517241.Age_In_Days_,>,__CN(__CC55023))))=>'8',__T(__OP2(__PP5517241.Status_Type_,<>,__CN('')))=>__PP5517241.Status_Type_Filtered_,FN_Compile(__cfg).FN__map_Inferred_Status(__ECAST(KEL.typ.nstr,__CN(__PP5517241.Filing_Type_Filtered_))));
+      SELF.Initial_Filing_ := __PP5517241.Filing_Type_Filtered_ = '7';
+      SELF := __PP5517241;
     END;
-    SELF.Sub_Filing_ := __PROJECT(__EE5549047,__ND5549218__Project(LEFT));
-    SELF := __PP5549027;
+    SELF.Sub_Filing_ := __PROJECT(__EE5517240,__ND5517411__Project(LEFT));
+    SELF := __PP5517220;
   END;
-  EXPORT __ENH_U_C_C_11 := PROJECT(__EE5549026,__ND5549243__Project(LEFT));
+  EXPORT __ENH_U_C_C_11 := PROJECT(__EE5517219,__ND5517436__Project(LEFT));
 END;

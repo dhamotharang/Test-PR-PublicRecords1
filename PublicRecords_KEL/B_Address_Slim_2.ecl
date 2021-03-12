@@ -5,10 +5,10 @@ IMPORT * FROM KEL15.Null;
 EXPORT B_Address_Slim_2(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG_Compile __cfg = CFG_Compile) := MODULE
   SHARED VIRTUAL TYPEOF(B_Address_Slim_3(__in,__cfg).__ENH_Address_Slim_3) __ENH_Address_Slim_3 := B_Address_Slim_3(__in,__cfg).__ENH_Address_Slim_3;
   SHARED VIRTUAL TYPEOF(B_Input_P_I_I_3(__in,__cfg).__ENH_Input_P_I_I_3) __ENH_Input_P_I_I_3 := B_Input_P_I_I_3(__in,__cfg).__ENH_Input_P_I_I_3;
-  SHARED __EE7002526 := __ENH_Address_Slim_3;
-  SHARED __EE7002542 := __ENH_Input_P_I_I_3;
-  SHARED __EE7002549 := __EE7002542(__NN(__EE7002542.Slim_Location_));
-  SHARED __ST1303037_Layout := RECORD
+  SHARED __EE6970719 := __ENH_Address_Slim_3;
+  SHARED __EE6970735 := __ENH_Input_P_I_I_3;
+  SHARED __EE6970742 := __EE6970735(__NN(__EE6970735.Slim_Location_));
+  SHARED __ST1303016_Layout := RECORD
     KEL.typ.ntyp(E_Address_Slim().Typ) UID;
     KEL.typ.nuid U_I_D__1_;
     KEL.typ.epoch Archive___Date_ := 0;
@@ -17,13 +17,13 @@ EXPORT B_Address_Slim_2(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CF
     KEL.typ.epoch Hybrid_Archive_Date_ := 0;
     KEL.typ.epoch Vault_Date_Last_Seen_ := 0;
   END;
-  SHARED __ST1303037_Layout __ND7002531__Project(B_Input_P_I_I_3(__in,__cfg).__ST1045020_Layout __PP7002527) := TRANSFORM
-    SELF.UID := __PP7002527.Slim_Location_;
-    SELF.U_I_D__1_ := __PP7002527.UID;
-    SELF := __PP7002527;
+  SHARED __ST1303016_Layout __ND6970724__Project(B_Input_P_I_I_3(__in,__cfg).__ST1044999_Layout __PP6970720) := TRANSFORM
+    SELF.UID := __PP6970720.Slim_Location_;
+    SELF.U_I_D__1_ := __PP6970720.UID;
+    SELF := __PP6970720;
   END;
-  SHARED __EE7002540 := PROJECT(__EE7002549,__ND7002531__Project(LEFT));
-  SHARED __ST1303065_Layout := RECORD
+  SHARED __EE6970733 := PROJECT(__EE6970742,__ND6970724__Project(LEFT));
+  SHARED __ST1303044_Layout := RECORD
     KEL.typ.ntyp(E_Address_Slim().Typ) UID;
     KEL.typ.ntyp(E_Input_P_I_I().Typ) O_N_L_Y___U_I_D_;
     KEL.typ.epoch Archive___Date_ := 0;
@@ -32,8 +32,8 @@ EXPORT B_Address_Slim_2(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CF
     KEL.typ.epoch Hybrid_Archive_Date_ := 0;
     KEL.typ.epoch Vault_Date_Last_Seen_ := 0;
   END;
-  SHARED __EE7002564 := PROJECT(__EE7002540,TRANSFORM(__ST1303065_Layout,SELF.O_N_L_Y___U_I_D_ := LEFT.U_I_D__1_,SELF := LEFT));
-  SHARED __ST1304269_Layout := RECORD
+  SHARED __EE6970757 := PROJECT(__EE6970733,TRANSFORM(__ST1303044_Layout,SELF.O_N_L_Y___U_I_D_ := LEFT.U_I_D__1_,SELF := LEFT));
+  SHARED __ST1304248_Layout := RECORD
     KEL.typ.nuid UID;
     KEL.typ.nstr Primary_Range_;
     KEL.typ.nstr Predirectional_;
@@ -44,10 +44,10 @@ EXPORT B_Address_Slim_2(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CF
     KEL.typ.ndataset(E_Address_Slim(__in,__cfg).High_Risk_Address_Layout) High_Risk_Address_;
     KEL.typ.ndataset(E_Address_Slim(__in,__cfg).Address_Type_Layout) Address_Type_;
     KEL.typ.nstr Source_;
-    KEL.typ.ndataset(B_Address_Slim_3(__in,__cfg).__ST81834_Layout) Address_N_A_I_C_S_List_;
-    KEL.typ.ndataset(B_Address_Slim_4(__in,__cfg).__ST81811_Layout) Address_N_I_A_C_S_High_Risk_Pre_;
-    KEL.typ.ndataset(B_Address_Slim_4(__in,__cfg).__ST81705_Layout) Address_S_I_C_High_Risk_Pre_;
-    KEL.typ.ndataset(B_Address_Slim_3(__in,__cfg).__ST81741_Layout) Address_S_I_C_List_;
+    KEL.typ.ndataset(B_Address_Slim_3(__in,__cfg).__ST81813_Layout) Address_N_A_I_C_S_List_;
+    KEL.typ.ndataset(B_Address_Slim_4(__in,__cfg).__ST81790_Layout) Address_N_I_A_C_S_High_Risk_Pre_;
+    KEL.typ.ndataset(B_Address_Slim_4(__in,__cfg).__ST81684_Layout) Address_S_I_C_High_Risk_Pre_;
+    KEL.typ.ndataset(B_Address_Slim_3(__in,__cfg).__ST81720_Layout) Address_S_I_C_List_;
     KEL.typ.ntyp(E_Address_Slim().Typ) U_I_D__1_;
     KEL.typ.ntyp(E_Input_P_I_I().Typ) O_N_L_Y___U_I_D_;
     KEL.typ.epoch Archive___Date_ := 0;
@@ -57,14 +57,14 @@ EXPORT B_Address_Slim_2(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CF
     KEL.typ.epoch Vault_Date_Last_Seen_ := 0;
     KEL.typ.int __RecordCount := 0;
   END;
-  __JC7002616(B_Address_Slim_3(__in,__cfg).__ST233283_Layout __EE7002526, __ST1303065_Layout __EE7002564) := __EEQP(__EE7002526.UID,__EE7002564.UID);
-  __ST1304269_Layout __JT7002616(B_Address_Slim_3(__in,__cfg).__ST233283_Layout __l, __ST1303065_Layout __r) := TRANSFORM
+  __JC6970809(B_Address_Slim_3(__in,__cfg).__ST233262_Layout __EE6970719, __ST1303044_Layout __EE6970757) := __EEQP(__EE6970719.UID,__EE6970757.UID);
+  __ST1304248_Layout __JT6970809(B_Address_Slim_3(__in,__cfg).__ST233262_Layout __l, __ST1303044_Layout __r) := TRANSFORM
     SELF.U_I_D__1_ := __r.UID;
     SELF := __l;
     SELF := __r;
   END;
-  SHARED __EE7002617 := JOIN(__EE7002526,__EE7002564,__JC7002616(LEFT,RIGHT),__JT7002616(LEFT,RIGHT),LEFT OUTER,SMART,KEEP(1));
-  EXPORT __ST214162_Layout := RECORD
+  SHARED __EE6970810 := JOIN(__EE6970719,__EE6970757,__JC6970809(LEFT,RIGHT),__JT6970809(LEFT,RIGHT),LEFT OUTER,SMART,KEEP(1));
+  EXPORT __ST214141_Layout := RECORD
     KEL.typ.nuid UID;
     KEL.typ.nstr Primary_Range_;
     KEL.typ.nstr Predirectional_;
@@ -75,10 +75,10 @@ EXPORT B_Address_Slim_2(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CF
     KEL.typ.ndataset(E_Address_Slim(__in,__cfg).High_Risk_Address_Layout) High_Risk_Address_;
     KEL.typ.ndataset(E_Address_Slim(__in,__cfg).Address_Type_Layout) Address_Type_;
     KEL.typ.nstr Source_;
-    KEL.typ.ndataset(B_Address_Slim_3(__in,__cfg).__ST81834_Layout) Address_N_A_I_C_S_List_;
-    KEL.typ.ndataset(B_Address_Slim_3(__in,__cfg).__ST81834_Layout) Address_N_A_I_C_S_Sorted_List_;
-    KEL.typ.ndataset(B_Address_Slim_3(__in,__cfg).__ST81741_Layout) Address_S_I_C_List_;
-    KEL.typ.ndataset(B_Address_Slim_3(__in,__cfg).__ST81741_Layout) Address_S_I_C_Sorted_List_;
+    KEL.typ.ndataset(B_Address_Slim_3(__in,__cfg).__ST81813_Layout) Address_N_A_I_C_S_List_;
+    KEL.typ.ndataset(B_Address_Slim_3(__in,__cfg).__ST81813_Layout) Address_N_A_I_C_S_Sorted_List_;
+    KEL.typ.ndataset(B_Address_Slim_3(__in,__cfg).__ST81720_Layout) Address_S_I_C_List_;
+    KEL.typ.ndataset(B_Address_Slim_3(__in,__cfg).__ST81720_Layout) Address_S_I_C_Sorted_List_;
     KEL.typ.ntyp(E_Input_P_I_I().Typ) P_I_I_;
     KEL.typ.epoch Archive___Date_ := 0;
     KEL.typ.epoch Date_First_Seen_ := 0;
@@ -87,17 +87,17 @@ EXPORT B_Address_Slim_2(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CF
     KEL.typ.epoch Vault_Date_Last_Seen_ := 0;
     KEL.typ.int __RecordCount := 0;
   END;
-  SHARED __ST214162_Layout __ND7002458__Project(__ST1304269_Layout __PP7002258) := TRANSFORM
-    __EE7002452 := __PP7002258.Address_N_A_I_C_S_List_;
-    __BS7002440 := __T(__EE7002452);
-    __EE7002456 := __BN(TOPN(__BS7002440(__NN(__T(__EE7002452).Address_N_A_I_C_S_Date_First_Seen_) AND __NN(__T(__EE7002452).Address_N_A_I_C_S_Date_Last_Seen_)),1000,__T(__T(__EE7002452).Address_N_A_I_C_S_Date_First_Seen_),__T(__T(__EE7002452).Address_N_A_I_C_S_Date_Last_Seen_),__T(High_Risk_N_A_I_C_S_)),__NL(__EE7002452));
-    SELF.Address_N_A_I_C_S_Sorted_List_ := __EE7002456;
-    __EE7002477 := __PP7002258.Address_S_I_C_List_;
-    __BS7002465 := __T(__EE7002477);
-    __EE7002481 := __BN(TOPN(__BS7002465(__NN(__T(__EE7002477).Address_S_I_C_Date_First_Seen_) AND __NN(__T(__EE7002477).Address_S_I_C_Date_Last_Seen_)),1000,__T(__T(__EE7002477).Address_S_I_C_Date_First_Seen_),__T(__T(__EE7002477).Address_S_I_C_Date_Last_Seen_),__T(High_Risk_S_I_C_)),__NL(__EE7002477));
-    SELF.Address_S_I_C_Sorted_List_ := __EE7002481;
-    SELF.P_I_I_ := __PP7002258.O_N_L_Y___U_I_D_;
-    SELF := __PP7002258;
+  SHARED __ST214141_Layout __ND6970651__Project(__ST1304248_Layout __PP6970451) := TRANSFORM
+    __EE6970645 := __PP6970451.Address_N_A_I_C_S_List_;
+    __BS6970633 := __T(__EE6970645);
+    __EE6970649 := __BN(TOPN(__BS6970633(__NN(__T(__EE6970645).Address_N_A_I_C_S_Date_First_Seen_) AND __NN(__T(__EE6970645).Address_N_A_I_C_S_Date_Last_Seen_)),1000,__T(__T(__EE6970645).Address_N_A_I_C_S_Date_First_Seen_),__T(__T(__EE6970645).Address_N_A_I_C_S_Date_Last_Seen_),__T(High_Risk_N_A_I_C_S_)),__NL(__EE6970645));
+    SELF.Address_N_A_I_C_S_Sorted_List_ := __EE6970649;
+    __EE6970670 := __PP6970451.Address_S_I_C_List_;
+    __BS6970658 := __T(__EE6970670);
+    __EE6970674 := __BN(TOPN(__BS6970658(__NN(__T(__EE6970670).Address_S_I_C_Date_First_Seen_) AND __NN(__T(__EE6970670).Address_S_I_C_Date_Last_Seen_)),1000,__T(__T(__EE6970670).Address_S_I_C_Date_First_Seen_),__T(__T(__EE6970670).Address_S_I_C_Date_Last_Seen_),__T(High_Risk_S_I_C_)),__NL(__EE6970670));
+    SELF.Address_S_I_C_Sorted_List_ := __EE6970674;
+    SELF.P_I_I_ := __PP6970451.O_N_L_Y___U_I_D_;
+    SELF := __PP6970451;
   END;
-  EXPORT __ENH_Address_Slim_2 := PROJECT(__EE7002617,__ND7002458__Project(LEFT));
+  EXPORT __ENH_Address_Slim_2 := PROJECT(__EE6970810,__ND6970651__Project(LEFT));
 END;
