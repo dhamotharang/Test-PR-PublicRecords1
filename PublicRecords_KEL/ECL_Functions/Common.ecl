@@ -45,6 +45,7 @@ EXPORT Common(PublicRecords_KEL.Interface_Options Options) := MODULE
 			 
 	EXPORT DoFDCJoin_dx_Header__key_did_hhid :=		
 			NOT Options.isFCRA AND
+			NOT Options.TurnOffHouseHolds AND
 			(Options.IncludeMini OR
 			Options.IncludeHouseholdMember OR
 			Options.IncludePerson OR
@@ -52,16 +53,10 @@ EXPORT Common(PublicRecords_KEL.Interface_Options Options) := MODULE
 	
 	EXPORT DoFDCJoin_Relatives__Key_Relatives_v3 := 
 		NOT Options.isFCRA AND	
-		NOT Options.isMarketing AND
+		NOT Options.TurnOffRelatives AND
 		(Options.IncludeMini OR
 		Options.IncludeFirstDegreeAssociations);
 
-	EXPORT DoFDCJoin_Marketing_Relatives__Key_Relatives_v3 := 
-		NOT Options.isFCRA AND	
-		Options.isMarketing AND
-		(Options.IncludeMini OR
-		Options.IncludeFirstDegreeAssociations);		
-	
 	EXPORT DoFDCJoin_Best_Person__Key_Watchdog :=
 			NOT Options.isFCRA AND
 			(Options.IncludeMini OR

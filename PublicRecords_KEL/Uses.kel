@@ -2892,28 +2892,6 @@ USE PublicRecords_KEL.ECL_Functions.Dataset_FDC(FDC,
 			Archive_Date = FORMAT('YYYYMMDD')archive_date),
 		PERMITS(DPMBitmap)),	
 		
-	Dataset_Relatives__Key_Marketing_Header_Relatives3( 
-		FirstDegreeAssociations(FILTER(Type IN ['PERSONAL', 'SSN ONLY', 'UCC', 'TRANS CLOSURE'] AND 
-								Personal = TRUE AND 
-								Business = FALSE AND 
-								Confidence = 'HIGH' AND 
-								((Title >= 1 AND Title < 43) OR (CoSourceCount > 1 AND CoSourceSum > 1 AND Title IN [43, 44]))),
-			DateFirstSeen = FORMAT('YYYYMMDD')rel_dt_first_seen, // Contains information for ASOF
-			DateLastSeen = FORMAT('YYYYMMDD')rel_dt_last_seen, // Contains information for ASOF
-			Subject = did1, 
-			FirstDegreeAssociation = did2, 
-			Title = title,
-			RelationshipType = type,
-			RelationshipConfidence = confidence,
-			RelationshipScore = total_score,
-			Generation = generation,
-			RelationshipDateFirstSeen = rel_dt_first_seen,
-			RelationshipDateLastSeen = rel_dt_last_seen,
-			Source = Src,
-			HybridArchiveDate = FORMAT('YYYYMMDD'),
-			Archive_Date = FORMAT('YYYYMMDD')archive_date),
-		PERMITS(DPMBitmap)),
-		
 	Dataset_BBB2__kfetch_BBB_LinkIds(
 		BusinessSele(
 			UltID = ultid,

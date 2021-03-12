@@ -9,6 +9,8 @@
 	<part name="GLBPurpose" type="xsd:integer"/>
 	<part name="DPPAPurpose" type="xsd:integer"/>
 	<part name="IsMarketing" type="xsd:boolean"/>
+	<part name="TurnOffHouseHolds" type="xsd:boolean"/>
+	<part name="TurnOffRelatives" type="xsd:boolean"/>
 	<part name="RetainInputLexid" type="xsd:boolean"/>
 	<part name="AppendPII" type="xsd:boolean"/>
 	<part name="IndustryClass" type="xsd:string"/>
@@ -38,6 +40,8 @@ EXPORT MAS_nonFCRA_Service() := MACRO
 		'DPPAPurpose',
 		'IndustryClass',
 		'IsMarketing',
+		'TurnOffHouseHolds',
+		'TurnOffRelatives',
 		'IncludeMinors',
 		'AllowedSourcesDataset',
 		'ExcludeSourcesDataset',
@@ -69,6 +73,8 @@ STRING100 Default_data_permission_mask := '';
 	UNSIGNED1 DPPA := 0 : STORED('DPPAPurpose');
 	#STORED('DPPAPurposeValue', DPPA);
 	BOOLEAN Is_Marketing := FALSE : STORED('IsMarketing');
+	BOOLEAN Turn_Off_HouseHolds := FALSE : STORED('TurnOffHouseHolds');
+	BOOLEAN Turn_Off_Relatives := FALSE : STORED('TurnOffRelatives');
 	BOOLEAN Include_Minors := TRUE : STORED('IncludeMinors');
 	STRING5 Industry_Class := Default_Industry_Class : STORED('IndustryClass');
 	AllowedSourcesDataset := DATASET([],PublicRecords_KEL.ECL_Functions.Constants.Layout_Allowed_Sources) : STORED('AllowedSourcesDataset');
@@ -130,6 +136,8 @@ STRING100 Default_data_permission_mask := '';
 		EXPORT UNSIGNED GLBAPurpose := GLBA;
 		EXPORT UNSIGNED DPPAPurpose := DPPA;
 		EXPORT BOOLEAN isMarketing := Is_Marketing; // When TRUE enables Marketing Restrictions
+		EXPORT BOOLEAN TurnOffRelatives := Turn_Off_Relatives; 
+		EXPORT BOOLEAN TurnOffHouseHolds := Turn_Off_HouseHolds;
 		EXPORT BOOLEAN IncludeMinors := Include_Minors; // When TRUE enables Marketing Restrictions
 		EXPORT DATASET(PublicRecords_KEL.ECL_Functions.Constants.Layout_Allowed_Sources) Allowed_Sources_Dataset := FinalAllowedSources;
 		EXPORT DATA57 KEL_Permissions_Mask := PublicRecords_KEL.ECL_Functions.Fn_KEL_DPMBitmap.Generate(

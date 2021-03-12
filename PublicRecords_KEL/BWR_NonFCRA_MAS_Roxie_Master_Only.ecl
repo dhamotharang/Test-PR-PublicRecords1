@@ -56,6 +56,12 @@ Output_Master_Results := TRUE;
 Output_SALT_Profile := FALSE;
 // Output_SALT_Profile := TRUE;
 
+
+// TurnOffHouseHolds := TRUE;
+TurnOffHouseHolds := FALSE;
+// TurnOffRelatives := TRUE;
+TurnOffRelatives := FALSE;
+
 // Use default list of allowed sources
 AllowedSourcesDataset := DATASET([],PublicRecords_KEL.ECL_Functions.Constants.Layout_Allowed_Sources);
 // Do not exclude any additional sources from allowed sources dataset.
@@ -171,6 +177,8 @@ soapLayout := RECORD
 	UNSIGNED1 DPPAPurpose;
 	BOOLEAN OutputMasterResults;
 	BOOLEAN IsMarketing;
+	BOOLEAN TurnOffHouseHolds;
+	BOOLEAN TurnOffRelatives;	
 	BOOLEAN IncludeMinors;
 	DATASET(PublicRecords_KEL.ECL_Functions.Constants.Layout_Allowed_Sources) AllowedSourcesDataset := DATASET([], PublicRecords_KEL.ECL_Functions.Constants.Layout_Allowed_Sources);
 	DATASET(PublicRecords_KEL.ECL_Functions.Constants.Layout_Allowed_Sources) ExcludeSourcesDataset := DATASET([], PublicRecords_KEL.ECL_Functions.Constants.Layout_Allowed_Sources);
@@ -234,6 +242,8 @@ soapLayout trans (pp le):= TRANSFORM
 	SELF.DPPAPurpose := Settings.DPPAPurpose;
 	SELF.IncludeMinors := Settings.IncludeMinors;
 	SELF.IsMarketing := FALSE;
+	SELF.TurnOffHouseHolds := TurnOffHouseHolds;
+	SELF.TurnOffRelatives := TurnOffRelatives;	
 	self.RetainInputLexid := Settings.RetainInputLexid;
 	self.appendpii := Settings.BestPIIAppend; //do not append best pii for running
 	SELF.AllowedSourcesDataset := AllowedSourcesDataset;

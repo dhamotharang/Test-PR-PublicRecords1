@@ -14,6 +14,8 @@
 	<part name="GLBPurpose" type="xsd:integer"/>
 	<part name="DPPAPurpose" type="xsd:integer"/>
 	<part name="IsMarketing" type="xsd:boolean"/>
+	<part name="TurnOffHouseHolds" type="xsd:boolean"/>
+	<part name="TurnOffRelatives" type="xsd:boolean"/>
 	<part name="AllowedSources" type="xsd:string"/>
 	<part name="IndustryClass" type="xsd:string"/>
 	<part name="AllowedSourcesDataset" type="tns:XmlDataSet" cols="100" rows="8"/>
@@ -48,6 +50,8 @@ EXPORT MAS_Business_nonFCRA_Service() := MACRO
         'DPPAPurpose',
         'IndustryClass',
         'IsMarketing',
+        'TurnOffHouseHolds',
+        'TurnOffRelatives',
         'IncludeMinors',
         'AllowedSources',
         'OverrideExperianRestriction',
@@ -90,6 +94,8 @@ BOOLEAN Default_IncludeMinors := TRUE;
 	BOOLEAN BIPAppend_Include_AuthRep := FALSE : STORED('BIPAppendIncludeAuthRep');
 	BOOLEAN BIPAppend_No_ReAppend := FALSE : STORED('BIPAppendNoReAppend');
 	BOOLEAN Is_Marketing := FALSE : STORED('IsMarketing');
+	BOOLEAN Turn_Off_HouseHolds := FALSE : STORED('TurnOffHouseHolds');
+	BOOLEAN Turn_Off_Relatives := FALSE : STORED('TurnOffRelatives');
 	// BOOLEAN Include_Minors := TRUE : STORED('IncludeMinors');
 	BOOLEAN Include_Minors := Default_IncludeMinors : STORED('IncludeMinors');
 	BOOLEAN OverrideExperianRestriction := FALSE : STORED('OverrideExperianRestriction');
@@ -146,6 +152,8 @@ BOOLEAN Default_IncludeMinors := TRUE;
 		EXPORT BOOLEAN ExcludeConsumerAttributes := Exclude_Consumer_Attributes;
 		EXPORT BOOLEAN OutputMasterResults := Output_Master_Results;
 		EXPORT BOOLEAN isMarketing := Is_Marketing; // When TRUE enables Marketing Restrictions
+		EXPORT BOOLEAN TurnOffRelatives := Turn_Off_Relatives; 
+		EXPORT BOOLEAN TurnOffHouseHolds := Turn_Off_HouseHolds; 
 		EXPORT BOOLEAN IncludeMinors := Include_Minors; // When TRUE enables Marketing Restrictions
 		EXPORT BOOLEAN Override_Experian_Restriction := OverrideExperianRestriction;
 		EXPORT STRING100 Allowed_Sources := AllowedSources;

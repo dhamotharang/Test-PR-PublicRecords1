@@ -23,7 +23,9 @@ EXPORT Interface_Options := INTERFACE
 	EXPORT BOOLEAN OutputMasterResults := FALSE;
 	EXPORT BOOLEAN IncludeMinors := TRUE;
 	EXPORT INTEGER upperage := 20;
-
+	EXPORT BOOLEAN TurnOffRelatives := FALSE;
+	EXPORT BOOLEAN TurnOffHouseHolds := FALSE;
+	
 	EXPORT DATASET(Gateway.Layouts.Config) Gateways := DATASET([], Gateway.Layouts.Config);
 	EXPORT BOOLEAN isBRM_Marketing := FALSE;
 

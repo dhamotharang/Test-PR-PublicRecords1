@@ -6,6 +6,8 @@
 	<part name="GLBPurpose" type="xsd:integer"/>
 	<part name="DPPAPurpose" type="xsd:integer"/>
 	<part name="IsMarketing" type="xsd:boolean"/>
+	<part name="TurnOffHouseHolds" type="xsd:boolean"/>
+	<part name="TurnOffRelatives" type="xsd:boolean"/>
 	<part name="AllowedSourcesDataset" type="tns:XmlDataSet" cols="100" rows="8"/>
 	<part name="ExcludeSourcesDataset" type="tns:XmlDataSet" cols="100" rows="8"/>
 	<part name="LexIdSourceOptout" type="xsd:integer"/>
@@ -66,6 +68,8 @@ export MAS_nonFCRA_FDC_Proddata_Service() := MACRO
 		'LexIdSourceOptout',
 		'ViewFDC',
 		'IsMarketing',
+		'TurnOffHouseHolds',
+		'TurnOffRelatives',
 		'IncludeAccident',
 		'IncludeAddress',
 		'IncludeAddressSummary',
@@ -133,6 +137,8 @@ export MAS_nonFCRA_FDC_Proddata_Service() := MACRO
 	UNSIGNED GLBA              := 1 : STORED('GLBA');
 	UNSIGNED DPPA              := 2 : STORED('DPPA');
 	BOOLEAN is_Marketing               := FALSE : STORED('IsMarketing');
+	BOOLEAN Turn_Off_Relatives               := FALSE : STORED('TurnOffRelatives');
+	BOOLEAN Turn_Off_HouseHolds               := FALSE : STORED('TurnOffHouseHolds');
 	BOOLEAN OverrideExperianRestriction := FALSE : STORED('OverrideExperianRestriction');
 	AllowedSourcesDataset := DATASET([],PublicRecords_KEL.ECL_Functions.Constants.Layout_Allowed_Sources) : STORED('AllowedSourcesDataset');
 	ExcludeSourcesDataset := DATASET([],PublicRecords_KEL.ECL_Functions.Constants.Layout_Allowed_Sources) : STORED('ExcludeSourcesDataset');
@@ -158,6 +164,8 @@ export MAS_nonFCRA_FDC_Proddata_Service() := MACRO
 		EXPORT INTEGER ScoreThreshold            := 80 : STORED('ScoreThreshold');
 		EXPORT BOOLEAN ExcludeConsumerShell      := FALSE;
 		EXPORT BOOLEAN isMarketing               := is_Marketing;
+		EXPORT BOOLEAN TurnOffRelatives := Turn_Off_Relatives; 
+		EXPORT BOOLEAN TurnOffHouseHolds := Turn_Off_HouseHolds;
 		EXPORT DATASET(PublicRecords_KEL.ECL_Functions.Constants.Layout_Allowed_Sources) Allowed_Sources_Dataset := FinalAllowedSources;
 		EXPORT DATA57 KEL_Permissions_Mask    := PublicRecords_KEL.ECL_Functions.Fn_KEL_DPMBitmap.Generate(
 				DataRestrictionMask, 
