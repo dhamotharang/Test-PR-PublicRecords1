@@ -1,4 +1,4 @@
-﻿import RoxieKeyBuild, tools, _control, Orbit3, FraudShared, standard,dops;
+﻿import RoxieKeyBuild, tools, _control, Orbit3, standard, dops;
 
 export Build_All(
                   string                           pversion,
@@ -23,7 +23,7 @@ export Build_All(
                   string  pFilenameErie            = 'FDN_ERIE_CF*txt', //FDN_ERIE_CF_YYYYMMDD.txt
                   string  pFilenameErieWatchList   = 'FDN_ERIE_WL*txt', //FDN_ERIE_WL_YYYYMMDD.txt
                   string  pGroupName               = _dataset().groupname,
-                  dataset(FraudShared.Layouts.Base.Main) pBaseMainFile            = IF(_Flags.Update.Main, FraudShared.Files().Base.Main.QA, DATASET([], FraudShared.Layouts.Base.Main)),
+                  dataset(Layouts.Base.Main) pBaseMainFile            = IF(_Flags.Update.Main, Files().Base.Main.QA, DATASET([], Layouts.Base.Main)),
                   dataset(Layouts.Base.SuspectIP)        pBaseSuspectIPFile       = IF(_Flags.Update.SuspectIP, Files().Base.SuspectIP.QA, DATASET([], Layouts.Base.SuspectIP)),
                   dataset(Layouts.Base.GLB5)             pBaseGLB5File            = IF(_Flags.Update.GLB5, Files().Base.GLB5.QA, DATASET([], Layouts.Base.GLB5)),
                   dataset(Layouts.Base.Tiger)            pBaseTigerFile           = IF(_Flags.Update.Tiger, Files().Base.Tiger.QA, DATASET([], Layouts.Base.Tiger)),
@@ -40,7 +40,7 @@ export Build_All(
                   dataset(Layouts.Input.Ainspection)     pUpdateAinspectionFile   = Files().Input.Ainspection.Sprayed,
                   dataset(Layouts.Input.Erie)            pUpdateErieFile          = Files().Input.Erie.Sprayed,
                   dataset(Layouts.Input.ErieWatchList)   pUpdateErieWatchListFile = Files().Input.ErieWatchList.Sprayed,
-                  dataset(FraudShared.Layouts.Base.Main) pBaseMainBuilt           = File_keybuild(FraudShared.Files(pversion).Base.Main.Built),
+                  dataset(Layouts.Base.Main) pBaseMainBuilt           = File_keybuild(Files(pversion).Base.Main.Built),
                    
                 //This below flag is to run full file or update append if pUpdateGLB5flag = false full file run and true runs update append of the base file
                   boolean pUpdateSuspectIPflag     = FraudDefenseNetwork._Flags.Update.SuspectIP,
@@ -69,12 +69,10 @@ export Build_All(
                                     pReplicate
                                   );
 
-//export dops_update := RoxieKeyBuild.updateversion('FDNKeys', pversion, _Control.MyInfo.EmailAddressNotify,,'N');
-
-  export sprayMBS_files := FraudShared.SprayMBSFiles(pServerIP, pDirectory, pversion := pversion);
+  export sprayMBS_files := SprayMBSFiles(pServerIP, pDirectory, pversion := pversion);
   export spray_fdn_files := parallel(sprayMBS_files, spray_files);
 
-shared base_portion := sequential(
+  shared base_portion := sequential(
                                    Create_Supers, spray_files, sprayMBS_files,
                                       Build_Base(
                                                   pversion,
@@ -121,25 +119,23 @@ export create_build := Orbit3.proc_Orbit3_CreateBuild ('FDN', pversion);
 
 export dops_update := dops.updateversion('FDNKeys',pversion, Email_Notification_Lists().Roxie,,'N');
 
-
-
   shared keys_portion := sequential(
-                                     FraudShared.Build_Keys(pversion, pBaseMainBuilt).All,
-                                     FraudShared.Build_AutoKeys(pversion, pBaseMainBuilt),
+                                     Build_Keys(pversion, pBaseMainBuilt).All,
+                                     Build_AutoKeys(pversion, pBaseMainBuilt),
                                      Promote().Inputfiles.Sprayed2Using,
                                      Promote().buildfiles.Built2QA,
                                      Promote().Inputfiles.Using2Used,
                                      Promote().Used2In,
                                      Promote().buildfiles.cleanup,
                                    //Promote Shared Files
-                                     FraudShared.Promote().Inputfiles.Sprayed2Using,
-                                     FraudShared.Promote().buildfiles.Built2QA,
-                                     FraudShared.Promote().Inputfiles.Using2Used,
-                                     FraudShared.Promote().buildfiles.cleanup,
+                                     Promote().Inputfiles.Sprayed2Using,
+                                     Promote().buildfiles.Built2QA,
+                                     Promote().Inputfiles.Using2Used,
+                                     Promote().buildfiles.cleanup,
                                      QA_Records(),
                                      Strata_Population_Stats(pversion, pIsTesting, pOverwrite, pBaseMainBuilt).All,
                                      create_build,
-							dops_update) : success(Send_Emails(pversion).BuildSuccess), failure(Send_Emails(pversion).BuildFailure
+							         dops_update) : success(Send_Emails(pversion).BuildSuccess), failure(Send_Emails(pversion).BuildFailure
                                    );
 
  export full_build := sequential(
@@ -181,18 +177,18 @@ export dops_update := dops.updateversion('FDNKeys',pversion, Email_Notification_
                                                  pBaseErieWatchListFile,
                                                  pUpdateErieWatchListFile,
                                                  pUpdateErieWatchListflag).All,
-                                                 FraudShared.Build_Keys(pversion, pBaseMainBuilt).All,
-                                                 FraudShared.Build_AutoKeys(pversion, pBaseMainBuilt),
+                                                 Build_Keys(pversion, pBaseMainBuilt).All,
+                                                 Build_AutoKeys(pversion, pBaseMainBuilt),
                                                  Promote().Inputfiles.Sprayed2Using,
                                                  Promote().buildfiles.Built2QA,
                                                  Promote().Inputfiles.Using2Used,
                                                  Promote().Used2In,
                                                  Promote().buildfiles.cleanup,
                                                //Promote Shared Files
-                                                 FraudShared.Promote().Inputfiles.Sprayed2Using,
-                                                 FraudShared.Promote().buildfiles.Built2QA,
-                                                 FraudShared.Promote().Inputfiles.Using2Used,
-                                                 FraudShared.Promote().buildfiles.cleanup,
+                                                 Promote().Inputfiles.Sprayed2Using,
+                                                 Promote().buildfiles.Built2QA,
+                                                 Promote().Inputfiles.Using2Used,
+                                                 Promote().buildfiles.cleanup,
                                                  QA_Records(),
                                                  Strata_Population_Stats(pversion, pIsTesting, pOverwrite, pBaseMainBuilt
                                                ).All
