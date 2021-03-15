@@ -459,8 +459,10 @@ EXPORT Records(eCrash_Services.IParam.searchrecords in_mod) := MODULE
 			// OUTPUT(debugMap,named('debugMap_PATH_CHOSEN'));
 			// END DEBUG ONLY -- COMMENT THIS SECTION *******************************************************
 			
-			recs_raw_all := eCrash_Services.Functions.FilterOutDeletedReports(recs_raw_all_with_deleted);				
+			recs_raw_all_0 := eCrash_Services.Functions.FilterOutDeletedReports(recs_raw_all_with_deleted);				
 			
+			recs_raw_all := eCrash_Services.Functions.filterOutTerminatedAgencyReports(recs_raw_all_0);
+
 			// penalize for NAME mismatches
 			recs_plus_pen := 
 					PROJECT(recs_raw_all,
