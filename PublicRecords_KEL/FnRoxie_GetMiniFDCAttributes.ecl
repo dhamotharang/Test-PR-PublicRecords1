@@ -7,7 +7,6 @@ EXPORT FnRoxie_GetMiniFDCAttributes(DATASET(PublicRecords_KEL.ECL_Functions.Layo
 			Boolean BestPIIAppend = FALSE) := FUNCTION
 
 	Common_Functions := PublicRecords_KEL.ECL_Functions.Common_Functions;
-	OptionsMini := PublicRecords_KEL.Interface_Mini_Options(Options);
 
 	Get_Lexids_FDC := table(FDCDataset.Dataset_Header__Key_Addr_Hist, {p_lexid, UIDAppend, G_ProcUID,
 															_count := count(group)}, p_lexid, UIDAppend, G_ProcUID, merge);
@@ -45,13 +44,13 @@ EXPORT FnRoxie_GetMiniFDCAttributes(DATASET(PublicRecords_KEL.ECL_Functions.Layo
 	
 	NonFCRAPersonAttributesRaw := NOCOMBINE(PROJECT(CleanInputs, TRANSFORM(LayoutNonFCRAPersonAttributes,
 		SELF.g_uid := LEFT.g_uid;
-		NonFCRAPersonResults := PublicRecords_KEL.Q_Non_F_C_R_A_Mini_Attributes_V1_Roxie_Dynamic(LEFT.ids , (INTEGER)(LEFT.P_InpClnArchDt[1..8]), OptionsMini.KEL_Permissions_Mask, FDCDataset).res0;	
+		NonFCRAPersonResults := PublicRecords_KEL.Q_Non_F_C_R_A_Mini_Attributes_V1_Roxie_Dynamic(LEFT.ids , (INTEGER)(LEFT.P_InpClnArchDt[1..8]), Options.KEL_Permissions_Mask, FDCDataset).res0;	
 		SELF.attributes := NonFCRAPersonResults;
 		SELF := [])));	
 
 	FCRAPersonAttributesRaw := NOCOMBINE(PROJECT(CleanInputs, TRANSFORM(LayoutFCRAPersonAttributes,
 		SELF.g_uid := LEFT.g_uid;
-		FCRAPersonResults := PublicRecords_KEL.Q_F_C_R_A_Mini_Attributes_V1_Roxie_Dynamic(LEFT.ids , (INTEGER)(LEFT.P_InpClnArchDt[1..8]), OptionsMini.KEL_Permissions_Mask, FDCDataset).res0;	
+		FCRAPersonResults := PublicRecords_KEL.Q_F_C_R_A_Mini_Attributes_V1_Roxie_Dynamic(LEFT.ids , (INTEGER)(LEFT.P_InpClnArchDt[1..8]), Options.KEL_Permissions_Mask, FDCDataset).res0;	
 		SELF.attributes := FCRAPersonResults;
 		SELF := [])));	
 			
@@ -80,7 +79,7 @@ EXPORT FnRoxie_GetMiniFDCAttributes(DATASET(PublicRecords_KEL.ECL_Functions.Layo
 	norm_FCRA := normalize(FCRAPersonAttributesRaw, left.attributes, Normalize_FinalFCRA(RIGHT,LEFT));
 	
 	
-	PersonAttributesClean := IF(OptionsMini.IsFCRA, 
+	PersonAttributesClean := IF(Options.IsFCRA, 
 															KEL.Clean(norm_FCRA, TRUE, TRUE, TRUE),
 															KEL.Clean(norm_nonFCRA, TRUE, TRUE, TRUE));	
 	

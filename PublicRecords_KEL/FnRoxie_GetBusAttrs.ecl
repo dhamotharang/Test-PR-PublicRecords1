@@ -53,12 +53,14 @@ EXPORT FnRoxie_GetBusAttrs(DATASET(PublicRecords_KEL.ECL_Functions.Input_Bus_Lay
 
 	CheckTDSPhone := PublicRecords_KEL.ECL_Functions.FnRoxie_Get_TDS_Phones(CheckTPMPhone);
 
-	// 'mini' fdc fetching is to gather address hist data from rank key on person then pass this to the rest of the FDC after creating prev/curr/emerging address related attributes 
-	OptionsMini := PublicRecords_KEL.Interface_Mini_Options(Options);
+//the mini FDC is used to gather information for attributes that will be needed for 'extra' searching in the FDC, like prev/curr address and best pii info.
+//if you need to add searching into a dataset that exists in the mini fdc you must also add that dataset into the mini fdc - i.e. header phone wild is used to search header so must be in the mini fdc
+//any dataset you add to the mini FDC must be re normalized into the FDC or we will lose that data 
+//all 6th rep data is calculated in the mini FDC 
+//overrides are also in the mini FDC
+	FDCDatasetMini := PublicRecords_KEL.Fn_MAS_FDC_Mini( RepsInput, Options, CheckTDSPhone);		
 
-	FDCDatasetMini := PublicRecords_KEL.Fn_MAS_FDC( RepsInput, OptionsMini, CheckTDSPhone);		
-
-	MiniAttributes := PublicRecords_KEL.FnRoxie_GetMiniFDCAttributes(RepsInput, FDCDatasetMini, OptionsMini, options.BestPIIAppend); 
+	MiniAttributes := PublicRecords_KEL.FnRoxie_GetMiniFDCAttributes(RepsInput, FDCDatasetMini, Options, options.BestPIIAppend); 
 
 	// At this time, only need to collect data for rep1 and not other reps. 
 	// If/when this changes all records from withRepLexIDs will need to be passed to Fn_MAS_FDC.
@@ -76,7 +78,7 @@ EXPORT FnRoxie_GetBusAttrs(DATASET(PublicRecords_KEL.ECL_Functions.Input_Bus_Lay
 	
 	//Rep1HighRiskAddressAttributes := PublicRecords_KEL.FnRoxie_GetHighRiskAddress(Rep1Input, Options, FDCDataset);
 	
-	// Rep6PersonAttributes :=  PublicRecords_KEL.FnRoxie_Get6thRepAttributes(MiniAttributes(RepNumber = 6), FDCDataset, Options);
+	// Rep6PersonAttributes :=  PublicRecords_KEL.FnRoxie_Get6thRepAttributes(MiniAttributes(RepNumber = 6), FDCDatasetMini, Options);//all of 6th rep fdc data is in mini fdc
 
 	// Join Consumer Results back in with business results
 	withRep1InputPII := JOIN(BusinessAttributes, Rep1InputPIIAttributes, LEFT.G_ProcBusUID = RIGHT.G_ProcBusUID,

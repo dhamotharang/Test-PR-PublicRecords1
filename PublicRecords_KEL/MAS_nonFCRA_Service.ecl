@@ -204,7 +204,6 @@ STRING100 Default_data_permission_mask := '';
 		EXPORT BOOLEAN IncludeWatercraft := TRUE;
 		EXPORT BOOLEAN IncludeZipCode := TRUE;
 		EXPORT BOOLEAN IncludeUCC := TRUE;
-		EXPORT BOOLEAN IncludeMini := TRUE;
 		EXPORT BOOLEAN IncludeOverrides := FALSE;
 
 	END;	

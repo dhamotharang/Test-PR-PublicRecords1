@@ -87,7 +87,6 @@ EXPORT Interface_Options := INTERFACE
 	EXPORT BOOLEAN IncludeZipCode := FALSE;
 	EXPORT BOOLEAN IncludeUCC := FALSE;
 	EXPORT BOOLEAN IncludeOverrides := FALSE;
-	EXPORT BOOLEAN IncludeMini := FALSE;
 	
 	// Performance options to turn ON/OFF ASSOCIATIONS in during FDC build. 
 	// By default, we'll check if their related ENTITIES are needed.

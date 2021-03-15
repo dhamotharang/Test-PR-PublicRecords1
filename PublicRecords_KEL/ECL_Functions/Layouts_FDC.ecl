@@ -1896,8 +1896,6 @@ SHARED Phone_Search_layout := BIPV2_Build.key_high_risk_industries.Phone_Search;
 	END;
 	
 	// ===================[ Composite Layout ]===================
-  
-
 	EXPORT Layout_FDC := RECORD
 		LayoutIDs_Inputs;
 //datasets in mini FDC
@@ -1913,8 +1911,8 @@ SHARED Phone_Search_layout := BIPV2_Build.key_high_risk_industries.Phone_Search;
 		DATASET(Layout_Doxie__Key_Header) Dataset_Doxie__Key_Header;		
 		DATASET(Layout_Header_Quick__Key_Did) Dataset_Header_Quick__Key_Did;	
 		DATASET(Layout_Header__Key_Addr_Hist) Dataset_Header__Key_Addr_Hist;	
-	
 		dataset(Layout_ConsumerStatementFlags) Dataset_ConsumerStatementFlags;
+
 
 //These are now in alphabetical order by PACKAGE NOT KEY.  please keep this in this order, if you are unsure where to put a key please check DOPS
 
