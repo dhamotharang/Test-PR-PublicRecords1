@@ -167,7 +167,6 @@ EXPORT MAS_FCRA_Service() := MACRO
 		EXPORT BOOLEAN IncludeWatercraft := TRUE;
 		EXPORT BOOLEAN IncludeZipCode := TRUE;
 		EXPORT BOOLEAN IncludeUCC := TRUE;
-		EXPORT BOOLEAN IncludeMini := TRUE;
 		EXPORT BOOLEAN IncludeOverrides := TRUE;
 		EXPORT BOOLEAN IncludeInferredPerformance := Allow_Inferred_Performance;
 

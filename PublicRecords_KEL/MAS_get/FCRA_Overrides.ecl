@@ -42,7 +42,7 @@ return If(date1 = '', datechooser(datevalue2), date1);
 	
 end;	
 
-EXPORT GetOverrideFlags(DATASET(PublicRecords_KEL.ECL_Functions.Layouts.LayoutInputPII) shell, BOOLEAN FDCMiniPop = TRUE) := function
+EXPORT GetOverrideFlags(DATASET(PublicRecords_KEL.ECL_Functions.Layouts.LayoutInputPII) shell) := function
 
 
 	PublicRecords_KEL.ECL_Functions.Layouts.LayoutInputPII_Overrides add_flags(PublicRecords_KEL.ECL_Functions.Layouts.LayoutInputPII_Overrides le, PublicRecords_KEL.ECL_Functions.Layouts.LayoutInputPII ri) := TRANSFORM
@@ -181,7 +181,7 @@ EXPORT GetOverrideFlags(DATASET(PublicRecords_KEL.ECL_Functions.Layouts.LayoutIn
 	
 		in_context := project(shell,transform(PublicRecords_KEL.ECL_Functions.Layouts.LayoutInputPII_Overrides, self := left; self :=[];));
 				
-		getPersonContext := if(options.isFCRA AND common.DoFDCJoin_Overrides AND FDCMiniPop, PublicRecords_KEL.MAS_get.checkPersonContext_MAS(GROUP(in_context,G_ProcUID), options.gateways, options.IntendedPurpose));
+		getPersonContext := if(options.isFCRA AND common.DoFDCJoin_Overrides, PublicRecords_KEL.MAS_get.checkPersonContext_MAS(GROUP(in_context,G_ProcUID), options.gateways, options.IntendedPurpose));
 		with_personcontext := ungroup(getPersonContext);
 		
 		final_FCRA := Join(with_personcontext, shell, 
@@ -189,7 +189,7 @@ EXPORT GetOverrideFlags(DATASET(PublicRecords_KEL.ECL_Functions.Layouts.LayoutIn
 						left.G_ProcUID = right.G_ProcUID,
 							add_flags (left,right), left outer);
 			
-	with_overrides := if((unsigned)shell[1].p_inpclnarchdt = (unsigned)(((string)risk_indicators.iid_constants.todaydate)[1..8]) and Options.isFCRA AND common.DoFDCJoin_Overrides, final_FCRA, PROJECT(shell, add_flags_blanks(LEFT)));
+	with_overrides := if((unsigned)shell[1].p_inpclnarchdt[1..8] = (unsigned)(((string)risk_indicators.iid_constants.todaydate)[1..8]) and Options.isFCRA AND common.DoFDCJoin_Overrides, final_FCRA, PROJECT(shell, add_flags_blanks(LEFT)));
 				
 	return with_overrides;	
 	

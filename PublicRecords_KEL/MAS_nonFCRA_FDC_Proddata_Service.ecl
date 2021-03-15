@@ -225,7 +225,6 @@ export MAS_nonFCRA_FDC_Proddata_Service() := MACRO
 		EXPORT BOOLEAN IncludeWatercraft := TRUE: STORED('IncludeWatercraft');
 		EXPORT BOOLEAN IncludeZipCode := TRUE: STORED('IncludeZipCode');
 		EXPORT BOOLEAN IncludeUCC := TRUE: STORED('IncludeUCC');
-		EXPORT BOOLEAN IncludeMini := TRUE: STORED('IncludeMini');
 	END;	
 
 	ds_input_bus := 
@@ -247,12 +246,10 @@ export MAS_nonFCRA_FDC_Proddata_Service() := MACRO
 	Rep1Input := withRepLexIDs(RepNumber = 1);
 
 	withBIPIDs := PublicRecords_KEL.ECL_Functions.Fn_AppendBIPIDs_Roxie( cleanBusiness, Rep1Input, Options );
-
-	OptionsMini := PublicRecords_KEL.Interface_Mini_Options(Options);
 	
-	FDCDatasetMini := PublicRecords_KEL.Fn_MAS_FDC( Rep1Input, OptionsMini, withBIPIDs);		
+	FDCDatasetMini := PublicRecords_KEL.Fn_MAS_FDC_Mini( Rep1Input, Options, withBIPIDs);		
 
-	MiniAttributes := PublicRecords_KEL.FnRoxie_GetMiniFDCAttributes(Rep1Input, FDCDatasetMini, OptionsMini, options.BestPIIAppend); 
+	MiniAttributes := PublicRecords_KEL.FnRoxie_GetMiniFDCAttributes(Rep1Input, FDCDatasetMini, Options, options.BestPIIAppend); 
 
 	FDCDataset := PublicRecords_KEL.Fn_MAS_FDC( MiniAttributes, Options,withBIPIDs,FDCDatasetMini );
 

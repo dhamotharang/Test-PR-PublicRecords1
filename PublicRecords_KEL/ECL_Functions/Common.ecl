@@ -11,7 +11,7 @@ EXPORT Common(PublicRecords_KEL.Interface_Options Options) := MODULE
 
 //IncludeMini
 	EXPORT DoFDCJoin_Doxie__Key_Header := 
-			Options.IncludeMini OR
+			
 			Options.IncludePerson OR 
 			Options.IncludePersonAddress OR 
 			Options.IncludePersonPhone OR 
@@ -22,14 +22,14 @@ EXPORT Common(PublicRecords_KEL.Interface_Options Options) := MODULE
 				
 	EXPORT DoFDCJoin_Quick_Header__key_wild_SSN := //quick header nonFCRA only
 			NOT Options.isFCRA AND
-			(Options.IncludeMini OR
+			(
 			Options.IncludePersonSSN OR 
 			Options.IncludeSocialSecurityNumber OR 
 			Options.IncludeSSNAddress OR
 			Options.IncludeSSNPhone);
 			
 	EXPORT DoFDCJoin_Dx_Header__key_wild_SSN := //header both
-			(Options.IncludeMini OR
+			(
 			Options.IncludePersonSSN OR 
 			Options.IncludeSocialSecurityNumber OR 
 			Options.IncludeSSNAddress OR
@@ -37,8 +37,7 @@ EXPORT Common(PublicRecords_KEL.Interface_Options Options) := MODULE
 			
 	EXPORT DoFDCJoin_Dx_Header__key_wild_phone := //header both
 			NOT Options.isFCRA AND
-			(Options.IncludeMini OR
-			Options.IncludePersonPhone OR 
+			(Options.IncludePersonPhone OR 
 			Options.IncludePhone OR 
 			Options.IncludeAddressPhone OR
 			Options.IncludeSSNPhone);
@@ -46,7 +45,7 @@ EXPORT Common(PublicRecords_KEL.Interface_Options Options) := MODULE
 	EXPORT DoFDCJoin_dx_Header__key_did_hhid :=		
 			NOT Options.isFCRA AND
 			NOT Options.TurnOffHouseHolds AND
-			(Options.IncludeMini OR
+			(
 			Options.IncludeHouseholdMember OR
 			Options.IncludePerson OR
 			Options.IncludeHousehold);	
@@ -54,12 +53,13 @@ EXPORT Common(PublicRecords_KEL.Interface_Options Options) := MODULE
 	EXPORT DoFDCJoin_Relatives__Key_Relatives_v3 := 
 		NOT Options.isFCRA AND	
 		NOT Options.TurnOffRelatives AND
-		(Options.IncludeMini OR
+		(
 		Options.IncludeFirstDegreeAssociations);
 
+	
 	EXPORT DoFDCJoin_Best_Person__Key_Watchdog :=
 			NOT Options.isFCRA AND
-			(Options.IncludeMini OR
+			(
 			Options.IncludePerson OR
 			 Options.IncludePersonSSN OR 
 			 Options.IncludePersonPhone);
@@ -69,7 +69,7 @@ EXPORT Common(PublicRecords_KEL.Interface_Options Options) := MODULE
 	EXPORT DoFDCJoin_Best_Person__Key_Watchdog_FCRA_nonEN :=
 			Options.isFCRA AND
 			Options.Data_Restriction_Mask[Risk_Indicators.iid_constants.posEquifaxRestriction] <> '1' AND //lets not put more ssns through the inq keys than we need too
-			(Options.IncludeMini OR
+			(
 			Options.IncludePerson OR
 			 Options.IncludePersonSSN OR 
 			 Options.IncludePersonPhone);
@@ -79,13 +79,13 @@ EXPORT Common(PublicRecords_KEL.Interface_Options Options) := MODULE
 	EXPORT DoFDCJoin_Best_Person__Key_Watchdog_FCRA_nonEQ :=
 			Options.isFCRA AND
 			Options.Data_Restriction_Mask[Risk_Indicators.iid_constants.posEquifaxRestriction] = '1' AND //lets not put more ssns through the inq keys than we need too
-			(Options.IncludeMini OR
+			(
 			Options.IncludePerson OR
 			 Options.IncludePersonSSN OR 
 			 Options.IncludePersonPhone);			
 
 	EXPORT DoFDCJoin_Header__Key_Addr_Hist := 
-		Options.IncludeMini OR
+		
 		Options.IncludePerson OR
 		Options.IncludePersonAddress OR
 		Options.IncludeZipCodePerson;
@@ -93,7 +93,7 @@ EXPORT Common(PublicRecords_KEL.Interface_Options Options) := MODULE
 	
 	EXPORT DoFDCJoin_BIPV2_Build__kfetch_contact_linkids :=
 		NOT Options.isFCRA AND
-	  (Options.IncludeMini OR
+	  (
 		 Options.IncludeBusinessProx OR
 		 Options.IncludeProxPerson OR
 		 Options.IncludeSelePerson OR
@@ -102,14 +102,14 @@ EXPORT Common(PublicRecords_KEL.Interface_Options Options) := MODULE
 		 
 	EXPORT DoFDCJoin_Header__key_ADL_segmentation :=
 			NOT Options.isFCRA AND
-			(Options.IncludeMini OR
+			(
 			Options.IncludePerson);		 
 		 
 //end of mini section	
 	
 	EXPORT DoFDCJoinfn_IndexedSearchForXLinkIDs	:= 
 			NOT Options.isFCRA AND
-			 (Options.IncludeMini OR
+			 (
 			 Options.IncludeBusinessSele OR
 			 Options.IncludeBusinessProx OR
 			 Options.IncludeProxPerson OR 

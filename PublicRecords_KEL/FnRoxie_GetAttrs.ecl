@@ -15,12 +15,15 @@ EXPORT FnRoxie_GetAttrs(DATASET(PublicRecords_KEL.ECL_Functions.Input_Layout) In
 	VerifiedInputPII := verifiedInputPIIPre(PullIDFlag = False);
 	pullidlexids := verifiedInputPIIPre(PullIDFlag = true);
 	
-	// 'mini' fdc fetching is to gather address hist data from rank key then pass this to the rest of the FDC after creating prev/curr/emerging address related attributes 
-	OptionsMini := PublicRecords_KEL.Interface_Mini_Options(Options);
 
-	FDCDatasetMini := PublicRecords_KEL.Fn_MAS_FDC( VerifiedInputPII, OptionsMini);		
+//the mini FDC is used to gather information for attributes that will be needed for 'extra' searching in the FDC, like prev/curr address and best pii info.
+//if you need to add searching into a dataset that exists in the mini fdc you must also add that dataset into the mini fdc - i.e. header phone wild is used to search header so must be in the mini fdc
+//any dataset you add to the mini FDC must be re normalized into the FDC or we will lose that data 
+//overrides are also in the mini FDC
+//options.BestPIIAppend must call mini FDC
+	FDCDatasetMini := PublicRecords_KEL.Fn_MAS_FDC_Mini( VerifiedInputPII, Options);		
 
-	MiniAttributes := PublicRecords_KEL.FnRoxie_GetMiniFDCAttributes(VerifiedInputPII, FDCDatasetMini, OptionsMini, options.BestPIIAppend); 
+	MiniAttributes := PublicRecords_KEL.FnRoxie_GetMiniFDCAttributes(VerifiedInputPII, FDCDatasetMini, Options, options.BestPIIAppend); 
 
 	FDCDataset := PublicRecords_KEL.Fn_MAS_FDC( MiniAttributes, Options , DATASET([], PublicRecords_KEL.ECL_Functions.Layouts.LayoutInputBII) ,FDCDatasetMini);
 
