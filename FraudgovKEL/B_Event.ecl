@@ -33806,7 +33806,7 @@ EXPORT B_Event := MODULE
     SELF.P15___Aot_Ssn_New_Kr_Aft_Id_Act_Cnt_Ev_ := MAP(__PP4144868.T15___Ssn_Pop_Flag_ = 0=> -99999,__PP4144868.T___Src_Class_Type_ < 2 OR __PP4144868.P15___Aot_Ssn_Kr_Act_Flag_Ev_ < 1=> -99998,__T(__OP2(__PP4144868.P15___Aot_Ssn_Kr_Act_New_Dt_Ev_,<,__CN(0)))=> -99997,__PP4144868.Aot_Ssn_New_Kr_Aft_Id_Act_Cnt_Ev_);
     SELF.P15___Aot_Ssn_New_Kr_Aft_Non_St_Act_Cnt_Ev_ := MAP(__PP4144868.T15___Ssn_Pop_Flag_ = 0=> -99999,__PP4144868.T___Src_Class_Type_ < 2 OR __PP4144868.P15___Aot_Ssn_Kr_Act_Flag_Ev_ < 1=> -99998,__T(__OP2(__PP4144868.P15___Aot_Ssn_Kr_Act_New_Dt_Ev_,<,__CN(0)))=> -99997,__PP4144868.Aot_Ssn_New_Kr_Aft_Non_St_Act_Cnt_Ev_);
     SELF.P15___I_D_Act_Old_Dt_ := MAP(__PP4144868.T15___Ssn_Pop_Flag_ = 0=>__ECAST(KEL.typ.nint,__CN(-99999)),__PP4144868.T___Src_Class_Type_ < 2 OR __PP4144868.P15___Aot_Id_Act_Cnt_Ev_ = 0=>__ECAST(KEL.typ.nint,__CN(-99998)),__ECAST(KEL.typ.nint,__PP4144868.M_I_N___Exp1__19_));
-    SELF.P15___Ssn_Risk_Unscrble_Flag_ := 1;
+    SELF.P15___Ssn_Risk_Unscrble_Flag_ := MAP(__PP4144868.T15___Ssn_Pop_Flag_ = 0 OR __PP4144868.T___Src_Class_Type_ < 2=>1,0);
     SELF.P16___Ao_T_Phn_K_R_Act_In_Agcy_New_Dt_Ev_ := MAP(__PP4144868.T16___Phn_Pop_Flag_ = 0=>__ECAST(KEL.typ.nint,__CN(-99999)),__PP4144868.T___Src_Class_Type_ < 2 OR __PP4144868.P16___Aot_Phn_Kr_Act_In_Agcy_Flag_Ev_ = 0=>__ECAST(KEL.typ.nint,__CN(-99998)), NOT (__PP4144868.C_O_U_N_T___Event__94_ <> 0)=>__ECAST(KEL.typ.nint,__CN(-99997)),__ECAST(KEL.typ.nint,__PP4144868.M_A_X___Exp1__10_));
     SELF.P16___Aot_Act_Cnt_Ev_ := __PP4144868.Aot_Act_Cnt_Ev__2_;
     SELF.P16___Aot_Add_Act_Cnt30_D_ := MAP(__PP4144868.T16___Phn_Pop_Flag_ = 0=> -99999,__PP4144868.T___Src_Class_Type_ < 2=> -99998,__PP4144868.Aot_Add_Act_Cnt30_D__2_);
@@ -33842,7 +33842,7 @@ EXPORT B_Event := MODULE
     SELF.P16___Aot_Phn_Safe_Act_Old_Dt_Ev_ := MAP(__PP4144868.T16___Phn_Pop_Flag_ = 0=>__ECAST(KEL.typ.nint,__CN(-99999)),__PP4144868.T___Src_Class_Type_ < 2 OR __PP4144868.P16___Aot_Phn_Safe_Act_Flag_Ev_ = 0=>__ECAST(KEL.typ.nint,__CN(-99998)), NOT (__PP4144868.C_O_U_N_T___Event__105_ <> 0)=>__ECAST(KEL.typ.nint,__CN(-99997)),__ECAST(KEL.typ.nint,__ECAST(KEL.typ.nint,__PP4144868.Aot_Phn_Safe_Act_Old_Dt_Ev_)));
     SELF.P16___Aot_Src1_Act_Cnt_Ev_ := __PP4144868.Aot_Src1_Act_Cnt_Ev__2_;
     SELF.P16___I_D_Act_Old_Dt_ := MAP(__PP4144868.T16___Phn_Pop_Flag_ = 0=>__ECAST(KEL.typ.nint,__CN(-99999)),__PP4144868.T___Src_Class_Type_ < 2 OR __PP4144868.P16___Aot_Id_Act_Cnt_Ev_ = 0=>__ECAST(KEL.typ.nint,__CN(-99998)),__ECAST(KEL.typ.nint,__PP4144868.M_I_N___Exp1__17_));
-    SELF.P16___Phn_Risk_Unscrble_Flag_ := 1;
+    SELF.P16___Phn_Risk_Unscrble_Flag_ := MAP(__PP4144868.T16___Phn_Pop_Flag_ = 0 OR __PP4144868.T___Src_Class_Type_ < 2=>1,0);
     __EE4148323 := __PP4144868.Not_In_Agengy_Email_Is_Kr_Flag_;
     __BS4148327 := __T(__EE4148323);
     __EE4148335 := __BN(TOPN(__BS4148327(__NN(__T(__EE4148323).T___Act_Dt_Echo_)),1, -__T(__T(__EE4148323).T___Act_Dt_Echo_),__T(T___Src_Agency_Desc_)),__NL(__EE4148323));
@@ -33875,7 +33875,7 @@ EXPORT B_Event := MODULE
     SELF.P17___Aot_Non_St_Act_Cnt30_D_ := MAP(__PP4144868.T17___Email_Pop_Flag_ = 0=> -99999,__PP4144868.T___Src_Class_Type_ < 2=> -99998,__PP4144868.Aot_Non_St_Act_Cnt30_D__4_);
     SELF.P17___Aot_Non_St_Act_Cnt_Ev_ := MAP(__PP4144868.T17___Email_Pop_Flag_ = 0=> -99999,__PP4144868.T___Src_Class_Type_ < 2=> -99998,__PP4144868.Aot_Non_St_Act_Cnt_Ev__4_);
     SELF.P17___Aot_Src1_Act_Cnt_Ev_ := __PP4144868.Aot_Src1_Act_Cnt_Ev__4_;
-    SELF.P17___Email_Risk_Unscrble_Flag_ := 1;
+    SELF.P17___Email_Risk_Unscrble_Flag_ := MAP(__PP4144868.T17___Email_Pop_Flag_ = 0 OR __PP4144868.T___Src_Class_Type_ < 2=>1,0);
     SELF.P17___I_D_Act_Old_Dt_ := MAP(__PP4144868.T17___Email_Pop_Flag_ = 0=>__ECAST(KEL.typ.nint,__CN(-99999)),__PP4144868.T___Src_Class_Type_ < 2 OR __PP4144868.P17___Aot_Id_Act_Cnt_Ev_ = 0=>__ECAST(KEL.typ.nint,__CN(-99998)),__ECAST(KEL.typ.nint,__PP4144868.M_I_N___Exp1__15_));
     __EE4148678 := __PP4144868.Not_In_Agengy_Ip_Addr_Is_Kr_Flag_;
     __BS4148682 := __T(__EE4148678);
@@ -33912,7 +33912,7 @@ EXPORT B_Event := MODULE
     SELF.P18___Aot_Non_St_Act_Cnt_Ev_ := MAP(__PP4144868.T18___Ip_Addr_Pop_Flag_ = 0=> -99999,__PP4144868.T___Src_Class_Type_ < 2=> -99998,__PP4144868.Aot_Non_St_Act_Cnt_Ev__3_);
     SELF.P18___Aot_Src1_Act_Cnt_Ev_ := __PP4144868.Aot_Src1_Act_Cnt_Ev__3_;
     SELF.P18___I_D_Act_Old_Dt_ := MAP(__PP4144868.T18___Ip_Addr_Pop_Flag_ = 0=>__ECAST(KEL.typ.nint,__CN(-99999)),__PP4144868.T___Src_Class_Type_ < 2 OR __PP4144868.P18___Aot_Id_Act_Cnt_Ev_ = 0=>__ECAST(KEL.typ.nint,__CN(-99998)),__ECAST(KEL.typ.nint,__PP4144868.M_I_N___Exp1__13_));
-    SELF.P18___Ip_Addr_Risk_Unscrble_Flag_ := 1;
+    SELF.P18___Ip_Addr_Risk_Unscrble_Flag_ := MAP(__PP4144868.T18___Ip_Addr_Pop_Flag_ = 0 OR __PP4144868.T___Src_Class_Type_ < 2=>1,0);
     __EE4149079 := __PP4144868.Not_In_Agengy_Bnk_Acct_Is_Kr_Flag_;
     __BS4149083 := __T(__EE4149079);
     __EE4149091 := __BN(TOPN(__BS4149083(__NN(__T(__EE4149079).T___Act_Dt_Echo_)),1, -__T(__T(__EE4149079).T___Act_Dt_Echo_),__T(T___Src_Agency_Desc_)),__NL(__EE4149079));
@@ -33945,7 +33945,7 @@ EXPORT B_Event := MODULE
     SELF.P19___Aot_Non_St_Act_Cnt30_D_ := MAP(__PP4144868.T19___Bnk_Acct_Pop_Flag_ = 0=> -99999,__PP4144868.T___Src_Class_Type_ < 2=> -99998,__PP4144868.Aot_Non_St_Act_Cnt30_D__6_);
     SELF.P19___Aot_Non_St_Act_Cnt_Ev_ := MAP(__PP4144868.T19___Bnk_Acct_Pop_Flag_ = 0=> -99999,__PP4144868.T___Src_Class_Type_ < 2=> -99998,__PP4144868.Aot_Non_St_Act_Cnt_Ev__6_);
     SELF.P19___Aot_Src1_Act_Cnt_Ev_ := __PP4144868.Aot_Src1_Act_Cnt_Ev__6_;
-    SELF.P19___Bnk_Acct_Risk_Unscrble_Flag_ := 1;
+    SELF.P19___Bnk_Acct_Risk_Unscrble_Flag_ := MAP(__PP4144868.T19___Bnk_Acct_Pop_Flag_ = 0 OR __PP4144868.T___Src_Class_Type_ < 2=>1,0);
     SELF.P19___I_D_Act_Old_Dt_ := MAP(__PP4144868.T19___Bnk_Acct_Pop_Flag_ = 0=>__ECAST(KEL.typ.nint,__CN(-99999)),__PP4144868.T___Src_Class_Type_ < 2 OR __PP4144868.P19___Aot_Id_Act_Cnt_Ev_ = 0=>__ECAST(KEL.typ.nint,__CN(-99998)),__ECAST(KEL.typ.nint,__PP4144868.M_I_N___Exp1__11_));
     SELF.P1___Ao_T_Add_Act_Cnt30_D_ := MAP(__PP4144868.T1___Lex_Id_Pop_Flag_ = 0 AND __PP4144868.T1___Rin_Id_Pop_Flag_ = 0=> -99999,__PP4144868.T___Src_Class_Type_ < 2=> -99998,__PP4144868.Aot_Add_Act_Cnt30_D__1_);
     SELF.P1___Aot_Act_Cnt_Ev_ := __PP4144868.Aot_Act_Cnt_Ev__1_;
@@ -34085,9 +34085,9 @@ EXPORT B_Event := MODULE
     SELF.P20___Aot_Non_St_Act_Cnt30_D_ := MAP(__PP4144868.T20___Dl_Pop_Flag_ = 0=> -99999,__PP4144868.T___Src_Class_Type_ < 2=> -99998,__PP4144868.Aot_Non_St_Act_Cnt30_D__5_);
     SELF.P20___Aot_Non_St_Act_Cnt_Ev_ := MAP(__PP4144868.T20___Dl_Pop_Flag_ = 0=> -99999,__PP4144868.T___Src_Class_Type_ < 2=> -99998,__PP4144868.Aot_Non_St_Act_Cnt_Ev__5_);
     SELF.P20___Aot_Src1_Act_Cnt_Ev_ := __PP4144868.Aot_Src1_Act_Cnt_Ev__5_;
-    SELF.P20___Dl_Risk_Unscrble_Flag_ := 1;
+    SELF.P20___Dl_Risk_Unscrble_Flag_ := MAP(__PP4144868.T20___Dl_Pop_Flag_ = 0 OR __PP4144868.T___Src_Class_Type_ < 2=>1,0);
     SELF.P20___I_D_Act_Old_Dt_ := MAP(__PP4144868.T20___Dl_Pop_Flag_ = 0=>__ECAST(KEL.typ.nint,__CN(-99999)),__PP4144868.T___Src_Class_Type_ < 2 OR __PP4144868.P20___Aot_Id_Act_Cnt_Ev_ = 0=>__ECAST(KEL.typ.nint,__CN(-99998)),__ECAST(KEL.typ.nint,__PP4144868.M_I_N___Exp1__3_));
-    SELF.P9___Addr_Risk_Unscrble_Flag_ := 1;
+    SELF.P9___Addr_Risk_Unscrble_Flag_ := MAP(__PP4144868.T9___Addr_Pop_Flag_ = 0 OR __PP4144868.T___Src_Class_Type_ < 2=>1,0);
     SELF.P9___Ao_T_Add_Act_Cnt_Ev_ := MAP(__PP4144868.T9___Addr_Pop_Flag_ = 0=> -99999,__PP4144868.T___Src_Class_Type_ < 2=> -99998,__PP4144868.Ao_T_Add_Act_Cnt_Ev_);
     SELF.P9___Ao_T_Addr_K_R_Act_In_Agcy_New_Dt_Ev_ := MAP(__PP4144868.T9___Addr_Pop_Flag_ = 0=>__ECAST(KEL.typ.nint,__CN(-99999)),__PP4144868.T___Src_Class_Type_ < 2 OR __PP4144868.P9___Aot_Addr_Kr_Act_In_Agcy_Flag_Ev_ = 0=>__ECAST(KEL.typ.nint,__CN(-99998)), NOT (__PP4144868.C_O_U_N_T___Event_ <> 0)=>__ECAST(KEL.typ.nint,__CN(-99997)),__ECAST(KEL.typ.nint,__PP4144868.M_A_X___Exp1_));
     SELF.P9___Ao_T_Addr_K_R_Act_In_Agcy_Old_Dt_Ev_ := MAP(__PP4144868.T9___Addr_Pop_Flag_ = 0=>__ECAST(KEL.typ.nint,__CN(-99999)),__PP4144868.T___Src_Class_Type_ < 2 OR __PP4144868.P9___Aot_Addr_Kr_Act_In_Agcy_Flag_Ev_ = 0=>__ECAST(KEL.typ.nint,__CN(-99998)), NOT (__PP4144868.C_O_U_N_T___Event__1_ <> 0)=>__ECAST(KEL.typ.nint,__CN(-99997)),__ECAST(KEL.typ.nint,__PP4144868.M_I_N___Exp1_));
