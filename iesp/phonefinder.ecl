@@ -188,6 +188,7 @@ export t_BasePhoneInfo := record
 	dataset(t_PhoneFinderSourceIndicator) SourceDetails {xpath('SourceDetails/SourceDetail'), MAXCOUNT(iesp.Constants.Phone_Finder.MaxSources)};
 	boolean SelfReportedSourcesOnly {xpath('SelfReportedSourcesOnly')};
 	integer TotalSourceCount {xpath('TotalSourceCount')};
+	string PhoneStarRating {xpath('PhoneStarRating')};
 end;
 		
 export t_PhoneFinderInfo := record (t_BasePhoneInfo)
