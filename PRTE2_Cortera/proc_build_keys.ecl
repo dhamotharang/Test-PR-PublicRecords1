@@ -61,8 +61,7 @@ RoxieKeyBuild.MAC_SK_Move_v2(constants.key_prefix + '@version@::linkids',
   NoUpdate           := OUTPUT('Skipping DOPS update because we are not in PROD');
   updatedops         := PRTE.UpdateVersion('CorteraKeys', filedate, _control.MyInfo.EmailAddressNormal, l_inloc:='B',l_inenvment:='N',l_includeboolean := 'N');
   PerformUpdateOrNot := IF(is_running_in_prod, updatedops, NoUpdate);
-  orbit_update       := Orbit3.proc_Orbit3_CreateBuild ('PRTE - Cortera',filedate);
-
+ 
  key_validations :=  output(dops.ValidatePRCTFileLayout(filedate, prte2.Constants.ipaddr_prod, prte2.Constants.ipaddr_roxie_nonfcra,Constants.dops_name, 'N'), named(Constants.dops_name+'Validation'));
                  
 
@@ -89,10 +88,10 @@ RoxieKeyBuild.MAC_SK_Move_v2(constants.key_prefix + '@version@::linkids',
 																move_qa_key_cortera_exec_key)
 																,
                        
-                       //Update DOPs         
-                               PerformUpdateOrNot,
-															 key_validations,
-                               orbit_update
+                            proc_build_empty_keys(filedate),                            
+														key_validations,                            
+														PerformUpdateOrNot,
+												    build_orbit(filedate)
 															 );
 
 END;
