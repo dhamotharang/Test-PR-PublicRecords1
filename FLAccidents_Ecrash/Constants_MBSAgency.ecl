@@ -57,5 +57,12 @@ EXPORT Constants_MBSAgency := MODULE
    EXPORT UNSIGNED1 EMAIL_TYPE_SUCCESS := 0;
    EXPORT UNSIGNED1 EMAIL_TYPE_FAILURE := 1;
    EXPORT UNSIGNED1 EMAIL_TYPE_BILLING := 2;
+	 
+// ###########################################################################
+//                   MBS Date Defaults
+// ###########################################################################	 
+	 EXPORT UNSIGNED4 DEFAULT_SOURCE_START_DATE := 20000101;
+	 EXPORT UNSIGNED4 DEFAULT_SOURCE_END_DATE := 99991231;
+	 EXPORT UNSIGNED4 DEFAULT_SOURCE_TERMINATION_DATE := 99991231;
 	
 END;

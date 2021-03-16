@@ -152,9 +152,23 @@ end;
                       AccountMonitoring.product_files.litigiousdebtor.litigiousdebtor_superkey_monitor, //(monitor::litigiousdebtor::courtid_docket)
                       AccountMonitoring.types.productMask.litigiousdebtor
                     }
+                    ,{
+                      AccountMonitoring.product_files.foreclosure.Foreclosure_fid_superfile, //(thor_data400::key::foreclosure_fid_qa)
+                      AccountMonitoring.product_files.foreclosure.Foreclosure_fid_superkey_monitor, //(monitor::foreclosure::foreclosure_fid)
+                      AccountMonitoring.types.productMask.foreclosure 
+                    }
+                    ,{
+                      AccountMonitoring.product_files.foreclosure.NOD_fid_superfile, //(thor_data400::key::nod::qa::fid)
+                      AccountMonitoring.product_files.foreclosure.NOD_fid_superkey_monitor, //(monitor::foreclosure::NOD_fid)
+                      AccountMonitoring.types.productMask.foreclosure 
+                    }
+                    ,{
+                      AccountMonitoring.product_files.foreclosure.Foreclosure_delta_rid_superfile, //(thor_data400::key::foreclosure::qa::delta_rid)
+                      AccountMonitoring.product_files.foreclosure.Foreclosure_delta_rid_superkey_monitor, //(monitor::foreclosure::delta_rid)
+                      AccountMonitoring.types.productMask.foreclosure 
+                    }
             ],AccountMonitoring.layouts.UPDATE_SOURCE.roxie_monitor_superfile_layout);
-                         
-                              
+
    SuperfilesReturn := if(GetAll,Superfiles,Superfiles(AccountMonitoring.types.testPMBits(product_mask_supported, product_mask)));
   return(SuperfilesReturn);
 end;

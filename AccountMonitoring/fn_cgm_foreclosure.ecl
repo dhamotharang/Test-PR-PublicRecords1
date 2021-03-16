@@ -1,5 +1,4 @@
-﻿
-IMPORT BatchServices, Header;
+﻿IMPORT $, dx_common;
 
 EXPORT DATASET(layouts.history) fn_cgm_foreclosure(
 		DATASET(AccountMonitoring.layouts.portfolio.base) in_portfolio,
@@ -9,7 +8,8 @@ EXPORT DATASET(layouts.history) fn_cgm_foreclosure(
 	FUNCTION
 		
 		// Assign base file(s). See block comment far below for layout definition.																								
-		base_file := product_files.foreclosure.base_file_slim;		
+		Foreclosure_fid_monitor_file := $.product_files.foreclosure.key_Foreclosure_fid_dist;		
+		NOD_fid_monitor_file := $.product_files.foreclosure.key_NOD_fid_dist;
 		
 		// Temporary Join Layout
 		temp_layout := record
@@ -32,12 +32,40 @@ EXPORT DATASET(layouts.history) fn_cgm_foreclosure(
 			string3  document_type;
 			unsigned6 did;
 			unsigned6 bdid;
+			dx_common.layout_ridkey;
 		end;
 
 		// Pivot on DID
 		temp_port_dist_1 := distribute(in_portfolio(did != 0),hash64(did));
-		temp_base_dist_1 := distribute(base_file(name1_did != ''),hash64(name1_did));
-		temp_join_1 := join(temp_port_dist_1,temp_base_dist_1,
+		temp_foreclosure_dist_1 := distribute(Foreclosure_fid_monitor_file(name1_did != ''),hash64(name1_did));
+		temp_NOD_dist_1 := distribute(NOD_fid_monitor_file(name1_did != ''),hash64(name1_did));
+
+		temp_join_1_did := join(temp_port_dist_1,temp_foreclosure_dist_1,
+			left.did = (unsigned6)right.name1_did,
+			transform(temp_layout,
+				self.pid            := left.pid,
+				self.rid            := left.rid,
+				self.hid            := 0,
+				self.foreclosure_id := RIGHT.foreclosure_id;
+				self.prim_range     := RIGHT.situs1_prim_range;
+				self.predir         := RIGHT.situs1_predir;
+				self.prim_name      := RIGHT.situs1_prim_name;
+				self.addr_suffix    := RIGHT.situs1_addr_suffix;
+				self.postdir        := RIGHT.situs1_postdir;
+				self.sec_range      := RIGHT.situs1_sec_range;
+				self.p_city_name    := RIGHT.situs1_p_city_name;
+				self.st             := RIGHT.situs1_st;
+				self.zip            := RIGHT.situs1_zip;
+				self.recording_date := RIGHT.recording_date;
+				self.filing_date    := RIGHT.filing_date;
+				self.deed_category  := RIGHT.deed_category;
+				self.document_type  := RIGHT.document_type;
+				self.did            := LEFT.did;
+				self.bdid           := LEFT.bdid;
+				self                := RIGHT),
+			local);
+
+			temp_join_2_did := join(temp_port_dist_1,temp_NOD_dist_1,
 			left.did = (unsigned6)right.name1_did,
 			transform(temp_layout,
 				self.pid            := left.pid,
@@ -64,8 +92,39 @@ EXPORT DATASET(layouts.history) fn_cgm_foreclosure(
 																		
 		// Pivot on Address
 		temp_port_dist_2 := distribute(in_portfolio(prim_name != ''),HASH64(z5,prim_range,prim_name,addr_suffix,predir));
-		temp_base_dist_2 := distributed(base_file(situs1_prim_name != ''),HASH64(situs1_zip,situs1_prim_range,situs1_prim_name,situs1_addr_suffix,situs1_predir));
-		temp_join_2 := join(temp_port_dist_2,temp_base_dist_2,
+		temp_foreclosure_dist_2 := distributed(Foreclosure_fid_monitor_file(situs1_prim_name != ''),HASH64(situs1_zip,situs1_prim_range,situs1_prim_name,situs1_addr_suffix,situs1_predir));
+		temp_NOD_dist_2 := distributed(NOD_fid_monitor_file(situs1_prim_name != ''),HASH64(situs1_zip,situs1_prim_range,situs1_prim_name,situs1_addr_suffix,situs1_predir));
+
+		temp_join_1_addr := join(temp_port_dist_2,temp_foreclosure_dist_2,
+			left.z5          = right.situs1_zip and
+			left.prim_name   = right.situs1_prim_name and
+			left.prim_range  = right.situs1_prim_range and
+			left.addr_suffix = right.situs1_addr_suffix and
+			left.predir      = right.situs1_predir,
+			transform(temp_layout,
+				self.pid            := left.pid,
+				self.rid            := left.rid,
+				self.hid            := 0,
+				self.foreclosure_id := RIGHT.foreclosure_id,
+				self.prim_range     := RIGHT.situs1_prim_range,
+				self.predir         := RIGHT.situs1_predir,
+				self.prim_name      := RIGHT.situs1_prim_name,
+				self.addr_suffix    := RIGHT.situs1_addr_suffix,
+				self.postdir        := RIGHT.situs1_postdir,
+				self.sec_range      := RIGHT.situs1_sec_range,
+				self.p_city_name    := RIGHT.situs1_p_city_name,
+				self.st             := RIGHT.situs1_st,
+				self.zip            := RIGHT.situs1_zip,
+				self.recording_date := RIGHT.recording_date,
+				self.filing_date    := RIGHT.filing_date,
+				self.deed_category  := RIGHT.deed_category,
+				self.document_type  := RIGHT.document_type,
+				self.did            := LEFT.did,
+				self.bdid           := LEFT.bdid;
+				self                := RIGHT),
+			local);
+			
+			temp_join_2_addr := join(temp_port_dist_2,temp_NOD_dist_2,
 			left.z5          = right.situs1_zip and
 			left.prim_name   = right.situs1_prim_name and
 			left.prim_range  = right.situs1_prim_range and
@@ -95,16 +154,18 @@ EXPORT DATASET(layouts.history) fn_cgm_foreclosure(
 			local);
 				
  		// Combine the possibilities from the various pivots (joins)
-		temp_all_joins := temp_join_1 
-										+ temp_join_2
+		temp_all_joins := temp_join_1_did + temp_join_2_did 
+						+ temp_join_1_addr + temp_join_2_addr
 											;
+    
+    temp_rollup_records := dx_common.Incrementals.mac_Rollup(temp_all_joins, $.product_files.foreclosure.key_Foreclosure_delta_rid, , , , TRUE);
 
 		// Dedup by pid/rid & key field (did, tmsid, etc.) so not to double-count
 		temp_all_deduped := 
 			DEDUP(
 				SORT(
-					DISTRIBUTE(temp_all_joins,HASH64(pid,rid)),
-          pid,rid,foreclosure_id,-recording_date,local
+					DISTRIBUTE(temp_rollup_records,HASH64(pid, rid)),
+					pid,rid,foreclosure_id,-recording_date,local
 				),
 				pid,rid,foreclosure_id,local
 			);

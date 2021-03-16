@@ -413,8 +413,27 @@ deduped_offenses := dedup(sorted_offense,
   
 	deduped_offensesPID := dedup(sort(distribute(deduped_offenses,HASH(offense_persistent_id)),offense_persistent_id,local),offense_persistent_id,local);
   
+	recordof(deduped_offensesPID) tr_rightPadDates(deduped_offensesPID l) := transform  //DF-28911
+	
+	self.process_date := hygenics_crim._functions.rightPadDate(l.process_date);	
+  self.off_date := hygenics_crim._functions.rightPadDate(l.off_date);	
+  self.arr_date := hygenics_crim._functions.rightPadDate(l.arr_date);	
+  self.arr_disp_date := hygenics_crim._functions.rightPadDate(l.arr_disp_date);	 
+  self.court_disp_date := hygenics_crim._functions.rightPadDate(l.court_disp_date);	
+  self.sent_date := hygenics_crim._functions.rightPadDate(l.sent_date);	
+  self.appeal_date := hygenics_crim._functions.rightPadDate(l.appeal_date);	
+  self.convict_dt := hygenics_crim._functions.rightPadDate(l.convict_dt);	
+  self.court_dt := hygenics_crim._functions.rightPadDate(l.court_dt);	
+  self.fcra_date := hygenics_crim._functions.rightPadDate(l.fcra_date);	
+  self.conviction_override_date := hygenics_crim._functions.rightPadDate(l.conviction_override_date);	 
+  self := l;
+  end;
+	
+	pad_dates_deduped_offensesPID := PROJECT(deduped_offensesPID,tr_rightPadDates(left));
 
-	PromoteSupers.MAC_SF_BuildProcess(deduped_offensesPID,'~thor_data400::base::corrections_court_offenses_' + doxie_build.buildstate,aout,2,,true)
-			 
+	//PromoteSupers.MAC_SF_BuildProcess(deduped_offensesPID,'~thor_data400::base::corrections_court_offenses_' + doxie_build.buildstate,aout,2,,true)
+		
+	PromoteSupers.MAC_SF_BuildProcess(pad_dates_deduped_offensesPID,'~thor_data400::base::corrections_court_offenses_' + doxie_build.buildstate,aout,2,,true) //DF-28911
+		
 export Out_Offenses := aout;	
 							

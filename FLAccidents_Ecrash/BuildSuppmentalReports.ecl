@@ -34,15 +34,15 @@ Bug# 180852 - PIR 4710 Coplogic Data ingestion
 */
 import STD; 
 export BuildSuppmentalReports := module 
-agency     := FLAccidents_Ecrash.Infiles.agency	  ;																		
-tpersn     := dedup(FLAccidents_Ecrash.Infiles.tpersn	,all,local)		;										
-tvehicl    := dedup(FLAccidents_Ecrash.Infiles.tvehicl	,all,local)		;	
+agency     := FLAccidents_Ecrash.Infiles.dAgency;																		
+tpersn     := dedup(FLAccidents_Ecrash.Infiles.tpersn	,all,local);										
+tvehicl    := dedup(FLAccidents_Ecrash.Infiles.tvehicl	,all,local);	
 tIncident := FLAccidents_Ecrash.IncidentsAfterSuppression;
 
 //keep all incidents and flag updated or duplicate version of reports
 
 dincident_EA :=	dedup(sort(distribute(
-																		tincident(work_type_id not in ['2','3']),hash(incident_id))
+																		tincident(work_type_id not in ['2','3']),hash32(agency_id, contrib_source))
 															,incident_id,Sent_to_HPCC_DateTime,creation_date,report_id,local)
 													,incident_id,right,local
 											);
@@ -52,16 +52,24 @@ dincidentCombined := dincident_EA ;
 									
 //------------------------------------------------------------------------------------------------------------------							
 tincident trecs0(tincident L, agency R) := transform
-  self.agency_name := if(L.agency_id = R.agency_id,R.Agency_Name,l.Agency_Name);
+  agency_source_matching := L.agency_id = R.agency_id AND L.Contrib_Source = R.Source_Id;
+  self.agency_name := if(agency_source_matching,
+	                       R.Agency_Name,
+												 L.Agency_Name);
+  IsAgencyActive := Functions.IsActiveDate(mod_Utilities.SysDate, R.Source_Start_Date, R.Source_Termination_Date);
+  self.is_terminated_agency := if(agency_source_matching, ~IsAgencyActive, true); 
   self := L;
 end;
 
 jrecs0 := distribute(join(dincidentCombined,agency,
-							left.agency_id = right.agency_id,
-							trecs0(left,right),left outer,lookup),hash(incident_id));
+							left.agency_id = right.agency_id AND 
+							left.contrib_source = right.source_id,
+							trecs0(left,right),lookup),hash32(incident_id));
+							
+filtered_jrecs0 := jrecs0(is_terminated_agency = FALSE);
 
 //------------------------------------------------------------------------------------------------------------------								
-FLAccidents_Ecrash.Layout_Infiles_Fixed.cmbnd  trecs1(jrecs0 L, tvehicl R) := transform
+FLAccidents_Ecrash.Layout_Infiles_Fixed.cmbnd  trecs1(filtered_jrecs0 L, tvehicl R) := transform
      self.incident_id                           := L.incident_id;
      self.creation_date                         := L.creation_date;
      self.Avoidance_Maneuver2                   := R.Avoidance_Maneuver2;
@@ -83,8 +91,8 @@ FLAccidents_Ecrash.Layout_Infiles_Fixed.cmbnd  trecs1(jrecs0 L, tvehicl R) := tr
 		 
 end;
 
-jrecs1 := join(jrecs0,	
-							  sort(dedup(sort(distribute(tvehicl(incident_id!=''),hash(incident_id))
+jrecs1 := join(filtered_jrecs0,	
+							  sort(dedup(sort(distribute(tvehicl(incident_id!=''),hash32(incident_id))
 												,vin,incident_id,unit_number,creation_date,local)
 										    ,vin,incident_id,unit_number,right,local)
 										    ,incident_id,local),
@@ -95,7 +103,7 @@ jrecs1 := join(jrecs0,
 											
 d_person :=		dedup(
 									sort(
-										distribute(tpersn(incident_id!=''),hash(incident_id)),
+										distribute(tpersn(incident_id!=''),hash32(incident_id)),
 												incident_id,vehicle_unit_number,last_name,first_name,date_of_birth,address,city,state,zip_code,home_phone,map(regexfind('DRIVER|VEHICLE DRIVER|VEHICLEDRIVER' , person_type) => 3
                                                                                                                                       ,regexfind('OWNER|VEHICLE OWNER|VEHICLEOWNER' , person_type) => 2,1),creation_date,local)
 								       ,incident_id,vehicle_unit_number,last_name,first_name,date_of_birth,address,city,state,zip_code,right,local); 
@@ -142,16 +150,15 @@ jrecsOthersPerson := join( jrecsOthers ,
 														trecs2(left,right),left outer,local);	
 
 //get person record that have 0 vehicle or if one or more recs in same incident have veh//like witness , property owner etc..
-Jperson := join(jrecs0,
+Jperson := join(filtered_jrecs0,
 											
 									d_person( vehicle_Unit_Number in ['','0','NUL','NULL']),
 														left.incident_id = right.incident_id ,
 							            	transform(FLAccidents_Ecrash.Layout_Infiles_Fixed.cmbnd, self := left , self:= right , self:=[]),local);		
 
-allrecs := dedup(sort(distribute(jrecs2 + jrecsOthersPerson+Jperson,hash(incident_id)),record,local),record,local) ;					
+allrecs := dedup(sort(distribute(jrecs2 + jrecsOthersPerson+Jperson,hash32(incident_id)),record,local),record,local) ;					
 
 // Suppress DE Reports with Flag value 0 in agency file.
-
 suppressAgencies := agency(drivers_exchange_flag ='0');
 
 updtdAllrecs:= join(allrecs, suppressAgencies(agency_id!=''),
@@ -217,8 +224,8 @@ shared tref := tref0 : independent;
 
 // Filter out TM's if TM came in accidently after TF.. All the TM's after TF are invalid.
 
-export IyetekFull := distribute(tref (report_code = 'TF'),hash(State_Report_Number));
-shared IyetekMeta := distribute(tref (report_code = 'TM') ,hash(state_report_number));
+export IyetekFull := distribute(tref (report_code = 'TF'),hash32(State_Report_Number));
+shared IyetekMeta := distribute(tref (report_code = 'TM') ,hash32(state_report_number));
 
 shared jdropMetadata := join( IyetekMeta,IyetekFull, left.state_report_number = right.State_Report_Number and 
                                         left.ORI_Number = right.ORI_Number and 
@@ -317,7 +324,7 @@ tincident_c  := sort(distribute(project(ds_coplogic,transform(FLAccidents_Ecrash
 												 
 													self.hash_				     :=	 dataset([{Left.Creation_Date,Left.Incident_ID,left.Report_ID,Left.Hash_Key,left.U_D_flag,left.Sent_to_HPCC_DateTime,left.report_code,left.page_count,left.Supplemental_report, left.report_type_id}],{FLAccidents_Ecrash.Layouts.l_hash});
 													self.super_report_id   := left.Report_ID;
-													self:= left))	,hash(case_identifier))	,case_identifier,agency_id,loss_state_abbr,crash_date,source_id, -Sent_to_HPCC_DateTime,-creation_date, local);											
+													self:= left))	,hash32(case_identifier))	,case_identifier,agency_id,loss_state_abbr,crash_date,source_id, -Sent_to_HPCC_DateTime,-creation_date, local);											
 
  tincident_c tmakechildren_c(tincident_c L, tincident_c R) := transform
 
@@ -331,7 +338,7 @@ tincident_other  := sort(distribute(project(ds_other,transform(FLAccidents_Ecras
 												 
 													self.hash_				     :=	 dataset([{Left.Creation_Date,Left.Incident_ID,left.Report_ID,Left.Hash_Key,left.U_D_flag,left.Sent_to_HPCC_DateTime,left.report_code,left.page_count,left.Supplemental_report, left.report_type_id}],{FLAccidents_Ecrash.Layouts.l_hash});
 													self.super_report_id   := left.Report_ID;
-													self:= left))	,hash(case_identifier))	,case_identifier,agency_id,loss_state_abbr,report_type_id,crash_date,source_id, -Sent_to_HPCC_DateTime,-creation_date, local);											
+													self:= left))	,hash32(case_identifier))	,case_identifier,agency_id,loss_state_abbr,report_type_id,crash_date,source_id, -Sent_to_HPCC_DateTime,-creation_date, local);											
 
  tincident_other tmakechildren_other(tincident_other L, tincident_other R) := transform
 

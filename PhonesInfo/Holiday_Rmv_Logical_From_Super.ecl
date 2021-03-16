@@ -24,12 +24,12 @@ bversion := output (stripped_b_version);
 
 //find super to clear
 super_ds := dataset([
-{'thor_data400::key::phones_ported_metadata_delete'},
-{'thor_data400::key::phones_ported_metadata_great_grandfather'},
-{'thor_data400::key::phones_ported_metadata_grandfather'},
-{'thor_data400::key::phones_ported_metadata_father'},
-{'thor_data400::key::phones_ported_metadata_built'},
-{'thor_data400::key::phones_ported_metadata_qa'}
+{'thor_data400::key::phones_transaction_delete'},
+{'thor_data400::key::phones_transaction_great_grandfather'},
+{'thor_data400::key::phones_transaction_grandfather'},
+{'thor_data400::key::phones_transaction_father'},
+{'thor_data400::key::phones_transaction_built'},
+{'thor_data400::key::phones_transaction_qa'}
 ],{string superfile});
 
 super_logical_recs_lo := record
