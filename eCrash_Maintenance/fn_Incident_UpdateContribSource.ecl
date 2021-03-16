@@ -67,7 +67,6 @@ Layout_Incident tIncSourceUpd(ds_incident_TM L, ds_agency_missing R) := TRANSFOR
  //Case4: I, -DE, B => L.contrib_source (B)
  
  contrib_source := MAP((isIyetekAgency AND isReportTypeDE AND STD.Str.ToUpperCase(L.contrib_source) = 'E') => 'I',
-											 (isIyetekAgency AND STD.Str.ToUpperCase(L.contrib_source) IN ['E', 'A']) => 'I',
 											 (isMSPAgency AND STD.Str.ToUpperCase(L.contrib_source) IN ['E', 'A']) => 'I',
 											 L.contrib_source
 											 );
@@ -103,8 +102,15 @@ pIncSourceUpdmissingFinal  := PROJECT(Updated_TM_EA_Incidents, TRANSFORM(Layout_
 																			                           STD.Str.ToUpperCase(LEFT.contrib_source) = 'A') => 'P', 
 																																 (LEFT.agency_id = '6931243' AND STD.Str.ToUpperCase(LEFT.vendor_code) = 'CRASHLOGIC' AND
 																																 STD.Str.ToUpperCase(LEFT.source_id) = 'TM') => 'GN',
-																			                           LEFT.contrib_source);
-																		 SELF := LEFT;));
+																																 (LEFT.agency_id = '1541360' AND STD.Str.ToUpperCase(LEFT.vendor_code) = 'IYETEK' AND
+																																 STD.Str.ToUpperCase(LEFT.source_id) = 'TM' AND 
+																																 STD.Str.ToUpperCase(LEFT.contrib_source) = 'E') => 'C',
+																																 (LEFT.agency_id IN eCrash_Maintenance.agency_list.agency_tm_list AND 
+																																  STD.Str.ToUpperCase(LEFT.source_id) = 'TM' AND 
+																																  STD.Str.ToUpperCase(LEFT.vendor_code) = 'IYETEK' AND 
+																																	STD.Str.ToUpperCase(LEFT.contrib_source) IN ['E', 'A']) => 'I',
+																			                            LEFT.contrib_source);
+																		  SELF := LEFT;));
  					
 ds_Incident_Upd_Out := OUTPUT(pIncSourceUpdmissingFinal ,, Files.Incident_Raw_LF('Update_Contrib_Source'), OVERWRITE, __COMPRESSED__,
 					                     CSV(TERMINATOR('\n'), SEPARATOR(','), QUOTE('"')));
