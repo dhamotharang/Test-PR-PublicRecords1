@@ -1,4 +1,4 @@
-/*
+﻿/*
   Solves the longest common substring problem.
   it returns a string with three components separated by commas:
     1. size of the longest common substring
@@ -11,9 +11,9 @@
       http://dataland_esp:8010/esp/files/stub.htm?Widget=WUDetailsWidget&Wuid=W20170512-162142#/stub/Summary
 */
 
-IMPORT Python;
+IMPORT Python3;
 EXPORT string Longest_Common_Substring(STRING s01,STRING s02) := 
-EMBED(Python)
+EMBED(Python3)
   import difflib
   d=difflib.SequenceMatcher(None,s01,s02)
   substring=d.find_longest_match(0, len(s01), 0, len(s02))
