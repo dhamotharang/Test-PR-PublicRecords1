@@ -4,8 +4,8 @@ IMPORT B_Address_2,CFG_Compile,E_Address,E_Geo_Link,E_Zip_Code FROM PublicRecord
 IMPORT * FROM KEL15.Null;
 EXPORT B_Address_1(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG_Compile __cfg = CFG_Compile) := MODULE
   SHARED VIRTUAL TYPEOF(B_Address_2(__in,__cfg).__ENH_Address_2) __ENH_Address_2 := B_Address_2(__in,__cfg).__ENH_Address_2;
-  SHARED __EE8288798 := __ENH_Address_2;
-  EXPORT __ST186099_Layout := RECORD
+  SHARED __EE8293263 := __ENH_Address_2;
+  EXPORT __ST186147_Layout := RECORD
     KEL.typ.nuid UID;
     KEL.typ.nstr Primary_Range_;
     KEL.typ.nstr Predirectional_;
@@ -58,11 +58,11 @@ EXPORT B_Address_1(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG_Com
     KEL.typ.epoch Vault_Date_Last_Seen_ := 0;
     KEL.typ.int __RecordCount := 0;
   END;
-  SHARED __ST186099_Layout __ND8288626__Project(B_Address_2(__in,__cfg).__ST213910_Layout __PP8287895) := TRANSFORM
-    SELF.Is_P_O_Box_ := __OR(__PP8287895.Is_P_O_Box_Zip_,__CN(__PP8287895.Is_P_O_Box_A_D_V_O_));
-    __EE8288621 := __PP8287895.Bestchild_Advo_;
-    SELF.Only_G_M_Flag_ := (__T(__EE8288621))[1].Only_Way_To_Get_Mail_Indicator_;
-    SELF := __PP8287895;
+  SHARED __ST186147_Layout __ND8293091__Project(B_Address_2(__in,__cfg).__ST213971_Layout __PP8292360) := TRANSFORM
+    SELF.Is_P_O_Box_ := __OR(__PP8292360.Is_P_O_Box_Zip_,__CN(__PP8292360.Is_P_O_Box_A_D_V_O_));
+    __EE8293086 := __PP8292360.Bestchild_Advo_;
+    SELF.Only_G_M_Flag_ := (__T(__EE8293086))[1].Only_Way_To_Get_Mail_Indicator_;
+    SELF := __PP8292360;
   END;
-  EXPORT __ENH_Address_1 := PROJECT(__EE8288798,__ND8288626__Project(LEFT));
+  EXPORT __ENH_Address_1 := PROJECT(__EE8293263,__ND8293091__Project(LEFT));
 END;

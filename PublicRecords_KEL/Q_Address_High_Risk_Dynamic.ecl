@@ -1,7 +1,7 @@
 //HPCC Systems KEL Compiler Version 1.5.0rc1
 IMPORT KEL15 AS KEL;
 IMPORT PublicRecords_KEL;
-IMPORT B_Address_3,B_Address_4,B_Address_5,B_Address_6,B_Address_Slim,B_Address_Slim_1,B_Address_Slim_2,B_Address_Slim_3,B_Address_Slim_4,B_Bankruptcy_4,B_Bankruptcy_5,B_Bankruptcy_6,B_Bankruptcy_7,B_Bankruptcy_8,B_Criminal_Offense_4,B_Criminal_Offense_5,B_Education_7,B_Input_P_I_I_10,B_Input_P_I_I_2,B_Input_P_I_I_3,B_Input_P_I_I_4,B_Input_P_I_I_5,B_Input_P_I_I_6,B_Input_P_I_I_7,B_Input_P_I_I_8,B_Input_P_I_I_9,B_Inquiry_10,B_Inquiry_11,B_Inquiry_3,B_Inquiry_4,B_Inquiry_5,B_Inquiry_6,B_Inquiry_7,B_Inquiry_8,B_Inquiry_9,B_Lien_Judgment_13,B_Person_10,B_Person_11,B_Person_3,B_Person_4,B_Person_5,B_Person_6,B_Person_7,B_Person_8,B_Person_9,B_Person_Accident_8,B_Person_Inquiry_4,B_Person_Inquiry_5,B_Person_Inquiry_6,B_Person_Inquiry_7,B_Person_Inquiry_8,B_Person_Lien_Judgment_12,B_Person_Property_4,B_Person_Property_5,B_Person_Property_6,B_Person_Property_7,B_Person_Property_8,B_Person_S_S_N_6,B_Professional_License_4,B_Professional_License_5,B_Property_4,B_Property_5,B_Property_Event_6,B_Property_Event_7,B_Property_Event_8,CFG_Compile,E_Accident,E_Address,E_Address_Inquiry,E_Address_Property,E_Address_Slim,E_Aircraft_Owner,E_Bankruptcy,E_Criminal_Offense,E_Education,E_Email,E_Email_Inquiry,E_First_Degree_Associations,E_First_Degree_Relative,E_Household,E_Household_Member,E_Input_P_I_I,E_Inquiry,E_Lien_Judgment,E_Person,E_Person_Accident,E_Person_Address,E_Person_Bankruptcy,E_Person_Education,E_Person_Email,E_Person_Inquiry,E_Person_Lien_Judgment,E_Person_Offenses,E_Person_Property,E_Person_Property_Event,E_Person_S_S_N,E_Person_Vehicle,E_Phone,E_Phone_Inquiry,E_Professional_License,E_Professional_License_Person,E_Property,E_Property_Event,E_S_S_N_Inquiry,E_Sele_Person,E_Social_Security_Number,E_Utility_Person,E_Watercraft_Owner,E_Zip_Code FROM PublicRecords_KEL;
+IMPORT B_Address_3,B_Address_4,B_Address_5,B_Address_6,B_Address_Slim,B_Address_Slim_1,B_Address_Slim_2,B_Address_Slim_3,B_Address_Slim_4,B_Bankruptcy_4,B_Bankruptcy_5,B_Bankruptcy_6,B_Bankruptcy_7,B_Bankruptcy_8,B_Criminal_Offense_4,B_Criminal_Offense_5,B_Criminal_Offense_6,B_Criminal_Offense_7,B_Education_7,B_Input_P_I_I_10,B_Input_P_I_I_2,B_Input_P_I_I_3,B_Input_P_I_I_4,B_Input_P_I_I_5,B_Input_P_I_I_6,B_Input_P_I_I_7,B_Input_P_I_I_8,B_Input_P_I_I_9,B_Inquiry_10,B_Inquiry_11,B_Inquiry_3,B_Inquiry_4,B_Inquiry_5,B_Inquiry_6,B_Inquiry_7,B_Inquiry_8,B_Inquiry_9,B_Lien_Judgment_13,B_Person_10,B_Person_11,B_Person_3,B_Person_4,B_Person_5,B_Person_6,B_Person_7,B_Person_8,B_Person_9,B_Person_Accident_8,B_Person_Inquiry_4,B_Person_Inquiry_5,B_Person_Inquiry_6,B_Person_Inquiry_7,B_Person_Inquiry_8,B_Person_Lien_Judgment_12,B_Person_Property_4,B_Person_Property_5,B_Person_Property_6,B_Person_Property_7,B_Person_Property_8,B_Person_S_S_N_6,B_Professional_License_4,B_Professional_License_5,B_Property_4,B_Property_5,B_Property_Event_6,B_Property_Event_7,B_Property_Event_8,CFG_Compile,E_Accident,E_Address,E_Address_Inquiry,E_Address_Property,E_Address_Slim,E_Aircraft_Owner,E_Bankruptcy,E_Criminal_Offense,E_Education,E_Email,E_Email_Inquiry,E_First_Degree_Associations,E_First_Degree_Relative,E_Household,E_Household_Member,E_Input_P_I_I,E_Inquiry,E_Lien_Judgment,E_Person,E_Person_Accident,E_Person_Address,E_Person_Bankruptcy,E_Person_Education,E_Person_Email,E_Person_Inquiry,E_Person_Lien_Judgment,E_Person_Offenses,E_Person_Property,E_Person_Property_Event,E_Person_S_S_N,E_Person_Vehicle,E_Phone,E_Phone_Inquiry,E_Professional_License,E_Professional_License_Person,E_Property,E_Property_Event,E_S_S_N_Inquiry,E_Sele_Person,E_Social_Security_Number,E_Utility_Person,E_Watercraft_Owner,E_Zip_Code FROM PublicRecords_KEL;
 IMPORT * FROM KEL15.Null;
 EXPORT Q_Address_High_Risk_Dynamic(KEL.typ.str __PInputStreetNumber, KEL.typ.str __PInputStreetName, KEL.typ.int __PInputZip, KEL.typ.str __PInputPredirectional, KEL.typ.str __PInputSuffix, KEL.typ.str __PInputPostDirectional, DATASET(RECORDOF(PublicRecords_KEL.ECL_Functions.Layouts.LayoutInputPII)) __PInputPIIDataset, KEL.typ.kdate __PP_InpClnArchDt, DATA57 __PDPM, CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault) := MODULE
   SHARED __cfg_Local := MODULE(CFG_Compile)
@@ -342,6 +342,9 @@ EXPORT Q_Address_High_Risk_Dynamic(KEL.typ.str __PInputStreetNumber, KEL.typ.str
   SHARED B_Bankruptcy_7_Local := MODULE(B_Bankruptcy_7(__in,__cfg_Local))
     SHARED TYPEOF(B_Bankruptcy_8(__in,__cfg_Local).__ENH_Bankruptcy_8) __ENH_Bankruptcy_8 := B_Bankruptcy_8_Local.__ENH_Bankruptcy_8;
   END;
+  SHARED B_Criminal_Offense_7_Local := MODULE(B_Criminal_Offense_7(__in,__cfg_Local))
+    SHARED TYPEOF(E_Criminal_Offense(__in,__cfg_Local).__Result) __E_Criminal_Offense := E_Criminal_Offense_Filtered.__Result;
+  END;
   SHARED B_Education_7_Local := MODULE(B_Education_7(__in,__cfg_Local))
     SHARED TYPEOF(E_Education(__in,__cfg_Local).__Result) __E_Education := E_Education_Filtered.__Result;
   END;
@@ -372,6 +375,9 @@ EXPORT Q_Address_High_Risk_Dynamic(KEL.typ.str __PInputStreetNumber, KEL.typ.str
   END;
   SHARED B_Bankruptcy_6_Local := MODULE(B_Bankruptcy_6(__in,__cfg_Local))
     SHARED TYPEOF(B_Bankruptcy_7(__in,__cfg_Local).__ENH_Bankruptcy_7) __ENH_Bankruptcy_7 := B_Bankruptcy_7_Local.__ENH_Bankruptcy_7;
+  END;
+  SHARED B_Criminal_Offense_6_Local := MODULE(B_Criminal_Offense_6(__in,__cfg_Local))
+    SHARED TYPEOF(B_Criminal_Offense_7(__in,__cfg_Local).__ENH_Criminal_Offense_7) __ENH_Criminal_Offense_7 := B_Criminal_Offense_7_Local.__ENH_Criminal_Offense_7;
   END;
   SHARED B_Input_P_I_I_6_Local := MODULE(B_Input_P_I_I_6(__in,__cfg_Local))
     SHARED TYPEOF(B_Input_P_I_I_7(__in,__cfg_Local).__ENH_Input_P_I_I_7) __ENH_Input_P_I_I_7 := B_Input_P_I_I_7_Local.__ENH_Input_P_I_I_7;
@@ -408,7 +414,7 @@ EXPORT Q_Address_High_Risk_Dynamic(KEL.typ.str __PInputStreetNumber, KEL.typ.str
     SHARED TYPEOF(B_Bankruptcy_6(__in,__cfg_Local).__ENH_Bankruptcy_6) __ENH_Bankruptcy_6 := B_Bankruptcy_6_Local.__ENH_Bankruptcy_6;
   END;
   SHARED B_Criminal_Offense_5_Local := MODULE(B_Criminal_Offense_5(__in,__cfg_Local))
-    SHARED TYPEOF(E_Criminal_Offense(__in,__cfg_Local).__Result) __E_Criminal_Offense := E_Criminal_Offense_Filtered.__Result;
+    SHARED TYPEOF(B_Criminal_Offense_6(__in,__cfg_Local).__ENH_Criminal_Offense_6) __ENH_Criminal_Offense_6 := B_Criminal_Offense_6_Local.__ENH_Criminal_Offense_6;
   END;
   SHARED B_Input_P_I_I_5_Local := MODULE(B_Input_P_I_I_5(__in,__cfg_Local))
     SHARED TYPEOF(B_Input_P_I_I_6(__in,__cfg_Local).__ENH_Input_P_I_I_6) __ENH_Input_P_I_I_6 := B_Input_P_I_I_6_Local.__ENH_Input_P_I_I_6;
@@ -530,9 +536,9 @@ EXPORT Q_Address_High_Risk_Dynamic(KEL.typ.str __PInputStreetNumber, KEL.typ.str
     SHARED TYPEOF(B_Address_Slim_1(__in,__cfg_Local).__ENH_Address_Slim_1) __ENH_Address_Slim_1 := B_Address_Slim_1_Local.__ENH_Address_Slim_1;
   END;
   SHARED TYPEOF(B_Address_Slim(__in,__cfg_Local).__ENH_Address_Slim) __ENH_Address_Slim := B_Address_Slim_Local.__ENH_Address_Slim;
-  SHARED __EE12130372 := __ENH_Address_Slim;
-  SHARED __EE12130452 := __EE12130372(__T(__AND(__OP2(__EE12130372.Primary_Range_,=,__CN(__PInputStreetNumber)),__AND(__OP2(__EE12130372.Primary_Name_,=,__CN(__PInputStreetName)),__AND(__OP2(__EE12130372.Z_I_P5_,=,__CN(__PInputZip)),__AND(__OP2(__EE12130372.Predirectional_,=,__CN(__PInputPredirectional)),__AND(__OP2(__EE12130372.Suffix_,=,__CN(__PInputSuffix)),__OP2(__EE12130372.Postdirectional_,=,__CN(__PInputPostDirectional)))))))));
-  SHARED __ST81883_Layout := RECORD
+  SHARED __EE12135993 := __ENH_Address_Slim;
+  SHARED __EE12136073 := __EE12135993(__T(__AND(__OP2(__EE12135993.Primary_Range_,=,__CN(__PInputStreetNumber)),__AND(__OP2(__EE12135993.Primary_Name_,=,__CN(__PInputStreetName)),__AND(__OP2(__EE12135993.Z_I_P5_,=,__CN(__PInputZip)),__AND(__OP2(__EE12135993.Predirectional_,=,__CN(__PInputPredirectional)),__AND(__OP2(__EE12135993.Suffix_,=,__CN(__PInputSuffix)),__OP2(__EE12135993.Postdirectional_,=,__CN(__PInputPostDirectional)))))))));
+  SHARED __ST81902_Layout := RECORD
     KEL.typ.nstr P_I___Inp_Addr_S_I_C_Code_H_R_List_;
     KEL.typ.nstr P_I___Inp_Addr_N_A_I_C_S_Code_H_R_List_;
     KEL.typ.str P_I___Inp_Addr_Is_H_R_Correct_Fac_Flag_ := '';
@@ -543,7 +549,7 @@ EXPORT Q_Address_High_Risk_Dynamic(KEL.typ.str __PInputStreetNumber, KEL.typ.str
     KEL.typ.epoch Vault_Date_Last_Seen_ := 0;
     KEL.typ.int __RecordCount := 0;
   END;
-  EXPORT Res0 := __UNWRAP(PROJECT(TABLE(PROJECT(__EE12130452,__ST81883_Layout),{KEL.typ.int __RecordCount := SUM(GROUP,__RecordCount),KEL.typ.epoch Archive___Date_ := KEL.era.SimpleRoll(GROUP,Archive___Date_,MIN,FALSE),KEL.typ.epoch Date_First_Seen_ := KEL.era.SimpleRoll(GROUP,Date_First_Seen_,MIN,FALSE),KEL.typ.epoch Date_Last_Seen_ := KEL.era.SimpleRoll(GROUP,Date_Last_Seen_,MAX,FALSE),KEL.typ.epoch Hybrid_Archive_Date_ := KEL.era.SimpleRoll(GROUP,Hybrid_Archive_Date_,MIN,FALSE),KEL.typ.epoch Vault_Date_Last_Seen_ := KEL.era.SimpleRoll(GROUP,Vault_Date_Last_Seen_,MAX,NMAX),P_I___Inp_Addr_S_I_C_Code_H_R_List_,P_I___Inp_Addr_N_A_I_C_S_Code_H_R_List_,P_I___Inp_Addr_Is_H_R_Correct_Fac_Flag_},P_I___Inp_Addr_S_I_C_Code_H_R_List_,P_I___Inp_Addr_N_A_I_C_S_Code_H_R_List_,P_I___Inp_Addr_Is_H_R_Correct_Fac_Flag_,MERGE),__ST81883_Layout));
+  EXPORT Res0 := __UNWRAP(PROJECT(TABLE(PROJECT(__EE12136073,__ST81902_Layout),{KEL.typ.int __RecordCount := SUM(GROUP,__RecordCount),KEL.typ.epoch Archive___Date_ := KEL.era.SimpleRoll(GROUP,Archive___Date_,MIN,FALSE),KEL.typ.epoch Date_First_Seen_ := KEL.era.SimpleRoll(GROUP,Date_First_Seen_,MIN,FALSE),KEL.typ.epoch Date_Last_Seen_ := KEL.era.SimpleRoll(GROUP,Date_Last_Seen_,MAX,FALSE),KEL.typ.epoch Hybrid_Archive_Date_ := KEL.era.SimpleRoll(GROUP,Hybrid_Archive_Date_,MIN,FALSE),KEL.typ.epoch Vault_Date_Last_Seen_ := KEL.era.SimpleRoll(GROUP,Vault_Date_Last_Seen_,MAX,NMAX),P_I___Inp_Addr_S_I_C_Code_H_R_List_,P_I___Inp_Addr_N_A_I_C_S_Code_H_R_List_,P_I___Inp_Addr_Is_H_R_Correct_Fac_Flag_},P_I___Inp_Addr_S_I_C_Code_H_R_List_,P_I___Inp_Addr_N_A_I_C_S_Code_H_R_List_,P_I___Inp_Addr_Is_H_R_Correct_Fac_Flag_,MERGE),__ST81902_Layout));
   EXPORT DBG_E_Input_P_I_I_PreEntity := __UNWRAP(E_Input_P_I_I_Params(__in,__cfg_Local).InData);
   EXPORT DBG_E_Input_P_I_I_Result := __UNWRAP(E_Input_P_I_I_Filtered.__Result);
   EXPORT DBG_E_Accident_Result := __UNWRAP(E_Accident_Filtered.__Result);
@@ -607,6 +613,7 @@ EXPORT Q_Address_High_Risk_Dynamic(KEL.typ.str __PInputStreetNumber, KEL.typ.str
   EXPORT DBG_E_Person_Property_Intermediate_8 := __UNWRAP(B_Person_Property_8_Local.__ENH_Person_Property_8);
   EXPORT DBG_E_Property_Event_Intermediate_8 := __UNWRAP(B_Property_Event_8_Local.__ENH_Property_Event_8);
   EXPORT DBG_E_Bankruptcy_Intermediate_7 := __UNWRAP(B_Bankruptcy_7_Local.__ENH_Bankruptcy_7);
+  EXPORT DBG_E_Criminal_Offense_Intermediate_7 := __UNWRAP(B_Criminal_Offense_7_Local.__ENH_Criminal_Offense_7);
   EXPORT DBG_E_Education_Intermediate_7 := __UNWRAP(B_Education_7_Local.__ENH_Education_7);
   EXPORT DBG_E_Input_P_I_I_Intermediate_7 := __UNWRAP(B_Input_P_I_I_7_Local.__ENH_Input_P_I_I_7);
   EXPORT DBG_E_Inquiry_Intermediate_7 := __UNWRAP(B_Inquiry_7_Local.__ENH_Inquiry_7);
@@ -616,6 +623,7 @@ EXPORT Q_Address_High_Risk_Dynamic(KEL.typ.str __PInputStreetNumber, KEL.typ.str
   EXPORT DBG_E_Property_Event_Intermediate_7 := __UNWRAP(B_Property_Event_7_Local.__ENH_Property_Event_7);
   EXPORT DBG_E_Address_Intermediate_6 := __UNWRAP(B_Address_6_Local.__ENH_Address_6);
   EXPORT DBG_E_Bankruptcy_Intermediate_6 := __UNWRAP(B_Bankruptcy_6_Local.__ENH_Bankruptcy_6);
+  EXPORT DBG_E_Criminal_Offense_Intermediate_6 := __UNWRAP(B_Criminal_Offense_6_Local.__ENH_Criminal_Offense_6);
   EXPORT DBG_E_Input_P_I_I_Intermediate_6 := __UNWRAP(B_Input_P_I_I_6_Local.__ENH_Input_P_I_I_6);
   EXPORT DBG_E_Inquiry_Intermediate_6 := __UNWRAP(B_Inquiry_6_Local.__ENH_Inquiry_6);
   EXPORT DBG_E_Person_Intermediate_6 := __UNWRAP(B_Person_6_Local.__ENH_Person_6);
@@ -717,6 +725,7 @@ EXPORT Q_Address_High_Risk_Dynamic(KEL.typ.str __PInputStreetNumber, KEL.typ.str
     OUTPUT(DBG_E_Person_Property_Intermediate_8,NAMED('DBG_E_Person_Property_Intermediate_8_Q_Address_High_Risk_Dynamic')),
     OUTPUT(DBG_E_Property_Event_Intermediate_8,NAMED('DBG_E_Property_Event_Intermediate_8_Q_Address_High_Risk_Dynamic')),
     OUTPUT(DBG_E_Bankruptcy_Intermediate_7,NAMED('DBG_E_Bankruptcy_Intermediate_7_Q_Address_High_Risk_Dynamic')),
+    OUTPUT(DBG_E_Criminal_Offense_Intermediate_7,NAMED('DBG_E_Criminal_Offense_Intermediate_7_Q_Address_High_Risk_Dynamic')),
     OUTPUT(DBG_E_Education_Intermediate_7,NAMED('DBG_E_Education_Intermediate_7_Q_Address_High_Risk_Dynamic')),
     OUTPUT(DBG_E_Input_P_I_I_Intermediate_7,NAMED('DBG_E_Input_P_I_I_Intermediate_7_Q_Address_High_Risk_Dynamic')),
     OUTPUT(DBG_E_Inquiry_Intermediate_7,NAMED('DBG_E_Inquiry_Intermediate_7_Q_Address_High_Risk_Dynamic')),
@@ -726,6 +735,7 @@ EXPORT Q_Address_High_Risk_Dynamic(KEL.typ.str __PInputStreetNumber, KEL.typ.str
     OUTPUT(DBG_E_Property_Event_Intermediate_7,NAMED('DBG_E_Property_Event_Intermediate_7_Q_Address_High_Risk_Dynamic')),
     OUTPUT(DBG_E_Address_Intermediate_6,NAMED('DBG_E_Address_Intermediate_6_Q_Address_High_Risk_Dynamic')),
     OUTPUT(DBG_E_Bankruptcy_Intermediate_6,NAMED('DBG_E_Bankruptcy_Intermediate_6_Q_Address_High_Risk_Dynamic')),
+    OUTPUT(DBG_E_Criminal_Offense_Intermediate_6,NAMED('DBG_E_Criminal_Offense_Intermediate_6_Q_Address_High_Risk_Dynamic')),
     OUTPUT(DBG_E_Input_P_I_I_Intermediate_6,NAMED('DBG_E_Input_P_I_I_Intermediate_6_Q_Address_High_Risk_Dynamic')),
     OUTPUT(DBG_E_Inquiry_Intermediate_6,NAMED('DBG_E_Inquiry_Intermediate_6_Q_Address_High_Risk_Dynamic')),
     OUTPUT(DBG_E_Person_Intermediate_6,NAMED('DBG_E_Person_Intermediate_6_Q_Address_High_Risk_Dynamic')),

@@ -1,6 +1,6 @@
 //HPCC Systems KEL Compiler Version 1.5.0rc1
 IMPORT KEL15 AS KEL;
-IMPORT B_Address,B_Address_1,B_Address_2,B_Address_3,B_Address_4,B_Address_5,B_Address_6,B_Address_Summary,B_Address_Summary_1,B_Address_Summary_2,B_Address_Summary_3,B_Address_Summary_4,B_Address_Summary_5,B_Aircraft_Owner_1,B_Aircraft_Owner_2,B_Aircraft_Owner_3,B_Bankruptcy,B_Bankruptcy_1,B_Bankruptcy_2,B_Bankruptcy_3,B_Bankruptcy_4,B_Bankruptcy_5,B_Bankruptcy_6,B_Bankruptcy_7,B_Bankruptcy_8,B_Business_Prox,B_Business_Prox_1,B_Business_Prox_2,B_Business_Prox_3,B_Business_Sele,B_Business_Sele_1,B_Business_Sele_10,B_Business_Sele_2,B_Business_Sele_3,B_Business_Sele_4,B_Business_Sele_5,B_Business_Sele_6,B_Business_Sele_7,B_Business_Sele_8,B_Business_Sele_9,B_Business_Sele_Overflow_1,B_Business_Sele_Overflow_2,B_Business_Sele_Overflow_3,B_Business_Sele_Overflow_4,B_Business_Sele_Overflow_5,B_Business_Sele_Overflow_6,B_Criminal_Offense,B_Criminal_Offense_1,B_Criminal_Offense_2,B_Criminal_Offense_3,B_Criminal_Offense_4,B_Criminal_Offense_5,B_Education,B_Education_1,B_Education_2,B_Education_3,B_Education_4,B_Education_5,B_Education_6,B_Education_7,B_Email,B_Email_1,B_Email_2,B_Email_3,B_First_Degree_Relative_5,B_Input_B_I_I_1,B_Input_B_I_I_10,B_Input_B_I_I_2,B_Input_B_I_I_3,B_Input_B_I_I_4,B_Input_B_I_I_5,B_Input_B_I_I_6,B_Input_B_I_I_7,B_Input_B_I_I_8,B_Input_B_I_I_9,B_Input_P_I_I_1,B_Input_P_I_I_10,B_Input_P_I_I_2,B_Input_P_I_I_3,B_Input_P_I_I_4,B_Input_P_I_I_5,B_Input_P_I_I_6,B_Input_P_I_I_7,B_Input_P_I_I_8,B_Input_P_I_I_9,B_Inquiry,B_Inquiry_1,B_Inquiry_10,B_Inquiry_11,B_Inquiry_2,B_Inquiry_3,B_Inquiry_4,B_Inquiry_5,B_Inquiry_6,B_Inquiry_7,B_Inquiry_8,B_Inquiry_9,B_Lien_Judgment,B_Lien_Judgment_1,B_Lien_Judgment_10,B_Lien_Judgment_11,B_Lien_Judgment_12,B_Lien_Judgment_13,B_Lien_Judgment_2,B_Lien_Judgment_3,B_Lien_Judgment_4,B_Lien_Judgment_5,B_Lien_Judgment_6,B_Lien_Judgment_7,B_Lien_Judgment_8,B_Lien_Judgment_9,B_Name_Summary,B_Name_Summary_1,B_Name_Summary_2,B_Name_Summary_3,B_Name_Summary_4,B_Name_Summary_5,B_Person,B_Person_1,B_Person_10,B_Person_11,B_Person_2,B_Person_3,B_Person_4,B_Person_5,B_Person_6,B_Person_7,B_Person_8,B_Person_9,B_Person_Accident_8,B_Person_Address_2,B_Person_Address_3,B_Person_Inquiry_3,B_Person_Inquiry_4,B_Person_Inquiry_5,B_Person_Inquiry_6,B_Person_Inquiry_7,B_Person_Inquiry_8,B_Person_Lien_Judgment_12,B_Person_Property_1,B_Person_Property_2,B_Person_Property_3,B_Person_Property_4,B_Person_Property_5,B_Person_Property_6,B_Person_Property_7,B_Person_Property_8,B_Person_S_S_N_1,B_Person_S_S_N_2,B_Person_S_S_N_3,B_Person_S_S_N_4,B_Person_S_S_N_5,B_Person_S_S_N_6,B_Person_Vehicle_1,B_Person_Vehicle_2,B_Person_Vehicle_3,B_Phone_Summary,B_Phone_Summary_1,B_Phone_Summary_2,B_Phone_Summary_3,B_Phone_Summary_4,B_Phone_Summary_5,B_Phone_Summary_6,B_Professional_License,B_Professional_License_1,B_Professional_License_2,B_Professional_License_3,B_Professional_License_4,B_Professional_License_5,B_Property,B_Property_1,B_Property_2,B_Property_3,B_Property_4,B_Property_5,B_Property_Event,B_Property_Event_1,B_Property_Event_2,B_Property_Event_3,B_Property_Event_4,B_Property_Event_5,B_Property_Event_6,B_Property_Event_7,B_Property_Event_8,B_S_S_N_Summary,B_S_S_N_Summary_1,B_S_S_N_Summary_2,B_S_S_N_Summary_3,B_S_S_N_Summary_4,B_S_S_N_Summary_5,B_Sele_Address_1,B_Sele_Address_2,B_Sele_Address_3,B_Sele_Address_4,B_Sele_Address_5,B_Sele_Address_6,B_Sele_Lien_Judgment_11,B_Sele_Person_1,B_Sele_Person_2,B_Sele_Person_3,B_Sele_Person_4,B_Sele_Person_5,B_Sele_Person_6,B_Sele_Person_7,B_Sele_Phone_Number_3,B_Sele_Phone_Number_4,B_Sele_Phone_Number_5,B_Sele_Phone_Number_6,B_Sele_Property_1,B_Sele_Property_2,B_Sele_Property_3,B_Sele_Property_4,B_Sele_T_I_N_3,B_Sele_T_I_N_4,B_Sele_T_I_N_5,B_Sele_T_I_N_6,B_Sele_Tradeline_1,B_Sele_Tradeline_2,B_Sele_Tradeline_3,B_Sele_U_C_C_2,B_Sele_U_C_C_3,B_Sele_U_C_C_4,B_Sele_U_C_C_5,B_Sele_U_C_C_6,B_Sele_U_C_C_7,B_Sele_U_C_C_8,B_Sele_U_C_C_9,B_Sele_Vehicle_1,B_Sele_Vehicle_2,B_Sele_Vehicle_3,B_Tradeline,B_Tradeline_1,B_Tradeline_10,B_Tradeline_2,B_Tradeline_3,B_Tradeline_4,B_Tradeline_5,B_Tradeline_6,B_Tradeline_7,B_Tradeline_8,B_Tradeline_9,B_U_C_C,B_U_C_C_1,B_U_C_C_10,B_U_C_C_11,B_U_C_C_12,B_U_C_C_13,B_U_C_C_2,B_U_C_C_3,B_U_C_C_4,B_U_C_C_5,B_U_C_C_6,B_U_C_C_7,B_U_C_C_8,B_U_C_C_9,B_Watercraft_Owner_1,B_Watercraft_Owner_2,B_Watercraft_Owner_3,CFG_Compile,E_Accident,E_Address,E_Address_Inquiry,E_Address_Property,E_Address_Property_Event,E_Address_Slim,E_Address_Summary,E_Aircraft,E_Aircraft_Owner,E_Bankruptcy,E_Business_Org,E_Business_Pow,E_Business_Prox,E_Business_Sele,E_Business_Sele_Overflow,E_Business_Ult,E_Criminal_Offender,E_Criminal_Offense,E_Criminal_Punishment,E_Drivers_License,E_E_B_R_Tradeline,E_Education,E_Email,E_Email_Inquiry,E_First_Degree_Associations,E_First_Degree_Relative,E_Geo_Link,E_Household,E_Household_Member,E_Input_B_I_I,E_Input_B_I_I_Input_P_I_I,E_Input_P_I_I,E_Inquiry,E_Lien_Judgment,E_Name_Summary,E_Person,E_Person_Accident,E_Person_Address,E_Person_Bankruptcy,E_Person_Education,E_Person_Email,E_Person_Inquiry,E_Person_Lien_Judgment,E_Person_Offenses,E_Person_Property,E_Person_Property_Event,E_Person_S_S_N,E_Person_Vehicle,E_Phone,E_Phone_Inquiry,E_Phone_Summary,E_Professional_License,E_Professional_License_Person,E_Property,E_Property_Event,E_Prox_Address,E_Prox_Phone_Number,E_Prox_T_I_N,E_S_S_N_Inquiry,E_S_S_N_Summary,E_Sele_Address,E_Sele_Aircraft,E_Sele_Bankruptcy,E_Sele_Lien_Judgment,E_Sele_Person,E_Sele_Phone_Number,E_Sele_Property,E_Sele_Property_Event,E_Sele_T_I_N,E_Sele_Tradeline,E_Sele_U_C_C,E_Sele_Vehicle,E_Sele_Watercraft,E_Sex_Offender,E_Social_Security_Number,E_Surname,E_T_I_N,E_Tradeline,E_U_C_C,E_Utility,E_Utility_Person,E_Vehicle,E_Watercraft,E_Watercraft_Owner,E_Zip_Code FROM PublicRecords_KEL;
+IMPORT B_Address,B_Address_1,B_Address_2,B_Address_3,B_Address_4,B_Address_5,B_Address_6,B_Address_Summary,B_Address_Summary_1,B_Address_Summary_2,B_Address_Summary_3,B_Address_Summary_4,B_Address_Summary_5,B_Aircraft_Owner_1,B_Aircraft_Owner_2,B_Aircraft_Owner_3,B_Bankruptcy,B_Bankruptcy_1,B_Bankruptcy_2,B_Bankruptcy_3,B_Bankruptcy_4,B_Bankruptcy_5,B_Bankruptcy_6,B_Bankruptcy_7,B_Bankruptcy_8,B_Business_Prox,B_Business_Prox_1,B_Business_Prox_2,B_Business_Prox_3,B_Business_Sele,B_Business_Sele_1,B_Business_Sele_10,B_Business_Sele_2,B_Business_Sele_3,B_Business_Sele_4,B_Business_Sele_5,B_Business_Sele_6,B_Business_Sele_7,B_Business_Sele_8,B_Business_Sele_9,B_Business_Sele_Overflow_1,B_Business_Sele_Overflow_2,B_Business_Sele_Overflow_3,B_Business_Sele_Overflow_4,B_Business_Sele_Overflow_5,B_Business_Sele_Overflow_6,B_Criminal_Offense,B_Criminal_Offense_1,B_Criminal_Offense_2,B_Criminal_Offense_3,B_Criminal_Offense_4,B_Criminal_Offense_5,B_Criminal_Offense_6,B_Criminal_Offense_7,B_Education,B_Education_1,B_Education_2,B_Education_3,B_Education_4,B_Education_5,B_Education_6,B_Education_7,B_Email,B_Email_1,B_Email_2,B_Email_3,B_First_Degree_Relative_5,B_Input_B_I_I_1,B_Input_B_I_I_10,B_Input_B_I_I_2,B_Input_B_I_I_3,B_Input_B_I_I_4,B_Input_B_I_I_5,B_Input_B_I_I_6,B_Input_B_I_I_7,B_Input_B_I_I_8,B_Input_B_I_I_9,B_Input_P_I_I_1,B_Input_P_I_I_10,B_Input_P_I_I_2,B_Input_P_I_I_3,B_Input_P_I_I_4,B_Input_P_I_I_5,B_Input_P_I_I_6,B_Input_P_I_I_7,B_Input_P_I_I_8,B_Input_P_I_I_9,B_Inquiry,B_Inquiry_1,B_Inquiry_10,B_Inquiry_11,B_Inquiry_2,B_Inquiry_3,B_Inquiry_4,B_Inquiry_5,B_Inquiry_6,B_Inquiry_7,B_Inquiry_8,B_Inquiry_9,B_Lien_Judgment,B_Lien_Judgment_1,B_Lien_Judgment_10,B_Lien_Judgment_11,B_Lien_Judgment_12,B_Lien_Judgment_13,B_Lien_Judgment_2,B_Lien_Judgment_3,B_Lien_Judgment_4,B_Lien_Judgment_5,B_Lien_Judgment_6,B_Lien_Judgment_7,B_Lien_Judgment_8,B_Lien_Judgment_9,B_Name_Summary,B_Name_Summary_1,B_Name_Summary_2,B_Name_Summary_3,B_Name_Summary_4,B_Name_Summary_5,B_Person,B_Person_1,B_Person_10,B_Person_11,B_Person_2,B_Person_3,B_Person_4,B_Person_5,B_Person_6,B_Person_7,B_Person_8,B_Person_9,B_Person_Accident_8,B_Person_Address_2,B_Person_Address_3,B_Person_Inquiry_3,B_Person_Inquiry_4,B_Person_Inquiry_5,B_Person_Inquiry_6,B_Person_Inquiry_7,B_Person_Inquiry_8,B_Person_Lien_Judgment_12,B_Person_Property_1,B_Person_Property_2,B_Person_Property_3,B_Person_Property_4,B_Person_Property_5,B_Person_Property_6,B_Person_Property_7,B_Person_Property_8,B_Person_S_S_N_1,B_Person_S_S_N_2,B_Person_S_S_N_3,B_Person_S_S_N_4,B_Person_S_S_N_5,B_Person_S_S_N_6,B_Person_Vehicle_1,B_Person_Vehicle_2,B_Person_Vehicle_3,B_Phone_Summary,B_Phone_Summary_1,B_Phone_Summary_2,B_Phone_Summary_3,B_Phone_Summary_4,B_Phone_Summary_5,B_Phone_Summary_6,B_Professional_License,B_Professional_License_1,B_Professional_License_2,B_Professional_License_3,B_Professional_License_4,B_Professional_License_5,B_Property,B_Property_1,B_Property_2,B_Property_3,B_Property_4,B_Property_5,B_Property_Event,B_Property_Event_1,B_Property_Event_2,B_Property_Event_3,B_Property_Event_4,B_Property_Event_5,B_Property_Event_6,B_Property_Event_7,B_Property_Event_8,B_S_S_N_Summary,B_S_S_N_Summary_1,B_S_S_N_Summary_2,B_S_S_N_Summary_3,B_S_S_N_Summary_4,B_S_S_N_Summary_5,B_Sele_Address_1,B_Sele_Address_2,B_Sele_Address_3,B_Sele_Address_4,B_Sele_Address_5,B_Sele_Address_6,B_Sele_Lien_Judgment_11,B_Sele_Person_1,B_Sele_Person_2,B_Sele_Person_3,B_Sele_Person_4,B_Sele_Person_5,B_Sele_Person_6,B_Sele_Person_7,B_Sele_Phone_Number_3,B_Sele_Phone_Number_4,B_Sele_Phone_Number_5,B_Sele_Phone_Number_6,B_Sele_Property_1,B_Sele_Property_2,B_Sele_Property_3,B_Sele_Property_4,B_Sele_T_I_N_3,B_Sele_T_I_N_4,B_Sele_T_I_N_5,B_Sele_T_I_N_6,B_Sele_Tradeline_1,B_Sele_Tradeline_2,B_Sele_Tradeline_3,B_Sele_U_C_C_2,B_Sele_U_C_C_3,B_Sele_U_C_C_4,B_Sele_U_C_C_5,B_Sele_U_C_C_6,B_Sele_U_C_C_7,B_Sele_U_C_C_8,B_Sele_U_C_C_9,B_Sele_Vehicle_1,B_Sele_Vehicle_2,B_Sele_Vehicle_3,B_Tradeline,B_Tradeline_1,B_Tradeline_10,B_Tradeline_2,B_Tradeline_3,B_Tradeline_4,B_Tradeline_5,B_Tradeline_6,B_Tradeline_7,B_Tradeline_8,B_Tradeline_9,B_U_C_C,B_U_C_C_1,B_U_C_C_10,B_U_C_C_11,B_U_C_C_12,B_U_C_C_13,B_U_C_C_2,B_U_C_C_3,B_U_C_C_4,B_U_C_C_5,B_U_C_C_6,B_U_C_C_7,B_U_C_C_8,B_U_C_C_9,B_Watercraft_Owner_1,B_Watercraft_Owner_2,B_Watercraft_Owner_3,CFG_Compile,E_Accident,E_Address,E_Address_Inquiry,E_Address_Property,E_Address_Property_Event,E_Address_Slim,E_Address_Summary,E_Aircraft,E_Aircraft_Owner,E_Bankruptcy,E_Business_Org,E_Business_Pow,E_Business_Prox,E_Business_Sele,E_Business_Sele_Overflow,E_Business_Ult,E_Criminal_Offender,E_Criminal_Offense,E_Criminal_Punishment,E_Drivers_License,E_E_B_R_Tradeline,E_Education,E_Email,E_Email_Inquiry,E_First_Degree_Associations,E_First_Degree_Relative,E_Geo_Link,E_Household,E_Household_Member,E_Input_B_I_I,E_Input_B_I_I_Input_P_I_I,E_Input_P_I_I,E_Inquiry,E_Lien_Judgment,E_Name_Summary,E_Person,E_Person_Accident,E_Person_Address,E_Person_Bankruptcy,E_Person_Education,E_Person_Email,E_Person_Inquiry,E_Person_Lien_Judgment,E_Person_Offenses,E_Person_Property,E_Person_Property_Event,E_Person_S_S_N,E_Person_Vehicle,E_Phone,E_Phone_Inquiry,E_Phone_Summary,E_Professional_License,E_Professional_License_Person,E_Property,E_Property_Event,E_Prox_Address,E_Prox_Phone_Number,E_Prox_T_I_N,E_S_S_N_Inquiry,E_S_S_N_Summary,E_Sele_Address,E_Sele_Aircraft,E_Sele_Bankruptcy,E_Sele_Lien_Judgment,E_Sele_Person,E_Sele_Phone_Number,E_Sele_Property,E_Sele_Property_Event,E_Sele_T_I_N,E_Sele_Tradeline,E_Sele_U_C_C,E_Sele_Vehicle,E_Sele_Watercraft,E_Sex_Offender,E_Social_Security_Number,E_Surname,E_T_I_N,E_Tradeline,E_U_C_C,E_Utility,E_Utility_Person,E_Vehicle,E_Watercraft,E_Watercraft_Owner,E_Zip_Code FROM PublicRecords_KEL;
 IMPORT * FROM KEL15.Null;
 EXPORT Q_Index_Build_Entity(KEL.typ.kdate __PP_InpClnArchDt, DATA57 __PDPM, CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault) := MODULE
   SHARED __cfg_Local := MODULE(CFG_Compile)
@@ -571,6 +571,9 @@ EXPORT Q_Index_Build_Entity(KEL.typ.kdate __PP_InpClnArchDt, DATA57 __PDPM, CFG_
     SHARED TYPEOF(B_Business_Sele_8(__in,__cfg_Local).__ENH_Business_Sele_8) __ENH_Business_Sele_8 := B_Business_Sele_8_Local.__ENH_Business_Sele_8;
     SHARED TYPEOF(B_Input_B_I_I_8(__in,__cfg_Local).__ENH_Input_B_I_I_8) __ENH_Input_B_I_I_8 := B_Input_B_I_I_8_Local.__ENH_Input_B_I_I_8;
   END;
+  SHARED B_Criminal_Offense_7_Local := MODULE(B_Criminal_Offense_7(__in,__cfg_Local))
+    SHARED TYPEOF(E_Criminal_Offense(__in,__cfg_Local).__Result) __E_Criminal_Offense := E_Criminal_Offense_Filtered.__Result;
+  END;
   SHARED B_Education_7_Local := MODULE(B_Education_7(__in,__cfg_Local))
     SHARED TYPEOF(E_Education(__in,__cfg_Local).__Result) __E_Education := E_Education_Filtered.__Result;
   END;
@@ -628,6 +631,9 @@ EXPORT Q_Index_Build_Entity(KEL.typ.kdate __PP_InpClnArchDt, DATA57 __PDPM, CFG_
   END;
   SHARED B_Business_Sele_Overflow_6_Local := MODULE(B_Business_Sele_Overflow_6(__in,__cfg_Local))
     SHARED TYPEOF(E_Business_Sele_Overflow(__in,__cfg_Local).__Result) __E_Business_Sele_Overflow := E_Business_Sele_Overflow_Filtered.__Result;
+  END;
+  SHARED B_Criminal_Offense_6_Local := MODULE(B_Criminal_Offense_6(__in,__cfg_Local))
+    SHARED TYPEOF(B_Criminal_Offense_7(__in,__cfg_Local).__ENH_Criminal_Offense_7) __ENH_Criminal_Offense_7 := B_Criminal_Offense_7_Local.__ENH_Criminal_Offense_7;
   END;
   SHARED B_Education_6_Local := MODULE(B_Education_6(__in,__cfg_Local))
     SHARED TYPEOF(B_Education_7(__in,__cfg_Local).__ENH_Education_7) __ENH_Education_7 := B_Education_7_Local.__ENH_Education_7;
@@ -715,7 +721,7 @@ EXPORT Q_Index_Build_Entity(KEL.typ.kdate __PP_InpClnArchDt, DATA57 __PDPM, CFG_
     SHARED TYPEOF(B_Business_Sele_Overflow_6(__in,__cfg_Local).__ENH_Business_Sele_Overflow_6) __ENH_Business_Sele_Overflow_6 := B_Business_Sele_Overflow_6_Local.__ENH_Business_Sele_Overflow_6;
   END;
   SHARED B_Criminal_Offense_5_Local := MODULE(B_Criminal_Offense_5(__in,__cfg_Local))
-    SHARED TYPEOF(E_Criminal_Offense(__in,__cfg_Local).__Result) __E_Criminal_Offense := E_Criminal_Offense_Filtered.__Result;
+    SHARED TYPEOF(B_Criminal_Offense_6(__in,__cfg_Local).__ENH_Criminal_Offense_6) __ENH_Criminal_Offense_6 := B_Criminal_Offense_6_Local.__ENH_Criminal_Offense_6;
   END;
   SHARED B_Education_5_Local := MODULE(B_Education_5(__in,__cfg_Local))
     SHARED TYPEOF(B_Education_6(__in,__cfg_Local).__ENH_Education_6) __ENH_Education_6 := B_Education_6_Local.__ENH_Education_6;
@@ -1502,122 +1508,122 @@ EXPORT Q_Index_Build_Entity(KEL.typ.kdate __PP_InpClnArchDt, DATA57 __PDPM, CFG_
   SHARED TYPEOF(E_Vehicle(__in,__cfg_Local).__Result) __E_Vehicle := E_Vehicle_Filtered.__Result;
   SHARED TYPEOF(E_Watercraft(__in,__cfg_Local).__Result) __E_Watercraft := E_Watercraft_Filtered.__Result;
   SHARED TYPEOF(E_Zip_Code(__in,__cfg_Local).__Result) __E_Zip_Code := E_Zip_Code_Filtered.__Result;
-  SHARED __EE5473040 := __E_Accident;
-  SHARED __EE5473042 := __EE5473040;
-  EXPORT Res0 := __UNWRAP(__EE5473042);
-  SHARED __EE12229694 := __ENH_Address;
-  SHARED __EE12229696 := __EE12229694;
-  EXPORT Res1 := __UNWRAP(__EE12229696);
-  SHARED __EE12229699 := __ENH_Address_Summary;
-  SHARED __EE12229701 := __EE12229699;
-  EXPORT Res2 := __UNWRAP(__EE12229701);
-  SHARED __EE5473051 := __E_Aircraft;
-  SHARED __EE5473053 := __EE5473051;
-  EXPORT Res3 := __UNWRAP(__EE5473053);
-  SHARED __EE12229705 := __ENH_Bankruptcy;
-  SHARED __EE12229707 := __EE12229705;
-  EXPORT Res4 := __UNWRAP(__EE12229707);
-  SHARED __EE5473058 := __E_Business_Ult;
-  SHARED __EE5473060 := __EE5473058;
-  EXPORT Res5 := __UNWRAP(__EE5473060);
-  SHARED __EE5473061 := __E_Business_Org;
-  SHARED __EE5473063 := __EE5473061;
-  EXPORT Res6 := __UNWRAP(__EE5473063);
-  SHARED __EE12229712 := __ENH_Business_Sele;
-  SHARED __EE12229714 := __EE12229712;
-  EXPORT Res7 := __UNWRAP(__EE12229714);
-  SHARED __EE12229717 := __ENH_Business_Prox;
-  SHARED __EE12229719 := __EE12229717;
-  EXPORT Res8 := __UNWRAP(__EE12229719);
-  SHARED __EE5473072 := __E_Business_Pow;
-  SHARED __EE5473074 := __EE5473072;
-  EXPORT Res9 := __UNWRAP(__EE5473074);
-  SHARED __EE5473075 := __E_Criminal_Offender;
-  SHARED __EE5473077 := __EE5473075;
-  EXPORT Res10 := __UNWRAP(__EE5473077);
-  SHARED __EE12229724 := __ENH_Criminal_Offense;
-  SHARED __EE12229726 := __EE12229724;
-  EXPORT Res11 := __UNWRAP(__EE12229726);
-  SHARED __EE5473082 := __E_Criminal_Punishment;
-  SHARED __EE5473084 := __EE5473082;
-  EXPORT Res12 := __UNWRAP(__EE5473084);
-  SHARED __EE5473085 := __E_Drivers_License;
-  SHARED __EE5473087 := __EE5473085;
-  EXPORT Res13 := __UNWRAP(__EE5473087);
-  SHARED __EE5473088 := __E_E_B_R_Tradeline;
-  SHARED __EE5473090 := __EE5473088;
-  EXPORT Res14 := __UNWRAP(__EE5473090);
-  SHARED __EE12229732 := __ENH_Education;
-  SHARED __EE12229734 := __EE12229732;
-  EXPORT Res15 := __UNWRAP(__EE12229734);
-  SHARED __EE12229737 := __ENH_Email;
-  SHARED __EE12229739 := __EE12229737;
-  EXPORT Res16 := __UNWRAP(__EE12229739);
-  SHARED __EE5473099 := __E_Household;
-  SHARED __EE5473101 := __EE5473099;
-  EXPORT Res17 := __UNWRAP(__EE5473101);
-  SHARED __EE12229743 := __ENH_Inquiry;
-  SHARED __EE12229745 := __EE12229743;
-  EXPORT Res18 := __UNWRAP(__EE12229745);
-  SHARED __EE12229748 := __ENH_Lien_Judgment;
-  SHARED __EE12229750 := __EE12229748;
-  EXPORT Res19 := __UNWRAP(__EE12229750);
-  SHARED __EE5473110 := __E_Geo_Link;
-  SHARED __EE5473112 := __EE5473110;
-  EXPORT Res20 := __UNWRAP(__EE5473112);
-  SHARED __EE12229754 := __ENH_Name_Summary;
-  SHARED __EE12229756 := __EE12229754;
-  EXPORT Res21 := __UNWRAP(__EE12229756);
-  SHARED __EE12229759 := __ENH_Person;
-  SHARED __EE12229761 := __EE12229759;
-  EXPORT Res22 := __UNWRAP(__EE12229761);
-  SHARED __EE5473121 := __E_Phone;
-  SHARED __EE5473123 := __EE5473121;
-  EXPORT Res23 := __UNWRAP(__EE5473123);
-  SHARED __EE12229765 := __ENH_Phone_Summary;
-  SHARED __EE12229767 := __EE12229765;
-  EXPORT Res24 := __UNWRAP(__EE12229767);
-  SHARED __EE12229770 := __ENH_Professional_License;
-  SHARED __EE12229772 := __EE12229770;
-  EXPORT Res25 := __UNWRAP(__EE12229772);
-  SHARED __EE12229775 := __ENH_Property;
-  SHARED __EE12229777 := __EE12229775;
-  EXPORT Res26 := __UNWRAP(__EE12229777);
-  SHARED __EE12229780 := __ENH_Property_Event;
-  SHARED __EE12229782 := __EE12229780;
-  EXPORT Res27 := __UNWRAP(__EE12229782);
-  SHARED __EE5473140 := __E_Sex_Offender;
-  SHARED __EE5473142 := __EE5473140;
-  EXPORT Res28 := __UNWRAP(__EE5473142);
-  SHARED __EE5473143 := __E_Social_Security_Number;
-  SHARED __EE5473145 := __EE5473143;
-  EXPORT Res29 := __UNWRAP(__EE5473145);
-  SHARED __EE12229787 := __ENH_S_S_N_Summary;
-  SHARED __EE12229789 := __EE12229787;
-  EXPORT Res30 := __UNWRAP(__EE12229789);
-  SHARED __EE5473150 := __E_Surname;
-  SHARED __EE5473152 := __EE5473150;
-  EXPORT Res31 := __UNWRAP(__EE5473152);
-  SHARED __EE5473153 := __E_T_I_N;
-  SHARED __EE5473155 := __EE5473153;
-  EXPORT Res32 := __UNWRAP(__EE5473155);
-  SHARED __EE12229794 := __ENH_Tradeline;
-  SHARED __EE12229796 := __EE12229794;
-  EXPORT Res33 := __UNWRAP(__EE12229796);
-  SHARED __EE12229799 := __ENH_U_C_C;
-  SHARED __EE12229801 := __EE12229799;
-  EXPORT Res34 := __UNWRAP(__EE12229801);
-  SHARED __EE5473164 := __E_Utility;
-  SHARED __EE5473166 := __EE5473164;
-  EXPORT Res35 := __UNWRAP(__EE5473166);
-  SHARED __EE5473167 := __E_Vehicle;
-  SHARED __EE5473169 := __EE5473167;
-  EXPORT Res36 := __UNWRAP(__EE5473169);
-  SHARED __EE5473170 := __E_Watercraft;
-  SHARED __EE5473172 := __EE5473170;
-  EXPORT Res37 := __UNWRAP(__EE5473172);
-  SHARED __EE5473173 := __E_Zip_Code;
-  EXPORT Res38 := __UNWRAP(__EE5473173);
+  SHARED __EE5475744 := __E_Accident;
+  SHARED __EE5475746 := __EE5475744;
+  EXPORT Res0 := __UNWRAP(__EE5475746);
+  SHARED __EE12235315 := __ENH_Address;
+  SHARED __EE12235317 := __EE12235315;
+  EXPORT Res1 := __UNWRAP(__EE12235317);
+  SHARED __EE12235320 := __ENH_Address_Summary;
+  SHARED __EE12235322 := __EE12235320;
+  EXPORT Res2 := __UNWRAP(__EE12235322);
+  SHARED __EE5475755 := __E_Aircraft;
+  SHARED __EE5475757 := __EE5475755;
+  EXPORT Res3 := __UNWRAP(__EE5475757);
+  SHARED __EE12235326 := __ENH_Bankruptcy;
+  SHARED __EE12235328 := __EE12235326;
+  EXPORT Res4 := __UNWRAP(__EE12235328);
+  SHARED __EE5475762 := __E_Business_Ult;
+  SHARED __EE5475764 := __EE5475762;
+  EXPORT Res5 := __UNWRAP(__EE5475764);
+  SHARED __EE5475765 := __E_Business_Org;
+  SHARED __EE5475767 := __EE5475765;
+  EXPORT Res6 := __UNWRAP(__EE5475767);
+  SHARED __EE12235333 := __ENH_Business_Sele;
+  SHARED __EE12235335 := __EE12235333;
+  EXPORT Res7 := __UNWRAP(__EE12235335);
+  SHARED __EE12235338 := __ENH_Business_Prox;
+  SHARED __EE12235340 := __EE12235338;
+  EXPORT Res8 := __UNWRAP(__EE12235340);
+  SHARED __EE5475776 := __E_Business_Pow;
+  SHARED __EE5475778 := __EE5475776;
+  EXPORT Res9 := __UNWRAP(__EE5475778);
+  SHARED __EE5475779 := __E_Criminal_Offender;
+  SHARED __EE5475781 := __EE5475779;
+  EXPORT Res10 := __UNWRAP(__EE5475781);
+  SHARED __EE12235345 := __ENH_Criminal_Offense;
+  SHARED __EE12235347 := __EE12235345;
+  EXPORT Res11 := __UNWRAP(__EE12235347);
+  SHARED __EE5475786 := __E_Criminal_Punishment;
+  SHARED __EE5475788 := __EE5475786;
+  EXPORT Res12 := __UNWRAP(__EE5475788);
+  SHARED __EE5475789 := __E_Drivers_License;
+  SHARED __EE5475791 := __EE5475789;
+  EXPORT Res13 := __UNWRAP(__EE5475791);
+  SHARED __EE5475792 := __E_E_B_R_Tradeline;
+  SHARED __EE5475794 := __EE5475792;
+  EXPORT Res14 := __UNWRAP(__EE5475794);
+  SHARED __EE12235353 := __ENH_Education;
+  SHARED __EE12235355 := __EE12235353;
+  EXPORT Res15 := __UNWRAP(__EE12235355);
+  SHARED __EE12235358 := __ENH_Email;
+  SHARED __EE12235360 := __EE12235358;
+  EXPORT Res16 := __UNWRAP(__EE12235360);
+  SHARED __EE5475803 := __E_Household;
+  SHARED __EE5475805 := __EE5475803;
+  EXPORT Res17 := __UNWRAP(__EE5475805);
+  SHARED __EE12235364 := __ENH_Inquiry;
+  SHARED __EE12235366 := __EE12235364;
+  EXPORT Res18 := __UNWRAP(__EE12235366);
+  SHARED __EE12235369 := __ENH_Lien_Judgment;
+  SHARED __EE12235371 := __EE12235369;
+  EXPORT Res19 := __UNWRAP(__EE12235371);
+  SHARED __EE5475814 := __E_Geo_Link;
+  SHARED __EE5475816 := __EE5475814;
+  EXPORT Res20 := __UNWRAP(__EE5475816);
+  SHARED __EE12235375 := __ENH_Name_Summary;
+  SHARED __EE12235377 := __EE12235375;
+  EXPORT Res21 := __UNWRAP(__EE12235377);
+  SHARED __EE12235380 := __ENH_Person;
+  SHARED __EE12235382 := __EE12235380;
+  EXPORT Res22 := __UNWRAP(__EE12235382);
+  SHARED __EE5475825 := __E_Phone;
+  SHARED __EE5475827 := __EE5475825;
+  EXPORT Res23 := __UNWRAP(__EE5475827);
+  SHARED __EE12235386 := __ENH_Phone_Summary;
+  SHARED __EE12235388 := __EE12235386;
+  EXPORT Res24 := __UNWRAP(__EE12235388);
+  SHARED __EE12235391 := __ENH_Professional_License;
+  SHARED __EE12235393 := __EE12235391;
+  EXPORT Res25 := __UNWRAP(__EE12235393);
+  SHARED __EE12235396 := __ENH_Property;
+  SHARED __EE12235398 := __EE12235396;
+  EXPORT Res26 := __UNWRAP(__EE12235398);
+  SHARED __EE12235401 := __ENH_Property_Event;
+  SHARED __EE12235403 := __EE12235401;
+  EXPORT Res27 := __UNWRAP(__EE12235403);
+  SHARED __EE5475844 := __E_Sex_Offender;
+  SHARED __EE5475846 := __EE5475844;
+  EXPORT Res28 := __UNWRAP(__EE5475846);
+  SHARED __EE5475847 := __E_Social_Security_Number;
+  SHARED __EE5475849 := __EE5475847;
+  EXPORT Res29 := __UNWRAP(__EE5475849);
+  SHARED __EE12235408 := __ENH_S_S_N_Summary;
+  SHARED __EE12235410 := __EE12235408;
+  EXPORT Res30 := __UNWRAP(__EE12235410);
+  SHARED __EE5475854 := __E_Surname;
+  SHARED __EE5475856 := __EE5475854;
+  EXPORT Res31 := __UNWRAP(__EE5475856);
+  SHARED __EE5475857 := __E_T_I_N;
+  SHARED __EE5475859 := __EE5475857;
+  EXPORT Res32 := __UNWRAP(__EE5475859);
+  SHARED __EE12235415 := __ENH_Tradeline;
+  SHARED __EE12235417 := __EE12235415;
+  EXPORT Res33 := __UNWRAP(__EE12235417);
+  SHARED __EE12235420 := __ENH_U_C_C;
+  SHARED __EE12235422 := __EE12235420;
+  EXPORT Res34 := __UNWRAP(__EE12235422);
+  SHARED __EE5475868 := __E_Utility;
+  SHARED __EE5475870 := __EE5475868;
+  EXPORT Res35 := __UNWRAP(__EE5475870);
+  SHARED __EE5475871 := __E_Vehicle;
+  SHARED __EE5475873 := __EE5475871;
+  EXPORT Res36 := __UNWRAP(__EE5475873);
+  SHARED __EE5475874 := __E_Watercraft;
+  SHARED __EE5475876 := __EE5475874;
+  EXPORT Res37 := __UNWRAP(__EE5475876);
+  SHARED __EE5475877 := __E_Zip_Code;
+  EXPORT Res38 := __UNWRAP(__EE5475877);
   EXPORT DBG_E_Accident_Result := __UNWRAP(E_Accident_Filtered.__Result);
   EXPORT DBG_E_Address_Result := __UNWRAP(E_Address_Filtered.__Result);
   EXPORT DBG_E_Address_Inquiry_Result := __UNWRAP(E_Address_Inquiry_Filtered.__Result);
@@ -1745,6 +1751,7 @@ EXPORT Q_Index_Build_Entity(KEL.typ.kdate __PP_InpClnArchDt, DATA57 __PDPM, CFG_
   EXPORT DBG_E_U_C_C_Intermediate_8 := __UNWRAP(B_U_C_C_8_Local.__ENH_U_C_C_8);
   EXPORT DBG_E_Bankruptcy_Intermediate_7 := __UNWRAP(B_Bankruptcy_7_Local.__ENH_Bankruptcy_7);
   EXPORT DBG_E_Business_Sele_Intermediate_7 := __UNWRAP(B_Business_Sele_7_Local.__ENH_Business_Sele_7);
+  EXPORT DBG_E_Criminal_Offense_Intermediate_7 := __UNWRAP(B_Criminal_Offense_7_Local.__ENH_Criminal_Offense_7);
   EXPORT DBG_E_Education_Intermediate_7 := __UNWRAP(B_Education_7_Local.__ENH_Education_7);
   EXPORT DBG_E_Input_B_I_I_Intermediate_7 := __UNWRAP(B_Input_B_I_I_7_Local.__ENH_Input_B_I_I_7);
   EXPORT DBG_E_Input_P_I_I_Intermediate_7 := __UNWRAP(B_Input_P_I_I_7_Local.__ENH_Input_P_I_I_7);
@@ -1762,6 +1769,7 @@ EXPORT Q_Index_Build_Entity(KEL.typ.kdate __PP_InpClnArchDt, DATA57 __PDPM, CFG_
   EXPORT DBG_E_Bankruptcy_Intermediate_6 := __UNWRAP(B_Bankruptcy_6_Local.__ENH_Bankruptcy_6);
   EXPORT DBG_E_Business_Sele_Intermediate_6 := __UNWRAP(B_Business_Sele_6_Local.__ENH_Business_Sele_6);
   EXPORT DBG_E_Business_Sele_Overflow_Intermediate_6 := __UNWRAP(B_Business_Sele_Overflow_6_Local.__ENH_Business_Sele_Overflow_6);
+  EXPORT DBG_E_Criminal_Offense_Intermediate_6 := __UNWRAP(B_Criminal_Offense_6_Local.__ENH_Criminal_Offense_6);
   EXPORT DBG_E_Education_Intermediate_6 := __UNWRAP(B_Education_6_Local.__ENH_Education_6);
   EXPORT DBG_E_Input_B_I_I_Intermediate_6 := __UNWRAP(B_Input_B_I_I_6_Local.__ENH_Input_B_I_I_6);
   EXPORT DBG_E_Input_P_I_I_Intermediate_6 := __UNWRAP(B_Input_P_I_I_6_Local.__ENH_Input_P_I_I_6);
@@ -2088,6 +2096,7 @@ EXPORT Q_Index_Build_Entity(KEL.typ.kdate __PP_InpClnArchDt, DATA57 __PDPM, CFG_
     OUTPUT(DBG_E_U_C_C_Intermediate_8,NAMED('DBG_E_U_C_C_Intermediate_8_Q_Index_Build_Entity')),
     OUTPUT(DBG_E_Bankruptcy_Intermediate_7,NAMED('DBG_E_Bankruptcy_Intermediate_7_Q_Index_Build_Entity')),
     OUTPUT(DBG_E_Business_Sele_Intermediate_7,NAMED('DBG_E_Business_Sele_Intermediate_7_Q_Index_Build_Entity')),
+    OUTPUT(DBG_E_Criminal_Offense_Intermediate_7,NAMED('DBG_E_Criminal_Offense_Intermediate_7_Q_Index_Build_Entity')),
     OUTPUT(DBG_E_Education_Intermediate_7,NAMED('DBG_E_Education_Intermediate_7_Q_Index_Build_Entity')),
     OUTPUT(DBG_E_Input_B_I_I_Intermediate_7,NAMED('DBG_E_Input_B_I_I_Intermediate_7_Q_Index_Build_Entity')),
     OUTPUT(DBG_E_Input_P_I_I_Intermediate_7,NAMED('DBG_E_Input_P_I_I_Intermediate_7_Q_Index_Build_Entity')),
@@ -2105,6 +2114,7 @@ EXPORT Q_Index_Build_Entity(KEL.typ.kdate __PP_InpClnArchDt, DATA57 __PDPM, CFG_
     OUTPUT(DBG_E_Bankruptcy_Intermediate_6,NAMED('DBG_E_Bankruptcy_Intermediate_6_Q_Index_Build_Entity')),
     OUTPUT(DBG_E_Business_Sele_Intermediate_6,NAMED('DBG_E_Business_Sele_Intermediate_6_Q_Index_Build_Entity')),
     OUTPUT(DBG_E_Business_Sele_Overflow_Intermediate_6,NAMED('DBG_E_Business_Sele_Overflow_Intermediate_6_Q_Index_Build_Entity')),
+    OUTPUT(DBG_E_Criminal_Offense_Intermediate_6,NAMED('DBG_E_Criminal_Offense_Intermediate_6_Q_Index_Build_Entity')),
     OUTPUT(DBG_E_Education_Intermediate_6,NAMED('DBG_E_Education_Intermediate_6_Q_Index_Build_Entity')),
     OUTPUT(DBG_E_Input_B_I_I_Intermediate_6,NAMED('DBG_E_Input_B_I_I_Intermediate_6_Q_Index_Build_Entity')),
     OUTPUT(DBG_E_Input_P_I_I_Intermediate_6,NAMED('DBG_E_Input_P_I_I_Intermediate_6_Q_Index_Build_Entity')),

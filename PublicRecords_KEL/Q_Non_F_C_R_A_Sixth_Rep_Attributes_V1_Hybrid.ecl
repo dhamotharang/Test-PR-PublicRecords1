@@ -62,219 +62,219 @@ EXPORT Q_Non_F_C_R_A_Sixth_Rep_Attributes_V1_Hybrid(KEL.typ.uid __PLexID_in, DAT
     EXPORT VIRTUAL DATASET(InLayout) InData := __d0;
   END;
   SHARED E_Accident_Filtered := MODULE(E_Accident(__in,__cfg_Local))
-    SHARED __AsofFitler(DATASET(InLayout) __ds) := __ds(__T(__OP2(__OP2(KEL.era.ToDateMinNull(__ds.Hybrid_Archive_Date_),<=,__CN(__PRunDateToMimic)),AND,__OP2(KEL.era.ToDateMaxNull(__ds.Vault_Date_Last_Seen_),>=,__CN(__PRunDateToMimic)))) AND __T(__OP2(KEL.era.ToDateMinNull(__ds.Hybrid_Archive_Date_),<=,__CN(__PP_InpClnArchDt))));
+    SHARED __AsofFitler(DATASET(InLayout) __ds) := __ds(__T(__OP2(__OP2(KEL.era.ToDateMinNull(__ds.Hybrid_Archive_Date_),<=,__CN(__PRunDateToMimic)),AND,__OP2(KEL.era.ToDateMaxNull(__ds.Vault_Date_Last_Seen_),>=,__CN(__PRunDateToMimic)))) AND __T(__OP2(KEL.era.ToDateMinNull(__ds.Archive___Date_),<=,__CN(__PP_InpClnArchDt))));
     SHARED __UsingFitler(DATASET(InLayout) __ds) := __ds(KEL.Permits.BitAnd(__ds.__Permits,__PDPM) = __ds.__Permits);
     SHARED __SourceFilter(DATASET(InLayout) __ds) := __UsingFitler(__AsofFitler(__ds));
   END;
   SHARED E_Address_Filtered := MODULE(E_Address(__in,__cfg_Local))
-    SHARED __AsofFitler(DATASET(InLayout) __ds) := __ds(__T(__OP2(__OP2(KEL.era.ToDateMinNull(__ds.Hybrid_Archive_Date_),<=,__CN(__PRunDateToMimic)),AND,__OP2(KEL.era.ToDateMaxNull(__ds.Vault_Date_Last_Seen_),>=,__CN(__PRunDateToMimic)))) AND __T(__OP2(KEL.era.ToDateMinNull(__ds.Hybrid_Archive_Date_),<=,__CN(__PP_InpClnArchDt))));
+    SHARED __AsofFitler(DATASET(InLayout) __ds) := __ds(__T(__OP2(__OP2(KEL.era.ToDateMinNull(__ds.Hybrid_Archive_Date_),<=,__CN(__PRunDateToMimic)),AND,__OP2(KEL.era.ToDateMaxNull(__ds.Vault_Date_Last_Seen_),>=,__CN(__PRunDateToMimic)))) AND __T(__OP2(KEL.era.ToDateMinNull(__ds.Archive___Date_),<=,__CN(__PP_InpClnArchDt))));
     SHARED __UsingFitler(DATASET(InLayout) __ds) := __ds(KEL.Permits.BitAnd(__ds.__Permits,__PDPM) = __ds.__Permits);
     SHARED __SourceFilter(DATASET(InLayout) __ds) := __UsingFitler(__AsofFitler(__ds));
   END;
   SHARED E_Address_Inquiry_Filtered := MODULE(E_Address_Inquiry(__in,__cfg_Local))
-    SHARED __AsofFitler(DATASET(InLayout) __ds) := __ds(__T(__OP2(__OP2(KEL.Era.nkdateFromNtimestamp(KEL.era.ToTimestampMinNull(__ds.Hybrid_Archive_Date_)),<=,__CN(__PRunDateToMimic)),AND,__OP2(KEL.era.ToDateMaxNull(__ds.Vault_Date_Last_Seen_),>=,__CN(__PRunDateToMimic)))) AND __T(__OP2(KEL.Era.nkdateFromNtimestamp(KEL.era.ToTimestampMinNull(__ds.Hybrid_Archive_Date_)),<=,__CN(__PP_InpClnArchDt))));
+    SHARED __AsofFitler(DATASET(InLayout) __ds) := __ds(__T(__OP2(__OP2(KEL.Era.nkdateFromNtimestamp(KEL.era.ToTimestampMinNull(__ds.Hybrid_Archive_Date_)),<=,__CN(__PRunDateToMimic)),AND,__OP2(KEL.era.ToDateMaxNull(__ds.Vault_Date_Last_Seen_),>=,__CN(__PRunDateToMimic)))) AND __T(__OP2(KEL.Era.nkdateFromNtimestamp(KEL.era.ToTimestampMinNull(__ds.Archive___Date_)),<=,__CN(__PP_InpClnArchDt))));
     SHARED __UsingFitler(DATASET(InLayout) __ds) := __ds(KEL.Permits.BitAnd(__ds.__Permits,__PDPM) = __ds.__Permits);
     SHARED __SourceFilter(DATASET(InLayout) __ds) := __UsingFitler(__AsofFitler(__ds));
   END;
   SHARED E_Address_Property_Filtered := MODULE(E_Address_Property(__in,__cfg_Local))
-    SHARED __AsofFitler(DATASET(InLayout) __ds) := __ds(__T(__OP2(__OP2(KEL.era.ToDateMinNull(__ds.Hybrid_Archive_Date_),<=,__CN(__PRunDateToMimic)),AND,__OP2(KEL.era.ToDateMaxNull(__ds.Vault_Date_Last_Seen_),>=,__CN(__PRunDateToMimic)))) AND __T(__OP2(KEL.era.ToDateMinNull(__ds.Hybrid_Archive_Date_),<=,__CN(__PP_InpClnArchDt))));
+    SHARED __AsofFitler(DATASET(InLayout) __ds) := __ds(__T(__OP2(__OP2(KEL.era.ToDateMinNull(__ds.Hybrid_Archive_Date_),<=,__CN(__PRunDateToMimic)),AND,__OP2(KEL.era.ToDateMaxNull(__ds.Vault_Date_Last_Seen_),>=,__CN(__PRunDateToMimic)))) AND __T(__OP2(KEL.era.ToDateMinNull(__ds.Archive___Date_),<=,__CN(__PP_InpClnArchDt))));
     SHARED __UsingFitler(DATASET(InLayout) __ds) := __ds(KEL.Permits.BitAnd(__ds.__Permits,__PDPM) = __ds.__Permits);
     SHARED __SourceFilter(DATASET(InLayout) __ds) := __UsingFitler(__AsofFitler(__ds));
   END;
   SHARED E_Aircraft_Owner_Filtered := MODULE(E_Aircraft_Owner(__in,__cfg_Local))
-    SHARED __AsofFitler(DATASET(InLayout) __ds) := __ds(__T(__OP2(__OP2(KEL.era.ToDateMinNull(__ds.Hybrid_Archive_Date_),<=,__CN(__PRunDateToMimic)),AND,__OP2(KEL.era.ToDateMaxNull(__ds.Vault_Date_Last_Seen_),>=,__CN(__PRunDateToMimic)))) AND __T(__OP2(KEL.era.ToDateMinNull(__ds.Hybrid_Archive_Date_),<=,__CN(__PP_InpClnArchDt))));
+    SHARED __AsofFitler(DATASET(InLayout) __ds) := __ds(__T(__OP2(__OP2(KEL.era.ToDateMinNull(__ds.Hybrid_Archive_Date_),<=,__CN(__PRunDateToMimic)),AND,__OP2(KEL.era.ToDateMaxNull(__ds.Vault_Date_Last_Seen_),>=,__CN(__PRunDateToMimic)))) AND __T(__OP2(KEL.era.ToDateMinNull(__ds.Archive___Date_),<=,__CN(__PP_InpClnArchDt))));
     SHARED __UsingFitler(DATASET(InLayout) __ds) := __ds(KEL.Permits.BitAnd(__ds.__Permits,__PDPM) = __ds.__Permits);
     SHARED __SourceFilter(DATASET(InLayout) __ds) := __UsingFitler(__AsofFitler(__ds));
   END;
   SHARED E_Bankruptcy_Filtered := MODULE(E_Bankruptcy(__in,__cfg_Local))
-    SHARED __AsofFitler(DATASET(InLayout) __ds) := __ds(__T(__OP2(__OP2(KEL.era.ToDateMinNull(__ds.Hybrid_Archive_Date_),<=,__CN(__PRunDateToMimic)),AND,__OP2(KEL.era.ToDateMaxNull(__ds.Vault_Date_Last_Seen_),>=,__CN(__PRunDateToMimic)))) AND __T(__OP2(KEL.era.ToDateMinNull(__ds.Hybrid_Archive_Date_),<=,__CN(__PP_InpClnArchDt))));
+    SHARED __AsofFitler(DATASET(InLayout) __ds) := __ds(__T(__OP2(__OP2(KEL.era.ToDateMinNull(__ds.Hybrid_Archive_Date_),<=,__CN(__PRunDateToMimic)),AND,__OP2(KEL.era.ToDateMaxNull(__ds.Vault_Date_Last_Seen_),>=,__CN(__PRunDateToMimic)))) AND __T(__OP2(KEL.era.ToDateMinNull(__ds.Archive___Date_),<=,__CN(__PP_InpClnArchDt))));
     SHARED __UsingFitler(DATASET(InLayout) __ds) := __ds(KEL.Permits.BitAnd(__ds.__Permits,__PDPM) = __ds.__Permits);
     SHARED __SourceFilter(DATASET(InLayout) __ds) := __UsingFitler(__AsofFitler(__ds));
   END;
   SHARED E_Criminal_Offense_Filtered := MODULE(E_Criminal_Offense(__in,__cfg_Local))
-    SHARED __AsofFitler(DATASET(InLayout) __ds) := __ds(__T(__OP2(__OP2(KEL.era.ToDateMinNull(__ds.Hybrid_Archive_Date_),<=,__CN(__PRunDateToMimic)),AND,__OP2(KEL.era.ToDateMaxNull(__ds.Vault_Date_Last_Seen_),>=,__CN(__PRunDateToMimic)))) AND __T(__OP2(KEL.era.ToDateMinNull(__ds.Hybrid_Archive_Date_),<=,__CN(__PP_InpClnArchDt))));
+    SHARED __AsofFitler(DATASET(InLayout) __ds) := __ds(__T(__OP2(__OP2(KEL.era.ToDateMinNull(__ds.Hybrid_Archive_Date_),<=,__CN(__PRunDateToMimic)),AND,__OP2(KEL.era.ToDateMaxNull(__ds.Vault_Date_Last_Seen_),>=,__CN(__PRunDateToMimic)))) AND __T(__OP2(KEL.era.ToDateMinNull(__ds.Archive___Date_),<=,__CN(__PP_InpClnArchDt))));
     SHARED __UsingFitler(DATASET(InLayout) __ds) := __ds(KEL.Permits.BitAnd(__ds.__Permits,__PDPM) = __ds.__Permits);
     SHARED __SourceFilter(DATASET(InLayout) __ds) := __UsingFitler(__AsofFitler(__ds));
   END;
   SHARED E_Education_Filtered := MODULE(E_Education(__in,__cfg_Local))
-    SHARED __AsofFitler(DATASET(InLayout) __ds) := __ds(__T(__OP2(__OP2(KEL.era.ToDateMinNull(__ds.Hybrid_Archive_Date_),<=,__CN(__PRunDateToMimic)),AND,__OP2(KEL.era.ToDateMaxNull(__ds.Vault_Date_Last_Seen_),>=,__CN(__PRunDateToMimic)))) AND __T(__OP2(KEL.era.ToDateMinNull(__ds.Hybrid_Archive_Date_),<=,__CN(__PP_InpClnArchDt))));
+    SHARED __AsofFitler(DATASET(InLayout) __ds) := __ds(__T(__OP2(__OP2(KEL.era.ToDateMinNull(__ds.Hybrid_Archive_Date_),<=,__CN(__PRunDateToMimic)),AND,__OP2(KEL.era.ToDateMaxNull(__ds.Vault_Date_Last_Seen_),>=,__CN(__PRunDateToMimic)))) AND __T(__OP2(KEL.era.ToDateMinNull(__ds.Archive___Date_),<=,__CN(__PP_InpClnArchDt))));
     SHARED __UsingFitler(DATASET(InLayout) __ds) := __ds(KEL.Permits.BitAnd(__ds.__Permits,__PDPM) = __ds.__Permits);
     SHARED __SourceFilter(DATASET(InLayout) __ds) := __UsingFitler(__AsofFitler(__ds));
   END;
   SHARED E_Email_Filtered := MODULE(E_Email(__in,__cfg_Local))
-    SHARED __AsofFitler(DATASET(InLayout) __ds) := __ds(__T(__OP2(__OP2(KEL.era.ToDateMinNull(__ds.Hybrid_Archive_Date_),<=,__CN(__PRunDateToMimic)),AND,__OP2(KEL.era.ToDateMaxNull(__ds.Vault_Date_Last_Seen_),>=,__CN(__PRunDateToMimic)))) AND __T(__OP2(KEL.era.ToDateMinNull(__ds.Hybrid_Archive_Date_),<=,__CN(__PP_InpClnArchDt))));
+    SHARED __AsofFitler(DATASET(InLayout) __ds) := __ds(__T(__OP2(__OP2(KEL.era.ToDateMinNull(__ds.Hybrid_Archive_Date_),<=,__CN(__PRunDateToMimic)),AND,__OP2(KEL.era.ToDateMaxNull(__ds.Vault_Date_Last_Seen_),>=,__CN(__PRunDateToMimic)))) AND __T(__OP2(KEL.era.ToDateMinNull(__ds.Archive___Date_),<=,__CN(__PP_InpClnArchDt))));
     SHARED __UsingFitler(DATASET(InLayout) __ds) := __ds(KEL.Permits.BitAnd(__ds.__Permits,__PDPM) = __ds.__Permits);
     SHARED __SourceFilter(DATASET(InLayout) __ds) := __UsingFitler(__AsofFitler(__ds));
   END;
   SHARED E_Email_Inquiry_Filtered := MODULE(E_Email_Inquiry(__in,__cfg_Local))
-    SHARED __AsofFitler(DATASET(InLayout) __ds) := __ds(__T(__OP2(__OP2(KEL.Era.nkdateFromNtimestamp(KEL.era.ToTimestampMinNull(__ds.Hybrid_Archive_Date_)),<=,__CN(__PRunDateToMimic)),AND,__OP2(KEL.era.ToDateMaxNull(__ds.Vault_Date_Last_Seen_),>=,__CN(__PRunDateToMimic)))) AND __T(__OP2(KEL.Era.nkdateFromNtimestamp(KEL.era.ToTimestampMinNull(__ds.Hybrid_Archive_Date_)),<=,__CN(__PP_InpClnArchDt))));
+    SHARED __AsofFitler(DATASET(InLayout) __ds) := __ds(__T(__OP2(__OP2(KEL.Era.nkdateFromNtimestamp(KEL.era.ToTimestampMinNull(__ds.Hybrid_Archive_Date_)),<=,__CN(__PRunDateToMimic)),AND,__OP2(KEL.era.ToDateMaxNull(__ds.Vault_Date_Last_Seen_),>=,__CN(__PRunDateToMimic)))) AND __T(__OP2(KEL.Era.nkdateFromNtimestamp(KEL.era.ToTimestampMinNull(__ds.Archive___Date_)),<=,__CN(__PP_InpClnArchDt))));
     SHARED __UsingFitler(DATASET(InLayout) __ds) := __ds(KEL.Permits.BitAnd(__ds.__Permits,__PDPM) = __ds.__Permits);
     SHARED __SourceFilter(DATASET(InLayout) __ds) := __UsingFitler(__AsofFitler(__ds));
   END;
   SHARED E_First_Degree_Associations_Filtered := MODULE(E_First_Degree_Associations(__in,__cfg_Local))
-    SHARED __AsofFitler(DATASET(InLayout) __ds) := __ds(__T(__OP2(__OP2(KEL.era.ToDateMinNull(__ds.Hybrid_Archive_Date_),<=,__CN(__PRunDateToMimic)),AND,__OP2(KEL.era.ToDateMaxNull(__ds.Vault_Date_Last_Seen_),>=,__CN(__PRunDateToMimic)))) AND __T(__OP2(KEL.era.ToDateMinNull(__ds.Hybrid_Archive_Date_),<=,__CN(__PP_InpClnArchDt))));
+    SHARED __AsofFitler(DATASET(InLayout) __ds) := __ds(__T(__OP2(__OP2(KEL.era.ToDateMinNull(__ds.Hybrid_Archive_Date_),<=,__CN(__PRunDateToMimic)),AND,__OP2(KEL.era.ToDateMaxNull(__ds.Vault_Date_Last_Seen_),>=,__CN(__PRunDateToMimic)))) AND __T(__OP2(KEL.era.ToDateMinNull(__ds.Archive___Date_),<=,__CN(__PP_InpClnArchDt))));
     SHARED __UsingFitler(DATASET(InLayout) __ds) := __ds(KEL.Permits.BitAnd(__ds.__Permits,__PDPM) = __ds.__Permits);
     SHARED __SourceFilter(DATASET(InLayout) __ds) := __UsingFitler(__AsofFitler(__ds));
   END;
   SHARED E_First_Degree_Relative_Filtered := MODULE(E_First_Degree_Relative(__in,__cfg_Local))
-    SHARED __AsofFitler(DATASET(InLayout) __ds) := __ds(__T(__OP2(__OP2(KEL.era.ToDateMinNull(__ds.Hybrid_Archive_Date_),<=,__CN(__PRunDateToMimic)),AND,__OP2(KEL.era.ToDateMaxNull(__ds.Vault_Date_Last_Seen_),>=,__CN(__PRunDateToMimic)))) AND __T(__OP2(KEL.era.ToDateMinNull(__ds.Hybrid_Archive_Date_),<=,__CN(__PP_InpClnArchDt))));
+    SHARED __AsofFitler(DATASET(InLayout) __ds) := __ds(__T(__OP2(__OP2(KEL.era.ToDateMinNull(__ds.Hybrid_Archive_Date_),<=,__CN(__PRunDateToMimic)),AND,__OP2(KEL.era.ToDateMaxNull(__ds.Vault_Date_Last_Seen_),>=,__CN(__PRunDateToMimic)))) AND __T(__OP2(KEL.era.ToDateMinNull(__ds.Archive___Date_),<=,__CN(__PP_InpClnArchDt))));
     SHARED __UsingFitler(DATASET(InLayout) __ds) := __ds(KEL.Permits.BitAnd(__ds.__Permits,__PDPM) = __ds.__Permits);
     SHARED __SourceFilter(DATASET(InLayout) __ds) := __UsingFitler(__AsofFitler(__ds));
   END;
   SHARED E_Household_Filtered := MODULE(E_Household(__in,__cfg_Local))
-    SHARED __AsofFitler(DATASET(InLayout) __ds) := __ds(__T(__OP2(__OP2(KEL.era.ToDateMinNull(__ds.Hybrid_Archive_Date_),<=,__CN(__PRunDateToMimic)),AND,__OP2(KEL.era.ToDateMaxNull(__ds.Vault_Date_Last_Seen_),>=,__CN(__PRunDateToMimic)))) AND __T(__OP2(KEL.era.ToDateMinNull(__ds.Hybrid_Archive_Date_),<=,__CN(__PP_InpClnArchDt))));
+    SHARED __AsofFitler(DATASET(InLayout) __ds) := __ds(__T(__OP2(__OP2(KEL.era.ToDateMinNull(__ds.Hybrid_Archive_Date_),<=,__CN(__PRunDateToMimic)),AND,__OP2(KEL.era.ToDateMaxNull(__ds.Vault_Date_Last_Seen_),>=,__CN(__PRunDateToMimic)))) AND __T(__OP2(KEL.era.ToDateMinNull(__ds.Archive___Date_),<=,__CN(__PP_InpClnArchDt))));
     SHARED __UsingFitler(DATASET(InLayout) __ds) := __ds(KEL.Permits.BitAnd(__ds.__Permits,__PDPM) = __ds.__Permits);
     SHARED __SourceFilter(DATASET(InLayout) __ds) := __UsingFitler(__AsofFitler(__ds));
   END;
   SHARED E_Household_Member_Filtered := MODULE(E_Household_Member(__in,__cfg_Local))
-    SHARED __AsofFitler(DATASET(InLayout) __ds) := __ds(__T(__OP2(__OP2(KEL.era.ToDateMinNull(__ds.Hybrid_Archive_Date_),<=,__CN(__PRunDateToMimic)),AND,__OP2(KEL.era.ToDateMaxNull(__ds.Vault_Date_Last_Seen_),>=,__CN(__PRunDateToMimic)))) AND __T(__OP2(KEL.era.ToDateMinNull(__ds.Hybrid_Archive_Date_),<=,__CN(__PP_InpClnArchDt))));
+    SHARED __AsofFitler(DATASET(InLayout) __ds) := __ds(__T(__OP2(__OP2(KEL.era.ToDateMinNull(__ds.Hybrid_Archive_Date_),<=,__CN(__PRunDateToMimic)),AND,__OP2(KEL.era.ToDateMaxNull(__ds.Vault_Date_Last_Seen_),>=,__CN(__PRunDateToMimic)))) AND __T(__OP2(KEL.era.ToDateMinNull(__ds.Archive___Date_),<=,__CN(__PP_InpClnArchDt))));
     SHARED __UsingFitler(DATASET(InLayout) __ds) := __ds(KEL.Permits.BitAnd(__ds.__Permits,__PDPM) = __ds.__Permits);
     SHARED __SourceFilter(DATASET(InLayout) __ds) := __UsingFitler(__AsofFitler(__ds));
   END;
   SHARED E_Input_P_I_I_Filtered := MODULE(E_Input_P_I_I_Params(__in,__cfg_Local))
-    SHARED __AsofFitler(DATASET(InLayout) __ds) := __ds(__T(__OP2(__OP2(KEL.era.ToDateMinNull(__ds.Hybrid_Archive_Date_),<=,__CN(__PRunDateToMimic)),AND,__OP2(KEL.era.ToDateMaxNull(__ds.Vault_Date_Last_Seen_),>=,__CN(__PRunDateToMimic)))) AND __T(__OP2(KEL.era.ToDateMinNull(__ds.Hybrid_Archive_Date_),<=,__CN(__PP_InpClnArchDt))));
+    SHARED __AsofFitler(DATASET(InLayout) __ds) := __ds(__T(__OP2(__OP2(KEL.era.ToDateMinNull(__ds.Hybrid_Archive_Date_),<=,__CN(__PRunDateToMimic)),AND,__OP2(KEL.era.ToDateMaxNull(__ds.Vault_Date_Last_Seen_),>=,__CN(__PRunDateToMimic)))) AND __T(__OP2(KEL.era.ToDateMinNull(__ds.Archive___Date_),<=,__CN(__PP_InpClnArchDt))));
     SHARED __UsingFitler(DATASET(InLayout) __ds) := __ds(KEL.Permits.BitAnd(__ds.__Permits,__PDPM) = __ds.__Permits);
     SHARED __SourceFilter(DATASET(InLayout) __ds) := __UsingFitler(__AsofFitler(__ds));
   END;
   SHARED E_Inquiry_Filtered := MODULE(E_Inquiry(__in,__cfg_Local))
-    SHARED __AsofFitler(DATASET(InLayout) __ds) := __ds(__T(__OP2(__OP2(KEL.Era.nkdateFromNtimestamp(KEL.era.ToTimestampMinNull(__ds.Hybrid_Archive_Date_)),<=,__CN(__PRunDateToMimic)),AND,__OP2(KEL.era.ToDateMaxNull(__ds.Vault_Date_Last_Seen_),>=,__CN(__PRunDateToMimic)))) AND __T(__OP2(KEL.Era.nkdateFromNtimestamp(KEL.era.ToTimestampMinNull(__ds.Hybrid_Archive_Date_)),<=,__CN(__PP_InpClnArchDt))));
+    SHARED __AsofFitler(DATASET(InLayout) __ds) := __ds(__T(__OP2(__OP2(KEL.Era.nkdateFromNtimestamp(KEL.era.ToTimestampMinNull(__ds.Hybrid_Archive_Date_)),<=,__CN(__PRunDateToMimic)),AND,__OP2(KEL.era.ToDateMaxNull(__ds.Vault_Date_Last_Seen_),>=,__CN(__PRunDateToMimic)))) AND __T(__OP2(KEL.Era.nkdateFromNtimestamp(KEL.era.ToTimestampMinNull(__ds.Archive___Date_)),<=,__CN(__PP_InpClnArchDt))));
     SHARED __UsingFitler(DATASET(InLayout) __ds) := __ds(KEL.Permits.BitAnd(__ds.__Permits,__PDPM) = __ds.__Permits);
     SHARED __SourceFilter(DATASET(InLayout) __ds) := __UsingFitler(__AsofFitler(__ds));
   END;
   SHARED E_Lien_Judgment_Filtered := MODULE(E_Lien_Judgment(__in,__cfg_Local))
-    SHARED __AsofFitler(DATASET(InLayout) __ds) := __ds(__T(__OP2(__OP2(KEL.era.ToDateMinNull(__ds.Hybrid_Archive_Date_),<=,__CN(__PRunDateToMimic)),AND,__OP2(KEL.era.ToDateMaxNull(__ds.Vault_Date_Last_Seen_),>=,__CN(__PRunDateToMimic)))) AND __T(__OP2(KEL.era.ToDateMinNull(__ds.Hybrid_Archive_Date_),<=,__CN(__PP_InpClnArchDt))));
+    SHARED __AsofFitler(DATASET(InLayout) __ds) := __ds(__T(__OP2(__OP2(KEL.era.ToDateMinNull(__ds.Hybrid_Archive_Date_),<=,__CN(__PRunDateToMimic)),AND,__OP2(KEL.era.ToDateMaxNull(__ds.Vault_Date_Last_Seen_),>=,__CN(__PRunDateToMimic)))) AND __T(__OP2(KEL.era.ToDateMinNull(__ds.Archive___Date_),<=,__CN(__PP_InpClnArchDt))));
     SHARED __UsingFitler(DATASET(InLayout) __ds) := __ds(KEL.Permits.BitAnd(__ds.__Permits,__PDPM) = __ds.__Permits);
     SHARED __SourceFilter(DATASET(InLayout) __ds) := __UsingFitler(__AsofFitler(__ds));
   END;
   SHARED E_Person_Filtered := MODULE(E_Person(__in,__cfg_Local))
-    SHARED __AsofFitler(DATASET(InLayout) __ds) := __ds(__T(__OP2(__OP2(KEL.era.ToDateMinNull(__ds.Hybrid_Archive_Date_),<=,__CN(__PRunDateToMimic)),AND,__OP2(KEL.era.ToDateMaxNull(__ds.Vault_Date_Last_Seen_),>=,__CN(__PRunDateToMimic)))) AND __T(__OP2(KEL.era.ToDateMinNull(__ds.Hybrid_Archive_Date_),<=,__CN(__PP_InpClnArchDt))));
+    SHARED __AsofFitler(DATASET(InLayout) __ds) := __ds(__T(__OP2(__OP2(KEL.era.ToDateMinNull(__ds.Hybrid_Archive_Date_),<=,__CN(__PRunDateToMimic)),AND,__OP2(KEL.era.ToDateMaxNull(__ds.Vault_Date_Last_Seen_),>=,__CN(__PRunDateToMimic)))) AND __T(__OP2(KEL.era.ToDateMinNull(__ds.Archive___Date_),<=,__CN(__PP_InpClnArchDt))));
     SHARED __UsingFitler(DATASET(InLayout) __ds) := __ds(KEL.Permits.BitAnd(__ds.__Permits,__PDPM) = __ds.__Permits);
     SHARED __SourceFilter(DATASET(InLayout) __ds) := __UsingFitler(__AsofFitler(__ds));
   END;
   SHARED E_Person_Accident_Filtered := MODULE(E_Person_Accident(__in,__cfg_Local))
-    SHARED __AsofFitler(DATASET(InLayout) __ds) := __ds(__T(__OP2(__OP2(KEL.era.ToDateMinNull(__ds.Hybrid_Archive_Date_),<=,__CN(__PRunDateToMimic)),AND,__OP2(KEL.era.ToDateMaxNull(__ds.Vault_Date_Last_Seen_),>=,__CN(__PRunDateToMimic)))) AND __T(__OP2(KEL.era.ToDateMinNull(__ds.Hybrid_Archive_Date_),<=,__CN(__PP_InpClnArchDt))));
+    SHARED __AsofFitler(DATASET(InLayout) __ds) := __ds(__T(__OP2(__OP2(KEL.era.ToDateMinNull(__ds.Hybrid_Archive_Date_),<=,__CN(__PRunDateToMimic)),AND,__OP2(KEL.era.ToDateMaxNull(__ds.Vault_Date_Last_Seen_),>=,__CN(__PRunDateToMimic)))) AND __T(__OP2(KEL.era.ToDateMinNull(__ds.Archive___Date_),<=,__CN(__PP_InpClnArchDt))));
     SHARED __UsingFitler(DATASET(InLayout) __ds) := __ds(KEL.Permits.BitAnd(__ds.__Permits,__PDPM) = __ds.__Permits);
     SHARED __SourceFilter(DATASET(InLayout) __ds) := __UsingFitler(__AsofFitler(__ds));
   END;
   SHARED E_Person_Address_Filtered := MODULE(E_Person_Address(__in,__cfg_Local))
-    SHARED __AsofFitler(DATASET(InLayout) __ds) := __ds(__T(__OP2(__OP2(KEL.era.ToDateMinNull(__ds.Hybrid_Archive_Date_),<=,__CN(__PRunDateToMimic)),AND,__OP2(KEL.era.ToDateMaxNull(__ds.Vault_Date_Last_Seen_),>=,__CN(__PRunDateToMimic)))) AND __T(__OP2(KEL.era.ToDateMinNull(__ds.Hybrid_Archive_Date_),<=,__CN(__PP_InpClnArchDt))));
+    SHARED __AsofFitler(DATASET(InLayout) __ds) := __ds(__T(__OP2(__OP2(KEL.era.ToDateMinNull(__ds.Hybrid_Archive_Date_),<=,__CN(__PRunDateToMimic)),AND,__OP2(KEL.era.ToDateMaxNull(__ds.Vault_Date_Last_Seen_),>=,__CN(__PRunDateToMimic)))) AND __T(__OP2(KEL.era.ToDateMinNull(__ds.Archive___Date_),<=,__CN(__PP_InpClnArchDt))));
     SHARED __UsingFitler(DATASET(InLayout) __ds) := __ds(KEL.Permits.BitAnd(__ds.__Permits,__PDPM) = __ds.__Permits);
     SHARED __SourceFilter(DATASET(InLayout) __ds) := __UsingFitler(__AsofFitler(__ds));
   END;
   SHARED E_Person_Bankruptcy_Filtered := MODULE(E_Person_Bankruptcy(__in,__cfg_Local))
-    SHARED __AsofFitler(DATASET(InLayout) __ds) := __ds(__T(__OP2(__OP2(KEL.era.ToDateMinNull(__ds.Hybrid_Archive_Date_),<=,__CN(__PRunDateToMimic)),AND,__OP2(KEL.era.ToDateMaxNull(__ds.Vault_Date_Last_Seen_),>=,__CN(__PRunDateToMimic)))) AND __T(__OP2(KEL.era.ToDateMinNull(__ds.Hybrid_Archive_Date_),<=,__CN(__PP_InpClnArchDt))));
+    SHARED __AsofFitler(DATASET(InLayout) __ds) := __ds(__T(__OP2(__OP2(KEL.era.ToDateMinNull(__ds.Hybrid_Archive_Date_),<=,__CN(__PRunDateToMimic)),AND,__OP2(KEL.era.ToDateMaxNull(__ds.Vault_Date_Last_Seen_),>=,__CN(__PRunDateToMimic)))) AND __T(__OP2(KEL.era.ToDateMinNull(__ds.Archive___Date_),<=,__CN(__PP_InpClnArchDt))));
     SHARED __UsingFitler(DATASET(InLayout) __ds) := __ds(KEL.Permits.BitAnd(__ds.__Permits,__PDPM) = __ds.__Permits);
     SHARED __SourceFilter(DATASET(InLayout) __ds) := __UsingFitler(__AsofFitler(__ds));
   END;
   SHARED E_Person_Education_Filtered := MODULE(E_Person_Education(__in,__cfg_Local))
-    SHARED __AsofFitler(DATASET(InLayout) __ds) := __ds(__T(__OP2(__OP2(KEL.era.ToDateMinNull(__ds.Hybrid_Archive_Date_),<=,__CN(__PRunDateToMimic)),AND,__OP2(KEL.era.ToDateMaxNull(__ds.Vault_Date_Last_Seen_),>=,__CN(__PRunDateToMimic)))) AND __T(__OP2(KEL.era.ToDateMinNull(__ds.Hybrid_Archive_Date_),<=,__CN(__PP_InpClnArchDt))));
+    SHARED __AsofFitler(DATASET(InLayout) __ds) := __ds(__T(__OP2(__OP2(KEL.era.ToDateMinNull(__ds.Hybrid_Archive_Date_),<=,__CN(__PRunDateToMimic)),AND,__OP2(KEL.era.ToDateMaxNull(__ds.Vault_Date_Last_Seen_),>=,__CN(__PRunDateToMimic)))) AND __T(__OP2(KEL.era.ToDateMinNull(__ds.Archive___Date_),<=,__CN(__PP_InpClnArchDt))));
     SHARED __UsingFitler(DATASET(InLayout) __ds) := __ds(KEL.Permits.BitAnd(__ds.__Permits,__PDPM) = __ds.__Permits);
     SHARED __SourceFilter(DATASET(InLayout) __ds) := __UsingFitler(__AsofFitler(__ds));
   END;
   SHARED E_Person_Email_Filtered := MODULE(E_Person_Email(__in,__cfg_Local))
-    SHARED __AsofFitler(DATASET(InLayout) __ds) := __ds(__T(__OP2(__OP2(KEL.era.ToDateMinNull(__ds.Hybrid_Archive_Date_),<=,__CN(__PRunDateToMimic)),AND,__OP2(KEL.era.ToDateMaxNull(__ds.Vault_Date_Last_Seen_),>=,__CN(__PRunDateToMimic)))) AND __T(__OP2(KEL.era.ToDateMinNull(__ds.Hybrid_Archive_Date_),<=,__CN(__PP_InpClnArchDt))));
+    SHARED __AsofFitler(DATASET(InLayout) __ds) := __ds(__T(__OP2(__OP2(KEL.era.ToDateMinNull(__ds.Hybrid_Archive_Date_),<=,__CN(__PRunDateToMimic)),AND,__OP2(KEL.era.ToDateMaxNull(__ds.Vault_Date_Last_Seen_),>=,__CN(__PRunDateToMimic)))) AND __T(__OP2(KEL.era.ToDateMinNull(__ds.Archive___Date_),<=,__CN(__PP_InpClnArchDt))));
     SHARED __UsingFitler(DATASET(InLayout) __ds) := __ds(KEL.Permits.BitAnd(__ds.__Permits,__PDPM) = __ds.__Permits);
     SHARED __SourceFilter(DATASET(InLayout) __ds) := __UsingFitler(__AsofFitler(__ds));
   END;
   SHARED E_Person_Inquiry_Filtered := MODULE(E_Person_Inquiry(__in,__cfg_Local))
-    SHARED __AsofFitler(DATASET(InLayout) __ds) := __ds(__T(__OP2(__OP2(KEL.Era.nkdateFromNtimestamp(KEL.era.ToTimestampMinNull(__ds.Hybrid_Archive_Date_)),<=,__CN(__PRunDateToMimic)),AND,__OP2(KEL.era.ToDateMaxNull(__ds.Vault_Date_Last_Seen_),>=,__CN(__PRunDateToMimic)))) AND __T(__OP2(KEL.Era.nkdateFromNtimestamp(KEL.era.ToTimestampMinNull(__ds.Hybrid_Archive_Date_)),<=,__CN(__PP_InpClnArchDt))));
+    SHARED __AsofFitler(DATASET(InLayout) __ds) := __ds(__T(__OP2(__OP2(KEL.Era.nkdateFromNtimestamp(KEL.era.ToTimestampMinNull(__ds.Hybrid_Archive_Date_)),<=,__CN(__PRunDateToMimic)),AND,__OP2(KEL.era.ToDateMaxNull(__ds.Vault_Date_Last_Seen_),>=,__CN(__PRunDateToMimic)))) AND __T(__OP2(KEL.Era.nkdateFromNtimestamp(KEL.era.ToTimestampMinNull(__ds.Archive___Date_)),<=,__CN(__PP_InpClnArchDt))));
     SHARED __UsingFitler(DATASET(InLayout) __ds) := __ds(KEL.Permits.BitAnd(__ds.__Permits,__PDPM) = __ds.__Permits);
     SHARED __SourceFilter(DATASET(InLayout) __ds) := __UsingFitler(__AsofFitler(__ds));
   END;
   SHARED E_Person_Lien_Judgment_Filtered := MODULE(E_Person_Lien_Judgment(__in,__cfg_Local))
-    SHARED __AsofFitler(DATASET(InLayout) __ds) := __ds(__T(__OP2(__OP2(KEL.era.ToDateMinNull(__ds.Hybrid_Archive_Date_),<=,__CN(__PRunDateToMimic)),AND,__OP2(KEL.era.ToDateMaxNull(__ds.Vault_Date_Last_Seen_),>=,__CN(__PRunDateToMimic)))) AND __T(__OP2(KEL.era.ToDateMinNull(__ds.Hybrid_Archive_Date_),<=,__CN(__PP_InpClnArchDt))));
+    SHARED __AsofFitler(DATASET(InLayout) __ds) := __ds(__T(__OP2(__OP2(KEL.era.ToDateMinNull(__ds.Hybrid_Archive_Date_),<=,__CN(__PRunDateToMimic)),AND,__OP2(KEL.era.ToDateMaxNull(__ds.Vault_Date_Last_Seen_),>=,__CN(__PRunDateToMimic)))) AND __T(__OP2(KEL.era.ToDateMinNull(__ds.Archive___Date_),<=,__CN(__PP_InpClnArchDt))));
     SHARED __UsingFitler(DATASET(InLayout) __ds) := __ds(KEL.Permits.BitAnd(__ds.__Permits,__PDPM) = __ds.__Permits);
     SHARED __SourceFilter(DATASET(InLayout) __ds) := __UsingFitler(__AsofFitler(__ds));
   END;
   SHARED E_Person_Offenses_Filtered := MODULE(E_Person_Offenses(__in,__cfg_Local))
-    SHARED __AsofFitler(DATASET(InLayout) __ds) := __ds(__T(__OP2(__OP2(KEL.era.ToDateMinNull(__ds.Hybrid_Archive_Date_),<=,__CN(__PRunDateToMimic)),AND,__OP2(KEL.era.ToDateMaxNull(__ds.Vault_Date_Last_Seen_),>=,__CN(__PRunDateToMimic)))) AND __T(__OP2(KEL.era.ToDateMinNull(__ds.Hybrid_Archive_Date_),<=,__CN(__PP_InpClnArchDt))));
+    SHARED __AsofFitler(DATASET(InLayout) __ds) := __ds(__T(__OP2(__OP2(KEL.era.ToDateMinNull(__ds.Hybrid_Archive_Date_),<=,__CN(__PRunDateToMimic)),AND,__OP2(KEL.era.ToDateMaxNull(__ds.Vault_Date_Last_Seen_),>=,__CN(__PRunDateToMimic)))) AND __T(__OP2(KEL.era.ToDateMinNull(__ds.Archive___Date_),<=,__CN(__PP_InpClnArchDt))));
     SHARED __UsingFitler(DATASET(InLayout) __ds) := __ds(KEL.Permits.BitAnd(__ds.__Permits,__PDPM) = __ds.__Permits);
     SHARED __SourceFilter(DATASET(InLayout) __ds) := __UsingFitler(__AsofFitler(__ds));
   END;
   SHARED E_Person_Property_Filtered := MODULE(E_Person_Property(__in,__cfg_Local))
-    SHARED __AsofFitler(DATASET(InLayout) __ds) := __ds(__T(__OP2(__OP2(KEL.era.ToDateMinNull(__ds.Hybrid_Archive_Date_),<=,__CN(__PRunDateToMimic)),AND,__OP2(KEL.era.ToDateMaxNull(__ds.Vault_Date_Last_Seen_),>=,__CN(__PRunDateToMimic)))) AND __T(__OP2(KEL.era.ToDateMinNull(__ds.Hybrid_Archive_Date_),<=,__CN(__PP_InpClnArchDt))));
+    SHARED __AsofFitler(DATASET(InLayout) __ds) := __ds(__T(__OP2(__OP2(KEL.era.ToDateMinNull(__ds.Hybrid_Archive_Date_),<=,__CN(__PRunDateToMimic)),AND,__OP2(KEL.era.ToDateMaxNull(__ds.Vault_Date_Last_Seen_),>=,__CN(__PRunDateToMimic)))) AND __T(__OP2(KEL.era.ToDateMinNull(__ds.Archive___Date_),<=,__CN(__PP_InpClnArchDt))));
     SHARED __UsingFitler(DATASET(InLayout) __ds) := __ds(KEL.Permits.BitAnd(__ds.__Permits,__PDPM) = __ds.__Permits);
     SHARED __SourceFilter(DATASET(InLayout) __ds) := __UsingFitler(__AsofFitler(__ds));
   END;
   SHARED E_Person_Property_Event_Filtered := MODULE(E_Person_Property_Event(__in,__cfg_Local))
-    SHARED __AsofFitler(DATASET(InLayout) __ds) := __ds(__T(__OP2(__OP2(KEL.era.ToDateMinNull(__ds.Hybrid_Archive_Date_),<=,__CN(__PRunDateToMimic)),AND,__OP2(KEL.era.ToDateMaxNull(__ds.Vault_Date_Last_Seen_),>=,__CN(__PRunDateToMimic)))) AND __T(__OP2(KEL.era.ToDateMinNull(__ds.Hybrid_Archive_Date_),<=,__CN(__PP_InpClnArchDt))));
+    SHARED __AsofFitler(DATASET(InLayout) __ds) := __ds(__T(__OP2(__OP2(KEL.era.ToDateMinNull(__ds.Hybrid_Archive_Date_),<=,__CN(__PRunDateToMimic)),AND,__OP2(KEL.era.ToDateMaxNull(__ds.Vault_Date_Last_Seen_),>=,__CN(__PRunDateToMimic)))) AND __T(__OP2(KEL.era.ToDateMinNull(__ds.Archive___Date_),<=,__CN(__PP_InpClnArchDt))));
     SHARED __UsingFitler(DATASET(InLayout) __ds) := __ds(KEL.Permits.BitAnd(__ds.__Permits,__PDPM) = __ds.__Permits);
     SHARED __SourceFilter(DATASET(InLayout) __ds) := __UsingFitler(__AsofFitler(__ds));
   END;
   SHARED E_Person_S_S_N_Filtered := MODULE(E_Person_S_S_N(__in,__cfg_Local))
-    SHARED __AsofFitler(DATASET(InLayout) __ds) := __ds(__T(__OP2(__OP2(KEL.era.ToDateMinNull(__ds.Hybrid_Archive_Date_),<=,__CN(__PRunDateToMimic)),AND,__OP2(KEL.era.ToDateMaxNull(__ds.Vault_Date_Last_Seen_),>=,__CN(__PRunDateToMimic)))) AND __T(__OP2(KEL.era.ToDateMinNull(__ds.Hybrid_Archive_Date_),<=,__CN(__PP_InpClnArchDt))));
+    SHARED __AsofFitler(DATASET(InLayout) __ds) := __ds(__T(__OP2(__OP2(KEL.era.ToDateMinNull(__ds.Hybrid_Archive_Date_),<=,__CN(__PRunDateToMimic)),AND,__OP2(KEL.era.ToDateMaxNull(__ds.Vault_Date_Last_Seen_),>=,__CN(__PRunDateToMimic)))) AND __T(__OP2(KEL.era.ToDateMinNull(__ds.Archive___Date_),<=,__CN(__PP_InpClnArchDt))));
     SHARED __UsingFitler(DATASET(InLayout) __ds) := __ds(KEL.Permits.BitAnd(__ds.__Permits,__PDPM) = __ds.__Permits);
     SHARED __SourceFilter(DATASET(InLayout) __ds) := __UsingFitler(__AsofFitler(__ds));
   END;
   SHARED E_Person_Vehicle_Filtered := MODULE(E_Person_Vehicle(__in,__cfg_Local))
-    SHARED __AsofFitler(DATASET(InLayout) __ds) := __ds(__T(__OP2(__OP2(KEL.era.ToDateMinNull(__ds.Hybrid_Archive_Date_),<=,__CN(__PRunDateToMimic)),AND,__OP2(KEL.era.ToDateMaxNull(__ds.Vault_Date_Last_Seen_),>=,__CN(__PRunDateToMimic)))) AND __T(__OP2(KEL.era.ToDateMinNull(__ds.Hybrid_Archive_Date_),<=,__CN(__PP_InpClnArchDt))));
+    SHARED __AsofFitler(DATASET(InLayout) __ds) := __ds(__T(__OP2(__OP2(KEL.era.ToDateMinNull(__ds.Hybrid_Archive_Date_),<=,__CN(__PRunDateToMimic)),AND,__OP2(KEL.era.ToDateMaxNull(__ds.Vault_Date_Last_Seen_),>=,__CN(__PRunDateToMimic)))) AND __T(__OP2(KEL.era.ToDateMinNull(__ds.Archive___Date_),<=,__CN(__PP_InpClnArchDt))));
     SHARED __UsingFitler(DATASET(InLayout) __ds) := __ds(KEL.Permits.BitAnd(__ds.__Permits,__PDPM) = __ds.__Permits);
     SHARED __SourceFilter(DATASET(InLayout) __ds) := __UsingFitler(__AsofFitler(__ds));
   END;
   SHARED E_Phone_Filtered := MODULE(E_Phone(__in,__cfg_Local))
-    SHARED __AsofFitler(DATASET(InLayout) __ds) := __ds(__T(__OP2(__OP2(KEL.era.ToDateMinNull(__ds.Hybrid_Archive_Date_),<=,__CN(__PRunDateToMimic)),AND,__OP2(KEL.era.ToDateMaxNull(__ds.Vault_Date_Last_Seen_),>=,__CN(__PRunDateToMimic)))) AND __T(__OP2(KEL.era.ToDateMinNull(__ds.Hybrid_Archive_Date_),<=,__CN(__PP_InpClnArchDt))));
+    SHARED __AsofFitler(DATASET(InLayout) __ds) := __ds(__T(__OP2(__OP2(KEL.era.ToDateMinNull(__ds.Hybrid_Archive_Date_),<=,__CN(__PRunDateToMimic)),AND,__OP2(KEL.era.ToDateMaxNull(__ds.Vault_Date_Last_Seen_),>=,__CN(__PRunDateToMimic)))) AND __T(__OP2(KEL.era.ToDateMinNull(__ds.Archive___Date_),<=,__CN(__PP_InpClnArchDt))));
     SHARED __UsingFitler(DATASET(InLayout) __ds) := __ds(KEL.Permits.BitAnd(__ds.__Permits,__PDPM) = __ds.__Permits);
     SHARED __SourceFilter(DATASET(InLayout) __ds) := __UsingFitler(__AsofFitler(__ds));
   END;
   SHARED E_Phone_Inquiry_Filtered := MODULE(E_Phone_Inquiry(__in,__cfg_Local))
-    SHARED __AsofFitler(DATASET(InLayout) __ds) := __ds(__T(__OP2(__OP2(KEL.Era.nkdateFromNtimestamp(KEL.era.ToTimestampMinNull(__ds.Hybrid_Archive_Date_)),<=,__CN(__PRunDateToMimic)),AND,__OP2(KEL.era.ToDateMaxNull(__ds.Vault_Date_Last_Seen_),>=,__CN(__PRunDateToMimic)))) AND __T(__OP2(KEL.Era.nkdateFromNtimestamp(KEL.era.ToTimestampMinNull(__ds.Hybrid_Archive_Date_)),<=,__CN(__PP_InpClnArchDt))));
+    SHARED __AsofFitler(DATASET(InLayout) __ds) := __ds(__T(__OP2(__OP2(KEL.Era.nkdateFromNtimestamp(KEL.era.ToTimestampMinNull(__ds.Hybrid_Archive_Date_)),<=,__CN(__PRunDateToMimic)),AND,__OP2(KEL.era.ToDateMaxNull(__ds.Vault_Date_Last_Seen_),>=,__CN(__PRunDateToMimic)))) AND __T(__OP2(KEL.Era.nkdateFromNtimestamp(KEL.era.ToTimestampMinNull(__ds.Archive___Date_)),<=,__CN(__PP_InpClnArchDt))));
     SHARED __UsingFitler(DATASET(InLayout) __ds) := __ds(KEL.Permits.BitAnd(__ds.__Permits,__PDPM) = __ds.__Permits);
     SHARED __SourceFilter(DATASET(InLayout) __ds) := __UsingFitler(__AsofFitler(__ds));
   END;
   SHARED E_Professional_License_Filtered := MODULE(E_Professional_License(__in,__cfg_Local))
-    SHARED __AsofFitler(DATASET(InLayout) __ds) := __ds(__T(__OP2(__OP2(KEL.era.ToDateMinNull(__ds.Hybrid_Archive_Date_),<=,__CN(__PRunDateToMimic)),AND,__OP2(KEL.era.ToDateMaxNull(__ds.Vault_Date_Last_Seen_),>=,__CN(__PRunDateToMimic)))) AND __T(__OP2(KEL.era.ToDateMinNull(__ds.Hybrid_Archive_Date_),<=,__CN(__PP_InpClnArchDt))));
+    SHARED __AsofFitler(DATASET(InLayout) __ds) := __ds(__T(__OP2(__OP2(KEL.era.ToDateMinNull(__ds.Hybrid_Archive_Date_),<=,__CN(__PRunDateToMimic)),AND,__OP2(KEL.era.ToDateMaxNull(__ds.Vault_Date_Last_Seen_),>=,__CN(__PRunDateToMimic)))) AND __T(__OP2(KEL.era.ToDateMinNull(__ds.Archive___Date_),<=,__CN(__PP_InpClnArchDt))));
     SHARED __UsingFitler(DATASET(InLayout) __ds) := __ds(KEL.Permits.BitAnd(__ds.__Permits,__PDPM) = __ds.__Permits);
     SHARED __SourceFilter(DATASET(InLayout) __ds) := __UsingFitler(__AsofFitler(__ds));
   END;
   SHARED E_Professional_License_Person_Filtered := MODULE(E_Professional_License_Person(__in,__cfg_Local))
-    SHARED __AsofFitler(DATASET(InLayout) __ds) := __ds(__T(__OP2(__OP2(KEL.era.ToDateMinNull(__ds.Hybrid_Archive_Date_),<=,__CN(__PRunDateToMimic)),AND,__OP2(KEL.era.ToDateMaxNull(__ds.Vault_Date_Last_Seen_),>=,__CN(__PRunDateToMimic)))) AND __T(__OP2(KEL.era.ToDateMinNull(__ds.Hybrid_Archive_Date_),<=,__CN(__PP_InpClnArchDt))));
+    SHARED __AsofFitler(DATASET(InLayout) __ds) := __ds(__T(__OP2(__OP2(KEL.era.ToDateMinNull(__ds.Hybrid_Archive_Date_),<=,__CN(__PRunDateToMimic)),AND,__OP2(KEL.era.ToDateMaxNull(__ds.Vault_Date_Last_Seen_),>=,__CN(__PRunDateToMimic)))) AND __T(__OP2(KEL.era.ToDateMinNull(__ds.Archive___Date_),<=,__CN(__PP_InpClnArchDt))));
     SHARED __UsingFitler(DATASET(InLayout) __ds) := __ds(KEL.Permits.BitAnd(__ds.__Permits,__PDPM) = __ds.__Permits);
     SHARED __SourceFilter(DATASET(InLayout) __ds) := __UsingFitler(__AsofFitler(__ds));
   END;
   SHARED E_Property_Filtered := MODULE(E_Property(__in,__cfg_Local))
-    SHARED __AsofFitler(DATASET(InLayout) __ds) := __ds(__T(__OP2(__OP2(KEL.era.ToDateMinNull(__ds.Hybrid_Archive_Date_),<=,__CN(__PRunDateToMimic)),AND,__OP2(KEL.era.ToDateMaxNull(__ds.Vault_Date_Last_Seen_),>=,__CN(__PRunDateToMimic)))) AND __T(__OP2(KEL.era.ToDateMinNull(__ds.Hybrid_Archive_Date_),<=,__CN(__PP_InpClnArchDt))));
+    SHARED __AsofFitler(DATASET(InLayout) __ds) := __ds(__T(__OP2(__OP2(KEL.era.ToDateMinNull(__ds.Hybrid_Archive_Date_),<=,__CN(__PRunDateToMimic)),AND,__OP2(KEL.era.ToDateMaxNull(__ds.Vault_Date_Last_Seen_),>=,__CN(__PRunDateToMimic)))) AND __T(__OP2(KEL.era.ToDateMinNull(__ds.Archive___Date_),<=,__CN(__PP_InpClnArchDt))));
     SHARED __UsingFitler(DATASET(InLayout) __ds) := __ds(KEL.Permits.BitAnd(__ds.__Permits,__PDPM) = __ds.__Permits);
     SHARED __SourceFilter(DATASET(InLayout) __ds) := __UsingFitler(__AsofFitler(__ds));
   END;
   SHARED E_Property_Event_Filtered := MODULE(E_Property_Event(__in,__cfg_Local))
-    SHARED __AsofFitler(DATASET(InLayout) __ds) := __ds(__T(__OP2(__OP2(KEL.era.ToDateMinNull(__ds.Hybrid_Archive_Date_),<=,__CN(__PRunDateToMimic)),AND,__OP2(KEL.era.ToDateMaxNull(__ds.Vault_Date_Last_Seen_),>=,__CN(__PRunDateToMimic)))) AND __T(__OP2(KEL.era.ToDateMinNull(__ds.Hybrid_Archive_Date_),<=,__CN(__PP_InpClnArchDt))));
+    SHARED __AsofFitler(DATASET(InLayout) __ds) := __ds(__T(__OP2(__OP2(KEL.era.ToDateMinNull(__ds.Hybrid_Archive_Date_),<=,__CN(__PRunDateToMimic)),AND,__OP2(KEL.era.ToDateMaxNull(__ds.Vault_Date_Last_Seen_),>=,__CN(__PRunDateToMimic)))) AND __T(__OP2(KEL.era.ToDateMinNull(__ds.Archive___Date_),<=,__CN(__PP_InpClnArchDt))));
     SHARED __UsingFitler(DATASET(InLayout) __ds) := __ds(KEL.Permits.BitAnd(__ds.__Permits,__PDPM) = __ds.__Permits);
     SHARED __SourceFilter(DATASET(InLayout) __ds) := __UsingFitler(__AsofFitler(__ds));
   END;
   SHARED E_S_S_N_Inquiry_Filtered := MODULE(E_S_S_N_Inquiry(__in,__cfg_Local))
-    SHARED __AsofFitler(DATASET(InLayout) __ds) := __ds(__T(__OP2(__OP2(KEL.Era.nkdateFromNtimestamp(KEL.era.ToTimestampMinNull(__ds.Hybrid_Archive_Date_)),<=,__CN(__PRunDateToMimic)),AND,__OP2(KEL.era.ToDateMaxNull(__ds.Vault_Date_Last_Seen_),>=,__CN(__PRunDateToMimic)))) AND __T(__OP2(KEL.Era.nkdateFromNtimestamp(KEL.era.ToTimestampMinNull(__ds.Hybrid_Archive_Date_)),<=,__CN(__PP_InpClnArchDt))));
+    SHARED __AsofFitler(DATASET(InLayout) __ds) := __ds(__T(__OP2(__OP2(KEL.Era.nkdateFromNtimestamp(KEL.era.ToTimestampMinNull(__ds.Hybrid_Archive_Date_)),<=,__CN(__PRunDateToMimic)),AND,__OP2(KEL.era.ToDateMaxNull(__ds.Vault_Date_Last_Seen_),>=,__CN(__PRunDateToMimic)))) AND __T(__OP2(KEL.Era.nkdateFromNtimestamp(KEL.era.ToTimestampMinNull(__ds.Archive___Date_)),<=,__CN(__PP_InpClnArchDt))));
     SHARED __UsingFitler(DATASET(InLayout) __ds) := __ds(KEL.Permits.BitAnd(__ds.__Permits,__PDPM) = __ds.__Permits);
     SHARED __SourceFilter(DATASET(InLayout) __ds) := __UsingFitler(__AsofFitler(__ds));
   END;
   SHARED E_Sele_Person_Filtered := MODULE(E_Sele_Person(__in,__cfg_Local))
-    SHARED __AsofFitler(DATASET(InLayout) __ds) := __ds(__T(__OP2(__OP2(KEL.era.ToDateMinNull(__ds.Hybrid_Archive_Date_),<=,__CN(__PRunDateToMimic)),AND,__OP2(KEL.era.ToDateMaxNull(__ds.Vault_Date_Last_Seen_),>=,__CN(__PRunDateToMimic)))) AND __T(__OP2(KEL.era.ToDateMinNull(__ds.Hybrid_Archive_Date_),<=,__CN(__PP_InpClnArchDt))));
+    SHARED __AsofFitler(DATASET(InLayout) __ds) := __ds(__T(__OP2(__OP2(KEL.era.ToDateMinNull(__ds.Hybrid_Archive_Date_),<=,__CN(__PRunDateToMimic)),AND,__OP2(KEL.era.ToDateMaxNull(__ds.Vault_Date_Last_Seen_),>=,__CN(__PRunDateToMimic)))) AND __T(__OP2(KEL.era.ToDateMinNull(__ds.Archive___Date_),<=,__CN(__PP_InpClnArchDt))));
     SHARED __UsingFitler(DATASET(InLayout) __ds) := __ds(KEL.Permits.BitAnd(__ds.__Permits,__PDPM) = __ds.__Permits);
     SHARED __SourceFilter(DATASET(InLayout) __ds) := __UsingFitler(__AsofFitler(__ds));
   END;
   SHARED E_Social_Security_Number_Filtered := MODULE(E_Social_Security_Number(__in,__cfg_Local))
-    SHARED __AsofFitler(DATASET(InLayout) __ds) := __ds(__T(__OP2(__OP2(KEL.era.ToDateMinNull(__ds.Hybrid_Archive_Date_),<=,__CN(__PRunDateToMimic)),AND,__OP2(KEL.era.ToDateMaxNull(__ds.Vault_Date_Last_Seen_),>=,__CN(__PRunDateToMimic)))) AND __T(__OP2(KEL.era.ToDateMinNull(__ds.Hybrid_Archive_Date_),<=,__CN(__PP_InpClnArchDt))));
+    SHARED __AsofFitler(DATASET(InLayout) __ds) := __ds(__T(__OP2(__OP2(KEL.era.ToDateMinNull(__ds.Hybrid_Archive_Date_),<=,__CN(__PRunDateToMimic)),AND,__OP2(KEL.era.ToDateMaxNull(__ds.Vault_Date_Last_Seen_),>=,__CN(__PRunDateToMimic)))) AND __T(__OP2(KEL.era.ToDateMinNull(__ds.Archive___Date_),<=,__CN(__PP_InpClnArchDt))));
     SHARED __UsingFitler(DATASET(InLayout) __ds) := __ds(KEL.Permits.BitAnd(__ds.__Permits,__PDPM) = __ds.__Permits);
     SHARED __SourceFilter(DATASET(InLayout) __ds) := __UsingFitler(__AsofFitler(__ds));
   END;
   SHARED E_Utility_Person_Filtered := MODULE(E_Utility_Person(__in,__cfg_Local))
-    SHARED __AsofFitler(DATASET(InLayout) __ds) := __ds(__T(__OP2(__OP2(KEL.era.ToDateMinNull(__ds.Hybrid_Archive_Date_),<=,__CN(__PRunDateToMimic)),AND,__OP2(KEL.era.ToDateMaxNull(__ds.Vault_Date_Last_Seen_),>=,__CN(__PRunDateToMimic)))) AND __T(__OP2(KEL.era.ToDateMinNull(__ds.Hybrid_Archive_Date_),<=,__CN(__PP_InpClnArchDt))));
+    SHARED __AsofFitler(DATASET(InLayout) __ds) := __ds(__T(__OP2(__OP2(KEL.era.ToDateMinNull(__ds.Hybrid_Archive_Date_),<=,__CN(__PRunDateToMimic)),AND,__OP2(KEL.era.ToDateMaxNull(__ds.Vault_Date_Last_Seen_),>=,__CN(__PRunDateToMimic)))) AND __T(__OP2(KEL.era.ToDateMinNull(__ds.Archive___Date_),<=,__CN(__PP_InpClnArchDt))));
     SHARED __UsingFitler(DATASET(InLayout) __ds) := __ds(KEL.Permits.BitAnd(__ds.__Permits,__PDPM) = __ds.__Permits);
     SHARED __SourceFilter(DATASET(InLayout) __ds) := __UsingFitler(__AsofFitler(__ds));
   END;
   SHARED E_Watercraft_Owner_Filtered := MODULE(E_Watercraft_Owner(__in,__cfg_Local))
-    SHARED __AsofFitler(DATASET(InLayout) __ds) := __ds(__T(__OP2(__OP2(KEL.era.ToDateMinNull(__ds.Hybrid_Archive_Date_),<=,__CN(__PRunDateToMimic)),AND,__OP2(KEL.era.ToDateMaxNull(__ds.Vault_Date_Last_Seen_),>=,__CN(__PRunDateToMimic)))) AND __T(__OP2(KEL.era.ToDateMinNull(__ds.Hybrid_Archive_Date_),<=,__CN(__PP_InpClnArchDt))));
+    SHARED __AsofFitler(DATASET(InLayout) __ds) := __ds(__T(__OP2(__OP2(KEL.era.ToDateMinNull(__ds.Hybrid_Archive_Date_),<=,__CN(__PRunDateToMimic)),AND,__OP2(KEL.era.ToDateMaxNull(__ds.Vault_Date_Last_Seen_),>=,__CN(__PRunDateToMimic)))) AND __T(__OP2(KEL.era.ToDateMinNull(__ds.Archive___Date_),<=,__CN(__PP_InpClnArchDt))));
     SHARED __UsingFitler(DATASET(InLayout) __ds) := __ds(KEL.Permits.BitAnd(__ds.__Permits,__PDPM) = __ds.__Permits);
     SHARED __SourceFilter(DATASET(InLayout) __ds) := __UsingFitler(__AsofFitler(__ds));
   END;
   SHARED E_Zip_Code_Filtered := MODULE(E_Zip_Code(__in,__cfg_Local))
-    SHARED __AsofFitler(DATASET(InLayout) __ds) := __ds(__T(__OP2(__OP2(KEL.era.ToDateMinNull(__ds.Hybrid_Archive_Date_),<=,__CN(__PRunDateToMimic)),AND,__OP2(KEL.era.ToDateMaxNull(__ds.Vault_Date_Last_Seen_),>=,__CN(__PRunDateToMimic)))) AND __T(__OP2(KEL.era.ToDateMinNull(__ds.Hybrid_Archive_Date_),<=,__CN(__PP_InpClnArchDt))));
+    SHARED __AsofFitler(DATASET(InLayout) __ds) := __ds(__T(__OP2(__OP2(KEL.era.ToDateMinNull(__ds.Hybrid_Archive_Date_),<=,__CN(__PRunDateToMimic)),AND,__OP2(KEL.era.ToDateMaxNull(__ds.Vault_Date_Last_Seen_),>=,__CN(__PRunDateToMimic)))) AND __T(__OP2(KEL.era.ToDateMinNull(__ds.Archive___Date_),<=,__CN(__PP_InpClnArchDt))));
     SHARED __UsingFitler(DATASET(InLayout) __ds) := __ds(KEL.Permits.BitAnd(__ds.__Permits,__PDPM) = __ds.__Permits);
     SHARED __SourceFilter(DATASET(InLayout) __ds) := __UsingFitler(__AsofFitler(__ds));
   END;
   SHARED TYPEOF(E_Person(__in,__cfg_Local).__Result) __E_Person := E_Person_Filtered.__Result;
-  SHARED __EE5470917 := __E_Person;
-  SHARED __EE12216299 := __EE5470917(__T(__OP2(__EE5470917.UID,=,__CN(__PLexID_in))));
-  SHARED __ST136515_Layout := RECORD
+  SHARED __EE5473621 := __E_Person;
+  SHARED __EE12221920 := __EE5473621(__T(__OP2(__EE5473621.UID,=,__CN(__PLexID_in))));
+  SHARED __ST136550_Layout := RECORD
     KEL.typ.nuid Lex_I_D_;
     KEL.typ.epoch Archive___Date_ := 0;
     KEL.typ.epoch Date_First_Seen_ := 0;
@@ -283,7 +283,7 @@ EXPORT Q_Non_F_C_R_A_Sixth_Rep_Attributes_V1_Hybrid(KEL.typ.uid __PLexID_in, DAT
     KEL.typ.epoch Vault_Date_Last_Seen_ := 0;
     KEL.typ.int __RecordCount := 0;
   END;
-  EXPORT Res0 := __UNWRAP(PROJECT(__EE12216299,TRANSFORM(__ST136515_Layout,SELF.Lex_I_D_ := LEFT.UID,SELF := LEFT)));
+  EXPORT Res0 := __UNWRAP(PROJECT(__EE12221920,TRANSFORM(__ST136550_Layout,SELF.Lex_I_D_ := LEFT.UID,SELF := LEFT)));
   EXPORT DBG_E_Input_P_I_I_PreEntity := __UNWRAP(E_Input_P_I_I_Params(__in,__cfg_Local).InData);
   EXPORT DBG_E_Input_P_I_I_Result := __UNWRAP(E_Input_P_I_I_Filtered.__Result);
   EXPORT DBG_E_Accident_Result := __UNWRAP(E_Accident_Filtered.__Result);

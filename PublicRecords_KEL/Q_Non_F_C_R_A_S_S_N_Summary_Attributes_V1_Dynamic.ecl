@@ -481,12 +481,12 @@ EXPORT Q_Non_F_C_R_A_S_S_N_Summary_Attributes_V1_Dynamic(KEL.typ.str __PSSN_in, 
     SHARED TYPEOF(B_S_S_N_Summary_1(__in,__cfg_Local).__ENH_S_S_N_Summary_1) __ENH_S_S_N_Summary_1 := B_S_S_N_Summary_1_Local.__ENH_S_S_N_Summary_1;
   END;
   SHARED TYPEOF(B_S_S_N_Summary(__in,__cfg_Local).__ENH_S_S_N_Summary) __ENH_S_S_N_Summary := B_S_S_N_Summary_Local.__ENH_S_S_N_Summary;
-  SHARED __EE12144738 := __ENH_S_S_N_Summary;
-  SHARED __EE12145048 := __EE12144738(__T(__OP2(__EE12144738.S_S_N_,=,__CN(__PSSN_in))));
-  SHARED __ST87042_Layout := RECORD
+  SHARED __EE12150359 := __ENH_S_S_N_Summary;
+  SHARED __EE12150669 := __EE12150359(__T(__OP2(__EE12150359.S_S_N_,=,__CN(__PSSN_in))));
+  SHARED __ST87061_Layout := RECORD
     KEL.typ.nbool Exp1_;
     KEL.typ.nstr P___Inp_Cln_Phone_Home_;
-    KEL.typ.ndataset(B_S_S_N_Summary_3(__in,__cfg_Local).__ST86478_Layout) S_S_N_Summary_Source_List_Sorted_;
+    KEL.typ.ndataset(B_S_S_N_Summary_3(__in,__cfg_Local).__ST86497_Layout) S_S_N_Summary_Source_List_Sorted_;
     KEL.typ.nstr P_I___Src_W_Inp_A_S_List_Ev_;
     KEL.typ.nstr P_I___Src_W_Inp_A_S_Emrg_Dt_List_Ev_;
     KEL.typ.nstr P_I___Src_W_Inp_A_S_Last_Dt_List_Ev_;
@@ -506,14 +506,14 @@ EXPORT Q_Non_F_C_R_A_S_S_N_Summary_Attributes_V1_Dynamic(KEL.typ.str __PSSN_in, 
     KEL.typ.epoch Vault_Date_Last_Seen_ := 0;
     KEL.typ.int __RecordCount := 0;
   END;
-  SHARED __ST87042_Layout __ND12145056__Project(B_S_S_N_Summary(__in,__cfg_Local).__ST185349_Layout __PP12145049) := TRANSFORM
-    SELF.Exp1_ := __OP2(__PP12145049.P___Inp_Cln_S_S_N_,=,__PP12145049.S_S_N_);
-    SELF := __PP12145049;
+  SHARED __ST87061_Layout __ND12150677__Project(B_S_S_N_Summary(__in,__cfg_Local).__ST185397_Layout __PP12150670) := TRANSFORM
+    SELF.Exp1_ := __OP2(__PP12150670.P___Inp_Cln_S_S_N_,=,__PP12150670.S_S_N_);
+    SELF := __PP12150670;
   END;
-  SHARED __ST87042_Layout __ND12145056__Rollup(__ST87042_Layout __r, DATASET(__ST87042_Layout) __recs) := TRANSFORM
-    __recs_S_S_N_Summary_Source_List_Sorted_ := NORMALIZE(__recs,__T(LEFT.S_S_N_Summary_Source_List_Sorted_),TRANSFORM(B_S_S_N_Summary_3(__in,__cfg_Local).__ST86478_Layout,SELF:=RIGHT));
+  SHARED __ST87061_Layout __ND12150677__Rollup(__ST87061_Layout __r, DATASET(__ST87061_Layout) __recs) := TRANSFORM
+    __recs_S_S_N_Summary_Source_List_Sorted_ := NORMALIZE(__recs,__T(LEFT.S_S_N_Summary_Source_List_Sorted_),TRANSFORM(B_S_S_N_Summary_3(__in,__cfg_Local).__ST86497_Layout,SELF:=RIGHT));
     __recs_S_S_N_Summary_Source_List_Sorted__allnull := NOT EXISTS(__recs(__NN(S_S_N_Summary_Source_List_Sorted_)));
-    SELF.S_S_N_Summary_Source_List_Sorted_ := __BN(PROJECT(TABLE(__recs_S_S_N_Summary_Source_List_Sorted_,{KEL.typ.int __RecordCount := SUM(GROUP,__RecordCount),KEL.typ.epoch Archive___Date_ := KEL.era.SimpleRoll(GROUP,Archive___Date_,MIN,FALSE),KEL.typ.epoch Date_First_Seen_ := KEL.era.SimpleRoll(GROUP,Date_First_Seen_,MIN,FALSE),KEL.typ.epoch Date_Last_Seen_ := KEL.era.SimpleRoll(GROUP,Date_Last_Seen_,MAX,FALSE),KEL.typ.epoch Hybrid_Archive_Date_ := KEL.era.SimpleRoll(GROUP,Hybrid_Archive_Date_,MIN,FALSE),KEL.typ.epoch Vault_Date_Last_Seen_ := KEL.era.SimpleRoll(GROUP,Vault_Date_Last_Seen_,MAX,NMAX),Primary_Name_Address_,Primary_Range_Address_,Zip_Address_,Translated_Source_Code_,Source_Date_First_Seen_,Source_Date_Last_Seen_},Primary_Name_Address_,Primary_Range_Address_,Zip_Address_,Translated_Source_Code_,Source_Date_First_Seen_,Source_Date_Last_Seen_),B_S_S_N_Summary_3(__in,__cfg_Local).__ST86478_Layout),__recs_S_S_N_Summary_Source_List_Sorted__allnull);
+    SELF.S_S_N_Summary_Source_List_Sorted_ := __BN(PROJECT(TABLE(__recs_S_S_N_Summary_Source_List_Sorted_,{KEL.typ.int __RecordCount := SUM(GROUP,__RecordCount),KEL.typ.epoch Archive___Date_ := KEL.era.SimpleRoll(GROUP,Archive___Date_,MIN,FALSE),KEL.typ.epoch Date_First_Seen_ := KEL.era.SimpleRoll(GROUP,Date_First_Seen_,MIN,FALSE),KEL.typ.epoch Date_Last_Seen_ := KEL.era.SimpleRoll(GROUP,Date_Last_Seen_,MAX,FALSE),KEL.typ.epoch Hybrid_Archive_Date_ := KEL.era.SimpleRoll(GROUP,Hybrid_Archive_Date_,MIN,FALSE),KEL.typ.epoch Vault_Date_Last_Seen_ := KEL.era.SimpleRoll(GROUP,Vault_Date_Last_Seen_,MAX,NMAX),Primary_Name_Address_,Primary_Range_Address_,Zip_Address_,Translated_Source_Code_,Source_Date_First_Seen_,Source_Date_Last_Seen_},Primary_Name_Address_,Primary_Range_Address_,Zip_Address_,Translated_Source_Code_,Source_Date_First_Seen_,Source_Date_Last_Seen_),B_S_S_N_Summary_3(__in,__cfg_Local).__ST86497_Layout),__recs_S_S_N_Summary_Source_List_Sorted__allnull);
     SELF.__RecordCount := SUM(__recs,__RecordCount);
     SELF.Archive___Date_ := KEL.era.SimpleRoll(__recs,Archive___Date_,MIN,FALSE);
     SELF.Date_First_Seen_ := KEL.era.SimpleRoll(__recs,Date_First_Seen_,MIN,FALSE);
@@ -522,7 +522,7 @@ EXPORT Q_Non_F_C_R_A_S_S_N_Summary_Attributes_V1_Dynamic(KEL.typ.str __PSSN_in, 
     SELF.Vault_Date_Last_Seen_ := KEL.era.SimpleRoll(__recs,Vault_Date_Last_Seen_,MAX,NMAX);
     SELF := __r;
   END;
-  EXPORT Res0 := __UNWRAP(ROLLUP(GROUP(KEL.Routines.SortAndAppendFilteredChildren(PROJECT(__EE12145048,__ND12145056__Project(LEFT)),'S_S_N_Summary_Source_List_Sorted_','s_s_n_summary_source_list_sorted_','clean','__recordcount,archive___date_,date_first_seen_,date_last_seen_,hybrid_archive_date_,vault_date_last_seen_'),Exp1_,P___Inp_Cln_Phone_Home_,S_S_N_Summary_Source_List_Sorted_Clean,P_I___Src_W_Inp_A_S_List_Ev_,P_I___Src_W_Inp_A_S_Emrg_Dt_List_Ev_,P_I___Src_W_Inp_A_S_Last_Dt_List_Ev_,P_I___Src_W_Inp_S_D_List_Ev_,P_I___Src_W_Inp_S_D_Emrg_Dt_List_Ev_,P_I___Src_W_Inp_S_D_Last_Dt_List_Ev_,P_I___Src_W_Inp_P_S_List_Ev_,P_I___Src_W_Inp_P_S_Emrg_Dt_List_Ev_,P_I___Src_W_Inp_P_S_Last_Dt_List_Ev_,P_I___Src_W_Inp_F_L_S_List_Ev_,P_I___Src_W_Inp_F_L_S_Emrg_Dt_List_Ev_,P_I___Src_W_Inp_F_L_S_Last_Dt_List_Ev_,ALL),GROUP,__ND12145056__Rollup(ROW(LEFT,__ST87042_Layout), PROJECT(ROWS(LEFT),__ST87042_Layout))));
+  EXPORT Res0 := __UNWRAP(ROLLUP(GROUP(KEL.Routines.SortAndAppendFilteredChildren(PROJECT(__EE12150669,__ND12150677__Project(LEFT)),'S_S_N_Summary_Source_List_Sorted_','s_s_n_summary_source_list_sorted_','clean','__recordcount,archive___date_,date_first_seen_,date_last_seen_,hybrid_archive_date_,vault_date_last_seen_'),Exp1_,P___Inp_Cln_Phone_Home_,S_S_N_Summary_Source_List_Sorted_Clean,P_I___Src_W_Inp_A_S_List_Ev_,P_I___Src_W_Inp_A_S_Emrg_Dt_List_Ev_,P_I___Src_W_Inp_A_S_Last_Dt_List_Ev_,P_I___Src_W_Inp_S_D_List_Ev_,P_I___Src_W_Inp_S_D_Emrg_Dt_List_Ev_,P_I___Src_W_Inp_S_D_Last_Dt_List_Ev_,P_I___Src_W_Inp_P_S_List_Ev_,P_I___Src_W_Inp_P_S_Emrg_Dt_List_Ev_,P_I___Src_W_Inp_P_S_Last_Dt_List_Ev_,P_I___Src_W_Inp_F_L_S_List_Ev_,P_I___Src_W_Inp_F_L_S_Emrg_Dt_List_Ev_,P_I___Src_W_Inp_F_L_S_Last_Dt_List_Ev_,ALL),GROUP,__ND12150677__Rollup(ROW(LEFT,__ST87061_Layout), PROJECT(ROWS(LEFT),__ST87061_Layout))));
   EXPORT DBG_E_Input_P_I_I_PreEntity := __UNWRAP(E_Input_P_I_I_Params(__in,__cfg_Local).InData);
   EXPORT DBG_E_Input_P_I_I_Result := __UNWRAP(E_Input_P_I_I_Filtered.__Result);
   EXPORT DBG_E_Accident_Result := __UNWRAP(E_Accident_Filtered.__Result);
