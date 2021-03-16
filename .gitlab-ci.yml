@@ -1,15 +1,4 @@
 default:
-  image: 
-    name: openjdk:14-alpine # OpenJDK 14
-  before_script:
-    # Install the required software/updates - For some reason the default versions are quite old, so specify the "edge" for latest and greatest
-    - apk update --repository http://dl-cdn.alpinelinux.org/alpine/edge/main/
-    - apk add git --repository http://dl-cdn.alpinelinux.org/alpine/edge/main/
-    - apk add git-lfs --repository http://dl-cdn.alpinelinux.org/alpine/edge/community/
-    - apk add wget --repository http://dl-cdn.alpinelinux.org/alpine/v3.9/main/ # Edge version breaks
-    - apk add busybox --repository http://dl-cdn.alpinelinux.org/alpine/edge/main/
-    - apk add coreutils --repository http://dl-cdn.alpinelinux.org/alpine/edge/main/
-    - rm -rf PublicRecords
   tags:
     # Pick a specific Shared GitLab runner to execute on
     - icboca # Innovation Cloud
@@ -32,39 +21,4 @@ stages:
 include:
   # Run the KEL Compiler to generate new ECL code, and submit that code via new Merge Request
   - local: 'AutoGenECL-PublicRecords_KEL.yml'
-    
-syntax_check:
-  image: gitlab.ins.risk.regn.net:4567/collda01/publicrecords/roxie-ci-clienttools
-  stage: build
-  only:
-    # only run the job at scheduled times
-    refs:
-      - schedules
-  script:
-    - RES_FILE="query_check_results.txt"
-    - WARN_FILE="query_check_warnings.txt"
-    - git config --global user.email "${GITLAB_USER_EMAIL}"
-    - git config --global user.name "${GITLAB_USER_NAME}"
-    - git checkout $CI_COMMIT_BRANCH
-    - echo "Begin Query Syntax Check:"
-    - cd .ci_root
-    - echo "Pulling Node Packages"
-    - npm install
-    - echo "Check Compiler Version"
-    - eclcc --version || true
-    - echo "Run Script"
-    - |
-      if node full_syntax_check.js | tee $RES_FILE
-      then checkres=0
-      else checkres=1
-      fi
-    - cat eclcc.log _syn_check_warnings.log > $WARN_FILE
-    # commit and push results to repo
-    - echo "Pulling Latest Changes"
-    - git pull https://${CIUser_Arqs}:${CIToken_Arqs}@${CI_REPOSITORY_URL#*@} $CI_COMMIT_BRANCH
-    - echo "Pushing Query Check Results"
-    - git add $RES_FILE
-    - git add $WARN_FILE
-    - git commit -m "Daily Query Syntax Check Results"
-    - git push https://${CIUser_Arqs}:${CIToken_Arqs}@${CI_REPOSITORY_URL#*@}
-    - exit $checkres
+  - local: 'RoxieDev_Query_CI.yml'
