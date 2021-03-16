@@ -1,6 +1,6 @@
 ﻿IMPORT Business_Credit_KEL, Business_Credit, Business_Risk_BIP, STD;
 
-EXPORT GLUE_fdc_append(DATASET(RECORDOF(Business_Credit_KEL.File_SBFE_temp.linkids)) linkid_recs) := MODULE
+EXPORT GLUE_fdc_append(DATASET(RECORDOF(Business_Credit_KEL.File_SBFE_temp.linkids)) linkid_recs, boolean production_current_mode) := MODULE
 	
 	EXPORT fdc_layout := RECORD
 		RECORDOF(Business_Credit_KEL.File_SBFE_temp);
@@ -65,7 +65,10 @@ EXPORT GLUE_fdc_append(DATASET(RECORDOF(Business_Credit_KEL.File_SBFE_temp.linki
 		SELF.seq := le.seq;
 		SELF.seq_num := HASH(c, le.seq, ri.sbfe_contributor_number, ri.contract_account_number, ri.account_type_reported); 
 		SELF.HistoryDateTime := le.HistoryDateTime;
-		SELF.load_date := IF(ri.original_version < Business_Risk_BIP.Constants.FirstSBFELoadDate, ri.cycle_end_date, ri.original_version); 
+		load_date := IF(ri.original_version < Business_Risk_BIP.Constants.FirstSBFELoadDate, ri.cycle_end_date, ri.original_version); 
+		SELF.load_date := load_date; 
+		SELF.load_dateYYYYMMDD := load_date[1..8]; 
+
 		SELF.acct_no := HASH(le.seq, ri.sbfe_contributor_number, ri.contract_account_number, ri.account_type_reported);
 		SELF := ri;
 		SELF := []
@@ -249,7 +252,7 @@ seq, sbfe_contributor_number, contract_account_number, account_type_reported,
 	// after the tradelines have been deduped, found that we're still sometimes over the 10k records total, so let's keep just the 10,000 most recent per seq                                           
 	EXPORT tradeline_recs := DEDUP(SORT(tradeline_recs_deduped, seq, -(integer)cycle_end_date, -(integer)last_activity_date), seq, KEEP(Business_Risk_BIP.Constants.Limit_SBFE));
 		
-  SHARED tradeline_recs_with_loaddate := getLoadDate(tradeline_recs, seq_num, cycle_end_date);
+  SHARED tradeline_recs_with_loaddate := if(production_current_mode, tradeline_recs, getLoadDate(tradeline_recs, seq_num, cycle_end_date) );
 	
 	EXPORT AddTradelines := DENORMALIZE(JustSeq, tradeline_recs_with_loaddate, LEFT.seq = RIGHT.seq
 																						AND IF(LEFT.historydate =(INTEGER)Business_Risk_BIP.Constants.NinesDate,
@@ -284,7 +287,11 @@ seq, sbfe_contributor_number, contract_account_number, account_type_reported,
 		SELF.seq:=le.seq;
 		SELF.seq_num := HASH(c, le.seq, ri.sbfe_contributor_number, ri.contract_account_number, ri.account_type_reported);
 		SELF.acct_no := HASH(le.seq, ri.sbfe_contributor_number, ri.contract_account_number, ri.account_type_reported);
-		SELF.load_date := IF(ri.original_version < Business_Risk_BIP.Constants.FirstSBFELoadDate, (STRING)ri.dt_first_seen, ri.original_version); 
+		
+		load_date := IF(ri.original_version < Business_Risk_BIP.Constants.FirstSBFELoadDate, (STRING)ri.dt_first_seen, ri.original_version); 
+		SELF.load_date := load_date; 
+		SELF.load_dateYYYYMMDD := load_date[1..8]; 
+		
 		SELF.HistoryDate := le.HistoryDate;
 		SELF.HistoryDateTime := le.HistoryDateTime;
 		SELF.HistoryDateLength := le.HistoryDateLength;
@@ -297,7 +304,7 @@ seq, sbfe_contributor_number, contract_account_number, account_type_reported,
 																						KEYED(RIGHT.contract_account_number = LEFT.contract_account_number) AND KEYED(RIGHT.sbfe_contributor_number = LEFT.sbfe_contributor_number) AND KEYED(RIGHT.account_type_reported = LEFT.account_type_reported), 
 																					xfm_BusinessInformation_recs(LEFT,RIGHT,COUNTER), ATMOST(Business_Risk_BIP.Constants.Limit_SBFE));
 																											
-	SHARED BusinessInformation_recs_with_loaddate := getLoadDate(BusinessInformation_recs, seq_num, dt_first_seen);		
+	SHARED BusinessInformation_recs_with_loaddate := if(production_current_mode, BusinessInformation_recs, getLoadDate(BusinessInformation_recs, seq_num, dt_first_seen));		
 	
 	SHARED BusinessInformation_recs_with_loaddate_filtered := BusinessInformation_recs_with_loaddate((historydate =(INTEGER)Business_Risk_BIP.Constants.NinesDate AND load_date[1..8] <= StringLib.getDateYYYYMMDD())
 																									OR Business_Risk_BIP.Common.fn_filter_on_archive_date((INTEGER)load_date, HistoryDateTime, HistoryDateLength));
@@ -307,7 +314,11 @@ seq, sbfe_contributor_number, contract_account_number, account_type_reported,
 			SELF.seq_num := HASH(c, le.seq, ri.sbfe_contributor_number, ri.contract_account_number, ri.account_type_reported),
 			SELF.acct_no := le.acct_no;
 			SELF.HistoryDateTime := le.HistoryDateTime;
-			SELF.load_date := IF(ri.original_version < Business_Risk_BIP.Constants.FirstSBFELoadDate, (STRING)ri.dt_first_seen, ri.original_version); 
+			
+			load_date := IF(ri.original_version < Business_Risk_BIP.Constants.FirstSBFELoadDate, (STRING)ri.dt_first_seen, ri.original_version); 
+			SELF.load_date := load_date; 
+			SELF.load_dateYYYYMMDD := load_date[1..8]; 
+		
 			SELF := ri;
 			SELF := [];
 		END;
@@ -318,7 +329,7 @@ seq, sbfe_contributor_number, contract_account_number, account_type_reported,
 																						KEYED(RIGHT.contract_account_number =LEFT.contract_account_number) AND KEYED(RIGHT.sbfe_contributor_number=LEFT.sbfe_contributor_number)  AND KEYED(RIGHT.account_type_reported = LEFT.account_type_reported),
 																						xfm_add_BusInfo(LEFT,RIGHT,COUNTER), ATMOST(Business_Risk_BIP.Constants.Limit_SBFE));
 																						
-	SHARED BusinessClassification_recs_with_loaddate := getLoadDate(BusinessClassification_recs, seq_num, dt_first_seen);																					
+	SHARED BusinessClassification_recs_with_loaddate := if(production_current_mode, BusinessClassification_recs, getLoadDate(BusinessClassification_recs, seq_num, dt_first_seen) );																					
 					
 					
 	EXPORT AddBusinessClassification := DENORMALIZE(BusinessInformation_recs_with_loaddate_filtered, BusinessClassification_recs_with_loaddate, LEFT.seq = RIGHT. seq AND LEFT.acct_no = RIGHT.acct_no
@@ -345,7 +356,11 @@ seq, sbfe_contributor_number, contract_account_number, account_type_reported,
 			SELF.seq_num := HASH(c, le.seq, ri.sbfe_contributor_number, ri.contract_account_number, ri.account_type_reported),
 			SELF.acct_no := HASH(le.seq, ri.sbfe_contributor_number, ri.contract_account_number, ri.account_type_reported);
 			SELF.HistoryDateTime := le.HistoryDateTime;
-			SELF.load_date := IF(ri.original_version < Business_Risk_BIP.Constants.FirstSBFELoadDate, (STRING)ri.dt_first_seen, ri.original_version);
+			
+			load_date := IF(ri.original_version < Business_Risk_BIP.Constants.FirstSBFELoadDate, (STRING)ri.dt_first_seen, ri.original_version); 
+			SELF.load_date := load_date; 
+			SELF.load_dateYYYYMMDD := load_date[1..8]; 
+		
 			SELF := ri;
 			SELF := [];
 		END;
@@ -354,7 +369,7 @@ seq, sbfe_contributor_number, contract_account_number, account_type_reported,
 																						KEYED(RIGHT.contract_account_number = LEFT.contract_account_number) AND KEYED(RIGHT.sbfe_contributor_number = LEFT.sbfe_contributor_number) AND KEYED(RIGHT.account_type_reported = LEFT.account_type_reported), 
 																					xfm_add_BusOwner(LEFT,RIGHT,COUNTER), ATMOST(Business_Risk_BIP.Constants.Limit_SBFE));
 																					
-	SHARED BusinessOwner_recs_with_loaddate := getLoadDate(BusinessOwner_recs, seq_num, dt_first_seen);	
+	SHARED BusinessOwner_recs_with_loaddate := if(production_current_mode, BusinessOwner_recs, getLoadDate(BusinessOwner_recs, seq_num, dt_first_seen));	
 	
 	EXPORT AddBusinessOwner := DENORMALIZE(AddBusinessClassification_KEL, BusinessOwner_recs_with_loaddate, LEFT.seq = RIGHT.seq
 																									AND IF(LEFT.historydate =(INTEGER)Business_Risk_BIP.Constants.NinesDate,
@@ -367,8 +382,12 @@ seq, sbfe_contributor_number, contract_account_number, account_type_reported,
 			SELF.seq := le.seq,
 			SELF.seq_num := HASH(c, le.seq, ri.sbfe_contributor_number, ri.contract_account_number, ri.account_type_reported),
 			SELF.acct_no := HASH(le.seq, ri.sbfe_contributor_number, ri.contract_account_number, ri.account_type_reported);
-			SELF.HistoryDateTime := le.HistoryDateTime;
-			SELF.load_date := IF(ri.original_version < Business_Risk_BIP.Constants.FirstSBFELoadDate, (STRING)ri.dt_first_seen, ri.original_version);
+			SELF.HistoryDateTime := le.HistoryDateTime;	
+
+			load_date := IF(ri.original_version < Business_Risk_BIP.Constants.FirstSBFELoadDate, (STRING)ri.dt_first_seen, ri.original_version); 
+			SELF.load_date := load_date; 
+			SELF.load_dateYYYYMMDD := load_date[1..8]; 
+		
 			SELF := ri;
 			SELF := [];
 		END;
@@ -377,7 +396,7 @@ seq, sbfe_contributor_number, contract_account_number, account_type_reported,
 																						KEYED(RIGHT.contract_account_number = LEFT.contract_account_number) AND KEYED(RIGHT.sbfe_contributor_number = LEFT.sbfe_contributor_number) AND KEYED(RIGHT.account_type_reported = LEFT.account_type_reported), 
 																						xfm_add_IndivOwner(LEFT,RIGHT,COUNTER), ATMOST(Business_Risk_BIP.Constants.Limit_SBFE));
 																						
-	SHARED IndividualOwner_recs_with_loaddate := getLoadDate(IndividualOwner_recs, seq_num, dt_first_seen);	
+	SHARED IndividualOwner_recs_with_loaddate := if(production_current_mode, IndividualOwner_recs, getLoadDate(IndividualOwner_recs, seq_num, dt_first_seen));	
 																						
 	EXPORT AddIndividualOwner := DENORMALIZE(AddBusinessOwner, IndividualOwner_recs_with_loaddate, LEFT.seq = RIGHT.seq
 																									AND IF(LEFT.historydate =(INTEGER)Business_Risk_BIP.Constants.NinesDate,

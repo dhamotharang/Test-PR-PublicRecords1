@@ -343,8 +343,33 @@ Model_requests := choosen(ModelOptions_In, 3);
 
 Models_to_use := IF(Model != '', single_model, Model_requests);
 
-Valid_requested_models := project(Models_to_use, Transform(Models.Layouts.Layout_Model_Request_In,
+Valid_requested_models_1 := project(Models_to_use, Transform(Models.Layouts.Layout_Model_Request_In,
                                        self := Models.FP_models.Valid_request(left, attributesIn, ip_value, includeriskindices, RedFlag_version, glb_ok)));
+                                       
+/////////////////////////////////////////////////////////
+//  BEGIN: Network Notify (IDA "model") special cases  //
+/////////////////////////////////////////////////////////
+
+//are we calling Network Notify?
+hasNetworkNotifyModel := Models.FP_models.Model_Check(Valid_requested_models_1, Models.FraudAdvisor_Constants.IDA_non_models_set);
+
+//attributes cannot be requested with Network Notify - blank them out
+attributesClean := IF(hasNetworkNotifyModel, dataset([],Models.Layouts.Layout_Attributes_In), attributesIn);
+
+//additional models cannot be requested with Network Notify - hardcode model set to NN
+Valid_requested_models := IF(hasNetworkNotifyModel,
+                             Dataset([Transform(Models.Layouts.Layout_Model_Request_In,
+                                   Self.ModelName := 'customfa_service',
+                                   Self.ModelOptions := Dataset([Transform(Models.Layouts.Layout_Model_Options,
+                                                                 Self.OptionName := 'custom',
+                                                                 Self.OptionValue := Models.FraudAdvisor_Constants.IDA_network_notify
+                                                                )])
+                                     )]),
+                             Valid_requested_models_1);
+
+/////////////////////////////////////////////////////////
+//  END: Network Notify (IDA "model") special cases    //
+/////////////////////////////////////////////////////////
 
 //Check minimum input for Digital Insights model
 IF((Models.FP_models.Model_Check(Valid_requested_models, ['di31906_0']))
@@ -457,7 +482,7 @@ prep2 := Models.FP_models.custom_field_replacement(prep2_temp, Valid_requested_m
 ////////////////////////////////////////////////////////////////////////////////////////
 
 //is this a FraudIntelModel?
-isFraudIntelModel := Models.FP_models.Model_Check(Valid_requested_models, [Models.FraudAdvisor_Constants.IDA_models_set]);
+isFraudIntelModel := Models.FP_models.Model_Check(Valid_requested_models, [Models.FraudAdvisor_Constants.IDA_models_set, Models.FraudAdvisor_Constants.IDA_non_models_set]);
 
 //blank out SSN, DOB, hphone, and wphone unless they meet specific lengths
 socs_trim := trim(socs_value);
@@ -529,9 +554,10 @@ Gateway.Layouts.Config gw_switch(gateways_in le) := transform
                           serviceNameLowerTrim = Gateway.Constants.ServiceName.bridgerwlc and OFACVersion = 4 and
                           Not Models.FP_models.Model_Check(Valid_requested_models, Risk_Indicators.iid_constants.FAXML_WatchlistModels)                                       => '',
                           serviceNameLowerTrim in Models.FraudAdvisor_Constants.IDA_services and 
-													((Not Models.FP_models.Model_Check(Valid_requested_models, Models.FraudAdvisor_Constants.IDA_models_set) and
-                            Not Models.FP_Models.Check_Valid_Attributes(attributesIn, [Models.FraudAdvisor_Constants.attrIDA])) or
-                          passesFraudIntelTotalCheck = FALSE)                                                                                                                 => '', //turn off IDA gateway if we don't need it OR minimum input check fails
+                          ((Not Models.FP_models.Model_Check(Valid_requested_models, Models.FraudAdvisor_Constants.IDA_models_set) and
+                            Not Models.FP_models.Model_Check(Valid_requested_models, Models.FraudAdvisor_Constants.IDA_non_models_set) and
+                            Not Models.FP_Models.Check_Valid_Attributes(attributesClean, [Models.FraudAdvisor_Constants.attrIDA])) or
+                            passesFraudIntelTotalCheck = FALSE)                                                                                                                 => '', //turn off IDA gateway if we don't need it OR minimum input check fails
                                                                                                                                                                                  le.servicename);
                                                                                                                                                
   self.url := map(Test_Data_Enabled                                                                                                                                           => '', //turn off gateway if we're using test seeds
@@ -541,9 +567,10 @@ Gateway.Layouts.Config gw_switch(gateways_in le) := transform
                   serviceNameLowerTrim = Gateway.Constants.ServiceName.bridgerwlc and OFACVersion = 4 and
                   Not Models.FP_models.Model_Check(Valid_requested_models, Risk_Indicators.iid_constants.FAXML_WatchlistModels)                                               => '',
                   serviceNameLowerTrim in Models.FraudAdvisor_Constants.IDA_services and 
-									((Not Models.FP_models.Model_Check(Valid_requested_models, Models.FraudAdvisor_Constants.IDA_models_set) and
-                    Not Models.FP_Models.Check_Valid_Attributes(attributesIn, [Models.FraudAdvisor_Constants.attrIDA])) or
-                  passesFraudIntelTotalCheck = FALSE)                                                                                                                          => '', //turn off IDA gateway if we don't need it OR minimum input check fails
+                  ((Not Models.FP_models.Model_Check(Valid_requested_models, Models.FraudAdvisor_Constants.IDA_models_set) and
+                    Not Models.FP_models.Model_Check(Valid_requested_models, Models.FraudAdvisor_Constants.IDA_non_models_set) and
+                    Not Models.FP_Models.Check_Valid_Attributes(attributesClean, [Models.FraudAdvisor_Constants.attrIDA])) or
+                    passesFraudIntelTotalCheck = FALSE)                                                                                                                          => '', //turn off IDA gateway if we don't need it OR minimum input check fails
                                                                                                                                                                                  le.url); 
   self := le;
   
@@ -606,16 +633,16 @@ attributesV2set := [Models.FraudAdvisor_Constants.attrV2,
                     Models.FraudAdvisor_Constants.attrV201,
                     Models.FraudAdvisor_Constants.attrV202];
 
-doAttributesVersion1 := Models.FP_Models.Check_Valid_Attributes(attributesIn, [Models.FraudAdvisor_Constants.attrV1]);	                  // output version1 if requested
-doIDAttributes := Models.FP_Models.Check_Valid_Attributes(attributesIn, [Models.FraudAdvisor_Constants.IDattr]);                          // Output IDAttributes if requested
-doAttributesVersion2 := Models.FP_Models.Check_Valid_Attributes(attributesIn, attributesV2set) and input_ok;	                            // output version2 if requested and minimum input entered
-doAttributesVersion201 := Models.FP_Models.Check_Valid_Attributes(attributesIn, [Models.FraudAdvisor_Constants.attrV201]) and input_ok;	  // output version201 if requested and minimum input entered
-doAttributesVersion202 := (Models.FP_Models.Check_Valid_Attributes(attributesIn, [Models.FraudAdvisor_Constants.attrV202]) 
+doAttributesVersion1 := Models.FP_Models.Check_Valid_Attributes(attributesClean, [Models.FraudAdvisor_Constants.attrV1]);	                  // output version1 if requested
+doIDAttributes := Models.FP_Models.Check_Valid_Attributes(attributesClean, [Models.FraudAdvisor_Constants.IDattr]);                          // Output IDAttributes if requested
+doAttributesVersion2 := Models.FP_Models.Check_Valid_Attributes(attributesClean, attributesV2set) and input_ok;	                            // output version2 if requested and minimum input entered
+doAttributesVersion201 := Models.FP_Models.Check_Valid_Attributes(attributesClean, [Models.FraudAdvisor_Constants.attrV201]) and input_ok;	  // output version201 if requested and minimum input entered
+doAttributesVersion202 := (Models.FP_Models.Check_Valid_Attributes(attributesClean, [Models.FraudAdvisor_Constants.attrV202]) 
                           or Models.FP_models.Model_Check(Valid_requested_models, ['fp1908_1'])) // run attributes by this model name in case model called by FlexID
                           and input_ok;	  // output version202 if requested and minimum input entered
-doParoAttributes := Models.FP_Models.Check_Valid_Attributes(attributesIn, [Models.FraudAdvisor_Constants.attrvparo]) and input_ok;	      // output Paro attrs if requested and minimum input entered
-doTMXAttributes := Models.FP_Models.Check_Valid_Attributes(attributesIn, [Models.FraudAdvisor_Constants.attrvTMX]) and input_ok;	      // output TMX attrs if requested and minimum input entered
-doIDA_Attributes := Models.FP_Models.Check_Valid_Attributes(attributesIn, [Models.FraudAdvisor_Constants.attrIDA]) and input_ok; // output IDA attrs if requested and minimum input entered
+doParoAttributes := Models.FP_Models.Check_Valid_Attributes(attributesClean, [Models.FraudAdvisor_Constants.attrvparo]) and input_ok;	      // output Paro attrs if requested and minimum input entered
+doTMXAttributes := Models.FP_Models.Check_Valid_Attributes(attributesClean, [Models.FraudAdvisor_Constants.attrvTMX]) and input_ok;	      // output TMX attrs if requested and minimum input entered
+doIDA_Attributes := Models.FP_Models.Check_Valid_Attributes(attributesClean, [Models.FraudAdvisor_Constants.attrIDA]) and input_ok; // output IDA attrs if requested and minimum input entered
 
 //Options copied over from targets np31 model to make it work the same in FraudAdvisor
 //These options are being hard coded to prevent target's fp1403_2 model from changing if FraudAdvisor settings change
@@ -676,7 +703,7 @@ bsVersion := map(
 //=========================
 //=== BS options        ===
 //=========================
-BSOptions := Models.FP_Models.Set_BSOptions(Valid_requested_models, attributesIn, input_ok, doInquiries, UseIngestDate);
+BSOptions := Models.FP_Models.Set_BSOptions(Valid_requested_models, attributesClean, input_ok, doInquiries, UseIngestDate);
 
 iid := //Group(Dataset([],risk_indicators.layout_output), seq);
        risk_indicators.InstantID_Function(prep, gateways, DPPA_Purpose, GLB_Purpose, isUtility, isLn, 
@@ -1290,7 +1317,7 @@ Deltabase_Logging_prep :=  DATASET([TRANSFORM(Risk_Reporting.Layouts.LOG_Deltaba
 																					 self.data_restriction_mask := DataRestriction,
 																					 self.data_permission_mask := DataPermission,
 																					 self.industry := Industry_Search[1].Industry,
-																					 self.i_attributes_name := attributesIn[1].name,
+																					 self.i_attributes_name := attributesClean[1].name,
 																					 self.i_ssn := socs_value,
                                            self.i_dob := dob_value,
                                            self.i_name_full := unparsed_fullname_value,

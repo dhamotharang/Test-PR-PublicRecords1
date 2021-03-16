@@ -347,11 +347,15 @@ Gateway.Layouts.Config gw_switch(gateways_in le) := TRANSFORM
                                    Risk_Indicators.iid_constants.idareportRetro] AND
                                    (~IDA_model_check OR ~Non_lexid_min_check)             => '',
                                                                                              le.url); 
-  SELF.properties := if(service_name IN [Gateway.Constants.ServiceName.FirstData], 
+  fd_properties := if(service_name IN [Gateway.Constants.ServiceName.FirstData], 
                         DATASET([TRANSFORM(Gateway.Layouts.ConfigProperties,
                                            SELF.name := 'SubscriberId';
                                            SELF.val := (STRING8)SubscriberId;)]),
                         DATASET([], Gateway.Layouts.ConfigProperties));
+                        
+  self.properties := le.properties + fd_properties;  //if the servicename is FirstData, add SubscriberId to the properties                     
+  self.transactionID := if(le.transactionid='', outofbandTransactionID, le.transactionid);
+  
   SELF := le;
 END;
 

@@ -79,7 +79,6 @@ did_out := Inquiry_Services.Log_Functions.fn_getDidVille(ds_in_cleanAddrs, mod_a
 did_out_sort := sort(did_out, seq);
 
 Business_Risk_BIP.Layouts.Input prepForBIPAppend(address.Layout_Batch_Out le) := transform
-	self.seq := 1;
 	self.CompanyName := ut.CleanCompany(in_params.company_name);
 	self.Prim_Range := le.prim_range;
 	self.Prim_Name := le.prim_name;
@@ -96,6 +95,16 @@ Business_Risk_BIP.Layouts.Input prepForBIPAppend(address.Layout_Batch_Out le) :=
 	filteredSSN := StringLib.StringFilter(in_params.ssn, '0123456789');
 	self.Rep_SSN := IF(LENGTH(filteredSSN) != 9 OR (INTEGER)filteredSSN <= 0, '', filteredSSN);
 	self.Rep_LexID := did_out_sort[1].did;
+  
+  // require that something in one of these company fields needs to be populated before trying to append BIP ids
+  self.seq := if( (trim(self.companyname)='' and
+  trim(self.Prim_Name)='' and
+  trim(self.Zip5)='' and
+  trim(self.City)='' and
+  trim(self.State)='' and
+  trim(self.Phone10)='' and
+  trim(self.FEIN)=''), skip, 1);
+
 	self := [];
 end;
 prepBIPAppend := project(cleaned(uid = 9), prepForBIPAppend(left));
