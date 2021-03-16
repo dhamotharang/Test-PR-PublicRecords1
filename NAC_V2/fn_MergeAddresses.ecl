@@ -80,9 +80,8 @@ fn_MergeClientAddresses(DATASET($.Layout_Base2) clientAddr, DATASET($.Layout_Bas
 		Do not process records that have previously been replaced
 	*/
 	unchanged := JOIN(current, clientAddr,
-							LEFT.CaseId = RIGHT.CaseId AND LEFT.ClientId = RIGHT.ClientId AND
-							LEFT.ProgramState = RIGHT.ProgramState and LEFT.ProgramCode = RIGHT.ProgramCode
-							and LEFT.GroupId = RIGHT.GroupId,
+							LEFT.CaseId = RIGHT.CaseId AND LEFT.ClientId = RIGHT.ClientId AND LEFT.GroupId = RIGHT.GroupId
+							AND LEFT.ProgramState = RIGHT.ProgramState and LEFT.ProgramCode = RIGHT.ProgramCode,
 								TRANSFORM($.Layout_Base2, self := LEFT),
 								LEFT ONLY, LOCAL);
 								
@@ -94,9 +93,8 @@ fn_MergeClientAddresses(DATASET($.Layout_Base2) clientAddr, DATASET($.Layout_Bas
 								RIGHT ONLY, LOCAL);*/
 
 	updatedAddress := JOIN(current, clientAddr,
-							LEFT.CaseId = RIGHT.CaseId AND LEFT.ClientId = RIGHT.ClientId AND
-							LEFT.ProgramState = RIGHT.ProgramState and LEFT.ProgramCode = RIGHT.ProgramCode
-							and LEFT.GroupId = RIGHT.GroupId,
+							LEFT.CaseId = RIGHT.CaseId AND LEFT.ClientId = RIGHT.ClientId AND LEFT.GroupId = RIGHT.GroupId
+							AND LEFT.ProgramState = RIGHT.ProgramState and LEFT.ProgramCode = RIGHT.ProgramCode,
 								xForm(RIGHT, LEFT),
 								INNER, LOCAL);
 
@@ -112,9 +110,8 @@ fn_MergeCaseAddresses(DATASET($.Layout_Base2) caseAddr, DATASET($.Layout_Base2) 
 		Do not process records that have previously been replaced
 	*/
 	unchanged := JOIN(current, caseAddr,
-							LEFT.CaseId = RIGHT.CaseId AND
-							LEFT.ProgramState = RIGHT.ProgramState and LEFT.ProgramCode = RIGHT.ProgramCode
-							and LEFT.GroupId = RIGHT.GroupId,
+							LEFT.CaseId = RIGHT.CaseId AND LEFT.ClientId = RIGHT.ClientId AND LEFT.GroupId = RIGHT.GroupId
+							AND LEFT.ProgramState = RIGHT.ProgramState and LEFT.ProgramCode = RIGHT.ProgramCode,
 								TRANSFORM($.Layout_Base2, self := LEFT),
 								LEFT ONLY, LOCAL);
 								
@@ -126,9 +123,8 @@ fn_MergeCaseAddresses(DATASET($.Layout_Base2) caseAddr, DATASET($.Layout_Base2) 
 								RIGHT ONLY, LOCAL);*/
 
 	updatedAddress := JOIN(current, caseAddr,
-							LEFT.CaseId = RIGHT.CaseId AND
-							LEFT.ProgramState = RIGHT.ProgramState and LEFT.ProgramCode = RIGHT.ProgramCode
-							and LEFT.GroupId = RIGHT.GroupId,
+							LEFT.CaseId = RIGHT.CaseId AND LEFT.ClientId = RIGHT.ClientId AND LEFT.GroupId = RIGHT.GroupId
+							AND LEFT.ProgramState = RIGHT.ProgramState and LEFT.ProgramCode = RIGHT.ProgramCode,
 								xForm(RIGHT, LEFT),
 								INNER, LOCAL);
 
@@ -143,13 +139,18 @@ JIRA DF_28954 Only update most recent case/client with new address
 
 EXPORT fn_MergeAddresses(DATASET($.Layout_Base2) newbase, DATASET($.Layout_Base2) base) := FUNCTION
 
-	trecent := table(base, {caseid, clientid, latest := MAX(GROUP, enddate)}, caseid, clientid);
+	trecent := table(base, {caseid, clientid, GroupId, programState, programCode,
+							earliest := MIN(GROUP, startdate), latest := MAX(GROUP, enddate)}, caseid, clientid, GroupId, programState, programCode);
 	recent := JOIN(DISTRIBUTE(base, hash32(caseid,clientid)), DISTRIBUTE(trecent, hash32(caseid,clientid)),
-						left.caseid=right.caseid AND left.clientid=right.clientid AND left.enddate=right.latest,
+						left.caseid=right.caseid AND left.clientid=right.clientid AND left.GroupId=right.GroupId
+						AND left.programState=right.programState AND left.programCode=right.programCode 
+						AND left.enddate=right.latest,
 						TRANSFORM(nac_V2.layout_base2, self := left), INNER, local);
 
 	notrecent := JOIN(DISTRIBUTE(base, hash32(caseid,clientid)), DISTRIBUTE(trecent, hash32(caseid,clientid)),
-						left.caseid=right.caseid AND left.clientid=right.clientid AND left.enddate<>right.latest,
+						left.caseid=right.caseid AND left.clientid=right.clientid AND left.GroupId=right.GroupId
+						AND left.programState=right.programState AND left.programCode=right.programCode 
+						AND left.enddate<>right.latest,
 						TRANSFORM(nac_V2.layout_base2, self := left), INNER, local);
 
 	
@@ -160,7 +161,6 @@ EXPORT fn_MergeAddresses(DATASET($.Layout_Base2) newbase, DATASET($.Layout_Base2
 	
 	CaseAddressesUpdated := IF(EXISTS(caseAddr), fn_MergeCaseAddresses(caseAddr, current), current);
 	
-													
 	// addresses that apply to clients (ClientId<>'')
 	clientAddr := DISTRIBUTE(newbase(addresstype<>'', ClientId<>''), HASH32(CaseID));
 		
