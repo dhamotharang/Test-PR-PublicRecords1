@@ -1,4 +1,4 @@
-﻿EXPORT MAC_PopulationStatistics(infile,Ref='',Input_agency_id = '',Input_agency_name = '',Input_source_id = '',Input_agency_state_abbr = '',Input_agency_ori = '',Input_allow_open_search = '',Input_append_overwrite_flag = '',Input_drivers_exchange_flag = '',OutFile) := MACRO
+﻿EXPORT MAC_PopulationStatistics(infile,Ref='',Input_agency_id = '',Input_agency_name = '',Input_source_id = '',Input_agency_state_abbr = '',Input_agency_ori = '',Input_allow_open_search = '',Input_append_overwrite_flag = '',Input_drivers_exchange_flag = '',Input_source_start_date = '',Input_source_end_date = '',Input_source_termination_date = '',Input_source_resale_allowed = '',Input_source_auto_renew = '',Input_source_allow_sale_of_component_data = '',Input_source_allow_extract_of_vehicle_data = '',OutFile) := MACRO
   IMPORT SALT37,Scrubs_eCrash_MBSAgency;
   #uniquename(of)
   %of% := RECORD
@@ -46,6 +46,41 @@
       '' 
     #ELSE
         IF( le.Input_drivers_exchange_flag = (TYPEOF(le.Input_drivers_exchange_flag))'','',':drivers_exchange_flag')
+    #END
++    #IF( #TEXT(Input_source_start_date)='' )
+      '' 
+    #ELSE
+        IF( le.Input_source_start_date = (TYPEOF(le.Input_source_start_date))'','',':source_start_date')
+    #END
++    #IF( #TEXT(Input_source_end_date)='' )
+      '' 
+    #ELSE
+        IF( le.Input_source_end_date = (TYPEOF(le.Input_source_end_date))'','',':source_end_date')
+    #END
++    #IF( #TEXT(Input_source_termination_date)='' )
+      '' 
+    #ELSE
+        IF( le.Input_source_termination_date = (TYPEOF(le.Input_source_termination_date))'','',':source_termination_date')
+    #END
++    #IF( #TEXT(Input_source_resale_allowed)='' )
+      '' 
+    #ELSE
+        IF( le.Input_source_resale_allowed = (TYPEOF(le.Input_source_resale_allowed))'','',':source_resale_allowed')
+    #END
++    #IF( #TEXT(Input_source_auto_renew)='' )
+      '' 
+    #ELSE
+        IF( le.Input_source_auto_renew = (TYPEOF(le.Input_source_auto_renew))'','',':source_auto_renew')
+    #END
++    #IF( #TEXT(Input_source_allow_sale_of_component_data)='' )
+      '' 
+    #ELSE
+        IF( le.Input_source_allow_sale_of_component_data = (TYPEOF(le.Input_source_allow_sale_of_component_data))'','',':source_allow_sale_of_component_data')
+    #END
++    #IF( #TEXT(Input_source_allow_extract_of_vehicle_data)='' )
+      '' 
+    #ELSE
+        IF( le.Input_source_allow_extract_of_vehicle_data = (TYPEOF(le.Input_source_allow_extract_of_vehicle_data))'','',':source_allow_extract_of_vehicle_data')
     #END
 ;
   END;
