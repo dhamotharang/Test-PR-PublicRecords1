@@ -3297,6 +3297,7 @@ Event: => P1_AotIdNacCollNewType := MAP(T1_LexIdPopFlag=0 AND T1_RinIdPopFlag=0 
 																				Subject.SrcType11.T_InpReasonDescEcho = 'Identity associated with NAC level 1 collision' => 1,
 																				Subject.SrcType11.T_InpReasonDescEcho = 'Identity associated with NAC level 2 collision' => 2);
 
+
 //Unscorable Attributes
 Event: => P1_IdRiskUnscrbleFlag := MAP((T1_LexIdPopFlag=0 AND T1_RinIdPopFlag=0) OR T_SrcClassType < 2 => 1, 0);
 Event: => P9_AddrRiskUnscrbleFlag := MAP(T9_AddrPopFlag=0 OR T_SrcClassType < 2 => 1, 0);
