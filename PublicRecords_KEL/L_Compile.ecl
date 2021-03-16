@@ -8178,6 +8178,8 @@ EXPORT L_Compile := MODULE
     KEL.typ.nbool Is_Felony_F_C_R_A_;
     KEL.typ.nbool Is_Felony_Non_F_C_R_A_;
     KEL.typ.nbool Is_Non_Felony_Records_;
+    KEL.typ.nkdate My_Crim_Date_;
+    KEL.typ.nstr Valid_Date_;
     KEL.typ.epoch Archive___Date_ := 0;
     KEL.typ.epoch Date_First_Seen_ := 0;
     KEL.typ.epoch Date_Last_Seen_ := 0;
@@ -30803,6 +30805,8 @@ EXPORT L_Compile := MODULE
     KEL.typ.nbool Is_Felony_F_C_R_A_;
     KEL.typ.nbool Is_Felony_Non_F_C_R_A_;
     KEL.typ.nbool Is_Non_Felony_Records_;
+    KEL.typ.nkdate My_Crim_Date_;
+    KEL.typ.nstr Valid_Date_;
     KEL.typ.epoch Archive___Date_ := 0;
     KEL.typ.epoch Date_First_Seen_ := 0;
     KEL.typ.epoch Date_Last_Seen_ := 0;
@@ -35647,6 +35651,8 @@ EXPORT L_Compile := MODULE
     KEL.typ.nbool Is_Felony_F_C_R_A_;
     KEL.typ.nbool Is_Felony_Non_F_C_R_A_;
     KEL.typ.nbool Is_Non_Felony_Records_;
+    KEL.typ.nkdate My_Crim_Date_;
+    KEL.typ.nstr Valid_Date_;
     KEL.typ.epoch Archive___Date_ := 0;
     KEL.typ.epoch Date_First_Seen_ := 0;
     KEL.typ.epoch Date_Last_Seen_ := 0;
