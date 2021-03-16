@@ -55,7 +55,7 @@ EXPORT Read := MODULE
     IMPORT dx_EBR, EBR;
     LOCAL executive_summary_1000_recs := dx_EBR.mac_read_by_bdid(
       inf,
-      EBR.Key_1000_Executive_Summary_FILE_NUMBER,
+      EBR.Key_1000_Executive_Summary_BDID,
       dx_EBR.mod_delta_rid.key_1000_delta_rid,
       choosen_number);
 
