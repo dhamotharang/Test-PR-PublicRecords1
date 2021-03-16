@@ -9,12 +9,12 @@ FIELDTYPE:invalid_agency_ori:ALLOW(0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHI
 FIELDTYPE:invalid_allow_open_search:ALLOW(01):LENGTHS(1)
 FIELDTYPE:invalid_append_overwrite_flag:ENUM(AP|OW):LENGTHS(2)
 FIELDTYPE:invalid_drivers_exchange_flag:ALLOW(01):LENGTHS(1)
-FIELDTYPE:invalid_date:ALLOW(0123456789-/: \N):LENGTHS(0,10)
-FIELDTYPE:invalid_date_time:ALLOW(0123456789-/: \N):LENGTHS(0,20)
-FIELDTYPE:invalid_resale_allowed:ALLOW(01 \N):LENGTHS(0,2)
-FIELDTYPE:invalid_auto_renew:ALLOW(01 \N):LENGTHS(0,2)
-FIELDTYPE:invalid_Allow_Sale_Of_Component_Data:ALLOW(01 \N):LENGTHS(0,2)
-FIELDTYPE:invalid_Allow_Extract_Of_Vehicle_Data:ALLOW(01 \N):LENGTHS(0,2)
+FIELDTYPE:invalid_date:ALLOW(0123456789- \N):LENGTHS(0,2,10)
+FIELDTYPE:invalid_date_time:ALLOW(0123456789-: \N):LENGTHS(0,2,20)
+FIELDTYPE:invalid_resale_allowed:ALLOW(01 \N):LENGTHS(0,1,2)
+FIELDTYPE:invalid_auto_renew:ALLOW(01 \N):LENGTHS(0,1,2)
+FIELDTYPE:invalid_Allow_Sale_Of_Component_Data:ALLOW(01 \N):LENGTHS(0,1,2)
+FIELDTYPE:invalid_Allow_Extract_Of_Vehicle_Data:ALLOW(01 \N):LENGTHS(0,1,2)
 
 FIELD:agency_id:LIKE(invalid_agency_id):TYPE(STRING):0,0
 FIELD:agency_name:TYPE(STRING):0,0
