@@ -1,4 +1,4 @@
-﻿IMPORT Cortera, UT, PromoteSupers, std, Prte2, PRTE2_Cortera, Address, AID, AID_Support;
+﻿IMPORT Cortera, UT, PromoteSupers, std, Prte2, PRTE2_Cortera, Address, AID, AID_Support,mdr;
 EXPORT Proc_build_base := FUNCTION
 
 
@@ -65,15 +65,17 @@ combine_files_clean := ds_clean_Boca + ds_clean_INS;
     
     SELF := Left;
     SELF := [];));
+		
+		ds_out2 := mdr.macGetGlobalSID(ds_out,'Cortera','','global_sid');
     
-    Header_File := Project(ds_out,
+    Header_File := Project(ds_out2,
                                        Transform(PRTE2_cortera.Layouts.base,
                                                  SElF := LEFT,
                                                  SELF := []
                                                 )
                                       );
     
-    Attribute_File := Project(ds_out,
+    Attribute_File := Project(ds_out2,
                                             Transform(PRTE2_cortera.Layouts.Attributes_Out, 
                                                       SELF.current_rec := true;
                                                       SELF.ultimate_linkid   := LEFT.LINK_ID;

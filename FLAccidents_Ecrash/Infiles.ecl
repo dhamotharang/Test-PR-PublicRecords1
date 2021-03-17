@@ -12,7 +12,7 @@ EXPORT Infiles := MODULE
 																														SELF := LEFT));	
 	
   SHARED uAgency := DEDUP(SORT(DISTRIBUTE(Agency(Agency_ID <> ''), HASH32(Agency_ID)), 
-                               Agency_ID, Source_ID, -(orig_source_start_date <> '0'), LOCAL), 
+                               Agency_ID, Source_ID, -orig_source_start_date, LOCAL), 
 													Agency_ID, Source_id, LOCAL);	
 		
   SHARED FabAgency := PROJECT(Agency, TRANSFORM(Layout_MBSAgency.agency,
@@ -429,6 +429,7 @@ EXPORT Infiles := MODULE
     SELF.Source_End_Date := L.Orig_Source_End_Date;
     SELF.Source_Termination_Date := L.Orig_Source_Termination_Date;
     SELF.Append_Overwrite_Flag := L.Append_Overwrite_Flag;
+    SELF := L;
     SELF := [];
   END;
 	EXPORT AgencyCmbnd := JOIN(uAgency, uBillingAgencies,
