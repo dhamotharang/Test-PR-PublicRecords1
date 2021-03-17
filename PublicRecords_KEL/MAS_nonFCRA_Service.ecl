@@ -1,4 +1,4 @@
-﻿﻿/*--SOAP--
+﻿﻿﻿/*--SOAP--
 <message name="MAS_nonFCRA_Service">
 	<part name="input" type="tns:XmlDataSet" cols="100" rows="8"/>
 	<part name="ScoreThreshold" type="xsd:integer"/> 
@@ -44,9 +44,13 @@ EXPORT MAS_nonFCRA_Service() := MACRO
 		'LexIdSourceOptout',
 		'RetainInputLexid',
 		'AppendPII',
-    '_TransactionId',
-    '_BatchUID',
-    '_GCID'
+		'_TransactionId',
+		'_BatchUID',
+		'_GCID',
+		'Watchlists_Requested',
+		'IncludeOfac',
+		'IncludeAdditionalWatchLists',
+		'Global_Watchlist_Threshold'
   ));
 
 STRING5 Default_Industry_Class := '';	
@@ -87,9 +91,31 @@ STRING100 Default_data_permission_mask := '';
 
 	DATASET(Gateway.Layouts.Config) GatewaysClean := PROJECT(gateways_in, gw_switch(LEFT));
 	
+	// OFAC parameters
+    BOOLEAN   include_ofac := FALSE : STORED('IncludeOfac');
+    BOOLEAN   include_additional_watchlists  := FALSE  : STORED('IncludeAdditionalWatchLists');
+    REAL Global_Watchlist_Threshold := Business_Risk_BIP.Constants.Default_Global_Watchlist_Threshold : STORED('Global_Watchlist_Threshold');
+    STRING watchlists := '' : STORED('Watchlists_Requested');
+    
+    OFACGW := GatewaysClean(STD.Str.ToLowerCase(servicename) = 'bridgerwlc')[1];
+	#STORED('OFACURL', OFACGW.url);
+    #STORED('IncludeOfacValue', include_ofac);
+    #STORED('IncludeAdditionalWatchListsValue', include_additional_watchlists);
+    #STORED('Watchlists_RequestedValue', watchlists);
+    #STORED('Global_Watchlist_ThresholdValue', Global_Watchlist_Threshold);
+		#CONSTANT('IsFCRA', FALSE);
+ 
+    // NetAcuity parameters
 	NetAcuityGW := GatewaysClean(STD.Str.ToLowerCase(servicename) = 'netacuity')[1];
 	#STORED('NetAcuityURL', NetAcuityGW.url);
+	#STORED('IsFCRAValue', FALSE);
 	
+	TargusGW := GatewaysClean(STD.Str.ToLowerCase(servicename) = 'targus')[1];
+	#STORED('TargusURL', TargusGW.url);
+	
+	InsurancePhoneGW := GatewaysClean(STD.Str.ToLowerCase(servicename) = 'insurancephoneheader')[1];
+	#STORED('InsurancePhoneURL', InsurancePhoneGW.url);
+
 	// If allowed sources aren't passed in, use default list of allowed sources
 	SetAllowedSources := IF(COUNT(AllowedSourcesDataset) = 0, PublicRecords_KEL.ECL_Functions.Constants.DEFAULT_ALLOWED_SOURCES_NONFCRA, AllowedSourcesDataset);
 	// If a source is on the Exclude list, remove it from the allowed sources list. 
@@ -148,6 +174,7 @@ STRING100 Default_data_permission_mask := '';
 		EXPORT BOOLEAN IncludeEBRTradeline := TRUE;
 		EXPORT BOOLEAN IncludeEmail := TRUE;
 		EXPORT BOOLEAN IncludeEmployment := TRUE;
+		EXPORT BOOLEAN IncludeForeclosure := TRUE;
 		EXPORT BOOLEAN IncludeGeolink := TRUE;
 		EXPORT BOOLEAN IncludeHousehold := TRUE;
 		EXPORT BOOLEAN IncludeInquiry := TRUE;
@@ -177,19 +204,34 @@ STRING100 Default_data_permission_mask := '';
 	IF(options.RetainInputLexid = FALSE AND options.BestPIIAppend = TRUE, FAIL('Insufficient Input'));
 
 
+
 	ResultSet := PublicRecords_KEL.FnRoxie_GetAttrs(ds_input, Options);		
 		
 	FinalResults := PROJECT(ResultSet, 
 		TRANSFORM(PublicRecords_KEL.ECL_Functions.Layout_Person_NonFCRA,
-			SELF := LEFT));
+			SELF := LEFT,
+			SELF := []));
 	
-	// IF(COUNT(ResultSet(NetAcuityRoyalty <> 0)) > 0, 
-    // OUTPUT(DATASET([TRANSFORM(Royalty.Layouts.Royalty, 
-	// SELF.royalty_type_code := Royalty.Constants.RoyaltyCode.NETACUITY;
-	// SELF.royalty_type := Royalty.Constants.RoyaltyType.NETACUITY;
-	// SELF.royalty_count  := COUNT(ResultSet(NetAcuityRoyalty <> 0)); 
-	// SELF := [];
-	// )]), NAMED('RoyaltySet')));
+
+	TargusRoyaltyCount := COUNT(ResultSet(TargusRoyalty <> 0));
+
+	TargusRoyaltyDS := DATASET([transform(Royalty.Layouts.Royalty,
+							SELF.royalty_type_code := Royalty.Constants.RoyaltyCode.TARGUS_PDE,
+							SELF.royalty_type := Royalty.Constants.RoyaltyType.TARGUS_PDE;
+							SELF.royalty_count := TargusRoyaltyCount; 
+							SELF := [];)]);
+							
+	NetAcuityRoyaltyCount := COUNT(ResultSet(NetAcuityRoyalty <> 0));
+
+	NetAcuityRoyaltyDS := DATASET([transform(Royalty.Layouts.Royalty,
+							SELF.royalty_type_code := Royalty.Constants.RoyaltyCode.NETACUITY,
+							SELF.royalty_type := Royalty.Constants.RoyaltyType.NETACUITY;
+							SELF.royalty_count := NetAcuityRoyaltyCount; 
+							SELF := [];)]);
+
+	RoyaltySet := TargusRoyaltyDS + NetAcuityRoyaltyDS;
+					
+	OUTPUT(RoyaltySet, NAMED('RoyaltySet'));
 	
   OUTPUT( FinalResults, NAMED('Results') );
 

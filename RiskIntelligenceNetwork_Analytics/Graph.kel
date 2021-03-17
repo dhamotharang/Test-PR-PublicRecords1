@@ -206,7 +206,7 @@ DriversLicense := ENTITY(QUERY(UID=OttoDriversLicenseId,
     MODEL(UID,
     rCustomer, SourceCustomers{rSourceCustomer}, LicenseNumber, State, OttoDriversLicenseId));
 
-Event := ENTITY(QUERY(UID(record_id), 
+Event := ENTITY(QUERY(UID(record_id,AcctNo), 
     Customer rCustomer=gc_id,
     Customer rSourceCustomer=gc_id,
 
@@ -579,7 +579,7 @@ PersonEvent := ASSOCIATION(QUERY(
     Customer rCustomer=gc_id,
     Person Subject=LexId,
     DATE EventDate,
-    Event Transaction=UID(record_id)
+    Event Transaction=UID(record_id,AcctNo)
    ));
      
 

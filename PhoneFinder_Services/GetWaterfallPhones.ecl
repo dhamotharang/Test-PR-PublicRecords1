@@ -101,6 +101,7 @@
                                   pInput.vendor = MDR.sourceTools.src_wired_Assets_Royalty => PhConstants.LastResort,
                                   pInput.vendor = MDR.sourceTools.src_Inhouse_QSent => PhConstants.InHouseQSent,
                                   PhConstants.Waterfall);
+    SELF.Phone_StarRating  := (STRING)pInput.Phone_StarRating;                              
     SELF                   := pInput;
     SELF                   := [];
   END;

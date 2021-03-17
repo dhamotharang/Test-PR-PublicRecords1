@@ -84,6 +84,18 @@ export Functions := MODULE
 			RETURN Result;
 		END;
 
+  EXPORT filterOutTerminatedAgencyReports(recs) := FUNCTIONMACRO
+			  // eliminate any reports from a terminated agency
+	 			TODAYS_DATE := Std.Date.Today();
+     agency_key := FLAccidents_Ecrash.key_EcrashV2_agency;
+     recs_filtered := JOIN(recs, agency_key,
+	                     KEYED(LEFT.jurisdiction_state = RIGHT.Agency_State_Abbr) AND
+																						      LEFT.jurisdiction_nbr = RIGHT.MBSI_Agency_ID AND
+																									   (UNSIGNED)RIGHT.source_termination_date <> 0 AND (UNSIGNED) RIGHT.source_termination_date <= TODAYS_DATE,
+																										  TRANSFORM(LEFT), LEFT ONLY);
+					RETURN recs_filtered;
+		ENDMACRO;
+
 	EXPORT create_date_dataset(string startdate, integer offset, boolean forwardOnly=false):=function
 
 		tmp_rec := record
@@ -729,11 +741,13 @@ export Functions := MODULE
 		DeltabaseReportSelectSql := DeltaBaseSql.GetImageRetrievalSqlByReportId(TRIM(RequestReportId), DeltaBaseDateAddedSql);
 
 		EmptyReportDeltabaseRow := DATASET([],eCrash_Services.Layouts.eCrashRecordStructure);
-		ReportDeltabaseRow := IF(
+		ReportDeltabaseRow0 := IF(
 			EXISTS(ReportHashKeysFromKey), 
 			EmptyReportDeltabaseRow, 
 			OwnerDriverDedup(DeltaBaseService.GetReportData(DeltabaseReportSelectSql))
 		);
+
+  ReportDeltabaseRow := filterOutTerminatedAgencyReports(ReportDeltabaseRow0);
 			
 		SuperReportRow := IF(EXISTS(ReportHashKeysFromKey), ReportPayloadRow, ReportDeltabaseRow);
 		//if we don't have request report id in the key, but do have it in the deltabase then

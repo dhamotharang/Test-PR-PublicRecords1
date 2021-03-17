@@ -13,7 +13,7 @@ EXPORT Fn_Clean_Date (STRING InDate,
 											BOOLEAN SetDefault = FALSE
 											) := FUNCTION
 
-	InDateWithDefault := IF(SetDefault AND TRIM(InDate) = '', ut.now('%Y%m%d%T', FALSE), InDate);
+	InDateWithDefault := IF(SetDefault AND TRIM(InDate) = '', ut.now('%Y%m%d%T', FALSE), InDate);// we know this produces an ECL warning about ut.now being deprecated, but switching to STD.Date causes the ECL compiler to crash
 	FullInDateinNums := STD.Str.Filter(InDateWithDefault, '0123456789');
 	InDateinNums := (STRING8)FullInDateinNums[1..8];
 	

@@ -8,6 +8,7 @@ EXPORT Layouts := MODULE
 	  boolean internal_testing;
 		string1 BusinessReportFetchLevel;
     boolean IncludeVendorSourceB;
+    boolean IncludeAssignmentsAndReleases;
 	end;
 
   // Additional input boolena needed for UCC section

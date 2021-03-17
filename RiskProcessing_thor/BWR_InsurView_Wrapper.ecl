@@ -57,12 +57,14 @@ layout_input := RiskProcessing_thor.Layouts.Layout_Insurance_Header;
   // unsigned8 rid;
  // END;
 
-inds := IF(inputFileName='thor::base::cdw::prod::insuranceheader',
-								IF(RecordsToRun=0, DATASET('~' + inputFileName, RiskProcessing_thor.Layouts.Layout_Insurance_Header,THOR)(StringLib.StringToUpperCase(adl_segmentation) = 'CORE' and active_flag = 'Y' and LENGTH(TRIM((STRING20)lexid)) <= 12),
-								CHOOSEN(DATASET('~' + inputFileName, RiskProcessing_thor.Layouts.Layout_Insurance_Header,THOR)(StringLib.StringToUpperCase(adl_segmentation) = 'CORE' and active_flag = 'Y' and LENGTH(TRIM((STRING20)lexid)) <= 12), RecordsToRun)),
-								//if not running on Insurance Header
-								IF(RecordsToRun=0, DATASET('~' + inputFileName, layout_input, thor)(LENGTH(TRIM((STRING20)lexid)) <= 12),
-								CHOOSEN(DATASET('~' + inputFileName, layout_input, thor)(LENGTH(TRIM((STRING20)lexid)) <= 12), RecordsToRun)));
+#IF(inputFileName='thor::base::cdw::prod::insuranceheader')
+       Inds := IF(RecordsToRun=0, DATASET('~' + inputFileName, RiskProcessing_thor.Layouts.Layout_Insurance_Header,THOR)(StringLib.StringToUpperCase(adl_segmentation) = 'CORE' and active_flag = 'Y' and LENGTH(TRIM((STRING20)lexid)) <= 12),
+CHOOSEN(DATASET('~' + inputFileName, RiskProcessing_thor.Layouts.Layout_Insurance_Header,THOR)(StringLib.StringToUpperCase(adl_segmentation) = 'CORE' and active_flag = 'Y' and LENGTH(TRIM((STRING20)lexid)) <= 12), RecordsToRun));
+#ELSE
+       Inds := IF(RecordsToRun=0, DATASET('~' + inputFileName, layout_input, thor)(LENGTH(TRIM((STRING20)lexid)) <= 12),
+CHOOSEN(DATASET('~' + inputFileName, layout_input, thor)(LENGTH(TRIM((STRING20)lexid)) <= 12), RecordsToRun));
+#END
+
 
 inds_dist := DISTRIBUTE(inds); //Distribute randomly
 
@@ -70,7 +72,7 @@ OUTPUT(CHOOSEN(inds_dist, eyeball_count), NAMED('Sample_InDS'));
 
 //project the distributed input file into the riskview.layouts.Layout_Riskview_Batch_In layout
 
-// Win...you will need to project the layout_input to this Batch_In layout if the input file layout has different column names
+// You will need to project the layout_input to this Batch_In layout if the input file layout has different column names
 BatchIn := PROJECT(inds_dist, TRANSFORM(riskview.layouts.Layout_Riskview_Batch_In,
     SELF.AcctNo := (STRING)LEFT.lexid;
 	SELF.lexID := (STRING)LEFT.lexid,

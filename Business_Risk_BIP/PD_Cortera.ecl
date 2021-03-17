@@ -1,4 +1,4 @@
-﻿IMPORT BIPV2, Cortera, MDR, STD; 
+﻿IMPORT BIPV2, dx_Cortera, MDR, STD; 
 
 EXPORT PD_Cortera(DATASET(Business_Risk_BIP.Layouts.Shell) LinkIDsFound, 
 									DATASET(BIPV2.IDlayouts.l_xlink_ids2) kFetchLinkIDs, 
@@ -7,7 +7,7 @@ EXPORT PD_Cortera(DATASET(Business_Risk_BIP.Layouts.Shell) LinkIDsFound,
 									Business_Risk_BIP.LIB_Business_Shell_LIBIN options, 
 									SET OF STRING2 AllowedSourcesSet) := MODULE
                   
- 	SHARED CorteraRaw := Cortera.Key_LinkIDs.kfetch2(kFetchLinkIDs,
+ 	SHARED CorteraRaw := dx_Cortera.Key_LinkIds.kfetch2(kFetchLinkIDs,
 	                                         kFetchLinkSearchLevel,
 	                                         0, // ScoreThreshold --> 0 = Give me everything
 																					 Business_Risk_BIP.Constants.Limit_Default,
@@ -22,7 +22,7 @@ EXPORT PD_Cortera(DATASET(Business_Risk_BIP.Layouts.Shell) LinkIDsFound,
 	
   SHARED CorteraRecs_DD := DEDUP(SORT(CorteraRecs, Seq, ultimate_linkid), Seq, ultimate_linkid);
 
-	SHARED CorteraAttributes_InHouse_Raw := JOIN(CorteraRecs_DD, Cortera.Key_Attributes_Link_Id,
+	SHARED CorteraAttributes_InHouse_Raw := JOIN(CorteraRecs_DD, dx_Cortera.Key_Attributes_Link_Id,
     KEYED( LEFT.ultimate_linkid = RIGHT.ultimate_linkid) AND LEFT.Ultid=RIGHT.UltID AND LEFT.OrgID=RIGHT.OrgID AND LEFT.SeleID=RIGHT.SeleID , 
 					TRANSFORM({RECORDOF(RIGHT), UNSIGNED4 Seq, UNSIGNED6 HistoryDate},
 											SELF.Seq := LEFT.Seq;

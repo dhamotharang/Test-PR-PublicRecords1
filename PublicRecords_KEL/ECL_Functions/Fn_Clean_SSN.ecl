@@ -16,14 +16,15 @@ EXPORT Fn_Clean_SSN(STRING ssn = '', BOOLEAN IsTIN = FALSE) := FUNCTION
   
   ssn_finished := 
     MAP(
-      LENGTH(ssn_filtered) < 7      											=> '',
       ssn_formatted IN ut.set_badssn 											=> '',
+			NOT IsTIN and LENGTH(ssn_filtered) = 4 and ssn_formatted[1..5] = '00000' => ssn_formatted,
+			NOT IsTIN and LENGTH(ssn_filtered) > 8 and ssn_formatted[1..5] = '00000' => ssn_formatted,
+      LENGTH(ssn_filtered) < 7      											=> '',
 			NOT IsTIN AND ssn_formatted[1..3] IN ['000', '666'] => '',
 			NOT IsTIN AND ssn_formatted[1] = '9' 								=> '',
 			NOT IsTIN AND ssn_formatted[4..5] = '00'						=> '',
 			NOT IsTIN AND ssn_formatted[6..9] = '0000' 					=> '',
       ssn_formatted
-
     );
     
   RETURN ssn_finished;
