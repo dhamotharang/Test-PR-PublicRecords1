@@ -198,7 +198,8 @@ EXPORT RawFetch_server(TYPEOF(h.cnp_name) param_cnp_name = (TYPEOF(h.cnp_name))'
                   OR (Config_BIP.WithinEditN(RIGHT.city,RIGHT.city_len,param_city,param_city_len,2, 0)))),
                 TRANSFORM(indexOutputRecord,
                           SELF.gss_word_weight := LEFT.gss_word_weight,
-                          SELF := RIGHT)); /*HACK25g*/
+                          SELF := RIGHT),
+                LIMIT(Config_BIP.L_CNPNAME_MAXBLOCKLIMIT,SKIP)); /*HACK25g*/
     RETURN IF(SUM(wds,spec) > 19,res,IF(SUM(wds,spec) = 0,DATASET([],indexOutputRecord) ,DATASET(ROW([],indexOutputRecord)))); // Ensure at least spc of specificity in gss portion
    END;
  

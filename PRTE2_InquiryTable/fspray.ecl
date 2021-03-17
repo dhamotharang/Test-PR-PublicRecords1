@@ -2,12 +2,12 @@
 
 EXPORT fSpray := FUNCTION
 
-return  Parallel(prte2.SprayFiles.Spray_Raw_Data('inquiry__ins__', 'ins', 'inquiry'),
-                 prte2.SprayFiles.Spray_Raw_Data('inquiry__base__', 'base', 'inquiry'),
-								 prte2.SprayFiles.Spray_Raw_Data('inquiry__clone__', 'clone', 'inquiry')
-						  	 );
-								 
-               
+RETURN PARALLEL(
+       prte2.SprayFiles.Spray_Raw_Data('inquiry__persons_1__', 'persons_1', 'inquiry'),
+       prte2.SprayFiles.Spray_Raw_Data('inquiry__business_1__', 'business_1', 'inquiry'),
+			 prte2.SprayFiles.Spray_Raw_Data('inquiry__business_2__', 'business_2', 'inquiry')
+			);
+
 end;
 
 
