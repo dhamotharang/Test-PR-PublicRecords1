@@ -58,7 +58,7 @@ EXPORT fn_MergeCases(DATASET($.Layout_Base2) newbase, DATASET($.Layout_Base2) ba
 								
 								self := left;
 						),
-							INNER, KEEP(1), LOCAL);
+							LEFT OUTER, KEEP(1), LOCAL);
 							
 //		notcurrent := base(StartDate > std.date.Today() OR EndDate < std.date.Today());
 									

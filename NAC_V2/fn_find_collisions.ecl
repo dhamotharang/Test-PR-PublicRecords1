@@ -229,24 +229,23 @@ EXPORT fn_find_collisions	(
 				1) inter state: state1 <> state2
 				2) intra state: state1=state2 and benefit1=benefit2 and ClientId<>ClientId
 				3) informational: state1=state2 and beneft1<>benefit2: NOT IMPLEMENTED YET
-		***/
-		
+		***/	
 		(left.ProgramState <> right.ProgramState
 			OR
-			(left.ProgramState = right.ProgramState and 
-				//left.ProgramCode = right.ProgramCode
+			(left.GroupId = right.GroupId and 
 				nac_v2.GetCollisionCode(left.ProgramCode) = nac_v2.GetCollisionCode(right.ProgramCode)
+				and left.CaseId <> right.CaseId
 				and left.ClientId <> right.ClientId
-				and left.CaseId <> right.CaseId)
-			//OR
-			//(left.ProgramState=right.ProgramState and 
-			//	left.ProgramCode<>right.ProgramCode)
-		) and
-		
-		// disregard the following check for version 2
-		//left.eligibility_status_indicator = right.eligibility_status_indicator and
+			)
+			OR
+			(left.GroupId <> right.GroupId and 
+				nac_v2.GetCollisionCode(left.ProgramCode) = nac_v2.GetCollisionCode(right.ProgramCode)
+			)
+		)
+		AND
+
 		left.PrepRecSeq<>right.PrepRecSeq and
-		left.StartDate <= Right.EndDate AND right.StartDate <= left.Enddate
+		(left.StartDate <= Right.EndDate AND right.StartDate <= left.Enddate)
 
 		//true	//the one just keeps the "and" from messing it up
 		//,tr(left,right)
