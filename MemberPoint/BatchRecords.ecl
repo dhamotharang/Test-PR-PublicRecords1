@@ -1,5 +1,5 @@
 ﻿IMPORT Address, ut, progressive_phone, Royalty,
-       PhoneFinder_Services, MemberPoint, Std,iesp,risk_indicators,Gateway,riskwise,patriot,OFAC_XG5,doxie,AutoStandardI;
+       PhoneFinder_Services, MemberPoint, Std,iesp,risk_indicators,riskwise,OFAC_XG5,doxie;
 
 	export BatchRecords(dataset(MemberPoint.Layouts.batchIn) rawBatchIn, MemberPoint.IParam.BatchParams BParams) := function
 		//------------------------------------------------------------------------------------------------//
@@ -72,17 +72,17 @@
 															IIDVersionOverride = false => MIN(MAX((unsigned)IIDversion, lowestAllowedVersion), maxAllowedVersion),	// choose the higher of the allowed or asked for because they can't override lowestAllowedVersion, however, don't let them pick a version that is higher than the highest one we currently support
 															(unsigned)IIDversion); // they can override, give them whatever they asked for
 			if(actualIIDVersion=99, FAIL('Not an allowable InstantIDVersion.  Currently versions 0 and 1 are supported'));
-      boolean doInquiries := ~DisableInquiriesInCVI AND dataRestriction[risk_indicators.iid_constants.posInquiriesRestriction]<>risk_indicators.iid_constants.sTrue AND
+      		boolean doInquiries := ~DisableInquiriesInCVI AND dataRestriction[risk_indicators.iid_constants.posInquiriesRestriction]<>risk_indicators.iid_constants.sTrue AND
 															actualIIDVersion=1;
  
-      watchlists_request := dataset([], iesp.share.t_StringArrayItem);
+      		watchlists_request := dataset([], iesp.share.t_StringArrayItem);
 			GlobalWatchListThreshold := Map( 
 																		OFACVersion >= 4	and GlobalWatchListThreshold_temp = 0	 => OFAC_XG5.Constants.DEF_THRESHOLD_KeyBank_REAL,
 																		OFACVersion < 4  and GlobalWatchListThreshold_temp = 0  => OFAC_XG5.Constants.DEF_THRESHOLD_REAL,
 																		GlobalWatchListThreshold_temp);
 		
 			isUtility := Doxie.Compliance.isUtilityRestricted(STD.Str.ToUpperCase(IndustryClassVal));
-      DobRadiusUse := if(UseDobFilter,DobRadius,-1);
+      		DobRadiusUse := if(UseDobFilter,DobRadius,-1);
 			NumReasons := 20;
 			DOBMatchOptions := dataset([{DOBMatchType, DOBMatchYearRadius}], risk_indicators.layouts.Layout_DOB_Match_Options);
 			integer BSVersion := MAP (
@@ -111,7 +111,7 @@
 
 		//Alternate to PhoneFinder
 		// isPhoneInfoAlternative	:= MemberPoint.IParam.IsPhoneFinderOperation;
-		isPhoneInfoAlternative	:= Std.Str.ToUpperCase(BParams.StrTransactionType) <> MemberPoint.Constants.PhoneTransactionType.WaterfallPhones;
+		isPhoneInfoAlternative	:= Std.Str.ToUpperCase(BParams.StrTransactionType) NOT IN [ MemberPoint.Constants.PhoneTransactionType.ContactPlusPhones, MemberPoint.Constants.PhoneTransactionType.WaterfallPhones ];
 		//------------------------------------------------------------------------------------------------//
 		//Set partial fields if no full value supplied
 		batchIn := PROJECT(rawBatchIn, TRANSFORM(MemberPoint.Layouts.batchIn,
@@ -125,7 +125,7 @@
 		ClassifiedNonMinors  := ClassifiedBatchInter(LN_search_name_type <> MemberPoint.Constants.LNSearchNameType.Minor);
 		//------------------------------------------------------------------------------------------------//
 		// Run deceased on all input minors without guardian information.	
-	  dsbestClassifiedMinors:=MemberPoint.getBest(ClassifiedMinors, BParams);
+	  	dsbestClassifiedMinors:=MemberPoint.getBest(ClassifiedMinors, BParams);
 		dsbestGoodClassifiedMinors:=dsbestClassifiedMinors(score  >= BParams.UniqueIdScoreThreshold);
 		dsbestClassifiedMinorprojected:=join(dsbestGoodClassifiedMinors,ClassifiedMinors,LEFT.SEQ=(INTEGER)RIGHT.ACCTNO,transform(MemberPoint.Layouts.BatchInter,
 		                                                          self.acctno:=RIGHT.acctno;
@@ -207,18 +207,18 @@
 		rawBatchProjected:=project(FS,transform(risk_indicators.layout_input,
 			dob_val := riskwise.cleandob(left.dob);
 			history_date := Std.Date.Today();
-  	  self.historydate :=  history_date;
-	    self.historyDateTimeStamp := risk_indicators.iid_constants.mygetdateTimeStamp('', history_date);
+  	  		self.historydate :=  history_date;
+	    	self.historyDateTimeStamp := risk_indicators.iid_constants.mygetdateTimeStamp('', history_date);
 			self.seq:=left.seq;
-	    self.ssn := left.ssn;
-	    self.dob := dob_val;
-	  	self.phone10 := left.primary_phone_number;
+	    	self.ssn := left.ssn;
+	    	self.dob := dob_val;
+	  		self.phone10 := left.primary_phone_number;
 			self.fname := STD.STR.ToUpperCase(left.Name_First);
 			self.lname := STD.STR.ToUpperCase(left.Name_Last);
 			self.mname := STD.STR.ToUpperCase(left.Name_Middle);
 			self.suffix := STD.STR.ToUpperCase(left.Name_Suffix);	
-  	  street_address := risk_indicators.MOD_AddressClean.street_address(LEFT.PRIM_RANGE+''+LEFT.PRIM_NAME+''+LEFT.ADDR_SUFFIX,LEFT.prim_range, LEFT.predir, LEFT.prim_name,  LEFT.postdir, LEFT.unit_desig, LEFT.sec_range);
-      clean_a2 := risk_indicators.MOD_AddressClean.clean_addr( street_address, leFT.p_City_name, leFT.St, leFT.Z5 );
+  	  		street_address := risk_indicators.MOD_AddressClean.street_address(LEFT.PRIM_RANGE+''+LEFT.PRIM_NAME+''+LEFT.ADDR_SUFFIX,LEFT.prim_range, LEFT.predir, LEFT.prim_name,  LEFT.postdir, LEFT.unit_desig, LEFT.sec_range);
+      		clean_a2 := risk_indicators.MOD_AddressClean.clean_addr( street_address, leFT.p_City_name, leFT.St, leFT.Z5 );
 			SELF.in_streetAddress := street_address;
 			SELF.in_city := left.p_City_name;
 			SELF.in_state := left.St;
@@ -299,11 +299,11 @@
 																											self:=[];
 																											end;
 	
-		 risk_indicatorsFINAL := join(risk_indicator_instantid, fs, left.seq = right.seq, format_out(LEFT, RIGHT));																																																	
-	   dsBestAddress 	:= MemberPoint.getBestAddress(dsBestGood, BParams);
+		risk_indicatorsFINAL := join(risk_indicator_instantid, fs, left.seq = right.seq, format_out(LEFT, RIGHT));																																																	
+	   	dsBestAddress 	:= MemberPoint.getBestAddress(dsBestGood, BParams);
 		// Generate the "Address" and "Possible New Address" based on the address from Best & BestAddress  	
-		 dsAddressesPre	:= MemberPoint.selectAddress(dsBestGood,dsBestAddress,AdultsOrGuardiansBatchInter,BParams);
-		 dsAddressesPreprojected:=project(dsAddressesPre,transform(MemberPoint.Layouts.AddressesRec_extended,
+		dsAddressesPre	:= MemberPoint.selectAddress(dsBestGood,dsBestAddress,AdultsOrGuardiansBatchInter,BParams);
+		dsAddressesPreprojected:=project(dsAddressesPre,transform(MemberPoint.Layouts.AddressesRec_extended,
 		                                                            self:=left;self:=[];
 	                                                             	));
 		 riskindicator_addressjoined:=join(dsAddressesPreprojected,risk_indicatorsFINAL,left.acctno=right.acctno,              
@@ -329,11 +329,11 @@
 																																				SELF.addressdescriptioncode10:=right.addressdescriptioncode10;
 																																				SELF.addressdescription10:=right.addressdescription10;
 																																				self:=left;self:=[];));
-		 dsAddresses 		:=  if(isIncludeAddress,riskindicator_addressjoined, dataset([],MemberPoint.Layouts.AddressesRec_extended)); 	
+		 dsAddresses :=  if(isIncludeAddress,riskindicator_addressjoined, dataset([],MemberPoint.Layouts.AddressesRec_extended)); 
 		//Run all adults except derived guardians thru deceased.
 		dsbestAdults:=MemberPoint.getBest(dsInputGoodWithDIDAndScore, BParams);
 		dsBestGoodAdults    := dsbestAdults(score  >= BParams.UniqueIdScoreThreshold);
-	  dsbestAdultsprojected:=join(dsBestGoodAdults,dsInputGoodWithDIDAndScore,LEFT.SEQ=(INTEGER)RIGHT.ACCTNO,transform(MemberPoint.Layouts.BatchInter,
+	  	dsbestAdultsprojected:=join(dsBestGoodAdults,dsInputGoodWithDIDAndScore,LEFT.SEQ=(INTEGER)RIGHT.ACCTNO,transform(MemberPoint.Layouts.BatchInter,
 		                                                          self.acctno:=RIGHT.acctno;
                                                               self.name_first:=if(LEFT.best_fname <> '',LEFT.best_fname,RIGHT.name_FIRST);
 																															self.name_middle:=if(LEFT.best_mname <> '',LEFT.best_mname,right.name_MIDDLE);
@@ -355,22 +355,29 @@
 		dsDeceasedInputAdults 				:= if(isIncludeDeceased, dsDeceasedInputAdultsPre, dataset([],MemberPoint.Layouts.DeceasedOut ));		// All deceased.
 		dsDeceased := dsDeceasedInputMinors + dsDeceasedInputAdults;
 		// Phone Info (Waterfall Phones)
-		 wfResult 					:= MemberPoint.getPhoneInfo(dsBestGood, BParams);
-		 dsPhonesPre				:=	map ( BParams.PhonesReturnCutoff = 'H' => wfResult((UNSIGNED)phone_score >= MemberPoint.Constants.PhoneScore.HighMin), 
-																BParams.PhonesReturnCutoff = 'L' => wfResult((UNSIGNED)phone_score >= MemberPoint.Constants.PhoneScore.LowMin),
-																																		wfResult((UNSIGNED)phone_score >= MemberPoint.Constants.PhoneScore.MidMin));//'M' and default
+		wfResult_pre	:= MemberPoint.getPhoneInfo(dsBestGood, BParams);
+		wfResult 		:= wfResult_pre.Records;
+		wfResult_royalties 	:= if(isIncludePhone AND EXISTS(wfResult) AND ~isPhoneInfoAlternative, 
+									wfResult_pre.royalties, 
+									DATASET([],Royalty.Layouts.RoyaltyForBatch) );	
+
+		dsPhonesPre	:= map ( BParams.PhonesReturnCutoff = 'H' => wfResult((UNSIGNED)phone_score >= MemberPoint.Constants.PhoneScore.HighMin), 
+							 BParams.PhonesReturnCutoff = 'L' => wfResult((UNSIGNED)phone_score >= MemberPoint.Constants.PhoneScore.LowMin),
+																 wfResult((UNSIGNED)phone_score >= MemberPoint.Constants.PhoneScore.MidMin));//'M' and default
 		ungroupedWFPhones	:= ungroup(dsPhonesPre);
 		connectedWFPhones	:= MemberPoint.ConnectedPhones.getConnectedWaterfall(ungroupedWFPhones, BParams);
 		filteredWFPhones	:= MAP( BParams.PhoneFilter = MemberPoint.Constants.PhoneFilterType.CellPhones => connectedWFPhones(switch_type=MemberPoint.Constants.WFPhoneType.CellPhones),
-															BParams.PhoneFilter = MemberPoint.Constants.PhoneFilterType.Landlines => connectedWFPhones(switch_type=MemberPoint.Constants.WFPhoneType.Landlines),
+									BParams.PhoneFilter = MemberPoint.Constants.PhoneFilterType.Landlines => connectedWFPhones(switch_type=MemberPoint.Constants.WFPhoneType.Landlines),
 															connectedWFPhones);
-		dsPhones 						:= if(isIncludePhone AND EXISTS(ungroupedWFPhones), 
-															filteredWFPhones, 
-															DATASET([],progressive_phone.layout_progressive_phone_common));
+		dsPhones := if(isIncludePhone AND EXISTS(ungroupedWFPhones), 
+									filteredWFPhones, 
+									DATASET([],progressive_phone.layout_progressive_phone_common));
+
 		// Phone Info (PhoneFinder)
-		pfPhones						:= IF(isIncludePhone AND EXISTS(dsBestGood), 
-															MemberPoint.getAlternatePhoneInfo(dsBestGood, BParams), 
-															DATASET([], PhoneFinder_Services.Layouts.PhoneFinder.BatchOut));
+		pfPhones := IF(isIncludePhone AND EXISTS(dsBestGood), 
+									MemberPoint.getAlternatePhoneInfo(dsBestGood, BParams), 
+									DATASET([], PhoneFinder_Services.Layouts.PhoneFinder.BatchOut));
+
 		dsEmailsWholePre 		:= MemberPoint.getEmailInfo(dsBestGood, BParams);
 		dsEmailsWhole				:= if(isIncludeEmail,dsEmailsWholePre, dataset([],MemberPoint.Layouts.EmailRec));
 		// dsEmailsResults 		:= ungroup(dsEmailsWhole.Records);
@@ -459,9 +466,9 @@
 			//MemberPoint Enhancements: For derived guardians (LN_Search_Name_Type = D) Name, SSN AND DOB score fields output should be null.
 			isDerived:= adultsOrGuardians.LN_search_name_type = MemberPoint.Constants.LNSearchNameType.Derived;
 			isPartial:= (LENGTH(TRIM(adultsOrGuardians.SSN)) < 5);
-      SELF.name_score:= map(isDerived =>'',
-			                      isIncludeGender=true and rowBest.verify_best_name=0 and StringLib.StringToUpperCase(batchin.name_first[1..3])=StringLib.StringToUpperCase(rowBest.best_fname[1..3]) and StringLib.StringToUpperCase(batchIn.name_last)!=StringLib.StringToUpperCase(rowBest.best_lname) and StringLib.StringToUpperCase(rowBest.gender)='M'=>'30',
-                            isIncludeGender=true  and rowBest.verify_best_name=0 and StringLib.StringToUpperCase(batchin.name_first[1..3])=StringLib.StringToUpperCase(rowBest.best_fname[1..3]) and StringLib.StringToUpperCase(batchin.name_last)!=StringLib.StringToUpperCase(rowBest.best_lname) and StringLib.StringToUpperCase(rowBest.gender)='F'=>'40',
+      		SELF.name_score:= map(	isDerived =>'',
+			                      	isIncludeGender=true and rowBest.verify_best_name=0 and STD.Str.ToUpperCase(batchin.name_first[1..3])=STD.Str.ToUpperCase(rowBest.best_fname[1..3]) and STD.Str.ToUpperCase(batchIn.name_last)!=STD.Str.ToUpperCase(rowBest.best_lname) and STD.Str.ToUpperCase(rowBest.gender)='M'=>'30',
+                            	   	isIncludeGender=true  and rowBest.verify_best_name=0 and STD.Str.ToUpperCase(batchin.name_first[1..3])=STD.Str.ToUpperCase(rowBest.best_fname[1..3]) and STD.Str.ToUpperCase(batchin.name_last)!=STD.Str.ToUpperCase(rowBest.best_lname) and STD.Str.ToUpperCase(rowBest.gender)='F'=>'40',
 								            (string) rowBest.verify_best_name);
 			SELF.ssn_score:= IF(~isPartial AND isIncludeSSN AND ~isDerived, (STRING)rowBest.verify_best_ssn, '');
 			SELF.dob_score:= IF(~isDerived AND isIncludeDOB, (STRING)rowBest.verify_best_dob, '');
@@ -633,8 +640,8 @@
 			self.email4_latest_orig_login_date:=rowsEmails[4].latest_orig_login_date;
 			self.email4_num_email_per_did:=rowsEmails[4].num_email_per_did;
 			self.email4_num_did_per_email:=rowsEmails[4].num_did_per_email;
-      SELF.Email5 := rowsEmails[5].orig_email;
-      self.email5_email_src:=rowsEmails[5].email_src;
+      		SELF.Email5 := rowsEmails[5].orig_email;
+      		self.email5_email_src:=rowsEmails[5].email_src;
 			self.email5_email_username:=rowsEmails[5].email_username;
 			self.email5_email_domain:=rowsEmails[5].email_domain;
 			self.email5_did:=rowsEmails[5].did;
@@ -896,6 +903,9 @@
 			SELF.Phone1_Last_Seen_Date:= choosenRecs[1].subj_date_last;
 			SELF.Phone1_Type:= choosenRecs[1].phpl_phones_plus_type;
 			SELF.Phone1_Line_Type:= choosenRecs[1].switch_type;// Cell . Landline
+			SELF.Phone1_Carrier := choosenRecs[1].phpl_phone_carrier;
+			SELF.Phone1_Carrier_City := choosenRecs[1].phpl_carrier_city;
+			SELF.Phone1_Carrier_State := choosenRecs[1].phpl_carrier_state;
 			SELF.Phone1_Score:= IF(BParams.ReturnScore, choosenRecs[1].phone_score, '');
 			SELF.Phone1_Score_confidence:= MemberPoint.Confidence.getConfidencePhoneScore(choosenRecs[1].phone_score);
 			SELF.Phone1_Score_confidence_star:= MemberPoint.Confidence.getStarRate((UNSIGNED)choosenRecs[1].phone_score);
@@ -908,6 +918,9 @@
 			SELF.Phone2_Last_Seen_Date:= choosenRecs[2].subj_date_last;
 			SELF.Phone2_Type:= choosenRecs[2].phpl_phones_plus_type;
 			SELF.Phone2_Line_Type:= choosenRecs[2].switch_type; // Cell . Landline
+			SELF.Phone2_Carrier := choosenRecs[2].phpl_phone_carrier;
+			SELF.Phone2_Carrier_City := choosenRecs[2].phpl_carrier_city;
+			SELF.Phone2_Carrier_State := choosenRecs[2].phpl_carrier_state;
 			SELF.Phone2_Score:= IF(BParams.ReturnScore, choosenRecs[2].phone_score, '');
 			SELF.Phone2_Score_confidence:= MemberPoint.Confidence.getConfidencePhoneScore(choosenRecs[2].phone_score);
 			SELF.Phone2_Score_confidence_star:= MemberPoint.Confidence.getStarRate((UNSIGNED)choosenRecs[2].phone_score);
@@ -920,6 +933,9 @@
 			SELF.Phone3_Last_Seen_Date:= choosenRecs[3].subj_date_last;
 			SELF.Phone3_Type:= choosenRecs[3].phpl_phones_plus_type;
 			SELF.Phone3_Line_Type:= choosenRecs[3].switch_type; // Cell . Landline
+			SELF.Phone3_Carrier := choosenRecs[3].phpl_phone_carrier;
+			SELF.Phone3_Carrier_City := choosenRecs[3].phpl_carrier_city;
+			SELF.Phone3_Carrier_State := choosenRecs[3].phpl_carrier_state;
 			SELF.Phone3_Score:= IF(BParams.ReturnScore, choosenRecs[3].phone_score, '');
 			SELF.Phone3_Score_confidence:= MemberPoint.Confidence.getConfidencePhoneScore(choosenRecs[3].phone_score);
 			SELF.Phone3_Score_confidence_star:= MemberPoint.Confidence.getStarRate((UNSIGNED)choosenRecs[3].phone_score);
@@ -959,7 +975,6 @@
 			SELF.Phone2_Carrier_State := choosenRecs[2].CarrierState;
 			SELF.Phone2_Phone_Status := choosenRecs[2].PhoneStatus;
 
-			
 			SELF.Phone3_Match_Codes:= MemberPoint.Util.getMatchCode(choosenRecs[3].PhoneNumber, adultsOrGuardians.primary_phone_number);
 			SELF.Phone3_Number := choosenRecs[3].PhoneNumber;
 			SELF.Phone3_Number_Listing_Name := choosenRecs[3].ListingName; 
@@ -974,17 +989,20 @@
 			SELF:= common;
 		END;
 		
-   commonBatchOut						:= join(AdultsOrGuardiansBatchInter, rawbatchin,
-		                              LEFT.acctno = RIGHT.acctno,buildCommonBatchOut(LEFT,right));
-		waterfallBatchOut					:= JOIN(AdultsOrGuardiansBatchInter, 
-																			commonBatchOut, 
-																			LEFT.acctno = RIGHT.acctno, 
-																			attachWaterfallPhones(LEFT, RIGHT));
-		phoneFinderBatchOut				:= JOIN(AdultsOrGuardiansBatchInter, 
-																			commonBatchOut, 
-																			LEFT.acctno = RIGHT.acctno, 
-																			attachPhoneFinderPhones(LEFT, RIGHT));
-		AdultsOrGuardiansBatchOut	:= IF(isPhoneInfoAlternative, phoneFinderBatchOut, waterfallBatchOut);
+   		commonBatchOut	:= join(AdultsOrGuardiansBatchInter, rawbatchin,
+		                   		LEFT.acctno = RIGHT.acctno,buildCommonBatchOut(LEFT,right));
+		
+		waterfallBatchOut	:= JOIN(AdultsOrGuardiansBatchInter, 
+									commonBatchOut, 
+									LEFT.acctno = RIGHT.acctno, 
+									attachWaterfallPhones(LEFT, RIGHT));
+
+		phoneFinderBatchOut	:= JOIN(AdultsOrGuardiansBatchInter, 
+									commonBatchOut, 
+									LEFT.acctno = RIGHT.acctno, 
+									attachPhoneFinderPhones(LEFT, RIGHT));
+		
+		AdultsOrGuardiansBatchOut := IF(isPhoneInfoAlternative, phoneFinderBatchOut, waterfallBatchOut);
 		// AdultsOrGuardiansBatchOut := PROJECT(AdultsOrGuardiansBatchInter,TheXform(LEFT));
 
 		//------------------------------------------------------------------------------------------------//
@@ -1008,9 +1026,9 @@
    		finalRec := record
    			dataset(MemberPoint.Layouts.BatchOut) Records;
    			dataset(Royalty.Layouts.RoyaltyForBatch) Royalties;
-   		end;	
-   
-   		finalRecords := dataset([{dsOutput ,dsEmailsWhole.Royalties}],finalRec);
+   		end;
+
+   		finalRecords := dataset([{dsOutput ,dsEmailsWhole.Royalties + wfResult_royalties}],finalRec);
 		return finalRecords;
 	end;
   
