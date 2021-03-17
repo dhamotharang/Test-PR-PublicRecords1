@@ -4,6 +4,6 @@ IMPORT B_Person_Address_3,CFG_Compile,E_Address,E_Geo_Link,E_Person,E_Person_Add
 IMPORT * FROM KEL15.Null;
 EXPORT B_Person_Address_2(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG_Compile __cfg = CFG_Compile) := MODULE
   SHARED VIRTUAL TYPEOF(B_Person_Address_3(__in,__cfg).__ENH_Person_Address_3) __ENH_Person_Address_3 := B_Person_Address_3(__in,__cfg).__ENH_Person_Address_3;
-  SHARED __EE8237206 := __ENH_Person_Address_3;
-  EXPORT __ENH_Person_Address_2 := __EE8237206;
+  SHARED __EE7984372 := __ENH_Person_Address_3;
+  EXPORT __ENH_Person_Address_2 := __EE7984372;
 END;
