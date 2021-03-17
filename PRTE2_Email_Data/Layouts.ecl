@@ -1,6 +1,10 @@
-﻿IMPORT PRTE2_Email_Data, email_data;
+﻿IMPORT PRTE2_Email_Data, email_data,AID_BUILD;
 
 EXPORT Layouts := MODULE
+
+ export rFinal := RECORD
+    AID_BUILD.layouts.rFinal;
+  end;
 
 Export incoming_base := record
 	string200 clean_email := '';
@@ -198,7 +202,6 @@ string link_fein;
 string link_inc_date;
 string cust_name;
 string bug_num;
-//string10 bug_name;
 string10	date_aging_ind;
 END;
 		
