@@ -82,7 +82,7 @@ EXPORT getGovID(dataset(identifier2.layout_Identifier2) in_ds,
                           );
 
 
-  SSNLastNameMatch := MAP(isCheck_SSNLastNameMatch AND in_rec.nas_summary IN [9,12]
+  SSNLastNameMatch := MAP(isCheck_SSNLastNameMatch AND in_rec.nas_summary IN [7,9,11,12]
                          AND ~EXISTS(in_rec.ri(hri in ['29','77','79','76'])) => _GovIdConst.PassValue
                           ,isCheck_SSNLastNameMatch => _GovIdConst.FailValue
                           ,_GovIdConst.DisabledValue
