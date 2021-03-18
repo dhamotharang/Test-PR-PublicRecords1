@@ -4,8 +4,8 @@ IMPORT B_Tradeline_2,CFG_Compile,E_Tradeline FROM PublicRecords_KEL;
 IMPORT * FROM KEL15.Null;
 EXPORT B_Tradeline_1(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG_Compile __cfg = CFG_Compile) := MODULE
   SHARED VIRTUAL TYPEOF(B_Tradeline_2(__in,__cfg).__ENH_Tradeline_2) __ENH_Tradeline_2 := B_Tradeline_2(__in,__cfg).__ENH_Tradeline_2;
-  SHARED __EE9323943 := __ENH_Tradeline_2;
-  EXPORT __ST204072_Layout := RECORD
+  SHARED __EE9322357 := __ENH_Tradeline_2;
+  EXPORT __ST204102_Layout := RECORD
     KEL.typ.nkdate A_R_Date_;
     KEL.typ.nint Total_A_R_;
     KEL.typ.nint Current_A_R_;
@@ -51,13 +51,13 @@ EXPORT B_Tradeline_1(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG_C
     KEL.typ.epoch Vault_Date_Last_Seen_ := 0;
     KEL.typ.int __RecordCount := 0;
   END;
-  EXPORT __ST204065_Layout := RECORD
+  EXPORT __ST204095_Layout := RECORD
     KEL.typ.nuid UID;
     KEL.typ.nint Ult_I_D_;
     KEL.typ.nint Org_I_D_;
     KEL.typ.nint Sele_I_D_;
     KEL.typ.nstr Account_Key_;
-    KEL.typ.ndataset(__ST204072_Layout) Records_;
+    KEL.typ.ndataset(__ST204102_Layout) Records_;
     KEL.typ.ndataset(E_Tradeline(__in,__cfg).Vendor_Dates_Layout) Vendor_Dates_;
     KEL.typ.ndataset(E_Tradeline(__in,__cfg).Data_Sources_Layout) Data_Sources_;
     KEL.typ.nkdate Current_Date_First_Of_Month_;
@@ -82,11 +82,11 @@ EXPORT B_Tradeline_1(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG_C
     KEL.typ.epoch Vault_Date_Last_Seen_ := 0;
     KEL.typ.int __RecordCount := 0;
   END;
-  SHARED __ST204065_Layout __ND9323948__Project(B_Tradeline_2(__in,__cfg).__ST223056_Layout __PP9323944) := TRANSFORM
-    __EE9323988 := __PP9323944.Records_;
-    SELF.Records_ := __BN(PROJECT(__T(__EE9323988),__ST204072_Layout),__NL(__EE9323988));
-    SELF.Trade_Date_ := KEL.era.ToDate(__PP9323944.Date_First_Seen_);
-    SELF := __PP9323944;
+  SHARED __ST204095_Layout __ND9322362__Project(B_Tradeline_2(__in,__cfg).__ST223086_Layout __PP9322358) := TRANSFORM
+    __EE9322402 := __PP9322358.Records_;
+    SELF.Records_ := __BN(PROJECT(__T(__EE9322402),__ST204102_Layout),__NL(__EE9322402));
+    SELF.Trade_Date_ := KEL.era.ToDate(__PP9322358.Date_First_Seen_);
+    SELF := __PP9322358;
   END;
-  EXPORT __ENH_Tradeline_1 := PROJECT(__EE9323943,__ND9323948__Project(LEFT));
+  EXPORT __ENH_Tradeline_1 := PROJECT(__EE9322357,__ND9322362__Project(LEFT));
 END;
