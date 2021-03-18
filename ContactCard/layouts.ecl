@@ -86,6 +86,14 @@ export layouts := module
   export pridid_rec := record
     unsigned1 priority;
     head.did;
+    unsigned1 depth;
+    integer2  rel_prim_range;
+    unsigned1 TitleNo := 0;
+    string15 type;
+    string10 confidence;
+    integer3 recent_cohabit;
+    boolean isRelative;
+    contact_relat_rec.relationship;
   end;
 
   export addr_phones_contacts_rec := record
