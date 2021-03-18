@@ -1,8 +1,8 @@
-﻿//HPCC Systems KEL Compiler Version 1.3.0beta5
+﻿//HPCC Systems KEL Compiler Version 1.5.0
 #OPTION('expandSelectCreateRow',true);
-IMPORT KEL13 AS KEL;
+IMPORT KEL15 AS KEL;
 IMPORT CFG_Compile,E_Business_Org,E_Business_Sele,E_Business_Sele_Overflow,E_Business_Ult,E_Sele_Tradeline,E_Tradeline FROM PublicRecords_KEL_Queries.B2B_KEL;
-IMPORT * FROM KEL13.Null;
+IMPORT * FROM KEL15.Null;
  
 RunAll := TRUE;
 RunFast := FALSE;
