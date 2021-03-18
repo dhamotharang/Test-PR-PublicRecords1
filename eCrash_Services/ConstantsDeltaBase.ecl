@@ -34,7 +34,7 @@ EXPORT ConstantsDeltaBase := MODULE
 	SHARED ImageRetrievalSqlSelectFrom :=
 		'SELECT k.date_added,k.state_report_number,k.original_st_rpt_num,k.case_identifier,k.original_case_ident,' +
 		'k.report_code,k.date_of_loss,k.agency_ori,k.agency_id,k.jurisdiction,k.jurisdiction_state,k.report_id,k.delta_key_id,' +
-		'k.report_hashkey,k.accident_location_street,k.vendor_report_id,k.report_type_id,k.vendor_code,k.page_count,' +
+		'k.report_hashkey,k.accident_location_street,k.vendor_report_id,k.report_type_id,k.contrib_source,k.vendor_code,k.page_count,' +
 		'k.accident_location_crossstreet,p.name_first,p.vehicle_unit_number,p.address,p.person_type,' +
 		'p.name_middle,p.name_last,p.driver_license_number,p.city,p.state,p.zip_code,p.date_added as person_creation_date,' +
 		'v.vin,v.vehicle_year,v.make_description,v.model_description,v.tag_number,k.is_deleted,k.incident_id,k.releasable' +
