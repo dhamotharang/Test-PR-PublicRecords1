@@ -2003,7 +2003,9 @@ EXPORT dsSourceCriteria := DATASET([
 {'EC (CFSP) 2021/398 Yemen List','1990'},
 {'EC 2021/391 Ukraine List','1991'},
 {'EC 2021/397 Yemen List','1992'},
-{'NBCTF (Israel) Seizure Orders','1993'}
+{'NBCTF (Israel) Seizure Orders','1993'},
+{'EC (CFSP) 2021/448 Ukraine List','1994'},
+{'EC 2021/446 Ukraine List','1995'}
 
 ],r);
 
