@@ -40,7 +40,8 @@ EXPORT fn_MergeCases(DATASET($.Layout_Base2) newbase, DATASET($.Layout_Base2) ba
 							LEFT.ProgramState = RIGHT.ProgramState and LEFT.ProgramCode = RIGHT.ProgramCode, 
 							TRANSFORM($.Layout_Base2,
 								// update existing cases with new case data
-								self.case_Monthly_Allotment := RIGHT.case_Monthly_Allotment;
+								
+								self.case_Monthly_Allotment := RIGHT.case_Monthly_Allotment;;
 								self.RegionCode := RIGHT.RegionCode;
 								self.CountyCode := RIGHT.CountyCode;
 								self.CountyName := RIGHT.CountyName;
@@ -50,18 +51,23 @@ EXPORT fn_MergeCases(DATASET($.Layout_Base2) newbase, DATASET($.Layout_Base2) ba
 								
 								self.Created := LEFT.Created;
 								self.Updated := Std.Date.Today();
-								self.FileName := IF(LEFT.FileName<>'',LEFT.FileName, right.FileName);	// keep original filename
-								self.NCF_FileDate := IF(RIGHT.NCF_FileDate=0,LEFT.NCF_FileDate, right.NCF_FileDate);
-								self.NCF_FileTime := IF(RIGHT.NCF_FileTime='',LEFT.NCF_FileTime, right.NCF_FileTime);
+								self.FileName := LEFT.FileName;
+								self.NCF_FileDate := RIGHT.NCF_FileDate;
+								self.NCF_FileTime := RIGHT.NCF_FileTime;
 
 								//*** Update addresses
 								
 								self := left;
 						),
-							LEFT OUTER, KEEP(1), LOCAL);
-							
+							INNER, KEEP(1), LOCAL);
+
+	unchanged := JOIN(baseCases, newcases, 
+							LEFT.CaseId = right.CaseId AND LEFT.GroupId = RIGHT.GroupId AND
+							LEFT.ProgramState = RIGHT.ProgramState and LEFT.ProgramCode = RIGHT.ProgramCode, 
+							TRANSFORM($.Layout_Base2,
+									self := left;), LEFT ONLY, LOCAL);
 //		notcurrent := base(StartDate > std.date.Today() OR EndDate < std.date.Today());
 									
-	return updated + notrecent;
+	return updated + unchanged + notrecent;
 
 END;
