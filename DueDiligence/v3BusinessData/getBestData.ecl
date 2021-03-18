@@ -145,6 +145,7 @@ EXPORT getBestData(DueDiligence.DDInterface.iDDRegulatoryCompliance regulatoryAc
         updateData := JOIN(inData, bestData,
                             LEFT.seq = RIGHT.seq,
                             TRANSFORM(DueDiligence.v3Layouts.InternalBusiness.SlimBestSearch,
+                                      SELF.inquiredBusiness := LEFT.inquiredBusiness;
                                       SELF := RIGHT;
                                       SELF := LEFT;),
                             LEFT OUTER,

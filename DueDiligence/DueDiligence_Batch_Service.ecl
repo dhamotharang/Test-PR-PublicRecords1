@@ -169,7 +169,7 @@ EXPORT DueDiligence_Batch_Service() := FUNCTION
   regulatoryCompliance := DueDiligence.CommonQuery.GetCompliance(dppa, glba, dataRestriction, dataPermission, DueDiligence.Constants.EMPTY, lexIdSourceOptout, transactionID, batchUID, globalCompanyID);
 
 
-  busProductResults := DueDiligence.CommonQuery.v3BusinessResults(busRecs, regulatoryCompliance, DueDiligence.Constants.EMPTY);
+  busProductResults := DueDiligence.CommonQuery.v3BusinessResults(busRecs, regulatoryCompliance, DueDiligence.Constants.EMPTY, FALSE, debugIndicator);
   transBusToBatch := PROJECT(busProductResults, TRANSFORM(DueDiligence.Layouts.BatchOut, SELF := LEFT; SELF := [];));
   
   
