@@ -219,9 +219,9 @@ EXPORT Q_Address_High_Risk_Dynamic(KEL.typ.str __PInputStreetNumber, KEL.typ.str
     SHARED TYPEOF(B_Address_Slim_1(__in,__cfg_Local).__ENH_Address_Slim_1) __ENH_Address_Slim_1 := B_Address_Slim_1_Local.__ENH_Address_Slim_1;
   END;
   SHARED TYPEOF(B_Address_Slim(__in,__cfg_Local).__ENH_Address_Slim) __ENH_Address_Slim := B_Address_Slim_Local.__ENH_Address_Slim;
-  SHARED __EE11716870 := __ENH_Address_Slim;
-  SHARED __EE11716950 := __EE11716870(__T(__AND(__OP2(__EE11716870.Primary_Range_,=,__CN(__PInputStreetNumber)),__AND(__OP2(__EE11716870.Primary_Name_,=,__CN(__PInputStreetName)),__AND(__OP2(__EE11716870.Z_I_P5_,=,__CN(__PInputZip)),__AND(__OP2(__EE11716870.Predirectional_,=,__CN(__PInputPredirectional)),__AND(__OP2(__EE11716870.Suffix_,=,__CN(__PInputSuffix)),__OP2(__EE11716870.Postdirectional_,=,__CN(__PInputPostDirectional)))))))));
-  SHARED __ST77118_Layout := RECORD
+  SHARED __EE11715262 := __ENH_Address_Slim;
+  SHARED __EE11715342 := __EE11715262(__T(__AND(__OP2(__EE11715262.Primary_Range_,=,__CN(__PInputStreetNumber)),__AND(__OP2(__EE11715262.Primary_Name_,=,__CN(__PInputStreetName)),__AND(__OP2(__EE11715262.Z_I_P5_,=,__CN(__PInputZip)),__AND(__OP2(__EE11715262.Predirectional_,=,__CN(__PInputPredirectional)),__AND(__OP2(__EE11715262.Suffix_,=,__CN(__PInputSuffix)),__OP2(__EE11715262.Postdirectional_,=,__CN(__PInputPostDirectional)))))))));
+  SHARED __ST77130_Layout := RECORD
     KEL.typ.nstr P_I___Inp_Addr_S_I_C_Code_H_R_List_;
     KEL.typ.nstr P_I___Inp_Addr_N_A_I_C_S_Code_H_R_List_;
     KEL.typ.str P_I___Inp_Addr_Is_H_R_Correct_Fac_Flag_ := '';
@@ -232,7 +232,7 @@ EXPORT Q_Address_High_Risk_Dynamic(KEL.typ.str __PInputStreetNumber, KEL.typ.str
     KEL.typ.epoch Vault_Date_Last_Seen_ := 0;
     KEL.typ.int __RecordCount := 0;
   END;
-  EXPORT Res0 := __UNWRAP(PROJECT(TABLE(PROJECT(__EE11716950,__ST77118_Layout),{KEL.typ.int __RecordCount := SUM(GROUP,__RecordCount),KEL.typ.epoch Archive___Date_ := KEL.era.SimpleRoll(GROUP,Archive___Date_,MIN,FALSE),KEL.typ.epoch Date_First_Seen_ := KEL.era.SimpleRoll(GROUP,Date_First_Seen_,MIN,FALSE),KEL.typ.epoch Date_Last_Seen_ := KEL.era.SimpleRoll(GROUP,Date_Last_Seen_,MAX,FALSE),KEL.typ.epoch Hybrid_Archive_Date_ := KEL.era.SimpleRoll(GROUP,Hybrid_Archive_Date_,MIN,FALSE),KEL.typ.epoch Vault_Date_Last_Seen_ := KEL.era.SimpleRoll(GROUP,Vault_Date_Last_Seen_,MAX,NMAX),P_I___Inp_Addr_S_I_C_Code_H_R_List_,P_I___Inp_Addr_N_A_I_C_S_Code_H_R_List_,P_I___Inp_Addr_Is_H_R_Correct_Fac_Flag_},P_I___Inp_Addr_S_I_C_Code_H_R_List_,P_I___Inp_Addr_N_A_I_C_S_Code_H_R_List_,P_I___Inp_Addr_Is_H_R_Correct_Fac_Flag_,MERGE),__ST77118_Layout));
+  EXPORT Res0 := __UNWRAP(PROJECT(TABLE(PROJECT(__EE11715342,__ST77130_Layout),{KEL.typ.int __RecordCount := SUM(GROUP,__RecordCount),KEL.typ.epoch Archive___Date_ := KEL.era.SimpleRoll(GROUP,Archive___Date_,MIN,FALSE),KEL.typ.epoch Date_First_Seen_ := KEL.era.SimpleRoll(GROUP,Date_First_Seen_,MIN,FALSE),KEL.typ.epoch Date_Last_Seen_ := KEL.era.SimpleRoll(GROUP,Date_Last_Seen_,MAX,FALSE),KEL.typ.epoch Hybrid_Archive_Date_ := KEL.era.SimpleRoll(GROUP,Hybrid_Archive_Date_,MIN,FALSE),KEL.typ.epoch Vault_Date_Last_Seen_ := KEL.era.SimpleRoll(GROUP,Vault_Date_Last_Seen_,MAX,NMAX),P_I___Inp_Addr_S_I_C_Code_H_R_List_,P_I___Inp_Addr_N_A_I_C_S_Code_H_R_List_,P_I___Inp_Addr_Is_H_R_Correct_Fac_Flag_},P_I___Inp_Addr_S_I_C_Code_H_R_List_,P_I___Inp_Addr_N_A_I_C_S_Code_H_R_List_,P_I___Inp_Addr_Is_H_R_Correct_Fac_Flag_,MERGE),__ST77130_Layout));
   EXPORT DBG_E_Input_P_I_I_PreEntity := __UNWRAP(E_Input_P_I_I_Params(__in,__cfg_Local).InData);
   EXPORT DBG_E_Input_P_I_I_Result := __UNWRAP(E_Input_P_I_I_Filtered.__Result);
   EXPORT DBG_E_Address_Result := __UNWRAP(E_Address_Filtered.__Result);

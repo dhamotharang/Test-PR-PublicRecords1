@@ -5,9 +5,9 @@ IMPORT * FROM KEL15.Null;
 EXPORT B_Address_Slim_1(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG_Compile __cfg = CFG_Compile) := MODULE
   SHARED VIRTUAL TYPEOF(B_Address_Slim_2(__in,__cfg).__ENH_Address_Slim_2) __ENH_Address_Slim_2 := B_Address_Slim_2(__in,__cfg).__ENH_Address_Slim_2;
   SHARED VIRTUAL TYPEOF(B_Input_P_I_I_2(__in,__cfg).__ENH_Input_P_I_I_2) __ENH_Input_P_I_I_2 := B_Input_P_I_I_2(__in,__cfg).__ENH_Input_P_I_I_2;
-  SHARED __EE8041724 := __ENH_Address_Slim_2;
-  SHARED __EE8041726 := __ENH_Input_P_I_I_2;
-  SHARED __ST2106525_Layout := RECORD
+  SHARED __EE8040138 := __ENH_Address_Slim_2;
+  SHARED __EE8040140 := __ENH_Input_P_I_I_2;
+  SHARED __ST2106555_Layout := RECORD
     KEL.typ.nuid UID;
     KEL.typ.nstr Primary_Range_;
     KEL.typ.nstr Predirectional_;
@@ -18,10 +18,10 @@ EXPORT B_Address_Slim_1(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CF
     KEL.typ.ndataset(E_Address_Slim(__in,__cfg).High_Risk_Address_Layout) High_Risk_Address_;
     KEL.typ.ndataset(E_Address_Slim(__in,__cfg).Address_Type_Layout) Address_Type_;
     KEL.typ.nstr Source_;
-    KEL.typ.ndataset(B_Address_Slim_3(__in,__cfg).__ST77048_Layout) Address_N_A_I_C_S_List_;
-    KEL.typ.ndataset(B_Address_Slim_3(__in,__cfg).__ST77048_Layout) Address_N_A_I_C_S_Sorted_List_;
-    KEL.typ.ndataset(B_Address_Slim_3(__in,__cfg).__ST76955_Layout) Address_S_I_C_List_;
-    KEL.typ.ndataset(B_Address_Slim_3(__in,__cfg).__ST76955_Layout) Address_S_I_C_Sorted_List_;
+    KEL.typ.ndataset(B_Address_Slim_3(__in,__cfg).__ST77060_Layout) Address_N_A_I_C_S_List_;
+    KEL.typ.ndataset(B_Address_Slim_3(__in,__cfg).__ST77060_Layout) Address_N_A_I_C_S_Sorted_List_;
+    KEL.typ.ndataset(B_Address_Slim_3(__in,__cfg).__ST76967_Layout) Address_S_I_C_List_;
+    KEL.typ.ndataset(B_Address_Slim_3(__in,__cfg).__ST76967_Layout) Address_S_I_C_Sorted_List_;
     KEL.typ.ntyp(E_Input_P_I_I().Typ) P_I_I_;
     KEL.typ.nuid U_I_D__1_;
     KEL.typ.ntyp(E_Person().Typ) Subject_;
@@ -123,19 +123,19 @@ EXPORT B_Address_Slim_1(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CF
     KEL.typ.nint G_L_B_Purpose_;
     KEL.typ.nbool Gateway_Is_F_C_R_A_;
     KEL.typ.nfloat Global_Watchlist_Threshold_;
-    KEL.typ.ndataset(B_Input_P_I_I_3(__in,__cfg).__ST79293_Layout) Good_Inquiries_Last_Year_For_Address_;
-    KEL.typ.ndataset(B_Input_P_I_I_2(__in,__cfg).__ST79457_Layout) Good_Inquiries_Last_Year_For_Email_;
-    KEL.typ.ndataset(B_Input_P_I_I_2(__in,__cfg).__ST79557_Layout) Good_Inquiries_Last_Year_For_Phone_;
-    KEL.typ.ndataset(B_Input_P_I_I_2(__in,__cfg).__ST79002_Layout) Good_Inquiries_Last_Year_For_S_S_N_;
+    KEL.typ.ndataset(B_Input_P_I_I_3(__in,__cfg).__ST79305_Layout) Good_Inquiries_Last_Year_For_Address_;
+    KEL.typ.ndataset(B_Input_P_I_I_2(__in,__cfg).__ST79469_Layout) Good_Inquiries_Last_Year_For_Email_;
+    KEL.typ.ndataset(B_Input_P_I_I_2(__in,__cfg).__ST79569_Layout) Good_Inquiries_Last_Year_For_Phone_;
+    KEL.typ.ndataset(B_Input_P_I_I_2(__in,__cfg).__ST79014_Layout) Good_Inquiries_Last_Year_For_S_S_N_;
     KEL.typ.nbool Include_Additional_Watchlists_;
     KEL.typ.nbool Include_O_F_A_C_;
     KEL.typ.bool Input_Address_On_A_V_M_ := FALSE;
     KEL.typ.nint Input_Address_Property_Cnt_;
     KEL.typ.nint Input_Address_Property_Cnt1_Y_;
     KEL.typ.nint Input_Address_Property_Cnt5_Y_;
-    KEL.typ.ndataset(B_Input_P_I_I_3(__in,__cfg).__ST78210_Layout) Input_Address_Property_Set_;
-    KEL.typ.ndataset(B_Input_P_I_I_3(__in,__cfg).__ST78261_Layout) Input_Address_Property_Set1_Y_;
-    KEL.typ.ndataset(B_Input_P_I_I_3(__in,__cfg).__ST78326_Layout) Input_Address_Property_Set5_Y_;
+    KEL.typ.ndataset(B_Input_P_I_I_3(__in,__cfg).__ST78222_Layout) Input_Address_Property_Set_;
+    KEL.typ.ndataset(B_Input_P_I_I_3(__in,__cfg).__ST78273_Layout) Input_Address_Property_Set1_Y_;
+    KEL.typ.ndataset(B_Input_P_I_I_3(__in,__cfg).__ST78338_Layout) Input_Address_Property_Set5_Y_;
     KEL.typ.nstr Input_Address_Status_Clean_Value_;
     KEL.typ.nstr Input_Address_Suffix_Clean_Value_;
     KEL.typ.nstr Input_Address_Type_Clean_Value_;
@@ -208,15 +208,15 @@ EXPORT B_Address_Slim_1(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CF
     KEL.typ.epoch Vault_Date_Last_Seen_ := 0;
     KEL.typ.int __RecordCount := 0;
   END;
-  __JC8041735(B_Address_Slim_2(__in,__cfg).__ST204631_Layout __EE8041724, B_Input_P_I_I_2(__in,__cfg).__ST297055_Layout __EE8041726) := __EEQP(__EE8041724.P_I_I_,__EE8041726.UID);
-  __ST2106525_Layout __JT8041735(B_Address_Slim_2(__in,__cfg).__ST204631_Layout __l, B_Input_P_I_I_2(__in,__cfg).__ST297055_Layout __r) := TRANSFORM
+  __JC8040149(B_Address_Slim_2(__in,__cfg).__ST204661_Layout __EE8040138, B_Input_P_I_I_2(__in,__cfg).__ST304717_Layout __EE8040140) := __EEQP(__EE8040138.P_I_I_,__EE8040140.UID);
+  __ST2106555_Layout __JT8040149(B_Address_Slim_2(__in,__cfg).__ST204661_Layout __l, B_Input_P_I_I_2(__in,__cfg).__ST304717_Layout __r) := TRANSFORM
     SELF.U_I_D__1_ := __r.UID;
     SELF.Z_I_P5__1_ := __r.Z_I_P5_;
     SELF := __l;
     SELF := __r;
   END;
-  SHARED __EE8041991 := JOIN(__EE8041724,__EE8041726,__JC8041735(LEFT,RIGHT),__JT8041735(LEFT,RIGHT),LEFT OUTER,SMART);
-  EXPORT __ST177187_Layout := RECORD
+  SHARED __EE8040405 := JOIN(__EE8040138,__EE8040140,__JC8040149(LEFT,RIGHT),__JT8040149(LEFT,RIGHT),LEFT OUTER,SMART);
+  EXPORT __ST177217_Layout := RECORD
     KEL.typ.nuid UID;
     KEL.typ.nstr Primary_Range_;
     KEL.typ.nstr Predirectional_;
@@ -228,9 +228,9 @@ EXPORT B_Address_Slim_1(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CF
     KEL.typ.ndataset(E_Address_Slim(__in,__cfg).Address_Type_Layout) Address_Type_;
     KEL.typ.nstr Source_;
     KEL.typ.nbool Address_N_A_I_C_S_Not_Contains_;
-    KEL.typ.ndataset(B_Address_Slim_3(__in,__cfg).__ST77048_Layout) Address_N_A_I_C_S_Sorted_List_;
+    KEL.typ.ndataset(B_Address_Slim_3(__in,__cfg).__ST77060_Layout) Address_N_A_I_C_S_Sorted_List_;
     KEL.typ.nbool Address_S_I_C_Not_Contains_;
-    KEL.typ.ndataset(B_Address_Slim_3(__in,__cfg).__ST76955_Layout) Address_S_I_C_Sorted_List_;
+    KEL.typ.ndataset(B_Address_Slim_3(__in,__cfg).__ST76967_Layout) Address_S_I_C_Sorted_List_;
     KEL.typ.nbool N_A_I_C_S_List_Not_Foind_;
     KEL.typ.nstr P___Cln_Addr_Full_Flag_;
     KEL.typ.nbool S_I_C_List_Not_Found_;
@@ -241,17 +241,17 @@ EXPORT B_Address_Slim_1(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CF
     KEL.typ.epoch Vault_Date_Last_Seen_ := 0;
     KEL.typ.int __RecordCount := 0;
   END;
-  SHARED __ST177187_Layout __ND8041609__Project(__ST2106525_Layout __PP8040288) := TRANSFORM
-    __EE8041599 := __PP8040288.Address_N_A_I_C_S_Sorted_List_;
-    SELF.Address_N_A_I_C_S_Not_Contains_ := __NOT(__FN2(KEL.Routines.Contains,KEL.Aggregates.ConcatNN(__EE8041599,LEFT.High_Risk_N_A_I_C_S_,__CN('|')),__CN('922140')));
-    __EE8041621 := __PP8040288.Address_S_I_C_Sorted_List_;
-    SELF.Address_S_I_C_Not_Contains_ := __NOT(__FN2(KEL.Routines.Contains,KEL.Aggregates.ConcatNN(__EE8041621,LEFT.High_Risk_S_I_C_,__CN('|')),__CN('9223')));
-    __BS8041641 := __T(__PP8040288.Address_N_A_I_C_S_Sorted_List_);
-    SELF.N_A_I_C_S_List_Not_Foind_ := __OR(__NOT(__CN(EXISTS(__T(__PP8040288.Address_N_A_I_C_S_Sorted_List_)))),__CN(NOT EXISTS(__BS8041641(__T(__NOT(__OR(__OP2(__CAST(KEL.typ.str,__T(__PP8040288.Address_N_A_I_C_S_Sorted_List_).High_Risk_N_A_I_C_S_),=,__CN('')),__NT(__T(__PP8040288.Address_N_A_I_C_S_Sorted_List_).High_Risk_N_A_I_C_S_))))))));
-    SELF.P___Cln_Addr_Full_Flag_ := __PP8040288.P___Inp_Cln_Addr_Full_Flag_Value_;
-    __BS8041670 := __T(__PP8040288.Address_S_I_C_Sorted_List_);
-    SELF.S_I_C_List_Not_Found_ := __OR(__NOT(__CN(EXISTS(__T(__PP8040288.Address_S_I_C_Sorted_List_)))),__CN(NOT EXISTS(__BS8041670(__T(__NOT(__OR(__OP2(__CAST(KEL.typ.str,__T(__PP8040288.Address_S_I_C_Sorted_List_).High_Risk_S_I_C_),=,__CN('')),__NT(__T(__PP8040288.Address_S_I_C_Sorted_List_).High_Risk_S_I_C_))))))));
-    SELF := __PP8040288;
+  SHARED __ST177217_Layout __ND8040023__Project(__ST2106555_Layout __PP8038702) := TRANSFORM
+    __EE8040013 := __PP8038702.Address_N_A_I_C_S_Sorted_List_;
+    SELF.Address_N_A_I_C_S_Not_Contains_ := __NOT(__FN2(KEL.Routines.Contains,KEL.Aggregates.ConcatNN(__EE8040013,LEFT.High_Risk_N_A_I_C_S_,__CN('|')),__CN('922140')));
+    __EE8040035 := __PP8038702.Address_S_I_C_Sorted_List_;
+    SELF.Address_S_I_C_Not_Contains_ := __NOT(__FN2(KEL.Routines.Contains,KEL.Aggregates.ConcatNN(__EE8040035,LEFT.High_Risk_S_I_C_,__CN('|')),__CN('9223')));
+    __BS8040055 := __T(__PP8038702.Address_N_A_I_C_S_Sorted_List_);
+    SELF.N_A_I_C_S_List_Not_Foind_ := __OR(__NOT(__CN(EXISTS(__T(__PP8038702.Address_N_A_I_C_S_Sorted_List_)))),__CN(NOT EXISTS(__BS8040055(__T(__NOT(__OR(__OP2(__CAST(KEL.typ.str,__T(__PP8038702.Address_N_A_I_C_S_Sorted_List_).High_Risk_N_A_I_C_S_),=,__CN('')),__NT(__T(__PP8038702.Address_N_A_I_C_S_Sorted_List_).High_Risk_N_A_I_C_S_))))))));
+    SELF.P___Cln_Addr_Full_Flag_ := __PP8038702.P___Inp_Cln_Addr_Full_Flag_Value_;
+    __BS8040084 := __T(__PP8038702.Address_S_I_C_Sorted_List_);
+    SELF.S_I_C_List_Not_Found_ := __OR(__NOT(__CN(EXISTS(__T(__PP8038702.Address_S_I_C_Sorted_List_)))),__CN(NOT EXISTS(__BS8040084(__T(__NOT(__OR(__OP2(__CAST(KEL.typ.str,__T(__PP8038702.Address_S_I_C_Sorted_List_).High_Risk_S_I_C_),=,__CN('')),__NT(__T(__PP8038702.Address_S_I_C_Sorted_List_).High_Risk_S_I_C_))))))));
+    SELF := __PP8038702;
   END;
-  EXPORT __ENH_Address_Slim_1 := PROJECT(__EE8041991,__ND8041609__Project(LEFT));
+  EXPORT __ENH_Address_Slim_1 := PROJECT(__EE8040405,__ND8040023__Project(LEFT));
 END;
