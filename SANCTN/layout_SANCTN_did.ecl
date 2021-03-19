@@ -1,7 +1,6 @@
 ﻿IMPORT standard, bipv2,dx_common;
 
 export layout_SANCTN_did := record
-  dx_common.layout_metadata;
   SANCTN.layout_SANCTN_party_clean_orig;
 	bipv2.IDlayouts.l_xlink_ids;	//Added for BIP project
 	unsigned8 source_rec_id := 0; //Added for BIP project
@@ -16,4 +15,7 @@ export layout_SANCTN_did := record
 	//CCPA-283 Adding CCPA new fields
 	UNSIGNED4 global_sid := 0;
 	UNSIGNED8 record_sid:=0;
+	UNSIGNED4 dt_effective_first:=0;
+  	UNSIGNED4 dt_effective_last:=0;
+  	UNSIGNED1 delta_ind := 0;
 end;
