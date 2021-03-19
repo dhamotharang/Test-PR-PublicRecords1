@@ -1,11 +1,11 @@
 ﻿//Barb O'Neill replaced Mac_Spray_Voters with this code for DOPS-461.
 IMPORT std,VotersV2,_Control;
 
-#workunit('name','Voters Build '+pversion);
-#option('multiplePersistInstances',FALSE);
-
 export spray_allowed_states(string st,string pversion, string sprayIP, string sourcePath,string superfileName,integer recSize,string groupName):= function
-				
+
+#workunit('name','Voters Build '+pversion);
+#option('multiplePersistInstances',FALSE);		
+		
     sprayed_name := VotersV2.cluster + 'in::Voters::sprayed::'+pversion+'::'+st;		
 		
 		spray_state := FileServices.SprayFixed(sprayIP                              
