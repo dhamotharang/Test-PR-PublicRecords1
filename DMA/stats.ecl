@@ -12,13 +12,13 @@ export stats(string filedate) := function
     END;
     key_DNC_Phone_new	:=	index(																	{kfield},
                                                                         {pfield},
-                                                                        Data_Services.foreign_prod+'thor_data400::key::DNC::'+ Doxie.Version_SuperKey +'::phone'
+                                                                        '~thor_data400::key::DNC::'+ Doxie.Version_SuperKey +'::phone'
                                                                     ):persist('~thor400::tps::key::prod::persist');
 
     dev_base := dma.File_SuppressionTPS_Delta.Base;
 
     key := dx_dma.key_DNC_Phone;
-    prod_Base :=	dataset(data_services.foreign_prod + 'thor_data400::base::suppression::tps',dx_dma.layouts.base,flat);
+    prod_Base :=	dataset('~thor_data400::base::suppression::tps',dx_dma.layouts.base,flat);
 
     base_dev_dedup := dedup(distribute(sort(dev_base, phonenumber),hash32(PhoneNumber)),phonenumber,local);
     base_prod_dedup := dedup(distribute(sort(prod_Base, phonenumber),hash32(PhoneNumber)),phonenumber,local);

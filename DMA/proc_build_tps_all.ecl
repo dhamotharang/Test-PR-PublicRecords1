@@ -1,6 +1,5 @@
 import	DMA, dx_dma, RoxieKeyBuild,ut, data_services, std;
-
-EXPORT	proc_build_tps_all(string	fileDate, boolean build_full = false, dataset(DMA.layout_in_suppressionTPS_National) in_name, boolean old_files = false)	:=
+EXPORT	proc_build_tps_all(string	fileDate, boolean build_full = false, dataset(DMA.layout_in_suppressionTPS_National) in_name, boolean debug_old_files = false)	:=
 module
 	
     //eliminates duplicates while maintaining relevant data
@@ -24,17 +23,15 @@ module
             SELF.delta_ind:= 1;
 		END;
         DMAPhone	:=	project(fileDMAIn,filterDMAPhone(left));
-        fileNationalIn :=	in_name;
-        /*dataset(data_services.foreign_prod +'thor_data400::in::suppression::TPS_National_'+fileDate,
+        fileNationalIn :=	dataset('~thor_data400::in::suppression::TPS_National_'+fileDate,
 																											DMA.layout_in_suppressionTPS_National,
 																											csv(separator(','),terminator('\n'))
-																										); */
+																										); 
 
         DMA.layout_in_suppressionTPS_National	filterNationalPhone(fileNationalIn	l)	:=
 		TRANSFORM
 			SELF.phonenumber	:=	REGEXFIND('[0-9]{10}',l.PhoneNumber,0);
             SELF := l;
-
 		END;
         
         fileNationalIn_filtered	:=	project(distribute(fileNationalIn(PhoneNumber	!=	''),hash32(phonenumber)),filterNationalPhone(left));
@@ -56,10 +53,10 @@ module
         TRANSFORM
             SELF.source := 'NTL';
             SELF.phonenumber	:=	L.phonenumber;
-            SELF.dt_effective_first := if(old_files, std.date.fromstringtodate(L.RequestDate[1..10],'%Y-%m-%d'),(unsigned)filedate);
+            SELF.dt_effective_first := if(debug_old_files, std.date.fromstringtodate(L.RequestDate[1..10],'%Y-%m-%d'),(unsigned)filedate);
             SELF.dt_effective_last :=   if( L.Indicator = 'A', 
                                             0, 
-                                            if(old_files, 
+                                            if(debug_old_files, 
                                                 std.date.fromstringtodate(L.RequestDate[1..10],'%Y-%m-%d'),
                                                 (unsigned)filedate)
                                         );

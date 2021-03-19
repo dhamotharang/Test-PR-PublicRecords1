@@ -1,7 +1,7 @@
 ﻿import	_control,RoxieKeyBuild,ut,Orbit3,Scrubs_DoNotCall, dx_dma;
 
 export	proc_build_DNC(string	sourceIP,string	fileDate,string	NationalSourceFile, 
-dataset(DMA.layout_in_suppressionTPS_National) in_name, boolean old_files,
+dataset(DMA.layout_in_suppressionTPS_National) in_name,
 string	DMASourceFile	=	'',string	groupName	=	'thor400_44',string	emailTarget	=	' ')	:=
 function
 	sprayIP	:=	map(	sourceIP	=	'edata10'		   =>	_control.IPAddress.edata10,
@@ -51,7 +51,7 @@ function
 
     build_full := dma.check_full;
 
-	buildKey	:=	DMA.proc_build_tps_all(fileDate, build_full, in_name, old_files).proc_build_key : success(sendSuccMsg),failure(sendFailMsg);
+	buildKey	:=	DMA.proc_build_tps_all(fileDate, build_full, in_name).proc_build_key : success(sendSuccMsg),failure(sendFailMsg);
 	
 	updateVersion	:=	RoxieKeyBuild.updateversion('DoNotCallKeys',fileDate,'kgummadi@seisint.com;cbrodeur@seisint.com;randy.reyes@lexisnexis.com;manuel.tarectecan@lexisnexis.com;abednego.escobal@lexisnexis.com',,
                                                     if(build_full, 'F','D'));
@@ -61,7 +61,7 @@ function
 	tpsBase		:=	distribute(DMA.file_suppressionTPS_delta.Base_new(filedate),hash(phonenumber));
 	tpsFather	:=	distribute(DMA.file_suppressionTPS_delta.base,hash(phonenumber));
 
-	typeof(tpsBase)	getNewRecs(DMA.layout_suppressionTPS.building	l,dx_dma.layouts.building	r)	:=
+	typeof(tpsBase)	getNewRecs(dx_dma.layouts.building	l,dx_dma.layouts.building	r)	:=
 	transform
 		self	:=	l;
 	end;
@@ -80,17 +80,17 @@ function
 																			'http://prod_esp:8010/WsWorkunits/WUInfo?Wuid='	+	workunit
 																		);
 	
-	return	sequential(	//sprayFileNational,
-											//addSuperNational,
-											//doDMA,
+	return	sequential(	sprayFileNational,
+											addSuperNational,
+											doDMA,
 											//buildNationalBase,
 											//buildBase,
-                                            DMA.proc_build_tps_all(fileDate, build_full, in_name, old_files).proc_build_base,
+                                            DMA.proc_build_tps_all(fileDate, build_full, in_name).proc_build_base,
                                             //qaRecs,
 											buildKey,
-                                            dma.stats(filedate),
-											//create_orbit_build,
-											//qaEmail,
+                                            //dma.stats(filedate),
+											create_orbit_build,
+											qaEmail,
 											//Scrubs_DoNotCall.fnRunScrubs(fileDate,'')
 										);
 	
