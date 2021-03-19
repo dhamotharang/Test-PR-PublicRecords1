@@ -1,5 +1,5 @@
 ﻿EXPORT MAC_Scrubs_Report(BuildDate,myFolder,scopename,inputFile,MemailList)	:=	FUNCTIONMACRO
-	import FraudShared,FraudGovPlatform,Salt35,Scrubs,tools,STD,ut;
+	import FraudGovPlatform,Salt35,Scrubs,tools,STD,ut;
 	folder := #EXPAND(myFolder);
 	inFile := inputFile;
 	#UNIQUENAME(DatasetName);
@@ -8,18 +8,18 @@
 	scope_datasetName := TRIM(scopename,ALL)+'_' + %DatasetName%	;
 	profilename := 'Scrubs_MBS'+ if(scopename != 'MBS' , '_'+scopename, '');
 	Filename := '~'+map(
-			scopename = 'CCID' => STD.File.GetSuperFileSubName(FraudShared.Filenames(BuildDate).Input.MBSFdnCCID.Sprayed,1),
-			scopename = 'ColvalDesc' => STD.File.GetSuperFileSubName(FraudShared.Filenames(BuildDate).Input.MBSColValDesc.Sprayed,1),
-			scopename = 'HHID' => STD.File.GetSuperFileSubName(FraudShared.Filenames(BuildDate).Input.MBSFdnHHID.Sprayed,1),
-			scopename = 'IndType' => STD.File.GetSuperFileSubName(FraudShared.Filenames(BuildDate).Input.MBSFdnIndType.Sprayed,1),
-			scopename = 'IndTypeExclusion' => STD.File.GetSuperFileSubName(FraudShared.Filenames(BuildDate).Input.MbsIndTypeExclusion.Sprayed,1),
-			scopename = 'MarketAppend' => STD.File.GetSuperFileSubName(FraudShared.Filenames(BuildDate).Input.MBSmarketAppend.Sprayed,1),
-			scopename = 'MasterIdIndTypeIncl' => STD.File.GetSuperFileSubName(FraudShared.Filenames(BuildDate).Input.MbsFdnMasterIDIndTypeInclusion.Sprayed,1),
-			scopename = 'MBS' => STD.File.GetSuperFileSubName(FraudShared.Filenames(BuildDate).Input.MBS.Sprayed,1),
-			scopename = 'NewGcIdExcl' => STD.File.GetSuperFileSubName(FraudShared.Filenames(BuildDate).Input.MbsNewGcIdExclusion.Sprayed,1),
-			scopename = 'ProductInclude' => STD.File.GetSuperFileSubName(FraudShared.Filenames(BuildDate).Input.MbsProductInclude.Sprayed,1),
-			scopename = 'SourceGcExclusion' => STD.File.GetSuperFileSubName(FraudShared.Filenames(BuildDate).Input.MBSSourceGcExclusion.Sprayed,1),
-			scopename = 'TableCol' => STD.File.GetSuperFileSubName(FraudShared.Filenames(BuildDate).Input.MBSTableCol.Sprayed,1),
+			scopename = 'CCID' => STD.File.GetSuperFileSubName(FraudGovPlatform.Filenames(BuildDate).Input.MBSFdnCCID.Sprayed,1),
+			scopename = 'ColvalDesc' => STD.File.GetSuperFileSubName(FraudGovPlatform.Filenames(BuildDate).Input.MBSColValDesc.Sprayed,1),
+			scopename = 'HHID' => STD.File.GetSuperFileSubName(FraudGovPlatform.Filenames(BuildDate).Input.MBSFdnHHID.Sprayed,1),
+			scopename = 'IndType' => STD.File.GetSuperFileSubName(FraudGovPlatform.Filenames(BuildDate).Input.MBSFdnIndType.Sprayed,1),
+			scopename = 'IndTypeExclusion' => STD.File.GetSuperFileSubName(FraudGovPlatform.Filenames(BuildDate).Input.MbsIndTypeExclusion.Sprayed,1),
+			scopename = 'MarketAppend' => STD.File.GetSuperFileSubName(FraudGovPlatform.Filenames(BuildDate).Input.MBSmarketAppend.Sprayed,1),
+			scopename = 'MasterIdIndTypeIncl' => STD.File.GetSuperFileSubName(FraudGovPlatform.Filenames(BuildDate).Input.MbsFdnMasterIDIndTypeInclusion.Sprayed,1),
+			scopename = 'MBS' => STD.File.GetSuperFileSubName(FraudGovPlatform.Filenames(BuildDate).Input.MBS.Sprayed,1),
+			scopename = 'NewGcIdExcl' => STD.File.GetSuperFileSubName(FraudGovPlatform.Filenames(BuildDate).Input.MbsNewGcIdExclusion.Sprayed,1),
+			scopename = 'ProductInclude' => STD.File.GetSuperFileSubName(FraudGovPlatform.Filenames(BuildDate).Input.MbsProductInclude.Sprayed,1),
+			scopename = 'SourceGcExclusion' => STD.File.GetSuperFileSubName(FraudGovPlatform.Filenames(BuildDate).Input.MBSSourceGcExclusion.Sprayed,1),
+			scopename = 'TableCol' => STD.File.GetSuperFileSubName(FraudGovPlatform.Filenames(BuildDate).Input.MBSTableCol.Sprayed,1),
 			''
 			);
 	process_date := BuildDate;

@@ -9,7 +9,7 @@ pVersion := '20180306';
 
 // Spray MBS
 		spray_mbs := sequential(
-			  FraudShared.SprayMBSFiles(pversion := pVersion,pGroupName := if(_Control.ThisEnvironment.Name='Dataland','thor400_dev01_2','thor400_30'), pDirectory := FraudGovPlatform_Validation.Constants.MBSLandingZonePathBase)
+			  FraudGovPlatform_Validation.SprayMBSFiles(pversion := pVersion)
 			, Scrubs_MBS.BuildSCRUBSReport(pversion)  
 		);
 

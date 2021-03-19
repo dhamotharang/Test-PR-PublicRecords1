@@ -39,6 +39,20 @@ module
 	// -- Input File Versions
 	//////////////////////////////////////////////////////////////////
 	export Input := module
+		tools.mac_FilesInput(Filenames(pversion,pUseProd).Input.Mbs,Layouts.Input.Mbs,Mbs, 'CSV',,'|\n','|\t|',,,false );
+		tools.mac_FilesInput(Filenames(pversion,pUseProd).Input.MbsNewGcIdExclusion,Layouts.Input.MbsNewGcIdExclusion,MbsNewGcIdExclusion,'CSV',,'|\n','|\t|',,,true);
+		tools.mac_FilesInput(Filenames(pversion,pUseProd).Input.MbsIndTypeExclusion,Layouts.Input.MbsIndTypeExclusion,MbsIndTypeExclusion,'CSV',,'|\n','|\t|',,,true);
+		tools.mac_FilesInput(Filenames(pversion,pUseProd).Input.MbsProductInclude,Layouts.Input.MbsProductInclude,MbsProductInclude,'CSV',,'|\n','|\t|',,,false);
+		tools.mac_FilesInput(Filenames(pversion,pUseProd).Input.MBSSourceGcExclusion,Layouts.Input.MBSSourceGcExclusion,MBSSourceGcExclusion,'CSV',,'|\n','|\t|',,,false);
+		tools.mac_FilesInput(Filenames(pversion,pUseProd).Input.MBSFdnIndType,Layouts.Input.MBSFdnIndType,MBSFdnIndType,'CSV',,'|\n','|\t|',,,false);
+		tools.mac_FilesInput(Filenames(pversion,pUseProd).Input.MBSFdnCCID,Layouts.Input.MBSFdnCCID,MBSFdnCCID,'CSV',,'\n',,,,false);
+		tools.mac_FilesInput(Filenames(pversion,pUseProd).Input.MBSFdnHHID,Layouts.Input.MBSFdnHHID,MBSFdnHHID,'CSV',,'|\n','|\t|',,,false);
+		tools.mac_FilesInput(Filenames(pversion,pUseProd).Input.MBSTableCol,Layouts.Input.MBSTableCol,MBSTableCol,'CSV',,'|\n','|\t|',,,false);
+		tools.mac_FilesInput(Filenames(pversion,pUseProd).Input.MBSColValDesc,Layouts.Input.MBSColValDesc,MBSColValDesc,'CSV',,'|\n','|\t|',,,false);
+		tools.mac_FilesInput(Filenames(pversion,pUseProd).Input.MBSmarketAppend,Layouts.Input.MBSmarketAppend,MBSmarketAppend,'CSV',,['\n','\r\n','\n\r'],['|','\t'],,,false);
+		tools.mac_FilesInput(Filenames(pversion,pUseProd).Input.MbsFdnMasterIDIndTypeInclusion ,Layouts.Input.MbsFdnMasterIDIndTypeInclusion,MbsFdnMasterIDIndTypeInclusion,'CSV',,'|\n','|\t|',,,true); 
+		tools.mac_FilesInput(Filenames(pversion,pUseProd).Input.MbsVelocityRules,Layouts.Input.MbsVelocityRules,MbsVelocityRules,'CSV',,'|\n','|\t|',,,true); 
+
 		tools.mac_FilesInput(Filenames(pversion,pUseProd).Input.IdentityData,Layouts.Input.IdentityData,IdentityData);
 		tools.mac_FilesInput(Filenames(pversion,pUseProd).Input.ByPassed_IdentityData,Layouts.Input.IdentityData,ByPassed_IdentityData);
 
@@ -57,9 +71,9 @@ module
 		tools.mac_FilesInput(Filenames(pversion,pUseProd).Input.ConfigAttributes,Layouts.Input.ConfigAttributes,ConfigAttributes,'CSV',,'\r\n',',',true);		
 		tools.mac_FilesInput(Filenames(pversion,pUseProd).Input.ConfigRules,Layouts.Input.ConfigRules,ConfigRules,'CSV',,'\r\n',',',true);
 
-		tools.mac_FilesInput(Filenames(pversion,pUseProd).Input.MBSInclusionDemoData,FraudShared.Layouts.Input.MbsFdnMasterIDIndTypeInclusion,MBSInclusionDemoData,'CSV',,'|\n','|\t|');
+		tools.mac_FilesInput(Filenames(pversion,pUseProd).Input.MBSInclusionDemoData,Layouts.Input.MbsFdnMasterIDIndTypeInclusion,MBSInclusionDemoData,'CSV',,'|\n','|\t|');
 		
-		tools.mac_FilesInput(Filenames(pversion,pUseProd).Input.MBSDemoData,FraudShared.Layouts.Input.Mbs,MBSDemoData,'CSV',,'|\n','|\t|');
+		tools.mac_FilesInput(Filenames(pversion,pUseProd).Input.MBSDemoData,Layouts.Input.Mbs,MBSDemoData,'CSV',,'|\n','|\t|');
 		
 	
 	end;

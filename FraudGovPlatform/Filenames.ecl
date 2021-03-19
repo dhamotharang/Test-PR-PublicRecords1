@@ -64,7 +64,22 @@ module
 	export Input := module
 	
 		shared Template(string tag) := _Dataset(pUseOtherEnvironment).InputTemplate + tag;
-		
+
+		export MBS                           := tools.mod_FilenamesInput(Template('mbs'                              ),pversion);
+		export MbsNewGcIdExclusion           := tools.mod_FilenamesInput(Template('MbsNewGcIdExclusion'              ),pversion); //In this new file gcid is replaced by exclusion_id and exclusion_type
+		export MbsIndTypeExclusion           := tools.mod_FilenamesInput(Template('MbsIndTypeExclusion'              ),pversion);
+		export MbsProductInclude             := tools.mod_FilenamesInput(Template('MbsProductInclude'                ),pversion);
+		export MBSSourceGcExclusion          := tools.mod_FilenamesInput(Template('MBSSourceGcExclusion'             ),pversion);
+		export MBSFdnIndType                 := tools.mod_FilenamesInput(Template('MBSFdnIndType'                    ),pversion);
+		export MBSFdnCCID                    := tools.mod_FilenamesInput(Template('MBSFdnCCID'                       ),pversion);
+		export MBSFdnHHID                    := tools.mod_FilenamesInput(Template('MBSFdnHHID'                       ),pversion);
+		export MBSTableCol                   := tools.mod_FilenamesInput(Template('MBSTableCol'                      ),pversion);
+		export MBSColValDesc                 := tools.mod_FilenamesInput(Template('MBSColValDesc'                    ),pversion);
+		export MBSmarketAppend               := tools.mod_FilenamesInput(Template('MBSmarketAppend'                  ),pversion);
+		export MbsFdnMasterIDIndTypeInclusion:= tools.mod_FilenamesInput(Template('MbsFdnMasterIDIndTypeInclusion'   ),pversion);
+		export MbsVelocityRules							 :=	tools.mod_FilenamesInput(Template('MbsVelocityRules'   							 ),pversion);
+
+
 		export IdentityData                  			:= tools.mod_FilenamesInput(Template('IdentityData'),pversion);
 		export KnownFraud                  			:= tools.mod_FilenamesInput(Template('KnownFraud'),pversion);
 		export Deltabase							:= tools.mod_FilenamesInput(Template('Deltabase'),pversion);
@@ -84,6 +99,18 @@ module
 		export ConfigRules									:= tools.mod_FilenamesInput(Template('ConfigRules'),pversion);
 
 		export dAll_filenames :=
+			MBS.dAll_filenames +
+			MbsNewGcIdExclusion.dAll_filenames +
+			MbsIndTypeExclusion.dAll_filenames +
+			MbsProductInclude.dAll_filenames +
+			MBSSourceGcExclusion.dAll_filenames +
+			MBSFdnIndType.dAll_filenames +
+			MBSFdnCCID.dAll_filenames +
+			MBSFdnHHID.dAll_filenames +
+			MBSTableCol.dAll_filenames +
+			MBSColValDesc.dAll_filenames +
+			MBSmarketAppend.dAll_filenames +
+			MbsFdnMasterIDIndTypeInclusion.dAll_filenames +		
 			IdentityData.dAll_filenames +
 			KnownFraud.dAll_filenames +
 			Deltabase.dAll_filenames +
