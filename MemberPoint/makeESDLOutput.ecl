@@ -246,6 +246,8 @@ EXPORT iesp.keepcontactreport.t_KeepContactReportResponse makeESDLOutput(dataset
 				self.Member.Phones :=  PhonesChild;
         		self.member.CalculatedAge:=if(includedob='1' and STD.Date.IsValidDate((integer)l.dob, 1900 , 2099),(string)lib_date.getage(l.dob),'');				self.Member.DOD := if(l.LN_search_name_type='M',iesp.ECL2ESP.toDatestring8(''),iesp.ECL2ESP.toDatestring8(L.Date_of_death));
 				self.Member.DeceasedMatchCodes := if(l.LN_search_name_type='M','',l.dcd_match_code);
+				self.Member.Verified_or_Proof_Code := l.Verified_or_Proof_Code;
+    			self.Member.Deceased_Source := l.Deceased_Source;
 				self.member.AddressDescriptionCodes:=AddressDescriptionCodes;
 				self.Member.Emails := EmailChild;
 				self.Member.InputEmailValidation :=  project(l, transform(iesp.keepcontactreport.t_KeepContactInputEmailValidation,

@@ -475,6 +475,17 @@
 			// Death
 			SELF.Date_of_death := rowDeceased.DOD8;
 			SELF.dcd_match_code := rowDeceased.matchcode; // this will be death match code + 1 string for 'D' or DOB matches
+			SELF.verified_or_proof_code := rowDeceased.VorP_code;
+			SELF.death_rec_src := rowDeceased.death_rec_src;
+			SELF.deceased_source := MAP(rowDeceased.death_rec_src = 'SSA' => 'SSA',
+										rowDeceased.death_rec_src <> 'SSA' AND rowDeceased.death_rec_src <> '' => 'SUP',
+										'');
+			SELF.isdeepdive := rowDeceased.isdeepdive;
+			SELF.dcd_filedate := rowDeceased.filedate;
+			SELF.state_death_flag := rowDeceased.state_death_flag;
+			SELF.state_death_id := rowDeceased.state_death_id;
+			SELF.dcd_rec_type := rowDeceased.rec_type;
+			SELF.dcd_rec_type_orig := rowDeceased.rec_type_orig;
 			// Email
 			self.Email1:=rowsEmails[1].orig_email;
 			self.email1_email_src:=rowsEmails[1].email_src;
