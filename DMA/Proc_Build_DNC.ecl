@@ -1,8 +1,6 @@
 ﻿import	_control,RoxieKeyBuild,ut,Orbit3,Scrubs_DoNotCall, dx_dma;
 
-export	proc_build_DNC(string	sourceIP,string	fileDate,string	NationalSourceFile, 
-dataset(DMA.layout_in_suppressionTPS_National) in_name,
-string	DMASourceFile	=	'',string	groupName	=	'thor400_44',string	emailTarget	=	' ')	:=
+export	proc_build_DNC(string	sourceIP,string	fileDate,string	NationalSourceFile, string	DMASourceFile	=	'',string	groupName	=	'thor400_44',string	emailTarget	=	' ')	:=
 function
 	sprayIP	:=	map(	sourceIP	=	'edata10'		   =>	_control.IPAddress.edata10,
 										sourceIP	=	'edata11'		   =>	_control.IPAddress.edata11,
@@ -51,7 +49,7 @@ function
 
     build_full := dma.check_full;
 
-	buildKey	:=	DMA.proc_build_tps_all(fileDate, build_full, in_name).proc_build_key : success(sendSuccMsg),failure(sendFailMsg);
+	buildKey	:=	DMA.proc_build_tps_all(fileDate, build_full).proc_build_key : success(sendSuccMsg),failure(sendFailMsg);
 	
 	updateVersion	:=	RoxieKeyBuild.updateversion('DoNotCallKeys',fileDate,'kgummadi@seisint.com;cbrodeur@seisint.com;randy.reyes@lexisnexis.com;manuel.tarectecan@lexisnexis.com;abednego.escobal@lexisnexis.com',,
                                                     if(build_full, 'F','D'));
@@ -85,7 +83,7 @@ function
 											doDMA,
 											//buildNationalBase,
 											//buildBase,
-                                            DMA.proc_build_tps_all(fileDate, build_full, in_name).proc_build_base,
+                                            DMA.proc_build_tps_all(fileDate, build_full).proc_build_base,
                                             //qaRecs,
 											buildKey,
                                             //dma.stats(filedate),

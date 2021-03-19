@@ -1,5 +1,5 @@
 import	DMA, dx_dma, RoxieKeyBuild,ut, data_services, std;
-EXPORT	proc_build_tps_all(string	fileDate, boolean build_full = false, dataset(DMA.layout_in_suppressionTPS_National) in_name, boolean debug_old_files = false)	:=
+EXPORT	proc_build_tps_all(string	fileDate, boolean build_full = false, boolean debug_old_files = false)	:=
 module
 	
     //eliminates duplicates while maintaining relevant data
@@ -10,6 +10,7 @@ module
             SELF.delta_ind := if(build_full and R.delta_ind != 3, 0, R.delta_ind);
             SELF := R;
         END;
+    
     EXPORT	proc_build_base	:=
 	FUNCTION
         
@@ -23,10 +24,7 @@ module
             SELF.delta_ind:= 1;
 		END;
         DMAPhone	:=	project(fileDMAIn,filterDMAPhone(left));
-        fileNationalIn :=	dataset('~thor_data400::in::suppression::TPS_National_'+fileDate,
-																											DMA.layout_in_suppressionTPS_National,
-																											csv(separator(','),terminator('\n'))
-																										); 
+        fileNationalIn :=	dataset('~thor_data400::in::suppression::TPS_National_'+fileDate, DMA.layout_in_suppressionTPS_National, csv(separator(','),terminator('\n'))); 
 
         DMA.layout_in_suppressionTPS_National	filterNationalPhone(fileNationalIn	l)	:=
 		TRANSFORM
@@ -42,6 +40,7 @@ module
         TRANSFORM
             SELF := R;
         END;
+
         sort_FISTPSN := sort(distribute(FISTPSN,hash32(phonenumber)), phonenumber, requestdate,local);
         new_data:= rollup(sort_FISTPSN,
                         left.phonenumber = right.phonenumber and 
@@ -63,6 +62,7 @@ module
             SELF.delta_ind := if(L.Indicator = 'A', 1, 3);
         END;
 
+        //takes the delta for delta updates and delta + base superfile for full updates
         base_data :=  if (build_full, 
                             project(FISTPSN,tReformat2Bldg(left))+DMAPhone(PhoneNumber	!=	'') + DMA.file_suppressionTPS_delta.base,
                             project(FISTPSN,tReformat2Bldg(left))+DMAPhone(PhoneNumber	!=	'')
@@ -70,7 +70,8 @@ module
         base_data_dist := distribute(base_data,hash32(phonenumber));
         sorted_new_data := sort(base_data_dist((unsigned)phonenumber != 0), phonenumber, dt_effective_first, dt_effective_last, local);
 
-        delta_base := rollup(sorted_new_data, left.phonenumber = right.phonenumber, isolate_relevant(left,right));
+        //rollup to keep only the latest record in the event of a new delta_ind and the oldest otherwise
+        delta_base := rollup(sorted_new_data, left.phonenumber = right.phonenumber, isolate_relevant(left,right), local);
         //since rollups do not affect non-duplicate records the following transform must be applied during a full build
         dx_dma.layouts.building	delta_ind_to_0(sorted_new_data L) := transform
             SELF.delta_ind := 0;
@@ -88,6 +89,7 @@ module
                             if(build_full, mvBase, output('not full build'))
                             );
 	END;
+
 
 	EXPORT	proc_build_key	:=
 	FUNCTION        
