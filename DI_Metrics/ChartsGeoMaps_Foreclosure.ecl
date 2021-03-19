@@ -1,5 +1,5 @@
 ﻿IMPORT _control, Property, data_services, STD; 
-export ChartsGeoMaps_Foreclosure(string pHostname, string pTarget, string pContact ='\' \'') := function
+export ChartsGeoMaps_Foreclosure(string pHostname, string pTarget, string pContact ='\' \'', STRING today = (STRING8)STD.Date.Today()) := function
 
 /*cleo needs these outputs:
 •	tbl_all_by_state
@@ -12,7 +12,7 @@ tbl_ChartsGeoMaps_Foreclosure_All_By_Category_ByState_filedate.csv //REMOVE THIS
 tbl_ChartsGeoMaps_Foreclosure_All_by_State_And_Year_filedate.csv //REMOVE THIS ONE
 tbl_ChartsGeoMaps_Foreclosure_All_By_Fips_And_Year_filedate.csv //REMOVE THIS ONE*/
 
-filedate := (STRING8)Std.Date.Today();
+filedate := today;
 
 //NOD & Foreclosure file now includes data from CL and BKS; source codes:  FR - CL NOD/Foreclosure; B7 - BKS NOD (incl Lis Pendens, etc); I5 - BKS REO (bank owned)
 nod_base := Property.File_Foreclosure_Base_v2;
@@ -235,12 +235,12 @@ NODs, LisPendens, Foreclosures by state & Year, Lis Pendens by state & Year, For
 
 //if everything in the Sequential statement runs, it will send the Success email, else it will send the Failure email
 email_alert := SEQUENTIAL(
-					 output(tbl_all_by_state,,'~thor_data400::data_insight::data_metrics::tbl_ChartsGeoMaps_all_by_state_'+ filedate +'.csv', CSV(heading(single), separator('|'),terminator('\r\n'),quote('\"')),overwrite)
-					,output(tbl_doct_typ,,'~thor_data400::data_insight::data_metrics::tbl_ChartsGeoMaps_doct_typ_'+ filedate +'.csv', CSV(heading(single), separator('|'),terminator('\r\n'),quote('\"')),overwrite)					
-					,output(tbl_deed_cat,,'~thor_data400::data_insight::data_metrics::tbl_ChartsGeoMaps_deed_cat_'+ filedate +'.csv', CSV(heading(single), separator('|'),terminator('\r\n'),quote('\"')),overwrite)										
-					,output(sort(tDates_fips_L, fips, deed_category),,'~thor_data400::data_insight::data_metrics::tbl_ChartsGeoMaps_LisPendens_by_Fips_And_Year_'+ filedate +'.csv', CSV(heading(single), separator('|'),terminator('\r\n'),quote('\"')),overwrite)					
-					,output(sort(tDates_fips_N, fips, deed_category),,'~thor_data400::data_insight::data_metrics::tbl_ChartsGeoMaps_NODs_by_Fips_And_Year_'+ filedate +'.csv', CSV(heading(single), separator('|'),terminator('\r\n'),quote('\"')),overwrite)										
-					,output(sort(tDates_fips_U, deed_category),,'~thor_data400::data_insight::data_metrics::tbl_ChartsGeoMaps_Foreclosure_by_Fips_And_Year_'+ filedate +'.csv', CSV(heading(single), separator('|'),terminator('\r\n'),quote('\"')),overwrite)										
+					 output(tbl_all_by_state,,'~thor_data400::data_insight::data_metrics::tbl_ChartsGeoMaps_all_by_state_'+ filedate +'.csv', CSV(heading(single), separator('|'),terminator('\r\n'),quote('\"')), overwrite, expire(10))
+					,output(tbl_doct_typ,,'~thor_data400::data_insight::data_metrics::tbl_ChartsGeoMaps_doct_typ_'+ filedate +'.csv', CSV(heading(single), separator('|'),terminator('\r\n'),quote('\"')), overwrite, expire(10))					
+					,output(tbl_deed_cat,,'~thor_data400::data_insight::data_metrics::tbl_ChartsGeoMaps_deed_cat_'+ filedate +'.csv', CSV(heading(single), separator('|'),terminator('\r\n'),quote('\"')), overwrite, expire(10))										
+					,output(sort(tDates_fips_L, fips, deed_category),,'~thor_data400::data_insight::data_metrics::tbl_ChartsGeoMaps_LisPendens_by_Fips_And_Year_'+ filedate +'.csv', CSV(heading(single), separator('|'),terminator('\r\n'),quote('\"')), overwrite, expire(10))					
+					,output(sort(tDates_fips_N, fips, deed_category),,'~thor_data400::data_insight::data_metrics::tbl_ChartsGeoMaps_NODs_by_Fips_And_Year_'+ filedate +'.csv', CSV(heading(single), separator('|'),terminator('\r\n'),quote('\"')), overwrite, expire(10))										
+					,output(sort(tDates_fips_U, deed_category),,'~thor_data400::data_insight::data_metrics::tbl_ChartsGeoMaps_Foreclosure_by_Fips_And_Year_'+ filedate +'.csv', CSV(heading(single), separator('|'),terminator('\r\n'),quote('\"')), overwrite, expire(10))										
 					,despray_tbl_all_by_state 
 					,despray_tbl_doct_typ 
 					,despray_tbl_deed_cat 
