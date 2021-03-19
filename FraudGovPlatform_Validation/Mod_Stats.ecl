@@ -1,4 +1,4 @@
-﻿IMPORT STD,ut,FraudGovPlatform,FraudShared,_validate;
+﻿IMPORT STD,ut,FraudGovPlatform,_validate;
 EXPORT Mod_stats := MODULE
 
 	EXPORT ValidateDelimiter(string fname, string pSeparator, string pTerminator):= module
@@ -386,10 +386,10 @@ END;
 		p1 := project(infile, transform(infile_r, self := left;));
 
 		MBS_Layout := Record
-			FraudShared.Layouts.Input.MBS;
+			FraudGovPlatform.Layouts.Input.MBS;
 			unsigned1 Deltabase := 0;
 		end;
-		MBS	:= project(FraudShared.Files().Input.MBS.sprayed(status = 1), transform(MBS_Layout, self.Deltabase := If(regexfind('DELTA', left.fdn_file_code, nocase),1,0); self := left));
+		MBS	:= project(FraudGovPlatform.Files().Input.MBS.sprayed(status = 1), transform(MBS_Layout, self.Deltabase := If(regexfind('DELTA', left.fdn_file_code, nocase),1,0); self := left));
 		
 		shared DeltabaseMbs 
 			:= join(	p1,

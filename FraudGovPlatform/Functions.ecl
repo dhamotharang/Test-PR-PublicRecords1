@@ -96,7 +96,7 @@ EXPORT Functions :=  MODULE
 										self.classification_Entity.investigated_count := right.classification_Entity.investigated_count; 
 										self:= left ) , left outer , lookup );
 
-		MBS := FraudShared.Files().Input.MBS.Sprayed; 
+		MBS := Files().Input.MBS.Sprayed; 
 
 		JMbs  := join (JCVD , MBS(status = 1) , 
 		left.source = right.fdn_file_code and 
