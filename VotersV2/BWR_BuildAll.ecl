@@ -3,7 +3,7 @@
 IMPORT std,VotersV2,_Control, tools;
 
 //Date format needs to be YYYYMMDD
-pVersion := '20210113';
+pVersion := '20210113'; //Make sure to change date on new builds
 sourceIP := 'bctlpedata11';
 sourcePath := '/data/load01/voters/sprays/';
 
