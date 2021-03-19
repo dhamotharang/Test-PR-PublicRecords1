@@ -1,30 +1,29 @@
 import dx_common;
-export layouts :=
+EXPORT layouts :=
 module
-    export	Base	:=
+    EXPORT	Base	:=
     record
         string3		Source;
         string10	PhoneNumber;		
-    end;
+    END;
     
-    export	Building	:=
+    EXPORT	Building	:=
     record
         string3		Source;
         string10	PhoneNumber;
-        UNSIGNED4 dt_effective_first;
-        UNSIGNED4 dt_effective_last;
-        UNSIGNED1 delta_ind; 
-        UNSIGNED8 record_sid;
-    end;
-    export delta_keyfield :=
+        dx_common.layout_metadata.dt_effective_first;
+        dx_common.layout_metadata.dt_effective_last;
+        dx_common.layout_metadata.delta_ind; 
+    END;
+    EXPORT delta_keyfield :=
     RECORD
         string10	PhoneNumber;
     END;
-    export Delta_payload := 
+    EXPORT Delta_payload := 
     record
         string10	PhoneNumber;
-        UNSIGNED4 dt_effective_first;
-        UNSIGNED4 dt_effective_last;
-        UNSIGNED1 delta_ind; 
-    end;
-end;
+        dx_common.layout_metadata.dt_effective_first;
+        dx_common.layout_metadata.dt_effective_last;
+        dx_common.layout_metadata.delta_ind; 
+    END;
+END;
