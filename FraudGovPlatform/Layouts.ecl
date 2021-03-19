@@ -374,7 +374,205 @@ EXPORT Layouts := MODULE
 			Sprayed.DisposableEmailDomains;
 			unsigned8		source_rec_id;
 			Provenance;
-		END;		
+		END;	
+
+		export mbs := record
+			unsigned6   fdn_file_info_id; // primary key from MBS 
+			string100   fdn_file_code; 
+			unsigned6   gc_id ; // global company id 
+			unsigned3   file_type ; // '1=Event Outcomes (Contributed), 2=Applicable Public Records, 3=Transactions, 4=Rel. Analytics'
+			string256   description; 
+			unsigned3   primary_source_entity; 
+			unsigned6   ind_type; 
+			unsigned3   update_freq;
+			unsigned6   expiration_days ;
+			unsigned6   post_contract_expiration_days ; 
+			unsigned3   status ; 
+			unsigned3   product_include ;
+			unsigned2   expectation_of_victim_entities;
+			unsigned2   suspected_discrepancy;
+			unsigned2   confidence_that_activity_was_deceitful;
+			unsigned2   workflow_stage_committed;
+			unsigned2   workflow_stage_detected;
+			unsigned2   channels;
+			unsigned2   threat;
+			unsigned2   alert_level;
+			unsigned2   entity_type;
+			unsigned2   entity_sub_type;
+			unsigned2   role;
+			unsigned2   evidence; 
+			string20    date_added ; 
+			string30    user_added; 
+			string20    date_changed ; 
+			string30    user_changed; 
+			string2			Customer_State := '';
+			string3			Customer_County := '';	
+			string 			Customer_Vertical := '';
+		end; 
+
+		Export MbsNewGcIdExclusion := record 
+			unsigned6  fdn_file_gc_exclusion_id ; 
+			unsigned6  fdn_file_info_id; 
+			unsigned6  exclusion_id; 
+			string20   exclusion_id_type; 
+			unsigned3   status; // 1=Active, 2=Expired/not-active',
+			string20    date_added; 
+			string30    user_added; 
+			string20    date_changed; 
+			string30    user_changed; 	
+		End;
+		
+		Export MbsIndTypeExclusion := record 
+
+			unsigned6  fdn_file_ind_type_exclusion_id ; 
+			unsigned6  fdn_file_info_id ;
+			unsigned6  Ind_type; 
+			unsigned3  status; // 1=Active, 2=Expired/not-active',
+			string20   date_added; 
+			string30   user_added; 
+			string20   date_changed; 
+			string30   user_changed; 
+		End; 
+
+		Export   MbsFdnMasterIDIndTypeInclusion    := record 
+			unsigned6	fdn_ind_type_gc_id_inclusion;  
+			unsigned6	fdn_file_info_id;                         
+			unsigned6	ind_type;                                    
+			unsigned6 inclusion_id;                             
+			string20	inclusion_type;                           
+			unsigned3	status; //1=Active, 2=Expired/not-active
+			string20 	date_added;                              
+			string30	user_added;                              
+			string20	date_changed;                          
+			string30	user_changed;                             
+		END;
+
+		Export  MbsProductInclude := Record 
+		unsigned6  fdn_file_product_include_id; 
+			unsigned6  fdn_file_info_id;
+			unsigned6  product_id ; 
+			unsigned3  status ; 	
+			string20   date_added; 
+			string30   user_added; 
+			string20   date_changed; 
+			string30   user_changed; 
+
+		End; 
+
+		Export   MBSSourceGcExclusion := record 
+		unsigned6  gc_id ; 
+			unsigned6  product_id ; 
+			unsigned6  company_id ; 
+			unsigned3  status ; 
+			string20   date_added; 
+			string30   user_added; 
+			string20   date_changed; 
+			string30   user_changed; 
+		End; 
+
+		Export   MBSFdnIndType         := record 
+		unsigned6  ind_type ; 
+			string255  description ;
+			unsigned3  status ; 
+			string20   date_added; 
+			string30   user_added; 
+			string20   date_changed; 
+			string30   user_changed; 
+
+		End; 
+
+		Export   MBSFdnCCID         := record 
+		unsigned6  cc_id; 
+			unsigned6  gc_id;
+			string30   account_id; 
+		End; 
+
+		Export   MBSFdnHHID         := record 
+		unsigned6  gc_id; 
+			string30   sub_account_id;
+			unsigned6  hh_id;
+		End;
+
+		Export MbsFdnMasterIdExcl := record 
+			unsigned6  fdn_file_gc_exclusion_id ; 
+			unsigned6  fdn_file_info_id; 
+			unsigned6  exclusion_id; 
+			string20   exclusion_id_type; 
+			data16     FdnMasterId;    
+			unsigned3  status; // 1=Active, 2=Expired/not-active',
+			string20   date_added; 
+			string30   user_added; 
+			string20   date_changed; 
+			string30   user_changed; 
+		End; 
+
+		Export   MbsFdnMasterIDIndTypeIncl    := record 
+			unsigned6	fdn_ind_type_gc_id_inclusion;  
+			unsigned6	fdn_file_info_id;                         
+			unsigned6	ind_type;                                    
+			unsigned6 	inclusion_id;                             
+			string20	inclusion_type; 
+			data16     	FdnMasterId;	
+			unsigned3	status; //1=Active, 2=Expired/not-active
+			string20 	date_added;                              
+			string30	user_added;                              
+			string20	date_changed;                          
+			string30	user_changed;                             
+		END;
+
+		Export FDNMasterID := record 
+		unsigned6  gc_id; 
+		unsigned6  hh_id; 
+		unsigned6  cc_id; 
+			unsigned6  GC_CC_HH_ID;
+		string10   id_type;
+		string10   FDNMasterID_Type;
+			data16     FdnMasterId;    
+		End; 	
+			
+		Export MBSTableCol := record 
+		unsigned3  table_column_id; 
+		qstring255 table_name; 
+		qstring255 column_name; 
+			unsigned2  is_column_value;
+		End;	
+			
+		Export MBSColValDesc := record 
+		unsigned3  column_value_desc_id; 
+		unsigned3  table_column_id; 
+		qstring255 desc_value;
+			unsigned2  status;
+		qstring300 description;
+		End; 		
+			
+		Export   MBSmarketAppend       := record 
+			string    company_id;
+			string 	  app_type;
+			string    market;
+			string    sub_market;
+			string    vertical ;
+			string    main_country_code;
+			string    bill_country_code;
+		END;
+
+		Export	MbsVelocityRules		:= record
+			unsigned6 ruleNum;
+			unsigned6	gc_id;
+			string60	fragment;
+			string100 fragment_description;
+			string60	contributionType;
+			string100	contributionTypeDescription;
+			unsigned2 fragment_weight;
+			unsigned2	category_weight;
+			unsigned2	minCnt;
+			unsigned2	maxTime;
+			string20	timeUnit;
+			unsigned2	status;
+			string25	date_added;
+			string25	date_changed;
+			string60	user_added;
+			string60	user_changed;
+		END;
 	END;
 
 	EXPORT Base := MODULE

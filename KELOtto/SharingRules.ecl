@@ -1,7 +1,7 @@
 ﻿#constant('Platform','FraudGov');
-import Fraudshared;
+import FraudGovPlatform;
 
-OttoRules := Fraudshared.Files('').input.mbsfdnmasteridindtypeinclusion.sprayed(inclusion_type = 'GCID' AND status = 1);
+OttoRules := FraudGovPlatform.Files('').input.mbsfdnmasteridindtypeinclusion.sprayed(inclusion_type = 'GCID' AND status = 1);
 
 // Prod Reference for testing in dataland.
 //OttoRules := Dataset('~foreign::10.173.44.105::fraudgov::in::sprayed::mbsfdnmasteridindtypeinclusion',Fraudshared.Layouts.input.mbsfdnmasteridindtypeinclusion,csv(SEPARATOR('|\t|'),QUOTE(''),TERMINATOR('|\n')));
