@@ -1,7 +1,7 @@
 ﻿IMPORT _control,UtilFile, data_services, STD;
-export ChartsGeoMaps_Utility(string pHostname, string pTarget, string pContact ='\' \'') := function
+export ChartsGeoMaps_Utility(string pHostname, string pTarget, string pContact ='\' \'', STRING today = (STRING8)STD.Date.Today()) := function
 
-filedate := (STRING8)Std.Date.Today();
+filedate := today;
 
 utility_full := dataset(data_services.foreign_prod +'thor_data400::base::utility_file', UtilFile.layout_util.base, flat);
 utility_did := dataset(data_services.foreign_prod + 'thor_data400::base::utility_DID', UtilFile.Layout_DID_Out, flat);
@@ -29,8 +29,8 @@ despray_util_tbl := STD.File.DeSpray('~thor_data400::data_insight::data_metrics:
 
 //if everything in the Sequential statement runs, it will send the Success email, else it will send the Failure email
 email_alert := SEQUENTIAL(
-					output(srt_util_tbl,,'~thor_data400::data_insight::data_metrics::tbl_ChartsGeoMaps_Utility_By_State_'+ filedate +'.csv', csv(heading(single), separator('|'),terminator('\r\n'),quote('\"')),overwrite)
-					//,output(srt_addr_tbl,,'~thor_data400::data_insight::data_metrics::tbl_ChartsGeoMaps_Utility_By_State_AddrType_'+ filedate +'.csv', csv(heading(single), separator('|'),terminator('\r\n'),quote('\"')),overwrite)
+					output(srt_util_tbl,,'~thor_data400::data_insight::data_metrics::tbl_ChartsGeoMaps_Utility_By_State_'+ filedate +'.csv', csv(heading(single), separator('|'),terminator('\r\n'),quote('\"')), overwrite, expire(10))
+					//,output(srt_addr_tbl,,'~thor_data400::data_insight::data_metrics::tbl_ChartsGeoMaps_Utility_By_State_AddrType_'+ filedate +'.csv', csv(heading(single), separator('|'),terminator('\r\n'),quote('\"')), overwrite, expire(10))
 					,despray_util_tbl
 					//,despray_addr_tbl
 					):

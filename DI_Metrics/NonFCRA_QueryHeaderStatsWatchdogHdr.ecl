@@ -2,9 +2,9 @@
 //W20200810-174548	Prod 
 
 IMPORT STD, _control, Header, Doxie, watchdog, ut, data_services;
-export NonFCRA_QueryHeaderStatsWatchdogHdr(string pHostname, string pTarget, string pContact ='\' \'') := function
+export NonFCRA_QueryHeaderStatsWatchdogHdr(string pHostname, string pTarget, string pContact ='\' \'', STRING today = (STRING8)STD.Date.Today()) := function
 
-filedate := (STRING8)Std.Date.Today();
+filedate := today;
 
 Layout_hdr_data_key := RECORD
   unsigned6 s_did;
@@ -406,29 +406,29 @@ despray_DIDAddressHasNameAndAddressAndPhoneNot1824   := STD.File.DeSpray('~thor_
 
 //if everything in the Sequential statement runs, it will send the Success email, else it will send the Failure email
 email_alert := SEQUENTIAL(
-					output(tbl_HeaderCoreSegmentsJoin,,'~thor_data400::data_insight::data_metrics::tbl_NonFCRA_HeaderCoreSegmentsJoin_'+ filedate +'.csv', csv(heading(single), separator('|'),terminator('\r\n'),quote('\"')),overwrite)
-					,output(tbl_WatchDogHeaderCoreSegments,,'~thor_data400::data_insight::data_metrics::tbl_NonFCRA_WatchDogHeaderCoreSegments_'+ filedate +'.csv', csv(heading(single), separator('|'),terminator('\r\n'),quote('\"')),overwrite)
-					,output(tbl_DIDAddressHasNameAndAddress,,'~thor_data400::data_insight::data_metrics::tbl_NonFCRA_DIDAddressHasNameAndAddress_'+ filedate +'.csv', csv(heading(single), separator('|'),terminator('\r\n'),quote('\"')),overwrite)
-					,output(tbl_DIDAddressHasNameAndAddressAndDOB,,'~thor_data400::data_insight::data_metrics::tbl_NonFCRA_DIDAddressHasNameAndAddressAndDOB_'+ filedate +'.csv', csv(heading(single), separator('|'),terminator('\r\n'),quote('\"')),overwrite)
-					,output(tbl_DIDAddressHasNameAndAddressAndDL,,'~thor_data400::data_insight::data_metrics::tbl_NonFCRA_DIDAddressHasNameAndAddressAndDL_'+ filedate +'.csv', csv(heading(single), separator('|'),terminator('\r\n'),quote('\"')),overwrite)
-					,output(tbl_DIDAddressHasNameAndAddressAndSSN,,'~thor_data400::data_insight::data_metrics::tbl_NonFCRA_DIDAddressHasNameAndAddressAndSSN_'+ filedate +'.csv', csv(heading(single), separator('|'),terminator('\r\n'),quote('\"')),overwrite)
-					,output(tbl_DIDAddressHasNameAndAddressAndSSNandDOB,,'~thor_data400::data_insight::data_metrics::tbl_NonFCRA_DIDAddressHasNameAndAddressAndSSNandDOB_'+ filedate +'.csv', csv(heading(single), separator('|'),terminator('\r\n'),quote('\"')),overwrite)
-					,output(tbl_DIDAddressHasNameAndAddressAndSSNandDOBAndDL,,'~thor_data400::data_insight::data_metrics::tbl_NonFCRA_DIDAddressHasNameAndAddressAndSSNandDOBAndDL_'+ filedate +'.csv', csv(heading(single), separator('|'),terminator('\r\n'),quote('\"')),overwrite)
-					,output(tbl_DIDAddressHasNameAndAddressAndPhone,,'~thor_data400::data_insight::data_metrics::tbl_NonFCRA_DIDAddressHasNameAndAddressAndPhone_'+ filedate +'.csv', csv(heading(single), separator('|'),terminator('\r\n'),quote('\"')),overwrite)
-					,output(tbl_DIDAddressHasNameAndAddress1824,,'~thor_data400::data_insight::data_metrics::tbl_NonFCRA_DIDAddressHasNameAndAddress1824_'+ filedate +'.csv', csv(heading(single), separator('|'),terminator('\r\n'),quote('\"')),overwrite)
-					,output(tbl_DIDAddressHasNameAndAddressAndDOB1824,,'~thor_data400::data_insight::data_metrics::tbl_NonFCRA_DIDAddressHasNameAndAddressAndDOB1824_'+ filedate +'.csv', csv(heading(single), separator('|'),terminator('\r\n'),quote('\"')),overwrite)
-					,output(tbl_DIDAddressHasNameAndAddressAndDL1824,,'~thor_data400::data_insight::data_metrics::tbl_NonFCRA_DIDAddressHasNameAndAddressAndDL1824_'+ filedate +'.csv', csv(heading(single), separator('|'),terminator('\r\n'),quote('\"')),overwrite)
-					,output(tbl_DIDAddressHasNameAndAddressAndSSN1824,,'~thor_data400::data_insight::data_metrics::tbl_NonFCRA_DIDAddressHasNameAndAddressAndSSN1824_'+ filedate +'.csv', csv(heading(single), separator('|'),terminator('\r\n'),quote('\"')),overwrite)
-					,output(tbl_DIDAddressHasNameAndAddressAndSSNandDOB1824,,'~thor_data400::data_insight::data_metrics::tbl_NonFCRA_DIDAddressHasNameAndAddressAndSSNandDOB1824_'+ filedate +'.csv', csv(heading(single), separator('|'),terminator('\r\n'),quote('\"')),overwrite)
-					,output(tbl_DIDAddressHasNameAndAddressAndSSNandDOBAndDL1824,,'~thor_data400::data_insight::data_metrics::tbl_NonFCRA_DIDAddressHasNameAndAddressAndSSNandDOBAndDL1824_'+ filedate +'.csv', csv(heading(single), separator('|'),terminator('\r\n'),quote('\"')),overwrite)
-					,output(tbl_DIDAddressHasNameAndAddressAndPhone1824,,'~thor_data400::data_insight::data_metrics::tbl_NonFCRA_DIDAddressHasNameAndAddressAndPhone1824_'+ filedate +'.csv', csv(heading(single), separator('|'),terminator('\r\n'),quote('\"')),overwrite)
-					,output(tbl_DIDAddressHasNameAndAddressNot1824,,'~thor_data400::data_insight::data_metrics::tbl_NonFCRA_DIDAddressHasNameAndAddressNot1824_'+ filedate +'.csv', csv(heading(single), separator('|'),terminator('\r\n'),quote('\"')),overwrite)
-					,output(tbl_DIDAddressHasNameAndAddressAndDOBNot1824,,'~thor_data400::data_insight::data_metrics::tbl_NonFCRA_DIDAddressHasNameAndAddressAndDOBNot1824_'+ filedate +'.csv', csv(heading(single), separator('|'),terminator('\r\n'),quote('\"')),overwrite)
-					,output(tbl_DIDAddressHasNameAndAddressAndDLNot1824,,'~thor_data400::data_insight::data_metrics::tbl_NonFCRA_DIDAddressHasNameAndAddressAndDLNot1824_'+ filedate +'.csv', csv(heading(single), separator('|'),terminator('\r\n'),quote('\"')),overwrite)
-					,output(tbl_DIDAddressHasNameAndAddressAndSSNNot1824,,'~thor_data400::data_insight::data_metrics::tbl_NonFCRA_DIDAddressHasNameAndAddressAndSSNNot1824_'+ filedate +'.csv', csv(heading(single), separator('|'),terminator('\r\n'),quote('\"')),overwrite)
-					,output(tbl_DIDAddressHasNameAndAddressAndSSNandDOBNot1824,,'~thor_data400::data_insight::data_metrics::tbl_NonFCRA_DIDAddressHasNameAndAddressAndSSNandDOBNot1824_'+ filedate +'.csv', csv(heading(single), separator('|'),terminator('\r\n'),quote('\"')),overwrite)
-					,output(tbl_DIDAddressHasNameAndAddressAndSSNandDOBAndDLNot1824,,'~thor_data400::data_insight::data_metrics::tbl_NonFCRA_DIDAddressHasNameAndAddressAndSSNandDOBAndDLNot1824_'+ filedate +'.csv', csv(heading(single), separator('|'),terminator('\r\n'),quote('\"')),overwrite)
-					,output(tbl_DIDAddressHasNameAndAddressAndPhoneNot1824,,'~thor_data400::data_insight::data_metrics::tbl_NonFCRA_DIDAddressHasNameAndAddressAndPhoneNot1824_'+ filedate +'.csv', csv(heading(single), separator('|'),terminator('\r\n'),quote('\"')),overwrite)
+					output(tbl_HeaderCoreSegmentsJoin,,'~thor_data400::data_insight::data_metrics::tbl_NonFCRA_HeaderCoreSegmentsJoin_'+ filedate +'.csv', csv(heading(single), separator('|'),terminator('\r\n'),quote('\"')), overwrite, expire(10))
+					,output(tbl_WatchDogHeaderCoreSegments,,'~thor_data400::data_insight::data_metrics::tbl_NonFCRA_WatchDogHeaderCoreSegments_'+ filedate +'.csv', csv(heading(single), separator('|'),terminator('\r\n'),quote('\"')), overwrite, expire(10))
+					,output(tbl_DIDAddressHasNameAndAddress,,'~thor_data400::data_insight::data_metrics::tbl_NonFCRA_DIDAddressHasNameAndAddress_'+ filedate +'.csv', csv(heading(single), separator('|'),terminator('\r\n'),quote('\"')), overwrite, expire(10))
+					,output(tbl_DIDAddressHasNameAndAddressAndDOB,,'~thor_data400::data_insight::data_metrics::tbl_NonFCRA_DIDAddressHasNameAndAddressAndDOB_'+ filedate +'.csv', csv(heading(single), separator('|'),terminator('\r\n'),quote('\"')), overwrite, expire(10))
+					,output(tbl_DIDAddressHasNameAndAddressAndDL,,'~thor_data400::data_insight::data_metrics::tbl_NonFCRA_DIDAddressHasNameAndAddressAndDL_'+ filedate +'.csv', csv(heading(single), separator('|'),terminator('\r\n'),quote('\"')), overwrite, expire(10))
+					,output(tbl_DIDAddressHasNameAndAddressAndSSN,,'~thor_data400::data_insight::data_metrics::tbl_NonFCRA_DIDAddressHasNameAndAddressAndSSN_'+ filedate +'.csv', csv(heading(single), separator('|'),terminator('\r\n'),quote('\"')), overwrite, expire(10))
+					,output(tbl_DIDAddressHasNameAndAddressAndSSNandDOB,,'~thor_data400::data_insight::data_metrics::tbl_NonFCRA_DIDAddressHasNameAndAddressAndSSNandDOB_'+ filedate +'.csv', csv(heading(single), separator('|'),terminator('\r\n'),quote('\"')), overwrite, expire(10))
+					,output(tbl_DIDAddressHasNameAndAddressAndSSNandDOBAndDL,,'~thor_data400::data_insight::data_metrics::tbl_NonFCRA_DIDAddressHasNameAndAddressAndSSNandDOBAndDL_'+ filedate +'.csv', csv(heading(single), separator('|'),terminator('\r\n'),quote('\"')), overwrite, expire(10))
+					,output(tbl_DIDAddressHasNameAndAddressAndPhone,,'~thor_data400::data_insight::data_metrics::tbl_NonFCRA_DIDAddressHasNameAndAddressAndPhone_'+ filedate +'.csv', csv(heading(single), separator('|'),terminator('\r\n'),quote('\"')), overwrite, expire(10))
+					,output(tbl_DIDAddressHasNameAndAddress1824,,'~thor_data400::data_insight::data_metrics::tbl_NonFCRA_DIDAddressHasNameAndAddress1824_'+ filedate +'.csv', csv(heading(single), separator('|'),terminator('\r\n'),quote('\"')), overwrite, expire(10))
+					,output(tbl_DIDAddressHasNameAndAddressAndDOB1824,,'~thor_data400::data_insight::data_metrics::tbl_NonFCRA_DIDAddressHasNameAndAddressAndDOB1824_'+ filedate +'.csv', csv(heading(single), separator('|'),terminator('\r\n'),quote('\"')), overwrite, expire(10))
+					,output(tbl_DIDAddressHasNameAndAddressAndDL1824,,'~thor_data400::data_insight::data_metrics::tbl_NonFCRA_DIDAddressHasNameAndAddressAndDL1824_'+ filedate +'.csv', csv(heading(single), separator('|'),terminator('\r\n'),quote('\"')), overwrite, expire(10))
+					,output(tbl_DIDAddressHasNameAndAddressAndSSN1824,,'~thor_data400::data_insight::data_metrics::tbl_NonFCRA_DIDAddressHasNameAndAddressAndSSN1824_'+ filedate +'.csv', csv(heading(single), separator('|'),terminator('\r\n'),quote('\"')), overwrite, expire(10))
+					,output(tbl_DIDAddressHasNameAndAddressAndSSNandDOB1824,,'~thor_data400::data_insight::data_metrics::tbl_NonFCRA_DIDAddressHasNameAndAddressAndSSNandDOB1824_'+ filedate +'.csv', csv(heading(single), separator('|'),terminator('\r\n'),quote('\"')), overwrite, expire(10))
+					,output(tbl_DIDAddressHasNameAndAddressAndSSNandDOBAndDL1824,,'~thor_data400::data_insight::data_metrics::tbl_NonFCRA_DIDAddressHasNameAndAddressAndSSNandDOBAndDL1824_'+ filedate +'.csv', csv(heading(single), separator('|'),terminator('\r\n'),quote('\"')), overwrite, expire(10))
+					,output(tbl_DIDAddressHasNameAndAddressAndPhone1824,,'~thor_data400::data_insight::data_metrics::tbl_NonFCRA_DIDAddressHasNameAndAddressAndPhone1824_'+ filedate +'.csv', csv(heading(single), separator('|'),terminator('\r\n'),quote('\"')), overwrite, expire(10))
+					,output(tbl_DIDAddressHasNameAndAddressNot1824,,'~thor_data400::data_insight::data_metrics::tbl_NonFCRA_DIDAddressHasNameAndAddressNot1824_'+ filedate +'.csv', csv(heading(single), separator('|'),terminator('\r\n'),quote('\"')), overwrite, expire(10))
+					,output(tbl_DIDAddressHasNameAndAddressAndDOBNot1824,,'~thor_data400::data_insight::data_metrics::tbl_NonFCRA_DIDAddressHasNameAndAddressAndDOBNot1824_'+ filedate +'.csv', csv(heading(single), separator('|'),terminator('\r\n'),quote('\"')), overwrite, expire(10))
+					,output(tbl_DIDAddressHasNameAndAddressAndDLNot1824,,'~thor_data400::data_insight::data_metrics::tbl_NonFCRA_DIDAddressHasNameAndAddressAndDLNot1824_'+ filedate +'.csv', csv(heading(single), separator('|'),terminator('\r\n'),quote('\"')), overwrite, expire(10))
+					,output(tbl_DIDAddressHasNameAndAddressAndSSNNot1824,,'~thor_data400::data_insight::data_metrics::tbl_NonFCRA_DIDAddressHasNameAndAddressAndSSNNot1824_'+ filedate +'.csv', csv(heading(single), separator('|'),terminator('\r\n'),quote('\"')), overwrite, expire(10))
+					,output(tbl_DIDAddressHasNameAndAddressAndSSNandDOBNot1824,,'~thor_data400::data_insight::data_metrics::tbl_NonFCRA_DIDAddressHasNameAndAddressAndSSNandDOBNot1824_'+ filedate +'.csv', csv(heading(single), separator('|'),terminator('\r\n'),quote('\"')), overwrite, expire(10))
+					,output(tbl_DIDAddressHasNameAndAddressAndSSNandDOBAndDLNot1824,,'~thor_data400::data_insight::data_metrics::tbl_NonFCRA_DIDAddressHasNameAndAddressAndSSNandDOBAndDLNot1824_'+ filedate +'.csv', csv(heading(single), separator('|'),terminator('\r\n'),quote('\"')), overwrite, expire(10))
+					,output(tbl_DIDAddressHasNameAndAddressAndPhoneNot1824,,'~thor_data400::data_insight::data_metrics::tbl_NonFCRA_DIDAddressHasNameAndAddressAndPhoneNot1824_'+ filedate +'.csv', csv(heading(single), separator('|'),terminator('\r\n'),quote('\"')), overwrite, expire(10))
 					,despray_HeaderCoreSegmentsJoin
 					,despray_WatchDogHeaderCoreSegments
 					,despray_DIDAddressHasNameAndAddress
