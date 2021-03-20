@@ -1,9 +1,9 @@
 ﻿//--- Marriage & Divorce Chart & Geo Map ---//
 
 IMPORT _control,marriage_divorce_v2, data_services, STD, ut;
-export ChartsGeoMaps_Marriage_Divorce(string pHostname, string pTarget, string pContact ='\' \'') := function
+export ChartsGeoMaps_Marriage_Divorce(string pHostname, string pTarget, string pContact ='\' \'', STRING today = (STRING8)STD.Date.Today()) := function
 
-filedate := (STRING8)Std.Date.Today();
+filedate := today;
 
 //3' for marriages and '7' for divorces
 mdv_base := marriage_divorce_v2.file_mar_div_base;
@@ -48,10 +48,10 @@ W20190219-131704-prod (marriage by state)
 
 //if everything in the Sequential statement runs, it will send the Success email, else it will send the Failure email
 email_alert := SEQUENTIAL(
-					output(sort(mar_age_table, party1_age),,'~thor_data400::data_insight::data_metrics::tbl_ChartsGeoMaps_MarriageByAgeChart_'+ filedate +'.csv', csv(heading(single), separator('|'),terminator('\r\n'),quote('\"')),overwrite)
-					,output(sort(div_age_table, party1_age),,'~thor_data400::data_insight::data_metrics::tbl_ChartsGeoMaps_DivorcesByAgeChart_'+ filedate +'.csv', csv(heading(single), separator('|'),terminator('\r\n'),quote('\"')),overwrite)
-					,output(sort(mar_state_tbl, state_origin),,'~thor_data400::data_insight::data_metrics::tbl_ChartsGeoMaps_MarriagesByState_'+ filedate +'.csv', csv(heading(single), separator('|'),terminator('\r\n'),quote('\"')),overwrite)
-					,output(sort(div_state_tbl, state_origin),,'~thor_data400::data_insight::data_metrics::tbl_ChartsGeoMaps_DivorcesByState_'+ filedate +'.csv', csv(heading(single), separator('|'),terminator('\r\n'),quote('\"')),overwrite)					
+					output(sort(mar_age_table, party1_age),,'~thor_data400::data_insight::data_metrics::tbl_ChartsGeoMaps_MarriageByAgeChart_'+ filedate +'.csv', csv(heading(single), separator('|'),terminator('\r\n'),quote('\"')), overwrite, expire(10))
+					,output(sort(div_age_table, party1_age),,'~thor_data400::data_insight::data_metrics::tbl_ChartsGeoMaps_DivorcesByAgeChart_'+ filedate +'.csv', csv(heading(single), separator('|'),terminator('\r\n'),quote('\"')), overwrite, expire(10))
+					,output(sort(mar_state_tbl, state_origin),,'~thor_data400::data_insight::data_metrics::tbl_ChartsGeoMaps_MarriagesByState_'+ filedate +'.csv', csv(heading(single), separator('|'),terminator('\r\n'),quote('\"')), overwrite, expire(10))
+					,output(sort(div_state_tbl, state_origin),,'~thor_data400::data_insight::data_metrics::tbl_ChartsGeoMaps_DivorcesByState_'+ filedate +'.csv', csv(heading(single), separator('|'),terminator('\r\n'),quote('\"')), overwrite, expire(10))					
 					,despray_mar_age_tbl
 					,despray_div_age_tbl
 					,despray_mar_state_tbl

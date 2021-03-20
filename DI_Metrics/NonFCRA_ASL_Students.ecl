@@ -3,9 +3,9 @@
 //W20200806-092127	Prod 
 
 IMPORT _control, data_services, alloymedia_student_list, american_student_list, STD, ut;
-export NonFCRA_ASL_Students(string pHostname, string pTarget, string pContact ='\' \'') := function
+export NonFCRA_ASL_Students(string pHostname, string pTarget, string pContact ='\' \'', STRING today = (STRING8)STD.Date.Today()) := function
 
-filedate := (STRING8)Std.Date.Today();
+filedate := today;
 
 //NonFCRA Alloy Student Data
 Key_DID_AlloyStudent := PULL(AlloyMedia_student_list.Key_DID);
@@ -46,7 +46,7 @@ despray_student_tbl := STD.File.DeSpray('~thor_data400::data_insight::data_metri
 //if everything in the Sequential statement runs, it will send the Success email, else it will send the Failure email
 email_alert := SEQUENTIAL(
 					output(srt_tbl_All_Students_No_HighSchool_DIDs,,'~thor_data400::data_insight::data_metrics::tbl_NonFCRA_Students_College_LexID_'+ filedate +'.csv'
-					,csv(heading(single), separator('|'),terminator('\r\n'),quote('\"')),overwrite)
+					,csv(heading(single), separator('|'),terminator('\r\n'),quote('\"')), overwrite, expire(10))
 					,despray_student_tbl):
 					Success(FileServices.SendEmail(pContact, 'NonFCRA Group: NonFCRA_ASL_Students Build Succeeded', workunit + ': Build complete.' + filedate)),
 					Failure(FileServices.SendEmail(pContact, 'NonFCRA Group:  NonFCRA_ASL_Students Build Failed', workunit + filedate + '\n' + FAILMESSAGE)
