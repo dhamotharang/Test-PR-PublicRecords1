@@ -2,9 +2,9 @@
 //W20200806-094150 Prod
 
 IMPORT _Control, LiensV2, STD, ut;
-EXPORT NonFCRA_LiensV2_Evictions(string pHostname, string pTarget, string pContact ='\' \'') := function
+EXPORT NonFCRA_LiensV2_Evictions(string pHostname, string pTarget, string pContact ='\' \'', STRING today = (STRING8)STD.Date.Today()) := function
 
-filedate := (STRING8)Std.Date.Today();
+filedate := today;
 
 //thor_data400::key::liensv2::fcra::20141219::main::tmsid.rmsid
 Key_LiensV2_main := PULL(LiensV2.key_liens_main_ID(eviction = 'Y'));
@@ -48,8 +48,8 @@ despray_evic_2010_tbl  := STD.File.DeSpray('~thor_data400::data_insight::data_me
 
 //if everything in the Sequential statement runs, it will send the Success email, else it will send the Failure email
 email_alert := SEQUENTIAL(
-					output(sort(tbl_Key_LiensV2_Evic_filings, filing_jurisdiction, eviction, skew(1.0)),,'~thor_data400::data_insight::data_metrics::tbl_Key_LiensV2_all_evictions_'+ filedate +'.csv', csv(heading(single), separator('|'),terminator('\r\n'),quote('\"')),overwrite)
-					,output(sort(tbl_Key_LiensV2_2010_filings, -filing_period,filing_jurisdiction, eviction, skew(1.0)),,'~thor_data400::data_insight::data_metrics::tbl_Key_LiensV2_2010_evictions_'+ filedate +'.csv', csv(heading(single), separator('|'),terminator('\r\n'),quote('\"')),overwrite)
+					output(sort(tbl_Key_LiensV2_Evic_filings, filing_jurisdiction, eviction, skew(1.0)),,'~thor_data400::data_insight::data_metrics::tbl_Key_LiensV2_all_evictions_'+ filedate +'.csv', csv(heading(single), separator('|'),terminator('\r\n'),quote('\"')), overwrite, expire(10))
+					,output(sort(tbl_Key_LiensV2_2010_filings, -filing_period,filing_jurisdiction, eviction, skew(1.0)),,'~thor_data400::data_insight::data_metrics::tbl_Key_LiensV2_2010_evictions_'+ filedate +'.csv', csv(heading(single), separator('|'),terminator('\r\n'),quote('\"')), overwrite, expire(10))
 					,despray_evic_all_tbl
 					,despray_evic_2010_tbl
 					):

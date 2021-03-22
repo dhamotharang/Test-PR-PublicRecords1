@@ -1,7 +1,7 @@
 ﻿IMPORT _control,UCCV2, data_services, STD; 
-export ChartsGeoMaps_UCC(string pHostname, string pTarget, string pContact ='\' \'') := function
+export ChartsGeoMaps_UCC(string pHostname, string pTarget, string pContact ='\' \'', STRING today = (STRING8)STD.Date.Today()) := function
 
-filedate := (STRING8)Std.Date.Today();
+filedate := today;
 
 //Filing Type
 ucc_base := UCCV2.File_UCC_Main_Base;
@@ -28,10 +28,10 @@ despray_map_tbl := STD.File.DeSpray('~thor_data400::data_insight::data_metrics::
 //if everything in the Sequential statement runs, it will send the Success email, else it will send the Failure email
 email_alert := SEQUENTIAL(
 					//Filing Type
-					output(srt_tbl,,'~thor_data400::data_insight::data_metrics::tbl_ChartsGeoMaps_UCC_By_Filing_Type_'+ filedate +'.csv', csv(heading(single), separator('|'),terminator('\r\n'),quote('\"')),overwrite)
+					output(srt_tbl,,'~thor_data400::data_insight::data_metrics::tbl_ChartsGeoMaps_UCC_By_Filing_Type_'+ filedate +'.csv', csv(heading(single), separator('|'),terminator('\r\n'),quote('\"')), overwrite, expire(10))
 					,despray_ucc_tbl
 					//Geo Map
-					,output(srt_map,,'~thor_data400::data_insight::data_metrics::tbl_ChartsGeoMaps_UCC_By_State_'+ filedate +'.csv', csv(heading(single), separator('|'),terminator('\r\n'),quote('\"')),overwrite)
+					,output(srt_map,,'~thor_data400::data_insight::data_metrics::tbl_ChartsGeoMaps_UCC_By_State_'+ filedate +'.csv', csv(heading(single), separator('|'),terminator('\r\n'),quote('\"')), overwrite, expire(10))
 					,despray_map_tbl):
 					Success(FileServices.SendEmail(pContact, 'ChartsGeoMaps Group: ChartsGeoMaps_UCC Build Succeeded', workunit + ': Build complete.' + filedate)),
 					Failure(FileServices.SendEmail(pContact, 'ChartsGeoMaps Group: ChartsGeoMaps_UCC Build Failed', workunit + filedate + '\n' + FAILMESSAGE)

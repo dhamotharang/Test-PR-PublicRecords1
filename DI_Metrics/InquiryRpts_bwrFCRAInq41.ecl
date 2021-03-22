@@ -1,7 +1,7 @@
 ﻿IMPORT _control, Inquiry_AccLogs, data_services, STD, ut; 
-export InquiryRpts_bwrFCRAInq41(string pHostname, string pTarget, string pContact ='\' \'') := function
+export InquiryRpts_bwrFCRAInq41(string pHostname, string pTarget, string pContact ='\' \'', STRING today = (STRING8)STD.Date.Today()) := function
 
-filedate := (STRING8)Std.Date.Today() : INDEPENDENT;
+filedate := today;
 
 bsversion := 41;
 isfcra := TRUE;
@@ -212,8 +212,8 @@ despray_InqByMonth :=STD.File.DeSpray('~thor_data400::data_insight::data_metrics
 
 //if everything in the Sequential statement runs, it will send the Success email, else it will send the Failure email
 email_alert := SEQUENTIAL(
-					 output(srt_InqADLsByMonth,,'~thor_data400::data_insight::data_metrics::tbl_InquiryRpts_FCRAInq41_InqADLsByMonth_'+ filedate +'.csv', csv(heading(single), separator('|'),terminator('\r\n'),quote('\"')),overwrite)
-					,output(srt_InqByMonth,,'~thor_data400::data_insight::data_metrics::tbl_InquiryRpts_FCRAInq41_InqByMonth_'+ filedate +'.csv', csv(heading(single), separator('|'),terminator('\r\n'),quote('\"')),overwrite)					
+					 output(srt_InqADLsByMonth,,'~thor_data400::data_insight::data_metrics::tbl_InquiryRpts_FCRAInq41_InqADLsByMonth_'+ filedate +'.csv', csv(heading(single), separator('|'),terminator('\r\n'),quote('\"')), overwrite, expire(10))
+					,output(srt_InqByMonth,,'~thor_data400::data_insight::data_metrics::tbl_InquiryRpts_FCRAInq41_InqByMonth_'+ filedate +'.csv', csv(heading(single), separator('|'),terminator('\r\n'),quote('\"')), overwrite, expire(10))					
 					,despray_InqADLsByMonth
 					,despray_InqByMonth):
 					Success(FileServices.SendEmail(pContact, 'InquiryRpts Group: InquiryRpts_bwrFCRAInq41 Build Succeeded', workunit + ': Build complete.' + filedate)),
