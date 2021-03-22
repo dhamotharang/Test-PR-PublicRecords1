@@ -480,7 +480,7 @@
 			SELF.deceased_source := MAP(rowDeceased.death_rec_src = 'SSA' => 'SSA',
 										rowDeceased.death_rec_src <> 'SSA' AND rowDeceased.death_rec_src <> '' => 'SUP',
 										'');
-			SELF.isdeepdive := rowDeceased.isdeepdive;
+			SELF.dcd_isdeepdive := rowDeceased.isdeepdive;
 			SELF.dcd_filedate := rowDeceased.filedate;
 			SELF.state_death_flag := rowDeceased.state_death_flag;
 			SELF.state_death_id := rowDeceased.state_death_id;
