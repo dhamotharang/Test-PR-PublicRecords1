@@ -18,7 +18,11 @@
 				
 				self.Prepped_addr1 := addr.Prepped_addr1;
 				self.Prepped_addr2 := addr.Prepped_addr2;
-				self.AddressType := addr.AddressType;
+				self.AddressType := MAP(
+										addr.AddressType='' AND self.Mailing_Street1 <> ''  => 'M',
+										addr.AddressType='' AND self.Physical_Street1 <> '' => 'P',
+										addr.AddressType <> '' => addr.AddressType,
+										'B');
 
 				self.prim_range := addr.prim_range;
 				self.predir := addr.predir;
