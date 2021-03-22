@@ -37,6 +37,9 @@ Include_Inferred_Performance := FALSE;
 Retain_Input_Lexid := FALSE;//keep what we have on input
 Append_PII := FALSE;//keep what we have on input
 
+Is_Prescreen := false;
+// Is_Prescreen := TRUE;
+
 // Inteded Purpose for FCRA. Stubbing this out for now so it can be used in the settings output for now.
 Intended_Purpose := ''; 
 // Intended_Purpose := 'PRESCREENING'; 
@@ -141,6 +144,7 @@ soapLayout := RECORD
 	BOOLEAN IncludeMinors;
 	BOOLEAN RetainInputLexid;
 	BOOLEAN appendpii;
+	BOOLEAN isprescreen;
 	DATASET(Gateway.Layouts.Config) gateways := DATASET([], Gateway.Layouts.Config);
 	DATASET(PublicRecords_KEL.ECL_Functions.Constants.Layout_Allowed_Sources) AllowedSourcesDataset := DATASET([], PublicRecords_KEL.ECL_Functions.Constants.Layout_Allowed_Sources);
 	DATASET(PublicRecords_KEL.ECL_Functions.Constants.Layout_Allowed_Sources) ExcludeSourcesDataset := DATASET([], PublicRecords_KEL.ECL_Functions.Constants.Layout_Allowed_Sources);
@@ -178,6 +182,7 @@ soapLayout trans (pp le):= TRANSFORM
     SELF.GLBPurpose := Settings.GLBAPurpose;
     SELF.DPPAPurpose := Settings.DPPAPurpose;
     SELF.IncludeMinors := Settings.IncludeMinors;
+		SELF.isprescreen := is_prescreen;
     SELF.IsMarketing := FALSE;
     SELF.OutputMasterResults := Output_Master_Results;
 	SELF.AllowedSourcesDataset := AllowedSourcesDataset;

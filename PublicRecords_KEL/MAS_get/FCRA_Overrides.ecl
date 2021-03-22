@@ -1,4 +1,4 @@
-﻿import PublicRecords_KEL, risk_indicators, fcra, MDR, faa, doxie_files, std, SexOffender, Prof_License_Mari, doxie, watercraft, bankruptcyv2, ln_propertyv2, RiskView, AVM_V2;
+﻿import PublicRecords_KEL, risk_indicators, fcra, MDR, faa,fcra, doxie_files, std, SexOffender, Prof_License_Mari, doxie, watercraft, bankruptcyv2, ln_propertyv2, RiskView, AVM_V2;
 IMPORT KEL13 AS KEL;
 
 //please note
@@ -16,6 +16,7 @@ SHARED GLBARegulatedDeathMasterRecord(STRING glb_flag) := glb_flag = 'Y';
 SHARED DPPARegulatedWaterCraftRecord(STRING dppa_flag) := IF(TRIM(dppa_flag, LEFT, RIGHT) = 'Y', TRUE, FALSE);	
 SHARED LN_PropertyV2_Src(STRING ln_fares_id) := MDR.sourceTools.fProperty(ln_fares_id);
 SHARED Common       := PublicRecords_KEL.ECL_Functions.Common(Options);
+SHARED restrictedStates := fcra.compliance.watercrafts.restricted_states;	// need consumer permission
 
 SHARED ArchiveDate(string datevalue_in1, string datevalue_in2 = '' ):= function
 	
@@ -1050,8 +1051,9 @@ EXPORT GetOverrideWatercraft(DATASET( Layouts_FDC.Layout_FDC) shell) := function
 
 				
 	Watercraft_correct := join(shell, FCRA.Key_Override_Watercraft.sid,
-    keyed(right.flag_file_id in left.water_correct_ffid),
-												TRANSFORM(Watercraftlay,
+    keyed(right.flag_file_id in left.water_correct_ffid) and
+		((Options.IsPrescreen AND right.state_origin not in restrictedStates) or ~Options.IsPrescreen),
+											TRANSFORM(Watercraftlay,
 													SELF := right,
 													SELF := left,
 													SELF := []), 

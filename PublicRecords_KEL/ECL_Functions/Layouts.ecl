@@ -79,7 +79,13 @@ EXPORT Layouts := MODULE
 		STRING InsuranceSource;
 		BOOLEAN InsuranceDLDataUsed;
 		BOOLEAN PI_InpDOBAgeIsMinorFlag;
-		BOOLEAN BestDataAppended;
+		BOOLEAN PI_BestDataAppended;
+		BOOLEAN PL_PrescreenOptOutFlag;
+		BOOLEAN PL_BestSSNAppendFlag;
+		BOOLEAN PL_BestAddrAppendFlag;
+		BOOLEAN PL_BestDOBAppendFlag;
+		BOOLEAN PL_BestPhoneAppendFlag;
+		BOOLEAN PL_BestNameAppendFlag;
 		BOOLEAN PullIDFlag;
 	END;
 	
@@ -1473,6 +1479,13 @@ EXPORT LayoutAppendedAddresses := RECORD
 		string6 PL_AlrtSecurityFreezeFlag;
 		string6 PL_AlrtSecurityAlertFlag;
 		string6 PL_AlrtIDTheftFlag;
+		BOOLEAN PI_BestDataAppended;
+		BOOLEAN PL_PrescreenOptOutFlag;
+		BOOLEAN PL_BestSSNAppendFlag;
+		BOOLEAN PL_BestAddrAppendFlag;
+		BOOLEAN PL_BestDOBAppendFlag;
+		BOOLEAN PL_BestPhoneAppendFlag;
+		BOOLEAN PL_BestNameAppendFlag;
 	END;
 	
 	EXPORT LayoutPerson := RECORD

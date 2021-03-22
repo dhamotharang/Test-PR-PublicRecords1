@@ -77,6 +77,13 @@ EXPORT FnRoxie_GetPersonAttributes(DATASET(PublicRecords_KEL.ECL_Functions.Layou
 	// Cast Attributes back to their string values
 	PersonAttributesWithLexID := JOIN(RecordsWithLexID, PersonAttributesClean, LEFT.G_ProcUID = RIGHT.G_ProcUID AND LEFT.P_LexID  = RIGHT.LexID, 
 		TRANSFORM(PublicRecords_KEL.ECL_Functions.Layouts.LayoutPerson,
+			self.PL_PrescreenOptOutFlag := left.PL_PrescreenOptOutFlag;
+			self.PI_BestDataAppended := left.PI_BestDataAppended;
+			self.PL_BestNameAppendFlag := left.PL_BestNameAppendFlag;
+			self.PL_BestSSNAppendFlag := left.PL_BestSSNAppendFlag;
+			self.PL_BestAddrAppendFlag := left.PL_BestAddrAppendFlag;
+			self.PL_BestDOBAppendFlag := left.PL_BestDOBAppendFlag;
+			self.PL_BestPhoneAppendFlag := left.PL_BestPhoneAppendFlag;
 			ResultsFound := RIGHT.LexID > 0;
 			P_LexIDSeenFlag := IF(ResultsFound,RIGHT.P_LexIDSeenFlag,'0');
 			LexIDNotOnFile := P_LexIDSeenFlag = '0';

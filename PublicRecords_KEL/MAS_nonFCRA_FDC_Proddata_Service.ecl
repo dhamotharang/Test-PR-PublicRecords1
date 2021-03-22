@@ -249,7 +249,7 @@ export MAS_nonFCRA_FDC_Proddata_Service() := MACRO
 	
 	FDCDatasetMini := PublicRecords_KEL.Fn_MAS_FDC_Mini( Rep1Input, Options, withBIPIDs);		
 
-	MiniAttributes := PublicRecords_KEL.FnRoxie_GetMiniFDCAttributes(Rep1Input, FDCDatasetMini, Options, options.BestPIIAppend); 
+	MiniAttributes := PublicRecords_KEL.FnRoxie_GetMiniFDCAttributes(Rep1Input, FDCDatasetMini, Options); 
 
 	FDCDataset := PublicRecords_KEL.Fn_MAS_FDC( MiniAttributes, Options,withBIPIDs,FDCDatasetMini );
 

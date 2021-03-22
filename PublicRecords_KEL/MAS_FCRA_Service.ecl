@@ -9,6 +9,7 @@
 	<part name="GLBPurpose" type="xsd:integer"/>
 	<part name="DPPAPurpose" type="xsd:integer"/>
 	<part name="IsMarketing" type="xsd:boolean"/>
+	<part name="IsPrescreen" type="xsd:boolean"/>
 	<part name="RetainInputLexid" type="xsd:boolean"/>
 	<part name="AppendPII" type="xsd:boolean"/>
 	<part name="IndustryClass" type="xsd:string"/>
@@ -35,6 +36,7 @@ EXPORT MAS_FCRA_Service() := MACRO
 		'DPPAPurpose',
 		'IndustryClass',
 		'IsMarketing',
+		'IsPrescreen',
 		'RetainInputLexid',
 		'AppendPII',
 		'IncludeMinors',
@@ -54,6 +56,7 @@ EXPORT MAS_FCRA_Service() := MACRO
 	UNSIGNED1 GLBA := 0 : STORED('GLBPurpose');
 	UNSIGNED1 DPPA := 0 : STORED('DPPAPurpose');
 	BOOLEAN Is_Marketing := FALSE : STORED('IsMarketing');
+	BOOLEAN Is_Prescreen := FALSE : STORED('IsPrescreen');
 	BOOLEAN Include_Minors := TRUE : STORED('IncludeMinors');
 	STRING5 Industry_Class := '' : STORED('IndustryClass');
 	STRING Intended_Purpose := '' : STORED('IntendedPurpose'); // Can be set to 'PRESCREENING' for FCRA Pre-Screen applications
@@ -103,6 +106,7 @@ EXPORT MAS_FCRA_Service() := MACRO
 		EXPORT UNSIGNED GLBAPurpose := GLBA;
 		EXPORT UNSIGNED DPPAPurpose := DPPA;
 		EXPORT BOOLEAN isMarketing := Is_Marketing; // When TRUE enables Marketing Restrictions
+		EXPORT BOOLEAN IsPrescreen := Is_Prescreen; // When TRUE enables Marketing Restrictions
 		EXPORT BOOLEAN IncludeMinors := Include_Minors; // When TRUE enables Marketing Restrictions
 		EXPORT DATASET(PublicRecords_KEL.ECL_Functions.Constants.Layout_Allowed_Sources) Allowed_Sources_Dataset := FinalAllowedSources;
 		EXPORT DATA57 KEL_Permissions_Mask := PublicRecords_KEL.ECL_Functions.Fn_KEL_DPMBitmap.Generate(
@@ -122,7 +126,7 @@ EXPORT MAS_FCRA_Service() := MACRO
 		
 		EXPORT DATASET(Gateway.Layouts.Config) Gateways := GatewaysClean;
 		EXPORT BOOLEAN RetainInputLexid := Retain_Input_Lexid;
-		EXPORT BOOLEAN BestPIIAppend := Append_PII; //do not append best pii for running
+		EXPORT BOOLEAN BestPIIAppend :=  Append_PII; //do not append best pii for running, always append best pii for prescreen
 
 		
 		// Override Include* Entity/Association options here if certain entities can be turned off to speed up processing.
