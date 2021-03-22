@@ -230,7 +230,7 @@ export Layouts := module
 		typeof(BatchServices.layout_Death_Batch_out.VorP_code) verified_or_proof_code;
 		typeof(BatchServices.layout_Death_Batch_out.death_rec_src) death_rec_src := '';
 		string3	deceased_source;
-		typeof(BatchServices.layout_Death_Batch_out.isdeepdive)	isdeepdive := FALSE;
+		typeof(BatchServices.layout_Death_Batch_out.isdeepdive)	dcd_isdeepdive := FALSE;
 		typeof(BatchServices.layout_Death_Batch_out.filedate) dcd_filedate;
 		typeof(BatchServices.layout_Death_Batch_out.state_death_flag) state_death_flag := '';
 		typeof(BatchServices.layout_Death_Batch_out.state_death_id) state_death_id;
