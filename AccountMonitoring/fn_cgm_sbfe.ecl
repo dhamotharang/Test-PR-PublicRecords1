@@ -34,7 +34,7 @@ EXPORT DATASET(AccountMonitoring.layouts.history) fn_cgm_sbfe(
 		
 		
 		// Temporary Join Layout
-		temp_layout := record
+		temp_layout := RECORD
 			in_documents.pid;
 			in_documents.rid;
 			in_documents.hid;
@@ -45,7 +45,7 @@ EXPORT DATASET(AccountMonitoring.layouts.history) fn_cgm_sbfe(
 			in_documents.seleid;
 			Key_Linkids.Sbfe_Contributor_Number;
 			Key_Linkids.Contract_Account_Number;
-		end;
+		END;
 	
 	
 		// Pivot on bip ids (ult/org/sele) for the sbfe linkid key. 
@@ -79,6 +79,8 @@ EXPORT DATASET(AccountMonitoring.layouts.history) fn_cgm_sbfe(
 			Key_Tradeline.Remaining_Balance;
 			Key_Tradeline.Current_Credit_Limit;
 			Key_Tradeline.cycle_end_date;
+			Key_Tradeline.Account_Status_1;
+			Key_Tradeline.Account_Status_2;
 			Key_Score.date_scored;
 			INTEGER credit_score;
 		END;	
@@ -139,7 +141,9 @@ EXPORT DATASET(AccountMonitoring.layouts.history) fn_cgm_sbfe(
 											LEFT.Date_Account_Opened,
 											LEFT.Remaining_Balance,
 											LEFT.Current_Credit_Limit,
-											LEFT.credit_score),
+											LEFT.credit_score,
+											LEFT.Account_Status_1,
+											LEFT.Account_Status_2),
 							SELF := LEFT)); 
 		
 		// Roll up the hashes for all records for a particular pid/rid; and return.
