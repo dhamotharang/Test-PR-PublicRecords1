@@ -1,4 +1,5 @@
-﻿EXPORT Layout_SANCTN_Party_New := RECORD
+﻿import dx_common;
+EXPORT Layout_SANCTN_Party_New := RECORD
   string8 batch_number;
   string8 incident_number;
   string8 party_number;
@@ -54,6 +55,9 @@
 	//CCPA-283 Adding CCPA new fields
 	unsigned6	did;
 	unsigned3 did_score;
-	UNSIGNED4 global_sid;
-	UNSIGNED8 record_sid;
+	UNSIGNED4 global_sid:=0;
+	UNSIGNED8 record_sid:=0;
+   UNSIGNED4 dt_effective_first:=0;
+  UNSIGNED4 dt_effective_last:=0;
+  UNSIGNED1 delta_ind := 0;
  END;
