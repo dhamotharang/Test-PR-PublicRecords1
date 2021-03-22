@@ -238,9 +238,9 @@ ds_append_best := project(PersonAttributesWithLexID, transform(PublicRecords_KEL
 		self := left;
 		self := [];));
 
-	MiniAttributesPre := IF(OptionsMini.BestPIIAppend  ,ds_append_best, //append best, append all like LI mode in boca she
-															IF((OptionsMini.IsPrescreen and OptionsMini.RetainInputLexid), prescreenappend, //prescreen append all but name components
-																	IF((OptionsMini.IsPrescreen and NOT OptionsMini.RetainInputLexid), appendssnonly ,PersonAttributesWithLexID)));//prescreen withno lexid on input, only append ssn if 4 digits or less, do not append the others
+	MiniAttributesPre := IF(Options.BestPIIAppend  ,ds_append_best, //append best, append all like LI mode in boca she
+															IF((Options.IsPrescreen and Options.RetainInputLexid), prescreenappend, //prescreen append all but name components
+																	IF((Options.IsPrescreen and NOT Options.RetainInputLexid), appendssnonly ,PersonAttributesWithLexID)));//prescreen withno lexid on input, only append ssn if 4 digits or less, do not append the others
 
 	MiniAttributes := SORT( MiniAttributesPre + PersonAttributesWithoutLexID, G_ProcUID ); 
 
