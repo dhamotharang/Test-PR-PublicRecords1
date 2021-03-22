@@ -3,8 +3,7 @@ IMPORT PublicRecords_KEL, Risk_Indicators, STD;
 
 EXPORT FnRoxie_GetMiniFDCAttributes(DATASET(PublicRecords_KEL.ECL_Functions.Layouts.LayoutInputPII) InputData,
 			DATASET(PublicRecords_KEL.ECL_Functions.Layouts_FDC().Layout_FDC) FDCDataset,
-			PublicRecords_KEL.Interface_Options Options,
-			Boolean BestPIIAppend = FALSE) := FUNCTION
+			PublicRecords_KEL.Interface_Options Options) := FUNCTION
 
 	Common_Functions := PublicRecords_KEL.ECL_Functions.Common_Functions;
 
@@ -199,15 +198,51 @@ ds_append_best := project(PersonAttributesWithLexID, transform(PublicRecords_KEL
 		self.P_InpClnAddrStateCode := left.CurrentAddrStateCode;
 		self.P_InpClnAddrCnty := left.CurrentAddrCnty;
 		self.P_InpClnAddrGeo := left.CurrentAddrGeo;
-		self.BestDataAppended := TRUE;
+		self.PI_BestDataAppended := TRUE;
+		self.PL_BestNameAppendFlag:= TRUE;
+		self.PL_BestSSNAppendFlag:= TRUE;
+		self.PL_BestAddrAppendFlag:= TRUE;
+		self.PL_BestDOBAppendFlag:= TRUE;
+		self.PL_BestPhoneAppendFlag:= FALSE;//no phone yet
+		self := left;
+		self := [];));
+		
+	prescreenappend := project(PersonAttributesWithLexID, transform(PublicRecords_KEL.ECL_Functions.Layouts.LayoutInputPII, 
+		self.P_InpClnSSN := left.BestSSN;
+		self.P_InpClnDOB := left.BestDOB;
+		self.P_InpClnAddrPrimRng := left.CurrentAddrPrimRng;
+		self.P_InpClnAddrPreDir := left.CurrentAddrPreDir;
+		self.P_InpClnAddrPrimName := left.CurrentAddrPrimName;
+		self.P_InpClnAddrSffx := left.CurrentAddrSffx;
+		self.P_InpClnAddrPostDir := left.CurrentAddrPostDir;
+		self.P_InpClnAddrCity := left.CurrentAddrCity;
+		self.P_InpClnAddrState := left.CurrentAddrState;
+		self.P_InpClnAddrZip5 := left.CurrentAddrZip5;
+		self.P_InpClnAddrSecRng := left.CurrentAddrSecRng;
+		self.P_InpClnAddrStateCode := left.CurrentAddrStateCode;
+		self.P_InpClnAddrCnty := left.CurrentAddrCnty;
+		self.P_InpClnAddrGeo := left.CurrentAddrGeo;
+		self.PI_BestDataAppended := TRUE;
+		self.PL_BestSSNAppendFlag:= TRUE;
+		self.PL_BestAddrAppendFlag:= TRUE;
+		self.PL_BestDOBAppendFlag:= TRUE;
+		self.PL_BestPhoneAppendFlag:= FALSE;//no phone yet
+		self := left;
+		self := [];));
+		
+	
+	appendssnonly := project(PersonAttributesWithLexID, transform(PublicRecords_KEL.ECL_Functions.Layouts.LayoutInputPII, 
+		self.P_InpClnSSN := IF((TRIM((STRING)left.P_InpClnSSN, left, right) = '') , left.BestSSN, left.P_InpClnSSN);
+		self.PI_BestDataAppended :=  IF((TRIM((STRING)left.P_InpClnSSN, left, right) = ''), TRUE,false);
+		self.PL_BestSSNAppendFlag:= self.PI_BestDataAppended;
 		self := left;
 		self := [];));
 
-
-	MiniAttributesPre := IF(BestPIIAppend ,ds_append_best, PersonAttributesWithLexID);//they say this option will never be used in busiesns and we want to override best append data.
+	MiniAttributesPre := IF(OptionsMini.BestPIIAppend  ,ds_append_best, //append best, append all like LI mode in boca she
+															IF((OptionsMini.IsPrescreen and OptionsMini.RetainInputLexid), prescreenappend, //prescreen append all but name components
+																	IF((OptionsMini.IsPrescreen and NOT OptionsMini.RetainInputLexid), appendssnonly ,PersonAttributesWithLexID)));//prescreen withno lexid on input, only append ssn if 4 digits or less, do not append the others
 
 	MiniAttributes := SORT( MiniAttributesPre + PersonAttributesWithoutLexID, G_ProcUID ); 
-
 
 	RETURN MiniAttributes;
 END;

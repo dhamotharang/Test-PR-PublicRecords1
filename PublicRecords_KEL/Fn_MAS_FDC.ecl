@@ -1,6 +1,6 @@
 ﻿IMPORT AID_Build, ADVO, AlloyMedia_student_list,  American_student_list, AutoKey, AVM_V2, BankruptcyV3, BBB2, BIPV2, BIPV2_Best, BIPV2_Build, Business_Risk_BIP, BusReg, CalBus, CellPhone, Certegy, Corp2, 
 		Cortera_Tradeline, Data_Services, DCAV2, Death_Master,  Doxie, Doxie_Files, DriversV2, DMA, dx_BestRecords, dx_ConsumerFinancialProtectionBureau, dx_Cortera, dx_DataBridge, DX_Email, 
-		dx_Cortera_Tradeline, dx_Equifax_Business_Data, dx_Gong, dx_Header, dx_Infutor_NARB, dx_PhonesInfo, dx_PhonesPlus,dx_property, dx_Relatives_v3, EBR, Email_Data, emerges, Experian_CRDB, FAA, FBNv2, FLAccidents_Ecrash, Fraudpoint3, Gong, 
+		dx_Cortera_Tradeline, dx_Equifax_Business_Data, dx_Gong, dx_Header, dx_Infutor_NARB, dx_PhonesInfo, dx_PhonesPlus,dx_property, dx_Relatives_v3, EBR, Email_Data, emerges, Experian_CRDB, fcra, FAA, FBNv2, FLAccidents_Ecrash, Fraudpoint3, Gong, 
 		GovData, Header, Header_Quick, InfoUSA, IRS5500, InfutorCID, Inquiry_AccLogs, LiensV2, LN_PropertyV2, MDR, OSHAIR, Phonesplus_v2, Prof_License_Mari, 
 		Prof_LicenseV2, Relationship, Risk_Indicators, RiskView, RiskWise, SAM, SexOffender, STD, Suppress, Targus, thrive, USPIS_HotList, Utilfile, ut,
 		VehicleV2, Watercraft, Watchdog, UCCV2, YellowPages, dx_OSHAIR, drivers;
@@ -68,6 +68,8 @@ EXPORT Fn_MAS_FDC(DATASET(PublicRecords_KEL.ECL_Functions.Layouts.LayoutInputPII
 	Environment := IF(Options.IsFCRA, data_services.data_env.iFCRA, data_services.data_env.iNonFCRA); // for CCPA Suppression calls
 
 	// IsMiniFDC := COUNT(FDCDataset_Mini) = 0; // If there weren't any records in the mini-fdc input, then this must be the mini fdc run.
+	
+	restrictedStates := fcra.compliance.watercrafts.restricted_states;	// need consumer permission
 
 	// Records from GLB sources might NOT be GLBA Regulated depending on if they are older than GLBA Laws
 	PreGLBRegulatedRecord := PublicRecords_KEL.ECL_Functions.Constants.PreGLBRegulatedRecord;
@@ -1738,7 +1740,8 @@ Bankruptcy_Files__Key_Search_Records_pre	:= Bankruptcy_Files__Key_Search_Records
 			JOIN(Input_FDC, Watercraft.key_watercraft_did(Options.isFCRA),
 				Common.DoFDCJoin_Watercraft_Files__Watercraft_DID = TRUE AND
 				LEFT.P_LexID > 0 AND
-				KEYED(LEFT.P_LexID = RIGHT.l_did),
+				KEYED(LEFT.P_LexID = RIGHT.l_did) and
+				((Options.IsPrescreen AND right.state_origin not in restrictedStates) or ~Options.IsPrescreen),
 				TRANSFORM(Layouts_FDC.Layout_Watercraft__key_watercraft_DID,
 					SELF.UIDAppend := LEFT.UIDAppend,
 					SELF.G_ProcUID := LEFT.G_ProcUID,
@@ -1759,6 +1762,7 @@ Bankruptcy_Files__Key_Search_Records_pre	:= Bankruptcy_Files__Key_Search_Records
 					KEYED(LEFT.watercraft_key = RIGHT.watercraft_key) AND
 					KEYED(LEFT.sequence_key = '' OR LEFT.sequence_key = RIGHT.sequence_key) AND
 					KEYED(LEFT.state_origin = '' OR LEFT.state_origin = RIGHT.state_origin) and
+					((Options.IsPrescreen AND right.state_origin not in restrictedStates) or ~Options.IsPrescreen) and
 					ArchiveDate((string)right.date_first_seen, (string)right.date_vendor_first_reported) <= LEFT.P_InpClnArchDt[1..8],
 				TRANSFORM(Layouts_FDC.Layout_Watercraft__Key_Watercraft_SID,
 					SELF.UIDAppend := LEFT.UIDAppend,

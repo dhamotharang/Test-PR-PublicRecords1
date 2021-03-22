@@ -36,14 +36,16 @@ Include_Minors := TRUE;
 Retain_Input_Lexid := FALSE;//keep what we have on input
 Append_PII := FALSE;//keep what we have on input
 
+Is_Prescreen := false;
+// Is_Prescreen := TRUE;
 // Inteded Purpose for FCRA. Stubbing this out for now so it can be used in the settings output for now.
 Intended_Purpose := ''; 
 // Intended_Purpose := 'PRESCREENING'; 
 
 // Universally Set the History Date YYYYMMDD for ALL records. Set to 0 to use the History Date located on each record of the input file
-histDate := '0';
+// histDate := '0';
 // histDate := '20190116'; 
-// histDate := (STRING)STD.Date.Today(); // Run with today's date
+histDate := (STRING)STD.Date.Today(); // Run with today's date
 
 Score_threshold := 80;
 // Score_threshold := 90;
@@ -138,6 +140,7 @@ soapLayout := RECORD
 	BOOLEAN IncludeMinors;
 	BOOLEAN RetainInputLexid;
 	BOOLEAN appendpii;
+	BOOLEAN isprescreen;
 	DATASET(Gateway.Layouts.Config) gateways := DATASET([], Gateway.Layouts.Config);
 	DATASET(PublicRecords_KEL.ECL_Functions.Constants.Layout_Allowed_Sources) AllowedSourcesDataset := DATASET([], PublicRecords_KEL.ECL_Functions.Constants.Layout_Allowed_Sources);
 	DATASET(PublicRecords_KEL.ECL_Functions.Constants.Layout_Allowed_Sources) ExcludeSourcesDataset := DATASET([], PublicRecords_KEL.ECL_Functions.Constants.Layout_Allowed_Sources);
@@ -173,6 +176,7 @@ soapLayout trans (pp le):= TRANSFORM
     SELF.GLBPurpose := Settings.GLBAPurpose;
     SELF.DPPAPurpose := Settings.DPPAPurpose;
     SELF.IncludeMinors := Settings.IncludeMinors;
+    SELF.isprescreen := is_prescreen;
     SELF.IsMarketing := FALSE;
     SELF.OutputMasterResults := Output_Master_Results;
 		SELF.AllowedSourcesDataset := AllowedSourcesDataset;

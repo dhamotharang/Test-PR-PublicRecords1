@@ -226,10 +226,12 @@ EXPORT Common(PublicRecords_KEL.Interface_Options Options) := MODULE
 
 	// Do JOINs for FCRA and nonFCRA
 	EXPORT DoFDCJoin_Prof_License_Mari__Key_Did :=
+		NOT Options.IsPrescreen AND
 		(Options.IncludeProfessionalLicense OR
 		 Options.IncludeProfessionalLicensePerson );
 
 	EXPORT DoFDCJoin_ADVO__Key_Addr1_History := 
+		NOT Options.IsPrescreen AND
 		Options.IncludeAddress;
 
 	EXPORT DoFDCJoin_DMA__Key_DNM_Name_Address := 

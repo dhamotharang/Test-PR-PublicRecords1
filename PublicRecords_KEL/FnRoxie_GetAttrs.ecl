@@ -23,23 +23,28 @@ EXPORT FnRoxie_GetAttrs(DATASET(PublicRecords_KEL.ECL_Functions.Input_Layout) In
 //options.BestPIIAppend must call mini FDC
 	FDCDatasetMini := PublicRecords_KEL.Fn_MAS_FDC_Mini( VerifiedInputPII, Options);		
 
-	MiniAttributes := PublicRecords_KEL.FnRoxie_GetMiniFDCAttributes(VerifiedInputPII, FDCDatasetMini, Options, options.BestPIIAppend); 
+	MiniAttributes := PublicRecords_KEL.FnRoxie_GetMiniFDCAttributes(VerifiedInputPII, FDCDatasetMini, Options); 
 
-	FDCDataset := PublicRecords_KEL.Fn_MAS_FDC( MiniAttributes, Options , DATASET([], PublicRecords_KEL.ECL_Functions.Layouts.LayoutInputBII) ,FDCDatasetMini);
+	//doing this call here instead of in FDC so we do not lose our optout flag, also products may want to skip fdc calls later if we get a hit here
+	//inside mini attributes we have dummy flags for adl_* append, these are in ECL for now, if they are needed in KEL later, they will have to be set in mini attributes.  they are also mappeded from left in person attributes
+	MiniAttributesWOptOuts := IF(options.isFCRA and options.isprescreen, PublicRecords_KEL.ECL_Functions.FnRoxie_get_optouts(MiniAttributes, options),MiniAttributes);//FCRA prescreen optouts 
 
-	InputChooser := if(options.BestPIIAppend, MiniAttributes, VerifiedInputPII);
+
+	FDCDataset := PublicRecords_KEL.Fn_MAS_FDC( MiniAttributesWOptOuts, Options , DATASET([], PublicRecords_KEL.ECL_Functions.Layouts.LayoutInputBII) ,FDCDatasetMini);
+
+	InputChooser := if(options.BestPIIAppend, MiniAttributesWOptOuts, VerifiedInputPII);
 
 
   // Get Attributes - cleans the attributes after KEL is done 
   InputPIIAttributes := PublicRecords_KEL.FnRoxie_GetInputPIIAttributes(InputChooser, Options, FDCDataset);
 	
-	PersonAttributes := PublicRecords_KEL.FnRoxie_GetPersonAttributes(MiniAttributes(IsInputRec = TRUE), FDCDataset, Options); 
+	PersonAttributes := PublicRecords_KEL.FnRoxie_GetPersonAttributes(MiniAttributesWOptOuts(IsInputRec = TRUE), FDCDataset, Options); 
 
 	// PII Corroboration Summary attributes are NonFCRA only
 	ALLSummaryAttributesNonFCRA := PublicRecords_KEL.FnRoxie_GetSummaryAttributes(InputChooser, Options, FDCDataset);
 	ALLSummaryAttributes := IF(NOT Options.IsFCRA, ALLSummaryAttributesNonFCRA, DATASET([], PublicRecords_KEL.ECL_Functions.Layouts.LayoutALLSumAttributes));
 	
-	InferredPerformanceAttributes := IF(Options.IsFCRA, PublicRecords_KEL.FnRoxie_GetInferredPerformanceAttributes(MiniAttributes(IsInputRec = TRUE), Options, FDCDataset), DATASET([], PublicRecords_KEL.ECL_Functions.Layouts.LayoutInferredAttributes));
+	InferredPerformanceAttributes := IF(Options.IsFCRA, PublicRecords_KEL.FnRoxie_GetInferredPerformanceAttributes(MiniAttributesWOptOuts(IsInputRec = TRUE), Options, FDCDataset), DATASET([], PublicRecords_KEL.ECL_Functions.Layouts.LayoutInferredAttributes));
 	
 	// HighRiskAddressAttributesNonFCRA := PublicRecords_KEL.FnRoxie_GetHighRiskAddress(InputChooser, Options, FDCDataset);
 	// HighRiskAddressAttributes  := IF(NOT Options.IsFCRA, HighRiskAddressAttributesNonFCRA, DATASET([], PublicRecords_KEL.ECL_Functions.Layouts.LayoutHighRiskAddressAttributes));
