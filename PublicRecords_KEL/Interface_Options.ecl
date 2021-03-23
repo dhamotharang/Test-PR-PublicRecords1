@@ -36,7 +36,8 @@ EXPORT Interface_Options := INTERFACE
 	EXPORT BOOLEAN BIPAppendPrimForce := FALSE;
 	EXPORT BOOLEAN BIPAppendReAppend := TRUE;
 	EXPORT BOOLEAN BIPAppendIncludeAuthRep := FALSE;
-
+	
+	EXPORT BOOLEAN CaliforniaInPerson := False; 
 	//lexid append and pii append
 	EXPORT BOOLEAN RetainInputLexid := False; //keep input lexid
 	EXPORT BOOLEAN BestPIIAppend := False; //do not append best pii for running

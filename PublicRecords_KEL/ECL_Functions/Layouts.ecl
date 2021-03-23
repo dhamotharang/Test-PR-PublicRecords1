@@ -1479,6 +1479,7 @@ EXPORT LayoutAppendedAddresses := RECORD
 		string6 PL_AlrtSecurityFreezeFlag;
 		string6 PL_AlrtSecurityAlertFlag;
 		string6 PL_AlrtIDTheftFlag;
+		Boolean P_SubjAppliedInCAFlag;
 		BOOLEAN PI_BestDataAppended;
 		BOOLEAN PL_PrescreenOptOutFlag;
 		BOOLEAN PL_BestSSNAppendFlag;
