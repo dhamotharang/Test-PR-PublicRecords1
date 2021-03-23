@@ -4,6 +4,6 @@ IMPORT B_Email_3,CFG_Compile,E_Email FROM PublicRecords_KEL;
 IMPORT * FROM KEL15.Null;
 EXPORT B_Email_2(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG_Compile __cfg = CFG_Compile) := MODULE
   SHARED VIRTUAL TYPEOF(B_Email_3(__in,__cfg).__ENH_Email_3) __ENH_Email_3 := B_Email_3(__in,__cfg).__ENH_Email_3;
-  SHARED __EE7125238 := __ENH_Email_3;
-  EXPORT __ENH_Email_2 := __EE7125238;
+  SHARED __EE7186715 := __ENH_Email_3;
+  EXPORT __ENH_Email_2 := __EE7186715;
 END;

@@ -4,8 +4,8 @@ IMPORT B_Sele_Person_2,B_Sele_Person_3,CFG_Compile,E_Business_Org,E_Business_Sel
 IMPORT * FROM KEL15.Null;
 EXPORT B_Sele_Person_1(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG_Compile __cfg = CFG_Compile) := MODULE
   SHARED VIRTUAL TYPEOF(B_Sele_Person_2(__in,__cfg).__ENH_Sele_Person_2) __ENH_Sele_Person_2 := B_Sele_Person_2(__in,__cfg).__ENH_Sele_Person_2;
-  SHARED __EE9314210 := __ENH_Sele_Person_2;
-  EXPORT __ST203268_Layout := RECORD
+  SHARED __EE9386249 := __ENH_Sele_Person_2;
+  EXPORT __ST205736_Layout := RECORD
     KEL.typ.ntyp(E_Business_Sele().Typ) Legal_;
     KEL.typ.ntyp(E_Person().Typ) Contact_;
     KEL.typ.nint Ult_I_D_;
@@ -16,7 +16,7 @@ EXPORT B_Sele_Person_1(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG
     KEL.typ.nstr Assoc_Valid_Date_;
     KEL.typ.nint Datemonths_;
     KEL.typ.bool Is_Executive_Ever_ := FALSE;
-    KEL.typ.ndataset(B_Sele_Person_3(__in,__cfg).__ST1264685_Layout) Relatives_;
+    KEL.typ.ndataset(B_Sele_Person_3(__in,__cfg).__ST1272942_Layout) Relatives_;
     KEL.typ.nbool Two_Years_;
     KEL.typ.epoch Archive___Date_ := 0;
     KEL.typ.epoch Date_First_Seen_ := 0;
@@ -25,10 +25,10 @@ EXPORT B_Sele_Person_1(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG
     KEL.typ.epoch Vault_Date_Last_Seen_ := 0;
     KEL.typ.int __RecordCount := 0;
   END;
-  SHARED __ST203268_Layout __ND9314359__Project(B_Sele_Person_2(__in,__cfg).__ST222173_Layout __PP9314211) := TRANSFORM
+  SHARED __ST205736_Layout __ND9386398__Project(B_Sele_Person_2(__in,__cfg).__ST224831_Layout __PP9386250) := TRANSFORM
     __CC13924 := '-99997';
-    SELF.Assoc_Valid_Date_ := IF(__T(__FN1(KEL.Routines.IsValidDate,__PP9314211.Assoc_Fs_Date_)),__ECAST(KEL.typ.nstr,__FN2(KEL.Routines.DateToString,__PP9314211.Assoc_Fs_Date_,__CN('%Y%m%d'))),__ECAST(KEL.typ.nstr,__CN(__CC13924)));
-    SELF := __PP9314211;
+    SELF.Assoc_Valid_Date_ := IF(__T(__FN1(KEL.Routines.IsValidDate,__PP9386250.Assoc_Fs_Date_)),__ECAST(KEL.typ.nstr,__FN2(KEL.Routines.DateToString,__PP9386250.Assoc_Fs_Date_,__CN('%Y%m%d'))),__ECAST(KEL.typ.nstr,__CN(__CC13924)));
+    SELF := __PP9386250;
   END;
-  EXPORT __ENH_Sele_Person_1 := PROJECT(__EE9314210,__ND9314359__Project(LEFT));
+  EXPORT __ENH_Sele_Person_1 := PROJECT(__EE9386249,__ND9386398__Project(LEFT));
 END;

@@ -4,8 +4,8 @@ IMPORT B_Tradeline_9,CFG_Compile,E_Tradeline FROM PublicRecords_KEL;
 IMPORT * FROM KEL15.Null;
 EXPORT B_Tradeline_8(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG_Compile __cfg = CFG_Compile) := MODULE
   SHARED VIRTUAL TYPEOF(B_Tradeline_9(__in,__cfg).__ENH_Tradeline_9) __ENH_Tradeline_9 := B_Tradeline_9(__in,__cfg).__ENH_Tradeline_9;
-  SHARED __EE5429453 := __ENH_Tradeline_9;
-  EXPORT __ST266330_Layout := RECORD
+  SHARED __EE5488585 := __ENH_Tradeline_9;
+  EXPORT __ST269121_Layout := RECORD
     KEL.typ.nkdate A_R_Date_;
     KEL.typ.nint Total_A_R_;
     KEL.typ.nint Current_A_R_;
@@ -33,13 +33,13 @@ EXPORT B_Tradeline_8(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG_C
     KEL.typ.epoch Vault_Date_Last_Seen_ := 0;
     KEL.typ.int __RecordCount := 0;
   END;
-  EXPORT __ST266323_Layout := RECORD
+  EXPORT __ST269114_Layout := RECORD
     KEL.typ.nuid UID;
     KEL.typ.nint Ult_I_D_;
     KEL.typ.nint Org_I_D_;
     KEL.typ.nint Sele_I_D_;
     KEL.typ.nstr Account_Key_;
-    KEL.typ.ndataset(__ST266330_Layout) Records_;
+    KEL.typ.ndataset(__ST269121_Layout) Records_;
     KEL.typ.ndataset(E_Tradeline(__in,__cfg).Vendor_Dates_Layout) Vendor_Dates_;
     KEL.typ.ndataset(E_Tradeline(__in,__cfg).Data_Sources_Layout) Data_Sources_;
     KEL.typ.nkdate Current_Date_First_Of_Month_;
@@ -53,20 +53,20 @@ EXPORT B_Tradeline_8(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG_C
     KEL.typ.epoch Vault_Date_Last_Seen_ := 0;
     KEL.typ.int __RecordCount := 0;
   END;
-  SHARED __ST266323_Layout __ND5429671__Project(B_Tradeline_9(__in,__cfg).__ST268166_Layout __PP5429454) := TRANSFORM
-    __EE5429487 := __PP5429454.Records_;
-    __ST266330_Layout __ND5429641__Project(B_Tradeline_9(__in,__cfg).__ST268173_Layout __PP5429488) := TRANSFORM
-      SELF.Carrier_Segment_ := __OP2(__PP5429488.Segment_I_D_,IN,__CN([1,4,5,6,8]));
-      SELF.Fleet_Segment_ := __OP2(__PP5429488.Segment_I_D_,IN,__CN([2,3,9]));
-      __CC43103 := 365;
-      SELF.Is1_Y_Record_ := __OP2(__PP5429488.Record_Age_In_Days_,>=,__CN(__CC43103));
-      SELF.Materials_Segment_ := __OP2(__PP5429488.Segment_I_D_,IN,__CN([10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25]));
-      SELF.Operations_Segment_ := __OP2(__PP5429488.Segment_I_D_,IN,__CN([26,27,28,29,30,31,32,33,34,35]));
-      SELF := __PP5429488;
+  SHARED __ST269114_Layout __ND5488803__Project(B_Tradeline_9(__in,__cfg).__ST270957_Layout __PP5488586) := TRANSFORM
+    __EE5488619 := __PP5488586.Records_;
+    __ST269121_Layout __ND5488773__Project(B_Tradeline_9(__in,__cfg).__ST270964_Layout __PP5488620) := TRANSFORM
+      SELF.Carrier_Segment_ := __OP2(__PP5488620.Segment_I_D_,IN,__CN([1,4,5,6,8]));
+      SELF.Fleet_Segment_ := __OP2(__PP5488620.Segment_I_D_,IN,__CN([2,3,9]));
+      __CC43951 := 365;
+      SELF.Is1_Y_Record_ := __OP2(__PP5488620.Record_Age_In_Days_,>=,__CN(__CC43951));
+      SELF.Materials_Segment_ := __OP2(__PP5488620.Segment_I_D_,IN,__CN([10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25]));
+      SELF.Operations_Segment_ := __OP2(__PP5488620.Segment_I_D_,IN,__CN([26,27,28,29,30,31,32,33,34,35]));
+      SELF := __PP5488620;
     END;
-    SELF.Records_ := __PROJECT(__EE5429487,__ND5429641__Project(LEFT));
-    SELF.Two_Year_Full_Date_ := __FN4(KEL.Routines.AdjustCalendar,__PP5429454.Current_Date_First_Of_Month_,__CN(-2),__CN(0),__CN(0));
-    SELF := __PP5429454;
+    SELF.Records_ := __PROJECT(__EE5488619,__ND5488773__Project(LEFT));
+    SELF.Two_Year_Full_Date_ := __FN4(KEL.Routines.AdjustCalendar,__PP5488586.Current_Date_First_Of_Month_,__CN(-2),__CN(0),__CN(0));
+    SELF := __PP5488586;
   END;
-  EXPORT __ENH_Tradeline_8 := PROJECT(__EE5429453,__ND5429671__Project(LEFT));
+  EXPORT __ENH_Tradeline_8 := PROJECT(__EE5488585,__ND5488803__Project(LEFT));
 END;
