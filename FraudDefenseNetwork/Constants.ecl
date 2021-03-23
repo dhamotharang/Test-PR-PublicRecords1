@@ -1,5 +1,4 @@
-﻿IMPORT FraudShared;
-EXPORT Constants(BOOLEAN pUseOtherEnvironment	= true) := MODULE
+﻿EXPORT Constants(BOOLEAN pUseOtherEnvironment	= true) := MODULE
 
 	EXPORT autokey_buildskipset := _Dataset().autokey_buildskipset;
 	/*
@@ -25,7 +24,7 @@ EXPORT Constants(BOOLEAN pUseOtherEnvironment	= true) := MODULE
   EXPORT TYPE_STR := 'AK';
 	
   #STORED('Platform', 'FDN');
-  EXPORT ak_dataset       := FraudShared.File_Autokey();
+  EXPORT ak_dataset       := File_Autokey();
   EXPORT ak_qa_keyname    := _Dataset().thor_cluster_files + 'key::fdn::qa::autokey::';
   EXPORT AUTOKEY_SKIP_SET := autokey_buildskipset;
 

@@ -1,4 +1,4 @@
-﻿import tools,FraudShared;
+﻿import tools;
 
 export Build_Base(
 
@@ -12,7 +12,7 @@ export Build_Base(
 	,boolean                                      pSkipAInspection                  = false
 	,boolean                                      pSkipErieBase                     = false
 	,boolean                                      pSkipErieWatchListBase            = false
-	,dataset(FraudShared.Layouts.Base.Main)				pBaseMainFile										  =	FraudShared.Files().Base.Main.QA
+	,dataset(Layouts.Base.Main)				            pBaseMainFile										  =	Files().Base.Main.QA
 
   ,dataset(Layouts.Base.SuspectIP)						  pBaseSuspectIPFile							  =	Files().Base.SuspectIP.QA
 	,dataset(Layouts.Input.SuspectIP)	            pUpdateSuspectIPFile	            =	Files().Input.SuspectIP.Sprayed
@@ -119,9 +119,9 @@ module
 					,pUpdateErieWatchListflag
 					).All)
 			 )
-			 ,MapToCommon(
+			 ,Build_Base_Main(
 					 pversion
-			 ).Build_Base_Shared_Main.All
+			 ).All
 			//,Promote().Inputfiles.Sprayed2Using
 		 )
 		,output('No Valid version parameter passed, skipping FDN.Build_Base atribute')
