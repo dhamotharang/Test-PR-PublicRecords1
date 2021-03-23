@@ -179,14 +179,14 @@ END;
 		SELF.current_rec 	:= TRUE;
 		
 		SELF.name         := MAP(fnValidName(le.name) = false => '',
-														fnValidCName(le.name) = false => '',
+														// fnValidCName(le.name) = false => '',
 														REGEXFIND(':',le.name)=>'',
 														NOT REGEXFIND('[A-Z]',le.name) => '',
 														REGEXFIND('C/O',le.name)=> REGEXREPLACE('C/O',le.name,''),
 														TRIM(le.name,LEFT,RIGHT));
 
 		SELF.organization := MAP(fnValidName(le.organization) = false => '',
-														fnValidCName(le.organization) = false => '',
+														// fnValidCName(le.organization) = false => '',
 														REGEXFIND(':',le.organization)=>'',
 														NOT REGEXFIND('[A-Z]',le.organization) => '',
 														TRIM(le.organization) = TRIM(self.name) => '',
@@ -279,7 +279,7 @@ END;
   AppendInput	:= PROJECT(ds_norm,tAppendFields(LEFT));
 	ds_dist     := DISTRIBUTE(AppendInput,HASH(domainname, email, name, street1, city, state));
   ds_sort     := SORT(ds_dist,domainname,email,name,street1,city,state,LOCAL);
-	ds_dedup    := DEDUP(ds_sort, EXCEPT RAWTEXT,EMAILTYPE,LOCAL);//: persist('~thor_data400::in::WhoIs::prep_ingest');
+	ds_dedup    := DEDUP(ds_sort, EXCEPT RAWTEXT,EMAILTYPE,LOCAL): persist('~thor_data400::in::WhoIs::prep_ingest');
 	RETURN ds_dedup;
 	
 END;

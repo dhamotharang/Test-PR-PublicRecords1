@@ -1,110 +1,110 @@
 ﻿Import AID, Address, bipv2;
 EXPORT layouts := MODULE
 	EXPORT raw := RECORD
-		STRING  domainName;
-		STRING  registrarName;
-		STRING  contactEmail;
-		STRING  whoisServer;
-		STRING  nameServers;
-		STRING  createdDate;	            //when the domain name was first registered/created
-		STRING  updatedDate;	            //when the whois data were updated
-		STRING  expiresDate;	            //when the domain name will expire
-		STRING  standardRegCreatedDate;	//created date in the standard format(YYYY-mm-dd), e.g. 2012-02-01
-		STRING  standardRegUpdatedDate;	//updated date in the standard format(YYYY-mm-dd), e.g. 2012-02-01
-		STRING  standardRegExpiresDate;	//expires date in the standard format(YYYY-mm-dd), e.g. 2012-02-01
-		STRING  status;	                //domain name status code
-		STRING  Audit_auditUpdatedDate;	//the timestamp of when the whois record is collected in the standardFormat(YYYYmm-dd), e.g. 2012-02-01
+		STRING100 domainName;
+		STRING100 registrarName;
+		STRING80  contactEmail;
+		STRING50  whoisServer;
+		STRING50  nameServers;
+		STRING50  createdDate;	            //when the domain name was first registered/created
+		STRING50  updatedDate;	            //when the whois data were updated
+		STRING50  expiresDate;	            //when the domain name will expire
+		STRING10  standardRegCreatedDate;	//created date in the standard format(YYYY-mm-dd), e.g. 2012-02-01
+		STRING10  standardRegUpdatedDate;	//updated date in the standard format(YYYY-mm-dd), e.g. 2012-02-01
+		STRING10  standardRegExpiresDate;	//expires date in the standard format(YYYY-mm-dd), e.g. 2012-02-01
+		STRING50  status;	                //domain name status code
+		STRING10  Audit_auditUpdatedDate;	//the timestamp of when the whois record is collected in the standardFormat(YYYYmm-dd), e.g. 2012-02-01
 
 		// The domain name registrant is the owner of the domain name. 
-		STRING  registrant_rawtext;
-		STRING  registrant_email;
-		STRING  registrant_name;
-		STRING  registrant_organization;
-		STRING registrant_street1;
-		STRING registrant_street2;
-		STRING registrant_street3;
-		STRING registrant_street4;
-		STRING  registrant_city;
-		STRING  registrant_state;
-		STRING  registrant_postalCode;
-		STRING  registrant_country;
-		STRING  registrant_fax;
-		STRING  registrant_faxExt;
-		STRING  registrant_phone;
-		STRING  registrant_phoneExt;
+		STRING100 registrant_rawtext;
+		STRING80  registrant_email;
+		STRING50  registrant_name;
+		STRING50  registrant_organization;
+		STRING100 registrant_street1;
+		STRING100 registrant_street2;
+		STRING100 registrant_street3;
+		STRING100 registrant_street4;
+		STRING25  registrant_city;
+		STRING10  registrant_state;
+		STRING20  registrant_postalCode;
+		STRING20  registrant_country;
+		STRING15  registrant_fax;
+		STRING15  registrant_faxExt;
+		STRING15  registrant_phone;
+		STRING15  registrant_phoneExt;
 		
 		// The administrative contact is the person in charge of the administrative 
 		// dealings pertaining to the company owning the domain name.
-		STRING administrativeContact_rawtext;
-		STRING  administrativeContact_email;
-		STRING  administrativeContact_name;
-		STRING  administrativeContact_organization;
-		STRING administrativeContact_street1;
-		STRING administrativeContact_street2;
-		STRING administrativeContact_street3;
-		STRING administrativeContact_street4;
-		STRING  administrativeContact_city;
-		STRING  administrativeContact_state;
-		STRING  administrativeContact_postalCode;
-		STRING  administrativeContact_country;
-		STRING  administrativeContact_fax;
-		STRING  administrativeContact_faxExt;
-		STRING  administrativeContact_phone;
-		STRING  administrativeContact_phoneExt;
+		STRING100 administrativeContact_rawtext;
+		STRING80  administrativeContact_email;
+		STRING50  administrativeContact_name;
+		STRING50  administrativeContact_organization;
+		STRING100 administrativeContact_street1;
+		STRING100 administrativeContact_street2;
+		STRING100 administrativeContact_street3;
+		STRING100 administrativeContact_street4;
+		STRING25  administrativeContact_city;
+		STRING10  administrativeContact_state;
+		STRING20  administrativeContact_postalCode;
+		STRING20  administrativeContact_country;
+		STRING15  administrativeContact_fax;
+		STRING15  administrativeContact_faxExt;
+		STRING15  administrativeContact_phone;
+		STRING15  administrativeContact_phoneExt;
 		// the billing contact is the individual who is authorized by the registrant 
 		// to receive the invoice for domain name registration and domain name renewal fees.	
-		STRING billingContact_rawText; 
-		STRING  billingContact_email; 
-		STRING  billingContact_name;
-		STRING  billingContact_organization; 
-		STRING billingContact_street1;
-		STRING billingContact_street2; 
-		STRING billingContact_street3;
-		STRING billingContact_street4; 
-		STRING  billingContact_city; 
-		STRING  billingContact_state;
-		STRING billingContact_postalCode; 
-		STRING billingContact_country;
-		STRING billingContact_fax; 
-		STRING billingContact_faxExt;
-		STRING billingContact_phone; 
-		STRING billingContact_phoneExt;
+		STRING100 billingContact_rawText; 
+		STRING80  billingContact_email; 
+		STRING50  billingContact_name;
+		STRING50  billingContact_organization; 
+		STRING100 billingContact_street1;
+		STRING100 billingContact_street2; 
+		STRING100 billingContact_street3;
+		STRING100 billingContact_street4; 
+		STRING25  billingContact_city; 
+		STRING10  billingContact_state;
+		STRING20 billingContact_postalCode; 
+		STRING20 billingContact_country;
+		STRING15 billingContact_fax; 
+		STRING15 billingContact_faxExt;
+		STRING15 billingContact_phone; 
+		STRING15 billingContact_phoneExt;
 		// The technical contact is the person in charge of all technical questions 
 		// regarding a particular domain name.			
-		STRING technicalContact_rawText; 
-		STRING  technicalContact_email;
-		STRING  technicalContact_name; 
-		STRING  technicalContact_organization;
-		STRING technicalContact_street1; 
-		STRING technicalContact_street2;
-		STRING technicalContact_street3; 
-		STRING technicalContact_street4;
-		STRING  technicalContact_city; 
-		STRING  technicalContact_state;
-		STRING  technicalContact_postalCode; 
-		STRING  technicalContact_country;
-		STRING  technicalContact_fax; 
-		STRING  technicalContact_faxExt;
-		STRING  technicalContact_phone; 
-		STRING  technicalContact_phoneExt;
+		STRING100 technicalContact_rawText; 
+		STRING80  technicalContact_email;
+		STRING50  technicalContact_name; 
+		STRING50  technicalContact_organization;
+		STRING100 technicalContact_street1; 
+		STRING100 technicalContact_street2;
+		STRING100 technicalContact_street3; 
+		STRING100 technicalContact_street4;
+		STRING25  technicalContact_city; 
+		STRING10  technicalContact_state;
+		STRING20  technicalContact_postalCode; 
+		STRING20  technicalContact_country;
+		STRING15  technicalContact_fax; 
+		STRING15  technicalContact_faxExt;
+		STRING15  technicalContact_phone; 
+		STRING15  technicalContact_phoneExt;
 		// The domain technical/zone contact is the person who tends to the technical aspects of 
 		// maintaining the domain’s name server and resolver software, and database files.
-		STRING  zoneContact_rawText; 
-		STRING  zoneContact_email; 
-		STRING  zoneContact_name;
-		STRING  zoneContact_organization; 
-		STRING  zoneContact_street1; 
-		STRING  zoneContact_street2;
-		STRING  zoneContact_street3; 
-		STRING  zoneContact_street4; 
-		STRING  zoneContact_city;
-		STRING  zoneContact_state; 
-		STRING  zoneContact_postalCode; 
-		STRING  zoneContact_country;
-		STRING  zoneContact_fax; 
-		STRING  zoneContact_faxExt; 
-		STRING  zoneContact_phone;
-		STRING  zoneContact_phoneExt;
+		STRING100 zoneContact_rawText; 
+		STRING80  zoneContact_email; 
+		STRING50  zoneContact_name;
+		STRING50  zoneContact_organization; 
+		STRING100 zoneContact_street1; 
+		STRING100 zoneContact_street2;
+		STRING100 zoneContact_street3; 
+		STRING100 zoneContact_street4; 
+		STRING25  zoneContact_city;
+		STRING10  zoneContact_state; 
+		STRING20  zoneContact_postalCode; 
+		STRING20  zoneContact_country;
+		STRING15  zoneContact_fax; 
+		STRING15  zoneContact_faxExt; 
+		STRING15  zoneContact_phone;
+		STRING15  zoneContact_phoneExt;
 	END;
 	
 	EXPORT CleanFields := RECORD
@@ -118,13 +118,13 @@ EXPORT layouts := MODULE
 		STRING100 street3;
 		STRING100 street4;
 		STRING25  city;
-		STRING25  state;
-		STRING25  postalCode;
-		STRING25  country;
-		STRING20 fax;
-		STRING20 faxExt;
-		STRING20 phone;
-		STRING20 phoneExt;
+		STRING10  state;
+		STRING20  postalCode;
+		STRING20  country;
+		STRING15 fax;
+		STRING15 faxExt;
+		STRING15 phone;
+		STRING15 phoneExt;
 	  raw;		
 	END;
 
@@ -165,4 +165,8 @@ EXPORT layouts := MODULE
 		// UNSIGNED8 uniq_email_id := 0;   //unique email identifier		
 		END;
 		
+  EXPORT UniqueId := RECORD
+	UNSIGNED8 unique_id;
+	Base;
+	END;
 END;	
