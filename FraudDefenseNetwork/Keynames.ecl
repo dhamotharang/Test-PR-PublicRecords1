@@ -1,4 +1,4 @@
-import tools;
+﻿import tools;
 
 export Keynames(
 
@@ -12,29 +12,28 @@ module
 	export llogicalautoTmplt		  :=  _Dataset(pUseOtherEnvironment).autokeytemplate							;
 
 	export Main := module
-		export ID                    := tools.mod_FilenamesBuild(lTemplate('ID'),pversion);
-		export DID                   := tools.mod_FilenamesBuild(lTemplate('DID'),pversion);
-		export BDID                  := tools.mod_FilenamesBuild(lTemplate('BDID'),pversion);
-		export Email                 := tools.mod_FilenamesBuild(lTemplate('Email'),pversion);
-		export Ip                    := tools.mod_FilenamesBuild(lTemplate('IP'),pversion);
-		export ProfessionalID        := tools.mod_FilenamesBuild(lTemplate('ProfessionalID'),pversion);
-		export DeviceID              := tools.mod_FilenamesBuild(lTemplate('DeviceID'),pversion);
-		export TIN                   := tools.mod_FilenamesBuild(lTemplate('TIN'),pversion);
-		export NPI                   := tools.mod_FilenamesBuild(lTemplate('NPI'),pversion);
-		export AppProviderID         := tools.mod_FilenamesBuild(lTemplate('AppProviderID'),pversion);
-		export LNPID                 := tools.mod_FilenamesBuild(lTemplate('LNPID'),pversion);
-    export Mbs                   := tools.mod_FilenamesBuild(lTemplate('Mbs'),pversion);
-    export MbsGcIdExclusion      := tools.mod_FilenamesBuild(lTemplate('MbsGcIdExclusion'),pversion);
-		export MbsIndTypeExclusion   := tools.mod_FilenamesBuild(lTemplate('MbsIndTypeExclusion'),pversion);
-    export MbsProductInclude     := tools.mod_FilenamesBuild(lTemplate('MbsProductInclude'),pversion);
-    export MbsFDNMasterID        := tools.mod_FilenamesBuild(lTemplate('Gcid_2_MbsFDNMasterID'),pversion);
-    export MbsFDNMasterIDExcl    := tools.mod_FilenamesBuild(lTemplate('MbsFDNMasterIDExclusion'),pversion);
-  	export LinkIds               := tools.mod_FilenamesBuild(lTemplate('LINKIDS'),pversion);
+		export ID                       := tools.mod_FilenamesBuild(lTemplate('ID'),pversion);
+		export DID                      := tools.mod_FilenamesBuild(lTemplate('DID'),pversion);
+		export Email                    := tools.mod_FilenamesBuild(lTemplate('Email'),pversion);
+		export Ip                       := tools.mod_FilenamesBuild(lTemplate('IP'),pversion);
+		export ProfessionalID           := tools.mod_FilenamesBuild(lTemplate('ProfessionalID'),pversion);
+		export DeviceID                 := tools.mod_FilenamesBuild(lTemplate('DeviceID'),pversion);
+		export TIN                      := tools.mod_FilenamesBuild(lTemplate('TIN'),pversion);
+		export NPI                      := tools.mod_FilenamesBuild(lTemplate('NPI'),pversion);
+		export AppProviderID            := tools.mod_FilenamesBuild(lTemplate('AppProviderID'),pversion);
+		export LNPID                    := tools.mod_FilenamesBuild(lTemplate('LNPID'),pversion);
+    export MbsIndTypeExclusion			:= tools.mod_FilenamesBuild(lTemplate('MbsIndTypeExclusion'),pversion);
+		export MbsProductInclude				:= tools.mod_FilenamesBuild(lTemplate('MbsProductInclude'),pversion);
+		export MbsFDNMasterID						:= tools.mod_FilenamesBuild(lTemplate('Gcid_2_MbsFDNMasterID'),pversion);
+		export MbsFDNMasterIDExcl				:= tools.mod_FilenamesBuild(lTemplate('MbsFDNMasterIDExclusion'),pversion);
+		export MbsFDNMasterIDIndTypIncl	:= tools.mod_FilenamesBuild(lTemplate('MbsFdnMasterIDIndTypeInclusion'),pversion);
+  	export LinkIds                  := tools.mod_FilenamesBuild(lTemplate('LINKIDS'),pversion);
+		export DriversLicense						:= tools.mod_FilenamesBuild(lTemplate('DriversLicense'),pversion);
+		export BankAccount							:= tools.mod_FilenamesBuild(lTemplate('BankAccount'),pversion);
 		
 		export dAll_filenames :=
 		    ID.dAll_filenames +
 			 	DID.dAll_filenames +
-				BDID.dAll_filenames +
 				Email.dAll_filenames +
 				IP.dAll_filenames + 
 				ProfessionalID.dAll_filenames + 
@@ -43,15 +42,15 @@ module
 				NPI.dAll_filenames + 
 				AppProviderID.dAll_filenames + 
 				LNPID.dAll_filenames + 
-				Mbs.dAll_filenames + 
-				MbsGcIdExclusion.dAll_filenames + 
 				MbsIndTypeExclusion.dAll_filenames +
 				MbsProductInclude.dAll_filenames +
 				MbsFDNMasterID.dAll_filenames +
 				MbsFDNMasterIDExcl.dAll_filenames +
-				LinkIds.dAll_filenames;  
-				
-		end;
+				MbsFDNMasterIDIndTypIncl.dAll_filenames +
+				DriversLicense.dAll_filenames +
+				BankAccount.dAll_filenames +
+				LinkIds.dAll_filenames;				
+		 end;
 	
 		
 	export autokeyroot	 		:= tools.mod_FilenamesBuild(llogicalautoTmplt																							,pversion	,llogicalautoTmplt																							);
@@ -72,7 +71,7 @@ module
 	export FEIN2 					  := tools.mod_FilenamesBuild(llogicalautoTmplt			+ 'FEIN2'															  ,pversion	,llogicalautoTmplt				+ 'FEIN2'														  );
 	export stnameb2 				:= tools.mod_FilenamesBuild(llogicalautoTmplt			+ 'stnameb2'														,pversion	,llogicalautoTmplt				+ 'stnameb2'													);
 	export zipb2 						:= tools.mod_FilenamesBuild(llogicalautoTmplt			+ 'zipb2'																,pversion	,llogicalautoTmplt				+ 'zipb2'															);
- 
+
 
 
 	export dAll_filenames :=

@@ -1,4 +1,4 @@
-﻿import _control, tools, FraudShared;
+﻿import _control, tools;
 
 export _Flags :=
 module
@@ -10,17 +10,29 @@ module
 	export FileExists := module
 	
 		export Input := module
-			export SuspectIP            := count(nothor(FileServices.SuperFileContents(Filenames().Input.SuspectIP    .Sprayed))) > 0;
-			export Glb5                 := count(nothor(FileServices.SuperFileContents(Filenames().Input.Glb5         .Sprayed))) > 0;
-			export Tiger                := count(nothor(FileServices.SuperFileContents(Filenames().Input.tiger        .Sprayed))) > 0;
-			export CFNA                 := count(nothor(FileServices.SuperFileContents(Filenames().Input.CFNA        	.Sprayed))) > 0;
-			export AInspection          := count(nothor(FileServices.SuperFileContents(Filenames().Input.AInspection  .Sprayed))) > 0;
-			export Erie                 := count(nothor(FileServices.SuperFileContents(Filenames().Input.Erie         .Sprayed))) > 0;
-			export ErieWatchList        := count(nothor(FileServices.SuperFileContents(Filenames().Input.ErieWatchList .Sprayed))) > 0;
+			export SuspectIP                        := count(nothor(FileServices.SuperFileContents(Filenames().Input.SuspectIP    .Sprayed))) > 0;
+			export Glb5                             := count(nothor(FileServices.SuperFileContents(Filenames().Input.Glb5         .Sprayed))) > 0;
+			export Tiger                            := count(nothor(FileServices.SuperFileContents(Filenames().Input.tiger        .Sprayed))) > 0;
+			export CFNA                             := count(nothor(FileServices.SuperFileContents(Filenames().Input.CFNA        	.Sprayed))) > 0;
+			export AInspection                      := count(nothor(FileServices.SuperFileContents(Filenames().Input.AInspection  .Sprayed))) > 0;
+			export Erie                             := count(nothor(FileServices.SuperFileContents(Filenames().Input.Erie         .Sprayed))) > 0;
+			export ErieWatchList                    := count(nothor(FileServices.SuperFileContents(Filenames().Input.ErieWatchList .Sprayed))) > 0;
+      export MBS                  						:= count(nothor(FileServices.SuperFileContents(Filenames().Input.MBS        										.Sprayed))) > 0;
+      export MbsNewGcIdExclusion  						:= count(nothor(FileServices.SuperFileContents(Filenames().Input.MbsNewGcIdExclusion  					.Sprayed))) > 0;
+      export MbsIndTypeExclusion  						:= count(nothor(FileServices.SuperFileContents(Filenames().Input.MbsIndTypeExclusion  					.Sprayed))) > 0;
+			export MbsFdnMasterIDIndTypeInclusion		:= count(nothor(FileServices.SuperFileContents(Filenames().Input.MbsFdnMasterIDIndTypeInclusion .Sprayed))) > 0;
+      export MbsProductInclude    						:= count(nothor(FileServices.SuperFileContents(Filenames().Input.MbsProductInclude        			.Sprayed))) > 0;
+      export MBSSourceGcExclusion 						:= count(nothor(FileServices.SuperFileContents(Filenames().Input.MBSSourceGcExclusion       		.Sprayed))) > 0;
+      export MBSmarketAppend      						:= count(nothor(FileServices.SuperFileContents(Filenames().Input.MBSmarketAppend       					.Sprayed))) > 0;
+      export MBSFdnIndType        						:= count(nothor(FileServices.SuperFileContents(Filenames().Input.MBSFdnIndType       						.Sprayed))) > 0;
+      export MBSFdnCCID           						:= count(nothor(FileServices.SuperFileContents(Filenames().Input.MBSFdnCCID       							.Sprayed))) > 0;
+      export MBSFdnHHID           						:= count(nothor(FileServices.SuperFileContents(Filenames().Input.MBSFdnHHID       							.Sprayed))) > 0;
+      export MBSTableCol          						:= count(nothor(FileServices.SuperFileContents(Filenames().Input.MBSTableCol       							.Sprayed))) > 0;
+      export MBSColValDesc        						:= count(nothor(FileServices.SuperFileContents(Filenames().Input.MBSColValDesc       						.Sprayed))) > 0;
 		end;
 					
 		export Base := module
-			export Main                 := count(nothor(FileServices.SuperFileContents(FraudShared.Filenames().Base.Main     .QA))) > 0;
+			export Main                 := count(nothor(FileServices.SuperFileContents(Filenames().Base.Main     .QA))) > 0;
 			export SuspectIP            := count(nothor(FileServices.SuperFileContents(Filenames().Base.SuspectIP            .QA))) > 0;
 			export Glb5                 := count(nothor(FileServices.SuperFileContents(Filenames().Base.GLB5                 .QA))) > 0;
 			export Tiger                := count(nothor(FileServices.SuperFileContents(Filenames().Base.Tiger                .QA))) > 0;

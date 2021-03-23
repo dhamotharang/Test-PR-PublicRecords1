@@ -1,9 +1,9 @@
-﻿IMPORT Data_Services, RoxieKeyBuild, FraudShared;
+﻿IMPORT Data_Services, RoxieKeyBuild;
 EXPORT fn_expand_fdn_main_base(string pdate) := FUNCTION
  
 	old_fdn_base := dataset(Data_Services.foreign_prod+'thor_data400::base::fdn::qa::main',Exp_Base_Layouts.main, thor); 
 
-	old_base_conv := project(old_fdn_base, transform(FraudShared.Layouts.Base.Main,
+	old_base_conv := project(old_fdn_base, transform(Layouts.Base.Main,
 																										self := left;
 																										self := []));
 	old_base_conv_dist := distribute(old_base_conv, hash32(record_id));	 
