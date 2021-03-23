@@ -12,6 +12,7 @@
 	<part name="IsPrescreen" type="xsd:boolean"/>
 	<part name="RetainInputLexid" type="xsd:boolean"/>
 	<part name="AppendPII" type="xsd:boolean"/>
+	<part name="CaliforniaInPerson" type="xsd:boolean"/>
 	<part name="IndustryClass" type="xsd:string"/>
 	<part name="IntendedPurpose" type="xsd:string"/>
 	<part name="AllowedSourcesDataset" type="tns:XmlDataSet" cols="100" rows="8"/>
@@ -39,6 +40,7 @@ EXPORT MAS_FCRA_Service() := MACRO
 		'IsPrescreen',
 		'RetainInputLexid',
 		'AppendPII',
+		'CaliforniaInPerson',
 		'IncludeMinors',
 		'IntendedPurpose',
 		'AllowedSourcesDataset',
@@ -65,6 +67,7 @@ EXPORT MAS_FCRA_Service() := MACRO
 	
 	BOOLEAN Retain_Input_Lexid := FALSE : STORED('RetainInputLexid');//keep what we have on input
 	BOOLEAN Append_PII := FALSE : STORED('AppendPII');//keep what we have on input
+	BOOLEAN California_In_Person := FALSE : STORED('CaliforniaInPerson');//keep what we have on input
 	BOOLEAN Allow_Inferred_Performance := FALSE : STORED('AllowInferredPerformance');//keep what we have on input
 		
 	// Nulling out stored variables to not propagate to Attributes.kel
@@ -127,7 +130,7 @@ EXPORT MAS_FCRA_Service() := MACRO
 		EXPORT DATASET(Gateway.Layouts.Config) Gateways := GatewaysClean;
 		EXPORT BOOLEAN RetainInputLexid := Retain_Input_Lexid;
 		EXPORT BOOLEAN BestPIIAppend :=  Append_PII; //do not append best pii for running, always append best pii for prescreen
-
+		EXPORT BOOLEAN CaliforniaInPerson := California_In_Person; //do not append best pii for running
 		
 		// Override Include* Entity/Association options here if certain entities can be turned off to speed up processing.
 		// This will bypass uneccesary key JOINS in PublicRecords_KEL.Fn_MAS_FDC if the keys don't contribute to any 
