@@ -15,7 +15,6 @@ EXPORT File_LIDB := module
 	EXPORT Response_Processed										:= dataset('~thor_data400::base::phones::lidb_reference', PhonesInfo.Layout_Common.lidbRespProcess, flat);
 
 	//Reformat w/ Appended Carrier Info
-	EXPORT Response_Processed_CR_Append					:= dataset('~thor_data400::base::phones::lidb_reference_cr_append', 			PhonesInfo.Layout_Common.temp_portedMetadata_Main, flat); 	//DF-26977
 	EXPORT Response_Processed_CR_Append_PType 	:= dataset('~thor_data400::base::phones::lidb_reference_cr_append_ptype', dx_PhonesInfo.Layouts.Phones_Type_Main, flat);							//DF-26977
 
 end;

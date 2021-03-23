@@ -55,8 +55,10 @@ string Insurance_policy_Exp_Date,
 string source_id,	
 string report_code,	
 string match_flag,	
-string date_vendor_last_reported
-	
+string date_vendor_last_reported,
+string airbags_deploy,
+string towed,
+string impact_location	
 end; 
 filein := dedup(dataset('~thor_data::in::nahdb::vin', layoutNahdbBatchVin, CSV(Terminator (['\n','\r\n']), Heading(1), Quote('"'), Separator([',']))),all);
 
@@ -66,7 +68,7 @@ filein := dedup(dataset('~thor_data::in::nahdb::vin', layoutNahdbBatchVin, CSV(T
  EA_natl_keyed_inquiry_set   := ['FA','EA','TM','TF','A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P','Q','R','S','T','U','V','W','X','Y','Z',
                                  'IA','IB','IC','ID','IE','IF','IG','IH','II','IJ','IK','IL','IM','IN','IO','IP','IQ','IR','IS','IT','IU','IV','IW','IX','IY','IZ'];
 
- accidents0:= FLAccidents_Ecrash.File_KeybuildV2.out(report_code in EA_natl_keyed_inquiry_set); 
+ accidents0:= Files_eCrash.Ds_Base_Consolidation_Ecrash(report_code in EA_natl_keyed_inquiry_set); 
  
  accidents1 := PROJECT(accidents0,transform(recordof(accidents0),self.record_type := trim(regexreplace('\\t|\\n| ',left.record_type,'')),self.cru_jurisdiction_nbr  :=   regexreplace('\\^M',left.cru_jurisdiction_nbr,''),
              self := left));
@@ -131,6 +133,12 @@ vin_match:= dedup(join(accidentDedup, distribute(filein(vin <> ''),hash(vin)),
            self.vehicle_unit_number   :=  left.vehicle_unit_number    ;
            self.vendor_code           :=  left.vendor_code;
            self.work_type_id          :=  left.work_type_id;
+		   self.airbags_deploy   := map  ( left.airbags_deploy  = '0' =>  'false',
+		                                                           left.airbags_deploy  = '1' =>  'true', ' ' );
+		   self.towed   := map  ( left.towed  = '0' =>  'false',
+		                                                           left.towed  = '1' =>  'true', ' ' );
+			self.impact_location := left.impact_location;
+		             
 					 self := right 
 				   ), right outer,local),all);
 

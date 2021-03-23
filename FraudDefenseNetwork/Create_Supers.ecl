@@ -1,9 +1,7 @@
-import tools,FraudShared;
+﻿IMPORT tools;
 
-export Create_Supers :=
-	tools.mod_Utilities.createallsupers(
-		filenames().Input.dAll_filenames +
-		FraudShared.filenames().Input.dAll_filenames,
-		filenames().dAll_filenames +
-		FraudShared.filenames().dAll_filenames +
-		FraudShared.keynames().dAll_filenames);
+EXPORT Create_Supers := tools.mod_Utilities.createallsupers(
+                                                            filenames().Input.dAll_filenames,
+                                                            filenames().dAll_filenames +
+                                                            keynames().dAll_filenames
+																														);

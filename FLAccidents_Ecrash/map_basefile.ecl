@@ -321,7 +321,11 @@ RETURN SEQUENTIAL(BuildSupplementalBase,
                   BuildeCrashBase,
 									BuildInseCrashSlimBase,
 									BuildPhotoIDBase,
-									BuildAgencyCmbndBase
+									BuildAgencyCmbndBase,
+									fn_Validate,
+									Proc_Build_Consolidation(filedate),
+									//Validate CRU Base file count -- DF-27413
+		              FLAccidents_Ecrash.fn_Validate_cru(filedate) 
 								 );
 
 END;

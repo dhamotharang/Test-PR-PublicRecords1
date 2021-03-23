@@ -1,16 +1,17 @@
-﻿IMPORT SALT311,STD;
+﻿IMPORT SALT44,STD;
 EXPORT Config := MODULE,VIRTUAL
+EXPORT DefaultTempPrefix := '~temp::';
 EXPORT CorrelateSampleSize := 100000000; // Size of sample used in hygiene.corelations
 EXPORT ByPassCleave := FALSE; // If set to true Cleave process will not run in the next internal linking iteration.
 EXPORT PersistExpire := 30; // PERSIST file expiration time in days.
-EXPORT AttrValueType := SALT311.AttrValueType;
-EXPORT CombinedCodeType := SALT311.Str512Type;
+EXPORT AttrValueType := SALT44.AttrValueType;
+EXPORT CombinedCodeType := SALT44.Str512Type;
 EXPORT KeysBitmapType := UNSIGNED8;
 EXPORT KeysBitmapOffset := 32;
 EXPORT MaxChildren := 100; // Maximum children allowed for a MULTIPLE(,LIST)
 alg := ENUM(UNSIGNED1, Standard=0, NoTrailingHalfEdit);
-EXPORT WithinEditN(SALT311.StrType l,UNSIGNED1 ll, SALT311.StrType r,UNSIGNED1 rl,UNSIGNED1 d, UNSIGNED1 edit_threshold=0,UNSIGNED1 mode=alg.Standard, BOOLEAN edFunction(SALT311.StrType l,UNSIGNED1 ll, SALT311.StrType r,UNSIGNED1 rl,UNSIGNED1 d,UNSIGNED1 mode) = SALT311.fn_EditDistance) := 
-        SALT311.WithinEditNew(l, ll, r, rl, d, edit_threshold, mode, edFunction);
+EXPORT WithinEditN(SALT44.StrType l,UNSIGNED1 ll, SALT44.StrType r,UNSIGNED1 rl,UNSIGNED1 d, UNSIGNED1 edit_threshold=0,UNSIGNED1 mode=alg.Standard, BOOLEAN edFunction(SALT44.StrType l,UNSIGNED1 ll, SALT44.StrType r,UNSIGNED1 rl,UNSIGNED1 d,UNSIGNED1 mode) = SALT44.fn_EditDistance) := 
+        SALT44.WithinEditNew(l, ll, r, rl, d, edit_threshold, mode, edFunction);
 EXPORT MatchThreshold := 38;
 EXPORT BasicMatchThreshold := MatchThreshold; // Possibly reduce by a little to give yourself wriggle room in the rather less precise basic match
 EXPORT MeowPrefetch := 20; //Number of transforms called at once
@@ -27,24 +28,25 @@ EXPORT cnp_name_Force := 0; // Wordbags have an implicit FORCE(0) when asking 'd
 EXPORT prim_range_Force := 0; 
 EXPORT city_clean_WheelThreshold := 2000;
 EXPORT company_url_Force := 0; // Wordbags have an implicit FORCE(0) when asking 'does it match'
+ 
 // Configuration of external files
- 
 EXPORT EFRKeyName := '~'+'key::BizLinkFull::proxid::EFR';
-d := DATASET([],Ext_Layouts.EFR_Layout);
  
+d := DATASET([],Ext_Layouts.EFR_Layout);
 EXPORT EFR := INDEX(d,{ultid,orgid,seleid,proxid},{d},EFRKeyName,OPT);
 EXPORT MaxExt_Data := 0; //Default of 0 fetches all
 EXPORT Ext_Data_MAXBLOCKSIZE:=10000;
 EXPORT Ext_Data_MAXBLOCKLIMIT:=10000;
+ 
 // Configuration of linkpath atmost/limit thresholds
-EXPORT L_CNPNAME_ZIP_MAXBLOCKSIZE:=250000; // Increased limit to 100K from 10K /*HACK27a*/
-EXPORT L_CNPNAME_ZIP_MAXBLOCKLIMIT:=250000; // Increased limit to 100K from 10K /*HACK27b*/
-EXPORT L_CNPNAME_ST_MAXBLOCKSIZE:=250000; // Increased limit to 100K from 10K /*HACK27c*/
-EXPORT L_CNPNAME_ST_MAXBLOCKLIMIT:=250000; // Increased limit to 100K from 10K /*HACK27d*/
+EXPORT L_CNPNAME_ZIP_MAXBLOCKSIZE:=250000; // Increased limit to 250K from 10K /*HACK27a*/
+EXPORT L_CNPNAME_ZIP_MAXBLOCKLIMIT:=250000; // Increased limit to 250K from 10K /*HACK27b*/
+EXPORT L_CNPNAME_ST_MAXBLOCKSIZE:=250000; // Increased limit to 250K from 10K /*HACK27c*/
+EXPORT L_CNPNAME_ST_MAXBLOCKLIMIT:=250000; // Increased limit to 250K from 10K /*HACK27d*/
 EXPORT L_CNPNAME_MAXBLOCKSIZE:=250000; // Increased limit to 250K from 10K /*HACK27g*/
 EXPORT L_CNPNAME_MAXBLOCKLIMIT:=250000; // Increased limit to 250K from 10K /*HACK27h*/
-EXPORT L_CNPNAME_FUZZY_MAXBLOCKSIZE:=250000; // Increased limit to 100K from 10K /*HACK27e*/
-EXPORT L_CNPNAME_FUZZY_MAXBLOCKLIMIT:=250000; // Increased limit to 100K from 10K /*HACK27f*/
+EXPORT L_CNPNAME_FUZZY_MAXBLOCKSIZE:=250000; // Increased limit to 250K from 10K /*HACK27e*/
+EXPORT L_CNPNAME_FUZZY_MAXBLOCKLIMIT:=250000; // Increased limit to 250K from 10K /*HACK27f*/
 EXPORT L_ADDRESS1_MAXBLOCKSIZE:=10000;
 EXPORT L_ADDRESS1_MAXBLOCKLIMIT:=10000;
 EXPORT L_ADDRESS2_MAXBLOCKSIZE:=10000;
@@ -69,6 +71,4 @@ EXPORT L_SOURCE_MAXBLOCKSIZE:=10000;
 EXPORT L_SOURCE_MAXBLOCKLIMIT:=10000;
 EXPORT L_CONTACT_DID_MAXBLOCKSIZE:=10000;
 EXPORT L_CONTACT_DID_MAXBLOCKLIMIT:=10000;
-
-export Infix := 'Bizlinkfull';
 END;

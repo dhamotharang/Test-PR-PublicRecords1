@@ -320,10 +320,7 @@ EXPORT proc_build_EcrashV2_keys(STRING filedate) := FUNCTION
                             move2_dlnnbrdlstate, move2_vinnbr, move2_licenseplatenbr, move2_officerbadgenbr, move2_lastname, move2_prefname_state, move2_standlocation, move2_agencyid_sentdate
                            );
 
-   build_ecrash_keys_all := SEQUENTIAL(   
-                                       CreateSuperFiles,
-                                       fn_Validate,
-                                       Proc_Build_Alpha(filedate),         
+   build_ecrash_keys_all := SEQUENTIAL(        
                                        build_keys,
                                        move_built_keys,
                                        move_qa_keys,

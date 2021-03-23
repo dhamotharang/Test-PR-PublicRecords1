@@ -1,6 +1,6 @@
 ﻿IMPORT STD, dx_Ecrash;
 
-EXPORT mod_PrepEcrashSearchKeys(DATASET(Layout_eCrash.Consolidation) EcrashIn = FLAccidents_Ecrash.File_KeybuildV2.out) := MODULE
+EXPORT mod_PrepEcrashSearchKeys(DATASET(Layout_eCrash.Consolidation) EcrashIn = Files_eCrash.Ds_Base_Consolidation_Ecrash) := MODULE
 
 SearchRecs := EcrashIn(report_code IN ['EA', 'TM', 'TF'] AND 
 	                            work_type_id NOT IN ['2', '3'] AND 

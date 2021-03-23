@@ -502,6 +502,9 @@ module
 				// -- JIRA - BH-915 Incorrect ROBERT HILL, possibly, associated to business
 				or  (mdr.sourceTools.sourceIsBusiness_Registration(pInput.source) and trim(pInput.company_source_group) in ['1855883 SHATTOS LLC','258208NORTH PARK TRUCK & EQUIPMENT'] and
 						 trim(pInput.lname) = 'HILL' and trim(pInput.prim_name) = 'PO BOX 705')
+				// -- JIRA - DF-28316 Remove More Accutrend (Src Code BR) Contact Records for LexID 562516533
+				or  (mdr.sourceTools.sourceIsBusiness_Registration(pInput.source) and trim(pInput.lname) = 'DAVIS' and trim(pInput.fname) = 'ROBERT' and
+						 trim(pInput.company_source_group) in ['200906210117RED BAR DYNAMICS LLC', '02-2124SALES MANAGEMENT ARCHITECTS', '03176344VIRTUAL DRIVER INTERACTIVE', '2007A0000143VITRUAL DRIVER INTERAC'])
 			;
 
 			boolean lFullFilter 		:= if(pFilterOut
@@ -720,7 +723,7 @@ module
 				// -- JIRA# DF-28031 - Remove TMSID DF204043915806782546018877941 from D&B FEIN
 				or	(MDR.sourceTools.SourceIsDunn_Bradstreet_Fein(pInput.source) and trim(pInput.vendor_id,left,right) = '018877941')
 				// -- JIRA# DF-26195 - Flush-n-fill the old historical SKA records from the basefiles and re-introduce them as new records again. Remove this code in the next run.
-				or	(MDR.sourceTools.SourceIsSKA(pInput.source))
+				//or	(MDR.sourceTools.SourceIsSKA(pInput.source))
 				;
 
 			boolean lFullFilter 		:= if(pFilterOut
@@ -1124,7 +1127,12 @@ module
 				or  (mdr.sourceTools.sourceIsBusiness_Registration(pInput.source) and trim(pInput.company_source_group) in ['1855883 SHATTOS LLC','258208NORTH PARK TRUCK & EQUIPMENT'] and
 						 trim(pInput.lname) = 'HILL' and trim(pInput.prim_name) = 'PO BOX 705')
 				// -- JIRA# DF-26195 - Flush-n-fill the old historical SKA records from the basefiles and re-introduce them as new records again. Remove this code in the next run.
-				or	(MDR.sourceTools.SourceIsSKA(pInput.source))
+				//or	(MDR.sourceTools.SourceIsSKA(pInput.source))
+				// -- JIRA - DF-28316 Remove More Accutrend (Src Code BR) Contact Records for LexID 562516533
+				or  (mdr.sourceTools.sourceIsBusiness_Registration(pInput.source) and trim(pInput.lname) = 'DAVIS' and trim(pInput.fname) = 'ROBERT' and
+						 trim(pInput.company_source_group) in ['200906210117RED BAR DYNAMICS LLC', '02-2124SALES MANAGEMENT ARCHITECTS', '03176344VIRTUAL DRIVER INTERACTIVE', '2007A0000143VITRUAL DRIVER INTERAC'])
+				// -- JIRA - DF-28595 Dispute - RACHELLE PIERCE, 1976789508 association to ASSISTIVE TECHNOLOGY IN MOTION
+				or  (mdr.sourceTools.sourceIsBusiness_Registration(pInput.source) and trim(pInput.lname) = 'PIERCE' and trim(pInput.fname) = 'RACHELLE' and trim(pInput.company_source_group) in ['X00631178ASSISTIVE TECHNOLOGY IN M'])
 			;
 
 			boolean lFullFilter 		:= if(pFilterOut
@@ -1248,6 +1256,12 @@ module
 				// -- JIRA - DF-28296 Bus Association - Sharese N. Brown may be confused with Sharese Lynette Brown
 				filterbugDF28296 := trimids(l.company_source_group) = 'F10000000471ALL YOU CAN BE ENTERTA' and l.did = 303538718
 														and l.bdid = 2462145988 and trim(l.lname) = 'SHARESE' and trim(l.fname) = 'BROWN';
+				
+				// -- JIRA - DF-28462 - 559414197 - disputing business association with The Village Buzz
+				filterbugDF28462 := l.bdid = 1059623428 and l.did = 559414197;
+				
+				// -- JIRA - DF-28704 - PAW Overlinking - LexID 1181125067 - J Lawrence Huber Jr
+				filterbugDF28704 := l.bdid = 45964591 and l.did = 1181125067;
 														
 				phone 				:= (unsigned6)ut.CleanPhone(header.fn_blank_bogus_phones((string)l.phone));  // Zero the phone if more than 10-digits
 				company_phone := (unsigned6)ut.CleanPhone(header.fn_blank_bogus_phones((string)l.company_phone));  // Zero the companyphone if more than 10-digits
@@ -1274,11 +1288,11 @@ module
 				self.DID									:= if(filterbug30402 or filterbug114192 or filterbugLNK563 or filterbugLNK1267 or
 																				filterbugDF22318 or filterbugDF23078 or filterbugLNK1501 or filterbugDF23926 or
 																				filterbugDF23188 or filterbugDF23549 or filterbugDF26722 or filterbugDF27867 or
-																				filterbugDF28296, 0, l.did);
+																				filterbugDF28296 or filterbugDF28462 or filterbugDF28704, 0, l.did);
 				self.ssn									:= if(filterbug30402 or filterbug114192 or filterbugLNK563 or filterbugLNK1267 or  
 																				filterbugDF22318 or filterbugDF23078 or filterbugLNK1501 or filterbugDF23926 or
 																				filterbugDF23188 or filterbugDF23549 or filterbugDF26722 or filterbugDF27867 or
-																				filterbugDF28296, 0, l.ssn);
+																				filterbugDF28296 or filterbugDF28462 or filterbugDF28704, 0, l.ssn);
 				//for bug 30494 & 30519.  20080424
 				self.dt_first_seen				:= (unsigned4)validatedate((string8)l.dt_first_seen						,if(length(trim((string8)l.dt_first_seen						)) = 8,0,1));
 				self.dt_last_seen					:= (unsigned4)validatedate((string8)l.dt_last_seen						,if(length(trim((string8)l.dt_last_seen							)) = 8,0,1));
@@ -1513,6 +1527,10 @@ module
 				// -- JIRA - DF-28296 Bus Association - Sharese N. Brown may be confused with Sharese Lynette Brown
 				filterbugDF28296 := trimids(l.company_source_group) = 'F10000000471ALL YOU CAN BE ENTERTA' and l.did = 303538718
 														and l.bdid = 2462145988 and trim(l.lname) = 'SHARESE' and trim(l.fname) = 'BROWN';
+				// -- JIRA - DF-28462 - 559414197 - disputing business association with The Village Buzz
+				filterbugDF28462 := l.bdid = 1059623428 and l.did = 559414197;
+				// -- JIRA - DF-28704 - PAW Overlinking - LexID 1181125067 - J Lawrence Huber Jr
+				filterbugDF28704 := l.bdid = 45964591 and l.did = 1181125067;
 				// --- Bug#35653 -  For the "Eq_employer" source first & last seen dates are set to zero/blank as the 
 				// dates coming in from the base file are harded coded.
 				ZeroEq_EmployerDate :=  (MDR.sourceTools.SourceIsEq_Employer(l.source));
@@ -1528,11 +1546,13 @@ module
 				self.DID									:= if(filterbug30402 or filterbugLNK563 or filterbugLNK1267 or 
 																				filterbugDF22318 or filterbugDF23078 or filterbugLNK1501 or
 																				filterbugDF23926 or filterbugDF23188 or filterbugDF23549 or 
-																				filterbugDF26722 or filterbugDF27867 or filterbugDF28296, 0, l.did)	;
+																				filterbugDF26722 or filterbugDF27867 or filterbugDF28296 or
+																				filterbugDF28462 or filterbugDF28704, 0, l.did)	;
 				self.ssn									:= if(filterbug30402 or filterbugLNK563 or filterbugLNK1267 or 
 																				filterbugDF22318 or filterbugDF23078 or filterbugLNK1501 or
 																				filterbugDF23926 or filterbugDF23188 or filterbugDF23549 or
-																				filterbugDF26722 or filterbugDF27867 or filterbugDF28296, 0, l.ssn)	;
+																				filterbugDF26722 or filterbugDF27867 or filterbugDF28296 or
+																				filterbugDF28462 or filterbugDF28704, 0, l.ssn)	;
 				self											:= l														;                              
 			end;
 			

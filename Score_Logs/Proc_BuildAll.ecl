@@ -1,5 +1,5 @@
 ﻿#WORKUNIT('name','Yogurt:Score Attribute and Outcome Daily Build');
-#WORKUNIT('priority','high');  
+//#WORKUNIT('priority','high');  
 #OPTION('AllowAutoQueueSwitch', true);
 
 IMPORT ut;
@@ -10,7 +10,8 @@ SEQUENTIAL(
 														Score_Logs.fn_Validate.dall;
 														score_logs.proc_CreateBaseFile(); //parameters let you choose to not output a certain base file (transaction, accounting, intermediate)
 														Score_Logs.TransactionID_stats();
-														Score_Logs.Proc_CreateKeys(version);
-														Score_Logs.proc_buildstrata(version)
+														//DF-28874 turn off key build
+														/*Score_Logs.Proc_CreateKeys(version);
+														Score_Logs.proc_buildstrata(version)*/
 													);
 

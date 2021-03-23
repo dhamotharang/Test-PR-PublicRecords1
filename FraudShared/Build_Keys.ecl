@@ -12,7 +12,6 @@ export Build_Keys(
 
 	tools.mac_WriteIndex('TheKeys.Main.ID.New'								  						,BuildMainIdKey				     					);
 	tools.mac_WriteIndex('TheKeys.Main.DID.New'															,BuildDidKey											 	);
-	tools.mac_WriteIndex('TheKeys.Main.BDID.New'														,BuildBdidKey							 					);
 	tools.mac_WriteIndex('TheKeys.Main.email.New'														,BuildemailKey						 					);
 	tools.mac_WriteIndex('TheKeys.Main.IP.New'								  						,BuildIPKey							   					);
 	tools.mac_WriteIndex('TheKeys.Main.ProfessionalID.New' 	    						,BuildProfessionalIDKey	   					);
@@ -23,7 +22,6 @@ export Build_Keys(
 	tools.mac_WriteIndex('TheKeys.Main.LNPID.New'               						,BuildLNPIDKey	         						);
 	tools.mac_WriteIndex('TheKeys.Main.DriversLicense.New'               		,BuildDriversLicenseKey	         		);
 	tools.mac_WriteIndex('TheKeys.Main.BankAccount.New'               			,BuildBankAccountKey	         			);
-	tools.mac_WriteIndex('TheKeys.Main.MBS.New'								  						,BuildMbsKey							 					);
 	tools.mac_WriteIndex('TheKeys.Main.MbsIndTypeExclusion.New'							,BuildMbsIndTypeExclusionKey				);
   tools.mac_WriteIndex('TheKeys.Main.MbsProductInclude.New'								,BuildMbsProductIncludeKey				 	);
   tools.mac_WriteIndex('TheKeys.Main.MbsFDNMasterIDKey.New'								,BuildMbsFDNMasterIDKey				 			);
@@ -52,7 +50,6 @@ export Build_Keys(
 		 parallel(
 			 BuildMainIdKey	
 			,BuildDidKey
-			,If(Platform.Source <> 'FraudGov',BuildBdidKey)
 			,BuildemailKey
 			,If(Platform.Source <> 'FraudGov',BuildIPKey)
 			,If(Platform.Source <> 'FraudGov',BuildProfessionalIDKey)
@@ -63,7 +60,6 @@ export Build_Keys(
 			,If(Platform.Source <> 'FraudGov',BuildLNPIDKey)
 			,BuildDriversLicenseKey
 			,BuildBankAccountKey
-			,If(Platform.Source <> 'FraudGov',BuildMbsKey)
 			,BuildMbsIndTypeExclusionKey
 			,BuildMbsProductIncludeKey
 			,BuildMbsFDNMasterIDKey

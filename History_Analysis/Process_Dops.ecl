@@ -1,6 +1,6 @@
 Import STD, _control, dops, History_Analysis, PromoteSupers, ut;
 
-Export process_dops( string pVersion, string datasetname, string location, string cluster, string fromdate, string todate, string dopsenv ) := Module
+Export process_dops( string pVersion, string datasetname, string location, string cluster, string fromdate, string todate ) := Module
  
 // file from 2 year history 
 KeysizedHistory := History_Analysis.Files(pVersion).keysizedhistory_report;
@@ -8,15 +8,14 @@ KeysizedHistory := History_Analysis.Files(pVersion).keysizedhistory_report;
 // datasetname = dataset name from dops
 // location = 'B' for boca or 'A' for alpharetta or '' or '*'
 // cluster = 'N' for nonfcra or 'F' for fcra or '' or '*' or 'S' - Customer Support or 'FS' - FCRA Customer Support or 'T' - Customer Test
-// environment = 'Q' for qa or 'P' for prod; this variable represents data in prod or qa roxie
 // start date of ten day range
 // end date of ten day range
 // dopsenv = 'dev' or 'prod'; dev - points to dev or prod DOPS DB
-fcraData := dops.GetHistoricalKeyInfo(datasetname, location, 'F', fromdate, todate, dopsenv );
+fcraData := dops.GetHistoricalKeyInfo(datasetname, location, 'F', fromdate, todate );
 
-nonfcraData := dops.GetHistoricalKeyInfo(datasetname, location, 'N' , fromdate, todate, dopsenv );
+nonfcraData := dops.GetHistoricalKeyInfo(datasetname, location, 'N' , fromdate, todate );
 
-Shared addBothInputs := (fcraData + nonfcraData );
+addBothInputs := (fcraData + nonfcraData );
 
 //from 2018-02-14 15:25:13 to 2/20/2020 1:45:05 AM
 fn_format_date (string date) := Function
@@ -71,7 +70,18 @@ old_data := History_Analysis.Files(pVersion).keysizedhistory_rawdata;
 
 dd_dataset := (old_data + dops_service );
 
-dedup_dataset := dedup(dd_dataset, datasetname, buildversion, whenqalive, whenprodlive, clusterflag, updateflag, superkey, logicalkey, size, recordcount, statuscode, statusdescription, all );
+dedup_dataset := dedup(dd_dataset, datasetname, 
+								   clusterflag, 
+								   whenqalive, 
+								   whenprodlive, 
+								   buildversion, 
+								   superkey, 
+								   logicalkey, 
+								   size, 
+								   recordcount,
+								   updateflag, 
+								   statuscode, 
+								   statusdescription, all );
 
 sorted_dataset := sort(dedup_dataset(datasetname<>''), datasetname, superkey, -buildversion, whenqalive, whenprodlive );
 

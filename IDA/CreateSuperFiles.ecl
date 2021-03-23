@@ -15,8 +15,12 @@ STD.File.CreateSuperFile('~thor_data400::base::IDA::qa',allowExist:=true);
 STD.File.CreateSuperFile('~thor_data400::base::IDA::father',allowExist:=true);
 STD.File.CreateSuperFile('~thor_data400::base::IDA::delete',allowExist:=true);
 
-
 STD.File.CreateSuperFile('~thor_data400::out::IDA::despray::built',allowExist:=true);
 STD.File.CreateSuperFile('~thor_data400::out::IDA::despray::qa',allowExist:=true);
 STD.File.CreateSuperFile('~thor_data400::out::IDA::despray::father',allowExist:=true);
 STD.File.CreateSuperFile('~thor_data400::out::IDA::despray::delete',allowExist:=true);
+
+STD.File.CreateSuperFile('~thor_data400::base::change::ida::built',allowExist:=true);
+STD.File.CreateSuperFile('~thor_data400::base::change::ida::qa',allowExist:=true);
+STD.File.CreateSuperFile('~thor_data400::base::change::ida::father',allowExist:=true);
+STD.File.CreateSuperFile('~thor_data400::base::change::ida::delete',allowExist:=true);

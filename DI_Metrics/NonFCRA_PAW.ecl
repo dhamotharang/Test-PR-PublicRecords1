@@ -2,9 +2,9 @@
 //W20200806-094223 Prod
 
 IMPORT _Control, PAW, STD, ut;
-EXPORT NonFCRA_PAW(string pHostname, string pTarget, string pContact ='\' \'') := function
+EXPORT NonFCRA_PAW(string pHostname, string pTarget, string pContact ='\' \'', STRING today = (STRING8)STD.Date.Today()) := function
 
-filedate := (STRING8)Std.Date.Today();
+filedate := today;
 
 Key_PAW := PAW.File_Base;
 Key_PAW_2010 := PROJECT(Key_PAW((integer4) dt_first_seen[1..4] >= 2010) 
@@ -25,7 +25,7 @@ despray_paw_tbl := STD.File.DeSpray('~thor_data400::data_insight::data_metrics::
 
 //if everything in the Sequential statement runs, it will send the Success email, else it will send the Failure email
 email_alert := SEQUENTIAL(
-					output(sort(tbl_Key_PAW_2010_DIDs, -first_seen, state, skew(1.0)),,'~thor_data400::data_insight::data_metrics::tbl_Key_PAW_2010_DIDs_FirstSeen_'+ filedate +'.csv', csv(heading(single), separator('|'),terminator('\r\n'),quote('\"')),overwrite)
+					output(sort(tbl_Key_PAW_2010_DIDs, -first_seen, state, skew(1.0)),,'~thor_data400::data_insight::data_metrics::tbl_Key_PAW_2010_DIDs_FirstSeen_'+ filedate +'.csv', csv(heading(single), separator('|'),terminator('\r\n'),quote('\"')), overwrite, expire(10))
 					,despray_paw_tbl):
 					Success(FileServices.SendEmail(pContact, 'NonFCRA Group: NonFCRA_PAW Build Succeeded', workunit + ': Build complete.' + filedate)),
 					Failure(FileServices.SendEmail(pContact, 'NonFCRA Group: NonFCRA_PAW Build Failed', workunit + filedate + '\n' + FAILMESSAGE)

@@ -33,9 +33,10 @@ _process(string prProcess ,boolean pUseProd, boolean pDaily) := Function
 		+');';
 
 	_cronWhen_ECL := Case( prProcess, 
-											   'IDA REAPPEND' =>  ':WHEN(IDA._CRON_ECL(\'' + prProcess + '\',' + _pUseProd + ',' + _pDaily + ').EVENT_NAME)\n' 
-											  ,'IDA BUILD'    =>  ':WHEN(CRON(\'0 11-23/1 * * *\'))\n'  
-												,			              ':WHEN(IDA._CRON_ECL(\'' + prProcess + '\',' + _pUseProd + ',' + _pDaily + ').EVENT_NAME)\n'
+											   'IDA REAPPEND'    =>  ':WHEN(IDA._CRON_ECL(\'' + prProcess + '\',' + _pUseProd + ',' + _pDaily + ').EVENT_NAME)\n' 
+											  ,'IDA HEADER FLAG' =>  ':WHEN(IDA._CRON_ECL(\'' + prProcess + '\',' + _pUseProd + ',' + _pDaily + ').EVENT_NAME)\n' 
+											  ,'IDA BUILD'       =>  ':WHEN(CRON(\'0 11-23/1 * * *\'))\n'  
+											  ,			             ':WHEN(IDA._CRON_ECL(\'' + prProcess + '\',' + _pUseProd + ',' + _pDaily + ').EVENT_NAME)\n'
 												);
 
 	schedule_ECL       :=  STD.Str.FindReplace( _createWUID_ECL, 'CRON_WHEN', _cronWhen_ECL); 
@@ -48,10 +49,12 @@ _process(string prProcess ,boolean pUseProd, boolean pDaily) := Function
 end; 
 
 DatalandProcesses  		:= Sequential(_process('IDA BUILD',false,true)
+                                    ,_process('IDA HEADER FLAG',false,false)
                                     ,_process('IDA REAPPEND',false,false)
 															    );
 															 
 ProdProcesses      		:= Sequential(_process('IDA BUILD',true,true)
+                                    ,_process('IDA HEADER FLAG',true,false)
                                     ,_process('IDA REAPPEND',true,false)
 																	);
 

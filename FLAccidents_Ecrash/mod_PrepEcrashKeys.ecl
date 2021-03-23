@@ -1,7 +1,6 @@
 ﻿IMPORT STD, dx_Ecrash;
 
-EXPORT mod_PrepEcrashKeys(DATASET(Layout_eCrash.Consolidation) EcrashIn = FLAccidents_Ecrash.File_KeybuildV2.out) := MODULE
-
+EXPORT mod_PrepEcrashKeys(DATASET(Layout_eCrash.Consolidation) EcrashIn = Files_eCrash.Ds_Base_Consolidation_Ecrash) := MODULE
 SHARED SupplementalBase := Files.Base.Supplemental;
 SHARED ds_PhotoBase := Files.Base.PhotoBase;
 

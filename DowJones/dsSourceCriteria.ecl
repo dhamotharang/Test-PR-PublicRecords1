@@ -1988,7 +1988,25 @@ EXPORT dsSourceCriteria := DATASET([
 {'EC 2021/29 Syria List','1975'},
 {'EC 2021/30 CFSP Syria List','1976'},
 {'EC (CFSP) 2021/55 Tunisia List','1977'},
-{'EC 2021/49 Tunisia List','1978'}
+{'EC 2021/49 Tunisia List','1978'},
+{'EC (CFSP) 2021/142 EU Terrorism List','1979'},
+{'EC 2021/138 Terrorism List','1980'},
+{'EC (CFSP) 2021/258 Zimbabwe List','1981'},
+{'EC (CFSP) 2021/276 Venezuela List','1982'},
+{'EC 2021/275 Venezuela List','1983'},
+{'OFAC - Protecting Europe\'s Energy Security Act','1984'},
+{'EC (CFSP) 2021/353 Belarus List','1985'},
+{'EC (CFSP) 2021/372 Human Rights Violations and Abuses List','1986'},
+{'EC 2021/339 Belarus List','1987'},
+{'EC 2021/371 Human Rights Violations and Abuses List','1988'},
+{'EC (CFSP) 2021/394 Ukraine List','1989'},
+{'EC (CFSP) 2021/398 Yemen List','1990'},
+{'EC 2021/391 Ukraine List','1991'},
+{'EC 2021/397 Yemen List','1992'},
+{'NBCTF (Israel) Seizure Orders','1993'},
+{'EC (CFSP) 2021/448 Ukraine List','1994'},
+{'EC 2021/446 Ukraine List','1995'}
+
 ],r);
 
 

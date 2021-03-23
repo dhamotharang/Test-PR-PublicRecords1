@@ -168,7 +168,11 @@ functionmacro
     ,Marketing_List.Validate_Address(seleid_level.business_address,seleid_level.city,seleid_level.state,seleid_level.zip5)
   );
 
-  ds_return_result := project(ds_return_result_validate_address ,Marketing_List.Layouts.business_information);  
+  ds_return_result := project(ds_return_result_validate_address ,transform(Marketing_List.Layouts.business_information
+    ,self.seleid_level.business_name := regexreplace('[^[:print:]]' ,left.seleid_level.business_name ,'' ,nocase)
+    ,self.proxid_level.business_name := regexreplace('[^[:print:]]' ,left.proxid_level.business_name ,'' ,nocase)
+    ,self                            := left
+  ));  
   
   ds_filtered_out_recs := join(ds_return_result_biz ,ds_return_result ,left.proxid = right.proxid ,transform(left)  ,left only,hash);
 

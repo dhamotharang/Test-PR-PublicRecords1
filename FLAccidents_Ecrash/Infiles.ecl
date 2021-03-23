@@ -5,21 +5,26 @@ EXPORT Infiles := MODULE
 // ###########################################################################
 //                        MBS Agency Raw File
 // ###########################################################################	
-  EXPORT Agency := Files_MBSAgency.DS_BASE_AGENCY;	
-	SHARED AgencyInput := PROJECT(Agency, TRANSFORM(Layout_Infiles_Fixed.agency, 
-                                SELF.agency_id := IF(TRIM(LEFT.agency_id, LEFT, RIGHT) <> '', LEFT.agency_id, ERROR('agency file bad')),
-                                SELF := LEFT));
+  EXPORT  Agency := PROJECT(Files_MBSAgency.DS_BASE_AGENCY, TRANSFORM(Layout_MBSAgency.agency, 
+	                                                          SELF.Agency_name := MAP(LEFT.agency_id = '1671327' => 'CHRISTIAN COUNTY CONST DIST 6',
+																														                        LEFT.agency_id = '1677717' => 'LINCOLN COUNTY CONSTABLE DIST3',
+																																										LEFT.Agency_name);
+																														SELF := LEFT));	
 	
   SHARED uAgency := DEDUP(SORT(DISTRIBUTE(Agency(Agency_ID <> ''), HASH32(Agency_ID)), 
-                               Agency_ID, -(Agency_Name <> ''), LOCAL), 
-												  Agency_ID, LOCAL);
+                               Agency_ID, Source_ID, -orig_source_start_date, LOCAL), 
+													Agency_ID, Source_id, LOCAL);	
 		
-  SHARED FabAgency := PROJECT(AgencyInput, TRANSFORM(Layout_Infiles_Fixed.agency,
-                                                     SELF.agency_ori := MAP(LEFT.agency_ori = '' AND TRIM(LEFT.agency_id, ALL) = '1520042' => 'GA0280000',
+  SHARED FabAgency := PROJECT(Agency, TRANSFORM(Layout_MBSAgency.agency,
+                       SELF.agency_ori := MAP(LEFT.agency_ori = '' AND TRIM(LEFT.agency_id, ALL) = '1520042' => 'GA0280000',
                                                                             LEFT.agency_ori = '' AND TRIM(LEFT.agency_id, ALL) = '1521562' => 'GA0331200',
 											                                                      LEFT.agency_ori);
-																			               SELF := LEFT;));
-
+																			               SELF := LEFT;));														 
+  
+	EXPORT dAgency := DEDUP(SORT(DISTRIBUTE(FabAgency, HASH32(Agency_ID, Source_ID)), 
+												       Agency_ID, Source_ID, -orig_source_start_date, LOCAL),
+										      Agency_ID, Source_ID, LOCAL):INDEPENDENT;
+		
 // ###########################################################################
 //                        CRU Billing Agency Raw File
 // ###########################################################################
@@ -185,6 +190,7 @@ EXPORT Infiles := MODULE
   jIncident := JOIN(dIncident, Incidents_ToDelete,
    				          TRIM(LEFT.incident_id, ALL) = TRIM(RIGHT.incident_id, ALL),
    				          LEFT ONLY, LOCAL);
+
   EXPORT tIncident := PROJECT(jIncident, TRANSFORM(Layout_Infiles_Fixed.incident,
 													    SELF.incident_id := LEFT.incident_id[1..9]; 
 													    SELF.case_identifier := STD.Str.ToUpperCase(LEFT.case_identifier);
@@ -193,39 +199,64 @@ EXPORT Infiles := MODULE
 													    SELF.contrib_source := LEFT.contrib_source;
 													    SELF.releasable := IF(TRIM(LEFT.releasable, LEFT, RIGHT) = '',  '1', LEFT.releasable);
 													    SELF.Supplemental_Report := LEFT.Supplemental_Report;
-													    SELF := LEFT;));
+															SELF.is_Terminated_Agency := FALSE;
+															SELF.allow_Sale_Of_Component_Data := TRUE; 	
+													    SELF := LEFT;
+														 ));
 
-  dIncident_EA := DISTRIBUTE(tincident(source_id NOT IN ['TF','TM'] AND work_type_id NOT IN ['2','3'] AND TRIM(vendor_code, LEFT, RIGHT) <> 'COPLOGIC'), HASH32(case_identifier));
-  sIncident_EA := SORT(dIncident_EA, case_identifier, agency_id, loss_state_abbr, report_type_id, crash_date, Sent_to_HPCC_DateTime, creation_date, report_id, RECORD, LOCAL);
-  uIncident_EA :=	DEDUP(sIncident_EA, case_identifier, agency_id, loss_state_abbr, report_type_id, crash_date, RIGHT, LOCAL);
+   dIncident_EA := DISTRIBUTE(tincident(source_id NOT IN ['TF','TM'] AND work_type_id NOT IN ['2','3'] AND TRIM(vendor_code, LEFT, RIGHT) <> 'COPLOGIC'), HASH32(case_identifier));
+   sIncident_EA := SORT(dIncident_EA, case_identifier, agency_id, loss_state_abbr, report_type_id, crash_date, Sent_to_HPCC_DateTime, creation_date, report_id, RECORD, LOCAL);
+   uIncident_EA :=	DEDUP(sIncident_EA, case_identifier, agency_id, loss_state_abbr, report_type_id, crash_date, RIGHT, LOCAL);
   
-	dIncident_EA_Coplogic := DISTRIBUTE(tIncident(source_id NOT IN ['TF','TM'] AND work_type_id NOT IN ['2','3'] AND TRIM(vendor_code, LEFT, RIGHT) = 'COPLOGIC'), HASH32(case_identifier));
-	sIncident_EA_Coplogic := SORT(dIncident_EA_Coplogic, case_identifier, agency_id, loss_state_abbr, report_type_id, crash_date, Sent_to_HPCC_DateTime, creation_date, report_id, RECORD, LOCAL);
-	uIncident_EA_Coplogic := DEDUP(sIncident_EA_Coplogic, case_identifier, agency_id, loss_state_abbr, report_type_id, crash_date, supplemental_report, RIGHT, LOCAL);
+	 dIncident_EA_Coplogic := DISTRIBUTE(tIncident(source_id NOT IN ['TF','TM'] AND work_type_id NOT IN ['2','3'] AND TRIM(vendor_code, LEFT, RIGHT) = 'COPLOGIC'), HASH32(case_identifier));
+	 sIncident_EA_Coplogic := SORT(dIncident_EA_Coplogic, case_identifier, agency_id, loss_state_abbr, report_type_id, crash_date, Sent_to_HPCC_DateTime, creation_date, report_id, RECORD, LOCAL);
+	 uIncident_EA_Coplogic := DEDUP(sIncident_EA_Coplogic, case_identifier, agency_id, loss_state_abbr, report_type_id, crash_date, supplemental_report, RIGHT, LOCAL);
 	
-  dIncident_EA_CRU := DISTRIBUTE(tIncident(work_type_id IN ['2','3']), HASH32(case_identifier));
-  sIncident_EA_CRU := SORT(dIncident_EA_CRU, case_identifier, agency_id, loss_state_abbr, work_type_id, report_type_id, cru_order_id, Sent_to_HPCC_DateTime, creation_date, CRU_Sequence_Nbr, report_id, RECORD, LOCAL);
-  uIncident_EA_CRU := DEDUP(sincident_EA_CRU, case_identifier, agency_id, loss_state_abbr, work_type_id, report_type_id, cru_order_id, RIGHT, LOCAL); 
+   dIncident_EA_CRU := DISTRIBUTE(tIncident(work_type_id IN ['2','3']), HASH32(case_identifier));
+   sIncident_EA_CRU := SORT(dIncident_EA_CRU, case_identifier, agency_id, loss_state_abbr, work_type_id, report_type_id, cru_order_id, Sent_to_HPCC_DateTime, creation_date, CRU_Sequence_Nbr, report_id, RECORD, LOCAL);
+   uIncident_EA_CRU := DEDUP(sincident_EA_CRU, case_identifier, agency_id, loss_state_abbr, work_type_id, report_type_id, cru_order_id, RIGHT, LOCAL); 
 
-  dincident_TF := DISTRIBUTE(tincident(source_id IN ['TM','TF']), HASH32(state_report_number));
-  sIncident_TF := SORT(dIncident_TF, state_report_number, agency_id, ORI_Number, loss_state_abbr, work_type_id, report_type_id, source_id, Sent_to_HPCC_DateTime, creation_date, report_id, RECORD, LOCAL);
-  uIncident_TF := DEDUP(sIncident_TF, state_report_number, agency_id, ORI_Number, loss_state_abbr, work_type_id, report_type_id, source_id, RIGHT, LOCAL);
+   dincident_TF := DISTRIBUTE(tincident(source_id IN ['TM','TF']), HASH32(state_report_number));
+   sIncident_TF := SORT(dIncident_TF, state_report_number, agency_id, ORI_Number, loss_state_abbr, work_type_id, report_type_id, source_id, Sent_to_HPCC_DateTime, creation_date, report_id, RECORD, LOCAL);
+   uIncident_TF := DEDUP(sIncident_TF, state_report_number, agency_id, ORI_Number, loss_state_abbr, work_type_id, report_type_id, source_id, RIGHT, LOCAL);
 
-  IncidentCombined := uIncident_EA + uIncident_EA_Coplogic + uIncident_EA_CRU	+ uIncident_TF;
+  // Exclude CRU
+  dIncidentCombinedEcrash := DISTRIBUTE(uIncident_EA + uIncident_EA_Coplogic + uIncident_TF, HASH32(agency_id, source_id));
+	
+	dIncidentCRU := DISTRIBUTE(uIncident_EA_CRU, HASH32(agency_id));
 
 // #############################################################################################
 //                  Join MBS Agency & Incident
 // #############################################################################################						
-	Layout_Infiles_Fixed.incident_ori tIncAgency(IncidentCombined L, FabAgency R) := TRANSFORM
+	Layout_Infiles_Fixed.incident_ori tIncAgency(dIncidentCombinedEcrash L, dAgency R) := TRANSFORM
+                                agency_source_matching := L.agency_id = R.agency_id AND L.Contrib_Source = R.Source_Id;
+                                SELF.agency_name := IF(agency_source_matching, R.Agency_Name, '');
+                                SELF.agency_ori := IF(agency_source_matching, R.Agency_Ori, '');
+																IsAgencyActive := Functions.IsActiveDate(mod_Utilities.SysDate, R.Source_Start_Date, R.Source_Termination_Date);
+                                SELF.is_terminated_agency := IF(agency_source_matching, ~IsAgencyActive, TRUE);
+                                allowSaleOfComponent := R.source_allow_sale_of_component_data IN ['0'];
+                                SELF.allow_Sale_Of_Component_Data := IF(agency_source_matching, allowSaleOfComponent, FALSE);
+                                SELF := L;
+                                SELF := [];
+  END;
+	jIncEcrash_Agency := JOIN(dIncidentCombinedEcrash, dAgency, 
+                            LEFT.agency_id = RIGHT.agency_id AND 
+														LEFT.contrib_source = RIGHT.source_id, 
+                            tIncAgency(LEFT, RIGHT), LOOKUP);                                                                                                                                    
+
+  Layout_Infiles_Fixed.incident_ori tCruIncAgency(dIncidentCRU L, dAgency R) := TRANSFORM
 		SELF.agency_name := IF(L.agency_id = R.agency_id, R.Agency_Name, '');
 		SELF.agency_ori := IF(L.agency_id = R.agency_id, R.Agency_Ori, '');
 		SELF := L;
 		SELF := [];
 	END;
-	jInc_Agency := JOIN(IncidentCombined, FabAgency, 
-								      LEFT.agency_id = RIGHT.agency_id, 
-								      tIncAgency(LEFT, RIGHT), LEFT OUTER, LOOKUP);
-  dInc_Agency := DISTRIBUTE(jInc_Agency, HASH32(incident_id)):INDEPENDENT;
+	
+  jIncCru_Agency := JOIN(dIncidentCRU, dAgency, 
+								         LEFT.agency_id = RIGHT.agency_id, 
+								         tCruIncAgency(LEFT, RIGHT), LEFT OUTER, LOOKUP);
+
+	Inc_Agency := jIncEcrash_Agency + jIncCru_Agency;
+  dInc_Agency := DISTRIBUTE(Inc_Agency, HASH32(incident_id)):INDEPENDENT;
 	
 // #############################################################################################
 //                  Join Combined Agency Incident with Vehicle
@@ -394,11 +425,15 @@ EXPORT Infiles := MODULE
     SELF.Cru_Agency_ID := R.Cru_Agency_ID;
     SELF.Cru_State_Number := (UNSIGNED3)R.Cru_State_Number;
     SELF.Source_ID := L.Source_ID;
+    SELF.Source_Start_date := L.Orig_Source_Start_Date;
+    SELF.Source_End_Date := L.Orig_Source_End_Date;
+    SELF.Source_Termination_Date := L.Orig_Source_Termination_Date;
     SELF.Append_Overwrite_Flag := L.Append_Overwrite_Flag;
+    SELF := L;
     SELF := [];
   END;
 	EXPORT AgencyCmbnd := JOIN(uAgency, uBillingAgencies,
 	                           LEFT.Agency_ID = RIGHT.Mbsi_Agency_ID,
-														 tAgencyCombined(LEFT, RIGHT), LEFT OUTER, LOCAL);
+														 tAgencyCombined(LEFT, RIGHT), LEFT OUTER, LOCAL); 
 															 
 END;

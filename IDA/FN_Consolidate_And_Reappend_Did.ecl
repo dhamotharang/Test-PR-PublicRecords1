@@ -3,15 +3,9 @@ Header, Header_Slimsort, didville, ut, DID_Add,Business_Header_SS, NID, AID,std,
 
 EXPORT FN_Consolidate_And_Reappend_Did(string pversion,boolean pUseProd=false,boolean pDaily=false):= MODULE
 
-// name                := trim('thor_data400::base::ida::daily::*');	                                                                            	
-// rawFilesinThor      := NOTHOR(STD.File.LogicalFileList(name,true,false,false));
-// shared pversion     := Max(rawFilesinThor,(string)std.str.splitwords(name,'::')[5][1..15]);
-
-// shared pversion:=IDA._Constants(pUseProd).filesdate;
-
-shared DailyBaseBuilt:=IDA.Files().Basedaily.Built;
-shared DailyBaseQA:=IDA.Files().Basedaily.QA;
-shared FullDaily:= DailyBaseBuilt + DailyBaseQA;
+EXPORT DailyBaseBuilt:=IDA.Files().Basedaily.Built;
+EXPORT DailyBaseQA:=if(nothor(FileServices.GetSuperFileSubCount(IDA.Filenames(pversion, pUseProd).lBaseTemplateDaily_qa)) <> 0,IDA.Files().Basedaily.QA);
+EXPORT FullDaily:= DailyBaseBuilt + DailyBaseQA;
 
 
 //Clean names
@@ -116,27 +110,29 @@ shared reapendedbase:= Updated_Base;
 											 ,reapendedbase + IDA.Files(pversion, pUseProd).base.built);																			
 				
 	VersionControl.macBuildNewLogicalFile( 
-																				 IDA.Filenames(pversion + 'R',pUseProd).base.new	
+																				 IDA.Filenames(pversion,pUseProd).base.new	
 																				,accumulative_base
 																				,Build_Did_Reappended_Base_File
 																			 );
 																						 
 export Build_Reappended_Base :=
 		sequential(Build_Did_Reappended_Base_File
-							,IDA.Promote(pversion + 'R',pUseProd,pDaily).BuildAccumulativefiles.New2Built
-							,IDA.Promote(pversion + 'R',pUseProd,pDaily).BuildAccumulativefiles.Built2QA
+							,IDA.Promote(pversion,pUseProd,pDaily).BuildAccumulativefiles.New2Built
+							,IDA.Promote(pversion,pUseProd,pDaily).BuildAccumulativefiles.Built2QA
 );
+
 
 DeleteDailySeq:=SEQUENTIAL(
 STD.File.StartSuperFileTransaction(),
 STD.File.RemoveOwnedSubFiles('~thor_data400::base::ida::daily::built',TRUE),
 STD.File.RemoveOwnedSubFiles('~thor_data400::base::ida::daily::qa',TRUE),
+STD.File.DeleteLogicalFile('~thor_data400::in::ida::header::flag'),
 STD.File.FinishSuperFileTransaction()
 );
 
 BaseChange:=IDA._BWR_Base_Change(pUseProd,false).Build_Base_Change;
 
-seq:=SEQUENTIAL(Build_Reappended_Base,BaseChange,DeleteDailySeq);
+seq:=SEQUENTIAL(Build_Reappended_Base,BaseChange,DeleteDailySeq): success(IDA.Send_Email(pversion,pUseProd,pDaily).BuildSuccess), failure(IDA.send_email(pversion,pUseProd,pDaily).BuildFailure);
 
 export All :=
 		if(IDA._Constants(pUseProd).IsValidversion(pversion)

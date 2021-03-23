@@ -1,4 +1,4 @@
-//---------------------------------------------------------------------------
+﻿//---------------------------------------------------------------------------
 // fStringDiff
 // Process to perform a Diff between two multi-line strings using the python
 // diff library.
@@ -13,7 +13,7 @@
 //---------------------------------------------------------------------------
 EXPORT fStringDiff(STRING sInput01,STRING sInput02,boolean sCleanSpaces = true):=FUNCTION
   IMPORT std;
-  IMPORT Python;
+  IMPORT Python3;
 
   // Simple function to split a string into a multi-line dataset
   fParseLines(STRING s):= NORMALIZE(
@@ -26,9 +26,9 @@ EXPORT fStringDiff(STRING sInput01,STRING sInput02,boolean sCleanSpaces = true):
     )
   );
 
-  // Embedded call to the python difflib library, then parse the lines into
+  // Embedded call to the Python3 difflib library, then parse the lines into
   // a dataset
-  STRING diffit(STRING s01,STRING s02) := EMBED(Python)
+  STRING diffit(STRING s01,STRING s02) := EMBED(Python3)
     import difflib
     d=difflib.Differ()
     diff=d.compare(s01.splitlines(),s02.splitlines())
@@ -36,13 +36,13 @@ EXPORT fStringDiff(STRING sInput01,STRING sInput02,boolean sCleanSpaces = true):
   ENDEMBED;
   
   //these aren't necessary because nocombine above speeds up the compare
-  // STRING ndiffit(STRING s01,STRING s02) := EMBED(Python)
+  // STRING ndiffit(STRING s01,STRING s02) := EMBED(Python3)
     // import difflib
     // diff=difflib.ndiff(s01.splitlines(),s02.splitlines())
     // return '\n'.join(list(diff))
   // ENDEMBED;
 
-  // STRING unifiedDiffit(STRING s01,STRING s02) := EMBED(Python)
+  // STRING unifiedDiffit(STRING s01,STRING s02) := EMBED(Python3)
     // import difflib
     // diff=difflib.unified_diff(s01.splitlines(),s02.splitlines(),lineterm = '\n')
     // return '\n'.join(list(diff))
