@@ -13,7 +13,7 @@ incident := project(FLAccidents_Ecrash.Infiles.incident(work_type_id in ['1', 'N
                                                                   self.case_identifier := if(left.source_id = 'TF', left.state_report_number, left.case_identifier);
 																										                                        self:= left;));
 																										 
-allrecs := sort(distribute(incident,hash(case_identifier))
+allrecs := sort(distribute(incident,hash32(case_identifier))
 			,case_identifier,agency_id,loss_state_abbr,report_type_id,source_id,crash_date,Sent_to_HPCC_DateTime,report_id,local)(hash_key != '"Hash_Key"');
 				
 keepers := dedup(allrecs
@@ -73,8 +73,8 @@ alldupes trecs2(alldupes L, dupehistory R) := transform
 self := L;
 end;
 
-newdupes := sort(join(distribute(alldupes,hash(del_incident_id)),
-								 distribute(dupehistory,hash(del_incident_id)),
+newdupes := sort(join(distribute(alldupes,hash32(del_incident_id)),
+								 distribute(dupehistory,hash32(del_incident_id)),
 								left.del_incident_id = right.del_incident_id and
 								left.add_incident_id = right.add_incident_id and 
 								left.flag = right.flag,
@@ -126,7 +126,7 @@ string11 report_id ;
 string11 super_report_id ; 
 end;
 
-base := FLAccidents_Ecrash.BaseFile;
+base := FLAccidents_Ecrash.BaseFile(is_Terminated_Agency = FALSE);
 
 slim_layout trecs_base(base L, newdupes R) := transform
 
@@ -182,7 +182,8 @@ jrecs_base := join(base(report_code <>'TM'),sort(newdupes, - del_incident_id),
 								trecs_base(left,right),lookup);
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////								
-prevbase:= dataset('~thor_data400::base::ecrash_father',FLAccidents_Ecrash.Layout_Basefile,thor);
+ds_prevbase:= dataset('~thor_data400::base::ecrash_father',FLAccidents_Ecrash.Layout_Basefile,thor);
+prevbase := ds_prevbase(is_Terminated_Agency = FALSE);
 		
 									 
 slim_layout trecs_prev(prevbase L, newdupes R) := transform
@@ -269,10 +270,10 @@ end;
 
 //TFDE := base (report_code ='TF' and report_type_id = 'DE'); 
 
-TFDE := dedup(sort(distribute(base (report_code ='TF' and report_type_id = 'DE' ), hash64(incident_id)),incident_id, crash_date,state_report_number, Agency_name, Loss_state_abbr, creation_date, local), incident_id, crash_date,state_report_number, Agency_name, Loss_state_abbr, creation_date, local);
+TFDE := dedup(sort(distribute(base (report_code ='TF' and report_type_id = 'DE' ), hash32(incident_id)),incident_id, crash_date,state_report_number, Agency_name, Loss_state_abbr, creation_date, local), incident_id, crash_date,state_report_number, Agency_name, Loss_state_abbr, creation_date, local);
 
 //TM_TF_A := base(report_code in ['TM','TF'] and report_type_id = 'A'); 
-TM_TF_A := dedup(sort(distribute(base(report_code in ['TM','TF'] and report_type_id = 'A' ), hash64(incident_id)),incident_id, crash_date,state_report_number, Agency_name, Loss_state_abbr, creation_date, local), incident_id, crash_date,state_report_number, Agency_name, Loss_state_abbr, creation_date, local);
+TM_TF_A := dedup(sort(distribute(base(report_code in ['TM','TF'] and report_type_id = 'A' ), hash32(incident_id)),incident_id, crash_date,state_report_number, Agency_name, Loss_state_abbr, creation_date, local), incident_id, crash_date,state_report_number, Agency_name, Loss_state_abbr, creation_date, local);
 
 
 
@@ -316,20 +317,12 @@ sequential(
 	 output(dedup(precs+dup_NotifyDE,record,all)(extra_data <> ''),,'~thor_data400::out::ecrash::'+fd+'::report_update'
 												,csv(terminator('\n')
 												,separator(','),quote('"'))
-												,overwrite) 
+												,overwrite, expire(7)) 
 	,fileservices.Despray('~thor_data400::out::ecrash::'+filedate+'::report_update'
 												, Constants.LandingZone
 												, '/data/super_credit/ecrash/account_monitoring/toprocess/ecrash_'
 																+filedate[1..4]+'-'+filedate[5..6]+'-'+filedate[7..8]+'_'+ 
-																timestamp[1..2]+'_'+timestamp[3..4]+'_'+timestamp[5..6]+'_report-update.csv'),
-			output(header_row+newdupes,,'~thor_data400::out::ecrash::'+fd+'::extract::caseDupes'
-												 ,csv(terminator('\n')
-												 ,separator(','))
-												 ,overwrite,__compressed__)
-				 ,fileservices.addsuperfile('~thor_data400::out::ecrash::dupes','~thor_data400::out::ecrash::'+filedate+'::extract::caseDupes')
-				 // ,fileservices.Despray('~thor_data400::out::ecrash::'+filedate+'::extract::caseDupes'
-												  // , Constants.LandingZone
-												  // , '/data/super_credit/ecrash/despray/dbdupes/ecrash_'+filedate+'_'+timestamp+'_extract_casedupes.csv',,,,true)
+																timestamp[1..2]+'_'+timestamp[3..4]+'_'+timestamp[5..6]+'_report-update.csv')
 					 );					
 
 end;

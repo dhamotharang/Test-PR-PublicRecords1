@@ -5,14 +5,14 @@ EXPORT Infiles := MODULE
 // ###########################################################################
 //                        MBS Agency Raw File
 // ###########################################################################	
-  EXPORT  Agency := PROJECT(Files_MBSAgency.DS_BASE_AGENCY, TRANSFORM(Layout_MBSAgency.agency, 
-	                                                          SELF.Agency_name := MAP(LEFT.agency_id = '1671327' => 'CHRISTIAN COUNTY CONST DIST 6',
-																														                        LEFT.agency_id = '1677717' => 'LINCOLN COUNTY CONSTABLE DIST3',
-																																										LEFT.Agency_name);
-																														SELF := LEFT));	
+  SHARED dsAgency := PROJECT(Files_MBSAgency.DS_BASE_AGENCY, TRANSFORM(Layout_MBSAgency.agency, 
+	                                                          // SELF.Agency_name := MAP(LEFT.agency_id = '1671327' => 'CHRISTIAN COUNTY CONST DIST 6',
+																														                        // LEFT.agency_id = '1677717' => 'LINCOLN COUNTY CONSTABLE DIST3',
+																																										// LEFT.Agency_name);
+																													SELF := LEFT));	
+	EXPORT Agency := DISTRIBUTED(dsAgency(Agency_ID <> ''), HASH32(Agency_ID));
 	
-  SHARED uAgency := DEDUP(SORT(DISTRIBUTE(Agency(Agency_ID <> ''), HASH32(Agency_ID)), 
-                               Agency_ID, Source_ID, -orig_source_start_date, LOCAL), 
+  SHARED uAgency := DEDUP(SORT(Agency, Agency_ID, Source_ID, -orig_source_start_date, LOCAL), 
 													Agency_ID, Source_id, LOCAL);	
 		
   SHARED FabAgency := PROJECT(Agency, TRANSFORM(Layout_MBSAgency.agency,
@@ -405,7 +405,9 @@ EXPORT Infiles := MODULE
 //     Combine all : Agency Incident Vehicle Person Commercial Citation & Property
 // #############################################################################################
 	Combined := jIncAgencyVehPersnComm_Citn + jIncAgency_Prop; 
-	Combined_DropSuppress := JOIN(Combined, Suppress_Agencies(agency_id <> ''),
+	uSuppressAgencies := DEDUP(SORT(Suppress_Agencies, Agency_id, LOCAL), Agency_id, LOCAL);
+
+	Combined_DropSuppress := JOIN(Combined, uSuppressAgencies,
 												        TRIM(LEFT.agency_id, LEFT, RIGHT) = TRIM(RIGHT.agency_id, LEFT, RIGHT) AND 
 																TRIM(LEFT.report_type_id, LEFT, RIGHT) = 'DE',
 												        MANY LOOKUP, LEFT ONLY );
