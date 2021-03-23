@@ -1,4 +1,4 @@
-﻿IMPORT standard, bipv2,dx_common;
+﻿IMPORT standard, bipv2;
 
 export layout_SANCTN_did := record
   SANCTN.layout_SANCTN_party_clean_orig;

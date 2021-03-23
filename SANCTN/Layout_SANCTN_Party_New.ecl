@@ -1,5 +1,4 @@
-﻿import dx_common;
-EXPORT Layout_SANCTN_Party_New := RECORD
+﻿EXPORT Layout_SANCTN_Party_New := RECORD
   string8 batch_number;
   string8 incident_number;
   string8 party_number;

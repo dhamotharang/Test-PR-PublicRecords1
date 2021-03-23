@@ -135,11 +135,11 @@ emailN := fileservices.sendemail('roxiebuilds@seisint.com;ehamel@seisint.com;tgi
 
 buildKey	:=	sequential(
 												Keys
-												//,Move_keys_orig
-												//,to_qa_orig
-												//,build_autokeys
-												//,build_boolean_keys
-												//,emailN
+												,Move_keys_orig
+												,to_qa_orig
+												,build_autokeys
+												,build_boolean_keys
+												,emailN
 	 											);	
 
 return	buildKey;
