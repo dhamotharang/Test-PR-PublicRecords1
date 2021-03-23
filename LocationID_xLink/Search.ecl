@@ -132,8 +132,8 @@ export Search(inDs,
 		inDs;
 		#IF(%CONTAINS_LOCID%<>true)
 		unsigned6 LocId;
-		integer weight := 0;
 		#END
+		integer weight := 0;
 	end;
 	
 	#uniquename(searchoutput)
