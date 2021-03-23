@@ -4,6 +4,7 @@
 **/
 EXPORT fn_rollupCases (DATASET(nac_v2.Layouts2.rCaseEx) cases_in) := 
 
-		DEDUP(SORT(DISTRIBUTE(cases_in, HASH32(CaseId)),
-							CaseId,ProgramState,ProgramCode,GroupId,-$.fn_lfnversion(filename), local),
-							CaseId,ProgramState,ProgramCode,GroupId, local);
+		DEDUP(SORT(DISTRIBUTE(cases_in, HASH32(GroupId,CaseId)),
+							GroupId,CaseId,ProgramCode,ProgramState,-$.fn_lfnversion(filename), local),
+							GroupId,CaseId,ProgramCode,ProgramState, local);
+	
