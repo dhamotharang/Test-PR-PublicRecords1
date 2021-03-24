@@ -1313,6 +1313,7 @@
 		export string KEYWORD_MAAMMC								:= '995';
 		export string KEYWORD_SIVES									:= '996';
 		export string KEYWORD_TWFA_IUU							:= '997';
+		export string KEYWORD_CANSEMPRC							:= '998';
 		
 		//When setting the keyword export use underscores for dashes (ex: For RBI-SANC, use RBI_SANC)	
 	end;
