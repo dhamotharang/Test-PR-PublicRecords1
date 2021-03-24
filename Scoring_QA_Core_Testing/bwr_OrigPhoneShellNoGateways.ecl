@@ -2,13 +2,13 @@
 //W20171208-071653
 #WORKUNIT('name', 'Phone_Shell');
 
-IMPORT Phone_Shell, Relocations, Risk_Indicators, RiskWise, UT;
+IMPORT Phone_Shell, Relocations, Risk_Indicators, RiskWise, UT, data_services;
 
 RecordsToRun := 0; // Number of records to run through the service - set to 0 to run all
 
 eyeball := 250; // Number of sample records to view
 
-RoxieIP := RiskWise.Shortcuts.dev192; // Production Roxie
+RoxieIP := RiskWise.Shortcuts.dev156; 
 // RoxieIP := RiskWise.Shortcuts.Staging_Neutral_RoxieIP; // Staging/Cert Roxie
 
 Threads := 1; // Number of Parallel threads to SOAPCALL with
@@ -40,15 +40,16 @@ Score_Threshold_In := 0;
  *******************************************/
 EnableQSentV2_TransUnion_Gateway := FALSE; // Set to TRUE to run the QSentV2 TransUnion Gateway (Source_List == 'TU')
 QSentV2_TransUnion_Gateway_URL := ''; // NOTE: THIS URL IS ONLY FOR TRANSUNION TEST SEEDS - WILL NOT RUN LIVE TRANSACTIONS
-// QSentV2_TransUnion_Gateway_URL := 'http://rw_score_dev:Password01@10.176.68.164:7726/WsGateway?ver_=1.67'; // NOTE: THIS URL IS ONLY FOR TRANSUNION TEST SEEDS - WILL NOT RUN LIVE TRANSACTIONS
+// QSentV2_TransUnion_Gateway_URL := riswise.shortcuts.QSentV2_TransUnion_Gateway_URL;
 
 EnableTargus_Gateway := FALSE; // Set to TRUE to run the Targus Gateway (Source_List == 'PDE')
 Targus_Gateway_URL := '';
-// Targus_Gateway_URL := 'http://rw_score_dev:Password01@10.176.68.164:7726/WsGateway/?ver_=1.70';
+// Targus_Gateway_URL := riskwise.shortcuts.gw_targus_sco[1].url;
 
 EnableMetronet_Experian_Gateway := FALSE; // Set to TRUE to run the Metronet Experian Gateway (Source_List == 'EXP')
 Metronet_Experian_Gateway_URL := '';
-// Metronet_Experian_Gateway_URL := 'http://rw_score_dev:Password01@10.176.68.164:7726/WsGateway?ver_=1.043';
+// Metronet_Experian_Gateway_URL := riskwise.shortcuts.Metronet_Experian_Gateway_URL;
+
 
 prii_layout := RECORD
     STRING Account;
