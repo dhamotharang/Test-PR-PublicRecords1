@@ -6,8 +6,8 @@ fixS0900	:= 	PROJECT(dataset(FileName + 'S0900',	Prof_License_Mari.layout_base_i
 															TRANSFORM(Prof_License_Mari.layouts.base, 
 															SELF.STD_SOURCE_DESC	:= IF(LEFT.STD_SOURCE_DESC = 'NATIONWIDE MORTGAGE LICENSING SYSTEM & REGISTRY','NMLS CONSUMER ACCESS',LEFT.STD_SOURCE_DESC),SELF:=LEFT, SELF:=[]));
 
-concatenated_basefiles :=  
-														PROJECT(dataset(FileName + 'cmrflat',Prof_License_Mari.layout_base_in,thor),							// ** FullDump
+
+concatenated_basefiles :=  PROJECT(dataset(FileName + 'cmrflat',Prof_License_Mari.layout_base_in,thor),							// ** FullDump
 																				 TRANSFORM(Prof_License_Mari.layouts.base,SELF:=LEFT,SELF:=[]))
 													 + PROJECT(dataset(FileName + 'cmrflat_test',Prof_License_Mari.layout_base_in,thor),			// ** Test Records
 																				 TRANSFORM(Prof_License_Mari.layouts.base,SELF:=LEFT,SELF:=[]))
@@ -93,9 +93,8 @@ concatenated_basefiles :=
 																				 TRANSFORM(Prof_License_Mari.layouts.base,SELF:=LEFT,SELF:=[]))
 													 + PROJECT(dataset(FileName + 'S0834',	Prof_License_Mari.layout_base_in,thor),						// ** Maryland Commssion of Real Estate Appraiser & Home Inspection
 																				 TRANSFORM(Prof_License_Mari.layouts.base,SELF:=LEFT,SELF:=[]))
-													 + PROJECT(dataset(FileName + 'S0836',	Prof_License_Mari.layout_base_in,thor),					// ** Maryland Real Estate Commission 
-																					TRANSFORM(Prof_License_Mari.layouts.base,SELF:=LEFT,SELF:=[]))
-													+ PROJECT(dataset(FileName + 'S0021',	Prof_License_Mari.layout_base_in,thor),						// ** Massachussetts, Commonwealth of (Development)
+													 // + PROJECT(dataset(FileName + 'S0836',	Prof_License_Mari.layout_base_in,thor),					// ** Maryland Real Estate Commission 
+													 + PROJECT(dataset(FileName + 'S0021',	Prof_License_Mari.layout_base_in,thor),						// ** Massachussetts, Commonwealth of (Development)
 																				 TRANSFORM(Prof_License_Mari.layouts.base,SELF:=LEFT,SELF:=[]))
 													 + PROJECT(dataset(FileName + 'S0298',	Prof_License_Mari.layout_base_in,thor),						// ** Michigan Department of Consumer & Industry Service
 																				 TRANSFORM(Prof_License_Mari.layouts.base,SELF:=LEFT,SELF:=[]))
