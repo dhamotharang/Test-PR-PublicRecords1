@@ -1414,6 +1414,7 @@
 				trim(kword, left, right) = 'MAAMMC' =>SubGroup_Constants.numKeywordsID.KEYWORD_MAAMMC,
 				trim(kword, left, right) = 'SIVES' =>SubGroup_Constants.numKeywordsID.KEYWORD_SIVES,
 				trim(kword, left, right) = 'TWFA-IUU' =>SubGroup_Constants.numKeywordsID.KEYWORD_TWFA_IUU,
+				trim(kword, left, right) = 'CANSEMPRC' =>SubGroup_Constants.numKeywordsID.KEYWORD_CANSEMPRC,
 								
 				//When setting the keyword export use underscores for dashes (ex: For RBI-SANC, use RBI_SANC)	
 				

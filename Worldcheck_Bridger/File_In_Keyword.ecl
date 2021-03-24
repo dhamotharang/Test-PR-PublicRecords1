@@ -141,6 +141,7 @@
 	{'265','CANSEMIR','','5'},
 	//{'307','CANSEMLBY','1','5'},
 	{'823','CANSEMNIC','','5'},
+	{'998','CANSEMPRC','','5'},
 	{'514','CANSEMRUS','','5'},
 	{'544','CANSEMRUS-FSR','','5'},
 	{'556','CANSEMSS','','5'},

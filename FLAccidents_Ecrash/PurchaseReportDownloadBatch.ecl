@@ -1,4 +1,4 @@
-import ut; 
+﻿import ut; 
 export PurchaseReportDownloadBatch := function
 rec := record 
 string report_download_id   ;                    
@@ -38,7 +38,9 @@ ds_d := project (ds,transform( {rec, string accident_date, string super_report_i
 ds_EA_TF  := ds_d (md5_hash <>'');
 ds_TM     := ds_d (md5_hash ='');
 
-base  := dedup(distribute(FLAccidents_Ecrash.BaseFile (work_type_id not in ['2','3'] and trim(hash_key,left,right) <>''), hash(hash_key)),   hash_key,loss_state_abbr,agency_name,all ,local):persist('test_ddedup') ; 
+eCrashBase := FLAccidents_Ecrash.BaseFile(is_Terminated_Agency = FALSE);
+
+base  := dedup(distribute(eCrashBase (work_type_id not in ['2','3'] and trim(hash_key,left,right) <>''), hash32(hash_key)),   hash_key,loss_state_abbr,agency_name,all ,local):persist('test_ddedup') ; 
 
 j_EA_1_0_TF := dedup(join ( base,ds_EA_TF ,  left.hash_key =right.md5_hash and left.loss_state_abbr =right.jurisdiction_state and
                                              stringlib.stringtouppercase(trim(left.agency_name,left,right)) = trim(right.jurisdiction,left,right),
@@ -49,7 +51,7 @@ j_EA_1_0_TF := dedup(join ( base,ds_EA_TF ,  left.hash_key =right.md5_hash and l
 											
 TM_no_hash := ds_TM(trim(agency_id,left,right) <> '1603437' ); 
 
-BaseFile1 := dedup(FLAccidents_Ecrash.BaseFile (source_id ='TM'), state_report_number,agency_id,loss_state_abbr, all); 
+BaseFile1 := dedup(eCrashBase (source_id ='TM'), state_report_number,agency_id,loss_state_abbr, all); 
 
 GetTM := dedup(join (BaseFile1, TM_no_hash, left.state_report_number = right.report_number and 
                                      left.agency_id =right.agency_id and 
@@ -61,7 +63,7 @@ GetTM := dedup(join (BaseFile1, TM_no_hash, left.state_report_number = right.rep
 
 TM_Nassau := ds_TM(trim(agency_id,left,right) = '1603437' ); 
 
-BaseFileD := dedup(FLAccidents_Ecrash.BaseFile (trim(agency_id,left,right) = '1603437' and work_type_id ='0' and source_id ='EA'), state_report_number,agency_id,loss_state_abbr, crash_date, all); 
+BaseFileD := dedup(eCrashBase (trim(agency_id,left,right) = '1603437' and work_type_id ='0' and source_id ='EA'), state_report_number,agency_id,loss_state_abbr, crash_date, all); 
 
 GetTM_Nassau := dedup(join(BaseFileD, TM_Nassau,left.state_report_number = right.report_number and 
                                      left.agency_id =right.agency_id and 
@@ -76,7 +78,7 @@ total := project(j_EA_1_0_TF + GetTM + GetTM_Nassau,{rec, string super_report_id
 
 total1 := total(super_report_id = ''); 
 
-base_supp  := dedup(distribute(FLAccidents_Ecrash.Files.Base.supplemental (work_type_id not in ['2','3'] and trim(hash_key,left,right) <>''), hash(hash_key)),   hash_key,jurisdiction_state,jurisdiction,all ,local) ; 
+base_supp  := dedup(distribute(FLAccidents_Ecrash.Files.Base.supplemental (work_type_id not in ['2','3'] and trim(hash_key,left,right) <>''), hash32(hash_key)),   hash_key,jurisdiction_state,jurisdiction,all ,local) ; 
 
 
 j := dedup(join(base_supp,total1, trim(left.hash_key,left,right) = trim(right.md5_hash,left,right) and 

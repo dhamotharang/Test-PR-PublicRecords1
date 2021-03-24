@@ -132,8 +132,8 @@ export Search(inDs,
 		inDs;
 		#IF(%CONTAINS_LOCID%<>true)
 		unsigned6 LocId;
-		integer weight := 0;
 		#END
+		integer weight := 0;
 	end;
 	
 	#uniquename(searchoutput)
@@ -151,10 +151,10 @@ export Search(inDs,
 	#uniquename(finalresult)
 	%finalresult% := join(%createoutput%, %removeLowWeight%, 
 							left.locid = right.locid,
-							transform(%outputrec%,self.locid := right.locid, self.weight := right.weight,
+							transform(%OutputRec%,self.locid := right.locid, self.weight := right.weight,
 							self := left, self := right), left outer, hash);
 
 	#uniquename(sortedRes)
-	%sortedRes% := sort(%finalresult%, inid, -weight);
+	%sortedRes% := sort(%finalresult%, inDs, -weight);
 	outDs          := %sortedRes%;
 endmacro;

@@ -34,7 +34,8 @@ Bug# 180852 - PIR 4710 Coplogic Data ingestion
 */
 import STD; 
 export BuildSuppmentalReports := module 
-agency     := FLAccidents_Ecrash.Infiles.dAgency;																		
+agency     := FLAccidents_Ecrash.Infiles.dAgency;			
+
 tpersn     := dedup(FLAccidents_Ecrash.Infiles.tpersn	,all,local);										
 tvehicl    := dedup(FLAccidents_Ecrash.Infiles.tvehicl	,all,local);	
 tIncident := FLAccidents_Ecrash.IncidentsAfterSuppression;
@@ -154,20 +155,20 @@ Jperson := join(filtered_jrecs0,
 											
 									d_person( vehicle_Unit_Number in ['','0','NUL','NULL']),
 														left.incident_id = right.incident_id ,
-							            	transform(FLAccidents_Ecrash.Layout_Infiles_Fixed.cmbnd, self := left , self:= right , self:=[]),local);		
+							            	transform(FLAccidents_Ecrash.Layout_Infiles_Fixed.cmbnd, self := left, self:= right, self:=[]), local);		
 
-allrecs := dedup(sort(distribute(jrecs2 + jrecsOthersPerson+Jperson,hash32(incident_id)),record,local),record,local) ;					
+allrecs := dedup(sort(distribute(jrecs2 + jrecsOthersPerson + Jperson, hash32(incident_id)), record, local), record, local) ;					
 
 // Suppress DE Reports with Flag value 0 in agency file.
-suppressAgencies := agency(drivers_exchange_flag ='0');
+suppressAgencies := distributed(Infiles.agency(drivers_exchange_flag ='0'), hash32(agency_id));
+uSuppressAgencies := dedup(sort(suppressAgencies, Agency_id, local), Agency_id, local);
 
-updtdAllrecs:= join(allrecs, suppressAgencies(agency_id!=''),
+updtdAllrecs:= join(allrecs, uSuppressAgencies,
 							      trim(left.agency_id,left,right) = trim(right.agency_id,left,right) and 
-										trim(left.report_type_id,left,right) ='DE',
-							      many lookup , left only);
+										trim(left.report_type_id,left,right) = 'DE',
+							      many lookup, left only);
 					
 // Supress reports
- 
 allrecs0 := updtdAllrecs(~(trim(case_identifier,left,right) in  FLAccidents_Ecrash.Suppress_Id and source_id in ['EA', 'TF'])); 
 allrecsSupressed1 := allrecs0(trim(report_id,left,right) not in FlAccidents_ecrash.Suppress_report_d);
 
