@@ -5,10 +5,10 @@
  *                   Options Section                   *
  *******************************************************/
 //Choose input data options
-inputSelection := 3; //1 = PII/BII only, 2 = lexID only, 3 = both PII/BII and lexID 
+inputSelection := 1; //1 = PII/BII only, 2 = lexID only, 3 = both PII/BII and lexID 
 
 //Choose file to run
-fileSelection := 4;
+fileSelection := 2;
 
 inputInfoLayout := RECORD
   STRING fileName;
@@ -46,7 +46,7 @@ archiveNumYears := 5;  //number of years to go back (1-5) -- only used with sele
 roxieSelection := 2;  //1 = Dev154, 2 = Dev156, 3 = cert, 4 = prod
 
 //Choose version of query
-serviceVersionRequested := '.6';  //3 = before   4 = after BIP Forward  5 = after perMatch   6 = after perMatch valid check
+serviceVersionRequested := '.11';  
 
 
 //Choose output selections
@@ -660,6 +660,10 @@ tbleLayout := RECORD
     UNSIGNED noPerDataFound := COUNT(slimAttrs(perAssetOwnProperty = '-1'));
     UNSIGNED perDataFound := COUNT(slimAttrs(perAssetOwnProperty <> '-1'));
   #END
+  UNSIGNED ddResultsWithNoAttributes := COUNT(base(NOT EXISTS(ddAttributes.attributes)));
+  UNSIGNED averageTiming := AVE(processedTimings, timeMS);
+  UNSIGNED fastestRequest := MIN(processedTimings, timeMS);
+  UNSIGNED slowestRequest := MAX(processedTimings, timeMS);
 END;
 
                         

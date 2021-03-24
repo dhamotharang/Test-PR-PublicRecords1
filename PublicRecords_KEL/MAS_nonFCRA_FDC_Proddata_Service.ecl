@@ -115,13 +115,14 @@ export MAS_nonFCRA_FDC_Proddata_Service() := MACRO
 			PublicRecords_KEL.ECL_Functions.Input_Bus_Layout;
 		END;
 
-						UNSIGNED1 _LexIdSourceOptout := 1 : STORED ('LexIdSourceOptout');
+		UNSIGNED1 _LexIdSourceOptout := 1 : STORED ('LexIdSourceOptout');
 
 
 		ds_input := DATASET([],layout_input_combined) : STORED('input');
 		
 
 		is_fcra := FALSE;
+		#CONSTANT('IsFCRA', is_fcra);
 
 		BOOLEAN ViewFDC := FALSE : STORED('ViewFDC');
 		STD.Date.Date_t dtArchiveDate := STD.Date.Today() : STORED('InputArchiveDateClean');
