@@ -2,7 +2,7 @@
 
 export strata(string filedate) := function
 
-d :=FLAccidents_Ecrash.BaseFile(is_Terminated_Agency = FALSE);
+d := BaseFile;
 
 
 rPopulationStats_File_ECrash

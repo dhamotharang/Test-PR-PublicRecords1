@@ -4,7 +4,7 @@ EXPORT mod_PrepEcrashFLAccidentPRKeys := MODULE
 
 SHARED ReadNtlFile := FLAccidents.BaseFile_NtlAccidents_Alpharetta;
 SHARED ReadInqFile := FLAccidents.File_CRU_inquiries;
-SHARED ReadEcrashFile := eCrashBaseAgencyExclusion(is_Terminated_Agency = FALSE);
+SHARED ReadEcrashFile := eCrashBaseAgencyExclusion;
 
 //***************************************************************
 //Ecrash0
