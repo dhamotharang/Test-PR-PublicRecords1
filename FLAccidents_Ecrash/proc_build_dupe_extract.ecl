@@ -126,9 +126,9 @@ string11 report_id ;
 string11 super_report_id ; 
 end;
 
-base := FLAccidents_Ecrash.BaseFile(is_Terminated_Agency = FALSE);
+dsEcrashBase := BaseFile;
 
-slim_layout trecs_base(base L, newdupes R) := transform
+slim_layout trecs_base(dsEcrashBase L, newdupes R) := transform
 
 self.case_identifier :=if(l.source_id = 'TF', l.state_report_number,l.case_identifier);
 self.accident_location	:= map(L.loss_cross_street!='' and L.loss_cross_street!= 'N/A' => L.loss_street+' & '+L.loss_cross_street,L.loss_street);
@@ -177,16 +177,16 @@ self := L;
 self := [];
 end;
 
-jrecs_base := join(base(report_code <>'TM'),sort(newdupes, - del_incident_id),
+jrecs_base := join(dsEcrashBase(report_code <>'TM'),sort(newdupes, - del_incident_id),
 								left.incident_id = right.add_incident_id,
 								trecs_base(left,right),lookup);
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////								
-ds_prevbase:= dataset('~thor_data400::base::ecrash_father',FLAccidents_Ecrash.Layout_Basefile,thor);
-prevbase := ds_prevbase(is_Terminated_Agency = FALSE);
+dsPrevEcrashBaseAll := Files_eCrash.DS_BASE_ECRASH_FATHER;
+dsEcrashPrevBase := dsPrevEcrashBaseAll(is_Terminated_Agency = FALSE);
 		
 									 
-slim_layout trecs_prev(prevbase L, newdupes R) := transform
+slim_layout trecs_prev(dsEcrashPrevBase L, newdupes R) := transform
 self.case_identifier :=if(l.source_id = 'TF', l.state_report_number,l.case_identifier);
 self.accident_location	:= map(L.loss_cross_street!='' and L.loss_cross_street!= 'N/A' => L.loss_street+' & '+L.loss_cross_street,L.loss_street);
 self.accident_street		:= L.loss_street;
@@ -233,7 +233,7 @@ self := L;
 self := [];
 end;
 
-jrecs_prevbase := join(prevbase(report_code <>'TM'),sort(newdupes, - del_incident_id),
+jrecs_prevbase := join(dsEcrashPrevBase(report_code <>'TM'),sort(newdupes, - del_incident_id),
 								left.incident_id = right.del_incident_id,
 								trecs_prev(left,right),lookup);
 		
@@ -268,12 +268,12 @@ end;
 
 //Notify if TM DE matches with TF/EA report type id recieved after TM DE 
 
-//TFDE := base (report_code ='TF' and report_type_id = 'DE'); 
+//TFDE := dsEcrashBase (report_code ='TF' and report_type_id = 'DE'); 
 
-TFDE := dedup(sort(distribute(base (report_code ='TF' and report_type_id = 'DE' ), hash32(incident_id)),incident_id, crash_date,state_report_number, Agency_name, Loss_state_abbr, creation_date, local), incident_id, crash_date,state_report_number, Agency_name, Loss_state_abbr, creation_date, local);
+TFDE := dedup(sort(distribute(dsEcrashBase (report_code ='TF' and report_type_id = 'DE' ), hash32(incident_id)),incident_id, crash_date,state_report_number, Agency_name, Loss_state_abbr, creation_date, local), incident_id, crash_date,state_report_number, Agency_name, Loss_state_abbr, creation_date, local);
 
-//TM_TF_A := base(report_code in ['TM','TF'] and report_type_id = 'A'); 
-TM_TF_A := dedup(sort(distribute(base(report_code in ['TM','TF'] and report_type_id = 'A' ), hash32(incident_id)),incident_id, crash_date,state_report_number, Agency_name, Loss_state_abbr, creation_date, local), incident_id, crash_date,state_report_number, Agency_name, Loss_state_abbr, creation_date, local);
+//TM_TF_A := dsEcrashBase(report_code in ['TM','TF'] and report_type_id = 'A'); 
+TM_TF_A := dedup(sort(distribute(dsEcrashBase(report_code in ['TM','TF'] and report_type_id = 'A' ), hash32(incident_id)),incident_id, crash_date,state_report_number, Agency_name, Loss_state_abbr, creation_date, local), incident_id, crash_date,state_report_number, Agency_name, Loss_state_abbr, creation_date, local);
 
 
 
@@ -326,12 +326,3 @@ sequential(
 					 );					
 
 end;
-
-
-
-
-								
-								
-								
-								
-

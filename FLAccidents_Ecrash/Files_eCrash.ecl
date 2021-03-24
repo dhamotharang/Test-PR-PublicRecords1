@@ -3,59 +3,138 @@
 EXPORT Files_eCrash := MODULE
                                                     
   // #################################################################################
-  //                                 Ecrash Prefix
+  //                  Ecrash Prefix
   // #################################################################################
   EXPORT SPRAY_ECRASH_PREFIX := Files.SPRAY_ECRASH_PREFIX;
   EXPORT BASE_ECRASH_PREFIX := Files.BASE_ECRASH_PREFIX;
-  EXPORT ORBIT_ECRASH_PREFIX := Files.ORBIT_ECRASH_PREFIX;	
-	
-  // #################################################################################
-  //                         Ecrash Suffixes for Spray Datasets 
-  // #################################################################################
-  EXPORT SUFFIX_SPRAY_INCIDENT := FileNames.INCIDENT_FILE_NAME;    
-  EXPORT SUFFIX_SPRAY_PERSON := FileNames.PERSON_FILE_NAME;        
-  EXPORT SUFFIX_SPRAY_VEHICLE := FileNames.VEHICLE_FILE_NAME;        
-  EXPORT SUFFIX_SPRAY_CITATION := FileNames.CITATION_FILE_NAME;        
-  EXPORT SUFFIX_SPRAY_COMMERCIAL := FileNames.COMMERCIAL_FILE_NAME;        
-  EXPORT SUFFIX_SPRAY_PROPERTY_DAMAGE := FileNames.PROPERTY_DAMAGE_FILE_NAME;        
-  EXPORT SUFFIX_SPRAY_DOCUMENT := FileNames.DOCUMENT_FILE_NAME;        
-  EXPORT SUFFIX_SPRAY_AGENCY := FileNames.AGENCY_FILE_NAME;        
-  EXPORT SUFFIX_SPRAY_BILLING_AGENCY := FileNames.BILLING_AGENCY_FILE_NAME;
-	
-  // #################################################################################
-  //                       Ecrash Suffixes for Base Datasets  
-  // #################################################################################	
-  EXPORT SUFFIX_NAME_INCIDENT := FileNames.INCIDENT_FILE_NAME;    
-  EXPORT SUFFIX_NAME_PERSON := FileNames.PERSON_FILE_NAME;        
-  EXPORT SUFFIX_NAME_VEHICLE := FileNames.VEHICLE_FILE_NAME;        
-  EXPORT SUFFIX_NAME_CITATION := FileNames.CITATION_FILE_NAME;        
-  EXPORT SUFFIX_NAME_COMMERCIAL := FileNames.COMMERCIAL_FILE_NAME;        
-  EXPORT SUFFIX_NAME_PROPERTY_DAMAGE := FileNames.PROPERTY_DAMAGE_FILE_NAME;        
-  EXPORT SUFFIX_NAME_DOCUMENT := FileNames.DOCUMENT_FILE_NAME;        
-  EXPORT SUFFIX_NAME_AGENCY := FileNames.AGENCY_FILE_NAME;        
-  EXPORT SUFFIX_NAME_BILLING_AGENCY := FileNames.BILLING_AGENCY_FILE_NAME;
+  EXPORT ORBIT_ECRASH_PREFIX := Files.ORBIT_ECRASH_PREFIX;
 	
   // #################################################################################
   //             Ecrash Suffixes for Combined Base Datasets 
   // #################################################################################
-  EXPORT SUFFIX_NAME_AGENCY_COMBINED := 'AGENCY_COMBINED';
-  EXPORT SUFFIX_NAME_ECRASH := 'ECRASH_BASE';    
-  EXPORT SUFFIX_NAME_SUPPLEMENTAL := 'SUPPLEMENTAL_BASE';	
-	EXPORT SUFFIX_NAME_INCIDENTS_EXTRACT := 'INCIDENTS_EXTRACT';
-	
-  // #################################################################################
-  //             Ecrash Suffixes for SUPPRESS & DELETES Datasets
-  // #################################################################################	
-  EXPORT SUFFIX_NAME_SUPPRESS_INCIDENTS := 'SUPPRESS_INCIDENTS';
-  EXPORT SUFFIX_NAME_SUPPRESS_REPORT_ID := 'SUPPRESS_REPORT_ID';
-  EXPORT SUFFIX_NAME_SUPPRESS_CASE_IDENTIFIER := 'SUPPRESS_CASE_IDENTIFIER';
-  EXPORT SUFFIX_NAME_ECRASH_DELETES := 'ECRASH_DELETES';
+  EXPORT SUFFIX_BASE_ECRASH := 'ECRASH';    
+  EXPORT SUFFIX_BASE_ClaimsClarity := 'ClaimsClarity';	
+  EXPORT SUFFIX_BASE_SUPPLEMENTAL := 'SUPPLEMENTAL';	
+  EXPORT SUFFIX_BASE_DOCUMENT := 'DOCUMENT';	
+	EXPORT SUFFIX_BASE_CRUVehicleIncidents := 'CRUVehicleIncidents';
 	
   // #################################################################################
   //             Ecrash Suffixes for Accidents Consolidation Base Files
   // #################################################################################
-  EXPORT SUFFIX_NAME_CONSOLIDATION_ECRASH := 'CONSOLIDATION_ECRASH';
-  EXPORT SUFFIX_NAME_CONSOLIDATION_PR := 'CONSOLIDATION_PR';
+  EXPORT SUFFIX_CONSOLIDATION_ECRASH := 'CONSOLIDATION_ECRASH';
+  EXPORT SUFFIX_CONSOLIDATION_PR := 'CONSOLIDATION_PR';
+  EXPORT SUFFIX_CONSOLIDATION_CRU := 'CONSOLIDATION_CRU';
+  EXPORT SUFFIX_CONSOLIDATION_MBSAgency := 'CONSOLIDATION_MBSAgency';		
+  																											
+  // ###########################################################################
+  //             Ecrash Combined BaseFiles Super File Definitions 
+  // ###########################################################################	 	
+  EXPORT FILE_BASE_ECRASH_SF := BASE_ECRASH_PREFIX + '::QA::' + SUFFIX_BASE_ECRASH;	
+  EXPORT FILE_BASE_ClaimsClarity_SF := BASE_ECRASH_PREFIX + '::QA::' + SUFFIX_BASE_ClaimsClarity;	
+	EXPORT FILE_BASE_SUPPLEMENTAL_SF := BASE_ECRASH_PREFIX + '::QA::' + SUFFIX_BASE_SUPPLEMENTAL;
+  EXPORT FILE_BASE_DOCUMENT_SF := BASE_ECRASH_PREFIX + '::QA::' + SUFFIX_BASE_DOCUMENT;
+  EXPORT FILE_BASE_CRUVehicleIncidents_SF := BASE_ECRASH_PREFIX + '::QA::' + SUFFIX_BASE_CRUVehicleIncidents;
+  
+  // ###########################################################################
+  //             Ecrash Accidents Consolidation Super File Definitions 
+  // ###########################################################################   	
+  EXPORT FILE_BASE_CONSOLIDATION_ECRASH_SF := BASE_ECRASH_PREFIX + '::QA::' + SUFFIX_CONSOLIDATION_ECRASH;	
+  EXPORT FILE_BASE_CONSOLIDATION_PR_SF := BASE_ECRASH_PREFIX + '::QA::' + SUFFIX_CONSOLIDATION_PR;	
+  EXPORT FILE_BASE_CONSOLIDATION_CRU_SF := BASE_ECRASH_PREFIX + '::QA::' + SUFFIX_CONSOLIDATION_CRU;	
+  EXPORT FILE_BASE_CONSOLIDATION_MBSAgency_SF := BASE_ECRASH_PREFIX + '::QA::' + SUFFIX_CONSOLIDATION_MBSAgency;
+  
+  // ###########################################################################
+  //               Ecrash Combined BaseFiles Dataset Definitions
+  // ########################################################################### 	
+  EXPORT DS_BASE_ECRASH := DATASET(FILE_BASE_ECRASH_SF, Layout_Basefile, THOR);
+  EXPORT DS_BASE_ClaimsClarity := DATASET(FILE_BASE_ClaimsClarity_SF, Layout_InseCrashSlim, THOR);	
+  EXPORT DS_BASE_SUPPLEMENTAL := DATASET(FILE_BASE_SUPPLEMENTAL_SF, Layouts.ReportVersion, THOR);
+  EXPORT DS_BASE_DOCUMENT := DATASET(FILE_BASE_DOCUMENT_SF, Layouts.PhotoLayout, THOR);
+	EXPORT DS_BASE_CRUVehicleIncidents := DATASET(FILE_BASE_CRUVehicleIncidents_SF, Layout_VehIncidents.SlimIncidents, THOR);
+  
+  // ###########################################################################
+  // Accidents Consolidation BaseFiles Dataset Definitions for 
+	// eCrash Keys, eCrash PR Keys & CRU Keys
+  // ###########################################################################   	
+  EXPORT DS_BASE_CONSOLIDATION_ECRASH := DATASET(FILE_BASE_CONSOLIDATION_ECRASH_SF, Layout_eCrash.Consolidation, THOR);	
+  EXPORT DS_BASE_CONSOLIDATION_PR := DATASET(FILE_BASE_CONSOLIDATION_PR_SF, Layout_eCrash.Consolidation, THOR);
+  EXPORT DS_BASE_CONSOLIDATION_CRU := DATASET(FILE_BASE_CONSOLIDATION_CRU_SF, Layout_eCrash.Accidents_Alpha, THOR);
+  EXPORT DS_BASE_CONSOLIDATION_MBSAgency := DATASET(FILE_BASE_CONSOLIDATION_MBSAgency_SF, Layouts.agency_cmbnd, THOR);		
+  																											
+  // ###########################################################################
+  //             Ecrash Combined BaseFiles Super File Father Definitions 
+  // ###########################################################################	 	
+  EXPORT FILE_BASE_ECRASH_FATHER := BASE_ECRASH_PREFIX + '::FATHER::' + SUFFIX_BASE_ECRASH;	
+  EXPORT FILE_BASE_ClaimsClarity_FATHER := BASE_ECRASH_PREFIX + '::FATHER::' + SUFFIX_BASE_ClaimsClarity;	
+	EXPORT FILE_BASE_SUPPLEMENTAL_FATHER := BASE_ECRASH_PREFIX + '::FATHER::' + SUFFIX_BASE_SUPPLEMENTAL;
+  EXPORT FILE_BASE_DOCUMENT_FATHER := BASE_ECRASH_PREFIX + '::FATHER::' + SUFFIX_BASE_DOCUMENT;
+  EXPORT FILE_BASE_CRUVehicleIncidents_FATHER := BASE_ECRASH_PREFIX + '::FATHER::' + SUFFIX_BASE_CRUVehicleIncidents;
+  
+  // ###########################################################################
+  //             Ecrash Accidents Consolidation Super File Definitions 
+  // ###########################################################################   	
+  EXPORT FILE_BASE_CONSOLIDATION_ECRASH_FATHER := BASE_ECRASH_PREFIX + '::FATHER::' + SUFFIX_CONSOLIDATION_ECRASH;	
+  EXPORT FILE_BASE_CONSOLIDATION_PR_FATHER := BASE_ECRASH_PREFIX + '::FATHER::' + SUFFIX_CONSOLIDATION_PR;	
+  EXPORT FILE_BASE_CONSOLIDATION_CRU_FATHER := BASE_ECRASH_PREFIX + '::FATHER::' + SUFFIX_CONSOLIDATION_CRU;	
+  EXPORT FILE_BASE_CONSOLIDATION_MBSAgency_FATHER := BASE_ECRASH_PREFIX + '::FATHER::' + SUFFIX_CONSOLIDATION_MBSAgency;
+  
+  // ###########################################################################
+  //               Ecrash Combined BaseFiles Dataset Definitions
+  // ########################################################################### 	
+  EXPORT DS_BASE_ECRASH_FATHER := DATASET(FILE_BASE_ECRASH_FATHER, Layout_Basefile, THOR);
+  EXPORT DS_BASE_ClaimsClarity_FATHER := DATASET(FILE_BASE_ClaimsClarity_FATHER, Layout_InseCrashSlim, THOR);	
+  EXPORT DS_BASE_SUPPLEMENTAL_FATHER := DATASET(FILE_BASE_SUPPLEMENTAL_FATHER, Layouts.ReportVersion, THOR);
+  EXPORT DS_BASE_DOCUMENT_FATHER := DATASET(FILE_BASE_DOCUMENT_FATHER, Layouts.PhotoLayout, THOR);
+	EXPORT DS_BASE_CRUVehicleIncidents_FATHER := DATASET(FILE_BASE_CRUVehicleIncidents_FATHER, Layout_VehIncidents.SlimIncidents, THOR);
+  
+  // ###########################################################################
+  // Accidents Consolidation BaseFiles Dataset Definitions for 
+	// eCrash Keys, eCrash PR Keys & CRU Keys
+  // ###########################################################################   	
+  EXPORT DS_BASE_CONSOLIDATION_ECRASH_FATHER := DATASET(FILE_BASE_CONSOLIDATION_ECRASH_FATHER, Layout_eCrash.Consolidation, THOR);	
+  EXPORT DS_BASE_CONSOLIDATION_PR_FATHER := DATASET(FILE_BASE_CONSOLIDATION_PR_FATHER, Layout_eCrash.Consolidation, THOR);
+  EXPORT DS_BASE_CONSOLIDATION_CRU_FATHER := DATASET(FILE_BASE_CONSOLIDATION_CRU_FATHER, Layout_eCrash.Accidents_Alpha, THOR);
+  EXPORT DS_BASE_CONSOLIDATION_MBSAgency_FATHER := DATASET(FILE_BASE_CONSOLIDATION_MBSAgency_FATHER, Layouts.agency_cmbnd, THOR);
+  
+  // ###########################################################################
+  //               Ecrash SUPPRESS & DELETES Dataset Definitions
+  // ###########################################################################  	
+  EXPORT DS_BASE_SUPPRESS_INCIDENTS := DATASET(mod_Utilities.Location + 'thor_data400::in::ecrash::suppress_tf.csv', Layouts.SuppressIncidents, CSV(HEADING(1), TERMINATOR(['\n','\r\n']), SEPARATOR(','), QUOTE('"')));
+  EXPORT DS_BASE_ECRASH_DELETES := DATASET(mod_Utilities.Location +'thor_data::in::ecrash_deletes', Layouts.deletes, CSV(TERMINATOR(['\n','\r\n']), SEPARATOR(','), QUOTE('"'))); 
+	
+  // #################################################################################
+  //                         Ecrash Suffixes for Spray Datasets 
+  // #################################################################################
+  // EXPORT SUFFIX_SPRAY_INCIDENT := FileNames.INCIDENT_FILE_NAME;    
+  // EXPORT SUFFIX_SPRAY_PERSON := FileNames.PERSON_FILE_NAME;        
+  // EXPORT SUFFIX_SPRAY_VEHICLE := FileNames.VEHICLE_FILE_NAME;        
+  // EXPORT SUFFIX_SPRAY_CITATION := FileNames.CITATION_FILE_NAME;        
+  // EXPORT SUFFIX_SPRAY_COMMERCIAL := FileNames.COMMERCIAL_FILE_NAME;        
+  // EXPORT SUFFIX_SPRAY_PROPERTY_DAMAGE := FileNames.PROPERTY_DAMAGE_FILE_NAME;        
+  // EXPORT SUFFIX_SPRAY_DOCUMENT := FileNames.DOCUMENT_FILE_NAME;        
+  // EXPORT SUFFIX_SPRAY_AGENCY := FileNames.AGENCY_FILE_NAME;        
+  // EXPORT SUFFIX_SPRAY_BILLING_AGENCY := FileNames.BILLING_AGENCY_FILE_NAME;
+	
+  // #################################################################################
+  //                       Ecrash Suffixes for Base Datasets  
+  // #################################################################################	
+  // EXPORT SUFFIX_INCIDENT := FileNames.INCIDENT_FILE_NAME;    
+  // EXPORT SUFFIX_PERSON := FileNames.PERSON_FILE_NAME;        
+  // EXPORT SUFFIX_VEHICLE := FileNames.VEHICLE_FILE_NAME;        
+  // EXPORT SUFFIX_CITATION := FileNames.CITATION_FILE_NAME;        
+  // EXPORT SUFFIX_COMMERCIAL := FileNames.COMMERCIAL_FILE_NAME;        
+  // EXPORT SUFFIX_PROPERTY_DAMAGE := FileNames.PROPERTY_DAMAGE_FILE_NAME;        
+  // EXPORT SUFFIX_DOCUMENT := FileNames.DOCUMENT_FILE_NAME;        
+  // EXPORT SUFFIX_AGENCY := FileNames.AGENCY_FILE_NAME;        
+  // EXPORT SUFFIX_BILLING_AGENCY := FileNames.BILLING_AGENCY_FILE_NAME;
+	
+  // #################################################################################
+  //             Ecrash Suffixes for SUPPRESS & DELETES Datasets
+  // #################################################################################	
+  // EXPORT SUFFIX_SUPPRESS_INCIDENTS := 'SUPPRESS_INCIDENTS';
+  // EXPORT SUFFIX_SUPPRESS_REPORT_ID := 'SUPPRESS_REPORT_ID';
+  // EXPORT SUFFIX_SUPPRESS_CASE_IDENTIFIER := 'SUPPRESS_CASE_IDENTIFIER';
+  // EXPORT SUFFIX_ECRASH_DELETES := 'ECRASH_DELETES';
 	
    // ###########################################################################
   //                 Ecrash Spray Super File Definitions
@@ -73,76 +152,62 @@ EXPORT Files_eCrash := MODULE
   // ###########################################################################
   //						Ecrash ALL Super File Definitions
   //###############################################################################    
-  // EXPORT FILE_ALL_INCIDENT_SF := BASE_ECRASH_PREFIX + '::ALL::' + SUFFIX_NAME_INCIDENT;
-  // EXPORT FILE_ALL_PERSON_SF := BASE_ECRASH_PREFIX + '::ALL::' + SUFFIX_NAME_PERSON;
-  // EXPORT FILE_ALL_VEHICLE_SF := BASE_ECRASH_PREFIX + '::ALL::' + SUFFIX_NAME_VEHICLE;
-  // EXPORT FILE_ALL_CITATION_SF := BASE_ECRASH_PREFIX + '::ALL::' + SUFFIX_NAME_CITATION;
-  // EXPORT FILE_ALL_COMMERCIAL_SF := BASE_ECRASH_PREFIX + '::ALL::' + SUFFIX_NAME_COMMERCIAL;
-  // EXPORT FILE_ALL_PROPERTY_DAMAGE_SF := BASE_ECRASH_PREFIX + '::ALL::' + SUFFIX_NAME_PROPERTY_DAMAGE;
-  // EXPORT FILE_ALL_DOCUMENT_SF := BASE_ECRASH_PREFIX + '::ALL::' + SUFFIX_NAME_DOCUMENT;
-  // EXPORT FILE_ALL_AGENCY_SF := BASE_ECRASH_PREFIX + '::ALL::' + SUFFIX_NAME_AGENCY;
-  // EXPORT FILE_ALL_BILLING_AGENCY_SF := BASE_ECRASH_PREFIX + '::ALL::' + SUFFIX_NAME_BILLING_AGENCY;
+  // EXPORT FILE_ALL_INCIDENT_SF := BASE_ECRASH_PREFIX + '::ALL::' + SUFFIX_INCIDENT;
+  // EXPORT FILE_ALL_PERSON_SF := BASE_ECRASH_PREFIX + '::ALL::' + SUFFIX_PERSON;
+  // EXPORT FILE_ALL_VEHICLE_SF := BASE_ECRASH_PREFIX + '::ALL::' + SUFFIX_VEHICLE;
+  // EXPORT FILE_ALL_CITATION_SF := BASE_ECRASH_PREFIX + '::ALL::' + SUFFIX_CITATION;
+  // EXPORT FILE_ALL_COMMERCIAL_SF := BASE_ECRASH_PREFIX + '::ALL::' + SUFFIX_COMMERCIAL;
+  // EXPORT FILE_ALL_PROPERTY_DAMAGE_SF := BASE_ECRASH_PREFIX + '::ALL::' + SUFFIX_PROPERTY_DAMAGE;
+  // EXPORT FILE_ALL_DOCUMENT_SF := BASE_ECRASH_PREFIX + '::ALL::' + SUFFIX_DOCUMENT;
+  // EXPORT FILE_ALL_AGENCY_SF := BASE_ECRASH_PREFIX + '::ALL::' + SUFFIX_AGENCY;
+  // EXPORT FILE_ALL_BILLING_AGENCY_SF := BASE_ECRASH_PREFIX + '::ALL::' + SUFFIX_BILLING_AGENCY;
 	
   // ###########################################################################
   //						Ecrash FULL Super File Definitions
   //###############################################################################    
-  // EXPORT FILE_FULL_INCIDENT_SF := BASE_ECRASH_PREFIX + '::FULL::' + SUFFIX_NAME_INCIDENT;
-  // EXPORT FILE_FULL_PERSON_SF := BASE_ECRASH_PREFIX + '::FULL::' + SUFFIX_NAME_PERSON;
-  // EXPORT FILE_FULL_VEHICLE_SF := BASE_ECRASH_PREFIX + '::FULL::' + SUFFIX_NAME_VEHICLE;
-  // EXPORT FILE_FULL_CITATION_SF := BASE_ECRASH_PREFIX + '::FULL::' + SUFFIX_NAME_CITATION;
-  // EXPORT FILE_FULL_COMMERCIAL_SF := BASE_ECRASH_PREFIX + '::FULL::' + SUFFIX_NAME_COMMERCIAL;
-  // EXPORT FILE_FULL_PROPERTY_DAMAGE_SF := BASE_ECRASH_PREFIX + '::FULL::' + SUFFIX_NAME_PROPERTY_DAMAGE;
-  // EXPORT FILE_FULL_DOCUMENT_SF := BASE_ECRASH_PREFIX + '::FULL::' + SUFFIX_NAME_DOCUMENT;
-  // EXPORT FILE_FULL_AGENCY_SF := BASE_ECRASH_PREFIX + '::FULL::' + SUFFIX_NAME_AGENCY;
-  // EXPORT FILE_FULL_BILLING_AGENCY_SF := BASE_ECRASH_PREFIX + '::FULL::' + SUFFIX_NAME_BILLING_AGENCY;
+  // EXPORT FILE_FULL_INCIDENT_SF := BASE_ECRASH_PREFIX + '::FULL::' + SUFFIX_INCIDENT;
+  // EXPORT FILE_FULL_PERSON_SF := BASE_ECRASH_PREFIX + '::FULL::' + SUFFIX_PERSON;
+  // EXPORT FILE_FULL_VEHICLE_SF := BASE_ECRASH_PREFIX + '::FULL::' + SUFFIX_VEHICLE;
+  // EXPORT FILE_FULL_CITATION_SF := BASE_ECRASH_PREFIX + '::FULL::' + SUFFIX_CITATION;
+  // EXPORT FILE_FULL_COMMERCIAL_SF := BASE_ECRASH_PREFIX + '::FULL::' + SUFFIX_COMMERCIAL;
+  // EXPORT FILE_FULL_PROPERTY_DAMAGE_SF := BASE_ECRASH_PREFIX + '::FULL::' + SUFFIX_PROPERTY_DAMAGE;
+  // EXPORT FILE_FULL_DOCUMENT_SF := BASE_ECRASH_PREFIX + '::FULL::' + SUFFIX_DOCUMENT;
+  // EXPORT FILE_FULL_AGENCY_SF := BASE_ECRASH_PREFIX + '::FULL::' + SUFFIX_AGENCY;
+  // EXPORT FILE_FULL_BILLING_AGENCY_SF := BASE_ECRASH_PREFIX + '::FULL::' + SUFFIX_BILLING_AGENCY;
 	
   //###############################################################################
   //						Ecrash INC Super File Definitions 
   //###############################################################################    
-  // EXPORT FILE_INC_INCIDENT_SF := BASE_ECRASH_PREFIX + '::INC::' + SUFFIX_NAME_INCIDENT;
-  // EXPORT FILE_INC_PERSON_SF := BASE_ECRASH_PREFIX + '::INC::' + SUFFIX_NAME_PERSON;
-  // EXPORT FILE_INC_VEHICLE_SF := BASE_ECRASH_PREFIX + '::INC::' + SUFFIX_NAME_VEHICLE;
-  // EXPORT FILE_INC_CITATION_SF := BASE_ECRASH_PREFIX + '::INC::' + SUFFIX_NAME_CITATION;
-  // EXPORT FILE_INC_COMMERCIAL_SF := BASE_ECRASH_PREFIX + '::INC::' + SUFFIX_NAME_COMMERCIAL;
-  // EXPORT FILE_INC_PROPERTY_DAMAGE_SF := BASE_ECRASH_PREFIX + '::INC::' + SUFFIX_NAME_PROPERTY_DAMAGE;
-  // EXPORT FILE_INC_DOCUMENT_SF := BASE_ECRASH_PREFIX + '::INC::' + SUFFIX_NAME_DOCUMENT;
-  // EXPORT FILE_INC_AGENCY_SF := BASE_ECRASH_PREFIX + '::INC::' + SUFFIX_NAME_AGENCY;
-  // EXPORT FILE_INC_BILLING_AGENCY_SF := BASE_ECRASH_PREFIX + '::INC::' + SUFFIX_NAME_BILLING_AGENCY;
+  // EXPORT FILE_INC_INCIDENT_SF := BASE_ECRASH_PREFIX + '::INC::' + SUFFIX_INCIDENT;
+  // EXPORT FILE_INC_PERSON_SF := BASE_ECRASH_PREFIX + '::INC::' + SUFFIX_PERSON;
+  // EXPORT FILE_INC_VEHICLE_SF := BASE_ECRASH_PREFIX + '::INC::' + SUFFIX_VEHICLE;
+  // EXPORT FILE_INC_CITATION_SF := BASE_ECRASH_PREFIX + '::INC::' + SUFFIX_CITATION;
+  // EXPORT FILE_INC_COMMERCIAL_SF := BASE_ECRASH_PREFIX + '::INC::' + SUFFIX_COMMERCIAL;
+  // EXPORT FILE_INC_PROPERTY_DAMAGE_SF := BASE_ECRASH_PREFIX + '::INC::' + SUFFIX_PROPERTY_DAMAGE;
+  // EXPORT FILE_INC_DOCUMENT_SF := BASE_ECRASH_PREFIX + '::INC::' + SUFFIX_DOCUMENT;
+  // EXPORT FILE_INC_AGENCY_SF := BASE_ECRASH_PREFIX + '::INC::' + SUFFIX_AGENCY;
+  // EXPORT FILE_INC_BILLING_AGENCY_SF := BASE_ECRASH_PREFIX + '::INC::' + SUFFIX_BILLING_AGENCY;
   																											
   // ###########################################################################
   //                Ecrash BaseFiles Super File Definitions 
   // ###########################################################################	
-  EXPORT FILE_BASE_INCIDENT_SF := BASE_ECRASH_PREFIX + '::QA::' + SUFFIX_NAME_INCIDENT;	
-  EXPORT FILE_BASE_PERSON_SF := BASE_ECRASH_PREFIX + '::QA::' + SUFFIX_NAME_PERSON;	
-  EXPORT FILE_BASE_VEHICLE_SF := BASE_ECRASH_PREFIX + '::QA::' + SUFFIX_NAME_VEHICLE;			
-  EXPORT FILE_BASE_CITATION_SF := BASE_ECRASH_PREFIX + '::QA::' + SUFFIX_NAME_CITATION;
-  EXPORT FILE_BASE_COMMERCIAL_SF := BASE_ECRASH_PREFIX + '::QA::' + SUFFIX_NAME_COMMERCIAL;	
-  EXPORT FILE_BASE_PROPERTY_DAMAGE_SF := BASE_ECRASH_PREFIX + '::QA::' + SUFFIX_NAME_PROPERTY_DAMAGE;
-  EXPORT FILE_BASE_DOCUMENT_SF := BASE_ECRASH_PREFIX + '::QA::' + SUFFIX_NAME_DOCUMENT;
-  EXPORT FILE_BASE_AGENCY_SF := BASE_ECRASH_PREFIX + '::QA::' + SUFFIX_NAME_AGENCY;	
-  EXPORT FILE_BASE_BILLING_AGENCY_SF := BASE_ECRASH_PREFIX + '::QA::' + SUFFIX_NAME_BILLING_AGENCY;	
-  																											
-  // ###########################################################################
-  //             Ecrash Combined BaseFiles Super File Definitions 
-  // ###########################################################################	 	
-  EXPORT FILE_BASE_AGENCY_COMBINED_SF := BASE_ECRASH_PREFIX + '::QA::' + SUFFIX_NAME_AGENCY_COMBINED;		
-  EXPORT FILE_BASE_ECRASH_SF := BASE_ECRASH_PREFIX + '::QA::' + SUFFIX_NAME_ECRASH;	
-  EXPORT FILE_BASE_INCIDENTS_EXTRACT_SF := BASE_ECRASH_PREFIX + '::QA::' + SUFFIX_NAME_INCIDENTS_EXTRACT;	
-  EXPORT FILE_BASE_SUPPLEMENTAL_SF := BASE_ECRASH_PREFIX + '::QA::' + SUFFIX_NAME_SUPPLEMENTAL;		
+  // EXPORT FILE_BASE_INCIDENT_SF := BASE_ECRASH_PREFIX + '::QA::' + SUFFIX_INCIDENT;	
+  // EXPORT FILE_BASE_PERSON_SF := BASE_ECRASH_PREFIX + '::QA::' + SUFFIX_PERSON;	
+  // EXPORT FILE_BASE_VEHICLE_SF := BASE_ECRASH_PREFIX + '::QA::' + SUFFIX_VEHICLE;			
+  // EXPORT FILE_BASE_CITATION_SF := BASE_ECRASH_PREFIX + '::QA::' + SUFFIX_CITATION;
+  // EXPORT FILE_BASE_COMMERCIAL_SF := BASE_ECRASH_PREFIX + '::QA::' + SUFFIX_COMMERCIAL;	
+  // EXPORT FILE_BASE_PROPERTY_DAMAGE_SF := BASE_ECRASH_PREFIX + '::QA::' + SUFFIX_PROPERTY_DAMAGE;
+  // EXPORT FILE_BASE_DOCUMENT_SF := BASE_ECRASH_PREFIX + '::QA::' + SUFFIX_DOCUMENT;
+  // EXPORT FILE_BASE_AGENCY_SF := BASE_ECRASH_PREFIX + '::QA::' + SUFFIX_AGENCY;	
+  // EXPORT FILE_BASE_BILLING_AGENCY_SF := BASE_ECRASH_PREFIX + '::QA::' + SUFFIX_BILLING_AGENCY;		
   
   // ###########################################################################
   //             Ecrash SUPPRESS & DELETES  Super File Definitions 
   // ###########################################################################  	
-  EXPORT FILE_BASE_SUPPRESS_INCIDENTS_SF := BASE_ECRASH_PREFIX + '::QA::' + SUFFIX_NAME_SUPPRESS_INCIDENTS;	
-  EXPORT FILE_BASE_SUPPRESS_REPORT_ID_SF := BASE_ECRASH_PREFIX + '::QA::' + SUFFIX_NAME_SUPPRESS_REPORT_ID;	
-  EXPORT FILE_BASE_SUPPRESS_CASE_IDENTIFIER_SF := BASE_ECRASH_PREFIX + '::QA::' + SUFFIX_NAME_SUPPRESS_CASE_IDENTIFIER;	
-  EXPORT FILE_BASE_ECRASH_DELETES_SF := BASE_ECRASH_PREFIX + '::QA::' + SUFFIX_NAME_ECRASH_DELETES;
-  
-  // ###########################################################################
-  //             Ecrash Accidents Consolidation Super File Definitions 
-  // ###########################################################################   	
-  EXPORT FILE_BASE_CONSOLIDATION_ECRASH_SF := BASE_ECRASH_PREFIX + '::QA::' + SUFFIX_NAME_CONSOLIDATION_ECRASH;	
-  EXPORT FILE_BASE_CONSOLIDATION_PR_SF := BASE_ECRASH_PREFIX + '::QA::' + SUFFIX_NAME_CONSOLIDATION_PR;	
+  // EXPORT FILE_BASE_SUPPRESS_INCIDENTS_SF := BASE_ECRASH_PREFIX + '::QA::' + SUFFIX_SUPPRESS_INCIDENTS;	
+  // EXPORT FILE_BASE_SUPPRESS_REPORT_ID_SF := BASE_ECRASH_PREFIX + '::QA::' + SUFFIX_SUPPRESS_REPORT_ID;	
+  // EXPORT FILE_BASE_SUPPRESS_CASE_IDENTIFIER_SF := BASE_ECRASH_PREFIX + '::QA::' + SUFFIX_SUPPRESS_CASE_IDENTIFIER;	
+  // EXPORT FILE_BASE_ECRASH_DELETES_SF := BASE_ECRASH_PREFIX + '::QA::' + SUFFIX_ECRASH_DELETES;	
 	
   // ###########################################################################
   //                  Ecrash Spray Dataset Definitions
@@ -178,82 +243,62 @@ EXPORT Files_eCrash := MODULE
   //###############################################################################
   //						Ecrash ALL File Dataset Definitions 
   //###############################################################################		
-  // EXPORT DS_ALL_INCIDENT := DATASET(FILE_ALL_INCIDENT_SF, Layouts_Ecrash.INCIDENT, THOR, OPT);
-  // EXPORT DS_ALL_PERSON := DATASET(FILE_ALL_PERSON_SF, Layouts_Ecrash.PERSON, THOR, OPT);
-  // EXPORT DS_ALL_VEHICLE := DATASET(FILE_ALL_VEHICLE_SF, Layouts_Ecrash.VEHICLE, THOR, OPT);
-  // EXPORT DS_ALL_CITATION := DATASET(FILE_ALL_CITATION_SF, Layouts_Ecrash.CITATION, THOR, OPT);
-  // EXPORT DS_ALL_COMMERCIAL := DATASET(FILE_ALL_COMMERCIAL_SF, Layouts_Ecrash.COMMERCIAL, THOR, OPT);
-  // EXPORT DS_ALL_PROPERTY_DAMAGE := DATASET(FILE_ALL_PROPERTY_DAMAGE_SF, Layouts_Ecrash.PROPERTY_DAMAGE, THOR, OPT);
-  // EXPORT DS_ALL_DOCUMENT := DATASET(FILE_ALL_DOCUMENT_SF, Layouts_Ecrash.DOCUMENT, THOR, OPT);
-  // EXPORT DS_ALL_AGENCY := DATASET(FILE_ALL_AGENCY_SF, Layouts_Ecrash.AGENCY, THOR, OPT);
-  // EXPORT DS_ALL_BILLING_AGENCY := DATASET(FILE_ALL_BILLING_AGENCY_SF, Layouts_Ecrash.BILLING_AGENCY, THOR, OPT);
+  // EXPORT DS_ALL_INCIDENT := DATASET(FILE_ALL_INCIDENT_SF, Layouts_Ecrash.INCIDENT, THOR);
+  // EXPORT DS_ALL_PERSON := DATASET(FILE_ALL_PERSON_SF, Layouts_Ecrash.PERSON, THOR);
+  // EXPORT DS_ALL_VEHICLE := DATASET(FILE_ALL_VEHICLE_SF, Layouts_Ecrash.VEHICLE, THOR);
+  // EXPORT DS_ALL_CITATION := DATASET(FILE_ALL_CITATION_SF, Layouts_Ecrash.CITATION, THOR);
+  // EXPORT DS_ALL_COMMERCIAL := DATASET(FILE_ALL_COMMERCIAL_SF, Layouts_Ecrash.COMMERCIAL, THOR);
+  // EXPORT DS_ALL_PROPERTY_DAMAGE := DATASET(FILE_ALL_PROPERTY_DAMAGE_SF, Layouts_Ecrash.PROPERTY_DAMAGE, THOR);
+  // EXPORT DS_ALL_DOCUMENT := DATASET(FILE_ALL_DOCUMENT_SF, Layouts_Ecrash.DOCUMENT, THOR);
+  // EXPORT DS_ALL_AGENCY := DATASET(FILE_ALL_AGENCY_SF, Layouts_Ecrash.AGENCY, THOR);
+  // EXPORT DS_ALL_BILLING_AGENCY := DATASET(FILE_ALL_BILLING_AGENCY_SF, Layouts_Ecrash.BILLING_AGENCY, THOR);
 
   //###############################################################################
   //						Ecrash FULL File Dataset Definitions 
   //###############################################################################		
-  // EXPORT DS_FULL_INCIDENT := DATASET(FILE_FULL_INCIDENT_SF, Layouts_Ecrash.INCIDENT, THOR, OPT);
-  // EXPORT DS_FULL_PERSON := DATASET(FILE_FULL_PERSON_SF, Layouts_Ecrash.PERSON, THOR, OPT);
-  // EXPORT DS_FULL_VEHICLE := DATASET(FILE_FULL_VEHICLE_SF, Layouts_Ecrash.VEHICLE, THOR, OPT);
-  // EXPORT DS_FULL_CITATION := DATASET(FILE_FULL_CITATION_SF, Layouts_Ecrash.CITATION, THOR, OPT);
-  // EXPORT DS_FULL_COMMERCIAL := DATASET(FILE_FULL_COMMERCIAL_SF, Layouts_Ecrash.COMMERCIAL, THOR, OPT);
-  // EXPORT DS_FULL_PROPERTY_DAMAGE := DATASET(FILE_FULL_PROPERTY_DAMAGE_SF, Layouts_Ecrash.PROPERTY_DAMAGE, THOR, OPT);
-  // EXPORT DS_FULL_DOCUMENT := DATASET(FILE_FULL_DOCUMENT_SF, Layouts_Ecrash.DOCUMENT, THOR, OPT);
-  // EXPORT DS_FULL_AGENCY := DATASET(FILE_FULL_AGENCY_SF, Layouts_Ecrash.AGENCY, THOR, OPT);
-  // EXPORT DS_FULL_BILLING_AGENCY := DATASET(FILE_FULL_BILLING_AGENCY_SF, Layouts_Ecrash.BILLING_AGENCY, THOR, OPT);
+  // EXPORT DS_FULL_INCIDENT := DATASET(FILE_FULL_INCIDENT_SF, Layouts_Ecrash.INCIDENT, THOR);
+  // EXPORT DS_FULL_PERSON := DATASET(FILE_FULL_PERSON_SF, Layouts_Ecrash.PERSON, THOR);
+  // EXPORT DS_FULL_VEHICLE := DATASET(FILE_FULL_VEHICLE_SF, Layouts_Ecrash.VEHICLE, THOR);
+  // EXPORT DS_FULL_CITATION := DATASET(FILE_FULL_CITATION_SF, Layouts_Ecrash.CITATION, THOR);
+  // EXPORT DS_FULL_COMMERCIAL := DATASET(FILE_FULL_COMMERCIAL_SF, Layouts_Ecrash.COMMERCIAL, THOR);
+  // EXPORT DS_FULL_PROPERTY_DAMAGE := DATASET(FILE_FULL_PROPERTY_DAMAGE_SF, Layouts_Ecrash.PROPERTY_DAMAGE, THOR);
+  // EXPORT DS_FULL_DOCUMENT := DATASET(FILE_FULL_DOCUMENT_SF, Layouts_Ecrash.DOCUMENT, THOR);
+  // EXPORT DS_FULL_AGENCY := DATASET(FILE_FULL_AGENCY_SF, Layouts_Ecrash.AGENCY, THOR);
+  // EXPORT DS_FULL_BILLING_AGENCY := DATASET(FILE_FULL_BILLING_AGENCY_SF, Layouts_Ecrash.BILLING_AGENCY, THOR);
 
   //###############################################################################
   //						Ecrash INC File Dataset Definitions 
   //###############################################################################		
-  // EXPORT DS_INC_INCIDENT := DATASET(FILE_INC_INCIDENT_SF, Layouts_Ecrash.INCIDENT, THOR, OPT);
-  // EXPORT DS_INC_PERSON := DATASET(FILE_INC_PERSON_SF, Layouts_Ecrash.PERSON, THOR, OPT);
-  // EXPORT DS_INC_VEHICLE := DATASET(FILE_INC_VEHICLE_SF, Layouts_Ecrash.VEHICLE, THOR, OPT);
-  // EXPORT DS_INC_CITATION := DATASET(FILE_INC_CITATION_SF, Layouts_Ecrash.CITATION, THOR, OPT);
-  // EXPORT DS_INC_COMMERCIAL := DATASET(FILE_INC_COMMERCIAL_SF, Layouts_Ecrash.COMMERCIAL, THOR, OPT);
-  // EXPORT DS_INC_PROPERTY_DAMAGE := DATASET(FILE_INC_PROPERTY_DAMAGE_SF, Layouts_Ecrash.PROPERTY_DAMAGE, THOR, OPT);
-  // EXPORT DS_INC_DOCUMENT := DATASET(FILE_INC_DOCUMENT_SF, Layouts_Ecrash.DOCUMENT, THOR, OPT);
-  // EXPORT DS_INC_AGENCY := DATASET(FILE_INC_AGENCY_SF, Layouts_Ecrash.AGENCY, THOR, OPT);
-  // EXPORT DS_INC_BILLING_AGENCY := DATASET(FILE_INC_BILLING_AGENCY_SF, Layouts_Ecrash.BILLING_AGENCY, THOR, OPT);			
+  // EXPORT DS_INC_INCIDENT := DATASET(FILE_INC_INCIDENT_SF, Layouts_Ecrash.INCIDENT, THOR);
+  // EXPORT DS_INC_PERSON := DATASET(FILE_INC_PERSON_SF, Layouts_Ecrash.PERSON, THOR);
+  // EXPORT DS_INC_VEHICLE := DATASET(FILE_INC_VEHICLE_SF, Layouts_Ecrash.VEHICLE, THOR);
+  // EXPORT DS_INC_CITATION := DATASET(FILE_INC_CITATION_SF, Layouts_Ecrash.CITATION, THOR);
+  // EXPORT DS_INC_COMMERCIAL := DATASET(FILE_INC_COMMERCIAL_SF, Layouts_Ecrash.COMMERCIAL, THOR);
+  // EXPORT DS_INC_PROPERTY_DAMAGE := DATASET(FILE_INC_PROPERTY_DAMAGE_SF, Layouts_Ecrash.PROPERTY_DAMAGE, THOR);
+  // EXPORT DS_INC_DOCUMENT := DATASET(FILE_INC_DOCUMENT_SF, Layouts_Ecrash.DOCUMENT, THOR);
+  // EXPORT DS_INC_AGENCY := DATASET(FILE_INC_AGENCY_SF, Layouts_Ecrash.AGENCY, THOR);
+  // EXPORT DS_INC_BILLING_AGENCY := DATASET(FILE_INC_BILLING_AGENCY_SF, Layouts_Ecrash.BILLING_AGENCY, THOR);			
   
   // ###########################################################################
   //               Ecrash Base Files Dataset Definitions  
   // ###########################################################################	
-  // EXPORT DS_BASE_INCIDENT := DATASET(FILE_BASE_INCIDENT_SF, Layouts_Ecrash.INCIDENT, THOR, OPT);
-  // EXPORT DS_BASE_PERSON := DATASET(FILE_BASE_PERSON_SF, Layouts_Ecrash.PERSON, THOR, OPT);	
-  // EXPORT DS_BASE_VEHICLE := DATASET(FILE_BASE_VEHICLE_SF, Layouts_Ecrash.VEHICLE, THOR, OPT);
-  // EXPORT DS_BASE_CITATION := DATASET(FILE_BASE_CITATION_SF, Layouts_Ecrash.CITATION, THOR, OPT);
-  // EXPORT DS_BASE_COMMERCIAL := DATASET(FILE_BASE_COMMERCIAL_SF, Layouts_Ecrash.COMMERCIAL, THOR, OPT);
-  // EXPORT DS_BASE_PROPERTY_DAMAGE := DATASET(FILE_BASE_PROPERTY_DAMAGE_SF, Layouts_Ecrash.PROPERTY_DAMAGE, THOR, OPT);
-  // EXPORT DS_BASE_DOCUMENT := DATASET(FILE_BASE_DOCUMENT_SF, Layouts_Ecrash.DOCUMENT, THOR, OPT);
-  // EXPORT DS_BASE_AGENCY := DATASET(FILE_BASE_AGENCY_SF, Layouts_Ecrash.AGENCY, THOR, OPT);	
-  // EXPORT DS_BASE_BILLING_AGENCY := DATASET(FILE_BASE_BILLING_AGENCY_SF, Layouts_Ecrash.BILLING_AGENCY, THOR, OPT);
-  
-  // ###########################################################################
-  //               Ecrash Combined BaseFiles Dataset Definitions
-  // ########################################################################### 	
-  // EXPORT DS_BASE_ECRASH := DATASET(FILE_BASE_ECRASH_SF, Layouts_Ecrash.ECRASH_BASE, THOR, OPT);	
-  // EXPORT DS_BASE_SUPPLEMENTAL := DATASET(FILE_BASE_SUPPLEMENTAL_SF, Layouts_Ecrash.SUPPLEMENTAL_BASE, THOR, OPT);
-  
-  // ###########################################################################
-  //      Ecrash Combined BaseFiles Dataset Definitions for Insurance Builds
-  // ########################################################################### 	
-  // EXPORT DS_BASE_AGENCY_COMBINED := DATASET(FILE_BASE_AGENCY_COMBINED_SF, Layouts_Ecrash.AGENCY_COMBINED, THOR, OPT);	
-  // EXPORT DS_BASE_INCIDENTS_EXTRACT := DATASET(FILE_BASE_INCIDENTS_EXTRACT_SF, Layouts_Ecrash.INCIDENTS_EXTRACT, THOR, OPT);
-  // EXPORT DS_BASE_INSECRASHSLIM := DATASET(FILE_BASE_INSECRASHSLIM_SF, Layout_InseCrashSlim, THOR, OPT);
-  // EXPORT DS_BASE_CRU_ACCIDENTS := DATASET(FILE_BASE_CRU_ACCIDENTS_SF, Layout_eCrash.Accidents_Alpha, THOR, OPT);
+  // EXPORT DS_BASE_INCIDENT := DATASET(FILE_BASE_INCIDENT_SF, Layouts_Ecrash.INCIDENT, THOR);
+  // EXPORT DS_BASE_PERSON := DATASET(FILE_BASE_PERSON_SF, Layouts_Ecrash.PERSON, THOR);	
+  // EXPORT DS_BASE_VEHICLE := DATASET(FILE_BASE_VEHICLE_SF, Layouts_Ecrash.VEHICLE, THOR);
+  // EXPORT DS_BASE_CITATION := DATASET(FILE_BASE_CITATION_SF, Layouts_Ecrash.CITATION, THOR);
+  // EXPORT DS_BASE_COMMERCIAL := DATASET(FILE_BASE_COMMERCIAL_SF, Layouts_Ecrash.COMMERCIAL, THOR);
+  // EXPORT DS_BASE_PROPERTY_DAMAGE := DATASET(FILE_BASE_PROPERTY_DAMAGE_SF, Layouts_Ecrash.PROPERTY_DAMAGE, THOR);
+  // EXPORT DS_BASE_DOCUMENT := DATASET(FILE_BASE_DOCUMENT_SF, Layouts_Ecrash.DOCUMENT, THOR);
+  // EXPORT DS_BASE_AGENCY := DATASET(FILE_BASE_AGENCY_SF, Layouts_Ecrash.AGENCY, THOR);	
+  // EXPORT DS_BASE_BILLING_AGENCY := DATASET(FILE_BASE_BILLING_AGENCY_SF, Layouts_Ecrash.BILLING_AGENCY, THOR);
   
   // ###########################################################################
   //               Ecrash SUPPRESS & DELETES Dataset Definitions
   // ###########################################################################  	
-  // EXPORT DS_BASE_SUPPRESS_INCIDENTS := DATASET(FILE_BASE_SUPPRESS_INCIDENTS_SF, Layouts_Ecrash.SUPPRESS_INCIDENTS, THOR, OPT);	
-  // EXPORT DS_BASE_SUPPRESS_REPORT_ID := DATASET(FILE_BASE_SUPPRESS_REPORT_ID_SF, Layouts_Ecrash.SUPPRESS_REPORT_ID, THOR, OPT);	
-  // EXPORT DS_BASE_SUPPRESS_CASE_IDENTIFIER := DATASET(FILE_BASE_SUPPRESS_CASE_IDENTIFIER_SF, Layouts_Ecrash.SUPPRESS_CASE_IDENTIFIER, THOR, OPT);
-  // EXPORT DS_BASE_ECRASH_DELETES := DATASET(FILE_BASE_ECRASH_DELETES_SF, Layouts_Ecrash.ECRASH_DELETES, THOR, OPT);
-  
-  // ###########################################################################
-  // Accidents Consolidation BaseFiles Dataset Definitions for eCrash Keys & eCrash PR Keys
-  // ###########################################################################   	
-  EXPORT DS_BASE_CONSOLIDATION_ECRASH := DATASET(FILE_BASE_CONSOLIDATION_ECRASH_SF, Layout_eCrash.Consolidation, THOR, OPT);	
-  EXPORT DS_BASE_CONSOLIDATION_PR := DATASET(FILE_BASE_CONSOLIDATION_PR_SF, Layout_eCrash.Consolidation, THOR, OPT);
+  // EXPORT DS_BASE_SUPPRESS_INCIDENTS := DATASET(FILE_BASE_SUPPRESS_INCIDENTS_SF, Layouts_Ecrash.SUPPRESS_INCIDENTS, THOR);	
+  // EXPORT DS_BASE_SUPPRESS_REPORT_ID := DATASET(FILE_BASE_SUPPRESS_REPORT_ID_SF, Layouts_Ecrash.SUPPRESS_REPORT_ID, THOR);	
+  // EXPORT DS_BASE_SUPPRESS_CASE_IDENTIFIER := DATASET(FILE_BASE_SUPPRESS_CASE_IDENTIFIER_SF, Layouts_Ecrash.SUPPRESS_CASE_IDENTIFIER, THOR);
+  // EXPORT DS_BASE_ECRASH_DELETES := DATASET(FILE_BASE_ECRASH_DELETES_SF, Layouts_Ecrash.ECRASH_DELETES, THOR);
 
  	//Existing
 //***********************************************************************

@@ -37,11 +37,11 @@ updatedops := map(morning = 'yes' and issunday = 'N' => sequential(prAutoProdEcr
 
 Email_list := 'Sai.Nagula@lexisnexis.com, Sudhir.Kasavajjala@lexisnexis.com, DataDevelopment-InsRiskeCrash@lexisnexisrisk.com';
 
-Spray_ECrash := Sequential(FLAccidents_Ecrash.Spray_In(false)/*, FLAccidents_Ecrash.Spray_In_Iyetek(false)*/): success( Sequential(FileServices.sendemail('DataReceiving@lexisnexis.com, sudhir.kasavajjala@lexisnexis.com, DataDevelopment-InsRiskeCrash@lexisnexisrisk.com','ECrash File Status' + filedate, 'Please archive ECrash files on LZ /super_credit/ecrash/build/'+ filedate))), failure(FileServices.sendemail(Email_list, '	ECrash Spray failure', failmessage));
+Spray_ECrash := Sequential(Spray_In(false)/*, Spray_In_Iyetek(false)*/): success( Sequential(FileServices.sendemail('DataReceiving@lexisnexis.com, sudhir.kasavajjala@lexisnexis.com, DataDevelopment-InsRiskeCrash@lexisnexisrisk.com','ECrash File Status' + filedate, 'Please archive ECrash files on LZ /super_credit/ecrash/build/'+ filedate))), failure(FileServices.sendemail(Email_list, '	ECrash Spray failure', failmessage));
 
 orbit_report.facc_Stats(getretval); 
 
-string timestamp := FLAccidents_Ecrash.mod_Utilities.StrSysSeconds : independent;
+string timestamp := mod_Utilities.StrSysSeconds : independent;
 
 verify_dops := if ( count(Sample_data.agency_data) <> 0, updatedops,Output('No_DopsUpdate_As_EA_Updates_Not_Processed'));
 
@@ -71,11 +71,11 @@ crudateds := dataset('~thor_data400::out::ecrash_spversion',{string10	processdat
 string10 spversion := crudateds[1].processdate;
 
 alpha_dependent := sequential( 
-	FLAccidents_Ecrash.ConcatInput
+	 ConcatInput
 	,fn_ValidIn(false)
 	,Spray_ECrash,  
 	CreateSuperFiles, 
-	FLAccidents_Ecrash.map_basefile(filedate)
+	proc_build_base(filedate)
 	): failure ( if ( trim(spversion) <> trim(filedate), fileservices.sendemail(
 																															Email_Notification_Lists.NOC,
 																															 '***ALERT*** ECRASH BUILD FAILURE , ENV: BOCA PROD, BUILD_DATE : '+filedate,
@@ -93,15 +93,15 @@ alpha_dependent := sequential(
 orbit_report.areport_Stats(nationalgetretval);
 
 build_key := sequential(
-	FLAccidents_Ecrash.fn_Inputstats.sentemail
-	,FLAccidents_Ecrash.proc_build_EcrashV2_keys(filedate)
+	 fn_Inputstats.sentemail
+	,proc_build_EcrashV2_keys(filedate)
 	,verify_dops
 	,OrbitCreateBuild
-	,FLAccidents_Ecrash.Sample_data.qa
-	,FLAccidents_Ecrash.strata(filedate)
-	,FLAccidents_Ecrash.proc_build_dupe_extract(filedate,timestamp)
-	,FLAccidents_Ecrash.Proc_build_Accident_watch(filedate,timestamp)
-	,FLAccidents_Ecrash.InFilesList
+	,Sample_data.qa
+	,strata(filedate)
+	,proc_build_dupe_extract(filedate,timestamp)
+	,Proc_build_Accident_watch(filedate,timestamp)
+	,InFilesList
 	,getretval
 	,nationalgetretval) : success(Send_Email(filedate,'V2').buildsuccess), failure(Send_Email(filedate,'V1').buildfailure);
 

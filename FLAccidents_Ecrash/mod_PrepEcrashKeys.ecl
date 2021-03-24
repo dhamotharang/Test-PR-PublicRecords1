@@ -1,8 +1,8 @@
 ﻿IMPORT STD, dx_Ecrash;
 
 EXPORT mod_PrepEcrashKeys(DATASET(Layout_eCrash.Consolidation) EcrashIn = Files_eCrash.Ds_Base_Consolidation_Ecrash) := MODULE
-SHARED SupplementalBase := Files.Base.Supplemental;
-SHARED ds_PhotoBase := Files.Base.PhotoBase;
+SHARED SupplementalBase := Files_eCrash.DS_BASE_SUPPLEMENTAL;
+SHARED ds_PhotoBase := Files_eCrash.DS_BASE_DOCUMENT;
 
 //***********************************************************************
 //                 key_ecrashV2_dol
@@ -62,7 +62,7 @@ EXPORT DateFile := DATASET([{'DELTADATE',Delta_Date}],dx_Ecrash.Layouts.DELTADAT
 //***********************************************************************
 //           key_EcrashV2_agency
 //***********************************************************************
-EXPORT AgencyBase :=  PROJECT(Files.Base.AgencyCmbd, TRANSFORM(dx_Ecrash.Layouts.AGENCY, SELF := LEFT; SELF := [];));
+EXPORT AgencyBase :=  PROJECT(Files_eCrash.DS_BASE_CONSOLIDATION_MBSAgency, TRANSFORM(dx_Ecrash.Layouts.AGENCY, SELF := LEFT; SELF := [];));
 
 //***********************************************************************
 //           Key_ecrashV2_PhotoId

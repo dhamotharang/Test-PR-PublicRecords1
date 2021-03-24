@@ -8,7 +8,7 @@
 																										(trim(incident_id,left,right) not in ToSupressSet)
 																									);
 																													
-	export IncidentsAfterSuppression := join(IncidentsSuppressed,FLAccidents_Ecrash.Files.deletes, 
+	export IncidentsAfterSuppression := join(IncidentsSuppressed, Files_eCrash.DS_BASE_ECRASH_DELETES, 
 																												trim(left.case_identifier,left,right) = trim(right.case_identifier,left,right) and 
 																												trim(left.State_Report_Number,left,right) = trim(right.State_Report_Number,left,right) and 
 																												trim(left.Source_ID ,left,right)= trim(right.Source_ID ,left,right)and 

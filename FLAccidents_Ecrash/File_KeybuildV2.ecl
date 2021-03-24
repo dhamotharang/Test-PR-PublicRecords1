@@ -1,4 +1,4 @@
-﻿IMPORT FLAccidents, STD;
+﻿IMPORT STD;
 
 EXPORT File_KeybuildV2 := MODULE
 
@@ -59,7 +59,7 @@ EXPORT File_KeybuildV2 := MODULE
 	SHARED fAlphaAccidents := ALLAlphaAccidents(STD.Str.ToUpperCase(TRIM(orig_agency_ori, ALL)) NOT IN Agency_exclusion.CRU_Agency_ori_list AND
 																							STD.Str.ToUpperCase(TRIM(agency_ori, ALL)) NOT IN Agency_exclusion.CRU_Agency_ori_list);
 	SHARED ActiveAlphaAccidents := PROJECT(fAlphaAccidents, TRANSFORM(Layout_eCrash.Accidents_Alpha, SELF := LEFT;));
-	EXPORT Alpha := ActiveAlphaAccidents;	
+	EXPORT CRU := ActiveAlphaAccidents;	
 
 // ###########################################################################
 //  ALL Accidents report data
@@ -84,4 +84,4 @@ EXPORT File_KeybuildV2 := MODULE
 																																 );
 	EXPORT prout := PROJECT(EcrashAgencyExclusion, TRANSFORM(Layout_eCrash.Consolidation, SELF := LEFT;));
 
-END; 
+END;
