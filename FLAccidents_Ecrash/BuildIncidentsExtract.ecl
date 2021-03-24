@@ -1,12 +1,49 @@
 ﻿IMPORT Data_Services, lib_StringLib;
-	Incidents := FLAccidents_Ecrash.IncidentsAfterSuppression(Source_id IN ['EA','TM','TF'] );
+  dAgency := Infiles.dAgency;
+	SuppressIncidents := IncidentsAfterSuppression(Source_id IN ['EA','TM','TF']):INDEPENDENT;
+
+	 //EA, Coplogic, TF, TM
+   dIncidentCombinedEcrash := DISTRIBUTE(SuppressIncidents(~(work_type_id IN ['2','3'])), HASH32(agency_id, source_id));
+	 
+	 //EA CRU
+	 dIncidentCRU := DISTRIBUTE(SuppressIncidents(work_type_id IN ['2','3']), HASH32(agency_id));
+
+// #############################################################################################
+//                  Join MBS Agency & Incident
+// #############################################################################################						
+	Layout_Infiles_Fixed.incident tIncAgency(dIncidentCombinedEcrash L, dAgency R) := TRANSFORM
+                                agency_source_matching := L.agency_id = R.agency_id AND L.Contrib_Source = R.Source_Id;
+                                SELF.agency_name := IF(agency_source_matching, R.Agency_Name, '');
+                                IsAgencyActive := Functions.IsActiveDate(mod_Utilities.SysDate, R.Source_Start_Date, R.Source_Termination_Date);
+                                SELF.is_terminated_agency := IF(agency_source_matching, ~IsAgencyActive, TRUE);
+																SELF.allow_Sale_Of_Component_Data := FALSE;
+                                SELF := L;
+                                SELF := [];
+  END;
+	jIncEcrash_Agency := JOIN(dIncidentCombinedEcrash, dAgency, 
+                            LEFT.agency_id = RIGHT.agency_id AND 
+														LEFT.contrib_source = RIGHT.source_id, 
+                            tIncAgency(LEFT, RIGHT), LOOKUP);                                                                                                                                    
+
+  Layout_Infiles_Fixed.incident tCruIncAgency(dIncidentCRU L, dAgency R) := TRANSFORM
+		SELF.agency_name := IF(L.agency_id = R.agency_id, R.Agency_Name, '');
+		SELF := L;
+		SELF := [];
+	END;
+	jIncCru_Agency := JOIN(dIncidentCRU, dAgency, 
+								         LEFT.agency_id = RIGHT.agency_id, 
+								         tCruIncAgency(LEFT, RIGHT), LEFT OUTER, LOOKUP);
+
+	Incidents := jIncEcrash_Agency(is_terminated_agency = FALSE) + jIncCru_Agency;
 
 	// Suppress the DE records basing on the drivers_exchange_flag in the agency file. 
-	suppressAgencies := FLAccidents_Ecrash.Infiles.agency(drivers_exchange_flag ='0');
+	suppressAgencies := DISTRIBUTED(Infiles.agency(drivers_exchange_flag ='0'), HASH32(agency_id));
+	uSuppressAgencies := DEDUP(SORT(suppressAgencies, Agency_id, LOCAL), Agency_id, LOCAL);
 
-	Incidents_DE_Suppression :=  JOIN(Incidents,suppressAgencies(agency_id!=''),
-																																TRIM(LEFT.agency_id,LEFT,RIGHT) = TRIM(RIGHT.agency_id,LEFT,RIGHT) AND TRIM(LEFT.report_type_id,LEFT,RIGHT) ='DE' ,
-																																MANY LOOKUP , LEFT ONLY );	
+	Incidents_DE_Suppression :=  JOIN(Incidents, uSuppressAgencies,
+																		TRIM(LEFT.agency_id,LEFT,RIGHT) = TRIM(RIGHT.agency_id,LEFT,RIGHT) AND 
+																		TRIM(LEFT.report_type_id,LEFT,RIGHT) ='DE',
+																		MANY LOOKUP, LEFT ONLY );	
 							
 	FLAccidents_Ecrash.Layout_VehIncidents.SlimIncidents RemoveNulls(Incidents_DE_Suppression L) := TRANSFORM
 			acc_nbr 																:= 	IF(L.source_id IN ['TM','TF'], stringlib.stringtouppercase(L.State_Report_number), stringlib.stringtouppercase(L.Case_identIFier));
