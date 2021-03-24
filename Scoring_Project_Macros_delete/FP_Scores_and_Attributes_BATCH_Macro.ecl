@@ -107,10 +107,7 @@ self.ModelName := 'fp1109_0';
   	
 	//self.ModelName := 'fp1109_9';  // fp1109_9 is the same model as fp1109_0, but includes criminal risk indicators
   self.IncludeVersion2 := true;
-  self.gateways := dataset([
-    {'netacuity', 'http://rw_score_dev:Password01@rwgatewaycert.sc.seisint.com:7726/WsGateway'}
-    // ,{'targus', 'todo:  add targus gateway when ready to run test for customers that want this on'}
-    ], risk_indicators.Layout_Gateways_In);
+  self.gateways := riskwise.shortcuts.gw_netacuityv4;
 	SELF := le;
 	self := [];
 end;
