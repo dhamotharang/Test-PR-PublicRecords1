@@ -1,4 +1,4 @@
-﻿import progressive_phone,addrbest,Gateway;
+﻿import progressive_phone,addrbest,Gateway,Std,Royalty,MemberPoint;
 
 /*
 Run the minor through WFV7 and only return a confirmed phone. 
@@ -30,10 +30,14 @@ EXPORT getPhoneInfo(dataset (MemberPoint.Layouts.BestExtended) dsBestE, MemberPo
 					self.st						:= left.c_best_st,
 					self.z5						:= left.c_best_z5,
 					self 							:= []
-				));
+		));
 
 		gateways_in := Gateway.Configuration.Get();
 		//WFP v7 only.  Returns the input phone along with any other selected countTypes.
+
+		isPhoneInfoContactplus	:= Std.Str.ToUpperCase(BParams.StrTransactionType) = MemberPoint.Constants.PhoneTransactionType.ContactPlusPhones;	
+		MPD := MemberPoint.Constants.Defaults;
+
 		BOOLEAN includeInputPhone := TRUE; 
 		BOOLEAN ReturnScore := BParams.ReturnScore;
 		STRING  scoreModel := BParams.Phones_Score_Model;
@@ -45,6 +49,8 @@ EXPORT getPhoneInfo(dataset (MemberPoint.Layouts.BestExtended) dsBestE, MemberPo
 		UNSIGNED2 MaxNumSpouse := BParams.MaxNumSpouse;
 		UNSIGNED2 MaxNumSubject := BParams.MaxNumSubject;
 		UNSIGNED2 MaxNumNeighbor := BParams.MaxNumNeighbor;
+		BOOLEAN UsePremiumSource_A := IF(isPhoneInfoContactplus,MPD.UsePremiumSource_A_cp,BParams.UsePremiumSource_A);
+      	INTEGER PremiumSource_A_limit := IF(isPhoneInfoContactplus,MPD.PremiumSource_A_limit_cp,BParams.PremiumSource_A_limit);
  
 		PhoneParams := module(project(BParams ,progressive_phone.iParam.Batch, opt)) 
 				EXPORT BOOLEAN ExcludeDeadContacts       := FALSE;
@@ -78,24 +84,38 @@ EXPORT getPhoneInfo(dataset (MemberPoint.Layouts.BestExtended) dsBestE, MemberPo
 				EXPORT BOOLEAN DIDMatch                  := BParams.Match_LinkID;
 		end;
 
-				dsPhones := AddrBest.Progressive_phone_common(PhoneBatchIn,
-																											PhoneParams
-																											 ,
-																											 ,
-																											 gateways_in,
-																											 ,
-																											 ,
-																											 ,
-																											 ,
-																											 scoreModel,
-																											 MaxNumAssociate,
-																											 MaxNumAssociateOther,
-																											 MaxNumFamilyOther,
-																											 MaxNumFamilyClose,
-																											 MaxNumParent,
-																											 MaxNumSpouse,
-																											 MaxNumSubject,
-																											 MaxNumNeighbor);
-			
-	return(dsPhones);
+				dsPhones :=  AddrBest.Progressive_phone_common(PhoneBatchIn,
+																PhoneParams
+																,
+																,
+																gateways_in,
+																,
+																,
+																,
+																,
+																scoreModel,
+																MaxNumAssociate,
+																MaxNumAssociateOther,
+																MaxNumFamilyOther,
+																MaxNumFamilyClose,
+																MaxNumParent,
+																MaxNumSpouse,
+																MaxNumSubject,
+																MaxNumNeighbor,
+																UsePremiumSource_A,
+																PremiumSource_A_limit);
+
+// ROYALTIES
+	ungroup_dsPhones := UNGROUP(dsPhones);
+	_f_out := progressive_phone.functions.UpdateWithMetadata(ungroup_dsPhones);
+	results_1 := MemberPoint.FinalizePhoneBatchResults(_f_out, Progressive_Phone.Layout_Progressive_phones.batch_out_plus, UsePremiumSource_A, scoreModel, BParams.MaxPhoneCount);
+	dRoyaltiesByAcctno_EQUIFAX := if(UsePremiumSource_A, Royalty.RoyaltyEFXDataMart.GetBatchRoyaltiesByAcctno(PhoneBatchIn, results_1,,,acctno));
+	dRoyalties := Royalty.GetBatchRoyalties(dRoyaltiesByAcctno_EQUIFAX, BParams.ReturnDetailedRoyalties);
+
+	Phone_results := project(results_1, TRANSFORM(progressive_phone.layout_progressive_phone_common,
+							SELF := LEFT,
+							SELF := []
+	));
+	dsPhones_final := dataset([{Phone_results,dRoyalties}],MemberPoint.Layouts.ProgressivePhoneRec);
+	return(dsPhones_final);
 end;

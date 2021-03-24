@@ -295,7 +295,7 @@ EXPORT Fn_KEL_DPMBitmap := MODULE
 				MDR.SourceTools.src_WV_Experian_DL => KELPermissions.Permit_WV_Experian_DL,
 				//MDR.SourceTools.src_MN_RESTRICTED_DL => KELPermissions.Permit_MN_RESTRICTED_DL,
 				MDR.SourceTools.src_Experian_DL => KELPermissions.Permit_Experian_DL,
-				MDR.SourceTools.src_Dummy_Records => KELPermissions.Permit_Dummy_Records,
+				// MDR.SourceTools.src_Dummy_Records => KELPermissions.Permit_Dummy_Records, // This Source Code 'DU' is a duplicate of src_Daily_Utilities below
 				MDR.SourceTools.src_Dummy_Records2 => KELPermissions.Permit_Dummy_Records2,
 				MDR.SourceTools.src_Daily_Utilities => KELPermissions.Permit_Daily_Utilities,
 				MDR.SourceTools.src_Dunn_Bradstreet => KELPermissions.Permit_Dunn_Bradstreet,
@@ -317,7 +317,7 @@ EXPORT Fn_KEL_DPMBitmap := MODULE
 				MDR.SourceTools.src_Equifax => KELPermissions.Permit_src_Equifax,
 				MDR.SourceTools.src_Equifax_Business_Data => KELPermissions.Permit_Equifax_Business_Data,
 				MDR.SourceTools.src_Equifax_Quick => KELPermissions.Permit_Equifax_Quick,
-				MDR.SourceTools.src_Equifax_Weekly => KELPermissions.Permit_Equifax_Weekly,
+				MDR.SourceTools.src_Equifax_Weekly => BitOr(KELPermissions.Permit_Equifax_Weekly, KELPermissions.Permit_WH_src), // src_Equifax_Weekly and WH_src are one in the same
 				//MDR.SourceTools.src_Eq_Employer => KELPermissions.Permit_Eq_Employer,
 				MDR.SourceTools.src_Experian_CRDB => KELPermissions.Permit_Experian_CRDB,
 				MDR.SourceTools.src_Experian_Credit_Header => KELPermissions.Permit_Experian_Credit_Header,
@@ -613,7 +613,7 @@ EXPORT Fn_KEL_DPMBitmap := MODULE
 				//MDR.SourceTools.src_ZOOM => KELPermissions.Permit_ZOOM,
 				MDR.SourceTools.src_BKFS_Nod => KELPermissions.Permit_BKFS_Nod,
 				MDR.SourceTools.src_BKFS_Reo => KELPermissions.Permit_BKFS_Reo,
-				MDR.SourceTools.WH_src => KELPermissions.Permit_WH_src,
+				// MDR.SourceTools.WH_src => KELPermissions.Permit_WH_src, // Duplicate of Permit_Equifax_Weekly above
 				PublicRecords_KEL.ECL_Functions.Constants.CCW_Source_MAS => KELPermissions.Permit_CCW_Source_MAS,
 				PublicRecords_KEL.ECL_Functions.Constants.Hunt_Fish_Source_MAS => KELPermissions.Permit_Hunt_Fish_Source_MAS,
 				PublicRecords_KEL.ECL_Functions.Constants.CityStateZip => KELPermissions.Permit_CityStateZip,
@@ -888,7 +888,7 @@ EXPORT Fn_KEL_DPMBitmap := MODULE
 			BitOr(IF(EXISTS(AllowedSources(Source = MDR.SourceTools.src_Equifax)), KELPermissions.Permit_src_Equifax, KELPermissions.Permit__NONE),
 			BitOr(IF(EXISTS(AllowedSources(Source = MDR.SourceTools.src_Equifax_Business_Data)), KELPermissions.Permit_Equifax_Business_Data, KELPermissions.Permit__NONE),
 			BitOr(IF(EXISTS(AllowedSources(Source = MDR.SourceTools.src_Equifax_Quick)), KELPermissions.Permit_Equifax_Quick, KELPermissions.Permit__NONE),
-			BitOr(IF(EXISTS(AllowedSources(Source = MDR.SourceTools.src_Equifax_Weekly)), KELPermissions.Permit_Equifax_Weekly, KELPermissions.Permit__NONE),
+			BitOr(IF(EXISTS(AllowedSources(Source IN [MDR.SourceTools.src_Equifax_Weekly, MDR.SourceTools.WH_Src])), BitOr(KELPermissions.Permit_Equifax_Weekly, KELPermissions.Permit_WH_Src), KELPermissions.Permit__NONE), // src_Equifax_Weekly and WH_Src are the same thing
 			//BitOr(IF(EXISTS(AllowedSources(Source = MDR.SourceTools.src_Eq_Employer)), KELPermissions.Permit_Eq_Employer, KELPermissions.Permit__NONE),
 			BitOr(IF(EXISTS(AllowedSources(Source = MDR.SourceTools.src_Experian_CRDB)), KELPermissions.Permit_Experian_CRDB, KELPermissions.Permit__NONE),
 			BitOr(IF(EXISTS(AllowedSources(Source = MDR.SourceTools.src_Experian_Credit_Header)), KELPermissions.Permit_Experian_Credit_Header, KELPermissions.Permit__NONE),
@@ -1183,7 +1183,6 @@ EXPORT Fn_KEL_DPMBitmap := MODULE
 			//BitOr(IF(EXISTS(AllowedSources(Source = MDR.SourceTools.src_ZOOM)), KELPermissions.Permit_ZOOM, KELPermissions.Permit__NONE),
 			BitOr(IF(EXISTS(AllowedSources(Source = MDR.SourceTools.src_BKFS_Nod)), KELPermissions.Permit_BKFS_Nod, KELPermissions.Permit__NONE),
 			BitOr(IF(EXISTS(AllowedSources(Source = MDR.SourceTools.src_BKFS_Reo)), KELPermissions.Permit_BKFS_Reo, KELPermissions.Permit__NONE),
-			BitOr(IF(EXISTS(AllowedSources(Source = MDR.SourceTools.WH_src)), KELPermissions.Permit_WH_src, KELPermissions.Permit__NONE),
 			BitOr(IF(EXISTS(AllowedSources(Source = PublicRecords_KEL.ECL_Functions.Constants.CCW_Source_MAS)), KELPermissions.Permit_CCW_Source_MAS, KELPermissions.Permit__NONE),
 			BitOr(IF(EXISTS(AllowedSources(Source = PublicRecords_KEL.ECL_Functions.Constants.Hunt_Fish_Source_MAS)), KELPermissions.Permit_Hunt_Fish_Source_MAS, KELPermissions.Permit__NONE),
 			BitOr(IF(EXISTS(AllowedSources(Source = PublicRecords_KEL.ECL_Functions.Constants.CityStateZip)), KELPermissions.Permit_CityStateZip, KELPermissions.Permit__NONE),
@@ -1211,7 +1210,7 @@ EXPORT Fn_KEL_DPMBitmap := MODULE
 			)))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))
 			)))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))
 			))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))
-			)))))))))))))))));
+			))))))))))))))));
 
 		RETURN(Permissions);
 	END;

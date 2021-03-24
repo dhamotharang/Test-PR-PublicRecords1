@@ -4,8 +4,8 @@ IMPORT CFG_Compile,E_Tradeline,FN_Compile FROM PublicRecords_KEL;
 IMPORT * FROM KEL15.Null;
 EXPORT B_Tradeline_10(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG_Compile __cfg = CFG_Compile) := MODULE
   SHARED VIRTUAL TYPEOF(E_Tradeline(__in,__cfg).__Result) __E_Tradeline := E_Tradeline(__in,__cfg).__Result;
-  SHARED __EE316365 := __E_Tradeline;
-  EXPORT __ST255493_Layout := RECORD
+  SHARED __EE324412 := __E_Tradeline;
+  EXPORT __ST259895_Layout := RECORD
     KEL.typ.nkdate A_R_Date_;
     KEL.typ.nint Total_A_R_;
     KEL.typ.nint Current_A_R_;
@@ -27,13 +27,13 @@ EXPORT B_Tradeline_10(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG_
     KEL.typ.epoch Vault_Date_Last_Seen_ := 0;
     KEL.typ.int __RecordCount := 0;
   END;
-  EXPORT __ST255486_Layout := RECORD
+  EXPORT __ST259888_Layout := RECORD
     KEL.typ.nuid UID;
     KEL.typ.nint Ult_I_D_;
     KEL.typ.nint Org_I_D_;
     KEL.typ.nint Sele_I_D_;
     KEL.typ.nstr Account_Key_;
-    KEL.typ.ndataset(__ST255493_Layout) Records_;
+    KEL.typ.ndataset(__ST259895_Layout) Records_;
     KEL.typ.ndataset(E_Tradeline(__in,__cfg).Vendor_Dates_Layout) Vendor_Dates_;
     KEL.typ.ndataset(E_Tradeline(__in,__cfg).Data_Sources_Layout) Data_Sources_;
     KEL.typ.nint Current_Month_;
@@ -45,17 +45,17 @@ EXPORT B_Tradeline_10(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG_
     KEL.typ.epoch Vault_Date_Last_Seen_ := 0;
     KEL.typ.int __RecordCount := 0;
   END;
-  SHARED __ST255486_Layout __ND316583__Project(E_Tradeline(__in,__cfg).Layout __PP316194) := TRANSFORM
-    __EE316241 := __PP316194.Records_;
-    __ST255493_Layout __ND316489__Project(E_Tradeline(__in,__cfg).Records_Layout __PP316485) := TRANSFORM
-      SELF.Record_Date_ := KEL.era.ToDate(__PP316485.Date_First_Seen_);
-      SELF := __PP316485;
+  SHARED __ST259888_Layout __ND324630__Project(E_Tradeline(__in,__cfg).Layout __PP324241) := TRANSFORM
+    __EE324288 := __PP324241.Records_;
+    __ST259895_Layout __ND324536__Project(E_Tradeline(__in,__cfg).Records_Layout __PP324532) := TRANSFORM
+      SELF.Record_Date_ := KEL.era.ToDate(__PP324532.Date_First_Seen_);
+      SELF := __PP324532;
     END;
-    SELF.Records_ := __PROJECT(__EE316241,__ND316489__Project(LEFT));
-    __CC13054 := KEL.Routines.MinN(FN_Compile(__cfg).FN_G_E_T_B_U_I_L_D_D_A_T_E(__ECAST(KEL.typ.nstr,__CN('cortera_build_version'))),__CN(__cfg.CurrentDate));
-    SELF.Current_Month_ := __FN1(KEL.Routines.Month,__CC13054);
-    SELF.Current_Year_ := __FN1(KEL.Routines.Year,__CC13054);
-    SELF := __PP316194;
+    SELF.Records_ := __PROJECT(__EE324288,__ND324536__Project(LEFT));
+    __CC13330 := KEL.Routines.MinN(FN_Compile(__cfg).FN_G_E_T_B_U_I_L_D_D_A_T_E(__ECAST(KEL.typ.nstr,__CN('cortera_build_version'))),__CN(__cfg.CurrentDate));
+    SELF.Current_Month_ := __FN1(KEL.Routines.Month,__CC13330);
+    SELF.Current_Year_ := __FN1(KEL.Routines.Year,__CC13330);
+    SELF := __PP324241;
   END;
-  EXPORT __ENH_Tradeline_10 := PROJECT(__EE316365,__ND316583__Project(LEFT));
+  EXPORT __ENH_Tradeline_10 := PROJECT(__EE324412,__ND324630__Project(LEFT));
 END;

@@ -1,4 +1,4 @@
-import BatchShare,didville,progressive_phone,doxie;
+﻿import BatchShare,didville,progressive_phone,doxie;
 
 export Layout_BestAddr := MODULE
 
@@ -192,6 +192,7 @@ export Layout_BestAddr := MODULE
     STRING1 long_term_hit := ''; //(Y/N)
     STRING1 short_term_hit := ''; //(Y/N)
     STRING1 owner_occupied_hit := ''; //(Y/N)
+    UNSIGNED8 location_id := 0;
   END;
   
   EXPORT batch_Out_both := RECORD

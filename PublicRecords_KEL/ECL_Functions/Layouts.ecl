@@ -259,6 +259,7 @@ EXPORT LayoutAppendedAddresses := RECORD
 		STRING6 P_InpValDOBInvalidFlag,
 		STRING6 P_InpValEmailInvalidFlag,
 		STRING6 P_InpValArchDtInvalidFlag,
+		STRING6 P_InpSSNIs4Digits;
 		INTEGER4 PI_InpAddrAVMVal;
 		INTEGER4 PI_InpAddrAVMValA1Y;
 		DECIMAL7_2 PI_InpAddrAVMRatio1Y;
@@ -283,6 +284,11 @@ EXPORT LayoutAppendedAddresses := RECORD
 		STRING10 PI_InpSSNDeceasedDt;
 		STRING6 PI_InpAddrStateDLAvailFlag;
 		STRING6 PI_InpAddrStateVoterAvailFlag;
+		//STRING PI_InpPhoneSICCodeHRList;
+		//STRING PI_InpPhoneNAICSCodeHRList;
+		//STRING6 PI_InpPhoneIsHRCorrectFacFlag;
+		//STRING6 PI_InpPhoneType;
+		//STRING6 PI_InpPhoneIsBusPhoneFlag;
 		INTEGER3 PI_SrchPerInpSSNCnt1Y;
 		INTEGER3 PI_SrchLexIDPerInpSSNCnt1Y;
 		INTEGER3 PI_SrchLNamePerInpSSNCnt1Y;
@@ -294,12 +300,44 @@ EXPORT LayoutAppendedAddresses := RECORD
 		INTEGER3 PI_SrchSSNPerInpAddrCnt1Y;
 		INTEGER3 PI_SrchPerInpEmailCnt1Y;
 		INTEGER3 PI_SrchLexIDPerInpEmailCnt1Y;
+ 		//STRING6 PI_InpAddrIsPOBoxFlag;
+		//STRING6 PI_InpAddrIsMilitaryFlag;
 		INTEGER3 PI_SrchPerInpPhoneCnt1Y;
 		INTEGER3 PI_SrchLexIDPerInpPhoneCnt1Y;
+		STRING10 PI_AlrtInpNameWatchlistRecNum;
+		STRING6 PI_AlrtInpNameOnWatchlistFlag;
 		Boolean BestDataAppended;
 		STRING45 IPaddr;
 		STRING24 IPresponse;
 		INTEGER4 NetAcuityRoyalty;
+		INTEGER4 TargusRoyalty;
+		STRING3 TargusSrc;
+		INTEGER4 InsPhoneHit;
+		STRING3 InsPhoneSrc;
+	END;
+	
+	//SHARED LayoutHighRiskAddressInternal := RECORD
+		//STRING PI_InpAddrSICCodeHRList;
+		//STRING PI_InpAddrNAICSCodeHRList;
+		//STRING6 PI_InpAddrIsHRCorrectFacFlag;
+	//END;
+	//EXPORT LayoutHighRiskAddressAttributes := RECORD
+		//INTEGER G_ProcUID;
+		//LayoutHighRiskAddressInternal;
+	//END;
+
+	SHARED LayoutInferredAttributesInternal := RECORD
+		STRING10 P_InpClnArchDtF6M;
+		STRING10 P_InpClnArchDtF1Y;
+		STRING10 P_InpClnArchDtF2Y;
+		integer3 PL_DrgCrimFelCnt1YF1Y;
+		integer3 PL_DrgLienCnt1YF1Y;
+		integer3 PL_DrgBkCnt1YF1Y;
+		integer3 PL_DrgLTD1YF1Y;
+	END;
+	EXPORT LayoutInferredAttributes := RECORD
+		INTEGER G_ProcUID;
+		LayoutInferredAttributesInternal;
 	END;
 
 	SHARED LayoutAddrSummaryInternal := RECORD
@@ -370,6 +408,7 @@ EXPORT LayoutAppendedAddresses := RECORD
 		LayoutSSNSumInternal;
 		LayoutPhoneSumInternal;
 		LayoutAddrSummaryInternal;
+		//LayoutHighRiskAddressInternal;
 	END;
 
 	SHARED LayoutInputBIIBusinessEchoInternal := RECORD
@@ -1030,6 +1069,8 @@ EXPORT LayoutAppendedAddresses := RECORD
 	SHARED LayoutPersonInternal := RECORD
 		STRING6	P_LexIDSeenFlag;
 		STRING12 P_LexIDCategory;
+		STRING6 P_LexIDIsDeceasedFlag;
+		INTEGER3 PL_EmrgAge;
 		INTEGER3 PL_AstVehAutoCntEv;
 		STRING	PL_AstVehAutoEmrgDtListEv;
 		STRING	PL_AstVehAutoLastDtListEv;
@@ -1208,6 +1249,8 @@ EXPORT LayoutAppendedAddresses := RECORD
 		STRING6 PL_CurrAddrIsSimpAddrFlag;
 		STRING6 PL_CurrAddrIsDropDeliveryFlag;
 		STRING6 PL_CurrAddrIsBusinessFlag;
+		STRING6 PL_CurrAddrIsMultiUnitFlag;
+		STRING6 PL_CurrAddrIsAptFlag;
 		//Previous Address
 		STRING6 PL_PrevAddrIsSimpAddrFlag;
 		STRING6 PL_PrevAddrIsBusinessFlag;
@@ -1260,10 +1303,10 @@ EXPORT LayoutAppendedAddresses := RECORD
 		//Email
 		INTEGER3 PL_EmailCntEv;
 		//Derog History
-		// INTEGER3 PL_DrgCnt7Y;
-		// STRING PL_DrgDtList7Y;
-		// INTEGER3 PL_DrgOldMsnc7Y;
-		// INTEGER3 PL_DrgNewMsnc7Y;			
+		INTEGER3 PL_DrgCnt7Y;
+		STRING PL_DrgDtList7Y;
+		INTEGER3 PL_DrgOldMsnc7Y;
+		INTEGER3 PL_DrgNewMsnc7Y;			
 		//Best PII
 		STRING20 PL_BestNameFirst;
 		STRING20 PL_BestNameMid;
@@ -1273,6 +1316,9 @@ EXPORT LayoutAppendedAddresses := RECORD
 		INTEGER3 PL_BestDOBAge;
 		integer7 PL_HHID;
 		integer3 PL_HHMmbrCnt;
+		INTEGER3 PL_HHMmbrBureauOnlyCnt;
+		INTEGER3 PL_HHMmbrAge18uCnt;
+
 		//Inquiry
 		//Inquiry History
 		INTEGER3 PL_SrchCollCnt5Y;
@@ -1368,10 +1414,10 @@ EXPORT LayoutAppendedAddresses := RECORD
 		INTEGER3 PL_SrchPhonePerLexIDCnt1Y;
 		INTEGER3 PL_SrchDOBPerLexIDCnt1Y;
 		INTEGER3 PL_SrchEmailPerLexIDCnt1Y;
-		//INTEGER3 PL_SrchPerCurrAddrCnt1Y;
-		//INTEGER3 PL_SrchLexIDPerCurrAddrCnt1Y;
-		//INTEGER3 PL_SrchLNamePerCurrAddrCnt1Y;
-		//INTEGER3 PL_SrchSSNPerCurrAddrCnt1Y;
+		INTEGER3 PL_SrchPerCurrAddrCnt1Y;
+		INTEGER3 PL_SrchLexIDPerCurrAddrCnt1Y;
+		INTEGER3 PL_SrchLNamePerCurrAddrCnt1Y;
+		INTEGER3 PL_SrchSSNPerCurrAddrCnt1Y;
 		// NonFCRA Inquiry PII Corroboration 
 		INTEGER3 PL_SrchPerLexIDWInpFLSCnt1Y;
 		INTEGER3 PL_SrchPerLexIDWInpASCnt1Y;
@@ -2013,7 +2059,7 @@ EXPORT LayoutAppendedAddresses := RECORD
 		STRING10 G_BuildUCCDt;
 		STRING10 G_BuildSrchDt;
 		STRING10 G_BuildInqDt;		
-		// STRING10 G_BuildHdrDt;
+		STRING10 G_BuildHdrDt;
 	END;
 	
 	EXPORT LayoutBuildDates := RECORD
@@ -2030,6 +2076,8 @@ EXPORT LayoutAppendedAddresses := RECORD
 		LayoutSSNSumInternal;
 		LayoutPhoneSumInternal;
 		LayoutAddrSummaryInternal;
+		LayoutInferredAttributesInternal;
+		//LayoutHighRiskAddressInternal;
 		STRING65 B_InpAcct;
 		INTEGER G_ProcBusUID;
 		LayoutInputBIIInternal - B_InpAcct;

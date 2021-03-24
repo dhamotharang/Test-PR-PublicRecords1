@@ -82,7 +82,7 @@ EXPORT getGovID(dataset(identifier2.layout_Identifier2) in_ds,
                           );
 
 
-  SSNLastNameMatch := MAP(isCheck_SSNLastNameMatch AND in_rec.nas_summary IN [9,12]
+  SSNLastNameMatch := MAP(isCheck_SSNLastNameMatch AND in_rec.nas_summary IN [7,9,11,12]
                          AND ~EXISTS(in_rec.ri(hri in ['29','77','79','76'])) => _GovIdConst.PassValue
                           ,isCheck_SSNLastNameMatch => _GovIdConst.FailValue
                           ,_GovIdConst.DisabledValue
@@ -325,6 +325,11 @@ EXPORT getGovID(dataset(identifier2.layout_Identifier2) in_ds,
 
 //  Build a dataset with all these attributes
 
+  rec_GovIdAttributes := record
+    string50 Attribute ;
+    unsigned1 Result ;
+  end;
+
   dsGovIdAttributes := DATASET([{_GovIdConst.String_SSNFullNameMatch,SSNFullNameMatch}
                                 ,{_GovIdConst.String_SSNDeathMatchVerification,SSNDeathMatchVerification}
                                 ,{_GovIdConst.String_SSNExists,SSNExists}
@@ -367,17 +372,37 @@ EXPORT getGovID(dataset(identifier2.layout_Identifier2) in_ds,
                                 ,{_GovIdConst.String_LexIDDeathMatch,LexIDDeathMatch}
                                 ,{_GovIdConst.String_SSNLowIssuance,SSNLowIssuance}
                                 ,{_GovIdConst.String_SSNSSAValid,SSNSSAValid}
-                                ],iesp.mod_identifier2.t_GovIdAttributes);
-  
-  
+                                ],rec_GovIdAttributes);
+
 
   GovIdPass := COUNT(dsGovIdAttributes(Result = _GovIdConst.PassValue )) >= MAX(SearchBy.GovIdThreshold,1);
+ 
+  // Build xml string using the dataset
+  recXMLstring := record
+    string attrtag;
+    string50 GovIdPasstag ;
+  END;
 
+  recXMLstring XformAddTags( dsGovIdAttributes L) := TRANSFORM
+    SELF.attrtag :=  '<' + L.Attribute +'>' + (STRING) L.Result + '</' + L.Attribute + '>';
+    SELF.GovIdPasstag := '<GovIdPass>' + IF(GovIdPass,'1','0') + '</GovIdPass>';
+  END;
+
+  withTags := PROJECT(dsGovIdAttributes,XformAddTags(LEFT));
+
+  recXMLstring Xformrollup(recXMLstring L, recXMLstring R) := TRANSFORM
+    SELF.attrtag := L.attrtag + R.attrtag ;
+    SELF.GovIdPasstag := L.GovIdPasstag
+  END;
+
+  rolledup := ROLLUP(withTags, Xformrollup(LEFT, RIGHT),GovIdPasstag);
+
+  _xmlstring := rolledup[1].GovIdPasstag + rolledup[1].attrtag ;
+  
   Result := Project (in_ds,TRANSFORM(identifier2.layout_Identifier2,
-                                      SELF.GovIdOutResult := PROJECT(LEFT,TRANSFORM(iesp.mod_identifier2.t_GovIdOutResult,
-                                      self.GovIdPass := GovIdPass,
-                                      self.GovIdAttributes := IF(EXISTS(InputGovIdAttributes),dsGovIdAttributes,DATASET([],iesp.mod_identifier2.t_GovIdAttributes)))),
-                                      SELF := LEFT ));
+                                     SELF.GovIdOutResult := IF(SearchBy.GovIdThreshold > 0, _xmlstring,'') ,
+                                     SELF := LEFT 
+                                     ));
 
   RETURN Result;
 END;

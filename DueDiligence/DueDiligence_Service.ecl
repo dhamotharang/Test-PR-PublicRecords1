@@ -34,10 +34,28 @@ EXPORT DueDiligence_Service := MACRO
     regulatoryCompliance := DueDiligence.CommonQuery.GetCompliance(dppa, glba, drm, dpm, userIn.IndustryClass, lexIdSourceOptout, transactionID, batchUID, globalCompanyID);
 
     //based on what was requested, call the appropriate attributes  
-    ddResults := DueDiligence.CommonQueryXML.mac_processV3XMLRequest(wseq, cleanData, regulatoryCompliance, DDssnMask, optionsIn.AdditionalInput, 
-                                                                      DueDiligence.Constants.ATTRIBUTE_RESPONSE_LAYOUT, DueDiligence.Constants.STRING_FALSE, debugIndicator, intermediates);
+    ddResults_temp := DueDiligence.CommonQueryXML.mac_processV3XMLRequest(wseq, cleanData, regulatoryCompliance, DDssnMask, optionsIn.AdditionalInput, 
+                                                                          DueDiligence.Constants.ATTRIBUTE_RESPONSE_LAYOUT, DueDiligence.Constants.STRING_FALSE, debugIndicator, intermediates);
 
 
+    ddResults := PROJECT(ddResults_temp, TRANSFORM(DueDiligence.Constants.ATTRIBUTE_RESPONSE_LAYOUT,
+                                              
+                                                    inputEcho := LEFT.result.inputEcho;
+                                                    inputPerLexID := TRIM(inputEcho.person.lexID);
+                                                    inputBusLexID := TRIM(inputEcho.business.lexID);
+                                                    
+                                                    personLexIDChanged := inputPerLexID <> DueDiligence.Constants.EMPTY AND
+                                                                          TRIM(LEFT.result.UniqueID) <> DueDiligence.Constants.EMPTY AND
+                                                                          inputPerLexID <> TRIM(LEFT.result.UniqueID);
+                                                                          
+                                                    businessLexIDChanged := inputBusLexID <> DueDiligence.Constants.EMPTY AND
+                                                                            TRIM(LEFT.result.BusinessID) <> DueDiligence.Constants.EMPTY AND
+                                                                            inputBusLexID <> TRIM(LEFT.result.BusinessID);
+                                                    
+                                                    //if a lexID was passed in and we found a valid business/person and lexID changed
+                                                    SELF.result.lexIDChanged := personLexIDChanged OR businessLexIDChanged;
+                                                    
+                                                    SELF := LEFT;));
  
     //********************************************************PERSON TEST SEED LOGIC HERE**********************************************************
 

@@ -55,30 +55,41 @@ EXPORT getSBFE(DATASET(Business_Risk_BIP.Layouts.Shell) Shell_pre,
 		SELF := le;
 	END;
 
-	linkid_recs_loaddate := JOIN(SBFESeq, Business_Credit.Key_ReleaseDates(),
+	linkid_recs_loaddate_hist := JOIN(SBFESeq, Business_Credit.Key_ReleaseDates(),
 	keyed(LEFT.original_version=RIGHT.version), getacctno_loaddate(LEFT,RIGHT),
 	LEFT OUTER,
 	atmost(10));// shouldn't ever be more than 1, but using 10 just to remove the warning
 
+	// create a transform to be used in production that doesn't need the granularity of history mode
+	RECORDOF(Business_Credit_KEL.File_SBFE_temp.linkids) getacctno_loaddate_production_mode(SBFESeq le) := TRANSFORM
+		SELF.acct_no := HASH(le.seq, le.sbfe_contributor_number, le.contract_account_number, le.account_type_reported);
+		load_Date := if(le.original_version < Business_Risk_BIP.Constants.FirstSBFELoadDate, (STRING)le.dt_first_seen, le.original_version);
+    SELF.load_date := load_date;
+		SELF.load_dateYYYYMMDD := load_date[1..8];
+		SELF := le;
+	END;
+	linkid_recs_loaddate_prod := project(SBFESeq, getacctno_loaddate_production_mode(LEFT));
+
+	// identify if this transaction is being run in production traffic to avoid some extra overhead of processing by historydate
+	production_current_mode := ((string)shell_pre[1].Clean_Input.HistoryDateTime)[1..6] = '999999';
+
+	linkid_recs_loaddate := if(production_current_mode, linkid_recs_loaddate_prod, linkid_recs_loaddate_hist);
 
 	linkid_recs_loaddate_dedup := DEDUP(SORT(linkid_recs_loaddate, seq, acct_no, original_version, -load_date), seq, acct_no);
 
   linkid_recs := Business_Risk_BIP.Common.FilterRecords2(linkid_recs_loaddate_dedup, load_date, MDR.SourceTools.src_Business_Credit, AllowedSourcesSet);
 
 	// Instantiate module for easier reference below.
-	mod_SBFE := Business_Credit_KEL.GLUE_fdc_append(linkid_recs);
+	mod_SBFE := Business_Credit_KEL.GLUE_fdc_append(linkid_recs, production_current_mode);
 
 	// Get majority of SBFE data.
 	SBFE_data := mod_SBFE.SBFE_result;
-
-	// identify if this transaction is being run in production traffic to avoid some extra overhead of processing by historydate
-	production_realtime_mode := ((string)shell_pre[1].Clean_Input.HistoryDateTime)[1..6] = '999999';
 
 	// Get future Tradelines data.
 	linkid_recs_future := Business_Risk_BIP.Common.FilterRecordsFuture(linkid_recs_loaddate_dedup, dt_first_seen, MDR.SourceTools.src_Business_Credit, AllowedSourcesSet);
 
 	// when in production mode, we don't need to add 3 years to the historydate of 999999 
-	SBFE_data_future          := if(production_realtime_mode, mod_SBFE.SBFE_Result_Future_ProductionMode, Business_Credit_KEL.GLUE_fdc_append(linkid_recs_future).SBFE_Result_Future);
+	SBFE_data_future          := if(production_current_mode, mod_SBFE.SBFE_Result_Future_ProductionMode, Business_Credit_KEL.GLUE_fdc_append(linkid_recs_future, production_current_mode).SBFE_Result_Future);
 
 	// Get BusinessIformation data separately to make work in the Transform below easier.
 	BusinessInformation_recs := mod_SBFE.AddBusinessClassification;
@@ -2490,7 +2501,9 @@ END;
 	// *********************
 	//   DEBUGGING OUTPUTS
 	// *********************
-	// OUTPUT(SBFERaw, NAMED('SBFERaw'));
+	// OUTPUT(choosen(SBFESeq, 10), NAMED('SBFESeq'));
+	// OUTPUT(choosen(linkid_recs_loaddate, 10), NAMED('linkid_recs_loaddate'));
+	
 	// OUTPUT(SBFE_data, NAMED('SBFE_data'));
 	// OUTPUT(SBFE_raw_data_future, NAMED('SBFErawdatafuture'));
 	// OUTPUT(SBFE_recs_added, NAMED('SBFE_recs_added'));
@@ -2501,6 +2514,8 @@ END;
 	// OUTPUT(SBFEVerification, NAMED('SBFEVerification'));
 	// OUTPUT(SBFEVerificationRolled, NAMED('SBFEVerificationRolled'));
 	// OUTPUT(mod_SBFE.AddBusinessClassification, NAMED('AddBusinessClassification'));
+
+	
 	RETURN IF( restrict_sbfe, Shell_pre, withErrorCodes );
 
 

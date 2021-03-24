@@ -11,7 +11,7 @@ NetAcuityInput := DATASET([{1, IPAddress, LexID}], riskwise.Layout_IPAI);
 
 gw_mod_access := Gateway.IParam.GetGatewayModAccess(glb, dppa);
 
-pre_netacuity_in :=  dx_gateway.parser_netacuity.NetAcuityOptOuts(NetAcuityInput, gw_mod_access);
+pre_netacuity_in :=  dx_gateway.parser_netacuity.NetAcuityOptOuts(NetAcuityInput, gw_mod_access, TRUE);
 
 // added a skip to remove records that don't have an input IP present so that it doesn't call netacuity unless it's there
 netacuity.Layout_NA_In prep(pre_netacuity_in le) := transform

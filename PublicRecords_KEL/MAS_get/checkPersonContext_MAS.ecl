@@ -180,6 +180,10 @@ PersonContext_transformed := project(dsResponseRecords(searchStatus=personContex
 		SELF.avm_correct_RECORD_ID := if(alert_needs_suppression and left.dataGroup in [	PersonContext.constants.datagroups.AVM ], 
 													[TRIM(left.RecID1, left, right)+TRIM(left.RecID2, left, right)+TRIM(left.RecID3, left, right)], //recid4 is always blank, // prim range, prim name and sec range
 													[]);
+		self.avm_medians_correct_RECORD_ID := if(alert_needs_suppression and left.dataGroup in [	PersonContext.constants.datagroups.AVM_MEDIANS ], 
+													[TRIM(left.RecID1, left, right)], //geolink
+													[]);
+													
 		SELF.infutor_correct_record_id := if(alert_needs_suppression and left.dataGroup in [	PersonContext.constants.datagroups.INFUTOR, 
 																															PersonContext.constants.datagroups.INFUTORCID	], 
 													[TRIM(left.RecID1, left, right)], 
@@ -236,15 +240,16 @@ rolled_personContext := rollup(PersonContext_sorted, left.lexid=right.lexid,
 		SELF.student_correct_RECORD_ID      := left.student_correct_RECORD_ID  +  right.student_correct_RECORD_ID ;
 		SELF.air_correct_RECORD_ID          := left.air_correct_RECORD_ID  +  right.air_correct_RECORD_ID ;
 		SELF.avm_correct_RECORD_ID          := left.avm_correct_RECORD_ID  +  right.avm_correct_RECORD_ID ;
+		SELF.avm_medians_correct_RECORD_ID  := left.avm_medians_correct_RECORD_ID  +  right.avm_medians_correct_RECORD_ID ;
 		SELF.infutor_correct_record_id      := left.infutor_correct_record_id  +  right.infutor_correct_record_id ;
 		SELF.gong_correct_record_id         := left.gong_correct_record_id  +  right.gong_correct_record_id ;
 		SELF.advo_correct_record_id         := left.advo_correct_record_id  +  right.advo_correct_record_id ;
 		SELF.email_data_correct_record_id   := left.email_data_correct_record_id  +  right.email_data_correct_record_id ;
 		SELF.inquiries_correct_record_id    := left.inquiries_correct_record_id  +  right.inquiries_correct_record_id ;
 		SELF.header_correct_record_id       := left.header_correct_record_id  +  right.header_correct_record_id ;
-		SELF.Death_correct_record_id		:= left.Death_correct_record_id  +  right.Death_correct_record_id ;
-		SELF.thrive_correct_record_id		:= left.thrive_correct_record_id  +  right.thrive_correct_record_id ;
-		SELF.SexOffender_correct_record_id		:= left.SexOffender_correct_record_id  +  right.SexOffender_correct_record_id ;
+		SELF.Death_correct_record_id				:= left.Death_correct_record_id  +  right.Death_correct_record_id ;
+		SELF.thrive_correct_record_id				:= left.thrive_correct_record_id  +  right.thrive_correct_record_id ;
+		SELF.SexOffender_correct_record_id	:= left.SexOffender_correct_record_id  +  right.SexOffender_correct_record_id ;
 
 		self := left;
 		));
@@ -277,6 +282,7 @@ with_personContext := join(input_with_DID, rolled_personContext, left.P_lexid=ri
 		SELF.student_correct_RECORD_ID      := left.student_correct_RECORD_ID  +  right.student_correct_RECORD_ID ;
 		SELF.air_correct_RECORD_ID          := left.air_correct_RECORD_ID  +  right.air_correct_RECORD_ID ;
 		SELF.avm_correct_RECORD_ID          := left.avm_correct_RECORD_ID  +  right.avm_correct_RECORD_ID ;
+		SELF.avm_medians_correct_RECORD_ID  := left.avm_medians_correct_RECORD_ID  +  right.avm_medians_correct_RECORD_ID ;
 		SELF.infutor_correct_record_id      := left.infutor_correct_record_id  +  right.infutor_correct_record_id ;
 		SELF.gong_correct_record_id         := left.gong_correct_record_id  +  right.gong_correct_record_id ;
 		SELF.advo_correct_record_id         := left.advo_correct_record_id  +  right.advo_correct_record_id ;
@@ -285,7 +291,7 @@ with_personContext := join(input_with_DID, rolled_personContext, left.P_lexid=ri
 		SELF.header_correct_record_id       := left.header_correct_record_id  +  right.header_correct_record_id ;
 		SELF.Death_correct_record_id				:= left.Death_correct_record_id  +  right.Death_correct_record_id ;
 		SELF.thrive_correct_record_id				:= left.thrive_correct_record_id  +  right.thrive_correct_record_id ;
-		SELF.SexOffender_correct_record_id				:= left.SexOffender_correct_record_id  +  right.SexOffender_correct_record_id ;
+		SELF.SexOffender_correct_record_id	:= left.SexOffender_correct_record_id  +  right.SexOffender_correct_record_id ;
 		
 		self := left,
 		self := []), keep(1), left outer);

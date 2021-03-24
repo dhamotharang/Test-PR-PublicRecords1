@@ -10,7 +10,7 @@ EXPORT FnRoxie_PhoneSumAttributes(DATASET(PublicRecords_KEL.ECL_Functions.Layout
 
 	LayoutPhoneSumAttributes := {UNSIGNED G_ProcUID, BOOLEAN ResultsFound, RECORDOF(PublicRecords_KEL.Q_Non_F_C_R_A_Phone_Summary_Attributes_V1_Dynamic('', DATASET([], PublicRecords_KEL.ECL_Functions.Layouts.LayoutInputPII), 0, PublicRecords_KEL.CFG_Compile.Permit__NONE).res0)};
 
-	PhoneSumAttributesRaw := JOIN(GoodInputOnly, FDCDataset,  LEFT.G_ProcUID = RIGHT.G_ProcUID, TRANSFORM(LayoutPhoneSumAttributes,
+	PhoneSumAttributesRaw := NOCOMBINE(JOIN(GoodInputOnly, FDCDataset,  LEFT.G_ProcUID = RIGHT.G_ProcUID, TRANSFORM(LayoutPhoneSumAttributes,
 		PhoneSummaryAttrs := PublicRecords_KEL.Q_Non_F_C_R_A_Phone_Summary_Attributes_V1_Dynamic(
 																		LEFT.P_InpClnPhoneHome,
 																		DATASET(LEFT), 
@@ -20,7 +20,7 @@ EXPORT FnRoxie_PhoneSumAttributes(DATASET(PublicRecords_KEL.ECL_Functions.Layout
 		SELF.G_ProcUID := LEFT.G_ProcUID,				
 		SELF.ResultsFound := EXISTS(PhoneSummaryAttrs);
 		SELF := PhoneSummaryAttrs[1]
-	), LEFT OUTER, ATMOST(100), KEEP(1));
+	), LEFT OUTER, ATMOST(100), KEEP(1)));
 	
 	PhoneSumInputPIIAttributeResults := KEL.Clean(PhoneSumAttributesRaw, TRUE, TRUE, TRUE);
 	

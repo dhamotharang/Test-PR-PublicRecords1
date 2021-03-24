@@ -605,6 +605,7 @@ EXPORT Constants := MODULE
     export unsigned2 MAX_COUNT_INDICATOR_ATTRIBUTE := 1000;
     export unsigned2 MAX_RISK_ATTRIBUTE := 100;
     export unsigned2 MAX_REPORT_RECORDS := 1;
+    export unsigned2 MAX_RULES_MATCHED := 1000;
   end;
 
   export Fraud_Point := MODULE
