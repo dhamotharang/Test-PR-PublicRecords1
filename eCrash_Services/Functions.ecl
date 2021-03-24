@@ -86,13 +86,19 @@ export Functions := MODULE
 
   EXPORT filterOutTerminatedAgencyReports(recs) := FUNCTIONMACRO
 			  // eliminate any reports from a terminated agency
+				 // reports should be eliminated if there is no match on the criteria to the Agency key, or if today's date 
+				 // does not fall between the source_start_date and the source_termination date
+				 // note: source_termination_date = 0 means not terminated
 	 			TODAYS_DATE := Std.Date.Today();
      agency_key := FLAccidents_Ecrash.key_EcrashV2_agency;
      recs_filtered := JOIN(recs, agency_key,
 	                     KEYED(LEFT.jurisdiction_state = RIGHT.Agency_State_Abbr) AND
 																						      LEFT.jurisdiction_nbr = RIGHT.MBSI_Agency_ID AND
-																									   (UNSIGNED)RIGHT.source_termination_date <> 0 AND (UNSIGNED) RIGHT.source_termination_date <= TODAYS_DATE,
-																										  TRANSFORM(LEFT), LEFT ONLY);
+																									   LEFT.contrib_source = RIGHT.source_id AND
+																										  (UNSIGNED)RIGHT.source_start_date <= TODAYS_DATE AND 
+																									   ((UNSIGNED)RIGHT.source_termination_date = 0 OR 
+																										   (UNSIGNED) RIGHT.source_termination_date > TODAYS_DATE),
+																										  TRANSFORM(LEFT), LIMIT(10000, SKIP), KEEP (1));
 					RETURN recs_filtered;
 		ENDMACRO;
 
