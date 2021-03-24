@@ -592,6 +592,7 @@
 	INTEGER PL_STLCnt2Y;
 	INTEGER PL_STLCnt5Y;
 	STRING PL_STLDtList5Y;
+	INTEGER3 PL_EmrgAge;
 	// Business attributes	
 	STRING65 B_InpAcct;
 	INTEGER	G_ProcBusUID;
