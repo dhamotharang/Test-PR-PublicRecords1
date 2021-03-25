@@ -9,10 +9,10 @@ Name Matches
 // W             Last Name only
 SSN Matches
 // S             Full SSN
-// P             Probable SSN
+// P             Possible SSN
 DOB Matches
 // D             DOB
-// B             Probable DOB
+// B             Possible DOB
 Address Matches
 // A             Street: prim range & prim name
 // C             City/State 
