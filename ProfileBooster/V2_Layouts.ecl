@@ -181,7 +181,7 @@ EXPORT	Verification := RECORD
 	END;
 		
 	EXPORT	HouseholdDemographics := RECORD
-		INTEGER4		HHID := ProfileBooster.ProfileBoosterV2_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA_INT;
+		INTEGER8		HHID := ProfileBooster.ProfileBoosterV2_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA_INT;
 		INTEGER3		HHTeenagerMmbrCnt := ProfileBooster.ProfileBoosterV2_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA_INT;
 		INTEGER3		HHYoungAdultMmbrCnt := ProfileBooster.ProfileBoosterV2_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA_INT;
 		INTEGER3		HHMiddleAgeMmbrCnt := ProfileBooster.ProfileBoosterV2_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA_INT;
@@ -671,7 +671,7 @@ EXPORT	Verification := RECORD
 		Risk_Indicators.Layout_Input;
 		unsigned1 rec_type := 1; //1=Prospect, 2=Household, 3=Relative/Associate
 		unsigned6 DID2 := 0;
-		unsigned6	HHID;
+		unsigned8	HHID;
 		string12	geoLink;
 		string12	relat_geoLink;
     Layout_ProfileBoosterV2;

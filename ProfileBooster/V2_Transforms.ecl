@@ -307,6 +307,18 @@ EXPORT V2_Transforms := MODULE
 		self 								:= [];
 	END;  
   
+     EXPORT ProfileBooster.V2_Layouts.Layout_PB2_Shell xfmAddHouseholdInfo(ProfileBooster.V2_Layouts.Layout_PB2_Shell le, dx_ProfileBooster.Layouts.i_lexid ri) := TRANSFORM
+        notDid2 := le.did2 != ri.did;
+        SELF.PurchNewAmt := IF(notDid2, ri.PurchNewAmt, le.PurchNewAmt);
+        SELF.PurchTotEv := IF(notDid2, ri.PurchTotEv, le.PurchTotEv);
+        SELF.PurchCntEv := IF(notDid2, ri.PurchCntEv, le.PurchCntEv);
+        SELF.PurchNewMsnc := IF(notDid2, ri.PurchNewMsnc, le.PurchNewMsnc);
+        SELF.PurchOldMsnc := IF(notDid2, ri.PurchOldMsnc, le.PurchOldMsnc);
+        SELF.PurchItemCntEv := IF(notDid2, ri.PurchItemCntEv, le.PurchItemCntEv);
+        SELF.PurchAmtAvg := IF(notDid2, ri.PurchAmtAvg, le.PurchAmtAvg);
+        SELF := le;
+    END;
+    
 /*   EXPORT ProfileBooster.V2_Layouts.Layout_PB2_Shell xfmAddCurrentAddressData(ProfileBooster.V2_Layouts.Layout_PB2_Shell le, dx_ProfileBooster.Layouts.i_address ri ) := TRANSFORM
    		fullhistorydate := risk_indicators.iid_constants.myGetDate(le.historydate);
    		// SELF.CurrAddrOwnershipIndx := ri.AddrOwnershipIndx;
@@ -544,7 +556,24 @@ EXPORT V2_Transforms := MODULE
 		self 					:= [];
 	END;
   
+    EXPORT ProfileBooster.V2_Layouts.Layout_PB2_Shell xfmPurchaseBehaviorRollup(ProfileBooster.V2_Layouts.Layout_PB2_Shell le, ProfileBooster.V2_Layouts.Layout_PB2_Shell ri) := transform
+		  SELF.HHPurchNewAmt := IF(le.dt_last_seen >= ri.dt_last_seen AND le.PurchNewAmt > 0, le.PurchNewAmt, ri.PurchNewAmt);
+		  SELF.HHPurchTotEv := le.PurchTotEv + IF(ri.PurchTotEv >= 0, ri.PurchTotEv, 0);
+		  SELF.HHPurchCntEv := le.PurchCntEv + IF(ri.PurchCntEv >= 0, ri.PurchCntEv, 0);
+          SELF.HHPurchNewMsnc := IF(le.PurchNewMsnc >= 0 AND ri.PurchNewMsnc >= 0, MIN(le.PurchNewMsnc, ri.PurchNewMsnc), MAX(le.PurchNewMsnc, ri.PurchNewMsnc, 0));
+          SELF.HHPurchOldMsnc := MAX(le.PurchOldMsnc, ri.PurchOldMsnc);
+		  SELF.HHPurchItemCntEv := le.PurchItemCntEv + IF(ri.PurchItemCntEv >= 0, ri.PurchItemCntEv, 0);
+          SELF := le;
+	END;
+  
   EXPORT ProfileBooster.V2_Layouts.Layout_PB2_BatchOut xfm_PB20_mod5(ProfileBooster.V2_Layouts.Layout_PB2_BatchOut l) := TRANSFORM
+            SELF.attributes.version2.HHPurchNewAmt  := ProfileBooster.ProfileBoosterV2_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA_INT;
+            SELF.attributes.version2.HHPurchTotEv  := ProfileBooster.ProfileBoosterV2_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA_INT;
+            SELF.attributes.version2.HHPurchNewMsnc  :=  ProfileBooster.ProfileBoosterV2_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA_INT;
+            SELF.attributes.version2.HHPurchOldMsnc  := ProfileBooster.ProfileBoosterV2_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA_INT;
+            SELF.attributes.version2.HHPurchItemCntEv  := ProfileBooster.ProfileBoosterV2_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA_INT;
+            SELF.attributes.version2.HHPurchAmtAvg  := ProfileBooster.ProfileBoosterV2_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA_INT;
+            SELF.attributes.version2.HHPurchCntEv  := ProfileBooster.ProfileBoosterV2_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA_INT;
 			SELF.attributes.version2.PurchNewAmt := ProfileBooster.ProfileBoosterV2_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA_INT;
 			SELF.attributes.version2.PurchTotEv := ProfileBooster.ProfileBoosterV2_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA_INT;
 			SELF.attributes.version2.PurchCntEv := ProfileBooster.ProfileBoosterV2_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA_INT;
@@ -599,6 +628,13 @@ EXPORT V2_Transforms := MODULE
 		
 	EXPORT ProfileBooster.V2_Layouts.Layout_PB2_BatchOut xfm_PB20_mod4(ProfileBooster.V2_Layouts.Layout_PB2_BatchOut l) := TRANSFORM
 		Modification4 := l.attributes.version2.PurchCntEv > 0;
+        HHModification4 := l.attributes.version2.HHPurchCntEv > 0;
+        SELF.attributes.version2.HHPurchNewAmt  := IF(HHModification4 AND l.attributes.version2.HHPurchNewAmt=ProfileBooster.ProfileBoosterV2_KEL.ECL_Functions.Constants.NO_DATA_FOUND_INT,ProfileBooster.ProfileBoosterV2_KEL.ECL_Functions.Constants.RECS_AVAIL_BUT_CANNOT_CALCULATE_INT,l.attributes.version2.HHPurchNewAmt);
+        SELF.attributes.version2.HHPurchTotEv  := IF(HHModification4 AND l.attributes.version2.HHPurchTotEv=ProfileBooster.ProfileBoosterV2_KEL.ECL_Functions.Constants.NO_DATA_FOUND_INT,ProfileBooster.ProfileBoosterV2_KEL.ECL_Functions.Constants.RECS_AVAIL_BUT_CANNOT_CALCULATE_INT,l.attributes.version2.HHPurchTotEv);
+        SELF.attributes.version2.HHPurchNewMsnc  := IF(HHModification4 AND l.attributes.version2.HHPurchNewMsnc=ProfileBooster.ProfileBoosterV2_KEL.ECL_Functions.Constants.NO_DATA_FOUND_INT,ProfileBooster.ProfileBoosterV2_KEL.ECL_Functions.Constants.RECS_AVAIL_BUT_CANNOT_CALCULATE_INT,l.attributes.version2.HHPurchNewMsnc);
+        SELF.attributes.version2.HHPurchOldMsnc  := IF(HHModification4 AND l.attributes.version2.HHPurchOldMsnc=ProfileBooster.ProfileBoosterV2_KEL.ECL_Functions.Constants.NO_DATA_FOUND_INT,ProfileBooster.ProfileBoosterV2_KEL.ECL_Functions.Constants.RECS_AVAIL_BUT_CANNOT_CALCULATE_INT,l.attributes.version2.HHPurchOldMsnc);
+        SELF.attributes.version2.HHPurchItemCntEv  := IF(HHModification4 AND l.attributes.version2.HHPurchItemCntEv=0,ProfileBooster.ProfileBoosterV2_KEL.ECL_Functions.Constants.RECS_AVAIL_BUT_CANNOT_CALCULATE_INT,l.attributes.version2.HHPurchItemCntEv);
+        SELF.attributes.version2.HHPurchAmtAvg  := IF(HHModification4 AND l.attributes.version2.HHPurchAmtAvg=ProfileBooster.ProfileBoosterV2_KEL.ECL_Functions.Constants.NO_DATA_FOUND_INT,ProfileBooster.ProfileBoosterV2_KEL.ECL_Functions.Constants.RECS_AVAIL_BUT_CANNOT_CALCULATE_INT,l.attributes.version2.HHPurchAmtAvg);
 		SELF.attributes.version2.PurchItemCntEv := IF(Modification4 AND l.attributes.version2.PurchItemCntEv=0,ProfileBooster.ProfileBoosterV2_KEL.ECL_Functions.Constants.RECS_AVAIL_BUT_CANNOT_CALCULATE_INT,l.attributes.version2.PurchItemCntEv);
 		SELF.attributes.version2.PurchOldMsnc := IF(Modification4 AND l.attributes.version2.PurchOldMsnc=ProfileBooster.ProfileBoosterV2_KEL.ECL_Functions.Constants.NO_DATA_FOUND_INT,ProfileBooster.ProfileBoosterV2_KEL.ECL_Functions.Constants.RECS_AVAIL_BUT_CANNOT_CALCULATE_INT,l.attributes.version2.PurchOldMsnc);
 		SELF.attributes.version2.PurchNewMsnc := IF(Modification4 AND l.attributes.version2.PurchNewMsnc=ProfileBooster.ProfileBoosterV2_KEL.ECL_Functions.Constants.NO_DATA_FOUND_INT,ProfileBooster.ProfileBoosterV2_KEL.ECL_Functions.Constants.RECS_AVAIL_BUT_CANNOT_CALCULATE_INT,l.attributes.version2.PurchNewMsnc);
@@ -611,6 +647,13 @@ EXPORT V2_Transforms := MODULE
 		
 	EXPORT ProfileBooster.V2_Layouts.Layout_PB2_BatchOut xfm_PB20_mod3(ProfileBooster.V2_Layouts.Layout_PB2_BatchOut l) := TRANSFORM
 		Modification3 := l.attributes.version2.PurchCntEv = 0;
+        HHModification3 := l.attributes.version2.HHPurchCntEv = 0;
+        SELF.attributes.version2.HHPurchNewAmt  := IF(HHModification3,ProfileBooster.ProfileBoosterV2_KEL.ECL_Functions.Constants.NO_DATA_FOUND_INT,l.attributes.version2.HHPurchNewAmt);
+        SELF.attributes.version2.HHPurchTotEv  := IF(HHModification3,ProfileBooster.ProfileBoosterV2_KEL.ECL_Functions.Constants.NO_DATA_FOUND_INT,l.attributes.version2.HHPurchTotEv);
+        SELF.attributes.version2.HHPurchNewMsnc  :=  IF(HHModification3,ProfileBooster.ProfileBoosterV2_KEL.ECL_Functions.Constants.NO_DATA_FOUND_INT,l.attributes.version2.HHPurchNewMsnc);
+        SELF.attributes.version2.HHPurchOldMsnc  := IF(HHModification3,ProfileBooster.ProfileBoosterV2_KEL.ECL_Functions.Constants.NO_DATA_FOUND_INT,l.attributes.version2.HHPurchOldMsnc);
+        SELF.attributes.version2.HHPurchItemCntEv  := IF(HHModification3,0,l.attributes.version2.HHPurchItemCntEv);
+        SELF.attributes.version2.HHPurchAmtAvg  := IF(HHModification3,ProfileBooster.ProfileBoosterV2_KEL.ECL_Functions.Constants.NO_DATA_FOUND_INT,l.attributes.version2.HHPurchAmtAvg);
 		SELF.attributes.version2.PurchItemCntEv := IF(Modification3,0,l.attributes.version2.PurchItemCntEv);
 		SELF.attributes.version2.PurchOldMsnc := IF(Modification3,ProfileBooster.ProfileBoosterV2_KEL.ECL_Functions.Constants.NO_DATA_FOUND_INT,l.attributes.version2.PurchOldMsnc);
 		SELF.attributes.version2.PurchNewMsnc := IF(Modification3,ProfileBooster.ProfileBoosterV2_KEL.ECL_Functions.Constants.NO_DATA_FOUND_INT,l.attributes.version2.PurchNewMsnc);

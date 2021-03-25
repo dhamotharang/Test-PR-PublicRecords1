@@ -163,7 +163,7 @@ wInfutorcid_roxie := PROJECT(wInfutorcid_roxie_flagged, TRANSFORM(ProfileBooster
 		self.dob							:= if(ri.src=mdr.sourceTools.src_TUCS_Ptrack, '', (string)ri.dob);
     self.ProspectAge 			:= if(ri.src=mdr.sourceTools.src_TUCS_Ptrack, 0, risk_indicators.years_apart((unsigned)fullhistorydate, (unsigned)ri.dob));
 		self.title						:= ri.title;
-		self.HHID							:= ri.HHID;
+		self.HHID							:= IF(ri.HHID = 0, le.HHID, ri.HHID);
 		self.hdr_prim_range		:= ri.prim_range;
 		self.hdr_predir				:= ri.predir;
 		self.hdr_prim_name		:= ri.prim_name;
@@ -817,8 +817,8 @@ wInfutorcid_roxie := PROJECT(wInfutorcid_roxie_flagged, TRANSFORM(ProfileBooster
 // output(filtered_reseqAddrs, named('reseqAddrs'));
 // output(with_hdr_addr_cache, named('with_hdr_addr_cache'));
 // output(withaddrs, named('withaddrs'));
-OUTPUT(wLnameCounts,,'~jfrancis::profilebooster20::V2_getVerification_ROXIE_' + thorlib.wuid(),CSV(HEADING(single), QUOTE('"')));
-OUTPUT(with_hdr_addr_cache,,'~jfrancis::profilebooster20::V2_getVerification_with_hdr_addr_cache_' + thorlib.wuid(),CSV(HEADING(single), QUOTE('"')));
+// OUTPUT(wLnameCounts,,'~jfrancis::profilebooster20::V2_getVerification_ROXIE_' + thorlib.wuid(),CSV(HEADING(single), QUOTE('"')));
+// OUTPUT(with_hdr_addr_cache,,'~jfrancis::profilebooster20::V2_getVerification_with_hdr_addr_cache_' + thorlib.wuid(),CSV(HEADING(single), QUOTE('"')));
 // OUTPUT(rolledAddrs,,'~jfrancis::profilebooster20::V2_getVerification_rolledAddrs_' + thorlib.wuid(),CSV(HEADING(single), QUOTE('"')));
 // OUTPUT(goodAddrs(did=168219),,'~jfrancis::profilebooster20::V2_getVerification_goodAddrs168219_' + thorlib.wuid(),CSV(HEADING(single), QUOTE('"')));
 // OUTPUT(COUNT(JOIN_rolled_email), NAMED('V2GV_Out_Cnt'));
