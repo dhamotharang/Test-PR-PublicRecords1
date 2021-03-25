@@ -4,8 +4,8 @@ IMPORT B_Sele_U_C_C_8,B_Sele_U_C_C_9,CFG_Compile,E_Business_Org,E_Business_Sele,
 IMPORT * FROM KEL15.Null;
 EXPORT B_Sele_U_C_C_7(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG_Compile __cfg = CFG_Compile) := MODULE
   SHARED VIRTUAL TYPEOF(B_Sele_U_C_C_8(__in,__cfg).__ENH_Sele_U_C_C_8) __ENH_Sele_U_C_C_8 := B_Sele_U_C_C_8(__in,__cfg).__ENH_Sele_U_C_C_8;
-  SHARED __EE5508063 := __ENH_Sele_U_C_C_8;
-  EXPORT __ST266337_Layout := RECORD
+  SHARED __EE5528430 := __ENH_Sele_U_C_C_8;
+  EXPORT __ST266639_Layout := RECORD
     KEL.typ.nstr R_M_S_I_D_;
     KEL.typ.nstr Party_Type_;
     KEL.typ.int Party_Sort_List_ := 0;
@@ -16,16 +16,16 @@ EXPORT B_Sele_U_C_C_7(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG_
     KEL.typ.epoch Vault_Date_Last_Seen_ := 0;
     KEL.typ.int __RecordCount := 0;
   END;
-  EXPORT __ST266329_Layout := RECORD
+  EXPORT __ST266631_Layout := RECORD
     KEL.typ.ntyp(E_Business_Sele().Typ) Legal_;
     KEL.typ.nstr T_M_S_I_D_;
     KEL.typ.ntyp(E_U_C_C().Typ) Filing_;
     KEL.typ.nint Ult_I_D_;
     KEL.typ.nint Org_I_D_;
     KEL.typ.nint Sele_I_D_;
-    KEL.typ.ndataset(__ST266337_Layout) Sub_Filing_;
+    KEL.typ.ndataset(__ST266639_Layout) Sub_Filing_;
     KEL.typ.ndataset(E_Sele_U_C_C(__in,__cfg).Data_Sources_Layout) Data_Sources_;
-    KEL.typ.ndataset(B_Sele_U_C_C_9(__in,__cfg).__ST270909_Layout) Best_Party_Types_;
+    KEL.typ.ndataset(B_Sele_U_C_C_9(__in,__cfg).__ST271211_Layout) Best_Party_Types_;
     KEL.typ.nstr Filtered_Party_Type_;
     KEL.typ.epoch Archive___Date_ := 0;
     KEL.typ.epoch Date_First_Seen_ := 0;
@@ -34,12 +34,12 @@ EXPORT B_Sele_U_C_C_7(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG_
     KEL.typ.epoch Vault_Date_Last_Seen_ := 0;
     KEL.typ.int __RecordCount := 0;
   END;
-  SHARED __ST266329_Layout __ND5508041__Project(B_Sele_U_C_C_8(__in,__cfg).__ST414456_Layout __PP5507908) := TRANSFORM
-    __EE5508066 := __PP5507908.Sub_Filing_;
-    SELF.Sub_Filing_ := __BN(PROJECT(__T(__EE5508066),__ST266337_Layout),__NL(__EE5508066));
-    __EE5508036 := __PP5507908.Best_Party_Types_;
-    SELF.Filtered_Party_Type_ := (__T(__EE5508036))[1].Party_Type_;
-    SELF := __PP5507908;
+  SHARED __ST266631_Layout __ND5528408__Project(B_Sele_U_C_C_8(__in,__cfg).__ST414795_Layout __PP5528275) := TRANSFORM
+    __EE5528433 := __PP5528275.Sub_Filing_;
+    SELF.Sub_Filing_ := __BN(PROJECT(__T(__EE5528433),__ST266639_Layout),__NL(__EE5528433));
+    __EE5528403 := __PP5528275.Best_Party_Types_;
+    SELF.Filtered_Party_Type_ := (__T(__EE5528403))[1].Party_Type_;
+    SELF := __PP5528275;
   END;
-  EXPORT __ENH_Sele_U_C_C_7 := PROJECT(__EE5508063,__ND5508041__Project(LEFT));
+  EXPORT __ENH_Sele_U_C_C_7 := PROJECT(__EE5528430,__ND5528408__Project(LEFT));
 END;

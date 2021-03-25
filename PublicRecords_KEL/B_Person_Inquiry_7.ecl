@@ -4,8 +4,8 @@ IMPORT B_Person_Inquiry_8,CFG_Compile,E_Inquiry,E_Person,E_Person_Inquiry FROM P
 IMPORT * FROM KEL15.Null;
 EXPORT B_Person_Inquiry_7(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG_Compile __cfg = CFG_Compile) := MODULE
   SHARED VIRTUAL TYPEOF(B_Person_Inquiry_8(__in,__cfg).__ENH_Person_Inquiry_8) __ENH_Person_Inquiry_8 := B_Person_Inquiry_8(__in,__cfg).__ENH_Person_Inquiry_8;
-  SHARED __EE5504157 := __ENH_Person_Inquiry_8;
-  EXPORT __ST444901_Layout := RECORD
+  SHARED __EE5524524 := __ENH_Person_Inquiry_8;
+  EXPORT __ST445240_Layout := RECORD
     KEL.typ.nstr Transaction_I_D_;
     KEL.typ.str Method_ := '';
     KEL.typ.str Function_Description_ := '';
@@ -28,13 +28,13 @@ EXPORT B_Person_Inquiry_7(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, 
     KEL.typ.epoch Vault_Date_Last_Seen_ := 0;
     KEL.typ.int __RecordCount := 0;
   END;
-  EXPORT __ST265986_Layout := RECORD
+  EXPORT __ST266288_Layout := RECORD
     KEL.typ.ntyp(E_Person().Typ) Subject_;
     KEL.typ.ntyp(E_Inquiry().Typ) Transaction_;
     KEL.typ.nstr Transaction_I_D_;
     KEL.typ.nstr Sequence_Number_;
     KEL.typ.ndataset(E_Person_Inquiry(__in,__cfg).Data_Sources_Layout) Data_Sources_;
-    KEL.typ.ndataset(__ST444901_Layout) Gather_Inquiries_;
+    KEL.typ.ndataset(__ST445240_Layout) Gather_Inquiries_;
     KEL.typ.timestamp Archive___Date_ := 0;
     KEL.typ.timestamp Date_First_Seen_ := 0;
     KEL.typ.timestamp Date_Last_Seen_ := 0;
@@ -42,16 +42,16 @@ EXPORT B_Person_Inquiry_7(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, 
     KEL.typ.epoch Vault_Date_Last_Seen_ := 0;
     KEL.typ.int __RecordCount := 0;
   END;
-  SHARED __ST265986_Layout __ND5504162__Project(B_Person_Inquiry_8(__in,__cfg).__ST268747_Layout __PP5504158) := TRANSFORM
-    __EE5504182 := __PP5504158.Gather_Inquiries_;
-    __ST444901_Layout __ND5504187__Project(B_Person_Inquiry_8(__in,__cfg).__ST96593_Layout __PP5504183) := TRANSFORM
-      SELF.Exclude_Function_Description_ := KEL.Routines.ToUpperCase(TRIM(__PP5504183.Function_Description_)) <> 'BANKO BATCH';
-      __CC35568 := ['CARDS - SUBPRIME','MSB','REFUND ANTICIPATION LOAN','RENT TO OWN','PAYDAY LOANS','PAY DAY LOANS','TITLE LOANS','PAY DAY','PAYDAY'];
-      SELF.Is_High_Risk_ := KEL.Routines.ToUpperCase(TRIM(__PP5504183.Industry_)) IN __CC35568;
-      SELF := __PP5504183;
+  SHARED __ST266288_Layout __ND5524529__Project(B_Person_Inquiry_8(__in,__cfg).__ST269049_Layout __PP5524525) := TRANSFORM
+    __EE5524549 := __PP5524525.Gather_Inquiries_;
+    __ST445240_Layout __ND5524554__Project(B_Person_Inquiry_8(__in,__cfg).__ST96693_Layout __PP5524550) := TRANSFORM
+      SELF.Exclude_Function_Description_ := KEL.Routines.ToUpperCase(TRIM(__PP5524550.Function_Description_)) <> 'BANKO BATCH';
+      __CC35570 := ['CARDS - SUBPRIME','MSB','REFUND ANTICIPATION LOAN','RENT TO OWN','PAYDAY LOANS','PAY DAY LOANS','TITLE LOANS','PAY DAY','PAYDAY'];
+      SELF.Is_High_Risk_ := KEL.Routines.ToUpperCase(TRIM(__PP5524550.Industry_)) IN __CC35570;
+      SELF := __PP5524550;
     END;
-    SELF.Gather_Inquiries_ := __PROJECT(__EE5504182,__ND5504187__Project(LEFT));
-    SELF := __PP5504158;
+    SELF.Gather_Inquiries_ := __PROJECT(__EE5524549,__ND5524554__Project(LEFT));
+    SELF := __PP5524525;
   END;
-  EXPORT __ENH_Person_Inquiry_7 := PROJECT(__EE5504157,__ND5504162__Project(LEFT));
+  EXPORT __ENH_Person_Inquiry_7 := PROJECT(__EE5524524,__ND5524529__Project(LEFT));
 END;

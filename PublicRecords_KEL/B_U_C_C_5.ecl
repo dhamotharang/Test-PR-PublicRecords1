@@ -4,8 +4,8 @@ IMPORT B_U_C_C_10,B_U_C_C_11,B_U_C_C_6,CFG_Compile,E_U_C_C FROM PublicRecords_KE
 IMPORT * FROM KEL15.Null;
 EXPORT B_U_C_C_5(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG_Compile __cfg = CFG_Compile) := MODULE
   SHARED VIRTUAL TYPEOF(B_U_C_C_6(__in,__cfg).__ENH_U_C_C_6) __ENH_U_C_C_6 := B_U_C_C_6(__in,__cfg).__ENH_U_C_C_6;
-  SHARED __EE5643567 := __ENH_U_C_C_6;
-  EXPORT __ST258413_Layout := RECORD
+  SHARED __EE5663934 := __ENH_U_C_C_6;
+  EXPORT __ST258715_Layout := RECORD
     KEL.typ.nstr R_M_S_I_D_;
     KEL.typ.nstr Filing_Jurisdiction_;
     KEL.typ.nstr Filing_Number_;
@@ -36,15 +36,15 @@ EXPORT B_U_C_C_5(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG_Compi
     KEL.typ.epoch Vault_Date_Last_Seen_ := 0;
     KEL.typ.int __RecordCount := 0;
   END;
-  EXPORT __ST258409_Layout := RECORD
+  EXPORT __ST258711_Layout := RECORD
     KEL.typ.nuid UID;
     KEL.typ.nstr T_M_S_I_D_;
-    KEL.typ.ndataset(__ST258413_Layout) Sub_Filing_;
+    KEL.typ.ndataset(__ST258715_Layout) Sub_Filing_;
     KEL.typ.ndataset(E_U_C_C(__in,__cfg).Collateral_Layout) Collateral_;
     KEL.typ.ndataset(E_U_C_C(__in,__cfg).Data_Sources_Layout) Data_Sources_;
     KEL.typ.nstr Best_Child_R_M_S_I_D_;
     KEL.typ.nstr Best_Inferred_Status_;
-    KEL.typ.ndataset(B_U_C_C_10(__in,__cfg).__ST119634_Layout) Best_U_C_C_Child_Record_;
+    KEL.typ.ndataset(B_U_C_C_10(__in,__cfg).__ST119736_Layout) Best_U_C_C_Child_Record_;
     KEL.typ.epoch Archive___Date_ := 0;
     KEL.typ.epoch Date_First_Seen_ := 0;
     KEL.typ.epoch Date_Last_Seen_ := 0;
@@ -52,12 +52,12 @@ EXPORT B_U_C_C_5(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG_Compi
     KEL.typ.epoch Vault_Date_Last_Seen_ := 0;
     KEL.typ.int __RecordCount := 0;
   END;
-  SHARED __ST258409_Layout __ND5643529__Project(B_U_C_C_6(__in,__cfg).__ST263311_Layout __PP5643229) := TRANSFORM
-    __EE5643570 := __PP5643229.Sub_Filing_;
-    SELF.Sub_Filing_ := __BN(PROJECT(__T(__EE5643570),__ST258413_Layout),__NL(__EE5643570));
-    __EE5643524 := __PP5643229.Best_U_C_C_Child_Record_;
-    SELF.Best_Inferred_Status_ := (PROJECT(__T(__EE5643524),TRANSFORM({KEL.typ.nstr __value},SELF.__value:=__CN(LEFT.Inferred_Status_))))[1].__value;
-    SELF := __PP5643229;
+  SHARED __ST258711_Layout __ND5663896__Project(B_U_C_C_6(__in,__cfg).__ST263613_Layout __PP5663596) := TRANSFORM
+    __EE5663937 := __PP5663596.Sub_Filing_;
+    SELF.Sub_Filing_ := __BN(PROJECT(__T(__EE5663937),__ST258715_Layout),__NL(__EE5663937));
+    __EE5663891 := __PP5663596.Best_U_C_C_Child_Record_;
+    SELF.Best_Inferred_Status_ := (PROJECT(__T(__EE5663891),TRANSFORM({KEL.typ.nstr __value},SELF.__value:=__CN(LEFT.Inferred_Status_))))[1].__value;
+    SELF := __PP5663596;
   END;
-  EXPORT __ENH_U_C_C_5 := PROJECT(__EE5643567,__ND5643529__Project(LEFT));
+  EXPORT __ENH_U_C_C_5 := PROJECT(__EE5663934,__ND5663896__Project(LEFT));
 END;
