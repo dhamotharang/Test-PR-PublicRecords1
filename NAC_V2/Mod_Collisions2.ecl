@@ -28,10 +28,10 @@ shared FileBase := project(Base, addrXform(left));
 																			,'')
 									,self:=left));
 */
-SHARED threashold:=enum(unsigned1,Low,Medium,High);
-SHARED score_threashold:=threashold;
-SHARED ssn_threashold:=threashold;
-SHARED dob_threashold:=threashold;
+EXPORT threashold:=enum(unsigned1,Low,Medium,High);
+EXPORT score_threashold:=threashold;
+EXPORT ssn_threashold:=threashold;
+EXPORT dob_threashold:=threashold;
 
 /*
 Best Match

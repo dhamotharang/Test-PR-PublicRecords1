@@ -274,16 +274,6 @@ asis := JOIN(candidates,updates,
 					TRANSFORM(nac_v2.Layout_Base2,
 						self := left;), left only, local);
 	result := unchanged + directUpdates + remaining + asis + newClients;
-/*OUTPUT(SORT(current(caseid='000967126'),clientid,startdate_raw), named('oldbasein'));
-OUTPUT(SORT(newbase(caseid='000967126'),clientid,startdate_raw), named('newbasein'));
-OUTPUT(SORT(clients(caseid='000967126'),clientid,startdate_raw), named('clientsin'));
-OUTPUT(SORT(candidates(caseid='000967126'),clientid,startdate_raw), named('candidates'));
-OUTPUT(SORT(updates(caseid='000967126'),clientid,startdate_raw), named('updates'));
-OUTPUT(SORT(unchanged(caseid='000967126',startdate_raw='202012'),clientid,startdate_raw), named('unchanged'));
-OUTPUT(SORT(directUpdates(caseid='000967126',startdate_raw='202012'),clientid,startdate_raw), named('directUpdates'));
-OUTPUT(SORT(remaining(caseid='000967126',startdate_raw='202012'),clientid,startdate_raw), named('remaining'));
-OUTPUT(SORT(asis(caseid='000967126',startdate_raw='202012'),clientid,startdate_raw), named('asis'));
-OUTPUT(SORT(newClients(caseid='000967126',startdate_raw='202012'),clientid,startdate_raw), named('newClients'));
-*/
+
 	return result(clientId<>'');
 END;
