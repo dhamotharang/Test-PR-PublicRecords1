@@ -483,10 +483,25 @@ BOOLEAN DEBUG := FALSE;
 //merge Prospect rec, Household recs, Relatives recs into one file
 	allDIDs := rolledDeceased + hhDIDs + relativeDIDs;
 	
+    // adds back values for the household recs
+    allDIDs_WithPBLexIDKey_Thor := JOIN(DISTRIBUTE(allDIDs,did), DISTRIBUTE(PB20LexIDKey,did),
+                  LEFT.did = RIGHT.did,
+                  mod_transforms.xfmAddHouseholdInfo(LEFT,RIGHT), LEFT OUTER, KEEP(1), LOCAL);
+
+    allDIDs_WithPBLexIDKey_Roxie := JOIN(allDIDs, PB20LexIDKey,
+                  LEFT.did = RIGHT.did,
+                  mod_transforms.xfmAddHouseholdInfo(LEFT,RIGHT), LEFT OUTER, KEEP(1));
+
+    #IF(onThor)
+        allDids_WithPBLexIDKey := allDIDs_WithPBLexIDKey_Thor;
+    #ELSE
+        allDids_WithPBLexIDKey := allDIDs_WithPBLexIDKey_Roxie;
+    #END
+  
 //if a DID is both a household member and a relative, keep only the household record so relatives attributes are exclusive
-	unique_DIDs_roxie := dedup(sort(allDIDs, seq, DID2, rec_type), seq, DID2);
+	unique_DIDs_roxie := dedup(sort(allDids_WithPBLexIDKey, seq, DID2, rec_type), seq, DID2);
 	
-	distributed_allDIDs := distribute(allDIDs, hash(seq, did2));
+	distributed_allDIDs := distribute(allDids_WithPBLexIDKey, hash(seq, did2));
 	unique_DIDs_thor := dedup(sort(distributed_allDIDs, seq, DID2, rec_type, local), seq, DID2, local);//   : PERSIST('~PROFILEBOOSTER::unique_DIDs_thor');  // remove persists because low on disk space and it's rebuilding persist file each time anyway
 	
 	#IF(onThor)
@@ -573,8 +588,25 @@ BOOLEAN DEBUG := FALSE;
 	end;
 	
 	finalSort 	:= sort(withPropertyCommon, seq, rec_type, did2);  //sort prospect record to the top (rec_type = 1)
-  finalRollup := rollup(finalSort, rollFinal(left,right), seq);  
+    finalRollup := rollup(finalSort, rollFinal(left,right), seq);  
   
+   getPurchaseBehaviorAttributes := ROLLUP(finalSort, mod_transforms.xfmPurchaseBehaviorRollup(LEFT, RIGHT), seq);
+   
+   withPurchaseBehavior := JOIN(finalRollup, getPurchaseBehaviorAttributes,  
+   												LEFT.seq = RIGHT.seq,
+   												TRANSFORM(ProfileBooster.V2_Layouts.Layout_PB2_Shell,
+                                                SELF.HHPurchNewAmt := RIGHT.HHPurchNewAmt;
+                                                SELF.HHPurchTotEv := RIGHT.HHPurchTotEv;
+                                                SELF.HHPurchCntEv := RIGHT.HHPurchCntEv;
+                                                SELF.HHPurchNewMsnc := RIGHT.HHPurchNewMsnc;
+                                                SELF.HHPurchOldMsnc := RIGHT.HHPurchOldMsnc;
+                                                SELF.HHPurchItemCntEv := RIGHT.HHPurchItemCntEv;
+                                                SELF.HHPurchAmtAvg := MAP(RIGHT.HHPurchTotEv < 0 => RIGHT.HHPurchTotEv,
+                                                                                                        RIGHT.HHPurchCntEv < 0 => RIGHT.HHPurchCntEv,
+                                                                                                        RIGHT.HHPurchTotEv / RIGHT.HHPurchCntEv);
+                                                SELF := LEFT), 
+                                                LEFT OUTER);
+   
 /*   //append relatives' average income
    	withRelaIncome := join(finalRollup, tRelaIncome,  
    												left.seq = right.seq,
@@ -605,7 +637,7 @@ BOOLEAN DEBUG := FALSE;
 	// Now that we have all necessary data in the PB2Shell, pass it to the attributes function to produce the attributes
 	// *******************************************************************************************************************
   attributes := if(std.Str.ToUpperCase(AttributesVersion) in ProfileBooster.Constants.setValidAttributeVersionsV2 OR domodel, //if valid attributes version requested, go get attributes
-									 ProfileBooster.V2_getAttributes(finalRollup, DataPermissionMask),
+									 ProfileBooster.V2_getAttributes(withPurchaseBehavior, DataPermissionMask),
 									 emptyAttr);  
 									 
 	withIncome := ProfileBooster.V2_estimatedIncome(attributes);
@@ -663,7 +695,7 @@ BOOLEAN DEBUG := FALSE;
  
   // output(slimShell,,'~dvstemp::out::profilebooster::slimshell_' + thorlib.wuid());
   // output(choosen(bestInfoLexID,100), named('bestInfoLexID'));
-  output(choosen(PB2_In,100), named('PB2_In'));
+  // output(choosen(PB2_In,100), named('PB2_In'));
   // output(choosen(did_prepped_output,100), named('did_prepped_output'));
   // output(choosen(highestDIDScore,100), named('highestDIDScore'));
 	// output(with_mover_model, named('with_mover_model'));
@@ -680,7 +712,7 @@ BOOLEAN DEBUG := FALSE;
   // output(withInfutor, named('withInfutor'));
   // output(withInputBus, named('withInputBus'));
   // output(withCurrBus, named('withCurrBus'));
-  // output(hhDIDs, named('hhDIDs'));
+  // output(CHOOSEN(hhDIDs,100), named('hhDIDs'));
   // output(relativeDIDs, named('relativeDIDs'));
   // output(allDIDs, named('allDIDs'));
   // output(uniqueDIDs, named('uniqueDIDs'));
@@ -742,8 +774,8 @@ BOOLEAN DEBUG := FALSE;
 	// output(count(withLexIDKey(dt_first_seen<>0)), named('V2SF_withLexIDKey_Cnt_DFSeen'));
 	// output(count(withLexIDKey(dt_last_seen<>201901)), named('V2SF_withLexIDKey_Cnt_DLSeen'));
   // output(choosen(withVerification, 100), named('V2SF_withVerification'));
-  output(withLexIDKey,,'~jfrancis::out::PB20_withLexIDKey_ROXIE',CSV(HEADING(single), QUOTE('"')),OVERWRITE);
-  output(finalRollup,,'~jfrancis::out::PB20_finalRollup_ROXIE',CSV(HEADING(single), QUOTE('"')),OVERWRITE);
+  // output(withLexIDKey,,'~jfrancis::out::PB20_withLexIDKey_ROXIE',CSV(HEADING(single), QUOTE('"')),OVERWRITE);
+  // output(finalRollup,,'~jfrancis::out::PB20_finalRollup_ROXIE',CSV(HEADING(single), QUOTE('"')),OVERWRITE);
   // output(choosen(withWatchdog, 100), named('V2SF_withWatchdog'));
   // output(choosen(withInfutorNARC, 100), named('V2SF_withInfutorNARC'));
   // output(choosen(withCurrAddressKey, 100), named('V2SF_withCurrAddressKey'));
@@ -755,12 +787,10 @@ BOOLEAN DEBUG := FALSE;
   // output(choosen(BlankMinors, 100), named('V2SF_BlankMinors'));
   // output(count(attributes), named('V2SF_attributesCnt'));
   // output(choosen(Final, 100), named('V2SF_Final'));
-
-testdids := [1653020855,2688684342,1765560556,2304428264,781043815];
-output(withCurrAddressKey(did in testdids),named('withCurrAddressKeySample'));
-output(PropertyCommon(did2 in testdids),named('PropertyCommonSample'));
-output(withPropertyCommon(did in testdids),named('withPropertyCommonSample'));
-
+// testdids := [1653020855,2688684342,1765560556,2304428264,781043815];
+// output(withCurrAddressKey(did in testdids),named('withCurrAddressKeySample'));
+// output(PropertyCommon(did2 in testdids),named('PropertyCommonSample'));
+// output(withPropertyCommon(did in testdids),named('withPropertyCommonSample'));
 
 /* ********************/
 

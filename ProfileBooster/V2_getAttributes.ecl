@@ -7,6 +7,7 @@ EXPORT V2_getAttributes(DATASET(ProfileBooster.V2_Layouts.Layout_PB2_Shell) PB2S
     nines	  := 9999999;
     noDid 	:= le.did = 0;
     isMinor := (le.ProspectAge > 0 and le.ProspectAge < 18); //check to see if person is a minor
+    noHHID := le.HHID = 0;
     self.seq																							:= le.seq;
     self.AcctNo																						:= le.AcctNo;
     self.LexID																						:= le.did;
@@ -689,7 +690,9 @@ EXPORT V2_getAttributes(DATASET(ProfileBooster.V2_Layouts.Layout_PB2_Shell) PB2S
     self.attributes.version2.ShortTermShopCnt1Y	            := IF(noDid or isMinor, -99999, MIN(le.ShortTermShopCnt1Y,ProfileBooster.V2_Constants.Max960));	
     
     //HOUSEHOLD ATTRIBUTES
-    self.attributes.version2.HHID                           := IF(noDid or isMinor, -99999, MIN(le.HHID,ProfileBooster.V2_Constants.Max999999999));	
+    self.attributes.version2.HHID                           := MAP(noDid or isMinor => -99999,
+                                                                   noHHID => -99998,
+                                                                   MIN(le.HHID,ProfileBooster.V2_Constants.Max999999999999999));	
     //include our prospect in the appropriate age bucket for household members
     HHTeenagerMmbrCnt			                                  := le.HHTeenagerMmbrCnt + IF((integer)le.DemAge between 13 and 19, 1, 0);
     HHYoungAdultMmbrCnt		                                  := le.HHYoungAdultMmbrCnt + IF((integer)le.DemAge between 20 and 39, 1, 0);
@@ -759,13 +762,29 @@ EXPORT V2_getAttributes(DATASET(ProfileBooster.V2_Layouts.Layout_PB2_Shell) PB2S
     
     self.attributes.version2.HHMmbrWIntSportCnt	            := IF(noDid or isMinor, -99999, MIN(le.HHMmbrWIntSportCnt,ProfileBooster.V2_Constants.Max255));	
     
-    self.attributes.version2.HHPurchNewAmt	                := IF(noDid or isMinor, -99999, MIN(le.HHPurchNewAmt,ProfileBooster.V2_Constants.Max9999));	
-    self.attributes.version2.HHPurchTotEv	                  := IF(noDid or isMinor, -99999, MIN(le.HHPurchTotEv,ProfileBooster.V2_Constants.Max9999));	
-    self.attributes.version2.HHPurchCntEv	                  := IF(noDid or isMinor, -99999, MIN(le.HHPurchCntEv,ProfileBooster.V2_Constants.Max9999));	
-    self.attributes.version2.HHPurchNewMsnc	                := IF(noDid or isMinor, -99999, MIN(le.HHPurchNewMsnc,ProfileBooster.V2_Constants.Max9999));	
-    self.attributes.version2.HHPurchOldMsnc	                := IF(noDid or isMinor, -99999, MIN(le.HHPurchOldMsnc,ProfileBooster.V2_Constants.Max9999));	
-    self.attributes.version2.HHPurchItemCntEv	              := IF(noDid or isMinor, -99999, MIN(le.HHPurchItemCntEv,ProfileBooster.V2_Constants.Max9999));	
-    self.attributes.version2.HHPurchAmtAvg	                := IF(noDid or isMinor, -99999, MIN(le.HHPurchAmtAvg,ProfileBooster.V2_Constants.Max9999));	
+    self.attributes.version2.HHPurchNewAmt	                := MAP(noDid or isMinor or noHHID => -99999, 
+                                                                                                          le.HHPurchNewAmt < 0 => -99997,
+                                                                                                          MIN(le.HHPurchNewAmt,ProfileBooster.V2_Constants.Max9999));	
+    self.attributes.version2.HHPurchTotEv	                  := MAP(noDid or isMinor or noHHID => -99999, 
+                                                                                                          le.HHPurchTotEv < 0 => -99997,
+                                                                                                          MIN(le.HHPurchTotEv,ProfileBooster.V2_Constants.Max99999));	
+    self.attributes.version2.HHPurchCntEv	                  := MAP(noDid or isMinor or noHHID => -99999, 
+                                                                                                          le.HHPurchCntEv < 0 => 0,
+                                                                                                          MIN(le.HHPurchCntEv,ProfileBooster.V2_Constants.Max999));
+    self.attributes.version2.HHPurchNewMsnc	                := MAP(noDid or isMinor or noHHID => -99999, 
+                                                                                                          le.HHPurchNewMsnc < 0 => -99997,
+                                                                                                          le.HHPurchNewMsnc = 0 OR le.HHPurchNewMsnc = 99998 => -99998,
+                                                                                                          MIN(le.HHPurchNewMsnc,ProfileBooster.V2_Constants.Max999));
+    self.attributes.version2.HHPurchOldMsnc	                := MAP(noDid or isMinor or noHHID => -99999, 
+                                                                                                          le.HHPurchOldMsnc < 0 => -99997,
+                                                                                                          le.HHPurchOldMsnc = 0 OR le.HHPurchOldMsnc = 99998 => -99998,
+                                                                                                          MIN(le.HHPurchOldMsnc,ProfileBooster.V2_Constants.Max999));
+    self.attributes.version2.HHPurchItemCntEv	              := MAP(noDid or isMinor or noHHID => -99999, 
+                                                                                                          le.HHPurchItemCntEv < 0 => -99997,
+                                                                                                          MIN(le.HHPurchItemCntEv,ProfileBooster.V2_Constants.Max999));
+    self.attributes.version2.HHPurchAmtAvg	                := MAP(noDid or isMinor or noHHID => -99999, 
+                                                                                                          le.HHPurchAmtAvg < 0 => -99997,
+                                                                                                          MIN(le.HHPurchAmtAvg,ProfileBooster.V2_Constants.Max9999));	
 
     self.attributes.version2.HHAstVehAutoCarCntEv	          := IF(noDid or isMinor, -99999, MIN(le.HHAstVehAutoCarCntEv,ProfileBooster.V2_Constants.Max9999));	
     self.attributes.version2.HHAstVehAutoCntEv	            := IF(noDid or isMinor, -99999, MIN(le.HHAstVehAutoCntEv,ProfileBooster.V2_Constants.Max9999));	
