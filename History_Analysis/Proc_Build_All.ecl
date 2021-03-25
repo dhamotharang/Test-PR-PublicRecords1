@@ -33,7 +33,7 @@ Export Proc_Build_All( string pVersion, string datasetname, string location, str
 
     DeltasStats := History_Analysis.Filenames(pVersion).BaseStatistics;
     
-    destdirectory := '/data/Builds/builds/Prod_History_Dashboard/data';
+    destdirectory := '/data/Builds/builds/Prod_History_Dashboard/data/';
 
     desprayDeltaUpdateQA := STD.File.DeSpray(DeltaUpdateQA, destinationIP, destdirectory+'DeltaBase-UpdateQA.csv', allowoverwrite := true );
 

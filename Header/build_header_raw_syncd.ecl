@@ -1,4 +1,4 @@
-﻿import PromoteSupers,ut,mdr,Data_Services,std,InsuranceHeader;
+﻿import PromoteSupers,ut,mdr,Data_Services,std,InsuranceHeader,mdr;
 pairs:=distribute(dataset(Filename_iHeader_did_rid,header.Layout_LAB_Pairs,flat),hash(rid));
 PromoteSupers.MAC_SF_BuildProcess(pairs,Data_Services.Data_Location.Prefix('Header')+'thor_data400::base::iheader_did_rid',copy_pairs,3,,true,pVersion:=Header.version_build);
 
@@ -14,7 +14,7 @@ droppedRidsBlankCnt:=   count(droppedRids(lname ='' ,  fname =''));
 duplicateRidsCount :=   count(table(Header.File_LAB_Pairs,{rid, rid_cnt := count(group)},rid,few,merge)(rid_cnt>1));
 
 //post Alpharetta DID to Boca DID if LAB build
-header_raw_syncd:=InsuranceHeader.File_InsuranceHeader_Payload;
+header_raw_syncd:=InsuranceHeader.File_InsuranceHeader_Payload(src<>mdr.sourceTools.src_Voters_v2_block);
 
 r:={string17 eventstamp:='',string800 eventdesc:=''};
 

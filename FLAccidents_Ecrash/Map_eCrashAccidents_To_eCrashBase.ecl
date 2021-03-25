@@ -1,11 +1,8 @@
-﻿EXPORT map_basefile(STRING filedate) := FUNCTION
-
-IMPORT FLAccidents, Address, ut, driversv2, STD, scrubs, scrubs_ecrash, nid, PromoteSupers;
+﻿IMPORT STD, ut, FLAccidents, Address;
 
   eCrashCombined := Infiles.eCrashCmbnd;
   vina	:= DISTRIBUTE(FLAccidents.File_VINA, HASH32(Vin_Input));
-  dvina := DEDUP(SORT(vina, Vin_Input, -((UNSIGNED)Model_Year), RECORD, LOCAL), Vin_Input, LOCAL):PERSIST('~thor_data400::persist::ecrash_vina');
-  AgencyCombined := Infiles.Agencycmbnd;
+  dvina := DEDUP(SORT(vina, Vin_Input, -((UNSIGNED)Model_Year), RECORD, LOCAL), Vin_Input, LOCAL);
 	
 // #############################################################################################
 // Clean names and addresses then append vina info
@@ -237,7 +234,7 @@ IMPORT FLAccidents, Address, ut, driversv2, STD, scrubs, scrubs_ecrash, nid, Pro
   END;
   peCrashNoVin := PROJECT(eCrashPreClean(vin = ''), teCrashNoVin(LEFT));
 			
-  eCrashClean := jeCrashVin_Vina + peCrashNoVin:PERSIST('~thor_data400::persist::ecrash_clean');
+  eCrashClean := jeCrashVin_Vina + peCrashNoVin;
 	
 // #############################################################################################
 // Append DID using lfname and dl match --bug # 48839
@@ -247,85 +244,33 @@ IMPORT FLAccidents, Address, ut, driversv2, STD, scrubs, scrubs_ecrash, nid, Pro
 // #############################################################################################
 // Join eCrash Reports with Supplemental Reports to get super_report_id
 // #############################################################################################
-  eCrashAccidents := DEDUP(SORT(DISTRIBUTE(eCrashADL, HASH32(incident_id)), RECORD, LOCAL), RECORD, LOCAL):PERSIST('~thor_data400::persist::ecrash_did');	
-	dsSupplemental := DISTRIBUTE(Files.base.Supplemental, HASH32(incident_id)); 
-	jeCrash_Supplemental := JOIN(eCrashAccidents, dsSupplemental, 
-												       LEFT.incident_id = RIGHT.incident_id, 
-												       TRANSFORM(Layout_Basefile,
-																         SELF.super_report_id := RIGHT.super_report_id,
-																				 SELF := LEFT), LEFT OUTER, LOCAL); 
-										 
-// #############################################################################################
-// Apply Scrubs to eCrash reports
-// #############################################################################################	
-	eCrashScrub := PROJECT(jeCrash_Supplemental, Layouts.scrubs);	
-	eCrashScrubStep1 := scrubs_ecrash.Scrubs.FromNone(eCrashScrub);
-  maxprocessdate := MAX(eCrashScrubStep1.ExpandedInFile(date_vendor_last_reported [1..2]= '20'), date_vendor_last_reported);
-	eCrashScrubStep2 := scrubs_ecrash.Scrubs.FromExpanded(eCrashScrubStep1.ExpandedInFile(date_vendor_last_reported = maxprocessdate)); 
+  eCrashAccidents := DEDUP(SORT(DISTRIBUTE(eCrashADL, HASH32(incident_id)), RECORD, LOCAL), RECORD, LOCAL);	
+	dsSupplemental := DISTRIBUTE(Files_eCrash.DS_BASE_SUPPLEMENTAL, HASH32(incident_id)); 
 	
-//Generate Scrub reports, send it to Orbit and output report with invalid examples in WU 
-	eCrashOrbitstats := eCrashScrubStep2.OrbitStats():PERSIST('~persist::ecrash_scrubs_rpt');
-//Submits stats to Orbit
-	eCrashSubmitStats := Scrubs.OrbitProfileStats('Scrubs_eCrash',, eCrashOrbitstats, filedate).SubmitStats;
-//Output Scrubs report with examples in WU
-	eCrashScrubsReportWithExamples := Scrubs.OrbitProfileStats('Scrubs_eCrash',, eCrashOrbitstats, filedate).CompareToProfile_with_examples;
-//Send Alerts and Scrubs reports via email 
-	eCrashScrubsAlert := eCrashScrubsReportWithExamples(RejectWarning = 'Y');
-	attachment := Scrubs.fn_email_attachment(eCrashScrubsAlert);	
-  mailfile := STD.System.Email.SendEmailAttachData ('DataDevelopment-InsRiskeCrash@lexisnexisrisk.com; sudhir.kasavajjala@lexisnexis.com',
-																						        'Scrubs eCrash Report ', //subject
-																						        'Scrubs eCrash Report ', //body
-																						        (data)attachment,
-																						        'text/csv',
-																						        'ScrubsReport.csv',
-																						        ,
-																					          ,
-																						        'sudhir.kasavajjala@lexisnexis.com');	
-  //append bitmap to base
-  eCrashAccidentsAll := PROJECT(eCrashScrubStep1.BitmapInfile, Layout_Basefile):PERSIST('~thor_data400::persist::ecrash_base'); 
-											 
+	jneCrash_Suppl := JOIN(eCrashAccidents, dsSupplemental, 
+                        LEFT.incident_id = RIGHT.incident_id, 
+                        TRANSFORM(Layout_Basefile,
+                                  SELF.super_report_id := RIGHT.super_report_id,
+                                  SELF := LEFT), LEFT OUTER, LOCAL);
+	
 // #############################################################################################
-// Insurance eCrashSlim Base file
-// #############################################################################################	
-  Layout_InseCrashSlim t_eCrashSlim(eCrashAccidentsAll L) := TRANSFORM
-	  //fabricated
-		SELF.accident_nbr := IF(L.source_id IN ['TM','TF'], L.state_report_number, L.case_identifier);
-		SELF.accident_date := IF(L.incident_id[1..9] = '188188188', '20100901', L.crash_date);
-		SELF.impact_location := IF(L.report_code = 'TM',
-                               IF(L.initial_point_of_contact[1..25] <> '','Damaged_Area_1: ' + L.initial_point_of_contact[1..25], '')
-															 +
-														   IF(L.initial_point_of_contact[25..] <> '','Damaged_Area_2: ' + L.initial_point_of_contact[25..], ''),
-														   IF(L.damaged_areas_derived1 <> '', 'Damaged_Area_1: ' + L.damaged_areas_derived1, '') 
-															 +
-															 IF(L.damaged_areas_derived2 <> '','Damaged_Area_2: ' + L.damaged_areas_derived2,'')
-														  );
-		SELF := L;
-	END;
-	pInseCrashSlim := PROJECT(eCrashAccidentsAll, t_eCrashSlim(LEFT)):PERSIST('~thor_data400::persist::InseCrashSlim_base', SINGLE);
-											 
-// #############################################################################################
-// Build & Promote Base files
-// 1) eCrashBase 2) InseCrashSlimBase 3) SupplementalBase
-// 4) DocumentBase 5) AgencyBase
-// #############################################################################################			
- 	PromoteSupers.Mac_SF_BuildProcess(eCrashAccidentsAll, '~thor_data400::base::ecrash', BuildeCrashBase, , , TRUE);
- 	PromoteSupers.Mac_SF_BuildProcess(pInseCrashSlim, '~thor_data400::base::InseCrashSlim', BuildInseCrashSlimBase , , , TRUE);
-  PromoteSupers.Mac_SF_BuildProcess(BuildSuppmentalReports.compare_add_new, '~thor_data400::base::ecrash_supplemental', BuildSupplementalBase, , , TRUE);
-	PromoteSupers.Mac_SF_BuildProcess(BuildPhotoFile.CmbndPhotos, '~thor_data400::base::ecrash_documents', BuildPhotoIDBase, , , TRUE);
-	PromoteSupers.Mac_SF_BuildProcess(AgencyCombined, '~thor_data400::base::agency_cmbnd', BuildAgencyCmbndBase, , , TRUE);
+// Remove Suppress & Delete Records
+// #############################################################################################																														 
+	rmeCrashCaseID := jneCrash_Suppl(~(TRIM(case_identifier, LEFT, RIGHT) IN Suppress_Id AND 
+	                                   report_code IN ['EA', 'TF']));																		 
+	rmeCrashRptID	:= rmeCrashCaseID(TRIM(report_id, LEFT, RIGHT) NOT IN Suppress_report_d);
+	
+	rmeCrashIncID := rmeCrashRptID(incident_id NOT IN supress_incident_id and incident_id NOT IN SET(Files_eCrash.DS_BASE_SUPPRESS_INCIDENTS, Incident_ID));
+	
+	jnIncID_Deletes	:= JOIN(rmeCrashIncID, Files_eCrash.DS_BASE_ECRASH_DELETES, 
+                          TRIM(LEFT.case_identifier, LEFT, RIGHT) = TRIM(RIGHT.case_identifier, LEFT, RIGHT) AND 
+                          TRIM(LEFT.State_Report_Number, LEFT, RIGHT) = TRIM(RIGHT.State_Report_Number, LEFT, RIGHT) AND 
+                          TRIM(LEFT.Source_ID , LEFT, RIGHT)= TRIM(RIGHT.Source_ID , LEFT, RIGHT)AND 
+                          TRIM(LEFT.Loss_State_Abbr, LEFT, RIGHT) = TRIM(RIGHT.Loss_State_Abbr, LEFT, RIGHT) AND 
+                          TRIM(LEFT.Crash_Date, LEFT, RIGHT) = STD.Str.FilterOut(TRIM(RIGHT.Crash_Date, LEFT, RIGHT),'-') AND 
+                          TRIM(LEFT.Agency_ID, LEFT, RIGHT) = TRIM(RIGHT.Agency_ID, LEFT, RIGHT) AND 
+                          TRIM(LEFT.Work_Type_ID , LEFT, RIGHT)= TRIM(RIGHT.Work_Type_ID, LEFT, RIGHT), MANY LOOKUP, LEFT ONLY );
+ 
+  deCrashAccidents := DISTRIBUTE(jnIncID_Deletes, HASH32(incident_id));									 
 
-RETURN SEQUENTIAL(BuildSupplementalBase,
-                  eCrashSubmitStats,
-		              OUTPUT(eCrashScrubsReportWithExamples, ALL, NAMED('ScrubsReportWithExamples')),
-		              IF(COUNT(eCrashScrubsAlert) > 1, mailfile, OUTPUT('No_Scrubs_Alerts')),
-                  BuildeCrashBase,
-									BuildInseCrashSlimBase,
-									BuildPhotoIDBase,
-									BuildAgencyCmbndBase,
-									fn_Validate,
-									Proc_Build_Consolidation(filedate),
-									//Validate CRU Base file count -- DF-27413
-		              FLAccidents_Ecrash.fn_Validate_cru(filedate) 
-								 );
-
-END;
+EXPORT Map_eCrashAccidents_To_eCrashBase := deCrashAccidents;
