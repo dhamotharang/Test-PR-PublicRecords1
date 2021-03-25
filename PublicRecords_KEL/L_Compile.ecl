@@ -7808,6 +7808,17 @@ EXPORT L_Compile := MODULE
     KEL.typ.epoch Vault_Date_Last_Seen_ := 0;
     KEL.typ.int __RecordCount := 0;
   END;
+  SHARED Index_Build_Entity_Res22_Internal_Layout_Short_Term_Loans_Sorted_Layout := RECORD
+    KEL.typ.nstr Loan_Date_First_Seen_;
+    KEL.typ.nint Loan_Age_In_Days_;
+    KEL.typ.nstr Source_;
+    KEL.typ.epoch Archive___Date_ := 0;
+    KEL.typ.epoch Date_First_Seen_ := 0;
+    KEL.typ.epoch Date_Last_Seen_ := 0;
+    KEL.typ.epoch Hybrid_Archive_Date_ := 0;
+    KEL.typ.epoch Vault_Date_Last_Seen_ := 0;
+    KEL.typ.int __RecordCount := 0;
+  END;
   SHARED Index_Build_Entity_Res22_Internal_Layout_Suits7_Y_List_Sorted_Layout := RECORD
     KEL.typ.nstr Amount_;
     KEL.typ.nstr Original_Filing_Date_;
@@ -9452,7 +9463,11 @@ EXPORT L_Compile := MODULE
     KEL.typ.nint P_L___S_T_L_Cnt1_Y_;
     KEL.typ.nint P_L___S_T_L_Cnt2_Y_;
     KEL.typ.nint P_L___S_T_L_Cnt5_Y_;
+    KEL.typ.nint P_L___S_T_L_Cnt_Ev_;
     KEL.typ.nstr P_L___S_T_L_Dt_List5_Y_;
+    KEL.typ.nstr P_L___S_T_L_Dt_List_Ev_;
+    KEL.typ.nstr P_L___S_T_L_New_Dt_Ev_;
+    KEL.typ.nstr P_L___S_T_L_Old_Dt_Ev_;
     KEL.typ.nint P_L___Srch_Addr_Per_Lex_I_D_Cnt1_Y_;
     KEL.typ.nint P_L___Srch_Auto_Cnt5_Y_;
     KEL.typ.nstr P_L___Srch_Auto_Dt_List5_Y_;
@@ -9668,6 +9683,7 @@ EXPORT L_Compile := MODULE
     KEL.typ.ndataset(Index_Build_Entity_Res22_Internal_Layout_Short_Term_Loans2_Y_Sorted_Layout) Short_Term_Loans2_Y_Sorted_;
     KEL.typ.nstr Short_Term_Loans5_Y_List_;
     KEL.typ.ndataset(Index_Build_Entity_Res22_Internal_Layout_Short_Term_Loans5_Y_Sorted_Layout) Short_Term_Loans5_Y_Sorted_;
+    KEL.typ.ndataset(Index_Build_Entity_Res22_Internal_Layout_Short_Term_Loans_Sorted_Layout) Short_Term_Loans_Sorted_;
     KEL.typ.nstr Suit7_Y_New_Date_;
     KEL.typ.nstr Suit7_Y_Old_Date_;
     KEL.typ.ndataset(Index_Build_Entity_Res22_Internal_Layout_Suits7_Y_List_Sorted_Layout) Suits7_Y_List_Sorted_;
@@ -12849,6 +12865,17 @@ EXPORT L_Compile := MODULE
     KEL.typ.epoch Vault_Date_Last_Seen_ := 0;
     KEL.typ.int __RecordCount := 0;
   END;
+  SHARED Index_Build_Association_Res4_Internal_Layout_Short_Term_Loans_Sorted_Layout := RECORD
+    KEL.typ.nstr Loan_Date_First_Seen_;
+    KEL.typ.nint Loan_Age_In_Days_;
+    KEL.typ.nstr Source_;
+    KEL.typ.epoch Archive___Date_ := 0;
+    KEL.typ.epoch Date_First_Seen_ := 0;
+    KEL.typ.epoch Date_Last_Seen_ := 0;
+    KEL.typ.epoch Hybrid_Archive_Date_ := 0;
+    KEL.typ.epoch Vault_Date_Last_Seen_ := 0;
+    KEL.typ.int __RecordCount := 0;
+  END;
   SHARED Index_Build_Association_Res4_Internal_Layout_Suits7_Y_List_Sorted_Layout := RECORD
     KEL.typ.nstr Amount_;
     KEL.typ.nstr Original_Filing_Date_;
@@ -14493,7 +14520,11 @@ EXPORT L_Compile := MODULE
     KEL.typ.nint P_L___S_T_L_Cnt1_Y_;
     KEL.typ.nint P_L___S_T_L_Cnt2_Y_;
     KEL.typ.nint P_L___S_T_L_Cnt5_Y_;
+    KEL.typ.nint P_L___S_T_L_Cnt_Ev_;
     KEL.typ.nstr P_L___S_T_L_Dt_List5_Y_;
+    KEL.typ.nstr P_L___S_T_L_Dt_List_Ev_;
+    KEL.typ.nstr P_L___S_T_L_New_Dt_Ev_;
+    KEL.typ.nstr P_L___S_T_L_Old_Dt_Ev_;
     KEL.typ.nint P_L___Srch_Addr_Per_Lex_I_D_Cnt1_Y_;
     KEL.typ.nint P_L___Srch_Auto_Cnt5_Y_;
     KEL.typ.nstr P_L___Srch_Auto_Dt_List5_Y_;
@@ -14709,6 +14740,7 @@ EXPORT L_Compile := MODULE
     KEL.typ.ndataset(Index_Build_Association_Res4_Internal_Layout_Short_Term_Loans2_Y_Sorted_Layout) Short_Term_Loans2_Y_Sorted_;
     KEL.typ.nstr Short_Term_Loans5_Y_List_;
     KEL.typ.ndataset(Index_Build_Association_Res4_Internal_Layout_Short_Term_Loans5_Y_Sorted_Layout) Short_Term_Loans5_Y_Sorted_;
+    KEL.typ.ndataset(Index_Build_Association_Res4_Internal_Layout_Short_Term_Loans_Sorted_Layout) Short_Term_Loans_Sorted_;
     KEL.typ.nstr Suit7_Y_New_Date_;
     KEL.typ.nstr Suit7_Y_Old_Date_;
     KEL.typ.ndataset(Index_Build_Association_Res4_Internal_Layout_Suits7_Y_List_Sorted_Layout) Suits7_Y_List_Sorted_;
@@ -18946,6 +18978,17 @@ EXPORT L_Compile := MODULE
     KEL.typ.epoch Vault_Date_Last_Seen_ := 0;
     KEL.typ.int __RecordCount := 0;
   END;
+  SHARED Index_Build_Association_Res10_Internal_Layout_Short_Term_Loans_Sorted_Layout := RECORD
+    KEL.typ.nstr Loan_Date_First_Seen_;
+    KEL.typ.nint Loan_Age_In_Days_;
+    KEL.typ.nstr Source_;
+    KEL.typ.epoch Archive___Date_ := 0;
+    KEL.typ.epoch Date_First_Seen_ := 0;
+    KEL.typ.epoch Date_Last_Seen_ := 0;
+    KEL.typ.epoch Hybrid_Archive_Date_ := 0;
+    KEL.typ.epoch Vault_Date_Last_Seen_ := 0;
+    KEL.typ.int __RecordCount := 0;
+  END;
   SHARED Index_Build_Association_Res10_Internal_Layout_Suits7_Y_List_Sorted_Layout := RECORD
     KEL.typ.nstr Amount_;
     KEL.typ.nstr Original_Filing_Date_;
@@ -20590,7 +20633,11 @@ EXPORT L_Compile := MODULE
     KEL.typ.nint P_L___S_T_L_Cnt1_Y_;
     KEL.typ.nint P_L___S_T_L_Cnt2_Y_;
     KEL.typ.nint P_L___S_T_L_Cnt5_Y_;
+    KEL.typ.nint P_L___S_T_L_Cnt_Ev_;
     KEL.typ.nstr P_L___S_T_L_Dt_List5_Y_;
+    KEL.typ.nstr P_L___S_T_L_Dt_List_Ev_;
+    KEL.typ.nstr P_L___S_T_L_New_Dt_Ev_;
+    KEL.typ.nstr P_L___S_T_L_Old_Dt_Ev_;
     KEL.typ.nint P_L___Srch_Addr_Per_Lex_I_D_Cnt1_Y_;
     KEL.typ.nint P_L___Srch_Auto_Cnt5_Y_;
     KEL.typ.nstr P_L___Srch_Auto_Dt_List5_Y_;
@@ -20806,6 +20853,7 @@ EXPORT L_Compile := MODULE
     KEL.typ.ndataset(Index_Build_Association_Res10_Internal_Layout_Short_Term_Loans2_Y_Sorted_Layout) Short_Term_Loans2_Y_Sorted_;
     KEL.typ.nstr Short_Term_Loans5_Y_List_;
     KEL.typ.ndataset(Index_Build_Association_Res10_Internal_Layout_Short_Term_Loans5_Y_Sorted_Layout) Short_Term_Loans5_Y_Sorted_;
+    KEL.typ.ndataset(Index_Build_Association_Res10_Internal_Layout_Short_Term_Loans_Sorted_Layout) Short_Term_Loans_Sorted_;
     KEL.typ.nstr Suit7_Y_New_Date_;
     KEL.typ.nstr Suit7_Y_Old_Date_;
     KEL.typ.ndataset(Index_Build_Association_Res10_Internal_Layout_Suits7_Y_List_Sorted_Layout) Suits7_Y_List_Sorted_;
@@ -25197,6 +25245,17 @@ EXPORT L_Compile := MODULE
     KEL.typ.epoch Vault_Date_Last_Seen_ := 0;
     KEL.typ.int __RecordCount := 0;
   END;
+  SHARED Index_Build_Association_Res22_Internal_Layout_Short_Term_Loans_Sorted_Layout := RECORD
+    KEL.typ.nstr Loan_Date_First_Seen_;
+    KEL.typ.nint Loan_Age_In_Days_;
+    KEL.typ.nstr Source_;
+    KEL.typ.epoch Archive___Date_ := 0;
+    KEL.typ.epoch Date_First_Seen_ := 0;
+    KEL.typ.epoch Date_Last_Seen_ := 0;
+    KEL.typ.epoch Hybrid_Archive_Date_ := 0;
+    KEL.typ.epoch Vault_Date_Last_Seen_ := 0;
+    KEL.typ.int __RecordCount := 0;
+  END;
   SHARED Index_Build_Association_Res22_Internal_Layout_Suits7_Y_List_Sorted_Layout := RECORD
     KEL.typ.nstr Amount_;
     KEL.typ.nstr Original_Filing_Date_;
@@ -26841,7 +26900,11 @@ EXPORT L_Compile := MODULE
     KEL.typ.nint P_L___S_T_L_Cnt1_Y_;
     KEL.typ.nint P_L___S_T_L_Cnt2_Y_;
     KEL.typ.nint P_L___S_T_L_Cnt5_Y_;
+    KEL.typ.nint P_L___S_T_L_Cnt_Ev_;
     KEL.typ.nstr P_L___S_T_L_Dt_List5_Y_;
+    KEL.typ.nstr P_L___S_T_L_Dt_List_Ev_;
+    KEL.typ.nstr P_L___S_T_L_New_Dt_Ev_;
+    KEL.typ.nstr P_L___S_T_L_Old_Dt_Ev_;
     KEL.typ.nint P_L___Srch_Addr_Per_Lex_I_D_Cnt1_Y_;
     KEL.typ.nint P_L___Srch_Auto_Cnt5_Y_;
     KEL.typ.nstr P_L___Srch_Auto_Dt_List5_Y_;
@@ -27057,6 +27120,7 @@ EXPORT L_Compile := MODULE
     KEL.typ.ndataset(Index_Build_Association_Res22_Internal_Layout_Short_Term_Loans2_Y_Sorted_Layout) Short_Term_Loans2_Y_Sorted_;
     KEL.typ.nstr Short_Term_Loans5_Y_List_;
     KEL.typ.ndataset(Index_Build_Association_Res22_Internal_Layout_Short_Term_Loans5_Y_Sorted_Layout) Short_Term_Loans5_Y_Sorted_;
+    KEL.typ.ndataset(Index_Build_Association_Res22_Internal_Layout_Short_Term_Loans_Sorted_Layout) Short_Term_Loans_Sorted_;
     KEL.typ.nstr Suit7_Y_New_Date_;
     KEL.typ.nstr Suit7_Y_Old_Date_;
     KEL.typ.ndataset(Index_Build_Association_Res22_Internal_Layout_Suits7_Y_List_Sorted_Layout) Suits7_Y_List_Sorted_;
@@ -30285,6 +30349,17 @@ EXPORT L_Compile := MODULE
     KEL.typ.epoch Vault_Date_Last_Seen_ := 0;
     KEL.typ.int __RecordCount := 0;
   END;
+  SHARED Index_Build_Association_Res40_Internal_Layout_Short_Term_Loans_Sorted_Layout := RECORD
+    KEL.typ.nstr Loan_Date_First_Seen_;
+    KEL.typ.nint Loan_Age_In_Days_;
+    KEL.typ.nstr Source_;
+    KEL.typ.epoch Archive___Date_ := 0;
+    KEL.typ.epoch Date_First_Seen_ := 0;
+    KEL.typ.epoch Date_Last_Seen_ := 0;
+    KEL.typ.epoch Hybrid_Archive_Date_ := 0;
+    KEL.typ.epoch Vault_Date_Last_Seen_ := 0;
+    KEL.typ.int __RecordCount := 0;
+  END;
   SHARED Index_Build_Association_Res40_Internal_Layout_Suits7_Y_List_Sorted_Layout := RECORD
     KEL.typ.nstr Amount_;
     KEL.typ.nstr Original_Filing_Date_;
@@ -31929,7 +32004,11 @@ EXPORT L_Compile := MODULE
     KEL.typ.nint P_L___S_T_L_Cnt1_Y_;
     KEL.typ.nint P_L___S_T_L_Cnt2_Y_;
     KEL.typ.nint P_L___S_T_L_Cnt5_Y_;
+    KEL.typ.nint P_L___S_T_L_Cnt_Ev_;
     KEL.typ.nstr P_L___S_T_L_Dt_List5_Y_;
+    KEL.typ.nstr P_L___S_T_L_Dt_List_Ev_;
+    KEL.typ.nstr P_L___S_T_L_New_Dt_Ev_;
+    KEL.typ.nstr P_L___S_T_L_Old_Dt_Ev_;
     KEL.typ.nint P_L___Srch_Addr_Per_Lex_I_D_Cnt1_Y_;
     KEL.typ.nint P_L___Srch_Auto_Cnt5_Y_;
     KEL.typ.nstr P_L___Srch_Auto_Dt_List5_Y_;
@@ -32145,6 +32224,7 @@ EXPORT L_Compile := MODULE
     KEL.typ.ndataset(Index_Build_Association_Res40_Internal_Layout_Short_Term_Loans2_Y_Sorted_Layout) Short_Term_Loans2_Y_Sorted_;
     KEL.typ.nstr Short_Term_Loans5_Y_List_;
     KEL.typ.ndataset(Index_Build_Association_Res40_Internal_Layout_Short_Term_Loans5_Y_Sorted_Layout) Short_Term_Loans5_Y_Sorted_;
+    KEL.typ.ndataset(Index_Build_Association_Res40_Internal_Layout_Short_Term_Loans_Sorted_Layout) Short_Term_Loans_Sorted_;
     KEL.typ.nstr Suit7_Y_New_Date_;
     KEL.typ.nstr Suit7_Y_Old_Date_;
     KEL.typ.ndataset(Index_Build_Association_Res40_Internal_Layout_Suits7_Y_List_Sorted_Layout) Suits7_Y_List_Sorted_;
@@ -38241,6 +38321,17 @@ EXPORT L_Compile := MODULE
     KEL.typ.epoch Vault_Date_Last_Seen_ := 0;
     KEL.typ.int __RecordCount := 0;
   END;
+  SHARED Index_Build_Association_Res67_Internal_Layout_Short_Term_Loans_Sorted_Layout := RECORD
+    KEL.typ.nstr Loan_Date_First_Seen_;
+    KEL.typ.nint Loan_Age_In_Days_;
+    KEL.typ.nstr Source_;
+    KEL.typ.epoch Archive___Date_ := 0;
+    KEL.typ.epoch Date_First_Seen_ := 0;
+    KEL.typ.epoch Date_Last_Seen_ := 0;
+    KEL.typ.epoch Hybrid_Archive_Date_ := 0;
+    KEL.typ.epoch Vault_Date_Last_Seen_ := 0;
+    KEL.typ.int __RecordCount := 0;
+  END;
   SHARED Index_Build_Association_Res67_Internal_Layout_Suits7_Y_List_Sorted_Layout := RECORD
     KEL.typ.nstr Amount_;
     KEL.typ.nstr Original_Filing_Date_;
@@ -39885,7 +39976,11 @@ EXPORT L_Compile := MODULE
     KEL.typ.nint P_L___S_T_L_Cnt1_Y_;
     KEL.typ.nint P_L___S_T_L_Cnt2_Y_;
     KEL.typ.nint P_L___S_T_L_Cnt5_Y_;
+    KEL.typ.nint P_L___S_T_L_Cnt_Ev_;
     KEL.typ.nstr P_L___S_T_L_Dt_List5_Y_;
+    KEL.typ.nstr P_L___S_T_L_Dt_List_Ev_;
+    KEL.typ.nstr P_L___S_T_L_New_Dt_Ev_;
+    KEL.typ.nstr P_L___S_T_L_Old_Dt_Ev_;
     KEL.typ.nint P_L___Srch_Addr_Per_Lex_I_D_Cnt1_Y_;
     KEL.typ.nint P_L___Srch_Auto_Cnt5_Y_;
     KEL.typ.nstr P_L___Srch_Auto_Dt_List5_Y_;
@@ -40101,6 +40196,7 @@ EXPORT L_Compile := MODULE
     KEL.typ.ndataset(Index_Build_Association_Res67_Internal_Layout_Short_Term_Loans2_Y_Sorted_Layout) Short_Term_Loans2_Y_Sorted_;
     KEL.typ.nstr Short_Term_Loans5_Y_List_;
     KEL.typ.ndataset(Index_Build_Association_Res67_Internal_Layout_Short_Term_Loans5_Y_Sorted_Layout) Short_Term_Loans5_Y_Sorted_;
+    KEL.typ.ndataset(Index_Build_Association_Res67_Internal_Layout_Short_Term_Loans_Sorted_Layout) Short_Term_Loans_Sorted_;
     KEL.typ.nstr Suit7_Y_New_Date_;
     KEL.typ.nstr Suit7_Y_Old_Date_;
     KEL.typ.ndataset(Index_Build_Association_Res67_Internal_Layout_Suits7_Y_List_Sorted_Layout) Suits7_Y_List_Sorted_;
@@ -41670,6 +41766,17 @@ EXPORT L_Compile := MODULE
     KEL.typ.int __RecordCount := 0;
   END;
   SHARED Index_Build_Association_Res71_Internal_Layout_Short_Term_Loans5_Y_Sorted_Layout := RECORD
+    KEL.typ.nstr Loan_Date_First_Seen_;
+    KEL.typ.nint Loan_Age_In_Days_;
+    KEL.typ.nstr Source_;
+    KEL.typ.epoch Archive___Date_ := 0;
+    KEL.typ.epoch Date_First_Seen_ := 0;
+    KEL.typ.epoch Date_Last_Seen_ := 0;
+    KEL.typ.epoch Hybrid_Archive_Date_ := 0;
+    KEL.typ.epoch Vault_Date_Last_Seen_ := 0;
+    KEL.typ.int __RecordCount := 0;
+  END;
+  SHARED Index_Build_Association_Res71_Internal_Layout_Short_Term_Loans_Sorted_Layout := RECORD
     KEL.typ.nstr Loan_Date_First_Seen_;
     KEL.typ.nint Loan_Age_In_Days_;
     KEL.typ.nstr Source_;
@@ -43324,7 +43431,11 @@ EXPORT L_Compile := MODULE
     KEL.typ.nint P_L___S_T_L_Cnt1_Y_;
     KEL.typ.nint P_L___S_T_L_Cnt2_Y_;
     KEL.typ.nint P_L___S_T_L_Cnt5_Y_;
+    KEL.typ.nint P_L___S_T_L_Cnt_Ev_;
     KEL.typ.nstr P_L___S_T_L_Dt_List5_Y_;
+    KEL.typ.nstr P_L___S_T_L_Dt_List_Ev_;
+    KEL.typ.nstr P_L___S_T_L_New_Dt_Ev_;
+    KEL.typ.nstr P_L___S_T_L_Old_Dt_Ev_;
     KEL.typ.nint P_L___Srch_Addr_Per_Lex_I_D_Cnt1_Y_;
     KEL.typ.nint P_L___Srch_Auto_Cnt5_Y_;
     KEL.typ.nstr P_L___Srch_Auto_Dt_List5_Y_;
@@ -43540,6 +43651,7 @@ EXPORT L_Compile := MODULE
     KEL.typ.ndataset(Index_Build_Association_Res71_Internal_Layout_Short_Term_Loans2_Y_Sorted_Layout) Short_Term_Loans2_Y_Sorted_;
     KEL.typ.nstr Short_Term_Loans5_Y_List_;
     KEL.typ.ndataset(Index_Build_Association_Res71_Internal_Layout_Short_Term_Loans5_Y_Sorted_Layout) Short_Term_Loans5_Y_Sorted_;
+    KEL.typ.ndataset(Index_Build_Association_Res71_Internal_Layout_Short_Term_Loans_Sorted_Layout) Short_Term_Loans_Sorted_;
     KEL.typ.nstr Suit7_Y_New_Date_;
     KEL.typ.nstr Suit7_Y_Old_Date_;
     KEL.typ.ndataset(Index_Build_Association_Res71_Internal_Layout_Suits7_Y_List_Sorted_Layout) Suits7_Y_List_Sorted_;
@@ -46943,6 +47055,17 @@ EXPORT L_Compile := MODULE
     KEL.typ.epoch Vault_Date_Last_Seen_ := 0;
     KEL.typ.int __RecordCount := 0;
   END;
+  SHARED Index_Build_Association_Res73_Internal_Layout_Short_Term_Loans_Sorted_Layout := RECORD
+    KEL.typ.nstr Loan_Date_First_Seen_;
+    KEL.typ.nint Loan_Age_In_Days_;
+    KEL.typ.nstr Source_;
+    KEL.typ.epoch Archive___Date_ := 0;
+    KEL.typ.epoch Date_First_Seen_ := 0;
+    KEL.typ.epoch Date_Last_Seen_ := 0;
+    KEL.typ.epoch Hybrid_Archive_Date_ := 0;
+    KEL.typ.epoch Vault_Date_Last_Seen_ := 0;
+    KEL.typ.int __RecordCount := 0;
+  END;
   SHARED Index_Build_Association_Res73_Internal_Layout_Suits7_Y_List_Sorted_Layout := RECORD
     KEL.typ.nstr Amount_;
     KEL.typ.nstr Original_Filing_Date_;
@@ -48587,7 +48710,11 @@ EXPORT L_Compile := MODULE
     KEL.typ.nint P_L___S_T_L_Cnt1_Y_;
     KEL.typ.nint P_L___S_T_L_Cnt2_Y_;
     KEL.typ.nint P_L___S_T_L_Cnt5_Y_;
+    KEL.typ.nint P_L___S_T_L_Cnt_Ev_;
     KEL.typ.nstr P_L___S_T_L_Dt_List5_Y_;
+    KEL.typ.nstr P_L___S_T_L_Dt_List_Ev_;
+    KEL.typ.nstr P_L___S_T_L_New_Dt_Ev_;
+    KEL.typ.nstr P_L___S_T_L_Old_Dt_Ev_;
     KEL.typ.nint P_L___Srch_Addr_Per_Lex_I_D_Cnt1_Y_;
     KEL.typ.nint P_L___Srch_Auto_Cnt5_Y_;
     KEL.typ.nstr P_L___Srch_Auto_Dt_List5_Y_;
@@ -48803,6 +48930,7 @@ EXPORT L_Compile := MODULE
     KEL.typ.ndataset(Index_Build_Association_Res73_Internal_Layout_Short_Term_Loans2_Y_Sorted_Layout) Short_Term_Loans2_Y_Sorted_;
     KEL.typ.nstr Short_Term_Loans5_Y_List_;
     KEL.typ.ndataset(Index_Build_Association_Res73_Internal_Layout_Short_Term_Loans5_Y_Sorted_Layout) Short_Term_Loans5_Y_Sorted_;
+    KEL.typ.ndataset(Index_Build_Association_Res73_Internal_Layout_Short_Term_Loans_Sorted_Layout) Short_Term_Loans_Sorted_;
     KEL.typ.nstr Suit7_Y_New_Date_;
     KEL.typ.nstr Suit7_Y_Old_Date_;
     KEL.typ.ndataset(Index_Build_Association_Res73_Internal_Layout_Suits7_Y_List_Sorted_Layout) Suits7_Y_List_Sorted_;
@@ -51307,6 +51435,17 @@ EXPORT L_Compile := MODULE
     KEL.typ.epoch Vault_Date_Last_Seen_ := 0;
     KEL.typ.int __RecordCount := 0;
   END;
+  SHARED Index_Build_Association_Res79_Internal_Layout_Short_Term_Loans_Sorted_Layout := RECORD
+    KEL.typ.nstr Loan_Date_First_Seen_;
+    KEL.typ.nint Loan_Age_In_Days_;
+    KEL.typ.nstr Source_;
+    KEL.typ.epoch Archive___Date_ := 0;
+    KEL.typ.epoch Date_First_Seen_ := 0;
+    KEL.typ.epoch Date_Last_Seen_ := 0;
+    KEL.typ.epoch Hybrid_Archive_Date_ := 0;
+    KEL.typ.epoch Vault_Date_Last_Seen_ := 0;
+    KEL.typ.int __RecordCount := 0;
+  END;
   SHARED Index_Build_Association_Res79_Internal_Layout_Suits7_Y_List_Sorted_Layout := RECORD
     KEL.typ.nstr Amount_;
     KEL.typ.nstr Original_Filing_Date_;
@@ -52951,7 +53090,11 @@ EXPORT L_Compile := MODULE
     KEL.typ.nint P_L___S_T_L_Cnt1_Y_;
     KEL.typ.nint P_L___S_T_L_Cnt2_Y_;
     KEL.typ.nint P_L___S_T_L_Cnt5_Y_;
+    KEL.typ.nint P_L___S_T_L_Cnt_Ev_;
     KEL.typ.nstr P_L___S_T_L_Dt_List5_Y_;
+    KEL.typ.nstr P_L___S_T_L_Dt_List_Ev_;
+    KEL.typ.nstr P_L___S_T_L_New_Dt_Ev_;
+    KEL.typ.nstr P_L___S_T_L_Old_Dt_Ev_;
     KEL.typ.nint P_L___Srch_Addr_Per_Lex_I_D_Cnt1_Y_;
     KEL.typ.nint P_L___Srch_Auto_Cnt5_Y_;
     KEL.typ.nstr P_L___Srch_Auto_Dt_List5_Y_;
@@ -53167,6 +53310,7 @@ EXPORT L_Compile := MODULE
     KEL.typ.ndataset(Index_Build_Association_Res79_Internal_Layout_Short_Term_Loans2_Y_Sorted_Layout) Short_Term_Loans2_Y_Sorted_;
     KEL.typ.nstr Short_Term_Loans5_Y_List_;
     KEL.typ.ndataset(Index_Build_Association_Res79_Internal_Layout_Short_Term_Loans5_Y_Sorted_Layout) Short_Term_Loans5_Y_Sorted_;
+    KEL.typ.ndataset(Index_Build_Association_Res79_Internal_Layout_Short_Term_Loans_Sorted_Layout) Short_Term_Loans_Sorted_;
     KEL.typ.nstr Suit7_Y_New_Date_;
     KEL.typ.nstr Suit7_Y_Old_Date_;
     KEL.typ.ndataset(Index_Build_Association_Res79_Internal_Layout_Suits7_Y_List_Sorted_Layout) Suits7_Y_List_Sorted_;

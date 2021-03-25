@@ -5,8 +5,8 @@ IMPORT * FROM KEL15.Null;
 EXPORT B_Person_Accident_8(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG_Compile __cfg = CFG_Compile) := MODULE
   SHARED VIRTUAL TYPEOF(E_Accident(__in,__cfg).__Result) __E_Accident := E_Accident(__in,__cfg).__Result;
   SHARED VIRTUAL TYPEOF(E_Person_Accident(__in,__cfg).__Result) __E_Person_Accident := E_Person_Accident(__in,__cfg).__Result;
-  SHARED __EE411344 := __E_Person_Accident;
-  SHARED __ST411669_Layout := RECORD
+  SHARED __EE411683 := __E_Person_Accident;
+  SHARED __ST412008_Layout := RECORD
     KEL.typ.ntyp(E_Person().Typ) Subject_;
     KEL.typ.ntyp(E_Accident().Typ) Acc_;
     KEL.typ.nstr Point_Of_Impact_;
@@ -59,15 +59,15 @@ EXPORT B_Person_Accident_8(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault,
     KEL.typ.epoch Vault_Date_Last_Seen_ := 0;
     KEL.typ.int __RecordCount := 0;
   END;
-  SHARED __EE411258 := __E_Accident;
-  SHARED __EE411270 := __EE411258.Report_Codes_;
+  SHARED __EE411597 := __E_Accident;
+  SHARED __EE411609 := __EE411597.Report_Codes_;
   SHARED __CC14028 := ['FA','A','IA','EA','TF'];
-  __JC5482176(E_Accident(__in,__cfg).Report_Codes_Layout __EE411270) := __T(__OP2(__EE411270.Report_Code_,IN,__CN(__CC14028)));
-  SHARED __EE5482177 := __EE411258(EXISTS(__CHILDJOINFILTER(__EE411270,__JC5482176)));
-  __JC5482210(E_Person_Accident(__in,__cfg).Layout __EE411344, E_Accident(__in,__cfg).Layout __EE5482177) := __EEQP(__EE411344.Acc_,__EE5482177.UID);
-  __JF5482210(E_Accident(__in,__cfg).Layout __EE5482177) := __NN(__EE5482177.UID);
-  SHARED __EE5482259 := JOIN(__EE411344,__EE5482177,__JC5482210(LEFT,RIGHT),TRANSFORM(__ST411669_Layout,SELF:=LEFT,SELF.Acc__1_:=__JF5482210(RIGHT)),HASH,LEFT OUTER,KEEP(1));
-  EXPORT __ST268672_Layout := RECORD
+  __JC5502543(E_Accident(__in,__cfg).Report_Codes_Layout __EE411609) := __T(__OP2(__EE411609.Report_Code_,IN,__CN(__CC14028)));
+  SHARED __EE5502544 := __EE411597(EXISTS(__CHILDJOINFILTER(__EE411609,__JC5502543)));
+  __JC5502577(E_Person_Accident(__in,__cfg).Layout __EE411683, E_Accident(__in,__cfg).Layout __EE5502544) := __EEQP(__EE411683.Acc_,__EE5502544.UID);
+  __JF5502577(E_Accident(__in,__cfg).Layout __EE5502544) := __NN(__EE5502544.UID);
+  SHARED __EE5502626 := JOIN(__EE411683,__EE5502544,__JC5502577(LEFT,RIGHT),TRANSFORM(__ST412008_Layout,SELF:=LEFT,SELF.Acc__1_:=__JF5502577(RIGHT)),HASH,LEFT OUTER,KEEP(1));
+  EXPORT __ST268974_Layout := RECORD
     KEL.typ.ntyp(E_Person().Typ) Subject_;
     KEL.typ.ntyp(E_Accident().Typ) Acc_;
     KEL.typ.nstr Point_Of_Impact_;
@@ -120,5 +120,5 @@ EXPORT B_Person_Accident_8(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault,
     KEL.typ.epoch Vault_Date_Last_Seen_ := 0;
     KEL.typ.int __RecordCount := 0;
   END;
-  EXPORT __ENH_Person_Accident_8 := PROJECT(__EE5482259,TRANSFORM(__ST268672_Layout,SELF.Is_Accident_Record_ := LEFT.Acc__1_,SELF := LEFT));
+  EXPORT __ENH_Person_Accident_8 := PROJECT(__EE5502626,TRANSFORM(__ST268974_Layout,SELF.Is_Accident_Record_ := LEFT.Acc__1_,SELF := LEFT));
 END;
