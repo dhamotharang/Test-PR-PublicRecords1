@@ -411,6 +411,7 @@
 	INTEGER PL_STLCnt2Y;
 	INTEGER PL_STLCnt5Y;
 	STRING PL_STLDtList5Y;
+	INTEGER3 PL_EmrgAge;
 	//Person Header Source Verification
 	// STRING10 G_BuildHdrDt;
 	// INTEGER PL_VerSrcCntEv;
