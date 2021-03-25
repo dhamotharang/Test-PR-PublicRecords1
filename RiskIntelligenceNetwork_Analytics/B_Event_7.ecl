@@ -4,8 +4,8 @@ IMPORT B_Event_8,E_Address,E_Bank,E_Bank_Account,E_Customer,E_Drivers_License,E_
 IMPORT * FROM KEL11.Null;
 EXPORT B_Event_7 := MODULE
   SHARED VIRTUAL TYPEOF(B_Event_8.__ENH_Event_8) __ENH_Event_8 := B_Event_8.__ENH_Event_8;
-  SHARED __EE27707 := __ENH_Event_8;
-  EXPORT __ST20812_Layout := RECORD
+  SHARED __EE27906 := __ENH_Event_8;
+  EXPORT __ST21011_Layout := RECORD
     KEL.typ.nuid UID;
     KEL.typ.nint Record_Id_;
     KEL.typ.nstr Acct_No_;
@@ -257,12 +257,12 @@ EXPORT B_Event_7 := MODULE
     KEL.typ.int __RecordCount := 0;
     UNSIGNED4 __Part := 0;
   END;
-  SHARED __ST20812_Layout __ND27961__Project(B_Event_8.__ST21318_Layout __PP26429) := TRANSFORM
-    SELF.No_Lex_Id_ := MAP(__T(__OP2(__PP26429.Lex_Id_,>,__CN(900000000000)))=>1,0);
-    SELF.T___Is_Bc_Shll_Hit_Flag_ := MAP(__T(__OP2(__PP26429.Bocashell_Hit_,=,__CN(TRUE)))=>1,0);
-    SELF.T___Person_Uid_Echo_ := MAP(__T(__OR(__OR(__OP2(__CAST(KEL.typ.str,__PP26429.Lex_Id_),=,__CN('')),__NT(__PP26429.Lex_Id_)),__OP2(__PP26429.Lex_Id_,=,__CN(0))))=>__ECAST(KEL.typ.nint,__CN(-99999)),__ECAST(KEL.typ.nint,__PP26429.Lex_Id_));
-    SELF.T___Src_Class_Type_ := MAP(__T(__OP2(__PP26429.T___Src_Type_,=,__CN(-99997)))=> -99997,__T(__OP2(__PP26429.T___Src_Type_,IN,__CN([6,14])))=>0,__T(__OP2(__PP26429.T___Src_Type_,IN,__CN([4,8,11])))=>1,__T(__OP2(__PP26429.T___Src_Type_,IN,__CN([3,7])))=>2,__T(__OP2(__PP26429.T___Src_Type_,IN,__CN([2,5])))=>3,4);
-    SELF := __PP26429;
+  SHARED __ST21011_Layout __ND28160__Project(B_Event_8.__ST21517_Layout __PP26628) := TRANSFORM
+    SELF.No_Lex_Id_ := MAP(__T(__OP2(__PP26628.Lex_Id_,>,__CN(900000000000)))=>1,0);
+    SELF.T___Is_Bc_Shll_Hit_Flag_ := MAP(__T(__OP2(__PP26628.Bocashell_Hit_,=,__CN(TRUE)))=>1,0);
+    SELF.T___Person_Uid_Echo_ := MAP(__T(__OR(__OR(__OP2(__CAST(KEL.typ.str,__PP26628.Lex_Id_),=,__CN('')),__NT(__PP26628.Lex_Id_)),__OP2(__PP26628.Lex_Id_,=,__CN(0))))=>__ECAST(KEL.typ.nint,__CN(-99999)),__ECAST(KEL.typ.nint,__PP26628.Lex_Id_));
+    SELF.T___Src_Class_Type_ := MAP(__T(__OP2(__PP26628.T___Src_Type_,=,__CN(-99997)))=> -99997,__T(__OP2(__PP26628.T___Src_Type_,IN,__CN([6,14])))=>0,__T(__OP2(__PP26628.T___Src_Type_,IN,__CN([4,8,11])))=>1,__T(__OP2(__PP26628.T___Src_Type_,IN,__CN([3,7])))=>2,__T(__OP2(__PP26628.T___Src_Type_,IN,__CN([2,5])))=>3,4);
+    SELF := __PP26628;
   END;
-  EXPORT __ENH_Event_7 := PROJECT(__EE27707,__ND27961__Project(LEFT));
+  EXPORT __ENH_Event_7 := PROJECT(__EE27906,__ND28160__Project(LEFT));
 END;
