@@ -3,7 +3,9 @@
 IMPORT std,VotersV2,_Control, tools;
 
 //Date format needs to be YYYYMMDD
-pVersion := '20200911';
+pVersion := '20210113'; //Make sure to change date on new builds
+sourceIP := 'bctlpedata11';
+sourcePath := '/data/load01/voters/sprays/';
 
 #workunit('name','Voters Build '+pVersion);
 #option('multiplePersistInstances',FALSE);
@@ -14,7 +16,7 @@ clear_main := sequential(FileServices.StartSuperFileTransaction(),
 															FileServices.ClearSuperFile(cleaned_superfile),
 															FileServices.FinishSuperFileTransaction());	
 
-spray_main := VotersV2.fSprayAndPromoteVoters(pVersion);
+spray_main := VotersV2.fSprayAndPromoteVoters(pVersion,sourceIP,sourcePath);
 					 
 full_build := sequential(           
            clear_main,
