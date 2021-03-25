@@ -34,15 +34,8 @@ function
 				,OUTPUT(Cortera_Tradeline.Ingest(pversion,pDeltaRun,pSprayedAddFile,,pPrevBaseFile).StandardStats(), ALL, NAMED('StandardStats'))
 				,Cortera_Tradeline.Ingest(pversion,pDeltaRun,pSprayedAddFile,,pPrevBaseFile).DoStats
 				,Cortera_Tradeline.Ingest().ValidityStats
-				,if (~pDeltaRun,
-						 sequential(
-								header.PostDID_HeaderVer_Update('cortera_tradeline','bip_build_version'),
-   							output('Full re-did was successful')
-						 ),
-						 output('Delta did was successful')
-				 )
-				,Cortera_Tradeline.Promote(pversion,'base',pIsDeltaBuild:=pDeltaRun).buildfiles.New2Built,
-			)		
+				,Cortera_Tradeline.Promote(pversion,'base',pIsDeltaBuild:=pDeltaRun).buildfiles.New2Built				
+			)
 			,output('No Valid version parameter passed, skipping Cortera_Tradeline.Build_Base atribute') 
 		);
 		
