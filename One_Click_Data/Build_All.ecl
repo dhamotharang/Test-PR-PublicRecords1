@@ -26,7 +26,7 @@ function
 					,pServerIP 
 					,pFilename
 					,pGroupName
-					,//pIsTesting
+					,pIsTesting
 					,pOverwrite
 
 				)
@@ -44,6 +44,7 @@ full_build :=
 									  ,Build_Keys		(pversion																		).all
 										,Build_Strata	(pversion																		)
 										,Promote().buildfiles.Built2QA
+										,Promote().Inputfiles.using2used
 										,Orbit3.proc_Orbit3_CreateBuild_AddItem('One Click Data',pversion,'N'); 
 									 ) 	
    			,fail('Raw data scrubs failed.  Build processing stopped.  Resolve scrubs issues before you run again.')
