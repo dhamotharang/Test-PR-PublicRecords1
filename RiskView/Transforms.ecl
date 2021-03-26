@@ -5038,6 +5038,33 @@ EXPORT Models.RVC2004_2_0.z_layouts_Input xfm_RVC2004_2_RVAttrs_and_Custom_Input
       self := [];
     END;
     
+    
+ //RVC2004_3 model transform
+EXPORT Models.RVC2004_3_0.z_layouts_Input xfm_RVC2004_3_RVAttrs_and_Custom_Inputs(riskview.layouts.attributes_internal_layout_noscore le, riskview.layouts.Layout_Custom_Inputs rt) := TRANSFORM
+       self.TransactionID := (String)le.seq;
+       // RV Attributes and custom inputs
+            
+      TodaysDate := (STRING)STD.Date.Today();
+      LastPaymentDate := rt.Custom_Inputs(OptionName = 'custom_input7')[1].Optionvalue;
+      DaysSinceLastPayment := IF( TRIM(LastPaymentDate) = '', -998, ut.DaysApart(TodaysDate,LastPaymentDate));
+            
+            
+      self.dayssince_LastPaymentDate                := (STRING)DaysSinceLastPayment; 
+      self.derogcount                               := le.derogcount;
+      self.inquirycollections12month                := le.inquirycollections12month;
+      self.bankruptcycount                          := le.bankruptcycount;
+      self.addrinputlengthofres                     := le.addrinputlengthofres;
+      self.inputprovidedphone                       := le.inputprovidedphone;
+      self.addrprevioustimeoldest                   := le.addrprevioustimeoldest;
+      self.ssndeceased                              := le.ssndeceased;
+      self.subjectdeceased                          := le.subjectdeceased;
+      self.confirmationsubjectfound                 := le.confirmationsubjectfound;
+      self.OutOfStatuteIndicator                    := rt.Custom_Inputs(OptionName = 'custom_input5')[1].Optionvalue;
+      self.CollateralStatus                         := rt.Custom_Inputs(OptionName = 'custom_input3')[1].Optionvalue;
+   
+      self := [];
+    END;    
+    
 // rv5 attribute transform
 EXPORT iesp.share.t_NameValuePair intoVersion5(riskview.layouts.layout_riskview5_search_results le, INTEGER c) := TRANSFORM
   SELF.name := MAP(

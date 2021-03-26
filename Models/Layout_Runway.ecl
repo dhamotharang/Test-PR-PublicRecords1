@@ -1244,6 +1244,13 @@ string3 RVC2004_2_0_reason3 := '';
 string3 RVC2004_2_0_reason4 := '';
 string3 RVC2004_2_0_reason5 := '';
 
+String3 RVC2004_3_0_score := '';
+string3 RVC2004_3_0_reason1 := '';
+string3 RVC2004_3_0_reason2 := '';
+string3 RVC2004_3_0_reason3 := '';
+string3 RVC2004_3_0_reason4 := '';
+string3 RVC2004_3_0_reason5 := '';
+
 String3 RVD1010_0_0_score := '';
 string2 RVD1010_0_0_reason1 := '';
 string2 RVD1010_0_0_reason2 := '';
