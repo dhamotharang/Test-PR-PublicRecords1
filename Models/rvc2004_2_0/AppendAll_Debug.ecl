@@ -1,0 +1,5 @@
+﻿EXPORT AppendAll_Debug(infile,do_RVC2004_2_0,pa_ChargeOffAmount,pa_OutOfStatuteIndicator,pa_addrinputownershipindex,pa_confirmationinputaddress,pa_confirmationsubjectfound,pa_dayssince_LastPaymentDate,pa_derogcount,pa_inputprovidedphone,pa_sourcecredheadertimeoldest,pa_ssndeceased,pa_subjectdeceased) := FUNCTIONMACRO
+  Step0 := infile;
+  Step1 := rvc2004_2_0.Append_RVC2004_2_0_Debug( Step0,do_RVC2004_2_0,pa_ChargeOffAmount,pa_OutOfStatuteIndicator,pa_addrinputownershipindex,pa_confirmationinputaddress,pa_confirmationsubjectfound,pa_dayssince_LastPaymentDate,pa_derogcount,pa_inputprovidedphone,pa_sourcecredheadertimeoldest,pa_ssndeceased,pa_subjectdeceased);
+  RETURN Step1;
+ENDMACRO;

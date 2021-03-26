@@ -1229,12 +1229,20 @@ string2 RVC1805_2_0_reason2 := '';
 string2 RVC1805_2_0_reason3 := '';
 string2 RVC1805_2_0_reason4 := '';
 
+
 String3 RVC2004_1_0_score := '';
-string2 RVC2004_1_0_reason1 := '';
-string2 RVC2004_1_0_reason2 := '';
-string2 RVC2004_1_0_reason3 := '';
-string2 RVC2004_1_0_reason4 := '';
-string2 RVC2004_1_0_reason5 := '';
+string3 RVC2004_1_0_reason1 := '';
+string3 RVC2004_1_0_reason2 := '';
+string3 RVC2004_1_0_reason3 := '';
+string3 RVC2004_1_0_reason4 := '';
+string3 RVC2004_1_0_reason5 := '';
+
+String3 RVC2004_2_0_score := '';
+string3 RVC2004_2_0_reason1 := '';
+string3 RVC2004_2_0_reason2 := '';
+string3 RVC2004_2_0_reason3 := '';
+string3 RVC2004_2_0_reason4 := '';
+string3 RVC2004_2_0_reason5 := '';
 
 String3 RVD1010_0_0_score := '';
 string2 RVD1010_0_0_reason1 := '';
