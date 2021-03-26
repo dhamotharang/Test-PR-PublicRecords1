@@ -93,7 +93,6 @@ EXPORT Fn_MAS_FDC_Mini(DATASET(PublicRecords_KEL.ECL_Functions.Layouts.LayoutInp
 		
 	CleanSIC(STRING SICCode) := STD.Str.Filter(SICCode, '0123456789')[1..4];
 	CleanNAIC(STRING NAICCode) := STD.Str.Filter(NAICCode, '0123456789')[1..6];		
-	Set_Large_Cortera_SeleIDs := [1173819,1651059];
 	
 
 	glb_ok := Risk_Indicators.iid_constants.glb_ok(Options.GLBAPurpose, Options.isFCRA);
