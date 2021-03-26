@@ -165,7 +165,8 @@ that is sent INTO calcindex for ECL.
                                     {'RVT2004_2', MType_T+'RVT2004_2', calcIndex( 86), '0-999', 0, FALSE}, //T-Mobile Thick
                                     {'RVC2004_2', MType_G+'RVC2004_2', calcIndex( 87), '0-999', 0, FALSE}, //NewRez DBA Shellpoint Mortgage Servicing                                 
                                     {'RVG2005_0', MType_G+'RVG2005_0', calcIndex( 88), '0-999', 0, TRUE}, //Riskview Credit Optics short term lending flagship
-                                    {'RVS2005_0', MType_S+'RVS2005_0', calcIndex( 89), '0-999', 0, TRUE}, //Riskview Credit Optics Cross Industry flagship                                    
+                                    {'RVS2005_0', MType_S+'RVS2005_0', calcIndex( 89), '0-999', 0, TRUE}, //Riskview Credit Optics Cross Industry flagship
+                                    {'RVC2004_3', MType_G+'RVC2004_3', calcIndex( 90), '0-999', 0, FALSE}, //NewRez DBA Shellpoint Mortgage Servicing
                                     // ------------------- FAKE MODELS - STATIC SCORE AND REASON CODES ------------------
                                     {'RVA9999_9', MType_A+'RVA9999_9', 0, '0-999', 0, FALSE},
                                     {'RVB9999_9', MType_B+'RVB9999_9', 0, '0-999', 0, FALSE},
@@ -229,6 +230,7 @@ that is sent INTO calcindex for ECL.
                       'RVT2004_2' => Models.getCreditLuciModels(blankshell, attrv5, blankIDA).RVT2004_2,
                       'RVC2004_1' => Models.getCreditLuciModels(blankshell, attrv5, blankIDA, customInputs).RVC2004_1,
                       'RVC2004_2' => Models.getCreditLuciModels(blankshell, attrv5, blankIDA, customInputs).RVC2004_2,
+                      'RVC2004_3' => Models.getCreditLuciModels(blankshell, attrv5, blankIDA, customInputs).RVC2004_3,
                       // ----------------------------------------------------------------------------------
                       // ------------------- FAKE MODELS - STATIC SCORE AND REASON CODES ------------------
                       'RVA9999_9' => UNGROUP(Models.FAKE_0_0(BocaShell, 'RV50')),
