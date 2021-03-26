@@ -2,8 +2,9 @@
 
 EXPORT getCreditLuciModels(GROUPED DATASET(risk_indicators.Layout_Boca_Shell) clam = GROUP( DATASET([], risk_indicators.Layout_Boca_Shell), seq),
                            GROUPED DATASET(riskview.layouts.attributes_internal_layout_noscore) RV_attributes = GROUP( DATASET([], riskview.layouts.attributes_internal_layout_noscore), seq), 
-                           DATASET(Risk_Indicators.layouts.layout_IDA_out) IDAattributes = DATASET([], Risk_Indicators.layouts.layout_IDA_out)
-                           ) := MODULE
+                           DATASET(Risk_Indicators.layouts.layout_IDA_out) IDAattributes = DATASET([], Risk_Indicators.layouts.layout_IDA_out),
+													 DATASET(RiskView.Layouts.Layout_Custom_Inputs) custom_inputs = DATASET([], RiskView.Layouts.Layout_Custom_Inputs))
+                            := MODULE
 
   //check if IDA attributes are present or had a gateway error
   SHARED IDA_attr_present := Exists(IDAattributes.Indicators);
@@ -167,8 +168,8 @@ EXPORT getCreditLuciModels(GROUPED DATASET(risk_indicators.Layout_Boca_Shell) cl
 
     RETURN RVT2004_2_final;
     
-  END;
-  
+    END;
+    
   SHARED get_RVS2005_0(GROUPED DATASET(riskview.layouts.attributes_internal_layout_noscore) RV_attrs,
                        DATASET(Risk_Indicators.layouts.layout_IDA_out) IDA_attrs) := FUNCTION
   
@@ -210,7 +211,49 @@ EXPORT getCreditLuciModels(GROUPED DATASET(risk_indicators.Layout_Boca_Shell) cl
     RETURN RVS2005_0_final;
   
   END;
-  
+			SHARED get_RVC2004_1(GROUPED DATASET(riskview.layouts.attributes_internal_layout_noscore) RV_attrs,
+                                  dataset(riskview.layouts.Layout_Custom_Inputs) custom_inputs
+                      ) := FUNCTION
+		
+		// Step1: Project the attributes and transform them into the layout the model needs
+				    RVC2004_1_input := JOIN(RV_attrs, custom_inputs, 
+                                  LEFT.seq = RIGHT.seq,
+                                  RiskView.Transforms.xfm_RVC2004_1_RVAttrs_and_Custom_Inputs(LEFT, RIGHT), 
+                                  ATMOST(Models.FraudAdvisor_Constants.LUCI_atmost));
+    
+    #IF(~Riskview.Constants.TurnOnValidation)
+		
+		// Step2: Call LUCI model
+    RVC2004_1 := Models.RVC2004_1_0.AsResults(RVC2004_1_input).Base();
+		
+		
+    
+		// Step3: Tranform back into normal model layout
+    RVC2004_1_final := PROJECT(RVC2004_1, TRANSFORM(Models.Layout_ModelOut,
+                                                          SELF.seq := (INTEGER)LEFT.TransactionId,
+                                                          SELF.score := LEFT.score;
+                                                          // grab the 5 reason codes and populate the reason code descriptions
+                                                          RC1 := DATASET([{LEFT.Messages[1].Code,Risk_Indicators.getHRIDesc(LEFT.Messages[1].Code)}],Risk_Indicators.Layout_Desc);
+                                                          RC2 := DATASET([{LEFT.Messages[2].Code,Risk_Indicators.getHRIDesc(LEFT.Messages[2].Code)}],Risk_Indicators.Layout_Desc);
+                                                          RC3 := DATASET([{LEFT.Messages[3].Code,Risk_Indicators.getHRIDesc(LEFT.Messages[3].Code)}],Risk_Indicators.Layout_Desc);
+                                                          RC4 := DATASET([{LEFT.Messages[4].Code,Risk_Indicators.getHRIDesc(LEFT.Messages[4].Code)}],Risk_Indicators.Layout_Desc);
+                                                          RC5 := DATASET([{LEFT.Messages[5].Code,Risk_Indicators.getHRIDesc(LEFT.Messages[5].Code)}],Risk_Indicators.Layout_Desc);
+                                                          
+                                                          SELF.ri := if(LEFT.score = '900', DATASET([], Risk_Indicators.Layout_Desc), RC1+RC2+RC3+RC4+RC5);
+                                                          SELF := []; 
+                                                          ));
+    #ELSE
+    
+    //Use this to get the "debug" layout of the LUCI model it has all of the intermediate variables
+    //it can be used to easily transform the results back into the validation file (model input) layout 
+    //which is found in Models.MODELNAME.z_layouts_Input
+    RVC2004_1_final := Models.RVC2004_1_0.AsResults(RVC2004_1_input).ValidationF;
+    
+    #END
+
+    RETURN RVC2004_1_final;
+		
+		END;
   //Export the LUCI model results
 
   EXPORT RVG2005_0 := get_RVG2005_0(RV_attributes, IDAattributes);
@@ -218,6 +261,5 @@ EXPORT getCreditLuciModels(GROUPED DATASET(risk_indicators.Layout_Boca_Shell) cl
   EXPORT RVA2008_1 := get_RVA2008_1(RV_attributes);
   EXPORT RVT2004_1 := get_RVT2004_1(RV_attributes);
   EXPORT RVT2004_2 := get_RVT2004_2(RV_attributes);
-  
-
+  EXPORT RVC2004_1 := get_RVC2004_1(RV_attributes, custom_inputs);
 END;
