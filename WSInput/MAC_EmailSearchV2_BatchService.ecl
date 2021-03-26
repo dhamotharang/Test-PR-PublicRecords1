@@ -24,6 +24,7 @@
                      'SearchTier',
                      'CheckEmailDeliverable',
                      'KeepUndeliverableEmail',
+                     'EmailValidationType',
                      'MaxEmailsForDeliveryCheck',
                      'SkipTMXcheck',
                      'MaxEmailsForTMXcheck',

@@ -116,7 +116,7 @@ EXPORT Raw := MODULE
     RETURN payload_recs;
   END;
 
-EXPORT GetEventHistory(DATASET($.Layouts.Gateway_Data.batch_in_bv_rec) in_emails,
+EXPORT GetEventHistory(DATASET($.Layouts.Gateway_Data.batch_in_gw_rec) in_emails,
                           STRING in_source='', STRING8 prior_year_date='') := FUNCTION
 
 
