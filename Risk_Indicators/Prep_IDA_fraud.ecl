@@ -42,14 +42,12 @@ EXPORT Prep_IDA_fraud(DATASET(Risk_Indicators.layouts.layout_IDA_in) indata,
   //how to get Product Name into this function? pass in gateway info or by itself?
   tempProductName := MAP(is_IDA_model OR doIDA_Attributes                                             => 'LNFraudAttributes',
                          is_IDA_non_model                                                             => 'NetworkG',
-                         //Models.FP_models.Model_Check(Model_requests, ['modeling_attribute_model']) => 'LNFraudAttributes', //This might need to change once we know what it is
                                                                                                          '' //Then IDA isn't needed
                      );
   //how to get productID into this function? pass in gateway info or as a passed parameter
   tempProductID := MAP(is_IDA_model OR doIDA_Attributes                                               => 'LFSS1.0',
                        is_IDA_non_model                                                               => 'NETG1.0',
-                       //Models.FP_models.Model_Check(Model_requests, ['modeling_attribute_model'])   => 'XA1.0',  //This will need to change once we know what it is
-                                                                                                       '' //Then IDA isn't needed
+                                                                                                         '' //Then IDA isn't needed
                      );
 
   //populate ProductName and ID based on what's requested.
