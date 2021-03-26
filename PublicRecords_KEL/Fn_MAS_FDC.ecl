@@ -97,7 +97,6 @@ EXPORT Fn_MAS_FDC(DATASET(PublicRecords_KEL.ECL_Functions.Layouts.LayoutInputPII
 		
 	CleanSIC(STRING SICCode) := STD.Str.Filter(SICCode, '0123456789')[1..4];
 	CleanNAIC(STRING NAICCode) := STD.Str.Filter(NAICCode, '0123456789')[1..6];		
-	Set_Large_Cortera_SeleIDs := [1173819,1651059];
 	
 
 	glb_ok := Risk_Indicators.iid_constants.glb_ok(Options.GLBAPurpose, Options.isFCRA);
@@ -3830,9 +3829,8 @@ Risk_Indicators__Correlation_Risk__key_addr_dob_summary_Denorm :=
 																								BIPV2.IDconstants.JoinTypes.LimitTransformJoin));	
 
 		
-	Cortera__kfetch_LinkID := Cortera__kfetch_LinkID_temp(SeleID NOT IN Set_Large_Cortera_SeleIDs);
 	
-	With_Cortera_Key_LinkIDs := DENORMALIZE(With_CalBus_key_Calbus_LinkIDS, Cortera__kfetch_LinkID,
+	With_Cortera_Key_LinkIDs := DENORMALIZE(With_CalBus_key_Calbus_LinkIDS, Cortera__kfetch_LinkID_temp,
 			ArchiveDate((string)right.dt_first_seen, (string)right.dt_vendor_first_reported) <= LEFT.P_InpClnArchDt[1..8] and
 			LEFT.G_ProcBusUID = RIGHT.UniqueID AND 
 			LEFT.B_LexIDUlt = RIGHT.ULTID AND 
