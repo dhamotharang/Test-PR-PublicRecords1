@@ -39,19 +39,24 @@ EXPORT out_rec SmartLinxReport (dataset (doxie.layout_references) dids,
     phones2use := choosen(SmartRollup.fn_smart_getPhonesPlusMetadata.byDid(best_rec),iesp.Constants.BR.MaxPhonesPlus);
 		self.PhonesV2 := phones2use;
 		self.Phones := project(phones2use, iesp.dirassistwireless.t_DirAssistWirelessSearchRecord);      
-		self := best_rec_esdl;           
-           self.Attributes := SmartRollup.fn_getAttributes(subject_did, mod_smartlinx);                               
+		self := best_rec_esdl;             
+           self.Attributes := SmartRollup.fn_getAttributes(subject_did, mod_smartlinx);                                         
            SELF.PhonesV3 := IF (mod_smartlinx.IncludeProgressivePhone, SmartRollup.fn_smart_getProgressivePhoneData.ProgressivePhoneResults(dids, mod_access, mod_smartlinx));
 		self := [];
 	end;
 
-  best_rec_smart   := if (mod_smartlinx.include_best,  dataset([additionalBest()]),dataset([],iesp.smartlinxreport.t_SLRBestInfo));
+  Tmpbest_rec_smart   := if (mod_smartlinx.include_best,  dataset([additionalBest()]),dataset([],iesp.smartlinxreport.t_SLRBestInfo));
   EQRoyalties  := IF (mod_smartlinx.include_best AND mod_smartlinx.IncludeProgressivePhone 
                                       and mod_smartlinx.UsePremiumSourceA and 
                                       ~doxie.compliance.isPhoneMartRestricted(mod_smartlinx.DataRestrictionMask) and
                                       mod_access.isValidGLB(),
-                                  SmartRollup.fn_smart_getProgressivePhoneData.CalculateBestSmartLinxRecPhoneRoyalties(best_rec_smart[1].PhonesV3, MDR.sourceTools.src_Equifax),                                           
+                                  SmartRollup.fn_smart_getProgressivePhoneData.CalculateBestSmartLinxRecPhoneRoyalties(tmpBest_rec_smart, MDR.sourceTools.src_Equifax).ds_royalties,                                           
                                 dataset([], Royalty.Layouts.Royalty));
+  // only take out the 'newtype' phone source value if progressive phone (phone shell) is in the results otherwise use tmpbest_recs_smart
+  best_rec_smart :=  if (mod_smartlinx.include_best and mod_smartlinx.IncludeProgressivePhone,
+                                         SmartRollup.fn_smart_getProgressivePhoneData.CalculateBestSmartLinxRecPhoneRoyalties(tmpBest_rec_smart, MDR.sourceTools.src_Equifax).best_rec_smart,                                           
+                                          Tmpbest_rec_smart);
+
 	subject_akas     := IF (mod_smartlinx.include_akas, project(pers.Akas,iesp.bps_share.t_BpsReportIdentity), dataset([],iesp.bps_share.t_BpsReportIdentity));
   s_akas           := SmartRollup.fn_smart_rollup_names(subject_akas);
 	p_aka_entities   := SmartRollup.fn_smart_aka_entities(s_akas, subject_akas);
@@ -140,7 +145,6 @@ EXPORT out_rec SmartLinxReport (dataset (doxie.layout_references) dids,
 	relativesOf      := SmartRollup.fn_relativeOf(relativesBase,subject_did,mod_smartlinx);
 	relativesTitle   := relativesOf;  // now titles are taken directly from new relatives' index
 	p_relatives      := relativesTitle;
-     
 
 	// Neighbors only want for subjects "current/newest" address,  20 addresses (10up10down), 2 Residents
 	s_neighbors      := IF (mod_smartlinx.include_neighbors, pers.NeighborsSlim, dataset([],iesp.bpsreport.t_NeighborSlim) );
@@ -386,8 +390,8 @@ EXPORT out_rec SmartLinxReport (dataset (doxie.layout_references) dids,
 
 		 p_worldcompliance := IF(mod_smartlinx.include_kris,PROJECT(s_kris.WorldCompRecs,TRANSFORM(iesp.smartlinxsearchcore.t_SLRResultMatch,SELF := LEFT)),
 																			dataset([],iesp.smartlinxsearchcore.t_SLRResultMatch));                                                                          
-            
-                 p_personIdentityFinal :=  smartRollup.fn_getPersonIdentity(dids, Mod_smartLinx);                                                                  
+            p_personIdentityFinal := smartRollup.fn_getPersonIdentity(dids, Mod_smartLinx);                  
+                                                                                                                                          
            iesp.smartlinxReport.t_SLRPersonRiskIndicatorSection  testXform() := TRANSFORM                 
                 self.PersonIdentityRisks := //choosen(
                                                                   dataset([{true,'P','Test'}]
@@ -499,7 +503,7 @@ EXPORT out_rec SmartLinxReport (dataset (doxie.layout_references) dids,
      // PEOPLE ASSOCS
      
       Self.Relatives                         := p_relatives;          
-      Self.Associates                        := p_associates;   
+      Self.Associates                        := p_associates;   // Simplified version of compreport, no distributed call to central records, no hash, no versioning of single sources, non-FCRA
       Self.Neighbors                         := p_neighbors;
    	// BUSINESS ASSOCS
    	 Self.CorporateAffiliations             := p_corp_aff;
