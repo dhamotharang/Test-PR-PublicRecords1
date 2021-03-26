@@ -98,7 +98,7 @@ RulesIn := DATASET([
 {'1', 'Identity34', 'Invalid SSN, address and phone', 'T9_AddrIsInvalidFlag=1, T15_SSNIsInvalidFlag=1, T16_PhnIsInvalidFlag=1', 3},
 {'1', 'Identity35', 'Address is commercial mail receiving facility and potentially manipulated identity', 'T9_AddrIsCMRAFlag=1, T1_ManipIDFlag=1', 3},
 {'1', 'Identity36', 'SSN used by multiple people, public records out of state and potentially synthetic identity', 'T15_SSNMultCurrIDFlagEv=1, T1L_CurrAddrNotInAgcyJurStFlag=1, T1_SynthIDFlag=1', 3},
-{'1', 'Identity37', 'Prepaid Phone and high risk IP address location (Miami,FL)', 'T16_PhnPrePdFlag=1, t18_ipaddrlocmiamiflag=1', 3},
+{'1', 'Identity37', 'Prepaid Phone and risky IP address location (Miami,FL)', 'T16_PhnPrePdFlag=1, t18_ipaddrlocmiamiflag=1', 3},
 {'1', 'Identity38', 'TOR', 'T18_IPAddrTORnodeFlag=1', 3},
 {'1', 'Identity39', 'Non-US IP address', 'T18_IPAddrLocNonUSFlag=1', 3},
 {'1', 'Identity40', 'VPN, vacant address and prepaid phone', 'T18_IPAddrVPNFlag=1, T9_AddrIsVacantFlag=1, T16_PhnPrePdFlag=1', 3},
@@ -122,14 +122,14 @@ RulesIn := DATASET([
 {'1', 'Identity58', 'Driver\'s License used by multiple people', 'T20_DLMultCurrIDFlagEv=1', 2},
 {'1', 'Identity59', 'Hosted IP address', 'T18_IPAddrHostedFlag=1',2},
 {'1', 'Identity60', 'VPN', 'T18_IPAddrVPNFlag=1', 2},
-{'1', 'Identity61', 'High risk IP address location (Miami,FL)', 'T18_IPAddrLocMiamiFlag=1', 2},
+{'1', 'Identity61', 'Risky IP address location (Miami,FL)', 'T18_IPAddrLocMiamiFlag=1', 2},
 {'1', 'Identity62', 'Phone is invalid', 'T16_PhnIsInvalidFlag=1', 2},
 {'1', 'Identity63', 'Phone prepaid', 'T16_PhnPrePdFlag=1', 2},
 {'1', 'Identity64', 'Input and public records address outside of agency state', 't1l_curraddrnotinagcyjurstflag=1, t9_addrnotinagcyjurstflag=1',3},
-{'1', 'Identity65', 'Potentially manipulated identity and high risk IP address (Miami, FL)', 't1_manipidflag=1, t18_ipaddrlocmiamiflag=1',3},
-{'1', 'Identity66', 'Potentially synthetic identity and high risk IP address (Miami, FL)', 't1_synthidflag=1, t18_ipaddrlocmiamiflag=1',3},
-{'1', 'Identity67', 'Potentially compromised identity and high risk IP address (Miami, FL)', 't1_stolidflag=1, t18_ipaddrlocmiamiflag=1',3},
-{'1', 'Identity68', 'VPN and high risk IP address (Miami, FL)', 't18_ipaddrvpnflag=1, t18_ipaddrlocmiamiflag=1',3},
+{'1', 'Identity65', 'Potentially manipulated identity and risky IP address location (Miami, FL)', 't1_manipidflag=1, t18_ipaddrlocmiamiflag=1',3},
+{'1', 'Identity66', 'Potentially synthetic identity and risky IP address location (Miami, FL)', 't1_synthidflag=1, t18_ipaddrlocmiamiflag=1',3},
+{'1', 'Identity67', 'Potentially compromised identity and risky IP address location (Miami, FL)', 't1_stolidflag=1, t18_ipaddrlocmiamiflag=1',3},
+{'1', 'Identity68', 'VPN and risky IP address location (Miami, FL)', 't18_ipaddrvpnflag=1, t18_ipaddrlocmiamiflag=1',3},
 {'1', 'Identity69', 'Input address outside of agency state and potentially manipulated identity', 't1_manipidflag=1, t9_addrnotinagcyjurstflag=1',3},
 {'1', 'Identity70', 'Input address outside of agency state and potentially synthetic identity', 't1_synthidflag=1, t9_addrnotinagcyjurstflag=1',3},
 {'1', 'Identity71', 'Input address outside of agency state and potentially compromised identity', 't1_stolidflag=1, t9_addrnotinagcyjurstflag=1',3},
@@ -138,7 +138,7 @@ RulesIn := DATASET([
 {'18', 'IPaddress02', 'VPN IP Address', 'T18_IPAddrVPNFlag=1', 2},
 {'18', 'IPaddress03', 'TOR IP Address', 'T18_IPAddrTORnodeFlag=1', 3},
 {'18', 'IPaddress04', 'Non-US based IP Address', 'T18_IPAddrLocNonUSFlag=1', 3},
-{'18', 'IPaddress05', 'High risk location (Miami,FL)', 'T18_IPAddrLocMiamiFlag=1', 2},
+{'18', 'IPaddress05', 'Risky location(Miami,FL)', 'T18_IPAddrLocMiamiFlag=1', 2},
 {'18', 'IPaddress06', 'IP is Known Risk', 'P18_AoTIPAddrKRActFlagEv=1', 3},
 
 {'16', 'Phone01', 'Phone is Invalid', 'T16_PhnIsInvalidFlag=1', 2},
@@ -186,4 +186,4 @@ MissingRules := NormRules(Std.Str.FindCount(RulesAttr, TRIM(Field))<1);
 output(MissingRules, named('MissingRules'));
       
 //output(NormRules,,'~fraudgov::in::sprayed::configrules', CSV(QUOTE('"')), overwrite);
-output(NormRules,,'~fraudgov::in::20210312::configrules', CSV(HEADING(SINGLE), SEPARATOR(','), TERMINATOR('\r\n'), QUOTE('"')), OVERWRITE);
+output(NormRules,,'~fraudgov::in::20210325::configrules', CSV(HEADING(SINGLE), SEPARATOR(','), TERMINATOR('\r\n'), QUOTE('"')), OVERWRITE);

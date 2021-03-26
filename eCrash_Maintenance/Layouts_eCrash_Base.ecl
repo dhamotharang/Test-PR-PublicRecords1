@@ -1,7 +1,7 @@
 ﻿citations_childrec := RECORD
    string7 citation_issued;
    string7 citation_type;
-   string100 citation_detail1;
+   string200 citation_detail1;
    string64 citation_status;
    string60 violation_code1;
    string60 violation_code2;
@@ -26,7 +26,7 @@ EXPORT Layouts_eCrash_Base := RECORD,maxlength(40000)
   string30 section_number1;
   string10 court_date;
   string9 court_time;
-  string100 citation_detail1;
+  string200 citation_detail1;
   string3 local_code;
   string60 violation_code1;
   string60 violation_code2;
@@ -251,7 +251,7 @@ EXPORT Layouts_eCrash_Base := RECORD,maxlength(40000)
   string60 injured_taken_by;
   string60 injured_taken_to;
   string7 incident_transported_for_medical_care;
-  string1 photographs_taken;
+  string7 photographs_taken;
   string100 photographed_by;
   string20 photographer_id;
   string50 photography_agency_name;
