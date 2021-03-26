@@ -1,4 +1,4 @@
-﻿IMPORT risk_indicators, RiskView, iesp, STD, Models;
+﻿IMPORT risk_indicators, RiskView, iesp, STD, Models, ut;
 
 EXPORT Transforms := module
 
@@ -4980,6 +4980,40 @@ EXPORT Models.RVT2004_2_0.z_layouts_Input xfm_RVT2004_2_RVAttrs(riskview.layouts
    
       self := [];
     END;
+    
+//RVC2004_1 model transform
+EXPORT Models.RVC2004_1_0.z_layouts_Input xfm_RVC2004_1_RVAttrs_and_Custom_Inputs(riskview.layouts.attributes_internal_layout_noscore le, riskview.layouts.Layout_Custom_Inputs rt) := TRANSFORM
+			self.TransactionID := (String)le.seq;
+			// RV Attributes and custom inputs
+			
+			TodaysDate := (STRING)STD.Date.Today();
+			ReceivedDate := rt.Custom_Inputs(OptionName = 'custom_input1')[1].Optionvalue;
+			dayssince_ReceivedDate := if( ReceivedDate = '', -998, ut.DaysApart(TodaysDate,ReceivedDate));
+			
+			
+			OpenDate := rt.Custom_Inputs(OptionName = 'custom_input2')[1].Optionvalue;
+			dayssince_OpenDate := if( OpenDate = '', -998, ut.DaysApart(TodaysDate,OpenDate));
+			
+			
+	    self.dayssince_ReceivedDate              			:= (STRING)dayssince_ReceivedDate; // uses RecievedDate
+	    self.dayssince_OpenDate              					:= (STRING)dayssince_OpenDate ; // uses OpenDate
+      self.sourcecredheadertimeoldest               := le.sourcecredheadertimeoldest;
+      self.addrprevioussubjectowned               	:= le.addrprevioussubjectowned;
+      self.addrinputmatchindex                      := le.addrinputmatchindex;
+      self.addrinputsubjectowned                 		:= le.addrinputsubjectowned;
+      self.addrprevioustimeoldest                   := le.addrprevioustimeoldest;
+      self.addrcurrentphoneservice                  := le.addrcurrentphoneservice;
+      self.ssndeceased                              := le.ssndeceased;
+      self.subjectdeceased                          := le.subjectdeceased;
+      self.confirmationsubjectfound                 := le.confirmationsubjectfound;
+			self.CollateralStatus               					:= rt.Custom_Inputs(OptionName = 'custom_input3')[1].Optionvalue;
+			self.LoanType               									:= rt.Custom_Inputs(OptionName = 'custom_input4')[1].Optionvalue;
+			self.OutOfStatuteIndicator               			:= rt.Custom_Inputs(OptionName = 'custom_input5')[1].Optionvalue;
+			self.ChargeOffAmount                      		:= rt.Custom_Inputs(OptionName = 'custom_input6')[1].Optionvalue;
+   
+      self := [];
+    END;
+    
 // rv5 attribute transform
 EXPORT iesp.share.t_NameValuePair intoVersion5(riskview.layouts.layout_riskview5_search_results le, INTEGER c) := TRANSFORM
   SELF.name := MAP(

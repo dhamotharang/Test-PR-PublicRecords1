@@ -20,7 +20,7 @@ export valid_attributes := ['riskviewattrv5', 'insurview2attr', checking_indicat
 
 export valid_IDA_models := ['rvg2005_0', 'rvs2005_0'];
 
-export attrv5_models := ['rva2008_1', 'rvt2004_1', 'rvt2004_2']; // this allows attributes to be run even if not requested
+export attrv5_models := ['rva2008_1', 'rvt2004_1', 'rvt2004_2', 'rvc2004_1']; // this allows attributes to be run even if not requested
 
 //non-standard custom models, scores must be cast as INTEGER vs UNSIGNED 
 export NonStandardScore_Models := ['ShortTermLendingRVR1903_1'];

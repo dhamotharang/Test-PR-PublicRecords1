@@ -1,0 +1,2 @@
+﻿IMPORT rvc2004_1_0;
+rvc2004_1_0.AppendAll(myfile,do_RVC2004_1_0,ChargeOffAmount,CollateralStatus,LoanType,OutOfStatuteIndicator,addrcurrentphoneservice,addrinputmatchindex,addrinputsubjectowned,addrprevioussubjectowned,addrprevioustimeoldest,confirmationsubjectfound,dayssince_OpenDate,dayssince_ReceivedDate,sourcecredheadertimeoldest,ssndeceased,subjectdeceased);
