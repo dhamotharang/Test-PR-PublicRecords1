@@ -16,7 +16,7 @@
 */
 /*--INFO-- Contains RiskView Alerts, Scores, Attributes, Report version 5.0 and higher */
 
-IMPORT Risk_Reporting, iesp, gateway, risk_indicators, std, Inquiry_AccLogs, RiskView, Royalty, Address, Doxie;
+IMPORT Risk_Reporting, iesp, gateway, risk_indicators, std, Inquiry_AccLogs, RiskView, Royalty, Address, Doxie, ut;
 
 export Search_Service := MACRO
 
@@ -249,11 +249,13 @@ export Search_Service := MACRO
 		
     //Blank out certain PII elements if they are only partially filled for IDA since they can't accept partial data
     is_proper_dob := Doxie.DOBTools((UNSIGNED)DateOfBirth).IsValidDOB;
+    is_numeric_zip := ut.isNumeric(trim(Zip));
     
     IDA_DOB := IF( Not(length(trim(DateOfBirth)) = 8 and is_proper_dob), '', DateOfBirth);
     IDA_SSN := IF(length(trim(SSN)) <> 9, '', SSN);
     IDA_Hphone := IF(length(trim(HomePhone)) <> 10, '', HomePhone);
-    IDA_Wphone := IF(length(trim(SSN)) <> 10, '', SSN);
+    IDA_Wphone := IF(length(trim(WorkPhone)) <> 10, '', WorkPhone);
+    IDA_ZIP := IF(length(trim(Zip)) <> 5 OR is_numeric_zip = FALSE, '', Zip);
     
     SELF.Seq := (integer)search.seq;
 		self.unparsedfullname := search.name.full;
@@ -264,7 +266,7 @@ export Search_Service := MACRO
 		SELF.street_addr := streetAddr;
 		SELF.p_City_name := City;
 		SELF.St := State;
-		SELF.Z5 := Zip;
+		SELF.Z5 := IF(Do_IDA, IDA_ZIP, Zip);
 		SELF.DOB := IF(Do_IDA, IDA_DOB, DateOfBirth);
 		SELF.SSN := IF(Do_IDA, IDA_SSN, SSN);
 		SELF.home_phone := IF(Do_IDA, IDA_Hphone, HomePhone);
