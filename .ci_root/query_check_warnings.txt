@@ -1,20 +1,20 @@
-00000000 2021-03-25 07:30:11  4892  4892 Loading plugin /opt/HPCCSystems/6.4.40/clienttools/plugins/liblogging.so[lib_logging] version = LOGGING 1.0.1
-00000001 2021-03-25 07:30:11  4892  4892 Loading plugin /opt/HPCCSystems/6.4.40/clienttools/plugins/libfileservices.so[lib_fileservices] version = FILESERVICES 2.1.3
-00000002 2021-03-25 07:30:11  4892  4892 Loading plugin /opt/HPCCSystems/6.4.40/clienttools/plugins/libunicodelib.so[lib_unicodelib] version = UNICODELIB 1.1.06
-00000003 2021-03-25 07:30:11  4892  4892 Loading plugin /opt/HPCCSystems/6.4.40/clienttools/plugins/libauditlib.so[lib_auditlib] version = AUDITLIB 1.0.1
-00000004 2021-03-25 07:30:11  4892  4892 Plugin /opt/HPCCSystems/6.4.40/clienttools/plugins/libdmetaphone.so exports getECLPluginDefinition but does not export ECL - not loading
-00000005 2021-03-25 07:30:11  4892  4892 Loading plugin /opt/HPCCSystems/6.4.40/clienttools/plugins/libtimelib.so[lib_timelib] version = TIMELIB 1.0.0
-00000006 2021-03-25 07:30:11  4892  4892 Loading plugin /opt/HPCCSystems/6.4.40/clienttools/plugins/libparselib.so[lib_parselib] version = PARSELIB 1.0.1
-00000007 2021-03-25 07:30:11  4892  4892 Loading plugin /opt/HPCCSystems/6.4.40/clienttools/plugins/libdebugservices.so[lib_debugservices] version = DEBUGSERVICES 1.0.1
-00000008 2021-03-25 07:30:11  4892  4892 Loading plugin /opt/HPCCSystems/6.4.40/clienttools/plugins/libworkunitservices.so[lib_WORKUNITSERVICES] version = WORKUNITSERVICES 1.0.2
-00000009 2021-03-25 07:30:11  4892  4892 Loading plugin /opt/HPCCSystems/6.4.40/clienttools/plugins/libstringlib.so[lib_stringlib] version = STRINGLIB 1.1.14
-0000000A 2021-03-25 07:30:11  4892  4892 Duplicate module found at /opt/HPCCSystems/6.4.40/clienttools/plugins/lib_auditlib.ecllib
-0000000B 2021-03-25 07:30:11  4892  4892 gpg: Creating PIPE program process : 'gpg --verify -' - hasinput=1, hasoutput=0 stderrbufsize=0
-0000000C 2021-03-25 07:30:11  4892  4892 gpg: Pipe: process 4894 complete 2
-0000000D 2021-03-25 07:30:11  4892  4892 GPG 2 gpg: Signature made Thu Mar  7 20:36:22 2019 UTC using RSA key ID 8DAA417D
+00000000 2021-03-26 06:14:01  4896  4896 Loading plugin /opt/HPCCSystems/6.4.40/clienttools/plugins/liblogging.so[lib_logging] version = LOGGING 1.0.1
+00000001 2021-03-26 06:14:01  4896  4896 Loading plugin /opt/HPCCSystems/6.4.40/clienttools/plugins/libfileservices.so[lib_fileservices] version = FILESERVICES 2.1.3
+00000002 2021-03-26 06:14:01  4896  4896 Loading plugin /opt/HPCCSystems/6.4.40/clienttools/plugins/libunicodelib.so[lib_unicodelib] version = UNICODELIB 1.1.06
+00000003 2021-03-26 06:14:01  4896  4896 Loading plugin /opt/HPCCSystems/6.4.40/clienttools/plugins/libauditlib.so[lib_auditlib] version = AUDITLIB 1.0.1
+00000004 2021-03-26 06:14:01  4896  4896 Plugin /opt/HPCCSystems/6.4.40/clienttools/plugins/libdmetaphone.so exports getECLPluginDefinition but does not export ECL - not loading
+00000005 2021-03-26 06:14:01  4896  4896 Loading plugin /opt/HPCCSystems/6.4.40/clienttools/plugins/libtimelib.so[lib_timelib] version = TIMELIB 1.0.0
+00000006 2021-03-26 06:14:01  4896  4896 Loading plugin /opt/HPCCSystems/6.4.40/clienttools/plugins/libparselib.so[lib_parselib] version = PARSELIB 1.0.1
+00000007 2021-03-26 06:14:01  4896  4896 Loading plugin /opt/HPCCSystems/6.4.40/clienttools/plugins/libdebugservices.so[lib_debugservices] version = DEBUGSERVICES 1.0.1
+00000008 2021-03-26 06:14:01  4896  4896 Loading plugin /opt/HPCCSystems/6.4.40/clienttools/plugins/libworkunitservices.so[lib_WORKUNITSERVICES] version = WORKUNITSERVICES 1.0.2
+00000009 2021-03-26 06:14:01  4896  4896 Loading plugin /opt/HPCCSystems/6.4.40/clienttools/plugins/libstringlib.so[lib_stringlib] version = STRINGLIB 1.1.14
+0000000A 2021-03-26 06:14:01  4896  4896 Duplicate module found at /opt/HPCCSystems/6.4.40/clienttools/plugins/lib_auditlib.ecllib
+0000000B 2021-03-26 06:14:01  4896  4896 gpg: Creating PIPE program process : 'gpg --verify -' - hasinput=1, hasoutput=0 stderrbufsize=0
+0000000C 2021-03-26 06:14:01  4896  4896 gpg: Pipe: process 4898 complete 2
+0000000D 2021-03-26 06:14:01  4896  4896 GPG 2 gpg: Signature made Thu Mar  7 20:36:22 2019 UTC using RSA key ID 8DAA417D
 gpg: Can't check signature: public key not found
 
-Syntax Check Warnings: 2021-03-25T07:30:11.997Z
+Syntax Check Warnings: 2021-03-26T06:14:01.377Z
 
 [[ Accident_Services.dolStateService ]]
 ----------------------------------------------------------
@@ -2421,6 +2421,12 @@ Syntax Check Warnings: 2021-03-25T07:30:11.997Z
 /builds/risk-engineering/PublicRecords/.ci_root/../tools/mac_RedefineFormat.ecl(318,12): warning C1048: While expanding macro <param>
 /builds/risk-engineering/PublicRecords/.ci_root/../DNB_DMI/File_Companies_Keybuild.ecl(26,86): warning C1048: While expanding macro mac_redefineformat
 0 error, 3 warnings
+----------------------------------------------------------
+
+[[ Doxie.Comprehensive_Report_Service ]]
+----------------------------------------------------------
+/builds/risk-engineering/PublicRecords/.ci_root/../tools/mac_FilesIndex.ecl(28,2): warning C2380: Name of exported symbol 'fcra_key' does not match the expected name 'key_HRI_Address_To_SIC_filtered_fcra'
+/builds/risk-engineering/PublicRecords/.ci_root/../Risk_Indicators/Key_HRI_Address_To_Sic_filtered_FCRA.ecl(5,253): warning C2380: While expanding macro mac_filesindex
 ----------------------------------------------------------
 
 [[ Doxie.dl_Helper ]]
