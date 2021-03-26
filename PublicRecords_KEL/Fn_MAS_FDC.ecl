@@ -5584,7 +5584,7 @@ Key_AccLogs_FCRA_SSN :=
 					SELF.UIDAppend := LEFT.UIDAppend,
 					SELF.G_ProcUID := LEFT.G_ProcUID,
 					SELF.did := LEFT.did,
-					SELF.src := MDR.sourceTools.src_Foreclosures;
+					SELF.src := RIGHT.source;
 					SELF.DPMBitmap := SetDPMBitmap( Source := self.src, FCRA_Restricted := FALSE, GLBA_Restricted := NotRegulated, Pre_GLB_Restricted := NotRegulated, DPPA_Restricted := NotRegulated, DPPA_State := BlankString, KELPermissions := CFG_File),				
 					SELF.Archive_Date := ArchiveDate(RIGHT.recording_date);
 					SELF.recording_date := ArchiveDate(RIGHT.recording_date);
