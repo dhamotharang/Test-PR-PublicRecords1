@@ -1,4 +1,4 @@
-﻿IMPORT header;
+﻿IMPORT header, Std;
 EXPORT mod_matchCodes := MODULE
 /*
 Best Match
@@ -20,7 +20,25 @@ Address Matches
 Reserved for Future Use
 // H             Phone
 */
-	shared strEq  (STRING str1, STRING str2) := str1 = str2 AND str2 <> '';
+	shared strEq  (string str1, string str2) := str1 = str2 AND str2 <> '';
+	shared intEq  (unsigned8 id1, unsigned8 id2) := id1 = id2 AND id2 <> 0;
+	
+	shared integer getAge(unsigned4 dob) :=
+					IF(NOT Std.Date.IsValidDate(dob), 0,
+					(integer)(Std.Date.MonthsBetween(dob, STD.Date.Today())/12)
+					);
+					
+	shared ValidLexid(unsigned6 lexId, unsigned4 dob, unsigned4 bestdob) :=
+					LexId <> 0 
+					AND getAge(dob) > 17
+					AND header.sig_near_dob(dob,bestdob);
+	
+	// best dob is dob returned by did_add.MAC_Add_DOB_By_DID
+	export boolean LexidMatch(unsigned6 lexId1, unsigned6 lexId2, unsigned4 dob1, unsigned4 dob2,
+										unsigned4 bestdob1, unsigned4 bestdob2) :=
+				 ValidLexid(lexId1, dob1, bestdob1) AND
+				 ValidLexid(lexId2, dob2, bestdob2) AND
+				 lexId1 = lexId2;
 
 	export NameMatch(string fname1, string lname1, string fname2, string lname2, string prefname1='', string prefname2='') := 
 
@@ -45,7 +63,7 @@ Reserved for Future Use
 				''
 			);
 
-	export DobMatch(unsigned dob1, unsigned dob2, string suffix1='', string suffix2='') := 
+	export DobMatch(unsigned4 dob1, unsigned4 dob2, string suffix1='', string suffix2='') := 
 			MAP(
 				dob1 = 0 OR dob2 = 0 => '',
 				dob1=dob2 => 'D',										// DOB match
@@ -56,24 +74,14 @@ Reserved for Future Use
 					) => 'B',
 			'');
 	export AddressMatch(string prim_range1, string prim_name1, string prim_range2, string prim_name2) :=
-			MAP(
-				prim_name1 = '' OR prim_name2 = '' => '',
-				prim_name1 = prim_name2 AND prim_range1 = prim_range2 => 'A',
-				''
-			);
+			IF(strEq(prim_name1, prim_name2) AND prim_range1 = prim_range2, 'A', '');
 				
 	export CityMatch(string city1, string st1, string city2, string st2) := 
-			MAP(
-				city1 = '' OR city2 = '' OR st1 = '' OR st2 = '' => '',
-				city1 = city2 AND st1 = st2 => 'C',
-				''
-			);
+			IF(strEq(city1, city2) AND strEq(st1, st2), 'C', '');
+
 			
 	export ZipMatch(string zip1, string zip2) := 
-			MAP(
-				zip1 = '' OR zip2 = '' => '',
-				zip1 = zip2 => 'Z',
-				''
-			);
+			IF(strEq(zip1, zip2), 'Z', '');
+
 				
 END;
