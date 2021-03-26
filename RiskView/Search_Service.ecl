@@ -16,7 +16,7 @@
 */
 /*--INFO-- Contains RiskView Alerts, Scores, Attributes, Report version 5.0 and higher */
 
-IMPORT Risk_Reporting, iesp, gateway, risk_indicators, std, Inquiry_AccLogs, RiskView, Royalty, Address, Doxie;
+IMPORT Risk_Reporting, iesp, gateway, risk_indicators, std, Inquiry_AccLogs, RiskView, Royalty, Address, Doxie, ut;
 
 export Search_Service := MACRO
 
@@ -229,17 +229,18 @@ export Search_Service := MACRO
   STRING20 CustomerNumber					:= context.MLAGatewayInfo.CustomerNumber ;
   STRING20 SecurityCode 					:= context.MLAGatewayInfo.SecurityCode  ;
 
-  // Check if any IDA models are requested.
-  IDA_model_check :=  auto_model_name IN RiskView.Constants.valid_IDA_models OR 
-                      bankcard_model_name IN RiskView.Constants.valid_IDA_models OR  
-                      Short_term_lending_model_name IN RiskView.Constants.valid_IDA_models OR  
-                      Telecommunications_model_name IN RiskView.Constants.valid_IDA_models OR  
-                      Crossindustry_model_name IN RiskView.Constants.valid_IDA_models OR  
-                      Custom_model_name IN RiskView.Constants.valid_IDA_models OR 
-                      Custom2_model_name IN RiskView.Constants.valid_IDA_models OR 
-                      Custom3_model_name IN RiskView.Constants.valid_IDA_models OR 
-                      Custom4_model_name IN RiskView.Constants.valid_IDA_models OR 
-                      Custom5_model_name IN RiskView.Constants.valid_IDA_models;
+  // Check if any IDA products are requested.
+  Do_IDA :=  STD.Str.ToLowerCase(AttributesVersionRequest) IN RiskView.Constants.IDA_modeling_attrs OR
+             auto_model_name IN RiskView.Constants.valid_IDA_models OR 
+             bankcard_model_name IN RiskView.Constants.valid_IDA_models OR  
+             Short_term_lending_model_name IN RiskView.Constants.valid_IDA_models OR  
+             Telecommunications_model_name IN RiskView.Constants.valid_IDA_models OR  
+             Crossindustry_model_name IN RiskView.Constants.valid_IDA_models OR  
+             Custom_model_name IN RiskView.Constants.valid_IDA_models OR 
+             Custom2_model_name IN RiskView.Constants.valid_IDA_models OR 
+             Custom3_model_name IN RiskView.Constants.valid_IDA_models OR 
+             Custom4_model_name IN RiskView.Constants.valid_IDA_models OR 
+             Custom5_model_name IN RiskView.Constants.valid_IDA_models;
 
 /* ***************************************
 	 *           Package Input:            *
@@ -248,11 +249,13 @@ export Search_Service := MACRO
 		
     //Blank out certain PII elements if they are only partially filled for IDA since they can't accept partial data
     is_proper_dob := Doxie.DOBTools((UNSIGNED)DateOfBirth).IsValidDOB;
+    is_numeric_zip := ut.isNumeric(trim(Zip));
     
     IDA_DOB := IF( Not(length(trim(DateOfBirth)) = 8 and is_proper_dob), '', DateOfBirth);
     IDA_SSN := IF(length(trim(SSN)) <> 9, '', SSN);
     IDA_Hphone := IF(length(trim(HomePhone)) <> 10, '', HomePhone);
-    IDA_Wphone := IF(length(trim(SSN)) <> 10, '', SSN);
+    IDA_Wphone := IF(length(trim(WorkPhone)) <> 10, '', WorkPhone);
+    IDA_ZIP := IF(length(trim(Zip)) <> 5 OR is_numeric_zip = FALSE, '', Zip);
     
     SELF.Seq := (integer)search.seq;
 		self.unparsedfullname := search.name.full;
@@ -263,11 +266,11 @@ export Search_Service := MACRO
 		SELF.street_addr := streetAddr;
 		SELF.p_City_name := City;
 		SELF.St := State;
-		SELF.Z5 := Zip;
-		SELF.DOB := IF(IDA_model_check, IDA_DOB, DateOfBirth);
-		SELF.SSN := IF(IDA_model_check, IDA_SSN, SSN);
-		SELF.home_phone := IF(IDA_model_check, IDA_Hphone, HomePhone);
-		SELF.work_phone := IF(IDA_model_check, IDA_Wphone, WorkPhone);
+		SELF.Z5 := IF(Do_IDA, IDA_ZIP, Zip);
+		SELF.DOB := IF(Do_IDA, IDA_DOB, DateOfBirth);
+		SELF.SSN := IF(Do_IDA, IDA_SSN, SSN);
+		SELF.home_phone := IF(Do_IDA, IDA_Hphone, HomePhone);
+		SELF.work_phone := IF(Do_IDA, IDA_Wphone, WorkPhone);
 		SELF.Email := Email;
 		SELF.DL_Number := DLNumber;
 		SELF.DL_State := DLState;
@@ -318,7 +321,7 @@ check_valid_input := IF((Standard_min_check
 							          (unsigned)packagedInput[1].LexID <> 0), TRUE, FALSE);
 
 
-Non_lexid_min_check := IF(IDA_model_check, 
+Non_lexid_min_check := IF(Do_IDA, 
                           IF(Standard_min_check, TRUE, FALSE),
                           TRUE); //Only go into this check if there is an IDA model, then lexid only is not a valid minimum input
                  
@@ -338,14 +341,14 @@ Gateway.Layouts.Config gw_switch(gateways_in le) := TRANSFORM
   SELF.servicename := Map( service_name IN [Risk_Indicators.iid_constants.idareport,
                                             Risk_Indicators.iid_constants.idareportUAT,
                                             Risk_Indicators.iid_constants.idareportRetro] AND 
-                                            (~IDA_model_check OR ~Non_lexid_min_check)    => '', 
+                                            (~Do_IDA OR ~Non_lexid_min_check)    => '', 
                                                                                              le.servicename);
 
   SELF.url := Map(service_name IN [Gateway.Constants.ServiceName.Targus]                  => '',// Don't allow Targus Gateway
                   service_name IN [Risk_Indicators.iid_constants.idareport,
                                    Risk_Indicators.iid_constants.idareportUAT,
                                    Risk_Indicators.iid_constants.idareportRetro] AND
-                                   (~IDA_model_check OR ~Non_lexid_min_check)             => '',
+                                   (~Do_IDA OR ~Non_lexid_min_check)             => '',
                                                                                              le.url); 
   fd_properties := if(service_name IN [Gateway.Constants.ServiceName.FirstData], 
                         DATASET([TRANSFORM(Gateway.Layouts.ConfigProperties,
@@ -545,7 +548,7 @@ search_results_temp := ungroup(
                                         STD.Str.ToLowerCase(AttributesVersionRequest) = RiskView.Constants.checking_indicators_attribute_request and left.Exception_code <> '' => ds_excep_Checking_Indicators,
                                         IncludeStatusRefreshChecks = TRUE AND COUNT(DeferredTransactionIDs) = 0 AND LEFT.Exception_Code <> ''  => ds_excep_status_refresh,
                                         IncludeStatusRefreshChecks = TRUE AND COUNT(DeferredTransactionIDs) <> 0 AND LEFT.Exception_Code <> '' => ds_excep_DTE,
-                                        IDA_model_check AND TRIM(LEFT.Exception_Code) <> ''                                                    => ds_IDA_exception,
+                                        Do_IDA AND TRIM(LEFT.Exception_Code) <> ''                                                             => ds_IDA_exception,
                                                                                                                                                   ds_excep_blank);
         SELF.result.fdcheckingindicator := left.FDGatewayCalled;
         SELF._Header.Status := (INTEGER)left.Status_Code;

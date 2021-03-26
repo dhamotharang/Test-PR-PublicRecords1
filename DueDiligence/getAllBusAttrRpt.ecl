@@ -63,10 +63,10 @@ EXPORT getAllBusAttrRpt(DATASET(DueDiligence.v3Layouts.Internal.BusinessTemp) v3
 
 
                                               SELF.DIDlessBEOCount := COUNT(allExecs(did = 0));
-                                              SELF.DIDlessExecs := allExecs(did = 0);
+                                              SELF.DIDlessExecs := CHOOSEN(SORT(allExecs(did = 0),lastName, firstName, suffix), DueDiligence.Constants.MAX_EXECS);
 
                                               SELF.execCount := COUNT(allExecs(did > 0));
-                                              SELF.execs := allExecs(did > 0);
+                                              SELF.execs := CHOOSEN(SORT(allExecs(did > 0), did), DueDiligence.Constants.MAX_EXECS);
 
                                               SELF := [];));
 

@@ -187,6 +187,8 @@ EXPORT Layouts := MODULE
     STRING15   email_status := '';
     STRING50   email_status_reason := '';
     STRING70   additional_status_info := '';
+    STRING20   ea_email_exist := '';
+    STRING20   ea_email_status := '';
     STRING8    date_last_verified := '';
     STRING50   relationship  := '';
     STRING50   record_err_msg  := '';
@@ -299,6 +301,8 @@ EXPORT Layouts := MODULE
     STRING15  email_status := '';
     STRING50  email_status_reason := '';
     STRING70  additional_status_info := '';
+    STRING20  ea_email_exist := '';
+    STRING20  ea_email_status := '';
     STRING50  relationship  := '';
     STRING    src;
     STRING50  record_err_msg  := '';
@@ -339,7 +343,7 @@ EXPORT Layouts := MODULE
   END;
 
   EXPORT Gateway_Data := MODULE
-    EXPORT batch_in_bv_rec := RECORD
+    EXPORT batch_in_gw_rec := RECORD
       STRING   email := '';
       INTEGER  rec_no := 0;
       INTEGER  group_no := 0;
@@ -372,6 +376,14 @@ EXPORT Layouts := MODULE
        STRING  RecsReturned {XPATH('RecsReturned')};
        STRING  Latency {XPATH('Latency')};
        STRING  ExceptionMessage {XPATH('Exceptions/Exception/Message')};
+    END;
+
+    EXPORT ea_result_rec := RECORD
+      STRING email := '';
+      STRING email_domain := '';
+      STRING email_username := '';
+      STRING email_status := '';
+      STRING email_exists := '';
     END;
 
   END;

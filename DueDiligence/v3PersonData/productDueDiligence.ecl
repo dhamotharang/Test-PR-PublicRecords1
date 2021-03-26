@@ -76,7 +76,7 @@ EXPORT productDueDiligence(DATASET(DueDiligence.v3Layouts.DDInput.PersonSearch) 
     //get requested attributes and report data if requested
     noResults := DATASET([], DueDiligence.v3Layouts.InternalPerson.PersonResults);
     
-    matchLevelAttributeData := DueDiligence.v3PersonAttributes.getMatchLevel(validInquiredData); //always called regardless of module(s)
+    matchLevelAttributeData := DueDiligence.v3PersonAttributes.getMatchLevel(validInquiredData, inData); //always called regardless of module(s)
     
     legalAttributeData := IF(requestingLegalAttributes, 
                                 DueDiligence.v3AttributeModules.getPersonLegal(validInquiredData, attributesRequested, regulatoryAccess, ddOptions),
