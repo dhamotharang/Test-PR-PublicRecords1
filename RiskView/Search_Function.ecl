@@ -219,6 +219,7 @@ Crossindustry_model := STD.Str.ToUpperCase(Crossindustry_model_name);
 CheckingIndicatorsRequest := STD.Str.ToLowerCase(AttributesVersionRequest) = RiskView.Constants.checking_indicators_attribute_request;
 NoCheckingIndicatorsRequest := STD.Str.ToLowerCase(AttributesVersionRequest) <> RiskView.Constants.checking_indicators_attribute_request;															
 
+IDAattrRequest := STD.Str.ToLowerCase(AttributesVersionRequest) IN RiskView.Constants.IDA_modeling_attrs;
 
 //good chance these come through with varied case, so we will build out the set and capitalize them all
 //start change to upper case
@@ -288,27 +289,28 @@ Custom_model_name_array := SET(ucase_custom_models, model);
 		in_ExcludeReportingSources := ExcludeReportingSources
 	);
 
-Do_IDA := Auto_model_name in Riskview.Constants.valid_IDA_models or 
-          Bankcard_model_name in Riskview.Constants.valid_IDA_models or
-          Short_term_lending_model_name in Riskview.Constants.valid_IDA_models or
-          Telecommunications_model_name in Riskview.Constants.valid_IDA_models or
-          Crossindustry_model_name in Riskview.Constants.valid_IDA_models or
-          Custom_model_name in Riskview.Constants.valid_IDA_models or
-          Custom2_model_name in Riskview.Constants.valid_IDA_models or
-          Custom3_model_name in Riskview.Constants.valid_IDA_models or
-          Custom4_model_name in Riskview.Constants.valid_IDA_models or
-          Custom5_model_name in Riskview.Constants.valid_IDA_models;
+Do_IDA := IDAattrRequest OR
+          Auto_model_name IN Riskview.Constants.valid_IDA_models OR 
+          Bankcard_model_name IN Riskview.Constants.valid_IDA_models OR
+          Short_term_lending_model_name IN Riskview.Constants.valid_IDA_models OR
+          Telecommunications_model_name IN Riskview.Constants.valid_IDA_models OR
+          Crossindustry_model_name in Riskview.Constants.valid_IDA_models OR
+          Custom_model_name IN Riskview.Constants.valid_IDA_models OR
+          Custom2_model_name IN Riskview.Constants.valid_IDA_models OR
+          Custom3_model_name IN Riskview.Constants.valid_IDA_models OR
+          Custom4_model_name IN Riskview.Constants.valid_IDA_models OR
+          Custom5_model_name IN Riskview.Constants.valid_IDA_models;
 			
-Do_Attribute_Models := 	Auto_model_name in Riskview.Constants.attrv5_models or 
-          Bankcard_model_name in Riskview.Constants.attrv5_models or
-          Short_term_lending_model_name in Riskview.Constants.attrv5_models or
-          Telecommunications_model_name in Riskview.Constants.attrv5_models or
-          Crossindustry_model_name in Riskview.Constants.attrv5_models or
-          Custom_model_name in Riskview.Constants.attrv5_models or
-          Custom2_model_name in Riskview.Constants.attrv5_models or
-          Custom3_model_name in Riskview.Constants.attrv5_models or
-          Custom4_model_name in Riskview.Constants.attrv5_models or
-          Custom5_model_name in Riskview.Constants.attrv5_models;
+Do_Attribute_Models := 	Auto_model_name IN Riskview.Constants.attrv5_models OR 
+          Bankcard_model_name IN Riskview.Constants.attrv5_models OR
+          Short_term_lending_model_name IN Riskview.Constants.attrv5_models OR
+          Telecommunications_model_name IN Riskview.Constants.attrv5_models OR
+          Crossindustry_model_name IN Riskview.Constants.attrv5_models OR
+          Custom_model_name IN Riskview.Constants.attrv5_models OR
+          Custom2_model_name IN Riskview.Constants.attrv5_models OR
+          Custom3_model_name IN Riskview.Constants.attrv5_models OR
+          Custom4_model_name IN Riskview.Constants.attrv5_models OR
+          Custom5_model_name IN Riskview.Constants.attrv5_models;
 
 
 Risk_Indicators.layouts.layout_IDA_in into_IDA(RiskView.Layouts.layout_riskview_input le, risk_indicators.Layout_Boca_Shell ri) := TRANSFORM   
@@ -354,7 +356,7 @@ LN_IDA_input := JOIN(riskview_input, clam,
                      LEFT OUTER);
 
 IDA_call := Risk_Indicators.Prep_IDA_Credit(LN_IDA_input,
-                                            gateways,
+                                            IF(Do_IDA, gateways, DATASET([],Gateway.Layouts.Config)), //blank out gateways if IDA not needed.
                                             FALSE, //indicates if we need Innovis attributes
                                             Intended_Purpose, 
                                             isCalifornia_in_person
@@ -485,7 +487,7 @@ end;
 
 #if(Riskview.Constants.TurnOnValidation = FALSE)
 
-riskview5_attr_search_results_attrv5 := join(clam, attrv5, left.seq=right.seq,
+riskview5_search_results_attrv5 := join(clam, attrv5, left.seq=right.seq,
 transform(riskview.layouts.layout_riskview5_search_results, 
 	self.LexID := if(right.did=0, '', (string)right.did);
 	self.ConsumerStatements := project(left.ConsumerStatements, transform(
@@ -494,7 +496,16 @@ transform(riskview.layouts.layout_riskview5_search_results,
 	self := left,
 	self := []), LEFT OUTER, KEEP(1), ATMOST(100));  
 
-riskview5_attr_search_results := join(riskview5_attr_search_results_attrv5, attrLnJ, left.seq=right.seq,
+
+riskview5_search_results_IDAattr := join(riskview5_search_results_attrv5, IDASlim,
+                                         LEFT.seq = RIGHT.seq,
+                                         TRANSFORM(riskview.layouts.layout_riskview5_search_results, 
+                                                   SELF.IDA_Attributes := RIGHT.Indicators,
+                                                   SELF := LEFT),
+                                         LEFT OUTER, KEEP(1), ATMOST(100));
+
+
+riskview5_attr_search_results := join(riskview5_search_results_IDAattr, attrLnJ, left.seq=right.seq,
 transform(riskview.layouts.layout_riskview5_search_results, 
 	self.LexID := if(right.did=0, '', (string)right.did); //don't show a lexid if the truedid is not TRUE
 	self.ConsumerStatements := left.ConsumerStatements;
