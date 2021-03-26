@@ -4983,20 +4983,18 @@ EXPORT Models.RVT2004_2_0.z_layouts_Input xfm_RVT2004_2_RVAttrs(riskview.layouts
     
 //RVC2004_1 model transform
 EXPORT Models.RVC2004_1_0.z_layouts_Input xfm_RVC2004_1_RVAttrs_and_Custom_Inputs(riskview.layouts.attributes_internal_layout_noscore le, riskview.layouts.Layout_Custom_Inputs rt) := TRANSFORM
-			self.TransactionID := (String)le.seq;
-			// RV Attributes and custom inputs
-			
-			TodaysDate := (STRING)STD.Date.Today();
-			ReceivedDate := rt.Custom_Inputs(OptionName = 'custom_input1')[1].Optionvalue;
-			dayssince_ReceivedDate := if( ReceivedDate = '', -998, ut.DaysApart(TodaysDate,ReceivedDate));
-			
-			
-			OpenDate := rt.Custom_Inputs(OptionName = 'custom_input2')[1].Optionvalue;
-			dayssince_OpenDate := if( OpenDate = '', -998, ut.DaysApart(TodaysDate,OpenDate));
-			
-			
-	    self.dayssince_ReceivedDate              			:= (STRING)dayssince_ReceivedDate; // uses RecievedDate
-	    self.dayssince_OpenDate              					:= (STRING)dayssince_OpenDate ; // uses OpenDate
+      self.TransactionID := (String)le.seq;
+      // RV Attributes and custom inputs
+      
+      TodaysDate := (STRING)STD.Date.Today();
+      ReceivedDate := rt.Custom_Inputs(OptionName = 'custom_input1')[1].Optionvalue;
+      dayssince_ReceivedDate := if( ReceivedDate = '', -998, ut.DaysApart(TodaysDate,ReceivedDate));
+
+      OpenDate := rt.Custom_Inputs(OptionName = 'custom_input2')[1].Optionvalue;
+      dayssince_OpenDate := if( OpenDate = '', -998, ut.DaysApart(TodaysDate,OpenDate));
+
+      self.dayssince_ReceivedDate              			:= (STRING)dayssince_ReceivedDate; // uses RecievedDate
+      self.dayssince_OpenDate              					:= (STRING)dayssince_OpenDate ; // uses OpenDate
       self.sourcecredheadertimeoldest               := le.sourcecredheadertimeoldest;
       self.addrprevioussubjectowned               	:= le.addrprevioussubjectowned;
       self.addrinputmatchindex                      := le.addrinputmatchindex;
@@ -5006,10 +5004,36 @@ EXPORT Models.RVC2004_1_0.z_layouts_Input xfm_RVC2004_1_RVAttrs_and_Custom_Input
       self.ssndeceased                              := le.ssndeceased;
       self.subjectdeceased                          := le.subjectdeceased;
       self.confirmationsubjectfound                 := le.confirmationsubjectfound;
-			self.CollateralStatus               					:= rt.Custom_Inputs(OptionName = 'custom_input3')[1].Optionvalue;
-			self.LoanType               									:= rt.Custom_Inputs(OptionName = 'custom_input4')[1].Optionvalue;
-			self.OutOfStatuteIndicator               			:= rt.Custom_Inputs(OptionName = 'custom_input5')[1].Optionvalue;
-			self.ChargeOffAmount                      		:= rt.Custom_Inputs(OptionName = 'custom_input6')[1].Optionvalue;
+      self.CollateralStatus               					:= rt.Custom_Inputs(OptionName = 'custom_input3')[1].Optionvalue;
+      self.LoanType               									:= rt.Custom_Inputs(OptionName = 'custom_input4')[1].Optionvalue;
+      self.OutOfStatuteIndicator               			:= rt.Custom_Inputs(OptionName = 'custom_input5')[1].Optionvalue;
+      self.ChargeOffAmount                      		:= rt.Custom_Inputs(OptionName = 'custom_input6')[1].Optionvalue;
+   
+      self := [];
+    END;
+    
+    
+//RVC2004_2 model transform
+EXPORT Models.RVC2004_2_0.z_layouts_Input xfm_RVC2004_2_RVAttrs_and_Custom_Inputs(riskview.layouts.attributes_internal_layout_noscore le, riskview.layouts.Layout_Custom_Inputs rt) := TRANSFORM
+        self.TransactionID := (String)le.seq;
+        // RV Attributes and custom inputs
+        
+        TodaysDate := (STRING)STD.Date.Today();
+        LastPaymentDate := rt.Custom_Inputs(OptionName = 'custom_input7')[1].Optionvalue;
+        DaysSinceLastPayment := if( LastPaymentDate = '', -998, ut.DaysApart(TodaysDate,LastPaymentDate));
+       
+       
+      self.dayssince_LastPaymentDate                := (STRING)DaysSinceLastPayment; 
+      self.derogcount                               := le.derogcount;
+      self.sourcecredheadertimeoldest               := le.sourcecredheadertimeoldest;
+      self.inputprovidedphone                       := le.inputprovidedphone;
+      self.confirmationinputaddress                 := le.confirmationinputaddress;
+      self.addrinputownershipindex                  := le.addrinputownershipindex;
+      self.ssndeceased                              := le.ssndeceased;
+      self.subjectdeceased                          := le.subjectdeceased;
+      self.confirmationsubjectfound                 := le.confirmationsubjectfound;
+      self.OutOfStatuteIndicator                    := rt.Custom_Inputs(OptionName = 'custom_input5')[1].Optionvalue;
+      self.ChargeOffAmount                          := rt.Custom_Inputs(OptionName = 'custom_input6')[1].Optionvalue;
    
       self := [];
     END;

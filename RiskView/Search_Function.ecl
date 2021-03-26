@@ -301,16 +301,16 @@ Do_IDA := IDAattrRequest OR
           Custom4_model_name IN Riskview.Constants.valid_IDA_models OR
           Custom5_model_name IN Riskview.Constants.valid_IDA_models;
 			
-Do_Attribute_Models := 	Auto_model_name IN Riskview.Constants.attrv5_models OR 
-          Bankcard_model_name IN Riskview.Constants.attrv5_models OR
-          Short_term_lending_model_name IN Riskview.Constants.attrv5_models OR
-          Telecommunications_model_name IN Riskview.Constants.attrv5_models OR
-          Crossindustry_model_name IN Riskview.Constants.attrv5_models OR
-          Custom_model_name IN Riskview.Constants.attrv5_models OR
-          Custom2_model_name IN Riskview.Constants.attrv5_models OR
-          Custom3_model_name IN Riskview.Constants.attrv5_models OR
-          Custom4_model_name IN Riskview.Constants.attrv5_models OR
-          Custom5_model_name IN Riskview.Constants.attrv5_models;
+Do_Attribute_Models := 	STD.Str.ToLowerCase(Auto_model_name) IN Riskview.Constants.attrv5_models OR 
+          STD.Str.ToLowerCase(Bankcard_model_name) IN Riskview.Constants.attrv5_models OR
+          STD.Str.ToLowerCase(Short_term_lending_model_name) IN Riskview.Constants.attrv5_models OR
+          STD.Str.ToLowerCase(Telecommunications_model_name) IN Riskview.Constants.attrv5_models OR
+          STD.Str.ToLowerCase(Crossindustry_model_name) IN Riskview.Constants.attrv5_models OR
+          STD.Str.ToLowerCase(Custom_model_name) IN Riskview.Constants.attrv5_models OR
+          STD.Str.ToLowerCase(Custom2_model_name) IN Riskview.Constants.attrv5_models OR
+          STD.Str.ToLowerCase(Custom3_model_name) IN Riskview.Constants.attrv5_models OR
+          STD.Str.ToLowerCase(Custom4_model_name) IN Riskview.Constants.attrv5_models OR
+          STD.Str.ToLowerCase(Custom5_model_name) IN Riskview.Constants.attrv5_models;
 
 
 Risk_Indicators.layouts.layout_IDA_in into_IDA(RiskView.Layouts.layout_riskview_input le, risk_indicators.Layout_Boca_Shell ri) := TRANSFORM   
