@@ -1,36 +1,14 @@
-﻿/*--SOAP--
-<message name="BatchService">
-  <part name="DPPAPurpose" type="xsd:byte"/>
-  <part name="GLBPurpose" type="xsd:byte"/>
-  <part name="DataPermissionMask" type="xsd:string"/>
-  <part name="DataRestrictionMask" type="xsd:string"/>
-  <part name="ApplicationType" type="xsd:string"/>
-  <part name="IndustryClass" type="xsd:string"/>
-  <part name="DOBMask" type="xsd:string"/>
-  <part name="SSNMask" type="xsd:string"/>
-  <part name="ResellerType" type="xsd:string"/>
-  <part name="IntendedUse" type="xsd:string"/>
-  <part name="batch_in" type="tns:XmlDataSet" cols="70" rows="25"/>
-  <part name="Max_Results_Per_Acct" type="xsd:unsignedInt"/>
-  <part name="MaxResults" type="xsd:unsignedInt"/>
-  <part name="PenaltThreshold" type="xsd:unsignedInt"/>
-  <part name="ReturnDetailedRoyalties" type="xsd:boolean"/>
-  <part name="Run_Deep_Dive" type="xsd:boolean"/>
-  <part name="IncludeHistoricData" type="xsd:boolean"/>
-  <part name="RequireLexidMatch" type="xsd:boolean"/>
-  <part name="EmailQualityRulesMask" type="xsd:string"/>
-  <part name="SearchType" type="xsd:string"/>
-  <part name="BVAPIkey" type="xsd:string"/>
-  <part name="CheckEmailDeliverable" type="xsd:boolean"/>
-  <part name="KeepUndeliverableEmail" type="xsd:boolean"/>
-  <part name="MaxEmailsForDeliveryCheck" type="xsd:unsignedInt"/>
-</message>
-*/
+﻿// =====================================================================
+// ROXIE QUERY
+// -----------
+// For the complete list of input parameters please check published WU.
+// Look at the history of this attribute for the old SOAP info.
+// =====================================================================
 
 
 EXPORT BatchService(useCannedRecs = 'false') := MACRO
 
-IMPORT AutoheaderV2, AutoKeyI, BatchShare, EmailV2_Services, Royalty;
+IMPORT AutoheaderV2, BatchShare, Doxie, EmailV2_Services, Royalty;
 
   #CONSTANT('SearchLibraryVersion', AutoheaderV2.Constants.LibVersion.SALT);
 
@@ -39,8 +17,10 @@ IMPORT AutoheaderV2, AutoKeyI, BatchShare, EmailV2_Services, Royalty;
   ds_xml_in := DATASET([], EmailV2_Services.Layouts.batch_email_input) : STORED('batch_in', FEW);
   batch_params := EmailV2_Services.IParams.getBatchParams();
 
-  IF(~EmailV2_Services.Constants.SearchType.isValidSearchType(batch_params.SearchType),
-        FAIL(AutoKeyI.errorcodes._codes.INVALID_INPUT, AutoKeyI.errorcodes._msgs(AutoKeyI.errorcodes._codes.INVALID_INPUT)));
+  isValidSearchType := EmailV2_Services.Constants.SearchType.isValidSearchType(batch_params.SearchType);
+  isAllowedValidation := EmailV2_Services.Constants.isAllowedValidation(batch_params.SearchTier, batch_params.EmailValidationType);
+
+  IF(~isValidSearchType OR (batch_params.CheckEmailDeliverable AND ~isAllowedValidation), FAIL(303, doxie.ErrorCodes(303)));
 
   BatchShare.MAC_SequenceInput(ds_xml_in, ds_batch_in);
 
