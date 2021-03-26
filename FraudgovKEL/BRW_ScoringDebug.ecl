@@ -24,39 +24,250 @@ RulesFlagsMatchedPlusPrep := JOIN(ModelingOutput, RulesList, (LEFT.customerid=RI
 RulesFlagsMatchedPlus := JOIN(RulesFlagsMatchedPlusPrep, RulesFlagsMatched, 
                            LEFT.customerid=RIGHT.customerid AND LEFT.industrytype=RIGHT.industrytype AND LEFT.entitycontextuid=RIGHT.entitycontextuid AND 
                            LEFT.entitytype=RIGHT.entitytype AND LEFT.rulename=RIGHT.rulename,
-                           TRANSFORM({RECORDOF(LEFT), RIGHT.RiskLevel}, SELF := LEFT, SELF := RIGHT), LEFT OUTER, HASH);
-                           
+                           TRANSFORM({RECORDOF(LEFT), RIGHT.RiskLevel}, SELF := LEFT, SELF := RIGHT), LEFT OUTER, HASH) : PERSIST('~fraudgov::temp::delemteme10jo');
+
 FinalRec := RECORD
   RECORDOF(RulesFlagsMatchedPlus);
-  STRING P1_IDRiskRuleNmList := '';
-  STRING P1_IDRiskRuleDescList := '';
-  STRING P1_IDRiskRuleFlagList := '';
-  STRING P1_IDRiskRuleLvlList := '';
+  
+  BOOLEAN FirstRowSet := FALSE;
+  
+  string p1_idriskrulenmlist;
+  string p1_idriskruledesclist;
+  string p1_idriskruleflaglist;
+  string p1_idriskrulelvllist;
+
+  string p9_addrriskrulenmlist;
+  string p9_addrriskruledesclist;
+  string p9_addrriskruleflaglist;
+  string p9_addrriskrulelvllist;
+
+  string p15_ssnriskrulenmlist;
+  string p15_ssnriskruledesclist;
+  string p15_ssnriskruleflaglist;
+  string p15_ssnriskrulelvllist;
+
+  string p16_phnriskrulenmlist;
+  string p16_phnriskruledesclist;
+  string p16_phnriskruleflaglist;
+  string p16_phnriskrulelvllist;
+
+  string p17_emailriskrulenmlist;
+  string p17_emailriskruledesclist;
+  string p17_emailriskruleflaglist;
+  string p17_emailriskrulelvllist;
+
+  string p18_ipriskrulenmlist;
+  string p18_ipriskruledesclist;
+  string p18_ipriskruleflaglist;
+  string p18_ipriskrulelvllist;
+
+  string p19_bnkriskrulenmlist;
+  string p19_bnkriskruledesclist;
+  string p19_bnkriskruleflaglist;
+  string p19_bnkriskrulelvllist;
+
+  string p20_dlriskrulenmlist;
+  string p20_dlriskruledesclist;
+  string p20_dlriskruleflaglist;
+  string p20_dlriskrulelvllist;
+  
 END;
 
 RulesFlagsFinal1 := PROJECT(RulesFlagsMatchedPlus,TRANSFORM(FinalRec, SELF := LEFT, SELF := [])); //create dataset to work with
-RulesFlagsFinal1Sorted := SORT(RulesFlagsFinal1, customerid, industrytype, entitycontextuid, rulename); //sort it first
+RulesFlagsFinal1Sorted := SORT(RulesFlagsFinal1, customerid, industrytype, entitycontextuid, entitytype, rulename); //sort it first
 
 FinalRec tFinal(FinalRec L,FinalRec R) := TRANSFORM
-  SELF.P1_IDRiskRuleNmList :=MAP(L.P1_IDRiskRuleNmList = '' => TRIM(L.rulename) + '|' + TRIM(R.rulename), TRIM(L.P1_IDRiskRuleNmList) + '|' + (R.rulename));
-  SELF.P1_IDRiskRuleDescList := MAP(L.P1_IDRiskRuleDescList = '' => TRIM(L.description) + '|' + TRIM(R.description), TRIM(L.P1_IDRiskRuleDescList) + '|' + (R.description));
-  SELF.P1_IDRiskRuleFlagList := MAP(L.P1_IDRiskRuleFlagList = '' => MAP(L.RiskLevel=0 => '0','1') + '|' + MAP(R.RiskLevel=0 => '0','1'), TRIM(L.P1_IDRiskRuleFlagList) + '|' + MAP(R.RiskLevel=0 => '0','1'));
-  SELF.P1_IDRiskRuleLvlList := MAP(L.P1_IDRiskRuleLvlList = '' => (STRING)L.RiskLevel + '|' + R.RiskLevel, TRIM(L.P1_IDRiskRuleLvlList) + '|' + R.RiskLevel);
+  SELF.P1_IDRiskRuleNmList :=MAP(L.entitytype = 1 AND NOT L.FirstRowSet => TRIM(L.rulename) + '|' + TRIM(R.rulename) + '|', 
+                               MAP(R.entitytype = 1 => 
+                                   TRIM(L.P1_IDRiskRuleNmList) + (R.rulename) + '|',
+                                   TRIM(L.P1_IDRiskRuleNmList)));
+  SELF.P1_IDRiskRuleDescList := MAP(L.entitytype = 1 AND NOT L.FirstRowSet => TRIM(L.description) + '|' + TRIM(R.description) + '|', 
+                               MAP(R.entitytype = 1 => 
+                                   TRIM(L.P1_IDRiskRuleDescList) + (R.description) + '|' ,
+                                   TRIM(L.P1_IDRiskRuleDescList)));
+  SELF.P1_IDRiskRuleFlagList := MAP(L.entitytype = 1 AND NOT L.FirstRowSet => MAP(L.RiskLevel=0 => '0','1') + '|' + MAP(R.RiskLevel=0 => '0','1') + '|' , 
+                               MAP(R.entitytype = 1 => 
+                                   TRIM(L.P1_IDRiskRuleFlagList) + MAP(R.RiskLevel=0 => '0','1') + '|' ,
+                                   TRIM(L.P1_IDRiskRuleFlagList)));
+  SELF.P1_IDRiskRuleLvlList := MAP(L.entitytype = 1 AND NOT L.FirstRowSet => (STRING)L.RiskLevel + '|' + R.RiskLevel + '|', 
+                               MAP(R.entitytype = 1 => 
+                                   TRIM(L.P1_IDRiskRuleLvlList) + R.RiskLevel + '|',
+                                   TRIM(L.P1_IDRiskRuleLvlList)));
+
+
+  SELF.P9_addrRiskRuleNmList :=MAP(L.entitytype = 9 AND NOT L.FirstRowSet => TRIM(L.rulename) + '|' + TRIM(R.rulename) + '|', 
+                               MAP(R.entitytype = 9 => 
+                                   TRIM(L.P9_addrRiskRuleNmList) + (R.rulename) + '|',
+                                   TRIM(L.P9_addrRiskRuleNmList)));
+  SELF.P9_addrRiskRuleDescList := MAP(L.entitytype = 9 AND NOT L.FirstRowSet => TRIM(L.description) + '|' + TRIM(R.description) + '|', 
+                               MAP(R.entitytype = 9 => 
+                                   TRIM(L.P9_addrRiskRuleDescList) + (R.description) + '|',
+                                   TRIM(L.P9_addrRiskRuleDescList)));
+  SELF.P9_addrRiskRuleFlagList := MAP(L.entitytype = 9 AND NOT L.FirstRowSet => MAP(L.RiskLevel=0 => '0','1') + '|' + MAP(R.RiskLevel=0 => '0','1') + '|', 
+                               MAP(R.entitytype = 9 => 
+                                   TRIM(L.P9_addrRiskRuleFlagList) + MAP(R.RiskLevel=0 => '0','1') + '|',
+                                   TRIM(L.P9_addrRiskRuleFlagList)));
+  SELF.P9_addrRiskRuleLvlList := MAP(L.entitytype = 9 AND NOT L.FirstRowSet => (STRING)L.RiskLevel + '|' + R.RiskLevel + '|', 
+                               MAP(R.entitytype = 9 => 
+                                   TRIM(L.P9_addrRiskRuleLvlList) + R.RiskLevel + '|',
+                                   TRIM(L.P9_addrRiskRuleLvlList)));
+                                   
+  SELF.p15_ssnRiskRuleNmList :=MAP(L.entitytype = 15 AND NOT L.FirstRowSet => TRIM(L.rulename) + '|' + TRIM(R.rulename) + '|', 
+                               MAP(R.entitytype = 15 => 
+                                   TRIM(L.p15_ssnRiskRuleNmList) + (R.rulename) + '|',
+                                   TRIM(L.p15_ssnRiskRuleNmList)));
+  SELF.p15_ssnRiskRuleDescList := MAP(L.entitytype = 15 AND NOT L.FirstRowSet => TRIM(L.description) + '|' + TRIM(R.description) + '|', 
+                               MAP(R.entitytype = 15 => 
+                                   TRIM(L.p15_ssnRiskRuleDescList) + (R.description) + '|',
+                                   TRIM(L.p15_ssnRiskRuleDescList)));
+  SELF.p15_ssnRiskRuleFlagList := MAP(L.entitytype = 15 AND NOT L.FirstRowSet => MAP(L.RiskLevel=0 => '0','1') + '|' + MAP(R.RiskLevel=0 => '0','1') + '|', 
+                               MAP(R.entitytype = 15 => 
+                                   TRIM(L.p15_ssnRiskRuleFlagList) + MAP(R.RiskLevel=0 => '0','1') + '|',
+                                   TRIM(L.p15_ssnRiskRuleFlagList)));
+  SELF.p15_ssnRiskRuleLvlList := MAP(L.entitytype = 15 AND NOT L.FirstRowSet => (STRING)L.RiskLevel + '|' + R.RiskLevel + '|', 
+                               MAP(R.entitytype = 15 => 
+                                   TRIM(L.p15_ssnRiskRuleLvlList) + R.RiskLevel + '|',
+                                   TRIM(L.p15_ssnRiskRuleLvlList)));
+
+  SELF.p16_phnRiskRuleNmList :=MAP(L.entitytype = 16 AND NOT L.FirstRowSet => TRIM(L.rulename) + '|' + TRIM(R.rulename) + '|', 
+                               MAP(R.entitytype = 16 => 
+                                   TRIM(L.p16_phnRiskRuleNmList) + (R.rulename) + '|',
+                                   TRIM(L.p16_phnRiskRuleNmList)));
+  SELF.p16_phnRiskRuleDescList := MAP(L.entitytype = 16 AND NOT L.FirstRowSet => TRIM(L.description) + '|' + TRIM(R.description) + '|', 
+                               MAP(R.entitytype = 16 => 
+                                   TRIM(L.p16_phnRiskRuleDescList) + (R.description) + '|',
+                                   TRIM(L.p16_phnRiskRuleDescList)));
+  SELF.p16_phnRiskRuleFlagList := MAP(L.entitytype = 16 AND NOT L.FirstRowSet => MAP(L.RiskLevel=0 => '0','1') + '|' + MAP(R.RiskLevel=0 => '0','1') + '|', 
+                               MAP(R.entitytype = 16 => 
+                                   TRIM(L.p16_phnRiskRuleFlagList) + MAP(R.RiskLevel=0 => '0','1') + '|',
+                                   TRIM(L.p16_phnRiskRuleFlagList)));
+  SELF.p16_phnRiskRuleLvlList := MAP(L.entitytype = 16 AND NOT L.FirstRowSet => (STRING)L.RiskLevel + '|' + R.RiskLevel + '|', 
+                               MAP(R.entitytype = 16 => 
+                                   TRIM(L.p16_phnRiskRuleLvlList) + R.RiskLevel + '|',
+                                   TRIM(L.p16_phnRiskRuleLvlList)));
+
+  SELF.p17_emailRiskRuleNmList :=MAP(L.entitytype = 17 AND NOT L.FirstRowSet => TRIM(L.rulename) + '|' + TRIM(R.rulename) + '|', 
+                               MAP(R.entitytype = 17 => 
+                                   TRIM(L.p17_emailRiskRuleNmList) + (R.rulename) + '|',
+                                   TRIM(L.p17_emailRiskRuleNmList)));
+  SELF.p17_emailRiskRuleDescList := MAP(L.entitytype = 17 AND NOT L.FirstRowSet => TRIM(L.description) + '|' + TRIM(R.description) + '|', 
+                               MAP(R.entitytype = 17 => 
+                                   TRIM(L.p17_emailRiskRuleDescList) + (R.description) + '|',
+                                   TRIM(L.p17_emailRiskRuleDescList)));
+  SELF.p17_emailRiskRuleFlagList := MAP(L.entitytype = 17 AND NOT L.FirstRowSet => MAP(L.RiskLevel=0 => '0','1') + '|' + MAP(R.RiskLevel=0 => '0','1') + '|', 
+                               MAP(R.entitytype = 17 => 
+                                   TRIM(L.p17_emailRiskRuleFlagList) + MAP(R.RiskLevel=0 => '0','1') + '|',
+                                   TRIM(L.p17_emailRiskRuleFlagList)));
+  SELF.p17_emailRiskRuleLvlList := MAP(L.entitytype = 17 AND NOT L.FirstRowSet => (STRING)L.RiskLevel + '|' + R.RiskLevel + '|', 
+                               MAP(R.entitytype = 17 => 
+                                   TRIM(L.p17_emailRiskRuleLvlList) + R.RiskLevel + '|',
+                                   TRIM(L.p17_emailRiskRuleLvlList)));
+
+  SELF.p18_ipRiskRuleNmList :=MAP(L.entitytype = 18 AND NOT L.FirstRowSet => TRIM(L.rulename) + '|' + TRIM(R.rulename) + '|', 
+                               MAP(R.entitytype = 18 => 
+                                   TRIM(L.p18_ipRiskRuleNmList) + (R.rulename) + '|',
+                                   TRIM(L.p18_ipRiskRuleNmList)));
+  SELF.p18_ipRiskRuleDescList := MAP(L.entitytype = 18 AND NOT L.FirstRowSet => TRIM(L.description) + '|' + TRIM(R.description) + '|', 
+                               MAP(R.entitytype = 18 => 
+                                   TRIM(L.p18_ipRiskRuleDescList) + (R.description) + '|',
+                                   TRIM(L.p18_ipRiskRuleDescList)));
+  SELF.p18_ipRiskRuleFlagList := MAP(L.entitytype = 18 AND NOT L.FirstRowSet => MAP(L.RiskLevel=0 => '0','1') + '|' + MAP(R.RiskLevel=0 => '0','1') + '|', 
+                               MAP(R.entitytype = 18 => 
+                                   TRIM(L.p18_ipRiskRuleFlagList) + MAP(R.RiskLevel=0 => '0','1') + '|',
+                                   TRIM(L.p18_ipRiskRuleFlagList)));
+  SELF.p18_ipRiskRuleLvlList := MAP(L.entitytype = 18 AND NOT L.FirstRowSet => (STRING)L.RiskLevel + '|' + R.RiskLevel + '|', 
+                               MAP(R.entitytype = 18 => 
+                                   TRIM(L.p18_ipRiskRuleLvlList) + R.RiskLevel + '|',
+                                   TRIM(L.p18_ipRiskRuleLvlList)));
+
+  SELF.p19_bnkRiskRuleNmList :=MAP(L.entitytype = 19 AND NOT L.FirstRowSet => TRIM(L.rulename) + '|' + TRIM(R.rulename) + '|', 
+                               MAP(R.entitytype = 19 => 
+                                   TRIM(L.p19_bnkRiskRuleNmList) + (R.rulename) + '|',
+                                   TRIM(L.p19_bnkRiskRuleNmList)));
+  SELF.p19_bnkRiskRuleDescList := MAP(L.entitytype = 19 AND NOT L.FirstRowSet => TRIM(L.description) + '|' + TRIM(R.description) + '|', 
+                               MAP(R.entitytype = 19 => 
+                                   TRIM(L.p19_bnkRiskRuleDescList) + (R.description) + '|',
+                                   TRIM(L.p19_bnkRiskRuleDescList)));
+  SELF.p19_bnkRiskRuleFlagList := MAP(L.entitytype = 19 AND NOT L.FirstRowSet => MAP(L.RiskLevel=0 => '0','1') + '|' + MAP(R.RiskLevel=0 => '0','1') + '|', 
+                               MAP(R.entitytype = 19 => 
+                                   TRIM(L.p19_bnkRiskRuleFlagList) + MAP(R.RiskLevel=0 => '0','1') + '|',
+                                   TRIM(L.p19_bnkRiskRuleFlagList)));
+  SELF.p19_bnkRiskRuleLvlList := MAP(L.entitytype = 19 AND NOT L.FirstRowSet => (STRING)L.RiskLevel + '|' + R.RiskLevel + '|', 
+                               MAP(R.entitytype = 19 => 
+                                   TRIM(L.p19_bnkRiskRuleLvlList) + R.RiskLevel + '|',
+                                   TRIM(L.p19_bnkRiskRuleLvlList)));
+
+  SELF.p20_dlRiskRuleNmList :=MAP(L.entitytype = 20 AND NOT L.FirstRowSet => TRIM(L.rulename) + '|' + TRIM(R.rulename) + '|', 
+                               MAP(R.entitytype = 20 => 
+                                   TRIM(L.p20_dlRiskRuleNmList) + (R.rulename) + '|',
+                                   TRIM(L.p20_dlRiskRuleNmList)));
+  SELF.p20_dlRiskRuleDescList := MAP(L.entitytype = 20 AND NOT L.FirstRowSet => TRIM(L.description) + '|' + TRIM(R.description) + '|', 
+                               MAP(R.entitytype = 20 => 
+                                   TRIM(L.p20_dlRiskRuleDescList) + (R.description) + '|',
+                                   TRIM(L.p20_dlRiskRuleDescList)));
+  SELF.p20_dlRiskRuleFlagList := MAP(L.entitytype = 20 AND NOT L.FirstRowSet => MAP(L.RiskLevel=0 => '0','1') + '|' + MAP(R.RiskLevel=0 => '0','1') + '|', 
+                               MAP(R.entitytype = 20 => 
+                                   TRIM(L.p20_dlRiskRuleFlagList) + MAP(R.RiskLevel=0 => '0','1') + '|',
+                                   TRIM(L.p20_dlRiskRuleFlagList)));
+  SELF.p20_dlRiskRuleLvlList := MAP(L.entitytype = 20 AND NOT L.FirstRowSet => (STRING)L.RiskLevel + '|' + R.RiskLevel + '|', 
+                               MAP(R.entitytype = 20 => 
+                                   TRIM(L.p20_dlRiskRuleLvlList) + R.RiskLevel + '|',
+                                   TRIM(L.p20_dlRiskRuleLvlList)));
+                                   
+  SELF.FirstRowSet := TRUE;
   SELF := L; //keeping the L rec makes it KEEP(1),LEFT
 // SELF := R; //keeping the R rec would make it KEEP(1),RIGHT
 END;
 RulesFlagFinal1 := ROLLUP(RulesFlagsFinal1Sorted,
                   LEFT.customerid=RIGHT.customerid AND LEFT.industrytype=RIGHT.industrytype AND LEFT.entitycontextuid=RIGHT.entitycontextuid,
                   tFinal(LEFT,RIGHT));
-                  
-RulesFlagFinal1;
-
+output(RulesFlagFinal1);
+                 
 RulesFlagFinal := JOIN(RulesFlagFinal1, ModelingOutput, LEFT.customerid=RIGHT.customerid AND LEFT.industrytype=RIGHT.industrytype AND LEFT.entitycontextuid=RIGHT.entitycontextuid,
-       TRANSFORM({LEFT.customerid, LEFT.industrytype, STRING t_actuid, LEFT.p1_idriskrulenmlist, LEFT.p1_idriskruledesclist, LEFT.p1_idriskruleflaglist, 
-                  LEFT.p1_idriskrulelvllist, RIGHT.p1_idriskindx, RIGHT.p15_ssnriskindx, RIGHT.p16_phnriskindx, RIGHT.p17_emailriskindx, 
+       TRANSFORM({LEFT.customerid, LEFT.industrytype, STRING t_actuid, 
+                  LEFT.p1_idriskrulenmlist, 
+                  LEFT.p1_idriskruledesclist, 
+                  LEFT.p1_idriskruleflaglist, 
+                  LEFT.p1_idriskrulelvllist, 
+                  
+                  LEFT.p15_ssnriskrulenmlist, 
+                  LEFT.p15_ssnriskruledesclist, 
+                  LEFT.p15_ssnriskruleflaglist, 
+                  LEFT.p15_ssnriskrulelvllist, 
+
+                  LEFT.p16_phnriskrulenmlist, 
+                  LEFT.p16_phnriskruledesclist, 
+                  LEFT.p16_phnriskruleflaglist, 
+                  LEFT.p16_phnriskrulelvllist, 
+
+                  LEFT.p17_emailriskrulenmlist, 
+                  LEFT.p17_emailriskruledesclist, 
+                  LEFT.p17_emailriskruleflaglist, 
+                  LEFT.p17_emailriskrulelvllist, 
+
+                  LEFT.p18_ipriskrulenmlist, 
+                  LEFT.p18_ipriskruledesclist, 
+                  LEFT.p18_ipriskruleflaglist, 
+                  LEFT.p18_ipriskrulelvllist, 
+
+                  LEFT.p19_bnkriskrulenmlist, 
+                  LEFT.p19_bnkriskruledesclist, 
+                  LEFT.p19_bnkriskruleflaglist, 
+                  LEFT.p19_bnkriskrulelvllist, 
+
+                  LEFT.p20_dlriskrulenmlist, 
+                  LEFT.p20_dlriskruledesclist, 
+                  LEFT.p20_dlriskruleflaglist, 
+                  LEFT.p20_dlriskrulelvllist, 
+
+                  LEFT.P9_addrriskrulenmlist, 
+                  LEFT.P9_addrriskruledesclist, 
+                  LEFT.P9_addrriskruleflaglist, 
+                  LEFT.P9_addrriskrulelvllist, 
+                  
+                  RIGHT.p1_idriskindx, RIGHT.p15_ssnriskindx, RIGHT.p16_phnriskindx, RIGHT.p17_emailriskindx, 
                   RIGHT.p19_bnkacctriskindx, RIGHT.p20_dlriskindx, RIGHT.p18_ipaddrriskindx, RIGHT.p9_addrriskindx}, SELF.t_actuid := LEFT.entitycontextuid[4..], SELF := LEFT, SELF := RIGHT), HASH);
 
-//output(RulesFlagFinal,, '~fraudgov::temp::scoringoutput', CSV(SEPARATOR(','), QUOTE('"')), overwrite);             
 
 HighRiskCountsPrep := TABLE(FraudgovKEL.KEL_EventPivot.PivotToEntitiesWithHRICounts, 
                     {customerid, industrytype, t_actuid, entitycontextuid,  
@@ -678,10 +889,47 @@ ModelingValidationLayout := RECORD
   integer8 p19_aothiidcurrprofusngbkaccntev;
   integer8 p20_aothiidcurrprofusngdlcntev;
   integer8 p9_aothiidcurrprofusngaddrcntev;
+  
   string p1_idriskrulenmlist;
   string p1_idriskruledesclist;
   string p1_idriskruleflaglist;
   string p1_idriskrulelvllist;
+
+  string p9_addrriskrulenmlist;
+  string p9_addrriskruledesclist;
+  string p9_addrriskruleflaglist;
+  string p9_addrriskrulelvllist;
+
+  string p15_ssnriskrulenmlist;
+  string p15_ssnriskruledesclist;
+  string p15_ssnriskruleflaglist;
+  string p15_ssnriskrulelvllist;
+
+  string p16_phnriskrulenmlist;
+  string p16_phnriskruledesclist;
+  string p16_phnriskruleflaglist;
+  string p16_phnriskrulelvllist;
+
+  string p17_emailriskrulenmlist;
+  string p17_emailriskruledesclist;
+  string p17_emailriskruleflaglist;
+  string p17_emailriskrulelvllist;
+
+  string p18_ipriskrulenmlist;
+  string p18_ipriskruledesclist;
+  string p18_ipriskruleflaglist;
+  string p18_ipriskrulelvllist;
+
+  string p19_bnkriskrulenmlist;
+  string p19_bnkriskruledesclist;
+  string p19_bnkriskruleflaglist;
+  string p19_bnkriskrulelvllist;
+
+  string p20_dlriskrulenmlist;
+  string p20_dlriskruledesclist;
+  string p20_dlriskruleflaglist;
+  string p20_dlriskrulelvllist;
+
   integer1 p1_idriskindx;
   integer1 p15_ssnriskindx;
   integer1 p16_phnriskindx;

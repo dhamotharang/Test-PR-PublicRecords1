@@ -468,7 +468,8 @@ MODULE
 	export src_Infutor_Motorcycle_Veh    := '2V';
 	export src_Vickers                   := 'V ';  // stock market insider trading info from Vickers   
 	export src_Voters_v2                 := 'VO';  // Voter Registrations
-    export src_MA_Census                 := 'UM';
+ export src_Voters_v2_block           := 'VB';
+ export src_MA_Census                 := 'UM';
 	export src_AK_Watercraft             := '#W';  // Watercrafts (boats, etc.) registrations ----v
 	export src_AL_Watercraft             := 'LW';
 	export src_AR_Watercraft             := 'RW';
