@@ -73,8 +73,9 @@ EXPORT Prep_IDA_fraud(DATASET(Risk_Indicators.layouts.layout_IDA_in) indata,
                              IDA_Error_Code IN [RiskView.Constants.IDA_USER, RiskView.Constants.IDA_SYSTEM] => RiskView.Constants.IDA_SOFT_ERROR,
                              IDA_Error_Code = RiskView.Constants.LNRS_NETWORK OR IDA_Header_Status != 0     => RiskView.Constants.IDA_GW_HARD_ERROR,
                                                                                                                '');
+                                                                                                               
   //fail with appropriate description if Internal_Error_Code comes back with something                                                                                      
-  IF(Internal_Error_Code != '', FAIL(RiskView.Constants.get_error_desc(Internal_Error_Code)));
+  IF(Internal_Error_Code != '', FAIL(RiskView.Constants.get_error_desc(Internal_Error_Code) + ' (Code ' + Internal_Error_Code + ')'));
   
   //Drop everything except the seq, AppID, and attributes
   Final := JOIN(indata, FromIDA,
