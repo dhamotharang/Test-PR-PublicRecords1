@@ -13,8 +13,10 @@ export no_riskview_report := false; //default to false as don't want to run the 
 
 export checking_indicators_attribute_request := 'rvcheckingattrv5';
 export FIS_custom_attr_request := 'riskviewattrv5fis';
+export IDA_nfs1_attr := 'riskviewattrv5nfs1';
+export IDA_modeling_attrs := [IDA_nfs1_attr];
 
-export valid_attributes := ['riskviewattrv5', 'insurview2attr', checking_indicators_attribute_request, FIS_custom_attr_request];
+export valid_attributes := ['riskviewattrv5', 'insurview2attr', checking_indicators_attribute_request, FIS_custom_attr_request, IDA_modeling_attrs];
 
 export valid_IDA_models := ['rvg2005_0', 'rvs2005_0'];
 

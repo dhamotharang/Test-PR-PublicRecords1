@@ -5519,4 +5519,10 @@ EXPORT iesp.share.t_NameValuePair intoFISattrs(riskview.layouts.layout_riskview5
            '' );
 	END;
 
+EXPORT iesp.share.t_NameValuePair intoIDAattrs(iesp.ida_report_response.t_IDAAttribute le) := TRANSFORM
+  Self.Name := le.Name;
+  Self.Value := le.Value;
+END;
+
+
 END;
