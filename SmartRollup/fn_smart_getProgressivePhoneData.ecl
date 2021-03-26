@@ -1,4 +1,4 @@
-﻿IMPORT doxie,iesp,PersonReports, Royalty, gateway, std;
+﻿IMPORT doxie,iesp,PersonReports, Royalty, gateway, std , MDR;
 
 EXPORT fn_smart_getProgressivePhoneData :=  MODULE
 
@@ -53,7 +53,8 @@ EXPORT fn_smart_getProgressivePhoneData :=  MODULE
                                                                                                        '','','','','',''),               
                              SELF.CarrierName := LEFT.Meta_Carrier_Name;                              
                              SELF.TypeFlag := LEFT.Meta_ServLine_Type; // LEFT.Subj_phone_type;
-                             SELF.NewType:= TRIM(LEFT.subj_phone_type_new,LEFT,RIGHT);                                                 
+                             SELF.NewType:= TRIM(LEFT.subj_phone_type_new,LEFT,RIGHT);        
+                             SELF.PremiumPhoneFlag := TRIM(LEFT.subj_phone_type_new,LEFT,RIGHT) =  MDR.sourceTools.src_Equifax;
                              SELF.vendorId :=  LEFT.Vendor;                                                    
                              SELF.ListedName :=  LEFT.subj_name_dual;
                                      
@@ -70,7 +71,7 @@ EXPORT fn_smart_getProgressivePhoneData :=  MODULE
                                  SELF.hri_Phone := DATASET ([], Risk_Indicators.Layout_Desc);
                                  SELF := [];
                               END;   
-                              AddHRIPhoneIndicators := false; // std.str.toUpperCase(LEFT.Meta_ServLine_Type) = 'LANDLINE';
+                              AddHRIPhoneIndicators := false; 
                               tmpPhoneHRI_Input  := IF (AddHriPhoneIndicators, DATASET([AddPhoneHRI()]),
                                                                       DATASET([],personReports.layouts.PhoneHRILayout));                                                                                                             
                                                                                              			                                                                                                      
@@ -85,11 +86,19 @@ EXPORT fn_smart_getProgressivePhoneData :=  MODULE
              return Phones;
          END;
          
-           EXPORT CalculateBestSmartLinxRecPhoneRoyalties( DATASET(iesp.smartlinxreport.t_SLRBestPhone) ds_in
-                                                                                                          ,STRING2 source) := FUNCTION                                                                                                      
+          EXPORT CalculateBestSmartLinxRecPhoneRoyalties(    DATASET(iesp.smartlinxreport.t_SLRBestInfo) tmpBest                                                                                                         
+                                                                                                          ,STRING2 source
+                                                                                                          ) := MODULE       
+             ds_in := Tmpbest[1].PhonesV3;                                                                                                          
              Royalty.RoyaltyEFXDataMart.MAC_GetWebRoyalties(ds_in, ds_equifax_royalties, NewType, source); 
-              ds_Royalties               :=  ds_equifax_royalties;                                                                             
-              RETURN ds_Royalties;
+              EXPORT ds_Royalties               :=  ds_equifax_royalties;                                                                             
+    
+               // now remove the source field 'newtype' value from output of PhonesV3 structure after royalties calculated
+               EXPORT best_rec_smart :=  PROJECT(tmpBest, TRANSFORM(iesp.smartlinxreport.t_SLRBestInfo,
+                                                                     SELF.Phonesv3 := PROJECT(left.Phonesv3,  TRANSFORM(iesp.smartlinxreport.t_SLRBestPhone,
+                                                                                                         SELF.NewType := '';
+                                                                                                         SELF := LEFT));
+                                                                     SELF := LEFT));                                                                                                 
          END;
 
 END;
