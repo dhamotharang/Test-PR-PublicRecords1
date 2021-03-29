@@ -10,7 +10,7 @@ EXPORT FnRoxie_AddrSummaryAttributes(DATASET(PublicRecords_KEL.ECL_Functions.Lay
 	
 	LayoutAddressSummaryAttributes := {UNSIGNED G_ProcUID, BOOLEAN ResultsFound, RECORDOF(PublicRecords_KEL.Q_Non_F_C_R_A_Address_Summary_Attributes_V1_Dynamic('', '', '', DATASET([], PublicRecords_KEL.ECL_Functions.Layouts.LayoutInputPII), 0, PublicRecords_KEL.CFG_Compile.Permit__NONE).res0)};
 	
-	AddressSummaryAttributesRaw := NOCOMBINE(JOIN(RecordsWithInputParms, FDCDataset,  LEFT.G_ProcUID = RIGHT.G_ProcUID, TRANSFORM(LayoutAddressSummaryAttributes,
+	AddressSummaryAttributesRaw := NOCOMBINE(JOIN(RecordsWithInputParms, FDCDataset,  LEFT.G_ProcUID = RIGHT.G_ProcUID AND RIGHT.RepNumber != 6, TRANSFORM(LayoutAddressSummaryAttributes,
 		AddressSummaryAttrs := PublicRecords_KEL.Q_Non_F_C_R_A_Address_Summary_Attributes_V1_Dynamic(
 																		LEFT.P_InpClnAddrPrimName,
 																		LEFT.P_InpClnAddrPrimRng,
@@ -22,7 +22,7 @@ EXPORT FnRoxie_AddrSummaryAttributes(DATASET(PublicRecords_KEL.ECL_Functions.Lay
 		SELF.G_ProcUID := LEFT.G_ProcUID,				
 		SELF.ResultsFound := EXISTS(AddressSummaryAttrs);
 		SELF := AddressSummaryAttrs[1]
-	), LEFT OUTER, ATMOST(100), KEEP(1)));
+	), LEFT OUTER, ATMOST(LEFT.G_ProcUID = RIGHT.G_ProcUID, 100), KEEP(1)));
 	
 	AddressSummaryAttributeResults := KEL.Clean(AddressSummaryAttributesRaw, TRUE, TRUE, TRUE);
 	

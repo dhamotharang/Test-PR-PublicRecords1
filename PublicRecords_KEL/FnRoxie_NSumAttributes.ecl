@@ -22,7 +22,7 @@ EXPORT FnRoxie_NSumAttributes(DATASET(PublicRecords_KEL.ECL_Functions.Layouts.La
 		SELF.G_ProcUID := LEFT.G_ProcUID,				
 		SELF.ResultsFound := EXISTS(NameSummaryAttrs);
 		SELF := NameSummaryAttrs[1]
-	), LEFT OUTER, ATMOST(100), KEEP(1)));
+	), LEFT OUTER, ATMOST(LEFT.G_ProcUID = RIGHT.G_ProcUID, 100), KEEP(1)));
 	
 	NSumInputPIIAttributeResults := KEL.Clean(NSumAttributesRaw, TRUE, TRUE, TRUE);
 	

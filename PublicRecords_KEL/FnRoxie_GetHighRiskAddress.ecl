@@ -28,7 +28,7 @@ EXPORT FnRoxie_GetHighRiskAddress (DATASET(PublicRecords_KEL.ECL_Functions.Layou
 																								DATASET(RIGHT)).res0;	
 			SELF := HighRiskResults[1];
 			SELF.ResultsFound := EXISTS(HighRiskResults)), 
-		LEFT OUTER, ATMOST(100), KEEP(1)));
+		LEFT OUTER, ATMOST(LEFT.G_ProcUID = RIGHT.G_ProcUID, 100), KEEP(1)));
 	
 	
 		AttributeResults := KEL.Clean(RawResults, TRUE, TRUE, TRUE);

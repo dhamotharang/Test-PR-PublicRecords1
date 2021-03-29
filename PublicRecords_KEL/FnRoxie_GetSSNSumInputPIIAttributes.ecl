@@ -20,7 +20,7 @@ EXPORT FnRoxie_GetSSNSumInputPIIAttributes (DATASET(PublicRecords_KEL.ECL_Functi
 		SELF.G_ProcUID := LEFT.G_ProcUID,				
 		SELF.ResultsFound := EXISTS(SSNSummaryAttrs);
 		SELF := SSNSummaryAttrs[1]
-	), LEFT OUTER, ATMOST(100), KEEP(1)));
+	), LEFT OUTER, ATMOST(LEFT.G_ProcUID = RIGHT.G_ProcUID, 100), KEEP(1)));
 	
 	SSNSumInputPIIAttributeResults := KEL.Clean(SSNSumInputPIIAttributesRaw, TRUE, TRUE, TRUE);
 	

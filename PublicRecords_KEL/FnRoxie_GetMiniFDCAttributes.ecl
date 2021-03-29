@@ -48,7 +48,7 @@ EXPORT FnRoxie_GetMiniFDCAttributes(DATASET(PublicRecords_KEL.ECL_Functions.Layo
 			NonFCRAPersonResults := PublicRecords_KEL.Q_Non_F_C_R_A_Mini_Attributes_V1_Roxie_Dynamic(LEFT.ids , (INTEGER)(LEFT.P_InpClnArchDt[1..8]), Options.KEL_Permissions_Mask, FDCDataset).res0;	
 			SELF.attributes := NonFCRAPersonResults;
 			SELF := []),
-		LEFT OUTER, ATMOST(100), KEEP(1)));
+		LEFT OUTER, ATMOST(LEFT.G_ProcUID = RIGHT.G_ProcUID, 100), KEEP(1)));
 		
 	FCRAPersonAttributesRaw := NOCOMBINE(JOIN(CleanInputs, FDCDataset,
 		LEFT.g_uid = RIGHT.UIDAppend  AND RIGHT.RepNumber != 6,
@@ -57,7 +57,7 @@ EXPORT FnRoxie_GetMiniFDCAttributes(DATASET(PublicRecords_KEL.ECL_Functions.Layo
 			FCRAPersonResults := PublicRecords_KEL.Q_F_C_R_A_Mini_Attributes_V1_Roxie_Dynamic(LEFT.ids , (INTEGER)(LEFT.P_InpClnArchDt[1..8]), Options.KEL_Permissions_Mask, DATASET(RIGHT)).res0;	
 			SELF.attributes := FCRAPersonResults;
 			SELF := []),
-		LEFT OUTER, ATMOST(100), KEEP(1)));
+		LEFT OUTER, ATMOST(LEFT.G_ProcUID = RIGHT.G_ProcUID, 100), KEEP(1)));
 		
 	FinalnonFCRA := RECORD
 		INTEGER g_uid;

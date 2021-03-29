@@ -20,7 +20,7 @@ EXPORT FnRoxie_PhoneSumAttributes(DATASET(PublicRecords_KEL.ECL_Functions.Layout
 		SELF.G_ProcUID := LEFT.G_ProcUID,				
 		SELF.ResultsFound := EXISTS(PhoneSummaryAttrs);
 		SELF := PhoneSummaryAttrs[1]
-	), LEFT OUTER, ATMOST(100), KEEP(1)));
+	), LEFT OUTER, ATMOST(LEFT.G_ProcUID = RIGHT.G_ProcUID, 100), KEEP(1)));
 	
 	PhoneSumInputPIIAttributeResults := KEL.Clean(PhoneSumAttributesRaw, TRUE, TRUE, TRUE);
 	
