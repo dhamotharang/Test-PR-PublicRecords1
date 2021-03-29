@@ -1,4 +1,5 @@
-﻿IMPORT BIPV2, Business_Credit, BusinessCredit_Services, Codes, Doxie, iesp, Suppress, Business_Risk_BIP;
+﻿
+IMPORT BIPV2, Business_Credit, BusinessCredit_Services, Codes, Doxie, iesp, Suppress, Business_Risk_BIP;
 
 EXPORT CreditReport_Records(BusinessCredit_Services.Iparam.reportrecords inmod) := FUNCTION
 
@@ -116,12 +117,12 @@ EXPORT CreditReport_Records(BusinessCredit_Services.Iparam.reportrecords inmod) 
    			SELF.Description:= Activity_Desc;
    			SELF						:= [];	
   END;
-   
-  SIC_LIST 				:= 	JOIN(SIC_NAICS_List((INTEGER)sic_code > 0) , Codes.Key_SIC4,
-   															KEYED(LEFT.SIC_Code = RIGHT.sic4_code), 
-   															activity_trans(LEFT.Sic_Code, RIGHT.sic4_description), 
-                                 NOSORT,
-                                 LIMIT(BusinessCredit_Services.Constants.JOIN_LIMIT) ); //SIC_NAICS_List is already SORTED.
+
+  SIC_LIST := JOIN(SIC_NAICS_List((INTEGER)sic_code > 0), Codes.Key_SIC,
+                KEYED(LEFT.SIC_Code = RIGHT.Code), 
+                activity_trans(LEFT.sic_code, RIGHT.Desc), 
+                NOSORT,
+                LIMIT(BusinessCredit_Services.Constants.JOIN_LIMIT) ); //SIC_NAICS_List is already SORTED.
    
   SIC_LIST_Final	:= CHOOSEN(PROJECT(SIC_LIST, 
    															TRANSFORM(iesp.businesscreditreport.t_BusinessCreditCodeDescription,
