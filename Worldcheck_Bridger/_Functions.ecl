@@ -1418,6 +1418,7 @@
 				trim(kword, left, right) = 'SKMF-URHH' =>SubGroup_Constants.numKeywordsID.KEYWORD_SKMF_URHH,
 				trim(kword, left, right) = 'VEMIJP-MW' =>SubGroup_Constants.numKeywordsID.KEYWORD_VEMIJP_MW,
 				trim(kword, left, right) = 'CLPDI-MW' =>SubGroup_Constants.numKeywordsID.KEYWORD_CLPDI_MW,
+				trim(kword, left, right) = 'UKHMT-NDS' =>SubGroup_Constants.numKeywordsID.KEYWORD_UKHMT_NDS,
 								
 				//When setting the keyword export use underscores for dashes (ex: For RBI-SANC, use RBI_SANC)	
 				
