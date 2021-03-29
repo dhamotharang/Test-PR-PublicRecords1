@@ -58,7 +58,7 @@ EXPORT getGovID(dataset(identifier2.layout_Identifier2) in_ds,
 
   // Calculate each attribute  
   SSNFullNameMatch := MAP(isCheck_SSNFullNameMatch AND in_rec.nas_summary IN [9,12]
-                          AND ~EXISTS(in_rec.ri(hri in ['29','77','79','76']))  => _GovIdConst.PassValue
+                          AND ~EXISTS(in_rec.ri(hri in ['MI','29','77','79','76']))  => _GovIdConst.PassValue
                           ,isCheck_SSNFullNameMatch => _GovIdConst.FailValue
                           ,_GovIdConst.DisabledValue
                           );
@@ -76,14 +76,14 @@ EXPORT getGovID(dataset(identifier2.layout_Identifier2) in_ds,
 
 
   MultipleIdentitySSN := MAP(isCheck_MultipleIdentitySSN AND in_rec.additionalidentities.uniqueadlcount < Options.MaxIdentities
-                            AND ~EXISTS(in_rec.ri(hri in ['CL','26','79']))   =>  _GovIdConst.PassValue
+                            AND ~EXISTS(in_rec.ri(hri in ['MI','CL','26','79']))   =>  _GovIdConst.PassValue
                             ,isCheck_MultipleIdentitySSN => _GovIdConst.FailValue
                             ,_GovIdConst.DisabledValue
                           );
 
 
   SSNLastNameMatch := MAP(isCheck_SSNLastNameMatch AND in_rec.nas_summary IN [7,9,11,12]
-                         AND ~EXISTS(in_rec.ri(hri in ['29','77','79','76'])) => _GovIdConst.PassValue
+                         AND ~EXISTS(in_rec.ri(hri in ['MI','29','77','79','76'])) => _GovIdConst.PassValue
                           ,isCheck_SSNLastNameMatch => _GovIdConst.FailValue
                           ,_GovIdConst.DisabledValue
                           );
@@ -92,14 +92,14 @@ EXPORT getGovID(dataset(identifier2.layout_Identifier2) in_ds,
                                     AND in_rec.verssn <>''
                                     AND  (unsigned) in_rec.ssa_date_last[1..4] >= (unsigned)in_rec.verDOB[1..4]
                                     AND in_rec.DOBMatchLevel IN [5,6,7,8]
-                                    AND  ~EXISTS(in_rec.ri(hri in ['28','29','79','NB','81','83'])) =>  _GovIdConst.PassValue
+                                    AND  ~EXISTS(in_rec.ri(hri in ['MI','28','29','79','NB','81','83'])) =>  _GovIdConst.PassValue
                          ,isCheck_SSNYOBDateAlert =>   _GovIdConst.FailValue
                          ,_GovIdConst.DisabledValue
                          );      
 
    
   SSN4FullNameMatch := MAP(isCheck_SSN4FullNameMatch AND in_rec.nas_summary IN [9,12]
-                          AND  ~EXISTS(in_rec.ri(hri in ['79','77','29','76']))  => _GovIdConst.PassValue
+                          AND  ~EXISTS(in_rec.ri(hri in ['MI','79','77','29','76']))  => _GovIdConst.PassValue
                           ,isCheck_SSN4FullNameMatch => _GovIdConst.FailValue
                           ,_GovIdConst.DisabledValue
                           );
@@ -111,7 +111,7 @@ EXPORT getGovID(dataset(identifier2.layout_Identifier2) in_ds,
                       );
 
   SSNHistory := MAP(isCheck_SSNHistory AND ~EXISTS(in_rec.ri(hri ='IS'))
-                    AND ~EXISTS(in_rec.ri(hri in ['79','77','29','76']))  => _GovIdConst.PassValue
+                    AND ~EXISTS(in_rec.ri(hri in ['MI','79','77','29','76']))  => _GovIdConst.PassValue
                     ,isCheck_SSNHistory => _GovIdConst.FailValue
                     ,_GovIdConst.DisabledValue
                     );
@@ -128,13 +128,13 @@ EXPORT getGovID(dataset(identifier2.layout_Identifier2) in_ds,
                              );
     
   Addr1LastNameMatch := MAP(isCheck_Addr1LastNameMatch AND ( in_rec.nas_summary IN [5,8,11,12] OR in_rec.nap_summary in [8,12])
-                            AND ~EXISTS(in_rec.ri(hri in ['PA','37','77','78','76','30'])) => _GovIdConst.PassValue
+                            AND ~EXISTS(in_rec.ri(hri in ['MI','PA','37','77','78','76','30'])) => _GovIdConst.PassValue
                           ,isCheck_Addr1LastNameMatch => _GovIdConst.FailValue
                           ,_GovIdConst.DisabledValue
                           );
 
   IdentityOccupancyVerified := MAP(isCheck_IdentityOccupancyVerified AND in_rec.InputAddressEverOccupant.WasEverOccupant
-                                  AND ~EXISTS(in_rec.ri(hri in ['37','77','78','76','30']))   => _GovIdConst.PassValue
+                                  AND ~EXISTS(in_rec.ri(hri in ['MI','37','77','78','76','30']))   => _GovIdConst.PassValue
                                    ,isCheck_IdentityOccupancyVerified => _GovIdConst.FailValue
                                    ,_GovIdConst.DisabledValue
                                    );
@@ -161,13 +161,13 @@ EXPORT getGovID(dataset(identifier2.layout_Identifier2) in_ds,
                         );
 
   PropertyAndDeed := MAP(isCheck_PropertyAndDeed AND in_rec.EverOwnedInputProperty.IsPropertyOwner
-                         AND ~EXISTS(in_rec.ri(hri in ['37','77','78','76','30'])) => _GovIdConst.PassValue
+                         AND ~EXISTS(in_rec.ri(hri in ['MI','37','77','78','76','30'])) => _GovIdConst.PassValue
                         ,isCheck_PropertyAndDeed => _GovIdConst.FailValue
                         ,_GovIdConst.DisabledValue
                         );
     
   IdentityOwnershipVerified := MAP(isCheck_IdentityOwnershipVerified AND in_rec.CurrentlyOwnInputProperty.IsPropertyOwner
-                                  AND ~EXISTS(in_rec.ri(hri in ['PA','37','77','78','76','30'])) => _GovIdConst.PassValue
+                                  AND ~EXISTS(in_rec.ri(hri in ['MI','PA','37','77','78','76','30'])) => _GovIdConst.PassValue
                                   ,isCheck_IdentityOwnershipVerified => _GovIdConst.FailValue
                                   ,_GovIdConst.DisabledValue
                                   );
@@ -209,7 +209,7 @@ EXPORT getGovID(dataset(identifier2.layout_Identifier2) in_ds,
   AgetoUse := If(hasValidInputDOB,AgefromInput,in_rec.discovereddob.age);
 
   Age_Verification := MAP(isCheck_Age_Verification AND AgetoUse > Options.AgeThreshold AND (integer)in_rec.CVI > Options.CVIThreshold
-                        AND ~EXISTS(in_rec.ri(hri in ['37','77','NB','76'])) => _GovIdConst.PassValue
+                        AND ~EXISTS(in_rec.ri(hri in ['MI','37','77','NB','76'])) => _GovIdConst.PassValue
                          ,isCheck_Age_Verification => _GovIdConst.FailValue
                          ,_GovIdConst.DisabledValue
                          );
@@ -217,43 +217,43 @@ EXPORT getGovID(dataset(identifier2.layout_Identifier2) in_ds,
   // End Age_Verification
 
   YOBSSNMatch := MAP(isCheck_YOBSSNMatch AND (in_rec.InputYOBMatchesSSN.InputYOBMatchesSSN OR in_rec.InputDOBMatchesSSN.InputDOBMatchesSSN) AND in_rec.DOBMatchLevel IN [5,6,7,8]
-                    AND ~EXISTS(in_rec.ri(hri in ['81','29','NB','83','79'])) => _GovIdConst.PassValue
+                    AND ~EXISTS(in_rec.ri(hri in ['MI','81','29','NB','83','79'])) => _GovIdConst.PassValue
                      ,isCheck_YOBSSNMatch => _GovIdConst.FailValue
                      ,_GovIdConst.DisabledValue
                      );
     
   DOBSSNMatch := MAP(isCheck_DOBSSNMatch AND in_rec.InputDOBMatchesSSN.InputDOBMatchesSSN
-                     AND ~EXISTS(in_rec.ri(hri in ['81','29','NB','83','79'])) => _GovIdConst.PassValue
+                     AND ~EXISTS(in_rec.ri(hri in ['MI','81','29','NB','83','79'])) => _GovIdConst.PassValue
                      ,isCheck_DOBSSNMatch => _GovIdConst.FailValue
                      ,_GovIdConst.DisabledValue
                      );
 
   DOBFullVerified := MAP(isCheck_DOBFullVerified AND in_rec.verify_dob='Y'
-                          AND ~EXISTS(in_rec.ri(hri in ['37','77','NB','81','76','83']))  => _GovIdConst.PassValue
+                          AND ~EXISTS(in_rec.ri(hri in ['MI','37','77','NB','81','76','83']))  => _GovIdConst.PassValue
                         ,isCheck_DOBFullVerified => _GovIdConst.FailValue
                         ,_GovIdConst.DisabledValue
                         );                       
     
   DOBMonthYearVerified := MAP(isCheck_DOBMonthYearVerified AND in_rec.DOBMatchLevel IN [7,8]
-                              AND ~EXISTS(in_rec.ri(hri in ['37','77','NB','81','76','83'])) => _GovIdConst.PassValue
+                              AND ~EXISTS(in_rec.ri(hri in ['MI','37','77','NB','81','76','83'])) => _GovIdConst.PassValue
                               ,isCheck_DOBMonthYearVerified => _GovIdConst.FailValue
                               ,_GovIdConst.DisabledValue
                               );
 
   DOBYearVerified := MAP(isCheck_DOBYearVerified AND in_rec.DOBMatchLevel IN [5,6,7,8]
-                         AND ~EXISTS(in_rec.ri(hri in ['37','77','NB','81','76','83'])) => _GovIdConst.PassValue
+                         AND ~EXISTS(in_rec.ri(hri in ['MI','37','77','NB','81','76','83'])) => _GovIdConst.PassValue
                         ,isCheck_DOBYearVerified => _GovIdConst.FailValue
                         ,_GovIdConst.DisabledValue
                         );
     
   DOBMonthDayVerified := MAP(isCheck_DOBMonthDayVerified AND in_rec.DOBMatchLevel IN [4,8]
-                            AND ~EXISTS(in_rec.ri(hri in ['81','83'])) => _GovIdConst.PassValue
+                            AND ~EXISTS(in_rec.ri(hri in ['MI','81','83'])) => _GovIdConst.PassValue
                              ,isCheck_DOBMonthDayVerified => _GovIdConst.FailValue
                              ,_GovIdConst.DisabledValue
                              );
     
   PhoneLastNameMatch := MAP(isCheck_PhoneLastNameMatch AND in_rec.nap_summary IN [7,9,11,12]
-                            AND ~EXISTS(in_rec.ri(hri in ['37','77','31','76','80'])) => _GovIdConst.PassValue
+                            AND ~EXISTS(in_rec.ri(hri in ['MI','37','77','31','76','80'])) => _GovIdConst.PassValue
                             ,isCheck_PhoneLastNameMatch => _GovIdConst.FailValue
                             ,_GovIdConst.DisabledValue
                             );
@@ -269,24 +269,24 @@ EXPORT getGovID(dataset(identifier2.layout_Identifier2) in_ds,
                               );
 
   PhoneVerified := MAP(isCheck_PhoneVerified AND (in_rec.nap_summary IN [7,9,11,12] OR (in_rec.nas_summary = 8 AND in_rec.nap_summary IN [6,7]))
-                       AND ~EXISTS(in_rec.ri(hri in ['37','77','31','76','80'])) => _GovIdConst.PassValue
+                       AND ~EXISTS(in_rec.ri(hri in ['MI','37','77','31','76','78','80'])) => _GovIdConst.PassValue
                        ,isCheck_PhoneVerified => _GovIdConst.FailValue
                        ,_GovIdConst.DisabledValue
                        );
     
   PhoneFullNameMatch := MAP(isCheck_PhoneFullNameMatch AND  in_rec.nap_summary IN [9,12] 
-                            AND ~EXISTS(in_rec.ri(hri in ['37','77','31','76','80'])) => _GovIdConst.PassValue 
+                            AND ~EXISTS(in_rec.ri(hri in ['MI','37','77','31','76','80'])) => _GovIdConst.PassValue 
                             ,isCheck_PhoneFullNameMatch => _GovIdConst.FailValue
                             ,_GovIdConst.DisabledValue
                             );
 
   DriverLicenseMatch := MAP(isCheck_DriverLicenseMatch AND  in_rec.DriversLicense.HasValidDriversLicense 
-                            AND ~EXISTS(in_rec.ri(hri in ['37','77','78','76','30','LN','LE']))=> _GovIdConst.PassValue
+                            AND ~EXISTS(in_rec.ri(hri in ['MI','37','77','78','76','30','LN','LE']))=> _GovIdConst.PassValue
                             ,isCheck_DriverLicenseMatch => _GovIdConst.FailValue
                             ,_GovIdConst.DisabledValue
                             );
   
-  DriversLicenseVerification := MAP(isCheck_DriversLicenseVerification AND ~EXISTS(in_rec.ri(hri IN ['DV','37','77','41','DD','DM','76','DF']))
+  DriversLicenseVerification := MAP(isCheck_DriversLicenseVerification AND ~EXISTS(in_rec.ri(hri IN ['MI','DV','37','77','41','DD','DM','76','DF']))
                                    AND in_rec.dl_number <> '' => _GovIdConst.PassValue
                                    ,isCheck_DriversLicenseVerification => _GovIdConst.FailValue
                                    ,_GovIdConst.DisabledValue
