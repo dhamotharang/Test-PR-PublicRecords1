@@ -37,7 +37,7 @@ module
   };
 
   contacts_sources_with_id := distribute(project(contacts_sources, 
-      transform(BIPV2.Layout_Business_Linking_Full, self.rcid:=counter; self:=left;)), rcid);
+      transform(BIPV2.Layout_Business_Linking_Full, self.rcid:=counter; self:=left;)), rcid) : persist('~persist::BIPV2_Build::key_contact_linkids.contacts_sources_with_id');
 
   ds := project(contacts_sources_with_id, transform(didding_layout, 																																						
     self.title := left.contact_name.title;
