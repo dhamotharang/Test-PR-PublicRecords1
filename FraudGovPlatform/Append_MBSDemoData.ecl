@@ -1,4 +1,4 @@
-﻿import tools,STD, FraudShared;
+﻿import tools,STD;
 EXPORT Append_MBSDemoData(string pversion):= Module
 
 MbsInclusion	:= FraudGovPlatform.files().Input.mbsfdnmasteridindtypeinclusion.Sprayed;
