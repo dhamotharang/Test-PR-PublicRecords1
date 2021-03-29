@@ -47,7 +47,7 @@ EXPORT FnRoxie_GetPersonAttributes(DATASET(PublicRecords_KEL.ECL_Functions.Layou
 		LEFT OUTER, ATMOST(100), KEEP(1)));
 
 	FCRAPersonAttributesRaw := NOCOMBINE(JOIN(RecordsWithLexID, FDCDataset,
-		LEFT.G_ProcUID = RIGHT.G_ProcUID,
+		LEFT.G_ProcUID = RIGHT.G_ProcUID AND RIGHT.RepNumber != 6,
 		TRANSFORM({INTEGER G_ProcUID, LayoutPersonAttributesRaw},
 			SELF.G_ProcUID := LEFT.G_ProcUID;
 			FCRAPersonResults := PublicRecords_KEL.Q_F_C_R_A_Person_Attributes_V1_Dynamic(LEFT.P_LexID , DATASET(LEFT), (INTEGER)(LEFT.P_InpClnArchDt[1..8]), Options.KEL_Permissions_Mask, DATASET(RIGHT)).res0;	

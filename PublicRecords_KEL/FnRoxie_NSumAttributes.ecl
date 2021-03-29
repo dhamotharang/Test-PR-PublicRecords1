@@ -10,7 +10,7 @@ EXPORT FnRoxie_NSumAttributes(DATASET(PublicRecords_KEL.ECL_Functions.Layouts.La
 
 	LayoutNSumAttributes := {UNSIGNED G_ProcUID, BOOLEAN ResultsFound, RECORDOF(PublicRecords_KEL.Q_Non_F_C_R_A_Name_Summary_Attributes_V1_Dynamic('', '', 0, DATASET([], PublicRecords_KEL.ECL_Functions.Layouts.LayoutInputPII), 0, PublicRecords_KEL.CFG_Compile.Permit__NONE).res0)};
 
-	NSumAttributesRaw := NOCOMBINE(JOIN(WithInputParms, FDCDataset,  LEFT.G_ProcUID = RIGHT.G_ProcUID, TRANSFORM(LayoutNSumAttributes,
+	NSumAttributesRaw := NOCOMBINE(JOIN(WithInputParms, FDCDataset,  LEFT.G_ProcUID = RIGHT.G_ProcUID AND RIGHT.RepNumber != 6, TRANSFORM(LayoutNSumAttributes,
 		NameSummaryAttrs := PublicRecords_KEL.Q_Non_F_C_R_A_Name_Summary_Attributes_V1_Dynamic(
 																		LEFT.P_InpClnNameFirst,
 																		LEFT.P_InpClnNameLast,
