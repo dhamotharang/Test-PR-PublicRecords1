@@ -1,4 +1,4 @@
-﻿IMPORT _control, Doxie, dx_PhoneFinderReportDelta, PromoteSupers, RoxieKeyBuild, std, ut, scrubs, Scrubs_PhoneFinder;
+﻿IMPORT _control, Doxie, dx_PhoneFinderReportDelta, PromoteSupers, RoxieKeyBuild, std, ut, scrubs, Scrubs_PhoneFinder, Orbit3;
 
 EXPORT Proc_Build_PhoneFinderReportDelta(string version, const varstring eclsourceip, string thor_name, string idType, string oPhType, string rIndType, string trType, string srcType):= FUNCTION
 	
@@ -206,6 +206,8 @@ EXPORT Proc_Build_PhoneFinderReportDelta(string version, const varstring eclsour
 													OUTPUT('Dops update failed due to reject warning(s)!',NAMED('Scrubs_Status'))
 													);
 	
+		orbitupdate			:= Orbit3.proc_Orbit3_CreateBuild_AddItem('PhoneFinder Report Delta',version,'N', 'darren.knowles@lexisnexisrisk.com');
+	
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	//Build Strata Reports for Build/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -255,7 +257,10 @@ EXPORT Proc_Build_PhoneFinderReportDelta(string version, const varstring eclsour
 																			//Build Keys
 																		  BuildKeys,																	
 																			
-																		  dopsUpdate)
+																		  dopsUpdate,
+																			
+																			//Orbit Update
+																			orbitupdate)
 																			/*buildStrata)*/:
 																														
 																			//Send Email Notifications
