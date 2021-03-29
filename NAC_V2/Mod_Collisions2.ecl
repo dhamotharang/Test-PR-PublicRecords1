@@ -23,16 +23,33 @@ Exact Matches
 // S             Full SSN
 // D             DOB
 Address Matches
-// A             Street: prim range & prim name
+// A             Address: prim range & prim name
 // C             City/State 
 // Z             Zip 
 Fuzzy Matches
-// P             Probable SSN
-// B             Probable DOB
-// V             Last Name + Partial First
+// P             Fuzzy SSN
+// B             Fuzzy DOB
+// V             Partial name (Last Name + First Initial)
 // W             Last Name only
 Future Use
 // H             Phone
+*/
+/*
+Search Types
+Match Set				Priority
+L									0							LexId
+NSD								1							Name, SSN, DOB
+VSD								2							Partial Name, SSN, DOB
+NSB								3							Name, SSN, Fuzzy DOB
+VSB								4							Partial Name, SSN, Fuzzy DOB
+NPD								5							Name, Fuzzy SSN, DOB
+VPD								6							Partial Name, Fuzzy SSN, DOB
+NPB								7							Name, Fuzzy SSN, Fuzzy DOB
+VPB								8							Partial Name, Fuzzy SSN, Fuzzy DOB
+NDAZ							9							Name, DOB, Address, Zip
+NDAC							10						Name, DOB, Address, City
+S									50						SSN
+
 */
 
 //////////////////////////////////

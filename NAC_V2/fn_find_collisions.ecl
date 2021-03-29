@@ -1,17 +1,17 @@
 ﻿import header,ut;
 
 // L             LexId
-// N             Name
-// S             Full SSN
-// P             Probable SSN
+// N             Name: Last and First
+// S             SSN
+// P             Fuzzy SSN
 // D             DOB
-// B             Probable DOB
+// B             Fuzzy DOB
 // A             Street Address
 // C             City/State Address
 // Z             Zip Address
-// V             Last Name + Partial First
-// W             Last Name
-// H             Phone
+// V             Partial Name: Last Name + Partial First
+// W             Last Name Only (Not used for matching)
+// H             Phone (not currently implemented)
 //
 // first name match parameter:
 //	0 match either

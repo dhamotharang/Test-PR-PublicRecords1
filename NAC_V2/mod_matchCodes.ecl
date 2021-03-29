@@ -4,17 +4,17 @@ EXPORT mod_matchCodes := MODULE
 Best Match
 // L             LexId
 Name Matches
-// N             exact match. Name: last name, first or preferred first
-// V             Last Name + Partial First
+// N             Name: last name, first or preferred first
+// V             Partial Name: Last Name + Partial First
 // W             Last Name only
 SSN Matches
-// S             Full SSN
-// P             Possible SSN
+// S             SSN
+// P             Fuzzy SSN
 DOB Matches
 // D             DOB
-// B             Possible DOB
+// B             Fuzzy DOB
 Address Matches
-// A             Street: prim range & prim name
+// A             Address: prim range & prim name
 // C             City/State 
 // Z             Zip 
 Reserved for Future Use
