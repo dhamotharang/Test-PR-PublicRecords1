@@ -119,7 +119,7 @@ EXPORT Address_Type
 			[
 			'P',		//Physical
 			'M',		//Mailing
-			'B'			//Both
+			'B' 		//Both
 			]
 			;
 EXPORT Address_Category
@@ -128,6 +128,7 @@ EXPORT Address_Category
 			'O'			//Other(Rehab, shelter, etc.)
 			,'T'		// Temporary
 			,'H'		// Homeless
+			,'U'		//Unknown (reserved for future use)
 			]
 			;
 EXPORT Eligible_Status

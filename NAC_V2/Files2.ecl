@@ -8,7 +8,7 @@
 	
 	export dsNCF2 := DATASET(Superfile_List.sfNCF2, $.Layouts2.rRawFile, CSV, opt);
 	export dsNCF2Base := DATASET(Superfile_List.sfNCF2Base, $.Layout_Base2, THOR, opt);
-	export dsNCF2PrevBase := DATASET(Superfile_List.sfNCF2Base+'_father', $.Layout_Base2, THOR, opt);
+	export dsNCF2PrevBase := DATASET(Superfile_List.sfNCF2Base+'::father', $.Layout_Base2, THOR, opt);
 	
 	export dsArchive := DATASET($.Superfile_List.sfArchive, $.Layouts2.rRawFile, THOR, opt);
 	
