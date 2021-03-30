@@ -57,6 +57,12 @@ EXPORT Layouts := MODULE
 			string10	geo_lat;
 			string11	geo_long;
       		unsigned2   RIN_Source := 0;
+			//RDP Section  
+			string75	start_date := '';
+			string75	end_date := '';
+			string10	Duration := '';
+			string30	TransactionStatus := '';
+			string		Reason := ''; 
 		END;
 		
 		EXPORT KnownFraud := RECORD
@@ -259,6 +265,10 @@ EXPORT Layouts := MODULE
 			string25 RemoteIPAddress;
 			string25 ConsumerIPAddress;
       		string256 Email_Address;
+			string75 EndDate; 
+			string10 Duration;
+			string30 TransactionStatus;
+			string Reason;
 		END;
 	
 		EXPORT validate_record := record
