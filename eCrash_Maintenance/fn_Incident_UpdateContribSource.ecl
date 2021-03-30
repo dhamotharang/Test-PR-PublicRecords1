@@ -27,7 +27,7 @@ lay_agency := RECORD
 	  STRING1   Source_Allow_Extract_Of_Vehicle_Data; 
 	END; 
 
-ds_agency := DATASET(Data_Services.foreign_prod + 'thor::ecrash::agency::20210312::donotdelete', lay_agency, THOR);
+ds_agency := flaccidents_ecrash.Files_MBSAgency.DS_BASE_AGENCY;
 uagency := DEDUP(SORT(ds_agency(Agency_ID <> ''), Agency_ID, (MAP(Source_ID = 'E' => 1, 2))), Agency_ID);
 
 Temp_Agency := RECORD
@@ -109,6 +109,28 @@ pIncSourceUpdmissingFinal  := PROJECT(Updated_TM_EA_Incidents, TRANSFORM(Layout_
 																																  STD.Str.ToUpperCase(LEFT.source_id) = 'TM' AND 
 																																  STD.Str.ToUpperCase(LEFT.vendor_code) = 'IYETEK' AND 
 																																	STD.Str.ToUpperCase(LEFT.contrib_source) IN ['E', 'A']) => 'I',
+																																	(LEFT.agency_id = '1513172' AND 
+																																  STD.Str.ToUpperCase(LEFT.source_id) = 'TM' AND 
+																																  STD.Str.ToUpperCase(LEFT.vendor_code) = 'IYETEK' AND 
+																																	STD.Str.ToUpperCase(LEFT.contrib_source) = 'C') => 'I',
+																																	(LEFT.agency_id = '1639547' AND 
+																																  STD.Str.ToUpperCase(LEFT.source_id) = 'TM' AND 
+																																  STD.Str.ToUpperCase(LEFT.vendor_code) = 'IYETEK' AND 
+																																	STD.Str.ToUpperCase(LEFT.contrib_source) = 'I') => 'A',
+																																	(LEFT.agency_id = '1537076' AND 
+																																  STD.Str.ToUpperCase(LEFT.source_id) = 'TM' AND 
+																																  STD.Str.ToUpperCase(LEFT.vendor_code) = 'IYETEK' AND 
+																																	STD.Str.ToUpperCase(LEFT.contrib_source) = 'C') => 'I',
+																																	(LEFT.agency_id = '1523972' AND 
+																																  STD.Str.ToUpperCase(LEFT.source_id) = 'TM' AND 
+																																  STD.Str.ToUpperCase(LEFT.vendor_code) = 'IYETEK' AND 
+																																	STD.Str.ToUpperCase(LEFT.contrib_source) = 'I') => 'C',
+																																	(LEFT.agency_id = '6667593' AND 
+																																  STD.Str.ToUpperCase(LEFT.source_id) = 'EA' AND
+																																	STD.Str.ToUpperCase(LEFT.contrib_source) = 'E') => 'A',
+																																	(LEFT.agency_id = '6696543' AND 
+																																  STD.Str.ToUpperCase(LEFT.source_id) = 'EA' AND
+																																	STD.Str.ToUpperCase(LEFT.contrib_source) = 'E') => 'I',
 																			                            LEFT.contrib_source);
 																		  SELF := LEFT;));
  					
