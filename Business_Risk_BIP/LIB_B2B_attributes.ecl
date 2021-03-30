@@ -13,6 +13,7 @@ EXPORT LIB_B2B_attributes (
   MODULE (Business_Risk_BIP.LIB_B2B_interface (Shell, Options, AllowedSourcesSet))
 #END
 #OPTION('expandSelectCreateRow', TRUE);
+	#OPTION('foldStored', TRUE);
 
   BHBuildDate := Risk_Indicators.get_Build_date('bip_build_version');
   allowMarketing := IF(Options.MarketingMode = 1, TRUE, FALSE);
