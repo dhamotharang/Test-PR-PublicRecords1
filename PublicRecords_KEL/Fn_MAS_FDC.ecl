@@ -153,6 +153,8 @@ end;
 							SELF.P_InpClnDL := right.P_InpClnDL,	
 							SELF.P_InpClnSSN := right.P_InpClnSSN,
 							SELF.P_InpClnNameLast := right.P_InpClnNameLast,
+							SELF.P_InpClnSurname1 := right.P_InpClnSurname1,
+							SELF.P_InpClnSurname2 := right.P_InpClnSurname2,
 							SELF.P_InpClnNameMid := right.P_InpClnNameMid,
 							SELF.P_InpClnNameFirst := right.P_InpClnNameFirst,
 							SELF.P_InpClnDOB := right.P_InpClnDOB,
@@ -179,6 +181,8 @@ end;
 							SELF.P_InpClnDL := LEFT.P_InpClnDL,	
 							SELF.P_InpClnSSN := LEFT.P_InpClnSSN,
 							SELF.P_InpClnNameLast := LEFT.P_InpClnNameLast,
+							SELF.P_InpClnSurname1 := left.P_InpClnSurname1,
+							SELF.P_InpClnSurname2 := left.P_InpClnSurname2,
 							SELF.P_InpClnNameMid := LEFT.P_InpClnNameMid,
 							SELF.P_InpClnNameFirst := LEFT.P_InpClnNameFirst,
 							SELF.P_InpClnDOB := LEFT.P_InpClnDOB,
@@ -417,7 +421,7 @@ Current_Address_Consumer_recs_Contacts := join(Current_Address_Consumer_recs, Cu
 		self.UIDAppend := le.UIDAppend,
 		self.g_procuid := le.UIDAppend,
 		self.P_InpClnArchDt := le.P_InpClnArchDt,
-		self.P_InpClnNameLast := ri.contact_name.lname,
+		self.P_InpClnSurname1 := ri.contact_name.lname,
 		self.Contact_date := if(ri.dt_last_seen_contact>(integer)le.P_InpClnArchDt[1..8],(integer)le.P_InpClnArchDt[1..8],ri.dt_last_seen_contact),
 		SELF := ri; 
 		self := [];
@@ -511,9 +515,21 @@ Current_Address_Consumer_recs_Contacts := join(Current_Address_Consumer_recs, Cu
 
 	//for searching
 	Input_FDC_Business_Contact_LexIDs := DEDUP(SORT(Input_Plus_Contacts, UIDAppend, P_LexID), UIDAppend, P_LexID);		//we use this later
-	temp_contacts_surnames := project(Business_Contact_LexIDs, transform(Layouts_FDC.Layout_FDC, self.P_InpClnNameLast := left.P_InpClnNameLast, self.UIDAppend := left.UIDAppend, self.g_procuid := left.UIDAppend, self := left, self := []));		
-	Input_surnames := Input_FDC + temp_contacts_surnames(P_InpClnNameLast<>'');	
-	Input_surnames_dedup := DEDUP(SORT(Input_surnames,UIDAppend,P_InpClnNameLast),UIDAppend,P_InpClnNameLast);							
+	//for now contacts only use surname1, this will be changed later
+	temp_contacts_surnames := project(Business_Contact_LexIDs, transform(Layouts_FDC.Layout_FDC, self.P_InpClnSurname1 := left.P_InpClnSurname1, self.UIDAppend := left.UIDAppend, self.g_procuid := left.UIDAppend, self := left, self := []));		
+	Input_surnames := Input_FDC + temp_contacts_surnames(P_InpClnSurname1<>'');							
+
+	cfpbsurname_input_contacts_pre :=
+		NORMALIZE( Input_surnames, 2, 
+			TRANSFORM( recordof(Input_Address_Current_Previous),
+				SELF.UIDAppend := LEFT.UIDAppend,
+				SELF.P_InpClnNameLast := CHOOSE( COUNTER, LEFT.P_InpClnSurname1, LEFT.P_InpClnSurname2);
+				SELF.P_InpClnSurname1 := LEFT.P_InpClnSurname1;
+				SELF.P_InpClnSurname2 := LEFT.P_InpClnSurname2;
+				SELF := LEFT,
+				SELF := []));
+
+	cfpbsurname_input_contacts := dedup(sort(cfpbsurname_input_contacts_pre, UIDAppend, P_InpClnNameLast),UIDAppend, P_InpClnNameLast);	
 
   Lookup_And_Input_LinkIDs := DEDUP(SORT(Lookup_And_Input_LinkIDs_Combined, UIDAppend, B_LexIDUlt, B_LexIDOrg, B_LexIDLegal), UIDAppend, B_LexIDUlt, B_LexIDOrg, B_LexIDLegal);
 
@@ -4595,17 +4611,20 @@ LienJudgement_all := dedup(sort(WithCorrectionsLiensParty+Temp_LienJudgement_lin
  
 dx_CFPB__key_Census_Surnames := IF( Options.isFCRA, dx_ConsumerFinancialProtectionBureau.key_census_surnames(TRUE), dx_ConsumerFinancialProtectionBureau.key_census_surnames(False));		
 	Key_CFPB__key_Census_Surnames :=
-			JOIN(Input_surnames_dedup, dx_CFPB__key_Census_Surnames,
+			JOIN(cfpbsurname_input_contacts, dx_CFPB__key_Census_Surnames,
 			Common.DoFDCJoin_dx_CFPB__key_Census_Surnames =TRUE AND
 			LEFT.P_InpClnNameLast <> '' AND
 				KEYED(LEFT.P_InpClnNameLast =RIGHT.name) and
 				ArchiveDate((string)right.dt_vendor_first_reported) <= LEFT.P_InpClnArchDt[1..8],
 				TRANSFORM(Layouts_FDC.Layout_dx_CFPB_key_Census_Surnames,
-					SELF.name := LEFT.P_InpClnNameLast,
+					SELF.name := right.name,
 					SELF.Src := PublicRecords_KEL.ECL_Functions.Constants.CFBPSurname,
 					SELF.DPMBitmap := SetDPMBitmap( Source := SELF.Src , FCRA_Restricted := Options.isFCRA, GLBA_Restricted := NotRegulated, Pre_GLB_Restricted := NotRegulated , DPPA_Restricted := NotRegulated, DPPA_State :='', KELPermissions := CFG_File),
 					self.Archive_Date := ArchiveDate((string)right.dt_vendor_first_reported);
 					self.dt_vendor_first_reported := (integer)archivedate( (string)right.dt_vendor_first_reported);
+					self.P_InpClnSurname1 := left.P_InpClnSurname1;
+					self.P_InpClnSurname2 := left.P_InpClnSurname2;
+					self.P_InpClnNameLast := left.P_InpClnNameLast;
 					SELF := RIGHT,
 					SELF := LEFT,
 					SELF := []),

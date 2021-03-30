@@ -150,6 +150,8 @@ end;
 							SELF.P_InpClnDL := right.P_InpClnDL,	
 							SELF.P_InpClnSSN := right.P_InpClnSSN,
 							SELF.P_InpClnNameLast := right.P_InpClnNameLast,
+							SELF.P_InpClnSurname1 := right.P_InpClnSurname1,
+							SELF.P_InpClnSurname2 := right.P_InpClnSurname2,
 							SELF.P_InpClnNameMid := right.P_InpClnNameMid,
 							SELF.P_InpClnNameFirst := right.P_InpClnNameFirst,
 							SELF.P_InpClnDOB := right.P_InpClnDOB,
@@ -168,6 +170,8 @@ end;
 							SELF.P_InpClnDL := left.P_InpClnDL,	
 							SELF.P_InpClnSSN := left.P_InpClnSSN,
 							SELF.P_InpClnNameLast := left.P_InpClnNameLast,
+							SELF.P_InpClnSurname1 := left.P_InpClnSurname1,
+							SELF.P_InpClnSurname2 := left.P_InpClnSurname2,
 							SELF.P_InpClnNameMid := left.P_InpClnNameMid,
 							SELF.P_InpClnNameFirst := left.P_InpClnNameFirst,
 							SELF.P_InpClnDOB := left.P_InpClnDOB,
@@ -197,6 +201,8 @@ end;
 							SELF.P_InpClnDL := LEFT.P_InpClnDL,	
 							SELF.P_InpClnSSN := LEFT.P_InpClnSSN,
 							SELF.P_InpClnNameLast := LEFT.P_InpClnNameLast,
+							SELF.P_InpClnSurname1 := left.P_InpClnSurname1,
+							SELF.P_InpClnSurname2 := left.P_InpClnSurname2,				
 							SELF.P_InpClnNameMid := LEFT.P_InpClnNameMid,
 							SELF.P_InpClnNameFirst := LEFT.P_InpClnNameFirst,
 							SELF.P_InpClnDOB := LEFT.P_InpClnDOB,
@@ -320,7 +326,7 @@ end;
 
 	//transform business contact into input layout and dedup
 	//only keep contacts within the past 3 years for 'extra' searching, keep 3 years for build date padding
-	temp_Contacts := project(Contacts, transform(Layouts_FDC.Layout_FDC, self.P_LexID := left.contact_did, self.UIDAppend := left.UIDAppend, self.g_procuid := left.UIDAppend, self.P_InpClnArchDt := LEFT.P_InpClnArchDt,self.P_InpClnNameLast := left.contact_name.lname, self.Contact_date := if(left.dt_last_seen_contact>(integer)LEFT.P_InpClnArchDt[1..8],(integer)LEFT.P_InpClnArchDt[1..8],left.dt_last_seen_contact), self := left, self := []));		
+	temp_Contacts := project(Contacts, transform(Layouts_FDC.Layout_FDC, self.P_LexID := left.contact_did, self.UIDAppend := left.UIDAppend, self.g_procuid := left.UIDAppend, self.P_InpClnArchDt := LEFT.P_InpClnArchDt,self.P_InpClnSurname1 := left.contact_name.lname, self.Contact_date := if(left.dt_last_seen_contact>(integer)LEFT.P_InpClnArchDt[1..8],(integer)LEFT.P_InpClnArchDt[1..8],left.dt_last_seen_contact), self := left, self := []));		
 	Bus_contact_Second := temp_Contacts((P_LexID > 0) and (ut.daysapart((string)Contact_date, P_InpClnArchDt[1..8]) < ut.DaysInNYears(3)));
 
 

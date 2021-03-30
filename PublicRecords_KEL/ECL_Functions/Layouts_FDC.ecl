@@ -28,6 +28,8 @@
 		STRING20 P_InpClnNameFirst;
 		STRING20 P_InpClnNameMid;
 		STRING30 P_InpClnNameLast;		
+		STRING30 P_InpClnSurname1;		
+		STRING30 P_InpClnSurname2;		
 		STRING20 p_inpclnarchdt;
 		STRING10 P_InpClnDOB;
 		STRING10 P_InpClnAddrPrimRng;

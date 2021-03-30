@@ -62,6 +62,14 @@ EXPORT Fn_CleanInput_Roxie( DATASET(PublicRecords_KEL.ECL_Functions.Layouts.Layo
 		SELF.P_InpClnNameFirst := cleaned_name.fname;
 		SELF.P_InpClnNameMid := cleaned_name.mname;
 		SELF.P_InpClnNameLast := cleaned_name.lname;
+		
+		surname1:=SELF.P_InpClnNameLast;
+		Surname1_filtered :=Std.Str.Find(TRIM(surname1),'-');
+		Valid_surname1:=IF(Surname1_filtered =0 ,STD.str.ToUpperCase(surname1[Surname1_filtered+1..]),TRIM(STD.str.ToUpperCase(surname1[1..Surname1_filtered-1]), LEFT, RIGHT));
+		Valid_surname2:=IF(Surname1_filtered =0,'',TRIM(STD.str.ToUpperCase(surname1[Surname1_filtered+1..]), LEFT, RIGHT));
+		
+		SELF.P_InpClnSurname1  := Valid_surname1;
+		SELF.P_InpClnSurname2  := Valid_surname2;
 		SELF.P_InpClnNamePrfx := cleaned_name.title;
 			
 		SELF.P_InpClnAddrPrimRng := cleaned_Addr.prim_range;
@@ -90,7 +98,8 @@ EXPORT Fn_CleanInput_Roxie( DATASET(PublicRecords_KEL.ECL_Functions.Layouts.Layo
 		SELF.P_InpClnDOB := cleaned_DOB.ValidPortion_00; 
 		SELF.P_InpClnDL := cleaned_DL;  
 		SELF.P_InpClnDLState := cleaned_DLState ;  
-		
+		SELF.AddressGeoLink := (trim(SELF.P_InpClnAddrStateCode, left, right) + trim(SELF.P_InpClnAddrCnty, left, right) + trim(SELF.P_InpClnAddrGeo, left, right)),
+
 		// Cleaned DOB metadata
 		SELF.DateAsNumsOnly := cleaned_DOB.DateAsNumsOnly; 
 		SELF.result := cleaned_DOB.result;  
@@ -110,7 +119,6 @@ EXPORT Fn_CleanInput_Roxie( DATASET(PublicRecords_KEL.ECL_Functions.Layouts.Layo
 		SELF.DateValid := cleaned_DOB.DateValid;  
 		SELF.ValidPortion_00 := cleaned_DOB.ValidPortion_00; 
 		SELF.ValidPortion_01 := cleaned_DOB.ValidPortion_01; 
-		
 		SELF.RepNumber := le.RepNumber;
 		SELF := le;
 		SELF := [];
