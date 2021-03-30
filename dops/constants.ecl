@@ -219,6 +219,6 @@ export constants := module
 																																	,'NA'
 																																	);	
 	
-	export integer pythonversion := 2;
+	export integer pythonversion := 3;
 	
 end;
