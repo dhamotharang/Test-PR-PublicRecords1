@@ -5,13 +5,13 @@ IMPORT * FROM KEL15.Null;
 EXPORT B_Person_Lien_Judgment_12(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG_Compile __cfg = CFG_Compile) := MODULE
   SHARED VIRTUAL TYPEOF(B_Lien_Judgment_13(__in,__cfg).__ENH_Lien_Judgment_13) __ENH_Lien_Judgment_13 := B_Lien_Judgment_13(__in,__cfg).__ENH_Lien_Judgment_13;
   SHARED VIRTUAL TYPEOF(E_Person_Lien_Judgment(__in,__cfg).__Result) __E_Person_Lien_Judgment := E_Person_Lien_Judgment(__in,__cfg).__Result;
-  SHARED __EE343631 := __E_Person_Lien_Judgment;
-  SHARED __EE5459604 := __ENH_Lien_Judgment_13;
-  SHARED __ST343716_Layout := RECORD
+  SHARED __EE346995 := __E_Person_Lien_Judgment;
+  SHARED __EE5586300 := __ENH_Lien_Judgment_13;
+  SHARED __ST347080_Layout := RECORD
     KEL.typ.nuid UID;
     KEL.typ.nstr T_M_S_I_D_;
     KEL.typ.nstr R_M_S_I_D_;
-    KEL.typ.ndataset(B_Lien_Judgment_13(__in,__cfg).__ST273527_Layout) Filing_;
+    KEL.typ.ndataset(B_Lien_Judgment_13(__in,__cfg).__ST276413_Layout) Filing_;
     KEL.typ.ndataset(E_Lien_Judgment(__in,__cfg).Book_Filing_Details_Layout) Book_Filing_Details_;
     KEL.typ.nstr Agency_I_D_;
     KEL.typ.nstr Agency_;
@@ -45,7 +45,7 @@ EXPORT B_Person_Lien_Judgment_12(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDe
     KEL.typ.epoch Vault_Date_Last_Seen_ := 0;
     KEL.typ.int __RecordCount := 0;
   END;
-  __ST343716_Layout __JT5459615(B_Lien_Judgment_13(__in,__cfg).__ST273522_Layout __l, B_Lien_Judgment_13(__in,__cfg).__ST273527_Layout __r) := TRANSFORM
+  __ST347080_Layout __JT5586311(B_Lien_Judgment_13(__in,__cfg).__ST276408_Layout __l, B_Lien_Judgment_13(__in,__cfg).__ST276413_Layout __r) := TRANSFORM
     SELF.T_M_S_I_D__1_ := __r.T_M_S_I_D_;
     SELF.Archive___Date_ := __r.Archive___Date_;
     SELF.Date_First_Seen_ := __r.Date_First_Seen_;
@@ -56,8 +56,8 @@ EXPORT B_Person_Lien_Judgment_12(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDe
     SELF := __l;
     SELF := __r;
   END;
-  SHARED __EE5459616 := NORMALIZE(__EE5459604,__T(LEFT.Filing_),__JT5459615(LEFT,RIGHT));
-  SHARED __ST5460045_Layout := RECORD
+  SHARED __EE5586312 := NORMALIZE(__EE5586300,__T(LEFT.Filing_),__JT5586311(LEFT,RIGHT));
+  SHARED __ST5586741_Layout := RECORD
     KEL.typ.nuid UID;
     KEL.typ.nstr Filing_Type_Description_;
     KEL.typ.nint Amount_;
@@ -70,15 +70,15 @@ EXPORT B_Person_Lien_Judgment_12(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDe
     KEL.typ.epoch Vault_Date_Last_Seen_ := 0;
     KEL.typ.int __RecordCount := 0;
   END;
-  SHARED __EE5460052 := PROJECT(TABLE(PROJECT(__EE5459616,__ST5460045_Layout),{KEL.typ.int __RecordCount := SUM(GROUP,__RecordCount),KEL.typ.epoch Archive___Date_ := KEL.era.SimpleRoll(GROUP,Archive___Date_,MIN,FALSE),KEL.typ.epoch Date_First_Seen_ := KEL.era.SimpleRoll(GROUP,Date_First_Seen_,MIN,FALSE),KEL.typ.epoch Date_Last_Seen_ := KEL.era.SimpleRoll(GROUP,Date_Last_Seen_,MAX,FALSE),KEL.typ.epoch Hybrid_Archive_Date_ := KEL.era.SimpleRoll(GROUP,Hybrid_Archive_Date_,MIN,FALSE),KEL.typ.epoch Vault_Date_Last_Seen_ := KEL.era.SimpleRoll(GROUP,Vault_Date_Last_Seen_,MAX,NMAX),UID,Filing_Type_Description_,Amount_,Landlord_Tenant_Dispute_Flag_,T_M_S_I_D__1_},UID,Filing_Type_Description_,Amount_,Landlord_Tenant_Dispute_Flag_,T_M_S_I_D__1_,MERGE),__ST5460045_Layout);
-  SHARED __ST5460072_Layout := RECORD
+  SHARED __EE5586748 := PROJECT(TABLE(PROJECT(__EE5586312,__ST5586741_Layout),{KEL.typ.int __RecordCount := SUM(GROUP,__RecordCount),KEL.typ.epoch Archive___Date_ := KEL.era.SimpleRoll(GROUP,Archive___Date_,MIN,FALSE),KEL.typ.epoch Date_First_Seen_ := KEL.era.SimpleRoll(GROUP,Date_First_Seen_,MIN,FALSE),KEL.typ.epoch Date_Last_Seen_ := KEL.era.SimpleRoll(GROUP,Date_Last_Seen_,MAX,FALSE),KEL.typ.epoch Hybrid_Archive_Date_ := KEL.era.SimpleRoll(GROUP,Hybrid_Archive_Date_,MIN,FALSE),KEL.typ.epoch Vault_Date_Last_Seen_ := KEL.era.SimpleRoll(GROUP,Vault_Date_Last_Seen_,MAX,NMAX),UID,Filing_Type_Description_,Amount_,Landlord_Tenant_Dispute_Flag_,T_M_S_I_D__1_},UID,Filing_Type_Description_,Amount_,Landlord_Tenant_Dispute_Flag_,T_M_S_I_D__1_,MERGE),__ST5586741_Layout);
+  SHARED __ST5586768_Layout := RECORD
     KEL.typ.ntyp(E_Person().Typ) Subject_;
     KEL.typ.ntyp(E_Lien_Judgment().Typ) Lien_;
     KEL.typ.nstr T_M_S_I_D_;
     KEL.typ.nstr R_M_S_I_D_;
     KEL.typ.ndataset(E_Person_Lien_Judgment(__in,__cfg).Details_Layout) Details_;
     KEL.typ.ndataset(E_Person_Lien_Judgment(__in,__cfg).Data_Sources_Layout) Data_Sources_;
-    KEL.typ.ndataset(__ST5460045_Layout) Lien_Judgment_;
+    KEL.typ.ndataset(__ST5586741_Layout) Lien_Judgment_;
     KEL.typ.epoch Archive___Date_ := 0;
     KEL.typ.epoch Date_First_Seen_ := 0;
     KEL.typ.epoch Date_Last_Seen_ := 0;
@@ -86,13 +86,13 @@ EXPORT B_Person_Lien_Judgment_12(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDe
     KEL.typ.epoch Vault_Date_Last_Seen_ := 0;
     KEL.typ.int __RecordCount := 0;
   END;
-  __JC5460069(E_Person_Lien_Judgment(__in,__cfg).Layout __EE343631, __ST5460045_Layout __EE5460052) := __EEQP(__EE343631.Lien_,__EE5460052.UID);
-  __ST5460072_Layout __Join__ST5460072_Layout(E_Person_Lien_Judgment(__in,__cfg).Layout __r, DATASET(__ST5460045_Layout) __recs) := TRANSFORM
+  __JC5586765(E_Person_Lien_Judgment(__in,__cfg).Layout __EE346995, __ST5586741_Layout __EE5586748) := __EEQP(__EE346995.Lien_,__EE5586748.UID);
+  __ST5586768_Layout __Join__ST5586768_Layout(E_Person_Lien_Judgment(__in,__cfg).Layout __r, DATASET(__ST5586741_Layout) __recs) := TRANSFORM
     SELF := __r;
     SELF.Lien_Judgment_ := __CN(__recs);
   END;
-  SHARED __EE5460070 := DENORMALIZE(DISTRIBUTE(__EE343631,HASH(Lien_)),DISTRIBUTE(__EE5460052,HASH(UID)),__JC5460069(LEFT,RIGHT),GROUP,__Join__ST5460072_Layout(LEFT,ROWS(RIGHT)),LOCAL);
-  EXPORT __ST273399_Layout := RECORD
+  SHARED __EE5586766 := DENORMALIZE(DISTRIBUTE(__EE346995,HASH(Lien_)),DISTRIBUTE(__EE5586748,HASH(UID)),__JC5586765(LEFT,RIGHT),GROUP,__Join__ST5586768_Layout(LEFT,ROWS(RIGHT)),LOCAL);
+  EXPORT __ST276285_Layout := RECORD
     KEL.typ.nstr Debtor_Plaintiff_;
     KEL.typ.nstr Subjects_Full_Name_;
     KEL.typ.nbool Is_Debtor_;
@@ -103,7 +103,7 @@ EXPORT B_Person_Lien_Judgment_12(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDe
     KEL.typ.epoch Vault_Date_Last_Seen_ := 0;
     KEL.typ.int __RecordCount := 0;
   END;
-  EXPORT __ST93711_Layout := RECORD
+  EXPORT __ST94626_Layout := RECORD
     KEL.typ.nstr T_M_S_I_D_;
     KEL.typ.nstr Filing_Type_Description_;
     KEL.typ.nint Amount_;
@@ -116,14 +116,14 @@ EXPORT B_Person_Lien_Judgment_12(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDe
     KEL.typ.epoch Vault_Date_Last_Seen_ := 0;
     KEL.typ.int __RecordCount := 0;
   END;
-  EXPORT __ST273393_Layout := RECORD
+  EXPORT __ST276279_Layout := RECORD
     KEL.typ.ntyp(E_Person().Typ) Subject_;
     KEL.typ.ntyp(E_Lien_Judgment().Typ) Lien_;
     KEL.typ.nstr T_M_S_I_D_;
     KEL.typ.nstr R_M_S_I_D_;
-    KEL.typ.ndataset(__ST273399_Layout) Details_;
+    KEL.typ.ndataset(__ST276285_Layout) Details_;
     KEL.typ.ndataset(E_Person_Lien_Judgment(__in,__cfg).Data_Sources_Layout) Data_Sources_;
-    KEL.typ.ndataset(__ST93711_Layout) Gather_Liens_;
+    KEL.typ.ndataset(__ST94626_Layout) Gather_Liens_;
     KEL.typ.epoch Archive___Date_ := 0;
     KEL.typ.epoch Date_First_Seen_ := 0;
     KEL.typ.epoch Date_Last_Seen_ := 0;
@@ -131,21 +131,21 @@ EXPORT B_Person_Lien_Judgment_12(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDe
     KEL.typ.epoch Vault_Date_Last_Seen_ := 0;
     KEL.typ.int __RecordCount := 0;
   END;
-  SHARED __ST273393_Layout __ND5460193__Project(__ST5460072_Layout __PP5460102) := TRANSFORM
-    __EE5460096 := __PP5460102.Details_;
-    __ST273399_Layout __ND5460188__Project(E_Person_Lien_Judgment(__in,__cfg).Details_Layout __PP5460125) := TRANSFORM
-      SELF.Is_Debtor_ := __OP2(__FN1(KEL.Routines.ToUpperCase,__FN1(TRIM,__PP5460125.Debtor_Plaintiff_)),=,__CN('D'));
-      SELF := __PP5460125;
+  SHARED __ST276279_Layout __ND5586889__Project(__ST5586768_Layout __PP5586798) := TRANSFORM
+    __EE5586792 := __PP5586798.Details_;
+    __ST276285_Layout __ND5586884__Project(E_Person_Lien_Judgment(__in,__cfg).Details_Layout __PP5586821) := TRANSFORM
+      SELF.Is_Debtor_ := __OP2(__FN1(KEL.Routines.ToUpperCase,__FN1(TRIM,__PP5586821.Debtor_Plaintiff_)),=,__CN('D'));
+      SELF := __PP5586821;
     END;
-    SELF.Details_ := __PROJECT(__EE5460096,__ND5460188__Project(LEFT));
-    __EE5460100 := __PP5460102.Lien_Judgment_;
-    __ST93711_Layout __ND5460153__Project(__ST5460045_Layout __PP5460149) := TRANSFORM
-      SELF.T_M_S_I_D_ := __PP5460149.T_M_S_I_D__1_;
-      SELF.My_Date_First_Seen_ := KEL.era.ToDate(__PP5460102.Date_First_Seen_);
-      SELF := __PP5460149;
+    SELF.Details_ := __PROJECT(__EE5586792,__ND5586884__Project(LEFT));
+    __EE5586796 := __PP5586798.Lien_Judgment_;
+    __ST94626_Layout __ND5586849__Project(__ST5586741_Layout __PP5586845) := TRANSFORM
+      SELF.T_M_S_I_D_ := __PP5586845.T_M_S_I_D__1_;
+      SELF.My_Date_First_Seen_ := KEL.era.ToDate(__PP5586798.Date_First_Seen_);
+      SELF := __PP5586845;
     END;
-    SELF.Gather_Liens_ := __PROJECT(__EE5460100,__ND5460153__Project(LEFT));
-    SELF := __PP5460102;
+    SELF.Gather_Liens_ := __PROJECT(__EE5586796,__ND5586849__Project(LEFT));
+    SELF := __PP5586798;
   END;
-  EXPORT __ENH_Person_Lien_Judgment_12 := PROJECT(__EE5460070,__ND5460193__Project(LEFT));
+  EXPORT __ENH_Person_Lien_Judgment_12 := PROJECT(__EE5586766,__ND5586889__Project(LEFT));
 END;
