@@ -1,5 +1,5 @@
 import	DMA, dx_dma, RoxieKeyBuild,ut, data_services, std;
-EXPORT	proc_build_tps_all(string	fileDate, boolean build_full = false, boolean debug_old_files = false)	:=
+EXPORT	proc_build_tps_all(string	fileDate, boolean build_full = false, boolean debug_old_files = false, dataset(DMA.layout_in_suppressionTPS_National) input = dataset([],DMA.layout_in_suppressionTPS_National))	:=
 module
 	
     //eliminates duplicates while maintaining relevant data
@@ -24,7 +24,9 @@ module
             SELF.delta_ind:= 1;
 		END;
         DMAPhone	:=	project(fileDMAIn,filterDMAPhone(left));
-        fileNationalIn :=	dataset('~thor_data400::in::suppression::TPS_National_'+fileDate, DMA.layout_in_suppressionTPS_National, csv(separator(','),terminator('\n'))); 
+        fileNationalIn :=	if(count(input) = 0,
+                        dataset('~thor_data400::in::suppression::TPS_National_'+fileDate, DMA.layout_in_suppressionTPS_National, csv(separator(','),terminator('\n')),opt),
+                        input); 
 
         DMA.layout_in_suppressionTPS_National	filterNationalPhone(fileNationalIn	l)	:=
 		TRANSFORM
@@ -85,7 +87,7 @@ module
                                                     dx_dma.names.base+'_delete'
                                                     ], dx_dma.names.base +'_'+filedate, true);
 		RETURN	sequential(
-                            output(if(build_full, project(delta_base(delta_ind != 3),delta_ind_to_0(left)), delta_base),, dx_dma.names.base +'_'+filedate),
+                            output(if(build_full, project(delta_base(delta_ind != 3),delta_ind_to_0(left)), delta_base),, dx_dma.names.base +'_'+filedate, overwrite),
                             if(build_full, mvBase, output('not full build'))
                             );
 	END;
