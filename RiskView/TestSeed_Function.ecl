@@ -360,7 +360,8 @@ RiskView.Layouts.Layout_RiskView5_Search_Results getSeed(Risk_Indicators.Layout_
 		self.AlertRegulatoryCondition	:= if(valid_attributes_requested, ri.AlertRegulatoryCondition	, '');
     
     //checking indicators section
-    self.CheckProfileIndex := if(CheckingIndicatorsRequest, ri.CheckProfileIndex	, '');
+    // self.CheckProfileIndex := if(CheckingIndicatorsRequest, ri.CheckProfileIndex	, '');
+    self.CheckProfileIndex := '';
     self.CheckTimeOldest := if(CheckingIndicatorsRequest, ri.CheckTimeOldest	, '');
     self.CheckTimeNewest := if(CheckingIndicatorsRequest, ri.CheckTimeNewest	, '');
     self.CheckNegTimeNewest := if(CheckingIndicatorsRequest, ri.CheckNegTimeNewest	, '');
