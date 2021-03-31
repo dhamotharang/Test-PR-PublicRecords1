@@ -1,6 +1,6 @@
-﻿import	_control,RoxieKeyBuild,ut,Orbit3,Scrubs_DoNotCall;
+﻿import	_control,RoxieKeyBuild,ut,Orbit3,Scrubs_DoNotCall, dx_dma;
 
-export	proc_build_DNC(string	sourceIP,string	fileDate,string	NationalSourceFile,string	DMASourceFile	=	'',string	groupName	=	'thor400_44',string	emailTarget	=	' ')	:=
+export	proc_build_DNC(string	sourceIP,string	fileDate,string	NationalSourceFile, string	DMASourceFile	=	'',string	groupName	=	'thor400_44',string	emailTarget	=	' ')	:=
 function
 	sprayIP	:=	map(	sourceIP	=	'edata10'		   =>	_control.IPAddress.edata10,
 										sourceIP	=	'edata11'		   =>	_control.IPAddress.edata11,
@@ -47,19 +47,19 @@ function
 								sequential(sprayFileDMA,addSuperDMA)
 							);
 
-	ut.MAC_SF_BuildProcess(DMA.proc_build_tps_all(fileDate).proc_build_base_national,'~thor_data400::base::suppression::tps_national',buildNationalBase,3,,true)
-	ut.MAC_SF_BuildProcess(DMA.proc_build_tps_all(fileDate).proc_build_base,'~thor_data400::base::suppression::tps',buildBase,3,,true)
+    build_full := dma.check_full;
+
+	buildKey	:=	DMA.proc_build_tps_all(fileDate, build_full).proc_build_key : success(sendSuccMsg),failure(sendFailMsg);
 	
-	buildKey	:=	DMA.proc_build_tps_all(fileDate).proc_build_key : success(sendSuccMsg),failure(sendFailMsg);
-	
-	updateVersion	:=	RoxieKeyBuild.updateversion('DoNotCallKeys',fileDate,'kgummadi@seisint.com;cbrodeur@seisint.com;randy.reyes@lexisnexis.com;manuel.tarectecan@lexisnexis.com;abednego.escobal@lexisnexis.com',,'N');
+	updateVersion	:=	RoxieKeyBuild.updateversion('DoNotCallKeys',fileDate,'kgummadi@seisint.com;cbrodeur@seisint.com;randy.reyes@lexisnexis.com;manuel.tarectecan@lexisnexis.com;abednego.escobal@lexisnexis.com',,
+                                                    if(build_full, 'F','D'));
 
   create_orbit_build:= Orbit3.proc_Orbit3_CreateBuild ('Do Not Call',fileDate,'N');	
 	
-	tpsBase		:=	distribute(DMA.file_suppressionTPS.Base,hash(phonenumber));
-	tpsFather	:=	distribute(DMA.file_suppressionTPS_father,hash(phonenumber));
+	tpsBase		:=	distribute(DMA.file_suppressionTPS_delta.Base_new(filedate),hash(phonenumber));
+	tpsFather	:=	distribute(DMA.file_suppressionTPS_delta.base,hash(phonenumber));
 
-	typeof(tpsBase)	getNewRecs(DMA.layout_suppressionTPS.Base	l,DMA.layout_suppressionTPS.Base	r)	:=
+	typeof(tpsBase)	getNewRecs(dx_dma.layouts.building	l,dx_dma.layouts.building	r)	:=
 	transform
 		self	:=	l;
 	end;
@@ -81,14 +81,15 @@ function
 	return	sequential(	sprayFileNational,
 											addSuperNational,
 											doDMA,
-											buildNationalBase,
-											buildBase,
+											//buildNationalBase,
+											//buildBase,
+                                            DMA.proc_build_tps_all(fileDate, build_full).proc_build_base,
+                                            //qaRecs,
 											buildKey,
-											updateVersion,
+                                            //dma.stats(filedate),
 											create_orbit_build,
-											qaRecs,
 											qaEmail,
-											Scrubs_DoNotCall.fnRunScrubs(fileDate,'')
+											//Scrubs_DoNotCall.fnRunScrubs(fileDate,'')
 										);
 	
 end;
