@@ -39,15 +39,17 @@ export IdAppendRoxie(
 			,segmentation := segmentation
 			);
 
+  SHARED useRes := scoreThreshold > 50 or NOT reAppend or allowInvalidResults;
+
 	export IdsOnly() := function
 		#IF(BIPV2.IdConstants.USE_LOCAL_KEYS)
 			res := project(localAppend, transform(BIPV2.IdAppendLayouts.IdsOnlyOutput, self := left, self := []));
 		#ELSE
 			res := project(remoteAppend.IdsOnly(), BIPV2.IdAppendLayouts.IdsOnlyOutput);
 		#END
-		return if(scoreThreshold > 50 or not reAppend or allowInvalidResults,
-			res,
-			error(recordof(res), 'score <= 50 can produce invalid id resolution'));
+		return if(useRes,
+			        res,
+			        error(recordof(res), 'score <= 50 can produce invalid id resolution'));
 	end;
 
 	shared defaultDataAccess := MODULE(doxie.IDataAccess) END;
@@ -65,9 +67,9 @@ export IdAppendRoxie(
 			                            ,mod_access := mod_access);
 		#END
 
-		return if(scoreThreshold > 50 or not reAppend or allowInvalidResults,
-			res,
-			error(recordof(res), 'score <= 50 can produce invalid id resolution'));
+		return if(useRes,
+              res,
+              error(recordof(res), 'score <= 50 can produce invalid id resolution'));
 	end;
 
 	export WithRecords(string fetchLevel = BIPV2.IdConstants.fetch_level_proxid
@@ -79,9 +81,9 @@ export IdAppendRoxie(
 		#ELSE
 			res := remoteAppend.WithRecords(fetchLevel := fetchLevel, mod_access := mod_access);
 		#END
-		return if(scoreThreshold > 50 or not reAppend or allowInvalidResults,
-			res,
-			error(recordof(res), 'score <= 50 can produce invalid id resolution'));
+		return if(useRes,
+              res,
+              error(recordof(res), 'score <= 50 can produce invalid id resolution'));
 	end;
 
 end;

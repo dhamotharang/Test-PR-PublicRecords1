@@ -39,14 +39,16 @@ EXPORT Fn_AppendBIPIDs_Roxie(
 		PrepBIPInput(LEFT, RIGHT), LEFT OUTER, ATMOST(100), KEEP(1));
 		
   Append := BIPV2.IdAppendRoxie(BIPSearchInput,
-		scoreThreshold := Options.BIPAppendScoreThreshold,
-		weightThreshold := Options.BIPAppendWeightThreshold,
-		primForce := Options.BIPAppendPrimForce, // Set to true if you only want matches where there is no mismatch on prim_range. 
+		                            scoreThreshold := Options.BIPAppendScoreThreshold,
+		                            weightThreshold := Options.BIPAppendWeightThreshold,
+		                            primForce := Options.BIPAppendPrimForce, // Set to true if you only want matches where there is no mismatch on prim_range. 
 																						// Setting to true will likely lower recall but may improve precision.
-		reAppend := Options.BIPAppendReAppend  // If you already have BIP ids on your input and don't want to look them up again, you can set this to false.
+	                            	reAppend := Options.BIPAppendReAppend  // If you already have BIP ids on your input and don't want to look them up again, you can set this to false.
   );
   
+  allids := Append.IdsOnly();
   IDsOnly := Append.IdsOnly()(SeleScore >= Options.BIPAppendScoreThreshold AND SeleWeight >= Options.BIPAppendWeightThreshold); 
+  
 	
 	BIPAppendResults := JOIN(BusinessInput, idsOnly, LEFT.G_ProcBusUID = RIGHT.Request_ID,
 		TRANSFORM(PublicRecords_KEL.ECL_Functions.Layouts.LayoutInputBII,
@@ -59,6 +61,10 @@ EXPORT Fn_AppendBIPIDs_Roxie(
 			SELF.B_LexIDLegalWgt := RIGHT.SeleWeight;
 			SELF := LEFT), 
 		LEFT OUTER, ATMOST(100), KEEP(1));
+
+  // OUTPUT(allids,NAMED('allids'));
+  // OUTPUT(IdsOnly,NAMED('IdsOnly'));
+  // OUTPUT(BIPAppendResults,NAMED('BIPAppendResults'));
 
 	RETURN BIPAppendResults;
 
