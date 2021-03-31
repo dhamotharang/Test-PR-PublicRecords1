@@ -23,6 +23,7 @@ EXPORT Superfile_List := module
 	export sfArchive := '~nac::in::archive';
 	export sfPayload := '~nac::out::payload';
 	export sfBase2 := '~nac::out::base2';
+	export sfBase2_father := '~nac::out::base2::father';
 	export sfBase1 := '~nac::in::base1';
 	export sfNCF2Base := '~nac::out::ncf2base';
 	export sfCollisions := '~nac::out::collisions2';
