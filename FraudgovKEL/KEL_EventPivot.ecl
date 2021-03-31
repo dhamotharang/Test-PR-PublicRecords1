@@ -80,7 +80,7 @@ SHARED MyRulesCnt := TABLE(MyRules, {RuleName, customerid, industrytype, entityt
 //output(MyRulesCnt, named('MyRulesCnt'));
 
 //Clean out from Modeling for UI
-codesToIgnore := '-99999\', \'-99998\', \'-99997';
+codesToIgnore := '-99999\', \'-99998\', \'-99997\', \'-99999.0\', \'-99998.0\', \'-99997.0';
 EXPORT UIStatsClean := FraudgovKEL.macCleanAnalyticUIOutput(UIStats, RECORDOF(UIStats), codesToIgnore);
 
 SHARED EventStatsPrep := FraudGovPlatform_Analytics.macPivotOttoOutput(UIStatsClean, 'industrytype,customerid,entitycontextuid,recordid', 
