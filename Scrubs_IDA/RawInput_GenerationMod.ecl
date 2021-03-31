@@ -59,7 +59,7 @@ EXPORT RawInput_GenerationMod := MODULE(SALT311.iGenerationMod)
     + 'FIELDTYPE:Invalid_SSN:SPACES( ):ALLOW(0123456789):LENGTHS(0,9):WORDS(0,1)\n'
     + 'FIELDTYPE:Invalid_DL:CUSTOM(Scrubs_IDA.Functions.FN_valid_DL > 0)\n'
     + 'FIELDTYPE:Invalid_Phone:LIKE(Invalid_Num):LENGTHS(0,10)\n'
-    + 'FIELDTYPE:Invalid_Clientassigneduniquerecordid:LIKE(Invalid_Num)\n'
+    + 'FIELDTYPE:Invalid_Clientassigneduniquerecordid:LIKE(Invalid_AlphaNum)\n'
     + 'FIELDTYPE:Invalid_Emailaddress:CUSTOM(Scrubs.Functions.fn_valid_email > 0)\n'
     + 'FIELDTYPE:Invalid_Ipaddress:CUSTOM(Scrubs.Functions.fn_valid_IP > 0)\n'
     + '\n'
@@ -77,7 +77,7 @@ EXPORT RawInput_GenerationMod := MODULE(SALT311.iGenerationMod)
     + 'FIELD:dl:TYPE(STRING12):LIKE(Invalid_DL):0,0\n'
     + 'FIELD:dlstate:TYPE(STRING5):LIKE(Invalid_State):0,0\n'
     + 'FIELD:phone:TYPE(STRING10):LIKE(Invalid_Phone):0,0\n'
-    + 'FIELD:clientassigneduniquerecordid:TYPE(UNSIGNED8):LIKE(Invalid_Clientassigneduniquerecordid):0,0\n'
+    + 'FIELD:clientassigneduniquerecordid:TYPE(STRING):LIKE(Invalid_Clientassigneduniquerecordid):0,0\n'
     + 'FIELD:emailaddress:TYPE(STRING50):LIKE(Invalid_Emailaddress):0,0\n'
     + 'FIELD:ipaddress:TYPE(STRING15):LIKE(Invalid_Ipaddress):0,0'
     ;

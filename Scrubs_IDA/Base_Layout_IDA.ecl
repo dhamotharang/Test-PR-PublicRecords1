@@ -24,7 +24,7 @@ EXPORT Base_Layout_IDA := RECORD
 	string12 orig_dl;
 	string5 orig_dlstate;
 	string orig_phone;
-	unsigned8 clientassigneduniquerecordid;
+	STRING clientassigneduniquerecordid;
 	string adl_ind;
 	string orig_email;
 	string15 orig_ipaddress;
