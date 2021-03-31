@@ -81,10 +81,7 @@ Empty_GW := DATASET([TRANSFORM(Gateway.Layouts.Config,
 							SELF.URL := ''; 
 							SELF := [])]);
               
-OFAC_GW := IF(IncludeOFACGW, DATASET([TRANSFORM(Gateway.Layouts.Config,
-							SELF.ServiceName := 'bridgerwlc'; 
-							SELF.URL := 'http://bridger_batch_cert:Br1dg3rBAtchC3rt@172.16.70.19:7003/WsSearchCore/?ver_=1'; 
-							SELF := [])]),
+OFAC_GW := IF(IncludeOFACGW, project(riskwise.shortcuts.gw_bridger, TRANSFORM(Gateway.Layouts.Config, self := left, self := [])),
 							Empty_GW);    
 
 Input_Gateways := (OFAC_GW)(URL <> '');
