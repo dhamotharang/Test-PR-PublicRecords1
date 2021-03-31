@@ -38,16 +38,16 @@ EXPORT FnRoxie_GetPersonAttributes(DATASET(PublicRecords_KEL.ECL_Functions.Layou
 	END;	
 														
 	NonFCRAPersonAttributesRaw := NOCOMBINE(JOIN(RecordsWithLexID, FDCDataset,
-		LEFT.G_ProcUID = RIGHT.G_ProcUID AND RIGHT.RepNumber != 6,
+		LEFT.G_ProcUID = RIGHT.G_ProcUID,
 		TRANSFORM({INTEGER G_ProcUID, LayoutPersonAttributesRaw},
 			SELF.G_ProcUID := LEFT.G_ProcUID;
 			NonFCRAPersonResults := PublicRecords_KEL.Q_Non_F_C_R_A_Person_Attributes_V1_Dynamic(LEFT.P_LexID , DATASET(LEFT), (INTEGER)(LEFT.P_InpClnArchDt[1..8]), Options.KEL_Permissions_Mask, DATASET(RIGHT)).res0;	
 			SELF := NonFCRAPersonResults[1],
 			SELF := []),
-		LEFT OUTER, ATMOST(LEFT.G_ProcUID = RIGHT.G_ProcUID, 100), KEEP(1)));
+		LEFT OUTER, ATMOST(100), KEEP(1)));
 
 	FCRAPersonAttributesRaw := NOCOMBINE(JOIN(RecordsWithLexID, FDCDataset,
-		LEFT.G_ProcUID = RIGHT.G_ProcUID AND RIGHT.RepNumber != 6,
+		LEFT.G_ProcUID = RIGHT.G_ProcUID,
 		TRANSFORM({INTEGER G_ProcUID, LayoutPersonAttributesRaw},
 			SELF.G_ProcUID := LEFT.G_ProcUID;
 			FCRAPersonResults := PublicRecords_KEL.Q_F_C_R_A_Person_Attributes_V1_Dynamic(LEFT.P_LexID , DATASET(LEFT), (INTEGER)(LEFT.P_InpClnArchDt[1..8]), Options.KEL_Permissions_Mask, DATASET(RIGHT)).res0;	
@@ -74,7 +74,7 @@ EXPORT FnRoxie_GetPersonAttributes(DATASET(PublicRecords_KEL.ECL_Functions.Layou
 			SELF.PL_AlrtSecurityAlertFlag := FCRAPersonResults[1].P_L___Alrt_Security_Alert_Flag_;
 			SELF.PL_AlrtIDTheftFlag := FCRAPersonResults[1].P_L___Alrt_I_D_Theft_Flag_;
 			SELF := []),
-		LEFT OUTER, ATMOST(LEFT.G_ProcUID = RIGHT.G_ProcUID, 100), KEEP(1)));
+		LEFT OUTER, ATMOST(100), KEEP(1)));
 		
 	PersonAttributesClean := IF(Options.IsFCRA, 
 															KEL.Clean(FCRAPersonAttributesRaw, TRUE, TRUE, TRUE),

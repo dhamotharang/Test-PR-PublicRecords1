@@ -7,10 +7,10 @@ EXPORT FnRoxie_GetInputPIIAttributes(DATASET(PublicRecords_KEL.ECL_Functions.Lay
 	LayoutInputPIIAttributes := RECORDOF(PublicRecords_KEL.Q_Input_Attributes_V1_Dynamic(DATASET([], PublicRecords_KEL.ECL_Functions.Layouts.LayoutInputPII), 0, PublicRecords_KEL.CFG_Compile.Permit__NONE, Options.isFCRA,).res0);
 
 	
-	InputPIIAttributesResults := NOCOMBINE(JOIN(RepInput, FDCDataset, LEFT.G_ProcUID = RIGHT.G_ProcUID AND RIGHT.RepNumber != 6, TRANSFORM(LayoutInputPIIAttributes,
+	InputPIIAttributesResults := NOCOMBINE(JOIN(RepInput, FDCDataset, LEFT.G_ProcUID = RIGHT.G_ProcUID, TRANSFORM(LayoutInputPIIAttributes,
 		PIIAttributes := PublicRecords_KEL.Q_Input_Attributes_V1_Dynamic(DATASET(LEFT), (INTEGER) LEFT.P_InpClnArchDt[1..8], Options.KEL_Permissions_Mask, Options.isFCRA, DATASET(RIGHT)).Res0;
 		SELF := PIIAttributes[1]), 
-	LEFT OUTER, ATMOST(LEFT.G_ProcUID = RIGHT.G_ProcUID, 100), KEEP(1)));
+	LEFT OUTER, ATMOST(100), KEEP(1)));
 		
 	InputPIIAttributes := KEL.Clean(InputPIIAttributesResults, TRUE, TRUE, TRUE);		
 	
