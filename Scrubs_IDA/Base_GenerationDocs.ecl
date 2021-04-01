@@ -25,7 +25,7 @@ FIELDTYPE:Invalid_Zip4:LIKE(Invalid_Num):LENGTHS(0,4)
 FIELDTYPE:Invalid_SSN:LIKE(Invalid_Num):LENGTHS(0,9)
 FIELDTYPE:Invalid_DL:CUSTOM(Scrubs_IDA.Functions.Fn_Valid_DL > 0)
 FIELDTYPE:Invalid_Phone:ALLOW(0123456789):LENGTHS(0,10)
-FIELDTYPE:Invalid_Clientassigneduniquerecordid:ALLOW(nfr0123456789):LENGTHS(18)
+FIELDTYPE:Invalid_Clientassigneduniquerecordid:ALLOW(nfrv0123456789):LENGTHS(17,18)
 FIELDTYPE:Invalid_Emailaddress:CUSTOM(Scrubs.Functions.fn_valid_email > 0)
 FIELDTYPE:Invalid_Ipaddress:CUSTOM(Scrubs.Functions.fn_valid_IP > 0)
 FIELDTYPE:Invalid_NID:LIKE(Invalid_Num):LENGTHS(0,18,19,20)
@@ -34,7 +34,7 @@ FIELDTYPE:Invalid_Add:SPACES( ):LIKE(Invalid_AlphaNum):WORDS(0..3)
 FIELDTYPE:Invalid_Add_Suff:LIKE(Invalid_AlphaNum):LENGTHS(0,2..4)
 FIELDTYPE:Invalid_Coor:CUSTOM(Scrubs.Functions.fn_geo_coord > 0)
 FIELDTYPE:Invalid_Err:LIKE(Invalid_AlphaNum):LENGTHS(4)
-FIELDTYPE:Invalid_AID:LIKE(Invalid_Num):LENGTHS(12)
+FIELDTYPE:Invalid_AID:LIKE(Invalid_Num):LENGTHS(12,13)
 
 FIELD:persistent_record_id:TYPE(STRING15):LIKE(Invalid_Rec_ID):0,0
 FIELD:src:TYPE(STRING2):LIKE(Invalid_Alpha):0,0
