@@ -27,7 +27,7 @@ EXPORT proc_build_all ( string pversion, boolean pDeltaBuild = false, boolean pI
 			Cortera_Tradeline.BuildTradelineScrubsReport(pversion),
 			Cortera_Tradeline.Promote().Inputfiles.Using2Used,
 			dops.updateversion('CorteraTradelineKeys',pversion,DopsEmail,,'N',l_updateflag:=pUpdateFlag),
-			Cortera.UpdateOrbit(pversion,build_name)
+			Cortera.UpdateOrbit(pversion,build_name),
 			if (isDelta,
 						output('Delta did was successful'),
 						sequential(
