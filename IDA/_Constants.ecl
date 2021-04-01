@@ -26,10 +26,11 @@ EXPORT _Constants(boolean pUseProd=false)  := module
 		
 	export Source_IP                          :=  if(pUseProd,TRIM('bctlpbatchio04.noam.lnrm.net'),TRIM('10.121.149.194'));
 	export GROUPNAME			      	      :=  ThorLib.Group();
-	export ROOTDIR 					          :=  if(pUseProd,TRIM('/data/prod_r3/b1064987/'),TRIM('/data/temp/petrvl01/IDA/'));
+	export ROOTDIR 					          :=  if(pUseProd,TRIM('/data/prod_r3/b1032422/'),TRIM('/data/temp/petrvl01/IDA/'));
 	export spray_path		  	              :=  if(pUseProd,TRIM(ROOTDIR + 'outgoing/'),TRIM(ROOTDIR +'outgoing/'));
-	export done_path                          :=  if(pUseProd,TRIM('/data/prod_r3/b1064987/done'),TRIM('/data/temp/petrvl01/IDA/done/'));
-	export despray_path                       :=  if(pUseProd,TRIM('/data/prod_r3/b1064987/incoming/'),TRIM('/data/temp/petrvl01/IDA/incoming/'));	
+	export done_path                          :=  if(pUseProd,TRIM('/data/prod_r3/b1032422/done'),TRIM('/data/temp/petrvl01/IDA/done/'));
+	export despray_path                       :=  if(pUseProd,TRIM('/data/prod_r3/b1032432/dali_files/'),TRIM('/data/temp/petrvl01/IDA/dali_files/'));	
+	export despray_incoming_path              :=  if(pUseProd,TRIM('/data/prod_r3/b1032432/incoming/'),TRIM('/data/temp/petrvl01/IDA/incoming/'));
 	
 	export RD                                 :=STD.File.RemoteDirectory(Source_IP,spray_path);
 	export SRT                                :=SORT(RD,name);
