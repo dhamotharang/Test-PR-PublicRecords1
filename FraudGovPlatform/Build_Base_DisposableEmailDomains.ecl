@@ -1,4 +1,4 @@
-﻿Import FraudShared,tools; 
+﻿Import tools; 
 EXPORT Build_Base_DisposableEmailDomains (
    string pversion	
 	,dataset(FraudGovPlatform.Layouts.Input.DisposableEmailDomains) FileInput = FraudGovPlatform.Files().Input.DisposableEmailDomains.Sprayed

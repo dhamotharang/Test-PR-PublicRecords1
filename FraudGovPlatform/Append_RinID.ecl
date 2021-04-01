@@ -1,8 +1,8 @@
-﻿IMPORT Header, FraudShared, ut, STD,FraudGovPlatform_Validation,_Validate;
+﻿IMPORT Header, ut, STD,FraudGovPlatform_Validation,_Validate;
 //1.Send main dataset to append lexid
 EXPORT Append_RinID(
-	dataset(FraudShared.Layouts.Base.Main) FileBase
-    ,dataset(FraudShared.Layouts.Base.Main) Previous_Build = $.Files().Base.Main_Orig.QA
+	dataset(FraudGovPlatform.Layouts.Base.Main) FileBase
+    ,dataset(FraudGovPlatform.Layouts.Base.Main) Previous_Build = $.Files().Base.Main_Orig.QA
 ) := FUNCTION
 
 	FirstRinID := FraudGovPlatform.Constants().FirstRinID;
@@ -19,7 +19,7 @@ EXPORT Append_RinID(
 		previous_base,
 		building_base,
 		left.record_id = right.record_id,
-		transform(FraudShared.Layouts.Base.Main,
+		transform(FraudGovPlatform.Layouts.Base.Main,
 			self.did:= if(left.record_id=right.record_id, left.did, right.did);
 			self.did_score:= if(left.record_id=right.record_id, left.did_score, right.did_score);
 			self := right),
@@ -53,7 +53,7 @@ EXPORT Append_RinID(
 	seed:= if (LastRinID > 0 , LastRinID+1, FirstRinID);
 	MAC_Sequence_Records(	with_pii, did,	new_rinid_sequences, seed);
 	
-	all_rinids := 	with_rinid	+	project(new_rinid_sequences,FraudShared.Layouts.Base.Main);
+	all_rinids := 	with_rinid	+	project(new_rinid_sequences,FraudGovPlatform.Layouts.Base.Main);
 	
 	//5.send all records with a RinID to be matched and collapsed
 	mtchs:= Mod_Collisions( all_rinids ).matches;

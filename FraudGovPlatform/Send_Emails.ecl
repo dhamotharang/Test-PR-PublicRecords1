@@ -8,8 +8,8 @@ export Send_Emails(
 	,dataset(lay_builds)	pBuildFilenames					= FraudShared.keynames(pversion,pUseOtherEnvironment).dAll_filenames
 	,string								pEmailList							= Email_Notification_Lists().BuildSuccess 
 	,string								pRoxieEmailList					= Email_Notification_Lists().Roxie
-	,string								pBuildName							= FraudShared.Platform.Name(pUseOtherEnvironment)
-	,string								pPackageName						= FraudShared.Platform.Name(pUseOtherEnvironment) + 'Keys'
+	,string								pBuildName							= FraudGovPlatform._Dataset(pUseOtherEnvironment).name
+	,string								pPackageName						= FraudGovPlatform._Dataset(pUseOtherEnvironment).name + 'Keys'
 	,string								pBuildMessage						= 'Base Files Finished'
 ) := 
 	tools.mod_SendEmails(

@@ -3,7 +3,7 @@
 /* DOCUMENTATION: https://confluence.rsi.lexisnexis.com/display/GTG/OTTO+-+Data+Build
 /* AUTHORS: DATA ENGINEERING (SESHA NOOKALA, OSCAR BARRIENTOS)
 /**************************************************************************************************************************************************/
-import tools, _control, FraudShared, Orbit3, FraudGovPlatform_Validation, STD, FraudGovPlatform_Analytics;
+import tools, _control, Orbit3, FraudGovPlatform_Validation, STD, FraudGovPlatform_Analytics;
 
 export Build_Kel(
 	 string pversion 	
