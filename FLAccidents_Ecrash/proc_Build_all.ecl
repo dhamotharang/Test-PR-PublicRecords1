@@ -43,8 +43,6 @@ orbit_report.facc_Stats(getretval);
 
 string timestamp := mod_Utilities.StrSysSeconds : independent;
 
-verify_dops := if ( count(Sample_data.agency_data) <> 0, updatedops,Output('No_DopsUpdate_As_EA_Updates_Not_Processed'));
-
 //Orbit Create Build for PR eCrashV2Keys, Insurance EcrashCruDeltaKeys & Insurance eCrashV2Keys
 orbit_date := (integer) filedate[1..8];
 prOrbitCreateBuild := map(ut.Weekday(orbit_date) = 'SUNDAY' and morning = 'yes' =>  Orbit3.proc_Orbit3_CreateBuild ( 'Accident Reports - ECrashV2 National',filedate),
@@ -95,12 +93,11 @@ orbit_report.areport_Stats(nationalgetretval);
 build_key := sequential(
 	 fn_Inputstats.sentemail
 	,proc_build_EcrashV2_keys(filedate)
-	,verify_dops
+	,updatedops
 	,OrbitCreateBuild
 	,Sample_data.qa
 	,strata(filedate)
 	,proc_build_dupe_extract(filedate,timestamp)
-	,Proc_build_Accident_watch(filedate,timestamp)
 	,InFilesList
 	,getretval
 	,nationalgetretval) : success(Send_Email(filedate,'V2').buildsuccess), failure(Send_Email(filedate,'V1').buildfailure);

@@ -2012,7 +2012,11 @@ EXPORT dsSourceCriteria := DATASET([
 {'EC (CFSP) 2021/483 Myanmar/Burma List','1999'},
 {'EC 2021/478 Human Rights Violations and Abuses List','2000'},
 {'EC 2021/480 Myanmar/Burma List','2001'},
-{'Vietnamese Public Security Ministry Wanted List','2002'}
+{'Vietnamese Public Security Ministry Wanted List','2002'},
+{'HMRC (UK) Anti-Money Laundering Non-Compliance List','2003'},
+{'Indian Home Affairs Ministry Banned Individual List','2004'},
+{'Ministry of Foreign Affairs (China) Public Statements','2005'},
+{'US Customs and Border Protection (CBP) Withhold Release Orders and Forced Labor Findings','2006'}
 
 ],r);
 
