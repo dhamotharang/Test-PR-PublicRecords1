@@ -5,8 +5,8 @@ export fSpray(boolean pUseProd = false) := MODULE
 
 version:=IDA._Constants(pUseProd).filesdate;
 
-RD:=IDA._Constants(false).RD;
-RDF:=IDA._Constants(false).RDF;
+RD:=IDA._Constants(pUseProd).RD;
+RDF:=IDA._Constants(pUseProd).RDF;
 
 
 
