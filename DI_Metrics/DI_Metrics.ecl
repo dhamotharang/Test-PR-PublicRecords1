@@ -3,6 +3,7 @@
 //pHostname := 'uspr-edata12.risk.regn.net'
 //pTarget := '/data/Builds/builds/DI_Metrics/'
 //pContact := 'cleophus.johnson@lexisnexisrisk.com'
+import STD, DI_Metrics;
 
 export DI_Metrics(string pHostname, string pTarget, string pContact ='\' \'') := function
 
