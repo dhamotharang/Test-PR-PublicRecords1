@@ -22,7 +22,7 @@ FIELDTYPE:Invalid_Zip4:LIKE(Invalid_Num):LENGTHS(0,4)
 FIELDTYPE:Invalid_SSN:LIKE(Invalid_Num):LENGTHS(0,9)
 FIELDTYPE:Invalid_DL:CUSTOM(Scrubs_IDA.Functions.Fn_Valid_DL > 0)
 FIELDTYPE:Invalid_Phone:ALLOW(0123456789):LENGTHS(0,10)
-FIELDTYPE:Invalid_Clientassigneduniquerecordid:LIKE(Invalid_Num):LENGTHS(15,16)
+FIELDTYPE:Invalid_Clientassigneduniquerecordid:ALLOW(nfr0123456789):LENGTHS(18)
 FIELDTYPE:Invalid_Emailaddress:CUSTOM(Scrubs.Functions.fn_valid_email > 0)
 FIELDTYPE:Invalid_Ipaddress:CUSTOM(Scrubs.Functions.fn_valid_IP > 0)
 FIELDTYPE:Invalid_NID:LIKE(Invalid_Num):LENGTHS(0,18,19,20)
@@ -56,7 +56,7 @@ FIELD:orig_ssn:TYPE(STRING12):LIKE(Invalid_SSN):0,0
 FIELD:orig_dl:TYPE(STRING12):LIKE(Invalid_DL):0,0
 FIELD:orig_dlstate:TYPE(STRING5):LIKE(Invalid_State):0,0
 FIELD:orig_phone:TYPE(STRING):LIKE(Invalid_Phone):0,0
-FIELD:clientassigneduniquerecordid:TYPE(UNSIGNED8):LIKE(Invalid_Clientassigneduniquerecordid):0,0
+FIELD:clientassigneduniquerecordid:TYPE(STRING):LIKE(Invalid_Clientassigneduniquerecordid):0,0
 FIELD:adl_ind:TYPE(STRING):LIKE(Invalid_Alpha):0,0
 FIELD:orig_email:TYPE(STRING):LIKE(Invalid_Emailaddress):0,0
 FIELD:orig_ipaddress:TYPE(STRING15):LIKE(Invalid_Ipaddress):0,0
