@@ -54,42 +54,33 @@ export UpdateRecordsAD(FullData,NewData,recref,MatchFields,UpdateFields,process_
         dNewData:=distribute(newData,hash(%CommaString%));
     #end;
 	RecordLayout:=#expand(recref);;
-    RecordLayoutTemp:=RECORD
-		RecordLayout;
+    
+	RecordLayoutNoSid:=RECORD
+		RecordLayout-[Record_Sid];
+	END;
+
+	RecordLayoutTemp:=RECORD
+		UNSIGNED8 record_sid;
 		boolean updated;
+		RecordLayoutNoSid OldRec;
+		RecordLayoutNoSid NewRec;
 	END;
 	effectivedate:=process_date;
-    #append(CommandString,'RecordLayoutTemp tCreateUpdatesAdds(RecordLayout L, RecordLayout R):=TRANSFORM\n');
+    #append(CommandString,'RecordLayoutTemp tCreateUpdates(RecordLayout L, RecordLayout R):=TRANSFORM\n');
     #append(CommandString,'self.record_sid:=L.record_sid;\n');
 	#append(CommandString,%'UpdateString'%);
-	#append(CommandString,'self.dt_effective_first:=(UNSIGNED4)effectivedate;\n');
-	#append(CommandString,'self.delta_ind:=1;\n');
-    #append(CommandString,'self:=R;\n');
+	#append(CommandString,'self.NewRec.dt_effective_first:=(UNSIGNED4)effectivedate;\n');
+	#append(CommandString,'self.OldRec.dt_effective_last:=(UNSIGNED4)effectivedate;\n');
+	#append(CommandString,'self.NewRec.delta_ind:=1;\n');
+	#append(CommandString,'self.OldRec.delta_ind:=3;\n');
+	#append(CommandString,'self.OldRec:=L;\n');
+	#append(CommandString,'self.NewRec:=R;\n');
     #append(CommandString,'end;\n');
 
-    #append(CommandString,'RecordLayoutTemp tCreateUpdatesDels(RecordLayout L, RecordLayout R):=TRANSFORM\n');
-    #append(CommandString,'self.record_sid:=L.record_sid;\n');
-	#append(CommandString,%'UpdateString'%);
-	#append(CommandString,'self.dt_effective_last:=(UNSIGNED4)effectivedate;\n');
-	#append(CommandString,'self.delta_ind:=3;\n');
-    #append(CommandString,'self:=L;\n');
-    #append(CommandString,'end;\n');
-
-    #APPEND(CommandString,'dUpdateRecordsTempAdd:=join(dFullData,dNewData,');
-	#append(CommandString,%'MatchString'%);
-	#APPEND(CommandString,',tCreateUpdatesAdds(left,right)');
-	#if(isLookup=false and isdist=false)
-	#append(CommandString,');\n');
-	
-	#elseif(islookup)
-    #append(CommandString,',lookup);\n');
-    #else
-    #append(CommandString,',local);\n');
-    #end
     
-    #APPEND(CommandString,'dUpdateRecordsTempDel:=join(dFullData,dNewData,');
+    #APPEND(CommandString,'dUpdateRecordsTemp:=join(dFullData,dNewData,');
 	#append(CommandString,%'MatchString'%);
-	#APPEND(CommandString,',tCreateUpdatesDels(left,right)');
+	#APPEND(CommandString,',tCreateUpdates(left,right)');
 	#if(isLookup=false and isdist=false)
 	#append(CommandString,');\n');
 	
@@ -100,10 +91,14 @@ export UpdateRecordsAD(FullData,NewData,recref,MatchFields,UpdateFields,process_
     #end
     
     //#append(CommandString,'');
-	#append(CommandString,'dUpdateRecords:=project(dUpdateRecordsTempAdd(updated)+dUpdateRecordsTempDel(updated),transform(RecordLayout,self:=Left;));\n');
-    %CommandString%;
+	#append(CommandString,'dUpdateRecordsAdds:=project(dUpdateRecordsTemp,\n');
+    #append(CommandString,'transform(RecordLayout,self.record_sid:=left.record+sid; self:=Left.NewRec;));\n');
+	#append(CommandString,'dUpdateRecordsDeletes:=project(dUpdateRecordsTemp,\n');
+    #append(CommandString,'transform(RecordLayout,self.record_sid:=left.record+sid; self:=Left.OldRec;));\n');
+	
+	%CommandString%;
 
-    return dUpdateRecords;
+    return dUpdateRecordsAdds+dUpdateRecordsDeletes;
 	//return %'CommandString'%;
 
 endmacro;
