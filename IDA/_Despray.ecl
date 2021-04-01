@@ -6,7 +6,7 @@ version:=if(pversion='',IDA._Constants(pUseProd).filesdate,pversion);
 
 DailyBase:=IDA.Files().Basedaily.Built;
 
-DesprayTable:=TABLE(DailyBase,{did,clientassigneduniquerecordid,orig_filecategory});
+DesprayTable:=TABLE(DailyBase,{did,clientassigneduniquerecordid});
 
 DesprayOut:=OUTPUT(DesprayTable,,'~thor_data400::out::ida::'+version+'::LEXID_APPEND',CSV(HEADING(SINGLE),SEPARATOR('|')),COMPRESSED);
 
