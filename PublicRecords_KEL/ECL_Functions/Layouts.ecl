@@ -159,7 +159,7 @@ EXPORT LayoutAppendedAddresses := RECORD
 	END;		
 			
 	EXPORT LayoutInputPII := RECORD
-		// INTEGER G_UID;		
+		INTEGER G_UID;		
 		INTEGER G_ProcUID;
 		INTEGER G_ProcBusUID;
 		INTEGER RepNumber;
