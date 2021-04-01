@@ -131,7 +131,7 @@ end;
 matchset := ['A','Z','D','P'];
 	 did_add.MAC_Match_Flex
 	 (new_base_s, matchset,					
-	 ssn, clean_dob, fname, mname, lname, name_suffix, 
+	 orig_ssn, clean_dob, fname, mname, lname, name_suffix, 
 	 prim_range, prim_name, sec_range, zip, st, clean_phone, 
 	 DID,IDA.Layouts.base, false, DID_Score_field, 
 	 75, d_did)
