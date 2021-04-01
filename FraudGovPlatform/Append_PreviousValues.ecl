@@ -1,7 +1,6 @@
-﻿   IMPORT FraudShared;
-EXPORT Append_PreviousValues (
-		dataset(FraudShared.Layouts.Base.Main) FileBase
-   ,dataset(FraudShared.Layouts.Base.Main) Previous_Build = $.Files().Base.Main_Orig.QA
+﻿EXPORT Append_PreviousValues (
+		dataset(FraudGovPlatform.Layouts.Base.Main) FileBase
+   ,dataset(FraudGovPlatform.Layouts.Base.Main) Previous_Build = $.Files().Base.Main_Orig.QA
 ) := FUNCTION
 
 	building_base := distribute(pull(FileBase), hash32(record_id));
@@ -11,7 +10,7 @@ EXPORT Append_PreviousValues (
 		previous_base,
 		building_base,
 		left.record_id = right.record_id,
-		transform(FraudShared.Layouts.Base.Main,
+		transform(FraudGovPlatform.Layouts.Base.Main,
 			SELF := if(left.record_id=right.record_id,LEFT, RIGHT )
 		),
 		RIGHT OUTER, LOCAL

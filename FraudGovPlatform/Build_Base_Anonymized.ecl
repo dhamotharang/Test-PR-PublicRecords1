@@ -1,8 +1,8 @@
-﻿import FraudShared, Anonymizer, Address,Std,tools;
+﻿import Anonymizer, Address,Std,tools;
 export Build_Base_Anonymized (
      string pversion
-    ,dataset(FraudShared.Layouts.Base.Main) pBaseFile   = $.Files().Base.Main_Orig.Built
-    ,dataset(FraudShared.Layouts.Base.Main) Previous_Build = FraudShared.Files().Base.Main.QA
+    ,dataset(FraudGovPlatform.Layouts.Base.Main) pBaseFile   = $.Files().Base.Main_Orig.Built
+    ,dataset(FraudGovPlatform.Layouts.Base.Main) Previous_Build = FraudGovPlatform.Files().Base.Main.QA
 ) := 
 module 
 
@@ -13,7 +13,7 @@ module
 		:= join (	distribute(pBaseFile,hash32(record_id)),
 					distribute(Previous_Build,hash32(record_id)),
 					left.record_id = right.record_id,
-					transform(FraudShared.Layouts.Base.Main, self := left),
+					transform(FraudGovPlatform.Layouts.Base.Main, self := left),
 					left only,
 					local);
 
@@ -21,7 +21,7 @@ module
 		:= join (	New_Recs,
 					CustomerSettings(Anonymize_Data = true),
 					(unsigned2)left.classification_Permissible_use_access.fdn_file_info_id = (unsigned2)right.fdn_file_info_id, 
-					transform(FraudShared.Layouts.Base.Main, self := left;),
+					transform(FraudGovPlatform.Layouts.Base.Main, self := left;),
 					inner,
 					LOOKUP);
 
@@ -39,7 +39,7 @@ module
 		,additional_address.clean_address.v_city_name,additional_address.clean_address.st,additional_address.clean_address.zip,,additional_address.clean_address.fips_county
 		,additional_address.clean_address.geo_blk,additional_address.clean_address.geo_lat,additional_address.clean_address.geo_long);	
 
-	 Fraudshared.Layouts.base.main	TrAddress	(anonymizeAddress2 l) := Transform
+	 FraudGovPlatform.Layouts.base.main	TrAddress	(anonymizeAddress2 l) := Transform
 											CAstreet1 := ut.CleanSpacesAndUpper(trim(l.clean_address.prim_range)+' '+
 												trim(l.clean_address.predir) +' '+
 												trim(l.clean_address.prim_name)+' '+
@@ -84,7 +84,7 @@ module
 		:= join(	New_Recs,
 					Sources_Anonymized,
 					left.record_id = right.record_id,
-					transform(FraudShared.Layouts.Base.Main, self := left;),
+					transform(FraudGovPlatform.Layouts.Base.Main, self := left;),
 					left only,
 					local);
 
@@ -92,7 +92,7 @@ module
 		:= join (	distribute(pBaseFile,hash32(record_id)),
 					distribute(Previous_Build,hash32(record_id)),
 					left.record_id = right.record_id,
-					transform(FraudShared.Layouts.Base.Main,self.did:=left.did,self.did_score:=left.did_score, self := right),
+					transform(FraudGovPlatform.Layouts.Base.Main,self.did:=left.did,self.did_score:=left.did_score, self := right),
 					inner,
 					local);
 
@@ -101,14 +101,13 @@ module
 	
 	MergeRecs := FraudGovPlatform.fn_dedup_main( Old_Recs + New_Records_Anonymized + New_Records_Not_Anonymized + Demo_main );
 
-	tools.mac_WriteFile(FraudShared.Filenames(pversion).Base.Main.New,MergeRecs,Build_Base_File_Anonymized);
+	tools.mac_WriteFile(FraudGovPlatform.Filenames(pversion).Base.Main.New,MergeRecs,Build_Base_File_Anonymized);
 
 	export All :=
 	if(tools.fun_IsValidVersion(pversion)
 		,sequential(
 				Build_Base_File_Anonymized,
-				FraudGovPlatform.Promote(pversion).buildfiles.New2Built,
-				Fraudshared.Promote(pversion).buildfiles.New2Built)
+				FraudGovPlatform.Promote(pversion).buildfiles.New2Built)
 		,output('No Valid version parameter passed, skipping Build_Base_Anonymized atribute')
 	);
 end;
