@@ -39,7 +39,7 @@ EXPORT fn_UpdateSuperFiles(AccountMonitoring.types.productMask product_mask =
                             AccountMonitoring.types.productMask.allProducts, // all
                             STRING roxie_esp_server_env = 'prod', // prod, cert 
 														STRING roxie_esp_server_cluster = 'nonfcra', // nonfcra, fcra
-                            STRING roxie_vip_server =  _Control.RoxieEnv.prodvip,
+                            STRING roxie_vip_server =  AccountMonitoring.constants.PROD_VIP,
                             STRING roxie_port = '8010'
                             
                             ) := FUNCTION
@@ -83,13 +83,13 @@ EXPORT fn_UpdateSuperFiles(AccountMonitoring.types.productMask product_mask =
    
   CGM_LogicalFilesFinal := GLOBAL(ROLLUP(CGM_LogicalFilesGroup,GROUP,RollFiles(LEFT,ROWS(LEFT))),FEW);
            
-	/*				 
-        output(roxie_esp_server,named('roxie_esp_server'));
-				output(liveClust,named('liveClust'));
-        output(choosen(roxiePack,4000),named('roxiePack'));
-        output(CGM_LogicalFiles,named('CGM_LogicalFiles'));
-        output(CGM_LogicalFilesFinal,named('CGM_LogicalFilesFinal'));
-*/
+	 
+        // output(roxie_esp_server,named('roxie_esp_server'));
+				// output(liveClust,named('liveClust'));
+        // output(choosen(roxiePack,4000),named('roxiePack'));
+        // output(CGM_LogicalFiles,named('CGM_LogicalFiles'));
+        // output(CGM_LogicalFilesFinal,named('CGM_LogicalFilesFinal'));
+
   update_monitor_file :=
         SEQUENTIAL(updateMonitorFiles(CGM_LogicalFilesFinal)
                   );
