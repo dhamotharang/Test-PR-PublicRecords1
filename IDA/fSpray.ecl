@@ -19,7 +19,7 @@ tools.Layout_Sprays.Info xForm(recordof(RDF) L) := transform
 								,0
 								,IDA.Filenames(version,pUseProd).lInputTemplate
 								,[{IDA.Filenames(version,pUseProd).lInputTemplate_built}] 
-								,'thor400_dev01'                                              
+								,ThorLib.Group()                                              
 								,REGEXFIND('[0-9]{8}'+'_'+'[0-9]{6}',L.name,0)                                             
 								,'[0-9]{8}'+'_'+'[0-9]{6}'                                                          
 								,'VARIABLE'                                                         

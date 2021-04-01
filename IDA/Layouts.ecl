@@ -17,7 +17,7 @@ Export Input :=RECORD
   STRING12 dl;
   STRING5 dlstate;
   STRING10 phone;
-  UNSIGNED8 clientassigneduniquerecordid;
+  string clientassigneduniquerecordid;
   STRING50 emailaddress;
   STRING15 ipaddress;
 	STRING20 filecategory;
@@ -49,7 +49,7 @@ EXPORT Base := RECORD
 	STRING12  orig_dl;
   STRING5   orig_dlstate;
 	string		orig_phone; 
-	UNSIGNED8 clientassigneduniquerecordid;
+	string clientassigneduniquerecordid;
 	string adl_ind;
 	string		orig_email; 
   STRING15  orig_ipaddress;
@@ -96,7 +96,7 @@ EXPORT Base := RECORD
 	
 EXPORT Despray := RECORD
 	UNSIGNED6 did;
-	UNSIGNED8 clientassigneduniquerecordid;
+	string clientassigneduniquerecordid;
   STRING20  orig_filecategory;
 end;
 
