@@ -14,7 +14,7 @@ ThorName	:=		IF(_control.ThisEnvironment.Name <> 'Prod_Thor',		FraudGovPlatform_
 ECLThorName	:=		IF(_control.ThisEnvironment.Name <> 'Prod_Thor',		FraudGovPlatform_Validation.Constants.ThorName_Dev,	FraudGovPlatform_Validation.Constants.ThorName_Prod);
 
 Build_Kel_Ecl := 
- 'import tools, FraudGovPlatform, FraudShared, Orbit3, FraudGovPlatform_Validation, STD, FraudGovPlatform_Analytics;\n'
+ 'import tools, FraudGovPlatform, Orbit3, FraudGovPlatform_Validation, STD, FraudGovPlatform_Analytics;\n'
 +'#CONSTANT(\'RunKelDemo\',false);\n'
 +'#CONSTANT(\'Platform\',\'FraudGov\');\n'
 +'#OPTION(\'multiplePersistInstances\',FALSE);\n'

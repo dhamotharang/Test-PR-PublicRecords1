@@ -1,4 +1,4 @@
-﻿import ut, tools, FraudShared;
+﻿import ut, tools;
 
 export _Flags :=
 module
@@ -33,8 +33,8 @@ module
 					
 		export Base := module
 			export AddressCache := count(nothor(FileServices.SuperFileContents(Filenames().Base.AddressCache.Built))) > 0;
-			export Main 	:= count(nothor(FileServices.SuperFileContents(FraudShared.Filenames().Base.Main.Built))) > 0;
-			export MainQA := count(nothor(FileServices.SuperFileContents(FraudShared.Filenames().Base.Main.QA))) > 0;
+			export Main 	:= count(nothor(FileServices.SuperFileContents(Filenames().Base.Main.Built))) > 0;
+			export MainQA := count(nothor(FileServices.SuperFileContents(Filenames().Base.Main.QA))) > 0;
 			export MainOrig 	:= count(nothor(FileServices.SuperFileContents(FraudGovPlatform.Filenames().Base.Main_Orig.Built))) > 0;			
 			export MainOrigQA := count(nothor(FileServices.SuperFileContents(FraudGovPlatform.Filenames().Base.Main_Orig.QA))) > 0;			
 			export Pii := count(nothor(FileServices.SuperFileContents(Filenames().Base.Pii.Built))) > 0;

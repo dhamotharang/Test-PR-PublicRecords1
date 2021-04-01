@@ -1,8 +1,8 @@
-﻿Import FraudShared,tools; 
+﻿Import tools; 
 EXPORT Build_Base_AddressCache (
    string pversion	
-	,dataset(FraudShared.Layouts.Base.Main) FileBase = $.Files().Base.Main_Orig.Built
-    ,dataset(FraudShared.Layouts.Base.Main) Previous_Build =  $.Files().Base.Main_Orig.QA
+	,dataset(FraudGovPlatform.Layouts.Base.Main) FileBase = $.Files().Base.Main_Orig.Built
+    ,dataset(FraudGovPlatform.Layouts.Base.Main) Previous_Build =  $.Files().Base.Main_Orig.QA
     ,dataset($.Layouts.Base.AddressCache) Previous_AddressCache = $.Files().Base.AddressCache.QA
 ) := 
 module 

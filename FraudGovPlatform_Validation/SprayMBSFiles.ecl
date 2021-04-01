@@ -1,13 +1,14 @@
 ﻿import tools, _control,lib_thorlib, FraudGovPlatform, Scrubs_MBS, ut, STD;
 
 export SprayMBSFiles(
-	string pversion
+	string pversion,
+	boolean	pUseOtherEnvironment = false
 ) :=
 function
 
-	pMBSServerIP := IF (_control.ThisEnvironment.Name <> 'Prod_Thor', _control.IPAddress.bctlpedata12, _control.IPAddress.bctlpedata10);
+	pMBSServerIP := IF (_control.ThisEnvironment.Name <> 'Prod_Thor', _control.IPAddress.bctlpedata10, _control.IPAddress.bctlpedata10);
 	pMBSFraudGovDirectory := IF (_control.ThisEnvironment.Name <> 'Prod_Thor', FraudGovPlatform_Validation.Constants.MBSLandingZonePathBase_dev, FraudGovPlatform_Validation.Constants.MBSLandingZonePathBase_prod);
-	pMBSFDNServerIP := IF (_control.ThisEnvironment.Name <> 'Prod_Thor', _control.IPAddress.bctlpedata12, _control.IPAddress.bctlpedata10);
+	pMBSFDNServerIP := IF (_control.ThisEnvironment.Name <> 'Prod_Thor', _control.IPAddress.bctlpedata10, _control.IPAddress.bctlpedata10);
 	pMBSFDNDirectory := IF (_control.ThisEnvironment.Name <> 'Prod_Thor', Constants.FDNMBSLandingZonePathBase_dev, Constants.FDNMBSLandingZonePathBase_prod);
 	pFilenamembs := '*file_info.txt';
 	pFilenameMbsFdnMasterIDIndTypeInclusion := '*ind_gc_inclusion.txt';
@@ -44,7 +45,7 @@ function
 			,''
 			,'VARIABLE'
 			,''
-			,FraudGovPlatform.Platform.max_record_size()
+			,FraudGovPlatform._Dataset(pUseOtherEnvironment).max_record_size
 			,'|\t|' 
       ,'|\n'
 			}
@@ -67,7 +68,7 @@ function
 			,''
 			,'VARIABLE'
 			,''
-			,FraudGovPlatform.Platform.max_record_size()
+			,FraudGovPlatform._Dataset(pUseOtherEnvironment).max_record_size
 			,'|\t|' 
       ,'|\n'
 			}
@@ -90,7 +91,7 @@ function
 			,''
 			,'VARIABLE'
 			,''
-			,FraudGovPlatform.Platform.max_record_size()
+			,FraudGovPlatform._Dataset(pUseOtherEnvironment).max_record_size
 			,'\\,'
 			}
 		], tools.Layout_Sprays.Info);
@@ -112,7 +113,7 @@ function
 			,''
 			,'VARIABLE'
 			,''
-			,FraudGovPlatform.Platform.max_record_size()
+			,FraudGovPlatform._Dataset(pUseOtherEnvironment).max_record_size
 			,'\\,'
 			}
 		], tools.Layout_Sprays.Info);
@@ -134,11 +135,11 @@ function
 	MAC_FilesToSprayHHID(pFilenameMBSFdnHHID 							,FraudGovPlatform.Filenames(pversion).Input.MBSFdnHHID , FilesToSprayMBSFdnHHID );
  
 	SprayTheFile(dataset(tools.Layout_Sprays.Info) FilesToSpray) :=
-		tools.fun_Spray(FilesToSpray,,,pOverwrite,pReplicate,true,pIsTesting,,FraudGovPlatform.Platform.Name() + ' ' + pversion,pNameOutput,pShouldSprayMultipleFilesAs1 := pSprayMultipleFilesAs1);
+		tools.fun_Spray(FilesToSpray,,,pOverwrite,pReplicate,true,pIsTesting,,FraudGovPlatform._Dataset(pUseOtherEnvironment).Name + ' ' + pversion,pNameOutput,pShouldSprayMultipleFilesAs1 := pSprayMultipleFilesAs1);
 
 	return sequential(
-		  FraudGovPlatform.Promote().Inputfiles.Sprayed2Using
-		 ,FraudGovPlatform.Promote(pdelete := true).Inputfiles.Using2Used				
+		  FraudGovPlatform.Promote().MBSInputfiles.Sprayed2Using
+		 ,FraudGovPlatform.Promote(pdelete := true).MBSInputfiles.Using2Used				
 		 ,if(not FraudGovPlatform._Flags.FileExists.Input.MBS                          	or pOverwrite,SprayTheFile(FilesToSprayMBS ))
 		 ,if(not FraudGovPlatform._Flags.FileExists.Input.MbsNewGcIdExclusion          	or pOverwrite,SprayTheFile(FilesToSprayMbsNewGcIdExclusion ))
 		 ,if(not FraudGovPlatform._Flags.FileExists.Input.MbsIndTypeExclusion          	or pOverwrite,SprayTheFile(FilesToSprayMbsIndTypeExclusion ))

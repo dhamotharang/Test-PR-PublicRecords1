@@ -1,4 +1,4 @@
-﻿import tools, FraudShared, NAC, Inquiry_AccLogs;
+﻿import tools, NAC, Inquiry_AccLogs;
 export Files(
 
 	 string		pversion = ''
@@ -65,7 +65,7 @@ module
 		tools.mac_FilesInput(Filenames(pversion,pUseProd).Input.DisposableEmailDomains,Layouts.Input.DisposableEmailDomains,DisposableEmailDomains);
 		tools.mac_FilesInput(Filenames(pversion,pUseProd).Input.ByPassed_DisposableEmailDomains,Layouts.Input.DisposableEmailDomains,ByPassed_DisposableEmailDomains);
 
-		tools.mac_FilesInput(Filenames(pversion,pUseProd).Input.DemoData,FraudShared.Layouts.Base.Main,DemoData);
+		tools.mac_FilesInput(Filenames(pversion,pUseProd).Input.DemoData,FraudGovPlatform.Layouts.Base.Main,DemoData);
 		
 		tools.mac_FilesInput(Filenames(pversion,pUseProd).Input.ConfigRiskLevel,Layouts.Input.ConfigRiskLevel,ConfigRiskLevel,'CSV',,'\r\n',',',true);
 		tools.mac_FilesInput(Filenames(pversion,pUseProd).Input.ConfigAttributes,Layouts.Input.ConfigAttributes,ConfigAttributes,'CSV',,'\r\n',',',true);		
@@ -82,6 +82,7 @@ module
 	// -- Base File Versions
 	//////////////////////////////////////////////////////////////////
 	export Base := module
+		tools.mac_FilesBase(Filenames(pversion,pUseProd).Base.Main,Layouts.Base.Main,Main);
 		tools.mac_FilesBase(Filenames(pversion,pUseProd).Base.AddressCache,Layouts.Base.AddressCache,AddressCache);
 		tools.mac_FilesBase(Filenames(pversion,pUseProd).Base.Pii,Layouts.Pii,Pii);
 		tools.mac_FilesBase(Filenames(pversion,pUseProd).Base.Crim,Layouts.Crim,Crim);
@@ -94,8 +95,8 @@ module
 		tools.mac_FilesBase(Filenames(pversion,pUseProd).Base.AgencyActivityDate,Layouts.AgencyActivityDate,AgencyActivityDate);
 		tools.mac_FilesBase(Filenames(pversion,pUseProd).Base.DisposableEmailDomains,Layouts.Base.DisposableEmailDomains,DisposableEmailDomains);
 		
-		tools.mac_FilesBase(Filenames(pversion,pUseProd).Base.Main_Orig,FraudShared.Layouts.Base.Main,Main_Orig);
-		tools.mac_FilesBase(Filenames(pversion,pUseProd).Base.Main_Anon,FraudShared.Layouts.Base.Main,Main_Anon);
+		tools.mac_FilesBase(Filenames(pversion,pUseProd).Base.Main_Orig,Layouts.Base.Main,Main_Orig);
+		tools.mac_FilesBase(Filenames(pversion,pUseProd).Base.Main_Anon,Layouts.Base.Main,Main_Anon);
 		tools.mac_FilesBase(Filenames(pversion,pUseProd).Base.Pii_Demo,Layouts.Pii,Pii_Demo);
 		tools.mac_FilesBase(Filenames(pversion,pUseProd).Base.Crim_Demo,Layouts.Crim,Crim_Demo);
 		tools.mac_FilesBase(Filenames(pversion,pUseProd).Base.Death_Demo,Layouts.Death,Death_Demo);
@@ -120,15 +121,15 @@ module
 	export CustomerDashboard1_1 := dataset(Filenames().CustomerDashboard1_1,Layouts.DashboardResponse,thor,opt);
 	export ClusterDetails := dataset(Filenames().ClusterDetails,Layouts.DashboardResponse,thor,opt);
 	export ProdDashboardVersion := dataset(Filenames().ProdDashboardVersion,Layouts.ProdDashboardVersion,thor,opt);
-	export FindLeads 				:= dataset(Filenames().FindLeads,Layouts.DashboardResponse,thor,opt);
-	export Dashboard 				:= dataset(Filenames().Dashboard,Layouts.DashboardResponse,thor,opt);
-	export LinksChart 			:= dataset(Filenames().LinksChart,Layouts.DashboardResponse,thor,opt);
-	export DetailsReport 		:= dataset(Filenames().DetailsReport,Layouts.DashboardResponse,thor,opt);
+	export FindLeads := dataset(Filenames().FindLeads,Layouts.DashboardResponse,thor,opt);
+	export Dashboard := dataset(Filenames().Dashboard,Layouts.DashboardResponse,thor,opt);
+	export LinksChart := dataset(Filenames().LinksChart,Layouts.DashboardResponse,thor,opt);
+	export DetailsReport := dataset(Filenames().DetailsReport,Layouts.DashboardResponse,thor,opt);
 
 	export Flags := module
 		export FraudgovInfoFile	:= dataset(Filenames().Flags.FraudgovInfoFn,Layouts.Flags.FraudgovInfoRec,thor,opt);
-		export SkipModules	:= dataset(Filenames().Flags.SkipModules,Layouts.Flags.SkipModules,thor,opt); 
-		export RefreshProdDashVersion	:= dataset(Filenames().Flags.RefreshProdDashVersion,Layouts.Flags.RefreshProdDashVersion,thor,opt); 
+		export SkipModules := dataset(Filenames().Flags.SkipModules,Layouts.Flags.SkipModules,thor,opt); 
+		export RefreshProdDashVersion := dataset(Filenames().Flags.RefreshProdDashVersion,Layouts.Flags.RefreshProdDashVersion,thor,opt); 
 		export CustomerActiveSprays := dataset(Filenames().Flags.CustomerActiveSprays,Layouts.Flags.CustomerActiveSprays,thor,opt);
 	end;
 
