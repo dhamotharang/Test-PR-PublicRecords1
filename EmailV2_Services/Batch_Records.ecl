@@ -35,7 +35,7 @@ EXPORT Batch_Records(
     
     // groupping records for royalty counts (in-house sources)
     srtd_recs := GROUP(SORT(_recs, acctno, -date_last_seen, date_first_seen, -original.login_date, -process_date, RECORD), acctno);
-    inh_royalties := Royalty.RoyaltyEmail.GetBatchRoyaltySet(srtd_recs, email_src, batch_params.MaxResultsPerAcct, batch_params.ReturnDetailedRoyalties);
+    inh_royalties := Royalty.RoyaltyEmail.GetBatchRoyaltySet(srtd_recs(email_src <> ''), email_src, batch_params.MaxResultsPerAcct, batch_params.ReturnDetailedRoyalties);
 
     // final project
     out_recs := PROJECT(_recs, $.Transforms.xfBatchOut(LEFT));    

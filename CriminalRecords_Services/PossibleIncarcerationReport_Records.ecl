@@ -18,7 +18,7 @@ EXPORT PossibleIncarcerationReport_Records($.IParam.incarceration_report in_para
   alert_flags := FFD.ConsumerFlag.getAlertIndicators(pc_recs, in_params.FCRAPurpose, in_params.FFDOptionsMask)[1];
 
   // FCRA Overrides
-  ds_best  := PROJECT(ds_in(did <> 0), TRANSFORM(doxie.layout_best, SELF.did := LEFT.did, SELF:=[]));
+  ds_best := PROJECT(ds_in(did <> 0), TRANSFORM(doxie.layout_best, SELF.did := LEFT.did, SELF:=[]));
   ds_flags := IF(isFCRA, FFD.GetFlagFile(ds_best, pc_recs));
 
   records_incr := CriminalRecords_BatchService.get_incarceration_records(ds_in, config_data, ds_flags, slim_pc_recs, isFCRA);
@@ -31,7 +31,7 @@ EXPORT PossibleIncarcerationReport_Records($.IParam.incarceration_report in_para
   layout_iesp_record := iesp.criminal_possibleincarceration_fcra.t_FcraPossibleIncarcerationRecord;
   
   layout_iesp_record incr_xform(layout_incr l) := TRANSFORM
-    espDate(string8 dt) := iesp.ECL2ESP.toDatestring8(dt);
+    espDate(STRING8 dt) := iesp.ECL2ESP.toDatestring8(dt);
     inmate_name := iesp.ECL2ESP.SetName(l.incr_fname, '', l.incr_lname, '', '');
     inmate_ssn := l.incr_ssn;
     SELF.IncarcerationFlag := l.incarceration_flag;
@@ -79,11 +79,11 @@ EXPORT PossibleIncarcerationReport_Records($.IParam.incarceration_report in_para
   input_consumer := FFD.MAC.PrepareConsumerRecord(in_params.did, TRUE);
 
   iesp.criminal_possibleincarceration_fcra.t_FcraPossibleIncarcerationReportResponse iesp_xform() := TRANSFORM
-    SELF._Header            := iesp.ECL2ESP.GetHeaderRow();
-    SELF.Records            := IF(~has_alert_suppression, records, $.Constants.BlankIncarcerationRecord);
+    SELF._Header := iesp.ECL2ESP.GetHeaderRow();
+    SELF.Records := IF(~has_alert_suppression, records, $.Constants.BlankIncarcerationRecord);
     SELF.ConsumerStatements := IF(show_consumer_stmts, consumer_stmts, FFD.Constants.BlankConsumerStatements);
-    SELF.ConsumerAlerts     := IF(isFCRA, consumer_alerts, FFD.Constants.BlankConsumerAlerts);
-    SELF.Consumer           := input_consumer;
+    SELF.ConsumerAlerts := IF(isFCRA, consumer_alerts, FFD.Constants.BlankConsumerAlerts);
+    SELF.Consumer := input_consumer;
   END;
 
   results := DATASET([iesp_xform()]);

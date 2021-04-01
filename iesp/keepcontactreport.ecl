@@ -114,6 +114,8 @@ export t_KeepContactResult := record
 	dataset(t_KeepContactPhoneInfo) Phones {xpath('Phones/Phone'), MAXCOUNT(iesp.constants.KeepContact.MAX_PHONES)};
 	iesp.share.t_Date DOD {xpath('DOD')};
 	string30 DeceasedMatchCodes {xpath('DeceasedMatchCodes')};
+	string1 VerifiedorProofCode {xpath('VerifiedorProofCode')};
+	string3 DeceasedSource {xpath('DeceasedSource')};
 	dataset(t_KeepContactEmail) Emails {xpath('Emails/Email'), MAXCOUNT(iesp.constants.KeepContact.MAX_EMAILS)};
 	t_KeepContactInputEmailValidation InputEmailValidation {xpath('InputEmailValidation')};
 end;

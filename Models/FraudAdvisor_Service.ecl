@@ -489,14 +489,19 @@ socs_trim := trim(socs_value);
 dob_trim := trim(dob_value);
 hphone_trim := trim(hphone_value);
 wphone_trim := trim(wphone_value);
+zip_trim := trim(zip_value);
 ssn_length := length(socs_trim);
 dob_length := length(dob_trim);
 hphone_length := length(hphone_trim);
 wphone_length := length(wphone_trim);
+zip_length := length(zip_trim);
+is_proper_dob := Doxie.DOBTools((UNSIGNED)dob_trim).IsValidDOB; //from RiskView.Search_Service
+is_numeric_zip := ut.isNumeric(zip_trim);
 ssn_FraudIntel := if(ssn_length <> 0 AND ssn_length <> 9, '', socs_trim);
-dob_FraudIntel := if(dob_length <> 0 AND dob_length <> 8, '', dob_trim);
+dob_FraudIntel := if((dob_length <> 0 AND dob_length <> 8) OR is_proper_dob = FALSE, '', dob_trim);
 hphone_FraudIntel := if(hphone_length <> 0 AND hphone_length <> 10, '', hphone_trim);
 wphone_FraudIntel := if(wphone_length <> 0 AND wphone_length <> 10, '', wphone_trim);
+zip_FraudIntel := if((zip_length <> 0 AND zip_length <> 5) OR is_numeric_zip = FALSE, '', zip_trim);
 
 //primary phone - if home phone empty, check work phone...
 //...if work phone also empty, blank out, otherwise use work phone...
@@ -520,7 +525,7 @@ passesFraudIntelMinimumCheck := (
                                     //...and one of the following
                                     (
                                       //StreetAddress1, Zip5
-                                      (trim(addr_value)<>'' and trim(zip_value)<>'')
+                                      (trim(addr_value)<>'' and zip_FraudIntel<>'')
                                       or
                                       //StreetAddress1, City, State
                                       (trim(addr_value)<>'' and trim(city_value)<>'' and trim(state_value)<>'')
@@ -836,7 +841,7 @@ IDA_input := PROJECT(iid, Transform(Risk_Indicators.layouts.layout_IDA_in,
                       SELF.in_streetAddress := addr_value;
                       SELF.in_city := city_value;
                       SELF.in_state := state_value;
-                      SELF.in_zipCode := zip_value;
+                      SELF.in_zipCode := zip_FraudIntel;
                       SELF.in_country := country_value;
                       SELF.ssn := ssn_FraudIntel;
                       SELF.dob := dob_FraudIntel;
