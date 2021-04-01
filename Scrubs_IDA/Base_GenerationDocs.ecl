@@ -36,7 +36,7 @@ FIELDTYPE:Invalid_Coor:CUSTOM(Scrubs.Functions.fn_geo_coord > 0)
 FIELDTYPE:Invalid_Err:LIKE(Invalid_AlphaNum):LENGTHS(4)
 FIELDTYPE:Invalid_AID:LIKE(Invalid_Num):LENGTHS(12)
 
-FIELD:persistent_record_id:TYPE(STRING19):LIKE(Invalid_Rec_ID):0,0
+FIELD:persistent_record_id:TYPE(STRING15):LIKE(Invalid_Rec_ID):0,0
 FIELD:src:TYPE(STRING2):LIKE(Invalid_Alpha):0,0
 FIELD:dt_first_seen:TYPE(UNSIGNED6):LIKE(Invalid_Date):0,0
 FIELD:dt_last_seen:TYPE(UNSIGNED6):LIKE(Invalid_Date):0,0
@@ -63,7 +63,7 @@ FIELD:clientassigneduniquerecordid:TYPE(STRING):LIKE(Invalid_Clientassigneduniqu
 FIELD:adl_ind:TYPE(STRING):LIKE(Invalid_Alpha):0,0
 FIELD:orig_email:TYPE(STRING):LIKE(Invalid_Emailaddress):0,0
 FIELD:orig_ipaddress:TYPE(STRING15):LIKE(Invalid_Ipaddress):0,0
-FIELD:orig_filecategory:TYPE(STRING):0,0
+FIELD:orig_filecategory:TYPE(STRING20):0,0
 FIELD:title:TYPE(STRING5):LIKE(Invalid_Title):0,0
 FIELD:fname:TYPE(STRING20):LIKE(Invalid_FName):0,0
 FIELD:mname:TYPE(STRING20):LIKE(Invalid_MName):0,0
