@@ -14,6 +14,22 @@ address_rank_key := dx_header.key_addr_hist();
 
 //search Infutor by DID to verify input name, address, phone
 	{ProfileBooster.V2_Layouts.Layout_PB2_Shell, UNSIGNED4 global_sid} getInfutor(PB2Shell le, infutorcid_key ri) := transform
+		EmrgDt_first_seen        := IF(ri.dt_first_seen=0,99998888,ri.dt_first_seen);
+		self.EmrgDt_first_seen   := EmrgDt_first_seen;
+		self.EmrgSrc             := MDR.sourceTools.src_InfutorCID;
+		//No DOB in InfutorCID
+		self.EmrgPrimaryRange    := ri.prim_range;
+		self.EmrgPredirectional	 := ri.predir;
+		self.EmrgPrimaryName	 := ri.prim_name;
+		self.EmrgSuffix	         := ri.addr_suffix;	
+		self.EmrgPostdirectional := ri.postdir;
+		self.EmrgUnitDesignation := ri.unit_desig;
+		self.EmrgSecondaryRange	 := ri.sec_range;
+		self.EmrgCity_Name	     := ri.p_city_name;	
+		self.EmrgSt			     := ri.st;
+		self.EmrgZIP5			 := ri.zip;
+		self.EmrgZIP4		     := ri.zip4;
+		
 		self.global_sid := ri.global_sid;
 		self.firstscore 	:= Risk_Indicators.FnameScore(le.fname, ri.fname);
 		self.firstcount 	:= (integer)Risk_Indicators.iid_constants.g(self.firstscore);
@@ -78,6 +94,23 @@ wInfutorcid_roxie := PROJECT(wInfutorcid_roxie_flagged, TRANSFORM(ProfileBooster
 
 //search Gong by DID to verify input name, address, phone
 	{ProfileBooster.V2_Layouts.Layout_PB2_Shell, UNSIGNED4 global_sid} getGong(PB2Shell le, gonghistorydid_key ri) := transform
+		OlderErmgRecord := (UNSIGNED6)(((STRING)ri.dt_first_seen)[1..6]) <= (UNSIGNED6)(((STRING)le.EmrgDt_first_seen)[1..6]) OR le.EmrgDt_first_seen IN [0,99998]; 
+		EmrgDt_first_seen        := IF(ri.dt_first_seen='0',(STRING)le.EmrgDt_first_seen,(STRING)ri.dt_first_seen);
+		self.EmrgDt_first_seen   := IF(OlderErmgRecord,(UNSIGNED6)ri.dt_first_seen,(UNSIGNED6)EmrgDt_first_seen);
+		self.EmrgSrc             := IF(OlderErmgRecord,ri.src,le.EmrgSrc);
+		//No DOB in Gong
+		self.EmrgPrimaryRange    := IF(OlderErmgRecord,ri.prim_range,le.EmrgPrimaryRange);
+		self.EmrgPredirectional	 := IF(OlderErmgRecord,ri.predir,le.EmrgPredirectional);
+		self.EmrgPrimaryName	 := IF(OlderErmgRecord,ri.prim_name,le.EmrgPrimaryName);
+		self.EmrgSuffix	         := IF(OlderErmgRecord,ri.suffix,le.EmrgSuffix);	
+		self.EmrgPostdirectional := IF(OlderErmgRecord,ri.postdir,le.EmrgPostdirectional);
+		self.EmrgUnitDesignation := IF(OlderErmgRecord,ri.unit_desig,le.EmrgUnitDesignation);
+		self.EmrgSecondaryRange	 := IF(OlderErmgRecord,ri.sec_range,le.EmrgSecondaryRange);
+		self.EmrgCity_Name	     := IF(OlderErmgRecord,ri.p_city_name,le.EmrgCity_Name);	
+		self.EmrgSt			     := IF(OlderErmgRecord,ri.st,le.EmrgSt);
+		self.EmrgZIP5			 := IF(OlderErmgRecord,ri.z5,le.EmrgZIP5);
+		self.EmrgZIP4		     := IF(OlderErmgRecord,ri.z4,le.EmrgZIP4);
+		
 		self.global_sid 			:= ri.global_sid;
 		self.firstscore 	:= Risk_Indicators.FnameScore(le.fname, ri.name_first);
 		self.firstcount 	:= (integer)Risk_Indicators.iid_constants.g(self.firstscore);
@@ -140,6 +173,29 @@ wInfutorcid_roxie := PROJECT(wInfutorcid_roxie_flagged, TRANSFORM(ProfileBooster
 
 //search header by DID to verify input name, address, phone, SSN
 	{ProfileBooster.V2_Layouts.Layout_PB2_Shell, UNSIGNED4 global_sid} getHeader(ProfileBooster.V2_Layouts.Layout_PB2_Shell le, header_key ri) := transform
+		OlderErmgRecord := (UNSIGNED6)(((STRING)ri.dt_first_seen)[1..6]) <= (UNSIGNED6)(((STRING)le.EmrgDt_first_seen)[1..6]) OR le.EmrgDt_first_seen IN [0,99998]; 
+		EmrgDt_first_seen        := IF(ri.dt_first_seen=0,le.EmrgDt_first_seen,ri.dt_first_seen);
+		self.EmrgDt_first_seen   := IF(OlderErmgRecord,(UNSIGNED6)ri.dt_first_seen,EmrgDt_first_seen);
+		self.EmrgSrc             := IF(OlderErmgRecord,ri.src,le.EmrgSrc);
+		EmrgDob	:= MAP(~OlderErmgRecord                       => le.EmrgDob, 
+		               ri.src=mdr.sourceTools.src_TUCS_Ptrack => le.EmrgDob, 
+															     (STRING)ri.dob);
+		self.EmrgDob			 := EmrgDob;
+		fullhistorydate := risk_indicators.iid_constants.myGetDate(le.historydate);
+		//first attempt at calculating EmrgAge
+		self.EmrgAge   			 := if(ri.src=mdr.sourceTools.src_TUCS_Ptrack, -99997, risk_indicators.years_apart((unsigned)EmrgDt_first_seen, (unsigned)EmrgDob));
+		self.EmrgPrimaryRange    := IF(OlderErmgRecord,ri.prim_range,le.EmrgPrimaryRange);
+		self.EmrgPredirectional	 := IF(OlderErmgRecord,ri.predir,le.EmrgPredirectional);
+		self.EmrgPrimaryName	 := IF(OlderErmgRecord,ri.prim_name,le.EmrgPrimaryName);
+		self.EmrgSuffix	         := IF(OlderErmgRecord,ri.suffix,le.EmrgSuffix);	
+		self.EmrgPostdirectional := IF(OlderErmgRecord,ri.postdir,le.EmrgPostdirectional);
+		self.EmrgUnitDesignation := IF(OlderErmgRecord,ri.unit_desig,le.EmrgUnitDesignation);
+		self.EmrgSecondaryRange	 := IF(OlderErmgRecord,ri.sec_range,le.EmrgSecondaryRange);
+		self.EmrgCity_Name	     := IF(OlderErmgRecord,ri.city_name,le.EmrgCity_Name);	
+		self.EmrgSt			     := IF(OlderErmgRecord,ri.st,le.EmrgSt);
+		self.EmrgZIP5			 := IF(OlderErmgRecord,ri.zip,le.EmrgZIP5);
+		self.EmrgZIP4		     := IF(OlderErmgRecord,ri.zip4,le.EmrgZIP4);
+		
 		self.global_sid 					:= ri.global_sid;
 		self.firstscore 			:= Risk_Indicators.FnameScore(le.fname, ri.fname);
 		self.firstcount 			:= (integer)Risk_Indicators.iid_constants.g(self.firstscore);
@@ -157,8 +213,7 @@ wInfutorcid_roxie := PROJECT(wInfutorcid_roxie_flagged, TRANSFORM(ProfileBooster
 		self.socscount 				:= (integer)Risk_Indicators.iid_constants.gn(self.socsscore);
 		self.dt_first_seen 		:= ri.dt_first_seen;
 
-    fullhistorydate := risk_indicators.iid_constants.myGetDate(le.historydate);
-    historydate := (unsigned)fullhistorydate[1..6];
+    	historydate := (unsigned)fullhistorydate[1..6];
 		self.dt_last_seen			:= if(ri.dt_last_seen > HistoryDate, HistoryDate, ri.dt_last_seen);
 		self.dob							:= if(ri.src=mdr.sourceTools.src_TUCS_Ptrack, '', (string)ri.dob);
     self.ProspectAge 			:= if(ri.src=mdr.sourceTools.src_TUCS_Ptrack, 0, risk_indicators.years_apart((unsigned)fullhistorydate, (unsigned)ri.dob));
@@ -280,6 +335,28 @@ wInfutorcid_roxie := PROJECT(wInfutorcid_roxie_flagged, TRANSFORM(ProfileBooster
 	#END
 
 	{ProfileBooster.V2_Layouts.Layout_PB2_Shell, UNSIGNED4 global_sid} getQHeader(ProfileBooster.V2_Layouts.Layout_PB2_Shell le, quickheader_key ri) := transform
+		OlderErmgRecord := (UNSIGNED6)(((STRING)ri.dt_first_seen)[1..6]) <= (UNSIGNED6)(((STRING)le.EmrgDt_first_seen)[1..6]) OR le.EmrgDt_first_seen=0; 
+		EmrgDt_first_seen := IF(OlderErmgRecord,ri.dt_first_seen,le.EmrgDt_first_seen);
+		self.EmrgDt_first_seen   := IF(OlderErmgRecord,(UNSIGNED6)ri.dt_first_seen,EmrgDt_first_seen);
+		self.EmrgSrc             := IF(OlderErmgRecord,ri.src,le.EmrgSrc);
+		EmrgDob	:= MAP(~OlderErmgRecord                       => le.EmrgDob, 
+		               ri.src=mdr.sourceTools.src_TUCS_Ptrack => le.EmrgDob, 
+															     (STRING)ri.dob);
+		self.EmrgDob			 := EmrgDob;
+    	fullhistorydate := risk_indicators.iid_constants.myGetDate(le.historydate);
+		self.EmrgAge   			 := if(ri.src=mdr.sourceTools.src_TUCS_Ptrack, 0, risk_indicators.years_apart((unsigned)EmrgDt_first_seen, (unsigned)EmrgDob));
+		self.EmrgPrimaryRange    := IF(OlderErmgRecord,ri.prim_range,le.EmrgPrimaryRange);
+		self.EmrgPredirectional	 := IF(OlderErmgRecord,ri.predir,le.EmrgPredirectional);
+		self.EmrgPrimaryName	 := IF(OlderErmgRecord,ri.prim_name,le.EmrgPrimaryName);
+		self.EmrgSuffix	         := IF(OlderErmgRecord,ri.suffix,le.EmrgSuffix);	
+		self.EmrgPostdirectional := IF(OlderErmgRecord,ri.postdir,le.EmrgPostdirectional);
+		self.EmrgUnitDesignation := IF(OlderErmgRecord,ri.unit_desig,le.EmrgUnitDesignation);
+		self.EmrgSecondaryRange	 := IF(OlderErmgRecord,ri.sec_range,le.EmrgSecondaryRange);
+		self.EmrgCity_Name	     := IF(OlderErmgRecord,ri.city_name,le.EmrgCity_Name);	
+		self.EmrgSt			     := IF(OlderErmgRecord,ri.st,le.EmrgSt);
+		self.EmrgZIP5			 := IF(OlderErmgRecord,ri.zip,le.EmrgZIP5);
+		self.EmrgZIP4		     := IF(OlderErmgRecord,ri.zip4,le.EmrgZIP4);
+		
 		self.global_sid			:= ri.global_sid;
 		self.firstscore 			:= Risk_Indicators.FnameScore(le.fname, ri.fname);
 		self.firstcount 			:= (integer)Risk_Indicators.iid_constants.g(self.firstscore);
@@ -297,12 +374,11 @@ wInfutorcid_roxie := PROJECT(wInfutorcid_roxie_flagged, TRANSFORM(ProfileBooster
 		self.socscount 				:= (integer)Risk_Indicators.iid_constants.gn(self.socsscore);
 		self.dt_first_seen 		:= ri.dt_first_seen;
 
-    fullhistorydate := risk_indicators.iid_constants.myGetDate(le.historydate);
-    historydate := (unsigned)fullhistorydate[1..6];
+    	historydate := (unsigned)fullhistorydate[1..6];
 		self.dt_last_seen			:= if(ri.dt_last_seen > HistoryDate, HistoryDate, ri.dt_last_seen);
 		self.dob							:= if(ri.src=mdr.sourceTools.src_TUCS_Ptrack, '', (string)ri.dob);
 		self.ProspectAge 			:= if(ri.src=mdr.sourceTools.src_TUCS_Ptrack, 0, risk_indicators.years_apart((unsigned)fullhistorydate, (unsigned)ri.dob));
-   	self.title						:= ri.title;
+   		self.title						:= ri.title;
 		self.hdr_prim_range		:= ri.prim_range;
 		self.hdr_predir				:= ri.predir;
 		self.hdr_prim_name		:= ri.prim_name;
@@ -367,6 +443,26 @@ wInfutorcid_roxie := PROJECT(wInfutorcid_roxie_flagged, TRANSFORM(ProfileBooster
 		self.title						:= if(le.title <> '', le.title, ri.title);		//keep whichever is populated
 		self.HHID							:= if(le.HHID <> 0, le.HHID, ri.HHID);		//keep whichever is populated
 		self.VerifiedCurrResMatchIndex	:= if(ri.VerifiedCurrResMatchIndex = '1', ri.VerifiedCurrResMatchIndex, le.VerifiedCurrResMatchIndex);
+		OlderErmgRecord := (UNSIGNED6)(((STRING)ri.EmrgDt_first_seen)[1..6]) <= (UNSIGNED6)(((STRING)le.EmrgDt_first_seen)[1..6]) OR le.EmrgDt_first_seen=0;
+		self.EmrgDt_first_seen   := IF(OlderErmgRecord,ri.EmrgDt_first_seen,le.EmrgDt_first_seen);
+		self.EmrgSrc             := IF(OlderErmgRecord,ri.EmrgSrc,le.EmrgSrc);
+		EmrgDob					 := IF(OlderErmgRecord,ri.EmrgDob,le.EmrgDob);
+		self.EmrgDob			 := EmrgDob;
+    	fullhistorydate := risk_indicators.iid_constants.myGetDate(le.historydate);
+		EmrgAge     			 := if(OlderErmgRecord,ri.EmrgAge,le.EmrgAge);
+		self.EmrgAge   			 := EmrgAge;
+		self.EmrgPrimaryRange    := IF(OlderErmgRecord,ri.EmrgPrimaryRange,le.EmrgPrimaryRange);
+		self.EmrgPredirectional	 := IF(OlderErmgRecord,ri.EmrgPredirectional,le.EmrgPredirectional);
+		self.EmrgPrimaryName	 := IF(OlderErmgRecord,ri.EmrgPrimaryName,le.EmrgPrimaryName);
+		self.EmrgSuffix	         := IF(OlderErmgRecord,ri.EmrgSuffix,le.EmrgSuffix);	
+		self.EmrgPostdirectional := IF(OlderErmgRecord,ri.EmrgPostdirectional,le.EmrgPostdirectional);
+		self.EmrgUnitDesignation := IF(OlderErmgRecord,ri.EmrgUnitDesignation,le.EmrgUnitDesignation);
+		self.EmrgSecondaryRange	 := IF(OlderErmgRecord,ri.EmrgSecondaryRange,le.EmrgSecondaryRange);
+		self.EmrgCity_Name	     := IF(OlderErmgRecord,ri.EmrgCity_Name,le.EmrgCity_Name);	
+		self.EmrgSt			     := IF(OlderErmgRecord,ri.EmrgSt,le.EmrgSt);
+		self.EmrgZIP5			 := IF(OlderErmgRecord,ri.EmrgZIP5,le.EmrgZIP5);
+		self.EmrgZIP4		     := IF(OlderErmgRecord,ri.EmrgZIP4,le.EmrgZIP4);
+		
 		self									:= le;
 	end;
 
@@ -390,6 +486,21 @@ wInfutorcid_roxie := PROJECT(wInfutorcid_roxie_flagged, TRANSFORM(ProfileBooster
 		self.title				:= ri.title;
 		self.HHID					:= ri.HHID;
 		self.VerifiedCurrResMatchIndex	:= ri.VerifiedCurrResMatchIndex;
+		self.EmrgDt_first_seen	 := ri.EmrgDt_first_seen;
+		self.EmrgSrc             := ri.EmrgSrc;
+		self.EmrgDob			 := ri.EmrgDob;
+    	self.EmrgAge   			 := ri.EmrgAge;
+		self.EmrgPrimaryRange    := ri.EmrgPrimaryRange;
+		self.EmrgPredirectional	 := ri.EmrgPredirectional;
+		self.EmrgPrimaryName	 := ri.EmrgPrimaryName;
+		self.EmrgSuffix	         := ri.EmrgSuffix;	
+		self.EmrgPostdirectional := ri.EmrgPostdirectional;
+		self.EmrgUnitDesignation := ri.EmrgUnitDesignation;
+		self.EmrgSecondaryRange	 := ri.EmrgSecondaryRange;
+		self.EmrgCity_Name	     := ri.EmrgCity_Name;	
+		self.EmrgSt			     := ri.EmrgSt;
+		self.EmrgZIP5			 := ri.EmrgZIP5;
+		self.EmrgZIP4		     := ri.EmrgZIP4;
 		self 							:= le;
 	END;
 
