@@ -12,6 +12,7 @@ export built := sequential(
 									,Scrubs_IDA.Fn_RunScrubs_Base(version,'vlad.petrokas@lexisnexisrisk.com')
 					                ,IDA._BWR_Despray(version,pUseProd)
 									,IDA._BWR_MoveToDone(pUseProd)
+									,IDA._BWR_MoveToIncoming(pUseProd);
 			                    ): success(IDA.Send_Email(version,pUseProd).BuildSuccess), failure(IDA.send_email(version,pUseProd).BuildFailure
 
 );
