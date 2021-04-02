@@ -28,7 +28,7 @@ EXPORT _Constants(boolean pUseProd=false)  := module
 	export GROUPNAME			      	      :=  ThorLib.Group();
 	export ROOTDIR 					          :=  if(pUseProd,TRIM('/data/prod_r3/b1032422/'),TRIM('/data/temp/petrvl01/IDA/'));
 	export spray_path		  	              :=  if(pUseProd,TRIM(ROOTDIR + 'outgoing/'),TRIM(ROOTDIR +'outgoing/'));
-	export done_path                          :=  if(pUseProd,TRIM('/data/prod_r3/b1032422/done'),TRIM('/data/temp/petrvl01/IDA/done/'));
+	export done_path                          :=  if(pUseProd,TRIM('/data/prod_r3/b1032422/done/'),TRIM('/data/temp/petrvl01/IDA/done/'));
 	export despray_path                       :=  if(pUseProd,TRIM('/data/prod_r3/b1032432/dali_files/'),TRIM('/data/temp/petrvl01/IDA/dali_files/'));	
 	export despray_incoming_path              :=  if(pUseProd,TRIM('/data/prod_r3/b1032432/incoming/'),TRIM('/data/temp/petrvl01/IDA/incoming/'));
 	

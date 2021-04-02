@@ -1,5 +1,7 @@
 IMPORT Scrubs_IDA, STD, Phonesplus_v2;
 
+#option('outputlimitmb',2000);
+
 EXPORT Fn_Comparison := FUNCTION 
     Outp := Scrubs_IDA.Base_In_IDA;
     r := {
