@@ -369,7 +369,7 @@ finalCorr2 := ROLLUP(sortedSet,
 										left.headerrec=right.headerrec, //new -- seems to keep us from rollup up QH records
 												getCorrectCorrections(LEFT,RIGHT));									
 									
-base_hf := PROJECT(finalCorr2 + corrOnly, TRANSFORM(tempHeader, SELF := LEFT));
+base_hf := PROJECT(finalCorr2 + corrOnly, TRANSFORM(tempHeader, SELF := LEFT, self.first_ingest_date := []));//first_ingest_date will be populated later
 
 
 // do left only join with the suppressions file.  if suppression exists, can't use that header record

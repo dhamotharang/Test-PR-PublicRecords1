@@ -55,6 +55,9 @@ Output_Master_Results := TRUE;
 // Output_SALT_Profile := FALSE;
 Output_SALT_Profile := TRUE;
 
+// Use_Ingest_Date := TRUE; 
+Use_Ingest_Date := false; 
+
 // TurnOffHouseHolds := TRUE;
 TurnOffHouseHolds := FALSE;
 // TurnOffRelatives := TRUE;
@@ -178,6 +181,7 @@ soapLayout := RECORD
 	BOOLEAN TurnOffHouseHolds;
 	BOOLEAN TurnOffRelatives;	
 	BOOLEAN IncludeMinors;
+	BOOLEAN UseIngestDate;
 	DATASET(PublicRecords_KEL.ECL_Functions.Constants.Layout_Allowed_Sources) AllowedSourcesDataset := DATASET([], PublicRecords_KEL.ECL_Functions.Constants.Layout_Allowed_Sources);
 	DATASET(PublicRecords_KEL.ECL_Functions.Constants.Layout_Allowed_Sources) ExcludeSourcesDataset := DATASET([], PublicRecords_KEL.ECL_Functions.Constants.Layout_Allowed_Sources);
 	UNSIGNED1 LexIdSourceOptout;
@@ -202,6 +206,7 @@ Settings := MODULE(PublicRecords_KEL.Interface_BWR_Settings)
 	EXPORT STRING Data_Permission_Mask := DataPermissionMask;
 	EXPORT UNSIGNED GLBAPurpose := GLBA;
 	EXPORT UNSIGNED DPPAPurpose := DPPA;
+	EXPORT boolean UseIngestDate := Use_Ingest_Date;
 	EXPORT UNSIGNED LexIDThreshold := Score_threshold;
 	EXPORT BOOLEAN IncludeMinors := Include_Minors;
 	EXPORT BOOLEAN RetainInputLexid := Retain_Input_Lexid;
@@ -240,6 +245,7 @@ soapLayout trans (pp le):= TRANSFORM
 	SELF.GLBPurpose := Settings.GLBAPurpose;
 	SELF.DPPAPurpose := Settings.DPPAPurpose;
 	SELF.IncludeMinors := Settings.IncludeMinors;
+	SELF.UseIngestDate := Settings.UseIngestDate;
 	SELF.IsMarketing := FALSE;
 	SELF.TurnOffHouseHolds := TurnOffHouseHolds;
 	SELF.TurnOffRelatives := TurnOffRelatives;	
