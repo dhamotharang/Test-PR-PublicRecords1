@@ -62,7 +62,59 @@ EXPORT DateFile := DATASET([{'DELTADATE',Delta_Date}],dx_Ecrash.Layouts.DELTADAT
 //***********************************************************************
 //           key_EcrashV2_agency
 //***********************************************************************
-EXPORT AgencyBase :=  PROJECT(Files_eCrash.DS_BASE_CONSOLIDATION_MBSAgency, TRANSFORM(dx_Ecrash.Layouts.AGENCY, SELF := LEFT; SELF := [];));
+dsAgencyBase := PROJECT(Files_eCrash.DS_BASE_CONSOLIDATION_MBSAgency, TRANSFORM(dx_Ecrash.Layouts.AGENCY, SELF := LEFT; SELF := [];));
+
+dsMissingAgency_1520372_CT := PROJECT(dsAgencyBase(mbsi_agency_id = '1520372' AND SOURCE_ID = 'P' AND AGENCY_STATE_ABBR = 'NJ' ), TRANSFORM(RECORDOF(dsAgencyBase), SELF.AGENCY_STATE_ABBR := 'CT'; SELF := LEFT));
+dsMissingAgency_1520372_PA := PROJECT(dsAgencyBase(mbsi_agency_id = '1520372' AND SOURCE_ID = 'P' AND AGENCY_STATE_ABBR = 'NJ'), TRANSFORM(RECORDOF(dsAgencyBase), SELF.AGENCY_STATE_ABBR := 'PA'; SELF := LEFT));
+
+dsMissingAgency_1521832_NY := PROJECT(dsAgencyBase(mbsi_agency_id = '1521832' AND SOURCE_ID = 'S' AND AGENCY_STATE_ABBR = 'NJ'), TRANSFORM(RECORDOF(dsAgencyBase), SELF.AGENCY_STATE_ABBR := 'NY'; SELF := LEFT));
+
+dsMissingAgency_1522732_NY_E := PROJECT(dsAgencyBase(mbsi_agency_id = '1522732' AND SOURCE_ID = 'E' AND AGENCY_STATE_ABBR = 'NJ'), TRANSFORM(RECORDOF(dsAgencyBase), SELF.AGENCY_STATE_ABBR := 'NY'; SELF := LEFT));
+dsMissingAgency_1522732_NY_P := PROJECT(dsAgencyBase(mbsi_agency_id = '1522732' AND SOURCE_ID = 'P' AND AGENCY_STATE_ABBR = 'NJ'), TRANSFORM(RECORDOF(dsAgencyBase), SELF.AGENCY_STATE_ABBR := 'NY'; SELF := LEFT));
+
+dsMissingAgency_1531712_AR := PROJECT(dsAgencyBase(mbsi_agency_id = '1531712' AND SOURCE_ID = 'P' AND AGENCY_STATE_ABBR = 'TX'), TRANSFORM(RECORDOF(dsAgencyBase), SELF.AGENCY_STATE_ABBR := 'AR'; SELF := LEFT));
+
+dsMissingAgency_1535782_RT := PROJECT(dsAgencyBase(mbsi_agency_id = '1535782' AND SOURCE_ID = 'S' AND AGENCY_STATE_ABBR = 'NJ'), TRANSFORM(RECORDOF(dsAgencyBase), SELF.AGENCY_STATE_ABBR := 'RT'; SELF := LEFT));
+dsMissingAgency_1535782_TE := PROJECT(dsAgencyBase(mbsi_agency_id = '1535782' AND SOURCE_ID = 'S' AND AGENCY_STATE_ABBR = 'NJ'), TRANSFORM(RECORDOF(dsAgencyBase), SELF.AGENCY_STATE_ABBR := 'TE'; SELF := LEFT));
+
+dsMissingAgency_1597786_NE := PROJECT(dsAgencyBase(mbsi_agency_id = '1597786' AND SOURCE_ID = 'S' AND AGENCY_STATE_ABBR = 'NJ'), TRANSFORM(RECORDOF(dsAgencyBase), SELF.AGENCY_STATE_ABBR := 'NE'; SELF := LEFT));
+
+dsMissingAgency_1536035_GA := PROJECT(dsAgencyBase(mbsi_agency_id = '1536035' AND SOURCE_ID = 'E' AND AGENCY_STATE_ABBR = 'MI'), TRANSFORM(RECORDOF(dsAgencyBase), SELF.AGENCY_STATE_ABBR := 'GA'; SELF := LEFT));//TEST
+
+dsMissingAgency_1616157_CA := PROJECT(dsAgencyBase(mbsi_agency_id = '1616157' AND SOURCE_ID = 'A' AND AGENCY_STATE_ABBR = 'FL'), TRANSFORM(RECORDOF(dsAgencyBase), SELF.AGENCY_STATE_ABBR := 'CA'; SELF := LEFT)); //TEST
+
+dsMissingAgency_1616167_NY := PROJECT(dsAgencyBase(mbsi_agency_id = '1616167' AND SOURCE_ID = 'A' AND AGENCY_STATE_ABBR = 'FL'), TRANSFORM(RECORDOF(dsAgencyBase), SELF.AGENCY_STATE_ABBR := 'NY'; SELF := LEFT)); //TEST
+
+dsMissingAgency_1616177_NJ := PROJECT(dsAgencyBase(mbsi_agency_id = '1616177' AND SOURCE_ID = 'EB' AND AGENCY_STATE_ABBR = 'FL'), TRANSFORM(RECORDOF(dsAgencyBase), SELF.AGENCY_STATE_ABBR := 'NJ'; SELF := LEFT)); //TEST
+
+dsMissingAgency_1616187_NM := PROJECT(dsAgencyBase(mbsi_agency_id = '1616187' AND SOURCE_ID = '' AND AGENCY_STATE_ABBR = 'FL'), TRANSFORM(RECORDOF(dsAgencyBase), SELF.AGENCY_STATE_ABBR := 'NM'; SELF := LEFT)); //TEST
+
+dsMissingAgency_1616197_CA := PROJECT(dsAgencyBase(mbsi_agency_id = '1616197' AND SOURCE_ID = 'E' AND AGENCY_STATE_ABBR = 'FL'), TRANSFORM(RECORDOF(dsAgencyBase), SELF.AGENCY_STATE_ABBR := 'CA'; SELF := LEFT)); //TEST
+
+dsMissingAgency_6664393_NJ := PROJECT(dsAgencyBase(mbsi_agency_id = '6664393' AND SOURCE_ID = 'C' AND AGENCY_STATE_ABBR = 'CA'), TRANSFORM(RECORDOF(dsAgencyBase), SELF.AGENCY_STATE_ABBR := 'NJ'; SELF := LEFT)); 
+
+dsMissingAgency_6716373_CT := PROJECT(dsAgencyBase(mbsi_agency_id = '6716373' AND SOURCE_ID = 'A' AND AGENCY_STATE_ABBR = 'MA'), TRANSFORM(RECORDOF(dsAgencyBase), SELF.AGENCY_STATE_ABBR := 'CT'; SELF := LEFT)); 
+
+dsMissingAgency_6718143_NJ := PROJECT(dsAgencyBase(mbsi_agency_id = '6718143' AND SOURCE_ID = 'P' AND AGENCY_STATE_ABBR = 'NY'), TRANSFORM(RECORDOF(dsAgencyBase), SELF.AGENCY_STATE_ABBR := 'NJ'; SELF := LEFT)); 
+
+dsMissingAgencyAll := dsMissingAgency_1520372_CT + dsMissingAgency_1520372_PA +
+                      dsMissingAgency_1521832_NY +
+											dsMissingAgency_1522732_NY_E + dsMissingAgency_1522732_NY_P +
+                      dsMissingAgency_1531712_AR +
+											dsMissingAgency_1535782_RT + dsMissingAgency_1535782_TE +
+											dsMissingAgency_1597786_NE +
+											dsMissingAgency_1536035_GA +
+											dsMissingAgency_1616157_CA +
+											dsMissingAgency_1616167_NY +
+											dsMissingAgency_1616177_NJ +
+											dsMissingAgency_1616187_NM +
+											dsMissingAgency_1616197_CA +
+											dsMissingAgency_6664393_NJ +
+											dsMissingAgency_6716373_CT +
+											dsMissingAgency_6718143_NJ;
+											
+dsAgencyBaseAll := dsAgencyBase + dsMissingAgencyAll;
+EXPORT AgencyBase :=  dsAgencyBaseAll;
 
 //***********************************************************************
 //           Key_ecrashV2_PhotoId
