@@ -16,7 +16,7 @@ Prommote := SEQUENTIAL(STD.File.StartSuperFileTransaction()
 	 				   ,STD.File.addsuperfile(TRIM(IDA.Filenames(version,pUseProd).lDesprayTemplate_qa),TRIM(IDA.Filenames(version,pUseProd).lDesprayTemplate_built),,TRUE)
 					   ,STD.File.ClearSuperfile(TRIM(IDA.Filenames(version,pUseProd).lDesprayTemplate_father))
 					   ,STD.File.addsuperfile(TRIM(IDA.Filenames(version,pUseProd).lDesprayTemplate_father),TRIM(IDA.Filenames(version,pUseProd).lDesprayTemplate_qa),,TRUE)
-					   ,STD.File.ClearSuperfile(TRIM(IDA.Filenames(version,pUseProd).lDesprayTemplate_delete),true)
+					   ,STD.File.ClearSuperfile(TRIM(IDA.Filenames(version,pUseProd).lDesprayTemplate_delete))
 					   ,STD.File.addsuperfile(TRIM(IDA.Filenames(version,pUseProd).lDesprayTemplate_delete),TRIM(IDA.Filenames(version,pUseProd).lDesprayTemplate_father),,TRUE)	
    					   ,STD.File.FinishSuperFileTransaction());	
 							
