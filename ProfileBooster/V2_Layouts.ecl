@@ -1,10 +1,20 @@
-﻿IMPORT ProfileBooster, Risk_Indicators, dx_ProfileBooster;
+﻿IMPORT ProfileBooster, Risk_Indicators, dx_ProfileBooster, BIPV2_Crosswalk;
 
 EXPORT V2_Layouts := MODULE
-
- 	EXPORT  ProspectDemographicEducation := RECORD
-		dx_ProfileBooster.Layouts.ProspectDemographicEducation;
-	END;
+  EXPORT Layout_Infutor := RECORD
+	unsigned6 DID;
+	string1 	marital_status;
+	string1 	gender;
+	string8		dob;
+	// string8 	dt_first_seen;
+	//Added for CCPA-10
+	UNSIGNED4 global_sid;
+	UNSIGNED8 record_sid;
+  END;
+  
+  EXPORT  ProspectDemographicEducation := RECORD
+  	dx_ProfileBooster.Layouts.ProspectDemographicEducation;
+  END;
   
   EXPORT Layout_Output_with_input_addr_rawaid := RECORD
     Risk_Indicators.Layout_Output;
@@ -56,33 +66,67 @@ EXPORT V2_Layouts := MODULE
     STRING6 src := ProfileBooster.ProfileBoosterV2_KEL.ECL_Functions.Constants.NO_DATA_FOUND;
     ProspectDemographicEducation;
   END;
+  EXPORT Layout_PB2_Slim_vehicles := RECORD
+	Layout_PB2_Slim;
+	string30	vehicle_key;
+	string15 	iteration_key;
+	string15 	sequence_key;
+	string2  	state_origin;
+	string4		year_make;
+	string5		make;
+	string3		model;
 
-	EXPORT Layout_PB2_Slim_vehicles := RECORD
-		Layout_PB2_Slim;
-		string30	vehicle_key;
-		string15 	iteration_key;
-		string15 	sequence_key;
-		string2  	state_origin;
-		string4		year_make;
-		string5		make;
-		string3		model;
+	string1 	vina_veh_type;
+	unsigned1 totalCount;
+	unsigned1 vehicleCount;
+	unsigned1 motorcycleCount;
+	integer3	months_first_reg := ProfileBooster.ProfileBoosterV2_KEL.ECL_Functions.Constants.NO_DATA_FOUND_INT;
+	integer3	months_last_reg := ProfileBooster.ProfileBoosterV2_KEL.ECL_Functions.Constants.NO_DATA_FOUND_INT;
 
-		string1 	vina_veh_type;
-		unsigned1 totalCount;
-		unsigned1 vehicleCount;
-		unsigned1 motorcycleCount;
-		integer3	months_first_reg := ProfileBooster.ProfileBoosterV2_KEL.ECL_Functions.Constants.NO_DATA_FOUND_INT;
-		integer3	months_last_reg := ProfileBooster.ProfileBoosterV2_KEL.ECL_Functions.Constants.NO_DATA_FOUND_INT;
+	string25 PPCurrOwnedAutoVIN;
+	string4 PPCurrOwnedAutoYear;
+	string36 PPCurrOwnedAutoMake;
+	string30 PPCurrOwnedAutoModel;
+	string20 PPCurrOwnedAutoSeries;
+	string25 PPCurrOwnedAutoType;
+  END;
+  EXPORT Layout_PB2_Slim_Crosswalk := RECORD
+	Layout_PB2_Slim;
+	integer4		   BusAssocFlagEv;
+	integer4           BusAssocOldMSnc;
+	integer4           BusLeadershipTitleFlag;
+	integer4           BusAssocCntEv;
+	unsigned6          uniqueID;
+    unsigned6          ultid;
+    unsigned6          orgid;
+    unsigned6          seleid;
+    unsigned6          proxid;
+	unsigned6          contact_did;          
+    unsigned4          dt_first_seen;
+    unsigned4          dt_last_seen;
+    unsigned4          dt_first_seen_at_business;
+    unsigned4          dt_last_seen_at_business;
+    integer            executive_ind_order;
+    string50           job_title1;
+    string50           job_title2;
+    string50           job_title3;
+    // dataset(BIPV2_Crosswalk.Layouts.SourceInfoRec) sourceInfo;
+  END;
 
-		string25 PPCurrOwnedAutoVIN;
-		string4 PPCurrOwnedAutoYear;
-		string36 PPCurrOwnedAutoMake;
-		string30 PPCurrOwnedAutoModel;
-		string20 PPCurrOwnedAutoSeries;
-		string25 PPCurrOwnedAutoType;
-	END;
+  EXPORT Layout_PB2_Slim_UCC := RECORD
+	unsigned6  UniqueID;
+	Layout_PB2_Slim;
+	string2     sourceCode:='';
+	string1  	party_type:='';
+	string31 	tmsid;	
+    string23 	rmsid:='';
+    string8     orig_filing_date;
+	// string8     dt_vendor_first_reported;
+	INTEGER3	BusUCCFilingCntEv := dx_ProfileBooster.Constants.MISSING_INPUT_DATA_INT;
+	INTEGER3	BusUCCFilingActiveCnt := dx_ProfileBooster.Constants.MISSING_INPUT_DATA_INT;
+  END;
 
-	EXPORT Layout_PB2_Slim_PAW := RECORD
+  EXPORT Layout_PB2_Slim_PAW := RECORD
 		Layout_PB2_Slim;
 		unsigned6 contact_id;
 		string12 	bid;
@@ -93,7 +137,7 @@ EXPORT V2_Layouts := MODULE
 		unsigned1	OccBusinessAssociation;
 		unsigned2	OccBusinessAssociationTime;
 		unsigned1	OccBusinessTitleLeadership;
-	END;
+  END;
 
 	EXPORT Layout_PB2_Slim_profLic := RECORD
 		Layout_PB2_Slim;
@@ -104,6 +148,8 @@ EXPORT V2_Layouts := MODULE
 		unsigned1	proflic_count;
 		string100	jobCategory; 
 		string1 	PLcategory;	
+		string6     ActiveNewTitleType;
+		string2		source_st;
 	END;
 
 EXPORT	Verification := RECORD
@@ -167,6 +213,10 @@ EXPORT	Verification := RECORD
 	EXPORT	ProspectEmergence := RECORD
 		dx_ProfileBooster.Layouts.ProspectEmergence;
 	END;
+
+	EXPORT	ProspectEmergenceHelpers := RECORD
+		dx_ProfileBooster.Layouts.ProspectEmergenceHelpers;
+	END;
 	
 	EXPORT	ProspectCourtRecords := RECORD
 		dx_ProfileBooster.Layouts.ProspectCourtRecords;
@@ -214,8 +264,8 @@ EXPORT	Verification := RECORD
 		INTEGER3		HHMmbrWAstPropCurrCnt := ProfileBooster.ProfileBoosterV2_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA_INT;
 		INTEGER3		HHAstPropCurrCnt := ProfileBooster.ProfileBoosterV2_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA_INT;
 		INTEGER4		HHMmbrPropAVMMax := ProfileBooster.ProfileBoosterV2_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA_INT;
-		INTEGER5	  HHMmbrPropAVMAvg := ProfileBooster.ProfileBoosterV2_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA_INT;
-		INTEGER5	  HHMmbrPropAVMTtl := ProfileBooster.ProfileBoosterV2_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA_INT;
+		INTEGER5	    HHMmbrPropAVMAvg := ProfileBooster.ProfileBoosterV2_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA_INT;
+		INTEGER5	    HHMmbrPropAVMTtl := ProfileBooster.ProfileBoosterV2_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA_INT;
 		INTEGER4		HHMemberPropAVMTtl1Y := ProfileBooster.ProfileBoosterV2_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA_INT;
 		INTEGER4		HHMemberPropAVMTtl5Y := ProfileBooster.ProfileBoosterV2_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA_INT;
 		INTEGER3		HHVehicleOwnedCnt := ProfileBooster.ProfileBoosterV2_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA_INT;
@@ -460,11 +510,13 @@ EXPORT	Verification := RECORD
 	
   EXPORT HelperAttributes := RECORD
     STRING12 ln_fares_id;
-    STRING AddrCurrFull;
-    unsigned8 input_addr_rawaid;
-    unsigned8 curr_addr_rawaid;
-    STRING AddrPrevFull;    
-    unsigned8 prev_addr_rawaid;
+    // STRING AddrCurrFull;
+    // unsigned8 input_addr_rawaid;
+    // unsigned8 curr_addr_rawaid;
+    // STRING AddrPrevFull;    
+    // unsigned8 prev_addr_rawaid;
+	dx_ProfileBooster.Layouts.ProspectCurrAddrHelpers;
+	dx_ProfileBooster.Layouts.ProspectPrevAddrHelpers;
   END;
   
 	EXPORT Layout_ProfileBoosterV2 := RECORD
@@ -479,8 +531,9 @@ EXPORT	Verification := RECORD
 		ProspectVehicle;
 		ProspectOccupationalRecords;
 		ProspectEmergence;
+		ProspectEmergenceHelpers;
 		ProspectCourtRecords;
-    ProspectShortTermCreditActivity;
+    	ProspectShortTermCreditActivity;
 		InputAddrCharac;
 		//HOUSEHOLD
 		HouseholdDemographics;
@@ -676,7 +729,8 @@ EXPORT	Verification := RECORD
 		string12	relat_geoLink;
     Layout_ProfileBoosterV2;
     HelperAttributes;
-    STRING10 	hdr_prim_range;
+	dx_ProfileBooster.Layouts.ProspectEmergenceHelpers;
+        STRING10 	hdr_prim_range;
 		STRING2  	hdr_predir;
 		STRING28  hdr_prim_name;
 		STRING4   hdr_addr_suffix;
@@ -698,41 +752,41 @@ EXPORT	Verification := RECORD
 		UNSIGNED3	hdr_date_last_seen;	
 		unsigned1	address_history_seq;
 		boolean 	inputAddrIsCurrent;
-		STRING10 	curr_prim_range;
-		STRING2  	curr_predir;
-		STRING28  curr_prim_name;
-		STRING4   curr_addr_suffix;
-		STRING2   curr_postdir;
-		STRING10  curr_unit_desig;
-		STRING8   curr_sec_range;
-		STRING25  curr_city_name;
-		STRING2   curr_st;
-		STRING5   curr_z5;
-		STRING4   curr_zip4;
-		STRING1   curr_addr_type;
-		STRING4   curr_addr_status;	
-		STRING3 	curr_county;
-		STRING7 	curr_geo_blk;	
-		UNSIGNED3	curr_date_first_seen;	
-		UNSIGNED3	curr_date_last_seen;	
+		// STRING10 	curr_prim_range;
+		// STRING2  	curr_predir;
+		// STRING28  curr_prim_name;
+		// STRING4   curr_addr_suffix;
+		// STRING2   curr_postdir;
+		// STRING10  curr_unit_desig;
+		// STRING8   curr_sec_range;
+		// STRING25  curr_city_name;
+		// STRING2   curr_st;
+		// STRING5   curr_z5;
+		// STRING4   curr_zip4;
+		// STRING1   curr_addr_type;
+		// STRING4   curr_addr_status;	
+		// STRING3 	curr_county;
+		// STRING7 	curr_geo_blk;	
+		// UNSIGNED3	curr_date_first_seen;	
+		// UNSIGNED3	curr_date_last_seen;	
 		UNSIGNED4	curr_AssessedAmount;	
-		STRING10 	prev_prim_range;
-		STRING2  	prev_predir;
-		STRING28  prev_prim_name;
-		STRING4   prev_addr_suffix;
-		STRING2   prev_postdir;
-		STRING10  prev_unit_desig;
-		STRING8   prev_sec_range;
-		STRING25  prev_city_name;
-		STRING2   prev_st;
-		STRING5   prev_z5;
-		STRING4   prev_zip4;
-		STRING1   prev_addr_type;
-		STRING4   prev_addr_status;	
-		STRING3 	prev_county;
-		STRING7 	prev_geo_blk;	
-		UNSIGNED3	prev_date_first_seen;	
-		UNSIGNED3	prev_date_last_seen;	
+		// STRING10 	prev_prim_range;
+		// STRING2  	prev_predir;
+		// STRING28  prev_prim_name;
+		// STRING4   prev_addr_suffix;
+		// STRING2   prev_postdir;
+		// STRING10  prev_unit_desig;
+		// STRING8   prev_sec_range;
+		// STRING25  prev_city_name;
+		// STRING2   prev_st;
+		// STRING5   prev_z5;
+		// STRING4   prev_zip4;
+		// STRING1   prev_addr_type;
+		// STRING4   prev_addr_status;	
+		// STRING3 	prev_county;
+		// STRING7 	prev_geo_blk;	
+		// UNSIGNED3	prev_date_first_seen;	
+		// UNSIGNED3	prev_date_last_seen;	
 		UNSIGNED4	prev_AssessedAmount;	
 		STRING10 	owned_prim_range;
 		STRING2  	owned_predir;

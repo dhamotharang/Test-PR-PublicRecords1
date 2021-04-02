@@ -14,16 +14,16 @@ EXPORT V2_Search_Function_THOR(DATASET(ProfileBooster.Layouts.Layout_PB_In) PB_I
 BOOLEAN DEBUG := FALSE;
 BOOLEAN PB11 := TRUE;
 
-	isFCRA 			:= false;
-	GLBA 				:= 0;
-	DPPA 				:= 0;
-	BSOptions := Risk_Indicators.iid_constants.BSOptions.RetainInputDID;
-	bsversion := 50;
+	isFCRA 		:= false;
+	GLBA 		:= 0;
+	DPPA 		:= 0;
+	BSOptions 	:= Risk_Indicators.iid_constants.BSOptions.RetainInputDID;
+	bsversion 	:= 50;
 	append_best := 0;	
 	gateways    := dataset([],Gateway.Layouts.Config);
 	todaysdate	:= (STRING8)Std.Date.Today();
-	nines		 		:= 9999999;
-  maxmths	    := 960;
+	nines		:= 9999999;
+  	maxmths	    := 960;
 
 // ********************************************************************
 // Transform PB input to Layout_Input so we can call iid_getDID_prepOutput
@@ -31,94 +31,89 @@ BOOLEAN PB11 := TRUE;
 
 Risk_Indicators.Layout_Input into(PB_In l) := TRANSFORM
 		self.did 		:= (integer)l.LexId;
-		self.score := if((integer)l.lexid<>0, 100, 0);  // hard code the DID score if DID is passed in on input
+		self.score 		:= if((integer)l.lexid<>0, 100, 0);  // hard code the DID score if DID is passed in on input
 		self.seq 		:= l.seq;
 		self.HistoryDate 	:= if(l.historydate=0, risk_indicators.iid_constants.default_history_date, l.HistoryDate);
 		self.ssn 		:= l.ssn;
 		dob_val 		:= riskwise.cleandob(l.dob);
-		dob 				:= dob_val;
+		dob 			:= dob_val;
 		self.dob 		:= if((unsigned)dob=0, '', dob);
 
 		fname  			:= l.Name_First ;
 		mname  			:= l.Name_Middle;
 		lname  			:= l.Name_Last ;
 		suffix 			:= l.Name_Suffix ;
-		self.fname  := stringlib.stringtouppercase(fname);
-		self.mname  := stringlib.stringtouppercase(mname);
-		self.lname  := stringlib.stringtouppercase(lname);
-		self.suffix := stringlib.stringtouppercase(suffix);
+		self.fname  	:= stringlib.stringtouppercase(fname);
+		self.mname  	:= stringlib.stringtouppercase(mname);
+		self.lname  	:= stringlib.stringtouppercase(lname);
+		self.suffix 	:= stringlib.stringtouppercase(suffix);
 		
-		addr_value 	:= trim(l.street_addr);
+		addr_value 		:= trim(l.street_addr);
 		clean_a2 		:= Risk_Indicators.MOD_AddressClean.clean_addr(addr_value, l.City_name, l.st, l.z5);
 		self.in_streetAddress:= addr_value;
-		self.in_city         := l.City_name;
-		self.in_state        := l.st;
-		self.in_zipCode      := l.z5;	
-		self.prim_range      := Address.CleanFields(clean_a2).prim_range;
-		self.predir          := Address.CleanFields(clean_a2).predir;
-		self.prim_name       := Address.CleanFields(clean_a2).prim_name;
-		self.addr_suffix     := Address.CleanFields(clean_a2).addr_suffix;
-		self.postdir         := Address.CleanFields(clean_a2).postdir;
-		self.unit_desig      := Address.CleanFields(clean_a2).unit_desig;
-		self.sec_range       := Address.CleanFields(clean_a2).sec_range;
-		self.p_city_name     := Address.CleanFields(clean_a2).p_city_name;
-		self.st              := Address.CleanFields(clean_a2).st;
-		self.z5              := Address.CleanFields(clean_a2).zip;
-		self.zip4            := Address.CleanFields(clean_a2).zip4;
-		self.lat             := Address.CleanFields(clean_a2).geo_lat;
-		self.long            := Address.CleanFields(clean_a2).geo_long;
-		self.addr_type 			 := risk_indicators.iid_constants.override_addr_type(l.street_addr, Address.CleanFields(clean_a2).rec_type[1],Address.CleanFields(clean_a2).cart);
-		self.addr_status     := Address.CleanFields(clean_a2).err_stat;
-		county          		 := Address.CleanFields(clean_a2).county;
-		self.county          := county[3..5]; //bytes 1-2 are state code, 3-5 are county number
-		self.geo_blk         := Address.CleanFields(clean_a2).geo_blk;
-		self.Phone10				 := StringLib.StringFilter(l.Phone10, '0123456789');
+		self.in_city    := l.City_name;
+		self.in_state   := l.st;
+		self.in_zipCode := l.z5;	
+		self.prim_range := Address.CleanFields(clean_a2).prim_range;
+		self.predir     := Address.CleanFields(clean_a2).predir;
+		self.prim_name  := Address.CleanFields(clean_a2).prim_name;
+		self.addr_suffix := Address.CleanFields(clean_a2).addr_suffix;
+		self.postdir    := Address.CleanFields(clean_a2).postdir;
+		self.unit_desig := Address.CleanFields(clean_a2).unit_desig;
+		self.sec_range  := Address.CleanFields(clean_a2).sec_range;
+		self.p_city_name := Address.CleanFields(clean_a2).p_city_name;
+		self.st         := Address.CleanFields(clean_a2).st;
+		self.z5         := Address.CleanFields(clean_a2).zip;
+		self.zip4       := Address.CleanFields(clean_a2).zip4;
+		self.lat        := Address.CleanFields(clean_a2).geo_lat;
+		self.long       := Address.CleanFields(clean_a2).geo_long;
+		self.addr_type 	:= risk_indicators.iid_constants.override_addr_type(l.street_addr, Address.CleanFields(clean_a2).rec_type[1],Address.CleanFields(clean_a2).cart);
+		self.addr_status := Address.CleanFields(clean_a2).err_stat;
+		county          := Address.CleanFields(clean_a2).county;
+		self.county     := county[3..5]; //bytes 1-2 are state code, 3-5 are county number
+		self.geo_blk    := Address.CleanFields(clean_a2).geo_blk;
+		self.Phone10	:= StringLib.StringFilter(l.Phone10, '0123456789');
 		self := [];
 	END;
 
-
-
-
 	iid_prep_roxie := PROJECT(PB_In, into(left));	
-
 
 // NEW::  Calling the AID address cache macro now that Tony added the new feature for us:  https://bugzilla.seisint.com/show_bug.cgi?id=194258
 
-r_layout_input_PlusRaw	:=
-record
-	ProfileBooster.Layouts.Layout_PB_In;
-	// add these 3 fields to existing layout anytime i want to use this macro
-	string60	Line1;
-	string60	LineLast;
-	unsigned8	rawAID;
-end;
+	r_layout_input_PlusRaw	:= RECORD
+		ProfileBooster.Layouts.Layout_PB_In;
+		// add these 3 fields to existing layout anytime i want to use this macro
+		string60	Line1;
+		string60	LineLast;
+		unsigned8	rawAID;
+	end;
 
-r_layout_input_PlusRaw	prep_for_AID(PB_In le)	:=
-transform
-	self.Line1		:=	trim(stringlib.stringtouppercase(le.street_addr));
-	self.LineLast	:=	address.addr2fromcomponents(stringlib.stringtouppercase(le.City_name), stringlib.stringtouppercase(le.St),  le.Z5);  // );, uppercase and trim city and state, zip5 only
-	self.rawAID			:=	0;
-	self	:=	le;
-end;
-aid_prepped	:=	project(PB_In, prep_for_AID(left));
+	r_layout_input_PlusRaw	prep_for_AID(PB_In le)	:=
+	transform
+		self.Line1		:=	trim(stringlib.stringtouppercase(le.street_addr));
+		self.LineLast	:=	address.addr2fromcomponents(stringlib.stringtouppercase(le.City_name), stringlib.stringtouppercase(le.St),  le.Z5);  // );, uppercase and trim city and state, zip5 only
+		self.rawAID			:=	0;
+		self	:=	le;
+	end;
+	aid_prepped	:=	project(PB_In, prep_for_AID(left));
 
 
-// new parameter is the NoNewCacheFiles
-unsigned4 lAIDAppendFlags := AID.Common.eReturnValues.RawAID | AID.Common.eReturnValues.ACECacheRecords | AID.Common.eReturnValues.NoNewCacheFiles;
+	// new parameter is the NoNewCacheFiles
+	unsigned4 lAIDAppendFlags := AID.Common.eReturnValues.RawAID | AID.Common.eReturnValues.ACECacheRecords | AID.Common.eReturnValues.NoNewCacheFiles;
 
-AID.MacAppendFromRaw_2Line(	aid_prepped,
-														Line1,
-														LineLast,
-														rawAID,
-														my_dataset_with_address_cache,
-														lAIDAppendFlags
-													);
+	AID.MacAppendFromRaw_2Line(	aid_prepped,
+															Line1,
+															LineLast,
+															rawAID,
+															my_dataset_with_address_cache,
+															lAIDAppendFlags
+														);
 
-Risk_Indicators.Layout_Input prep_for_thor(my_dataset_with_address_cache l) := TRANSFORM
+	Risk_Indicators.Layout_Input prep_for_thor(my_dataset_with_address_cache l) := TRANSFORM
 		self.did 		:= (integer)l.LexId;
 		self.score := if((integer)l.lexid<>0, 100, 0);  // hard code the DID score if DID is passed in on input
 		self.seq 		:= l.seq;   
-    self.HistoryDate 	:= if(l.historydate=0, risk_indicators.iid_constants.default_history_date, l.HistoryDate);
+		self.HistoryDate 	:= if(l.historydate=0, risk_indicators.iid_constants.default_history_date, l.HistoryDate);
 
 		self.ssn 		:= l.ssn;
 		dob_val 		:= riskwise.cleandob(l.dob);
@@ -166,24 +161,24 @@ Risk_Indicators.Layout_Input prep_for_thor(my_dataset_with_address_cache l) := T
 										 
 #IF(onThor)
 	iid_prep := iid_prep_thor;
-  did_prepped_output := ungroup(Risk_Indicators.iid_getDID_prepOutput_THOR(iid_prep, DPPA, GLBA, isFCRA, bsversion, DataRestrictionMask, append_best, gateways, BSOptions));
+  	did_prepped_output := ungroup(Risk_Indicators.iid_getDID_prepOutput_THOR(iid_prep, DPPA, GLBA, isFCRA, bsversion, DataRestrictionMask, append_best, gateways, BSOptions));
 #ELSE
 	iid_prep :=iid_prep_roxie;
-  did_prepped_output := ungroup(risk_indicators.iid_getDID_prepOutput(iid_prep, DPPA, GLBA, isFCRA, bsversion, DataRestrictionMask, append_best, gateways, BSOptions));
+  	did_prepped_output := ungroup(risk_indicators.iid_getDID_prepOutput(iid_prep, DPPA, GLBA, isFCRA, bsversion, DataRestrictionMask, append_best, gateways, BSOptions));
 #END
 
-  // ********************************************************************
+ 	// ********************************************************************
 	// Get the DID and Append the Input Account Number
 	// ********************************************************************
-  //pick the DID with the highest score, 
-  //in the event that multiple have the same score, choose the lowest value DID to make this deterministic
-  sortDIDs := SORT(UNGROUP(did_prepped_output), seq, -score, did);
-  highestDIDScore := DEDUP(sortDIDs, seq); 
+    //pick the DID with the highest score, 
+    //in the event that multiple have the same score, choose the lowest value DID to make this deterministic
+  	sortDIDs := SORT(UNGROUP(did_prepped_output), seq, -score, did);
+  	highestDIDScore := DEDUP(sortDIDs, seq); 
   
-	with_DID := JOIN(distribute(PB_In, seq), distribute(highestDIDScore(DID<>0), seq), 
+ 	with_DID := JOIN(distribute(PB_In, seq), distribute(highestDIDScore(DID<>0), seq), 
 									LEFT.seq = RIGHT.seq, TRANSFORM(Risk_Indicators.Layout_Output, SELF.Account := LEFT.AcctNo; SELF := RIGHT), local);
 									
-donotmail_key := dma.key_DNM_Name_Address;
+  	donotmail_key := dma.key_DNM_Name_Address;
 
 //join to DoNotMail to set the DNM attribute
 	ProfileBooster.V2_Layouts.Layout_PB2_Shell setDNMFlag(with_DID le, donotmail_key ri ) := TRANSFORM
@@ -268,32 +263,32 @@ donotmail_key := dma.key_DNM_Name_Address;
   rolledDeceased := rollup(sortedDeceased, rollDeceased(left,right), seq);
 
 //join to the Infutor key to get marital status and gender
-	ProfileBooster.V2_Layouts.Layout_PB2_Shell getInfutor(rolledDeceased le, ProfileBooster.Key_Infutor_DID ri ) := TRANSFORM
-		self.marital_status	:= ri.marital_status;
-		self.gender					:= ri.gender;
-		self.DOB						:= if(le.DOB = '', ri.DOB, le.DOB);
-    historydate := risk_indicators.iid_constants.myGetDate(le.historydate)[1..6]; 
+	ProfileBooster.V2_Layouts.Layout_PB2_Shell getInfutor(rolledDeceased le, ProfileBooster.V2_Key_Infutor_DID ri ) := TRANSFORM
+		// OlderErmgRecord := (UNSIGNED6)(((STRING)ri.dt_first_seen)[1..6]) < (UNSIGNED6)(((STRING)le.EmrgDt_first_seen)[1..6]); 
+		// EmrgDt_first_seen := IF(OlderErmgRecord,(UNSIGNED6)ri.dt_first_seen,(UNSIGNED6)le.EmrgDt_first_seen);
+		// self.EmrgDt_first_seen	:= EmrgDt_first_seen;
+		// self.EmrgSrc            := IF(OlderErmgRecord,MDR.sourceTools.src_InfutorNarc,le.EmrgSrc);
+		// EmrgDob	:= MAP(~OlderErmgRecord                       => le.EmrgDob, 
+		// 													     (STRING)ri.dob);
+		// self.EmrgDob			:= EmrgDob;
+    	// fullhistorydate := risk_indicators.iid_constants.myGetDate(le.historydate);
+		// self.EmrgAge   			:= risk_indicators.years_apart((unsigned)EmrgDt_first_seen, (unsigned)EmrgDob);
+		self.marital_status	    := ri.marital_status;
+		self.gender				:= ri.gender;
+		self.DOB				:= if(le.DOB = '', ri.DOB, le.DOB);
+        historydate := risk_indicators.iid_constants.myGetDate(le.historydate)[1..6]; 
 		self.ProspectAge		:= if(le.ProspectAge <> 0, le.ProspectAge, risk_indicators.years_apart((unsigned)HistoryDate, (unsigned)ri.DOB));
-		self 								:= le;
+		self 					:= le;
 	END;
 	
-	withInfutor_roxie := join(rolledDeceased, ProfileBooster.Key_Infutor_DID,
-		keyed(left.DID = right.DID), 
-		getInfutor(left,right), left outer, keep(1)
-	);
-	
 	withInfutor_thor := join(distribute(rolledDeceased, did), 
-													 distribute(pull(ProfileBooster.Key_Infutor_DID), did),
+													 distribute(pull(ProfileBooster.V2_Key_Infutor_DID), did),
 		left.DID = right.DID, 
 		getInfutor(left,right), left outer, keep(1), local)
 	;	
 	// : PERSIST('~PROFILEBOOSTER::with_infutor_thor_full::' + prt); // remove persists because low on disk space and it's rebuilding persist file each time anyway
 	
-	#IF(onThor)
-		withInfutor := withInfutor_thor;
-	#ELSE
-		withInfutor := withInfutor_roxie;
-	#END
+	withInfutor := withInfutor_thor;
 	
 //get business count for the input address
 ProfileBooster.V2_Layouts.Layout_PB2_Shell getInputBus(withInfutor le, Address_Attributes.key_AML_addr ri)  := TRANSFORM
@@ -774,21 +769,27 @@ withCurrBus_thor := withCurrBus_thor_hits + with_InputBus_curraddr_notpopulated;
    																	// self.RaACrtRecLienJudgAmtMax  := if(left.rec_type = ProfileBooster.Constants.recType.Relative, min(RaACrtRecLienJudgAmtMax, nines), 0); 
    																	// self.RaACrtRecBkrptMmbrCnt36Mo	:= if(left.rec_type = ProfileBooster.Constants.recType.Relative, if(right.BJL.BK_count36 > 0, 1, 0), 0);
 																	   self.ProfLicActivNewIndx := -99998;
+																	   self.ProfLicActvNewTitleType := '-99998';
 																	   self := left), left outer, parallel);	
 
 //--------- Professional License -------------//
 
-profLicRecs := ProfileBooster.V2_getProfLic(slimShell);
+	profLicRecs := ProfileBooster.V2_getProfLic(slimShell);
       	
-      	withProfLic := join(withDerogs, profLicRecs,
+    withProfLic := join(withDerogs, profLicRecs,
       												left.seq = right.seq and
-      												left.did2 = right.did2,
+      												left.did2 = right.did,
       												transform(ProfileBooster.V2_Layouts.Layout_PB2_Shell,
-      																	self.ProfLicFlagEv      	:= (integer)right.professional_license_flag;
-      																	self.ProfLicActivNewIndx    := if(right.PLcategory <> '', (integer3)right.PLcategory, -99997);
-                                                                        self.ProfLicActvNewTitleType := 'TESTING';
-      																	
-                                       // self.HHOccProfLicMmbrCnt 		:= if(left.rec_type in [ProfileBooster.Constants.recType.Prospect,ProfileBooster.Constants.recType.Household] and right.professional_license_flag=true, 1, 0);  
+      																	self.ProfLicFlagEv      	 := IF(right.professional_license_flag,1,0);
+      																	self.ProfLicActivNewIndx     := map(right.did2 <= 0		    => -99998,
+																			                                right.PLcategory IN ['1','2','3','4','5'] => (integer3)right.PLcategory, 
+																		                                                               -99997);
+                                                                        self.ProfLicActvNewTitleType := map(right.did2 <= 0		    => '-99998',
+																			                                ((integer)right.ActiveNewTitleType) BETWEEN 0 and 183 AND right.ActiveNewTitleType <> '' => right.ActiveNewTitleType, 
+																		                                                               '-99997');
+																		self.BusAssocOldMSnc := -99998;
+																		self.BusLeadershipTitleFlag := -99998;
+                                       									// self.HHOccProfLicMmbrCnt 		:= if(left.rec_type in [ProfileBooster.Constants.recType.Prospect,ProfileBooster.Constants.recType.Household] and right.professional_license_flag=true, 1, 0);  
       																	// self.RaAOccProfLicMmbrCnt		:= if(left.rec_type = ProfileBooster.Constants.recType.Relative and right.professional_license_flag=true, 1, 0); 
       																	self := left), left outer, parallel);
 
@@ -797,17 +798,19 @@ profLicRecs := ProfileBooster.V2_getProfLic(slimShell);
    
    	busnAssocRecs := ProfileBooster.V2_getBusnAssoc(slimShell);
    	
-   	withBusnAssoc := join(withDerogs, busnAssocRecs,
+   	withBusnAssoc := join(withProfLic, busnAssocRecs,
    	// withBusnAssoc := join(withProfLic, busnAssocRecs,
    												left.seq = right.seq and
    												left.did2 = right.did2,
    												transform(ProfileBooster.V2_Layouts.Layout_PB2_Shell,
-   																	self.BusAssocFlagEv         	:= right.OccBusinessAssociation;	
-   																	self.BusAssocOldMSnc          	:= if(right.contact_id<>0, right.OccBusinessAssociationTime, -99998);
-   																	self.BusLeadershipTitleFlag    	:= right.OccBusinessTitleLeadership;
-                                                                    self.BusAssocCntEv              := if(right.OccBusinessAssociation = 1, 1, 0);
+   																	self.BusAssocFlagEv         	:= if(right.did2<>0, right.BusAssocFlagEv, 0);	
+   																	self.BusAssocOldMSnc          	:= if(right.did2<>0, right.BusAssocOldMSnc, -99998);
+   																	self.BusLeadershipTitleFlag    	:= if(right.did2<>0, right.BusLeadershipTitleFlag, -99998);
+                                                                    self.BusAssocCntEv              := if(right.did2<>0, right.BusAssocCntEv, 0);
                                                                     // self.HHOccBusinessAssocMmbrCnt 	:= if(left.rec_type in [ProfileBooster.Constants.recType.Prospect,ProfileBooster.Constants.recType.Household] and right.OccBusinessAssociation = 1, 1, 0);  
    																	// self.RaAOccBusinessAssocMmbrCnt	:= if(left.rec_type = ProfileBooster.Constants.recType.Relative and right.OccBusinessAssociation = 1, 1, 0); 
+																	self.BusUCCFilingCntEv          := -99998;
+																	self.BusUCCFilingActiveCnt	    := -99998;
    																	self := left), left outer, parallel);
 
    //--------------- UCC Filings -------------//
@@ -817,9 +820,8 @@ profLicRecs := ProfileBooster.V2_getProfLic(slimShell);
    												left.seq = right.seq and
    												left.did2 = right.did2,
    												transform(ProfileBooster.V2_Layouts.Layout_PB2_Shell,
-   																	// self.BusUCCFilingCntEv          := right. //mas attribute?
-                                                                    // self.BusUCCFilingActiveCnt      := right. //mas attribute?
-   																	
+   																	self.BusUCCFilingCntEv          := if(right.did2<>0, right.BusUCCFilingCntEv, -99998);
+                                                                    self.BusUCCFilingActiveCnt      := if(right.did2<>0, right.BusUCCFilingActiveCnt, -99998);
 																	self := left), left outer, parallel);
 
 
@@ -1710,9 +1712,9 @@ OUTPUT(count(withAssessments),named('Check9'));
 */
 
 ProfileBooster.V2_Layouts.Layout_PB2_BatchOut getAttr(withOneClickRollup le) := transform
-	self.seq																								:= le.seq;
-	self.AcctNo																							:= le.AcctNo;
-	self.LexID																							:= le.did;
+	self.seq								:= le.seq;
+	self.AcctNo								:= le.AcctNo;
+	self.LexID								:= le.did;
 	
   // self.attributes.version2.DemUpdtOldMsnc := le.DemUpdtOldMsnc;
 	// self.attributes.version2.DemUpdtNewMsnc := le.DemUpdtNewMsnc;
@@ -1733,7 +1735,7 @@ ProfileBooster.V2_Layouts.Layout_PB2_BatchOut getAttr(withOneClickRollup le) := 
 	self.attributes.version2.DemEduCollTierHighEv := le.DemEduCollTierHighEv;
 	self.attributes.version2.DemEduCollRecNewMajorTypeEv := le.DemEduCollRecNewMajorTypeEv;
 	
-  self.attributes.version2.DemEduCollEvidFlagEv := le.DemEduCollEvidFlagEv;
+ 	self.attributes.version2.DemEduCollEvidFlagEv := le.DemEduCollEvidFlagEv;
 
 	self.attributes.version2.DemEduCollSrcNewRecOldMsncEv := le.DemEduCollSrcNewRecOldMsncEv;
 	self.attributes.version2.DemEduCollSrcNewRecNewMsncEv := le.DemEduCollSrcNewRecNewMsncEv;
@@ -1757,7 +1759,7 @@ ProfileBooster.V2_Layouts.Layout_PB2_BatchOut getAttr(withOneClickRollup le) := 
 	self.attributes.version2.IntSportPersonFlag5Y := le.IntSportPersonFlag5Y;
 	self.attributes.version2.IntSportPersonTravelerFlagEv := le.IntSportPersonTravelerFlagEv;
   
-  self.attributes.version2.LifeMoveNewMsnc := IF(le.LifeMoveNewMsnc<-99997,-99998,le.LifeMoveNewMsnc);
+  	self.attributes.version2.LifeMoveNewMsnc := IF(le.LifeMoveNewMsnc<-99997,-99998,le.LifeMoveNewMsnc);
 	self.attributes.version2.LifeNameLastChngFlag := le.LifeNameLastChngFlag;
 	self.attributes.version2.LifeNameLastChngFlag1Y := le.LifeNameLastChngFlag1Y;
 	self.attributes.version2.LifeNameLastCntEv := le.LifeNameLastCntEv;
@@ -1769,28 +1771,28 @@ ProfileBooster.V2_Layouts.Layout_PB2_BatchOut getAttr(withOneClickRollup le) := 
 	self.attributes.version2.LifeAddrEconTrajType := le.LifeAddrEconTrajType;
 	self.attributes.version2.LifeAddrEconTrajIndx := le.LifeAddrEconTrajIndx;
   
-  self.attributes.version2.AstCurrFlag := le.AstCurrFlag;
-  self.attributes.version2.AstPropCurrFlag := le.AstPropCurrFlag;
-  self.attributes.version2.AstPropCurrCntEv := le.AstPropCurrCntEv;
-  self.attributes.version2.AstPropCurrValTot := le.AstPropCurrValTot;
-  self.attributes.version2.AstPropCurrAVMTot := le.AstPropCurrAVMTot;
-  self.attributes.version2.AstPropSaleNewMsnc := IF(le.AstPropSaleNewMsnc<-99997,-99998,le.AstPropSaleNewMsnc);
-  self.attributes.version2.AstPropCntEv := le.AstPropCntEv;
-  self.attributes.version2.AstPropSoldCntEv := le.AstPropSoldCntEv;
-  self.attributes.version2.AstPropSoldCnt1Y := le.AstPropSoldCnt1Y;
-  self.attributes.version2.AstPropSoldNewRatio := le.AstPropSoldNewRatio;
-  self.attributes.version2.AstPropPurchCnt1Y := le.AstPropPurchCnt1Y;
-  self.attributes.version2.AstPropAirCrftCntEv := le.AstPropAirCrftCntEv;
-  self.attributes.version2.AstPropWtrcrftCntEv := le.AstPropWtrcrftCntEv;
+	self.attributes.version2.AstCurrFlag := le.AstCurrFlag;
+	self.attributes.version2.AstPropCurrFlag := le.AstPropCurrFlag;
+	self.attributes.version2.AstPropCurrCntEv := le.AstPropCurrCntEv;
+	self.attributes.version2.AstPropCurrValTot := le.AstPropCurrValTot;
+	self.attributes.version2.AstPropCurrAVMTot := le.AstPropCurrAVMTot;
+	self.attributes.version2.AstPropSaleNewMsnc := IF(le.AstPropSaleNewMsnc<-99997,-99998,le.AstPropSaleNewMsnc);
+	self.attributes.version2.AstPropCntEv := le.AstPropCntEv;
+	self.attributes.version2.AstPropSoldCntEv := le.AstPropSoldCntEv;
+	self.attributes.version2.AstPropSoldCnt1Y := le.AstPropSoldCnt1Y;
+	self.attributes.version2.AstPropSoldNewRatio := le.AstPropSoldNewRatio;
+	self.attributes.version2.AstPropPurchCnt1Y := le.AstPropPurchCnt1Y;
+	self.attributes.version2.AstPropAirCrftCntEv := le.AstPropAirCrftCntEv;
+	self.attributes.version2.AstPropWtrcrftCntEv := le.AstPropWtrcrftCntEv;
 
-  self.attributes.version2.ShortTermShopNewMsnc := le.ShortTermShopNewMsnc;
+	self.attributes.version2.ShortTermShopNewMsnc := le.ShortTermShopNewMsnc;
 	self.attributes.version2.ShortTermShopOldMsnc := le.ShortTermShopOldMsnc;
 	self.attributes.version2.ShortTermShopCntEv := le.ShortTermShopCntEv;
 	self.attributes.version2.ShortTermShopCnt6M := le.ShortTermShopCnt6M;
 	self.attributes.version2.ShortTermShopCnt5Y := le.ShortTermShopCnt5Y;
 	self.attributes.version2.ShortTermShopCnt1Y := le.ShortTermShopCnt1Y;
   
-  self.attributes.version2.CurrAddrOwnershipIndx := le.CurrAddrOwnershipIndx;
+  	self.attributes.version2.CurrAddrOwnershipIndx := le.CurrAddrOwnershipIndx;
 	self.attributes.version2.CurrAddrHasPoolFlag := le.CurrAddrHasPoolFlag;
 	self.attributes.version2.CurrAddrIsMobileHomeFlag := le.CurrAddrIsMobileHomeFlag;
 	self.attributes.version2.CurrAddrBathCnt := le.CurrAddrBathCnt;
@@ -1815,9 +1817,49 @@ ProfileBooster.V2_Layouts.Layout_PB2_BatchOut getAttr(withOneClickRollup le) := 
 	self.attributes.version2.CurrAddrIsVacantFlag := le.CurrAddrIsVacantFlag;
 	self.attributes.version2.CurrAddrStatus := le.CurrAddrStatus;
 	self.attributes.version2.CurrAddrIsAptFlag := le.CurrAddrIsAptFlag;
+
+	self.attributes.version2.AddrCurrFull := le.AddrCurrFull;
+	self.attributes.version2.curr_addr_rawaid := le.curr_addr_rawaid;
+	self.attributes.version2.curr_prim_range := le.curr_prim_range;
+	self.attributes.version2.curr_predir := le.curr_predir;
+	self.attributes.version2.curr_prim_name := le.curr_prim_name;
+	self.attributes.version2.curr_addr_suffix := le.curr_addr_suffix;
+	self.attributes.version2.curr_postdir := le.curr_postdir;
+	self.attributes.version2.curr_unit_desig := le.curr_unit_desig;
+	self.attributes.version2.curr_sec_range := le.curr_sec_range;
+	self.attributes.version2.curr_city_name := le.curr_city_name;
+	self.attributes.version2.curr_st := le.curr_st;
+	self.attributes.version2.curr_z5 := le.curr_z5;
+	self.attributes.version2.curr_zip4 := le.curr_zip4;
+	self.attributes.version2.curr_addr_type := le.curr_addr_type;
+	self.attributes.version2.curr_addr_status := le.curr_addr_status;	
+	self.attributes.version2.curr_county := le.curr_county;
+	self.attributes.version2.curr_geo_blk := le.curr_geo_blk;	
+	self.attributes.version2.curr_date_first_seen := le.curr_date_first_seen;	
+	self.attributes.version2.curr_date_last_seen := le.curr_date_last_seen;
+
+	self.attributes.version2.AddrPrevFull := le.AddrPrevFull;
+	self.attributes.version2.prev_addr_rawaid := le.prev_addr_rawaid;
+	self.attributes.version2.prev_prim_range := le.prev_prim_range;
+	self.attributes.version2.prev_predir := le.prev_predir;
+	self.attributes.version2.prev_prim_name := le.prev_prim_name;
+	self.attributes.version2.prev_addr_suffix := le.prev_addr_suffix;
+	self.attributes.version2.prev_postdir := le.prev_postdir;
+	self.attributes.version2.prev_unit_desig := le.prev_unit_desig;
+	self.attributes.version2.prev_sec_range := le.prev_sec_range;
+	self.attributes.version2.prev_city_name := le.prev_city_name;
+	self.attributes.version2.prev_st := le.prev_st;
+	self.attributes.version2.prev_z5 := le.prev_z5;
+	self.attributes.version2.prev_zip4 := le.prev_zip4;
+	self.attributes.version2.prev_addr_type := le.prev_addr_type;
+	self.attributes.version2.prev_addr_status := le.prev_addr_status;	
+	self.attributes.version2.prev_county := le.prev_county;
+	self.attributes.version2.prev_geo_blk := le.prev_geo_blk;	
+	self.attributes.version2.prev_date_first_seen := le.prev_date_first_seen;	
+	self.attributes.version2.prev_date_last_seen := le.prev_date_last_seen;
   
-  self.attributes.version2.DrgCnt7Y := le.DrgCnt7Y;
-  self.attributes.version2.DrgSeverityIndx7Y := le.DrgSeverityIndx7Y;
+    self.attributes.version2.DrgCnt7Y := le.DrgCnt7Y;
+    self.attributes.version2.DrgSeverityIndx7Y := le.DrgSeverityIndx7Y;
 	self.attributes.version2.DrgCnt1Y := le.DrgCnt1Y;
 	self.attributes.version2.DrgNewMsnc7Y := le.DrgNewMsnc7Y;
 	self.attributes.version2.DrgCrimFelCnt7Y := le.DrgCrimFelCnt7Y;
@@ -1846,154 +1888,184 @@ ProfileBooster.V2_Layouts.Layout_PB2_BatchOut getAttr(withOneClickRollup le) := 
 	self.attributes.version2.busassocoldmsnc := le.busassocoldmsnc;
 	self.attributes.version2.busleadershiptitleflag := le.busleadershiptitleflag;
 	self.attributes.version2.busassoccntev := le.busassoccntev;
-	self.attributes.version2.busassocsmbusflag := le.busassocsmbusflag;
+	// self.attributes.version2.busassocsmbusflag := le.busassocsmbusflag;
 	self.attributes.version2.proflicactvnewtitletype := le.proflicactvnewtitletype;
 	self.attributes.version2.busuccfilingcntev := le.busuccfilingcntev;
 	self.attributes.version2.busuccfilingactivecnt := le.busuccfilingactivecnt;
-  
-	self.attributes.version2.emrgage                        := le.emrgage;
-	self.attributes.version2.emrgatorafter21flag            := le.emrgatorafter21flag;
-	self.attributes.version2.emrgrecordtype                 := le.emrgrecordtype;
-	self.attributes.version2.emrgaddresshrindex             := le.emrgaddresshrindex;
-	self.attributes.version2.emrglexidsatemrgaddrcnt1y      := le.emrglexidsatemrgaddrcnt1y;
-	self.attributes.version2.emrgage25to59flag              := le.emrgage25to59flag;
-  															
-  self.attributes.version2.HHID                           := le.HHID;  
-  self.attributes.version2.addrcurrfull                   := le.addrcurrfull;  
-  self.attributes.version2.curr_addr_rawaid               := le.curr_addr_rawaid;  
-  self.attributes.version2.addrprevfull                   := le.addrprevfull;  
-  self.attributes.version2.prev_addr_rawaid               := le.prev_addr_rawaid;  
-  
-  self.attributes.version2.HHTeenagerMmbrCnt							:= le.HHTeenagerMmbrCnt;
-  self.attributes.version2.HHYoungAdultMmbrCnt						:= le.HHYoungAdultMmbrCnt;
-  self.attributes.version2.HHMiddleAgemmbrCnt							:= le.HHMiddleAgemmbrCnt;
-  self.attributes.version2.HHSeniorMmbrCnt								:= le.HHSeniorMmbrCnt;
-  self.attributes.version2.HHElderlyMmbrCnt								:= le.HHElderlyMmbrCnt;
-  self.attributes.version2.HHMmbrAgeMed										:= le.HHMmbrAgeMed;
-  self.attributes.version2.HHMmbrAgeAvg										:= le.HHMmbrAgeAvg;
-  self.attributes.version2.HHComplexTotalCnt							:= le.HHComplexTotalCnt;
-  self.attributes.version2.HHUnitsInComplexCnt						:= le.HHUnitsInComplexCnt;
-  self.attributes.version2.HHMmbrCnt						          := le.HHMmbrCnt;
-  self.attributes.version2.HHEstimatedIncomeTotal         := le.HHEstimatedIncomeTotal;
-  self.attributes.version2.HHEstimatedIncomeAvg	          := le.HHEstimatedIncomeAvg;
-  self.attributes.version2.HHMmbrWEduCollCnt	            := le.HHMmbrWEduCollCnt;
-  self.attributes.version2.HHMmbrWEduCollEvidEvCnt	      := le.HHMmbrWEduCollEvidEvCnt;
-  self.attributes.version2.HHMmbrWEduColl2YrCnt	          := le.HHMmbrWEduColl2YrCnt;
-  self.attributes.version2.HHMmbrWEduColl4YrCnt	          := le.HHMmbrWEduColl4YrCnt;
-  self.attributes.version2.HHMmbrWEduCollGradCnt	        := le.HHMmbrWEduCollGradCnt;
-  self.attributes.version2.HHMmbrWCollPvtCnt	            := le.HHMmbrWCollPvtCnt;
-  self.attributes.version2.HHMmbrCollTierHighest	        := le.HHMmbrCollTierHighest;
-  self.attributes.version2.HHMmbrCollTierAvg	            := le.HHMmbrCollTierAvg;
-  
-  self.attributes.version2.HHMmbrWIntSportCnt	            := le.HHMmbrWIntSportCnt;
-  
-  self.attributes.version2.HHMmbrWDrgCnt7Y								:= le.HHMmbrWDrgCnt7Y;
-  self.attributes.version2.HHMmbrWDrgCnt1Y						    := le.HHMmbrWDrgCnt1Y;
-  self.attributes.version2.HHDrgNewMsnc7Y					        := le.HHDrgNewMsnc7Y;
-  self.attributes.version2.HHMmbrWCrimFelCnt7Y			      := le.HHMmbrWCrimFelCnt7Y;
-  self.attributes.version2.HHMmbrWCrimFelCnt1Y					  := le.HHMmbrWCrimFelCnt1Y;
-  self.attributes.version2.HHMmbrWCrimFelNewMsnc7Y			  := le.HHMmbrWCrimFelNewMsnc7Y;
-  self.attributes.version2.HHMmbrWCrimNFelCnt7Y				    := le.HHMmbrWCrimNFelCnt7Y;
-  self.attributes.version2.HHMmbrWCrimNFelCnt1Y		        := le.HHMmbrWCrimNFelCnt1Y;
-  self.attributes.version2.HHMmbrWCrimNFelNewMsnc7Y				:= le.HHMmbrWCrimNFelNewMsnc7Y;
-  self.attributes.version2.HHMmbrWEvictCnt7Y		          := le.HHMmbrWEvictCnt7Y;
-  self.attributes.version2.HHMmbrWEvictCnt1Y					    := le.HHMmbrWEvictCnt1Y;
-  self.attributes.version2.HHMmbrWEvictNewMsnc7Y					:= le.HHMmbrWEvictNewMsnc7Y;
-  self.attributes.version2.HHMmbrWLnJCnt7Y				        := le.HHMmbrWLnJCnt7Y;
-  self.attributes.version2.HHMmbrWLnJCnt1Y				        := le.HHMmbrWLnJCnt1Y;
-  self.attributes.version2.HHMmbrLnJAmtTot7Y						  := le.HHMmbrLnJAmtTot7Y;
-  self.attributes.version2.HHMmbrWLnJNewMsnc7Y			      := le.HHMmbrWLnJNewMsnc7Y;
-  self.attributes.version2.HHMmbrWBkCnt10Y		            := le.HHMmbrWBkCnt10Y;
-  self.attributes.version2.HHMmbrWBkCnt1Y		              := le.HHMmbrWBkCnt1Y;
-  self.attributes.version2.HHMmbrWBkCnt2Y		              := le.HHMmbrWBkCnt2Y;
-  self.attributes.version2.HHMmbrWBkNewMsnc10Y		        := le.HHMmbrWBkNewMsnc10Y;
-  self.attributes.version2.HHMmbrWFrClCnt7Y		            := le.HHMmbrWFrClCnt7Y;
-  self.attributes.version2.HHMmbrWFrClNewMSnc7Y		        := le.HHMmbrWFrClNewMSnc7Y;
-  
-  self.attributes.version2.HHMmbrWithProfLicCnt		        := le.HHMmbrWithProfLicCnt;
-  self.attributes.version2.HHMmbrWBusAssocCnt		          := le.HHMmbrWBusAssocCnt;
-  self.attributes.version2.HHMmbrWProfLicCat1Cnt		      := le.HHMmbrWProfLicCat1Cnt;
-  self.attributes.version2.HHMmbrWProfLicCat2Cnt		      := le.HHMmbrWProfLicCat2Cnt;
-  self.attributes.version2.HHMmbrWProfLicCat3Cnt		      := le.HHMmbrWProfLicCat3Cnt;
-  self.attributes.version2.HHMmbrWProfLicCat4Cnt		      := le.HHMmbrWProfLicCat4Cnt;
-  self.attributes.version2.HHMmbrWProfLicCat5Cnt		      := le.HHMmbrWProfLicCat5Cnt;
-  self.attributes.version2.HHMmbrWProfLicUncatCnt		      := le.HHMmbrWProfLicUncatCnt;
-  
-  self.attributes.version2.HHPurchNewAmt							    := le.HHPurchNewAmt;
-  self.attributes.version2.HHPurchTotEv						        := le.HHPurchTotEv;
-  self.attributes.version2.HHPurchCntEv						        := le.HHPurchCntEv;
-  self.attributes.version2.HHPurchNewMsnc							  	:= le.HHPurchNewMsnc;
-  self.attributes.version2.HHPurchOldMsnc						    	:= le.HHPurchOldMsnc;
-  self.attributes.version2.HHPurchItemCntEv								:= le.HHPurchItemCntEv;
-  self.attributes.version2.HHPurchAmtAvg									:= le.HHPurchAmtAvg;
- 
-  
-  self.attributes.version2.RaATeenagerCnt							    := le.RaATeenagerCnt;
-  self.attributes.version2.RaAYoungAdultCnt							  := le.RaAYoungAdultCnt;
-  self.attributes.version2.RaAMiddleAgeCnt							  := le.RaAMiddleAgeCnt;
-  self.attributes.version2.RaASeniorCnt							      := le.RaASeniorCnt;
-  self.attributes.version2.RaAElderlyCnt							    := le.RaAElderlyCnt;
-  self.attributes.version2.RaAUniqueHHCnt							    := le.RaAUniqueHHCnt;
-  self.attributes.version2.RaACnt							            := le.RaACnt;
-  self.attributes.version2.RaAMedianIncome							  := le.RaAMedianIncome;
-  self.attributes.version2.RaAWEduCollCnt			            := le.RaAWEduCollCnt;
-  self.attributes.version2.RaAWEduColl2YCnt		            := le.RaAWEduColl2YCnt;
-  self.attributes.version2.RaAWEduColl4YCnt		            := le.RaAWEduColl4YCnt;
-  self.attributes.version2.RaAWEduCollGradCnt	            := le.RaAWEduCollGradCnt;
-  self.attributes.version2.RaAWCollPvtCnt				          := le.RaAWCollPvtCnt;
-  self.attributes.version2.RaAWTopTierCollCnt			      	:= le.RaAWTopTierCollCnt;
-  self.attributes.version2.RaAWMidTierCollCnt				      := le.RaAWMidTierCollCnt;
-  self.attributes.version2.RaAWLowTierCollCnt				      := le.RaAWLowTierCollCnt;
-  self.attributes.version2.RaACurrAddrCloseDist				    := le.RaACurrAddrCloseDist;
-  self.attributes.version2.RaACurrAddrCloseNZDist					:= le.RaACurrAddrCloseNZDist;
-  self.attributes.version2.RaACurrAddr25MiDistCnt1Y				:= le.RaACurrAddr25MiDistCnt1Y;
-  self.attributes.version2.RaACurrAddr100MiDistCnt1Y			:= le.RaACurrAddr100MiDistCnt1Y;
-  self.attributes.version2.RaACurrAddrGT500MiDistCnt1Y		:= le.RaACurrAddrGT500MiDistCnt1Y;
-  self.attributes.version2.RelOver500MiCnt1Y					    := le.RelOver500MiCnt1Y;
-  self.attributes.version2.RaACurrAddrDistAvg1Y					  := le.RaACurrAddrDistAvg1Y;
-  self.attributes.version2.RaAWCrim25MiCnt7Y					    := le.RaAWCrim25MiCnt7Y;
-  self.attributes.version2.RaAWCrimCurrAddrCloseDist7Y		:= le.RaAWCrimCurrAddrCloseDist7Y;
-  self.attributes.version2.RaAEstIncomeAvg					      := le.RaAEstIncomeAvg;
-  self.attributes.version2.RaAEstIncomeMax					      := le.RaAEstIncomeMax;
-  self.attributes.version2.RaACurrHomeValAvg					    := le.RaACurrHomeValAvg;
-  
-  self.attributes.version2.RaAPropOwnCnt					        := le.RaAPropOwnCnt;
-  self.attributes.version2.RaAPropCurrOwnTot 			        := le.RaAPropCurrOwnTot;
-  self.attributes.version2.RaAPropCurrAVMValMax 	        := le.RaAPropCurrAVMValMax;
-  self.attributes.version2.RaAPropCurrAVMValAvg 	        := le.RaAPropCurrAVMValAvg;
-  self.attributes.version2.RaAPropCurrAVMValTot		        := le.RaAPropCurrAVMValTot;
-  self.attributes.version2.RaAPropCurrAVMValTot1Y					:= le.RaAPropCurrAVMValTot1Y;
-  self.attributes.version2.RaAPropCurrAVMValTot5Y					:= le.RaAPropCurrAVMValTot5Y;
-  self.attributes.version2.RaAVehicleOwnedCnt						  := le.RaAVehicleOwnedCnt;
-  self.attributes.version2.RaAAutoOwnedCnt						    := le.RaAAutoOwnedCnt;
-  self.attributes.version2.RaAMotorcycleOwnedCnt					:= le.RaAMotorcycleOwnedCnt;
-  self.attributes.version2.RaAAircraftOwnedCnt						:= le.RaAAircraftOwnedCnt;
-  self.attributes.version2.RaAWatercraftOwnedCnt					:= le.RaAWatercraftOwnedCnt;
-  
-  self.attributes.version2.RaAWDrgCnt7Y					        	:= le.RaAWDrgCnt7Y;
-  self.attributes.version2.RaAWDrgCnt1Y					          := le.RaAWDrgCnt1Y;
-  self.attributes.version2.RaAWDrgNewMSnc7Y			          := le.RaAWDrgNewMSnc7Y;
-  self.attributes.version2.RaAWCrimFelCnt7Y				        := le.RaAWCrimFelCnt7Y;
-  self.attributes.version2.RaAWCrimFelCnt1Y		            := le.RaAWCrimFelCnt1Y;
-  self.attributes.version2.RaAWCrimFelNewMSnc7Y				    := le.RaAWCrimFelNewMSnc7Y;
-  self.attributes.version2.RaAWCrimNFelCnt7Y		          := le.RaAWCrimNFelCnt7Y;
-  self.attributes.version2.RaAWCrmiNFelCnt1Y				      := le.RaAWCrmiNFelCnt1Y;
-  self.attributes.version2.RaAWCrimNFelNewMSnc7Y		      := le.RaAWCrimNFelNewMSnc7Y;
-  self.attributes.version2.RaAWEvictCnt7Y				          := le.RaAWEvictCnt7Y;
-  self.attributes.version2.RaAWEvictCnt1Y			            := le.RaAWEvictCnt1Y;
-  self.attributes.version2.RaAWEvictNewMSnc7Y						  := le.RaAWEvictNewMSnc7Y;
-  self.attributes.version2.RaAWLnJCnt7Y			              := le.RaAWLnJCnt7Y;
-  self.attributes.version2.RaAWLnJCnt1Y		              	:= le.RaAWLnJCnt1Y;
-  self.attributes.version2.RaALnJAmtTot		              	:= le.RaALnJAmtTot;
-  self.attributes.version2.RaAWLnJNewMSnc7Y		          	:= le.RaAWLnJNewMSnc7Y;
-  self.attributes.version2.RaAWBkCnt10Y			              := le.RaAWBkCnt10Y;
-  self.attributes.version2.RaAWBkCnt1Y			              := le.RaAWBkCnt1Y;
-  self.attributes.version2.RaAWBkCnt2Y		              	:= le.RaAWBkCnt2Y;
-  self.attributes.version2.RaAWBkNewMSnc10Y		          	:= le.RaAWBkNewMSnc10Y;
-  self.attributes.version2.RaAFrClCnt7Y			              := le.RaAFrClCnt7Y;
-  self.attributes.version2.RaAFrClNewMsnc7Y			          := le.RaAFrClNewMsnc7Y;
- 
-  self.attributes.version2.RaAWIntSportCnt	                := le.RaAWIntSportCnt;		  
+    
+	EmrgDt_first_seen := le.EmrgDt_first_seen;
+	self.attributes.version2.emrgage                        := MAP(EmrgDt_first_seen<=0 => -99998,
+	                                                               le.emrgage=0         => -99997,
+	                                                                                       le.emrgage);
+	self.attributes.version2.emrgatorafter21flag            := MAP(le.emrgage > 21 => 1,
+	                                                               le.emrgage > 0  => 0,
+																                      -99998);
+	self.attributes.version2.emrgage25to59flag              := MAP(le.emrgage >= 25 AND le.emrgage <= 60 => 1,
+	                                                               le.emrgage = 0                        => -99998,
+																                                            0);
+    propertySources  := MDR.SourceTools.set_Property;
+	proflicSources   := MDR.SourceTools.set_Prolic;
+	derogSources     := MDR.SourceTools.set_Bk + MDR.SourceTools.set_Liens + [MDR.SourceTools.src_Foreclosures] + MDR.sourceTools.set_Sex_Offender;
+	busnAssocSources := MDR.sourceTools.set_Business_header;
+	educationSources := [MDR.sourceTools.src_American_Students_List ] + [MDR.sourceTools.src_OKC_Student_List];
+	sportingSources  := MDR.sourceTools.set_EMerge_CCW + MDR.sourceTools.set_EMerge_CCW_NY + MDR.sourceTools.set_EMerge_Cens + MDR.sourceTools.set_EMerge_Fish + MDR.sourceTools.set_EMerge_Hunt;
+	self.attributes.version2.emrgrecordtype                 := MAP(le.EmrgSrc IN propertySources  => 'A',//property
+	                                                               le.EmrgSrc IN proflicSources   => 'P',//prof lic
+																   le.EmrgSrc IN derogSources     => 'D',//derog
+																   le.EmrgSrc IN busnAssocSources => 'B',//busn assoc
+																   le.EmrgSrc IN educationSources => 'E',//education
+																   le.EmrgSrc IN sportingSources  => 'S',//sporting
+																                                     'O');//other
+	// self.attributes.version2.emrgaddresshrindex             := le.emrgaddresshrindex; //connect to address key on Roxie?
+	// self.attributes.version2.emrglexidsatemrgaddrcnt1y      := le.emrglexidsatemrgaddrcnt1y; //connect to address key on Roxie?
+	
+	self.attributes.version2.EmrgDOB                        := IF(le.EmrgDOB='','-99997',le.EmrgDOB);
+	self.attributes.version2.EmrgSrc                        := le.EmrgSrc;
+	self.attributes.version2.EmrgDt_first_seen              := le.EmrgDt_first_seen;
+	self.attributes.version2.EmrgAddrFull                   := le.EmrgAddrFull;
+	self.attributes.version2.EmrgPrimaryRange               := le.EmrgPrimaryRange;
+	self.attributes.version2.EmrgPredirectional             := le.EmrgPredirectional;
+	self.attributes.version2.EmrgPrimaryName                := le.EmrgPrimaryName;
+	self.attributes.version2.EmrgSuffix                     := le.EmrgSuffix;
+	self.attributes.version2.EmrgPostdirectional            := le.EmrgPostdirectional;
+	self.attributes.version2.EmrgUnitDesignation            := le.EmrgUnitDesignation;
+	self.attributes.version2.EmrgSecondaryRange             := le.EmrgSecondaryRange;
+	self.attributes.version2.EmrgZIP5                       := le.EmrgZIP5;
+	self.attributes.version2.EmrgZIP4                       := le.EmrgZIP4;
+	self.attributes.version2.EmrgCity_Name                  := le.EmrgCity_Name;
+	self.attributes.version2.EmrgSt                         := le.EmrgSt;
+	
+	self.attributes.version2.HHID                           := le.HHID;  
+	self.attributes.version2.HHTeenagerMmbrCnt				:= le.HHTeenagerMmbrCnt;
+	self.attributes.version2.HHYoungAdultMmbrCnt			:= le.HHYoungAdultMmbrCnt;
+	self.attributes.version2.HHMiddleAgemmbrCnt				:= le.HHMiddleAgemmbrCnt;
+	self.attributes.version2.HHSeniorMmbrCnt				:= le.HHSeniorMmbrCnt;
+	self.attributes.version2.HHElderlyMmbrCnt				:= le.HHElderlyMmbrCnt;
+	self.attributes.version2.HHMmbrAgeMed					:= le.HHMmbrAgeMed;
+	self.attributes.version2.HHMmbrAgeAvg					:= le.HHMmbrAgeAvg;
+	self.attributes.version2.HHComplexTotalCnt				:= le.HHComplexTotalCnt;
+	self.attributes.version2.HHUnitsInComplexCnt			:= le.HHUnitsInComplexCnt;
+	self.attributes.version2.HHMmbrCnt						:= le.HHMmbrCnt;
+	self.attributes.version2.HHEstimatedIncomeTotal         := le.HHEstimatedIncomeTotal;
+	self.attributes.version2.HHEstimatedIncomeAvg	        := le.HHEstimatedIncomeAvg;
+	self.attributes.version2.HHMmbrWEduCollCnt	            := le.HHMmbrWEduCollCnt;
+	self.attributes.version2.HHMmbrWEduCollEvidEvCnt	    := le.HHMmbrWEduCollEvidEvCnt;
+	self.attributes.version2.HHMmbrWEduColl2YrCnt	        := le.HHMmbrWEduColl2YrCnt;
+	self.attributes.version2.HHMmbrWEduColl4YrCnt	        := le.HHMmbrWEduColl4YrCnt;
+	self.attributes.version2.HHMmbrWEduCollGradCnt	        := le.HHMmbrWEduCollGradCnt;
+	self.attributes.version2.HHMmbrWCollPvtCnt	            := le.HHMmbrWCollPvtCnt;
+	self.attributes.version2.HHMmbrCollTierHighest	        := le.HHMmbrCollTierHighest;
+	self.attributes.version2.HHMmbrCollTierAvg	            := le.HHMmbrCollTierAvg;
+	
+	self.attributes.version2.HHMmbrWIntSportCnt	            := le.HHMmbrWIntSportCnt;
+	
+	self.attributes.version2.HHMmbrWDrgCnt7Y				:= le.HHMmbrWDrgCnt7Y;
+	self.attributes.version2.HHMmbrWDrgCnt1Y				:= le.HHMmbrWDrgCnt1Y;
+	self.attributes.version2.HHDrgNewMsnc7Y					:= le.HHDrgNewMsnc7Y;
+	self.attributes.version2.HHMmbrWCrimFelCnt7Y			:= le.HHMmbrWCrimFelCnt7Y;
+	self.attributes.version2.HHMmbrWCrimFelCnt1Y			:= le.HHMmbrWCrimFelCnt1Y;
+	self.attributes.version2.HHMmbrWCrimFelNewMsnc7Y		:= le.HHMmbrWCrimFelNewMsnc7Y;
+	self.attributes.version2.HHMmbrWCrimNFelCnt7Y			:= le.HHMmbrWCrimNFelCnt7Y;
+	self.attributes.version2.HHMmbrWCrimNFelCnt1Y		    := le.HHMmbrWCrimNFelCnt1Y;
+	self.attributes.version2.HHMmbrWCrimNFelNewMsnc7Y		:= le.HHMmbrWCrimNFelNewMsnc7Y;
+	self.attributes.version2.HHMmbrWEvictCnt7Y		        := le.HHMmbrWEvictCnt7Y;
+	self.attributes.version2.HHMmbrWEvictCnt1Y				:= le.HHMmbrWEvictCnt1Y;
+	self.attributes.version2.HHMmbrWEvictNewMsnc7Y			:= le.HHMmbrWEvictNewMsnc7Y;
+	self.attributes.version2.HHMmbrWLnJCnt7Y				:= le.HHMmbrWLnJCnt7Y;
+	self.attributes.version2.HHMmbrWLnJCnt1Y				:= le.HHMmbrWLnJCnt1Y;
+	self.attributes.version2.HHMmbrLnJAmtTot7Y				:= le.HHMmbrLnJAmtTot7Y;
+	self.attributes.version2.HHMmbrWLnJNewMsnc7Y			:= le.HHMmbrWLnJNewMsnc7Y;
+	self.attributes.version2.HHMmbrWBkCnt10Y		        := le.HHMmbrWBkCnt10Y;
+	self.attributes.version2.HHMmbrWBkCnt1Y		            := le.HHMmbrWBkCnt1Y;
+	self.attributes.version2.HHMmbrWBkCnt2Y		            := le.HHMmbrWBkCnt2Y;
+	self.attributes.version2.HHMmbrWBkNewMsnc10Y		    := le.HHMmbrWBkNewMsnc10Y;
+	self.attributes.version2.HHMmbrWFrClCnt7Y		        := le.HHMmbrWFrClCnt7Y;
+	self.attributes.version2.HHMmbrWFrClNewMSnc7Y		    := le.HHMmbrWFrClNewMSnc7Y;
+	
+	self.attributes.version2.HHMmbrWithProfLicCnt		    := le.HHMmbrWithProfLicCnt;
+	self.attributes.version2.HHMmbrWBusAssocCnt		        := le.HHMmbrWBusAssocCnt;
+	self.attributes.version2.HHMmbrWProfLicCat1Cnt		    := le.HHMmbrWProfLicCat1Cnt;
+	self.attributes.version2.HHMmbrWProfLicCat2Cnt		    := le.HHMmbrWProfLicCat2Cnt;
+	self.attributes.version2.HHMmbrWProfLicCat3Cnt		    := le.HHMmbrWProfLicCat3Cnt;
+	self.attributes.version2.HHMmbrWProfLicCat4Cnt		    := le.HHMmbrWProfLicCat4Cnt;
+	self.attributes.version2.HHMmbrWProfLicCat5Cnt		    := le.HHMmbrWProfLicCat5Cnt;
+	self.attributes.version2.HHMmbrWProfLicUncatCnt		    := le.HHMmbrWProfLicUncatCnt;
+	
+	self.attributes.version2.HHPurchNewAmt					:= le.HHPurchNewAmt;
+	self.attributes.version2.HHPurchTotEv					:= le.HHPurchTotEv;
+	self.attributes.version2.HHPurchCntEv					:= le.HHPurchCntEv;
+	self.attributes.version2.HHPurchNewMsnc					:= le.HHPurchNewMsnc;
+	self.attributes.version2.HHPurchOldMsnc					:= le.HHPurchOldMsnc;
+	self.attributes.version2.HHPurchItemCntEv				:= le.HHPurchItemCntEv;
+	self.attributes.version2.HHPurchAmtAvg					:= le.HHPurchAmtAvg;
+	
+	
+	self.attributes.version2.RaATeenagerCnt					:= le.RaATeenagerCnt;
+	self.attributes.version2.RaAYoungAdultCnt				:= le.RaAYoungAdultCnt;
+	self.attributes.version2.RaAMiddleAgeCnt				:= le.RaAMiddleAgeCnt;
+	self.attributes.version2.RaASeniorCnt					:= le.RaASeniorCnt;
+	self.attributes.version2.RaAElderlyCnt					:= le.RaAElderlyCnt;
+	self.attributes.version2.RaAUniqueHHCnt					:= le.RaAUniqueHHCnt;
+	self.attributes.version2.RaACnt							:= le.RaACnt;
+	self.attributes.version2.RaAMedianIncome				:= le.RaAMedianIncome;
+	self.attributes.version2.RaAWEduCollCnt			        := le.RaAWEduCollCnt;
+	self.attributes.version2.RaAWEduColl2YCnt		        := le.RaAWEduColl2YCnt;
+	self.attributes.version2.RaAWEduColl4YCnt		        := le.RaAWEduColl4YCnt;
+	self.attributes.version2.RaAWEduCollGradCnt	            := le.RaAWEduCollGradCnt;
+	self.attributes.version2.RaAWCollPvtCnt				    := le.RaAWCollPvtCnt;
+	self.attributes.version2.RaAWTopTierCollCnt			    := le.RaAWTopTierCollCnt;
+	self.attributes.version2.RaAWMidTierCollCnt				:= le.RaAWMidTierCollCnt;
+	self.attributes.version2.RaAWLowTierCollCnt				:= le.RaAWLowTierCollCnt;
+	self.attributes.version2.RaACurrAddrCloseDist			:= le.RaACurrAddrCloseDist;
+	self.attributes.version2.RaACurrAddrCloseNZDist			:= le.RaACurrAddrCloseNZDist;
+	self.attributes.version2.RaACurrAddr25MiDistCnt1Y		:= le.RaACurrAddr25MiDistCnt1Y;
+	self.attributes.version2.RaACurrAddr100MiDistCnt1Y		:= le.RaACurrAddr100MiDistCnt1Y;
+	self.attributes.version2.RaACurrAddrGT500MiDistCnt1Y	:= le.RaACurrAddrGT500MiDistCnt1Y;
+	self.attributes.version2.RelOver500MiCnt1Y				:= le.RelOver500MiCnt1Y;
+	self.attributes.version2.RaACurrAddrDistAvg1Y			:= le.RaACurrAddrDistAvg1Y;
+	self.attributes.version2.RaAWCrim25MiCnt7Y				:= le.RaAWCrim25MiCnt7Y;
+	self.attributes.version2.RaAWCrimCurrAddrCloseDist7Y	:= le.RaAWCrimCurrAddrCloseDist7Y;
+	self.attributes.version2.RaAEstIncomeAvg				:= le.RaAEstIncomeAvg;
+	self.attributes.version2.RaAEstIncomeMax				:= le.RaAEstIncomeMax;
+	self.attributes.version2.RaACurrHomeValAvg				:= le.RaACurrHomeValAvg;
+	
+	self.attributes.version2.RaAPropOwnCnt					:= le.RaAPropOwnCnt;
+	self.attributes.version2.RaAPropCurrOwnTot 			    := le.RaAPropCurrOwnTot;
+	self.attributes.version2.RaAPropCurrAVMValMax 	        := le.RaAPropCurrAVMValMax;
+	self.attributes.version2.RaAPropCurrAVMValAvg 	        := le.RaAPropCurrAVMValAvg;
+	self.attributes.version2.RaAPropCurrAVMValTot		    := le.RaAPropCurrAVMValTot;
+	self.attributes.version2.RaAPropCurrAVMValTot1Y			:= le.RaAPropCurrAVMValTot1Y;
+	self.attributes.version2.RaAPropCurrAVMValTot5Y			:= le.RaAPropCurrAVMValTot5Y;
+	self.attributes.version2.RaAVehicleOwnedCnt				:= le.RaAVehicleOwnedCnt;
+	self.attributes.version2.RaAAutoOwnedCnt				:= le.RaAAutoOwnedCnt;
+	self.attributes.version2.RaAMotorcycleOwnedCnt			:= le.RaAMotorcycleOwnedCnt;
+	self.attributes.version2.RaAAircraftOwnedCnt			:= le.RaAAircraftOwnedCnt;
+	self.attributes.version2.RaAWatercraftOwnedCnt			:= le.RaAWatercraftOwnedCnt;
+	
+	self.attributes.version2.RaAWDrgCnt7Y					:= le.RaAWDrgCnt7Y;
+	self.attributes.version2.RaAWDrgCnt1Y					:= le.RaAWDrgCnt1Y;
+	self.attributes.version2.RaAWDrgNewMSnc7Y			    := le.RaAWDrgNewMSnc7Y;
+	self.attributes.version2.RaAWCrimFelCnt7Y				:= le.RaAWCrimFelCnt7Y;
+	self.attributes.version2.RaAWCrimFelCnt1Y		        := le.RaAWCrimFelCnt1Y;
+	self.attributes.version2.RaAWCrimFelNewMSnc7Y			:= le.RaAWCrimFelNewMSnc7Y;
+	self.attributes.version2.RaAWCrimNFelCnt7Y		        := le.RaAWCrimNFelCnt7Y;
+	self.attributes.version2.RaAWCrmiNFelCnt1Y				:= le.RaAWCrmiNFelCnt1Y;
+	self.attributes.version2.RaAWCrimNFelNewMSnc7Y		    := le.RaAWCrimNFelNewMSnc7Y;
+	self.attributes.version2.RaAWEvictCnt7Y				    := le.RaAWEvictCnt7Y;
+	self.attributes.version2.RaAWEvictCnt1Y			        := le.RaAWEvictCnt1Y;
+	self.attributes.version2.RaAWEvictNewMSnc7Y				:= le.RaAWEvictNewMSnc7Y;
+	self.attributes.version2.RaAWLnJCnt7Y			        := le.RaAWLnJCnt7Y;
+	self.attributes.version2.RaAWLnJCnt1Y		            := le.RaAWLnJCnt1Y;
+	self.attributes.version2.RaALnJAmtTot		            := le.RaALnJAmtTot;
+	self.attributes.version2.RaAWLnJNewMSnc7Y		        := le.RaAWLnJNewMSnc7Y;
+	self.attributes.version2.RaAWBkCnt10Y			        := le.RaAWBkCnt10Y;
+	self.attributes.version2.RaAWBkCnt1Y			        := le.RaAWBkCnt1Y;
+	self.attributes.version2.RaAWBkCnt2Y		            := le.RaAWBkCnt2Y;
+	self.attributes.version2.RaAWBkNewMSnc10Y		        := le.RaAWBkNewMSnc10Y;
+	self.attributes.version2.RaAFrClCnt7Y			        := le.RaAFrClCnt7Y;
+	self.attributes.version2.RaAFrClNewMsnc7Y			    := le.RaAFrClNewMsnc7Y;
+	
+	self.attributes.version2.RaAWIntSportCnt	            := le.RaAWIntSportCnt;		  
     
 	self	:= le;
 	self	:= [];
@@ -2043,6 +2115,7 @@ Final := SORT(attr, seq);
   output(choosen(withDerogs,100), named('withDerogs'));
   output(choosen(withProfLic,100), named('withProfLic'));
   output(choosen(withBusnAssoc,100), named('withBusnAssoc'));
+  output(choosen(uccFilings, 100), named('uccFilings'));
   // output(choosen(sportsRecs,100), named('sportsRecs'));
   // output(choosen(withSports,100), named('withSports'));
   // output(p_address, named('p_address'));
@@ -2079,8 +2152,9 @@ Final := SORT(attr, seq);
   // output(withHHIncome, named('withHHIncome'));
   // output( withBankingExperiance, named('withBankingExperiance'));
   // output(withAVM,, '~jfrancis::profile_booster20::withAVM_' + thorlib.wuid(), OVERWRITE);
-  //testdids := [236652451040,857178120,1055307807,195248237589,190889513826,236830768283,152883814553,146108921098,2723046329,1400687212,1987326982,2249861882]; //0 and 0 research
-
+  testdids := [1439701036,10451331058,35079677273,1469465500,329715771,2602737429,1814630365,190567206340,333465668,145261689458,1240516440,645711285];
+  output(profLicRecs(did in testdids),named('profLicRecsSample'));
+  output(withProfLic(did in testdids),named('withProfLicSample'));
   //output(withStudent(did IN testdids),, '~jfrancis::profile_booster20::withStudent_' + thorlib.wuid(), OVERWRITE);
   //output(withWatercraft(did IN testdids),, '~jfrancis::profile_booster20::withWatercraft_' + thorlib.wuid(), OVERWRITE);
   //output(withAircraft(did IN testdids),, '~jfrancis::profile_booster20::withAircraft_' + thorlib.wuid(), OVERWRITE);

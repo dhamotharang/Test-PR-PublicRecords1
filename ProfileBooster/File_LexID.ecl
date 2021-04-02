@@ -57,8 +57,49 @@ export File_LexID(STRING8 history_date) := function
   // unsigned8 filepos;
 // END;
   // base := DATASET('~jfrancis::in::pb20::sampleWatchdog.csv',testLayout,CSV(heading(single), quote('"')));
+  // base := DATASET('~jfrancis::in::pb20::sampleHeaderAllDids.csv',dx_Header.layout_key_header,CSV(heading(single), quote('"')));
   base := DATASET('~jfrancis::in::pb20::sampleHeader.csv',dx_Header.layout_key_header,CSV(heading(single), quote('"')));
   distributed_allDIDs := distribute(base(dt_first_seen<=(unsigned)risk_indicators.iid_constants.myGetDate((integer)history_date[1..6])), hash(did));
+
+  // HeaderWithEmergence := RECORD
+  //   dx_Header.layout_key_header;
+  //   dx_ProfileBooster.Layouts.ProspectEmergence;
+  //   dx_ProfileBooster.Layouts.ProspectEmergenceHelpers;
+  // END;
+// EXPORT	ProspectEmergence := RECORD
+// 		INTEGER3		EmrgAge := dx_ProfileBooster.Constants.MISSING_INPUT_DATA_INT;
+// 		INTEGER3		EmrgAtOrAfter21Flag := dx_ProfileBooster.Constants.MISSING_INPUT_DATA_INT;
+// 		INTEGER3		EmrgRecordType := dx_ProfileBooster.Constants.MISSING_INPUT_DATA_INT;
+// 		INTEGER3		EmrgAddressHRIndex := dx_ProfileBooster.Constants.MISSING_INPUT_DATA_INT;
+// 		INTEGER3		EmrgLexIDsAtEmrgAddrCnt1Y := dx_ProfileBooster.Constants.MISSING_INPUT_DATA_INT;
+// 		INTEGER3		EmrgAge25to59Flag := dx_ProfileBooster.Constants.MISSING_INPUT_DATA_INT;
+// 	END;
+
+// 	EXPORT  ProspectEmergenceHelpers := RECORD
+// 		STRING      EmrgDOB := dx_ProfileBooster.Constants.MISSING_INPUT_DATA;
+// 		STRING2			EmrgSrc;
+// 		STRING   		EmrgAddrFull;
+// 		STRING10 		EmrgPrimaryRange;
+// 		STRING6  		EmrgPredirectional;
+// 		STRING28 		EmrgPrimaryName;
+// 		STRING6  		EmrgSuffix;
+// 		STRING6  		EmrgPostdirectional;
+// 		STRING10 		EmrgUnitDesignation;
+// 		STRING8  		EmrgSecondaryRange;
+// 		STRING6  		EmrgZIP5;
+// 		STRING6  		EmrgZIP4;
+// 		STRING25 		EmrgCity_Name;
+// 		STRING6  		EmrgSt;
+// 	END;
+  // dx_Header.layout_key_header rollHeaderForEmergence(dx_Header.layout_key_header le, dx_Header.layout_key_header ri) := TRANSFORM
+  //   OlderRecord := ri.date_first_seen<le.date_first_seen;
+  //   EmrgAge := IF(OlderRecord,)
+  //   SELF.EmrgAge := EmrgAge;
+  //   self.dob							:= if(ri.src=mdr.sourceTools.src_TUCS_Ptrack, '', (string)ri.dob);
+  //   self.ProspectAge 			:= if(ri.src=mdr.sourceTools.src_TUCS_Ptrack, 0, risk_indicators.years_apart((unsigned)fullhistorydate, (unsigned)ri.dob));
+		
+
+  // END;
 
 	uniqueDIDs := dedup(sort(distributed_allDIDs, DID, local), DID, local);//   : PERSIST('~PROFILEBOOSTER::unique_DIDs_thor');  // remove persists because low on disk space and it's rebuilding persist file each time anyway
 
@@ -266,10 +307,27 @@ export File_LexID(STRING8 history_date) := function
                   SELF.EmrgAge := LEFT.attributes.version2.EmrgAge;
                   SELF.EmrgAtOrAfter21Flag := LEFT.attributes.version2.EmrgAtOrAfter21Flag;
                   SELF.EmrgRecordType := LEFT.attributes.version2.EmrgRecordType;
-                  SELF.EmrgAddressHRIndex := LEFT.attributes.version2.EmrgAddressHRIndex;
+                  SELF.EmrgAddrType := LEFT.attributes.version2.EmrgAddrType;
                   SELF.EmrgLexIDsAtEmrgAddrCnt1Y := LEFT.attributes.version2.EmrgLexIDsAtEmrgAddrCnt1Y;
                   SELF.EmrgAge25to59Flag := LEFT.attributes.version2.EmrgAge25to59Flag;
                   
+                  SELF.EmrgDOB := LEFT.attributes.version2.EmrgDOB;
+                  SELF.EmrgSrc := LEFT.attributes.version2.EmrgSrc;
+                  SELF.EmrgDt_first_seen := LEFT.attributes.version2.EmrgDt_first_seen;
+                  SELF.EmrgAddrFull := LEFT.attributes.version2.EmrgAddrFull;
+                  SELF.EmrgPrimaryRange := LEFT.attributes.version2.EmrgPrimaryRange;
+                  SELF.EmrgPredirectional := LEFT.attributes.version2.EmrgPredirectional;
+                  SELF.EmrgPrimaryName := LEFT.attributes.version2.EmrgPrimaryName;
+                  SELF.EmrgSuffix := LEFT.attributes.version2.EmrgSuffix;
+                  SELF.EmrgPostdirectional := LEFT.attributes.version2.EmrgPostdirectional;
+                  SELF.EmrgUnitDesignation := LEFT.attributes.version2.EmrgUnitDesignation;
+                  SELF.EmrgSecondaryRange := LEFT.attributes.version2.EmrgSecondaryRange;
+                  SELF.EmrgZIP5 := LEFT.attributes.version2.EmrgZIP5;
+                  SELF.EmrgZIP4 := LEFT.attributes.version2.EmrgZIP4;
+                  SELF.EmrgCity_Name := LEFT.attributes.version2.EmrgCity_Name;
+                  SELF.EmrgSt := LEFT.attributes.version2.EmrgSt;
+
+
                   SELF.DrgCnt7Y := LEFT.attributes.version2.DrgCnt7Y;
                   SELF.DrgSeverityIndx7Y := LEFT.attributes.version2.DrgSeverityIndx7Y;
                   SELF.DrgCnt1Y := LEFT.attributes.version2.DrgCnt1Y;
@@ -303,10 +361,44 @@ export File_LexID(STRING8 history_date) := function
                   
                   SELF.AddrCurrFull := LEFT.attributes.version2.AddrCurrFull;
                   SELF.curr_addr_rawaid := LEFT.attributes.version2.curr_addr_rawaid;
+                  SELF.curr_prim_range := LEFT.attributes.version2.curr_prim_range;
+                  SELF.curr_predir := LEFT.attributes.version2.curr_predir;
+                  SELF.curr_prim_name := LEFT.attributes.version2.curr_prim_name;
+                  SELF.curr_addr_suffix := LEFT.attributes.version2.curr_addr_suffix;
+                  SELF.curr_postdir := LEFT.attributes.version2.curr_postdir;
+                  SELF.curr_unit_desig := LEFT.attributes.version2.curr_unit_desig;
+                  SELF.curr_sec_range := LEFT.attributes.version2.curr_sec_range;
+                  SELF.curr_city_name := LEFT.attributes.version2.curr_city_name;
+                  SELF.curr_st := LEFT.attributes.version2.curr_st;
+                  SELF.curr_z5 := LEFT.attributes.version2.curr_z5;
+                  SELF.curr_zip4 := LEFT.attributes.version2.curr_zip4;
+                  SELF.curr_addr_type := LEFT.attributes.version2.curr_addr_type;
+                  SELF.curr_addr_status := LEFT.attributes.version2.curr_addr_status;	
+                  SELF.curr_county := LEFT.attributes.version2.curr_county;
+                  SELF.curr_geo_blk := LEFT.attributes.version2.curr_geo_blk;	
+                  SELF.curr_date_first_seen := LEFT.attributes.version2.curr_date_first_seen;	
+                  SELF.curr_date_last_seen := LEFT.attributes.version2.curr_date_last_seen;
+                  
                   SELF.AddrPrevFull := LEFT.attributes.version2.AddrPrevFull;
                   SELF.prev_addr_rawaid := LEFT.attributes.version2.prev_addr_rawaid;
-
-                  SELF.date_last_seen := STD.Date.Today();
+                  SELF.prev_prim_range := LEFT.attributes.version2.prev_prim_range;
+                  SELF.prev_predir := LEFT.attributes.version2.prev_predir;
+                  SELF.prev_prim_name := LEFT.attributes.version2.prev_prim_name;
+                  SELF.prev_addr_suffix := LEFT.attributes.version2.prev_addr_suffix;
+                  SELF.prev_postdir := LEFT.attributes.version2.prev_postdir;
+                  SELF.prev_unit_desig := LEFT.attributes.version2.prev_unit_desig;
+                  SELF.prev_sec_range := LEFT.attributes.version2.prev_sec_range;
+                  SELF.prev_city_name := LEFT.attributes.version2.prev_city_name;
+                  SELF.prev_st := LEFT.attributes.version2.prev_st;
+                  SELF.prev_z5 := LEFT.attributes.version2.prev_z5;
+                  SELF.prev_zip4 := LEFT.attributes.version2.prev_zip4;
+                  SELF.prev_addr_type := LEFT.attributes.version2.prev_addr_type;
+                  SELF.prev_addr_status := LEFT.attributes.version2.prev_addr_status;	
+                  SELF.prev_county := LEFT.attributes.version2.prev_county;
+                  SELF.prev_geo_blk := LEFT.attributes.version2.prev_geo_blk;	
+                  SELF.prev_date_first_seen := LEFT.attributes.version2.prev_date_first_seen;	
+                  SELF.prev_date_last_seen := LEFT.attributes.version2.prev_date_last_seen;
+                  // SELF.date_last_seen := STD.Date.Today();
                   SELF.datetime := STD.Date.Today();
                   // SELF.global_sid   := 0;   
                   // SELF.record_sid   := 0; 
@@ -408,13 +500,13 @@ finalWithKEL := JOIN(final(did<>0), pbKelResult(lexid<>-99999),
   // output(choosen(sportsRecs, eyeball), named('sportsRecs'));
   // output(choosen(withSports, eyeball), named('withSports'));
   // output(choosen(finalSort, eyeball), named('finalSort'));
-  output(choosen(final, 100), named('final_lexid'));
+  // output(choosen(final, 100), named('final_lexid'));
   // OUTPUT(choosen(PP1,eyeball), named('PP1'));
   // OUTPUT(choosen(PP,eyeball), named('PP'));
   // output(choosen(pbKelResult, eyeball), named('pbKelResult'));
   // output(choosen(PB_Search_Function_THOR, eyeball), named('PB_Search_Function_THOR'));
-  output(choosen(final(did=250159), 100), named('finalSample'));
-  output(choosen(finalWithKEL(did=250159), 100), named('finalWithKELSample'));
+  // output(choosen(final(did=250159), 100), named('finalSample'));
+  // output(choosen(finalWithKEL(did=250159), 100), named('finalWithKELSample'));
 
 /* ********************/
 

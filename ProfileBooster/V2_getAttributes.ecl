@@ -646,7 +646,7 @@ EXPORT V2_getAttributes(DATASET(ProfileBooster.V2_Layouts.Layout_PB2_Shell) PB2S
                                                                                                             MIN(le.DrgLnJNewMsnc7Y,ProfileBooster.V2_Constants.Max960));
     self.attributes.version2.DrgLnJAmtTot7Y					        := MAP(noDid or isMinor                      => -99999, 
                                                                    le.DrgLnJCnt7Y=0                      => -99998,
-                                                                   le.DrgLnJAmtTot7Y <= 0                 => -99997,
+                                                                   le.DrgLnJAmtTot7Y <= 0                => -99997,
                                                                                                             MIN(le.DrgLnJAmtTot7Y, ProfileBooster.V2_Constants.Max9999999));
     self.attributes.version2.DrgBkCnt10Y							      := IF(noDid or isMinor, -99999, MIN(le.DrgBkCnt10Y,ProfileBooster.V2_Constants.Max255));
     self.attributes.version2.DrgBkCnt1Y							        := IF(noDid or isMinor, -99999, MIN(le.DrgBkCnt1Y,ProfileBooster.V2_Constants.Max255));
@@ -655,13 +655,26 @@ EXPORT V2_getAttributes(DATASET(ProfileBooster.V2_Layouts.Layout_PB2_Shell) PB2S
                                                                    le.DrgBkNewMsnc10Y < 0                => -99997,
                                                                                                             MIN(le.DrgBkNewMsnc10Y,ProfileBooster.V2_Constants.Max960));
     self.attributes.version2.ProfLicFlagEv									:= IF(noDid or isMinor, -99999, le.ProfLicFlagEv);
-    self.attributes.version2.ProfLicActivNewIndx  					:= IF(noDid or isMinor, -99999, MIN(le.ProfLicActivNewIndx, ProfileBooster.V2_Constants.Max5));
+    ProfLicActivNewIndx                           					:= MAP(noDid or isMinor                      => -99999,
+                                                                   le.ProfLicFlagEv = 0                  => -99998, 
+                                                                   le.ProfLicActivNewIndx = 0            => -99997,
+                                                                   MIN(le.ProfLicActivNewIndx, ProfileBooster.V2_Constants.Max5));
+    self.attributes.version2.ProfLicActivNewIndx            := ProfLicActivNewIndx;
     self.attributes.version2.BusAssocFlagEv					        := IF(noDid or isMinor, -99999, le.BusAssocFlagEv);
-    self.attributes.version2.BusAssocOldMSnc          			:= IF(noDid or isMinor /*or le.OccBusinessAssociationTime = ProfileBooster.V2_Constants.Max9999999*/, -99999, MIN(le.BusAssocOldMSnc,ProfileBooster.V2_Constants.Max960));
-    self.attributes.version2.BusLeadershipTitleFlag   			:= IF(noDid or isMinor, -99999, le.BusLeadershipTitleFlag);
+    self.attributes.version2.BusAssocOldMSnc          			:= MAP(noDid or isMinor                      => -99999, 
+                                                                   le.busassocflagev = 0                 => -99998,
+                                                                                                            MIN(le.BusAssocOldMSnc,ProfileBooster.V2_Constants.Max960));
+    self.attributes.version2.BusLeadershipTitleFlag   			:= MAP(noDid or isMinor                      => -99999, 
+                                                                   le.busassocflagev = 0                 => -99998,
+                                                                                                            le.BusLeadershipTitleFlag);
     self.attributes.version2.BusAssocCntEv			            := IF(noDid or isMinor, -99999, MIN(le.BusAssocCntEv,99));
-    self.attributes.version2.BusAssocSmBusFlag		          := IF(noDid or isMinor, -99999, le.BusAssocSmBusFlag);
-    self.attributes.version2.ProfLicActvNewTitleType			  := IF(noDid or isMinor, '-99999', le.ProfLicActvNewTitleType);
+    // self.attributes.version2.BusAssocSmBusFlag		          := IF(noDid or isMinor, -99999, le.BusAssocSmBusFlag);
+    self.attributes.version2.ProfLicActvNewTitleType			  := MAP(noDid or isMinor                      => '-99999', 
+                                                                   le.ProfLicFlagEv = 0                  => '-99998',
+                                                                   ProfLicActivNewIndx = -99997          => '-99997',
+                                                                   ProfLicActivNewIndx = -99998          => '-99998',
+                                                                   le.ProfLicActvNewTitleType = ''       => '-99998',
+                                                                                                            le.ProfLicActvNewTitleType);
     self.attributes.version2.BusUCCFilingCntEv			        := IF(noDid or isMinor, -99999, MIN(le.BusUCCFilingCntEv,ProfileBooster.V2_Constants.Max999));
     self.attributes.version2.BusUCCFilingActiveCnt			    := IF(noDid or isMinor, -99999, MIN(le.BusUCCFilingActiveCnt,ProfileBooster.V2_Constants.Max999));
 
@@ -670,11 +683,17 @@ EXPORT V2_getAttributes(DATASET(ProfileBooster.V2_Layouts.Layout_PB2_Shell) PB2S
     self.attributes.version2.IntSportPersonFlag5Y					  := IF(noDid or isMinor, -99999, le.IntSportPersonFlag5Y);	
     self.attributes.version2.IntSportPersonTravelerFlagEv	  := IF(noDid or isMinor, -99999, le.IntSportPersonTravelerFlagEv);	
     
-    self.attributes.version2.EmrgAge	                      := IF(noDid or isMinor, -99999, MIN(le.EmrgAge,ProfileBooster.V2_Constants.Max99));	
-    self.attributes.version2.EmrgAtOrAfter21Flag	          := IF(noDid or isMinor, -99999, le.EmrgAtOrAfter21Flag);	
-    self.attributes.version2.EmrgRecordType	                := IF(noDid or isMinor, -99999, le.EmrgRecordType);	
-    self.attributes.version2.EmrgAddressHRIndex	            := IF(noDid or isMinor, -99999, MIN(le.EmrgAddressHRIndex,ProfileBooster.V2_Constants.Max10));	
-    self.attributes.version2.EmrgLexIDsAtEmrgAddrCnt1Y      := IF(noDid or isMinor, -99999, MIN(le.EmrgLexIDsAtEmrgAddrCnt1Y,ProfileBooster.V2_Constants.Max999));	
+    self.attributes.version2.EmrgAge	                      := MAP(noDid or isMinor                      => -99999, 
+                                                                   le.EmrgRecordType = ''                => -99998,
+                                                                                                            MIN(le.EmrgAge,ProfileBooster.V2_Constants.Max99));	
+    self.attributes.version2.EmrgAtOrAfter21Flag	          := MAP(noDid or isMinor                      => -99999, 
+                                                                   le.EmrgAge = -99998                   => -99998,
+                                                                                                            le.EmrgAtOrAfter21Flag);	
+    self.attributes.version2.EmrgRecordType	                := IF(noDid or isMinor, '-99999', le.EmrgRecordType);	
+    self.attributes.version2.EmrgAddrType	                  := IF(noDid or isMinor, '-99999', le.EmrgAddrType);	
+    self.attributes.version2.EmrgLexIDsAtEmrgAddrCnt1Y      := MAP(noDid or isMinor                      => -99999, 
+                                                                   le.EmrgAddrType = '-99998'            => -99998,
+                                                                                                            MIN(le.EmrgLexIDsAtEmrgAddrCnt1Y,ProfileBooster.V2_Constants.Max999));	
     self.attributes.version2.EmrgAge25to59Flag	            := IF(noDid or isMinor, -99999, le.EmrgAge25to59Flag);	
 
     self.attributes.version2.ShortTermShopNewMsnc	          := MAP(noDid or isMinor                      => -99999, 

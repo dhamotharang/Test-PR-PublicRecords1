@@ -248,16 +248,33 @@ EXPORT V2_Transforms := MODULE
     SELF.BusAssocOldMSnc := ri.BusAssocOldMSnc;
     SELF.BusLeadershipTitleFlag := ri.BusLeadershipTitleFlag;
     SELF.BusAssocCntEv := ri.BusAssocCntEv;
-    SELF.BusAssocSmBusFlag := ri.BusAssocSmBusFlag;
     SELF.ProfLicActvNewTitleType := ri.ProfLicActvNewTitleType;
     SELF.BusUCCFilingCntEv := ri.BusUCCFilingCntEv;
     SELF.BusUCCFilingActiveCnt := ri.BusUCCFilingActiveCnt;
-    SELF.EmrgAge := ri.EmrgAge;
-    SELF.EmrgAtOrAfter21Flag := ri.EmrgAtOrAfter21Flag;
-    SELF.EmrgRecordType := ri.EmrgRecordType;
-    SELF.EmrgAddressHRIndex := ri.EmrgAddressHRIndex;
-    SELF.EmrgLexIDsAtEmrgAddrCnt1Y := ri.EmrgLexIDsAtEmrgAddrCnt1Y;
-    SELF.EmrgAge25to59Flag := ri.EmrgAge25to59Flag;
+    
+    OlderErmgRecord := ri.EmrgDt_first_seen < le.EmrgDt_first_seen and ri.EmrgDt_first_seen>0;
+  	self.EmrgDt_first_seen   := IF(OlderErmgRecord,ri.EmrgDt_first_seen,le.EmrgDt_first_seen);
+		self.EmrgSrc             := IF(OlderErmgRecord,ri.EmrgSrc,le.EmrgSrc);
+		self.EmrgDob			       := IF(OlderErmgRecord,ri.EmrgDob,le.EmrgDob);
+		self.EmrgAge   			     := IF(OlderErmgRecord,ri.EmrgAge,le.EmrgAge);
+		self.EmrgPrimaryRange    := IF(OlderErmgRecord,ri.EmrgPrimaryRange,le.EmrgPrimaryRange);
+		self.EmrgPredirectional	 := IF(OlderErmgRecord,ri.EmrgPredirectional,le.EmrgPredirectional);
+		self.EmrgPrimaryName	   := IF(OlderErmgRecord,ri.EmrgPrimaryName,le.EmrgPrimaryName);
+		self.EmrgSuffix	         := IF(OlderErmgRecord,ri.EmrgSuffix,le.EmrgSuffix);	
+		self.EmrgPostdirectional := IF(OlderErmgRecord,ri.EmrgPostdirectional,le.EmrgPostdirectional);
+		self.EmrgUnitDesignation := IF(OlderErmgRecord,ri.EmrgUnitDesignation,le.EmrgUnitDesignation);
+		self.EmrgSecondaryRange	 := IF(OlderErmgRecord,ri.EmrgSecondaryRange,le.EmrgSecondaryRange);
+		self.EmrgCity_Name	     := IF(OlderErmgRecord,ri.EmrgCity_Name,le.EmrgCity_Name);	
+		self.EmrgSt			         := IF(OlderErmgRecord,ri.EmrgSt,le.EmrgSt);
+		self.EmrgZIP5			       := IF(OlderErmgRecord,ri.EmrgZIP5,le.EmrgZIP5);
+		self.EmrgZIP4		         := IF(OlderErmgRecord,ri.EmrgZIP4,le.EmrgZIP4);
+	
+    SELF.EmrgAtOrAfter21Flag := IF(OlderErmgRecord,ri.EmrgAtOrAfter21Flag,le.EmrgAtOrAfter21Flag);
+    SELF.EmrgRecordType      := IF(OlderErmgRecord,ri.EmrgRecordType,le.EmrgRecordType);
+    SELF.EmrgAddrType        := IF(OlderErmgRecord,ri.EmrgAddrType,le.EmrgAddrType);
+    SELF.EmrgLexIDsAtEmrgAddrCnt1Y := IF(OlderErmgRecord,ri.EmrgLexIDsAtEmrgAddrCnt1Y,le.EmrgLexIDsAtEmrgAddrCnt1Y);
+    SELF.EmrgAge25to59Flag   := IF(OlderErmgRecord,ri.EmrgAge25to59Flag,le.EmrgAge25to59Flag);
+    
     SELF.DrgCnt7Y := ri.DrgCnt7Y;
     SELF.DrgSeverityIndx7Y := ri.DrgSeverityIndx7Y;
     SELF.DrgCnt1Y := ri.DrgCnt1Y;
@@ -288,7 +305,7 @@ EXPORT V2_Transforms := MODULE
     SELF.ShortTermShopCnt5Y := ri.ShortTermShopCnt5Y;
     SELF.ShortTermShopCnt1Y := ri.ShortTermShopCnt1Y;
     SELF.HHID := ri.HHID;
-    //HELPER ATTRIBUTES
+
     SELF.CurrAddrAVMVal := ri.CurrAddrAVMVal;
     SELF.CurrAddrAVMValA1Y := ri.CurrAddrAVMValA1Y;
     SELF.CurrAddrAVMRatio1Y := (STRING10)ri.CurrAddrAVMRatio1Y;
@@ -386,12 +403,17 @@ EXPORT V2_Transforms := MODULE
   EXPORT ProfileBooster.V2_Layouts.Layout_PB2_Shell getDeceasedDID(ProfileBooster.V2_Layouts.Layout_PB2_Shell le, Doxie.key_Death_masterV2_ssa_DID ri) := transform
 		SELF.dod 		:= if(ri.src <> MDR.sourceTools.src_Death_Restricted, (UNSIGNED)ri.dod8, 0);  //excludes SSA 
 		SELF.dodSSA := (UNSIGNED)ri.dod8;  //unrestricted so includes SSA
-		self 	:= le;
+		self 	      := le;
 	END;
   
   EXPORT ProfileBooster.V2_Layouts.Layout_PB2_Shell rollDeceased(ProfileBooster.V2_Layouts.Layout_PB2_Shell le, ProfileBooster.V2_Layouts.Layout_PB2_Shell ri) := transform
 		SELF.dod		:= max(le.dod, ri.dod);
 		SELF.dodSSA	:= max(le.dodSSA, ri.dodSSA);
+		self				:= le;
+	END;
+
+  EXPORT ProfileBooster.V2_Layouts.Layout_PB2_Shell rollEmergence(ProfileBooster.V2_Layouts.Layout_PB2_Shell le, ProfileBooster.V2_Layouts.Layout_PB2_Shell ri) := transform
+		SELF.emrglexidsatemrgaddrcnt1y := le.emrglexidsatemrgaddrcnt1y + ri.emrglexidsatemrgaddrcnt1y;
 		self				:= le;
 	END;
   
