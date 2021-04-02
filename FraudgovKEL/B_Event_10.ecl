@@ -4,8 +4,8 @@ IMPORT B_Event_11,E_Address,E_Bank,E_Bank_Account,E_Customer,E_Drivers_License,E
 IMPORT * FROM KEL011.Null;
 EXPORT B_Event_10 := MODULE
   SHARED VIRTUAL TYPEOF(B_Event_11.__ENH_Event_11) __ENH_Event_11 := B_Event_11.__ENH_Event_11;
-  SHARED __EE109956 := __ENH_Event_11;
-  EXPORT __ST103879_Layout := RECORD
+  SHARED __EE112217 := __ENH_Event_11;
+  EXPORT __ST106140_Layout := RECORD
     KEL.typ.nuid UID;
     KEL.typ.ntyp(E_Customer.Typ) _r_Customer_;
     KEL.typ.ntyp(E_Customer.Typ) _r_Source_Customer_;
@@ -308,9 +308,9 @@ EXPORT B_Event_10 := MODULE
     KEL.typ.epoch Date_Last_Seen_ := 0;
     KEL.typ.int __RecordCount := 0;
   END;
-  SHARED __ST103879_Layout __ND110573__Project(B_Event_11.__ST104491_Layout __PP108431) := TRANSFORM
-    SELF.T___Src_Class_Type_ := MAP(__T(__OP2(__PP108431.T___Src_Type_,=,__CN(-99997)))=> -99997,__T(__OP2(__PP108431.T___Src_Type_,IN,__CN([6,14])))=>0,__T(__OP2(__PP108431.T___Src_Type_,IN,__CN([4,8,11])))=>1,__T(__OP2(__PP108431.T___Src_Type_,IN,__CN([3,7])))=>2,__T(__OP2(__PP108431.T___Src_Type_,IN,__CN([2,5])))=>3,4);
-    SELF := __PP108431;
+  SHARED __ST106140_Layout __ND112834__Project(B_Event_11.__ST106752_Layout __PP110692) := TRANSFORM
+    SELF.T___Src_Class_Type_ := MAP(__T(__OP2(__PP110692.T___Src_Type_,=,__CN(-99997)))=> -99997,__T(__OP2(__PP110692.T___Src_Type_,IN,__CN([6,14])))=>0,__T(__OP2(__PP110692.T___Src_Type_,IN,__CN([4,8,11])))=>1,__T(__OP2(__PP110692.T___Src_Type_,IN,__CN([3,7])))=>2,__T(__OP2(__PP110692.T___Src_Type_,IN,__CN([2,5])))=>3,4);
+    SELF := __PP110692;
   END;
-  EXPORT __ENH_Event_10 := PROJECT(__EE109956,__ND110573__Project(LEFT)) : PERSIST('~fraudgov::temp::KEL::FraudgovKEL::Event::Annotated_10',EXPIRE(7));
+  EXPORT __ENH_Event_10 := PROJECT(__EE112217,__ND112834__Project(LEFT)) : PERSIST('~fraudgov::temp::KEL::FraudgovKEL::Event::Annotated_10',EXPIRE(7));
 END;

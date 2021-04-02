@@ -1,7 +1,7 @@
-﻿import roxiekeybuild,seed_files;
+﻿IMPORT Orbit3,roxiekeybuild,seed_files;
 
-export Proc_InstantID_Keys(string filedate) := 
-function
+EXPORT Proc_InstantID_Keys(STRING filedate, BOOLEAN isDatalandBuild = FALSE) := 
+FUNCTION
 
 
 roxiekeybuild.mac_sk_buildprocess_v2_local(Seed_Files.Key_InstantID,'abc','~thor_data400::key::testseed::'+filedate+'::instantid',a);
@@ -165,12 +165,10 @@ buildkey := parallel(a,b,c,ca,aa,bb,cc,d,e,f,g,h,i,j,k,l,m,n,hc,amlr,amlrb, amlr
 movekey := sequential(a1,b1,c1,ca1,aa1,bb1,cc1,d1,e1,f1,g1,h1,i1,j1,k1,l1,m1,n1,hcbuilt,amlrbuilt,amlrbbuilt,amlrbuiltv2,amlrbbuiltv2,idfabuilt,idfcbuilt,idfebuilt,idfibuilt,idfnbuilt,idfpbuilt,idfsbuilt,vobuilt,intlggbuilt,prbobuilt,sbabuilt,sbfebuilt,sbmbuilt,osbuilt, osattributesbuilt, biid20Pt1built,biid20Pt2built,biid20Pt3built,sba20built,vor1built,vor2built,vor3built,vor4built,vor5built,vor6built,vor7built);
 movetoqa := sequential(a2,b2,c2,ca2,aa2,bb2,cc2,d2,e2,f2,g2,h2,i2,j2,k2,l2,m2,n2,hcqa,amlrqa,amlrbqa, amlrqav2,amlrbqav2,idfaqa,idfcqa,idfeqa,idfiqa,idfnqa,idfpqa,idfsqa,voqa,intlggqa,prboqa,sbaqa,sbfeqa,sbmqa,osqa, osattributesqa, biid20Pt1qa,biid20Pt2qa,biid20Pt3qa,sba20qa,vor1qa,vor2qa,vor3qa,vor4qa,vor5qa,vor6qa,vor7qa);
 
+orbit_update := Orbit3.proc_Orbit3_CreateBuild_AddItem('Test Seed Keys',(string)filedate,'N');
 
- dops_update := Roxiekeybuild.updateversion('TestseedKeys',filedate,'john.freibaum@lexisnexisrisk.com,Anantha.Venkatachalam@lexisnexisrisk.com',,'N');
+RETURN IF(isDatalandBuild,
+          sequential(buildkey,movekey),
+          sequential(buildkey,movekey,movetoqa,orbit_update));
 
-
-return sequential(buildkey,movekey,movetoqa,dops_update);
-
-
-
-end;
+END;

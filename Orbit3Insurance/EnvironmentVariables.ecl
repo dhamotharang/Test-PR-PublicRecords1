@@ -17,7 +17,7 @@ export  namespace :=   IF( STD.System.Util.PlatformVersionCheck('7.8') ,
 
 	export 	SOAPActionLogin 	:=	'http://lexisnexis.com/Orbit/IOrbitServiceBase/Login';
 	export	ServiceUserName		:=	'svc_ccc_orbit_hpcc@mbs';
-	export	ServicePassword		:=	'7lSo57vdy83H';
+	export	ServicePassword		:=	'Krn9ctL4aK';
 	export	ApplicationName		:=	'InsuranceUS';
 
 	// export xmlns_  := 'http://schemas.datacontract.org/2004/07/OrbitDataContracts';

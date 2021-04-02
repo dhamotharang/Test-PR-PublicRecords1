@@ -1,29 +1,6 @@
-﻿Import Data_Services, doxie,FLAccidents, STD;
-
-// eCrash & CRU Reports
-EcrashAndCru := FLAccidents_Ecrash.File_KeybuildV2.prout(report_code in ['EA','TM','TF'] and  
-                                                        (work_type_id in ['2','3'] or ( (work_type_id in ['0','1']  and 
-																											  (trim(report_type_id,all) in ['A','DE'] or STD.str.ToUpperCase(trim(vendor_code,left,right)) = 'CMPD'))) ) ); 
-// CRU Inq/Natational Accident Reports
-Filter_CRU := FLAccidents_Ecrash.File_KeybuildV2.prout(report_code not in ['EA','TM','TF']);
-				
-// eCrash Reports:  normalize addl_report_number for ecrash TM,TF and EA work type 1,0
-NormAddlRpt := project(EcrashAndCru(trim(addl_report_number,left,right) not in ['','0','UNK', 'UNKNOWN'] and work_type_id not in ['2','3']), 
-                       transform( {EcrashAndCru},
-                                 self.accident_nbr := STD.Str.Filter(left.addl_report_number,'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789');
-                                 self := left;)); 
-
-crash_accnbr_base_norm := (EcrashAndCru + NormAddlRpt + Filter_CRU (vin+driver_license_nbr+tag_nbr+lname <> '')) (trim(accident_nbr,left,right)<> '');
-											 
-dst_accnbr_base := distribute(crash_accnbr_base_norm, hash(orig_accnbr));
-srt_accnbr_base := sort(dst_accnbr_base, except did, except b_did, local);
-dep_accnbr_base := dedup(srt_accnbr_base, except did, except b_did, local);
-
-																				
-export key_EcrashV2_accnbrv1 := index(dep_accnbr_base
-                                  ,{string40 l_accnbr := accident_nbr, report_code,jurisdiction_state, jurisdiction}
-
-								 ,{
+﻿export key_EcrashV2_accnbrv1 := index(mod_PrepEcrashPRKeys().dep_accnbrv1_base
+                   ,{l_accnbr, report_code, jurisdiction_state, jurisdiction}
+                   ,{
 								   orig_accnbr, 
 								   vehicle_incident_id,
 									 vehicle_status,
@@ -185,7 +162,7 @@ export key_EcrashV2_accnbrv1 := index(dep_accnbr_base
 									 Releasable,
 									 Date_Report_Submitted
 									 }
-							     ,Data_Services.Data_location.Prefix('ecrash')+'thor_data400::key::ecrashV2_accnbrv1_' + doxie.Version_SuperKey);
+							     ,Files_PR.FILE_KEY_ACCNBRV1_SF);
 							 		 // ,Data_Services.Data_location.Prefix('ecrash')+'thor_data400::key::PRUS::ecrashV2_accnbrv1_' + doxie.Version_SuperKey);
 										
 

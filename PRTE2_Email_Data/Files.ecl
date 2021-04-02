@@ -3,9 +3,16 @@
 
 EXPORT Files := MODULE
   EXPORT INCOMING_BOCA_1					:= dataset(Constants.in_prefix_name + 'boca', Layouts.incoming_base, CSV(HEADING(1), SEPARATOR('\t'), TERMINATOR(['\n','\r\n']), QUOTE('"')));
-	EXPORT INCOMING_BOCA				   :=	project(INCOMING_BOCA_1(clean_email !=''),Layouts.incoming_base);
-
-
+	
+	EXPORT INCOMING_BOCA				    := project(INCOMING_BOCA_1(clean_email !=''),Layouts.incoming_base);
+		
+	EXPORT INCOMING_INS_1					  := dataset(constants.in_prefix_name  + 'ins', Layouts.incoming_base, CSV(HEADING(1), SEPARATOR('\t'), TERMINATOR(['\n','\r\n']), QUOTE('"')));
+  
+	EXPORT INCOMING_INS 				    := project(INCOMING_INS_1(clean_email !=''),Layouts.incoming_base); 	
+	
+	EXPORT INCOMING_BOCA_ALL			  :=	INCOMING_BOCA +   INCOMING_INS;
+	
+	
 //Insurance Input Base File--	
 	EXPORT email_Base_SF_PROD			:= PRTE2_Common.Constants.Add_Foreign_prod(Constants.base_prefix_alpha + Constants.qaVersion + 'alpha_base');	
 	EXPORT INCOMING_ALPHA  				:= DATASET( email_Base_SF_PROD, Layouts.incoming_alpha, THOR);

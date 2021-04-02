@@ -23,18 +23,21 @@ module
 		 STD.File.ClearSuperFile(FraudGovPlatform.Filenames().Sprayed._NACDelete, true),
 		 STD.File.ClearSuperFile(FraudGovPlatform.Filenames().Sprayed._RDPDelete, true),
 		 STD.File.ClearSuperFile(FraudGovPlatform.Filenames().Sprayed._InquiryLogsDelete, true),
+		 STD.File.ClearSuperFile(FraudGovPlatform.Filenames().Sprayed._DisposableEmailDomainsDelete, true),
 		 STD.File.AddSuperFile(FraudGovPlatform.Filenames().Sprayed._IdentityDataDelete, FraudGovPlatform.Filenames().Sprayed._IdentityDataPassed,addcontents := true),
 		 STD.File.AddSuperFile(FraudGovPlatform.Filenames().Sprayed._KnownFraudDelete, FraudGovPlatform.Filenames().Sprayed._KnownFraudPassed,addcontents := true),
 		 STD.File.AddSuperFile(FraudGovPlatform.Filenames().Sprayed._DeltabaseDelete, FraudGovPlatform.Filenames().Sprayed._DeltabasePassed,addcontents := true),
 		 STD.File.AddSuperFile(FraudGovPlatform.Filenames().Sprayed._NACDelete, FraudGovPlatform.Filenames().Sprayed._NACPassed,addcontents := true),
 		 STD.File.AddSuperFile(FraudGovPlatform.Filenames().Sprayed._RDPDelete, FraudGovPlatform.Filenames().Sprayed._RDPPassed,addcontents := true),
 		 STD.File.AddSuperFile(FraudGovPlatform.Filenames().Sprayed._InquiryLogsDelete, FraudGovPlatform.Filenames().Sprayed._InquiryLogsPassed,addcontents := true),
+		 STD.File.AddSuperFile(FraudGovPlatform.Filenames().Sprayed._DisposableEmailDomainsDelete, FraudGovPlatform.Filenames().Sprayed._DisposableEmailDomainsPassed,addcontents := true),
 		 STD.File.ClearSuperFile(FraudGovPlatform.Filenames().Sprayed._IdentityDataPassed),
 		 STD.File.ClearSuperFile(FraudGovPlatform.Filenames().Sprayed._KnownFraudPassed),
 		 STD.File.ClearSuperFile(FraudGovPlatform.Filenames().Sprayed._DeltabasePassed),
 		 STD.File.ClearSuperFile(FraudGovPlatform.Filenames().Sprayed._NACPassed),
 		 STD.File.ClearSuperFile(FraudGovPlatform.Filenames().Sprayed._RDPPassed),
-		 STD.File.ClearSuperFile(FraudGovPlatform.Filenames().Sprayed._InquiryLogsPassed),		 
+		 STD.File.ClearSuperFile(FraudGovPlatform.Filenames().Sprayed._InquiryLogsPassed),
+		 STD.File.ClearSuperFile(FraudGovPlatform.Filenames().Sprayed._DisposableEmailDomainsPassed),		 
 		 STD.File.FinishSuperFileTransaction()
 		);
 		export Rejected2Delete := SEQUENTIAL(
@@ -45,6 +48,7 @@ module
 		 STD.File.ClearSuperFile(FraudGovPlatform.Filenames().Sprayed._NACRejected, true),
 		 STD.File.ClearSuperFile(FraudGovPlatform.Filenames().Sprayed._RDPRejected, true),
 		 STD.File.ClearSuperFile(FraudGovPlatform.Filenames().Sprayed._InquiryLogsRejected, true),	
+		 STD.File.ClearSuperFile(FraudGovPlatform.Filenames().Sprayed._DisposableEmailDomainsRejected, true),	
 		 STD.File.FinishSuperFileTransaction()
 		);
 

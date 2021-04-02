@@ -22,7 +22,7 @@ EXPORT CarrierReferenceMain_GenerationMod := MODULE(SALT311.iGenerationMod)
   EXPORT spc_FILENAME := 'PhonesInfo';
   EXPORT spc_INGESTSTATUS := '';
   EXPORT spc_EXTERNAL_MAPPING := 'UniqueID:';
-  EXPORT spc_EXTERNAL_BATCH_PARAM := ',/* MY_ */,dt_first_reported,dt_last_reported,dt_start,dt_end,ocn,carrier_name,name,serv,line,prepaid,high_risk_indicator,activation_dt,number_in_service,spid,operator_full_name,is_current,override_file,data_type,ocn_state,overall_ocn,target_ocn,overall_target_ocn,ocn_abbr_name,rural_lec_indicator,small_ilec_indicator,category,carrier_address1,carrier_address2,carrier_floor,carrier_room,carrier_city,carrier_state,carrier_zip,carrier_phone,affiliated_to,overall_company,contact_function,contact_name,contact_title,contact_address1,contact_address2,contact_city,contact_state,contact_zip,contact_phone,contact_fax,contact_email,contact_information,prim_range,predir,prim_name,addr_suffix,postdir,unit_desig,sec_range,p_city_name,v_city_name,st,z5,zip4,cart,cr_sort_sz,lot,lot_order,dpbc,chk_digit,rec_type,ace_fips_st,fips_county,geo_lat,geo_long,msa,geo_blk,geo_match,err_stat,append_rawaid,address_type,privacy_indicator';
+  EXPORT spc_EXTERNAL_BATCH_PARAM := ',/* MY_ */,dt_first_reported,dt_last_reported,dt_start,dt_end,ocn,carrier_name,serv,line,prepaid,high_risk_indicator,activation_dt,number_in_service,spid,operator_full_name,is_current,override_file,data_type,ocn_state,overall_ocn,target_ocn,overall_target_ocn,ocn_abbr_name,rural_lec_indicator,small_ilec_indicator,category,carrier_address1,carrier_address2,carrier_floor,carrier_room,carrier_city,carrier_state,carrier_zip,carrier_phone,affiliated_to,overall_company,contact_function,contact_name,contact_title,contact_address1,contact_address2,contact_city,contact_state,contact_zip,contact_phone,contact_fax,contact_email,contact_information,prim_range,predir,prim_name,addr_suffix,postdir,unit_desig,sec_range,p_city_name,v_city_name,st,z5,zip4,cart,cr_sort_sz,lot,lot_order,dpbc,chk_digit,rec_type,ace_fips_st,fips_county,geo_lat,geo_long,msa,geo_blk,geo_match,err_stat,append_rawaid,address_type,privacy_indicator';
   EXPORT spc_HAS_TWOSTEP := FALSE;
   EXPORT spc_HAS_PARTITION := FALSE;
   EXPORT spc_HAS_FIELDTYPES := TRUE;
@@ -47,14 +47,14 @@ EXPORT CarrierReferenceMain_GenerationMod := MODULE(SALT311.iGenerationMod)
     + 'FIELDTYPE:Invalid_AlphaNum:SPACES( ):ALLOW(ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789)\n'
     + 'FIELDTYPE:Invalid_Char:SPACES( ):ALLOW(ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789&-/\',.)\n'
     + 'FIELDTYPE:Invalid_Date:CUSTOM(Scrubs.fn_valid_date>0)\n'
-    + 'FIELDTYPE:Invalid_Email:SPACES( ):ALLOW(ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-@.=)\n'
+    + 'FIELDTYPE:Invalid_Email:SPACES( ):ALLOW(ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-@=.)\n'
     + 'FIELDTYPE:Invalid_Flag:SPACES( ):ALLOW(1)\n'
     + 'FIELDTYPE:Invalid_Indicator:SPACES( ):ALLOW(X)\n'
-    + 'FIELDTYPE:Invalid_Ocn_Name:ALLOW(ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789 )\n'
+    + 'FIELDTYPE:Invalid_Ocn_Name:ALLOW(ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789):LENGTHS(1..)\n'
     + 'FIELDTYPE:Invalid_NotBlank:LENGTHS(1..)\n'
     + 'FIELDTYPE:Invalid_Num:SPACES( ):ALLOW(0123456789)\n'
     + 'FIELDTYPE:Invalid_SpecialChar:SPACES( ):ALLOW(ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789:/@&#-,&.\')\n'
-    + 'FIELDTYPE:Invalid_Type:ALLOW(0123456789):LENGTHS(1)\n'
+    + 'FIELDTYPE:Invalid_Type:ALLOW(0123):LENGTHS(1)\n'
     + '\n'
     + 'FIELD:dt_first_reported:LIKE(Invalid_Date):TYPE(STRING8):0,0\n'
     + 'FIELD:dt_last_reported:LIKE(Invalid_Date):TYPE(STRING8):0,0\n'
@@ -62,7 +62,6 @@ EXPORT CarrierReferenceMain_GenerationMod := MODULE(SALT311.iGenerationMod)
     + 'FIELD:dt_end:LIKE(Invalid_Date):TYPE(STRING8):0,0\n'
     + 'FIELD:ocn:LIKE(Invalid_Ocn_Name):TYPE(STRING8):0,0\n'
     + 'FIELD:carrier_name:LIKE(Invalid_NotBlank):TYPE(STRING60):0,0\n'
-    + 'FIELD:name:LIKE(Invalid_Ocn_Name):TYPE(STRING60):0,0\n'
     + 'FIELD:serv:LIKE(Invalid_Type):TYPE(STRING1):0,0\n'
     + 'FIELD:line:LIKE(Invalid_Type):TYPE(STRING1):0,0\n'
     + 'FIELD:prepaid:LIKE(Invalid_Flag):TYPE(STRING2):0,0\n'

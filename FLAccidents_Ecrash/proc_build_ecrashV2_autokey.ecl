@@ -1,16 +1,16 @@
-import AutoKeyB2,FLAccidents;
+﻿IMPORT AutoKeyB2, dx_eCrash;
 
-export Proc_build_ecrashV2_autokey(string filedate) := function
+EXPORT Proc_build_ecrashV2_autokey(STRING filedate) := FUNCTION
 
-Cluster		:= '~thor_data400';
-ak_skipSet := FLAccidents.Constants.ak_skipSet;
-ak_typeStr := FLAccidents.Constants.ak_typeStr;
-e_keyname  := Cluster + '::key::ecrashV2::autokey::';
-e_logical	:= Cluster+'::key::ecrashV2::'+filedate+'::autokey::';
-e_dataset	:= FLAccidents_Ecrash.File_Ecrash_AutoKeyV2;
-e_srcType	:= 'ecrash';
+ak_skipSet := dx_eCrash.Constants.ak_skipSet;
+ak_typeStr := dx_eCrash.Constants.ak_typeStr;
 
-AutoKeyB2.MAC_Build (e_dataset
+ak_keyname  := dx_eCrash.Constants.ak_keyname;
+ak_logical	:= dx_eCrash.Names.KEY_PREFIX + '::' + filedate + '::' + dx_eCrash.Names.ECRASHV2_AUTOKEY + '::';
+
+ak_dataset	:= File_Ecrash_AutoKeyV2;
+
+AutoKeyB2.MAC_Build (ak_dataset
 					,fname,mname,lname
 					,zero
 					,zero
@@ -27,16 +27,16 @@ AutoKeyB2.MAC_Build (e_dataset
 					,zero
 					,b_prim_name,b_prim_range,b_st,b_v_city_name,b_zip5,b_sec_range
           ,b_did
-					,e_keyname
-					,e_logical
-					,outaction,false
-					,ak_skipSet,true,ak_typeStr
-					,true,,,zero);
+					,ak_keyname
+					,ak_logical
+					,outaction,FALSE
+					,ak_skipSet,TRUE,ak_typeStr
+					,TRUE,,,zero);
 
-AutoKeyB2.MAC_AcceptSK_to_QA(e_keyname, mymove,, ak_skipset);
+AutoKeyB2.MAC_AcceptSK_to_QA(ak_keyname, mymove,, ak_skipset);
 
-retval := sequential(outaction,mymove);
+retval := SEQUENTIAL(outaction,mymove);
 
-return retval;
+RETURN retval;
 
-end;
+END;

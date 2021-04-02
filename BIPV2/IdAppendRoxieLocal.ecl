@@ -3,7 +3,7 @@ import BIPV2;
 import BIPV2_Company_Names;
 import BIPV2_Suppression;
 import BizLinkFull;
-import SALT311;
+import SALT44;
 import Std.Str;
 import BIPV2_xlink_segmentation;
 
@@ -12,11 +12,11 @@ import BIPV2_xlink_segmentation;
 export IdAppendRoxieLocal(
 		dataset(BIPV2.IdAppendLayouts.AppendInput) inputDs
 		,unsigned scoreThreshold = 75
-		,unsigned weightThreshold = 44
-		,boolean disableSaltForce = false
+		,unsigned weightThreshold = IdConstants.APPEND_WEIGHT_THRESHOLD_ROXIE
+		,boolean disableSaltForce = true
 		,boolean primForcePost = false 
 		,boolean useFuzzy = true
-		,boolean doZipExpansion = true
+		,boolean doZipExpansion = false
 		,boolean reAppend = true
 		,boolean segmentation = true
 	) := function
@@ -49,8 +49,8 @@ inputDsZip :=
 			map(nozip => dataset([], BizLinkFull.Process_Biz_Layouts.layout_zip_cases),
 		      doZipExpansion => zipCases,
 			    oneZip);
-		self.city := if(doZipExpansion, zipsExpanded[1].city, left.city);
-		self.state := if(doZipExpansion, zipsExpanded[1].state, left.state);
+		self.city := if(doZipExpansion, if(zipsExpanded[1].city='', left.city, zipsExpanded[1].city) , left.city);
+		self.state := if(doZipExpansion, if(zipsExpanded[1].state='', left.state, zipsExpanded[1].state), left.state);
 		lenPhone := length(trim(left.phone10));
 		self.company_phone_3 := if(lenPhone = 10, left.phone10[..3], '');
 		self.company_phone_7 := if(lenPhone = 10, left.phone10[4..10], if(lenPhone = 7, trim(left.phone10), ''));
@@ -65,29 +65,29 @@ template := bizlinkfull.process_biz_layouts.inputlayout;
 SALTInput := project(inputDsCnp, transform({BizLinkFull.Process_Biz_Layouts.InputLayout},
   self.UniqueID       := (typeof(Template.UniqueID))left.request_id;
 	// company name prefix is an option
-	namePrefix := BizLinkFull.Fields.Make_company_name_prefix((SALT311.StrType) BizLinkFull.fn_company_name_prefix(left.cnp_name));
+	namePrefix := BizLinkFull.Fields.Make_company_name_prefix((SALT44.StrType) BizLinkFull.fn_company_name_prefix(left.cnp_name));
   self.company_name_prefix := if(not useFuzzy, '',
 	                               (typeof(Template.company_name_prefix)) namePrefix);
   self.cnp_number     := (typeof(Template.cnp_number))left.cnp_number;
   self.cnp_btype      := (typeof(Template.cnp_btype))left.cnp_btype;
   self.cnp_lowv       := (typeof(Template.cnp_lowv))left.cnp_lowv;
-  self.cnp_name       := (typeof(Template.cnp_name))BizLinkFull.Fields.Make_cnp_name((SALT311.StrType)LEFT.cnp_name);
+  self.cnp_name       := (typeof(Template.cnp_name))BizLinkFull.Fields.Make_cnp_name((SALT44.StrType)LEFT.cnp_name);
   self.prim_range     := (typeof(Template.prim_range))left.prim_range;
-  self.prim_name      := (typeof(Template.prim_name))BizLinkFull.Fields.Make_prim_name((SALT311.StrType)LEFT.prim_name);
-  self.sec_range      := (typeof(Template.sec_range))BizLinkFull.Fields.Make_sec_range((SALT311.StrType)LEFT.sec_range);   
-  self.city           := (typeof(Template.city))BizLinkFull.Fields.Make_city((SALT311.StrType)LEFT.city);
-  self.st             := (typeof(Template.st))BizLinkFull.Fields.Make_st((SALT311.StrType)LEFT.state);
+  self.prim_name      := (typeof(Template.prim_name))BizLinkFull.Fields.Make_prim_name((SALT44.StrType)LEFT.prim_name);
+  self.sec_range      := (typeof(Template.sec_range))BizLinkFull.Fields.Make_sec_range((SALT44.StrType)LEFT.sec_range);   
+  self.city           := (typeof(Template.city))BizLinkFull.Fields.Make_city((SALT44.StrType)LEFT.city);
+  self.st             := (typeof(Template.st))BizLinkFull.Fields.Make_st((SALT44.StrType)LEFT.state);
   self.zip_cases      := LEFT.zip_cases;
   self.company_phone  := (typeof(Template.company_phone))left.phone10;
   self.company_phone_3 := (typeof(Template.company_phone_3))left.company_phone_3;
   self.company_phone_3_ex:= '';
   self.company_phone_7 := (typeof(Template.company_phone_7))left.company_phone_7;
   self.company_fein   := (typeof(Template.company_fein))LEFT.fein;
-  self.company_url    := (typeof(Template.company_url))BizLinkFull.Fields.Make_company_url((SALT311.StrType)LEFT.url);
-  self.company_sic_code1 :=(typeof(Template.company_sic_code1))BizLinkFull.Fields.Make_company_sic_code1((SALT311.StrType)LEFT.sic_code);
-  self.fname          := (typeof(Template.fname))BizLinkFull.Fields.Make_fname((SALT311.StrType)left.contact_fname);
-  self.mname          := (typeof(Template.mname))BizLinkFull.Fields.Make_mname((SALT311.StrType)left.contact_mname);
-  self.lname          := (typeof(Template.lname))BizLinkFull.Fields.Make_lname((SALT311.StrType)left.contact_lname);
+  self.company_url    := (typeof(Template.company_url))BizLinkFull.Fields.Make_company_url((SALT44.StrType)LEFT.url);
+  self.company_sic_code1 :=(typeof(Template.company_sic_code1))BizLinkFull.Fields.Make_company_sic_code1((SALT44.StrType)LEFT.sic_code);
+  self.fname          := (typeof(Template.fname))BizLinkFull.Fields.Make_fname((SALT44.StrType)left.contact_fname);
+  self.mname          := (typeof(Template.mname))BizLinkFull.Fields.Make_mname((SALT44.StrType)left.contact_mname);
+  self.lname          := (typeof(Template.lname))BizLinkFull.Fields.Make_lname((SALT44.StrType)left.contact_lname);
   self.fname_preferred := (typeof(Template.fname_preferred))left.fname_preferred;
   self.contact_email  := (typeof(Template.contact_email))left.Email;
   self.contact_ssn    := (typeof(Template.contact_ssn))left.contact_ssn;
@@ -325,15 +325,5 @@ topIds :=
 	suppressed :=  BIPV2_Suppression.macSuppress(preSuppression + passThruPreSuppress);
 
 	return suppressed;
-
-	// return parallel(
-		// output(SALTInput, named('SALTInput'));
-		// output(rawResults, named('rawResults'));
-		// output(preSuppression, named('preSuppression'));
-		// output(passThru0, named('passThru0'));
-		// output(passThru, named('passThru'));
-		// output(passThruPreSuppress, named('passThruPreSuppress'));
-		// output(suppressed, named('suppressed'));
-	// );
 
 end;

@@ -6,10 +6,9 @@
 
 IMPORT _Control, BankruptcyV2, BankruptcyV3, data_services, STD, ut;
 
-export FCRA_Bankruptcy(string pHostname, string pTarget, string pContact ='\' \'') := function
+export FCRA_Bankruptcy(string pHostname, string pTarget, string pContact ='\' \'', STRING today = (STRING8)STD.Date.Today()) := function
 
-filedate := (STRING8)Std.Date.Today();
-rpt_yyyymmdd := filedate[1..8];
+filedate := today;
 
 // BKv3_base := BankruptcyV2.file_bankruptcy_main_v3;
 // Key_BKv3_FCRA_main := INDEX(BKv3_base,{string50 tmsid},{BKv3_base} - [tmsid,scrubsbits1], data_services.foreign_prod+'thor_data400::key::bankruptcyv3::fcra::main::tmsid_qa');
@@ -36,7 +35,7 @@ despray_bk_tbl := STD.File.DeSpray('~thor_data400::data_insight::data_metrics::t
 //if everything in the Sequential statement runs, it will send the Success email, else it will send the Failure email
 email_alert := SEQUENTIAL(
 					output(tbl_Key_BKv3_FCRA_2010_filings,,'~thor_data400::data_insight::data_metrics::tbl_Key_BKV3_FCRA_2010_filings_by_Chapter_'+ filedate +'.csv'
-					,csv(heading(single), separator('|'),terminator('\r\n'),quote('\"')),overwrite)
+					,csv(heading(single), separator('|'),terminator('\r\n'),quote('\"')), overwrite, expire(10))
 					,despray_bk_tbl):
 					Success(FileServices.SendEmail(pContact, 'FCRA Group: FCRA_Bankruptcy Build Succeeded', workunit + ': Build complete.' + filedate)),
 					Failure(FileServices.SendEmail(pContact, 'FCRA Group: FCRA_Bankruptcy Build Failed', workunit + filedate + '\n' + FAILMESSAGE)

@@ -1,7 +1,7 @@
 ﻿// -- both take in datasets in their respective layouts.  Adds those candidates to the underlink file.
 
-// -- BIPV2_ForceLink.Layouts.Proxid_Underlink  -- { unsigned6 proxid  ,integer   underLinkId }
-// -- BIPV2_ForceLink.Layouts.lgid3_Underlink   -- { unsigned6 lgid3   ,integer   underLinkId }
+// -- BIPV2_ForceLink.Layouts.input.Proxid_Underlink  -- { unsigned6 proxid  ,integer   underLinkId  ,string comment}
+// -- BIPV2_ForceLink.Layouts.input.lgid3_Underlink   -- { unsigned6 lgid3   ,integer   underLinkId  ,string comment}
 
 
 EXPORT Add_Candidates :=

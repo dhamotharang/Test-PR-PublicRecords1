@@ -1,4 +1,4 @@
-//////////////////////////////////////////////////////////////////////////////////////////
+﻿//////////////////////////////////////////////////////////////////////////////////////////
 // Attribute 	: Call_Manage_Superfiles
 
 // PARAMETERS	: movefile = true - moves the logical file from in superfile to using 
@@ -20,7 +20,7 @@ import UCCV2;
 
 export Call_Manage_InSuperfiles(boolean movefile,boolean preprocess = false) := function
 	// UCCV2 dictionary is used as s lookup for source and sourcetype
-	ds := if (preprocess,UCCV2.UCCV2_Dictionary(sourcetype = 'ALL'),UCCV2.UCCV2_Dictionary);
+	ds := if (preprocess,UCCV2.UCCV2_Dictionary(sourcetype in ['ALL','AllSecuredParty','AllDebtors','Filings']),UCCV2.UCCV2_Dictionary);
 	recs := record
 		ds.source;
 		ds.sourcetype;

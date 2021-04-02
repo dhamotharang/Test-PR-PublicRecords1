@@ -50,8 +50,8 @@ EXPORT Proc_Build_Ported_Metadata_DeltaFile_PDV(string version, string filename,
 	
 	//Run Build & Provide Email on Build Status
 	sendEmail		:= sequential(sprayDailyDelta, buildBaseDelta, desprayBaseDelta, moveComBaseDelta):
-														Success(FileServices.SendEmail(_control.MyInfo.EmailAddressNotify + ';judy.tao@lexisnexisrisk.com' /*+ ';gregory.rose@lexisnexisrisk.com' + ';darren.knowles@lexisnexisrisk.com'*/, 'Prod PhonesInfo Ported & Metadata DeltaBase Key Build Succeeded', workunit + ': Build complete.')),
-														Failure(FileServices.SendEmail(_control.MyInfo.EmailAddressNotify + ';judy.tao@lexisnexisrisk.com' /*+ ';gregory.rose@lexisnexisrisk.com' + ';darren.knowles@lexisnexisrisk.com'*/, 'Prod PhonesInfo Ported & Metadata DeltaBaseKey Build Failed', workunit + '\n' + FAILMESSAGE)
+														Success(FileServices.SendEmail(contacts, 'Prod PhonesInfo Ported & Metadata DeltaBase Key Build Succeeded', workunit + ': Build complete.')),
+														Failure(FileServices.SendEmail(contacts, 'Prod PhonesInfo Ported & Metadata DeltaBaseKey Build Failed', workunit + '\n' + FAILMESSAGE)
 														);
 
 	return sendEmail;

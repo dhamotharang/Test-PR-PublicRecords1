@@ -6,7 +6,7 @@
 	/*portV2: N = Use PMT or 
 						Y = Use Phone Type File*/
 
-EXPORT Pull_New_Phones(string version, string portV2) := FUNCTION
+EXPORT Pull_New_Phones(string version, string portV2, string contacts) := FUNCTION
  
 	///////////////////////////////////////////////////////////////////////////////
 	//Find New Phone Records Not in iConectiv Port File////////////////////////////
@@ -32,7 +32,7 @@ EXPORT Pull_New_Phones(string version, string portV2) := FUNCTION
 			prtPMT 			:= project(dedup(sort(distribute(PhonesInfo.File_Metadata.PortedMetadata_Main(is_ported=true and source in ['P!','PK']), hash(phone)), phone, local), phone, local), phLayout);
 			
 			//Phone Type File	
-			prtPType		:= project(dedup(sort(distribute(PhonesInfo.File_Phones_Transaction.Main(source in ['P!','PK'] and transaction_code='PA' and transaction_end_dt=0), hash(phone)), phone, local), phone, local), phLayout);
+			prtPType		:= project(dedup(sort(distribute(PhonesInfo.File_Phones_Transaction.Main(source in ['P!','PK'] and transaction_code='PA' and transaction_end_dt=0), hash(phone)), phone, -vendor_last_reported_dt, local), phone, local), phLayout);
 	
 	dsIC 						:= if(portV2='N',
 												prtPMT,							//Phones Metadata Key
@@ -73,6 +73,16 @@ EXPORT Pull_New_Phones(string version, string portV2) := FUNCTION
 	
 	outFile					:= output(ddNewPhFile,, '~thor_data400::in::phones::new_phone_daily_' + version, __compressed__);
 	
-	RETURN outFile;
+	//Email Build Status	
+	emailDOps					:= contacts;
+	emailDev					:= ';judy.tao@lexisnexisrisk.com';
+	
+	emailTarget				:= contacts + emailDev;
+	emailBuildNotice 	:= if(count(ddNewPhFile(phone<>'')) > 0
+																,fileservices.SendEmail(emailTarget, 'Phones Metadata: New L6_Phones', 'Phones Metadata: New Phones File Is Now Available.  Please see: ' + 'http://uspr-prod-thor-esp.risk.regn.net:8010/WsWorkunits/WUInfo?Wuid='+ workunit + '&Widget=WUDetailsWidget#/stub/Results-DL/Grid')
+																,fileservices.SendEmail(emailTarget, 'Phones Metadata: No New L6', 'There Were No New Phones Records In This Build')
+																);
+																
+	RETURN sequential (outFile, emailBuildNotice);
 	
 END;

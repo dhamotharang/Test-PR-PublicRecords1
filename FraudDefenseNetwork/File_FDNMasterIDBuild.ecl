@@ -1,9 +1,9 @@
-export File_FDNMasterIDBuild := module
+﻿export File_FDNMasterIDBuild := module
 
-shared	ccid_ds            := FraudDefenseNetwork.Files().Input.MBSFdnCCID.sprayed; //456751
-shared	hhid_ds            := FraudDefenseNetwork.Files().Input.MBSFdnHHID.sprayed; //185196
-shared	newGCExcl_ds       := FraudDefenseNetwork.Files().Input.MbsNewGcIdExclusion.sprayed;
-
+shared	ccid_ds            := Files().Input.MBSFdnCCID.sprayed; //456751
+shared	hhid_ds            := Files().Input.MBSFdnHHID.sprayed; //185196
+shared	newGCExcl_ds       := Files().Input.MbsNewGcIdExclusion.sprayed;
+shared 	MsIndTypIncl_ds    := Files().Input.mbsfdnmasteridindtypeinclusion.sprayed;
 
 				gcid_proj          := project(newGCExcl_ds(exclusion_id_type='GCID'), transform(FraudDefenseNetwork.Layouts.Input.FDNMasterID,
 																									self.gc_id               := left.exclusion_id;
@@ -37,13 +37,22 @@ shared	newGCExcl_ds       := FraudDefenseNetwork.Files().Input.MbsNewGcIdExclusi
 																									self                     := [];));
 																					
        FdnmasterId_Fab     := gcid_proj + ccid_proj + hhid_proj;
-export FdnmasterId         := dedup(sort(FdnmasterId_fab, gc_id, hh_id, cc_id, gc_cc_hh_id, FdnmasterId),gc_id, hh_id, cc_id, gc_cc_hh_id, FdnmasterId);
 
 
-		   jn_mastID_Excl      := join(FDNMasterID, newGCExcl_ds(status=1), left.gc_cc_hh_id = right.exclusion_id and left.FDNMasterID_Type = right.exclusion_id_type,
-																																				transform(FraudDefenseNetwork.Layouts.Input.MbsFdnMasterIdExcl, 
+export FdnmasterId         			:= dedup(sort(FdnmasterId_fab, gc_id, hh_id, cc_id, gc_cc_hh_id, FdnmasterId),gc_id, hh_id, cc_id, gc_cc_hh_id, FdnmasterId);
+
+
+shared jn_mastID_Excl      			:= join(FDNMasterID, newGCExcl_ds(status=1), left.gc_cc_hh_id = right.exclusion_id and left.FDNMasterID_Type = right.exclusion_id_type,
+																																				 transform(Layouts.Input.MbsFdnMasterIdExcl, 
 																																									self.FdnmasterId :=left.FdnmasterId,
 																																									self :=right),right outer);
-export FdnmasterIdExcl     := dedup(sort(jn_mastID_Excl,record),record);		
+																																									
+shared jn_mastIDIndTyp_Incl    	:= join(FDNMasterID, MsIndTypIncl_ds(status=1), left.gc_cc_hh_id = right.inclusion_id and left.FDNMasterID_Type = right.inclusion_type,
+																																				transform(Layouts.Input.MbsFdnMasterIDIndTypeIncl, 
+																																									self.FdnmasterId :=left.FdnmasterId,
+																																									self :=right),right outer);
+export FdnmasterIdExcl     			:= dedup(sort(jn_mastID_Excl,record),record);		
+
+export FdnmasterIdIndTypIncl		:= dedup(sort(jn_mastIDIndTyp_Incl,record),record);	
 
 End;

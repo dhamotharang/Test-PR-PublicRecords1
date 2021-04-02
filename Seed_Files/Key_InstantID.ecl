@@ -1,4 +1,4 @@
-import ut;
+import Data_Services,Seed_Files;
 
 
 d :=  seed_files.file_InstantID;
@@ -12,4 +12,4 @@ newtable := table(d,newrec);
 
 export key_InstantID := index(newtable,{dataset_name,hashvalue},
 																	{newtable},
-																	'~thor_data400::key::testseed::qa::instantid');
+																	Data_Services.Data_location.Prefix('NONAMEGIVEN') + 'thor_data400::key::testseed::qa::instantid');

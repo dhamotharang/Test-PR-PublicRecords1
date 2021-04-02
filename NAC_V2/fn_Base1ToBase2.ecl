@@ -136,7 +136,7 @@ EXPORT fn_Base1ToBase2(DATASET(NAC_V2.Layouts.base) b) := FUNCTION
 						self.LastName := left.Client_Last_Name;
 						self.FirstName := left.Client_First_Name;
 						self.MiddleName := left.Client_Middle_Name;
-						self.NameSuffix := '';
+						self.NameSuffix := left.Client_Name_Suffix;
 						
 						self.HoH_Indicator := IF(left.Client_Last_Name=left.Case_Last_Name
 														and left.Client_First_Name=left.Case_First_Name
@@ -179,7 +179,7 @@ EXPORT fn_Base1ToBase2(DATASET(NAC_V2.Layouts.base) b) := FUNCTION
 						self.case_Last_Name := left.case_last_name;
 						self.case_First_Name := left.case_first_name;
 						self.case_Middle_Name := left.case_middle_name;
-						self.case_Name_Suffix := '';
+						self.case_Name_Suffix := left.case_name_suffix;
 						self.RegionCode := '';
 						self.CountyCode := left.case_county_parish_code;
 						self.CountyName := left.case_county_parish_name;

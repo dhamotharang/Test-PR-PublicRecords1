@@ -1,4 +1,4 @@
-Import ut,tools; 
+﻿Import ut,tools; 
 
 EXPORT Build_Base_Main ( 
    string pversion
@@ -7,20 +7,10 @@ EXPORT Build_Base_Main (
 	) := 
 module
 
-  New_records := FraudDefenseNetwork.MapToCommon().NewBaseRid ; 
-	
-	 // Apply AID logic to everything.  
-	 
-  dAppendAID     := FraudDefenseNetwork.Standardize_Entity.address(New_records) : persist(Persistnames.AppendAID);
-	dAppendPhone   := FraudDefenseNetwork.Standardize_Entity.Phone (dAppendAID);
-
-	// Add DID, BDID 
-	NewBase        := Append_IDs.fAll(dAppendPhone);
-	
-													
+  New_records := FraudDefenseNetwork.MapToCommon(pversion).NewBaseRid ; 
+		
 	// Rollup Main Base 
-	
-	pDataset_sort := sort(NewBase , record, -dt_last_seen,-process_date);
+	pDataset_sort := sort(New_records , record, -dt_last_seen,-process_date);
 			
 	pDataset_sort RollupBase(pDataset_sort l, pDataset_sort r) := 
 	transform

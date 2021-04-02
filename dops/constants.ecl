@@ -5,15 +5,15 @@ import STD,lib_thorlib,_Control;
 export constants := module
 	
 	export location := 'B';
-	export devdaliip := fileservices.ResolveHostName('dataland_dali.br.seisint.com');
-	export proddaliip := fileservices.ResolveHostName('prod_dali.br.seisint.com');
+	export devdaliip := [fileservices.ResolveHostName('dataland_dali.br.seisint.com')];
+	export proddaliip := [fileservices.ResolveHostName('prod_dali.br.seisint.com'),'10.173.26.7'];
 	
 	export daliip := nothor(STD.Str.SplitWords(lib_thorlib.thorlib.daliServers(),':')[1]) : independent;
 	export jobowner := nothor(lib_thorlib.thorlib.jobowner()) : independent;
 	
 	export ThorEnvironment := map (
-																	daliip = devdaliip => 'dev'
-																	,daliip = proddaliip => 'prod'
+																	daliip in devdaliip => 'dev'
+																	,daliip in proddaliip => 'prod'
 																	,'na'
 																	);
 	
@@ -219,6 +219,6 @@ export constants := module
 																																	,'NA'
 																																	);	
 	
-	export integer pythonversion := 2;
+	export integer pythonversion := 3;
 	
 end;

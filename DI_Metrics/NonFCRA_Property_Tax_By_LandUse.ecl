@@ -3,9 +3,9 @@
 //original code pulled from W20190211-124931-dataland, that code only pulled records from the 'monthly' file; it did not include the 'fast' file
 
 IMPORT _Control, data_services, LN_PropertyV2, LN_PropertyV2_Fast, STD, ut;
-export NonFCRA_Property_Tax_By_LandUse(string pHostname, string pTarget, string pContact ='\' \'') := function 
+export NonFCRA_Property_Tax_By_LandUse(string pHostname, string pTarget, string pContact ='\' \'', STRING today = (STRING8)STD.Date.Today()) := function 
 
-filedate := (STRING8)Std.Date.Today();
+filedate := today;
 
 tax_key1 := PULL(LN_PropertyV2.key_assessor_fid(false));
 tax_key2 := PULL(LN_PropertyV2_Fast.key_assessor_fid(false,true));
@@ -50,8 +50,8 @@ tbl_Non_FCRA_props_srcB := STD.File.Despray('~thor_data400::data_insight::data_m
 
 //if everything in the Sequential statement runs, it will send the Success email, else it will send the Failure email
 email_alert := SEQUENTIAL(
-					output(sort(tbl_Key_Tax_Non_FCRA_2010_props_srcA, source_val, proc_date,state_code, standardized_land_use_code, skew(1.0)),,'~thor_data400::data_insight::data_metrics::tbl_Key_Tax_Non_FCRA_2010_properties_by_StandLandUse_SrcA_'+ filedate +'.csv', CSV(heading(single), separator('|'),terminator('\r\n'),quote('\"')),overwrite)
-					,output(sort(tbl_Key_Tax_Non_FCRA_2010_props_srcB, source_val, proc_date,state_code, standardized_land_use_code, skew(1.0)),,'~thor_data400::data_insight::data_metrics::tbl_Key_Tax_Non_FCRA_2010_properties_by_StandLandUse_SrcB_'+ filedate +'.csv', CSV(heading(single), separator('|'),terminator('\r\n'),quote('\"')),overwrite)
+					output(sort(tbl_Key_Tax_Non_FCRA_2010_props_srcA, source_val, proc_date,state_code, standardized_land_use_code, skew(1.0)),,'~thor_data400::data_insight::data_metrics::tbl_Key_Tax_Non_FCRA_2010_properties_by_StandLandUse_SrcA_'+ filedate +'.csv', CSV(heading(single), separator('|'),terminator('\r\n'),quote('\"')), overwrite, expire(10))
+					,output(sort(tbl_Key_Tax_Non_FCRA_2010_props_srcB, source_val, proc_date,state_code, standardized_land_use_code, skew(1.0)),,'~thor_data400::data_insight::data_metrics::tbl_Key_Tax_Non_FCRA_2010_properties_by_StandLandUse_SrcB_'+ filedate +'.csv', CSV(heading(single), separator('|'),terminator('\r\n'),quote('\"')), overwrite, expire(10))
 					,tbl_Non_FCRA_props_srcA  
 					,tbl_Non_FCRA_props_srcB):
 					Success(FileServices.SendEmail(pContact, 'NonFCRA Group: NonFCRA_Property_Tax_By_LandUse Build Succeeded', workunit + ': Build complete.' + filedate)),

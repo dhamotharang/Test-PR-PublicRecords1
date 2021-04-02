@@ -194,6 +194,8 @@
 		self.ocn												:= '';
 		self.global_sid									:= 0;
 		self.record_sid									:= 0;
+		self.alt_spid										:= '';
+		self.lalt_spid									:= '';
 		self 														:= l;
 	end;
 	

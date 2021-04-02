@@ -145,20 +145,10 @@ OCTECT_WIDTH := 3;
 
 	shared MbsRoll			:= Rollup(MbsSrt, Transform(recordof(left),self:=left), fdn_file_info_id,fdn_file_code,gc_id,file_type,ind_type);
 	
-	shared Base_MbsDeltaBase							:= Join(if(FraudGovPlatform._Flags.UseDemoData,MbsRoll,Mbs_orig)
-																							,Files().Input.MbsFdnIndType.Sprayed(status=1)
-																							,left.ind_type=right.ind_type
-																							,Transform(Layouts_Key.Classification.Permissible_use_access,
-																										self.Ind_type_description:=ut.CleanSpacesAndUpper(right.description)
-																										,self:=left,self:=[]));
-
-	
 	shared pFileKeyFDNMasterID     				:= File_FDNMasterIDBuild.FDNMasterID;
   shared pFileKeyFDNMasterIDExcl 				:= File_FDNMasterIDBuild.FDNMasterIDExcl;
 	shared pFileKeyFDNMasterIDIndTypIncl 	:= File_FDNMasterIDBuild.FdnmasterIdIndTypIncl;
  	shared BaseMain_DID            				:= BaseMain(DID != 0);
-	shared BaseMain_BDID           				:= BaseMain(BDID != 0);
-	shared BaseMbs                 				:= BaseMain(classification_Permissible_use_access.fdn_file_info_id != 0);
   shared BaseMain_Email          				:= BaseMain(Email_Address != '');
 	shared BaseMain_Ip             				:= BaseMain(IP_Address != '');
 	shared BaseMain_ProfessionalID 				:= BaseMain(Professional_ID != '');
@@ -172,7 +162,6 @@ OCTECT_WIDTH := 3;
 	shared BaseMain_CityState 						:= BaseMain(clean_address.p_city_name != '' and clean_address.st != '');
 	shared BaseMain_Zip				 						:= BaseMain(clean_address.zip != '');
 	shared BaseMain_CustomerID 						:= BaseMain(customer_id != '');
-	shared BaseMain_County 								:= BaseMain(county != '');
 	shared BaseMain_ReportedDate 					:= BaseMain(Reported_Date != '');
 	shared BaseMain_SerialNumber 					:= BaseMain(Serial_Number != '');
 	shared BaseMain_MACAddress 						:= BaseMain(MAC_Address != '');
@@ -184,20 +173,16 @@ OCTECT_WIDTH := 3;
 	shared BaseMain_BankName							:= BaseMain_BankNamePrep(Bank_Name != '');
 	shared BaseMain_ISP										:= BaseMain_IspPrep;
 	shared BaseMain_IPRange								:= BaseMain_IPRangePrep;
-	shared BaseMain_CustomerProgram				:= BaseMain(classification_permissible_use_access.ind_type_description != '');
 	shared MbsIndTypExclusion      				:= project(Files().Input.MbsIndtypeExclusion.Sprayed,FraudShared.Layouts_Key.MbsindtypeExclusion)(status=1);  
 	shared MbsProdutInclude        				:= project(Files().Input.MbsProductInclude.Sprayed,FraudShared.Layouts_Key.MbsProductInclude)(status=1);  
 	shared MbsFDNMasterID          				:= project(pFileKeyFDNMasterID,FraudShared.Layouts_Key.FDNMasterID);  
 	shared MbsFDNMasterIDExcl      				:= project(pFileKeyFDNMasterIDExcl,FraudShared.Layouts_Key.MbsFdnMasterIdExcl);  
 	shared MbsFDNMasterIDIndTypIncl				:= project(pFileKeyFDNMasterIDIndTypIncl,FraudShared.Layouts_Key.MbsFdnMasterIDIndTypeIncl);  
-	shared BaseMbsVelocityRules						:= File_Velocityrules.Velocity_Key;  
 	shared BaseMbsFdnIndType        			:= project(Files().Input.MbsFdnIndType.Sprayed,Transform(Layouts_Key.MbsFdnIndType,self.description:=ut.CleanSpacesAndUpper(left.description),self:=left))(status=1);
-	shared BaseMbsDeltaBase        				:= Base_MbsDeltaBase;
-
+	
  export Main := module
 	tools.mac_FilesIndex('BaseMain,{record_id, UID},{BaseMain}',KeyNames(pversion).Main.ID,ID);
 	tools.mac_FilesIndex('BaseMain_DID,{DID , classification_Entity.Entity_type_id, classification_Entity.Entity_sub_type_id},{record_id , UID}',KeyNames(pversion).Main.DID,DID);
-	tools.mac_FilesIndex('BaseMain_BDID,{BDID , classification_Entity.Entity_type_id, classification_Entity.Entity_sub_type_id},{record_id , UID}',KeyNames(pversion).Main.BDID,BDID);
 	tools.mac_FilesIndex('BaseMain_Email,{Email_Address , classification_Entity.Entity_type_id, classification_Entity.Entity_sub_type_id},{record_id , UID}',KeyNames(pversion).Main.email,email);
 	tools.mac_FilesIndex('BaseMain_Ip,{IP_Address , classification_Entity.Entity_type_id, classification_Entity.Entity_sub_type_id},{record_id , UID}',KeyNames(pversion).Main.IP,IP);
 	tools.mac_FilesIndex('BaseMain_ProfessionalID,{Professional_ID , classification_Entity.Entity_type_id, classification_Entity.Entity_sub_type_id},{record_id , UID}',KeyNames(pversion).Main.ProfessionalID,ProfessionalID);
@@ -211,29 +196,24 @@ OCTECT_WIDTH := 3;
 	tools.mac_FilesIndex('BaseMain_CityState,{clean_address.p_city_name, clean_address.st , classification_Entity.Entity_type_id, classification_Entity.Entity_sub_type_id},{record_id , UID}',KeyNames(pversion).Main.CityState,CityState);		
 	tools.mac_FilesIndex('BaseMain_Zip,{clean_address.zip , classification_Entity.Entity_type_id, classification_Entity.Entity_sub_type_id},{record_id , UID}',KeyNames(pversion).Main.Zip,Zip);		
 	tools.mac_FilesIndex('BaseMain_CustomerID,{customer_id , classification_Entity.Entity_type_id, classification_Entity.Entity_sub_type_id},{record_id , UID}',KeyNames(pversion).Main.CustomerID,CustomerID);		
-	tools.mac_FilesIndex('BaseMain_County,{county , classification_Entity.Entity_type_id, classification_Entity.Entity_sub_type_id},{record_id , UID}',KeyNames(pversion).Main.County,County);		
 	tools.mac_FilesIndex('BaseMain_ReportedDate,{reported_date , classification_Entity.Entity_type_id, classification_Entity.Entity_sub_type_id},{record_id , UID}',KeyNames(pversion).Main.ReportedDate,ReportedDate);		
 	tools.mac_FilesIndex('BaseMain_SerialNumber,{serial_number , classification_Entity.Entity_type_id, classification_Entity.Entity_sub_type_id},{record_id , UID}',KeyNames(pversion).Main.SerialNumber,SerialNumber);		
 	tools.mac_FilesIndex('BaseMain_MACAddress,{mac_address , classification_Entity.Entity_type_id, classification_Entity.Entity_sub_type_id},{record_id , UID}',KeyNames(pversion).Main.MACAddress,MACAddress);		
 	tools.mac_FilesIndex('BaseMain_Host,{hash64_host , hash64_user, classification_Entity.Entity_type_id, classification_Entity.Entity_sub_type_id},{record_id , UID}',KeyNames(pversion).Main.Host,Host);		
 	tools.mac_FilesIndex('BaseMain_User,{hash64_user , hash64_host, classification_Entity.Entity_type_id, classification_Entity.Entity_sub_type_id},{record_id , UID}',KeyNames(pversion).Main.User,User);		
 	tools.mac_FilesIndex('BaseMain_HouseholdID,{Household_ID , classification_Entity.Entity_type_id, classification_Entity.Entity_sub_type_id},{record_id , UID}',KeyNames(pversion).Main.HouseholdID,HouseholdID);		
-	tools.mac_FilesIndex('BaseMain_CustomerProgram,{classification_permissible_use_access.ind_type_description , classification_Entity.Entity_type_id, classification_Entity.Entity_sub_type_id},{record_id , UID}',KeyNames(pversion).Main.CustomerProgram,CustomerProgram);		
 	tools.mac_FilesIndex('BaseMain_AmountPaid,{Amount_Paid , classification_Entity.Entity_type_id, classification_Entity.Entity_sub_type_id},{record_id , UID}',KeyNames(pversion).Main.AmountPaid,AmountPaid);		
 	tools.mac_FilesIndex('BaseMain_BankRoutingNumber,{Bank_Routing_Number , Entity_type_id, Entity_sub_type_id},{record_id , UID}',KeyNames(pversion).Main.BankRoutingNumber,BankRoutingNumber);		
 	tools.mac_FilesIndex('BaseMain_BankName,{Bank_Name , Entity_type_id, Entity_sub_type_id},{record_id , UID}',KeyNames(pversion).Main.BankName,BankName);		
 	tools.mac_FilesIndex('BaseMain_ISP,{isp , Entity_type_id, Entity_sub_type_id},{record_id , UID}',KeyNames(pversion).Main.Isp,Isp);		
 	tools.mac_FilesIndex('BaseMain_IPRange,{digit1, digit2, digit3, digit4, digit5, digit6, digit7, digit8, digit9, digit10, digit11, digit12, classification_Entity.Entity_type_id, classification_Entity.Entity_sub_type_id},{record_id , UID}',KeyNames(pversion).Main.IPRange,IPRange);		
 	// MBS exclusions 
-	tools.mac_FilesIndex('BaseMbs,{classification_Permissible_use_access.fdn_file_info_id},{record_id , UID}',KeyNames(pversion).Main.Mbs,Mbs);
 	tools.mac_FilesIndex('MbsIndTypExclusion,{fdn_file_info_id},{MbsIndTypExclusion}',KeyNames(pversion).Main.MbsIndTypeExclusion,MbsIndTypeExclusion);
 	tools.mac_FilesIndex('MbsProdutInclude,{fdn_file_info_id},{MbsProdutInclude}',KeyNames(pversion).Main.MbsProductInclude,MbsProductInclude);
 	tools.mac_FilesIndex('MbsFDNMasterID,{gc_id},{MbsFDNMasterID}',KeyNames(pversion).Main.MbsFDNMasterID,MbsFDNMasterIDKey);
 	tools.mac_FilesIndex('MbsFDNMasterIDExcl,{fdn_file_info_id},{MbsFDNMasterIDExcl}',KeyNames(pversion).Main.MbsFDNMasterIDExcl,MbsFDNMasterIDExclKey);
 	tools.mac_FilesIndex('MbsFDNMasterIDIndTypIncl,{fdn_file_info_id},{MbsFDNMasterIDIndTypIncl}',KeyNames(pversion).Main.MbsFDNMasterIDIndTypIncl,MbsFDNMasterIDIndTypInclKey);
-	tools.mac_FilesIndex('BaseMbsVelocityRules,{gc_id},{BaseMbsVelocityRules}',KeyNames(pversion).Main.MbsVelocityRules,MbsVelocityRules);
 	tools.mac_FilesIndex('BaseMbsFdnIndType,{description},{BaseMbsFdnIndType}',KeyNames(pversion).Main.MbsFdnIndType,MbsFdnIndType);
-	tools.mac_FilesIndex('BaseMbsDeltaBase,{gc_id,ind_type},{BaseMbsDeltaBase}',KeyNames(pversion).Main.MbsDeltaBase,MbsDeltaBase);
-
+	
 	end; 	
 end;

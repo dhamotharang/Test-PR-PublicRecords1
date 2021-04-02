@@ -2,7 +2,7 @@
 
 IMPORT PromoteSupers, Std, FLAccidents_Ecrash;
 
-	NtlAccidentsInquiry := FLAccidents_Ecrash.File_CRU_inquiries;
+	NtlAccidentsInquiry := File_CRU_inquiries;
 	
 	Layout_NtlAccidentsInquiry.ConsolidationBase tNtlAccidentsInquiry(NtlAccidentsInquiry L, UNSIGNED1 cnt) := TRANSFORM
 		SELF.report_code := 'I'+ L.report_code;

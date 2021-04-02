@@ -91,7 +91,10 @@ function
                                       ,size_max_filter
 																			);
 
-  myfile_list             := project(myfile_list2_filtered ,transform({recordof(left),string ClusterName,integer8 longsize,integer8 realsize},self.ClusterName := STD.File.GetLogicalFileAttribute('~' + trim(left.name),'clusterName'),self.longsize := left.size,self.realsize := left.size,self := left))
+  myfile_list             := project(myfile_list2_filtered ,transform({recordof(left),string ClusterName,integer8 longsize,integer8 realsize}
+    // ,self.ClusterName := STD.File.GetLogicalFileAttribute('~' + trim(left.name),'clusterName')
+    ,self.clustername := left.cluster
+    ,self.longsize := left.size,self.realsize := left.size,self := left))
   (pCluster			= '' or  regexfind(pCluster		,ClusterName	, nocase)) 
   : independent;
                                       

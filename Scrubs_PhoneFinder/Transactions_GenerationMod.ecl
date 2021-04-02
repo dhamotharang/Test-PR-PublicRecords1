@@ -48,7 +48,7 @@ EXPORT Transactions_GenerationMod := MODULE(SALT311.iGenerationMod)
     + 'FIELDTYPE:Invalid_ID:ALLOW(0123456789R\\\\N)\n'
     + 'FIELDTYPE:Invalid_Code:ALLOW(0123456789\\(\\). -\\\\N)\n'
     + 'FIELDTYPE:Invalid_Alpha:ALLOW(ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz\\\\ )\n'
-    + 'FIELDTYPE:Invalid_AlphaChar:ALLOW(ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789\\(\\)_ .,:#/-&\\\\\')\n'
+    + 'FIELDTYPE:Invalid_AlphaChar:ALLOW(ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789\\\\(\\\\)_[] .,:;#/-&\\\\\'*)\n'
     + 'FIELDTYPE:Invalid_Risk:ENUM(PASS|FAIL|WARN|\\\\N|)\n'
     + 'FIELDTYPE:Invalid_Phone_Type:ENUM(POSSIBLE WIRELESS|LANDLINE|POSSIBLE VOIP|OTHER UNKNOWN|PAGER|CABLE|OTHER/UNKNOWN|\\\\N|)\n'
     + 'FIELDTYPE:Invalid_Phone_Status:ENUM(ACTIVE|INACTIVE|NOT AVAILABLE|\\\\N|)\n'

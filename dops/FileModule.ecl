@@ -1,4 +1,4 @@
-﻿import lib_fileservices,lib_thorlib,ut,STD;
+﻿import lib_fileservices,lib_thorlib,ut,STD,_Control;
 EXPORT FileModule(string esp = ''
 									,string port = '8010'
 									,string targettype = ''
@@ -531,7 +531,7 @@ END;
 		return if (count(dGetStatus) > 0, dNormRecs, dataset([],rDBLayout));
 	end;
 	
-	export fMakeSoapcallstoUpdateDOPSDB(string pThorESP = 'prod_esp.br.seisint.com'
+	export fMakeSoapcallstoUpdateDOPSDB(string pThorESP = _Control.IPAddress.Prod_thor_ESP
 																,string pThorPort = '8010'
 																,string receiveemail = ''
 																,string senderemail = '') := function

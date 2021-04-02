@@ -133,22 +133,22 @@ def dPayloadRestriction():
 ##---------------------------------------------------------------------------
 def dZipSpecificity():
 	return [
-		('Key_BizHead_L_ADDRESS1',     '(SELF.zipWeight :=.*SELF.zip_match_code = SALT311.MatchCode.ExactMatch =>)([^*]+)(.+EXPORT ScoredFetch_Batch)','HACK16','\g<1> /*HACK16 \g<2>*/ 1100 \g<3>','Disregard zip specificity when calculating weight'),
-		('Key_BizHead_L_ADDRESS2',     '(SELF.zipWeight :=.*SELF.zip_match_code = SALT311.MatchCode.ExactMatch =>)([^*]+)(.+EXPORT ScoredFetch_Batch)','HACK16','\g<1> /*HACK16 \g<2>*/ 1100 \g<3>','Disregard zip specificity when calculating weight'),
-		('Key_BizHead_L_ADDRESS3',     '(SELF.zipWeight :=.*SELF.zip_match_code = SALT311.MatchCode.ExactMatch =>)([^*]+)(.+EXPORT ScoredFetch_Batch)','HACK16','\g<1> /*HACK16 \g<2>*/ 1100 \g<3>','Disregard zip specificity when calculating weight'),
-		('Key_BizHead_L_CNPNAME',      '(SELF.zipWeight :=.*SELF.zip_match_code = SALT311.MatchCode.ExactMatch =>)([^*]+)(.+EXPORT ScoredFetch_Batch)','HACK16','\g<1> /*HACK16 \g<2>*/ 1100 \g<3>','Disregard zip specificity when calculating weight'),
-		('Key_BizHead_L_CNPNAME_FUZZY','(SELF.zipWeight :=.*SELF.zip_match_code = SALT311.MatchCode.ExactMatch =>)([^*]+)(.+EXPORT ScoredFetch_Batch)','HACK16','\g<1> /*HACK16 \g<2>*/ 1100 \g<3>','Disregard zip specificity when calculating weight'),
-		('Key_BizHead_L_CNPNAME_ST',   '(SELF.zipWeight :=.*SELF.zip_match_code = SALT311.MatchCode.ExactMatch =>)([^*]+)(.+EXPORT ScoredFetch_Batch)','HACK16','\g<1> /*HACK16 \g<2>*/ 1100 \g<3>','Disregard zip specificity when calculating weight'),
-		('Key_BizHead_L_CNPNAME_ZIP',  '(SELF.zipWeight :=.*SELF.zip_match_code = SALT311.MatchCode.ExactMatch =>)([^*]+)(.+EXPORT ScoredFetch_Batch)','HACK16','\g<1> /*HACK16 \g<2>*/ 1100 \g<3>','Disregard zip specificity when calculating weight'),
-		('Key_BizHead_L_CONTACT',      '(SELF.zipWeight :=.*SELF.zip_match_code = SALT311.MatchCode.ExactMatch =>)([^*]+)(.+EXPORT ScoredFetch_Batch)','HACK16','\g<1> /*HACK16 \g<2>*/ 1100 \g<3>','Disregard zip specificity when calculating weight'),
-		('Key_BizHead_L_CONTACT_SSN',  '(SELF.zipWeight :=.*SELF.zip_match_code = SALT311.MatchCode.ExactMatch =>)([^*]+)(.+EXPORT ScoredFetch_Batch)','HACK16','\g<1> /*HACK16 \g<2>*/ 1100 \g<3>','Disregard zip specificity when calculating weight'),
-		('Key_BizHead_L_EMAIL',        '(SELF.zipWeight :=.*SELF.zip_match_code = SALT311.MatchCode.ExactMatch =>)([^*]+)(.+EXPORT ScoredFetch_Batch)','HACK16','\g<1> /*HACK16 \g<2>*/ 1100 \g<3>','Disregard zip specificity when calculating weight'),
-		('Key_BizHead_L_FEIN',         '(SELF.zipWeight :=.*SELF.zip_match_code = SALT311.MatchCode.ExactMatch =>)([^*]+)(.+EXPORT ScoredFetch_Batch)','HACK16','\g<1> /*HACK16 \g<2>*/ 1100 \g<3>','Disregard zip specificity when calculating weight'),
-		('Key_BizHead_L_PHONE',        '(SELF.zipWeight :=.*SELF.zip_match_code = SALT311.MatchCode.ExactMatch =>)([^*]+)(.+EXPORT ScoredFetch_Batch)','HACK16','\g<1> /*HACK16 \g<2>*/ 1100 \g<3>','Disregard zip specificity when calculating weight'),
-		('Key_BizHead_L_SIC',          '(SELF.zipWeight :=.*SELF.zip_match_code = SALT311.MatchCode.ExactMatch =>)([^*]+)(.+EXPORT ScoredFetch_Batch)','HACK16','\g<1> /*HACK16 \g<2>*/ 1100 \g<3>','Disregard zip specificity when calculating weight'),
-		('Key_BizHead_L_SOURCE',       '(SELF.zipWeight :=.*SELF.zip_match_code = SALT311.MatchCode.ExactMatch =>)([^*]+)(.+EXPORT ScoredFetch_Batch)','HACK16','\g<1> /*HACK16 \g<2>*/ 1100 \g<3>','Disregard zip specificity when calculating weight'),
-		('Key_BizHead_L_URL',          '(SELF.zipWeight :=.*SELF.zip_match_code = SALT311.MatchCode.ExactMatch =>)([^*]+)(.+EXPORT ScoredFetch_Batch)','HACK16','\g<1> /*HACK16 \g<2>*/ 1100 \g<3>','Disregard zip specificity when calculating weight'),
-		('Mod_Ext_Data',               '(SELF.zipWeight :=.*?SELF.zip_match_code = SALT311.MatchCode.ExactMatch =>)([^*]+)','HACK16','\g<1> /*HACK16 \g<2>*/ 1100','Disregard zip specificity when calculating weight')
+		('Key_BizHead_L_ADDRESS1',     '(SELF.zipWeight :=.*SELF.zip_match_code = SALT44.MatchCode.ExactMatch =>)([^*]+)(.+EXPORT ScoredFetch_Batch)','HACK16','\g<1> /*HACK16 \g<2>*/ 1100 \g<3>','Disregard zip specificity when calculating weight'),
+		('Key_BizHead_L_ADDRESS2',     '(SELF.zipWeight :=.*SELF.zip_match_code = SALT44.MatchCode.ExactMatch =>)([^*]+)(.+EXPORT ScoredFetch_Batch)','HACK16','\g<1> /*HACK16 \g<2>*/ 1100 \g<3>','Disregard zip specificity when calculating weight'),
+		('Key_BizHead_L_ADDRESS3',     '(SELF.zipWeight :=.*SELF.zip_match_code = SALT44.MatchCode.ExactMatch =>)([^*]+)(.+EXPORT ScoredFetch_Batch)','HACK16','\g<1> /*HACK16 \g<2>*/ 1100 \g<3>','Disregard zip specificity when calculating weight'),
+		('Key_BizHead_L_CNPNAME',      '(SELF.zipWeight :=.*SELF.zip_match_code = SALT44.MatchCode.ExactMatch =>)([^*]+)(.+EXPORT ScoredFetch_Batch)','HACK16','\g<1> /*HACK16 \g<2>*/ 1100 \g<3>','Disregard zip specificity when calculating weight'),
+		('Key_BizHead_L_CNPNAME_FUZZY','(SELF.zipWeight :=.*SELF.zip_match_code = SALT44.MatchCode.ExactMatch =>)([^*]+)(.+EXPORT ScoredFetch_Batch)','HACK16','\g<1> /*HACK16 \g<2>*/ 1100 \g<3>','Disregard zip specificity when calculating weight'),
+		('Key_BizHead_L_CNPNAME_ST',   '(SELF.zipWeight :=.*SELF.zip_match_code = SALT44.MatchCode.ExactMatch =>)([^*]+)(.+EXPORT ScoredFetch_Batch)','HACK16','\g<1> /*HACK16 \g<2>*/ 1100 \g<3>','Disregard zip specificity when calculating weight'),
+		('Key_BizHead_L_CNPNAME_ZIP',  '(SELF.zipWeight :=.*SELF.zip_match_code = SALT44.MatchCode.ExactMatch =>)([^*]+)(.+EXPORT ScoredFetch_Batch)','HACK16','\g<1> /*HACK16 \g<2>*/ 1100 \g<3>','Disregard zip specificity when calculating weight'),
+		('Key_BizHead_L_CONTACT',      '(SELF.zipWeight :=.*SELF.zip_match_code = SALT44.MatchCode.ExactMatch =>)([^*]+)(.+EXPORT ScoredFetch_Batch)','HACK16','\g<1> /*HACK16 \g<2>*/ 1100 \g<3>','Disregard zip specificity when calculating weight'),
+		('Key_BizHead_L_CONTACT_SSN',  '(SELF.zipWeight :=.*SELF.zip_match_code = SALT44.MatchCode.ExactMatch =>)([^*]+)(.+EXPORT ScoredFetch_Batch)','HACK16','\g<1> /*HACK16 \g<2>*/ 1100 \g<3>','Disregard zip specificity when calculating weight'),
+		('Key_BizHead_L_EMAIL',        '(SELF.zipWeight :=.*SELF.zip_match_code = SALT44.MatchCode.ExactMatch =>)([^*]+)(.+EXPORT ScoredFetch_Batch)','HACK16','\g<1> /*HACK16 \g<2>*/ 1100 \g<3>','Disregard zip specificity when calculating weight'),
+		('Key_BizHead_L_FEIN',         '(SELF.zipWeight :=.*SELF.zip_match_code = SALT44.MatchCode.ExactMatch =>)([^*]+)(.+EXPORT ScoredFetch_Batch)','HACK16','\g<1> /*HACK16 \g<2>*/ 1100 \g<3>','Disregard zip specificity when calculating weight'),
+		('Key_BizHead_L_PHONE',        '(SELF.zipWeight :=.*SELF.zip_match_code = SALT44.MatchCode.ExactMatch =>)([^*]+)(.+EXPORT ScoredFetch_Batch)','HACK16','\g<1> /*HACK16 \g<2>*/ 1100 \g<3>','Disregard zip specificity when calculating weight'),
+		('Key_BizHead_L_SIC',          '(SELF.zipWeight :=.*SELF.zip_match_code = SALT44.MatchCode.ExactMatch =>)([^*]+)(.+EXPORT ScoredFetch_Batch)','HACK16','\g<1> /*HACK16 \g<2>*/ 1100 \g<3>','Disregard zip specificity when calculating weight'),
+		('Key_BizHead_L_SOURCE',       '(SELF.zipWeight :=.*SELF.zip_match_code = SALT44.MatchCode.ExactMatch =>)([^*]+)(.+EXPORT ScoredFetch_Batch)','HACK16','\g<1> /*HACK16 \g<2>*/ 1100 \g<3>','Disregard zip specificity when calculating weight'),
+		('Key_BizHead_L_URL',          '(SELF.zipWeight :=.*SELF.zip_match_code = SALT44.MatchCode.ExactMatch =>)([^*]+)(.+EXPORT ScoredFetch_Batch)','HACK16','\g<1> /*HACK16 \g<2>*/ 1100 \g<3>','Disregard zip specificity when calculating weight'),
+		('Mod_Ext_Data',               '(SELF.zipWeight :=.*?SELF.zip_match_code = SALT44.MatchCode.ExactMatch =>)([^*]+)','HACK16','\g<1> /*HACK16 \g<2>*/ 1100','Disregard zip specificity when calculating weight')
 		]
 
 ##---------------------------------------------------------------------------
@@ -176,13 +176,13 @@ def dRemoveParallel():
 ##---------------------------------------------------------------------------
 def dGSSCnpNameWeight():
 	return [
-		('Key_BizHead_L_CNPNAME',      '(SELF\.cnp_nameWeight \:\=   le\.gss_word_weight\; \/\/Fixed Wordbag weights accumulated in gss_weight field)','HACK22_a','SELF.cnp_nameWeight := SALT311.MatchBagOfWords(le.cnp_name,param_cnp_name,3177747,1)/100; /*HACK22_a*/','Change cnp_nameWeigth to use MatchBagOfWords instead of GSS weight'),
+		('Key_BizHead_L_CNPNAME',      '(SELF\.cnp_nameWeight \:\= le\.gss_word_weight\; \/\/Fixed Wordbag weights accumulated in gss_weight field)','HACK22_a','SELF.cnp_nameWeight := SALT44.MatchBagOfWords(le.cnp_name,param_cnp_name,3177747,1)/100; /*HACK22_a*/','Change cnp_nameWeigth to use MatchBagOfWords instead of GSS weight'),
 		('Key_BizHead_L_CNPNAME',      '(SELF\.cnp_name_GSS_Weight := le\.gss_word_weight\;\/\/ MORE \- need to scale in independence)','HACK22_b','SELF.cnp_name_GSS_Weight := SELF.cnp_nameWeight; /*HACK22_b*/','Change cnp_nameWeigth to use MatchBagOfWords instead of GSS weight'),
-		('Key_BizHead_L_CNPNAME_ST',      '(SELF\.cnp_nameWeight \:\=   le\.gss_word_weight\; \/\/Fixed Wordbag weights accumulated in gss_weight field)','HACK22_a','SELF.cnp_nameWeight := SALT311.MatchBagOfWords(le.cnp_name,param_cnp_name,3177747,1)/100; /*HACK22_a*/','Change cnp_nameWeigth to use MatchBagOfWords instead of GSS weight'),
+		('Key_BizHead_L_CNPNAME_ST',      '(SELF\.cnp_nameWeight \:\= le\.gss_word_weight\; \/\/Fixed Wordbag weights accumulated in gss_weight field)','HACK22_a','SELF.cnp_nameWeight := SALT44.MatchBagOfWords(le.cnp_name,param_cnp_name,3177747,1)/100; /*HACK22_a*/','Change cnp_nameWeigth to use MatchBagOfWords instead of GSS weight'),
 		('Key_BizHead_L_CNPNAME_ST',      '(SELF\.cnp_name_GSS_Weight := le\.gss_word_weight\;\/\/ MORE \- need to scale in independence)','HACK22_b','SELF.cnp_name_GSS_Weight := SELF.cnp_nameWeight; /*HACK22_b*/','Change cnp_nameWeigth to use MatchBagOfWords instead of GSS weight'),
-		('Key_BizHead_L_CNPNAME_ZIP',      '(SELF\.cnp_nameWeight \:\=   le\.gss_word_weight\; \/\/Fixed Wordbag weights accumulated in gss_weight field)','HACK22_a','SELF.cnp_nameWeight := SALT311.MatchBagOfWords(le.cnp_name,param_cnp_name,3177747,1)/100; /*HACK22_a*/','Change cnp_nameWeigth to use MatchBagOfWords instead of GSS weight'),
+		('Key_BizHead_L_CNPNAME_ZIP',      '(SELF\.cnp_nameWeight \:\= le\.gss_word_weight\; \/\/Fixed Wordbag weights accumulated in gss_weight field)','HACK22_a','SELF.cnp_nameWeight := SALT44.MatchBagOfWords(le.cnp_name,param_cnp_name,3177747,1)/100; /*HACK22_a*/','Change cnp_nameWeigth to use MatchBagOfWords instead of GSS weight'),
 		('Key_BizHead_L_CNPNAME_ZIP',      '(SELF\.cnp_name_GSS_Weight := le\.gss_word_weight\;\/\/ MORE \- need to scale in independence)','HACK22_b','SELF.cnp_name_GSS_Weight := SELF.cnp_nameWeight; /*HACK22_b*/','Change cnp_nameWeigth to use MatchBagOfWords instead of GSS weight'),
-		('Mod_Ext_Data',      '(SELF\.cnp_nameWeight \:\=   le\.gss_word_weight\; \/\/Fixed Wordbag weights accumulated in gss_weight field)','HACK22_a','SELF.cnp_nameWeight := SALT311.MatchBagOfWords(le.cnp_name,param_cnp_name,3177747,1)/100; /*HACK22_a*/','Change cnp_nameWeigth to use MatchBagOfWords instead of GSS weight'),
+		('Mod_Ext_Data',      '(SELF\.cnp_nameWeight \:\= le\.gss_word_weight\; \/\/Fixed Wordbag weights accumulated in gss_weight field)','HACK22_a','SELF.cnp_nameWeight := SALT44.MatchBagOfWords(le.cnp_name,param_cnp_name,3177747,1)/100; /*HACK22_a*/','Change cnp_nameWeigth to use MatchBagOfWords instead of GSS weight'),
 		('Mod_Ext_Data',      '(SELF\.cnp_name_GSS_Weight := le\.gss_word_weight\;\/\/ MORE \- need to scale in independence)','HACK22_b','SELF.cnp_name_GSS_Weight := SELF.cnp_nameWeight; /*HACK22_b*/','Change cnp_nameWeigth to use MatchBagOfWords instead of GSS weight')
 		]
 
@@ -224,7 +224,7 @@ def dCnpNameOptimizations():
                                                                       AND Keyed(fallback_value >= param_fallback_value)
                                                                       
                                                                   ),
-                                                                  Config_BIP.L_CNPNAME_FUZZY_MAXBLOCKLIMIT,
+                                                                  Config_BIP.L_CNPNAME_MAXBLOCKLIMIT,
                                                                   ONFAIL(TRANSFORM(SlimKeyRec, 
                                                                                    SELF := ROW([],SlimKeyRec))),
                                                                   keyed),
@@ -251,7 +251,8 @@ def dCnpNameOptimizations():
                   OR (Config_BIP.WithinEditN(RIGHT.city,RIGHT.city_len,param_city,param_city_len,2, 0)))),
                 TRANSFORM(indexOutputRecord,
                           SELF.gss_word_weight := LEFT.gss_word_weight,
-                          SELF := RIGHT)); /*HACK25g*/''','Change the join in rawfetch_server code for Roxie'),
+                          SELF := RIGHT),
+                LIMIT(Config_BIP.L_CNPNAME_MAXBLOCKLIMIT,SKIP)); /*HACK25g*/''','Change the join in rawfetch_server code for Roxie'),
 			('Key_BizHead_L_CNPNAME', '(Returnable(.*?))<>.( OR.*?;)','HACK25h','\g<1>>1\g<3> /*HACK25h*/','Change fallback logic to actually work'),
 		]		
 		
@@ -292,28 +293,109 @@ def dChangeConfigLimits():
 ##---------------------------------------------------------------------------		
 def dAddLimitsForBOW():
     return[
-        ('Key_BizHead_L_CNPNAME_ST', '(doIndexRead.*? := STEPPED\()(KEY.*?$)', 'HACK28a', '\g<1>LIMIT(\g<2>', 'Add Limit to keyed lookup so as to not blow out the result set'),
-        ('Key_BizHead_L_CNPNAME_ST', '(AND .*?)(,ultid,orgid,seleid,proxid,PRIORITY.*?$)', 'HACK28b', '\g<1>,Config_BIP.L_CNPNAME_ST_MAXBLOCKLIMIT,ONFAIL(TRANSFORM(KeyRec,SELF := ROW([],KeyRec))),KEYED)\g<2>', 'Add Limit to keyed lookup so as to not blow out the result set'),
-        ('Key_BizHead_L_CNPNAME_ST', '(Returnable\(DATASET\(RECORDOF\(RawData0\)\) d\).*?)<>(.*?$)', 'HACK28c', '\g<1>>\g<2>', 'Fix fallback logic to actually work and fallback'),
-        ('Key_BizHead_L_CNPNAME_ZIP', '(doIndexRead.*? := STEPPED\()(KEY.*?$)', 'HACK28a', '\g<1>LIMIT(\g<2>', 'Add Limit to keyed lookup so as to not blow out the result set'),
-        ('Key_BizHead_L_CNPNAME_ZIP', '(AND .*?)(,ultid,orgid,seleid,proxid,PRIORITY.*?$)', 'HACK28b', '\g<1>,Config_BIP.L_CNPNAME_ZIP_MAXBLOCKLIMIT,ONFAIL(TRANSFORM(KeyRec,SELF := ROW([],KeyRec))),KEYED)\g<2>', 'Add Limit to keyed lookup so as to not blow out the result set'),
-        ('Key_BizHead_L_CNPNAME_ZIP', '(Returnable\(DATASET\(RECORDOF\(RawData0\)\) d\).*?)<>(.*?$)', 'HACK28c', '\g<1>>\g<2>', 'Fix fallback logic to actually work and fallback')
-    ]    
+        # ('Key_BizHead_L_CNPNAME_ST', '(doIndexRead.*? := STEPPED\()(KEY.*?$)', 'HACK28a', '\g<1>LIMIT/*HACK28a*/(\g<2>', 'Add Limit to keyed lookup so as to not blow out the result set'),
+        # ('Key_BizHead_L_CNPNAME_ST', '(AND .*?)(,ultid,orgid,seleid,proxid,PRIORITY.*?$)', 'HACK28b', '\g<1>,Config_BIP.L_CNPNAME_ST_MAXBLOCKLIMIT,ONFAIL(TRANSFORM(KeyRec,SELF := ROW([],KeyRec))),KEYED)/*HACK28b*/\g<2>', 'Add Limit to keyed lookup so as to not blow out the result set'),
+        # ('Key_BizHead_L_CNPNAME_ST', '(Returnable\(DATASET\(RECORDOF\(RawData0\)\) d\).*?)<>(.*?$)', 'HACK28c', '\g<1>>\g<2>/*HACK28c*/', 'Fix fallback logic to actually work and fallback'),
+        # ('Key_BizHead_L_CNPNAME_ZIP', '(doIndexRead.*? := STEPPED\()(KEY.*?$)', 'HACK28a', '\g<1>LIMIT/*HACK28a*/(\g<2>', 'Add Limit to keyed lookup so as to not blow out the result set'),
+        # ('Key_BizHead_L_CNPNAME_ZIP', '(AND .*?)(,ultid,orgid,seleid,proxid,PRIORITY.*?$)', 'HACK28b', '\g<1>,Config_BIP.L_CNPNAME_ZIP_MAXBLOCKLIMIT,ONFAIL(TRANSFORM(KeyRec,SELF := ROW([],KeyRec))),KEYED)/*HACK28b*/\g<2>', 'Add Limit to keyed lookup so as to not blow out the result set'),
+        # ('Key_BizHead_L_CNPNAME_ZIP', '(Returnable\(DATASET\(RECORDOF\(RawData0\)\) d\).*?)<>(.*?$)', 'HACK28c', '\g<1>>\g<2>/*HACK28c*/', 'Fix fallback logic to actually work and fallback'),
+		('Mod_Ext_Data', '(STEPPED\()(KEYL_CNPNAME_ZIP.*?)(,ultid,orgid,seleid,proxid,PRIORITY.*?$)', 'HACK28a', '\g<1>LIMIT(\g<2>,Config_BIP.L_CNPNAME_ZIP_MAXBLOCKLIMIT,ONFAIL(TRANSFORM(KeyRec,SELF := ROW([],KeyRec))),KEYED)/*HACK28a*/\g<3>', 'Add Limit to keyed lookup so as to not blow out the result set'),
+		('Mod_Ext_Data', '(STEPPED\()(KEYL_CNPNAME_ST.*?)(,ultid,orgid,seleid,proxid,PRIORITY.*?$)', 'HACK28b', '\g<1>LIMIT(\g<2>,Config_BIP.L_CNPNAME_ST_MAXBLOCKLIMIT,ONFAIL(TRANSFORM(KeyRec,SELF := ROW([],KeyRec))),KEYED)/*HACK28b*/\g<3>', 'Add Limit to keyed lookup so as to not blow out the result set'),
+		('Mod_Ext_Data', '(STEPPED\()(KEYL_CNPNAME.*?)(,ultid,orgid,seleid,proxid,PRIORITY.*?$)', 'HACK28c', '\g<1>LIMIT(\g<2>,Config_BIP.L_CNPNAME_MAXBLOCKLIMIT,ONFAIL(TRANSFORM(KeyRec,SELF := ROW([],KeyRec))),KEYED)/*HACK28c*/\g<3>', 'Add Limit to keyed lookup so as to not blow out the result set'),
+		('Mod_Ext_Data', '(STEPPED\()(KEYL_URL.*?)(,ultid,orgid,seleid,proxid,PRIORITY.*?$)', 'HACK28d', '\g<1>LIMIT(\g<2>,Config_BIP.L_URL_MAXBLOCKLIMIT,ONFAIL(TRANSFORM(KeyRec,SELF := ROW([],KeyRec))),KEYED)/*HACK28d*/\g<3>', 'Add Limit to keyed lookup so as to not blow out the result set')
+	]
 
-getHacks = 	dAppendForce() + \
-			dUpdateKeynames() + \
-			dAdjustCNPScore() + \
-			dZipThreshold() + \
-			dPayloadRestriction() + \
-			dZipSpecificity() + \
-			dRemoveRcid() + \
-			dRemoveParallel() + \
-			dGSSCnpNameWeight() + \
-			dExtFileDisableForceOn() + \
-			dRemoveRcidJoinCondition() + \
-			dCnpNameOptimizations() + \
-			dCnpNameFuzzyFallbackValueChanges() + \
-            dChangeConfigLimits() + \
-            dAddLimitsForBOW()
+##---------------------------------------------------------------------------
+##HACK29
+##Add use of CNPNAME slim key to L_CNPNAME_ST and L_CNPNAME_ZIP for Roxie. (BH-1169)
+##Also adding limits to keyed joins on BOW linkpaths (BH-1175)
+##---------------------------------------------------------------------------		
+def dAddCnpSlim():
+    return [
+        ('Key_BizHead_L_CNPNAME_ST', '(slimrec := {.*?;)', 'HACK29a', '\g<1>\n\tslimKeyRec := recordof(Key_BizHead_L_CNPNAME.SlimKey);/*HACK29a*/', 'Adding layout of slim key'),
+        ('Key_BizHead_L_CNPNAME_ST', '(doIndexRead\(UNSIGNED4 search,UNSIGNED2 spc\) :=) .*?;', 'HACK29b', '''\g<1> STEPPED(LIMIT(Key_BizHead_L_CNPNAME.SlimKey( KEYED(GSS_hash = search) // ADDED LIMIT
+                                                                      AND KEYED(GSS_Bloom = BloomF)
+                                                                      AND Keyed(fallback_value >= param_fallback_value)
+                                                                      
+                                                                  ),
+                                                                  Config_BIP.L_CNPNAME_MAXBLOCKLIMIT,
+                                                                  ONFAIL(TRANSFORM(SlimKeyRec, 
+                                                                                   SELF := ROW([],SlimKeyRec))),
+                                                                  keyed),
+                                                           ultid,
+                                                           orgid,
+                                                           seleid,
+                                                           proxid,
+                                                           PRIORITY(40-spc)); /*HACK29b*/''', 'Adding Slim Key Lookup'),
+        ('Key_BizHead_L_CNPNAME_ST', '(res := JOIN\(.*?steppedmatches, Key,).*?;', 'HACK29c', '''\g<1>KEYED(RIGHT.GSS_Hash = wds[1].hsh)
+                AND KEYED((RIGHT.st = param_st)) 
+                AND KEYED(RIGHT.fallback_value >= param_fallback_value) 
+                AND KEYED(LEFT.proxid = RIGHT.proxid 
+                          AND LEFT.seleid = RIGHT.seleid 
+                          AND LEFT.orgid = RIGHT.orgid 
+                          AND LEFT.ultid = RIGHT.ultid)
+                AND ((param_prim_name = (TYPEOF(RIGHT.prim_name))'' 
+                    OR RIGHT.prim_name = (TYPEOF(RIGHT.prim_name))'') 
+                    OR (RIGHT.prim_name = param_prim_name) 
+                    OR ((Config_BIP.WithinEditN(RIGHT.prim_name,RIGHT.prim_name_len,param_prim_name,param_prim_name_len,1, 0))))
+                AND ((~EXISTS(param_zip) 
+                    OR RIGHT.zip = (TYPEOF(RIGHT.zip))'') 
+                    OR (RIGHT.zip IN SET(param_zip,zip))),
+                TRANSFORM(indexOutputRecord,
+                          SELF.gss_word_weight := LEFT.gss_word_weight,
+                          SELF := RIGHT),
+                LIMIT(Config_BIP.L_CNPNAME_ST_MAXBLOCKLIMIT,SKIP)); /*HACK29c*/''', 'Change Keyed join and add limit/skip logic'),      
+        ('Key_BizHead_L_CNPNAME_ZIP', '(slimrec := {.*?;)', 'HACK29d', '\g<1>\n\tslimKeyRec := recordof(Key_BizHead_L_CNPNAME.SlimKey);/*HACK29d*/', 'Adding layout of slim key'),
+        ('Key_BizHead_L_CNPNAME_ZIP', '(doIndexRead\(UNSIGNED4 search,UNSIGNED2 spc\) :=) .*?;', 'HACK29e', '''\g<1> STEPPED(LIMIT(Key_BizHead_L_CNPNAME.SlimKey( KEYED(GSS_hash = search) // ADDED LIMIT
+                                                                      AND KEYED(GSS_Bloom = BloomF)
+                                                                      AND Keyed(fallback_value >= param_fallback_value)
+                                                                      
+                                                                  ),
+                                                                  Config_BIP.L_CNPNAME_MAXBLOCKLIMIT,
+                                                                  ONFAIL(TRANSFORM(SlimKeyRec, 
+                                                                                   SELF := ROW([],SlimKeyRec))),
+                                                                  keyed),
+                                                           ultid,
+                                                           orgid,
+                                                           seleid,
+                                                           proxid,
+                                                           PRIORITY(40-spc)); /*HACK29e*/''', 'Adding Slim Key Lookup'),
+        ('Key_BizHead_L_CNPNAME_ZIP', '(res := JOIN\(.*?steppedmatches, Key,).*?;', 'HACK29f', '''\g<1>KEYED(RIGHT.GSS_Hash = wds[1].hsh)
+                AND KEYED((RIGHT.zip IN SET(param_zip,zip))) 
+                AND KEYED(RIGHT.fallback_value >= param_fallback_value) 
+                AND KEYED(LEFT.proxid = RIGHT.proxid 
+                    AND LEFT.seleid = RIGHT.seleid 
+                    AND LEFT.orgid = RIGHT.orgid 
+                    AND LEFT.ultid = RIGHT.ultid)
+                AND ((param_prim_name = (TYPEOF(RIGHT.prim_name))'' 
+                    OR RIGHT.prim_name = (TYPEOF(RIGHT.prim_name))'') 
+                    OR (RIGHT.prim_name = param_prim_name) 
+                    OR ((Config_BIP.WithinEditN(RIGHT.prim_name,RIGHT.prim_name_len,param_prim_name,param_prim_name_len,1, 0))))
+                AND ((param_st = (TYPEOF(RIGHT.st))'' 
+                    OR RIGHT.st = (TYPEOF(RIGHT.st))'') 
+                    OR (RIGHT.st = param_st)),
+                TRANSFORM(indexOutputRecord,
+                          SELF.gss_word_weight := LEFT.gss_word_weight,
+                          SELF := RIGHT),
+                LIMIT(Config_BIP.L_CNPNAME_ZIP_MAXBLOCKLIMIT,SKIP)); /*HACK29f*/''', 'Change Keyed join and add limit/skip logic'),        
+        ('Key_BizHead_L_URL', '(res := JOIN\( steppedmatches, Key, .*?)\);', 'HACK29g', '\g<1>,LIMIT(Config_BIP.L_URL_MAXBLOCKLIMIT,SKIP,TRANSFORM(indexOutputRecord, SELF := ROW([],indexOutputRecord)))); /*HACK29g*/', 'Adding limit to keyed join'),                                      
+    ]
+
+# getHacks = 	dAppendForce() + \
+# 			dUpdateKeynames() + \
+# 			dAdjustCNPScore() + \
+# 			dZipThreshold() + \
+# 			dPayloadRestriction() + \
+# 			dZipSpecificity() + \
+# 			dRemoveRcid() + \
+# 			dRemoveParallel() + \
+# 			dGSSCnpNameWeight() + \
+# 			dExtFileDisableForceOn() + \
+# 			dRemoveRcidJoinCondition() + \
+# 			dCnpNameOptimizations() + \
+# 			dCnpNameFuzzyFallbackValueChanges() + \
+#             dChangeConfigLimits() + \
+#             dAddLimitsForBOW() + \
+#             dAddCnpSlim()
 			
-
+getHacks = dAddCnpSlim()

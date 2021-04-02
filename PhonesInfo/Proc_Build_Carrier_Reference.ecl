@@ -1,4 +1,4 @@
-﻿IMPORT _control, PromoteSupers, RoxieKeyBuild, Scrubs_PhonesInfo, Std;
+﻿IMPORT _control, PromoteSupers, RoxieKeyBuild, Scrubs_PhonesInfo, Std, dx_PhonesInfo;
 
 //DF-28036: Convert 6-Digit Spids to 4-Character Spids
 
@@ -101,14 +101,42 @@ EXPORT Proc_Build_Carrier_Reference(string version, string inclCheck, string ema
 		scrubsRuns				:= sequential(Scrubs_PhonesInfo.RawLergFileScrubs(version, emailTarget),
 																		Scrubs_PhonesInfo.MainCarrierRefScrubs(version, emailTarget)
 																		);
+																		
+	/////////////////////////////////////////////////////////////////////////////////////////////////////////////	
+	//Build Carrier Reference Key////////////////////////////////////////////////////////////////////////////////
+	/////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	RoxieKeyBuild.Mac_SK_BuildProcess_v3_local(dx_PhonesInfo.Key_Source_Reference.ocn_name
+																							,PhonesInfo.File_Source_Reference.Main
+																							,'~thor_data400::key::phonesmetadata::carrier_reference'
+																							,'~thor_data400::key::'+version+'::phonesmetadata::carrier_reference'
+																							,bkPhonesMetadataCarrierName
+																							);	
 
+	//Move Metadata Carrier Name Key to Built Superfile	
+	Roxiekeybuild.Mac_SK_Move_to_Built_v2('~thor_data400::key::phonesmetadata::carrier_reference'
+																							,'~thor_data400::key::'+version+'::phonesmetadata::carrier_reference'
+																							,mvBltPhonesMetadataCarrierName
+																							);
+	
+	//Move Metadata Carrier Name Key to QA Superfile
+	PromoteSupers.Mac_SK_Move_v2('~thor_data400::key::phonesmetadata::carrier_reference','Q',mvQAPhonesMetadataCarrierName,'3');
+	
+	keyBuild 						:= sequential(bkPhonesMetadataCarrierName, mvBltPhonesMetadataCarrierName, mvBltPhonesMetadataCarrierName, mvQAPhonesMetadataCarrierName);
+
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////	
+//Run Strata Stats///////////////////////////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	PhonesInfo.Out_STRATA_Population_Stats_Monthly(
+																			 PhonesInfo.File_Source_Reference.Main		
+																			,version      
+																			,buildStrata);        
 	//////////////////////////////////////////////////////////////////////////////////////////////
 	//Run Check/Output Files/Generate Emails//////////////////////////////////////////////////////
 	//////////////////////////////////////////////////////////////////////////////////////////////
 		
 		//Do Pre-Build Check
-		doCheck 					:= pullCheck;																												//Run Lerg1 Category Change Check
-		prodBuild					:= sequential(runBuild, pullRevIncomp, pullRevDiff, scrubsRuns);		//Run Build / Generate Review Files
+		doCheck 					:= pullCheck;																																	//Run Lerg1 Category Change Check
+		prodBuild					:= sequential(runBuild, pullRevIncomp, pullRevDiff, scrubsRuns, keyBuild, buildStrata);		//Run Build / Generate Review Files / Build Key
 		checkBuild				:= if(checkFile='no lerg1 category changes',
 														prodBuild,
 														output('check lerg1 for changes'));

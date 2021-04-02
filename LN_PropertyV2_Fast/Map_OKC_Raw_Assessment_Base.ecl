@@ -676,10 +676,10 @@ EXPORT Map_OKC_Raw_Assessment_Base(string	pVersionDate,
 		dAssessNormSearchName := dedup(sort(normalize(sort_nid,2,tNormSearchCleanNames(LEFT,counter)),
 															record,local),record, EXCEPT conjunctive_name_seq,local);*/
 		
-		LN_Propertyv2.Append_AID(dNormSearchName,dSearchCleanAddr,false);
-		dSearchAID	:=	dSearchCleanAddr; 
+		// LN_Propertyv2.Append_AID(dNormSearchName,dSearchCleanAddr,false); // DF-28245 unify multiple calls to AID into a single call
+		// dSearchAID	:=	dSearchCleanAddr; 
 
-		EXPORT dNew	:=	project(dSearchAID, LN_PropertyV2_Fast.Layout_prep_search_prp);
+		EXPORT dNew	:=	project(dNormSearchName, LN_PropertyV2_Fast.Layout_prep_search_prp);
 		
 	END;
 END;

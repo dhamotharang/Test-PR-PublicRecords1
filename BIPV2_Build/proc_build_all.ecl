@@ -65,6 +65,7 @@ export proc_build_all(
   ,pSkipEmp               = 'false'
   ,pSkipCommonBase        = 'false'
   ,pSkipCleanCommonBase   = 'false'
+  ,pSkipRenameKeys        = 'false'
   ,pSkipXlink             = 'false'
   ,pSkipCopyXlinkKeys     = 'false'
   ,pSkipXlinkValidation   = 'false'
@@ -89,11 +90,11 @@ export proc_build_all(
   ,pSkipEntityReport      = 'false'
   ,pSkipDashboard         = 'false'
   ,pSkipCopyOtherKeys     = 'false'
-  ,pSkipRenameKeys        = 'false'
   ,pSkipVerifyKeys        = 'false'
   ,pSkipUpdateDOPS        = 'false'
   ,pSkipDOTSpecsPost      = 'false'
   ,pSkipSeleRelSpecsPost  = 'false'
+  ,pSkipUnderlinkReport   = 'false'
   ,pOmitDisposition       = '' // NOTE: Set to 'preserve' or 'ghost' to recover from a missing source in the ingest file
   // ,pOmitDisposition       = 'preserve' // temporary, until MO Corps and MS Corps problems are resolved  
 
@@ -176,6 +177,7 @@ functionmacro
       ,if(pSkipEmp              = false ,BIPV2_Build.proc_empid                ().MultIter_run (pEmpStartIteration     ,pEmpNumIterations    ,pdoEmpInit    ,pdoEmpSpecs     ,pdoEmpIters    ,pdoEmpPost              ,,,,,pCompileTest  ))
       ,if(pSkipCommonBase       = false ,BIPV2_Build.proc_CommonBase           ()                                                                                                                           )
       ,if(pSkipCleanCommonBase  = false ,BIPV2_Build.proc_Clean_Commonbase     (pversion)                                                                                                                           )
+      ,if(pSkipRenameKeys       = false ,BIPV2_Build.proc_rename_BIPV2FullKeys (pversion,pRenameKeysFilter,false,,'built')                                                                    ) //only rename bipv2_proxid,strnbrname & bipv2_relative, rest should be correct
       
       ,Wait4Threads
       
@@ -188,7 +190,6 @@ functionmacro
       // ,if(pSkipDataCard      = false ,BIPV2_Build.proc_DataCard               (pversion                                                                                                     )) // do datacard --moved to earlier in build
       ,if(pSkipEntityReport  = false ,BIPV2_Build.proc_EntityReport           (pversion                                                                                                     )) // do entity report
       ,if(pSkipDashboard     = false ,BIPV2_Build.proc_Dashboard              (pversion                                                                                                     )) // do dashboard
-      ,if(pSkipRenameKeys    = false ,BIPV2_Build.proc_rename_BIPV2FullKeys   (pversion,pRenameKeysFilter,false,,'built')                                                                    ) //only rename bipv2_proxid,strnbrname & bipv2_relative, rest should be correct
       ,if(pSkipCopyOtherKeys = false ,BIPV2_Build.proc_copy_keys              (pversion ,'','','BestAndSeleRelative',false,true                                                              )) // Copy the rest of the BIPV2FullKeys package to dataland, turn off alpha copy
       ,if(pPromote2QA        = true  ,BIPV2_Build.proc_Promote2QA             (pversion)                                                                                                     )
       ,if(pSkipVerifyKeys    = false ,BIPV2_Build.BIPV2FullKeys_Package       (keyversion).outputpackage                                                                                     ) //double check that keys match layout
@@ -197,6 +198,7 @@ functionmacro
       ,UpdateBIPV2WeeklyKeysDops
       ,copyFatherCommonBase2StorageThor
       ,Wait4PostProcessThreads
+      ,if(pSkipUnderlinkReport = false ,BIPV2_Build.proc_Underlink_Report    (pversion  ,pCompileTest))
       // ,if(pSkipDOTSpecsPost     = false ,BIPV2_Build.proc_dotid().runSpecs())
       // ,if(pSkipSeleRelSpecsPost = false ,BIPV2_Build.proc_Seleid_relatives     (pversion,true,false,false       ))
       

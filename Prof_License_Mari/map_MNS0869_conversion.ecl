@@ -1,4 +1,4 @@
-﻿// MNS0869 / Minnesotas Bookstore /	Real Estate // raw data to common layout for MARI and PL use
+﻿﻿﻿// MNS0869 / Minnesotas Bookstore /	Real Estate // raw data to common layout for MARI and PL use
 #workunit('name','Yogurt: map_MNS0869_conversion'); 
 IMPORT Prof_License, Prof_License_Mari, Address, Ut, Lib_FileServices, lib_stringlib;
 
@@ -138,14 +138,16 @@ EXPORT map_MNS0869_conversion(STRING pVersion) := FUNCTION
 	  // use the right parser for name field
 		SELF.NAME_ORG_PREFX		:= Prof_License_Mari.mod_clean_name_addr.GetCorpPrefix(StdNAME_ORG);
 	
-		//Terri's review comment(BUG 124107) - 3. NAME_ORG is set to last name + first name for MD
-		SELF.NAME_ORG 				:= MAP(mariParse='MD' AND LENGTH(tmpLName)>1=> stringlib.stringcleanspaces(CleanNAME_ORG[46..65]+' '+CleanNAME_ORG[6..25]),
-																 tempTypeCd = 'GR' AND mariParse = 'MD' AND LENGTH(TRIM(tmpCleanNAME_ORG[46..65])) < 2 => StdNAME_ORG,
-																 mariParse='MD' AND LENGTH(tmpLName)<2 AND trimLname != ''=> trimLname + ' ' + trimFname,
-																 REGEXFIND(IPpattern,StdNAME_ORG) => Prof_License_Mari.mod_clean_name_addr.cleanInternetName(CleanNAME_ORG),
-																 CleanNAME_ORG);
+		//Terri's review comment(BUG 124107) - 3. NAME_ORG is set to last name + first name for MD															 
+		SELF.NAME_ORG                 := MAP(StdNAME_ORG = 'THE LLC' => StdNAME_ORG,
+                                     mariParse='MD' AND LENGTH(tmpLName)>1=> stringlib.stringcleanspaces(CleanNAME_ORG[46..65]+' '+CleanNAME_ORG[6..25]),
+                                                                 tempTypeCd = 'GR' AND mariParse = 'MD' AND LENGTH(TRIM(tmpCleanNAME_ORG[46..65])) < 2 => StdNAME_ORG,
+                                                                 mariParse='MD' AND LENGTH(tmpLName)<2 AND trimLname != ''=> trimLname + ' ' + trimFname,
+                                                                 REGEXFIND(IPpattern,StdNAME_ORG) => Prof_License_Mari.mod_clean_name_addr.cleanInternetName(CleanNAME_ORG),
+                                                                 CleanNAME_ORG);														 
 		
 		SELF.NAME_ORG_ORIG		:= tempTrimName;    //Names before we clean it
+		
 		//Terri's review comment(BUG 124107) - 1. Set the name format.
 		SELF.NAME_FORMAT			:= IF(SELF.NAME_ORG_ORIG<>'','F','');
 	
@@ -361,7 +363,8 @@ EXPORT map_MNS0869_conversion(STRING pVersion) := FUNCTION
 		SELF.ADDR_STATE_1		  := IF(TRIM(clnAddrAddr1[115..116])<>'',TRIM(clnAddrAddr1[115..116]),trimState);
 		SELF.ADDR_ZIP5_1		  := IF(TRIM(clnAddrAddr1[117..121])<>'',TRIM(clnAddrAddr1[117..121]),tmpZip[1..5]);
 		SELF.ADDR_ZIP4_1		  := clnAddrAddr1[122..125];
-		SELF.addr_CNTY_1      := ut.CleanSpacesAndUpper(pInput.COUNTY);
+		trimCNTY							:= ut.CleanSpacesAndUpper(pInput.COUNTY);
+		SELF.addr_CNTY_1      := IF(trimCNTY='NULL','',trimCNTY);
 		SELF.ADDR_ADDR1_2			:= '';
 		SELF.ADDR_ADDR2_2			:= '';
 		SELF.ADDR_ADDR3_2			:= '';
@@ -400,8 +403,9 @@ EXPORT map_MNS0869_conversion(STRING pVersion) := FUNCTION
 			
 								
 		// assign office license number
-		tempOffSlnum 					:= ut.CleanSpacesAndUpper(pInput.CID);
+		tempOffSlnum 					:= TRIM(Prof_License_Mari.mod_clean_name_addr.strippunctName(pInput.CID),LEFT,RIGHT);
 		SELF.off_license_nbr 	:= tempOffSlnum;
+	
 
 		//Store	TrimAddrNameContact in contact if the name is in FML or LFM format
 		SELF.NAME_CONTACT_FIRST := MAP(REGEXFIND('([A-Z]+) ([A-Z]{1})[\\.]? ([A-Z]+)',TrimAddrNameContact) AND

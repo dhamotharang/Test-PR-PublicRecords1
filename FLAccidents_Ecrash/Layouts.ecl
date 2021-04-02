@@ -175,6 +175,13 @@ string Work_Type_ID;
 
 end; 
 
+export SuppressIncidents := record
+	string Incident_ID;
+	string ORI_Number;
+	string State_Report_Number;
+	string Agency_ID;
+end;
+
 export TFafterTF := record 
  string Sent_to_HPCC_DateTime,
  string creation_date , 

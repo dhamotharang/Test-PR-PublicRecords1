@@ -55,8 +55,11 @@ string Insurance_policy_Exp_Date,
 string source_id,	
 string report_code,	
 string match_flag,	
-string date_vendor_last_reported
-	
+string date_vendor_last_reported,
+string airbags_deploy,
+string towed,
+string impact_location,
+string photographs_taken	
 end; 
 filein := dedup(dataset('~thor_data::in::nahdb::vin', layoutNahdbBatchVin, CSV(Terminator (['\n','\r\n']), Heading(1), Quote('"'), Separator([',']))),all);
 
@@ -66,7 +69,7 @@ filein := dedup(dataset('~thor_data::in::nahdb::vin', layoutNahdbBatchVin, CSV(T
  EA_natl_keyed_inquiry_set   := ['FA','EA','TM','TF','A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P','Q','R','S','T','U','V','W','X','Y','Z',
                                  'IA','IB','IC','ID','IE','IF','IG','IH','II','IJ','IK','IL','IM','IN','IO','IP','IQ','IR','IS','IT','IU','IV','IW','IX','IY','IZ'];
 
- accidents0:= FLAccidents_Ecrash.File_KeybuildV2.out(report_code in EA_natl_keyed_inquiry_set); 
+ accidents0:= Files_eCrash.Ds_Base_Consolidation_Ecrash(report_code in EA_natl_keyed_inquiry_set); 
  
  accidents1 := PROJECT(accidents0,transform(recordof(accidents0),self.record_type := trim(regexreplace('\\t|\\n| ',left.record_type,'')),self.cru_jurisdiction_nbr  :=   regexreplace('\\^M',left.cru_jurisdiction_nbr,''),
              self := left));
@@ -131,6 +134,14 @@ vin_match:= dedup(join(accidentDedup, distribute(filein(vin <> ''),hash(vin)),
            self.vehicle_unit_number   :=  left.vehicle_unit_number    ;
            self.vendor_code           :=  left.vendor_code;
            self.work_type_id          :=  left.work_type_id;
+		   self.airbags_deploy   := map  ( left.airbags_deploy  = '0' =>  'false',
+		                                                           left.airbags_deploy  = '1' =>  'true', ' ' );
+		   self.towed   := map  ( left.towed  = '0' =>  'false',
+		                                                           left.towed  = '1' =>  'true', ' ' );
+			self.impact_location := left.impact_location;
+			self.photographs_taken := left.Photographs_Taken;
+
+		             
 					 self := right 
 				   ), right outer,local),all);
 
@@ -146,7 +157,7 @@ return sequential(FLAccidents_Ecrash.Spray_nahdb_vin(filedate),
                  count(out); 
                  count(out(acc_dol <>'')); 
                  output(out,,'~thor_data::out::nahdb_batch_vin_'+filedate,csv(
-                 HEADING('VIN|rd_adjuster|acc_vin| order_id	| sequence_nbr|	 reason_id| acct_nbr	| vehicle_incident_id| vehicle_unit_number |	vendor_code| work_type_id|  orig_lname | orig_fname | orig_mname |  vehicle_owner| dob| driver_license_nbr| dlnbr_st| vehicle_year|  vehicle_make|  vehicle_model| tag_nbr| tagnbr_st| report_type_id| loss_type| acc_dol| accident_location|  acc_city|	 vehicle_incident_city| acc_st	| jurisdiction| orig_accnbr|	 accident_nbr| addl_report_number| acc_county| crash_county| cru_jurisdiction_nbr| agency_ori| carrier_name|	  Insurance_policy_num|	    Insurance_policy_Eff_Date|    Insurance_policy_Exp_Date| source_id|	 report_code|	 match_flag|	 date_vendor_last_reported  \n','',SINGLE),
+                 HEADING('VIN|rd_adjuster|acc_vin| order_id	| sequence_nbr|	 reason_id| acct_nbr	| vehicle_incident_id| vehicle_unit_number |	vendor_code| work_type_id|  orig_lname | orig_fname | orig_mname |  vehicle_owner| dob| driver_license_nbr| dlnbr_st| vehicle_year|  vehicle_make|  vehicle_model| tag_nbr| tagnbr_st| report_type_id| loss_type| acc_dol| accident_location|  acc_city|	 vehicle_incident_city| acc_st	| jurisdiction| orig_accnbr|	 accident_nbr| addl_report_number| acc_county| crash_county| cru_jurisdiction_nbr| agency_ori| carrier_name|	  Insurance_policy_num|	    Insurance_policy_Eff_Date|    Insurance_policy_Exp_Date| source_id|	 report_code|	 match_flag|	 date_vendor_last_reported|airbags_deploy | towed|impact_location| photographs_taken \n','',SINGLE),
                  SEPARATOR('|'), TERMINATOR('\n')),OVERWRITE), 
 						     fileservices.despray('~thor_data::out::nahdb_batch_vin_'+filedate, _control.IPAddress.bctlpedata10, '/data/hds_180/cjr/nahdb_out_vin_'+filedate+'.csv',,,,TRUE)); 
 

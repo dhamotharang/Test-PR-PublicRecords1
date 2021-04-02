@@ -15,7 +15,7 @@ build_all := sequential(
                         fn_CreateSuperFiles_NtlAccidents(),
                         ConcatNationalInputfiles,
                         Spray_NtlCrash,
-			                  FLAccidents_Ecrash.map_basefile_inquiry(filedate),
+			                  map_basefile_inquiry(filedate),
 			                  notify('NTLCRU INQ BASE COMPLETE', '*'),
                         build_inq,
 								        Build_NtlAccidents_Consolidation,

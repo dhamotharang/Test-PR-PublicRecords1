@@ -2,9 +2,9 @@
 // Prod W20200806-095922
 
 IMPORT _Control, data_services, STD, watercraft;
-export NonFCRA_Watercraft(string pHostname, string pTarget, string pContact ='\' \'') := function
+export NonFCRA_Watercraft(string pHostname, string pTarget, string pContact ='\' \'', STRING today = (STRING8)STD.Date.Today()) := function
 
-filedate := (STRING8)Std.Date.Today();
+filedate := today;
 
 Key_Boats_Non_FCRA_wid := PULL(Watercraft.key_watercraft_wid(false));
 //output(Key_Boats_Non_FCRA_wid);
@@ -21,14 +21,14 @@ Key_Boats_Non_FCRA_wid_2010_IDs := DEDUP(sort(distribute(Key_Boats_Non_FCRA_wid_
 tbl_Key_Boats_Non_FCRA_wid_2010_IDs := TABLE(Key_Boats_Non_FCRA_wid_2010_IDs, {first_registration, state_origin, watercraft_class_description, wid_count := count(group)}, first_registration, state_origin, watercraft_class_description, MANY);
 
 //Despray to bctlpedata12 (one thor file and one csv file). FTP to \\Risk\inf\Data_Factory\DI_Landingzone
-despray_boat_tbl := STD.File.DeSpray('~thor_data400::data_insight::data_metrics::tbl_Key_Boats_Non_FCRA_wid_2010_IDs_FirstSeen'+ filedate +'.csv',
+despray_boat_tbl := STD.File.DeSpray('~thor_data400::data_insight::data_metrics::tbl_Key_Boats_Non_FCRA_wid_2010_IDs_FirstSeen_'+ filedate +'.csv',
 																		 pHostname, 
-																		 pTarget + '/tbl_Key_Boats_Non_FCRA_wid_2010_IDs_FirstSeen'+ filedate +'.csv'
+																		 pTarget + '/tbl_Key_Boats_Non_FCRA_wid_2010_IDs_FirstSeen_'+ filedate +'.csv'
 																		 ,,,,true);
 
 //if everything in the Sequential statement runs, it will send the Success email, else it will send the Failure email
 email_alert := SEQUENTIAL(
-					output(sort(tbl_Key_Boats_Non_FCRA_wid_2010_IDs, -first_registration, state_origin, watercraft_class_description,  skew(1.0)),,'~thor_data400::data_insight::data_metrics::tbl_Key_Boats_Non_FCRA_wid_2010_IDs_FirstSeen'+ filedate +'.csv', csv(heading(single), separator('|'),terminator('\r\n'),quote('\"')),overwrite)
+					output(sort(tbl_Key_Boats_Non_FCRA_wid_2010_IDs, -first_registration, state_origin, watercraft_class_description,  skew(1.0)),,'~thor_data400::data_insight::data_metrics::tbl_Key_Boats_Non_FCRA_wid_2010_IDs_FirstSeen_'+ filedate +'.csv', csv(heading(single), separator('|'),terminator('\r\n'),quote('\"')), overwrite, expire(10))
 					,despray_boat_tbl):
 					Success(FileServices.SendEmail(pContact, 'NonFCRA Group: NonFCRA_Watercraft Build Succeeded', workunit + ': Build complete.' + filedate)),
 					Failure(FileServices.SendEmail(pContact, 'NonFCRA Group: NonFCRA_Watercraft Build Failed', workunit + filedate + '\n' + FAILMESSAGE)

@@ -8,7 +8,7 @@ EXPORT Spray_TCPA_Daily(string pVersion, const varstring pEclSourceIp, string pD
 										pThor);
 						
 	sprayFile 	:= Std.File.SprayVariable(pEclSourceIp,
-																				pDirectory + pVersion + '/' + pFileName + '.TXT',
+																				pDirectory + IF(NOT REGEXFIND(pVersion,pDirectory),pVersion,'') + '/' + pFileName + '.TXT',
 																				,
 																				'|',
 																				'\r\n',

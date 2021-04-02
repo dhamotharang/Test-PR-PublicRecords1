@@ -1,4 +1,8 @@
 ﻿
+
+IMPORT std, NAC_V2, wk_ut;
+
+;
 /*divide(INTEGER	dividend ,INTEGER	divisor) := FUNCTION
 	decimal8_2 x := (dividend*1000)/divisor;
 	x1 := ROUND(x);
@@ -59,6 +63,8 @@ EXPORT Print := MODULE
 	shared warningText := PROJECT(SORT(nac_v2.ValidationCodes.dsWarningCodes,errCode), TRANSFORM(dRow,
 								self.text := left.textValue + ' = WARNING - ' + left.msg;));
 
+
+
 	export NCR_Header := DATASET([
 				{'====================================== FIELD MESSAGES ==================================='},
 				{(string6)'STATE'
@@ -69,6 +75,7 @@ EXPORT Print := MODULE
 						+ (string8)'  COUNT'
 						+ (string6)'   PCT'}
 				], dRow);
+
 
 
 	// Legend for NCR2 report
@@ -112,9 +119,18 @@ EXPORT Print := MODULE
 																				integer nWarnings,		// total warnings
 																				string2 st='XX', boolean reject = false,  
 																				DATASET(NAC_V2.Layouts2.rItemSummary) programs,
-																				DATASET(NAC_V2.Layouts2.rItemSummary) types
-																				) := FUNCTION
+																				DATASET(NAC_V2.Layouts2.rItemSummary) types,
+																				BOOLEAN show_email_message) := FUNCTION
 
+GroupID := STD.Str.ToLowerCase(lfn[6..9]);
+
+boolean IsOnboarding(string gid) := NAC_V2.dNAC2Config(GroupID=gid)[1].Onboarding in ['y','Y'];
+IsOnboardingMessage := IF(IsOnboarding(GroupID) = FALSE, 
+		STD.Str.toUpperCase(GroupID) + ' is in Production, file will be FULLY ingested. ', 
+		STD.Str.toUpperCase(GroupID) + ' is onboarding, file is STAGED for file validation only. ');
+
+internal_use_message := IF(show_email_message, '*** For Internal Use only ***', '');
+onboarding_message := IF(show_email_message, IsOnboardingMessage, '');
 
   d_prog := programs(itemcode = 'D');  // DSNAP
 	UNSIGNED4	d_count :=  d_prog[1].counts;  
@@ -190,6 +206,8 @@ EXPORT Print := MODULE
 
 
 				ds := DATASET([{lfn}], dRow) 
+						 	& DATASET([{internal_use_message}], dRow) 
+							& DATASET([{onboarding_message}], dRow) 	
 							& NCR_Header
 							& PROJECT(SORT(NCR_Samples(errs, nTotal, st),textValue), TRANSFORM(dRow,
 										self.text := (string6)left.state + (string6)left.RecordCode +
@@ -372,7 +390,7 @@ EXPORT Print := MODULE
 
 		records := rr_cases + rr_clients + rr_addresses + rr_contacts + rr_exceptions + rr_badRecords;
 	
-		return SORT(CHOOSEN(records, 1000),errorcode);		// HHSCO-35
+		RETURN CHOOSEN(SORT(records, errorcode), 1000);		// HHSCO-35
 			
 	END;
 

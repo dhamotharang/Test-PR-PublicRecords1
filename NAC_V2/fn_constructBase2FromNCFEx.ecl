@@ -18,7 +18,11 @@
 				
 				self.Prepped_addr1 := addr.Prepped_addr1;
 				self.Prepped_addr2 := addr.Prepped_addr2;
-				self.AddressType := addr.AddressType;
+				self.AddressType := MAP(
+										addr.AddressType='' AND self.Mailing_Street1 <> ''  => 'M',
+										addr.AddressType='' AND self.Physical_Street1 <> '' => 'P',
+										addr.AddressType <> '' => addr.AddressType,
+										'B');
 
 				self.prim_range := addr.prim_range;
 				self.predir := addr.predir;
@@ -152,12 +156,12 @@ EXPORT fn_constructBase2FromNCFEx(DATASET($.Layouts2.rNac2Ex) nacin, string8 ver
 								self := [];
 								));
 
-	ds2 := JOIN(DISTRIBUTE(ds1, HASH32(GroupId, ProgramState,ProgramCode,CaseId)),
-							DISTRIBUTE(clients, HASH32(GroupId, ProgramState,ProgramCode,CaseId)),
+	ds2 := JOIN(DISTRIBUTE(ds1, HASH32(GroupId,CaseId,ProgramCode,ProgramState)),
+							DISTRIBUTE(clients, HASH32(GroupId,CaseId,ProgramCode,ProgramState)),
 								left.GroupId=right.GroupId
-								AND left.ProgramState=right.ProgramState
+								AND left.CaseId=right.CaseId
 								AND left.ProgramCode=right.ProgramCode
-								AND left.CaseId=right.CaseId,
+								AND left.ProgramState=right.ProgramState,
 								//AND left.filename=right.filename,
 				TRANSFORM(layout_Base2,
 					self.case_Last_Name := if(right.HHIndicator='Y', right.LastName, left.LastName);
@@ -218,22 +222,3 @@ EXPORT fn_constructBase2FromNCFEx(DATASET($.Layouts2.rNac2Ex) nacin, string8 ver
 	return ds5;
 
 END;
-	// add head of household as case name
-/*
-	ds3 := JOIN(DISTRIBUTE(ds2(case_last_name=''), HASH32(GroupId, ProgramState,ProgramCode,CaseId)),
-							DISTRIBUTE(clients(HHIndicator='Y'), HASH32(GroupId, ProgramState,ProgramCode,CaseId)),
-								left.GroupId=right.GroupId
-								AND left.ProgramState=right.ProgramState
-								AND left.ProgramCode=right.ProgramCode
-								AND left.CaseId=right.CaseId,
-								//AND left.filename=right.filename,
-				TRANSFORM(layout_Base2,
-					self.case_Last_Name := if(right.HHIndicator='Y', right.LastName, left.LastName);
-					self.case_First_Name := if(right.HHIndicator='Y', right.FirstName, left.FirstName);
-					self.case_Middle_Name := if(right.HHIndicator='Y', right.MiddleName, left.MiddleName);
-					self.case_Name_Suffix := if(right.HHIndicator='Y', right.NameSuffix, left.NameSuffix);
-					self := left;
-					), LEFT OUTER, KEEP(1), LOCAL);
-					
-	ds4 := ds2(case_last_name<>'') + ds3;
-*/

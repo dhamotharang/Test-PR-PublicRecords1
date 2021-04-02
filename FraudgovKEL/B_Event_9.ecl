@@ -4,8 +4,8 @@ IMPORT B_Event_10,E_Address,E_Bank,E_Bank_Account,E_Customer,E_Drivers_License,E
 IMPORT * FROM KEL011.Null;
 EXPORT B_Event_9 := MODULE
   SHARED VIRTUAL TYPEOF(B_Event_10.__ENH_Event_10) __ENH_Event_10 := B_Event_10.__ENH_Event_10;
-  SHARED __EE113395 := __ENH_Event_10;
-  EXPORT __ST103229_Layout := RECORD
+  SHARED __EE115656 := __ENH_Event_10;
+  EXPORT __ST105490_Layout := RECORD
     KEL.typ.nuid UID;
     KEL.typ.ntyp(E_Customer.Typ) _r_Customer_;
     KEL.typ.ntyp(E_Customer.Typ) _r_Source_Customer_;
@@ -313,13 +313,13 @@ EXPORT B_Event_9 := MODULE
     KEL.typ.epoch Date_Last_Seen_ := 0;
     KEL.typ.int __RecordCount := 0;
   END;
-  SHARED __ST103229_Layout __ND114014__Project(B_Event_10.__ST103879_Layout __PP111792) := TRANSFORM
-    SELF.No_Lex_Id_ := MAP(__T(__OP2(__PP111792.Lex_Id_,>,__CN(900000000000)))=>1,0);
-    SELF.T___Evt_Type1_Status_Code_Echo_ := MAP(__PP111792.T___Src_Class_Type_ <> 2 AND __PP111792.T___Src_Class_Type_ <> 3 AND __PP111792.T___Src_Class_Type_ <> 0=>__ECAST(KEL.typ.nint,__CN(-99998)),__T(__OR(__OP2(__CAST(KEL.typ.str,__PP111792._event__type__1_),=,__CN('')),__NT(__PP111792._event__type__1_)))=>__ECAST(KEL.typ.nint,__CN(-99997)),__ECAST(KEL.typ.nint,__PP111792._event__type__1_));
-    SELF.T___Evt_Type2_Status_Code_Echo_ := MAP(__PP111792.T___Src_Class_Type_ <> 2 AND __PP111792.T___Src_Class_Type_ <> 3 AND __PP111792.T___Src_Class_Type_ <> 0=>__ECAST(KEL.typ.nint,__CN(-99998)),__T(__OR(__OP2(__CAST(KEL.typ.str,__PP111792._event__type__2_),=,__CN('')),__NT(__PP111792._event__type__2_)))=>__ECAST(KEL.typ.nint,__CN(-99997)),__ECAST(KEL.typ.nint,__PP111792._event__type__2_));
-    SELF.T___Evt_Type3_Status_Code_Echo_ := MAP(__PP111792.T___Src_Class_Type_ <> 2 AND __PP111792.T___Src_Class_Type_ <> 3 AND __PP111792.T___Src_Class_Type_ <> 0=>__ECAST(KEL.typ.nint,__CN(-99998)),__T(__OR(__OP2(__CAST(KEL.typ.str,__PP111792._event__type__3_),=,__CN('')),__NT(__PP111792._event__type__3_)))=>__ECAST(KEL.typ.nint,__CN(-99997)),__ECAST(KEL.typ.nint,__PP111792._event__type__3_));
-    SELF.T___Person_Uid_Echo_ := MAP(__T(__OR(__NT(__PP111792.Lex_Id_),__OP2(__PP111792.Lex_Id_,=,__CN(0))))=>__ECAST(KEL.typ.nint,__CN(-99999)),__ECAST(KEL.typ.nint,__PP111792.Lex_Id_));
-    SELF := __PP111792;
+  SHARED __ST105490_Layout __ND116275__Project(B_Event_10.__ST106140_Layout __PP114053) := TRANSFORM
+    SELF.No_Lex_Id_ := MAP(__T(__OP2(__PP114053.Lex_Id_,>,__CN(900000000000)))=>1,0);
+    SELF.T___Evt_Type1_Status_Code_Echo_ := MAP(__PP114053.T___Src_Class_Type_ <> 2 AND __PP114053.T___Src_Class_Type_ <> 3 AND __PP114053.T___Src_Class_Type_ <> 0=>__ECAST(KEL.typ.nint,__CN(-99998)),__T(__OR(__OP2(__CAST(KEL.typ.str,__PP114053._event__type__1_),=,__CN('')),__NT(__PP114053._event__type__1_)))=>__ECAST(KEL.typ.nint,__CN(-99997)),__ECAST(KEL.typ.nint,__PP114053._event__type__1_));
+    SELF.T___Evt_Type2_Status_Code_Echo_ := MAP(__PP114053.T___Src_Class_Type_ <> 2 AND __PP114053.T___Src_Class_Type_ <> 3 AND __PP114053.T___Src_Class_Type_ <> 0=>__ECAST(KEL.typ.nint,__CN(-99998)),__T(__OR(__OP2(__CAST(KEL.typ.str,__PP114053._event__type__2_),=,__CN('')),__NT(__PP114053._event__type__2_)))=>__ECAST(KEL.typ.nint,__CN(-99997)),__ECAST(KEL.typ.nint,__PP114053._event__type__2_));
+    SELF.T___Evt_Type3_Status_Code_Echo_ := MAP(__PP114053.T___Src_Class_Type_ <> 2 AND __PP114053.T___Src_Class_Type_ <> 3 AND __PP114053.T___Src_Class_Type_ <> 0=>__ECAST(KEL.typ.nint,__CN(-99998)),__T(__OR(__OP2(__CAST(KEL.typ.str,__PP114053._event__type__3_),=,__CN('')),__NT(__PP114053._event__type__3_)))=>__ECAST(KEL.typ.nint,__CN(-99997)),__ECAST(KEL.typ.nint,__PP114053._event__type__3_));
+    SELF.T___Person_Uid_Echo_ := MAP(__T(__OR(__NT(__PP114053.Lex_Id_),__OP2(__PP114053.Lex_Id_,=,__CN(0))))=>__ECAST(KEL.typ.nint,__CN(-99999)),__ECAST(KEL.typ.nint,__PP114053.Lex_Id_));
+    SELF := __PP114053;
   END;
-  EXPORT __ENH_Event_9 := PROJECT(__EE113395,__ND114014__Project(LEFT)) : PERSIST('~fraudgov::temp::KEL::FraudgovKEL::Event::Annotated_9',EXPIRE(7));
+  EXPORT __ENH_Event_9 := PROJECT(__EE115656,__ND116275__Project(LEFT)) : PERSIST('~fraudgov::temp::KEL::FraudgovKEL::Event::Annotated_9',EXPIRE(7));
 END;

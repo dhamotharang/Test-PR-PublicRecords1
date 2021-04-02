@@ -1,4 +1,4 @@
-
+﻿
 // NMS0822 / New Mexico Real Estate Commission / Real Estate //
 
 export layout_NMS0822 := MODULE
@@ -15,6 +15,7 @@ export layout_NMS0822 := MODULE
 		STRING50   CITY;
 		STRING2    STATE;
 		STRING10   ZIP;
+		STRING			FIELD1;
 		STRING50   COUNTY;//new in Update 20151008
 		STRING50   EMAIL_1;
 		STRING30   LICSTAT;

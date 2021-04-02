@@ -1,4 +1,4 @@
-﻿EXPORT proc_remove_dups(DATASET($.Layout_Tradeline_base) tradelines = $.Files.Base) := FUNCTION
+﻿EXPORT proc_remove_dups(DATASET($.Layout_Tradeline_base) tradelines = $.Files().Base.Tradeline.Built) := FUNCTION
 
 	b1 := SORT(DISTRIBUTE(tradelines(status=''), hash32(account_key)), account_key, ar_date, -filedate, LOCAL);
 

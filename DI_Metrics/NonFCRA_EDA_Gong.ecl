@@ -2,9 +2,9 @@
 //W20200806-094037 Prod
 
 IMPORT _Control, Gong_Neustar, MDR, STD, ut;
-export NonFCRA_EDA_GONG(string pHostname, string pTarget, string pContact ='\' \'') := function
+export NonFCRA_EDA_GONG(string pHostname, string pTarget, string pContact ='\' \'', STRING today = (STRING8)STD.Date.Today()) := function
 
-filedate := (STRING8)Std.Date.Today();
+filedate := today;
 
 Key_Non_FCRA_Gong_History_did := PULL(Gong_Neustar.Key_History_did);
 rs_Key_Non_FCRA_Gong_History_did := Key_Non_FCRA_Gong_History_did;
@@ -51,8 +51,8 @@ despray_gong_ls_tbl := STD.File.DeSpray('~thor_data400::data_insight::data_metri
 
 //if everything in the Sequential statement runs, it will send the Success email, else it will send the Failure email
 email_alert := SEQUENTIAL(
-					output(sort(tbl_src_dates_first_seen, -src, first_seen, skew(1.0)),,'~thor_data400::data_insight::data_metrics::tbl_Key_GongEDA_Non_FCRA_DIDs_FirstSeen_'+ filedate +'.csv', csv(heading(single), separator('|'),terminator('\r\n'),quote('\"')),overwrite)
-					,output(sort(tbl_src_dates_last_seen, -src, last_seen, skew(1.0)),,'~thor_data400::data_insight::data_metrics::tbl_Key_GongEDA_Non_FCRA_DIDs_LastSeen_'+ filedate +'.csv', csv(heading(single), separator('|'),terminator('\r\n'),quote('\"')),overwrite)
+					output(sort(tbl_src_dates_first_seen, -src, first_seen, skew(1.0)),,'~thor_data400::data_insight::data_metrics::tbl_Key_GongEDA_Non_FCRA_DIDs_FirstSeen_'+ filedate +'.csv', csv(heading(single), separator('|'),terminator('\r\n'),quote('\"')), overwrite, expire(10))
+					,output(sort(tbl_src_dates_last_seen, -src, last_seen, skew(1.0)),,'~thor_data400::data_insight::data_metrics::tbl_Key_GongEDA_Non_FCRA_DIDs_LastSeen_'+ filedate +'.csv', csv(heading(single), separator('|'),terminator('\r\n'),quote('\"')), overwrite, expire(10))
 					,despray_gong_fs_tbl
 					,despray_gong_ls_tbl):
 					Success(FileServices.SendEmail(pContact, 'NonFCRA Group: NonFCRA_EDA_GONG Build Succeeded', workunit + ': Build complete.' + filedate)),

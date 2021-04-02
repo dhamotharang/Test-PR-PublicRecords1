@@ -1,5 +1,7 @@
-﻿IMPORT NAC;
+﻿IMPORT NAC, Std;
 EXPORT fn_ReNormalizeCollisions_1(DATASET(Nac.Layouts.Collisions) c) := FUNCTION
+
+string uc(string s) := Std.Str.ToUpperCase(s);
 
 Layout_Slim := RECORD
 
@@ -33,6 +35,8 @@ Layout_Slim := RECORD
 	,string20 SearchCaseID
 	,string		addr1
 	,string		addr2
+	,string1 SearchEligibilityStatus
+	,string1 ClientEligibilityStatus
 	,unsigned4 SearchProcessDate
 	,unsigned4 ClientProcessDate
 	,unsigned4 SearchNCFFileDate
@@ -48,11 +52,17 @@ Layout_Slim xSlim (Nac.Layouts.Collisions c) := TRANSFORM
 													TRIM(c.SearchAddress1City) + ', ' + c.SearchAddress1State + ' ' + c.SearchAddress1Zip[1..5])
 								);	
 	self.Addr2 := IF(c.CasePhysicalStreet1='',
-					StandardizeName(TRIM(c.CasePhysicalStreet1) + ', ' +
-													TRIM(c.CasePhysicalCity) + ', ' + c.CasePhysicalState + ' ' + c.CasePhysicalZip[1..5]),	
 					StandardizeName(TRIM(c.CaseMailStreet1) + ', ' +
-													TRIM(c.CaseMailCity) + ', ' + c.CaseMailState + ' ' + c.CaseMailZip[1..5])
+													TRIM(c.CaseMailCity) + ', ' + c.CaseMailState + ' ' + c.CaseMailZip[1..5]),
+					StandardizeName(TRIM(c.CasePhysicalStreet1) + ', ' +
+													TRIM(c.CasePhysicalCity) + ', ' + c.CasePhysicalState + ' ' + c.CasePhysicalZip[1..5])	
 								);	
+	self.SearchLastName := uc(c.SearchLastName);
+	self.SearchFirstName := uc(c.SearchFirstName);
+	self.SearchMiddleName := uc(c.SearchMiddleName);
+	self.ClientLastName := uc(c.ClientLastName);
+	self.ClientFirstName := uc(c.ClientFirstName);
+	self.ClientMiddleName := uc(c.ClientMiddleName);
 	self := c;
 END;
 

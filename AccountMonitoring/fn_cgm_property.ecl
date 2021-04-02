@@ -1,4 +1,4 @@
-IMPORT LN_PropertyV2, ut, NID, BIPV2;
+IMPORT $, LN_PropertyV2, ut, NID, BIPV2;
 
 EXPORT DATASET(layouts.history) fn_cgm_property(
 		DATASET(AccountMonitoring.layouts.portfolio.base) in_portfolio,
@@ -7,9 +7,9 @@ EXPORT DATASET(layouts.history) fn_cgm_property(
 	) := 
 	FUNCTION
 
-		search_file := AccountMonitoring.product_files.property.search_file_slim;
-		deeds_file  := AccountMonitoring.product_files.property.deeds_file_dist;
-		linkid_file := DISTRIBUTED(AccountMonitoring.product_files.property.SearchLinkid_key,HASH64(seleid));
+		search_file := AccountMonitoring.product_files.property.Property_search_key_sorted;
+		deeds_file  := AccountMonitoring.product_files.property.Property_deed_key_dist;
+		linkid_file := DISTRIBUTED(AccountMonitoring.product_files.property.Property_SearchLinkid_superkey_dist,HASH64(seleid));
 
 		// Temporary Join Layout
 		temp_layout := RECORD
@@ -36,7 +36,7 @@ EXPORT DATASET(layouts.history) fn_cgm_property(
 			deeds_file.fares_refi_flag;
 		END;	
 		
-		temp_layout xfm_collect_monitoring_data(layouts.portfolio.base l, AccountMonitoring.product_files.property.layout_search_file_b r) :=
+		temp_layout xfm_collect_monitoring_data($.layouts.portfolio.base l, RECORDOF(LN_PropertyV2.key_search_fid()) r) :=
 			TRANSFORM
 				SELF.pid  := l.pid;
 				SELF.rid  := l.rid;
@@ -157,7 +157,7 @@ EXPORT DATASET(layouts.history) fn_cgm_property(
 
 		// Now create a hash value from only the fields we're interested in (these are the
 		// non *id fields in the temp_layout).
-		temp_redist_again := SORT(DISTRIBUTE(temp_add_refi_flag,HASH64(pid,rid)),pid,rid,LOCAL);
+		temp_redist_again := SORT(DISTRIBUTE(temp_add_refi_flag,HASH64(pid,rid)),pid,rid, ln_fares_id,LOCAL);
 															
 		temp_unrolled_hashes := PROJECT(temp_redist_again,
 			transform(layouts.history,

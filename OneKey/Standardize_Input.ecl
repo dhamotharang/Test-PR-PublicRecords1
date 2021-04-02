@@ -26,12 +26,12 @@ EXPORT Standardize_Input := MODULE
       //////////////////////////////////////////////////////////////////////////////////////
       // -- Map Fields
       //////////////////////////////////////////////////////////////////////////////////////																																												 
-      SELF.prep_addr_line1										  := addr1;
-      SELF.prep_addr_line_last								  := addr2;
+      SELF.prep_addr_line1										:= addr1;
+      SELF.prep_addr_line_last								:= addr2;
 
-      SELF.source                               := MDR.sourceTools.src_One_Key;
-      SELF.dt_vendor_first_reported						  := (UNSIGNED4)pversion;
-      SELF.dt_vendor_last_reported						  := (UNSIGNED4)pversion;
+      SELF.source                               := MDR.sourceTools.src_SKA;
+      SELF.dt_vendor_first_reported						:= (UNSIGNED4)pversion;
+      SELF.dt_vendor_last_reported						:= (UNSIGNED4)pversion;
       SELF.record_type                          := 'C';
 						
       SELF.HCP_HCE_ID                           := TRIM(l.HCP_HCE_ID, LEFT, RIGHT);

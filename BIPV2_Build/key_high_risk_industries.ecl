@@ -81,7 +81,7 @@ export key_high_risk_industries := module
 	 
 	 addrSearchDs2 := project(addrSearchDs,AddLocIDField);
 	 
-   LocationID_xLink.Append(addrSearchDs2
+   LocationID_xLink.Search(addrSearchDs2
                           ,prim_range
                           ,predir
                           ,prim_name

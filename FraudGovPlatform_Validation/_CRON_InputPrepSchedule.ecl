@@ -1,4 +1,4 @@
-﻿import FraudGovPlatform,_Control,STD;
+﻿import FraudGovPlatform,_Control,STD,ut;
 
 every_hour := '0 * * * *';
 
@@ -23,8 +23,8 @@ Proj_dsFileListSorted := project(dsFileListSorted, transform(new_rec,
 	self:=left));
 	
 J_dsFileListSorted	:= join(Proj_dsFileListSorted, FraudGovPlatform.Files().Flags.CustomerActiveSprays,
-		left.customer_id = right.customer_id and
-		left.file_type = right.file_type
+		ut.CleanSpacesandUpper(left.customer_id) = ut.CleanSpacesandUpper(right.customer_id) and
+		ut.CleanSpacesandUpper(left.file_type) = ut.CleanSpacesandUpper(right.file_type)
 	 );
 	 
 pfile:=STD.STR.SplitWords(J_dsFileListSorted[1].Name,'/');

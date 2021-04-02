@@ -2,7 +2,7 @@
 IMPORT Scrubs; // Import modules for FieldTypes attribute definitions
 EXPORT CarrierReferenceMain_Fields := MODULE
  
-EXPORT NumFields := 78;
+EXPORT NumFields := 77;
  
 // Processing for each FieldType
 EXPORT SALT311.StrType FieldTypeName(UNSIGNED2 i) := CHOOSE(i,'Invalid_Alpha','Invalid_AlphaNum','Invalid_Char','Invalid_Date','Invalid_Email','Invalid_Flag','Invalid_Indicator','Invalid_Ocn_Name','Invalid_NotBlank','Invalid_Num','Invalid_SpecialChar','Invalid_Type');
@@ -39,12 +39,12 @@ EXPORT InValidFT_Invalid_Date(SALT311.StrType s) := WHICH(~Scrubs.fn_valid_date(
 EXPORT InValidMessageFT_Invalid_Date(UNSIGNED1 wh) := CHOOSE(wh,SALT311.HygieneErrors.CustomFail('Scrubs.fn_valid_date'),SALT311.HygieneErrors.Good);
  
 EXPORT MakeFT_Invalid_Email(SALT311.StrType s0) := FUNCTION
-  s1 := SALT311.stringfilter(s0,'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-@.= '); // Only allow valid symbols
+  s1 := SALT311.stringfilter(s0,'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-@=. '); // Only allow valid symbols
   s2 := SALT311.stringcleanspaces( SALT311.stringsubstituteout(s1,' ',' ') ); // Insert spaces but avoid doubles
   RETURN  s2;
 END;
-EXPORT InValidFT_Invalid_Email(SALT311.StrType s) := WHICH(LENGTH(TRIM(s))<>LENGTH(TRIM(SALT311.StringFilter(s,'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-@.= '))));
-EXPORT InValidMessageFT_Invalid_Email(UNSIGNED1 wh) := CHOOSE(wh,SALT311.HygieneErrors.NotInChars('ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-@.= '),SALT311.HygieneErrors.Good);
+EXPORT InValidFT_Invalid_Email(SALT311.StrType s) := WHICH(LENGTH(TRIM(s))<>LENGTH(TRIM(SALT311.StringFilter(s,'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-@=. '))));
+EXPORT InValidMessageFT_Invalid_Email(UNSIGNED1 wh) := CHOOSE(wh,SALT311.HygieneErrors.NotInChars('ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-@=. '),SALT311.HygieneErrors.Good);
  
 EXPORT MakeFT_Invalid_Flag(SALT311.StrType s0) := FUNCTION
   s1 := SALT311.stringfilter(s0,'1 '); // Only allow valid symbols
@@ -63,11 +63,11 @@ EXPORT InValidFT_Invalid_Indicator(SALT311.StrType s) := WHICH(LENGTH(TRIM(s))<>
 EXPORT InValidMessageFT_Invalid_Indicator(UNSIGNED1 wh) := CHOOSE(wh,SALT311.HygieneErrors.NotInChars('X '),SALT311.HygieneErrors.Good);
  
 EXPORT MakeFT_Invalid_Ocn_Name(SALT311.StrType s0) := FUNCTION
-  s1 := SALT311.stringfilter(s0,'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789 '); // Only allow valid symbols
+  s1 := SALT311.stringfilter(s0,'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789'); // Only allow valid symbols
   RETURN  s1;
 END;
-EXPORT InValidFT_Invalid_Ocn_Name(SALT311.StrType s) := WHICH(LENGTH(TRIM(s))<>LENGTH(TRIM(SALT311.StringFilter(s,'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789 '))));
-EXPORT InValidMessageFT_Invalid_Ocn_Name(UNSIGNED1 wh) := CHOOSE(wh,SALT311.HygieneErrors.NotInChars('ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789 '),SALT311.HygieneErrors.Good);
+EXPORT InValidFT_Invalid_Ocn_Name(SALT311.StrType s) := WHICH(LENGTH(TRIM(s))<>LENGTH(TRIM(SALT311.StringFilter(s,'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789'))),~(LENGTH(TRIM(s)) >= 1));
+EXPORT InValidMessageFT_Invalid_Ocn_Name(UNSIGNED1 wh) := CHOOSE(wh,SALT311.HygieneErrors.NotInChars('ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789'),SALT311.HygieneErrors.NotLength('1..'),SALT311.HygieneErrors.Good);
  
 EXPORT MakeFT_Invalid_NotBlank(SALT311.StrType s0) := FUNCTION
   RETURN  s0;
@@ -92,17 +92,17 @@ EXPORT InValidFT_Invalid_SpecialChar(SALT311.StrType s) := WHICH(LENGTH(TRIM(s))
 EXPORT InValidMessageFT_Invalid_SpecialChar(UNSIGNED1 wh) := CHOOSE(wh,SALT311.HygieneErrors.NotInChars('ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789:/@&#-,&.\' '),SALT311.HygieneErrors.Good);
  
 EXPORT MakeFT_Invalid_Type(SALT311.StrType s0) := FUNCTION
-  s1 := SALT311.stringfilter(s0,'0123456789'); // Only allow valid symbols
+  s1 := SALT311.stringfilter(s0,'0123'); // Only allow valid symbols
   RETURN  s1;
 END;
-EXPORT InValidFT_Invalid_Type(SALT311.StrType s) := WHICH(LENGTH(TRIM(s))<>LENGTH(TRIM(SALT311.StringFilter(s,'0123456789'))),~(LENGTH(TRIM(s)) = 1));
-EXPORT InValidMessageFT_Invalid_Type(UNSIGNED1 wh) := CHOOSE(wh,SALT311.HygieneErrors.NotInChars('0123456789'),SALT311.HygieneErrors.NotLength('1'),SALT311.HygieneErrors.Good);
+EXPORT InValidFT_Invalid_Type(SALT311.StrType s) := WHICH(LENGTH(TRIM(s))<>LENGTH(TRIM(SALT311.StringFilter(s,'0123'))),~(LENGTH(TRIM(s)) = 1));
+EXPORT InValidMessageFT_Invalid_Type(UNSIGNED1 wh) := CHOOSE(wh,SALT311.HygieneErrors.NotInChars('0123'),SALT311.HygieneErrors.NotLength('1'),SALT311.HygieneErrors.Good);
  
-EXPORT SALT311.StrType FieldName(UNSIGNED2 i) := CHOOSE(i,'dt_first_reported','dt_last_reported','dt_start','dt_end','ocn','carrier_name','name','serv','line','prepaid','high_risk_indicator','activation_dt','number_in_service','spid','operator_full_name','is_current','override_file','data_type','ocn_state','overall_ocn','target_ocn','overall_target_ocn','ocn_abbr_name','rural_lec_indicator','small_ilec_indicator','category','carrier_address1','carrier_address2','carrier_floor','carrier_room','carrier_city','carrier_state','carrier_zip','carrier_phone','affiliated_to','overall_company','contact_function','contact_name','contact_title','contact_address1','contact_address2','contact_city','contact_state','contact_zip','contact_phone','contact_fax','contact_email','contact_information','prim_range','predir','prim_name','addr_suffix','postdir','unit_desig','sec_range','p_city_name','v_city_name','st','z5','zip4','cart','cr_sort_sz','lot','lot_order','dpbc','chk_digit','rec_type','ace_fips_st','fips_county','geo_lat','geo_long','msa','geo_blk','geo_match','err_stat','append_rawaid','address_type','privacy_indicator');
-EXPORT SALT311.StrType FlatName(UNSIGNED2 i) := CHOOSE(i,'dt_first_reported','dt_last_reported','dt_start','dt_end','ocn','carrier_name','name','serv','line','prepaid','high_risk_indicator','activation_dt','number_in_service','spid','operator_full_name','is_current','override_file','data_type','ocn_state','overall_ocn','target_ocn','overall_target_ocn','ocn_abbr_name','rural_lec_indicator','small_ilec_indicator','category','carrier_address1','carrier_address2','carrier_floor','carrier_room','carrier_city','carrier_state','carrier_zip','carrier_phone','affiliated_to','overall_company','contact_function','contact_name','contact_title','contact_address1','contact_address2','contact_city','contact_state','contact_zip','contact_phone','contact_fax','contact_email','contact_information','prim_range','predir','prim_name','addr_suffix','postdir','unit_desig','sec_range','p_city_name','v_city_name','st','z5','zip4','cart','cr_sort_sz','lot','lot_order','dpbc','chk_digit','rec_type','ace_fips_st','fips_county','geo_lat','geo_long','msa','geo_blk','geo_match','err_stat','append_rawaid','address_type','privacy_indicator');
-EXPORT FieldNum(SALT311.StrType fn) := CASE(fn,'dt_first_reported' => 0,'dt_last_reported' => 1,'dt_start' => 2,'dt_end' => 3,'ocn' => 4,'carrier_name' => 5,'name' => 6,'serv' => 7,'line' => 8,'prepaid' => 9,'high_risk_indicator' => 10,'activation_dt' => 11,'number_in_service' => 12,'spid' => 13,'operator_full_name' => 14,'is_current' => 15,'override_file' => 16,'data_type' => 17,'ocn_state' => 18,'overall_ocn' => 19,'target_ocn' => 20,'overall_target_ocn' => 21,'ocn_abbr_name' => 22,'rural_lec_indicator' => 23,'small_ilec_indicator' => 24,'category' => 25,'carrier_address1' => 26,'carrier_address2' => 27,'carrier_floor' => 28,'carrier_room' => 29,'carrier_city' => 30,'carrier_state' => 31,'carrier_zip' => 32,'carrier_phone' => 33,'affiliated_to' => 34,'overall_company' => 35,'contact_function' => 36,'contact_name' => 37,'contact_title' => 38,'contact_address1' => 39,'contact_address2' => 40,'contact_city' => 41,'contact_state' => 42,'contact_zip' => 43,'contact_phone' => 44,'contact_fax' => 45,'contact_email' => 46,'contact_information' => 47,'prim_range' => 48,'predir' => 49,'prim_name' => 50,'addr_suffix' => 51,'postdir' => 52,'unit_desig' => 53,'sec_range' => 54,'p_city_name' => 55,'v_city_name' => 56,'st' => 57,'z5' => 58,'zip4' => 59,'cart' => 60,'cr_sort_sz' => 61,'lot' => 62,'lot_order' => 63,'dpbc' => 64,'chk_digit' => 65,'rec_type' => 66,'ace_fips_st' => 67,'fips_county' => 68,'geo_lat' => 69,'geo_long' => 70,'msa' => 71,'geo_blk' => 72,'geo_match' => 73,'err_stat' => 74,'append_rawaid' => 75,'address_type' => 76,'privacy_indicator' => 77,0);
-EXPORT SET OF SALT311.StrType FieldRules(UNSIGNED2 i) := CHOOSE(i,['CUSTOM'],['CUSTOM'],['CUSTOM'],['CUSTOM'],['ALLOW'],['LENGTHS'],['ALLOW'],['ALLOW','LENGTHS'],['ALLOW','LENGTHS'],['ALLOW'],['ALLOW'],[],[],['ALLOW'],['LENGTHS'],[],['ALLOW'],['ALLOW'],['ALLOW'],['ALLOW'],['ALLOW'],['ALLOW'],[],['ALLOW'],['ALLOW'],['ALLOW'],[],[],[],[],['ALLOW'],['ALLOW'],['ALLOW'],['ALLOW'],[],[],[],[],[],[],[],['ALLOW'],['ALLOW'],['ALLOW'],['ALLOW'],['ALLOW'],['ALLOW'],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[]);
-EXPORT BOOLEAN InBaseLayout(UNSIGNED2 i) := CHOOSE(i,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,FALSE);
+EXPORT SALT311.StrType FieldName(UNSIGNED2 i) := CHOOSE(i,'dt_first_reported','dt_last_reported','dt_start','dt_end','ocn','carrier_name','serv','line','prepaid','high_risk_indicator','activation_dt','number_in_service','spid','operator_full_name','is_current','override_file','data_type','ocn_state','overall_ocn','target_ocn','overall_target_ocn','ocn_abbr_name','rural_lec_indicator','small_ilec_indicator','category','carrier_address1','carrier_address2','carrier_floor','carrier_room','carrier_city','carrier_state','carrier_zip','carrier_phone','affiliated_to','overall_company','contact_function','contact_name','contact_title','contact_address1','contact_address2','contact_city','contact_state','contact_zip','contact_phone','contact_fax','contact_email','contact_information','prim_range','predir','prim_name','addr_suffix','postdir','unit_desig','sec_range','p_city_name','v_city_name','st','z5','zip4','cart','cr_sort_sz','lot','lot_order','dpbc','chk_digit','rec_type','ace_fips_st','fips_county','geo_lat','geo_long','msa','geo_blk','geo_match','err_stat','append_rawaid','address_type','privacy_indicator');
+EXPORT SALT311.StrType FlatName(UNSIGNED2 i) := CHOOSE(i,'dt_first_reported','dt_last_reported','dt_start','dt_end','ocn','carrier_name','serv','line','prepaid','high_risk_indicator','activation_dt','number_in_service','spid','operator_full_name','is_current','override_file','data_type','ocn_state','overall_ocn','target_ocn','overall_target_ocn','ocn_abbr_name','rural_lec_indicator','small_ilec_indicator','category','carrier_address1','carrier_address2','carrier_floor','carrier_room','carrier_city','carrier_state','carrier_zip','carrier_phone','affiliated_to','overall_company','contact_function','contact_name','contact_title','contact_address1','contact_address2','contact_city','contact_state','contact_zip','contact_phone','contact_fax','contact_email','contact_information','prim_range','predir','prim_name','addr_suffix','postdir','unit_desig','sec_range','p_city_name','v_city_name','st','z5','zip4','cart','cr_sort_sz','lot','lot_order','dpbc','chk_digit','rec_type','ace_fips_st','fips_county','geo_lat','geo_long','msa','geo_blk','geo_match','err_stat','append_rawaid','address_type','privacy_indicator');
+EXPORT FieldNum(SALT311.StrType fn) := CASE(fn,'dt_first_reported' => 0,'dt_last_reported' => 1,'dt_start' => 2,'dt_end' => 3,'ocn' => 4,'carrier_name' => 5,'serv' => 6,'line' => 7,'prepaid' => 8,'high_risk_indicator' => 9,'activation_dt' => 10,'number_in_service' => 11,'spid' => 12,'operator_full_name' => 13,'is_current' => 14,'override_file' => 15,'data_type' => 16,'ocn_state' => 17,'overall_ocn' => 18,'target_ocn' => 19,'overall_target_ocn' => 20,'ocn_abbr_name' => 21,'rural_lec_indicator' => 22,'small_ilec_indicator' => 23,'category' => 24,'carrier_address1' => 25,'carrier_address2' => 26,'carrier_floor' => 27,'carrier_room' => 28,'carrier_city' => 29,'carrier_state' => 30,'carrier_zip' => 31,'carrier_phone' => 32,'affiliated_to' => 33,'overall_company' => 34,'contact_function' => 35,'contact_name' => 36,'contact_title' => 37,'contact_address1' => 38,'contact_address2' => 39,'contact_city' => 40,'contact_state' => 41,'contact_zip' => 42,'contact_phone' => 43,'contact_fax' => 44,'contact_email' => 45,'contact_information' => 46,'prim_range' => 47,'predir' => 48,'prim_name' => 49,'addr_suffix' => 50,'postdir' => 51,'unit_desig' => 52,'sec_range' => 53,'p_city_name' => 54,'v_city_name' => 55,'st' => 56,'z5' => 57,'zip4' => 58,'cart' => 59,'cr_sort_sz' => 60,'lot' => 61,'lot_order' => 62,'dpbc' => 63,'chk_digit' => 64,'rec_type' => 65,'ace_fips_st' => 66,'fips_county' => 67,'geo_lat' => 68,'geo_long' => 69,'msa' => 70,'geo_blk' => 71,'geo_match' => 72,'err_stat' => 73,'append_rawaid' => 74,'address_type' => 75,'privacy_indicator' => 76,0);
+EXPORT SET OF SALT311.StrType FieldRules(UNSIGNED2 i) := CHOOSE(i,['CUSTOM'],['CUSTOM'],['CUSTOM'],['CUSTOM'],['ALLOW','LENGTHS'],['LENGTHS'],['ALLOW','LENGTHS'],['ALLOW','LENGTHS'],['ALLOW'],['ALLOW'],[],[],['ALLOW','LENGTHS'],['LENGTHS'],[],['ALLOW'],['ALLOW'],['ALLOW'],['ALLOW'],['ALLOW'],['ALLOW'],[],['ALLOW'],['ALLOW'],['ALLOW'],[],[],[],[],['ALLOW'],['ALLOW'],['ALLOW'],['ALLOW'],[],[],[],[],[],[],[],['ALLOW'],['ALLOW'],['ALLOW'],['ALLOW'],['ALLOW'],['ALLOW'],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[]);
+EXPORT BOOLEAN InBaseLayout(UNSIGNED2 i) := CHOOSE(i,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,FALSE);
  
 //Individual field level validation
  
@@ -129,10 +129,6 @@ EXPORT InValidMessage_ocn(UNSIGNED1 wh) := InValidMessageFT_Invalid_Ocn_Name(wh)
 EXPORT Make_carrier_name(SALT311.StrType s0) := MakeFT_Invalid_NotBlank(s0);
 EXPORT InValid_carrier_name(SALT311.StrType s) := InValidFT_Invalid_NotBlank(s);
 EXPORT InValidMessage_carrier_name(UNSIGNED1 wh) := InValidMessageFT_Invalid_NotBlank(wh);
- 
-EXPORT Make_name(SALT311.StrType s0) := MakeFT_Invalid_Ocn_Name(s0);
-EXPORT InValid_name(SALT311.StrType s) := InValidFT_Invalid_Ocn_Name(s);
-EXPORT InValidMessage_name(UNSIGNED1 wh) := InValidMessageFT_Invalid_Ocn_Name(wh);
  
 EXPORT Make_serv(SALT311.StrType s0) := MakeFT_Invalid_Type(s0);
 EXPORT InValid_serv(SALT311.StrType s) := InValidFT_Invalid_Type(s);
@@ -445,7 +441,6 @@ Bad_Pivots := %t2%(Cnt>100);
     BOOLEAN Diff_dt_end;
     BOOLEAN Diff_ocn;
     BOOLEAN Diff_carrier_name;
-    BOOLEAN Diff_name;
     BOOLEAN Diff_serv;
     BOOLEAN Diff_line;
     BOOLEAN Diff_prepaid;
@@ -528,7 +523,6 @@ Bad_Pivots := %t2%(Cnt>100);
     SELF.Diff_dt_end := le.dt_end <> ri.dt_end;
     SELF.Diff_ocn := le.ocn <> ri.ocn;
     SELF.Diff_carrier_name := le.carrier_name <> ri.carrier_name;
-    SELF.Diff_name := le.name <> ri.name;
     SELF.Diff_serv := le.serv <> ri.serv;
     SELF.Diff_line := le.line <> ri.line;
     SELF.Diff_prepaid := le.prepaid <> ri.prepaid;
@@ -601,7 +595,7 @@ Bad_Pivots := %t2%(Cnt>100);
     SELF.Diff_address_type := le.address_type <> ri.address_type;
     SELF.Diff_privacy_indicator := le.privacy_indicator <> ri.privacy_indicator;
     SELF.Val := (SALT311.StrType)evaluate(le,pivot_exp);
-    SELF.Num_Diffs := 0+ IF( SELF.Diff_dt_first_reported,1,0)+ IF( SELF.Diff_dt_last_reported,1,0)+ IF( SELF.Diff_dt_start,1,0)+ IF( SELF.Diff_dt_end,1,0)+ IF( SELF.Diff_ocn,1,0)+ IF( SELF.Diff_carrier_name,1,0)+ IF( SELF.Diff_name,1,0)+ IF( SELF.Diff_serv,1,0)+ IF( SELF.Diff_line,1,0)+ IF( SELF.Diff_prepaid,1,0)+ IF( SELF.Diff_high_risk_indicator,1,0)+ IF( SELF.Diff_activation_dt,1,0)+ IF( SELF.Diff_number_in_service,1,0)+ IF( SELF.Diff_spid,1,0)+ IF( SELF.Diff_operator_full_name,1,0)+ IF( SELF.Diff_is_current,1,0)+ IF( SELF.Diff_override_file,1,0)+ IF( SELF.Diff_data_type,1,0)+ IF( SELF.Diff_ocn_state,1,0)+ IF( SELF.Diff_overall_ocn,1,0)+ IF( SELF.Diff_target_ocn,1,0)+ IF( SELF.Diff_overall_target_ocn,1,0)+ IF( SELF.Diff_ocn_abbr_name,1,0)+ IF( SELF.Diff_rural_lec_indicator,1,0)+ IF( SELF.Diff_small_ilec_indicator,1,0)+ IF( SELF.Diff_category,1,0)+ IF( SELF.Diff_carrier_address1,1,0)+ IF( SELF.Diff_carrier_address2,1,0)+ IF( SELF.Diff_carrier_floor,1,0)+ IF( SELF.Diff_carrier_room,1,0)+ IF( SELF.Diff_carrier_city,1,0)+ IF( SELF.Diff_carrier_state,1,0)+ IF( SELF.Diff_carrier_zip,1,0)+ IF( SELF.Diff_carrier_phone,1,0)+ IF( SELF.Diff_affiliated_to,1,0)+ IF( SELF.Diff_overall_company,1,0)+ IF( SELF.Diff_contact_function,1,0)+ IF( SELF.Diff_contact_name,1,0)+ IF( SELF.Diff_contact_title,1,0)+ IF( SELF.Diff_contact_address1,1,0)+ IF( SELF.Diff_contact_address2,1,0)+ IF( SELF.Diff_contact_city,1,0)+ IF( SELF.Diff_contact_state,1,0)+ IF( SELF.Diff_contact_zip,1,0)+ IF( SELF.Diff_contact_phone,1,0)+ IF( SELF.Diff_contact_fax,1,0)+ IF( SELF.Diff_contact_email,1,0)+ IF( SELF.Diff_contact_information,1,0)+ IF( SELF.Diff_prim_range,1,0)+ IF( SELF.Diff_predir,1,0)+ IF( SELF.Diff_prim_name,1,0)+ IF( SELF.Diff_addr_suffix,1,0)+ IF( SELF.Diff_postdir,1,0)+ IF( SELF.Diff_unit_desig,1,0)+ IF( SELF.Diff_sec_range,1,0)+ IF( SELF.Diff_p_city_name,1,0)+ IF( SELF.Diff_v_city_name,1,0)+ IF( SELF.Diff_st,1,0)+ IF( SELF.Diff_z5,1,0)+ IF( SELF.Diff_zip4,1,0)+ IF( SELF.Diff_cart,1,0)+ IF( SELF.Diff_cr_sort_sz,1,0)+ IF( SELF.Diff_lot,1,0)+ IF( SELF.Diff_lot_order,1,0)+ IF( SELF.Diff_dpbc,1,0)+ IF( SELF.Diff_chk_digit,1,0)+ IF( SELF.Diff_rec_type,1,0)+ IF( SELF.Diff_ace_fips_st,1,0)+ IF( SELF.Diff_fips_county,1,0)+ IF( SELF.Diff_geo_lat,1,0)+ IF( SELF.Diff_geo_long,1,0)+ IF( SELF.Diff_msa,1,0)+ IF( SELF.Diff_geo_blk,1,0)+ IF( SELF.Diff_geo_match,1,0)+ IF( SELF.Diff_err_stat,1,0)+ IF( SELF.Diff_append_rawaid,1,0)+ IF( SELF.Diff_address_type,1,0)+ IF( SELF.Diff_privacy_indicator,1,0);
+    SELF.Num_Diffs := 0+ IF( SELF.Diff_dt_first_reported,1,0)+ IF( SELF.Diff_dt_last_reported,1,0)+ IF( SELF.Diff_dt_start,1,0)+ IF( SELF.Diff_dt_end,1,0)+ IF( SELF.Diff_ocn,1,0)+ IF( SELF.Diff_carrier_name,1,0)+ IF( SELF.Diff_serv,1,0)+ IF( SELF.Diff_line,1,0)+ IF( SELF.Diff_prepaid,1,0)+ IF( SELF.Diff_high_risk_indicator,1,0)+ IF( SELF.Diff_activation_dt,1,0)+ IF( SELF.Diff_number_in_service,1,0)+ IF( SELF.Diff_spid,1,0)+ IF( SELF.Diff_operator_full_name,1,0)+ IF( SELF.Diff_is_current,1,0)+ IF( SELF.Diff_override_file,1,0)+ IF( SELF.Diff_data_type,1,0)+ IF( SELF.Diff_ocn_state,1,0)+ IF( SELF.Diff_overall_ocn,1,0)+ IF( SELF.Diff_target_ocn,1,0)+ IF( SELF.Diff_overall_target_ocn,1,0)+ IF( SELF.Diff_ocn_abbr_name,1,0)+ IF( SELF.Diff_rural_lec_indicator,1,0)+ IF( SELF.Diff_small_ilec_indicator,1,0)+ IF( SELF.Diff_category,1,0)+ IF( SELF.Diff_carrier_address1,1,0)+ IF( SELF.Diff_carrier_address2,1,0)+ IF( SELF.Diff_carrier_floor,1,0)+ IF( SELF.Diff_carrier_room,1,0)+ IF( SELF.Diff_carrier_city,1,0)+ IF( SELF.Diff_carrier_state,1,0)+ IF( SELF.Diff_carrier_zip,1,0)+ IF( SELF.Diff_carrier_phone,1,0)+ IF( SELF.Diff_affiliated_to,1,0)+ IF( SELF.Diff_overall_company,1,0)+ IF( SELF.Diff_contact_function,1,0)+ IF( SELF.Diff_contact_name,1,0)+ IF( SELF.Diff_contact_title,1,0)+ IF( SELF.Diff_contact_address1,1,0)+ IF( SELF.Diff_contact_address2,1,0)+ IF( SELF.Diff_contact_city,1,0)+ IF( SELF.Diff_contact_state,1,0)+ IF( SELF.Diff_contact_zip,1,0)+ IF( SELF.Diff_contact_phone,1,0)+ IF( SELF.Diff_contact_fax,1,0)+ IF( SELF.Diff_contact_email,1,0)+ IF( SELF.Diff_contact_information,1,0)+ IF( SELF.Diff_prim_range,1,0)+ IF( SELF.Diff_predir,1,0)+ IF( SELF.Diff_prim_name,1,0)+ IF( SELF.Diff_addr_suffix,1,0)+ IF( SELF.Diff_postdir,1,0)+ IF( SELF.Diff_unit_desig,1,0)+ IF( SELF.Diff_sec_range,1,0)+ IF( SELF.Diff_p_city_name,1,0)+ IF( SELF.Diff_v_city_name,1,0)+ IF( SELF.Diff_st,1,0)+ IF( SELF.Diff_z5,1,0)+ IF( SELF.Diff_zip4,1,0)+ IF( SELF.Diff_cart,1,0)+ IF( SELF.Diff_cr_sort_sz,1,0)+ IF( SELF.Diff_lot,1,0)+ IF( SELF.Diff_lot_order,1,0)+ IF( SELF.Diff_dpbc,1,0)+ IF( SELF.Diff_chk_digit,1,0)+ IF( SELF.Diff_rec_type,1,0)+ IF( SELF.Diff_ace_fips_st,1,0)+ IF( SELF.Diff_fips_county,1,0)+ IF( SELF.Diff_geo_lat,1,0)+ IF( SELF.Diff_geo_long,1,0)+ IF( SELF.Diff_msa,1,0)+ IF( SELF.Diff_geo_blk,1,0)+ IF( SELF.Diff_geo_match,1,0)+ IF( SELF.Diff_err_stat,1,0)+ IF( SELF.Diff_append_rawaid,1,0)+ IF( SELF.Diff_address_type,1,0)+ IF( SELF.Diff_privacy_indicator,1,0);
   END;
 // Now need to remove bad pivots from comparison
 #uniquename(L)
@@ -620,7 +614,6 @@ Bad_Pivots := %t2%(Cnt>100);
     Count_Diff_dt_end := COUNT(GROUP,%Closest%.Diff_dt_end);
     Count_Diff_ocn := COUNT(GROUP,%Closest%.Diff_ocn);
     Count_Diff_carrier_name := COUNT(GROUP,%Closest%.Diff_carrier_name);
-    Count_Diff_name := COUNT(GROUP,%Closest%.Diff_name);
     Count_Diff_serv := COUNT(GROUP,%Closest%.Diff_serv);
     Count_Diff_line := COUNT(GROUP,%Closest%.Diff_line);
     Count_Diff_prepaid := COUNT(GROUP,%Closest%.Diff_prepaid);

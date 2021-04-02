@@ -43,9 +43,11 @@ SKIP((C = 2 AND L.SIC02 in ['',L.Primary_SIC] AND L.NAICS02 in ['',L.NAICS01]) O
 	SELF.source       						:=	mdr.sourcetools.src_Database_USA;
 	SELF.source_docid  						:=	trim(l.DBUSA_Business_ID) + trim(l.DBUSA_Executive_ID);
 	SELF.source_rec_id            :=  L.record_sid;
-	SELF.siccode       						:=	CHOOSE(C, L.Primary_SIC, L.SIC02, L.SIC03, L.SIC04, L.SIC05, L.SIC06);
+	temp_sic_code                 :=  CHOOSE(C, L.Primary_SIC, L.SIC02, L.SIC03, L.SIC04, L.SIC05, L.SIC06);
+	SELF.siccode						      :=  If(ut.fn_SIC_functions.fn_validate_SICCode(temp_sic_code[1..4]) = 1,ut.CleanSpacesAndUpper(temp_sic_code[1..4]),'');
 	SELF.industry_description 		:=	CHOOSE(C, L.Primary_SIC_Desc, L.SIC02_Desc, L.SIC03_Desc, L.SIC04_Desc, L.SIC05_Desc, L.SIC06_Desc);
-	SELF.naics        						:=	CHOOSE(C, L.NAICS01, L.NAICS02, L.NAICS03, L.NAICS04, L.NAICS05, L.NAICS06);
+	temp_naics_code    						:=	CHOOSE(C, L.NAICS01, L.NAICS02, L.NAICS03, L.NAICS04, L.NAICS05, L.NAICS06);
+  SELF.naics            				:=  If(ut.fn_NAICS_functions.fn_validate_NAICSCode(temp_naics_code) = 1,ut.CleanSpacesAndUpper(temp_naics_code),'');
 	SELF.business_description 		:=	CHOOSE(C, L.NAICS01_Desc, L.NAICS02_Desc, L.NAICS03_Desc, L.NAICS04_Desc, L.NAICS05_Desc, L.NAICS06_Desc);
   SELF 													:=	L;
 	SELF 													:=	[];

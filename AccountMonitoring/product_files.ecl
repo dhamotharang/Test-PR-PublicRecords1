@@ -1,12 +1,12 @@
-﻿/*2011-07-06T18:43:20Z (Chris Albee_prod)
+﻿﻿/*2011-07-06T18:43:20Z (Chris Albee_prod)
 Add BK daily files.
 */
 IMPORT AccountMonitoring,BankruptcyV2, Business_Header, CellPhone, CourtLink, Corrections, Did_Add, Doxie, 
 			 Data_Services, Gong, Gong_Neustar, Header, Header_Quick, Header_Services, LiensV2, LN_PropertyV2, NID, PAW, 
-			 PhonesFeedback, Phonesplus, POE, Property, Risk_Indicators, ut, UtilFile, Watchdog, 
+			 PhonesFeedback, Phonesplus, POE, Risk_Indicators, ut, UtilFile, Watchdog, 
 			 hygenics_crim, business_header_ss, PhonesInfo, BIPV2_Best, 
 			 Business_Credit, Business_Credit_Scoring, UCCV2, SAM, Inquiry_AccLogs, Corp2,
-			 VehicleV2, FAA, Watercraft, Phonesplus_v2, dx_PhonesInfo;
+			 VehicleV2, FAA, Watercraft, Phonesplus_v2, dx_PhonesInfo, dx_Phone_TCPA, dx_Property;
 			 
 EXPORT product_files := MODULE
 
@@ -357,41 +357,48 @@ EXPORT product_files := MODULE
 	
 	EXPORT foreclosure := MODULE
 
-		// =========================== ORIGINALLY: ===========================
-		// export File_Foreclosure_Base := PROJECT(File_Foreclosure_Base_v2, Layout_Fares_Foreclosure);
-		// ===================================================================	
-		EXPORT base_filename_raw := 'thor_data400::base::foreclosure';
-		EXPORT base_filename := AccountMonitoring.constants.DATA_LOCATION + base_filename_raw;
-		EXPORT base_file_raw := DATASET(base_filename, Property.Layout_Fares_Foreclosure_v2, THOR);
-		EXPORT base_file     := PROJECT(base_file_raw, Property.Layout_Fares_Foreclosure);
+		EXPORT Foreclosure_fid_superfile := 'thor_data400::key::foreclosure_fid_'+doxie.Version_SuperKey;
+		EXPORT Foreclosure_fid_superkey_monitor := 'monitor::foreclosure::foreclosure_fid';
+		EXPORT Foreclosure_fid_superkeyname := AccountMonitoring.constants.MONITOR_KEY_CLUSTER + Foreclosure_fid_superkey_monitor+ '_qa';
 		
-		EXPORT Layout_Base_Header_file_slim := RECORD
-			Property.Layout_Fares_Foreclosure.foreclosure_id;
-			Property.Layout_Fares_Foreclosure.situs1_prim_range;
-			Property.Layout_Fares_Foreclosure.situs1_predir;
-			Property.Layout_Fares_Foreclosure.situs1_prim_name;
-			Property.Layout_Fares_Foreclosure.situs1_addr_suffix;
-			Property.Layout_Fares_Foreclosure.situs1_postdir;
-			Property.Layout_Fares_Foreclosure.situs1_sec_range;
-			Property.Layout_Fares_Foreclosure.situs1_p_city_name;
-			Property.Layout_Fares_Foreclosure.situs1_st;
-			Property.Layout_Fares_Foreclosure.situs1_zip;
-			Property.Layout_Fares_Foreclosure.recording_date;
-			Property.Layout_Fares_Foreclosure.filing_date;
-			Property.Layout_Fares_Foreclosure.deed_category;
-			Property.Layout_Fares_Foreclosure.document_type;
-			Property.Layout_Fares_Foreclosure.name1_did;
-		END;
+		EXPORT key_Foreclosure_fid := 
+			PULL(INDEX(
+				dx_Property.Key_Foreclosures_FID,  
+				Foreclosure_fid_superkeyname
+			));
+			
+		EXPORT key_Foreclosure_fid_dist :=
+			DISTRIBUTE(
+				key_Foreclosure_fid, 
+				HASH64(situs1_zip,situs1_prim_range,situs1_prim_name,situs1_addr_suffix,situs1_predir)
+			): INDEPENDENT;
 
-		EXPORT base_file_slim := 
-			PROJECT(
-				DISTRIBUTE(
-					base_file, 
-					HASH64(situs1_zip,situs1_prim_range,situs1_prim_name,situs1_addr_suffix,situs1_predir)
-				),
-				Layout_Base_Header_file_slim
-			) : INDEPENDENT; //PERSIST('acctmon::foreclosure::base_file_slim');
+		EXPORT NOD_fid_superfile := 'thor_data400::key::nod::'+doxie.Version_SuperKey+'::fid';
+		EXPORT NOD_fid_superkey_monitor := 'monitor::foreclosure::nod_fid';
+		EXPORT NOD_fid_superkeyname := AccountMonitoring.constants.MONITOR_KEY_CLUSTER + NOD_fid_superkey_monitor+ '_qa';
 		
+		EXPORT key_NOD_fid := 
+			PULL(INDEX(
+				dx_Property.Key_NOD_FID,  
+				NOD_fid_superkeyname
+			));
+			
+		EXPORT key_NOD_fid_dist :=
+			DISTRIBUTE(
+				key_NOD_fid, 
+				HASH64(situs1_zip,situs1_prim_range,situs1_prim_name,situs1_addr_suffix,situs1_predir)
+			): INDEPENDENT;
+
+    
+		EXPORT Foreclosure_delta_rid_superfile := 'thor_data400::key::foreclosure::'+doxie.Version_SuperKey+'::delta_rid';
+		EXPORT Foreclosure_delta_rid_superkey_monitor := 'monitor::foreclosure::delta_rid';
+		EXPORT Foreclosure_delta_rid_superkeyname := AccountMonitoring.constants.MONITOR_KEY_CLUSTER + Foreclosure_delta_rid_superkey_monitor+ '_qa';
+
+		EXPORT key_Foreclosure_delta_rid := 
+			INDEX(
+				dx_Property.Key_Foreclosure_Delta_Rid,  
+				Foreclosure_delta_rid_superkeyname
+			);
 	END;
 	
 	EXPORT people_at_work := MODULE
@@ -730,39 +737,17 @@ EXPORT product_files := MODULE
 		//																		ln_fares_id NOT IN LN_PropertyV2.Suppress_LNFaresID);
 		// ===================================================================
 		
-		// Search file.
-		EXPORT layout_search_file_b := RECORD
-			LN_PropertyV2.Layout_DID_Out.ln_fares_id;
-			LN_PropertyV2.Layout_DID_Out.fname;
-			LN_PropertyV2.Layout_DID_Out.mname;
-			LN_PropertyV2.Layout_DID_Out.lname;
-			LN_PropertyV2.Layout_DID_Out.name_suffix;
-			LN_PropertyV2.Layout_DID_Out.cname;
-			LN_PropertyV2.Layout_DID_Out.prim_range;
-			LN_PropertyV2.Layout_DID_Out.predir;
-			LN_PropertyV2.Layout_DID_Out.prim_name;
-			LN_PropertyV2.Layout_DID_Out.suffix;
-			LN_PropertyV2.Layout_DID_Out.postdir;
-			LN_PropertyV2.Layout_DID_Out.unit_desig;
-			LN_PropertyV2.Layout_DID_Out.sec_range;
-			LN_PropertyV2.Layout_DID_Out.p_city_name;
-			LN_PropertyV2.Layout_DID_Out.st;
-			LN_PropertyV2.Layout_DID_Out.zip;
-			LN_PropertyV2.Layout_DID_Out.did;
-			LN_PropertyV2.Layout_DID_Out.bdid;
-			LN_PropertyV2.Layout_DID_Out.prop_addr_propagated_ind;
-			LN_PropertyV2.Layout_DID_Out.dt_last_seen;
-			LN_PropertyV2.Layout_DID_Out.dt_vendor_last_reported;
-			LN_PropertyV2.Layout_DID_Out.app_ssn;
-			LN_PropertyV2.Layout_DID_Out.process_date;
-		END;
+		// Search file.		
+		EXPORT Property_search_Roxiesuperfile:= 'thor_data400::key::ln_propertyv2::qa::search.fid';
+		EXPORT Property_search_keyname_monitor := 'monitor::LN_PropertyV2::Search_fid';
+		EXPORT Property_search_superkey_monitor := AccountMonitoring.constants.MONITOR_KEY_CLUSTER + Property_search_keyname_monitor + '_qa';
 		
-		EXPORT search_filename_raw := 'thor_data400::base::ln_propertyv2::search';
-		EXPORT search_filename     := AccountMonitoring.constants.DATA_LOCATION + search_filename_raw;
-		EXPORT search_file         := DATASET(search_filename, LN_PropertyV2.Layout_DID_Out, THOR);
-		EXPORT search_file_cleaned := 
-			search_file
-				( NOT ( LENGTH(TRIM(cname)) BETWEEN 1 AND 3 OR
+    SHARED Property_search_key_undist := INDEX(
+												LN_PropertyV2.key_search_fid(),  
+												Property_search_superkey_monitor
+												);
+    
+    SHARED Property_search_key_filtered := Property_search_key_undist( NOT ( LENGTH(TRIM(cname)) BETWEEN 1 AND 3 OR
 							 ( TRIM(prim_range)  = '' AND 
 								 TRIM(prim_name)   = '' AND 
 								 TRIM(v_city_name) = '' AND 
@@ -771,78 +756,71 @@ EXPORT product_files := MODULE
 							) AND
 				 (source_code[2] = 'P') AND
 				 ln_fares_id NOT IN LN_PropertyV2.Suppress_LNFaresID );
-		
-		EXPORT search_file_cleaned_slim := PROJECT(search_file_cleaned,layout_search_file_b);
 
-		EXPORT search_file_dist_slim := 
-			DISTRIBUTE(search_file_cleaned_slim,
+		SHARED Property_search_key_dist := 
+			DISTRIBUTE(Property_search_key_filtered,
 			           HASH32(did, bdid, app_ssn, lname, fname, 
-								        prim_range, prim_name, suffix, p_city_name, st, zip));
-												
-		EXPORT search_file_slim := 
-			DEDUP(SORT(search_file_dist_slim,
+								prim_range, prim_name, suffix, p_city_name, st, zip)): INDEPENDENT;
+	  
+		EXPORT Property_search_key_sorted := DEDUP(SORT(Property_search_key_dist,
 								 did, bdid, app_ssn, lname, fname, 
-								 prim_range, prim_name, suffix, p_city_name, st, zip, -process_date, 
+								 prim_range, prim_name, suffix, p_city_name, st, zip, -process_date, RECORD,
 								 LOCAL),
 						did, bdid, app_ssn, lname, fname, 
 						prim_range, prim_name, suffix, p_city_name, st, zip, 
-						LOCAL)
-			: /*INDEPENDENT;*/ PERSIST('acctmon::property::search_file_slim');
-	
+						LOCAL);
+
 		// Deeds file.
-		EXPORT layout_deeds_file_b := RECORD
-			LN_PropertyV2.layout_addl_fares_deed.ln_fares_id;
-			LN_PropertyV2.layout_addl_fares_deed.fares_refi_flag;
-		END;
-		
-		EXPORT deeds_filename_raw := 'thor_data400::base::ln_propertyv2::Addl::fares_deed';
-		EXPORT deeds_filename     := AccountMonitoring.constants.DATA_LOCATION + deeds_filename_raw;
-		EXPORT deeds_file         := DATASET(deeds_filename, LN_PropertyV2.layout_addl_fares_deed, THOR);
-		
-		SHARED deeds_file_slim := PROJECT(deeds_file,layout_deeds_file_b);
-
-		EXPORT deeds_file_dist := 
-			DISTRIBUTE(deeds_file_slim, HASH64(ln_fares_id)) : /*INDEPENDENT;*/ PERSIST('acctmon::property::deeds_file_slim');
 	
-		// Linkid key
-		property_build_version         := TRIM(did_add.get_EnvVariable('Property_Build_Version') ):INDEPENDENT;
-		
-		EXPORT SearchLinkid_keyname_raw := 'thor_data400::key::ln_propertyv2::' + property_build_version + '::search.linkids';
-		EXPORT SearchLinkid_keyname     := AccountMonitoring.constants.DATA_LOCATION + SearchLinkid_keyname_raw;
-			
-		EXPORT SearchLinkid_superkeyname_raw 	:= 'thor_data400::key::ln_propertyv2' + doxie.Version_SuperKey + '::search.linkids';
-		EXPORT SearchLinkid_superkeyname     	:= AccountMonitoring.constants.DATA_LOCATION + SearchLinkid_superkeyname_raw;
+		EXPORT Property_deed_Roxiesuperfile := 'thor_data400::key::ln_propertyv2::qa::addlfaresdeed.fid';
+		EXPORT Property_deed_keyname_monitor := 'monitor::LN_PropertyV2::addlfaresdeed.fid';
+		EXPORT Property_deed_superkey_monitor := AccountMonitoring.constants.MONITOR_KEY_CLUSTER + Property_deed_keyname_monitor + '_qa';
 
-		SHARED SearchLinkid_key_undist := 
+		SHARED Property_deed_key_undist := INDEX(
+										LN_PropertyV2.key_addl_fares_deed_fid,  
+										Property_deed_superkey_monitor
+										);
+
+		EXPORT Property_deed_key_dist := 
+			DISTRIBUTE(Property_deed_key_undist, HASH64(ln_fares_id)) : INDEPENDENT;
+	
+		// Linkid key		
+		EXPORT Property_SearchLinkid_Roxie_superfile := 'thor_data400::key::ln_propertyv2::qa::search.linkids';
+		EXPORT Property_SearchLinkid_keyname_monitor     := 'monitor::LN_PropertyV2::search.linkids';
+		EXPORT Property_SearchLinkid_superkey_monitor := AccountMonitoring.constants.MONITOR_KEY_CLUSTER + Property_SearchLinkid_keyname_monitor + '_qa';
+
+		SHARED Property_SearchLinkid_superkey_undist := 
 				INDEX(
 					LN_PropertyV2.Key_LinkIds.key,  
-					SearchLinkid_keyname
+					Property_SearchLinkid_superkey_monitor
 				);
 
-		EXPORT SearchLinkid_key :=
+		EXPORT Property_SearchLinkid_superkey_dist :=
 				DISTRIBUTE(
-					SearchLinkid_key_undist, 
+					Property_SearchLinkid_superkey_undist, 
 					HASH64(seleid)
 					): INDEPENDENT; //PERSIST('acctmon::property::search_linkid');
 		
 		
-	END;
+	END; // End Property Module
 	
 	EXPORT litigiousdebtor := MODULE
-		
-		EXPORT layout_search_file_b := RECORD
-			CourtLink.Layouts.Base.debtor_lname;
-			CourtLink.Layouts.Base.debtor_fname;
-			CourtLink.Layouts.Base.CourtState;
-			CourtLink.Layouts.Base.DocketNumber;
-		END;
-		
-		EXPORT litigiousdebtor_filename_raw    := 'thor_data400::base::courtlink::qa::litdebt';
-		EXPORT litigiousdebtor_filename        := AccountMonitoring.constants.DATA_LOCATION + litigiousdebtor_filename_raw;
-		EXPORT litigiousdebtor_file            := DATASET(litigiousdebtor_filename, CourtLink.Layouts.Base, THOR);
-		
-		EXPORT litigiousdebtor_file_slim := DISTRIBUTE(litigiousdebtor_file, HASH32(debtor_lname, debtor_fname, CourtState, DocketNumber)) 
-		                                    : INDEPENDENT; //PERSIST('acctmon::litigiousdebtor::search_file_slim');
+
+    EXPORT litigiousdebtor_Roxie_SuperFile := 'thor_data400::key::courtlink::qa::courtid_docket';
+    EXPORT litigiousdebtor_superkey_monitor := 'monitor::litigiousdebtor::courtid_docket';
+    EXPORT litigiousdebtor_superkey     := AccountMonitoring.constants.MONITOR_KEY_CLUSTER + litigiousdebtor_superkey_monitor + '_qa';
+
+    SHARED litigiousdebtor_key_undist := 
+        INDEX(
+              CourtLink.key_CourtID_Docket,
+              litigiousdebtor_superkey
+            );
+
+    EXPORT litigiousdebtor_key :=
+        DISTRIBUTE(
+                  litigiousdebtor_key_undist, 
+                  HASH32(debtor_lname, NID.PreferredFirstNew(debtor_fname), CourtState)
+                ): INDEPENDENT; //PERSIST('acctmon::litigiousdebtor::search_file_slim');
 	END;
 
 	EXPORT liens := MODULE
@@ -1107,19 +1085,18 @@ EXPORT product_files := MODULE
 	
 	EXPORT phonefeedback := MODULE
 		
-      EXPORT phonefeedback_phone_keyname := 'thor_data400::key::phonesFeedback::'+doxie.Version_SuperKey+'::phone';
-      EXPORT PhonesFeedback_Phone_superkey_monitor := 'monitor::PhonesFeedback::Phone';
-      EXPORT PhonesFeedback_superkey     := AccountMonitoring.constants.MONITOR_KEY_CLUSTER + PhonesFeedback_Phone_superkey_monitor + '_qa';
+		EXPORT phonefeedback_phone_keyname := 'thor_data400::key::phonesFeedback::'+doxie.Version_SuperKey+'::phone';
+		EXPORT PhonesFeedback_Phone_superkey_monitor := 'monitor::PhonesFeedback::Phone';
+		EXPORT PhonesFeedback_superkey     := AccountMonitoring.constants.MONITOR_KEY_CLUSTER + PhonesFeedback_Phone_superkey_monitor + '_qa';
 
-      SHARED PhonesFeedback_key_undist := INDEX(
-												PhonesFeedback.Key_PhonesFeedback_phone(),  
-												PhonesFeedback_superkey
-												);
+		SHARED PhonesFeedback_key_undist := INDEX(
+											PhonesFeedback.Key_PhonesFeedback_phone(),  
+											PhonesFeedback_superkey
+											);
 
-      EXPORT PhonesFeedback_key_monitor := DISTRIBUTE(PhonesFeedback_key_undist(did != 0), 
-                                             HASH64(did)
-                                            ): INDEPENDENT; 
-	
+		EXPORT PhonesFeedback_key_monitor := DISTRIBUTE(PhonesFeedback_key_undist(did != 0), 
+																						HASH64(did)
+																					): INDEPENDENT;			
 	END;
 
 	EXPORT workplace := MODULE
@@ -1204,22 +1181,39 @@ EXPORT product_files := MODULE
 	END; // end workplace module
 
 	EXPORT PhoneOwnership := MODULE
-		EXPORT pphone_superkeyname := AccountMonitoring.constants.DATA_LOCATION + 'thor_data400::key::phones_ported_metadata_'+doxie.Version_SuperKey;
-		pphone_build_version         := TRIM( did_add.get_EnvVariable('pphones_build_version') ):INDEPENDENT;
-		key_pphone_keyname_raw := 'thor_data400::key::'+pphone_build_version+'::phones_ported_metadata';
-		key_pphone_keyname     := AccountMonitoring.constants.DATA_LOCATION + key_pphone_keyname_raw;
-		// Define a Duplicate Index; this points to the logical key file
-		EXPORT key_pphone := 
-			INDEX(
-				PhonesInfo.Key_Phones.Ported_Metadata,  
-				key_pphone_keyname
-			);
+
+	  EXPORT phones_transaction_superfile	:= 'thor_data400::key::Phones_transaction_'+doxie.Version_SuperKey;
+    EXPORT phones_transaction_for_superkey_monitor := 'monitor::Phones_transaction';
+	  EXPORT phones_transaction_superkeyname := AccountMonitoring.constants.MONITOR_KEY_CLUSTER + phones_transaction_for_superkey_monitor + '_qa';
+	
+		EXPORT key_phones_transaction := 
+			PULL(INDEX(
+				dx_PhonesInfo.Key_Phones_Transaction,  
+				phones_transaction_superkeyname
+			));
 			
-		EXPORT key_pphone_dist :=
+		EXPORT key_phones_transaction_dist :=
 			DISTRIBUTE(
-				key_pphone, 
+				key_phones_transaction, 
 				HASH64(phone)
 			): INDEPENDENT;
+
+    EXPORT phones_WDNC_superfile  := 'thor_data400::key::tcpa::'+doxie.Version_SuperKey+'::phone_history';
+	  EXPORT phones_WDNC_for_superkey_monitor := 'monitor::Phones_WDNC';
+	  EXPORT phones_WDNC_superkeyname := AccountMonitoring.constants.MONITOR_KEY_CLUSTER + phones_WDNC_for_superkey_monitor + '_qa';
+	  
+	  EXPORT key_phones_WDNC := 
+	      PULL(INDEX(
+	        dx_Phone_TCPA.Key_TCPA_Phone_History(),  
+	        phones_WDNC_superkeyname
+	      ));
+	      
+	  EXPORT key_phones_WDNC_dist :=
+	      DISTRIBUTE(
+	        key_phones_WDNC, 
+	        HASH64(phone)
+	      ): INDEPENDENT;
+
 	END; //end of phone ownership
 	
 	EXPORT sbfe := MODULE

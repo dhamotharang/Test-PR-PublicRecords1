@@ -49,7 +49,7 @@ EXPORT OtherPhones_GenerationMod := MODULE(SALT311.iGenerationMod)
     + 'FIELDTYPE:Invalid_Type:ENUM(LANDLINE|POSSIBLE WIRELESS|PAGER|POSSIBLE VOIP|WIRELESS|VOIP|OTHER/UNKNOWN|CABLE|\\\\N|)\n'
     + 'FIELDTYPE:Invalid_Status:ENUM(ACTIVE|NOT AVAILABLE|INACTIVE|\\\\N|)\n'
     + 'FIELDTYPE:Invalid_Port:ENUM(Not Ported|Ported|\\\\N|)\n'
-    + 'FIELDTYPE:Invalid_AlphaChar:ALLOW(ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789 .,/-&|\\\\\')\n'
+    + 'FIELDTYPE:Invalid_AlphaChar:ALLOW(ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789\\\\(\\\\)@*:;#_ .,/-&|\\\\\')\n'
     + 'FIELDTYPE:Invalid_Phone:LIKE(Invalid_No):LENGTHS(0,9,10)\n'
     + 'FIELDTYPE:Invalid_Date:CUSTOM(Scrubs_PhoneFinder.Functions.Split_Date > 0)\n'
     + 'FIELDTYPE:Invalid_File:CUSTOM(Scrubs_PhoneFinder.Functions.Check_File > 0)\n'

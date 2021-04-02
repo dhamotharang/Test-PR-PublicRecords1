@@ -6,7 +6,8 @@
 
 #workunit('priority','high'); 
 
-import _Control, STD;
+import _Control, STD, ProfileBooster;
+
 
 EXPORT bwr_ProfileBooster_OneMain_Step3(string IPaddr, string AbsolutePath, string NotifyList) := function
 
@@ -228,6 +229,8 @@ original_output_full := original_output1 + original_output2 + original_output3 +
 dedup_original_output := dedup(sort(original_output_full(lexid<>0), lexid), lexid);	// REMOVE RECORDS WHERE LEXID = 0 (PULLID)
 
 
+
+
 batchout := RECORD
   unsigned6 LexID;
   string2 DoNotMail;
@@ -424,7 +427,8 @@ reducedInput := join(original_input, project_deduped, left.lexid=right.lexid, tr
 											self.zip4 := left.z4));
 											
  reducedOutput := join(reducedInput, project_deduped, left.lexid=right.lexid, transform(batchout, self := right));  // reduce output if there is no Input record - don't ask
- 
+ reducedOutputListGen := join(reducedInput, dedup_original_output, left.lexid=right.lexid, transform(modified_batchoutflat_layout, self := right));  // reduce output if there is no Input record - don't ask
+
  NewLexidCount := count(project_deduped) - count(reducedOutput);
  
  Assert(count(reducedOutput) = count(reducedInput),'FAIL COUNTS', FAIL): FAILURE(FileServices.SendEmail(EmailList,'OneMain Step3 Input Output file counts do not match', 'The failed workunit is:' + WORKUNIT + FAILMESSAGE));	
@@ -434,6 +438,10 @@ reducedInput := join(original_input, project_deduped, left.lexid=right.lexid, tr
  Output(choosen(reducedOutput,10), NAMED('dedup_original_output'));
  output(count(reducedOutput), NAMED('count_dedup_original_output'));
  output(reducedOutput,, '~thor400::profilebooster::LN_Output_springleaf_layout_ProfBooster.csv', csv(heading(single), quote('"'), terminator('\r\n')), overwrite);
+ 
+ output(count(reducedOutputListGen), NAMED('count_all_attributeFile'));
+ output(reducedOutputListGen,, '~thor400::profilebooster::PB10ListGen_Attributes.csv', csv(heading(single), quote('"')), overwrite);
+ output(reducedInput,, '~thor400::profilebooster::PB10ListGen_layout_PII.csv', csv(heading(single), quote('"'), terminator('\r\n')), overwrite);
 											
  output(choosen(reducedInput, 10), NAMED('reduced_input'));
  output(count(reducedInput), NAMED('count_reduced_input'));
@@ -457,6 +465,7 @@ reducedInput := join(original_input, project_deduped, left.lexid=right.lexid, tr
 STD.File.DeSpray('~thor400::profilebooster::LN_Output_springleaf_layout_ProfBooster.csv', IPaddr, desprayPath): FAILURE(FileServices.SendEmail(EmailList,'OneMain Step3 Despray failed', 'The failed workunit is:' + WORKUNIT + FAILMESSAGE));
 STD.File.DeSpray('~thor400::profilebooster::LN_Output_springleaf_layout_PII.csv', IPaddr, desprayPathPII): FAILURE(FileServices.SendEmail(EmailList,'OneMain Step3 PII Despray failed', 'The failed workunit is:' + WORKUNIT + FAILMESSAGE));	
 	
+
 // email results of this bwr
 	
 	FileServices.SendEmail(EmailList, 'OneMain Step3 finished ' + WORKUNIT, 'Original Input count  ' + ded + '    Original Output count ' + ded2 +

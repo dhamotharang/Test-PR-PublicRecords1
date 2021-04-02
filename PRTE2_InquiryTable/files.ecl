@@ -1,9 +1,10 @@
 ﻿Export files:=Module
-EXPORT Inquiry_Ins_IN := DATASET(constants.input_file_1, in_Layout, CSV(HEADING(1), SEPARATOR('\t'), TERMINATOR(['\n','\r\n']), QUOTE('"')) );
-EXPORT Inquiry_Base_IN := DATASET(constants.input_file_2, in_Layout, CSV(HEADING(1), SEPARATOR('\t'), TERMINATOR(['\n','\r\n']), QUOTE('"')) );
-EXPORT Inquiry_Clone_IN := DATASET(constants.input_file_3, in_Layout, CSV(HEADING(1), SEPARATOR('\t'), TERMINATOR(['\n','\r\n']), QUOTE('"')) );
 
-Export Inquiry_In:=Inquiry_Ins_IN + Inquiry_Base_IN + Inquiry_Clone_IN;
+EXPORT Inquiry_1 := DATASET(constants.input_file_1, in_Layout, CSV(HEADING(1), SEPARATOR('\t'), TERMINATOR(['\n','\r\n']), QUOTE('"')) );
+EXPORT Inquiry_2 := DATASET(constants.input_file_2, in_Layout, CSV(HEADING(1), SEPARATOR('\t'), TERMINATOR(['\n','\r\n']), QUOTE('"')) );
+EXPORT Inquiry_3 := DATASET(constants.input_file_3, in_Layout, CSV(HEADING(1), SEPARATOR('\t'), TERMINATOR(['\n','\r\n']), QUOTE('"')) );
+
+Export Inquiry_In:=Inquiry_1 + Inquiry_2 + Inquiry_3;
 
 EXPORT Inquiry_base := DATASET(constants.Base_Inquiry, base_layout, FLAT );
 
@@ -85,8 +86,6 @@ self.person_q.zip:=left.person_q_zip;
 self.person_q.personal_phone := left.person_q_personal_phone;
 self.person_q.work_phone:= left.person_q_work_phone;
 self.person_q.dob:=left.person_q_dob;
-//self.person_q.dl:=left.person_q_dl;
-//self.person_q.dl_st:=left.person_q_dl_st;
 self.person_q.email_address:=left.person_q_email_address;
 self.person_q.ssn :=left.person_q_ssn;
 self.person_q.linkid:=left.person_q_linkid;

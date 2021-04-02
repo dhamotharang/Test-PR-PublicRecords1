@@ -5,13 +5,13 @@ EXPORT Proc_FirstData_buildall(
 	STRING  pServerIP  = FirstData.Constants(pVersion).serverIP,
 	STRING  pDirectory = FirstData.Constants(pVersion).Directory + pVersion + '/',
 	STRING  pFilename  = '*csv',
-	STRING  pContacts  = Email_Notification_Lists().BuildSuccess,
+	STRING  pContacts,
 	STRING  pGroupName = _Dataset().pGroupname,
 	BOOLEAN pIsTesting = FALSE,
 	BOOLEAN pOverwrite = FALSE
 ) := MODULE
     //updateType = D for delta build and F for Full build
-    day_of_week := ut.Weekday((integer)pversion);
+    day_of_week := ut.Weekday((integer)pVersion);
     shared updateType := if( day_of_week = 'MONDAY', 'F', 'D');
 	// Spray Files.
 	EXPORT SprayFiles := IF(pDirectory != '',FirstData.fSprayFiles(
@@ -19,6 +19,7 @@ EXPORT Proc_FirstData_buildall(
 			pServerIP,
 			pDirectory,
 			pFilename,
+			pContacts,
 			pGroupName,
 			pIsTesting,
 			pOverwrite
@@ -39,7 +40,7 @@ EXPORT Proc_FirstData_buildall(
 		SprayFiles,
 		BuildLogger.PrepEnd(false),
 		BuildLogger.BaseStart(False),
-		FirstData.Build_BaseFile(pversion, updateType = 'D').ALL,
+		FirstData.Build_BaseFile(pVersion, updateType = 'D').ALL,
 		BuildLogger.BaseEnd(False),
 		BuildLogger.KeyStart(false),
 		FirstData.proc_build_keys(pVersion, updateType = 'D'),
@@ -47,27 +48,27 @@ EXPORT Proc_FirstData_buildall(
 		BuildLogger.PostStart(False),
 		FirstData.QA_Records(),
  		dops_update,
-		FirstData.Strata_Population_Stats(pversion,pIsTesting).All,
-		Scrubs_FirstData.fn_RunScrubs(pversion,''),
+		FirstData.Strata_Population_Stats(pVersion,pContacts,pIsTesting).All,
+		Scrubs_FirstData.fn_RunScrubs(pVersion,''),
 		BuildLogger.PostEnd(False), 
 		BuildLogger.BuildEnd(false) 
 	): 
  	SUCCESS(
 		Send_Emails(
-			pversion,,,,
+			pVersion,,,,
 			pContacts,
 			RoxieKeyBuild.Email_Notification_List + ';' + pContacts
 		).BuildSuccess
 	),
 	FAILURE(
 		Send_Emails(
-			pversion,,,,
+			pVersion,,,,
 			pContacts,
 			RoxieKeyBuild.Email_Notification_List + ';' + pContacts
 		).BuildFailure
 	);
 	EXPORT All :=
-	IF(VersionControl.IsValidVersion(pversion)
+	IF(VersionControl.IsValidVersion(pVersion)
 		,full_build
 		,OUTPUT('No Valid version parameter passed, skipping FirstData.Proc_FirstData_Buildall().All')
 	);

@@ -9,7 +9,8 @@
 
 */
 
-uc(string s) := Std.Str.ToUpperCase(s);
+string uc(string s) := Std.Str.ToUpperCase(s);
+string fix(string s) := Std.Str.CleanSpaces(uc(Std.Str.SubstituteIncluded(s,'._',' ')));
 
 GetCases(string ilfn) := PROJECT(
 		SORT(DISTRIBUTE($.ExtractRecords(ilfn).cases, hash32(CaseId)),
@@ -26,10 +27,10 @@ GetClients(string ilfn) := PROJECT(
 				//	ClientId, CaseId, Eligibility, filename, LOCAL),
 				TRANSFORM($.Layouts2.rClientEx,
 					self.ProgramState := uc(left.ProgramState);
-					self.LastName := uc(left.LastName);
-					self.FirstName := uc(left.FirstName);
-					self.MiddleName := uc(left.MiddleName);
-					self.NameSuffix := uc(left.NameSuffix);
+					self.LastName := fix(left.LastName);
+					self.FirstName := fix(left.FirstName);
+					self.MiddleName := fix(left.MiddleName);
+					self.NameSuffix := fix(left.NameSuffix);
 					self.Email := TRIM(left.email,left,right);
 					self := left;
 			));
@@ -50,7 +51,7 @@ GetContacts(string ilfn) := DEDUP(SORT(DISTRIBUTE(
 				PROJECT($.ExtractRecords(ilfn).contacts,
 						TRANSFORM($.Layouts2.rStateContactEx;
 							self.ProgramState := uc(left.ProgramState);
-							self.ContactName := uc(left.ContactName);
+							self.ContactName := fix(left.ContactName);
 							self := left;
 						)),
 				hash32(contactname)),

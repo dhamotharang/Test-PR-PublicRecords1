@@ -29,6 +29,10 @@ EXPORT mod_Utilities := MODULE
 	 EXPORT STRING8 ConvertSlashedMDYtoCYMD(STRING pDate) :=	INTFORMAT((INTEGER2) REGEXREPLACE('.*/.*/([0-9]+)',pDate,'$1'),4,1) +
                                                             INTFORMAT((INTEGER1) REGEXREPLACE('([0-9]+)/.*/.*',pDate,'$1'),2,1) + 
                                                             INTFORMAT((INTEGER1) REGEXREPLACE('.*/([0-9]+)/.*',pDate,'$1'),2,1);
+																														
+	 EXPORT ConvDtTimeStampToYYYYMMDD(STRING DtTimeStamp ) := IF(TRIM(DtTimeStamp, LEFT, RIGHT)[1..10] <> '0000-00-00',
+																												       STD.Str.FilterOut(TRIM(DtTimeStamp, LEFT, RIGHT)[1..10], '-'),
+																												       '');
 																																																										
 	 EXPORT StartDateOfWeek(UNSIGNED4 DateIn) := STD.Date.DatesForWeek(DateIn).StartDate;
 	 
