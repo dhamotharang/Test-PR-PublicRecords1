@@ -8,6 +8,7 @@
 	<part name="IsMarketing" type="xsd:boolean"/>
 	<part name="TurnOffHouseHolds" type="xsd:boolean"/>
 	<part name="TurnOffRelatives" type="xsd:boolean"/>
+	<part name="UseIngestDate" type="xsd:boolean"/>
 	<part name="AllowedSourcesDataset" type="tns:XmlDataSet" cols="100" rows="8"/>
 	<part name="ExcludeSourcesDataset" type="tns:XmlDataSet" cols="100" rows="8"/>
 	<part name="LexIdSourceOptout" type="xsd:integer"/>
@@ -70,6 +71,7 @@ export MAS_nonFCRA_FDC_Proddata_Service() := MACRO
 		'IsMarketing',
 		'TurnOffHouseHolds',
 		'TurnOffRelatives',
+		'UseIngestDate',
 		'IncludeAccident',
 		'IncludeAddress',
 		'IncludeAddressSummary',
@@ -139,6 +141,7 @@ export MAS_nonFCRA_FDC_Proddata_Service() := MACRO
 	BOOLEAN is_Marketing               := FALSE : STORED('IsMarketing');
 	BOOLEAN Turn_Off_Relatives               := FALSE : STORED('TurnOffRelatives');
 	BOOLEAN Turn_Off_HouseHolds               := FALSE : STORED('TurnOffHouseHolds');
+	BOOLEAN Use_Ingest_Date               := FALSE : STORED('UseIngestDate');
 	BOOLEAN OverrideExperianRestriction := FALSE : STORED('OverrideExperianRestriction');
 	AllowedSourcesDataset := DATASET([],PublicRecords_KEL.ECL_Functions.Constants.Layout_Allowed_Sources) : STORED('AllowedSourcesDataset');
 	ExcludeSourcesDataset := DATASET([],PublicRecords_KEL.ECL_Functions.Constants.Layout_Allowed_Sources) : STORED('ExcludeSourcesDataset');
@@ -164,6 +167,7 @@ export MAS_nonFCRA_FDC_Proddata_Service() := MACRO
 		EXPORT INTEGER ScoreThreshold            := 80 : STORED('ScoreThreshold');
 		EXPORT BOOLEAN ExcludeConsumerShell      := FALSE;
 		EXPORT BOOLEAN isMarketing               := is_Marketing;
+		EXPORT BOOLEAN UseIngestDate               := Use_Ingest_Date;
 		EXPORT BOOLEAN TurnOffRelatives := Turn_Off_Relatives; 
 		EXPORT BOOLEAN TurnOffHouseHolds := Turn_Off_HouseHolds;
 		EXPORT DATASET(PublicRecords_KEL.ECL_Functions.Constants.Layout_Allowed_Sources) Allowed_Sources_Dataset := FinalAllowedSources;

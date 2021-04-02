@@ -12,6 +12,7 @@
 	<part name="TurnOffHouseHolds" type="xsd:boolean"/>
 	<part name="TurnOffRelatives" type="xsd:boolean"/>
 	<part name="RetainInputLexid" type="xsd:boolean"/>
+	<part name="UseIngestDate" type="xsd:boolean"/>
 	<part name="AppendPII" type="xsd:boolean"/>
 	<part name="IndustryClass" type="xsd:string"/>
 	<part name="AllowedSourcesDataset" type="tns:XmlDataSet" cols="100" rows="8"/>
@@ -47,6 +48,7 @@ EXPORT MAS_nonFCRA_Service() := MACRO
 		'ExcludeSourcesDataset',
 		'LexIdSourceOptout',
 		'RetainInputLexid',
+		'UseIngestDate',
 		'AppendPII',
 		'_TransactionId',
 		'_BatchUID',
@@ -76,6 +78,7 @@ STRING100 Default_data_permission_mask := '';
 	BOOLEAN Turn_Off_HouseHolds := FALSE : STORED('TurnOffHouseHolds');
 	BOOLEAN Turn_Off_Relatives := FALSE : STORED('TurnOffRelatives');
 	BOOLEAN Include_Minors := TRUE : STORED('IncludeMinors');
+	BOOLEAN Use_Ingest_Date := FALSE : STORED('UseIngestDate');
 	STRING5 Industry_Class := Default_Industry_Class : STORED('IndustryClass');
 	AllowedSourcesDataset := DATASET([],PublicRecords_KEL.ECL_Functions.Constants.Layout_Allowed_Sources) : STORED('AllowedSourcesDataset');
 	ExcludeSourcesDataset := DATASET([],PublicRecords_KEL.ECL_Functions.Constants.Layout_Allowed_Sources) : STORED('ExcludeSourcesDataset');
@@ -138,7 +141,8 @@ STRING100 Default_data_permission_mask := '';
 		EXPORT BOOLEAN isMarketing := Is_Marketing; // When TRUE enables Marketing Restrictions
 		EXPORT BOOLEAN TurnOffRelatives := Turn_Off_Relatives; 
 		EXPORT BOOLEAN TurnOffHouseHolds := Turn_Off_HouseHolds;
-		EXPORT BOOLEAN IncludeMinors := Include_Minors; // When TRUE enables Marketing Restrictions
+		EXPORT BOOLEAN IncludeMinors := Include_Minors;
+		EXPORT BOOLEAN UseIngestDate := Use_Ingest_Date;
 		EXPORT DATASET(PublicRecords_KEL.ECL_Functions.Constants.Layout_Allowed_Sources) Allowed_Sources_Dataset := FinalAllowedSources;
 		EXPORT DATA57 KEL_Permissions_Mask := PublicRecords_KEL.ECL_Functions.Fn_KEL_DPMBitmap.Generate(
 			DataRestrictionMask, 
