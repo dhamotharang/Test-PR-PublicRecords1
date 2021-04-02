@@ -57,6 +57,8 @@ EXPORT getGovID(dataset(identifier2.layout_Identifier2) in_ds,
 
 
   // Calculate each attribute  
+  // Descriptions for each of the below Risk Indicator codes can be found at Risk_Indicators.getHRIDesc
+
   SSNFullNameMatch := MAP(isCheck_SSNFullNameMatch AND in_rec.nas_summary IN [9,12]
                           AND ~EXISTS(in_rec.ri(hri in ['MI','29','77','79','76']))  => _GovIdConst.PassValue
                           ,isCheck_SSNFullNameMatch => _GovIdConst.FailValue
