@@ -1,4 +1,4 @@
-﻿#OPTION('multiplePersistInstances',FALSE);
+﻿// #OPTION('multiplePersistInstances',FALSE);
 import ut, business_header, mdr, lib_stringlib, email_data;
 
 EXPORT As_Business_Linking (
@@ -56,7 +56,7 @@ EXPORT As_Business_Linking (
 				self.current					           := true;
 				self.dppa						             := false;
 				self.contact_did                 := l.did;
-				self.contact_job_title_raw       := CHOOSE(C,l.Title_Desc_1,l.Title_Desc_2,l.Title_Desc_3,l.Title_Desc_4);
+				self.contact_job_title_raw       := if(trim(l.fname) = '' and trim(l.lname) = ''  ,'',CHOOSE(C,l.Title_Desc_1,l.Title_Desc_2,l.Title_Desc_3,l.Title_Desc_4));
 				self.contact_name.title          := l.title;
 				self.contact_name.fname          := l.fname;
 				self.contact_name.mname          := l.mname;
@@ -70,7 +70,7 @@ EXPORT As_Business_Linking (
 				self 							   						 := [];
 		end;
 		
-		from_base      := NORMALIZE(pBase, 4, trfMAPBLInterface(LEFT,COUNTER));
+		from_base      := NORMALIZE(pBase, if(trim(left.fname) = '' and trim(left.lname) = '',1,4), trfMAPBLInterface(LEFT,COUNTER));
 
     // Roll Up - to eliminate duplicates and keep the oldest (first) source_record_id
 	  from_base_Dist := DISTRIBUTE(from_base, HASH(company_name,contact_name.fname,contact_name.mname,contact_name.lname));
