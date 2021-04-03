@@ -5,7 +5,7 @@ EXPORT mac_Suppress(
 
    pDataset
   ,pShouldExplode               = 'true'                                                                      //if true, it will explode the clusters where suppression was applied.  false = turn off explosions
-  ,pSuppressionFieldFilter      = '\'^(rcid|company_fein|duns_number|source|proxid|dotid|lgid3|cnp_name)$\''  //use regex to filter for the fields you want to possibly suppress(include context fields if used) and id fields.  ex. '^(company_fein|duns_number|source|proxid|lgid3)$'
+  ,pSuppressionFieldFilter      = '\'^(rcid|company_fein|duns_number|active_duns_number|source|proxid|dotid|lgid3|cnp_name)$\''  //use regex to filter for the fields you want to possibly suppress(include context fields if used) and id fields.  ex. '^(company_fein|duns_number|source|proxid|lgid3)$'
   ,pContextFieldFilter          = '\'^(source|cnp_name)$\''                                                   //use regex to filter for only the fields that are used in context with the suppression fields. ex. '^(source)$'
   ,pSetIDsFieldFilter           = '[\'rcid\',\'dotid\',\'proxid\',\'lgid3\']'                                 //use set to filter for only the ID fields you want to possibly explode if a suppression is performed on that cluster.  I
                                                                                                               //  Include fields that will be used as reset fields, and sort ascendingly by level in hierarchy.  ex. ['dotid','proxid','lgid3']
