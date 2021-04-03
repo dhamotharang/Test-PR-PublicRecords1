@@ -7,15 +7,16 @@ EXPORT Build_weekly_keys(
   ,string   pWuid       = workunit
 	,string	  pEmail_List = BIPV2_Build.mod_email.emailList
   ,boolean  pIsDataland = BIPV2_Build._Constants().IsDataland
+  ,boolean  pOverwrite  = false
 ) :=
 module
 
-  export BuildLinkids_dataset             := tools.macf_WriteFile (filenames(pversion).contact_linkids.new      ,BIPV2_Build.key_contact_linkids.dkeybuild    );
-  export BuildLinkIds                     := tools.macf_writeindex('BIPV2_Build.key_contact_linkids.key         ,keynames(pversion).contact_linkids.new'      );
-  export BuildContactTitleLinkids_dataset := tools.macf_WriteFile (filenames(pversion).contact_title_linkids.new,BIPV2_Build.key_contact_title_linkids(pversion).dkeybuild    );
-  export BuildContactTitleLinkIds         := tools.macf_writeindex('BIPV2_Build.key_contact_title_linkids(pversion).key   ,keynames(pversion).contact_title_linkids.new'      );
-  export BuildDirLinkIdsOutsideBIPBuild   := tools.macf_writeindex('BIPV2_Build.key_directories_linkids.key     ,keynames(pversion).directories_linkids.new'  );  //uses qa supers
-  export BuildDirLinkIdsInsideBIPBuild    := tools.macf_writeindex('BIPV2_Build.key_directories_linkids.kbuilt  ,keynames(pversion).directories_linkids.new'  );  //uses built supers
+  export BuildLinkids_dataset             := tools.macf_WriteFile (filenames(pversion).contact_linkids.new      ,BIPV2_Build.key_contact_linkids.dkeybuild                    ,,,pOverwrite);
+  export BuildLinkIds                     := tools.macf_writeindex('BIPV2_Build.key_contact_linkids.key         ,keynames(pversion).contact_linkids.new'                        ,true);
+  export BuildContactTitleLinkids_dataset := tools.macf_WriteFile (filenames(pversion).contact_title_linkids.new,BIPV2_Build.key_contact_title_linkids(pversion).dkeybuild    ,,,pOverwrite);
+  export BuildContactTitleLinkIds         := tools.macf_writeindex('BIPV2_Build.key_contact_title_linkids(pversion).key   ,keynames(pversion).contact_title_linkids.new'        ,true);
+  export BuildDirLinkIdsOutsideBIPBuild   := tools.macf_writeindex('BIPV2_Build.key_directories_linkids.key     ,keynames(pversion).directories_linkids.new'                    ,true);  //uses qa supers
+  export BuildDirLinkIdsInsideBIPBuild    := tools.macf_writeindex('BIPV2_Build.key_directories_linkids.kbuilt  ,keynames(pversion).directories_linkids.new'                    ,true);  //uses built supers
 
   export BuildDirLinkIds    := if(pInBIPBuild  ,BuildDirLinkIdsInsideBIPBuild  ,BuildDirLinkIdsOutsideBIPBuild);
   
@@ -36,9 +37,15 @@ module
   //Get file items for orbit, send email including them to make easier to populate item list in orbit instance
   export SendOrbitItemList  := wk_ut.Strata_Orbit_Item_list(pWuid,'BIPV2','Weekly_Keys'  ,pversion ,pEmailNotifyList := pEmail_List     ,pFileRegex := regexfilterout,pIsTesting := false);
   
+  keynames_built := dataset([{Bipv2_Build.keynames(pversion).contact_linkids.new},{Bipv2_Build.keynames(pversion).contact_title_linkids.new},{Bipv2_Build.keynames(pversion).directories_linkids.new}], Tools.Layout_Names);
+  
+  clear_superfiles_for_overwrite :=if(pOverwrite = true ,nothor(Tools.fun_ClearfilesFromSupers(keynames_built, false)));
+  
+        
   export buildall := 
   sequential(
-     BuildLinkids_dataset
+     clear_superfiles_for_overwrite
+    ,BuildLinkids_dataset
     ,BuildLinkIds
     ,promote2builtcont
     ,BuildContactTitleLinkids_dataset // uses contact key

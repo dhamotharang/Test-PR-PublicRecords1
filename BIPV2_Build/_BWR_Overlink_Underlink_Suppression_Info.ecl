@@ -20,7 +20,7 @@
 
   Suppression:
     BIPV2.BWR_ManualSuppression                 -- suppress records from output keys in the kfetch(example here: BIPV2_Suppression.BWR_Test).
-    BIPV2_Suppression.BWR_ManualSuppression     -- same as BIPV2.ManualSuppression.addCandidates from BIPV2.BWR_ManualSuppression above.
+    BIPV2_Suppression.BWR_ManualSuppression     -- adds seleid, proxid pairs to the suppression key, updates BIPV2SuppressionKeys in DOPS.  this can suppress proxids in queries.
 
     BIPV2_Field_Suppression._BWR_Add_Candidates                   -- Add candidates to custom Suppression/Explosion file.  Will work for all clusters/fields.
     BIPV2_Field_Suppression._BWR_Remove_Candidates                -- Remove Candidates from custome suppression/explosion file.
