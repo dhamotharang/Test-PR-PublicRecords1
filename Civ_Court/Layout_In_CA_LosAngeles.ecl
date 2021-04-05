@@ -1,4 +1,4 @@
-﻿﻿IMPORT Civ_Court, ut;
+﻿﻿﻿IMPORT Civ_Court, ut;
 
 EXPORT Layout_In_CA_LosAngeles := MODULE
 
@@ -50,7 +50,7 @@ EXPORT Layout_In_CA_LosAngeles_new := RECORD
 	// string1 	suffix; //G = Glendale, B = Burbank
 	// string13 	blank8;
 	string4		indx_type;
-	// string2 	CR;
+	string2 	CR;
 END;
 
 END;
