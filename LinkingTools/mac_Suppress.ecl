@@ -328,19 +328,19 @@ functionmacro
         #APPEND(TRANSFORMECL ,'self.' + trim(get_field_name(%MYCOUNTER%)) + ' := if(trim(suppress(left,\''  + trim(get_field_name(%MYCOUNTER%)) + '\',(string)left.' + trim(get_field_name(%MYCOUNTER%)) + ')) = \'Suppress\' ,(typeof(left.' + trim(get_field_name(%MYCOUNTER%)) + '))\'\'  ,left.' + trim(get_field_name(%MYCOUNTER%)) + ');\n')
       #END
       
-      #IF(%SUPPRESSCOUNTER% != 1)
-        #APPEND(FIELDSSUPPRESSED          ,'+ ')
-        #APPEND(FIELDSANDVALUESSUPPRESSED ,'+ ')
-        #APPEND(SUPPRESSIONIDS            ,'+ ')
-        #APPEND(DEBUGSTUFF                ,'+ ')
-      #ELSE
-        #APPEND(FIELDSSUPPRESSED          ,'  ')
-        #APPEND(FIELDSANDVALUESSUPPRESSED ,'  ')
-        #APPEND(SUPPRESSIONIDS            ,'  ')
-        #APPEND(DEBUGSTUFF                ,'  ')
-      #END
       
       #IF((%'LIDFIELDFILTER'% = '' or not regexfind(%'LIDFIELDFILTER'% ,trim(get_field_name(%MYCOUNTER%))  ,nocase)) and (pContextFieldFilter = '' or not regexfind(pContextFieldFilter ,trim(get_field_name(%MYCOUNTER%))  ,nocase)))
+        #IF(%SUPPRESSCOUNTER% != 1)
+          #APPEND(FIELDSSUPPRESSED          ,'+ ')
+          #APPEND(FIELDSANDVALUESSUPPRESSED ,'+ ')
+          #APPEND(SUPPRESSIONIDS            ,'+ ')
+          #APPEND(DEBUGSTUFF                ,'+ ')
+        #ELSE
+          #APPEND(FIELDSSUPPRESSED          ,'  ')
+          #APPEND(FIELDSANDVALUESSUPPRESSED ,'  ')
+          #APPEND(SUPPRESSIONIDS            ,'  ')
+          #APPEND(DEBUGSTUFF                ,'  ')
+        #END
         #APPEND(FIELDSSUPPRESSED          ,'if(trim(suppress(left,\''  + trim(get_field_name(%MYCOUNTER%)) + '\',(string)left.' + trim(get_field_name(%MYCOUNTER%)) + ')) = \'Suppress\' ,\','  + trim(get_field_name(%MYCOUNTER%)) + '\',\'\')\n')
 
         #APPEND(FIELDSANDVALUESSUPPRESSED ,'suppresscontext(left,\''  + trim(get_field_name(%MYCOUNTER%)) + '\',(string)left.' + trim(get_field_name(%MYCOUNTER%)) + ')\n')

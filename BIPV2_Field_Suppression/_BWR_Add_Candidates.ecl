@@ -14,7 +14,7 @@ ds_context := dataset([
   
 ]  ,BIPV2_Field_Suppression.layouts.Suppression_field);
 
-// -- ID VALUES
+// -- ID VALUES to explode -- 'HY' hierarchy does not explode right now so this should be null
 ds_IDS := dataset([
   {'proxid' ,'dotid'}
  ,{'lgid3'  ,'proxid'}
@@ -28,4 +28,4 @@ ds_suppressions :=
   ]  ,BIPV2_Field_Suppression.layouts.Suppression_in);  
 
 // -- PERFORM SUPPRESSION
-BIPV2_Field_Suppression.Add_Candidates(ds_suppressions);
+BIPV2_Field_Suppression.Add_Candidates(ds_suppressions,'IL'  /*,'HY' for hierarchy*/);

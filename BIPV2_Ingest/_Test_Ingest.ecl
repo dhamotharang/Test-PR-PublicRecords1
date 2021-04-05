@@ -8,6 +8,8 @@ EXPORT _Test_Ingest(
   ,pReturn_Code               = 'false'
   ,pPreserve_Ingest_Statuses  = 'false'
   ,pShould_Output_Src_samples = 'true'
+  ,pShould_Reclean_base_file  = 'true'
+  ,pShould_Xlink_file         = 'true'
   
 ) :=
 functionmacro
@@ -20,8 +22,11 @@ functionmacro
   ds_as_linking_filtered    := ds_as_linking      (count(pSet_Test_Sources) = 0 or source in pSet_Test_Sources)  : persist('~persist::BIPV2_Ingest._Test_Ingest::ds_as_linking_filtered');
 
 
+  #IF(pShould_Reclean_base_file = true)
   ds_base_Filtered          := BIPV2_Files.tools_dotid().reclean(pBase_File(count(pSet_Test_Sources) = 0 or source in pSet_Test_Sources)) : persist('~persist::BIPV2_Ingest._Test_Ingest::ds_base_Filtered');
-
+  #ELSE
+  ds_base_Filtered          := pBase_File(count(pSet_Test_Sources) = 0 or source in pSet_Test_Sources) : persist('~persist::BIPV2_Ingest._Test_Ingest::ds_base_Filtered');
+  #END
   // --
   // ds_base_blank_above_lgid3 := project(BIPV2_Tools.idIntegrity().blank_above_lgid3(ds_base_Filtered),transform(BIPV2.CommonBase.Layout,self := left,self := []));
   // ds_base_reclean           := BIPV2_Files.tools_dotid().reclean(ds_base_blank_above_lgid3,false,false);
@@ -173,16 +178,22 @@ functionmacro
     #SET(current_source4condition ,regexreplace('\\\\',pSet_Test_Sources[%cnt%],'\\\\\\') )
     #SET(current_source_desc  ,trim(std.str.filter(regexreplace(' ',std.str.cleanspaces(mdr.sourceTools.translatesource(%'current_source'%)),'_',nocase) ,'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_'))  )
 
-    #APPEND(gen_work_code  ,'ingest_results_' + %'current_source_desc'% + '_new := ingest_results(source = \'' + %'current_source4condition'% + '\',ingest_status = \'New\');\n')
-    #APPEND(gen_work_code  ,'ingest_results_' + %'current_source_desc'% + '_old := ingest_results(source = \'' + %'current_source4condition'% + '\',ingest_status = \'Old\');\n')
+    #APPEND(gen_work_code  ,'ingest_results_' + %'current_source_desc'% + '_new := ingest_results(source = \'' + %'current_source4condition'% + '\',ingest_status  = \'New\');\n')
+    #APPEND(gen_work_code  ,'ingest_results_' + %'current_source_desc'% + '_old := ingest_results(source = \'' + %'current_source4condition'% + '\',ingest_status != \'New\');\n')
+
     #APPEND(gen_work_code  ,'ds_diff_srid_' + %'current_source_desc'% + ' := join(')
     #APPEND(gen_work_code  ,' ingest_results_' + %'current_source_desc'% + '_new') 
+    // #APPEND(gen_work_code  ,',ingest_results_' + %'current_source_desc'% + '_old \n')
     #APPEND(gen_work_code  ,',fdedupright(ingest_results_' + %'current_source_desc'% + '_old) \n')
     #APPEND(gen_work_code  ,',left.company_name = right.company_name and left.company_name_type_raw = right.company_name_type_raw and left.lname  = right.lname and left.fname  = right.fname and left.prim_name = right.prim_name and left.prim_range = right.prim_range and left.v_city_name = right.v_city_name')
     #APPEND(gen_work_code  ,',transform({dataset({string ingest_status,BIPV2.CommonBase.Layout - ingest_status}) recs}\n')
     #APPEND(gen_work_code  ,',self.recs := project(dataset(left) ,transform({string ingest_status,BIPV2.CommonBase.Layout - ingest_status},self := left,self := []))\n')
     #APPEND(gen_work_code  ,'+ project(dataset(right),transform({string ingest_status,BIPV2.CommonBase.Layout - ingest_status},self := left,self := []))\n')
     #APPEND(gen_work_code  ,'),hash,keep(1));\n')
+
+
+
+
 
     #APPEND(gen_work_code  ,'ds_srid_but_diff_status_' + %'current_source_desc'% + ' := join(ingest_results_' + %'current_source_desc'% + '_new ,ingest_results_' + %'current_source_desc'% + '_old \n')
     #APPEND(gen_work_code  ,',left.source_record_id = right.source_record_id and left.company_name_type_raw = right.company_name_type_raw and left.fname  = right.fname and left.prim_name = right.prim_name,transform({dataset({string ingest_status,BIPV2.CommonBase.Layout - ingest_status}) recs}\n')
@@ -193,10 +204,10 @@ functionmacro
     #APPEND(gen_work_code  ,'ds_base_Filtered_' + %'current_source_desc'% + ' := ds_base_Filtered(source = \'' + %'current_source4condition'% + '\');\n')
 
     #APPEND(gen_output_code11,',output(enth (ds_base_Filtered_'        + %'current_source_desc'% + ',500)  ,named(\'Example___' + %'current_source_desc'% + '\'),all)\n')
-    #APPEND(gen_output_code1 ,',output(enth (ds_srid_but_diff_status_' + %'current_source_desc'% + ',500)  ,named(\'Example_' + %'current_source_desc'% + '\'),all)\n')
+    #APPEND(gen_output_code1 ,',output(topn (ds_srid_but_diff_status_' + %'current_source_desc'% + ',500,recs[2].rcid,recs[1].rcid)  ,named(\'Example_' + %'current_source_desc'% + '\'),all)\n')
     #APPEND(gen_output_code2 ,',output(count(ds_srid_but_diff_status_' + %'current_source_desc'% + '    )  ,named(\'Count_'   + %'current_source_desc'% + '\')    )\n')
 
-    #APPEND(gen_output_code3 ,',output(enth (ds_diff_srid_' + %'current_source_desc'% + ',500)  ,named(\'Example__' + %'current_source_desc'% + '\'),all)\n')
+    #APPEND(gen_output_code3 ,',output(topn (ds_diff_srid_' + %'current_source_desc'% + ',500,recs[2].rcid,recs[1].rcid)  ,named(\'Example__' + %'current_source_desc'% + '\'),all)\n')
     #APPEND(gen_output_code4 ,',output(count(ds_diff_srid_' + %'current_source_desc'% + '    )  ,named(\'Count__'   + %'current_source_desc'% + '\')    )\n')
 
 
@@ -220,13 +231,16 @@ functionmacro
     ,output(ds_ingest_statuses_by_source_name_type  ,named('Ingest_statuses_by_source_and_name_type'  ),all)
 
 
+#IF(pShould_Xlink_file = true)
     ,output('Results of Xlink Append on New Records'  ,named('__________'))
     ,output(ds_xlink_stats                         ,named('Xlink_Stats_New_Records'                  ),all)
     ,output(choosen(ds_new_xlink_append      ,100)  ,named('Examples_Xlink_Append_For_New_Records'         ))
-
+#END
     ,output('Counts of As Linking and Base File records'  ,named('_'))
     ,output(count(ds_as_linking_filtered             )  ,named('Count_ds_as_linking_filtered'    ))
     ,output(count(ds_base_Filtered                   )  ,named('Count_ds_base_Filtered'          ))
+    ,output(count(ingest_results                     )  ,named('Count_ingest_results'            ))
+    ,output(count(ds_base_Filtered                   ) - count(ingest_results                     )  ,named('Count_Records_Lost'            ))
     ,output(count(ds_as_linking_prep_ingest          )  ,named('Count_ds_as_linking_prep_ingest' ))
 
     ,output('Examples of As Linking and Base File records'  ,named('__'))
