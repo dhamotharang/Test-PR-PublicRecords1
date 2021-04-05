@@ -10,7 +10,6 @@ version:=ut.GetDate : independent;
 
 lECL1 :=
  'import FraudGovPlatform_Validation,ut;\n'
-+'#CONSTANT	(\'Platform\',\'FraudGov\');\n'
 +'wuname := \'FraudGov Deltabase Input Prep\';\n'
 +'#WORKUNIT(\'name\', wuname);\n'
 +'#WORKUNIT(\'priority\',\'high\');\n'

@@ -10,7 +10,6 @@ version:=ut.GetDate : independent;
 
 lECL1 :=
  'import FraudGovPlatform_Validation,Scrubs_FraudGov,ut;\n'
- +'#CONSTANT	(\'Platform\',\'FraudGov\');\n'
 +'#OPTION(\'multiplePersistInstances\',FALSE);\n'
 +'wuname := \'FraudGov DEDI Input Prep\';\n'
 +'#WORKUNIT(\'name\', wuname);\n'
