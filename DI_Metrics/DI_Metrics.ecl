@@ -7,7 +7,7 @@ import STD, DI_Metrics;
 
 export DI_Metrics(string pHostname, string pTarget, string pContact ='\' \'') := function
 
-today := (STRING8)STD.Date.Today();
+today := (STRING8)(WORKUNIT[2..9]);
 
 build_all := SEQUENTIAL(
 
