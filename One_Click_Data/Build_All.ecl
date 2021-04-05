@@ -38,6 +38,7 @@ full_build :=
 	sequential(
 		 create_supers
 		,spray_files
+		,Promote().Inputfiles.Sprayed2using
 		,RunScrubs
     ,if(Scrubs.mac_ScrubsFailureTest('Scrubs_One_Click_Data', pversion)
    			,sequential( Build_Base		(pversion,pIsTesting,pSprayedFile,pBaseFile	).All

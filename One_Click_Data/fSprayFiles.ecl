@@ -34,7 +34,6 @@ function
 	
 	], tools.Layout_Sprays.Info);
 		
-	return sequential(tools.fun_Spray(FilesToSpray,,,pOverwrite,,FALSE,pIsTesting,,pGroupName+' '+pversion,pNameOutput,,,,TRUE) 
-	                  ,Promote().Inputfiles.Sprayed2using );
+	return tools.fun_Spray(FilesToSpray,,,pOverwrite,,FALSE,pIsTesting,,pGroupName+' '+pversion,pNameOutput,,,,TRUE);
 	
 end;
