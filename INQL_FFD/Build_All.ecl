@@ -8,7 +8,6 @@ build_full_key := sequential  (
 																Build_Keys(false, isFCRA, pVersion).all; // build full keys - new
 																dops.updateversion('FCRA_InquiryHistoryKeys',pVersion,INQL_FFD.Email_Notification_Lists.DopsUpdate,,'F');
 																INQL_FFD.FN_Update_Orbit(pVersion).run;
-																//INQL_FFD.proc_KeyDiff;
 															);
 
 build_delta_key := Sequential (
@@ -26,8 +25,8 @@ doBuild 				:= sequential (
 																if (_Flags().Weekday,  
 																		Sequential (
 																								if (doBuildFull
-																									   ,build_full_key
-																									   ,output('Full Keys will not be built - ' + Fn_Get_Current_Version.fcra_full_keys_dops_certQA + ' is still in QA or Age of Daily Base is less than 6 days ')
+																									  ,build_full_key
+																									  ,output('Full Keys will not be built - ' + Fn_Get_Current_Version.fcra_full_keys_dops_certQA + ' is still in QA or Age of Daily Base is less than 6 days ')
 																									 ),
 																								if (~doBuildFull and doBuildDelta
 																										,build_delta_key

@@ -1,6 +1,14 @@
 ﻿import inql_v2, data_services;
 export FN_Apply_FCRA_Remediation_Soft_Inquiry(dataset(INQL_FFD.Layouts.Base)  base_file) := module
 
+rCapitalOne:=record
+string uniqueid;
+string transaction_id;
+string transaction_timestamp;
+end;
+dCapitalOne := dataset(data_services.foreign_fcra_logs+'thor10_231::in::inquiry::remediation::capitalone', rCapitalOne,  csv( separator(','), terminator(['\n', '\r\n'])), opt);
+tCapitalOne := table(dCapitalOne,{dCapitalOne.Transaction_Id});
+
 rDiscover:= RECORD
     string LN_TRAN_ID;
     string LN_TRSFRM_TMS;
@@ -20,7 +28,7 @@ dAmex := dataset(data_services.foreign_fcra_logs + 'uspr::inql::fcra::amex_trans
          (trim(Julian_Date) <>'Date');
 tAmex := table(dAmex,{dAmex.transaction_id});
 
-tRemediation := tDiscover + tAmex;
+tRemediation := tDiscover + tAmex + tCapitalOne;
 
 export base_remediation := join(base_file,tRemediation,
          left.transaction_id 	= right.transaction_id, 
