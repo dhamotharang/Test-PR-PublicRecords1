@@ -53,7 +53,7 @@ export UpdateRecordsAD(FullData,NewData,recref,MatchFields,UpdateFields,process_
         dFullData:=distribute(fulldata,hash(%CommaString%));
         dNewData:=distribute(newData,hash(%CommaString%));
     #end;
-	RecordLayout:=#expand(recref);;
+	RecordLayout:=#expand(recref);
     
 	RecordLayoutNoSid:=RECORD
 		RecordLayout-[Record_Sid];
@@ -91,13 +91,13 @@ export UpdateRecordsAD(FullData,NewData,recref,MatchFields,UpdateFields,process_
     #end
     
     //#append(CommandString,'');
-	#append(CommandString,'dUpdateRecordsAdds:=project(dUpdateRecordsTemp,\n');
-    #append(CommandString,'transform(RecordLayout,self.record_sid:=left.record+sid; self:=Left.NewRec;));\n');
-	#append(CommandString,'dUpdateRecordsDeletes:=project(dUpdateRecordsTemp,\n');
-    #append(CommandString,'transform(RecordLayout,self.record_sid:=left.record+sid; self:=Left.OldRec;));\n');
+	#append(CommandString,'dUpdateRecordsAdds:=project(dUpdateRecordsTemp(updated),\n');
+    #append(CommandString,'transform(RecordLayout,self.record_sid:=left.record_sid; self:=Left.NewRec;));\n');
+	#append(CommandString,'dUpdateRecordsDeletes:=project(dUpdateRecordsTemp(updated),\n');
+    #append(CommandString,'transform(RecordLayout,self.record_sid:=left.record_sid; self:=Left.OldRec;));\n');
 	
 	%CommandString%;
-
+//
     return dUpdateRecordsAdds+dUpdateRecordsDeletes;
 	//return %'CommandString'%;
 
