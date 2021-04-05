@@ -391,8 +391,10 @@ export FCRA_Append(infile, outfile) := macro
 																						 left.permissions.fcra_purpose);
 
 																self := left)) ;							
+// outfile := %outAppended%;
+outfile := dedup(sort(%outAppended%, record), record);
 
-outfile := %outAppended%;/*(
+/*(
 											 ~(mbs.company_id = '103201' and search_info.product_code = '2' and search_info.function_description = 'RWBATCH' and search_info.datetime[..8] between '20120223' and '20120225') and //TEMPORARY
 											 ~(mbs.company_id = '103201' and search_info.product_code = '2' and search_info.function_description = 'RWBATCH' and search_info.datetime[..8] between '20120514' and '20130515') and //TEMPORARY
 											 ~(mbs.company_id = '108006' and search_info.product_code = '2' and search_info.function_description = 'MODELS.RISKVIEWBATCHSERVICE' and search_info.datetime[..8] between '20130901' and '20131031') and

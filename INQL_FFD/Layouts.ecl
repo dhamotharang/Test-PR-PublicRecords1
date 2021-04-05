@@ -1,4 +1,4 @@
-﻿import standard, dx_InquiryHistory;
+﻿import standard, dx_InquiryHistory, iesp;
 
 EXPORT Layouts := Module
 
@@ -110,6 +110,7 @@ EXPORT Base    := record
 
 		string9 	version     	:= '';
 		unsigned4 filedate  		:= 0;
+		unsigned8 group_rid     := 0;
 		
 end;
 
@@ -140,6 +141,145 @@ export Input_PPC_Xlated :=record
 		boolean isRiskview			:= false;
 end;
 
-
-
+export Input_Encrypted :=record
+		string transaction_id;
+    string key_version;
+    string text_1;
+    string text_2;
+    string key_encrypted;
+    string time_stamp;
+    string key_group;
 end;
+
+export Comomn_Input_Encrypted :=record
+		string transaction_id;
+    string key_version;
+    string text;
+    string key_encrypted;
+    string time_stamp;
+    string key_group;
+end;
+
+EXPORT Decrypted_Keys := RECORD
+    string key_group;
+    string key_version;
+    string key_encrypted;
+    string key_decrypted;
+  END;
+
+// EXPORT Decrypted_Text := RECORD(Comomn_Input_Encrypted)
+EXPORT Decrypted_Text := RECORD
+    Comomn_Input_Encrypted;
+		string key_decrypted;
+    string2048 text_decrypted;
+END;
+
+EXPORT Decrypted_Data := RECORD
+		string transaction_id{xpath('transaction_id')};	
+		string lex_id{xpath('lex_id')};
+		string	ssn{xpath('ssn')};
+		string	drivers_license_number{xpath('drivers_license_number')};
+		string	drivers_license_state{xpath('drivers_license_state')};
+		string	name_first{xpath('name_first')};
+		string	name_last{xpath('name_last')};
+		string	name_middle{xpath('name_middle')};
+		string	name_suffix{xpath('name_suffix')};
+		string	addr_street{xpath('addr_street')};
+		string	addr_city{xpath('addr_city')};
+		string	addr_state{xpath('addr_state')};
+		string	addr_zip5{xpath('addr_zip5')};
+		string	addr_zip4{xpath('addr_zip4')};
+		string	dob{xpath('dob')};
+		string	email_address{xpath('email_address')};
+		string	state_id_number{xpath('state_id_number')};
+		string	state_id_state{xpath('state_id_state')};
+		string	eu_company_name{xpath('eu_company_name')};
+		string	eu_address_street{xpath('eu_address_street')};
+		string	eu_address_city{xpath('eu_address_city')};
+		string	eu_address_state{xpath('eu_address_state')};
+		string	eu_address_zip5{xpath('eu_address_zip5')};
+		string	eu_address_phone{xpath('eu_address_phone')};
+		string	phone{xpath('phone')};
+END;
+
+EXPORT Input_Decrypted := record
+		Comomn_Input_Encrypted;
+		string key_decrypted;
+		unsigned appended_did;
+		string	ssn;
+		string	drivers_license_number;
+		string	drivers_license_state;
+		string	name_first;
+		string	name_last;
+		string	name_middle;
+		string	name_suffix;
+		string	addr_street;
+		string	addr_city;
+		string	addr_state;
+		string	addr_zip5;
+		string	addr_zip4;
+		string	dob;
+		string	email_address;
+		string	state_id_number;
+		string	state_id_state;
+		string	eu_company_name;
+		string	eu_address_street;
+		string	eu_address_city;
+		string	eu_address_state;
+		string	eu_address_zip5;
+		string	eu_address_phone;
+		string	phone;
+end;
+
+export Base_Encrypted :=record
+		string transaction_id;
+    string key_version;
+    string text;
+    string key_encrypted;
+    string time_stamp;
+    string key_group;
+		string key_decrypted;
+		string version;
+		unsigned8 filedate;
+		UNSIGNED8 group_rid;
+end;
+
+EXPORT Input_Encrypted_History := record
+
+		Input_Encrypted;
+		string raw_filename;
+		unsigned8 filedate;
+
+END;
+
+
+  //ESP layouts
+  EXPORT t_Key := RECORD
+    string KeyVersion {xpath('KeyVersion')}; //integer?
+    string EncryptionKey {xpath('EncryptionKey')};
+    string KeyGroup {xpath('KeyGroup')};
+  END;
+
+  EXPORT t_RsaKey := RECORD (t_Key)
+    string RSAProtectedKey {xpath('RSAProtectedKey')};
+  END;
+
+  EXPORT t_KeyDecryptionRequest := RECORD (iesp.share.t_BaseRequest)
+    string RSAPublicKeyPEM {xpath('RSAPublicKeyPEM')};
+    DATASET(t_Key) keys {xpath('Keys/Key')};
+  END;
+
+  EXPORT t_KeyDecryptionResponse := record
+    iesp.share.t_ResponseHeader _Header {xpath('Header')};
+    DATASET(t_RsaKey) keys {xpath('Keys/Key')};
+  END;
+
+  EXPORT t_KeyDecryptionResponseEx := record
+    t_KeyDecryptionResponse response {xpath('response')};
+  END;
+
+  EXPORT decrypted := RECORD (t_KeyDecryptionResponseEx)
+    string soap_message {maxlength (8000)} := '';
+  END;
+
+END;
