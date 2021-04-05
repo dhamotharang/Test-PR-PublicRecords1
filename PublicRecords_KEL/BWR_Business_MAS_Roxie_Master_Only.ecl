@@ -9,6 +9,11 @@ InputFile := '~mas::uat::mas_brm_regression_10ktestsample.csv';//for weekly regr
 // InputFile := '~mas::uatsamples::business_nfcra_1m_07092019.csv'; //1m file
 // InputFile := '~mas::uatsamples::business_nfcra_iptest_04232020.csv'; 
 
+
+
+// inputFile :=  '~mas::uat::mas_brm_regression_10ktestsample_brm_marketing.csv';
+// inputFile :=  '~mas::uat::mas_brm_regression_100k_testsample_brm_marketing.csv';
+
 /* Data Setting 	NonFCRA 	
 DRMFares = 0 //FARES - bit 1
 DRMExperian =	0 - //FARES bit 6

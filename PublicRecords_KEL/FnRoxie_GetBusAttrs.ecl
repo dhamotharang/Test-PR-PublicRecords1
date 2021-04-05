@@ -2,7 +2,8 @@
 IMPORT PublicRecords_KEL;
 
 EXPORT FnRoxie_GetBusAttrs(DATASET(PublicRecords_KEL.ECL_Functions.Input_Bus_Layout) InputData,
-                PublicRecords_KEL.Interface_Options Options) := FUNCTION
+                PublicRecords_KEL.Interface_Options Options,
+                PublicRecords_KEL.Join_Interface_Options JoinFlags) := FUNCTION
 								
   ds_input := 
     PROJECT(
@@ -58,14 +59,14 @@ EXPORT FnRoxie_GetBusAttrs(DATASET(PublicRecords_KEL.ECL_Functions.Input_Bus_Lay
 //any dataset you add to the mini FDC must be re normalized into the FDC or we will lose that data 
 //all 6th rep data is calculated in the mini FDC 
 //overrides are also in the mini FDC
-	FDCDatasetMini := PublicRecords_KEL.Fn_MAS_FDC_Mini( RepsInput, Options, CheckTDSPhone);		
+	FDCDatasetMini := PublicRecords_KEL.Fn_MAS_FDC_Mini( RepsInput, Options, JoinFlags, CheckTDSPhone);		
 
 	MiniAttributes := PublicRecords_KEL.FnRoxie_GetMiniFDCAttributes(RepsInput, FDCDatasetMini, Options); 
 
 	// At this time, only need to collect data for rep1 and not other reps. 
 	// If/when this changes all records from withRepLexIDs will need to be passed to Fn_MAS_FDC.
 	// Just passing in Rep1 Inputs for now to avoid fetching too much data.
-	FDCDataset := PublicRecords_KEL.Fn_MAS_FDC( MiniAttributes, Options, CheckTDSPhone, FDCDatasetMini );
+	FDCDataset := PublicRecords_KEL.Fn_MAS_FDC( MiniAttributes, Options, JoinFlags, CheckTDSPhone, FDCDatasetMini );
 
 	BusinessAttributes := PublicRecords_KEL.Library.LIB_BusinessAttributes_Function(CheckTDSPhone, Prep_RepInput, FDCDataset, Options);
 

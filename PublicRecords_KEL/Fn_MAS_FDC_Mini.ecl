@@ -12,6 +12,7 @@
 
 EXPORT Fn_MAS_FDC_Mini(DATASET(PublicRecords_KEL.ECL_Functions.Layouts.LayoutInputPII) Input_all,
 									PublicRecords_KEL.Interface_Options Options,
+									PublicRecords_KEL.Join_Interface_Options JoinFlags,
 									DATASET(PublicRecords_KEL.ECL_Functions.Layouts.LayoutInputBII) BusinessInput = DATASET([], PublicRecords_KEL.ECL_Functions.Layouts.LayoutInputBII)
 									) := FUNCTION
 	
@@ -57,7 +58,7 @@ EXPORT Fn_MAS_FDC_Mini(DATASET(PublicRecords_KEL.ECL_Functions.Layouts.LayoutInp
 																											marketing_flag := Options.isMarketing);	
 	
 	Layouts_FDC  := PublicRecords_KEL.ECL_Functions.Layouts_FDC(Options);
-	Common       := PublicRecords_KEL.ECL_Functions.Common(Options);
+	Common       := PublicRecords_KEL.ECL_Functions.Common(Options, JoinFlags);
 	CFG_File     := PublicRecords_KEL.CFG_Compile;
 	Regulated    := PublicRecords_KEL.ECL_Functions.Constants.Regulated;
 	NotRegulated := PublicRecords_KEL.ECL_Functions.Constants.NotRegulated;
@@ -132,7 +133,7 @@ end;
 
 //all overrides and suppressions are gathered in the mini FDC the passed to the FDC
 	//FCRA overrides are NOT archivable 
-	Input_getoverides:= PublicRecords_KEL.MAS_get.FCRA_Overrides(Options).GetOverrideFlags(Input_pre_override);		
+	Input_getoverides:= PublicRecords_KEL.MAS_get.FCRA_Overrides(Options, JoinFlags).GetOverrideFlags(Input_pre_override);		
 
 	SixthRepInput := Input_getoverides(RepNumber = 6);
 
@@ -357,7 +358,7 @@ end;
 
 	Key_dx_Header__key_did_hhid :=
 			JOIN(Input_FDC, dx_Header.key_did_hhid(),
-			Common.DoFDCJoin_dx_Header__key_did_hhid =TRUE  and  NOT options.isBRM_Marketing and
+			Common.DoFDCJoin_dx_Header__key_did_hhid =TRUE  and 
 			LEFT.P_LexID <> 0 AND
 				KEYED(LEFT.P_LexID =RIGHT.did) and right.ver=1,
 				TRANSFORM(Layouts_FDC.Layout_dx_Header__key_did_hhid,
@@ -387,7 +388,7 @@ end;
 	//hhid returned is used to search did 
 	Key_dx_Header__key_hhid_did :=
 			JOIN(deduped_HHIDS, dx_Header.key_hhid_did(), //no dates - does not need date selected.
-			Common.DoFDCJoin_dx_Header__key_did_hhid =TRUE  and  NOT options.isBRM_Marketing and
+			Common.DoFDCJoin_dx_Header__key_did_hhid =TRUE  and 
 			LEFT.hhid_relat <> 0 AND
 				KEYED(LEFT.hhid_relat =RIGHT.hhid_relat),
 				TRANSFORM(Layouts_FDC.Layout_dx_Header__key_hhid_did,
@@ -412,7 +413,7 @@ end;
 						         
 		ismarketing := if(Options.isMarketing,'MARKETING','');
 		sourcecoderelatives := if(Options.isMarketing,MDR.sourceTools.src_Marketing_Relatives_Data,MDR.sourceTools.src_Relatives_Data);
-		HeaderRelatives :=  IF(Common.DoFDCJoin_Relatives__Key_Relatives_v3 = TRUE AND NOT options.isBRM_Marketing, Relationship.proc_GetRelationshipNeutral(PROJECT(Input_FDC_Business_Contact_LexIDs, TRANSFORM(Relationship.layout_GetRelationship.DIDs_layout, SELF.DID := LEFT.P_Lexid)),
+		HeaderRelatives :=  IF(Common.DoFDCJoin_Relatives__Key_Relatives_v3 = TRUE , Relationship.proc_GetRelationshipNeutral(PROJECT(Input_FDC_Business_Contact_LexIDs, TRANSFORM(Relationship.layout_GetRelationship.DIDs_layout, SELF.DID := LEFT.P_Lexid)),
 																	TopNCount:=100,
 																	RelativeFlag :=TRUE,AssociateFlag:=TRUE,
 																	doAtmost:=TRUE,MaxCount:=PublicRecords_KEL.ECL_Functions.Constants.Default_Atmost_1000, RelKeyFlag:= ismarketing).result);
@@ -468,7 +469,7 @@ end;
 	
 	Header__key_ADL_segmentation_Records := 
 		JOIN(Input_HHIDLexids_Input6thRep_preADL, Header.key_ADL_segmentation, //adl seg is nonFCRA only for now
-				Common.DoFDCJoin_Header__key_ADL_segmentation = TRUE  and  NOT options.isBRM_Marketing and
+				Common.DoFDCJoin_Header__key_ADL_segmentation = TRUE  and  
 				LEFT.P_LexID > 0 AND
 				KEYED(LEFT.P_LexID = RIGHT.did),
 				TRANSFORM(Layouts_FDC.Layout_Header__key_ADL_segmentation,
@@ -566,7 +567,8 @@ end;
 			
 	Best_Person__Key_Watchdog_FCRA_nonEN_Records := 
 		JOIN(Input_FDC, Watchdog.Key_Watchdog_FCRA_nonEN, //watchdog data is not archivable
-				Common.DoFDCJoin_Best_Person__Key_Watchdog_FCRA_nonEN = TRUE  and
+				Common.DoFDCJoin_Best_Person__Key_Watchdog_FCRA = TRUE  and
+				Options.Data_Restriction_Mask[Risk_Indicators.iid_constants.posEquifaxRestriction] <> '1' and
 				LEFT.P_LexID > 0 AND
 				KEYED(LEFT.P_LexID = RIGHT.did),
 				TRANSFORM(Layouts_FDC.Layout_Best_Person__Key_Watchdog_FCRA_nonEN,
@@ -586,7 +588,8 @@ end;
 	
 	Best_Person__Key_Watchdog_FCRA_nonEQ_Records := 
 		JOIN(Input_FDC, Watchdog.Key_Watchdog_FCRA_nonEQ, //watchdog data is not archivable
-				Common.DoFDCJoin_Best_Person__Key_Watchdog_FCRA_nonEQ = TRUE  and
+				Common.DoFDCJoin_Best_Person__Key_Watchdog_FCRA = TRUE  and
+				Options.Data_Restriction_Mask[Risk_Indicators.iid_constants.posEquifaxRestriction] = '1' AND
 				LEFT.P_LexID > 0 AND
 				KEYED(LEFT.P_LexID = RIGHT.did),
 				TRANSFORM(Layouts_FDC.Layout_Best_Person__Key_Watchdog_FCRA_nonEQ,
@@ -680,7 +683,7 @@ end;
 	Header_Quick__Key_Did := IF(Options.IsFCRA, Header_Quick.Key_Did_FCRA, Header_Quick.Key_Did);
 	
 		Header_Quick__Key_Did_Records_Unsuppressed :=  JOIN(clean_QH, Header_Quick__Key_Did,
-				common.DoFDCJoin_Doxie__Key_Header = TRUE  and NOT options.isBRM_Marketing and //turn off for brm marketing
+				common.DoFDCJoin_Doxie__Key_Header = TRUE  and 
 				LEFT.P_LexID > 0 AND
 				KEYED(LEFT.P_LexID = (UNSIGNED)RIGHT.did) and
 				IF(Options.isMarketing,(PublicRecords_KEL.ECL_Functions.Constants.SetQuickHeaderSource(right.src) IN PublicRecords_KEL.ECL_Functions.Constants.ALLOWED_MARKETING_SOURCES OR PublicRecords_KEL.ECL_Functions.Common_Functions.IsMarketingAllowedKey(PublicRecords_KEL.ECL_Functions.Constants.SetQuickHeaderSource(right.src), right.st)), TRUE) and
@@ -752,7 +755,7 @@ end;
 /*************************************************************************************************************/
 
 	Doxie__Key_Header_Records_Unsuppressed := JOIN(clean_Header, dx_header.key_header(iType),
-				common.DoFDCJoin_Doxie__Key_Header = TRUE  and NOT options.isBRM_Marketing and //turn off for brm marketing
+				common.DoFDCJoin_Doxie__Key_Header = TRUE  and 
 			LEFT.P_LexID > 0 AND
 				KEYED(LEFT.P_LexID = (UNSIGNED)RIGHT.s_did) and
 				IF(Options.isMarketing,(right.src IN PublicRecords_KEL.ECL_Functions.Constants.ALLOWED_MARKETING_SOURCES OR PublicRecords_KEL.ECL_Functions.Common_Functions.IsMarketingAllowedKey(right.src, right.st)), TRUE) and
@@ -790,7 +793,7 @@ end;
 	
 	
 	real_Header_and_Quick_with_ingestdate_appended := join(Header_Quick_Header_Records, dx_Header.key_first_ingest(iType),
-				options.UseIngestDate AND common.DoFDCJoin_Doxie__Key_Header = TRUE and NOT options.isBRM_Marketing and
+				options.UseIngestDate AND common.DoFDCJoin_Doxie__Key_Header = TRUE and 
 				left.rid<>0 and 
 				keyed(left.rid=right.rid),
 			transform(Layouts_FDC.tempHeader,
@@ -888,7 +891,7 @@ end;
 	// Header: consumer only
 	Key_Header_Addr_Hist_temp := 
 			JOIN((Input_FDC_RelativesLexids_Business_Contact_LexIDs_Input6thRep), dx_Header.key_addr_hist(iType), 
-				Common.DoFDCJoin_Header__Key_Addr_Hist = TRUE  AND NOT options.isBRM_Marketing and //turn off for brm marketing
+				Common.DoFDCJoin_Header__Key_Addr_Hist = TRUE  AND 
 				LEFT.P_LexID > 0 AND
 				KEYED(LEFT.P_LexID = RIGHT.s_did) and
 				ArchiveDate((string)right.date_first_seen) <= LEFT.P_InpClnArchDt[1..8],
@@ -905,7 +908,7 @@ end;
 
 	Key_Header_Addr_Hist := 
 			JOIN(Key_Header_Addr_Hist_temp, AID_Build.Key_AID_Base, 
-				Common.DoFDCJoin_Header__Key_Addr_Hist = TRUE  AND NOT options.isBRM_Marketing and //turn off for brm marketing
+				Common.DoFDCJoin_Header__Key_Addr_Hist = TRUE  AND 
 				KEYED(LEFT.Rawaid = RIGHT.Rawaid),
 				TRANSFORM(Layouts_FDC.Layout_Header__Key_Addr_Hist,
 					SELF.UIDAppend := LEFT.UIDAppend,
