@@ -5,7 +5,8 @@ IMPORT KEL13 AS KEL;
 //FCRA overrides are NOT archivable
 
 
-EXPORT FCRA_Overrides(PublicRecords_KEL.Interface_Options Options) := MODULE 
+EXPORT FCRA_Overrides(PublicRecords_KEL.Interface_Options Options,
+											PublicRecords_KEL.Join_Interface_Options JoinFlags) := MODULE 
 
 SHARED Layouts_FDC  := PublicRecords_KEL.ECL_Functions.Layouts_FDC(Options);
 SHARED NotRegulated := PublicRecords_KEL.ECL_Functions.Constants.NotRegulated;
@@ -15,7 +16,7 @@ SHARED CFG_File     := PublicRecords_KEL.CFG_Compile;
 SHARED GLBARegulatedDeathMasterRecord(STRING glb_flag) := glb_flag = 'Y';
 SHARED DPPARegulatedWaterCraftRecord(STRING dppa_flag) := IF(TRIM(dppa_flag, LEFT, RIGHT) = 'Y', TRUE, FALSE);	
 SHARED LN_PropertyV2_Src(STRING ln_fares_id) := MDR.sourceTools.fProperty(ln_fares_id);
-SHARED Common       := PublicRecords_KEL.ECL_Functions.Common(Options);
+SHARED Common       := PublicRecords_KEL.ECL_Functions.Common(Options, JoinFlags);
 SHARED restrictedStates := fcra.compliance.watercrafts.restricted_states;	// need consumer permission
 
 SHARED ArchiveDate(string datevalue_in1, string datevalue_in2 = '' ):= function
