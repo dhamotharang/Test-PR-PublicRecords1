@@ -722,25 +722,6 @@ Export   MBSmarketAppend       := record
 	string    bill_country_code;
 END;
 
-Export	MbsVelocityRules		:= record
-	unsigned6 ruleNum;
-	unsigned6	gc_id;
-	string60	fragment;
-	string100 fragment_description;
-	string60	contributionType;
-	string100	contributionTypeDescription;
-	unsigned2 fragment_weight;
-	unsigned2	category_weight;
-	unsigned2	minCnt;
-	unsigned2	maxTime;
-	string20	timeUnit;
-	unsigned2	status;
-	string25	date_added;
-	string25	date_changed;
-	string60	user_added;
-	string60	user_changed;
-END;
-
 Export Conviction_Lookup := record
 	string	court_disp_desc;
 	string	conviction_flag;
