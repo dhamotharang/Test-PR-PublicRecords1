@@ -475,19 +475,6 @@ Export FDNMasterID := record
 	data16     FdnMasterId;    
 End;
 
-Export MbsVelocityRules	:= Record
-		unsigned6		gc_id;
-		string60		fragment;
-		string60		contributionType;
-		unsigned2		fragment_weight;
-		unsigned2		category_weight;
-		unsigned6 	ruleNum;
-		unsigned2 	minCnt;		
-		unsigned2		maxTime;
-		string20		timeUnit;
-		string  		description;
-End;
-
 Export MbsFdnIndType	:= Record
 	string255  description ;  
 	unsigned6  ind_type ; 
