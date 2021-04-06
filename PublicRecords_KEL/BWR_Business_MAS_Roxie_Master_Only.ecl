@@ -9,6 +9,11 @@ InputFile := '~mas::uat::mas_brm_regression_10ktestsample.csv';//for weekly regr
 // InputFile := '~mas::uatsamples::business_nfcra_1m_07092019.csv'; //1m file
 // InputFile := '~mas::uatsamples::business_nfcra_iptest_04232020.csv'; 
 
+
+
+// inputFile :=  '~mas::uat::mas_brm_regression_10ktestsample_brm_marketing.csv';
+// inputFile :=  '~mas::uat::mas_brm_regression_100k_testsample_brm_marketing.csv';
+
 /* Data Setting 	NonFCRA 	
 DRMFares = 0 //FARES - bit 1
 DRMExperian =	0 - //FARES bit 6
@@ -62,6 +67,9 @@ Output_Master_Results := TRUE;
 Output_SALT_Profile := TRUE;
 
 Exclude_Consumer_Attributes := FALSE; //if TRUE, bypasses consumer logic and sets all consumer shell fields to blank/0.
+
+// Use_Ingest_Date := TRUE; 
+Use_Ingest_Date := false;
 
 // TurnOffHouseHolds := TRUE;
 TurnOffHouseHolds := FALSE;
@@ -248,6 +256,7 @@ soapLayout := RECORD
 	BOOLEAN TurnOffHouseHolds;
 	BOOLEAN TurnOffRelatives;
 	BOOLEAN IncludeMinors;
+	BOOLEAN UseIngestDate;
 	DATASET(PublicRecords_KEL.ECL_Functions.Constants.Layout_Allowed_Sources) AllowedSourcesDataset := DATASET([], PublicRecords_KEL.ECL_Functions.Constants.Layout_Allowed_Sources);
 	DATASET(PublicRecords_KEL.ECL_Functions.Constants.Layout_Allowed_Sources) ExcludeSourcesDataset := DATASET([], PublicRecords_KEL.ECL_Functions.Constants.Layout_Allowed_Sources);
 	
@@ -279,6 +288,7 @@ Settings := MODULE(PublicRecords_KEL.Interface_BWR_Settings)
 	EXPORT STRING Data_Permission_Mask := DataPermissionMask;
 	EXPORT UNSIGNED GLBAPurpose := GLBA;
 	EXPORT UNSIGNED DPPAPurpose := DPPA;
+	EXPORT boolean UseIngestDate := Use_Ingest_Date;
 	EXPORT BOOLEAN Override_Experian_Restriction := OverrideExperianRestriction;
 	EXPORT STRING Allowed_Sources := AllowedSources; // Controls inclusion of DNBDMI data
 	EXPORT UNSIGNED LexIDThreshold := Score_threshold;
@@ -322,6 +332,7 @@ soapLayout trans (inDataReadyDist le):= TRANSFORM
 	SELF.IsMarketing := FALSE;
 	SELF.TurnOffHouseHolds := TurnOffHouseHolds;
 	SELF.TurnOffRelatives := TurnOffRelatives;
+	SELF.UseIngestDate := Settings.UseIngestDate;
 	SELF.OutputMasterResults := Output_Master_Results;
 	SELF.AllowedSourcesDataset := AllowedSourcesDataset;
 	SELF.ExcludeSourcesDataset := ExcludeSourcesDataset;

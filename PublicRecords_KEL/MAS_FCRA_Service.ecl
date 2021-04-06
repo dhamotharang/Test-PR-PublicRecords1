@@ -132,57 +132,16 @@ EXPORT MAS_FCRA_Service() := MACRO
 		EXPORT BOOLEAN BestPIIAppend :=  Append_PII; //do not append best pii for running, always append best pii for prescreen
 		EXPORT BOOLEAN CaliforniaInPerson := California_In_Person; //do not append best pii for running
 		
-		// Override Include* Entity/Association options here if certain entities can be turned off to speed up processing.
-		// This will bypass uneccesary key JOINS in PublicRecords_KEL.Fn_MAS_FDC if the keys don't contribute to any 
-		// ENTITIES/ASSOCIATIONS being used by the query.	
-
-		EXPORT BOOLEAN IncludeAccident := TRUE;
-		EXPORT BOOLEAN IncludeAddress := TRUE;
-		EXPORT BOOLEAN IncludeAddressSummary := TRUE;
-		EXPORT BOOLEAN IncludeAircraft := TRUE;
-		EXPORT BOOLEAN IncludeBankruptcy := TRUE;
-		EXPORT BOOLEAN IncludeBusinessSele := TRUE;
-		EXPORT BOOLEAN IncludeBusinessProx := TRUE;
-		EXPORT BOOLEAN IncludeCriminalOffender := TRUE;
-		EXPORT BOOLEAN IncludeCriminalOffense := TRUE;
-		EXPORT BOOLEAN IncludeCriminalPunishment := TRUE;
-		EXPORT BOOLEAN IncludeDriversLicense := TRUE;
-		EXPORT BOOLEAN IncludeEducation := TRUE;
-		EXPORT BOOLEAN IncludeEBRTradeline := TRUE;
-		EXPORT BOOLEAN IncludeEmail := TRUE;
-		EXPORT BOOLEAN IncludeEmployment := TRUE;
-		EXPORT BOOLEAN IncludeForeclosure := TRUE;
-		EXPORT BOOLEAN IncludeGeolink := TRUE;
-		EXPORT BOOLEAN IncludeHousehold := TRUE;
-		EXPORT BOOLEAN IncludeInquiry := TRUE;
-		EXPORT BOOLEAN IncludeLienJudgment := TRUE;
-		EXPORT BOOLEAN IncludeNameSummary := TRUE;
-		EXPORT BOOLEAN IncludePerson := TRUE;
-		EXPORT BOOLEAN IncludePhone := TRUE;
-		EXPORT BOOLEAN IncludePhoneSummary := TRUE;
-		EXPORT BOOLEAN IncludeProfessionalLicense := TRUE;
-		EXPORT BOOLEAN IncludeProperty := TRUE;
-		EXPORT BOOLEAN IncludePropertyEvent := TRUE;
-		EXPORT BOOLEAN IncludeSexOffender := TRUE;
-		EXPORT BOOLEAN IncludeSocialSecurityNumber := TRUE;
-		EXPORT BOOLEAN IncludeSSNSummary := TRUE;
-		EXPORT BOOLEAN IncludeSurname := TRUE;
-		EXPORT BOOLEAN IncludeTIN := TRUE;
-		EXPORT BOOLEAN IncludeTradeline := TRUE;
-		EXPORT BOOLEAN IncludeUtility := TRUE;
-		EXPORT BOOLEAN IncludeVehicle := TRUE;
-		EXPORT BOOLEAN IncludeWatercraft := TRUE;
-		EXPORT BOOLEAN IncludeZipCode := TRUE;
-		EXPORT BOOLEAN IncludeUCC := TRUE;
-		EXPORT BOOLEAN IncludeOverrides := TRUE;
 		EXPORT BOOLEAN IncludeInferredPerformance := Allow_Inferred_Performance;
 
-
+	
 	END;
+	
+	JoinFlags := PublicRecords_KEL.Internal_Join_Interface_Options(PublicRecords_KEL.Join_Interface_Options);
 
 	IF(options.RetainInputLexid = FALSE AND options.BestPIIAppend = TRUE, FAIL('Insufficient Input'));
 
-  ResultSet := PublicRecords_KEL.FnRoxie_GetAttrs(ds_input, Options);
+  ResultSet := PublicRecords_KEL.FnRoxie_GetAttrs(ds_input, Options, JoinFlags);
 
 	FinalResults := PROJECT(ResultSet, 
 		TRANSFORM(PublicRecords_KEL.ECL_Functions.Layout_Person_FCRA,

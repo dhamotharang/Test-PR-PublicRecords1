@@ -16,6 +16,7 @@
 	<part name="IsMarketing" type="xsd:boolean"/>
 	<part name="TurnOffHouseHolds" type="xsd:boolean"/>
 	<part name="TurnOffRelatives" type="xsd:boolean"/>
+	<part name="UseIngestDate" type="xsd:boolean"/>
 	<part name="AllowedSources" type="xsd:string"/>
 	<part name="IndustryClass" type="xsd:string"/>
 	<part name="AllowedSourcesDataset" type="tns:XmlDataSet" cols="100" rows="8"/>
@@ -36,7 +37,7 @@ EXPORT MAS_Business_nonFCRA_Service() := MACRO
   #WEBSERVICE(FIELDS(
         'input',
         'ScoreThreshold',
-		'Gateways',
+        'Gateways',
         'ExcludeConsumerAttributes',
         'OutputMasterResults',
         'BIPAppendScoreThreshold',
@@ -52,19 +53,20 @@ EXPORT MAS_Business_nonFCRA_Service() := MACRO
         'IsMarketing',
         'TurnOffHouseHolds',
         'TurnOffRelatives',
+        'UseIngestDate',
         'IncludeMinors',
         'AllowedSources',
         'OverrideExperianRestriction',
-		'AllowedSourcesDataset',
-		'ExcludeSourcesDataset',
-		'LexIdSourceOptout',
-		'_TransactionId',
-		'_BatchUID',
-		'_GCID',
-		'Watchlists_Requested',
-		'IncludeOfac',
-		'IncludeAdditionalWatchLists',
-		'Global_Watchlist_Threshold'
+        'AllowedSourcesDataset',
+        'ExcludeSourcesDataset',
+        'LexIdSourceOptout',
+        '_TransactionId',
+        '_BatchUID',
+        '_GCID',
+        'Watchlists_Requested',
+        'IncludeOfac',
+        'IncludeAdditionalWatchLists',
+        'Global_Watchlist_Threshold'
   ));
 
 STRING5 Default_Industry_Class := '';	
@@ -96,6 +98,7 @@ BOOLEAN Default_IncludeMinors := TRUE;
 	BOOLEAN Is_Marketing := FALSE : STORED('IsMarketing');
 	BOOLEAN Turn_Off_HouseHolds := FALSE : STORED('TurnOffHouseHolds');
 	BOOLEAN Turn_Off_Relatives := FALSE : STORED('TurnOffRelatives');
+	BOOLEAN Use_Ingest_Date := FALSE : STORED('UseIngestDate');
 	// BOOLEAN Include_Minors := TRUE : STORED('IncludeMinors');
 	BOOLEAN Include_Minors := Default_IncludeMinors : STORED('IncludeMinors');
 	BOOLEAN OverrideExperianRestriction := FALSE : STORED('OverrideExperianRestriction');
@@ -154,7 +157,8 @@ BOOLEAN Default_IncludeMinors := TRUE;
 		EXPORT BOOLEAN isMarketing := Is_Marketing; // When TRUE enables Marketing Restrictions
 		EXPORT BOOLEAN TurnOffRelatives := Turn_Off_Relatives; 
 		EXPORT BOOLEAN TurnOffHouseHolds := Turn_Off_HouseHolds; 
-		EXPORT BOOLEAN IncludeMinors := Include_Minors; // When TRUE enables Marketing Restrictions
+		EXPORT BOOLEAN UseIngestDate := Use_Ingest_Date; 
+		EXPORT BOOLEAN IncludeMinors := Include_Minors; 
 		EXPORT BOOLEAN Override_Experian_Restriction := OverrideExperianRestriction;
 		EXPORT STRING100 Allowed_Sources := AllowedSources;
 		EXPORT DATASET(PublicRecords_KEL.ECL_Functions.Constants.Layout_Allowed_Sources) Allowed_Sources_Dataset := FinalAllowedSources;
@@ -192,48 +196,14 @@ BOOLEAN Default_IncludeMinors := TRUE;
 		// Override Include* Entity/Association options here if certain entities can be turned off to speed up processing.
 		// This will bypass uneccesary key JOINS in PublicRecords_KEL.Fn_MAS_FCRA_FDC if the keys don't contribute to any 
 		// ENTITIES/ASSOCIATIONS being used by the query.
-		EXPORT BOOLEAN IncludeAccident := TRUE;
-		EXPORT BOOLEAN IncludeAddress := TRUE;
-		EXPORT BOOLEAN IncludeAddressSummary := TRUE;
-		EXPORT BOOLEAN IncludeAircraft := TRUE;
-		EXPORT BOOLEAN IncludeBankruptcy := TRUE;
-		EXPORT BOOLEAN IncludeBusinessSele := TRUE;
-		EXPORT BOOLEAN IncludeBusinessProx := TRUE;
-		EXPORT BOOLEAN IncludeCriminalOffender := TRUE;
-		EXPORT BOOLEAN IncludeCriminalOffense := TRUE;
-		EXPORT BOOLEAN IncludeCriminalPunishment := TRUE;
-		EXPORT BOOLEAN IncludeDriversLicense := TRUE;
-		EXPORT BOOLEAN IncludeEducation := TRUE;
-		EXPORT BOOLEAN IncludeEBRTradeline := TRUE;
-		EXPORT BOOLEAN IncludeEmail := TRUE;
-		EXPORT BOOLEAN IncludeEmployment := TRUE;
-		EXPORT BOOLEAN IncludeForeclosure := TRUE;
-		EXPORT BOOLEAN IncludeGeolink := TRUE;
-		EXPORT BOOLEAN IncludeHousehold := TRUE;
-		EXPORT BOOLEAN IncludeInquiry := TRUE;
-		EXPORT BOOLEAN IncludeLienJudgment := TRUE;
-		EXPORT BOOLEAN IncludeNameSummary := TRUE;
-		EXPORT BOOLEAN IncludePerson := TRUE;
-		EXPORT BOOLEAN IncludePhone := TRUE;
-		EXPORT BOOLEAN IncludePhoneSummary := TRUE;
-		EXPORT BOOLEAN IncludeProfessionalLicense := TRUE;
-		EXPORT BOOLEAN IncludeProperty := TRUE;
-		EXPORT BOOLEAN IncludePropertyEvent := TRUE;
-		EXPORT BOOLEAN IncludeSocialSecurityNumber := TRUE;
-		EXPORT BOOLEAN IncludeSSNSummary := TRUE;
-		EXPORT BOOLEAN IncludeSurname := TRUE;
-		EXPORT BOOLEAN IncludeTIN := TRUE;
-		EXPORT BOOLEAN IncludeTradeline := TRUE;
-		EXPORT BOOLEAN IncludeUtility := TRUE;
-		EXPORT BOOLEAN IncludeVehicle := TRUE;
-		EXPORT BOOLEAN IncludeWatercraft := TRUE;
-		EXPORT BOOLEAN IncludeZipCode := TRUE;
-		EXPORT BOOLEAN IncludeUCC := TRUE;
-		EXPORT BOOLEAN IncludeOverrides := FALSE;
+
 
 	END;	
 	
-  ResultSet := PublicRecords_KEL.FnRoxie_GetBusAttrs(ds_input, Options);		
+	JoinFlags := PublicRecords_KEL.Internal_Join_Interface_Options(PublicRecords_KEL.Join_Interface_Options);	
+	
+  ResultSet := PublicRecords_KEL.FnRoxie_GetBusAttrs(ds_input, Options, JoinFlags);		
+	
 	
 	FinalResults := PROJECT(ResultSet, 
 		TRANSFORM(PublicRecords_KEL.ECL_Functions.Layout_Business_NonFCRA,

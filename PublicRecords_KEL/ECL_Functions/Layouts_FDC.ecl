@@ -28,6 +28,8 @@
 		STRING20 P_InpClnNameFirst;
 		STRING20 P_InpClnNameMid;
 		STRING30 P_InpClnNameLast;		
+		STRING30 P_InpClnSurname1;		
+		STRING30 P_InpClnSurname2;		
 		STRING20 p_inpclnarchdt;
 		STRING10 P_InpClnDOB;
 		STRING10 P_InpClnAddrPrimRng;
@@ -121,6 +123,7 @@ SHARED unsigned1 iType := IF(Options.IsFCRA, data_services.data_env.iFCRA, data_
 		INTEGER G_ProcUID; 
 		Boolean HeaderRec;
 		STRING Archive_Date;
+		unsigned4 first_ingest_date;
 		dpmtype;
 		dx_Header.layout_header;	
 		PublicRecords_KEL.ECL_Functions.Layout_Overrides.header_correct_record_id;
@@ -131,6 +134,7 @@ SHARED unsigned1 iType := IF(Options.IsFCRA, data_services.data_env.iFCRA, data_
 		RECORDOF(Doxie__Key_Header)-dt_first_seen;//same as dx_Header.layout_header;
 		unsigned dt_first_seen;
 		STRING Archive_Date;
+		unsigned4 first_ingest_date;
 		dpmtype;
 		PublicRecords_KEL.ECL_Functions.Layout_Overrides.header_correct_record_id;
 		Boolean HeaderRec;//for corrections
@@ -146,6 +150,7 @@ SHARED unsigned1 iType := IF(Options.IsFCRA, data_services.data_env.iFCRA, data_
 		RECORDOF(Header_Quick__Key_Did)- dt_first_seen;
 		unsigned dt_first_seen;
 		STRING Archive_Date;
+		unsigned4 first_ingest_date;
 		dpmtype;
 		PublicRecords_KEL.ECL_Functions.Layout_Overrides.header_correct_record_id;
 		Boolean HeaderRec;//for corrections

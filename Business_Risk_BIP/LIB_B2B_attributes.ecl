@@ -13,6 +13,7 @@ EXPORT LIB_B2B_attributes (
   MODULE (Business_Risk_BIP.LIB_B2B_interface (Shell, Options, AllowedSourcesSet))
 #END
 #OPTION('expandSelectCreateRow', TRUE);
+	#OPTION('foldStored', TRUE);
 
   BHBuildDate := Risk_Indicators.get_Build_date('bip_build_version');
   allowMarketing := IF(Options.MarketingMode = 1, TRUE, FALSE);
@@ -59,15 +60,22 @@ EXPORT LIB_B2B_attributes (
 
     EXPORT isMarketing := IF(Options.MarketingMode = 1, TRUE, FALSE);
 
-    //default options in PublicRecords_KEL.Interface_Options have been changed to FALSE
-    EXPORT BOOLEAN IncludeTradeline := TRUE;
 
   END;
 
+
+		//default setting for keys is false, turn on only what is needed for attributes		
+	JoinFlags := MODULE(PublicRecords_KEL.Join_Interface_Options);
+
+		EXPORT BOOLEAN DoFDCJoin_Tradeline_Files__Tradeline__Key_LinkIds := TRUE;
+		EXPORT BOOLEAN DoFDCJoin_Business_Files__Business__Key_BH_Linking_Ids := TRUE;
+	end;
+	
    // BusinessInput := PROJECT(Input,Transform(PublicRecords_KEL.ECL_Functions.Layouts.LayoutInputBII BS Input to ECL_Functions.Layouts.LayoutInputBII - pop seq# and bip IDs.
 
   FDCDataset := PublicRecords_KEL.Fn_MAS_FDC(DATASET([], PublicRecords_KEL.ECL_Functions.Layouts.LayoutInputPII),
                   KEL_Options,
+                  JoinFlags,
                   BusinessInput);
 
   Common_Functions := PublicRecords_KEL.ECL_Functions.Common_Functions;

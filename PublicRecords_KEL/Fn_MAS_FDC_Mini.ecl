@@ -12,6 +12,7 @@
 
 EXPORT Fn_MAS_FDC_Mini(DATASET(PublicRecords_KEL.ECL_Functions.Layouts.LayoutInputPII) Input_all,
 									PublicRecords_KEL.Interface_Options Options,
+									PublicRecords_KEL.Join_Interface_Options JoinFlags,
 									DATASET(PublicRecords_KEL.ECL_Functions.Layouts.LayoutInputBII) BusinessInput = DATASET([], PublicRecords_KEL.ECL_Functions.Layouts.LayoutInputBII)
 									) := FUNCTION
 	
@@ -57,7 +58,7 @@ EXPORT Fn_MAS_FDC_Mini(DATASET(PublicRecords_KEL.ECL_Functions.Layouts.LayoutInp
 																											marketing_flag := Options.isMarketing);	
 	
 	Layouts_FDC  := PublicRecords_KEL.ECL_Functions.Layouts_FDC(Options);
-	Common       := PublicRecords_KEL.ECL_Functions.Common(Options);
+	Common       := PublicRecords_KEL.ECL_Functions.Common(Options, JoinFlags);
 	CFG_File     := PublicRecords_KEL.CFG_Compile;
 	Regulated    := PublicRecords_KEL.ECL_Functions.Constants.Regulated;
 	NotRegulated := PublicRecords_KEL.ECL_Functions.Constants.NotRegulated;
@@ -132,7 +133,7 @@ end;
 
 //all overrides and suppressions are gathered in the mini FDC the passed to the FDC
 	//FCRA overrides are NOT archivable 
-	Input_getoverides:= PublicRecords_KEL.MAS_get.FCRA_Overrides(Options).GetOverrideFlags(Input_pre_override);		
+	Input_getoverides:= PublicRecords_KEL.MAS_get.FCRA_Overrides(Options, JoinFlags).GetOverrideFlags(Input_pre_override);		
 
 	SixthRepInput := Input_getoverides(RepNumber = 6);
 
@@ -150,6 +151,8 @@ end;
 							SELF.P_InpClnDL := right.P_InpClnDL,	
 							SELF.P_InpClnSSN := right.P_InpClnSSN,
 							SELF.P_InpClnNameLast := right.P_InpClnNameLast,
+							SELF.P_InpClnSurname1 := right.P_InpClnSurname1,
+							SELF.P_InpClnSurname2 := right.P_InpClnSurname2,
 							SELF.P_InpClnNameMid := right.P_InpClnNameMid,
 							SELF.P_InpClnNameFirst := right.P_InpClnNameFirst,
 							SELF.P_InpClnDOB := right.P_InpClnDOB,
@@ -168,6 +171,8 @@ end;
 							SELF.P_InpClnDL := left.P_InpClnDL,	
 							SELF.P_InpClnSSN := left.P_InpClnSSN,
 							SELF.P_InpClnNameLast := left.P_InpClnNameLast,
+							SELF.P_InpClnSurname1 := left.P_InpClnSurname1,
+							SELF.P_InpClnSurname2 := left.P_InpClnSurname2,
 							SELF.P_InpClnNameMid := left.P_InpClnNameMid,
 							SELF.P_InpClnNameFirst := left.P_InpClnNameFirst,
 							SELF.P_InpClnDOB := left.P_InpClnDOB,
@@ -197,6 +202,8 @@ end;
 							SELF.P_InpClnDL := LEFT.P_InpClnDL,	
 							SELF.P_InpClnSSN := LEFT.P_InpClnSSN,
 							SELF.P_InpClnNameLast := LEFT.P_InpClnNameLast,
+							SELF.P_InpClnSurname1 := left.P_InpClnSurname1,
+							SELF.P_InpClnSurname2 := left.P_InpClnSurname2,				
 							SELF.P_InpClnNameMid := LEFT.P_InpClnNameMid,
 							SELF.P_InpClnNameFirst := LEFT.P_InpClnNameFirst,
 							SELF.P_InpClnDOB := LEFT.P_InpClnDOB,
@@ -209,7 +216,15 @@ end;
 							self := left;
 							SELF := []), FULL OUTER );
 
-
+	Input_Phone_Consumer_recs :=
+		NORMALIZE( Input, 2, // Consumer input can contain a homephone and a workphone
+			TRANSFORM( Layouts_FDC.LayoutPhoneGeneric_inputs,
+				SELF.UIDAppend := LEFT.G_ProcUID,
+				SELF.Phone := CHOOSE( COUNTER, LEFT.P_InpClnPhoneHome, LEFT.P_InpClnPhoneWork),
+				SELF := LEFT,
+				SELF := []
+			)
+		);
 
 	Input_Address_Consumer_recs :=
 		PROJECT( Input,
@@ -320,7 +335,7 @@ end;
 
 	//transform business contact into input layout and dedup
 	//only keep contacts within the past 3 years for 'extra' searching, keep 3 years for build date padding
-	temp_Contacts := project(Contacts, transform(Layouts_FDC.Layout_FDC, self.P_LexID := left.contact_did, self.UIDAppend := left.UIDAppend, self.g_procuid := left.UIDAppend, self.P_InpClnArchDt := LEFT.P_InpClnArchDt,self.P_InpClnNameLast := left.contact_name.lname, self.Contact_date := if(left.dt_last_seen_contact>(integer)LEFT.P_InpClnArchDt[1..8],(integer)LEFT.P_InpClnArchDt[1..8],left.dt_last_seen_contact), self := left, self := []));		
+	temp_Contacts := project(Contacts, transform(Layouts_FDC.Layout_FDC, self.P_LexID := left.contact_did, self.UIDAppend := left.UIDAppend, self.g_procuid := left.UIDAppend, self.P_InpClnArchDt := LEFT.P_InpClnArchDt,self.P_InpClnSurname1 := left.contact_name.lname, self.Contact_date := if(left.dt_last_seen_contact>(integer)LEFT.P_InpClnArchDt[1..8],(integer)LEFT.P_InpClnArchDt[1..8],left.dt_last_seen_contact), self := left, self := []));		
 	Bus_contact_Second := temp_Contacts((P_LexID > 0) and (ut.daysapart((string)Contact_date, P_InpClnArchDt[1..8]) < ut.DaysInNYears(3)));
 
 
@@ -343,7 +358,7 @@ end;
 
 	Key_dx_Header__key_did_hhid :=
 			JOIN(Input_FDC, dx_Header.key_did_hhid(),
-			Common.DoFDCJoin_dx_Header__key_did_hhid =TRUE  and  NOT options.isBRM_Marketing and
+			Common.DoFDCJoin_dx_Header__key_did_hhid =TRUE  and 
 			LEFT.P_LexID <> 0 AND
 				KEYED(LEFT.P_LexID =RIGHT.did) and right.ver=1,
 				TRANSFORM(Layouts_FDC.Layout_dx_Header__key_did_hhid,
@@ -373,7 +388,7 @@ end;
 	//hhid returned is used to search did 
 	Key_dx_Header__key_hhid_did :=
 			JOIN(deduped_HHIDS, dx_Header.key_hhid_did(), //no dates - does not need date selected.
-			Common.DoFDCJoin_dx_Header__key_did_hhid =TRUE  and  NOT options.isBRM_Marketing and
+			Common.DoFDCJoin_dx_Header__key_did_hhid =TRUE  and 
 			LEFT.hhid_relat <> 0 AND
 				KEYED(LEFT.hhid_relat =RIGHT.hhid_relat),
 				TRANSFORM(Layouts_FDC.Layout_dx_Header__key_hhid_did,
@@ -398,7 +413,7 @@ end;
 						         
 		ismarketing := if(Options.isMarketing,'MARKETING','');
 		sourcecoderelatives := if(Options.isMarketing,MDR.sourceTools.src_Marketing_Relatives_Data,MDR.sourceTools.src_Relatives_Data);
-		HeaderRelatives :=  IF(Common.DoFDCJoin_Relatives__Key_Relatives_v3 = TRUE AND NOT options.isBRM_Marketing, Relationship.proc_GetRelationshipNeutral(PROJECT(Input_FDC_Business_Contact_LexIDs, TRANSFORM(Relationship.layout_GetRelationship.DIDs_layout, SELF.DID := LEFT.P_Lexid)),
+		HeaderRelatives :=  IF(Common.DoFDCJoin_Relatives__Key_Relatives_v3 = TRUE , Relationship.proc_GetRelationshipNeutral(PROJECT(Input_FDC_Business_Contact_LexIDs, TRANSFORM(Relationship.layout_GetRelationship.DIDs_layout, SELF.DID := LEFT.P_Lexid)),
 																	TopNCount:=100,
 																	RelativeFlag :=TRUE,AssociateFlag:=TRUE,
 																	doAtmost:=TRUE,MaxCount:=PublicRecords_KEL.ECL_Functions.Constants.Default_Atmost_1000, RelKeyFlag:= ismarketing).result);
@@ -454,7 +469,7 @@ end;
 	
 	Header__key_ADL_segmentation_Records := 
 		JOIN(Input_HHIDLexids_Input6thRep_preADL, Header.key_ADL_segmentation, //adl seg is nonFCRA only for now
-				Common.DoFDCJoin_Header__key_ADL_segmentation = TRUE  and  NOT options.isBRM_Marketing and
+				Common.DoFDCJoin_Header__key_ADL_segmentation = TRUE  and  
 				LEFT.P_LexID > 0 AND
 				KEYED(LEFT.P_LexID = RIGHT.did),
 				TRANSFORM(Layouts_FDC.Layout_Header__key_ADL_segmentation,
@@ -552,7 +567,8 @@ end;
 			
 	Best_Person__Key_Watchdog_FCRA_nonEN_Records := 
 		JOIN(Input_FDC, Watchdog.Key_Watchdog_FCRA_nonEN, //watchdog data is not archivable
-				Common.DoFDCJoin_Best_Person__Key_Watchdog_FCRA_nonEN = TRUE  and
+				Common.DoFDCJoin_Best_Person__Key_Watchdog_FCRA = TRUE  and
+				Options.Data_Restriction_Mask[Risk_Indicators.iid_constants.posEquifaxRestriction] <> '1' and
 				LEFT.P_LexID > 0 AND
 				KEYED(LEFT.P_LexID = RIGHT.did),
 				TRANSFORM(Layouts_FDC.Layout_Best_Person__Key_Watchdog_FCRA_nonEN,
@@ -572,7 +588,8 @@ end;
 	
 	Best_Person__Key_Watchdog_FCRA_nonEQ_Records := 
 		JOIN(Input_FDC, Watchdog.Key_Watchdog_FCRA_nonEQ, //watchdog data is not archivable
-				Common.DoFDCJoin_Best_Person__Key_Watchdog_FCRA_nonEQ = TRUE  and
+				Common.DoFDCJoin_Best_Person__Key_Watchdog_FCRA = TRUE  and
+				Options.Data_Restriction_Mask[Risk_Indicators.iid_constants.posEquifaxRestriction] = '1' AND
 				LEFT.P_LexID > 0 AND
 				KEYED(LEFT.P_LexID = RIGHT.did),
 				TRANSFORM(Layouts_FDC.Layout_Best_Person__Key_Watchdog_FCRA_nonEQ,
@@ -666,10 +683,9 @@ end;
 	Header_Quick__Key_Did := IF(Options.IsFCRA, Header_Quick.Key_Did_FCRA, Header_Quick.Key_Did);
 	
 		Header_Quick__Key_Did_Records_Unsuppressed :=  JOIN(clean_QH, Header_Quick__Key_Did,
-				common.DoFDCJoin_Doxie__Key_Header = TRUE  and NOT options.isBRM_Marketing and //turn off for brm marketing
+				common.DoFDCJoin_Doxie__Key_Header = TRUE  and 
 				LEFT.P_LexID > 0 AND
 				KEYED(LEFT.P_LexID = (UNSIGNED)RIGHT.did) and
-				ArchiveDate((string)right.dt_first_seen, (string)right.dt_vendor_first_reported) <= LEFT.P_InpClnArchDt[1..8] and
 				IF(Options.isMarketing,(PublicRecords_KEL.ECL_Functions.Constants.SetQuickHeaderSource(right.src) IN PublicRecords_KEL.ECL_Functions.Constants.ALLOWED_MARKETING_SOURCES OR PublicRecords_KEL.ECL_Functions.Common_Functions.IsMarketingAllowedKey(PublicRecords_KEL.ECL_Functions.Constants.SetQuickHeaderSource(right.src), right.st)), TRUE) and
 				IF(Options.isFCRA ,(PublicRecords_KEL.ECL_Functions.Constants.SetQuickHeaderSource(right.src) IN SET(PublicRecords_KEL.ECL_Functions.Constants.Allowed_Consumer_Header_SRC(Options.isFCRA), Src)),PublicRecords_KEL.ECL_Functions.Constants.SetQuickHeaderSource(right.src) IN SET(PublicRecords_KEL.ECL_Functions.Constants.Allowed_Consumer_Header_SRC, Src) ) and
 				(Header.isPreGLB_LIB(right.dt_nonglb_last_seen, right.dt_first_seen, PublicRecords_KEL.ECL_Functions.Constants.SetQuickHeaderSource(right.src), options.Data_Restriction_Mask) or glb_ok) and				
@@ -679,7 +695,6 @@ end;
 					SELF.UIDAppend := LEFT.UIDAppend,
 					SELF.G_ProcUID := LEFT.G_ProcUID,
 					SELF.P_LexID := LEFT.P_LexID,
-					self.Archive_Date :=  ArchiveDate((string)right.dt_first_seen, (string)right.dt_vendor_first_reported);	
 					SELF.DPMBitmap := SetDPMBitmap( Source := PublicRecords_KEL.ECL_Functions.Constants.SetQuickHeaderSource(right.src), FCRA_Restricted := Options.isFCRA, GLBA_Restricted := NotRegulated, Pre_GLB_Restricted := PublicRecords_KEL.ECL_Functions.Constants.PreGLBRegulatedRecord(right.Src, right.dt_nonglb_last_seen, right.dt_first_seen), DPPA_Restricted := NotRegulated, DPPA_State := PublicRecords_KEL.ECL_Functions.Constants.GetDPPAState(PublicRecords_KEL.ECL_Functions.Constants.SetQuickHeaderSource(right.src)),Marketing_State := right.st, KELPermissions := CFG_File, Is_Consumer_Header := TRUE),
 					SELF.HeaderRec := FALSE,
 					SELF := RIGHT,
@@ -713,20 +728,36 @@ end;
 					SELF := []), 
 				ATMOST(PublicRecords_KEL.ECL_Functions.Constants.Default_Atmost_1000));
 
+		Key_wild_phone :=	//	No dates does not need DateSelector
+			JOIN(Input_Phone_Consumer_recs, dx_Header.key_wild_phone(iType),
+				Common.DoFDCJoin_Dx_Header__key_wild_phone = TRUE AND 
+				(INTEGER)LEFT.Phone > 0 AND
+				KEYED(LEFT.Phone[4..10] = RIGHT.p7 AND
+							   LEFT.Phone[1..3] = RIGHT.p3),
+				TRANSFORM(Layouts_FDC.Layout_Header_key_wild_phone,
+					SELF.UIDAppend := LEFT.UIDAppend,
+					SELF.G_ProcUID := LEFT.G_ProcUID,
+					SELF.P_LexID := LEFT.P_LexID,
+					SELF := RIGHT, 
+					SELF := LEFT,
+					SELF := []), 
+				ATMOST(PublicRecords_KEL.ECL_Functions.Constants.Default_Atmost_1000));
+
+
 /*************************************************************************************************************/
 //for searching
 	temp_wild_SSN := project(Key_wild_SSN, transform(Layouts_FDC.Layout_FDC, self.P_LexID := left.did,  self := left, self := []));			
-	lexids_for_Header := temp_wild_SSN + Input_FDC_RelativesLexids_HHIDLexids_Business_Contact_LexIDs_Input6thRep;
+	temp_wild_phone := project(Key_wild_phone, transform(Layouts_FDC.Layout_FDC, self.P_LexID := left.did,  self := left, self := []));		
+	lexids_for_Header := temp_wild_phone + temp_wild_SSN + Input_FDC_RelativesLexids_HHIDLexids_Business_Contact_LexIDs_Input6thRep;
 	clean_Header := dedup(sort(lexids_for_Header, UIDAppend, P_LexID), UIDAppend, P_LexID);
 	
 
 /*************************************************************************************************************/
 
 	Doxie__Key_Header_Records_Unsuppressed := JOIN(clean_Header, dx_header.key_header(iType),
-				common.DoFDCJoin_Doxie__Key_Header = TRUE  and NOT options.isBRM_Marketing and //turn off for brm marketing
+				common.DoFDCJoin_Doxie__Key_Header = TRUE  and 
 			LEFT.P_LexID > 0 AND
 				KEYED(LEFT.P_LexID = (UNSIGNED)RIGHT.s_did) and
-				ArchiveDate((string)right.dt_first_seen, (string)right.dt_vendor_first_reported) <= LEFT.P_InpClnArchDt[1..8] and
 				IF(Options.isMarketing,(right.src IN PublicRecords_KEL.ECL_Functions.Constants.ALLOWED_MARKETING_SOURCES OR PublicRecords_KEL.ECL_Functions.Common_Functions.IsMarketingAllowedKey(right.src, right.st)), TRUE) and
 				IF(Options.isFCRA ,(right.src IN SET(PublicRecords_KEL.ECL_Functions.Constants.Allowed_Consumer_Header_SRC(Options.isFCRA), Src)),right.src IN SET(PublicRecords_KEL.ECL_Functions.Constants.Allowed_Consumer_Header_SRC, Src) ) and
 				(Header.isPreGLB_LIB(right.dt_nonglb_last_seen, right.dt_first_seen, right.src, options.Data_Restriction_Mask) or glb_ok) and				
@@ -736,7 +767,6 @@ end;
 					SELF.UIDAppend := LEFT.UIDAppend,
 					SELF.G_ProcUID := LEFT.G_ProcUID,
 					SELF.P_LexID := LEFT.P_LexID,
-					self.Archive_Date :=ArchiveDate((string)right.dt_first_seen, (string)right.dt_vendor_first_reported);	
 					SELF.HeaderRec := TRUE,
 					SELF.DPMBitmap := SetDPMBitmap( Source := right.src, FCRA_Restricted := Options.isFCRA, GLBA_Restricted := NotRegulated, Pre_GLB_Restricted := PublicRecords_KEL.ECL_Functions.Constants.PreGLBRegulatedRecord(right.Src, right.dt_nonglb_last_seen, right.dt_first_seen), DPPA_Restricted := NotRegulated, DPPA_State := PublicRecords_KEL.ECL_Functions.Constants.GetDPPAState(right.src), Marketing_State := right.st, KELPermissions := CFG_file, Is_Consumer_Header := TRUE),
 					SELF := RIGHT,
@@ -760,61 +790,108 @@ end;
 	Header_Quick_Header_Records := Suppress.MAC_SuppressSource(GetCorrectionsHeaderQuick, mod_access, did_field := did, data_env := Environment);
 
 	//need to put qh back in its layout which is basically the same as header but need this for uses
-	Header_Quick__Key_Did_Records_final := Header_Quick_Header_Records(headerrec = FALSE);
-	Doxie__Key_Header_Records_final := Header_Quick_Header_Records(headerrec = TRUE);
+	
+	
+	real_Header_and_Quick_with_ingestdate_appended := join(Header_Quick_Header_Records, dx_Header.key_first_ingest(iType),
+				options.UseIngestDate AND common.DoFDCJoin_Doxie__Key_Header = TRUE and 
+				left.rid<>0 and 
+				keyed(left.rid=right.rid),
+			transform(Layouts_FDC.tempHeader,
+				self.first_ingest_date := right.first_ingest_date,
+				self := left
+				), left outer, atmost(1000), keep(1));
+	
+		Header_Quick__Key_Did_Records_final := IF(options.UseIngestDate, real_Header_and_Quick_with_ingestdate_appended(headerrec = FALSE), Header_Quick_Header_Records(headerrec = FALSE));
+	Doxie__Key_Header_Records_final := IF(options.UseIngestDate, real_Header_and_Quick_with_ingestdate_appended(headerrec = TRUE), Header_Quick_Header_Records(headerrec = TRUE));
 
 	With_Doxie__Key_QuickHeader_original := DENORMALIZE(With_Best_Person__Key_Watchdog_FCRA_nonEQ, Header_Quick__Key_Did_Records_final,
+			IF(~options.UseIngestDate, 
+					ArchiveDate((string)right.dt_first_seen, (string)right.dt_vendor_first_reported) <= LEFT.P_InpClnArchDt[1..8], 
+					IF(right.first_ingest_date<>0, 
+								ArchiveDate((string)right.first_ingest_date) <= LEFT.P_InpClnArchDt[1..8], 
+										ArchiveDate((string)right.dt_first_seen, (string)right.dt_vendor_first_reported) <= LEFT.P_InpClnArchDt[1..8])) and
 				LEFT.UIDAppend = RIGHT.UIDAppend and 
 				left.g_procuid = right.g_procuid, GROUP,
 				TRANSFORM(Layouts_FDC.Layout_FDC,
 						SELF.Dataset_Header_Quick__Key_Did :=  project(ROWS(RIGHT),transform(Layouts_FDC.Layout_Header_Quick__Key_Did, 
 									SELF.DPMBitmap := left.DPMBitmap,
 									self.dt_first_seen :=  (integer)archivedate((string)left.dt_first_seen);
+									self.Archive_Date := MAP(~options.UseIngestDate => ArchiveDate((string)left.dt_first_seen, (string)left.dt_vendor_first_reported),//FCRA, no use ingest
+												left.first_ingest_date<>0 => ArchiveDate((string)left.first_ingest_date), //populated use it
+												ArchiveDate((string)left.dt_first_seen, (string)left.dt_vendor_first_reported));//else the old way	
 									SELF := LEFT,
 									SELF := []));
 					SELF := LEFT,
 					SELF := []));  
 
 	With_Doxie__Key_QuickHeader_6threp := DENORMALIZE(With_Best_Person__Key_Watchdog_6threp, Header_Quick__Key_Did_Records_final,
+			IF(~options.UseIngestDate, 
+					ArchiveDate((string)right.dt_first_seen, (string)right.dt_vendor_first_reported) <= LEFT.P_InpClnArchDt[1..8], 
+					IF(right.first_ingest_date<>0, 
+								ArchiveDate((string)right.first_ingest_date) <= LEFT.P_InpClnArchDt[1..8], 
+										ArchiveDate((string)right.dt_first_seen, (string)right.dt_vendor_first_reported) <= LEFT.P_InpClnArchDt[1..8])) and
 				LEFT.UIDAppend = RIGHT.UIDAppend and 
 				left.g_procuid = right.g_procuid, GROUP,
 				TRANSFORM(Layouts_FDC.Layout_FDC,
 						SELF.Dataset_Header_Quick__Key_Did :=  project(ROWS(RIGHT),transform(Layouts_FDC.Layout_Header_Quick__Key_Did, 
 									SELF.DPMBitmap := left.DPMBitmap,
 									self.dt_first_seen :=  (integer)archivedate((string)left.dt_first_seen);
+									self.Archive_Date := MAP(~options.UseIngestDate => ArchiveDate((string)left.dt_first_seen, (string)left.dt_vendor_first_reported),//FCRA, no use ingest
+												left.first_ingest_date<>0 => ArchiveDate((string)left.first_ingest_date), //populated use it
+												ArchiveDate((string)left.dt_first_seen, (string)left.dt_vendor_first_reported));//else the old way	
 									SELF := LEFT,
 									SELF := []));
 					SELF := LEFT,
 					SELF := []));  
 
 	With_Doxie__Key_Header_original := DENORMALIZE(With_Doxie__Key_QuickHeader_original, Doxie__Key_Header_Records_final,
+			IF(~options.UseIngestDate, 
+					ArchiveDate((string)right.dt_first_seen, (string)right.dt_vendor_first_reported) <= LEFT.P_InpClnArchDt[1..8], 
+					IF(right.first_ingest_date<>0, 
+								ArchiveDate((string)right.first_ingest_date) <= LEFT.P_InpClnArchDt[1..8], 
+										ArchiveDate((string)right.dt_first_seen, (string)right.dt_vendor_first_reported) <= LEFT.P_InpClnArchDt[1..8])) and
 				LEFT.UIDAppend = RIGHT.UIDAppend and 
 				left.g_procuid = right.g_procuid, GROUP,
 				TRANSFORM(Layouts_FDC.Layout_FDC,
 						SELF.Dataset_Doxie__Key_Header := project(ROWS(RIGHT),transform(Layouts_FDC.Layout_Doxie__Key_Header, 
 						SELF.DPMBitmap := left.DPMBitmap,
 						self.dt_first_seen :=  (integer)archivedate((string)left.dt_first_seen);
+						self.Archive_Date := MAP(~options.UseIngestDate => ArchiveDate((string)left.dt_first_seen, (string)left.dt_vendor_first_reported),//FCRA, no use ingest
+												left.first_ingest_date<>0 => ArchiveDate((string)left.first_ingest_date), //populated use it
+												ArchiveDate((string)left.dt_first_seen, (string)left.dt_vendor_first_reported));//else the old way	
 						SELF := LEFT,
 						SELF := []));
 					SELF := LEFT,
 					SELF := []));  
 
 	With_Doxie__Key_Header_6threp := DENORMALIZE(With_Doxie__Key_QuickHeader_6threp, Doxie__Key_Header_Records_final,
+			IF(~options.UseIngestDate, 
+					ArchiveDate((string)right.dt_first_seen, (string)right.dt_vendor_first_reported) <= LEFT.P_InpClnArchDt[1..8], 
+					IF(right.first_ingest_date<>0, 
+								ArchiveDate((string)right.first_ingest_date) <= LEFT.P_InpClnArchDt[1..8], 
+										ArchiveDate((string)right.dt_first_seen, (string)right.dt_vendor_first_reported) <= LEFT.P_InpClnArchDt[1..8])) and
 				LEFT.UIDAppend = RIGHT.UIDAppend and 
 				left.g_procuid = right.g_procuid, GROUP,
 				TRANSFORM(Layouts_FDC.Layout_FDC,
 						SELF.Dataset_Doxie__Key_Header := project(ROWS(RIGHT),transform(Layouts_FDC.Layout_Doxie__Key_Header, 
 						SELF.DPMBitmap := left.DPMBitmap,
 						self.dt_first_seen :=  (integer)archivedate((string)left.dt_first_seen);
+						self.Archive_Date := MAP(~options.UseIngestDate => ArchiveDate((string)left.dt_first_seen, (string)left.dt_vendor_first_reported),//FCRA, no use ingest
+												left.first_ingest_date<>0 => ArchiveDate((string)left.first_ingest_date), //populated use it
+												ArchiveDate((string)left.dt_first_seen, (string)left.dt_vendor_first_reported));//else the old way	
 						SELF := LEFT,
 						SELF := []));
 					SELF := LEFT,
 					SELF := []));  
-					
+	
+	Header_original := NORMALIZE(With_Doxie__Key_Header_original, LEFT.Dataset_Doxie__Key_Header, TRANSFORM(RECORDOF(RIGHT), SELF.P_LexID := LEFT.P_LexID, SELF := RIGHT));	
+	Header_6threp := NORMALIZE(With_Doxie__Key_Header_6threp, LEFT.Dataset_Doxie__Key_Header, TRANSFORM(RECORDOF(RIGHT), SELF.P_LexID := LEFT.P_LexID, SELF := RIGHT));	
+	
+	
 	// Header: consumer only
 	Key_Header_Addr_Hist_temp := 
 			JOIN((Input_FDC_RelativesLexids_Business_Contact_LexIDs_Input6thRep), dx_Header.key_addr_hist(iType), 
-				Common.DoFDCJoin_Header__Key_Addr_Hist = TRUE  AND NOT options.isBRM_Marketing and //turn off for brm marketing
+				Common.DoFDCJoin_Header__Key_Addr_Hist = TRUE  AND 
 				LEFT.P_LexID > 0 AND
 				KEYED(LEFT.P_LexID = RIGHT.s_did) and
 				ArchiveDate((string)right.date_first_seen) <= LEFT.P_InpClnArchDt[1..8],
@@ -831,7 +908,7 @@ end;
 
 	Key_Header_Addr_Hist := 
 			JOIN(Key_Header_Addr_Hist_temp, AID_Build.Key_AID_Base, 
-				Common.DoFDCJoin_Header__Key_Addr_Hist = TRUE  AND NOT options.isBRM_Marketing and //turn off for brm marketing
+				Common.DoFDCJoin_Header__Key_Addr_Hist = TRUE  AND 
 				KEYED(LEFT.Rawaid = RIGHT.Rawaid),
 				TRANSFORM(Layouts_FDC.Layout_Header__Key_Addr_Hist,
 					SELF.UIDAppend := LEFT.UIDAppend,
@@ -853,7 +930,7 @@ end;
 					SELF := []), 
 				ATMOST(PublicRecords_KEL.ECL_Functions.Constants.PROPERTY_SEARCH_FID_JOIN_LIMIT), KEEP(1));
 
-	AddrHistToHeader := join(Key_Header_Addr_Hist, Doxie__Key_Header_Records_final,
+	AddrHistToHeader := join(Key_Header_Addr_Hist, (Header_6threp+Header_original),
 											LEFT.UIDAppend = RIGHT.UIDAppend  AND
 											left.s_did<>0 and left.zip<>'' and left.prim_name<>'' and
 											left.s_did=right.did and 

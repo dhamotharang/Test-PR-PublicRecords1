@@ -4,8 +4,8 @@ IMPORT B_U_C_C_10,B_U_C_C_11,B_U_C_C_8,CFG_Compile,E_U_C_C FROM PublicRecords_KE
 IMPORT * FROM KEL15.Null;
 EXPORT B_U_C_C_7(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG_Compile __cfg = CFG_Compile) := MODULE
   SHARED VIRTUAL TYPEOF(B_U_C_C_8(__in,__cfg).__ENH_U_C_C_8) __ENH_U_C_C_8 := B_U_C_C_8(__in,__cfg).__ENH_U_C_C_8;
-  SHARED __EE5528772 := __ENH_U_C_C_8;
-  EXPORT __ST266942_Layout := RECORD
+  SHARED __EE5655468 := __ENH_U_C_C_8;
+  EXPORT __ST269828_Layout := RECORD
     KEL.typ.nstr R_M_S_I_D_;
     KEL.typ.nstr Filing_Jurisdiction_;
     KEL.typ.nstr Filing_Number_;
@@ -36,14 +36,14 @@ EXPORT B_U_C_C_7(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG_Compi
     KEL.typ.epoch Vault_Date_Last_Seen_ := 0;
     KEL.typ.int __RecordCount := 0;
   END;
-  EXPORT __ST266938_Layout := RECORD
+  EXPORT __ST269824_Layout := RECORD
     KEL.typ.nuid UID;
     KEL.typ.nstr T_M_S_I_D_;
-    KEL.typ.ndataset(__ST266942_Layout) Sub_Filing_;
+    KEL.typ.ndataset(__ST269828_Layout) Sub_Filing_;
     KEL.typ.ndataset(E_U_C_C(__in,__cfg).Collateral_Layout) Collateral_;
     KEL.typ.ndataset(E_U_C_C(__in,__cfg).Data_Sources_Layout) Data_Sources_;
     KEL.typ.nstr Best_Child_R_M_S_I_D_;
-    KEL.typ.ndataset(B_U_C_C_10(__in,__cfg).__ST119736_Layout) Best_U_C_C_Child_Record_;
+    KEL.typ.ndataset(B_U_C_C_10(__in,__cfg).__ST120651_Layout) Best_U_C_C_Child_Record_;
     KEL.typ.epoch Archive___Date_ := 0;
     KEL.typ.epoch Date_First_Seen_ := 0;
     KEL.typ.epoch Date_Last_Seen_ := 0;
@@ -51,10 +51,10 @@ EXPORT B_U_C_C_7(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG_Compi
     KEL.typ.epoch Vault_Date_Last_Seen_ := 0;
     KEL.typ.int __RecordCount := 0;
   END;
-  SHARED __ST266938_Layout __ND5528777__Project(B_U_C_C_8(__in,__cfg).__ST269579_Layout __PP5528773) := TRANSFORM
-    __EE5528812 := __PP5528773.Sub_Filing_;
-    SELF.Sub_Filing_ := __BN(PROJECT(__T(__EE5528812),__ST266942_Layout),__NL(__EE5528812));
-    SELF := __PP5528773;
+  SHARED __ST269824_Layout __ND5655473__Project(B_U_C_C_8(__in,__cfg).__ST272465_Layout __PP5655469) := TRANSFORM
+    __EE5655508 := __PP5655469.Sub_Filing_;
+    SELF.Sub_Filing_ := __BN(PROJECT(__T(__EE5655508),__ST269828_Layout),__NL(__EE5655508));
+    SELF := __PP5655469;
   END;
-  EXPORT __ENH_U_C_C_7 := PROJECT(__EE5528772,__ND5528777__Project(LEFT));
+  EXPORT __ENH_U_C_C_7 := PROJECT(__EE5655468,__ND5655473__Project(LEFT));
 END;

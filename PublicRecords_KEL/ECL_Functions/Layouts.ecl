@@ -31,6 +31,8 @@ EXPORT Layouts := MODULE
 		STRING20 P_InpClnNameFirst;
 		STRING20 P_InpClnNameMid;
 		STRING30 P_InpClnNameLast;
+		STRING30 P_InpClnSurname1;
+		STRING30 P_InpClnSurname2;
 		STRING6 P_InpClnNameSffx;
 		STRING10 P_InpClnAddrPrimRng;
 		STRING6 P_InpClnAddrPreDir;
@@ -53,6 +55,7 @@ EXPORT Layouts := MODULE
 		STRING7 P_InpClnAddrGeo;
 		STRING6 P_InpClnAddrType;
 		STRING6 P_InpClnAddrStatus;
+		STRING AddressGeoLink;
 		// INTEGER7 P_InpClnAddrLocID;
 		INTEGER7 P_InpClnAddrPropertyUID;
 		STRING9 P_InpClnSSN;

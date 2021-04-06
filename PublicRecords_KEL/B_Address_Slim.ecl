@@ -4,8 +4,8 @@ IMPORT B_Address_Slim_1,B_Address_Slim_3,B_Address_Slim_4,CFG_Compile,E_Address_
 IMPORT * FROM KEL15.Null;
 EXPORT B_Address_Slim(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG_Compile __cfg = CFG_Compile) := MODULE
   SHARED VIRTUAL TYPEOF(B_Address_Slim_1(__in,__cfg).__ENH_Address_Slim_1) __ENH_Address_Slim_1 := B_Address_Slim_1(__in,__cfg).__ENH_Address_Slim_1;
-  SHARED __EE9418265 := __ENH_Address_Slim_1;
-  EXPORT __ST133394_Layout := RECORD
+  SHARED __EE9557380 := __ENH_Address_Slim_1;
+  EXPORT __ST135153_Layout := RECORD
     KEL.typ.nuid UID;
     KEL.typ.nstr Primary_Range_;
     KEL.typ.nstr Predirectional_;
@@ -26,15 +26,15 @@ EXPORT B_Address_Slim(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG_
     KEL.typ.epoch Vault_Date_Last_Seen_ := 0;
     KEL.typ.int __RecordCount := 0;
   END;
-  SHARED __ST133394_Layout __ND9418214__Project(B_Address_Slim_1(__in,__cfg).__ST179575_Layout __PP9418024) := TRANSFORM
-    __CC13960 := '-99999';
-    SELF.P_I___Inp_Addr_Is_H_R_Correct_Fac_Flag_ := MAP(__T(__OP2(__PP9418024.P___Cln_Addr_Full_Flag_,<>,__CN('1')))=>__CC13960,__T(__OR(__OR(__PP9418024.Address_S_I_C_Not_Contains_,__PP9418024.Address_N_A_I_C_S_Not_Contains_),__AND(__PP9418024.S_I_C_List_Not_Found_,__PP9418024.N_A_I_C_S_List_Not_Foind_)))=>'0','1');
-    __CC13965 := '-99998';
-    __EE9418207 := __PP9418024.Address_N_A_I_C_S_Sorted_List_;
-    SELF.P_I___Inp_Addr_N_A_I_C_S_Code_H_R_List_ := MAP(__T(__OP2(__PP9418024.P___Cln_Addr_Full_Flag_,<>,__CN('1')))=>__ECAST(KEL.typ.nstr,__CN(__CC13960)),__T(__PP9418024.N_A_I_C_S_List_Not_Foind_)=>__ECAST(KEL.typ.nstr,__CN(__CC13965)),__ECAST(KEL.typ.nstr,KEL.Aggregates.ConcatNN(__EE9418207,LEFT.High_Risk_N_A_I_C_S_,__CN('|'))));
-    __EE9418236 := __PP9418024.Address_S_I_C_Sorted_List_;
-    SELF.P_I___Inp_Addr_S_I_C_Code_H_R_List_ := MAP(__T(__OP2(__PP9418024.P___Cln_Addr_Full_Flag_,<>,__CN('1')))=>__ECAST(KEL.typ.nstr,__CN(__CC13960)),__T(__PP9418024.S_I_C_List_Not_Found_)=>__ECAST(KEL.typ.nstr,__CN(__CC13965)),__ECAST(KEL.typ.nstr,KEL.Aggregates.ConcatNN(__EE9418236,LEFT.High_Risk_S_I_C_,__CN('|'))));
-    SELF := __PP9418024;
+  SHARED __ST135153_Layout __ND9557329__Project(B_Address_Slim_1(__in,__cfg).__ST182103_Layout __PP9557139) := TRANSFORM
+    __CC13923 := '-99999';
+    SELF.P_I___Inp_Addr_Is_H_R_Correct_Fac_Flag_ := MAP(__T(__OP2(__PP9557139.P___Cln_Addr_Full_Flag_,<>,__CN('1')))=>__CC13923,__T(__OR(__OR(__PP9557139.Address_S_I_C_Not_Contains_,__PP9557139.Address_N_A_I_C_S_Not_Contains_),__AND(__PP9557139.S_I_C_List_Not_Found_,__PP9557139.N_A_I_C_S_List_Not_Foind_)))=>'0','1');
+    __CC13928 := '-99998';
+    __EE9557322 := __PP9557139.Address_N_A_I_C_S_Sorted_List_;
+    SELF.P_I___Inp_Addr_N_A_I_C_S_Code_H_R_List_ := MAP(__T(__OP2(__PP9557139.P___Cln_Addr_Full_Flag_,<>,__CN('1')))=>__ECAST(KEL.typ.nstr,__CN(__CC13923)),__T(__PP9557139.N_A_I_C_S_List_Not_Foind_)=>__ECAST(KEL.typ.nstr,__CN(__CC13928)),__ECAST(KEL.typ.nstr,KEL.Aggregates.ConcatNN(__EE9557322,LEFT.High_Risk_N_A_I_C_S_,__CN('|'))));
+    __EE9557351 := __PP9557139.Address_S_I_C_Sorted_List_;
+    SELF.P_I___Inp_Addr_S_I_C_Code_H_R_List_ := MAP(__T(__OP2(__PP9557139.P___Cln_Addr_Full_Flag_,<>,__CN('1')))=>__ECAST(KEL.typ.nstr,__CN(__CC13923)),__T(__PP9557139.S_I_C_List_Not_Found_)=>__ECAST(KEL.typ.nstr,__CN(__CC13928)),__ECAST(KEL.typ.nstr,KEL.Aggregates.ConcatNN(__EE9557351,LEFT.High_Risk_S_I_C_,__CN('|'))));
+    SELF := __PP9557139;
   END;
-  EXPORT __ENH_Address_Slim := PROJECT(__EE9418265,__ND9418214__Project(LEFT));
+  EXPORT __ENH_Address_Slim := PROJECT(__EE9557380,__ND9557329__Project(LEFT));
 END;
