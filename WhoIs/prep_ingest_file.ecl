@@ -165,7 +165,7 @@ END;
 
 	ds_norm 	:= NORMALIZE(clnfile,5,t_norm_email(LEFT,COUNTER));
 
-	//Populate added fields prior to cleaning
+	//Clean Name and Address
 	Layouts.Base tAppendFields(Layouts.CleanFields le) := TRANSFORM
 		SELF.DID          							:= 0;
 		SELF.RawAID											:= 0;
@@ -179,14 +179,14 @@ END;
 		SELF.current_rec 	:= TRUE;
 		
 		SELF.name         := MAP(fnValidName(le.name) = false => '',
-														// fnValidCName(le.name) = false => '',
+														fnValidCName(le.name) = false => '',
 														REGEXFIND(':',le.name)=>'',
 														NOT REGEXFIND('[A-Z]',le.name) => '',
 														REGEXFIND('C/O',le.name)=> REGEXREPLACE('C/O',le.name,''),
 														TRIM(le.name,LEFT,RIGHT));
 
 		SELF.organization := MAP(fnValidName(le.organization) = false => '',
-														// fnValidCName(le.organization) = false => '',
+														fnValidCName(le.organization) = false => '',
 														REGEXFIND(':',le.organization)=>'',
 														NOT REGEXFIND('[A-Z]',le.organization) => '',
 														TRIM(le.organization) = TRIM(self.name) => '',

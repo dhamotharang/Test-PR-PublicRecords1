@@ -1,4 +1,4 @@
-﻿﻿IMPORT	ut, AID, AID_Support, DID_Add, Business_Header_SS, address, NID, STD, PromoteSupers,
+﻿IMPORT	ut, AID, AID_Support, DID_Add, Business_Header_SS, address, NID, STD, PromoteSupers,
 							PRTE2, WhoIs; //using a cleaning functions in these repositories;
 			
 EXPORT proc_build_base(STRING8 version) := FUNCTION
@@ -11,14 +11,11 @@ EXPORT proc_build_base(STRING8 version) := FUNCTION
 
 	//Populate current_rec based on whether or not record is in the new input file as this is a full replace
 	//Unknown = 1 Ancient = 2 Old = 3 Unchanged = 4 Updated = 5 New = 6
-	PopCurrentRec	:= Project(new_base, TRANSFORM(WhoIs.Layouts.Base, SELF.current_rec := IF(LEFT.__Tpe in [2,3],FALSE,TRUE);
+	PopCurrentRec	:= Project(IngestPrep, TRANSFORM(WhoIs.Layouts.Base, SELF.current_rec := TRUE;
 																																				SELF := LEFT;
 																																				SELF:= [];));
-
-	ValidNamefile := PopCurrentRec(trim(Name,left,right)!= '');//: persist('~thor_data400::in::WhoIs::ValidName');
-	InvNamefile   := PopCurrentRec(trim(Name,left,right) = '');//: persist('~thor_data400::in::WhoIs::InvalidName');
-	
-	NID.Mac_CleanFullNames(ValidNameFile, FileClnName, NAME
+								
+	NID.Mac_CleanFullNames(PopCurrentRec, FileClnName, NAME
 													,includeInRepository:=true, normalizeDualNames:=true, useV2 := true);
 	
 	//Name flags
@@ -26,7 +23,7 @@ EXPORT proc_build_base(STRING8 version) := FUNCTION
 	business_flags := ['B'];
 	InvName_flags	:= ['I'];
 		
-	ValidClnName	:= Project(FileClnName,TRANSFORM(WhoIs.Layouts.Base,
+	InputFileClnName	:= PROJECT(FileClnName,TRANSFORM(WhoIs.Layouts.Base,
 																					BOOLEAN IsName	:=	LEFT.nametype IN person_flags OR
 																														 (LEFT.nametype = 'U' AND trim(LEFT.cln_fname) != '' AND TRIM(LEFT.cln_lname) != ''); 
 																					SELF.clean_title				:=	IF(IsName, LEFT.cln_title, '');
@@ -39,18 +36,10 @@ EXPORT proc_build_base(STRING8 version) := FUNCTION
 																																				IF(LEFT.Organization != '',STD.Str.CleanSpaces(LEFT.Organization),''));
 																					SELF := LEFT));
 																					
-	InvClnName	:= Project(InvNamefile, TRANSFORM(WhoIs.Layouts.Base,
-																						SELF.clean_title				:=	'';
-																						SELF.clean_fname				:=	'';
-																						SELF.clean_mname				:=	'';
-																						SELF.clean_lname				:=	'';
-																						SELF.clean_name_suffix	:=	'';
-																						SELF.clean_cname				:=  LEFT.Organization;
-																						SELF := LEFT));
-	//Combine clean name files
-	rsCleanName := ValidClnName + InvClnName;//: persist('~thor_data400::in::WhoIs::CleanName');
-																						
+																					
 		//AID process
+	unsigned4 lAIDFlags := AID.Common.eReturnValues.RawAID | AID.Common.eReturnValues.ACECacheRecords;
+	
 	WhoIs.Layouts.Base tProjectAIDClean_prep(WhoIs.Layouts.Base pInput) := TRANSFORM
 	  FullAddr	  := STD.Str.CleanSpaces(TRIM(pInput.street1) +' '+TRIM(pInput.street2) +' '+TRIM(pInput.street3) +' '+TRIM(pInput.street4));
     clnFullAddr	:= MAP(NOT REGEXFIND('[A-Z]',FullAddr)=> '',
@@ -64,14 +53,13 @@ EXPORT proc_build_base(STRING8 version) := FUNCTION
 		self := pInput;
 	END;
 
-	rsAIDCleanName	:= PROJECT(rsCleanName ,tProjectAIDClean_prep(LEFT)); 
+	rsAIDCleanName	:= PROJECT(InputFileClnName ,tProjectAIDClean_prep(LEFT)); 
 	
 	rsAID_NoAddr		:=	rsAIDCleanName(TRIM(Append_Prep_Address_Situs) = '' OR TRIM(Append_Prep_Address_Last_Situs) = '' 
 																			OR STD.Str.Find(Append_Prep_Address_Situs, '@', 1) > 0 OR LENGTH(postalCode)<5 OR TRIM(state) = '');
 	rsAID_Addr			:=	rsAIDCleanName(TRIM(Append_Prep_Address_Situs) != '' AND TRIM(Append_Prep_Address_Last_Situs) != ''
 																			AND STD.Str.Find(Append_Prep_Address_Situs, '@', 1) = 0 AND LENGTH(postalCode)>=5 AND TRIM(state) != '');
 
-	unsigned4 lAIDFlags := AID.Common.eReturnValues.RawAID | AID.Common.eReturnValues.ACECacheRecords;	
 	AID.MacAppendFromRaw_2Line(rsAID_Addr,Append_Prep_Address_Situs, Append_Prep_Address_Last_Situs, RawAID,
 																											rsCleanAID, lAIDFlags);	
 	
@@ -140,8 +128,8 @@ EXPORT proc_build_base(STRING8 version) := FUNCTION
 	rsCleanAIDGoodAddr		:= PROJECT(rsCleanAID, tProjectClean(LEFT));
 	rsCleanAIDGoodNoAddr	:= PROJECT(rsAID_NoAddr, tProjectNoAddrClean(LEFT));
 	
-	rsCleanAIDGood	:=	rsCleanAIDGoodAddr + rsCleanAIDGoodNoAddr;//: persist('~thor_data400::in::WhoIs::CleanAIDGood');
-	
+	rsCleanAIDGood	:=	rsCleanAIDGoodAddr + rsCleanAIDGoodNoAddr;																					
+
 	//////////////////////////////////////////////////////////////////////////////////////
 	// -- Append the LexIds
 	//////////////////////////////////////////////////////////////////////////////////////
