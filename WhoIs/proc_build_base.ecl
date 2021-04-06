@@ -11,9 +11,7 @@ EXPORT proc_build_base(STRING8 version) := FUNCTION
 
 	//Populate current_rec based on whether or not record is in the new input file as this is a full replace
 	//Unknown = 1 Ancient = 2 Old = 3 Unchanged = 4 Updated = 5 New = 6
-	PopCurrentRec	:= Project(IngestPrep, TRANSFORM(WhoIs.Layouts.Base, SELF.current_rec := TRUE;
-																																				SELF := LEFT;
-																																				SELF:= [];));
+  PopCurrentRec	:= Project(new_base, TRANSFORM(WhoIs.Layouts.Base, SELF.current_rec := IF(LEFT.__Tpe in [2,3],FALSE,TRUE);
 								
 	NID.Mac_CleanFullNames(PopCurrentRec, FileClnName, NAME
 													,includeInRepository:=true, normalizeDualNames:=true, useV2 := true);
