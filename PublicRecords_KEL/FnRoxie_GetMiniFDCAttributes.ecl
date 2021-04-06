@@ -41,8 +41,17 @@ EXPORT FnRoxie_GetMiniFDCAttributes(DATASET(PublicRecords_KEL.ECL_Functions.Layo
 		Dataset({RECORDOF(PublicRecords_KEL.Q_F_C_R_A_Mini_Attributes_V1_Roxie_Dynamic([], 0, PublicRecords_KEL.CFG_Compile.Permit__NONE).res0)}) attributes;
 	END;
 	
+	FDCRolled := ROLLUP(SORT(FDCDataset, UIDAppend, RepNumber), LEFT.UIDAppend = RIGHT.UIDAppend, TRANSFORM(RECORDOF(LEFT),
+		SELF.Dataset_Header__key_ADL_segmentation := LEFT.Dataset_Header__key_ADL_segmentation + RIGHT.Dataset_Header__key_ADL_segmentation,
+		SELF.Dataset_Best_Person__Key_Watchdog := LEFT.Dataset_Best_Person__Key_Watchdog + RIGHT.Dataset_Best_Person__Key_Watchdog,
+		SELF.Dataset_Header_Quick__Key_Did := LEFT.Dataset_Header_Quick__Key_Did + RIGHT.Dataset_Header_Quick__Key_Did,
+		SELF.Dataset_Doxie__Key_Header := LEFT.Dataset_Doxie__Key_Header + RIGHT.Dataset_Doxie__Key_Header,
+		SELF.Dataset_Header__Key_Addr_Hist := LEFT.Dataset_Header__Key_Addr_Hist + RIGHT.Dataset_Header__Key_Addr_Hist,
+		SELF := LEFT));
+		
+		
 	// For business transactions, Rep 1 and Rep 6 lexids are input as a set in one row to KEL, so we need to denorm the FDC to include both the 6th rep data and all the other business/rep data.
-	MiniAttributesInput := DENORMALIZE(CleanInputs, FDCDataset, LEFT.g_uid = RIGHT.UIDAppend, TRANSFORM(temp, SELF.FDCDataset := DATASET(RIGHT), SELF := LEFT));
+	MiniAttributesInput := DENORMALIZE(CleanInputs, FDCRolled, LEFT.g_uid = RIGHT.UIDAppend, TRANSFORM(temp, SELF.FDCDataset := DATASET(RIGHT), SELF := LEFT));
 	
 	NonFCRAPersonAttributesRaw := NOCOMBINE(PROJECT(MiniAttributesInput,
 		TRANSFORM(LayoutNonFCRAPersonAttributes,
