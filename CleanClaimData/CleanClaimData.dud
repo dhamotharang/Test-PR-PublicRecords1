@@ -33,7 +33,7 @@ OUTPUTS
 		STRING50 PatientKey;
 		STRING55 ClaimNumber;
 		STRING10 ClaimLineNumber;
-		STRING8	 BeginingDateOfService;
+		STRING8	 BeginningDateOfService;
 		STRING8  EndingDateOfService; 	
 		STRING8  ServiceDate;	
 		STRING18 ChargeAmount;
