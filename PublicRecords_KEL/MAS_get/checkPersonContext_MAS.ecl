@@ -120,17 +120,22 @@ PersonContext_transformed := project(dsResponseRecords(searchStatus=personContex
     or suppression_record;
 
 
-		MAIN := if(alert_needs_suppression and left.dataGroup in [	PersonContext.constants.datagroups.BANKRUPTCY_MAIN], [TRIM(left.RecID1, left, right)+TRIM(left.RecID2, left, right)], []);//court_code	case_number
-		SEARCH := if(alert_needs_suppression and left.dataGroup in [	PersonContext.constants.datagroups.BANKRUPTCY_SEARCH], [TRIM(left.RecID1, left, right)+TRIM(left.RecID2, left, right)+TRIM(left.RecID3, left, right)], []);//tmsid	name_type	did
+					MAIN := if(alert_needs_suppression and left.dataGroup in [	PersonContext.constants.datagroups.BANKRUPTCY_MAIN], 
+											[TRIM(left.RecID1, left, right)+TRIM(left.RecID2, left, right)+TRIM(left.RecID3, left, right)+TRIM(left.RecID4, left, right)], 
+											[]);//court_code	case_number //mas does not have main key
+											
+					SEARCH := if(alert_needs_suppression and left.dataGroup in [	PersonContext.constants.datagroups.BANKRUPTCY_SEARCH], 
+											[TRIM(left.RecID1, left, right)+TRIM(left.RecID2, left, right)+TRIM(left.RecID3, left, right)+TRIM(left.RecID4, left, right)], 
+											[]);//tmsid	name_type	did
 		
 		SELF.bankrupt_correct_cccn := [MAIN,SEARCH];	
 
 
 		RecIdForStId := TRIM(left.RecID1, left, right);       
-		SELF.lien_correct_tmsid_rmsid := if(alert_needs_suppression and left.dataGroup in [	PersonContext.constants.datagroups.LIEN_MAIN, 
-											PersonContext.constants.datagroups.LIEN_PARTY ], 
-											[TRIM(left.RecID1, left, right)], 
-											[]);		
+		SELF.lien_correct_tmsid_rmsid := if(alert_needs_suppression and left.dataGroup in [	PersonContext.constants.datagroups.LIEN_MAIN, PersonContext.constants.datagroups.LIEN_PARTY ], 
+											[TRIM(left.RecID1, left, right)+TRIM(left.RecID2, left, right)+TRIM(left.RecID3, left, right)+TRIM(left.RecID4, left, right)], 
+											[]);	
+											
 		ConsumerStatements1 := project(Risk_Indicators.iid_constants.ds_Record, 
 				transform(Risk_Indicators.Layouts.tmp_Consumer_Statements, 		
 																									self.uniqueID := LexID;
@@ -152,68 +157,80 @@ PersonContext_transformed := project(dsResponseRecords(searchStatus=personContex
 		SELF.crim_correct_ofk := if(alert_needs_suppression and left.dataGroup in [	PersonContext.constants.datagroups.OFFENDERS, 
 																															PersonContext.constants.datagroups.OFFENDERS_PLUS,
 																															PersonContext.constants.datagroups.OFFENSES	], 
-													[TRIM(left.RecID1, left, right)], 
+													[Trim(TRIM(TRIM(left.RecID1, left, right)+TRIM(left.RecID2, left, right)+TRIM(left.RecID3, left, right),left,right)+TRIM(left.RecID4, left, right),left,right)],//updated offender key too long for recid1
 													[]);    
+													
 		SELF.prop_correct_lnfare := if(alert_needs_suppression and left.dataGroup in [	PersonContext.constants.datagroups.ASSESSMENT, 
 																																			PersonContext.constants.datagroups.DEED,
 																																			PersonContext.constants.datagroups.PROPERTY_SEARCH,
 																																			PersonContext.constants.datagroups.PROPERTY	], 
-												[TRIM(left.RecID1, left, right)], 
-												[]); 
-		SELF.water_correct_RECORD_ID := if(alert_needs_suppression and left.dataGroup in [	PersonContext.constants.datagroups.WATERCRAFT, 
-																																					PersonContext.constants.datagroups.WATERCRAFT_DETAILS ], 
-													[TRIM(left.RecID1, left, right)], 
+													[TRIM(left.RecID1, left, right)+TRIM(left.RecID2, left, right)+TRIM(left.RecID3, left, right)+TRIM(left.RecID4, left, right)], 
+													[]); 
+													
+		SELF.water_correct_RECORD_ID := if(alert_needs_suppression and left.dataGroup in [	PersonContext.constants.datagroups.WATERCRAFT, PersonContext.constants.datagroups.WATERCRAFT_DETAILS ], 
+													[TRIM(left.RecID1, left, right)+TRIM(left.RecID2, left, right)+TRIM(left.RecID3, left, right)+TRIM(left.RecID4, left, right)], 
 													[]);
-		SELF.proflic_correct_RECORD_ID := if(alert_needs_suppression and left.dataGroup in [	PersonContext.constants.datagroups.PROFLIC, 
-																																						PersonContext.constants.datagroups.MARI	], 
-													[TRIM(left.RecID1, left, right)], 
+													
+		SELF.proflic_correct_RECORD_ID := if(alert_needs_suppression and left.dataGroup in [	PersonContext.constants.datagroups.PROFLIC, PersonContext.constants.datagroups.MARI	], 
+													[TRIM(left.RecID1, left, right)+TRIM(left.RecID2, left, right)+TRIM(left.RecID3, left, right)+TRIM(left.RecID4, left, right)], 
 													[]);
 
-		AMS := if(alert_needs_suppression and left.dataGroup in [	PersonContext.constants.datagroups.STUDENT], [TRIM(left.RecID1, left, right)], []);//key
-		Alloy := if(alert_needs_suppression and left.dataGroup in [	PersonContext.constants.datagroups.STUDENT_ALLOY], [TRIM(left.RecID1, left, right)+TRIM(left.RecID2, left, right)+TRIM(left.RecID3, left, right)], []);//	sequence_number	key_code	rawaid
+						AMS := if(alert_needs_suppression and left.dataGroup in [	PersonContext.constants.datagroups.STUDENT], 
+																	[TRIM(left.RecID1, left, right)+TRIM(left.RecID2, left, right)+TRIM(left.RecID3, left, right)+TRIM(left.RecID4, left, right)], 
+																	[]);//key
+																	
+						Alloy := if(alert_needs_suppression and left.dataGroup in [	PersonContext.constants.datagroups.STUDENT_ALLOY], 
+																	[TRIM(left.RecID1, left, right)+TRIM(left.RecID2, left, right)+TRIM(left.RecID3, left, right)+TRIM(left.RecID4, left, right)], 
+																	[]);//	sequence_number	key_code	rawaid
 		
 		SELF.student_correct_RECORD_ID := [AMS,Alloy];										
 													
 		SELF.air_correct_RECORD_ID  := if(alert_needs_suppression and left.dataGroup in [	PersonContext.constants.datagroups.AIRCRAFT ], 
-													[TRIM(left.RecID1, left, right)], 
-													[]);
-		SELF.avm_correct_RECORD_ID := if(alert_needs_suppression and left.dataGroup in [	PersonContext.constants.datagroups.AVM ], 
-													[TRIM(left.RecID1, left, right)+TRIM(left.RecID2, left, right)+TRIM(left.RecID3, left, right)], //recid4 is always blank, // prim range, prim name and sec range
-													[]);
-		self.avm_medians_correct_RECORD_ID := if(alert_needs_suppression and left.dataGroup in [	PersonContext.constants.datagroups.AVM_MEDIANS ], 
-													[TRIM(left.RecID1, left, right)], //geolink
+													[TRIM(left.RecID1, left, right)+TRIM(left.RecID2, left, right)+TRIM(left.RecID3, left, right)+TRIM(left.RecID4, left, right)], 
 													[]);
 													
-		SELF.infutor_correct_record_id := if(alert_needs_suppression and left.dataGroup in [	PersonContext.constants.datagroups.INFUTOR, 
-																															PersonContext.constants.datagroups.INFUTORCID	], 
-													[TRIM(left.RecID1, left, right)], 
+		SELF.avm_correct_RECORD_ID := if(alert_needs_suppression and left.dataGroup in [	PersonContext.constants.datagroups.AVM ], 
+													[TRIM(left.RecID1, left, right)+TRIM(left.RecID2, left, right)+TRIM(left.RecID3, left, right)+TRIM(left.RecID4, left, right)], //recid4 is always blank, // prim range, prim name and sec range
 													[]);
+													
+		self.avm_medians_correct_RECORD_ID := if(alert_needs_suppression and left.dataGroup in [	PersonContext.constants.datagroups.AVM_MEDIANS ], 
+													[TRIM(left.RecID1, left, right)+TRIM(left.RecID2, left, right)+TRIM(left.RecID3, left, right)+TRIM(left.RecID4, left, right)], //geolink
+													[]);
+													
+		SELF.infutor_correct_record_id := if(alert_needs_suppression and left.dataGroup in [	PersonContext.constants.datagroups.INFUTOR, PersonContext.constants.datagroups.INFUTORCID	], 
+													[TRIM(left.RecID1, left, right)+TRIM(left.RecID2, left, right)+TRIM(left.RecID3, left, right)+TRIM(left.RecID4, left, right)], 
+													[]);
+													
 		SELF.gong_correct_record_id := if(alert_needs_suppression and left.dataGroup in [	PersonContext.constants.datagroups.GONG ], 
-													[TRIM(left.RecID1, left, right)], 
+													[TRIM(left.RecID1, left, right)+TRIM(left.RecID2, left, right)+TRIM(left.RecID3, left, right)+TRIM(left.RecID4, left, right)], 
 													[]);
+													
 		SELF.advo_correct_record_id := if(alert_needs_suppression and left.dataGroup in [	PersonContext.constants.datagroups.ADVO ], 
 													[TRIM(left.RecID1, left, right)+TRIM(left.RecID2, left, right)+TRIM(left.RecID3, left, right)+TRIM(left.RecID4, left, right)], //zip, Prim range, Prim name and sec range
 													[]);
+													
 		SELF.email_data_correct_record_id := if(alert_needs_suppression and left.dataGroup in [	PersonContext.constants.datagroups.EMAIL_DATA ], 
-													[TRIM(left.RecID1, left, right)], 
+													[TRIM(left.RecID1, left, right)+TRIM(left.RecID2, left, right)+TRIM(left.RecID3, left, right)+TRIM(left.RecID4, left, right)], 
 													[]);
+													
 		SELF.inquiries_correct_record_id  := if(alert_needs_suppression and left.dataGroup in [	PersonContext.constants.datagroups.INQUIRIES ], 
-													[TRIM(left.RecID1, left, right)], 
+													[TRIM(left.RecID1, left, right)+TRIM(left.RecID2, left, right)+TRIM(left.RecID3, left, right)+TRIM(left.RecID4, left, right)], 
 													[]);
-		SELF.header_correct_record_id := if(alert_needs_suppression and left.dataGroup in [	PersonContext.constants.datagroups.HDR ] AND left.recID1 <> '', // for some reason we have recid1 blank some times..
-													[TRIM(left.RecID1, left, right)], 
+													
+		SELF.header_correct_record_id := if(alert_needs_suppression and left.dataGroup in [	PersonContext.constants.datagroups.HDR ] , // for some reason we have recid1 blank some times..
+													[TRIM(left.RecID1, left, right)+TRIM(left.RecID2, left, right)+TRIM(left.RecID3, left, right)+TRIM(left.RecID4, left, right)], 
 													[]);		
 													
 		SELF.Death_correct_record_id := if(alert_needs_suppression and left.dataGroup in [	PersonContext.constants.datagroups.DID_DEATH ], 
-													[TRIM(left.RecID1, left, right)+TRIM(left.RecID2, left, right)], //did	state_death_id
+													[TRIM(left.RecID1, left, right)+TRIM(left.RecID2, left, right)+TRIM(left.RecID3, left, right)+TRIM(left.RecID4, left, right)], //did	state_death_id
 													[]);
 	
 		self.thrive_correct_record_id := if(alert_needs_suppression and left.dataGroup in [	PersonContext.constants.datagroups.THRIVE ], 
-													[TRIM(left.RecID1, left, right)], 
+													[TRIM(left.RecID1, left, right)+TRIM(left.RecID2, left, right)+TRIM(left.RecID3, left, right)+TRIM(left.RecID4, left, right)], 
 													[]);		
 													
 		self.SexOffender_correct_record_id := if(alert_needs_suppression and left.dataGroup in [	PersonContext.constants.datagroups.SO_MAIN ], 
-													[TRIM(left.RecID1, left, right)], 
+													[TRIM(left.RecID1, left, right)+TRIM(left.RecID2, left, right)+TRIM(left.RecID3, left, right)+TRIM(left.RecID4, left, right)], 
 													[]);
 		self := [];
 		
