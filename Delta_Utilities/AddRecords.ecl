@@ -1,4 +1,4 @@
-export AddRecords(FullData,NewData,recref,MatchFields,DistSet='',isDist=false,isLookup=false):=functionmacro
+export AddRecords(FullData,NewData,recref,MatchFields,DistSet='',isDist=false,isLookup=false,process_date=''):=functionmacro
 
 #Declare(CommandString);
 	#declare(CommaString);
@@ -43,6 +43,8 @@ export AddRecords(FullData,NewData,recref,MatchFields,DistSet='',isDist=false,is
 
     RecordLayout:=#expand(recref);
 
+	effectivedate:=process_date;
+
     #APPEND(CommandString,'dAddRecords:=join(dFullData,dNewData,');
 	#append(CommandString,%'MatchString'%);
 	#APPEND(CommandString,',transform(right)');
@@ -68,7 +70,8 @@ export AddRecords(FullData,NewData,recref,MatchFields,DistSet='',isDist=false,is
 
     #append(CommandString,'RecordLayout tCreateAdds(RecordLayout L, RecordLayout R):=TRANSFORM\n');
     #append(CommandString,'SELF.Record_Sid:=IF (l.Record_Sid=0, PrevBase+1, l.Record_Sid+thorlib.nodes());\n');
-    #append(CommandString,'self.delta_ind:=1;\n');
+    #append(CommandString,'self.dt_effective_first:=if(effectivedate<>'',(unsigned4)effectivedate,R.dt_effective_first):=1;\n');
+	#append(CommandString,'self.delta_ind:=1;\n');
     #append(CommandString,'self:=R;\n');
     #append(CommandString,'end;\n');
 
