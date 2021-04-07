@@ -1,6 +1,6 @@
 Import ProfileBooster, Data_Services, doxie, ut;
 
-f := ProfileBooster.V2_Build_Infutor;
+f := ProfileBooster.V2_Key_Build_Infutor;
 
 export V2_Key_Infutor_DID := index(f,{did},{f},
 			//Data_Services.Data_Location.Prefix('NONAMEGIVEN')

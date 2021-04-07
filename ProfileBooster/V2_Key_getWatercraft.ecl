@@ -1,7 +1,7 @@
 ﻿IMPORT ProfileBooster, _Control, Watercraft, RiskWise, ut, std, risk_indicators;
 onThor := _Control.Environment.OnThor;
 
-EXPORT V2_getWatercraft(DATASET(ProfileBooster.V2_Layouts.Layout_PB2_Slim) PBslim) := FUNCTION
+EXPORT V2_Key_getWatercraft(DATASET(ProfileBooster.V2_Key_Layouts.Layout_PB2_Slim) PBslim) := FUNCTION
 
 WCidKey := Watercraft.key_watercraft_did(false); 
  

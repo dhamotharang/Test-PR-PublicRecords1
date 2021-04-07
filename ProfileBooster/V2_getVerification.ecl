@@ -14,9 +14,10 @@ address_rank_key := dx_header.key_addr_hist();
 
 //search Infutor by DID to verify input name, address, phone
 	{ProfileBooster.V2_Layouts.Layout_PB2_Shell, UNSIGNED4 global_sid} getInfutor(PB2Shell le, infutorcid_key ri) := transform
-		EmrgDt_first_seen        := IF(ri.dt_first_seen=0,99998888,ri.dt_first_seen);
-		self.EmrgDt_first_seen   := EmrgDt_first_seen;
+		EmrgDt_first_seen        := IF(ri.dt_first_seen=0,'99998888',(STRING8)ri.dt_first_seen);
+		self.EmrgDt_first_seen   := (UNSIGNED)ProfileBooster.V2_Common.convertDateTo8(EmrgDt_first_seen);
 		self.EmrgSrc             := MDR.sourceTools.src_InfutorCID;
+		self.EmrgDOB			 := le.dob;
 		//No DOB in InfutorCID
 		self.EmrgPrimaryRange    := ri.prim_range;
 		self.EmrgPredirectional	 := ri.predir;
@@ -94,9 +95,9 @@ wInfutorcid_roxie := PROJECT(wInfutorcid_roxie_flagged, TRANSFORM(ProfileBooster
 
 //search Gong by DID to verify input name, address, phone
 	{ProfileBooster.V2_Layouts.Layout_PB2_Shell, UNSIGNED4 global_sid} getGong(PB2Shell le, gonghistorydid_key ri) := transform
-		OlderErmgRecord := (UNSIGNED6)(((STRING)ri.dt_first_seen)[1..6]) <= (UNSIGNED6)(((STRING)le.EmrgDt_first_seen)[1..6]) OR le.EmrgDt_first_seen IN [0,99998]; 
-		EmrgDt_first_seen        := IF(ri.dt_first_seen='0',(STRING)le.EmrgDt_first_seen,(STRING)ri.dt_first_seen);
-		self.EmrgDt_first_seen   := IF(OlderErmgRecord,(UNSIGNED6)ri.dt_first_seen,(UNSIGNED6)EmrgDt_first_seen);
+		OlderErmgRecord := (UNSIGNED6)((ProfileBooster.V2_Common.convertDateTo8((STRING)ri.dt_first_seen))[1..6]) <= (UNSIGNED6)((ProfileBooster.V2_Common.convertDateTo8((STRING)le.EmrgDt_first_seen))[1..6]) OR ProfileBooster.V2_Common.convertDateTo8((STRING)le.EmrgDt_first_seen) IN ['0','99998','99998888']; 
+		EmrgDt_first_seen        := IF(ri.dt_first_seen='0',ProfileBooster.V2_Common.convertDateTo8((STRING)le.EmrgDt_first_seen),ProfileBooster.V2_Common.convertDateTo8((STRING)ri.dt_first_seen));
+		self.EmrgDt_first_seen   := IF(OlderErmgRecord,(UNSIGNED6)ProfileBooster.V2_Common.convertDateTo8(ri.dt_first_seen),(UNSIGNED6)EmrgDt_first_seen);
 		self.EmrgSrc             := IF(OlderErmgRecord,ri.src,le.EmrgSrc);
 		//No DOB in Gong
 		self.EmrgPrimaryRange    := IF(OlderErmgRecord,ri.prim_range,le.EmrgPrimaryRange);
@@ -173,9 +174,9 @@ wInfutorcid_roxie := PROJECT(wInfutorcid_roxie_flagged, TRANSFORM(ProfileBooster
 
 //search header by DID to verify input name, address, phone, SSN
 	{ProfileBooster.V2_Layouts.Layout_PB2_Shell, UNSIGNED4 global_sid} getHeader(ProfileBooster.V2_Layouts.Layout_PB2_Shell le, header_key ri) := transform
-		OlderErmgRecord := (UNSIGNED6)(((STRING)ri.dt_first_seen)[1..6]) <= (UNSIGNED6)(((STRING)le.EmrgDt_first_seen)[1..6]) OR le.EmrgDt_first_seen IN [0,99998]; 
-		EmrgDt_first_seen        := IF(ri.dt_first_seen=0,le.EmrgDt_first_seen,ri.dt_first_seen);
-		self.EmrgDt_first_seen   := IF(OlderErmgRecord,(UNSIGNED6)ri.dt_first_seen,EmrgDt_first_seen);
+		OlderErmgRecord := (UNSIGNED6)((ProfileBooster.V2_Common.convertDateTo8((STRING)ri.dt_first_seen))[1..6]) <= (UNSIGNED)((ProfileBooster.V2_Common.convertDateTo8((STRING)le.EmrgDt_first_seen))[1..6]) OR ProfileBooster.V2_Common.convertDateTo8((STRING)le.EmrgDt_first_seen) IN ['0','99998']; 
+		EmrgDt_first_seen        := IF(ri.dt_first_seen=0,ProfileBooster.V2_Common.convertDateTo8((STRING)le.EmrgDt_first_seen),ProfileBooster.V2_Common.convertDateTo8((STRING)ri.dt_first_seen));
+		self.EmrgDt_first_seen   := IF(OlderErmgRecord,(UNSIGNED6)ProfileBooster.V2_Common.convertDateTo8((STRING)ri.dt_first_seen),(UNSIGNED)EmrgDt_first_seen);
 		self.EmrgSrc             := IF(OlderErmgRecord,ri.src,le.EmrgSrc);
 		EmrgDob	:= MAP(~OlderErmgRecord                       => le.EmrgDob, 
 		               ri.src=mdr.sourceTools.src_TUCS_Ptrack => le.EmrgDob, 
@@ -294,38 +295,38 @@ wInfutorcid_roxie := PROJECT(wInfutorcid_roxie_flagged, TRANSFORM(ProfileBooster
 	wHeader_thor_flagged := Suppress.MAC_FlagSuppressedSource(wHeader_thor_unsuppressed, mod_access);
 
 	wHeader_thor := PROJECT(wHeader_roxie_flagged, TRANSFORM(ProfileBooster.V2_Layouts.Layout_PB2_Shell,
-		self.firstscore 	:=  IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.firstscore);
-		self.firstcount 	:= IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.firstcount);
-		self.lastscore 		:= IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.lastscore);
-		self.lastcount 		:= IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.lastcount);
-		self.addrscore 		:= IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.addrscore);
-		self.addrcount 		:= IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.addrcount);
-		self.phonescore 	:= IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.phonescore);
-		self.phonecount 	:= IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.phonecount);
-		self.socsscore 				:= IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.socsscore);
-		self.socscount 				:= IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.socscount);
-		self.dt_first_seen 		:= IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.dt_first_seen);
-		self.dt_last_seen			:= IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.dt_last_seen);
-		self.dob							:= IF(left.is_suppressed, Suppress.OptOutMessage('STRING'), left.dob);
-		self.ProspectAge 			:= IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.ProspectAge);
-		self.title						:= IF(left.is_suppressed, Suppress.OptOutMessage('STRING'), left.title);
-		self.HHID							:= IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.HHID);
-		self.hdr_prim_range		:= IF(left.is_suppressed, Suppress.OptOutMessage('STRING'), left.hdr_prim_range);
-		self.hdr_predir				:= IF(left.is_suppressed, Suppress.OptOutMessage('STRING'), left.hdr_predir);
-		self.hdr_prim_name		:= IF(left.is_suppressed, Suppress.OptOutMessage('STRING'), left.hdr_prim_name);
-		self.hdr_addr_suffix	:= IF(left.is_suppressed, Suppress.OptOutMessage('STRING'), left.hdr_addr_suffix);
-		self.hdr_postdir			:= IF(left.is_suppressed, Suppress.OptOutMessage('STRING'), left.hdr_postdir);
-		self.hdr_unit_desig		:= IF(left.is_suppressed, Suppress.OptOutMessage('STRING'), left.hdr_unit_desig);
-		self.hdr_sec_range		:= IF(left.is_suppressed, Suppress.OptOutMessage('STRING'), left.hdr_sec_range);
-		self.hdr_z5						:= IF(left.is_suppressed, Suppress.OptOutMessage('STRING'), left.hdr_z5);
-		self.hdr_zip4					:= IF(left.is_suppressed, Suppress.OptOutMessage('STRING'), left.hdr_zip4);
-		self.hdr_city_name		:= IF(left.is_suppressed, Suppress.OptOutMessage('STRING'), left.hdr_city_name);
-		self.hdr_st						:= IF(left.is_suppressed, Suppress.OptOutMessage('STRING'), left.hdr_st);
-		self.hdr_county				:= IF(left.is_suppressed, Suppress.OptOutMessage('STRING'), left.hdr_county);
-		self.hdr_geo_blk			:= IF(left.is_suppressed, Suppress.OptOutMessage('STRING'), left.hdr_geo_blk);
-		self.hdr_lname				:= IF(left.is_suppressed, Suppress.OptOutMessage('STRING'), left.hdr_lname);
-		self.hdr_addr1				:= IF(left.is_suppressed, Suppress.OptOutMessage('STRING'), left.hdr_addr1);
-		self.hdr_rawaid 			:= IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.hdr_rawaid);
+		self.firstscore 		 :=  IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.firstscore);
+		self.firstcount 		 := IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.firstcount);
+		self.lastscore 			 := IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.lastscore);
+		self.lastcount 			 := IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.lastcount);
+		self.addrscore 			 := IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.addrscore);
+		self.addrcount 			 := IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.addrcount);
+		self.phonescore 		 := IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.phonescore);
+		self.phonecount 		 := IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.phonecount);
+		self.socsscore 			 := IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.socsscore);
+		self.socscount 			 := IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.socscount);
+		self.dt_first_seen 		 := IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.dt_first_seen);
+		self.dt_last_seen		 := IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.dt_last_seen);
+		self.dob				 := IF(left.is_suppressed, Suppress.OptOutMessage('STRING'), left.dob);
+		self.ProspectAge 		 := IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.ProspectAge);
+		self.title				 := IF(left.is_suppressed, Suppress.OptOutMessage('STRING'), left.title);
+		self.HHID				 := IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.HHID);
+		self.hdr_prim_range		 := IF(left.is_suppressed, Suppress.OptOutMessage('STRING'), left.hdr_prim_range);
+		self.hdr_predir			 := IF(left.is_suppressed, Suppress.OptOutMessage('STRING'), left.hdr_predir);
+		self.hdr_prim_name		 := IF(left.is_suppressed, Suppress.OptOutMessage('STRING'), left.hdr_prim_name);
+		self.hdr_addr_suffix	 := IF(left.is_suppressed, Suppress.OptOutMessage('STRING'), left.hdr_addr_suffix);
+		self.hdr_postdir		 := IF(left.is_suppressed, Suppress.OptOutMessage('STRING'), left.hdr_postdir);
+		self.hdr_unit_desig		 := IF(left.is_suppressed, Suppress.OptOutMessage('STRING'), left.hdr_unit_desig);
+		self.hdr_sec_range		 := IF(left.is_suppressed, Suppress.OptOutMessage('STRING'), left.hdr_sec_range);
+		self.hdr_z5				 := IF(left.is_suppressed, Suppress.OptOutMessage('STRING'), left.hdr_z5);
+		self.hdr_zip4			 := IF(left.is_suppressed, Suppress.OptOutMessage('STRING'), left.hdr_zip4);
+		self.hdr_city_name		 := IF(left.is_suppressed, Suppress.OptOutMessage('STRING'), left.hdr_city_name);
+		self.hdr_st				 := IF(left.is_suppressed, Suppress.OptOutMessage('STRING'), left.hdr_st);
+		self.hdr_county			 := IF(left.is_suppressed, Suppress.OptOutMessage('STRING'), left.hdr_county);
+		self.hdr_geo_blk		 := IF(left.is_suppressed, Suppress.OptOutMessage('STRING'), left.hdr_geo_blk);
+		self.hdr_lname			 := IF(left.is_suppressed, Suppress.OptOutMessage('STRING'), left.hdr_lname);
+		self.hdr_addr1			 := IF(left.is_suppressed, Suppress.OptOutMessage('STRING'), left.hdr_addr1);
+		self.hdr_rawaid 		 := IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.hdr_rawaid);
     SELF := LEFT;));
 
 	#IF(onThor)
@@ -335,9 +336,9 @@ wInfutorcid_roxie := PROJECT(wInfutorcid_roxie_flagged, TRANSFORM(ProfileBooster
 	#END
 
 	{ProfileBooster.V2_Layouts.Layout_PB2_Shell, UNSIGNED4 global_sid} getQHeader(ProfileBooster.V2_Layouts.Layout_PB2_Shell le, quickheader_key ri) := transform
-		OlderErmgRecord := (UNSIGNED6)(((STRING)ri.dt_first_seen)[1..6]) <= (UNSIGNED6)(((STRING)le.EmrgDt_first_seen)[1..6]) OR le.EmrgDt_first_seen=0; 
-		EmrgDt_first_seen := IF(OlderErmgRecord,ri.dt_first_seen,le.EmrgDt_first_seen);
-		self.EmrgDt_first_seen   := IF(OlderErmgRecord,(UNSIGNED6)ri.dt_first_seen,EmrgDt_first_seen);
+		OlderErmgRecord := (UNSIGNED6)((ProfileBooster.V2_Common.convertDateTo8((STRING)ri.dt_first_seen))[1..6]) <= (UNSIGNED6)((ProfileBooster.V2_Common.convertDateTo8((STRING)le.EmrgDt_first_seen))[1..6]) OR ProfileBooster.V2_Common.convertDateTo8((STRING)le.EmrgDt_first_seen)='0'; 
+		EmrgDt_first_seen := IF(OlderErmgRecord,ProfileBooster.V2_Common.convertDateTo8((STRING)ri.dt_first_seen),ProfileBooster.V2_Common.convertDateTo8((STRING)le.EmrgDt_first_seen));
+		self.EmrgDt_first_seen   := IF(OlderErmgRecord,(UNSIGNED6)ProfileBooster.V2_Common.convertDateTo8((STRING)ri.dt_first_seen),(UNSIGNED6)EmrgDt_first_seen);
 		self.EmrgSrc             := IF(OlderErmgRecord,ri.src,le.EmrgSrc);
 		EmrgDob	:= MAP(~OlderErmgRecord                       => le.EmrgDob, 
 		               ri.src=mdr.sourceTools.src_TUCS_Ptrack => le.EmrgDob, 
@@ -357,47 +358,47 @@ wInfutorcid_roxie := PROJECT(wInfutorcid_roxie_flagged, TRANSFORM(ProfileBooster
 		self.EmrgZIP5			 := IF(OlderErmgRecord,ri.zip,le.EmrgZIP5);
 		self.EmrgZIP4		     := IF(OlderErmgRecord,ri.zip4,le.EmrgZIP4);
 		
-		self.global_sid			:= ri.global_sid;
-		self.firstscore 			:= Risk_Indicators.FnameScore(le.fname, ri.fname);
-		self.firstcount 			:= (integer)Risk_Indicators.iid_constants.g(self.firstscore);
-		self.lastscore 				:= Risk_Indicators.LnameScore(le.lname, ri.lname);
-		self.lastcount 				:= (integer)Risk_Indicators.iid_constants.g(self.lastscore);
-		zip_score 						:= Risk_Indicators.AddrScore.zip_score(le.in_zipcode, ri.zip);
-		cityst_score 					:= Risk_Indicators.AddrScore.citystate_score(le.in_city, le.in_state, ri.city_name, ri.st, '1');
-		self.addrscore 				:= Risk_Indicators.AddrScore.AddressScore(le.prim_range, le.prim_name, le.sec_range,
+		self.global_sid			 := ri.global_sid;
+		self.firstscore 		 := Risk_Indicators.FnameScore(le.fname, ri.fname);
+		self.firstcount 	   	 := (integer)Risk_Indicators.iid_constants.g(self.firstscore);
+		self.lastscore 		 	 := Risk_Indicators.LnameScore(le.lname, ri.lname);
+		self.lastcount 		     := (integer)Risk_Indicators.iid_constants.g(self.lastscore);
+		zip_score 				 := Risk_Indicators.AddrScore.zip_score(le.in_zipcode, ri.zip);
+		cityst_score 			 := Risk_Indicators.AddrScore.citystate_score(le.in_city, le.in_state, ri.city_name, ri.st, '1');
+		self.addrscore 			 := Risk_Indicators.AddrScore.AddressScore(le.prim_range, le.prim_name, le.sec_range,
 																																		ri.prim_range, ri.prim_name, ri.sec_range,
 																																		zip_score, cityst_score);
-		self.addrcount 				:= (integer)Risk_Indicators.iid_constants.ga(self.AddrScore);
-		self.phonescore 			:= Risk_Indicators.PhoneScore(le.phone10, ri.phone);
-		self.phonecount 			:= (integer)Risk_Indicators.iid_constants.gn(self.phonescore);
-		self.socsscore 				:= Risk_Indicators.PhoneScore(le.ssn, ri.ssn);
-		self.socscount 				:= (integer)Risk_Indicators.iid_constants.gn(self.socsscore);
-		self.dt_first_seen 		:= ri.dt_first_seen;
+		self.addrcount 			 := (integer)Risk_Indicators.iid_constants.ga(self.AddrScore);
+		self.phonescore 		 := Risk_Indicators.PhoneScore(le.phone10, ri.phone);
+		self.phonecount 		 := (integer)Risk_Indicators.iid_constants.gn(self.phonescore);
+		self.socsscore 			 := Risk_Indicators.PhoneScore(le.ssn, ri.ssn);
+		self.socscount 			 := (integer)Risk_Indicators.iid_constants.gn(self.socsscore);
+		self.dt_first_seen 		 := ri.dt_first_seen;
 
     	historydate := (unsigned)fullhistorydate[1..6];
-		self.dt_last_seen			:= if(ri.dt_last_seen > HistoryDate, HistoryDate, ri.dt_last_seen);
-		self.dob							:= if(ri.src=mdr.sourceTools.src_TUCS_Ptrack, '', (string)ri.dob);
-		self.ProspectAge 			:= if(ri.src=mdr.sourceTools.src_TUCS_Ptrack, 0, risk_indicators.years_apart((unsigned)fullhistorydate, (unsigned)ri.dob));
-   		self.title						:= ri.title;
-		self.hdr_prim_range		:= ri.prim_range;
-		self.hdr_predir				:= ri.predir;
-		self.hdr_prim_name		:= ri.prim_name;
-		self.hdr_addr_suffix	:= ri.suffix;
-		self.hdr_postdir			:= ri.postdir;
-		self.hdr_unit_desig		:= ri.unit_desig;
-		self.hdr_sec_range		:= ri.sec_range;
-		self.hdr_z5						:= ri.zip;
-		self.hdr_zip4					:= ri.zip4;
-		self.hdr_city_name		:= ri.city_name;
-		self.hdr_st						:= ri.st;
-		self.hdr_county				:= ri.county;
-		self.hdr_geo_blk			:= ri.geo_blk;
-		self.hdr_lname				:= ri.lname;
-		self.hdr_addr1				:= trim(ri.prim_range) + trim(ri.prim_name);
-		self.hdr_rawaid 			:= ri.rawaid;
-		inputAddrFound				:= le.prim_range = ri.prim_range and le.prim_name = ri.prim_name and le.z5 = ri.zip;
+		self.dt_last_seen		 := if(ri.dt_last_seen > HistoryDate, HistoryDate, ri.dt_last_seen);
+		self.dob				 := if(ri.src=mdr.sourceTools.src_TUCS_Ptrack, '', (string)ri.dob);
+		self.ProspectAge 		 := if(ri.src=mdr.sourceTools.src_TUCS_Ptrack, 0, risk_indicators.years_apart((unsigned)fullhistorydate, (unsigned)ri.dob));
+   		self.title				 := ri.title;
+		self.hdr_prim_range		 := ri.prim_range;
+		self.hdr_predir			 := ri.predir;
+		self.hdr_prim_name		 := ri.prim_name;
+		self.hdr_addr_suffix	 := ri.suffix;
+		self.hdr_postdir		 := ri.postdir;
+		self.hdr_unit_desig		 := ri.unit_desig;
+		self.hdr_sec_range		 := ri.sec_range;
+		self.hdr_z5				 := ri.zip;
+		self.hdr_zip4			 := ri.zip4;
+		self.hdr_city_name		 := ri.city_name;
+		self.hdr_st				 := ri.st;
+		self.hdr_county			 := ri.county;
+		self.hdr_geo_blk		 := ri.geo_blk;
+		self.hdr_lname			 := ri.lname;
+		self.hdr_addr1			 := trim(ri.prim_range) + trim(ri.prim_name);
+		self.hdr_rawaid 		 := ri.rawaid;
+		inputAddrFound			 := le.prim_range = ri.prim_range and le.prim_name = ri.prim_name and le.z5 = ri.zip;
 		self.VerifiedCurrResMatchIndex	:= if(inputAddrFound, '1', '0'); //if input address is on header, flag it as being known
-		self									:= le;
+		self					 := le;
 	end;
 
 	wQHeader_roxie_unsuppressed := join(PB2Shell, quickheader_key,
@@ -443,8 +444,8 @@ wInfutorcid_roxie := PROJECT(wInfutorcid_roxie_flagged, TRANSFORM(ProfileBooster
 		self.title						:= if(le.title <> '', le.title, ri.title);		//keep whichever is populated
 		self.HHID							:= if(le.HHID <> 0, le.HHID, ri.HHID);		//keep whichever is populated
 		self.VerifiedCurrResMatchIndex	:= if(ri.VerifiedCurrResMatchIndex = '1', ri.VerifiedCurrResMatchIndex, le.VerifiedCurrResMatchIndex);
-		OlderErmgRecord := (UNSIGNED6)(((STRING)ri.EmrgDt_first_seen)[1..6]) <= (UNSIGNED6)(((STRING)le.EmrgDt_first_seen)[1..6]) OR le.EmrgDt_first_seen=0;
-		self.EmrgDt_first_seen   := IF(OlderErmgRecord,ri.EmrgDt_first_seen,le.EmrgDt_first_seen);
+		OlderErmgRecord := (UNSIGNED6)((ProfileBooster.V2_Common.convertDateTo8((STRING)ri.EmrgDt_first_seen))[1..6]) <= (UNSIGNED6)((ProfileBooster.V2_Common.convertDateTo8((STRING)le.EmrgDt_first_seen))[1..6]) OR ProfileBooster.V2_Common.convertDateTo8((STRING)le.EmrgDt_first_seen)='0';
+		self.EmrgDt_first_seen   := IF(OlderErmgRecord,(UNSIGNED)ProfileBooster.V2_Common.convertDateTo8((STRING)ri.EmrgDt_first_seen),(UNSIGNED)ProfileBooster.V2_Common.convertDateTo8((STRING)le.EmrgDt_first_seen));
 		self.EmrgSrc             := IF(OlderErmgRecord,ri.EmrgSrc,le.EmrgSrc);
 		EmrgDob					 := IF(OlderErmgRecord,ri.EmrgDob,le.EmrgDob);
 		self.EmrgDob			 := EmrgDob;
@@ -469,24 +470,24 @@ wInfutorcid_roxie := PROJECT(wInfutorcid_roxie_flagged, TRANSFORM(ProfileBooster
   rolledVer := rollup(sortVer, rollVer(left,right), seq);
 
 	ProfileBooster.V2_Layouts.Layout_PB2_Shell addVerification(PB2Shell le, rolledVer ri) := TRANSFORM
-		self.firstscore 	:= ri.firstscore;
-		self.firstcount 	:= ri.firstcount;
-		self.lastscore 		:= ri.lastscore;
-		self.lastcount 		:= ri.lastcount;
-		self.addrscore 		:= ri.addrscore;
-		self.addrcount 		:= ri.addrcount;
-		self.phonescore 	:= ri.phonescore;
-		self.phonecount 	:= ri.phonecount;
-		self.socsscore 		:= ri.socsscore;
-		self.socscount 		:= ri.socscount;
-		self.dt_first_seen := ri.dt_first_seen;
-		self.dt_last_seen	:= ri.dt_last_seen;
-		self.dob					:= ri.dob;
-		self.ProspectAge	:= ri.ProspectAge;
-		self.title				:= ri.title;
-		self.HHID					:= ri.HHID;
+		self.firstscore 	     := ri.firstscore;
+		self.firstcount 	     := ri.firstcount;
+		self.lastscore 		     := ri.lastscore;
+		self.lastcount 		     := ri.lastcount;
+		self.addrscore 		     := ri.addrscore;
+		self.addrcount 		     := ri.addrcount;
+		self.phonescore 	     := ri.phonescore;
+		self.phonecount 	     := ri.phonecount;
+		self.socsscore 		     := ri.socsscore;
+		self.socscount 	 	     := ri.socscount;
+		self.dt_first_seen       := ri.dt_first_seen;
+		self.dt_last_seen	     := ri.dt_last_seen;
+		self.dob				 := ri.dob;
+		self.ProspectAge	     := ri.ProspectAge;
+		self.title				 := ri.title;
+		self.HHID				 := ri.HHID;
 		self.VerifiedCurrResMatchIndex	:= ri.VerifiedCurrResMatchIndex;
-		self.EmrgDt_first_seen	 := ri.EmrgDt_first_seen;
+		self.EmrgDt_first_seen	 := (UNSIGNED)ProfileBooster.V2_Common.convertDateTo8((STRING)ri.EmrgDt_first_seen);
 		self.EmrgSrc             := ri.EmrgSrc;
 		self.EmrgDob			 := ri.EmrgDob;
     	self.EmrgAge   			 := ri.EmrgAge;
@@ -501,7 +502,7 @@ wInfutorcid_roxie := PROJECT(wInfutorcid_roxie_flagged, TRANSFORM(ProfileBooster
 		self.EmrgSt			     := ri.EmrgSt;
 		self.EmrgZIP5			 := ri.EmrgZIP5;
 		self.EmrgZIP4		     := ri.EmrgZIP4;
-		self 							:= le;
+		self 					 := le;
 	END;
 
 	wVerification := join(PB2Shell, rolledVer,

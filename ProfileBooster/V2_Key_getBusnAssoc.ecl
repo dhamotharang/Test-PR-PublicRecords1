@@ -1,7 +1,7 @@
 IMPORT ProfileBooster, _Control, BIPV2, BIPV2_Crosswalk, paw, riskwise, ut, risk_indicators, AML, MDR, Doxie, Suppress ;
 onThor := _Control.Environment.OnThor; 
 
-EXPORT V2_getBusnAssoc( DATASET(ProfileBooster.V2_Layouts.Layout_PB2_Slim) PBslim, 
+EXPORT V2_Key_getBusnAssoc( DATASET(ProfileBooster.V2_Key_Layouts.Layout_PB2_Slim) PBslim, 
 									 doxie.IDataAccess mod_access = MODULE (doxie.IDataAccess) END) := FUNCTION;
 
 // BIPV2 Crosswalk ////http://10.173.101.101:8010/?NodeGroup=roxie_cert_pull&LogicalName=key::bipv2::crosswalk::20210202::consumer2biz&Widget=ResultWidget
@@ -86,7 +86,7 @@ BIPV2CrosswalkResult := BIPV2_Crosswalk.Key_ConsumerToBip.getDataFiltered(crossw
                     applyMarketingRestrictions := true,
                     mod_access := mod_access);
 
-ProfileBooster.V2_Layouts.Layout_PB2_Slim_Crosswalk append_crosswalk(pbslim le, BIPV2_Crosswalk.Layouts.ConsumerToBipFinalRec rt) := TRANSFORM
+ProfileBooster.V2_Key_Layouts.Layout_PB2_Slim_Crosswalk append_crosswalk(pbslim le, BIPV2_Crosswalk.Layouts.ConsumerToBipFinalRec rt) := TRANSFORM
     SELF.seq := le.seq;
 	SELF.did := le.did;
 	SELF.did2 := le.did2;
@@ -130,7 +130,7 @@ with_crosswalk_thor := JOIN(
 	append_crosswalk(LEFT,RIGHT),
 	KEEP(100), local);
 
-ProfileBooster.V2_Layouts.Layout_PB2_Slim_Crosswalk roll_crosswalk(ProfileBooster.V2_Layouts.Layout_PB2_Slim_Crosswalk le, ProfileBooster.V2_Layouts.Layout_PB2_Slim_Crosswalk ri) := TRANSFORM
+ProfileBooster.V2_Key_Layouts.Layout_PB2_Slim_Crosswalk roll_crosswalk(ProfileBooster.V2_Key_Layouts.Layout_PB2_Slim_Crosswalk le, ProfileBooster.V2_Key_Layouts.Layout_PB2_Slim_Crosswalk ri) := TRANSFORM
 	// sameDID := le.did2=ri.did2;
     use_right := ri.dt_first_seen_at_business > le.dt_first_seen_at_business;
 	SELF.BusAssocFlagEv := MAX(le.BusAssocFlagEv, ri.BusAssocFlagEv);
@@ -150,7 +150,7 @@ END;
 with_crosswalk_rolled_tmp := ROLLUP(SORT(with_crosswalk_thor,seq,did,did2,-dt_first_seen_at_business,-dt_last_seen_at_business,-dt_first_seen,-dt_last_seen), LEFT.did=RIGHT.did AND LEFT.did2=RIGHT.did2, roll_crosswalk(LEFT,RIGHT));
 
 
-// ProfileBooster.V2_Layouts.Layout_PB2_Slim_PAW append_contact_id(pbslim le, paw.key_did rt) := transform
+// ProfileBooster.V2_Key_Layouts.Layout_PB2_Slim_PAW append_contact_id(pbslim le, paw.key_did rt) := transform
 // 	SELF.seq := le.seq;
 // 	SELF.did := le.did;
 // 	SELF.did2 := le.did2;
@@ -169,7 +169,7 @@ with_crosswalk_rolled_tmp := ROLLUP(SORT(with_crosswalk_thor,seq,did,did2,-dt_fi
 								
 // with_contactID := with_contactID_thor;
 
-// {ProfileBooster.V2_Layouts.Layout_PB2_Slim_PAW, UNSIGNED4 global_sid} append_paw_details(with_contactID le, paw.Key_contactid rt) := transform
+// {ProfileBooster.V2_Key_Layouts.Layout_PB2_Slim_PAW, UNSIGNED4 global_sid} append_paw_details(with_contactID le, paw.Key_contactid rt) := transform
 // 	SELF.global_sid := rt.global_sid;
 // 	SELF.seq := le.seq;
 // 	SELF.did := le.did;
@@ -202,13 +202,13 @@ with_crosswalk_rolled_tmp := ROLLUP(SORT(with_crosswalk_thor,seq,did,did2,-dt_fi
 // 								 atmost(left.contact_id=right.contact_id,riskwise.max_atmost), keep(1),
 // 	local); 
 
-// pawTitle_thor := Suppress.Suppress_ReturnOldLayout(pawTitle_thor_unsuppressed, mod_access, ProfileBooster.V2_Layouts.Layout_PB2_Slim_PAW);
+// pawTitle_thor := Suppress.Suppress_ReturnOldLayout(pawTitle_thor_unsuppressed, mod_access, ProfileBooster.V2_Key_Layouts.Layout_PB2_Slim_PAW);
 
 // pawTitle := pawTitle_thor;
 
 // SortPAW :=  sort(pawTitle, seq, did2, -dt_last_seen);
 
-// ProfileBooster.V2_Layouts.Layout_PB2_Slim_PAW rollPAW(SortPAW le, SortPAW ri) := TRANSFORM
+// ProfileBooster.V2_Key_Layouts.Layout_PB2_Slim_PAW rollPAW(SortPAW le, SortPAW ri) := TRANSFORM
 // 	SELF.OccBusinessAssociation 	:= max(le.OccBusinessAssociation,ri.OccBusinessAssociation);	
 // 	SELF.OccBusinessAssociationTime	:= max(le.OccBusinessAssociationTime, ri.OccBusinessAssociationTime);	//save oldest 
 // 	SELF.OccBusinessTitleLeadership	:= le.OccBusinessTitleLeadership;	  //keep most recent

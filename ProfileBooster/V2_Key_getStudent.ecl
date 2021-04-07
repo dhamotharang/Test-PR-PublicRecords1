@@ -1,9 +1,9 @@
 ﻿IMPORT _Control, american_student_list, RiskWise, ut, mdr, risk_indicators, std, Inquiry_AccLogs, Doxie;
 onThor := _Control.Environment.OnThor;
 
-EXPORT V2_getStudent(DATASET(ProfileBooster.V2_Layouts.Layout_PB2_Slim) PBslim) := FUNCTION
+EXPORT V2_Key_getStudent(DATASET(ProfileBooster.V2_Key_Layouts.Layout_PB2_Slim) PBslim) := FUNCTION
 
-ProfileBooster.V2_Layouts.Layout_PB2_Slim_student	addStudent(PBslim le, american_student_list.key_DID ri) := transform
+ProfileBooster.V2_Key_Layouts.Layout_PB2_Slim_student	addStudent(PBslim le, american_student_list.key_DID ri) := transform
 		self.student_date_first_seen	:= ri.date_first_seen;
 		self.student_date_last_seen		:= ri.date_last_seen;
     self.student_college_code			  := MAP(ri.college_code = '1' => '3',
@@ -182,7 +182,7 @@ students_thor := join(
   hsStudents := dedup(sort(students((NOT student_file_type IN ['C','H','O']) OR (student_file_type='M' and student_college_name='')), seq, DID2, -student_date_last_seen, -student_date_first_seen,src),seq, DID2, local);
   collStudents := SORT(students(student_file_type IN ['C','H','O'] OR (student_file_type='M' and student_college_name<>'')), seq, DID2, -student_date_last_seen, -student_date_first_seen,src, local);
 //rollup to accumulate the counts 
-  ProfileBooster.V2_Layouts.Layout_PB2_Slim_student rollStudents(ProfileBooster.V2_Layouts.Layout_PB2_Slim_student le, ProfileBooster.V2_Layouts.Layout_PB2_Slim_student ri) := transform
+  ProfileBooster.V2_Key_Layouts.Layout_PB2_Slim_student rollStudents(ProfileBooster.V2_Key_Layouts.Layout_PB2_Slim_student le, ProfileBooster.V2_Key_Layouts.Layout_PB2_Slim_student ri) := transform
     PL_EduCollSrcEmrgOldestDt       := map(le.student_date_first_seen = '0'		=> (INTEGER)ri.student_date_first_seen,
                                            ri.student_date_first_seen = '0'		=> (INTEGER)le.student_date_first_seen,
 																													 min((INTEGER)le.student_date_first_seen, (INTEGER)ri.student_date_first_seen));
@@ -267,7 +267,7 @@ students_thor := join(
 	
   rolledStudents := rollup(collStudents, rollStudents(left,right), seq, local);
 
-  // ProfileBooster.V2_Layouts.Layout_PB2_Slim_student xfm_GetStudentInquiries(ProfileBooster.V2_Layouts.Layout_PB2_Slim_student le, Inquiry_AccLogs.Key_Inquiry_DID ri) := TRANSFORM 
+  // ProfileBooster.V2_Key_Layouts.Layout_PB2_Slim_student xfm_GetStudentInquiries(ProfileBooster.V2_Key_Layouts.Layout_PB2_Slim_student le, Inquiry_AccLogs.Key_Inquiry_DID ri) := TRANSFORM 
     // SELF.DemEduCollEvidFlagEv := MAP(
                                       // ri.s_did = le.did        => '1',
                                       // le.DemEduCollEvidFlagEv);
@@ -298,7 +298,7 @@ students_thor := join(
 						inner, atmost(riskwise.max_atmost * 5));	
 */  
   
-  ProfileBooster.V2_Layouts.Layout_PB2_Slim_student xfm_HS_Students(ProfileBooster.V2_Layouts.Layout_PB2_Slim_student le) := transform
+  ProfileBooster.V2_Key_Layouts.Layout_PB2_Slim_student xfm_HS_Students(ProfileBooster.V2_Key_Layouts.Layout_PB2_Slim_student le) := transform
     self.DemEduCollCurrFlag           := 0;
     self.DemEduCollFlagEv             := 0;
     self.DemEduCollNewLevelEv         := IF(le.DemEduCollFlagEv=1 AND le.student_college_code='',

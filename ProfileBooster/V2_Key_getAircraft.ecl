@@ -1,7 +1,7 @@
 ﻿IMPORT ProfileBooster, _Control, faa, RiskWise, ut, Risk_Indicators;
 onThor := _Control.Environment.OnThor;
 
-EXPORT V2_getAircraft(DATASET(ProfileBooster.V2_Layouts.Layout_PB2_Slim) PBslim) := FUNCTION
+EXPORT V2_Key_getAircraft(DATASET(ProfileBooster.V2_Key_Layouts.Layout_PB2_Slim) PBslim) := FUNCTION
 
 ACIdsKey := faa.key_aircraft_did(false);
 
