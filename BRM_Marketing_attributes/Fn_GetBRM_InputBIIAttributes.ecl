@@ -15,20 +15,19 @@ EXPORT Fn_GetBRM_InputBIIAttributes(DATASET(PublicRecords_KEL.ECL_Functions.Layo
                          SELF.RepInput := ROWS(RIGHT),
                          SELF.BusinessInput := LEFT));
 	
-	LayoutBIIAttributes := RECORDOF( PublicRecords_KEL.Q_Input_Bus_Attributes_V1_Dynamic(
+	LayoutBIIAttributes := RECORDOF( BRM_Marketing_attributes.BRM_KEL.Q_Input_Bus_Attributes_V1_Dynamic(
 																	DATASET([], PublicRecords_KEL.ECL_Functions.Layouts.LayoutInputPII), 
 																	DATASET([], PublicRecords_KEL.ECL_Functions.Layouts.LayoutInputBII), 
                          0, 
 												       PublicRecords_KEL.CFG_Compile.Permit__NONE).res0);
 	
 	BIIAttributes_Results := PROJECT(BIIAttributesInput, TRANSFORM(LayoutBIIAttributes,
-	NonFCRABIIResults := PublicRecords_KEL.Q_Input_Bus_Attributes_V1_Dynamic(
-                        LEFT.RepInput,
-                        DATASET(LEFT.BusinessInput),
-                        (INTEGER)LEFT.BusinessInput.B_InpClnArchDt[1..8],
-                        Options.KEL_Permissions_Mask).res0;
-					
-                        SELF := NonFCRABIIResults[1]));
+													NonFCRABIIResults := BRM_Marketing_attributes.BRM_KEL.Q_Input_Bus_Attributes_V1_Dynamic(
+													LEFT.RepInput,
+													DATASET(LEFT.BusinessInput),
+													(INTEGER)LEFT.BusinessInput.B_InpClnArchDt[1..8],
+													Options.KEL_Permissions_Mask).res0;
+													SELF := NonFCRABIIResults[1]));
 	 
 	InputPIIBIIAttributes := KEL.Clean(BIIAttributes_Results,TRUE, TRUE, TRUE);
 	ds_changedatatype :=
