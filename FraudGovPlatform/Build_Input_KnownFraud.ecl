@@ -1,7 +1,7 @@
-﻿IMPORT tools,STD, FraudGovPlatform_Validation, FraudShared,ut,_Validate; 
+﻿IMPORT tools,STD, FraudGovPlatform_Validation, ut,_Validate; 
 EXPORT Build_Input_KnownFraud(
 	 string pversion
-	,dataset(FraudShared.Layouts.Input.mbs) MBS_Sprayed = FraudShared.Files().Input.MBS.sprayed
+	,dataset(Layouts.Input.mbs) MBS_Sprayed = Files().Input.MBS.sprayed
 	,dataset(Layouts.Input.KnownFraud) KnownFraud_Sprayed =  files().Input.KnownFraud.sprayed	
 	,dataset(Layouts.Input.KnownFraud) ByPassed_KnownFraud_Sprayed = files().Input.ByPassed_KnownFraud.sprayed	
 ) :=

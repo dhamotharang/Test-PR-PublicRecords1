@@ -1,4 +1,4 @@
-﻿IMPORT FraudShared, tools;
+﻿IMPORT tools;
 EXPORT Build_Base(
 	 string	pversion
 ) :=

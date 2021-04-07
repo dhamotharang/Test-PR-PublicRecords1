@@ -1,7 +1,7 @@
-﻿IMPORT tools,STD, FraudGovPlatform_Validation, FraudShared, ut,_Validate;
+﻿IMPORT tools,STD, FraudGovPlatform_Validation, ut,_Validate;
 EXPORT Build_Input_IdentityData(
 	 string pversion
-	,dataset(FraudShared.Layouts.Input.mbs) MBS_Sprayed = FraudShared.Files().Input.MBS.sprayed
+	,dataset(Layouts.Input.mbs) MBS_Sprayed = Files().Input.MBS.sprayed
 	,dataset(Layouts.Input.IdentityData) IdentityData_Sprayed =  files().Input.IdentityData.sprayed	
 	,dataset(Layouts.Input.IdentityData) ByPassed_IdentityData_Sprayed = files().Input.ByPassed_IdentityData.sprayed
 ) :=
