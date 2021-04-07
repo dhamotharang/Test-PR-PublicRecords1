@@ -1,5 +1,4 @@
-﻿import FraudShared;
-EXPORT Mod_Collisions(DATASET(FraudShared.Layouts.Base.Main) FileBase) := Module
+﻿EXPORT Mod_Collisions(DATASET(FraudGovPlatform.Layouts.Base.Main) FileBase) := Module
 
 SHARED threashold:=enum(unsigned1,Low,Medium,High);
 SHARED ssn_threashold:=threashold;

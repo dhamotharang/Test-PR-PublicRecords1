@@ -1,7 +1,7 @@
 Export Append_CleanName (
 	FileBase
 ) := FUNCTIONMACRO
-		IMPORT FraudShared,NID, Address;		
+		IMPORT NID, Address;		
 
 		useFullname := FileBase(raw_first_name = '' and raw_middle_name = '' and raw_last_name ='' and raw_full_name != '');
 		useFields := FileBase(raw_first_name != '' or raw_middle_name !='' or raw_last_name != '');
@@ -50,7 +50,7 @@ Export Append_CleanName (
             FileBase, 
             CleanedNames, 
                 LEFT.record_id = RIGHT.record_id,
-            TRANSFORM(FraudShared.Layouts.Base.Main, 
+            TRANSFORM(FraudGovPlatform.Layouts.Base.Main, 
 				SELF.cleaned_name.title       := IF (LEFT.record_id = RIGHT.record_id, RIGHT.cleaned_name.title, LEFT.cleaned_name.title);
 				SELF.cleaned_name.fname       := IF (LEFT.record_id = RIGHT.record_id, RIGHT.cleaned_name.fname, LEFT.cleaned_name.fname);
 				SELF.cleaned_name.mname       := IF (LEFT.record_id = RIGHT.record_id, RIGHT.cleaned_name.mname, LEFT.cleaned_name.mname);
@@ -65,7 +65,7 @@ Export Append_CleanName (
 
 		CleanedRecs15 := PROJECT(
             CleanedRecs,
-            TRANSFORM(FraudShared.Layouts.Base.Main, 
+            TRANSFORM(FraudGovPlatform.Layouts.Base.Main, 
 				cleaned_fullname:= ut.CleanSpacesAndUpper(LEFT.cleaned_name.fname+LEFT.cleaned_name.mname+LEFT.cleaned_name.lname);
 				raw_fullname:=ut.CleanSpacesAndUpper(LEFT.raw_first_name+LEFT.raw_middle_name+LEFT.raw_middle_name);
 				SELF.cleaned_name.title       := IF (cleaned_fullname = '' and raw_fullname != '', LEFT.raw_title, LEFT.cleaned_name.title);
