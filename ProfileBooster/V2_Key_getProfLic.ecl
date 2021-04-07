@@ -1,7 +1,7 @@
 import _Control, prof_licenseV2, riskwise, ut, ProfileBooster, Risk_Indicators, Doxie, Suppress, STD;
 onThor := _Control.Environment.OnThor;
 
-export V2_getProfLic(DATASET(ProfileBooster.V2_Layouts.Layout_PB2_Slim) PBslim,
+export V2_Key_getProfLic(DATASET(ProfileBooster.V2_Key_Layouts.Layout_PB2_Slim) PBslim,
 							  doxie.IDataAccess mod_access = MODULE (doxie.IDataAccess) END) := FUNCTION
 
 string8 proflic_build_date := Risk_Indicators.get_Build_date('proflic_build_version');
@@ -10,7 +10,7 @@ checkDays(string8 d1, string8 d2, unsigned2 days) := ut.DaysApart(d1,d2) <= days
 
 key_did := prof_licenseV2.key_proflic_did(false);
 
-{ProfileBooster.V2_Layouts.Layout_PB2_Slim_profLic, UNSIGNED4 global_sid} addProfLic(PBslim le, key_did rt) := transform
+{ProfileBooster.V2_Key_Layouts.Layout_PB2_Slim_profLic, UNSIGNED4 global_sid} addProfLic(PBslim le, key_did rt) := transform
 	self.global_sid := rt.global_sid;
 	hit := trim(rt.prolic_key)!='';	// make sure we have a good record
 	myGetDate := Risk_Indicators.iid_constants.myGetDate(le.historydate);
@@ -30,7 +30,7 @@ end;
 
 license_recs_original_thor_unsuppressed := join(
 distribute(PBslim(did2<>0), did2), 
-distribute(pull(key_did(STD.Str.touppercase(source_st) not in ProfileBooster.V2_Constants.setProfLicStatesRes)), did),
+distribute(pull(key_did(STD.Str.touppercase(source_st) not in ProfileBooster.V2_Key_Constants.setProfLicStatesRes)), did),
 											left.did2=right.did and
 											(unsigned)(right.date_last_seen[1..6]) < (unsigned)((string8)left.historydate)[1..6],
 											addProfLic(left,right), left outer, atmost(left.did2=right.did,riskwise.max_atmost),
@@ -40,7 +40,7 @@ license_recs_original_thor_filtered := 	license_recs_original_thor_unsuppressed(
 		
 license_recs_original_thor_flagged := Suppress.MAC_FlagSuppressedSource(license_recs_original_thor_filtered, mod_access);
 
-license_recs_original_thor := PROJECT(license_recs_original_thor_flagged, TRANSFORM(ProfileBooster.V2_Layouts.Layout_PB2_Slim_profLic, 
+license_recs_original_thor := PROJECT(license_recs_original_thor_flagged, TRANSFORM(ProfileBooster.V2_Key_Layouts.Layout_PB2_Slim_profLic, 
 	self.prolic_key :=  IF(left.is_suppressed, Suppress.OptOutMessage('STRING'), left.prolic_key);
 	self.date_first_seen :=  IF(left.is_suppressed, Suppress.OptOutMessage('STRING'), left.date_first_seen);
 	self.professional_license_flag :=  IF(left.is_suppressed, false, left.professional_license_flag);
@@ -70,7 +70,7 @@ mari_data := risk_indicators.Boca_Shell_Mari(preMari, isFCRA, isPreScreen, mod_a
 mari_recs := join (preMari, mari_data,
 		left.seq=right.seq and
 		left.did=right.did,
-		transform (ProfileBooster.V2_Layouts.Layout_PB2_Slim_profLic, 
+		transform (ProfileBooster.V2_Key_Layouts.Layout_PB2_Slim_profLic, 
 			self.rec_type := (unsigned)left.fname;
 			hit := trim(right.license_nbr)!='';	// check to see that we have a good record
 			myGetDate := Risk_Indicators.iid_constants.myGetDate(left.historydate);
@@ -89,7 +89,7 @@ mari_recs := join (preMari, mari_data,
 
 license_recs := ungroup(license_recs_original) + ungroup(mari_recs);
 										
-ProfileBooster.V2_Layouts.Layout_PB2_Slim_profLic roll_licenses(ProfileBooster.V2_Layouts.Layout_PB2_Slim_profLic le, ProfileBooster.V2_Layouts.Layout_PB2_Slim_profLic rt) := transform
+ProfileBooster.V2_Key_Layouts.Layout_PB2_Slim_profLic roll_licenses(ProfileBooster.V2_Key_Layouts.Layout_PB2_Slim_profLic le, ProfileBooster.V2_Key_Layouts.Layout_PB2_Slim_profLic rt) := transform
 	self.professional_license_flag := le.professional_license_flag or rt.professional_license_flag;
 	self.proflic_count := Max(le.proflic_count, rt.proflic_count);
 	self.license_type := if(le.license_type<>'', le.license_type, rt.license_type);	// keep the most current license type
@@ -98,7 +98,7 @@ end;
 
 rolled_licenses := rollup(group(sort(license_recs, seq, did2, prolic_key), seq, did2, prolic_key), true, roll_licenses(left,right));	
 
-ProfileBooster.V2_Layouts.Layout_PB2_Slim_profLic roll_licenses2(ProfileBooster.V2_Layouts.Layout_PB2_Slim_profLic le, ProfileBooster.V2_Layouts.Layout_PB2_Slim_profLic rt) := transform
+ProfileBooster.V2_Key_Layouts.Layout_PB2_Slim_profLic roll_licenses2(ProfileBooster.V2_Key_Layouts.Layout_PB2_Slim_profLic le, ProfileBooster.V2_Key_Layouts.Layout_PB2_Slim_profLic rt) := transform
 	self.professional_license_flag := le.professional_license_flag or rt.professional_license_flag;
 	self.proflic_count := le.proflic_count+rt.proflic_count;
 	self.license_type := if(le.license_type<>'', le.license_type, rt.license_type);	// keep the most current license type
@@ -110,10 +110,10 @@ with_category_v5_thor1 := join(
 	distribute(rolled_licenses2(license_type<>''), hash(license_type)), 
 	distribute(pull(Prof_LicenseV2.Key_LicenseType_lookup(false)), hash(license_type)), 
 		left.license_type=right.license_type, 	
-			transform(ProfileBooster.V2_Layouts.Layout_PB2_Slim_profLic, 
+			transform(ProfileBooster.V2_Key_Layouts.Layout_PB2_Slim_profLic, 
 			self.jobCategory := right.occupation; 
 			self.PLcategory := right.category;
-			self.ActiveNewTitleType := ProfileBooster.V2_Common.getProfLicActiveNewTitleType((STRING)right.occupation, (INTEGER)right.category);
+			self.ActiveNewTitleType := ProfileBooster.V2_Key_Common.getProfLicActiveNewTitleType((STRING)right.occupation, (INTEGER)right.category);
 			self := left), left outer, atmost(100), keep(1),
 		local);
 with_category_v5_thor := with_category_v5_thor1 + rolled_licenses2(license_type='');  // add back the records with empty license type

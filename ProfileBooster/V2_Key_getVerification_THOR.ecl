@@ -1,7 +1,7 @@
 ﻿import _Control, Risk_Indicators, dx_header, dx_Gong, RiskWise, InfutorCID, Gong, header_quick, MDR, ut, address, AID_Build, ProfileBooster;
 onThor := _Control.Environment.OnThor;
 
-EXPORT V2_getVerification_THOR(DATASET(ProfileBooster.V2_Layouts.Layout_PB2_Shell) PBShell) := FUNCTION
+EXPORT V2_Key_getVerification_THOR(DATASET(ProfileBooster.V2_Key_Layouts.Layout_PB2_Shell) PBShell) := FUNCTION
 
 	nines	 := 9999999;
 
@@ -11,38 +11,10 @@ header_key := dx_header.key_header();
 quickheader_key := header_quick.key_DID;
 address_rank_key := dx_header.key_addr_hist();
 
-
-// EXPORT	ProspectEmergence := RECORD
-// 		INTEGER3		EmrgAge := dx_ProfileBooster.Constants.MISSING_INPUT_DATA_INT;
-// 		INTEGER3		EmrgAtOrAfter21Flag := dx_ProfileBooster.Constants.MISSING_INPUT_DATA_INT;
-// 		INTEGER3		EmrgRecordType := dx_ProfileBooster.Constants.MISSING_INPUT_DATA_INT;
-// 		INTEGER3		EmrgAddressHRIndex := dx_ProfileBooster.Constants.MISSING_INPUT_DATA_INT;
-// 		INTEGER3		EmrgLexIDsAtEmrgAddrCnt1Y := dx_ProfileBooster.Constants.MISSING_INPUT_DATA_INT;
-// 		INTEGER3		EmrgAge25to59Flag := dx_ProfileBooster.Constants.MISSING_INPUT_DATA_INT;
-// 	END;
-
-// 	EXPORT  ProspectEmergenceHelpers := RECORD
-// 		STRING      	EmrgDOB := dx_ProfileBooster.Constants.MISSING_INPUT_DATA;
-// 		STRING2			EmrgSrc;
-// 		STRING   		EmrgAddrFull;
-// 		STRING10 		EmrgPrimaryRange;
-// 		STRING6  		EmrgPredirectional;
-// 		STRING28 		EmrgPrimaryName;
-// 		STRING6  		EmrgSuffix;
-// 		STRING6  		EmrgPostdirectional;
-// 		STRING10 		EmrgUnitDesignation;
-// 		STRING8  		EmrgSecondaryRange;
-// 		STRING6  		EmrgZIP5;
-// 		STRING6  		EmrgZIP4;
-// 		STRING25 		EmrgCity_Name;
-// 		STRING6  		EmrgSt;
-// 	END;
-
-
-//search Infutor by DID to verify input name, address, phone
-	ProfileBooster.V2_Layouts.Layout_PB2_Shell getInfutor(PBShell le, infutorcid_key ri) := transform	
-		EmrgDt_first_seen        := IF(ri.dt_first_seen=0,99998888,ri.dt_first_seen);
-		self.EmrgDt_first_seen   := EmrgDt_first_seen;
+	//search Infutor by DID to verify input name, address, phone
+	ProfileBooster.V2_Key_Layouts.Layout_PB2_Shell getInfutor(PBShell le, infutorcid_key ri) := transform	
+		EmrgDt_first_seen        := IF(ri.dt_first_seen=0,'99998888',ProfileBooster.V2_Key_Common.convertDateTo8((STRING)ri.dt_first_seen));
+		self.EmrgDt_first_seen   := (UNSIGNED6)ProfileBooster.V2_Key_Common.convertDateTo8(EmrgDt_first_seen);
 		self.EmrgSrc             := MDR.sourceTools.src_InfutorCID;
 		//No DOB in InfutorCID
 		self.EmrgPrimaryRange    := ri.prim_range;
@@ -76,15 +48,15 @@ address_rank_key := dx_header.key_addr_hist();
 										left.did<>0 and
 										left.did=right.did and
 										right.dt_first_seen < (unsigned)risk_indicators.iid_constants.myGetDate(left.historydate),
-										getInfutor(left,right), left outer, KEEP(100), local);
+										 getInfutor(left,right), left outer, KEEP(100), local);
 
 	wInfutorCid := wInfutorCid_thor;
   
 //search Gong by DID to verify input name, address, phone
-	ProfileBooster.V2_Layouts.Layout_PB2_Shell getGong(PBShell le, gonghistorydid_key ri) := transform	
-		OlderErmgRecord := (UNSIGNED6)(((STRING)ri.dt_first_seen)[1..6]) <= (UNSIGNED6)(((STRING)le.EmrgDt_first_seen)[1..6]) OR le.EmrgDt_first_seen IN [0,99998]; 
-		EmrgDt_first_seen        := IF(ri.dt_first_seen='0',(STRING)le.EmrgDt_first_seen,(STRING)ri.dt_first_seen);
-		self.EmrgDt_first_seen   := IF(OlderErmgRecord,(UNSIGNED6)ri.dt_first_seen,(UNSIGNED6)EmrgDt_first_seen);
+	ProfileBooster.V2_Key_Layouts.Layout_PB2_Shell getGong(PBShell le, gonghistorydid_key ri) := transform	
+		OlderErmgRecord := (UNSIGNED6)(((STRING)ri.dt_first_seen)[1..6]) <= (UNSIGNED6)(((STRING)le.EmrgDt_first_seen)[1..6]) OR ProfileBooster.V2_Key_Common.convertDateTo8((STRING)le.EmrgDt_first_seen) IN ['0','99998','99998888']; 
+		EmrgDt_first_seen        := IF(ri.dt_first_seen='0',ProfileBooster.V2_Key_Common.convertDateTo8((STRING)le.EmrgDt_first_seen),ProfileBooster.V2_Key_Common.convertDateTo8((STRING)ri.dt_first_seen));
+		self.EmrgDt_first_seen   := IF(OlderErmgRecord,(UNSIGNED6)ProfileBooster.V2_Key_Common.convertDateTo8((STRING)ri.dt_first_seen),(UNSIGNED6)EmrgDt_first_seen);
 		self.EmrgSrc             := IF(OlderErmgRecord,ri.src,le.EmrgSrc);
 		//No DOB in Gong
 		self.EmrgPrimaryRange    := IF(OlderErmgRecord,ri.prim_range,le.EmrgPrimaryRange);
@@ -123,10 +95,13 @@ address_rank_key := dx_header.key_addr_hist();
 	wGong := wGong_thor;
 
 	//search header by DID to verify input name, address, phone, SSN	
-	ProfileBooster.V2_Layouts.Layout_PB2_Shell getHeader(ProfileBooster.V2_Layouts.Layout_PB2_Shell le, header_key ri) := transform
-		OlderErmgRecord := (UNSIGNED6)(((STRING)ri.dt_first_seen)[1..6]) <= (UNSIGNED6)(((STRING)le.EmrgDt_first_seen)[1..6]) OR le.EmrgDt_first_seen IN [0,99998]; 
-		EmrgDt_first_seen        := IF(ri.dt_first_seen=0,le.EmrgDt_first_seen,ri.dt_first_seen);
-		self.EmrgDt_first_seen   := IF(OlderErmgRecord,(UNSIGNED6)ri.dt_first_seen,EmrgDt_first_seen);
+	ProfileBooster.V2_Key_Layouts.Layout_PB2_Shell getHeader(ProfileBooster.V2_Key_Layouts.Layout_PB2_Shell le, header_key ri) := transform
+		OlderErmgRecord := (UNSIGNED6)(((STRING)ri.dt_first_seen)[1..6]) <= (UNSIGNED6)(((STRING)le.EmrgDt_first_seen)[1..6]) OR ProfileBooster.V2_Key_Common.convertDateTo8((STRING)le.EmrgDt_first_seen) IN ['0','99998','99998888']; 
+		EmrgDt_first_seen        := IF((STRING)ri.dt_first_seen='0',ProfileBooster.V2_Key_Common.convertDateTo8((STRING)le.EmrgDt_first_seen),ProfileBooster.V2_Key_Common.convertDateTo8((STRING)ri.dt_first_seen));
+		self.EmrgDt_first_seen   := IF(OlderErmgRecord,(UNSIGNED6)ProfileBooster.V2_Key_Common.convertDateTo8((STRING)ri.dt_first_seen),(UNSIGNED6)EmrgDt_first_seen);
+		// OlderErmgRecord := (UNSIGNED6)((ProfileBooster.V2_Key_Common.convertDateTo8((STRING)ri.dt_first_seen))[1..6]) <= (UNSIGNED6)((ProfileBooster.V2_Key_Common.convertDateTo8((STRING)le.EmrgDt_first_seen))[1..6]) OR ProfileBooster.V2_Key_Common.convertDateTo8((STRING)le.EmrgDt_first_seen) IN ['0','99998','99998888']; 
+		// EmrgDt_first_seen        := IF(ProfileBooster.V2_Key_Common.convertDateTo8((STRING)ri.dt_first_seen)='0',(UNSIGNED6)ProfileBooster.V2_Key_Common.convertDateTo8((STRING)le.EmrgDt_first_seen),(UNSIGNED6)ProfileBooster.V2_Key_Common.convertDateTo8((STRING)ri.dt_first_seen));
+		// self.EmrgDt_first_seen   := IF(OlderErmgRecord,(UNSIGNED6)ProfileBooster.V2_Key_Common.convertDateTo8((STRING)ri.dt_first_seen),(UNSIGNED6)EmrgDt_first_seen);
 		self.EmrgSrc             := IF(OlderErmgRecord,ri.src,le.EmrgSrc);
 		EmrgDob	:= MAP(~OlderErmgRecord or ri.dob=0           => le.EmrgDob, 
 		               ri.src=mdr.sourceTools.src_TUCS_Ptrack => le.EmrgDob, 
@@ -192,19 +167,20 @@ address_rank_key := dx_header.key_addr_hist();
 		self					 := le;
 	end;
 	
-	wHeader_thor := join(distribute(PBShell, did), distribute(pull(header_key), s_did),	
+	wHeader := join(distribute(PBShell, did), distribute(pull(header_key), s_did),	
 										left.DID <> 0 and
 										left.DID = right.s_DID and
 										right.src in MDR.sourcetools.set_Marketing_Header and
 										right.dt_first_seen <> 0 and right.dt_first_seen < left.historydate,
 									getHeader(left, right), left outer, keep(200), local);
 
-	wHeader := wHeader_thor;
-  
-	ProfileBooster.V2_Layouts.Layout_PB2_Shell getQHeader(ProfileBooster.V2_Layouts.Layout_PB2_Shell le, quickheader_key ri) := transform
-		OlderErmgRecord := (UNSIGNED6)(((STRING)ri.dt_first_seen)[1..6]) <= (UNSIGNED6)(((STRING)le.EmrgDt_first_seen)[1..6]) OR le.EmrgDt_first_seen=0; 
-		EmrgDt_first_seen := IF(OlderErmgRecord,ri.dt_first_seen,le.EmrgDt_first_seen);
-		self.EmrgDt_first_seen   := IF(OlderErmgRecord,(UNSIGNED6)ri.dt_first_seen,EmrgDt_first_seen);
+  	ProfileBooster.V2_Key_Layouts.Layout_PB2_Shell getQHeader(ProfileBooster.V2_Key_Layouts.Layout_PB2_Shell le, quickheader_key ri) := transform
+		OlderErmgRecord := (UNSIGNED6)(((STRING)ri.dt_first_seen)[1..6]) <= (UNSIGNED6)(((STRING)le.EmrgDt_first_seen)[1..6]) OR ProfileBooster.V2_Key_Common.convertDateTo8((STRING)le.EmrgDt_first_seen) IN ['0','99998','99998888']; 
+		EmrgDt_first_seen        := IF((STRING)ri.dt_first_seen='0',ProfileBooster.V2_Key_Common.convertDateTo8((STRING)le.EmrgDt_first_seen),ProfileBooster.V2_Key_Common.convertDateTo8((STRING)ri.dt_first_seen));
+		self.EmrgDt_first_seen   := IF(OlderErmgRecord,(UNSIGNED6)ProfileBooster.V2_Key_Common.convertDateTo8((STRING)ri.dt_first_seen),(UNSIGNED6)EmrgDt_first_seen);
+		// OlderErmgRecord := (UNSIGNED6)(((STRING)ri.dt_first_seen)[1..6]) <= (UNSIGNED6)(((STRING)le.EmrgDt_first_seen)[1..6]) OR ProfileBooster.V2_Key_Common.convertDateTo8((STRING)le.EmrgDt_first_seen) IN ['0','99998','99998888']; 
+		// EmrgDt_first_seen := IF(OlderErmgRecord,ProfileBooster.V2_Key_Common.convertDateTo8((STRING)ri.dt_first_seen),ProfileBooster.V2_Key_Common.convertDateTo8((STRING)le.EmrgDt_first_seen));
+		// self.EmrgDt_first_seen   := IF(OlderErmgRecord,(UNSIGNED6)ProfileBooster.V2_Key_Common.convertDateTo8((STRING)ri.dt_first_seen),(UNSIGNED6)EmrgDt_first_seen);
 		self.EmrgSrc             := IF(OlderErmgRecord,ri.src,le.EmrgSrc);
 		EmrgDob	:= MAP(~OlderErmgRecord or ri.dob=0           => le.EmrgDob, 
 		               ri.src=mdr.sourceTools.src_TUCS_Ptrack => le.EmrgDob, 
@@ -279,7 +255,7 @@ address_rank_key := dx_header.key_addr_hist();
 	sortVer := sort(ungroup(wInfutorCid + wGong + wHeader + wQHeader), seq);
 
 //rollup to accumulate the verification counts 
-  	ProfileBooster.V2_Layouts.Layout_PB2_Shell rollVer(ProfileBooster.V2_Layouts.Layout_PB2_Shell le, ProfileBooster.V2_Layouts.Layout_PB2_Shell ri) := transform
+  	ProfileBooster.V2_Key_Layouts.Layout_PB2_Shell rollVer(ProfileBooster.V2_Key_Layouts.Layout_PB2_Shell le, ProfileBooster.V2_Key_Layouts.Layout_PB2_Shell ri) := transform
 		self.firstcount		:= le.firstcount + ri.firstcount;
 		self.lastcount		:= le.lastcount + ri.lastcount;
 		self.addrcount		:= le.addrcount + ri.addrcount;
@@ -295,8 +271,8 @@ address_rank_key := dx_header.key_addr_hist();
 		self.HHID							:= if(le.HHID <> 0, le.HHID, ri.HHID);		//keep whichever is populated	
 		self.VerifiedCurrResMatchIndex	:= if(ri.VerifiedCurrResMatchIndex = '1', ri.VerifiedCurrResMatchIndex, le.VerifiedCurrResMatchIndex);
 		
-		OlderErmgRecord := (UNSIGNED6)(((STRING)ri.EmrgDt_first_seen)[1..6]) <= (UNSIGNED6)(((STRING)le.EmrgDt_first_seen)[1..6]) OR le.EmrgDt_first_seen=0;
-		self.EmrgDt_first_seen   := IF(OlderErmgRecord,ri.EmrgDt_first_seen,le.EmrgDt_first_seen);
+		OlderErmgRecord := (UNSIGNED6)(((STRING)ri.EmrgDt_first_seen)[1..6]) <= (UNSIGNED6)(((STRING)le.EmrgDt_first_seen)[1..6]) OR ProfileBooster.V2_Key_Common.convertDateTo8((STRING)le.EmrgDt_first_seen) IN ['0','99998','99998888'];
+		self.EmrgDt_first_seen   := IF(OlderErmgRecord,(UNSIGNED6)ProfileBooster.V2_Key_Common.convertDateTo8((STRING)ri.EmrgDt_first_seen),(UNSIGNED6)ProfileBooster.V2_Key_Common.convertDateTo8((STRING)le.EmrgDt_first_seen));
 		self.EmrgSrc             := IF(OlderErmgRecord,ri.EmrgSrc,le.EmrgSrc);
 		EmrgDob					 := IF(OlderErmgRecord,ri.EmrgDob,le.EmrgDob);
 		self.EmrgDob			 := EmrgDob;
@@ -327,7 +303,7 @@ address_rank_key := dx_header.key_addr_hist();
 	
   	rolledVer := rollup(sortVer, rollVer(left,right), seq);
 
-	ProfileBooster.V2_Layouts.Layout_PB2_Shell addVerification(PBShell le, rolledVer ri) := TRANSFORM
+	ProfileBooster.V2_Key_Layouts.Layout_PB2_Shell addVerification(PBShell le, rolledVer ri) := TRANSFORM
 		self.firstscore 		 := ri.firstscore;
 		self.firstcount 		 := ri.firstcount;
 		self.lastscore 			 := ri.lastscore;
@@ -345,7 +321,7 @@ address_rank_key := dx_header.key_addr_hist();
 		self.title				 := ri.title;					
 		self.HHID				 := ri.HHID;		
 		self.VerifiedCurrResMatchIndex	:= ri.VerifiedCurrResMatchIndex;
-		self.EmrgDt_first_seen	 := ri.EmrgDt_first_seen;
+		self.EmrgDt_first_seen	 := (UNSIGNED6)ProfileBooster.V2_Key_Common.convertDateTo8((STRING)ri.EmrgDt_first_seen);
 		self.EmrgSrc             := ri.EmrgSrc;
 		self.EmrgDob			 := ri.EmrgDob;
     	self.EmrgAge   			 := ri.EmrgAge;
@@ -375,7 +351,7 @@ address_rank_key := dx_header.key_addr_hist();
 
 	
 //join all addresses from the header to the address history key to determine current address versus previous address
-	ProfileBooster.V2_Layouts.Layout_PB2_Shell getAddrSeq(dedupHdr le, address_rank_key ri) := TRANSFORM
+	ProfileBooster.V2_Key_Layouts.Layout_PB2_Shell getAddrSeq(dedupHdr le, address_rank_key ri) := TRANSFORM
 		single_instance_address 	:= ri.addressstatus[5]='S';
 		addr1 := address.Addr1FromComponents(ri.prim_range,ri.predir,ri.prim_name,ri.suffix,ri.postdir,ri.unit_desig,ri.sec_range);
 		address_history_seq := map( 
@@ -409,21 +385,21 @@ address_rank_key := dx_header.key_addr_hist();
 	goodAddrs := group(sort(wAddrSeq(address_history_seq <> 255), seq, address_history_seq), seq);
 	
 //reassign the sequence number in case there are holes (eg - change 1,3,4... to 1,2,3...) 
-	reseqAddrs := iterate(goodAddrs, transform(ProfileBooster.V2_Layouts.Layout_PB2_Shell, self.address_history_seq := counter, self := right));
+	reseqAddrs := iterate(goodAddrs, transform(ProfileBooster.V2_Key_Layouts.Layout_PB2_Shell, self.address_history_seq := counter, self := right));
 
 // with_hdr_addr_cache := reseqAddrs;
 
 
 	aid_key := AID_Build.Key_AID_Base;
 	
-	ProfileBooster.V2_Layouts.Layout_PB2_Shell append_addr_type(ProfileBooster.V2_Layouts.Layout_PB2_Shell le, aid_key rt) := transform
+	ProfileBooster.V2_Key_Layouts.Layout_PB2_Shell append_addr_type(ProfileBooster.V2_Key_Layouts.Layout_PB2_Shell le, aid_key rt) := transform
 		unparsedAddress := address.Addr1FromComponents(le.hdr_prim_range, le.hdr_predir, le.hdr_prim_name, le.hdr_addr_suffix, le.hdr_postdir, le.hdr_unit_desig, le.hdr_sec_range);
 		self.hdr_addr_type		:= risk_indicators.iid_constants.override_addr_type(unparsedAddress, 
 																		rt.rec_type,
 																		rt.cart);
 		self.hdr_addr_status			:= rt.err_stat;
-    self.curr_addr_rawaid     := rt.rawaid;
-    self.prev_addr_rawaid     := rt.rawaid;
+    	self.curr_addr_rawaid     := rt.rawaid;
+    	self.prev_addr_rawaid     := rt.rawaid;
 		self := le;
 	end;
 	
@@ -439,61 +415,61 @@ address_rank_key := dx_header.key_addr_hist();
 
 	withAddrs := join(wVerification, with_hdr_addr_cache,  
 												left.seq = right.seq,
-												transform(ProfileBooster.V2_Layouts.Layout_PB2_Shell,
+												transform(ProfileBooster.V2_Key_Layouts.Layout_PB2_Shell,
 																	isInputAddr						:= left.prim_range = right.hdr_prim_range and left.prim_name = right.hdr_prim_name and left.z5 = right.hdr_z5; 
                                   HdrAddrFull           := TRIM(Address.Addr1FromComponents(right.hdr_prim_range,right.hdr_predir,right.hdr_prim_name,
                                                                                        right.hdr_addr_suffix,right.hdr_postdir,right.hdr_unit_desig, 
                                                                                        right.hdr_sec_range))+' '+TRIM(right.hdr_city_name)+', '+right.hdr_st
                                                                                        +' '+right.hdr_z5+'-'+right.hdr_zip4;															    
-                                  self.address_history_seq := right.address_history_seq;                                  
-                                  self.AddrCurrFull     := if(right.address_history_seq=1, HdrAddrFull, '');                             
-                                  self.curr_addr_rawaid := if(right.address_history_seq=1, right.hdr_rawaid, 0);
-                                  self.curr_prim_range	:= if(right.address_history_seq=1, right.hdr_prim_range, '');
-																	self.curr_predir			:= if(right.address_history_seq=1, right.hdr_predir, '');
-																	self.curr_prim_name		:= if(right.address_history_seq=1, right.hdr_prim_name, '');
-																	self.curr_addr_suffix	:= if(right.address_history_seq=1, right.hdr_addr_suffix, '');
-																	self.curr_postdir			:= if(right.address_history_seq=1, right.hdr_postdir, '');
-																	self.curr_unit_desig	:= if(right.address_history_seq=1, right.hdr_unit_desig, '');
-																	self.curr_sec_range		:= if(right.address_history_seq=1, right.hdr_sec_range, '');
-																	self.curr_city_name		:= if(right.address_history_seq=1, right.hdr_city_name, '');
-																	self.curr_st					:= if(right.address_history_seq=1, right.hdr_st, '');
-																	self.curr_z5					:= if(right.address_history_seq=1, right.hdr_z5, '');
-																	self.curr_zip4				:= if(right.address_history_seq=1, right.hdr_zip4, '');
-																	self.curr_date_first_seen	:= if(right.address_history_seq=1, right.hdr_date_first_seen, 0);
-																	self.curr_date_last_seen	:= if(right.address_history_seq=1, right.hdr_date_last_seen, 0);
-																	self.LifeMoveNewMsnc	:= if(right.address_history_seq=1, right.LifeMoveNewMsnc, nines);
-																	// self.LifeMoveNewMsnc	:= if(right.address_history_seq=1, right.LifeMoveNewMsnc, left.LifeMoveNewMsnc);
-																	self.curr_addr_type		:= if(right.address_history_seq=1, right.hdr_addr_type, '');
-																	self.curr_addr_status		:= if(right.address_history_seq=1, right.hdr_addr_status, '');
-																	self.curr_county			:= if(right.address_history_seq=1, right.hdr_county, '');
-																	self.curr_geo_blk			:= if(right.address_history_seq=1, right.hdr_geo_blk, '');
-                                  isSameAddr            := left.curr_addr_rawaid=right.hdr_rawaid;
-                                  self.AddrPrevFull     := if(right.address_history_seq=2 AND ~isSameAddr, HdrAddrFull, '');
-                                  self.prev_addr_rawaid := if(right.address_history_seq=2 AND ~isSameAddr, right.hdr_rawaid, 0);
-                                  self.prev_prim_range	:= if(right.address_history_seq=2 AND ~isSameAddr, right.hdr_prim_range, '');
-																	self.prev_predir			:= if(right.address_history_seq=2 AND ~isSameAddr, right.hdr_predir, '');
-																	self.prev_prim_name		:= if(right.address_history_seq=2 AND ~isSameAddr, right.hdr_prim_name, '');
-																	self.prev_addr_suffix	:= if(right.address_history_seq=2 AND ~isSameAddr, right.hdr_addr_suffix, '');
-																	self.prev_postdir			:= if(right.address_history_seq=2 AND ~isSameAddr, right.hdr_postdir, '');
-																	self.prev_unit_desig	:= if(right.address_history_seq=2 AND ~isSameAddr, right.hdr_unit_desig, '');
-																	self.prev_sec_range		:= if(right.address_history_seq=2 AND ~isSameAddr, right.hdr_sec_range, '');
-																	self.prev_city_name		:= if(right.address_history_seq=2 AND ~isSameAddr, right.hdr_city_name, '');
-																	self.prev_st					:= if(right.address_history_seq=2 AND ~isSameAddr, right.hdr_st, '');
-																	self.prev_z5					:= if(right.address_history_seq=2 AND ~isSameAddr, right.hdr_z5, '');
-																	self.prev_zip4				:= if(right.address_history_seq=2 AND ~isSameAddr, right.hdr_zip4, '');
-																	self.prev_date_first_seen	:= if(right.address_history_seq=2 AND ~isSameAddr, right.hdr_date_first_seen, 0);
-																	self.prev_date_last_seen	:= if(right.address_history_seq=2 AND ~isSameAddr, right.hdr_date_last_seen, 0);
-																	self.prev_addr_type		:= if(right.address_history_seq=2 AND ~isSameAddr, right.hdr_addr_type, '');
-																	self.prev_addr_status		:= if(right.address_history_seq=2 AND ~isSameAddr, right.hdr_addr_status, '');
-																	self.prev_county			:= if(right.address_history_seq=2, right.hdr_county, '');
-																	self.prev_geo_blk			:= if(right.address_history_seq=2, right.hdr_geo_blk, '');
-																	self.VerifiedCurrResMatchIndex	:= if(right.address_history_seq=1 and isInputAddr, '2', left.VerifiedCurrResMatchIndex);
-																	self := left), left outer);
+                                  self.address_history_seq  := right.address_history_seq;                                  
+                                  self.AddrCurrFull         := if(right.address_history_seq=1, HdrAddrFull, '');                             
+                                  self.curr_addr_rawaid     := if(right.address_history_seq=1, right.hdr_rawaid, 0);
+                                  self.curr_prim_range	    := if(right.address_history_seq=1, right.hdr_prim_range, '');
+								  self.curr_predir			:= if(right.address_history_seq=1, right.hdr_predir, '');
+								  self.curr_prim_name		:= if(right.address_history_seq=1, right.hdr_prim_name, '');
+								  self.curr_addr_suffix	    := if(right.address_history_seq=1, right.hdr_addr_suffix, '');
+								  self.curr_postdir			:= if(right.address_history_seq=1, right.hdr_postdir, '');
+								  self.curr_unit_desig	    := if(right.address_history_seq=1, right.hdr_unit_desig, '');
+								  self.curr_sec_range		:= if(right.address_history_seq=1, right.hdr_sec_range, '');
+								  self.curr_city_name		:= if(right.address_history_seq=1, right.hdr_city_name, '');
+								  self.curr_st				:= if(right.address_history_seq=1, right.hdr_st, '');
+								  self.curr_z5				:= if(right.address_history_seq=1, right.hdr_z5, '');
+								  self.curr_zip4			:= if(right.address_history_seq=1, right.hdr_zip4, '');
+								  self.curr_date_first_seen	:= if(right.address_history_seq=1, right.hdr_date_first_seen, 0);
+								  self.curr_date_last_seen	:= if(right.address_history_seq=1, right.hdr_date_last_seen, 0);
+								  self.LifeMoveNewMsnc	    := if(right.address_history_seq=1, right.LifeMoveNewMsnc, nines);
+								  // self.LifeMoveNewMsnc	:= if(right.address_history_seq=1, right.LifeMoveNewMsnc, left.LifeMoveNewMsnc);
+								  self.curr_addr_type		:= if(right.address_history_seq=1, right.hdr_addr_type, '');
+								  self.curr_addr_status		:= if(right.address_history_seq=1, right.hdr_addr_status, '');
+								  self.curr_county			:= if(right.address_history_seq=1, right.hdr_county, '');
+								  self.curr_geo_blk			:= if(right.address_history_seq=1, right.hdr_geo_blk, '');
+                                  isSameAddr                := left.curr_addr_rawaid=right.hdr_rawaid;
+                                  self.AddrPrevFull         := if(right.address_history_seq=2 AND ~isSameAddr, HdrAddrFull, '');
+                                  self.prev_addr_rawaid     := if(right.address_history_seq=2 AND ~isSameAddr, right.hdr_rawaid, 0);
+                                  self.prev_prim_range	    := if(right.address_history_seq=2 AND ~isSameAddr, right.hdr_prim_range, '');
+								  self.prev_predir			:= if(right.address_history_seq=2 AND ~isSameAddr, right.hdr_predir, '');
+								  self.prev_prim_name		:= if(right.address_history_seq=2 AND ~isSameAddr, right.hdr_prim_name, '');
+								  self.prev_addr_suffix  	:= if(right.address_history_seq=2 AND ~isSameAddr, right.hdr_addr_suffix, '');
+								  self.prev_postdir			:= if(right.address_history_seq=2 AND ~isSameAddr, right.hdr_postdir, '');
+								  self.prev_unit_desig	    := if(right.address_history_seq=2 AND ~isSameAddr, right.hdr_unit_desig, '');
+								  self.prev_sec_range		:= if(right.address_history_seq=2 AND ~isSameAddr, right.hdr_sec_range, '');
+								  self.prev_city_name		:= if(right.address_history_seq=2 AND ~isSameAddr, right.hdr_city_name, '');
+								  self.prev_st				:= if(right.address_history_seq=2 AND ~isSameAddr, right.hdr_st, '');
+								  self.prev_z5				:= if(right.address_history_seq=2 AND ~isSameAddr, right.hdr_z5, '');
+								  self.prev_zip4			:= if(right.address_history_seq=2 AND ~isSameAddr, right.hdr_zip4, '');
+								  self.prev_date_first_seen	:= if(right.address_history_seq=2 AND ~isSameAddr, right.hdr_date_first_seen, 0);
+								  self.prev_date_last_seen	:= if(right.address_history_seq=2 AND ~isSameAddr, right.hdr_date_last_seen, 0);
+								  self.prev_addr_type		:= if(right.address_history_seq=2 AND ~isSameAddr, right.hdr_addr_type, '');
+								  self.prev_addr_status		:= if(right.address_history_seq=2 AND ~isSameAddr, right.hdr_addr_status, '');
+								  self.prev_county			:= if(right.address_history_seq=2, right.hdr_county, '');
+								  self.prev_geo_blk			:= if(right.address_history_seq=2, right.hdr_geo_blk, '');
+								  self.VerifiedCurrResMatchIndex	:= if(right.address_history_seq=1 and isInputAddr, '2', left.VerifiedCurrResMatchIndex);
+								  self := left), left outer);
 
   // sortedAddrs := SORT(withAddrs, seq, -address_history_seq);
 
 //rollup to get current and previous address on same record
-  ProfileBooster.V2_Layouts.Layout_PB2_Shell rollAddrs(ProfileBooster.V2_Layouts.Layout_PB2_Shell le, ProfileBooster.V2_Layouts.Layout_PB2_Shell ri) := transform
+  ProfileBooster.V2_Key_Layouts.Layout_PB2_Shell rollAddrs(ProfileBooster.V2_Key_Layouts.Layout_PB2_Shell le, ProfileBooster.V2_Key_Layouts.Layout_PB2_Shell ri) := transform
         self.AddrCurrFull     := if(ri.AddrCurrFull<>'', ri.AddrCurrFull, le.AddrCurrFull);                             
         self.curr_addr_rawaid := if(ri.curr_addr_rawaid<>0, ri.curr_addr_rawaid, le.curr_addr_rawaid);                             
     
@@ -584,7 +560,7 @@ address_rank_key := dx_header.key_addr_hist();
 	addr_counts := table(d_addr, addr_stats, seq, did, local);
 
   //join address counts back to PB shell and append address count
-	ProfileBooster.V2_Layouts.Layout_PB2_Shell getAddrCounts(rolledAddrs le, addr_counts ri) := TRANSFORM
+	ProfileBooster.V2_Key_Layouts.Layout_PB2_Shell getAddrCounts(rolledAddrs le, addr_counts ri) := TRANSFORM
 		SELF.LifeAddrCnt			:= ri.addr_ct;
 		// SELF.LifeAddrCnt			:= ri.addr_ct180;
 		SELF 						:= le;
@@ -618,7 +594,7 @@ address_rank_key := dx_header.key_addr_hist();
 	lname_counts := table(d_last, lname_stats, seq, did, local);
 
 //join last name counts back to PB shell and append last name counts
-	ProfileBooster.V2_Layouts.Layout_PB2_Shell getLnameCounts(wAddrCounts le, lname_counts ri) := TRANSFORM
+	ProfileBooster.V2_Key_Layouts.Layout_PB2_Shell getLnameCounts(wAddrCounts le, lname_counts ri) := TRANSFORM
 		SELF.LifeNameLastChngFlag	  := if(ri.lname_ct > 1, 1, 0);
 		SELF.LifeNameLastChngFlag1Y	  := if(ri.lname_ct12 > 0, 1, 0);
         SELF.LifeNameLastCntEv        := ri.lname_ct;
@@ -646,7 +622,7 @@ testDIDs := [59916920346,1377159319,1572947382,848704579,548611871,1495681593,14
 OUTPUT(CHOOSEN(sortVer(did IN testDIDs),100), NAMED('sortVer'));
 OUTPUT(CHOOSEN(withAddrs(did IN testDIDs),100), NAMED('withAddrs'));
 // OUTPUT(CHOOSEN(sortedAddrs(seq IN seqDups),100), NAMED('sortedAddrs'));
-OUTPUT(CHOOSEN(rolledAddrs(did IN testDIDs),100), NAMED('rolledAddrs'));
+// OUTPUT(CHOOSEN(rolledAddrs(did IN testDIDs),100), NAMED('rolledAddrs'));
 // OUTPUT(CHOOSEN(rolledAddrs(curr_addr_rawaid=prev_addr_rawaid),100), NAMED('rolledAddrsDups'));
 // OUTPUT(COUNT(rolledAddrs(curr_addr_rawaid=prev_addr_rawaid)), NAMED('rolledAddrsDups_Cnt'));
 // OUTPUT(hdrBuildDate01, NAMED('hdrBuildDate01'));
@@ -660,8 +636,8 @@ OUTPUT(CHOOSEN(rolledAddrs(did IN testDIDs),100), NAMED('rolledAddrs'));
 // OUTPUT(filtered_reseqAddrs, named('reseqAddrs'));
 // OUTPUT(CHOOSEN(with_hdr_addr_cache,100), named('with_hdr_addr_cache'));
 // OUTPUT(withaddrs, named('withaddrs'));
-OUTPUT(CHOOSEN(wLnameCounts(did IN testDIDs),100), NAMED('wLnameCounts_getVer_Final'));
-OUTPUT(wLnameCounts,,'~jfrancis::profilebooster20::V2_getVerification_THOR_' + thorlib.wuid(), OVERWRITE);
+// OUTPUT(CHOOSEN(wLnameCounts(did IN testDIDs),100), NAMED('wLnameCounts_getVer_Final'));
+OUTPUT(wLnameCounts,,'~jfrancis::profilebooster20::V2_getVerification_THOR', OVERWRITE);
 	// output(ids_only,, '~dvstemp::profile_booster_property_testcase::ids_only::mathis_' + thorlib.wuid());
 
 return wLnameCounts;	

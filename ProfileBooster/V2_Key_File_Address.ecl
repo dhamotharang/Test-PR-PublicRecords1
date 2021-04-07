@@ -1,7 +1,7 @@
 ﻿import ProfileBooster, Doxie, MDR, dx_header, Risk_Indicators, address, AID, Gateway, STD, dma, 
        Address_Attributes, Riskwise, avm_v2, dx_ProfileBooster, LN_PropertyV2, LN_PropertyV2_Services, Advo, AID_Build;
 
-export File_Address(UNSIGNED3 history_date) := function
+export V2_Key_File_Address(UNSIGNED3 history_date) := function
   DataRestrictionMask := Risk_Indicators.iid_constants.default_DataRestriction;
   DataPermissionMask := Risk_Indicators.iid_constants.default_DataPermission;
  	isFCRA 			:= false;
@@ -46,7 +46,7 @@ single_instance_address 	:= ri.addressstatus[5]='S';
  // pb20LexidKey1 := DISTRIBUTE(dx_profilebooster.Key_Lexid(0)(curr_addr_rawaid>0),curr_addr_rawaid);
  // pb20LexidKey2 := DISTRIBUTE(dx_profilebooster.Key_Lexid(0)(prev_addr_rawaid>0),prev_addr_rawaid);
  // rolledAddrsFile := '~jfrancis::out::pb20_withverification_roxie';
- // raLayout := ProfileBooster.V2_Layouts.Layout_PB2_Shell;
+ // raLayout := ProfileBooster.V2_Key_Layouts.Layout_PB2_Shell;
  // rolledAddrs := DATASET(rolledAddrsFile,raLayout,CSV(HEADING(single), QUOTE('"')));
 
  RECORDOF(key_addr_hist) doHalfJoin(key_addr_hist l) := TRANSFORM
@@ -170,7 +170,7 @@ base_pre3 := JOIN(DISTRIBUTE(key_addr_hist,HASH64(zip,prim_range,prim_name,predi
 
 r_layout_input_PlusRaw	:=
 record
-	ProfileBooster.V2_Layouts.Layout_PB2_In;
+	ProfileBooster.V2_Key_Layouts.Layout_PB2_In;
 	// add these 3 fields to existing layout anytime i want to use this macro
 	string60	Line1;
 	string60	LineLast;
@@ -271,7 +271,7 @@ OUTPUT(count(without_DID),named('Check3'));
   donotmail_key := dma.key_DNM_Name_Address;
  
   //join to DoNotMail to set the DNM attribute
-	ProfileBooster.V2_Layouts.Layout_PB2_Shell setDNMFlag(without_DID le, donotmail_key ri ) := TRANSFORM
+	ProfileBooster.V2_Key_Layouts.Layout_PB2_Shell setDNMFlag(without_DID le, donotmail_key ri ) := TRANSFORM
 		self.DoNotMail 		:= if(ri.l_zip='', '0', '1');
 		self.DID2 				:= le.DID; 	//propogate the prospect's DID to DID2 at this point
 		self.rec_type 		:= ProfileBooster.Constants.recType.Prospect; //all records are "Prospect" type at this point.  Household and Relatives will be added later.
@@ -296,7 +296,7 @@ OUTPUT(count(without_DID),named('Check3'));
 // OUTPUT(count(withDoNotMail),named('Check4'));
   
   //join to my_dataset_with_address_cache to get RawAID back
-	ProfileBooster.V2_Layouts.Layout_PB2_Shell setRawAID(withDoNotMail le, my_dataset_with_address_cache ri ) := TRANSFORM
+	ProfileBooster.V2_Key_Layouts.Layout_PB2_Shell setRawAID(withDoNotMail le, my_dataset_with_address_cache ri ) := TRANSFORM
 		// self.RawAID				:= ri.aidwork_acecache.AID;
 		// self.RawAID				:= ri.aidwork_acecache.cleanAID;
 		self.RawAID				:= ri.aidwork_rawaid;
@@ -319,7 +319,7 @@ OUTPUT(count(without_DID),named('Check3'));
   //JOIN to aid_key to get addr_type and addr_status
   aid_key := AID_Build.Key_AID_Base;
 
-	ProfileBooster.V2_Layouts.Layout_PB2_Shell append_addr_type(withRawAID le, aid_key rt) := transform
+	ProfileBooster.V2_Key_Layouts.Layout_PB2_Shell append_addr_type(withRawAID le, aid_key rt) := transform
 		unparsedAddress := address.Addr1FromComponents(le.prim_range, le.predir, le.prim_name, le.suffix, le.postdir, le.unit_desig, le.sec_range);
 		self.addr_type		:= if(le.addr_type='',risk_indicators.iid_constants.override_addr_type(unparsedAddress,rt.rec_type,rt.cart),le.addr_type);
 		self.addr_status	:= if(le.addr_status='',rt.err_stat,le.addr_status);
@@ -333,7 +333,7 @@ OUTPUT(count(without_DID),named('Check3'));
 															left outer, atmost(riskwise.max_atmost), keep(1), local); 
 	
   //get business count for the input address
-  ProfileBooster.V2_Layouts.Layout_PB2_Shell getInputBus(withAID_key le, Address_Attributes.key_AML_addr ri)  := TRANSFORM
+  ProfileBooster.V2_Key_Layouts.Layout_PB2_Shell getInputBus(withAID_key le, Address_Attributes.key_AML_addr ri)  := TRANSFORM
 		self.InpAddrBusRegCnt 	:= ri.biz_cnt;
 		// self.ResCurrBusinessCnt 	:= if(le.curr_equals_input, ri.biz_cnt, 0);
 		self 											:= le;
@@ -498,7 +498,7 @@ OUTPUT(count(withInputBus_thor_hits),named('Check7'));
 	
 	prop_common := Risk_Indicators.Boca_Shell_Property_Common(p_address, ids_only(did<>0), includeRelativeInfo, filter_out_fares, IsFCRA, in_mod_property, ViewDebugs, from_PB);
 	
-ProfileBooster.V2_Layouts.Layout_PB2_Shell append_property(ProfileBooster.V2_Layouts.Layout_PB2_Shell le, prop_common rt) := transform
+ProfileBooster.V2_Key_Layouts.Layout_PB2_Shell append_property(ProfileBooster.V2_Key_Layouts.Layout_PB2_Shell le, prop_common rt) := transform
 		//see if the input address or current address came back as an owned address
 		isInputAddr												:= le.z5=rt.zip5 and le.prim_range=rt.prim_range and le.prim_name=rt.prim_name;                              
 		isCurrAddr												:= le.curr_z5=rt.zip5 and le.curr_prim_range=rt.prim_range and le.curr_prim_name=rt.prim_name;
@@ -596,7 +596,7 @@ prop_common_distr := distribute(prop_common, did);
 	withProperty_distributed := distribute(withProperty, seq);
 	sortedProperty :=  sort(withProperty, seq, did2, -sale_date_by_did, -owned_prim_range, -owned_prim_name, local); //within DID, sort most recent sold property to top
 
-	ProfileBooster.V2_Layouts.Layout_PB2_Shell rollProperty(sortedProperty le, sortedProperty ri) := TRANSFORM
+	ProfileBooster.V2_Key_Layouts.Layout_PB2_Shell rollProperty(sortedProperty le, sortedProperty ri) := TRANSFORM
 		same_prop := le.owned_prim_range=ri.owned_prim_range and le.owned_prim_name=ri.owned_prim_name;
 		same_sold_prop := le.sold_prim_range = ri.sold_prim_range AND le.sold_prim_name = ri.sold_prim_name;
 		
@@ -678,7 +678,7 @@ prop_common_distr := distribute(prop_common, did);
 	withAVM := join(rolledProperty, AVMrecs,
 												left.seq = right.seq and
 												left.rec_type=ProfileBooster.Constants.recType.Prospect, //we sent only Prospect recs to AVM search so only need to update Prospects here
-												transform(ProfileBooster.V2_Layouts.Layout_PB2_Shell,
+												transform(ProfileBooster.V2_Key_Layouts.Layout_PB2_Shell,
 																	// self.CurrAddrAVMVal 					:= right.address_history_1.avm_automated_valuation;
 																	// self.CurrAddrAVMValA1Y 			:= right.address_history_1.avm_automated_valuation2;
 																	// self.CurrAddrAVMRatio1Y := if(right.address_history_1.avm_automated_valuation = 0 or right.address_history_1.avm_automated_valuation2 = 0, 
@@ -828,7 +828,7 @@ prop_common_distr := distribute(prop_common, did);
 	withAVMOwned := join(withAVM, avms1Owned,
 												left.seq = right.seq and
 												left.DID2 = right.DID,
-												transform(ProfileBooster.V2_Layouts.Layout_PB2_Shell,
+												transform(ProfileBooster.V2_Key_Layouts.Layout_PB2_Shell,
 																	self.PropCurrOwnedAVMTtl 			:= if(left.rec_type = ProfileBooster.Constants.recType.Prospect, right.Input_Address_Information.avm_automated_valuation, 0);
 																	self.HHPropCurrAVMHighest 		:= if(left.rec_type in [ProfileBooster.Constants.recType.Prospect,ProfileBooster.Constants.recType.Household], right.Input_Address_Information.avm_automated_valuation, 0);
 																	self.RaAPropOwnerAVMHighest 	:= if(left.rec_type = ProfileBooster.Constants.recType.Relative, right.Input_Address_Information.avm_automated_valuation, 0);
@@ -839,7 +839,7 @@ prop_common_distr := distribute(prop_common, did);
 
 	groupAVMOwned := group(sortedAVMOwned(RaAPropOwnerAVMMed<>0), seq);	
 
-	ProfileBooster.V2_Layouts.Layout_PB2_Shell rollAVMOwned(sortedAVMOwned le, sortedAVMOwned ri) := TRANSFORM
+	ProfileBooster.V2_Key_Layouts.Layout_PB2_Shell rollAVMOwned(sortedAVMOwned le, sortedAVMOwned ri) := TRANSFORM
 		self.PropCurrOwnedAVMTtl					:= le.PropCurrOwnedAVMTtl + ri.PropCurrOwnedAVMTtl;
 		self.HHPropCurrAVMHighest					:= max(le.HHPropCurrAVMHighest, ri.HHPropCurrAVMHighest);
 		self.RaAPropOwnerAVMHighest				:= max(le.RaAPropOwnerAVMHighest, ri.RaAPropOwnerAVMHighest);
@@ -881,14 +881,14 @@ prop_common_distr := distribute(prop_common, did);
 	withEconTraj := join(rolledAVMOwned, econTraj,
 												left.seq = right.seq and
 												left.rec_type = ProfileBooster.Constants.recType.Prospect,  //update only the prospect record (not HH or relative)
-												transform(ProfileBooster.V2_Layouts.Layout_PB2_Shell,
+												transform(ProfileBooster.V2_Key_Layouts.Layout_PB2_Shell,
 																	self.LifeAddrEconTrajType 	:= right.economic_trajectory;
 																	self.LifeAddrEconTrajIndx 	:= right.economic_trajectory_index;
 																	self := left), left outer, parallel);
 	
 // At this point we have one record for the prospect, one for each household member and one for each relative - roll them up 
 // here to sum all of the household and relatives attributes for the prospect record  
-  ProfileBooster.V2_Layouts.Layout_PB2_Shell rollFinal(ProfileBooster.V2_Layouts.Layout_PB2_Shell le, ProfileBooster.V2_Layouts.Layout_PB2_Shell ri) := transform
+  ProfileBooster.V2_Key_Layouts.Layout_PB2_Shell rollFinal(ProfileBooster.V2_Key_Layouts.Layout_PB2_Shell le, ProfileBooster.V2_Key_Layouts.Layout_PB2_Shell ri) := transform
 		self.HHTeenagerMmbrCnt							:= le.HHTeenagerMmbrCnt + ri.HHTeenagerMmbrCnt;
 		self.HHYoungAdultMmbrCnt						:= le.HHYoungAdultMmbrCnt + ri.HHYoungAdultMmbrCnt;
 		self.HHMiddleAgemmbrCnt							:= le.HHMiddleAgemmbrCnt + ri.HHMiddleAgemmbrCnt;
@@ -978,14 +978,14 @@ prop_common_distr := distribute(prop_common, did);
 //append relatives' average income
 	// withRelaIncome := join(finalRollup, tRelaIncome,  
 												// left.seq = right.seq,
-												// transform(ProfileBooster.V2_Layouts.Layout_PB2_Shell,
+												// transform(ProfileBooster.V2_Key_Layouts.Layout_PB2_Shell,
 																	// self.RaAMedIncomeRange	:= right.RelaIncome;  
 																	// self := left), left outer);
 
 //append count of households within relatives
 	// withRelaHHcnt := join(withRelaIncome, tRelaHHcnt,  
 												// left.seq = right.seq,
-												// transform(ProfileBooster.V2_Layouts.Layout_PB2_Shell,
+												// transform(ProfileBooster.V2_Key_Layouts.Layout_PB2_Shell,
 																	// self.RaAHHCnt	:= right.RelaHHcnt;  
 																	// self := left), left outer);
 
@@ -994,7 +994,7 @@ prop_common_distr := distribute(prop_common, did);
 //append median AVM value for relatives
 	// withAVMMed := join(withRelaHHcnt, tRelaAVMMed,  
 												// left.seq = right.seq,
-												// transform(ProfileBooster.V2_Layouts.Layout_PB2_Shell,
+												// transform(ProfileBooster.V2_Key_Layouts.Layout_PB2_Shell,
 																	// self.RAAPropOwnerAVMMed	:= right.RelaAVMMed;  
 																	// self := left), left outer);
 	
@@ -1049,7 +1049,7 @@ prop_common_distr := distribute(prop_common, did);
  kaf := LN_PropertyV2.key_addr_fid(FALSE);
 
  // layout_ids_plus_fares append_fares_id_by_addr(p_addr le, kaf rt) := transform
- ProfileBooster.V2_Layouts.Layout_PB2_Shell append_fares_id_by_addr(withInputBus_thor_hits le, kaf rt) := transform
+ ProfileBooster.V2_Key_Layouts.Layout_PB2_Shell append_fares_id_by_addr(withInputBus_thor_hits le, kaf rt) := transform
 	// SELF.historydate := le.historydate,
 	// SELF.inp_did     := le.did,
 	// SELF.inp_fname   := le.fname,
@@ -1085,7 +1085,7 @@ OUTPUT(count(ids_plus_fares_by_address_thor),named('Check8'));
 
   Assessments := LN_PropertyV2.File_Assessment;
   
-  ProfileBooster.V2_Layouts.Layout_PB2_Shell append_assessments(ids_plus_fares_by_address_thor l, Assessments r) := TRANSFORM
+  ProfileBooster.V2_Key_Layouts.Layout_PB2_Shell append_assessments(ids_plus_fares_by_address_thor l, Assessments r) := TRANSFORM
     SELF.AddrHasPoolFlag := MAP(r.pool_code NOT IN ['0',''] => 1,0);
 // Land use codes for Mobile Home:
 // 0135	MOBILE HOME LOT
@@ -1130,7 +1130,7 @@ OUTPUT(count(withAssessments),named('Check9'));
  
 /*   PropertyAssessments := LN_PropertyV2.key_assessor_fid(FALSE);
    
-     ProfileBooster.V2_Layouts.Layout_PB2_Shell append_property_assessments(ids_plus_fares_by_address_thor l, PropertyAssessments r) := TRANSFORM
+     ProfileBooster.V2_Key_Layouts.Layout_PB2_Shell append_property_assessments(ids_plus_fares_by_address_thor l, PropertyAssessments r) := TRANSFORM
        SELF.AddrHasPoolFlag := MAP(r.pool_code NOT IN ['0',''] => 1,0);
        SELF.AddrIsMobileHomeFlag := IF(r.ln_mobile_home_indicator='Y',1,0);
        SELF.MobHomeFlag := IF(r.ln_mobile_home_indicator='Y',1,0);
@@ -1167,7 +1167,7 @@ OUTPUT(count(withAssessments),named('Check9'));
 
   ADVO_BASE_PRE := advo.key_addr1;
   
-  ProfileBooster.V2_Layouts.Layout_PB2_Shell append_advo(withAssessments l, ADVO_BASE_PRE r) := TRANSFORM
+  ProfileBooster.V2_Key_Layouts.Layout_PB2_Shell append_advo(withAssessments l, ADVO_BASE_PRE r) := TRANSFORM
     MissingInADVO := r.street_name='' AND r.zip_5='';  
     SELF.AddrIsCollegeFlag := MAP(MissingInADVO => -99998,
                                   r.college_indicator='Y' => 1,
@@ -1200,7 +1200,7 @@ OUTPUT(count(withAssessments),named('Check9'));
                    append_advo(LEFT,RIGHT), LEFT OUTER, KEEP(1), atmost(RiskWise.max_atmost), LOCAL);
 OUTPUT(count(withADVO),named('Check10'));
 
-  // ProfileBooster.V2_Layouts.Layout_PB2_Shell without_advo(withAssessments l, ADVO_BASE_PRE r) := TRANSFORM
+  // ProfileBooster.V2_Key_Layouts.Layout_PB2_Shell without_advo(withAssessments l, ADVO_BASE_PRE r) := TRANSFORM
     // SELF.AddrIsCollegeFlag := -99998;
     // SELF.AddrIsAptFlag     := -99998;
     // SELF.AddrIsVacantFlag  := -99998;
@@ -1221,7 +1221,7 @@ OUTPUT(count(withADVO),named('Check10'));
 
   header_key := dx_header.key_header();
 
-  ProfileBooster.V2_Layouts.Layout_PB2_Shell append_header(withADVO l, header_key r) := TRANSFORM
+  ProfileBooster.V2_Key_Layouts.Layout_PB2_Shell append_header(withADVO l, header_key r) := TRANSFORM
     SELF.HHID := r.HHID;
     SELF := l;
     SELF := []

@@ -275,7 +275,7 @@ BOOLEAN DEBUG := FALSE;
   // ********************************************************************
 	// Get the Marketing Watchdog demographics
 	// ********************************************************************
-	withWatchdog_thor := join(distribute(withEmail,did), distribute(MarketingWatchdogKey(adl_ind IN ['CORE', 'NO_SSN']),did),
+  withWatchdog_thor := join(distribute(withEmail,did), distribute(MarketingWatchdogKey(adl_ind IN ['CORE', 'NO_SSN']),did),
                   LEFT.did = RIGHT.did,
                   mod_transforms.setWatchdog(left,right), left outer, keep(1), local
   );
@@ -285,24 +285,24 @@ BOOLEAN DEBUG := FALSE;
                   mod_transforms.setWatchdog(left,right), left outer, keep(1)
   );
   #IF(onThor)
-		withWatchdog := withWatchdog_thor;
-	#ELSE
-		withWatchdog := withWatchdog_roxie;
-	#END
-  
-	withWatchdogDEAD_thor := join(distribute(withWatchdog,did), distribute(MarketingWatchdogKey(adl_ind IN ['DEAD']),did),
-                  LEFT.did = RIGHT.did,
-                  mod_transforms.setWatchdogDEAD(left,right), left outer, keep(1)
+	withWatchdog := withWatchdog_thor;
+  #ELSE
+	withWatchdog := withWatchdog_roxie;
+  #END
+
+  withWatchdogDEAD_thor := join(distribute(withWatchdog,did), distribute(MarketingWatchdogKey(adl_ind IN ['DEAD']),did),
+				LEFT.did = RIGHT.did,
+				mod_transforms.setWatchdogDEAD(left,right), left outer, keep(1)
   );
   withWatchdogDEAD_roxie := join(withWatchdog, MarketingWatchdogKey(adl_ind IN ['DEAD']),
                   LEFT.did = RIGHT.did,
                   mod_transforms.setWatchdogDEAD(left,right), left outer, keep(1)
   );
   #IF(onThor)
-		withWatchdogDEAD := withWatchdogDEAD_thor;
-	#ELSE
-		withWatchdogDEAD := withWatchdogDEAD_roxie;
-	#END
+	withWatchdogDEAD := withWatchdogDEAD_thor;
+  #ELSE
+	withWatchdogDEAD := withWatchdogDEAD_roxie;
+  #END
 
   // ********************************************************************
 	// Get the InfutorNarc demographics
@@ -567,14 +567,52 @@ BOOLEAN DEBUG := FALSE;
 	// #END
   
 //slim down the uniqueDIDs records to create a smaller layout to pass into all of the following searches
-	slimShell := project(withCurrAddressKey,  
-												transform(ProfileBooster.V2_Layouts.Layout_PB2_Slim,
-																	self 							:= left));
+	slimShell := project(withCurrAddressKey,transform(ProfileBooster.V2_Layouts.Layout_PB2_Slim,self:= left));
+	slimShell2 := project(withCurrAddressKey,transform(ProfileBooster.V2_Layouts.Layout_PB2_Slim_emergence,self:= left));
+
+	Emergence := ProfileBooster.V2_getEmrgAddress(slimShell2);
+
+	ProfileBooster.V2_Layouts.Layout_PB2_Shell xfmAddEmergence(ProfileBooster.V2_Layouts.Layout_PB2_Shell le, Emergence ri ) := TRANSFORM
+	 	SELF.EmrgLexIDsAtEmrgAddrCnt1Y := ri.EmrgLexIDsAtEmrgAddrCnt1Yb-1;
+    	self 						   := le;  
+		self 						   := [];
+	END;  
+
+	withEmergence_roxie := JOIN(withCurrAddressKey, Emergence,
+						  LEFT.emrgprimaryrange=RIGHT.emrgprimaryrange AND 	
+                          LEFT.emrgpredirectional=RIGHT.emrgpredirectional AND
+                          LEFT.emrgprimaryname=RIGHT.emrgprimaryname AND
+                          LEFT.emrgprimaryname<>'' AND
+                          LEFT.emrgsuffix=RIGHT.emrgsuffix AND
+                          LEFT.emrgpostdirectional=RIGHT.emrgpostdirectional AND
+                          LEFT.emrgunitdesignation=RIGHT.emrgunitdesignation AND
+                          LEFT.emrgsecondaryrange=RIGHT.emrgsecondaryrange AND
+                          LEFT.emrgzip5=RIGHT.emrgzip5,
+						  xfmAddEmergence(left,right), LEFT OUTER, keep(1));
+	withEmergence_thor := JOIN(DISTRIBUTE(withCurrAddressKey,HASH64(emrgzip5,emrgprimaryrange,emrgpredirectional,emrgprimaryname,emrgsuffix,emrgpostdirectional,emrgunitdesignation,emrgsecondaryrange)), 
+							   DISTRIBUTE(Emergence,HASH64(emrgzip5,emrgprimaryrange,emrgpredirectional,emrgprimaryname,emrgsuffix,emrgpostdirectional,emrgunitdesignation,emrgsecondaryrange)),
+						  LEFT.emrgprimaryrange=RIGHT.emrgprimaryrange AND 	
+                          LEFT.emrgpredirectional=RIGHT.emrgpredirectional AND
+                          LEFT.emrgprimaryname=RIGHT.emrgprimaryname AND
+                          LEFT.emrgprimaryname<>'' AND
+                          LEFT.emrgsuffix=RIGHT.emrgsuffix AND
+                          LEFT.emrgpostdirectional=RIGHT.emrgpostdirectional AND
+                          LEFT.emrgunitdesignation=RIGHT.emrgunitdesignation AND
+                          LEFT.emrgsecondaryrange=RIGHT.emrgsecondaryrange AND
+                          LEFT.emrgzip5=RIGHT.emrgzip5,
+						  xfmAddEmergence(left,right), LEFT OUTER, keep(1), local);
+	#IF(onThor)
+		withEmergence := withEmergence_thor;
+	#ELSE
+		withEmergence := withEmergence_roxie;
+	#END
+
+
 
   PropertyCommon := ProfileBooster.V2_getProperty(uniqueDIDs,slimShell,DataRestrictionMask,DataPermissionMask);
 
 //JOIN withPropertyCommon to uniqueDIDs? look at propcommon output
-  withPropertyCommon := join(distribute(withCurrAddressKey,did2), 
+  withPropertyCommon := join(distribute(withEmergence,did2), 
                              distribute(PropertyCommon,did2),
                              LEFT.did2 = right.did2
                              AND LEFT.did = right.did,
@@ -769,16 +807,17 @@ BOOLEAN DEBUG := FALSE;
 	// output(withBankingExperiance, named('withBankingExperiance'));
 	// output(choosen(withEmail, 100), named('V2SF_withEmail'));
 	// output(choosen(PB20LexIDKey, 100), named('V2SF_PB20LexIDKey'));
-	// output(choosen(withLexIDKey, 100), named('V2SF_withLexIDKey'));
+	output(choosen(withLexIDKey, 100), named('V2SF_withLexIDKey'));
 	// output(count(withLexIDKey), named('V2SF_withLexIDKey_Cnt'));
 	// output(count(withLexIDKey(dt_first_seen<>0)), named('V2SF_withLexIDKey_Cnt_DFSeen'));
 	// output(count(withLexIDKey(dt_last_seen<>201901)), named('V2SF_withLexIDKey_Cnt_DLSeen'));
-  // output(choosen(withVerification, 100), named('V2SF_withVerification'));
+  output(choosen(withVerification, 100), named('V2SF_withVerification'));
   // output(withLexIDKey,,'~jfrancis::out::PB20_withLexIDKey_ROXIE',CSV(HEADING(single), QUOTE('"')),OVERWRITE);
   // output(finalRollup,,'~jfrancis::out::PB20_finalRollup_ROXIE',CSV(HEADING(single), QUOTE('"')),OVERWRITE);
-  // output(choosen(withWatchdog, 100), named('V2SF_withWatchdog'));
-  // output(choosen(withInfutorNARC, 100), named('V2SF_withInfutorNARC'));
-  // output(choosen(withCurrAddressKey, 100), named('V2SF_withCurrAddressKey'));
+  output(choosen(withWatchdog, 100), named('V2SF_withWatchdog'));
+  output(choosen(withInfutorNARC, 100), named('V2SF_withInfutorNARC'));
+  output(choosen(withCurrAddressKey, 100), named('V2SF_withCurrAddressKey'));
+  output(choosen(withEmergence, 100), named('V2SF_withEmergence'));  
   // output(count(withCurrAddressKey), named('V2SF_withCurrAddressKey_Cnt'));
   // output(count(withCurrAddressKey(CurrAddrLat<>'')), named('V2SF_withCurrAddressKeyADDRLAT_Cnt'));
   // output(choosen(withInputAddressKey, 100), named('V2SF_withInputAddressKey'));

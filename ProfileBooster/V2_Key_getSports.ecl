@@ -1,14 +1,14 @@
 ﻿IMPORT ProfileBooster, _Control, Doxie, eMerges, RiskWise, Risk_Indicators, ut;
 onThor := _Control.Environment.OnThor;
 
-EXPORT V2_getSports(DATASET(ProfileBooster.V2_Layouts.Layout_PB2_Slim) PBslim1) := FUNCTION
+EXPORT V2_Key_getSports(DATASET(ProfileBooster.V2_Key_Layouts.Layout_PB2_Slim) PBslim1) := FUNCTION
 
 PBSlim := PBslim1(did<>0);
 
 //hunting and fishing
 sportsDIDkey := eMerges.Key_HuntFish_Did(false);
 
-ProfileBooster.V2_Layouts.Layout_PB2_Slim_sports	addSportsIDs(PBslim le, sportsDIDkey ri) := transform
+ProfileBooster.V2_Key_Layouts.Layout_PB2_Slim_sports	addSportsIDs(PBslim le, sportsDIDkey ri) := transform
       self.rid 	:= ri.rid;
 			self 			:= le;
       self 			:= [];
@@ -35,7 +35,7 @@ sportsDIDs_thor := join(
 
 sportsRIDkey := eMerges.Key_HuntFish_Rid(false);
 
-ProfileBooster.V2_Layouts.Layout_PB2_Slim_sports	addSportsDetails(sportsDIDs le, sportsRIDkey ri) := transform
+ProfileBooster.V2_Key_Layouts.Layout_PB2_Slim_sports	addSportsDetails(sportsDIDs le, sportsRIDkey ri) := transform
 			dateLicense					      := if(ri.dateLicense[5..6] = '', ri.dateLicense[1..4] + '1201', ri.dateLicense[1..6] + '01');  //default month to 12 if not populated and just default day to 01
 			validdate 					      := Doxie.DOBTools((integer)dateLicense).IsValidDOB;
 			monthsApart					      := if(~validdate, 99, ut.MonthsApart(risk_indicators.iid_constants.myGetDate(le.historydate)[1..6],dateLicense)); //if date isn't valid, don't use
@@ -70,7 +70,7 @@ sportsDetails_thor := join(
 //conceal and carry
 ccwDIDkey := eMerges.key_ccw_did(false);
 
-ProfileBooster.V2_Layouts.Layout_PB2_Slim_sports	addCCWIDs(PBslim le, ccwDIDkey ri) := transform
+ProfileBooster.V2_Key_Layouts.Layout_PB2_Slim_sports	addCCWIDs(PBslim le, ccwDIDkey ri) := transform
       self.rid 	:= ri.rid;
 			self 			:= le;
       self 			:= [];
@@ -97,7 +97,7 @@ ccwDIDs_thor := join(
 
 ccwRIDkey := eMerges.key_ccw_rid(false);
 
-ProfileBooster.V2_Layouts.Layout_PB2_Slim_sports	addCCWDetails(ccwDIDs le, ccwRIDkey ri) := transform
+ProfileBooster.V2_Key_Layouts.Layout_PB2_Slim_sports	addCCWDetails(ccwDIDs le, ccwRIDkey ri) := transform
 			dateLicense					      := if(ri.ccwregdate[5..6] = '', ri.ccwregdate[1..4] + '1201', ri.ccwregdate[1..6] + '01');  //default month to 12 if not populated and just default day to 01
 			validdate 					      := Doxie.DOBTools((integer)dateLicense).IsValidDOB;
 			monthsApart					      := if(~validdate, 99, ut.MonthsApart(risk_indicators.iid_constants.myGetDate(le.historydate)[1..6],dateLicense)); //if date isn't valid, don't use
@@ -132,7 +132,7 @@ ccwDetails_thor := join(
 
 sortSportsdetails := sort(sportsDetails + ccwDetails, seq, did, RID);
 
-ProfileBooster.V2_Layouts.Layout_PB2_Slim_sports rollSports(sportsDetails le, sportsDetails ri) := TRANSFORM
+ProfileBooster.V2_Key_Layouts.Layout_PB2_Slim_sports rollSports(sportsDetails le, sportsDetails ri) := TRANSFORM
 	self.IntSportPersonFlagEv := max(le.IntSportPersonFlagEv, ri.IntSportPersonFlagEv);	
 	self.IntSportPersonFlag1Y := max(le.IntSportPersonFlag1Y, ri.IntSportPersonFlag1Y);	
 	self.IntSportPersonFlag5Y := max(le.IntSportPersonFlag5Y, ri.IntSportPersonFlag5Y);	

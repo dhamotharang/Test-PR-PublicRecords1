@@ -1,12 +1,12 @@
 ﻿IMPORT _Control, VehicleV2, RiskWise, ut, MDR, risk_indicators, Doxie, Suppress, ProfileBooster;
 onThor := _Control.Environment.OnThor;
 
-EXPORT V2_getVehicles(DATASET(ProfileBooster.V2_Layouts.Layout_PB2_Slim) PBslim,
+EXPORT V2_Key_getVehicles(DATASET(ProfileBooster.V2_Key_Layouts.Layout_PB2_Slim) PBslim,
 									doxie.IDataAccess mod_access = MODULE (doxie.IDataAccess) END) := FUNCTION
 
 kvd := VehicleV2.key_vehicle_did;
  
-ProfileBooster.V2_Layouts.Layout_PB2_Slim_vehicles getVehKey(PBslim le, kvd ri) := TRANSFORM
+ProfileBooster.V2_Key_Layouts.Layout_PB2_Slim_vehicles getVehKey(PBslim le, kvd ri) := TRANSFORM
 	self.vehicle_key := ri.vehicle_key;
 	self.iteration_key := ri.iteration_key;
 	self.sequence_key := ri.sequence_key;
@@ -34,7 +34,7 @@ vehRecs_thor :=  join(distribute(PBslim, did2),
 
 vehPartyKey := VehicleV2.Key_Vehicle_Party_Key;
 											
-{ProfileBooster.V2_Layouts.Layout_PB2_Slim_vehicles, UNSIGNED4 global_sid}  add_party(vehRecs le, vehPartyKey ri) := TRANSFORM
+{ProfileBooster.V2_Key_Layouts.Layout_PB2_Slim_vehicles, UNSIGNED4 global_sid}  add_party(vehRecs le, vehPartyKey ri) := TRANSFORM
 	self.global_sid 		:= ri.global_sid;
 	// self.totalCount		 		:= if(ri.Sequence_Key<>'' AND ri.history='', 1, 0); 
 	self.totalCount		 		:= if(ri.Sequence_Key<>'', 1, 0); 
@@ -55,7 +55,7 @@ vehPartyRecs_roxie_unsuppressed :=  join(vehRecs, vehPartyKey,
 										(RIGHT.date_first_seen <> 0 and RIGHT.date_first_seen < (integer)left.historydate)),
 											add_party(LEFT,RIGHT), atmost(riskwise.max_atmost));
 											
-vehPartyRecs_roxie := Suppress.Suppress_ReturnOldLayout(vehPartyRecs_roxie_unsuppressed, mod_access, ProfileBooster.V2_Layouts.Layout_PB2_Slim_vehicles);											
+vehPartyRecs_roxie := Suppress.Suppress_ReturnOldLayout(vehPartyRecs_roxie_unsuppressed, mod_access, ProfileBooster.V2_Key_Layouts.Layout_PB2_Slim_vehicles);											
 
 vehPartyRecs_thor_unsuppressed :=  join(distribute(vehRecs, hash64(vehicle_key, iteration_key, sequence_key)), 
 													 distribute(pull(vehPartyKey), hash64(vehicle_key, iteration_key, sequence_key)),
@@ -68,7 +68,7 @@ vehPartyRecs_thor_unsuppressed :=  join(distribute(vehRecs, hash64(vehicle_key, 
 											add_party(LEFT,RIGHT),
 											local);	
 											
-vehPartyRecs_thor := Suppress.Suppress_ReturnOldLayout(vehPartyRecs_thor_unsuppressed, mod_access, ProfileBooster.V2_Layouts.Layout_PB2_Slim_vehicles);											
+vehPartyRecs_thor := Suppress.Suppress_ReturnOldLayout(vehPartyRecs_thor_unsuppressed, mod_access, ProfileBooster.V2_Key_Layouts.Layout_PB2_Slim_vehicles);											
 
 #IF(onThor)
 	vehPartyRecs := vehPartyRecs_thor;
@@ -76,7 +76,7 @@ vehPartyRecs_thor := Suppress.Suppress_ReturnOldLayout(vehPartyRecs_thor_unsuppr
 	vehPartyRecs := vehPartyRecs_roxie;
 #END
 
-{ProfileBooster.V2_Layouts.Layout_PB2_Slim_vehicles, UNSIGNED4 global_sid} add_Vehicles_main(vehPartyRecs le, VehicleV2.Key_Vehicle_Main_Key ri) := TRANSFORM
+{ProfileBooster.V2_Key_Layouts.Layout_PB2_Slim_vehicles, UNSIGNED4 global_sid} add_Vehicles_main(vehPartyRecs le, VehicleV2.Key_Vehicle_Main_Key ri) := TRANSFORM
 	self.global_sid := ri.global_sid;
 	gotMain := ri.vehicle_key <> '';
 	SELF.year_make := if(gotMain, ri.Best_Model_Year, '');
@@ -102,7 +102,7 @@ vehMainRecs_roxie_unsuppressed := JOIN(vehPartyRecs, VehicleV2.Key_Vehicle_Main_
 										keyed(left.iteration_key=right.iteration_key) and right.orig_vin<>'',
 										add_Vehicles_main(LEFT,RIGHT), atmost(riskwise.max_atmost));
 
-vehMainRecs_roxie := Suppress.Suppress_ReturnOldLayout(vehMainRecs_roxie_unsuppressed, mod_access, ProfileBooster.V2_Layouts.Layout_PB2_Slim_vehicles);
+vehMainRecs_roxie := Suppress.Suppress_ReturnOldLayout(vehMainRecs_roxie_unsuppressed, mod_access, ProfileBooster.V2_Key_Layouts.Layout_PB2_Slim_vehicles);
 
 vehMainRecs_thor_unsuppressed := JOIN(distribute(vehPartyRecs, hash64(vehicle_key, iteration_key)), 
 										distribute(pull(VehicleV2.Key_Vehicle_Main_Key(orig_vin<>'')), hash64(vehicle_key, iteration_key)),
@@ -111,7 +111,7 @@ vehMainRecs_thor_unsuppressed := JOIN(distribute(vehPartyRecs, hash64(vehicle_ke
 										add_Vehicles_main(LEFT,RIGHT), atmost(riskwise.max_atmost),
 										local);
 										
-vehMainRecs_thor := Suppress.Suppress_ReturnOldLayout(vehMainRecs_thor_unsuppressed, mod_access, ProfileBooster.V2_Layouts.Layout_PB2_Slim_vehicles);
+vehMainRecs_thor := Suppress.Suppress_ReturnOldLayout(vehMainRecs_thor_unsuppressed, mod_access, ProfileBooster.V2_Key_Layouts.Layout_PB2_Slim_vehicles);
 
 #IF(onThor)
 	vehMainRecs := vehMainRecs_thor;
@@ -119,7 +119,7 @@ vehMainRecs_thor := Suppress.Suppress_ReturnOldLayout(vehMainRecs_thor_unsuppres
 	vehMainRecs := vehMainRecs_roxie;
 #END
 
-ProfileBooster.V2_Layouts.Layout_PB2_Slim_vehicles rollVins(vehMainRecs le, vehMainRecs ri) := TRANSFORM
+ProfileBooster.V2_Key_Layouts.Layout_PB2_Slim_vehicles rollVins(vehMainRecs le, vehMainRecs ri) := TRANSFORM
 	self.months_first_reg	:= max(le.months_first_reg, ri.months_first_reg);	//save oldest registration
 	self.months_last_reg	:= min(le.months_last_reg, ri.months_last_reg);	  //save newest registration
 	
@@ -140,7 +140,7 @@ vehDedup :=  rollup(sort(vehMainRecs, seq, did2, PPCurrOwnedAutoVIN, -months_fir
 
 vehSort := sort(vehDedup, seq, did2, months_last_reg, months_first_reg, PPCurrOwnedAutoVIN);  // get the details from the latest registration
 										 
-ProfileBooster.V2_Layouts.Layout_PB2_Slim_vehicles rollVehicles(vehDedup le, vehDedup ri) := TRANSFORM
+ProfileBooster.V2_Key_Layouts.Layout_PB2_Slim_vehicles rollVehicles(vehDedup le, vehDedup ri) := TRANSFORM
 	self.vehicleCount 	  := le.vehicleCount + ri.vehicleCount;	
 	self.motorcycleCount 	:= le.motorcycleCount + ri.motorcycleCount;	
 	self.months_first_reg	:= max(le.months_first_reg, ri.months_first_reg);	//save oldest registration

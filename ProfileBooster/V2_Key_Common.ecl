@@ -1,6 +1,6 @@
 IMPORT Risk_Indicators, UT;
 
-EXPORT V2_Common := MODULE
+EXPORT V2_Key_Common := MODULE
 	
 //this works with dates in YYYYMMDD format
 EXPORT integer monthsApart_YYYYMMDD(string8 d1, string8 d2, boolean roundUpPartial = false) := FUNCTION

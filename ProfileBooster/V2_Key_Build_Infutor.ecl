@@ -1,6 +1,6 @@
 import ProfileBooster, Infutor_NARC;
 
-export V2_Build_Infutor := function
+export V2_Key_Build_Infutor := function
 
 	distInfutorDID := distribute(Infutor_NARC.File_Infutor_Narc_DID(DID<>0), did);
 

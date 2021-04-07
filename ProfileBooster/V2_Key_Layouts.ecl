@@ -1,6 +1,6 @@
-﻿IMPORT ProfileBooster, Risk_Indicators, dx_ProfileBooster, BIPV2_Crosswalk;
+IMPORT ProfileBooster, Risk_Indicators, dx_ProfileBooster, BIPV2_Crosswalk;
 
-EXPORT V2_Layouts := MODULE
+EXPORT V2_Key_Layouts := MODULE
   EXPORT Layout_Infutor := RECORD
 	unsigned6 DID;
 	string1 	marital_status;

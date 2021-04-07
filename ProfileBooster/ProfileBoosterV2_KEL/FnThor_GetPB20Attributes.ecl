@@ -1,7 +1,7 @@
 ﻿IMPORT KEL12 AS KEL;
 IMPORT ProfileBooster, Business_Risk_BIP, ProfileBooster.ProfileBoosterV2_KEL, Risk_Indicators, STD;
 
-EXPORT FnTHOR_GetPB11Attributes(DATASET(ProfileBooster.ProfileBoosterV2_KEL.ECL_Functions.Layouts.LayoutInputPII) InputData,
+EXPORT FnThor_GetPB20Attributes(DATASET(ProfileBooster.ProfileBoosterV2_KEL.ECL_Functions.Layouts.LayoutInputPII) InputData,
 			ProfileBooster.ProfileBoosterV2_KEL.Interface_Options OptionsRaw,
 			ProfileBooster.ProfileBoosterV2_KEL.CFG_Compile KEL_Settings = ProfileBooster.ProfileBoosterV2_KEL.CFG_Compile) := FUNCTION
 	
@@ -13,18 +13,18 @@ EXPORT FnTHOR_GetPB11Attributes(DATASET(ProfileBooster.ProfileBoosterV2_KEL.ECL_
 	RecordsWithLexID := DISTRIBUTE(InputData(P_LexID > 0),P_LexID);
 	RecordsWithoutLexID := DISTRIBUTE(InputData(P_LexID <= 0),P_LexID);
 	
-	UNSIGNED8 PDPM := ProfileBooster.ProfileBoosterV2_KEL.ECL_Functions.Fn_KEL_DPMBitmap.Generate(Options.Data_Restriction_Mask, 
-																																																Options.Data_Permission_Mask, 
-																																																Options.GLBAPurpose, 
-																																																Options.DPPAPurpose, 
-																																																FALSE,//isFCRA
-																																																TRUE,//isMarketing 
-																																																FALSE,//AllowDNBDMI
-																																																FALSE, //OverrideExperianRestriction
-																																																'', //PermissiblePurpose, 
-																																																'',// IndustryClass ??DRMKT
-																																																KEL_Settings,//ProfileBoosterV2_KEL.CFG_Compile, 
-																																																FALSE);
+	UNSIGNED8 PDPM := ProfileBooster.ProfileBoosterV2_KEL.ECL_Functions.Fn_KEL_DPMBitmap.Generate(	Options.Data_Restriction_Mask, 
+																									Options.Data_Permission_Mask, 
+																									Options.GLBAPurpose, 
+																									Options.DPPAPurpose, 
+																									FALSE,//isFCRA
+																									TRUE,//isMarketing 
+																									FALSE,//AllowDNBDMI
+																									FALSE, //OverrideExperianRestriction
+																									'', //PermissiblePurpose, 
+																									'',// IndustryClass ??DRMKT
+																									KEL_Settings,//ProfileBoosterV2_KEL.CFG_Compile, 
+																									FALSE);
 																																																
 	mod_transforms := ProfileBooster.ProfileBoosterV2_KEL.ECL_Functions.Transforms;
 	
@@ -202,19 +202,19 @@ EXPORT FnTHOR_GetPB11Attributes(DATASET(ProfileBooster.ProfileBoosterV2_KEL.ECL_
 			SELF.AstVehAutoEmrgPriceMin := MAP(
 								LexIDNotOnFile => ProfileBooster.ProfileBoosterV2_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA_INT, 
 								ResultsFound => (INTEGER3)RIGHT.PL_AstVehAutoEmrgPriceMin, 0);
-      SELF.PL_PurchMinDate := MAP(
+      		SELF.PL_PurchMinDate := MAP(
 								LexIDNotOnFile => ProfileBooster.ProfileBoosterV2_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA_INT, 
 								ResultsFound => (INTEGER4)RIGHT.PL_PurchMinDate, 0);
-      SELF.PL_PurchMaxDate := MAP(
+      		SELF.PL_PurchMaxDate := MAP(
 								LexIDNotOnFile => ProfileBooster.ProfileBoosterV2_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA_INT, 
 								ResultsFound => (INTEGER4)RIGHT.PL_PurchMaxDate, 0);
-      SELF.PL_VehicleMinDate := MAP(
+      		SELF.PL_VehicleMinDate := MAP(
 								LexIDNotOnFile => ProfileBooster.ProfileBoosterV2_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA_INT, 
 								ResultsFound => (INTEGER4)RIGHT.PL_VehicleMinDate, 0);
-      SELF.PL_VehicleMaxDate := MAP(
+      		SELF.PL_VehicleMaxDate := MAP(
 								LexIDNotOnFile => ProfileBooster.ProfileBoosterV2_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA_INT, 
 								ResultsFound => (INTEGER4)RIGHT.PL_VehicleMaxDate, 0);
-      SELF := LEFT;
+      		SELF := LEFT;
 		),LEFT OUTER, KEEP(1), LOCAL); 
       	
    	PB2AttributesWithoutLexID := PROJECT(RecordsWithoutLexID, mod_transforms.xfm_MissingInputData(LEFT), LOCAL );
@@ -222,13 +222,13 @@ EXPORT FnTHOR_GetPB11Attributes(DATASET(ProfileBooster.ProfileBoosterV2_KEL.ECL_
    	// PB2Attributes := SORT( PB2AttributesWithLexID + PB2AttributesWithoutLexID, G_ProcUID ); 
    	PB2Attributes := PB2AttributesWithLexID + PB2AttributesWithoutLexID;
 
-		//DEBUGGING
-		OUTPUT(CHOOSEN(LexIDAttributesInput,100), NAMED('LexIDAttributesInput_100'));
-		// OUTPUT(COUNT(LexIDAttributesInput), NAMED('LexIDAttributesInput_cnt'));
-   	OUTPUT(CHOOSEN(PB2AttributesRaw,100), NAMED('PB2AttributesRaw_100'));
+	//DEBUGGING
+	// OUTPUT(CHOOSEN(LexIDAttributesInput,100), NAMED('LexIDAttributesInput_100'));
+	// OUTPUT(COUNT(LexIDAttributesInput), NAMED('LexIDAttributesInput_cnt'));
+   	// OUTPUT(CHOOSEN(PB2AttributesRaw,100), NAMED('PB2AttributesRaw_100'));
    	// OUTPUT(CHONT(PB2AttributesRaw), NAMED('PB2AttributesRaw_cnt'));
    	// OUTPUT(COUNT(PB2Attributes), NAMED('PB2Attributes_cnt'));
-   	OUTPUT(CHOOSEN(PB2AttributesRawCleaned,100), NAMED('PB2AttributesRawCleaned_100'));
+   	// OUTPUT(CHOOSEN(PB2AttributesRawCleaned,100), NAMED('PB2AttributesRawCleaned_100'));
    
    	RETURN PB2Attributes;
 

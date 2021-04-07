@@ -3,9 +3,8 @@ onThor := _Control.Environment.OnThor;
 
 //Note - this function mimics Bocashell derogs function with mods made specific to Profile Booster. 
 //			 Only a portion of fields returned here are actually used in PB and the others could be removed at some point.
-export V2_getDerogs_Hist (GROUPED DATASET(Risk_Indicators.layouts.layout_derogs_input) ids,
+export V2_Key_getDerogs_Hist (GROUPED DATASET(Risk_Indicators.layouts.layout_derogs_input) ids,
 										doxie.IDataAccess mod_access = MODULE (doxie.IDataAccess) END) := FUNCTION
-OUTPUT(COUNT(ids),NAMED('GETDEROGS_IN'));															 
 bans_did      := BankruptcyV3.key_bankruptcyV3_did();
 bans_search   := BankruptcyV3.key_bankruptcyv3_search_full_bip();
 
@@ -19,7 +18,7 @@ checkDays(string8 d1, string8 d2, unsigned2 days) := ut.DaysApart(d1,d2) <= days
 
 layout_derog_process := RECORD
 		Risk_Indicators.layouts.layout_derogs_input;
-		ProfileBooster.V2_Layouts.Layout_Derogs BJL;
+		ProfileBooster.V2_Key_Layouts.Layout_Derogs BJL;
 		Risk_Indicators.Layouts.Layout_Liens Liens;
 
 END;
@@ -65,7 +64,6 @@ bankrupt_added_thor := JOIN(distribute(ids, did),
 	bankrupt_added := ungroup(bankrupt_added_roxie);
 #END
 
-
 layout_extended get_bankrupt_search (layout_extended le, bans_search ri) := TRANSFORM
 	myGetDate := Risk_Indicators.iid_constants.myGetDate(le.historydate);
 	SELF.BJL.bankrupt := ri.case_number<>'';
@@ -90,7 +88,7 @@ layout_extended get_bankrupt_search (layout_extended le, bans_search ri) := TRAN
 	SELF.BJL.bk_count24 := (integer)risk_indicators.iid_constants.checkdays(myGetDate,(STRING8)date_last_seen,ut.DaysInNYears(2), le.historydate);
 	SELF.BJL.bk_count36 := (integer)risk_indicators.iid_constants.checkdays(myGetDate,(STRING8)date_last_seen,ut.DaysInNYears(3), le.historydate);
 	SELF.BJL.bk_count60 := (integer)risk_indicators.iid_constants.checkdays(myGetDate,(STRING8)date_last_seen,ut.DaysInNYears(5), le.historydate);
-  SELF.BJL.bk_chapter := ri.chapter;
+    SELF.BJL.bk_chapter := ri.chapter;
 	SELF.bk_disp_date := max((INTEGER)ri.date_filed, 
 			if((INTEGER)ri.discharged[1..6] < le.historydate, (INTEGER)ri.discharged, 0));
 	SELF := le;
@@ -265,7 +263,7 @@ liens_added_thor := JOIN(
 	SELF.date_last_seen := (unsigned)ri.date_last_seen;// to be used in evictions
 	
 	self.tmsid := if(ri.tmsid='', '', le.tmsid);	// set these to blank so that we miss on the evictions search below
-  self.rmsid := if(ri.rmsid='', '', le.rmsid);
+    self.rmsid := if(ri.rmsid='', '', le.rmsid);
 	
 	SELF := le;
 END;
@@ -375,7 +373,7 @@ layout_extended get_evictions(liens_full le, liensV2.key_liens_main_ID ri) := tr
 	isRecent := ut.DaysApart((string8)le.date_first_seen,myGetDate)<365*2+1;
 
 	isEviction := ri.eviction='Y';
-  self.evictionRec  := isEviction;
+    self.evictionRec  := isEviction;
 	// evictions 
 	SELF.BJL.eviction_recent_unreleased_count := (INTEGER)(isEviction and ((INTEGER)le.date_last_seen=0 OR (string)le.date_last_seen > myGetDate) AND isRecent);
 	SELF.BJL.eviction_historical_unreleased_count := (INTEGER)(isEviction and ((INTEGER)le.date_last_seen=0 OR (string)le.date_last_seen > myGetDate) AND ~isRecent);
@@ -901,11 +899,8 @@ all_foreclosures_thor := all_foreclosures_thor1 + wFID(fid='');  // add back the
 #ELSE
 	all_foreclosures := all_foreclosures_roxie;
 #END
-OUTPUT(COUNT(all_foreclosures),NAMED('GETDEROGS_all_foreclosures'));
 
 wForeclosures := dedup(sort(all_foreclosures, seq, did, -BJL.last_foreclosure_date), seq, did);
-OUTPUT(COUNT(wForeclosures),NAMED('GETDEROGS_wForeclosures'));
-
 
 // output(liens_added, named('liens_added'),overwrite);
 // output(liens_full, named('liens_full'),overwrite);

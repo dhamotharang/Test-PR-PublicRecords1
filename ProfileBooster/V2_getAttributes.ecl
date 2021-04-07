@@ -683,18 +683,29 @@ EXPORT V2_getAttributes(DATASET(ProfileBooster.V2_Layouts.Layout_PB2_Shell) PB2S
     self.attributes.version2.IntSportPersonFlag5Y					  := IF(noDid or isMinor, -99999, le.IntSportPersonFlag5Y);	
     self.attributes.version2.IntSportPersonTravelerFlagEv	  := IF(noDid or isMinor, -99999, le.IntSportPersonTravelerFlagEv);	
     
-    self.attributes.version2.EmrgAge	                      := MAP(noDid or isMinor                      => -99999, 
+    EmrgAge	                                                := MAP(noDid or isMinor                      => -99999, 
                                                                    le.EmrgRecordType = ''                => -99998,
                                                                                                             MIN(le.EmrgAge,ProfileBooster.V2_Constants.Max99));	
+    self.attributes.version2.EmrgAge                        := EmrgAge;
     self.attributes.version2.EmrgAtOrAfter21Flag	          := MAP(noDid or isMinor                      => -99999, 
-                                                                   le.EmrgAge = -99998                   => -99998,
+                                                                   EmrgAge = -99998                      => -99998,
                                                                                                             le.EmrgAtOrAfter21Flag);	
-    self.attributes.version2.EmrgRecordType	                := IF(noDid or isMinor, '-99999', le.EmrgRecordType);	
-    self.attributes.version2.EmrgAddrType	                  := IF(noDid or isMinor, '-99999', le.EmrgAddrType);	
+    self.attributes.version2.EmrgRecordType	                := MAP(noDid or isMinor                      => '-99999', 
+                                                                   le.EmrgRecordType NOT IN ['A','P','D','B','E','S','O'] => '-99998',
+                                                                                                            le.EmrgRecordType);	
+    self.attributes.version2.EmrgAddrType	                  := MAP(noDid or isMinor                      => '-99999', 
+                                                                   le.EmrgPrimaryName=''                 => '-99998',
+                                                                   le.EmrgAddrType NOT IN ['F','G','H','P','R','S','U'] => '-99997',
+                                                                                                            le.EmrgAddrType);	
     self.attributes.version2.EmrgLexIDsAtEmrgAddrCnt1Y      := MAP(noDid or isMinor                      => -99999, 
                                                                    le.EmrgAddrType = '-99998'            => -99998,
+                                                                   le.EmrgPrimaryName=''                 => -99998,
+                                                                   le.EmrgDt_first_seen <= 0             => -99997,
                                                                                                             MIN(le.EmrgLexIDsAtEmrgAddrCnt1Y,ProfileBooster.V2_Constants.Max999));	
-    self.attributes.version2.EmrgAge25to59Flag	            := IF(noDid or isMinor, -99999, le.EmrgAge25to59Flag);	
+    self.attributes.version2.EmrgAge25to59Flag	            := MAP(noDid or isMinor                      => -99999, 
+                                                                   EmrgAge=-99998                        => -99998,
+                                                                   (unsigned)le.EmrgDob<=0               => -99997,
+                                                                                                            le.EmrgAge25to59Flag);	
 
     self.attributes.version2.ShortTermShopNewMsnc	          := MAP(noDid or isMinor                      => -99999, 
                                                                    le.ShortTermShopNewMsnc = 99998 or le.ShortTermShopCntEv=0 => -99998,
