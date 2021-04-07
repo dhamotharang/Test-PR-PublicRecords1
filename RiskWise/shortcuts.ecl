@@ -1,4 +1,4 @@
-﻿import risk_indicators, Phone_Shell, Data_Services, RiskWise;
+﻿import risk_indicators, Phone_Shell, Data_Services, RiskWise, ut;
 
 // placeholder for all of the roxie VIPs to use when processing files using soapcall
 export shortcuts := module
@@ -58,30 +58,33 @@ export shortcuts := module
 
 
   export gw_empty     := dataset( [], risk_indicators.layout_gateways_in );
-  export gw_targus    := dataset( [{'targus','https://rw_data_dev:Password01@espcertvip.risk.regn.net:8726/wsGateway'}], risk_indicators.layout_gateways_in );
-  export gw_targus_sco := dataset( [{'targus','https://rw_score_dev:Password01@espcertvip.risk.regn.net:8726/wsGateway'}], risk_indicators.layout_gateways_in );
-  export gw_targus_prod := dataset([{'targus','https://rw_data_prod:Password01@espprodvip.risk.regn.net:8726/wsGateway/?ver_=1.70'}], risk_indicators.layout_gateways_in );
-  export gw_bridger := dataset([{'bridgerwlc','http://bridger_batch_cert:Br1dg3rBAtchC3rt@172.16.70.19:7003/WsSearchCore/?ver_=1'}], risk_indicators.Layout_Gateways_In);
-  export gw_bridgerApi_cert := dataset( [{'bridgerapi', 'https://HPCC_AML;amlAdmin1:CSS2LCE#!@bctwdbrg301.risk.regn.net/LN.WebServices/11.3/XgServices.svc/Search'}], risk_indicators.layout_gateways_in );
+  export gw_targus    := dataset( [{'targus','https://rw_data_dev:' + ut.Credentials('rw_data_dev').fGetAppUserInfo()[1].password + '@espcertvip.risk.regn.net:8726/wsGateway'}], risk_indicators.layout_gateways_in );
+  export gw_targus_sco := dataset( [{'targus','https://rw_score_dev:' + ut.Credentials('rw_score_dev').fGetAppUserInfo()[1].password + '@espcertvip.risk.regn.net:8726/wsGateway'}], risk_indicators.layout_gateways_in );
+  export gw_targus_prod := dataset([{'targus','https://rw_data_prod:' + ut.Credentials('rw_data_prod').fGetAppUserInfo()[1].password + '@espprodvip.risk.regn.net:8726/wsGateway/?ver_=1.70'}], risk_indicators.layout_gateways_in );
+  export gw_bridger := dataset([{'bridgerwlc','http://bridger_batch_cert:' + ut.Credentials('bridger_batch_cert').fGetAppUserInfo()[1].password + '@172.16.70.19:7003/WsSearchCore/?ver_=1'}], risk_indicators.Layout_Gateways_In);
+  export gw_bridgerApi_cert := dataset( [{'bridgerapi', 'https://HPCC_AML;amlAdmin1:' + ut.Credentials('HPCC_AML;amlAdmin1').fGetAppUserInfo()[1].password + '@bctwdbrg301.risk.regn.net/LN.WebServices/11.3/XgServices.svc/Search'}], risk_indicators.layout_gateways_in );
 
-  export gw_netacuityv4_cert := dataset( [{'netacuity','https://rw_score_dev:Password01@espcertvip.risk.regn.net:8726/WsGateway/?ver_=1.93'}], risk_indicators.layout_gateways_in );
+  export gw_netacuityv4_cert := dataset( [{'netacuity','https://rw_score_dev:' + ut.Credentials('rw_score_dev').fGetAppUserInfo()[1].password + '@espcertvip.risk.regn.net:8726/WsGateway/?ver_=1.93'}], risk_indicators.layout_gateways_in );
   // use this version for anything that is customer paid test  
-  export gw_netacuityv4_prod := dataset( [{'netacuity','https://rox_netacuitygw:g3t3m2018@espprodvip.risk.regn.net:8726/WsGateway/?ver_=1.93'}], risk_indicators.layout_gateways_in );
+  export gw_netacuityv4_prod := dataset( [{'netacuity','https://rox_netacuitygw:' + ut.Credentials('rox_netacuitygw').fGetAppUserInfo()[1].password + '@espprodvip.risk.regn.net:8726/WsGateway/?ver_=1.93'}], risk_indicators.layout_gateways_in );
   export gw_netacuityv4 := gw_netacuityv4_cert  :DEPRECATED('If running a paid customer test, use gw_netacuityv4_prod instead');
-  export gw_emailrisk:= dataset( [{'emailrisk','https://rw_score_dev:Password01@espcertvip.risk.regn.net:8726/WsGatewayEx/EmailRisk?form&ver_=2.9'}], risk_indicators.layout_gateways_in );
+  export gw_emailrisk:= dataset( [{'emailrisk','https://rw_score_dev:' + ut.Credentials('rw_score_dev').fGetAppUserInfo()[1].password + '@espcertvip.risk.regn.net:8726/WsGatewayEx/EmailRisk?form&ver_=2.9'}], risk_indicators.layout_gateways_in );
   export gw_FCRA      := dataset( [{'FCRA','http://roxieqavip.br.seisint.com:9876'}], risk_indicators.layout_gateways_in );
   // export gw_personContext	:= dataset( [{'delta_personcontext','http://ln_api_dempsey_dev:g0n0l3s!@10.176.68.172:7534/WsSupport/?ver_=2'}], risk_indicators.layout_gateways_in );
-  export gw_personContext	:= dataset( [{'delta_personcontext','HTTPS://ln_api_dempsey:g0n0l3s!@10.176.69.172:8534/WsSupport/?ver_=2.0'}], risk_indicators.layout_gateways_in );
+  export gw_personContext	:= dataset( [{'delta_personcontext','HTTPS://ln_api_dempsey:' + ut.Credentials('ln_api_dempsey').fGetAppUserInfo()[1].password + '@10.176.69.172:8534/WsSupport/?ver_=2.0'}], risk_indicators.layout_gateways_in );
     //deltabase gateways for Inquiries
-  export gw_delta_dev := dataset( [{'delta_inquiry','http://rw_score_dev:Password01@10.176.68.151:7909/WsDeltaBase/preparedsql'}], risk_indicators.layout_gateways_in );
-  export gw_delta_prod := dataset( [{'delta_inquiry','http://delta_iid_api_user:2rch%40p1$$@10.176.69.151:7909/WsDeltaBase/preparedsql'}], risk_indicators.layout_gateways_in );
-	export gw_threatmetrix := dataset([{'threatmetrix_test', 'https://rw_score_dev:Password01@espcertvip.risk.regn.net:8426/WsGatewayEx/?ver_=2.28'}], Risk_Indicators.Layout_Gateways_In);
-	export gw_insurancephoneheader := dataset([{'insurancephoneheader','https://api_prod_gw_roxie:g0h3%40t2x@espprodvip.risk.regn.net:8726/WsGatewayEx/?ver_=1.87'}], risk_indicators.Layout_Gateways_In);
-	
+  export gw_delta_dev := dataset( [{'delta_inquiry','http://rw_score_dev:' + ut.Credentials('rw_score_dev').fGetAppUserInfo()[1].password + '@10.176.68.151:7909/WsDeltaBase/preparedsql'}], risk_indicators.layout_gateways_in );
+  export gw_delta_prod := dataset( [{'delta_inquiry','http://delta_iid_api_user:' + ut.Credentials('delta_iid_api_user').fGetAppUserInfo()[1].password + '@10.176.69.151:7909/WsDeltaBase/preparedsql'}], risk_indicators.layout_gateways_in );
+	export gw_threatmetrix := dataset([{'threatmetrix_test', 'https://rw_score_dev:' + ut.Credentials('rw_score_dev').fGetAppUserInfo()[1].password + '@espcertvip.risk.regn.net:8426/WsGatewayEx/?ver_=2.28'}], Risk_Indicators.Layout_Gateways_In);
+	export gw_insurancephoneheader := dataset([{'insurancephoneheader','https://api_prod_gw_roxie:' + ut.Credentials('api_prod_gw_roxie').fGetAppUserInfo()[1].password + '@espprodvip.risk.regn.net:8726/WsGatewayEx/?ver_=1.87'}], risk_indicators.Layout_Gateways_In);
+
+	export Metronet_Experian_Gateway_URL := 'http://rw_score_dev:' + ut.Credentials('rw_score_dev').fGetAppUserInfo()[1].password + '@10.176.68.164:7726/WsGateway?ver_=1.043';
+	export QSentV2_TransUnion_Gateway_URL := 'http://rw_score_dev:' + ut.Credentials('rw_score_dev').fGetAppUserInfo()[1].password + '@10.176.68.164:7726/WsGateway?ver_=1.67'; // NOTE: THIS URL IS ONLY FOR TRANSUNION TEST SEEDS - WILL NOT RUN LIVE TRANSACTIONS
+
   //Cert ESP gateways for IDA gateway
-  export cert_gw_IDA := dataset( [{'idareport','https://rw_score_dev:Password01@10.176.68.164:8726/wsgatewayex/?ver_=2.84'}], risk_indicators.layout_gateways_in );
-  export cert_gw_IDA_UAT := dataset( [{'idareport_uat','https://rw_score_dev:Password01@10.176.68.164:8726/wsgatewayex/?ver_=2.84'}], risk_indicators.layout_gateways_in );
-  export cert_gw_IDA_Retro := dataset( [{'idareport_retro','https://rw_score_dev:Password01@10.176.68.164:8726/wsgatewayex/?ver_=2.84'}], risk_indicators.layout_gateways_in );
+  export cert_gw_IDA := dataset( [{'idareport','https://rw_score_dev:' + ut.Credentials('rw_score_dev').fGetAppUserInfo()[1].password + '@10.176.68.164:8726/wsgatewayex/?ver_=2.84'}], risk_indicators.layout_gateways_in );
+  export cert_gw_IDA_UAT := dataset( [{'idareport_uat','https://rw_score_dev:' + ut.Credentials('rw_score_dev').fGetAppUserInfo()[1].password + '@10.176.68.164:8726/wsgatewayex/?ver_=2.84'}], risk_indicators.layout_gateways_in );
+  export cert_gw_IDA_Retro := dataset( [{'idareport_retro','https://rw_score_dev:' + ut.Credentials('rw_score_dev').fGetAppUserInfo()[1].password + '@10.176.68.164:8726/wsgatewayex/?ver_=2.84'}], risk_indicators.layout_gateways_in );
 	
 	// DATA
 	shared prii_layout := RECORD

@@ -46,7 +46,7 @@
 		EnableMetronet_Experian_Gateway := FALSE; // Set to TRUE to run the Metronet Experian Gateway (Source_List == 'EXP')
 		Metronet_Experian_Gateway_URL := '';
 		// EnableMetronet_Experian_Gateway := TRUE; // Set to TRUE to run the Metronet Experian Gateway (Source_List == 'EXP')
-		// Metronet_Experian_Gateway_URL := 'http://rw_score_dev:Password01@10.176.68.164:7726/WsGateway?ver_=1.043';
+		// Metronet_Experian_Gateway_URL := riskwise.shortcuts.Metronet_Experian_Gateway_URL;
 
 		prii_layout := RECORD
 			unsigned acct_no;
