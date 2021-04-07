@@ -4,9 +4,9 @@ Import History_Analysis, dops, PromoteSupers;
 
 Export CreateStandaloneReports := Module
 
-    Export StandaloneQAReport( string pVersion, string datasetname, string location, string cluster, string fromdate, string todate ) := Function
+    Export StandaloneQAReport( string vip,string pVersion, string datasetname, string location, string cluster, string fromdate, string todate ) := Function
 
-        update_source := History_Analysis.fspray(pVersion, datasetname, location, cluster, fromdate, todate ).build_4;
+        update_source := History_Analysis.fspray(vip, pVersion, datasetname, location, cluster, fromdate, todate ).build_4;
 
         convertToDeltas := History_Analysis.Fn_BuildDeltas.fn_buildQADeltas(History_Analysis.Files(pVersion).keysizedhistory_service);
 
@@ -25,10 +25,10 @@ Export CreateStandaloneReports := Module
 
     End;
 
-    Export StandaloneProdReport( string pVersion, string datasetname, string location, string cluster, string fromdate, string todate ) := Function
+    Export StandaloneProdReport( string vip, string pVersion, string datasetname, string location, string cluster, string fromdate, string todate ) := Function
 
         
-        update_source := History_Analysis.fspray(pVersion, datasetname, location, cluster, fromdate, todate ).build_4;
+        update_source := History_Analysis.fspray(vip, pVersion, datasetname, location, cluster, fromdate, todate ).build_4;
 
         convertToDeltas := History_Analysis.Fn_BuildDeltas.fn_buildProdDeltas(History_Analysis.Files(pVersion).keysizedhistory_service);
 
