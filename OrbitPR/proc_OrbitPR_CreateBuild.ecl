@@ -1,18 +1,18 @@
-﻿import  ut,_Control,STD,OrbitPR;
-export proc_Orbit3_CreateBuild_AddItem(string buildname,string Buildvs,string Envmt = 'N', string email_list = '',string BuildStatus = 'BUILD_AVAILABLE_FOR_USE', boolean skipcreatebuild = false,boolean skipupdatebuild = false, boolean skipaddcomponents = false, boolean runcreatebuild = true, boolean runaddcomponentsonly = false,boolean is_npf = false) := function
+﻿/*2019-01-12T01:11:26Z (Kasavajjala, Sudhir (RIS-BCT))
+
+*/
+import std,ut,OrbitPR,_Control;
+export Proc_OrbitPR_CreateBuild(string buildname,string Buildvs,string Envmt = 'N',string email_list = '',string BuildStatus = 'BUILD_AVAILABLE_FOR_USE', boolean skipcreatebuild = false,boolean skipupdatebuild = false,boolean runcreatebuild = true, boolean is_npf = false) := function
 
 string wuid := workunit;
 
 
 
 
-ECL1 := 'import OrbitPR;\r\n'+
- '#workunit(\'name\',\'Orbit Create Build Instance and Add Items -- '+ buildname + '-- '+Buildvs+'\');\r\n'+
-'OrbitPR.proc_OrbitPR_CreateBuild_AddItem_sp( \''+buildname+'\', \''+Buildvs+'\', \''+Envmt+'\', \''+BuildStatus+'\', \''+email_list+'\', '+if (skipcreatebuild , 'true','false')+ ','
+ECL1 := '#workunit(\'name\',\'Orbit Create Build Instance -- '+ buildname + '-- '+Buildvs+'\');\r\n'+
+'OrbitPR.proc_OrbitPR_CreateBuild_sp( \''+buildname+'\', \''+Buildvs+'\', \''+Envmt+'\', \''+BuildStatus+'\', \''+email_list+'\', '+if (skipcreatebuild , 'true','false')+ ','
 + if (skipupdatebuild , 'true','false')+','
-+ if (skipaddcomponents , 'true','false')+','
 +if (runcreatebuild, 'true','false') +','
-+if (runaddcomponentsonly, 'true','false') +','
 +if (is_npf,'true','false')+' , \''+wuid+'\') \n'
 +' : success(OrbitPR.Send_Email(\''+Buildvs+'\', \''+email_list+'\', \''+buildname+'\', \''+Buildvs+'\' ).build_success)\n'
 +' , failure(OrbitPR.Send_Email(\''+Buildvs+'\', \''+email_list+'\', \''+buildname+'\', \''+Buildvs+'\').build_failure)\n'
@@ -25,7 +25,7 @@ spcluster := map  ( regexfind('_eclcc',tgtcluster)  and _Control.ThisEnvironment
                                    regexfind('_eclcc',tgtcluster)  = false and _Control.ThisEnvironment.Name = 'Dataland'       =>  'hthor_dev',
 							 'hthor'									 );
 
-    fswu :=  _control.fSubmitNewWorkunit(ECL1, trim(spcluster)) :   SUCCESS(fileservices.sendemail(OrbitPR.Send_Email(Buildvs,email_list,buildname,Buildvs ).emaillist
+    fswu :=  _control.fSubmitNewWorkunit(ECL1, trim(spcluster)) :   SUCCESS(fileservices.sendemail(Send_Email(Buildvs,email_list,buildname,Buildvs ).emaillist
 																			                                                                                                     ,'OrbitPR  submit WU to spawn status -- '+ workunit + '  ,  ' +
 																																												   ' Build Name : ' +buildname +  ' , ' +
 																																												   ' Build vs : ' +Buildvs
@@ -33,7 +33,7 @@ spcluster := map  ( regexfind('_eclcc',tgtcluster)  and _Control.ThisEnvironment
 																																												   ' Build Name : ' +buildname +   ' , ' +
 																																												   ' Build vs : ' +Buildvs
 																			                                                                                                       )),
-		                                                                                                                                                                                      FAILURE(fileservices.sendemail(OrbitPR.Send_Email(Buildvs,email_list,buildname,Buildvs ).emaillist
+		                                                                                                                                                                                      FAILURE(fileservices.sendemail(Send_Email(Buildvs,email_list,buildname,Buildvs ).emaillist
 																			                                                                                                     ,'OrbitPR submit WU to spawn status -- '+ workunit +   '  ,  ' +
 																																												 ' Build Name : ' +buildname +  ',' +
 																																												 ' Build vs : ' +Buildvs
