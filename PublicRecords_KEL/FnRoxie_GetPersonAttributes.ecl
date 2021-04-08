@@ -37,38 +37,44 @@ EXPORT FnRoxie_GetPersonAttributes(DATASET(PublicRecords_KEL.ECL_Functions.Layou
 		string6 PL_AlrtIDTheftFlag;
 	END;	
 														
-	NonFCRAPersonAttributesRaw := NOCOMBINE(PROJECT(RecordsWithLexID, TRANSFORM({INTEGER G_ProcUID, LayoutPersonAttributesRaw},
-		SELF.G_ProcUID := LEFT.G_ProcUID;
-		NonFCRAPersonResults := PublicRecords_KEL.Q_Non_F_C_R_A_Person_Attributes_V1_Dynamic(LEFT.P_LexID , DATASET(LEFT), (INTEGER)(LEFT.P_InpClnArchDt[1..8]), Options.KEL_Permissions_Mask, FDCDataset).res0;	
-		SELF := NonFCRAPersonResults[1],
-		SELF := [])));	
+	NonFCRAPersonAttributesRaw := NOCOMBINE(JOIN(RecordsWithLexID, FDCDataset,
+		LEFT.G_ProcUID = RIGHT.G_ProcUID,
+		TRANSFORM({INTEGER G_ProcUID, LayoutPersonAttributesRaw},
+			SELF.G_ProcUID := LEFT.G_ProcUID;
+			NonFCRAPersonResults := PublicRecords_KEL.Q_Non_F_C_R_A_Person_Attributes_V1_Dynamic(LEFT.P_LexID , DATASET(LEFT), (INTEGER)(LEFT.P_InpClnArchDt[1..8]), Options.KEL_Permissions_Mask, DATASET(RIGHT)).res0;	
+			SELF := NonFCRAPersonResults[1],
+			SELF := []),
+		LEFT OUTER, ATMOST(100), KEEP(1)));
 
-	FCRAPersonAttributesRaw := NOCOMBINE(PROJECT(RecordsWithLexID, TRANSFORM({INTEGER G_ProcUID, LayoutPersonAttributesRaw},
-		SELF.G_ProcUID := LEFT.G_ProcUID;
-		FCRAPersonResults := PublicRecords_KEL.Q_F_C_R_A_Person_Attributes_V1_Dynamic(LEFT.P_LexID , DATASET(LEFT), (INTEGER)(LEFT.P_InpClnArchDt[1..8]), Options.KEL_Permissions_Mask, FDCDataset).res0;	
-		SELF := FCRAPersonResults[1],
-		SELF.PL_InqPerLexIDCnt1Y := FCRAPersonResults[1].P_L___Inq_Per_Lex_I_D_Cnt1_Y_;
-		SELF.PL_InqSSNPerLexIDCnt1Y := FCRAPersonResults[1].P_L___Inq_S_S_N_Per_Lex_I_D_Cnt1_Y_;
-		SELF.PL_InqAddrPerLexIDCnt1Y := FCRAPersonResults[1].P_L___Inq_Addr_Per_Lex_I_D_Cnt1_Y_;
-		SELF.PL_InqLNamePerLexIDCnt1Y := FCRAPersonResults[1].P_L___Inq_L_Name_Per_Lex_I_D_Cnt1_Y_;
-		SELF.PL_InqFNamePerLexIDCnt1Y := FCRAPersonResults[1].P_L___Inq_F_Name_Per_Lex_I_D_Cnt1_Y_;
-		SELF.PL_InqPhonePerLexIDCnt1Y := FCRAPersonResults[1].P_L___Inq_Phone_Per_Lex_I_D_Cnt1_Y_;
-		SELF.PL_InqDOBPerLexIDCnt1Y := FCRAPersonResults[1].P_L___Inq_D_O_B_Per_Lex_I_D_Cnt1_Y_;
-		SELF.PL_InqPerLexIDWInpFLSCnt1Y := FCRAPersonResults[1].P_L___Inq_Per_Lex_I_D_W_Inp_F_L_S_Cnt1_Y_;
-		SELF.PL_InqPerLexIDWInpASCnt1Y := FCRAPersonResults[1].P_L___Inq_Per_Lex_I_D_W_Inp_A_S_Cnt1_Y_;
-		SELF.PL_InqPerLexIDWInpSDCnt1Y := FCRAPersonResults[1].P_L___Inq_Per_Lex_I_D_W_Inp_S_D_Cnt1_Y_;
-		SELF.PL_InqPerLexIDWInpPSCnt1Y := FCRAPersonResults[1].P_L___Inq_Per_Lex_I_D_W_Inp_P_S_Cnt1_Y_;
-		SELF.PL_InqPerLexIDWInpFLASCnt1Y := FCRAPersonResults[1].P_L___Inq_Per_Lex_I_D_W_Inp_F_L_A_S_Cnt1_Y_;
-		SELF.PL_InqPerLexIDWInpFLPSCnt1Y := FCRAPersonResults[1].P_L___Inq_Per_Lex_I_D_W_Inp_F_L_P_S_Cnt1_Y_;
-		SELF.PL_InqPerLexIDWInpFLAPSCnt1Y := FCRAPersonResults[1].P_L___Inq_Per_Lex_I_D_W_Inp_F_L_A_P_S_Cnt1_Y_;
-		
-		SELF.PL_AlrtCorrectedFlag := FCRAPersonResults[1].P_L___Alrt_Corrected_Flag_;
-		SELF.PL_AlrtConsStatementFlag := FCRAPersonResults[1].P_L___Alrt_Cons_Statement_Flag_;
-		SELF.PL_AlrtDisputeFlag := FCRAPersonResults[1].P_L___Alrt_Dispute_Flag_;
-		SELF.PL_AlrtSecurityFreezeFlag := FCRAPersonResults[1].P_L___Alrt_Security_Freeze_Flag_;
-		SELF.PL_AlrtSecurityAlertFlag := FCRAPersonResults[1].P_L___Alrt_Security_Alert_Flag_;
-		SELF.PL_AlrtIDTheftFlag := FCRAPersonResults[1].P_L___Alrt_I_D_Theft_Flag_;
-		SELF := [])));	
+	FCRAPersonAttributesRaw := NOCOMBINE(JOIN(RecordsWithLexID, FDCDataset,
+		LEFT.G_ProcUID = RIGHT.G_ProcUID,
+		TRANSFORM({INTEGER G_ProcUID, LayoutPersonAttributesRaw},
+			SELF.G_ProcUID := LEFT.G_ProcUID;
+			FCRAPersonResults := PublicRecords_KEL.Q_F_C_R_A_Person_Attributes_V1_Dynamic(LEFT.P_LexID , DATASET(LEFT), (INTEGER)(LEFT.P_InpClnArchDt[1..8]), Options.KEL_Permissions_Mask, DATASET(RIGHT)).res0;	
+			SELF := FCRAPersonResults[1],
+			SELF.PL_InqPerLexIDCnt1Y := FCRAPersonResults[1].P_L___Inq_Per_Lex_I_D_Cnt1_Y_;
+			SELF.PL_InqSSNPerLexIDCnt1Y := FCRAPersonResults[1].P_L___Inq_S_S_N_Per_Lex_I_D_Cnt1_Y_;
+			SELF.PL_InqAddrPerLexIDCnt1Y := FCRAPersonResults[1].P_L___Inq_Addr_Per_Lex_I_D_Cnt1_Y_;
+			SELF.PL_InqLNamePerLexIDCnt1Y := FCRAPersonResults[1].P_L___Inq_L_Name_Per_Lex_I_D_Cnt1_Y_;
+			SELF.PL_InqFNamePerLexIDCnt1Y := FCRAPersonResults[1].P_L___Inq_F_Name_Per_Lex_I_D_Cnt1_Y_;
+			SELF.PL_InqPhonePerLexIDCnt1Y := FCRAPersonResults[1].P_L___Inq_Phone_Per_Lex_I_D_Cnt1_Y_;
+			SELF.PL_InqDOBPerLexIDCnt1Y := FCRAPersonResults[1].P_L___Inq_D_O_B_Per_Lex_I_D_Cnt1_Y_;
+			SELF.PL_InqPerLexIDWInpFLSCnt1Y := FCRAPersonResults[1].P_L___Inq_Per_Lex_I_D_W_Inp_F_L_S_Cnt1_Y_;
+			SELF.PL_InqPerLexIDWInpASCnt1Y := FCRAPersonResults[1].P_L___Inq_Per_Lex_I_D_W_Inp_A_S_Cnt1_Y_;
+			SELF.PL_InqPerLexIDWInpSDCnt1Y := FCRAPersonResults[1].P_L___Inq_Per_Lex_I_D_W_Inp_S_D_Cnt1_Y_;
+			SELF.PL_InqPerLexIDWInpPSCnt1Y := FCRAPersonResults[1].P_L___Inq_Per_Lex_I_D_W_Inp_P_S_Cnt1_Y_;
+			SELF.PL_InqPerLexIDWInpFLASCnt1Y := FCRAPersonResults[1].P_L___Inq_Per_Lex_I_D_W_Inp_F_L_A_S_Cnt1_Y_;
+			SELF.PL_InqPerLexIDWInpFLPSCnt1Y := FCRAPersonResults[1].P_L___Inq_Per_Lex_I_D_W_Inp_F_L_P_S_Cnt1_Y_;
+			SELF.PL_InqPerLexIDWInpFLAPSCnt1Y := FCRAPersonResults[1].P_L___Inq_Per_Lex_I_D_W_Inp_F_L_A_P_S_Cnt1_Y_;
+			
+			SELF.PL_AlrtCorrectedFlag := FCRAPersonResults[1].P_L___Alrt_Corrected_Flag_;
+			SELF.PL_AlrtConsStatementFlag := FCRAPersonResults[1].P_L___Alrt_Cons_Statement_Flag_;
+			SELF.PL_AlrtDisputeFlag := FCRAPersonResults[1].P_L___Alrt_Dispute_Flag_;
+			SELF.PL_AlrtSecurityFreezeFlag := FCRAPersonResults[1].P_L___Alrt_Security_Freeze_Flag_;
+			SELF.PL_AlrtSecurityAlertFlag := FCRAPersonResults[1].P_L___Alrt_Security_Alert_Flag_;
+			SELF.PL_AlrtIDTheftFlag := FCRAPersonResults[1].P_L___Alrt_I_D_Theft_Flag_;
+			SELF := []),
+		LEFT OUTER, ATMOST(100), KEEP(1)));
 		
 	PersonAttributesClean := IF(Options.IsFCRA, 
 															KEL.Clean(FCRAPersonAttributesRaw, TRUE, TRUE, TRUE),

@@ -25,9 +25,9 @@ EXPORT FnRoxie_GetMiniFDCAttributes(DATASET(PublicRecords_KEL.ECL_Functions.Layo
 	temp := RECORD
 		SET ids;
 		PublicRecords_KEL.ECL_Functions.Layouts.LayoutInputPII;
+		DATASET(PublicRecords_KEL.ECL_Functions.Layouts_FDC().Layout_FDC) FDCDataset;
 	end;
 	
-
 	getids := project(Combine_InputData, transform(temp, self.ids := SET(Get_Lexids_FDC, P_LexID); self := left;  self := [];));			
 						
 	CleanInputs := getids(P_LexID  > 0 and (INTEGER)p_inpclnarchdt <> 0);
@@ -41,18 +41,33 @@ EXPORT FnRoxie_GetMiniFDCAttributes(DATASET(PublicRecords_KEL.ECL_Functions.Layo
 		Dataset({RECORDOF(PublicRecords_KEL.Q_F_C_R_A_Mini_Attributes_V1_Roxie_Dynamic([], 0, PublicRecords_KEL.CFG_Compile.Permit__NONE).res0)}) attributes;
 	END;
 	
-	NonFCRAPersonAttributesRaw := NOCOMBINE(PROJECT(CleanInputs, TRANSFORM(LayoutNonFCRAPersonAttributes,
-		SELF.g_uid := LEFT.g_uid;
-		NonFCRAPersonResults := PublicRecords_KEL.Q_Non_F_C_R_A_Mini_Attributes_V1_Roxie_Dynamic(LEFT.ids , (INTEGER)(LEFT.P_InpClnArchDt[1..8]), Options.KEL_Permissions_Mask, FDCDataset).res0;	
-		SELF.attributes := NonFCRAPersonResults;
-		SELF := [])));	
+	FDCRolled := ROLLUP(SORT(FDCDataset, UIDAppend, RepNumber), LEFT.UIDAppend = RIGHT.UIDAppend, TRANSFORM(RECORDOF(LEFT),
+		SELF.Dataset_Header__key_ADL_segmentation := LEFT.Dataset_Header__key_ADL_segmentation + RIGHT.Dataset_Header__key_ADL_segmentation,
+		SELF.Dataset_Best_Person__Key_Watchdog := LEFT.Dataset_Best_Person__Key_Watchdog + RIGHT.Dataset_Best_Person__Key_Watchdog,
+		SELF.Dataset_Header_Quick__Key_Did := LEFT.Dataset_Header_Quick__Key_Did + RIGHT.Dataset_Header_Quick__Key_Did,
+		SELF.Dataset_Doxie__Key_Header := LEFT.Dataset_Doxie__Key_Header + RIGHT.Dataset_Doxie__Key_Header,
+		SELF.Dataset_Header__Key_Addr_Hist := LEFT.Dataset_Header__Key_Addr_Hist + RIGHT.Dataset_Header__Key_Addr_Hist,
+		SELF := LEFT));
+		
+		
+	// For business transactions, Rep 1 and Rep 6 lexids are input as a set in one row to KEL, so we need to denorm the FDC to include both the 6th rep data and all the other business/rep data.
+	MiniAttributesInput := DENORMALIZE(CleanInputs, FDCRolled, LEFT.g_uid = RIGHT.UIDAppend, TRANSFORM(temp, SELF.FDCDataset := DATASET(RIGHT), SELF := LEFT));
+	
+	NonFCRAPersonAttributesRaw := NOCOMBINE(PROJECT(MiniAttributesInput,
+		TRANSFORM(LayoutNonFCRAPersonAttributes,
+			SELF.g_uid := LEFT.g_uid;
+			NonFCRAPersonResults := PublicRecords_KEL.Q_Non_F_C_R_A_Mini_Attributes_V1_Roxie_Dynamic(LEFT.ids, (INTEGER)(LEFT.P_InpClnArchDt[1..8]), Options.KEL_Permissions_Mask, LEFT.FDCDataset).res0;	
+			SELF.attributes := NonFCRAPersonResults;
+			SELF := [])));
+		
+	FCRAPersonAttributesRaw := NOCOMBINE(PROJECT(MiniAttributesInput,
+		TRANSFORM(LayoutFCRAPersonAttributes,
+			SELF.g_uid := LEFT.g_uid;
+			FCRAPersonResults := PublicRecords_KEL.Q_F_C_R_A_Mini_Attributes_V1_Roxie_Dynamic(LEFT.ids, (INTEGER)(LEFT.P_InpClnArchDt[1..8]), Options.KEL_Permissions_Mask, LEFT.FDCDataset).res0;	
+			SELF.attributes := FCRAPersonResults;
+			SELF := [])));
 
-	FCRAPersonAttributesRaw := NOCOMBINE(PROJECT(CleanInputs, TRANSFORM(LayoutFCRAPersonAttributes,
-		SELF.g_uid := LEFT.g_uid;
-		FCRAPersonResults := PublicRecords_KEL.Q_F_C_R_A_Mini_Attributes_V1_Roxie_Dynamic(LEFT.ids , (INTEGER)(LEFT.P_InpClnArchDt[1..8]), Options.KEL_Permissions_Mask, FDCDataset).res0;	
-		SELF.attributes := FCRAPersonResults;
-		SELF := [])));	
-			
+		
 	FinalnonFCRA := RECORD
 		INTEGER g_uid;
 		RECORDOF(PublicRecords_KEL.Q_Non_F_C_R_A_Mini_Attributes_V1_Roxie_Dynamic([], 0, PublicRecords_KEL.CFG_Compile.Permit__NONE).res0);
@@ -245,4 +260,4 @@ ds_append_best := project(PersonAttributesWithLexID, transform(PublicRecords_KEL
 	MiniAttributes := SORT( MiniAttributesPre + PersonAttributesWithoutLexID, G_ProcUID ); 
 
 	RETURN MiniAttributes;
-END;
+END;	
