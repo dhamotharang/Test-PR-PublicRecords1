@@ -1333,7 +1333,8 @@ riskview.layouts.layout_riskview5_search_results apply_score_alert_filters(alert
 	self.PhoneInputMobile 	 := if(suppress_condition, '', le.PhoneInputMobile 	);
   
   //Checking Indicators
-  self.CheckProfileIndex := if(AlertRegulatoryCondition = '0' and CheckingIndicatorsRequest, '-1', '');
+  // self.CheckProfileIndex := if(AlertRegulatoryCondition = '0' and CheckingIndicatorsRequest, '-1', '');
+  self.CheckProfileIndex := '';
   self.CheckTimeOldest := if(AlertRegulatoryCondition = '0' and CheckingIndicatorsRequest, '-1', '');
   self.CheckTimeNewest := if(AlertRegulatoryCondition = '0' and CheckingIndicatorsRequest, '-1', '');
   self.CheckNegTimeOldest := if(AlertRegulatoryCondition = '0' and CheckingIndicatorsRequest, '-1', '');

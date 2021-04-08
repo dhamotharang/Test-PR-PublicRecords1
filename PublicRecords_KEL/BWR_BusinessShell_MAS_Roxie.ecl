@@ -14,7 +14,8 @@ OutputFile := '~blptemp::out::shell31_with_mas_output'; // by default ThorLib.WU
 
 * ************************************************/
 // RoxieIP := RiskWise.shortcuts.Dev156;
-RoxieIP := 'http://broxievip.sc.seisint.com:9876';
+RoxieIP := riskwise.shortcuts.prod_batch_analytics_roxie;
+
 Threads := 1;
 RecordsToRun := 5; // Number of records to run through the BWR. Set to 0 to run all.
 eyeball := 5; // Number of records to view in the BWR outputs.
