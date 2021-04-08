@@ -1,4 +1,4 @@
-﻿import tools, STD;
+﻿import tools, STD,FraudShared;
 lay_builds 	:= tools.Layout_FilenameVersions.builds;
 lay_inputs	:= tools.Layout_FilenameVersions.Inputs;
 
@@ -12,6 +12,7 @@ export Promote(
 	,dataset(lay_inputs) pMBSInputFilenames = Filenames(pversion).Input.dMBS_filenames
 	,dataset(lay_builds) pBuildFilenames = 	Filenames(pversion).dAll_filenames
 											+ Keynames  (pversion).dAll_filenames
+											+ FraudShared.Keynames(pversion).dAll_filenames
 																					
 ) :=
 module
