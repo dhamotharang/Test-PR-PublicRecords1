@@ -575,6 +575,33 @@
   EXPORT AGENCY_PAYLOAD := RECORD
     AGENCY AND NOT AGENCY_KEYED;
   END;
+   
+  EXPORT AGENCYSOURCE := RECORD
+    string11 mbsi_agency_id;
+    string3 contrib_source;
+    string3 agency_state_abbr;
+    string100 agency_name;
+    string11 agency_ori;
+    string5 cru_agency_id;
+    unsigned3 cru_state_number;
+    string2 append_overwrite_flag;
+    string10 source_start_date;
+    string10 source_end_date;
+    string20 source_termination_date;
+    string1 source_resale_allowed;
+    string1 source_auto_renew;
+    string1 source_allow_sale_of_component_data;
+    string1 source_allow_extract_of_vehicle_data;
+  END;
+ 
+  EXPORT AGENCYSOURCE_KEYED := RECORD
+    AGENCYSOURCE.mbsi_agency_id;
+    AGENCYSOURCE.contrib_source;
+  END;
+
+  EXPORT AGENCYSOURCE_PAYLOAD := RECORD
+    AGENCYSOURCE AND NOT AGENCYSOURCE_KEYED;
+  END;
 
   EXPORT PHOTOID := RECORD
     string11 super_report_id;
