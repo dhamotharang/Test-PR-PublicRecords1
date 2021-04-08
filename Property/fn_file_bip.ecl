@@ -7,7 +7,7 @@ file_in := IF(DeedType = 'NOD',
 							Property.File_Foreclosure_Normalized(TRIM(deed_category)IN Category_filter.Foreclosure AND TRIM(foreclosure_id,LEFT,RIGHT) NOT IN Suppress_FID)
 							);
 
-pFileIn := DEDUP(SORT(PROJECT(file_in(site_prim_name<>'' and site_zip<>''),dx_Property.Layouts.BIP_layout),RECORD,-source_rec_id),RECORD, EXCEPT source_rec_id);
+pFileIn := DEDUP(SORT(PROJECT(file_in(site_prim_name<>'' and site_zip<>''),dx_Property.Layouts.BIP_layout),RECORD,-source_rec_id),ALL, EXCEPT source_rec_id);
 
 RETURN pFileIn(UltID > 0);
 
