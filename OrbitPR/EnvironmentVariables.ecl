@@ -3,7 +3,8 @@ export EnvironmentVariables := module
 
 	export username := 'svc_pr_orbit_hpcc@mbs';
 	export password := '0r61t79!';
-	export switchtonewversion := true;
+
+	export switchtonewversion := true : STORED('switchtonewversion');
 	export serviceurl := 
 		if (_control.ThisEnvironment.Name = 'Prod_Thor', 
 		if (switchtonewversion,
