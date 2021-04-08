@@ -128,7 +128,7 @@ end;
 
 //DID
 
-matchset := ['A','Z','D','P'];
+matchset := ['A','Z','D','P','S'];
 	 did_add.MAC_Match_Flex
 	 (new_base_s, matchset,					
 	 orig_ssn, clean_dob, fname, mname, lname, name_suffix, 
