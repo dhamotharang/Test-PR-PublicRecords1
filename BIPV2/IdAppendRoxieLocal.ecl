@@ -6,7 +6,6 @@ import BizLinkFull;
 import SALT44;
 import Std.Str;
 import BIPV2_xlink_segmentation;
-Import UT;
 
 // Should we disable fallback? Can we disable fallback?
 
@@ -323,39 +322,6 @@ topIds :=
 
 	suppressed :=  BIPV2_Suppression.macSuppress(preSuppression + passThruPreSuppress);
 
-// outputlayout := RECORD 
-//   Dataset(RECORDOF(inputDs)) inputDs;
-//   boolean reAppend;
-//   Dataset(RECORDOF(inputDsZip)) inputDsZip;
-//   Dataset(RECORDOF(inputDsCnp)) inputDsCnp;
-//   Dataset(RECORDOF(SALTInput)) SALTInput;
-//   Dataset(RECORDOF(meowBizRawResults)) meowBizRawResults;
-//   Dataset(RECORDOF(OutSegResult)) OutSegResult;
-//   Dataset(RECORDOF(rawResults)) rawResults;
-//   Dataset(RECORDOF(topIds)) topIds;
-//   Dataset(RECORDOF(passThru0)) passThru0;
-//   Dataset(RECORDOF(passThru)) passThru;
-//   Dataset(RECORDOF(passThruPreSuppress)) passThruPreSuppress;
-//   Dataset(RECORDOF(suppressed)) suppressed;
-//  END;
- 
-//  ds_getallend := project(ut.ds_oneRecord, transform(outputlayout, 
-//  self.inputDs := inputDs;
-//  self.reAppend := reAppend;
-//  self.passThru := passThru;
-//  self.inputDsZip := inputDsZip;
-//  self.inputDsCnp := inputDsCnp;
-//  self.meowBizRawResults := meowBizRawResults;
-//  self.SALTInput := SALTInput;
-//  self.OutSegResult := OutSegResult;
-//  self.rawResults := rawResults;
-//  self.topIds := topIds;
-//  self.passThru0 := passThru0;
-//  self.suppressed := suppressed;
-//  self.passThruPreSuppress := passThruPreSuppress;
-//  ));
- //output(ds_getallend, named('ds_getallend'), extend);
- 
 	return suppressed;
 
 	// return parallel(

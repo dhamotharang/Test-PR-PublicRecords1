@@ -23,7 +23,7 @@
 </message>
 */
 
-IMPORT PublicRecords_KEL, Royalty, iesp, STD, BRM_Marketing_attributes;
+IMPORT PublicRecords_KEL, Royalty, iesp, STD, BRM_Marketing_attributes, Business_Risk_BIP;
 EXPORT BRM_Marketing_Attr_Batch_Services() := MACRO
 
 		#OPTION('expandSelectCreateRow', TRUE);
