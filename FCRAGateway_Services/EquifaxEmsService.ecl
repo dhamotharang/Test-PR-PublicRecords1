@@ -45,7 +45,7 @@ EXPORT EquifaxEmsService := MACRO
       //G-ESP added a couple fields that aren't used by T-ESP here.
       //Fails when not projected.
       SELF.mergedCreditReport := PROJECT(L.response.emsResponse.creditReports, TRANSFORM(
-        iesp.mergedcreditreport_fcra.t_CreditReportRecord, SELF := LEFT, SELF := []));
+        iesp.mergedcreditreport_fcra.t_CreditReportRecord, SELF := LEFT));
 
       SELF := L.response.emsResponse;
       SELF := [];
