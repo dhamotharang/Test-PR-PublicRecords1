@@ -22,9 +22,9 @@ Export Send_Email( string pVersion, string contacts ) := Module
 							+ ' The End.';
           
     // If job is executed successfully, an email will be sent to users in the corresponding list
-	Export build_success    := STD.System.Email.SendEmail(contacts, subject, body_success, contacts );
+	Export build_success    := STD.System.Email.SendEmail(contacts, subject, body_success );
 													
     // If job fails, an email will be sent to notify the users in corresponding list 
-	Export build_failure    := STD.System.Email.SendEmail(contacts, subject, body_failure, contacts );
+	Export build_failure    := STD.System.Email.SendEmail(contacts, subject, body_failure );
 
 	End;
