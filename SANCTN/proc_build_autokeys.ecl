@@ -20,10 +20,6 @@ SANCTN.layout_autokeys;
 	//CCPA-283 Adding CCPA new fields
 	UNSIGNED4 global_sid:=0;
 	UNSIGNED8 record_sid:=0;
-    UNSIGNED4 dt_effective_first:=0;
-    UNSIGNED4 dt_effective_last:=0;
-    UNSIGNED1 delta_ind := 0;
-
 END;
 
 xpnd_sanctn xpand_sanctn(pty L, inc R) :=  TRANSFORM
