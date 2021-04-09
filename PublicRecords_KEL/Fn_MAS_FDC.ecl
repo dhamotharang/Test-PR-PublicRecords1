@@ -436,7 +436,7 @@ Current_Address_Consumer_recs_Contacts := join(Current_Address_Consumer_recs, Cu
 
 	// Only keep 100 contacts per business for LexID searching to improve performance
 	Business_Contact_LexIDs_Temp := DEDUP(SORT(Temp_FDCDataset_mini_contacts, UIDAppend, P_LexID), WHOLE RECORD);
-	Business_Contact_LexIDs := DEDUP(SORT(Business_Contact_LexIDs_Temp, P_LexID, UIDAppend),P_LexID, UIDAppend, KEEP(100));//only keep 100 seen in the last 3 years
+	Business_Contact_LexIDs := DEDUP(DEDUP(SORT(Business_Contact_LexIDs_Temp, UIDAppend, P_LexID), UIDAppend, P_LexID), UIDAppend, KEEP(100));	
 
 	For_Lexid_Search := IF(Common.DoFDCJoinfn_IndexedSearchForXLinkIDs = TRUE, PROJECT(Business_Contact_LexIDs + Input_FDC, TRANSFORM(BIPV2.IDFunctions.rec_SearchInput,	
 				// Contatonation UIDAppend and P_LexID to form acctno when searching for businesses tied to a contact.

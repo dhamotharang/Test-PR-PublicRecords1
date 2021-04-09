@@ -342,9 +342,7 @@ end;
 
 	// Only keep 100 contacts per business for LexID searching to improve performance
 	Business_Contact_LexIDs_Temp := DEDUP(SORT(Bus_contact_Second, UIDAppend, P_LexID), WHOLE RECORD);
-	Business_Contact_LexIDs := DEDUP(SORT(Business_Contact_LexIDs_Temp, P_LexID, UIDAppend),P_LexID, UIDAppend, KEEP(100));//only keep 100 seen in the last 3 years
-
-	
+	Business_Contact_LexIDs := DEDUP(DEDUP(SORT(Business_Contact_LexIDs_Temp, UIDAppend, P_LexID), UIDAppend, P_LexID), UIDAppend, KEEP(100));	
 /*************************************************************************************************************/
 	//transform business contact into input layout and dedup
 	Input_Plus_Contacts := Input_FDC + Business_Contact_LexIDs;
@@ -997,6 +995,9 @@ end;
 						SELF.Dataset_ConsumerStatementFlags := ROWS(RIGHT),
 						SELF := LEFT,
 						SELF := []));		
+	
+	output(Business_Contact_LexIDs);
+	count(Business_Contact_LexIDs);
 	
 	RETURN (With_ConsumerStatementFlags+With_Header_Addr_Hist_Records_6threp);
 	
