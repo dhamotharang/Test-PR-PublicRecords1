@@ -217,7 +217,8 @@ EXPORT fn_getSearchOutput(DATASET(HomesteadExemptionV2_Services.Layouts.workRec)
     // LEXID
     SELF.LexId:=(STRING)L.did;
     SELF.LexIdScore:=(STRING)L.score;
-    SELF.ExceptionOccured:=IF(L.error_code!=0,'Y','');
+    hasException:=L.error_code!=0;
+    SELF.ExceptionOccured:=IF(hasException,'Y','');
     SELF.ExceptionCode:=L.exception_code;
 
     // BEST RECORD
@@ -235,7 +236,8 @@ EXPORT fn_getSearchOutput(DATASET(HomesteadExemptionV2_Services.Layouts.workRec)
     SELF.BestRecord.DOB   :=iesp.ECL2ESP.toDatestring8(DOB);
     SELF.BestRecord.Phone :=bestRec.phoneno;
     // Use best DOB else input DOB to calculate age
-    SELF.BestRecord.Age   :=ut.Age((UNSIGNED4)IF(bestRec.DOB!='',bestRec.DOB,L.DOB));
+    BestRecAge:=ut.Age((UNSIGNED4)IF(bestRec.DOB!='',bestRec.DOB,L.DOB));
+    SELF.BestRecord.Age:=BestRecAge;
     SELF.BestRecord.Address.StreetNumber        :=bestRec.prim_range;
     SELF.BestRecord.Address.StreetPreDirection  :=bestRec.predir;
     SELF.BestRecord.Address.StreetName          :=bestRec.prim_name;
@@ -253,7 +255,8 @@ EXPORT fn_getSearchOutput(DATASET(HomesteadExemptionV2_Services.Layouts.workRec)
 
     // DECEASED RECORD
     // Populate WHEN match code includes 'N' (name match) AND DOB YYYY matches best DOB or input DOB
-    dcsdRec:=SORT(L.deceased_records(Std.Str.Find(MatchCode,'N')>0 AND (DOB[1..4]=bestRec.DOB[1..4] OR DOB[1..4]=L.DOB[1..4])),-fileDate)[1];
+    dcsdRecs:=SORT(L.deceased_records(Std.Str.Find(MatchCode,'N')>0 AND (DOB[1..4]=bestRec.DOB[1..4] OR DOB[1..4]=L.DOB[1..4])),-fileDate);
+    dcsdRec:=dcsdRecs[1]; // latest deceased record
     SELF.DeceasedRecord.DOD :=iesp.ECL2ESP.toDatestring8(dcsdRec.DOD);
     SELF.DeceasedRecord.DOB :=iesp.ECL2ESP.toDatestring8(dcsdRec.DOB_masked);
     SELF.DeceasedRecord.Name.First  :=dcsdRec.name_first;
@@ -297,7 +300,49 @@ EXPORT fn_getSearchOutput(DATASET(HomesteadExemptionV2_Services.Layouts.workRec)
     SELF.Voter.Year:=voterLastVote[1].LastDateVote; // LAST VOTER YEAR
 
     // MAX PROPERTY RECORDS
-    SELF.Properties:=CHOOSEN(PROJECT(SORT(L.property_records,property_rank,-sortby_date),propertyRecords(LEFT)),in_mod.MaxProperties);
+    Properties:=CHOOSEN(PROJECT(SORT(L.property_records,property_rank,-sortby_date),propertyRecords(LEFT)),in_mod.MaxProperties);
+    SELF.Properties:=Properties;
+
+    // RISK CODES
+    TODAY:=iesp.ECL2ESP.toDatestring8((STRING)Std.Date.Today());
+    dsEmpty:=DATASET([],iesp.homestead_exemption_search.t_HomesteadExemptionRiskCodes);
+
+    inputAddr:=ROW({L.prim_range,L.prim_name,L.sec_range,L.p_city_name,L.st,L.z5},HomesteadExemptionV2_Services.Layouts.addrMin);
+    bestAddr:=ROW({bestRec.prim_range,bestRec.prim_name,bestRec.sec_range,bestRec.p_city_name,bestRec.st,bestRec.z5},HomesteadExemptionV2_Services.Layouts.addrMin);
+    inputMatchesBest:=HomesteadExemptionV2_Services.Functions.compare2Addresses(inputAddr,bestAddr,includeSecondaryRange:=FALSE);
+    // IF BEST ADDRESS IS PO BOX OR INPUT ADDDRESS MATCHES BEST ADDRESS THEN EMPTY DATASET ELSE RISK CODE 20
+    scoreRec20:=IF(address.isPOBox(bestRec.prim_name) OR inputMatchesBest,dsEmpty,
+      DATASET([{CNST.BEST_ADDR,CNST.BEST_ADDR_MSG,CNST.WARN,TODAY}],iesp.homestead_exemption_search.t_HomesteadExemptionRiskCodes));
+
+    drvrRec:=driverCurrent[1];
+    drvrAddr:=ROW({drvrRec.prim_range,drvrRec.prim_name,drvrRec.sec_range,drvrRec.p_city_name,drvrRec.st,drvrRec.z5},HomesteadExemptionV2_Services.Layouts.addrMin);
+    inputMatchesDrvr:=HomesteadExemptionV2_Services.Functions.compare2Addresses(inputAddr,drvrAddr,includeSecondaryRange:=FALSE);
+    // IF NO CURRENT DRIVER RECORD OR INPUT ADDDRESS MATCHES DRIVER ADDRESS THEN KEEP ELSE ADD RISK CODE 30
+    scoreRec30:=IF(NOT EXISTS(driverCurrent) OR inputMatchesDrvr,scoreRec20,scoreRec20+
+      DATASET([{CNST.DRVR_ADDR,CNST.DRVR_ADDR_MSG,CNST.WARN,TODAY}],iesp.homestead_exemption_search.t_HomesteadExemptionRiskCodes));
+
+    // IF NO BEST RECORD AGE OR BEST RECORD AGE MEETS OR EXCEEDS THRESHOLD THEN KEEP ELSE ADD RISK CODE 40
+    scoreRec40:=IF(BestRecAge=0 OR BestRecAge>=CNST.AGE_THRESHOLD,scoreRec30,scoreRec30+
+      DATASET([{CNST.NOT_AGE_65,CNST.NOT_AGE_65_MSG,CNST.WARN,TODAY}],iesp.homestead_exemption_search.t_HomesteadExemptionRiskCodes));
+
+    previousYear:=((INTEGER)L.tax_year)-1;
+    previousYears:=HomesteadExemptionV2_Services.Functions.previousYears((STRING)previousYear,CNST.EXEMPTION_YEARS);
+    otherProperties:=Properties(PropertyRank>1,Property.Address.StreetAddress1!='',Property.Address.StateCityZip!='');
+    exemptionClaimed:=otherProperties(Assessment.ExemptionClaimed='Y',RecentExemptionYear IN SET(previousYears,year));
+    // IF NO OTHER FULL ADDRESS PROPERTIES CLAIM EXEMPTION WITHIN TWO YEARS THEN KEEP ELSE ADD RISK CODE 50
+    scoreRec50:=IF(NOT EXISTS(exemptionClaimed),scoreRec40,scoreRec40+
+      DATASET([{CNST.HAS_EXMPTN,CNST.HAS_EXMPTN_MSG,CNST.FAILED,TODAY}],iesp.homestead_exemption_search.t_HomesteadExemptionRiskCodes));
+
+    // IF NO DECEASED RECORDS EXISTS THEN KEEP ELSE ADD RISK CODE 60
+    scoreRec60:=IF(NOT EXISTS(dcsdRecs), scoreRec50,scoreRec50+
+      DATASET([{CNST.IS_DECEASED,CNST.IS_DECEASED_MSG,CNST.FAILED,TODAY}],iesp.homestead_exemption_search.t_HomesteadExemptionRiskCodes));
+
+    // IF EXCEPTION THEN EMPTY DATASET ELSEIF ANY RISK CODES 20-60 EXISTS THEN KEEP ELSE REPORT NO RISK INDICATORS CODE 10
+    RiskCodeRecs:=MAP(hasException => dsEmpty,
+      EXISTS(scoreRec60) => scoreRec60,
+      DATASET([{CNST.NO_RISK,CNST.NO_RISK_MSG,CNST.PASS,TODAY}],iesp.homestead_exemption_search.t_HomesteadExemptionRiskCodes));
+
+    SELF.RiskCodes:=CHOOSEN(RiskCodeRecs,iesp.constants.hmstdExmptn.MAX_RISKCODES);
     SELF:=[];
   END;
 
