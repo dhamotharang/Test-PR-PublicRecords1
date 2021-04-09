@@ -86,7 +86,8 @@ function
                                             DMA.proc_build_tps_all(fileDate, build_full).proc_build_base,
                                             //qaRecs,
 											buildKey,
-                                            //dma.stats(filedate),
+                                            dma.stats(filedate, build_full),
+                                            updateVersion,
 											create_orbit_build,
 											qaEmail,
 											//Scrubs_DoNotCall.fnRunScrubs(fileDate,'')

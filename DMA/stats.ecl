@@ -1,6 +1,6 @@
 import dx_dma, dma, std, data_services, doxie;
-#OPTION ('multiplePersistInstances', false);
-export stats(string filedate) := function
+
+export stats(string filedate, boolean build_full = false) := function
     kfield:= RECORD
         string10 Phonenumber;
     END;
@@ -10,27 +10,29 @@ export stats(string filedate) := function
         unsigned4 dt_effective_last;
         unsigned1 delta_ind;
     END;
-    key_DNC_Phone_new	:=	index(																	{kfield},
-                                                                        {pfield},
-                                                                        '~thor_data400::key::DNC::'+ Doxie.Version_SuperKey +'::phone'
-                                                                    ):persist('~thor400::tps::key::prod::persist');
+    key_old	:= if(build_full,
+                        index({kfield}, {pfield}, '~thor_data400::key::DNC::father::phone'),
+                        join(dx_dma.key_DNC_Phone, index({kfield}, {pfield}, dx_dma.names.key_dnc_new(filedate)), 
+                        left.phonenumber	=	right.phonenumber and left.delta_ind != 3, 
+                        left only)
+                        );
 
-    dev_base := dma.File_SuppressionTPS_Delta.Base;
+    new_base := dma.File_SuppressionTPS_Delta.Base;
 
     key := dx_dma.key_DNC_Phone;
-    prod_Base :=	dataset('~thor_data400::base::suppression::tps',dx_dma.layouts.base,flat);
+    last_Base :=	if(build_full,
+                        dma.File_SuppressionTPS_Delta.father,
+                        dma.File_SuppressionTPS_Delta.base - dma.File_SuppressionTPS_Delta.base_new(filedate)
+                        );
 
-    base_dev_dedup := dedup(distribute(sort(dev_base, phonenumber),hash32(PhoneNumber)),phonenumber,local);
-    base_prod_dedup := dedup(distribute(sort(prod_Base, phonenumber),hash32(PhoneNumber)),phonenumber,local);
+    base_new_dedup := dedup(distribute(sort(new_base, phonenumber),hash32(PhoneNumber)),phonenumber,local);
+    base_last_dedup := dedup(distribute(sort(last_Base, phonenumber),hash32(PhoneNumber)),phonenumber,local);
 
-    extra_in_dev_base := join(base_prod_dedup, base_dev_dedup, left.phonenumber	=	right.phonenumber, right only);
-    missing_from_dev_base := join(base_prod_dedup, base_dev_dedup, left.phonenumber	=	right.phonenumber, left only);
+    extra_in_new_base := join(base_last_dedup, base_new_dedup, left.phonenumber	=	right.phonenumber, right only);
+    missing_from_new_base := join(base_last_dedup, base_new_dedup, left.phonenumber	=	right.phonenumber and right.delta_ind != 3, left only);
 
-    key_dev_dedup := dedup(distribute(sort(key, phonenumber),hash32(PhoneNumber)),phonenumber,local);
-    key_prod_dedup := dedup(distribute(sort(key_DNC_Phone_new, phonenumber),hash32(PhoneNumber)),phonenumber,local);
-
-    extra_in_dev_key := join(key_prod_dedup, key_dev_dedup, left.phonenumber	=	right.phonenumber, right only);
-    missing_from_dev_key := join(key_prod_dedup, key_dev_dedup, left.phonenumber	=	right.phonenumber, left only);
+    key_new_dedup := dedup(distribute(sort(key, phonenumber),hash32(PhoneNumber)),phonenumber,local);
+    key_last_dedup := dedup(distribute(sort(key_old, phonenumber),hash32(PhoneNumber)),phonenumber,local);
 
     new_key :=	index(  {dx_dma.layouts.delta_keyfield},
                                     {dx_dma.layouts.delta_payload},
@@ -39,16 +41,23 @@ export stats(string filedate) := function
     adds := new_key(delta_ind = 1);
     deletes := new_key(delta_ind = 3);
 
+    extra_in_new_key := join(key_last_dedup, key_new_dedup, left.phonenumber	=	right.phonenumber, right only);
+    missing_from_new_key := if(build_full,
+                                join(key_last_dedup, key_new_dedup, left.phonenumber	=	right.phonenumber, left only),
+                                deletes
+                                );
+
+
     return sequential(  
-                        output(count(base_dev_dedup), named('dev_base_record_count_'+filedate)),
-                        output(count(base_prod_dedup), named('prod_base_record_count_'+filedate)),
-                        //output(extra_in_dev_base,, '~thor400::tps::base::extra_in_dev_base', overwrite),
-                        //output(missing_from_dev_base,, '~thor400::tps::base::missing_from_dev_base', overwrite),
-                        output(count(key_dev_dedup), named('dev_key_record_count_'+filedate)),
-                        output(count(key_prod_dedup), named('prod_key_record_count_'+filedate)),
-                        //output(extra_in_dev_key,, '~thor400::tps::key::extra_in_dev_key', overwrite),
-                        //output(missing_from_dev_key,, '~thor400::tps::key::missing_from_dev_key', overwrite),
-                        output(count(missing_from_dev_key),named('missing_from_dev_key_'+filedate)),
+                        output(count(base_new_dedup), named('new_base_record_count_'+filedate)),
+                        output(count(base_last_dedup), named('last_base_record_count_'+filedate)),
+                        //output(extra_in_new_base,, '~thor400::tps::base::extra_in_new_base', overwrite),
+                        //output(missing_from_new_base,, '~thor400::tps::base::missing_from_new_base', overwrite),
+                        output(count(key_new_dedup), named('new_key_record_count_'+filedate)),
+                        output(count(key_last_dedup), named('last_key_record_count_'+filedate)),
+                        output(extra_in_new_key,, '~thor400::tps::key::extra_in_new_key', overwrite),
+                        output(missing_from_new_key,, '~thor400::tps::key::missing_from_new_key', overwrite),
+                        output(count(missing_from_new_key),named('deleted_'+filedate)),
                         output(count(adds),named('new_delta_adds_'+filedate)),
                         output(count(deletes),named('new_delta_deletes_'+filedate)),
                         output(adds,named('adds_sample_'+filedate)),
