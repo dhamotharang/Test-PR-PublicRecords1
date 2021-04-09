@@ -921,7 +921,8 @@ riskview.layouts.layout_riskview5_search_results apply_score_alert_filters(alert
 	 
 	auto_deceased := has200Score and le.auto_score_name not in deceased_exception_models;
 	// to prevent a 200 score with a 222A alert (happens when ssn is deceased but unable to find lexid), overwrite all scores to 222 if 222A alert is returned.  Models prioritize 200 over 222.
-	no_truedid := UT.Exists2(ds_alerts (alert_code = '222A'));
+  // Also need to make sure that 100B alert conditions override the score to 222, if 100B condition happens, the bocashell is overriding truedid to false which forces ConfirmationSubjectFound = 0
+	no_truedid := UT.Exists2(ds_alerts (alert_code = '222A')) OR le.ConfirmationSubjectFound='0';
   SELF.Auto_score := MAP(le.Auto_score <> '' AND score_override_alert_returned	=> '100',
 												 le.Auto_score <> '' AND prescreen_score_pass_auto			=> '1',
 												 le.Auto_score <> '' AND prescreen_score_fail_auto			=> '0',
