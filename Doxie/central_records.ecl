@@ -11,7 +11,8 @@ export central_records(
   integer1 nonSS = suppress.constants.NonSubjectSuppression.doNothing,
   dataset(FFD.Layouts.PersonContextBatchSlim) slim_pc_recs = FFD.Constants.BlankPersonContextBatchSlim,
   integer8 inFFDMask = 0,
-  dataset (FCRA.Layout_override_flag) ds_flags = FCRA.compliance.blank_flagfile
+  dataset (FCRA.Layout_override_flag) ds_flags = FCRA.compliance.blank_flagfile,
+  BOOLEAN skipPhonesPlus = FALSE
 ) := FUNCTION
 
 con := doxie_crs.constants;
@@ -92,7 +93,7 @@ idom := IF (Include_InternetDomains_val, CHOOSEN (doxie_raw.WhoIs_raw (dids,,, d
 nod_for := nod_foreclosure_records (dids, ssn_mask_value, application_type_value, industry_class_val);
 nod := if(include_NoticeOfDefaults_val, nod_for.nod);
 frcl := if(include_foreclosures_val, nod_for.foreclosure);
-phpl := if(Include_PhonesPlus_val,
+phpl := if(Include_PhonesPlus_val AND NOT skipPhonesPlus,
   moxie_phonesplus_server.phonesplus_did_records(dids, con.max_phonesplus, score_threshold_value,glb_purpose,dppa_purpose,,true,true).w_timezone);
 
 email := map(Include_Email_Addresses_val and EmailVersion in [0,1] and email_dedup_val => doxie.fn_dedup_email(dids,ssn_mask_value,application_type_value,industry_class_value), // checking if to dedup emails
@@ -175,12 +176,11 @@ doxie.layout_central_records tra (layout_central_header l) := transform
   self.fl_crash_children                  := IF (~IsFCRA, global(flcr));
   self.nod_children                       := IF (check_cond, if(not doxie.DataRestriction.Fares, global(nod)));
   self.foreclosure_children               := IF (check_cond, if(not doxie.DataRestriction.Fares, global(frcl)));
-  self.phonesplus_children                := IF (~IsFCRA,choosen(phpl, con.max_phonesplus));
+  self.phonesplus_children                := IF (~IsFCRA, choosen(phpl, con.max_phonesplus));
   self.premium_phone_children             := IF (check_cond, choosen(prph, con.max_phonesplus));
   self.Email_children                     := IF (~ISFCRA, global(email));
   self.EmailV2Records                     := IF (~ISFCRA, global(emailV2.EmailV2Records));
   self.EmailV2Royalties                   := IF (~ISFCRA, global(emailV2.EmailV2Royalties));
-
   self.verification                       := IF (~ISFCRA, verification);
   self.phone_summary                      := IF (~ISFCRA, phone_summary);
 
@@ -197,7 +197,7 @@ doxie.layout_central_records tra (layout_central_header l) := transform
 
   self.hasCriminalConviction              := IF (~IsFCRA, crimIndicators[1].hasCriminalConviction,false);
   self.isSexualOffender                   := IF (~IsFCRA, crimIndicators[1].isSexualOffender,false);
-    // subject's names, addresses, relatives, neighbors, etc. are all taken from header_data
+  // subject's names, addresses, relatives, neighbors, etc. are all taken from header_data
   Self := l;
   self := [];
 end;

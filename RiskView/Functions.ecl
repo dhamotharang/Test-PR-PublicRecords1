@@ -191,20 +191,25 @@ END; // JuLiProcessStatusRefresh END
      
     Invalid_addr_request := Trim(Std.Str.ToLowerCase(AttributesVersionRequest)) not in RiskView.Constants.valid_attributes;
     FIS_custom_addr_request := Trim(Std.Str.ToLowerCase(AttributesVersionRequest)) = RiskView.Constants.FIS_custom_attr_request;
+    IDA_addr_request := Trim(Std.Str.ToLowerCase(AttributesVersionRequest)) IN RiskView.Constants.IDA_modeling_attrs;
 
     emptyNameValuePairs := Dataset([], iesp.share.t_NameValuePair);
 
     nameValuePairsVersion5 :=  NORMALIZE(Search_results, 203, RiskView.Transforms.intoVersion5(LEFT, COUNTER))(trim(value)<>'');
     nameValuePairsFIS := NORMALIZE(Search_results, 8, RiskView.Transforms.intoFISattrs(LEFT, COUNTER));
+    nameValuePairsIDA := Project(Search_results.IDA_Attributes, RiskView.Transforms.intoIDAattrs(LEFT));
     
     //Assign tags to sort the order of the attribute groups
     Version5Tagged := PROJECT(nameValuePairsVersion5, TRANSFORM({iesp.share.t_NameValuePair, UNSIGNED1 Tag}, SELF.Tag := 1; SELF := LEFT));
     FISTagged      := PROJECT(nameValuePairsFIS, TRANSFORM({iesp.share.t_NameValuePair, UNSIGNED1 Tag}, SELF.Tag := 2; SELF := LEFT));
     
     FIS_attr_set := PROJECT(SORT(Version5Tagged + FISTagged, Tag), TRANSFORM(iesp.share.t_NameValuePair, SELF := LEFT));
+    
+    IDA_attr_set := nameValuePairsVersion5 & nameValuePairsIDA;
      
     FullAttrSet := Map(Invalid_addr_request    => emptyNameValuePairs,     //invalid request, return nothing
                        FIS_custom_addr_request => FIS_attr_set,            //FIS custom attrs requested, return v5 set plus FIS custom set
+                       IDA_addr_request        => IDA_attr_set,            //IDA modeling attrs requested, return v5 set plus IDA set
                                                   nameValuePairsVersion5); //Otherwise return the normal v5 set
      
      Return FullAttrSet;

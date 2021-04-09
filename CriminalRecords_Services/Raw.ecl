@@ -1,45 +1,45 @@
-﻿import STD, doxie, doxie_files, hygenics_crim, ut, FCRA, FFD, D2C;
+﻿IMPORT STD, doxie, doxie_files, hygenics_crim, ut, FCRA, FFD, D2C;
 
 MAX_OVERRIDE_LIMIT := FCRA.compliance.MAX_OVERRIDE_LIMIT;
 
-export Raw := module
-  export getOffenderKeys := module
+EXPORT Raw := MODULE
+  EXPORT getOffenderKeys := MODULE
 
-    export byDIDs(dataset(doxie.layout_references) in_dids,
-                  boolean IsFCRA=false,
-                  dataset (fcra.Layout_override_flag) flagfile = fcra.compliance.blank_flagfile) := function
-      correct_ofk  := SET (flagfile (file_id=FCRA.FILE_ID.OFFENDERS), record_id);
+    EXPORT byDIDs(DATASET(doxie.layout_references) in_dids,
+                  BOOLEAN IsFCRA=FALSE,
+                  DATASET (fcra.Layout_override_flag) flagfile = fcra.compliance.blank_flagfile) := FUNCTION
+      correct_ofk := SET (flagfile (file_id=FCRA.FILE_ID.OFFENDERS), record_id);
       correct_ffid := SET (flagfile (file_id=FCRA.FILE_ID.OFFENDERS), flag_file_id);
-      deduped := dedup(sort(in_dids,did),did);
+      deduped := DEDUP(SORT(in_dids,did),did);
       offenders_key := doxie_files.Key_Offenders(isFCRA);
       // FCRA: this function returns only IDs, which will be used for fetching raw data.
-      ofks := join(deduped, offenders_key,
-                    keyed(left.did = right.sdid)  AND
-                    (~isFCRA or
-                    (string)Right.offender_key NOT IN correct_ofk),
-                    transform(CriminalRecords_Services.layouts.l_search,self := right),
+      ofks := JOIN(deduped, offenders_key,
+                    KEYED(LEFT.did = RIGHT.sdid) AND
+                    (~isFCRA OR
+                    (STRING)RIGHT.offender_key NOT IN correct_ofk),
+                    TRANSFORM(CriminalRecords_Services.layouts.l_search,SELF := RIGHT),
                     atmost(ut.limits.OFFENDERS_PER_DID));
 
       // overrides (FCRA side only)
-      ofks_override := CHOOSEN (fcra.key_override_crim.offenders (keyed (flag_file_id IN correct_ffid)), MAX_OVERRIDE_LIMIT);
+      ofks_override := CHOOSEN (fcra.key_override_crim.offenders (KEYED (flag_file_id IN correct_ffid)), MAX_OVERRIDE_LIMIT);
       // combine main data and overrides; apply FCRA-filtering
       // available dates are: (process_date, file_date, case_date, record_setup_date)
-      ofks_fcra := (ofks + project (ofks_override, CriminalRecords_Services.layouts.l_search));
-      return if(isFCRA, ofks_fcra, ofks);
-    end;
+      ofks_fcra := (ofks + PROJECT (ofks_override, CriminalRecords_Services.layouts.l_search));
+      RETURN IF(isFCRA, ofks_fcra, ofks);
+    END;
 
-    export byDocNums(dataset(CriminalRecords_Services.layouts.docnum_rec) in_docnums) := Function
-      deduped := dedup(sort(in_docnums,doc_number),doc_number);
+    EXPORT byDocNums(DATASET(CriminalRecords_Services.layouts.docnum_rec) in_docnums) := FUNCTION
+      deduped := DEDUP(SORT(in_docnums,doc_number),doc_number);
       docnum_key := doxie_files.Key_offenders_docnum();
-      ofks := join(deduped, docnum_key,
-                    keyed(left.doc_number=right.docnum),
-                    transform(CriminalRecords_Services.layouts.l_search,self:=right),
+      ofks := JOIN(deduped, docnum_key,
+                    KEYED(LEFT.doc_number=RIGHT.docnum),
+                    TRANSFORM(CriminalRecords_Services.layouts.l_search,SELF:=RIGHT),
                     atmost(ut.limits.OFFENDERS_PER_DID));
-      return ofks;
-    end;
+      RETURN ofks;
+    END;
 
-    export byCaseNum(dataset(CriminalRecords_Services.layouts.casenum_rec) in_casenums) := Function
-      deduped := dedup(sort(in_casenums, case_number), case_number);
+    EXPORT byCaseNum(DATASET(CriminalRecords_Services.layouts.casenum_rec) in_casenums) := FUNCTION
+      deduped := DEDUP(SORT(in_casenums, case_number), case_number);
 
       CriminalRecords_Services.layouts.casenum_rec clean_case_num(CriminalRecords_Services.layouts.casenum_rec le) := TRANSFORM
         SELF.case_number := hygenics_crim._functions.clean_case_number(le.case_number);
@@ -48,60 +48,56 @@ export Raw := module
       deduped_cleaned := PROJECT(deduped, clean_case_num(LEFT));
 
       casenum_key := hygenics_crim.Key_offenders_casenumber();
-      ofks := join(deduped_cleaned, casenum_key,
-                  keyed(left.case_number = right.case_num),
-                  transform(CriminalRecords_Services.layouts.l_search, self := right),
+      ofks := JOIN(deduped_cleaned, casenum_key,
+                  KEYED(LEFT.case_number = RIGHT.case_num),
+                  TRANSFORM(CriminalRecords_Services.layouts.l_search, SELF := RIGHT),
                   atmost(ut.limits.OFFENDERS_PER_DID));
 
-      return ofks;
-    end;
+      RETURN ofks;
+    END;
 
-
-
-
-
-    export byoffenderID(dataset(CriminalRecords_Services.layouts.l_search) in_offenderid) := Function
-      deduped := dedup(sort(in_offenderid,offender_key),offender_key);
+    EXPORT byoffenderID(DATASET(CriminalRecords_Services.layouts.l_search) in_offenderid) := FUNCTION
+      deduped := DEDUP(SORT(in_offenderid,offender_key),offender_key);
       offenderkey_key := doxie_files.Key_Offenders_OffenderKey();
-      ofks_did := join(deduped, offenderkey_key,
-                        keyed(left.offender_key=right.ofk),
-                        transform(doxie.layout_references,self.did:=(unsigned) right.did),
+      ofks_did := JOIN(deduped, offenderkey_key,
+                        KEYED(LEFT.offender_key=RIGHT.ofk),
+                        TRANSFORM(doxie.layout_references,SELF.did:=(UNSIGNED) RIGHT.did),
                         atmost(ut.limits.OFFENDERS_PER_DID));
       ofks:=byDIDs(ofks_did);
-      return dedup(sort(ofks+in_offenderid,offender_key),offender_key);
-    end;
+      RETURN DEDUP(SORT(ofks+in_offenderid,offender_key),offender_key);
+    END;
 
-  end; //end of getOffenderKeys module
+  END; //end of getOffenderKeys module
 
-  export getOffenderRaw(dataset(CriminalRecords_Services.layouts.l_search) ids,
-                        boolean IsFCRA = false,
-                        dataset (fcra.Layout_override_flag) flagfile = fcra.compliance.blank_flagfile,
-                        dataset(FFD.Layouts.PersonContextBatchSlim) slim_pc_recs = FFD.Constants.BlankPersonContextBatchSlim,
-                        integer8 inFFDOptionsMask = 0,
-                        boolean isCNSMR = false) := function
+  EXPORT getOffenderRaw(DATASET(CriminalRecords_Services.layouts.l_search) ids,
+                        BOOLEAN IsFCRA = FALSE,
+                        DATASET (fcra.Layout_override_flag) flagfile = fcra.compliance.blank_flagfile,
+                        DATASET(FFD.Layouts.PersonContextBatchSlim) slim_pc_recs = FFD.Constants.BlankPersonContextBatchSlim,
+                        INTEGER8 inFFDOptionsMask = 0,
+                        BOOLEAN isCNSMR = FALSE) := FUNCTION
 
-    boolean showConsumerStatements := FFD.FFDMask.isShowConsumerStatements(inFFDOptionsMask);
-    boolean showDisputedRecords := FFD.FFDMask.isShowDisputed(inFFDOptionsMask);
+    BOOLEAN showConsumerStatements := FFD.FFDMask.isShowConsumerStatements(inFFDOptionsMask);
+    BOOLEAN showDisputedRecords := FFD.FFDMask.isShowDisputed(inFFDOptionsMask);
 
-    correct_puid  := SET (flagfile (file_id=FCRA.FILE_ID.OFFENDERS_PLUS), record_id);
+    correct_puid := SET (flagfile (file_id=FCRA.FILE_ID.OFFENDERS_PLUS), record_id);
     correct_ofk_recid := SET (flagfile (file_id=FCRA.FILE_ID.OFFENDERS), record_id);
     correct_ffid := SET (flagfile (file_id=FCRA.FILE_ID.OFFENDERS_PLUS), flag_file_id);
     //here we identify offender_key values which are suppressions - flag_file_id is blank
     //we need them to support suppression of override records for cluster which is based on offender_key
-    suppressed_ofk  := SET (flagfile (file_id=FCRA.FILE_ID.OFFENDERS AND flag_file_id=''), record_id);
+    suppressed_ofk := SET (flagfile (file_id=FCRA.FILE_ID.OFFENDERS AND flag_file_id=''), record_id);
     correct_ofk := SET (flagfile (file_id=FCRA.FILE_ID.OFFENDERS), flag_file_id);
     offenderkey_key := doxie_files.Key_Offenders_OffenderKey(isFCRA);
-    recs1 := join(ids, offenderkey_key,
-                  keyed(left.offender_key=right.ofk) and
-                  (~isFCRA or
-                  (((string)Right.offender_persistent_id NOT IN correct_puid
-                  and (string)Right.ofk NOT IN correct_ofk_recid)
-                  and (Right.data_type != '4')))
-                  and (~isCNSMR or (right.data_type not in D2C.Constants.DOCRestrictedDataTypes AND right.vendor not in D2C.Constants.DOCRestrictedVendors))  ,//Restricting access to arrest logs (data_type = 5) and source vendor = MH (Minnesota) when industry class = CNSMR
-                  transform(CriminalRecords_Services.layouts.l_raw,
-                  self:=left,
-                  self :=right),
-                  atmost(ut.limits.OFFENDERS_MAX));
+    recs1 := JOIN(ids, offenderkey_key,
+      KEYED(LEFT.offender_key=RIGHT.ofk) AND
+      (~isFCRA OR
+      (((STRING)RIGHT.offender_persistent_id NOT IN correct_puid
+      AND (STRING)RIGHT.ofk NOT IN correct_ofk_recid)
+      AND (RIGHT.data_type != '4')))
+      AND (~isCNSMR OR (RIGHT.data_type NOT IN D2C.Constants.DOCRestrictedDataTypes AND RIGHT.vendor NOT IN D2C.Constants.DOCRestrictedVendors)) ,//Restricting access to arrest logs (data_type = 5) AND source vendor = MH (Minnesota) when industry class = CNSMR
+      TRANSFORM(CriminalRecords_Services.layouts.l_raw,
+      SELF:=LEFT,
+      SELF :=RIGHT),
+      ATMOST(ut.limits.OFFENDERS_MAX));
 
     // overrides (FCRA side only) - we have 2 indices for offenders overrides
     // we are making this change to now account for both
@@ -117,31 +113,31 @@ export Raw := module
 
     // combine main data and overrides; apply FCRA-filtering
     // available dates are: (process_date, file_date, case_date, record_setup_date)
-    recs_fcra := (recs1 + project (ds_override, transform(CriminalRecords_Services.layouts.l_raw, self := left, self := []))) (
-                FCRA.crim_is_ok ((string) STD.Date.Today(), fcra_date, fcra_conviction_flag, fcra_traffic_flag));
+    recs_fcra := (recs1 + PROJECT (ds_override, TRANSFORM(CriminalRecords_Services.layouts.l_raw, SELF := LEFT, SELF := []))) (
+                FCRA.crim_is_ok ((STRING) STD.Date.Today(), fcra_date, fcra_conviction_flag, fcra_traffic_flag));
 
     CriminalRecords_Services.layouts.l_raw xformStatements( CriminalRecords_Services.layouts.l_raw l ,
-                                                            FFD.Layouts.PersonContextBatchSlim r ) := transform,
-    skip((~ShowDisputedRecords and r.isDisputed) or (~ShowConsumerStatements and exists(r.StatementIDs)))
-      self.StatementIDs := r.StatementIds;
-      self.IsDisputed   := r.IsDisputed;
-      self := l;
-    end;
+                                                            FFD.Layouts.PersonContextBatchSlim r ) := TRANSFORM,
+    SKIP((~ShowDisputedRecords AND r.isDisputed) OR (~ShowConsumerStatements AND EXISTS(r.StatementIDs)))
+      SELF.StatementIDs := r.StatementIds;
+      SELF.IsDisputed := r.IsDisputed;
+      SELF := l;
+    END;
 
-    recs_ds := join(recs_fcra, slim_pc_recs,
-                            (unsigned)left.did = (unsigned) right.lexid
-                            and
-                            ((right.DataGroup = FFD.Constants.DATAGROUPS.OFFENDERS_PLUS and
-                              left.offender_persistent_id = (integer) right.RecID1)
-                              or
-                             (right.DataGroup = FFD.Constants.DATAGROUPS.OFFENDERS and
-                              left.offender_key = right.RecId1)
-                            ),
-                            xformStatements(left,right),
-                            left outer,
-                            keep(1),limit(0));
-    recs := if(isFCRA, recs_ds, recs1);
+    recs_ds := JOIN(recs_fcra, slim_pc_recs,
+      (UNSIGNED)LEFT.did = (UNSIGNED) RIGHT.lexid
+      AND
+      ((RIGHT.DataGroup = FFD.Constants.DATAGROUPS.OFFENDERS_PLUS AND
+        LEFT.offender_persistent_id = (INTEGER) RIGHT.RecID1)
+        OR
+        (RIGHT.DataGroup = FFD.Constants.DATAGROUPS.OFFENDERS AND
+        LEFT.offender_key = RIGHT.RecId1)
+      ),
+      xformStatements(LEFT,RIGHT),
+      LEFT OUTER,
+      KEEP(1),LIMIT(0));
+    recs := IF(isFCRA, recs_ds, recs1);
 
-    return recs;
-  end;
-end;
+    RETURN recs;
+  END;
+END;

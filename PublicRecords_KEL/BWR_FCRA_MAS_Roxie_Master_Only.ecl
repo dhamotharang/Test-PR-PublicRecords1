@@ -1,16 +1,15 @@
 ﻿// EXPORT BWR_FCRA_MAS_Roxie_Master_Only := 'todo';
 
-#workunit('name','MAS FCRA Consumer dev156 2 thread');
+#workunit('name','MAS FCRA Consumer dev156 1 thread');
 IMPORT PublicRecords_KEL, RiskWise, STD, Gateway, UT, SALT38, SALTRoutines;
 /* PublicRecords_KEL.BWR_FCRA_MAS_Roxie */
-threads := 2;
+threads := 1;
 
 RoxieIP := RiskWise.shortcuts.Dev156;
 NeutralRoxieIP:= RiskWise.Shortcuts.staging_neutral_roxieIP;
-// PCG_Dev := 'http://delta_dempers_dev:g0n0l3s!@10.176.68.149:7720/WsSupport/?ver_=2.0'; //-- testing on DEV servers
-// PCG_Cert := 'http://ln_api_dempsey_dev:g0n0l3s!@10.176.68.149:7720/WsSupport/?ver_=2.0'; //-- testing on PROD servers DO NOT USE THIS UNLESS YOU NEED TO				
+// PCG_Dev := riskwise.shortcuts.gw_personContext;
 
-// InputFile := '~mas::uatsamples::consumer_fcra_100k_07102019.csv';
+//InputFile := '~mas::uatsamples::consumer_fcra_100k_07102019.csv';
 InputFile := '~mas::uat::mas_fcra_10k_sample_20200707.csv';
 // InputFile := '~mas::uatsamples::consumer_fcra_1m_07092019.csv';
 // InputFile := '~mas::uatsamples::consumer_nonfcra_iptest_04232020.csv'; //Samesample as NonFCRA only testing IP validation
@@ -77,18 +76,15 @@ Empty_GW := DATASET([TRANSFORM(Gateway.Layouts.Config,
 							SELF.URL := ''; 
 							SELF := [])]);
 
-Targus_GW := IF(IncludeTargusGW, DATASET([TRANSFORM(Gateway.Layouts.Config,
-							SELF.ServiceName := 'targus'; 
-							SELF.URL := 'HTTP://api_qa_gw_roxie:g0h3%40t2x@gatewaycertesp.sc.seisint.com:7726/WsGateway/?ver_=1.70'; 
-							SELF := [])]),
-							Empty_GW);  
+Targus_GW := IF(IncludeTargusGW, project(riskwise.shortcuts.gw_targus_sco, TRANSFORM(Gateway.Layouts.Config, self := left, self := [])),
+							Empty_GW);   
 
 Input_Gateways := (NeutralRoxie_GW + Targus_GW)(URL <> '');
 
 RecordsToRun := 0;
 eyeball := 25;
 
-OutputFile := '~bbraaten::out::PersonFCRA_Roxie_100k_archive_atmost_test_'+ ThorLib.wuid();
+OutputFile := '~akoenen::out::PersonFCRA_Roxie_100k_archive_KS6961_after_'+ ThorLib.wuid();
 
 prii_layout := RECORD
     STRING Account             ;
@@ -212,7 +208,7 @@ END;
 bwr_results := 
 				SOAPCALL(soap_in, 
 				RoxieIP,
-				'publicrecords_kel.MAS_FCRA_Service',
+				'publicrecords_kel.MAS_FCRA_Service', 
 				{soap_in}, 
 				DATASET(layout_MAS_Test_Service_output),
 				// XPATH('*'),

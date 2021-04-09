@@ -256,6 +256,7 @@ export Master := dataset(
       {'ROYALTY', 'ACCUDATA_CNAM_CNM2',               '711', 'G', '' , 'Accudata phone number calling name'},
       {'ROYALTY', 'ACCUDATA_OCN_LNP',                 '712', 'G', '' , 'Accudata local number portability data'},
       {'ROYALTY', 'BRITE_VERIFY_EMAIL',               '720', 'G', '' , 'BRITE VERIFY realtime email'},
+      {'ROYALTY', 'EMAIL_RISK_NR',                    '731', 'G', '' , 'Email Risk/Emailage gateway'},
       {'ROYALTY', 'FIRST_DATA',                       '735', 'G', '' , 'First Data/Fiserv'},
       {'ROYALTY', 'NETWISE_EMAIL',                    '750', 'G', 'WQ' , 'NetWise Data Social Media Email gateway'},
       {'ROYALTY', 'IDA',                              '760', 'G', '' , 'ID Analytics'}    ]

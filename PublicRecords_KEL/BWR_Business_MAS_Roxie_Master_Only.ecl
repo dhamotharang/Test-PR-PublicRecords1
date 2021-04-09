@@ -4,7 +4,7 @@ Threads := 1;
 
 RoxieIP := RiskWise.shortcuts.dev156;
 
-// InputFile := '~mas::uatsamples::business_nfcra_100k_07102019.csv'; //100k file
+//InputFile := '~mas::uatsamples::business_nfcra_100k_07102019.csv'; //100k file
 InputFile := '~mas::uat::mas_brm_regression_10ktestsample.csv';//for weekly regression testing
 // InputFile := '~mas::uatsamples::business_nfcra_1m_07092019.csv'; //1m file
 // InputFile := '~mas::uatsamples::business_nfcra_iptest_04232020.csv'; 
@@ -63,8 +63,8 @@ BIPAppend_Include_AuthRep := FALSE; // Determines whether Auth Rep data is used 
 Output_Master_Results := TRUE; 
 
 // Toggle to include/exclude SALT profile of results file
-// Output_SALT_Profile := FALSE;
-Output_SALT_Profile := TRUE;
+Output_SALT_Profile := FALSE;
+// Output_SALT_Profile := TRUE;
 
 Exclude_Consumer_Attributes := FALSE; //if TRUE, bypasses consumer logic and sets all consumer shell fields to blank/0.
 
@@ -93,21 +93,18 @@ Empty_GW := DATASET([TRANSFORM(Gateway.Layouts.Config,
 							SELF.URL := ''; 
 							SELF := [])]);
               
-OFAC_GW := IF(IncludeOFACGW, DATASET([TRANSFORM(Gateway.Layouts.Config,
-							SELF.ServiceName := 'bridgerwlc'; 
-							SELF.URL := 'http://bridger_batch_cert:Br1dg3rBAtchC3rt@172.16.70.19:7003/WsSearchCore/?ver_=1'; 
-							SELF := [])]),
+OFAC_GW := IF(IncludeOFACGW, project(riskwise.shortcuts.gw_bridger, TRANSFORM(Gateway.Layouts.Config, self := left, self := [])),
 							Empty_GW);    
 
 Input_Gateways := (OFAC_GW)(URL <> '');
 
-RecordsToRun := 10;
+RecordsToRun := 0;
 eyeball := 20;
 
 AllowedSources := ''; // Stubbing this out for use in settings output for now. To be used to turn on DNBDMI by setting to 'DNBDMI'
 OverrideExperianRestriction := FALSE; // Stubbing this out for use in settings output for now. To be used to control whether Experian Business Data (EBR and CRDB) is returned.
 
-OutputFile := '~lweiner::out::Business_Roxie_100k_Current_'+ ThorLib.wuid();
+OutputFile := '~akoenen::out::Business_Roxie_100k_Current_ks-6961_after_'+ ThorLib.wuid();
 
 prii_layout := RECORD
 	STRING AccountNumber;

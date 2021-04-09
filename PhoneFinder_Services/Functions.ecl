@@ -526,6 +526,7 @@
       SELF.TotalSourceCount                 := IF(inMod.isPrimarySearchPII, pInput.TotalSourceCount, 0);
       SELF.SelfReportedSourcesOnly          := IF(inMod.isPrimarySearchPII, pInput.SelfReportedSourcesOnly, FALSE);
       SELF.Identity_count                   := pInput.Identity_count;
+      SELF.PhoneStarRating                  := pInput.Phone_StarRating;
       SELF.ZumigoDeviceDetails.SimMinDays   := pInput.sim_Tenure_MinDays;
       SELF.ZumigoDeviceDetails.SimMaxDays   := pInput.sim_Tenure_MaxDays;
       SELF.ZumigoDeviceDetails.DeviceMinDays:= pInput.imei_Tenure_MinDays;
@@ -579,6 +580,7 @@
       // Source details will be populated in OtherPhones in a PII Search.
       SELF.SourceDetails           := PROJECT(pInput.sourceinfo, TRANSFORM(iesp.phonefinder.t_PhoneFinderSourceIndicator, SELF := LEFT));
       SELF.identity_count          := pInput.identity_count;
+      SELF.PhoneStarRating         := pInput.Phone_StarRating;
       SELF                         := pInput;
       SELF.PhoneAddressState       := '';
 
@@ -794,6 +796,7 @@
       SELF.source                  := MAP(inmod.IsPrimarySearchPII and pinput.phone_source IN PhoneFinder_Services.Constants.GatewaySources => PhoneFinder_Services.Constants.SOURCES.Gateway,
                                           inmod.IsPrimarySearchPII                                                                          => PhoneFinder_Services.Constants.SOURCES.Internal,
                                           '');
+      SELF.PhoneStarRating         := pInput.Phone_StarRating;                                    
       SELF                         := pInput;
       SELF.PhoneAddressState       := '';
 
@@ -915,6 +918,7 @@
       SELF.source                           := MAP( inmod.IsPrimarySearchPII and pinput.phone_source IN PhoneFinder_Services.Constants.GatewaySources => PhoneFinder_Services.Constants.SOURCES.Gateway,
                                                     inmod.IsPrimarySearchPII                                                                          => PhoneFinder_Services.Constants.SOURCES.Internal,
                                                     '');
+      SELF.PhoneStarRating                  := pInput.Phone_StarRating;
       SELF                                  := pInput.RealTimePhone_Ext;
       SELF                                  := pInput;
 
@@ -1071,6 +1075,7 @@
           #APPEND(OtherPhones, 'SELF.OtherPhone' + %'j'% + '_MonthsSinceLastSeen := pInput.other_phones[' + %'j'% + '].MonthsSinceLastSeen;\n')
           #APPEND(OtherPhones, 'SELF.OtherPhone' + %'j'% + '_PhoneOwnershipIndicator := pInput.other_phones[' + %'j'% + '].PhoneOwnershipIndicator;\n')
           #APPEND(OtherPhones, 'SELF.OtherPhone' + %'j'% + '_CallForwardingIndicator := pInput.other_phones[' + %'j'% + '].CallForwardingIndicator;\n')
+          #APPEND(OtherPhones, 'SELF.OtherPhone' + %'j'% + '_PhoneStarRating := pInput.other_phones[' + %'j'% + '].PhoneStarRating;\n')
           #SET(j, %j% + 1)
         #END
       #END

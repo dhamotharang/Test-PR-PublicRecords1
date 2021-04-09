@@ -70,7 +70,6 @@ export Constants := module
     export String40 ZumigoIdentity := 'zumigoidentity'; //Zumigo Line Identity
     // Equifax Account Decisioning gateway
     export String40 EquifaxAcctDecisioning := 'equifaxattributes'; // FCRA only as of 10/2017
-    export String40 EquifaxEVS := 'equifaxevs'; // Equifax Employment Verification Service
     export String40 IsAccuDataCNAM := 'accudata_cnam'; //CallerID - Retrieve Calling Name for phone number
     export String40 IsEquifaxEmsReport := 'equifax_ems'; //Equifax Tri-Merge report.
     export String40 IsTuFraudAlert := 'tu_fraud_alert'; //Transunion Fraud Alert

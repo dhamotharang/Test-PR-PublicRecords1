@@ -13,16 +13,17 @@ export no_riskview_report := false; //default to false as don't want to run the 
 
 export checking_indicators_attribute_request := 'rvcheckingattrv5';
 export FIS_custom_attr_request := 'riskviewattrv5fis';
+export IDA_nfs1_attr := 'riskviewattrv5nfs1';
+export IDA_modeling_attrs := [IDA_nfs1_attr];
 
-export valid_attributes := ['riskviewattrv5', 'insurview2attr', checking_indicators_attribute_request, FIS_custom_attr_request];
+export valid_attributes := ['riskviewattrv5', 'insurview2attr', checking_indicators_attribute_request, FIS_custom_attr_request, IDA_modeling_attrs];
 
 export valid_IDA_models := ['rvg2005_0', 'rvs2005_0'];
 
-export attrv5_models := ['rva2008_1', 'rvt2004_1', 'rvt2004_2']; // this allows attributes to be run even if not requested
+export attrv5_models := ['rva2008_1', 'rvt2004_1', 'rvt2004_2', 'rvc2004_1', 'rvc2004_2', 'rvc2004_3']; // this allows attributes to be run even if not requested
 
-//List of models that are using the next gen riskview reason codes, used in Riskview. Transforms
-//these need to be the output model names that the customer sees
-export next_gen_models := ['ShortTermLendingRVG2005_0'];
+//non-standard custom models, scores must be cast as INTEGER vs UNSIGNED 
+export NonStandardScore_Models := ['ShortTermLendingRVR1903_1'];
 
 /* Model Validation -- Use this when trying to validate a new model through the RiskView.Search_Service */
 EXPORT TurnOnValidation := FALSE;
@@ -74,26 +75,32 @@ export OKCError := 'OKC22';
 export generalErrorCodes :=['22','23','24'];
 export DTEErrorCodes := ['41', '42', '43', '44', '45', 'DTE22'];
 
-export Checking_Indicator_error_desc(string5 error_code) := function
-  desc := map(
-			trim(error_code) = FDSubscriberIDErrorCode => 'Request for RiskView Checking Indicators denied due to incomplete account setup.',
-			trim(error_code) = FDGatewayTimeout 	=> 'Request for RiskView Checking Indicator attributes could not complete due to an error with the server. Note: This error is valid only for the RiskView Checking Indicators.',
-			'');
-	return desc;
-end;
+EXPORT IDA_USER := 'USER';
+EXPORT IDA_SYSTEM := 'SYSTEM';
+EXPORT LNRS := 'LNRS';
+EXPORT LNRS_NETWORK := 'NETWORK';
 
-export MLA_error_desc(string5 error_code) := function
-	desc := map(
-			trim(error_code) = gatewayErrorCode => 'Request for covered military borrower status could not complete due to an error with the server.',
-			trim(error_code) = InputErrorCode 	=> 'Request for covered military borrower status could not complete due to insufficient minimum inputs.',
-			trim(error_code) = purposeErrorCode => 'Request for covered military borrower status could not complete due to invalid permissible purpose.',
-			'');
-	return desc;
-end;
+EXPORT LN_SOFT_ERROR := '31';
+EXPORT IDA_SOFT_ERROR := '32';
+EXPORT IDA_GW_HARD_ERROR := '33';
+EXPORT IDA_GW_ERRORS := [LN_SOFT_ERROR,IDA_SOFT_ERROR,IDA_GW_HARD_ERROR];
+
+EXPORT get_error_desc(STRING10 error_code) := FUNCTION
+  desc := MAP(
+          TRIM(error_code) = gatewayErrorCode                => 'Request for covered military borrower status could not complete due to an error with the server.',
+          TRIM(error_code) = InputErrorCode 	               => 'Request for covered military borrower status could not complete due to insufficient minimum inputs.',
+          TRIM(error_code) = purposeErrorCode                => 'Request for covered military borrower status could not complete due to invalid permissible purpose.',
+          TRIM(error_code) = FDSubscriberIDErrorCode         => 'Request for RiskView Checking Indicators denied due to incomplete account setup.',
+          TRIM(error_code) = FDGatewayTimeout 	             => 'Request for RiskView Checking Indicator attributes could not complete due to an error with the server. Note: This error is valid only for the RiskView Checking Indicators.',
+          TRIM(error_code) = OKCError                        => 'Error occurred in status refresh.',
+          TRIM(error_code) = DTEError                        => 'The record is no longer reporting and may not be used in an FCRA decision.',
+          TRIM(error_code) IN [LN_SOFT_ERROR,IDA_SOFT_ERROR] => 'The specified database could not be accessed.',
+          TRIM(error_code) = IDA_GW_HARD_ERROR               => 'Unable to connect to the server.',
+                                                                '');
+  RETURN desc;
+END;
 
 // Status Refresh Constants
-export StatusRefresh_error_desc := 'Error occurred in status refresh.';
-export DTE_error_desc := 'The record is no longer reporting and may not be used in an FCRA decision.';
 export Deferred_request_desc := 'Request has been Deferred';
 export DefendantDesc := 'DEFENDANT';
 

@@ -123,8 +123,10 @@ EXPORT getInputBestData(DATASET(DueDiligence.v3Layouts.Internal.BusinessTemp) in
     //get unique iquireds - no need to get the same data twice
     uniqueBusinesses := DEDUP(SORT(searchByLexID, inquiredBusiness.seleID), inquiredBusiness.seleID);
     
+    
     transUniqueBusinesses := PROJECT(uniqueBusinesses, TRANSFORM(DueDiligence.v3Layouts.InternalBusiness.SlimBestSearch,
                                                                  SELF.seq := LEFT.seq;
+                                                                 SELF.inquiredBusiness := LEFT.inquiredBusiness.seleID;
                                                                  SELF.seleID := LEFT.inquiredBusiness.seleID;
                                                                  SELF.historyDate := LEFT.historyDate;
                                                                  SELF := [];));
@@ -133,67 +135,76 @@ EXPORT getInputBestData(DATASET(DueDiligence.v3Layouts.Internal.BusinessTemp) in
 
     bestDataByLexID := bestData.SearchWithLexID(transUniqueBusinesses);
     
-    updateInquiredBest := JOIN(inData, bestDataByLexID,
-                               LEFT.inquiredBusiness.seleID = RIGHT.seleID,
-                               TRANSFORM(DueDiligence.v3Layouts.Internal.BusinessTemp,
-                                         SELF.seq := LEFT.seq;
-                                         
-                                         lexIDValid := RIGHT.companyName <> DueDiligence.Constants.EMPTY OR
-                                                       RIGHT.fein <> DueDiligence.Constants.EMPTY OR
-                                                       RIGHT.phone <> DueDiligence.Constants.EMPTY OR
-                                                       RIGHT.streetAddress1 <> DueDiligence.Constants.EMPTY OR
-                                                       RIGHT.city <> DueDiligence.Constants.EMPTY OR
-                                                       RIGHT.state <> DueDiligence.Constants.EMPTY OR
-                                                       RIGHT.zip <> DueDiligence.Constants.EMPTY;
-                                                         
-                                         
-                                         SELF.validBusiness := lexIDValid;
-                                         SELF.lexIDScore := RIGHT.lexIDScore;
-                                         SELF.bestData := IF(lexIDValid AND ddOptions.inputUsage <> DueDiligence.Constants.USE_INPUT_DATA_ENUM.AS_IS, RIGHT);
-                                                          
-                                         bipsToUse := mac_bipsToUse(LEFT, RIGHT, lexIDValid);
-                                                          
-                                         SELF.inquiredBusiness.ultID := bipsToUse.ultID;
-                                         SELF.inquiredBusiness.orgID := bipsToUse.orgID;
-                                         SELF.inquiredBusiness.seleID := bipsToUse.seleID;
-                                         SELF.inquiredBusiness.proxID := bipsToUse.proxID;
-                                         SELF.inquiredBusiness.powID := bipsToUse.powID;
-                                         
-                                         SELF.inquiredBusiness.companyName := mac_dataToUse(LEFT.inquiredBusiness.companyName, RIGHT.companyName, lexIDValid);
-                                         SELF.inquiredBusiness.fein := mac_dataToUse(LEFT.inquiredBusiness.fein, RIGHT.fein, lexIDValid);
-                                         SELF.inquiredBusiness.phone := mac_dataToUse(LEFT.inquiredBusiness.phone, RIGHT.phone, lexIDValid);
-                                         
-                                         
-                                         
-                                         //determine which address to use
-                                         addressToUse := mac_addressToUse(LEFT, RIGHT, lexIDValid, TRUE);
-                                         
-                                         SELF.inquiredBusiness.streetAddress1 := addressToUse.streetAddress1;
-                                         SELF.inquiredBusiness.streetAddress2 := addressToUse.streetAddress2;
-                                         SELF.inquiredBusiness.prim_range := addressToUse.prim_range;
-                                         SELF.inquiredBusiness.predir := addressToUse.predir;
-                                         SELF.inquiredBusiness.prim_name := addressToUse.prim_name;
-                                         SELF.inquiredBusiness.addr_suffix := addressToUse.addr_suffix;
-                                         SELF.inquiredBusiness.postdir := addressToUse.postdir;
-                                         SELF.inquiredBusiness.unit_desig := addressToUse.unit_desig;
-                                         SELF.inquiredBusiness.sec_range := addressToUse.sec_range;
-                                         
-                                         SELF.inquiredBusiness.city := addressToUse.city;
-                                         SELF.inquiredBusiness.state := addressToUse.state;
-                                         SELF.inquiredBusiness.zip := addressToUse.zip;
-                                         SELF.inquiredBusiness.zip4 := addressToUse.zip4;
-                                         SELF.inquiredBusiness.geo_blk := addressToUse.geo_blk;
-                                         SELF.inquiredBusiness.county := addressToUse.county;
-                                         SELF.inquiredBusiness.countyName := addressToUse.countyName;
-                                         
-                                         SELF := LEFT;));
+    //we can no longer join by unique seleID because BIP forwarding could change the lexID so seleID returned may not match
+    updateAllLexIDInput :=JOIN(searchByLexID, bestDataByLexID,
+                                LEFT.inquiredBusiness.seleID = RIGHT.inquiredBusiness,
+                                TRANSFORM(DueDiligence.v3Layouts.InternalBusiness.SlimBestSearch,
+                                          SELF.seq := LEFT.seq;
+                                          SELF := RIGHT;),
+                                LEFT OUTER,
+                                ATMOST(DueDiligence.Constants.MAX_1));
+    
+    updateInquiredLexIDBest := JOIN(inData, updateAllLexIDInput,
+                                     LEFT.seq = RIGHT.seq,
+                                     TRANSFORM(DueDiligence.v3Layouts.Internal.BusinessTemp,
+                                               SELF.seq := LEFT.seq;
+                                               
+                                               lexIDValid := RIGHT.companyName <> DueDiligence.Constants.EMPTY OR
+                                                             RIGHT.fein <> DueDiligence.Constants.EMPTY OR
+                                                             RIGHT.phone <> DueDiligence.Constants.EMPTY OR
+                                                             RIGHT.streetAddress1 <> DueDiligence.Constants.EMPTY OR
+                                                             RIGHT.city <> DueDiligence.Constants.EMPTY OR
+                                                             RIGHT.state <> DueDiligence.Constants.EMPTY OR
+                                                             RIGHT.zip <> DueDiligence.Constants.EMPTY;
+                                                               
+                                               
+                                               SELF.validBusiness := lexIDValid;
+                                               SELF.lexIDScore := RIGHT.lexIDScore;
+                                               SELF.bestData := IF(lexIDValid AND ddOptions.inputUsage <> DueDiligence.Constants.USE_INPUT_DATA_ENUM.AS_IS, RIGHT);
+                                                                
+                                               bipsToUse := mac_bipsToUse(LEFT, RIGHT, lexIDValid);
+                                                                
+                                               SELF.inquiredBusiness.ultID := bipsToUse.ultID;
+                                               SELF.inquiredBusiness.orgID := bipsToUse.orgID;
+                                               SELF.inquiredBusiness.seleID := bipsToUse.seleID;
+                                               SELF.inquiredBusiness.proxID := bipsToUse.proxID;
+                                               SELF.inquiredBusiness.powID := bipsToUse.powID;
+                                               
+                                               SELF.inquiredBusiness.companyName := mac_dataToUse(LEFT.inquiredBusiness.companyName, RIGHT.companyName, lexIDValid);
+                                               SELF.inquiredBusiness.fein := mac_dataToUse(LEFT.inquiredBusiness.fein, RIGHT.fein, lexIDValid);
+                                               SELF.inquiredBusiness.phone := mac_dataToUse(LEFT.inquiredBusiness.phone, RIGHT.phone, lexIDValid);
+                                               
+                                               
+                                               
+                                               //determine which address to use
+                                               addressToUse := mac_addressToUse(LEFT, RIGHT, lexIDValid, TRUE);
+                                               
+                                               SELF.inquiredBusiness.streetAddress1 := addressToUse.streetAddress1;
+                                               SELF.inquiredBusiness.streetAddress2 := addressToUse.streetAddress2;
+                                               SELF.inquiredBusiness.prim_range := addressToUse.prim_range;
+                                               SELF.inquiredBusiness.predir := addressToUse.predir;
+                                               SELF.inquiredBusiness.prim_name := addressToUse.prim_name;
+                                               SELF.inquiredBusiness.addr_suffix := addressToUse.addr_suffix;
+                                               SELF.inquiredBusiness.postdir := addressToUse.postdir;
+                                               SELF.inquiredBusiness.unit_desig := addressToUse.unit_desig;
+                                               SELF.inquiredBusiness.sec_range := addressToUse.sec_range;
+                                               
+                                               SELF.inquiredBusiness.city := addressToUse.city;
+                                               SELF.inquiredBusiness.state := addressToUse.state;
+                                               SELF.inquiredBusiness.zip := addressToUse.zip;
+                                               SELF.inquiredBusiness.zip4 := addressToUse.zip4;
+                                               SELF.inquiredBusiness.geo_blk := addressToUse.geo_blk;
+                                               SELF.inquiredBusiness.county := addressToUse.county;
+                                               SELF.inquiredBusiness.countyName := addressToUse.countyName;
+                                               
+                                               SELF := LEFT;));
 
 
     
     
     //if we didn't get a best lexID/information, see if we can get it via the BII entered
     noLexIDInput := inData(inquiredBusiness.seleID = 0);
-    noValidLexIDInput := updateInquiredBest(validBusiness = FALSE AND
+    invalidLexIDWithBII := updateInquiredLexIDBest(validBusiness = FALSE AND
                                             (inquiredBusiness.companyName <> DueDiligence.Constants.EMPTY OR
                                             inquiredBusiness.fein <> DueDiligence.Constants.EMPTY OR
                                             inquiredBusiness.phone <> DueDiligence.Constants.EMPTY OR
@@ -202,7 +213,7 @@ EXPORT getInputBestData(DATASET(DueDiligence.v3Layouts.Internal.BusinessTemp) in
                                             inquiredBusiness.state <> DueDiligence.Constants.EMPTY OR
                                             inquiredBusiness.zip <> DueDiligence.Constants.EMPTY));
     
-    searchByBII := noLexIDInput + noValidLexIDInput;
+    searchByBII := noLexIDInput + invalidLexIDWithBII;
     
     
     transBII := PROJECT(searchByBII, TRANSFORM(DueDiligence.v3Layouts.InternalBusiness.SlimBestSearch,
@@ -279,7 +290,21 @@ EXPORT getInputBestData(DATASET(DueDiligence.v3Layouts.Internal.BusinessTemp) in
                                       
     
     //determine how we should use the input for searches going forward
-    allResults := DEDUP(SORT(updateInquiredBest + updateInquiredBIIBest, seq, -validBusiness), seq);
+    allResults := DEDUP(SORT((updateInquiredLexIDBest + updateInquiredBIIBest)(validBusiness), seq), seq);
+    
+    finalBest := JOIN(inData, allResults,
+                       LEFT.seq = RIGHT.seq,
+                       TRANSFORM(DueDiligence.v3Layouts.Internal.BusinessTemp,
+                                  SELF.seq := LEFT.seq;
+                                  
+                                  validBusiness := RIGHT.validBusiness;
+                                  
+                                  SELF := IF(validBusiness, RIGHT);
+                                  
+                                  SELF := [];),
+                       LEFT OUTER,
+                       ATMOST(DueDiligence.Constants.MAX_1));
+                                  
 
 
 
@@ -289,15 +314,17 @@ EXPORT getInputBestData(DATASET(DueDiligence.v3Layouts.Internal.BusinessTemp) in
     // OUTPUT(uniqueBusinesses, NAMED('uniqueBusinesses'));
     // OUTPUT(transUniqueBusinesses, NAMED('transUniqueBusinesses'));
     // OUTPUT(bestDataByLexID, NAMED('bestDataByLexID'));
-    // OUTPUT(updateInquiredBest, NAMED('updateInquiredBest'));
+    // OUTPUT(updateAllLexIDInput, NAMED('updateAllLexIDInput'));
+    // OUTPUT(updateInquiredLexIDBest, NAMED('updateInquiredLexIDBest'));
     // OUTPUT(noLexIDInput, NAMED('noLexIDInput'));
-    // OUTPUT(noValidLexIDInput, NAMED('noValidLexIDInput'));
+    // OUTPUT(invalidLexIDWithBII, NAMED('invalidLexIDWithBII'));
     // OUTPUT(searchByBII, NAMED('searchByBII'));
     // OUTPUT(transBII, NAMED('transBII'));
     // OUTPUT(bestDataByBII, NAMED('bestDataByBII'));
     // OUTPUT(updateInquiredBIIBest, NAMED('updateInquiredBIIBest'));
     // OUTPUT(allResults, NAMED('allResults'));
+    // OUTPUT(finalBest, NAMED('finalBest'));
 
 
-    RETURN allResults;
+    RETURN finalBest;
 END;

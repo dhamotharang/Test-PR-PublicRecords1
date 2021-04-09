@@ -6,11 +6,61 @@ import iesp;
 
 export emailrisk := MODULE
 			
+export t_EmailRiskCustomFields := record
+	string Custom1 {xpath('Custom1')};
+	string Custom2 {xpath('Custom2')};
+	string Custom3 {xpath('Custom3')};
+	string Custom4 {xpath('Custom4')};
+	string Custom5 {xpath('Custom5')};
+	string Custom6 {xpath('Custom6')};
+	string Custom7 {xpath('Custom7')};
+end;
+		
+export t_EmailRiskBillingAddress := record
+	string BillingAddress {xpath('BillingAddress')};
+	string BillingCity {xpath('BillingCity')};
+	string BillingRegion {xpath('BillingRegion')};
+	string BillingCountry {xpath('BillingCountry')};
+	string BillingPostal {xpath('BillingPostal')};
+end;
+		
+export t_EmailRiskShippingAddress := record
+	string ShippingAddress {xpath('ShippingAddress')};
+	string ShippingCity {xpath('ShippingCity')};
+	string ShippingRegion {xpath('ShippingRegion')};
+	string ShippingCountry {xpath('ShippingCountry')};
+	string ShippingPostal {xpath('ShippingPostal')};
+end;
+		
+export t_EmailRiskServiceInfo := record
+	integer ServiceTime {xpath('ServiceTime')};
+	iesp.share.t_TimeStamp ServiceDate {xpath('ServiceDate')};
+	string ServiceLocation {xpath('ServiceLocation')};
+	string ServiceCategory {xpath('ServiceCategory')};
+	string DeliveryType {xpath('DeliveryType')};
+end;
+		
 export t_EmailRiskSearchFields := record
 	string Email {xpath('Email')};
+	string SecondaryEmail {xpath('SecondaryEmail')};
+	string IPAddress {xpath('IPAddress')};
+	string FirstName {xpath('FirstName')};
+	string LastName {xpath('LastName')};
+	string Phone {xpath('Phone')};
+	boolean ExistingCustomer {xpath('ExistingCustomer')};
+	string CustomerId {xpath('CustomerId')};
+	string PartnerId {xpath('PartnerId')};
+	t_EmailRiskBillingAddress BillingAddress {xpath('BillingAddress')};
+	t_EmailRiskShippingAddress ShippingAddress {xpath('ShippingAddress')};
+	string TransactionTypeId {xpath('TransactionTypeId')}; //values['','1','2','3','4','5','6','7','8','9','10','11','12','13','14','15','16','17','']
+	t_EmailRiskServiceInfo ServiceInfo {xpath('ServiceInfo')};
+	string DeviceId {xpath('DeviceId')};
+	string DeviceSource {xpath('DeviceSource')}; //values['','100','110','120','130','140','150','160','170','180','190','200','999','']
+	t_EmailRiskCustomFields CustomFields {xpath('CustomFields')};
 end;
 		
 export t_EmailRiskOptions := record (iesp.share.t_BaseOption)
+	string Version {xpath('Version')}; //values['BASIC','PREMIUM','EARMS','']
 end;
 		
 export t_EmailRiskSocialMediaLink := record
@@ -24,45 +74,99 @@ export t_EmailRiskResponseStatus := record
 	string Description {xpath('Description')};
 end;
 		
-export t_EmailRiskResult := record
-	string Email {xpath('Email')};
-	string Ename {xpath('Ename')};
-	iesp.share.t_Date Dob {xpath('Dob')};
-	string Gender {xpath('Gender')};
-	string Location {xpath('Location')};
-	string Title {xpath('Title')};
-	string Company {xpath('Company')};
-	string NameMatch {xpath('NameMatch')};
-	string DomainName {xpath('DomainName')};
-	string Country {xpath('Country')};
-	string DomainCountryName {xpath('DomainCountryName')};
-	string DomainCompany {xpath('DomainCompany')};
-	string DomainCategory {xpath('DomainCategory')};
-	string DomainCorporate {xpath('DomainCorporate')};
-	dataset(t_EmailRiskSocialMediaLink) SocialMediaLinks {xpath('SocialMediaLinks/SocialMediaLink'), MAXCOUNT(1)};
-	integer SocialMediaFriends {xpath('SocialMediaFriends')};
-	string ImageUrl {xpath('ImageUrl')};
-	iesp.share.t_TimeStamp EmailAge {xpath('EmailAge')};
-	integer EmailCreationDays {xpath('EmailCreationDays')};
-	iesp.share.t_TimeStamp DomainAge {xpath('DomainAge')};
-	integer DomainCreationDays {xpath('DomainCreationDays')};
-	iesp.share.t_TimeStamp FirstVerificationDate {xpath('FirstVerificationDate')};
-	integer FirstSeenDays {xpath('FirstSeenDays')};
-	iesp.share.t_TimeStamp LastVerificationDate {xpath('LastVerificationDate')};
-	integer TotalHits {xpath('TotalHits')};
-	integer UniqueHits {xpath('UniqueHits')};
-	integer EaStatusId {xpath('EaStatusId')};
-	string Status {xpath('Status')};
-	string EmailExists {xpath('EmailExists')};
-	string DomainExists {xpath('DomainExists')};
-	string EaScore {xpath('EaScore')};
+export t_EmailRiskIPInfo := record
+	string IPAddress {xpath('IPAddress')};
+	string IPReputation {xpath('IPReputation')};
+	string IPAnonymousDetected {xpath('IPAnonymousDetected')};
+	string IPProxyType {xpath('IPProxyType')};
+	string IPProxyDescription {xpath('IPProxyDescription')};
+	string IPIsp {xpath('IPIsp')};
+	string IPOrg {xpath('IPOrg')};
+	string IPUserType {xpath('IPUserType')};
+	string IPNetSpeedCell {xpath('IPNetSpeedCell')};
+	string IPCorporateProxy {xpath('IPCorporateProxy')};
+	string IPAutonomousNum {xpath('IPAutonomousNum')};
+	string IPDomain {xpath('IPDomain')};
+	string IPCountryMatch {xpath('IPCountryMatch')};
+	string IPShipCountryMatch {xpath('IPShipCountryMatch')};
+end;
+		
+export t_EmailRiskIPLocation := record
+	string IPTimeZone {xpath('IPTimeZone')};
+	string IPContinentCode {xpath('IPContinentCode')};
+	string IPCountry {xpath('IPCountry')};
+	string IPCountryCode {xpath('IPCountryCode')};
+	string IPRegion {xpath('IPRegion')};
+	string IPCity {xpath('IPCity')};
+	string IPCallingCode {xpath('IPCallingCode')};
+	string IPMetroCode {xpath('IPMetroCode')};
+	real8 IPLatitude {xpath('IPLatitude')};
+	real8 IPLongitude {xpath('IPLongitude')};
+	string IPMap {xpath('IPMap')};
+	real8 IPCountryConfidence {xpath('IPCountryConfidence')};
+	real8 IPRegionConfidence {xpath('IPRegionConfidence')};
+	real8 IPCityConfidence {xpath('IPCityConfidence')};
+	string IPPostalCode {xpath('IPPostalCode')};
+	real8 IPPostalConfidence {xpath('IPPostalConfidence')};
+	integer IPDistanceKm {xpath('IPDistanceKm')};
+	integer IPDistanceMiles {xpath('IPDistanceMiles')};
+	integer IPShipDistanceKm {xpath('IPShipDistanceKm')};
+	integer IPShipDistanceMiles {xpath('IPShipDistanceMiles')};
+	integer IPAccuracyRadius {xpath('IPAccuracyRadius')};
+end;
+		
+export t_EmailRiskIPRisk := record
+	integer IPRiskLevelId {xpath('IPRiskLevelId')};
+	string IPRiskLevel {xpath('IPRiskLevel')};
+	integer IPRiskReasonId {xpath('IPRiskReasonId')};
+	string IPRiskReason {xpath('IPRiskReason')};
+	string IPRiskCountry {xpath('IPRiskCountry')};
+end;
+		
+export t_EmailRiskAddress := record
+	string ShipForward {xpath('ShipForward')};
+	string CityPostalMatch {xpath('CityPostalMatch')};
+	string ShipCityPostalMatch {xpath('ShipCityPostalMatch')};
+	string DomainCountryMatch {xpath('DomainCountryMatch')};
+	string BillRiskCountry {xpath('BillRiskCountry')};
+	string StandardizedBillingAddress {xpath('StandardizedBillingAddress')};
+	string StandardizedShippingAddress {xpath('StandardizedShippingAddress')};
+end;
+		
+export t_EmailRiskDigitalIdentityScore := record
+	integer OverallDigitalIdentityScore {xpath('OverallDigitalIdentityScore')};
+	string DigitalIdentityScoreDescription {xpath('DigitalIdentityScoreDescription')};
+	integer EmailToIPConfidence {xpath('EmailToIPConfidence')};
+	integer EmailToPhoneConfidence {xpath('EmailToPhoneConfidence')};
+	integer EmailToBillAddressConfidence {xpath('EmailToBillAddressConfidence')};
+	integer EmailToShipAddressConfidence {xpath('EmailToShipAddressConfidence')};
+	integer EmailToFullNameConfidence {xpath('EmailToFullNameConfidence')};
+	integer EmailToLastNameConfidence {xpath('EmailToLastNameConfidence')};
+	integer IPToPhoneConfidence {xpath('IPToPhoneConfidence')};
+	integer IPToBillAddressConfidence {xpath('IPToBillAddressConfidence')};
+	integer IPToShipAddressConfidence {xpath('IPToShipAddressConfidence')};
+	integer IPToFullNameConfidence {xpath('IPToFullNameConfidence')};
+	integer IPToLastNameConfidence {xpath('IPToLastNameConfidence')};
+	integer PhoneToBillAddressConfidence {xpath('PhoneToBillAddressConfidence')};
+	integer PhoneToShipAddressConfidence {xpath('PhoneToShipAddressConfidence')};
+	integer PhoneToFullNameConfidence {xpath('PhoneToFullNameConfidence')};
+	integer PhoneToLastNameConfidence {xpath('PhoneToLastNameConfidence')};
+	integer BillAddressToFullNameConfidence {xpath('BillAddressToFullNameConfidence')};
+	integer BillAddressToLastNameConfidence {xpath('BillAddressToLastNameConfidence')};
+	integer ShipAddressToBillAddressConfidence {xpath('ShipAddressToBillAddressConfidence')};
+	integer ShipAddressToFullNameConfidence {xpath('ShipAddressToFullNameConfidence')};
+	integer ShipAddressToLastNameConfidence {xpath('ShipAddressToLastNameConfidence')};
+end;
+		
+export t_EmailRiskDomainRisk := record
+	string EAScore {xpath('EAScore')};
 	string FraudRisk {xpath('FraudRisk')};
-	integer EaReasonId {xpath('EaReasonId')};
-	string EaReason {xpath('EaReason')};
-	integer EaAdviceId {xpath('EaAdviceId')};
-	string EaAdvice {xpath('EaAdvice')};
-	integer EaRiskBandId {xpath('EaRiskBandId')};
-	string EaRiskBand {xpath('EaRiskBand')};
+	integer EAReasonId {xpath('EAReasonId')};
+	string EAReason {xpath('EAReason')};
+	integer EAAdviceId {xpath('EAAdviceId')};
+	string EAAdvice {xpath('EAAdvice')};
+	integer EARiskBandId {xpath('EARiskBandId')};
+	string EARiskBand {xpath('EARiskBand')};
 	string SourceIndustry {xpath('SourceIndustry')};
 	string FraudType {xpath('FraudType')};
 	iesp.share.t_TimeStamp LastFlaggedOn {xpath('LastFlaggedOn')};
@@ -73,6 +177,72 @@ export t_EmailRiskResult := record
 	string DomainRiskCountry {xpath('DomainRiskCountry')};
 end;
 		
+export t_EmailRiskDomainInfo := record
+	string DomainName {xpath('DomainName')};
+	string Country {xpath('Country')};
+	string DomainCountryName {xpath('DomainCountryName')};
+	string DomainCompany {xpath('DomainCompany')};
+	string DomainCategory {xpath('DomainCategory')};
+	string DomainCorporate {xpath('DomainCorporate')};
+end;
+		
+export t_EmailRiskSocialMedia := record
+	dataset(t_EmailRiskSocialMediaLink) SocialMediaLinks {xpath('SocialMediaLinks/SocialMediaLink'), MAXCOUNT(iesp.Constants.EmailRiskGateway.MAX_SOCIAL_MEDIA_LINKS)};
+	integer SocialMediaFriends {xpath('SocialMediaFriends')};
+	string ImageUrl {xpath('ImageUrl')};
+end;
+		
+export t_EmailRiskPhoneInfo := record
+	string PhoneOwner {xpath('PhoneOwner')};
+	string PhoneOwnerType {xpath('PhoneOwnerType')};
+	string PhoneCarrierType {xpath('PhoneCarrierType')};
+	string PhoneCarrierWorkCode {xpath('PhoneCarrierWorkCode')};
+	string PhoneCarrierName {xpath('PhoneCarrierName')};
+	string PhoneStatus {xpath('PhoneStatus')};
+	string CustomerPhoneBillingLocation {xpath('CustomerPhoneBillingLocation')};
+	string PhoneOwnerMatch {xpath('PhoneOwnerMatch')};
+end;
+		
+export t_EmailRiskResult := record
+	string Email {xpath('Email')};
+	string Ename {xpath('Ename')};
+	string Location {xpath('Location')};
+	string Title {xpath('Title')};
+	string Company {xpath('Company')};
+	string NameMatch {xpath('NameMatch')};
+	iesp.share.t_TimeStamp EmailAge {xpath('EmailAge')};
+	integer EmailCreationDays {xpath('EmailCreationDays')};
+	iesp.share.t_TimeStamp DomainAge {xpath('DomainAge')};
+	integer DomainCreationDays {xpath('DomainCreationDays')};
+	iesp.share.t_TimeStamp FirstVerificationDate {xpath('FirstVerificationDate')};
+	integer FirstSeenDays {xpath('FirstSeenDays')};
+	iesp.share.t_TimeStamp LastVerificationDate {xpath('LastVerificationDate')};
+	integer TotalHits {xpath('TotalHits')};
+	integer UniqueHits {xpath('UniqueHits')};
+	integer EAStatusId {xpath('EAStatusId')};
+	string Status {xpath('Status')};
+	string EmailExists {xpath('EmailExists')};
+	string DomainExists {xpath('DomainExists')};
+	t_EmailRiskDomainInfo DomainInfo {xpath('DomainInfo')};
+	t_EmailRiskSocialMedia SocialMedia {xpath('SocialMedia')};
+	t_EmailRiskDomainRisk DomainRisk {xpath('DomainRisk')};
+	t_EmailRiskIPInfo IPInfo {xpath('IPInfo')};
+	t_EmailRiskIPLocation IPLocation {xpath('IPLocation')};
+	t_EmailRiskIPRisk IPRisk {xpath('IPRisk')};
+	string DeviceIdRiskLevel {xpath('DeviceIdRiskLevel')};
+	t_EmailRiskPhoneInfo PhoneInfo {xpath('PhoneInfo')};
+	t_EmailRiskAddress Address {xpath('Address')};
+	string Custom1 {xpath('Custom1')};
+	string Custom2 {xpath('Custom2')};
+	string Custom3 {xpath('Custom3')};
+	string Custom4 {xpath('Custom4')};
+	string Custom5 {xpath('Custom5')};
+	string Custom6 {xpath('Custom6')};
+	string Custom7 {xpath('Custom7')};
+	t_EmailRiskDigitalIdentityScore DigitalIdentityScore {xpath('DigitalIdentityScore')};
+	string CorrelationId {xpath('CorrelationId')};
+end;
+		
 export t_EmailRiskStandardResponse := record
 	string Email {xpath('Email')};
 	string QueryType {xpath('QueryType')};
@@ -80,11 +250,12 @@ export t_EmailRiskStandardResponse := record
 	iesp.share.t_TimeStamp Created {xpath('Created')};
 	integer ResponseCount {xpath('ResponseCount')};
 	string Lang {xpath('Lang')};
+	integer ServiceTime {xpath('ServiceTime')};
 end;
 		
 export t_EmailRiskResponseData := record
 	t_EmailRiskStandardResponse StandardResponse {xpath('StandardResponse')};
-	dataset(t_EmailRiskResult) Results {xpath('Results/Result'), MAXCOUNT(1)};
+	dataset(t_EmailRiskResult) Results {xpath('Results/Result'), MAXCOUNT(iesp.Constants.EmailRiskGateway.MAX_RESULTS)};
 	t_EmailRiskResponseStatus ResponseStatus {xpath('ResponseStatus')};
 end;
 		

@@ -1,4 +1,4 @@
-﻿import Entiera,doxie,address, AutoStandardI;
+﻿import email_data, doxie, address, AutoStandardI;
 
 export Assorted_Layouts := MODULE
 
@@ -69,10 +69,10 @@ end;
 
 
 export layout_emails := record
-Entiera.All_Entiera_Layouts.Entiera_final_layout.orig_email;
+email_Data.Layout_email.keys.orig_email;
 string clean_email := '';
-Entiera.All_Entiera_Layouts.Entiera_final_layout.orig_login_date;
-Entiera.All_Entiera_Layouts.Entiera_final_layout.orig_site;
+email_data.layout_email.keys.orig_login_date;
+email_data.layout_email.keys.orig_site;
 string8 date_first_seen;
 string8 date_last_seen;
 string8 date_vendor_first_reported;
@@ -98,25 +98,25 @@ end;
     unsigned6 did;
     unsigned6 emailid;
     string2 src;
-    Entiera.All_Entiera_Layouts.Entiera_final_layout.best_dob;
-    Entiera.All_Entiera_Layouts.Entiera_final_layout.best_ssn;
+    email_data.layout_email.keys.best_dob;
+    email_data.layout_email.keys.best_ssn;
     unsigned4 latest_orig_login_date;
     dataset(layout_names) names {maxcount(Constants.MAX_NAMES_PER_PERSON)};
     dataset(layout_addresses) addresses {maxcount(Constants.MAX_ADDRS_PER_PERSON)};
-    dataset(layout_emails) emails {maxcount(Constants.MAX_EMAILS_PER_PERSON)};  
+    dataset(layout_emails) emails {maxcount(Constants.MAX_EMAILS_PER_PERSON)};
   END;
 
   export layout_entiera_rollup := record
     boolean isDeepDive;
     unsigned2 penalt_didssndob;
     layout_inputs.ssn_mask_value;
-    unsigned2 penalt_threshold;    
+    unsigned2 penalt_threshold;
     layout_report_rollup;
-  END;  
+  END;
 
   export layout_entiera_rollup_w_seq := record
     unsigned3 seq;
-    unsigned2 penalt;    
+    unsigned2 penalt;
     layout_entiera_rollup;
   END;
 

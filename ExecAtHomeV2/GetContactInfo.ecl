@@ -50,7 +50,8 @@ FUNCTION
     LIMIT(0),
     LEFT OUTER);
 
-  ds_AddDoNotCallFlag := dx_DMA.AppendDoNotCallFlag(ds_AddPhone, person_best_phone);
+  // Flags phone numbers on the do not call list.
+  ds_AddDoNotCallFlag := dx_DMA.AppendDoNotCallFlag(ds_AddPhone, person_best_phone, TRUE);
 
   // In the following join, the do_not_mail_flag uses only the RIGHT.l_lname
   // with an OR in addition to all of the conditions in the KEYED join. The thought

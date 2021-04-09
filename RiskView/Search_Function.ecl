@@ -1,4 +1,4 @@
-﻿import _Control, AID, gateway, risk_indicators, address, riskwise, ut, Models, iesp, personcontext, STD, RiskView, Risk_Reporting;
+﻿import _Control, AID, gateway, risk_indicators, address, riskwise, ut, Models, iesp, personcontext, STD, RiskView;
 onThor := _Control.Environment.OnThor;
 
 EXPORT Search_Function(
@@ -219,6 +219,7 @@ Crossindustry_model := STD.Str.ToUpperCase(Crossindustry_model_name);
 CheckingIndicatorsRequest := STD.Str.ToLowerCase(AttributesVersionRequest) = RiskView.Constants.checking_indicators_attribute_request;
 NoCheckingIndicatorsRequest := STD.Str.ToLowerCase(AttributesVersionRequest) <> RiskView.Constants.checking_indicators_attribute_request;															
 
+IDAattrRequest := STD.Str.ToLowerCase(AttributesVersionRequest) IN RiskView.Constants.IDA_modeling_attrs;
 
 //good chance these come through with varied case, so we will build out the set and capitalize them all
 //start change to upper case
@@ -288,27 +289,28 @@ Custom_model_name_array := SET(ucase_custom_models, model);
 		in_ExcludeReportingSources := ExcludeReportingSources
 	);
 
-Do_IDA := Auto_model_name in Riskview.Constants.valid_IDA_models or 
-          Bankcard_model_name in Riskview.Constants.valid_IDA_models or
-          Short_term_lending_model_name in Riskview.Constants.valid_IDA_models or
-          Telecommunications_model_name in Riskview.Constants.valid_IDA_models or
-          Crossindustry_model_name in Riskview.Constants.valid_IDA_models or
-          Custom_model_name in Riskview.Constants.valid_IDA_models or
-          Custom2_model_name in Riskview.Constants.valid_IDA_models or
-          Custom3_model_name in Riskview.Constants.valid_IDA_models or
-          Custom4_model_name in Riskview.Constants.valid_IDA_models or
-          Custom5_model_name in Riskview.Constants.valid_IDA_models;
+Do_IDA := IDAattrRequest OR
+          Auto_model_name IN Riskview.Constants.valid_IDA_models OR 
+          Bankcard_model_name IN Riskview.Constants.valid_IDA_models OR
+          Short_term_lending_model_name IN Riskview.Constants.valid_IDA_models OR
+          Telecommunications_model_name IN Riskview.Constants.valid_IDA_models OR
+          Crossindustry_model_name in Riskview.Constants.valid_IDA_models OR
+          Custom_model_name IN Riskview.Constants.valid_IDA_models OR
+          Custom2_model_name IN Riskview.Constants.valid_IDA_models OR
+          Custom3_model_name IN Riskview.Constants.valid_IDA_models OR
+          Custom4_model_name IN Riskview.Constants.valid_IDA_models OR
+          Custom5_model_name IN Riskview.Constants.valid_IDA_models;
 			
-Do_Attribute_Models := 	Auto_model_name in Riskview.Constants.attrv5_models or 
-          Bankcard_model_name in Riskview.Constants.attrv5_models or
-          Short_term_lending_model_name in Riskview.Constants.attrv5_models or
-          Telecommunications_model_name in Riskview.Constants.attrv5_models or
-          Crossindustry_model_name in Riskview.Constants.attrv5_models or
-          Custom_model_name in Riskview.Constants.attrv5_models or
-          Custom2_model_name in Riskview.Constants.attrv5_models or
-          Custom3_model_name in Riskview.Constants.attrv5_models or
-          Custom4_model_name in Riskview.Constants.attrv5_models or
-          Custom5_model_name in Riskview.Constants.attrv5_models;
+Do_Attribute_Models := 	STD.Str.ToLowerCase(Auto_model_name) IN Riskview.Constants.attrv5_models OR 
+          STD.Str.ToLowerCase(Bankcard_model_name) IN Riskview.Constants.attrv5_models OR
+          STD.Str.ToLowerCase(Short_term_lending_model_name) IN Riskview.Constants.attrv5_models OR
+          STD.Str.ToLowerCase(Telecommunications_model_name) IN Riskview.Constants.attrv5_models OR
+          STD.Str.ToLowerCase(Crossindustry_model_name) IN Riskview.Constants.attrv5_models OR
+          STD.Str.ToLowerCase(Custom_model_name) IN Riskview.Constants.attrv5_models OR
+          STD.Str.ToLowerCase(Custom2_model_name) IN Riskview.Constants.attrv5_models OR
+          STD.Str.ToLowerCase(Custom3_model_name) IN Riskview.Constants.attrv5_models OR
+          STD.Str.ToLowerCase(Custom4_model_name) IN Riskview.Constants.attrv5_models OR
+          STD.Str.ToLowerCase(Custom5_model_name) IN Riskview.Constants.attrv5_models;
 
 
 Risk_Indicators.layouts.layout_IDA_in into_IDA(RiskView.Layouts.layout_riskview_input le, risk_indicators.Layout_Boca_Shell ri) := TRANSFORM   
@@ -354,7 +356,7 @@ LN_IDA_input := JOIN(riskview_input, clam,
                      LEFT OUTER);
 
 IDA_call := Risk_Indicators.Prep_IDA_Credit(LN_IDA_input,
-                                            gateways,
+                                            IF(Do_IDA, gateways, DATASET([],Gateway.Layouts.Config)), //blank out gateways if IDA not needed.
                                             FALSE, //indicates if we need Innovis attributes
                                             Intended_Purpose, 
                                             isCalifornia_in_person
@@ -362,6 +364,16 @@ IDA_call := Risk_Indicators.Prep_IDA_Credit(LN_IDA_input,
 
 //Don't call the gateway unless a valid IDA model is being called...
 IDA_results := IF(Do_IDA, IDA_call, DATASET([],iesp.ida_report_response.t_IDAReportResponseEx));
+
+//There is no way to join back to the input if an error happens so map the error here.
+IDA_error_code := MAP(IDA_results[1].response.ErrorRecord.Code = Riskview.Constants.LNRS          => Riskview.Constants.LN_Soft_Error,
+                      IDA_results[1].response.ErrorRecord.Code IN [Riskview.Constants.IDA_USER,
+                                                                   Riskview.Constants.IDA_SYSTEM] => Riskview.Constants.IDA_Soft_Error,
+                      IDA_results[1].response.ErrorRecord.Code = Riskview.Constants.LNRS_NETWORK  => Riskview.Constants.IDA_GW_Hard_Error,
+                      IDA_results[1].response._Header.Status != 0                                 => Riskview.Constants.IDA_GW_Hard_Error,
+                                                                                                     ''
+                     );
+
 
 //We only need the attributes/Indicators for models, and IDScore fields for alerts, so slim it down
 IDASlim := JOIN(LN_IDA_input, IDA_results,
@@ -375,7 +387,8 @@ IDASlim := JOIN(LN_IDA_input, IDA_results,
                           SELF.IDScoreResultCode4 := RIGHT.response.outputrecord.IDScoreResultCode4;
                           SELF.IDScoreResultCode5 := RIGHT.response.outputrecord.IDScoreResultCode5;
                           SELF.IDScoreResultCode6 := RIGHT.response.outputrecord.IDScoreResultCode6;
-                          SELF.Indicators := RIGHT.response.outputrecord.Indicators
+                          SELF.Indicators := RIGHT.response.outputrecord.Indicators;
+                          SELF.Exception_code := IDA_error_code;
                           ),
                 LEFT OUTER, ATMOST(RiskWise.max_atmost));
 	
@@ -474,7 +487,7 @@ end;
 
 #if(Riskview.Constants.TurnOnValidation = FALSE)
 
-riskview5_attr_search_results_attrv5 := join(clam, attrv5, left.seq=right.seq,
+riskview5_search_results_attrv5 := join(clam, attrv5, left.seq=right.seq,
 transform(riskview.layouts.layout_riskview5_search_results, 
 	self.LexID := if(right.did=0, '', (string)right.did);
 	self.ConsumerStatements := project(left.ConsumerStatements, transform(
@@ -483,7 +496,16 @@ transform(riskview.layouts.layout_riskview5_search_results,
 	self := left,
 	self := []), LEFT OUTER, KEEP(1), ATMOST(100));  
 
-riskview5_attr_search_results := join(riskview5_attr_search_results_attrv5, attrLnJ, left.seq=right.seq,
+
+riskview5_search_results_IDAattr := join(riskview5_search_results_attrv5, IDASlim,
+                                         LEFT.seq = RIGHT.seq,
+                                         TRANSFORM(riskview.layouts.layout_riskview5_search_results, 
+                                                   SELF.IDA_Attributes := RIGHT.Indicators,
+                                                   SELF := LEFT),
+                                         LEFT OUTER, KEEP(1), ATMOST(100));
+
+
+riskview5_attr_search_results := join(riskview5_search_results_IDAattr, attrLnJ, left.seq=right.seq,
 transform(riskview.layouts.layout_riskview5_search_results, 
 	self.LexID := if(right.did=0, '', (string)right.did); //don't show a lexid if the truedid is not TRUE
 	self.ConsumerStatements := left.ConsumerStatements;
@@ -1322,7 +1344,8 @@ riskview.layouts.layout_riskview5_search_results apply_score_alert_filters(alert
 	self.PhoneInputMobile 	 := if(suppress_condition, '', le.PhoneInputMobile 	);
   
   //Checking Indicators
-  self.CheckProfileIndex := if(AlertRegulatoryCondition = '0' and CheckingIndicatorsRequest, '-1', '');
+  // self.CheckProfileIndex := if(AlertRegulatoryCondition = '0' and CheckingIndicatorsRequest, '-1', '');
+  self.CheckProfileIndex := '';
   self.CheckTimeOldest := if(AlertRegulatoryCondition = '0' and CheckingIndicatorsRequest, '-1', '');
   self.CheckTimeNewest := if(AlertRegulatoryCondition = '0' and CheckingIndicatorsRequest, '-1', '');
   self.CheckNegTimeOldest := if(AlertRegulatoryCondition = '0' and CheckingIndicatorsRequest, '-1', '');
@@ -1388,9 +1411,10 @@ riskview.layouts.layout_riskview5_search_results doReport(riskview.layouts.layou
 	self := le;
 end;
 
-riskview5_search_results_tmp := join(riskview5_score_search_results, Report_output, left.seq = right.seq, 
-		doReport(left, right),
-		 left outer);
+riskview5_search_results_tmp := JOIN(riskview5_score_search_results, Report_output,
+                                     LEFT.seq = RIGHT.seq, 
+                                     doReport(LEFT, RIGHT),
+                                     LEFT OUTER);
 
 //Join the search results to the IDA results so that we have it all available for alert logic.
 rv5_search_plus_IDA := JOIN(riskview5_search_results_tmp, IDASlim, 
@@ -1402,11 +1426,12 @@ rv5_search_plus_IDA := JOIN(riskview5_search_results_tmp, IDASlim,
                                       SELF.IDScoreResultCode4 := RIGHT.IDScoreResultCode4,
                                       SELF.IDScoreResultCode5 := RIGHT.IDScoreResultCode5,
                                       SELF.IDScoreResultCode6 := RIGHT.IDScoreResultCode6,
+                                      SELF.Exception_code := RIGHT.Exception_code,
                                       SELF := LEFT),
                             LEFT OUTER);
 
-riskview5_search_results := join(rv5_search_plus_IDA, clam, 
-		left.seq=right.seq, apply_score_alert_filters(left, right));
+riskview5_search_results := JOIN(rv5_search_plus_IDA, clam, 
+                            LEFT.seq=RIGHT.seq, apply_score_alert_filters(LEFT, RIGHT));
 
 //Military Lending Act - new as of September 2016 
 layout_preMLA := record

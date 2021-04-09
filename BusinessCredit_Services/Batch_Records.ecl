@@ -136,7 +136,7 @@ FUNCTION
 															SELF.best_phone := LEFT.company_phone[1].company_phone;
 															SELF.best_fein := LEFT.company_fein[1].company_fein;
 															SELF.best_sic_code := LEFT.sic_code[1].company_sic_code1;
-															SELF.best_SIC_Description := Codes.Key_SIC4(keyed(sic4_code = LEFT.sic_code[1].company_sic_code1))[1].sic4_description;
+															SELF.best_SIC_Description := Codes.Key_SIC(KEYED(Code = LEFT.sic_code[1].company_sic_code1))[1].Desc;
 															SELF.best_naics_code := LEFT.naics_code[1].company_naics_code1;
 															SELF.best_NAICS_DESCRIPTION := Codes.Key_NAICS(KEYED(naics_code = LEFT.naics_code[1].company_naics_code1))[1].naics_description;
 															SELF.url := LEFT.company_url[1].company_url;

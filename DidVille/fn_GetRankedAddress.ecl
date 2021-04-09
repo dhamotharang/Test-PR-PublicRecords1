@@ -1,4 +1,4 @@
-IMPORT doxie, Address, Address_Rank, Didville, Patriot;
+﻿IMPORT doxie, Address, Address_Rank, Didville, Patriot;
 
 EXPORT fn_GetRankedAddress(DATASET(DidVille.Layout_Did_OutBatch) batch_in,
 													 doxie.IDataAccess in_mod) := FUNCTION
@@ -49,6 +49,7 @@ EXPORT fn_GetRankedAddress(DATASET(DidVille.Layout_Did_OutBatch) batch_in,
 		SELF.best_zip := ri.BA_z5;
 		SELF.best_zip4 := ri.BA_zip4;
 		SELF.best_addr_date := (UNSIGNED)ri.ba_dt_last_seen;
+    SELF.location_id := ri.location_id;
 		
 		SELF.phone10 := le.phone;
 		SELF.title := le.name_title;

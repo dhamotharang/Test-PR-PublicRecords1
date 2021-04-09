@@ -33,10 +33,10 @@ end;
 		
 export t_RINIdentityReportOption := record (iesp.share.t_BaseReportOption)
 	boolean AppendBest {xpath('AppendBest')};//hidden[internal]
-	unsigned3 DIDScoreThreshold {xpath('DIDScoreThreshold')};
+	unsigned3 DIDScoreThreshold {xpath('DIDScoreThreshold')};//hidden[internal]
 	boolean IsOnline {xpath('IsOnline')};//hidden[internal]
 	boolean UseAllSearchFields {xpath('UseAllSearchFields')};//hidden[internal]
-	string Platform {xpath('Platform')};
+	string Platform {xpath('Platform')};//hidden[internal]
 end;
 		
 export t_RINProfileElementKnownRisk := record
@@ -80,10 +80,18 @@ export t_RINRiskAttribute := record
 	dataset(iesp.share.t_NameValuePair) NVPs {xpath('NVPs/NVP'), MAXCOUNT(iesp.Constants.RIN.MAX_COUNT_NVP)};
 end;
 		
+export t_RINRiskRulesMatched := record
+	string60 ElementType {xpath('ElementType')};
+	string100 RuleName {xpath('RuleName')};
+	string250 Description {xpath('Description')};
+	string10 RiskLevel {xpath('RiskLevel')};
+end;
+		
 export t_RINIdentityReportRecord := record
 	t_RINIdentityProfile IdentityProfile {xpath('IdentityProfile')};//hidden[internal]
 	string10 RiskLevel {xpath('RiskLevel')};
 	dataset(t_RINRiskAttribute) RiskAttributes {xpath('RiskAttributes/RiskAttribute'), MAXCOUNT(iesp.Constants.RIN.MAX_COUNT_INDICATOR_ATTRIBUTE)};//hidden[internal]
+	dataset(t_RINRiskRulesMatched) RulesMatched {xpath('RulesMatched/RuleMatched'), MAXCOUNT(iesp.Constants.RIN.MAX_RULES_MATCHED)};//hidden[internal]
 end;
 		
 export t_IdentityReportResponse := record
