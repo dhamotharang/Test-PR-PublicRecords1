@@ -2,7 +2,7 @@
 
 EXPORT Layout_In_CA_LosAngeles := MODULE
 
-EXPORT Layout_In_CA_LosAngeles_old := RECORD
+EXPORT old := RECORD
 	string2	 	blank1;
 	string2 	month_of_filing;
 	string2 	blank2;
@@ -28,7 +28,7 @@ EXPORT Layout_In_CA_LosAngeles_old := RECORD
 END;
 
 
-EXPORT Layout_In_CA_LosAngeles_new := RECORD
+EXPORT new := RECORD
 	string2	 	blank1;
 	string2 	month_of_filing;
 	string2 	blank2;

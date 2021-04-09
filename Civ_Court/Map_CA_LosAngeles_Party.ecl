@@ -1,22 +1,22 @@
-﻿﻿﻿IMPORT Civ_Court, civil_court, crim_common, ut, Address, lib_StringLib;
+﻿﻿﻿IMPORT Civ_Court, civil_court, crim_common, ut, Address, lib_StringLib, STD;
 
 #option('multiplePersistInstances',FALSE);
 
 //original AbInitio mapping /stub_cleaning/court/work/mp/ca_civil_county_los_angeles_02_upd.mp
 
-fLA 	:= Civ_Court.File_In_CA_LosAngeles;
+fLA_old 	:= Civ_Court.File_In_CA_LosAngeles.old;
+searchpattern := '^(.*)-(.*)-(.*)$'; //To find court code in case_number in new layout
 
-Civil_Court.Layout_In_Party tLA(fLA input, integer1 C) := Transform
+Civil_Court.Layout_In_Party tLAOld(fLA_old input, integer1 C) := TRANSFORM
 self.process_date				:= civil_court.Version_Development;
 self.vendor						  := '18';
 self.state_origin				:= 'CA';
 self.source_file				:= 'CA-LA-CNTY-CIV-COURT';
 UpperCaseNum						:= ut.CleanSpacesAndUpper(input.case_number);
-// self.case_key					  := '18'+ut.CleanSpacesAndUpper(input.dist_prfx)+ut.CleanSpacesAndUpper(input.case_type)+UpperCaseNum;
-self.case_key					  := ut.CleanSpacesAndUpper(UpperCaseNum);
+self.case_key					  := '18'+ut.CleanSpacesAndUpper(input.dist_prfx)+ut.CleanSpacesAndUpper(input.case_type)+UpperCaseNum;
 self.parent_case_key		:= '';
-self.court_code					:= ut.CleanSpacesAndUpper(input.branch_code_id);
-self.court						  := MAP(self.court_code = 'B' => 'LA COUNTY, LA CENTRAL' ,
+self.court_code					:= ut.CleanSpacesAndUpper(input.dist_prfx);
+self.court							:= MAP(self.court_code = 'B' => 'LA COUNTY, LA CENTRAL' ,
 																self.court_code = 'E' => 'LA COUNTY, BURBANK/GLENDALE',
 																self.court_code = 'G' => 'LA COUNTY, NORTH EAST PASADENA',
 																self.court_code = 'K' => 'LA COUNTY, EAST POMONA' ,
@@ -30,15 +30,15 @@ self.court						  := MAP(self.court_code = 'B' => 'LA COUNTY, LA CENTRAL' ,
 																self.court_code = 'V' => 'LA COUNTY, SOUTH EAST NORWALK',
 																self.court_code = 'Y' => 'LA COUNTY, SOUTH WEST TORRANCE','');
 self.case_number				:= UpperCaseNum;
-// self.case_type_code			:= ut.CleanSpacesAndUpper(input.case_type);
-// self.case_type					:= MAP(self.case_type_code = 'C' => 'CIVIL',
-																// self.case_type_code = 'D' => 'DIVORCE',
-																// self.case_type_code = 'Q' => 'DOMESTIC VIOLENCE',
-																// self.case_type_code = 'P' => 'PROBATE',
-																// self.case_type_code = 'S' => 'SPECIAL PROCEEDINGS',
-																// self.case_type_code = 'Y' => 'DOMESTIC SUPPORT',
-																// self.case_type_code = 'Z' => 'DOMESTIC SUPPORT',
-																// self.case_type_code = 'L' => 'RESL', '');
+self.case_type_code			:= ut.CleanSpacesAndUpper(input.case_type);
+self.case_type					:= MAP(self.case_type_code = 'C' => 'CIVIL',
+																self.case_type_code = 'D' => 'DIVORCE',
+																self.case_type_code = 'Q' => 'DOMESTIC VIOLENCE',
+																self.case_type_code = 'P' => 'PROBATE',
+																self.case_type_code = 'S' => 'SPECIAL PROCEEDINGS',
+																self.case_type_code = 'Y' => 'DOMESTIC SUPPORT',
+																self.case_type_code = 'Z' => 'DOMESTIC SUPPORT',
+																self.case_type_code = 'L' => 'RESL', '');
 ClnName1							:= IF(REGEXFIND('^\\.',input.party_name1),REGEXREPLACE('^\\.',input.party_name1,''),
 														IF(REGEXFIND('CHANGE NAME|^does [0-9]+',input.party_name1,NOCASE),'',
 															ut.CleanSpacesAndUpper(input.party_name1)));
@@ -54,69 +54,70 @@ self.entity_type_code_1_master := CHOOSE(C,IF(StringLib.StringFind(input.party_t
 self := [];
 END;
 
-pLA	:= normalize(fLA,2,tLA(left,counter));
+pLA	:= NORMALIZE(fLA_old,2,tLAOld(left,counter));
 
-//Filter blank entity_1 prior to cleaning
-filter_LA_All := filter_LA + filter_LA_New;
-// filter_LA	:= pLA(trim(entity_1,all) <> '');
+//New Los Angeles County Layout
+fLA_new 	:= Civ_Court.File_In_CA_LosAngeles.new;
+//searchpattern := '^(.*)-(.*)-(.*)$'; //To find court code in case_number in new layout
 
-fLA_new 	:= Civ_Court.File_In_CA_LosAngeles;
-
-Civil_Court.Layout_In_Party tLA(fLA_new input, integer1 C) := Transform
+Civil_Court.Layout_In_Party tLANew(fLA_new input, integer1 C) := Transform
 self.process_date				:= civil_court.Version_Development;
 self.vendor						  := '18';
 self.state_origin				:= 'CA';
 self.source_file				:= 'CA-LA-CNTY-CIV-COURT';
 UpperCaseNum						:= ut.CleanSpacesAndUpper(input.case_number);
-// self.case_key					  := '18'+ut.CleanSpacesAndUpper(input.dist_prfx)+ut.CleanSpacesAndUpper(input.case_type)+UpperCaseNum;
-self.case_key					  := ut.CleanSpacesAndUpper(UpperCaseNum);
+self.case_key						:= UpperCaseNum;
 self.parent_case_key		:= '';
-self.court_code					:= ut.CleanSpacesAndUpper(input.branch_code_id);
-self.court						  := MAP(self.court_code = 'AR' => 'Airport' ,
-																self.court_code = 'AH' => 'Alhambra',
-																self.court_code = 'AV' => 'Antelope Valley',
-																self.court_code = 'AP' => 'Appeals',
-																self.court_code = 'BF' => 'Bellflower',
-																self.court_code = 'BH' => 'Beverly Hills',
-																self.court_code = 'BB' => 'Burbank',
-																self.court_code = 'CT' => 'Catalina',
-																self.court_code = 'CA' => 'Central Arraignment Courts',
-																self.court_code = 'CW' => 'Central Civil West',
-																self.court_code = 'CH' => 'Chatsworth',
-																self.court_code = 'CC' => 'Childrens Court',
-																self.court_code = 'CM' => 'Compton',
-																self.court_code = 'CJ' => 'Criminal Justice Center',
-																self.court_code = 'DW' => 'Downey',
-																self.court_code = 'EL' => 'East Los Angeles',
-																self.court_code = 'EJ' => 'Eastlake Juvenile',
-																self.court_code = 'EM' => 'El Monte',
-																self.court_code = 'GD' => 'Glendale',
-																self.court_code = 'HW' => 'Hollywood',
-																self.court_code = 'IW' => 'Inglewood',
-																self.court_code = 'IJ' => 'Inglewood - Juvenile',
-																self.court_code = 'LJ' => 'Juvenile Justice - Lancaster',
-																self.court_code = 'LB' => 'Long Beach',
-																self.court_code = 'LP' => 'Los Padrinos',
-																self.court_code = 'MH' => 'Mental Health',
-																self.court_code = 'MT' => 'Metropolitan',
-																self.court_code = 'NW' => 'Norwalk',
-																self.court_code = 'PD' => 'Pasadena',
-																self.court_code = 'PN' => 'Pomona North',
-																self.court_code = 'PS' => 'Pomona South',
-																self.court_code = 'SF' => 'San Fernando',
-																self.court_code = 'SC' => 'Santa Clarita',
-																self.court_code = 'SM' => 'Santa Monica',
-																self.court_code = 'SS' => 'Spring Street',
-																self.court_code = 'ST' => 'Stanley Mosk',
-																self.court_code = 'SJ' => 'Sylmar Juvenile',
-																self.court_code = 'TR' => 'Torrance',
-																self.court_code = 'VE' => 'Van Nuys East',
-																self.court_code = 'VW' => 'Van Nuys West',
-																self.court_code = 'WC' => 'West Covina',
-																self.court_code = 'WH' => 'Whittier','');
-																
+TempCourtCd							:= IF(STD.Str.Find(UpperCaseNum,'-',1) > 0,REGEXFIND('^(.*)-(.*)-(.*)$',UpperCaseNum,3)[1..2],
+															 IF(STD.Str.Find(UpperCaseNum,'-',1) = 0 AND REGEXFIND('^[0-9]',UpperCaseNum),UpperCaseNum[3..4],
+																	IF(REGEXFIND('^[A-Z]',UpperCaseNum),UpperCaseNum[1],'')));
+self.court_code					:= ut.CleanSpacesAndUpper(TempCourtCd);
+self.court						  := MAP(self.court_code = 'AR' => 'AIRPORT' ,
+																self.court_code = 'AH' => 'ALHAMBRA',
+																self.court_code = 'AV' => 'ANTELOPE VALLEY',
+																self.court_code = 'AP' => 'APPEALS',
+																self.court_code = 'B' => 'LA COUNTY, LA CENTRAL',
+																self.court_code = 'BF' => 'BELLFLOWER',
+																self.court_code = 'BH' => 'BEVERLY HILLS',
+																self.court_code = 'BB' => 'BURBANK',
+																self.court_code = 'CT' => 'CATALINA',
+																self.court_code = 'CA' => 'CENTRAL ARRAIGNMENT COURTS',
+																self.court_code = 'CW' => 'CENTRAL CIVIL WEST',
+																self.court_code = 'CH' => 'CHATSWORTH',
+																self.court_code = 'CC' => 'CHILDRENS COURT',
+																self.court_code = 'CM' => 'COMPTON',
+																self.court_code = 'CJ' => 'CRIMINAL JUSTICE CENTER',
+																self.court_code = 'DW' => 'DOWNEY',
+																self.court_code = 'EL' => 'EAST LOS ANGELES',
+																self.court_code = 'EJ' => 'EASTLAKE JUVENILE',
+																self.court_code = 'EM' => 'EL MONTE',
+																self.court_code = 'GD' => 'GLENDALE',
+																self.court_code = 'HW' => 'HOLLYWOOD',
+																self.court_code = 'IW' => 'INGLEWOOD',
+																self.court_code = 'IJ' => 'INGLEWOOD - JUVENILE',
+																self.court_code = 'LJ' => 'JUVENILE JUSTICE - LANCASTER',
+																self.court_code = 'LB' => 'LONG BEACH',
+																self.court_code = 'LP' => 'LOS PADRINOS',
+																self.court_code = 'MH' => 'MENTAL HEALTH',
+																self.court_code = 'MT' => 'METROPOLITAN',
+																self.court_code = 'NW' => 'NORWALK',
+																self.court_code = 'PD' => 'PASADENA',
+																self.court_code = 'PN' => 'POMONA NORTH',
+																self.court_code = 'PS' => 'POMONA SOUTH',
+																self.court_code = 'SF' => 'SAN FERNANDO',
+																self.court_code = 'SC' => 'SANTA CLARITA',
+																self.court_code = 'SM' => 'SANTA MONICA',
+																self.court_code = 'SS' => 'SPRING STREET',
+																self.court_code = 'ST' => 'STANLEY MOSK',
+																self.court_code = 'SJ' => 'SYLMAR JUVENILE',
+																self.court_code = 'TR' => 'TORRANCE',
+																self.court_code = 'VE' => 'VAN NUYS EAST',
+																self.court_code = 'VW' => 'VAN NUYS WEST',
+																self.court_code = 'WC' => 'WEST COVINA',
+																self.court_code = 'WH' => 'WHITTIER','');																
 self.case_number				:= UpperCaseNum;
-self.case_type_code			:= ut.CleanSpacesAndUpper(input.case_type);
+TempCaseType						:= IF(STD.Str.Find(UpperCaseNum,'-',1) = 0 AND REGEXFIND('^[0-9]',UpperCaseNum),UpperCaseNum[5..6],'CV');
+self.case_type_code			:= ut.CleanSpacesAndUpper(TempCaseType);
 self.case_type					:= MAP(self.case_type_code = 'AD' => 'ADOPTION',
 																self.case_type_code = 'AO' => 'ARREST ONLY',
 																self.case_type_code = 'LC' => 'CIVIL - LIMITED',
@@ -158,6 +159,13 @@ self.entity_type_code_1_master := CHOOSE(C,IF(StringLib.StringFind(input.party_t
 																						IF(StringLib.StringFind(input.party_type,'--',1)>0,'10','30'));
 self := [];
 END;
+
+pLANew	:= NORMALIZE(fLA_new,2,tLANew(left,counter));
+
+CombineAll	:= pLA + pLANew;
+
+//Filter blank entity_1 prior to cleaning
+filter_LA	:= CombineAll(trim(entity_1,all) <> '');
 
 Civ_court.Civ_Court_Cleaner(filter_LA,cleanLA);
 
