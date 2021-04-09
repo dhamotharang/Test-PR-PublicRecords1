@@ -9,14 +9,15 @@ target_url_b := Gateway._shortcuts.dev155_roxie;
 
 my_query := 'DueDiligence.DueDiligence_service';
 
-testcases := dev_regression.bucket().get(my_query, 'compliance regression');
+//tids := [693, 703, 713, 723];
+testcases := dev_regression.bucket().get(my_query, 'compliance regression'); //(tid IN tids);
 OUTPUT(testcases, NAMED('testcases'));
 
 mod_test := MODULE (dev_regression.ISoapConfig)
-  EXPORT string query_a := my_query;
+  EXPORT string query_a := my_query + '.1';
   EXPORT string url_a := target_url_a;
 
-  EXPORT string query_b := 'DueDiligence.DueDiligence_service_test';
+  EXPORT string query_b := my_query + '.2';
   EXPORT string url_b := target_url_b;
 END;
 
