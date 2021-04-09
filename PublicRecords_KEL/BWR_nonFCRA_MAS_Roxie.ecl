@@ -88,39 +88,21 @@ Empty_GW := DATASET([TRANSFORM(Gateway.Layouts.Config,
 							SELF.URL := ''; 
 							SELF := [])]);
 							
-DeltaBase_GW := IF(IncludeDeltaBase, DATASET([TRANSFORM(Gateway.Layouts.Config,
-							// The inquiry delta base which feeds the 1 day inq attrs is not needed for the input rep 1 at this point. for now we only run this delta base code in the nonFCRA service 
-							//below is the dev delta base for inquiries, this is the default to prevent hammering the production gateway by accident
-							SELF.ServiceName := RiskWise.shortcuts.gw_delta_dev[1].servicename; 
-							SELF.URL := RiskWise.shortcuts.gw_delta_dev[1].url; //dev
-							//below is the production delta base for inquiries.  be careful not to hammer this production gateway with too much traffic
-							// SELF.ServiceName := RiskWise.shortcuts.gw_delta_prod[1].servicename; 
-							// SELF.URL := RiskWise.shortcuts.gw_delta_prod[1].url; 
-							SELF := [])]),
+// The inquiry delta base which feeds the 1 day inq attrs is not needed for the input rep 1 at this point. for now we only run this delta base code in the nonFCRA service 
+//below is the dev delta base for inquiries, this is the default to prevent hammering the production gateway by accident
+DeltaBase_GW := IF(IncludeDeltaBase, project(riskwise.shortcuts.gw_delta_dev, TRANSFORM(Gateway.Layouts.Config, self := left, self := [])), 
 							Empty_GW);	
 							
-NetAcuity_GW := IF(IncludeNetAcuity, DATASET([TRANSFORM(Gateway.Layouts.Config,
-							SELF.ServiceName := RiskWise.shortcuts.gw_netacuityv4_prod[1].servicename; 
-							SELF.URL := RiskWise.shortcuts.gw_netacuityv4_prod[1].url; 
-							SELF := [])]),
+NetAcuity_GW := IF(IncludeNetAcuity, project(riskwise.shortcuts.gw_netacuityv4_prod, TRANSFORM(Gateway.Layouts.Config, self := left, self := [])),
 							Empty_GW);
 
-OFAC_GW := IF(IncludeOFACGW, DATASET([TRANSFORM(Gateway.Layouts.Config,
-							SELF.ServiceName := 'bridgerwlc'; 
-							SELF.URL := 'http://bridger_batch_cert:Br1dg3rBAtchC3rt@172.16.70.19:7003/WsSearchCore/?ver_=1'; 
-							SELF := [])]),
+OFAC_GW := IF(IncludeOFACGW, project(riskwise.shortcuts.gw_bridger, TRANSFORM(Gateway.Layouts.Config, self := left, self := [])),
 							Empty_GW);  
 							
-Targus_GW := IF(IncludeTargusGW, DATASET([TRANSFORM(Gateway.Layouts.Config,
-							SELF.ServiceName := 'targus'; 
-							SELF.URL := 'HTTP://api_qa_gw_roxie:g0h3%40t2x@gatewaycertesp.sc.seisint.com:7726/WsGateway/?ver_=1.70'; 
-							SELF := [])]),
+Targus_GW := IF(IncludeTargusGW, project(riskwise.shortcuts.gw_targus_sco, TRANSFORM(Gateway.Layouts.Config, self := left, self := [])),
 							Empty_GW);  
 
-InsurancePhone_GW := IF(IncludeInsurancePhoneGW, DATASET([TRANSFORM(Gateway.Layouts.Config,
-							SELF.ServiceName := 'insurancephoneheader'; 
-							SELF.URL := 'HTTP://api_qa_gw_roxie:g0h3%40t2x@gatewaycertesp.sc.seisint.com:7726/WsGatewayEx/?ver_=1.87'; 
-							SELF := [])]),
+InsurancePhone_GW := IF(IncludeInsurancePhoneGW, project(riskwise.shortcuts.gw_insurancephoneheader, TRANSFORM(Gateway.Layouts.Config, self := left, self := [])),
 							Empty_GW);  
 							
 Input_Gateways := (DeltaBase_GW + NetAcuity_GW + OFAC_GW + Targus_GW + InsurancePhone_GW)(URL <> '');

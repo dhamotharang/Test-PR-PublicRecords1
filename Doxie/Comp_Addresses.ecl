@@ -92,6 +92,7 @@ Rels_Dn_ranked := Header.Mac_Append_addr_ind(Rels_Dn_pre, addr_ind, /*src*/, did
 Rels_1 := if(do_address_hierarchy,project(Rels_Dn_ranked,
                                     transform(Address_Format,
                                      self.tnt :=  doxie.enhanceTNT(do_address_hierarchy, left.tnt, left.addr_ind, left.best_addr_rank),
+                                     self.location_id := left.locid;
                                      self := left)),Rels_Dn_pre);
 
 Address_Format tra(Address_Format lef,Address_Format ref) := transform

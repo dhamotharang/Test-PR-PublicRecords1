@@ -539,6 +539,11 @@ EXPORT Constants := MODULE
 		EXPORT UNSIGNED2 MAX_GOV_DEBARRED_CONTRACTORS := 100; //EBR_Servicesconstants.maxcounts.Government_Debarred_Contractor value, but may be too big here???
 	END;
 
+  EXPORT EmailRiskGateway := MODULE
+    EXPORT UNSIGNED1 MAX_RESULTS := 1;
+    EXPORT UNSIGNED1 MAX_SOCIAL_MEDIA_LINKS := 1;
+  END;
+
   // Federal Aviation Administration (FAA) - Aircraft Registrations & Pilots
 	export MAX_COUNT_SEARCH_RESPONSE_RECORDS := 2000;
 	export MAX_COUNT_REPORT_RESPONSE_RECORDS := 2000;
@@ -605,6 +610,7 @@ EXPORT Constants := MODULE
     export unsigned2 MAX_COUNT_INDICATOR_ATTRIBUTE := 1000;
     export unsigned2 MAX_RISK_ATTRIBUTE := 100;
     export unsigned2 MAX_REPORT_RECORDS := 1;
+    export unsigned2 MAX_RULES_MATCHED := 1000;
   end;
 
   export Fraud_Point := MODULE

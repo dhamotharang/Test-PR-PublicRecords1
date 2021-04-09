@@ -1,0 +1,2 @@
+﻿IMPORT rvc2004_3_0;
+rvc2004_3_0.AppendAll(myfile,do_RVC2004_3_0,CollateralStatus,OutOfStatuteIndicator,addrinputlengthofres,addrprevioustimeoldest,bankruptcycount,confirmationsubjectfound,dayssince_LastPaymentDate,derogcount,inputprovidedphone,inquirycollections12month,ssndeceased,subjectdeceased);

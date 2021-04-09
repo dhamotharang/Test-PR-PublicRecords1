@@ -203,7 +203,8 @@ archive_bf_last_seen_date := map(
     _archive_date < left.LAST_SEEN_DATE => 1,
                                                 0);
 
-  self.CheckProfileIndex := if(makeGatewayCall = false or (string)left.RISK_PNC = '', '-1', (string)(min(80, max(0,(integer)left.RISK_PNC))));
+  // self.CheckProfileIndex := if(makeGatewayCall = false or (string)left.RISK_PNC = '', '-1', (string)(min(80, max(0,(integer)left.RISK_PNC))));
+  self.CheckProfileIndex := '';
 
   self.CheckTimeOldest := if(makeGatewayCall = false or (string)archive_bf_first_seen_date = '1' or (string)archive_bf_first_seen_date_true = '1' or (string)archive_bf_last_seen_date = '1' or (string)archive_bf_first_seen_date_true = '-1' 
                           or (string)archive_bf_first_seen_date_true = '-2', '-1', (string)checktimeoldest_1);

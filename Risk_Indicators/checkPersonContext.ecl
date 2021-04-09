@@ -202,9 +202,15 @@ PersonContext_transformed := project(dsResponseRecords(searchStatus=personContex
 		SELF.header_correct_record_id := if(alert_needs_suppression and left.dataGroup in [	PersonContext.constants.datagroups.HDR ], 
 													[Trim(TRIM(TRIM(left.RecID1, left, right)+TRIM(left.RecID2, left, right)+TRIM(left.RecID3, left, right),left,right)+TRIM(left.RecID4, left, right),left,right)], 
 													[]);
-    SELF.death_correct_record_id := if(alert_needs_suppression and left.dataGroup in [	PersonContext.constants.datagroups.DID_DEATH ], 
-													[Trim(TRIM(TRIM(left.RecID1, left, right)+TRIM(left.RecID2, left, right)+TRIM(left.RecID3, left, right),left,right)+TRIM(left.RecID4, left, right),left,right)], 
-													[]);
+		// we need the state_death_id in the death_correct_record_id
+		// sometimes we have LexID in the RecID1 field, then put RecID2 into the death_correct_record_id
+		RecID1_is_LexID := (unsigned)left.LexID=(unsigned)left.recId1;
+		recid_to_use := if(RecID1_is_LexID,
+		[TRIM(left.RecID2, left, right)],// state_death_id is being put in RecID2
+		[Trim(TRIM(TRIM(left.RecID1, left, right)+TRIM(left.RecID2, left, right)+TRIM(left.RecID3, left, right),left,right)+TRIM(left.RecID4, left, right),left,right)] );
+															
+		SELF.death_correct_record_id := if(alert_needs_suppression and left.dataGroup in [	PersonContext.constants.datagroups.DID_DEATH ], recid_to_use, []);
+	
 	
 		self := [];
 		

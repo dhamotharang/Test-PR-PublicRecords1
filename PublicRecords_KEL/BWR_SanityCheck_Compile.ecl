@@ -1,4 +1,4 @@
-//HPCC Systems KEL Compiler Version 1.5.0rc1
+﻿//HPCC Systems KEL Compiler Version 1.5.0rc1
 #OPTION('expandSelectCreateRow',true);
 IMPORT KEL15 AS KEL;
 IMPORT CFG_Compile,E_Accident,E_Address,E_Address_Inquiry,E_Address_Phone,E_Address_Property,E_Address_Property_Event,E_Address_Slim,E_Address_Summary,E_Aircraft,E_Aircraft_Owner,E_Bankruptcy,E_Business_Org,E_Business_Pow,E_Business_Prox,E_Business_Sele,E_Business_Sele_Overflow,E_Business_Ult,E_Criminal_Details,E_Criminal_Offender,E_Criminal_Offense,E_Criminal_Punishment,E_Drivers_License,E_E_B_R_Tradeline,E_Education,E_Email,E_Email_Inquiry,E_First_Degree_Associations,E_First_Degree_Relative,E_Geo_Link,E_House_Hold_Phone,E_Household,E_Household_Member,E_Input_B_I_I,E_Input_B_I_I_Input_P_I_I,E_Input_P_I_I,E_Inquiry,E_Lien_Judgment,E_Name_Summary,E_Person,E_Person_Accident,E_Person_Address,E_Person_Bankruptcy,E_Person_Drivers_License,E_Person_Education,E_Person_Email,E_Person_Email_Phone_Address,E_Person_Inquiry,E_Person_Lien_Judgment,E_Person_Offender,E_Person_Offenses,E_Person_Phone,E_Person_Property,E_Person_Property_Event,E_Person_S_S_N,E_Person_Sex_Offender,E_Person_Vehicle,E_Phone,E_Phone_Inquiry,E_Phone_Summary,E_Professional_License,E_Professional_License_Person,E_Property,E_Property_Event,E_Prox_Address,E_Prox_Email,E_Prox_Person,E_Prox_Phone_Number,E_Prox_T_I_N,E_Prox_Utility,E_S_S_N_Address,E_S_S_N_Inquiry,E_S_S_N_Summary,E_Second_Degree_Associations,E_Sele_Address,E_Sele_Aircraft,E_Sele_Bankruptcy,E_Sele_E_B_R_Tradeline,E_Sele_Email,E_Sele_Inquiry,E_Sele_Lien_Judgment,E_Sele_Person,E_Sele_Phone_Number,E_Sele_Property,E_Sele_Property_Event,E_Sele_T_I_N,E_Sele_Tradeline,E_Sele_U_C_C,E_Sele_Utility,E_Sele_Vehicle,E_Sele_Watercraft,E_Sex_Offender,E_Social_Security_Number,E_Surname,E_T_I_N,E_T_I_N_Address,E_T_I_N_Inquiry,E_T_I_N_Phone_Number,E_Tradeline,E_U_C_C,E_Utility,E_Utility_Address,E_Utility_Person,E_Vehicle,E_Watercraft,E_Watercraft_Owner,E_Zip_Code,E_Zip_Code_Person FROM PublicRecords_KEL;
@@ -234,6 +234,20 @@ IF(RunAll OR RunFast OR RunUidSourceCounts,OUTPUT(E_Address_Slim().TopSourcedUID
 IF(RunAll OR RunFast OR RunUidSourceCounts,OUTPUT(E_Address_Slim().UIDSourceDistribution,NAMED('E_Address_Slim_UIDSourceDistribution')));
 IF(RunAll OR RunFast OR RunNullCounts,OUTPUT(E_Address_Slim().NullCounts,NAMED('E_Address_Slim_NullCounts')));
 
+//AddressSlim sanity checks
+IF(RunAll OR RunSanityCheckSummary,OUTPUT(E_Address_Slim().SanityCheck,NAMED('E_Address_Slim_SanityCheck')));
+IF(RunAll OR RunInvalidSingleValues,OUTPUT(E_Address_Slim().Primary_Range__SingleValue_Invalid,NAMED('E_Address_Slim_Primary_Range__SingleValue_Invalid')));
+IF(RunAll OR RunInvalidSingleValues,OUTPUT(E_Address_Slim().Predirectional__SingleValue_Invalid,NAMED('E_Address_Slim_Predirectional__SingleValue_Invalid')));
+IF(RunAll OR RunInvalidSingleValues,OUTPUT(E_Address_Slim().Primary_Name__SingleValue_Invalid,NAMED('E_Address_Slim_Primary_Name__SingleValue_Invalid')));
+IF(RunAll OR RunInvalidSingleValues,OUTPUT(E_Address_Slim().Suffix__SingleValue_Invalid,NAMED('E_Address_Slim_Suffix__SingleValue_Invalid')));
+IF(RunAll OR RunInvalidSingleValues,OUTPUT(E_Address_Slim().Postdirectional__SingleValue_Invalid,NAMED('E_Address_Slim_Postdirectional__SingleValue_Invalid')));
+IF(RunAll OR RunInvalidSingleValues,OUTPUT(E_Address_Slim().Z_I_P5__SingleValue_Invalid,NAMED('E_Address_Slim_Z_I_P5__SingleValue_Invalid')));
+IF(RunAll OR RunInvalidSingleValues,OUTPUT(E_Address_Slim().Source__SingleValue_Invalid,NAMED('E_Address_Slim_Source__SingleValue_Invalid')));
+IF(RunAll OR RunFast OR RunUidSourceCounts,OUTPUT(E_Address_Slim().UIDSourceCounts,NAMED('E_Address_Slim_UIDSourceCounts')));
+IF(RunAll OR RunFast OR RunUidSourceCounts,OUTPUT(E_Address_Slim().TopSourcedUIDs(TopNUids),NAMED('E_Address_Slim_TopSourcedUIDs')));
+IF(RunAll OR RunFast OR RunUidSourceCounts,OUTPUT(E_Address_Slim().UIDSourceDistribution,NAMED('E_Address_Slim_UIDSourceDistribution')));
+IF(RunAll OR RunFast OR RunNullCounts,OUTPUT(E_Address_Slim().NullCounts,NAMED('E_Address_Slim_NullCounts')));
+ 
 //Property sanity checks
 IF(RunAll OR RunSanityCheckSummary,OUTPUT(E_Property().SanityCheck,NAMED('E_Property_SanityCheck')));
 IF(RunAll OR RunInvalidSingleValues,OUTPUT(E_Property().Primary_Range__SingleValue_Invalid,NAMED('E_Property_Primary_Range__SingleValue_Invalid')));

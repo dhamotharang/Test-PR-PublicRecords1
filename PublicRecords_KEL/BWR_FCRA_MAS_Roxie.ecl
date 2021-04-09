@@ -6,8 +6,7 @@ threads := 1;
 
 RoxieIP := RiskWise.shortcuts.Dev156;
 NeutralRoxieIP:= RiskWise.Shortcuts.staging_neutral_roxieIP;
-// PCG_Dev := 'http://delta_dempers_dev:g0n0l3s!@10.176.68.149:7720/WsSupport/?ver_=2.0'; //-- testing on DEV servers
-// PCG_Cert := 'http://ln_api_dempsey_dev:g0n0l3s!@10.176.68.149:7720/WsSupport/?ver_=2.0'; //-- testing on PROD servers DO NOT USE THIS UNLESS YOU NEED TO				
+// PCG_Dev := riskwise.shortcuts.gw_personContext;
 
 InputFile := '~mas::uatsamples::consumer_fcra_100k_07102019.csv';
 //InputFile := '~bbraaten::in::personfcra_lexids_w20200811-114047.csv';//lexids appended from FCRA vault file aug 2020
@@ -80,10 +79,7 @@ Empty_GW := DATASET([TRANSFORM(Gateway.Layouts.Config,
 							SELF.URL := ''; 
 							SELF := [])]);
 
-Targus_GW := IF(IncludeTargusGW, DATASET([TRANSFORM(Gateway.Layouts.Config,
-							SELF.ServiceName := 'targus'; 
-							SELF.URL := 'HTTP://api_qa_gw_roxie:g0h3%40t2x@gatewaycertesp.sc.seisint.com:7726/WsGateway/?ver_=1.70'; 
-							SELF := [])]),
+Targus_GW := IF(IncludeTargusGW, project(riskwise.shortcuts.gw_targus_sco, TRANSFORM(Gateway.Layouts.Config, self := left, self := [])),
 							Empty_GW);  
 							
 Input_Gateways := (NeutralRoxie_GW + Targus_GW)(URL <> '');

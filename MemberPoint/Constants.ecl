@@ -6,6 +6,7 @@
 			EXPORT STRING1 Premium:= '1';
 			EXPORT STRING1 Ultimate:= '2';
 			EXPORT STRING1 WaterfallPhones:= 'W';
+			EXPORT STRING1 ContactPlusPhones:= 'C';
 		END;
 		
 		EXPORT EmailTransactionType:= MODULE
@@ -54,7 +55,7 @@
 			export boolean IncludeDOB := true;
 			export boolean IncludeSSN := true;
 			export boolean IncludeGender := true;
-			export string25 Phones_Score_Model := 'PHONESCORE_V2';
+			export string25 Phones_Score_Model := 'COMMON_SCORE';
 			export string1	AddressConfidenceThreshold := 'M';
 			export string1	PhonesReturnCutoff := 'M';
 			
@@ -154,6 +155,11 @@
 			EXPORT INTEGER MaxPhoneCount:= 3;
 			EXPORT BOOLEAN ReturnScore:= TRUE;
 			EXPORT BOOLEAN StrictAPSX:= FALSE;
+			EXPORT BOOLEAN UsePremiumSource_A := FALSE;
+      		EXPORT UNSIGNED1 PremiumSource_A_limit := 0;
+			// Contact Plus
+			EXPORT BOOLEAN UsePremiumSource_A_cp := TRUE;
+      		EXPORT UNSIGNED1 PremiumSource_A_limit_cp := 3;			
 		end;
 			
 		export unsigned SubjectAdultScore := 100; // between 0-100

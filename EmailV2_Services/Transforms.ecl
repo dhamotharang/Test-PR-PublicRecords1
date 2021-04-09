@@ -230,11 +230,26 @@ EXPORT Transforms := MODULE
       SELF.additional_status_info := additional_status;
   END;
 
-  EXPORT iesp.briteverify_email.t_BriteVerifyEmailRequest xfBVSoapRequest($.Layouts.Gateway_Data.batch_in_bv_rec L, STRING apikey)
+  EXPORT iesp.briteverify_email.t_BriteVerifyEmailRequest xfBVSoapRequest($.Layouts.Gateway_Data.batch_in_gw_rec L, STRING apikey)
   := TRANSFORM
     SELF.SearchBy.EmailAddress  := TRIM(L.email,ALL);
     SELF.Options.JSONServiceAPIKey := apikey;
     SELF:=[];
+  END;
+
+  EXPORT iesp.emailrisk.t_EmailRiskRequest xfEASoapRequest($.Layouts.Gateway_Data.batch_in_gw_rec L, STRING version = '') := TRANSFORM
+    SELF.SearchBy.Email  := TRIM(L.email, ALL);
+    SELF.Options.Version := STD.Str.ToUpperCase(version);
+    SELF := [];
+  END;
+
+  EXPORT $.Layouts.Gateway_Data.ea_result_rec xfEASoapResults(iesp.emailrisk.t_EmailRiskResponse le) := TRANSFORM
+    results := le.EmailRiskResponseData.Results[1];
+    SELF.email := STD.Str.ToUpperCase(TRIM(results.Email, ALL));
+    SELF.email_username := STD.Str.ToUpperCase(TRIM(results.Ename, ALL));
+    SELF.email_domain := STD.Str.ToUpperCase(TRIM(results.DomainInfo.DomainName, ALL));
+    SELF.email_exists := STD.Str.ToUpperCase(TRIM(results.EmailExists, ALL));
+    SELF.email_status := STD.Str.ToLowerCase(TRIM(results.Status, ALL));
   END;
 
   EXPORT $.Layouts.batch_in_rec xfSearchIn(iesp.emailsearchv2.t_EmailSearchV2SearchBy rec_in)
@@ -437,6 +452,8 @@ EXPORT Transforms := MODULE
                                      le.additional_status_info<>'' => le.additional_status_info,
                                      _last_verified<>'' => _last_verified,
                                      '');
+      SELF.ea_email_exist := le.ea_email_exist;
+      SELF.ea_email_status := le.ea_email_status;
       SELF.ln_date_first := IF(le.ln_date_first>0, (STRING) le.ln_date_first,'');
       SELF.ln_date_last := IF(le.ln_date_last>0, (STRING) le.ln_date_last,'');
       SELF := le;
