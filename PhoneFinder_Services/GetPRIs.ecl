@@ -8,9 +8,7 @@ EXPORT GetPRIs( DATASET($.Layouts.PhoneFinder.Final)             dSearchResults,
                 ) :=
 FUNCTION
   // Calculate the identity counts - count the number of identities for each phone to calculate RI
-  dCntPhoneIdentities := IF(inMod.hasActiveIdentityCountRules,
-                            $.GetIdentitiesCount(dSearchResults),
-                            dSearchResults);
+  dCntPhoneIdentities := $.GetIdentitiesCount(dSearchResults);
 
   dRemoveOtherPhoneHistory := dCntPhoneIdentities(isPrimaryIdentity OR isPrimaryPhone);
 

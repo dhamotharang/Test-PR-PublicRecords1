@@ -1,8 +1,8 @@
-﻿//HPCC Systems KEL Compiler Version 1.3.0beta5
-IMPORT KEL13 AS KEL;
+﻿//HPCC Systems KEL Compiler Version 1.5.0
+IMPORT KEL15 AS KEL;
 IMPORT PublicRecords_KEL;
 IMPORT CFG_Compile FROM PublicRecords_KEL_Queries.B2B_KEL;
-IMPORT * FROM KEL13.Null;
+IMPORT * FROM KEL15.Null;
 EXPORT E_Tradeline(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG_Compile __cfg = CFG_Compile) := MODULE
   EXPORT Typ := KEL.typ.uid;
   EXPORT InLayout := RECORD
@@ -53,11 +53,7 @@ EXPORT E_Tradeline(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG_Com
   SHARED __SortedTable := SORT(__Table,KeyVal);
   SHARED NullLookupRec := DATASET([{NullKeyVal,1,0}],__TabRec);
   EXPORT Lookup := NullLookupRec + PROJECT(__SortedTable,TRANSFORM(__TabRec,SELF.UID:=COUNTER,SELF:=LEFT));
-  SHARED Archive___Date_0Rule(STRING a) := MAP(KEL.Routines.IsValidDate((KEL.typ.kdate)(a[1..8]))=>a[1..8],'0');
-  SHARED Date_First_Seen_0Rule(STRING a) := MAP(KEL.Routines.IsValidDate((KEL.typ.kdate)(a[1..8]))=>a[1..8],'0');
-  SHARED Date_Last_Seen_0Rule(STRING a) := MAP(KEL.Routines.IsValidDate((KEL.typ.kdate)(a[1..8]))=>a[1..8],'0');
-  SHARED Hybrid_Archive_Date_0Rule(STRING a) := MAP(KEL.Routines.IsValidDate((KEL.typ.kdate)(a[1..8]))=>a[1..8],'0');
-  SHARED __Mapping0 := 'UID(DEFAULT:UID),ultid(OVERRIDE:Ult_I_D_:0),orgid(OVERRIDE:Org_I_D_:0),seleid(OVERRIDE:Sele_I_D_:0),account_key(OVERRIDE:Account_Key_:\'\'),ar_date(OVERRIDE:A_R_Date_:DATE),status(OVERRIDE:Status_),total_ar(OVERRIDE:Total_A_R_:\'\'),current_ar(OVERRIDE:Current_A_R_:\'\'),aging_1to30(OVERRIDE:Aging1_To30_:\'\'),aging_31to60(OVERRIDE:Aging31_To60_:\'\'),aging_61to90(OVERRIDE:Aging61_To90_:\'\'),aging_91plus(OVERRIDE:Aging91_Plus_:\'\'),credit_limit(OVERRIDE:Credit_Limit_:\'\'),segment_id(OVERRIDE:Segment_I_D_:\'\'),dtvendorfirstreported(DEFAULT:Dt_Vendor_First_Reported_:DATE),dtvendorlastreported(DEFAULT:Dt_Vendor_Last_Reported_:DATE),filedate(OVERRIDE:File_Date_:DATE),first_sale_date(OVERRIDE:First_Sale_Date_:DATE),last_sale_date(OVERRIDE:Last_Sale_Date_:DATE),source(OVERRIDE:Source_:\'\'),archive_date(OVERRIDE:Archive___Date_:EPOCH:Archive___Date_0Rule),dt_first_seen(OVERRIDE:Date_First_Seen_:EPOCH:Date_First_Seen_0Rule),dt_last_seen(OVERRIDE:Date_Last_Seen_:EPOCH:Date_Last_Seen_0Rule),hybridarchivedate(DEFAULT:Hybrid_Archive_Date_:EPOCH:Hybrid_Archive_Date_0Rule),vaultdatelastseen(DEFAULT:Vault_Date_Last_Seen_:EPOCH),DPMBitmap(OVERRIDE:__Permits:PERMITS)';
+  SHARED __Mapping0 := 'UID(DEFAULT:UID),ultid(OVERRIDE:Ult_I_D_:0),orgid(OVERRIDE:Org_I_D_:0),seleid(OVERRIDE:Sele_I_D_:0),account_key(OVERRIDE:Account_Key_:\'\'),ar_date(OVERRIDE:A_R_Date_:DATE),status(OVERRIDE:Status_),total_ar(OVERRIDE:Total_A_R_:\'\'),current_ar(OVERRIDE:Current_A_R_:\'\'),aging_1to30(OVERRIDE:Aging1_To30_:\'\'),aging_31to60(OVERRIDE:Aging31_To60_:\'\'),aging_61to90(OVERRIDE:Aging61_To90_:\'\'),aging_91plus(OVERRIDE:Aging91_Plus_:\'\'),credit_limit(OVERRIDE:Credit_Limit_:\'\'),segment_id(OVERRIDE:Segment_I_D_:\'\'),dtvendorfirstreported(DEFAULT:Dt_Vendor_First_Reported_:DATE),dtvendorlastreported(DEFAULT:Dt_Vendor_Last_Reported_:DATE),filedate(OVERRIDE:File_Date_:DATE),first_sale_date(OVERRIDE:First_Sale_Date_:DATE),last_sale_date(OVERRIDE:Last_Sale_Date_:DATE),source(OVERRIDE:Source_:\'\'),archive_date(OVERRIDE:Archive___Date_:EPOCH),dt_first_seen(OVERRIDE:Date_First_Seen_:EPOCH),dt_last_seen(OVERRIDE:Date_Last_Seen_:EPOCH),hybridarchivedate(DEFAULT:Hybrid_Archive_Date_:EPOCH),vaultdatelastseen(DEFAULT:Vault_Date_Last_Seen_:EPOCH),DPMBitmap(OVERRIDE:__Permits:PERMITS)';
   SHARED __d0_Norm := NORMALIZE(__in,LEFT.Dataset_Cortera_Tradeline__Key_LinkIds,TRANSFORM(RECORDOF(__in.Dataset_Cortera_Tradeline__Key_LinkIds),SELF:=RIGHT));
   SHARED __d0_Out := RECORD
     RECORDOF(PublicRecords_KEL.ECL_Functions.Dataset_FDC.Dataset_Cortera_Tradeline__Key_LinkIds);

@@ -27,7 +27,7 @@ EXPORT getIDA_attributes(DATASET(Risk_Indicators.layouts.layout_IDA_in) indata,
   iesp.ida_report_request.t_IDAReportRequest prep(indata le) := TRANSFORM
     // Client and product values
     SELF.ReportBy.Client := TRIM(le.Client);
-    SELF.ReportBy.Affiliate := '';
+    SELF.ReportBy.Affiliate := TRIM(le.Affiliate);
     SELF.ReportBy.Solution := TRIM(le.Solution);
     SELF.ReportBy.ProductName := TRIM(le.ProductName);
     SELF.ReportBy.ProductID := TRIM(le.ProductID);

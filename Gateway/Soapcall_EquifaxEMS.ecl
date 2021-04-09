@@ -61,7 +61,7 @@ EXPORT SoapCall_EquifaxEms(
     DATASET([],extended_response));
 
   //This transform converts the soap response to a dataset and catches all exceptions.
-  iesp.equifax_ems.t_EquifaxEmsResponseEx pickupSoapMessage(extended_response L) := TRANSFORM
+  iesp.equifax_ems.t_EquifaxEmsResponse pickupSoapMessage(extended_response L) := TRANSFORM
     //soapFault exceptions occur when the ESP response status <> 200
     soapMsg := DATASET([L.soap_message],{STRING line});
     parsedSoapResponse := PARSE(soapMsg,line,FCRAGateway_Services.Layouts.fault_rec,XML('soap:Envelope/soap:Body/soap:Fault'));
@@ -80,15 +80,15 @@ EXPORT SoapCall_EquifaxEms(
     isResponseInvalid := EXISTS(espFault) OR EXISTS(soapFault) OR
       (L.response.emsResponse.pdfReport = '' AND L.response.emsResponse.errorInfo.errorMessage = '');
 
-    SELF.response._header.Message := soapFault[1].Message;
-    SELF.response._header.status := MAP(
+    SELF._header.Message := soapFault[1].Message;
+    SELF._header.status := MAP(
       makeGatewayCall = FALSE => FCRAGateway_Services.Constants.GatewayStatus.NOCALL,
       isResponseInvalid => FCRAGateway_Services.Constants.GatewayStatus.ERROR,
       FCRAGateway_Services.Constants.GatewayStatus.SUCCESS
     );
 
-    SELF.response._header.Exceptions := CHOOSEN(soapFault + espFault, iesp.Constants.MaxResponseExceptions);
-    SELF := L;
+    SELF._header.Exceptions := CHOOSEN(soapFault + espFault, iesp.Constants.MaxResponseExceptions);
+    SELF := L.response;
   END;
 
   #IF(FCRAGateway_Services.Constants.Debug.EquifaxEmsSoapcall)
@@ -98,6 +98,8 @@ EXPORT SoapCall_EquifaxEms(
     OUTPUT(soapResp, NAMED('ems_soapResp'));
   #END
 
-  RETURN PROJECT(soapResp, pickupSoapMessage(LEFT));
+  result := PROJECT(soapResp, pickupSoapMessage(LEFT))[1];
+
+  RETURN result;
 
 END;

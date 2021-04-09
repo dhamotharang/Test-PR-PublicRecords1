@@ -126,6 +126,7 @@ EXPORT Names := MODULE
 //                Ecrash keys suffix
 //***********************************************************************
   EXPORT AGENCY_SUFFIX := 'agency';
+  EXPORT AGENCYSOURCE_SUFFIX := 'agencysource';
   EXPORT UNRESTRICTED_ACCNBRV1_SUFFIX := 'unrestricted_accnbrv1'; 
   EXPORT PHOTO_ID_SUFFIX := 'PhotoId';
   EXPORT DOL_SUFFIX := 'dol';
@@ -138,6 +139,9 @@ EXPORT Names := MODULE
 //***************************************************************
   EXPORT i_AGENCY := KEY_PREFIX + '_' + AGENCY_SUFFIX; 
   EXPORT i_AGENCY_SF := i_AGENCY + '_' + VERSION; 
+	
+  EXPORT i_AGENCYSOURCE := KEY_PREFIX + '_' + AGENCYSOURCE_SUFFIX; 
+  EXPORT i_AGENCYSOURCE_SF := i_AGENCYSOURCE + '_' + VERSION; 
   
   EXPORT i_UNRESTRICTED_ACCNBRV1 := KEY_PREFIX + '_' + UNRESTRICTED_ACCNBRV1_SUFFIX;
   EXPORT i_UNRESTRICTED_ACCNBRV1_SF := i_UNRESTRICTED_ACCNBRV1 + '_' + VERSION;
