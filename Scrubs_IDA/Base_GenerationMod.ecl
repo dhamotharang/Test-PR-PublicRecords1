@@ -62,7 +62,7 @@ EXPORT Base_GenerationMod := MODULE(SALT311.iGenerationMod)
     + 'FIELDTYPE:Invalid_SSN:LIKE(Invalid_Num):LENGTHS(0,9)\n'
     + 'FIELDTYPE:Invalid_DL:CUSTOM(Scrubs_IDA.Functions.Fn_Valid_DL > 0)\n'
     + 'FIELDTYPE:Invalid_Phone:ALLOW(0123456789):LENGTHS(0,10)\n'
-    + 'FIELDTYPE:Invalid_Clientassigneduniquerecordid:ALLOW(nfrv0123456789):LENGTHS(17,18,19)\n'
+    + 'FIELDTYPE:Invalid_Clientassigneduniquerecordid:ALLOW(abcdefghijklmnopqrstuvwxyz0123456789):LENGTHS(17,18,19)\n'
     + 'FIELDTYPE:Invalid_Emailaddress:CUSTOM(Scrubs.Functions.fn_valid_email > 0)\n'
     + 'FIELDTYPE:Invalid_Ipaddress:CUSTOM(Scrubs.Functions.fn_valid_IP > 0)\n'
     + 'FIELDTYPE:Invalid_NID:LIKE(Invalid_Num):LENGTHS(0,18,19,20)\n'
