@@ -26,6 +26,7 @@ EXPORT fn_getBestInfoBySeleID(DATASET(Business_Risk_BIP.Layouts.Input) InputOrig
 	cleanedInput_only_seleid   := cleanedInput(NOT has_bii() AND input_echo.SeleID != 0);
 	cleanedInput_no_seleid     := cleanedInput(has_bii() AND input_echo.SeleID = 0);
 	cleanedInput_having_seleid := cleanedInput(has_bii() AND input_echo.SeleID != 0);
+  cleanedInput_no_bii_or_seleid := cleanedInput(NOT has_bii() AND input_echo.SeleID = 0);
 
 	// ---------------[ Scenario 1 ]---------------
 
@@ -160,7 +161,17 @@ EXPORT fn_getBestInfoBySeleID(DATASET(Business_Risk_BIP.Layouts.Input) InputOrig
 			INNER, KEEP(1), FEW
 		);
 
-	input_with_best := SORT( (input_repopulated + input_passed_through), acctno );
+  //doing this so that we don't drop the records that do not meet minimum input requirements
+  input_no_bii_or_seleid := JOIN(InputOrig, cleanedInput_no_bii_or_seleid,
+                                 LEFT.acctNo = RIGHT.input_echo.acctNo,
+                                 TRANSFORM(Business_Risk_BIP.Layouts.Input,
+                                           SELF.seq := LEFT.seq;
+                                           SELF.acctNo := LEFT.acctNo;
+                                           SELF := LEFT;),
+                                 INNER, 
+                                 KEEP(1), FEW);  
+
+	input_with_best := SORT((input_repopulated + input_passed_through + input_no_bii_or_seleid), acctno);
 
 	// OUTPUT( cleanedInput, NAMED('cleanedInput') );
 	// OUTPUT( cleanedInput_only_seleid, NAMED('cleanedInput_only_seleid') );
