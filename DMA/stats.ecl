@@ -34,15 +34,19 @@ export stats(string filedate, boolean build_full = false) := function
     key_new_dedup := dedup(distribute(sort(key, phonenumber),hash32(PhoneNumber)),phonenumber,local);
     key_last_dedup := dedup(distribute(sort(key_old, phonenumber),hash32(PhoneNumber)),phonenumber,local);
 
-    extra_in_new_key := join(key_last_dedup, key_new_dedup, left.phonenumber	=	right.phonenumber, right only);
-    missing_from_new_key := join(key_last_dedup, key_new_dedup, left.phonenumber	=	right.phonenumber, left only);
-
     new_key :=	index(  {dx_dma.layouts.delta_keyfield},
                                     {dx_dma.layouts.delta_payload},
                                     dx_dma.names.key_dnc_new(filedate)
                                     );
     adds := new_key(delta_ind = 1);
     deletes := new_key(delta_ind = 3);
+
+    extra_in_new_key := join(key_last_dedup, key_new_dedup, left.phonenumber	=	right.phonenumber, right only);
+    missing_from_new_key := if(build_full,
+                                join(key_last_dedup, key_new_dedup, left.phonenumber	=	right.phonenumber, left only),
+                                deletes
+                                );
+
 
     return sequential(  
                         output(count(base_new_dedup), named('new_base_record_count_'+filedate)),
@@ -52,8 +56,8 @@ export stats(string filedate, boolean build_full = false) := function
                         output(count(key_new_dedup), named('new_key_record_count_'+filedate)),
                         output(count(key_last_dedup), named('last_key_record_count_'+filedate)),
                         output(extra_in_new_key,, '~thor400::tps::key::extra_in_new_key', overwrite),
-                        //output(missing_from_new_key,, '~thor400::tps::key::missing_from_new_key', overwrite),
-                        //output(count(missing_from_new_key),named('deleted_'+filedate)),
+                        output(missing_from_new_key,, '~thor400::tps::key::missing_from_new_key', overwrite),
+                        output(count(missing_from_new_key),named('deleted_'+filedate)),
                         output(count(adds),named('new_delta_adds_'+filedate)),
                         output(count(deletes),named('new_delta_deletes_'+filedate)),
                         output(adds,named('adds_sample_'+filedate)),
