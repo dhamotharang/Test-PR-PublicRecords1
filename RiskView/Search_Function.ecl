@@ -2,51 +2,52 @@
 onThor := _Control.Environment.OnThor;
 
 EXPORT Search_Function(
-	dataset(RiskView.Layouts.layout_riskview_input) riskview_input, 
-	dataset(Gateway.Layouts.Config) gateways,
-	string50 datarestriction,
-	string AttributesVersionRequest,
-	string Auto_model_name,
-	string Bankcard_model_name,
-	string Short_term_lending_model_name,
-	string Telecommunications_model_name,
-	string Crossindustry_model_name,
-	string Custom_model_name,
-	string Custom2_model_name,
-	string Custom3_model_name,
-	string Custom4_model_name,
-	string Custom5_model_name,
-	string intended_purpose,
-	string prescreen_score_threshold,
-	boolean isCalifornia_in_person,
-	string caller,  // to control the behavior of searches for batch versus online
-	boolean RiskviewReportRequest,
-	string50 datapermission,
-	string6	SSNMask,
-	string6 DOBMask,
-	boolean	DLMask,
-	string FilterLienTypes,  
-	string120	EndUserCompanyName,
-	string20 CustomerNumber,
-	string10 SecurityCode,
-	boolean	IncludeRecordsWithSSN,
-	boolean	IncludeBureauRecs, 
-	integer2 ReportingPeriod, 
-	boolean IncludeLnJ,
-	boolean RetainInputDID,
-	boolean exception_score_reason = FALSE,
-    boolean InsuranceMode = FALSE, //BF _ This value is set to true for insurance only.
-	boolean InsuranceBankruptcyAllow10Yr = FALSE, //Value is true for insurance only.
-	unsigned6 MinimumAmount = 0,
-	dataset(iesp.share.t_StringArrayItem) ExcludeStates = dataset([], iesp.share.t_StringArrayItem),
-	dataset(iesp.share.t_StringArrayItem) ExcludeReportingSources = dataset([], iesp.share.t_StringArrayItem),
-	boolean IncludeStatusRefreshChecks = FALSE,
-	DATASET({string32 DeferredTransactionID}) DeferredTransactionIDs = DATASET([], {string32 DeferredTransactionID}),
+  dataset(RiskView.Layouts.layout_riskview_input) riskview_input, 
+  dataset(Gateway.Layouts.Config) gateways,
+  string50 datarestriction,
+  string AttributesVersionRequest,
+  string Auto_model_name,
+  string Bankcard_model_name,
+  string Short_term_lending_model_name,
+  string Telecommunications_model_name,
+  string Crossindustry_model_name,
+  string Custom_model_name,
+  string Custom2_model_name,
+  string Custom3_model_name,
+  string Custom4_model_name,
+  string Custom5_model_name,
+  string intended_purpose,
+  string prescreen_score_threshold,
+  boolean isCalifornia_in_person,
+  string caller,  // to control the behavior of searches for batch versus online
+  boolean RiskviewReportRequest,
+  string50 datapermission,
+  string6	SSNMask,
+  string6 DOBMask,
+  boolean	DLMask,
+  string FilterLienTypes,  
+  string120	EndUserCompanyName,
+  string20 CustomerNumber,
+  string10 SecurityCode,
+  boolean	IncludeRecordsWithSSN,
+  boolean	IncludeBureauRecs, 
+  integer2 ReportingPeriod, 
+  boolean IncludeLnJ,
+  boolean RetainInputDID,
+  boolean exception_score_reason = FALSE,
+  boolean InsuranceMode = FALSE, //BF _ This value is set to true for insurance only.
+  boolean InsuranceBankruptcyAllow10Yr = FALSE, //Value is true for insurance only.
+  unsigned6 MinimumAmount = 0,
+  dataset(iesp.share.t_StringArrayItem) ExcludeStates = dataset([], iesp.share.t_StringArrayItem),
+  dataset(iesp.share.t_StringArrayItem) ExcludeReportingSources = dataset([], iesp.share.t_StringArrayItem),
+  boolean IncludeStatusRefreshChecks = FALSE,
+  DATASET({string32 DeferredTransactionID}) DeferredTransactionIDs = DATASET([], {string32 DeferredTransactionID}),
   string5 StatusRefreshWaitPeriod = '',
   boolean IsBatch = FALSE, // Changes the output of the DTE child dataset
-	string20 CompanyID = '',
-	string32 TransactionID ='',
-  string50 IDA_AppID = ''
+  string20 CompanyID = '',
+  string32 TransactionID ='',
+  string50 IDA_AppID = '',
+  string120 IDA_EndUser = ''
   ) := function
 
 boolean   isPreScreenPurpose := STD.Str.ToUpperCase(intended_purpose) = 'PRESCREENING';
@@ -315,9 +316,13 @@ Do_Attribute_Models := 	STD.Str.ToLowerCase(Auto_model_name) IN Riskview.Constan
 
 Risk_Indicators.layouts.layout_IDA_in into_IDA(RiskView.Layouts.layout_riskview_input le, risk_indicators.Layout_Boca_Shell ri) := TRANSFORM   
   
+  //Need to preprocess Affiliate since IDA Affiliate field can't handle most special characters or spaces
+  clean_EndUser := RegexReplace('[^a-z0-9]', TRIM(IDA_EndUser), '', NOCASE); //only allow letters, numbers
+  
   SELF.CompanyID := companyID,
   SELF.ESPTransactionID := TransactionID,
   SELF.App_ID := IDA_AppID,
+  SELF.Affiliate := clean_EndUser,
   
   SELF.seq := le.seq;
   SELF.DID := ri.did; // grab the did from the bocashell 
