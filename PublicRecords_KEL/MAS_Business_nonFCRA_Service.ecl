@@ -200,7 +200,7 @@ BOOLEAN Default_IncludeMinors := TRUE;
 
 	END;	
 	
-	JoinFlags := PublicRecords_KEL.Internal_Join_Interface_Options(PublicRecords_KEL.Join_Interface_Options);	
+	JoinFlags := PublicRecords_KEL.Internal_Join_Interface_Options_Business_Only(PublicRecords_KEL.Join_Interface_Options);	//turn off ecl
 	
   ResultSet := PublicRecords_KEL.FnRoxie_GetBusAttrs(ds_input, Options, JoinFlags);		
 	
