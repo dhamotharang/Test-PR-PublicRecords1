@@ -51,4 +51,25 @@ EXPORT Constants := MODULE
 	EXPORT VERIFIED := 'Verified';
 	EXPORT PROOF := 'Proof';
 
+	EXPORT UNSIGNED1 AGE_THRESHOLD := 65;
+	EXPORT UNSIGNED1 EXEMPTION_YEARS := 2;
+
+	EXPORT UNSIGNED1 NO_RISK     := 10;
+	EXPORT UNSIGNED1 BEST_ADDR   := 20;
+	EXPORT UNSIGNED1 DRVR_ADDR   := 30;
+	EXPORT UNSIGNED1 NOT_AGE_65  := 40;
+	EXPORT UNSIGNED1 HAS_EXMPTN  := 50;
+	EXPORT UNSIGNED1 IS_DECEASED := 60;
+
+	EXPORT NO_RISK_MSG     := 'No risk indicators found';
+	EXPORT BEST_ADDR_MSG   := 'Best address does not match input address';
+	EXPORT DRVR_ADDR_MSG   := 'Drivers license address does not match input address';
+	EXPORT NOT_AGE_65_MSG  := 'Applicant is not age 65 or older';
+	EXPORT HAS_EXMPTN_MSG  := 'Data indicates applicant has a homestead exemption on another property';
+	EXPORT IS_DECEASED_MSG := 'Data indicates applicant is deceased';
+
+	EXPORT PASS := 'PASS';
+	EXPORT WARN := 'WARN';
+	EXPORT FAILED := 'FAIL';
+
 END;
