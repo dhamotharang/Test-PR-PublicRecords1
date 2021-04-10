@@ -166,4 +166,8 @@ EXPORT layouts := MODULE
 		bipv2.IDlayouts.l_xlink_ids;
 		END;
 		
+  EXPORT UniqueId := RECORD
+	UNSIGNED8 unique_id;
+	Base;
+	END;
 END;	

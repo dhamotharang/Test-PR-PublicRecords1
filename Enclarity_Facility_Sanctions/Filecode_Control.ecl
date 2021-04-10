@@ -14,7 +14,7 @@ EXPORT Filecode_Control(string filedate, boolean pUseProd = false) := MODULE
 								'SNC_GAF1','SNC_ILF4','SNC_INF3','SNC_KSF1','SNC_KYF1','SNC_MDF2' ,'SNC_MDF4','SNC_MEF3','SNC_MIF2','SNC_MNF1',
 								'SNC_MNF3','SNC_MOF1','SNC_MOF2','SNC_MSF1','SNC_MTF2','SNC_NCF2' ,'SNC_NCF3','SNC_NCF4','SNC_NDF1','SNC_NEF1',
 								'SNC_NEF3','SNC_NHF2','SNC_NHF3','SNC_NJF3','SNC_NVF1','SNC_NYF1','SNC_NYF2' ,'SNC_OHF1','SNC_ORF3','SNC_PAF1',
-								'SNC_PAF2','SNC_SCF2','SNC_SCF3','SNC_TNF1','SNC-WAF1','SNC_WYF2'];
+								'SNC_PAF2','SNC_SCF2','SNC_SCF3','SNC_TNF1','SNC_WAF1','SNC_WYF2'];
 																					 
 	EXPORT fullwithrein_filecodes:= ['SNC_HIF2','SNC_IAF2','SNC_IDF2','SNC_LAF3','SNC_NJF1','SNC_TXF1','SNC_WVF1','SNC_WVF2','SNC_WVF3'];
 

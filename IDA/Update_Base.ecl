@@ -65,8 +65,10 @@ cleanNames_t := project(cleanNames, transform({recordof(cleanNames), string orig
 																		self := left));			
 																					
 																			
-unsigned4	lFlags := AID.Common.eReturnValues.RawAID | AID.Common.eReturnValues.ACECacheRecords;		
-AID.MacAppendFromRaw_2Line(cleanNames_t,orig_addr1,orig_addr2,RawAID,cleanAddr, lFlags);
+																																							
+unsigned4	lFlags := AID.Common.eReturnValues.RawAID | AID.Common.eReturnValues.ACECacheRecords | AID.Common.eReturnValues.NoNewCacheFiles;
+AID.MacAppendFromRaw_2Line(cleanNames_t,orig_addr1,orig_addr2,RawAID,cleanAddr,lFlags);
+
 
 IDA.Layouts.base tr(cleanAddr l) := TRANSFORM
 	self.title := l.cln_title;
