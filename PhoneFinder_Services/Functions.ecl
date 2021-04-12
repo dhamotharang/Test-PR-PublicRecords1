@@ -368,16 +368,14 @@
   EXPORT FormatResults2IESP(DATASET(lFinal) dIn, PhoneFinder_Services.iParam.SearchParams inMod) :=
   FUNCTION
     today := STD.Date.Today();
-
+  
     // Identities section
     $.Layouts.log_identities tFormat2IespIdentity(lFinal pInput) :=
     TRANSFORM
       dt_first_seen := ValidateDate((INTEGER)pInput.dt_first_seen);
       dt_last_seen  := ValidateDate((INTEGER)pInput.dt_last_seen);
 
-      vFullName      := MAP(pInput.fname != '' or pInput.lname != ''                                    => Address.NameFromComponents(pInput.fname, pInput.mname, pInput.lname, pInput.name_suffix),
-                            pInput.subj_phone_type_new != MDR.sourceTools.src_Phones_Accudata_CNAM_CNM2 => pInput.listed_name,
-                            '');
+      vFullName      := pInput.full_name;
       vStreetAddress := Address.Addr1FromComponents(pInput.prim_range, pInput.predir, pInput.prim_name, pInput.suffix,
                                                     pInput.postdir, pInput.unit_desig, pInput.sec_range);
       vCityStZip     := Address.Addr2FromComponentsWithZip4(pInput.city_name, pInput.st, pInput.zip, pInput.zip4);
@@ -663,14 +661,13 @@
 
     dFormat2Denorm := PROJECT(dSearchIn, tFormat2Denorm(LEFT));
 
+
     pf.PhoneFinder.IdentityIesp tFormat2IespIdentity(lFinal pInput) :=
     TRANSFORM
       dt_first_seen := $.Functions.ValidateDate((INTEGER)pInput.dt_first_seen);
       dt_last_seen  := $.Functions.ValidateDate((INTEGER)pInput.dt_last_seen);
 
-      vFullName      := MAP(pInput.fname != '' or pInput.lname != '' => Address.NameFromComponents(pInput.fname, pInput.mname, pInput.lname, pInput.name_suffix),
-                            pInput.subj_phone_type_new != MDR.sourceTools.src_Phones_Accudata_CNAM_CNM2 => pInput.listed_name,
-                            '');
+      vFullName      := pInput.full_name;
       vStreetAddress := Address.Addr1FromComponents(pInput.prim_range, pInput.predir, pInput.prim_name, pInput.suffix,
                                                     pInput.postdir, pInput.unit_desig, pInput.sec_range);
       vCityStZip     := Address.Addr2FromComponentsWithZip4(pInput.city_name, pInput.st, pInput.zip, pInput.zip4);

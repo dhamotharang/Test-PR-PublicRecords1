@@ -26,7 +26,7 @@ FUNCTION
 
   dIdentitySlimWithPO := IF(inMod.IsPrimarySearchPII, UNGROUP(dIdentitySlimPropagatePO), dIdentitySlim);
 
-  dIdentitySlimFiltered := dIdentitySlimWithPO((lname != '' OR listed_name != '') AND typeflag != Phones.Constants.TypeFlag.DataSource_PV);
+  dIdentitySlimFiltered := dIdentitySlimWithPO((lname != '' OR listed_name != '' OR Full_name != '') AND typeflag != Phones.Constants.TypeFlag.DataSource_PV);
 
   // Rollup
   $.Layouts.PhoneFinder.IdentitySlim tIdentityRollup($.Layouts.PhoneFinder.IdentitySlim le, $.Layouts.PhoneFinder.IdentitySlim ri) :=
