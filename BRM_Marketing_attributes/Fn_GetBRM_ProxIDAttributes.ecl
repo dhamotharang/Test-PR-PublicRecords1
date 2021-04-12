@@ -31,19 +31,28 @@ EXPORT Fn_GetBRM_ProxIDAttributes(DATASET(PublicRecords_KEL.ECL_Functions.Layout
 			SELF.RepInput := ROWS(RIGHT),
 			SELF.InputData := LEFT));
 					
-	BusinessProxIDAttributesRaw := PROJECT(BusinessProxAttributesInput, TRANSFORM({INTEGER G_ProcBusUID, LayoutBusinessProxIDAttributes},
-		SELF.G_ProcBusUID := LEFT.InputData.G_ProcBusUID;
-		NonFCRABusinessProxIDResults := BRM_Marketing_attributes.BRM_KEL.Q_Non_F_C_R_A_Business_Prox_I_D_Attributes_V1_Dynamic(
-				(INTEGER7)LEFT.InputData.B_LexIDUlt,
-				(INTEGER7)LEFT.InputData.B_LexIDOrg,
-				(INTEGER7)LEFT.InputData.B_LexIDLegal,
-				(INTEGER7)LEFT.InputData.B_LexIDLoc,
-				LEFT.RepInput,
-				DATASET(LEFT.InputData),
-				(INTEGER)LEFT.InputData.B_InpClnArchDt[1..8],
-				Options.KEL_Permissions_Mask, 
-				FDCDataset).res0;
-		SELF := NonFCRABusinessProxIDResults[1]));	
+
+
+  BusinessProxIDAttributesRaw := NOCOMBINE(JOIN(BusinessProxAttributesInput, FDCDataset,
+                                                LEFT.InputData.G_ProcBusUID = RIGHT.G_ProcBusUID,
+                                                TRANSFORM({INTEGER G_ProcBusUID, LayoutBusinessProxIDAttributes},
+                                                          SELF.G_ProcBusUID := LEFT.InputData.G_ProcBusUID;
+                                                          NonFCRABusinessProxIDResults := BRM_Marketing_attributes.BRM_KEL.Q_Non_F_C_R_A_Business_Prox_I_D_Attributes_V1_Dynamic(
+                                                            LEFT.InputData.B_LexIDUlt,
+                                                            LEFT.InputData.B_LexIDOrg,
+                                                            LEFT.InputData.B_LexIDLegal,
+                                                            LEFT.InputData.B_LexIDLoc,
+                                                            LEFT.RepInput,
+                                                            DATASET(LEFT.InputData),
+                                                            (INTEGER)LEFT.InputData.B_InpClnArchDt[1..8],
+                                                            Options.KEL_Permissions_Mask, 
+                                                            DATASET(RIGHT)).res0;
+                                                            
+                                                  SELF := NonFCRABusinessProxIDResults[1]), 
+                                                LEFT OUTER, ATMOST(100), KEEP(1)));
+
+
+
 	
 	BusinessProxIDAttributesClean := KEL.Clean(BusinessProxIDAttributesRaw, TRUE, TRUE, TRUE);
 	
@@ -75,7 +84,8 @@ EXPORT Fn_GetBRM_ProxIDAttributes(DATASET(PublicRecords_KEL.ECL_Functions.Layout
 			SELF := LEFT));
 			
 	BusinessProxIDAttributes := SORT(BusinessAttributesWithProxID + BusinessAttributesWithoutProxID, G_ProcBusUID);
-	
+
+
 	RETURN BusinessProxIDAttributes;
 END;	
 

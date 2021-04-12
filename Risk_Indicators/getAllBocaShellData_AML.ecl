@@ -1,4 +1,4 @@
-﻿IMPORT Ut, riskwise, models, easi, doxie, dma, fcra_opt_out, USPIS_HotList, AML, gateway, risk_indicators;
+﻿IMPORT Ut, riskwise, models, easi, doxie, dma, fcra_opt_out, USPIS_HotList, AML, gateway, risk_indicators, STD;
 
 EXPORT getAllBocaShellData_AML (
   GROUPED DATASET (risk_indicators.Layout_output) iid,
@@ -87,7 +87,7 @@ production_realtime_mode := iid[1].historydate=risk_indicators.iid_constants.def
   ids_only_derogs := project(pre_ids_only,
             transform(layouts.layout_derogs_input,
             self.insurance_bk_filter := insuranceMode and
-                (left.shell_input.st='AZ' or stringlib.stringtouppercase(left.shell_input.in_state)='AZ');
+                (left.shell_input.st='AZ' or STD.Str.ToUpperCase(left.shell_input.in_state)='AZ');
             self := left));
 
   // try to get multiple records per did to pass into derogs
@@ -96,7 +96,7 @@ production_realtime_mode := iid[1].historydate=risk_indicators.iid_constants.def
                           le.iid.did2,
                           le.iid.did3);
     self.insurance_bk_filter := insuranceMode and
-                (le.shell_input.st='AZ' or stringlib.stringtouppercase(le.shell_input.in_state)='AZ');
+                (le.shell_input.st='AZ' or STD.Str.ToUpperCase(le.shell_input.in_state)='AZ');
     self := le;
   end;
   p_did := NORMALIZE(pre_ids_only(~isrelat),3,get_dids (LEFT,COUNTER))(did<>0);
@@ -531,14 +531,14 @@ ssnFlagsPrepforAddr := group(project(ssnFlagsPrep, transform(risk_indicators.Lay
 ExactMatchLevel:=iid_constants.default_ExactMatchLevel;
 
 //aml  just ids with ssn flags        fixed memory limit error - iid_getssnflags expects diff seq for each individual.
-withSSNFlags := iid_getSSNFlags(group(ssnFlagsPrepseq, seq), mod_access.dppa, mod_access.glb, isFCRA, false/*runSSNCodes*/, ExactMatchLevel, mod_access.DataRestrictionMask, BSversion, BSOptions, mod_access.DataPermissionMask, mod_access := mod_access);
+withSSNFlags := Risk_Indicators.iid_getSSNFlags(group(ssnFlagsPrepseq, seq), mod_access, isFCRA, false/*runSSNCodes*/, ExactMatchLevel, BSversion, BSOptions);
 
 SSNFlagsOrigSeq := join(withSSNFlags, ssnFlagsPrep, (integer)left.account = right.origseq and left.did = right.did,
                         transform({recordof(withSSNFlags)}, self.seq := right.origseq, self.account := right.account, self := left));
 
 // withSSNFlags need again for relatives
 layout_bocashell_neutral add_ssnFlags(  SSNFlagsOrigSeq le, pre_ids_only ri) := TRANSFORM
-  self.AMLParentNonUsSSN := if(Risk_Indicators.rcSet.isCode85(le.ssn, le.socllowissue) and stringlib.stringtolowercase(ri.relation) in ['father','mother'], 1, 0);
+  self.AMLParentNonUsSSN := if(Risk_Indicators.rcSet.isCode85(le.ssn, le.socllowissue) and STD.Str.ToLowerCase(ri.relation) in ['father','mother'], 1, 0);
   self.AMLSocsRCISflag := le.socsRCISflag;
   self.AMLSocllowissue := le.socllowissue;
   self.AMLsocsvalflag  := le.socsvalflag;

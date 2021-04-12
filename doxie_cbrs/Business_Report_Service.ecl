@@ -1,91 +1,23 @@
-﻿/*--SOAP--
-<message name="BusinessReportService" wuTimeout="300000">
-  <part name="INDUSTRYCLASS" type="xsd:string"/>
-  <part name="BDID" type="xsd:string"/>
-  <part name="BDL" type="xsd:string"/>
-  <part name="CompanyName" type="xsd:string"/>
-  <part name="AlternateCompanyName" type="xsd:string"/>
-  <part name="Addr" type="xsd:string"/>
-  <part name="City" type="xsd:string"/>
-  <part name="State" type="xsd:string"/>
-  <part name="Zip" type="xsd:string"/>
-  <part name="BusinessPhone" type="xsd:string"/>
-  <part name="TaxIdNumber" type="xsd:string"/>
-  <part name="DPPAPurpose" type="xsd:byte"/>
-  <part name="GLBPurpose" type="xsd:byte"/>
-  <part name="Include_Bus_DPPA" type="xsd:boolean"/>
-  <part name="DataRestrictionMask" type="xsd:string"/>
-  <part name="DataPermissionMask" type="xsd:string"/>
-  <part name="SSNMask" type="xsd:string"/>
-  <part name="SelectIndividually" type="xsd:boolean"/>
-  <part name="IncludeNameVariations" type="xsd:boolean"/>
-  <part name="IncludeAddressVariations" type="xsd:boolean"/>
-  <part name="IncludePhoneVariations" type="xsd:boolean"/>
-  <part name="IncludeDunBradstreetRecords" type="xsd:boolean"/>
-  <part name="IncludeExperianBusinessReports" type="xsd:boolean"/>
-  <part name="IncludeIRS5500" type="xsd:boolean"/>
-  <part name="IncludeDCA" type="xsd:boolean"/>
-  <part name="IncludeSales" type="xsd:boolean"/>
-  <part name="IncludeIndustryInformation" type="xsd:boolean"/>
-  <part name="IncludeLiensJudgments" type="xsd:boolean"/>
-  <part name="IncludeLiensJudgmentsV2" type="xsd:boolean"/>
-  <part name="IncludeUCCFilings" type="xsd:boolean"/>
-  <part name="IncludeUCCFilingsV2" type="xsd:boolean"/>
-  <part name="IncludeAssociatedPeople" type="xsd:boolean"/>
-  <part name="IncludeInternetDomains" type="xsd:boolean"/>
-  <part name="IncludeBankruptcies" type="xsd:boolean"/>
-  <part name="IncludeBankruptciesV2" type="xsd:boolean"/>
-  <part name="IncludeBusinessRegistrations" type="xsd:boolean"/>
-  <part name="IncludeProperties" type="xsd:boolean"/>
-  <part name="IncludePropertiesV2" type="xsd:boolean"/>
-  <part name="IncludeMotorVehicles" type="xsd:boolean"/>
-  <part name="IncludeMotorVehiclesV2" type="xsd:boolean"/>
-  <part name="IncludeWatercrafts" type="xsd:boolean"/>
-  <part name="IncludeAircrafts" type="xsd:boolean"/>
-  <part name="IncludeProfessionalLicenses" type="xsd:boolean"/>
-  <part name="IncludeCompanyIDnumbers" type="xsd:boolean"/>
-  <part name="IncludeCompanyIDnumbersV2" type="xsd:boolean"/>
-  <part name="IncludeCompanyProfile" type="xsd:boolean"/>
-  <part name="IncludeCompanyProfileV2" type="xsd:boolean"/>
-  <part name="IncludeRegisteredAgents" type="xsd:boolean"/>
-  <part name="IncludeExecutives" type="xsd:boolean"/>
-  <part name="IncludeBusinessAssociates" type="xsd:boolean"/>
-  <part name="IncludeNoticeOfDefaults" type="xsd:boolean"/>
-  <part name="IncludeForeclosures" type="xsd:boolean"/>
-  <part name="IncludeSourceCounts" type="xsd:boolean"/>
-  <part name="IncludeSourceFlags" type="xsd:boolean"/>
-  <part name="IncludeCompanyVerification" type="xsd:boolean"/>
-  <part name="IncludePhoneSummary" type="xsd:boolean"/>
-  <part name="IncludeSanctions" type="xsd:boolean"/>
-  <part name="UccVersion" type="xsd:byte"/>
-  <part name="JudgmentLienVersion" type="xsd:byte"/>
-  <part name="BankruptcyVersion" type="xsd:byte"/>
-  <part name="VehicleVersion" type="xsd:byte"/>
-  <part name="PropertyVersion" type="xsd:byte"/>
-
-  <part name="hashvals" type="tns:XmlDataSet" cols="70" rows="3"/>
-  <part name="ReturnHashes" type="xsd:boolean"/>
-  <part name="TrackNameChanges" type="xsd:boolean"/>
-  <part name="TrackAddressChanges" type="xsd:boolean"/>
-  <part name="TrackAssetChanges" type="xsd:boolean"/>
-  <part name="TrackPropertyChanges" type="xsd:boolean"/>
-  <part name="TrackBankruptcyChanges" type="xsd:boolean"/>
-  <part name="TrackUCCChanges" type="xsd:boolean"/>
-  <part name="TrackLiensChanges" type="xsd:boolean"/>
-  <part name="TrackLicenseChanges" type="xsd:boolean"/>
-  <part name="TrackCorpChanges" type="xsd:boolean"/>
-</message>
+﻿// =====================================================================
+// ROXIE QUERY
+// -----------
+// For the complete list of input parameters please check published WU.
+// Look at the history of this attribute for the old SOAP info.
+// =====================================================================
+/*--INFO--
+    Dayton Smartlynx Business Report Replacement.
 */
-/*--INFO-- Dayton Smartlynx Business Report Replacement.*/
 
 IMPORT AutoheaderV2, AutoStandardI, doxie, doxie_cbrs, Royalty, WSInput;
 
 EXPORT Business_Report_Service() := MACRO
   #CONSTANT('SearchLibraryVersion', AutoheaderV2.Constants.LibVersion.SALT);
+  #CONSTANT('TwoPartySearch', FALSE);
+
     #ONWARNING(4207, ignore);
     //The following macro defines the field sequence on WsECL page of query.
     WSInput.MAC_Business_Report_Service();
-    
+
     #OPTION ('globalAutoHoist', FALSE);
     #OPTION ('spotCSE', FALSE);
     STRING BDL := '' : STORED('BDL');

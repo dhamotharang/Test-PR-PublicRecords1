@@ -26,18 +26,24 @@ LayoutBIIAndPII := RECORD
 			SELF.RepInput := ROWS(RIGHT),
 			SELF.InputData := LEFT));
 					
-	BusinessSeleAttributes_Results := PROJECT(BusinessSeleAttributesInput, TRANSFORM({INTEGER G_ProcBusUID, LayoutBusinessSeleIDAttributes},
-		SELF.G_ProcBusUID := LEFT.InputData.G_ProcBusUID;
-		NonFCRABusinessSeleIDResults := BRM_Marketing_attributes.BRM_KEL.Q_Non_F_C_R_A_Business_Sele_I_D_Attributes_V1_Dynamic(
-				LEFT.InputData.B_LexIDUlt,
-				LEFT.InputData.B_LexIDOrg,
-				LEFT.InputData.B_LexIDLegal,
-				LEFT.RepInput,
-				DATASET(LEFT.InputData),
-				(INTEGER)LEFT.InputData.B_InpClnArchDt[1..8],
-				Options.KEL_Permissions_Mask, 
-				FDCDataset).res0;
-		SELF := NonFCRABusinessSeleIDResults[1]));
-		
+  BusinessSeleAttributes_Results := NOCOMBINE(JOIN(BusinessSeleAttributesInput, FDCDataset,
+                                                    LEFT.InputData.G_ProcBusUID = RIGHT.G_ProcBusUID,
+                                                            TRANSFORM({INTEGER G_ProcBusUID, LayoutBusinessSeleIDAttributes},
+                                                              SELF.G_ProcBusUID := LEFT.InputData.G_ProcBusUID;
+                                                              NonFCRABusinessSeleIDResults := BRM_Marketing_attributes.BRM_KEL.Q_Non_F_C_R_A_Business_Sele_I_D_Attributes_V1_Dynamic(
+                                                                LEFT.InputData.B_LexIDUlt,
+                                                                LEFT.InputData.B_LexIDOrg,
+                                                                LEFT.InputData.B_LexIDLegal,
+                                                                LEFT.RepInput,
+                                                                DATASET(LEFT.InputData),
+                                                                (INTEGER)LEFT.InputData.B_InpClnArchDt[1..8],
+                                                                Options.KEL_Permissions_Mask, 
+                                                                DATASET(RIGHT)).res0;
+                                                              SELF := NonFCRABusinessSeleIDResults[1]), 
+                                                            LEFT OUTER, ATMOST(100), KEEP(1)));
+
+
+
+
 	RETURN(BusinessSeleAttributes_Results);
 END;

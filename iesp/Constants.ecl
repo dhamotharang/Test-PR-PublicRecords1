@@ -919,6 +919,7 @@ EXPORT Constants := MODULE
 		export unsigned2 MAX_OWNERS  := 4;
 		export unsigned2 MAX_PERSONS := 5;
 		export unsigned2 MAX_PROPERTIES := 15;
+		export unsigned2 MAX_RISKCODES := 5;
 	end;
 
   // Hunting & Fishing Licenses

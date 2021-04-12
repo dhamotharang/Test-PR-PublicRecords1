@@ -686,7 +686,7 @@ ssnFlagsPrep := group(join(bestSSNsd, pre_ids_only, left.did=right.did,
 ExactMatchLevel:=risk_indicators.iid_constants.default_ExactMatchLevel;
 
 //aml  just ids with ssn flags
-withSSNFlags := Risk_Indicators.iid_getSSNFlags(ssnFlagsPrep, dppa, glb, isFCRA, false/*runSSNCodes*/, ExactMatchLevel, DataRestriction, BSversion, BSOptions, DataPermission, mod_access := mod_access);
+withSSNFlags := Risk_Indicators.iid_getSSNFlags(ssnFlagsPrep, mod_access, isFCRA, false/*runSSNCodes*/, ExactMatchLevel, BSversion, BSOptions);
 
 //todo withSSNFlags need again for relatives
 risk_indicators.layout_bocashell_neutral add_ssnFlags(  withSSNFlags le, pre_ids_only ri) := TRANSFORM
@@ -1802,7 +1802,7 @@ bsData51 := if(bsversion>=51, group(shell51_branch1, seq), group(bsData50, seq))
 bsData52_a := if(bsversion >= 52 and ~isFCRA, risk_indicators.Boca_Shell_PII_Stability(bsdata51), bsdata51);
 
 bsData := if(bsversion >= 52,
-  risk_indicators.Boca_Shell_BestPII_Data(bsData52_a, isFCRA, glb, dppa, bsversion, datarestriction, datapermission, bsoptions, mod_access),
+  risk_indicators.Boca_Shell_BestPII_Data(bsData52_a, mod_access, isFCRA, bsversion, bsoptions),
   bsData52_a);
 
 // output fraudPoint 2.0 attributes
