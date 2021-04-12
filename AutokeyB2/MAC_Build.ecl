@@ -1,4 +1,4 @@
-/*
+﻿/*
 Reinstating previous version due to (as yet) unexplained YP issues with DID field and dedup differences
 */
 export MAC_Build (indataset,infname,inmname,inlname,
@@ -55,7 +55,9 @@ export MAC_Build (indataset,infname,inmname,inlname,
             visitor = 'standard.MStandardBuild',
             visitorb = 'standard.MStandardBuildb',
             processCompoundNames = FALSE,
-            rec_payload = '\'\''
+            rec_payload = '\'\'',
+           	isdelta=false,
+	          maxFID=0
             )  :=
 MACRO
 
@@ -90,9 +92,12 @@ consolidate_seq_num := iterate(sort_by_uniqueid, %same_fake%(left,right),local);
 
 with_seq_num_use :=if(use_unique,consolidate_seq_num,with_sequence_num);
 
+//DF-29144: add the maxi FID from prev keys when generating the new incremental key to avoid the duplicate FIDs 
+AddtoValue:=MaxFID;
 #uniquename(addFid)
 {indataset, FakeIDFieldType FakeID} %addFid% (with_seq_rec le) := TRANSFORM
-  fid := le.seq_num_added + autokey.did_adder(typeStr);
+ 	fid := if(isdelta,AddtoValue + le.seq_num_added + autokey.did_adder(typeStr),
+	         le.seq_num_added + autokey.did_adder(typeStr));
   self.FakeID := fid;
   SELF.inDID := if((unsigned8)le.inDID > 0 or useOnlyRecordIDs, le.inDID, fid);
   SELF.inBDID := if((unsigned8)le.inBDID > 0 or useOnlyRecordIDs, le.inBDID, fid);  //will be the same when both were zero
