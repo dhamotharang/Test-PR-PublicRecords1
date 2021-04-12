@@ -70,11 +70,13 @@ EXPORT Datasource_ABMS := MODULE
 													 dataset(Healthcare_Header_Services.layouts.layout_slim) inputSlim,
 													 dataset(Healthcare_Header_Services.layouts.CombinedHeaderResultsDoxieLayout) inputRecs,
 													 dataset(Healthcare_Header_Services.Layouts.common_runtime_config) cfg) := function
+			alreadyPopulated := exists(inputRecs(exists(abmsRaw) and src=Healthcare_Header_Services.constants.SRC_SOAP_HCP));
 			fmtRec_ABMSData := getABMSData(input(name_last <> ''),inputSlim,cfg);//Remove business only search records
-			results := join(inputRecs,fmtRec_ABMSData, left.acctno=right.acctno,
+			results := if(alreadyPopulated,inputRecs,
+										join(inputRecs,fmtRec_ABMSData, left.acctno=right.acctno,
 																			transform(Healthcare_Header_Services.layouts.CombinedHeaderResultsDoxieLayout,
 																								self.abmsRaw := right.childinfo;
-																								self := left),keep(Healthcare_Header_Services.Constants.MAX_RECS_ON_JOIN),limit(0),left outer);
+																								self := left),keep(Healthcare_Header_Services.Constants.MAX_RECS_ON_JOIN),limit(0),left outer));
 			return results;
 		end;
 end;
