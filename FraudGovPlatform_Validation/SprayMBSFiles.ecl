@@ -150,9 +150,12 @@ function
 		 ,if(not FraudGovPlatform._Flags.FileExists.Input.MBSTableCol                  	or pOverwrite,SprayTheFile(FilesToSprayMBSTableCol ))
 		 ,if(not FraudGovPlatform._Flags.FileExists.Input.MBSColValDesc                	or pOverwrite,SprayTheFile(FilesToSprayMBSColValDesc ))
 		 ,if(not FraudGovPlatform._Flags.FileExists.Input.MbsFdnMasterIDIndTypeInclusion or pOverwrite,SprayTheFile(FilesToSprayMbsFdnMasterIDIndTypeInclusion ))
-		, if(not FraudGovPlatform._Flags.FileExists.Input.MBSFdnCCID 					or pOverwrite , SprayTheFile(FilesToSprayMBSFdnCCID ))
-		, if(not FraudGovPlatform._Flags.FileExists.Input.MBSFdnHHID 					or pOverwrite , SprayTheFile(FilesToSprayMBSFdnHHID ))
+		, if(not FraudGovPlatform._Flags.FileExists.Input.MBSFdnCCID 					or pOverwrite,SprayTheFile(FilesToSprayMBSFdnCCID ))
+		, if(not FraudGovPlatform._Flags.FileExists.Input.MBSFdnHHID 					or pOverwrite,SprayTheFile(FilesToSprayMBSFdnHHID ))
 		, If(FraudGovPlatform._Flags.UseDemoData,FraudGovPlatform.Append_MBSDemoData(pversion).MbsIncl)
+		, if(~STD.File.FileExists(FraudGovPlatform.Filenames(pversion).Input.MBSFdnHHID.new(pversion)),STD.File.SwapSuperFile(FraudGovPlatform.filenames().input.MBSFdnHHID.used,FraudGovPlatform.filenames().input.MBSFdnHHID.sprayed))
+		, if(~STD.File.FileExists(FraudGovPlatform.Filenames(pversion).Input.MBSmarketAppend.new(pversion)),STD.File.SwapSuperFile(FraudGovPlatform.filenames().input.MBSmarketAppend.used,FraudGovPlatform.filenames().input.MBSmarketAppend.sprayed))
+
 		);
 
 end;
