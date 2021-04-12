@@ -205,6 +205,7 @@
       STRING1                                           tnt;
       STRING40                                          primary_address_type;
       STRING120                                         listed_name;
+      STRING120                                         Full_name;
       STRING120                                         listed_name_targus;
       STRING10                                          listed_phone;
       STRING1                                           listing_type_res;
@@ -313,6 +314,7 @@
       STRING20  mname;
       STRING20  lname;
       STRING5   name_suffix;
+      STRING120 Full_name;
       STRING120 listed_name;
       STRING10  prim_range;
       STRING2   predir;

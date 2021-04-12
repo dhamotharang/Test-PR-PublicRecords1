@@ -7,6 +7,9 @@ EXPORT GetPRIs( DATASET($.Layouts.PhoneFinder.Final)             dSearchResults,
                 DATASET(Autokey_batch.Layouts.rec_inBatchMaster) dProcessInput
                 ) :=
 FUNCTION
+  // Filter out city state callerIDs
+  dAccuDataCNAM_Filter := $.GetValidFullName(dSearchResults);
+  
   // Calculate the identity counts - count the number of identities for each phone to calculate RI
   dCntPhoneIdentities := $.GetIdentitiesCount(dSearchResults);
 

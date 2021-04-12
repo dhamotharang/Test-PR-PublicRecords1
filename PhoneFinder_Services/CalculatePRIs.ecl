@@ -87,7 +87,7 @@ FUNCTION
 
       BOOLEAN isPRIFail := CASE(le.RiskId,
                                 -1 => pInput.isPrimaryPhone AND pInput.phone = '',
-                                0  => pInput.isPrimaryIdentity AND (pInput.fname = '' AND pInput.lname = '' AND pInput.mname = '' AND (pInput.listed_name = '' OR pInput.subj_phone_type_new = MDR.sourceTools.src_Phones_Accudata_CNAM_CNM2)
+                                0  => pInput.isPrimaryIdentity AND (pInput.full_name = ''
                                                                AND  pInput.prim_range = '' AND pInput.prim_name = '' AND pInput.county_code = '' AND pInput.county_name = '' AND pInput.city_name = '' AND pInput.st = '' AND pInput.zip = ''
                                                                AND  pInput.predir = ''AND  pInput.suffix = ''AND  pInput.postdir = '' AND  pInput.unit_desig = '' AND  pInput.sec_range = ''),
                                 1  => IF(inmod.IsGovsearch, (pInput.fname <>'' OR pInput.lname <> '' OR pInput.listed_name <> '') AND pInput.PhoneStatus = $.Constants.PhoneStatus.Inactive,
