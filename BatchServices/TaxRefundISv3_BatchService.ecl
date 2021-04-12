@@ -1,77 +1,43 @@
-﻿/*--SOAP--
-<message name="TaxRefundISv3_BatchService">
-
-  <!-- Common input options -->
-  <part name="ApplicationType"       type="xsd:string"/>
-  <part name="DPPAPurpose"          type="xsd:byte"/>
-  <part name="GLBPurpose"           type="xsd:byte"/> 
-  <part name="DataPermissionMask"   type="xsd:string"/>
-  <part name="DataRestrictionMask"  type="xsd:string"/>
-  <part name="IndustryClass"        type="xsd:string"/>
-  <part name="IncludeBlankDOD"      type="xsd:boolean"/>
-  <part name="PhoneticMatch"        type="xsd:boolean"/>
-  <part name="AllowNickNames"       type="xsd:boolean"/>
-  <part name="IncludeMinors"        type="xsd:boolean"/>
-
-  <!-- TRIS specific input options -->
-  <part name="InputState"           type="xsd:string"/>
-  <part name="ModelName"            type="xsd:string"/>
-  <part name="FilterRule"           type="xsd:string"/>
-  <part name="ScoreCut"             type="xsd:string"/>
-  <part name="DIDScoreThreshold"    type="xsd:unsigned2"/>
-  <part name="Creditor"             type="xsd:string"/>
-  <part name="RefundThreshold"      type="xsd:unsigned3"/>
-  <!-- <part name="IncludeIPAddrGW"      type="xsd:boolean"/> -->
-  <!-- <part name="IncludeDebtEvasion"   type="xsd:boolean"/> -->
-  <part name="GetSSNBest"           type="xsd:boolean"/>
-
-  <part name="TaxRefund_batch_in"      type="tns:XmlDataSet" cols="70" rows="25"/> 
-
-   <!-- <part name="Gateways"                type="tns:XmlDataSet" cols="70" rows="25"/> -->
-  <part name="ReturnDetailedRoyalties" type="xsd:boolean"/>  
-  <part name="includeDependantID"      type="xsd:boolean"/>  
-  <part name="IPAddrExceedsRange"      type="xsd:integer"/>  
-  <part name="GlobalCompanyId"      type="xsd:unsigned6"/>  
-  <part name="IndustryType"      type="xsd:unsigned2"/>  
-  <part name="ProductCode"      type="xsd:unsigned6"/>
-
-  <part name="AddressRiskHRICodes"    type="xsd:string"/>
-  <part name="IdentityRiskHRICodes"   type="xsd:string"/>
-  <part name="ReportOnlyHRICodes"     type="xsd:string"/>
-
-</message>
-*/
-/*--INFO-- This service processes the input through Deceased, Criminal, ADL Best, Best 
+﻿// =====================================================================
+// ROXIE QUERY
+// -----------
+// For the complete list of input parameters please check published WU.
+// Look at the history of this attribute for the old SOAP info.
+// =====================================================================
+/*--INFO--
+           This service processes the input through Deceased, Criminal, ADL Best, Best
            Address and SSN Issuance batch services to fill in the appropriate output fields.
-           Additonally when needed applicable (input person info is deceased), 
+           Additonally when needed applicable (input person info is deceased),
            it uses Bankruptcy, Driver's License, Liens, MVRs, Property(deeds only) and
            Voters batch services to fill in certain output fields.
-           The search requires a minimum input of last name, 
-           first name or middle name or initial, SSN, and Street Address 1, City and 
+           The search requires a minimum input of last name,
+           first name or middle name or initial, SSN, and Street Address 1, City and
            State, or Zip.  req 4.1.2
 */
 
 IMPORT AutoheaderV2, BatchServices, BatchShare, doxie, Gateway, Royalty, ut, WSInput;
 
-  
+
 EXPORT TaxRefundISv3_BatchService := MACRO
-  #constant('SearchLibraryVersion', AutoheaderV2.Constants.LibVersion.SALT);
-  //The following macro defines the field sequence on WsECL page of query. 
+  #CONSTANT('SearchLibraryVersion', AutoheaderV2.Constants.LibVersion.SALT);
+  #CONSTANT('TwoPartySearch', FALSE);
+
+  //The following macro defines the field sequence on WsECL page of query.
   WSInput.MAC_TaxRefundISv3_BatchService();
-  
+
   #constant('penaltthreshold','10');
-  
+
   rec_layout_in := BatchServices.TaxRefundISv3_BatchService_Layouts.rec_batch_in;
-  
+
   ds_batch := dataset([], rec_layout_in) : stored('TaxRefund_batch_in');
-  
+
   gateways_in := Gateway.Configuration.Get();
 
   doxie.MAC_Header_Field_Declare();
-  
+
   BatchShare.MAC_SequenceInput(ds_batch, ds_sequenced);
   BatchShare.MAC_CapitalizeInput(ds_sequenced, ds_batch_in);
-  
+
   mod_access := doxie.compliance.GetGlobalDataAccessModule();
 
   string filter_rule := '' : stored('FilterRule');
@@ -98,7 +64,7 @@ EXPORT TaxRefundISv3_BatchService := MACRO
     // TRIS v3.2 Enhancement: IncludeIPAddrGW & IncludeDebtEvasion are no longer to be used.
     // EXPORT boolean   IncludeIPAddrGW        := true : stored('IncludeIPAddrGW'); // default to true
     // EXPORT boolean   IncludeDebtEvasion   := true : stored('IncludeDebtEvasion'); // default to false
-      
+
     // TRIS V3.1 with fdn
     EXPORT boolean   IncludeDependantID    := false : stored('IncludeDependantID');
     EXPORT integer   IPAddrExceedsRange   := 100 : stored('IPAddrExceedsRange');
@@ -116,16 +82,16 @@ EXPORT TaxRefundISv3_BatchService := MACRO
   gc_id        := mod_args.GlobalCompanyId;
   ind_type     := mod_args.IndustryType;
   product_code := mod_args.ProductCode;
-  
+
   //Checking that gc_id, industry type, and product code have some values for fdn data.
   IF(isv3fdn and gc_id = 0,
             FAIL(ut.constants_MessageCodes.FDN_GC_ID,
             ut.MapMessageCodes(ut.constants_MessageCodes.FDN_GC_ID)));
-            
+
   IF(isv3fdn and ind_type = 0,
             FAIL(ut.constants_MessageCodes.FDN_INDUSTRY_TYPE,
             ut.MapMessageCodes(ut.constants_MessageCodes.FDN_INDUSTRY_TYPE)));
-            
+
   IF(isv3fdn and product_code = 0,
             FAIL(ut.constants_MessageCodes.FDN_PRODUCT_CODE,
             ut.MapMessageCodes(ut.constants_MessageCodes.FDN_PRODUCT_CODE)));
@@ -134,11 +100,11 @@ EXPORT TaxRefundISv3_BatchService := MACRO
 
   // ****TRIS v3.2 Enhancement: Req 3.1.3.14 Since NetAcutiy gateway call is removed from query, royalty calculation is not needed....
   // ****....However completely removing it may causes issues at ESP end, so projecting dRoyalties below to blank dataset
-     
+
   // dIPIn := PROJECT(ds_batch_in, TRANSFORM(Royalty.RoyaltyNetAcuity.IPData,
                                   // SELF.AcctNo := LEFT.AcctNo;
                                   // SELF.IPAddr := LEFT.IP_Address));
-                                                                             
+
   BOOLEAN  ReturnDetailedRoyalties := false : STORED('ReturnDetailedRoyalties');
 
   dRoyaltiesByAcctno_FDN   := Royalty.RoyaltyFDNCoRR.GetBatchRoyaltiesByAcctno(Results_temp,fdn_count);

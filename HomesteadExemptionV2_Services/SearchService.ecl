@@ -1,9 +1,9 @@
-/*--SOAP--
-<message name="SearchService">
-  <part name="Gateways" type="tns:XmlDataSet" cols="80" rows="4"/>
-  <part name="HomesteadExemptionSearchRequest" type="tns:XmlDataSet" cols="80" rows="30" />
-</message>
-*/
+// =====================================================================
+// ROXIE QUERY
+// -----------
+// For the complete list of input parameters please check published WU.
+// Look at the history of this attribute for the old SOAP info.
+// =====================================================================
 
 IMPORT iesp, WSInput, Royalty;
 
@@ -11,6 +11,7 @@ EXPORT SearchService := MACRO
 
   // #OPTION('optimizeLevel',2); // option is to help speed up compile times in dev roxie
   #CONSTANT('SearchLibraryVersion',AutoheaderV2.Constants.LibVersion.SALT);
+  #CONSTANT('TwoPartySearch', FALSE);
   WSInput.MAC_HomesteadExemption_SearchService();
 
   rec_in := iesp.Homestead_Exemption_Search.t_HomesteadExemptionSearchRequest;

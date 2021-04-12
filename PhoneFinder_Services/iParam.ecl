@@ -234,8 +234,8 @@ MODULE
       EXPORT BOOLEAN IncludeTransUnionIQ411  := pfOptions.IncludeTransUnionIQ411;
       EXPORT BOOLEAN IncludeTransUnionPVS    := pfOptions.IncludeTransUnionPVS;
 
-      EXPORT BOOLEAN UseTransUnionIQ411      := (TransactionType IN [$.Constants.TransType.Premium,$.Constants.TransType.Ultimate] OR IncludeTransUnionIQ411) AND ~doxie.compliance.isQSentRestricted(drm);
-      EXPORT BOOLEAN UseTransUnionPVS        := (TransactionType IN [$.Constants.TransType.Premium,$.Constants.TransType.Ultimate] OR IncludeTransUnionPVS) AND ~doxie.compliance.isQSentRestricted(drm);
+      EXPORT BOOLEAN UseTransUnionIQ411      := (TransactionType IN [$.Constants.TransType.Premium,$.Constants.TransType.Ultimate] OR IncludeTransUnionIQ411) AND ~doxie.compliance.isQSentRestricted(drm) AND mod_access.isValidGLB();
+      EXPORT BOOLEAN UseTransUnionPVS        := (TransactionType IN [$.Constants.TransType.Premium,$.Constants.TransType.Ultimate] OR IncludeTransUnionPVS) AND ~doxie.compliance.isQSentRestricted(drm) AND mod_access.isValidGLB();
       EXPORT BOOLEAN UseQSent           	   := UseTransUnionIQ411 OR UseTransUnionPVS;
       EXPORT BOOLEAN UseInHousePhoneMetadata := pfOptions.UseInHousePhoneMetadata : STORED('UseInHousePhoneMetadata'); // Need to read from stored for options defined in MBS for API transactions as they would come under the root tag
       EXPORT BOOLEAN UseInHousePhoneMetadataOnly := UseInHousePhoneMetadata OR ~UseTransUnionPVS;
@@ -325,7 +325,7 @@ MODULE
       EXPORT UNSIGNED  PenaltyThreshold    := AutoStandardI.InterfaceTranslator.penalt_threshold_value.val(PROJECT(globalMod,AutoStandardI.InterfaceTranslator.penalt_threshold_value.params));
       EXPORT BOOLEAN   UseLastResort       := doxie.compliance.use_LastResort(dpm) AND TransactionType <> $.Constants.TransType.PHONERISKASSESSMENT;
       EXPORT BOOLEAN   UseInHouseQSent     := doxie.compliance.use_QSent(dpm) AND TransactionType <> $.Constants.TransType.PHONERISKASSESSMENT;
-      EXPORT BOOLEAN   UseQSent            := ~doxie.compliance.isQSentRestricted(drm) AND TransactionType IN [$.Constants.TransType.Premium,$.Constants.TransType.Ultimate];
+      EXPORT BOOLEAN   UseQSent            := ~doxie.compliance.isQSentRestricted(drm) AND TransactionType IN [$.Constants.TransType.Premium,$.Constants.TransType.Ultimate] AND mod_access.isValidGLB();
       EXPORT BOOLEAN   UseTargus           := ~doxie.compliance.isPhoneFinderTargusRestricted(drm) AND TransactionType = $.Constants.TransType.Ultimate;
       EXPORT BOOLEAN   UseEquifax          := ~doxie.compliance.isPhoneMartRestricted(drm) AND TransactionType = $.Constants.TransType.Ultimate AND mod_access.isValidGLB();
       EXPORT BOOLEAN   useWaterfallv6			 := FALSE : STORED('useWaterfallv6');//internal

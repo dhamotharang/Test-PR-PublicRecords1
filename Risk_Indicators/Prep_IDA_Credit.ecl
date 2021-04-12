@@ -46,7 +46,7 @@ EXPORT Prep_IDA_Credit( DATASET(Risk_Indicators.layouts.layout_IDA_in) indata,
       SELF.ProductID := Risk_Indicators.iid_constants.idaCreditProductID;     //Will need to make this configurable once Innovis models are ready
       //Real transactions should never go over 16 characters and IDA breaks if it goes over 17, so limit what can be passed to IDA
       SELF.ESPTransactionId := IF(LENGTH(TRIM(LEFT.ESPTransactionId)) > 16, LEFT.ESPTransactionId[1..16], TRIM(LEFT.ESPTransactionId));
-
+      SELF.Affiliate := LEFT.Affiliate[1..100]; //Truncate Affiliate to 100 chars cause thats all IDA supports
       SELF := LEFT
 			));
   

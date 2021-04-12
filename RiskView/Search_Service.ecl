@@ -223,6 +223,7 @@ export Search_Service := MACRO
   //Needed for IDA gateway calls AppID is a mandatory field for IDA
   //Use QueryID if populated, otherwise use the TransactionID
   STRING50 IDA_AppID := IF(users.QueryID != '', users.QueryID, outofbandTransactionID);
+  STRING120 IDA_EndUser_CompanyName := users.EndUser.CompanyName;
 	
   //Used only by MLA
   STRING20 EndUserCompanyName 		:= context.MLAGatewayInfo.EndUserCompanyName;
@@ -412,7 +413,8 @@ search_results_temp := ungroup(
               IsBatch := FALSE,
               CompanyID := CompanyID,
               TransactionID := outofbandTransactionID,
-              IDA_AppID := IDA_AppID
+              IDA_AppID := IDA_AppID,
+              IDA_EndUser := IDA_EndUser_CompanyName
       		) 
       	);
   
