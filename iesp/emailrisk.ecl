@@ -40,10 +40,16 @@ export t_EmailRiskServiceInfo := record
 	string DeliveryType {xpath('DeliveryType')};
 end;
 		
+export t_EmailRiskQueryFields := record
+	string Email {xpath('Email')};
+	string IPAddress {xpath('IPAddress')};
+end;
+		
 export t_EmailRiskSearchFields := record
 	string Email {xpath('Email')};
-	string SecondaryEmail {xpath('SecondaryEmail')};
 	string IPAddress {xpath('IPAddress')};
+	dataset(t_EmailRiskQueryFields) Query {xpath('Query/Item'), MAXCOUNT(5)};
+	string SecondaryEmail {xpath('SecondaryEmail')};
 	string FirstName {xpath('FirstName')};
 	string LastName {xpath('LastName')};
 	string Phone {xpath('Phone')};
@@ -52,6 +58,7 @@ export t_EmailRiskSearchFields := record
 	string PartnerId {xpath('PartnerId')};
 	t_EmailRiskBillingAddress BillingAddress {xpath('BillingAddress')};
 	t_EmailRiskShippingAddress ShippingAddress {xpath('ShippingAddress')};
+	string RecordId {xpath('RecordId')};
 	string TransactionTypeId {xpath('TransactionTypeId')}; //values['','1','2','3','4','5','6','7','8','9','10','11','12','13','14','15','16','17','']
 	t_EmailRiskServiceInfo ServiceInfo {xpath('ServiceInfo')};
 	string DeviceId {xpath('DeviceId')};
@@ -240,11 +247,13 @@ export t_EmailRiskResult := record
 	string Custom6 {xpath('Custom6')};
 	string Custom7 {xpath('Custom7')};
 	t_EmailRiskDigitalIdentityScore DigitalIdentityScore {xpath('DigitalIdentityScore')};
+	string RecordId {xpath('RecordId')};
 	string CorrelationId {xpath('CorrelationId')};
 end;
 		
 export t_EmailRiskStandardResponse := record
 	string Email {xpath('Email')};
+	string Query {xpath('Query')};
 	string QueryType {xpath('QueryType')};
 	integer Count {xpath('Count')};
 	iesp.share.t_TimeStamp Created {xpath('Created')};
