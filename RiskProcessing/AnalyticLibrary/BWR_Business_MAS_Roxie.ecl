@@ -1,5 +1,5 @@
 ﻿/* PublicRecords_KEL.BWR_Business_MAS_Roxie */
-IMPORT PublicRecords_KEL, RiskWise, SALT38, SALTRoutines, STD;
+IMPORT PublicRecords_KEL, RiskWise, SALT38, SALTRoutines, STD, Business_Risk_BIP, gateway;
 Threads := 1;
 
 roxieIP := RiskWise.Shortcuts.prod_batch_analytics_roxie;
@@ -65,6 +65,23 @@ Exclude_Consumer_Attributes := FALSE; //if TRUE, bypasses consumer logic and set
 AllowedSourcesDataset := DATASET([],PublicRecords_KEL.ECL_Functions.Constants.Layout_Allowed_Sources);
 // Do not exclude any additional sources from allowed sources dataset.
 ExcludeSourcesDataset := DATASET([],PublicRecords_KEL.ECL_Functions.Constants.Layout_Allowed_Sources);
+
+// OFAC parameters
+IncludeOFACGW := FALSE;
+include_ofac := TRUE : STORED('IncludeOfacValue'); // This is different than the param to turn off/on the gateway, this adds an OFAC watchlist in the gateway
+include_additional_watchlists  := TRUE : STORED('IncludeAdditionalWatchListsValue');
+Global_Watchlist_Threshold := Business_Risk_BIP.Constants.Default_Global_Watchlist_Threshold : STORED('Global_Watchlist_ThresholdValue');
+watchlists:= 'ALLV4' : STORED('Watchlists_RequestedValue'); // Returns all watchlists for OFAC Version 4
+
+Empty_GW := DATASET([TRANSFORM(Gateway.Layouts.Config, 
+							SELF.ServiceName := ''; 
+							SELF.URL := ''; 
+							SELF := [])]);
+              
+OFAC_GW := IF(IncludeOFACGW, project(riskwise.shortcuts.gw_bridger, TRANSFORM(Gateway.Layouts.Config, self := left, self := [])),
+							Empty_GW);    
+
+Input_Gateways := (OFAC_GW)(URL <> '');
 
 RecordsToRun := 10;
 eyeball := 120;
@@ -209,6 +226,7 @@ soapLayout := RECORD
 	// STRING CustomerId; // This is used only for failed transactions here; it's ignored by the ECL service.
 	DATASET(PublicRecords_KEL.ECL_Functions.Input_Bus_Layout) input;
 	INTEGER ScoreThreshold;
+	DATASET(Gateway.Layouts.Config) gateways := DATASET([], Gateway.Layouts.Config);
 	STRING DataRestrictionMask;
 	STRING DataPermissionMask;
 	UNSIGNED1 GLBPurpose;
@@ -219,18 +237,23 @@ soapLayout := RECORD
 	BOOLEAN IncludeMinors;
 	DATASET(PublicRecords_KEL.ECL_Functions.Constants.Layout_Allowed_Sources) AllowedSourcesDataset := DATASET([], PublicRecords_KEL.ECL_Functions.Constants.Layout_Allowed_Sources);
 	DATASET(PublicRecords_KEL.ECL_Functions.Constants.Layout_Allowed_Sources) ExcludeSourcesDataset := DATASET([], PublicRecords_KEL.ECL_Functions.Constants.Layout_Allowed_Sources);
-	
+
 	UNSIGNED BIPAppendScoreThreshold;
 	UNSIGNED BIPAppendWeightThreshold;
 	BOOLEAN BIPAppendPrimForce;
 	BOOLEAN bipappendnoreappend;
 	BOOLEAN BIPAppendIncludeAuthRep;
-  BOOLEAN OverrideExperianRestriction;
-	
+	BOOLEAN OverrideExperianRestriction;
+
 	UNSIGNED1 LexIdSourceOptout;
-  STRING _TransactionId;
-  STRING _BatchUID;
-  UNSIGNED6 _GCID;
+	STRING _TransactionId;
+	STRING _BatchUID;
+	UNSIGNED6 _GCID;
+
+	BOOLEAN IncludeOfac;
+	BOOLEAN IncludeAdditionalWatchLists;
+	REAL Global_Watchlist_Threshold;
+	STRING Watchlists_Requested;
 end;
 
 Settings := MODULE(PublicRecords_KEL.Interface_BWR_Settings)
@@ -276,6 +299,7 @@ soapLayout trans (inDataReadyDist le):= TRANSFORM
 		SELF := LEFT;
 		SELF := []));
 	SELF.ScoreThreshold := Settings.LexIDThreshold;
+	SELF.gateways := Input_Gateways;
 	SELF.DataRestrictionMask := Settings.Data_Restriction_Mask;
 	SELF.DataPermissionMask := Settings.Data_Permission_Mask;
 	SELF.GLBPurpose := Settings.GLBAPurpose;
@@ -296,6 +320,10 @@ soapLayout trans (inDataReadyDist le):= TRANSFORM
 	SELF._TransactionId := TransactionId;
 	SELF._BatchUID := BatchUID;
 	SELF._GCID := GCID;	
+	SELF.IncludeOfac := include_ofac;
+	SELF.IncludeAdditionalWatchLists := include_additional_watchlists;
+	SELF.Global_Watchlist_Threshold := Global_Watchlist_Threshold;
+	SELF.Watchlists_Requested := watchlists;
 END;
 
 soap_in := PROJECT(inDataReadyDist, trans(LEFT));
@@ -323,10 +351,10 @@ ResultSet :=
 OUTPUT(CHOOSEN(inDataReady, eyeball), NAMED('Raw_input'));
 OUTPUT( ResultSet, NAMED('Results') );
 
-
-results_temp := project(ResultSet, transform(layout_MAS_Business_Service_output, 	
-													self.Results.B_InpAcct := if(left.Results.B_InpAcct = '', left.Results.P_InpAcct, left.Results.B_InpAcct);
-													self.MasterResults.B_InpAcct := if(left.MasterResults.B_InpAcct = '', left.MasterResults.P_InpAcct, left.MasterResults.B_InpAcct);
+//temp patch for pullid blanking out b input account
+results_temp := project(resultset, transform(layout_MAS_Business_Service_output, 	
+													self.Results.B_InpAcct := if(TRIM(left.Results.B_InpAcct) = '', left.Results.P_InpAcct, left.Results.B_InpAcct);
+													self.MasterResults.B_InpAcct := if(TRIM(left.MasterResults.B_InpAcct) = '', left.MasterResults.P_InpAcct, left.MasterResults.B_InpAcct);
 													self.Results := left.Results;
 													self.MasterResults := left.MasterResults;
 													));

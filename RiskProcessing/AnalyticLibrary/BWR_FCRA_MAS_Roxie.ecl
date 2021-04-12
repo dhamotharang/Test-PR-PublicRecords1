@@ -1,5 +1,5 @@
 ﻿/* PublicRecords_KEL.BWR_FCRA_MAS_Roxie */
-IMPORT PublicRecords_KEL, RiskWise, STD, Gateway, UT, SALT38, SALTRoutines;
+IMPORT PublicRecords_KEL, RiskWise, SALT38, SALTRoutines, STD, gateway;
 threads := 1;
 
 roxieIP := RiskWise.Shortcuts.prod_batch_fcra; 
@@ -10,6 +10,7 @@ NeutralRoxieIP := RiskWise.Shortcuts.prod_batch_analytics_roxie;
 
 InputFile := '~mas::uatsamples::consumer_fcra_100k_07102019.csv';
 //InputFile := '~mas::uatsamples::consumer_fcra_1m_07092019.csv';
+
 
 /* Data Setting 	FCRA 	
 DRMFares = 1 //FARES - bit 1
@@ -23,11 +24,15 @@ DPMDL =	0 //use_InsuranceDLData - bit 13
 GLBA 	= 0 
 DPPA 	= 0 
 */
-GLBA := 0; // FCRA isn't GLBA restricted
-DPPA := 0; // FCRA isn't DPPA restricted
+GLBA := 0  : STORED('GLBPurposeValue'); // FCRA isn't GLBA restricted
+DPPA := 0  : STORED('DPPAPurposeValue'); // FCRA isn't DPPA restricted
 DataPermissionMask := '0000000000000';  
 DataRestrictionMask := '1000010000000100000000000000000000000000000000000'; 
 Include_Minors := TRUE;
+Include_Inferred_Performance := FALSE;
+Retain_Input_Lexid := FALSE;//keep what we have on input
+Append_PII := FALSE;//keep what we have on input
+
 // Inteded Purpose for FCRA. Stubbing this out for now so it can be used in the settings output for now.
 Intended_Purpose := ''; 
 // Intended_Purpose := 'PRESCREENING'; 
@@ -53,6 +58,25 @@ Output_SALT_Profile := FALSE;
 AllowedSourcesDataset := DATASET([],PublicRecords_KEL.ECL_Functions.Constants.Layout_Allowed_Sources);
 // Do not exclude any additional sources from allowed sources dataset.
 ExcludeSourcesDataset := DATASET([],PublicRecords_KEL.ECL_Functions.Constants.Layout_Allowed_Sources);
+
+IncludeTargusGW := FALSE;
+
+// Parameter needed to turn CCPA on for Targus -- has to use #STORED since IsFCRA isn't a parameter passed to the soapcall
+#STORED('IsFCRAValue', TRUE);
+
+NeutralRoxie_GW := DATASET([{'neutralroxie', NeutralRoxieIP}], Gateway.Layouts.Config);
+// SELF.Gateways := 	DATASET([{'neutralroxie', NeutralRoxieIP},
+									//	{'delta_personcontext', PCG_Dev}], Gateway.Layouts.Config);
+									
+Empty_GW := DATASET([TRANSFORM(Gateway.Layouts.Config, 
+							SELF.ServiceName := ''; 
+							SELF.URL := ''; 
+							SELF := [])]);
+
+Targus_GW := IF(IncludeTargusGW, project(riskwise.shortcuts.gw_targus_sco, TRANSFORM(Gateway.Layouts.Config, self := left, self := [])),
+							Empty_GW);  
+							
+Input_Gateways := (NeutralRoxie_GW + Targus_GW)(URL <> '');
 
 RecordsToRun := 10;
 eyeball := 100;
@@ -108,9 +132,12 @@ soapLayout := RECORD
 	BOOLEAN OutputMasterResults;
 	BOOLEAN IsMarketing;
 	BOOLEAN IncludeMinors;
+	BOOLEAN RetainInputLexid;
+	BOOLEAN appendpii;
 	DATASET(Gateway.Layouts.Config) gateways := DATASET([], Gateway.Layouts.Config);
 	DATASET(PublicRecords_KEL.ECL_Functions.Constants.Layout_Allowed_Sources) AllowedSourcesDataset := DATASET([], PublicRecords_KEL.ECL_Functions.Constants.Layout_Allowed_Sources);
 	DATASET(PublicRecords_KEL.ECL_Functions.Constants.Layout_Allowed_Sources) ExcludeSourcesDataset := DATASET([], PublicRecords_KEL.ECL_Functions.Constants.Layout_Allowed_Sources);
+	BOOLEAN AllowInferredPerformance;
 end;
 
 Settings := MODULE(PublicRecords_KEL.Interface_BWR_Settings)
@@ -126,7 +153,9 @@ Settings := MODULE(PublicRecords_KEL.Interface_BWR_Settings)
 	EXPORT UNSIGNED DPPAPurpose := DPPA;
 	EXPORT UNSIGNED LexIDThreshold := Score_threshold;
 	EXPORT BOOLEAN IncludeMinors := Include_Minors;
-
+	EXPORT BOOLEAN RetainInputLexid := Retain_Input_Lexid;
+	EXPORT BOOLEAN BestPIIAppend := Append_PII; //do not append best pii for running
+	EXPORT BOOLEAN IncludeInferredPerformance := Include_Inferred_Performance; 
 END;
 
 
@@ -135,7 +164,7 @@ soapLayout trans (pp le):= TRANSFORM
     SELF.input := PROJECT(le, TRANSFORM(PublicRecords_KEL.ECL_Functions.Input_Layout,
         SELF := LEFT;
         SELF := []));   
-    SELF.Gateways := 	DATASET([{'neutralroxie', NeutralRoxieIP}], Gateway.Layouts.Config);
+    SELF.Gateways := Input_Gateways;
     SELF.ScoreThreshold := Settings.LexIDThreshold;
     SELF.DataRestrictionMask := Settings.Data_Restriction_Mask;
     SELF.DataPermissionMask := Settings.Data_Permission_Mask;
@@ -144,8 +173,11 @@ soapLayout trans (pp le):= TRANSFORM
     SELF.IncludeMinors := Settings.IncludeMinors;
     SELF.IsMarketing := FALSE;
     SELF.OutputMasterResults := Output_Master_Results;
-		SELF.AllowedSourcesDataset := AllowedSourcesDataset;
-		SELF.ExcludeSourcesDataset := ExcludeSourcesDataset;
+	SELF.AllowedSourcesDataset := AllowedSourcesDataset;
+	SELF.ExcludeSourcesDataset := ExcludeSourcesDataset;
+	SELF.RetainInputLexid := Settings.RetainInputLexid;
+	SELF.appendpii := Settings.BestPIIAppend; //do not append best pii for running
+	SELF.AllowInferredPerformance := Include_Inferred_Performance; //do not append best pii for running
 END;
 
 soap_in := PROJECT(pp, trans(LEFT));
