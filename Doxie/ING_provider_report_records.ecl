@@ -1,10 +1,10 @@
-import Healthcare_Header_Services, Prof_LicenseV2_Services, doxie;
+﻿import Healthcare_Header_Services, Prof_LicenseV2_Services, doxie;
 export ING_provider_report_records(dataset(Prof_LicenseV2_Services.Layout_Search_Ids_Prov) provs, boolean Include_Sanc=false, dataset(Healthcare_Header_Services.Layouts.autokeyInput) searchByCriteria= dataset([],Healthcare_Header_Services.Layouts.autokeyInput),dataset(Healthcare_Header_Services.Layouts.common_runtime_config) cfg = dataset([{'1'}],Healthcare_Header_Services.Layouts.common_runtime_config)) := FUNCTION
 
 	doxie.MAC_Header_Field_Declare();
 	//Format prov into new format
 	newlayout  := Healthcare_Header_Services.Layouts.autokeyInput;
-	newProv := if(exists(provs),project(provs, transform(newlayout,self.acctno:='1';self.providersrc := if(left.ProviderSrc = '','H',left.ProviderSrc);
+	newProv := if(exists(provs),project(provs, transform(newlayout,self.acctno:='1';self.providersrc := if(left.ProviderSrc = '','P',left.ProviderSrc);
 			self := left;self:=[])));
 	searchBy:=project(searchByCriteria,transform(newlayout,self:=left))+newProv;
 	rawData := Healthcare_Header_Services.Records.getRecordsRawDoxieIndividual(searchBy,cfg);

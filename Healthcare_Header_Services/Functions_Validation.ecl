@@ -1,4 +1,4 @@
-import iesp,ut,Business_Header,Business_Header_SS,Risk_Indicators,doxie,suppress,enclarity, std, 
+﻿import iesp,ut,Business_Header,Business_Header_SS,Risk_Indicators,doxie,suppress,enclarity, std, 
 	dx_BestRecords, dx_Header;
 
 export Functions_Validation := Module
@@ -14,37 +14,37 @@ export Functions_Validation := Module
 			string1			FlipFName := '';
 			string20		FlipLName := '';
 		end;
-		export NameVerified(layouts.CombinedHeaderResultsDoxieLayout results,layouts.autokeyInput src) := Function 
-			hasLast := Functions.cleanWord(src.name_last) <> '';
-			recs := project(results.names, transform(layouts.Verifications, self.NameVerified := if((Functions.cleanWord(left.FirstName) = Functions.cleanWord(src.name_first) and Functions.cleanWord(left.LastName) = Functions.cleanWord(src.name_last)),true,skip)));
+		export NameVerified(Healthcare_Header_Services.layouts.CombinedHeaderResultsDoxieLayout results,Healthcare_Header_Services.layouts.autokeyInput src) := Function 
+			hasLast := Healthcare_Header_Services.Functions.cleanWord(src.name_last) <> '';
+			recs := project(results.names, transform(Healthcare_Header_Services.layouts.Verifications, self.NameVerified := if((Healthcare_Header_Services.Functions.cleanWord(left.FirstName) = Healthcare_Header_Services.Functions.cleanWord(src.name_first) and Healthcare_Header_Services.Functions.cleanWord(left.LastName) = Healthcare_Header_Services.Functions.cleanWord(src.name_last)),true,skip)));
 			return hasLast and exists(recs);
 		end;
-		export CompanyNamesVerified(layouts.CombinedHeaderResultsDoxieLayout results,layouts.autokeyInput src) := Function 
-			hasFull := Functions.cleanBusinessWord(src.comp_name) <> '';
-			recs := project(results.names, transform(layouts.Verifications, self.CompanyNameVerified := IF (ut.CompanySimilar100 (Functions.cleanBusinessWord(Functions.getCleanHealthCareName(left.CompanyName)), Functions.cleanBusinessWord(Functions.getCleanHealthCareName(stringlib.StringToUpperCase(src.comp_name))),true) < 60,true,skip)));
-			recs2 := project(results.names, transform(layouts.Verifications, self.CompanyNameVerified := 
-													if (Functions.CompareBusinessNameConfidence(left.CompanyName,src.comp_name) > Constants.BUS_NAME_BIPMATCH_THRESHOLD,true,skip)));
+		export CompanyNamesVerified(Healthcare_Header_Services.layouts.CombinedHeaderResultsDoxieLayout results,Healthcare_Header_Services.layouts.autokeyInput src) := Function 
+			hasFull := Healthcare_Header_Services.Functions.cleanBusinessWord(src.comp_name) <> '';
+			recs := project(results.names, transform(Healthcare_Header_Services.layouts.Verifications, self.CompanyNameVerified := IF (ut.CompanySimilar100 (Healthcare_Header_Services.Functions.cleanBusinessWord(Healthcare_Header_Services.Functions.getCleanHealthCareName(left.CompanyName)), Healthcare_Header_Services.Functions.cleanBusinessWord(Healthcare_Header_Services.Functions.getCleanHealthCareName(stringlib.StringToUpperCase(src.comp_name))),true) < 60,true,skip)));
+			recs2 := project(results.names, transform(Healthcare_Header_Services.layouts.Verifications, self.CompanyNameVerified := 
+													if (Healthcare_Header_Services.Functions.CompareBusinessNameConfidence(left.CompanyName,src.comp_name) > Constants.BUS_NAME_BIPMATCH_THRESHOLD,true,skip)));
 			return hasFull and (exists(recs) or exists(recs2));
 		end;
-		export AddressVerified(layouts.CombinedHeaderResultsDoxieLayout results,layouts.autokeyInput src) := Function 
-			hasPrimRange := Functions.cleanWord(src.prim_range) <>'';
-			hasPrimName := Functions.cleanWord(src.prim_name) <>'';
-			hasCity := Functions.cleanWord(src.p_city_name) <>'';
+		export AddressVerified(Healthcare_Header_Services.layouts.CombinedHeaderResultsDoxieLayout results,Healthcare_Header_Services.layouts.autokeyInput src) := Function 
+			hasPrimRange := Healthcare_Header_Services.Functions.cleanWord(src.prim_range) <>'';
+			hasPrimName := Healthcare_Header_Services.Functions.cleanWord(src.prim_name) <>'';
+			hasCity := Healthcare_Header_Services.Functions.cleanWord(src.p_city_name) <>'';
 			hasInputAddrtoVerify := (hasPrimRange and hasPrimName) or (hasPrimName and hasCity);
-			input_range := Functions.cleanWord(src.prim_range);
-			input_name := Functions.cleanWord(src.prim_name);
-			recs := project(results.Addresses, transform(layouts.Verifications, self.AddressVerified := if((Functions.cleanWord(left.prim_range) = input_range and 
-																																									Functions.cleanWord(left.prim_name) = input_name) or  
-																																									(Functions.cleanWord(left.prim_range) = input_name and 
-																																									Functions.cleanWord(left.p_city_name) = Functions.cleanWord(src.p_city_name)),true,skip)));
+			input_range := Healthcare_Header_Services.Functions.cleanWord(src.prim_range);
+			input_name := Healthcare_Header_Services.Functions.cleanWord(src.prim_name);
+			recs := project(results.Addresses, transform(Healthcare_Header_Services.layouts.Verifications, self.AddressVerified := if((Healthcare_Header_Services.Functions.cleanWord(left.prim_range) = input_range and 
+																																									Healthcare_Header_Services.Functions.cleanWord(left.prim_name) = input_name) or  
+																																									(Healthcare_Header_Services.Functions.cleanWord(left.prim_range) = input_name and 
+																																									Healthcare_Header_Services.Functions.cleanWord(left.p_city_name) = Healthcare_Header_Services.Functions.cleanWord(src.p_city_name)),true,skip)));
 			return hasInputAddrtoVerify and exists(recs);
 		end;
-		export PhoneVerified(layouts.CombinedHeaderResultsDoxieLayout results, layouts.autokeyInput src) := Function 
+		export PhoneVerified(Healthcare_Header_Services.layouts.CombinedHeaderResultsDoxieLayout results, Healthcare_Header_Services.layouts.autokeyInput src) := Function 
 			hasPhone := src.homephone <> '';
-			recs := project(results.Phones, transform(layouts.Verifications, self.PhoneVerified := if(Functions.cleanWord(left.phone) = Functions.cleanWord(src.homephone) and Functions.cleanWord(left.Phone) <> '',true,skip)));
+			recs := project(results.Phones, transform(Healthcare_Header_Services.layouts.Verifications, self.PhoneVerified := if(Healthcare_Header_Services.Functions.cleanWord(left.phone) = Healthcare_Header_Services.Functions.cleanWord(src.homephone) and Healthcare_Header_Services.Functions.cleanWord(left.Phone) <> '',true,skip)));
 			return hasPhone and exists(recs);
 		end;
-		export SSNVerified(layouts.CombinedHeaderResultsDoxieLayout results, layouts.autokeyInput src) := Function 
+		export SSNVerified(Healthcare_Header_Services.layouts.CombinedHeaderResultsDoxieLayout results, Healthcare_Header_Services.layouts.autokeyInput src) := Function 
 			hasSSN := src.SSN <> '' and length(trim(src.SSN,all))=9;
 			deepdiveSSNMatch := results.src = Constants.SRC_BOCA_PERSON_HEADER and hasSSN and exists(results.ssns(ssn=src.SSN));
 			hasName := src.name_first <> '' and src.name_last <> '';
@@ -59,7 +59,7 @@ export Functions_Validation := Module
 																										self.FlipFName := stringlib.StringToUpperCase(left.LastName[1..2]); 
 																										self.FlipLName:=stringlib.StringToUpperCase(left.FirstName);self:=left)),record),record);
 			getdidfromssn := if(hasSSN and hasName,Choosen(dx_Header.key_SSN()(keyed(s1=src.ssn[1]),keyed(s2=src.ssn[2]),keyed(s3=src.ssn[3]),keyed(s4=src.ssn[4]),keyed(s5=src.ssn[5]),keyed(s6=src.ssn[6]),keyed(s7=src.ssn[7]),keyed(s8=src.ssn[8]),keyed(s9=src.ssn[9])),50));
-			didbasedssn := dedup(sort(project(getdidfromssn(ut.NameMatch100(pfname,'','',stringlib.StringToUpperCase(src.name_first),'','')>80),layouts.layout_did),record),record);
+			didbasedssn := dedup(sort(project(getdidfromssn(ut.NameMatch100(pfname,'','',stringlib.StringToUpperCase(src.name_first),'','')>80),Healthcare_Header_Services.layouts.layout_did),record),record);
 			bestRecs := dx_BestRecords.get(dataset([{didbasedssn[1].did}], doxie.layout_references), 
 				did, dx_BestRecords.Constants.perm_type.glb);
 			bestInfo:=bestRecs(((fname[1..2]=stringlib.StringToUpperCase(src.name_first[1..2]) and lname = stringlib.StringToUpperCase(src.name_last)) or 
@@ -84,8 +84,8 @@ export Functions_Validation := Module
 																					 ut.NameMatch100(right.combo.lname3.fname[1..2],'',right.combo.lname3.lname,left.FlipFName,'',left.FlipLName)>80,
 														right.ssn,skip);
 														self := right),keep(Constants.MAX_RECS_ON_JOIN), limit(0));
-			recs := project(results.ssnlookups, transform(layouts.Verifications, self.SSNVerified := if(Functions.cleanWord(left.ssn) = Functions.cleanWord(src.SSN) and Functions.cleanWord(left.ssn) <> '',true,skip)));
-			recs2 := project(results.ssns, transform(layouts.Verifications, self.SSNVerified := if(Functions.cleanWord(left.ssn) = Functions.cleanWord(src.SSN) and Functions.cleanWord(left.ssn) <> '',true,skip)));
+			recs := project(results.ssnlookups, transform(Healthcare_Header_Services.layouts.Verifications, self.SSNVerified := if(Healthcare_Header_Services.Functions.cleanWord(left.ssn) = Healthcare_Header_Services.Functions.cleanWord(src.SSN) and Healthcare_Header_Services.Functions.cleanWord(left.ssn) <> '',true,skip)));
+			recs2 := project(results.ssns, transform(Healthcare_Header_Services.layouts.Verifications, self.SSNVerified := if(Healthcare_Header_Services.Functions.cleanWord(left.ssn) = Healthcare_Header_Services.Functions.cleanWord(src.SSN) and Healthcare_Header_Services.Functions.cleanWord(left.ssn) <> '',true,skip)));
 			// output(hasSSN);
 			// output(hasName);
 			// output(results.Src);
@@ -100,58 +100,58 @@ export Functions_Validation := Module
 			// output(recs2);
 			return hasSSN and (exists(recs) or exists(recs2) or exists(ds_ssn_match) or exists(bestInfo_match) or deepdiveSSNMatch);
 		end;
-		Export feinlookup1(dataset(layouts.feinLookup) ds) := function
+		Export feinlookup1(dataset(Healthcare_Header_Services.layouts.feinLookup) ds) := function
 			return join(ds,Business_Header.RoxieKeys().NewFetch.Key_FEIN_QA,keyed(left.bit1=right.f1) and keyed(left.bit2=right.f2) and keyed(left.bit3=right.f3) and
 																																			keyed(left.bit4=right.f4) and keyed(left.bit5=right.f5) and keyed(left.bit6=right.f6) and
 																																			keyed(left.bit7=right.f7) and keyed(left.bit8=right.f8) and keyed(left.bit9=right.f9),
-																																			transform(layouts.feinLookupResults, self.CompanyName := right.cname;self:=[];),
+																																			transform(Healthcare_Header_Services.layouts.feinLookupResults, self.CompanyName := right.cname;self:=[];),
 																																			keep(Constants.MAX_RECS_ON_JOIN),limit(0));
 		end;
-		Export feinlookup2(dataset(layouts.feinLookup) ds) := function
+		Export feinlookup2(dataset(Healthcare_Header_Services.layouts.feinLookup) ds) := function
 			return join(ds,Business_Header_SS.Key_BH_FEIN,keyed(left.fein=right.fein),
-																											transform(layouts.feinLookupResults, self.CompanyName := right.Company_Name;self:=[];),
+																											transform(Healthcare_Header_Services.layouts.feinLookupResults, self.CompanyName := right.Company_Name;self:=[];),
 																											keep(Constants.MAX_RECS_ON_JOIN),limit(0));
 		end;
-		Export feinlookup3(dataset(layouts.feinLookup) ds) := function
+		Export feinlookup3(dataset(Healthcare_Header_Services.layouts.feinLookup) ds) := function
 			hits:= join(ds,enclarity.Keys(,true).associate_bill_tin.qa,keyed((string)left.fein=right.bill_tin),
 																											transform(recordof(enclarity.Keys(,true).associate_bill_tin.qa), self:= right;self:=[];),
 																											keep(Constants.MAX_RECS_ON_JOIN),limit(0));
 			results := join(hits(billing_group_key <> ''),Enclarity.Keys(,true).facility_group_key.qa,keyed(left.billing_group_key=right.group_key),
-																											transform(layouts.feinLookupResults, self.CompanyName := right.prac_company_name;self:=[];),
+																											transform(Healthcare_Header_Services.layouts.feinLookupResults, self.CompanyName := right.prac_company_name;self:=[];),
 																											keep(Constants.MAX_RECS_ON_JOIN),limit(0));
 			results2 := join(hits(billing_group_key <> ''),Enclarity.Keys(,true).facility_group_key.qa,keyed(left.billing_group_key=right.group_key),
-																											transform(layouts.feinLookupResults, self.CompanyName := right.clean_company_name;self:=[];),
+																											transform(Healthcare_Header_Services.layouts.feinLookupResults, self.CompanyName := right.clean_company_name;self:=[];),
 																											keep(Constants.MAX_RECS_ON_JOIN),limit(0));
 			return results+results2;
 		end;
-		export FEINVerified(layouts.CombinedHeaderResultsDoxieLayout results, layouts.autokeyInput src) := Function 
+		export FEINVerified(Healthcare_Header_Services.layouts.CombinedHeaderResultsDoxieLayout results, Healthcare_Header_Services.layouts.autokeyInput src) := Function 
 			hasTIN := src.taxid <> '';
 			hasFEIN := src.FEIN <> '';
 			hasInputValuetoVerify := hasTIN or hasFEIN;
-			recs := project(results.feins, transform(layouts.Verifications, self.FEINVerified := if((Functions.cleanWord(left.fein) = Functions.cleanWord(src.FEIN) or Functions.cleanWord(left.fein) = Functions.cleanWord(src.taxid)) and Functions.cleanWord(left.fein) <> '',true,skip)));
-			recs2 := project(results.taxids, transform(layouts.Verifications, self.FEINVerified := if((Functions.cleanWord(left.taxid) = Functions.cleanWord(src.taxid) or Functions.cleanWord(left.taxid) = Functions.cleanWord(src.fein)) and Functions.cleanWord(left.taxid) <> '',true,skip)));
-			feinFmt := project(results.feins,transform(layouts.feinLookup,
+			recs := project(results.feins, transform(Healthcare_Header_Services.layouts.Verifications, self.FEINVerified := if((Healthcare_Header_Services.Functions.cleanWord(left.fein) = Healthcare_Header_Services.Functions.cleanWord(src.FEIN) or Healthcare_Header_Services.Functions.cleanWord(left.fein) = Healthcare_Header_Services.Functions.cleanWord(src.taxid)) and Healthcare_Header_Services.Functions.cleanWord(left.fein) <> '',true,skip)));
+			recs2 := project(results.taxids, transform(Healthcare_Header_Services.layouts.Verifications, self.FEINVerified := if((Healthcare_Header_Services.Functions.cleanWord(left.taxid) = Healthcare_Header_Services.Functions.cleanWord(src.taxid) or Healthcare_Header_Services.Functions.cleanWord(left.taxid) = Healthcare_Header_Services.Functions.cleanWord(src.fein)) and Healthcare_Header_Services.Functions.cleanWord(left.taxid) <> '',true,skip)));
+			feinFmt := project(results.feins,transform(Healthcare_Header_Services.layouts.feinLookup,
 																									val2CheckFmt := (string)INTFORMAT((integer)left.fein,9,1);
 																									self.fein:=(integer)val2CheckFmt; self.bit1:=val2CheckFmt[1]; 
 																									self.bit2:=val2CheckFmt[2]; self.bit3:=val2CheckFmt[3]; 
 																									self.bit4:=val2CheckFmt[4]; self.bit5:=val2CheckFmt[5]; 
 																									self.bit6:=val2CheckFmt[6]; self.bit7:=val2CheckFmt[7]; 
 																									self.bit8:=val2CheckFmt[8]; self.bit9:=val2CheckFmt[9];));
-			taxidFmt := project(results.taxids,transform(layouts.feinLookup,
+			taxidFmt := project(results.taxids,transform(Healthcare_Header_Services.layouts.feinLookup,
 																									val2CheckFmt := (string)INTFORMAT((integer)left.taxid,9,1);
 																									self.fein:=(integer)val2CheckFmt; self.bit1:=val2CheckFmt[1]; 
 																									self.bit2:=val2CheckFmt[2]; self.bit3:=val2CheckFmt[3]; 
 																									self.bit4:=val2CheckFmt[4]; self.bit5:=val2CheckFmt[5]; 
 																									self.bit6:=val2CheckFmt[6]; self.bit7:=val2CheckFmt[7]; 
 																									self.bit8:=val2CheckFmt[8]; self.bit9:=val2CheckFmt[9];));
-			userInput := project(src,transform(layouts.feinLookup,
+			userInput := project(src,transform(Healthcare_Header_Services.layouts.feinLookup,
 																									val2CheckFmt := (string)INTFORMAT((integer)left.taxid,9,1);
 																									self.fein:=(integer)val2CheckFmt; self.bit1:=val2CheckFmt[1]; 
 																									self.bit2:=val2CheckFmt[2]; self.bit3:=val2CheckFmt[3]; 
 																									self.bit4:=val2CheckFmt[4]; self.bit5:=val2CheckFmt[5]; 
 																									self.bit6:=val2CheckFmt[6]; self.bit7:=val2CheckFmt[7]; 
 																									self.bit8:=val2CheckFmt[8]; self.bit9:=val2CheckFmt[9];));
-			userInput2 := project(src,transform(layouts.feinLookup,
+			userInput2 := project(src,transform(Healthcare_Header_Services.layouts.feinLookup,
 																									val2CheckFmt := (string)INTFORMAT((integer)left.fein,9,1);
 																									self.fein:=(integer)val2CheckFmt; self.bit1:=val2CheckFmt[1]; 
 																									self.bit2:=val2CheckFmt[2]; self.bit3:=val2CheckFmt[3]; 
@@ -163,30 +163,30 @@ export Functions_Validation := Module
 			lookup1 := feinlookup1(ds(fein>0));
 			lookup2 := feinlookup2(ds(fein>0));
 			lookup3 := feinlookup3(ds(fein>0));
-			CNamesInput := dataset([{src.comp_name,0}],layouts.feinLookupResults);
-			CNamesResults := Project(results.Names,transform(layouts.feinLookupResults,self.CompanyName:=left.CompanyName;self:=[];));
-			CNamesResultsNPI1 := Project(results.NPIRaw,transform(layouts.feinLookupResults,self.CompanyName:=left.EntityInformation.CompanyName;self:=[];));
-			CNamesResultsNPI2 := Project(results.NPIRaw,transform(layouts.feinLookupResults,self.CompanyName:=left.EntityInformation.CompanyNameAKA;self:=[];));
+			CNamesInput := dataset([{src.comp_name,0}],Healthcare_Header_Services.layouts.feinLookupResults);
+			CNamesResults := Project(results.Names,transform(Healthcare_Header_Services.layouts.feinLookupResults,self.CompanyName:=left.CompanyName;self:=[];));
+			CNamesResultsNPI1 := Project(results.NPIRaw,transform(Healthcare_Header_Services.layouts.feinLookupResults,self.CompanyName:=left.EntityInformation.CompanyName;self:=[];));
+			CNamesResultsNPI2 := Project(results.NPIRaw,transform(Healthcare_Header_Services.layouts.feinLookupResults,self.CompanyName:=left.EntityInformation.CompanyNameAKA;self:=[];));
 			//Cleaned Company Names from Results
-			ResultsCompanyNamesCleaned := dedup(project(CNamesInput+CNamesResults+CNamesResultsNPI1+CNamesResultsNPI2,transform(layouts.feinLookupResults,self.CompanyName:=Functions.getCleanHealthCareName(left.CompanyName);self:=[];))(CompanyName<>''),all);
+			ResultsCompanyNamesCleaned := dedup(project(CNamesInput+CNamesResults+CNamesResultsNPI1+CNamesResultsNPI2,transform(Healthcare_Header_Services.layouts.feinLookupResults,self.CompanyName:=Healthcare_Header_Services.Functions.getCleanHealthCareName(left.CompanyName);self:=[];))(CompanyName<>''),all);
 			//Cleaned Company Names from lookup1
-			lookup1Cleaned := dedup(project(lookup1,transform(layouts.feinLookupResults,self.CompanyName:=Functions.getCleanHealthCareName(left.CompanyName);self:=[];)),all);
+			lookup1Cleaned := dedup(project(lookup1,transform(Healthcare_Header_Services.layouts.feinLookupResults,self.CompanyName:=Healthcare_Header_Services.Functions.getCleanHealthCareName(left.CompanyName);self:=[];)),all);
 			//Cleaned Company Names from lookup2
-			lookup2Cleaned := dedup(project(lookup2,transform(layouts.feinLookupResults,self.CompanyName:=Functions.getCleanHealthCareName(left.CompanyName);self:=[];)),all);
+			lookup2Cleaned := dedup(project(lookup2,transform(Healthcare_Header_Services.layouts.feinLookupResults,self.CompanyName:=Healthcare_Header_Services.Functions.getCleanHealthCareName(left.CompanyName);self:=[];)),all);
 			//Cleaned Company Names from lookup3
-			lookup3Cleaned := dedup(project(lookup3,transform(layouts.feinLookupResults,self.CompanyName:=Functions.getCleanHealthCareName(left.CompanyName);self:=[];)),all);
+			lookup3Cleaned := dedup(project(lookup3,transform(Healthcare_Header_Services.layouts.feinLookupResults,self.CompanyName:=Healthcare_Header_Services.Functions.getCleanHealthCareName(left.CompanyName);self:=[];)),all);
 			
 			lookMatch1 := join(lookup1Cleaned(CompanyName<>''),ResultsCompanyNamesCleaned(CompanyName<>''),
-																					left.boguslink = right.boguslink,transform(layouts.Verifications, 
-																								closematch := ut.CompanySimilar100(Functions.getCleanHealthCareName(left.CompanyName),Functions.getCleanHealthCareName(right.CompanyName));
+																					left.boguslink = right.boguslink,transform(Healthcare_Header_Services.layouts.Verifications, 
+																								closematch := ut.CompanySimilar100(Healthcare_Header_Services.Functions.getCleanHealthCareName(left.CompanyName),Healthcare_Header_Services.Functions.getCleanHealthCareName(right.CompanyName));
 																								self.FEINVerified := if(closematch<=Constants.BUS_NAME_MATCH_THRESHOLD,true,skip)),keep(Constants.MAX_RECS_ON_JOIN), limit(0));
 			lookMatch2 := join(lookup2Cleaned(CompanyName<>''),ResultsCompanyNamesCleaned(CompanyName<>''),
-																					left.boguslink = right.boguslink,transform(layouts.Verifications, 
-																								closematch := ut.CompanySimilar100(Functions.getCleanHealthCareName(left.CompanyName),Functions.getCleanHealthCareName(right.CompanyName));
+																					left.boguslink = right.boguslink,transform(Healthcare_Header_Services.layouts.Verifications, 
+																								closematch := ut.CompanySimilar100(Healthcare_Header_Services.Functions.getCleanHealthCareName(left.CompanyName),Healthcare_Header_Services.Functions.getCleanHealthCareName(right.CompanyName));
 																								self.FEINVerified := if(closematch<=Constants.BUS_NAME_MATCH_THRESHOLD,true,skip)),keep(Constants.MAX_RECS_ON_JOIN), limit(0));
 			lookMatch3 := join(lookup3Cleaned(CompanyName<>''),ResultsCompanyNamesCleaned(CompanyName<>''),
-																					left.boguslink = right.boguslink,transform(layouts.Verifications, 
-																								closematch := ut.CompanySimilar100(Functions.getCleanHealthCareName(left.CompanyName),Functions.getCleanHealthCareName(right.CompanyName));
+																					left.boguslink = right.boguslink,transform(Healthcare_Header_Services.layouts.Verifications, 
+																								closematch := ut.CompanySimilar100(Healthcare_Header_Services.Functions.getCleanHealthCareName(left.CompanyName),Healthcare_Header_Services.Functions.getCleanHealthCareName(right.CompanyName));
 																								self.FEINVerified := if(closematch<=Constants.BUS_NAME_MATCH_THRESHOLD,true,skip)),keep(Constants.MAX_RECS_ON_JOIN), limit(0));
 			// output(src,named('src'));
 			// output(hasInputValuetoVerify,named('hasInputValuetoVerify'));
@@ -210,191 +210,191 @@ export Functions_Validation := Module
 			// output(lookMatch2,named('lookMatch2'));
 			return hasInputValuetoVerify and (exists(recs) or exists(recs2) or exists(lookMatch1) or exists(lookMatch2) or exists(lookMatch3));
 		end;
-		Export FEINExists(layouts.CombinedHeaderResultsDoxieLayout results, layouts.autokeyInput src) := Function
+		Export FEINExists(Healthcare_Header_Services.layouts.CombinedHeaderResultsDoxieLayout results, Healthcare_Header_Services.layouts.autokeyInput src) := Function
 			hasTIN := src.taxid <> '';
 			hasFEIN := src.FEIN <> '';
 			hasInputValuetoVerify := hasTIN or hasFEIN;
-			inResults := project(results.feins, transform(layouts.Verifications, self.FEINSuppliedExists := if((Functions.cleanWord(left.fein) = Functions.cleanWord(src.FEIN) or Functions.cleanWord(left.fein) = Functions.cleanWord(src.taxid)) and Functions.cleanWord(left.fein) <> '',true,skip)));
-			inResults2 := project(results.taxids, transform(layouts.Verifications, self.FEINSuppliedExists := if((Functions.cleanWord(left.taxid) = Functions.cleanWord(src.taxid) or Functions.cleanWord(left.taxid) = Functions.cleanWord(src.fein)) and Functions.cleanWord(left.taxid) <> '',true,skip)));
+			inResults := project(results.feins, transform(Healthcare_Header_Services.layouts.Verifications, self.FEINSuppliedExists := if((Healthcare_Header_Services.Functions.cleanWord(left.fein) = Healthcare_Header_Services.Functions.cleanWord(src.FEIN) or Healthcare_Header_Services.Functions.cleanWord(left.fein) = Healthcare_Header_Services.Functions.cleanWord(src.taxid)) and Healthcare_Header_Services.Functions.cleanWord(left.fein) <> '',true,skip)));
+			inResults2 := project(results.taxids, transform(Healthcare_Header_Services.layouts.Verifications, self.FEINSuppliedExists := if((Healthcare_Header_Services.Functions.cleanWord(left.taxid) = Healthcare_Header_Services.Functions.cleanWord(src.taxid) or Healthcare_Header_Services.Functions.cleanWord(left.taxid) = Healthcare_Header_Services.Functions.cleanWord(src.fein)) and Healthcare_Header_Services.Functions.cleanWord(left.taxid) <> '',true,skip)));
 			val2Check := map(hasInputValuetoVerify and hasFEIN =>src.FEIN,
 											 hasInputValuetoVerify and hasTIN => src.taxid,'');
 			val2CheckFmt := (string)INTFORMAT((integer)val2Check,9,1);
-			ds := dataset([{(integer)val2CheckFmt,val2CheckFmt[1],val2CheckFmt[2],val2CheckFmt[3],val2CheckFmt[4],val2CheckFmt[5],val2CheckFmt[6],val2CheckFmt[7],val2CheckFmt[8],val2CheckFmt[9]}],layouts.feinLookup);
+			ds := dataset([{(integer)val2CheckFmt,val2CheckFmt[1],val2CheckFmt[2],val2CheckFmt[3],val2CheckFmt[4],val2CheckFmt[5],val2CheckFmt[6],val2CheckFmt[7],val2CheckFmt[8],val2CheckFmt[9]}],Healthcare_Header_Services.layouts.feinLookup);
 			recs := feinlookup1(ds);
 			recs2 := feinlookup2(ds);
 			recs3 := feinlookup3(ds);
 			return hasInputValuetoVerify and (exists(inResults) or exists(inResults2) or exists(recs) or exists(recs2) or exists(recs3));
 		end;
-		Export MedSchoolVerified(layouts.CombinedHeaderResultsDoxieLayout results, layouts.autokeyInput src) := Function
+		Export MedSchoolVerified(Healthcare_Header_Services.layouts.CombinedHeaderResultsDoxieLayout results, Healthcare_Header_Services.layouts.autokeyInput src) := Function
 			hasInput := src.MedicalSchoolNameVerification <> '';
-			hasMatch := exists(project(results.MedSchools, transform(layouts.Verifications, self.MedicalSchoolNameVerified := if(BridgerScoreLib.companyScore(left.MedSchoolName,src.MedicalSchoolNameVerification)>.80,true,skip))));
+			hasMatch := exists(project(results.MedSchools, transform(Healthcare_Header_Services.layouts.Verifications, self.MedicalSchoolNameVerified := if(BridgerScoreLib.companyScore(left.MedSchoolName,src.MedicalSchoolNameVerification)>.80,true,skip))));
 			return hasInput and hasMatch;
 		End;
-		Export GradYearVerified(layouts.CombinedHeaderResultsDoxieLayout results, layouts.autokeyInput src) := Function
+		Export GradYearVerified(Healthcare_Header_Services.layouts.CombinedHeaderResultsDoxieLayout results, Healthcare_Header_Services.layouts.autokeyInput src) := Function
 			hasInput := src.GraduationYearVerification > 0;
-			hasMatch := exists(project(results.MedSchools, transform(layouts.Verifications, self.GraduationYearVerified := if(src.GraduationYearVerification=(integer)left.GraduationYear and (integer)left.GraduationYear <> 0,true,skip))));
+			hasMatch := exists(project(results.MedSchools, transform(Healthcare_Header_Services.layouts.Verifications, self.GraduationYearVerified := if(src.GraduationYearVerification=(integer)left.GraduationYear and (integer)left.GraduationYear <> 0,true,skip))));
 			return hasInput and hasMatch;
 		End;
-		export CLIAValid(layouts.CombinedHeaderResultsDoxieLayout results, layouts.autokeyInput src) := Function 
+		export CLIAValid(Healthcare_Header_Services.layouts.CombinedHeaderResultsDoxieLayout results, Healthcare_Header_Services.layouts.autokeyInput src) := Function 
 			hasClia := src.CLIANumber <> '';
-			recs := project(results.CLIARaw(RecordType='C'), transform(layouts.Verifications, self.CLIAValid := if(Functions.cleanWord(left.CLIANumber) = Functions.cleanWord(src.CLIANumber) and Functions.cleanWord(left.CLIANumber) <> '' 
+			recs := project(results.CLIARaw(RecordType='C'), transform(Healthcare_Header_Services.layouts.Verifications, self.CLIAValid := if(Healthcare_Header_Services.Functions.cleanWord(left.CLIANumber) = Healthcare_Header_Services.Functions.cleanWord(src.CLIANumber) and Healthcare_Header_Services.Functions.cleanWord(left.CLIANumber) <> '' 
 																																															 and checkCurrentLicense(left.ExpirationDate) 
 																																															 and (trim(left.TerminationCode,all) = '' or trim(left.TerminationCode,all) = '00'),true,skip)));
 			return hasClia and exists(recs);
 		end;
-		export CLIAVerified(layouts.CombinedHeaderResultsDoxieLayout results, layouts.autokeyInput src) := Function 
+		export CLIAVerified(Healthcare_Header_Services.layouts.CombinedHeaderResultsDoxieLayout results, Healthcare_Header_Services.layouts.autokeyInput src) := Function 
 			hasClia := src.CLIANumber <> '';
-			recs := project(results.CLIARaw, transform(layouts.Verifications, self.CLIAVerified := if(Functions.cleanWord(left.CLIANumber) = Functions.cleanWord(src.CLIANumber) and Functions.cleanWord(left.CLIANumber) <> '',true,skip)));
+			recs := project(results.CLIARaw, transform(Healthcare_Header_Services.layouts.Verifications, self.CLIAVerified := if(Healthcare_Header_Services.Functions.cleanWord(left.CLIANumber) = Healthcare_Header_Services.Functions.cleanWord(src.CLIANumber) and Healthcare_Header_Services.Functions.cleanWord(left.CLIANumber) <> '',true,skip)));
 			return hasClia and exists(recs);
 		end;
-		Export UPINVerified(layouts.CombinedHeaderResultsDoxieLayout results, layouts.autokeyInput src) := Function
+		Export UPINVerified(Healthcare_Header_Services.layouts.CombinedHeaderResultsDoxieLayout results, Healthcare_Header_Services.layouts.autokeyInput src) := Function
 			hasInput := src.upin <> '';
-			hasMatch := exists(project(results.upins, transform(layouts.Verifications,self.UPINVerified := if(Functions.cleanWord(left.upin) = Functions.cleanWord(src.UPIN) and Functions.cleanWord(left.upin) <> '',true,skip))));
+			hasMatch := exists(project(results.upins, transform(Healthcare_Header_Services.layouts.Verifications,self.UPINVerified := if(Healthcare_Header_Services.Functions.cleanWord(left.upin) = Healthcare_Header_Services.Functions.cleanWord(src.UPIN) and Healthcare_Header_Services.Functions.cleanWord(left.upin) <> '',true,skip))));
 			return hasInput and hasMatch;
 		End;
-		Export NpiExists(layouts.autokeyInput src) := Function
+		Export NpiExists(Healthcare_Header_Services.layouts.autokeyInput src) := Function
 			hasInput := src.npi <> '';
-			hasMatch := exists(Functions.getNPPESByNPI(dataset([{src.NPI}],layouts.NPPES_Layouts.layout_npiid)));
+			hasMatch := exists(Healthcare_Header_Services.Functions.getNPPESByNPI(dataset([{src.NPI}],Healthcare_Header_Services.layouts.NPPES_Layouts.layout_npiid)));
 			return hasInput and hasMatch;
 		End;
-		Export NPIValid(layouts.CombinedHeaderResultsDoxieLayout results, layouts.autokeyInput src) := Function
+		Export NPIValid(Healthcare_Header_Services.layouts.CombinedHeaderResultsDoxieLayout results, Healthcare_Header_Services.layouts.autokeyInput src) := Function
 			hasInput := src.npi <> '';
-			hasMatch := exists(project(results.NPIRaw, transform(layouts.Verifications, self.NPIValid := if(Functions.cleanWord(left.NPIInformation.NPINumber) = Functions.cleanWord(src.NPI) and 
-																																					Functions.cleanWord(left.NPIInformation.NPINumber) <> '' and 
+			hasMatch := exists(project(results.NPIRaw, transform(Healthcare_Header_Services.layouts.Verifications, self.NPIValid := if(Healthcare_Header_Services.Functions.cleanWord(left.NPIInformation.NPINumber) = Healthcare_Header_Services.Functions.cleanWord(src.NPI) and 
+																																					Healthcare_Header_Services.Functions.cleanWord(left.NPIInformation.NPINumber) <> '' and 
 																																					(length(trim(iesp.ECL2ESP.t_DateToString8(left.NPIInformation.DeactivationDate),all))=0 or length(trim(iesp.ECL2ESP.t_DateToString8(left.NPIInformation.ReactivationDate),all))>0),
 																																					true,skip))));
 			return hasInput and hasMatch;
 		End;
-		Export NpiVerified(layouts.CombinedHeaderResultsDoxieLayout results, layouts.autokeyInput src) := Function
+		Export NpiVerified(Healthcare_Header_Services.layouts.CombinedHeaderResultsDoxieLayout results, Healthcare_Header_Services.layouts.autokeyInput src) := Function
 			hasInput := src.npi <> '';
-			hasMatch := exists(project(results.npis, transform(layouts.Verifications, self.NPIVerified := if(Functions.cleanWord(left.npi) = Functions.cleanWord(src.NPI) and Functions.cleanWord(left.npi) <> '',true,skip))));
-			hasMatch2 := exists(project(results.NPIRaw, transform(layouts.Verifications, self.NPIVerified := if(Functions.cleanWord(left.NPIInformation.NPINumber) = Functions.cleanWord(src.NPI) and Functions.cleanWord(left.NPIInformation.NPINumber) <> '',true,skip))));
+			hasMatch := exists(project(results.npis, transform(Healthcare_Header_Services.layouts.Verifications, self.NPIVerified := if(Healthcare_Header_Services.Functions.cleanWord(left.npi) = Healthcare_Header_Services.Functions.cleanWord(src.NPI) and Healthcare_Header_Services.Functions.cleanWord(left.npi) <> '',true,skip))));
+			hasMatch2 := exists(project(results.NPIRaw, transform(Healthcare_Header_Services.layouts.Verifications, self.NPIVerified := if(Healthcare_Header_Services.Functions.cleanWord(left.NPIInformation.NPINumber) = Healthcare_Header_Services.Functions.cleanWord(src.NPI) and Healthcare_Header_Services.Functions.cleanWord(left.NPIInformation.NPINumber) <> '',true,skip))));
 			return hasInput and (hasMatch or hasMatch2);
 		End;
-		export DEAValid(layouts.CombinedHeaderResultsDoxieLayout results, layouts.autokeyInput src) := Function 
+		export DEAValid(Healthcare_Header_Services.layouts.CombinedHeaderResultsDoxieLayout results, Healthcare_Header_Services.layouts.autokeyInput src) := Function 
 			hasDea := src.DEA <> '';
-			recs := project(results.deas, transform(layouts.Verifications, self.DEAVerified := if((Functions.cleanWord(left.dea) = Functions.cleanWord(src.DEA) or Functions.cleanOnlyNumbers(left.dea) = Functions.cleanOnlyNumbers(src.DEA)) and Functions.cleanWord(left.dea) <> '' and trim(left.expiration_date,all)>=trim(currentDate,all),true,skip)));
+			recs := project(results.deas, transform(Healthcare_Header_Services.layouts.Verifications, self.DEAVerified := if((Healthcare_Header_Services.Functions.cleanWord(left.dea) = Healthcare_Header_Services.Functions.cleanWord(src.DEA) or Healthcare_Header_Services.Functions.cleanOnlyNumbers(left.dea) = Healthcare_Header_Services.Functions.cleanOnlyNumbers(src.DEA)) and Healthcare_Header_Services.Functions.cleanWord(left.dea) <> '' and trim(left.expiration_date,all)>=trim(currentDate,all),true,skip)));
 			return hasDea and exists(recs);
 		end;
-		export DEA2Valid(layouts.CombinedHeaderResultsDoxieLayout results, layouts.autokeyInput src) := Function 
+		export DEA2Valid(Healthcare_Header_Services.layouts.CombinedHeaderResultsDoxieLayout results, Healthcare_Header_Services.layouts.autokeyInput src) := Function 
 			hasDea := src.DEA2 <> '';
-			recs := project(results.deas, transform(layouts.Verifications, self.DEA2Verified := if((Functions.cleanWord(left.dea) = Functions.cleanWord(src.DEA2) or Functions.cleanOnlyNumbers(left.dea) = Functions.cleanOnlyNumbers(src.DEA2)) and Functions.cleanWord(left.dea) <> '' and trim(left.expiration_date,all)>=trim(currentDate,all),true,skip)));
+			recs := project(results.deas, transform(Healthcare_Header_Services.layouts.Verifications, self.DEA2Verified := if((Healthcare_Header_Services.Functions.cleanWord(left.dea) = Healthcare_Header_Services.Functions.cleanWord(src.DEA2) or Healthcare_Header_Services.Functions.cleanOnlyNumbers(left.dea) = Healthcare_Header_Services.Functions.cleanOnlyNumbers(src.DEA2)) and Healthcare_Header_Services.Functions.cleanWord(left.dea) <> '' and trim(left.expiration_date,all)>=trim(currentDate,all),true,skip)));
 			return hasDea and exists(recs);
 		end;
-		export DEAVerified(layouts.CombinedHeaderResultsDoxieLayout results, layouts.autokeyInput src) := Function 
+		export DEAVerified(Healthcare_Header_Services.layouts.CombinedHeaderResultsDoxieLayout results, Healthcare_Header_Services.layouts.autokeyInput src) := Function 
 			hasDea := src.DEA <> '';
-			recs := project(results.deas, transform(layouts.Verifications, self.DEAVerified := if((Functions.cleanWord(left.dea) = Functions.cleanWord(src.DEA) or Functions.cleanOnlyNumbers(left.dea) = Functions.cleanOnlyNumbers(src.DEA)) and Functions.cleanWord(left.dea) <> '',true,skip)));
+			recs := project(results.deas, transform(Healthcare_Header_Services.layouts.Verifications, self.DEAVerified := if((Healthcare_Header_Services.Functions.cleanWord(left.dea) = Healthcare_Header_Services.Functions.cleanWord(src.DEA) or Healthcare_Header_Services.Functions.cleanOnlyNumbers(left.dea) = Healthcare_Header_Services.Functions.cleanOnlyNumbers(src.DEA)) and Healthcare_Header_Services.Functions.cleanWord(left.dea) <> '',true,skip)));
 			return hasDea and exists(recs);
 		end;
-		export DEA2Verified(layouts.CombinedHeaderResultsDoxieLayout results, layouts.autokeyInput src) := Function 
+		export DEA2Verified(Healthcare_Header_Services.layouts.CombinedHeaderResultsDoxieLayout results, Healthcare_Header_Services.layouts.autokeyInput src) := Function 
 			hasDea := src.DEA2 <> '';
-			recs := project(results.deas, transform(layouts.Verifications, self.DEA2Verified := if((Functions.cleanWord(left.dea) = Functions.cleanWord(src.DEA2) or Functions.cleanOnlyNumbers(left.dea) = Functions.cleanOnlyNumbers(src.DEA2)) and Functions.cleanWord(left.dea) <> '',true,skip)));
+			recs := project(results.deas, transform(Healthcare_Header_Services.layouts.Verifications, self.DEA2Verified := if((Healthcare_Header_Services.Functions.cleanWord(left.dea) = Healthcare_Header_Services.Functions.cleanWord(src.DEA2) or Healthcare_Header_Services.Functions.cleanOnlyNumbers(left.dea) = Healthcare_Header_Services.Functions.cleanOnlyNumbers(src.DEA2)) and Healthcare_Header_Services.Functions.cleanWord(left.dea) <> '',true,skip)));
 			return hasDea and exists(recs);
 		end;
-		export NCPDPNumberVerified(layouts.CombinedHeaderResultsDoxieLayout results, layouts.autokeyInput src) := Function 
+		export NCPDPNumberVerified(Healthcare_Header_Services.layouts.CombinedHeaderResultsDoxieLayout results, Healthcare_Header_Services.layouts.autokeyInput src) := Function 
 			hasNCPDP := src.NCPDPNumber <> '';
-			recs := project(results.NCPDPRaw, transform(layouts.Verifications, self.NCPDPNumberVerified := if((integer)Functions.cleanWord(left.EntityInformation.PharmacyProviderId) = (integer)Functions.cleanWord(src.NCPDPNumber) and Functions.cleanWord(left.EntityInformation.PharmacyProviderId) <> '',true,skip)));
+			recs := project(results.NCPDPRaw, transform(Healthcare_Header_Services.layouts.Verifications, self.NCPDPNumberVerified := if((integer)Healthcare_Header_Services.Functions.cleanWord(left.EntityInformation.PharmacyProviderId) = (integer)Healthcare_Header_Services.Functions.cleanWord(src.NCPDPNumber) and Healthcare_Header_Services.Functions.cleanWord(left.EntityInformation.PharmacyProviderId) <> '',true,skip)));
 			return hasNCPDP and exists(recs);
 		end;
-		export LicenseMatch(dataset(layouts.layout_LicenseValidation) results, string srcLic, String srcLicState) := Function 
+		export LicenseMatch(dataset(Healthcare_Header_Services.layouts.layout_LicenseValidation) results, string srcLic, String srcLicState) := Function 
 			hasLicense := srcLic <> '';
 			hasLicenseState := srcLicState <> '';
-			recsRaw := project(sort(results,-TerminationDate), transform(layouts.Verifications, 
-																						isLicMatch := trim(left.cleanLicenseNum,all) = trim(Functions.cleanWord(srcLic),all) or left.cleanIntLicenseNum = (integer)Functions.cleanOnlyNumbers(srcLic);
-																						isStateMatch := trim(left.cleanLicenseState,all) = trim(Functions.cleanWord(srcLicState),all);
+			recsRaw := project(sort(results,-TerminationDate), transform(Healthcare_Header_Services.layouts.Verifications, 
+																						isLicMatch := trim(left.cleanLicenseNum,all) = trim(Healthcare_Header_Services.Functions.cleanWord(srcLic),all) or left.cleanIntLicenseNum = (integer)Healthcare_Header_Services.Functions.cleanOnlyNumbers(srcLic);
+																						isStateMatch := trim(left.cleanLicenseState,all) = trim(Healthcare_Header_Services.Functions.cleanWord(srcLicState),all);
 																						self.License1ResultMatch := if(isLicMatch and if(srcLicState <> '',isStateMatch,true), (string)left.licenseSeq,skip);
 																						self := left));
 			return if(hasLicense,recsRaw[1].License1ResultMatch,'');
 		end;
-		export CustomerLicenseValid(dataset(layouts.layout_LicenseValidation) results, string srcLic, String srcLicState) := Function 
+		export CustomerLicenseValid(dataset(Healthcare_Header_Services.layouts.layout_LicenseValidation) results, string srcLic, String srcLicState) := Function 
 			hasLicense := srcLic <> '';
 			hasLicenseState := srcLicState <> '';//Supplied
-			recsRaw := project(results, transform(layouts.layout_LicenseValidation, 
-																												self.LicenseValid := trim(left.cleanLicenseNum,all) = trim(Functions.cleanWord(srcLic)) or left.cleanIntLicenseNum = (integer)Functions.cleanOnlyNumbers(srcLic);
-																												self.LicenseStateValid := trim(left.cleanLicenseState,all) = trim(Functions.cleanWord(srcLicState),all);
+			recsRaw := project(results, transform(Healthcare_Header_Services.layouts.layout_LicenseValidation, 
+																												self.LicenseValid := trim(left.cleanLicenseNum,all) = trim(Healthcare_Header_Services.Functions.cleanWord(srcLic)) or left.cleanIntLicenseNum = (integer)Healthcare_Header_Services.Functions.cleanOnlyNumbers(srcLic);
+																												self.LicenseStateValid := trim(left.cleanLicenseState,all) = trim(Healthcare_Header_Services.Functions.cleanWord(srcLicState),all);
 																												self := left));
 			recs := recsRaw(LicenseValid and TerminationDateValid and if(hasLicenseState,LicenseStateValid,true));
 			return hasLicense and exists(recs);
 		end;
-		export CustomerLicenseVerified(dataset(layouts.layout_LicenseValidation) results, string srcLic, String srcLicState) := Function 
+		export CustomerLicenseVerified(dataset(Healthcare_Header_Services.layouts.layout_LicenseValidation) results, string srcLic, String srcLicState) := Function 
 			hasLicense := srcLic <> '';
 			hasLicenseState := srcLicState <> '';//Supplied
-			recsRaw := project(results, transform(layouts.layout_LicenseValidation, 
-																												self.LicenseValid := trim(left.cleanLicenseNum,all) = trim(Functions.cleanWord(srcLic),all) or left.cleanIntLicenseNum = (integer)Functions.cleanOnlyNumbers(srcLic);
-																												self.LicenseStateValid := trim(left.cleanLicenseState,all) = trim(Functions.cleanWord(srcLicState),all);
+			recsRaw := project(results, transform(Healthcare_Header_Services.layouts.layout_LicenseValidation, 
+																												self.LicenseValid := trim(left.cleanLicenseNum,all) = trim(Healthcare_Header_Services.Functions.cleanWord(srcLic),all) or left.cleanIntLicenseNum = (integer)Healthcare_Header_Services.Functions.cleanOnlyNumbers(srcLic);
+																												self.LicenseStateValid := trim(left.cleanLicenseState,all) = trim(Healthcare_Header_Services.Functions.cleanWord(srcLicState),all);
 																												self := left));
 			recs := recsRaw(LicenseValid and if(hasLicenseState,LicenseStateValid,true));
 			return hasLicense and exists(recs);
 		end;
-		export LicenseValid(dataset(layouts.layout_LicenseValidation) results, string srcLic, String srcLicState) := Function 
+		export LicenseValid(dataset(Healthcare_Header_Services.layouts.layout_LicenseValidation) results, string srcLic, String srcLicState) := Function 
 			hasLicense := srcLic <> '';
 			hasLicenseState := srcLicState <> '';
-			recsRaw := project(results, transform(layouts.layout_LicenseValidation, 
-																												self.LicenseValid := trim(left.cleanLicenseNum,all) = trim(Functions.cleanWord(srcLic)) or left.cleanIntLicenseNum = (integer)Functions.cleanOnlyNumbers(srcLic);
-																												self.LicenseStateValid := trim(left.cleanLicenseState,all) = trim(Functions.cleanWord(srcLicState),all);
+			recsRaw := project(results, transform(Healthcare_Header_Services.layouts.layout_LicenseValidation, 
+																												self.LicenseValid := trim(left.cleanLicenseNum,all) = trim(Healthcare_Header_Services.Functions.cleanWord(srcLic)) or left.cleanIntLicenseNum = (integer)Healthcare_Header_Services.Functions.cleanOnlyNumbers(srcLic);
+																												self.LicenseStateValid := trim(left.cleanLicenseState,all) = trim(Healthcare_Header_Services.Functions.cleanWord(srcLicState),all);
 																												self := left));
 			recs := recsRaw(LicenseValid and TerminationDateValid and if(hasLicenseState,LicenseStateValid,true));
 			return hasLicense and exists(recs);
 		end;
-		export LicenseVerified(dataset(layouts.layout_LicenseValidation) results, string srcLic, String srcLicState) := Function 
+		export LicenseVerified(dataset(Healthcare_Header_Services.layouts.layout_LicenseValidation) results, string srcLic, String srcLicState) := Function 
 			hasLicense := srcLic <> '';
 			hasLicenseState := srcLicState <> '';
 			hasLicensetoVerify := hasLicense and hasLicenseState;
-			recsRaw := project(results, transform(layouts.layout_LicenseValidation, 
-																												self.LicenseValid := trim(left.cleanLicenseNum,all) = trim(Functions.cleanWord(srcLic),all) or left.cleanIntLicenseNum = (integer)Functions.cleanOnlyNumbers(srcLic);
-																												self.LicenseStateValid := trim(left.cleanLicenseState,all) = trim(Functions.cleanWord(srcLicState),all);
+			recsRaw := project(results, transform(Healthcare_Header_Services.layouts.layout_LicenseValidation, 
+																												self.LicenseValid := trim(left.cleanLicenseNum,all) = trim(Healthcare_Header_Services.Functions.cleanWord(srcLic),all) or left.cleanIntLicenseNum = (integer)Healthcare_Header_Services.Functions.cleanOnlyNumbers(srcLic);
+																												self.LicenseStateValid := trim(left.cleanLicenseState,all) = trim(Healthcare_Header_Services.Functions.cleanWord(srcLicState),all);
 																												self := left));
 			recs := recsRaw(LicenseValid and if(hasLicenseState,LicenseStateValid,true));
 			return hasLicense and exists(recs);
 		end;
-		export TaxonomyVerified(layouts.CombinedHeaderResultsDoxieLayout results, string srcTaxonomy) := Function 
+		export TaxonomyVerified(Healthcare_Header_Services.layouts.CombinedHeaderResultsDoxieLayout results, string srcTaxonomy) := Function 
 			hasTaxonomy := srcTaxonomy <> '';
-			recs := project(results.Taxonomy, transform(layouts.Verifications, self.TaxonomyVerified := if(Functions.cleanWord(left.TaxonomyCode) = Functions.cleanWord(srcTaxonomy) and Functions.cleanWord(left.TaxonomyCode) <> '',true,skip)));
-			nppesRec := NORMALIZE(results.NPIRaw,left.ProviderTaxonomies,transform(layouts.layout_taxonomy,self.acctno:='1';self.ProviderID:=(unsigned6)left.NPIInformation.NPINumber,self.TaxonomyCode:=right.SelectedTaxonomyCode;self.PrimaryIndicator:=right.PrimaryTaxonomy,self:=[]));
-			recs2 := project(nppesRec, transform(layouts.Verifications, self.TaxonomyVerified := if(Functions.cleanWord(left.TaxonomyCode) = Functions.cleanWord(srcTaxonomy) and Functions.cleanWord(left.TaxonomyCode) <> '',true,skip)));
+			recs := project(results.Taxonomy, transform(Healthcare_Header_Services.layouts.Verifications, self.TaxonomyVerified := if(Healthcare_Header_Services.Functions.cleanWord(left.TaxonomyCode) = Healthcare_Header_Services.Functions.cleanWord(srcTaxonomy) and Healthcare_Header_Services.Functions.cleanWord(left.TaxonomyCode) <> '',true,skip)));
+			nppesRec := NORMALIZE(results.NPIRaw,left.ProviderTaxonomies,transform(Healthcare_Header_Services.layouts.layout_taxonomy,self.acctno:='1';self.ProviderID:=(unsigned6)left.NPIInformation.NPINumber,self.TaxonomyCode:=right.SelectedTaxonomyCode;self.PrimaryIndicator:=right.PrimaryTaxonomy,self:=[]));
+			recs2 := project(nppesRec, transform(Healthcare_Header_Services.layouts.Verifications, self.TaxonomyVerified := if(Healthcare_Header_Services.Functions.cleanWord(left.TaxonomyCode) = Healthcare_Header_Services.Functions.cleanWord(srcTaxonomy) and Healthcare_Header_Services.Functions.cleanWord(left.TaxonomyCode) <> '',true,skip)));
 			return hasTaxonomy and (exists(recs) or exists(recs2));
 		end;
-		export ABMSSpecialtyValid(layouts.CombinedHeaderResultsDoxieLayout results, string srcSpecialty) := Function 
+		export ABMSSpecialtyValid(Healthcare_Header_Services.layouts.CombinedHeaderResultsDoxieLayout results, string srcSpecialty) := Function 
 			hasSpecialty := srcSpecialty <> '';
 			recs := project(results.abmsRaw[1].Certifications(CertificateType <> 'S'), 
-								transform(layouts.Verifications, self.BoardCertifiedSpecialtyVerified := if(Functions.cleanWord(left.CertificateName) = Functions.cleanWord(srcSpecialty) and 
-																																													 Functions.cleanWord(left.CertificateName) <> '' and 
+								transform(Healthcare_Header_Services.layouts.Verifications, self.BoardCertifiedSpecialtyVerified := if(Healthcare_Header_Services.Functions.cleanWord(left.CertificateName) = Healthcare_Header_Services.Functions.cleanWord(srcSpecialty) and 
+																																													 Healthcare_Header_Services.Functions.cleanWord(left.CertificateName) <> '' and 
 																																													 (trim(left.DurationType) = 'L' or 
 																																														trim(left.DurationType) = 'M' or 
 																																														trim(iesp.ecl2esp.DateToString(left.ExpireDate),all)>=trim(currentDate,all) or 
 																																														trim(iesp.ecl2esp.DateToString(left.ReverificationDate),all)>=trim(currentDate,all)),true,skip)));
 			return hasSpecialty and exists(recs);
 		end;
-		export ABMSSpecialtyVerified(layouts.CombinedHeaderResultsDoxieLayout results, string srcSpecialty) := Function 
+		export ABMSSpecialtyVerified(Healthcare_Header_Services.layouts.CombinedHeaderResultsDoxieLayout results, string srcSpecialty) := Function 
 			hasSpecialty := srcSpecialty <> '';
-			recs := project(results.abmsRaw[1].Certifications(CertificateType <> 'S'), transform(layouts.Verifications, self.BoardCertifiedSpecialtyVerified := if(Functions.cleanWord(left.CertificateName) = Functions.cleanWord(srcSpecialty) and Functions.cleanWord(left.CertificateName) <> '',true,skip)));
+			recs := project(results.abmsRaw[1].Certifications(CertificateType <> 'S'), transform(Healthcare_Header_Services.layouts.Verifications, self.BoardCertifiedSpecialtyVerified := if(Healthcare_Header_Services.Functions.cleanWord(left.CertificateName) = Healthcare_Header_Services.Functions.cleanWord(srcSpecialty) and Healthcare_Header_Services.Functions.cleanWord(left.CertificateName) <> '',true,skip)));
 			return hasSpecialty and exists(recs);
 		end;
-		export ABMSSubSpecialtyValid(layouts.CombinedHeaderResultsDoxieLayout results, string srcSubSpecialty) := Function 
+		export ABMSSubSpecialtyValid(Healthcare_Header_Services.layouts.CombinedHeaderResultsDoxieLayout results, string srcSubSpecialty) := Function 
 			hasSubSpecialty := srcSubSpecialty <> '';
 			recs := project(results.abmsRaw[1].Certifications(CertificateType = 'S'), 
-								transform(layouts.Verifications, self.BoardCertifiedSubSpecialtyVerified := if(Functions.cleanWord(left.CertificateName) = Functions.cleanWord(srcSubSpecialty) and 
-																																														 Functions.cleanWord(left.CertificateName) <> '' and 
+								transform(Healthcare_Header_Services.layouts.Verifications, self.BoardCertifiedSubSpecialtyVerified := if(Healthcare_Header_Services.Functions.cleanWord(left.CertificateName) = Healthcare_Header_Services.Functions.cleanWord(srcSubSpecialty) and 
+																																														 Healthcare_Header_Services.Functions.cleanWord(left.CertificateName) <> '' and 
 																																														 (trim(left.DurationType) = 'L' or 
 																																															trim(left.DurationType) = 'M' or 
 																																															trim(iesp.ecl2esp.DateToString(left.ExpireDate),all)>=trim(currentDate,all) or 
 																																															trim(iesp.ecl2esp.DateToString(left.ReverificationDate),all)>=trim(currentDate,all)),true,skip)));
 			return hasSubSpecialty and exists(recs);
 		end;
-		export ABMSSubSpecialtyVerified(layouts.CombinedHeaderResultsDoxieLayout results, string srcSubSpecialty) := Function 
+		export ABMSSubSpecialtyVerified(Healthcare_Header_Services.layouts.CombinedHeaderResultsDoxieLayout results, string srcSubSpecialty) := Function 
 			hasSubSpecialty := srcSubSpecialty <> '';
-			recs := project(results.abmsRaw[1].Certifications(CertificateType = 'S'), transform(layouts.Verifications, self.BoardCertifiedSubSpecialtyVerified := if(Functions.cleanWord(left.CertificateName) = Functions.cleanWord(srcSubSpecialty) and Functions.cleanWord(left.CertificateName) <> '',true,skip)));
+			recs := project(results.abmsRaw[1].Certifications(CertificateType = 'S'), transform(Healthcare_Header_Services.layouts.Verifications, self.BoardCertifiedSubSpecialtyVerified := if(Healthcare_Header_Services.Functions.cleanWord(left.CertificateName) = Healthcare_Header_Services.Functions.cleanWord(srcSubSpecialty) and Healthcare_Header_Services.Functions.cleanWord(left.CertificateName) <> '',true,skip)));
 			return hasSubSpecialty and exists(recs);
 		end;
-		export isAliveNoSanc(layouts.CombinedHeaderResultsDoxieLayout results) := Function 
+		export isAliveNoSanc(Healthcare_Header_Services.layouts.CombinedHeaderResultsDoxieLayout results) := Function 
 			//If Death false and Sanctions do not exist we are good.
 			isDead := results.DeathLookup or results.DateofDeath <> '';
 			hasSanctions := exists(results.Sanctions);
 			return if(isDead or hasSanctions,false,true);
 		end;
 
-		export layouts.CombinedHeaderResultsDoxieLayout processVerifications(layouts.CombinedHeaderResultsDoxieLayout results, layouts.autokeyInput src, dataset(Layouts.common_runtime_config) cfg) := Transform 
-			rec_out := layouts.Verifications;
+		export Healthcare_Header_Services.layouts.CombinedHeaderResultsDoxieLayout processVerifications(Healthcare_Header_Services.layouts.CombinedHeaderResultsDoxieLayout results, Healthcare_Header_Services.layouts.autokeyInput src, dataset(Healthcare_Header_Services.layouts.common_runtime_config) cfg) := Transform 
+			rec_out := Healthcare_Header_Services.layouts.Verifications;
 			rec_out setinput():=transform
 				self.Acctno := src.acctno;
 				self.VerificationConfiguration := src.OneStepRule;
@@ -419,38 +419,38 @@ export Functions_Validation := Module
 				self.DEAVerified := DEAVerified(results,src);
 				self.DEA2Verified := DEA2Verified(results,src);
 				self.NCPDPNumberVerified := NCPDPNumberVerified(results,src);
-				licRecs1 := Sort(project(results.StateLicenses, transform(layouts.layout_LicenseValidation, 
+				licRecs1 := Sort(project(results.StateLicenses, transform(Healthcare_Header_Services.layouts.layout_LicenseValidation, 
 																									self.licenseSeq := left.licenseSeq;
 																									self.origLicenseState := left.LicenseState;
-																									self.cleanLicenseState := Functions.cleanWord(left.LicenseState);
+																									self.cleanLicenseState := Healthcare_Header_Services.Functions.cleanWord(left.LicenseState);
 																									self.origLicenseNum := left.LicenseNumber;
-																									self.cleanLicenseNum := Functions.cleanWord(left.LicenseNumber);
-																									self.cleanIntLicenseNum := (integer)Functions.cleanOnlyNumbers(left.LicenseNumber);
+																									self.cleanLicenseNum := Healthcare_Header_Services.Functions.cleanWord(left.LicenseNumber);
+																									self.cleanIntLicenseNum := (integer)Healthcare_Header_Services.Functions.cleanOnlyNumbers(left.LicenseNumber);
 																									self.LicenseValid := false;
 																									self.LicenseStateValid := false;
 																									self.TerminationDate := left.Termination_Date;
 																									self.TerminationDateValid := trim(left.Termination_Date,all)>=trim(currentDate,all))),record);
-				licRecs2 := Sort(project(results.StateLicenses, transform(layouts.layout_LicenseValidation, 
+				licRecs2 := Sort(project(results.StateLicenses, transform(Healthcare_Header_Services.layouts.layout_LicenseValidation, 
 																									self.licenseSeq := left.licenseSeq;
 																									self.origLicenseState := left.LicenseState;
-																									self.cleanLicenseState := Functions.cleanWord(left.LicenseState);
+																									self.cleanLicenseState := Healthcare_Header_Services.Functions.cleanWord(left.LicenseState);
 																									self.origLicenseNum := if(left.LicenseType<>'',trim(left.LicenseType,left,right)+'.','')+left.LicenseNumberFmt;
-																									self.cleanLicenseNum := Functions.cleanWord(if(left.LicenseType<>'',trim(left.LicenseType,left,right)+'.','')+left.LicenseNumberFmt);
-																									self.cleanIntLicenseNum := (integer)Functions.cleanOnlyNumbers(if(left.LicenseType<>'',trim(left.LicenseType,left,right)+'.','')+left.LicenseNumberFmt);
+																									self.cleanLicenseNum := Healthcare_Header_Services.Functions.cleanWord(if(left.LicenseType<>'',trim(left.LicenseType,left,right)+'.','')+left.LicenseNumberFmt);
+																									self.cleanIntLicenseNum := (integer)Healthcare_Header_Services.Functions.cleanOnlyNumbers(if(left.LicenseType<>'',trim(left.LicenseType,left,right)+'.','')+left.LicenseNumberFmt);
 																									self.LicenseValid := false;
 																									self.LicenseStateValid := false;
 																									self.TerminationDate := left.Termination_Date;
 																									self.TerminationDateValid := trim(left.Termination_Date,all)>=trim(currentDate,all))),record);
 				licRecs := licRecs1+licRecs2;
-				customerlicRecs := Sort(project(results.customerLicense, transform(layouts.layout_LicenseValidation, 
+				customerlicRecs := Sort(project(results.customerLicense, transform(Healthcare_Header_Services.layouts.layout_LicenseValidation, 
 																									stateDefault := map(trim(left.CustomerDataSrc,left,right) = '1535116' => 'MI',
 																																			'');
 																									self.licenseSeq := 0;
 																									self.origLicenseState := stateDefault;
 																									self.cleanLicenseState := stateDefault;
 																									self.origLicenseNum := left.LicenseNumber;
-																									self.cleanLicenseNum := Functions.cleanWord(left.LicenseNumber);
-																									self.cleanIntLicenseNum := (integer)Functions.cleanOnlyNumbers(left.LicenseNumber);
+																									self.cleanLicenseNum := Healthcare_Header_Services.Functions.cleanWord(left.LicenseNumber);
+																									self.cleanIntLicenseNum := (integer)Healthcare_Header_Services.Functions.cleanOnlyNumbers(left.LicenseNumber);
 																									self.LicenseValid := false;
 																									self.LicenseStateValid := false;
 																									self.TerminationDate := iesp.ECL2ESP.t_DateToString8(left.ExpirationDate);
@@ -584,8 +584,9 @@ export Functions_Validation := Module
 			end;
 			validation_ds:=dataset([setinput()]);
 			OneStepValidation := Functions_OneStepPass.compareResults2Configuration(stringlib.StringToUpperCase(src.OneStepRule),validation_ds);
-			self.VerificationInfo := OneStepValidation;
-			addInputSSN := if(OneStepValidation[1].SSNVerified,dataset([{src.ssn}],Layouts.layout_ssn),dataset([{''}],Layouts.layout_ssn)); 
+			alreadyDone:=results.src=Healthcare_Header_Services.constants.SRC_SOAP_HCP;
+			self.VerificationInfo := if(alreadyDone,results.VerificationInfo,OneStepValidation);
+			addInputSSN := if(OneStepValidation[1].SSNVerified,dataset([{src.ssn}],Healthcare_Header_Services.layouts.layout_ssn),dataset([{''}],Healthcare_Header_Services.layouts.layout_ssn)); 
 			ssnInfo := dedup(results.ssns+addInputSSN,record,all)(SSN<>'');
 			ssnLookupInfo := results.SSNLookups;
 			suppressionType := if(cfg[1].glb_ok,'NONE','LAST4');
