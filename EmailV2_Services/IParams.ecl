@@ -102,16 +102,21 @@ EXPORT IParams := MODULE
 
       EXPORT UNSIGNED1 EmailQualityRulesMask := IF(in_optns.EmailQualityRulesMask != '', GetEmailRulesMask(in_optns.EmailQualityRulesMask), 0);
       EXPORT BOOLEAN isDirectMarketing () := in_optns.IsMarketingUse OR mod_access.isDirectMarketing ();
-      SHARED STRING _SearchTier := IF($.Constants.isValidTier(in_optns.SearchTier), in_optns.SearchTier,'');
+      EXPORT STRING SearchTier := IF($.Constants.isValidTier(in_optns.SearchTier), in_optns.SearchTier,'');
 
       EXPORT STRING   _RestrictedUseCase := in_optns.RestrictedUseCase;
       EXPORT STRING   RestrictedUseCase := MAP (EmailV2_Services.Constants.RestrictedUseCase.isValid(_RestrictedUseCase) => _RestrictedUseCase,
-                                               EmailV2_Services.Constants.isPremium(_SearchTier)=>EmailV2_Services.Constants.RestrictedUseCase.Standard,
+                                               EmailV2_Services.Constants.isPremium(SearchTier)=>EmailV2_Services.Constants.RestrictedUseCase.Standard,
                                                EmailV2_Services.Constants.RestrictedUseCase.NoRoyaltySources);
       EXPORT STRING   BVAPIkey := IF(in_optns.BVAPIkey != '', in_optns.BVAPIkey, EmailV2_Services.Constants.GatewayValues.BVAPIkey);;
       EXPORT UNSIGNED MaxEmailsForDeliveryCheck := IF(in_optns.MaxEmailsForDeliveryCheck > 0, in_optns.MaxEmailsForDeliveryCheck, EmailV2_Services.Constants.Defaults.MaxEmailsToCheckDeliverable);
       BOOLEAN  _CheckEmailDeliverable := in_optns.CheckEmailDeliverable;
-      EXPORT BOOLEAN  CheckEmailDeliverable := EmailV2_Services.Constants.isPremium(_SearchTier) OR _CheckEmailDeliverable;
+      EXPORT BOOLEAN  CheckEmailDeliverable := EmailV2_Services.Constants.isPremium(SearchTier) OR _CheckEmailDeliverable;
+      STRING _EmailValidationType := in_optns.EmailValidationType;
+      EXPORT STRING EmailValidationType := MAP(
+        $.Constants.EmailValidationType.isValidType(_EmailValidationType) => _EmailValidationType,
+        CheckEmailDeliverable => EmailV2_Services.Constants.EmailValidationType.BriteVerify,
+        '');
       EXPORT BOOLEAN  KeepUndeliverableEmail := in_optns.KeepUndeliverableEmail;
       BOOLEAN  SkipTMXcheck := in_optns.SkipTMX OR EmailV2_Services.Constants.SearchType.isEIA(SearchType)
                                       OR EmailV2_Services.Constants.SearchType.isEIC(SearchType); // we never suppress email records for EIC/EIA searches and we are not returning TMX data otherwise
