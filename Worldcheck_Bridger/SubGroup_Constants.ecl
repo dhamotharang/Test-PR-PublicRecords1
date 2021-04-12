@@ -1320,6 +1320,9 @@
 		export string KEYWORD_UKHMT_NDS							:= '1002';
 		export string KEYWORD_SLGAZ_NAT							:= '1003';
 		export string KEYWORD_BYKGB									:= '1004';
+		export string KEYWORD_SECO_TB								:= '1005';
+		export string KEYWORD_ECPN_MW								:= '1006';
+		export string KEYWORD_DOPN_MW								:= '1007';
 		
 		//When setting the keyword export use underscores for dashes (ex: For RBI-SANC, use RBI_SANC)	
 	end;

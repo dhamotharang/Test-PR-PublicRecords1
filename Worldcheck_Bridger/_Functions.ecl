@@ -1421,6 +1421,9 @@
 				trim(kword, left, right) = 'UKHMT-NDS' =>SubGroup_Constants.numKeywordsID.KEYWORD_UKHMT_NDS,
 				trim(kword, left, right) = 'SLGAZ-NAT' =>SubGroup_Constants.numKeywordsID.KEYWORD_SLGAZ_NAT,
 				trim(kword, left, right) = 'BYKGB' =>SubGroup_Constants.numKeywordsID.KEYWORD_BYKGB,
+				trim(kword, left, right) = 'SECO-TB' =>SubGroup_Constants.numKeywordsID.KEYWORD_SECO_TB,
+				trim(kword, left, right) = 'ECPN-MW' =>SubGroup_Constants.numKeywordsID.KEYWORD_ECPN_MW,
+				trim(kword, left, right) = 'DOPN-MW' =>SubGroup_Constants.numKeywordsID.KEYWORD_DOPN_MW,
 								
 				//When setting the keyword export use underscores for dashes (ex: For RBI-SANC, use RBI_SANC)	
 				
