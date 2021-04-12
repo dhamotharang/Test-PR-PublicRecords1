@@ -211,18 +211,17 @@ EXPORT _Search:=MODULE
     BIPV2_Company_Names.functions.mac_go(dFormatted,dCompany,uniqueid,company_name,,FALSE);
     dAugmented:=PROJECT(dCompany,TRANSFORM(BizLinkFull._Search.lInputAugmented,
       dAirportReplacement:=BIPV2.fn_translate_city(stringlib.StringToUpperCase(LEFT.city));
-			sTmpCity:=IF(LENGTH(TRIM(LEFT.city))=3,IF(COUNT(dAirportReplacement)=0,LEFT.city,dAirportReplacement[1]),LEFT.city);
-			sTmpState:=IF(LENGTH(TRIM(LEFT.city))=3,IF(COUNT(dAirportReplacement)=0,LEFT.st,dAirportReplacement[2]),LEFT.st);
-      dZips:=BIPV2.fn_get_zips_2(sTmpCity,sTmpState,TRIM(LEFT.zip_cases[1].zip),LEFT.zip_radius);
+      sTmpState:=IF(LENGTH(TRIM(LEFT.city))=3,IF(COUNT(dAirportReplacement)=0,LEFT.st,dAirportReplacement[2]),LEFT.st);
+      SELF.city:=IF(LENGTH(TRIM(LEFT.city))=3,IF(COUNT(dAirportReplacement)=0,LEFT.city,dAirportReplacement[1]),LEFT.city);
+      dZips:=BIPV2.fn_get_zips_2(SELF.city,sTmpState,TRIM(LEFT.zip_cases[1].zip),LEFT.zip_radius);
       Input_zip_radius:=LEFT.zip_radius;
       SELF.zip_cases:=MAP(
         ~bZipExtrapolate AND TRIM(LEFT.zip_cases[1].zip)='' => DATASET([],BizLinkFull.Process_Biz_Layouts.layout_zip_cases),
         ~bZipExtrapolate => DATASET([{TRIM(LEFT.zip_cases[1].zip),100}],BizLinkFull.Process_Biz_Layouts.layout_zip_cases),
         dZips[1].zip='' => DATASET([],BizLinkFull.Process_Biz_Layouts.layout_zip_cases),
-        PROJECT(dZips,TRANSFORM(BizLinkFull.Process_Biz_Layouts.layout_zip_cases,SELF.weight:=100-((LEFT.radius/Input_zip_radius)*80);SELF:=LEFT;))
+        PROJECT(dZips,TRANSFORM(BizLinkFull.Process_Biz_Layouts.layout_zip_cases,SELF.weight:=100-((LEFT.radius/Input_zip_radius)*50);SELF:=LEFT;))
       );
-      SELF.city:=IF(dZips[1].city='', LEFT.city, dZips[1].city);
-			SELF.st:=IF(dZips[1].state='', LEFT.st, dZips[1].state);
+      SELF.st:=dZips[1].state;
       SELF.company_name_prefix:=BizLinkFull.fn_company_name_prefix(LEFT.cnp_name);
       sPhone3:=IF(LENGTH(TRIM(LEFT.company_phone))=10,LEFT.company_phone[..3],'');
       SELF.company_phone_3:=IF(LEFT.allow7digitmatch,'',sPhone3);

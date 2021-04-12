@@ -1,19 +1,20 @@
-﻿IMPORT SALT44;
+IMPORT SALT44;
 EXPORT Fields := MODULE
- 
+
 EXPORT NumFields := 46;
- 
+
 // Processing for each FieldType
 EXPORT SALT44.StrType FieldTypeName(UNSIGNED2 i) := CHOOSE(i,'T_ALLCAPS','T_ALPHANUM','T_ALPHA','T_NUMBER','T_FEIN');
 EXPORT FieldTypeNum(SALT44.StrType fn) := CASE(fn,'T_ALLCAPS' => 1,'T_ALPHANUM' => 2,'T_ALPHA' => 3,'T_NUMBER' => 4,'T_FEIN' => 5,0);
- 
+
+
 EXPORT MakeFT_T_ALLCAPS(SALT44.StrType s0) := FUNCTION
   s1 := SALT44.stringtouppercase(s0); // Force to upper case
   RETURN  s1;
 END;
 EXPORT InValidFT_T_ALLCAPS(SALT44.StrType s) := WHICH(SALT44.stringtouppercase(s)<>s);
 EXPORT InValidMessageFT_T_ALLCAPS(UNSIGNED1 wh) := CHOOSE(wh,SALT44.HygieneErrors.NotCaps,SALT44.HygieneErrors.Good);
- 
+
 EXPORT MakeFT_T_ALPHANUM(SALT44.StrType s0) := FUNCTION
   s1 := SALT44.stringtouppercase(s0); // Force to upper case
   s2 := SALT44.stringfilter(s1,'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789 <>{}[]-^=!+&,./'); // Only allow valid symbols
@@ -22,7 +23,7 @@ EXPORT MakeFT_T_ALPHANUM(SALT44.StrType s0) := FUNCTION
 END;
 EXPORT InValidFT_T_ALPHANUM(SALT44.StrType s) := WHICH(SALT44.stringtouppercase(s)<>s,LENGTH(TRIM(s))<>LENGTH(TRIM(SALT44.StringFilter(s,'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789 <>{}[]-^=!+&,./'))));
 EXPORT InValidMessageFT_T_ALPHANUM(UNSIGNED1 wh) := CHOOSE(wh,SALT44.HygieneErrors.NotCaps,SALT44.HygieneErrors.NotInChars('ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789 <>{}[]-^=!+&,./'),SALT44.HygieneErrors.Good);
- 
+
 EXPORT MakeFT_T_ALPHA(SALT44.StrType s0) := FUNCTION
   s1 := SALT44.stringtouppercase(s0); // Force to upper case
   s2 := SALT44.stringfilter(s1,'ABCDEFGHIJKLMNOPQRSTUVWXYZ'); // Only allow valid symbols
@@ -30,213 +31,214 @@ EXPORT MakeFT_T_ALPHA(SALT44.StrType s0) := FUNCTION
 END;
 EXPORT InValidFT_T_ALPHA(SALT44.StrType s) := WHICH(SALT44.stringtouppercase(s)<>s,LENGTH(TRIM(s))<>LENGTH(TRIM(SALT44.StringFilter(s,'ABCDEFGHIJKLMNOPQRSTUVWXYZ'))));
 EXPORT InValidMessageFT_T_ALPHA(UNSIGNED1 wh) := CHOOSE(wh,SALT44.HygieneErrors.NotCaps,SALT44.HygieneErrors.NotInChars('ABCDEFGHIJKLMNOPQRSTUVWXYZ'),SALT44.HygieneErrors.Good);
- 
+
 EXPORT MakeFT_T_NUMBER(SALT44.StrType s0) := FUNCTION
   s1 := SALT44.stringfilter(s0,'0123456789'); // Only allow valid symbols
   RETURN  s1;
 END;
 EXPORT InValidFT_T_NUMBER(SALT44.StrType s) := WHICH(LENGTH(TRIM(s))<>LENGTH(TRIM(SALT44.StringFilter(s,'0123456789'))));
 EXPORT InValidMessageFT_T_NUMBER(UNSIGNED1 wh) := CHOOSE(wh,SALT44.HygieneErrors.NotInChars('0123456789'),SALT44.HygieneErrors.Good);
- 
+
 EXPORT MakeFT_T_FEIN(SALT44.StrType s0) := FUNCTION
   s1 := SALT44.stringfilter(s0,'0123456789'); // Only allow valid symbols
   RETURN  s1;
 END;
 EXPORT InValidFT_T_FEIN(SALT44.StrType s) := WHICH(LENGTH(TRIM(s))<>LENGTH(TRIM(SALT44.StringFilter(s,'0123456789'))),~(LENGTH(TRIM(s)) = 9));
 EXPORT InValidMessageFT_T_FEIN(UNSIGNED1 wh) := CHOOSE(wh,SALT44.HygieneErrors.NotInChars('0123456789'),SALT44.HygieneErrors.NotLength('9'),SALT44.HygieneErrors.Good);
- 
+
+
 EXPORT SALT44.StrType FieldName(UNSIGNED2 i) := CHOOSE(i,'parent_proxid','sele_proxid','org_proxid','ultimate_proxid','has_lgid','empid','source','source_record_id','source_docid','company_name','company_name_prefix','cnp_name','cnp_number','cnp_btype','cnp_lowv','company_phone','company_phone_3','company_phone_3_ex','company_phone_7','company_fein','company_sic_code1','active_duns_number','prim_range','prim_name','sec_range','city','city_clean','st','zip','company_url','isContact','contact_did','title','fname','fname_preferred','mname','lname','name_suffix','contact_ssn','contact_email','sele_flag','org_flag','ult_flag','fallback_value','CONTACTNAME','STREETADDRESS');
 EXPORT SALT44.StrType FlatName(UNSIGNED2 i) := CHOOSE(i,'parent_proxid','sele_proxid','org_proxid','ultimate_proxid','has_lgid','empid','source','source_record_id','source_docid','company_name','company_name_prefix','cnp_name','cnp_number','cnp_btype','cnp_lowv','company_phone','company_phone_3','company_phone_3_ex','company_phone_7','company_fein','company_sic_code1','active_duns_number','prim_range','prim_name','sec_range','city','city_clean','st','zip','company_url','isContact','contact_did','title','fname','fname_preferred','mname','lname','name_suffix','contact_ssn','contact_email','sele_flag','org_flag','ult_flag','fallback_value','CONTACTNAME','STREETADDRESS');
 EXPORT FieldNum(SALT44.StrType fn) := CASE(fn,'parent_proxid' => 0,'sele_proxid' => 1,'org_proxid' => 2,'ultimate_proxid' => 3,'has_lgid' => 4,'empid' => 5,'source' => 6,'source_record_id' => 7,'source_docid' => 8,'company_name' => 9,'company_name_prefix' => 10,'cnp_name' => 11,'cnp_number' => 12,'cnp_btype' => 13,'cnp_lowv' => 14,'company_phone' => 15,'company_phone_3' => 16,'company_phone_3_ex' => 17,'company_phone_7' => 18,'company_fein' => 19,'company_sic_code1' => 20,'active_duns_number' => 21,'prim_range' => 22,'prim_name' => 23,'sec_range' => 24,'city' => 25,'city_clean' => 26,'st' => 27,'zip' => 28,'company_url' => 29,'isContact' => 30,'contact_did' => 31,'title' => 32,'fname' => 33,'fname_preferred' => 34,'mname' => 35,'lname' => 36,'name_suffix' => 37,'contact_ssn' => 38,'contact_email' => 39,'sele_flag' => 40,'org_flag' => 41,'ult_flag' => 42,'fallback_value' => 43,'CONTACTNAME' => 44,'STREETADDRESS' => 45,0);
 EXPORT SET OF SALT44.StrType FieldRules(UNSIGNED2 i) := CHOOSE(i,[],[],[],[],[],[],[],[],[],['CAPS','ALLOW'],['CAPS','ALLOW'],['CAPS','ALLOW'],[],[],[],[],[],[],[],['ALLOW','LENGTHS'],[],[],[],['CAPS','ALLOW'],['CAPS','ALLOW'],['CAPS','ALLOW'],['CAPS','ALLOW'],['CAPS','ALLOW'],['ALLOW'],['CAPS','ALLOW'],[],[],[],['CAPS','ALLOW'],['CAPS','ALLOW'],['CAPS','ALLOW'],['CAPS','ALLOW'],['CAPS','ALLOW'],[],['CAPS'],[],[],[],[],[],[],[]);
 EXPORT BOOLEAN InBaseLayout(UNSIGNED2 i) := CHOOSE(i,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,FALSE,FALSE,FALSE);
- 
+
 //Individual field level validation
 EXPORT Make_parent_proxid(SALT44.StrType s0) := s0;
 EXPORT InValid_parent_proxid(SALT44.StrType s) := 0;
 EXPORT InValidMessage_parent_proxid(UNSIGNED1 wh) := '';
- 
+
 EXPORT Make_sele_proxid(SALT44.StrType s0) := s0;
 EXPORT InValid_sele_proxid(SALT44.StrType s) := 0;
 EXPORT InValidMessage_sele_proxid(UNSIGNED1 wh) := '';
- 
+
 EXPORT Make_org_proxid(SALT44.StrType s0) := s0;
 EXPORT InValid_org_proxid(SALT44.StrType s) := 0;
 EXPORT InValidMessage_org_proxid(UNSIGNED1 wh) := '';
- 
+
 EXPORT Make_ultimate_proxid(SALT44.StrType s0) := s0;
 EXPORT InValid_ultimate_proxid(SALT44.StrType s) := 0;
 EXPORT InValidMessage_ultimate_proxid(UNSIGNED1 wh) := '';
- 
+
 EXPORT Make_has_lgid(SALT44.StrType s0) := s0;
 EXPORT InValid_has_lgid(SALT44.StrType s) := 0;
 EXPORT InValidMessage_has_lgid(UNSIGNED1 wh) := '';
- 
+
 EXPORT Make_empid(SALT44.StrType s0) := s0;
 EXPORT InValid_empid(SALT44.StrType s) := 0;
 EXPORT InValidMessage_empid(UNSIGNED1 wh) := '';
- 
+
 EXPORT Make_source(SALT44.StrType s0) := s0;
 EXPORT InValid_source(SALT44.StrType s) := 0;
 EXPORT InValidMessage_source(UNSIGNED1 wh) := '';
- 
+
 EXPORT Make_source_record_id(SALT44.StrType s0) := s0;
 EXPORT InValid_source_record_id(SALT44.StrType s) := 0;
 EXPORT InValidMessage_source_record_id(UNSIGNED1 wh) := '';
- 
+
 EXPORT Make_source_docid(SALT44.StrType s0) := s0;
 EXPORT InValid_source_docid(SALT44.StrType s) := 0;
 EXPORT InValidMessage_source_docid(UNSIGNED1 wh) := '';
- 
+
 EXPORT Make_company_name(SALT44.StrType s0) := MakeFT_T_ALPHANUM(s0);
 EXPORT InValid_company_name(SALT44.StrType s) := InValidFT_T_ALPHANUM(s);
 EXPORT InValidMessage_company_name(UNSIGNED1 wh) := InValidMessageFT_T_ALPHANUM(wh);
- 
+
 EXPORT Make_company_name_prefix(SALT44.StrType s0) := MakeFT_T_ALPHANUM(s0);
 EXPORT InValid_company_name_prefix(SALT44.StrType s) := InValidFT_T_ALPHANUM(s);
 EXPORT InValidMessage_company_name_prefix(UNSIGNED1 wh) := InValidMessageFT_T_ALPHANUM(wh);
- 
+
 EXPORT Make_cnp_name(SALT44.StrType s0) := MakeFT_T_ALPHANUM(s0);
 EXPORT InValid_cnp_name(SALT44.StrType s) := InValidFT_T_ALPHANUM(s);
 EXPORT InValidMessage_cnp_name(UNSIGNED1 wh) := InValidMessageFT_T_ALPHANUM(wh);
- 
+
 EXPORT Make_cnp_number(SALT44.StrType s0) := s0;
 EXPORT InValid_cnp_number(SALT44.StrType s) := 0;
 EXPORT InValidMessage_cnp_number(UNSIGNED1 wh) := '';
- 
+
 EXPORT Make_cnp_btype(SALT44.StrType s0) := s0;
 EXPORT InValid_cnp_btype(SALT44.StrType s) := 0;
 EXPORT InValidMessage_cnp_btype(UNSIGNED1 wh) := '';
- 
+
 EXPORT Make_cnp_lowv(SALT44.StrType s0) := s0;
 EXPORT InValid_cnp_lowv(SALT44.StrType s) := 0;
 EXPORT InValidMessage_cnp_lowv(UNSIGNED1 wh) := '';
- 
+
 EXPORT Make_company_phone(SALT44.StrType s0) := s0;
 EXPORT InValid_company_phone(SALT44.StrType s) := 0;
 EXPORT InValidMessage_company_phone(UNSIGNED1 wh) := '';
- 
+
 EXPORT Make_company_phone_3(SALT44.StrType s0) := s0;
 EXPORT InValid_company_phone_3(SALT44.StrType s) := 0;
 EXPORT InValidMessage_company_phone_3(UNSIGNED1 wh) := '';
- 
+
 EXPORT Make_company_phone_3_ex(SALT44.StrType s0) := s0;
 EXPORT InValid_company_phone_3_ex(SALT44.StrType s) := 0;
 EXPORT InValidMessage_company_phone_3_ex(UNSIGNED1 wh) := '';
- 
+
 EXPORT Make_company_phone_7(SALT44.StrType s0) := s0;
 EXPORT InValid_company_phone_7(SALT44.StrType s) := 0;
 EXPORT InValidMessage_company_phone_7(UNSIGNED1 wh) := '';
- 
+
 EXPORT Make_company_fein(SALT44.StrType s0) := MakeFT_T_FEIN(s0);
 EXPORT InValid_company_fein(SALT44.StrType s) := InValidFT_T_FEIN(s);
 EXPORT InValidMessage_company_fein(UNSIGNED1 wh) := InValidMessageFT_T_FEIN(wh);
- 
+
 EXPORT Make_company_sic_code1(SALT44.StrType s0) := s0;
 EXPORT InValid_company_sic_code1(SALT44.StrType s) := 0;
 EXPORT InValidMessage_company_sic_code1(UNSIGNED1 wh) := '';
- 
+
 EXPORT Make_active_duns_number(SALT44.StrType s0) := s0;
 EXPORT InValid_active_duns_number(SALT44.StrType s) := 0;
 EXPORT InValidMessage_active_duns_number(UNSIGNED1 wh) := '';
- 
+
 EXPORT Make_prim_range(SALT44.StrType s0) := s0;
 EXPORT InValid_prim_range(SALT44.StrType s) := 0;
 EXPORT InValidMessage_prim_range(UNSIGNED1 wh) := '';
- 
+
 EXPORT Make_prim_name(SALT44.StrType s0) := MakeFT_T_ALPHANUM(s0);
 EXPORT InValid_prim_name(SALT44.StrType s) := InValidFT_T_ALPHANUM(s);
 EXPORT InValidMessage_prim_name(UNSIGNED1 wh) := InValidMessageFT_T_ALPHANUM(wh);
- 
+
 EXPORT Make_sec_range(SALT44.StrType s0) := MakeFT_T_ALPHANUM(s0);
 EXPORT InValid_sec_range(SALT44.StrType s) := InValidFT_T_ALPHANUM(s);
 EXPORT InValidMessage_sec_range(UNSIGNED1 wh) := InValidMessageFT_T_ALPHANUM(wh);
- 
+
 EXPORT Make_city(SALT44.StrType s0) := MakeFT_T_ALPHANUM(s0);
 EXPORT InValid_city(SALT44.StrType s) := InValidFT_T_ALPHANUM(s);
 EXPORT InValidMessage_city(UNSIGNED1 wh) := InValidMessageFT_T_ALPHANUM(wh);
- 
+
 EXPORT Make_city_clean(SALT44.StrType s0) := MakeFT_T_ALPHANUM(s0);
 EXPORT InValid_city_clean(SALT44.StrType s) := InValidFT_T_ALPHANUM(s);
 EXPORT InValidMessage_city_clean(UNSIGNED1 wh) := InValidMessageFT_T_ALPHANUM(wh);
- 
+
 EXPORT Make_st(SALT44.StrType s0) := MakeFT_T_ALPHA(s0);
 EXPORT InValid_st(SALT44.StrType s) := InValidFT_T_ALPHA(s);
 EXPORT InValidMessage_st(UNSIGNED1 wh) := InValidMessageFT_T_ALPHA(wh);
- 
+
 EXPORT Make_zip(SALT44.StrType s0) := MakeFT_T_NUMBER(s0);
 EXPORT InValid_zip(SALT44.StrType s) := InValidFT_T_NUMBER(s);
 EXPORT InValidMessage_zip(UNSIGNED1 wh) := InValidMessageFT_T_NUMBER(wh);
- 
+
 EXPORT Make_company_url(SALT44.StrType s0) := MakeFT_T_ALPHANUM(s0);
 EXPORT InValid_company_url(SALT44.StrType s) := InValidFT_T_ALPHANUM(s);
 EXPORT InValidMessage_company_url(UNSIGNED1 wh) := InValidMessageFT_T_ALPHANUM(wh);
- 
+
 EXPORT Make_isContact(SALT44.StrType s0) := s0;
 EXPORT InValid_isContact(SALT44.StrType s) := 0;
 EXPORT InValidMessage_isContact(UNSIGNED1 wh) := '';
- 
+
 EXPORT Make_contact_did(SALT44.StrType s0) := s0;
 EXPORT InValid_contact_did(SALT44.StrType s) := 0;
 EXPORT InValidMessage_contact_did(UNSIGNED1 wh) := '';
- 
+
 EXPORT Make_title(SALT44.StrType s0) := s0;
 EXPORT InValid_title(SALT44.StrType s) := 0;
 EXPORT InValidMessage_title(UNSIGNED1 wh) := '';
- 
+
 EXPORT Make_fname(SALT44.StrType s0) := MakeFT_T_ALPHANUM(s0);
 EXPORT InValid_fname(SALT44.StrType s) := InValidFT_T_ALPHANUM(s);
 EXPORT InValidMessage_fname(UNSIGNED1 wh) := InValidMessageFT_T_ALPHANUM(wh);
- 
+
 EXPORT Make_fname_preferred(SALT44.StrType s0) := MakeFT_T_ALPHANUM(s0);
 EXPORT InValid_fname_preferred(SALT44.StrType s) := InValidFT_T_ALPHANUM(s);
 EXPORT InValidMessage_fname_preferred(UNSIGNED1 wh) := InValidMessageFT_T_ALPHANUM(wh);
- 
+
 EXPORT Make_mname(SALT44.StrType s0) := MakeFT_T_ALPHANUM(s0);
 EXPORT InValid_mname(SALT44.StrType s) := InValidFT_T_ALPHANUM(s);
 EXPORT InValidMessage_mname(UNSIGNED1 wh) := InValidMessageFT_T_ALPHANUM(wh);
- 
+
 EXPORT Make_lname(SALT44.StrType s0) := MakeFT_T_ALPHANUM(s0);
 EXPORT InValid_lname(SALT44.StrType s) := InValidFT_T_ALPHANUM(s);
 EXPORT InValidMessage_lname(UNSIGNED1 wh) := InValidMessageFT_T_ALPHANUM(wh);
- 
+
 EXPORT Make_name_suffix(SALT44.StrType s0) := MakeFT_T_ALPHANUM(s0);
 EXPORT InValid_name_suffix(SALT44.StrType s) := InValidFT_T_ALPHANUM(s);
 EXPORT InValidMessage_name_suffix(UNSIGNED1 wh) := InValidMessageFT_T_ALPHANUM(wh);
- 
+
 EXPORT Make_contact_ssn(SALT44.StrType s0) := s0;
 EXPORT InValid_contact_ssn(SALT44.StrType s) := 0;
 EXPORT InValidMessage_contact_ssn(UNSIGNED1 wh) := '';
- 
+
 EXPORT Make_contact_email(SALT44.StrType s0) := MakeFT_T_ALLCAPS(s0);
 EXPORT InValid_contact_email(SALT44.StrType s) := InValidFT_T_ALLCAPS(s);
 EXPORT InValidMessage_contact_email(UNSIGNED1 wh) := InValidMessageFT_T_ALLCAPS(wh);
- 
+
 EXPORT Make_sele_flag(SALT44.StrType s0) := s0;
 EXPORT InValid_sele_flag(SALT44.StrType s) := 0;
 EXPORT InValidMessage_sele_flag(UNSIGNED1 wh) := '';
- 
+
 EXPORT Make_org_flag(SALT44.StrType s0) := s0;
 EXPORT InValid_org_flag(SALT44.StrType s) := 0;
 EXPORT InValidMessage_org_flag(UNSIGNED1 wh) := '';
- 
+
 EXPORT Make_ult_flag(SALT44.StrType s0) := s0;
 EXPORT InValid_ult_flag(SALT44.StrType s) := 0;
 EXPORT InValidMessage_ult_flag(UNSIGNED1 wh) := '';
- 
+
 EXPORT Make_fallback_value(SALT44.StrType s0) := s0;
 EXPORT InValid_fallback_value(SALT44.StrType s) := 0;
 EXPORT InValidMessage_fallback_value(UNSIGNED1 wh) := '';
- 
+
 EXPORT Make_CONTACTNAME(SALT44.StrType s0) := s0;
 EXPORT InValid_CONTACTNAME(SALT44.StrType fname,SALT44.StrType mname,SALT44.StrType lname) := WHICH(InValid_fname(fname)>0,InValid_mname(mname)>0,InValid_lname(lname)>0);
- 
+
 EXPORT InValidMessage_CONTACTNAME(UNSIGNED1 wh) := '';
 EXPORT Make_STREETADDRESS(SALT44.StrType s0) := s0;
 EXPORT InValid_STREETADDRESS(SALT44.StrType prim_range,SALT44.StrType prim_name,SALT44.StrType sec_range) := WHICH(InValid_prim_range(prim_range)>0,InValid_prim_name(prim_name)>0,InValid_sec_range(sec_range)>0);
- 
+
 EXPORT InValidMessage_STREETADDRESS(UNSIGNED1 wh) := '';
- 
+
 // This macro will compute and count field level differences based upon a pivot expression
 export MAC_CountDifferencesByPivot(in_left,in_right,pivot_exp,bad_pivots,out_counts) := MACRO
   IMPORT SALT44,BizLinkFull;
@@ -409,7 +411,7 @@ Bad_Pivots := %t2%(Cnt>100);
     Count_Diff_org_flag := COUNT(GROUP,%Closest%.Diff_org_flag);
     Count_Diff_ult_flag := COUNT(GROUP,%Closest%.Diff_ult_flag);
     Count_Diff_fallback_value := COUNT(GROUP,%Closest%.Diff_fallback_value);
- 
+
   END;
   out_counts := table(%Closest%,%AggRec%,true);
 ENDMACRO;
@@ -449,7 +451,7 @@ EXPORT UIDConsistency(infile) := FUNCTIONMACRO
     EXPORT orgid_Unbased := JOIN(f(orgid<>0),bases,LEFT.orgid=RIGHT.orgid,TRANSFORM(LEFT),LEFT ONLY,HASH);
     bases := f((UNSIGNED)ultid=(UNSIGNED)rcid); // Get the bases
     EXPORT ultid_Unbased := JOIN(f(ultid<>0),bases,LEFT.ultid=RIGHT.ultid,TRANSFORM(LEFT),LEFT ONLY,HASH);
- 
+
     // Children with two parents
     f_thin := TABLE(f(rcid<>0,proxid<>0),{rcid,proxid},rcid,proxid,MERGE);
     EXPORT rcid_Twoparents := DEDUP(JOIN(f_thin,f_thin,LEFT.rcid=RIGHT.rcid AND LEFT.proxid>RIGHT.proxid,TRANSFORM({SALT44.UIDType proxid1,SALT44.UIDType rcid,SALT44.UIDType proxid2},SELF.proxid1:=LEFT.proxid,SELF.proxid2:=RIGHT.proxid,SELF.rcid:=LEFT.rcid),HASH),WHOLE RECORD,ALL);
