@@ -996,8 +996,6 @@ end;
 						SELF := LEFT,
 						SELF := []));		
 	
-	output(Business_Contact_LexIDs);
-	count(Business_Contact_LexIDs);
 	
 	RETURN (With_ConsumerStatementFlags+With_Header_Addr_Hist_Records_6threp);
 	
