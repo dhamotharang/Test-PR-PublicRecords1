@@ -23,9 +23,11 @@ function
 	submit_stats := Scrubs.ScrubsPlus_PassFile(file_to_scrub_t,'ADVO','ADVO','Scrubs_ADVO','',pversion,emailList,false);
 
   //append bitmap to base
-  dbuildbase := dataset('~thor_data::Scrubs_ADVO::Scrubs_Bits',Advo.Layouts.Layout_Common_Out,thor);
-	VersionControl.macBuildNewLogicalFile(filenames(pversion).base.new,dbuildbase,BuildAdvoBase	,pShouldExport := false);
-	// BuildAdvoBase:=output(dbuildbase,,'~thor_data400::base::ADVO::ScrubsTest::20170215',thor,overwrite);
+ // dbuildbase := dataset('~thor_data::Scrubs_ADVO::Scrubs_Bits',Advo.Layouts.Layout_Common_Out,thor);
+ //JIRA:DF-29165 -- Temp fix untill  this is included in platform upgrade.
+dbuildbase := dataset ( '~thor_data::Scrubs_ADVO::Scrubs_Bits',Advo.Scrubs. Bitmap_Layout,thor);
+SwitchLayout:=project(dbuildbase,transform(advo.layouts.layout_common_out,self:=left;));
+VersionControl.macBuildNewLogicalFile(Advo.filenames('20210405').base.new,  SwitchLayout,    BuildAdvoBase ,pShouldExport		:= false);	// BuildAdvoBase:=output(dbuildbase,,'~thor_data400::base::ADVO::ScrubsTest::20170215',thor,overwrite);
 //*****************************************************************************************************	
 
   // DF-21511 Show counts of blanked out fields in thor_data400::key::avm_v2::fcra::@version@::address
