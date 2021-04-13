@@ -1,4 +1,5 @@
-﻿
+﻿#WORKUNIT('name', 'NAC2 Contributory File Scheduler');
+#WORKUNIT('protect',true);
 
 IMPORT _Control, STD;
 
@@ -52,10 +53,8 @@ x := PROJECT(dOKFiles, TRANSFORM(r2,
 					));
 
 version := (string8)Std.Date.Today() : INDEPENDENT;
-#WORKUNIT('protect',true);
 
 // NOTE: System time is standard time + 5; therefore, Sunday at 10 PM is actually Monday 3 AM
-#WORKUNIT('name', 'NAC2 NCF2 Contributory File Scheduler');
 ThorName := 'thor400_44_sla_eclcc';		// for prod
 
 lECL1 :=
@@ -63,7 +62,13 @@ envVars
 +'nac_v2.ProcessContributoryFile(\'' + ip + '\',\''+ x[1].dataDir+'\',\''+ x[1].lfn+'\',\''+ opsdir + '\',\''+ version+'\');\n';
 every_10_min := '*/10 0-23 * * *';
 
+NOC_MSG := '** NOC **\n\n';
+
 IF(EXISTS(x), EVALUATE(
 		_Control.fSubmitNewWorkunit(lECL1, ThorName)
-		)) : WHEN(CRON(every_10_min));
+		)) : WHEN(CRON(every_10_min))
+	,FAILURE(STD.System.Email.SendEmail('nacprojectsupport@lnssi.com,,ris-glonoc@risk.lexisnexisrisk.com'
+																			,'NAC2 Contributory File Scheduler failure'
+																			,NOC_MSG)
+															);
 
