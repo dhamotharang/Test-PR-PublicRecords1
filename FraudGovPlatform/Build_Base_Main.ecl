@@ -25,8 +25,6 @@ module
 		self.dt_last_seen := left.Process_Date;
 		self.dt_vendor_last_reported := left.FileDate;
 		self.dt_vendor_first_reported := left.FileDate;
-		SELF.start_date := STD.Str.FindReplace( STD.Str.FindReplace( left.start_date,':',''),'/','')[1..8] ; 
-		SELF.end_date := STD.Str.FindReplace( STD.Str.FindReplace( left.end_date,':',''),'/','')[1..8] ;
 		self:= left; 
 		self:= [];
 	)); 
