@@ -67,7 +67,7 @@ NOC_MSG := '** NOC **\n\n';
 IF(exists(x), EVALUATE(
 		_Control.fSubmitNewWorkunit(lECL1, ThorName)
 		)) : WHEN(CRON(every_10_min))
-	,FAILURE(STD.System.Email.SendEmail('nacprojectsupport@lnssi.com,,ris-glonoc@risk.lexisnexisrisk.com'
+	,FAILURE(STD.System.Email.SendEmail('nacprojectsupport@lnssi.com,ris-glonoc@risk.lexisnexisrisk.com'
 																			,'NAC2 Contributory File Scheduler failure'
 																			,NOC_MSG)
 															);
