@@ -35,12 +35,12 @@ update_version := RoxieKeyBuild.updateversion(dops_fcrapkg_wdog,filedate,'Sudhir
 create_build := Orbit3.proc_Orbit3_CreateBuild('FCRA Watchdog',filedate,env_flag);
 
 //keydiff fcra
-keydiff_fcra :=  Watchdog.fGetIndexAttributes (dops_fcrapkg_wdog,'B',env_flag);
+//keydiff_fcra :=  Watchdog.fGetIndexAttributes (dops_fcrapkg_wdog,'B',env_flag);
 
 
 EXPORT Proc_build_FCRA_keys := sequential(parallel(FCRA_nonEN_key,FCRA_nonEQ_key),
                                           parallel(mv_FCRA_nonEN,mv_FCRA_nonEQ),
 																					parallel(mv_FCRA_nonEN_qa,mv_FCRA_nonEQ_qa),
-																					update_version,create_build,keydiff_fcra): 
+																					update_version,create_build/*,keydiff_fcra*/): 
 			                                        success(email_success),
 			                                         failure(email_failure); 
