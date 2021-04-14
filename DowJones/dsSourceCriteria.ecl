@@ -1994,7 +1994,32 @@ EXPORT dsSourceCriteria := DATASET([
 {'EC (CFSP) 2021/258 Zimbabwe List','1981'},
 {'EC (CFSP) 2021/276 Venezuela List','1982'},
 {'EC 2021/275 Venezuela List','1983'},
-{'OFAC - Protecting Europe\'s Energy Security Act','1984'}
+{'OFAC - Protecting Europe\'s Energy Security Act','1984'},
+{'EC (CFSP) 2021/353 Belarus List','1985'},
+{'EC (CFSP) 2021/372 Human Rights Violations and Abuses List','1986'},
+{'EC 2021/339 Belarus List','1987'},
+{'EC 2021/371 Human Rights Violations and Abuses List','1988'},
+{'EC (CFSP) 2021/394 Ukraine List','1989'},
+{'EC (CFSP) 2021/398 Yemen List','1990'},
+{'EC 2021/391 Ukraine List','1991'},
+{'EC 2021/397 Yemen List','1992'},
+{'NBCTF (Israel) Seizure Orders','1993'},
+{'EC (CFSP) 2021/448 Ukraine List','1994'},
+{'EC 2021/446 Ukraine List','1995'},
+{'Asian Infrastructure Investment Bank (AIIB) Debarment List','1996'},
+{'DFATD (Canada) Special Economic Measures (People\'s Republic of China) Regulations','1997'},
+{'EC (CFSP) 2021/481 Human Rights Violations and Abuses List','1998'},
+{'EC (CFSP) 2021/483 Myanmar/Burma List','1999'},
+{'EC 2021/478 Human Rights Violations and Abuses List','2000'},
+{'EC 2021/480 Myanmar/Burma List','2001'},
+{'Vietnamese Public Security Ministry Wanted List','2002'},
+{'HMRC (UK) Anti-Money Laundering Non-Compliance List','2003'},
+{'Indian Home Affairs Ministry Banned Individual List','2004'},
+{'Ministry of Foreign Affairs (China) Public Statements','2005'},
+{'US Customs and Border Protection (CBP) Withhold Release Orders and Forced Labor Findings','2006'},
+{'EC (CFSP) 2021/560 Somalia List','2007'},
+{'EC 2021/549 ISIL (Da\'esh) and Al-Qaida List','2008'},
+{'EC 2021/559 Somalia List','2009'}
 
 ],r);
 

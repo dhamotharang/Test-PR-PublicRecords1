@@ -109,4 +109,4 @@
 		SELF := L;
 		SELF := []; 
 	END;
-EXPORT Map_eCrashAccidents_To_eCrashConsolidation := NORMALIZE(eCrashAccidents, 2, teCrashAccidents(LEFT, COUNTER));
+EXPORT Map_eCrashAccidents_To_eCrashConsolidation := NORMALIZE(eCrashAccidents(is_terminated_agency = FALSE), 2, teCrashAccidents(LEFT, COUNTER));

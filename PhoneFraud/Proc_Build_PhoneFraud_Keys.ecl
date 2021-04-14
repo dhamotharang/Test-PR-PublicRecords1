@@ -147,7 +147,7 @@ EXPORT Proc_Build_PhoneFraud_Keys(string version, string oType, string sType):= 
 	//Update DOPs Page///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-		dopsUpdate 			:= Roxiekeybuild.updateversion('PhoneFraudKeys', version, 'Christopher.Brodeur@lexisnexisrisk.com, Charles.Pettola@lexisnexisrisk.com, Judy.Tao@lexisnexisrisk.com', , 'N' ,,,,,, updatetype);
+		dopsUpdate 			:= Roxiekeybuild.updateversion('PhoneFraudKeys', version, 'Christopher.Brodeur@lexisnexisrisk.com, CHERRY.AUSTERO@lexisnexisrisk.com, Judy.Tao@lexisnexisrisk.com', , 'N' ,,,,,, updatetype);
 
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	//Build Strata Reports for Build/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -205,8 +205,8 @@ EXPORT Proc_Build_PhoneFraud_Keys(string version, string oType, string sType):= 
 																	create_phonefraud_build,
 																	buildStrata,
 																	Scrubs_PhoneFraud.fn_RunScrubs(version,'Judy.Tao@lexisnexis.com')):
-																	Success(FileServices.SendEmail('Judy.Tao@lexisnexisrisk.com;Christopher.Brodeur@lexisnexisrisk.com;Charles.Pettola@lexisnexisrisk.com', 'PhoneFraud Key Build Succeeded', workunit + ': Build completed.')),
-																	Failure(FileServices.SendEmail('Judy.Tao@lexisnexisrisk.com;Christopher.Brodeur@lexisnexisrisk.com;Charles.Pettola@lexisnexisrisk.com', 'PhoneFraud Key Build Failed', workunit + '\n' + FAILMESSAGE)
+																	Success(FileServices.SendEmail('Judy.Tao@lexisnexisrisk.com;Christopher.Brodeur@lexisnexisrisk.com;CHERRY.AUSTERO@lexisnexisrisk.com', 'PhoneFraud Key Build Succeeded', workunit + ': Build completed.')),
+																	Failure(FileServices.SendEmail('Judy.Tao@lexisnexisrisk.com;Christopher.Brodeur@lexisnexisrisk.com;CHERRY.AUSTERO@lexisnexisrisk.com', 'PhoneFraud Key Build Failed', workunit + '\n' + FAILMESSAGE)
 																	);
 
 	RETURN sendEmail;

@@ -1,4 +1,4 @@
-﻿import tools, HealthCareFacility,FraudShared, NID, ut; 
+﻿import tools, HealthCareFacility, NID, ut; 
 export MapToCommon  (
 		string pversion
 	 ,dataset(Layouts.Base.SuspectIP)    inBaseSuspectIP     = Files().Base.SuspectIP.Built
@@ -14,7 +14,7 @@ export MapToCommon  (
 module  
  
  // SuspectIP  
- export		SuspectIP                    := project (inBaseSuspectIP, transform(FraudShared.Layouts.Base.Main , 
+ export		SuspectIP                    := project (inBaseSuspectIP, transform(Layouts.Base.Main , 
         
       self.Record_ID                      := left.Record_SID;
       self.Reported_Date                  := left.Reported_Date;
@@ -61,7 +61,7 @@ module
 	
 	)); 
 				
- Export		GLB5                    := project (inBaseGLB5 , transform(FraudShared.Layouts.Base.Main , 
+ Export		GLB5                    := project (inBaseGLB5 , transform(Layouts.Base.Main , 
 			
 		
 			self.Record_ID              := left.Record_SID; 
@@ -142,7 +142,7 @@ module
 	
 // Tiger base to common 
 
-Export		Tiger                   := project (inBaseTiger , transform(FraudShared.Layouts.Base.Main , 
+Export		Tiger                   := project (inBaseTiger , transform(Layouts.Base.Main , 
 			
 			self.Record_ID              := left.Record_SID; 
       self.Customer_Event_ID      := left.CUST_ID_NUM ; 
@@ -206,7 +206,7 @@ Export		Tiger                   := project (inBaseTiger , transform(FraudShared.
 	)); 
 
  // CFNA 
- Export		CFNA                   := project (inBaseCFNA , transform(FraudShared.Layouts.Base.Main , 
+ Export		CFNA                   := project (inBaseCFNA , transform(Layouts.Base.Main , 
 
       self.Record_ID                      := left.Record_SID;
 			self.Reason_Description             := 'IDENTITY FRAUD'; 
@@ -275,7 +275,7 @@ Export		Tiger                   := project (inBaseTiger , transform(FraudShared.
 	
 	));
 	
- Export		TextMinedCrim                            := project(inBaseTextMinedCrim, transform(FraudShared.Layouts.Base.Main , 
+ Export		TextMinedCrim                            := project(inBaseTextMinedCrim, transform(Layouts.Base.Main , 
 
       self.Record_ID                      := left.Record_SID;
 			self.Reason_Description             := left.charge; 
@@ -345,7 +345,7 @@ Export		Tiger                   := project (inBaseTiger , transform(FraudShared.
   	  self                                                                    := [];
      )); 
 		 
- Export		OIG                            := project (inBaseOIG, transform(FraudShared.Layouts.Base.Main , 
+ Export		OIG                            := project (inBaseOIG, transform(Layouts.Base.Main , 
 
       self.Record_ID                      := left.Record_SID;
 			self.Reason_Description             := left.sancdesc;
@@ -425,7 +425,7 @@ Export		Tiger                   := project (inBaseTiger , transform(FraudShared.
 	));
  
  // Address Inspection
- Export		AInspection                    := project (inBaseAInspection, transform(FraudShared.Layouts.Base.Main , 
+ Export		AInspection                    := project (inBaseAInspection, transform(Layouts.Base.Main , 
 
       self.Record_ID                      := left.Record_SID;
 			self.ln_report_date                 := left.dt_first_reported; 
@@ -472,7 +472,7 @@ Export		Tiger                   := project (inBaseTiger , transform(FraudShared.
 	));  
 	
 //Erie
- Export		Erie                                := project (inBaseErie, transform(FraudShared.Layouts.Base.Main , 
+ Export		Erie                                := project (inBaseErie, transform(Layouts.Base.Main , 
 
       self.Record_ID                          := left.Record_SID;
 			self.Reason_Description                 := '';
@@ -589,7 +589,7 @@ Export		Tiger                   := project (inBaseTiger , transform(FraudShared.
 	));  
 	
 //ErieWatchList
- Export		ErieWatchList                      := project(inBaseErieWatchList(source ='ERIE_WATCHLIST'), transform(FraudShared.Layouts.Base.Main, 
+ Export		ErieWatchList                      := project(inBaseErieWatchList(source ='ERIE_WATCHLIST'), transform(Layouts.Base.Main, 
 			self.Record_ID                          := left.Record_SID;
 			self.Reason_Description                 := '';
 			self.reported_date                      := left.validStartDate;	
@@ -645,7 +645,7 @@ Export		Tiger                   := project (inBaseTiger , transform(FraudShared.
 	));  
 	
 //ErieNICBWatchList
- Export  ErieNICBWatchList                   := project(inBaseErieWatchList(source ='ERIE_NICB_WATCHLIST'), transform(FraudShared.Layouts.Base.Main, 
+ Export  ErieNICBWatchList                   := project(inBaseErieWatchList(source ='ERIE_NICB_WATCHLIST'), transform(Layouts.Base.Main, 
       self.Record_ID                         := left.Record_SID;
 			self.Reason_Description                 := '';
 			self.reported_date                      := left.validStartDate;	
@@ -706,7 +706,6 @@ Export		Tiger                   := project (inBaseTiger , transform(FraudShared.
   CombinedClassification := Functions.Classification(SuspectIP + GLB5 + Tiger + CFNA + TextMinedCrim + OIG + AInspection + Erie + ErieWatchList + ErieNICBWatchList) ; 
 	
 // Filter header records
-NewBaseRid := CombinedClassification (Customer_event_id not in ['CUST_ID_NUM','CUSTOMERID']);
-export Build_Base_Shared_Main := FraudShared.Build_Base_Main(pversion,NewBaseRid);
+export NewBaseRid := CombinedClassification (Customer_event_id not in ['CUST_ID_NUM','CUSTOMERID']);
 
 end;

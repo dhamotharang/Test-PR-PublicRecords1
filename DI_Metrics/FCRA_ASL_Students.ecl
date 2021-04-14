@@ -3,10 +3,9 @@
  
 IMPORT _Control, American_student_list, alloymedia_student_list, data_services, STD, ut;
 
-export FCRA_ASL_Students(string pHostname, string pTarget, string pContact ='\' \'') := function
+export FCRA_ASL_Students(string pHostname, string pTarget, string pContact ='\' \'', STRING today = (STRING8)STD.Date.Today()) := function
 
-filedate := (STRING8)Std.Date.Today();
-rpt_yyyymmdd := filedate[1..8];
+filedate := today;
 	
 //FCRA Alloy Media Student Key
 Key_DID_FCRA_AlloyStudent := PULL(AlloyMedia_student_list.Key_DID_FCRA);
@@ -46,7 +45,7 @@ despray_fcra_student_tbl := STD.File.DeSpray('~thor_data400::data_insight::data_
 //if everything in the Sequential statement runs, it will send the Success email, else it will send the Failure email
 email_alert := SEQUENTIAL(
 					output(srt_tbl_FCRA_Students_College_LexID,,'~thor_data400::data_insight::data_metrics::tbl_FCRA_Students_College_LexID_'+ filedate +'.csv'
-					,csv(heading(single), separator('|'),terminator('\r\n'),quote('\"')),overwrite)
+					,csv(heading(single), separator('|'),terminator('\r\n'),quote('\"')), overwrite, expire(10))
 					,despray_fcra_student_tbl):
 					Success(FileServices.SendEmail(pContact, 'FCRA Group: FCRA_ASL_Students Build Succeeded', workunit + ': Build complete.' + filedate)),
 					Failure(FileServices.SendEmail(pContact, 'FCRA Group:  FCRA_ASL_Students Build Failed', workunit + filedate + '\n' + FAILMESSAGE)

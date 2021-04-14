@@ -1,5 +1,11 @@
 ﻿/*
   mac_dataset_diff
+  also need:
+    to rollup diff info to show in one field the field name diffs, then can do a table on that to count them
+    and also get samples.
+    ds_stats records affected is wrong.  sayd 451K when 
+
+
     if you have a rid
       need to compare all fields for each record.
       can join on rid, and then generate code in the transform to compare each field left and right.
@@ -92,6 +98,8 @@ functionmacro
   ds_records_affected           := table(ds_norm  ,{rid       ,unsigned cnt_fields_changed_per_record := count(group)} ,rid       ,merge);
   ds_records_changed_per_field  := table(ds_norm  ,{fieldname ,unsigned cnt_records_changed           := count(group)} ,fieldname ,merge);
   
+  ds_example_changes_per_field := join(ds_records_changed_per_field ,ds_norm ,left.fieldname = right.fieldname ,transform({recordof(left) or recordof(right)},self := left,self := right)  ,partition right,keep(10) ,hash);
+  
   ds_stats := dataset([
     {'pDataset_orig'        ,ut.fIntWithCommas(count(pDataset_orig                ))}
    ,{'pDataset_new'         ,ut.fIntWithCommas(count(pDataset_new                 ))}
@@ -108,6 +116,7 @@ functionmacro
     ,output(topn(ds_norm                      ,300  ,rid                  )  ,named('tools_mac_dataset_diff__ds_norm'                       )  ,all)
     ,output(topn(ds_records_affected          ,300  ,rid                  )  ,named('tools_mac_dataset_diff__ds_records_affected'           )  ,all)
     ,output(topn(ds_records_changed_per_field ,300  ,-cnt_records_changed )  ,named('tools_mac_dataset_diff__ds_records_changed_per_field'  )  ,all)
+    ,output(topn(ds_example_changes_per_field ,1000 ,-cnt_records_changed,fieldname,rid )  ,named('tools_mac_dataset_diff__ds_changes_per_field'  )  ,all)
   
   );
 	#if(pOutputEcl = true)

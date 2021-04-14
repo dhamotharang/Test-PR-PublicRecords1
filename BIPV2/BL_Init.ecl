@@ -57,6 +57,7 @@ function
         (     mdr.sourceTools.SourceIsDunn_Bradstreet     (l.source) 
           or  mdr.sourceTools.SourceIsInfutor_NARB        (l.source) 
           or  mdr.sourceTools.SourceIsDunn_Bradstreet_Fein(l.source)
+          or  mdr.sourceTools.SourceIsDataBridge          (l.source) 
         ) 
         and length(trim(psic)) in [4,8]
       )

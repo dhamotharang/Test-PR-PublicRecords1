@@ -157,6 +157,8 @@ EXPORT Layout_iConectiv := MODULE
 		string	 	port_end_dt;									//Port End Date (Last Update)
 		string 		remove_port_dt;								//Disconnect Date
 		boolean		is_ported := false;
+		string    alt_spid;
+		string    lalt_spid;
 	END;
 	
 	EXPORT Intermediate_Temp := RECORD
@@ -207,6 +209,8 @@ EXPORT Layout_iConectiv := MODULE
 		string	 	port_end_dt;									//Port End Date (Last Update)
 		string 		remove_port_dt;								//Disconnect Date
 		boolean		is_ported;										//Latest Active Record
+		string 		alt_spid;
+		string 		lalt_spid;
 	END;
 	
 	EXPORT Main_PortData_Validate := RECORD
@@ -235,7 +239,7 @@ EXPORT Layout_iConectiv := MODULE
 	END;
 
 	EXPORT Phones_Transaction_Main_PDV := RECORD
-		dx_PhonesInfo.Layouts.Phones_Transaction_Main;
+		dx_PhonesInfo.Layouts.Phones_Transaction_Main-[alt_spid, lalt_spid];
 		string 		alt_spid;
 		string 		lalt_spid;
 		string 		line_type;

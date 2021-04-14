@@ -1,8 +1,8 @@
-﻿import Address,ut,_control; 
+﻿import Address,STD,_control; 
 
-EXPORT NAHDB_BatchRun_VIN(string filedate/*, string customerName*/) := function 
+export NAHDB_BatchRun_VIN(string filedate/*, string customerName*/) := function 
 
-layoutNahdbBatchVin := Record
+layoutNahdbBatchVin := record
 string Vin;
 string rd_adjuster;
 
@@ -55,10 +55,13 @@ string Insurance_policy_Exp_Date,
 string source_id,	
 string report_code,	
 string match_flag,	
-string date_vendor_last_reported
-	
+string date_vendor_last_reported,
+string airbags_deploy,
+string towed,
+string impact_location,
+string photographs_taken	
 end; 
-filein := dedup(dataset('~thor_data::in::nahdb::vin', layoutNahdbBatchVin, CSV(Terminator (['\n','\r\n']), Heading(1), Quote('"'), Separator([',']))),all);
+filein := dedup(dataset('~thor_data::in::nahdb::vin', layoutNahdbBatchVin, csv(terminator (['\n','\r\n']), heading(1), quote('"'), separator([',']))),all);
 
 
  // filter out I7 or Interactive reports 
@@ -68,16 +71,13 @@ filein := dedup(dataset('~thor_data::in::nahdb::vin', layoutNahdbBatchVin, CSV(T
 
  accidents0:= Files_eCrash.Ds_Base_Consolidation_Ecrash(report_code in EA_natl_keyed_inquiry_set); 
  
- accidents1 := PROJECT(accidents0,transform(recordof(accidents0),self.record_type := trim(regexreplace('\\t|\\n| ',left.record_type,'')),self.cru_jurisdiction_nbr  :=   regexreplace('\\^M',left.cru_jurisdiction_nbr,''),
+ accidents1 := project(accidents0,transform(recordof(accidents0),self.record_type := trim(regexreplace('\\t|\\n| ',left.record_type,'')),self.cru_jurisdiction_nbr  :=   regexreplace('\\^M',left.cru_jurisdiction_nbr,''),
              self := left));
-
 
  accidents := distribute(accidents1(vin <>''),hash(vin)); 
  accidentDedup := dedup(sort(accidents,vin,did,orig_accnbr,accident_date,jurisdiction_state,jurisdiction,cru_order_id, report_type_id,-date_vendor_last_reported,map(report_code in [ 'EA','TF','TM'] => 1,  report_code[1] = 'I' => 2,
 																																																									 report_code = 'A' => 2,3),carrier_name,local), vin,did,orig_accnbr,accident_date,jurisdiction_state,jurisdiction,cru_order_id,report_type_id, local); 
-
  //vin match 
-
 vin_match:= dedup(join(accidentDedup, distribute(filein(vin <> ''),hash(vin)),
                 
 				trim(left.vin,left,right) = trim(right.vin,left,right) /*and 
@@ -131,23 +131,30 @@ vin_match:= dedup(join(accidentDedup, distribute(filein(vin <> ''),hash(vin)),
            self.vehicle_unit_number   :=  left.vehicle_unit_number    ;
            self.vendor_code           :=  left.vendor_code;
            self.work_type_id          :=  left.work_type_id;
+		   self.airbags_deploy   := map  ( left.airbags_deploy  = '0' =>  'false',
+		                                                           left.airbags_deploy  = '1' =>  'true', ' ' );
+		   self.towed   := map  ( left.towed  = '0' =>  'false',
+		                                                           left.towed  = '1' =>  'true', ' ' );
+			self.impact_location := left.impact_location;
+			self.photographs_taken := left.Photographs_Taken;
+
+		             
 					 self := right 
 				   ), right outer,local),all);
 
 
 // remove multiple vin records caused due to VIN lookup from batch
-
 out := project(vin_match,transform(layoutOut, self.source_id := if (left.acc_dol ='', '', left.source_id), self := left)); 
 
 										
 return sequential(FLAccidents_Ecrash.Spray_nahdb_vin(filedate), 
-                 count(filein); 
-                 //output(out); 
-                 count(out); 
-                 count(out(acc_dol <>'')); 
-                 output(out,,'~thor_data::out::nahdb_batch_vin_'+filedate,csv(
-                 HEADING('VIN|rd_adjuster|acc_vin| order_id	| sequence_nbr|	 reason_id| acct_nbr	| vehicle_incident_id| vehicle_unit_number |	vendor_code| work_type_id|  orig_lname | orig_fname | orig_mname |  vehicle_owner| dob| driver_license_nbr| dlnbr_st| vehicle_year|  vehicle_make|  vehicle_model| tag_nbr| tagnbr_st| report_type_id| loss_type| acc_dol| accident_location|  acc_city|	 vehicle_incident_city| acc_st	| jurisdiction| orig_accnbr|	 accident_nbr| addl_report_number| acc_county| crash_county| cru_jurisdiction_nbr| agency_ori| carrier_name|	  Insurance_policy_num|	    Insurance_policy_Eff_Date|    Insurance_policy_Exp_Date| source_id|	 report_code|	 match_flag|	 date_vendor_last_reported  \n','',SINGLE),
-                 SEPARATOR('|'), TERMINATOR('\n')),OVERWRITE), 
-						     fileservices.despray('~thor_data::out::nahdb_batch_vin_'+filedate, _control.IPAddress.bctlpedata10, '/data/hds_180/cjr/nahdb_out_vin_'+filedate+'.csv',,,,TRUE)); 
+                 count(filein), 
+                 //output(out),
+                 count(out), 
+                 count(out(acc_dol <>'')),
+                 output(out,,'~thor_data::out::nahdb_batch_vin_'+filedate,
+								 csv(heading('VIN|rd_adjuster|acc_vin| order_id	| sequence_nbr|	 reason_id| acct_nbr	| vehicle_incident_id| vehicle_unit_number |	vendor_code| work_type_id|  orig_lname | orig_fname | orig_mname |  vehicle_owner| dob| driver_license_nbr| dlnbr_st| vehicle_year|  vehicle_make|  vehicle_model| tag_nbr| tagnbr_st| report_type_id| loss_type| acc_dol| accident_location|  acc_city|	 vehicle_incident_city| acc_st	| jurisdiction| orig_accnbr|	 accident_nbr| addl_report_number| acc_county| crash_county| cru_jurisdiction_nbr| agency_ori| carrier_name|	  Insurance_policy_num|	    Insurance_policy_Eff_Date|    Insurance_policy_Exp_Date| source_id|	 report_code|	 match_flag|	 date_vendor_last_reported|airbags_deploy | towed|impact_location| photographs_taken \n','',SINGLE),
+                     separator('|'), terminator('\n')), overwrite, __compressed__, expire(Constants.ThorFile_NAHDB_Days_To_Expire)), 
+						     STD.File.DeSpray('~thor_data::out::nahdb_batch_vin_'+filedate, _control.IPAddress.bctlpedata10, '/data/hds_180/cjr/nahdb_out_vin_'+filedate+'.csv',,,,TRUE)); 
 
 end; 

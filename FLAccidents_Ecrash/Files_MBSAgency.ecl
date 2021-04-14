@@ -44,7 +44,7 @@ EXPORT Files_MBSAgency := MODULE
 //               Agency Spray Dataset Definition
 //###########################################################################  
   EXPORT DS_SPRAY_AGENCY := DATASET(FILE_SPRAY_AGENCY_SF,
-																		FLAccidents_Ecrash.Layout_Infiles.agency,
+																		Layout_MBSAgency.agency_spray,
 																		csv(terminator(['|\n', '\n', '\nr', '\r', '\rn']), separator('|\t|'),quote('"')))
 														(Agency_ID != 'Agency_ID');
 
@@ -58,7 +58,7 @@ EXPORT Files_MBSAgency := MODULE
 //###########################################################################
 //              Agency Build Base File Dataset Definition  
 //###########################################################################	
-  EXPORT DS_BASE_AGENCY := DATASET(FILE_BASE_AGENCY_SF, Layout_Infiles_Fixed.agency_contrib_source, THOR, OPT);
+  EXPORT DS_BASE_AGENCY := DATASET(FILE_BASE_AGENCY_SF, Layout_MBSAgency.agency, THOR, OPT);
    
 //###########################################################################
 //              Agency Orbit Profile Dataset Definition

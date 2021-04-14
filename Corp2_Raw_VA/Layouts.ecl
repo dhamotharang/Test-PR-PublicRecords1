@@ -5,6 +5,7 @@
 		STRING   corps_entity_id;
 		STRING   corps_name;
 		STRING   corps_status;
+		STRING   corps_StatusReason;
 		STRING   corps_status_date;
 		STRING   corps_duration; 
 		STRING   corps_incorp_date;
@@ -36,6 +37,7 @@
 		STRING   lp_entity_id;
 		STRING   lp_name;
 		STRING   lp_status;
+		STRING   lp_StatusReason;
 		STRING   lp_status_date;
 		STRING   lp_duration; 
 		STRING   lp_incorp_date;
@@ -118,6 +120,7 @@
 		STRING   llc_entity_id;
 		STRING   llc_name;
 		STRING   llc_status;
+		STRING   llc_StatusReason;
 		STRING   llc_status_date;
 		STRING   llc_duration; 
 		STRING   llc_incorp_date;
@@ -144,7 +147,100 @@
 		STRING   llc_assess_ind;
 		STRING   llc_stock1;
 	END;
+	
+	EXPORT PSALayoutIn 			:= RECORD 			//Public Service Authority                        
+		STRING   psa_Entity_ID;
+		STRING   psa_Name;
+		STRING   psa_Status;
+		STRING   psa_StatusReason;
+		STRING   psa_Status_Date;
+		STRING   psa_Duration; 
+		STRING   psa_Incorp_Date;
+		STRING   psa_Incorp_State;
+		STRING   psa_Industry_Code;
+		STRING   psa_Street1;
+		STRING   psa_Street2;
+		STRING   psa_City;
+		STRING   psa_State;
+		STRING   psa_Zip;
+		STRING   psa_PrinOffEff_Date;
+		STRING   psa_RA_Name;
+		STRING   psa_RA_Street1; 
+		STRING   psa_RA_Street2;
+		STRING   psa_RA_City;
+		STRING   psa_RA_State;
+		STRING   psa_RA_Zip;
+		STRING   psa_RA_Eff_Date;
+		STRING   psa_RA_Status;
+		STRING   psa_RA_Loc;
+		STRING   psa_Stock_Ind;
+		STRING   psa_Total_Shares;
+		STRING   psa_Merger_Ind;
+		STRING   psa_Assess_Ind;
+	END;
 
+	EXPORT BTLayoutIn 			:= RECORD 		//Business Trust
+		STRING   bt_Entity_ID;
+		STRING   bt_Name;
+		STRING   bt_Status;
+		STRING   bt_StatusReason;
+		STRING   bt_Status_Date;
+		STRING   bt_Duration; 
+		STRING   bt_Incorp_Date;
+		STRING   bt_Incorp_State;
+		STRING   bt_Industry_Code;
+		STRING   bt_Street1;
+		STRING   bt_Street2;
+		STRING   bt_City;
+		STRING   bt_State;
+		STRING   bt_Zip;
+		STRING   bt_PrinOffEff_Date;
+		STRING   bt_RA_Name;
+		STRING   bt_RA_Street1; 
+		STRING   bt_RA_Street2;
+		STRING   bt_RA_City;
+		STRING   bt_RA_State;
+		STRING   bt_RA_Zip;
+		STRING   bt_RA_Eff_Date;
+		STRING   bt_RA_Status;
+		STRING   bt_RA_Loc;
+		STRING   bt_Stock_Ind;
+		STRING   bt_Total_Shares;
+		STRING   bt_Merger_Ind;
+		STRING   bt_Assess_Ind;
+	END;
+	
+	EXPORT GPLayoutIn 	:= RECORD 					//General Partner
+		STRING   gp_Entity_ID;
+		STRING   gp_Name;
+		STRING   gp_Status;
+		STRING   gp_StatusReason;
+		STRING   gp_Status_Date;
+		STRING   gp_Duration; 
+		STRING   gp_Incorp_Date;
+		STRING   gp_Incorp_State;
+		STRING   gp_Industry_Code;
+		STRING   gp_Street1;
+		STRING   gp_Street2;
+		STRING   gp_City;
+		STRING   gp_State;
+		STRING   gp_Zip;
+		STRING   gp_PrinOffEff_Date;
+		STRING   gp_RA_Name;
+		STRING   gp_RA_Street1; 
+		STRING   gp_RA_Street2;
+		STRING   gp_RA_City;
+		STRING   gp_RA_State;
+		STRING   gp_RA_Zip;
+		STRING   gp_RA_Eff_Date;
+		STRING   gp_RA_Status;
+		STRING   gp_RA_Loc;
+		STRING   gp_StockInd;
+		STRING   gp_Total_Shares;
+		STRING   gp_Merger_Ind;
+		STRING   gp_Assess_Ind;
+	END;
+	
   //**********************************	
 	//Below are TEMPORARY Record layouts
   //**********************************	
@@ -192,15 +288,15 @@
 	
 	EXPORT NamesHist_TempLay					     := RECORD
 		NamesHistLayoutIn;
-		TempCorpsLayoutIn.corps_entity_id;
-		TempCorpsLayoutIn.corps_incorp_date;
-		TempCorpsLayoutIn.corps_incorp_state;
+		CorpsLayoutIn.corps_entity_id;
+		CorpsLayoutIn.corps_incorp_date;
+		CorpsLayoutIn.corps_incorp_state;
 	END;
 	
 	EXPORT Reserved_TempLay									:= RECORD
 		ReservedLayoutIn;
-		TempCorpsLayoutIn.corps_entity_id;
-		TempCorpsLayoutIn.corps_incorp_date;
+		CorpsLayoutIn.corps_entity_id;
+		CorpsLayoutIn.corps_incorp_date;
 	END;
 			
 END;

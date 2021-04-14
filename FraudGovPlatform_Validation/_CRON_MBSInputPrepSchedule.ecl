@@ -9,7 +9,6 @@ emailList:=FraudGovPlatform_Validation.Mailing_List().Alert;
 
 lECL1 :=
  'import FraudGovPlatform_Validation,Scrubs_MBS,ut;\n'
-+'#CONSTANT	(\'Platform\',\'FraudGov\');\n'
 +'wuname := \'FraudGov MBS Input Prep\';\n'
 +'#WORKUNIT(\'name\', wuname);\n'
 +'#WORKUNIT(\'priority\',\'high\');\n'

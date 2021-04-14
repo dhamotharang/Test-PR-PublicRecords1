@@ -22,7 +22,7 @@ EXPORT ProcessContributoryFile(string ip, string dataDir, string lfn, string mai
 		outgoing := dataDir+'outgoing/';
 		
 		gid := Lower(lfn[6..9]);
-		onboarding := IsOnboarding(gid);			// If onboarding, send reports but do not process file
+		onboarding := IsOnboarding(gid);			// If not onboard, send reports but do not process file
 		
 		ilfn := '~nac::uber::in::'+lfn;
 
@@ -51,6 +51,8 @@ EXPORT ProcessContributoryFile(string ip, string dataDir, string lfn, string mai
 		treshld_  := $.Mod_Sets.threshld;
 		
 		processed := $.PreprocessNCF2(ilfn);
+		IsEmptyFile:= NOT EXISTS(processed);
+
 		//base2 := $.fn_constructBase2FromNCFEx(processed, version);				
 		reports := $.GetReports(processed, ilfn, FALSE);
 		ExcessiveInvalidRecordsFound :=	reports.RejectFile;
@@ -80,22 +82,26 @@ EXPORT ProcessContributoryFile(string ip, string dataDir, string lfn, string mai
 							NOTHOR(Std.File.AddSuperFile(NAC_V2.Superfile_List.sfReady, ModifyFileName(ilfn, 'ncfx')))
 					)
 				);
-		
-		doit := sequential(
-				MoveReadyToSpraying
-				,SprayIt
-				,Archive(ilfn)
-				,OUTPUT(processed,,ModifyFileName(ilfn, 'nac2'), COMPRESSED, OVERWRITE)
-				,OUTPUT(reports.TotalRecords, named('total_records'))
-				,OUTPUT(reports.ErrorCount, named('Error_Count'))
-				,MoveToTempOrReject
-				,out_NCF_reports
-				,IF(NOT ExcessiveInvalidRecordsFound, queueFileForProcessing)
-				,despray_NCF_reports('ncx2')
-				,despray_NCF_reports('ncd2')
-				,despray_NCF_reports('ncr2')
-				,$.Send_Email(fn := ilfn, groupid := lfn[6..9]).FileValidationReport
-				);
 
+		doit :=  
+			sequential(
+					MoveReadyToSpraying
+					,SprayIt
+					,Archive(ilfn)
+					,OUTPUT(processed,,ModifyFileName(ilfn, 'nac2'), COMPRESSED, OVERWRITE)
+					,OUTPUT(reports.TotalRecords, named('total_records'))
+					,OUTPUT(reports.ErrorCount, named('Error_Count'))
+					,MoveToTempOrReject
+					,out_NCF_reports
+					,IF(NOT ExcessiveInvalidRecordsFound, queueFileForProcessing)
+					,despray_NCF_reports('ncx2')
+					,despray_NCF_reports('ncd2')
+					,despray_NCF_reports('ncr2')
+					,IF(IsEmptyFile, NAC_V2.Send_Email(fn := ilfn, groupid := lfn[6..9]).FileEmptyErrorAlert, 
+							NAC_V2.Send_Email(fn := ilfn, groupid := lfn[6..9]).FileValidationReport)
+					);
 	return doit;
 END;
+
+
+

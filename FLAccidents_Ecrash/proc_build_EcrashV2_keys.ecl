@@ -209,6 +209,14 @@ EXPORT proc_build_EcrashV2_keys(STRING filedate) := FUNCTION
    RoxieKeybuild.MAC_build_logical(dx_eCrash.KEY_AGENCY, mod_PrepEcrashKeys().AgencyBase, dx_eCrash.Names.i_AGENCY, L_FILE_KEY_AGENCY, bk_agency);
    RoxieKeyBuild.Mac_SK_Move_To_Built(L_FILE_KEY_AGENCY, dx_eCrash.Names.i_AGENCY, move1_agency);
    RoxieKeyBuild.Mac_SK_Move_V3(dx_eCrash.Names.i_AGENCY, 'Q', move2_agency, filedate);
+    
+// ########################################################################### 
+//                   AGENCYSOURCE KEY
+// ########################################################################## 
+   L_FILE_KEY_AGENCYSOURCE := dx_eCrash.Names.KEY_PREFIX + '::' + filedate + '::' + dx_eCrash.Names.AGENCYSOURCE_SUFFIX;
+   RoxieKeybuild.MAC_build_logical(dx_eCrash.KEY_AGENCYSOURCE, mod_PrepEcrashKeys().AgencySourceBase, dx_eCrash.Names.i_AGENCYSOURCE, L_FILE_KEY_AGENCYSOURCE, bk_agencysource);
+   RoxieKeyBuild.Mac_SK_Move_To_Built(L_FILE_KEY_AGENCYSOURCE, dx_eCrash.Names.i_AGENCYSOURCE, move1_agencysource);
+   RoxieKeyBuild.Mac_SK_Move_V3(dx_eCrash.Names.i_AGENCYSOURCE, 'Q', move2_agencysource, filedate);
    
 // ########################################################################### 
 //                   PHOTO ID KEY
@@ -302,30 +310,31 @@ EXPORT proc_build_EcrashV2_keys(STRING filedate) := FUNCTION
    build_keys := PARALLEL(bk_ecrash0, bk_ecrash1, bk_ecrash2, bk_ecrash3, bk_ecrash4, bk_ecrash5, bk_ecrash6, bk_ecrash7,                 //EcrashFLAccidentPRKeys
                           bk_accnbr, bk_accnbrv1, bk_bdid, bk_did, bk_dlnbr, bk_tagnbr, bk_vin, bk_vin7,                //EcrashPRKeys
                           bk_agencyid, bk_ct, bk_dow, bk_hod, bk_inter, bk_moy,                                                           //EcrashAnalyticsKeys                                           
-                          bk_dol, bk_unrestricted_accnbrv1, bk_deltadate, bk_agency, bk_photoid, bk_reportid, bk_supplemental,//EcrashKeys
+                          bk_dol, bk_unrestricted_accnbrv1, bk_deltadate, bk_agency, bk_agencysource, bk_photoid, bk_reportid, bk_supplemental,//EcrashKeys
                           bk_dlnnbrdlstate, bk_vinnbr, bk_licenseplatenbr, bk_officerbadgenbr, bk_lastname, bk_prefname_state, bk_standlocation, bk_agencyid_sentdate //EcrashSearchKeys
                          );
                      
    move_built_keys := PARALLEL(move1_ecrash0, move1_ecrash1, move1_ecrash2, move1_ecrash3, move1_ecrash4, move1_ecrash5, move1_ecrash6, move1_ecrash7,
                                move1_accnbr, move1_accnbrv1, move1_bdid, move1_did, move1_dlnbr, move1_tagnbr, move1_vin, move1_vin7,
                                move1_agencyid, move1_ct, move1_dow, move1_hod, move1_inter, move1_moy,
-                               move1_dol, move1_unrestricted_accnbrv1, move1_deltadate, move1_agency, move1_photoid, move1_reportid, move1_supplemental,
+                               move1_dol, move1_unrestricted_accnbrv1, move1_deltadate, move1_agency, move1_agencysource, move1_photoid, move1_reportid, move1_supplemental,
                                move1_dlnnbrdlstate, move1_vinnbr, move1_licenseplatenbr, move1_officerbadgenbr, move1_lastname, move1_prefname_state, move1_standlocation, move1_agencyid_sentdate
                               );
                                  
    move_qa_keys := PARALLEL(move2_ecrash0, move2_ecrash1, move2_ecrash2, move2_ecrash3, move2_ecrash4, move2_ecrash5, move2_ecrash6, move2_ecrash7,
                             move2_accnbr, move2_accnbrv1, move2_bdid, move2_did, move2_dlnbr, move2_tagnbr, move2_vin, move2_vin7,
                             move2_agencyid, move2_ct, move2_dow, move2_hod, move2_inter, move2_moy,
-                            move2_dol, move2_unrestricted_accnbrv1, move2_deltadate, move2_agency, move2_photoid, move2_reportid, move2_supplemental,
+                            move2_dol, move2_unrestricted_accnbrv1, move2_deltadate, move2_agency, move2_agencysource, move2_photoid, move2_reportid, move2_supplemental,
                             move2_dlnnbrdlstate, move2_vinnbr, move2_licenseplatenbr, move2_officerbadgenbr, move2_lastname, move2_prefname_state, move2_standlocation, move2_agencyid_sentdate
                            );
 
-   build_ecrash_keys_all := SEQUENTIAL(        
+   build_ecrash_keys_all := SEQUENTIAL( 
+	                                     CreateSuperFiles,
                                        build_keys,
                                        move_built_keys,
                                        move_qa_keys,
                                        proc_build_ecrashV2_autokey(filedate)
                                       );
-               
+          
    RETURN build_ecrash_keys_all;
 END;

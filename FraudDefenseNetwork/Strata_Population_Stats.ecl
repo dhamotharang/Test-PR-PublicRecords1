@@ -1,11 +1,11 @@
-import strata, tools,FraudShared;
+﻿import strata, tools;
 
 export Strata_Population_Stats(
 
 	 string																				pversion
 	,boolean																			pIsTesting 			= false
 	,boolean																			pOverwrite		 	= false
-	,dataset(FraudShared.Layouts.Base.Main)										pBaseMainBuilt					= FraudShared.Files().Base.Main.Built
+	,dataset(Layouts.Base.Main)										pBaseMainBuilt					= Files().Base.Main.Built
 ) :=
 module
 
