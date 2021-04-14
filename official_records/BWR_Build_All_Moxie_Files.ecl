@@ -1,7 +1,7 @@
 ﻿import Official_Records, Lib_FileServices,RoxieKeybuild,orbit_report,dops,Scrubs_Official_Records;
 export BWR_Build_All_Moxie_Files := function
 #workunit('name','Official Records Build All' );
-
+#option ('multiplePersistInstances',FALSE); 
 leMailTarget := 'jtao@seisint.com;skasavajjala@seisint.com;jason.allerdings@lexisnexisrisk.com';
 
 fSendMail(string pSubject,string pBody)
