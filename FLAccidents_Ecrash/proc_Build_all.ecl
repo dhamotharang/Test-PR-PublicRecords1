@@ -69,8 +69,8 @@ crudateds := dataset('~thor_data400::out::ecrash_spversion',{string10	processdat
 string10 spversion := crudateds[1].processdate;
 
 alpha_dependent := sequential( 
-	 ConcatInput
-	,fn_ValidIn(false)
+	 Fn_ConcatInput()
+	,Fn_ValidIn(false)
 	,Spray_ECrash,  
 	CreateSuperFiles, 
 	proc_build_base(filedate)
