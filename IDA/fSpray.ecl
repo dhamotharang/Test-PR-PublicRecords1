@@ -27,7 +27,7 @@ tools.Layout_Sprays.Info xForm(recordof(RDF) L) := transform
 								,''
 								,'|'
 								,''               //'\\n,\\r\\n'
-								,','                     //''
+								,''                     //''
 								,true
 								}
 								,tools.Layout_Sprays.Info);
