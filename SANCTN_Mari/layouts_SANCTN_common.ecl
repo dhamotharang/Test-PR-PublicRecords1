@@ -1,4 +1,4 @@
-﻿import SANCTN_Mari, standard, AID, BIPV2;
+﻿import SANCTN_Mari, standard, AID, BIPV2, dx_common;
 
 export layouts_SANCTN_common := MODULE
 
@@ -56,6 +56,7 @@ export SANCTN_incident_did := RECORD
 END;
 
 export SANCTN_incident_bip := RECORD
+		dx_common.layout_metadata;
 		BIPV2.IDlayouts.l_xlink_ids;  //Added for BIP project
 		unsigned8 source_rec_id := 0; //Added for BIP project		
 		SANCTN_incident_did;
@@ -105,7 +106,9 @@ export SANCTN_party_base := RECORD
 	//CCPA-97 Add 2 new fields for CCPA
 	unsigned4 global_sid;
 	unsigned8 record_sid;
-	
+	UNSIGNED4 dt_effective_first;
+  	UNSIGNED4 dt_effective_last;
+  	UNSIGNED1 delta_ind;
 		
 END;
 
@@ -159,6 +162,7 @@ Standard.L_Address.detailed;
 END;
 
 export SANCTN_incident_text	:= RECORD
+		dx_common.layout_metadata;
 		STRING8 BATCH;
 		STRING1 DBCODE;
 		STRING8 INCIDENT_NUM;
@@ -169,6 +173,7 @@ export SANCTN_incident_text	:= RECORD
 END;
 
 export SANCTN_party_text	:= RECORD
+		dx_common.layout_metadata;
 		STRING8 BATCH;
 		STRING1 DBCODE;
 		STRING8 INCIDENT_NUM;
@@ -180,6 +185,7 @@ END;
 
 
 export Midex_cd := RECORD
+		dx_common.layout_metadata
 		STRING8		BATCH;
 		STRING1	 	DBCODE;
 		INTEGER		PRIMARY_KEY;
@@ -197,6 +203,7 @@ END;
 
 
 export PARTY_AKA_DBA := RECORD
+		dx_common.layout_metadata;
 		STRING8   BATCH;
 		STRING1 	DBCODE;	
 		STRING8   INCIDENT_NUM;
