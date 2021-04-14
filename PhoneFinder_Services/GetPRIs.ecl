@@ -11,7 +11,7 @@ FUNCTION
   dAccuDataCNAM_Filter := $.GetValidFullName(dSearchResults);
   
   // Calculate the identity counts - count the number of identities for each phone to calculate RI
-  dCntPhoneIdentities := $.GetIdentitiesCount(dSearchResults);
+  dCntPhoneIdentities := $.GetIdentitiesCount(dAccuDataCNAM_Filter);
 
   dRemoveOtherPhoneHistory := dCntPhoneIdentities(isPrimaryIdentity OR isPrimaryPhone);
 
