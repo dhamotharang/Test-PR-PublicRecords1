@@ -1323,6 +1323,7 @@
 		export string KEYWORD_SECO_TB								:= '1005';
 		export string KEYWORD_ECPN_MW								:= '1006';
 		export string KEYWORD_DOPN_MW								:= '1007';
+		export string KEYWORD_OFAC_RUSSIA_EO				:= '1008';
 		
 		//When setting the keyword export use underscores for dashes (ex: For RBI-SANC, use RBI_SANC)	
 	end;

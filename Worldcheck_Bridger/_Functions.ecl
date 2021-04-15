@@ -1424,6 +1424,7 @@
 				trim(kword, left, right) = 'SECO-TB' =>SubGroup_Constants.numKeywordsID.KEYWORD_SECO_TB,
 				trim(kword, left, right) = 'ECPN-MW' =>SubGroup_Constants.numKeywordsID.KEYWORD_ECPN_MW,
 				trim(kword, left, right) = 'DOPN-MW' =>SubGroup_Constants.numKeywordsID.KEYWORD_DOPN_MW,
+				trim(kword, left, right) = 'OFAC-RUSSIA-EO' =>SubGroup_Constants.numKeywordsID.KEYWORD_OFAC_RUSSIA_EO,
 								
 				//When setting the keyword export use underscores for dashes (ex: For RBI-SANC, use RBI_SANC)	
 				
