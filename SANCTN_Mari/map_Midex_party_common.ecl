@@ -60,6 +60,7 @@ SANCTN_Mari.layouts_SANCTN_common.SANCTN_party_base clnPartyToCommon(Layout_Part
 		self.global_sid											 	:= 0;
 		self.record_sid											 	:= 0;
 		self := input;
+		self:=[];
 
 		// self := [];
 END;
