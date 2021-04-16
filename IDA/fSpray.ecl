@@ -47,7 +47,7 @@ PrepSuper := SEQUENTIAL(STD.File.StartSuperFileTransaction()
 	 					 ,STD.File.addsuperfile(TRIM(IDA.Filenames(version,pUseProd).lInputTemplate_qa),TRIM(IDA.Filenames(version,pUseProd).lInputTemplate_built),,TRUE)
 						 ,STD.File.ClearSuperfile(TRIM(IDA.Filenames(version,pUseProd).lInputTemplate_father))
 						 ,STD.File.addsuperfile(TRIM(IDA.Filenames(version,pUseProd).lInputTemplate_father),TRIM(IDA.Filenames(version,pUseProd).lInputTemplate_qa),,TRUE)
-						 ,STD.File.ClearSuperfile(TRIM(IDA.Filenames(version,pUseProd).lInputTemplate_delete),true)
+						//  ,STD.File.ClearSuperfile(TRIM(IDA.Filenames(version,pUseProd).lInputTemplate_delete))
 						 ,STD.File.addsuperfile(TRIM(IDA.Filenames(version,pUseProd).lInputTemplate_delete),TRIM(IDA.Filenames(version,pUseProd).lInputTemplate_father),,TRUE)	
    						 ,STD.File.FinishSuperFileTransaction());
 											 
