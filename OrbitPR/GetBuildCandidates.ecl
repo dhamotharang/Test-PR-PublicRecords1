@@ -3,7 +3,8 @@ EXPORT GetBuildCandidates(
 				string BuildName,
 				string BuildVersion,
 				string ptoken,
-				string BuildInstanceID
+				string BuildInstanceID,
+				boolean isswitch = orbitPR.EnvironmentVariables.switchtonewversion
 	
 				) := function
 
@@ -74,7 +75,7 @@ rUpdateBuildRequest	:= RECORD
 	end;
 
  rSOAPResponse		lResponse := SOAPCALL (         
-			OrbitPR.EnvironmentVariables.serviceurl,
+			OrbitPR.EnvironmentVariables.serviceurl(isswitch),
 		'GetBuildCandidates',
 		rBuildrequest,
 		rSOAPResponse,

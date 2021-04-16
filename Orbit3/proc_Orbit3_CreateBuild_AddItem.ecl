@@ -1,5 +1,5 @@
 ﻿import  ut,_Control,STD,OrbitPR;
-export proc_Orbit3_CreateBuild_AddItem(string buildname,string Buildvs,string Envmt = 'N', string email_list = '',string BuildStatus = 'BUILD_AVAILABLE_FOR_USE', boolean skipcreatebuild = false,boolean skipupdatebuild = false, boolean skipaddcomponents = false, boolean runcreatebuild = true, boolean runaddcomponentsonly = false,boolean is_npf = false) := function
+export proc_Orbit3_CreateBuild_AddItem(string buildname,string Buildvs,string Envmt = 'N', string email_list = '',string BuildStatus = 'BUILD_AVAILABLE_FOR_USE', boolean skipcreatebuild = false,boolean skipupdatebuild = false, boolean skipaddcomponents = false, boolean runcreatebuild = true, boolean runaddcomponentsonly = false,boolean is_npf = false , boolean isswitch = orbitPR.EnvironmentVariables.switchtonewversion) := function
 
 string wuid := workunit;
 
@@ -13,7 +13,8 @@ ECL1 := 'import OrbitPR;\r\n'+
 + if (skipaddcomponents , 'true','false')+','
 +if (runcreatebuild, 'true','false') +','
 +if (runaddcomponentsonly, 'true','false') +','
-+if (is_npf,'true','false')+' , \''+wuid+'\') \n'
++if (is_npf,'true','false')+','
++if (isswitch,'true','false')+' , \''+wuid+'\') \n'
 +' : success(OrbitPR.Send_Email(\''+Buildvs+'\', \''+email_list+'\', \''+buildname+'\', \''+Buildvs+'\' ).build_success)\n'
 +' , failure(OrbitPR.Send_Email(\''+Buildvs+'\', \''+email_list+'\', \''+buildname+'\', \''+Buildvs+'\').build_failure)\n'
 +' ;\n';
