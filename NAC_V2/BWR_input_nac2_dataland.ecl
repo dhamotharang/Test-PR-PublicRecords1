@@ -63,12 +63,18 @@ envVars
 every_10_min := '*/10 0-23 * * *';
 
 NOC_MSG := '** NOC **\n\n';
+FAIL_LIST := 'Jose.Bello@lexisnexis.com'
+										+',Tony.Kirk@lexisnexis.com'
+										+',Charles.Salvo@lexisnexis.com'
+										+',ris-glonoc@risk.lexisnexis.com'
+										+',Sudhir.Kasavajjala@lexisnexisrisk.com';
 
 IF(exists(x), EVALUATE(
 		_Control.fSubmitNewWorkunit(lECL1, ThorName)
 		)) : WHEN(CRON(every_10_min))
-	,FAILURE(STD.System.Email.SendEmail('nacprojectsupport@lnssi.com,ris-glonoc@risk.lexisnexisrisk.com'
-																			,'NAC2 Contributory File Scheduler failure'
+	,RECOVERY(EVALUATE(_Control.fSubmitNewWorkunit(lECL1, ThorName)),10)
+	,FAILURE(STD.System.Email.SendEmail(FAIL_LIST
+																			,'NAC2 Contributory File Scheduler failure (dataland)'
 																			,NOC_MSG)
 															);
 
