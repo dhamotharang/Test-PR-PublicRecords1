@@ -1,6 +1,6 @@
 import roxiekeybuild,seed_files;
 
-export Proc_RiskViewAttr_Keys(string filedate) := 
+export Proc_RiskViewAttr_Keys(string filedate) :=
 function
 
 
@@ -24,7 +24,6 @@ roxiekeybuild.Mac_SK_Move('~thor_data400::key::testseed::@version@::rvtelecom','
 
 roxiekeybuild.mac_sk_buildprocess_v2_local(Seed_Files.Key_RiskView,'abc','~thor_data400::key::testseed::'+filedate+'::riskview',q);
 roxiekeybuild.mac_sk_buildprocess_v2_local(Seed_Files.Key_RiskView2,'abc','~thor_data400::key::testseed::'+filedate+'::riskview2',rv2);
-roxiekeybuild.mac_sk_buildprocess_v2_local(Seed_Files.Key_RVderogs,'abc','~thor_data400::key::testseed::'+filedate+'::rvderogs',r);
 roxiekeybuild.mac_sk_buildprocess_v2_local(Seed_Files.Key_FCRA_GongHistory,'abc','~thor_data400::key::testseed::'+filedate+'::fcragonghistory',s);
 roxiekeybuild.mac_sk_buildprocess_v2_local(Seed_Files.key_NCFInsurance,'abc','~thor_data400::key::testseed::'+filedate+'::ncfinsurance',ncf);
 roxiekeybuild.mac_sk_buildprocess_v2_local(Seed_Files.key_MVRInsurance,'abc','~thor_data400::key::testseed::'+filedate+'::mvrinsurance',mvr);
@@ -33,7 +32,6 @@ roxiekeybuild.mac_sk_buildprocess_v2_local(Seed_Files.Key_Boca_Shell4(true),'abc
 
 roxiekeybuild.Mac_SK_Move_to_Built_v2('~thor_data400::key::testseed::@version@::riskview','~thor_data400::key::testseed::'+filedate+'::riskview',q1);
 roxiekeybuild.Mac_SK_Move_to_Built_v2('~thor_data400::key::testseed::@version@::riskview2','~thor_data400::key::testseed::'+filedate+'::riskview2',mvrv2);
-roxiekeybuild.Mac_SK_Move_to_Built_v2('~thor_data400::key::testseed::@version@::rvderogs','~thor_data400::key::testseed::'+filedate+'::rvderogs',r1);
 roxiekeybuild.Mac_SK_Move_to_Built_v2('~thor_data400::key::testseed::@version@::fcragonghistory','~thor_data400::key::testseed::'+filedate+'::fcragonghistory',s1);
 roxiekeybuild.Mac_SK_Move_to_Built_v2('~thor_data400::key::testseed::@version@::ncfinsurance','~thor_data400::key::testseed::'+filedate+'::ncfinsurance',mvncf);
 roxiekeybuild.Mac_SK_Move_to_Built_v2('~thor_data400::key::testseed::@version@::mvrinsurance','~thor_data400::key::testseed::'+filedate+'::mvrinsurance',mvmvr);
@@ -42,16 +40,15 @@ roxiekeybuild.Mac_SK_Move_to_Built_v2('~thor_data400::key::testseed::@version@::
 
 roxiekeybuild.Mac_SK_Move('~thor_data400::key::testseed::@version@::riskview','Q',q2);
 roxiekeybuild.Mac_SK_Move('~thor_data400::key::testseed::@version@::riskview2','Q',mvqrv2);
-roxiekeybuild.Mac_SK_Move('~thor_data400::key::testseed::@version@::rvderogs','Q',r2);
 roxiekeybuild.Mac_SK_Move('~thor_data400::key::testseed::@version@::fcragonghistory','Q',s2);
 roxiekeybuild.Mac_SK_Move('~thor_data400::key::testseed::@version@::ncfinsurance','Q',mvqncf);
 roxiekeybuild.Mac_SK_Move('~thor_data400::key::testseed::@version@::mvrinsurance','Q',mvqmvr);
 roxiekeybuild.Mac_SK_Move('~thor_data400::key::testseed::@version@::boca_shell_fcra','Q',mvqmbs);
 roxiekeybuild.Mac_SK_Move('~thor_data400::key::testseed::@version@::boca_shell4_fcra','Q',mvqmbs4);
 
- buildkey := parallel(a,b,c,d,p,q,r,s,ncf,mvr,bs,bs4,rv2);
- movekey := sequential(a1,b1,c1,d1,p1,q1,r1,s1,mvncf,mvmvr,mvbs,mvbs4,mvrv2);
- movetoqa := sequential(a2,b2,c2,d2,p2,q2,r2,s2,mvqncf,mvqmvr,mvqmbs,mvqmbs4,mvqrv2);
+ buildkey := parallel(a,b,c,d,p,q,s,ncf,mvr,bs,bs4,rv2);
+ movekey := sequential(a1,b1,c1,d1,p1,q1,s1,mvncf,mvmvr,mvbs,mvbs4,mvrv2);
+ movetoqa := sequential(a2,b2,c2,d2,p2,q2,s2,mvqncf,mvqmvr,mvqmbs,mvqmbs4,mvqrv2);
  dops_update := Roxiekeybuild.updateversion('RiskviewseedKeys',filedate,'john.freibaum@lexisnexis.com',,'F');
 
 
