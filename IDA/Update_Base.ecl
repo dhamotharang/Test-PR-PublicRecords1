@@ -42,7 +42,7 @@ Ida.layouts.base tMapping(ida.layouts.input L, C) := TRANSFORM
 	SELF := [];
 END;
 
-std_input := project(IDA.Files(pversion,pUseProd).input, tMapping(LEFT, counter));
+std_input := project(input, tMapping(LEFT, counter));
 
 
 //Clean names

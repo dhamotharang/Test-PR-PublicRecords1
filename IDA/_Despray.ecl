@@ -8,7 +8,7 @@ DailyBase:=IDA.Files().Basedaily.Built;
 
 DesprayTable:=TABLE(DailyBase,{did,clientassigneduniquerecordid});
 
-DesprayOut:=OUTPUT(DesprayTable,,'~thor_data400::out::ida::'+version+'::LEXID_APPEND',CSV(HEADING(SINGLE),SEPARATOR('|')),COMPRESSED);
+DesprayOut:=OUTPUT(DesprayTable,,'~thor_data400::out::ida::'+version+'::LEXID_APPEND',CSV(HEADING(SINGLE),separator('|'),terminator(['\n', '\r\n']), quote('"')),COMPRESSED);
 
 Prommote := SEQUENTIAL(STD.File.StartSuperFileTransaction()
                        ,STD.File.PromoteSuperFileList(['~thor_data400::out::ida::despray::built'],'~thor_data400::out::ida::'+version+'::LEXID_APPEND')
