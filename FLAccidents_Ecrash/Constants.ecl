@@ -117,10 +117,11 @@ EXPORT CONSTANTS := MODULE
 //Max Count for Citations Child Records
   EXPORT Max_Citations_ChildRec_Count := 50;
 
-
+//No of days to expire the Thor Extract file
+  EXPORT ThorFile_Dupe_Days_To_Expire := 7;
+  EXPORT ThorFile_NAHDB_Days_To_Expire := 30;
+	
 END;
-
-
 
 
 

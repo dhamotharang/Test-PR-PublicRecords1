@@ -101,7 +101,12 @@ EXPORT Files_eCrash := MODULE
   // ###########################################################################  	
   EXPORT DS_BASE_SUPPRESS_INCIDENTS := DATASET(mod_Utilities.Location + 'thor_data400::in::ecrash::suppress_tf.csv', Layouts.SuppressIncidents, CSV(HEADING(1), TERMINATOR(['\n','\r\n']), SEPARATOR(','), QUOTE('"')));
   EXPORT DS_BASE_ECRASH_DELETES := DATASET(mod_Utilities.Location +'thor_data::in::ecrash_deletes', Layouts.deletes, CSV(TERMINATOR(['\n','\r\n']), SEPARATOR(','), QUOTE('"'))); 
-	
+  
+  // ###########################################################################
+  //               Ecrash Extract Dataset Definitions
+  // ###########################################################################  	
+	EXPORT DS_DUPES_EXTRACT := DATASET('~thor_data400::out::ecrash::dupes', Layouts.DupesExtract, CSV(TERMINATOR('\n'), SEPARATOR(',')));
+
   // #################################################################################
   //                         Ecrash Suffixes for Spray Datasets 
   // #################################################################################
