@@ -14,7 +14,7 @@ functionmacro
 
 	dslim := project(pDataset, transform(
 	{
-  #IF(trim(#TEXT(pID)) not in ['address','source_record_id','sbfe_id','vl_id'])
+  #IF(trim(#TEXT(pID)) not in ['address','source_record_id','sbfe_id','vl_id'] and trim(#TEXT(pID)) != 'cnp_name_raw')
      pDataset.pId
     ,string source
   #ELSE
@@ -42,8 +42,8 @@ functionmacro
       ,pDataset.ultid
      #END
    #END
-  ,pDataset.cnp_name
   ,string cnp_name_raw
+  ,pDataset.cnp_name
   ,string address
   #IF(trim(#TEXT(pID)) != 'company_phone')
   ,string company_phone
@@ -69,9 +69,9 @@ functionmacro
     self.cnp_name_raw      := left.cnp_name;
     
 		self.fein		    := left.company_fein;
-    self.a_duns     := left.active_duns_number;
+    self.a_duns     := left.duns_number;
     self.a_entnum   := left.active_enterprise_number;
-    self.a_corpkey  := left.active_domestic_corp_key;
+    self.a_corpkey  := if(mdr.sourcetools.SourceIsCorpV2(left.source),left.vl_id ,'');
   #IF(trim(#TEXT(pID)) != 'address' and pPrepend_Source_to_Address = true)
 		self.address	  := left.source + '- ' +  stringlib.stringcleanspaces(trim(left.prim_range,left,right) + ' ' + trim(left.prim_name,left,right) + ' ' + trim(left.sec_range,left,right) + ' ' + trim(left.v_city_name,left,right) + ' ' + trim(left.st,left,right) + ' ' + trim(left.zip));
   #ELSE
