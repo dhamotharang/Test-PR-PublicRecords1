@@ -43,6 +43,6 @@ RejectedOut:=sequential(outbad
 );
 
 
-return SEQUENTIAL(CleanOut,RejectedOut);
+return SEQUENTIAL(CleanOut,IF(EXISTS(badrecords),RejectedOut));
 
 end;
