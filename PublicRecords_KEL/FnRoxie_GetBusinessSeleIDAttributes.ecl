@@ -32,11 +32,26 @@ LayoutBIIAndPII := RECORD
 			SELF.RepInput := ROWS(RIGHT),
 			SELF.InputData := LEFT));
 					
-	BusinessSeleAttributes_Results := NOCOMBINE(JOIN(BusinessSeleAttributesInput, FDCDataset,
-		LEFT.InputData.G_ProcBusUID = RIGHT.G_ProcBusUID,
-		TRANSFORM({INTEGER G_ProcBusUID, LayoutBusinessSeleIDAttributes},
-			SELF.G_ProcBusUID := LEFT.InputData.G_ProcBusUID;
-			NonFCRABusinessSeleIDResults := PublicRecords_KEL.Q_Non_F_C_R_A_Business_Sele_I_D_Attributes_V1_Dynamic(
+	// BusinessSeleAttributes_Results := NOCOMBINE(JOIN(BusinessSeleAttributesInput, FDCDataset,//think we need FDCDataset(repnumber != 6) - repnumber needed for batch
+		// LEFT.InputData.G_ProcBusUID = RIGHT.G_ProcBusUID,
+		// TRANSFORM({INTEGER G_ProcBusUID, LayoutBusinessSeleIDAttributes},
+			// SELF.G_ProcBusUID := LEFT.InputData.G_ProcBusUID;
+			// NonFCRABusinessSeleIDResults := PublicRecords_KEL.Q_Non_F_C_R_A_Business_Sele_I_D_Attributes_V1_Dynamic(
+				// LEFT.InputData.B_LexIDUlt,
+				// LEFT.InputData.B_LexIDOrg,
+				// LEFT.InputData.B_LexIDLegal,
+				// LEFT.RepInput,
+				// DATASET(LEFT.InputData),
+				// (INTEGER)LEFT.InputData.B_InpClnArchDt[1..8],
+				// Options.KEL_Permissions_Mask, 
+				// DATASET(RIGHT)).res0;
+			// SELF := NonFCRABusinessSeleIDResults[1]), 
+		// LEFT OUTER, ATMOST(100), KEEP(1)));
+
+
+	BusinessSeleAttributes_Results := NOCOMBINE(PROJECT(BusinessSeleAttributesInput, TRANSFORM({INTEGER G_ProcBusUID, LayoutBusinessSeleIDAttributes},
+		SELF.G_ProcBusUID := LEFT.InputData.G_ProcBusUID;
+		NonFCRABusinessSeleIDResults := PublicRecords_KEL.Q_Non_F_C_R_A_Business_Sele_I_D_Attributes_V1_Dynamic(
 				LEFT.InputData.B_LexIDUlt,
 				LEFT.InputData.B_LexIDOrg,
 				LEFT.InputData.B_LexIDLegal,
@@ -44,10 +59,8 @@ LayoutBIIAndPII := RECORD
 				DATASET(LEFT.InputData),
 				(INTEGER)LEFT.InputData.B_InpClnArchDt[1..8],
 				Options.KEL_Permissions_Mask, 
-				DATASET(RIGHT)).res0;
-			SELF := NonFCRABusinessSeleIDResults[1]), 
-		LEFT OUTER, ATMOST(100), KEEP(1)));
-
+				FDCDataset).res0;
+		SELF := NonFCRABusinessSeleIDResults[1])));
 
 	BusinessSeleIDAttributesRaw := KEL.Clean(BusinessSeleAttributes_Results, true, true, true);
 

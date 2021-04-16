@@ -33,11 +33,26 @@ EXPORT FnRoxie_GetBusinessProxIDAttributes(DATASET(PublicRecords_KEL.ECL_Functio
 			SELF.RepInput := ROWS(RIGHT),
 			SELF.InputData := LEFT));
 					
-	BusinessProxIDAttributesRaw := NOCOMBINE(JOIN(BusinessProxAttributesInput, FDCDataset,
-		LEFT.InputData.G_ProcBusUID = RIGHT.G_ProcBusUID,
-		TRANSFORM({INTEGER G_ProcBusUID, LayoutBusinessProxIDAttributes},
-			SELF.G_ProcBusUID := LEFT.InputData.G_ProcBusUID;
-			NonFCRABusinessProxIDResults := PublicRecords_KEL.Q_Non_F_C_R_A_Business_Prox_I_D_Attributes_V1_Dynamic(
+	// BusinessProxIDAttributesRaw := NOCOMBINE(JOIN(BusinessProxAttributesInput, FDCDataset,//think we need FDCDataset(repnumber != 6) - repnumber needed for batch
+		// LEFT.InputData.G_ProcBusUID = RIGHT.G_ProcBusUID,
+		// TRANSFORM({INTEGER G_ProcBusUID, LayoutBusinessProxIDAttributes},
+			// SELF.G_ProcBusUID := LEFT.InputData.G_ProcBusUID;
+			// NonFCRABusinessProxIDResults := PublicRecords_KEL.Q_Non_F_C_R_A_Business_Prox_I_D_Attributes_V1_Dynamic(
+				// LEFT.InputData.B_LexIDUlt,
+				// LEFT.InputData.B_LexIDOrg,
+				// LEFT.InputData.B_LexIDLegal,
+				// LEFT.InputData.B_LexIDLoc,
+				// LEFT.RepInput,
+				// DATASET(LEFT.InputData),
+				// (INTEGER)LEFT.InputData.B_InpClnArchDt[1..8],
+				// Options.KEL_Permissions_Mask, 
+				// DATASET(RIGHT)).res0;
+			// SELF := NonFCRABusinessProxIDResults[1]), 
+		// LEFT OUTER, ATMOST(100), KEEP(1)));
+		
+		BusinessProxIDAttributesRaw := NOCOMBINE(PROJECT(BusinessProxAttributesInput, TRANSFORM({INTEGER G_ProcBusUID, LayoutBusinessProxIDAttributes},
+		SELF.G_ProcBusUID := LEFT.InputData.G_ProcBusUID;
+		NonFCRABusinessProxIDResults := PublicRecords_KEL.Q_Non_F_C_R_A_Business_Prox_I_D_Attributes_V1_Dynamic(
 				LEFT.InputData.B_LexIDUlt,
 				LEFT.InputData.B_LexIDOrg,
 				LEFT.InputData.B_LexIDLegal,
@@ -46,9 +61,8 @@ EXPORT FnRoxie_GetBusinessProxIDAttributes(DATASET(PublicRecords_KEL.ECL_Functio
 				DATASET(LEFT.InputData),
 				(INTEGER)LEFT.InputData.B_InpClnArchDt[1..8],
 				Options.KEL_Permissions_Mask, 
-				DATASET(RIGHT)).res0;
-			SELF := NonFCRABusinessProxIDResults[1]), 
-		LEFT OUTER, ATMOST(100), KEEP(1)));
+				FDCDataset).res0;
+		SELF := NonFCRABusinessProxIDResults[1])));		
 	
 	BusinessProxIDAttributesClean := KEL.Clean(BusinessProxIDAttributesRaw, TRUE, TRUE, TRUE);
 	
