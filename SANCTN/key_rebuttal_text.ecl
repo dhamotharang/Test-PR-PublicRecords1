@@ -5,7 +5,7 @@ f_sanctn_rebuttal := SANCTN.file_base_rebuttal;
 KeyName 			:= 'thor_data400::key::sanctn::';
 
 layout_SANCTN_rebuttal_key := RECORD
-  SANCTN.layout_SANCTN_rebuttal_in AND NOT [RECORD_TYPE];
+  SANCTN.layout_SANCTN_rebuttal_Base AND NOT [RECORD_TYPE];
 END;
 
 f_sanctn_rebuttal_new := project(f_sanctn_rebuttal, TRANSFORM(layout_SANCTN_rebuttal_key, SELF := LEFT));
