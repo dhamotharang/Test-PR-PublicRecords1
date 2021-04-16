@@ -1,7 +1,8 @@
 ﻿EXPORT GetBuildInstance (
          string BuildName,
 				string BuildVersion,
-				string ptoken/*,
+				string ptoken,
+				boolean isswitch = orbitPR.EnvironmentVariables.switchtonewversion/*,
 				string BuildInstanceId*/
 		
 				) := module
@@ -41,7 +42,7 @@ rStatus := RECORD
 	
 export retcode := SOAPCALL ( 
          
-			OrbitPR.EnvironmentVariables.serviceurl,
+			OrbitPR.EnvironmentVariables.serviceurl(isswitch),
 		'GetBuildInstance',
 		rBuildrequest,
 		rStatus,

@@ -4,10 +4,11 @@ EXPORT CreateBuild(
 				string MasterBuildName,
 				string BuildVersion,
 				string ptoken,
-
+                 boolean isswitch = orbitPR.EnvironmentVariables.switchtonewversion,
 				string Excludefrom_Scorecard = '1',
 				string NewCoverage_Area = '1' ,
 				string Skipped_Build = '0'
+				
 	
 				) := module
 
@@ -49,7 +50,7 @@ rStatus := RECORD
 	
 export retcode := SOAPCALL ( 
          
-			OrbitPR.EnvironmentVariables.serviceurl,
+			OrbitPR.EnvironmentVariables.serviceurl(isswitch),
 		'CreateBuild',
 		rBuildrequest,
 		rStatus,

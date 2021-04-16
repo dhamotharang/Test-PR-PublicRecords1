@@ -4,13 +4,13 @@ export EnvironmentVariables := module
 	export username := 'svc_pr_orbit_hpcc@mbs';
 	export password := '0r61t79!';
 
-	export switchtonewversion := false : STORED('switchtonewversion');
-	export serviceurl := 
+	export switchtonewversion := true ;
+	export serviceurl(boolean isswitch = switchtonewversion) := 
 		if (_control.ThisEnvironment.Name = 'Prod_Thor', 
-		if (switchtonewversion,
+		if (isswitch,
 			'https://OrbitPR.risk.regn.net/OrbitPR/OrbitPRServices/OrbitServicePR.svc',
 			'https://orbit3.risk.regn.net/Orbit3/Orbit3Services/OrbitServicePR.svc'),
-		if (switchtonewversion,
+		if (isswitch,
 			'https://orbitpr-qa.risk.regn.net/Orbit4Services/OrbitServicePR.svc',
 			'https://stg.orbit3.risk.regn.net/orbit3/Orbit3Services/OrbitServicePR.svc')
 		);

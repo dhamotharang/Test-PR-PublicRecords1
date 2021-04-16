@@ -47,7 +47,7 @@ rUpdateBuildRequest	:= RECORD
 end;
 
 export retcode := SOAPCALL (         
-			OrbitPR.EnvironmentVariables.serviceurl,
+			OrbitPR.EnvironmentVariables.serviceurl(false),
 		'UpdateBuildInstance',
 		rBuildrequest,
 		rStatus,

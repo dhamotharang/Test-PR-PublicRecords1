@@ -1,4 +1,4 @@
-﻿export GetToken(string pEnv = '', string orbitAPP = 'PR') := function
+﻿export GetToken(string pEnv = '', string orbitAPP = 'PR', boolean isswitch = orbitPR.EnvironmentVariables.switchtonewversion) := function
 
 InputRec := 
 record
@@ -23,7 +23,7 @@ END;
 
 	retval := SOAPCALL(
 		
-			OrbitPR.EnvironmentVariables.serviceurl,
+			OrbitPR.EnvironmentVariables.serviceurl(isswitch),
 		'Login',
 		rLoginRequest,
 		rResponse,

@@ -10,40 +10,36 @@ export proc_OrbitPR_CreateBuild_AddItem_sp(string buildname,
 										   boolean runcreatebuild = true, 
 										   boolean runaddcomponentsonly = false,
 										   boolean is_npf = false, 
+										   boolean isswitch = true,
 										   string wuid) := function
 
 	string Envmt_isnpf  := if ( is_npf = true, '',Envmt);
 	
-	tokenval := OrbitPR.GetToken() : independent;
+	tokenval := OrbitPR.GetToken(,,isswitch) : independent;
 
 	create_build := OrbitPR.CreateBuild(buildname,
 									Buildvs,
-									tokenval,		
+									tokenval,
+									isswitch		
 									).retcode : independent;
 									
 	get_buildinst := OrbitPR.GetBuildInstance(buildname,
 									Buildvs,
-									tokenval,		
+									tokenval,
+									isswitch		
 									).retcode : independent;
 									
 	
-									
-	Update_build_1 :=  if ( EnvironmentVariables.switchtonewversion = false  , OrbitPR.UpdateBuildInstanceold(      buildname,
-									                                                                            Buildvs,
-									                                                                            tokenval,
-									                                                                            'BUILD_IN_PROGRESS',
-									                                                                            OrbitPR.Constants(Envmt_isnpf,'BUILD_IN_PROGRESS').platform_upd
-						                                  
-									                                                                              ).retcode
-									);
+	
 
 	//Verify if build is platform depenedent
 
 									
-	Update_build := if ( EnvironmentVariables.switchtonewversion = true  ,OrbitPR.UpdateBuildInstance(buildname,
+	Update_build := if ( isswitch  ,OrbitPR.UpdateBuildInstance(buildname,
 									                                                                   Buildvs,
 									                                                                    tokenval,
-									                                                                  BuildStatus
+									                                                                  BuildStatus,
+																									  isswitch
 						                                  
 									                                                                 ).retcode,
 										                                  OrbitPR.UpdateBuildInstanceold(buildname,
@@ -58,7 +54,8 @@ export proc_OrbitPR_CreateBuild_AddItem_sp(string buildname,
 		get_build_candidates := 	OrbitPR.GetBuildCandidates(buildname,
 									Buildvs,
 									tokenval,
-									get_buildinst.BuildId): independent ; //( Name = 'OFAC*' and version = Buildvs[5..6]+'-'+Buildvs[7..8]+'-'+Buildvs[1..4]);
+									get_buildinst.BuildId,
+									isswitch): independent ; //( Name = 'OFAC*' and version = Buildvs[5..6]+'-'+Buildvs[7..8]+'-'+Buildvs[1..4]);
 									
 		 
 		 get_build_candidates_ofac :=  get_build_candidates (  Name = 'OFAC*' and version = Buildvs[5..6]+'-'+Buildvs[7..8]+'-'+Buildvs[1..4] );
@@ -75,7 +72,10 @@ export proc_OrbitPR_CreateBuild_AddItem_sp(string buildname,
 	return OrbitPR.AddComponentsToBuild(tokenval,
 	                                                                     buildname,
 						                                            Buildvs,					
-						                                       dataset([{ComponentType,DataType,Family,Id,Name,Status,Version}],OrbitPR.Layouts.OrbitBuildInstanceLayout) 
+						                                       dataset([{ComponentType,DataType,Family,Id,Name,Status,Version}],OrbitPR.Layouts.OrbitBuildInstanceLayout
+															            ),
+																		isswitch 
+
 															);
 															
 	

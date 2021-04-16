@@ -2,7 +2,7 @@
 
 */
 import std,ut,OrbitPR,_Control;
-export Proc_Orbit3_CreateBuild(string buildname,string Buildvs,string Envmt = 'N',string email_list = '',string BuildStatus = 'BUILD_AVAILABLE_FOR_USE', boolean skipcreatebuild = false,boolean skipupdatebuild = false,boolean runcreatebuild = true, boolean is_npf = false) := function
+export Proc_Orbit3_CreateBuild(string buildname,string Buildvs,string Envmt = 'N',string email_list = '',string BuildStatus = 'BUILD_AVAILABLE_FOR_USE', boolean skipcreatebuild = false,boolean skipupdatebuild = false,boolean runcreatebuild = true, boolean is_npf = false, boolean isswitch = orbitPR.EnvironmentVariables.switchtonewversion) := function
 
 string wuid := workunit;
 
@@ -13,7 +13,8 @@ ECL1 := '#workunit(\'name\',\'Orbit Create Build Instance -- '+ buildname + '-- 
 'OrbitPR.proc_OrbitPR_CreateBuild_sp( \''+buildname+'\', \''+Buildvs+'\', \''+Envmt+'\', \''+BuildStatus+'\', \''+email_list+'\', '+if (skipcreatebuild , 'true','false')+ ','
 + if (skipupdatebuild , 'true','false')+','
 +if (runcreatebuild, 'true','false') +','
-+if (is_npf,'true','false')+' , \''+wuid+'\') \n'
++if (is_npf,'true','false') + ','
++if (isswitch,'true','false')+' , \''+wuid+'\')\n'
 +' : success(OrbitPR.Send_Email(\''+Buildvs+'\', \''+email_list+'\', \''+buildname+'\', \''+Buildvs+'\' ).build_success)\n'
 +' , failure(OrbitPR.Send_Email(\''+Buildvs+'\', \''+email_list+'\', \''+buildname+'\', \''+Buildvs+'\').build_failure)\n'
 +' ;\n';

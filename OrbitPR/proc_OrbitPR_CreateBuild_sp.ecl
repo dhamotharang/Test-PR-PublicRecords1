@@ -7,26 +7,29 @@ export Proc_OrbitPR_CreateBuild_sp(string buildname,
                                   boolean skipcreatebuild = false,
                                   boolean skipupdatebuild = false,
                                   boolean runcreatebuild = true,
-                                  boolean is_npf = false, 
+                                  boolean is_npf = false,
+								  boolean isswitch = orbitPR.EnvironmentVariables.switchtonewversion, 
                                   string wuid) := function
 
   	string Envmt_isnpf  := if ( is_npf = true, '',Envmt);
 
 	
-	tokenval := OrbitPR.GetToken();
+	tokenval := OrbitPR.GetToken(,,isswitch);
 
 	create_build := OrbitPR.CreateBuild(buildname,
 									Buildvs,
-									tokenval,		
+									tokenval,
+									isswitch		
 									).retcode;
 									
 	
 	
 									
-	Update_build := if ( EnvironmentVariables.switchtonewversion = true , OrbitPR.UpdateBuildInstance(buildname,
+	Update_build := if ( isswitch = true , OrbitPR.UpdateBuildInstance(buildname,
 									                                                                 Buildvs,
 									                                                                 tokenval,
-									                                                                 BuildStatus
+									                                                                 BuildStatus,
+																									 isswitch
 						                                  
 									                                                                 ).retcode,
 										                                   OrbitPR.UpdateBuildInstanceold(buildname,

@@ -3,7 +3,8 @@
 EXPORT AddComponentsToBuild(string			pLoginToken,
 																	string			pBuildName,
 																	string			pBuildVersion,
-																	dataset(OrbitPR.Layouts.OrbitBuildInstanceLayout)	pBuildCandidates
+																	dataset(OrbitPR.Layouts.OrbitBuildInstanceLayout)	pBuildCandidates,
+				                                                      boolean isswitch = orbitPR.EnvironmentVariables.switchtonewversion
 																 ) := function
 
 //SOAP Request format
@@ -79,7 +80,7 @@ end;
 
 ///////////////////////////////////////////////////////////////////////////////
 	lResponse	:=  SOAPCALL (         
-			OrbitPR.EnvironmentVariables.serviceurl,
+			OrbitPR.EnvironmentVariables.serviceurl(isswitch),
 		'AddBuildInstanceComponent',
 		rBuildrequest,
 		rStatus,

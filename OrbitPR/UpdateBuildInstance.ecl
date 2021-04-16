@@ -7,6 +7,7 @@ EXPORT UpdateBuildInstance(
 				string BuildVersion,
 				string ptoken,
 			  string BuildStatus =  'BUILD_IN_PROGRESS',
+			boolean isswitch = orbitPR.EnvironmentVariables.switchtonewversion,
 				string NewCoverage_Area = '1',
 				string Excludefrom_Scorecard = '1',
 				string Skipped_Build = '0'
@@ -45,7 +46,7 @@ rUpdateBuildRequest	:= RECORD
 end;
 
 export retcode := SOAPCALL (         
-			OrbitPR.EnvironmentVariables.serviceurl,
+			OrbitPR.EnvironmentVariables.serviceurl(isswitch),
 		'UpdateBuildInstance',
 		rBuildrequest,
 		rStatus,
