@@ -6,7 +6,7 @@ EXPORT Update_Base (string pversion='', boolean pUseProd=false, boolean pdaily=t
 
 //standardize input
 
-input := IDA.Files(pversion,pUseProd).input;
+input := IDA.Files(pversion,pUseProd).cleanedinput;
 
 Ida.layouts.base tMapping(ida.layouts.input L, C) := TRANSFORM
 
