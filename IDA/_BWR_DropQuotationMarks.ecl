@@ -14,8 +14,6 @@ prj:=PROJECT(ds,TRANSFORM({recordof(ds)},
                               SELF.x:=REGEXREPLACE('\"',Left.x,''),
                               SELF:=LEFT));
 
-prj;
-
 
 out:=output(prj,,'~thor_data400::in::prep::ida::'+pversion,csv(heading(single),separator(''), terminator(['\n', '\r\n']), quote('"')),compressed,overwrite);
 
