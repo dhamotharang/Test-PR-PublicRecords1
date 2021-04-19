@@ -11,17 +11,19 @@ self.source_st                 := 'AZ';
 self.vendor                    := 'Arizona Acupuncture Board of Examiners';
 self.profession_or_board       := 'Acupuncturists';
 self.license_number            := l.License_Number;
-self.orig_name                 := trim(l.Last_Name)+' '+ trim(l.First_Name)+' ' + trim(l.Middle_Name);
+self.orig_name                 := trim(l.Last_Name)+' '+ trim(l.First_Name);
 self.name_order                := 'LFM';
 self.expiration_date           := Prof_License_preprocess.dateconv(l.License_Expiration_Date);
+self.issue_date           := Prof_License_preprocess.dateconv(l.License_Issue_Date);
+
 self.status                    := l.Status_of_License;
 self.orig_addr_1               := l.Address1;
-self.orig_addr_2               := l.Address2;
-self.orig_city                 := l.City;
-self.orig_st                   := if ( length(trim(l.State)) > 2 , '' , trim(l.State) ) ;
-self.orig_zip                  := regexreplace('-',trim(l.ZIP),'')[1..9];
-self.company_name              := l.BusinessName;
-self.license_type              := l.Title;                                                                                                              
+//self.orig_addr_2               := l.Address2;
+//self.orig_city                 := l.City;
+//self.orig_st                   := if ( length(trim(l.State)) > 2 , '' , trim(l.State) ) ;
+//self.orig_zip                  := regexreplace('-',trim(l.ZIP),'')[1..9];
+//self.company_name              := l.BusinessName;
+self.license_type              := l.License_Type;                                                                                                              
 self := l;                                                                                                                                                                                                                                                                                           
 self := [];                                                                                                                                                                                                                                                                                          
 
