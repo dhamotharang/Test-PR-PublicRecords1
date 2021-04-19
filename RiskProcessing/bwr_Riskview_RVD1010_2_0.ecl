@@ -1,4 +1,4 @@
-#workunit('name','FCRA-RiskView Process-Retail');
+﻿#workunit('name','FCRA-RiskView Process-Retail');
 #option ('hthorMemoryLimit', 1000)
 
 
@@ -95,7 +95,7 @@ l := RECORD
 END;
 
 
-fcraroxieIP := 'http://fcrabatch.sc.seisint.com:9876'; 
+fcraroxieIP := 'http://fcrathorvip.hpcc.risk.regn.net:9876'; 
 
 
 l t_f(f le, INTEGER c) := TRANSFORM

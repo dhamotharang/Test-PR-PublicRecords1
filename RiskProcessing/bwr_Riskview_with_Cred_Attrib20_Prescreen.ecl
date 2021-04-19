@@ -1,4 +1,4 @@
-#workunit('name','FCRA-Credit Attributes 2.0 - Prescreen');
+﻿#workunit('name','FCRA-Credit Attributes 2.0 - Prescreen');
 
 eyeball := 10;
 
@@ -100,7 +100,7 @@ l := RECORD
 END;
 
 
-fcraroxieIP := 'http://fcrabatch.sc.seisint.com:9876'; 
+fcraroxieIP := 'http://fcrathorvip.hpcc.risk.regn.net:9876'; 
 
 l t_f(f le, INTEGER c) := TRANSFORM
 	SELF.old_account_number := le.account;

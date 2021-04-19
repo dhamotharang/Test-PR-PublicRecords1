@@ -1,4 +1,4 @@
-export macro_run_bs2() := macro
+﻿export macro_run_bs2() := macro
 
 #workunit('name','Bocashell Creation for Tracking');
 #option ('hthorMemoryLimit', 1000)
@@ -9,7 +9,7 @@ export macro_run_bs2() := macro
 eyeball := 10;
  
 neutral_roxieIP := 'http://roxiebatch.br.seisint.com:9856';
-roxieIP_fcra := 'http://fcrabatch.sc.seisint.com:9876';
+roxieIP_fcra := 'http://fcrathorvip.hpcc.risk.regn.net:9876';
 
 input_file := '~nmontpetit::in::first_inv_857_bs_input';
 output_file := '~nmontpetit::out::first_inv';

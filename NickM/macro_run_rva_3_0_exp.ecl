@@ -1,4 +1,4 @@
-EXPORT macro_run_rva_3_0_exp(archive_date) := macro
+﻿EXPORT macro_run_rva_3_0_exp(archive_date) := macro
 
 #workunit('name','FCRA-Credit Attributes 3.0 with Experian');
 #option ('hthorMemoryLimit', 1000);
@@ -81,7 +81,7 @@ l := RECORD
 END;
 
 
-fcraroxieIP := 'http://fcrabatch.sc.seisint.com:9876'; 
+fcraroxieIP := 'http://fcrathorvip.hpcc.risk.regn.net:9876'; 
 
 l t_f(f le, INTEGER c) := TRANSFORM
 	SELF.old_account_number := le.account;
