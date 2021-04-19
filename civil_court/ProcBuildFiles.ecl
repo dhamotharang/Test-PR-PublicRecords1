@@ -40,7 +40,8 @@ EXPORT ProcBuildFiles(
 	RETURN SEQUENTIAL(
 		fUpdateCurrDevVerLogical,
 		fCreateDevVerSuper,
-		fPlaceInDevVerSuper,
+		fPlaceInDevVerSuper
+		/*
 		PARALLEL(
 			civil_court.Out_Moxie_Party,
 			civil_court.Out_Moxie_Matter,
@@ -63,5 +64,6 @@ EXPORT ProcBuildFiles(
 		),
 		Orbit3.proc_Orbit3_CreateBuild('Civil Court',Civil_Court.Version_Development,'N'),
 		fSendMail('Civil Court 2 of 2','Civil Court job complete')
+		*/
 	);
 END; 
