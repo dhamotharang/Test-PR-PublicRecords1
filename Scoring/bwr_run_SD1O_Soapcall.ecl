@@ -24,9 +24,8 @@ end;
 soap_in := project(f,into_SD1O_input(LEFT));
 output(soap_in, named('soap_in'));
 
-roxieIP :='http://certfcraroxievip.sc.seisint.com:9876' ; // cert fcra roxie
+roxieIP :='http://certfcraroxievip.hpcc.risk.regn.net:9876' ; // cert fcra roxie
 isFCRA := true;
-//roxieIP := 'http://stcloudroxievip.sc.seisint.com:9876';  //St. Cloud Roxie
 
 s_f := Scoring.SD1O_Soapcall(soap_in, roxieIP, isFCRA);
 try_2 := JOIN(soap_in, s_f(errorcode<>''), LEFT.account=RIGHT.account, TRANSFORM(Scoring.Layout_SD1O_Soapcall,SELF := LEFT));

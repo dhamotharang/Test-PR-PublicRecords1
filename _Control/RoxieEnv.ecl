@@ -21,6 +21,6 @@ export RoxieEnv := MODULE
 	export DR_prod_fcra_roxieIP := 'http://ofcraroxievip.sc.seisint.com:9876';
 
 	export staging_neutral_roxieIP := 'http://certstagingvip.hpcc.risk.regn.net:9876'; 
-	export staging_fcra_roxieIP :='http://certfcraroxievip.sc.seisint.com:9876'; 
+	export staging_fcra_roxieIP :='http://certfcraroxievip.hpcc.risk.regn.net:9876'; 
 
 END;
