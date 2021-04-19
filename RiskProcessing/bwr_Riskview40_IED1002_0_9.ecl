@@ -1,4 +1,4 @@
-#workunit('name','FCRA-RiskView IED1002_0');
+﻿#workunit('name','FCRA-RiskView IED1002_0');
 #option ('hthorMemoryLimit', 1000);
 import models, Riskwise, Risk_Indicators;
 
@@ -77,7 +77,7 @@ l := RECORD
 	layout_soap;
 END;
 
-fcraroxieIP := 'http://fcrabatch.sc.seisint.com:9876'; 
+fcraroxieIP := 'http://fcrathorvip.hpcc.risk.regn.net:9876'; 
 neutralroxieIP := 'http://roxiebatch.br.seisint.com:9856';
 
 

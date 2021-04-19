@@ -15,10 +15,10 @@ export RoxieEnv := MODULE
 	export prodprctvip := 'http://demoroxievip.sc.seisint.com:9876';
 
 	export prod_batch_neutral := 'http://roxiebatch.br.seisint.com:9856';
-	export prod_batch_fcra := 'http://fcrabatch.sc.seisint.com:9876';
+	export prod_batch_fcra := 'http://fcrathorvip.hpcc.risk.regn.net:9876';
 
 	export DR_prod_neutral_roxieIP := 'http://oroxievip.sc.seisint.com:9876';
-	export DR_prod_fcra_roxieIP := 'http://ofcraroxievip.sc.seisint.com:9876';
+	export DR_prod_fcra_roxieIP := 'http://prdrfcrathorvip.hpcc.risk.regn.net:9876';
 
 	export staging_neutral_roxieIP := 'http://certstagingvip.hpcc.risk.regn.net:9876'; 
 	export staging_fcra_roxieIP :='http://certfcraroxievip.hpcc.risk.regn.net:9876'; 

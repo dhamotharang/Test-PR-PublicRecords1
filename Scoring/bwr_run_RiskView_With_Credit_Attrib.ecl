@@ -1,4 +1,4 @@
-#workunit('name','FCRA-RiskView attributes');
+﻿#workunit('name','FCRA-RiskView attributes');
 
 
 prii_layout := RECORD
@@ -68,8 +68,7 @@ l := RECORD
 END;
 
 
-//fcraroxieIP := 'http://temp-fcra.sc.seisint.com:9876'; 
-fcraroxieIP := 'http://ofcraroxievip.sc.seisint.com:9876'; 
+fcraroxieIP := 'http://prdrfcrathorvip.hpcc.risk.regn.net:9876'; 
 
 
 l t_f(f le, INTEGER c) := TRANSFORM

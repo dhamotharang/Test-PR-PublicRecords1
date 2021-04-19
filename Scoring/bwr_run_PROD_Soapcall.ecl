@@ -1,4 +1,4 @@
-/*****************************************
+﻿/*****************************************
 1. Change the input file and add the layout
 2. Replace "SD1O" with the prod code needed
 3. Change the output file name
@@ -42,11 +42,7 @@ Scoring.Layout_SD1O_Soapcall into_SD1O_input(f le) := transform
 //	self.dppapurpose := 0; 	self.glbpurpose := 5;
 	self.dppapurpose := 3; 	self.glbpurpose := 1;
 	self.gateways := dataset([
-{'FCRA', 'http://ofcraroxievip.sc.seisint.com:9876'},
-{'attus','http://rw_data_prod: Password01@orwgatewayprod.or.seisint.com:8090/wsGateway'},
-{'netacuity','http://rw_data_prod: Password01@orwgatewayprod.or.seisint.com:8090/wsGateway'},
-{'veris','http://rw_data_prod:Password01@orwgatewayprod.or.seisint.com: 8090/ws_ssn'},
-{'targus','http://rw_data_prod:Password01@orwgatewayprod.or.seisint.com: 8090/wsGateway'},
+{'FCRA', 'http://prdrfcrathorvip.hpcc.risk.regn.net:9876'},
 {'neutralroxie','http://oroxievip.sc.seisint.com:9876'}],risk_indicators.Layout_Gateways_In);
 
 	self := le;
@@ -58,7 +54,7 @@ unsigned1 Parallel_threads := 30;
 soap_in := project(f,into_SD1O_input(LEFT));
 output(soap_in, named('soap_in'));
 
-roxieIP :='http://ofcraroxievip.sc.seisint.com:9876' ; // fcra roxie
+roxieIP :='http://prdrfcrathorvip.hpcc.risk.regn.net:9876' ; // fcra roxie
 //roxieIP:='http://oroxievip.sc.seisint.com:9876';  //Regular Roxie
 
 Scoring.MAC_PROD_Soapcall(soap_in, RiskWise.Layout_SD1O, roxieIP, 'RiskWiseFCRA.RiskWiseMainSD1O',s_f, Parallel_threads);
