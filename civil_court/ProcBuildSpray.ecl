@@ -130,7 +130,7 @@ EXPORT ProcBuildSpray(
 	END;
 	
 	EXPORT sprayFresno(
-		STRING pFileMask = '*_civilcaseindex.csv'
+		STRING pFileMask = 'ca_fresno_en_*_civilcaseindex.csv'
 	) := doSprayUp(
 		'Fresno',
 		pFileMask,
@@ -148,7 +148,7 @@ EXPORT ProcBuildSpray(
 	);
 
 	EXPORT sprayLosAngeles(
-		STRING pFileMask = 'Superior_Civ_*.txt',
+		STRING pFileMask = 'ca_los_angeles_en_Superior_Civ_*.txt',
 		INTEGER pRecordSize = 144
 	) := doSprayUp(
 		'Los Angeles',
@@ -160,12 +160,24 @@ EXPORT ProcBuildSpray(
 	);
 
 	EXPORT sprayMarin(
-		STRING pFileMask = 'civilpublicindex_quarterly.csv'
+		STRING pFileMask = 'ca_marin_pn_civilpublicindex_quarterly.csv'
 	) := doSprayUp(
 		'Marin',
 		pFileMask,	
 		'~thor_data400::in::civil::ca_marin_' + pVersion,
 		'~thor_data400::in::civil::ca_marin'
+	);
+
+	EXPORT spraySanBernardino(
+		STRING pFileMask = 'ca_san_bernardino_en_*Quarter*_*.txt',
+		INTEGER pRecordSize = 144
+	) := doSprayUp(
+		'San Bernardino',
+		pFileMask,
+		'~thor_data400::in::civil::ca_san_bernardino_thru_' + pVersion,
+		'~thor_data400::in::civil::ca_san_bernardino',
+		pRecordSize,
+		FALSE
 	);
 
 END;
