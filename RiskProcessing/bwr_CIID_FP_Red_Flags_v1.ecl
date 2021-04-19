@@ -152,7 +152,7 @@ l t_f(f le, INTEGER c) := TRANSFORM
                                                                   le.historydate
       );
 
- 	// self.scores := dataset([{'Models.FraudAdvisor_Service','http://roxiebatch.br.seisint.com:9856',parms}], models.Layout_Score_Chooser);
+ 	// self.scores := dataset([{'Models.FraudAdvisor_Service','http://roxiethorvip.hpcc.risk.regn.net:9856',parms}], models.Layout_Score_Chooser);
 	self.scores := dataset([], models.Layout_Score_Chooser);	// for when no models are requested
 	
 	// the following 2 lines are included for e3220 searching, please do not use on regular runs *************************************************************************************

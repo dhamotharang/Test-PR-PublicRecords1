@@ -8,7 +8,7 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 eyeball := 10;
  
-neutral_roxieIP := 'http://roxiebatch.br.seisint.com:9856';
+neutral_roxieIP := 'http://roxiethorvip.hpcc.risk.regn.net:9856';
 roxieIP_fcra := 'http://fcrathorvip.hpcc.risk.regn.net:9876';
 
 input_file := '~nmontpetit::in::first_inv_857_bs_input';
