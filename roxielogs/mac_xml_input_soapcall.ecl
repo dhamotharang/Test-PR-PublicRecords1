@@ -1,4 +1,4 @@
-// output(choosen(, 100))
+﻿// output(choosen(, 100))
 
 
 
@@ -23,7 +23,7 @@ f_in_dst2 := project(f_in_dst, layout_input);
 
 xlayout := roxielogs.LAYOUTS_XML_INPUT_SOAPCALL.GONG_SERVICES_GONGHISTORYSEARCHSSERVICE_OUTPUT;
 
-roxie_ip := 'roxiestaging.br.seisint.com:9876';
+roxie_ip := 'certstagingvip.hpcc.risk.regn.net:9876';
 //roxie_ip := 'roxiebatch.br.seisint.com:9876';
 // roxie_ip := 'http://10.173.3.5:9876/';
 //roxie_ip := 'http://10.173.193.1:9876'; //qa

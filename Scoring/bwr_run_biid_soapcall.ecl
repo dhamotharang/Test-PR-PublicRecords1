@@ -1,4 +1,4 @@
-pb1i_layout := record
+﻿pb1i_layout := record
 	string30 ACCOUNT := '';
      string30 CMPY := '';
      string30 DBANAME := '';
@@ -34,7 +34,7 @@ f := dataset('~mzhang::in::GE_Samp_BIID', pb1i_layout, csv(quote('"')));
 //output(f);
 
 roxieIP :='http://oroxievip.sc.seisint.com:9876';  //DR Roxie
-// roxieIP := 'http://roxieqavip.br.seisint.com:9876'; 
+// roxieIP := 'http://certstagingvip.hpcc.risk.regn.net:9876'; 
 
 // populate the input values to business instant id with the original input values
 riskprocessing.Layout_BIID_Soapcall into_bus_input(f le) := transform
