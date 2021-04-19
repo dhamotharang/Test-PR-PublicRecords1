@@ -1326,6 +1326,9 @@
 		export string KEYWORD_OFAC_RUSSIA_EO				:= '1008';
 		export string KEYWORD_TRMASAK								:= '1009';
 		export string KEYWORD_IDLPSE								:= '1010';
+		export string KEYWORD_PTCMVM_AJC						:= '1011';
+		export string KEYWORD_PTCMVM_DWN						:= '1012';
+		export string KEYWORD_FINMA_DU							:= '1013';
 		
 		//When setting the keyword export use underscores for dashes (ex: For RBI-SANC, use RBI_SANC)	
 	end;

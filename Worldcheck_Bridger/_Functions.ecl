@@ -1427,6 +1427,9 @@
 				trim(kword, left, right) = 'OFAC-RUSSIA-EO' =>SubGroup_Constants.numKeywordsID.KEYWORD_OFAC_RUSSIA_EO,
 				trim(kword, left, right) = 'TRMASAK' =>SubGroup_Constants.numKeywordsID.KEYWORD_TRMASAK,
 				trim(kword, left, right) = 'IDLPSE' =>SubGroup_Constants.numKeywordsID.KEYWORD_IDLPSE,
+				trim(kword, left, right) = 'PTCMVM-AJC' =>SubGroup_Constants.numKeywordsID.KEYWORD_PTCMVM_AJC,
+				trim(kword, left, right) = 'PTCMVM-DWN' =>SubGroup_Constants.numKeywordsID.KEYWORD_PTCMVM_DWN,
+				trim(kword, left, right) = 'FINMA-DU' =>SubGroup_Constants.numKeywordsID.KEYWORD_FINMA_DU,
 								
 				//When setting the keyword export use underscores for dashes (ex: For RBI-SANC, use RBI_SANC)	
 				
