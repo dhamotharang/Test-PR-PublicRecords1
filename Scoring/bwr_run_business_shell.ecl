@@ -1,4 +1,4 @@
-SD2I := record
+﻿SD2I := record
      string30 account := '';
      string1 apptype := '';
      string15 firstname := '';
@@ -123,7 +123,7 @@ end;
 indata := project(f,into_bus_input(LEFT, counter));
 output(indata);
 
-roxieIP :='http://roxiestaging.br.seisint.com:9876';  // staging roxie
+roxieIP :='http://certstagingvip.hpcc.risk.regn.net:9876';  // staging roxie
 //roxieIP :='http://oroxievip.sc.seisint.com:9876';  // DR roxie
 // roxieIP := 'http://10.173.202.2:9876'; 
 

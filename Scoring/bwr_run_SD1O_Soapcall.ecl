@@ -1,4 +1,4 @@
-import riskwise, Scoring, Seed_Files;
+﻿import riskwise, Scoring, Seed_Files;
 
 f := dataset('~eschepers::in::charmingex75', Seed_Files.layout_prii, csv(QUOTE('"')));
 output(f);
@@ -16,7 +16,7 @@ Scoring.Layout_SD1O_Soapcall into_SD1O_input(f le) := transform
 	self.runSeed:=false ;
 	self.dppapurpose := 0;
 	self.glbpurpose := 5;
-	self.gateways := dataset([{'FCRA', 'http://roxieqavip.br.seisint.com:9876'}], risk_indicators.Layout_Gateways_In);
+	self.gateways := dataset([{'FCRA', 'http://certstagingvip.hpcc.risk.regn.net:9876'}], risk_indicators.Layout_Gateways_In);
 	self := le;
 	self := [];
 end;

@@ -1,4 +1,4 @@
-Export mac_append_score(infile, outf, daily_file_fraud_count,//daily file in fraud function count below here will append score
+﻿Export mac_append_score(infile, outf, daily_file_fraud_count,//daily file in fraud function count below here will append score
 isdaily = 'true') := macro 
 
 import risk_indicators, inquiry_acclogs, models;
@@ -118,7 +118,7 @@ infile_iter := iterate(infile_batch_group, iter_id(left, right));
 fdInput := project(infile_iter, transform(%fp_batch_in%, self := left));
 infile_id_dedup := group(dedup(fdInput, AcctNo));
 roxie_IP := 'roxiebatch.br.seisint.com:9856'; 
-//roxie_IP := 'roxiestaging.br.seisint.com:9876';  // change this back to prod roxie when ready to run the full test 
+//roxie_IP := 'certstagingvip.hpcc.risk.regn.net:9876';  // change this back to prod roxie when ready to run the full test 
 
 insize := sizeof(%fp_batch_in%);
 outsize := sizeof(models.Layout_FD_Batch_Out);		

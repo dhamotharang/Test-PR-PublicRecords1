@@ -206,7 +206,7 @@ export constants := module
 																																			=> MAP(
 																																					p_cluster = 'fcra' and p_environment = 'cert' =>  'http://certfcraroxievip.sc.seisint.com:9876'
 																																					,p_cluster = 'fcra' and p_environment = 'prod' =>  _Control.RoxieEnv.prod_batch_fcra
-																																					,p_cluster = 'nonfcra' and p_environment = 'cert' =>  'http://roxiestaging.sc.seisint.com:9876'
+																																					,p_cluster = 'nonfcra' and p_environment = 'cert' =>  'http://certstagingvip.hpcc.risk.regn.net:9876'
 																																					,p_cluster = 'nonfcra' and p_environment = 'prod' =>  _Control.RoxieEnv.prodvip
 																																					,'NA')
 																																	,vFileScope(p_loc) = 'usins'
