@@ -153,14 +153,14 @@ self.name_order           := '';
 self.expiration_date      := Prof_License_preprocess.dateconv(l.Effective_To);
 self.issue_date           := Prof_License_preprocess.dateconv(l.Original_Licensure_Date);
 self.last_renewal_date    := Prof_License_preprocess.dateconv(l.Effective_From);
-self.dob                  := Prof_License_preprocess.dateconv(l.DOB);
+//self.dob                  := Prof_License_preprocess.dateconv(l.DOB);
 self.status               := l.Status;
 self.orig_addr_1          := l.Address;
 self.orig_city            := trim(l.City)[1..40];
 self.orig_st              := l.State;
 self.orig_zip             := regexreplace('-',trim(l.Zip),'')[1..9];
 self.license_type         := l.License_Type;
-self.county_str            := l.County;
+//self.county_str            := l.County;
 self.company_name     := '';
 self := l;                                                                                                                                                                                                                                                                                           
 
