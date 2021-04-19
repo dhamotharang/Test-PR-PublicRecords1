@@ -1,6 +1,6 @@
-// default ip is QA roxie, if you want to run instantid against a different roxie, pass this function the IP of that roxie.
+﻿// default ip is QA roxie, if you want to run instantid against a different roxie, pass this function the IP of that roxie.
 
-export InstantID_SoapCall(dataset(Layout_InstID_SoapCall) indataset, string roxieIP='http://roxiestaging.br.seisint.com:9876')  := function
+export InstantID_SoapCall(dataset(Layout_InstID_SoapCall) indataset, string roxieIP='http://certstagingvip.hpcc.risk.regn.net:9876')  := function
 
 dist_dataset := DISTRIBUTE(indataset, RANDOM());
 

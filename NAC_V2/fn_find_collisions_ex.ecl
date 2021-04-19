@@ -238,7 +238,8 @@ EXPORT fn_find_collisions_ex	(
 				3) informational: state1=state2 and beneft1<>benefit2: NOT IMPLEMENTED YET
 		***/
 		AND
-		(left.ProgramState <> right.ProgramState
+		(
+			(left.ProgramState <> right.ProgramState AND nac_V2.MatchAllowed(left.ProgramCode,right.ProgramCode))
 			OR
 			(left.GroupId = right.GroupId and 
 				nac_v2.GetCollisionCode(left.ProgramCode) = nac_v2.GetCollisionCode(right.ProgramCode)

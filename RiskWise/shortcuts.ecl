@@ -67,7 +67,7 @@ export shortcuts := module
   export gw_netacuityv4_prod := dataset( [{'netacuity','https://rox_netacuitygw:g3t3m2018@espprodvip.risk.regn.net:8726/WsGateway/?ver_=1.93'}], risk_indicators.layout_gateways_in );
   export gw_netacuityv4 := gw_netacuityv4_cert  :DEPRECATED('If running a paid customer test, use gw_netacuityv4_prod instead');
   export gw_emailrisk:= dataset( [{'emailrisk','https://rw_score_dev:Password01@espcertvip.risk.regn.net:8726/WsGatewayEx/EmailRisk?form&ver_=2.9'}], risk_indicators.layout_gateways_in );
-  export gw_FCRA      := dataset( [{'FCRA','http://roxieqavip.br.seisint.com:9876'}], risk_indicators.layout_gateways_in );
+  export gw_FCRA      := dataset( [{'FCRA','http://certstagingvip.hpcc.risk.regn.net:9876'}], risk_indicators.layout_gateways_in );
   // export gw_personContext	:= dataset( [{'delta_personcontext','http://ln_api_dempsey_dev:g0n0l3s!@10.176.68.172:7534/WsSupport/?ver_=2'}], risk_indicators.layout_gateways_in );
   export gw_personContext	:= dataset( [{'delta_personcontext','HTTPS://ln_api_dempsey:g0n0l3s!@10.176.69.172:8534/WsSupport/?ver_=2.0'}], risk_indicators.layout_gateways_in );
     //deltabase gateways for Inquiries

@@ -1,4 +1,4 @@
-import riskwise, Scoring, Seed_Files;
+﻿import riskwise, Scoring, Seed_Files;
 
 f := dataset('~eschepers::in::charmingex75', Seed_Files.layout_prii, csv(QUOTE('"')));
 output(f);
@@ -16,7 +16,7 @@ Scoring.Layout_SD1O_Soapcall into_SD1O_input(f le) := transform
 	self.runSeed:=false ;
 	self.dppapurpose := 0;
 	self.glbpurpose := 5;
-	self.gateways := dataset([{'FCRA', 'http://roxieqavip.br.seisint.com:9876'}], risk_indicators.Layout_Gateways_In);
+	self.gateways := dataset([{'FCRA', 'http://certstagingvip.hpcc.risk.regn.net:9876'}], risk_indicators.Layout_Gateways_In);
 	self := le;
 	self := [];
 end;
@@ -24,9 +24,8 @@ end;
 soap_in := project(f,into_SD1O_input(LEFT));
 output(soap_in, named('soap_in'));
 
-roxieIP :='http://certfcraroxievip.sc.seisint.com:9876' ; // cert fcra roxie
+roxieIP :='http://certfcraroxievip.hpcc.risk.regn.net:9876' ; // cert fcra roxie
 isFCRA := true;
-//roxieIP := 'http://stcloudroxievip.sc.seisint.com:9876';  //St. Cloud Roxie
 
 s_f := Scoring.SD1O_Soapcall(soap_in, roxieIP, isFCRA);
 try_2 := JOIN(soap_in, s_f(errorcode<>''), LEFT.account=RIGHT.account, TRANSFORM(Scoring.Layout_SD1O_Soapcall,SELF := LEFT));

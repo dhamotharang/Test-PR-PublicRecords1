@@ -1,4 +1,4 @@
-/*--SOAP--
+﻿/*--SOAP--
 <message name="FCRAData_service"  wuTimeout="300000">
 	<part name="AlphaNumericInput" type="xsd:boolean" default="false" description=" Defines whether the input is from VRU (numeric only) or non-numeric"/>
 	<part name="IncludeAllHeaderResults" type="xsd:boolean" description="If checked, header results will not be deduped (for QA testing)"/>
@@ -24,7 +24,7 @@
 	<part name="dob" type="xsd:string" description=" full date of birth"/>
   <separator />
 	
-	<part name="instant_ip" type="xsd:string" default="http://roxiestaging.br.seisint.com:9876" description=" gateway to VRU Identity service and neutral did service"/>
+	<part name="instant_ip" type="xsd:string" default="http://certstagingvip.hpcc.risk.regn.net:9876" description=" gateway to VRU Identity service and neutral did service"/>
 	<part name='NonSubjectSuppression' type = 'xsd:unsignedInt' default="2"/> <!-- [1,2,3] -->
 </message>
 */
