@@ -78,7 +78,7 @@ l := RECORD
 END;
 
 fcraroxieIP := 'http://fcrathorvip.hpcc.risk.regn.net:9876'; 
-neutralroxieIP := 'http://roxiebatch.br.seisint.com:9856';
+neutralroxieIP := 'http://roxiethorvip.hpcc.risk.regn.net:9856';
 
 
 l t_f(f le, INTEGER c) := TRANSFORM

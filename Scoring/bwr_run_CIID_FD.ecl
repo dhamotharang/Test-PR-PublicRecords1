@@ -1,4 +1,4 @@
-#workunit('name','Consumer IID-FD Process');
+﻿#workunit('name','Consumer IID-FD Process');
 
 prii_layout := RECORD
 	STRING AccountNumber;
@@ -73,7 +73,7 @@ l t_f(f le, INTEGER c) := TRANSFORM
 	SELF.DPPAPurpose := 3;
 	SELF.GLBPurpose := 1;
 //	self.historydateyyyymm := '200601';
-	self.scores := dataset([{'Models.FraudAdvisor_Service','http://oroxievip.sc.seisint.com:9876',parms}], models.Layout_Score_Chooser);
+	self.scores := dataset([{'Models.FraudAdvisor_Service','http://prdrroxiethorvip.hpcc.risk.regn.net:9876',parms}], models.Layout_Score_Chooser);
 	SELF := le;
 	self := [];
 end;
@@ -83,7 +83,7 @@ output(p_f, named('CIID_Input'));
 
 dist_dataset := PROJECT(p_f,TRANSFORM(layout_soap,SELF := LEFT));
 
-roxieIP := 'http://oroxievip.sc.seisint.com:9876'; // dr vip
+roxieIP := 'http://prdrroxiethorvip.hpcc.risk.regn.net:9876'; // dr vip
 
 xlayout := RECORD
 	(risk_indicators.Layout_InstandID_NuGen)

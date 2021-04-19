@@ -116,7 +116,7 @@ l t_f(f le, INTEGER c) := TRANSFORM
 //  self.scores := dataset([{'Models.RVBankCard_Service', fcraroxieIP,params}], models.Layout_Score_Chooser); 
 	self.scores := dataset([{'Models.RVRetail_Service', fcraroxieIP,params}], models.Layout_Score_Chooser); 
 //	self.scores := dataset([{'Models.RVTelecom_Service', fcraroxieIP,params}], models.Layout_Score_Chooser); 
-	self.gateways := dataset([{'neutralroxie', 'http://roxiebatch.br.seisint.com:9856'}], risk_indicators.Layout_Gateways_In);
+	self.gateways := dataset([{'neutralroxie', 'http://roxiethorvip.hpcc.risk.regn.net:9856'}], risk_indicators.Layout_Gateways_In);
 
 	SELF := le;
 	self := [];

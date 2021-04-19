@@ -95,7 +95,7 @@ l t_f(f le, INTEGER c) := TRANSFORM
 //	self.HistoryDateYYYYMM := le.historydateyyyymm; //999999;
   SELF.HistoryDateYYYYMM := (Integer) le.historydateyyyymm[1..6];
 	
-	self.gateways := dataset([{'neutralroxie', 'http://roxiebatch.br.seisint.com:9856'}], risk_indicators.Layout_Gateways_In);
+	self.gateways := dataset([{'neutralroxie', 'http://roxiethorvip.hpcc.risk.regn.net:9856'}], risk_indicators.Layout_Gateways_In);
 
 	self.DataRestrictionMask := '1000010001000100000000000'; // to restrict fares, experian and transunion 
 

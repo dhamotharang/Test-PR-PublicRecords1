@@ -86,7 +86,7 @@ DataRestrictionMask := '10000100010001000000000000000000000000000'; // to restri
 // DataRestrictionMask := '10000100010001000000000000000000000000001';//to restrict fares, LIENS/Jdgmts, experian and transunion 
 
 fcraroxieIP := 'http://fcrathorvip.hpcc.risk.regn.net:9876'; 
-neutralroxieIP := 'http://roxiebatch.br.seisint.com:9856';
+neutralroxieIP := 'http://roxiethorvip.hpcc.risk.regn.net:9856';
 // fcraroxieIP := riskwise.shortcuts.staging_fcra_roxieIP;
 // neutralroxieip := riskwise.shortcuts.staging_neutral_roxieIP;
 

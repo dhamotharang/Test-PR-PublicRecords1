@@ -1,4 +1,4 @@
-#workunit('name','Business IID-BD Process');
+﻿#workunit('name','Business IID-BD Process');
 
 layout:= record
 	string	AccountNumber	;
@@ -37,7 +37,7 @@ f := dataset('~tfuerstenberg::in::jpmc-biid-bf-082707', Layout, csv(QUOTE('"')))
 output(f);
 
 
-roxieIP :='http://oroxievip.sc.seisint.com:9876';  // DR roxie
+roxieIP :='http://prdrroxiethorvip.hpcc.risk.regn.net:9876';  // DR roxie
 
 Layout_BIID_Soapcall := record
 	string	AccountNumber;

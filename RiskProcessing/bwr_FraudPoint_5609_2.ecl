@@ -1,4 +1,4 @@
-#workunit('name','Fraudpoint-score-rcodes_5609_2');
+﻿#workunit('name','Fraudpoint-score-rcodes_5609_2');
 #option ('hthorMemoryLimit', 1000)
 #option ('linkCountedRows', false) 
 
@@ -107,7 +107,7 @@ layout_old_acct into_fdInput(f le, INTEGER c) := TRANSFORM
 
 	self.HistoryDateYYYYMM:= le.historydateyyyymm;
 	self.model := 'fd5609_2';	// set to blank if you don't want the new model
-	//self.gateways := dataset([{'neutralroxie', 'http://roxiebatch.br.seisint.com:9856'}], risk_indicators.Layout_Gateways_In);
+	//self.gateways := dataset([{'neutralroxie', 'http://roxiethorvip.hpcc.risk.regn.net:9856'}], risk_indicators.Layout_Gateways_In);
 	
 	self.DataRestrictionMask := '000000000000';	// byte 6, if 1, restricts experian, byte 8, if 1, restricts equifax
 	

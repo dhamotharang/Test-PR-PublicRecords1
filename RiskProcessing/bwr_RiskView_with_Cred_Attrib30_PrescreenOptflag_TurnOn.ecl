@@ -96,7 +96,7 @@ l t_f(f le, INTEGER c) := TRANSFORM
 
 //	self.HistoryDateYYYYMM := le.historydateyyyymm; //999999;
 
-	self.gateways := dataset([{'neutralroxie', 'http://roxiebatch.br.seisint.com:9856'}], risk_indicators.Layout_Gateways_In);
+	self.gateways := dataset([{'neutralroxie', 'http://roxiethorvip.hpcc.risk.regn.net:9856'}], risk_indicators.Layout_Gateways_In);
 
 	self.DataRestrictionMask := '100001000101'; // to restrict fares, experian and transunion.  Advo also restricted because this is presreen 
 
