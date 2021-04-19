@@ -139,7 +139,6 @@ EXPORT fn_find_collisions_ex	(
 			#end
 		#end
 
-
 		#if('L' in matchset)
 			left.did=right.did and
 		#end
