@@ -17,7 +17,7 @@ export RoxieEnv := MODULE
 	export prod_batch_neutral := 'http://roxiebatch.br.seisint.com:9856';
 	export prod_batch_fcra := 'http://fcrathorvip.hpcc.risk.regn.net:9876';
 
-	export DR_prod_neutral_roxieIP := 'http://oroxievip.sc.seisint.com:9876';
+	export DR_prod_neutral_roxieIP := 'http://prdrroxiethorvip.hpcc.risk.regn.net:9876';
 	export DR_prod_fcra_roxieIP := 'http://prdrfcrathorvip.hpcc.risk.regn.net:9876';
 
 	export staging_neutral_roxieIP := 'http://certstagingvip.hpcc.risk.regn.net:9876'; 

@@ -1,4 +1,4 @@
-import riskwise, Scoring;
+﻿import riskwise, Scoring;
 
 pi_layout := record
 string	ProPay_ID	;
@@ -44,7 +44,7 @@ end;
 soap_in := project(f,into_PRIO_input(LEFT));
 output(soap_in);
 
-roxieIP :='http://oroxievip.sc.seisint.com:9876' ; // DR roxie
+roxieIP :='http://prdrroxiethorvip.hpcc.risk.regn.net:9876' ; // DR roxie
 
 
 s_f := Scoring.PRIO_Soapcall(soap_in, roxieIP);

@@ -43,7 +43,7 @@ Scoring.Layout_SD1O_Soapcall into_SD1O_input(f le) := transform
 	self.dppapurpose := 3; 	self.glbpurpose := 1;
 	self.gateways := dataset([
 {'FCRA', 'http://prdrfcrathorvip.hpcc.risk.regn.net:9876'},
-{'neutralroxie','http://oroxievip.sc.seisint.com:9876'}],risk_indicators.Layout_Gateways_In);
+{'neutralroxie','http://prdrroxiethorvip.hpcc.risk.regn.net:9876'}],risk_indicators.Layout_Gateways_In);
 
 	self := le;
 	self := [];
@@ -55,7 +55,7 @@ soap_in := project(f,into_SD1O_input(LEFT));
 output(soap_in, named('soap_in'));
 
 roxieIP :='http://prdrfcrathorvip.hpcc.risk.regn.net:9876' ; // fcra roxie
-//roxieIP:='http://oroxievip.sc.seisint.com:9876';  //Regular Roxie
+//roxieIP:='http://prdrroxiethorvip.hpcc.risk.regn.net:9876';  //Regular Roxie
 
 Scoring.MAC_PROD_Soapcall(soap_in, RiskWise.Layout_SD1O, roxieIP, 'RiskWiseFCRA.RiskWiseMainSD1O',s_f, Parallel_threads);
 
