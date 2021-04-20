@@ -161,7 +161,7 @@ EXPORT Records := module
 		rolledRawBusinesses := rollup(groupedRawBusinesses, group, Healthcare_Header_Services.Transforms.doFinalRollup(left,rows(left)));
 		//Data is rolled into final format the same as the soapcall returns.
 		getBusinessSoapCall := getHCOSoapCall(HCOSoapCall,cfg)(lnpid>0 or issearchfailed);
-		finalRawBusinesses := Healthcare_Header_Services.Functions.doPenalty(getBusinessSoapCall,DistinctInputRecsbyAcctno,cfg[1].penalty_threshold);
+		finalRawBusinesses := Healthcare_Header_Services.Functions.doPenalty(rolledRawBusinesses+getBusinessSoapCall,DistinctInputRecsbyAcctno,cfg[1].penalty_threshold);
 		//Append Business Sanctions to found records.
 		// getBusinesses := Healthcare_Header_Services.Datasource_SelectFile.getAppendBusSanctions(finalRawBusinesses,BusinessRecords,cfg);
 		//Get no hits for Business Sanctions Search

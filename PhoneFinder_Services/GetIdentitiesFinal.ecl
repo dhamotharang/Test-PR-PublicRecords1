@@ -1,4 +1,4 @@
-IMPORT $, Advo, DID_Add, iesp, Phones, STD, ut, SSNBest_Services;
+﻿IMPORT $, Advo, DID_Add, iesp, Phones, STD, ut, SSNBest_Services, Address;
 
 EXPORT GetIdentitiesFinal(DATASET($.Layouts.PhoneFinder.Final) dSearchResults,
                           DATASET($.Layouts.BatchInAppendDID)  dInBestInfo,
@@ -123,6 +123,7 @@ FUNCTION
     SELF.fname       := IF(isInputDID, ri.name_first, le.fname);
     SELF.mname       := IF(isInputDID, ri.name_middle, le.mname);
     SELF.lname       := IF(isInputDID, ri.name_last, le.lname);
+    SELF.full_name   := IF(isInputDID, Address.NameFromComponents(ri.name_first, ri.name_middle, ri.name_last, ri.name_suffix), le.full_name),
     SELF.name_suffix := IF(isInputDID, ri.name_suffix, le.name_suffix);
     SELF.prim_range  := IF(isInputDID, ri.prim_range, le.prim_range);
     SELF.predir      := IF(isInputDID, ri.predir, le.predir);
