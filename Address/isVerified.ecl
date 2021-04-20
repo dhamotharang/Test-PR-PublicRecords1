@@ -1,7 +1,7 @@
-import ut;
-export boolean isVerified(string1 tnt, string10 phone, string10 listedphone) := 
+﻿import ut;
+export boolean isVerified(string1 tnt, string10 phone = '', string10 listedphone = '', boolean useTNTonly = false) := 
 	tnt in ['B','V'] and
-	ut.NNEQ_Phone(phone, listedphone);
+	(useTNTonly OR ut.NNEQ_Phone(phone, listedphone));
 
 
 /*
