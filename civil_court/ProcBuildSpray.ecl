@@ -173,15 +173,12 @@ EXPORT ProcBuildSpray(
 	);
 
 	EXPORT spraySanBernardino(
-		STRING pFileMask = 'ca_san_bernardino_en_*Quarter*_*.txt',
-		INTEGER pRecordSize = 144
+		STRING pFileMask = 'ca_san_bernardino_en_*Quarter*_*.txt'
 	) := doSprayUp(
 		'San Bernardino',
 		pFileMask,
 		'~thor_data400::in::civil::ca_san_bernardino_thru_' + pVersion,
-		'~thor_data400::in::civil::ca_san_bernardino',
-		pRecordSize,
-		FALSE
+		'~thor_data400::in::civil::ca_san_bernardino'
 	);
 
 END;
