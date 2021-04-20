@@ -1,4 +1,4 @@
-#workunit('name','OFAC Process');
+﻿#workunit('name','OFAC Process');
 #option ('hthorMemoryLimit', 1000)
 
 
@@ -84,7 +84,7 @@ output(p_f, named('OFAC_Input'));
 
 dist_dataset := PROJECT(p_f,TRANSFORM(layout_soap,SELF := LEFT));
 
-roxieIP := 'http://roxiebatch.br.seisint.com:9856'; // roxiebatch
+roxieIP := 'http://roxiethorvip.hpcc.risk.regn.net:9856'; // roxiebatch
 
 xlayout := RECORD
 	(risk_indicators.Layout_InstandID_NuGen)

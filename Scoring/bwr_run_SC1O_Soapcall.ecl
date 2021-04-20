@@ -1,4 +1,4 @@
-import riskwise, Scoring;
+﻿import riskwise, Scoring;
 
 pi_layout := record
 string	ACCOUNT	;
@@ -45,7 +45,7 @@ end;
 soap_in := project(f,into_SC1O_input(LEFT));
 output(soap_in);
 
-roxieIP :='http://roxiestaging.br.seisint.com:9876' ; // staging roxie
+roxieIP :='http://certstagingvip.hpcc.risk.regn.net:9876' ; // staging roxie
 //roxieIP := 'http://stcloudroxievip.sc.seisint.com:9876';  //St. Cloud Roxie
 
 s_f := Scoring.SC1O_Soapcall(soap_in, roxieIP);

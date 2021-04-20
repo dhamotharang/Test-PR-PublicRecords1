@@ -1,6 +1,6 @@
-import riskwise;
+﻿import riskwise;
 
-export MAC_BC1O_Batch (inf, outf, glb, dppa, roxie_ip = 'http://roxiestaging.br.seisint.com:9876') := macro
+export MAC_BC1O_Batch (inf, outf, glb, dppa, roxie_ip = 'http://certstagingvip.hpcc.risk.regn.net:9876') := macro
 import did_add;
 
 #uniquename(insize)

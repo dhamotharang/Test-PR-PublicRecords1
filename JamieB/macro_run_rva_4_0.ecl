@@ -1,4 +1,4 @@
-export macro_run_rva_4_0(archive_date) := macro
+﻿export macro_run_rva_4_0(archive_date) := macro
 #workunit('name','FCRA-Credit Attributes 4.0');
 #option ('hthorMemoryLimit', 1000)
 #option ('linkCountedRows', false) 
@@ -81,7 +81,7 @@ layout_soap := record
 	unsigned6 did;
 end;
 
-fcraroxieIP := 'http://fcrabatch.sc.seisint.com:9876';  
+fcraroxieIP := 'http://fcrathorvip.hpcc.risk.regn.net:9876';  
 // fcraroxieIP := riskwise.shortcuts.dev64b; 
 // fcraroxieIP := riskwise.shortcuts.staging_fcra_roxieIP; 
 

@@ -16,7 +16,7 @@ output(badrecords,all,NAMED('Bad_records'));
 
 goodrecords:=ds(REGEXFIND('[a-z]{3}[0-9]{15}|[a-z]{3}[0-9]{14}|[a-z]{3}[0-9]{13}',clientassigneduniquerecordid,nocase));
 output(count(goodrecords),NAMED('Good_records_count'));
-output(goodrecords,NAMED('Good_records'));
+output(choosen(goodrecords,100),NAMED('Good_records'));
 
 
 

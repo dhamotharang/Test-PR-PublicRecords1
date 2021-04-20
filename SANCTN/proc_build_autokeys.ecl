@@ -1,4 +1,4 @@
-﻿import _control, AutoKeyB2,Address,autokey,AutoKeyI, MDR, ut, codes, Std;
+﻿import _control, AutoKeyB2,Address,autokey,AutoKeyI, MDR, ut, codes, Std,dx_common;
 
 export proc_build_autokeys(string filedate) := function
 
@@ -18,9 +18,8 @@ SANCTN.layout_autokeys;
   INTEGER8 zero := 0;
 	blk  := '';
 	//CCPA-283 Adding CCPA new fields
-	UNSIGNED4 global_sid := 0;
+	UNSIGNED4 global_sid:=0;
 	UNSIGNED8 record_sid:=0;
-
 END;
 
 xpnd_sanctn xpand_sanctn(pty L, inc R) :=  TRANSFORM

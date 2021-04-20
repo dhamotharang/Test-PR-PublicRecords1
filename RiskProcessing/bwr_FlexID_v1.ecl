@@ -209,7 +209,7 @@ output(p_f, named('CIID_Input'));
 dist_dataset := distribute(p_f, random());
 
 
-roxieIP :='http://roxiebatch.br.seisint.com:9856';  // roxiebatch
+roxieIP :='http://roxiethorvip.hpcc.risk.regn.net:9856';  // roxiebatch
 
 
 xlayout := RECORD
