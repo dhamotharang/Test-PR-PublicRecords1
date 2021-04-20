@@ -138,6 +138,9 @@ EXPORT fn_find_collisions	(
 			   hash32(lname)
 			#end
 			
+		#elseif('V' in matchset AND 'D' in matchset)
+			hash32(lname,clean_dob)
+
 		#elseif('V' in matchset)
 			#if(fname_match = 1)
 			   hash32(lname,fname[1])
