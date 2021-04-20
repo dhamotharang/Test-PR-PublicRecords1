@@ -33,7 +33,7 @@ f := dataset('~mzhang::in::GE_Samp_BIID', pb1i_layout, csv(quote('"')));
 //f := enth(dataset('~eschepers::in::GE_Samp_BIID', pb1i_layout, csv(quote('"'))),5);
 //output(f);
 
-roxieIP :='http://oroxievip.sc.seisint.com:9876';  //DR Roxie
+roxieIP :='http://prdrroxiethorvip.hpcc.risk.regn.net:9876';  //DR Roxie
 // roxieIP := 'http://certstagingvip.hpcc.risk.regn.net:9876'; 
 
 // populate the input values to business instant id with the original input values

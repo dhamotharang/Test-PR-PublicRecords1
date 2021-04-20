@@ -1,4 +1,4 @@
-#workunit('name','Consumer Fraud Defender Process');
+﻿#workunit('name','Consumer Fraud Defender Process');
 #option ('hthorMemoryLimit', 1000)
 
 
@@ -77,7 +77,7 @@ l t_f(f le, INTEGER c) := TRANSFORM
 	SELF.GLBPurpose := 1;
 	self.DataRestrictionMask := '000000000000';  // to allow use of both Equifax and Experian, this is the default value for all legacy scoring products	
 //	self.historydateyyyymm := '200601';
-	self.scores := dataset([{'Models.FraudAdvisor_Service','http://roxiebatch.br.seisint.com:9856',parms}], models.Layout_Score_Chooser);
+	self.scores := dataset([{'Models.FraudAdvisor_Service','http://roxiethorvip.hpcc.risk.regn.net:9856',parms}], models.Layout_Score_Chooser);
 	SELF := le;
 	self := [];
 end;
@@ -87,7 +87,7 @@ output(p_f, named('CIID_Input'));
 
 dist_dataset := PROJECT(p_f,TRANSFORM(layout_soap,SELF := LEFT));
 
-roxieIP := 'http://roxiebatch.br.seisint.com:9856'; // roxiebatch
+roxieIP := 'http://roxiethorvip.hpcc.risk.regn.net:9856'; // roxiebatch
 
 xlayout := RECORD
 	(risk_indicators.Layout_InstandID_NuGen)

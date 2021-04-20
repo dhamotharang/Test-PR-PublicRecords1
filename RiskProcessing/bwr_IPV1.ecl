@@ -1,4 +1,4 @@
-#workunit('name','NonFCRA-ivp1');
+﻿#workunit('name','NonFCRA-ivp1');
 #option ('hthorMemoryLimit', 1000);
 
 /* *** Note that Neticuity is turned ON *** needs to use Cert gateway  */
@@ -24,7 +24,7 @@ Scoring.Layout_IPVO_Soapcall into_IPVO_input(f le) := transform
 	self.HistoryDateYYYYMM:=(integer)'999999';
 	self.dppapurpose := 3;
 	self.glbpurpose := 1;
-	self.gateways := dataset([{'fcra', 'http://roxiebatch.br.seisint.com:9856'},
+	self.gateways := dataset([{'fcra', 'http://roxiethorvip.hpcc.risk.regn.net:9856'},
 						{'netacuity', 'http://rw_score_dev:Password01@rwgatewaycert.sc.seisint.com:7726/WsGateway'}], risk_indicators.Layout_Gateways_In);
 	self := le;
 	self := [];

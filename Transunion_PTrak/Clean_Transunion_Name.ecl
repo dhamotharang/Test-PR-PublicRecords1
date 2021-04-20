@@ -1,6 +1,8 @@
 IMPORT  address, ut;
 
-norm_names:=  Transunion_PTrak.Normalize_Transunion_Update;
+EXPORT Clean_Transunion_Name(STRING Full_filedate,STRING Update_filedate) := FUNCTION
+
+norm_names:=  Transunion_PTrak.Normalize_Transunion_Update(Full_filedate,Update_filedate);
 
 
 namerec := RECORD
@@ -50,7 +52,8 @@ Transunion_PTrak.Layout_Transunion_Out.NormCleandNameRec t_CleanName(dedup_names
 	SELF := L;	
 END;
 
-name_clean := PROJECT(dedup_names, t_CleanName(LEFT)); 
+name_clean := PROJECT(dedup_names, t_CleanName(LEFT)):persist('~thor_data400::persist::transunionptrak_clean_names'); 
 
+return name_clean;
 
-EXPORT Clean_Transunion_Name:= name_clean:persist('~thor_data400::persist::transunionptrak_clean_names');
+END;
