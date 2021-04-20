@@ -8,7 +8,7 @@
 
 EXPORT BatchService(useCannedRecs = 'false') := MACRO
 
-IMPORT AutoheaderV2, BatchShare, Doxie, EmailV2_Services, Royalty;
+IMPORT AutoheaderV2, BatchShare, Doxie, EmailV2_Services, Royalty, WSInput;
 
   #CONSTANT('SearchLibraryVersion', AutoheaderV2.Constants.LibVersion.SALT);
 
@@ -17,8 +17,11 @@ IMPORT AutoheaderV2, BatchShare, Doxie, EmailV2_Services, Royalty;
   ds_xml_in := DATASET([], EmailV2_Services.Layouts.batch_email_input) : STORED('batch_in', FEW);
   batch_params := EmailV2_Services.IParams.getBatchParams();
 
+  STRING SearchTier := '' : STORED('SearchTier');
+  STRING EmailValidationType := '' : STORED('EmailValidationType');
+
   isValidSearchType := EmailV2_Services.Constants.SearchType.isValidSearchType(batch_params.SearchType);
-  isAllowedValidation := EmailV2_Services.Constants.isAllowedValidation(batch_params.SearchTier, batch_params.EmailValidationType);
+  isAllowedValidation := EmailV2_Services.Constants.isAllowedValidation(SearchTier, EmailValidationType);
 
   IF(~isValidSearchType OR (batch_params.CheckEmailDeliverable AND ~isAllowedValidation), FAIL(303, doxie.ErrorCodes(303)));
 

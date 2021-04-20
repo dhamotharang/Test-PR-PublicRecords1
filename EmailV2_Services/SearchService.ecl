@@ -27,7 +27,7 @@ EXPORT SearchService := MACRO
   in_mod := EmailV2_Services.IParams.getSearchParams(search_options);
 
   isValidSearchType := EmailV2_Services.Constants.SearchType.isValidSearchType(in_mod.SearchType);
-  isAllowedValidation := EmailV2_Services.Constants.isAllowedValidation(in_mod.SearchTier, in_mod.EmailValidationType);
+  isAllowedValidation := EmailV2_Services.Constants.isAllowedValidation(search_options.SearchTier, search_options.EmailValidationType);
 
   IF(~isValidSearchType OR (in_mod.CheckEmailDeliverable AND ~isAllowedValidation), FAIL(303, doxie.ErrorCodes(303)));
 

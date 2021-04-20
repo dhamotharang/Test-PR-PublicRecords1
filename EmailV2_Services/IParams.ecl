@@ -55,7 +55,7 @@ EXPORT IParams := MODULE
       EXPORT STRING   BVAPIkey := EmailV2_Services.Constants.GatewayValues.BVAPIkey;
       EXPORT UNSIGNED MaxEmailsForDeliveryCheck := EmailV2_Services.Constants.Defaults.MaxEmailsToCheckDeliverable : STORED('MaxEmailsForDeliveryCheck'); // internal option not passed by EmailSearchV2 batch plugin
       STRING  _SearchTier := ''  : STORED('SearchTier');
-      EXPORT STRING SearchTier := IF(EmailV2_Services.Constants.isValidTier(_SearchTier), _SearchTier,
+      SHARED STRING SearchTier := IF(EmailV2_Services.Constants.isValidTier(_SearchTier), _SearchTier,
                                      EmailV2_Services.Constants.Basic); //default to basic
       EXPORT STRING   RestrictedUseCase := IF (EmailV2_Services.Constants.isBasic(SearchTier),
                                                EmailV2_Services.Constants.RestrictedUseCase.NoRoyaltySources,
@@ -102,7 +102,7 @@ EXPORT IParams := MODULE
 
       EXPORT UNSIGNED1 EmailQualityRulesMask := IF(in_optns.EmailQualityRulesMask != '', GetEmailRulesMask(in_optns.EmailQualityRulesMask), 0);
       EXPORT BOOLEAN isDirectMarketing () := in_optns.IsMarketingUse OR mod_access.isDirectMarketing ();
-      EXPORT STRING SearchTier := IF($.Constants.isValidTier(in_optns.SearchTier), in_optns.SearchTier,'');
+      SHARED STRING SearchTier := IF($.Constants.isValidTier(in_optns.SearchTier), in_optns.SearchTier,'');
 
       EXPORT STRING   _RestrictedUseCase := in_optns.RestrictedUseCase;
       EXPORT STRING   RestrictedUseCase := MAP (EmailV2_Services.Constants.RestrictedUseCase.isValid(_RestrictedUseCase) => _RestrictedUseCase,
