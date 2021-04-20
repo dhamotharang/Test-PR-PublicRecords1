@@ -43,6 +43,10 @@ EXPORT ProcBuildSpray(
 		STRING pSuperInFile,
 		STRING pLogicalInFile
 	) := FUNCTION
+		IF(
+			NOT STD.File.SuperFileExists(pSuperInFile),
+			STD.File.CreateSuperFile(pSuperInFile)
+		); 
 		RETURN SEQUENTIAL(
 			STD.File.StartSuperFileTransaction(),
 			STD.File.ClearSuperFile(pSuperInFile),
