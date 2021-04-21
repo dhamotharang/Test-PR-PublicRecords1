@@ -1475,15 +1475,16 @@ export layout_trustdefender_in := RECORD
 EXPORT layout_IDA_in := RECORD
   //starting with layout_input, add any other fields needed here.
   Risk_Indicators.Layout_Input;
-  String Client;  
-  String Solution;
-  String ProductName;
-  String ProductID;
-  String App_ID;
-  String ESPTransactionId;
-  String CompanyID;
-  String Channel;
-	string CARetailFlag; // for FCRA only, for california in person applicants
+  STRING Client;  
+  STRING Solution;
+  STRING ProductName;
+  STRING ProductID;
+  STRING App_ID;
+  STRING ESPTransactionId;
+  STRING CompanyID;
+  STRING Channel;
+  STRING CARetailFlag; // for FCRA only, for california in person applicants
+  STRING Affiliate; // for FCRA only, used for EndUser CompanyName
 	
 	// for innovis attribute eventually
 	// string best_ssn;

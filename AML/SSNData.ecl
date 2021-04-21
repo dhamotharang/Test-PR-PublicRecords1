@@ -1,7 +1,7 @@
 ﻿import doxie, risk_indicators, riskwise, AML;
 
-EXPORT SSNData (DATASET(Layouts.RelatLayoutV2) RelatsIn,
-                           $.IParam.iAml mod_aml,
+EXPORT SSNData (DATASET(AML.Layouts.RelatLayoutV2) RelatsIn,
+                           AML.IParam.iAml mod_aml,
                            boolean isFCRA = false,
                            boolean IsBusn
                            ) := FUNCTION;
@@ -22,7 +22,7 @@ bestSSN := risk_indicators.collection_shell_mod.getBestCleaned(unique_dids,
                                                                mod_aml.glb,
                                                                clean_address:=false); // don't need clean address, just the best SSN
 
-Layouts.RelatLayoutV2 addBEST(DedupIDs le, bestSSN ri) := TRANSFORM
+AML.Layouts.RelatLayoutV2 addBEST(DedupIDs le, bestSSN ri) := TRANSFORM
 
     self.seq := le.seq;
     self.origdid := le.origdid;
@@ -144,11 +144,11 @@ ExactMatchLevel:=  risk_indicators.iid_constants.default_ExactMatchLevel;
 runSSNCodes := True;
 //aml  just ids with ssn flags    iid_getssnflags expects diff seq for each individual.
 withSSNFlags := risk_indicators.iid_getSSNFlags(group(ssnFlagsPrepseq, seq),
-                                                mod_access.dppa, mod_access.glb, isFCRA, runSSNCodes,
-                                                ExactMatchLevel, mod_access.DataRestrictionMask, mod_aml.bs_version, mod_aml.bs_options, mod_access := mod_access);
+                                                mod_access, isFCRA, runSSNCodes,
+                                                ExactMatchLevel, mod_aml.bs_version, mod_aml.bs_options);
 
 
-withBSADL := Risk_Indicators.Boca_Shell_ADL(withSSNFlags, isFCRA, mod_access.dppa, mod_access.DataRestrictionMask, mod_access := mod_access);  //ssn per adl   ssns_per_adl_seen_18months
+withBSADL := Risk_Indicators.Boca_Shell_ADL(withSSNFlags, isFCRA, mod_access);  //ssn per adl   ssns_per_adl_seen_18months
 
 
 
@@ -196,7 +196,7 @@ suspiciousSSNs := join(CheckSSNTypes, risk_indicators.Key_SSN_Table_v4_2,
 
 
 
-Layouts.RelatLayoutV2  PrepOutput(RelatsIn le, suspiciousSSNs ri)  := TRANSFORM
+AML.Layouts.RelatLayoutV2  PrepOutput(RelatsIn le, suspiciousSSNs ri)  := TRANSFORM
 
   self.seq := le.seq;
   self.historydate := le.historydate;

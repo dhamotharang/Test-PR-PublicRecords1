@@ -1,14 +1,12 @@
-﻿/*--SOAP--
-<message name="SearchService"  wuTimeout="300000">
-  <part name="EmailSearchV2SearchRequest" type="tns:XmlDataSet" cols="70" rows="25"/>
-  <separator />
-  <part name="gateways" type="tns:XmlDataSet" cols="70" rows="4"/>
-</message>
-*/
+﻿// =====================================================================
+// ROXIE QUERY
+// -----------
+// For the complete list of input parameters please check published WU.
+// Look at the history of this attribute for the old SOAP info.
+// =====================================================================
 
-EXPORT SearchService :=
-MACRO
-  IMPORT iesp,EmailV2_Services;
+EXPORT SearchService := MACRO
+  IMPORT Doxie, EmailV2_Services, iesp;
 
   #WEBSERVICE(FIELDS(
     'EmailSearchV2Request',
@@ -27,6 +25,11 @@ MACRO
   iesp.ECL2ESP.SetInputSearchOptions (search_options);
 
   in_mod := EmailV2_Services.IParams.getSearchParams(search_options);
+
+  isValidSearchType := EmailV2_Services.Constants.SearchType.isValidSearchType(in_mod.SearchType);
+  isAllowedValidation := EmailV2_Services.Constants.isAllowedValidation(in_mod.SearchTier, in_mod.EmailValidationType);
+
+  IF(~isValidSearchType OR (in_mod.CheckEmailDeliverable AND ~isAllowedValidation), FAIL(303, doxie.ErrorCodes(303)));
 
   rpt := EmailV2_Services.Search_Records(search_by, in_mod);
 

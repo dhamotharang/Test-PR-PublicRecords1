@@ -26,7 +26,7 @@ EXPORT LIB_RiskView_Models ( GROUPED DATASET(Risk_Indicators.Layout_Boca_Shell) 
   SHARED IDAattrs := arguments.IDA_Attrs;
 
 	// EXPORT ValidatingModel := Models.RVG1809_1_0(BocaShell); // Change this to the model you are tring to validate
-	EXPORT ValidatingModel := Models.getCreditLuciModels(BocaShell, attrv5, IDAattrs).RVS2005_0; // Change this to the model you are tring to validate
+	EXPORT ValidatingModel := Models.getCreditLuciModels(BocaShell, attrv5, IDAattrs, customInputs).RVS2005_0; // Change this to the model you are tring to validate
 	
 	
 	// Version 4.0
@@ -159,14 +159,14 @@ that is sent INTO calcindex for ECL.
                                     {'RVG1809_1', MType_G+'RVG1809_1', calcIndex( 79), '0-999', 0, FALSE}, //Tranzaction
                                     {'RVA1908_1', MType_A+'RVA1908_1', calcIndex( 80), '0-999', 0, FALSE}, //SCUSA
                                     {'RVR1903_1', MType_G+'RVR1903_1', calcIndex( 82), '-1 - 2', 0, FALSE}, //Sheffield Financial (non-standard score -1,0,1,2)
-                                                                               // 83 not used
+                                    {'RVC2004_1', MType_G+'RVC2004_1', calcIndex( 83), '0-999', 0, FALSE}, //NewRez DBA Shellpoint Mortgage Servicing                                
                                     {'RVA2008_1', MType_A+'RVA2008_1', calcIndex( 84), '0-999', 0, FALSE}, //Automobile Acceptance Corporation
                                     {'RVT2004_1', MType_T+'RVT2004_1', calcIndex( 85), '0-999', 0, FALSE}, //T-Mobile Thin
                                     {'RVT2004_2', MType_T+'RVT2004_2', calcIndex( 86), '0-999', 0, FALSE}, //T-Mobile Thick
-                                                                               // 87 not used
+                                    {'RVC2004_2', MType_G+'RVC2004_2', calcIndex( 87), '0-999', 0, FALSE}, //NewRez DBA Shellpoint Mortgage Servicing                                 
                                     {'RVG2005_0', MType_G+'RVG2005_0', calcIndex( 88), '0-999', 0, TRUE}, //Riskview Credit Optics short term lending flagship
                                     {'RVS2005_0', MType_S+'RVS2005_0', calcIndex( 89), '0-999', 0, TRUE}, //Riskview Credit Optics Cross Industry flagship
-                                    
+                                    {'RVC2004_3', MType_G+'RVC2004_3', calcIndex( 90), '0-999', 0, FALSE}, //NewRez DBA Shellpoint Mortgage Servicing
                                     // ------------------- FAKE MODELS - STATIC SCORE AND REASON CODES ------------------
                                     {'RVA9999_9', MType_A+'RVA9999_9', 0, '0-999', 0, FALSE},
                                     {'RVB9999_9', MType_B+'RVB9999_9', 0, '0-999', 0, FALSE},
@@ -228,6 +228,9 @@ that is sent INTO calcindex for ECL.
                       'RVA2008_1' => Models.getCreditLuciModels(blankshell, attrv5, blankIDA).RVA2008_1,
                       'RVT2004_1' => Models.getCreditLuciModels(blankshell, attrv5, blankIDA).RVT2004_1,
                       'RVT2004_2' => Models.getCreditLuciModels(blankshell, attrv5, blankIDA).RVT2004_2,
+                      'RVC2004_1' => Models.getCreditLuciModels(blankshell, attrv5, blankIDA, customInputs).RVC2004_1,
+                      'RVC2004_2' => Models.getCreditLuciModels(blankshell, attrv5, blankIDA, customInputs).RVC2004_2,
+                      'RVC2004_3' => Models.getCreditLuciModels(blankshell, attrv5, blankIDA, customInputs).RVC2004_3,
                       // ----------------------------------------------------------------------------------
                       // ------------------- FAKE MODELS - STATIC SCORE AND REASON CODES ------------------
                       'RVA9999_9' => UNGROUP(Models.FAKE_0_0(BocaShell, 'RV50')),

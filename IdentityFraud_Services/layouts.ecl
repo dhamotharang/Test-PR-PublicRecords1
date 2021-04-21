@@ -1,4 +1,4 @@
-IMPORT doxie, EmailService, Entiera, header, iesp, models, Risk_Indicators, Standard;
+IMPORT doxie, header, iesp, models, Standard;
 
 EXPORT layouts := MODULE
 
@@ -55,7 +55,7 @@ EXPORT layouts := MODULE
 // carrier, carrier_city, carrier_state, PhoneType, phone_first_seen, phone_last_seen, caption_text,
 // bdid,linked_did,includedByHHID,timezone,listed_timezone,publish_code,listed_name_prefix,listed_name_first,
 // listed_name_middle,listed_name_last,listed_name_suffix,
-// boolean glb, boolean dppa	
+// boolean glb, boolean dppa
 
   // for static table which contains all indicators possible in IdentityFraud report
   export ri_map := record
@@ -93,7 +93,7 @@ EXPORT layouts := MODULE
     unsigned6 did;
 	  dataset(ifr.t_IFRPhone) PhoneInfo {MAXCOUNT(100)}; // TODO:
   end;
-	
+
   // for use in "no longer reported" arythmetics
   export bureau_indicator := record
     slim_header.not_in_bureau;
@@ -125,7 +125,7 @@ EXPORT layouts := MODULE
 		Standard.Name;
 		Standard.Addr;
 	end;
-	
+
 	export	id_fraud_attributes	:=
 	record
 		unsigned6	did;
@@ -155,7 +155,7 @@ EXPORT layouts := MODULE
 		typeof(Models.Layout_FraudAttributes.Version2.SourceRiskLevel)					SourceRiskLevel;
 		typeof(Models.Layout_FraudAttributes.Version2.SearchVelocityRiskLevel)	VelocityRiskLevel;
 	end;
-	
+
 	// Email layout
 	export	email_rec	:=
 	record(ifr.t_IFREmail)
@@ -166,7 +166,7 @@ EXPORT layouts := MODULE
 		string8		date_first_seen;
 		string8		date_last_seen;
 	end;
-	
+
 	export	email_did_rec	:=
 	record
 		email_rec	-	[date_first_seen,date_last_seen];

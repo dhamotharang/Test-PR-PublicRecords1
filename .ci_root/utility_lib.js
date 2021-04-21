@@ -190,6 +190,21 @@ let findPath = function(str, workpath) {
   return pp;
 }
 
+// count warnings / errors in a results string
+let countExceptions = function(text) {
+  let regex_e = /: error [A-Z]\d+:/g;
+  let regex_w = /: warning [A-Z]\d+:/g;
+  let lines = text.split('\n');
+  let out = { errors: 0, warnings: 0 };
+
+  for (let item of lines) {
+    if (regex_e.test(item)) out.errors++;
+    if (regex_w.test(item)) out.warnings++;
+  }
+
+  return out;
+};
+
 // perform syntax check
 let syntax_check_async = function(path, workpath, use_fast = true) {
   return new Promise(resolve => {
@@ -211,8 +226,10 @@ let syntax_check_async = function(path, workpath, use_fast = true) {
       out.stderr = (stderr) ? stderr.trim() : '';
 
       if (error) {
+        let ex = countExceptions(out.stderr);
+
         // eclcc may return an error code but no errors - in that case mark as ok
-        out.ok = !(out.stderr);
+        out.ok = (ex.errors <= 0);
         out.status = error.status;
       }
       else out.ok = true;

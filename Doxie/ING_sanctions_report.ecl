@@ -1,5 +1,6 @@
-/*--SOAP--
+﻿/*--SOAP--
 <message name="IngenixSanctionsReportRequest">
+  <part name="Gateways" type="tns:XmlDataSet" cols="80" rows="4"/>
   <part name="SanctionID" type="tns:EspStringArray" required="1"/>
   <part name="DPPAPurpose" type="xsd:byte"/>
   <part name="GLBPurpose" type="xsd:byte"/>

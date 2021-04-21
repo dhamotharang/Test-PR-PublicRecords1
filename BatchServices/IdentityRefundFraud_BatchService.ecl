@@ -1,48 +1,15 @@
-/*--SOAP--
-<message name="IdentityRefundFraud_BatchService">
-
-  <!-- Common input options -->
-  <part name="ApplicationType"      type="xsd:string"/>
-  <part name="DPPAPurpose"          type="xsd:byte"/>
-  <part name="GLBPurpose"           type="xsd:byte"/>
-  <part name="DataPermissionMask"   type="xsd:string"/>
-  <part name="DataRestrictionMask"  type="xsd:string"/>
-  <part name="IndustryClass"        type="xsd:string"/>
-  <part name="IncludeBlankDOD"      type="xsd:boolean"/>
-  <part name="PhoneticMatch"        type="xsd:boolean"/>
-  <part name="AllowNickNames"       type="xsd:boolean"/>
-  <part name="IncludeMinors"        type="xsd:boolean"/>
-
-  <!-- Specific input options -->
-  <part name="InputState"           type="xsd:string"/>
-  <part name="ModelName"            type="xsd:string"/>
-  <part name="FilterRule"           type="xsd:string"/>
-  <part name="ScoreCut"             type="xsd:string"/>
-  <part name="DIDScoreThreshold"    type="xsd:unsigned2"/>
-  <part name="Creditor"             type="xsd:string"/>
-  <part name="RefundThreshold"      type="xsd:unsigned3"/>
-  <part name="GetSSNBest"           type="xsd:boolean"/>
-
-  <part name="ReturnDetailedRoyalties" type="xsd:boolean"/>
-  <part name="includeDependantID"      type="xsd:boolean"/>
-  <part name="IPAddrExceedsRange"      type="xsd:integer"/>
-  <part name="GlobalCompanyId"         type="xsd:unsigned6"/>
-  <part name="IndustryType"            type="xsd:unsigned2"/>
-  <part name="ProductCode"             type="xsd:unsigned6"/>
-
-  <part name="AddressRiskHRICodes"     type="xsd:string"/>
-  <part name="IdentityRiskHRICodes"    type="xsd:string"/>
-  <part name="ReportOnlyHRICodes"      type="xsd:string"/>
-
-  <part name="TaxRefund_batch_in"   type="tns:XmlDataSet" cols="70" rows="25"/>
-</message>
-*/
-
+// =====================================================================
+// ROXIE QUERY
+// -----------
+// For the complete list of input parameters please check published WU.
+// Look at the history of this attribute for the old SOAP info.
+// =====================================================================
 IMPORT AutoheaderV2, BatchServices, BatchShare, doxie, Royalty, ut, WSInput;
 
 EXPORT IdentityRefundFraud_BatchService := MACRO
   #CONSTANT('penaltthreshold','10');
   #CONSTANT('SearchLibraryVersion',AutoheaderV2.Constants.LibVersion.SALT);
+  #CONSTANT('TwoPartySearch', FALSE);
 
   WSInput.MAC_TaxRefundISv3_BatchService();
 

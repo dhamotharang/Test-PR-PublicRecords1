@@ -50,9 +50,8 @@ rec := RECORD
   integer8 zero;
   string0 blk;
 	//CCPA-283 Adding CCPA new fields
-	UNSIGNED4 global_sid := 0;
+	UNSIGNED4 global_sid:=0;
 	UNSIGNED8 record_sid:=0;
-
 END;
 
 // fakepf := SANCTN.file_out_party_cleaned;

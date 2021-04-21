@@ -36,8 +36,13 @@ EXPORT CommonIndividual := MODULE
   
   EXPORT GetIIDSSNFlags(DATASET(DueDiligence.Layouts.Indv_Internal) inData, STRING dataRestrictionMask,
                         UNSIGNED1 dppa, UNSIGNED1 glba, INTEGER bsVersion, UNSIGNED8 bsOptions, BOOLEAN isFCRA,
-                        doxie.IDataAccess mod_access = MODULE (doxie.IDataAccess) END) := FUNCTION
+                        doxie.IDataAccess mod_access) := FUNCTION
       
+      this_mod_access := MODULE(PROJECT(mod_access, doxie.IDataAccess))
+        EXPORT unsigned1 glb := glba;
+        EXPORT unsigned1 dppa := ^.dppa;
+        EXPORT string DataRestrictionMask := ^.dataRestrictionMask;
+      END;
       
       exactMatchLevel := risk_indicators.iid_constants.default_ExactMatchLevel;
       
@@ -63,8 +68,8 @@ EXPORT CommonIndividual := MODULE
                                                     SELF := LEFT.individual;
                                                     SELF := [];));	
 
-      withSSNFlags := risk_indicators.iid_getSSNFlags(GROUP(ssnFlagsPrepseq, seq), dppa, glba, isFCRA, TRUE, exactMatchLevel, dataRestrictionMask, bsVersion, bsOptions,
-                                                                                              mod_access := mod_access);	
+      withSSNFlags := risk_indicators.iid_getSSNFlags(GROUP(ssnFlagsPrepseq, seq),
+                                                      this_mod_access, isFCRA, TRUE, exactMatchLevel, bsVersion, bsOptions);
 		
       RETURN withSSNFlags;
   END;
@@ -102,8 +107,20 @@ EXPORT CommonIndividual := MODULE
   
       getRelationInfo := GetAllRelationships(inquiredData, TRUE);                               
                                               
+      rollRelatedPartyInput := ROLLUP(SORT(relatedPartyResults, seq, did),
+                                      LEFT.seq = RIGHT.seq AND
+                                      LEFT.did = RIGHT.did,
+                                      TRANSFORM(DueDiligence.LayoutsInternal.RelatedParty,
+                                                SELF.currIncar := LEFT.currIncar OR RIGHT.currIncar;
+                                                SELF.prevIncar := LEFT.prevIncar OR RIGHT.prevIncar;
+                                                SELF.potentialSO := LEFT.potentialSO OR RIGHT.potentialSO;
+                                                SELF.currProbation := LEFT.currProbation OR RIGHT.currProbation;
+                                                SELF.currParole := LEFT.currParole OR RIGHT.currParole;
+                                                SELF.felonyPast3Years := LEFT.felonyPast3Years OR RIGHT.felonyPast3Years;
+                                                SELF := LEFT;));
                                               
-      updateRelationInfo := JOIN(getRelationInfo, relatedPartyResults,
+                                              
+      updateRelationInfo := JOIN(getRelationInfo, rollRelatedPartyInput,
                                   LEFT.seq = RIGHT.seq AND
                                   LEFT.did = RIGHT.did,
                                   TRANSFORM({RECORDOF(LEFT), DATASET(DueDiligence.Layouts.SlimRelation) spouses, DATASET(DueDiligence.Layouts.SlimRelation) parents, DATASET(DueDiligence.Layouts.SlimRelation) associates},

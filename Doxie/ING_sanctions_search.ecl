@@ -1,5 +1,6 @@
-/*--SOAP--
+﻿/*--SOAP--
 <message name="IngenixSanctionsRequest"> 
+  <part name="Gateways" type="tns:XmlDataSet" cols="80" rows="4"/>
 	<part name="UnParsedFullName" type="xsd:string"/> 
   <part name="LastName" type="xsd:string"/>
   <part name="FirstName" type="xsd:string"/>

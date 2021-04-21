@@ -1,7 +1,13 @@
-﻿import risk_indicators, Phone_Shell, Data_Services, RiskWise, ut;
+﻿import risk_indicators, Phone_Shell, Data_Services, RiskWise, ut, STD;
 
 // placeholder for all of the roxie VIPs to use when processing files using soapcall
 export shortcuts := module
+
+  EXPORT check_thread_count(Integer num_threads, Integer thread_limit=100 ) := FUNCTION
+    Total_threads := STD.System.Job.Nodes() * num_threads;
+    IF(Total_threads > thread_limit, FAIL('Thread count ('+Total_threads+') too high. Reduce your thread count or use a smaller thor.'));
+    Return Total_threads;
+  END;
 
 //-- update VIPS from warren as of Dec 11, 2019
 	export prod_batch_analytics_roxie := 'http://roxiethorvip.hpcc.risk.regn.net:9856';

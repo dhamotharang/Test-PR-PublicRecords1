@@ -209,7 +209,7 @@ EXPORT GatewayData := MODULE
 
   SHARED GetEAGatewayData(DATASET($.Layouts.Gateway_Data.batch_in_gw_rec) in_emails,
                    $.IParams.EmailParams in_mod,
-                   UNSIGNED1 gw_timeout = $.Constants.GatewayValues.requestTimeout,
+                   UNSIGNED1 gw_timeout = $.Constants.GatewayValues.EA_GW_TIMEOUT,
                    UNSIGNED1 gw_retries = $.Constants.GatewayValues.requestRetries,
                    UNSIGNED1 gw_threads = $.Constants.Defaults.MaxEmailsToCheckDeliverable) := FUNCTION
 

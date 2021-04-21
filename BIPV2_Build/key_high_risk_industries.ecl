@@ -49,7 +49,7 @@ export key_high_risk_industries := module
    LocIDInput := project(addrSearchDs,
 			                      transform(LocationID.IdAppendLayouts.AppendInput, self := left, self.request_id := left.UniqueId, self := []));
 																									
-   locid_results := LocationID.IdAppendRoxie(LocIDInput);
+      locid_results := LocationID.IdAppendRoxie(LocIDInput);
 											 
 	  outputRec := record
 					addrSearchDs.UniqueId;

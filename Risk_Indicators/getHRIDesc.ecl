@@ -535,6 +535,13 @@ export getHRIDesc(string5 rc, boolean nextgen_credit = false) := CASE(TRIM(rc),
 'D2' => 'Distance from Input Address to Retail Address over 200 Miles',
 'D3' => 'Distance from Input Address to Retail Address over 400 Miles',
 
+// custom reason codes for Shellpoint
+'Z01' => 'Debt information missing',
+'Z02' => 'Time since debt received',
+'Z03' => 'Characteristics of outstanding loan',
+'Z04' => 'Amount of debt charged off',
+'Z05' => 'Time since account opening',
+'Z06' => 'Time since last payment',
 
 // Reason Code and Descriptions for SBOM_0_0 (Business Only) and SBBM_0_0 (Blended)
 'B017' => 'Too few business associates on record with business',

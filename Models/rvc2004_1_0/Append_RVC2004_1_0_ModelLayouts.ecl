@@ -1,0 +1,70 @@
+﻿EXPORT Append_RVC2004_1_0_ModelLayouts := MODULE
+  EXPORT Prepare := RECORD
+    UNSIGNED1 RVC2004_1_0_sc := 0; // Which scorecard was used
+    UNSIGNED1 RVC2004_1_0_ex := 0; // Which exception fired
+    BOOLEAN RVC2004_1_0_RV5_Attr_200 := FALSE;
+    BOOLEAN RVC2004_1_0_RV5_Attr_222 := FALSE;
+  END;
+  EXPORT Working := RECORD
+    UNSIGNED4 AvoidEmpty := 0;
+  END;
+  EXPORT Debug := RECORD
+// Variables for components of score SCORECARD_model6
+    UNSIGNED1 RVC2004_1_0_SCORECARD_model6_LoanType_range := 0;
+    REAL4 RVC2004_1_0_SCORECARD_model6_LoanType_score := 0;
+    REAL4  RVC2004_1_0_SCORECARD_model6_LoanType_contribution_best := 0;
+    STRING5 RVC2004_1_0_SCORECARD_model6_LoanType_reason := '';
+    UNSIGNED1 RVC2004_1_0_SCORECARD_model6_addrinputsubjectowned_range := 0;
+    REAL4 RVC2004_1_0_SCORECARD_model6_addrinputsubjectowned_score := 0;
+    REAL4  RVC2004_1_0_SCORECARD_model6_addrinputsubjectowned_contribution_best := 0;
+    STRING5 RVC2004_1_0_SCORECARD_model6_addrinputsubjectowned_reason := '';
+    UNSIGNED1 RVC2004_1_0_SCORECARD_model6_addrprevioustimeoldest_range := 0;
+    REAL4 RVC2004_1_0_SCORECARD_model6_addrprevioustimeoldest_score := 0;
+    REAL4  RVC2004_1_0_SCORECARD_model6_addrprevioustimeoldest_contribution_best := 0;
+    STRING5 RVC2004_1_0_SCORECARD_model6_addrprevioustimeoldest_reason := '';
+    UNSIGNED1 RVC2004_1_0_SCORECARD_model6_addrprevioussubjectowned_range := 0;
+    REAL4 RVC2004_1_0_SCORECARD_model6_addrprevioussubjectowned_score := 0;
+    REAL4  RVC2004_1_0_SCORECARD_model6_addrprevioussubjectowned_contribution_best := 0;
+    STRING5 RVC2004_1_0_SCORECARD_model6_addrprevioussubjectowned_reason := '';
+    UNSIGNED1 RVC2004_1_0_SCORECARD_model6_addrinputmatchindex_range := 0;
+    REAL4 RVC2004_1_0_SCORECARD_model6_addrinputmatchindex_score := 0;
+    REAL4  RVC2004_1_0_SCORECARD_model6_addrinputmatchindex_contribution_best := 0;
+    STRING5 RVC2004_1_0_SCORECARD_model6_addrinputmatchindex_reason := '';
+    UNSIGNED1 RVC2004_1_0_SCORECARD_model6_ChargeOffAmount_range := 0;
+    REAL4 RVC2004_1_0_SCORECARD_model6_ChargeOffAmount_score := 0;
+    REAL4  RVC2004_1_0_SCORECARD_model6_ChargeOffAmount_contribution_best := 0;
+    STRING5 RVC2004_1_0_SCORECARD_model6_ChargeOffAmount_reason := '';
+    UNSIGNED1 RVC2004_1_0_SCORECARD_model6_addrcurrentphoneservice_range := 0;
+    REAL4 RVC2004_1_0_SCORECARD_model6_addrcurrentphoneservice_score := 0;
+    REAL4  RVC2004_1_0_SCORECARD_model6_addrcurrentphoneservice_contribution_best := 0;
+    STRING5 RVC2004_1_0_SCORECARD_model6_addrcurrentphoneservice_reason := '';
+    UNSIGNED1 RVC2004_1_0_SCORECARD_model6_dayssince_ReceivedDate_range := 0;
+    REAL4 RVC2004_1_0_SCORECARD_model6_dayssince_ReceivedDate_score := 0;
+    REAL4  RVC2004_1_0_SCORECARD_model6_dayssince_ReceivedDate_contribution_best := 0;
+    STRING5 RVC2004_1_0_SCORECARD_model6_dayssince_ReceivedDate_reason := '';
+    UNSIGNED1 RVC2004_1_0_SCORECARD_model6_CollateralStatus_range := 0;
+    REAL4 RVC2004_1_0_SCORECARD_model6_CollateralStatus_score := 0;
+    REAL4  RVC2004_1_0_SCORECARD_model6_CollateralStatus_contribution_best := 0;
+    STRING5 RVC2004_1_0_SCORECARD_model6_CollateralStatus_reason := '';
+    UNSIGNED1 RVC2004_1_0_SCORECARD_model6_dayssince_OpenDate_range := 0;
+    REAL4 RVC2004_1_0_SCORECARD_model6_dayssince_OpenDate_score := 0;
+    REAL4  RVC2004_1_0_SCORECARD_model6_dayssince_OpenDate_contribution_best := 0;
+    STRING5 RVC2004_1_0_SCORECARD_model6_dayssince_OpenDate_reason := '';
+    UNSIGNED1 RVC2004_1_0_SCORECARD_model6_OutOfStatuteIndicator_range := 0;
+    REAL4 RVC2004_1_0_SCORECARD_model6_OutOfStatuteIndicator_score := 0;
+    REAL4  RVC2004_1_0_SCORECARD_model6_OutOfStatuteIndicator_contribution_best := 0;
+    STRING5 RVC2004_1_0_SCORECARD_model6_OutOfStatuteIndicator_reason := '';
+    UNSIGNED1 RVC2004_1_0_SCORECARD_model6_sourcecredheadertimeoldest_range := 0;
+    REAL4 RVC2004_1_0_SCORECARD_model6_sourcecredheadertimeoldest_score := 0;
+    REAL4  RVC2004_1_0_SCORECARD_model6_sourcecredheadertimeoldest_contribution_best := 0;
+    STRING5 RVC2004_1_0_SCORECARD_model6_sourcecredheadertimeoldest_reason := '';
+    REAL RVC2004_1_0_SCORECARD_model6_Score0 := 0;
+    REAL RVC2004_1_0_SCORECARD_model6_Score1 := 0;
+    INTEGER2 RVC2004_1_0_SCORECARD_model6_Score := 0;
+    SET OF STRING5 RVC2004_1_0_SCORECARD_model6_Reasons :=[];
+  END;
+  EXPORT Result := RECORD
+    INTEGER2 RVC2004_1_0_Score := 0;
+    SET OF STRING5 RVC2004_1_0_Reasons := [];
+  END;
+END;

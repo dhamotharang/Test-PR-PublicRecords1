@@ -1,60 +1,19 @@
-﻿/*--SOAP--
-<message name="ReportService" wuTimeout="300000">
-  <part name="Addr" type="xsd:string"/>
-  <part name="City" type="xsd:string"/>
-  <part name="State" type="xsd:string"/>
-  <part name="Zip" type="xsd:string"/>
-  <separator />
-  <part name="DID" type="xsd:string" required="1" />
-  <part name="DPPAPurpose" type="xsd:byte" default="1"/>
-  <part name="GLBPurpose" type="xsd:byte" default="1"/>
-  <part name="SSNMask" type="xsd:string"/> <!-- [NONE, ALL, LAST4, FIRST5] -->
-  <part name="DataRestrictionMask" type="xsd:string" default="00000000000"/>
-  <part name="DataPermissionMask" type="xsd:string"/>
-  <part name="ApplicationType" type="xsd:string"/>
-  <separator />
-  <part name="MaxResidents" type="xsd:unsignedInt"/>
-  <part name="IncludeCensusData" type="xsd:boolean"/>
-  <part name="IncludeProperties" type="xsd:boolean"/>
-  <part name="MaxProperties" type="xsd:unsignedInt"/>
-  <part name="IncludeDriversLicenses" type="xsd:boolean"/>
-  <part name="MaxDriversLicenses" type="xsd:unsignedInt"/>
-  <part name="IncludeMotorVehicles" type="xsd:boolean"/>
-  <part name="MaxMotorVehicles" type="xsd:unsignedInt"/>
-  <part name="IncludeBusinesses" type="xsd:boolean"/>
-  <part name="MaxBusinesses" type="xsd:unsignedInt"/>
-  <part name="IncludeNeighbors" type="xsd:boolean"/>
-  <part name="NeighborCount" type="xsd:unsignedInt"/>
-  <part name="MaxNeighbors" type="xsd:unsignedInt"/>
-  <part name="IncludeBankruptcies" type="xsd:boolean"/>
-  <part name="MaxBankruptcies" type="xsd:unsignedInt"/>
-  <part name="IncludeResidentialPhones" type="xsd:boolean"/>
-  <part name="MaxResidentialPhones" type="xsd:unsignedInt"/>
-  <part name="IncludeBusinessPhones" type="xsd:boolean"/>
-  <part name="MaxBusinessPhones" type="xsd:unsignedInt"/>
-  <part name="IncludeLiensJudgments" type="xsd:boolean"/>
-  <part name="MaxLiens" type="xsd:unsignedInt"/>
-  <part name="IncludeCriminalRecords" type="xsd:boolean"/>
-  <part name="MaxCriminalRecords" type="xsd:unsignedInt"/>
-  <part name="IncludeSexualOffenses" type="xsd:boolean"/>
-  <part name="MaxSexualOffenses" type="xsd:unsignedInt"/>
-  <part name="IncludeHuntingFishingLicenses" type="xsd:boolean"/>
-  <part name="MaxHuntingAndFishingLicenses" type="xsd:unsignedInt"/>
-  <part name="IncludeWeaponPermits" type="xsd:boolean"/>
-  <part name="MaxWeaponPermits" type="xsd:unsignedInt"/>
-  <part name="LocationReportOnly" type="xsd:boolean"/>
-  <part name="AddressReportRequest" type="tns:XmlDataSet" cols="80" rows="30" />
-  <part name="gateways" type="tns:XmlDataSet" cols="110" rows="4"/>
-</message>
+﻿// =====================================================================
+// ROXIE QUERY
+// -----------
+// For the complete list of input parameters please check published WU.
+// Look at the history of this attribute for the old SOAP info.
+// =====================================================================
+/*--INFO--
+    Searches for Address Report.
 */
-/*--INFO-- Searches for Address Report*/
 
 import AutoStandardI, PersonReports, iesp, doxie, AddressReport_Services, STD;
 EXPORT ReportService := MACRO
 
 //The following macro defines the field sequence on WsECL page of query.
   WSInput.MAC_AddrReport_ReportService();
-  
+
   #constant('nodeepdive',true);
   #constant('SelectIndividually', true);
   #constant('IncludePriorProperties', true);
@@ -62,7 +21,8 @@ EXPORT ReportService := MACRO
   #constant('IncludeDetails', true);
   #constant ('IncludeNonDMVSources', true);
   #constant ('IncludeNonRegulatedVehicleSources', true);
-  
+  #CONSTANT('TwoPartySearch', FALSE);
+
   include_def := module
     export boolean include_businesses := true;
     export boolean include_CensusData := true;
@@ -115,18 +75,18 @@ EXPORT ReportService := MACRO
 			#stored ('MaxWeaponPermits', global(tag).MaxConcealedWeapons);
     return output (dataset ([],{integer x}), named('__internal__'), extend);
   end;
-  
+
   //Due to a dependency to BPS report and to changes done during Project July on the ESP side
   //ESP had to split the request and the response for this service in order to be able to keep generating the layout
   //instead of manually making the changes
   //This should not become the norm
   rec_in := iesp.addressreportreq.t_AddressReportRequest;
   ds_in := DATASET ([], rec_in) : STORED ('AddressReportRequest', FEW);
-  
+
   first_raw := ds_in[1] : INDEPENDENT;
   iesp.ECL2ESP.SetInputBaseRequest (first_raw);
   ReportBy := global (first_raw.ReportBy);
-  
+
   //***************************************************//
   // iesp.ECL2ESP.SetInputAddress (ReportBy.Address);
   // Unfortunately I cannot use the standard ECL2ESP setIputAddress
@@ -141,7 +101,7 @@ EXPORT ReportService := MACRO
   boolean includeAssignmentsAndReleases := first_raw.Options.IncludeAssignmentsAndReleases : STORED('IncludeAssignmentsAndReleases');
 
   include_stored := PersonReports.GlobalIncludes ();
-  
+
   tmp := AutoStandardI.GlobalModule();
   mod_access := doxie.compliance.GetGlobalDataAccessModuleTranslated(tmp);
 
@@ -172,7 +132,7 @@ EXPORT ReportService := MACRO
   recs := AddressReport_Services.ReportService_Records (addr_mod, FALSE,includeAssignmentsAndReleases);
   results_recs := project(recs, transform(iesp.addressreport.t_AddressReportResponse, self := left.ReportResponse));
   output(results_recs, named ('Results'));
-  
+
   //Royalties for Location Report
   if(tempmod.locationReport, output(recs.royalties, NAMED('RoyaltySet')));
 

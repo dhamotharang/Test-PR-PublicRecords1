@@ -1,7 +1,7 @@
-﻿import risk_indicators, doxie;
+﻿import AML, risk_indicators, doxie;
 
 export AMLcommonFunction(grouped DATASET(risk_indicators.Layout_Output) with_did,
-              $.IParam.IAml mod_aml,
+              AML.IParam.IAml mod_aml,
               boolean suppressNearDups=false,
               boolean isFCRA=false,
               boolean runSSNCodes=true, boolean runBestAddrCheck=true,
@@ -50,12 +50,12 @@ MoverDIDs := join(with_hierarchy, Movers,
                   transform(risk_indicators.iid_constants.layout_outx,
                               self := left));
 
-GetZipDist := GetMoveDist(MoverDIDs);
+GetZipDist := AML.GetMoveDist(MoverDIDs);
 
 // iid_getSSNFlags was located prior to rolled_header. When entering a 4 byte ssn, flags were being set before the ssn was fixed.
-with_ssn_flags := risk_indicators.iid_getSSNFlags(rolled_header_normal, mod_access.dppa, mod_access.glb,
-                                                  isFCRA, runSSNCodes, ExactMatchLevel, mod_access.DataRestrictionMask, mod_aml.bs_version,
-                                                  mod_aml.bs_options, mod_access.DataPermissionMask, mod_access := mod_access);
+with_ssn_flags := risk_indicators.iid_getSSNFlags(rolled_header_normal, mod_access,
+                                                  isFCRA, runSSNCodes, ExactMatchLevel, mod_aml.bs_version,
+                                                  mod_aml.bs_options);
 
 Indivslim := record
 
@@ -125,12 +125,12 @@ rolledHdrdtls := rollup(getHDRSSNType, rollHeader(left, right), seq ,did);
 
 with_best_addr := risk_indicators.iid_check_best(with_addr_history, with_ssn_flags, ExactMatchLevel, mod_aml.bs_version);
 
-PrepBSlayout := GetBSLayout(with_best_addr);
+PrepBSlayout := AML.GetBSLayout(with_best_addr);
 
 AddHdrdetails := join(PrepBSlayout, rolledHdrdtls,
                       left.seq = right.seq and
                       left.did = right.did,
-                      transform(Layouts.LayoutAMLShellV2,
+                      transform(AML.Layouts.LayoutAMLShellV2,
                                   self.did := left.did,
                                   self.seq := left.seq,
                                   self.isVoter :=   right.isVoter,
@@ -144,7 +144,7 @@ AddHdrdetails := join(PrepBSlayout, rolledHdrdtls,
 AddMovers := join(AddHdrdetails,GetZipDist ,
                       left.seq = right.seq and
                       left.did = right.did,
-                      transform(Layouts.LayoutAMLShellV2,
+                      transform(AML.Layouts.LayoutAMLShellV2,
                                   self.Move1_dist :=   if(right.did <> 0, right.Move1_dist, 9999),
                                   self.Move2_dist :=   if(right.did <> 0, right.Move2_dist, 9999),
                                   self.Move3_dist :=   if(right.did <> 0, right.Move3_dist, 9999),
