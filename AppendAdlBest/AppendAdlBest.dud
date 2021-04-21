@@ -20,13 +20,12 @@ INPUTS
 	STRING DPPAPURPOSE: LABEL("DPPA Purpose"),DEFAULT("^GLOBAL|DPPAPURPOSE");
 	STRING GLBPURPOSE: LABEL("GLB Purpose"),DEFAULT("^GLOBAL|GLBPURPOSE");
 	STRING DATARESTRICTIONMASK: LABEL("Data Restriction Mask"),DEFAULT("^GLOBAL|DATARESTRICTIONMASK");
-	STRING DATAPERMISSIONMASK: LABEL("Data Restriction Mask"),DEFAULT("^GLOBAL|DATAPERMISSIONMASK");
+	STRING DATAPERMISSIONMASK: LABEL("Data Permission Mask"),DEFAULT("^GLOBAL|DATAPERMISSIONMASK");
 	STRING Appends: LABEL("ADL Appends Option"),DEFAULT("^GLOBAL|APPENDS");
 	STRING Verify: LABEL("ADL Verify Option"),DEFAULT("^GLOBAL|VERIFY");
 	ENUM("False","True") Deduped: LABEL("ADL Deduped Option"),DESCRIPTION("Dedup output records from ADL Best"),OPTIONAL,DEFAULT("True");
 	ENUM("False","True") IncludeRanking: LABEL("Include Ranking"),DESCRIPTION("ADL Best Include ranking option"),OPTIONAL,DEFAULT("False");
 	ENUM("False","True") PatriotProcess: LABEL("Patriot Process"),DESCRIPTION("ADL Best Patriot Process option"),OPTIONAL,DEFAULT("False");
-	ENUM("False","True") IncludeMinors: LABEL("Include Minors"),DESCRIPTION("Include minors. Currently this option does not do anything. See ReadMe"),OPTIONAL,DEFAULT("False");
 	STRING AdlRoxieIP:LABEL("ADL Best Roxie VIP"),DEFAULT("^GLOBAL|ADLROXIEIP");
 	INT    PARALLELNODES:LABEL("Parallel Nodes"),DEFAULT("^GLOBAL|PARALLELNODES");
 	INT    BATCHSIZE:LABEL("Batch Size"),DEFAULT("^GLOBAL|BATCHSIZE");
@@ -68,7 +67,7 @@ GENERATES INLINE
  
   %^edsOutput% := AppendAdlBest.macAppendAdlBest(%dsInput%, %Lexid%, %UniqueId%, %^qPrefix%,
     %^qDPPAPURPOSE%, %^qGLBPURPOSE%, %^qDATARESTRICTIONMASK%, %^qDATAPERMISSIONMASK%,
-    %^qAppends%, %^qVerify%, %^qDeduped%, %^qIncludeRanking%, MaxResultsPerAcct,
+    %^qAppends%, %^qVerify%, %^qDeduped%, %^qIncludeRanking%, MaxResultsPerAcct, %^qPatriotProcess%,
     %^AdlRoxieIP%, ParallelNodes, BatchSize, ParallelRequests);
 ENDGENERATES
 
