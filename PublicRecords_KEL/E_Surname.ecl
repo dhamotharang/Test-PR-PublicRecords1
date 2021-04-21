@@ -1,4 +1,4 @@
-﻿//HPCC Systems KEL Compiler Version 1.5.0rc1
+//HPCC Systems KEL Compiler Version 1.5.0rc1
 IMPORT KEL15 AS KEL;
 IMPORT PublicRecords_KEL;
 IMPORT CFG_Compile FROM PublicRecords_KEL;
@@ -45,7 +45,7 @@ EXPORT E_Surname(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG_Compi
   SHARED __SortedTable := SORT(__Table,KeyVal);
   SHARED NullLookupRec := DATASET([{NullKeyVal,1,0}],__TabRec);
   EXPORT Lookup := NullLookupRec + PROJECT(__SortedTable,TRANSFORM(__TabRec,SELF.UID:=COUNTER,SELF:=LEFT));
-  SHARED __Mapping0 := 'UID(DEFAULT:UID),name(OVERRIDE:Surname_:\'\'),is_latest(OVERRIDE:Is_Latest_),name_rank(OVERRIDE:Name_Rank_:0),name_count(OVERRIDE:Name_Count_:0),prop100k(OVERRIDE:Prop100_K_:0.0),cum_prop100k(OVERRIDE:Cumulative_Prop100_K_:0.0),pctwhite(OVERRIDE:Percent_White_:0.0),pctblack(OVERRIDE:Percent_Black_:0.0),pctapi(OVERRIDE:Percent_Asian_Pacific_Islander_:0.0),pctaian(OVERRIDE:Percent_American_Indian_Alaska_Native_:0.0),pct2prace(OVERRIDE:Percent_Multiracial_:0.0),pcthispanic(OVERRIDE:Percent_Hispanic_:0.0),src(OVERRIDE:Source_:\'\'),archive_date(OVERRIDE:Archive___Date_:EPOCH),datefirstseen(DEFAULT:Date_First_Seen_:EPOCH),datelastseen(DEFAULT:Date_Last_Seen_:EPOCH),hybridarchivedate(DEFAULT:Hybrid_Archive_Date_:EPOCH),vaultdatelastseen(DEFAULT:Vault_Date_Last_Seen_:EPOCH),DPMBitmap(OVERRIDE:__Permits:PERMITS)';
+  SHARED __Mapping0 := 'UID(DEFAULT:UID),name(OVERRIDE:Surname_:\'\'),is_latest(OVERRIDE:Is_Latest_),name_rank(OVERRIDE:Name_Rank_:0),name_count(OVERRIDE:Name_Count_:0),prop100k(OVERRIDE:Prop100_K_:0.0),cum_prop100k(OVERRIDE:Cumulative_Prop100_K_:0.0),pctwhite(OVERRIDE:Percent_White_:0.0),pctblack(OVERRIDE:Percent_Black_:0.0),pctapi(OVERRIDE:Percent_Asian_Pacific_Islander_:0.0),pctaian(OVERRIDE:Percent_American_Indian_Alaska_Native_:0.0),pct2prace(OVERRIDE:Percent_Multiracial_:0.0),pcthispanic(OVERRIDE:Percent_Hispanic_:0.0),src(OVERRIDE:Source_:\'\'),archive_date(DEFAULT:Archive___Date_:EPOCH),dt_vendor_first_reported(OVERRIDE:Date_First_Seen_:EPOCH),datelastseen(DEFAULT:Date_Last_Seen_:EPOCH),hybridarchivedate(DEFAULT:Hybrid_Archive_Date_:EPOCH),vaultdatelastseen(DEFAULT:Vault_Date_Last_Seen_:EPOCH),DPMBitmap(OVERRIDE:__Permits:PERMITS)';
   SHARED __d0_Norm := NORMALIZE(__in,LEFT.Dataset_dx_CFPB_key_Census_Surnames,TRANSFORM(RECORDOF(__in.Dataset_dx_CFPB_key_Census_Surnames),SELF:=RIGHT));
   SHARED __d0_Out := RECORD
     RECORDOF(PublicRecords_KEL.ECL_Functions.Dataset_FDC.Dataset_dx_CFPB_key_Census_Surnames);

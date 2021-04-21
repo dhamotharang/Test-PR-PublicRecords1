@@ -1,11 +1,11 @@
-﻿//HPCC Systems KEL Compiler Version 1.5.0rc1
+//HPCC Systems KEL Compiler Version 1.5.0rc1
 IMPORT KEL15 AS KEL;
 IMPORT B_Bankruptcy_7,CFG_Compile,E_Bankruptcy FROM PublicRecords_KEL;
 IMPORT * FROM KEL15.Null;
 EXPORT B_Bankruptcy_6(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG_Compile __cfg = CFG_Compile) := MODULE
   SHARED VIRTUAL TYPEOF(B_Bankruptcy_7(__in,__cfg).__ENH_Bankruptcy_7) __ENH_Bankruptcy_7 := B_Bankruptcy_7(__in,__cfg).__ENH_Bankruptcy_7;
-  SHARED __EE6179709 := __ENH_Bankruptcy_7;
-  EXPORT __ST274701_Layout := RECORD
+  SHARED __EE6539108 := __ENH_Bankruptcy_7;
+  EXPORT __ST281378_Layout := RECORD
     KEL.typ.nstr Source_Description_;
     KEL.typ.nstr Original_Chapter_;
     KEL.typ.nstr Filing_Type_;
@@ -32,7 +32,7 @@ EXPORT B_Bankruptcy_6(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG_
     KEL.typ.epoch Vault_Date_Last_Seen_ := 0;
     KEL.typ.int __RecordCount := 0;
   END;
-  EXPORT __ST487680_Layout := RECORD
+  EXPORT __ST484029_Layout := RECORD
     KEL.typ.nstr Source_Description_;
     KEL.typ.nstr Original_Chapter_;
     KEL.typ.nstr Filing_Type_;
@@ -63,16 +63,16 @@ EXPORT B_Bankruptcy_6(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG_
     KEL.typ.epoch Vault_Date_Last_Seen_ := 0;
     KEL.typ.int __RecordCount := 0;
   END;
-  EXPORT __ST274694_Layout := RECORD
+  EXPORT __ST281371_Layout := RECORD
     KEL.typ.nuid UID;
     KEL.typ.nstr T_M_S_I_D_;
     KEL.typ.nstr Court_Code_;
     KEL.typ.nstr Case_Number_;
     KEL.typ.nstr Original_Case_Number_;
-    KEL.typ.ndataset(__ST274701_Layout) Records_;
+    KEL.typ.ndataset(__ST281378_Layout) Records_;
     KEL.typ.ndataset(E_Bankruptcy(__in,__cfg).Case_Details_Layout) Case_Details_;
     KEL.typ.ndataset(E_Bankruptcy(__in,__cfg).Data_Sources_Layout) Data_Sources_;
-    KEL.typ.ndataset(__ST487680_Layout) Best_Child_Record_;
+    KEL.typ.ndataset(__ST484029_Layout) Best_Child_Record_;
     KEL.typ.nbool Has_Case_Number_;
     KEL.typ.epoch Archive___Date_ := 0;
     KEL.typ.epoch Date_First_Seen_ := 0;
@@ -81,18 +81,18 @@ EXPORT B_Bankruptcy_6(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG_
     KEL.typ.epoch Vault_Date_Last_Seen_ := 0;
     KEL.typ.int __RecordCount := 0;
   END;
-  SHARED __ST274694_Layout __ND6179686__Project(B_Bankruptcy_7(__in,__cfg).__ST279615_Layout __PP6179331) := TRANSFORM
-    __EE6179712 := __PP6179331.Records_;
-    SELF.Records_ := __BN(PROJECT(__T(__EE6179712),__ST274701_Layout),__NL(__EE6179712));
-    __EE6179684 := __PP6179331.Best_Child_Record_;
-    __ST487680_Layout __ND6179636__Project(B_Bankruptcy_7(__in,__cfg).__ST450095_Layout __PP6179451) := TRANSFORM
-      __CC29944 := 365;
-      SELF.Banko1_Year_ := __AND(__AND(__PP6179451.Is_Bankruptcy_,__OP2(__PP6179451.Filing_Age_In_Days_,<=,__CN(__CC29944))),__NOT(__NT(__PP6179451.Filing_Age_In_Days_)));
-      SELF.Bankruptcy_Date_ := KEL.era.ToDate(__PP6179331.Date_First_Seen_);
-      SELF := __PP6179451;
+  SHARED __ST281371_Layout __ND6539085__Project(B_Bankruptcy_7(__in,__cfg).__ST286280_Layout __PP6538730) := TRANSFORM
+    __EE6539111 := __PP6538730.Records_;
+    SELF.Records_ := __BN(PROJECT(__T(__EE6539111),__ST281378_Layout),__NL(__EE6539111));
+    __EE6539083 := __PP6538730.Best_Child_Record_;
+    __ST484029_Layout __ND6539035__Project(B_Bankruptcy_7(__in,__cfg).__ST445304_Layout __PP6538850) := TRANSFORM
+      __CC29660 := 365;
+      SELF.Banko1_Year_ := __AND(__AND(__PP6538850.Is_Bankruptcy_,__OP2(__PP6538850.Filing_Age_In_Days_,<=,__CN(__CC29660))),__NOT(__NT(__PP6538850.Filing_Age_In_Days_)));
+      SELF.Bankruptcy_Date_ := KEL.era.ToDate(__PP6538730.Date_First_Seen_);
+      SELF := __PP6538850;
     END;
-    SELF.Best_Child_Record_ := __PROJECT(__EE6179684,__ND6179636__Project(LEFT));
-    SELF := __PP6179331;
+    SELF.Best_Child_Record_ := __PROJECT(__EE6539083,__ND6539035__Project(LEFT));
+    SELF := __PP6538730;
   END;
-  EXPORT __ENH_Bankruptcy_6 := PROJECT(__EE6179709,__ND6179686__Project(LEFT));
+  EXPORT __ENH_Bankruptcy_6 := PROJECT(__EE6539108,__ND6539085__Project(LEFT));
 END;

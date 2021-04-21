@@ -1,4 +1,4 @@
-﻿//HPCC Systems KEL Compiler Version 1.5.0rc1
+//HPCC Systems KEL Compiler Version 1.5.0rc1
 IMPORT KEL15 AS KEL;
 IMPORT PublicRecords_KEL;
 IMPORT CFG_Compile,E_Person,E_Property,E_Property_Event,E_Zip_Code FROM PublicRecords_KEL;
@@ -29,7 +29,7 @@ EXPORT E_Person_Property_Event(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefa
   SHARED VIRTUAL __SourceFilter(DATASET(InLayout) __ds) := __ds;
   SHARED VIRTUAL __GroupedFilter(GROUPED DATASET(InLayout) __ds) := __ds;
   SHARED __Mapping := 'subject(DEFAULT:Subject_:0),Event_(DEFAULT:Event_:0),lnfaresid(DEFAULT:L_N_Fares_I_D_:\'\'),personnumber(DEFAULT:Person_Number_:0),firstname(DEFAULT:First_Name_:\'\'),lastname(DEFAULT:Last_Name_:\'\'),conjunctivenamesequence(DEFAULT:Conjunctive_Name_Sequence_:0),partyisbuyerorowner(DEFAULT:Party_Is_Buyer_Or_Owner_),partyisborrower(DEFAULT:Party_Is_Borrower_),partyisseller(DEFAULT:Party_Is_Seller_),partyiscareof(DEFAULT:Party_Is_Care_Of_),vendorsourcecode(DEFAULT:Vendor_Source_Code_:\'\'),source(DEFAULT:Source_:\'\'),archive_date(DEFAULT:Archive___Date_:EPOCH),datefirstseen(DEFAULT:Date_First_Seen_:EPOCH),datelastseen(DEFAULT:Date_Last_Seen_:EPOCH),hybridarchivedate(DEFAULT:Hybrid_Archive_Date_:EPOCH),vaultdatelastseen(DEFAULT:Vault_Date_Last_Seen_:EPOCH)';
-  SHARED __Mapping0 := 'did(OVERRIDE:Subject_:0),Event_(DEFAULT:Event_:0),ln_fares_id(OVERRIDE:L_N_Fares_I_D_:\'\'),personnumber(DEFAULT:Person_Number_:0),firstname(DEFAULT:First_Name_:\'\'),lastname(DEFAULT:Last_Name_:\'\'),conjunctivenamesequence(DEFAULT:Conjunctive_Name_Sequence_:0),partyisbuyerorowner(OVERRIDE:Party_Is_Buyer_Or_Owner_),partyisborrower(OVERRIDE:Party_Is_Borrower_),partyisseller(OVERRIDE:Party_Is_Seller_),partyiscareof(OVERRIDE:Party_Is_Care_Of_),vendor_source_flag(OVERRIDE:Vendor_Source_Code_:\'\'),src(OVERRIDE:Source_:\'\'),archive_date(OVERRIDE:Archive___Date_:EPOCH),datefirstseen(DEFAULT:Date_First_Seen_:EPOCH),datelastseen(DEFAULT:Date_Last_Seen_:EPOCH),hybridarchivedate(DEFAULT:Hybrid_Archive_Date_:EPOCH),vaultdatelastseen(DEFAULT:Vault_Date_Last_Seen_:EPOCH),DPMBitmap(OVERRIDE:__Permits:PERMITS)';
+  SHARED __Mapping0 := 'did(OVERRIDE:Subject_:0),Event_(DEFAULT:Event_:0),ln_fares_id(OVERRIDE:L_N_Fares_I_D_:\'\'),personnumber(DEFAULT:Person_Number_:0),fname(OVERRIDE:First_Name_:\'\'),lname(OVERRIDE:Last_Name_:\'\'),conjunctivenamesequence(DEFAULT:Conjunctive_Name_Sequence_:0),partyisbuyerorowner(OVERRIDE:Party_Is_Buyer_Or_Owner_),partyisborrower(OVERRIDE:Party_Is_Borrower_),partyisseller(OVERRIDE:Party_Is_Seller_),partyiscareof(OVERRIDE:Party_Is_Care_Of_),vendor_source_flag(OVERRIDE:Vendor_Source_Code_:\'\'),src(OVERRIDE:Source_:\'\'),archive_date(OVERRIDE:Archive___Date_:EPOCH),datefirstseen(DEFAULT:Date_First_Seen_:EPOCH),datelastseen(DEFAULT:Date_Last_Seen_:EPOCH),hybridarchivedate(DEFAULT:Hybrid_Archive_Date_:EPOCH),vaultdatelastseen(DEFAULT:Vault_Date_Last_Seen_:EPOCH),DPMBitmap(OVERRIDE:__Permits:PERMITS)';
   SHARED __d0_Norm := NORMALIZE(__in,LEFT.Dataset_PropertyV2__Key_Search_Fid,TRANSFORM(RECORDOF(__in.Dataset_PropertyV2__Key_Search_Fid),SELF:=RIGHT));
   EXPORT __d0_KELfiltered := __d0_Norm(did != 0 AND ln_fares_id != '');
   SHARED __d0_Event__Layout := RECORD
@@ -126,8 +126,8 @@ EXPORT E_Person_Property_Event(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefa
     {'PersonPropertyEvent','PublicRecords_KEL.ECL_Functions.Dataset_FDC','Event',COUNT(__d0(__NL(Event_))),COUNT(__d0(__NN(Event_)))},
     {'PersonPropertyEvent','PublicRecords_KEL.ECL_Functions.Dataset_FDC','ln_fares_id',COUNT(__d0(__NL(L_N_Fares_I_D_))),COUNT(__d0(__NN(L_N_Fares_I_D_)))},
     {'PersonPropertyEvent','PublicRecords_KEL.ECL_Functions.Dataset_FDC','PersonNumber',COUNT(__d0(__NL(Person_Number_))),COUNT(__d0(__NN(Person_Number_)))},
-    {'PersonPropertyEvent','PublicRecords_KEL.ECL_Functions.Dataset_FDC','FirstName',COUNT(__d0(__NL(First_Name_))),COUNT(__d0(__NN(First_Name_)))},
-    {'PersonPropertyEvent','PublicRecords_KEL.ECL_Functions.Dataset_FDC','LastName',COUNT(__d0(__NL(Last_Name_))),COUNT(__d0(__NN(Last_Name_)))},
+    {'PersonPropertyEvent','PublicRecords_KEL.ECL_Functions.Dataset_FDC','fname',COUNT(__d0(__NL(First_Name_))),COUNT(__d0(__NN(First_Name_)))},
+    {'PersonPropertyEvent','PublicRecords_KEL.ECL_Functions.Dataset_FDC','lname',COUNT(__d0(__NL(Last_Name_))),COUNT(__d0(__NN(Last_Name_)))},
     {'PersonPropertyEvent','PublicRecords_KEL.ECL_Functions.Dataset_FDC','ConjunctiveNameSequence',COUNT(__d0(__NL(Conjunctive_Name_Sequence_))),COUNT(__d0(__NN(Conjunctive_Name_Sequence_)))},
     {'PersonPropertyEvent','PublicRecords_KEL.ECL_Functions.Dataset_FDC','partyisbuyerorowner',COUNT(__d0(__NL(Party_Is_Buyer_Or_Owner_))),COUNT(__d0(__NN(Party_Is_Buyer_Or_Owner_)))},
     {'PersonPropertyEvent','PublicRecords_KEL.ECL_Functions.Dataset_FDC','partyisborrower',COUNT(__d0(__NL(Party_Is_Borrower_))),COUNT(__d0(__NN(Party_Is_Borrower_)))},
