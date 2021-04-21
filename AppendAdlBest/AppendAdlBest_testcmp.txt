@@ -1,0 +1,65 @@
+ID "9e0db636-c6a2-4969-a7e9-b342133541a8";
+NAME appendadlbest_testcmp;
+LABEL "Test composition for Append ADL Best ";
+DESCRIPTION "Auto-generated test composition for plugin AppendAdlBest";
+VERSION "1.0.0";
+AUTHOR "CarmigJX";
+PERMISSIONS
+VIEW:PUBLIC;
+EDIT:PRIVATE;
+RUN:PUBLIC;
+END
+
+INPUTS
+	STRING CompareWUID: DEFAULT("W123456-123456");
+END
+INSTANCE OutDataset.OutDataset(Ins004): LABEL("Output Dataset"),VERSION("2.0")
+	dsInput="^Ins003|dsOutput"
+	name="~qa::appendadlbest::appendadlbest::output"
+	Method="THOR"
+END
+INSTANCE AppendAdlBest.AppendAdlBest(Ins003): VERSION("1.0.0")
+	dsInput=^Ins002|dsOutput
+	Deduped=True
+	IncludeRanking=False
+	PatriotProcess=False
+	Prefix=Best2
+	Lexid=did
+	DPPAPURPOSE=0
+	GLBPURPOSE=0
+	DATARESTRICTIONMASK=00000000000001010000000000000000000000000000000000
+	DATAPERMISSIONMASK=1110010001000000000000000000000000000
+	Appends="BEST_ALL, BEST_EDA, HHID_PLUS"
+	Verify=BEST_ALL
+	AdlRoxieIP="http://roxieqavip.br.seisint.com:9876"
+	PARALLELNODES=50
+	BATCHSIZE=100
+	PARALLELREQUESTS=2
+END
+INSTANCE AppendAdlBest.AppendAdlBest(Ins002): VERSION("1.0.0")
+	dsInput=^Ins001|dsOutput
+	Lexid_childds_recnum=1
+	UniqueId_childds_recnum=1
+	Deduped=True
+	IncludeRanking=False
+	PatriotProcess=False
+	Prefix=Best
+	Lexid=did
+	DPPAPURPOSE=0
+	GLBPURPOSE=0
+	DATARESTRICTIONMASK=00000000000001010000000000000000000000000000000000
+	DATAPERMISSIONMASK=1110010001000000000000000000000000000
+	Appends="BEST_ALL, BEST_EDA, HHID_PLUS"
+	Verify=BEST_ALL
+	AdlRoxieIP="http://roxieqavip.br.seisint.com:9876"
+	PARALLELNODES=50
+	BATCHSIZE=100
+	PARALLELREQUESTS=2
+END
+INSTANCE UseDataset.UseDataset(Ins001): LABEL("Use Dataset"),VERSION("1.1")
+	LogicalFilename="~qa::appendadlbest::appendadlbest::input"
+	Structure="RECORD
+    unsigned6 did;
+  END;"
+	Method="THOR"
+END

@@ -27,7 +27,7 @@
   
 	LOCAL rAdlIn      := DidVille.Layout_Did_InBatchRaw;
   LOCAL rAdlOut     := DidVille.Layout_Did_OutBatch_Raw;
-  LOCAL ServiceIP   := #IF ( #TEXT(InRoxie) <> '') 	(STRING) TRIM(InRoxie)  #ELSE 'http://10.239.194.100:9876' #END;
+  LOCAL ServiceIP   := #IF ( #TEXT(InRoxie) <> '') 	(STRING) TRIM(InRoxie)  #ELSE 'http://roxieqavip.br.seisint.com:9876' #END;
 	LOCAL ServiceName := 'didville.did_batch_service_raw';
   
   //Dedup to only send the same Lexid once
@@ -46,8 +46,8 @@
     STRING errorcode;
   END;
   
-  STRING optionValue := '<DPPAPurpose>'+inDPPA+'</DPPAPurpose><GLBPurpose>'+inGLB+'</GLBPurpose><DataRestrictionMask>'+inDRM+'</DataRestrictionMask><DataPermissionMask>'+inDPM+'</DataPermissionMask><IndustryClass>'+InIndustryClass+'</IndustryClass>'
-    +'<Appends>'+inAppends+'</Appends><Verify>'+InVerify+'</Verify><Deduped>'+inDeduped+'</Deduped><IncludeRanking>'+inIncludeRanking+'</IncludeRanking><PatriotProcess>'+inPatriotProcess+'</PatriotProcess><Max_Results_Per_Acct>'+InMaxResultsPerAcct+'</Max_Results_Per_Acct>';
+  STRING optionValue := '<DPPAPurpose>'+(STRING)inDPPA+'</DPPAPurpose><GLBPurpose>'+(STRING)inGLB+'</GLBPurpose><DataRestrictionMask>'+(STRING)inDRM+'</DataRestrictionMask><DataPermissionMask>'+(STRING)inDPM+'</DataPermissionMask><IndustryClass>'+(STRING)InIndustryClass+'</IndustryClass>'
+    +'<Appends>'+(STRING)inAppends+'</Appends><Verify>'+(STRING)InVerify+'</Verify><Deduped>'+(STRING)inDeduped+'</Deduped><IncludeRanking>'+(STRING)inIncludeRanking+'</IncludeRanking><PatriotProcess>'+(STRING)inPatriotProcess+'</PatriotProcess><Max_Results_Per_Acct>'+(STRING)InMaxResultsPerAcct+'</Max_Results_Per_Acct>';
   STRING options := optionValue + '<did_batch_in><Row>';	
   
   LOCAL rAdlSoapOut xFormSoapError(dAdlSoapIn le) := TRANSFORM
