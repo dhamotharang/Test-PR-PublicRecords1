@@ -17,13 +17,13 @@ file_base_party_new := dataset(SANCTN.cluster_name + 'base::SANCTN::party',SANCT
 
 file_base_party_father := dataset(SANCTN.cluster_name + 'base::SANCTN::party_father',SANCTN.layout_SANCTN_did,thor);
 
-file_base_party_aka_dba_new := dataset(SANCTN.cluster_name + 'base::SANCTN::party_aka_dba',SANCTN.layout_SANCTN_aka_dba_in,thor);
+file_base_party_aka_dba_new := dataset(SANCTN.cluster_name + 'base::SANCTN::party_aka_dba',SANCTN.layout_SANCTN_aka_dba_base,thor);
 
-file_base_party_aka_dba_father := dataset(SANCTN.cluster_name + 'base::SANCTN::party_aka_dba_father',SANCTN.layout_SANCTN_aka_dba_in,thor);
+file_base_party_aka_dba_father := dataset(SANCTN.cluster_name + 'base::SANCTN::party_aka_dba_father',SANCTN.layout_SANCTN_aka_dba_base,thor);
 
-file_base_rebuttal_new := dataset(SANCTN.cluster_name + 'base::SANCTN::rebuttal',SANCTN.layout_SANCTN_rebuttal_in,thor);
+file_base_rebuttal_new := dataset(SANCTN.cluster_name + 'base::SANCTN::rebuttal',SANCTN.layout_SANCTN_rebuttal_base,thor);
 
-file_base_rebuttal_father := dataset(SANCTN.cluster_name + 'base::SANCTN::rebuttal_father',SANCTN.layout_SANCTN_rebuttal_in,thor);
+file_base_rebuttal_father := dataset(SANCTN.cluster_name + 'base::SANCTN::rebuttal_father',SANCTN.layout_SANCTN_rebuttal_base,thor);
 
 EXPORT fnDeltaBaseFiles(string version) := ordered(
 file_compare.Fn_File_Compare(file_base_incident_father,file_base_incident_new,SANCTN.layout_SANCTN_incident_clean-[incident_date_clean,fcr_date_clean,cln_modified_date, cln_load_date],,SANCTN.layout_SANCTN_incident_clean-[incident_date_clean,fcr_date_clean,cln_modified_date, cln_load_date],true,,true,true,'SANCTN','file_base_incident',version),
