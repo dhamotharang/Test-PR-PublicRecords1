@@ -1,0 +1,85 @@
+﻿NAME AppendAdlBest;
+LABEL "Append ADL Best";
+VERSION "1.0.0";
+AUTHOR "CarmigJX";
+CATEGORY APPEND;
+DESCRIPTION "Soapcalls Roxie batch service didville.did_batch_service_raw to append best information";
+PERMISSIONS
+  VIEW:PUBLIC;
+  EDIT:PRIVATE;
+  RUN:PUBLIC;
+END
+
+INPUTS
+	STRING Prefix: LABEL("Append Column Prefix"),DESCRIPTION("Prefix to be appended to the new fields"),OPTIONAL,DEFAULT("");
+	DATASET dsInput: MAPBYNAME
+    FIELD Lexid: LABEL("LexID"),DESCRIPTION("LexisNexis person identifier");
+    FIELD UniqueId: LABEL("Unique Identifier / Account Number"),DESCRIPTION("Unique identifier field used by ADL Best roxie query"),OPTIONAL,DEFAULT("");
+  END
+	ENUM("True","False") UseNonBlank: LABEL("Use Non Blank Index"),DESCRIPTION("If true returns blank info when the best algorithm couldn't find best info. Otherwise randomly picks one"),OPTIONAL,DEFAULT("True");
+	STRING DPPAPURPOSE: LABEL("DPPA Purpose"),DEFAULT("^GLOBAL|DPPAPURPOSE");
+	STRING GLBPURPOSE: LABEL("GLB Purpose"),DEFAULT("^GLOBAL|GLBPURPOSE");
+	STRING DATARESTRICTIONMASK: LABEL("Data Restriction Mask"),DEFAULT("^GLOBAL|DATARESTRICTIONMASK");
+	STRING DATAPERMISSIONMASK: LABEL("Data Restriction Mask"),DEFAULT("^GLOBAL|DATAPERMISSIONMASK");
+	STRING Appends: LABEL("ADL Appends Option"),DEFAULT("^GLOBAL|APPENDS");
+	STRING Verify: LABEL("ADL Verify Option"),DEFAULT("^GLOBAL|VERIFY");
+	ENUM("False","True") Deduped: LABEL("ADL Deduped Option"),DESCRIPTION("Dedup output records from ADL Best"),OPTIONAL,DEFAULT("True");
+	ENUM("False","True") IncludeRanking: LABEL("Include Ranking"),DESCRIPTION("ADL Best Include ranking option"),OPTIONAL,DEFAULT("False");
+	ENUM("False","True") PatriotProcess: LABEL("Patriot Process"),DESCRIPTION("ADL Best Patriot Process option"),OPTIONAL,DEFAULT("False");
+	ENUM("False","True") IncludeMinors: LABEL("Include Minors"),DESCRIPTION("Include minors. Currently this option does not do anything. See ReadMe"),OPTIONAL,DEFAULT("False");
+	STRING AdlRoxieIP:LABEL("ADL Best Roxie VIP"),DEFAULT("^GLOBAL|ADLROXIEIP");
+	INT    PARALLELNODES:LABEL("Parallel Nodes"),DEFAULT("^GLOBAL|PARALLELNODES");
+	INT    BATCHSIZE:LABEL("Batch Size"),DEFAULT("^GLOBAL|BATCHSIZE");
+	INT    PARALLELREQUESTS:LABEL("Parallel Requests"),DEFAULT("^GLOBAL|PARALLELREQUESTS");
+END
+
+OUTPUTS
+	DATASET dsOutput(dsInput): PREFIX(INPUTS.Prefix),APPEND
+		STRING Title;
+    STRING FirstName;
+    STRING MiddleName;
+    STRING LastName;
+    STRING NameSuffix;
+    STRING Address;
+    STRING City;
+    STRING State;
+    STRING Zip;
+    STRING Zip4;
+    STRING AddressDate;
+    STRING Phone: OPTIONAL;
+    STRING DOB: OPTIONAL;
+    STRING DOD: OPTIONAL;
+    STRING SSN: OPTIONAL;
+  END
+END
+
+GENERATES INLINE
+	IMPORT AppendAdlBest, DidVille;
+  
+  //ADL Best has the option to return more than 1 BEST record per input record
+  //however since this is an APPEND HIPIE plugin we will only EVER return 1 best info per input
+  //therefore we are forcing this option to be 1 for the time being so the HIPIE plugin isn't 
+  //responsible for deciding which best info to append.
+  INTEGER MaxResultsPerAcct := 1;
+  
+  ParallelNodes 		:= IF (%PARALLELNODES% BETWEEN 1 AND 50, %PARALLELNODES%, 50);
+  BatchSize 			  := IF (%BATCHSIZE% BETWEEN 1 AND 100, %BATCHSIZE%,100);
+  ParallelRequests  := IF (%PARALLELREQUESTS% BETWEEN 1 AND 2, %PARALLELREQUESTS%,2);
+ 
+  %^edsOutput% := AppendAdlBest.macAppendAdlBest(%dsInput%, %Lexid%, %UniqueId%, %^qPrefix%,
+    %^qDPPAPURPOSE%, %^qGLBPURPOSE%, %^qDATARESTRICTIONMASK%, %^qDATAPERMISSIONMASK%,
+    %^qAppends%, %^qVerify%, %^qDeduped%, %^qIncludeRanking%, MaxResultsPerAcct,
+    %^AdlRoxieIP%, ParallelNodes, BatchSize, ParallelRequests);
+ENDGENERATES
+
+
+RESOURCES
+	FILE readme: FILENAME("AppendAdlBest_ReadMe.txt"),LABEL("Plugin Readme File");
+	FILE appendadlbestinfo_testcmp: FILENAME("appendadlbestinfo_testcmp.txt"),LABEL("Plugin Test Composition");
+	FILE AppendAdlBest_BuildTestDataset: FILENAME("AppendAdlBest_BuildTestDataset.ecl"),LABEL("BWR to create data for test composition");
+	FILE checklist: FILENAME("AppendAdlBestChecklist.xlsx"),LABEL("Plugin Checklist");
+  ECL AppendAdlBest: FILENAME("AppendAdlBest"),URL("http://10.241.100.153:8010");
+	ECL DidVille: FILENAME("DidVille"),URL("http://10.241.100.153:8010");
+	ECL hipie_ecl: FILENAME("hipie_ecl"),URL("http://10.241.100.153:8010");
+  LOGICALFILE test: FILENAME("~qa::appendadlbestinfo::appendadlbestinfo::input"),URL("http://10.241.100.159:8010"),DALIIP("10.241.100.159"),CLUSTER("thor100_100dev");
+END
