@@ -82,20 +82,20 @@ SANCTN.Out_File_SANCTN_Stats_Population_V2 (SANCTN.file_base_incident
 
 
 sequential(
-					//%spray_payload%
-					//,%input_delta%
-					//#if(skiptest=true)
-					//,if(%input_test%=false,fail)
-					//#end
-          //,%parse_data%
-          //,%clean_data%
-					//,%base_transfer%
-					//%base_delta%
-					//#if(skiptest=true)
-					//,if(%base_test%=false,fail)
-					//#end
-					//,%build_keys%
-					%qa_samp%
+					%spray_payload%
+					,%input_delta%
+					#if(skiptest=true)
+					,if(%input_test%=false,fail)
+					#end
+          ,%parse_data%
+          ,%clean_data%
+					,%base_transfer%
+					,%base_delta%
+					#if(skiptest=true)
+					,if(%base_test%=false,fail)
+					#end
+					,%build_keys%
+					,%qa_samp%
 					,%updatedops%
 				  ,getretval
 					,do_STRATA
