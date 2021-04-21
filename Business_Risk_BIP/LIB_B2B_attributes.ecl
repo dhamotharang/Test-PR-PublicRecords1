@@ -9,6 +9,7 @@ EXPORT LIB_B2B_attributes (
             SET OF STRING2 AllowedSourcesSet) :=
 #IF(use_library)
   MODULE, LIBRARY (Business_Risk_BIP.LIB_B2B_interface)
+#OPTION('foldStored', TRUE);
 #ELSE
   MODULE (Business_Risk_BIP.LIB_B2B_interface (Shell, Options, AllowedSourcesSet))
 #END

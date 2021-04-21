@@ -372,6 +372,8 @@ EXPORT Transforms := MODULE
                                      le.additional_status_info<>'' => le.additional_status_info,
                                      _last_verified<>'' => _last_verified,
                                      '');
+    SELF.EAEmailExist := le.ea_email_exist;
+    SELF.EAEmailStatus := le.ea_email_status;
 
     SELF.EmailId := le.email_id;
     SELF.Relationship := le.Relationship;

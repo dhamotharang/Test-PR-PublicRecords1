@@ -1,6 +1,7 @@
-
+﻿
 /*--SOAP--
 <message name="IngenixProviderRequest">  
+  <part name="Gateways" type="tns:XmlDataSet" cols="80" rows="4"/>
   <part name="LastName"           type="xsd:string"/>
   <part name="FirstName"          type="xsd:string"/>
   <part name="MiddleName"         type="xsd:string"/>

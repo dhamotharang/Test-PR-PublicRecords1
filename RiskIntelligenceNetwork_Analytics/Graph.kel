@@ -1296,13 +1296,13 @@ Event: => T1L_BestDlNotInAgcyJurStFlag := MAP(T1_LexIdPopFlag=0 => -99999,
                                                                     
 
 Event: => P1_IdRiskUnscrbleFlag := MAP((T1_LexIdPopFlag=0 AND T1_RinIdPopFlag=1) OR T_SrcClassType < 2 => 1, 0);
-Event: => P9_AddrRiskUnscrbleFlag := 1;
-Event: => P15_SsnRiskUnscrbleFlag := 1;
-Event: => P16_PhnRiskUnscrbleFlag := 1;
-Event: => P17_EmailRiskUnscrbleFlag := 1;
-Event: => P18_IpAddrRiskUnscrbleFlag := 1;
-Event: => P19_BnkAcctRiskUnscrbleFlag := 1;
-Event: => P20_DlRiskUnscrbleFlag := 1;
+Event: => P9_AddrRiskUnscrbleFlag := MAP(T9_AddrPopFlag=0 OR T_SrcClassType < 2 => 1, 0);
+Event: => P15_SsnRiskUnscrbleFlag := MAP( T15_SsnPopFlag=0 OR T_SrcClassType < 2 => 1, 0);
+Event: => P16_PhnRiskUnscrbleFlag := MAP(T16_PhnPopFlag=0 OR T_SrcClassType < 2 => 1, 0);
+Event: => P17_EmailRiskUnscrbleFlag := MAP(T17_EmailPopFlag=0 OR T_SrcClassType < 2 => 1, 0);
+Event: => P18_IpAddrRiskUnscrbleFlag := MAP(T18_IpAddrPopFlag=0 OR T_SrcClassType < 2 => 1, 0);
+Event: => P19_BnkAcctRiskUnscrbleFlag := MAP(T19_BnkAcctPopFlag=0 OR T_SrcClassType < 2 => 1, 0);
+Event: => P20_DlRiskUnscrbleFlag := MAP(T20_DlPopFlag=0 OR T_SrcClassType < 2 => 1, 0);
 
 Event: => T18_isanispecho := isanisp;
 
@@ -1315,6 +1315,7 @@ QUERY: InputRin(DATASET OF RiskIntelligenceNetwork_Analytics.Layouts.KelInputLay
 								T1L_IdIsBcShllHitFlag,
 								T1L_LexIdSeenFlag,
 								T1L_BcShllLexIdMatchesInpFlag,
+								T1L_CurrAddrPopFlag,
 								T_BcShllLexIdEcho,
                  T1L_IdCurrIncarcFlag,
                   T1L_IdCrimFlSdMatchFlag,

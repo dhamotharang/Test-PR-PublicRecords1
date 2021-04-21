@@ -1,0 +1,5 @@
+﻿EXPORT AppendAll(infile,do_RVC2004_3_0,pa_CollateralStatus,pa_OutOfStatuteIndicator,pa_addrinputlengthofres,pa_addrprevioustimeoldest,pa_bankruptcycount,pa_confirmationsubjectfound,pa_dayssince_LastPaymentDate,pa_derogcount,pa_inputprovidedphone,pa_inquirycollections12month,pa_ssndeceased,pa_subjectdeceased) := FUNCTIONMACRO
+  Step0 := infile;
+  Step1 := rvc2004_3_0.Append_RVC2004_3_0_Model( Step0,do_RVC2004_3_0,pa_CollateralStatus,pa_OutOfStatuteIndicator,pa_addrinputlengthofres,pa_addrprevioustimeoldest,pa_bankruptcycount,pa_confirmationsubjectfound,pa_dayssince_LastPaymentDate,pa_derogcount,pa_inputprovidedphone,pa_inquirycollections12month,pa_ssndeceased,pa_subjectdeceased);
+  RETURN Step1;
+ENDMACRO;

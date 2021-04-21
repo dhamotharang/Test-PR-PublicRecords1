@@ -1,0 +1,2 @@
+﻿IMPORT rvc2004_2_0;
+rvc2004_2_0.AppendAll(myfile,do_RVC2004_2_0,ChargeOffAmount,OutOfStatuteIndicator,addrinputownershipindex,confirmationinputaddress,confirmationsubjectfound,dayssince_LastPaymentDate,derogcount,inputprovidedphone,sourcecredheadertimeoldest,ssndeceased,subjectdeceased);

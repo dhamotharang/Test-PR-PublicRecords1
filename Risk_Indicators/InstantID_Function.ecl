@@ -1,12 +1,12 @@
-﻿import iesp, _Control, Gateway, Risk_Indicators;
+﻿import iesp, _Control, Gateway, Risk_Indicators, doxie;
 
 USE_LIBRARY := not _Control.LibraryUse.ForceOff_Risk_Indicators__LIB_InstantID_Function;
 
 
 
 export InstantID_Function(DATASET(risk_indicators.layout_input) indata1, dataset(Gateway.Layouts.Config) gateways,
-                          unsigned1 in_dppa, unsigned1 in_glb, 
-                          boolean in_isUtility=false, boolean in_ln_branded, 
+                          unsigned1 in_dppa, unsigned1 in_glb,
+                          boolean in_isUtility=false, boolean in_ln_branded,
                           boolean in_ofac_only=true,
                           BOOLEAN in_suppressNearDups=false, boolean in_require2Ele=false,
                           boolean in_from_BIID = false, boolean in_isFCRA = false, boolean in_ExcludeWatchLists = false, boolean in_from_IT1O=false,
@@ -19,10 +19,10 @@ export InstantID_Function(DATASET(risk_indicators.layout_input) indata1, dataset
                           string10 in_CustomDataFilter='',
                           boolean in_runDLverification=false,
                           dataset(iesp.share.t_StringArrayItem) watchlists_requested=dataset([], iesp.share.t_StringArrayItem),
-                          dataset(risk_indicators.layouts.Layout_DOB_Match_Options) DOBMatchOptions=dataset([], risk_indicators.layouts.layout_dob_match_options),													
+                          dataset(risk_indicators.layouts.Layout_DOB_Match_Options) DOBMatchOptions=dataset([], risk_indicators.layouts.layout_dob_match_options),
                           unsigned2 in_EverOccupant_PastMonths = 0,
                           unsigned4 in_EverOccupant_StartDate = 99999999,
-                          unsigned1 in_append_best=0, 
+                          unsigned1 in_append_best=0,
                           unsigned8 in_BSOptions = 0,
                           unsigned3 in_LastSeenThreshold = risk_indicators.iid_constants.oneyear,
                           string20 in_CompanyID = '',
@@ -38,17 +38,17 @@ export InstantID_Function(DATASET(risk_indicators.layout_input) indata1, dataset
 FUNCTION
 
 // if they are not on already, force on the InstantID enhancement options for nonfcra shell 50 and higher
-in_BSOptions_override := if(in_bsversion >= 50 and in_isFCRA=false, 
-(if(Risk_Indicators.iid_constants.CheckBSOptionFlag(Risk_Indicators.iid_constants.BSOptions.IncludeInsNAP, in_BSOptions), 0, risk_indicators.iid_constants.BSOptions.IncludeInsNAP) + 
- if(Risk_Indicators.iid_constants.CheckBSOptionFlag(Risk_Indicators.iid_constants.BSOptions.IsInstantIDv1, in_BSOptions), 0, risk_indicators.iid_constants.BSOptions.IsInstantIDv1) + 
- if(Risk_Indicators.iid_constants.CheckBSOptionFlag(Risk_Indicators.iid_constants.BSOptions.IncludeInquiries, in_BSOptions), 0, 
+in_BSOptions_override := if(in_bsversion >= 50 and in_isFCRA=false,
+(if(Risk_Indicators.iid_constants.CheckBSOptionFlag(Risk_Indicators.iid_constants.BSOptions.IncludeInsNAP, in_BSOptions), 0, risk_indicators.iid_constants.BSOptions.IncludeInsNAP) +
+ if(Risk_Indicators.iid_constants.CheckBSOptionFlag(Risk_Indicators.iid_constants.BSOptions.IsInstantIDv1, in_BSOptions), 0, risk_indicators.iid_constants.BSOptions.IsInstantIDv1) +
+ if(Risk_Indicators.iid_constants.CheckBSOptionFlag(Risk_Indicators.iid_constants.BSOptions.IncludeInquiries, in_BSOptions), 0,
 		if(in_DataRestriction[risk_indicators.iid_constants.posInquiriesRestriction]<>risk_indicators.iid_constants.sTrue , risk_indicators.iid_constants.BSOptions.IncludeInquiries, 0)
 		))  +
  in_BSOptions,
  in_BSOptions);
 
 // for batch queries, dedup the input to reduce searching
-indata := dedup(sort(indata1, 
+indata := dedup(sort(indata1,
 	historydate, fname, mname, lname, suffix, ssn, dob, phone10, wphone10, in_streetAddress, in_city, in_state, in_zipcode, dl_number, dl_state, email_address, did, seq),
 	historydate, fname, mname, lname, suffix, ssn, dob, phone10, wphone10, in_streetAddress, in_city, in_state, in_zipcode, dl_number, dl_state, email_address, did);
 
@@ -71,21 +71,19 @@ seq_map := join( indata1, indata,
 		and left.email_address=right.email_address
 		and left.did=right.did,
 	transform( {unsigned input_seq, unsigned deduped_seq}, self.input_seq := left.seq, self.deduped_seq := right.seq ), keep(1)/*, ALL*/);
-	
 
-#if(USE_LIBRARY)
+
 	// Pack arguments
 	args := module(risk_indicators.LIBIN)
 			export unsigned1 dppa := in_dppa;
 			export unsigned1 glb := in_glb;
-			export boolean isUtility := in_isUtility; 
+			export boolean isUtility := in_isUtility;
 			export boolean ln_branded := in_ln_branded;
 			export boolean ofac_only:= in_ofac_only;
-			export boolean suppressNearDups:= in_suppressNearDups; 
+			export boolean suppressNearDups:= in_suppressNearDups;
 			export boolean require2Ele:= in_require2Ele;
 			export boolean from_BIID := in_from_BIID;
-			export boolean isFCRA := in_isFCRA; 
-			export boolean ExcludeWatchLists := in_ExcludeWatchLists; 
+			export boolean ExcludeWatchLists := in_ExcludeWatchLists;
 			export boolean from_IT1O:= in_from_IT1O;
 			export unsigned1 ofac_version := in_ofac_version;
 			export boolean include_ofac := in_include_OFAC;
@@ -99,7 +97,7 @@ seq_map := join( indata1, indata,
 			export boolean runAreaCodeSplitSearch:= in_runAreaCodeSplitSearch;
 			export boolean allowCellphones := in_allowCellphones;
 			export string10 ExactMatchLevel := in_ExactMatchLevel;
-			export string50 DataRestriction := in_DataRestriction;
+			export string DataRestrictionMask := in_DataRestriction;
 			export string10 CustomDataFilter := in_CustomDataFilter;
 			export boolean runDLverification := in_runDLverification;
 			export unsigned2 EverOccupant_PastMonths := in_EverOccupant_PastMonths;
@@ -108,41 +106,35 @@ seq_map := join( indata1, indata,
 			export unsigned8 BSOptions := in_BSOptions_override;
 			export unsigned3 LastSeenThreshold := in_LastSeenThreshold;
 			export string20 CompanyID := in_CompanyID;
-			export string50 DataPermission := in_DataPermission;
+			export string DataPermissionMask := in_DataPermission;
 			export boolean IncludeNAPData := in_IncludeNAPData;
 			export string100 IntendedPurpose := in_IntendedPurpose;
-			export unsigned1 iid_LexIdSourceOptout := LexIdSourceOptout;
-			export string16 iid_TransactionID := (string16)TransactionID;
-			export string16 iid_BatchUID := (string16)BatchUID;
-			export unsigned6 iid_GlobalCompanyId := GlobalCompanyId;
-      export string5 IndustryClass := in_industryClass;
+			export unsigned1 lexid_source_optout := LexIdSourceOptout;
+			export string transaction_id := IF (TransactionID != '', TransactionID, BatchUID);
+			export unsigned6 global_company_id := GlobalCompanyId;
+      export string5 industry_class := in_industryClass;
+      export string ssn_mask := '';
 		END;
 
+#if(USE_LIBRARY)
 	// Call Library
 	iid_results := if(in_isFCRA,	library('Risk_Indicators.LIB_InstantID_Function_FCRA', Risk_Indicators.IInstantID_Function(indata, gateways, args, watchlists_requested, DOBMatchOptions)).results,
 												library('Risk_Indicators.LIB_InstantID_Function', Risk_Indicators.IInstantID_Function(indata, gateways, args, watchlists_requested, DOBMatchOptions)).results);
 #else
-	base := Risk_Indicators.iid_base_function(indata, gateways, in_dppa, in_glb, in_isUtility, in_ln_branded, 
-								in_ofac_only, in_suppressNearDups, in_require2ele, in_from_biid, in_isFCRA, in_excludewatchlists, in_from_IT1O, 
-								in_ofac_version, in_include_ofac, in_include_additional_watchlists, in_global_watchlist_threshold, in_dob_radius, in_bsversion,
-								in_runSSNCodes, in_runBestAddrCheck, in_runChronoPhoneLookup, in_runAreaCodeSplitSearch, // optimization options	
-								in_allowCellphones, in_ExactMatchLevel, in_DataRestriction, in_CustomDataFilter, in_runDLverification,
-								watchlists_requested, DOBMatchOptions, in_EverOccupant_PastMonths, in_EverOccupant_StartDate, in_append_best,
-								in_BSOptions_override, in_LastSeenThreshold, in_CompanyID, in_DataPermission, in_IncludeNAPData, in_IntendedPurpose,
-								LexIdSourceOptout := LexIdSourceOptout, 
-								TransactionID := TransactionID, 
-								BatchUID := BatchUID, 
-								GlobalCompanyID := GlobalCompanyID,
-                IndustryClass := in_industryClass
-                );
+
+  mod_access := PROJECT(args, doxie.IDataAccess, OPT);
+  mod_iid := PROJECT (args, risk_indicators.ICommonInstantId);
+
+
+	base := Risk_Indicators.iid_base_function(indata, gateways, mod_iid, mod_access, in_isFCRA, watchlists_requested, DOBMatchOptions);
 
 	iid_results := base;
-	
+
 #end
 
 	// join the results back to the original input so that every record on input has a response populated
 	full_response := join( seq_map, iid_results, left.deduped_seq=right.seq, transform( risk_indicators.layout_output, self.seq := left.input_seq, self := right ), keep(1) );
-  
+
   valid_full_response := IF(in_isFCRA, full_response, full_response(IF(watchlist_table = 'ERR', ERROR('Bridger Gateway Error'), true)));
 
 
@@ -155,7 +147,7 @@ seq_map := join( indata1, indata,
 // output(	in_ofac_only	, named('in_ofac_only')	);
 // output(	in_suppressNearDups	, named('in_suppressNearDups')	);
 // output(	in_require2Ele	, named('in_require2Ele')	);
-// output(	in_from_BIID	, named('in_from_BIID')	);//10  
+// output(	in_from_BIID	, named('in_from_BIID')	);//10
 // output(	in_isFCRA	, named('in_isFCRA')	);
 // output(	in_ExcludeWatchLists	, named('in_ExcludeWatchLists')	);
 // output(	in_from_IT1O	, named('in_from_IT1O')	);
@@ -166,7 +158,7 @@ seq_map := join( indata1, indata,
 // output(	in_dob_radius	, named('in_dob_radius')	);
 // output(	in_BSversion	, named('in_BSversion')	);
 // output(	in_runSSNCodes	, named('in_runSSNCodes')	);//20
-// output(	in_runBestAddrCheck	, named('in_runBestAddrCheck')	); 
+// output(	in_runBestAddrCheck	, named('in_runBestAddrCheck')	);
 // output(	in_runChronoPhoneLookup	, named('in_runChronoPhoneLookup')	);
 // output(	in_runAreaCodeSplitSearch	, named('in_runAreaCodeSplitSearch')	);
 // output(	in_allowCellphones	, named('in_allowCellphones')	);

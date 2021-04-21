@@ -227,8 +227,16 @@ export Layouts := module
 		//string8 date_of_death;
 		typeof(BatchServices.layout_Death_Batch_out.dod8) Date_of_death;
 		string31 dcd_match_code; // this will be death match code + 1 string for 'D' or DOB matches
+		typeof(BatchServices.layout_Death_Batch_out.VorP_code) verified_or_proof_code;
+		typeof(BatchServices.layout_Death_Batch_out.death_rec_src) death_rec_src := '';
+		string3	deceased_source;
+		typeof(BatchServices.layout_Death_Batch_out.isdeepdive)	dcd_isdeepdive := FALSE;
+		typeof(BatchServices.layout_Death_Batch_out.filedate) dcd_filedate;
+		typeof(BatchServices.layout_Death_Batch_out.state_death_flag) state_death_flag := '';
+		typeof(BatchServices.layout_Death_Batch_out.state_death_id) state_death_id;
+		typeof(BatchServices.layout_Death_Batch_out.rec_type) dcd_rec_type;
+		typeof(BatchServices.layout_Death_Batch_out.rec_type_orig) dcd_rec_type_orig;
 
-//  Email
 		//  Email
 		STRING    orig_email;
 		string    Email1;

@@ -1,0 +1,81 @@
+﻿IMPORT doxie;
+ 
+EXPORT Names := MODULE
+
+  SHARED LOCATION_PREFIX := '~';
+  SHARED VERSION := doxie.Version_SuperKey;
+
+  EXPORT FDN_PRODUCT := 'fdn';
+  EXPORT FDN_AUTOKEY := 'autokey';
+
+  EXPORT KEY_PREFIX := LOCATION_PREFIX + 'thor_data400::key::' + FDN_PRODUCT;
+  EXPORT KEY_AUTOKEY_PREFIX := KEY_PREFIX + '::@version@::' + FDN_AUTOKEY + '::';
+
+//***************************************************************
+//           FDN keys suffix
+//***************************************************************
+  EXPORT ID_SUFFIX := 'id';
+  EXPORT DID_SUFFIX := 'did';
+  EXPORT IP_SUFFIX := 'ip';
+  EXPORT EMAIL_SUFFIX := 'email';
+  EXPORT PROFESSIONALID_SUFFIX := 'professionalid';
+  EXPORT DEVICEID_SUFFIX := 'deviceid';
+  EXPORT TIN_SUFFIX := 'tin';
+  EXPORT NPI_SUFFIX := 'npi';
+  EXPORT APPPROVIDERID_SUFFIX := 'appproviderid';
+  EXPORT LNPID_SUFFIX := 'lnpid';
+  EXPORT MBS_INDTYPE_EXCLUSION_SUFFIX := 'mbsindtypeexclusion';
+  EXPORT MBS_PRODUCT_INCLUDE_SUFFIX := 'mbsproductinclude';
+  EXPORT MBS_FDN_MASTERID_SUFFIX := 'gcid_2_mbsfdnmasterid';
+  EXPORT MBS_FDN_MASTERID_EXCL_SUFFIX := 'mbsfdnmasteridexclusion';
+  EXPORT LINKIDS_SUFFIX := 'linkids';
+
+//***************************************************************
+//           FDN keys File definitions
+//***************************************************************
+  EXPORT i_ID := KEY_PREFIX + '::' + ID_SUFFIX;
+  EXPORT i_ID_SF := KEY_PREFIX + '::' + VERSION + '::' + ID_SUFFIX;
+	
+	EXPORT i_DID := KEY_PREFIX + '::' + DID_SUFFIX;
+  EXPORT i_DID_SF := KEY_PREFIX + '::' + VERSION + '::' + DID_SUFFIX;
+	
+	EXPORT i_IP := KEY_PREFIX + '::' + IP_SUFFIX;
+  EXPORT i_IP_SF := KEY_PREFIX + '::' + VERSION + '::' + IP_SUFFIX;
+	
+	EXPORT i_EMAIL := KEY_PREFIX + '::' + EMAIL_SUFFIX;
+  EXPORT i_EMAIL_SF := KEY_PREFIX + '::' + VERSION + '::' + EMAIL_SUFFIX;
+	
+	EXPORT i_PROFESSIONALID := KEY_PREFIX + '::' + PROFESSIONALID_SUFFIX;
+  EXPORT i_PROFESSIONALID_SF := KEY_PREFIX + '::' + VERSION + '::' + PROFESSIONALID_SUFFIX;
+	
+	EXPORT i_DEVICEID := KEY_PREFIX + '::' + DEVICEID_SUFFIX;
+  EXPORT i_DEVICEID_SF := KEY_PREFIX + '::' + VERSION + '::' + DEVICEID_SUFFIX;
+	
+	EXPORT i_TIN := KEY_PREFIX + '::' + TIN_SUFFIX;
+  EXPORT i_TIN_SF := KEY_PREFIX + '::' + VERSION + '::' + TIN_SUFFIX;
+	
+	EXPORT i_NPI := KEY_PREFIX + '::' + NPI_SUFFIX;
+  EXPORT i_NPI_SF := KEY_PREFIX + '::' + VERSION + '::' + NPI_SUFFIX;
+	
+	EXPORT i_APP_PROVIDERID := KEY_PREFIX + '::' + APPPROVIDERID_SUFFIX;
+  EXPORT i_APP_PROVIDERID_SF := KEY_PREFIX + '::' + VERSION + '::' + APPPROVIDERID_SUFFIX;
+	
+	EXPORT i_LNPID := KEY_PREFIX + '::' + LNPID_SUFFIX;
+  EXPORT i_LNPID_SF := KEY_PREFIX + '::' + VERSION + '::' + LNPID_SUFFIX;
+	
+	EXPORT i_MBS_INDTYPE_EXCLUSION := KEY_PREFIX + '::' + MBS_INDTYPE_EXCLUSION_SUFFIX;
+  EXPORT i_MBS_INDTYPE_EXCLUSION_SF := KEY_PREFIX + '::' + VERSION + '::' + MBS_INDTYPE_EXCLUSION_SUFFIX;
+	
+	EXPORT i_MBS_PRODUCT_INCLUDE := KEY_PREFIX + '::' + MBS_PRODUCT_INCLUDE_SUFFIX;
+  EXPORT i_MBS_PRODUCT_INCLUDE_SF := KEY_PREFIX + '::' + VERSION + '::' + MBS_PRODUCT_INCLUDE_SUFFIX;
+	
+	EXPORT i_MBS_FDN_MASTERID := KEY_PREFIX + '::' + MBS_FDN_MASTERID_SUFFIX;
+  EXPORT i_MBS_FDN_MASTERID_SF := KEY_PREFIX + '::' + VERSION + '::' + MBS_FDN_MASTERID_SUFFIX;
+	
+	EXPORT i_MBS_FDN_MASTERID_EXCL := KEY_PREFIX + '::' + MBS_FDN_MASTERID_EXCL_SUFFIX;
+  EXPORT i_MBS_FDN_MASTERID_EXCL_SF := KEY_PREFIX + '::' + VERSION + '::' + MBS_FDN_MASTERID_EXCL_SUFFIX;
+	
+	EXPORT i_LINKIDS := KEY_PREFIX + '::' + LINKIDS_SUFFIX;
+  EXPORT i_LINKIDS_SF := KEY_PREFIX + '::' + VERSION + '::' + LINKIDS_SUFFIX;
+
+END;

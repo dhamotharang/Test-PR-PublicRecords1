@@ -19,14 +19,14 @@ EXPORT Functions := MODULE
 	end;
   Export BusName_SplitAndSequenceWords(STRING s) := FUNCTION
 		//Needs OSS implement later
-		r10 := DATASET(Std.Str.SplitWords(s, ' '), layouts.BusName_WordRec);
-		r20 := PROJECT(r10,TRANSFORM(layouts.BusName_SeqWordRec,
+		r10 := DATASET(Std.Str.SplitWords(s, ' '), Healthcare_Header_Services.layouts.BusName_WordRec);
+		r20 := PROJECT(r10,TRANSFORM(Healthcare_Header_Services.layouts.BusName_SeqWordRec,
 																	SELF.seq := COUNTER,
 																	SELF.word := LEFT.word));
 		RETURN r20;
 	END;
-  Export BusName_ResequenceWords(DATASET(Layouts.BusName_SeqWordRec) ds) := FUNCTION
-    resultDS := PROJECT(SORT(ds, seq),TRANSFORM(Layouts.BusName_SeqWordRec,
+  Export BusName_ResequenceWords(DATASET(Healthcare_Header_Services.layouts.BusName_SeqWordRec) ds) := FUNCTION
+    resultDS := PROJECT(SORT(ds, seq),TRANSFORM(Healthcare_Header_Services.layouts.BusName_SeqWordRec,
 																									SELF.seq := COUNTER,
 																									SELF.word := LEFT.word));
     RETURN resultDS;
@@ -61,23 +61,23 @@ EXPORT Functions := MODULE
                 ],NoiseRec);
   END;
   // Removes certain prefix and suffix whole words from the argument
-  Export BusName_CleanPrefixAndSuffixFromSequencedWords(DATASET(Layouts.BusName_SeqWordRec) seqNameWords) := FUNCTION
+  Export BusName_CleanPrefixAndSuffixFromSequencedWords(DATASET(Healthcare_Header_Services.layouts.BusName_SeqWordRec) seqNameWords) := FUNCTION
         r10 := JOIN(seqNameWords,BusName_getNoiseWords(),LEFT.word = RIGHT.word,LOOKUP, LEFT OUTER);
         firstWordSeq := MIN(r10(word_type != 2), seq);
         lastWordSeq := MAX(r10(word_type != 1), seq);
         r20 := r10(seq BETWEEN firstWordSeq AND lastWordSeq);
-        noiselessWordsDS := PROJECT(SORT(r20, seq),TRANSFORM(Layouts.BusName_SeqWordRec,
+        noiselessWordsDS := PROJECT(SORT(r20, seq),TRANSFORM(Healthcare_Header_Services.layouts.BusName_SeqWordRec,
 																															SELF.seq := COUNTER,
 																															SELF := LEFT));
     RETURN noiselessWordsDS;
   END;
 	// Translates certain whole words in the argument
-	Export BusName_TranslateSequencedWords(DATASET(Layouts.BusName_SeqWordRec) seqNameWords) := FUNCTION
+	Export BusName_TranslateSequencedWords(DATASET(Healthcare_Header_Services.layouts.BusName_SeqWordRec) seqNameWords) := FUNCTION
 		TranslationRec := RECORD
 			STRING      origWord;
 			STRING      newWord;
 		END;
-		// Adapted from HealthCareFacility.Constants.Conv_Table
+		// Adapted from HealthCareFacility.Healthcare_Header_Services.Constants.Conv_Table
 		translationWords := DATASET([
 								{'1ENTRAL','CENTRAL'},
 								{'ACQUISTION','ACQUISITION'},
@@ -177,11 +177,11 @@ EXPORT Functions := MODULE
 		RETURN r10;
 	END;
 	// Returns a string composed of the first character of each word in the argument
-	Export BusName_MakeInitialism(DATASET(Layouts.BusName_SeqWordRec) ds) := FUNCTION
-			tempDS := PROJECT(ds,TRANSFORM(Layouts.BusName_SeqWordRec,
+	Export BusName_MakeInitialism(DATASET(Healthcare_Header_Services.layouts.BusName_SeqWordRec) ds) := FUNCTION
+			tempDS := PROJECT(ds,TRANSFORM(Healthcare_Header_Services.layouts.BusName_SeqWordRec,
 											SELF.word := LEFT.word[1],
 											SELF := LEFT));
-			resultDS := ROLLUP(SORT(tempDS, seq),TRUE,TRANSFORM(Layouts.BusName_SeqWordRec,
+			resultDS := ROLLUP(SORT(tempDS, seq),TRUE,TRANSFORM(Healthcare_Header_Services.layouts.BusName_SeqWordRec,
 											SELF.word := LEFT.word + RIGHT.word,
 											SELF := RIGHT));
 			finalWord := resultDS[1].word;
@@ -189,7 +189,7 @@ EXPORT Functions := MODULE
 	END;
 	Export BusName_ScorePrefixMatch(STRING name1, STRING name2) := FUNCTION
 			maxNameLength := MAX(LENGTH(name1), LENGTH(name2));
-			matchCount := Functions_C.BusName_PrefixMatchCount(name1, name2);
+			matchCount := Healthcare_Header_Services.Functions_C.BusName_PrefixMatchCount(name1, name2);
 			score := matchCount / maxNameLength * 100;
 			RETURN score;
 	END;
@@ -220,7 +220,7 @@ EXPORT Functions := MODULE
 			inputNameInitialism := BusName_MakeInitialism(inputNameWords);
 			candidateNameInitialism := BusName_MakeInitialism(candidateNameWords);
 	// Compare every word in input vs. candidate strings
-			wordsCombined1 := JOIN(inputNameWords,candidateNameWords,TRUE,TRANSFORM(Layouts.BusName_WordsScoredRec,
+			wordsCombined1 := JOIN(inputNameWords,candidateNameWords,TRUE,TRANSFORM(Healthcare_Header_Services.layouts.BusName_WordsScoredRec,
 														word1InitialsPos := STD.Str.Find(candidateNameInitialism, LEFT.word, 1);
 														word2InitialsPos := STD.Str.Find(inputNameInitialism, RIGHT.word, 1);
 														SELF.seq1 := LEFT.seq,
@@ -299,29 +299,29 @@ EXPORT Functions := MODULE
 		return returnVal;
 	END;
 	//Did Frequency Logic
-	Export processDids(dataset(Layouts.layout_did) ds) := Function  
+	Export processDids(dataset(Healthcare_Header_Services.layouts.layout_did) ds) := Function  
 		grp:=sort(ds,did);
 		tmprec := record
 			did:=grp.did;
 			freq:=count(group);
 		end;
 		t:=table(grp,tmprec,did,few);
-		f:=sort(project(t,Layouts.layout_did),-freq);
+		f:=sort(project(t,Healthcare_Header_Services.layouts.layout_did),-freq);
 		return f;
 	end;
 	// BDid Frequency Logic
-	Export processBDids(dataset(Layouts.layout_bdid) ds) := Function  
+	Export processBDids(dataset(Healthcare_Header_Services.layouts.layout_bdid) ds) := Function  
 		grp:=sort(ds,bdid);
 		tmprec := record
 			bdid:=grp.bdid;
 			freq:=count(group);
 		end;
 		t:=table(grp,tmprec,bdid,few);
-		f:=sort(project(t,Layouts.layout_bdid),-freq);
+		f:=sort(project(t,Healthcare_Header_Services.layouts.layout_bdid),-freq);
 		return f;
 	end;
 	// BIP Frequency Logic
-	Export processBIPKeys(dataset(Layouts.layout_bipkeys) ds) := Function  
+	Export processBIPKeys(dataset(Healthcare_Header_Services.layouts.layout_bipkeys) ds) := Function  
 		grp:=group(sort(ds,UltID,UltScore,UltWeight,OrgID,OrgScore,OrgWeight,SELEID,SELEScore,SELEWeight,ProxID,ProxScore,ProxWeight),UltID,OrgID,SELEID,ProxID);
 		tmprec := record
 			UltID:=grp.UltID;
@@ -339,7 +339,7 @@ EXPORT Functions := MODULE
 			freq:=count(group);
 		end;
 		t:=table(grp,tmprec,few);
-		f:=sort(project(t,Layouts.layout_bipkeys),-freq);
+		f:=sort(project(t,Healthcare_Header_Services.layouts.layout_bipkeys),-freq);
 		return f;
 	end;
 	export buildAddress (string prim_range, string predir, string prim_name, string addr_suffix, string postdir, string unit_desig, string sec_range) := function
@@ -383,7 +383,7 @@ EXPORT Functions := MODULE
 		unsigned	matchFieldClnNumber := 0;
 		string		matchFieldOptional := '';
 	End;
-	Shared calcStLicPenalty(String rawLicenseState, String rawLicense, dataset(layouts.layout_licenseinfo) recs) := Function
+	Shared calcStLicPenalty(String rawLicenseState, String rawLicense, dataset(Healthcare_Header_Services.layouts.layout_licenseinfo) recs) := Function
 		validdata := rawLicense<>'';
 		missingState := rawLicenseState='';
 		tmpRec := project(recs,transform(matchData,
@@ -405,7 +405,7 @@ EXPORT Functions := MODULE
 											0);
 		return penaltyVal;
 	end;
-	Shared calcTaxIdPenalty(String rawInput, dataset(layouts.layout_taxid) recs) := Function
+	Shared calcTaxIdPenalty(String rawInput, dataset(Healthcare_Header_Services.layouts.layout_taxid) recs) := Function
 		validdata := rawinput <> '';
 		tmpRec := project(recs,transform(matchData,
 														self.matchFieldClnNumber:= (integer)cleanOnlyNumbers(left.taxid);
@@ -419,7 +419,7 @@ EXPORT Functions := MODULE
 											0);
 		return penaltyVal;
 	end;
-	Shared calcFeinPenalty(String rawInput, dataset(layouts.layout_fein) recs) := Function
+	Shared calcFeinPenalty(String rawInput, dataset(Healthcare_Header_Services.layouts.layout_fein) recs) := Function
 		validdata := rawinput <> '';
 		tmpRec := project(recs,transform(matchData,
 														self.matchFieldClnNumber:= (integer)cleanOnlyNumbers(left.fein);
@@ -433,7 +433,7 @@ EXPORT Functions := MODULE
 											0);
 		return penaltyVal;
 	end;
-	Shared calcUpinPenalty(String rawInput, dataset(layouts.layout_upin) recs) := Function
+	Shared calcUpinPenalty(String rawInput, dataset(Healthcare_Header_Services.layouts.layout_upin) recs) := Function
 		validdata := rawinput <> '';
 		tmpRec := project(recs,transform(matchData,
 														self.matchFieldClnNumber:= (integer)cleanOnlyNumbers(left.upin);
@@ -447,7 +447,7 @@ EXPORT Functions := MODULE
 											0);
 		return penaltyVal;
 	end;
-	Shared calcNpiPenalty(String rawInput, dataset(layouts.layout_npi) recs) := Function
+	Shared calcNpiPenalty(String rawInput, dataset(Healthcare_Header_Services.layouts.layout_npi) recs) := Function
 		validdata := rawinput <> '';
 		tmpRec := project(recs,transform(matchData,
 														self.matchFieldClnNumber:= (integer)cleanOnlyNumbers(left.npi);
@@ -461,7 +461,7 @@ EXPORT Functions := MODULE
 											0);
 		return penaltyVal;
 	end;
-	Shared calcDeaPenalty(String rawInput, dataset(layouts.layout_dea) recs) := Function
+	Shared calcDeaPenalty(String rawInput, dataset(Healthcare_Header_Services.layouts.layout_dea) recs) := Function
 		validdata := rawinput <> '';
 		tmpRec := project(recs,transform(matchData,
 														self.matchFieldClnNumber:= (integer)cleanOnlyNumbers(left.dea);
@@ -475,7 +475,7 @@ EXPORT Functions := MODULE
 											0);
 		return penaltyVal;
 	end;	
-	Shared calcCLIAPenalty(String rawInput, dataset(layouts.layout_clianumber) recs) := Function
+	Shared calcCLIAPenalty(String rawInput, dataset(Healthcare_Header_Services.layouts.layout_clianumber) recs) := Function
 		validdata := rawinput <> '';
 		checkString := recs((integer)cleanOnlyNumbers(clianumber)=(integer)cleanOnlyNumbers(rawInput));
 		penaltyVal := map(validdata and exists(recs) => if(exists(checkString),0,4),
@@ -524,8 +524,8 @@ EXPORT Functions := MODULE
 			// output(addrPenalty+'->'+inStreetNbr+' '+inStreet+' '+inCity+' '+inState+' '+inZip+' RAW '+rawStreetNbr+' '+rawStreet+' '+rawCity+' '+rawState+' '+rawZip+' '+zip_Radius);
 			return If(foundHouse,addrPenalty,addrPenalty+2);
 	end;
-	Export getBestAddrPenalty (dataset(layouts.layout_addressinfo) inAddrs, layouts.autokeyInput input, integer zipradius) := function
-			bestValues := project(inAddrs,transform(layouts.layout_addressinfo,
+	Export getBestAddrPenalty (dataset(Healthcare_Header_Services.layouts.layout_addressinfo) inAddrs, Healthcare_Header_Services.layouts.autokeyInput input, integer zipradius) := function
+			bestValues := project(inAddrs,transform(Healthcare_Header_Services.layouts.layout_addressinfo,
 															getPenalty := getAddrPenalty(input.prim_range,input.prim_name,input.p_city_name,input.st,input.z5,
 																								STD.Str.ToUpperCase(left.prim_range),STD.Str.ToUpperCase(left.prim_name),STD.Str.ToUpperCase(left.p_city_name),STD.Str.ToUpperCase(left.st),left.z5,zipradius);
 															self.addrPenalty:=getPenalty;self:=left));
@@ -550,26 +550,26 @@ EXPORT Functions := MODULE
 												 0);	
 			foundCompany := inCompany<> '' and rawCompany <> ''; // we found a business
 			Confidence := CompareBusinessNameConfidence(rawCompany,inCompany);
-			busPenalty := map(foundCompany => if(Confidence>=Constants.BUS_NAME_BIPMATCH_THRESHOLD,(100-Confidence)/10,(100-Confidence)/5),
+			busPenalty := map(foundCompany => if(Confidence>=Healthcare_Header_Services.Constants.BUS_NAME_BIPMATCH_THRESHOLD,(100-Confidence)/10,(100-Confidence)/5),
 												// inCompany <> '' => 10,
 												0);
 
 			return namePenalty+busPenalty;
 	end;
-	Export getBestNamePenalty (dataset(layouts.layout_nameinfo) inNames, layouts.autokeyInput input) := function
-			bestValues := project(inNames(LastName<>'' or CompanyName <>''),transform(layouts.layout_nameinfo,
+	Export getBestNamePenalty (dataset(Healthcare_Header_Services.layouts.layout_nameinfo) inNames, Healthcare_Header_Services.layouts.autokeyInput input) := function
+			bestValues := project(inNames(LastName<>'' or CompanyName <>''),transform(Healthcare_Header_Services.layouts.layout_nameinfo,
 															getPenalty := getNamePenalty(input.name_first,input.name_middle,input.name_last,input.comp_name,
 																							 STD.Str.ToUpperCase(left.FirstName),STD.Str.ToUpperCase(left.MiddleName),STD.Str.ToUpperCase(left.LastName),STD.Str.ToUpperCase(left.CompanyName));
 															self.namePenalty:=getPenalty;self:=left));
 
 			return min(bestValues,namePenalty);
 	end;
-	Export doPenalty (dataset(layouts.CombinedHeaderResults) inRecs, dataset(layouts.autokeyInput) input, integer maxPenalty, integer zipradius = Constants.ZIP_RADIUS) := function
+	Export doPenalty (dataset(Healthcare_Header_Services.layouts.CombinedHeaderResults) inRecs, dataset(Healthcare_Header_Services.layouts.autokeyInput) input, integer maxPenalty, integer zipradius = Healthcare_Header_Services.Constants.ZIP_RADIUS) := function
 		//Custom penalty logic
-		outRec := layouts.CombinedHeaderResults;
-		outRec xform(outRec l, layouts.autokeyInput r) := transform
+		outRec := Healthcare_Header_Services.layouts.CombinedHeaderResults;
+		outRec xform(outRec l, Healthcare_Header_Services.layouts.autokeyInput r) := transform
 						//Collect Addresses and apply penalty to get lowest
-						allAddrs := l.addresses + project(l.affiliates,transform(layouts.layout_addressinfo, self:=left;self:=[])) + project(l.hospitals,transform(layouts.layout_addressinfo, self:=left;self:=[]));
+						allAddrs := l.addresses + project(l.affiliates,transform(Healthcare_Header_Services.layouts.layout_addressinfo, self:=left;self:=[])) + project(l.hospitals,transform(Healthcare_Header_Services.layouts.layout_addressinfo, self:=left;self:=[]));
 						hasAddressInput := r.prim_range<>'' or r.prim_name <> '' or r.p_city_name <> '' or r.st <> '' or r.z5 <>'';
 						hasNameInput := r.name_first <> '' or r.name_middle <> '' or r.name_last <> '' or r.comp_name <>'';
 						addrPen := if(hasAddressInput,getBestAddrPenalty(allAddrs,r,zipradius),0);
@@ -604,8 +604,8 @@ EXPORT Functions := MODULE
 																		isStateLicenseMatch8 or isStateLicenseMatch9 or isStateLicenseMatch10;
 						isLNPIDMatch := r.ProviderID > 0 and r.derivedInputRecord = false and (l.lnpid > 0 and l.lnpid = r.ProviderID);
 						isExactSSN := exists(l.ssns(ssn=r.SSN)) and r.SSN <> '';
-						isDeepDiveSSNMatch := exists(l.ssns(ssn=r.SSN)) and r.SSN <> '' and l.src = Constants.SRC_BOCA_PERSON_HEADER;
-						isDeepDiveFEINMatch := exists(l.feins(fein=r.fein)) and r.fein <> '' and l.src = Constants.SRC_BOCA_BUS_HEADER;
+						isDeepDiveSSNMatch := exists(l.ssns(ssn=r.SSN)) and r.SSN <> '' and l.src = Healthcare_Header_Services.Constants.SRC_BOCA_PERSON_HEADER;
+						isDeepDiveFEINMatch := exists(l.feins(fein=r.fein)) and r.fein <> '' and l.src = Healthcare_Header_Services.Constants.SRC_BOCA_BUS_HEADER;
 						adjustAddrPenalty := isDEAMatch or isNPIMatch or isUPINMatch or isExactCLIA or isExactNCPDP or isStateLicenseMatch;
 						addrPenalty :=if(adjustAddrPenalty,truncate(addrPen/10),addrPen);//Address penalty could be very high and should not count as much as other penalties divide by 10
 						totalPen := namePen+addrPenalty+stlicPen+taxidPen+feinPen+upinPen+npiPen+deaPen+cliaPen+ncpdpPen;
@@ -633,8 +633,8 @@ EXPORT Functions := MODULE
 						self :=l;
 						self:=[];
 		end;
-		recsWithPenalty := join(inRecs(penalty_applied=false),input,left.acctno=right.acctno,xform(left,right),keep(Constants.MAX_RECS_ON_JOIN), limit(0));
-    removeOverPenalty := recsWithPenalty(record_penalty<=if(src=Constants.SRC_BOCA_PERSON_HEADER,maxPenalty*Constants.DEEPDIVE_PENALTY_MULTIPLIER,maxPenalty) or isExactLNID or isExactDEA or isExactNPI or isExactUPIN or isExactCLIA or isExactNCPDP or isExactStateLicense  or isExactLNPID or isExactSSN or isautokeysresult or isDeepDiveSSNMatch or isDeepDiveFEINMatch or isSearchFailed);					
+		recsWithPenalty := join(inRecs(penalty_applied=false),input,left.acctno=right.acctno,xform(left,right),keep(Healthcare_Header_Services.Constants.MAX_RECS_ON_JOIN), limit(0));
+    removeOverPenalty := recsWithPenalty(record_penalty<=if(src=Healthcare_Header_Services.Constants.SRC_BOCA_PERSON_HEADER,maxPenalty*Healthcare_Header_Services.Constants.DEEPDIVE_PENALTY_MULTIPLIER,maxPenalty) or isExactLNID or isExactDEA or isExactNPI or isExactUPIN or isExactCLIA or isExactNCPDP or isExactStateLicense  or isExactLNPID or isExactSSN or isautokeysresult or isDeepDiveSSNMatch or isDeepDiveFEINMatch or isSearchFailed or trim(Src,left,right) in ['P','O']);					
 		//remove derived records if we have a non derived input records with the same acctno.
 		recsNotDerivedInput := removeOverPenalty(isDerivedSource=false);
 		recsDerivedInput := join(removeOverPenalty,recsNotDerivedInput, left.acctno=right.acctno, all, left only);
@@ -642,30 +642,18 @@ EXPORT Functions := MODULE
 		finalRecs := recsNotDerivedInput+recsDerivedInput+inRecs(penalty_applied=true);
 		sortRecs := sort(finalRecs,acctno,srcid,src,record_penalty);
 		dedupRecs := sort(dedup(sortRecs, acctno,srcid,src),record_penalty);
-
-
-
-
-
-
-
-
-
-
-
-
-				return dedupRecs;
+		return dedupRecs;
 	end;
 	//AMS Specific Functions
-	export getAmsGroupAffiliations(dataset(Layouts.searchKeyResults_plus_input) provs) := function
+	export getAmsGroupAffiliations(dataset(Healthcare_Header_Services.layouts.searchKeyResults_plus_input) provs) := function
 			getGroupsIDs := join(provs,ams.keys().Affiliation.AMSID.qa,keyed(if (left.vendorid <> '',(string)left.vendorid,(string)left.prov_id) = right.ams_id) and 
 												keyed(right.record_type = AMS._Constants().CURRENT) and 
 												right.rawfields.affil_status = AMS._Constants().ACTIVE AND 
 												right.isparent = FALSE and 
-												right.rawfields.affil_type != AMS._Constants().PROVIDER_TO_HOSPITAL,keep(Constants.MAX_RECS_ON_JOIN), limit(0));
+												right.rawfields.affil_type != AMS._Constants().PROVIDER_TO_HOSPITAL,keep(Healthcare_Header_Services.Constants.MAX_RECS_ON_JOIN), limit(0));
 			getActualAffiliations := JOIN(getGroupsIDs,ams.keys().main.amsid.qa,
 												KEYED(LEFT.ams_other_id = RIGHT.ams_id),
-												transform(layouts.layout_affiliateHospital, 
+												transform(Healthcare_Header_Services.layouts.layout_affiliateHospital, 
 															self.acctno := left.acctno;
 															SELF.providerid := (unsigned6)left.ams_id;
 															self.BDID := right.BDID;
@@ -683,25 +671,25 @@ EXPORT Functions := MODULE
 															self.st := RIGHT.clean_company_address.st;
 															self.z5 := RIGHT.clean_company_address.zip;
 															self.zip4 := RIGHT.clean_company_address.zip4;
-															self:=[]),keep(Constants.MAX_RECS_ON_JOIN), limit(0));
-			layouts.layout_Child_affiliateHospital doRollup(layouts.layout_affiliateHospital l, 
-																									dataset(layouts.layout_affiliateHospital) r) := TRANSFORM
+															self:=[]),keep(Healthcare_Header_Services.Constants.MAX_RECS_ON_JOIN), limit(0));
+			Healthcare_Header_Services.layouts.layout_Child_affiliateHospital doRollup(Healthcare_Header_Services.layouts.layout_affiliateHospital l, 
+																									dataset(Healthcare_Header_Services.layouts.layout_affiliateHospital) r) := TRANSFORM
 				SELF.acctno := l.acctno;
 				self.ProviderID := l.ProviderID;
-				self.childinfo := choosen(r,Constants.MAX_GROUP_AFFILIATIONS);
+				self.childinfo := choosen(r,Healthcare_Header_Services.Constants.MAX_GROUP_AFFILIATIONS);
 			END;
 			results_rolled := rollup(group(sort(getActualAffiliations,acctno,ProviderID),acctno,ProviderID),group,doRollup(left,rows(left)));
 		return results_rolled;
 	End;
-	export getAmsHospitalInfo(dataset(layouts.searchKeyResults_plus_input) provs) := function
+	export getAmsHospitalInfo(dataset(Healthcare_Header_Services.layouts.searchKeyResults_plus_input) provs) := function
 			getGroupsIDs := join(provs,ams.keys().Affiliation.AMSID.qa,keyed(if (left.vendorid <> '',(string)left.vendorid,(string)left.prov_id) = right.ams_id) and 
 												keyed(right.record_type = AMS._Constants().CURRENT) and 
 												right.rawfields.affil_status = AMS._Constants().ACTIVE AND 
 												right.isparent = FALSE and 
-												right.rawfields.affil_type = AMS._Constants().PROVIDER_TO_HOSPITAL,keep(Constants.MAX_RECS_ON_JOIN), limit(0));
+												right.rawfields.affil_type = AMS._Constants().PROVIDER_TO_HOSPITAL,keep(Healthcare_Header_Services.Constants.MAX_RECS_ON_JOIN), limit(0));
 			getActualAffiliations := JOIN(getGroupsIDs,ams.keys().main.amsid.qa,
 												KEYED(LEFT.ams_other_id = RIGHT.ams_id),
-												transform(layouts.layout_affiliateHospital, 
+												transform(Healthcare_Header_Services.layouts.layout_affiliateHospital, 
 															self.acctno := left.acctno;
 															SELF.providerid := (unsigned6)left.ams_id;
 															self.BDID := right.BDID;
@@ -719,26 +707,26 @@ EXPORT Functions := MODULE
 															self.st := RIGHT.clean_company_address.st;
 															self.z5 := RIGHT.clean_company_address.zip;
 															self.zip4 := RIGHT.clean_company_address.zip4;
-															self:=[]),keep(Constants.MAX_RECS_ON_JOIN), limit(0));
-			layouts.layout_Child_affiliateHospital doRollup(layouts.layout_affiliateHospital l, dataset(layouts.layout_affiliateHospital) r) := TRANSFORM
+															self:=[]),keep(Healthcare_Header_Services.Constants.MAX_RECS_ON_JOIN), limit(0));
+			Healthcare_Header_Services.layouts.layout_Child_affiliateHospital doRollup(Healthcare_Header_Services.layouts.layout_affiliateHospital l, dataset(Healthcare_Header_Services.layouts.layout_affiliateHospital) r) := TRANSFORM
 				SELF.acctno := l.acctno;
 				self.ProviderID := l.ProviderID;
-				self.childinfo := choosen(r,Constants.MAX_HOSPITAL_AFFILIATIONS);
+				self.childinfo := choosen(r,Healthcare_Header_Services.Constants.MAX_HOSPITAL_AFFILIATIONS);
 			END;
 			results_rolled := rollup(group(sort(getActualAffiliations,acctno,ProviderID),acctno,ProviderID),group,doRollup(left,rows(left)));
 		return results_rolled;
 	End;
-	Export getAmsNpis(dataset(layouts.searchKeyResults_plus_input) provs) := function
+	Export getAmsNpis(dataset(Healthcare_Header_Services.layouts.searchKeyResults_plus_input) provs) := function
 		result := join(provs,ams.keys().IDNumber.AMSID.qa, 
 									 keyed(if (left.vendorid <> '',(string)left.vendorid,(string)left.prov_id) = right.ams_id) 
 									 and keyed(right.record_type = AMS._Constants().CURRENT)
 									 and right.src_cd_desc = 'NPI',
-									 transform(layouts.layout_npi,
+									 transform(Healthcare_Header_Services.layouts.layout_npi,
 														 self.acctno:=left.acctno;
 														 SELF.providerid := (unsigned6)right.ams_id;
 														 self.npi:=right.rawfields.indy_id),
-									 keep(Constants.MAX_RECS_ON_JOIN), limit(0));
-		layouts.layout_child_npi doRollup(layouts.layout_npi l, dataset(layouts.layout_npi) r) := TRANSFORM
+									 keep(Healthcare_Header_Services.Constants.MAX_RECS_ON_JOIN), limit(0));
+		Healthcare_Header_Services.layouts.layout_child_npi doRollup(Healthcare_Header_Services.layouts.layout_npi l, dataset(Healthcare_Header_Services.layouts.layout_npi) r) := TRANSFORM
 			SELF.acctno := l.acctno;
 			self.ProviderID := l.ProviderID;
 			self.childinfo := r;
@@ -746,22 +734,22 @@ EXPORT Functions := MODULE
 		results_rolled := rollup(group(sort(result,acctno,ProviderID),acctno,ProviderID),group,doRollup(left,rows(left)));
 		return results_rolled;
 	End;
-	Export getAmsDeas(dataset(layouts.searchKeyResults_plus_input) provs) := function
+	Export getAmsDeas(dataset(Healthcare_Header_Services.layouts.searchKeyResults_plus_input) provs) := function
 		result := join(provs,ams.keys().IDNumber.AMSID.qa, 
 									 keyed(if (left.vendorid <> '',(string)left.vendorid,(string)left.prov_id) = right.ams_id)
 									 and keyed(right.record_type = AMS._Constants().CURRENT)
 									 and right.src_cd_desc = 'DEA',
-									 transform(layouts.layout_dea,
+									 transform(Healthcare_Header_Services.layouts.layout_dea,
 														 self.acctno:=left.acctno;
 														 SELF.providerid := (unsigned6)right.ams_id;
 														 self.dea:=right.rawfields.indy_id, 
 														 self.expiration_date:=right.rawfields.indy_id_end_date),
-								   keep(Constants.MAX_RECS_ON_JOIN), limit(0));
-		f_deas2 := dedup(sort(JOIN(result,dea.Key_dea_reg_num,keyed(left.dea=right.dea_registration_number),transform(layouts.layout_dea, self.expiration_date:=right.Expiration_Date;self :=left),keep(Constants.MAX_RECS_ON_JOIN), limit(0)),acctno,providerid,dea,-Expiration_Date),acctno,providerid,dea,Expiration_Date);
+								   keep(Healthcare_Header_Services.Constants.MAX_RECS_ON_JOIN), limit(0));
+		f_deas2 := dedup(sort(JOIN(result,dea.Key_dea_reg_num,keyed(left.dea=right.dea_registration_number),transform(Healthcare_Header_Services.layouts.layout_dea, self.expiration_date:=right.Expiration_Date;self :=left),keep(Healthcare_Header_Services.Constants.MAX_RECS_ON_JOIN), limit(0)),acctno,providerid,dea,-Expiration_Date),acctno,providerid,dea,Expiration_Date);
 		f_deas := result+f_deas2;
 		f_deas_srt := sort(f_deas(DEA<>''), record);
 		f_deas_dep := sort(dedup(f_deas_srt, acctno,providerid,dea,Expiration_Date),acctno,providerid,dea,-Expiration_Date);
-		layouts.layout_child_dea doRollup(layouts.layout_dea l, dataset(layouts.layout_dea) r) := TRANSFORM
+		Healthcare_Header_Services.layouts.layout_child_dea doRollup(Healthcare_Header_Services.layouts.layout_dea l, dataset(Healthcare_Header_Services.layouts.layout_dea) r) := TRANSFORM
 			SELF.acctno := l.acctno;
 			self.ProviderID := l.ProviderID;
 			self.childinfo := r;
@@ -769,15 +757,15 @@ EXPORT Functions := MODULE
 		results_rolled := rollup(group(sort(f_deas_dep,acctno,ProviderID),acctno,ProviderID),group,doRollup(left,rows(left)));
 		return results_rolled;
 	End;
-	Export getAmsDegrees(dataset(layouts.searchKeyResults_plus_input) provs) := function
+	Export getAmsDegrees(dataset(Healthcare_Header_Services.layouts.searchKeyResults_plus_input) provs) := function
 		result := join(provs,ams.keys().Degree.amsid.qa, 
 									 keyed(if (left.vendorid <> '',(string)left.vendorid,(string)left.prov_id) = right.ams_id),
-												transform(layouts.layout_degree, 
+												transform(Healthcare_Header_Services.layouts.layout_degree, 
 																	self.acctno:=left.acctno;
 																	self.providerid:=(unsigned6)right.ams_id;
 																	self.Degree := right.rawfields.degree;self:=[]),
-								   keep(Constants.MAX_RECS_ON_JOIN), limit(0));
-		layouts.layout_child_degree doRollup(layouts.layout_degree l, dataset(layouts.layout_degree) r) := TRANSFORM
+								   keep(Healthcare_Header_Services.Constants.MAX_RECS_ON_JOIN), limit(0));
+		Healthcare_Header_Services.layouts.layout_child_degree doRollup(Healthcare_Header_Services.layouts.layout_degree l, dataset(Healthcare_Header_Services.layouts.layout_degree) r) := TRANSFORM
 			SELF.acctno := l.acctno;
 			self.ProviderID := l.ProviderID;
 			self.childinfo := r;
@@ -785,15 +773,15 @@ EXPORT Functions := MODULE
 		results_rolled := rollup(group(sort(result,acctno,ProviderID),acctno,ProviderID),group,doRollup(left,rows(left)));
 		return results_rolled;
 	End;
-	Export getAmsSpecialty(dataset(layouts.searchKeyResults_plus_input) provs) := function
+	Export getAmsSpecialty(dataset(Healthcare_Header_Services.layouts.searchKeyResults_plus_input) provs) := function
 		result := join(provs,ams.keys().specialty.amsid.qa, 
 									 keyed(if (left.vendorid <> '',(string)left.vendorid,(string)left.prov_id) = right.ams_id),
-												transform(layouts.layout_specialty, 
+												transform(Healthcare_Header_Services.layouts.layout_specialty, 
 																	self.acctno:=left.acctno;
 																	self.providerid:=(unsigned6)right.ams_id;
 																	self.SpecialtyName := right.specialty_desc;self:=[]),
-								   keep(Constants.MAX_RECS_ON_JOIN), limit(0));
-		layouts.layout_child_specialty doRollup(layouts.layout_specialty l, dataset(layouts.layout_specialty) r) := TRANSFORM
+								   keep(Healthcare_Header_Services.Constants.MAX_RECS_ON_JOIN), limit(0));
+		Healthcare_Header_Services.layouts.layout_child_specialty doRollup(Healthcare_Header_Services.layouts.layout_specialty l, dataset(Healthcare_Header_Services.layouts.layout_specialty) r) := TRANSFORM
 			SELF.acctno := l.acctno;
 			self.ProviderID := l.ProviderID;
 			self.childinfo := r;
@@ -801,11 +789,11 @@ EXPORT Functions := MODULE
 		results_rolled := rollup(group(sort(result,acctno,ProviderID),acctno,ProviderID),group,doRollup(left,rows(left)));
 		return results_rolled;
 	End;
-	Export getAmsLicenses(dataset(layouts.searchKeyResults_plus_input) provs) := function
+	Export getAmsLicenses(dataset(Healthcare_Header_Services.layouts.searchKeyResults_plus_input) provs) := function
 		result := dedup(sort(join(provs,ams.keys().StateLicense.amsid.qa, 
 									 keyed(if (left.vendorid <> '',(string)left.vendorid,(string)left.prov_id) = right.ams_id)
 									 and keyed(right.record_type = AMS._Constants().CURRENT),
-									 transform(layouts.layout_licenseinfo,
+									 transform(Healthcare_Header_Services.layouts.layout_licenseinfo,
 												self.licenseAcctno := left.acctno;
 												SELF.providerid := (unsigned6)right.ams_id;
 												self.licenseSeq := 1;
@@ -814,8 +802,8 @@ EXPORT Functions := MODULE
 												self.LicenseStatus := right.rawfields.st_lic_status;
 												self.Effective_Date := right.rawfields.st_lic_issue_date;
 												self.Termination_Date:=right.rawfields.st_lic_exp_date),
-										keep(Constants.MAX_RECS_ON_JOIN), limit(0)),LicenseState,-Termination_Date, LicenseNumber),all);
-		layouts.layout_child_licenseinfo doRollup(layouts.layout_licenseinfo l, dataset(layouts.layout_licenseinfo) r) := TRANSFORM
+										keep(Healthcare_Header_Services.Constants.MAX_RECS_ON_JOIN), limit(0)),LicenseState,-Termination_Date, LicenseNumber),all);
+		Healthcare_Header_Services.layouts.layout_child_licenseinfo doRollup(Healthcare_Header_Services.layouts.layout_licenseinfo l, dataset(Healthcare_Header_Services.layouts.layout_licenseinfo) r) := TRANSFORM
 			SELF.acctno := l.licenseAcctno;
 			self.ProviderID := l.ProviderID;
 			self.childinfo := r;
@@ -826,8 +814,8 @@ EXPORT Functions := MODULE
 		return results_rolled;
 	End;
 	//Enclarity specific Functions
-		Export buildLegacySanctionRecord(layouts.CombinedHeaderResults parent, dataset(layouts.layout_sanctions) sanc) := Function
-			outlayout := layouts.layout_LegacySanctions;
+		Export buildLegacySanctionRecord(Healthcare_Header_Services.layouts.CombinedHeaderResults parent, dataset(Healthcare_Header_Services.layouts.layout_sanctions) sanc) := Function
+			outlayout := Healthcare_Header_Services.layouts.layout_LegacySanctions;
 			results := project(choosen(sanc,iesp.Constants.HPR.MAX_SANCTIONS),transform(outlayout,
 											self.acctno := trim(left.acctno,left,right);
 											self.ProviderID:= left.ProviderID;
@@ -919,10 +907,10 @@ EXPORT Functions := MODULE
 			return results;
 		end;
 	//Append Data lookups
-	Export getSlimHdrRecords (dataset(layouts.CombinedHeaderResults) resultRecs, 
-													dataset(layouts.autokeyInput) inputRecs) := function
+	Export getSlimHdrRecords (dataset(Healthcare_Header_Services.layouts.CombinedHeaderResults) resultRecs, 
+													dataset(Healthcare_Header_Services.layouts.autokeyInput) inputRecs) := function
 		basedata := join(resultRecs,inputRecs,left.acctno=right.acctno,
-											transform(Layouts.layout_slim,
+											transform(Healthcare_Header_Services.layouts.layout_slim,
 															self.acctno := right.acctno;
 															self.ProviderID:=left.LNPID;
 															self.VendorID:='';
@@ -938,16 +926,17 @@ EXPORT Functions := MODULE
 															self.UserState := right.st;
 															self.UserZip := right.z5;
 															self.dids := left.dids;
-															self.isDeepDiveResults := left.src = Constants.SRC_BOCA_PERSON_HEADER;
-															self.clianumbers := dataset([{right.CLIANumber}],layouts.layout_clianumber);
+															self.isDeepDiveResults := left.src = Healthcare_Header_Services.Constants.SRC_BOCA_PERSON_HEADER;
+															self.clianumbers := dataset([{right.CLIANumber}],Healthcare_Header_Services.layouts.layout_clianumber);
 															self.npis := left.npis;),
-												keep(Constants.MAX_RECS_ON_JOIN), limit(0));
+												keep(Healthcare_Header_Services.Constants.MAX_RECS_ON_JOIN), limit(0));
 		return basedata;
 	end;
-	Export getSSN(dataset(layouts.layout_slim) input,
-								dataset(Layouts.common_runtime_config) cfg) := Function
+	Export getSSN(dataset(Healthcare_Header_Services.layouts.layout_slim) input,
+								dataset(Healthcare_Header_Services.layouts.common_runtime_config) cfg) := Function
 	  ssn_mask_val := AutoStandardI.InterfaceTranslator.ssn_mask_val.val(project(gm,AutoStandardI.InterfaceTranslator.ssn_mask_val.params)); 
-		byDids := dedup(normalize(input,left.dids,transform(Layouts.layout_sanc_DID,self.acctno := left.acctno;self.ProviderID:=left.ProviderID;self.did:=right.did;self.freq:=right.freq;self:=[])),all);
+	  dob_mask_val := AutoStandardI.InterfaceTranslator.dob_mask_value.val(project(gm,AutoStandardI.InterfaceTranslator.dob_mask_value.params)); 
+		byDids := dedup(normalize(input,left.dids,transform(Healthcare_Header_Services.layouts.layout_sanc_DID,self.acctno := left.acctno;self.ProviderID:=left.ProviderID;self.did:=right.did;self.freq:=right.freq;self:=[])),all);
 		
 		doxie.mac_best_records(byDids,
 													 did,
@@ -958,34 +947,36 @@ EXPORT Functions := MODULE
 													 cfg[1].DRM,
 													 include_dod := false);	// Athough this is the default value, we include it to remark the fact that DOD is not been fetched from here.
 													 
-		layouts.layout_ssns_freq get_provider_ssns(layouts.layout_sanc_DID l, recordof(outfile) r) := transform
+		Healthcare_Header_Services.layouts.layout_ssns_freq get_provider_ssns(Healthcare_Header_Services.layouts.layout_sanc_DID l, recordof(outfile) r) := transform
 			self.ssn := r.ssn;
+			self.dob_raw := r.dob;
 			self := l;
 		end;
 													 
 		f_ssns := join(byDids, outfile,
 										(left.did = right.did) and (RIGHT.Valid_SSN = 'G' or RIGHT.Valid_SSN = ' ' or RIGHT.Valid_SSN = ''),
-										get_provider_ssns(left, right),keep(Constants.MAX_RECS_ON_JOIN),limit(0))(ssn<>'');
+										get_provider_ssns(left, right),keep(Healthcare_Header_Services.Constants.MAX_RECS_ON_JOIN),limit(0))(ssn<>'');
 									
 		//Check to see if we have a match to user criteria
 		f_ssns_best := join(input,f_ssns,left.acctno=right.acctno and left.ProviderID= right.ProviderID,
-														transform(layouts.layout_ssns_bestHit,
+														transform(Healthcare_Header_Services.layouts.layout_ssns_bestHit,
 															self.besthit:=if(trim(left.UserSSN,all)=trim(right.ssn,all) and left.UserSSN<>'',true,false);
 															self:=left;
-															self:=right),keep(Constants.MAX_RECS_ON_JOIN),limit(0));
+															self:=right),keep(Healthcare_Header_Services.Constants.MAX_RECS_ON_JOIN),limit(0));
 			
 		
 		//Group and Dedupe
-		f_ssns_BestOnly := project(f_ssns_best(besthit=true),layouts.layout_ssns);
+		f_ssns_BestOnly := project(f_ssns_best(besthit=true),transform(Healthcare_Header_Services.layouts.layout_ssns,self:=left;self:=[]));
 		f_ssns_GetOthers := join(f_ssns,f_ssns_BestOnly,left.acctno=right.acctno and left.ProviderID= right.ProviderID,left only);
 		//If we are not returning the user value, then base the best on frequence and only return the highest one.
 		f_ssns_OthersWithFreq := dedup(sort(f_ssns_GetOthers,acctno,ProviderID,-freq),acctno,ProviderID);
-		f_ssns_OthersWithHighestFreq := project(f_ssns_OthersWithFreq,layouts.layout_ssns);
+		f_ssns_OthersWithHighestFreq := project(f_ssns_OthersWithFreq,Healthcare_Header_Services.layouts.layout_ssns);
 		f_ssns_final := sort(f_ssns_BestOnly+f_ssns_OthersWithHighestFreq,acctno,ProviderID);
 		//Masking for SSN 
 		doxie.MAC_PruneOldSSNs(f_ssns_final, out_ssn_pruned, ssn, providerid);
-		suppress.MAC_Mask(out_ssn_pruned, f_ssns_masked, ssn, blank, true, false,,,,ssn_mask_val);
-		layouts.layout_child_ssns doRollup(layouts.layout_ssns l, dataset(layouts.layout_ssns) r) := TRANSFORM
+		suppress.MAC_Mask_Date(out_ssn_pruned, f_dob_masked, dob_raw, dob,dob_mask_val);
+		suppress.MAC_Mask(f_dob_masked, f_ssns_masked, ssn, blank, true, false,,,,ssn_mask_val);
+		Healthcare_Header_Services.layouts.layout_child_ssns doRollup(Healthcare_Header_Services.layouts.layout_ssns l, dataset(Healthcare_Header_Services.layouts.layout_ssns) r) := TRANSFORM
 			SELF.acctno := l.acctno;
 			self.ProviderID := l.ProviderID;
 			self.childinfo := r;
@@ -999,26 +990,27 @@ EXPORT Functions := MODULE
 		// output(f_ssns_final,named('f_ssns_final'));
 		return results_rolled;
 	end;
-	Export appendSSN (dataset(layouts.layout_slim) inputSlim, 
-										dataset(layouts.CombinedHeaderResultsDoxieLayout) inputRecs,
-										dataset(Layouts.common_runtime_config) cfg) := function
+	Export appendSSN (dataset(Healthcare_Header_Services.layouts.layout_slim) inputSlim, 
+										dataset(Healthcare_Header_Services.layouts.CombinedHeaderResultsDoxieLayout) inputRecs,
+										dataset(Healthcare_Header_Services.layouts.common_runtime_config) cfg) := function
 		fmtRec_SSN := getSSN(inputSlim, cfg);
 		results := join(inputRecs,fmtRec_SSN, left.acctno=right.acctno and left.LNPID=(integer)right.providerid,
-																		transform(layouts.CombinedHeaderResultsDoxieLayout,
-																							self.SSNs := project(right.childinfo,transform(Layouts.layout_ssn, self.SSN:=left.SSN));
+																		transform(Healthcare_Header_Services.layouts.CombinedHeaderResultsDoxieLayout,
+																							self.dobs := if(exists(left.dobs),left.dobs,project(right.childinfo,transform(Healthcare_Header_Services.layouts.layout_dob,self.dob:=left.dob.year+left.dob.month+left.dob.day)));
+																							self.SSNs := project(right.childinfo,transform(Healthcare_Header_Services.layouts.layout_ssn, self.SSN:=left.SSN));
 																							self.SSNLookups := right.childinfo;
 																							self := left),left outer);
 		return results;
 	end;
-	Export doCheckDeath(dataset(layouts.layout_slim) input) := Function
+	Export doCheckDeath(dataset(Healthcare_Header_Services.layouts.layout_slim) input) := Function
 			deathparams := DeathV2_Services.IParam.GetDeathRestrictions(gm);
 			glb_ok := deathparams.isValidGlb();
-			byDids := normalize(input,left.dids,transform(Layouts.layout_death_DID,self.acctno := left.acctno;self.ProviderID:=left.ProviderID;self.did:=right.did;self.ssn:=if(left.UserSSNFound,left.UserSSN,'');self.freq:=right.freq;self.dob:=if(left.UserDOBFound,left.UserDOB[1..6],'');self.UserSSNFound:=left.UserSSNFound;self:=[]));
+			byDids := normalize(input,left.dids,transform(Healthcare_Header_Services.layouts.layout_death_DID,self.acctno := left.acctno;self.ProviderID:=left.ProviderID;self.did:=right.did;self.ssn:=if(left.UserSSNFound,left.UserSSN,'');self.freq:=right.freq;self.dob:=if(left.UserDOBFound,left.UserDOB[1..6],'');self.UserSSNFound:=left.UserSSNFound;self:=[]));
 			byDids_BestFreq := dedup(sort(byDids,acctno,ProviderID,-freq),acctno,ProviderID);
       deathRecs			:=dx_death_master.Get.byDid(byDids,did, deathparams);
 			death_BestHit := join(byDids(SSN<>''),deathRecs,			
 									left.did = right.did,
-									transform(layouts.layout_death_BestHit,
+									transform(Healthcare_Header_Services.layouts.layout_death_BestHit,
 										matchbyDOB := left.dob <> '' and left.dob[1..6]=right.death.dob8[1..6];
 										matchbySSN := left.UserSSNFound and left.SSN = right.death.ssn;
 										keepRecord := map(matchbyDOB or matchbySSN => true,
@@ -1027,45 +1019,40 @@ EXPORT Functions := MODULE
 																		 true);
 										self.acctno:=if(keepRecord,left.acctno,skip); self.providerid :=left.providerid;self.death_ind:=true;self.dod:=right.death.dod8;self.besthit:=if(left.UserSSNFound and left.SSN=right.death.SSN,true,false)),
 									keep(1), limit(0));
-			death_BestHitFmt := project(death_BestHit(besthit=true),layouts.layout_death);
+			death_BestHitFmt := project(death_BestHit(besthit=true),Healthcare_Header_Services.layouts.layout_death);
 			//if you don't have the best record based on a match to user input, use the best freq.
 			death_NotBestHit := join(byDids_BestFreq,death_BestHit(besthit=false),left.acctno=right.acctno and left.ProviderID= right.ProviderID,transform(right));
-			death_NotBestHitFmt := project(death_NotBestHit,layouts.layout_death);
+			death_NotBestHitFmt := project(death_NotBestHit,Healthcare_Header_Services.layouts.layout_death);
 			death_final := death_BestHitFmt+death_NotBestHitFmt;
 		return death_final;
 	end;
-	Export appendDeath (dataset(layouts.layout_slim) inputSlim, 
-											dataset(layouts.CombinedHeaderResultsDoxieLayout) inputRecs) := function
+	Export appendDeath (dataset(Healthcare_Header_Services.layouts.layout_slim) inputSlim, 
+											dataset(Healthcare_Header_Services.layouts.CombinedHeaderResultsDoxieLayout) inputRecs) := function
 		updateSSN := join(inputRecs,inputSlim,left.acctno=right.acctno and left.lnpid=(integer)right.providerid,
-													transform(layouts.layout_slim,self.UserSSNFound:=exists(left.ssns(ssn=right.userSSN));self:=right),
-													keep(Constants.MAX_RECS_ON_JOIN), limit(0));
+													transform(Healthcare_Header_Services.layouts.layout_slim,self.UserSSNFound:=exists(left.ssns(ssn=right.userSSN));self:=right),
+													keep(Healthcare_Header_Services.Constants.MAX_RECS_ON_JOIN), limit(0));
 		fmtRec_Death := sort(doCheckDeath(updateSSN),acctno,providerid,-dod);
 		results := join(inputRecs,fmtRec_Death, left.acctno=right.acctno and left.lnpid=(integer)right.providerid,
-																		transform(layouts.CombinedHeaderResultsDoxieLayout,
-																							self.DeathLookup := right.death_ind;
-																							self.DateofDeath := right.dod;
+																		transform(Healthcare_Header_Services.layouts.CombinedHeaderResultsDoxieLayout,
+																							self.DeathLookup := if(left.src=Healthcare_Header_Services.constants.SRC_SOAP_HCP, left.DateofDeath<>'',right.death_ind);
+																							self.DateofDeath := if(left.src=Healthcare_Header_Services.constants.SRC_SOAP_HCP,left.DateofDeath,right.dod);
 																							self := left),left outer);
-
-
-
-
-
 		// output(inputSlim);
 		// output(inputRecs);
 		// output(updateSSN);
 		return results;
 	end;
 	//Validation Functions
-	EXPORT getNPPESByNPI(dataset(Layouts.NPPES_Layouts.layout_npiid) NPIRec) := FUNCTION
+	EXPORT getNPPESByNPI(dataset(Healthcare_Header_Services.layouts.NPPES_Layouts.layout_npiid) NPIRec) := FUNCTION
 		npi_key := NPPES.Key_NPPES_npi;
 		nppes_ids_bynpi := join(NPIRec, npi_key, Keyed(left.npi_id = right.npi),
-														transform(recordof(Layouts.NPPES_Layouts.temp_layout), self := right),keep(Constants.MAX_RECS_ON_JOIN), limit(0));
+														transform(recordof(Healthcare_Header_Services.layouts.NPPES_Layouts.temp_layout), self := right),keep(Healthcare_Header_Services.Constants.MAX_RECS_ON_JOIN), limit(0));
 		RETURN nppes_ids_bynpi;
 	END;
 	
 	
 	
-	export AppendAffiliations(dataset(Healthcare_Header_Services.Layouts.CombinedHeaderResultsDoxieLayout) resultRecs,dataset(Layouts.common_runtime_config) cfg):=function 
+	export AppendAffiliations(dataset(Healthcare_Header_Services.Layouts.CombinedHeaderResultsDoxieLayout) resultRecs,dataset(Healthcare_Header_Services.layouts.common_runtime_config) cfg):=function 
 	  affiliates:= PROJECT(resultRecs(srcBusinessHeader),TRANSFORM(Healthcare_Affiliations.Layouts.batch_in,
 																																	self.acctno:=(integer)left.acctno;
 																																	self.entityid:=(string)left.lnpid;
@@ -1073,7 +1060,7 @@ EXPORT Functions := MODULE
 	  cfg1:=project(cfg[1],transform(Healthcare_Affiliations.Layouts.RunTimeConfig,
 				                           self.maxAddressesPerMatch:=Healthcare_Affiliations.Constants.MaxAddressesPerMatch,self:=[];));
 	  rawrecaffialites:=Healthcare_Affiliations.Raw.getRecords(affiliates, cfg1);//Rollup
-	  fmtrawrecaffialites := project(rawrecaffialites ,transform(Layouts.layout_newaffiliates,
+	  fmtrawrecaffialites := project(rawrecaffialites ,transform(Healthcare_Header_Services.layouts.layout_newaffiliates,
 																																 self.acctno:=(string)left.acctno;
 																																 self.providerid:=(integer)left.SourceID;
 																																 self.effective := iesp.ECL2ESP.t_DateToString8(left.Effective);
@@ -1103,18 +1090,18 @@ EXPORT Functions := MODULE
 																																// self.Specialty1:=left.Specialties.Specialty;
 																																 self:=left;));
 						
-	  layouts.layout_child_newaffiliates doRollup(Layouts.layout_newaffiliates l, dataset(Layouts.layout_newaffiliates) r) := TRANSFORM
+	  Healthcare_Header_Services.layouts.layout_child_newaffiliates doRollup(Healthcare_Header_Services.layouts.layout_newaffiliates l, dataset(Healthcare_Header_Services.layouts.layout_newaffiliates) r) := TRANSFORM
 		         SELF.acctno := l.acctno;
 		         self.ProviderID :=l.ProviderID;
-		         self.childinfo := choosen(r,iesp.constants.HPR.MAX_AFFILIATIONS);//fix to right constant
+		         self.childinfo := choosen(r,iesp.Constants.HPR.MAX_AFFILIATIONS);//fix to right constant
 	  END;
 	  results_rolled := rollup(group(sort(fmtrawrecaffialites,acctno,ProviderID),acctno,ProviderID),group,doRollup(left,rows(left)));
     final_affrecs:=Join(resultRecs,results_rolled, left.acctno=(string)right.acctno and 
 																								   left.lnpid = (integer)right.ProviderID, 
-																								   transform(layouts.CombinedHeaderResultsDoxieLayout,
+																								   transform(Healthcare_Header_Services.layouts.CombinedHeaderResultsDoxieLayout,
 	                                                           self.newaffiliations := right.childinfo;
 										                                         self := left), 
-																														 left outer,keep(Constants.MAX_RECS_ON_JOIN), limit(0));//keep and limit
+																														 left outer,keep(Healthcare_Header_Services.Constants.MAX_RECS_ON_JOIN), limit(0));//keep and limit
     return final_affrecs;
 	end;
 end;

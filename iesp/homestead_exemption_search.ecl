@@ -24,6 +24,7 @@ end;
 export t_HomesteadExemptionSearchBy := record
 	string4 TaxYear {xpath('TaxYear')};
 	string2 TaxState {xpath('TaxState')};
+	integer ExemptionAmount {xpath('ExemptionAmount')};
 	iesp.share.t_Address Address {xpath('Address')};
 	dataset(t_HEOwner) Owners {xpath('Owners/Owner'), MAXCOUNT(iesp.constants.hmstdExmptn.MAX_OWNERS)};
 end;
@@ -141,6 +142,13 @@ export t_HEPropertyRecord := record
 	string7 VoterAddressMatch {xpath('VoterAddressMatch')};
 end;
 
+export t_HomesteadExemptionRiskCodes := record
+	unsigned1 Code {xpath('Code')};
+	string80 Description {xpath('Description')};
+	string4 Indicator {xpath('Indicator')}; //values['Pass','Fail','Warn','']
+	iesp.share.t_Date TransactionDate {xpath('TransactionDate')};
+end;
+
 export t_HomesteadExemptionRecord := record
 	string12 LexId {xpath('LexId')};
 	string4 LexIdScore {xpath('LexIdScore')};
@@ -152,6 +160,7 @@ export t_HomesteadExemptionRecord := record
 	t_HEDriver Driver {xpath('Driver')};
 	t_HEVoter Voter {xpath('Voter')};
 	dataset(t_HEPropertyRecord) Properties {xpath('Properties/Property'), MAXCOUNT(iesp.constants.hmstdExmptn.MAX_PROPERTIES)};
+	dataset(t_HomesteadExemptionRiskCodes) RiskCodes {xpath('RiskCodes/RiskCode'), MAXCOUNT(iesp.constants.hmstdExmptn.MAX_RISKCODES)};
 end;
 
 export t_HomesteadExemptionSearchResponse := record

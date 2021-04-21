@@ -12,14 +12,15 @@ string typeGSA2 := 'EXCLUDED/DELETED';
 
 sanctions_ids_raw := dataset(sanction_id_set, {unsigned6 sanction_id});
 // peal off Header Sanction ID's and process them
-sanctions_ids_hdr := sanctions_ids_raw(sanction_id > 1000000);
+// sanctions_ids_hdr := sanctions_ids_raw(sanction_id > 1000000);
+sanctions_ids_hdr := sanctions_ids_raw;
 getHdrIDs_fromSanctionID := dedup(project(sanctions_ids_hdr,transform(recordof(sanctions_ids_hdr),self.sanction_id:=(integer)((STRING)left.sanction_id)[1..(length((string)left.sanction_id)-3)])),all);
 // Get header records for this Sanction
 newlayout  := Healthcare_Header_Services.Layouts.autokeyInput;
 ds:=project(getHdrIDs_fromSanctionID, transform(newlayout,
 												 self.acctno:='1';
 												 self.ProviderID := left.sanction_id; 
-												 self.ProviderSrc := 'H';
+												 self.ProviderSrc := 'P';
 												 self:=[];));
 Healthcare_Header_Services.Layouts.common_runtime_config buildConfig():=transform
 	 self.glb_ok := ut.glb_ok (gm.GLBPurpose);
@@ -42,7 +43,8 @@ filterResponse2 := rawdata2(exists(legacysanctions));
 fmtHdrRecs2 := project(filterResponse2.LegacySanctions,transform(out_rec,self.sanc_id:=(string)left.sanc_id;self:=left;self:=[]));
 
 //If there are legacy gap file sanction ids get them
-sanctions_ids := sanctions_ids_raw(sanction_id < 10000000);//Gap file records
+// sanctions_ids := sanctions_ids_raw(sanction_id < 10000000);//Gap file records
+sanctions_ids := sanctions_ids_raw;//Gap file records  review these as we might get bad matches and need to filter them out.
 
 sanctions_id_key := doxie_files.key_sanctions_sancid;
 
