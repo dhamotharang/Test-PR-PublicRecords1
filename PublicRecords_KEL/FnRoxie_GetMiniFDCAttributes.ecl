@@ -32,14 +32,11 @@ EXPORT FnRoxie_GetMiniFDCAttributes(DATASET(PublicRecords_KEL.ECL_Functions.Layo
 						
 	CleanInputs := getids(P_LexID  > 0 and (INTEGER)p_inpclnarchdt <> 0);
 									
-	LayoutFCRAPersonAttributes := RECORD
+	LayoutPersonAttributes := RECORD
 		INTEGER g_uid;
-		Dataset({RECORDOF(PublicRecords_KEL.Q_Non_F_C_R_A_Mini_Attributes_V1_Roxie_Dynamic([], 0, PublicRecords_KEL.CFG_Compile.Permit__NONE).res0)}) attributes;
+		Dataset({RECORDOF(PublicRecords_KEL.Q_Mini_Attributes_V1_Roxie_Dynamic([], 0, PublicRecords_KEL.CFG_Compile.Permit__NONE, Options.IsFCRA).res0)}) attributes;
 	END;
-	LayoutNonFCRAPersonAttributes := RECORD
-		INTEGER g_uid;
-		Dataset({RECORDOF(PublicRecords_KEL.Q_F_C_R_A_Mini_Attributes_V1_Roxie_Dynamic([], 0, PublicRecords_KEL.CFG_Compile.Permit__NONE).res0)}) attributes;
-	END;
+
 	
 	FDCRolled := ROLLUP(SORT(FDCDataset, UIDAppend, RepNumber), LEFT.UIDAppend = RIGHT.UIDAppend, TRANSFORM(RECORDOF(LEFT),
 		SELF.Dataset_Header__key_ADL_segmentation := LEFT.Dataset_Header__key_ADL_segmentation + RIGHT.Dataset_Header__key_ADL_segmentation,
@@ -53,95 +50,92 @@ EXPORT FnRoxie_GetMiniFDCAttributes(DATASET(PublicRecords_KEL.ECL_Functions.Layo
 	// For business transactions, Rep 1 and Rep 6 lexids are input as a set in one row to KEL, so we need to denorm the FDC to include both the 6th rep data and all the other business/rep data.
 	MiniAttributesInput := DENORMALIZE(CleanInputs, FDCRolled, LEFT.g_uid = RIGHT.UIDAppend, TRANSFORM(temp, SELF.FDCDataset := DATASET(RIGHT), SELF := LEFT));
 	
-	NonFCRAPersonAttributesRaw := NOCOMBINE(PROJECT(MiniAttributesInput,
-		TRANSFORM(LayoutNonFCRAPersonAttributes,
+	PersonAttributesRaw := NOCOMBINE(PROJECT(MiniAttributesInput,
+		TRANSFORM(LayoutPersonAttributes,
 			SELF.g_uid := LEFT.g_uid;
-			NonFCRAPersonResults := PublicRecords_KEL.Q_Non_F_C_R_A_Mini_Attributes_V1_Roxie_Dynamic(LEFT.ids, (INTEGER)(LEFT.P_InpClnArchDt[1..8]), Options.KEL_Permissions_Mask, LEFT.FDCDataset).res0;	
-			SELF.attributes := NonFCRAPersonResults;
-			SELF := [])));
-		
-	FCRAPersonAttributesRaw := NOCOMBINE(PROJECT(MiniAttributesInput,
-		TRANSFORM(LayoutFCRAPersonAttributes,
-			SELF.g_uid := LEFT.g_uid;
-			FCRAPersonResults := PublicRecords_KEL.Q_F_C_R_A_Mini_Attributes_V1_Roxie_Dynamic(LEFT.ids, (INTEGER)(LEFT.P_InpClnArchDt[1..8]), Options.KEL_Permissions_Mask, LEFT.FDCDataset).res0;	
-			SELF.attributes := FCRAPersonResults;
+			PersonResults := PublicRecords_KEL.Q_Mini_Attributes_V1_Roxie_Dynamic(LEFT.ids, (INTEGER)(LEFT.P_InpClnArchDt[1..8]), Options.KEL_Permissions_Mask, Options.IsFCRA, LEFT.FDCDataset).res0;	
+			SELF.attributes := PersonResults;
 			SELF := [])));
 
 		
-	FinalnonFCRA := RECORD
+	Final := RECORD
 		INTEGER g_uid;
-		RECORDOF(PublicRecords_KEL.Q_Non_F_C_R_A_Mini_Attributes_V1_Roxie_Dynamic([], 0, PublicRecords_KEL.CFG_Compile.Permit__NONE).res0);
-	END;	
-	FinalFCRA := RECORD
-		INTEGER g_uid;
-		RECORDOF(PublicRecords_KEL.Q_F_C_R_A_Mini_Attributes_V1_Roxie_Dynamic([], 0, PublicRecords_KEL.CFG_Compile.Permit__NONE).res0);
+		RECORDOF(PublicRecords_KEL.Q_Mini_Attributes_V1_Roxie_Dynamic([], 0, PublicRecords_KEL.CFG_Compile.Permit__NONE, Options.IsFCRA).res0);
 	END;
 	
-	FinalnonFCRA Normalize_FinalnonFCRA(RecordOF(LayoutNonFCRAPersonAttributes.attributes) ri, LayoutNonFCRAPersonAttributes le) := TRANSFORM
+	Final Normalize_Final(RecordOF(LayoutPersonAttributes.attributes) ri, LayoutPersonAttributes le) := TRANSFORM
 		SELF.g_uid := le.g_uid;
 		SELF := ri;
 		SELF := le;
 	END;
 			
-	FinalFCRA Normalize_FinalFCRA(RecordOF(LayoutFCRAPersonAttributes.attributes) ri, LayoutFCRAPersonAttributes le) := TRANSFORM
-		SELF.g_uid := le.g_uid;	
-		SELF := ri;
-		SELF := le;
-	END;
-		
-	norm_nonFCRA := normalize(NonFCRAPersonAttributesRaw, left.attributes, Normalize_FinalnonFCRA(RIGHT,LEFT));
-	norm_FCRA := normalize(FCRAPersonAttributesRaw, left.attributes, Normalize_FinalFCRA(RIGHT,LEFT));
+
+	norm := normalize(PersonAttributesRaw, left.attributes, Normalize_Final(RIGHT,LEFT));	
 	
-	
-	PersonAttributesClean := IF(Options.IsFCRA, 
-															KEL.Clean(norm_FCRA, TRUE, TRUE, TRUE),
-															KEL.Clean(norm_nonFCRA, TRUE, TRUE, TRUE));	
+	PersonAttributesClean := KEL.Clean(norm, TRUE, TRUE, TRUE);	
 	
 	PersonAttributesWithLexID := JOIN(RecordsWithLexID, PersonAttributesClean, LEFT.g_uid = RIGHT.g_uid AND LEFT.P_LexID  = RIGHT.LexID, 
 		TRANSFORM(PublicRecords_KEL.ECL_Functions.Layouts.LayoutInputPII,
-			ResultsFound := RIGHT.LexID > 0;
-			P_LexIDSeenFlag := IF(ResultsFound,RIGHT.P_LexIDSeenFlag,'0');
-			LexIDNotOnFile := P_LexIDSeenFlag = '0';
-			self.CurrentAddrPrimRng :=  IF(ResultsFound, RIGHT.CurrentAddrPrimRng, '');
-			self.CurrentAddrPreDir:= IF(ResultsFound, RIGHT.CurrentAddrPreDir, '');
-			self.CurrentAddrPrimName:= IF(ResultsFound, RIGHT.CurrentAddrPrimName, '');
-			self.CurrentAddrSffx:= IF(ResultsFound, RIGHT.CurrentAddrSffx, '');
-			self.CurrentAddrPostDir := IF(ResultsFound, RIGHT.CurrentPostdirectional, '');
-			self.CurrentAddrSecRng:= IF(ResultsFound, RIGHT.CurrentAddrSecRng, '');
-			self.CurrentAddrState:= IF(ResultsFound, RIGHT.CurrentAddrState, '');
-			self.CurrentAddrZip5:= IF(ResultsFound, (STRING)RIGHT.CurrentAddrZip5, '');
-			self.CurrentAddrStateCode:= IF(ResultsFound, (STRING)RIGHT.CurrentAddrStateCode, '');
-			self.CurrentAddrCnty:= IF(ResultsFound, (STRING)RIGHT.CurrentAddrCnty, '');
-			self.CurrentAddrGeo:= IF(ResultsFound, (STRING)RIGHT.CurrentAddrGeo, '');
-			self.CurrentAddrCity:= IF(ResultsFound, (STRING)RIGHT.CurrentAddrCity, '');
-			self.PreviousAddrPrimRng:= IF(ResultsFound, RIGHT.PreviousAddrPrimRng, '');
-			self.PreviousAddrPreDir:= IF(ResultsFound, RIGHT.PreviousAddrPreDir, '');
-			self.PreviousAddrPrimName:= IF(ResultsFound, RIGHT.PreviousAddrPrimName, '');
-			self.PreviousAddrSffx:= IF(ResultsFound, RIGHT.PreviousAddrSffx, '');
-			self.PreviousAddrPostDir:= IF(ResultsFound, RIGHT.PreviousPostdirectional, '');
-			self.PreviousAddrSecRng:= IF(ResultsFound, RIGHT.PreviousAddrSecRng, '');
-			self.PreviousAddrState:= IF(ResultsFound, RIGHT.PreviousAddrState, '');
-			self.PreviousAddrZip5:= IF(ResultsFound, (STRING)RIGHT.PreviousAddrZip5, '');
-			self.PreviousAddrStateCode:= IF(ResultsFound, (STRING)RIGHT.PreviousAddrStateCode, '');
-			self.PreviousAddrCnty:= IF(ResultsFound, (STRING)RIGHT.PreviousAddrCnty, '');
-			self.PreviousAddrGeo:= IF(ResultsFound, (STRING)RIGHT.PreviousAddrGeo, '');
-			self.EmergingAddrPrimRng:= IF(ResultsFound, RIGHT.EmergingAddrPrimRng, '');
-			self.EmergingAddrPreDir:= IF(ResultsFound, RIGHT.EmergingAddrPreDir, '');
-			self.EmergingAddrPrimName:= IF(ResultsFound, RIGHT.EmergingAddrPrimName, '');
-			self.EmergingAddrSffx:= IF(ResultsFound, RIGHT.EmergingAddrSffx, '');
-			self.EmergingAddrPostDir:= IF(ResultsFound, RIGHT.EmergingPostdirectional, '');
-			self.EmergingAddrSecRng:= IF(ResultsFound, RIGHT.EmergingAddrSecRng, '');
-			self.EmergingAddrState:= IF(ResultsFound, RIGHT.EmergingAddrState, '');
-			self.EmergingAddrZip5:= IF(ResultsFound, (STRING)RIGHT.EmergingAddrZip5, '');
-			self.EmergingAddrStateCode:= IF(ResultsFound, (STRING)RIGHT.EmergingAddrStateCode, '');
-			self.EmergingAddrCnty:= IF(ResultsFound, (STRING)RIGHT.EmergingAddrCnty, '');
-			self.EmergingAddrGeo:= IF(ResultsFound, (STRING)RIGHT.EmergingAddrGeo, '');
+			SELF.CurrentAddrPrimRng := RIGHT.PrepCurrentAddrPrimRng;
+			SELF.CurrentAddrPreDir := RIGHT.PrepCurrentAddrPreDir;
+			SELF.CurrentAddrPrimName := RIGHT.PrepCurrentAddrPrimName;
+			SELF.CurrentAddrPostDir  := RIGHT.PrepCurrentPostdirectional;
+			SELF.CurrentAddrSffx := RIGHT.PrepCurrentAddrSffx;
+			SELF.CurrentAddrSecRng := RIGHT.PrepCurrentAddrSecRng;
+			SELF.CurrentAddrState := RIGHT.PrepCurrentAddrState;
+			SELF.CurrentAddrZip5 := RIGHT.PrepCurrentAddrZip5;
+			SELF.CurrentAddrZip4 := RIGHT.PrepCurrentAddrZip4;
+			SELF.CurrentAddrStateCode := RIGHT.PrepCurrentAddrStateCode;
+			SELF.CurrentAddrCnty := RIGHT.PrepCurrentAddrCnty;
+			SELF.CurrentAddrGeo := RIGHT.PrepCurrentAddrGeo;
+			SELF.CurrentAddrCity  := RIGHT.PrepCurrentAddrCity;
+			SELF.CurrentAddrLat := RIGHT.PrepCurrentAddrLat;
+			SELF.CurrentAddrLng := RIGHT.PrepCurrentAddrLng;
+			SELF.CurrentAddrUnitDesignation := RIGHT.PrepCurrentAddrUnitDesignation;
+			SELF.CurrentAddrType := RIGHT.PrepCurrentAddrType;
+			SELF.CurrentAddrStatus := RIGHT.PrepCurrentAddrStatus;
+			SELF.CurrentAddrDateFirstSeen := RIGHT.PrepCurrentAddrDateFirstSeen;
+			SELF.CurrentAddrDateLastSeen := RIGHT.PrepCurrentAddrDateLastSeen;
+			SELF.CurrentAddrFull  := RIGHT.PrepCurrentAddrFull;
+			SELF.PreviousAddrPrimRng := RIGHT.PrepPreviousAddrPrimRng;
+			SELF.PreviousAddrPreDir := RIGHT.PrepPreviousAddrPreDir;
+			SELF.PreviousAddrPrimName := RIGHT.PrepPreviousAddrPrimName;
+			SELF.PreviousAddrPostdir := RIGHT.PrepPreviousPostdirectional;
+			SELF.PreviousAddrSffx := RIGHT.PrepPreviousAddrSffx;
+			SELF.PreviousAddrSecRng := RIGHT.PrepPreviousAddrSecRng;
+			SELF.PreviousAddrState := RIGHT.PrepPreviousAddrState;
+			SELF.PreviousAddrZip5 := RIGHT.PrepPreviousAddrZip5;
+			SELF.PreviousAddrZip4 := RIGHT.PrepPreviousAddrZip4;
+			SELF.PreviousAddrStateCode := RIGHT.PrepPreviousAddrStateCode;
+			SELF.PreviousAddrCnty := RIGHT.PrepPreviousAddrCnty;
+			SELF.PreviousAddrGeo := RIGHT.PrepPreviousAddrGeo;
+			SELF.PreviousAddrCity := RIGHT.PrepPreviousAddrCity;
+			SELF.PreviousAddrLat := RIGHT.PrepPreviousAddrLat;
+			SELF.PreviousAddrLng := RIGHT.PrepPreviousAddrLng;
+			SELF.PreviousAddrUnitDesignation := RIGHT.PrepPreviousAddrUnitDesignation;
+			SELF.PreviousAddrType := RIGHT.PrepPreviousAddrType;
+			SELF.PreviousAddrStatus := RIGHT.PrepPreviousAddrStatus;
+			SELF.PreviousAddrDateFirstSeen := RIGHT.PrepPreviousAddrDateFirstSeen;
+			SELF.PreviousAddrDateLastSeen := RIGHT.PrepPreviousAddrDateLastSeen;
+			SELF.PreviousAddrFull := RIGHT.PrepPreviousAddrFull;
+			
+			self.EmergingAddrPrimRng:= RIGHT.EmergingAddrPrimRng;
+			self.EmergingAddrPreDir:= RIGHT.EmergingAddrPreDir;
+			self.EmergingAddrPrimName:= RIGHT.EmergingAddrPrimName;
+			self.EmergingAddrSffx:= RIGHT.EmergingAddrSffx;
+			self.EmergingAddrPostDir:= RIGHT.EmergingPostdirectional;
+			self.EmergingAddrSecRng:= RIGHT.EmergingAddrSecRng;
+			self.EmergingAddrState:= RIGHT.EmergingAddrState;
+			self.EmergingAddrZip5:= (STRING)RIGHT.EmergingAddrZip5;
+			self.EmergingAddrStateCode:= (STRING)RIGHT.EmergingAddrStateCode;
+			self.EmergingAddrCnty:= (STRING)RIGHT.EmergingAddrCnty;
+			self.EmergingAddrGeo:= (STRING)RIGHT.EmergingAddrGeo;
 
-			SELF.BestNameFirst := IF(ResultsFound, (STRING)RIGHT.PL_BestNameFirst, '');
-			SELF.BestNameMid := IF(ResultsFound, (STRING)RIGHT.PL_BestNameMid, '');
-			SELF.BestNameLast := IF(ResultsFound, (STRING)RIGHT.PL_BestNameLast, '');
-			SELF.BestSSN := IF(ResultsFound, (STRING)RIGHT.PL_BestSSN, '');
-			SELF.BestDOB := IF(ResultsFound, (STRING)RIGHT.PL_BestDOB, '');
+			SELF.BestNameFirst := RIGHT.PL_BestNameFirst;
+			SELF.BestNameMid := RIGHT.PL_BestNameMid;
+			SELF.BestNameLast := RIGHT.PL_BestNameLast;;
+			SELF.BestSSN := RIGHT.PL_BestSSN;;
+			SELF.BestDOB := RIGHT.PL_BestDOB;;
 									
 			self.p_lexidscore := if(left.p_lexidscore =  (-1*PublicRecords_KEL.ECL_Functions.Constants.NO_DATA_FOUND_INT),PublicRecords_KEL.ECL_Functions.Constants.NO_DATA_FOUND_INT,left.p_lexidscore);//have to put this back
 			SELF := LEFT;

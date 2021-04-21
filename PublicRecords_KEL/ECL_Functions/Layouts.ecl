@@ -92,47 +92,52 @@ EXPORT Layouts := MODULE
 		BOOLEAN PullIDFlag;
 	END;
 	
-EXPORT LayoutAppendedAddresses := RECORD
+	EXPORT LayoutAppendedAddresses := RECORD
 		//current
 		STRING10 CurrentAddrPrimRng;
 		STRING6 CurrentAddrPreDir;
 		STRING28 CurrentAddrPrimName;
 		STRING6 CurrentAddrSffx;
 		STRING6 CurrentAddrPostDir;
-		STRING10 CurrentAddrUnitDesig;
+		STRING10 CurrentAddrUnitDesignation;
 		STRING8 CurrentAddrSecRng;
 		STRING25 CurrentAddrCity;
 		STRING6 CurrentAddrState;
 		STRING6 CurrentAddrZip5;
-		// STRING6 CurrentAddrZip4;
+		STRING6 CurrentAddrZip4;
 		// STRING CurrentAddrSt;
-		// STRING10 CurrentAddrLat;
-		// STRING11 CurrentAddrLng;
+		STRING10 CurrentAddrLat;
+		STRING11 CurrentAddrLng;
 		STRING6 CurrentAddrStateCode;	
 		STRING6 CurrentAddrCnty;
 		STRING7 CurrentAddrGeo;
-		// STRING6 CurrentAddrType;
-		// STRING6 CurrentAddrStatus;		
-		//previous
+		STRING6 CurrentAddrType;
+		STRING6 CurrentAddrStatus;		
+		STRING8 CurrentAddrDateFirstSeen;
+		STRING8 CurrentAddrDateLastSeen;
+		STRING CurrentAddrFull;
 		STRING10 PreviousAddrPrimRng;
 		STRING6 PreviousAddrPreDir;
 		STRING28 PreviousAddrPrimName;
 		STRING6 PreviousAddrSffx;
 		STRING6 PreviousAddrPostDir;
-		STRING10 PreviousAddrUnitDesig;
+		STRING10 PreviousAddrUnitDesignation;
 		STRING8 PreviousAddrSecRng;
-		// STRING25 PreviousAddrCity;
+		STRING25 PreviousAddrCity;
 		STRING6 PreviousAddrState;
 		STRING6 PreviousAddrZip5;
-		// STRING6 PreviousAddrZip4;
+		STRING6 PreviousAddrZip4;
 		// STRING PreviousAddrSt;
-		// STRING10 PreviousAddrLat;
-		// STRING11 PreviousAddrLng;
-		STRING6 PreviousAddrStateCode;
+		STRING10 PreviousAddrLat;
+		STRING11 PreviousAddrLng;
+		STRING6 PreviousAddrStateCode;	
 		STRING6 PreviousAddrCnty;
 		STRING7 PreviousAddrGeo;
-		// STRING6 PreviousAddrType;
-		// STRING6 PreviousAddrStatus;
+		STRING6 PreviousAddrType;
+		STRING6 PreviousAddrStatus;
+		STRING8 PreviousAddrDateFirstSeen;
+		STRING8 PreviousAddrDateLastSeen;
+		STRING PreviousAddrFull;
 		//Emerging Address
 		STRING10 EmergingAddrPrimRng;
 		STRING6 EmergingAddrPreDir;
@@ -158,7 +163,6 @@ EXPORT LayoutAppendedAddresses := RECORD
 		STRING20 BestNameLast;
 		STRING10 BestSSN;
 		STRING10 BestDOB;		
-		
 	END;		
 			
 	EXPORT LayoutInputPII := RECORD
