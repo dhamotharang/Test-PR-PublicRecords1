@@ -170,12 +170,16 @@ sysdate := (string)STD.date.today();
 	
 	LiensV2.Layout_Liens_Hogan xfmDefName(CleanDef L) := TRANSFORM
 		isCompany 	:= IF(L.INDIVBUSUN ='I' AND (TRIM(L.AKA_YN) = '' OR L.AKA_YN = 'I'),'0','1');
-		self.clean_def_pname				:= IF(L.nametype IN person_flags, L.cln_title+L.cln_fname+L.cln_mname+L.cln_lname+L.cln_suffix+'  ','');
+		self.clean_def_pname				:= MAP(L.nametype IN person_flags and L.generation <> '' => L.cln_title+L.cln_fname+L.cln_mname+L.cln_lname+L.generation+'  ',
+		                                   L.nametype IN person_flags and L.generation  = '' => L.cln_title+L.cln_fname+L.cln_mname+L.cln_lname+L.cln_suffix+'  ',
+		                                   '');
 		self.clean_def_cname				:= IF(isCompany = '1' OR L.nametype IN business_flags, L.DEFNAME,'');
 		self.clean_plaintiff_pname	:= '';
 		self.clean_plaintiff_cname 	:= '';
  		self.clean_atty_pname 			:= '';
 		self.clean_atty_cname 			:= '';
+		// self.DEFNAME                := MAP(L.generation <> '' and L.cln_suffix = '' and L.DEFNAME <> '' => trim(L.DEFNAME)+' '+L.generation,
+		                                   // L.DEFNAME);
 		self := L;
 	END;
 	
