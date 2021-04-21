@@ -17,6 +17,7 @@ EXPORT attrV202 := 'fraudpointattrv202';
 // EXPORT attrV203 := 'fraudpointattrv203';        //effectively removed, but leaving this here as a reminder
 EXPORT attrvparo := 'fraudpointattrvparo';
 EXPORT attrvTMX := 'fraudpointattrv202_diattrv1';
+EXPORT attrIDA := 'fraudintelattrv0.0';
 
 //The ‘fraudpoint2_models’ set are models that return risk indicies and so need the expanded layout.
 EXPORT fraudpoint2_models := ['fp1109_0', 'fp1109_9', 'fp1307_2', 'fp1307_1', 'fp31310_2',
@@ -38,7 +39,9 @@ EXPORT bill_to_ship_to_models := ['fp1409_2', 'fp1509_2'];
 EXPORT Paro_models := ['msn1803_1', 'rsn804_1'];	
 
 //Set of Fraud Intelligence models (IDA combined models)
-EXPORT IDA_models_set := ['fibn12010_0'];	
+EXPORT IDA_models_set := ['fibn12010_0'];
+EXPORT IDA_network_notify := 'netn12103_0';
+EXPORT IDA_non_models_set := [IDA_network_notify];
 EXPORT IDA_services := ['idareport', 'idareport_uat','idareport_retro'];															 															 
 																		 
 //The ‘custom_models’ set are all possible models and so add any new model name to this set.  
@@ -49,7 +52,7 @@ EXPORT XML_custom_models := ['fp3710_0', 'fp3904_1', 'fp3905_1', 'idn6051', 'fd5
                              'fp1510_2', 'fp1511_1', 'fp1512_1','fp31604_0', 'fp1610_1', 'fp1610_2', 'fp1609_1', 'fp1611_1', 'fp1606_1','fp1702_2',
                              'fp1702_1','fp1706_1','fp1609_2','fp1607_1', 'fp1712_0','fp1508_1','fp1802_1','fp1705_1','fp1801_1', 'fp1806_1',
                              'fp1710_1', Paro_models,'fp1803_1','fp1704_1','fp1902_1','di31906_0','fp1908_1', 'fp1909_1', 'fp1909_2','fp1907_1','fp1907_2',
-                             IDA_models_set];									
+                             IDA_models_set, IDA_non_models_set];									
 //Does your model have any vehicle fields (from Boca Shell).
 EXPORT DoVechicle_List  := ['fp31105_1','fp3904_1', 'fp1407_1', 'fp1407_2', 'fp1506_1','fp1509_2', 
                                     'fp31505_0', 'fp3fdn1505_0', 'fp31505_9', 'fp3fdn1505_9', 'fp1610_1', 
@@ -90,7 +93,7 @@ EXPORT List_detailed_model_description := ['ain801_1','fp31505_0','fp31505_9','f
                                            'fp1512_1','fp31604_0','fp1610_1','fp1610_2','fp1609_1','fp1611_1','fp1606_1','fp1702_2','fp1702_1','fp1706_1',
                                            'fp1609_2','fp1607_1','fp1712_0','fp1508_1','fp1802_1','fp1705_1','fp1801_1','fp1806_1','fp1710_1','fp1803_1',
                                            'fp1704_1','fp1902_1','di31906_0', 'fp1908_1', 'fp1909_1', 'fp1909_2', 'fp1907_1','fp1907_2', Paro_models,
-                                           IDA_models_set];																																														
+                                           IDA_models_set, IDA_non_models_set];																																														
 
 
 
@@ -113,6 +116,7 @@ END;
 EXPORT getModel_Description( STRING model_name) := FUNCTION
 
     FP_Model_Description := map(STD.STR.ToLowerCase(model_name) in IDA_models_set	                  => 'FraudIntelligence' + STD.STR.ToUpperCase(trim(model_name)),
+                                STD.STR.ToLowerCase(model_name) in IDA_non_models_set	              => 'FraudIntelligence' + STD.STR.ToUpperCase(trim(model_name)),
                                 STD.STR.ToLowerCase(model_name) in List_detailed_model_description	=> 'FraudPoint' + STD.STR.ToUpperCase(trim(model_name)),
                                                                                                        'FraudPoint');
     RETURN FP_Model_Description;
@@ -186,6 +190,7 @@ EXPORT getBilling_Index (STRING model_name)  := FUNCTION
               'fp1907_1'     => Risk_Indicators.BillingIndex.FP1907_1,
               'fp1907_2'     => Risk_Indicators.BillingIndex.FP1907_2,
               'fibn12010_0'  => Risk_Indicators.BillingIndex.FIBN12010_0,
+              'netn12103_0'  => Risk_Indicators.BillingIndex.NETN12103_0,
               ''
                );
 	    RETURN FP_BillingIndex;

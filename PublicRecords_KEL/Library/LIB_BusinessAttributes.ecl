@@ -7,7 +7,7 @@ EXPORT LIB_BusinessAttributes(DATASET(PublicRecords_KEL.ECL_Functions.Layouts.La
 			DATASET(PublicRecords_KEL.ECL_Functions.Layouts_FDC().Layout_FDC) FDCDataset,
 			PublicRecords_KEL.Interface_Options Options) := MODULE
 	#OPTION('expandSelectCreateRow', TRUE);
-
+	#OPTION('foldStored', TRUE);
 
 	InputPIIBIIAttributes := PublicRecords_KEL.FnRoxie_GetInputBIIAttributes(InputData, RepInput, Options);
 

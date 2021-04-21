@@ -26,7 +26,7 @@ EXPORT LIB_RiskView_Models ( GROUPED DATASET(Risk_Indicators.Layout_Boca_Shell) 
   SHARED IDAattrs := arguments.IDA_Attrs;
 
 	// EXPORT ValidatingModel := Models.RVG1809_1_0(BocaShell); // Change this to the model you are tring to validate
-	EXPORT ValidatingModel := Models.getCreditLuciModels(blankshell, attrv5, blankIDA).RVA2008_1; // Change this to the model you are tring to validate
+	EXPORT ValidatingModel := Models.getCreditLuciModels(BocaShell, attrv5, IDAattrs, customInputs).RVS2005_0; // Change this to the model you are tring to validate
 	
 	
 	// Version 4.0
@@ -115,58 +115,63 @@ By us adding 70 in ECL, the logger will convert it to be the same value that ESP
 that is sent INTO calcindex for ECL.
 */
 
-	EXPORT ValidV50Models := DATASET([// Model Name |    Output Name     | Model Index   | Model Type
-                                    //     v      |         v          |    v          |    v
-                                    {'RVS1706_0', MType_S+'RVS1706_0', calcIndex( 39), '0-999', 0}, //RV Crossindustry Flaghips
-                                    {'RVA1503_0', MType_A+'RVA1503_0', calcIndex( 40), '0-999', 0},
-                                    {'RVB1503_0', MType_B+'RVB1503_0', calcIndex( 41), '0-999', 0},
-                                    {'RVG1502_0', MType_G+'RVG1502_0', calcIndex( 42), '0-999', 0},
-                                    {'RVT1503_0', MType_T+'RVT1503_0', calcIndex( 43), '0-999', 0},
-                                    {'RVA1504_1', MType_A+'RVA1504_1', calcIndex( 44), '0-999', 0},
-                                    {'RVA1504_2', MType_A+'RVA1504_2', calcIndex( 45), '0-999', 0},
-                                    {'RVG1601_1', MType_G+'RVG1601_1', calcIndex( 46), '0-999', 0},
-                                    {'RVT1601_1', MType_T+'RVT1601_1', calcIndex( 47), '0-999', 0},
-                                    {'RVA1603_1', MType_A+'RVA1603_1', calcIndex( 48), '0-999', 0},
+	EXPORT ValidV50Models := DATASET([// Model Name |    Output Name     | Model Index   | Model Type | Model Index2 | Next Gen Credit
+                                    //     v      |         v          |    v          |    v       |              |
+                                    {'RVS1706_0', MType_S+'RVS1706_0', calcIndex( 39), '0-999', 0, FALSE}, //RV Crossindustry Flaghips
+                                    {'RVA1503_0', MType_A+'RVA1503_0', calcIndex( 40), '0-999', 0, FALSE},
+                                    {'RVB1503_0', MType_B+'RVB1503_0', calcIndex( 41), '0-999', 0, FALSE},
+                                    {'RVG1502_0', MType_G+'RVG1502_0', calcIndex( 42), '0-999', 0, FALSE},
+                                    {'RVT1503_0', MType_T+'RVT1503_0', calcIndex( 43), '0-999', 0, FALSE},
+                                    {'RVA1504_1', MType_A+'RVA1504_1', calcIndex( 44), '0-999', 0, FALSE},
+                                    {'RVA1504_2', MType_A+'RVA1504_2', calcIndex( 45), '0-999', 0, FALSE},
+                                    {'RVG1601_1', MType_G+'RVG1601_1', calcIndex( 46), '0-999', 0, FALSE},
+                                    {'RVT1601_1', MType_T+'RVT1601_1', calcIndex( 47), '0-999', 0, FALSE},
+                                    {'RVA1603_1', MType_A+'RVA1603_1', calcIndex( 48), '0-999', 0, FALSE},
                                     //Note - MLA1608_0 uses 2 billing indexes below (offsets 49 and 52)
-                                    {'RVG1511_1', MType_G+'RVG1511_1', calcIndex( 50), '0-999', 0},
-                                    {'RVG1605_1', MType_G+'RVG1605_1', calcIndex( 51), '0-999', 0},
-                                    {'MLA1608_0', 'MLA1608_0', calcIndex( 52), '', calcIndex( 49)}, //Military Lending Act (Equifax gateway)
+                                    {'RVG1511_1', MType_G+'RVG1511_1', calcIndex( 50), '0-999', 0, FALSE},
+                                    {'RVG1605_1', MType_G+'RVG1605_1', calcIndex( 51), '0-999', 0, FALSE},
+                                    {'MLA1608_0', 'MLA1608_0', calcIndex( 52), '', calcIndex( 49), FALSE}, //Military Lending Act (Equifax gateway)
                                     //place hold for #53 between #52 and #54 ( as I just realized now #53 doesn’t exist.)
-                                    {'RVA1607_1', MType_A+'RVA1607_1', calcIndex( 54), '0-999', 0},
-                                    {'RVP1605_1', MType_G+'RVP1605_1', calcIndex( 55), '0-999', 0},
-                                    {'RVA1605_1', MType_A+'RVA1605_1', calcIndex( 56), '0-999', 0},
-                                    {'RVA1601_1', MType_A+'RVA1601_1', calcIndex( 57), '0-999', 0}, //Harley
-                                    {'RVT1608_1', MType_T+'RVT1608_1', calcIndex( 58), '0-999', 0}, //T-Mobil - RVT1608_1
-                                    {'RVT1608_2', MType_T+'RVT1608_2', calcIndex( 59), '0-999', 0}, //T-Mobil - RVT1608_2
-                                    {'RVC1602_1', MType_G+'RVC1602_1', calcIndex( 60), '0-999', 0}, //OutSource
-                                    {'RVG1702_1', MType_G+'RVG1702_1', calcIndex( 61), '0-999', 0}, //Kinecta
-                                    {'RVG1705_1', MType_G+'RVG1705_1', calcIndex( 62), '0-999', 0}, //Telecheck Gaming
-                                    {'RVC1609_1', MType_G+'RVC1609_1', calcIndex( 63), '0-999', 0}, //TJR
-                                    {'RVB1610_1', MType_B+'RVB1610_1', calcIndex( 64), '0-999', 0}, //USAA
-                                    {'RVG1706_1', MType_G+'RVG1706_1', calcIndex( 65), '0-999', 0}, //Telecheck nonGaming
-                                    {'RVA1611_1', MType_A+'RVA1611_1', calcIndex( 66), '0-999', 0}, //Ford Motor Credit
-                                    {'RVA1611_2', MType_A+'RVA1611_2', calcIndex( 67), '0-999', 0}, //Ford Motor Credit
-                                    {'RVG1610_1', MType_G+'RVG1610_1', calcIndex( 68), '0-999', 0}, //ACCESS Model
-                                    {'RVP1702_1', MType_G+'RVP1702_1', calcIndex( 69), '0-999', 0}, //DM Services
-                                    {'RVG1802_1', MType_G+'RVG1802_1', calcIndex( 70), '0-999', 0}, //Direct Financial
-                                    {'RVD1801_1', MType_D+'RVD1801_1', calcIndex( 71), '0-999', 0}, //Digital
-                                    {'RVA1811_1', MType_A+'RVA1811_1', calcIndex( 72), '0-999', 0}, //Cresent
-                                    {'RVG1808_3', MType_G+'RVG1808_3', calcIndex( 75), '0-999', 0}, //Telechek
-                                    {'RVG1808_1', MType_G+'RVG1808_1', calcIndex( 73), '0-999', 0}, //Telechek
-                                    {'RVG1808_2', MType_G+'RVG1808_2', calcIndex( 74), '0-999', 0}, //Telechek
-                                    {'RVA1809_1', MType_A+'RVA1809_1', calcIndex( 76), '0-999', 0}, //CactusJack
-                                    {'RVA1904_1', MType_A+'RVA1904_1', calcIndex( 78), '0-999', 0}, //Westlake Financial
-                                    {'RVG1809_1', MType_G+'RVG1809_1', calcIndex( 79), '0-999', 0}, //Tranzaction
-                                    {'RVA1908_1', MType_A+'RVA1908_1', calcIndex( 80), '0-999', 0}, //SCUSA
-                                    {'RVR1903_1', MType_G+'RVR1903_1', calcIndex( 82), '-1 - 2', 0}, //Sheffield Financial (non-standard score -1,0,1,2)
-                                    {'RVG2005_0', MType_G+'RVG2005_0', calcIndex( 83), '0-999', 0}, //Riskview Credit Optics short term lending flagship
-                                    {'RVA2008_1', MType_A+'RVA2008_1', calcIndex( 84), '0-999', 0}, //Automobile Acceptance Corporation
-
+                                    {'RVA1607_1', MType_A+'RVA1607_1', calcIndex( 54), '0-999', 0, FALSE},
+                                    {'RVP1605_1', MType_G+'RVP1605_1', calcIndex( 55), '0-999', 0, FALSE},
+                                    {'RVA1605_1', MType_A+'RVA1605_1', calcIndex( 56), '0-999', 0, FALSE},
+                                    {'RVA1601_1', MType_A+'RVA1601_1', calcIndex( 57), '0-999', 0, FALSE}, //Harley
+                                    {'RVT1608_1', MType_T+'RVT1608_1', calcIndex( 58), '0-999', 0, FALSE}, //T-Mobil - RVT1608_1
+                                    {'RVT1608_2', MType_T+'RVT1608_2', calcIndex( 59), '0-999', 0, FALSE}, //T-Mobil - RVT1608_2
+                                    {'RVC1602_1', MType_G+'RVC1602_1', calcIndex( 60), '0-999', 0, FALSE}, //OutSource
+                                    {'RVG1702_1', MType_G+'RVG1702_1', calcIndex( 61), '0-999', 0, FALSE}, //Kinecta
+                                    {'RVG1705_1', MType_G+'RVG1705_1', calcIndex( 62), '0-999', 0, FALSE}, //Telecheck Gaming
+                                    {'RVC1609_1', MType_G+'RVC1609_1', calcIndex( 63), '0-999', 0, FALSE}, //TJR
+                                    {'RVB1610_1', MType_B+'RVB1610_1', calcIndex( 64), '0-999', 0, FALSE}, //USAA
+                                    {'RVG1706_1', MType_G+'RVG1706_1', calcIndex( 65), '0-999', 0, FALSE}, //Telecheck nonGaming
+                                    {'RVA1611_1', MType_A+'RVA1611_1', calcIndex( 66), '0-999', 0, FALSE}, //Ford Motor Credit
+                                    {'RVA1611_2', MType_A+'RVA1611_2', calcIndex( 67), '0-999', 0, FALSE}, //Ford Motor Credit
+                                    {'RVG1610_1', MType_G+'RVG1610_1', calcIndex( 68), '0-999', 0, FALSE}, //ACCESS Model
+                                    {'RVP1702_1', MType_G+'RVP1702_1', calcIndex( 69), '0-999', 0, FALSE}, //DM Services
+                                    {'RVG1802_1', MType_G+'RVG1802_1', calcIndex( 70), '0-999', 0, FALSE}, //Direct Financial
+                                    {'RVD1801_1', MType_D+'RVD1801_1', calcIndex( 71), '0-999', 0, FALSE}, //Digital
+                                    {'RVA1811_1', MType_A+'RVA1811_1', calcIndex( 72), '0-999', 0, FALSE}, //Cresent
+                                    {'RVG1808_3', MType_G+'RVG1808_3', calcIndex( 75), '0-999', 0, FALSE}, //Telechek
+                                    {'RVG1808_1', MType_G+'RVG1808_1', calcIndex( 73), '0-999', 0, FALSE}, //Telechek
+                                    {'RVG1808_2', MType_G+'RVG1808_2', calcIndex( 74), '0-999', 0, FALSE}, //Telechek
+                                    {'RVA1809_1', MType_A+'RVA1809_1', calcIndex( 76), '0-999', 0, FALSE}, //CactusJack
+                                    {'RVA1904_1', MType_A+'RVA1904_1', calcIndex( 78), '0-999', 0, FALSE}, //Westlake Financial
+                                    {'RVG1809_1', MType_G+'RVG1809_1', calcIndex( 79), '0-999', 0, FALSE}, //Tranzaction
+                                    {'RVA1908_1', MType_A+'RVA1908_1', calcIndex( 80), '0-999', 0, FALSE}, //SCUSA
+                                    {'RVR1903_1', MType_G+'RVR1903_1', calcIndex( 82), '-1 - 2', 0, FALSE}, //Sheffield Financial (non-standard score -1,0,1,2)
+                                    {'RVC2004_1', MType_G+'RVC2004_1', calcIndex( 83), '0-999', 0, FALSE}, //NewRez DBA Shellpoint Mortgage Servicing                                
+                                    {'RVA2008_1', MType_A+'RVA2008_1', calcIndex( 84), '0-999', 0, FALSE}, //Automobile Acceptance Corporation
+                                    {'RVT2004_1', MType_T+'RVT2004_1', calcIndex( 85), '0-999', 0, FALSE}, //T-Mobile Thin
+                                    {'RVT2004_2', MType_T+'RVT2004_2', calcIndex( 86), '0-999', 0, FALSE}, //T-Mobile Thick
+                                    {'RVC2004_2', MType_G+'RVC2004_2', calcIndex( 87), '0-999', 0, FALSE}, //NewRez DBA Shellpoint Mortgage Servicing                                 
+                                    {'RVG2005_0', MType_G+'RVG2005_0', calcIndex( 88), '0-999', 0, TRUE}, //Riskview Credit Optics short term lending flagship
+                                    {'RVS2005_0', MType_S+'RVS2005_0', calcIndex( 89), '0-999', 0, TRUE}, //Riskview Credit Optics Cross Industry flagship
+                                    {'RVC2004_3', MType_G+'RVC2004_3', calcIndex( 90), '0-999', 0, FALSE}, //NewRez DBA Shellpoint Mortgage Servicing
                                     // ------------------- FAKE MODELS - STATIC SCORE AND REASON CODES ------------------
-                                    {'RVA9999_9', MType_A+'RVA9999_9', 0, '0-999', 0},
-                                    {'RVB9999_9', MType_B+'RVB9999_9', 0, '0-999', 0},
-                                    {'RVG9999_9', MType_G+'RVG9999_9', 0, '0-999', 0},
-                                    {'RVT9999_9', MType_T+'RVT9999_9', 0, '0-999', 0}
+                                    {'RVA9999_9', MType_A+'RVA9999_9', 0, '0-999', 0, FALSE},
+                                    {'RVB9999_9', MType_B+'RVB9999_9', 0, '0-999', 0, FALSE},
+                                    {'RVG9999_9', MType_G+'RVG9999_9', 0, '0-999', 0, FALSE},
+                                    {'RVT9999_9', MType_T+'RVT9999_9', 0, '0-999', 0, FALSE}
                                     // ----------------------------------------------------------------------------------
                                   ], RiskView.Layouts.Model_Constants);
 	
@@ -180,6 +185,8 @@ that is sent INTO calcindex for ECL.
                       'RVB1503_0' => UNGROUP(Models.RVB1503_0_0(BocaShell, lexIDOnlyOnInput)),
                       'RVG1502_0' => UNGROUP(Models.RVG1502_0_0(BocaShell, lexIDOnlyOnInput)),
                       'RVT1503_0' => UNGROUP(Models.RVT1503_0_0(BocaShell, lexIDOnlyOnInput)),
+                      'RVG2005_0' => Models.getCreditLuciModels(BocaShell, attrv5, IDAattrs).RVG2005_0,
+                      'RVS2005_0' => Models.getCreditLuciModels(BocaShell, attrv5, IDAattrs).RVS2005_0,
                       // ----------------------------------------------------------------------------------
                       // --------------------------------- CUSTOM MODELS ----------------------------------
                       'RVA1504_1' => UNGROUP(Models.RVA1504_1_0(BocaShell, lexIDOnlyOnInput)),
@@ -218,8 +225,12 @@ that is sent INTO calcindex for ECL.
                       'RVA1904_1' => UNGROUP(Models.RVA1904_1_0(BocaShell, isPreScreenPurpose)),
                       'RVA1908_1' => UNGROUP(Models.RVA1908_1_0(BocaShell)),	
                       'RVR1903_1' => UNGROUP(Models.RVR1903_1_0(attrv5)),
-                      'RVG2005_0' => Models.getCreditLuciModels(BocaShell, attrv5, IDAattrs).RVG2005_0,
                       'RVA2008_1' => Models.getCreditLuciModels(blankshell, attrv5, blankIDA).RVA2008_1,
+                      'RVT2004_1' => Models.getCreditLuciModels(blankshell, attrv5, blankIDA).RVT2004_1,
+                      'RVT2004_2' => Models.getCreditLuciModels(blankshell, attrv5, blankIDA).RVT2004_2,
+                      'RVC2004_1' => Models.getCreditLuciModels(blankshell, attrv5, blankIDA, customInputs).RVC2004_1,
+                      'RVC2004_2' => Models.getCreditLuciModels(blankshell, attrv5, blankIDA, customInputs).RVC2004_2,
+                      'RVC2004_3' => Models.getCreditLuciModels(blankshell, attrv5, blankIDA, customInputs).RVC2004_3,
                       // ----------------------------------------------------------------------------------
                       // ------------------- FAKE MODELS - STATIC SCORE AND REASON CODES ------------------
                       'RVA9999_9' => UNGROUP(Models.FAKE_0_0(BocaShell, 'RV50')),

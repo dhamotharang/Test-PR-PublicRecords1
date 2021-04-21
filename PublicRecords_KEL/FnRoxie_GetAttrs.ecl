@@ -36,24 +36,50 @@ EXPORT FnRoxie_GetAttrs(DATASET(PublicRecords_KEL.ECL_Functions.Input_Layout) In
 	ALLSummaryAttributesNonFCRA := PublicRecords_KEL.FnRoxie_GetSummaryAttributes(InputChooser, Options, FDCDataset);
 	ALLSummaryAttributes := IF(NOT Options.IsFCRA, ALLSummaryAttributesNonFCRA, DATASET([], PublicRecords_KEL.ECL_Functions.Layouts.LayoutALLSumAttributes));
 	
-	withPersonAttributes := JOIN(InputPIIAttributes, PersonAttributes, LEFT.G_ProcUID = RIGHT.G_ProcUID,
+	// InferredPerformanceAttributes := IF(Options.IsFCRA, PublicRecords_KEL.FnRoxie_GetInferredPerformanceAttributes(MiniAttributes(IsInputRec = TRUE), Options, FDCDataset), DATASET([], PublicRecords_KEL.ECL_Functions.Layouts.LayoutInferredAttributes));
+	
+	// HighRiskAddressAttributesNonFCRA := PublicRecords_KEL.FnRoxie_GetHighRiskAddress(InputChooser, Options, FDCDataset);
+	// HighRiskAddressAttributes  := IF(NOT Options.IsFCRA, HighRiskAddressAttributesNonFCRA, DATASET([], PublicRecords_KEL.ECL_Functions.Layouts.LayoutHighRiskAddressAttributes));
+	
+	withPersonAttributes := JOIN(InputPIIAttributes, PersonAttributes, 
+	LEFT.G_ProcUID = RIGHT.G_ProcUID,
 		TRANSFORM(PublicRecords_KEL.ECL_Functions.Layouts.LayoutMaster,
 			SELF := RIGHT,
 			SELF := LEFT,
 			SELF := []),
 		LEFT OUTER, KEEP(1), ATMOST(100));
 
-	withPersonALLSummaryAttributes := JOIN(withPersonAttributes, ALLSummaryAttributes, LEFT.G_ProcUID = RIGHT.G_ProcUID,
+	withPersonALLSummaryAttributes := JOIN(withPersonAttributes, ALLSummaryAttributes, 
+	LEFT.G_ProcUID = RIGHT.G_ProcUID,
 		TRANSFORM(PublicRecords_KEL.ECL_Functions.Layouts.LayoutMaster,
+			SELF.G_ProcUID := LEFT.G_procUID, //If right is empty this ensures that G_ProcUID is not blank
 			SELF := RIGHT,
 			SELF := LEFT,
 			SELF := []),
-		LEFT OUTER, KEEP(1), ATMOST(100));	
+		LEFT OUTER, KEEP(1), ATMOST(100));
+		
+	// withInferredPerformanceAttributes := JOIN(withPersonALLSummaryAttributes, InferredPerformanceAttributes, 
+	// LEFT.G_ProcUID = RIGHT.G_ProcUID,
+		// TRANSFORM(PublicRecords_KEL.ECL_Functions.Layouts.LayoutMaster,
+			// SELF.G_ProcUID := LEFT.G_procUID,//If right is empty this ensures that G_ProcUID is not blank
+			// SELF := RIGHT,
+			// SELF := LEFT,
+			// SELF := []),
+		// LEFT OUTER, KEEP(1), ATMOST(100));	
+		
+	// withHighRiskAddressAttributes := JOIN(withInferredPerformanceAttributes, HighRiskAddressAttributes, 
+	// LEFT.G_ProcUID = RIGHT.G_ProcUID,
+		// TRANSFORM(PublicRecords_KEL.ECL_Functions.Layouts.LayoutMaster,
+			// SELF := RIGHT,
+			// SELF := LEFT,
+			// SELF := []),
+		// LEFT OUTER, KEEP(1), ATMOST(100));	
 		
 
 	
 	FinalResultWithPullID := PublicRecords_KEL.FnRoxie_GetPullIDOverrides(pullidlexids, Options);
 
+	// FinalResultWithBuildDates  := PublicRecords_KEL.FnRoxie_GetBuildDates(IF(Options.IsFCRA,withInferredPerformanceAttributes,withPersonALLSummaryAttributes), Options);
 	FinalResultWithBuildDates  := PublicRecords_KEL.FnRoxie_GetBuildDates(withPersonALLSummaryAttributes, Options);
 
 	MasterResults := SORT((FinalResultWithPullID+FinalResultWithBuildDates ), G_ProcUID);

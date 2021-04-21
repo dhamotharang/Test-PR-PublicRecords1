@@ -19,4 +19,5 @@
 	EXPORT BOOLEAN BusinessLexIDIncludeAuthRep := FALSE;
 		EXPORT BOOLEAN RetainInputLexid := False; //keep input lexid
 	EXPORT BOOLEAN BestPIIAppend := False; //do not append best pii for running
+	EXPORT BOOLEAN IncludeInferredPerformance := FALSE; 
 END;	

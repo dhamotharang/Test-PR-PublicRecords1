@@ -17,7 +17,8 @@ export Boca_Shell_Derogs_FCRA (GROUPED DATASET(risk_indicators.layouts.layout_de
 	checkDays(string8 d1, string8 d2, unsigned2 days) := ut.DaysApart(d1,d2) <= days and d1>d2;
 	insurance_fcra_filter :=  (BSOptions & risk_indicators.iid_constants.BSOptions.InsuranceFCRAMode) > 0;
 
-  // Pull all derog corrections; filter by corresponding fcra-compliance
+  // Pull all derog corrections; filter by corresponding fcra-compliance.
+  // Note that,corrections data are only available in production_realtime_mode.
 	Risk_Indicators.Layouts_Derog_Info.layout_derog_process_plus fetch_corrections(ids le) := TRANSFORM
 		
 		// date_filed on the override search file isn't populated (bug 58380), so we need to look at the main file to check the date

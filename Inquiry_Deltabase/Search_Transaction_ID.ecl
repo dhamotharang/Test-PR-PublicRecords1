@@ -1,4 +1,4 @@
-IMPORT Gateway, Inquiry_Deltabase, Inquiry_AccLogs, Risk_Indicators, RiskWise, Suspicious_Fraud_LN, UT;
+﻿IMPORT Gateway, Inquiry_Deltabase, Suspicious_Fraud_LN, std;
 
 EXPORT Inquiry_Deltabase.Layouts.Inquiry_Transaction_ID Search_Transaction_ID (DATASET(Inquiry_Deltabase.Layouts.Input_Deltabase_Transaction_ID) SearchInput,
 																																SET OF STRING100 FunctionDescriptions, // Example: Inquiry_AccLogs.shell_constants.set_valid_nonfcra_functions
@@ -8,6 +8,7 @@ EXPORT Inquiry_Deltabase.Layouts.Inquiry_Transaction_ID Search_Transaction_ID (D
 																																INTEGER gatewayRetries = 0):= FUNCTION
 	
 	SelectLimit := TRIM(SQLSelectLimit, ALL);
+	deltabase_cfg := gateways(servicename = Gateway.Constants.ServiceName.DeltaInquiry)[1];
 	
 	// We need to convert the Function Description SET into a DATASET so we can utilize the convertDelimited Function to get a giant string of Function Descriptions
 	FunctionDescriptionDataset := DATASET(FunctionDescriptions, Inquiry_Deltabase.Layouts.Function_Descriptions);
@@ -17,6 +18,7 @@ EXPORT Inquiry_Deltabase.Layouts.Inquiry_Transaction_ID Search_Transaction_ID (D
 
 	// Generate the Deltabase SELECT statement
 	Inquiry_Deltabase.Layouts.Deltabase_Input generateSelects(Inquiry_Deltabase.Layouts.Input_Deltabase_Transaction_ID le) := TRANSFORM
+		self.transactionID := deltabase_cfg.transactionid;	
 		Transaction_ID := le.Transaction_ID;
 		
 		SQLSelect := IF((INTEGER)SelectLimit <= 0, '10', SelectLimit); // Make sure that a valid Limit was set
@@ -60,7 +62,7 @@ EXPORT Inquiry_Deltabase.Layouts.Inquiry_Transaction_ID Search_Transaction_ID (D
 		SELF.Use := le.Use;
 		SELF.Appended_ADL := (INTEGER)le.Response_LexID;
 		// Need to reformat DateTime, as the Deltabase returns YYYY-MM-DD HH:MM:SS but the Inquiries Key is YYYYMMDD HHMMSSmm
-		CleanedDateTime := StringLib.StringFilter(le.DateTime, '0123456789');
+		CleanedDateTime := std.str.Filter(le.DateTime, '0123456789');
 		SELF.DateTime := IF(CleanedDateTime = '', '', CleanedDateTime[1..8] + ' ' + CleanedDateTime[9..14] + '01');
 		SELF.Sequence_Number := le.Seq;
 		SELF.Product_Code := le.Product_Code;

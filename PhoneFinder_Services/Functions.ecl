@@ -368,16 +368,14 @@
   EXPORT FormatResults2IESP(DATASET(lFinal) dIn, PhoneFinder_Services.iParam.SearchParams inMod) :=
   FUNCTION
     today := STD.Date.Today();
-
+  
     // Identities section
     $.Layouts.log_identities tFormat2IespIdentity(lFinal pInput) :=
     TRANSFORM
       dt_first_seen := ValidateDate((INTEGER)pInput.dt_first_seen);
       dt_last_seen  := ValidateDate((INTEGER)pInput.dt_last_seen);
 
-      vFullName      := MAP(pInput.fname != '' or pInput.lname != ''                                    => Address.NameFromComponents(pInput.fname, pInput.mname, pInput.lname, pInput.name_suffix),
-                            pInput.subj_phone_type_new != MDR.sourceTools.src_Phones_Accudata_CNAM_CNM2 => pInput.listed_name,
-                            '');
+      vFullName      := pInput.full_name;
       vStreetAddress := Address.Addr1FromComponents(pInput.prim_range, pInput.predir, pInput.prim_name, pInput.suffix,
                                                     pInput.postdir, pInput.unit_desig, pInput.sec_range);
       vCityStZip     := Address.Addr2FromComponentsWithZip4(pInput.city_name, pInput.st, pInput.zip, pInput.zip4);
@@ -526,6 +524,7 @@
       SELF.TotalSourceCount                 := IF(inMod.isPrimarySearchPII, pInput.TotalSourceCount, 0);
       SELF.SelfReportedSourcesOnly          := IF(inMod.isPrimarySearchPII, pInput.SelfReportedSourcesOnly, FALSE);
       SELF.Identity_count                   := pInput.Identity_count;
+      SELF.PhoneStarRating                  := pInput.Phone_StarRating;
       SELF.ZumigoDeviceDetails.SimMinDays   := pInput.sim_Tenure_MinDays;
       SELF.ZumigoDeviceDetails.SimMaxDays   := pInput.sim_Tenure_MaxDays;
       SELF.ZumigoDeviceDetails.DeviceMinDays:= pInput.imei_Tenure_MinDays;
@@ -579,6 +578,7 @@
       // Source details will be populated in OtherPhones in a PII Search.
       SELF.SourceDetails           := PROJECT(pInput.sourceinfo, TRANSFORM(iesp.phonefinder.t_PhoneFinderSourceIndicator, SELF := LEFT));
       SELF.identity_count          := pInput.identity_count;
+      SELF.PhoneStarRating         := pInput.Phone_StarRating;
       SELF                         := pInput;
       SELF.PhoneAddressState       := '';
 
@@ -661,14 +661,13 @@
 
     dFormat2Denorm := PROJECT(dSearchIn, tFormat2Denorm(LEFT));
 
+
     pf.PhoneFinder.IdentityIesp tFormat2IespIdentity(lFinal pInput) :=
     TRANSFORM
       dt_first_seen := $.Functions.ValidateDate((INTEGER)pInput.dt_first_seen);
       dt_last_seen  := $.Functions.ValidateDate((INTEGER)pInput.dt_last_seen);
 
-      vFullName      := MAP(pInput.fname != '' or pInput.lname != '' => Address.NameFromComponents(pInput.fname, pInput.mname, pInput.lname, pInput.name_suffix),
-                            pInput.subj_phone_type_new != MDR.sourceTools.src_Phones_Accudata_CNAM_CNM2 => pInput.listed_name,
-                            '');
+      vFullName      := pInput.full_name;
       vStreetAddress := Address.Addr1FromComponents(pInput.prim_range, pInput.predir, pInput.prim_name, pInput.suffix,
                                                     pInput.postdir, pInput.unit_desig, pInput.sec_range);
       vCityStZip     := Address.Addr2FromComponentsWithZip4(pInput.city_name, pInput.st, pInput.zip, pInput.zip4);
@@ -794,6 +793,7 @@
       SELF.source                  := MAP(inmod.IsPrimarySearchPII and pinput.phone_source IN PhoneFinder_Services.Constants.GatewaySources => PhoneFinder_Services.Constants.SOURCES.Gateway,
                                           inmod.IsPrimarySearchPII                                                                          => PhoneFinder_Services.Constants.SOURCES.Internal,
                                           '');
+      SELF.PhoneStarRating         := pInput.Phone_StarRating;                                    
       SELF                         := pInput;
       SELF.PhoneAddressState       := '';
 
@@ -915,6 +915,7 @@
       SELF.source                           := MAP( inmod.IsPrimarySearchPII and pinput.phone_source IN PhoneFinder_Services.Constants.GatewaySources => PhoneFinder_Services.Constants.SOURCES.Gateway,
                                                     inmod.IsPrimarySearchPII                                                                          => PhoneFinder_Services.Constants.SOURCES.Internal,
                                                     '');
+      SELF.PhoneStarRating                  := pInput.Phone_StarRating;
       SELF                                  := pInput.RealTimePhone_Ext;
       SELF                                  := pInput;
 
@@ -1071,6 +1072,7 @@
           #APPEND(OtherPhones, 'SELF.OtherPhone' + %'j'% + '_MonthsSinceLastSeen := pInput.other_phones[' + %'j'% + '].MonthsSinceLastSeen;\n')
           #APPEND(OtherPhones, 'SELF.OtherPhone' + %'j'% + '_PhoneOwnershipIndicator := pInput.other_phones[' + %'j'% + '].PhoneOwnershipIndicator;\n')
           #APPEND(OtherPhones, 'SELF.OtherPhone' + %'j'% + '_CallForwardingIndicator := pInput.other_phones[' + %'j'% + '].CallForwardingIndicator;\n')
+          #APPEND(OtherPhones, 'SELF.OtherPhone' + %'j'% + '_PhoneStarRating := pInput.other_phones[' + %'j'% + '].PhoneStarRating;\n')
           #SET(j, %j% + 1)
         #END
       #END

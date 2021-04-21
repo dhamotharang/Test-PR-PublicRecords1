@@ -9,5 +9,6 @@ EXPORT Constants := MODULE
   EXPORT PERSON_CHAR := 'P';
   EXPORT COMPANY_CHAR :='C';
   EXPORT CASE_CLOSED := 'Case Closed';
+  EXPORT FLAG_TRUE := 'Y';
 
 END;

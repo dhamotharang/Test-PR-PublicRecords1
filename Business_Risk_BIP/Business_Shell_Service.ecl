@@ -267,7 +267,7 @@
                                     // the service is large.
                                     // This service won't run on a 1-way.
 																		
-IMPORT Business_Risk_BIP,Cortera, Gateway, iesp, Risk_Indicators, OFAC_XG5;
+IMPORT Business_Risk_BIP, Cortera, Gateway, iesp, Risk_Indicators, OFAC_XG5;
 
 EXPORT Business_Shell_Service() := FUNCTION
 	/* ************************************************************************

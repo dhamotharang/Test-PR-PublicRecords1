@@ -1,4 +1,4 @@
-﻿IMPORT BIPV2, BatchShare, BIPV2_Best_SBFE;
+﻿IMPORT BatchShare, BIPV2, BIPV2_Best_SBFE;
 
 EXPORT Batch_layouts := MODULE
 		EXPORT Batch_Input := RECORD
@@ -134,22 +134,24 @@ EXPORT Batch_layouts := MODULE
 		
 		EXPORT TradelineInfo := RECORD
 				BIPV2.IDlayouts.l_key_ids_bare;
-				STRING30	Sbfe_Contributor_Number;
-				STRING50	Contract_Account_Number;
-				STRING3		Account_Type_Reported;
-				STRING12	Current_Credit_Limit;
-				STRING12	Remaining_Balance;
-				STRING8		Date_Account_Opened;
-				STRING8		Date_Account_Closed;
-				STRING12	Amount_Charged_Off_By_Creditor;
-				STRING8		Date_Account_Was_Charged_Off;
-				STRING75	Account_Closure_Basis;  
+				STRING30  Sbfe_Contributor_Number;
+				STRING50  Contract_Account_Number;
+				STRING3   Account_Type_Reported;
+				STRING12  Current_Credit_Limit;
+				STRING12  Remaining_Balance;
+				STRING8   Date_Account_Opened;
+				STRING8   Date_Account_Closed;
+				STRING3   Account_Status_1;
+				STRING3   Account_Status_2;
+				STRING12  Amount_Charged_Off_By_Creditor;
+				STRING8   Date_Account_Was_Charged_Off;
+				STRING75  Account_Closure_Basis;  
 				STRING15  Past_Due_Amount_01to30;
 				STRING15  Past_Due_Amount_31to60;
 				STRING15  Past_Due_Amount_61to90;
 				STRING15  Past_Due_Amount_91to120;
 				STRING15  Past_Due_Amount_120Plus;
-				STRING8		Cycle_End_Date;
+				STRING8   Cycle_End_Date;
 		END;
 		
 		EXPORT 	BipSlim_layout := RECORD

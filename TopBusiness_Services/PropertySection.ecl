@@ -44,7 +44,7 @@ EXPORT fn_fullView(
 	                                 join(property_recs_raw,																	      
 																	      LN_PropertyV2.key_deed_fid(),																	     
 																	keyed(left.ln_fares_id = right.ln_fares_id)
-																	AND if(in_options.IncludeVendorSourceB, true, not LN_PropertyV2.fn_isAssignmentAndReleaseRecord(right.record_type,right.state,right.document_type_code)), //flag is for checking if BK assignments and releases should be
+																	AND if(in_options.IncludeAssignmentsAndReleases, true, not LN_PropertyV2.fn_isAssignmentAndReleaseRecord(right.record_type,right.state,right.document_type_code)), //flag is for checking if BK assignments and releases should be
 																																																																																								//included. If not remove the rcd types for assgns and releases.
 																	transform(TopBusiness_Services.PropertySection_layouts.rec_mortgage,																																		
 																	self.st := right.state;
@@ -1104,7 +1104,7 @@ denorm1stParamLarge := project(property_partyPayLoadDeduped,
 		                            LN_PropertyV2.key_deed_fid(),		                   
                          keyed(left.in_ln_fares_id = right.ln_fares_id) and 											     
 														 (left.ln_fares_id[2]='D' or left.ln_fares_id[2]='M')
-														 AND if(in_options.IncludeVendorSourceB, true, not LN_PropertyV2.fn_isAssignmentAndReleaseRecord(right.record_type,right.state,right.document_type_code)), //flag is for checking if BK assignments and releases should be
+														 AND if(in_options.IncludeAssignmentsAndReleases, true, not LN_PropertyV2.fn_isAssignmentAndReleaseRecord(right.record_type,right.state,right.document_type_code)), //flag is for checking if BK assignments and releases should be
 																																																																																								//included. If not remove the rcd types for assgns and releases.
 											   deed_info(left, right), left outer,keep(TopBusiness_Services.Constants.PropertyKeepDeedConstant));
 

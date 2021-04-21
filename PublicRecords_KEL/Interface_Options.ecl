@@ -25,7 +25,8 @@ EXPORT Interface_Options := INTERFACE
 	EXPORT INTEGER upperage := 20;
 
 	EXPORT DATASET(Gateway.Layouts.Config) Gateways := DATASET([], Gateway.Layouts.Config);
-	
+	EXPORT BOOLEAN isBRM_Marketing := FALSE;
+
 	// BIP Append Options
 	EXPORT UNSIGNED BIPAppendScoreThreshold := 75;
 	EXPORT UNSIGNED BIPAppendWeightThreshold := 0;
@@ -60,6 +61,7 @@ EXPORT Interface_Options := INTERFACE
 	EXPORT BOOLEAN IncludeEmail := FALSE;
 	EXPORT BOOLEAN IncludeEBRTradeline := FALSE;
 	EXPORT BOOLEAN IncludeEmployment := FALSE;
+	EXPORT BOOLEAN IncludeForeclosure := FALSE;
 	EXPORT BOOLEAN IncludeGeolink := FALSE;
 	EXPORT BOOLEAN IncludeHousehold := FALSE;
 	EXPORT BOOLEAN IncludeInquiry := FALSE;
@@ -103,6 +105,7 @@ EXPORT Interface_Options := INTERFACE
 	EXPORT BOOLEAN IncludeEmploymentBusinessAddress := IncludeEmployment AND IncludeAddress;
 	EXPORT BOOLEAN IncludeEmploymentPerson := IncludeEmployment AND IncludePerson;
 	EXPORT BOOLEAN IncludeFirstDegreeAssociations := IncludePerson;
+	EXPORT BOOLEAN IncludeForeclosureAddress := IncludeForeclosure AND IncludeAddress;
 	EXPORT BOOLEAN IncludeHouseholdMember := IncludePerson;
 	EXPORT BOOLEAN IncludeHouseholdPhone := IncludeHousehold AND IncludePhone;
 	EXPORT BOOLEAN IncludeOffenderAddress := IncludeCriminalOffender AND IncludeAddress;
@@ -113,6 +116,7 @@ EXPORT Interface_Options := INTERFACE
 	EXPORT BOOLEAN IncludePersonEducation := IncludePerson AND IncludeEducation;
 	EXPORT BOOLEAN IncludePersonEmail := IncludePerson AND IncludeEmail;
 	EXPORT BOOLEAN IncludePersonEmailPhoneAddress := IncludePerson AND IncludeEmail AND IncludeAddress AND IncludePhone;
+	EXPORT BOOLEAN IncludePersonForeclosure := IncludePerson AND IncludeForeclosure;
 	EXPORT BOOLEAN IncludePersonInquiry := IncludePerson AND IncludeInquiry;
 	EXPORT BOOLEAN IncludePersonOffender := IncludePerson AND IncludeCriminalOffender;
 	EXPORT BOOLEAN IncludePersonOffenses := IncludePerson AND IncludeCriminalOffense;
@@ -162,5 +166,6 @@ EXPORT Interface_Options := INTERFACE
 	EXPORT BOOLEAN IncludePersonLienJudgment := IncludePerson AND IncludeLienJudgment;
 	EXPORT BOOLEAN IncludeSeleLienJudgment := IncludeBusinessSele AND IncludeLienJudgment;
  	EXPORT BOOLEAN IncludeSelePersonSurname := IncludeBusinessSele AND IncludeSurname AND IncludeSelePerson; 	
-	EXPORT BOOLEAN IncludeProxPersonSurname := IncludeBusinessProx AND IncludeSurname AND IncludeProxPerson; 
+	EXPORT BOOLEAN IncludeProxPersonSurname := IncludeBusinessProx AND IncludeSurname AND IncludeProxPerson;
+	EXPORT BOOLEAN IncludeInferredPerformance := FALSE;
 END;	

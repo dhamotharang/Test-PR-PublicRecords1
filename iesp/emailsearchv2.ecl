@@ -26,6 +26,7 @@ export t_EmailSearchV2Option := record (iesp.share.t_BaseSearchOptionEx)
 	boolean IncludeHistoricData {xpath('IncludeHistoricData')};//hidden[internal]
 	boolean CheckEmailDeliverable {xpath('CheckEmailDeliverable')};//hidden[internal]
 	boolean KeepUndeliverableEmail {xpath('KeepUndeliverableEmail')};//hidden[internal]
+	string EmailValidationType {xpath('EmailValidationType')};//hidden[internal]
 	unsigned2 MaxEmailsForDeliveryCheck {xpath('MaxEmailsForDeliveryCheck')};//hidden[internal]
 	string BVAPIkey {xpath('BVAPIkey')};//hidden[ecl_only]
 	boolean SkipTMX {xpath('SkipTMX')};//hidden[internal]
@@ -86,6 +87,8 @@ export t_EmailSearchV2Record := record
 	string EmailStatus {xpath('EmailStatus')};
 	string EmailStatusReason {xpath('EmailStatusReason')};
 	string AdditionalStatusInfo {xpath('AdditionalStatusInfo')};
+	string EAEmailExist {xpath('EAEmailExist')};//hidden[internal]
+	string EAEmailStatus {xpath('EAEmailStatus')};//hidden[internal]
 	string Relationship {xpath('Relationship')};
 	unsigned EmailId {xpath('EmailId')};//hidden[internal]
 	iesp.share.t_Date LNDateFirst {xpath('LNDateFirst')};

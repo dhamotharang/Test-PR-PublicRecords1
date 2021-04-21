@@ -84,6 +84,24 @@ export Functions := MODULE
 			RETURN Result;
 		END;
 
+  EXPORT filterOutTerminatedAgencyReports(recs) := FUNCTIONMACRO
+			  // eliminate any reports from a terminated agency
+				 // reports should be eliminated if there is no match on the criteria to the Agency key, or if today's date 
+				 // does not fall between the source_start_date and the source_termination date
+				 // note: source_termination_date = 0 means not terminated
+	 			TODAYS_DATE := Std.Date.Today();
+     agency_key := FLAccidents_Ecrash.key_EcrashV2_agency;
+     recs_filtered := JOIN(recs, agency_key,
+	                     KEYED(LEFT.jurisdiction_state = RIGHT.Agency_State_Abbr) AND
+																						      LEFT.jurisdiction_nbr = RIGHT.MBSI_Agency_ID AND
+																									   LEFT.contrib_source = RIGHT.source_id AND
+																										  (UNSIGNED)RIGHT.source_start_date <= TODAYS_DATE AND 
+																									   ((UNSIGNED)RIGHT.source_termination_date = 0 OR 
+																										   (UNSIGNED) RIGHT.source_termination_date > TODAYS_DATE),
+																										  TRANSFORM(LEFT), LIMIT(10000, SKIP), KEEP (1));
+					RETURN recs_filtered;
+		ENDMACRO;
+
 	EXPORT create_date_dataset(string startdate, integer offset, boolean forwardOnly=false):=function
 
 		tmp_rec := record
@@ -729,11 +747,13 @@ export Functions := MODULE
 		DeltabaseReportSelectSql := DeltaBaseSql.GetImageRetrievalSqlByReportId(TRIM(RequestReportId), DeltaBaseDateAddedSql);
 
 		EmptyReportDeltabaseRow := DATASET([],eCrash_Services.Layouts.eCrashRecordStructure);
-		ReportDeltabaseRow := IF(
+		ReportDeltabaseRow0 := IF(
 			EXISTS(ReportHashKeysFromKey), 
 			EmptyReportDeltabaseRow, 
 			OwnerDriverDedup(DeltaBaseService.GetReportData(DeltabaseReportSelectSql))
 		);
+
+  ReportDeltabaseRow := filterOutTerminatedAgencyReports(ReportDeltabaseRow0);
 			
 		SuperReportRow := IF(EXISTS(ReportHashKeysFromKey), ReportPayloadRow, ReportDeltabaseRow);
 		//if we don't have request report id in the key, but do have it in the deltabase then

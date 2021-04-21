@@ -13,7 +13,7 @@
 */
 /*--INFO-- This Service is the interface into the Business InstantID ECL service, version 2.0. */
 
-IMPORT BIPV2, Business_Risk_BIP, Gateway, iesp, MDR, OFAC_XG5, Risk_Indicators, Risk_Reporting, Royalty, STD, Inquiry_AccLogs, LNSmallBusiness, BusinessInstantID20_Services;
+IMPORT BIPV2, Business_Risk_BIP, Gateway, iesp, MDR, OFAC_XG5, Risk_Indicators, Risk_Reporting, Royalty, STD, Inquiry_AccLogs, LNSmallBusiness, BusinessInstantID20_Services, BusinessCredit_Services;
 
 EXPORT InstantID20_Service() := MACRO
 
@@ -124,6 +124,7 @@ EXPORT InstantID20_Service() := MACRO
 			self							:= le;
 			self							:= [];
 		end;
+
 		Options := MODULE(BusinessInstantID20_Services.iOptions)
 			// Clean up the Options and make sure that defaults are enforced. RULE: For this product,
 			// if we're retrieving SBFE data (DPM[12] value set to '1'), then we cannot retrieve Experian
@@ -148,7 +149,7 @@ EXPORT InstantID20_Service() := MACRO
 			EXPORT UNSIGNED1	OFAC_Version				 := MAX(MIN(_OFAC_Version, BusinessInstantID20_Services.Constants.MAX_OFAC_VERSION), 0);
 			EXPORT BOOLEAN    IncludeTargusGateway := _IncludeTargusGateway;
 			EXPORT REAL				Global_Watchlist_Threshold	:= MAX(MIN(_Global_Watchlist_Threshold, 1), 0);
-			EXPORT BOOLEAN    OverRideExperianRestriction := MAP( _OverRideExperianRestriction = TRUE => TRUE, _DataPermissionMask[12] IN BusinessInstantID20_Services.Constants.RESTRICTED_SET => TRUE, FALSE );
+			EXPORT BOOLEAN    OverRideExperianRestriction := MAP(  _OverRideExperianRestriction = TRUE => TRUE, _DataPermissionMask[12] IN BusinessInstantID20_Services.Constants.RESTRICTED_SET => TRUE, FALSE );
 			EXPORT BOOLEAN    RunTargusGatewayAnywayForTesting := _RunTargusGateway;
 			EXPORT DATASET(iesp.Share.t_StringArrayItem) Watchlists_Requested := _Watchlists_Requested;
 			EXPORT DATASET(Gateway.Layouts.Config) Gateways   := PROJECT(_Gateways, Options_gateway_switch(left));
@@ -157,16 +158,16 @@ EXPORT InstantID20_Service() := MACRO
 			EXPORT BOOLEAN    DisableIntermediateShellLogging := _DisableIntermediateShellLogging;
 			EXPORT BusinessInstantID20_Services.Types.productTypeEnum BIID20_productType := _BIID20ProductType;
 			EXPORT BOOLEAN    useSBFE := DataPermissionMask[12] NOT IN BusinessInstantID20_Services.Constants.RESTRICTED_SET;
-			EXPORT DATASET(LNSmallBusiness.Layouts.AttributeGroupRec) AttributesRequested := PROJECT(option.AttributesVersionRequest, TRANSFORM(LNSmallBusiness.Layouts.AttributeGroupRec, SELF.AttributeGroup := STD.Str.ToUpperCase(LEFT.Value)));
-			EXPORT DATASET(LNSmallBusiness.Layouts.ModelNameRec) ModelsRequested :=
-				PROJECT(option.IncludeModels.Names,
-				TRANSFORM(LNSmallBusiness.Layouts.ModelNameRec,
-					SELF.ModelName := STD.Str.ToUpperCase(LEFT.Value)));
-			EXPORT DATASET(LNSmallBusiness.Layouts.ModelOptionsRec) ModelOptions :=
-				PROJECT(option.IncludeModels.ModelOptions,
-				TRANSFORM(LNSmallBusiness.Layouts.ModelOptionsRec,
-					SELF.OptionName := STD.Str.ToUpperCase(TRIM(LEFT.OptionName, LEFT, RIGHT)),
-					SELF.OptionValue := STD.Str.ToUpperCase(TRIM(LEFT.OptionValue, LEFT, RIGHT))));
+			EXPORT DATASET(LNSmallBusiness.Layouts.AttributeGroupRec) AttributesRequested := PROJECT(option.AttributesVersionRequest, 
+                                                                                               TRANSFORM(LNSmallBusiness.Layouts.AttributeGroupRec, 
+                                                                                               SELF.AttributeGroup := STD.Str.ToUpperCase(LEFT.Value)));
+      EXPORT DATASET(LNSmallBusiness.Layouts.ModelNameRec) ModelsRequested := PROJECT(option.IncludeModels.Names, 
+                                                                                     TRANSFORM(LNSmallBusiness.Layouts.ModelNameRec, 
+					                                                                                     SELF.ModelName := STD.Str.ToUpperCase(LEFT.Value)));
+			EXPORT DATASET(LNSmallBusiness.Layouts.ModelOptionsRec) ModelOptions := PROJECT(option.IncludeModels.ModelOptions,
+                                                                                      TRANSFORM(LNSmallBusiness.Layouts.ModelOptionsRec, 
+                                                                                                SELF.OptionName := STD.Str.ToUpperCase(TRIM(LEFT.OptionName, LEFT, RIGHT)), 
+                                                                                                SELF.OptionValue := STD.Str.ToUpperCase(TRIM(LEFT.OptionValue, LEFT, RIGHT))));
 		END;
 
   IF( Options.OFAC_Version != 4 AND OFAC_XG5.constants.wlALLV4 IN SET(Options.Watchlists_Requested, value),

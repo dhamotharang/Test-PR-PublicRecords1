@@ -473,6 +473,51 @@ EXPORT LayoutsInternal := MODULE
     STRING5  Move2_dist;
     STRING5  Move3_dist;
   END;
+  
+  EXPORT VehicleKeys := RECORD
+    UNSIGNED6 inputDID;
+    STRING30 vehicle_Key;
+    STRING15 iteration_Key;
+    STRING15 sequence_Key;
+    UNSIGNED4 historyDate;
+  END;
+
+  EXPORT PartyInfoLayout := RECORD
+    VehicleKeys;
+    UNSIGNED4 dateFirstSeen;
+    STRING1 origNameType;
+    STRING30 licensePlateType;
+    STRING1 history;
+    
+    STRING2 titleState;
+    STRING8 titleDate;
+    STRING8 titleLatestIssueDate;
+    STRING8 titleEarliestIssueDate;
+    
+    STRING2 registeredState;
+    STRING8 registeredDate;
+    STRING8 registeredLatestEffectiveDate;
+    STRING8 registeredLatestExpirationDate;
+    
+    UNSIGNED partyID;
+  END;
+
+  EXPORT carInfoLayout := RECORD
+    VehicleKeys;
+    STRING4 year;
+    STRING36 make;
+    STRING30 model;
+    STRING50 classType;
+    STRING25 vin;
+    BOOLEAN isCurrent;
+    UNSIGNED6 basePrice;
+    STRING2 stateOrigin;
+    STRING2 sourceCode;
+    UNSIGNED4 global_sid;
+    BOOLEAN nonDMVSource;
+    DATASET(PartyInfoLayout) registrants;
+    DATASET(PartyInfoLayout) owners;
+  END;
 
 
 END;

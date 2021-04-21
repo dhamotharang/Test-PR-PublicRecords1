@@ -1,3 +1,9 @@
+// =====================================================================
+// ROXIE QUERY
+// -----------
+// For the complete list of input parameters please check published WU.
+// Look at the history of this attribute for the old SOAP info.
+// =====================================================================
 IMPORT AutoStandardI, Doxie, FCRA, FFD, Gateway, iesp;
 
 EXPORT PossibleIncarcerationReportServiceFCRA := MACRO
@@ -16,7 +22,7 @@ EXPORT PossibleIncarcerationReportServiceFCRA := MACRO
   input_params := AutoStandardI.GlobalModule();
   mod_access := doxie.compliance.GetGlobalDataAccessModuleTranslated(input_params);
 
-  tempmod := MODULE(PROJECT(mod_access, CriminalRecords_Services.IParam.incarceration_report, opt))
+  tempmod := MODULE(PROJECT(mod_access, CriminalRecords_Services.IParam.incarceration_report, OPT))
     EXPORT UNSIGNED8 did := (UNSIGNED8) report_by.UniqueID;
     EXPORT BOOLEAN ReturnDocName := report_opt.ReturnDocName;
     EXPORT BOOLEAN ReturnSSN := report_opt.ReturnSSN;

@@ -4,6 +4,6 @@ IMPORT B_Lien_Judgment_13,B_Lien_Judgment_9,CFG_Compile,E_Lien_Judgment FROM Pub
 IMPORT * FROM KEL15.Null;
 EXPORT B_Lien_Judgment_8(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG_Compile __cfg = CFG_Compile) := MODULE
   SHARED VIRTUAL TYPEOF(B_Lien_Judgment_9(__in,__cfg).__ENH_Lien_Judgment_9) __ENH_Lien_Judgment_9 := B_Lien_Judgment_9(__in,__cfg).__ENH_Lien_Judgment_9;
-  SHARED __EE4809144 := __ENH_Lien_Judgment_9;
-  EXPORT __ENH_Lien_Judgment_8 := __EE4809144;
+  SHARED __EE4652855 := __ENH_Lien_Judgment_9;
+  EXPORT __ENH_Lien_Judgment_8 := __EE4652855;
 END;

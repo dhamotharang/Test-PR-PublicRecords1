@@ -4,8 +4,8 @@ IMPORT B_Inquiry_11,CFG_Compile,E_Inquiry FROM PublicRecords_KEL;
 IMPORT * FROM KEL15.Null;
 EXPORT B_Inquiry_10(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG_Compile __cfg = CFG_Compile) := MODULE
   SHARED VIRTUAL TYPEOF(B_Inquiry_11(__in,__cfg).__ENH_Inquiry_11) __ENH_Inquiry_11 := B_Inquiry_11(__in,__cfg).__ENH_Inquiry_11;
-  SHARED __EE4785066 := __ENH_Inquiry_11;
-  EXPORT __ST254809_Layout := RECORD
+  SHARED __EE4628670 := __ENH_Inquiry_11;
+  EXPORT __ST259203_Layout := RECORD
     KEL.typ.nuid UID;
     KEL.typ.nstr Transaction_I_D_;
     KEL.typ.nstr Sequence_Number_;
@@ -19,6 +19,7 @@ EXPORT B_Inquiry_10(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG_Co
     KEL.typ.str Inquiry_Function_Description_ := '';
     KEL.typ.str Inquiry_Industry_ := '';
     KEL.typ.str Inquiry_Method_ := '';
+    KEL.typ.nint Inquiry_Product_Code_;
     KEL.typ.str Inquiry_Sub_Market_ := '';
     KEL.typ.str Inquiry_Vertical_ := '';
     KEL.typ.bool Is_Length_Sub_Market_ := FALSE;
@@ -29,17 +30,19 @@ EXPORT B_Inquiry_10(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG_Co
     KEL.typ.epoch Vault_Date_Last_Seen_ := 0;
     KEL.typ.int __RecordCount := 0;
   END;
-  SHARED __ST254809_Layout __ND4784939__Project(B_Inquiry_11(__in,__cfg).__ST255695_Layout __PP4784567) := TRANSFORM
-    __EE4784932 := __PP4784567.Search_Info_;
-    SELF.Inquiry_Function_Description_ := __DEFAULT((__T(__EE4784932))[1].Function_Description_,'');
-    __EE4784949 := __PP4784567.Bus_Intel_;
-    SELF.Inquiry_Industry_ := __DEFAULT((__T(__EE4784949))[1].Industry_,'');
-    __EE4784965 := __PP4784567.Search_Info_;
-    SELF.Inquiry_Method_ := __DEFAULT((__T(__EE4784965))[1].Method_,'');
-    __EE4784983 := __PP4784567.Bus_Intel_;
-    SELF.Inquiry_Vertical_ := __DEFAULT((__T(__EE4784983))[1].Vertical_,'');
-    SELF.Is_Length_Sub_Market_ := KEL.Routines.StartsWith(KEL.Routines.ToUpperCase(TRIM(__PP4784567.Inquiry_Sub_Market_)),'FIRST PARTY');
-    SELF := __PP4784567;
+  SHARED __ST259203_Layout __ND4628528__Project(B_Inquiry_11(__in,__cfg).__ST260097_Layout __PP4628138) := TRANSFORM
+    __EE4628521 := __PP4628138.Search_Info_;
+    SELF.Inquiry_Function_Description_ := __DEFAULT((__T(__EE4628521))[1].Function_Description_,'');
+    __EE4628538 := __PP4628138.Bus_Intel_;
+    SELF.Inquiry_Industry_ := __DEFAULT((__T(__EE4628538))[1].Industry_,'');
+    __EE4628554 := __PP4628138.Search_Info_;
+    SELF.Inquiry_Method_ := __DEFAULT((__T(__EE4628554))[1].Method_,'');
+    __EE4628570 := __PP4628138.Search_Info_;
+    SELF.Inquiry_Product_Code_ := (__T(__EE4628570))[1].Product_Code_;
+    __EE4628586 := __PP4628138.Bus_Intel_;
+    SELF.Inquiry_Vertical_ := __DEFAULT((__T(__EE4628586))[1].Vertical_,'');
+    SELF.Is_Length_Sub_Market_ := KEL.Routines.StartsWith(KEL.Routines.ToUpperCase(TRIM(__PP4628138.Inquiry_Sub_Market_)),'FIRST PARTY');
+    SELF := __PP4628138;
   END;
-  EXPORT __ENH_Inquiry_10 := PROJECT(__EE4785066,__ND4784939__Project(LEFT));
+  EXPORT __ENH_Inquiry_10 := PROJECT(__EE4628670,__ND4628528__Project(LEFT));
 END;

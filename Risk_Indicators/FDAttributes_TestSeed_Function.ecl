@@ -15,7 +15,8 @@ export FDAttributes_TestSeed_Function(dataset(Risk_Indicators.Layout_Input) inDa
     self.version202 := ri.version202;
     self.IDAttributes := ri.IDAttributes;
     self.ParoAttributes := ri.ParoAttributes;
-    self.ThreatMetrix := ri.Threatmetrix; 
+    self.ThreatMetrix := ri.Threatmetrix;
+    self.IDA_Attributes := []; //IDA does not use internal test seeds
     self.compromisedDL_hash := '';  // we don't need to log this for testseed transactions
 	END;
 	FDtest := join(inData, Seed_Files.Key_FDAttributes,keyed(right.dataset_name=Test_Data_Table_Name) and 

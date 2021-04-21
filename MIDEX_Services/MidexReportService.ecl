@@ -198,6 +198,7 @@ EXPORT MidexReportService  :=
 			EXPORT DATASET 	 LinkIds													 := bip_ds;
 			EXPORT STRING1	 BusinessReportFetchLevel 				 := trim(STD.STR.ToUpperCase(BusinessReportFetchLevel),left,right);
 			EXPORT boolean   includeVendorSourceB          := ReportOptions.IncludeVendorSourceB;
+			EXPORT boolean   IncludeAssignmentsAndReleases          := ReportOptions.IncludeAssignmentsAndReleases;
     END;
   
   mod_access := doxie.compliance.GetGlobalDataAccessModuleTranslated(input_params);

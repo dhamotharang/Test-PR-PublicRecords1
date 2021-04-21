@@ -43,17 +43,17 @@ EXPORT FnRoxie_GetMiniFDCAttributes(DATASET(PublicRecords_KEL.ECL_Functions.Layo
 		Dataset({RECORDOF(PublicRecords_KEL.Q_F_C_R_A_Mini_Attributes_V1_Roxie_Dynamic([], 0, PublicRecords_KEL.CFG_Compile.Permit__NONE).res0)}) attributes;
 	END;
 	
-	NonFCRAPersonAttributesRaw := PROJECT(CleanInputs, TRANSFORM(LayoutNonFCRAPersonAttributes,
+	NonFCRAPersonAttributesRaw := NOCOMBINE(PROJECT(CleanInputs, TRANSFORM(LayoutNonFCRAPersonAttributes,
 		SELF.g_uid := LEFT.g_uid;
 		NonFCRAPersonResults := PublicRecords_KEL.Q_Non_F_C_R_A_Mini_Attributes_V1_Roxie_Dynamic(LEFT.ids , (INTEGER)(LEFT.P_InpClnArchDt[1..8]), OptionsMini.KEL_Permissions_Mask, FDCDataset).res0;	
 		SELF.attributes := NonFCRAPersonResults;
-		SELF := []));	
+		SELF := [])));	
 
-	FCRAPersonAttributesRaw := PROJECT(CleanInputs, TRANSFORM(LayoutFCRAPersonAttributes,
+	FCRAPersonAttributesRaw := NOCOMBINE(PROJECT(CleanInputs, TRANSFORM(LayoutFCRAPersonAttributes,
 		SELF.g_uid := LEFT.g_uid;
 		FCRAPersonResults := PublicRecords_KEL.Q_F_C_R_A_Mini_Attributes_V1_Roxie_Dynamic(LEFT.ids , (INTEGER)(LEFT.P_InpClnArchDt[1..8]), OptionsMini.KEL_Permissions_Mask, FDCDataset).res0;	
 		SELF.attributes := FCRAPersonResults;
-		SELF := []));	
+		SELF := [])));	
 			
 	FinalnonFCRA := RECORD
 		INTEGER g_uid;

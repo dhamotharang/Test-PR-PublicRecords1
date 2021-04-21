@@ -206,4 +206,5 @@ export BillingIndex := MODULE
     export FP1907_1     := '186'; //FP1907_1 - FraudPoint 3.0 for Kohl's, online
     export FP1907_2     := '187'; //FP1907_2 - FraudPoint 3.0 for Kohl's, in-store
     export FIBN12010_0  := '189'; //FIBN12010_0 -  FraudIntel Flagship (BOA) (189 - 70 = 119)
+    export NETN12103_0  := '190'; //NETN12103_0 - FraudIntel Network Notifiy
 END;

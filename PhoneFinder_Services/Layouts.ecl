@@ -205,6 +205,7 @@
       STRING1                                           tnt;
       STRING40                                          primary_address_type;
       STRING120                                         listed_name;
+      STRING120                                         Full_name;
       STRING120                                         listed_name_targus;
       STRING10                                          listed_phone;
       STRING1                                           listing_type_res;
@@ -284,6 +285,7 @@
       UNSIGNED                                              TotalSourceCount;
       UNSIGNED                                              identity_id;
       UNSIGNED                                              phone_id;
+      STRING1                                               phone_starRating;
     END;
 
     EXPORT ExcludePhones :=
@@ -312,6 +314,7 @@
       STRING20  mname;
       STRING20  lname;
       STRING5   name_suffix;
+      STRING120 Full_name;
       STRING120 listed_name;
       STRING10  prim_range;
       STRING2   predir;
@@ -403,6 +406,7 @@
       INTEGER  imei_Tenure_MinDays;
       INTEGER  imei_Tenure_MaxDays;
       DATASET(Src_Rec) Phn_src_all;
+      STRING1  phone_starrating;
     END;
 
     EXPORT IdentityIesp :=
@@ -530,7 +534,8 @@
                 'STRING8  OtherPhone' + %'cntPhone'% + '_MonthsWithPhone;' +
                 'STRING8  OtherPhone' + %'cntPhone'% + '_MonthsSinceLastSeen;' +
                 'BOOLEAN  OtherPhone' + %'cntPhone'% + '_PhoneOwnershipIndicator;' +
-                'STRING15  OtherPhone' + %'cntPhone'% + '_CallForwardingIndicator;');
+                'STRING15  OtherPhone' + %'cntPhone'% + '_CallForwardingIndicator;' +
+                'STRING1  OtherPhone' + %'cntPhone'% + '_PhoneStarRating;');
         #SET(cntPhone,%cntPhone% + 1)
       #END
     #END
@@ -647,6 +652,7 @@
       %OtherPhones%
       %PhoneHistoryInfo%
       STRING   Number;
+      STRING1 PhoneStarRating;
       STRING   _Type;
       STRING   Carrier;
       STRING   CarrierCity;
@@ -933,6 +939,9 @@
     INTEGER  spoof_count;
     STRING32 last_spoof_date;
     STRING32 phone_forwarded;
+    UNSIGNED1 phone_verified;
+    STRING32 verification_type;
+    STRING1 phone_star_rating;
   END;
 
   EXPORT	delta_phones_rpt_otherphones:= RECORD
@@ -949,6 +958,7 @@
     STRING16 porting_code;
     STRING32 phone_forwarded;
     INTEGER1	verified_carrier;
+    STRING1 phone_star_rating;
   END;
 
   EXPORT	delta_phones_rpt_identities:= RECORD
