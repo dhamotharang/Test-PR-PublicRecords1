@@ -567,7 +567,7 @@ Current_Address_Consumer_recs_Contacts := join(Current_Address_Consumer_recs, Cu
 	//special search for avm
 	//need to use did from fid key instead of plexid in case input address is valid but not tied to P_lexid				
 	InputRelativesHHIDTrans := project(Input_FDC + RelativesLexids + HHIDLexids, transform({unsigned6 did;}, self.did := left.P_LexID, self := []));
-	Input_RelativesWithHHIDLexids := SET((InputRelativesHHIDTrans), DID);
+	Input_RelativesWithHHIDLexids := SET(InputRelativesHHIDTrans(did > 0), DID);
 
 	norm_nonFCRA_watchdog := NORMALIZE(FDCDataset_Mini, LEFT.Dataset_Best_Person__Key_Watchdog, TRANSFORM(RECORDOF(RIGHT), SELF.P_LexID := LEFT.P_LexID, self.P_InpClnArchDt := left.P_InpClnArchDt,SELF := RIGHT));	
 	norm_FCRA_watchdognonEN := NORMALIZE(FDCDataset_Mini, LEFT.Dataset_Best_Person__Key_Watchdog_FCRA_nonEN, TRANSFORM(RECORDOF(RIGHT), SELF.P_LexID := LEFT.P_LexID, self.P_InpClnArchDt := left.P_InpClnArchDt, SELF := RIGHT));
@@ -5623,6 +5623,8 @@ Key_AccLogs_FCRA_SSN :=
 					SELF.Dataset_DX_Property__Key_Foreclosures_FID_With_Did := ROWS(RIGHT),
 					SELF := LEFT,
 					SELF := []));
+					
+
 	RETURN (With_Property__Key_Foreclosures_FID_With_Did);
 
 	

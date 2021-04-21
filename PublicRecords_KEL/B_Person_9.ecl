@@ -1,14 +1,14 @@
-//HPCC Systems KEL Compiler Version 1.5.0rc1
+﻿//HPCC Systems KEL Compiler Version 1.5.0rc1
 IMPORT KEL15 AS KEL;
 IMPORT B_Person_10,CFG_Compile,E_Address,E_Address_Slim,E_Address_Summary,E_Email,E_Geo_Link,E_Input_P_I_I,E_Name_Summary,E_Person,E_Phone,E_Phone_Summary,E_Property,E_S_S_N_Summary,E_Social_Security_Number,E_Surname,E_Zip_Code,FN_Compile FROM PublicRecords_KEL;
 IMPORT * FROM KEL15.Null;
 EXPORT B_Person_9(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG_Compile __cfg = CFG_Compile) := MODULE
   SHARED VIRTUAL TYPEOF(E_Input_P_I_I(__in,__cfg).__Result) __E_Input_P_I_I := E_Input_P_I_I(__in,__cfg).__Result;
   SHARED VIRTUAL TYPEOF(B_Person_10(__in,__cfg).__ENH_Person_10) __ENH_Person_10 := B_Person_10(__in,__cfg).__ENH_Person_10;
-  SHARED __EE5613931 := __ENH_Person_10;
-  SHARED __EE5613947 := __E_Input_P_I_I;
-  SHARED __EE5613954 := __EE5613947(__NN(__EE5613947.Subject_));
-  SHARED __ST389092_Layout := RECORD
+  SHARED __EE6133747 := __ENH_Person_10;
+  SHARED __EE6133763 := __E_Input_P_I_I;
+  SHARED __EE6133770 := __EE6133763(__NN(__EE6133763.Subject_));
+  SHARED __ST416219_Layout := RECORD
     KEL.typ.ntyp(E_Person().Typ) UID;
     KEL.typ.nuid U_I_D__1_;
     KEL.typ.epoch Archive___Date_ := 0;
@@ -17,13 +17,13 @@ EXPORT B_Person_9(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG_Comp
     KEL.typ.epoch Hybrid_Archive_Date_ := 0;
     KEL.typ.epoch Vault_Date_Last_Seen_ := 0;
   END;
-  SHARED __ST389092_Layout __ND5613936__Project(E_Input_P_I_I(__in,__cfg).Layout __PP5613932) := TRANSFORM
-    SELF.UID := __PP5613932.Subject_;
-    SELF.U_I_D__1_ := __PP5613932.UID;
-    SELF := __PP5613932;
+  SHARED __ST416219_Layout __ND6133752__Project(E_Input_P_I_I(__in,__cfg).Layout __PP6133748) := TRANSFORM
+    SELF.UID := __PP6133748.Subject_;
+    SELF.U_I_D__1_ := __PP6133748.UID;
+    SELF := __PP6133748;
   END;
-  SHARED __EE5613945 := PROJECT(__EE5613954,__ND5613936__Project(LEFT));
-  SHARED __ST389120_Layout := RECORD
+  SHARED __EE6133761 := PROJECT(__EE6133770,__ND6133752__Project(LEFT));
+  SHARED __ST416247_Layout := RECORD
     KEL.typ.ntyp(E_Person().Typ) UID;
     KEL.typ.ntyp(E_Input_P_I_I().Typ) O_N_L_Y___U_I_D_;
     KEL.typ.epoch Archive___Date_ := 0;
@@ -32,8 +32,8 @@ EXPORT B_Person_9(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG_Comp
     KEL.typ.epoch Hybrid_Archive_Date_ := 0;
     KEL.typ.epoch Vault_Date_Last_Seen_ := 0;
   END;
-  SHARED __EE5613969 := PROJECT(__EE5613945,TRANSFORM(__ST389120_Layout,SELF.O_N_L_Y___U_I_D_ := LEFT.U_I_D__1_,SELF := LEFT));
-  SHARED __ST390156_Layout := RECORD
+  SHARED __EE6133785 := PROJECT(__EE6133761,TRANSFORM(__ST416247_Layout,SELF.O_N_L_Y___U_I_D_ := LEFT.U_I_D__1_,SELF := LEFT));
+  SHARED __ST417283_Layout := RECORD
     KEL.typ.nuid UID;
     KEL.typ.nstr Gender_;
     KEL.typ.nstr Lex_I_D_Segment_;
@@ -49,8 +49,8 @@ EXPORT B_Person_9(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG_Comp
     KEL.typ.ndataset(E_Person(__in,__cfg).Hunt_Fish_Layout) Hunt_Fish_;
     KEL.typ.ndataset(E_Person(__in,__cfg).Consumer_Statement_Flags_Layout) Consumer_Statement_Flags_;
     KEL.typ.ndataset(E_Person(__in,__cfg).Thrive_Layout) Thrive_;
-    KEL.typ.ndataset(B_Person_10(__in,__cfg).__ST93236_Layout) Address_Hierarchy_Set_;
-    KEL.typ.ndataset(B_Person_10(__in,__cfg).__ST370978_Layout) All_Lien_Data_;
+    KEL.typ.ndataset(B_Person_10(__in,__cfg).__ST96561_Layout) Address_Hierarchy_Set_;
+    KEL.typ.ndataset(B_Person_10(__in,__cfg).__ST397428_Layout) All_Lien_Data_;
     KEL.typ.ntyp(E_Person().Typ) U_I_D__1_;
     KEL.typ.ntyp(E_Input_P_I_I().Typ) O_N_L_Y___U_I_D_;
     KEL.typ.epoch Archive___Date_ := 0;
@@ -60,24 +60,27 @@ EXPORT B_Person_9(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG_Comp
     KEL.typ.epoch Vault_Date_Last_Seen_ := 0;
     KEL.typ.int __RecordCount := 0;
   END;
-  __JC5614102(B_Person_10(__in,__cfg).__ST373066_Layout __EE5613931, __ST389120_Layout __EE5613969) := __EEQP(__EE5613931.UID,__EE5613969.UID);
-  __ST390156_Layout __JT5614102(B_Person_10(__in,__cfg).__ST373066_Layout __l, __ST389120_Layout __r) := TRANSFORM
+  __JC6133923(B_Person_10(__in,__cfg).__ST399578_Layout __EE6133747, __ST416247_Layout __EE6133785) := __EEQP(__EE6133747.UID,__EE6133785.UID);
+  __ST417283_Layout __JT6133923(B_Person_10(__in,__cfg).__ST399578_Layout __l, __ST416247_Layout __r) := TRANSFORM
     SELF.U_I_D__1_ := __r.UID;
     SELF := __l;
     SELF := __r;
   END;
-  SHARED __EE5614103 := JOIN(__EE5613931,__EE5613969,__JC5614102(LEFT,RIGHT),__JT5614102(LEFT,RIGHT),LEFT OUTER,SMART,KEEP(1));
-  EXPORT __ST387354_Layout := RECORD
+  SHARED __EE6133924 := JOIN(__EE6133747,__EE6133785,__JC6133923(LEFT,RIGHT),__JT6133923(LEFT,RIGHT),LEFT OUTER,SMART,KEEP(1));
+  EXPORT __ST414483_Layout := RECORD
     KEL.typ.nstr T_M_S_I_D_;
     KEL.typ.nstr Filing_Type_Description_;
     KEL.typ.nint Amount_;
     KEL.typ.bool Landlord_Tenant_Dispute_Flag_ := FALSE;
     KEL.typ.nkdate Original_Filing_Date_;
+    KEL.typ.nint Age_In_Days_;
     KEL.typ.nbool Is_Civil_Court_Judgment_;
     KEL.typ.nbool Is_Federal_Tax_Lien_;
     KEL.typ.nbool Is_Foreclosure_Judgment_;
     KEL.typ.nbool Is_Other_Lien_;
     KEL.typ.nbool Is_Other_Tax_Lien_;
+    KEL.typ.nbool Is_Over_All_Judgment_;
+    KEL.typ.nbool Is_Over_All_Lien_;
     KEL.typ.nbool Is_Small_Cliams_Judgment_;
     KEL.typ.nbool Is_State_Tax_Lien_;
     KEL.typ.nbool Is_Total_Tax_Lien_;
@@ -88,7 +91,7 @@ EXPORT B_Person_9(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG_Comp
     KEL.typ.epoch Vault_Date_Last_Seen_ := 0;
     KEL.typ.int __RecordCount := 0;
   END;
-  EXPORT __ST273949_Layout := RECORD
+  EXPORT __ST287366_Layout := RECORD
     KEL.typ.nuid UID;
     KEL.typ.nstr Gender_;
     KEL.typ.nstr Lex_I_D_Segment_;
@@ -104,10 +107,10 @@ EXPORT B_Person_9(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG_Comp
     KEL.typ.ndataset(E_Person(__in,__cfg).Hunt_Fish_Layout) Hunt_Fish_;
     KEL.typ.ndataset(E_Person(__in,__cfg).Consumer_Statement_Flags_Layout) Consumer_Statement_Flags_;
     KEL.typ.ndataset(E_Person(__in,__cfg).Thrive_Layout) Thrive_;
-    KEL.typ.ndataset(B_Person_10(__in,__cfg).__ST93236_Layout) Address_Hierarchy_Set_;
-    KEL.typ.ndataset(__ST387354_Layout) All_Lien_Data_;
+    KEL.typ.ndataset(B_Person_10(__in,__cfg).__ST96561_Layout) Address_Hierarchy_Set_;
+    KEL.typ.ndataset(__ST414483_Layout) All_Lien_Data_;
     KEL.typ.ntyp(E_Input_P_I_I().Typ) P_I_I_;
-    KEL.typ.ndataset(B_Person_10(__in,__cfg).__ST93236_Layout) Recent_Addr_Full_Set_;
+    KEL.typ.ndataset(B_Person_10(__in,__cfg).__ST96561_Layout) Recent_Addr_Full_Set_;
     KEL.typ.epoch Archive___Date_ := 0;
     KEL.typ.epoch Date_First_Seen_ := 0;
     KEL.typ.epoch Date_Last_Seen_ := 0;
@@ -115,29 +118,24 @@ EXPORT B_Person_9(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG_Comp
     KEL.typ.epoch Vault_Date_Last_Seen_ := 0;
     KEL.typ.int __RecordCount := 0;
   END;
-  SHARED __ST273949_Layout __ND5614787__Project(__ST390156_Layout __PP5613160) := TRANSFORM
-    __EE5613731 := __PP5613160.All_Lien_Data_;
-    __ST387354_Layout __ND5614759__Project(B_Person_10(__in,__cfg).__ST370978_Layout __PP5613457) := TRANSFORM
-      __CC32789 := ['CIVIL JUDGMENT','CIVIL JUDGMENT RELEASE','CIVIL SPECIAL JUDGMENT','CIVIL SPECIAL JUDGMENT RELEASE','FEDERAL COURT JUDGMENT','JUDGMENT','JUDGMENTS','JUDGMENTS DOCKET','RENEW/REOPEN CIVIL JUDGMENT','SATISFACTION OF JUDGMENT','SATISFIED JUDGMENT','SUBSEQUENT JUDGMENT','DOMESTIC JUDGMENT IN DIVORCE','DOMESTIC RELEASE IN DIVORCE'];
-      SELF.Is_Civil_Court_Judgment_ := __AND(__CN(__PP5613457.Landlord_Tenant_Dispute_Flag_ = FALSE),__OP2(__PP5613457.Filing_Type_Description_,IN,__CN(__CC32789)));
-      __CC32793 := ['FORECLOSURE (JUDGMENT)','FORECLOSURE SATISFIED'];
-      SELF.Is_Foreclosure_Judgment_ := __AND(__CN(__PP5613457.Landlord_Tenant_Dispute_Flag_ = FALSE),__OP2(__PP5613457.Filing_Type_Description_,IN,__CN(__CC32793)));
-      __CC32773 := ['BUILDING LIEN','BUILDING LIEN RELEASE','BUILDING RELEASE','CHILD SUPPORT LIEN','CHILD SUPPORT PAYMENT','CHILD SUPPORT PAYMENT RELEASE','JUDGEMENT LIEN','JUDGMENT LIEN RELEASE','SIDEWALK LIEN','SIDEWALK LIEN RELEASE','SIDEWALK RELEASE','WELFARE LIEN'];
-      SELF.Is_Other_Lien_ := __AND(__CN(__PP5613457.Landlord_Tenant_Dispute_Flag_ = FALSE),__OP2(__PP5613457.Filing_Type_Description_,IN,__CN(__CC32773)));
-      __CC32798 := ['RENEW/REOPEN SMALL CLAIM JUDGM','SMALL CLAIMS JUDGMENT','SMALL CLAIMS JUDGMENT RELEASE'];
-      SELF.Is_Small_Cliams_Judgment_ := __AND(__CN(__PP5613457.Landlord_Tenant_Dispute_Flag_ = FALSE),__OP2(__PP5613457.Filing_Type_Description_,IN,__CN(__CC32798)));
-      SELF.Is_Total_Tax_Lien_ := __OR(__OR(__PP5613457.Is_Federal_Tax_Lien_,__PP5613457.Is_State_Tax_Lien_),__PP5613457.Is_Other_Tax_Lien_);
-      SELF := __PP5613457;
+  SHARED __ST287366_Layout __ND6134624__Project(__ST417283_Layout __PP6132975) := TRANSFORM
+    __EE6133547 := __PP6132975.All_Lien_Data_;
+    __ST414483_Layout __ND6133281__Project(B_Person_10(__in,__cfg).__ST397428_Layout __PP6133277) := TRANSFORM
+      __CC13392 := KEL.Routines.MinN(FN_Compile(__cfg).FN_G_E_T_B_U_I_L_D_D_A_T_E(__ECAST(KEL.typ.nstr,__CN('liens_build_version'))),__CN(__cfg.CurrentDate));
+      SELF.Age_In_Days_ := FN_Compile(__cfg).FN_A_B_S_D_A_Y_S_B_E_T_W_E_E_N(__ECAST(KEL.typ.nkdate,__PP6133277.Original_Filing_Date_),__ECAST(KEL.typ.nkdate,__CC13392));
+      SELF.Is_Over_All_Judgment_ := __OR(__OR(__PP6133277.Is_Civil_Court_Judgment_,__PP6133277.Is_Foreclosure_Judgment_),__PP6133277.Is_Small_Cliams_Judgment_);
+      SELF.Is_Over_All_Lien_ := __OR(__PP6133277.Is_Total_Tax_Lien_,__PP6133277.Is_Other_Lien_);
+      SELF := __PP6133277;
     END;
-    SELF.All_Lien_Data_ := __PROJECT(__EE5613731,__ND5614759__Project(LEFT));
-    SELF.P_I_I_ := __PP5613160.O_N_L_Y___U_I_D_;
-    __EE5613753 := __PP5613160.Address_Hierarchy_Set_;
-    __CC22757 := [0,91,92,93,94,95,96,97,98,99];
-    __BS5613754 := __T(__EE5613753);
-    __EE5614802 := __BS5613754(__T(__AND(__CN(FN_Compile(__cfg).FN_Is_Not_Enough_To_Clean(__ECAST(KEL.typ.nstr,__T(__EE5613753).Address_Rank_)) = FALSE),__AND(__NOT(__OP2(__T(__EE5613753).Address_Rank_,IN,__CN(__CC22757))),__AND(__OR(__OP2(__T(__EE5613753).Address_Type_,<>,__CN('BUS')),__NT(__T(__EE5613753).Address_Type_)),__OR(__OP2(__T(__EE5613753).Addr1_From_Components_,<>,__CN('P')),__NT(__T(__EE5613753).Addr1_From_Components_)))))));
-    __EE5614813 := TOPN(__EE5614802(__NN(__EE5614802.Address_Rank_) AND __NN(__EE5614802.Sort_Field_)),2,__T(__EE5614802.Address_Rank_), -__T(__EE5614802.Sort_Field_),__T(Address_Type_),__T(Address_Status_),__T(State_Code_),__T(County_Code_),__T(Latitude_),__T(Longitude_),__T(Geo_Blk_),__T(Addr_Full_),__T(Primary_Range_),__T(Predirectional_),__T(Primary_Name_),__T(Suffix_),__T(Postdirectional_),__T(Unit_Designation_),__T(Secondary_Range_),__T(Postal_City_),__T(State_),__T(Z_I_P5_),__T(Z_I_P4_),__T(Addr1_From_Components_),__T(Hierarchy_Date_First_Seen_),__T(Hierarchy_Date_Last_Seen_));
-    SELF.Recent_Addr_Full_Set_ := __CN(__EE5614813);
-    SELF := __PP5613160;
+    SELF.All_Lien_Data_ := __PROJECT(__EE6133547,__ND6133281__Project(LEFT));
+    SELF.P_I_I_ := __PP6132975.O_N_L_Y___U_I_D_;
+    __EE6133569 := __PP6132975.Address_Hierarchy_Set_;
+    __CC22776 := [0,91,92,93,94,95,96,97,98,99];
+    __BS6133570 := __T(__EE6133569);
+    __EE6134610 := __BS6133570(__T(__AND(__CN(FN_Compile(__cfg).FN_Is_Not_Enough_To_Clean(__ECAST(KEL.typ.nstr,__T(__EE6133569).Address_Rank_)) = FALSE),__AND(__NOT(__OP2(__T(__EE6133569).Address_Rank_,IN,__CN(__CC22776))),__AND(__OR(__OP2(__T(__EE6133569).Address_Type_,<>,__CN('BUS')),__NT(__T(__EE6133569).Address_Type_)),__OR(__OP2(__T(__EE6133569).Addr1_From_Components_,<>,__CN('P')),__NT(__T(__EE6133569).Addr1_From_Components_)))))));
+    __EE6134621 := TOPN(__EE6134610(__NN(__EE6134610.Address_Rank_) AND __NN(__EE6134610.Sort_Field_)),2,__T(__EE6134610.Address_Rank_), -__T(__EE6134610.Sort_Field_),__T(Address_Type_),__T(Address_Status_),__T(State_Code_),__T(County_Code_),__T(Latitude_),__T(Longitude_),__T(Geo_Blk_),__T(Addr_Full_),__T(Primary_Range_),__T(Predirectional_),__T(Primary_Name_),__T(Suffix_),__T(Postdirectional_),__T(Unit_Designation_),__T(Secondary_Range_),__T(Postal_City_),__T(State_),__T(Z_I_P5_),__T(Z_I_P4_),__T(Addr1_From_Components_),__T(Hierarchy_Date_First_Seen_),__T(Hierarchy_Date_Last_Seen_));
+    SELF.Recent_Addr_Full_Set_ := __CN(__EE6134621);
+    SELF := __PP6132975;
   END;
-  EXPORT __ENH_Person_9 := PROJECT(__EE5614103,__ND5614787__Project(LEFT));
+  EXPORT __ENH_Person_9 := PROJECT(__EE6133924,__ND6134624__Project(LEFT));
 END;

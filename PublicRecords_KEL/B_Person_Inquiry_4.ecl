@@ -1,11 +1,11 @@
-//HPCC Systems KEL Compiler Version 1.5.0rc1
+﻿//HPCC Systems KEL Compiler Version 1.5.0rc1
 IMPORT KEL15 AS KEL;
 IMPORT B_Person_Inquiry_5,CFG_Compile,E_Inquiry,E_Person,E_Person_Inquiry FROM PublicRecords_KEL;
 IMPORT * FROM KEL15.Null;
 EXPORT B_Person_Inquiry_4(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG_Compile __cfg = CFG_Compile) := MODULE
   SHARED VIRTUAL TYPEOF(B_Person_Inquiry_5(__in,__cfg).__ENH_Person_Inquiry_5) __ENH_Person_Inquiry_5 := B_Person_Inquiry_5(__in,__cfg).__ENH_Person_Inquiry_5;
-  SHARED __EE5970504 := __ENH_Person_Inquiry_5;
-  EXPORT __ST785145_Layout := RECORD
+  SHARED __EE6539292 := __ENH_Person_Inquiry_5;
+  EXPORT __ST849357_Layout := RECORD
     KEL.typ.nstr Transaction_I_D_;
     KEL.typ.str Method_ := '';
     KEL.typ.str Function_Description_ := '';
@@ -44,13 +44,13 @@ EXPORT B_Person_Inquiry_4(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, 
     KEL.typ.epoch Vault_Date_Last_Seen_ := 0;
     KEL.typ.int __RecordCount := 0;
   END;
-  EXPORT __ST253079_Layout := RECORD
+  EXPORT __ST265508_Layout := RECORD
     KEL.typ.ntyp(E_Person().Typ) Subject_;
     KEL.typ.ntyp(E_Inquiry().Typ) Transaction_;
     KEL.typ.nstr Transaction_I_D_;
     KEL.typ.nstr Sequence_Number_;
     KEL.typ.ndataset(E_Person_Inquiry(__in,__cfg).Data_Sources_Layout) Data_Sources_;
-    KEL.typ.ndataset(__ST785145_Layout) Gather_Inquiries_;
+    KEL.typ.ndataset(__ST849357_Layout) Gather_Inquiries_;
     KEL.typ.timestamp Archive___Date_ := 0;
     KEL.typ.timestamp Date_First_Seen_ := 0;
     KEL.typ.timestamp Date_Last_Seen_ := 0;
@@ -58,15 +58,15 @@ EXPORT B_Person_Inquiry_4(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, 
     KEL.typ.epoch Vault_Date_Last_Seen_ := 0;
     KEL.typ.int __RecordCount := 0;
   END;
-  SHARED __ST253079_Layout __ND5970490__Project(B_Person_Inquiry_5(__in,__cfg).__ST259966_Layout __PP5970204) := TRANSFORM
-    __EE5970488 := __PP5970204.Gather_Inquiries_;
-    __ST785145_Layout __ND5970439__Project(B_Person_Inquiry_5(__in,__cfg).__ST591945_Layout __PP5970229) := TRANSFORM
-      SELF.Is_Other_ := NOT (__PP5970229.Is_Banking_ OR __PP5970229.Is_Auto_Srch_ OR __PP5970229.Is_Retail_ OR __PP5970229.Is_Mortgage_ OR __PP5970229.Is_Utility_ OR __PP5970229.Is_Prepaid_Card_ OR __PP5970229.Is_Communications_ OR __PP5970229.Is_Student_Loan_ OR __PP5970229.Is_Retail_Payment_ OR __PP5970229.Is_Quiz_Provider_);
-      SELF.Valid_Retail_ := __AND(__PP5970229.Valid_Inquiries_,__CN(__PP5970229.Is_Retail_));
-      SELF := __PP5970229;
+  SHARED __ST265508_Layout __ND6539278__Project(B_Person_Inquiry_5(__in,__cfg).__ST272716_Layout __PP6538992) := TRANSFORM
+    __EE6539276 := __PP6538992.Gather_Inquiries_;
+    __ST849357_Layout __ND6539227__Project(B_Person_Inquiry_5(__in,__cfg).__ST632953_Layout __PP6539017) := TRANSFORM
+      SELF.Is_Other_ := NOT (__PP6539017.Is_Banking_ OR __PP6539017.Is_Auto_Srch_ OR __PP6539017.Is_Retail_ OR __PP6539017.Is_Mortgage_ OR __PP6539017.Is_Utility_ OR __PP6539017.Is_Prepaid_Card_ OR __PP6539017.Is_Communications_ OR __PP6539017.Is_Student_Loan_ OR __PP6539017.Is_Retail_Payment_ OR __PP6539017.Is_Quiz_Provider_);
+      SELF.Valid_Retail_ := __AND(__PP6539017.Valid_Inquiries_,__CN(__PP6539017.Is_Retail_));
+      SELF := __PP6539017;
     END;
-    SELF.Gather_Inquiries_ := __PROJECT(__EE5970488,__ND5970439__Project(LEFT));
-    SELF := __PP5970204;
+    SELF.Gather_Inquiries_ := __PROJECT(__EE6539276,__ND6539227__Project(LEFT));
+    SELF := __PP6538992;
   END;
-  EXPORT __ENH_Person_Inquiry_4 := PROJECT(__EE5970504,__ND5970490__Project(LEFT));
+  EXPORT __ENH_Person_Inquiry_4 := PROJECT(__EE6539292,__ND6539278__Project(LEFT));
 END;

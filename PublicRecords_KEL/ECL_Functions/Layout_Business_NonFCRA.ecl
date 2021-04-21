@@ -160,11 +160,11 @@
 	STRING10 PI_InpSSNDeceasedDt;
 	STRING6 PI_InpAddrStateDLAvailFlag;
 	STRING6 PI_InpAddrStateVoterAvailFlag;
-	//STRING PI_InpPhoneSICCodeHRList;
-	//STRING PI_InpPhoneNAICSCodeHRList;
-	//STRING6 PI_InpPhoneIsHRCorrectFacFlag;
-	//STRING6 PI_InpPhoneType;
-	//STRING6 PI_InpPhoneIsBusPhoneFlag;	
+	STRING PI_InpPhoneSICCodeHRList;
+	STRING PI_InpPhoneNAICSCodeHRList;
+	STRING6 PI_InpPhoneIsHRCorrectFacFlag;
+	STRING6 PI_InpPhoneType;
+	STRING6 PI_InpPhoneIsBusPhoneFlag;	
 	INTEGER3 PI_SrchPerInpSSNCnt1Y;
 	INTEGER3 PI_SrchLexIDPerInpSSNCnt1Y;
 	INTEGER3 PI_SrchLNamePerInpSSNCnt1Y;
@@ -593,6 +593,38 @@
 	INTEGER PL_STLCnt5Y;
 	STRING PL_STLDtList5Y;
 	INTEGER3 PL_EmrgAge;
+	
+	STRING6 PL_AstPropFlagEv;
+	STRING6 PL_AstPropCurrFlag;
+	STRING6 PL_AstPropOwnershipIndx;
+	INTEGER3 PL_AstPropCurrWMktValCnt;
+	STRING PL_AstPropCurrMktValList;
+	INTEGER3 PL_AstPropCurrWTaxValCnt;
+	STRING PL_AstPropCurrTaxValList;
+	INTEGER4 PL_AstPropCurrTaxValTot;
+	INTEGER3 PL_AstPropCurrWAVMValCnt;
+	STRING PL_AstPropCurrAVMValList;
+	INTEGER4 PL_AstPropCurrAVMValTot;
+	INTEGER4 PL_AstPropCurrAVMValAvg;
+	//Person Header Source Verification
+	STRING10 G_BuildHdrDt;
+	INTEGER PL_VerSrcCntEv;
+	STRING100 PL_VerSrcListEv;
+	STRING300 PL_VerSrcEmrgDtListEv;
+	STRING300 PL_VerSrcLastDtListEv;
+	STRING10 PL_VerSrcOldDtEv;
+	STRING10 PL_VerSrcNewDtEv;
+	STRING6 P_LexIDRstdOnlyFlag;
+	
+	STRING100 PL_VerSSNSrcListEv;
+	STRING300 PL_VerSSNSrcEmrgDtListEv;
+	STRING300 PL_VerSSNSrcLastDtListEv;
+	INTEGER8 PL_VerSSNSrcCntEv;
+	INTEGER PL_VerNameFirstSrcCntEv;
+	STRING PL_VerNameFirstSrcListEv;
+	STRING PL_VerNameFirstSrcEmrgDtListEv;
+	STRING PL_VerNameFirstSrcLastDtListEv;	
+	
 	// Business attributes	
 	STRING65 B_InpAcct;
 	INTEGER	G_ProcBusUID;
@@ -1678,13 +1710,5 @@
 	STRING6 BE_BestAddrNewTaxValYrEv;
 	INTEGER4 BE_BestAddrLotSize;
 	INTEGER4 BE_BestAddrBldgSize;
-	//Person Header Source Verification
-	// STRING10 G_BuildHdrDt;
-	// INTEGER PL_VerSrcCntEv;
-	// STRING100 PL_VerSrcListEv;
-	// STRING300 PL_VerSrcEmrgDtListEv;
-	// STRING300 PL_VerSrcLastDtListEv;
-	// STRING10 PL_VerSrcOldDtEv;
-	// STRING10 PL_VerSrcNewDtEv;
-	// STRING6 P_LexIDRstdOnlyFlag;
+
 END;
