@@ -34,5 +34,13 @@ RoxieDev_Query_CI:
     - git add $RES_FILE
     - git add $WARN_FILE
     - git commit -m "Daily Query Syntax Check Results"
-    - git push https://${CIUser_Arqs}:${CIToken_Arqs}@${CI_REPOSITORY_URL#*@}
+    - |
+      if git push https://${CIUser_Arqs}:${CIToken_Arqs}@${CI_REPOSITORY_URL#*@}
+      then echo "Git Push Succeeded"
+      elif sleep 5m && git push https://${CIUser_Arqs}:${CIToken_Arqs}@${CI_REPOSITORY_URL#*@}
+      then echo "Git Push Succeeded (2nd Attempt)"
+      elif sleep 5m && git push https://${CIUser_Arqs}:${CIToken_Arqs}@${CI_REPOSITORY_URL#*@}
+      then echo "Git Push Succeeded (3rd Attempt)"
+      else checkres=1
+      fi
     - exit $checkres

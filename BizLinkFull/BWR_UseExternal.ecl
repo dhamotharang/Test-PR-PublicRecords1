@@ -1,9 +1,9 @@
-﻿//This is the code to execute in a builder window
+//This is the code to execute in a builder window
 #OPTION('multiplePersistInstances', FALSE);
-#workunit('name','BizLinkFull.BWR_UseExternal - Using External Linking - SALT V4.4.1');
+#workunit('name','BizLinkFull.BWR_UseExternal - Using External Linking - SALT V4.4.4');
 IMPORT BizLinkFull,SALT44;
 // For any fields you have replace the /* */ 
- 
+
 // This is the 'thor only' version (no roxie)
   SmallJob := TRUE;
   InUpdateIDs := FALSE;

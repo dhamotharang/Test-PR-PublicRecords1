@@ -372,7 +372,7 @@ output(ConsumerStatementResults, named('CSDResults'));
 #else // Else, output the model results directly
 
 /* Use this join for Validation*/
-Results := join(batchin_with_seq, search_results, left.seq=right.seq,
+Results := join(batchin_with_seq, search_results, left.seq=(Integer)right.TransactionID, // use TransactionID for LUCI models, seq for older models
 		transform( {string30 acctno, recordof(search_results)},
 			self.acctno := left.acctno;
 			self := right, self := []), left outer);  // make this a left outer join to put the original inputs back in 

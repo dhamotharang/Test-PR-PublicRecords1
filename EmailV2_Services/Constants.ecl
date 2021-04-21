@@ -98,6 +98,7 @@ EXPORT Constants := MODULE
     EXPORT UNSIGNED  MaxSQLBindVariables := 10;
     EXPORT UNSIGNED1 requestTimeout  := 5;
     EXPORT UNSIGNED1 requestRetries  := 1;
+    EXPORT UNSIGNED1 EA_GW_TIMEOUT   := 3;
     EXPORT STRING    SourceBriteVerifyEmail := 'BriteVerify_Email';
     EXPORT STRING    SourceBV := 'BV';
     EXPORT STRING    RoleAddress  := 'Role Address';

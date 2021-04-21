@@ -3,12 +3,12 @@
 EXPORT GetIdentitiesCount(DATASET($.Layouts.PhoneFinder.Final) dIn) :=
 FUNCTION
 
-  dIn_filter := dIn(did != 0 OR lname != '' OR listed_name != '' OR typeflag != Phones.Constants.TypeFlag.DataSource_PV);
+  dIn_filter := dIn(did != 0 OR full_name != '' OR typeflag != Phones.Constants.TypeFlag.DataSource_PV);
   dInDedup_did := DEDUP(SORT(dIn_filter(did != 0), acctno, phone, did), 
                         acctno, phone, did );
 
-  dInDedup_nodid := DEDUP(SORT(dIn_filter((did = 0)), acctno, phone, fname, lname, listed_name, prim_range, prim_name, predir, suffix, postdir, unit_desig, sec_range, city_name, st, zip), 
-                        acctno, phone, fname, lname, listed_name, prim_range, prim_name, predir, suffix, postdir, unit_desig, sec_range,city_name, st, zip);                      
+  dInDedup_nodid := DEDUP(SORT(dIn_filter((did = 0)), acctno, phone, full_name, prim_range, prim_name, predir, suffix, postdir, unit_desig, sec_range, city_name, st, zip), 
+                        acctno, phone, full_name, prim_range, prim_name, predir, suffix, postdir, unit_desig, sec_range,city_name, st, zip);                      
   
   dInDedup := SORT(dInDedup_did & dInDedup_nodid, acctno, phone);
   rCntIdentity_Layout :=
