@@ -345,7 +345,7 @@ end;
 	Business_Contact_LexIDs := DEDUP(DEDUP(SORT(Business_Contact_LexIDs_Temp, UIDAppend, P_LexID), UIDAppend, P_LexID), UIDAppend, KEEP(100));	
 /*************************************************************************************************************/
 	//transform business contact into input layout and dedup
-	Input_Plus_Contacts := Input_FDC + Business_Contact_LexIDs;
+	Input_Plus_Contacts := (Input_FDC + Business_Contact_LexIDs)(P_LexID > 0);
 
 	//for searching
 	Input_FDC_Business_Contact_LexIDs := DEDUP(SORT(Input_Plus_Contacts, UIDAppend, P_LexID), UIDAppend, P_LexID);		//we use this later
@@ -357,7 +357,7 @@ end;
 	Key_dx_Header__key_did_hhid :=
 			JOIN(Input_FDC, dx_Header.key_did_hhid(),
 			Common.DoFDCJoin_dx_Header__key_did_hhid =TRUE  and 
-			LEFT.P_LexID <> 0 AND
+			LEFT.P_LexID > 0 AND
 				KEYED(LEFT.P_LexID =RIGHT.did) and right.ver=1,
 				TRANSFORM(Layouts_FDC.Layout_dx_Header__key_did_hhid,
 					SELF.UIDAppend := LEFT.UIDAppend,
@@ -387,7 +387,7 @@ end;
 	Key_dx_Header__key_hhid_did :=
 			JOIN(deduped_HHIDS, dx_Header.key_hhid_did(), //no dates - does not need date selected.
 			Common.DoFDCJoin_dx_Header__key_did_hhid =TRUE  and 
-			LEFT.hhid_relat <> 0 AND
+			LEFT.hhid_relat > 0 AND
 				KEYED(LEFT.hhid_relat =RIGHT.hhid_relat),
 				TRANSFORM(Layouts_FDC.Layout_dx_Header__key_hhid_did,
 					SELF.UIDAppend := LEFT.UIDAppend,
@@ -411,7 +411,7 @@ end;
 						         
 		ismarketing := if(Options.isMarketing,'MARKETING','');
 		sourcecoderelatives := if(Options.isMarketing,MDR.sourceTools.src_Marketing_Relatives_Data,MDR.sourceTools.src_Relatives_Data);
-		HeaderRelatives :=  IF(Common.DoFDCJoin_Relatives__Key_Relatives_v3 = TRUE , Relationship.proc_GetRelationshipNeutral(PROJECT(Input_FDC_Business_Contact_LexIDs, TRANSFORM(Relationship.layout_GetRelationship.DIDs_layout, SELF.DID := LEFT.P_Lexid)),
+		HeaderRelatives :=  IF(Common.DoFDCJoin_Relatives__Key_Relatives_v3 = TRUE , Relationship.proc_GetRelationshipNeutral(PROJECT(Input_FDC_Business_Contact_LexIDs(P_LexID > 0), TRANSFORM(Relationship.layout_GetRelationship.DIDs_layout, SELF.DID := LEFT.P_Lexid)),
 																	TopNCount:=100,
 																	RelativeFlag :=TRUE,AssociateFlag:=TRUE,
 																	doAtmost:=TRUE,MaxCount:=PublicRecords_KEL.ECL_Functions.Constants.Default_Atmost_1000, RelKeyFlag:= ismarketing).result);
@@ -448,7 +448,7 @@ end;
 
 
 /*************************************************************************************************************/
-	All_Relatives := (Key_Relatives__Key_Relatives_V3);//both marketing and non marketing relatives.
+	All_Relatives := Key_Relatives__Key_Relatives_V3(did2 >0);//both marketing and non marketing relatives.
 	
 	Seperate_relatives := All_Relatives(did1 IN InputLexids);//we only want input lexid relatives NOT contact relatives
 
@@ -456,11 +456,11 @@ end;
  	
 	Seperate_HouseHold_Lexids := Key_dx_Header__key_hhid_did(P_LexID IN InputLexids);//we only want input lexid hhids NOT contact hhids
 
-  HHIDLexids_preadl := PROJECT(Seperate_HouseHold_Lexids, TRANSFORM(Layouts_FDC.Layout_FDC, SELF.P_LexID := LEFT.did; SELF := LEFT; SELF := []));
+  HHIDLexids_preadl := PROJECT(Seperate_HouseHold_Lexids(did >0), TRANSFORM(Layouts_FDC.Layout_FDC, SELF.P_LexID := LEFT.did; SELF := LEFT; SELF := []));
 		
 	//for searching
 	//this HHID Dataset can go to ADL Seq ONLY please use other HHID dataset Input_HHIDLexids below for other key searching
-  Input_HHIDLexids_Input6thRep_preADL := DEDUP(SORT((Input_FDC + HHIDLexids_preadl + Input6thRep), UIDAppend, P_LexID), UIDAppend, P_LexID);
+  Input_HHIDLexids_Input6thRep_preADL := DEDUP(SORT(((Input_FDC + HHIDLexids_preadl + Input6thRep)(P_LexID > 0)), UIDAppend, P_LexID), UIDAppend, P_LexID);
  
 /*************************************************************************************************************/
 	
@@ -511,14 +511,14 @@ end;
 /*************************************************************************************************************/
 //for searching	
 
-  Input_HHIDLexids := DEDUP(SORT((Input_FDC + HHIDLexids), UIDAppend, P_LexID), UIDAppend, P_LexID);
-	Input_FDC_RelativesLexids_HHIDLexids_LexIDs := DEDUP(SORT((RelativesLexids + Input_HHIDLexids ), UIDAppend, P_LexID), UIDAppend, P_LexID);
+  Input_HHIDLexids := DEDUP(SORT((Input_FDC + HHIDLexids)(P_LexID > 0), UIDAppend, P_LexID), UIDAppend, P_LexID);
+	Input_FDC_RelativesLexids_HHIDLexids_LexIDs := DEDUP(SORT((RelativesLexids + Input_HHIDLexids )(P_LexID > 0), UIDAppend, P_LexID), UIDAppend, P_LexID);
 
-	Business_Contact_LexIDs_Input6thRep := DEDUP(SORT((Business_Contact_LexIDs + Input6thRep(P_LexID >0)), UIDAppend, P_LexID), UIDAppend, P_LexID);
+	Business_Contact_LexIDs_Input6thRep := DEDUP(SORT((Business_Contact_LexIDs + Input6thRep)(P_LexID > 0), UIDAppend, P_LexID), UIDAppend, P_LexID);
 
-	Input_FDC_RelativesLexids_Business_Contact_LexIDs_Input6thRep := DEDUP(SORT((Input_FDC + RelativesLexids + Business_Contact_LexIDs_Input6thRep), UIDAppend, P_LexID), UIDAppend, P_LexID);
+	Input_FDC_RelativesLexids_Business_Contact_LexIDs_Input6thRep := DEDUP(SORT((Input_FDC + RelativesLexids + Business_Contact_LexIDs_Input6thRep)(P_LexID > 0), UIDAppend, P_LexID), UIDAppend, P_LexID);
 
-  Input_FDC_RelativesLexids_HHIDLexids_Business_Contact_LexIDs_Input6thRep := DEDUP(SORT((Input_FDC_RelativesLexids_HHIDLexids_LexIDs + Business_Contact_LexIDs_Input6thRep), UIDAppend, P_LexID), UIDAppend, P_LexID);
+  Input_FDC_RelativesLexids_HHIDLexids_Business_Contact_LexIDs_Input6thRep := DEDUP(SORT((Input_FDC_RelativesLexids_HHIDLexids_LexIDs + Business_Contact_LexIDs_Input6thRep)(P_LexID > 0), UIDAppend, P_LexID), UIDAppend, P_LexID);
 
 
 /*************************************************************************************************************/
@@ -642,8 +642,8 @@ end;
 																				self := []));
 /*************************************************************************************************************/	
 //for searching																		
-	Input_Best_SSN_nonFCRA := Dedup(Sort(Best_SSN_NonFCRA+Input_FDC, UIDAppend, P_InpClnSSN),UIDAppend, P_InpClnSSN);
-	Input_Best_SSN_FCRA := Dedup(Sort(Best_SSN_FCRA+Input_FDC, UIDAppend, P_InpClnSSN),UIDAppend, P_InpClnSSN);
+	Input_Best_SSN_nonFCRA := Dedup(Sort((Best_SSN_NonFCRA+Input_FDC)((integer)P_InpClnSSN>0), UIDAppend, P_InpClnSSN),UIDAppend, P_InpClnSSN);
+	Input_Best_SSN_FCRA := Dedup(Sort((Best_SSN_FCRA+Input_FDC)((integer)P_InpClnSSN>0), UIDAppend, P_InpClnSSN),UIDAppend, P_InpClnSSN);
 /*************************************************************************************************************/
 	
 	Key_QH_SSN :=	

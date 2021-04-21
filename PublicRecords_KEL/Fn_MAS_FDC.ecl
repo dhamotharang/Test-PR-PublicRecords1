@@ -362,7 +362,7 @@ Current_Address_Consumer_recs_Contacts := join(Current_Address_Consumer_recs, Cu
 				SELF := LEFT,
 				SELF := []));
 
-		AVMGeoInputPrevCurr := dedup(sort(AVMGeoInputPrevCurrPre, UIDAppend, AddressGeoLink),UIDAppend, AddressGeoLink);					
+		AVMGeoInputPrevCurr := dedup(sort(AVMGeoInputPrevCurrPre(AddressGeoLink <> ''), UIDAppend, AddressGeoLink),UIDAppend, AddressGeoLink);					
 
 
 	Input_Phone_Consumer_recs :=
@@ -512,13 +512,13 @@ Current_Address_Consumer_recs_Contacts := join(Current_Address_Consumer_recs, Cu
 //all of this data below is used again for searching which is why we are re normalizing the data here
 
 	//transform business contact into input layout and dedup
-	Input_Plus_Contacts := Input_FDC + Business_Contact_LexIDs;
+	Input_Plus_Contacts := (Input_FDC + Business_Contact_LexIDs)(P_LexID > 0);
 
 	//for searching
 	Input_FDC_Business_Contact_LexIDs := DEDUP(SORT(Input_Plus_Contacts, UIDAppend, P_LexID), UIDAppend, P_LexID);		//we use this later
 	//for now contacts only use surname1, this will be changed later
 	temp_contacts_surnames := project(Business_Contact_LexIDs, transform(Layouts_FDC.Layout_FDC, self.P_InpClnSurname1 := left.P_InpClnSurname1, self.UIDAppend := left.UIDAppend, self.g_procuid := left.UIDAppend, self := left, self := []));		
-	Input_surnames := Input_FDC + temp_contacts_surnames(P_InpClnSurname1<>'');							
+	Input_surnames := (Input_FDC + temp_contacts_surnames)(P_InpClnSurname1<>'' and P_InpClnSurname1<>'-99998'and P_InpClnSurname1<>'-99999'and P_InpClnSurname1<>'-99997');							
 
 	cfpbsurname_input_contacts_pre :=
 		NORMALIZE( Input_surnames, 2, 
@@ -540,7 +540,7 @@ Current_Address_Consumer_recs_Contacts := join(Current_Address_Consumer_recs, Cu
 	norm_dx_Header__key_hhid_did := NORMALIZE(FDCDataset_Mini, LEFT.Dataset_dx_Header__key_hhid_did, TRANSFORM(RECORDOF(RIGHT), SELF.P_LexID := LEFT.P_LexID, SELF := RIGHT));	
 	norm_Key_Relatives_V3 := NORMALIZE(FDCDataset_Mini, LEFT.Dataset_Relatives__Key_Relatives_V3, TRANSFORM(RECORDOF(RIGHT), SELF.P_LexID := LEFT.P_LexID, SELF := RIGHT));	
 
-	All_Relatives := norm_Key_Relatives_V3;//both marketing and non marketing relatives with new interface.
+	All_Relatives := norm_Key_Relatives_V3(did2 >0);//both marketing and non marketing relatives with new interface.
 	
 	Seperate_relatives := All_Relatives(did1 IN InputLexids);//we only want input lexid relatives NOT contact relatives
 
@@ -548,7 +548,7 @@ Current_Address_Consumer_recs_Contacts := join(Current_Address_Consumer_recs, Cu
  	
 	Seperate_HouseHold_Lexids := norm_dx_Header__key_hhid_did(P_LexID IN InputLexids);//we only want input lexid hhids NOT contact hhids
 
-  HHIDLexids_preadl := PROJECT(Seperate_HouseHold_Lexids, TRANSFORM(Layouts_FDC.Layout_FDC, SELF.P_LexID := LEFT.did; SELF := LEFT; SELF := []));
+  HHIDLexids_preadl := PROJECT(Seperate_HouseHold_Lexids(did >0), TRANSFORM(Layouts_FDC.Layout_FDC, SELF.P_LexID := LEFT.did; SELF := LEFT; SELF := []));
 				
 	norm_Header__key_ADL_segmentation := NORMALIZE(FDCDataset_Mini, LEFT.Dataset_Header__key_ADL_segmentation, TRANSFORM(RECORDOF(RIGHT), SELF.P_LexID := LEFT.P_LexID, SELF := RIGHT));
 
@@ -559,10 +559,10 @@ Current_Address_Consumer_recs_Contacts := join(Current_Address_Consumer_recs, Cu
 
   HHIDLexids := PROJECT(HHIDs_ADLs_Good_Lexids, TRANSFORM(Layouts_FDC.Layout_FDC, SELF.P_LexID := LEFT.did; SELF := LEFT; SELF := []));
 
-  Input_HHIDLexids := DEDUP(SORT((Input_FDC + HHIDLexids), UIDAppend, P_LexID), UIDAppend, P_LexID);
-	Input_FDC_RelativesLexids_HHIDLexids_LexIDs := DEDUP(SORT((RelativesLexids + Input_HHIDLexids ), UIDAppend, P_LexID), UIDAppend, P_LexID);
+  Input_HHIDLexids := DEDUP(SORT((Input_FDC + HHIDLexids)(P_LexID > 0), UIDAppend, P_LexID), UIDAppend, P_LexID);
+	Input_FDC_RelativesLexids_HHIDLexids_LexIDs := DEDUP(SORT((RelativesLexids + Input_HHIDLexids )(P_LexID > 0), UIDAppend, P_LexID), UIDAppend, P_LexID);
 
-	Input_FDC_RelativesLexids_HHIDLexids_Business_Contact_LexIDs := DEDUP(SORT((Input_FDC_RelativesLexids_HHIDLexids_LexIDs + Business_Contact_LexIDs), UIDAppend, P_LexID), UIDAppend, P_LexID);
+	Input_FDC_RelativesLexids_HHIDLexids_Business_Contact_LexIDs := DEDUP(SORT((Input_FDC_RelativesLexids_HHIDLexids_LexIDs + Business_Contact_LexIDs)(P_LexID > 0), UIDAppend, P_LexID), UIDAppend, P_LexID);
 
 	//special search for avm
 	//need to use did from fid key instead of plexid in case input address is valid but not tied to P_lexid				
@@ -597,9 +597,9 @@ Current_Address_Consumer_recs_Contacts := join(Current_Address_Consumer_recs, Cu
 																				self := []));
 
 //for searching																		
-	Input_Best_SSN_nonFCRA := Dedup(Sort(Best_SSN_NonFCRA+Input_FDC, UIDAppend, P_InpClnSSN),UIDAppend, P_InpClnSSN);
+	Input_Best_SSN_nonFCRA := Dedup(Sort((Best_SSN_NonFCRA+Input_FDC)((integer)P_InpClnSSN>0), UIDAppend, P_InpClnSSN),UIDAppend, P_InpClnSSN);
 	Input_Best_Phone_nonFCRA := Dedup(Sort(Best_Phone_NonFCRA(phone <> '')+Input_Phone_All, UIDAppend, phone),UIDAppend, phone);
-	Input_Best_SSN_FCRA := Dedup(Sort(Best_SSN_FCRA+Input_FDC, UIDAppend, P_InpClnSSN),UIDAppend, P_InpClnSSN);
+	Input_Best_SSN_FCRA := Dedup(Sort((Best_SSN_FCRA+Input_FDC)((integer)P_InpClnSSN>0), UIDAppend, P_InpClnSSN),UIDAppend, P_InpClnSSN);
 /*************************************************************************************************************/
 
 	
@@ -681,7 +681,7 @@ BIPV2.IDAppendLayouts.AppendInput PrepBIPInputprox(Layouts_FDC.Layout_FDC le) :=
 
 /*************************************************************************************************************/
 //for searching
-	Input_and_Best_Address := sort(Dedup(Input_Address_All + Best_Sele_Address_Clean(PrimaryName != '' AND ZIP5 != ''), 
+	Input_and_Best_Address := sort(Dedup((Input_Address_All + Best_Sele_Address_Clean)(PrimaryName != '' AND ZIP5 != ''), 
 																				PrimaryRange, Predirectional, PrimaryName, AddrSuffix, Postdirectional, City, State, ZIP5, SecondaryRange, UIDAppend),
 																						PrimaryRange, Predirectional, PrimaryName, AddrSuffix, Postdirectional, City, State, ZIP5, SecondaryRange, UIDAppend);
 	
@@ -690,7 +690,7 @@ BIPV2.IDAppendLayouts.AppendInput PrepBIPInputprox(Layouts_FDC.Layout_FDC le) :=
 	Input_Address_BusBest_Current_Previous := dedup(sort(Input_Address_BusBest_Current_Previous_Pre, UIDAppend, PrimaryRange, Predirectional, PrimaryName, AddrSuffix, Postdirectional, City, State, ZIP5, SecondaryRange, CityCode),
 																			UIDAppend, PrimaryRange, Predirectional, PrimaryName, AddrSuffix, Postdirectional, City, State, ZIP5, SecondaryRange, CityCode); 
 																			
-	Input_Address_BusBest_Current_Previous_Emerging_dedup	:=	dedup(sort((Emerging_Address_Consumer_recs+Input_Address_BusBest_Current_Previous), UIDAppend, PrimaryRange, Predirectional, PrimaryName, AddrSuffix, Postdirectional, City, State, ZIP5, SecondaryRange, CityCode),
+	Input_Address_BusBest_Current_Previous_Emerging_dedup	:=	dedup(sort((Emerging_Address_Consumer_recs+Input_Address_BusBest_Current_Previous)(PrimaryName != '' AND ZIP5 != ''), UIDAppend, PrimaryRange, Predirectional, PrimaryName, AddrSuffix, Postdirectional, City, State, ZIP5, SecondaryRange, CityCode),
 																			UIDAppend, PrimaryRange, Predirectional, PrimaryName, AddrSuffix, Postdirectional, City, State, ZIP5, SecondaryRange, CityCode); 																
 																			
 	Input_Address_BusBest_Current_Previous_Emerging := Project(Input_Address_BusBest_Current_Previous_Emerging_dedup, transform({recordof(left), unsigned AddrHighRiskUID}, self.AddrHighRiskUID := counter, self := left));													
@@ -967,7 +967,7 @@ BIPV2.IDAppendLayouts.AppendInput PrepBIPInputprox(Layouts_FDC.Layout_FDC le) :=
 	addresses_for_AVM_pre := WithCorrectionsPropSearch(DID IN Input_RelativesWithHHIDLexids);
 	
 	addresses_for_AVM :=
-		PROJECT( addresses_for_AVM_pre(prim_name <> ''), //cleaning up garbage
+		PROJECT( addresses_for_AVM_pre(prim_name <> ''AND zip != ''), //cleaning up garbage
 			TRANSFORM( Layouts_FDC.LayoutAddressGeneric_inputs,
 				SELF.UIDAppend       := LEFT.UIDAppend,
 				SELF.PrimaryRange    := LEFT.prim_range,
@@ -978,7 +978,7 @@ BIPV2.IDAppendLayouts.AppendInput PrepBIPInputprox(Layouts_FDC.Layout_FDC le) :=
 				self := LEFT,
 				Self := [];));
 
-	addresses_for_AVM_slim := dedup(sort((addresses_for_AVM+Input_Address_Current_Previous), PrimaryRange, PrimaryName, SecondaryRange, State, ZIP5, UIDAppend ),PrimaryRange, PrimaryName, SecondaryRange, State, ZIP5, UIDAppend );//dedup by avm keyed fields
+	addresses_for_AVM_slim := dedup(sort((addresses_for_AVM+Input_Address_Current_Previous)(PrimaryName != '' AND ZIP5 != ''), PrimaryRange, PrimaryName, SecondaryRange, State, ZIP5, UIDAppend ),PrimaryRange, PrimaryName, SecondaryRange, State, ZIP5, UIDAppend );//dedup by avm keyed fields
 /*************************************************************************************************************/
 
 
@@ -1221,7 +1221,7 @@ BIPV2.IDAppendLayouts.AppendInput PrepBIPInputprox(Layouts_FDC.Layout_FDC le) :=
 /*************************************************************************************************************/	
 //for searching
 	//Include associated business address by Seleid to get additional address info
-	Input_Best_and_Business_Address := DEDUP(SORT(Input_and_Best_Address + Associated_Business_Address, 
+	Input_Best_and_Business_Address := DEDUP(SORT((Input_and_Best_Address + Associated_Business_Address)(PrimaryName != '' AND ZIP5 != ''), 
 																				PrimaryRange, Predirectional, PrimaryName, AddrSuffix, Postdirectional, City, State, ZIP5, SecondaryRange, UIDAppend),
 																						PrimaryRange, Predirectional, PrimaryName, AddrSuffix, Postdirectional, City, State, ZIP5, SecondaryRange, UIDAppend);			
 		
@@ -1262,7 +1262,7 @@ BIPV2.IDAppendLayouts.AppendInput PrepBIPInputprox(Layouts_FDC.Layout_FDC le) :=
 				self := LEFT,
 				Self := [];));
 				
-	addresses_for_Advo_slim := dedup(sort((property_addresses_for_Advo + addr_hist_addresses_for_advo + Input_Best_and_Business_Address), PrimaryRange, PrimaryName, AddrSuffix, SecondaryRange, Predirectional, Postdirectional, SecondaryRange, ZIP5, UIDAppend )
+	addresses_for_Advo_slim := dedup(sort((property_addresses_for_Advo + addr_hist_addresses_for_advo + Input_Best_and_Business_Address)(PrimaryName != '' AND ZIP5 != ''), PrimaryRange, PrimaryName, AddrSuffix, SecondaryRange, Predirectional, Postdirectional, SecondaryRange, ZIP5, UIDAppend )
 																								,PrimaryRange, PrimaryName, AddrSuffix, SecondaryRange, Predirectional, Postdirectional, SecondaryRange, ZIP5, UIDAppend  );//dedup by advo keyed fields
 /*************************************************************************************************************/
 
@@ -2100,7 +2100,7 @@ Bankruptcy_Files__Key_Search_Records_pre	:= Bankruptcy_Files__Key_Search_Records
 					
 	Key_FraudPoint3__Key_Phone := JOIN(Input_Phone_All, FraudPoint3.key_phone, 
 				Common.DoFDCJoin_Fraudpoint3__Key_Phone = TRUE AND
-				LEFT.Phone <> '' AND
+				(INTEGER)LEFT.Phone > 0 AND
 				KEYED(LEFT.Phone  = RIGHT.Phone_Number),
 				TRANSFORM(Layouts_FDC.Layout_FraudPoint3_Key_Phone,
 					SELF.UIDAppend := LEFT.UIDAppend,
@@ -2204,7 +2204,7 @@ Bankruptcy_Files__Key_Search_Records_pre	:= Bankruptcy_Files__Key_Search_Records
 					SELF := LEFT,
 					SELF := []));
 
-	Input_Address_BusBest_Current_Previous_zip := DEDUP(SORT(Input_Address_BusBest_Current_Previous, UIDAppend, Zip5), UIDAppend, Zip5);
+	Input_Address_BusBest_Current_Previous_zip := DEDUP(SORT(Input_Address_BusBest_Current_Previous(PrimaryName != '' AND ZIP5 != ''), UIDAppend, Zip5), UIDAppend, Zip5);
 		
 	Key_RiskWise_CityStZip:=
 			JOIN(Input_Address_BusBest_Current_Previous_zip, RiskWise.Key_CityStZip, 
@@ -2497,7 +2497,7 @@ Bankruptcy_Files__Key_Search_Records_pre	:= Bankruptcy_Files__Key_Search_Records
 	Gong__Key_History_Phone_Records_Unsuppressed := 
 		JOIN( Input_Phone_All, Gong__Key_History_Phone, 
 			Common.DoFDCJoin_Gong__Key_History_Phone AND
-			LEFT.Phone != '' AND
+			(INTEGER)LEFT.Phone > 0 AND
 			KEYED(
 				LEFT.Phone[4..10] = RIGHT.p7 AND 
 				LEFT.Phone[1..3] = RIGHT.p3) and
@@ -2542,7 +2542,7 @@ Bankruptcy_Files__Key_Search_Records_pre	:= Bankruptcy_Files__Key_Search_Records
 	Targus__Key_History_Phone_Records_Unsuppressed := 
 		JOIN( Input_Phone_All, Targus__Key_History_Phone, 
 			Common.DoFDCJoin_Targus__Key_Targus_Phone AND
-			LEFT.Phone != '' AND
+			(INTEGER)LEFT.Phone > 0 AND
 			KEYED(
 				LEFT.Phone[4..10] = RIGHT.p7 AND 
 				LEFT.Phone[1..3] = RIGHT.p3) and
@@ -2575,7 +2575,7 @@ Bankruptcy_Files__Key_Search_Records_pre	:= Bankruptcy_Files__Key_Search_Records
 	InfutorCID__Key_Phone_Records_Unsuppressed := 
 		JOIN( Input_Phone_All, InfutorCID__Key_Phone, 
 			Common.DoFDCJoin_InfutorCID__Key_Infutor_Phone AND
-			LEFT.Phone != '' AND
+			(INTEGER)LEFT.Phone > 0 AND
 			KEYED( LEFT.Phone = RIGHT.phone ) and
 			ArchiveDate((string)right.dt_first_seen) <= LEFT.P_InpClnArchDt[1..8],
 			TRANSFORM(Layouts_FDC.Layout_InfutorCID__Key_Infutor_Phone,
@@ -2615,7 +2615,7 @@ Bankruptcy_Files__Key_Search_Records_pre	:= Bankruptcy_Files__Key_Search_Records
 		
 	Key_PhonesPlus_v2__Keys_Source_Level_Phone := JOIN(Input_Phone_All, dx_PhonesPlus.Key_Source_Level_Phone(iType), 
 				Common.DoFDCJoin_PhonePlus_V2__Key_Source_Level_Payload_phone = TRUE AND
-				LEFT.Phone <> '' AND
+				(INTEGER)LEFT.Phone > 0 AND
 				KEYED(LEFT.Phone  = RIGHT.cellphone),
 				TRANSFORM(Layouts_FDC.Layout_PhonesPlus_v2_Key_Source_Level_Temp,
 					SELF.UIDAppend := LEFT.UIDAppend,
@@ -2669,7 +2669,7 @@ Bankruptcy_Files__Key_Search_Records_pre	:= Bankruptcy_Files__Key_Search_Records
 
 	Key_dx_PhonesInfo__Key_Phones_Type := JOIN(Input_Phone_All, dx_PhonesInfo.Key_Phones_Type, 
 				Common.DoFDCJoin_PhoneInfo__Key_Phone_Type = TRUE AND
-				LEFT.Phone <> '' AND
+				(INTEGER)LEFT.Phone > 0 AND
 				KEYED(LEFT.Phone  = RIGHT.Phone) and
 				ArchiveDate((string)right.vendor_first_reported_dt) <= LEFT.P_InpClnArchDt[1..8],
 				TRANSFORM(Layouts_FDC.Layout_dx_PhonesInfo_Key_Phones_Type,
@@ -2693,7 +2693,7 @@ Bankruptcy_Files__Key_Search_Records_pre	:= Bankruptcy_Files__Key_Search_Records
 					
 	Key_dx_PhonesInfo__Key_Phones_Transaction := JOIN(Input_Phone_All, dx_PhonesInfo.Key_Phones_Transaction, 
 				Common.DoFDCJoin_PhoneInfo__Key_Phone_Transaction = TRUE AND
-				LEFT.Phone <> '' AND
+				(INTEGER)LEFT.Phone > 0 AND
 				KEYED(LEFT.Phone  = RIGHT.Phone) and
 				ArchiveDate((string)right.vendor_first_reported_dt) <= LEFT.P_InpClnArchDt[1..8],
 				TRANSFORM(Layouts_FDC.Layout_dx_PhonesInfo_Key_Phones_Transaction,
@@ -2720,7 +2720,7 @@ Bankruptcy_Files__Key_Search_Records_pre	:= Bankruptcy_Files__Key_Search_Records
 	Key_Iverification__Keys_Iverification_phone_Unsuppressed := 
 			JOIN(Input_Phone_All, Phonesplus_v2.Keys_Iverification().phone.qa, 
 				Common.DoFDCJoin_PhonePlus_V2__Iverification_Phone = TRUE AND
-				LEFT.Phone <> '' AND
+				(INTEGER)LEFT.Phone > 0 AND
 				KEYED(LEFT.Phone = RIGHT.phone) and
 				ArchiveDate((string)right.dt_first_seen) <= LEFT.P_InpClnArchDt[1..8],
 				TRANSFORM(Layouts_FDC.Layout_Key_Iverification__Keys_Iverification_Phone,
@@ -2750,7 +2750,7 @@ Bankruptcy_Files__Key_Search_Records_pre	:= Bankruptcy_Files__Key_Search_Records
 	Key_Iverification__Keys_Iverification_Did_Phone_Unsuppressed := 
 			JOIN(Input_Phone_All, Phonesplus_v2.Keys_Iverification().did_phone.qa, 
 				Common.DoFDCJoin_PhonePlus_V2__Iverification_Did_Phone = TRUE AND
-				LEFT.P_LexID != 0 AND LEFT.Phone <> '' AND
+				LEFT.P_LexID > 0 AND (INTEGER)LEFT.Phone > 0 AND
 				KEYED(LEFT.P_LexID = RIGHT.did AND 
 							LEFT.Phone = RIGHT.phone) and
 							ArchiveDate((string)right.dt_first_seen) <= LEFT.P_InpClnArchDt[1..8],
@@ -2782,7 +2782,7 @@ Bankruptcy_Files__Key_Search_Records_pre	:= Bankruptcy_Files__Key_Search_Records
 	Key_CellPhone__Key_Neustar_Phone := 	//Key has no dates does not need DateSelector
 			JOIN(Input_Phone_All, CellPhone.key_neustar_phone, 
 				Common.DoFDCJoin_CellPhone__Key_Nustar_Phone = TRUE AND
-				LEFT.Phone <> '' AND
+				(INTEGER)LEFT.Phone > 0 AND
 				KEYED(LEFT.Phone = RIGHT.cellphone),
 					TRANSFORM(Layouts_FDC.Layout_Key_CellPhone__Key_Neustar_Phone,
 					SELF.UIDAppend := LEFT.UIDAppend,
@@ -2896,7 +2896,7 @@ Bankruptcy_Files__Key_Search_Records_pre	:= Bankruptcy_Files__Key_Search_Records
 Risk_Indicators__Correlation_Risk__key_addr_dob_summary_Denorm := 
 			JOIN(Input_FDC, Risk_Indicators.Correlation_Risk.key_addr_dob_summary,
 				Common.DoFDCJoin_Risk_Indicators__Correlation_Risk__key_addr_dob_summary = TRUE AND
-				LEFT.P_InpClnAddrPrimName != '' AND LEFT.P_InpClnAddrZip5 != '' AND LEFT.P_InpClnDOB <> '' AND
+				LEFT.P_InpClnAddrPrimName != '' AND LEFT.P_InpClnAddrZip5 != '' AND (INTEGER)LEFT.P_InpClnDOB > 0 AND
 				KEYED(LEFT.P_InpClnAddrPrimName = RIGHT.prim_name) AND
 				KEYED(LEFT.P_InpClnAddrPrimRng = RIGHT.prim_range) AND
 				KEYED(LEFT.P_InpClnAddrZip5 = RIGHT.zip) AND
@@ -3001,7 +3001,7 @@ Risk_Indicators__Correlation_Risk__key_addr_dob_summary_Denorm :=
 	Risk_Indicators__Key_SSN_dob_Summary := 
    		JOIN(Input_FDC, Risk_Indicators.Correlation_Risk.key_ssn_dob_summary,
             Common.DoFDCJoin_Risk_Indicators__Correlation_Risk__key_ssn_dob_summary = TRUE AND
-            LEFT.P_InpClnSSN <> '' AND LEFT.P_InpClnDOB <> '' AND
+            LEFT.P_InpClnSSN <> '' AND (INTEGER)LEFT.P_InpClnDOB > 0 AND
             KEYED(LEFT.P_InpClnSSN = RIGHT.SSN) AND
             KEYED(LEFT.P_InpClnDOB = (STRING)RIGHT.dob),
             TRANSFORM(Layouts_FDC.Layout_ssn_dob_summary_key_records,
@@ -3099,7 +3099,7 @@ Risk_Indicators__Correlation_Risk__key_addr_dob_summary_Denorm :=
     RiskTable__Key_Name_Dob_Summary := 
    		JOIN(input_fdc, Risk_Indicators.Correlation_Risk.key_name_dob_summary,
             Common.DoFDCJoin_Risk_Indicators__Correlation_Risk__key_name_dob_summary = TRUE AND
-            LEFT.P_InpClnNameLast <> '' AND
+            LEFT.P_InpClnNameLast <> '' AND left.P_InpClnNameFirst<>'' and (INTEGER)left.P_InpClnDOB>0 AND
             KEYED(LEFT.P_InpClnNameLast = RIGHT.lname) AND
             KEYED(LEFT.P_InpClnNameFirst = RIGHT.fname) AND
             KEYED(LEFT.P_InpClnDOB = (STRING)RIGHT.dob),
@@ -3264,7 +3264,7 @@ Risk_Indicators__Correlation_Risk__key_addr_dob_summary_Denorm :=
      RiskTable__Key_Phone_Dob_Summary := 
    		JOIN(Input_FDC, Risk_Indicators.Correlation_Risk.key_phone_dob_summary,
             Common.DoFDCJoin_Risk_Indicators__Correlation_Risk__key_phone_dob_summary = TRUE AND
-            LEFT.P_InpClnPhoneHome <> '' AND LEFT.P_InpClnDOB <> '' AND
+            LEFT.P_InpClnPhoneHome <> '' AND (INTEGER)LEFT.P_InpClnDOB > 0 AND
             KEYED(LEFT.P_InpClnPhoneHome = RIGHT.phone) AND
             KEYED(LEFT.P_InpClnDOB = (STRING)RIGHT.dob),
             TRANSFORM(Layouts_FDC.Layout_phone_dob_summary_key_records,
@@ -3381,57 +3381,57 @@ Risk_Indicators__Correlation_Risk__key_addr_dob_summary_Denorm :=
 					SELF := LEFT,
 					SELF := []));
 
-		highriskaddrin := project(Input_Address_BusBest_Current_Previous_Emerging, transform(BIPV2_Build.key_high_risk_industries.AddrSearchLayout, 
-																													self.prim_range := left.PrimaryRange,
-																													self.predir := left.Predirectional,
-																													self.prim_name := left.PrimaryName,
-																													self.postdir := left.Postdirectional,
-																													self.addr_suffix := left.AddrSuffix,
-																													self.sec_range := left.SecondaryRange,
-																													self.v_city_name := left.City,
-																													self.st := left.State,
-																													self.zip5 := left.ZIP5,
-																													self.UniqueId := left.AddrHighRiskUID)); 
+		// highriskaddrin := project(Input_Address_BusBest_Current_Previous_Emerging, transform(BIPV2_Build.key_high_risk_industries.AddrSearchLayout, 
+																													// self.prim_range := left.PrimaryRange,
+																													// self.predir := left.Predirectional,
+																													// self.prim_name := left.PrimaryName,
+																													// self.postdir := left.Postdirectional,
+																													// self.addr_suffix := left.AddrSuffix,
+																													// self.sec_range := left.SecondaryRange,
+																													// self.v_city_name := left.City,
+																													// self.st := left.State,
+																													// self.zip5 := left.ZIP5,
+																													// self.UniqueId := left.AddrHighRiskUID)); 
 
 		highriskphonein := project(Input_Best_Phone_nonFCRA, transform(BIPV2_Build.key_high_risk_industries.PhoneSearchLayout, 
 																													self.company_phone := left.Phone,
 																													self.UniqueId := left.UIDAppend));
 
-		high_risk_industries_addr_search := IF(Common.DoFDCJoin_HighRiskAddress = TRUE,BIPV2_Build.key_high_risk_industries.Address_Search_Roxie(highriskaddrin));
+		// high_risk_industries_addr_search := IF(Common.DoFDCJoin_HighRiskAddress = TRUE,BIPV2_Build.key_high_risk_industries.Address_Search_Roxie(highriskaddrin));
 		high_risk_industries_Phone_search := IF(Common.DoFDCJoin_HighRiskPhone = TRUE,BIPV2_Build.key_high_risk_industries.Phone_Search(highriskphonein));
 
-		high_risk_industries_addr := join(Input_Address_BusBest_Current_Previous_Emerging, high_risk_industries_addr_search,  
-																			left.AddrHighRiskUID = right.UniqueId,
-																		transform(Layouts_FDC.Layout_BIPV2_Build__key_high_risk_industries_addr, 
-																									self.UIDAppend := left.UIDAppend;
-																									self.SIC_Code := if(right.code_type = 'SIC', right.code, ''), 
-																									self.NAICS_Code := if(right.code_type = 'NAICS', right.code, ''), 
-																									SELF.Archive_Date := ArchiveDate((string)right.dt_first_seen);
-																									SELF.dt_first_seen := (integer)ArchiveDate((string)right.dt_first_seen);
-																									SELF.SRC := PublicRecords_KEL.ECL_Functions.Constants.HighRiskIndustries;
-																									SELF.DPMBitmap := SetDPMBitmap( Source := SELF.SRC, FCRA_Restricted := Options.isFCRA, GLBA_Restricted := NotRegulated, Pre_GLB_Restricted := NotRegulated, DPPA_Restricted := NotRegulated, DPPA_State := BlankString, KELPermissions := CFG_File),																				
-																									self.prim_range := left.PrimaryRange,
-																									self.predir := left.Predirectional,
-																									self.prim_name := left.PrimaryName,
-																									self.postdir := left.Postdirectional,
-																									self.addr_suffix := left.AddrSuffix,
-																									self.sec_range := left.SecondaryRange,
-																									self.v_city_name := left.City,
-																									self.st := left.State,
-																									self.zip5 := left.ZIP5,																									
-																									self := left,
-																									self := right,
-																									self := [])); 
+		// high_risk_industries_addr := join(Input_Address_BusBest_Current_Previous_Emerging, high_risk_industries_addr_search,  
+																			// left.AddrHighRiskUID = right.UniqueId,
+																		// transform(Layouts_FDC.Layout_BIPV2_Build__key_high_risk_industries_addr, 
+																									// self.UIDAppend := left.UIDAppend;
+																									// self.SIC_Code := if(right.code_type = 'SIC', right.code, ''), 
+																									// self.NAICS_Code := if(right.code_type = 'NAICS', right.code, ''), 
+																									// SELF.Archive_Date := ArchiveDate((string)right.dt_first_seen);
+																									// SELF.dt_first_seen := (integer)ArchiveDate((string)right.dt_first_seen);
+																									// SELF.SRC := PublicRecords_KEL.ECL_Functions.Constants.HighRiskIndustries;
+																									// SELF.DPMBitmap := SetDPMBitmap( Source := SELF.SRC, FCRA_Restricted := Options.isFCRA, GLBA_Restricted := NotRegulated, Pre_GLB_Restricted := NotRegulated, DPPA_Restricted := NotRegulated, DPPA_State := BlankString, KELPermissions := CFG_File),																				
+																									// self.prim_range := left.PrimaryRange,
+																									// self.predir := left.Predirectional,
+																									// self.prim_name := left.PrimaryName,
+																									// self.postdir := left.Postdirectional,
+																									// self.addr_suffix := left.AddrSuffix,
+																									// self.sec_range := left.SecondaryRange,
+																									// self.v_city_name := left.City,
+																									// self.st := left.State,
+																									// self.zip5 := left.ZIP5,																									
+																									// self := left,
+																									// self := right,
+																									// self := [])); 
 
-		With_BIPV2_Build_HighRiskaddr := DENORMALIZE(With_UtilFile_Key_LinkIds, high_risk_industries_addr,
-					ArchiveDate((string)right.dt_first_seen) <= LEFT.P_InpClnArchDt[1..8] and
-					LEFT.UIDAppend = RIGHT.UIDAppend, GROUP,
-					TRANSFORM(Layouts_FDC.Layout_FDC,
-							SELF.Dataset_BIPV2_Build__key_high_risk_industries_addr := ROWS(RIGHT),	
-							self := left, 
-							self := []));
+		// With_BIPV2_Build_HighRiskaddr := DENORMALIZE(With_UtilFile_Key_LinkIds, high_risk_industries_addr,
+					// ArchiveDate((string)right.dt_first_seen) <= LEFT.P_InpClnArchDt[1..8] and
+					// LEFT.UIDAppend = RIGHT.UIDAppend, GROUP,
+					// TRANSFORM(Layouts_FDC.Layout_FDC,
+							// SELF.Dataset_BIPV2_Build__key_high_risk_industries_addr := ROWS(RIGHT),	
+							// self := left, 
+							// self := []));
 		
-		With_BIPV2_Build_HighRiskphone := DENORMALIZE(With_BIPV2_Build_HighRiskaddr, high_risk_industries_Phone_search,
+		With_BIPV2_Build_HighRiskphone := DENORMALIZE(With_UtilFile_Key_LinkIds, high_risk_industries_Phone_search,
 					ArchiveDate((string)right.dt_first_seen) <= LEFT.P_InpClnArchDt[1..8] and
 					LEFT.UIDAppend = RIGHT.UniqueId, GROUP,
 					TRANSFORM(Layouts_FDC.Layout_FDC,
@@ -4617,13 +4617,11 @@ dx_CFPB__key_Census_Surnames := IF( Options.isFCRA, dx_ConsumerFinancialProtecti
 			JOIN(cfpbsurname_input_contacts, dx_CFPB__key_Census_Surnames,
 			Common.DoFDCJoin_dx_CFPB__key_Census_Surnames =TRUE AND
 			LEFT.P_InpClnNameLast <> '' AND
-				KEYED(LEFT.P_InpClnNameLast =RIGHT.name) and
-				ArchiveDate((string)right.dt_vendor_first_reported) <= LEFT.P_InpClnArchDt[1..8],
+				KEYED(LEFT.P_InpClnNameLast =RIGHT.name),
 				TRANSFORM(Layouts_FDC.Layout_dx_CFPB_key_Census_Surnames,
 					SELF.name := right.name,
 					SELF.Src := PublicRecords_KEL.ECL_Functions.Constants.CFBPSurname,
 					SELF.DPMBitmap := SetDPMBitmap( Source := SELF.Src , FCRA_Restricted := Options.isFCRA, GLBA_Restricted := NotRegulated, Pre_GLB_Restricted := NotRegulated , DPPA_Restricted := NotRegulated, DPPA_State :='', KELPermissions := CFG_File),
-					self.Archive_Date := ArchiveDate((string)right.dt_vendor_first_reported);
 					self.dt_vendor_first_reported := (integer)archivedate( (string)right.dt_vendor_first_reported);
 					self.P_InpClnSurname1 := left.P_InpClnSurname1;
 					self.P_InpClnSurname2 := left.P_InpClnSurname2;
@@ -4647,15 +4645,13 @@ dx_CFPB__key_Census_Surnames := IF( Options.isFCRA, dx_ConsumerFinancialProtecti
 			JOIN(GeoInputPrevCurrContactCFPB, Key_BLKGRP,
 			Common.DoFDCJoin_dx_CFPB__key_BLKGRP =TRUE AND
 			LEFT.AddressGeoLink <> '' AND
-				KEYED(LEFT.AddressGeoLink =RIGHT.geoid10_blkgrp) and
-				ArchiveDate((string)right.dt_vendor_first_reported) <= LEFT.P_InpClnArchDt[1..8],
+				KEYED(LEFT.AddressGeoLink =RIGHT.geoid10_blkgrp),
 				TRANSFORM(Layouts_FDC.Layout_dx_ConsumerFinancialProtectionBureau__Key_BLKGRP,
 					SELF.UIDAppend := LEFT.UIDAppend,
 					SELF.G_ProcUID := LEFT.G_ProcUID,
 					SELF.geoid10_blkgrp := LEFT.AddressGeoLink,
 					SELF.Src := PublicRecords_KEL.ECL_Functions.Constants.CFBPGeolinks,
 					SELF.DPMBitmap := SetDPMBitmap( Source := '', FCRA_Restricted := Options.isFCRA, GLBA_Restricted := NotRegulated, Pre_GLB_Restricted := NotRegulated , DPPA_Restricted := NotRegulated, DPPA_State :='', KELPermissions := CFG_File),
-					self.Archive_Date :=  ArchiveDate((string)right.dt_vendor_first_reported);
 					self.dt_vendor_first_reported := (integer)archivedate( (string)right.dt_vendor_first_reported);
 					SELF := RIGHT,
 					SELF := LEFT,
@@ -4676,15 +4672,13 @@ dx_CFPB__key_Census_Surnames := IF( Options.isFCRA, dx_ConsumerFinancialProtecti
 			JOIN(GeoInputPrevCurrContactCFPB, key_BLKGRP_attr_over18,
 			Common.DoFDCJoin_dx_CFPB__key_BLKGRP =TRUE AND
 			LEFT.AddressGeoLink <> '' AND
-				KEYED(LEFT.AddressGeoLink =RIGHT.geoind) and
-				ArchiveDate((string)right.dt_vendor_first_reported) <= LEFT.P_InpClnArchDt[1..8],
+				KEYED(LEFT.AddressGeoLink =RIGHT.geoind),
 				TRANSFORM(Layouts_FDC.Layout_dx_ConsumerFinancialProtectionBureau__key_BLKGRP_attr_over18,
 					SELF.UIDAppend := LEFT.UIDAppend,
 					SELF.G_ProcUID := LEFT.G_ProcUID,
 					SELF.geoind := LEFT.AddressGeoLink,
 					SELF.Src := PublicRecords_KEL.ECL_Functions.Constants.CFBPGeolinks,
 					SELF.DPMBitmap := SetDPMBitmap( Source := '', FCRA_Restricted := Options.isFCRA, GLBA_Restricted := NotRegulated, Pre_GLB_Restricted := NotRegulated , DPPA_Restricted := NotRegulated, DPPA_State :='', KELPermissions := CFG_File),
-					self.Archive_Date := ArchiveDate((string)right.dt_vendor_first_reported);
 					self.dt_vendor_first_reported := (integer)archivedate( (string)right.dt_vendor_first_reported);
 					SELF := RIGHT,
 					SELF := LEFT,
@@ -4703,7 +4697,7 @@ Key_HuntFish_Did := IF( Options.isFCRA, eMerges.Key_HuntFish_Did(TRUE), eMerges.
 	eMerges__Key_HuntFish_Did :=
 			JOIN(Input_FDC_RelativesLexids_HHIDLexids_LexIDs, Key_HuntFish_Did,
 			Common.DoFDCJoin_eMerges__Key_HuntFish_Rid =TRUE AND
-			LEFT.P_LexID <> 0 AND
+			LEFT.P_LexID > 0 AND
 				KEYED(LEFT.P_LexID =RIGHT.did),
 				TRANSFORM(Layouts_FDC.Layout_eMerges__Key_HuntFish_Did,
 					SELF.UIDAppend := LEFT.UIDAppend,
@@ -4751,7 +4745,7 @@ key_ccw_did := IF( Options.isFCRA, eMerges.key_ccw_did(TRUE), eMerges.key_ccw_di
 	eMerges__key_ccw_did :=
 			JOIN(Input_FDC, key_ccw_did,
 			Common.DoFDCJoin_eMerges__key_ccw_rid =TRUE and 
-			LEFT.P_LexID <> 0 AND
+			LEFT.P_LexID > 0 AND
 				KEYED(LEFT.P_LexID =RIGHT.did_out6),
 				TRANSFORM(Layouts_FDC.Layout_eMerges__key_ccw_did,
 					SELF.UIDAppend := LEFT.UIDAppend,
@@ -4794,7 +4788,7 @@ Key_SexOffender_DID := IF( Options.isFCRA,SexOffender.Key_SexOffender_DID(TRUE),
 	SexOffender__Key_SexOffender_DID :=
 			JOIN(Input_FDC, Key_SexOffender_DID,
 			Common.DoFDCJoin_Key_SexOffender =TRUE AND
-			LEFT.P_LexID <> 0 AND
+			LEFT.P_LexID > 0 AND
 				KEYED(LEFT.P_LexID =RIGHT.did),
 				TRANSFORM(Layouts_FDC.Layout_SexOffender__Key_SexOffender_DID,
 					SELF.UIDAppend := LEFT.UIDAppend,
@@ -4846,7 +4840,7 @@ Key_SexOffender_SPK := IF( Options.isFCRA, SexOffender.Key_SexOffender_SPK(TRUE)
 
 	thrive__keys__Did_qa_Regular := JOIN(input_FDC, key_thrive_did,
 					Common.DoFDCJoin_Thrive__Key_did_QA = TRUE AND
-					LEFT.P_LexID <> 0 AND
+					LEFT.P_LexID > 0 AND
 				KEYED(LEFT.P_LexID =RIGHT.did) and
 				ArchiveDate((string)right.dt_first_seen, (string)right.dt_vendor_first_reported) <= LEFT.P_InpClnArchDt[1..8],
 				TRANSFORM(Layouts_FDC.Layout_Thrive__Key___Did_QA,
@@ -4864,7 +4858,7 @@ Key_SexOffender_SPK := IF( Options.isFCRA, SexOffender.Key_SexOffender_SPK(TRUE)
 	
 	thrive__keys__Did_qa_Inferred := JOIN(input_FDC, key_thrive_did,
 					Common.DoFDCJoin_Thrive__Key_did_QA = TRUE AND
-					LEFT.P_LexID <> 0 AND
+					LEFT.P_LexID > 0 AND
 				KEYED(LEFT.P_LexID =RIGHT.did) and
 				ArchiveDate((string)right.dt_first_seen, (string)right.dt_vendor_first_reported) <= (STRING)STD.Date.AdjustDate((INTEGER)LEFT.P_InpClnArchDt[1..8],2,0,0) AND
 				ArchiveDate((string)right.dt_first_seen, (string)right.dt_vendor_first_reported) >= LEFT.P_InpClnArchDt[1..8],
@@ -4903,7 +4897,7 @@ Key_SexOffender_SPK := IF( Options.isFCRA, SexOffender.Key_SexOffender_SPK(TRUE)
 	fraudpoint3__Key_DID := 
 		JOIN(input_fdc, fraudpoint3.Key_DID,
 					Common.DoFDCJoin_fraudpoint3__Key_DID = TRUE AND
-					LEFT.P_LexID <> 0 AND
+					LEFT.P_LexID > 0 AND
 					KEYED(LEFT.P_LexID = RIGHT.s_did),
 				TRANSFORM(Layouts_FDC.Layout_fraudpoint3__Key_DID,
 					SELF.UIDAppend := LEFT.UIDAppend,
@@ -5341,7 +5335,7 @@ Key_AccLogs_FCRA_SSN :=
 			JOIN(Input_FDC, Inquiry_AccLogs.Key_Inquiry_FEIN, 
 				Common.DoFDCJoin_Inquiry_AccLogs__Inquiry_Table_FEIN = TRUE AND
 				options.Data_Restriction_Mask[risk_indicators.iid_constants.posInquiriesRestriction]<>risk_indicators.iid_constants.sTrue and
-				LEFT.B_InpClnTIN <> '' AND
+				(INTEGER)LEFT.B_InpClnTIN > 0 AND
 				KEYED(LEFT.B_InpClnTIN = RIGHT.appended_ein) AND
 				ArchiveDate((string)right.Search_Info.DateTime[1..8]) <= LEFT.P_InpClnArchDt[1..8] and
 							//lets dump the inquiries we don't care about
@@ -5367,7 +5361,7 @@ Key_AccLogs_FCRA_SSN :=
 			JOIN(Input_FDC, Inquiry_AccLogs.Key_Inquiry_FEIN_Update, 
 				Common.DoFDCJoin_Inquiry_AccLogs__Inquiry_Table_FEIN = TRUE AND
 				options.Data_Restriction_Mask[risk_indicators.iid_constants.posInquiriesRestriction]<>risk_indicators.iid_constants.sTrue and
-				LEFT.B_InpClnTIN <> '' AND
+				(INTEGER)LEFT.B_InpClnTIN > 0 AND
 				KEYED(LEFT.B_InpClnTIN = RIGHT.appended_ein) AND
 				ArchiveDate((string)right.Search_Info.DateTime[1..8]) <= LEFT.P_InpClnArchDt[1..8] and
 							//lets dump the inquiries we don't care about
