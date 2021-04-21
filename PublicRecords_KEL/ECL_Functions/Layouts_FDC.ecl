@@ -1305,6 +1305,8 @@ SHARED unsigned1 iType := IF(Options.IsFCRA, data_services.data_env.iFCRA, data_
 		PropertyV2_Key_Search_Fid_Records.seleid;
 		PropertyV2_Key_Search_Fid_Records.proxid;
 		PropertyV2_Key_Search_Fid_Records.powid;
+		PropertyV2_Key_Search_Fid_Records.fname;
+		PropertyV2_Key_Search_Fid_Records.lname;
 		PropertyV2_Key_Search_Fid_Records.persistent_record_id;//overrides & suppressions
 		PropertyV2_Key_Search_Fid_Records.vendor_source_flag;
 		BOOLEAN PartyIsBuyerOrOwner;
