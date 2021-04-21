@@ -1,13 +1,13 @@
-﻿//HPCC Systems KEL Compiler Version 1.5.0rc1
+//HPCC Systems KEL Compiler Version 1.5.0rc1
 IMPORT KEL15 AS KEL;
 IMPORT B_Address_3,B_Address_5,CFG_Compile,E_Address,E_Geo_Link,E_Zip_Code FROM PublicRecords_KEL;
 IMPORT * FROM KEL15.Null;
 EXPORT B_Address_2(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG_Compile __cfg = CFG_Compile) := MODULE
   SHARED VIRTUAL TYPEOF(B_Address_3(__in,__cfg).__ENH_Address_3) __ENH_Address_3 := B_Address_3(__in,__cfg).__ENH_Address_3;
   SHARED VIRTUAL TYPEOF(E_Zip_Code(__in,__cfg).__Result) __E_Zip_Code := E_Zip_Code(__in,__cfg).__Result;
-  SHARED __EE7558007 := __ENH_Address_3;
-  SHARED __EE7558009 := __E_Zip_Code;
-  SHARED __ST1366391_Layout := RECORD
+  SHARED __EE7987037 := __ENH_Address_3;
+  SHARED __EE7987039 := __E_Zip_Code;
+  SHARED __ST1389841_Layout := RECORD
     KEL.typ.nuid UID;
     KEL.typ.nstr Primary_Range_;
     KEL.typ.nstr Predirectional_;
@@ -57,15 +57,15 @@ EXPORT B_Address_2(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG_Com
     KEL.typ.epoch Vault_Date_Last_Seen_ := 0;
     KEL.typ.int __RecordCount := 0;
   END;
-  __JC7558018(B_Address_5(__in,__cfg).__ST267624_Layout __EE7558007, E_Zip_Code(__in,__cfg).Layout __EE7558009) := __EEQP(__EE7558007.Z_I_P5_,__EE7558009.UID);
-  __ST1366391_Layout __JT7558018(B_Address_5(__in,__cfg).__ST267624_Layout __l, E_Zip_Code(__in,__cfg).Layout __r) := TRANSFORM
+  __JC7987048(B_Address_5(__in,__cfg).__ST274198_Layout __EE7987037, E_Zip_Code(__in,__cfg).Layout __EE7987039) := __EEQP(__EE7987037.Z_I_P5_,__EE7987039.UID);
+  __ST1389841_Layout __JT7987048(B_Address_5(__in,__cfg).__ST274198_Layout __l, E_Zip_Code(__in,__cfg).Layout __r) := TRANSFORM
     SELF.U_I_D__1_ := __r.UID;
     SELF.Data_Sources__1_ := __r.Data_Sources_;
     SELF := __l;
     SELF := __r;
   END;
-  SHARED __EE7558179 := JOIN(__EE7558007,__EE7558009,__JC7558018(LEFT,RIGHT),__JT7558018(LEFT,RIGHT),LEFT OUTER,HASH);
-  EXPORT __ST219945_Layout := RECORD
+  SHARED __EE7987209 := JOIN(__EE7987037,__EE7987039,__JC7987048(LEFT,RIGHT),__JT7987048(LEFT,RIGHT),LEFT OUTER,HASH);
+  EXPORT __ST226720_Layout := RECORD
     KEL.typ.nuid UID;
     KEL.typ.nstr Primary_Range_;
     KEL.typ.nstr Predirectional_;
@@ -116,23 +116,23 @@ EXPORT B_Address_2(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG_Com
     KEL.typ.epoch Vault_Date_Last_Seen_ := 0;
     KEL.typ.int __RecordCount := 0;
   END;
-  SHARED __ST219945_Layout __ND7557756__Project(__ST1366391_Layout __PP7556276) := TRANSFORM
-    __EE7557751 := __PP7556276.Bestchild_Advo_;
-    SELF.College_Flag_ := (__T(__EE7557751))[1].College_Indicator_;
-    __EE7557766 := __PP7556276.Bestchild_Advo_;
-    SELF.Do_Not_Deliver_Flag_ := (__T(__EE7557766))[1].Do_Not_Deliver_Indicator_;
-    __EE7557780 := __PP7556276.Bestchild_Advo_;
-    SELF.Drop_Indicator_Flag_ := (__T(__EE7557780))[1].Drop_Indicator_;
-    __BS7557786 := __T(__PP7556276.Address_Type_);
-    SELF.Is_P_O_Box_A_D_V_O_ := EXISTS(__BS7557786(__T(__OP2(__T(__PP7556276.Address_Type_).Address_Type_Code_,=,__CN('9')))));
-    SELF.Is_P_O_Box_Zip_ := __OP2(__PP7556276.Zip_Class_,=,__CN('P'));
-    __EE7557813 := __PP7556276.Bestchild_Advo_;
-    SELF.Seasonal_Delivery_Flag_ := (__T(__EE7557813))[1].Seasonal_Delivery_Indicator_;
-    __EE7557827 := __PP7556276.Bestchild_Advo_;
-    SELF.Style_Flag_ := (__T(__EE7557827))[1].Style_Code_;
-    __EE7557841 := __PP7556276.Bestchild_Advo_;
-    SELF.Throw_Back_Flag_ := (__T(__EE7557841))[1].Throw_Back_Indicator_;
-    SELF := __PP7556276;
+  SHARED __ST226720_Layout __ND7986786__Project(__ST1389841_Layout __PP7985306) := TRANSFORM
+    __EE7986781 := __PP7985306.Bestchild_Advo_;
+    SELF.College_Flag_ := (__T(__EE7986781))[1].College_Indicator_;
+    __EE7986796 := __PP7985306.Bestchild_Advo_;
+    SELF.Do_Not_Deliver_Flag_ := (__T(__EE7986796))[1].Do_Not_Deliver_Indicator_;
+    __EE7986810 := __PP7985306.Bestchild_Advo_;
+    SELF.Drop_Indicator_Flag_ := (__T(__EE7986810))[1].Drop_Indicator_;
+    __BS7986816 := __T(__PP7985306.Address_Type_);
+    SELF.Is_P_O_Box_A_D_V_O_ := EXISTS(__BS7986816(__T(__OP2(__T(__PP7985306.Address_Type_).Address_Type_Code_,=,__CN('9')))));
+    SELF.Is_P_O_Box_Zip_ := __OP2(__PP7985306.Zip_Class_,=,__CN('P'));
+    __EE7986843 := __PP7985306.Bestchild_Advo_;
+    SELF.Seasonal_Delivery_Flag_ := (__T(__EE7986843))[1].Seasonal_Delivery_Indicator_;
+    __EE7986857 := __PP7985306.Bestchild_Advo_;
+    SELF.Style_Flag_ := (__T(__EE7986857))[1].Style_Code_;
+    __EE7986871 := __PP7985306.Bestchild_Advo_;
+    SELF.Throw_Back_Flag_ := (__T(__EE7986871))[1].Throw_Back_Indicator_;
+    SELF := __PP7985306;
   END;
-  EXPORT __ENH_Address_2 := PROJECT(__EE7558179,__ND7557756__Project(LEFT));
+  EXPORT __ENH_Address_2 := PROJECT(__EE7987209,__ND7986786__Project(LEFT));
 END;

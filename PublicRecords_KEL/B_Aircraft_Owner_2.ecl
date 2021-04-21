@@ -1,11 +1,11 @@
-﻿//HPCC Systems KEL Compiler Version 1.5.0rc1
+//HPCC Systems KEL Compiler Version 1.5.0rc1
 IMPORT KEL15 AS KEL;
 IMPORT B_Aircraft_Owner_3,CFG_Compile,E_Aircraft,E_Aircraft_Owner,E_Person FROM PublicRecords_KEL;
 IMPORT * FROM KEL15.Null;
 EXPORT B_Aircraft_Owner_2(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG_Compile __cfg = CFG_Compile) := MODULE
   SHARED VIRTUAL TYPEOF(B_Aircraft_Owner_3(__in,__cfg).__ENH_Aircraft_Owner_3) __ENH_Aircraft_Owner_3 := B_Aircraft_Owner_3(__in,__cfg).__ENH_Aircraft_Owner_3;
-  SHARED __EE7560903 := __ENH_Aircraft_Owner_3;
-  EXPORT __ST220347_Layout := RECORD
+  SHARED __EE7990245 := __ENH_Aircraft_Owner_3;
+  EXPORT __ST227189_Layout := RECORD
     KEL.typ.ntyp(E_Aircraft().Typ) Plane_;
     KEL.typ.ntyp(E_Person().Typ) Owner_;
     KEL.typ.nint Registrant_Type_;
@@ -21,10 +21,10 @@ EXPORT B_Aircraft_Owner_2(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, 
     KEL.typ.epoch Vault_Date_Last_Seen_ := 0;
     KEL.typ.int __RecordCount := 0;
   END;
-  SHARED __ST220347_Layout __ND7560963__Project(B_Aircraft_Owner_3(__in,__cfg).__ST240692_Layout __PP7560904) := TRANSFORM
-    __CC13777 := '-99997';
-    SELF.Aircraft_Min_Date_ := IF(__T(__FN1(KEL.Routines.IsValidDate,__PP7560904.Date_First_Seen_Capped_)),__ECAST(KEL.typ.nstr,__FN2(KEL.Routines.DateToString,__PP7560904.Date_First_Seen_Capped_,__CN('%Y%m%d'))),__ECAST(KEL.typ.nstr,__CN(__CC13777)));
-    SELF := __PP7560904;
+  SHARED __ST227189_Layout __ND7990305__Project(B_Aircraft_Owner_3(__in,__cfg).__ST247487_Layout __PP7990246) := TRANSFORM
+    __CC13836 := '-99997';
+    SELF.Aircraft_Min_Date_ := IF(__T(__FN1(KEL.Routines.IsValidDate,__PP7990246.Date_First_Seen_Capped_)),__ECAST(KEL.typ.nstr,__FN2(KEL.Routines.DateToString,__PP7990246.Date_First_Seen_Capped_,__CN('%Y%m%d'))),__ECAST(KEL.typ.nstr,__CN(__CC13836)));
+    SELF := __PP7990246;
   END;
-  EXPORT __ENH_Aircraft_Owner_2 := PROJECT(__EE7560903,__ND7560963__Project(LEFT));
+  EXPORT __ENH_Aircraft_Owner_2 := PROJECT(__EE7990245,__ND7990305__Project(LEFT));
 END;
