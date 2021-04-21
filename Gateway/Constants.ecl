@@ -81,6 +81,11 @@ export Constants := module
     // DeferredTaskESP methods
     export String40 GetRequestInfo := 'dtegetrequestinfo'; // DTE Status Refresh method
     export String40 OKCcourtrunner := 'okccourtrunner'; // OKC court runner
+    // Healthcare methods
+    export String40 IsHCHCP := 'searchservicehcp'; // Soapcall to Healthcare HCP service
+    export String40 IsHCHCO := 'searchservicehco'; // Soapcall to Healthcare HCO service
+    export String40 IsHCHCPBatch := 'searchservicehcpbatch'; // Soapcall to Healthcare HCP Batch service
+    export String40 IsHCHCOBatch := 'searchservicehcobatch'; // Soapcall to Healthcare HCO Batch service
   end;
 
   export ConfigProperties := module

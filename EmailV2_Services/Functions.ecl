@@ -474,7 +474,7 @@ EXPORT Functions := MODULE
 
     ext_royalties:= PROJECT(row_in.Royalties, Royalty.Layouts.Royalty);  // royalties from input (like gateway royalties)
 
-    inh_royalties := Royalty.RoyaltyEmail.GetRoyaltySet(row_in.Records, email_src);
+    inh_royalties := Royalty.RoyaltyEmail.GetRoyaltySet(row_in.Records(email_src <> ''), email_src);
 
     // Now combine results for output
     res_row := ROW({row_in.Records, inh_royalties + ext_royalties}, $.Layouts.email_royalty_combined_rec);

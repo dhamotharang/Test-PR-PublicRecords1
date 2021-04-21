@@ -1,4 +1,4 @@
-import person_models,moxie_phonesplus_server,doxie_raw,header,Relocations,doxie,dx_death_master,address,PhonesFeedback_Services,
+﻿import ADDRESS,person_models,moxie_phonesplus_server,doxie_raw,header,Relocations,doxie,dx_death_master,PhonesFeedback_Services,
       AutoStandardI,DeathV2_Services,suppress, ContactCard, STD, MDR,
       PhonesFeedback;  // PhonesFeedback is used in macro Mac_Append_Feedback()
 
@@ -15,6 +15,12 @@ contact_addr_rec := RECORD
  rec.contact_rec;
  rec.addr_rec;
 END;
+
+contact_addr_plus_rec := RECORD(contact_addr_rec)
+ string2 addr_ind;
+ string2 best_addr_rank;
+END;
+
 getSubjectDeceasedData (unsigned _subjectDID, DeathV2_Services.IParam.DeathRestrictions _death_params) := FUNCTION
 //***** SEE IF DECEASED
   subject_did := dataset([{_subjectDID}], doxie.layout_references);
@@ -106,7 +112,7 @@ header.MAC_GLB_DPPA_Clean_RNA(rna_in,head_pull2_rna,mod_access);
                       transform(contact_addr_rec,
                                 self.subject_dt_last_seen := if(left.did = subjectdid, left.dt_last_seen, 0),  //mark subject recs so i can use them to populate subject_dt_last_seen in next join
                                 self.verified := address.isVerified(left.tnt, left.phone, left.listed_phone),
-                                self.timezone:='',self.listed_timezone :='',self := left)),
+                                self.timezone:='',self.listed_timezone :='', self := left)),
                   did, prim_range, prim_name, zip);
 
 head_slim rollem(head_slim l, head_slim r) := transform
@@ -142,44 +148,63 @@ shared_addrs := join(head_roll1(did = subjectDID), head_roll1(did <> subjectDID)
                                       self := left),
                           left outer);
 
-  RETURN all_addresses;
+// AH macro , TNT & other logic 
+all_addresses_ah_sorted_pre := Header.Mac_Append_addr_ind(all_addresses, addr_ind, /*src*/, did, prim_range, prim_name, sec_range, city_name
+                                              , st, zip, predir, postdir, suffix, dt_first_seen, dt_last_seen, dt_vendor_first_reported
+                                              , dt_vendor_last_reported /*,isTrusted,*/ /*isFCRA,*/ /*hitQH,*/ /*debug*/);
+
+                     
+all_addresses_ah_sorted_plus := project(all_addresses_ah_sorted_pre,transform(contact_addr_plus_rec,
+                                   tnt := doxie.enhanceTNT(true, left.tnt, left.addr_ind, left.best_addr_rank);
+                                   self.tnt := tnt;
+                                   self.verified := ADDRESS.isVerified (tnt,,,true);
+                                   self.location_ID := left.locid;
+                                   self.addr_ind := left.addr_ind;
+                                   self.best_addr_rank := left.best_addr_rank;
+                                   self := left));
+           
+
+  RETURN all_addresses_ah_sorted_plus;
 END;
 
-//TO DO: replace this function logic with AH sorting
-getMostRecentAddresses(dataset(contact_addr_rec) all_addresses,
+
+getMostRecentAddresses(dataset(contact_addr_plus_rec) all_addresses,
                          dataset(doxie.layout_references) deg2relDIDs) := FUNCTION
 
-head_shared := all_addresses(newEnough(dt_last_seen div 100) and not ut.isPOBox(prim_name));
+//***** ONLY KEEP ADDRESSES THAT ARE YOUR NEWEST
+all_addresses_ah_sorted := sort(all_addresses,did,(unsigned) addr_ind, (unsigned) best_addr_rank);
+all_addresses_ah_best_only := dedup(all_addresses_ah_sorted,did);
 
 //***** APPEND SUBJECT_DT_LAST_SEEN
-head_roll2 := join(head_shared,
-                  head_shared(subject_dt_last_seen > 0),  //aka subject recs
+head_roll2 := join(all_addresses_ah_best_only,
+                  all_addresses(subject_dt_last_seen > 0),  //aka subject recs
                   left.prim_range = right.prim_range and
                   left.prim_name = right.prim_name and
                   left.zip = right.zip,
-                  transform({head_shared},
-                            self.subject_dt_last_seen := right.dt_last_seen,
-                            self.isSubject:=true,
+                  transform(contact_addr_rec,
+                            isSubject := right.subject_dt_last_seen > 0;  
+                            self.subject_dt_last_seen := if(isSubject,right.dt_last_seen,0),
+                            self.isSubject:= isSubject,
                             self := left),
                   left outer,
                   keep(1));
 
-//***** ONLY KEEP ADDRESSES THAT ARE YOUR NEWEST
-did_date1 := dedup(sort(head_roll2, did, -dt_last_seen), did);
-
+                     
 //***** ENFORCE STRICT DATE FOR 2ND DEGREE RELS
-did_date := join(did_date1, deg2relDIDs,
+deg2rel_with_date := join(head_roll2, deg2relDIDs,
                 left.did = right.did,
-                transform({did_date1},
-                          self.dt_last_seen := if(right.did = 0, left.dt_last_seen, max(did_date1, dt_last_seen)),
+                transform(contact_addr_rec,
+                          self.dt_last_seen := if(right.did = 0, left.dt_last_seen, max(head_roll2, dt_last_seen)),
                           self := left),
                 left outer);
 
+
 latest_addrs :=
-            join(head_roll2, did_date,
+            join(head_roll2, deg2rel_with_date,
                   left.did = right.did and
                   left.dt_last_seen = right.dt_last_seen,
                   transform(contact_addr_rec, self := left));
+
 
 RETURN latest_addrs;
 END;

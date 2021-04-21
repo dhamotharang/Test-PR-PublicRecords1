@@ -1,4 +1,4 @@
-﻿/*--SOAP-- 
+﻿﻿/*--SOAP-- 
 <message name="Biz_Header_Service_2">
 <part name="proxid" type="unsignedInt"/>
 <part name="company_name" type="xsd:string"/>
@@ -302,4 +302,3 @@ IF(bResearch,
   )
 );
 ENDMACRO;
-

@@ -756,7 +756,9 @@ export Layouts := MODULE
 			unsigned1 lexid_source_optout := 1;
 		//	boolean log_record_source := TRUE;
 			string  product_name:='';
-			unsigned6 global_company_id := 0
+			unsigned6 global_company_id := 0;
+			string6 SSNMask:=''; 
+			string6 DOBMask:=''; 
 	end;
 
 	export autokeyInput_base := record
@@ -1149,12 +1151,15 @@ export Layouts := MODULE
 		string20	acctno := '';
 		unsigned6	ProviderID:=0;
 		string12 	ssn:='';
+		unsigned4  dob_raw:=0;
+		Standard.Date.datestr  dob;
 	END;	
 	EXPORT layout_ssns_freq := RECORD	
 		string20	acctno := '';
 		unsigned6	ProviderID:=0;
 		string12 	ssn:='';
 		unsigned2 freq:=0;
+		unsigned4  dob_raw:=0;
 	END;	
 	EXPORT layout_ssns_bestHit := RECORD	
 		string20	acctno := '';
@@ -1162,6 +1167,7 @@ export Layouts := MODULE
 		string12 	ssn:='';
 		unsigned2 freq:=0;
 		boolean		besthit := false;
+		unsigned4  dob_raw:=0;
 	END;	
 	EXPORT layout_child_ssns := RECORD	
 		string20	acctno := '';
@@ -1451,17 +1457,17 @@ export Layouts := MODULE
 		integer 	ProcessingMessage := 0;
 		boolean	 	srcIndividualHeader := false;
 		boolean	 	srcBusinessHeader := false;
+		boolean	DeathLookup := false;
+		string8	DateofDeath := '';
+		dataset(iesp.abms.t_ABMSResults) abmsRaw := dataset([],iesp.abms.t_ABMSResults);
+		dataset(Verifications) VerificationInfo := dataset([],Verifications);
 	End;
 
 	Export CombinedHeaderResultsDoxieLayout := record
 		CombinedHeaderResults;
 		dataset(layout_ssns)			SSNLookups := dataset([],layout_ssns);
-		boolean	DeathLookup := false;
-		string8	DateofDeath := '';
 		dataset(iesp.healthcare.t_StateVitalRecord) customerDeath := dataset([],iesp.healthcare.t_StateVitalRecord);
 		dataset(iesp.healthcare.t_StateLicenseRecord) customerLicense := dataset([],iesp.healthcare.t_StateLicenseRecord);
-		dataset(iesp.abms.t_ABMSResults) abmsRaw := dataset([],iesp.abms.t_ABMSResults);
-		dataset(Verifications) VerificationInfo := dataset([],Verifications);
 	End;
 	
 	Export searchKeyResults := record

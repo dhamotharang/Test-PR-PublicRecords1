@@ -115,6 +115,11 @@ export Configuration := module
   export IsOKCcourtrunner(string40 svcName) := STD.Str.ToLowerCase(trim(svcName)) = STD.Str.ToLowerCase(Gateway.Constants.ServiceName.OKCcourtrunner);
   export IsDTEGetRequestInfo(string40 svcName) := STD.Str.ToLowerCase(trim(svcName)) = STD.Str.ToLowerCase(Gateway.Constants.ServiceName.GetRequestInfo);
   export IsIDAFraud(string40 svcName) := STD.Str.ToLowerCase(trim(svcName)) = STD.Str.ToLowerCase(Gateway.Constants.ServiceName.IDAFraud);
+  // Healthcare methods
+  export IsHCHCP(string40 svcName) := STD.Str.ToLowerCase(trim(svcName))=STD.Str.ToLowerCase(Gateway.Constants.ServiceName.IsHCHCP);
+  export IsHCHCO(string40 svcName) := STD.Str.ToLowerCase(trim(svcName))=STD.Str.ToLowerCase(Gateway.Constants.ServiceName.IsHCHCO);
+  export IsHCHCPBatch(string40 svcName) := STD.Str.ToLowerCase(trim(svcName))=STD.Str.ToLowerCase(Gateway.Constants.ServiceName.IsHCHCPBatch);
+  export IsHCHCOBatch(string40 svcName) := STD.Str.ToLowerCase(trim(svcName))=STD.Str.ToLowerCase(Gateway.Constants.ServiceName.IsHCHCOBatch);
   // ************************************************************************
   // Use functions below to retrieve gateway configuration properties.
   //

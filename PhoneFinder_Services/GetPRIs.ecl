@@ -1,4 +1,4 @@
-﻿IMPORT $, STD, Gateway, Phones, ThreatMetrix, Autokey_batch;
+﻿IMPORT $, STD, Gateway, Phones, ThreatMetrix, Autokey_batch, Address;
 
 EXPORT GetPRIs( DATASET($.Layouts.PhoneFinder.Final)             dSearchResults,
                 DATASET($.Layouts.BatchInAppendDID)              dInBestInfo,
@@ -7,8 +7,11 @@ EXPORT GetPRIs( DATASET($.Layouts.PhoneFinder.Final)             dSearchResults,
                 DATASET(Autokey_batch.Layouts.rec_inBatchMaster) dProcessInput
                 ) :=
 FUNCTION
+  // Filter out city state callerIDs
+  dAccuDataCNAM_Filter := $.GetValidFullName(dSearchResults);
+
   // Calculate the identity counts - count the number of identities for each phone to calculate RI
-  dCntPhoneIdentities := $.GetIdentitiesCount(dSearchResults);
+  dCntPhoneIdentities := $.GetIdentitiesCount(dAccuDataCNAM_Filter);
 
   dRemoveOtherPhoneHistory := dCntPhoneIdentities(isPrimaryIdentity OR isPrimaryPhone);
 
@@ -65,6 +68,7 @@ FUNCTION
                                         SELF.dt_last_seen            := IF(LEFT.dt_last_seen != '', LEFT.dt_last_seen, (STRING)RIGHT.dt_last_seen),
                                         SELF.fname                   := LEFT.fname,
                                         SELF.lname                   := LEFT.lname,
+                                        SELF.full_name               := LEFT.full_name,
                                         SELF.prim_range              := LEFT.prim_range,
                                         SELF.predir                  := LEFT.predir,
                                         SELF.prim_name               := LEFT.prim_name,
@@ -140,6 +144,7 @@ FUNCTION
                                 SELF.phone             := IF(isResExists, RIGHT.phone, LEFT.homephone),
                                 SELF.fname             := IF(isResExists, RIGHT.fname, LEFT.name_first),
                                 SELF.lname             := IF(isResExists, RIGHT.lname, LEFT.name_last),
+                                SELF.full_name         := IF(isResExists, RIGHT.full_name, Address.NameFromComponents(LEFT.name_first, RIGHT.mname, LEFT.name_last, RIGHT.name_suffix)),
                                 SELF.isPrimaryPhone    := IF(isResExists, RIGHT.isPrimaryPhone, TRUE), // This will process the RiskIndicators for "no identity and no phone"
                                 SELF.isPrimaryIdentity := IF(isResExists, RIGHT.isPrimaryIdentity, TRUE), // This will process the RiskIndicators for "no identity and no phone"
                                 SELF.phonestatus       := IF(RIGHT.PhoneOwnershipIndicator, $.Constants.PhoneStatus.Active, RIGHT.phonestatus); // PHPR- 483 If Phone verified by zumigo then update phonestatus to be ACTIVE;
