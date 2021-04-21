@@ -64,6 +64,7 @@ LayoutBIIAndPII := RECORD
 
 	BusinessSeleIDAttributesRaw := KEL.Clean(BusinessSeleAttributes_Results, true, true, true);
 
+
 	LayoutBusinessSeleIDNoDatesAttributes := RECORDOF(PublicRecords_KEL.Q_Non_F_C_R_A_Business_Sele_I_D_No_Dates_Attributes_V1_Dynamic(
 																	0, // UltID
 																	0, // OrgID

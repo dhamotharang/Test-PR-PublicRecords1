@@ -1,11 +1,11 @@
-//HPCC Systems KEL Compiler Version 1.5.0rc1
+﻿//HPCC Systems KEL Compiler Version 1.5.0rc1
 IMPORT KEL15 AS KEL;
 IMPORT CFG_Compile,E_Address_Summary,FN_Compile FROM PublicRecords_KEL;
 IMPORT * FROM KEL15.Null;
 EXPORT B_Address_Summary_5(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG_Compile __cfg = CFG_Compile) := MODULE
   SHARED VIRTUAL TYPEOF(E_Address_Summary(__in,__cfg).__Result) __E_Address_Summary := E_Address_Summary(__in,__cfg).__Result;
-  SHARED __EE524243 := __E_Address_Summary;
-  EXPORT __ST255383_Layout := RECORD
+  SHARED __EE557421 := __E_Address_Summary;
+  EXPORT __ST267812_Layout := RECORD
     KEL.typ.nstr Name_First_Name_;
     KEL.typ.nstr Name_Last_Name_;
     KEL.typ.nstr Name_Source_;
@@ -18,7 +18,7 @@ EXPORT B_Address_Summary_5(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault,
     KEL.typ.epoch Vault_Date_Last_Seen_ := 0;
     KEL.typ.int __RecordCount := 0;
   END;
-  EXPORT __ST255391_Layout := RECORD
+  EXPORT __ST267820_Layout := RECORD
     KEL.typ.nkdate Dob_Date_Of_Birth_;
     KEL.typ.nstr Dob_Date_Of_Birth_Padded_;
     KEL.typ.nstr Dob_Source_;
@@ -31,13 +31,13 @@ EXPORT B_Address_Summary_5(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault,
     KEL.typ.epoch Vault_Date_Last_Seen_ := 0;
     KEL.typ.int __RecordCount := 0;
   END;
-  EXPORT __ST255377_Layout := RECORD
+  EXPORT __ST267806_Layout := RECORD
     KEL.typ.nuid UID;
     KEL.typ.nstr Primary_Name_;
     KEL.typ.nstr Primary_Range_;
     KEL.typ.nstr Zip_;
-    KEL.typ.ndataset(__ST255383_Layout) Name_Summary_;
-    KEL.typ.ndataset(__ST255391_Layout) Date_Of_Birth_Summary_;
+    KEL.typ.ndataset(__ST267812_Layout) Name_Summary_;
+    KEL.typ.ndataset(__ST267820_Layout) Date_Of_Birth_Summary_;
     KEL.typ.epoch Archive___Date_ := 0;
     KEL.typ.epoch Date_First_Seen_ := 0;
     KEL.typ.epoch Date_Last_Seen_ := 0;
@@ -45,20 +45,20 @@ EXPORT B_Address_Summary_5(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault,
     KEL.typ.epoch Vault_Date_Last_Seen_ := 0;
     KEL.typ.int __RecordCount := 0;
   END;
-  SHARED __ST255377_Layout __ND524400__Project(E_Address_Summary(__in,__cfg).Layout __PP524119) := TRANSFORM
-    __EE524146 := __PP524119.Name_Summary_;
-    __ST255383_Layout __ND524333__Project(E_Address_Summary(__in,__cfg).Name_Summary_Layout __PP524329) := TRANSFORM
-      SELF.Translated_Source_Code_ := FN_Compile(__cfg).FN_Consumer_Source_Group(__ECAST(KEL.typ.nstr,__PP524329.Name_Source_));
-      SELF := __PP524329;
+  SHARED __ST267806_Layout __ND557578__Project(E_Address_Summary(__in,__cfg).Layout __PP557297) := TRANSFORM
+    __EE557324 := __PP557297.Name_Summary_;
+    __ST267812_Layout __ND557511__Project(E_Address_Summary(__in,__cfg).Name_Summary_Layout __PP557507) := TRANSFORM
+      SELF.Translated_Source_Code_ := FN_Compile(__cfg).FN_Consumer_Source_Group(__ECAST(KEL.typ.nstr,__PP557507.Name_Source_));
+      SELF := __PP557507;
     END;
-    SELF.Name_Summary_ := __PROJECT(__EE524146,__ND524333__Project(LEFT));
-    __EE524191 := __PP524119.Date_Of_Birth_Summary_;
-    __ST255391_Layout __ND524378__Project(E_Address_Summary(__in,__cfg).Date_Of_Birth_Summary_Layout __PP524374) := TRANSFORM
-      SELF.D_O_B_Translated_Source_Code_ := FN_Compile(__cfg).FN_Consumer_Source_Group(__ECAST(KEL.typ.nstr,__PP524374.Dob_Source_));
-      SELF := __PP524374;
+    SELF.Name_Summary_ := __PROJECT(__EE557324,__ND557511__Project(LEFT));
+    __EE557369 := __PP557297.Date_Of_Birth_Summary_;
+    __ST267820_Layout __ND557556__Project(E_Address_Summary(__in,__cfg).Date_Of_Birth_Summary_Layout __PP557552) := TRANSFORM
+      SELF.D_O_B_Translated_Source_Code_ := FN_Compile(__cfg).FN_Consumer_Source_Group(__ECAST(KEL.typ.nstr,__PP557552.Dob_Source_));
+      SELF := __PP557552;
     END;
-    SELF.Date_Of_Birth_Summary_ := __PROJECT(__EE524191,__ND524378__Project(LEFT));
-    SELF := __PP524119;
+    SELF.Date_Of_Birth_Summary_ := __PROJECT(__EE557369,__ND557556__Project(LEFT));
+    SELF := __PP557297;
   END;
-  EXPORT __ENH_Address_Summary_5 := PROJECT(__EE524243,__ND524400__Project(LEFT));
+  EXPORT __ENH_Address_Summary_5 := PROJECT(__EE557421,__ND557578__Project(LEFT));
 END;

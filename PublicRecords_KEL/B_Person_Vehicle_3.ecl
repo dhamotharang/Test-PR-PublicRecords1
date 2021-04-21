@@ -1,11 +1,11 @@
-//HPCC Systems KEL Compiler Version 1.5.0rc1
+﻿//HPCC Systems KEL Compiler Version 1.5.0rc1
 IMPORT KEL15 AS KEL;
 IMPORT CFG_Compile,E_Person,E_Person_Vehicle,E_Vehicle,FN_Compile FROM PublicRecords_KEL;
 IMPORT * FROM KEL15.Null;
 EXPORT B_Person_Vehicle_3(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG_Compile __cfg = CFG_Compile) := MODULE
   SHARED VIRTUAL TYPEOF(E_Person_Vehicle(__in,__cfg).__Result) __E_Person_Vehicle := E_Person_Vehicle(__in,__cfg).__Result;
-  SHARED __EE6952212 := __E_Person_Vehicle;
-  EXPORT __ST241891_Layout := RECORD
+  SHARED __EE7545291 := __E_Person_Vehicle;
+  EXPORT __ST253768_Layout := RECORD
     KEL.typ.ntyp(E_Person().Typ) Subject_;
     KEL.typ.ntyp(E_Vehicle().Typ) Automobile_;
     KEL.typ.ndataset(E_Person_Vehicle(__in,__cfg).Registration_Layout) Registration_;
@@ -20,12 +20,12 @@ EXPORT B_Person_Vehicle_3(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, 
     KEL.typ.epoch Vault_Date_Last_Seen_ := 0;
     KEL.typ.int __RecordCount := 0;
   END;
-  SHARED __ST241891_Layout __ND6952164__Project(E_Person_Vehicle(__in,__cfg).Layout __PP1269367) := TRANSFORM
-    __EE6952139 := __PP1269367.Counts_Model_;
-    __CC13302 := KEL.Routines.MinN(FN_Compile(__cfg).FN_G_E_T_B_U_I_L_D_D_A_T_E(__ECAST(KEL.typ.nstr,__CN('vehicle_build_version'))),__CN(__cfg.CurrentDate));
-    __EE6952159 := __PP1269367.Counts_Model_;
-    SELF.Date_First_Seen_Capped_ := IF(__T(__OP2(KEL.Aggregates.MinNN(__EE6952139,KEL.era.ToDate(__T(__EE6952139).Date_First_Seen_)),>,__CC13302)),__ECAST(KEL.typ.nkdate,__CC13302),__ECAST(KEL.typ.nkdate,KEL.Aggregates.MinNN(__EE6952159,KEL.era.ToDate(__T(__EE6952159).Date_First_Seen_))));
-    SELF := __PP1269367;
+  SHARED __ST253768_Layout __ND7545243__Project(E_Person_Vehicle(__in,__cfg).Layout __PP1350330) := TRANSFORM
+    __EE7545218 := __PP1350330.Counts_Model_;
+    __CC13304 := KEL.Routines.MinN(FN_Compile(__cfg).FN_G_E_T_B_U_I_L_D_D_A_T_E(__ECAST(KEL.typ.nstr,__CN('vehicle_build_version'))),__CN(__cfg.CurrentDate));
+    __EE7545238 := __PP1350330.Counts_Model_;
+    SELF.Date_First_Seen_Capped_ := IF(__T(__OP2(KEL.Aggregates.MinNN(__EE7545218,KEL.era.ToDate(__T(__EE7545218).Date_First_Seen_)),>,__CC13304)),__ECAST(KEL.typ.nkdate,__CC13304),__ECAST(KEL.typ.nkdate,KEL.Aggregates.MinNN(__EE7545238,KEL.era.ToDate(__T(__EE7545238).Date_First_Seen_))));
+    SELF := __PP1350330;
   END;
-  EXPORT __ENH_Person_Vehicle_3 := PROJECT(__EE6952212,__ND6952164__Project(LEFT));
+  EXPORT __ENH_Person_Vehicle_3 := PROJECT(__EE7545291,__ND7545243__Project(LEFT));
 END;
