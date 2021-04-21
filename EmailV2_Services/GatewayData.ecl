@@ -35,7 +35,7 @@ EXPORT GatewayData := MODULE
     RETURN with_domain_status;
   END;
 
-  GetBVDeltabase(DATASET($.Layouts.Gateway_Data.batch_in_bv_rec) in_emails,
+  GetBVDeltabase(DATASET($.Layouts.Gateway_Data.batch_in_gw_rec) in_emails,
                             DATASET(Gateway.Layouts.Config) gateways = Gateway.Constants.void_gateway,
                             UNSIGNED1 gw_timeout = $.Constants.GatewayValues.requestTimeout,
                             UNSIGNED1 gw_retries = $.Constants.GatewayValues.requestRetries):= FUNCTION
@@ -53,7 +53,7 @@ EXPORT GatewayData := MODULE
                      'ORDER BY Date_Added DESC ' +
                      'LIMIT ' + $.Constants.GatewayValues.SQLSelectLimit;
 
-    Gateway.Layouts.DeltabaseSQL.input_rec xfSelect(DATASET($.Layouts.Gateway_Data.batch_in_bv_rec) emls) := TRANSFORM
+    Gateway.Layouts.DeltabaseSQL.input_rec xfSelect(DATASET($.Layouts.Gateway_Data.batch_in_gw_rec) emls) := TRANSFORM
       prepared_select_criteria := STD.Str.RemoveSuffix(STD.Str.Repeat( '?,', COUNT(emls)), ',');
 
       SELF.Select := prepared_select_prefix + prepared_select_criteria + prepared_select_suffix;
@@ -86,7 +86,7 @@ EXPORT GatewayData := MODULE
     prior_3month_date := (STRING8) STD.Date.AdjustDate(today, 0,0,-90);
 
     emails_for_hist := DEDUP(PROJECT(in_emails(cleaned.clean_email!='' AND (email_status='' OR (date_last_verified < prior_3month_date AND $.Constants.isUnverifiableEmail(email_status)))),
-                                    TRANSFORM($.Layouts.Gateway_Data.batch_in_bv_rec,
+                                    TRANSFORM($.Layouts.Gateway_Data.batch_in_gw_rec,
                                               SELF.email := TRIM(LEFT.cleaned.clean_email,ALL))
                                       ), ALL);
 
@@ -107,7 +107,7 @@ EXPORT GatewayData := MODULE
                               ));
 
     db_check_emails := PROJECT(recheck_events + all_events(email_status=''), // the email addresses are already deduped
-                           TRANSFORM($.Layouts.Gateway_Data.batch_in_bv_rec,
+                           TRANSFORM($.Layouts.Gateway_Data.batch_in_gw_rec,
                                      SELF.email := TRIM(LEFT.email,ALL),
                                      SELF.rec_no := COUNTER,
                                      SELF.group_no := COUNTER DIV $.Constants.GatewayValues.MaxSQLBindVariables  // separating on groups of 10
@@ -179,7 +179,7 @@ EXPORT GatewayData := MODULE
     RETURN ds_email_all;
   END;
 
-  GetBVGatewayData(DATASET($.Layouts.Gateway_Data.batch_in_bv_rec) in_emails,
+  SHARED GetBVGatewayData(DATASET($.Layouts.Gateway_Data.batch_in_gw_rec) in_emails,
                           $.IParams.EmailParams in_mod,
                           UNSIGNED1 gw_timeout = $.Constants.GatewayValues.requestTimeout,
                           UNSIGNED1 gw_retries = $.Constants.GatewayValues.requestRetries):= FUNCTION
@@ -207,7 +207,40 @@ EXPORT GatewayData := MODULE
     RETURN ds_bw_gw_res;
   END;
 
-  EXPORT VerifyDeliveryStatus(DATASET($.Layouts.email_final_rec) ds_email_in,
+  SHARED GetEAGatewayData(DATASET($.Layouts.Gateway_Data.batch_in_gw_rec) in_emails,
+                   $.IParams.EmailParams in_mod,
+                   UNSIGNED1 gw_timeout = $.Constants.GatewayValues.EA_GW_TIMEOUT,
+                   UNSIGNED1 gw_retries = $.Constants.GatewayValues.requestRetries,
+                   UNSIGNED1 gw_threads = $.Constants.Defaults.MaxEmailsToCheckDeliverable) := FUNCTION
+
+    gateway_cfg := in_mod.gateways(Gateway.Configuration.IsEmailRisk(servicename))[1];
+    make_gw_call := in_mod.CheckEmailDeliverable AND $.Constants.isEmailageValidation(in_mod.EmailValidationType);
+    version := CASE(in_mod.EmailValidationType,
+      $.Constants.EmailValidationType.EmailageBasic => $.Constants.Basic,
+      $.Constants.EmailValidationType.EmailagePremium => $.Constants.Premium,
+      ''
+    );
+
+    ds_ea_gw_request := PROJECT(in_emails, $.Transforms.xfEASoapRequest(LEFT, version));
+
+    ds_ea_gw_response := IF(make_gw_call, Gateway.SoapCall_EmailRisk(ds_ea_gw_request, gateway_cfg, make_gw_call, gw_timeout, gw_retries, gw_threads));
+    ds_ea_gw_recs := PROJECT(ds_ea_gw_response, $.Transforms.xfEASoapResults(LEFT));
+
+    ds_ea_royalties := Royalty.RoyaltyEmailRisk.GetRoyalties(ds_ea_gw_response(_header.status = Gateway.Constants.defaults.STATUS_SUCCESS AND
+      EmailRiskResponseData.Results[1].Status <> $.Constants.GatewayValues.EA_ERROR)); // EA may return an error as part of a successful soap response
+
+    combined_rec := RECORD
+      DATASET($.Layouts.Gateway_Data.ea_result_rec) EARecords;
+      DATASET(Royalty.Layouts.Royalty) EARoyalties;
+    END;
+
+    ds_ea_gw_res := ROW({ds_ea_gw_recs, ds_ea_royalties}, combined_rec);
+
+    RETURN ds_ea_gw_res;
+
+  END;
+
+  SHARED VerifyDeliveryStatusBV(DATASET($.Layouts.email_final_rec) ds_email_in,
                               $.IParams.EmailParams in_mod) := FUNCTION
 
     is_BV_allowed := ~Doxie.Compliance.isBriteVerifyRestricted(in_mod.DataRestrictionMask);
@@ -239,7 +272,7 @@ EXPORT GatewayData := MODULE
     ds_email_chsn := UNGROUP(TOPN(GROUP(ds_email_srtd, acctno), in_mod.MaxEmailsForDeliveryCheck, acctno));
 
     ds_bw_gw_to_call := DEDUP(PROJECT(ds_email_chsn,
-                           TRANSFORM($.Layouts.Gateway_Data.batch_in_bv_rec,
+                           TRANSFORM($.Layouts.Gateway_Data.batch_in_gw_rec,
                                      SELF.email := TRIM(LEFT.cleaned.clean_email,ALL))
                                       ), ALL);
 
@@ -273,6 +306,63 @@ EXPORT GatewayData := MODULE
     //OUTPUT(ds_bw_gw_to_call, NAMED('ds_batch_selected'), EXTEND);
     //OUTPUT(gw_soapcal_recs.BVRecords, NAMED('gw_soapcal_recs'), EXTEND);
     RETURN combined_resp;
+  END;
+
+  SHARED VerifyDeliveryStatusEA(DATASET($.Layouts.email_final_rec) ds_email_in, $.IParams.EmailParams in_mod) := FUNCTION
+
+    ds_email_fltr := ds_email_in(~$.Constants.isUndeliverableEmail(email_status)); // exclude non-deliverable emails based on email_status
+    ds_email_srtd := $.Functions.SortResults(ds_email_fltr, in_mod);
+    ds_email_chsn := UNGROUP(TOPN(GROUP(ds_email_srtd, acctno), in_mod.MaxEmailsForDeliveryCheck, acctno));
+
+    ds_email_gw := PROJECT(ds_email_chsn, TRANSFORM($.Layouts.Gateway_Data.batch_in_gw_rec, SELF.email := TRIM(LEFT.cleaned.clean_email, ALL)));
+    ds_gw_data := IF(EXISTS(ds_email_gw), GetEAGatewayData(DEDUP(ds_email_gw, ALL), in_mod));
+
+    ds_email_res := JOIN(ds_email_in, ds_gw_data.EARecords,
+                         LEFT.cleaned.clean_email = RIGHT.email,
+                         TRANSFORM($.Layouts.email_final_rec,
+                           // In case of general error from ea, overwrite email_status, email_status_reason to unknown, '' respectively
+                           isGeneralError := STD.Str.ToUpperCase(RIGHT.email_status) = $.Constants.GatewayValues.EA_ERROR;
+                           ea_email_exist := RIGHT.email_exists;
+                           ea_email_status := RIGHT.email_status;
+                           mapped_email_status := $.Constants.GatewayValues.get_ea_email_status(ea_email_exist, ea_email_status);
+                           mapped_email_status_reason := $.Constants.GatewayValues.get_ea_email_status_reason(ea_email_status);
+                           SELF.ea_email_exist := ea_email_exist,
+                           SELF.ea_email_status := ea_email_status,
+                           // email_exists from emailage is translated to email_status if available
+                           SELF.email_status := MAP(isGeneralError => $.Constants.StatusUnknown,
+                                                    ea_email_exist <> '' AND mapped_email_status <> '' => mapped_email_status,
+                                                    LEFT.email_status <> '' => LEFT.email_status,
+                                                    $.Constants.StatusUnknown),
+                           // email_status from emailage is translated to email_status_reason if available
+                           SELF.email_status_reason := MAP(isGeneralError => '',
+                                                           ea_email_status <> '' => mapped_email_status_reason,
+                                                           LEFT.email_status_reason),
+                           SELF.date_last_verified := IF(ea_email_exist <> '', (STRING8) STD.Date.Today(), LEFT.date_last_verified),
+                           SELF := LEFT),
+                         KEEP(1), LIMIT(0),
+                         LEFT OUTER);
+    
+    gw_royalties := Royalty.GetBatchRoyalties(PROJECT(ds_gw_data.EARoyalties, TRANSFORM(Royalty.Layouts.RoyaltyForBatch, SELF := LEFT, SELF := [])));
+
+    combined_resp := ROW({ds_email_res, gw_royalties}, $.Layouts.email_combined_rec);
+
+    RETURN combined_resp;
+
+  END;
+
+  EXPORT VerifyDeliveryStatus(DATASET($.Layouts.email_final_rec) ds_email_in, $.IParams.EmailParams in_mod) := FUNCTION
+    
+    ds_bv_validated := VerifyDeliveryStatusBV(ds_email_in, in_mod);
+    ds_ea_validated := VerifyDeliveryStatusEA(ds_email_in, in_mod);
+
+    ds_validated := MAP(
+      $.Constants.isBriteVerifyValidation(in_mod.EmailValidationType) => ds_bv_validated,
+      $.Constants.isEmailageValidation(in_mod.EmailValidationType) => ds_ea_validated,
+      ROW([], $.Layouts.email_combined_rec)
+    );
+    
+    RETURN ds_validated;
+
   END;
 
   EXPORT getTMXInsights (DATASET($.Layouts.email_final_rec) ds_batch_in,

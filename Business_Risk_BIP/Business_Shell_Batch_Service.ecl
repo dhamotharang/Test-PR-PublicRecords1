@@ -55,7 +55,7 @@
 /*--INFO-- Business Shell Batch Service - This is the Batch Service utilizing BIP linking. */
 
 #option('expandSelectCreateRow', true);
-IMPORT Business_Risk_BIP, Gateway, iesp, UT, Cortera, Risk_Indicators, patriot, OFAC_XG5, STD;
+IMPORT Business_Risk_BIP, Gateway, iesp, UT, dx_Cortera, Risk_Indicators, patriot, OFAC_XG5, STD;
 
 EXPORT Business_Shell_Batch_Service() := FUNCTION
 	/* ************************************************************************

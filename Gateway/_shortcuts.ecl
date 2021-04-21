@@ -13,11 +13,11 @@ export _shortcuts := module
   export dev_one_way_8 := 'http://10.173.3.8:9876';
   export dev_one_way_9 := 'http://10.173.3.9:9876';
   export dev_one_way_10 := 'http://10.173.3.10:9876';
-  export dev154_roxie := 'http://10.173.154.1:9876';
-  export dev155_roxie := 'http://10.173.155.1:9876';
-  export dev156_roxie := 'http://10.173.156.1:9876';
-  export dev157_roxie := 'http://10.173.157.1:9876';
-  export dev158_roxie := 'http://10.173.158.1:9876';
+  export dev154_roxie := 'http://dev154vip.hpcc.risk.regn.net:9876'; //or a specific node: http://10.173.154.1:9876'
+  export dev155_roxie := 'http://dev155vip.hpcc.risk.regn.net:9876'; // 'http://10.173.155.1:9876'
+  export dev156_roxie := 'http://dev156vip.hpcc.risk.regn.net:9876'; // 'http://10.173.156.1:9876'
+  export dev157_roxie := 'http://dev157vip.hpcc.risk.regn.net:9876'; // 'http://10.173.157.1:9876'
+  export dev158_roxie := 'http://dev158vip.hpcc.risk.regn.net:9876'; // 'http://10.173.158.1:9876'
   export soapshark(string target) := 'https://bctwpprroxie301.risk.regn.net/SoapShark/capture?target=' + STD.STR.toLowerCase(target);
 
   // This is just for testing convenience, feel free to add any gateway you need to this list.

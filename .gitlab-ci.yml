@@ -1,0 +1,24 @@
+default:
+  tags:
+    # Pick a specific Shared GitLab runner to execute on
+    - icboca # Innovation Cloud
+    #- us-east # Use either Boca or Alpha
+    - docker
+    - linux
+    - privileged
+
+stages:
+    # The order listed here is the order these run inside the pipelines
+    - build # Generic build stage
+    - merge # Code Merge
+    - test # Generic test stage
+    - thor_test # Test code on Thor, doesn't need to wait for a Publish step to test
+    - publish # Push code to Roxie
+    - deploy # Generic deploy stage
+    - roxie_test # Test code on Roxie
+    - documentation # Generate or update Documentation
+
+include:
+  # Run the KEL Compiler to generate new ECL code, and submit that code via new Merge Request
+  - local: 'AutoGenECL-PublicRecords_KEL.yml'
+  - local: 'RoxieDev_Query_CI.yml'

@@ -169,6 +169,7 @@ EXPORT FP_models := MODULE
     doAttributesVersion202 := (Check_Valid_Attributes(Attr_Request, [Models.FraudAdvisor_Constants.attrV202]) or Model_Check(ModelRequest, ['fp1908_1'])) and inputok;
     doParoAttributes := Check_Valid_Attributes(Attr_Request, [Models.FraudAdvisor_Constants.attrvparo]) and inputok;
     doTMXAttributes := Check_Valid_Attributes(Attr_Request, [Models.FraudAdvisor_Constants.attrvTMX]) and inputok;
+    doIDA_Attributes := Check_Valid_Attributes(Attr_Request, [Models.FraudAdvisor_Constants.attrIDA]) and inputok;
     
 
     turn_on_RetainInputDID       := Model_Check(ModelRequest, ['fp31604_0']) and inputok;

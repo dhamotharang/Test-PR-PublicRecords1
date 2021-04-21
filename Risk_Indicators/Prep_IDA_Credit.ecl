@@ -46,23 +46,11 @@ EXPORT Prep_IDA_Credit( DATASET(Risk_Indicators.layouts.layout_IDA_in) indata,
       SELF.ProductID := Risk_Indicators.iid_constants.idaCreditProductID;     //Will need to make this configurable once Innovis models are ready
       //Real transactions should never go over 16 characters and IDA breaks if it goes over 17, so limit what can be passed to IDA
       SELF.ESPTransactionId := IF(LENGTH(TRIM(LEFT.ESPTransactionId)) > 16, LEFT.ESPTransactionId[1..16], TRIM(LEFT.ESPTransactionId));
-
+      SELF.Affiliate := LEFT.Affiliate[1..100]; //Truncate Affiliate to 100 chars cause thats all IDA supports
       SELF := LEFT
 			));
   
   FromIDA := Risk_Indicators.getIDA_attributes(IDA_input, gateways_prep, Gateway_mode, Timeout_sec, Retries);
-  
-  //Fail the transaction if the IDA gateway call didn't work.
-  //This check is for IDA combined models, if a service ends up calling
-  //IDA and they don't want the transaction to fail, will need to modify this logic
-  IDA_error_check := (FromIDA[1].response._Header.Status != 0) OR 
-                       (FromIDA[1].response.ErrorRecord.Code != '' AND FromIDA[1].response.ErrorRecord.Message != '');
-
-  IF(IDA_error_check, 
-    IF(TRIM(STD.STR.ToUpperCase(FromIDA[1].response.ErrorRecord.Code)) = 'USER', 
-      FAIL('Gateway ' + TRIM(FromIDA[1].response.ErrorRecord.Code) + ' error: ' + FromIDA[1].response.ErrorRecord.Message),
-      FAIL('503 Service Unavailable: The service was unavailable due to temporary overload or maintenance.')
-    )); 
 
   //Don't want IDA gateway running in batch yet
   #IF(_control.Environment.OnThor)

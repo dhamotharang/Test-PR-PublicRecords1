@@ -111,7 +111,7 @@ ds_pubDidRecs  			:= MIDEX_Services.Raw_Public.fn_get_PublicSanctnDidData( in_di
     // --------------------------------------------------------------------------------------------------------------
     //              TopBusiness Data
     // --------------------------------------------------------------------------------------------------------------
-		rec_topBusinessRecs_bip_raw := IF(MidexReportSearchType = MIDEX_SERVICES.Constants.NEW_BUSINESS_REPORT, MIDEX_Services.TopBusiness_Sections(in_linkids, mod_access, in_mod.BusinessIDFetchLevel, in_mod.includeVendorSourceB)); 
+		rec_topBusinessRecs_bip_raw := IF(MidexReportSearchType = MIDEX_SERVICES.Constants.NEW_BUSINESS_REPORT, MIDEX_Services.TopBusiness_Sections(in_linkids, mod_access, in_mod.BusinessIDFetchLevel, in_mod.includeVendorSourceB,in_mod.IncludeAssignmentsAndReleases)); 
     rec_topBusinessRecs 				:= PROJECT(rec_topBusinessRecs_bip_raw, iesp.midexcompreport.t_MIDEXCompTopBusinessRecord)[1];
 
     // --------------------------------------------------------------------------------------------------------------
@@ -120,7 +120,7 @@ ds_pubDidRecs  			:= MIDEX_Services.Raw_Public.fn_get_PublicSanctnDidData( in_di
 		smartLinx_pers_options	:= MODULE(PROJECT(in_mod,Midex_Services.Iparam.smartLinxPersonIncludeOptions))	END;
     
 		rec_smartLinxPersonRecs_raw := IF(MidexReportSearchType = MIDEX_SERVICES.Constants.PERSON_REPORT, 
-                                      PROJECT(MIDEX_Services.SmartLinx_Person_Sections(in_mod.did, include_SourceDocs, smartLinx_pers_options, in_mod.includeVendorSourceB), 
+                                      PROJECT(MIDEX_Services.SmartLinx_Person_Sections(in_mod.did, include_SourceDocs, smartLinx_pers_options/*, in_mod.includeVendorSourceB*/), 
                                               MIDEX_Services.Layouts.rec_SmartLinxPersonWithSources ));
 
     // since this is a single record coming back, but send only first row to function for layout transform

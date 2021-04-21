@@ -1,0 +1,148 @@
+IMPORT risk_indicators;
+
+//non-ESDL input/output
+EXPORT layout := MODULE
+
+  SHARED permissions := RECORD
+    string  dppapurpose;
+    string  glbpurpose;
+    string  datapermissionmask;
+    string  datarestrictionmask;
+    string  industryclass;
+    string  excludedmvpii;
+    string  ssnmask;
+    string  dlmask;
+    string  dobmask;
+    string  _transactionid;
+    string  _batchuid;
+    string  _gcid;
+    string  lexidsourceoptout;
+  END;
+
+  //taken from query's WU
+  //if some of these fields are datasets, or iesp.t_StringArrayItem, etc. they will be initialized incorrectly
+  EXPORT request := RECORD(permissions)
+    string  instantidversion;
+    string  iidversionoverride;
+    // string  _espclientinterfaceversion;
+    string  ofacversion;
+    // string  _loginid;
+    // string  gateways; //is initialized by regression framework
+    // string  _batchjobid;
+    // string  _batchspecid;
+    // string  blind;
+    // string  _blind;
+    string  includetarguse3220;
+    string  watchlist;
+    string  accountnumber;
+    string  fromid2;
+    string  uniqueid;
+    string  historydatetimestamp;
+    string  historydateyyyymm;
+    string  ssn;
+    string  dateofbirth;
+    string  age;
+    string  homephone;
+    string  workphone;
+    string  unparsedfullname;
+    string  nameinputorder;
+    string  cleannamefml;
+    string  firstname;
+    string  middlename;
+    string  lastname;
+    string  namesuffix;
+    string  addr;
+    string  streetaddress;
+    string  primrange;
+    string  predir;
+    string  primname;
+    string  addrsuffix;
+    string  postdir;
+    string  unitdesignation;
+    string  secrange;
+    string  city;
+    string  state;
+    string  zip;
+    string  country;
+    string  customcvimodelname;
+    string  dlnumber;
+    string  dlstate;
+    string  email;
+    string  ipaddress;
+    string  employername;
+    string  formername;
+    string  dobmatchoptions;
+    string  bsversion;
+    string  disablecustomernetworkoptionincvi;
+    string  disallowinsurancephoneheadergateway;
+    string  disablenongovernmentdldata;
+    string  allowemergingid;
+    string  enableemergingid;
+    string  includedigitalidentity;
+    // string  _companyid;
+    string  customdatafilter;
+    string  usedobfilter;
+    string  dobradius;
+    string  everoccupant_pastmonths;
+    string  everoccupant_startdate;
+    string  exactfirstnamematch;
+    string  exactlastnamematch;
+    string  exactaddrmatch;
+    string  exactphonematch;
+    string  exactssnmatch;
+    string  exactdobmatch;
+    string  exactfirstnamematchallownicknames;
+    string  exactdriverlicensematch;
+    string  includeofac;
+    string  includeadditionalwatchlists;
+    string  excludewatchlists;
+    string  globalwatchlistthreshold;
+    string  includenapdata;
+    string  lastseenthreshold;
+    string  ofaconly;
+    string  includedlverification;
+    string  scores;
+    string  excludeminors;
+    string  redflag_version;
+    string  testdataenabled;
+    string  testdatatablename;
+    string  includeallriskindicators;
+    string  passportupperline;
+    string  passportlowerline;
+    string  gender;
+    string  fromiidmodel;
+    string  searchsicnaicscodes;
+    string  includedpbc;
+    string  includeemailverification;
+    string  includemsoverride;
+    string  includecompliancecap;
+    string  includeitin;
+    string  includedobincvi;
+    string  includedriverlicenseincvi;
+    string  poboxcompliance;
+    string  includecloverride;
+    string  includemioverride;
+    string  isidentifier2;
+    string  fromflexid;
+    string  channel;
+    string  income;
+    string  ownorrent;
+    string  locationidentifier;
+    string  otherapplicationidentifier;
+    string  otherapplicationidentifier2;
+    string  otherapplicationidentifier3;
+    string  dateofapplication;
+    string  timeofapplication;
+    string  outcometrackingoptout;
+    // string  _logfunctionname;
+    // string  _espmethodname;
+    // string  _deliverymethod;
+    string  __deathmasterpurpose;
+    string  instantidarchivingoptin;
+  END;
+
+  EXPORT request_defaults := request - permissions;
+
+  EXPORT response := risk_indicators.Layout_InstandID_NuGen;
+
+END;

@@ -1,53 +1,38 @@
-﻿/*--SOAP--
-<message name="Possible_Incarceration_Indicator_Batch_Service" wuTimeout="300000">
-  <part name="batch_in" type="tns:XmlDataSet" cols="70" rows="25"/>
-  <part name="Match_Name" type="xsd:boolean"/>
-  <part name="Match_City" type="xsd:boolean"/>
-  <part name="Match_Street_Address" type="xsd:boolean"/>
-  <part name="Match_State" type="xsd:boolean"/>
-  <part name="Match_Zip" type="xsd:boolean"/>
-  <part name="Match_SSN" type="xsd:boolean"/>
-  <part name="Match_DOB" type="xsd:boolean"/>
-  <part name="workHard" type="xsd:boolean"/>
-  <part name="Run_Deep_Dive" type="xsd:boolean"/>
-  <part name="Return_DOC_Name" type="xsd:boolean"/>
-  <part name="Return_SSN" type="xsd:boolean"/>
-  <part name="PenaltThreshold" type="xsd:unsignedInt"/>
-  <part name="DPPAPurpose" type="xsd:unsignedInt"/>
-  <part name="GLBPurpose" type="xsd:unsignedInt"/>
-  <part name="DataRestrictionMask" type="xsd:string"/>
-</message>
-*/
+﻿// =====================================================================
+// ROXIE QUERY
+// -----------
+// For the complete list of input parameters please check published WU.
+// Look at the history of this attribute for the old SOAP info.
+// =====================================================================
 /*--INFO-- Possible Incarceration Indicator.*/
-
 
 IMPORT AutoStandardI, BatchShare, CriminalRecords_BatchService,ut;
 
 EXPORT Possible_Incarceration_Indicator_Batch_Service() := MACRO
-  #constant('SearchLibraryVersion', AutoheaderV2.Constants.LibVersion.SALT);
+  #CONSTANT('SearchLibraryVersion', AutoheaderV2.Constants.LibVersion.SALT);
   gm := AutoStandardI.GlobalModule();
-  BOOLEAN match_name      := FALSE : STORED('Match_Name');
-  BOOLEAN match_addr      := FALSE : STORED('Match_Street_Address');
-  BOOLEAN match_city      := FALSE : STORED('Match_City');
-  BOOLEAN match_state     := FALSE : STORED('Match_State');
-  BOOLEAN match_zip       := FALSE : STORED('Match_Zip');
-  BOOLEAN match_ssn       := FALSE : STORED('Match_SSN');
-  BOOLEAN Match_DOB       := FALSE : STORED('Match_DOB');
+  BOOLEAN match_name := FALSE : STORED('Match_Name');
+  BOOLEAN match_addr := FALSE : STORED('Match_Street_Address');
+  BOOLEAN match_city := FALSE : STORED('Match_City');
+  BOOLEAN match_state := FALSE : STORED('Match_State');
+  BOOLEAN match_zip := FALSE : STORED('Match_Zip');
+  BOOLEAN match_ssn := FALSE : STORED('Match_SSN');
+  BOOLEAN Match_DOB := FALSE : STORED('Match_DOB');
   BOOLEAN Return_Doc_Name := FALSE : STORED('Return_DOC_Name');
-  BOOLEAN Return_SSN      := FALSE : STORED('Return_SSN');
+  BOOLEAN Return_SSN := FALSE : STORED('Return_SSN');
 
   batch_params := BatchShare.IParam.getBatchParams();
-  pii_batch_params := module(project(batch_params, CriminalRecords_BatchService.IParam.batch_params, opt))
-    export MatchName     := match_name;
-    export MatchStrAddr  := match_addr;
-    export MatchCity     := match_city;
-    export MatchState    := match_state;
-    export MatchZip      := match_zip;
-    export MatchSSN      := match_ssn;
-    export MatchDOB      := match_DOB;
-    export ReturnDocName := Return_Doc_Name;
-    export ReturnSSN     := Return_SSN;
-  end;
+  pii_batch_params := MODULE(PROJECT(batch_params, CriminalRecords_BatchService.IParam.batch_params, OPT))
+    EXPORT MatchName := match_name;
+    EXPORT MatchStrAddr := match_addr;
+    EXPORT MatchCity := match_city;
+    EXPORT MatchState := match_state;
+    EXPORT MatchZip := match_zip;
+    EXPORT MatchSSN := match_ssn;
+    EXPORT MatchDOB := match_DOB;
+    EXPORT ReturnDocName := Return_Doc_Name;
+    EXPORT ReturnSSN := Return_SSN;
+  END;
 
   ds_xml_in := DATASET([], CriminalRecords_BatchService.Layouts.batch_pii_in) : STORED('batch_in', FEW);
 
@@ -58,7 +43,7 @@ EXPORT Possible_Incarceration_Indicator_Batch_Service() := MACRO
   ds_batch_out := CriminalRecords_BatchService.Possible_Incarceration_Indicator_Batch_Service_Records(pii_batch_params, ds_batch_in).Records;
 
   // Restore original acctno.
-  BatchShare.MAC_RestoreAcctno(ds_batch_in, ds_batch_out, ds_batch_ready, false);
+  BatchShare.MAC_RestoreAcctno(ds_batch_in, ds_batch_out, ds_batch_ready, FALSE);
 
   ut.mac_TrimFields(ds_batch_ready, 'ds_batch_ready', results);
   OUTPUT(results, NAMED('Results'));

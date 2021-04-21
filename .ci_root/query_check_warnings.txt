@@ -1,0 +1,1919 @@
+00000000 USR 2021-04-21 00:53:46.887  7838  7838 "list disks: Creating PIPE program process : 'lsblk -o TYPE,MAJ:MIN --pairs' - hasinput=0, hasoutput=1 stderrbufsize=8192"
+00000001 USR 2021-04-21 00:53:46.891  7838  7838 "list disks: Pipe: process 7840 complete 0"
+00000002 OPR 2021-04-21 00:53:46.894  7838  7838 "WARNING: Warning: Could not load /opt/HPCCSystems/7.10.24/clienttools/filehooks/libs3file.so: libaws-c-event-stream.so.0unstable: cannot open shared object file: No such file or directory"
+00000003 PRG 2021-04-21 00:53:46.894  7838  7838 "File hook library /opt/HPCCSystems/7.10.24/clienttools/filehooks/libs3file.so could not be loaded"
+00000004 PRG 2021-04-21 00:53:46.905  7838  7838 "Loading plugin /opt/HPCCSystems/7.10.24/clienttools/plugins/liblogging.so[lib_logging] version = LOGGING 1.0.1"
+00000005 PRG 2021-04-21 00:53:46.905  7838  7838 "Loading library /opt/HPCCSystems/7.10.24/clienttools/plugins/lib_metaphone3.ecllib"
+00000006 PRG 2021-04-21 00:53:46.905  7838  7838 "Loading library /opt/HPCCSystems/7.10.24/clienttools/plugins/javascript.ecllib"
+00000007 PRG 2021-04-21 00:53:46.905  7838  7838 "Loading library /opt/HPCCSystems/7.10.24/clienttools/plugins/kafka.ecllib"
+00000008 PRG 2021-04-21 00:53:46.909  7838  7838 "Loading plugin /opt/HPCCSystems/7.10.24/clienttools/plugins/libfileservices.so[lib_fileservices] version = FILESERVICES 2.1.4"
+00000009 PRG 2021-04-21 00:53:46.909  7838  7838 "Loading library /opt/HPCCSystems/7.10.24/clienttools/plugins/couchbase.ecllib"
+0000000A PRG 2021-04-21 00:53:46.909  7838  7838 "Loading library /opt/HPCCSystems/7.10.24/clienttools/plugins/lib_memcached.ecllib"
+0000000B PRG 2021-04-21 00:53:46.909  7838  7838 "Loading library /opt/HPCCSystems/7.10.24/clienttools/plugins/lib_cryptolib.ecllib"
+0000000C PRG 2021-04-21 00:53:46.909  7838  7838 "Loading library /opt/HPCCSystems/7.10.24/clienttools/plugins/python3.ecllib"
+0000000D PRG 2021-04-21 00:53:46.909  7838  7838 "Loading library /opt/HPCCSystems/7.10.24/clienttools/plugins/lib_keylib.ecllib"
+0000000E PRG 2021-04-21 00:53:46.909  7838  7838 "Loading plugin /opt/HPCCSystems/7.10.24/clienttools/plugins/libunicodelib.so[lib_unicodelib] version = UNICODELIB 1.1.06"
+0000000F PRG 2021-04-21 00:53:46.909  7838  7838 "Loading library /opt/HPCCSystems/7.10.24/clienttools/plugins/lib_thorlib.ecllib"
+00000010 PRG 2021-04-21 00:53:46.909  7838  7838 "Loading library /opt/HPCCSystems/7.10.24/clienttools/plugins/java.ecllib"
+00000011 PRG 2021-04-21 00:53:46.910  7838  7838 "Loading plugin /opt/HPCCSystems/7.10.24/clienttools/plugins/libauditlib.so[lib_auditlib] version = AUDITLIB 1.0.1"
+00000012 PRG 2021-04-21 00:53:46.910  7838  7838 "Loading library /opt/HPCCSystems/7.10.24/clienttools/plugins/lib_eclblas.ecllib"
+00000013 PRG 2021-04-21 00:53:46.910  7838  7838 "Loading library /opt/HPCCSystems/7.10.24/clienttools/plugins/sqlite3.ecllib"
+00000014 PRG 2021-04-21 00:53:46.910  7838  7838 "Loading library /opt/HPCCSystems/7.10.24/clienttools/plugins/lib_saltlib.ecllib"
+00000015 PRG 2021-04-21 00:53:46.910  7838  7838 "Loading library /opt/HPCCSystems/7.10.24/clienttools/plugins/lib_h3.ecllib"
+00000016 PRG 2021-04-21 00:53:46.910  7838  7838 "Loading library /opt/HPCCSystems/7.10.24/clienttools/plugins/R.ecllib"
+00000017 PRG 2021-04-21 00:53:46.910  7838  7838 "Loading library /opt/HPCCSystems/7.10.24/clienttools/plugins/lib_word.ecllib"
+00000018 PRG 2021-04-21 00:53:46.910  7838  7838 "Loading library /opt/HPCCSystems/7.10.24/clienttools/plugins/lib_metaphone.ecllib"
+00000019 PRG 2021-04-21 00:53:46.910  7838  7838 "Loading plugin /opt/HPCCSystems/7.10.24/clienttools/plugins/libtimelib.so[lib_timelib] version = TIMELIB 1.0.0"
+0000001A PRG 2021-04-21 00:53:46.910  7838  7838 "Loading library /opt/HPCCSystems/7.10.24/clienttools/plugins/lib_redis.ecllib"
+0000001B PRG 2021-04-21 00:53:46.910  7838  7838 "Loading library /opt/HPCCSystems/7.10.24/clienttools/plugins/python.ecllib"
+0000001C PRG 2021-04-21 00:53:46.910  7838  7838 "Loading plugin /opt/HPCCSystems/7.10.24/clienttools/plugins/libparselib.so[lib_parselib] version = PARSELIB 1.0.1"
+0000001D PRG 2021-04-21 00:53:46.911  7838  7838 "Loading plugin /opt/HPCCSystems/7.10.24/clienttools/plugins/libdebugservices.so[lib_debugservices] version = DEBUGSERVICES 1.0.1"
+0000001E PRG 2021-04-21 00:53:46.911  7838  7838 "Loading plugin /opt/HPCCSystems/7.10.24/clienttools/plugins/libworkunitservices.so[lib_WORKUNITSERVICES] version = WORKUNITSERVICES 1.0.2"
+0000001F PRG 2021-04-21 00:53:46.911  7838  7838 "Loading library /opt/HPCCSystems/7.10.24/clienttools/plugins/mysql.ecllib"
+00000020 PRG 2021-04-21 00:53:46.911  7838  7838 "Loading library /opt/HPCCSystems/7.10.24/clienttools/plugins/sqs.ecllib"
+00000021 PRG 2021-04-21 00:53:46.911  7838  7838 "Loading plugin /opt/HPCCSystems/7.10.24/clienttools/plugins/libstringlib.so[lib_stringlib] version = STRINGLIB 1.1.14"
+00000022 PRG 2021-04-21 00:53:46.911  7838  7838 "Loading library /opt/HPCCSystems/7.10.24/clienttools/plugins/lib_fingerprintlib.ecllib"
+00000023 PRG 2021-04-21 00:53:46.911  7838  7838 "Loading library /opt/HPCCSystems/7.10.24/clienttools/plugins/lib_namelib.ecllib"
+00000024 PRG 2021-04-21 00:53:46.911  7838  7838 "Loading library /opt/HPCCSystems/7.10.24/clienttools/plugins/lib_datalib.ecllib"
+00000025 PRG 2021-04-21 00:53:46.911  7838  7838 "Loading library /opt/HPCCSystems/7.10.24/clienttools/plugins/lib_EntityScore.ecllib"
+00000026 PRG 2021-04-21 00:53:46.911  7838  7838 "Loading library /opt/HPCCSystems/7.10.24/clienttools/plugins/lib_auditlib.ecllib"
+00000027 USR 2021-04-21 00:53:46.911  7838  7838 "WARNING: Duplicate module found at /opt/HPCCSystems/7.10.24/clienttools/plugins/lib_auditlib.ecllib"
+00000028 PRG 2021-04-21 00:53:46.911  7838  7838 "Loading library /opt/HPCCSystems/7.10.24/clienttools/plugins/lib_date.ecllib"
+00000029 PRG 2021-04-21 00:53:46.911  7838  7838 "Loading library /opt/HPCCSystems/7.10.24/clienttools/plugins/lib_CanadaClean.ecllib"
+0000002A PRG 2021-04-21 00:53:46.911  7838  7838 "Loading library /opt/HPCCSystems/7.10.24/clienttools/plugins/cassandra.ecllib"
+0000002B PRG 2021-04-21 00:53:46.911  7838  7838 "Loading library /opt/HPCCSystems/7.10.24/clienttools/plugins/lib_AddrClean.ecllib"
+0000002C PRG 2021-04-21 00:53:46.911  7838  7838 "Loading library /opt/HPCCSystems/7.10.24/clienttools/plugins/lib_BridgerScore.ecllib"
+0000002D PRG 2021-04-21 00:53:46.911  7838  7838 "Loading library /opt/HPCCSystems/7.10.24/clienttools/plugins/lib_ziplib.ecllib"
+0000002E PRG 2021-04-21 00:53:46.911  7838  7838 "Loading library /opt/HPCCSystems/7.10.24/clienttools/plugins/DMS.ecllib"
+0000002F PRG 2021-04-21 00:53:46.911  7838  7838 "Loading library /opt/HPCCSystems/7.10.24/clienttools/plugins/lib_Ofac.ecllib"
+00000030 USR 2021-04-21 00:53:46.976  7838  7838 "gpg: Creating PIPE program process : 'gpg --verify -' - hasinput=1, hasoutput=0 stderrbufsize=0"
+00000031 PRG 2021-04-21 00:53:46.977  7838  7838 "gpg: PIPE process 'gpg --verify -' failed to start"
+Syntax Check Warnings: 2021-04-21T00:53:47.024Z
+
+[[ addrBest.BestAddress_Batch_Service ]]
+----------------------------------------------------------
+/builds/risk-engineering/PublicRecords/.ci_root/../PhonesFeedback_Services/CleanDate.ecl(89,39): warning C2003: substring applied to value of type Integer
+/builds/risk-engineering/PublicRecords/.ci_root/../InsuranceHeader_BestOfBest/Layouts.ecl(23,3): warning C2112: A field called DID is already defined in this record
+0 error, 2 warnings
+----------------------------------------------------------
+
+[[ AddrBest.BestAddr_ProgressivePhone_Service ]]
+----------------------------------------------------------
+/builds/risk-engineering/PublicRecords/.ci_root/../InsuranceHeader_BestOfBest/Layouts.ecl(23,3): warning C2112: A field called DID is already defined in this record
+/builds/risk-engineering/PublicRecords/.ci_root/../PhonesFeedback_Services/CleanDate.ecl(89,39): warning C2003: substring applied to value of type Integer
+0 error, 2 warnings
+----------------------------------------------------------
+
+[[ AddressReport_Services.AddressSummaryService ]]
+----------------------------------------------------------
+/builds/risk-engineering/PublicRecords/.ci_root/../PhonesFeedback_Services/CleanDate.ecl(89,39): warning C2003: substring applied to value of type Integer
+0 error, 1 warning
+----------------------------------------------------------
+
+[[ AddressReport_Services.ReportService ]]
+----------------------------------------------------------
+/builds/risk-engineering/PublicRecords/.ci_root/../InsuranceHeader_BestOfBest/Layouts.ecl(23,3): warning C2112: A field called DID is already defined in this record
+/builds/risk-engineering/PublicRecords/.ci_root/../PhonesFeedback_Services/CleanDate.ecl(89,39): warning C2003: substring applied to value of type Integer
+0 error, 2 warnings
+----------------------------------------------------------
+
+[[ Address_Attributes.SmartGrid_BatchService ]]
+----------------------------------------------------------
+/builds/risk-engineering/PublicRecords/.ci_root/../Risk_Indicators/Address_Table_function.ecl(54,50): warning C2003: substring applied to value of type Integer
+/builds/risk-engineering/PublicRecords/.ci_root/../Risk_Indicators/Address_Table_function.ecl(86,50): warning C2003: substring applied to value of type Integer
+0 error, 2 warnings
+----------------------------------------------------------
+
+[[ Address_Rank.BatchService ]]
+----------------------------------------------------------
+/builds/risk-engineering/PublicRecords/.ci_root/../InsuranceHeader_BestOfBest/Layouts.ecl(23,3): warning C2112: A field called DID is already defined in this record
+0 error, 1 warning
+----------------------------------------------------------
+
+[[ Address_Services.RightAddressService ]]
+----------------------------------------------------------
+/builds/risk-engineering/PublicRecords/.ci_root/../PhonesFeedback_Services/CleanDate.ecl(89,39): warning C2003: substring applied to value of type Integer
+0 error, 1 warning
+----------------------------------------------------------
+
+[[ Address_Shell.Address_Attributes_Batch_Service ]]
+----------------------------------------------------------
+/builds/risk-engineering/PublicRecords/.ci_root/../Address_Shell/layoutPropertyCharacteristics.ecl(8,1): warning C2380: Name of exported symbol 'attributesVersion1' does not match the expected name 'layoutPropertyCharacteristics'
+/builds/risk-engineering/PublicRecords/.ci_root/../Address_Shell/layoutPropertyCharacteristics.ecl(27,1): warning C2380: Name of exported symbol 'propertyAddress' does not match the expected name 'layoutPropertyCharacteristics'
+/builds/risk-engineering/PublicRecords/.ci_root/../Address_Shell/layoutPropertyCharacteristics.ecl(47,1): warning C2380: Name of exported symbol 'propertyAttributes' does not match the expected name 'layoutPropertyCharacteristics'
+/builds/risk-engineering/PublicRecords/.ci_root/../Address_Shell/layoutPropertyCharacteristics.ecl(104,1): warning C2380: Name of exported symbol 'PropertyCharacteristics' does not match the expected name 'layoutPropertyCharacteristics'
+/builds/risk-engineering/PublicRecords/.ci_root/../Address_Shell/layoutPropertyCharacteristics.ecl(445,1): warning C2380: Name of exported symbol 'propertyMortgages' does not match the expected name 'layoutPropertyCharacteristics'
+/builds/risk-engineering/PublicRecords/.ci_root/../Address_Shell/layoutPropertyCharacteristics.ecl(462,1): warning C2380: Name of exported symbol 'propertySales' does not match the expected name 'layoutPropertyCharacteristics'
+/builds/risk-engineering/PublicRecords/.ci_root/../Address_Shell/layoutPropertyCharacteristics.ecl(475,1): warning C2380: Name of exported symbol 'propertyTax' does not match the expected name 'layoutPropertyCharacteristics'
+/builds/risk-engineering/PublicRecords/.ci_root/../Address_Shell/layoutPropertyCharacteristics.ecl(522,1): warning C2380: Name of exported symbol 'costSummary' does not match the expected name 'layoutPropertyCharacteristics'
+/builds/risk-engineering/PublicRecords/.ci_root/../Address_Shell/layoutPropertyCharacteristics.ecl(535,1): warning C2380: Name of exported symbol 'propertyDescriptionRecordSet' does not match the expected name 'layoutPropertyCharacteristics'
+/builds/risk-engineering/PublicRecords/.ci_root/../Address_Shell/layoutPropertyCharacteristics.ecl(549,1): warning C2380: Name of exported symbol 'propAttributes' does not match the expected name 'layoutPropertyCharacteristics'
+/builds/risk-engineering/PublicRecords/.ci_root/../Address_Shell/layoutPropertyCharacteristics.ecl(553,1): warning C2380: Name of exported symbol 'propCharacteristics' does not match the expected name 'layoutPropertyCharacteristics'
+/builds/risk-engineering/PublicRecords/.ci_root/../Address_Shell/layoutPropertyCharacteristics.ecl(562,1): warning C2380: Name of exported symbol 'ercCharacteristics' does not match the expected name 'layoutPropertyCharacteristics'
+/builds/risk-engineering/PublicRecords/.ci_root/../Address_Shell/layoutInput.ecl(3,1): warning C2380: Name of exported symbol 'options' does not match the expected name 'layoutInput'
+/builds/risk-engineering/PublicRecords/.ci_root/../Address_Shell/layoutInput.ecl(11,1): warning C2380: Name of exported symbol 'address' does not match the expected name 'layoutInput'
+0 error, 14 warnings
+----------------------------------------------------------
+
+[[ Address_Shell.Address_Attributes_Service ]]
+----------------------------------------------------------
+/builds/risk-engineering/PublicRecords/.ci_root/../Address_Shell/layoutInput.ecl(3,1): warning C2380: Name of exported symbol 'options' does not match the expected name 'layoutInput'
+/builds/risk-engineering/PublicRecords/.ci_root/../Address_Shell/layoutInput.ecl(11,1): warning C2380: Name of exported symbol 'address' does not match the expected name 'layoutInput'
+/builds/risk-engineering/PublicRecords/.ci_root/../Address_Shell/layoutPropertyCharacteristics.ecl(8,1): warning C2380: Name of exported symbol 'attributesVersion1' does not match the expected name 'layoutPropertyCharacteristics'
+/builds/risk-engineering/PublicRecords/.ci_root/../Address_Shell/layoutPropertyCharacteristics.ecl(27,1): warning C2380: Name of exported symbol 'propertyAddress' does not match the expected name 'layoutPropertyCharacteristics'
+/builds/risk-engineering/PublicRecords/.ci_root/../Address_Shell/layoutPropertyCharacteristics.ecl(47,1): warning C2380: Name of exported symbol 'propertyAttributes' does not match the expected name 'layoutPropertyCharacteristics'
+/builds/risk-engineering/PublicRecords/.ci_root/../Address_Shell/layoutPropertyCharacteristics.ecl(104,1): warning C2380: Name of exported symbol 'PropertyCharacteristics' does not match the expected name 'layoutPropertyCharacteristics'
+/builds/risk-engineering/PublicRecords/.ci_root/../Address_Shell/layoutPropertyCharacteristics.ecl(445,1): warning C2380: Name of exported symbol 'propertyMortgages' does not match the expected name 'layoutPropertyCharacteristics'
+/builds/risk-engineering/PublicRecords/.ci_root/../Address_Shell/layoutPropertyCharacteristics.ecl(462,1): warning C2380: Name of exported symbol 'propertySales' does not match the expected name 'layoutPropertyCharacteristics'
+/builds/risk-engineering/PublicRecords/.ci_root/../Address_Shell/layoutPropertyCharacteristics.ecl(475,1): warning C2380: Name of exported symbol 'propertyTax' does not match the expected name 'layoutPropertyCharacteristics'
+/builds/risk-engineering/PublicRecords/.ci_root/../Address_Shell/layoutPropertyCharacteristics.ecl(522,1): warning C2380: Name of exported symbol 'costSummary' does not match the expected name 'layoutPropertyCharacteristics'
+/builds/risk-engineering/PublicRecords/.ci_root/../Address_Shell/layoutPropertyCharacteristics.ecl(535,1): warning C2380: Name of exported symbol 'propertyDescriptionRecordSet' does not match the expected name 'layoutPropertyCharacteristics'
+/builds/risk-engineering/PublicRecords/.ci_root/../Address_Shell/layoutPropertyCharacteristics.ecl(549,1): warning C2380: Name of exported symbol 'propAttributes' does not match the expected name 'layoutPropertyCharacteristics'
+/builds/risk-engineering/PublicRecords/.ci_root/../Address_Shell/layoutPropertyCharacteristics.ecl(553,1): warning C2380: Name of exported symbol 'propCharacteristics' does not match the expected name 'layoutPropertyCharacteristics'
+/builds/risk-engineering/PublicRecords/.ci_root/../Address_Shell/layoutPropertyCharacteristics.ecl(562,1): warning C2380: Name of exported symbol 'ercCharacteristics' does not match the expected name 'layoutPropertyCharacteristics'
+0 error, 14 warnings
+----------------------------------------------------------
+
+[[ AML.AML_Batch_Service ]]
+----------------------------------------------------------
+/builds/risk-engineering/PublicRecords/.ci_root/../tools/mac_FilesIndex.ecl(28,2): warning C2380: Name of exported symbol 'fcra_key' does not match the expected name 'Key_HRI_Address_To_Sic_filtered_FCRA'
+/builds/risk-engineering/PublicRecords/.ci_root/../Risk_Indicators/Key_HRI_Address_To_Sic_filtered_FCRA.ecl(5,253): warning C2380: While expanding macro mac_filesindex
+0 error, 2 warnings
+----------------------------------------------------------
+
+[[ AML.AML_Service ]]
+----------------------------------------------------------
+/builds/risk-engineering/PublicRecords/.ci_root/../tools/mac_FilesIndex.ecl(28,2): warning C2380: Name of exported symbol 'fcra_key' does not match the expected name 'Key_HRI_Address_To_Sic_filtered_FCRA'
+/builds/risk-engineering/PublicRecords/.ci_root/../Risk_Indicators/Key_HRI_Address_To_Sic_filtered_FCRA.ecl(5,253): warning C2380: While expanding macro mac_filesindex
+0 error, 2 warnings
+----------------------------------------------------------
+
+[[ BatchServices.AppendDid_BatchService ]]
+----------------------------------------------------------
+/builds/risk-engineering/PublicRecords/.ci_root/../InsuranceHeader_BestOfBest/Layouts.ecl(23,3): warning C2112: A field called DID is already defined in this record
+0 error, 1 warning
+----------------------------------------------------------
+
+[[ BatchServices.BusinessInView_BatchService ]]
+----------------------------------------------------------
+/builds/risk-engineering/PublicRecords/.ci_root/../BatchServices/BusinessInView_BatchService.ecl(31,3): warning C2380: Name of exported symbol 'Defaults' does not match the expected name '_tmp_ecl'
+/builds/risk-engineering/PublicRecords/_tmp_ecl.ecl(1,44): warning C2380: While expanding macro businessinview_batchservice
+/builds/risk-engineering/PublicRecords/.ci_root/../tools/mac_RedefineFormat.ecl(779,1): warning C1048: EXPORT/SHARED qualifiers are ignored in this context
+/builds/risk-engineering/PublicRecords/.ci_root/../tools/mac_RedefineFormat.ecl(318,12): warning C1048: While expanding macro <param>
+/builds/risk-engineering/PublicRecords/.ci_root/../DNB_DMI/File_Companies_Keybuild.ecl(26,86): warning C1048: While expanding macro mac_redefineformat
+0 error, 5 warnings
+----------------------------------------------------------
+
+[[ BatchServices.DEA_BatchService ]]
+----------------------------------------------------------
+/builds/risk-engineering/PublicRecords/.ci_root/../BatchServices/xfm_DEA_make_flat.ecl(5,1): warning C2380: Name of exported symbol 'get_business_description' does not match the expected name 'xfm_DEA_make_flat'
+0 error, 1 warning
+----------------------------------------------------------
+
+[[ BatchServices.IdentityRefundFraud_BatchService ]]
+----------------------------------------------------------
+/builds/risk-engineering/PublicRecords/.ci_root/../PhonesFeedback_Services/CleanDate.ecl(89,39): warning C2003: substring applied to value of type Integer
+/builds/risk-engineering/PublicRecords/.ci_root/../InsuranceHeader_BestOfBest/Layouts.ecl(23,3): warning C2112: A field called DID is already defined in this record
+/builds/risk-engineering/PublicRecords/.ci_root/../Risk_Indicators/Boca_Shell_BtSt_Properties.ecl(40,3): warning C2112: A field called ln_fares_id is already defined in this record
+/builds/risk-engineering/PublicRecords/.ci_root/../Risk_Indicators/Boca_Shell_BtSt_Properties.ecl(40,3): warning C2112: A field called did is already defined in this record
+0 error, 4 warnings
+----------------------------------------------------------
+
+[[ BatchServices.OFAC_BatchService ]]
+----------------------------------------------------------
+/builds/risk-engineering/PublicRecords/.ci_root/../BatchServices/xfm_OFAC_make_flat.ecl(4,1): warning C2380: Name of exported symbol 'm_Remarks' does not match the expected name 'xfm_OFAC_make_flat'
+/builds/risk-engineering/PublicRecords/.ci_root/../BatchServices/xfm_OFAC_make_flat.ecl(77,1): warning C2380: Name of exported symbol 'm_Addresses' does not match the expected name 'xfm_OFAC_make_flat'
+0 error, 2 warnings
+----------------------------------------------------------
+
+[[ BatchServices.STR_BatchService ]]
+----------------------------------------------------------
+/builds/risk-engineering/PublicRecords/.ci_root/../InsuranceHeader_BestOfBest/Layouts.ecl(23,3): warning C2112: A field called DID is already defined in this record
+0 error, 1 warning
+----------------------------------------------------------
+
+[[ BatchServices.TaxRefundISv3_BatchService ]]
+----------------------------------------------------------
+/builds/risk-engineering/PublicRecords/.ci_root/../PhonesFeedback_Services/CleanDate.ecl(89,39): warning C2003: substring applied to value of type Integer
+/builds/risk-engineering/PublicRecords/.ci_root/../InsuranceHeader_BestOfBest/Layouts.ecl(23,3): warning C2112: A field called DID is already defined in this record
+/builds/risk-engineering/PublicRecords/.ci_root/../Risk_Indicators/Boca_Shell_BtSt_Properties.ecl(40,3): warning C2112: A field called ln_fares_id is already defined in this record
+/builds/risk-engineering/PublicRecords/.ci_root/../Risk_Indicators/Boca_Shell_BtSt_Properties.ecl(40,3): warning C2112: A field called did is already defined in this record
+0 error, 4 warnings
+----------------------------------------------------------
+
+[[ BatchServices.TaxRefundIS_BatchService ]]
+----------------------------------------------------------
+/builds/risk-engineering/PublicRecords/.ci_root/../PhonesFeedback_Services/CleanDate.ecl(89,39): warning C2003: substring applied to value of type Integer
+/builds/risk-engineering/PublicRecords/.ci_root/../InsuranceHeader_BestOfBest/Layouts.ecl(23,3): warning C2112: A field called DID is already defined in this record
+/builds/risk-engineering/PublicRecords/.ci_root/../Risk_Indicators/Boca_Shell_BtSt_Properties.ecl(40,3): warning C2112: A field called ln_fares_id is already defined in this record
+/builds/risk-engineering/PublicRecords/.ci_root/../Risk_Indicators/Boca_Shell_BtSt_Properties.ecl(40,3): warning C2112: A field called did is already defined in this record
+0 error, 4 warnings
+----------------------------------------------------------
+
+[[ BestAddressAndPhone_Services.SearchService ]]
+----------------------------------------------------------
+/builds/risk-engineering/PublicRecords/.ci_root/../PhonesFeedback_Services/CleanDate.ecl(89,39): warning C2003: substring applied to value of type Integer
+0 error, 1 warning
+----------------------------------------------------------
+
+[[ BS_Services.InstantIDService ]]
+----------------------------------------------------------
+/builds/risk-engineering/PublicRecords/.ci_root/../PhonesFeedback_Services/CleanDate.ecl(89,39): warning C2003: substring applied to value of type Integer
+0 error, 1 warning
+----------------------------------------------------------
+
+[[ BusinessBatch_BIP.RollupService ]]
+----------------------------------------------------------
+/builds/risk-engineering/PublicRecords/.ci_root/../LaborActions_WHD/cluster.ecl(2,1): warning C2380: Name of exported symbol 'Cluster_in' does not match the expected name 'cluster'
+/builds/risk-engineering/PublicRecords/.ci_root/../BusinessBatch_BIP/Best.ecl(220,81): warning C2003: substring applied to value of type Integer
+0 error, 2 warnings
+----------------------------------------------------------
+
+[[ BusinessContactCard.ReportService ]]
+----------------------------------------------------------
+/builds/risk-engineering/PublicRecords/.ci_root/../BusinessContactCard/ReportView.ecl(7,3): warning C1048: EXPORT/SHARED qualifiers are ignored in this context
+/builds/risk-engineering/PublicRecords/.ci_root/../PhonesFeedback_Services/CleanDate.ecl(89,39): warning C2003: substring applied to value of type Integer
+0 error, 2 warnings
+----------------------------------------------------------
+
+[[ businesscredit_services.bcd_smallbizcombinedreport ]]
+----------------------------------------------------------
+/builds/risk-engineering/PublicRecords/.ci_root/../BusinessCredit_Services/fn_getBuzCreditTrades.ecl(212,46): warning C2003: substring applied to value of type Integer
+/builds/risk-engineering/PublicRecords/.ci_root/../BusinessCredit_Services/fn_getBuzCreditTrades.ecl(202,68): warning C2003: substring applied to value of type Integer
+0 error, 2 warnings
+----------------------------------------------------------
+
+[[ BusinessCredit_Services.BusinessAuthRepSearchService ]]
+----------------------------------------------------------
+/builds/risk-engineering/PublicRecords/.ci_root/../PhonesFeedback_Services/CleanDate.ecl(89,39): warning C2003: substring applied to value of type Integer
+/builds/risk-engineering/PublicRecords/.ci_root/../InsuranceHeader_BestOfBest/Layouts.ecl(23,3): warning C2112: A field called DID is already defined in this record
+0 error, 2 warnings
+----------------------------------------------------------
+
+[[ BusinessCredit_Services.CreditReportService ]]
+----------------------------------------------------------
+/builds/risk-engineering/PublicRecords/.ci_root/../BusinessCredit_Services/fn_getBuzCreditTrades.ecl(212,46): warning C2003: substring applied to value of type Integer
+/builds/risk-engineering/PublicRecords/.ci_root/../BusinessCredit_Services/fn_getBuzCreditTrades.ecl(202,68): warning C2003: substring applied to value of type Integer
+0 error, 2 warnings
+----------------------------------------------------------
+
+[[ BusinessInstantID20_Services.InstantID20_Batch_Service ]]
+----------------------------------------------------------
+/builds/risk-engineering/PublicRecords/.ci_root/../BusinessInstantID20_Services/fn_GetHeaderRecords.ecl(91,77): warning C2112: A field called UniqueID is already defined in this record
+0 error, 1 warning
+----------------------------------------------------------
+
+[[ BusinessInstantID20_Services.InstantID20_Service ]]
+----------------------------------------------------------
+/builds/risk-engineering/PublicRecords/.ci_root/../BusinessInstantID20_Services/fn_GetHeaderRecords.ecl(91,77): warning C2112: A field called UniqueID is already defined in this record
+0 error, 1 warning
+----------------------------------------------------------
+
+[[ Business_Header.BH_GID_RollupSearchService ]]
+----------------------------------------------------------
+/builds/risk-engineering/PublicRecords/.ci_root/../Business_Header/fn_RSS_attachSourceInfo.ecl(11,1): warning C2380: Name of exported symbol 'params' does not match the expected name 'fn_RSS_attachSourceInfo'
+0 error, 1 warning
+----------------------------------------------------------
+
+[[ Business_Risk.Business_Shell ]]
+----------------------------------------------------------
+/builds/risk-engineering/PublicRecords/.ci_root/../tools/mac_RedefineFormat.ecl(779,1): warning C1048: EXPORT/SHARED qualifiers are ignored in this context
+/builds/risk-engineering/PublicRecords/.ci_root/../tools/mac_RedefineFormat.ecl(318,12): warning C1048: While expanding macro <param>
+/builds/risk-engineering/PublicRecords/.ci_root/../DNB_DMI/File_Companies_Keybuild.ecl(26,86): warning C1048: While expanding macro mac_redefineformat
+0 error, 3 warnings
+----------------------------------------------------------
+
+[[ Business_Risk.InstantID_Batch_Service ]]
+----------------------------------------------------------
+/builds/risk-engineering/PublicRecords/.ci_root/../tools/mac_RedefineFormat.ecl(779,1): warning C1048: EXPORT/SHARED qualifiers are ignored in this context
+/builds/risk-engineering/PublicRecords/.ci_root/../tools/mac_RedefineFormat.ecl(318,12): warning C1048: While expanding macro <param>
+/builds/risk-engineering/PublicRecords/.ci_root/../DNB_DMI/File_Companies_Keybuild.ecl(26,86): warning C1048: While expanding macro mac_redefineformat
+/builds/risk-engineering/PublicRecords/.ci_root/../Business_Risk/InstantID_Batch_Service_records.ecl(244,46): warning C2003: substring applied to value of type Integer
+/builds/risk-engineering/PublicRecords/.ci_root/../Business_Risk/InstantID_Batch_Service_records.ecl(245,46): warning C2003: substring applied to value of type Integer
+0 error, 5 warnings
+----------------------------------------------------------
+
+[[ business_risk_bip.lib_b2b_attributes ]]
+----------------------------------------------------------
+/builds/risk-engineering/PublicRecords/.ci_root/../PublicRecords_KEL/ECL_Functions/Layouts_FDC.ecl(1892,4): warning C2112: A field called UniqueId is already defined in this record
+/builds/risk-engineering/PublicRecords/.ci_root/../PublicRecords_KEL/ECL_Functions/Layouts_FDC.ecl(1893,4): warning C2112: A field called code is already defined in this record
+/builds/risk-engineering/PublicRecords/.ci_root/../PublicRecords_KEL/ECL_Functions/Layouts_FDC.ecl(1893,4): warning C2112: A field called code_type is already defined in this record
+/builds/risk-engineering/PublicRecords/.ci_root/../PublicRecords_KEL/ECL_Functions/Layouts_FDC.ecl(1893,4): warning C2112: A field called dt_first_seen is already defined in this record
+/builds/risk-engineering/PublicRecords/.ci_root/../PublicRecords_KEL/ECL_Functions/Layouts_FDC.ecl(1893,4): warning C2112: A field called dt_last_seen is already defined in this record
+/builds/risk-engineering/PublicRecords/.ci_root/../PublicRecords_KEL/ECL_Functions/Layouts_FDC.ecl(1881,4): warning C2112: A field called code is already defined in this record
+/builds/risk-engineering/PublicRecords/.ci_root/../PublicRecords_KEL/ECL_Functions/Layouts_FDC.ecl(1881,4): warning C2112: A field called code_type is already defined in this record
+/builds/risk-engineering/PublicRecords/.ci_root/../PublicRecords_KEL/ECL_Functions/Layouts_FDC.ecl(1881,4): warning C2112: A field called dt_first_seen is already defined in this record
+/builds/risk-engineering/PublicRecords/.ci_root/../PublicRecords_KEL/ECL_Functions/Layouts_FDC.ecl(1881,4): warning C2112: A field called dt_last_seen is already defined in this record
+/builds/risk-engineering/PublicRecords/.ci_root/../PublicRecords_KEL/ECL_Functions/Layouts_FDC.ecl(1015,3): warning C2112: A field called phone is already defined in this record
+/builds/risk-engineering/PublicRecords/.ci_root/../PublicRecords_KEL/ECL_Functions/Layouts_FDC.ecl(1024,3): warning C2112: A field called phone is already defined in this record
+/builds/risk-engineering/PublicRecords/.ci_root/../PublicRecords_KEL/ECL_Functions/Layouts_FDC.ecl(998,3): warning C2112: A field called record_sid is already defined in this record
+/builds/risk-engineering/PublicRecords/.ci_root/../PublicRecords_KEL/Fn_MAS_FDC.ecl(4305,68): warning C2112: A field called UIDAppend is already defined in this record
+/builds/risk-engineering/PublicRecords/.ci_root/../PublicRecords_KEL/Fn_MAS_FDC.ecl(4305,68): warning C2112: A field called G_ProcUID is already defined in this record
+/builds/risk-engineering/PublicRecords/.ci_root/../PublicRecords_KEL/Fn_MAS_FDC.ecl(4305,68): warning C2112: A field called G_ProcBusUID is already defined in this record
+/builds/risk-engineering/PublicRecords/.ci_root/../PublicRecords_KEL/Fn_MAS_FDC.ecl(4305,68): warning C2112: A field called P_LexID is already defined in this record
+/builds/risk-engineering/PublicRecords/.ci_root/../PublicRecords_KEL/Fn_MAS_FDC.ecl(4305,68): warning C2112: A field called B_LexIDUlt is already defined in this record
+/builds/risk-engineering/PublicRecords/.ci_root/../PublicRecords_KEL/Fn_MAS_FDC.ecl(4305,68): warning C2112: A field called B_LexIDOrg is already defined in this record
+/builds/risk-engineering/PublicRecords/.ci_root/../PublicRecords_KEL/Fn_MAS_FDC.ecl(4305,68): warning C2112: A field called B_LexIDLegal is already defined in this record
+/builds/risk-engineering/PublicRecords/.ci_root/../PublicRecords_KEL/Fn_MAS_FDC.ecl(4305,68): warning C2112: A field called B_LexIDSite is already defined in this record
+/builds/risk-engineering/PublicRecords/.ci_root/../PublicRecords_KEL/Fn_MAS_FDC.ecl(4305,68): warning C2112: A field called B_LexIDLoc is already defined in this record
+/builds/risk-engineering/PublicRecords/.ci_root/../PublicRecords_KEL/Fn_MAS_FDC.ecl(4305,68): warning C2112: A field called B_InpClnTIN is already defined in this record
+/builds/risk-engineering/PublicRecords/.ci_root/../PublicRecords_KEL/Fn_MAS_FDC.ecl(4305,68): warning C2112: A field called P_InpClnEmail is already defined in this record
+/builds/risk-engineering/PublicRecords/.ci_root/../PublicRecords_KEL/Fn_MAS_FDC.ecl(4305,68): warning C2112: A field called P_InpClnDL is already defined in this record
+/builds/risk-engineering/PublicRecords/.ci_root/../PublicRecords_KEL/Fn_MAS_FDC.ecl(4305,68): warning C2112: A field called P_InpClnSSN is already defined in this record
+/builds/risk-engineering/PublicRecords/.ci_root/../PublicRecords_KEL/Fn_MAS_FDC.ecl(4305,68): warning C2112: A field called P_InpClnNameFirst is already defined in this record
+/builds/risk-engineering/PublicRecords/.ci_root/../PublicRecords_KEL/Fn_MAS_FDC.ecl(4305,68): warning C2112: A field called P_InpClnNameMid is already defined in this record
+/builds/risk-engineering/PublicRecords/.ci_root/../PublicRecords_KEL/Fn_MAS_FDC.ecl(4305,68): warning C2112: A field called P_InpClnNameLast is already defined in this record
+/builds/risk-engineering/PublicRecords/.ci_root/../PublicRecords_KEL/Fn_MAS_FDC.ecl(4305,68): warning C2112: A field called p_inpclnarchdt is already defined in this record
+/builds/risk-engineering/PublicRecords/.ci_root/../PublicRecords_KEL/Fn_MAS_FDC.ecl(4305,68): warning C2112: A field called P_InpClnDOB is already defined in this record
+/builds/risk-engineering/PublicRecords/.ci_root/../PublicRecords_KEL/Fn_MAS_FDC.ecl(4305,68): warning C2112: A field called P_InpClnAddrPrimRng is already defined in this record
+/builds/risk-engineering/PublicRecords/.ci_root/../PublicRecords_KEL/Fn_MAS_FDC.ecl(4305,68): warning C2112: A field called P_InpClnAddrPreDir is already defined in this record
+/builds/risk-engineering/PublicRecords/.ci_root/../PublicRecords_KEL/Fn_MAS_FDC.ecl(4305,68): warning C2112: A field called P_InpClnAddrPrimName is already defined in this record
+/builds/risk-engineering/PublicRecords/.ci_root/../PublicRecords_KEL/Fn_MAS_FDC.ecl(4305,68): warning C2112: A field called P_InpClnAddrSffx is already defined in this record
+/builds/risk-engineering/PublicRecords/.ci_root/../PublicRecords_KEL/Fn_MAS_FDC.ecl(4305,68): warning C2112: A field called P_InpClnAddrPostDir is already defined in this record
+/builds/risk-engineering/PublicRecords/.ci_root/../PublicRecords_KEL/Fn_MAS_FDC.ecl(4305,68): warning C2112: A field called P_InpClnAddrCity is already defined in this record
+/builds/risk-engineering/PublicRecords/.ci_root/../PublicRecords_KEL/Fn_MAS_FDC.ecl(4305,68): warning C2112: A field called P_InpClnAddrState is already defined in this record
+/builds/risk-engineering/PublicRecords/.ci_root/../PublicRecords_KEL/Fn_MAS_FDC.ecl(4305,68): warning C2112: A field called P_InpClnAddrZip5 is already defined in this record
+/builds/risk-engineering/PublicRecords/.ci_root/../PublicRecords_KEL/Fn_MAS_FDC.ecl(4305,68): warning C2112: A field called P_InpClnAddrSecRng is already defined in this record
+/builds/risk-engineering/PublicRecords/.ci_root/../PublicRecords_KEL/Fn_MAS_FDC.ecl(4305,68): warning C2112: A field called AddressGeoLink is already defined in this record
+/builds/risk-engineering/PublicRecords/.ci_root/../PublicRecords_KEL/Fn_MAS_FDC.ecl(4305,68): warning C2112: A field called P_InpClnAddrStateCode is already defined in this record
+/builds/risk-engineering/PublicRecords/.ci_root/../PublicRecords_KEL/Fn_MAS_FDC.ecl(4305,68): warning C2112: A field called P_InpClnAddrCnty is already defined in this record
+/builds/risk-engineering/PublicRecords/.ci_root/../PublicRecords_KEL/Fn_MAS_FDC.ecl(4305,68): warning C2112: A field called P_InpClnAddrGeo is already defined in this record
+/builds/risk-engineering/PublicRecords/.ci_root/../PublicRecords_KEL/Fn_MAS_FDC.ecl(4305,68): warning C2112: A field called P_InpClnPhoneHome is already defined in this record
+/builds/risk-engineering/PublicRecords/.ci_root/../PublicRecords_KEL/Fn_MAS_FDC.ecl(4305,68): warning C2112: A field called RepNumber is already defined in this record
+/builds/risk-engineering/PublicRecords/.ci_root/../PublicRecords_KEL/Fn_MAS_FDC.ecl(4305,68): warning C2112: A field called Contact_date is already defined in this record
+/builds/risk-engineering/PublicRecords/.ci_root/../PublicRecords_KEL/Fn_MAS_FDC.ecl(4305,68): warning C2112: A field called IsInput is already defined in this record
+/builds/risk-engineering/PublicRecords/.ci_root/../PublicRecords_KEL/Fn_MAS_FDC.ecl(4305,68): warning C2112: A field called Vehicle_Key is already defined in this record
+/builds/risk-engineering/PublicRecords/.ci_root/../PublicRecords_KEL/Fn_MAS_FDC.ecl(4305,68): warning C2112: A field called Iteration_Key is already defined in this record
+/builds/risk-engineering/PublicRecords/.ci_root/../PublicRecords_KEL/Fn_MAS_FDC.ecl(4305,68): warning C2112: A field called Source_Code is already defined in this record
+/builds/risk-engineering/PublicRecords/.ci_root/../PublicRecords_KEL/Fn_MAS_FDC.ecl(4305,68): warning C2112: A field called State_Origin is already defined in this record
+/builds/risk-engineering/PublicRecords/.ci_root/../PublicRecords_KEL/Fn_MAS_FDC.ecl(4305,68): warning C2112: A field called State_Bitmap_Flag is already defined in this record
+/builds/risk-engineering/PublicRecords/.ci_root/../PublicRecords_KEL/Fn_MAS_FDC.ecl(4305,68): warning C2112: A field called global_sid is already defined in this record
+/builds/risk-engineering/PublicRecords/.ci_root/../PublicRecords_KEL/Fn_MAS_FDC.ecl(4305,68): warning C2112: A field called record_sid is already defined in this record
+/builds/risk-engineering/PublicRecords/.ci_root/../PublicRecords_KEL/Fn_MAS_FDC.ecl(4305,68): warning C2112: A field called src is already defined in this record
+/builds/risk-engineering/PublicRecords/.ci_root/../PublicRecords_KEL/Fn_MAS_FDC.ecl(4305,68): warning C2112: A field called Archive_Date is already defined in this record
+/builds/risk-engineering/PublicRecords/.ci_root/../PublicRecords_KEL/Fn_MAS_FDC.ecl(4305,68): warning C2112: A field called DPMBitMAP is already defined in this record
+0 error, 57 warnings
+----------------------------------------------------------
+
+[[ ConsumerDisclosure.FCRADataService ]]
+----------------------------------------------------------
+/builds/risk-engineering/PublicRecords/.ci_root/../tools/mac_FilesIndex.ecl(28,2): warning C2380: Name of exported symbol 'fcra_key' does not match the expected name 'key_HRI_Address_To_SIC_filtered_fcra'
+/builds/risk-engineering/PublicRecords/.ci_root/../Risk_Indicators/Key_HRI_Address_To_Sic_filtered_FCRA.ecl(5,253): warning C2380: While expanding macro mac_filesindex
+/builds/risk-engineering/PublicRecords/.ci_root/../RiskWiseFCRA/_Inquiries_data.ecl(187,33): warning C2003: substring applied to value of type Integer
+0 error, 3 warnings
+----------------------------------------------------------
+
+[[ ConsumerProfile_Services.ReportServiceFCRA ]]
+----------------------------------------------------------
+/builds/risk-engineering/PublicRecords/.ci_root/../tools/mac_FilesIndex.ecl(28,2): warning C2380: Name of exported symbol 'fcra_key' does not match the expected name 'key_HRI_Address_To_SIC_filtered_fcra'
+/builds/risk-engineering/PublicRecords/.ci_root/../Risk_Indicators/Key_HRI_Address_To_Sic_filtered_FCRA.ecl(5,253): warning C2380: While expanding macro mac_filesindex
+0 error, 2 warnings
+----------------------------------------------------------
+
+[[ ContactCard.ReportService ]]
+----------------------------------------------------------
+/builds/risk-engineering/PublicRecords/.ci_root/../PhonesFeedback_Services/CleanDate.ecl(89,39): warning C2003: substring applied to value of type Integer
+/builds/risk-engineering/PublicRecords/.ci_root/../InsuranceHeader_BestOfBest/Layouts.ecl(23,3): warning C2112: A field called DID is already defined in this record
+0 error, 2 warnings
+----------------------------------------------------------
+
+[[ DCA_Services.Batch_Service ]]
+----------------------------------------------------------
+/builds/risk-engineering/PublicRecords/.ci_root/../AutokeyB2/mac_get_payload.ecl(18,8): warning C1048: EXPORT/SHARED qualifiers are ignored in this context
+/builds/risk-engineering/PublicRecords/.ci_root/../DCA_Services/Batch_Service_Records.ecl(152,120): warning C1048: While expanding macro mac_get_payload
+/builds/risk-engineering/PublicRecords/.ci_root/../DCA_Services/Batch_Service_Records.ecl(149,3): warning C1048: EXPORT/SHARED qualifiers are ignored in this context
+/builds/risk-engineering/PublicRecords/.ci_root/../DCA_Services/Batch_Service_Records.ecl(128,3): warning C1048: EXPORT/SHARED qualifiers are ignored in this context
+/builds/risk-engineering/PublicRecords/.ci_root/../DCA/file_SearchAutokey.ecl(9,3): warning C1048: EXPORT/SHARED qualifiers are ignored in this context
+/builds/risk-engineering/PublicRecords/.ci_root/../DCA_Services/Batch_Service_Records.ecl(130,3): warning C1048: EXPORT/SHARED qualifiers are ignored in this context
+/builds/risk-engineering/PublicRecords/.ci_root/../DCA_Services/Batch_Service_Records.ecl(129,3): warning C1048: EXPORT/SHARED qualifiers are ignored in this context
+0 error, 7 warnings
+----------------------------------------------------------
+
+[[ DeaV2_Services.DEASearchService ]]
+----------------------------------------------------------
+/builds/risk-engineering/PublicRecords/.ci_root/../DeaV2_Services/DEASearchService.ecl(42,3): warning C2380: Name of exported symbol 'DEA_params' does not match the expected name '_tmp_ecl'
+/builds/risk-engineering/PublicRecords/_tmp_ecl.ecl(1,34): warning C2380: While expanding macro deasearchservice
+0 error, 2 warnings
+----------------------------------------------------------
+
+[[ DemoSearchTool.TestCaseSearchService ]]
+----------------------------------------------------------
+/builds/risk-engineering/PublicRecords/.ci_root/../DemoSearchTool/TestCaseSearchService.ecl(24,5): warning C2380: Name of exported symbol 'firstRow' does not match the expected name '_tmp_ecl'
+/builds/risk-engineering/PublicRecords/_tmp_ecl.ecl(1,39): warning C2380: While expanding macro testcasesearchservice
+/builds/risk-engineering/PublicRecords/.ci_root/../DemoSearchTool/TestCaseSearchService.ecl(25,5): warning C2380: Name of exported symbol 'searchBy' does not match the expected name '_tmp_ecl'
+/builds/risk-engineering/PublicRecords/_tmp_ecl.ecl(1,39): warning C2380: While expanding macro testcasesearchservice
+/builds/risk-engineering/PublicRecords/.ci_root/../DemoSearchTool/TestCaseSearchService.ecl(26,5): warning C2380: Name of exported symbol 'options' does not match the expected name '_tmp_ecl'
+/builds/risk-engineering/PublicRecords/_tmp_ecl.ecl(1,39): warning C2380: While expanding macro testcasesearchservice
+0 error, 6 warnings
+----------------------------------------------------------
+
+[[ DidVille.Did_Batch_Service_Raw ]]
+----------------------------------------------------------
+/builds/risk-engineering/PublicRecords/.ci_root/../InsuranceHeader_BestOfBest/Layouts.ecl(23,3): warning C2112: A field called DID is already defined in this record
+0 error, 1 warning
+----------------------------------------------------------
+
+[[ DidVille.Did_Numeric_Service ]]
+----------------------------------------------------------
+/builds/risk-engineering/PublicRecords/.ci_root/../PhonesFeedback_Services/CleanDate.ecl(89,39): warning C2003: substring applied to value of type Integer
+0 error, 1 warning
+----------------------------------------------------------
+
+[[ DidVille.Did_Score_Service ]]
+----------------------------------------------------------
+/builds/risk-engineering/PublicRecords/.ci_root/../PhonesFeedback_Services/CleanDate.ecl(89,39): warning C2003: substring applied to value of type Integer
+0 error, 1 warning
+----------------------------------------------------------
+
+[[ Diversity_Certification_Services.Batch_Service ]]
+----------------------------------------------------------
+/builds/risk-engineering/PublicRecords/.ci_root/../AutokeyB2/mac_get_payload.ecl(18,8): warning C1048: EXPORT/SHARED qualifiers are ignored in this context
+/builds/risk-engineering/PublicRecords/.ci_root/../Diversity_Certification_Services/Batch_Service_Records.ecl(97,114): warning C1048: While expanding macro mac_get_payload
+/builds/risk-engineering/PublicRecords/.ci_root/../Diversity_Certification_Services/Batch_Service_Records.ecl(94,3): warning C1048: EXPORT/SHARED qualifiers are ignored in this context
+/builds/risk-engineering/PublicRecords/.ci_root/../Diversity_Certification_Services/Batch_Service_Records.ecl(81,3): warning C1048: EXPORT/SHARED qualifiers are ignored in this context
+/builds/risk-engineering/PublicRecords/.ci_root/../Diversity_Certification_Services/Batch_Service_Records.ecl(83,3): warning C1048: EXPORT/SHARED qualifiers are ignored in this context
+/builds/risk-engineering/PublicRecords/.ci_root/../Diversity_Certification_Services/Batch_Service_Records.ecl(82,3): warning C1048: EXPORT/SHARED qualifiers are ignored in this context
+0 error, 6 warnings
+----------------------------------------------------------
+
+[[ DMAP_Services.ReportService ]]
+----------------------------------------------------------
+/builds/risk-engineering/PublicRecords/.ci_root/../tools/mac_FilesIndex.ecl(28,2): warning C2380: Name of exported symbol 'fcra_key' does not match the expected name 'key_HRI_Address_To_SIC_filtered_fcra'
+/builds/risk-engineering/PublicRecords/.ci_root/../Risk_Indicators/Key_HRI_Address_To_Sic_filtered_FCRA.ecl(5,253): warning C2380: While expanding macro mac_filesindex
+/builds/risk-engineering/PublicRecords/.ci_root/../PhonesFeedback_Services/CleanDate.ecl(89,39): warning C2003: substring applied to value of type Integer
+/builds/risk-engineering/PublicRecords/.ci_root/../InsuranceHeader_BestOfBest/Layouts.ecl(23,3): warning C2112: A field called DID is already defined in this record
+/builds/risk-engineering/PublicRecords/.ci_root/../DMAP_Services/Transforms.ecl(165,39): warning C2003: substring applied to value of type Integer
+0 error, 5 warnings
+----------------------------------------------------------
+
+[[ DNB_Services.SearchService ]]
+----------------------------------------------------------
+/builds/risk-engineering/PublicRecords/.ci_root/../tools/mac_RedefineFormat.ecl(779,1): warning C1048: EXPORT/SHARED qualifiers are ignored in this context
+/builds/risk-engineering/PublicRecords/.ci_root/../tools/mac_RedefineFormat.ecl(318,12): warning C1048: While expanding macro <param>
+/builds/risk-engineering/PublicRecords/.ci_root/../DNB_DMI/File_Companies_Keybuild.ecl(26,86): warning C1048: While expanding macro mac_redefineformat
+0 error, 3 warnings
+----------------------------------------------------------
+
+[[ Doxie.Comprehensive_Report_Service ]]
+----------------------------------------------------------
+/builds/risk-engineering/PublicRecords/.ci_root/../tools/mac_FilesIndex.ecl(28,2): warning C2380: Name of exported symbol 'fcra_key' does not match the expected name 'key_HRI_Address_To_SIC_filtered_fcra'
+/builds/risk-engineering/PublicRecords/.ci_root/../Risk_Indicators/Key_HRI_Address_To_Sic_filtered_FCRA.ecl(5,253): warning C2380: While expanding macro mac_filesindex
+----------------------------------------------------------
+
+[[ Doxie.dl_Helper ]]
+----------------------------------------------------------
+/builds/risk-engineering/PublicRecords/.ci_root/../InsuranceHeader_BestOfBest/Layouts.ecl(23,3): warning C2112: A field called DID is already defined in this record
+0 error, 1 warning
+----------------------------------------------------------
+
+[[ Doxie.dl_Search ]]
+----------------------------------------------------------
+/builds/risk-engineering/PublicRecords/.ci_root/../InsuranceHeader_BestOfBest/Layouts.ecl(23,3): warning C2112: A field called DID is already defined in this record
+0 error, 1 warning
+----------------------------------------------------------
+
+[[ Doxie.HeaderFileRollupService ]]
+----------------------------------------------------------
+/builds/risk-engineering/PublicRecords/.ci_root/../PhonesFeedback_Services/CleanDate.ecl(89,39): warning C2003: substring applied to value of type Integer
+/builds/risk-engineering/PublicRecords/.ci_root/../InsuranceHeader_BestOfBest/Layouts.ecl(23,3): warning C2112: A field called DID is already defined in this record
+0 error, 2 warnings
+----------------------------------------------------------
+
+[[ Doxie.HeaderFileSearchService ]]
+----------------------------------------------------------
+/builds/risk-engineering/PublicRecords/.ci_root/../PhonesFeedback_Services/CleanDate.ecl(89,39): warning C2003: substring applied to value of type Integer
+/builds/risk-engineering/PublicRecords/.ci_root/../InsuranceHeader_BestOfBest/Layouts.ecl(23,3): warning C2112: A field called DID is already defined in this record
+0 error, 2 warnings
+----------------------------------------------------------
+
+[[ Doxie.HeaderSource_Service ]]
+----------------------------------------------------------
+/builds/risk-engineering/PublicRecords/.ci_root/../InsuranceHeader_BestOfBest/Layouts.ecl(23,3): warning C2112: A field called DID is already defined in this record
+/builds/risk-engineering/PublicRecords/.ci_root/../PhonesFeedback_Services/CleanDate.ecl(89,39): warning C2003: substring applied to value of type Integer
+0 error, 2 warnings
+----------------------------------------------------------
+
+[[ Doxie.ING_provider_report ]]
+----------------------------------------------------------
+/builds/risk-engineering/PublicRecords/.ci_root/../GSA_Services/Layouts.ecl(124,4): warning C2112: A field called gsa_id is already defined in this record
+0 error, 1 warning
+----------------------------------------------------------
+
+[[ Doxie.ING_provider_search ]]
+----------------------------------------------------------
+/builds/risk-engineering/PublicRecords/.ci_root/../GSA_Services/Layouts.ecl(124,4): warning C2112: A field called gsa_id is already defined in this record
+0 error, 1 warning
+----------------------------------------------------------
+
+[[ Doxie.ING_sanctions_report ]]
+----------------------------------------------------------
+/builds/risk-engineering/PublicRecords/.ci_root/../GSA_Services/Layouts.ecl(124,4): warning C2112: A field called gsa_id is already defined in this record
+0 error, 1 warning
+----------------------------------------------------------
+
+[[ Doxie.ING_sanctions_search ]]
+----------------------------------------------------------
+/builds/risk-engineering/PublicRecords/.ci_root/../GSA_Services/Layouts.ecl(124,4): warning C2112: A field called gsa_id is already defined in this record
+0 error, 1 warning
+----------------------------------------------------------
+
+[[ Doxie.phone_noreconn_search ]]
+----------------------------------------------------------
+/builds/risk-engineering/PublicRecords/.ci_root/../Doxie/phone_noreconn_search.ecl(22,3): warning C2380: Name of exported symbol 'prog_phone' does not match the expected name '_tmp_ecl'
+/builds/risk-engineering/PublicRecords/_tmp_ecl.ecl(1,30): warning C2380: While expanding macro phone_noreconn_search
+/builds/risk-engineering/PublicRecords/.ci_root/../PhonesFeedback_Services/CleanDate.ecl(89,39): warning C2003: substring applied to value of type Integer
+0 error, 3 warnings
+----------------------------------------------------------
+
+[[ Doxie.Vehicle_Helper ]]
+----------------------------------------------------------
+/builds/risk-engineering/PublicRecords/.ci_root/../InsuranceHeader_BestOfBest/Layouts.ecl(23,3): warning C2112: A field called DID is already defined in this record
+0 error, 1 warning
+----------------------------------------------------------
+
+[[ Doxie.Vehicle_Report ]]
+----------------------------------------------------------
+/builds/risk-engineering/PublicRecords/.ci_root/../InsuranceHeader_BestOfBest/Layouts.ecl(23,3): warning C2112: A field called DID is already defined in this record
+0 error, 1 warning
+----------------------------------------------------------
+
+[[ Doxie.Vehicle_Search ]]
+----------------------------------------------------------
+/builds/risk-engineering/PublicRecords/.ci_root/../InsuranceHeader_BestOfBest/Layouts.ecl(23,3): warning C2112: A field called DID is already defined in this record
+0 error, 1 warning
+----------------------------------------------------------
+
+[[ Doxie.WeAlsoFoundService ]]
+----------------------------------------------------------
+/builds/risk-engineering/PublicRecords/.ci_root/../PhonesFeedback_Services/CleanDate.ecl(89,39): warning C2003: substring applied to value of type Integer
+/builds/risk-engineering/PublicRecords/.ci_root/../InsuranceHeader_BestOfBest/Layouts.ecl(23,3): warning C2112: A field called DID is already defined in this record
+0 error, 2 warnings
+----------------------------------------------------------
+
+[[ doxie_cbrs.Business_Report_Service ]]
+----------------------------------------------------------
+/builds/risk-engineering/PublicRecords/.ci_root/../tools/mac_RedefineFormat.ecl(779,1): warning C1048: EXPORT/SHARED qualifiers are ignored in this context
+/builds/risk-engineering/PublicRecords/.ci_root/../tools/mac_RedefineFormat.ecl(318,12): warning C1048: While expanding macro <param>
+/builds/risk-engineering/PublicRecords/.ci_root/../DNB_DMI/File_Companies_Keybuild.ecl(26,86): warning C1048: While expanding macro mac_redefineformat
+0 error, 3 warnings
+----------------------------------------------------------
+
+[[ doxie_cbrs.Business_Report_Service_Raw ]]
+----------------------------------------------------------
+/builds/risk-engineering/PublicRecords/.ci_root/../tools/mac_RedefineFormat.ecl(779,1): warning C1048: EXPORT/SHARED qualifiers are ignored in this context
+/builds/risk-engineering/PublicRecords/.ci_root/../tools/mac_RedefineFormat.ecl(318,12): warning C1048: While expanding macro <param>
+/builds/risk-engineering/PublicRecords/.ci_root/../DNB_DMI/File_Companies_Keybuild.ecl(26,86): warning C1048: While expanding macro mac_redefineformat
+0 error, 3 warnings
+----------------------------------------------------------
+
+[[ doxie_cbrs.Business_Report_Source_Service ]]
+----------------------------------------------------------
+/builds/risk-engineering/PublicRecords/.ci_root/../tools/mac_RedefineFormat.ecl(779,1): warning C1048: EXPORT/SHARED qualifiers are ignored in this context
+/builds/risk-engineering/PublicRecords/.ci_root/../tools/mac_RedefineFormat.ecl(318,12): warning C1048: While expanding macro <param>
+/builds/risk-engineering/PublicRecords/.ci_root/../DNB_DMI/File_Companies_Keybuild.ecl(26,86): warning C1048: While expanding macro mac_redefineformat
+0 error, 3 warnings
+----------------------------------------------------------
+
+[[ doxie_cbrs.Profile_Report_Service ]]
+----------------------------------------------------------
+/builds/risk-engineering/PublicRecords/.ci_root/../tools/mac_RedefineFormat.ecl(779,1): warning C1048: EXPORT/SHARED qualifiers are ignored in this context
+/builds/risk-engineering/PublicRecords/.ci_root/../tools/mac_RedefineFormat.ecl(318,12): warning C1048: While expanding macro <param>
+/builds/risk-engineering/PublicRecords/.ci_root/../DNB_DMI/File_Companies_Keybuild.ecl(26,86): warning C1048: While expanding macro mac_redefineformat
+0 error, 3 warnings
+----------------------------------------------------------
+
+[[ DriversV2_Services.Batch_Service ]]
+----------------------------------------------------------
+/builds/risk-engineering/PublicRecords/.ci_root/../InsuranceHeader_BestOfBest/Layouts.ecl(23,3): warning C2112: A field called DID is already defined in this record
+0 error, 1 warning
+----------------------------------------------------------
+
+[[ DriversV2_Services.DLReportService ]]
+----------------------------------------------------------
+/builds/risk-engineering/PublicRecords/.ci_root/../InsuranceHeader_BestOfBest/Layouts.ecl(23,3): warning C2112: A field called DID is already defined in this record
+0 error, 1 warning
+----------------------------------------------------------
+
+[[ DriversV2_Services.DLSearchService ]]
+----------------------------------------------------------
+/builds/risk-engineering/PublicRecords/.ci_root/../DriversV2_Services/wildcard.ecl(21,34): warning C2003: substring applied to value of type Integer
+/builds/risk-engineering/PublicRecords/.ci_root/../InsuranceHeader_BestOfBest/Layouts.ecl(23,3): warning C2112: A field called DID is already defined in this record
+0 error, 2 warnings
+----------------------------------------------------------
+
+[[ DriversV2_Services.FocusSearchService ]]
+----------------------------------------------------------
+/builds/risk-engineering/PublicRecords/.ci_root/../InsuranceHeader_BestOfBest/Layouts.ecl(23,3): warning C2112: A field called DID is already defined in this record
+0 error, 1 warning
+----------------------------------------------------------
+
+[[ eAuth.eAuthService ]]
+----------------------------------------------------------
+/builds/risk-engineering/PublicRecords/.ci_root/../tools/mac_FilesIndex.ecl(28,2): warning C2380: Name of exported symbol 'fcra_key' does not match the expected name 'key_HRI_Address_To_SIC_filtered_fcra'
+/builds/risk-engineering/PublicRecords/.ci_root/../Risk_Indicators/Key_HRI_Address_To_Sic_filtered_FCRA.ecl(5,253): warning C2380: While expanding macro mac_filesindex
+/builds/risk-engineering/PublicRecords/.ci_root/../PhonesFeedback_Services/CleanDate.ecl(89,39): warning C2003: substring applied to value of type Integer
+/builds/risk-engineering/PublicRecords/.ci_root/../InsuranceHeader_BestOfBest/Layouts.ecl(23,3): warning C2112: A field called DID is already defined in this record
+0 error, 4 warnings
+----------------------------------------------------------
+
+[[ FCRA.Comprehensive_Report_Service ]]
+----------------------------------------------------------
+/builds/risk-engineering/PublicRecords/.ci_root/../tools/mac_FilesIndex.ecl(28,2): warning C2380: Name of exported symbol 'fcra_key' does not match the expected name 'key_HRI_Address_To_SIC_filtered_fcra'
+/builds/risk-engineering/PublicRecords/.ci_root/../Risk_Indicators/Key_HRI_Address_To_Sic_filtered_FCRA.ecl(5,253): warning C2380: While expanding macro mac_filesindex
+/builds/risk-engineering/PublicRecords/.ci_root/../PhonesFeedback_Services/CleanDate.ecl(89,39): warning C2003: substring applied to value of type Integer
+/builds/risk-engineering/PublicRecords/.ci_root/../InsuranceHeader_BestOfBest/Layouts.ecl(23,3): warning C2112: A field called DID is already defined in this record
+/builds/risk-engineering/PublicRecords/.ci_root/../GSA_Services/Layouts.ecl(124,4): warning C2112: A field called gsa_id is already defined in this record
+0 error, 5 warnings
+----------------------------------------------------------
+
+[[ FCRA.GongHistorySearchService ]]
+----------------------------------------------------------
+/builds/risk-engineering/PublicRecords/.ci_root/../tools/mac_FilesIndex.ecl(28,2): warning C2380: Name of exported symbol 'fcra_key' does not match the expected name 'key_HRI_Address_To_SIC_filtered_FCRA'
+/builds/risk-engineering/PublicRecords/.ci_root/../Risk_Indicators/Key_HRI_Address_To_Sic_filtered_FCRA.ecl(5,253): warning C2380: While expanding macro mac_filesindex
+0 error, 2 warnings
+----------------------------------------------------------
+
+[[ FCRA.RiskView_Derogs_Report ]]
+----------------------------------------------------------
+/builds/risk-engineering/PublicRecords/.ci_root/../tools/mac_FilesIndex.ecl(28,2): warning C2380: Name of exported symbol 'fcra_key' does not match the expected name 'key_HRI_Address_To_SIC_filtered_FCRA'
+/builds/risk-engineering/PublicRecords/.ci_root/../Risk_Indicators/Key_HRI_Address_To_Sic_filtered_FCRA.ecl(5,253): warning C2380: While expanding macro mac_filesindex
+0 error, 2 warnings
+----------------------------------------------------------
+
+[[ FCRA.RiskView_Derogs_Report_Batch ]]
+----------------------------------------------------------
+/builds/risk-engineering/PublicRecords/.ci_root/../tools/mac_FilesIndex.ecl(28,2): warning C2380: Name of exported symbol 'fcra_key' does not match the expected name 'key_HRI_Address_To_SIC_filtered_FCRA'
+/builds/risk-engineering/PublicRecords/.ci_root/../Risk_Indicators/Key_HRI_Address_To_Sic_filtered_FCRA.ecl(5,253): warning C2380: While expanding macro mac_filesindex
+0 error, 2 warnings
+----------------------------------------------------------
+
+[[ Govt_Collections_Services.Batch_Service ]]
+----------------------------------------------------------
+/builds/risk-engineering/PublicRecords/.ci_root/../PhonesFeedback_Services/CleanDate.ecl(89,39): warning C2003: substring applied to value of type Integer
+/builds/risk-engineering/PublicRecords/.ci_root/../InsuranceHeader_BestOfBest/Layouts.ecl(23,3): warning C2112: A field called DID is already defined in this record
+0 error, 2 warnings
+----------------------------------------------------------
+
+[[ Govt_Collections_Services.Report_Service ]]
+----------------------------------------------------------
+/builds/risk-engineering/PublicRecords/.ci_root/../PhonesFeedback_Services/CleanDate.ecl(89,39): warning C2003: substring applied to value of type Integer
+/builds/risk-engineering/PublicRecords/.ci_root/../InsuranceHeader_BestOfBest/Layouts.ecl(23,3): warning C2112: A field called DID is already defined in this record
+0 error, 2 warnings
+----------------------------------------------------------
+
+[[ GSA_Services.BatchService ]]
+----------------------------------------------------------
+/builds/risk-engineering/PublicRecords/.ci_root/../GSA_Services/BatchService.ecl(14,3): warning C2380: Name of exported symbol 'max_results_per_acct' does not match the expected name '_tmp_ecl'
+/builds/risk-engineering/PublicRecords/_tmp_ecl.ecl(1,28): warning C2380: While expanding macro batchservice
+/builds/risk-engineering/PublicRecords/.ci_root/../GSA_Services/BatchService.ecl(21,3): warning C2380: Name of exported symbol 'ds_batch_in' does not match the expected name '_tmp_ecl'
+/builds/risk-engineering/PublicRecords/_tmp_ecl.ecl(1,28): warning C2380: While expanding macro batchservice
+/builds/risk-engineering/PublicRecords/.ci_root/../GSA_Services/Layouts.ecl(124,4): warning C2112: A field called gsa_id is already defined in this record
+0 error, 5 warnings
+----------------------------------------------------------
+
+[[ GSA_Services.SearchService ]]
+----------------------------------------------------------
+/builds/risk-engineering/PublicRecords/.ci_root/../GSA_Services/Layouts.ecl(124,4): warning C2112: A field called gsa_id is already defined in this record
+0 error, 1 warning
+----------------------------------------------------------
+
+[[ GSA_Services.SearchService_MultipleRequests ]]
+----------------------------------------------------------
+/builds/risk-engineering/PublicRecords/.ci_root/../GSA_Services/SearchService_MultipleRequests.ecl(27,3): warning C2380: Name of exported symbol 'inputData' does not match the expected name '_tmp_ecl'
+/builds/risk-engineering/PublicRecords/_tmp_ecl.ecl(1,46): warning C2380: While expanding macro searchservice_multiplerequests
+/builds/risk-engineering/PublicRecords/.ci_root/../GSA_Services/Layouts.ecl(124,4): warning C2112: A field called gsa_id is already defined in this record
+0 error, 3 warnings
+----------------------------------------------------------
+
+[[ Header_Services.HeaderFileAdvancedAddressSearch ]]
+----------------------------------------------------------
+/builds/risk-engineering/PublicRecords/.ci_root/../PhonesFeedback_Services/CleanDate.ecl(89,39): warning C2003: substring applied to value of type Integer
+/builds/risk-engineering/PublicRecords/.ci_root/../InsuranceHeader_BestOfBest/Layouts.ecl(23,3): warning C2112: A field called DID is already defined in this record
+0 error, 2 warnings
+----------------------------------------------------------
+
+[[ Header_Services.HeaderFileNeighborSearchService ]]
+----------------------------------------------------------
+/builds/risk-engineering/PublicRecords/.ci_root/../PhonesFeedback_Services/CleanDate.ecl(89,39): warning C2003: substring applied to value of type Integer
+/builds/risk-engineering/PublicRecords/.ci_root/../InsuranceHeader_BestOfBest/Layouts.ecl(23,3): warning C2112: A field called DID is already defined in this record
+0 error, 2 warnings
+----------------------------------------------------------
+
+[[ Healthcare_Ganga.BatchService ]]
+----------------------------------------------------------
+/builds/risk-engineering/PublicRecords/.ci_root/../Healthcare_Ganga/Functions.ecl(42,12): warning C2003: substring applied to value of type Integer
+/builds/risk-engineering/PublicRecords/.ci_root/../Healthcare_Ganga/Functions.ecl(43,13): warning C2003: substring applied to value of type Integer
+/builds/risk-engineering/PublicRecords/.ci_root/../Healthcare_Ganga/Functions.ecl(44,11): warning C2003: substring applied to value of type Integer
+/builds/risk-engineering/PublicRecords/.ci_root/../GSA_Services/Layouts.ecl(124,4): warning C2112: A field called gsa_id is already defined in this record
+0 error, 4 warnings
+----------------------------------------------------------
+
+[[ healthcare_ganga.searchservice ]]
+----------------------------------------------------------
+/builds/risk-engineering/PublicRecords/.ci_root/../Healthcare_Ganga/Functions.ecl(42,12): warning C2003: substring applied to value of type Integer
+/builds/risk-engineering/PublicRecords/.ci_root/../Healthcare_Ganga/Functions.ecl(43,13): warning C2003: substring applied to value of type Integer
+/builds/risk-engineering/PublicRecords/.ci_root/../Healthcare_Ganga/Functions.ecl(44,11): warning C2003: substring applied to value of type Integer
+/builds/risk-engineering/PublicRecords/.ci_root/../GSA_Services/Layouts.ecl(124,4): warning C2112: A field called gsa_id is already defined in this record
+0 error, 4 warnings
+----------------------------------------------------------
+
+[[ Healthcare_Provider_Services.ABMS_SearchService_Batch ]]
+----------------------------------------------------------
+/builds/risk-engineering/PublicRecords/.ci_root/../Healthcare_Provider_Services/ABMS_SearchService_Batch.ecl(21,2): warning C2380: Name of exported symbol 'ds_batch_in_stored' does not match the expected name '_tmp_ecl'
+/builds/risk-engineering/PublicRecords/_tmp_ecl.ecl(1,56): warning C2380: While expanding macro abms_searchservice_batch
+/builds/risk-engineering/PublicRecords/.ci_root/../Healthcare_Provider_Services/ABMS_SearchService_Batch.ecl(22,2): warning C2380: Name of exported symbol 'PenaltThreshold' does not match the expected name '_tmp_ecl'
+/builds/risk-engineering/PublicRecords/_tmp_ecl.ecl(1,56): warning C2380: While expanding macro abms_searchservice_batch
+/builds/risk-engineering/PublicRecords/.ci_root/../Healthcare_Provider_Services/ABMS_SearchService_Batch.ecl(23,2): warning C2380: Name of exported symbol 'DPPAPurpose' does not match the expected name '_tmp_ecl'
+/builds/risk-engineering/PublicRecords/_tmp_ecl.ecl(1,56): warning C2380: While expanding macro abms_searchservice_batch
+/builds/risk-engineering/PublicRecords/.ci_root/../Healthcare_Provider_Services/ABMS_SearchService_Batch.ecl(24,2): warning C2380: Name of exported symbol 'GLBPurpose' does not match the expected name '_tmp_ecl'
+/builds/risk-engineering/PublicRecords/_tmp_ecl.ecl(1,56): warning C2380: While expanding macro abms_searchservice_batch
+/builds/risk-engineering/PublicRecords/.ci_root/../Healthcare_Provider_Services/ABMS_SearchService_Batch.ecl(25,2): warning C2380: Name of exported symbol 'batch_includeCareer' does not match the expected name '_tmp_ecl'
+/builds/risk-engineering/PublicRecords/_tmp_ecl.ecl(1,56): warning C2380: While expanding macro abms_searchservice_batch
+/builds/risk-engineering/PublicRecords/.ci_root/../Healthcare_Provider_Services/ABMS_SearchService_Batch.ecl(26,2): warning C2380: Name of exported symbol 'batch_includeEducation' does not match the expected name '_tmp_ecl'
+/builds/risk-engineering/PublicRecords/_tmp_ecl.ecl(1,56): warning C2380: While expanding macro abms_searchservice_batch
+/builds/risk-engineering/PublicRecords/.ci_root/../Healthcare_Provider_Services/ABMS_SearchService_Batch.ecl(27,2): warning C2380: Name of exported symbol 'batch_includeProfessionalAssociations' does not match the expected name '_tmp_ecl'
+/builds/risk-engineering/PublicRecords/_tmp_ecl.ecl(1,56): warning C2380: While expanding macro abms_searchservice_batch
+0 error, 14 warnings
+----------------------------------------------------------
+
+[[ Healthcare_Provider_Services.report_service ]]
+----------------------------------------------------------
+/builds/risk-engineering/PublicRecords/.ci_root/../tools/mac_FilesIndex.ecl(28,2): warning C2380: Name of exported symbol 'fcra_key' does not match the expected name 'key_HRI_Address_To_SIC_filtered_fcra'
+/builds/risk-engineering/PublicRecords/.ci_root/../Risk_Indicators/Key_HRI_Address_To_Sic_filtered_FCRA.ecl(5,253): warning C2380: While expanding macro mac_filesindex
+/builds/risk-engineering/PublicRecords/.ci_root/../GSA_Services/Layouts.ecl(124,4): warning C2112: A field called gsa_id is already defined in this record
+/builds/risk-engineering/PublicRecords/.ci_root/../PhonesFeedback_Services/CleanDate.ecl(89,39): warning C2003: substring applied to value of type Integer
+/builds/risk-engineering/PublicRecords/.ci_root/../InsuranceHeader_BestOfBest/Layouts.ecl(23,3): warning C2112: A field called DID is already defined in this record
+0 error, 5 warnings
+----------------------------------------------------------
+
+[[ Healthcare_Provider_Services.SearchService ]]
+----------------------------------------------------------
+/builds/risk-engineering/PublicRecords/.ci_root/../GSA_Services/Layouts.ecl(124,4): warning C2112: A field called gsa_id is already defined in this record
+0 error, 1 warning
+----------------------------------------------------------
+
+[[ Healthcare_Provider_Services.SearchService_Batch ]]
+----------------------------------------------------------
+/builds/risk-engineering/PublicRecords/.ci_root/../GSA_Services/Layouts.ecl(124,4): warning C2112: A field called gsa_id is already defined in this record
+0 error, 1 warning
+----------------------------------------------------------
+
+[[ Healthcare_Services.Customer_Death_Search_Batch ]]
+----------------------------------------------------------
+/builds/risk-engineering/PublicRecords/.ci_root/../Healthcare_Services/Customer_Death_Search_Batch.ecl(18,2): warning C2380: Name of exported symbol 'myRecords' does not match the expected name '_tmp_ecl'
+/builds/risk-engineering/PublicRecords/_tmp_ecl.ecl(1,50): warning C2380: While expanding macro customer_death_search_batch
+0 error, 2 warnings
+----------------------------------------------------------
+
+[[ Healthcare_Services.Customer_License_Search_Batch ]]
+----------------------------------------------------------
+/builds/risk-engineering/PublicRecords/.ci_root/../Healthcare_Services/Customer_License_Search_Batch.ecl(18,2): warning C2380: Name of exported symbol 'myRecords' does not match the expected name '_tmp_ecl'
+/builds/risk-engineering/PublicRecords/_tmp_ecl.ecl(1,52): warning C2380: While expanding macro customer_license_search_batch
+0 error, 2 warnings
+----------------------------------------------------------
+
+[[ Healthcare_Services.DisclosedEntity_BatchService ]]
+----------------------------------------------------------
+/builds/risk-engineering/PublicRecords/.ci_root/../GSA_Services/Layouts.ecl(124,4): warning C2112: A field called gsa_id is already defined in this record
+0 error, 1 warning
+----------------------------------------------------------
+
+[[ Healthcare_Services.DisclosedEntity_SearchService ]]
+----------------------------------------------------------
+/builds/risk-engineering/PublicRecords/.ci_root/../GSA_Services/Layouts.ecl(124,4): warning C2112: A field called gsa_id is already defined in this record
+0 error, 1 warning
+----------------------------------------------------------
+
+[[ HomesteadExemptionV2_Services.BatchService ]]
+----------------------------------------------------------
+/builds/risk-engineering/PublicRecords/.ci_root/../PhonesFeedback_Services/CleanDate.ecl(89,39): warning C2003: substring applied to value of type Integer
+/builds/risk-engineering/PublicRecords/.ci_root/../InsuranceHeader_BestOfBest/Layouts.ecl(23,3): warning C2112: A field called DID is already defined in this record
+0 error, 2 warnings
+----------------------------------------------------------
+
+[[ homesteadexemptionv2_services.searchservice ]]
+----------------------------------------------------------
+/builds/risk-engineering/PublicRecords/.ci_root/../PhonesFeedback_Services/CleanDate.ecl(89,39): warning C2003: substring applied to value of type Integer
+/builds/risk-engineering/PublicRecords/.ci_root/../InsuranceHeader_BestOfBest/Layouts.ecl(23,3): warning C2112: A field called DID is already defined in this record
+0 error, 2 warnings
+----------------------------------------------------------
+
+[[ Identifier2.Identifier2_Service ]]
+----------------------------------------------------------
+/builds/risk-engineering/PublicRecords/.ci_root/../tools/mac_FilesIndex.ecl(28,2): warning C2380: Name of exported symbol 'fcra_key' does not match the expected name 'key_HRI_Address_To_SIC_filtered_fcra'
+/builds/risk-engineering/PublicRecords/.ci_root/../Risk_Indicators/Key_HRI_Address_To_Sic_filtered_FCRA.ecl(5,253): warning C2380: While expanding macro mac_filesindex
+/builds/risk-engineering/PublicRecords/.ci_root/../InsuranceHeader_BestOfBest/Layouts.ecl(23,3): warning C2112: A field called DID is already defined in this record
+/builds/risk-engineering/PublicRecords/.ci_root/../PhonesFeedback_Services/CleanDate.ecl(89,39): warning C2003: substring applied to value of type Integer
+0 error, 4 warnings
+----------------------------------------------------------
+
+[[ IdentityFraud_Services.IdentityFraudReportService ]]
+----------------------------------------------------------
+/builds/risk-engineering/PublicRecords/.ci_root/../PhonesFeedback_Services/CleanDate.ecl(89,39): warning C2003: substring applied to value of type Integer
+0 error, 1 warning
+----------------------------------------------------------
+
+[[ IdentityManagement_Services.ReportService ]]
+----------------------------------------------------------
+/builds/risk-engineering/PublicRecords/.ci_root/../PhonesFeedback_Services/CleanDate.ecl(89,39): warning C2003: substring applied to value of type Integer
+/builds/risk-engineering/PublicRecords/.ci_root/../InsuranceHeader_BestOfBest/Layouts.ecl(23,3): warning C2112: A field called DID is already defined in this record
+/builds/risk-engineering/PublicRecords/.ci_root/../InsuranceHeader_BestOfBest/Layouts.ecl(18,3): warning C2112: A field called DID is already defined in this record
+0 error, 3 warnings
+----------------------------------------------------------
+
+[[ Insurance_Certification_Services.Batch_Service ]]
+----------------------------------------------------------
+/builds/risk-engineering/PublicRecords/.ci_root/../Workers_Compensation/cluster.ecl(3,1): warning C2380: Name of exported symbol 'Cluster_in' does not match the expected name 'cluster'
+/builds/risk-engineering/PublicRecords/.ci_root/../AutokeyB2/mac_get_payload.ecl(18,8): warning C1048: EXPORT/SHARED qualifiers are ignored in this context
+/builds/risk-engineering/PublicRecords/.ci_root/../Insurance_Certification_Services/Batch_Service_Records.ecl(136,134): warning C1048: While expanding macro mac_get_payload
+/builds/risk-engineering/PublicRecords/.ci_root/../Insurance_Certification_Services/Batch_Service_Records.ecl(130,3): warning C1048: EXPORT/SHARED qualifiers are ignored in this context
+/builds/risk-engineering/PublicRecords/.ci_root/../Insurance_Certification_Services/Batch_Service_Records.ecl(106,3): warning C1048: EXPORT/SHARED qualifiers are ignored in this context
+/builds/risk-engineering/PublicRecords/.ci_root/../Workers_Compensation/File_Base_Payload.ecl(17,1): warning C1048: EXPORT/SHARED qualifiers are ignored in this context
+/builds/risk-engineering/PublicRecords/.ci_root/../Workers_Compensation/File_Base_Payload.ecl(11,1): warning C1048: EXPORT/SHARED qualifiers are ignored in this context
+/builds/risk-engineering/PublicRecords/.ci_root/../Workers_Compensation/File_Base_Payload.ecl(5,1): warning C1048: EXPORT/SHARED qualifiers are ignored in this context
+/builds/risk-engineering/PublicRecords/.ci_root/../Insurance_Certification_Services/Batch_Service_Records.ecl(108,3): warning C1048: EXPORT/SHARED qualifiers are ignored in this context
+/builds/risk-engineering/PublicRecords/.ci_root/../Insurance_Certification_Services/Batch_Service_Records.ecl(107,3): warning C1048: EXPORT/SHARED qualifiers are ignored in this context
+/builds/risk-engineering/PublicRecords/.ci_root/../AutokeyB2/mac_get_payload.ecl(18,8): warning C1048: EXPORT/SHARED qualifiers are ignored in this context
+/builds/risk-engineering/PublicRecords/.ci_root/../Insurance_Certification_Services/Batch_Service_Records.ecl(133,129): warning C1048: While expanding macro mac_get_payload
+/builds/risk-engineering/PublicRecords/.ci_root/../Insurance_Certification_Services/Batch_Service_Records.ecl(127,3): warning C1048: EXPORT/SHARED qualifiers are ignored in this context
+/builds/risk-engineering/PublicRecords/.ci_root/../Insurance_Certification_Services/Batch_Service_Records.ecl(103,3): warning C1048: EXPORT/SHARED qualifiers are ignored in this context
+/builds/risk-engineering/PublicRecords/.ci_root/../Insurance_Certification/File_Base_Payload.ecl(15,1): warning C1048: EXPORT/SHARED qualifiers are ignored in this context
+/builds/risk-engineering/PublicRecords/.ci_root/../Insurance_Certification/File_Base_Payload.ecl(10,1): warning C1048: EXPORT/SHARED qualifiers are ignored in this context
+/builds/risk-engineering/PublicRecords/.ci_root/../Insurance_Certification/File_Base_Payload.ecl(5,1): warning C1048: EXPORT/SHARED qualifiers are ignored in this context
+/builds/risk-engineering/PublicRecords/.ci_root/../Insurance_Certification_Services/Batch_Service_Records.ecl(105,3): warning C1048: EXPORT/SHARED qualifiers are ignored in this context
+/builds/risk-engineering/PublicRecords/.ci_root/../Insurance_Certification_Services/Batch_Service_Records.ecl(104,3): warning C1048: EXPORT/SHARED qualifiers are ignored in this context
+0 error, 19 warnings
+----------------------------------------------------------
+
+[[ InView_Services.InViewReportService ]]
+----------------------------------------------------------
+/builds/risk-engineering/PublicRecords/.ci_root/../tools/mac_RedefineFormat.ecl(779,1): warning C1048: EXPORT/SHARED qualifiers are ignored in this context
+/builds/risk-engineering/PublicRecords/.ci_root/../tools/mac_RedefineFormat.ecl(318,12): warning C1048: While expanding macro <param>
+/builds/risk-engineering/PublicRecords/.ci_root/../DNB_DMI/File_Companies_Keybuild.ecl(26,86): warning C1048: While expanding macro mac_redefineformat
+0 error, 3 warnings
+----------------------------------------------------------
+
+[[ ISS.ConsumerAttributes_Service ]]
+----------------------------------------------------------
+/builds/risk-engineering/PublicRecords/.ci_root/../tools/mac_FilesIndex.ecl(28,2): warning C2380: Name of exported symbol 'fcra_key' does not match the expected name 'key_HRI_Address_To_SIC_filtered_FCRA'
+/builds/risk-engineering/PublicRecords/.ci_root/../Risk_Indicators/Key_HRI_Address_To_Sic_filtered_FCRA.ecl(5,253): warning C2380: While expanding macro mac_filesindex
+0 error, 2 warnings
+----------------------------------------------------------
+
+[[ ISS.FCRAInsurview2_Batch_Service ]]
+----------------------------------------------------------
+/builds/risk-engineering/PublicRecords/.ci_root/../tools/mac_FilesIndex.ecl(28,2): warning C2380: Name of exported symbol 'fcra_key' does not match the expected name 'key_HRI_Address_To_SIC_filtered_fcra'
+/builds/risk-engineering/PublicRecords/.ci_root/../Risk_Indicators/Key_HRI_Address_To_Sic_filtered_FCRA.ecl(5,253): warning C2380: While expanding macro mac_filesindex
+/builds/risk-engineering/PublicRecords/.ci_root/../RiskView/Search_RptFunction.ecl(331,68): warning C2003: substring applied to value of type Integer
+/builds/risk-engineering/PublicRecords/.ci_root/../RiskWiseFCRA/_Lien_RV_data.ecl(62,81): warning C2003: substring applied to value of type Integer
+/builds/risk-engineering/PublicRecords/.ci_root/../RiskView/Search_RptFunction.ecl(85,80): warning C2003: While expanding macro _lien_rv_data
+/builds/risk-engineering/PublicRecords/.ci_root/../RiskWiseFCRA/_Lien_RV_data.ecl(20,69): warning C2003: substring applied to value of type Integer
+/builds/risk-engineering/PublicRecords/.ci_root/../RiskView/Search_RptFunction.ecl(85,80): warning C2003: While expanding macro _lien_rv_data
+/builds/risk-engineering/PublicRecords/.ci_root/../RiskView/Search_RptFunction.ecl(262,115): warning C2003: substring applied to value of type Integer
+/builds/risk-engineering/PublicRecords/.ci_root/../RiskView/Search_RptFunction.ecl(364,93): warning C2003: substring applied to value of type Integer
+/builds/risk-engineering/PublicRecords/.ci_root/../RiskWiseFCRA/_Inquiries_data.ecl(187,33): warning C2003: substring applied to value of type Integer
+0 error, 10 warnings
+----------------------------------------------------------
+
+[[ ISS.FcraInsurView2_Service ]]
+----------------------------------------------------------
+/builds/risk-engineering/PublicRecords/.ci_root/../tools/mac_FilesIndex.ecl(28,2): warning C2380: Name of exported symbol 'fcra_key' does not match the expected name 'key_HRI_Address_To_SIC_filtered_fcra'
+/builds/risk-engineering/PublicRecords/.ci_root/../Risk_Indicators/Key_HRI_Address_To_Sic_filtered_FCRA.ecl(5,253): warning C2380: While expanding macro mac_filesindex
+/builds/risk-engineering/PublicRecords/.ci_root/../RiskView/Search_RptFunction.ecl(331,68): warning C2003: substring applied to value of type Integer
+/builds/risk-engineering/PublicRecords/.ci_root/../RiskWiseFCRA/_Lien_RV_data.ecl(62,81): warning C2003: substring applied to value of type Integer
+/builds/risk-engineering/PublicRecords/.ci_root/../RiskView/Search_RptFunction.ecl(85,80): warning C2003: While expanding macro _lien_rv_data
+/builds/risk-engineering/PublicRecords/.ci_root/../RiskWiseFCRA/_Lien_RV_data.ecl(20,69): warning C2003: substring applied to value of type Integer
+/builds/risk-engineering/PublicRecords/.ci_root/../RiskView/Search_RptFunction.ecl(85,80): warning C2003: While expanding macro _lien_rv_data
+/builds/risk-engineering/PublicRecords/.ci_root/../RiskView/Search_RptFunction.ecl(262,115): warning C2003: substring applied to value of type Integer
+/builds/risk-engineering/PublicRecords/.ci_root/../RiskView/Search_RptFunction.ecl(364,93): warning C2003: substring applied to value of type Integer
+/builds/risk-engineering/PublicRecords/.ci_root/../RiskWiseFCRA/_Inquiries_data.ecl(187,33): warning C2003: substring applied to value of type Integer
+0 error, 10 warnings
+----------------------------------------------------------
+
+[[ ISS.ISS_Service ]]
+----------------------------------------------------------
+/builds/risk-engineering/PublicRecords/.ci_root/../tools/mac_FilesIndex.ecl(28,2): warning C2380: Name of exported symbol 'fcra_key' does not match the expected name 'key_HRI_Address_To_SIC_filtered_FCRA'
+/builds/risk-engineering/PublicRecords/.ci_root/../Risk_Indicators/Key_HRI_Address_To_Sic_filtered_FCRA.ecl(5,253): warning C2380: While expanding macro mac_filesindex
+0 error, 2 warnings
+----------------------------------------------------------
+
+[[ LaborActions_EBSA_Services.SearchService ]]
+----------------------------------------------------------
+/builds/risk-engineering/PublicRecords/.ci_root/../LaborActions_EBSA/File_Base_Payload.ecl(1,1): warning C2380: Name of exported symbol 'BaseTempLayout' does not match the expected name 'File_Base_Payload'
+/builds/risk-engineering/PublicRecords/.ci_root/../LaborActions_EBSA/File_Base_Payload.ecl(8,1): warning C2380: Name of exported symbol 'trfReformat' does not match the expected name 'File_Base_Payload'
+0 error, 2 warnings
+----------------------------------------------------------
+
+[[ LaborActions_WHD_Services.batch_service ]]
+----------------------------------------------------------
+/builds/risk-engineering/PublicRecords/.ci_root/../LaborActions_WHD/cluster.ecl(2,1): warning C2380: Name of exported symbol 'Cluster_in' does not match the expected name 'cluster'
+/builds/risk-engineering/PublicRecords/.ci_root/../LaborActions_WHD/File_Base_Payload.ecl(17,1): warning C1048: EXPORT/SHARED qualifiers are ignored in this context
+/builds/risk-engineering/PublicRecords/.ci_root/../LaborActions_WHD/File_Base_Payload.ecl(11,1): warning C1048: EXPORT/SHARED qualifiers are ignored in this context
+/builds/risk-engineering/PublicRecords/.ci_root/../LaborActions_WHD/File_Base_Payload.ecl(5,1): warning C1048: EXPORT/SHARED qualifiers are ignored in this context
+0 error, 4 warnings
+----------------------------------------------------------
+
+[[ LNSmallBusiness.SmallBusiness_Batch_Service ]]
+----------------------------------------------------------
+/builds/risk-engineering/PublicRecords/.ci_root/../tools/mac_RedefineFormat.ecl(779,1): warning C1048: EXPORT/SHARED qualifiers are ignored in this context
+/builds/risk-engineering/PublicRecords/.ci_root/../tools/mac_RedefineFormat.ecl(318,12): warning C1048: While expanding macro <param>
+/builds/risk-engineering/PublicRecords/.ci_root/../DNB_DMI/File_Companies_Keybuild.ecl(26,86): warning C1048: While expanding macro mac_redefineformat
+0 error, 3 warnings
+----------------------------------------------------------
+
+[[ LNSmallBusiness.SmallBusiness_BIP_Combined_Service ]]
+----------------------------------------------------------
+/builds/risk-engineering/PublicRecords/.ci_root/../BusinessCredit_Services/fn_getBuzCreditTrades.ecl(212,46): warning C2003: substring applied to value of type Integer
+/builds/risk-engineering/PublicRecords/.ci_root/../BusinessCredit_Services/fn_getBuzCreditTrades.ecl(202,68): warning C2003: substring applied to value of type Integer
+0 error, 2 warnings
+----------------------------------------------------------
+
+[[ LNSmallBusiness.SmallBusiness_Service ]]
+----------------------------------------------------------
+/builds/risk-engineering/PublicRecords/.ci_root/../tools/mac_RedefineFormat.ecl(779,1): warning C1048: EXPORT/SHARED qualifiers are ignored in this context
+/builds/risk-engineering/PublicRecords/.ci_root/../tools/mac_RedefineFormat.ecl(318,12): warning C1048: While expanding macro <param>
+/builds/risk-engineering/PublicRecords/.ci_root/../DNB_DMI/File_Companies_Keybuild.ecl(26,86): warning C1048: While expanding macro mac_redefineformat
+0 error, 3 warnings
+----------------------------------------------------------
+
+[[ Location_Services.AddressHistory_Report_Service ]]
+----------------------------------------------------------
+/builds/risk-engineering/PublicRecords/.ci_root/../PhonesFeedback_Services/CleanDate.ecl(89,39): warning C2003: substring applied to value of type Integer
+0 error, 1 warning
+----------------------------------------------------------
+
+[[ Location_Services.LocationReportService ]]
+----------------------------------------------------------
+/builds/risk-engineering/PublicRecords/.ci_root/../InsuranceHeader_BestOfBest/Layouts.ecl(23,3): warning C2112: A field called DID is already defined in this record
+0 error, 1 warning
+----------------------------------------------------------
+
+[[ Location_Services.LocationSearchService ]]
+----------------------------------------------------------
+/builds/risk-engineering/PublicRecords/.ci_root/../PhonesFeedback_Services/CleanDate.ecl(89,39): warning C2003: substring applied to value of type Integer
+/builds/risk-engineering/PublicRecords/.ci_root/../InsuranceHeader_BestOfBest/Layouts.ecl(23,3): warning C2112: A field called DID is already defined in this record
+0 error, 2 warnings
+----------------------------------------------------------
+
+[[ MemberPoint.BatchService ]]
+----------------------------------------------------------
+/builds/risk-engineering/PublicRecords/.ci_root/../PhonesFeedback_Services/CleanDate.ecl(89,39): warning C2003: substring applied to value of type Integer
+/builds/risk-engineering/PublicRecords/.ci_root/../InsuranceHeader_BestOfBest/Layouts.ecl(23,3): warning C2112: A field called DID is already defined in this record
+0 error, 2 warnings
+----------------------------------------------------------
+
+[[ MemberPoint.ReportService ]]
+----------------------------------------------------------
+/builds/risk-engineering/PublicRecords/.ci_root/../MemberPoint/Functions.ecl(51,1): warning C1048: EXPORT/SHARED qualifiers are ignored in this context
+/builds/risk-engineering/PublicRecords/.ci_root/../MemberPoint/ReportService.ecl(80,93): warning C1048: While expanding macro buildmininputerrorsds
+/builds/risk-engineering/PublicRecords/_tmp_ecl.ecl(1,28): warning C1048: While expanding macro reportservice
+/builds/risk-engineering/PublicRecords/.ci_root/../PhonesFeedback_Services/CleanDate.ecl(89,39): warning C2003: substring applied to value of type Integer
+/builds/risk-engineering/PublicRecords/.ci_root/../InsuranceHeader_BestOfBest/Layouts.ecl(23,3): warning C2112: A field called DID is already defined in this record
+0 error, 5 warnings
+----------------------------------------------------------
+
+[[ MIDEX_Services.MidexReportService ]]
+----------------------------------------------------------
+/builds/risk-engineering/PublicRecords/.ci_root/../tools/mac_FilesIndex.ecl(28,2): warning C2380: Name of exported symbol 'fcra_key' does not match the expected name 'key_HRI_Address_To_SIC_filtered_fcra'
+/builds/risk-engineering/PublicRecords/.ci_root/../Risk_Indicators/Key_HRI_Address_To_Sic_filtered_FCRA.ecl(5,253): warning C2380: While expanding macro mac_filesindex
+/builds/risk-engineering/PublicRecords/.ci_root/../InsuranceHeader_BestOfBest/Layouts.ecl(23,3): warning C2112: A field called DID is already defined in this record
+/builds/risk-engineering/PublicRecords/.ci_root/../GSA_Services/Layouts.ecl(124,4): warning C2112: A field called gsa_id is already defined in this record
+/builds/risk-engineering/PublicRecords/.ci_root/../PhonesFeedback_Services/CleanDate.ecl(89,39): warning C2003: substring applied to value of type Integer
+/builds/risk-engineering/PublicRecords/.ci_root/../MIDEX_Services/Functions.ecl(482,89): warning C2003: substring applied to value of type Integer
+0 error, 6 warnings
+----------------------------------------------------------
+
+[[ Models.BusinessAdvisor_Service ]]
+----------------------------------------------------------
+/builds/risk-engineering/PublicRecords/.ci_root/../Models/BusinessAdvisor_Service.ecl(412,45): warning C2003: substring applied to value of type Integer
+/builds/risk-engineering/PublicRecords/_tmp_ecl.ecl(1,33): warning C2003: While expanding macro businessadvisor_service
+/builds/risk-engineering/PublicRecords/.ci_root/../Models/BusinessAdvisor_Service.ecl(413,45): warning C2003: substring applied to value of type Integer
+/builds/risk-engineering/PublicRecords/_tmp_ecl.ecl(1,33): warning C2003: While expanding macro businessadvisor_service
+0 error, 4 warnings
+----------------------------------------------------------
+
+[[ Models.ChargebackDefender_Service ]]
+----------------------------------------------------------
+/builds/risk-engineering/PublicRecords/.ci_root/../Risk_Indicators/Boca_Shell_BtSt_Properties.ecl(40,3): warning C2112: A field called ln_fares_id is already defined in this record
+/builds/risk-engineering/PublicRecords/.ci_root/../Risk_Indicators/Boca_Shell_BtSt_Properties.ecl(40,3): warning C2112: A field called did is already defined in this record
+/builds/risk-engineering/PublicRecords/.ci_root/../Models/getCBDAttributes.ecl(45,101): warning C2003: substring applied to value of type Integer
+/builds/risk-engineering/PublicRecords/.ci_root/../Models/getCBDAttributes.ecl(39,135): warning C2003: substring applied to value of type Integer
+/builds/risk-engineering/PublicRecords/.ci_root/../Models/getCBDAttributes.ecl(40,135): warning C2003: substring applied to value of type Integer
+/builds/risk-engineering/PublicRecords/.ci_root/../Models/getCBDAttributes.ecl(17,30): warning C2003: substring applied to value of type Integer
+/builds/risk-engineering/PublicRecords/.ci_root/../Models/getCBDAttributes.ecl(46,101): warning C2003: substring applied to value of type Integer
+/builds/risk-engineering/PublicRecords/.ci_root/../Models/getCBDAttributes.ecl(245,110): warning C2003: substring applied to value of type Integer
+/builds/risk-engineering/PublicRecords/.ci_root/../Models/getCBDAttributes.ecl(246,110): warning C2003: substring applied to value of type Integer
+/builds/risk-engineering/PublicRecords/.ci_root/../Models/getCBDAttributes.ecl(252,111): warning C2003: substring applied to value of type Integer
+/builds/risk-engineering/PublicRecords/.ci_root/../Models/getCBDAttributes.ecl(253,111): warning C2003: substring applied to value of type Integer
+/builds/risk-engineering/PublicRecords/.ci_root/../Models/getCBDAttributes.ecl(257,113): warning C2003: substring applied to value of type Integer
+/builds/risk-engineering/PublicRecords/.ci_root/../Models/getCBDAttributes.ecl(258,113): warning C2003: substring applied to value of type Integer
+/builds/risk-engineering/PublicRecords/.ci_root/../Models/getCBDAttributes.ecl(264,116): warning C2003: substring applied to value of type Integer
+/builds/risk-engineering/PublicRecords/.ci_root/../Models/getCBDAttributes.ecl(265,116): warning C2003: substring applied to value of type Integer
+/builds/risk-engineering/PublicRecords/.ci_root/../Models/getCBDAttributes.ecl(288,209): warning C2003: substring applied to value of type Integer
+/builds/risk-engineering/PublicRecords/.ci_root/../Models/getCBDAttributes.ecl(289,209): warning C2003: substring applied to value of type Integer
+/builds/risk-engineering/PublicRecords/.ci_root/../Models/getCBDAttributes.ecl(290,207): warning C2003: substring applied to value of type Integer
+/builds/risk-engineering/PublicRecords/.ci_root/../Models/getCBDAttributes.ecl(291,207): warning C2003: substring applied to value of type Integer
+0 error, 19 warnings
+----------------------------------------------------------
+
+[[ Models.FD_NonFCRA_Service ]]
+----------------------------------------------------------
+/builds/risk-engineering/PublicRecords/.ci_root/../Risk_Indicators/Boca_Shell_BtSt_Properties.ecl(40,3): warning C2112: A field called ln_fares_id is already defined in this record
+/builds/risk-engineering/PublicRecords/.ci_root/../Risk_Indicators/Boca_Shell_BtSt_Properties.ecl(40,3): warning C2112: A field called did is already defined in this record
+0 error, 2 warnings
+----------------------------------------------------------
+
+[[ Models.FraudAdvisor_Batch_Service ]]
+----------------------------------------------------------
+/builds/risk-engineering/PublicRecords/.ci_root/../Risk_Indicators/Boca_Shell_BtSt_Properties.ecl(40,3): warning C2112: A field called ln_fares_id is already defined in this record
+/builds/risk-engineering/PublicRecords/.ci_root/../Risk_Indicators/Boca_Shell_BtSt_Properties.ecl(40,3): warning C2112: A field called did is already defined in this record
+0 error, 2 warnings
+----------------------------------------------------------
+
+[[ Models.FraudAdvisor_Service ]]
+----------------------------------------------------------
+/builds/risk-engineering/PublicRecords/.ci_root/../Risk_Indicators/Boca_Shell_BtSt_Properties.ecl(40,3): warning C2112: A field called ln_fares_id is already defined in this record
+/builds/risk-engineering/PublicRecords/.ci_root/../Risk_Indicators/Boca_Shell_BtSt_Properties.ecl(40,3): warning C2112: A field called did is already defined in this record
+0 error, 2 warnings
+----------------------------------------------------------
+
+[[ Models.Healthcare_SocioEconomic_Batch_Service ]]
+----------------------------------------------------------
+/builds/risk-engineering/PublicRecords/.ci_root/../Models/Healthcare_SocioEconomic_Transforms_Core.ecl(1345,23): warning C2003: substring applied to value of type Integer
+/builds/risk-engineering/PublicRecords/.ci_root/../Models/Healthcare_SocioEconomic_Core_NoTrending.ecl(229,194): warning C2003: While expanding macro ge_18_patterns
+/builds/risk-engineering/PublicRecords/.ci_root/../Models/Healthcare_SocioEconomic_Batch_Service.ecl(33,80): warning C2003: While expanding macro healthcare_socioeconomic_core_notrending
+/builds/risk-engineering/PublicRecords/_tmp_ecl.ecl(1,48): warning C2003: While expanding macro healthcare_socioeconomic_batch_service
+/builds/risk-engineering/PublicRecords/.ci_root/../Models/Healthcare_SocioEconomic_Transforms_Core.ecl(1345,79): warning C2003: substring applied to value of type Integer
+/builds/risk-engineering/PublicRecords/.ci_root/../Models/Healthcare_SocioEconomic_Core_NoTrending.ecl(229,194): warning C2003: While expanding macro ge_18_patterns
+/builds/risk-engineering/PublicRecords/.ci_root/../Models/Healthcare_SocioEconomic_Batch_Service.ecl(33,80): warning C2003: While expanding macro healthcare_socioeconomic_core_notrending
+/builds/risk-engineering/PublicRecords/_tmp_ecl.ecl(1,48): warning C2003: While expanding macro healthcare_socioeconomic_batch_service
+/builds/risk-engineering/PublicRecords/.ci_root/../Models/Healthcare_SocioEconomic_Transforms_Core.ecl(3580,26): warning C2003: substring applied to value of type Integer
+/builds/risk-engineering/PublicRecords/.ci_root/../Models/Healthcare_SocioEconomic_Core_NoTrending.ecl(230,224): warning C2003: While expanding macro lt_18_patterns0
+/builds/risk-engineering/PublicRecords/.ci_root/../Models/Healthcare_SocioEconomic_Batch_Service.ecl(33,80): warning C2003: While expanding macro healthcare_socioeconomic_core_notrending
+/builds/risk-engineering/PublicRecords/_tmp_ecl.ecl(1,48): warning C2003: While expanding macro healthcare_socioeconomic_batch_service
+/builds/risk-engineering/PublicRecords/.ci_root/../Models/Healthcare_SocioEconomic_Transforms_Core.ecl(3580,82): warning C2003: substring applied to value of type Integer
+/builds/risk-engineering/PublicRecords/.ci_root/../Models/Healthcare_SocioEconomic_Core_NoTrending.ecl(230,224): warning C2003: While expanding macro lt_18_patterns0
+/builds/risk-engineering/PublicRecords/.ci_root/../Models/Healthcare_SocioEconomic_Batch_Service.ecl(33,80): warning C2003: While expanding macro healthcare_socioeconomic_core_notrending
+/builds/risk-engineering/PublicRecords/_tmp_ecl.ecl(1,48): warning C2003: While expanding macro healthcare_socioeconomic_batch_service
+/builds/risk-engineering/PublicRecords/.ci_root/../Models/Healthcare_SocioEconomic_Transforms_Core.ecl(4162,26): warning C2003: substring applied to value of type Integer
+/builds/risk-engineering/PublicRecords/.ci_root/../Models/Healthcare_SocioEconomic_Core_NoTrending.ecl(231,211): warning C2003: While expanding macro lt_18_patterns1
+/builds/risk-engineering/PublicRecords/.ci_root/../Models/Healthcare_SocioEconomic_Batch_Service.ecl(33,80): warning C2003: While expanding macro healthcare_socioeconomic_core_notrending
+/builds/risk-engineering/PublicRecords/_tmp_ecl.ecl(1,48): warning C2003: While expanding macro healthcare_socioeconomic_batch_service
+/builds/risk-engineering/PublicRecords/.ci_root/../Models/Healthcare_SocioEconomic_Transforms_Core.ecl(4162,82): warning C2003: substring applied to value of type Integer
+/builds/risk-engineering/PublicRecords/.ci_root/../Models/Healthcare_SocioEconomic_Core_NoTrending.ecl(231,211): warning C2003: While expanding macro lt_18_patterns1
+/builds/risk-engineering/PublicRecords/.ci_root/../Models/Healthcare_SocioEconomic_Batch_Service.ecl(33,80): warning C2003: While expanding macro healthcare_socioeconomic_core_notrending
+/builds/risk-engineering/PublicRecords/_tmp_ecl.ecl(1,48): warning C2003: While expanding macro healthcare_socioeconomic_batch_service
+0 error, 24 warnings
+----------------------------------------------------------
+
+[[ Models.Healthcare_SocioEconomic_Batch_Service_V2 ]]
+----------------------------------------------------------
+/builds/risk-engineering/PublicRecords/.ci_root/../Models/Healthcare_SocioEconomic_Batch_Service_V2.ecl(77,26): warning C2003: substring applied to value of type Integer
+/builds/risk-engineering/PublicRecords/_tmp_ecl.ecl(1,51): warning C2003: While expanding macro healthcare_socioeconomic_batch_service_v2
+/builds/risk-engineering/PublicRecords/.ci_root/../Models/Healthcare_SocioEconomic_Batch_Service_V2.ecl(78,27): warning C2003: substring applied to value of type Integer
+/builds/risk-engineering/PublicRecords/_tmp_ecl.ecl(1,51): warning C2003: While expanding macro healthcare_socioeconomic_batch_service_v2
+0 error, 4 warnings
+----------------------------------------------------------
+
+[[ Models.Healthcare_SocioEconomic_Batch_Service_V3 ]]
+----------------------------------------------------------
+/builds/risk-engineering/PublicRecords/.ci_root/../Models/Healthcare_SocioEconomic_Transforms_V3.ecl(30,30): warning C2003: substring applied to value of type Integer
+/builds/risk-engineering/PublicRecords/.ci_root/../Models/Healthcare_SocioEconomic_Transforms_V3.ecl(31,31): warning C2003: substring applied to value of type Integer
+/builds/risk-engineering/PublicRecords/.ci_root/../Models/Healthcare_SocioEconomic_Transforms_V3.ecl(1345,23): warning C2003: substring applied to value of type Integer
+/builds/risk-engineering/PublicRecords/.ci_root/../Models/Healthcare_SocioEconomic_Batch_Service_V3.ecl(221,190): warning C2003: While expanding macro ge_18_patterns
+/builds/risk-engineering/PublicRecords/_tmp_ecl.ecl(1,51): warning C2003: While expanding macro healthcare_socioeconomic_batch_service_v3
+/builds/risk-engineering/PublicRecords/.ci_root/../Models/Healthcare_SocioEconomic_Transforms_V3.ecl(1345,79): warning C2003: substring applied to value of type Integer
+/builds/risk-engineering/PublicRecords/.ci_root/../Models/Healthcare_SocioEconomic_Batch_Service_V3.ecl(221,190): warning C2003: While expanding macro ge_18_patterns
+/builds/risk-engineering/PublicRecords/_tmp_ecl.ecl(1,51): warning C2003: While expanding macro healthcare_socioeconomic_batch_service_v3
+/builds/risk-engineering/PublicRecords/.ci_root/../Models/Healthcare_SocioEconomic_Transforms_V3.ecl(3580,26): warning C2003: substring applied to value of type Integer
+/builds/risk-engineering/PublicRecords/.ci_root/../Models/Healthcare_SocioEconomic_Batch_Service_V3.ecl(222,220): warning C2003: While expanding macro lt_18_patterns0
+/builds/risk-engineering/PublicRecords/_tmp_ecl.ecl(1,51): warning C2003: While expanding macro healthcare_socioeconomic_batch_service_v3
+/builds/risk-engineering/PublicRecords/.ci_root/../Models/Healthcare_SocioEconomic_Transforms_V3.ecl(3580,82): warning C2003: substring applied to value of type Integer
+/builds/risk-engineering/PublicRecords/.ci_root/../Models/Healthcare_SocioEconomic_Batch_Service_V3.ecl(222,220): warning C2003: While expanding macro lt_18_patterns0
+/builds/risk-engineering/PublicRecords/_tmp_ecl.ecl(1,51): warning C2003: While expanding macro healthcare_socioeconomic_batch_service_v3
+/builds/risk-engineering/PublicRecords/.ci_root/../Models/Healthcare_SocioEconomic_Transforms_V3.ecl(4162,26): warning C2003: substring applied to value of type Integer
+/builds/risk-engineering/PublicRecords/.ci_root/../Models/Healthcare_SocioEconomic_Batch_Service_V3.ecl(223,207): warning C2003: While expanding macro lt_18_patterns1
+/builds/risk-engineering/PublicRecords/_tmp_ecl.ecl(1,51): warning C2003: While expanding macro healthcare_socioeconomic_batch_service_v3
+/builds/risk-engineering/PublicRecords/.ci_root/../Models/Healthcare_SocioEconomic_Transforms_V3.ecl(4162,82): warning C2003: substring applied to value of type Integer
+/builds/risk-engineering/PublicRecords/.ci_root/../Models/Healthcare_SocioEconomic_Batch_Service_V3.ecl(223,207): warning C2003: While expanding macro lt_18_patterns1
+/builds/risk-engineering/PublicRecords/_tmp_ecl.ecl(1,51): warning C2003: While expanding macro healthcare_socioeconomic_batch_service_v3
+0 error, 20 warnings
+----------------------------------------------------------
+
+[[ Models.Healthcare_SocioEconomic_Batch_Service_V4 ]]
+----------------------------------------------------------
+/builds/risk-engineering/PublicRecords/.ci_root/../Models/Healthcare_SocioEconomic_Transforms_Core.ecl(30,30): warning C2003: substring applied to value of type Integer
+/builds/risk-engineering/PublicRecords/.ci_root/../Models/Healthcare_SocioEconomic_Transforms_Core.ecl(31,31): warning C2003: substring applied to value of type Integer
+/builds/risk-engineering/PublicRecords/.ci_root/../Models/Healthcare_SocioEconomic_Transforms_Core.ecl(1345,23): warning C2003: substring applied to value of type Integer
+/builds/risk-engineering/PublicRecords/.ci_root/../Models/Healthcare_SocioEconomic_Core.ecl(217,194): warning C2003: While expanding macro ge_18_patterns
+/builds/risk-engineering/PublicRecords/.ci_root/../Models/Healthcare_SocioEconomic_Batch_Service_V4.ecl(82,88): warning C2003: While expanding macro healthcare_socioeconomic_core
+/builds/risk-engineering/PublicRecords/_tmp_ecl.ecl(1,51): warning C2003: While expanding macro healthcare_socioeconomic_batch_service_v4
+/builds/risk-engineering/PublicRecords/.ci_root/../Models/Healthcare_SocioEconomic_Transforms_Core.ecl(1345,79): warning C2003: substring applied to value of type Integer
+/builds/risk-engineering/PublicRecords/.ci_root/../Models/Healthcare_SocioEconomic_Core.ecl(217,194): warning C2003: While expanding macro ge_18_patterns
+/builds/risk-engineering/PublicRecords/.ci_root/../Models/Healthcare_SocioEconomic_Batch_Service_V4.ecl(82,88): warning C2003: While expanding macro healthcare_socioeconomic_core
+/builds/risk-engineering/PublicRecords/_tmp_ecl.ecl(1,51): warning C2003: While expanding macro healthcare_socioeconomic_batch_service_v4
+/builds/risk-engineering/PublicRecords/.ci_root/../Models/Healthcare_SocioEconomic_Transforms_Core.ecl(3580,26): warning C2003: substring applied to value of type Integer
+/builds/risk-engineering/PublicRecords/.ci_root/../Models/Healthcare_SocioEconomic_Core.ecl(218,224): warning C2003: While expanding macro lt_18_patterns0
+/builds/risk-engineering/PublicRecords/.ci_root/../Models/Healthcare_SocioEconomic_Batch_Service_V4.ecl(82,88): warning C2003: While expanding macro healthcare_socioeconomic_core
+/builds/risk-engineering/PublicRecords/_tmp_ecl.ecl(1,51): warning C2003: While expanding macro healthcare_socioeconomic_batch_service_v4
+/builds/risk-engineering/PublicRecords/.ci_root/../Models/Healthcare_SocioEconomic_Transforms_Core.ecl(3580,82): warning C2003: substring applied to value of type Integer
+/builds/risk-engineering/PublicRecords/.ci_root/../Models/Healthcare_SocioEconomic_Core.ecl(218,224): warning C2003: While expanding macro lt_18_patterns0
+/builds/risk-engineering/PublicRecords/.ci_root/../Models/Healthcare_SocioEconomic_Batch_Service_V4.ecl(82,88): warning C2003: While expanding macro healthcare_socioeconomic_core
+/builds/risk-engineering/PublicRecords/_tmp_ecl.ecl(1,51): warning C2003: While expanding macro healthcare_socioeconomic_batch_service_v4
+/builds/risk-engineering/PublicRecords/.ci_root/../Models/Healthcare_SocioEconomic_Transforms_Core.ecl(4162,26): warning C2003: substring applied to value of type Integer
+/builds/risk-engineering/PublicRecords/.ci_root/../Models/Healthcare_SocioEconomic_Core.ecl(219,211): warning C2003: While expanding macro lt_18_patterns1
+/builds/risk-engineering/PublicRecords/.ci_root/../Models/Healthcare_SocioEconomic_Batch_Service_V4.ecl(82,88): warning C2003: While expanding macro healthcare_socioeconomic_core
+/builds/risk-engineering/PublicRecords/_tmp_ecl.ecl(1,51): warning C2003: While expanding macro healthcare_socioeconomic_batch_service_v4
+/builds/risk-engineering/PublicRecords/.ci_root/../Models/Healthcare_SocioEconomic_Transforms_Core.ecl(4162,82): warning C2003: substring applied to value of type Integer
+/builds/risk-engineering/PublicRecords/.ci_root/../Models/Healthcare_SocioEconomic_Core.ecl(219,211): warning C2003: While expanding macro lt_18_patterns1
+/builds/risk-engineering/PublicRecords/.ci_root/../Models/Healthcare_SocioEconomic_Batch_Service_V4.ecl(82,88): warning C2003: While expanding macro healthcare_socioeconomic_core
+/builds/risk-engineering/PublicRecords/_tmp_ecl.ecl(1,51): warning C2003: While expanding macro healthcare_socioeconomic_batch_service_v4
+0 error, 26 warnings
+----------------------------------------------------------
+
+[[ Models.Healthcare_SocioEconomic_Batch_Service_V5 ]]
+----------------------------------------------------------
+/builds/risk-engineering/PublicRecords/.ci_root/../Models/Healthcare_SocioEconomic_Transforms_Core.ecl(30,30): warning C2003: substring applied to value of type Integer
+/builds/risk-engineering/PublicRecords/.ci_root/../Models/Healthcare_SocioEconomic_Transforms_Core.ecl(31,31): warning C2003: substring applied to value of type Integer
+/builds/risk-engineering/PublicRecords/.ci_root/../Models/Healthcare_SocioEconomic_Transforms_Core.ecl(1345,23): warning C2003: substring applied to value of type Integer
+/builds/risk-engineering/PublicRecords/.ci_root/../Models/Healthcare_SocioEconomic_Core.ecl(217,194): warning C2003: While expanding macro ge_18_patterns
+/builds/risk-engineering/PublicRecords/.ci_root/../Models/Healthcare_SocioEconomic_Batch_Service_V5.ecl(47,80): warning C2003: While expanding macro healthcare_socioeconomic_core
+/builds/risk-engineering/PublicRecords/_tmp_ecl.ecl(1,51): warning C2003: While expanding macro healthcare_socioeconomic_batch_service_v5
+/builds/risk-engineering/PublicRecords/.ci_root/../Models/Healthcare_SocioEconomic_Transforms_Core.ecl(1345,79): warning C2003: substring applied to value of type Integer
+/builds/risk-engineering/PublicRecords/.ci_root/../Models/Healthcare_SocioEconomic_Core.ecl(217,194): warning C2003: While expanding macro ge_18_patterns
+/builds/risk-engineering/PublicRecords/.ci_root/../Models/Healthcare_SocioEconomic_Batch_Service_V5.ecl(47,80): warning C2003: While expanding macro healthcare_socioeconomic_core
+/builds/risk-engineering/PublicRecords/_tmp_ecl.ecl(1,51): warning C2003: While expanding macro healthcare_socioeconomic_batch_service_v5
+/builds/risk-engineering/PublicRecords/.ci_root/../Models/Healthcare_SocioEconomic_Transforms_Core.ecl(3580,26): warning C2003: substring applied to value of type Integer
+/builds/risk-engineering/PublicRecords/.ci_root/../Models/Healthcare_SocioEconomic_Core.ecl(218,224): warning C2003: While expanding macro lt_18_patterns0
+/builds/risk-engineering/PublicRecords/.ci_root/../Models/Healthcare_SocioEconomic_Batch_Service_V5.ecl(47,80): warning C2003: While expanding macro healthcare_socioeconomic_core
+/builds/risk-engineering/PublicRecords/_tmp_ecl.ecl(1,51): warning C2003: While expanding macro healthcare_socioeconomic_batch_service_v5
+/builds/risk-engineering/PublicRecords/.ci_root/../Models/Healthcare_SocioEconomic_Transforms_Core.ecl(3580,82): warning C2003: substring applied to value of type Integer
+/builds/risk-engineering/PublicRecords/.ci_root/../Models/Healthcare_SocioEconomic_Core.ecl(218,224): warning C2003: While expanding macro lt_18_patterns0
+/builds/risk-engineering/PublicRecords/.ci_root/../Models/Healthcare_SocioEconomic_Batch_Service_V5.ecl(47,80): warning C2003: While expanding macro healthcare_socioeconomic_core
+/builds/risk-engineering/PublicRecords/_tmp_ecl.ecl(1,51): warning C2003: While expanding macro healthcare_socioeconomic_batch_service_v5
+/builds/risk-engineering/PublicRecords/.ci_root/../Models/Healthcare_SocioEconomic_Transforms_Core.ecl(4162,26): warning C2003: substring applied to value of type Integer
+/builds/risk-engineering/PublicRecords/.ci_root/../Models/Healthcare_SocioEconomic_Core.ecl(219,211): warning C2003: While expanding macro lt_18_patterns1
+/builds/risk-engineering/PublicRecords/.ci_root/../Models/Healthcare_SocioEconomic_Batch_Service_V5.ecl(47,80): warning C2003: While expanding macro healthcare_socioeconomic_core
+/builds/risk-engineering/PublicRecords/_tmp_ecl.ecl(1,51): warning C2003: While expanding macro healthcare_socioeconomic_batch_service_v5
+/builds/risk-engineering/PublicRecords/.ci_root/../Models/Healthcare_SocioEconomic_Transforms_Core.ecl(4162,82): warning C2003: substring applied to value of type Integer
+/builds/risk-engineering/PublicRecords/.ci_root/../Models/Healthcare_SocioEconomic_Core.ecl(219,211): warning C2003: While expanding macro lt_18_patterns1
+/builds/risk-engineering/PublicRecords/.ci_root/../Models/Healthcare_SocioEconomic_Batch_Service_V5.ecl(47,80): warning C2003: While expanding macro healthcare_socioeconomic_core
+/builds/risk-engineering/PublicRecords/_tmp_ecl.ecl(1,51): warning C2003: While expanding macro healthcare_socioeconomic_batch_service_v5
+0 error, 26 warnings
+----------------------------------------------------------
+
+[[ Models.Healthcare_SocioEconomic_RT_Service ]]
+----------------------------------------------------------
+/builds/risk-engineering/PublicRecords/.ci_root/../Models/Healthcare_SocioEconomic_Transforms_Core.ecl(30,30): warning C2003: substring applied to value of type Integer
+/builds/risk-engineering/PublicRecords/.ci_root/../Models/Healthcare_SocioEconomic_Transforms_Core.ecl(31,31): warning C2003: substring applied to value of type Integer
+0 error, 2 warnings
+----------------------------------------------------------
+
+[[ Models.OrderScore_Service ]]
+----------------------------------------------------------
+/builds/risk-engineering/PublicRecords/.ci_root/../Risk_Indicators/Boca_Shell_BtSt_Properties.ecl(40,3): warning C2112: A field called ln_fares_id is already defined in this record
+/builds/risk-engineering/PublicRecords/.ci_root/../Risk_Indicators/Boca_Shell_BtSt_Properties.ecl(40,3): warning C2112: A field called did is already defined in this record
+/builds/risk-engineering/PublicRecords/.ci_root/../Models/getCBDAttributes.ecl(45,101): warning C2003: substring applied to value of type Integer
+/builds/risk-engineering/PublicRecords/.ci_root/../Models/getCBDAttributes.ecl(39,135): warning C2003: substring applied to value of type Integer
+/builds/risk-engineering/PublicRecords/.ci_root/../Models/getCBDAttributes.ecl(40,135): warning C2003: substring applied to value of type Integer
+/builds/risk-engineering/PublicRecords/.ci_root/../Models/getCBDAttributes.ecl(17,30): warning C2003: substring applied to value of type Integer
+/builds/risk-engineering/PublicRecords/.ci_root/../Models/getCBDAttributes.ecl(46,101): warning C2003: substring applied to value of type Integer
+/builds/risk-engineering/PublicRecords/.ci_root/../Models/getCBDAttributes.ecl(245,110): warning C2003: substring applied to value of type Integer
+/builds/risk-engineering/PublicRecords/.ci_root/../Models/getCBDAttributes.ecl(246,110): warning C2003: substring applied to value of type Integer
+/builds/risk-engineering/PublicRecords/.ci_root/../Models/getCBDAttributes.ecl(252,111): warning C2003: substring applied to value of type Integer
+/builds/risk-engineering/PublicRecords/.ci_root/../Models/getCBDAttributes.ecl(253,111): warning C2003: substring applied to value of type Integer
+/builds/risk-engineering/PublicRecords/.ci_root/../Models/getCBDAttributes.ecl(257,113): warning C2003: substring applied to value of type Integer
+/builds/risk-engineering/PublicRecords/.ci_root/../Models/getCBDAttributes.ecl(258,113): warning C2003: substring applied to value of type Integer
+/builds/risk-engineering/PublicRecords/.ci_root/../Models/getCBDAttributes.ecl(264,116): warning C2003: substring applied to value of type Integer
+/builds/risk-engineering/PublicRecords/.ci_root/../Models/getCBDAttributes.ecl(265,116): warning C2003: substring applied to value of type Integer
+/builds/risk-engineering/PublicRecords/.ci_root/../Models/getCBDAttributes.ecl(288,209): warning C2003: substring applied to value of type Integer
+/builds/risk-engineering/PublicRecords/.ci_root/../Models/getCBDAttributes.ecl(289,209): warning C2003: substring applied to value of type Integer
+/builds/risk-engineering/PublicRecords/.ci_root/../Models/getCBDAttributes.ecl(290,207): warning C2003: substring applied to value of type Integer
+/builds/risk-engineering/PublicRecords/.ci_root/../Models/getCBDAttributes.ecl(291,207): warning C2003: substring applied to value of type Integer
+0 error, 19 warnings
+----------------------------------------------------------
+
+[[ Models.RecoverScore_Batch_Service ]]
+----------------------------------------------------------
+/builds/risk-engineering/PublicRecords/.ci_root/../tools/mac_FilesIndex.ecl(28,2): warning C2380: Name of exported symbol 'fcra_key' does not match the expected name 'key_HRI_Address_To_SIC_filtered_FCRA'
+/builds/risk-engineering/PublicRecords/.ci_root/../Risk_Indicators/Key_HRI_Address_To_Sic_filtered_FCRA.ecl(5,253): warning C2380: While expanding macro mac_filesindex
+/builds/risk-engineering/PublicRecords/.ci_root/../Models/RecoverScore2.ecl(123,36): warning C2003: substring applied to value of type Integer
+0 error, 3 warnings
+----------------------------------------------------------
+
+[[ Models.RiskViewReport_Service ]]
+----------------------------------------------------------
+/builds/risk-engineering/PublicRecords/.ci_root/../tools/mac_FilesIndex.ecl(28,2): warning C2380: Name of exported symbol 'fcra_key' does not match the expected name 'key_HRI_Address_To_SIC_filtered_fcra'
+/builds/risk-engineering/PublicRecords/.ci_root/../Risk_Indicators/Key_HRI_Address_To_Sic_filtered_FCRA.ecl(5,253): warning C2380: While expanding macro mac_filesindex
+/builds/risk-engineering/PublicRecords/.ci_root/../Models/RiskViewReport_data.ecl(680,60): warning C2003: substring applied to value of type Integer
+/builds/risk-engineering/PublicRecords/.ci_root/../RiskWiseFCRA/_Inquiries_data.ecl(187,33): warning C2003: substring applied to value of type Integer
+/builds/risk-engineering/PublicRecords/.ci_root/../Models/RiskViewReport_RptFunction.ecl(248,97): warning C2003: substring applied to value of type Integer
+/builds/risk-engineering/PublicRecords/.ci_root/../Models/RiskViewReport_RptFunction.ecl(249,96): warning C2003: substring applied to value of type Integer
+0 error, 6 warnings
+----------------------------------------------------------
+
+[[ Models.RiskView_Batch_Service ]]
+----------------------------------------------------------
+/builds/risk-engineering/PublicRecords/.ci_root/../Models/RiskView_Batch_Service.ecl(725,61): warning C2003: substring applied to value of type Integer
+/builds/risk-engineering/PublicRecords/_tmp_ecl.ecl(1,32): warning C2003: While expanding macro riskview_batch_service
+/builds/risk-engineering/PublicRecords/.ci_root/../Models/RiskView_Batch_Service.ecl(726,61): warning C2003: substring applied to value of type Integer
+/builds/risk-engineering/PublicRecords/_tmp_ecl.ecl(1,32): warning C2003: While expanding macro riskview_batch_service
+0 error, 4 warnings
+----------------------------------------------------------
+
+[[ NaturalDisaster_Readiness.Batch_Service ]]
+----------------------------------------------------------
+/builds/risk-engineering/PublicRecords/.ci_root/../NaturalDisaster_Readiness/Batch_Service_Records.ecl(105,3): warning C1048: EXPORT/SHARED qualifiers are ignored in this context
+/builds/risk-engineering/PublicRecords/.ci_root/../NaturalDisaster_Readiness/File_Base_Payload.ecl(17,2): warning C1048: EXPORT/SHARED qualifiers are ignored in this context
+/builds/risk-engineering/PublicRecords/.ci_root/../NaturalDisaster_Readiness/File_Base_Payload.ecl(11,2): warning C1048: EXPORT/SHARED qualifiers are ignored in this context
+/builds/risk-engineering/PublicRecords/.ci_root/../NaturalDisaster_Readiness/File_Base_Payload.ecl(5,2): warning C1048: EXPORT/SHARED qualifiers are ignored in this context
+/builds/risk-engineering/PublicRecords/.ci_root/../NaturalDisaster_Readiness/Batch_Service_Records.ecl(107,3): warning C1048: EXPORT/SHARED qualifiers are ignored in this context
+/builds/risk-engineering/PublicRecords/.ci_root/../NaturalDisaster_Readiness/Batch_Service_Records.ecl(106,3): warning C1048: EXPORT/SHARED qualifiers are ignored in this context
+0 error, 6 warnings
+----------------------------------------------------------
+
+[[ paw_services.PAWSearchService ]]
+----------------------------------------------------------
+/builds/risk-engineering/PublicRecords/.ci_root/../PhonesFeedback_Services/CleanDate.ecl(89,39): warning C2003: substring applied to value of type Integer
+/builds/risk-engineering/PublicRecords/.ci_root/../InsuranceHeader_BestOfBest/Layouts.ecl(23,3): warning C2112: A field called DID is already defined in this record
+0 error, 2 warnings
+----------------------------------------------------------
+
+[[ PersonReports.AssetReportService ]]
+----------------------------------------------------------
+/builds/risk-engineering/PublicRecords/.ci_root/../tools/mac_FilesIndex.ecl(28,2): warning C2380: Name of exported symbol 'fcra_key' does not match the expected name 'key_HRI_Address_To_SIC_filtered_fcra'
+/builds/risk-engineering/PublicRecords/.ci_root/../Risk_Indicators/Key_HRI_Address_To_Sic_filtered_FCRA.ecl(5,253): warning C2380: While expanding macro mac_filesindex
+/builds/risk-engineering/PublicRecords/.ci_root/../InsuranceHeader_BestOfBest/Layouts.ecl(23,3): warning C2112: A field called DID is already defined in this record
+/builds/risk-engineering/PublicRecords/.ci_root/../PhonesFeedback_Services/CleanDate.ecl(89,39): warning C2003: substring applied to value of type Integer
+0 error, 4 warnings
+----------------------------------------------------------
+
+[[ PersonReports.AssetReportServiceFCRA ]]
+----------------------------------------------------------
+/builds/risk-engineering/PublicRecords/.ci_root/../tools/mac_FilesIndex.ecl(28,2): warning C2380: Name of exported symbol 'fcra_key' does not match the expected name 'key_HRI_Address_To_SIC_filtered_fcra'
+/builds/risk-engineering/PublicRecords/.ci_root/../Risk_Indicators/Key_HRI_Address_To_Sic_filtered_FCRA.ecl(5,253): warning C2380: While expanding macro mac_filesindex
+/builds/risk-engineering/PublicRecords/.ci_root/../InsuranceHeader_BestOfBest/Layouts.ecl(23,3): warning C2112: A field called DID is already defined in this record
+/builds/risk-engineering/PublicRecords/.ci_root/../PhonesFeedback_Services/CleanDate.ecl(89,39): warning C2003: substring applied to value of type Integer
+0 error, 4 warnings
+----------------------------------------------------------
+
+[[ PersonReports.FinderReportService ]]
+----------------------------------------------------------
+/builds/risk-engineering/PublicRecords/.ci_root/../tools/mac_FilesIndex.ecl(28,2): warning C2380: Name of exported symbol 'fcra_key' does not match the expected name 'key_HRI_Address_To_SIC_filtered_fcra'
+/builds/risk-engineering/PublicRecords/.ci_root/../Risk_Indicators/Key_HRI_Address_To_Sic_filtered_FCRA.ecl(5,253): warning C2380: While expanding macro mac_filesindex
+/builds/risk-engineering/PublicRecords/.ci_root/../InsuranceHeader_BestOfBest/Layouts.ecl(23,3): warning C2112: A field called DID is already defined in this record
+/builds/risk-engineering/PublicRecords/.ci_root/../PhonesFeedback_Services/CleanDate.ecl(89,39): warning C2003: substring applied to value of type Integer
+0 error, 4 warnings
+----------------------------------------------------------
+
+[[ PersonReports.PrelitReportService ]]
+----------------------------------------------------------
+/builds/risk-engineering/PublicRecords/.ci_root/../tools/mac_FilesIndex.ecl(28,2): warning C2380: Name of exported symbol 'fcra_key' does not match the expected name 'key_HRI_Address_To_SIC_filtered_fcra'
+/builds/risk-engineering/PublicRecords/.ci_root/../Risk_Indicators/Key_HRI_Address_To_Sic_filtered_FCRA.ecl(5,253): warning C2380: While expanding macro mac_filesindex
+/builds/risk-engineering/PublicRecords/.ci_root/../PhonesFeedback_Services/CleanDate.ecl(89,39): warning C2003: substring applied to value of type Integer
+/builds/risk-engineering/PublicRecords/.ci_root/../InsuranceHeader_BestOfBest/Layouts.ecl(23,3): warning C2112: A field called DID is already defined in this record
+0 error, 4 warnings
+----------------------------------------------------------
+
+[[ PersonReports.PrelitReportServiceFCRA ]]
+----------------------------------------------------------
+/builds/risk-engineering/PublicRecords/.ci_root/../tools/mac_FilesIndex.ecl(28,2): warning C2380: Name of exported symbol 'fcra_key' does not match the expected name 'key_HRI_Address_To_SIC_filtered_fcra'
+/builds/risk-engineering/PublicRecords/.ci_root/../Risk_Indicators/Key_HRI_Address_To_Sic_filtered_FCRA.ecl(5,253): warning C2380: While expanding macro mac_filesindex
+/builds/risk-engineering/PublicRecords/.ci_root/../PhonesFeedback_Services/CleanDate.ecl(89,39): warning C2003: substring applied to value of type Integer
+/builds/risk-engineering/PublicRecords/.ci_root/../InsuranceHeader_BestOfBest/Layouts.ecl(23,3): warning C2112: A field called DID is already defined in this record
+0 error, 4 warnings
+----------------------------------------------------------
+
+[[ PersonReports.RNAReportService ]]
+----------------------------------------------------------
+/builds/risk-engineering/PublicRecords/.ci_root/../tools/mac_FilesIndex.ecl(28,2): warning C2380: Name of exported symbol 'fcra_key' does not match the expected name 'key_HRI_Address_To_SIC_filtered_fcra'
+/builds/risk-engineering/PublicRecords/.ci_root/../Risk_Indicators/Key_HRI_Address_To_Sic_filtered_FCRA.ecl(5,253): warning C2380: While expanding macro mac_filesindex
+/builds/risk-engineering/PublicRecords/.ci_root/../PhonesFeedback_Services/CleanDate.ecl(89,39): warning C2003: substring applied to value of type Integer
+/builds/risk-engineering/PublicRecords/.ci_root/../InsuranceHeader_BestOfBest/Layouts.ecl(23,3): warning C2112: A field called DID is already defined in this record
+0 error, 4 warnings
+----------------------------------------------------------
+
+[[ PersonReports.SmartLinxReportService ]]
+----------------------------------------------------------
+/builds/risk-engineering/PublicRecords/.ci_root/../tools/mac_FilesIndex.ecl(28,2): warning C2380: Name of exported symbol 'fcra_key' does not match the expected name 'key_HRI_Address_To_SIC_filtered_fcra'
+/builds/risk-engineering/PublicRecords/.ci_root/../Risk_Indicators/Key_HRI_Address_To_Sic_filtered_FCRA.ecl(5,253): warning C2380: While expanding macro mac_filesindex
+/builds/risk-engineering/PublicRecords/.ci_root/../InsuranceHeader_BestOfBest/Layouts.ecl(23,3): warning C2112: A field called DID is already defined in this record
+/builds/risk-engineering/PublicRecords/.ci_root/../GSA_Services/Layouts.ecl(124,4): warning C2112: A field called gsa_id is already defined in this record
+/builds/risk-engineering/PublicRecords/.ci_root/../PhonesFeedback_Services/CleanDate.ecl(89,39): warning C2003: substring applied to value of type Integer
+0 error, 5 warnings
+----------------------------------------------------------
+
+[[ PersonSearch_Services.CheckSearchService ]]
+----------------------------------------------------------
+/builds/risk-engineering/PublicRecords/.ci_root/../PhonesFeedback_Services/CleanDate.ecl(89,39): warning C2003: substring applied to value of type Integer
+0 error, 1 warning
+----------------------------------------------------------
+
+[[ PersonSearch_Services.PersonRollupService ]]
+----------------------------------------------------------
+/builds/risk-engineering/PublicRecords/.ci_root/../PhonesFeedback_Services/CleanDate.ecl(89,39): warning C2003: substring applied to value of type Integer
+/builds/risk-engineering/PublicRecords/.ci_root/../InsuranceHeader_BestOfBest/Layouts.ecl(23,3): warning C2112: A field called DID is already defined in this record
+0 error, 2 warnings
+----------------------------------------------------------
+
+[[ PersonSearch_Services.PersonSearchService ]]
+----------------------------------------------------------
+/builds/risk-engineering/PublicRecords/.ci_root/../PhonesFeedback_Services/CleanDate.ecl(89,39): warning C2003: substring applied to value of type Integer
+/builds/risk-engineering/PublicRecords/.ci_root/../InsuranceHeader_BestOfBest/Layouts.ecl(23,3): warning C2112: A field called DID is already defined in this record
+0 error, 2 warnings
+----------------------------------------------------------
+
+[[ PersonSlimReport_Services.ReportService ]]
+----------------------------------------------------------
+/builds/risk-engineering/PublicRecords/.ci_root/../tools/mac_FilesIndex.ecl(28,2): warning C2380: Name of exported symbol 'fcra_key' does not match the expected name 'key_HRI_Address_To_SIC_filtered_fcra'
+/builds/risk-engineering/PublicRecords/.ci_root/../Risk_Indicators/Key_HRI_Address_To_Sic_filtered_FCRA.ecl(5,253): warning C2380: While expanding macro mac_filesindex
+/builds/risk-engineering/PublicRecords/.ci_root/../InsuranceHeader_BestOfBest/Layouts.ecl(23,3): warning C2112: A field called DID is already defined in this record
+/builds/risk-engineering/PublicRecords/.ci_root/../PhonesFeedback_Services/CleanDate.ecl(89,39): warning C2003: substring applied to value of type Integer
+0 error, 4 warnings
+----------------------------------------------------------
+
+[[ PhoneFinder_Services.PhoneFinderBatchService ]]
+----------------------------------------------------------
+/builds/risk-engineering/PublicRecords/.ci_root/../PhonesFeedback_Services/CleanDate.ecl(89,39): warning C2003: substring applied to value of type Integer
+0 error, 1 warning
+----------------------------------------------------------
+
+[[ PhoneFinder_Services.PhoneFinderReportService ]]
+----------------------------------------------------------
+/builds/risk-engineering/PublicRecords/.ci_root/../PhonesFeedback_Services/CleanDate.ecl(89,39): warning C2003: substring applied to value of type Integer
+0 error, 1 warning
+----------------------------------------------------------
+
+[[ PhonesFeedback_Services.ReportService ]]
+----------------------------------------------------------
+/builds/risk-engineering/PublicRecords/.ci_root/../PhonesFeedback_Services/CleanDate.ecl(89,39): warning C2003: substring applied to value of type Integer
+0 error, 1 warning
+----------------------------------------------------------
+
+[[ Phone_Shell.Phone_Shell_Service ]]
+----------------------------------------------------------
+/builds/risk-engineering/PublicRecords/.ci_root/../PhonesFeedback_Services/CleanDate.ecl(89,39): warning C2003: substring applied to value of type Integer
+0 error, 1 warning
+----------------------------------------------------------
+
+[[ prof_LicenseV2_Services.Discpl_Batch_Service ]]
+----------------------------------------------------------
+/builds/risk-engineering/PublicRecords/.ci_root/../GSA_Services/Layouts.ecl(124,4): warning C2112: A field called gsa_id is already defined in this record
+0 error, 1 warning
+----------------------------------------------------------
+
+[[ prof_LicenseV2_Services.Medlic_Batch_Service ]]
+----------------------------------------------------------
+/builds/risk-engineering/PublicRecords/.ci_root/../GSA_Services/Layouts.ecl(124,4): warning C2112: A field called gsa_id is already defined in this record
+0 error, 1 warning
+----------------------------------------------------------
+
+[[ prof_LicenseV2_Services.Medlic_PL_Combined_Batch_Service ]]
+----------------------------------------------------------
+/builds/risk-engineering/PublicRecords/.ci_root/../GSA_Services/Layouts.ecl(124,4): warning C2112: A field called gsa_id is already defined in this record
+0 error, 1 warning
+----------------------------------------------------------
+
+[[ prof_LicenseV2_Services.Prof_LicenseReportService ]]
+----------------------------------------------------------
+/builds/risk-engineering/PublicRecords/.ci_root/../GSA_Services/Layouts.ecl(124,4): warning C2112: A field called gsa_id is already defined in this record
+0 error, 1 warning
+----------------------------------------------------------
+
+[[ prof_LicenseV2_Services.Prof_LicenseSearchService ]]
+----------------------------------------------------------
+/builds/risk-engineering/PublicRecords/.ci_root/../GSA_Services/Layouts.ecl(124,4): warning C2112: A field called gsa_id is already defined in this record
+0 error, 1 warning
+----------------------------------------------------------
+
+[[ progressive_phone.ContactPlusSearchService ]]
+----------------------------------------------------------
+/builds/risk-engineering/PublicRecords/.ci_root/../PhonesFeedback_Services/CleanDate.ecl(89,39): warning C2003: substring applied to value of type Integer
+/builds/risk-engineering/PublicRecords/.ci_root/../InsuranceHeader_BestOfBest/Layouts.ecl(23,3): warning C2112: A field called DID is already defined in this record
+0 error, 2 warnings
+----------------------------------------------------------
+
+[[ progressive_phone.progressive_phone_batch_service ]]
+----------------------------------------------------------
+/builds/risk-engineering/PublicRecords/.ci_root/../PhonesFeedback_Services/CleanDate.ecl(89,39): warning C2003: substring applied to value of type Integer
+0 error, 1 warning
+----------------------------------------------------------
+
+[[ progressive_phone.progressive_phone_batch_with_details_service ]]
+----------------------------------------------------------
+/builds/risk-engineering/PublicRecords/.ci_root/../PhonesFeedback_Services/CleanDate.ecl(89,39): warning C2003: substring applied to value of type Integer
+0 error, 1 warning
+----------------------------------------------------------
+
+[[ progressive_phone.progressive_phone_with_feedback_batch_service ]]
+----------------------------------------------------------
+/builds/risk-engineering/PublicRecords/.ci_root/../PhonesFeedback_Services/CleanDate.ecl(89,39): warning C2003: substring applied to value of type Integer
+0 error, 1 warning
+----------------------------------------------------------
+
+[[ progressive_phone.progressive_phone_with_feedback_online_service ]]
+----------------------------------------------------------
+/builds/risk-engineering/PublicRecords/.ci_root/../PhonesFeedback_Services/CleanDate.ecl(89,39): warning C2003: substring applied to value of type Integer
+0 error, 1 warning
+----------------------------------------------------------
+
+[[ PropertyCharacteristics_Services.BatchService ]]
+----------------------------------------------------------
+/builds/risk-engineering/PublicRecords/.ci_root/../PropertyCharacteristics_Services/records_batch.ecl(163,2): warning C1048: EXPORT/SHARED qualifiers are ignored in this context
+/builds/risk-engineering/PublicRecords/.ci_root/../PropertyCharacteristics_Services/records_batch.ecl(162,2): warning C1048: EXPORT/SHARED qualifiers are ignored in this context
+/builds/risk-engineering/PublicRecords/.ci_root/../PropertyCharacteristics_Services/records_batch.ecl(161,2): warning C1048: EXPORT/SHARED qualifiers are ignored in this context
+0 error, 3 warnings
+----------------------------------------------------------
+
+[[ PropertyFraudDiscovery.BatchService ]]
+----------------------------------------------------------
+/builds/risk-engineering/PublicRecords/.ci_root/../PhonesFeedback_Services/CleanDate.ecl(89,39): warning C2003: substring applied to value of type Integer
+/builds/risk-engineering/PublicRecords/.ci_root/../InsuranceHeader_BestOfBest/Layouts.ecl(23,3): warning C2112: A field called DID is already defined in this record
+0 error, 2 warnings
+----------------------------------------------------------
+
+[[ PublicHousing_Services.BatchService ]]
+----------------------------------------------------------
+/builds/risk-engineering/PublicRecords/.ci_root/../PhonesFeedback_Services/CleanDate.ecl(89,39): warning C2003: substring applied to value of type Integer
+/builds/risk-engineering/PublicRecords/.ci_root/../InsuranceHeader_BestOfBest/Layouts.ecl(23,3): warning C2112: A field called DID is already defined in this record
+0 error, 2 warnings
+----------------------------------------------------------
+
+[[ PublicProfileServices.ReportService ]]
+----------------------------------------------------------
+/builds/risk-engineering/PublicRecords/.ci_root/../tools/mac_FilesIndex.ecl(28,2): warning C2380: Name of exported symbol 'fcra_key' does not match the expected name 'key_HRI_Address_To_SIC_filtered_fcra'
+/builds/risk-engineering/PublicRecords/.ci_root/../Risk_Indicators/Key_HRI_Address_To_Sic_filtered_FCRA.ecl(5,253): warning C2380: While expanding macro mac_filesindex
+/builds/risk-engineering/PublicRecords/.ci_root/../PhonesFeedback_Services/CleanDate.ecl(89,39): warning C2003: substring applied to value of type Integer
+/builds/risk-engineering/PublicRecords/.ci_root/../InsuranceHeader_BestOfBest/Layouts.ecl(23,3): warning C2112: A field called DID is already defined in this record
+/builds/risk-engineering/PublicRecords/.ci_root/../GSA_Services/Layouts.ecl(124,4): warning C2112: A field called gsa_id is already defined in this record
+0 error, 5 warnings
+----------------------------------------------------------
+
+[[ PublicRecords_KEL.MAS_nonFCRA_FDC_Proddata_Service ]]
+----------------------------------------------------------
+/builds/risk-engineering/PublicRecords/.ci_root/../PublicRecords_KEL/ECL_Functions/Layouts_FDC.ecl(1892,4): warning C2112: A field called UniqueId is already defined in this record
+/builds/risk-engineering/PublicRecords/.ci_root/../PublicRecords_KEL/ECL_Functions/Layouts_FDC.ecl(1893,4): warning C2112: A field called code is already defined in this record
+/builds/risk-engineering/PublicRecords/.ci_root/../PublicRecords_KEL/ECL_Functions/Layouts_FDC.ecl(1893,4): warning C2112: A field called code_type is already defined in this record
+/builds/risk-engineering/PublicRecords/.ci_root/../PublicRecords_KEL/ECL_Functions/Layouts_FDC.ecl(1893,4): warning C2112: A field called dt_first_seen is already defined in this record
+/builds/risk-engineering/PublicRecords/.ci_root/../PublicRecords_KEL/ECL_Functions/Layouts_FDC.ecl(1893,4): warning C2112: A field called dt_last_seen is already defined in this record
+/builds/risk-engineering/PublicRecords/.ci_root/../PublicRecords_KEL/ECL_Functions/Layouts_FDC.ecl(1881,4): warning C2112: A field called code is already defined in this record
+/builds/risk-engineering/PublicRecords/.ci_root/../PublicRecords_KEL/ECL_Functions/Layouts_FDC.ecl(1881,4): warning C2112: A field called code_type is already defined in this record
+/builds/risk-engineering/PublicRecords/.ci_root/../PublicRecords_KEL/ECL_Functions/Layouts_FDC.ecl(1881,4): warning C2112: A field called dt_first_seen is already defined in this record
+/builds/risk-engineering/PublicRecords/.ci_root/../PublicRecords_KEL/ECL_Functions/Layouts_FDC.ecl(1881,4): warning C2112: A field called dt_last_seen is already defined in this record
+/builds/risk-engineering/PublicRecords/.ci_root/../PublicRecords_KEL/ECL_Functions/Layouts_FDC.ecl(1015,3): warning C2112: A field called phone is already defined in this record
+/builds/risk-engineering/PublicRecords/.ci_root/../PublicRecords_KEL/ECL_Functions/Layouts_FDC.ecl(1024,3): warning C2112: A field called phone is already defined in this record
+/builds/risk-engineering/PublicRecords/.ci_root/../PublicRecords_KEL/ECL_Functions/Layouts_FDC.ecl(998,3): warning C2112: A field called record_sid is already defined in this record
+/builds/risk-engineering/PublicRecords/.ci_root/../PublicRecords_KEL/Fn_MAS_FDC.ecl(4305,68): warning C2112: A field called UIDAppend is already defined in this record
+/builds/risk-engineering/PublicRecords/.ci_root/../PublicRecords_KEL/Fn_MAS_FDC.ecl(4305,68): warning C2112: A field called G_ProcUID is already defined in this record
+/builds/risk-engineering/PublicRecords/.ci_root/../PublicRecords_KEL/Fn_MAS_FDC.ecl(4305,68): warning C2112: A field called G_ProcBusUID is already defined in this record
+/builds/risk-engineering/PublicRecords/.ci_root/../PublicRecords_KEL/Fn_MAS_FDC.ecl(4305,68): warning C2112: A field called P_LexID is already defined in this record
+/builds/risk-engineering/PublicRecords/.ci_root/../PublicRecords_KEL/Fn_MAS_FDC.ecl(4305,68): warning C2112: A field called B_LexIDUlt is already defined in this record
+/builds/risk-engineering/PublicRecords/.ci_root/../PublicRecords_KEL/Fn_MAS_FDC.ecl(4305,68): warning C2112: A field called B_LexIDOrg is already defined in this record
+/builds/risk-engineering/PublicRecords/.ci_root/../PublicRecords_KEL/Fn_MAS_FDC.ecl(4305,68): warning C2112: A field called B_LexIDLegal is already defined in this record
+/builds/risk-engineering/PublicRecords/.ci_root/../PublicRecords_KEL/Fn_MAS_FDC.ecl(4305,68): warning C2112: A field called B_LexIDSite is already defined in this record
+/builds/risk-engineering/PublicRecords/.ci_root/../PublicRecords_KEL/Fn_MAS_FDC.ecl(4305,68): warning C2112: A field called B_LexIDLoc is already defined in this record
+/builds/risk-engineering/PublicRecords/.ci_root/../PublicRecords_KEL/Fn_MAS_FDC.ecl(4305,68): warning C2112: A field called B_InpClnTIN is already defined in this record
+/builds/risk-engineering/PublicRecords/.ci_root/../PublicRecords_KEL/Fn_MAS_FDC.ecl(4305,68): warning C2112: A field called P_InpClnEmail is already defined in this record
+/builds/risk-engineering/PublicRecords/.ci_root/../PublicRecords_KEL/Fn_MAS_FDC.ecl(4305,68): warning C2112: A field called P_InpClnDL is already defined in this record
+/builds/risk-engineering/PublicRecords/.ci_root/../PublicRecords_KEL/Fn_MAS_FDC.ecl(4305,68): warning C2112: A field called P_InpClnSSN is already defined in this record
+/builds/risk-engineering/PublicRecords/.ci_root/../PublicRecords_KEL/Fn_MAS_FDC.ecl(4305,68): warning C2112: A field called P_InpClnNameFirst is already defined in this record
+/builds/risk-engineering/PublicRecords/.ci_root/../PublicRecords_KEL/Fn_MAS_FDC.ecl(4305,68): warning C2112: A field called P_InpClnNameMid is already defined in this record
+/builds/risk-engineering/PublicRecords/.ci_root/../PublicRecords_KEL/Fn_MAS_FDC.ecl(4305,68): warning C2112: A field called P_InpClnNameLast is already defined in this record
+/builds/risk-engineering/PublicRecords/.ci_root/../PublicRecords_KEL/Fn_MAS_FDC.ecl(4305,68): warning C2112: A field called p_inpclnarchdt is already defined in this record
+/builds/risk-engineering/PublicRecords/.ci_root/../PublicRecords_KEL/Fn_MAS_FDC.ecl(4305,68): warning C2112: A field called P_InpClnDOB is already defined in this record
+/builds/risk-engineering/PublicRecords/.ci_root/../PublicRecords_KEL/Fn_MAS_FDC.ecl(4305,68): warning C2112: A field called P_InpClnAddrPrimRng is already defined in this record
+/builds/risk-engineering/PublicRecords/.ci_root/../PublicRecords_KEL/Fn_MAS_FDC.ecl(4305,68): warning C2112: A field called P_InpClnAddrPreDir is already defined in this record
+/builds/risk-engineering/PublicRecords/.ci_root/../PublicRecords_KEL/Fn_MAS_FDC.ecl(4305,68): warning C2112: A field called P_InpClnAddrPrimName is already defined in this record
+/builds/risk-engineering/PublicRecords/.ci_root/../PublicRecords_KEL/Fn_MAS_FDC.ecl(4305,68): warning C2112: A field called P_InpClnAddrSffx is already defined in this record
+/builds/risk-engineering/PublicRecords/.ci_root/../PublicRecords_KEL/Fn_MAS_FDC.ecl(4305,68): warning C2112: A field called P_InpClnAddrPostDir is already defined in this record
+/builds/risk-engineering/PublicRecords/.ci_root/../PublicRecords_KEL/Fn_MAS_FDC.ecl(4305,68): warning C2112: A field called P_InpClnAddrCity is already defined in this record
+/builds/risk-engineering/PublicRecords/.ci_root/../PublicRecords_KEL/Fn_MAS_FDC.ecl(4305,68): warning C2112: A field called P_InpClnAddrState is already defined in this record
+/builds/risk-engineering/PublicRecords/.ci_root/../PublicRecords_KEL/Fn_MAS_FDC.ecl(4305,68): warning C2112: A field called P_InpClnAddrZip5 is already defined in this record
+/builds/risk-engineering/PublicRecords/.ci_root/../PublicRecords_KEL/Fn_MAS_FDC.ecl(4305,68): warning C2112: A field called P_InpClnAddrSecRng is already defined in this record
+/builds/risk-engineering/PublicRecords/.ci_root/../PublicRecords_KEL/Fn_MAS_FDC.ecl(4305,68): warning C2112: A field called AddressGeoLink is already defined in this record
+/builds/risk-engineering/PublicRecords/.ci_root/../PublicRecords_KEL/Fn_MAS_FDC.ecl(4305,68): warning C2112: A field called P_InpClnAddrStateCode is already defined in this record
+/builds/risk-engineering/PublicRecords/.ci_root/../PublicRecords_KEL/Fn_MAS_FDC.ecl(4305,68): warning C2112: A field called P_InpClnAddrCnty is already defined in this record
+/builds/risk-engineering/PublicRecords/.ci_root/../PublicRecords_KEL/Fn_MAS_FDC.ecl(4305,68): warning C2112: A field called P_InpClnAddrGeo is already defined in this record
+/builds/risk-engineering/PublicRecords/.ci_root/../PublicRecords_KEL/Fn_MAS_FDC.ecl(4305,68): warning C2112: A field called P_InpClnPhoneHome is already defined in this record
+/builds/risk-engineering/PublicRecords/.ci_root/../PublicRecords_KEL/Fn_MAS_FDC.ecl(4305,68): warning C2112: A field called RepNumber is already defined in this record
+/builds/risk-engineering/PublicRecords/.ci_root/../PublicRecords_KEL/Fn_MAS_FDC.ecl(4305,68): warning C2112: A field called Contact_date is already defined in this record
+/builds/risk-engineering/PublicRecords/.ci_root/../PublicRecords_KEL/Fn_MAS_FDC.ecl(4305,68): warning C2112: A field called IsInput is already defined in this record
+/builds/risk-engineering/PublicRecords/.ci_root/../PublicRecords_KEL/Fn_MAS_FDC.ecl(4305,68): warning C2112: A field called Vehicle_Key is already defined in this record
+/builds/risk-engineering/PublicRecords/.ci_root/../PublicRecords_KEL/Fn_MAS_FDC.ecl(4305,68): warning C2112: A field called Iteration_Key is already defined in this record
+/builds/risk-engineering/PublicRecords/.ci_root/../PublicRecords_KEL/Fn_MAS_FDC.ecl(4305,68): warning C2112: A field called Source_Code is already defined in this record
+/builds/risk-engineering/PublicRecords/.ci_root/../PublicRecords_KEL/Fn_MAS_FDC.ecl(4305,68): warning C2112: A field called State_Origin is already defined in this record
+/builds/risk-engineering/PublicRecords/.ci_root/../PublicRecords_KEL/Fn_MAS_FDC.ecl(4305,68): warning C2112: A field called State_Bitmap_Flag is already defined in this record
+/builds/risk-engineering/PublicRecords/.ci_root/../PublicRecords_KEL/Fn_MAS_FDC.ecl(4305,68): warning C2112: A field called global_sid is already defined in this record
+/builds/risk-engineering/PublicRecords/.ci_root/../PublicRecords_KEL/Fn_MAS_FDC.ecl(4305,68): warning C2112: A field called record_sid is already defined in this record
+/builds/risk-engineering/PublicRecords/.ci_root/../PublicRecords_KEL/Fn_MAS_FDC.ecl(4305,68): warning C2112: A field called src is already defined in this record
+/builds/risk-engineering/PublicRecords/.ci_root/../PublicRecords_KEL/Fn_MAS_FDC.ecl(4305,68): warning C2112: A field called Archive_Date is already defined in this record
+/builds/risk-engineering/PublicRecords/.ci_root/../PublicRecords_KEL/Fn_MAS_FDC.ecl(4305,68): warning C2112: A field called DPMBitMAP is already defined in this record
+/builds/risk-engineering/PublicRecords/.ci_root/../PublicRecords_KEL/FN_Compile.ecl(291,25): warning C2003: substring applied to value of type Integer
+0 error, 58 warnings
+----------------------------------------------------------
+
+[[ RelationshipIdentifier_Services.Batch_Service ]]
+----------------------------------------------------------
+/builds/risk-engineering/PublicRecords/.ci_root/../PhonesFeedback_Services/CleanDate.ecl(89,39): warning C2003: substring applied to value of type Integer
+0 error, 1 warning
+----------------------------------------------------------
+
+[[ RelationshipIdentifier_Services.Report_Service ]]
+----------------------------------------------------------
+/builds/risk-engineering/PublicRecords/.ci_root/../PhonesFeedback_Services/CleanDate.ecl(89,39): warning C2003: substring applied to value of type Integer
+0 error, 1 warning
+----------------------------------------------------------
+
+[[ Residency_Services.BatchService ]]
+----------------------------------------------------------
+/builds/risk-engineering/PublicRecords/.ci_root/../tools/mac_FilesIndex.ecl(28,2): warning C2380: Name of exported symbol 'fcra_key' does not match the expected name 'key_HRI_Address_To_SIC_filtered_fcra'
+/builds/risk-engineering/PublicRecords/.ci_root/../Risk_Indicators/Key_HRI_Address_To_Sic_filtered_FCRA.ecl(5,253): warning C2380: While expanding macro mac_filesindex
+/builds/risk-engineering/PublicRecords/.ci_root/../InsuranceHeader_BestOfBest/Layouts.ecl(23,3): warning C2112: A field called DID is already defined in this record
+/builds/risk-engineering/PublicRecords/.ci_root/../PhonesFeedback_Services/CleanDate.ecl(89,39): warning C2003: substring applied to value of type Integer
+0 error, 4 warnings
+----------------------------------------------------------
+
+[[ RiskIntelligenceNetwork_Services.BatchService ]]
+----------------------------------------------------------
+/builds/risk-engineering/PublicRecords/.ci_root/../ut/fn_FormatFullName.ecl(2,2): warning C2380: Name of exported symbol 'FormatLastName' does not match the expected name 'fn_FormatFullName'
+/builds/risk-engineering/PublicRecords/.ci_root/../ut/fn_FormatFullName.ecl(11,2): warning C2380: Name of exported symbol 'FormatFirstName' does not match the expected name 'fn_FormatFullName'
+/builds/risk-engineering/PublicRecords/.ci_root/../InsuranceHeader_BestOfBest/Layouts.ecl(23,3): warning C2112: A field called DID is already defined in this record
+0 error, 3 warnings
+----------------------------------------------------------
+
+[[ RiskIntelligenceNetwork_Services.RealtimeAssessmentReportService ]]
+----------------------------------------------------------
+/builds/risk-engineering/PublicRecords/.ci_root/../ut/fn_FormatFullName.ecl(2,2): warning C2380: Name of exported symbol 'FormatLastName' does not match the expected name 'fn_FormatFullName'
+/builds/risk-engineering/PublicRecords/.ci_root/../ut/fn_FormatFullName.ecl(11,2): warning C2380: Name of exported symbol 'FormatFirstName' does not match the expected name 'fn_FormatFullName'
+/builds/risk-engineering/PublicRecords/.ci_root/../InsuranceHeader_BestOfBest/Layouts.ecl(23,3): warning C2112: A field called DID is already defined in this record
+0 error, 3 warnings
+----------------------------------------------------------
+
+[[ RiskIntelligenceNetwork_Services.ReportService ]]
+----------------------------------------------------------
+/builds/risk-engineering/PublicRecords/.ci_root/../ut/fn_FormatFullName.ecl(2,2): warning C2380: Name of exported symbol 'FormatLastName' does not match the expected name 'fn_FormatFullName'
+/builds/risk-engineering/PublicRecords/.ci_root/../ut/fn_FormatFullName.ecl(11,2): warning C2380: Name of exported symbol 'FormatFirstName' does not match the expected name 'fn_FormatFullName'
+/builds/risk-engineering/PublicRecords/.ci_root/../InsuranceHeader_BestOfBest/Layouts.ecl(23,3): warning C2112: A field called DID is already defined in this record
+0 error, 3 warnings
+----------------------------------------------------------
+
+[[ RiskIntelligenceNetwork_Services.SearchService ]]
+----------------------------------------------------------
+/builds/risk-engineering/PublicRecords/.ci_root/../ut/fn_FormatFullName.ecl(2,2): warning C2380: Name of exported symbol 'FormatLastName' does not match the expected name 'fn_FormatFullName'
+/builds/risk-engineering/PublicRecords/.ci_root/../ut/fn_FormatFullName.ecl(11,2): warning C2380: Name of exported symbol 'FormatFirstName' does not match the expected name 'fn_FormatFullName'
+/builds/risk-engineering/PublicRecords/.ci_root/../InsuranceHeader_BestOfBest/Layouts.ecl(23,3): warning C2112: A field called DID is already defined in this record
+0 error, 3 warnings
+----------------------------------------------------------
+
+[[ RiskView.Batch_Service ]]
+----------------------------------------------------------
+/builds/risk-engineering/PublicRecords/.ci_root/../tools/mac_FilesIndex.ecl(28,2): warning C2380: Name of exported symbol 'fcra_key' does not match the expected name 'key_HRI_Address_To_SIC_filtered_fcra'
+/builds/risk-engineering/PublicRecords/.ci_root/../Risk_Indicators/Key_HRI_Address_To_Sic_filtered_FCRA.ecl(5,253): warning C2380: While expanding macro mac_filesindex
+/builds/risk-engineering/PublicRecords/.ci_root/../RiskView/Search_RptFunction.ecl(331,68): warning C2003: substring applied to value of type Integer
+/builds/risk-engineering/PublicRecords/.ci_root/../RiskWiseFCRA/_Lien_RV_data.ecl(62,81): warning C2003: substring applied to value of type Integer
+/builds/risk-engineering/PublicRecords/.ci_root/../RiskView/Search_RptFunction.ecl(85,80): warning C2003: While expanding macro _lien_rv_data
+/builds/risk-engineering/PublicRecords/.ci_root/../RiskWiseFCRA/_Lien_RV_data.ecl(20,69): warning C2003: substring applied to value of type Integer
+/builds/risk-engineering/PublicRecords/.ci_root/../RiskView/Search_RptFunction.ecl(85,80): warning C2003: While expanding macro _lien_rv_data
+/builds/risk-engineering/PublicRecords/.ci_root/../RiskView/Search_RptFunction.ecl(262,115): warning C2003: substring applied to value of type Integer
+/builds/risk-engineering/PublicRecords/.ci_root/../RiskView/Search_RptFunction.ecl(364,93): warning C2003: substring applied to value of type Integer
+/builds/risk-engineering/PublicRecords/.ci_root/../RiskWiseFCRA/_Inquiries_data.ecl(187,33): warning C2003: substring applied to value of type Integer
+0 error, 10 warnings
+----------------------------------------------------------
+
+[[ RiskView.Search_Service ]]
+----------------------------------------------------------
+/builds/risk-engineering/PublicRecords/.ci_root/../tools/mac_FilesIndex.ecl(28,2): warning C2380: Name of exported symbol 'fcra_key' does not match the expected name 'key_HRI_Address_To_SIC_filtered_fcra'
+/builds/risk-engineering/PublicRecords/.ci_root/../Risk_Indicators/Key_HRI_Address_To_Sic_filtered_FCRA.ecl(5,253): warning C2380: While expanding macro mac_filesindex
+/builds/risk-engineering/PublicRecords/.ci_root/../RiskView/Search_RptFunction.ecl(331,68): warning C2003: substring applied to value of type Integer
+/builds/risk-engineering/PublicRecords/.ci_root/../RiskWiseFCRA/_Lien_RV_data.ecl(62,81): warning C2003: substring applied to value of type Integer
+/builds/risk-engineering/PublicRecords/.ci_root/../RiskView/Search_RptFunction.ecl(85,80): warning C2003: While expanding macro _lien_rv_data
+/builds/risk-engineering/PublicRecords/.ci_root/../RiskWiseFCRA/_Lien_RV_data.ecl(20,69): warning C2003: substring applied to value of type Integer
+/builds/risk-engineering/PublicRecords/.ci_root/../RiskView/Search_RptFunction.ecl(85,80): warning C2003: While expanding macro _lien_rv_data
+/builds/risk-engineering/PublicRecords/.ci_root/../RiskView/Search_RptFunction.ecl(262,115): warning C2003: substring applied to value of type Integer
+/builds/risk-engineering/PublicRecords/.ci_root/../RiskView/Search_RptFunction.ecl(364,93): warning C2003: substring applied to value of type Integer
+/builds/risk-engineering/PublicRecords/.ci_root/../RiskWiseFCRA/_Inquiries_data.ecl(187,33): warning C2003: substring applied to value of type Integer
+0 error, 10 warnings
+----------------------------------------------------------
+
+[[ RiskWise.CBDO_Batch_Service ]]
+----------------------------------------------------------
+/builds/risk-engineering/PublicRecords/.ci_root/../Risk_Indicators/Boca_Shell_BtSt_Properties.ecl(40,3): warning C2112: A field called ln_fares_id is already defined in this record
+/builds/risk-engineering/PublicRecords/.ci_root/../Risk_Indicators/Boca_Shell_BtSt_Properties.ecl(40,3): warning C2112: A field called did is already defined in this record
+0 error, 2 warnings
+----------------------------------------------------------
+
+[[ RiskWise.IT1O_Batch_Service ]]
+----------------------------------------------------------
+/builds/risk-engineering/PublicRecords/.ci_root/../Models/RecoverScore2.ecl(123,36): warning C2003: substring applied to value of type Integer
+0 error, 1 warning
+----------------------------------------------------------
+
+[[ RiskWise.PR2O_Batch_Service ]]
+----------------------------------------------------------
+/builds/risk-engineering/PublicRecords/.ci_root/../Risk_Indicators/Boca_Shell_BtSt_Properties.ecl(40,3): warning C2112: A field called ln_fares_id is already defined in this record
+/builds/risk-engineering/PublicRecords/.ci_root/../Risk_Indicators/Boca_Shell_BtSt_Properties.ecl(40,3): warning C2112: A field called did is already defined in this record
+0 error, 2 warnings
+----------------------------------------------------------
+
+[[ RiskWise.RiskWiseMainCBDO ]]
+----------------------------------------------------------
+/builds/risk-engineering/PublicRecords/.ci_root/../Risk_Indicators/Boca_Shell_BtSt_Properties.ecl(40,3): warning C2112: A field called ln_fares_id is already defined in this record
+/builds/risk-engineering/PublicRecords/.ci_root/../Risk_Indicators/Boca_Shell_BtSt_Properties.ecl(40,3): warning C2112: A field called did is already defined in this record
+0 error, 2 warnings
+----------------------------------------------------------
+
+[[ RiskWise.RiskWiseMainCDxO ]]
+----------------------------------------------------------
+/builds/risk-engineering/PublicRecords/.ci_root/../Risk_Indicators/Boca_Shell_BtSt_Properties.ecl(40,3): warning C2112: A field called ln_fares_id is already defined in this record
+/builds/risk-engineering/PublicRecords/.ci_root/../Risk_Indicators/Boca_Shell_BtSt_Properties.ecl(40,3): warning C2112: A field called did is already defined in this record
+0 error, 2 warnings
+----------------------------------------------------------
+
+[[ RiskWise.RiskWiseMainDLLO ]]
+----------------------------------------------------------
+/builds/risk-engineering/PublicRecords/.ci_root/../Risk_Indicators/Boca_Shell_BtSt_Properties.ecl(40,3): warning C2112: A field called ln_fares_id is already defined in this record
+/builds/risk-engineering/PublicRecords/.ci_root/../Risk_Indicators/Boca_Shell_BtSt_Properties.ecl(40,3): warning C2112: A field called did is already defined in this record
+0 error, 2 warnings
+----------------------------------------------------------
+
+[[ RiskWise.RiskWiseMainIT1O ]]
+----------------------------------------------------------
+/builds/risk-engineering/PublicRecords/.ci_root/../Models/RecoverScore2.ecl(123,36): warning C2003: substring applied to value of type Integer
+0 error, 1 warning
+----------------------------------------------------------
+
+[[ RiskWise.RiskWiseMainPR2O ]]
+----------------------------------------------------------
+/builds/risk-engineering/PublicRecords/.ci_root/../Risk_Indicators/Boca_Shell_BtSt_Properties.ecl(40,3): warning C2112: A field called ln_fares_id is already defined in this record
+/builds/risk-engineering/PublicRecords/.ci_root/../Risk_Indicators/Boca_Shell_BtSt_Properties.ecl(40,3): warning C2112: A field called did is already defined in this record
+0 error, 2 warnings
+----------------------------------------------------------
+
+[[ RiskWise.RiskWiseMainSC1O ]]
+----------------------------------------------------------
+/builds/risk-engineering/PublicRecords/.ci_root/../Risk_Indicators/Boca_Shell_BtSt_Properties.ecl(40,3): warning C2112: A field called ln_fares_id is already defined in this record
+/builds/risk-engineering/PublicRecords/.ci_root/../Risk_Indicators/Boca_Shell_BtSt_Properties.ecl(40,3): warning C2112: A field called did is already defined in this record
+0 error, 2 warnings
+----------------------------------------------------------
+
+[[ RiskWise.RiskWiseMainSD1O ]]
+----------------------------------------------------------
+/builds/risk-engineering/PublicRecords/.ci_root/../Risk_Indicators/Boca_Shell_BtSt_Properties.ecl(40,3): warning C2112: A field called ln_fares_id is already defined in this record
+/builds/risk-engineering/PublicRecords/.ci_root/../Risk_Indicators/Boca_Shell_BtSt_Properties.ecl(40,3): warning C2112: A field called did is already defined in this record
+0 error, 2 warnings
+----------------------------------------------------------
+
+[[ RiskWise.RiskwiseMainSS1O ]]
+----------------------------------------------------------
+/builds/risk-engineering/PublicRecords/.ci_root/../Risk_Indicators/Boca_Shell_BtSt_Properties.ecl(40,3): warning C2112: A field called ln_fares_id is already defined in this record
+/builds/risk-engineering/PublicRecords/.ci_root/../Risk_Indicators/Boca_Shell_BtSt_Properties.ecl(40,3): warning C2112: A field called did is already defined in this record
+0 error, 2 warnings
+----------------------------------------------------------
+
+[[ RiskWise.SC1O_Batch_Service ]]
+----------------------------------------------------------
+/builds/risk-engineering/PublicRecords/.ci_root/../Risk_Indicators/Boca_Shell_BtSt_Properties.ecl(40,3): warning C2112: A field called ln_fares_id is already defined in this record
+/builds/risk-engineering/PublicRecords/.ci_root/../Risk_Indicators/Boca_Shell_BtSt_Properties.ecl(40,3): warning C2112: A field called did is already defined in this record
+0 error, 2 warnings
+----------------------------------------------------------
+
+[[ RiskWise.SD1O_Batch_Service ]]
+----------------------------------------------------------
+/builds/risk-engineering/PublicRecords/.ci_root/../Risk_Indicators/Boca_Shell_BtSt_Properties.ecl(40,3): warning C2112: A field called ln_fares_id is already defined in this record
+/builds/risk-engineering/PublicRecords/.ci_root/../Risk_Indicators/Boca_Shell_BtSt_Properties.ecl(40,3): warning C2112: A field called did is already defined in this record
+0 error, 2 warnings
+----------------------------------------------------------
+
+[[ RiskWise.VRU_IdentityService ]]
+----------------------------------------------------------
+/builds/risk-engineering/PublicRecords/.ci_root/../RiskWise/VRU_IdentityService.ecl(225,44): warning C2003: substring applied to value of type Integer
+/builds/risk-engineering/PublicRecords/_tmp_ecl.ecl(1,31): warning C2003: While expanding macro vru_identityservice
+0 error, 2 warnings
+----------------------------------------------------------
+
+[[ RiskWiseFCRA.FCRAData_Service ]]
+----------------------------------------------------------
+/builds/risk-engineering/PublicRecords/.ci_root/../tools/mac_FilesIndex.ecl(28,2): warning C2380: Name of exported symbol 'fcra_key' does not match the expected name 'key_HRI_Address_To_SIC_filtered_fcra'
+/builds/risk-engineering/PublicRecords/.ci_root/../Risk_Indicators/Key_HRI_Address_To_Sic_filtered_FCRA.ecl(5,253): warning C2380: While expanding macro mac_filesindex
+/builds/risk-engineering/PublicRecords/.ci_root/../RiskWiseFCRA/_Inquiries_data.ecl(187,33): warning C2003: substring applied to value of type Integer
+0 error, 3 warnings
+----------------------------------------------------------
+
+[[ RiskWiseFCRA.RiskWiseMainSC1O ]]
+----------------------------------------------------------
+/builds/risk-engineering/PublicRecords/.ci_root/../tools/mac_FilesIndex.ecl(28,2): warning C2380: Name of exported symbol 'fcra_key' does not match the expected name 'key_HRI_Address_To_SIC_filtered_FCRA'
+/builds/risk-engineering/PublicRecords/.ci_root/../Risk_Indicators/Key_HRI_Address_To_Sic_filtered_FCRA.ecl(5,253): warning C2380: While expanding macro mac_filesindex
+0 error, 2 warnings
+----------------------------------------------------------
+
+[[ RiskWiseFCRA.RiskWiseMainSD1O ]]
+----------------------------------------------------------
+/builds/risk-engineering/PublicRecords/.ci_root/../tools/mac_FilesIndex.ecl(28,2): warning C2380: Name of exported symbol 'fcra_key' does not match the expected name 'key_HRI_Address_To_SIC_filtered_FCRA'
+/builds/risk-engineering/PublicRecords/.ci_root/../Risk_Indicators/Key_HRI_Address_To_Sic_filtered_FCRA.ecl(5,253): warning C2380: While expanding macro mac_filesindex
+0 error, 2 warnings
+----------------------------------------------------------
+
+[[ Risk_Indicators.Boca_Shell ]]
+----------------------------------------------------------
+/builds/risk-engineering/PublicRecords/.ci_root/../tools/mac_FilesIndex.ecl(28,2): warning C2380: Name of exported symbol 'fcra_key' does not match the expected name 'key_HRI_Address_To_SIC_filtered_FCRA'
+/builds/risk-engineering/PublicRecords/.ci_root/../Risk_Indicators/Key_HRI_Address_To_Sic_filtered_FCRA.ecl(5,253): warning C2380: While expanding macro mac_filesindex
+0 error, 2 warnings
+----------------------------------------------------------
+
+[[ Risk_Indicators.Boca_Shell_BtSt_Service ]]
+----------------------------------------------------------
+/builds/risk-engineering/PublicRecords/.ci_root/../Risk_Indicators/Boca_Shell_BtSt_Properties.ecl(40,3): warning C2112: A field called ln_fares_id is already defined in this record
+/builds/risk-engineering/PublicRecords/.ci_root/../Risk_Indicators/Boca_Shell_BtSt_Properties.ecl(40,3): warning C2112: A field called did is already defined in this record
+0 error, 2 warnings
+----------------------------------------------------------
+
+[[ Risk_Indicators.Collection_Shell_Service ]]
+----------------------------------------------------------
+/builds/risk-engineering/PublicRecords/.ci_root/../PhonesFeedback_Services/CleanDate.ecl(89,39): warning C2003: substring applied to value of type Integer
+0 error, 1 warning
+----------------------------------------------------------
+
+[[ Risk_Indicators.Contactability_Batch_Service ]]
+----------------------------------------------------------
+/builds/risk-engineering/PublicRecords/.ci_root/../PhonesFeedback_Services/CleanDate.ecl(89,39): warning C2003: substring applied to value of type Integer
+0 error, 1 warning
+----------------------------------------------------------
+
+[[ Risk_Indicators.LIB_Boca_Shell_Function ]]
+----------------------------------------------------------
+/builds/risk-engineering/PublicRecords/.ci_root/../tools/mac_FilesIndex.ecl(28,2): warning C2380: Name of exported symbol 'fcra_key' does not match the expected name 'Key_HRI_Address_To_Sic_filtered_FCRA'
+/builds/risk-engineering/PublicRecords/.ci_root/../Risk_Indicators/Key_HRI_Address_To_Sic_filtered_FCRA.ecl(5,253): warning C2380: While expanding macro mac_filesindex
+0 error, 2 warnings
+----------------------------------------------------------
+
+[[ Risk_Indicators.LIB_Boca_Shell_Function_FCRA ]]
+----------------------------------------------------------
+/builds/risk-engineering/PublicRecords/.ci_root/../tools/mac_FilesIndex.ecl(28,2): warning C2380: Name of exported symbol 'fcra_key' does not match the expected name 'key_HRI_Address_To_SIC_filtered_FCRA'
+/builds/risk-engineering/PublicRecords/.ci_root/../Risk_Indicators/Key_HRI_Address_To_Sic_filtered_FCRA.ecl(5,253): warning C2380: While expanding macro mac_filesindex
+0 error, 2 warnings
+----------------------------------------------------------
+
+[[ Risk_Indicators.LIB_InstantID_Function ]]
+----------------------------------------------------------
+/builds/risk-engineering/PublicRecords/.ci_root/../tools/mac_FilesIndex.ecl(28,2): warning C2380: Name of exported symbol 'fcra_key' does not match the expected name 'key_HRI_Address_To_SIC_filtered_FCRA'
+/builds/risk-engineering/PublicRecords/.ci_root/../Risk_Indicators/Key_HRI_Address_To_Sic_filtered_FCRA.ecl(5,253): warning C2380: While expanding macro mac_filesindex
+/builds/risk-engineering/PublicRecords/.ci_root/../InsuranceHeader_BestOfBest/Layouts.ecl(18,3): warning C2112: A field called DID is already defined in this record
+/builds/risk-engineering/PublicRecords/.ci_root/../InsuranceHeader_BestOfBest/Layouts.ecl(23,3): warning C2112: A field called DID is already defined in this record
+0 error, 4 warnings
+----------------------------------------------------------
+
+[[ Risk_Indicators.LIB_InstantID_Function_FCRA ]]
+----------------------------------------------------------
+/builds/risk-engineering/PublicRecords/.ci_root/../tools/mac_FilesIndex.ecl(28,2): warning C2380: Name of exported symbol 'fcra_key' does not match the expected name 'key_HRI_Address_To_SIC_filtered_FCRA'
+/builds/risk-engineering/PublicRecords/.ci_root/../Risk_Indicators/Key_HRI_Address_To_Sic_filtered_FCRA.ecl(5,253): warning C2380: While expanding macro mac_filesindex
+0 error, 2 warnings
+----------------------------------------------------------
+
+[[ SANCTN_Services.FocusSearchService ]]
+----------------------------------------------------------
+/builds/risk-engineering/PublicRecords/.ci_root/../SANCTN_Services/GetDataSourceByID.ecl(12,1): warning C2380: Name of exported symbol 'OUT_REC' does not match the expected name 'GetDataSourceByID'
+/builds/risk-engineering/PublicRecords/.ci_root/../SANCTN_Services/GetDataSourceByID.ecl(16,1): warning C2380: Name of exported symbol 'GetBestCity' does not match the expected name 'GetDataSourceByID'
+0 error, 2 warnings
+----------------------------------------------------------
+
+[[ SANCTN_Services.SanctnSearchService ]]
+----------------------------------------------------------
+/builds/risk-engineering/PublicRecords/.ci_root/../SANCTN_Services/GetDataSourceByID.ecl(12,1): warning C2380: Name of exported symbol 'OUT_REC' does not match the expected name 'GetDataSourceByID'
+/builds/risk-engineering/PublicRecords/.ci_root/../SANCTN_Services/GetDataSourceByID.ecl(16,1): warning C2380: Name of exported symbol 'GetBestCity' does not match the expected name 'GetDataSourceByID'
+0 error, 2 warnings
+----------------------------------------------------------
+
+[[ SexOffender_Services.SearchService ]]
+----------------------------------------------------------
+/builds/risk-engineering/PublicRecords/.ci_root/../InsuranceHeader_BestOfBest/Layouts.ecl(23,3): warning C2112: A field called DID is already defined in this record
+/builds/risk-engineering/PublicRecords/.ci_root/../PhonesFeedback_Services/CleanDate.ecl(89,39): warning C2003: substring applied to value of type Integer
+0 error, 2 warnings
+----------------------------------------------------------
+
+[[ SexOffender_Services.SearchServiceFCRA ]]
+----------------------------------------------------------
+/builds/risk-engineering/PublicRecords/.ci_root/../InsuranceHeader_BestOfBest/Layouts.ecl(23,3): warning C2112: A field called DID is already defined in this record
+/builds/risk-engineering/PublicRecords/.ci_root/../PhonesFeedback_Services/CleanDate.ecl(89,39): warning C2003: substring applied to value of type Integer
+0 error, 2 warnings
+----------------------------------------------------------
+
+[[ SiteSec_ISMS_Services.SearchService ]]
+----------------------------------------------------------
+/builds/risk-engineering/PublicRecords/.ci_root/../SiteSec_ISMS/Cluster.ecl(2,1): warning C2380: Name of exported symbol 'Cluster_in' does not match the expected name 'cluster'
+0 error, 1 warning
+----------------------------------------------------------
+
+[[ SNA.MortgageCollusion_Batch_Service ]]
+----------------------------------------------------------
+/builds/risk-engineering/PublicRecords/.ci_root/../SNA/MortgageCollusion_Function.ecl(285,16): warning C2003: substring applied to value of type Integer
+0 error, 1 warning
+----------------------------------------------------------
+
+[[ Statewide_Services.CountService ]]
+----------------------------------------------------------
+/builds/risk-engineering/PublicRecords/.ci_root/../GSA_Services/Layouts.ecl(124,4): warning C2112: A field called gsa_id is already defined in this record
+/builds/risk-engineering/PublicRecords/.ci_root/../DriversV2_Services/wildcard.ecl(21,34): warning C2003: substring applied to value of type Integer
+/builds/risk-engineering/PublicRecords/.ci_root/../InsuranceHeader_BestOfBest/Layouts.ecl(23,3): warning C2112: A field called DID is already defined in this record
+0 error, 3 warnings
+----------------------------------------------------------
+
+[[ Statewide_Services.FAB_SearchService ]]
+----------------------------------------------------------
+/builds/risk-engineering/PublicRecords/.ci_root/../GSA_Services/Layouts.ecl(124,4): warning C2112: A field called gsa_id is already defined in this record
+0 error, 1 warning
+----------------------------------------------------------
+
+[[ Statewide_Services.FAP_SearchService ]]
+----------------------------------------------------------
+/builds/risk-engineering/PublicRecords/.ci_root/../GSA_Services/Layouts.ecl(124,4): warning C2112: A field called gsa_id is already defined in this record
+/builds/risk-engineering/PublicRecords/.ci_root/../DriversV2_Services/wildcard.ecl(21,34): warning C2003: substring applied to value of type Integer
+/builds/risk-engineering/PublicRecords/.ci_root/../InsuranceHeader_BestOfBest/Layouts.ecl(23,3): warning C2112: A field called DID is already defined in this record
+0 error, 3 warnings
+----------------------------------------------------------
+
+[[ SupplierRisk_Services.SupplierRiskReport_Service ]]
+----------------------------------------------------------
+/builds/risk-engineering/PublicRecords/.ci_root/../LaborActions_WHD/cluster.ecl(2,1): warning C2380: Name of exported symbol 'Cluster_in' does not match the expected name 'cluster'
+0 error, 1 warning
+----------------------------------------------------------
+
+[[ TeaserSearchServices.ThinTeaserRollupService ]]
+----------------------------------------------------------
+/builds/risk-engineering/PublicRecords/.ci_root/../PhonesFeedback_Services/CleanDate.ecl(89,39): warning C2003: substring applied to value of type Integer
+0 error, 1 warning
+----------------------------------------------------------
+
+[[ TeaserSearchServices.ThinTeaserService ]]
+----------------------------------------------------------
+/builds/risk-engineering/PublicRecords/.ci_root/../PhonesFeedback_Services/CleanDate.ecl(89,39): warning C2003: substring applied to value of type Integer
+0 error, 1 warning
+----------------------------------------------------------
+
+[[ TopBusiness_Services.BusinessReportComprehensive ]]
+----------------------------------------------------------
+/builds/risk-engineering/PublicRecords/.ci_root/../LaborActions_WHD/cluster.ecl(2,1): warning C2380: Name of exported symbol 'Cluster_in' does not match the expected name 'cluster'
+0 error, 1 warning
+----------------------------------------------------------
+
+[[ TopBusiness_Services.SourceCountService ]]
+----------------------------------------------------------
+/builds/risk-engineering/PublicRecords/.ci_root/../tools/mac_RedefineFormat.ecl(779,1): warning C1048: EXPORT/SHARED qualifiers are ignored in this context
+/builds/risk-engineering/PublicRecords/.ci_root/../tools/mac_RedefineFormat.ecl(318,12): warning C1048: While expanding macro <param>
+/builds/risk-engineering/PublicRecords/.ci_root/../DNB_DMI/File_Companies_Keybuild.ecl(26,86): warning C1048: While expanding macro mac_redefineformat
+/builds/risk-engineering/PublicRecords/.ci_root/../TopBusiness_Services/SourceCount.ecl(60,4): warning C1048: EXPORT/SHARED qualifiers are ignored in this context
+0 error, 4 warnings
+----------------------------------------------------------
+
+[[ TopBusiness_Services.SourceService ]]
+----------------------------------------------------------
+/builds/risk-engineering/PublicRecords/.ci_root/../LaborActions_WHD/cluster.ecl(2,1): warning C2380: Name of exported symbol 'Cluster_in' does not match the expected name 'cluster'
+0 error, 1 warning
+----------------------------------------------------------
+
+[[ UPS_Services.RightAddressService ]]
+----------------------------------------------------------
+/builds/risk-engineering/PublicRecords/.ci_root/../PhonesFeedback_Services/CleanDate.ecl(89,39): warning C2003: substring applied to value of type Integer
+0 error, 1 warning
+----------------------------------------------------------
+
+[[ VehicleV2_Services.RealTime_Batch_Service_V2 ]]
+----------------------------------------------------------
+/builds/risk-engineering/PublicRecords/.ci_root/../PhonesFeedback_Services/CleanDate.ecl(89,39): warning C2003: substring applied to value of type Integer
+/builds/risk-engineering/PublicRecords/.ci_root/../InsuranceHeader_BestOfBest/Layouts.ecl(23,3): warning C2112: A field called DID is already defined in this record
+0 error, 2 warnings
+----------------------------------------------------------
+
+[[ VerificationOfOccupancy.Batch_Service ]]
+----------------------------------------------------------
+/builds/risk-engineering/PublicRecords/.ci_root/../tools/mac_FilesIndex.ecl(28,2): warning C2380: Name of exported symbol 'fcra_key' does not match the expected name 'key_HRI_Address_To_SIC_filtered_fcra'
+/builds/risk-engineering/PublicRecords/.ci_root/../Risk_Indicators/Key_HRI_Address_To_Sic_filtered_FCRA.ecl(5,253): warning C2380: While expanding macro mac_filesindex
+/builds/risk-engineering/PublicRecords/.ci_root/../PhonesFeedback_Services/CleanDate.ecl(89,39): warning C2003: substring applied to value of type Integer
+/builds/risk-engineering/PublicRecords/.ci_root/../InsuranceHeader_BestOfBest/Layouts.ecl(23,3): warning C2112: A field called DID is already defined in this record
+0 error, 4 warnings
+----------------------------------------------------------
+
+[[ VerificationOfOccupancy.PAR_Search_Service ]]
+----------------------------------------------------------
+/builds/risk-engineering/PublicRecords/.ci_root/../tools/mac_FilesIndex.ecl(28,2): warning C2380: Name of exported symbol 'fcra_key' does not match the expected name 'key_HRI_Address_To_SIC_filtered_fcra'
+/builds/risk-engineering/PublicRecords/.ci_root/../Risk_Indicators/Key_HRI_Address_To_Sic_filtered_FCRA.ecl(5,253): warning C2380: While expanding macro mac_filesindex
+/builds/risk-engineering/PublicRecords/.ci_root/../PhonesFeedback_Services/CleanDate.ecl(89,39): warning C2003: substring applied to value of type Integer
+/builds/risk-engineering/PublicRecords/.ci_root/../InsuranceHeader_BestOfBest/Layouts.ecl(23,3): warning C2112: A field called DID is already defined in this record
+0 error, 4 warnings
+----------------------------------------------------------
+
+[[ VerificationOfOccupancy.Search_Service ]]
+----------------------------------------------------------
+/builds/risk-engineering/PublicRecords/.ci_root/../tools/mac_FilesIndex.ecl(28,2): warning C2380: Name of exported symbol 'fcra_key' does not match the expected name 'key_HRI_Address_To_SIC_filtered_fcra'
+/builds/risk-engineering/PublicRecords/.ci_root/../Risk_Indicators/Key_HRI_Address_To_Sic_filtered_FCRA.ecl(5,253): warning C2380: While expanding macro mac_filesindex
+/builds/risk-engineering/PublicRecords/.ci_root/../PhonesFeedback_Services/CleanDate.ecl(89,39): warning C2003: substring applied to value of type Integer
+/builds/risk-engineering/PublicRecords/.ci_root/../InsuranceHeader_BestOfBest/Layouts.ecl(23,3): warning C2112: A field called DID is already defined in this record
+0 error, 4 warnings
+----------------------------------------------------------
+
+[[ WorkPlace_Services.Plus_SearchService ]]
+----------------------------------------------------------
+/builds/risk-engineering/PublicRecords/.ci_root/../PhonesFeedback_Services/CleanDate.ecl(89,39): warning C2003: substring applied to value of type Integer
+/builds/risk-engineering/PublicRecords/.ci_root/../InsuranceHeader_BestOfBest/Layouts.ecl(23,3): warning C2112: A field called DID is already defined in this record
+0 error, 2 warnings
+----------------------------------------------------------
+

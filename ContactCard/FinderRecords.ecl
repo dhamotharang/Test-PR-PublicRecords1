@@ -1,4 +1,4 @@
-﻿import person_models,moxie_phonesplus_server,doxie_raw,header,Relocations,doxie,dx_death_master,address,PhonesFeedback_Services,
+﻿import ADDRESS,person_models,moxie_phonesplus_server,doxie_raw,header,Relocations,doxie,dx_death_master,PhonesFeedback_Services,
       AutoStandardI,DeathV2_Services,suppress, ContactCard, STD, MDR,
       PhonesFeedback;  // PhonesFeedback is used in macro Mac_Append_Feedback()
 
@@ -11,37 +11,92 @@ con := ContactCard.constants;
 rec := ContactCard.layouts;
 storeds := ContactCard.storeds;
 
-export FinderRecords(
-  dataset(doxie.layout_references) dids,
-  doxie.IDataAccess mod_access):=
-MODULE
+contact_addr_rec := RECORD
+ rec.contact_rec;
+ rec.addr_rec;
+END;
 
-shared subjectDIDs := dids;
-shared subjectDID := max(subjectDIDs, did);
+contact_addr_plus_rec := RECORD(contact_addr_rec)
+ string2 addr_ind;
+ string2 best_addr_rank;
+END;
 
-shared newEnough(unsigned2 yr) := yr + con.max_AgeOfData >= (unsigned2)(((STRING)STD.Date.Today())[1..4]);
+getSubjectDeceasedData (unsigned _subjectDID, DeathV2_Services.IParam.DeathRestrictions _death_params) := FUNCTION
+//***** SEE IF DECEASED
+  subject_did := dataset([{_subjectDID}], doxie.layout_references);
+  subject_death_recs := dx_death_master.Get.byDid(subject_did, did, _death_params, , con.max_subject);
 
+  dodpadlock_rec := RECORD
+    dx_death_master.layout_death;
+    boolean IsLimitedAccessDMF:= false;
+  END;
+
+  SubjectDeathRecords_info := project(subject_death_recs, transform(dodpadlock_rec, self.IsLimitedAccessDMF := (left.death.src = MDR.sourceTools.src_Death_Restricted), self := left.death));
+  Death_source_grp :=  sort(group(sort(SubjectDeathRecords_info, did, dod8), did, dod8), if(IsLimitedAccessDMF, 1, 0));
+
+  Subject_DeathRecords := ungroup(iterate(Death_source_grp,
+                                              transform(dodpadlock_rec,
+                                                        self.IsLimitedAccessDMF := if(counter = 1, ((integer)right.dod8 != 0 and right.IsLimitedAccessDMF), left.IsLimitedAccessDMF) ,
+                                                        self := right)));
+
+  RETURN Subject_DeathRecords;
+END;
+
+newEnough(unsigned2 yr) := yr + con.max_AgeOfData >= (unsigned2)(((STRING)STD.Date.Today())[1..4]);
+
+getRelativesAssociates(dataset(doxie.layout_references) dids, doxie.IDataAccess mod_access) := FUNCTION
 //***** GET THE RELATIVES
 //	depth is input to service and defaults to 1 by #stored('RelativeDepth',con.default_RelativeDepth) in ContactCard.ReportService,
 //	so we can have depth beyond 1 in allrel
-shared allrel := Doxie_Raw.relative_raw(dids, mod_access,
+  allrel := Doxie_Raw.relative_raw(dids, mod_access,
                                               true, true,
                                               Relative_Depth, max_relatives);
 
 // rel is the group that i will actually consider relatives in the final output
 // there are some refs to allrel because we use them to figure out some of the relationships
 // note that depth>1 is allowed if newEnough
-shared rel := allrel(depth=1 or newEnough((unsigned2)(((STRING)recent_cohabit)[1..4])));
+  rel := allrel(depth=1 or newEnough((unsigned2)(((STRING)recent_cohabit)[1..4])));
+
+
+  rel_det := choosen(project(rel(isRelative and depth = 1),
+                                transform(rec.pridid_rec,
+                                            self.did:=left.person2,
+                                            self.priority := con.priority_relative,
+                                            self.relationship := if(left.titleNo <> 0, Header.relative_titles.fn_get_str_title(left.titleNo), con.str_Relative),
+                                            self:=left)),
+                                  con.max_relatives);
+
+//***** DID SETS
+  AssocDIDs 		:= 	choosen(sort(dedup(
+                          project(rel(~isRelative, number_cohabits >= con.min_number_cohabits),
+                                  transform(rec.pridid_rec,
+                                            self.did := left.person2,
+                                            self.priority := con.priority_associate,
+                                            self.relationship := con.str_Associate +
+                                              if(left.titleno=Header.relative_titles.num_transactionalAssociate,'',' ' + header.translateRelativePrimrange(left.rel_prim_range)),
+                                            self := left)),
+                          all),-recent_cohabit), con.max_associates);
+  deg2rels 	:= 	choosen(sort(dedup(
+                          project(rel(depth > 1, isRelative, number_cohabits >= con.min_number_cohabits),
+                                  transform(rec.pridid_rec,
+                                            self.did := left.person2,
+                                            self.priority := con.priority_relative,
+                                            self.relationship := if(left.titleNo <> 0, Header.relative_titles.fn_get_str_title(left.titleNo), con.str_Relative),
+                                            self := left)),
+                          all),depth,-recent_cohabit), con.max_relatives);
 
 // this just removes the deceased
-shared relassocdids := project(dx_death_master.Exclude(rel, person2, death_params),
-  transform(doxie.layout_references, self.did := left.person2));
+  all_rels := dx_death_master.Exclude(AssocDIDs+deg2rels+rel_det, did, death_params);
 
-//***** GET ALL THE HEADER RECORDS
+  RETURN all_rels;
+END;
+getSubjectRelAssocAddressHistory (dataset(doxie.layout_references) dids,
+                                  unsigned6 subjectDID,
+                                  doxie.IDataAccess mod_access) := FUNCTION
 
-shared csa := doxie.Comp_Subject_Addresses(dids + relassocdids, , dial_contactprecision_value, , mod_access);
+ csa := doxie.Comp_Subject_Addresses(dids, , dial_contactprecision_value, , mod_access);
 
-shared head_nopull := csa.raw;
+ head_nopull := csa.raw;
 
 //***** PULL IDS
 Suppress.MAC_Suppress(head_nopull,head_pull1,mod_access.application_type,Suppress.Constants.LinkTypes.DID,did);
@@ -50,75 +105,14 @@ Suppress.MAC_Suppress(head_pull1,head_pull2,mod_access.application_type,Suppress
 rna_IN := head_pull2(did<>subjectDID);
 header.MAC_GLB_DPPA_Clean_RNA(rna_in,head_pull2_rna,mod_access);
 
-export head := head_pull2_rna + head_pull2(did = subjectDID);
-
-//***** DETAILED RELS
-// this join removes associates and also relatives beyond depth of 1
-shared head_lessassoc := join(head, rel(~isRelative or depth > 1),
-                      left.did = right.person2,
-                      transform(doxie_raw.Layout_HeaderRawOutput, self := left),
-                      left only);
-
-export rel_det := choosen(project(rel(isRelative and depth = 1),
-                                transform({doxie_Raw.Layout_RelativeRawOutput,doxie.layout_references,string20 title},
-                                            self.did:=left.person2,
-                                            self.title:=Header.relative_titles.fn_get_str_title(left.titleNo),
-                                            self:=left)),
-                                  con.max_relatives);
-shared rel_lnames := dedup(project(head_lessassoc, {head_lessassoc.lname}), all);
-
-shared alldids_rec := record
-doxie.layout_references;
-rel.rel_prim_range;
-rel.recent_cohabit;
-rel.depth;
-rel.titleno;
-rel.type;
-rel.confidence;
-end;
-
-//***** DID SETS
-shared AssocDIDs 		:= 	choosen(sort(dedup(project(rel(~isRelative, number_cohabits >= con.min_number_cohabits), transform(alldids_rec, self.did := left.person2, self := left)), all),-recent_cohabit), con.max_associates);
-shared deg2relDIDs 	:= 	choosen(sort(dedup(project(rel(depth > 1, isRelative, number_cohabits >= con.min_number_cohabits), transform(alldids_rec, self.did := left.person2, self := left)), all),depth,-recent_cohabit), con.max_relatives);
-shared relDIDs   		:= 	dedup(project(rel_det, alldids_rec), all);
-shared spouseDIDs 		:=  project(rel_det(titleNo in Header.relative_titles.set_Spouse), doxie.layout_references);
-shared allDIDs_noNeibhors	:= 	dedup(sort(project(subjectDIDs, transform(rec.pridid_rec, self.priority := con.priority_subject, 		self := left)) +
-                                project(AssocDIDs, 	transform(rec.pridid_rec, self.priority := con.priority_associate, 	self := left)) +
-                                project(deg2relDIDs, transform(rec.pridid_rec, self.priority := con.priority_relative, 	self := left)) +
-                                project(relDIDs, 		transform(rec.pridid_rec, self.priority := con.priority_relative, 	self := left)),
-                                did, priority),
-                            did);
-
-//***** SEE IF DECEASED
-subject_did := dataset([{subjectDID}], doxie.layout_references);
-subject_death_recs := dx_death_master.Get.byDid(subject_did, did, death_params, , con.max_subject);
-
-dodpadlock_rec := RECORD
-  dx_death_master.layout_death;
-  boolean IsLimitedAccessDMF:= false;
-END;
-
-SubjectDeathRecords_info := project(subject_death_recs, transform(dodpadlock_rec, self.IsLimitedAccessDMF := (left.death.src = MDR.sourceTools.src_Death_Restricted), self := left.death));
-Death_source_grp :=  sort(group(sort(SubjectDeathRecords_info, did, dod8), did, dod8), if(IsLimitedAccessDMF, 1, 0));
-
-export SubjectDeathRecords := ungroup(iterate(Death_source_grp,
-                                              transform(dodpadlock_rec,
-                                                        self.IsLimitedAccessDMF := if(counter = 1, ((integer)right.dod8 != 0 and right.IsLimitedAccessDMF), left.IsLimitedAccessDMF) ,
-                                                        self := right)));
+ head := head_pull2_rna + head_pull2(did = subjectDID);
 
 
-shared boolean SubjectIsDeceased :=
-  exists(SubjectDeathRecords) or
-  exists(head(did = subjectDID and address.isDeathRecord(prim_name)));
-
-//***** PREPARE HEADER FOR GONG APPEND
-shared head_slim := sort(join(head,
-                      allDIDs_noNeibhors,
-                      left.did = right.did,
-                      transform({rec.contact_rec, rec.addr_rec},
-                                self.subject_dt_last_seen := if(right.priority = con.priority_subject, left.dt_last_seen, 0),  //mark subject recs so i can use them to populate subject_dt_last_seen in next join
+ head_slim := sort(PROJECT(head,
+                      transform(contact_addr_rec,
+                                self.subject_dt_last_seen := if(left.did = subjectdid, left.dt_last_seen, 0),  //mark subject recs so i can use them to populate subject_dt_last_seen in next join
                                 self.verified := address.isVerified(left.tnt, left.phone, left.listed_phone),
-                                self.timezone:='',self.listed_timezone :='',self := left)),
+                                self.timezone:='',self.listed_timezone :='', self := left)),
                   did, prim_range, prim_name, zip);
 
 head_slim rollem(head_slim l, head_slim r) := transform
@@ -145,7 +139,7 @@ shared_addrs := join(head_roll1(did = subjectDID), head_roll1(did <> subjectDID)
                       left.zip = right.zip,
                       transform({head_roll1.prim_name, head_roll1.prim_range, head_roll1.zip}, self := left));
 
-shared old_shared := join(head_roll1, dedup(shared_addrs, prim_name, prim_range, zip, all),
+  all_addresses := join(head_roll1, dedup(shared_addrs, prim_name, prim_range, zip, all),
                           left.prim_name=right.prim_name and
                           left.prim_range = right.prim_range and
                           left.zip = right.zip,
@@ -154,84 +148,77 @@ shared old_shared := join(head_roll1, dedup(shared_addrs, prim_name, prim_range,
                                       self := left),
                           left outer);
 
-export head_subject := old_shared(did = subjectDID);
-head_shared := old_shared(newEnough(dt_last_seen div 100) and not ut.isPOBox(prim_name));
+// AH macro , TNT & other logic 
+all_addresses_ah_sorted_pre := Header.Mac_Append_addr_ind(all_addresses, addr_ind, /*src*/, did, prim_range, prim_name, sec_range, city_name
+                                              , st, zip, predir, postdir, suffix, dt_first_seen, dt_last_seen, dt_vendor_first_reported
+                                              , dt_vendor_last_reported /*,isTrusted,*/ /*isFCRA,*/ /*hitQH,*/ /*debug*/);
+
+                     
+all_addresses_ah_sorted_plus := project(all_addresses_ah_sorted_pre,transform(contact_addr_plus_rec,
+                                   tnt := doxie.enhanceTNT(true, left.tnt, left.addr_ind, left.best_addr_rank);
+                                   self.tnt := tnt;
+                                   self.verified := ADDRESS.isVerified (tnt,,,true);
+                                   self.location_ID := left.locid;
+                                   self.addr_ind := left.addr_ind;
+                                   self.best_addr_rank := left.best_addr_rank;
+                                   self := left));
+           
+
+  RETURN all_addresses_ah_sorted_plus;
+END;
+
+
+getMostRecentAddresses(dataset(contact_addr_plus_rec) all_addresses,
+                         dataset(doxie.layout_references) deg2relDIDs) := FUNCTION
+
+//***** ONLY KEEP ADDRESSES THAT ARE YOUR NEWEST
+all_addresses_ah_sorted := sort(all_addresses,did,(unsigned) addr_ind, (unsigned) best_addr_rank);
+all_addresses_ah_best_only := dedup(all_addresses_ah_sorted,did);
 
 //***** APPEND SUBJECT_DT_LAST_SEEN
-head_roll2 := join(head_shared,
-                  head_shared(subject_dt_last_seen > 0),  //aka subject recs
+head_roll2 := join(all_addresses_ah_best_only,
+                  all_addresses(subject_dt_last_seen > 0),  //aka subject recs
                   left.prim_range = right.prim_range and
                   left.prim_name = right.prim_name and
                   left.zip = right.zip,
-                  transform({head_shared},
-                            self.subject_dt_last_seen := right.dt_last_seen,
-                            self.isSubject:=true,
+                  transform(contact_addr_rec,
+                            isSubject := right.subject_dt_last_seen > 0;  
+                            self.subject_dt_last_seen := if(isSubject,right.dt_last_seen,0),
+                            self.isSubject:= isSubject,
                             self := left),
                   left outer,
                   keep(1));
 
-//***** ONLY KEEP ADDRESSES THAT ARE YOUR NEWEST
-did_date1 := dedup(sort(head_roll2, did, -dt_last_seen), did);
-
+                     
 //***** ENFORCE STRICT DATE FOR 2ND DEGREE RELS
-did_date := join(did_date1, deg2relDIDs,
+deg2rel_with_date := join(head_roll2, deg2relDIDs,
                 left.did = right.did,
-                transform({did_date1},
-                          self.dt_last_seen := if(right.did = 0, left.dt_last_seen, max(did_date1, dt_last_seen)),
+                transform(contact_addr_rec,
+                          self.dt_last_seen := if(right.did = 0, left.dt_last_seen, max(head_roll2, dt_last_seen)),
                           self := left),
                 left outer);
 
-head_roll :=
-            join(head_roll2, did_date,
+
+latest_addrs :=
+            join(head_roll2, deg2rel_with_date,
                   left.did = right.did and
                   left.dt_last_seen = right.dt_last_seen,
-                  transform({head_shared}, self := left));
+                  transform(contact_addr_rec, self := left));
 
 
-//***** NEIGHBORS FOR SUBJECT AT MOST RECENT ADDRESS(ES)
-targetRecs := project(head_roll(did = subjectDID),
-                      transform(doxie.layout_nbr_targets,
-                                self.seqTarget := COUNTER;
-                                self := left
-                                ));
-mode := 'C';
-nbr := choosen(doxie.nbr_records(
-  targetRecs,
-  mode,
+RETURN latest_addrs;
+END;
 
-  // attrs declared in doxie.MAC_Selection_Declare
-  Max_Neighborhoods,
-  Neighbors_PerAddress,
-  Neighbors_Per_NA,
-  Neighbor_Recency,
-  mod_access := mod_access
-)(did <> subjectDID), con.max_neighbors);
+rank_apt(boolean aptOff, string listing_name) :=
+  map(not aptOff => 0,
+      aptOff     => map(exists(con.ds_AptWords(STD.STR.Find(listing_name, trim(word), 1) > 0)) => 1,
+                        2),
+      0);
 
-nbrAddrDIDs := 	dedup(sort(nbr, did,-dt_last_seen), did);
-nbrDIDs   	:= 	project(nbrAddrDIDs, doxie.layout_references);
-allDIDs		  := 	dedup(sort(
-                            allDIDs_noNeibhors +
-                            project(nbrDIDs, 		transform(rec.pridid_rec, self.priority := con.priority_neighbor, 	self := left)),
-                            did, priority),
-                        did);
-
-head_roll_wnei :=
-  head_roll +
-  project(nbr, transform({head_shared},
-                        self.subject_dt_last_seen := 0,
-                        self.shared_address := '';
-                        self.address_seq_no := -1,
-                        self.listed_phone := '',
-                        self.company_name := '',
-                        self.timezone :='',
-                        self.listed_timezone :='',
-                        self.verified := false,  //hard to compute here with no listed phone
-                        self.isSubject :=false,
-                          self.dt_vendor_first_reported := 0,
-                        self.dt_vendor_last_reported := 0,
-                        // self.Feedback:=[],
-                        self := left,
-                        self := []));
+getGongData(dataset(contact_addr_rec) head_roll_wnei,
+            dataset(doxie.layout_references) allDIDs,
+            dataset({string lname}) rel_lnames,
+            doxie.IDataAccess mod_access) := FUNCTION
 
 //***** FIND GONG BY ADDRESS
 fgong := dedup(project(head_roll_wnei, transform(doxie.layout_AppendGongByAddr_input,
@@ -264,7 +251,7 @@ rec.contact_phone_addr_rec_ext tra_pa(head_roll_wnei l, wgong r) := transform
   self.phone.dt_last_seen := l.dt_last_seen;
 end;
 
-phoneaddr := join(head_roll_wnei, wgong,
+all_gong_res := join(head_roll_wnei, wgong,
                   left.prim_Range = right.prim_range and
                   left.prim_name = right.prim_name and
                   left.zip = right.zip and
@@ -292,56 +279,137 @@ phoneaddr := join(head_roll_wnei, wgong,
                                         self := left,
                                         self := []))));
 
-//***** IF YOU ARE A NEIGHBOR, MAKE SURE YOU ARE NOT MATCHED UP WITH THE SUBJECT'S HOME PHONE (APT)
-subjectPhones := dedup(phoneaddr(contact.did = subjectDID and phone.phone <> '' and phone.listing_name <> ''), phone.phone, phone.listing_name, all);
 
-phoneaddr_cln :=
-          join(phoneaddr, subjectPhones,
-              left.contact.did in set(nbrDIDs, did) and
-              left.phone.phone = right.phone.phone and
-              left.phone.listing_name = right.phone.listing_name,
-              transform(rec.contact_phone_addr_rec_ext,
-                        self.phone.phone 					:= if(right.phone.phone <> '', '', 		left.phone.phone),
-                        self.phone.listing_name 		:= if(right.phone.phone <> '', '', 		left.phone.listing_name),
-                        self.phone.apartmentoffice := if(right.phone.phone <> '', false, left.phone.apartmentoffice),
-                        self := left),
-              left outer);
+  RETURN all_gong_res;
+END;
 
+//***** NEIGHBORS FOR SUBJECT AT MOST RECENT ADDRESS(ES)
+getNeighbors(DATASET(contact_addr_rec) subject_addrs, UNSIGNED6 subjectDID,
+             doxie.IDataAccess mod_access) := FUNCTION
 
-//***** KEEP ONE ADDRESS FOR EACH DID/PHONE COMBO	(HAS ADDED BENEFIT OF ALLOWING ONLY ONE PHONELESS ADDRESS PER PERSON)
-pa_ddp := ungroup(dedup(sort(group(sort(phoneaddr_cln, contact.did, phone.phone),
-                                  contact.did, phone.phone),
-                            if(length(trim(phone.phone)) = 10, 0, 1), doxie.tnt_score(addr.tnt), -addr.dt_last_seen),
-                        true));
+targetRecs := project(subject_addrs,
+                      transform(doxie.layout_nbr_targets,
+                                self.seqTarget := COUNTER;
+                                self := left
+                                ));
 
-//***** KEEP storeds.PHONESPERPERSON PHONES PER PERSON
-rank_apt(boolean aptOff,typeof(wgong.listing_name) listing_name) :=
-  map(not aptOff => 0,
-      aptOff     => map(exists(con.ds_AptWords(STD.STR.Find(listing_name, trim(word), 1) > 0)) => 1,
-                        2),
-      0);
+mode := 'C';
+nbr := choosen(doxie.nbr_records(
+  targetRecs,
+  mode,
 
-pa_srt := dedup(sort(pa_ddp, contact.did, if(length(trim(phone.phone)) = 10, 0, 1), doxie.tnt_score(addr.tnt), -addr.dt_last_seen, rank_apt(phone.apartmentoffice,phone.listing_name), ut.StringSimilar100(phone.listing_name, contact.lname), ut.StringSimilar100(phone.listing_name, contact.fname)),
-                contact.did, keep(storeds.PhonesPerPerson));
+  // attrs declared in doxie.MAC_Selection_Declare
+  Max_Neighborhoods,
+  Neighbors_PerAddress,
+  Neighbors_Per_NA,
+  Neighbor_Recency,
+  mod_access := mod_access
+)(did <> subjectDID), con.max_neighbors);
 
+  all_nbrs :=
+   project(nbr, transform(contact_addr_rec,
+                        self.subject_dt_last_seen := 0,
+                        self.shared_address := '';
+                        self.address_seq_no := -1,
+                        self.listed_phone := '',
+                        self.company_name := '',
+                        self.timezone :='',
+                        self.listed_timezone :='',
+                        self.verified := false,  //hard to compute here with no listed phone
+                        self.isSubject :=false,
+                          self.dt_vendor_first_reported := 0,
+                        self.dt_vendor_last_reported := 0,
+                        // self.Feedback:=[],
+                        self := left,
+                        self := []));
 
-boolean NoVerifiedHomeAddresses := not exists(pa_srt(addr.verified and contact.did = subjectDID));
+  RETURN all_nbrs;
+END;
 
-//***** PHONES +
-checkRNA := header.constants.checkRNA;
-ipp := Include_PhonesPlus_val;
-ipprna := storeds.IncludePhonesPlus_for_RNA;
+getWorkPhones(dataset(doxie.layout_references) _dids,
+              dataset(rec.pridid_rec) spouseDIDs,
+              DATASET(contact_addr_rec) old_shared,
+              doxie.IDataAccess mod_access) := FUNCTION
+
+  wphones_chsn1 := choosen(sort(doxie.Fn_PhonesAtWork(_dids+PROJECT(spouseDIDs, doxie.layout_references),
+                                  mod_access, con.min_PAWRecencyInDays,con.min_PAWConfidencescore),
+                              ut.StringSimilar100(contact.lname, phone.listing_name)),
+                        con.max_workphones);
+
+  wphones_chsn := join(wphones_chsn1, old_shared,
+                    left.contact.did = right.did and
+                    left.addr.prim_range = right.prim_range and
+                    left.addr.prim_name = right.prim_name and
+                    left.addr.zip = right.zip,
+                    transform({wphones_chsn1, contact_addr_rec.shared_address, contact_addr_rec.verified, contact_addr_rec.tnt},
+                              self.shared_address := right.shared_address,
+                              self.verified := right.verified,
+                              self.tnt := right.tnt,
+                              self := left),
+                    left outer,
+                    keep(1));
+
+  work_phones := join(wphones_chsn, spouseDIDs,
+            (unsigned6)left.contact.did = right.did,
+              transform(rec.rollup_rec2,
+                        self.relationship := if(right.did = 0, con.str_Subject, right.relationship);
+                        self.relationship_last_seen := right.recent_cohabit,
+                        self.priority := con.priority_WorkPhone,
+                        self.ReachMe := con.str_ReachMe(con.priority_WorkPhone);
+                        self.addr.shared_address := left.shared_address,
+                        self.addr.verified := left.verified,
+                        self := left,
+                        self := []), left outer);
+
+  RETURN work_phones;
+END;
+
+getSubjectPhonesPlus(
+   DATASET(doxie.layout_references) dids,
+   doxie.IDataAccess mod_access) := FUNCTION
+
 
 //get PP data for input subject only:
-ophones := if(ipp, moxie_phonesplus_server.phonesplus_did_records(dids(ipp),
-                      con.max_phonesplus, score_threshold_value, mod_access.glb, mod_access.dppa, con.min_PhonesPlusConfidencescore, true).w_timezoneSeenDt);
+ophones :=  moxie_phonesplus_server.phonesplus_did_records(dids,
+                      con.max_phonesplus, score_threshold_value, mod_access.glb, mod_access.dppa, con.min_PhonesPlusConfidencescore, true).w_timezoneSeenDt;
 
 ophones_chsn := choosen(sort(dedup(sort(ophones,phoneno,-last_seen),phoneno),-last_seen),con.max_phonesplus);
 
+pp_subject := project(ophones_chsn, transform(rec.rollup_rec2,
+                        self.relationship := con.str_Subject;
+                        self.priority := con.priority_PhonesPlus,
+                        self.ReachMe := con.str_ReachMe(con.priority_PhonesPlus);
+                        self.phone.phone := left.phoneno,
+                        self.phone.listing_name := left.listed_name,
+                        self.phone.publish_code := con.str_publish_code_yes,
+                        self.phone.PhoneType := con.str_phonesPlusType,
+                        self.phone.dt_last_seen := left.last_seen,
+                        self.contact.did := (unsigned6)left.did,
+                        self.contact.lname := left.name_last,
+                        self.contact.mname := left.name_middle,
+                        self.contact.fname := left.name_first,
+                        self.addr.city_name := left.city,
+                        self.addr.zip := left.z5,
+                        self.addr.zip4 := left.z4,
+                        self.addr.dt_last_seen := left.last_seen,
+                        self.addr.dt_first_seen := left.first_seen,
+                        self.addr := left,
+                        self := []));
+
+  RETURN pp_subject;
+END;
+
+
 //get Phones+ for RNA separately since GLB restrictions are different for RNA vs. subject
 // and we need to skip calculating penalties for relatives,associates,neighbors' dids as they are based on global module input:
-ophones_rna := if(ipprna, moxie_phonesplus_server.phonesplus_did_records(project(allDIDs(did<>subjectDID),doxie.layout_references)(ipprna),
-                              con.max_phonesplus, score_threshold_value, mod_access.glb, mod_access.dppa, con.min_PhonesPlusConfidencescore, false, false, checkRNA).w_timezoneSeenDt);
+getPhonesPlusRNA(
+               DATASET(doxie.layout_references) _all_dids,
+               DATASET(contact_addr_rec) nbrAddrDIDs,
+               doxie.IDataAccess mod_access
+               ) := FUNCTION
+
+ophones_rna := moxie_phonesplus_server.phonesplus_did_records(_all_dids,
+                              con.max_phonesplus, score_threshold_value, mod_access.glb, mod_access.dppa, con.min_PhonesPlusConfidencescore, false, false, header.constants.checkRNA).w_timezoneSeenDt;
 
 // we will keep only one record per phone/did combination similar to pa_ddp above and upto 10 Phones+ per did
 ophones_rna_grpd := group(dedup(sort(ophones_rna,did,phoneno,-last_seen,-first_seen),did,phoneno),did);
@@ -349,7 +417,8 @@ ophones_rna_chsn := topn(ophones_rna_grpd,con.max_phonesplus,did,-last_seen,reco
 
 // for neighbors we pull addresses from header, for others from Phones+
 // Instead of populating the cell phone address in the neighbors address results, populate the address used to identify person as a neighbor of the subject (based on up to 3-month-old addresses from header).
-oph_rna := join(ungroup(ophones_rna_chsn),nbrAddrDIDs, (unsigned6)left.did=right.did, transform(rec.contact_phone_addr_rec_ext,
+pplus_rna := join(ungroup(ophones_rna_chsn), nbrAddrDIDs,
+(unsigned6)left.did=right.did, transform(rec.contact_phone_addr_rec_ext,
                         self.phone.phone := left.phoneno,
                         self.phone.listing_name := left.listed_name,
                         self.phone.PhoneType := con.str_phonesPlusType,
@@ -374,111 +443,14 @@ oph_rna := join(ungroup(ophones_rna_chsn),nbrAddrDIDs, (unsigned6)left.did=right
                         self.addr.st := if(right.did > 0, right.st,left.st),
                         self := []),
                         left outer);
+  RETURN pplus_rna;
+END;
 
-// per new req.1.2.6 PPlus data for rels/asoc/neigb need to be combined within each section with gong phones(pa_srt):
-pa_pp := pa_srt + if(ipprna,oph_rna);
+getRelocation(UNSIGNED6 subjectDID) := FUNCTION
 
-//***** WORK PHONES
-wphones_chsn1 := choosen(sort(doxie.Fn_PhonesAtWork((dids+spouseDIDs)(not SubjectIsDeceased),
-                                  mod_access, con.min_PAWRecencyInDays,con.min_PAWConfidencescore),
-                              ut.StringSimilar100(contact.lname, phone.listing_name)),
-                        con.max_workphones);
+  relo_chsn := choosen(Relocations.wdtg.get_gong_by_did(subjectDID,,storeds.targetRadius,storeds.maxDaysBefore,storeds.maxDaysAfter), con.max_Relocation);
 
-wphones_chsn := join(wphones_chsn1,head_roll2,
-                    left.contact.did = right.did and
-                    left.addr.prim_range = right.prim_range and
-                    left.addr.prim_name = right.prim_name and
-                    left.addr.zip = right.zip,
-                    transform({wphones_chsn1, head_roll2.shared_address, head_roll2.verified, head_roll.tnt},
-                              self.shared_address := right.shared_address,
-                              self.verified := right.verified,
-                              self.tnt := right.tnt,
-                              self := left),
-                    left outer,
-                    keep(1));
-
-//***** RELO PHONES
-relo_chsn := if(con.IncludeRelocation and NoVerifiedHomeAddresses and not SubjectIsDeceased,
-                choosen(Relocations.wdtg.get_gong_by_did(subjectDID,,storeds.targetRadius,storeds.maxDaysBefore,storeds.maxDaysAfter), con.max_Relocation));
-
-
-//***** POPULATE PRIORITY AND REACHME
-pa_p := join(pa_pp, allDIDs,								//ALLDIDS MAY LOSE SOME OF THE RELATIVES HERE, BUT I BELEIVE THEY ARE BETTER LEFT OUT
-            left.contact.did = right.did,
-                transform(rec.rollup_rec2,
-                          self.priority := right.priority,
-                          self.reachme := con.str_ReachMe(right.priority),
-                          self := left,
-                          self := []
-                ));
-
-//***** POPULATE RELATIONSHIP FOR RELS AND ASSOCIATES
-
-pa_r2 := join(pa_P, AssocDIDs,
-            left.contact.did = right.did,
-                transform(rec.rollup_rec2,
-                          self.relationship := if(right.did = 0, if(left.relationship <> '', left.relationship, con.str_Subject), con.str_Associate +
-                            if(right.titleno=Header.relative_titles.num_transactionalAssociate,'',' ' + header.translateRelativePrimrange(right.rel_prim_range))),
-                          self.relationship_type := right.type,
-                          self.relationship_confidence := right.confidence,
-                          self.relationship_last_seen := if(right.did = 0, left.relationship_last_seen, right.recent_cohabit),
-                          self.depth := if(right.did = 0, left.depth,right.depth),
-                          self := left
-                ), left outer);
-
-pa_r3 := join(pa_r2, rel(isRelative),
-            left.contact.did = right.person2,
-                transform(rec.rollup_rec2,
-                          self.relationship := if(right.person2 = 0, left.relationship, if(right.titleNo <> 0, Header.relative_titles.fn_get_str_title(right.titleNo), con.str_Relative)),
-                          self.relationship_type := if(right.person2 = 0, left.relationship_type, right.type),
-                          self.relationship_confidence := if(right.person2 = 0, left.relationship_confidence, right.confidence),
-                          self.relationship_last_seen := if(right.person2 = 0, left.relationship_last_seen, right.recent_cohabit),
-                          self.depth := if(right.person2 = 0, left.depth,right.depth),
-                          self := left
-                ), left outer);
-
-pa_r := join(pa_r3, nbrDIDs,
-            left.contact.did = right.did,
-                transform(rec.rollup_rec2,
-                          self.relationship := if(right.did = 0, left.relationship, con.str_Neighbor),
-                          self := left
-                ), left outer);
-
-// this PP is only for subject
-oph := project(ophones_chsn, transform(rec.rollup_rec2,
-                        self.relationship := con.str_Subject;
-                        self.priority := con.priority_PhonesPlus,
-                        self.ReachMe := con.str_ReachMe(con.priority_PhonesPlus);
-                        self.phone.phone := left.phoneno,
-                        self.phone.listing_name := left.listed_name,
-                        self.phone.publish_code := con.str_publish_code_yes,
-                        self.phone.PhoneType := con.str_phonesPlusType,
-                        self.phone.dt_last_seen := left.last_seen,
-                        self.contact.did := (unsigned6)left.did,
-                        self.contact.lname := left.name_last,
-                        self.contact.mname := left.name_middle,
-                        self.contact.fname := left.name_first,
-                        self.addr.city_name := left.city,
-                        self.addr.zip := left.z5,
-                        self.addr.zip4 := left.z4,
-                        self.addr.dt_last_seen := left.last_seen,
-                        self.addr.dt_first_seen := left.first_seen,
-                        self.addr := left,
-                        self := []));
-
-wph := join(wphones_chsn, dedup(rel_det, did, all),
-            (unsigned6)left.contact.did = right.did,
-              transform(rec.rollup_rec2,
-                        self.relationship := if(right.did = 0, con.str_Subject, Header.relative_titles.fn_get_str_title(right.titleNo));
-                        self.relationship_last_seen := right.recent_cohabit,
-                        self.priority := con.priority_WorkPhone,
-                        self.ReachMe := con.str_ReachMe(con.priority_WorkPhone);
-                        self.addr.shared_address := left.shared_address,
-                        self.addr.verified := left.verified,
-                        self := left,
-                        self := []), left outer);
-
-rph := project(relo_chsn,
+  relocation_ph := project(relo_chsn,
               transform(rec.rollup_rec2,
                         self.relationship := con.str_PossibleSubject;
                         self.relationship_last_seen := 0;//right.recent_cohabit,
@@ -500,6 +472,162 @@ rph := project(relo_chsn,
                         self.phone.publish_code := con.str_publish_code_yes,
                         self := left,
                         self := []));
+  RETURN relocation_ph;
+END;
+
+
+EXPORT FinderRecords(
+  dataset(doxie.layout_references) dids,
+  doxie.IDataAccess mod_access):=
+MODULE
+
+SHARED subjectDIDs := dids;
+SHARED subjectDID := max(subjectDIDs, did);
+
+EXPORT SubjectDeathRecords := getSubjectDeceasedData(subjectDID, death_params);
+
+
+SHARED rel := getRelativesAssociates(dids, mod_access);
+
+
+//***** GET ALL THE HEADER RECORDS
+SHARED relassocdids := project(rel, transform(doxie.layout_references, self.did := left.did));
+
+SHARED old_shared := getSubjectRelAssocAddressHistory(dids + relassocdids, subjectDID, mod_access);
+
+EXPORT head_subject := old_shared(did = subjectDID);
+
+ spouseDIDs 		:=  rel(titleNo in Header.relative_titles.set_Spouse);
+ allDIDs_noNeibhors	:= 	dedup(sort(
+                              project(subjectDIDs,
+                                      transform(rec.pridid_rec,
+                                                self.priority := con.priority_subject,
+                                                self.relationship := con.str_Subject;
+                                                self := left,
+                                                self:=[]))
+                              + rel,
+                              did, priority, depth),
+                            did);
+
+ boolean SubjectIsDeceased :=
+  exists(SubjectDeathRecords) or
+  exists(head_subject(address.isDeathRecord(prim_name)));
+
+
+// this join removes associates and also relatives beyond depth of 1
+ head_lessassoc := join(old_shared, rel(~isRelative or depth > 1),
+                      left.did = right.did,
+                      transform({string lname}, self.lname := left.lname),
+                      left only);
+
+ rel_lnames := dedup(head_lessassoc, all);
+
+deg2relDIDs := PROJECT(rel(isRelative AND depth>1), doxie.layout_references);
+//TO DO: change most recent address logic to be based on AddressHierarchy ranking
+head_roll := getMostRecentAddresses(old_shared, deg2relDIDs);
+
+subject_recent_addrs := head_roll(did = subjectDID);
+
+//get gong phones for subject and rels/assocs
+// TO DO: replace this call with doxie.fn_progressivePhone.byDIDonly() and
+// TO DO: add best address to progressive phones results (based on head_roll)
+phoneaddr_gong_sra := getGongData(head_roll, SubjectDids+relassocdids, rel_lnames, mod_access);
+
+subjectPhones := dedup(phoneaddr_gong_sra(contact.did = subjectDID and phone.phone <> '' and phone.listing_name <> ''), phone.phone, phone.listing_name, all);
+
+
+nbr := getNeighbors(subject_recent_addrs, subjectDID, mod_access);
+
+nbrAddrDIDs := 	dedup(sort(nbr, did,-dt_last_seen), did); // keep most recent address to report with PP+ for neighbors
+nbrDIDs   	:= 	project(nbrAddrDIDs, doxie.layout_references);
+allDIDs		  := 	dedup(sort(
+                            allDIDs_noNeibhors +
+                            project(nbrDIDs,
+                                    transform(rec.pridid_rec,
+                                              self.priority := con.priority_neighbor,
+                                              self.relationship := con.str_Neighbor,
+                                              self := left,
+                                              self:=[])),
+                            did, priority),
+                        did);
+
+// get gong phones for neighbors
+phoneaddr_nei := getGongData(nbr, nbrDIDs, rel_lnames, mod_access);
+
+//***** IF YOU ARE A NEIGHBOR, MAKE SURE YOU ARE NOT MATCHED UP WITH THE SUBJECT'S HOME PHONE (APT)
+phoneaddr_gong_nei :=
+          join(phoneaddr_nei, subjectPhones,
+              left.contact.did in set(nbrDIDs, did) and
+              left.phone.phone = right.phone.phone and
+              left.phone.listing_name = right.phone.listing_name,
+              transform(rec.contact_phone_addr_rec_ext,
+                        self.phone.phone 					:= if(right.phone.phone <> '', '', 		left.phone.phone),
+                        self.phone.listing_name 		:= if(right.phone.phone <> '', '', 		left.phone.listing_name),
+                        self.phone.apartmentoffice := if(right.phone.phone <> '', false, left.phone.apartmentoffice),
+                        self := left),
+              left outer);
+
+//TO DO: keep only neighbors gong phones here
+phoneaddr_cln := phoneaddr_gong_sra + phoneaddr_gong_nei;
+
+//***** KEEP ONE ADDRESS FOR EACH DID/PHONE COMBO	(HAS ADDED BENEFIT OF ALLOWING ONLY ONE PHONELESS ADDRESS PER PERSON)
+pa_gong_ddp := ungroup(dedup(sort(group(sort(phoneaddr_cln, contact.did, phone.phone),
+                                  contact.did, phone.phone),
+                            if(length(trim(phone.phone)) = 10, 0, 1), doxie.tnt_score(addr.tnt), -addr.dt_last_seen
+                            // add criteria to pick listing name matching contact and also to make sort deterministic
+                          //  ,rank_apt(phone.apartmentoffice,phone.listing_name), ut.StringSimilar100(phone.listing_name, contact.lname), ut.StringSimilar100(phone.listing_name, contact.fname), record
+                       ), true));
+
+// these are our all gong phones (for subject/rels/assoc/neighbors)
+// TO DO: combine neighbors gong phones here with new progressive phones for subject/rels/assoc
+pa_srt := dedup(sort(pa_gong_ddp, contact.did, if(length(trim(phone.phone)) = 10, 0, 1), doxie.tnt_score(addr.tnt), -addr.dt_last_seen, rank_apt(phone.apartmentoffice,phone.listing_name), ut.StringSimilar100(phone.listing_name, contact.lname), ut.StringSimilar100(phone.listing_name, contact.fname)),
+                contact.did, keep(storeds.PhonesPerPerson));
+
+
+boolean NoVerifiedHomeAddresses := not exists(pa_srt(addr.verified and contact.did = subjectDID));
+
+//***** RELO PHONES
+rph := if(con.IncludeRelocation and NoVerifiedHomeAddresses and not SubjectIsDeceased,
+          getRelocation(subjectDID));
+
+//***** WORK PHONES
+wph := IF(not SubjectIsDeceased, getWorkPhones(dids, spouseDIDs, old_shared, mod_access));
+
+checkRNA := header.constants.checkRNA;
+
+//***** PHONES +
+ipp := Include_PhonesPlus_val;
+ipprna := storeds.IncludePhonesPlus_for_RNA;
+
+// this PP is rels/assoc/neigb
+//TO DO: eliminate rels/assoc from this call, keep neighbors only
+rna_lexids := relassocdids + nbrDIDs;
+oph_rna := IF(ipprna, getPhonesPlusRNA(rna_lexids, nbrAddrDIDs, mod_access));
+
+// this PP is only for subject
+// TO DO: eliminate this call  (phones for subject/rels/assoc will come from doxie.fn_progressivePhone.byDIDonly())
+oph := if(ipp, getSubjectPhonesPlus(dids, mod_access));
+
+// TO DO:  possibly treat ipp and ipprna options to filter progressive phones based on phone type - landline vs wireless?
+
+//***** POPULATE PRIORITY AND REACHME
+// per new req.1.2.6 PPlus data for rels/asoc/neigb need to be combined within each section with gong phones(pa_srt):
+pa_pp := pa_srt + if(ipprna,oph_rna);
+
+pa_r := join(pa_pp, allDIDs,								//ALLDIDS MAY LOSE SOME OF THE RELATIVES HERE, BUT I BELEIVE THEY ARE BETTER LEFT OUT
+            left.contact.did = right.did,
+                transform(rec.rollup_rec2,
+                          self.priority := right.priority,
+                          self.reachme := con.str_ReachMe(right.priority),
+                          self.relationship := if(right.did = 0, con.str_Subject, right.relationship),
+                          self.relationship_type := right.type,
+                          self.relationship_confidence := right.confidence,
+                          self.relationship_last_seen :=  right.recent_cohabit,
+                          self.depth := right.depth,
+                          self := left,
+                          self := []
+                ));
+
 //***** ADD BEST NAME AND THROW OUT ONE IF TWO ASSOCIATES WITH SAME NAME
 rna_dppa_ok := mod_access.isValidDPPA(checkRNA);
 rna_glb_ok :=mod_access.isValidGLB(checkRNA);
@@ -510,6 +638,8 @@ rna_dids := alldids(did != subjectDID);
 doxie.mac_best_records(rna_dids, did, rnabest, rna_dppa_ok, rna_glb_ok, false, mod_access.DataRestrictionMask)
 doxie.mac_best_records(SubjectDids, did, sbest, _dppa_ok, _glb_ok, false, mod_access.DataRestrictionMask)
 fbest := rnabest + sbest;
+
+//TO DO: remove oph from here when progressive phones are added
 wb2 := join(pa_r + oph + wph + rph, fbest,
           left.contact.did = right.did,
           transform(rec.rollup_rec2,
@@ -685,7 +815,7 @@ srtd2 := project(srtd, transform(rec.rollup_rec2,
 // output(phoneaddr, all, named('phoneaddr'));
 // output(subjectPhones, all, named('subjectPhones'));
 // output(phoneaddr_cln, all, named('phoneaddr_cln'));
-// output(pa_ddp, named('pa_ddp'));
+// output(pa_gong_ddp, named('pa_gong_ddp'));
 // output(pa_srt, named('pa_srt'));
 // output(pa_p, named('pa_p'));
 // output(pa_r, named('pa_r'));

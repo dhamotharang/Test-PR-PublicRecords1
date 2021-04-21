@@ -1,39 +1,39 @@
-import corrections, iesp, FFD;
+IMPORT corrections, iesp, FFD;
 
-export layouts := module
+EXPORT layouts := MODULE
 
-	export l_search := record
-		string60	offender_key;
-		boolean		isDeepDive	:= false;
-	end;
+  EXPORT l_search := RECORD
+    STRING60 offender_key;
+    BOOLEAN isDeepDive := FALSE;
+  END;
 
-	export docnum_rec := record
-		string25	doc_number;
-	end;
+  EXPORT docnum_rec := RECORD
+    STRING25 doc_number;
+  END;
 
-	export casenum_rec := record
-		string35 case_number;
-	end;
-	
-	export l_raw := record
-		corrections.layout_Offender;
-		boolean		isDeepDive	:= false;
-		unsigned2	penalt			:= 0;
-		FFD.Layouts.CommonRawRecordElements;
-	end;
+  EXPORT casenum_rec := RECORD
+    STRING35 case_number;
+  END;
+  
+  EXPORT l_raw := RECORD
+    corrections.layout_Offender;
+    BOOLEAN isDeepDive := FALSE;
+    UNSIGNED2 penalt := 0;
+    FFD.Layouts.CommonRawRecordElements;
+  END;
 
-	export offense_rec := record
-		unsigned bitmap;
-		string description;
-	end;
+  EXPORT offense_rec := RECORD
+    UNSIGNED bitmap;
+    STRING description;
+  END;
 
-	export raw_with_offenses := record
-		l_raw;
-		dataset(offense_rec) offenses;
-	end;
+  EXPORT raw_with_offenses := RECORD
+    l_raw;
+    DATASET(offense_rec) offenses;
+  END;
 
-	export t_CrimSearchRecordWithPenalty := record
-		iesp.criminal_fcra.t_FcraCrimSearchRecord;
-	end;
-	
-end;
+  EXPORT t_CrimSearchRecordWithPenalty := RECORD
+    iesp.criminal_fcra.t_FcraCrimSearchRecord;
+  END;
+  
+END;

@@ -5,11 +5,6 @@
 //  dx_ebr.mod_delta_rid.key_5600_delta_rid
 // ---------------------------------------------------------------
 
-// ---------------------------------------------------------------
-// For delta rollup logic (dx_common.mac_incremental_rollup) use:
-//  $.mod_delta_rid.key_5600_delta_rid
-// ---------------------------------------------------------------
-
 EXPORT Key_5600_Demographic_Data_linkids := MODULE
 
   // DEFINE THE INDEX

@@ -4,8 +4,8 @@ IMPORT B_Bankruptcy_7,B_Bankruptcy_8,CFG_Compile,E_Bankruptcy,FN_Compile FROM Pu
 IMPORT * FROM KEL15.Null;
 EXPORT B_Bankruptcy_6(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG_Compile __cfg = CFG_Compile) := MODULE
   SHARED VIRTUAL TYPEOF(B_Bankruptcy_7(__in,__cfg).__ENH_Bankruptcy_7) __ENH_Bankruptcy_7 := B_Bankruptcy_7(__in,__cfg).__ENH_Bankruptcy_7;
-  SHARED __EE4828669 := __ENH_Bankruptcy_7;
-  EXPORT __ST242984_Layout := RECORD
+  SHARED __EE4672571 := __ENH_Bankruptcy_7;
+  EXPORT __ST247288_Layout := RECORD
     KEL.typ.nstr Source_Description_;
     KEL.typ.nstr Original_Chapter_;
     KEL.typ.nstr Filing_Type_;
@@ -32,7 +32,7 @@ EXPORT B_Bankruptcy_6(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG_
     KEL.typ.epoch Vault_Date_Last_Seen_ := 0;
     KEL.typ.int __RecordCount := 0;
   END;
-  EXPORT __ST385641_Layout := RECORD
+  EXPORT __ST394161_Layout := RECORD
     KEL.typ.nstr Source_Description_;
     KEL.typ.nstr Original_Chapter_;
     KEL.typ.nstr Filing_Type_;
@@ -61,16 +61,16 @@ EXPORT B_Bankruptcy_6(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG_
     KEL.typ.epoch Vault_Date_Last_Seen_ := 0;
     KEL.typ.int __RecordCount := 0;
   END;
-  EXPORT __ST242977_Layout := RECORD
+  EXPORT __ST247281_Layout := RECORD
     KEL.typ.nuid UID;
     KEL.typ.nstr T_M_S_I_D_;
     KEL.typ.nstr Court_Code_;
     KEL.typ.nstr Case_Number_;
     KEL.typ.nstr Original_Case_Number_;
-    KEL.typ.ndataset(__ST242984_Layout) Records_;
+    KEL.typ.ndataset(__ST247288_Layout) Records_;
     KEL.typ.ndataset(E_Bankruptcy(__in,__cfg).Case_Details_Layout) Case_Details_;
     KEL.typ.ndataset(E_Bankruptcy(__in,__cfg).Data_Sources_Layout) Data_Sources_;
-    KEL.typ.ndataset(__ST385641_Layout) Best_Child_Record_;
+    KEL.typ.ndataset(__ST394161_Layout) Best_Child_Record_;
     KEL.typ.nbool Has_Case_Number_;
     KEL.typ.epoch Archive___Date_ := 0;
     KEL.typ.epoch Date_First_Seen_ := 0;
@@ -79,19 +79,19 @@ EXPORT B_Bankruptcy_6(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG_
     KEL.typ.epoch Vault_Date_Last_Seen_ := 0;
     KEL.typ.int __RecordCount := 0;
   END;
-  SHARED __ST242977_Layout __ND4828646__Project(B_Bankruptcy_7(__in,__cfg).__ST247304_Layout __PP4828284) := TRANSFORM
-    __EE4828672 := __PP4828284.Records_;
-    SELF.Records_ := __BN(PROJECT(__T(__EE4828672),__ST242984_Layout),__NL(__EE4828672));
-    __EE4828644 := __PP4828284.Best_Child_Record_;
-    __ST385641_Layout __ND4828598__Project(B_Bankruptcy_8(__in,__cfg).__ST250191_Layout __PP4828404) := TRANSFORM
-      __CC12926 := KEL.Routines.MinN(FN_Compile(__cfg).FN_G_E_T_B_U_I_L_D_D_A_T_E(__ECAST(KEL.typ.nstr,__CN('bankruptcy_daily'))),__CN(__cfg.CurrentDate));
-      SELF.Filing_Age_In_Days_ := FN_Compile(__cfg).FN_A_B_S_D_A_Y_S_B_E_T_W_E_E_N(__ECAST(KEL.typ.nkdate,__PP4828404.Date_Filed_),__ECAST(KEL.typ.nkdate,__CC12926));
-      __BS4828474 := __T(__PP4828284.Case_Details_);
-      SELF.Is_Bankruptcy_ := __AND(__PP4828284.Has_Case_Number_,__CN(EXISTS(__BS4828474(__T(__OP2(__CAST(KEL.typ.str,__T(__PP4828284.Case_Details_).Case_I_D_),<>,__CN('')))))));
-      SELF := __PP4828404;
+  SHARED __ST247281_Layout __ND4672548__Project(B_Bankruptcy_7(__in,__cfg).__ST251621_Layout __PP4672186) := TRANSFORM
+    __EE4672574 := __PP4672186.Records_;
+    SELF.Records_ := __BN(PROJECT(__T(__EE4672574),__ST247288_Layout),__NL(__EE4672574));
+    __EE4672546 := __PP4672186.Best_Child_Record_;
+    __ST394161_Layout __ND4672500__Project(B_Bankruptcy_8(__in,__cfg).__ST254534_Layout __PP4672306) := TRANSFORM
+      __CC13202 := KEL.Routines.MinN(FN_Compile(__cfg).FN_G_E_T_B_U_I_L_D_D_A_T_E(__ECAST(KEL.typ.nstr,__CN('bankruptcy_daily'))),__CN(__cfg.CurrentDate));
+      SELF.Filing_Age_In_Days_ := FN_Compile(__cfg).FN_A_B_S_D_A_Y_S_B_E_T_W_E_E_N(__ECAST(KEL.typ.nkdate,__PP4672306.Date_Filed_),__ECAST(KEL.typ.nkdate,__CC13202));
+      __BS4672376 := __T(__PP4672186.Case_Details_);
+      SELF.Is_Bankruptcy_ := __AND(__PP4672186.Has_Case_Number_,__CN(EXISTS(__BS4672376(__T(__OP2(__CAST(KEL.typ.str,__T(__PP4672186.Case_Details_).Case_I_D_),<>,__CN('')))))));
+      SELF := __PP4672306;
     END;
-    SELF.Best_Child_Record_ := __PROJECT(__EE4828644,__ND4828598__Project(LEFT));
-    SELF := __PP4828284;
+    SELF.Best_Child_Record_ := __PROJECT(__EE4672546,__ND4672500__Project(LEFT));
+    SELF := __PP4672186;
   END;
-  EXPORT __ENH_Bankruptcy_6 := PROJECT(__EE4828669,__ND4828646__Project(LEFT));
+  EXPORT __ENH_Bankruptcy_6 := PROJECT(__EE4672571,__ND4672548__Project(LEFT));
 END;

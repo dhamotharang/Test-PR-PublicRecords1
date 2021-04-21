@@ -1,7 +1,7 @@
 ﻿IMPORT AutoStandardI, doxie, iesp, PersonReports;
 
-EXPORT SmartLinx_Person_Sections (STRING in_did, BOOLEAN include_sourceDocSection, MIDEX_Services.Iparam.smartLinxPersonIncludeOptions options,
-																																																															boolean includeBlackKnight=false) :=
+EXPORT SmartLinx_Person_Sections (STRING in_did, BOOLEAN include_sourceDocSection, MIDEX_Services.Iparam.smartLinxPersonIncludeOptions options/*,
+																																																															boolean includeBlackKnight=false*/) :=
       // NOTE: the original SmartLinx code uses Exclude Sources -- This function takes 
       //       include sources because it is consistent with the remaining Midex attribute code.
       //       The change is made when the ExcludeSources boolean flag is set.
@@ -82,7 +82,8 @@ EXPORT SmartLinx_Person_Sections (STRING in_did, BOOLEAN include_sourceDocSectio
       EXPORT UNSIGNED1 neighbors_per_address     := 1;
       EXPORT UNSIGNED1 relative_depth            := 3;
       EXPORT UNSIGNED1 email_version             := 1;
-      EXPORT BOOLEAN   includeVendorSourceB := includeBlackKnight;
+      EXPORT BOOLEAN   includeVendorSourceB := options.includeVendorSourceB;
+      EXPORT BOOLEAN   IncludeAssignmentsAndReleases := options.IncludeAssignmentsAndReleases;
     END;
 
     in_didUnsigned := (UNSIGNED6) in_did;

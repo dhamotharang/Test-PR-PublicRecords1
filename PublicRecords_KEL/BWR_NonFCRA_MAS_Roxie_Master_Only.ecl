@@ -1,10 +1,10 @@
 ﻿// EXPORT BWR_NonFCRA_MAS_Roxie_Master_Only := 'todo';
-IMPORT PublicRecords_KEL, RiskWise, salt38, Saltroutines, std, gateway;
+IMPORT PublicRecords_KEL, RiskWise, salt38, Saltroutines, std, gateway, Business_Risk_BIP;
 
 /* PublicRecords_KEL.BWR_nonFCRA_MAS_Roxie */
-#workunit('name','MAS NonFCRA Consumer dev156 2 Thread-Testfile');
+#workunit('name','MAS NonFCRA Consumer dev156 1 Thread-Testfile');
 
-threads := 2;
+threads := 1;
 
 RoxieIP := RiskWise.shortcuts.Dev156;
 
@@ -26,8 +26,8 @@ DPMDL =	1 //use_InsuranceDLData - bit 13
 GLBA 	= 1 
 DPPA 	= 1 
 */ 
-GLBA := 1;
-DPPA := 1;
+GLBA := 1 : STORED('GLBPurposeValue');
+DPPA := 1 : STORED('DPPAPurposeValue');
 DataPermissionMask := '0000000001101';  
 DataRestrictionMask := '0000000000000000000000000000000000000000000000000'; 
 Include_Minors := TRUE;
@@ -62,42 +62,48 @@ AllowedSourcesDataset := DATASET([],PublicRecords_KEL.ECL_Functions.Constants.La
 ExcludeSourcesDataset := DATASET([],PublicRecords_KEL.ECL_Functions.Constants.Layout_Allowed_Sources);
 
 IncludeDeltaBase := FALSE;
-// IncludeDeltaBase := TRUE;
 IncludeNetAcuity := FALSE;
-// IncludeNetAcuity := TRUE;
+IncludeOFACGW := FALSE;
+IncludeTargusGW := FALSE;
+IncludeInsurancePhoneGW := FALSE;
+
+// OFAC parameters
+include_ofac := TRUE : STORED('IncludeOfacValue'); // This is different than the param to turn off/on the gateway, this adds an OFAC watchlist in the gateway
+include_additional_watchlists  := TRUE : STORED('IncludeAdditionalWatchListsValue');
+Global_Watchlist_Threshold := Business_Risk_BIP.Constants.Default_Global_Watchlist_Threshold : STORED('Global_Watchlist_ThresholdValue');
+watchlists:= 'ALLV4' : STORED('Watchlists_RequestedValue'); // Returns all watchlists for OFAC Version 4
+
+// Parameter needed to turn CCPA on for Targus -- has to use #STORED since IsFCRA isn't a parameter passed to the soapcall
+#STORED('IsFCRAValue', FALSE);
 
 Empty_GW := DATASET([TRANSFORM(Gateway.Layouts.Config, 
 							SELF.ServiceName := ''; 
 							SELF.URL := ''; 
 							SELF := [])]);
 							
-DeltaBase_GW := IF(IncludeDeltaBase, DATASET([TRANSFORM(Gateway.Layouts.Config,
-							// The inquiry delta base which feeds the 1 day inq attrs is not needed for the input rep 1 at this point. for now we only run this delta base code in the nonFCRA service 
-							//below is the dev delta base for inquiries, this is the default to prevent hammering the production gateway by accident
-							SELF.ServiceName := RiskWise.shortcuts.gw_delta_dev[1].servicename; 
-							SELF.URL := RiskWise.shortcuts.gw_delta_dev[1].url; //dev
-							//below is the production delta base for inquiries.  be careful not to hammer this production gateway with too much traffic
-							// SELF.ServiceName := RiskWise.shortcuts.gw_delta_prod[1].servicename; 
-							// SELF.URL := RiskWise.shortcuts.gw_delta_prod[1].url; 
-							SELF := [])]),
+// The inquiry delta base which feeds the 1 day inq attrs is not needed for the input rep 1 at this point. for now we only run this delta base code in the nonFCRA service 
+//below is the dev delta base for inquiries, this is the default to prevent hammering the production gateway by accident
+DeltaBase_GW := IF(IncludeDeltaBase, project(riskwise.shortcuts.gw_delta_dev, TRANSFORM(Gateway.Layouts.Config, self := left, self := [])), 
 							Empty_GW);	
 							
-NetAcuity_GW := IF(IncludeNetAcuity, DATASET([TRANSFORM(Gateway.Layouts.Config,
-							SELF.ServiceName := RiskWise.shortcuts.gw_netacuityv4_prod[1].servicename; 
-							SELF.URL := RiskWise.shortcuts.gw_netacuityv4_prod[1].url; 
-							SELF := [])]),
+NetAcuity_GW := IF(IncludeNetAcuity, project(riskwise.shortcuts.gw_netacuityv4_prod, TRANSFORM(Gateway.Layouts.Config, self := left, self := [])),
 							Empty_GW);
-							
-Input_Gateways := (DeltaBase_GW + NetAcuity_GW)(URL <> '');
 
-// Store GLB AND DPPA values at a workflow level so they can be accessed by the gateways within attributes.kel
-#STORED('GLBPurposeValue', GLBA);
-#STORED('DPPAPurposeValue', DPPA);
-	
+OFAC_GW := IF(IncludeOFACGW, project(riskwise.shortcuts.gw_bridger, TRANSFORM(Gateway.Layouts.Config, self := left, self := [])),
+							Empty_GW);  
+							
+Targus_GW := IF(IncludeTargusGW, project(riskwise.shortcuts.gw_targus_sco, TRANSFORM(Gateway.Layouts.Config, self := left, self := [])),
+							Empty_GW);  
+
+InsurancePhone_GW := IF(IncludeInsurancePhoneGW, project(riskwise.shortcuts.gw_insurancephoneheader, TRANSFORM(Gateway.Layouts.Config, self := left, self := [])),
+							Empty_GW);  
+							
+Input_Gateways := (DeltaBase_GW + NetAcuity_GW + OFAC_GW + Targus_GW + InsurancePhone_GW)(URL <> '');
+
 RecordsToRun := 0;
 eyeball := 25;
 
-OutputFile := '~bbraaten::out::PersonNonFCRA_Roxie_100k_Current_atmosts_'+ ThorLib.wuid();
+OutputFile := '~akoenen::out::PersonNonFCRA_Roxie_100k_archive_KS6961_after_'+ ThorLib.wuid();
 
 prii_layout := RECORD
     STRING Account             ;
@@ -150,12 +156,16 @@ soapLayout := RECORD
 	BOOLEAN IncludeMinors;
 	DATASET(PublicRecords_KEL.ECL_Functions.Constants.Layout_Allowed_Sources) AllowedSourcesDataset := DATASET([], PublicRecords_KEL.ECL_Functions.Constants.Layout_Allowed_Sources);
 	DATASET(PublicRecords_KEL.ECL_Functions.Constants.Layout_Allowed_Sources) ExcludeSourcesDataset := DATASET([], PublicRecords_KEL.ECL_Functions.Constants.Layout_Allowed_Sources);
-  UNSIGNED1 LexIdSourceOptout;
+	UNSIGNED1 LexIdSourceOptout;
 	BOOLEAN RetainInputLexid;
 	BOOLEAN appendpii;
-  STRING _TransactionId;
-  STRING _BatchUID;
-  UNSIGNED6 _GCID;
+	STRING _TransactionId;
+	STRING _BatchUID;
+	UNSIGNED6 _GCID;
+	BOOLEAN IncludeOfac;
+	BOOLEAN IncludeAdditionalWatchLists;
+	REAL Global_Watchlist_Threshold;
+	STRING Watchlists_Requested;
 end;
 
 Settings := MODULE(PublicRecords_KEL.Interface_BWR_Settings)
@@ -215,6 +225,10 @@ soapLayout trans (pp le):= TRANSFORM
 	SELF._TransactionId := TransactionId;
 	SELF._BatchUID := BatchUID;
 	SELF._GCID := GCID;
+	SELF.IncludeOfac := include_ofac;
+	SELF.IncludeAdditionalWatchLists := include_additional_watchlists;
+	SELF.Global_Watchlist_Threshold := Global_Watchlist_Threshold;
+	SELF.Watchlists_Requested := watchlists;
 END;
 
 soap_in := Distribute(PROJECT(pp, trans(LEFT)), RANDOM());
@@ -277,6 +291,8 @@ OUTPUT(Error_Inputs,,OutputFile+'_Error_Inputs', CSV(QUOTE('"')), OVERWRITE, exp
 OUTPUT(CHOOSEN(Passed_with_Extras, eyeball), NAMED('Sample_Master_Layout'));
 
 OUTPUT(Passed_with_Extras,,OutputFile +'_MasterLayout.csv', CSV(HEADING(single), QUOTE('"')), expire(45));
+
+Output(ave(Passed, time_ms), named('average_time_ms')); 
 
 OUTPUT(Failed,,OutputFile+'errors', thor,  expire(20));
 

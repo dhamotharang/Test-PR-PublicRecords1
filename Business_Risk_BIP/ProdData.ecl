@@ -123,7 +123,7 @@
 /*--INFO-- Prod Data Service - This is the XML Service utilizing BIP linking*/
 
 #option('expandSelectCreateRow', true);
-IMPORT Address, BIPV2, BizLinkFull, Business_Risk_BIP, Corp2, Doxie, dx_Email, EBR, EBR_Services, Gateway,
+IMPORT Address, BIPV2, BizLinkFull, Business_Risk_BIP, Corp2, Doxie, dx_EBR, dx_Email, EBR, EBR_Services, Gateway,
  iesp, LiensV2, LN_PropertyV2, MDR, NID, Risk_Indicators, RiskWise, UT, STD;
 
 EXPORT ProdData() := FUNCTION
@@ -210,7 +210,7 @@ EXPORT ProdData() := FUNCTION
 	'IncludeProfessionalLicense',
 	'KeepLargeBusinesses',
 	'OverrideExperianRestriction',
-  'gateways'
+	'gateways'
 	));
 
 	/* ************************************************************************
@@ -300,13 +300,13 @@ EXPORT ProdData() := FUNCTION
 	REAL Global_Watchlist_Threshold_In := Business_Risk_BIP.Constants.Default_Global_Watchlist_Threshold : STORED('Global_Watchlist_Threshold');
 
 layout_watchlists_temp := record
-    dataset(iesp.share.t_StringArrayItem) WatchList {xpath('WatchList/Name'), MAXCOUNT(iesp.Constants.MaxCountWatchLists)};
-  end;
+		dataset(iesp.share.t_StringArrayItem) WatchList {xpath('WatchList/Name'), MAXCOUNT(iesp.Constants.MaxCountWatchLists)};
+	end;
 
-  watchlist_options := dataset([],layout_watchlists_temp) : stored('Watchlists_Requested', few);
-  Watchlists_Requested_In := watchlist_options[1].WatchList;
+	watchlist_options := dataset([],layout_watchlists_temp) : stored('Watchlists_Requested', few);
+	Watchlists_Requested_In := watchlist_options[1].WatchList;
 
-  // Output Options
+	// Output Options
 	UNSIGNED4 OutputRecordCount_In := 100 : STORED('OutputRecordCount');
 	BOOLEAN IncludeAll_In							:= FALSE : STORED('IncludeAll');
 	BOOLEAN IncludeLinkingResults_In	:= FALSE : STORED('IncludeLinkingResults');
@@ -342,7 +342,7 @@ layout_watchlists_temp := record
 	UNSIGNED1 KeepLargeBusinesses_In  := Business_Risk_BIP.Constants.DefaultJoinType : STORED('KeepLargeBusinesses');
 	BOOLEAN OverrideExperianRestriction_In := FALSE : STORED('OverrideExperianRestriction');
 
-  gateways_in := Gateway.Configuration.Get();
+	gateways_in := Gateway.Configuration.Get();
 
 	/* ************************************************************************
 	 *              Create the Appropriate Library Interface                  *
@@ -445,15 +445,15 @@ layout_watchlists_temp := record
 		EXPORT STRING50		AllowedSources			:= STD.Str.ToUpperCase(AllowedSources_In);
 		EXPORT UNSIGNED1	BIPBestAppend				:= MAX(MIN(BIPBestAppend_In, Business_Risk_BIP.Constants.BIPBestAppend.OverwriteWithBest), Business_Risk_BIP.Constants.BIPBestAppend.Default);
 		EXPORT UNSIGNED1	OFAC_Version				:= MAX(MIN(OFAC_Version_In, 4), 0);
-    EXPORT DATASET(Gateway.Layouts.Config) Gateways 									:= gateways_in;
+		EXPORT DATASET(Gateway.Layouts.Config) Gateways 									:= gateways_in;
 		EXPORT REAL				Global_Watchlist_Threshold	:= if(OFAC_Version in [1, 2, 3], 0.84, 0.85);
 		EXPORT DATASET(iesp.Share.t_StringArrayItem) Watchlists_Requested := Watchlists_Requested_In;
 		EXPORT UNSIGNED1	KeepLargeBusinesses	:= MAX(MIN(KeepLargeBusinesses_In, 1), 0);
 		EXPORT BOOLEAN		OverrideExperianRestriction := OverrideExperianRestriction_In;
-    EXPORT BOOLEAN 		Include_OFAC 																		:= if(OFAC_Version = 1, false, true);
+		EXPORT BOOLEAN 		Include_OFAC 																		:= if(OFAC_Version = 1, false, true);
 	END;
 
-  mod_access := PROJECT(options, doxie.IDataAccess);
+	mod_access := PROJECT(options, doxie.IDataAccess);
 
 	// Define the default interface for output options
 	OutputInterface := INTERFACE
@@ -465,7 +465,7 @@ layout_watchlists_temp := record
 		EXPORT BOOLEAN		IncludeBusinessHeader	:= FALSE;
 		EXPORT BOOLEAN		IncludeBusReg				:= FALSE;
 		EXPORT BOOLEAN		IncludeCorpFilings	:= FALSE;
-    EXPORT BOOLEAN    IncludeCortera      := FALSE;
+		EXPORT BOOLEAN    IncludeCortera      := FALSE;
 		EXPORT BOOLEAN		IncludeDCA					:= FALSE;
 		EXPORT BOOLEAN		IncludeDEADCO				:= FALSE;
 		EXPORT BOOLEAN		IncludeDNBDMI				:= FALSE;
@@ -500,7 +500,7 @@ layout_watchlists_temp := record
 		EXPORT BOOLEAN IncludeBusinessHeader := IncludeBusinessHeader_In;
 		EXPORT BOOLEAN IncludeBusReg := IncludeBusReg_In;
 		EXPORT BOOLEAN IncludeCorpFilings := IncludeCorpFilings_In;
-    EXPORT BOOLEAN IncludeCortera := IncludeCortera_In;
+		EXPORT BOOLEAN IncludeCortera := IncludeCortera_In;
 		EXPORT BOOLEAN IncludeDCA := IncludeDCA_In;
 		EXPORT BOOLEAN IncludeDEADCO := IncludeDEADCO_In;
 		EXPORT BOOLEAN IncludeDNBDMI := IncludeDNBDMI_In;
@@ -723,7 +723,7 @@ layout_watchlists_temp := record
 																										DATASET([], Gateway.Layouts.Config), /*Gateways*/
 																										0 /*BSOptions*/);
 
-   if(options.OFAC_Version = 4 and not exists(options.Gateways(servicename = 'bridgerwlc')) , fail(Risk_Indicators.iid_constants.OFAC4_NoGateway));
+	 if(options.OFAC_Version = 4 and not exists(options.Gateways(servicename = 'bridgerwlc')) , fail(Risk_Indicators.iid_constants.OFAC4_NoGateway));
 
 	// Pick the DID with the highest score, in the event that multiple have the same score, choose the lowest value DID to make this deterministic
 	DIDKept := ROLLUP(SORT(DIDAppend, Seq, -Score, DID), LEFT.Seq = RIGHT.Seq, TRANSFORM(LEFT));
@@ -830,7 +830,7 @@ layout_watchlists_temp := record
 	InqBuildDate := Risk_Indicators.get_Build_date('inquiry_update_build_version');
 
 	InquiriesAll := Business_Risk_BIP.PD_Inquiries(LinkIDsFound, kFetchLinkIDs, kFetchLinkSearchLevel,
-     options, AllowedSourcesSet, mod_access);
+		 options, AllowedSourcesSet, mod_access);
 
 	// --------------- Judgments and Liens ----------------
 	// Get the TMSID/RMSID results for Liens and Judgments data
@@ -909,27 +909,29 @@ layout_watchlists_temp := record
 
 	ebr_filing_numbers_plus_seq_ddpd := DEDUP(ebr_filing_numbers_plus_seq, ALL, HASH);
 
-	header_recs_pre :=	JOIN(ebr_filing_numbers_plus_seq_ddpd, EBR.Key_0010_Header_FILE_NUMBER, KEYED(LEFT.file_number = RIGHT.file_number), TRANSFORM({RECORDOF(RIGHT), UNSIGNED4 Seq}, SELF.Seq := LEFT.Seq, SELF := RIGHT), ATMOST(EBR_Services.constants.maxcounts.default));
+	header_recs_appended := dx_EBR.Append.Header_0010_By_File_Number(ebr_filing_numbers_plus_seq_ddpd, atmost_number := EBR_Services.constants.maxcounts.default);
+	header_recs_pre := PROJECT(header_recs_appended, TRANSFORM({RECORDOF(EBR.Key_0010_Header_FILE_NUMBER), UNSIGNED4 Seq},
+		SELF.Seq := LEFT.Seq, SELF := LEFT.ebr_data));
 
 	// Mimicking what is done in other business queries, we will keep 1 file_number per sequence.  To do this we will keep the most recently processed record, following by most recently last seen, and then lastly the smallest file_number to make it determinate
 	header_recs := GROUP(DEDUP(SORT(header_recs_pre, seq, -process_date_last_seen, -date_last_seen, file_number), Seq), seq);
 
-	executive_recs_added :=	JOIN(header_recs, ebr.Key_1000_Executive_Summary_FILE_NUMBER,	KEYED(LEFT.file_number = RIGHT.file_number), TRANSFORM({RECORDOF(RIGHT), UNSIGNED4 Seq},
-				SELF.seq                        := LEFT.seq,
-				SELF.process_date               := LEFT.process_date,
-				SELF.FILE_NUMBER                := LEFT.file_number,
-				SELF := RIGHT), ATMOST(EBR_Services.constants.maxcounts.default));
+	executive_recs_appended := dx_EBR.Append.Executive_Summary_1000_By_File_Number(header_recs, atmost_number := EBR_Services.constants.maxcounts.default);
+	executive_recs_added :=	PROJECT(executive_recs_appended, TRANSFORM({RECORDOF(LEFT.ebr_data), UNSIGNED4 Seq},
+		SELF.seq := LEFT.seq,
+		SELF.process_date := LEFT.process_date,
+		SELF.FILE_NUMBER := LEFT.file_number,
+		SELF := LEFT.ebr_data));
 
-	trade_payment_total_recs_added :=	JOIN(executive_recs_added, ebr.Key_2015_Trade_Payment_Totals_FILE_NUMBER,	KEYED(LEFT.file_number = RIGHT.file_number), TRANSFORM(RIGHT), ATMOST(EBR_Services.constants.maxcounts.default));
-
+	trade_payment_total_recs_added := dx_EBR.Get.Trade_Payment_Totals_2015_By_File_Number(executive_recs_added, atmost_number := EBR_Services.constants.maxcounts.default);
 
 	// --------------- UCC - Uniform Commercial Code ----------------
 	UCCDataSeq := Business_Risk_BIP.PD_UCC(LinkIDsFound, kFetchLinkIDs, kFetchLinkSearchLevel, linkingOptions, options, AllowedSourcesSet);
 
 	// ------------- Corp2 - Corporate Filings ------------
 	CorpFilings_raw := Corp2.Key_LinkIDs.Corp.kfetch2(kFetchLinkIDs,
-	                                         kFetchLinkSearchLevel,
-	                                         0, // ScoreThreshold --> 0 = Give me everything
+																					 kFetchLinkSearchLevel,
+																					 0, // ScoreThreshold --> 0 = Give me everything
 																						Business_Risk_BIP.Constants.Limit_Default,
 																						Options.KeepLargeBusinesses);
 
@@ -939,12 +941,12 @@ layout_watchlists_temp := record
  // Calculate the source code by state to restrict records for Marketing properly. We'll
  // borrow corp_src_type for the state source code.
  CorpFilings_withSrcCode :=
-  PROJECT(
-    CorpFilings_seq,
-    TRANSFORM( RECORDOF(CorpFilings_seq),
-      SELF.corp_src_type := MDR.sourceTools.fCorpV2( LEFT.corp_key, LEFT.corp_state_origin ),
-      SELF := LEFT
-    ) );
+	PROJECT(
+		CorpFilings_seq,
+		TRANSFORM( RECORDOF(CorpFilings_seq),
+			SELF.corp_src_type := MDR.sourceTools.fCorpV2( LEFT.corp_key, LEFT.corp_state_origin ),
+			SELF := LEFT
+		) );
 
 	// Filter out records after our history date.
 	CorpFilings_recs := Business_Risk_BIP.Common.FilterRecords(CorpFilings_withSrcCode, dt_last_seen, dt_vendor_first_reported, corp_src_type, AllowedSourcesSet);

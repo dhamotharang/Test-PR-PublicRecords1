@@ -62,6 +62,7 @@ export Constants := module
     // FCRA Full File Disclosure person context deltabase
     export String40 delta_personcontext := 'delta_personcontext'; //FCRA Full File Disclosure
     export String40 delta_inquiryhistory := 'delta_inquiryhistory'; // FCRA Inquiry History
+    export String40 key_decryption := 'key_decryption'; // FCRA Inquiry History
     export String40 AttIapQuery := 'att_iap'; // ATT DQ_IRS - Information Retrieval Service
     export String40 ConsumerCreditReport := 'consumercreditreport'; //FCRA Consumer Credit Report
     export String40 DeltabaseSql := 'DeltaBaseSql';
@@ -69,7 +70,6 @@ export Constants := module
     export String40 ZumigoIdentity := 'zumigoidentity'; //Zumigo Line Identity
     // Equifax Account Decisioning gateway
     export String40 EquifaxAcctDecisioning := 'equifaxattributes'; // FCRA only as of 10/2017
-    export String40 EquifaxEVS := 'equifaxevs'; // Equifax Employment Verification Service
     export String40 IsAccuDataCNAM := 'accudata_cnam'; //CallerID - Retrieve Calling Name for phone number
     export String40 IsEquifaxEmsReport := 'equifax_ems'; //Equifax Tri-Merge report.
     export String40 IsTuFraudAlert := 'tu_fraud_alert'; //Transunion Fraud Alert
@@ -81,6 +81,11 @@ export Constants := module
     // DeferredTaskESP methods
     export String40 GetRequestInfo := 'dtegetrequestinfo'; // DTE Status Refresh method
     export String40 OKCcourtrunner := 'okccourtrunner'; // OKC court runner
+    // Healthcare methods
+    export String40 IsHCHCP := 'searchservicehcp'; // Soapcall to Healthcare HCP service
+    export String40 IsHCHCO := 'searchservicehco'; // Soapcall to Healthcare HCO service
+    export String40 IsHCHCPBatch := 'searchservicehcpbatch'; // Soapcall to Healthcare HCP Batch service
+    export String40 IsHCHCOBatch := 'searchservicehcobatch'; // Soapcall to Healthcare HCO Batch service
   end;
 
   export ConfigProperties := module

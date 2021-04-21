@@ -1,4 +1,4 @@
-import risk_indicators,PhonesFeedback_Services,FFD;
+﻿import risk_indicators,PhonesFeedback_Services,FFD;
 // import risk_indicators;
 export Layout_Comp_Addresses := record
 string1      shared_address := '';
@@ -37,5 +37,6 @@ string10   geo_lat := '';
 string11   geo_long := '';
 unsigned8 rawaid := 0;
 FFD.Layouts.CommonRawRecordElements;
+unsigned8 location_id := 0;
 end;
 	

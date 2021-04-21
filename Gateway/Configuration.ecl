@@ -90,7 +90,6 @@ export Configuration := module
   export IsAttIapQuery(string40 svcName) := STD.Str.ToLowerCase(trim(svcName))=Gateway.Constants.ServiceName.AttIapQuery;
   export IsZumigoIdentity(string40 svcName) := STD.Str.ToLowerCase(trim(svcName))=Gateway.Constants.ServiceName.ZumigoIdentity;
   export IsEquifaxAcctDecisioning(string40 svcName) := STD.Str.ToLowerCase(trim(svcName))=Gateway.Constants.ServiceName.EquifaxAcctDecisioning;
-  export IsEquifaxEVS(string40 svcName) := STD.Str.ToLowerCase(trim(svcName))=Gateway.Constants.ServiceName.EquifaxEVS;
   export IsAccuDataCNAM(string40 svcName) := STD.Str.ToLowerCase(trim(svcName)) = Gateway.Constants.ServiceName.IsAccuDataCNAM;
   export IsEquifaxEmsReport(string40 svcName) := STD.Str.ToLowerCase(trim(svcName)) = Gateway.Constants.ServiceName.IsEquifaxEmsReport;
   export IsTuFraudAlert(string40 svcName) := STD.Str.ToLowerCase(trim(svcName)) = Gateway.Constants.ServiceName.IsTuFraudAlert;
@@ -105,6 +104,7 @@ export Configuration := module
   export IsPhoneMetadata(string40 svcName) := STD.Str.ToLowerCase(trim(svcName)) = Gateway.Constants.ServiceName.PhonesMetaData;
   export IsDeltaPersoncontext(string40 svcName) := STD.Str.ToLowerCase(trim(svcName)) = Gateway.Constants.ServiceName.delta_personcontext;
   export IsDeltaInquiryHistory(string40 svcName) := STD.Str.ToLowerCase(trim(svcName)) = Gateway.Constants.ServiceName.delta_inquiryhistory;
+  export IsKeyDecryptionInquiryHistory(string40 svcName) := STD.Str.ToLowerCase(trim(svcName)) = Gateway.Constants.ServiceName.key_decryption;
   export IsConsumerCreditReport(string40 svcName) := STD.Str.ToLowerCase(trim(svcName))=Gateway.Constants.ServiceName.ConsumerCreditReport;
   export IsBriteVerifyEmail(string40 svcName) := STD.Str.ToLowerCase(trim(svcName))=STD.Str.ToLowerCase(Gateway.Constants.ServiceName.BriteVerifyEmail);
   export IsEmailRisk(string40 svcName) := STD.Str.ToLowerCase(trim(svcName))=STD.Str.ToLowerCase(Gateway.Constants.ServiceName.EmailRisk);
@@ -115,6 +115,11 @@ export Configuration := module
   export IsOKCcourtrunner(string40 svcName) := STD.Str.ToLowerCase(trim(svcName)) = STD.Str.ToLowerCase(Gateway.Constants.ServiceName.OKCcourtrunner);
   export IsDTEGetRequestInfo(string40 svcName) := STD.Str.ToLowerCase(trim(svcName)) = STD.Str.ToLowerCase(Gateway.Constants.ServiceName.GetRequestInfo);
   export IsIDAFraud(string40 svcName) := STD.Str.ToLowerCase(trim(svcName)) = STD.Str.ToLowerCase(Gateway.Constants.ServiceName.IDAFraud);
+  // Healthcare methods
+  export IsHCHCP(string40 svcName) := STD.Str.ToLowerCase(trim(svcName))=STD.Str.ToLowerCase(Gateway.Constants.ServiceName.IsHCHCP);
+  export IsHCHCO(string40 svcName) := STD.Str.ToLowerCase(trim(svcName))=STD.Str.ToLowerCase(Gateway.Constants.ServiceName.IsHCHCO);
+  export IsHCHCPBatch(string40 svcName) := STD.Str.ToLowerCase(trim(svcName))=STD.Str.ToLowerCase(Gateway.Constants.ServiceName.IsHCHCPBatch);
+  export IsHCHCOBatch(string40 svcName) := STD.Str.ToLowerCase(trim(svcName))=STD.Str.ToLowerCase(Gateway.Constants.ServiceName.IsHCHCOBatch);
   // ************************************************************************
   // Use functions below to retrieve gateway configuration properties.
   //

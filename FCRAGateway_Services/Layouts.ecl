@@ -34,8 +34,23 @@ EXPORT Layouts := MODULE
       iesp.share.t_Address parsed_Address; // add parsed address fields from equifax report to output
     END;
 
+    EXPORT CreditReportRecord := record
+      iesp.equifax_ems.t_CreditReportRecord;
+      dataset(iesp.share.t_CodeMap) Validations;
+    END;
+
+    EXPORT EmsResponse := RECORD
+      iesp.equifax_ems.t_EmsResponse - CreditReports;
+      dataset(CreditReportRecord) CreditReports;
+    END;
+
+    EXPORT EquifaxEmsResponse := record
+      iesp.share.t_ResponseHeader _Header;
+      EmsResponse emsResponse;
+    END;
+
     EXPORT gateway_out := RECORD
-      iesp.equifax_ems.t_EquifaxEmsResponse response;
+      EquifaxEmsResponse response;
     END;
 
     //This is the gateway response with royalties, alerts from personContext, and uniqueValidation

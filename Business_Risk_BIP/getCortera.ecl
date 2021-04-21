@@ -1,4 +1,4 @@
-﻿IMPORT BIPV2, Cortera, doxie, MDR, Risk_Indicators, STD, UT;
+﻿IMPORT BIPV2, Cortera, doxie, dx_Cortera, MDR, Risk_Indicators, STD, UT;
 
 EXPORT getCortera(DATASET(Business_Risk_BIP.Layouts.Shell) Shell,
                           Business_Risk_BIP.LIB_Business_Shell_LIBIN Options,
@@ -77,7 +77,7 @@ EXPORT getCortera(DATASET(Business_Risk_BIP.Layouts.Shell) Shell,
 	// ---------------[ Cortera Data ]----------------
 	CorteraBuildDate := Risk_Indicators.get_Build_date('cortera_build_version');
 
-	CorteraRaw := Cortera.Key_LinkIDs.kfetch2(Business_Risk_BIP.Common.GetLinkIDs(Shell),
+	CorteraRaw := dx_Cortera.Key_LinkIds.kfetch2(Business_Risk_BIP.Common.GetLinkIDs(Shell),
                                             Business_Risk_BIP.Common.SetLinkSearchLevel(link_search_level),
                                             0, // ScoreThreshold --> 0 = Give me everything
                                             Business_Risk_BIP.Constants.Limit_Default,
@@ -118,7 +118,7 @@ EXPORT getCortera(DATASET(Business_Risk_BIP.Layouts.Shell) Shell,
 
 	CorteraRecs_DD := DEDUP(SORT(CorteraRecs, Seq, ultimate_linkid), Seq, ultimate_linkid);
 
-	CorteraAttributes_InHouse_Raw := JOIN(CorteraRecs_DD, Cortera.Key_Attributes_Link_Id,
+	CorteraAttributes_InHouse_Raw := JOIN(CorteraRecs_DD, dx_Cortera.Key_Attributes_Link_Id,
     KEYED( LEFT.ultimate_linkid = RIGHT.ultimate_linkid) AND LEFT.Ultid=RIGHT.UltID AND LEFT.OrgID=RIGHT.OrgID AND LEFT.SeleID=RIGHT.SeleID ,
 					TRANSFORM({RECORDOF(RIGHT), UNSIGNED4 Seq, UNSIGNED6 HistoryDate},
 											SELF.Seq := LEFT.Seq;

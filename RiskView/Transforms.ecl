@@ -1,4 +1,4 @@
-﻿IMPORT risk_indicators, RiskView, iesp, STD, Models;
+﻿IMPORT risk_indicators, RiskView, iesp, STD, Models, ut;
 
 EXPORT Transforms := module
 
@@ -108,9 +108,9 @@ BOOLEAN ExcludeStatusRefresh = FALSE) := TRANSFORM
                                ri.Exception_Code IN Riskview.Constants.DTEErrorCodes => '41',
                                ri.Status_Code = '801' => ri.Status_Code,
                                '');
-    SELF.Exception_Message := MAP(ri.Exception_Code = Riskview.Constants.OKCError => RiskView.Constants.StatusRefresh_error_desc,
-                                  ri.Exception_Code IN Riskview.Constants.generalErrorCodes => RiskView.Constants.MLA_error_desc(ri.Exception_Code),
-                                  ri.Exception_Code IN Riskview.Constants.DTEErrorCodes  => RiskView.Constants.DTE_error_desc,
+    SELF.Exception_Message := MAP(ri.Exception_Code = Riskview.Constants.OKCError => RiskView.Constants.get_error_desc(RiskView.Constants.OKCError),
+                                  ri.Exception_Code IN Riskview.Constants.generalErrorCodes => RiskView.Constants.get_error_desc(ri.Exception_Code),
+                                  ri.Exception_Code IN Riskview.Constants.DTEErrorCodes  => RiskView.Constants.get_error_desc(RiskView.Constants.DTEError),
                                   ri.Status_Code = '801' => RiskView.Constants.Deferred_request_desc,
                                   '');
     SELF.Liens1_Seq:= IF(~suppress_condition, ri.LnJliens[1].Seq, '');
@@ -4635,6 +4635,268 @@ EXPORT Models.RVG2005_0_1.z_layouts_Input xfm_RVG2005_RVAttrs_and_IDAattrs(riskv
       self := [];
     END;
 
+EXPORT Models.RVS2005_0_1.z_layouts_Input xfm_RVS2005_RVAttrs_and_IDAattrs(riskview.layouts.attributes_internal_layout_noscore le, Risk_Indicators.layouts.layout_IDA_out rt) := TRANSFORM
+  Self.TransactionID := (String)le.seq;
+  //RV attributes
+  SELF.INPUTPROVIDEDFIRSTNAME          := (REAL)le.inputprovidedfirstname;
+  SELF.INPUTPROVIDEDLASTNAME           := (REAL)le.inputprovidedlastname;
+  SELF.INPUTPROVIDEDSTREETADDRESS      := (REAL)le.inputprovidedstreetaddress;
+  SELF.INPUTPROVIDEDCITY               := (REAL)le.inputprovidedcity;
+  SELF.INPUTPROVIDEDSTATE              := (REAL)le.inputprovidedstate;
+  SELF.INPUTPROVIDEDZIPCODE            := (REAL)le.inputprovidedzipcode;
+  SELF.INPUTPROVIDEDSSN                := (REAL)le.inputprovidedssn;
+  SELF.INPUTPROVIDEDDATEOFBIRTH        := (REAL)le.inputprovideddateofbirth;
+  SELF.INPUTPROVIDEDPHONE              := (REAL)le.inputprovidedphone;
+  SELF.INPUTPROVIDEDLEXID              := (REAL)le.inputprovidedlexid;
+  SELF.SUBJECTRECORDTIMEOLDEST         := (REAL)le.subjectrecordtimeoldest;
+  SELF.SUBJECTRECORDTIMENEWEST         := (REAL)le.subjectrecordtimenewest;
+  SELF.SUBJECTNEWESTRECORD12MONTH      := (REAL)le.subjectnewestrecord12month;
+  SELF.SUBJECTACTIVITYINDEX03MONTH     := (REAL)le.subjectactivityindex03month;
+  SELF.SUBJECTACTIVITYINDEX06MONTH     := (REAL)le.subjectactivityindex06month;
+  SELF.SUBJECTACTIVITYINDEX12MONTH     := (REAL)le.subjectactivityindex12month;
+  SELF.SUBJECTAGE                      := (REAL)le.subjectage;
+  SELF.SUBJECTDECEASED                 := (REAL)le.subjectdeceased;
+  SELF.SUBJECTSSNCOUNT                 := (REAL)le.subjectssncount;
+  SELF.SUBJECTSTABILITYINDEX           := (REAL)le.subjectstabilityindex;
+  SELF.SUBJECTSTABILITYPRIMARYFACTOR   := le.subjectstabilityprimaryfactor;
+  SELF.SUBJECTABILITYINDEX             := (REAL)le.subjectabilityindex;
+  SELF.SUBJECTABILITYPRIMARYFACTOR     := le.subjectabilityprimaryfactor;
+  SELF.SUBJECTWILLINGNESSINDEX         := (REAL)le.subjectwillingnessindex;
+  SELF.SUBJECTWILLINGNESSPRIMARYFACTOR := le.subjectwillingnessprimaryfactor;
+  SELF.CONFIRMATIONSUBJECTFOUND        := (REAL)le.confirmationsubjectfound;
+  SELF.CONFIRMATIONINPUTNAME           := (REAL)le.confirmationinputname;
+  SELF.CONFIRMATIONINPUTDOB            := (REAL)le.confirmationinputdob;
+  SELF.CONFIRMATIONINPUTSSN            := (REAL)le.confirmationinputssn;
+  SELF.CONFIRMATIONINPUTADDRESS        := (REAL)le.confirmationinputaddress;
+  SELF.SOURCENONDEROGPROFILEINDEX      := (REAL)le.sourcenonderogprofileindex;
+  SELF.SOURCENONDEROGCOUNT             := (REAL)le.sourcenonderogcount;
+  SELF.SOURCENONDEROGCOUNT03MONTH      := (REAL)le.sourcenonderogcount03month;
+  SELF.SOURCENONDEROGCOUNT06MONTH      := (REAL)le.sourcenonderogcount06month;
+  SELF.SOURCENONDEROGCOUNT12MONTH      := (REAL)le.sourcenonderogcount12month;
+  SELF.SOURCECREDHEADERTIMEOLDEST      := (REAL)le.sourcecredheadertimeoldest;
+  SELF.SOURCECREDHEADERTIMENEWEST      := (REAL)le.sourcecredheadertimenewest;
+  SELF.SOURCEVOTERREGISTRATION         := (REAL)le.sourcevoterregistration;
+  SELF.EDUCATIONATTENDANCE             := (REAL)le.educationattendance;
+  SELF.EDUCATIONEVIDENCE               := (REAL)le.educationevidence;
+  SELF.EDUCATIONPROGRAMATTENDED        := (REAL)le.educationprogramattended;
+  SELF.EDUCATIONINSTITUTIONPRIVATE     := (REAL)le.educationinstitutionprivate;
+  SELF.EDUCATIONINSTITUTIONRATING      := (REAL)le.educationinstitutionrating;
+  SELF.PROFLICCOUNT                    := (REAL)le.profliccount;
+  SELF.PROFLICTYPECATEGORY             := (REAL)le.proflictypecategory;
+  SELF.BUSINESSASSOCIATION             := (REAL)le.businessassociation;
+  SELF.BUSINESSASSOCIATIONINDEX        := (REAL)le.businessassociationindex;
+  SELF.BUSINESSASSOCIATIONTIMEOLDEST   := (REAL)le.businessassociationtimeoldest;
+  SELF.BUSINESSTITLELEADERSHIP         := (REAL)le.businesstitleleadership;
+  SELF.ASSETINDEX                      := (REAL)le.assetindex;
+  SELF.ASSETINDEXPRIMARYFACTOR         := le.assetindexprimaryfactor;
+  SELF.ASSETOWNERSHIP                  := (REAL)le.assetownership;
+  SELF.ASSETPROP                       := (REAL)le.assetprop;
+  SELF.ASSETPROPINDEX                  := (REAL)le.assetpropindex;
+  SELF.ASSETPROPEVERCOUNT              := (REAL)le.assetpropevercount;
+  SELF.ASSETPROPCURRENTCOUNT           := (REAL)le.assetpropcurrentcount;
+  SELF.ASSETPROPCURRENTTAXTOTAL        := (REAL)le.assetpropcurrenttaxtotal;
+  SELF.ASSETPROPPURCHASECOUNT12MONTH   := (REAL)le.assetproppurchasecount12month;
+  SELF.ASSETPROPPURCHASETIMEOLDEST     := (REAL)le.assetproppurchasetimeoldest;
+  SELF.ASSETPROPPURCHASETIMENEWEST     := (REAL)le.assetproppurchasetimenewest;
+  SELF.ASSETPROPNEWESTMORTGAGETYPE     := (REAL)le.assetpropnewestmortgagetype;
+  SELF.ASSETPROPEVERSOLDCOUNT          := (REAL)le.assetpropeversoldcount;
+  SELF.ASSETPROPSOLDCOUNT12MONTH       := (REAL)le.assetpropsoldcount12month;
+  SELF.ASSETPROPSALETIMEOLDEST         := (REAL)le.assetpropsaletimeoldest;
+  SELF.ASSETPROPSALETIMENEWEST         := (REAL)le.assetpropsaletimenewest;
+  SELF.ASSETPROPNEWESTSALEPRICE        := le.assetpropnewestsaleprice;
+  SELF.ASSETPROPSALEPURCHASERATIO      := (REAL)le.assetpropsalepurchaseratio;
+  SELF.ASSETPERSONAL                   := (REAL)le.assetpersonal;
+  SELF.ASSETPERSONALCOUNT              := (REAL)le.assetpersonalcount;
+  SELF.PURCHASEACTIVITYINDEX           := (REAL)le.purchaseactivityindex;
+  SELF.PURCHASEACTIVITYCOUNT           := (REAL)le.purchaseactivitycount;
+  SELF.PURCHASEACTIVITYDOLLARTOTAL     := (REAL)le.purchaseactivitydollartotal;
+  SELF.DEROGSEVERITYINDEX              := (REAL)le.derogseverityindex;
+  SELF.DEROGCOUNT                      := (REAL)le.derogcount;
+  SELF.DEROGCOUNT12MONTH               := (REAL)le.derogcount12month;
+  SELF.DEROGTIMENEWEST                 := (REAL)le.derogtimenewest;
+  SELF.CRIMINALFELONYCOUNT             := (REAL)le.criminalfelonycount;
+  SELF.CRIMINALFELONYCOUNT12MONTH      := (REAL)le.criminalfelonycount12month;
+  SELF.CRIMINALFELONYTIMENEWEST        := (REAL)le.criminalfelonytimenewest;
+  SELF.CRIMINALNONFELONYCOUNT          := (REAL)le.criminalnonfelonycount;
+  SELF.CRIMINALNONFELONYCOUNT12MONTH   := (REAL)le.criminalnonfelonycount12month;
+  SELF.CRIMINALNONFELONYTIMENEWEST     := (REAL)le.criminalnonfelonytimenewest;
+  SELF.EVICTIONCOUNT                   := (REAL)le.evictioncount;
+  SELF.EVICTIONCOUNT12MONTH            := (REAL)le.evictioncount12month;
+  SELF.EVICTIONTIMENEWEST              := (REAL)le.evictiontimenewest;
+  SELF.LIENJUDGMENTSEVERITYINDEX       := (REAL)le.lienjudgmentseverityindex;
+  SELF.LIENJUDGMENTCOUNT               := (REAL)le.lienjudgmentcount;
+  SELF.LIENJUDGMENTCOUNT12MONTH        := (REAL)le.lienjudgmentcount12month;
+  SELF.LIENJUDGMENTSMALLCLAIMSCOUNT    := (REAL)le.lienjudgmentsmallclaimscount;
+  SELF.LIENJUDGMENTCOURTCOUNT          := (REAL)le.lienjudgmentcourtcount;
+  SELF.LIENJUDGMENTTAXCOUNT            := (REAL)le.lienjudgmenttaxcount;
+  SELF.LIENJUDGMENTFORECLOSURECOUNT    := (REAL)le.lienjudgmentforeclosurecount;
+  SELF.LIENJUDGMENTOTHERCOUNT          := (REAL)le.lienjudgmentothercount;
+  SELF.LIENJUDGMENTTIMENEWEST          := (REAL)le.lienjudgmenttimenewest;
+  SELF.LIENJUDGMENTDOLLARTOTAL         := (REAL)le.lienjudgmentdollartotal;
+  SELF.BANKRUPTCYCOUNT                 := (REAL)le.bankruptcycount;
+  SELF.BANKRUPTCYCOUNT24MONTH          := (REAL)le.bankruptcycount24month;
+  SELF.BANKRUPTCYTIMENEWEST            := (REAL)le.bankruptcytimenewest;
+  SELF.BANKRUPTCYCHAPTER               := (REAL)le.bankruptcychapter;
+  SELF.BANKRUPTCYSTATUS                := (REAL)le.bankruptcystatus;
+  SELF.BANKRUPTCYDISMISSED24MONTH      := (REAL)le.bankruptcydismissed24month;
+  SELF.SHORTTERMLOANREQUEST            := (REAL)le.shorttermloanrequest;
+  SELF.SHORTTERMLOANREQUEST12MONTH     := (REAL)le.shorttermloanrequest12month;
+  SELF.SHORTTERMLOANREQUEST24MONTH     := (REAL)le.shorttermloanrequest24month;
+  SELF.INQUIRYAUTO12MONTH              := (REAL)le.inquiryauto12month;
+  SELF.INQUIRYBANKING12MONTH           := (REAL)le.inquirybanking12month;
+  SELF.INQUIRYTELCOM12MONTH            := (REAL)le.inquirytelcom12month;
+  SELF.INQUIRYNONSHORTTERM12MONTH      := (REAL)le.inquirynonshortterm12month;
+  SELF.INQUIRYSHORTTERM12MONTH         := (REAL)le.inquiryshortterm12month;
+  SELF.INQUIRYCOLLECTIONS12MONTH       := (REAL)le.inquirycollections12month;
+  SELF.SSNSUBJECTCOUNT                 := (REAL)le.ssnsubjectcount;
+  SELF.SSNDECEASED                     := (REAL)le.ssndeceased;
+  SELF.SSNDATELOWISSUED                := (REAL)le.ssndatelowissued;
+  SELF.SSNPROBLEMS                     := (REAL)le.ssnproblems;
+  SELF.ADDRONFILECOUNT                 := (REAL)le.addronfilecount;
+  SELF.ADDRONFILECORRECTIONAL          := (REAL)le.addronfilecorrectional;
+  SELF.ADDRONFILECOLLEGE               := (REAL)le.addronfilecollege;
+  SELF.ADDRONFILEHIGHRISK              := (REAL)le.addronfilehighrisk;
+  SELF.ADDRINPUTTIMEOLDEST             := (REAL)le.addrinputtimeoldest;
+  SELF.ADDRINPUTTIMENEWEST             := (REAL)le.addrinputtimenewest;
+  SELF.ADDRINPUTLENGTHOFRES            := (REAL)le.addrinputlengthofres;
+  SELF.ADDRINPUTSUBJECTCOUNT           := (REAL)le.addrinputsubjectcount;
+  SELF.ADDRINPUTMATCHINDEX             := (REAL)le.addrinputmatchindex;
+  SELF.ADDRINPUTSUBJECTOWNED           := (REAL)le.addrinputsubjectowned;
+  SELF.ADDRINPUTDEEDMAILING            := (REAL)le.addrinputdeedmailing;
+  SELF.ADDRINPUTOWNERSHIPINDEX         := (REAL)le.addrinputownershipindex;
+  SELF.ADDRINPUTPHONESERVICE           := (REAL)le.addrinputphoneservice;
+  SELF.ADDRINPUTPHONECOUNT             := (REAL)le.addrinputphonecount;
+  SELF.ADDRINPUTDWELLTYPE              := le.addrinputdwelltype;
+  SELF.ADDRINPUTDWELLTYPEINDEX         := (REAL)le.addrinputdwelltypeindex;
+  SELF.ADDRINPUTDELIVERY               := (REAL)le.addrinputdelivery;
+  SELF.ADDRINPUTTIMELASTSALE           := (REAL)le.addrinputtimelastsale;
+  SELF.ADDRINPUTLASTSALEPRICE          := (REAL)le.addrinputlastsaleprice;
+  SELF.ADDRINPUTTAXVALUE               := (REAL)le.addrinputtaxvalue;
+  SELF.ADDRINPUTTAXYR                  := (REAL)le.addrinputtaxyr;
+  SELF.ADDRINPUTTAXMARKETVALUE         := (REAL)le.addrinputtaxmarketvalue;
+  SELF.ADDRINPUTAVMVALUE               := (REAL)le.addrinputavmvalue;
+  SELF.ADDRINPUTAVMVALUE12MONTH        := (REAL)le.addrinputavmvalue12month;
+  SELF.ADDRINPUTAVMRATIO12MONTHPRIOR   := (REAL)le.addrinputavmratio12monthprior;
+  SELF.ADDRINPUTAVMVALUE60MONTH        := (REAL)le.addrinputavmvalue60month;
+  SELF.ADDRINPUTAVMRATIO60MONTHPRIOR   := (REAL)le.addrinputavmratio60monthprior;
+  SELF.ADDRINPUTCOUNTYRATIO            := (REAL)le.addrinputcountyratio;
+  SELF.ADDRINPUTTRACTRATIO             := (REAL)le.addrinputtractratio;
+  SELF.ADDRINPUTBLOCKRATIO             := (REAL)le.addrinputblockratio;
+  SELF.ADDRINPUTPROBLEMS               := (REAL)le.addrinputproblems;
+  SELF.ADDRCURRENTTIMEOLDEST           := (REAL)le.addrcurrenttimeoldest;
+  SELF.ADDRCURRENTTIMENEWEST           := (REAL)le.addrcurrenttimenewest;
+  SELF.ADDRCURRENTLENGTHOFRES          := (REAL)le.addrcurrentlengthofres;
+  SELF.ADDRCURRENTSUBJECTOWNED         := (REAL)le.addrcurrentsubjectowned;
+  SELF.ADDRCURRENTDEEDMAILING          := (REAL)le.addrcurrentdeedmailing;
+  SELF.ADDRCURRENTOWNERSHIPINDEX       := (REAL)le.addrcurrentownershipindex;
+  SELF.ADDRCURRENTPHONESERVICE         := (REAL)le.addrcurrentphoneservice;
+  SELF.ADDRCURRENTDWELLTYPE            := le.addrcurrentdwelltype;
+  SELF.ADDRCURRENTDWELLTYPEINDEX       := (REAL)le.addrcurrentdwelltypeindex;
+  SELF.ADDRCURRENTTIMELASTSALE         := (REAL)le.addrcurrenttimelastsale;
+  SELF.ADDRCURRENTLASTSALESPRICE       := (REAL)le.addrcurrentlastsalesprice;
+  SELF.ADDRCURRENTTAXVALUE             := (REAL)le.addrcurrenttaxvalue;
+  SELF.ADDRCURRENTTAXYR                := (REAL)le.addrcurrenttaxyr;
+  SELF.ADDRCURRENTTAXMARKETVALUE       := (REAL)le.addrcurrenttaxmarketvalue;
+  SELF.ADDRCURRENTAVMVALUE             := (REAL)le.addrcurrentavmvalue;
+  SELF.ADDRCURRENTAVMVALUE12MONTH      := (REAL)le.addrcurrentavmvalue12month;
+  SELF.ADDRCURRENTAVMRATIO12MONTHPRIOR := (REAL)le.addrcurrentavmratio12monthprior;
+  SELF.ADDRCURRENTAVMVALUE60MONTH      := (REAL)le.addrcurrentavmvalue60month;
+  SELF.ADDRCURRENTAVMRATIO60MONTHPRIOR := (REAL)le.addrcurrentavmratio60monthprior;
+  SELF.ADDRCURRENTCOUNTYRATIO          := (REAL)le.addrcurrentcountyratio;
+  SELF.ADDRCURRENTTRACTRATIO           := (REAL)le.addrcurrenttractratio;
+  SELF.ADDRCURRENTBLOCKRATIO           := (REAL)le.addrcurrentblockratio;
+  SELF.ADDRCURRENTCORRECTIONAL         := (REAL)le.addrcurrentcorrectional;
+  SELF.ADDRPREVIOUSTIMEOLDEST          := (REAL)le.addrprevioustimeoldest;
+  SELF.ADDRPREVIOUSTIMENEWEST          := (REAL)le.addrprevioustimenewest;
+  SELF.ADDRPREVIOUSLENGTHOFRES         := (REAL)le.addrpreviouslengthofres;
+  SELF.ADDRPREVIOUSSUBJECTOWNED        := (REAL)le.addrprevioussubjectowned;
+  SELF.ADDRPREVIOUSOWNERSHIPINDEX      := (REAL)le.addrpreviousownershipindex;
+  SELF.ADDRPREVIOUSDWELLTYPE           := le.addrpreviousdwelltype;
+  SELF.ADDRPREVIOUSDWELLTYPEINDEX      := (REAL)le.addrpreviousdwelltypeindex;
+  SELF.ADDRPREVIOUSCORRECTIONAL        := (REAL)le.addrpreviouscorrectional;
+  SELF.ADDRSTABILITYINDEX              := (REAL)le.addrstabilityindex;
+  SELF.ADDRCHANGECOUNT03MONTH          := (REAL)le.addrchangecount03month;
+  SELF.ADDRCHANGECOUNT06MONTH          := (REAL)le.addrchangecount06month;
+  SELF.ADDRCHANGECOUNT12MONTH          := (REAL)le.addrchangecount12month;
+  SELF.ADDRCHANGECOUNT24MONTH          := (REAL)le.addrchangecount24month;
+  SELF.ADDRCHANGECOUNT60MONTH          := (REAL)le.addrchangecount60month;
+  SELF.ADDRLASTMOVETAXRATIODIFF        := (REAL)le.addrlastmovetaxratiodiff;
+  SELF.ADDRLASTMOVEECONTRAJECTORY      := (REAL)le.addrlastmoveecontrajectory;
+  SELF.ADDRLASTMOVEECONTRAJECTORYINDEX := (REAL)le.addrlastmoveecontrajectoryindex;
+  SELF.PHONEINPUTPROBLEMS              := (REAL)le.phoneinputproblems;
+  SELF.PHONEINPUTSUBJECTCOUNT          := (REAL)le.phoneinputsubjectcount;
+  SELF.PHONEINPUTMOBILE                := (REAL)le.phoneinputmobile;
+  SELF.ALERTREGULATORYCONDITION        := (REAL)le.alertregulatorycondition;
+
+  //IDA attributes
+  SELF.CADCSAP_IBK_S1_D90_NUM          := (REAL)rt.Indicators(name='CADCSAP_IBK_S1_D90_NUM')[1].value;
+  SELF.CADCSAP_IBK_S1_D90_UADD         := (REAL)rt.Indicators(name='CADCSAP_IBK_S1_D90_UADD')[1].value;
+  SELF.CADCSAP_IBK_S1_D90_DAYSMR       := (REAL)rt.Indicators(name='CADCSAP_IBK_S1_D90_DAYSMR')[1].value;
+  SELF.CADCSAP_IBK_S1_D120_NUM         := (REAL)rt.Indicators(name='CADCSAP_IBK_S1_D120_NUM')[1].value;
+  SELF.CADCSAP_IBK_S1_D120_UADD        := (REAL)rt.Indicators(name='CADCSAP_IBK_S1_D120_UADD')[1].value;
+  SELF.CADCSAP_IBK_S1_D120_DAYSMR      := (REAL)rt.Indicators(name='CADCSAP_IBK_S1_D120_DAYSMR')[1].value;
+  SELF.CADCSAP_IBK_S1_D365_NUM         := (REAL)rt.Indicators(name='CADCSAP_IBK_S1_D365_NUM')[1].value;
+  SELF.CADCSAP_IBK_S1_D365_DAYSMR      := (REAL)rt.Indicators(name='CADCSAP_IBK_S1_D365_DAYSMR')[1].value;
+  SELF.CADCSAP_IBK_S1_D1095_UADD       := (REAL)rt.Indicators(name='CADCSAP_IBK_S1_D1095_UADD')[1].value;
+  SELF.CADCSAP_IBK_A1_D90_NUM          := (REAL)rt.Indicators(name='CADCSAP_IBK_A1_D90_NUM')[1].value;
+  SELF.CADCSAP_IBK_A1_D90_DAYSMR       := (REAL)rt.Indicators(name='CADCSAP_IBK_A1_D90_DAYSMR')[1].value;
+  SELF.CADCSAP_IBK_A1_D120_DAYSMR      := (REAL)rt.Indicators(name='CADCSAP_IBK_A1_D120_DAYSMR')[1].value;
+  SELF.CADCSAP_IBK_P1_D90_NUM          := (REAL)rt.Indicators(name='CADCSAP_IBK_P1_D90_NUM')[1].value;
+  SELF.CADCSAP_IBK_P1_D90_UADD         := (REAL)rt.Indicators(name='CADCSAP_IBK_P1_D90_UADD')[1].value;
+  SELF.CADCSAP_IBK_P1_D90_DAYSMR       := (REAL)rt.Indicators(name='CADCSAP_IBK_P1_D90_DAYSMR')[1].value;
+  SELF.CADCSAP_IBK_P1_D120_NUM         := (REAL)rt.Indicators(name='CADCSAP_IBK_P1_D120_NUM')[1].value;
+  SELF.CADCSAP_IBK_P1_D1095_DAYSMR     := (REAL)rt.Indicators(name='CADCSAP_IBK_P1_D1095_DAYSMR')[1].value;
+  SELF.CADCSAP_IBK_PX_D90_NUM          := (REAL)rt.Indicators(name='CADCSAP_IBK_PX_D90_NUM')[1].value;
+  SELF.CADCSAP_IBK_PX_D90_DAYSMR       := (REAL)rt.Indicators(name='CADCSAP_IBK_PX_D90_DAYSMR')[1].value;
+  SELF.CADCSAP_IBK_PX_D120_NUM         := (REAL)rt.Indicators(name='CADCSAP_IBK_PX_D120_NUM')[1].value;
+  SELF.CADCSAP_IBK_PX_D120_DAYSMR      := (REAL)rt.Indicators(name='CADCSAP_IBK_PX_D120_DAYSMR')[1].value;
+  SELF.CADCSAP_IBK_PX_D365_NUM         := (REAL)rt.Indicators(name='CADCSAP_IBK_PX_D365_NUM')[1].value;
+  SELF.CADCSAP_IBK_PX_D365_DAYSMR      := (REAL)rt.Indicators(name='CADCSAP_IBK_PX_D365_DAYSMR')[1].value;
+  SELF.CADCSAP_IBK_PX_D1095_DAYSMR     := (REAL)rt.Indicators(name='CADCSAP_IBK_PX_D1095_DAYSMR')[1].value;
+  SELF.CADCSAP_IPD_S1_D90_UADD         := (REAL)rt.Indicators(name='CADCSAP_IPD_S1_D90_UADD')[1].value;
+  SELF.CADCSAP_IPD_S1_D1095_UADD       := (REAL)rt.Indicators(name='CADCSAP_IPD_S1_D1095_UADD')[1].value;
+  SELF.CADCSAP_IPD_A1_D90_DAYSMR       := (REAL)rt.Indicators(name='CADCSAP_IPD_A1_D90_DAYSMR')[1].value;
+  SELF.CADCSAP_IPD_A1_D120_NUM         := (REAL)rt.Indicators(name='CADCSAP_IPD_A1_D120_NUM')[1].value;
+  SELF.CADCSAP_IPD_A1_D120_DAYSMR      := (REAL)rt.Indicators(name='CADCSAP_IPD_A1_D120_DAYSMR')[1].value;
+  SELF.CADCSAP_IPD_A1_D1095_NUM        := (REAL)rt.Indicators(name='CADCSAP_IPD_A1_D1095_NUM')[1].value;
+  SELF.CADCSAP_IPD_P1_D90_NUM          := (REAL)rt.Indicators(name='CADCSAP_IPD_P1_D90_NUM')[1].value;
+  SELF.CADCSAP_IPD_P1_D365_DAYSMR      := (REAL)rt.Indicators(name='CADCSAP_IPD_P1_D365_DAYSMR')[1].value;
+  SELF.CADCSAP_IPD_PX_D90_DAYSMR       := (REAL)rt.Indicators(name='CADCSAP_IPD_PX_D90_DAYSMR')[1].value;
+  SELF.CADCSAP_IPD_PX_D120_NUM         := (REAL)rt.Indicators(name='CADCSAP_IPD_PX_D120_NUM')[1].value;
+  SELF.CADCSAP_IPD_PX_D120_DAYSMR      := (REAL)rt.Indicators(name='CADCSAP_IPD_PX_D120_DAYSMR')[1].value;
+  SELF.CADCSAP_IPD_PX_D365_NUM         := (REAL)rt.Indicators(name='CADCSAP_IPD_PX_D365_NUM')[1].value;
+  SELF.CADCSAP_IPD_PX_D365_DAYSMR      := (REAL)rt.Indicators(name='CADCSAP_IPD_PX_D365_DAYSMR')[1].value;
+  SELF.CADCSAP_IPD_PX_D1095_NUM        := (REAL)rt.Indicators(name='CADCSAP_IPD_PX_D1095_NUM')[1].value;
+  SELF.CADCSAP_IPD_PX_D1095_UADD       := (REAL)rt.Indicators(name='CADCSAP_IPD_PX_D1095_UADD')[1].value;
+  SELF.CADCSAP_IPD_PX_D1095_DAYSMR     := (REAL)rt.Indicators(name='CADCSAP_IPD_PX_D1095_DAYSMR')[1].value;
+  SELF.CADCSAP_IX_S1_D90_NUM           := (REAL)rt.Indicators(name='CADCSAP_IX_S1_D90_NUM')[1].value;
+  SELF.CADCSAP_IX_S1_D90_DAYSMR        := (REAL)rt.Indicators(name='CADCSAP_IX_S1_D90_DAYSMR')[1].value;
+  SELF.CADCSAP_IX_S1_D120_UADD         := (REAL)rt.Indicators(name='CADCSAP_IX_S1_D120_UADD')[1].value;
+  SELF.CADCSAP_IX_S1_D120_DAYSMR       := (REAL)rt.Indicators(name='CADCSAP_IX_S1_D120_DAYSMR')[1].value;
+  SELF.CADCSAP_IX_S1_D365_NUM          := (REAL)rt.Indicators(name='CADCSAP_IX_S1_D365_NUM')[1].value;
+  SELF.CADCSAP_IX_S1_D1095_NUM         := (REAL)rt.Indicators(name='CADCSAP_IX_S1_D1095_NUM')[1].value;
+  SELF.CADCSAP_IX_S1_D1095_UADD        := (REAL)rt.Indicators(name='CADCSAP_IX_S1_D1095_UADD')[1].value;
+  SELF.CADCSAP_IX_A1_D90_NUM           := (REAL)rt.Indicators(name='CADCSAP_IX_A1_D90_NUM')[1].value;
+  SELF.CADCSAP_IX_A1_D90_DAYSMR        := (REAL)rt.Indicators(name='CADCSAP_IX_A1_D90_DAYSMR')[1].value;
+  SELF.CADCSAP_IX_A1_D120_DAYSMR       := (REAL)rt.Indicators(name='CADCSAP_IX_A1_D120_DAYSMR')[1].value;
+  SELF.CADCSAP_IX_P1_D90_NUM           := (REAL)rt.Indicators(name='CADCSAP_IX_P1_D90_NUM')[1].value;
+  SELF.CADCSAP_IX_P1_D90_UADD          := (REAL)rt.Indicators(name='CADCSAP_IX_P1_D90_UADD')[1].value;
+  SELF.CADCSAP_IX_P1_D90_DAYSMR        := (REAL)rt.Indicators(name='CADCSAP_IX_P1_D90_DAYSMR')[1].value;
+  SELF.CADCSAP_IX_P1_D120_DAYSMR       := (REAL)rt.Indicators(name='CADCSAP_IX_P1_D120_DAYSMR')[1].value;
+  SELF.CADCSAP_IX_P1_D365_NUM          := (REAL)rt.Indicators(name='CADCSAP_IX_P1_D365_NUM')[1].value;
+  SELF.CADCSAP_IX_PX_D90_NUM           := (REAL)rt.Indicators(name='CADCSAP_IX_PX_D90_NUM')[1].value;
+  SELF.CADCSAP_IX_PX_D90_DAYSMR        := (REAL)rt.Indicators(name='CADCSAP_IX_PX_D90_DAYSMR')[1].value;
+  SELF.CADCSAP_IX_PX_D120_NUM          := (REAL)rt.Indicators(name='CADCSAP_IX_PX_D120_NUM')[1].value;
+  SELF.CADCSAP_IX_PX_D120_UADD         := (REAL)rt.Indicators(name='CADCSAP_IX_PX_D120_UADD')[1].value;
+  SELF.CADCSAP_IX_PX_D120_DAYSMR       := (REAL)rt.Indicators(name='CADCSAP_IX_PX_D120_DAYSMR')[1].value;
+  SELF.CADCSAP_IX_PX_D365_NUM          := (REAL)rt.Indicators(name='CADCSAP_IX_PX_D365_NUM')[1].value;
+  SELF.CADCSAP_IX_PX_D365_DAYSMR       := (REAL)rt.Indicators(name='CADCSAP_IX_PX_D365_DAYSMR')[1].value;
+  SELF.CADCSAP_IX_PX_D1095_NUM         := (REAL)rt.Indicators(name='CADCSAP_IX_PX_D1095_NUM')[1].value;
+  SELF.CADCSAP_IX_PX_D1095_DAYSMR      := (REAL)rt.Indicators(name='CADCSAP_IX_PX_D1095_DAYSMR')[1].value;
+  
+  SELF := [];
+END;
+
 //RVA2008_1 model transform
 EXPORT Models.RVA2008_1_0.z_layouts_Input xfm_RVA2008_RVAttrs(riskview.layouts.attributes_internal_layout_noscore le) := TRANSFORM
       Self.TransactionID := (String)le.seq;
@@ -4660,7 +4922,149 @@ EXPORT Models.RVA2008_1_0.z_layouts_Input xfm_RVA2008_RVAttrs(riskview.layouts.a
       
       self := [];
     END;
+		
+//RVT2004_1 model transform
+EXPORT Models.RVT2004_1_0.z_layouts_Input xfm_RVT2004_1_RVAttrs(riskview.layouts.attributes_internal_layout_noscore le) := TRANSFORM
+			self.TransactionID := (String)le.seq;
+			// RV Attributes
+	    self.SUBJECTRECORDTIMEOLDEST                  := le.subjectrecordtimeoldest;
+      self.SUBJECTDECEASED                          := le.subjectdeceased;
+      self.CONFIRMATIONSUBJECTFOUND                 := le.confirmationsubjectfound;
+      self.SOURCENONDEROGCOUNT                      := le.sourcenonderogcount;
+      self.SOURCENONDEROGCOUNT06MONTH               := le.sourcenonderogcount06month;
+      self.SSNDECEASED                              := le.ssndeceased;
+      self.ASSETPROPEVERCOUNT                       := le.assetpropevercount;
+      self.EVICTIONCOUNT                            := le.evictioncount;
+      self.LIENJUDGMENTCOUNT                        := le.lienjudgmentcount;
+      self.BANKRUPTCYSTATUS                         := le.bankruptcystatus;
+      self.SHORTTERMLOANREQUEST                     := le.shorttermloanrequest;
+      self.INQUIRYAUTO12MONTH                       := le.inquiryauto12month;
+      self.INQUIRYBANKING12MONTH                    := le.inquirybanking12month;
+      self.INQUIRYSHORTTERM12MONTH                  := le.inquiryshortterm12month;
+      self.INQUIRYCOLLECTIONS12MONTH                := le.inquirycollections12month;
+      self.ADDRONFILECOUNT                          := le.addronfilecount;
+      self.ADDRCURRENTOWNERSHIPINDEX                := le.addrcurrentownershipindex;
+      self.ADDRPREVIOUSTIMEOLDEST                   := le.addrprevioustimeoldest;
+      self.ADDRCHANGECOUNT60MONTH                   := le.addrchangecount60month;
+      self.ALERTREGULATORYCONDITION                 := le.alertregulatorycondition;
+      
+      self := [];
+    END;    
 
+//RVT2004_2 model transform
+EXPORT Models.RVT2004_2_0.z_layouts_Input xfm_RVT2004_2_RVAttrs(riskview.layouts.attributes_internal_layout_noscore le) := TRANSFORM
+			self.TransactionID := (String)le.seq;
+			// RV Attributes
+	    self.SUBJECTRECORDTIMEOLDEST                  := le.subjectrecordtimeoldest;
+      self.SUBJECTDECEASED                          := le.subjectdeceased;
+      self.CONFIRMATIONSUBJECTFOUND                 := le.confirmationsubjectfound;
+      self.SOURCENONDEROGCOUNT                      := le.sourcenonderogcount;
+      self.SOURCENONDEROGCOUNT06MONTH               := le.sourcenonderogcount06month;
+      self.SSNDECEASED                              := le.ssndeceased;
+      self.ASSETPROPCURRENTCOUNT                    := le.assetpropcurrentcount;
+      self.ASSETPROPEVERSOLDCOUNT                   := le.assetpropeversoldcount;
+      self.EVICTIONCOUNT                            := le.evictioncount;
+      self.LIENJUDGMENTCOUNT                        := le.lienjudgmentcount;
+      self.LIENJUDGMENTSMALLCLAIMSCOUNT             := le.lienjudgmentsmallclaimscount;
+      self.BANKRUPTCYSTATUS                         := le.bankruptcystatus;
+      self.SHORTTERMLOANREQUEST                     := le.shorttermloanrequest;
+      self.INQUIRYAUTO12MONTH                       := le.inquiryauto12month;
+      self.INQUIRYBANKING12MONTH                    := le.inquirybanking12month;
+      self.INQUIRYSHORTTERM12MONTH                  := le.inquiryshortterm12month;
+      self.INQUIRYCOLLECTIONS12MONTH                := le.inquirycollections12month;
+      self.ADDRONFILECOUNT                          := le.addronfilecount;
+      self.ADDRCURRENTOWNERSHIPINDEX                := le.addrcurrentownershipindex;
+      self.ADDRPREVIOUSTIMEOLDEST                   := le.addrprevioustimeoldest;
+      self.ADDRCHANGECOUNT60MONTH                   := le.addrchangecount60month;
+      self.ALERTREGULATORYCONDITION                 := le.alertregulatorycondition;
+   
+      self := [];
+    END;
+    
+//RVC2004_1 model transform
+EXPORT Models.RVC2004_1_0.z_layouts_Input xfm_RVC2004_1_RVAttrs_and_Custom_Inputs(riskview.layouts.attributes_internal_layout_noscore le, riskview.layouts.Layout_Custom_Inputs rt) := TRANSFORM
+      self.TransactionID := (String)le.seq;
+      // RV Attributes and custom inputs
+      
+      TodaysDate := (STRING)STD.Date.Today();
+      ReceivedDate := rt.Custom_Inputs(OptionName = 'custom_input1')[1].Optionvalue;
+      dayssince_ReceivedDate := if( ReceivedDate = '', -998, ut.DaysApart(TodaysDate,ReceivedDate));
+
+      OpenDate := rt.Custom_Inputs(OptionName = 'custom_input2')[1].Optionvalue;
+      dayssince_OpenDate := if( OpenDate = '', -998, ut.DaysApart(TodaysDate,OpenDate));
+
+      self.dayssince_ReceivedDate              			:= (STRING)dayssince_ReceivedDate; // uses RecievedDate
+      self.dayssince_OpenDate              					:= (STRING)dayssince_OpenDate ; // uses OpenDate
+      self.sourcecredheadertimeoldest               := le.sourcecredheadertimeoldest;
+      self.addrprevioussubjectowned               	:= le.addrprevioussubjectowned;
+      self.addrinputmatchindex                      := le.addrinputmatchindex;
+      self.addrinputsubjectowned                 		:= le.addrinputsubjectowned;
+      self.addrprevioustimeoldest                   := le.addrprevioustimeoldest;
+      self.addrcurrentphoneservice                  := le.addrcurrentphoneservice;
+      self.ssndeceased                              := le.ssndeceased;
+      self.subjectdeceased                          := le.subjectdeceased;
+      self.confirmationsubjectfound                 := le.confirmationsubjectfound;
+      self.CollateralStatus               					:= rt.Custom_Inputs(OptionName = 'custom_input3')[1].Optionvalue;
+      self.LoanType               									:= rt.Custom_Inputs(OptionName = 'custom_input4')[1].Optionvalue;
+      self.OutOfStatuteIndicator               			:= rt.Custom_Inputs(OptionName = 'custom_input5')[1].Optionvalue;
+      self.ChargeOffAmount                      		:= rt.Custom_Inputs(OptionName = 'custom_input6')[1].Optionvalue;
+   
+      self := [];
+    END;
+    
+    
+//RVC2004_2 model transform
+EXPORT Models.RVC2004_2_0.z_layouts_Input xfm_RVC2004_2_RVAttrs_and_Custom_Inputs(riskview.layouts.attributes_internal_layout_noscore le, riskview.layouts.Layout_Custom_Inputs rt) := TRANSFORM
+        self.TransactionID := (String)le.seq;
+        // RV Attributes and custom inputs
+        
+        TodaysDate := (STRING)STD.Date.Today();
+        LastPaymentDate := rt.Custom_Inputs(OptionName = 'custom_input7')[1].Optionvalue;
+        DaysSinceLastPayment := if( LastPaymentDate = '', -998, ut.DaysApart(TodaysDate,LastPaymentDate));
+       
+       
+      self.dayssince_LastPaymentDate                := (STRING)DaysSinceLastPayment; 
+      self.derogcount                               := le.derogcount;
+      self.sourcecredheadertimeoldest               := le.sourcecredheadertimeoldest;
+      self.inputprovidedphone                       := le.inputprovidedphone;
+      self.confirmationinputaddress                 := le.confirmationinputaddress;
+      self.addrinputownershipindex                  := le.addrinputownershipindex;
+      self.ssndeceased                              := le.ssndeceased;
+      self.subjectdeceased                          := le.subjectdeceased;
+      self.confirmationsubjectfound                 := le.confirmationsubjectfound;
+      self.OutOfStatuteIndicator                    := rt.Custom_Inputs(OptionName = 'custom_input5')[1].Optionvalue;
+      self.ChargeOffAmount                          := rt.Custom_Inputs(OptionName = 'custom_input6')[1].Optionvalue;
+   
+      self := [];
+    END;
+    
+    
+ //RVC2004_3 model transform
+EXPORT Models.RVC2004_3_0.z_layouts_Input xfm_RVC2004_3_RVAttrs_and_Custom_Inputs(riskview.layouts.attributes_internal_layout_noscore le, riskview.layouts.Layout_Custom_Inputs rt) := TRANSFORM
+       self.TransactionID := (String)le.seq;
+       // RV Attributes and custom inputs
+            
+      TodaysDate := (STRING)STD.Date.Today();
+      LastPaymentDate := rt.Custom_Inputs(OptionName = 'custom_input7')[1].Optionvalue;
+      DaysSinceLastPayment := IF( TRIM(LastPaymentDate) = '', -998, ut.DaysApart(TodaysDate,LastPaymentDate));
+            
+            
+      self.dayssince_LastPaymentDate                := (STRING)DaysSinceLastPayment; 
+      self.derogcount                               := le.derogcount;
+      self.inquirycollections12month                := le.inquirycollections12month;
+      self.bankruptcycount                          := le.bankruptcycount;
+      self.addrinputlengthofres                     := le.addrinputlengthofres;
+      self.inputprovidedphone                       := le.inputprovidedphone;
+      self.addrprevioustimeoldest                   := le.addrprevioustimeoldest;
+      self.ssndeceased                              := le.ssndeceased;
+      self.subjectdeceased                          := le.subjectdeceased;
+      self.confirmationsubjectfound                 := le.confirmationsubjectfound;
+      self.OutOfStatuteIndicator                    := rt.Custom_Inputs(OptionName = 'custom_input5')[1].Optionvalue;
+      self.CollateralStatus                         := rt.Custom_Inputs(OptionName = 'custom_input3')[1].Optionvalue;
+   
+      self := [];
+    END;    
+    
 // rv5 attribute transform
 EXPORT iesp.share.t_NameValuePair intoVersion5(riskview.layouts.layout_riskview5_search_results le, INTEGER c) := TRANSFORM
   SELF.name := MAP(
@@ -5079,156 +5483,6 @@ EXPORT iesp.share.t_NameValuePair intoVersion5(riskview.layouts.layout_riskview5
 END;
 
 
-EXPORT iesp.riskview2.t_RiskView2ModelHRI intoModel(riskview.layouts.layout_riskview5_search_results le, integer c) := TRANSFORM
-
-    Is_next_gen := MAP(
-			c=1	 => le.Auto_Score_Name in RiskView.Constants.next_gen_models,
-			c=2	 => le.BankCard_Score_Name in RiskView.Constants.next_gen_models,
-			c=3	 => le.Short_term_lending_Score_Name in RiskView.Constants.next_gen_models,
-			c=4	 => le.Telecommunications_Score_Name in RiskView.Constants.next_gen_models,
-			c=5	 => le.Crossindustry_Score_Name in RiskView.Constants.next_gen_models,
-			c=6	 => le.Custom_Score_Name in RiskView.Constants.next_gen_models,
-			c=7	 => le.Custom2_Score_Name in RiskView.Constants.next_gen_models,
-			c=8	 => le.Custom3_Score_Name in RiskView.Constants.next_gen_models,
-			c=9	 => le.Custom4_Score_Name in RiskView.Constants.next_gen_models,
-			c=10 => le.Custom5_Score_Name in RiskView.Constants.next_gen_models,
-			        FALSE
-		);
-    
-		score_name := MAP(
-			c=1	=> le.Auto_Score_Name,
-			c=2	=> le.BankCard_Score_Name,
-			c=3	=> le.Short_term_lending_Score_Name,
-			c=4	=> le.Telecommunications_Score_Name,
-			c=5	=> le.Crossindustry_Score_Name,
-			c=6	=> le.Custom_Score_Name,
-			c=7	=> le.Custom2_Score_Name,
-			c=8	=> le.Custom3_Score_Name,
-			c=9	=> le.Custom4_Score_Name,
-			c=10	=> le.Custom5_Score_Name,
-			''
-		);
-		
-		score_type := MAP(
-			c=1 => le.Auto_Type,
-			c=2 => le.BankCard_Type,
-			c=3 => le.Short_term_lending_Type,
-			c=4 => le.Telecommunications_Type,
-			c=5 => le.Crossindustry_Type,
-			c=6 => le.Custom_Type,
-			c=7 => le.Custom2_Type,
-			c=8 => le.Custom3_Type,
-			c=9 => le.Custom4_Type,
-			c=10 => le.Custom5_Type,			
-			''
-		);
-
-		score_value := MAP(
-			c=1	=> le.auto_score,
-			c=2	=> le.Bankcard_score,
-			c=3	=> le.Short_term_lending_score,
-			c=4	=> le.Telecommunications_score,
-			c=5	=> le.Crossindustry_score,
-			c=6	=> le.Custom_score,
-			c=7 => le.Custom2_score,
-			c=8 => le.Custom3_score,
-			c=9 => le.Custom4_score,
-			c=10 => le.Custom5_score,
-			''
-		);
-		
-		reason1 := MAP(
-			c=1	=> le.auto_reason1,
-			c=2	=> le.Bankcard_reason1,
-			c=3	=> le.Short_term_lending_reason1,
-			c=4	=> le.Telecommunications_reason1,
-			c=5	=> le.Crossindustry_reason1,
-			c=6	=> le.Custom_reason1,
-			c=7	=> le.Custom2_reason1,
-			c=8	=> le.Custom3_reason1,
-			c=9	=> le.Custom4_reason1,
-			c=10	=> le.Custom5_reason1,
-			''
-		);
-		
-		reason2 := MAP(
-			c=1	=> le.auto_reason2,
-			c=2	=> le.Bankcard_reason2,
-			c=3	=> le.Short_term_lending_reason2,
-			c=4	=> le.Telecommunications_reason2,
-			c=5	=> le.Crossindustry_reason2,
-			c=6	=> le.Custom_reason2,
-			c=7	=> le.Custom2_reason2,
-			c=8	=> le.Custom3_reason2,
-			c=9	=> le.Custom4_reason2,
-			c=10	=> le.Custom5_reason2,
-			''
-		);
-		
-		reason3 := MAP(
-			c=1	=> le.auto_reason3,
-			c=2	=> le.Bankcard_reason3,
-			c=3	=> le.Short_term_lending_reason3,
-			c=4	=> le.Telecommunications_reason3,
-			c=5	=> le.Crossindustry_reason3,
-			c=6	=> le.Custom_reason3,
-			c=7	=> le.Custom2_reason3,
-			c=8	=> le.Custom3_reason3,
-			c=9	=> le.Custom4_reason3,
-			c=10	=> le.Custom5_reason3,
-			''
-		);
-		
-		reason4 := MAP(
-			c=1	=> le.auto_reason4,
-			c=2	=> le.Bankcard_reason4,
-			c=3	=> le.Short_term_lending_reason4,
-			c=4	=> le.Telecommunications_reason4,
-			c=5	=> le.Crossindustry_reason4,
-			c=6	=> le.Custom_reason4,
-			c=7	=> le.Custom2_reason4,
-			c=8	=> le.Custom3_reason4,
-			c=9	=> le.Custom4_reason4,
-			c=10	=> le.Custom5_reason4,
-			''
-		);
-		
-		reason5 := MAP(
-			c=1	=> le.auto_reason5,
-			c=2	=> le.Bankcard_reason5,
-			c=3	=> le.Short_term_lending_reason5,
-			c=4	=> le.Telecommunications_reason5,
-			c=5	=> le.Crossindustry_reason5,
-			c=6	=> le.Custom_reason5,
-			c=7	=> le.Custom2_reason5,
-			c=8	=> le.Custom3_reason5,
-			c=9	=> le.Custom4_reason5,
-			c=10	=> le.Custom5_reason5,
-			''
-		);
-		
-		ds_reasons := DATASET([
-			{1, reason1, Risk_Indicators.getHRIDesc(reason1, Is_next_gen)},
-			{2, reason2, Risk_Indicators.getHRIDesc(reason2, Is_next_gen)},
-			{3, reason3, Risk_Indicators.getHRIDesc(reason3, Is_next_gen)},
-			{4, reason4, Risk_Indicators.getHRIDesc(reason4, Is_next_gen)},
-			{5, reason5, Risk_Indicators.getHRIDesc(reason5, Is_next_gen)}
-			], iesp.riskview2.t_RiskView2RiskIndicator)(ReasonCode NOT IN ['','00']); // Only keep the valid reason codes
-		
-		self.name := score_name;
-    
-    //non-standard custom models, scores must be cast as INTEGER vs UNSIGNED
-    NonStandardModels := ['ShortTermLendingRVR1903_1'];
-		
-		SELF.Scores := DATASET([transform(iesp.riskview2.t_RiskView2ScoreHRI,
-			// self.value := (unsigned)score_value;
-			self.value := if(score_name IN NonStandardModels, (integer)score_value, (unsigned)score_value);
-			self._type := score_type;
-			self.ScoreReasons := ds_reasons;
-			)]);
-	END;
-
-
 EXPORT iesp.riskview2.t_RiskView2Alert norm_alerts(riskview.layouts.layout_riskview5_search_results le, INTEGER c) := TRANSFORM
 		
 		SELF.code := MAP(
@@ -5349,5 +5603,11 @@ EXPORT iesp.share.t_NameValuePair intoFISattrs(riskview.layouts.layout_riskview5
     c=8 => le.rv3AssetIndex,
            '' );
 	END;
+
+EXPORT iesp.share.t_NameValuePair intoIDAattrs(iesp.ida_report_response.t_IDAAttribute le) := TRANSFORM
+  Self.Name := le.Name;
+  Self.Value := le.Value;
+END;
+
 
 END;

@@ -1475,15 +1475,16 @@ export layout_trustdefender_in := RECORD
 EXPORT layout_IDA_in := RECORD
   //starting with layout_input, add any other fields needed here.
   Risk_Indicators.Layout_Input;
-  String Client;  
-  String Solution;
-  String ProductName;
-  String ProductID;
-  String App_ID;
-  String ESPTransactionId;
-  String CompanyID;
-  String Channel;
-	string CARetailFlag; // for FCRA only, for california in person applicants
+  STRING Client;  
+  STRING Solution;
+  STRING ProductName;
+  STRING ProductID;
+  STRING App_ID;
+  STRING ESPTransactionId;
+  STRING CompanyID;
+  STRING Channel;
+  STRING CARetailFlag; // for FCRA only, for california in person applicants
+  STRING Affiliate; // for FCRA only, used for EndUser CompanyName
 	
 	// for innovis attribute eventually
 	// string best_ssn;
@@ -1494,9 +1495,16 @@ EXPORT layout_IDA_in := RECORD
 END;
 
 EXPORT layout_IDA_out := RECORD
-  Unsigned4 seq;
-  String App_ID;
-  dataset(iesp.ida_report_response.t_IDAAttribute) Indicators {xpath('Indicators/Attribute'), MAXCOUNT(1)};
+  UNSIGNED4 seq;
+  STRING App_ID;
+  STRING3 IDScoreResultCode1;
+  STRING3 IDScoreResultCode2;
+  STRING3 IDScoreResultCode3;
+  STRING3 IDScoreResultCode4;
+  STRING3 IDScoreResultCode5;
+  STRING3 IDScoreResultCode6;
+  DATASET(iesp.ida_report_response.t_IDAAttribute) Indicators {XPATH('Indicators/Attribute'), MAXCOUNT(1)};
+  STRING10 Exception_code := '';
 END;
 
  

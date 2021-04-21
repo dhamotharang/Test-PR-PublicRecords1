@@ -1,4 +1,4 @@
-import Healthcare_Header_Services, Prof_LicenseV2_Services, doxie;
+﻿import Healthcare_Header_Services, Prof_LicenseV2_Services, doxie;
 export ING_provider_report_records(dataset(Prof_LicenseV2_Services.Layout_Search_Ids_Prov) provs, boolean Include_Sanc=false, dataset(Healthcare_Header_Services.Layouts.autokeyInput) searchByCriteria= dataset([],Healthcare_Header_Services.Layouts.autokeyInput),dataset(Healthcare_Header_Services.Layouts.common_runtime_config) cfg = dataset([{'1'}],Healthcare_Header_Services.Layouts.common_runtime_config)) := FUNCTION
 
 	doxie.MAC_Header_Field_Declare();

@@ -25,6 +25,19 @@ EXPORT Constants := MODULE
     EXPORT STRING20 SingleSearchAccountNo := '0';
   END;
 
+  EXPORT EmailValidationType := MODUlE
+    EXPORT STRING None := 'NONE';
+    EXPORT STRING BriteVerify := 'BV';
+    EXPORT STRING EmailageBasic := 'EABASIC'; // Emailage a.k.a EmailRisk basic tier
+    EXPORT STRING EmailagePremium := 'EAPREMIUM'; // Emailage a.k.a EmailRisk premium tier
+
+    EXPORT BOOLEAN isValidType(STRING _type) := STD.Str.ToUpperCase(_type) IN [None, BriteVerify, EmailageBasic, EmailagePremium];
+    EXPORT BOOLEAN isBasicValidation(STRING _type) := STD.Str.ToUpperCase(_type) IN [EmailageBasic, None, ''];
+  END;
+
+  EXPORT BOOLEAN isBriteVerifyValidation(string _type) := STD.Str.ToUpperCase(_type) = EmailValidationType.BriteVerify;
+  EXPORT BOOLEAN isEmailageValidation(string _type) := STD.Str.ToUpperCase(_type) IN [EmailValidationType.EmailageBasic, EmailValidationType.EmailagePremium];
+
   EXPORT UNSIGNED EmailQualityRulesForBVCall := 0
                                                | dx_Email.Translation_Codes.rules_bitmap_code('role_address')        // role address is valid email address for the purpose of email delivery check
                                                | dx_Email.Translation_Codes.rules_bitmap_code('disposable_address'); // disposable address is valid email address for the purpose of email delivery check
@@ -38,6 +51,7 @@ EXPORT Constants := MODULE
   EXPORT BOOLEAN isPremium(STRING _tier) := STD.Str.ToLowerCase(_tier) = Premium;
   EXPORT BOOLEAN isBasic(STRING _tier) := STD.Str.ToLowerCase(_tier) = Basic;
   EXPORT BOOLEAN isValidTier(STRING _tier) := STD.Str.ToLowerCase(_tier) IN [Basic, Premium];
+  EXPORT BOOLEAN isAllowedValidation(string _tier, string _type) := ~isBasic(_tier) OR EmailValidationType.isBasicValidation(_type);
 
   EXPORT STRING LastVerified := 'last verified';
 
@@ -46,7 +60,7 @@ EXPORT Constants := MODULE
   EXPORT STRING DomainInactive := 'inactive';
   EXPORT STRING DomainAcceptAll := 'accept_all';
   EXPORT BOOLEAN isUnverifiableEmail(STRING _status) := STD.Str.ToLowerCase(_status) = DomainAcceptAll;
-  STRING StatusValid := 'valid';
+  EXPORT STRING StatusValid := 'valid';
   EXPORT BOOLEAN isValid(STRING _status) := STD.Str.ToLowerCase(_status) = StatusValid;
   EXPORT STRING StatusUnknown := 'unknown';
   EXPORT BOOLEAN isUnknown(STRING _status) := STD.Str.ToLowerCase(_status) = StatusUnknown;
@@ -84,6 +98,7 @@ EXPORT Constants := MODULE
     EXPORT UNSIGNED  MaxSQLBindVariables := 10;
     EXPORT UNSIGNED1 requestTimeout  := 5;
     EXPORT UNSIGNED1 requestRetries  := 1;
+    EXPORT UNSIGNED1 EA_GW_TIMEOUT   := 3;
     EXPORT STRING    SourceBriteVerifyEmail := 'BriteVerify_Email';
     EXPORT STRING    SourceBV := 'BV';
     EXPORT STRING    RoleAddress  := 'Role Address';
@@ -96,6 +111,8 @@ EXPORT Constants := MODULE
     EXPORT STRING    TMXPolicy      := 'Email Risk Assessment';
     EXPORT STRING    TMXServiceType := 'all';
     EXPORT STRING    TMXApiType     := 'AttributeQuery';
+    EXPORT STRING    EA_ERROR       := 'GENERALERROR';
+    EXPORT STRING    EA_VALID_DOMAIN := 'VALIDDOMAIN';
 
     dict_email_address_invalid := DICTIONARY([
       {DOMAIN_INACTIVE => 'Email Domain Inactive'},
@@ -104,6 +121,37 @@ EXPORT Constants := MODULE
       {EMAIL_DOMAIN_INVALID  => 'Email Domain Invalid'}],
       {STRING error_code => STRING error_desc});
     EXPORT get_error_desc(STRING _code) := dict_email_address_invalid[_code].error_desc;
+
+    // emailage email exists mapping to output email_status
+    dict_email_status_ea := DICTIONARY([
+      {'YES' => StatusValid},
+      {'NO' => StatusInvalid},
+      {'NOTANYMORE' => StatusInvalid},
+      {'NOT ANYMORE' => StatusInvalid},
+      {'NOTSURE' => StatusUnknown},
+      {'NOT SURE' => StatusUnknown},
+      {'' => StatusUnknown}],
+      {STRING ea_email_exist => STRING email_status});
+
+    map_ea_email_status(STRING ea_email_exist) := dict_email_status_ea[STD.Str.ToUpperCase(ea_email_exist)].email_status;
+    EXPORT get_ea_email_status(STRING ea_email_exist, STRING ea_email_status) := IF(
+      STD.Str.ToUpperCase(ea_email_status) = EA_VALID_DOMAIN AND STD.Str.ToUpperCase(ea_email_exist) IN ['NOT SURE', 'NOTSURE'],
+      DomainAcceptAll,
+      map_ea_email_status(ea_email_exist)
+    );
+
+    // emailage email status mapping to output email_status_reason
+    dict_email_status_reason_ea := DICTIONARY([
+      {EA_ERROR => ''},
+      {'CERTIFIED' => ''},
+      {'DOMAININEXISTENT' => 'Email Domain Invalid'},
+      {'EMAILINEXISTENT' => 'Email Account Invalid'},
+      {EA_VALID_DOMAIN => 'Email Domain Valid'},
+      {'VERIFIED' => ''},
+      {'UNKNOWN' => ''}],
+      {STRING ea_email_status => STRING email_status_reason});
+
+    EXPORT get_ea_email_status_reason(STRING ea_email_status) := dict_email_status_reason_ea[STD.Str.ToUpperCase(ea_email_status)].email_status_reason;
 
   END;
 END;

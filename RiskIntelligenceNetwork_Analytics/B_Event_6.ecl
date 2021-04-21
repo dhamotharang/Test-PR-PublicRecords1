@@ -4,8 +4,8 @@ IMPORT B_Event_7,E_Address,E_Bank,E_Bank_Account,E_Customer,E_Drivers_License,E_
 IMPORT * FROM KEL11.Null;
 EXPORT B_Event_6 := MODULE
   SHARED VIRTUAL TYPEOF(B_Event_7.__ENH_Event_7) __ENH_Event_7 := B_Event_7.__ENH_Event_7;
-  SHARED __EE30204 := __ENH_Event_7;
-  EXPORT __ST20181_Layout := RECORD
+  SHARED __EE30467 := __ENH_Event_7;
+  EXPORT __ST20444_Layout := RECORD
     KEL.typ.nuid UID;
     KEL.typ.nint Record_Id_;
     KEL.typ.nstr Acct_No_;
@@ -259,10 +259,10 @@ EXPORT B_Event_6 := MODULE
     KEL.typ.int __RecordCount := 0;
     UNSIGNED4 __Part := 0;
   END;
-  SHARED __ST20181_Layout __ND30460__Project(B_Event_7.__ST20748_Layout __PP28930) := TRANSFORM
-    SELF.T1___Lex_Id_Pop_Flag_ := MAP(__T(__OP2(__PP28930.T___Person_Uid_Echo_,=,__CN(-99999)))=> -99999,__PP28930.No_Lex_Id_ = 1=>0,1);
-    SELF.T___Bc_Shll_Lex_Id_Echo_ := MAP(__PP28930.T___Is_Bc_Shll_Hit_Flag_ < 1 OR __PP28930.T___Src_Class_Type_ < 4=>__ECAST(KEL.typ.nint,__CN(-99998)),__T(__OP2(__PP28930.Bocashell_Lex_Id_,=,__CN(0)))=>__ECAST(KEL.typ.nint,__CN(-99997)),__ECAST(KEL.typ.nint,__PP28930.Bocashell_Lex_Id_));
-    SELF := __PP28930;
+  SHARED __ST20444_Layout __ND30723__Project(B_Event_7.__ST21011_Layout __PP29193) := TRANSFORM
+    SELF.T1___Lex_Id_Pop_Flag_ := MAP(__T(__OP2(__PP29193.T___Person_Uid_Echo_,=,__CN(-99999)))=> -99999,__PP29193.No_Lex_Id_ = 1=>0,1);
+    SELF.T___Bc_Shll_Lex_Id_Echo_ := MAP(__PP29193.T___Is_Bc_Shll_Hit_Flag_ < 1 OR __PP29193.T___Src_Class_Type_ < 4=>__ECAST(KEL.typ.nint,__CN(-99998)),__T(__OP2(__PP29193.Bocashell_Lex_Id_,=,__CN(0)))=>__ECAST(KEL.typ.nint,__CN(-99997)),__ECAST(KEL.typ.nint,__PP29193.Bocashell_Lex_Id_));
+    SELF := __PP29193;
   END;
-  EXPORT __ENH_Event_6 := PROJECT(__EE30204,__ND30460__Project(LEFT));
+  EXPORT __ENH_Event_6 := PROJECT(__EE30467,__ND30723__Project(LEFT));
 END;

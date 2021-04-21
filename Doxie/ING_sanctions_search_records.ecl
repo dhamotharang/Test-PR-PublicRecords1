@@ -1,9 +1,11 @@
-﻿IMPORT autokey, autokeyI, doxie, AutoStandardI, Address, OIG, Healthcare_Header_Services,ut;
+﻿IMPORT autokey, autokeyI, doxie, AutoStandardI, Address, OIG, Healthcare_Header_Services,ut,Gateway;
 
 EXPORT ING_Sanctions_Search_Records ( STRING11 taxid_value, BOOLEAN include_OIG ) := 
    FUNCTION
 
 
+		gateways_in := Gateway.Configuration.Get();
+		dHCPGWCfg := gateways_in(Gateway.Configuration.IsHCHCP(Gateway.Constants.ServiceName.IsHCHCP));
     doxie.MAC_Header_Field_Declare()
 		gm := AutoStandardI.GlobalModule();
 		//Format search criteria into new format
@@ -31,6 +33,7 @@ EXPORT ING_Sanctions_Search_Records ( STRING11 taxid_value, BOOLEAN include_OIG 
 																 self.dob := (string)gm.dob;
 																 self.did := (integer)gm.did;
 																 self.TaxID := taxid_value;
+																 self.providersrc := if(exists(dHCPGWCfg),'P','');
 																 self:=[]
 														end;
 		ds:=dataset([setinput()]);
@@ -54,6 +57,7 @@ EXPORT ING_Sanctions_Search_Records ( STRING11 taxid_value, BOOLEAN include_OIG 
 		   TRANSFORM
 			   SELF.rec_type := 'ING';
 				 self.did := (integer)l.did;
+				 self.provco_address_clean_v_city_name:=l.provco_address_clean_p_city_name;
 				SELF          :=   l;
 				SELF          :=  [];
 			END; // end sanction transform into final layout

@@ -115,6 +115,7 @@ export BusinessReportComprehensive() := macro
      #stored('IncludeBizToBizDelinquencyRiskIndicator', report_options.IncludeBizToBizDelinquencyRiskIndicator);
 	#stored('LnBranded',user_options.LnBranded);
 	#stored('IncludeVendorSourceB',report_options.IncludeVendorSourceB);	
+	#stored('IncludeAssignmentsAndReleases',report_options.IncludeAssignmentsAndReleases);	
   #WEBSERVICE(FIELDS('ULTID',
 	                    'ORGID',
 											'SELEID',
@@ -155,6 +156,7 @@ export BusinessReportComprehensive() := macro
                                                           'IncludeBizToBizDelinquencyRiskIndicator',
 											'LnBranded',
 											'IncludeVendorSourceB',
+                      'IncludeAssignmentsAndReleases',
 											'DataRestrictionMask',
 											'DataPermissionMask',
 											'DPPAPurpose',
@@ -194,6 +196,7 @@ export BusinessReportComprehensive() := macro
      boolean IncludeBizToBizDelinquencyRI := false : stored('IncludeBizToBizDelinquencyRiskIndicator');
 	boolean lnbranded 						:= false : stored('LnBranded');
 	boolean includeVendorSourceB 						:= false : stored('IncludeVendorSourceB');
+	boolean IncludeAssignmentsAndReleases 						:= false : stored('IncludeAssignmentsAndReleases');
 	// set DEFAULT for query level report fetches to be at the SELEID = S level.
 	string1 BusinessReportFetchLevel := 'S' : stored('BusinessReportFetchLevel');
 	  
@@ -231,6 +234,7 @@ export BusinessReportComprehensive() := macro
            self.IncludeBizToBizDelinquencyRiskIndicator      :=  IncludeBizToBizDelinquencyRI;
 		self.lnbranded 											:= lnbranded;
 		self.IncludeVendorSourceB           := includeVendorSourceB;
+		self.IncludeAssignmentsAndReleases  := IncludeAssignmentsAndReleases;
 		self.internal_testing 							:= false ; //internal_testing;
 		self.BusinessReportFetchLevel 			:= topbusiness_services.functions.fn_fetchLevel(trim(std.str.ToUpperCase(BusinessReportFetchLevel),left,right)[1]);    
 		self := [];

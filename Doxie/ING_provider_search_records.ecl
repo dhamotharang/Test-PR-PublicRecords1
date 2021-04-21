@@ -33,6 +33,7 @@ EXPORT ING_provider_search_records ( STRING15 taxid_value, STRING2 lic_st, STRIN
 																 self.license_state := lic_st;
 																 self.TaxID := taxid_value;
 																 self.NPI := npi_number;
+																 self.providersrc := 'P';
 																 self:=[]
 														end;
 		ds:=dataset([setinput()]);
@@ -41,8 +42,7 @@ EXPORT ING_provider_search_records ( STRING15 taxid_value, STRING2 lic_st, STRIN
 			 self.dppa_ok := ut.dppa_ok(gm.DPPAPurpose);
                          self.DRM := gm.DataRestrictionMask;
 	 	   self.glb:= gm.GLBPurpose;
-       self.dppa:= gm.DPPAPurpose; 
-
+       self.dppa:= gm.DPPAPurpose;
 			// self:=[];Do not uncomment otherwise the default values will not get set.
 		end;
 		cfg:=dataset([buildConfig()]);
@@ -50,40 +50,74 @@ EXPORT ING_provider_search_records ( STRING15 taxid_value, STRING2 lic_st, STRIN
 		rawDataOrig := Healthcare_Header_Services.Records.getRecordsIndividual(ds,cfg);
 		foundHit := exists(rawDataOrig);
 		// rawDataAlt := if(not foundHit,Healthcare_Provider_Services.Provider_Records_Consolidated.getRecordsByAutoKeys(tmpMod));
-		rawData := rawDataOrig;
-		npiData := rawDataOrig.npis[1].npi;
-		rawDataFmt := Healthcare_Header_Services.Records.fmtRecordsSearch(rawData);
-		ds_project_ING := rawDataFmt;
-    org_out_rec := doxie.ingenix_provider_module.layout_ingenix_provider_search_plus;
+		// rawData := rawDataOrig;
+		// npiData := rawDataOrig.npis[1].npi;
+		// rawDataFmt := Healthcare_Header_Services.Records.fmtRecordsSearch(rawData);
+		// ds_project_ING := rawDataFmt;
+    // org_out_rec := doxie.ingenix_provider_module.layout_ingenix_provider_search_plus;
       
       // transform ING name child dataset into ING/NPPES name rec child dataset
-		doxie.ingenix_provider_module.ING_NPPES_name_rec xfm_ING_name_info (doxie.ingenix_provider_module.ingenix_name_rec l) :=
-		   TRANSFORM
-			  SELF.Prov_Name_prefix_Text  := '';
-				SELF.Prov_Clean_fname       := l.Prov_Clean_fname;
-				SELF.Prov_Clean_mname       := l.Prov_Clean_mname;
-				SELF.Prov_Clean_lname       := l.Prov_Clean_lname;
-				SELF.Prov_Clean_name_suffix := l.Prov_Clean_name_suffix;
-				SELF.Prov_Credential_Text   := '';
-				SELF.ProviderNameTierID     := l.ProviderNameTierID;
-		   END;
+		// doxie.ingenix_provider_module.ING_NPPES_name_rec xfm_ING_name_info (doxie.ingenix_provider_module.ingenix_name_rec l) :=
+		   // TRANSFORM
+			  // SELF.Prov_Name_prefix_Text  := '';
+				// SELF.Prov_Clean_fname       := l.Prov_Clean_fname;
+				// SELF.Prov_Clean_mname       := l.Prov_Clean_mname;
+				// SELF.Prov_Clean_lname       := l.Prov_Clean_lname;
+				// SELF.Prov_Clean_name_suffix := l.Prov_Clean_name_suffix;
+				// SELF.Prov_Credential_Text   := '';
+				// SELF.ProviderNameTierID     := l.ProviderNameTierID;
+		   // END;
 		
 		// transform ING layout into ING/NPPES output record layout	
-		doxie.ingenix_provider_module.layout_ingenix_NPPES_provider_search xfm_ING_into_final_layout (org_out_rec l) :=
+		doxie.ingenix_provider_module.layout_ingenix_NPPES_provider_search xfm_ING_into_final_layout (Healthcare_Header_Services.layouts.CombinedHeaderResults l) :=
 		   TRANSFORM
 			  SELF.rec_type := 'ING';
-				SELF.name     := PROJECT( choosen(l.name,100), xfm_ING_name_info( LEFT ) );
-        self.address 	:= choosen(l.address,100);
-        self.dob 			:= choosen(l.dob,100);
-        self.license 	:= choosen(l.license,100);
-        self.taxid		:= choosen(l.taxid,100);
+				self.providerid:= (string)l.LNPID, 
+				self.providersrc:= l.Src, 
+				self.did:= (string)l.dids[1].did, 
+				self.name:= dedup(project(choosen(l.Names,100), 
+																	transform(doxie.ingenix_provider_module.ING_NPPES_name_rec,
+																						skipit := left.FirstName = '' and left.MiddleName = '' and left.LastName ='';
+																						self.Prov_Clean_fname := if(skipit,skip,left.FirstName);
+																						self.Prov_Clean_mname := left.MiddleName;
+																						self.Prov_Clean_lname := if(left.LastName <>'',left.LastName,left.CompanyName);
+																						self.Prov_Clean_name_suffix := left.Suffix;
+																						self := [];)),Prov_Clean_fname,Prov_Clean_mname,Prov_Clean_lname,all);
+				self.address := project(choosen(l.Addresses,100), 
+																		transform(doxie.ingenix_provider_module.ingenix_addr_rec_online,
+																							tmp_off_phone:=project(left.Phones(phonenumber<>''),transform(doxie.ingenix_provider_module.ingenix_phone_slim_rec, self.PhoneNumber := left.phonenumber,self.PhoneType:='OFFICE PHONE';self := []));
+																							tmp_off_fax:=project(left.Phones(faxnumber<>''),transform(doxie.ingenix_provider_module.ingenix_phone_slim_rec, self.PhoneNumber := left.faxnumber,self.PhoneType:='OFFICE FAX';self := []));
+																							self.Prov_Clean_prim_range:=left.prim_range;
+																							self.Prov_Clean_predir:=left.predir;
+																							self.Prov_Clean_prim_name:=left.prim_name;
+																							self.Prov_Clean_addr_suffix:=left.addr_suffix;
+																							self.Prov_Clean_postdir:=left.postdir;
+																							self.Prov_Clean_unit_desig:=left.unit_desig;
+																							self.Prov_Clean_sec_range:=left.sec_range;
+																							self.Prov_Clean_p_city_name:=left.p_city_name;
+																							self.Prov_Clean_v_city_name:=left.v_city_name;
+																							self.Prov_Clean_st:=left.st;
+																							self.Prov_Clean_zip:=left.z5;
+																							self.Prov_Clean_zip4:=left.zip4;
+																							self.first_seen := left.first_seen;
+																							self.last_seen := left.last_seen;
+																							SELF.PHONE := tmp_off_phone(PhoneNumber<>'')+tmp_off_fax(PhoneNumber<>''); 
+																							self := []));
+				self.dob := project(choosen(l.dobs,100), 
+																		transform(doxie.ingenix_provider_module.ingenix_dob_rec, self.BirthDate:=left.dob;self := [];));
+				self.license := dedup(sort(project(choosen(l.StateLicenses,100), 
+																		transform(doxie.ingenix_provider_module.ingenix_license_rec,self := left;self := [])),record),record);
+				self.taxid := project(choosen(l.taxids,100), 
+																		transform(doxie.ingenix_provider_module.ingenix_taxid_rec, self.TaxID:=left.taxid;self := [];));
+				self.npi := l.npis[1].npi;
+				self.nppesverified := l.nppesverified;
 				SELF          := l;
 				SELF          := [];
 		   END;
 
 		// The original Ingenix Search and output 
-		ds_ING_out  := PROJECT( ds_project_ING, xfm_ING_into_final_layout(LEFT));
-    doxie.Mac_CHD_Penalty( ds_ING_out, ds_ING_out_final_pre,
+		ds_ING_out  := PROJECT( rawDataOrig, xfm_ING_into_final_layout(LEFT));
+    doxie.Mac_CHD_Penalty( ds_ING_out, ds_ING_out_final,
 								           name, prov_clean_fname, prov_clean_mname, prov_clean_lname,
 					                 FALSE, faked_ssn_child, faked_ssn_field,
 					                 TRUE, dob, birthdate, FALSE, address, prov_clean_predir,
@@ -92,8 +126,8 @@ EXPORT ING_provider_search_records ( STRING15 taxid_value, STRING2 lic_st, STRIN
 							             prov_clean_v_city_name,faked_county,prov_clean_st,prov_clean_zip,
 					                 FALSE, faked_phone_child, faked_phone_field, TRUE );
 
-		ds_ING_out_final := 
-			PROJECT( ds_ING_out_final_pre, transform(doxie.ingenix_provider_module.layout_ingenix_NPPES_provider_search_penalt, self.npi := npiData; self := left; self :=[]; ));
+		// ds_ING_out_final := 
+			// PROJECT( ds_ING_out_final_pre, transform(doxie.ingenix_provider_module.layout_ingenix_NPPES_provider_search_penalt, self.npi := npiData; self := left; self :=[]; ));
 
 
       /* ****************************************

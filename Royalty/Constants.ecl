@@ -103,6 +103,7 @@ export Constants := module
     export unsigned2 ACCUDATA_CNAM_CNM2 := 711;
     export unsigned2 ACCUDATA_OCN_LNP := 712;
     export unsigned2 BRITE_VERIFY_EMAIL := 720;
+    export unsigned2 EMAIL_RISK_NR := 731;
     export unsigned2 FIRST_DATA := 735;
     export unsigned2 NETWISE_EMAIL := 750;
     export unsigned2 IDA := 760;
@@ -210,6 +211,7 @@ export Constants := module
     export ACCUDATA_CNAM_CNM2 := _TYPE(RoyaltyCode.ACCUDATA_CNAM_CNM2);
     export ACCUDATA_OCN_LNP := _TYPE(RoyaltyCode.ACCUDATA_OCN_LNP);
     export BRITE_VERIFY_EMAIL := _TYPE(RoyaltyCode.BRITE_VERIFY_EMAIL);
+    export EMAIL_RISK_NR := _TYPE(RoyaltyCode.EMAIL_RISK_NR);;
     export FIRST_DATA := _TYPE(RoyaltyCode.FIRST_DATA);
     export NETWISE_EMAIL := _TYPE(RoyaltyCode.NETWISE_EMAIL);
     export IDA := _TYPE(RoyaltyCode.IDA);
@@ -223,15 +225,8 @@ export Constants := module
 
   export set of string2 LastResortRoyalty := [MDR.sourceTools.src_wired_Assets_Royalty];
 
-  export WORKPLACE_ROYALTY_SET := [
-    // MDR.sourceTools.src_One_Click_Data,
-    // As of 03/04/2020 (estd.), One Click Data is no longer a royalty
-    MDR.sourceTools.src_Teletrack,
-    MDR.sourceTools.src_SalesChannel,
-    MDR.sourceTools.src_Thrive_LT,
-    MDR.sourceTools.src_Thrive_PD,
-    MDR.sourceTools.src_Netwise
-    ];
+  base_workplace_tab := Codes.Key_Codes_V3(keyed(file_name = 'WPL_SOURCES'), keyed(field_name = 'ROYALTY'));
+  export WORKPLACE_ROYALTY_SET := set(base_workplace_tab, code);
 
   // Email Royalties: Ensure that removed providers are absent from FCRA/non-FCRA queries
   base_email_tab := Codes.Key_Codes_V3(keyed(file_name = 'EMAIL_SOURCES'), keyed(field_name = 'ROYALTY'));

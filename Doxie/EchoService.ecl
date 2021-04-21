@@ -5,9 +5,8 @@
 /*--INFO--
 This is a test service to facilitate creation of new keys and sub-sequent addition to package file.
 */
-IMPORT Data_Services, dx_Banko, dx_Cortera_Tradeline, dx_EBR, dx_Property, Patriot, Prof_License_Mari;
+IMPORT Data_Services, dx_Banko, dx_Cortera, dx_Cortera_Tradeline, dx_EBR, dx_Property, Patriot, Prof_License_Mari;
 EXPORT EchoService := MACRO
-  OUTPUT(CHOOSEN(dx_Cortera_Tradeline.Key_Delta_Rid, 10), named('cortera_tradeline_delta_rid'));
   OUTPUT(CHOOSEN(Prof_License_Mari.Key_Search_Delta_Rid(), 10), named('Prof_License_Mari_Key_Search_Delta_Rid'));
   OUTPUT(CHOOSEN(Prof_License_Mari.Key_Regulatory_Actions_Delta_Rid(), 10), named('Prof_License_Mari_Key_Regulatory_Actions_Delta_Rid'));
   OUTPUT(CHOOSEN(Prof_License_Mari.Key_Disciplinary_Actions_Delta_Rid(), 10), named('Prof_License_Mari_Key_Disciplinary_Actions_Delta_Rid'));
@@ -21,7 +20,8 @@ EXPORT EchoService := MACRO
   OUTPUT(CHOOSEN(dx_OSHAIR.keys_delta_rid.Hazardous_Substance, 10), NAMED('dx_OSHAIR_Hazardous_Substance_Delta_RID'));
   OUTPUT(CHOOSEN(dx_OSHAIR.keys_delta_rid.Inspection, 10), NAMED('dx_OSHAIR_Inspection_Delta_RID'));
   OUTPUT(CHOOSEN(dx_OSHAIR.keys_delta_rid.Program, 10), NAMED('dx_OSHAIR_Program_Delta_RID'));
-  OUTPUT(CHOOSEN(dx_OSHAIR.keys_delta_rid.Violations, 10), NAMED('dx_OSHAIR_Violations_Delta_RID'));  OUTPUT(CHOOSEN(dx_ebr.mod_delta_rid.key_0010_delta_rid, 10), named('dx_ebr_key_0010_delta_rid'));
+  OUTPUT(CHOOSEN(dx_OSHAIR.keys_delta_rid.Violations, 10), NAMED('dx_OSHAIR_Violations_Delta_RID'));
+  OUTPUT(CHOOSEN(dx_ebr.mod_delta_rid.key_0010_delta_rid, 10), named('dx_ebr_key_0010_delta_rid'));
   OUTPUT(CHOOSEN(dx_ebr.mod_delta_rid.key_1000_delta_rid, 10), named('dx_ebr_key_1000_delta_rid'));
   OUTPUT(CHOOSEN(dx_ebr.mod_delta_rid.key_2000_delta_rid, 10), named('dx_ebr_key_2000_delta_rid'));
   OUTPUT(CHOOSEN(dx_ebr.mod_delta_rid.key_2015_delta_rid, 10), named('dx_ebr_key_2015_delta_rid'));
@@ -42,5 +42,8 @@ EXPORT EchoService := MACRO
   OUTPUT(CHOOSEN(dx_ebr.mod_delta_rid.key_autokey_payload_delta_rid, 10), named('dx_ebr_key_autokey_payload_delta_rid'));
   OUTPUT(CHOOSEN(dx_Property.Key_Foreclosure_Delta_Rid, 10), named('dx_Property_Key_Foreclosure_Delta_Rid'));
   OUTPUT(CHOOSEN(dx_Property.Key_Normalized_Delta_Rid, 10), named('dx_Property_Key_Normalized_Delta_Rid'));
-  OUTPUT(CHOOSEN(Suppress.Key_New_Suppression, 10), named('suppress_key_new_suppression'));
+  OUTPUT(CHOOSEN(dx_Cortera.Key_Delta_Rid_Attributes, 10), named('dx_Cortera_Key_Delta_Rid_Attributes'));
+  OUTPUT(CHOOSEN(dx_Cortera.Key_Delta_Rid_Executive, 10), named('dx_Cortera_Key_Delta_Rid_Executive'));
+  OUTPUT(CHOOSEN(dx_Cortera.Key_Delta_Rid_Hdr, 10), named('dx_Cortera_Key_Delta_Rid_Hdr'));
+  OUTPUT(CHOOSEN(dx_Cortera.Key_Build_Version, 10), named('dx_Cortera_Key_Build_Version'));
 ENDMACRO;

@@ -6,8 +6,8 @@
 	<part name="BIPAppendWeightThreshold" type="xsd:integer"/>
 	<part name="BIPAppendPrimForce" type="xsd:boolean"/>
 	<part name="BIPAppendIncludeAuthRep" type="xsd:boolean"/>
-	<part name="BIPAppendNoReAppend" type="xsd:boolean"/>
-	<part name="DataRestrictionMask" type="xsd:string"/>
+	<part name="BIPAppendReAppend" type="xsd:boolean"/>
+  <part name="DataRestrictionMask" type="xsd:string"/>
 	<part name="DataPermissionMask" type="xsd:string"/>
 	<part name="GLBPurpose" type="xsd:integer"/>
 	<part name="DPPAPurpose" type="xsd:integer"/>
@@ -23,7 +23,7 @@
 </message>
 */
 
-IMPORT PublicRecords_KEL, Royalty, iesp, STD, BRM_Marketing_attributes;
+IMPORT PublicRecords_KEL, Royalty, iesp, STD, BRM_Marketing_attributes, Business_Risk_BIP;
 EXPORT BRM_Marketing_Attr_Batch_Services() := MACRO
 
 		#OPTION('expandSelectCreateRow', TRUE);
@@ -34,7 +34,7 @@ EXPORT BRM_Marketing_Attr_Batch_Services() := MACRO
 		'BIPAppendWeightThreshold',
 		'BIPAppendPrimForce',
 		'BIPAppendIncludeAuthRep',
-		'BIPAppendNoReAppend',
+		'BIPAppendReAppend',
 		'DataRestrictionMask',
 		'DataPermissionMask',
 		'GLBPurpose',
@@ -70,7 +70,7 @@ EXPORT BRM_Marketing_Attr_Batch_Services() := MACRO
 	UNSIGNED BIPAppend_Weight_Threshold := 0 : STORED('BIPAppendWeightThreshold');
 	BOOLEAN BIPAppend_PrimForce := FALSE : STORED('BIPAppendPrimForce');
 	BOOLEAN BIPAppend_Include_AuthRep := FALSE : STORED('BIPAppendIncludeAuthRep');
-	BOOLEAN BIPAppend_No_ReAppend := FALSE : STORED('BIPAppendNoReAppend');
+	BOOLEAN BIPAppend_ReAppend := TRUE : STORED('BIPAppendReAppend');
 	BOOLEAN Is_Marketing := TRUE;
 	BOOLEAN is_FCRA := FALSE;
 	BOOLEAN OverrideExperianRestriction := FALSE : STORED('OverrideExperianRestriction');
@@ -94,7 +94,7 @@ EXPORT BRM_Marketing_Attr_Batch_Services() := MACRO
 
 	BOOLEAN Allow_DNBDMI := STD.Str.Find( AllowedSources, Business_Risk_BIP.Constants.AllowDNBDMI, 1 ) > 0; // When TRUE this will unmask DNB DMI data - NO CUSTOMERS CAN USE THIS, FOR RESEARCH PURPOSES ONLY
 	#STORED('AllowAll', Allow_DNBDMI); // If DNBDMI is allowed, set AllowAll to TRUE for Business Best test
-
+    #CONSTANT('IsFCRA', FALSE);
 	Options := MODULE(PublicRecords_KEL.Interface_Options)
 		EXPORT INTEGER ScoreThreshold := Score_threshold;
 		EXPORT STRING100 Data_Restriction_Mask := DataRestrictionMask;
@@ -102,6 +102,8 @@ EXPORT BRM_Marketing_Attr_Batch_Services() := MACRO
 		EXPORT UNSIGNED GLBAPurpose := GLBA;
 		EXPORT UNSIGNED DPPAPurpose := DPPA;
 		EXPORT BOOLEAN isFCRA := is_FCRA;
+		EXPORT BOOLEAN isMarketing := Is_Marketing;	  
+		EXPORT BOOLEAN isBRM_Marketing := TRUE;  //this is used in the FDC code to turn off specific keys that are not needed for attributes but are still included in the below entity boolean groups
 		EXPORT STRING100 Allowed_Sources := AllowedSources;
 		EXPORT STRING5 IndustryClass := Industry_Class; // When set to UTILI or DRMKT this restricts Utility data
 		EXPORT BOOLEAN Override_Experian_Restriction := OverrideExperianRestriction;
@@ -111,7 +113,7 @@ EXPORT BRM_Marketing_Attr_Batch_Services() := MACRO
 			GLBA, 
 			DPPA, 
 			FALSE,//isfcra
-			TRUE, //ismarketing
+			Is_Marketing, //ismarketing
 			0, //Allow_DNBDMI
 			Override_Experian_Restriction,//OverrideExperianRestriction
 			'',//PermissiblePurpose - For FCRA Products Only
@@ -119,11 +121,12 @@ EXPORT BRM_Marketing_Attr_Batch_Services() := MACRO
 			PublicRecords_KEL.CFG_Compile);
 		
 		// BIP Append Options
-   EXPORT UNSIGNED BIPAppendScoreThreshold := MAP(BIPAppend_No_ReAppend => 0,
-                                                BIPAppend_Score_Threshold = 0 => 75, MIN(MAX(51,BIPAppend_Score_Threshold), 100));		
+   EXPORT UNSIGNED BIPAppendScoreThreshold := MAP(NOT BIPAppend_ReAppend => 0, // 
+                                                BIPAppend_Score_Threshold = 0 => 75, 
+                                                MIN(MAX(51,BIPAppend_Score_Threshold), 100));		
 		EXPORT UNSIGNED BIPAppendWeightThreshold := BIPAppend_Weight_Threshold;
 		EXPORT BOOLEAN BIPAppendPrimForce := BIPAppend_PrimForce;
-		EXPORT BOOLEAN BIPAppendReAppend := /*NOT*/ BIPAppend_No_ReAppend;
+		EXPORT BOOLEAN BIPAppendReAppend :=  BIPAppend_ReAppend;
 		EXPORT BOOLEAN BIPAppendIncludeAuthRep := BIPAppend_Include_AuthRep;
 		// CCPA Options
 		EXPORT UNSIGNED1 LexIdSourceOptout := _LexIdSourceOptout;
@@ -157,7 +160,33 @@ EXPORT BRM_Marketing_Attr_Batch_Services() := MACRO
 	
 	BRM_Marketing_Attributes.Layout_BRM_NonFCRA.Batch_Input getInput(BRM_Marketing_Attributes.Layout_BRM_NonFCRA.Batch_In_Layout le, UNSIGNED4 c) := TRANSFORM
 	SELF.G_ProcBusUID := c;
-	SELF := le;
+  SELF.HistoryDateYYYYMM := le.HistoryDateYYYYMM ;
+	SELF.HistoryDate := le.HistoryDate;
+ 	SELF.SeleID := le.SeleID;
+// if we are not using bipappend(sele provided) then clear out the rest of the BII
+  SELF.AcctNo := IF(BIPAppend_ReAppend, le.AcctNo , '');	
+	SELF.CompanyName := IF(BIPAppend_ReAppend, le.CompanyName , '');
+	SELF.AlternateCompanyName := IF(BIPAppend_ReAppend, le.AlternateCompanyName , '');
+	SELF.StreetAddressLine1 := IF(BIPAppend_ReAppend, le.StreetAddressLine1 , '');
+	SELF.StreetAddressLine2 := IF(BIPAppend_ReAppend, le.StreetAddressLine2 , '');
+	SELF.City1 := IF(BIPAppend_ReAppend, le.City1 , '');
+	SELF.State1 := IF(BIPAppend_ReAppend, le.State1 , '');
+	SELF.Zip1 := IF(BIPAppend_ReAppend, le.Zip1 , '');
+	SELF.BusinessTIN := IF(BIPAppend_ReAppend, le.BusinessTIN , '');
+	SELF.BusinessPhone := IF(BIPAppend_ReAppend, le.BusinessPhone , '');
+	SELF.BusinessURL := IF(BIPAppend_ReAppend, le.BusinessURL , '');
+	SELF.BusinessEmailAddress := IF(BIPAppend_ReAppend, le.BusinessEmailAddress , '');
+	SELF.PowID := IF(BIPAppend_ReAppend, le.PowID , '');
+	SELF.ProxID := IF(BIPAppend_ReAppend, le.ProxID , '');
+	SELF.OrgID := IF(BIPAppend_ReAppend, le.OrgID , '');
+	SELF.UltID := IF(BIPAppend_ReAppend, le.UltID , '');
+	SELF.custom_input1 := IF(BIPAppend_ReAppend, le.custom_input1, '');
+	SELF.custom_input2 := IF(BIPAppend_ReAppend, le.custom_input2, '');
+	SELF.custom_input3 := IF(BIPAppend_ReAppend, le.custom_input3, '');
+	SELF.custom_input4 := IF(BIPAppend_ReAppend, le.custom_input4, '');
+	SELF.custom_input5 := IF(BIPAppend_ReAppend, le.custom_input5, '');
+
+  SELF := le;
 	END;
 	
 	batchin_with_UID := project(ds_input, getInput(LEFT, COUNTER));

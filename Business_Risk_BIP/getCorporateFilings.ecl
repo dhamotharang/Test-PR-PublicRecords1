@@ -1,4 +1,4 @@
-﻿IMPORT BIPV2, Business_Risk_BIP, Corp2, EBR, MDR, Risk_Indicators, UT, riskwise, Doxie, STD;
+﻿IMPORT BIPV2, Business_Risk_BIP, Corp2, EBR, MDR, Risk_Indicators, UT, riskwise, Doxie, STD, BusinessCredit_Services;
 
 EXPORT getCorporateFilings(DATASET(Business_Risk_BIP.Layouts.Shell) Shell,
 											 Business_Risk_BIP.LIB_Business_Shell_LIBIN Options,
@@ -29,16 +29,17 @@ EXPORT getCorporateFilings(DATASET(Business_Risk_BIP.Layouts.Shell) Shell,
 
 	// Filter out records after our history date.
 	EBR_recs := Business_Risk_BIP.Common.FilterRecords(EBRSeq, date_first_seen, (UNSIGNED)Business_Risk_BIP.Constants.MissingDate, MDR.SourceTools.src_EBR, AllowedSourcesSet);
-
-  EBR_recs_temp :=
-    PROJECT(
-      EBR_recs,
-      TRANSFORM( {RECORDOF(EBR_recs), STRING EverPublic},
-        SELF.EverPublic := LEFT.owner_type_code,
-        SELF := LEFT,
-        SELF := []
-      )
-    );
+//if we are running this model in biid20 we need to use diff corp recs like LNSMB does
+  BBFM1906_1_0_Set := EXISTS(Options.ModelsRequested(ModelName IN [BusinessCredit_Services.Constants.BBFM1906_1_0] ));
+  
+    EBR_recs_temp := PROJECT(
+                              EBR_recs,
+                                TRANSFORM( {RECORDOF(EBR_recs), STRING EverPublic},
+                                          SELF.EverPublic := LEFT.owner_type_code,
+                                          SELF := LEFT,
+                                          SELF := []
+                              )
+                            );
 
 	EBR_recs_rollup :=
 		ROLLUP(
@@ -566,7 +567,7 @@ EXPORT getCorporateFilings(DATASET(Business_Risk_BIP.Layouts.Shell) Shell,
 		);
 
  withCorpFilingsData_NonBIID20 := IF( Options.BusShellVersion < Business_Risk_BIP.Constants.BusShellVersion_v30, withCorpFilingsData_Old, withCorpFilingsData_New );
- withCorpFilingsData := IF( Options.BusShellVersion < Business_Risk_BIP.Constants.BusShellVersion_v30 AND Options.IsBIID20 = TRUE, withCorpFilingsData_BIID20, withCorpFilingsData_NonBIID20);
+ withCorpFilingsData := IF( Options.BusShellVersion < Business_Risk_BIP.Constants.BusShellVersion_v30 AND Options.IsBIID20 = TRUE AND BBFM1906_1_0_Set = FALSE, withCorpFilingsData_BIID20, withCorpFilingsData_NonBIID20);
 
   // Get all unique NAIC Codes along with dates. For this data source, we only need the primary code.
 	tempLayout := RECORD

@@ -112,7 +112,7 @@ export SearchService := macro
                                   self.source := left.Records[1].SourceCode));
 
   // Next call a function to actually count the source.
-  Royalty.MAC_RoyaltyWorkplace(ds_results_slimmed, ds_royalties);
+  ds_royalties := Royalty.RoyaltyWorkplace.GetRoyaltySet(ds_results_slimmed, source);
  
   // Then output the RoyaltySet dataset
   output(ds_royalties,Named('RoyaltySet'));

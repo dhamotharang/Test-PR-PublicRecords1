@@ -1,4 +1,4 @@
-import Address_Rank, AutoStandardI, Doxie;
+﻿import Address_Rank, AutoStandardI, Doxie;
 
 export Records (dataset(AddrBest.Layout_BestAddr.Batch_in) batch_in,
   AddrBest.IParams.SearchParams in_mod) := module
@@ -55,6 +55,7 @@ export Records (dataset(AddrBest.Layout_BestAddr.Batch_in) batch_in,
     self.matchmoveeffdate := r.matchmoveeffdate;
     self.college_addr := r.college_addr;
     self.business_addr := r.business_addr;
+    self.location_id := r.location_id;
     self := l;
     self := [];
   end;

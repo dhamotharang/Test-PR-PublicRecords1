@@ -1,4 +1,5 @@
-import ContactCard, doxie_raw, doxie, ut;
+﻿import ContactCard, doxie_raw, doxie, header, ut, EmailV2_Services;
+
 
 con := contactcard.constants;
 rec := contactcard.layouts;
@@ -22,7 +23,12 @@ srtd := contactcard.FinderRecords(dids, mod_access).results;
 //****** GET THE ADDRESSES
 head := contactcard.FinderRecords(dids, mod_access).head_subject;
 
-addr_shared := project(head, transform(rec.comp_addr_rec,
+comp_addr_plus_rec := record(rec.comp_addr_rec)
+ string2 addr_ind;
+ string2 best_addr_rank;
+end;
+
+addr_shared := project(head, transform(comp_addr_plus_rec,
                                        self.address_seq_no := counter,
                                        self.phones := [],
                                        self.hri_address := [],
@@ -34,7 +40,8 @@ ut.getTimeZone(addr_shared_w_timezone0,listed_phone,listed_timezone,addr_shared_
 subphones := doxie.fn_phone_records_wide(project(addr_shared_w_timezone, doxie.Layout_Comp_Addresses))
   (not business_flag);
 
-rec_plus := record(rec.comp_addr_rec)
+//rec_plus := record(rec.comp_addr_rec)
+rec_plus := record(comp_addr_plus_rec)
     unsigned2 ss;
 end;
 
@@ -50,18 +57,19 @@ addr_phone := join(addr_shared_w_timezone, subphones,
           left outer);
 
 addr_phone_srtd := project(sort(addr_phone, address_seq_no, ss),
-                           transform(rec.comp_addr_rec, self.phones := left.phones(trim(phone, all) <> ''),
+                           transform(comp_addr_plus_rec, self.phones := left.phones(trim(phone, all) <> ''),
                                                         self := left));
 
 addr_phone_rolled :=
   rollup(addr_phone_srtd,
          left.address_seq_no = right.address_seq_no,
-         transform(rec.comp_addr_rec,
+         transform(comp_addr_plus_rec,
                    self.phones := choosen((left.phones + right.phones)(phone <> ''), con.max_PhonesPerAddr),
                    self := left));
-
-addr_phone_rolled_srtd := sort(addr_phone_rolled,  doxie.tnt_score(tnt), -if(dt_last_seen=0,dt_first_seen,dt_last_seen),phone<>listed_phone,lname,fname,mname,prim_range,did,phone,record);
-
+// AH Sort                        
+ addr_phone_rolled_srtd_ah_sorted := sort(addr_phone_rolled, did,(unsigned) addr_ind, (unsigned) best_addr_rank);
+ addr_phone_rolled_srtd := project(addr_phone_rolled_srtd_ah_sorted,rec.comp_addr_rec);
+ 
 //****** BK
 bks := choosen(Doxie_Raw.bkV2_raw(dids,,,,mod_access.ssn_mask), con.max_bankruptcies);
 
@@ -103,7 +111,7 @@ akas t_akas(akas l) := transform
 end;
 l_akas := project(akas,t_akas(left));
 
-email_v2 := Doxie.emailv2_records(dids, mod_access);
+email_v2 := Doxie.emailv2_records(dids, mod_access,,EmailV2_Services.Constants.Premium);
 
 prop_count := doxie.Fn_comp_prop_count(dids[1].did,0,mod_access.dppa,mod_access.glb,mod_access.ln_branded,mod_access.probation_override);
 

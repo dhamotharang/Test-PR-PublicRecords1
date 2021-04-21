@@ -1,5 +1,4 @@
-﻿import BusinessInstantID20_Services,ut,LNSmallBusiness,Business_Risk_BIP,STD,BusinessCredit_Services,
-       Risk_Indicators,Address,riskwise,Models,BIPV2;
+﻿IMPORT BusinessInstantID20_Services, UT, LNSmallBusiness, Business_Risk_BIP, STD, BusinessCredit_Services, Risk_Indicators, Address, Riskwise, Models, BIPV2;
 
 // The following function obtains Models
 EXPORT fn_GetModels(DATASET(LNSmallBusiness.BIP_Layouts.Input) Input,
@@ -25,6 +24,8 @@ EXPORT fn_GetModels(DATASET(LNSmallBusiness.BIP_Layouts.Input) Input,
       EXPORT BOOLEAN IncludeMinors				:= TRUE; // Shouldn't really have an impact on business searches, set to TRUE for now
       EXPORT BOOLEAN LNBranded						:= TRUE; // Not entirely certain what effect this has
     END;
+
+    //TO-DO: remove parameter AppendBestsFromLexIDs and check on line 30
     SeqInput_Raw := PROJECT(Input, TRANSFORM(LNSmallBusiness.BIP_Layouts.InputWSeq, SELF.Seq := COUNTER; SELF := LEFT));
     SeqInput := IF(AppendBestsFromLexIDs, LNSmallBusiness.SmallBusiness_BIP_Append_Inputs(SeqInput_Raw, linkingOptions), SeqInput_Raw) ;
     Business_Risk_BIP.Layouts.Input convertToBusinessShellInput(RECORDOF(ds_input) le) := TRANSFORM
@@ -198,11 +199,7 @@ EXPORT fn_GetModels(DATASET(LNSmallBusiness.BIP_Layouts.Input) Input,
     IncludeVeh          := TRUE;
     IncludeDerog        := TRUE;
 
-    bsversion := MAP(EXISTS(Options.ModelsRequested(ModelName IN
-                                                    [BusinessCredit_Services.Constants.BLENDED_SCORE_BBFM_NSBFEWITHEXP,
-                                                    BusinessCredit_Services.Constants.BLENDED_SCORE_BBFM])) => 54, Options.BusShellVersion = Business_Risk_BIP.Constants.BusShellVersion_v22 => 51 , 50);
 
-    //BSVersion           := if(BusShellVersion = Business_Risk_BIP.Constants.BusShellVersion_v22, 51, 50);
     IsFCRA              := FALSE;
     LN_Branded          := FALSE;
     OFAC_Only           := TRUE;
@@ -219,21 +216,22 @@ EXPORT fn_GetModels(DATASET(LNSmallBusiness.BIP_Layouts.Input) Input,
     DoScore             := TRUE;
     Nugen               := TRUE;
     Include_DL_Verification := TRUE;
+
     UNSIGNED1 AppendBest := 1;		// search best file
     UNSIGNED3 LastSeenThreshold := Risk_Indicators.iid_constants.max_unsigned3;
-    UNSIGNED8 BSOptions := Risk_Indicators.iid_constants.BSOptions.IncludeFraudVelocity +
-                           Risk_Indicators.iid_constants.BSOptions.RetainInputDID +  	// always retain the input DID that we append in the business shell instead of appending it again inside of CIID
-                           Risk_Indicators.iid_constants.BSOptions.TurnOffTumblings;  // really speeds up the inquiries function if we don't need the tumblings
+    
 
-    /* Need this used if want same results as a separate boca shell
-    boolean RetainInputDID := false;
-    unsigned8 BSOptions :=
-      if(Include_DL_Verification, risk_indicators.iid_constants.BSOptions.IncludeDoNotMail +
-                         risk_indicators.iid_constants.BSOptions.IncludeFraudVelocity,
-                          0) +
-      if(RetainInputDID, Risk_Indicators.iid_constants.BSOptions.RetainInputDID, 0 ) +
-      if(bsVersion >= 50, risk_indicators.iid_constants.BSOptions.IncludeHHIDSummary, 0);
-    */
+    //instantiating module 
+    modBocaShellConfigs := BusinessInstantID20_Services.modSetBocaShellConfigurations();
+    
+    //setting Boca Shell version
+    BSVersion := modBocaShellConfigs.setBocaShellVersion(Options.ModelsRequested, Options.BusShellVersion);
+    
+    //setting Boca Shell options 
+    BSOptions := modBocaShellConfigs.setBocaShellOptions(Options.ModelsRequested);
+    
+
+    
     Layout_AcctNo := RECORD
       UNSIGNED4 input_seq;
       STRING30 acctno;
@@ -261,11 +259,11 @@ EXPORT fn_GetModels(DATASET(LNSmallBusiness.BIP_Layouts.Input) Input,
       cleaned_name := Address.CleanPerson73(le.Rep_FullName);
       BOOLEAN valid_cleaned := le.Rep_FullName <> '';
 
-      SELF.fname  := STD.Str.ToUpperCase(if(le.Rep_FirstName=''   AND valid_cleaned, cleaned_name[6..25], le.Rep_FirstName));
-      SELF.lname  := STD.Str.ToUpperCase(if(le.Rep_LastName=''    AND valid_cleaned, cleaned_name[46..65], le.Rep_LastName));
-      SELF.mname  := STD.Str.ToUpperCase(if(le.Rep_MiddleName=''  AND valid_cleaned, cleaned_name[26..45], le.Rep_MiddleName));
-      SELF.suffix := STD.Str.ToUpperCase(if(le.Rep_NameSuffix ='' AND valid_cleaned, cleaned_name[66..70], le.Rep_NameSuffix));
-      SELF.title  := STD.Str.ToUpperCase(if(valid_cleaned, cleaned_name[1..5],''));
+      SELF.fname  := STD.Str.ToUpperCase(IF(le.Rep_FirstName=''   AND valid_cleaned, cleaned_name[6..25], le.Rep_FirstName));
+      SELF.lname  := STD.Str.ToUpperCase(IF(le.Rep_LastName=''    AND valid_cleaned, cleaned_name[46..65], le.Rep_LastName));
+      SELF.mname  := STD.Str.ToUpperCase(IF(le.Rep_MiddleName=''  AND valid_cleaned, cleaned_name[26..45], le.Rep_MiddleName));
+      SELF.suffix := STD.Str.ToUpperCase(IF(le.Rep_NameSuffix ='' AND valid_cleaned, cleaned_name[66..70], le.Rep_NameSuffix));
+      SELF.title  := STD.Str.ToUpperCase(IF(valid_cleaned, cleaned_name[1..5],''));
 
       Street_Address := risk_indicators.MOD_AddressClean.street_address(le.Rep_StreetAddress1);
       clean_a2 := risk_indicators.MOD_AddressClean.clean_addr(Street_Address, le.Rep_City, le.Rep_State, le.Rep_Zip ) ;
@@ -307,24 +305,25 @@ EXPORT fn_GetModels(DATASET(LNSmallBusiness.BIP_Layouts.Input) Input,
     IID_Prep := PROJECT(IID_Prep_Acct, Risk_Indicators.Layout_Input );
 
     IID := Risk_Indicators.InstantID_Function(IID_Prep, Options.Gateways,	Options.dppa,	Options.glb, IsUtility, LN_Branded, OFAC_Only, SuppressNearDups,
-                                              Require2ele, IsFCRA, From_BIID, ExcludeWatchLists, From_IT1O, Options.OFAC_Version, Options.Include_OFAC,
-                                              Addtl_Watchlists, Options.Global_Watchlist_Threshold, DOB_Radius, BSVersion, In_DataRestriction := Options.DataRestrictionMask,
-    in_runDLverification := include_DL_verification, in_append_best := AppendBest, in_BSOptions := BSOptions, in_LastSeenThreshold := LastSeenThreshold, in_DataPermission := Options.DataPermissionMask,
-		LexIdSourceOptout := Options.lexid_source_optout,
-	  TransactionID := Options.transaction_id,
-	  BatchUID := Options.transaction_id,
-	  GlobalCompanyID := Options.global_company_id);
+                                              Require2ele, IsFCRA, From_BIID, ExcludeWatchLists, From_IT1O, Options.OFAC_Version, Options.Include_OFAC, Addtl_Watchlists, 
+                                              Options.Global_Watchlist_Threshold, DOB_Radius, BSVersion, In_DataRestriction := Options.DataRestrictionMask,
+                                              in_runDLverification := include_DL_verification, in_append_best := AppendBest, in_BSOptions := BSOptions, 
+                                              in_LastSeenThreshold := LastSeenThreshold, in_DataPermission := Options.DataPermissionMask,
+                                              LexIdSourceOptout := Options.lexid_source_optout,
+                                              TransactionID := Options.transaction_id,
+                                              BatchUID := Options.transaction_id,
+                                              GlobalCompanyID := Options.global_company_id);
 
     Clam := Risk_Indicators.Boca_Shell_Function(IID, Options.Gateways,	Options.dppa,	Options.glb, IsUtility, LN_Branded, IncludeRel, IncludeDL, IncludeVeh, IncludeDerog, BSVersion, DoScore, Nugen,
-		DataRestriction := Options.DataRestrictionMask, BSOptions := BSOptions, DataPermission := Options.DataPermissionMask,
-		LexIdSourceOptout := Options.lexid_source_optout,
-	  TransactionID := Options.transaction_id,
-	  BatchUID := Options.transaction_id,
-	  GlobalCompanyID := Options.global_company_id);
+                                                DataRestriction := Options.DataRestrictionMask, BSOptions := BSOptions, DataPermission := Options.DataPermissionMask,
+                                                LexIdSourceOptout := Options.lexid_source_optout,
+                                                TransactionID := Options.transaction_id,
+                                                BatchUID := Options.transaction_id,
+                                                GlobalCompanyID := Options.global_company_id);
 
     Blank_Boca_Shell := GROUP(DATASET([], Risk_Indicators.Layout_Boca_Shell), Seq);
 
-    Boca_Shell_Grouped := IF(EXISTS(Options.ModelsRequested(ModelName in BusinessCredit_Services.Constants.MODEL_NAME_SETS.BLENDED_ALL)), Clam, Blank_Boca_Shell); //don't call the boca shell if a model doesn't need it
+    Boca_Shell_Grouped := IF(EXISTS(Options.ModelsRequested(ModelName IN BusinessCredit_Services.Constants.MODEL_NAME_SETS.BLENDED_ALL)), Clam, Blank_Boca_Shell); //don't call the boca shell if a model doesn't need it
 
 /* **************************************************************************
 	 *                            Calculate Scores                            *
@@ -332,7 +331,7 @@ EXPORT fn_GetModels(DATASET(LNSmallBusiness.BIP_Layouts.Input) Input,
 	 ************************************************************************ */
     shell_res_grpd := GROUP(SORT(Shell_Results,seq),seq);
 
-    #if(Models.LIB_BusinessRisk_Models().TurnOnValidation = FALSE)
+    #IF(Models.LIB_BusinessRisk_Models().TurnOnValidation = FALSE)
 
     Layout_ModelOut_Plus := RECORD
       Models.Layout_ModelOut;
@@ -355,38 +354,53 @@ EXPORT fn_GetModels(DATASET(LNSmallBusiness.BIP_Layouts.Input) Input,
       IF( EXISTS(Options.ModelsRequested(ModelName = 'SBOM9999_9')),
           setModelName('SBOM9999_9', Models.LIB_BusinessRisk_Function(shell_res_grpd, 'SBOM9999_9')) ) +
       // Actual model names:
-      IF( EXISTS(Options.ModelsRequested(ModelName = BusinessCredit_Services.Constants.BLENDED_SCORE_MODEL)),
-          setModelName(BusinessCredit_Services.Constants.BLENDED_SCORE_MODEL, Models.LIB_BusinessRisk_Function(shell_res_grpd, BusinessCredit_Services.Constants.BLENDED_SCORE_MODEL, boca_shell_grouped)) ) +
-      IF( EXISTS(Options.ModelsRequested(ModelName = BusinessCredit_Services.Constants.CREDIT_SCORE_MODEL)),
-          setModelName(BusinessCredit_Services.Constants.CREDIT_SCORE_MODEL, Models.LIB_BusinessRisk_Function(shell_res_grpd, BusinessCredit_Services.Constants.CREDIT_SCORE_MODEL)) ) +
-      IF( EXISTS(Options.ModelsRequested(ModelName = BusinessCredit_Services.Constants.BLENDED_SCORE_SLBB)),
-          setModelName(BusinessCredit_Services.Constants.BLENDED_SCORE_SLBB, Models.LIB_BusinessRisk_Function(shell_res_grpd, BusinessCredit_Services.Constants.BLENDED_SCORE_SLBB, boca_shell_grouped)) ) +
-      IF( EXISTS(Options.ModelsRequested(ModelName = BusinessCredit_Services.Constants.BLENDED_SCORE_BBFM)),
-          setModelName(BusinessCredit_Services.Constants.BLENDED_SCORE_BBFM, Models.LIB_BusinessRisk_Function(shell_res_grpd, BusinessCredit_Services.Constants.BLENDED_SCORE_BBFM, boca_shell_grouped)) ) +
-      IF( EXISTS(Options.ModelsRequested(ModelName = BusinessCredit_Services.Constants.BLENDED_SCORE_BBFM_NSBFEWITHEXP)),
-        setModelName(BusinessCredit_Services.Constants.BLENDED_SCORE_BBFM_NSBFEWITHEXP, Models.LIB_BusinessRisk_Function(shell_res_grpd, BusinessCredit_Services.Constants.BLENDED_SCORE_BBFM_NSBFEWITHEXP, boca_shell_grouped)) ) +
-      IF( EXISTS(Options.ModelsRequested(ModelName = BusinessCredit_Services.Constants.CREDIT_SCORE_SLBO)),
-          setModelName(BusinessCredit_Services.Constants.CREDIT_SCORE_SLBO, Models.LIB_BusinessRisk_Function(shell_res_grpd, BusinessCredit_Services.Constants.CREDIT_SCORE_SLBO)) ) +
-      IF( EXISTS(Options.ModelsRequested(ModelName = BusinessCredit_Services.Constants.BLENDED_SCORE_SLBBNFEL)),
-          setModelName(BusinessCredit_Services.Constants.BLENDED_SCORE_SLBBNFEL, Models.LIB_BusinessRisk_Function(shell_res_grpd, BusinessCredit_Services.Constants.BLENDED_SCORE_SLBBNFEL, boca_shell_grouped)) ) +
-      IF( EXISTS(Options.ModelsRequested(ModelName = BusinessCredit_Services.Constants.CREDIT_SCORE_SLBONFEL)),
-          setModelName(BusinessCredit_Services.Constants.CREDIT_SCORE_SLBONFEL, Models.LIB_BusinessRisk_Function(shell_res_grpd, BusinessCredit_Services.Constants.CREDIT_SCORE_SLBONFEL)) ) +
+      IF( EXISTS(Options.ModelsRequested(ModelName = BusinessCredit_Services.Constants.BLENDED_SCORE_MODEL)), 
+          setModelName(BusinessCredit_Services.Constants.BLENDED_SCORE_MODEL, Models.LIB_BusinessRisk_Function(shell_res_grpd, BusinessCredit_Services.Constants.BLENDED_SCORE_MODEL, boca_shell_grouped)) ) + 
+      
+      IF( EXISTS(Options.ModelsRequested(ModelName = BusinessCredit_Services.Constants.BBFM1906_1_0)), 
+          setModelName(BusinessCredit_Services.Constants.BBFM1906_1_0, Models.LIB_BusinessRisk_Function(shell_res_grpd, BusinessCredit_Services.Constants.BBFM1906_1_0, boca_shell_grouped)) ) + 
+    
+      IF( EXISTS(Options.ModelsRequested(ModelName = BusinessCredit_Services.Constants.CREDIT_SCORE_MODEL)), 
+          setModelName(BusinessCredit_Services.Constants.CREDIT_SCORE_MODEL, Models.LIB_BusinessRisk_Function(shell_res_grpd, BusinessCredit_Services.Constants.CREDIT_SCORE_MODEL)) ) + 		
+      
+      IF( EXISTS(Options.ModelsRequested(ModelName = BusinessCredit_Services.Constants.BLENDED_SCORE_SLBB)), 
+          setModelName(BusinessCredit_Services.Constants.BLENDED_SCORE_SLBB, Models.LIB_BusinessRisk_Function(shell_res_grpd, BusinessCredit_Services.Constants.BLENDED_SCORE_SLBB, boca_shell_grouped)) ) + 
+      
+      IF( EXISTS(Options.ModelsRequested(ModelName = BusinessCredit_Services.Constants.BLENDED_SCORE_BBFM)), 
+          setModelName(BusinessCredit_Services.Constants.BLENDED_SCORE_BBFM, Models.LIB_BusinessRisk_Function(shell_res_grpd, BusinessCredit_Services.Constants.BLENDED_SCORE_BBFM, boca_shell_grouped)) ) + 
+      
+      IF( EXISTS(Options.ModelsRequested(ModelName = BusinessCredit_Services.Constants.BLENDED_SCORE_BBFM_NSBFEWITHEXP)), 
+        setModelName(BusinessCredit_Services.Constants.BLENDED_SCORE_BBFM_NSBFEWITHEXP, Models.LIB_BusinessRisk_Function(shell_res_grpd, BusinessCredit_Services.Constants.BLENDED_SCORE_BBFM_NSBFEWITHEXP, boca_shell_grouped)) ) +    
+      
+      IF( EXISTS(Options.ModelsRequested(ModelName = BusinessCredit_Services.Constants.CREDIT_SCORE_SLBO)), 
+          setModelName(BusinessCredit_Services.Constants.CREDIT_SCORE_SLBO, Models.LIB_BusinessRisk_Function(shell_res_grpd, BusinessCredit_Services.Constants.CREDIT_SCORE_SLBO)) ) + 		
+      
+      IF( EXISTS(Options.ModelsRequested(ModelName = BusinessCredit_Services.Constants.BLENDED_SCORE_SLBBNFEL)), 
+          setModelName(BusinessCredit_Services.Constants.BLENDED_SCORE_SLBBNFEL, Models.LIB_BusinessRisk_Function(shell_res_grpd, BusinessCredit_Services.Constants.BLENDED_SCORE_SLBBNFEL, boca_shell_grouped)) ) + 		
+      
+      IF( EXISTS(Options.ModelsRequested(ModelName = BusinessCredit_Services.Constants.CREDIT_SCORE_SLBONFEL)), 
+          setModelName(BusinessCredit_Services.Constants.CREDIT_SCORE_SLBONFEL, Models.LIB_BusinessRisk_Function(shell_res_grpd, BusinessCredit_Services.Constants.CREDIT_SCORE_SLBONFEL)) ) + 		
 
 
       DATASET([], Layout_ModelOut_Plus);
 
     // If no rep info is input, but a blended model is requested, set the score to 0 and blank out the reason codes since there isn't enough info to calculate.
-
-
-
-      Model_Results_Good_Inputs := JOIN(Model_Results_unsorted, ds_input, LEFT.Seq = RIGHT.Seq, TRANSFORM(RECORDOF(LEFT),
-        Invalid_Blended_Request := LEFT.ModelName IN BusinessCredit_Services.Constants.MODEL_NAME_SETS.BLENDED_ALL AND
-                                                            (TRIM(RIGHT.AuthReps[1].FullName) = '' AND TRIM(RIGHT.AuthReps[1].FirstName) = '' AND TRIM(RIGHT.AuthReps[1].LastName) = '');
-        SELF.Score := IF(Invalid_Blended_Request, '0', LEFT.Score);
-        SELF.ri := IF(Invalid_Blended_Request, DATASET([],	Risk_Indicators.Layout_Desc), LEFT.ri);
-        SELF := LEFT),
-        LEFT OUTER, KEEP(1));
-
+    //Unless the model is BBFM1906_1_0, then use the score
+  
+      Model_Results_Good_Inputs := JOIN(Model_Results_unsorted, ds_input, 
+                                        LEFT.Seq = RIGHT.Seq, 
+                                        TRANSFORM(RECORDOF(LEFT),
+                                                  Invalid_Blended_Request := LEFT.ModelName IN BusinessCredit_Services.Constants.MODEL_NAME_SETS.BLENDED_ALL 
+                                                    AND (TRIM(RIGHT.AuthReps[1].FullName) = '' 
+                                                    AND TRIM(RIGHT.AuthReps[1].FirstName) = ''
+                                                    AND TRIM(RIGHT.AuthReps[1].LastName)  = ''
+                                                    AND LEFT.ModelName != BusinessCredit_Services.Constants.BBFM1906_1_0);
+                                                  SELF.Score := IF(Invalid_Blended_Request, '0', LEFT.Score);
+                                                  SELF.ri := IF(Invalid_Blended_Request, DATASET([],	Risk_Indicators.Layout_Desc), LEFT.ri);
+                                                  SELF := LEFT), 
+                                        LEFT OUTER, 
+                                        KEEP(1)); 
+ 
 
 
     Model_Results_sorted :=
@@ -471,22 +485,33 @@ EXPORT fn_GetModels(DATASET(LNSmallBusiness.BIP_Layouts.Input) Input,
         // xfm_addScores(LEFT,ROWS(RIGHT))
       // );
 
-    // DEBUGs.............:
-    // OUTPUT(Options.ModelsRequested,named('_ModelsRequested') );
-   // OUTPUT(SeqInput,named('_SeqInput') );
-    // OUTPUT(Shell_Results,named('_Shell_Results') );
-    // OUTPUT(IID_Prep,named('_IID_Prep') );
-    //OUTPUT(Model_Results_unsorted,named('_Model_Results_unsorted') );
-    //OUTPUT(Model_Results_Good_Inputs,named('_Model_Results_Good_Inputs') );
-    // OUTPUT(Model_Results_sorted,named('_Model_Results_sorted') );
-    // OUTPUT(allow_SBFE_scores,named('_allow_SBFE_scores') );
-    //OUTPUT(BusShellv22_scores_requested,named('_BusShellv22_scores_requested') );
+    // DEBUGGING OPTIONS
+    // OUTPUT(SeqInput_Raw, NAMED('SeqInput_Raw'));
+    // OUTPUT(SeqInput, NAMED('SeqInput'));
+    // OUTPUT(Shell_Input, NAMED('Shell_Input'));
+    // OUTPUT(BIPIDWeightThreshold, NAMED('BIPIDWeightThreshold'));
+    // OUTPUT(allow_SBFE_scores, NAMED('allow_SBFE_scores'));
+    // OUTPUT(SBFE_models_requested, NAMED('SBFE_models_requested'));
+    // OUTPUT(BusShellv22_scores_requested, NAMED('BusShellv22_scores_requested'));
+    // OUTPUT(Shell_Results, NAMED('Shell_Results'));
+    // OUTPUT(BSVersion, NAMED('BSVersion'));
+    // OUTPUT(BSOptions, NAMED('BSOptions'));
+    // OUTPUT(IID_Prep_Acct, NAMED('IID_Prep_Acct'));
+    // OUTPUT(IID_Prep, NAMED('IID_Prep'));
+    // OUTPUT(IID, NAMED('IID'));
+    // OUTPUT(Clam, NAMED('BocaShellResults'));
+    // OUTPUT(Blank_Boca_Shell, NAMED('Blank_Boca_Shell'));
+    // OUTPUT(Boca_Shell_Grouped, NAMED('Boca_Shell_Grouped'));
+    // OUTPUT(Model_Results_unsorted, NAMED('Model_Results_unsorted'));
+    // OUTPUT(Model_Results_Good_Inputs, NAMED('Model_Results_Good_Inputs'));
+    // OUTPUT(Model_Results_sorted, NAMED('Model_Results_sorted'));
+
     RETURN Model_Results;
 
-    #else // Else, output the model results directly
+    #ELSE // Else, output the model results directly
 
 //	return Models.LIB_BusinessRisk_Models(shell_res_grpd,,boca_shell_grouped,iid,,DPPA_Purpose,GLBA_Purpose,DataRestrictionMask_in,DataPermissionMask,appType).ValidatingModel;
- return Models.LIB_BusinessRisk_Models(shell_res_grpd , bocaShell := boca_shell_grouped).ValidatingModel;
-#end
+  RETURN Models.LIB_BusinessRisk_Models(shell_res_grpd , bocaShell := boca_shell_grouped).ValidatingModel;
+#END
 
-  END;
+END;
