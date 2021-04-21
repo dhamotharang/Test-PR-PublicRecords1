@@ -1,6 +1,6 @@
-﻿IMPORT SALT44,STD;
+IMPORT SALT44,STD;
 EXPORT hygiene(dataset(layout_BizHead) h) := MODULE
- 
+
 //A simple summary record
 EXPORT Summary(SALT44.Str30Type  txt) := FUNCTION
   SummaryLayout := RECORD
@@ -190,7 +190,7 @@ EXPORT Summary(SALT44.Str30Type  txt) := FUNCTION
   END;
   RETURN TABLE(T,R1);
 END;
- 
+
 summary0 := Summary('Summary');
   invRec := RECORD
   UNSIGNED  FldNo;
@@ -208,7 +208,7 @@ invRec invert(summary0 le, INTEGER C) := TRANSFORM
   SELF.maxlength := CHOOSE(C,le.maxlength_parent_proxid,le.maxlength_sele_proxid,le.maxlength_org_proxid,le.maxlength_ultimate_proxid,le.maxlength_has_lgid,le.maxlength_empid,le.maxlength_source,le.maxlength_source_record_id,le.maxlength_source_docid,le.maxlength_company_name,le.maxlength_company_name_prefix,le.maxlength_cnp_name,le.maxlength_cnp_number,le.maxlength_cnp_btype,le.maxlength_cnp_lowv,le.maxlength_company_phone,le.maxlength_company_phone_3,le.maxlength_company_phone_3_ex,le.maxlength_company_phone_7,le.maxlength_company_fein,le.maxlength_company_sic_code1,le.maxlength_active_duns_number,le.maxlength_prim_range,le.maxlength_prim_name,le.maxlength_sec_range,le.maxlength_city,le.maxlength_city_clean,le.maxlength_st,le.maxlength_zip,le.maxlength_company_url,le.maxlength_isContact,le.maxlength_contact_did,le.maxlength_title,le.maxlength_fname,le.maxlength_fname_preferred,le.maxlength_mname,le.maxlength_lname,le.maxlength_name_suffix,le.maxlength_contact_ssn,le.maxlength_contact_email,le.maxlength_sele_flag,le.maxlength_org_flag,le.maxlength_ult_flag,le.maxlength_fallback_value);
   SELF.avelength := CHOOSE(C,le.avelength_parent_proxid,le.avelength_sele_proxid,le.avelength_org_proxid,le.avelength_ultimate_proxid,le.avelength_has_lgid,le.avelength_empid,le.avelength_source,le.avelength_source_record_id,le.avelength_source_docid,le.avelength_company_name,le.avelength_company_name_prefix,le.avelength_cnp_name,le.avelength_cnp_number,le.avelength_cnp_btype,le.avelength_cnp_lowv,le.avelength_company_phone,le.avelength_company_phone_3,le.avelength_company_phone_3_ex,le.avelength_company_phone_7,le.avelength_company_fein,le.avelength_company_sic_code1,le.avelength_active_duns_number,le.avelength_prim_range,le.avelength_prim_name,le.avelength_sec_range,le.avelength_city,le.avelength_city_clean,le.avelength_st,le.avelength_zip,le.avelength_company_url,le.avelength_isContact,le.avelength_contact_did,le.avelength_title,le.avelength_fname,le.avelength_fname_preferred,le.avelength_mname,le.avelength_lname,le.avelength_name_suffix,le.avelength_contact_ssn,le.avelength_contact_email,le.avelength_sele_flag,le.avelength_org_flag,le.avelength_ult_flag,le.avelength_fallback_value);
 END;
- 
+
 EXPORT invSummary := NORMALIZE(summary0, 44, invert(LEFT,COUNTER));
 // The character counts
 // Move everything into 'inverted list' form so processing can be done 'in library'
@@ -271,12 +271,13 @@ SHARED FldIds := DATASET([{1,'parent_proxid'}
       ,{43,'ult_flag'}
       ,{44,'fallback_value'}],SALT44.MAC_Character_Counts.Field_Identification);
 EXPORT AllProfiles := SALT44.MAC_Character_Counts.FN_Profile(FldInv0,FldIds);
- 
+
 EXPORT SrcProfiles := SALT44.MAC_Character_Counts.Src_Profile(FldInv0,FldIds);
- 
+
 EXPORT Correlations := SALT44.MAC_Correlate.Fn_Profile(Pairs0,FldIds);
- 
- 
+
+
+
 ErrorRecord := RECORD
   UNSIGNED1 FieldNum;
   UNSIGNED1 ErrorNum;
@@ -284,97 +285,97 @@ END;
 ErrorRecord NoteErrors(h le,UNSIGNED1 c) := TRANSFORM
   SELF.ErrorNum := CHOOSE(c,
     Fields.InValid_parent_proxid((SALT44.StrType)le.parent_proxid),
- 
+
     Fields.InValid_sele_proxid((SALT44.StrType)le.sele_proxid),
- 
+
     Fields.InValid_org_proxid((SALT44.StrType)le.org_proxid),
- 
+
     Fields.InValid_ultimate_proxid((SALT44.StrType)le.ultimate_proxid),
- 
+
     Fields.InValid_has_lgid((SALT44.StrType)le.has_lgid),
- 
+
     Fields.InValid_empid((SALT44.StrType)le.empid),
- 
+
     Fields.InValid_source((SALT44.StrType)le.source),
- 
+
     Fields.InValid_source_record_id((SALT44.StrType)le.source_record_id),
- 
+
     Fields.InValid_source_docid((SALT44.StrType)le.source_docid),
- 
+
     Fields.InValid_company_name((SALT44.StrType)le.company_name),
- 
+
     Fields.InValid_company_name_prefix((SALT44.StrType)le.company_name_prefix),
- 
+
     Fields.InValid_cnp_name((SALT44.StrType)le.cnp_name),
- 
+
     Fields.InValid_cnp_number((SALT44.StrType)le.cnp_number),
- 
+
     Fields.InValid_cnp_btype((SALT44.StrType)le.cnp_btype),
- 
+
     Fields.InValid_cnp_lowv((SALT44.StrType)le.cnp_lowv),
- 
+
     Fields.InValid_company_phone((SALT44.StrType)le.company_phone),
- 
+
     Fields.InValid_company_phone_3((SALT44.StrType)le.company_phone_3),
- 
+
     Fields.InValid_company_phone_3_ex((SALT44.StrType)le.company_phone_3_ex),
- 
+
     Fields.InValid_company_phone_7((SALT44.StrType)le.company_phone_7),
- 
+
     Fields.InValid_company_fein((SALT44.StrType)le.company_fein),
- 
+
     Fields.InValid_company_sic_code1((SALT44.StrType)le.company_sic_code1),
- 
+
     Fields.InValid_active_duns_number((SALT44.StrType)le.active_duns_number),
- 
+
     Fields.InValid_prim_range((SALT44.StrType)le.prim_range),
- 
+
     Fields.InValid_prim_name((SALT44.StrType)le.prim_name),
- 
+
     Fields.InValid_sec_range((SALT44.StrType)le.sec_range),
- 
+
     Fields.InValid_city((SALT44.StrType)le.city),
- 
+
     Fields.InValid_city_clean((SALT44.StrType)le.city_clean),
- 
+
     Fields.InValid_st((SALT44.StrType)le.st),
- 
+
     Fields.InValid_zip((SALT44.StrType)le.zip),
- 
+
     Fields.InValid_company_url((SALT44.StrType)le.company_url),
- 
+
     Fields.InValid_isContact((SALT44.StrType)le.isContact),
- 
+
     Fields.InValid_contact_did((SALT44.StrType)le.contact_did),
- 
+
     Fields.InValid_title((SALT44.StrType)le.title),
- 
+
     Fields.InValid_fname((SALT44.StrType)le.fname),
- 
+
     Fields.InValid_fname_preferred((SALT44.StrType)le.fname_preferred),
- 
+
     Fields.InValid_mname((SALT44.StrType)le.mname),
- 
+
     Fields.InValid_lname((SALT44.StrType)le.lname),
- 
+
     Fields.InValid_name_suffix((SALT44.StrType)le.name_suffix),
- 
+
     Fields.InValid_contact_ssn((SALT44.StrType)le.contact_ssn),
- 
+
     Fields.InValid_contact_email((SALT44.StrType)le.contact_email),
- 
+
     Fields.InValid_sele_flag((SALT44.StrType)le.sele_flag),
- 
+
     Fields.InValid_org_flag((SALT44.StrType)le.org_flag),
- 
+
     Fields.InValid_ult_flag((SALT44.StrType)le.ult_flag),
- 
+
     Fields.InValid_fallback_value((SALT44.StrType)le.fallback_value),
- 
+
     0, // Uncleanable field
- 
+
     0, // Uncleanable field
- 
+
     0);
   SELF.FieldNum := IF(SELF.ErrorNum=0,SKIP,c); // Bail early to avoid creating record
 END;
@@ -399,11 +400,11 @@ EXPORT StandardStats(BOOLEAN doSummaryGlobal = TRUE, BOOLEAN doAllProfiles = TRU
   myTimeStamp := (UNSIGNED6)SALT44.Fn_Now('YYYYMMDDHHMMSS') : INDEPENDENT;
   fieldPopulationOverall := Summary('');
   SALT44.mod_StandardStatsTransforms.mac_hygieneSummaryTransform(BizLinkFull, Fields, 'RECORDOF(fieldPopulationOverall)', FALSE);
- 
+
   fieldPopulationOverall_Standard := IF(doSummaryGlobal, NORMALIZE(fieldPopulationOverall, COUNT(FldIds) * 6, xSummary(LEFT, COUNTER, myTimeStamp, 'all', 'all')));
   fieldPopulationOverall_TotalRecs_Standard := IF(doSummaryGlobal, SALT44.mod_StandardStatsTransforms.mac_hygieneTotalRecs(fieldPopulationOverall, myTimeStamp, 'all', FALSE, 'all'));
   allProfiles_Standard := IF(doAllProfiles, SALT44.mod_StandardStatsTransforms.hygieneAllProfiles(AllProfiles, myTimeStamp, 10, 'all'));
- 
+
   RETURN fieldPopulationOverall_Standard & fieldPopulationOverall_TotalRecs_Standard & allProfiles_Standard;
 END;
 END;
