@@ -33,21 +33,20 @@ EXPORT FnRoxie_GetAttrs(DATASET(PublicRecords_KEL.ECL_Functions.Input_Layout) In
 
 	FDCDataset := PublicRecords_KEL.Fn_MAS_FDC( MiniAttributesWOptOuts, Options , JoinFlags, DATASET([], PublicRecords_KEL.ECL_Functions.Layouts.LayoutInputBII) ,FDCDatasetMini);
 
-	InputChooser := if(options.BestPIIAppend, MiniAttributesWOptOuts, VerifiedInputPII);
-
+	MiniAttributeInputRecords := MiniAttributesWOptOuts(IsInputRec = TRUE);
 
   // Get Attributes - cleans the attributes after KEL is done 
-  InputPIIAttributes := PublicRecords_KEL.FnRoxie_GetInputPIIAttributes(InputChooser, Options, FDCDataset);
+  InputPIIAttributes := PublicRecords_KEL.FnRoxie_GetInputPIIAttributes(MiniAttributeInputRecords, Options, FDCDataset);
 	
-	PersonAttributes := PublicRecords_KEL.FnRoxie_GetPersonAttributes(MiniAttributesWOptOuts(IsInputRec = TRUE), FDCDataset, Options); 
+	PersonAttributes := PublicRecords_KEL.FnRoxie_GetPersonAttributes(MiniAttributeInputRecords, FDCDataset, Options); 
 
 	// PII Corroboration Summary attributes are NonFCRA only
-	ALLSummaryAttributesNonFCRA := PublicRecords_KEL.FnRoxie_GetSummaryAttributes(InputChooser, Options, FDCDataset);
+	ALLSummaryAttributesNonFCRA := PublicRecords_KEL.FnRoxie_GetSummaryAttributes(MiniAttributeInputRecords, Options, FDCDataset);
 	ALLSummaryAttributes := IF(NOT Options.IsFCRA, ALLSummaryAttributesNonFCRA, DATASET([], PublicRecords_KEL.ECL_Functions.Layouts.LayoutALLSumAttributes));
 	
-	InferredPerformanceAttributes := IF(Options.IsFCRA, PublicRecords_KEL.FnRoxie_GetInferredPerformanceAttributes(MiniAttributesWOptOuts(IsInputRec = TRUE), Options, FDCDataset), DATASET([], PublicRecords_KEL.ECL_Functions.Layouts.LayoutInferredAttributes));
+	InferredPerformanceAttributes := IF(Options.IsFCRA, PublicRecords_KEL.FnRoxie_GetInferredPerformanceAttributes(MiniAttributeInputRecords, Options, FDCDataset), DATASET([], PublicRecords_KEL.ECL_Functions.Layouts.LayoutInferredAttributes));
 	
-	// HighRiskAddressAttributesNonFCRA := PublicRecords_KEL.FnRoxie_GetHighRiskAddress(InputChooser, Options, FDCDataset);
+	// HighRiskAddressAttributesNonFCRA := PublicRecords_KEL.FnRoxie_GetHighRiskAddress(MiniAttributeInputRecords, Options, FDCDataset);
 	// HighRiskAddressAttributes  := IF(NOT Options.IsFCRA, HighRiskAddressAttributesNonFCRA, DATASET([], PublicRecords_KEL.ECL_Functions.Layouts.LayoutHighRiskAddressAttributes));
 	
 	withPersonAttributes := JOIN(InputPIIAttributes, PersonAttributes, 
@@ -96,5 +95,3 @@ EXPORT FnRoxie_GetAttrs(DATASET(PublicRecords_KEL.ECL_Functions.Input_Layout) In
 
   RETURN MasterResults;
  END;
-
- 
