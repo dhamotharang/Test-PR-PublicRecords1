@@ -1,6 +1,6 @@
-﻿//This is the code to execute in a builder window
+//This is the code to execute in a builder window
 #OPTION('multiplePersistInstances', FALSE);
-#workunit('name','BizLinkFull.BWR_Delta - Finding the Delta of Two Files - SALT V4.4.1');
+#workunit('name','BizLinkFull.BWR_Delta - Finding the Delta of Two Files - SALT V4.4.4');
 IMPORT BizLinkFull,SALT44;
 FilePrev := DATASET([], BizLinkFull.Layout_BizHead);
 FileNew := DATASET([], BizLinkFull.Layout_BizHead);
@@ -10,4 +10,4 @@ PARALLEL(OUTPUT(d.DifferenceSummary, NAMED('Summary'), ALL),
          OUTPUT(d.Differences, NAMED('SomeDifferences')),
          // Standard layout statistics
          OUTPUT(d.StandardStats(), NAMED('StandardStats'), ALL));
- 
+
