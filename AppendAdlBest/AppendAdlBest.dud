@@ -68,7 +68,7 @@ GENERATES INLINE
   %^edsOutput% := AppendAdlBest.macAppendAdlBest(%dsInput%, %Lexid%, %UniqueId%, %^qPrefix%,
     %^qDPPAPURPOSE%, %^qGLBPURPOSE%, %^qDATARESTRICTIONMASK%, %^qDATAPERMISSIONMASK%,
     %^qAppends%, %^qVerify%, %^qDeduped%, %^qIncludeRanking%, MaxResultsPerAcct, %^qPatriotProcess%,
-    %^AdlRoxieIP%, ParallelNodes, BatchSize, ParallelRequests);
+    %^qAdlRoxieIP%, ParallelNodes, BatchSize, ParallelRequests);
 ENDGENERATES
 
 
