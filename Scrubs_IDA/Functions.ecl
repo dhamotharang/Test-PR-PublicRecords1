@@ -76,6 +76,18 @@ EXPORT FUNCTIONS := MODULE
 
     END;
 
+    EXPORT fn_valid_clientId(string id) := FUNCTION 
+        cleanID     := TRIM(id, ALL);
+        rgx         := '^[a-z]{3}[0-9]{9,17}$';
+        isValidId   := REGEXFIND(rgx, cleanID);
+
+        RETURN if(
+                    isValidId 
+                    ,1
+                    ,0
+                );
+    END;
+
     EXPORT fn_valid_IP(string ip) := FUNCTION
 
         cleanIp      := TRIM(ip,whitespace);
@@ -84,7 +96,7 @@ EXPORT FUNCTIONS := MODULE
         isBlank     := LENGTH(cleanIp) = 0;
 
         RETURN if(
-                    (isIPV4 AND isMinLength) or isBlank
+                    (isIPV4 AND isMinLength) OR isBlank
                     ,1
                     ,0
                 );
