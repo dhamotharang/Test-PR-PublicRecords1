@@ -1,4 +1,4 @@
-/*****************************************
+﻿/*****************************************
 1. Change the input file and layout
 2. Replace "IDPO" with the prod code needed
 3. Change the output file name
@@ -23,7 +23,7 @@ Scoring.Layout_IDPO_Soapcall into_IDPO_input(f le) := transform
 	self.runSeed:=false ;
 	self.dppapurpose := 0;
 	self.glbpurpose := 5;
-	self.gateways := dataset([{'Neutral', 'http://oroxievip.sc.seisint.com:9876'}], risk_indicators.Layout_Gateways_In);
+	self.gateways := dataset([{'Neutral', 'http://prdrroxiethorvip.hpcc.risk.regn.net:9876'}], risk_indicators.Layout_Gateways_In);
 	self := le;
 	self := [];
 end;
@@ -31,7 +31,7 @@ end;
 soap_in := project(f,into_IDPO_input(LEFT));
 output(soap_in, named('soap_in'));
 
-roxieIP:='http://oroxievip.sc.seisint.com:9876';  //DR Roxie
+roxieIP:='http://prdrroxiethorvip.hpcc.risk.regn.net:9876'; //DR Roxie
 
 Scoring.MAC_PROD_Soapcall(soap_in, RiskWise.Layout_IDPO, roxieIP, 'RiskWise.RiskWiseMainIDPO',s_f);
 

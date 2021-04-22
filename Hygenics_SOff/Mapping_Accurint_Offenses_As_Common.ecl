@@ -381,6 +381,7 @@ o2 defCategory(o2 l):= transform
 						'FALSE PRETENSES \\(ATTEMPT\\)|'+
 						'RESISTING ARREST|'+
 						', FALSE PRETENSES|'+
+						'PURJURY|'+
 
 						
 						'WITHIN 500\'',
@@ -3392,6 +3393,8 @@ o2 defCategory(o2 l):= transform
 					trim(l.offense_description, left, right) = 'INDICTMENT NUMBER CP870011443' 				=> 'OTH',                     
 					trim(l.offense_description, left, right) = 'KANSAS' 				=> 'OTH',                                            
 
+          trim(l.offense_description, left, right) = '3699:39-13-PT5 S' 				=> 'OTH', 
+          trim(l.offense_description, left, right) = 'TDCJ;ID (PC 22.011(A)(2)' 				=> 'OTH',
 
 					
 					trim(l.offense_description, left, right) in ['ARRALC196360022020121115','ATTEMPT 1ST DEGREE','BARKIM196660118920131111','BARSAM196851116020120808','BEADAN197550719520130828','BLADAV196750822320130712','BLADAV196750823020130712','BONALB198460015420130101','BONALB198460016420130101',

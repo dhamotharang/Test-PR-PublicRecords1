@@ -5,10 +5,9 @@
 
 IMPORT _Control, data_services, LN_PropertyV2, LN_PropertyV2_Fast, STD, ut;
 
-export FCRA_Property_By_DocType(string pHostname, string pTarget, string pContact ='\' \'') := function
+export FCRA_Property_By_DocType(string pHostname, string pTarget, string pContact ='\' \'', STRING today = (STRING8)STD.Date.Today()) := function
 
-filedate := (STRING8)Std.Date.Today();
-rpt_yyyymmdd := filedate[1..8];
+filedate := today;
 
 //FCRA keys:
 Key_Deeds_FCRA_monthly := PULL(LN_PropertyV2.key_deed_fid(true));
@@ -51,7 +50,7 @@ despray_fcra_deed_tbl := STD.File.DeSpray('~thor_data400::data_insight::data_met
 
 //if everything in the Sequential statement runs, it will send the Success email, else it will send the Failure email
 email_alert := SEQUENTIAL(
-					output(sort(tbl_Key_Deeds_FCRA_2010_props, -proc_date, state, document_type_code, skew(1.0)),,'~thor_data400::data_insight::data_metrics::tbl_key_deeds_fcra_2010_properties_by_doctype_'+ filedate +'.csv', csv(heading(single), separator('|'),terminator('\r\n'),quote('\"')),overwrite)
+					output(sort(tbl_Key_Deeds_FCRA_2010_props, -proc_date, state, document_type_code, skew(1.0)),,'~thor_data400::data_insight::data_metrics::tbl_key_deeds_fcra_2010_properties_by_doctype_'+ filedate +'.csv', csv(heading(single), separator('|'),terminator('\r\n'),quote('\"')),overwrite,expire(10))
 					,despray_fcra_deed_tbl):
 					Success(FileServices.SendEmail(pContact, 'FCRA Group: FCRA_Property_By_DocType Build Succeeded', workunit + ': Build complete.' + filedate)),
 					Failure(FileServices.SendEmail(pContact, 'FCRA Group: FCRA_Property_By_DocType Build Failed', workunit + filedate + '\n' + FAILMESSAGE)

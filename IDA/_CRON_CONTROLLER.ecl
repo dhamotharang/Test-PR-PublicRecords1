@@ -35,7 +35,7 @@ _process(string prProcess ,boolean pUseProd, boolean pDaily) := Function
 	_cronWhen_ECL := Case( prProcess, 
 											   'IDA REAPPEND'    =>  ':WHEN(IDA._CRON_ECL(\'' + prProcess + '\',' + _pUseProd + ',' + _pDaily + ').EVENT_NAME)\n' 
 											  ,'IDA HEADER FLAG' =>  ':WHEN(IDA._CRON_ECL(\'' + prProcess + '\',' + _pUseProd + ',' + _pDaily + ').EVENT_NAME)\n' 
-											  ,'IDA BUILD'       =>  ':WHEN(CRON(\'0 11-23/1 * * *\'))\n'  
+											  ,'IDA BUILD'       =>  ':WHEN(CRON(\'15  0-23/2 * * *\'))\n'  
 											  ,			             ':WHEN(IDA._CRON_ECL(\'' + prProcess + '\',' + _pUseProd + ',' + _pDaily + ').EVENT_NAME)\n'
 												);
 

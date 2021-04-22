@@ -3,18 +3,25 @@
 	EXPORT payload := RECORD,MAXLENGTH(20000)
 	  STRING line;
 	END;
-
-	EXPORT agency := RECORD  
-	  STRING Agency_ID;
-	  STRING Agency_Name;
-	  STRING Source_ID;
-	  STRING Agency_State_Abbr;
-	  STRING Agency_ori; 
-	  STRING Allow_Open_Search; 
-	  STRING Append_Overwrite_Flag;
-	  STRING Drivers_Exchange_Flag;  
-	END;
-
+  
+	// EXPORT agency := RECORD
+		// STRING Agency_ID;
+	  // STRING Agency_Name;
+		// STRING Agency_State_Abbr;
+	  // STRING Agency_ori;
+	  // STRING Allow_Open_Search;
+	  // STRING Append_Overwrite_Flag;
+	  // STRING Drivers_Exchange_Flag;   
+	  // STRING Source_ID;
+	  // STRING Source_Start_Date; 
+	  // STRING Source_End_Date; 
+	  // STRING Source_Termination_Date; 
+	  // STRING Source_Resale_Allowed; 
+	  // STRING Source_Auto_Renew; 
+	  // STRING Source_Allow_Sale_Of_Component_Data; 
+	  // STRING Source_Allow_Extract_Of_Vehicle_Data; 
+	// END; 
+	
 	EXPORT billing_agencies := RECORD
 		STRING Cru_Agency_ID;
 		STRING Cru_State_Number;

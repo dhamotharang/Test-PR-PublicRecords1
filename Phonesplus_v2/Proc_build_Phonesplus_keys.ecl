@@ -6,20 +6,20 @@ function
 /////////////////////////////////////////////////////////////////////////////////
 // -- Build Keys
 /////////////////////////////////////////////////////////////////////////////////
-RoxieKeyBuild.Mac_SK_BuildProcess_v2_local(key_neustar_phone_history
-                                          ,'~thor_data400::key::neustar_phone_history'
-										  ,'~thor_data400::key::neustar::'+filedate+'::phone_history'
-										  ,bk_neustar_hist);
-											
+
+//DF-29064: Remove Neustar Phone History Key from Build
+										
 knp := CellPhone.key_neustar_phone;
 RoxieKeyBuild.Mac_SK_BuildProcess_v2_local(knp
                                           ,'~thor_data400::key::neustar_phone'
 										  ,'~thor_data400::key::neustar::'+filedate+'::phone'
 										  ,bk_phone);
+											
 RoxieKeyBuild.Mac_SK_BuildProcess_v2_local(key_phonesplus_did
 										  ,'~thor_data400::key::phonesplusv2_did'
 										  ,'~thor_data400::key::phonesplusv2::' +filedate+ '::did'
 										  ,bk_did);
+											
 RoxieKeyBuild.Mac_SK_BuildProcess_v2_local(key_phonesplus_companyname
 										  ,'~thor_data400::key::phonesplusv2_companyname'
 										  ,'~thor_data400::key::phonesplusv2::' +filedate+ '::companyname'
@@ -62,7 +62,6 @@ Phonesplus_v2.MAC_Build('Phonesplusv2', filedate, dist_DSphonesplus,fname,mname,
 				 lookups,
 				 fdid,
 				 '~thor_data400::key::phonesplusv2_',bld_phonesplus_auto,false)
-
 						
 dist_DSphonesplus_rec := record
 	unsigned6 fdid;
@@ -94,12 +93,15 @@ Roxiekeybuild.Mac_SK_Move_to_Built_v2('~thor_data400::key::neustar_phone_history
 Roxiekeybuild.Mac_SK_Move_to_Built_v2('~thor_data400::key::neustar_phone'
 								     ,'~thor_data400::key::neustar::'+filedate+'::phone'
 									 ,mv2blt_phone);
+									 
 Roxiekeybuild.Mac_SK_Move_to_Built_v2('~thor_data400::key::phonesplusv2_did'
 								     ,'~thor_data400::key::phonesplusv2::'+filedate+'::did'
 									 ,mv2blt_did);
+									 
 Roxiekeybuild.Mac_SK_Move_to_Built_v2('~thor_data400::key::phonesplusv2_fdids'
 								     ,'~thor_data400::key::phonesplusv2::'+filedate+'::fdids'
 									 ,mv2blt_fdids);
+									 
 Roxiekeybuild.Mac_SK_Move_to_Built_v2('~thor_data400::key::phonesplusv2_companyname'
 								     ,'~thor_data400::key::phonesplusv2::'+filedate+'::companyname'
 									 ,mv2blt_pcname);
@@ -109,7 +111,6 @@ Roxiekeybuild.Mac_SK_Move_to_Built_v2('~thor_data400::key::phonesplusv2_companyn
 // -- Move Keys to QA
 /////////////////////////////////////////////////////////////////////////////////
 
-ut.mac_sk_move_v2('~thor_data400::key::neustar_phone_history' ,'Q',mv2qa_neustar_hist);
 ut.mac_sk_move_v2('~thor_data400::key::neustar_phone' ,'Q',mv2qa_phone);
 ut.mac_sk_move_v2('~thor_data400::key::phonesplusv2_did','Q',mv2qa_did);
 ut.mac_sk_move_v2('~thor_data400::key::phonesplusv2_fdids','Q',mv2qa_fdids);
@@ -134,7 +135,7 @@ email := fileservices.sendemail('RoxieBuilds@seisint.com ; vniemela@seisint.com 
 								'      9) thor_data400::key::phonesplus_zip_qa(thor_data400::key::phonesplusv2::'+ filedate +'::zip),\n' +
 								'     10) thor_data400::key::neustar_phone(thor_data400::key::neustar::'+ filedate +'::phone),\n' +
 								'     11) thor_data400::key::phonesplus_companyname_qa(thor_data400::key::phonesplusv2::'+ filedate +'::companyname),\n' +
-						        '         have been built and ready to be deployed to QA.'); 
+						    '         have been built and ready to be deployed to QA.'); 
 			
 			
 
@@ -148,7 +149,6 @@ sequential(
 	parallel(
 			 bk_did
 		   ,bld_fdids
-			 ,bk_neustar_hist
 			 ,bk_phone
 			 ,bk_pcname
 			 ,bld_phonesplus_auto
@@ -156,14 +156,12 @@ sequential(
 	parallel(
 			 mv2blt_did
 			,mv2blt_fdids
-			,mv2blt_neustar_hist
 			,mv2blt_phone
 			,mv2blt_pcname
 			),
 	parallel(
 			mv2qa_did
 		  ,mv2qa_fdids
-			,mv2qa_neustar_hist
 		  ,mv2qa_phone
 		  ,mv2qa_pcname
 		  ,mv_autokey

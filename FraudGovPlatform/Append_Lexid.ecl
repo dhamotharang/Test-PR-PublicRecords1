@@ -1,10 +1,10 @@
 ﻿EXPORT Append_Lexid( pBaseFile ) := 
 FUNCTIONMACRO
-		import FraudShared,DID_Add,_Validate, Std;
+		import DID_Add,_Validate, Std;
 		FirstRinID := FraudGovPlatform.Constants().FirstRinID;
 
 		dFileBase 		:= distribute	(pull(pBaseFile),record_id	);
-		with_lexid := project(dFileBase(rin_source in [4,5,6,7] and rawlinkid > 0),  transform( FraudShared.Layouts.Base.Main , self.did := left.rawlinkid, self:=left));
+		with_lexid := project(dFileBase(rin_source in [4,5,6,7] and rawlinkid > 0),  transform( FraudGovPlatform.Layouts.Base.Main , self.did := left.rawlinkid, self:=left));
 		without_lexid := join(dFileBase, with_lexid, left.record_id = right.record_id, left only);
 
 		with_pii := without_lexid

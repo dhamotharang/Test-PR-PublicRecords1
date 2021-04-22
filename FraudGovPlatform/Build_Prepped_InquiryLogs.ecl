@@ -1,4 +1,4 @@
-﻿IMPORT tools,STD, FraudGovPlatform_Validation, FraudShared, ut, Inquiry_AccLogs;
+﻿IMPORT tools,STD, FraudGovPlatform_Validation, ut, Inquiry_AccLogs;
 EXPORT Build_Prepped_InquiryLogs (
 	 string		pversion
 ) :=

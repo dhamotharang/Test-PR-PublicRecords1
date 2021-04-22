@@ -12,9 +12,9 @@ OUTPUT(choosen(FullDailyBase,1000),NAMED('DailyBaseOutput'));
 DailyBaseStats :=TABLE(FullDailyBase,{daily_base_did_total_cnt:= count(group,((did)=0 or (did)<>0)),
                                     daily_base_did_equals_zero_cnt:= count(group,((did)=0)),
                                     daily_base_did_not_equals_zero_cnt:= count(group,((did)<>0)),
-                                    daily_base_clientassigneduniquerecordid_total_cnt:= count(group,((clientassigneduniquerecordid)=0 or (clientassigneduniquerecordid)<>0)),
-                                    daily_base_clientassigneduniquerecordid_equals_zero_cnt:= count(group,( (clientassigneduniquerecordid)=0 )),
-                                    daily_base_clientassigneduniquerecordid_not_equals_zero_cnt:= count(group,( (clientassigneduniquerecordid)<>0 ))});
+                                    daily_base_clientassigneduniquerecordid_total_cnt:= count(group,((clientassigneduniquerecordid)='' or (clientassigneduniquerecordid)<>'')),
+                                    daily_base_clientassigneduniquerecordid_equals_zero_cnt:= count(group,( (clientassigneduniquerecordid)='' )),
+                                    daily_base_clientassigneduniquerecordid_not_equals_zero_cnt:= count(group,( (clientassigneduniquerecordid)<>'' ))});
 output(DailyBaseStats,NAMED('DailyBaseStats'));
 
 shared MonthlyBase:=IDA.Files(pversion, pUseProd).base.built;
@@ -23,9 +23,9 @@ OUTPUT(choosen(MonthlyBase,1000),NAMED('MonthlyBaseOutput'));
 MonthlyBaseStats :=TABLE(MonthlyBase,{monthly_base_did_total_cnt:= count(group,((did)=0 or (did)<>0)),
                                     monthly_base_did_equals_zero_cnt:= count(group,((did)=0)),
                                     monthly_base_did_not_equals_zero_cnt:= count(group,((did)<>0)),
-                                    monthly_base_clientassigneduniquerecordid_total_cnt:= count(group,((clientassigneduniquerecordid)=0 or (clientassigneduniquerecordid)<>0)),
-                                    monthly_base_clientassigneduniquerecordid_equals_zero_cnt:= count(group,( (clientassigneduniquerecordid)=0 )),
-                                    monthly_base_clientassigneduniquerecordid_not_equals_zero_cnt:= count(group,( (clientassigneduniquerecordid)<>0 ))});
+                                    monthly_base_clientassigneduniquerecordid_total_cnt:= count(group,((clientassigneduniquerecordid)='' or (clientassigneduniquerecordid)<>'')),
+                                    monthly_base_clientassigneduniquerecordid_equals_zero_cnt:= count(group,( (clientassigneduniquerecordid)='' )),
+                                    monthly_base_clientassigneduniquerecordid_not_equals_zero_cnt:= count(group,( (clientassigneduniquerecordid)<>'' ))});
 output(MonthlyBaseStats,NAMED('MonthlyBaseStats'));
 
 j := JOIN(FullDailyBase,MonthlyBase, LEFT.did=RIGHT.did AND LEFT.clientassigneduniquerecordid=RIGHT.clientassigneduniquerecordid,RIGHT ONLY);
@@ -35,7 +35,7 @@ output(srt,all,NAMED('Changed_Records'));
 				
 shared basechanges:=		srt;	
 
-BaseChangesDesprayTable:=TABLE(basechanges,{did,clientassigneduniquerecordid,orig_filecategory});
+BaseChangesDesprayTable:=TABLE(basechanges,{did,clientassigneduniquerecordid});
 
 ChangeOut:=OUTPUT(BaseChangesDesprayTable,,IDA.Filenames(pversion,pUseProd).BaseChange.new,CSV(HEADING(SINGLE),SEPARATOR('|')),COMPRESSED);
 
@@ -52,5 +52,7 @@ Build_Change_Base := if(nothor(FileServices.GetSuperFileSubCount(IDA.Filenames(p
 
 DesprayBaseChange:=STD.File.DeSpray('~thor_data400::base::change::ida::built',IDA._Constants(pUseProd).Source_IP,IDA._Constants(pUseProd).despray_path + IDA._Constants(pUseProd).despray_change_filename);
 
-export Build_Base_Change:=SEQUENTIAL(Build_Change_Base,DesprayBaseChange);
+seq:=SEQUENTIAL(Build_Change_Base,DesprayBaseChange): success(IDA.Send_Email(pversion,pUseProd).ChangeSuccess), failure(IDA.send_email(pversion,pUseProd).ChangeFailure);
+
+export Build_Base_Change:=seq;
 end;

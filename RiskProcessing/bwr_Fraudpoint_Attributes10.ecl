@@ -1,4 +1,4 @@
-#workunit('name','Fraudpoint Attributes');
+﻿#workunit('name','Fraudpoint Attributes');
 #option ('hthorMemoryLimit', 1000)
 #option ('linkCountedRows', false)
 
@@ -109,7 +109,7 @@ layout_old_acct into_fdInput(f le, INTEGER c) := TRANSFORM
 
 	SELF.RequestedAttributeGroups := dataset([{'Version1'}], layout_attributes_in);
 //	self.scores := dataset([{'Models.RVTelecom_Service', fcraroxieIP,params}], models.Layout_Score_Chooser); 
-	//self.gateways := dataset([{'neutralroxie', 'http://roxiebatch.br.seisint.com:9856'}], risk_indicators.Layout_Gateways_In);
+	//self.gateways := dataset([{'neutralroxie', 'http://roxiethorvip.hpcc.risk.regn.net:9856'}], risk_indicators.Layout_Gateways_In);
 	SELF := le;
 	self := [];
 end;

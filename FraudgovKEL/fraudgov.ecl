@@ -1,10 +1,10 @@
-﻿IMPORT Std, FraudgovKEL, FraudShared, data_services, ut,doxie,Suppress;
+﻿IMPORT Std, FraudgovKEL, FraudGovPlatform, data_services, ut,doxie,Suppress;
 #CONSTANT ('Platform','FraudGov');
 RunKelDemo :=false:stored('RunKelDemo');
 
 FileIn := If(RunKelDemo=false,'fraudgov::base::built::Main','fraudgov::in::sprayed::demodata');
 
-fraudgov_dataset_Input := dataset(data_services.foreign_prod+FileIn, FraudShared.Layouts.Base.Main, thor); 
+fraudgov_dataset_Input := dataset(data_services.foreign_prod+FileIn, FraudGovPlatform.Layouts.Base.Main, thor); 
 
 // Supress CCPA
 mod_access := MODULE(doxie.IDataAccess) END; // default mod_access
@@ -24,7 +24,7 @@ fraudgov_dataset_base_prep	:= PROJECT(fraudgov_dataset_base_prep1,
 								  SELF.ip_address := MAP(LEFT.ip_address in Set_ip_address => '',LEFT.ip_address),
 								  SELF := LEFT));
 
-//PULL(FraudShared.files(,FraudgovKEL.Constants.useOtherEnvironmentDali).base.Main.built);
+//PULL(FraudGovPlatform.files(,FraudgovKEL.Constants.useOtherEnvironmentDali).base.Main.built);
  
 
 // Prep!!!
@@ -41,7 +41,7 @@ Layout_Clean_Name := 	record
 	string  name_score			;
 end;
 
-Main         :=  FraudShared.Layouts.Base.Main - cleaned_name;
+Main         :=  FraudGovPlatform.Layouts.Base.Main - cleaned_name;
 
 fraudgov_dataset_base := PROJECT(fraudgov_dataset_base_prep, 
                        TRANSFORM({
@@ -107,4 +107,4 @@ Set_Addresses := [12638153115695167395,10246789559473286115];
 
 tempFinal := DATASET('~foreign::10.173.14.201::temp::fraudgov', RECORDOF(Final), THOR);//(did in Set_incarcerated OR did in Set_deceased or did % 1000000 = 1 or OttoAddressId in Set_Addresses);
 
-EXPORT fraudgov := Final;//final; // tempFinal; // 
+EXPORT fraudgov := final; // tempFinal; // 

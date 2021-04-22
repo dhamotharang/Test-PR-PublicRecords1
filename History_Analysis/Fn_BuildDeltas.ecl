@@ -10,11 +10,11 @@ Export Fn_BuildDeltas := Module
     // Ensures no blank whenlive fields are counted and filter out data only in qa
     f_keysizedhistory_rec := loadrawdata( whenQAlive<>'NA', whenQAlive<>'');
 
-    s_keysizedhistory_rec := sort(f_keysizedhistory_rec, datasetname, superkey, buildversion, whenQAlive ); // Sorted dataset
+    t_previousRec := project( f_keysizedhistory_rec, history_analysis.layouts.BaseRecQA );
 
-    g_keysizedhistory_rec := group(s_keysizedhistory_rec, datasetname, superkey ); // Grouped Dataset
+    s_keysizedhistory_rec := sort(t_previousRec, datasetname, superkey, updateflag, buildversion, whenQAlive ); // Sorted dataset
 
-    t_previousRec := project( g_keysizedhistory_rec, history_analysis.layouts.BaseRecQA );
+    g_keysizedhistory_rec := group(s_keysizedhistory_rec, datasetname, superkey, updateflag ); // Grouped Dataset
 
     // Transform QA Deltas
     history_analysis.layouts.BaseRecQA CountDeltas( history_analysis.layouts.BaseRecQA Le, history_analysis.layouts.BaseRecQA Ri ) := Transform
@@ -43,7 +43,7 @@ Export Fn_BuildDeltas := Module
     End;
 
     // Iterate and count deltas
-    iterateCount := iterate(t_previousRec, CountDeltas(left, right));
+    iterateCount := iterate(g_keysizedhistory_rec, CountDeltas(left, right));
 
     filterIterate:=  iterateCount( not prevrecord_count = 0 ); // Fitered to remove versions with prevrecord_count of zero
 
@@ -57,11 +57,11 @@ Export Fn_BuildDeltas := Module
     // Ensures no blank whenQAlive fields 
     f_keysizedhistory_rec := loadrawdata( whenProdlive<>'NA', whenProdLive<>'');
 
-    s_keysizedhistory_rec := sort(f_keysizedhistory_rec, datasetname, superkey, buildversion, whenProdlive ); // Sorted dataset
+    t_previousRec := project( f_keysizedhistory_rec, history_analysis.layouts.BaseRecprod );
 
-    g_keysizedhistory_rec := group(s_keysizedhistory_rec, datasetname, superkey); // Grouped Dataset
+    s_keysizedhistory_rec := sort(t_previousRec, datasetname, superkey, updateflag, buildversion, whenProdlive ); // Sorted dataset
 
-    t_previousRec := project( g_keysizedhistory_rec, history_analysis.layouts.BaseRecprod );
+    g_keysizedhistory_rec := group(s_keysizedhistory_rec, datasetname, superkey, updateflag ); // Grouped Dataset
 
     // Transform Prod Deltas
     history_analysis.layouts.BaseRecprod CountDeltas( history_analysis.layouts.BaseRecprod Le, history_analysis.layouts.BaseRecprod Ri ) := Transform
@@ -90,7 +90,7 @@ Export Fn_BuildDeltas := Module
     End;
 
     // Iterate and count deltas
-    iterateCount := iterate(t_previousRec, CountDeltas(left, right));
+    iterateCount := iterate(g_keysizedhistory_rec, CountDeltas(left, right));
 
     filterIterate:=  iterateCount( not prevrecord_count = 0 ); // Fitered to remove versions with prevrecord_count of zero
 

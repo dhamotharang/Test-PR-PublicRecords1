@@ -1,7 +1,6 @@
 ﻿IMPORT _control,ut,RoxieKeyBuild, PromoteSupers, Orbit3;
 
 EXPORT proc_build_all(STRING version) := FUNCTION
-  #workunit('name', 'Yogurt:V12 build');
 	
 	//Run V12 Spray
 	spray_all := V12.proc_spray_V12_files(version);
@@ -27,7 +26,7 @@ EXPORT proc_build_all(STRING version) := FUNCTION
 										FileServices.FinishSuperFileTransaction()
 									);
 									
-  create_orbit_build:= Orbit3.Proc_Orbit3_CreateBuild_npf ('V12 Group',version);
+  create_orbit_build:= Orbit3.Proc_Orbit3_CreateBuild ('V12 Group',version,is_npf:=true);
 		
   RETURN If(EXISTS(FileServices.RemoteDirectory(_control.IPAddress.bctlpedata11,'/data/hds_180/V12/data/'+ version,'*.txt')),
 					SEQUENTIAL(spray_all

@@ -1,4 +1,4 @@
-﻿import doxie, tools, versioncontrol,FraudShared;
+﻿import doxie, tools, versioncontrol;
 
 export Build_Keys(
 	 string pversion = ''

@@ -9,8 +9,7 @@ ThorName:=IF(_control.ThisEnvironment.Name<> 'Prod_Thor',Constants.ThorName_Dev,
 version:=ut.GetDate : independent;
 
 lECL1 :=
- 'import FraudGovPlatform_Validation,ut;\n'
-+'#CONSTANT	(\'Platform\',\'FraudGov\');\n'
+ 'import FraudGovPlatform_Validation,ut,Scrubs_FraudGov;\n'
 +'wuname := \'FraudGov Deltabase Input Prep\';\n'
 +'#WORKUNIT(\'name\', wuname);\n'
 +'#WORKUNIT(\'priority\',\'high\');\n'

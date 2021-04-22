@@ -28,10 +28,10 @@ function
   ds_patch_proxids    := BIPV2_Tools.initParentID(ds_pop_corpkeys,dotid,proxid) : persist('~persist::BIPV2_ProxID::_Preprocess::ds_patch_proxids');
   
   // -- patch Proxid underlinks outside of salt
-  ds_patch_Underlinks := BIPV2_ForceLink.mac_ForceLink_Proxid(ds_patch_proxids);
+  ds_patch_Underlinks := BIPV2_ForceLink.mac_ForceLink_Proxid(ds_patch_proxids)   : persist('~persist::BIPV2_ProxID::_Preprocess::ds_patch_Underlinks');
   
   // -- Suppress & Explode overlinks
-  ds_suppress := BIPV2_Field_Suppression.mac_Suppress(ds_patch_Underlinks);
+  ds_suppress := BIPV2_Field_Suppression.mac_Suppress(ds_patch_Underlinks)  : persist('~persist::BIPV2_ProxID::_Preprocess::ds_suppress');
   
   // -- only intialize zero proxids and patch underlinks once.  when called a second time in the process, skip that part.
   ds_use            := if(pStrataBuildStep = 'Proxid' ,ds_suppress ,ds_slim);

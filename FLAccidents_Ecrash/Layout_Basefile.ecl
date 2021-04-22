@@ -100,8 +100,12 @@
 	STRING11 agency_id;
 	STRING100 agency_name;
 	STRING11 agency_ori;
+	
 	//PR Recon COPPR-49
 	BOOLEAN is_Terminated_Agency;
+		//PR Recon COPPR-63
+	BOOLEAN allow_Sale_Of_Component_Data; 
+	
 	STRING19 sent_to_hpcc_datetime;
 	STRING4 corrected_incident;
 	STRING9 cru_order_id;

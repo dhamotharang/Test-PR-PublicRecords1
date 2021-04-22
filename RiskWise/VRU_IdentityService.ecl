@@ -1,4 +1,4 @@
-/*--SOAP--
+﻿/*--SOAP--
 <message name="VRU_IdentityService">
 	<part name="AlphaNumericInput" type="xsd:boolean" default="false" description=" Defines whether the input is from VRU (numeric only) or non-numeric"/>
 
@@ -22,7 +22,7 @@
   <separator />
 	
 	<part name="seq" type="xsd:unsigned" />
-	<part name="neutralIP" type="xsd:string" default="http://roxiestaging.br.seisint.com:9876" description=" gateway to Neutral DID Service"/>
+	<part name="neutralIP" type="xsd:string" default="http://certstagingvip.hpcc.risk.regn.net:9876" description=" gateway to Neutral DID Service"/>
 </message>
 */
 /*--INFO-- Returns DID based on VRU input. */

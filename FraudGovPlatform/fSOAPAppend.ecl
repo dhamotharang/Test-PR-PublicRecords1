@@ -1,4 +1,4 @@
-﻿Import FraudShared,riskwise,risk_indicators,data_services,CriminalRecords_BatchService,DeathV2_Services,models,AppendIpMetadata,std,AppendRelativesAddressMatch,Advo,didville,PhonesInfo,
+﻿Import riskwise,risk_indicators,data_services,CriminalRecords_BatchService,DeathV2_Services,models,AppendIpMetadata,std,AppendRelativesAddressMatch,Advo,didville,PhonesInfo,
 gateway,riskprocessing,_control,Autokey_batch,DriversV2_Services;
 
 EXPORT fSOAPAppend(boolean	UpdatePii   = _Flags.Update.Pii)	:= MODULE

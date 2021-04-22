@@ -1,7 +1,7 @@
 ﻿import Data_Services, ut, STD;
 EXPORT fn_Inputstats  := module
 
-dInbase := dataset(Data_Services.foreign_prod+'thor_data400::base::ecrash',FLAccidents_Ecrash.Layout_Basefile,thor) ( regexreplace('-',sent_to_hpcc_datetime[1..10],'') = ut.getDateOffset(-1,mod_Utilities.StrSysDate));
+dInbase := Files_eCrash.DS_BASE_ECRASH ( regexreplace('-',sent_to_hpcc_datetime[1..10],'') = ut.getDateOffset(-1,mod_Utilities.StrSysDate));
 
 
 rec := record

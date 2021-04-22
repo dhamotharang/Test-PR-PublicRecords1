@@ -31,7 +31,7 @@ pfile:=STD.STR.SplitWords(J_dsFileListSorted[1].Name,'/');
 FileDir:=RootDir + pfile[1] +'/';
 
 lECL1 :=
- 'import ut;\n'
+ 'import FraudGovPlatform_Validation,ut;\n'
 +'wuname := \'FraudGov Input Prep\';\n'
 +'#WORKUNIT(\'name\', wuname);\n'
 +'#WORKUNIT(\'priority\',\'high\');\n'

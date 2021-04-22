@@ -1,21 +1,29 @@
 import dx_common;
-export layouts :=
+EXPORT layouts :=
 module
-    export suppressionTPS	:=
-    module
-        
-        export	Base	:=
-        record
-            string3		Source;
-            string10	PhoneNumber;		
-        end;
-        
-        export	Building	:=
-        record
-            string10	PhoneNumber;
-            UNSIGNED4 dt_effective_first;
-            UNSIGNED4 dt_effective_last;
-            UNSIGNED1 delta_ind; 
-        end;
-    end;
-end;
+    EXPORT	Base	:=
+    record
+        string3		Source;
+        string10	PhoneNumber;		
+    END;
+    
+    EXPORT	Building	:=
+    record
+        string3		Source;
+        string10	PhoneNumber;
+        dx_common.layout_metadata.dt_effective_first;
+        dx_common.layout_metadata.dt_effective_last;
+        dx_common.layout_metadata.delta_ind; 
+    END;
+    EXPORT delta_keyfield :=
+    RECORD
+        string10	PhoneNumber;
+    END;
+    EXPORT Delta_payload := 
+    record
+        string10	PhoneNumber;
+        dx_common.layout_metadata.dt_effective_first;
+        dx_common.layout_metadata.dt_effective_last;
+        dx_common.layout_metadata.delta_ind; 
+    END;
+END;

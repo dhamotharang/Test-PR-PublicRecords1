@@ -3,6 +3,8 @@
 //-----------------------------------------------------------------
 	//current name, alias, aka and former name
 
+EXPORT Normalize_Transunion_Update(STRING Full_filedate,STRING Update_filedate) := FUNCTION
+
 Transunion_PTrak.Layout_Transunion_Out.NormNameAddressRec t_norm_name (Transunion_PTrak.Layout_Transunion_Update_In L, INTEGER C):= TRANSFORM
 	get_suffix(string suffix) := map(trim(suffix, left, right) IN ['JR', 'SR', 'II', 'III', 'IV', 'V', 'VI', 'VII', 'VIII', 'IX', 'X'] => trim(suffix, left, right),  
 																	 DataLib.StringFind(suffix,'RD',1) > 0 => 'III',
@@ -14,7 +16,7 @@ Transunion_PTrak.Layout_Transunion_Out.NormNameAddressRec t_norm_name (Transunio
 	 current_name 						:= StringLib.StringCleanSpaces((L.LASTNAME+', '+L.FIRSTNAME+' '+ L.MIDDLENAME +' '+ get_suffix(L.SUFFIX)));
 	 SELF.Name       					:= CHOOSE(C,current_name,L.AKA1,L.AKA2,L.AKA3);
 	 SELF.NameType  					:= CHOOSE(C,'O','A1','A2','A3');
-	 SELF.FileType						:= 'U';
+	 SELF.FileType						:= if(Full_filedate <> '','F','U');
 	 SELF.VendorDocumentIdentifier 		:= '0' + L.PARTYID ;
 	 SELF.CurrentName.FirstName 		:= L.FIRSTNAME;
 	 SELF.CurrentName.MiddleName		:= L.MIDDLENAME;
@@ -33,15 +35,17 @@ Transunion_PTrak.Layout_Transunion_Out.NormNameAddressRec t_norm_name (Transunio
 	 SELF.NormAddress.City				:= L.CITY;
 	 SELF.NormAddress.State				:= L.STATE;
 	 SELF.NormAddress.ZipCode			:= L.ZIPCODE;
-   SELF.NormAddress.UpdatedDate		:= ''	;
+   	 SELF.NormAddress.UpdatedDate		:= ''	;
 	 SELF.PreviousAddress				:= DATASET([{'','','','','',''}], Transunion_PTrak.Layout_Transunion_Full_In.AddressRec);
 	 SELF.Orig_DECEASEDINDICATOR		:= L.DECEASEDINDICATOR;
-	 	SELF.DECEASEDDATE := StringLib.StringFindReplace(L.DECEASEDDATE, '-','');
+	 SELF.DECEASEDDATE := StringLib.StringFindReplace(L.DECEASEDDATE, '-','');
 	 SELF           					:= L;
 END;
 
 norm_names := NORMALIZE(Transunion_Ptrak.File_Transunion_Update_In, 4, t_norm_name(LEFT, COUNTER));
 
-norm_names_filtered := norm_names(TRIM(Name,all) <> '' AND TRIM(Name,all) <> ',');
+norm_names_filtered := norm_names(TRIM(Name,all) <> '' AND TRIM(Name,all) <> ',') :persist('~thor_data400::persist::transunionptrak_normalized_names_update');
 
-EXPORT Normalize_Transunion_Update := norm_names_filtered:persist('~thor_data400::persist::transunionptrak_normalized_names_update');
+return norm_names_filtered;
+
+END;

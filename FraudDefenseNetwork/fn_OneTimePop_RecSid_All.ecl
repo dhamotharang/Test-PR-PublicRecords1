@@ -1,4 +1,4 @@
-﻿import tools, FraudDefenseNetwork, data_services, lib_fileservices, _control, FraudShared;
+﻿import tools, FraudDefenseNetwork, data_services, lib_fileservices, _control;
 export fn_OneTimePop_RecSid_All(STRING run_date) := function 
 
 Location := IF(_control.ThisEnvironment.Name = 'Prod_Thor', '~', Data_Services.Foreign_Prod);
@@ -37,7 +37,7 @@ Glb5_old := DATASET(Location + 'thor_data400::base::fdn::qa::glb5', FraudDefense
 
 // GLB5 Append Market information 
   inBaseGLB5_dist       := DISTRIBUTE(Glb5_old, HASH32(orig_company_id));
-  MBSmarketAppend_dist  := DISTRIBUTE(FraudShared.Files().Input.MBSmarketAppend.Sprayed, HASH32(company_id));
+  MBSmarketAppend_dist  := DISTRIBUTE(Files().Input.MBSmarketAppend.Sprayed, HASH32(company_id));
 
 	Glb5MarketAppend      := join(inBaseGLB5_dist, MBSmarketAppend_dist, left.orig_company_id = right.company_id,
                                               transform(FraudDefenseNetwork.Layouts.base.Glb5,
@@ -55,8 +55,8 @@ Glb5_old := DATASET(Location + 'thor_data400::base::fdn::qa::glb5', FraudDefense
 // Source exlusions 
 
   FilterSet    := ['GOV', 'GOVERNMENT & ACADEMIC', 'GOVERNMENT', 'HEA', 'HEALTHCARE INITIATIVE', 'GOVERNMENT HEALTHCARE', 'INTERNAL', 'HC -   PROVIDER',  'TAX & REVENUE.FEDERAL','HEALTHCARE' , 'PROVIDER', 'PHARMACY' ,'PAYER'];
-  SrcExclusion := set(FraudShared.Files().Input.MBSSourceGcExclusion.Sprayed (gc_id <>0  and status = 1), (string)gc_id); 
-	SrcExclusionC := set(FraudShared.Files().Input.MBSSourceGcExclusion.Sprayed (gc_id <>0 and status = 1), (string)company_id); 
+  SrcExclusion := set(Files().Input.MBSSourceGcExclusion.Sprayed (gc_id <>0  and status = 1), (string)gc_id); 
+	SrcExclusionC := set(Files().Input.MBSSourceGcExclusion.Sprayed (gc_id <>0 and status = 1), (string)company_id); 
   Jfiltered    := Glb5MarketAppend(global_company_id   not in SrcExclusion ); 
 	Jfiltered1   := Jfiltered(company_id    not in SrcExclusionC );
   JcountryCode := Jfiltered1(sybase_MAIN_COUNTRY_CODE = 'USA'); 

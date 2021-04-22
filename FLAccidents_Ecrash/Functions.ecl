@@ -215,4 +215,9 @@ EXPORT Functions := MODULE
     '');
   END;
 	
+  EXPORT BOOLEAN IsActiveDate(UNSIGNED4 TodaysDate, UNSIGNED4 startDt, UNSIGNED4 terminationDt) := FUNCTION
+    B1 := TodaysDate BETWEEN startDt AND terminationDt;
+   RETURN B1;
+  END; 
+
 END;

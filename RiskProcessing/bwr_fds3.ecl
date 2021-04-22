@@ -1,4 +1,4 @@
-#workunit('name','nonfcra-fds3');
+﻿#workunit('name','nonfcra-fds3');
 #option ('hthorMemoryLimit', 1000)
 
 
@@ -64,7 +64,7 @@ Scoring.Layout_PR2O_soapcall into_PR2O_input(f le) := transform
 //	self.HistoryDateYYYYMM:=(integer)'200607';
 	self.dppapurpose := 3;
 	self.glbpurpose := 1;
-//	self.gateways := dataset([{'neutralroxie', 'http://roxiebatch.br.seisint.com:9856'}], risk_indicators.Layout_Gateways_In);
+//	self.gateways := dataset([{'neutralroxie', 'http://roxiethorvip.hpcc.risk.regn.net:9856'}], risk_indicators.Layout_Gateways_In);
 	self := le;
 	self := [];
 end;
@@ -72,7 +72,7 @@ end;
 soap_in := project(f,into_PR2O_input(LEFT));
 output(soap_in, named('soap_in'));
 
-roxieIP:='http://roxiebatch.br.seisint.com:9856';  // Roxiebatch
+roxieIP:='http://roxiethorvip.hpcc.risk.regn.net:9856';  // Roxiebatch
 
 xlayout := RECORD
 	STRING errorcode;

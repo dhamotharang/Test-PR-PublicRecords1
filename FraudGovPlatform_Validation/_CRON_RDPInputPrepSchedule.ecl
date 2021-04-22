@@ -6,7 +6,6 @@ ThorName	:=		IF(_control.ThisEnvironment.Name		<> 'Prod_Thor',		Constants.ThorNa
 
 lECL1 :=
  'import FraudGovPlatform_Validation,Scrubs_FraudGov,ut;\n'
- +'#CONSTANT	(\'Platform\',\'FraudGov\');\n'
 +'#OPTION(\'multiplePersistInstances\',FALSE);\n'
 +'wuname := \'FraudGov RDP Input Prep\';\n'
 +'#WORKUNIT(\'name\', wuname);\n'

@@ -1,23 +1,38 @@
 ﻿import header,ut;
 
 // L             LexId
-// N             Name
-// S             Full SSN
-// P             Probable SSN
+// N             Name: Last and First
+// S             SSN
+// P             Fuzzy SSN
 // D             DOB
-// B             Probable DOB
+// B             Fuzzy DOB
 // A             Street Address
 // C             City/State Address
 // Z             Zip Address
-// V             Last Name + Partial First
-// W             Last Name
-// H             Phone
+// V             Partial Name: Last Name + Partial First
+// W             Last Name Only (Not used for matching)
+// H             Phone (not currently implemented)
 //
 // first name match parameter:
 //	0 match either
 //  1 match first name
 //  2 match preferred name 
+/* Supported searches
+N_S_D  NSD
+V_S_D  SD
+N_S_B  NS
+V_S_B  S
+N_P_D  ND
+V_P_D  D
+N_P_B  N  runs twice
+V_P_B  ex only
+N_D_A_Z NDAS
+N_D_A_C NDAC
+S       S
+L       L
 
+NSD are exact
+*/
 
 EXPORT fn_find_collisions	(
 	infile1
@@ -29,20 +44,8 @@ EXPORT fn_find_collisions	(
 	,fname_match=0
 	) := FUNCTIONMACRO
 	
-	matchChars:=
-					 if('L' in matchset,'L','')
-					+if('N' in matchset,'N','')
-					+if('V' in matchset,'V','')
-					+if('W' in matchset,'W','')
-					+if('S' in matchset,'S','')
-					+if('P' in matchset,'P','')
-					+if('D' in matchset,'D','')
-					+if('B' in matchset,'B','')
-					+if('A' in matchset,'A','')
-					+if('C' in matchset,'C','')
-					+if('Z' in matchset,'Z','')
-					+if('H' in matchset,'H','')
-					;	
+	matchChars:= TRANSFER(matchset, string);
+
 /*
 	ssn_value(string9 l, string9 r) :=
 		MAP( l='' or r='' => 0
@@ -95,7 +98,7 @@ EXPORT fn_find_collisions	(
 				#if(fname_match = 1)
 					 fname<>'',
 				#elseif(fname_match = 2)
-					 prefname<>'',
+					 prefname<>'',prefname<>fname,
 				#end
 			#end
 			#if('A' in matchset)
@@ -103,10 +106,29 @@ EXPORT fn_find_collisions	(
 			#end
 			true)  //the one just keeps the commas from messing it up
 		,
+		//**********
+		// START DISTRIBUTEION
+		//**********
 		#if('L' in matchset)
 			did
+		#elseif('N' in matchset AND 'S' in matchset AND 'D' in matchset)
+			hash32(lname,clean_ssn,clean_dob)
+
+		#elseif('N' in matchset AND 'D' in matchset AND 'A' in matchset AND 'C' in matchset)
+			hash32(lname,clean_dob,prim_name,v_city_name)
+
+		#elseif('N' in matchset AND 'D' in matchset AND 'A' in matchset AND 'Z' in matchset)
+			hash32(lname,clean_dob,prim_name,zip)
+
+		#elseif('S' in matchset AND 'D' in matchset)
+			hash32(clean_ssn,clean_dob)
+			
 		#elseif('S' in matchset)
 			hash32(clean_ssn)
+
+		#elseif('N' in matchset AND 'D' in matchset)
+			hash32(lname,clean_dob)
+			
 		#elseif('N' in matchset)
 			#if(fname_match = 1)
 			   hash32(lname,fname)
@@ -115,6 +137,10 @@ EXPORT fn_find_collisions	(
 			#else
 			   hash32(lname)
 			#end
+			
+		#elseif('V' in matchset AND 'D' in matchset)
+			hash32(lname,clean_dob)
+
 		#elseif('V' in matchset)
 			#if(fname_match = 1)
 			   hash32(lname,fname[1])
@@ -229,24 +255,24 @@ EXPORT fn_find_collisions	(
 				1) inter state: state1 <> state2
 				2) intra state: state1=state2 and benefit1=benefit2 and ClientId<>ClientId
 				3) informational: state1=state2 and beneft1<>benefit2: NOT IMPLEMENTED YET
-		***/
-		
-		(left.ProgramState <> right.ProgramState
+		***/	
+		(
+			(left.ProgramState <> right.ProgramState AND nac_V2.MatchAllowed(left.ProgramCode,right.ProgramCode))
 			OR
-			(left.ProgramState = right.ProgramState and 
-				//left.ProgramCode = right.ProgramCode
+			(left.GroupId = right.GroupId and 
 				nac_v2.GetCollisionCode(left.ProgramCode) = nac_v2.GetCollisionCode(right.ProgramCode)
+				and left.CaseId <> right.CaseId
 				and left.ClientId <> right.ClientId
-				and left.CaseId <> right.CaseId)
-			//OR
-			//(left.ProgramState=right.ProgramState and 
-			//	left.ProgramCode<>right.ProgramCode)
-		) and
-		
-		// disregard the following check for version 2
-		//left.eligibility_status_indicator = right.eligibility_status_indicator and
+			)
+			OR
+			(left.GroupId <> right.GroupId and 
+				nac_v2.GetCollisionCode(left.ProgramCode) = nac_v2.GetCollisionCode(right.ProgramCode)
+			)
+		)
+		AND
+
 		left.PrepRecSeq<>right.PrepRecSeq and
-		left.StartDate <= Right.EndDate AND right.StartDate <= left.Enddate
+		(left.StartDate <= Right.EndDate AND right.StartDate <= left.Enddate)
 
 		//true	//the one just keeps the "and" from messing it up
 		//,tr(left,right)

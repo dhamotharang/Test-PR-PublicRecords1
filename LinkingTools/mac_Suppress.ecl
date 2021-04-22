@@ -328,19 +328,19 @@ functionmacro
         #APPEND(TRANSFORMECL ,'self.' + trim(get_field_name(%MYCOUNTER%)) + ' := if(trim(suppress(left,\''  + trim(get_field_name(%MYCOUNTER%)) + '\',(string)left.' + trim(get_field_name(%MYCOUNTER%)) + ')) = \'Suppress\' ,(typeof(left.' + trim(get_field_name(%MYCOUNTER%)) + '))\'\'  ,left.' + trim(get_field_name(%MYCOUNTER%)) + ');\n')
       #END
       
-      #IF(%SUPPRESSCOUNTER% != 1)
-        #APPEND(FIELDSSUPPRESSED          ,'+ ')
-        #APPEND(FIELDSANDVALUESSUPPRESSED ,'+ ')
-        #APPEND(SUPPRESSIONIDS            ,'+ ')
-        #APPEND(DEBUGSTUFF                ,'+ ')
-      #ELSE
-        #APPEND(FIELDSSUPPRESSED          ,'  ')
-        #APPEND(FIELDSANDVALUESSUPPRESSED ,'  ')
-        #APPEND(SUPPRESSIONIDS            ,'  ')
-        #APPEND(DEBUGSTUFF                ,'  ')
-      #END
       
       #IF((%'LIDFIELDFILTER'% = '' or not regexfind(%'LIDFIELDFILTER'% ,trim(get_field_name(%MYCOUNTER%))  ,nocase)) and (pContextFieldFilter = '' or not regexfind(pContextFieldFilter ,trim(get_field_name(%MYCOUNTER%))  ,nocase)))
+        #IF(%SUPPRESSCOUNTER% != 1)
+          #APPEND(FIELDSSUPPRESSED          ,'+ ')
+          #APPEND(FIELDSANDVALUESSUPPRESSED ,'+ ')
+          #APPEND(SUPPRESSIONIDS            ,'+ ')
+          #APPEND(DEBUGSTUFF                ,'+ ')
+        #ELSE
+          #APPEND(FIELDSSUPPRESSED          ,'  ')
+          #APPEND(FIELDSANDVALUESSUPPRESSED ,'  ')
+          #APPEND(SUPPRESSIONIDS            ,'  ')
+          #APPEND(DEBUGSTUFF                ,'  ')
+        #END
         #APPEND(FIELDSSUPPRESSED          ,'if(trim(suppress(left,\''  + trim(get_field_name(%MYCOUNTER%)) + '\',(string)left.' + trim(get_field_name(%MYCOUNTER%)) + ')) = \'Suppress\' ,\','  + trim(get_field_name(%MYCOUNTER%)) + '\',\'\')\n')
 
         #APPEND(FIELDSANDVALUESSUPPRESSED ,'suppresscontext(left,\''  + trim(get_field_name(%MYCOUNTER%)) + '\',(string)left.' + trim(get_field_name(%MYCOUNTER%)) + ')\n')
@@ -528,8 +528,10 @@ functionmacro
     #ELSE
       return when(ds_result 
         ,parallel(
-           output(ds_overall_stats                                                                                                                        ,named('LinkingTools_mac_Suppress_ds_overall_stats'                        ),all)
-          ,output(topn(ds_fields_suppressed_stats             ,300  ,-cnt                                                                               ) ,named('LinkingTools_mac_Suppress_ds_fields_suppressed_stats'            ),all)  
+          #IF(pShouldExplode = true)   
+           output(ds_overall_stats                                                                                                                        ,named('LinkingTools_mac_Suppress_ds_overall_stats'                        ),all),
+          #END
+           output(topn(ds_fields_suppressed_stats             ,300  ,-cnt                                                                               ) ,named('LinkingTools_mac_Suppress_ds_fields_suppressed_stats'            ),all)  
           ,output(topn(ds_fields_and_values_suppressed_stats  ,300  ,-cnt                                                                               ) ,named('LinkingTools_mac_Suppress_ds_fields_and_values_suppressed_stats' ),all)
           ,output(topn(ds_suppressionid_stats                 ,300  ,-cnt                                                                               ) ,named('LinkingTools_mac_Suppress_ds_suppressionid_stats'                ),all)
           // #IF(pShouldExplode = true and pShouldIncrementFile = true) 

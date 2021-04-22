@@ -784,6 +784,7 @@ EXPORT tools_dotid(dataset(l_as_linking) ds_as_linking = dataset([],l_as_linking
         (     mdr.sourceTools.SourceIsDunn_Bradstreet     (psource) 
           or  mdr.sourceTools.SourceIsInfutor_NARB        (psource) 
           or  mdr.sourceTools.SourceIsDunn_Bradstreet_Fein(psource)
+          or  mdr.sourceTools.SourceIsDataBridge          (psource) 
         ) 
         and length(trim(psic)) in [4,8]
       )
@@ -806,6 +807,37 @@ EXPORT tools_dotid(dataset(l_as_linking) ds_as_linking = dataset([],l_as_linking
 		end;
 		return project(ds_in, tCleanSIC(left));
 	end;
+  
+  
+	export dataset(l_dot) RemoveBogusNames(dataset(l_dot) ds_in) := 
+  function
+      filterexamples := ds_in(
+                            BIPV2_Tools.BogusNames.BogusNames(company_name  )
+                         // or BIPV2_Tools.BogusNames.BogusNames(dba_name     )
+                         or BIPV2_Tools.BogusNames.BogusNames(lname         )
+                         or BIPV2_Tools.BogusNames.BogusNames(mname         )
+                         or BIPV2_Tools.BogusNames.BogusNames(fname         )
+                      );
+      
+      filterout :=    ds_in(
+                          ~(BIPV2_Tools.BogusNames.BogusNames(company_name  )
+                         // or BIPV2_Tools.BogusNames.BogusNames(dba_name     )
+                         or BIPV2_Tools.BogusNames.BogusNames(lname         )
+                         or BIPV2_Tools.BogusNames.BogusNames(mname         )
+                         or BIPV2_Tools.BogusNames.BogusNames(fname         )
+                      ));
+
+      return when(filterout
+        ,parallel(
+           output(count(ds_in    )                    ,named('BIPV2_Files_tools_dotid_RemoveBogusNames_Count_In'            ))
+          ,output(count(filterout)                    ,named('BIPV2_Files_tools_dotid_RemoveBogusNames_Count_Out'           ))
+          ,output(count(ds_in    ) - count(filterout) ,named('BIPV2_Files_tools_dotid_RemoveBogusNames_Count_Removed'       ))
+          ,output(choosen(filterexamples,100)         ,named('BIPV2_Files_tools_dotid_RemoveBogusNames_FilteredOut_Examples'))
+        )
+      );
+  
+  end;
+
 	// rerun selected routines on an existing DOT file
 	export dataset(l_dot) reclean(dataset(l_dot) ds_in) := function
 		ds_cnp	:= SetCompanyFields     (ds_in    );
@@ -816,8 +848,9 @@ EXPORT tools_dotid(dataset(l_as_linking) ds_as_linking = dataset([],l_as_linking
     ds_pr		:= SetPrimRangeDerived  (ds_pn    ,'reclean');
     ds_at   := SetAddrType          (ds_pr    );
     ds_owner:= Set_Vanity_Owner_Did (ds_at    ,false,'reclean');
-    ds_sic  := SetSICNAICS          (ds_owner    );
-		return ds_sic;
+    ds_sic  := SetSICNAICS          (ds_owner );
+    ds_filt := RemoveBogusNames     (ds_sic   );
+		return ds_filt;
 	end;
 	
 	export city_samp(ds_in, st_field, city_field) := functionmacro

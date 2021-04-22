@@ -121,7 +121,7 @@ EXPORT Proc_Build_Carrier_Reference(string version, string inclCheck, string ema
 	//Move Metadata Carrier Name Key to QA Superfile
 	PromoteSupers.Mac_SK_Move_v2('~thor_data400::key::phonesmetadata::carrier_reference','Q',mvQAPhonesMetadataCarrierName,'3');
 	
-	keyBuild 						:= sequential(bkPhonesMetadataCarrierName, mvBltPhonesMetadataCarrierName, mvBltPhonesMetadataCarrierName);
+	keyBuild 						:= sequential(bkPhonesMetadataCarrierName, mvBltPhonesMetadataCarrierName, mvBltPhonesMetadataCarrierName, mvQAPhonesMetadataCarrierName);
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////	
 //Run Strata Stats///////////////////////////////////////////////////////////////////////////////////////////

@@ -108,6 +108,8 @@ eclcodepre  :=
  + 'SkipUpdateDOPS        := SkipVerifyKeys       ;\n'
  + 'SkipDOTSpecsPost      := SkipUpdateDOPS       ;\n'
  + 'SkipSeleRelSpecsPost  := SkipDOTSpecsPost     ;\n'
+ + 'SkipUnderlinkReport   := SkipSeleRelSpecsPost ;\n'
+ 
  + 'OmitDisposition       := \'preserve\'            ;// NOTE: Set to \'preserve\' or \'ghost\' to recover from a missing source in the ingest file\n'
  + 'RenameKeysFilter         := \'bipv2_proxid|strnbrname|bipv2_relative|biz_preferred\'  ;\n'
  + 'InputFilenameForProxMj6  := BIPV2_Proxid.filenames().out.built    ; //\'BIPV2_Files.files_dotid.FILE_BASE\'  //default is to start where we left off\n'
@@ -204,6 +206,7 @@ eclcodepre  :=
  + '  ,pSkipUpdateDOPS        := SkipUpdateDOPS\n'
  + '  ,pSkipDOTSpecsPost      := SkipDOTSpecsPost\n'
  + '  ,pSkipSeleRelSpecsPost  := SkipSeleRelSpecsPost\n'
+ + '  ,pSkipUnderlinkReport   := SkipUnderlinkReport\n'
  + '  ,pOmitDisposition       := OmitDisposition\n'
  + '  ,pRenameKeysFilter          := RenameKeysFilter\n'
  + '  // ,pDotFilenameForProx        := DotFilenameForProx\n'

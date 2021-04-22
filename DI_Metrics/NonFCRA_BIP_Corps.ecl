@@ -11,9 +11,9 @@
 //W20200806-092231	Prod 
 
 IMPORT _Control, BIPV2, BIPV2_PostProcess, corp2, data_services, STD, ut;
-EXPORT NonFCRA_BIP_Corps(string pHostname, string pTarget, string pContact ='\' \'') := function
+EXPORT NonFCRA_BIP_Corps(string pHostname, string pTarget, string pContact ='\' \'', STRING today = (STRING8)STD.Date.Today()) := function
 
-filedate := (STRING8)Std.Date.Today();
+filedate := today;
 
 //key_BIPV2_Header := INDEX(layout_BIP_linkids, rec_nonkeyed_fields_BIP, data_services.foreign_prod+ 'thor_data400::key::bipv2::business_header::qa::linkids');
 key_BIPV2_Header := PULL(BIPV2.Key_BH_Linking_Ids.key);
@@ -76,10 +76,10 @@ despray_corp_lseen_tbl := STD.File.DeSpray('~thor_data400::data_insight::data_me
 
 //if everything in the Sequential statement runs, it will send the Success email, else it will send the Failure email
 email_alert := SEQUENTIAL(
-						output(sort(tbl_SELEIDs_by_Segment, sele_seg),,'~thor_data400::data_insight::data_metrics::tbl_SELEIDs_by_Segment_'+ filedate +'.csv', csv(heading(single), separator('|'),terminator('\r\n'),quote('\"')),overwrite)
-						,output(sort(tbl_PROXIDs_by_Segment, prox_seg),,'~thor_data400::data_insight::data_metrics::tbl_PROXIDs_by_Segment_'+ filedate +'.csv', csv(heading(single), separator('|'),terminator('\r\n'),quote('\"')),overwrite)
-						,output(sort(tbl_src_dates_first_seen_Corps, corp_state_origin,-first_seen),,'~thor_data400::data_insight::data_metrics::tbl_src_dates_first_seen_Corps_'+ filedate +'.csv', csv(heading(single), separator('|'),terminator('\r\n'),quote('\"')),overwrite)
-						,output(sort(tbl_src_dates_last_seen_Corps, corp_state_origin,-last_seen),,'~thor_data400::data_insight::data_metrics::tbl_src_dates_last_seen_Corps_'+ filedate +'.csv', csv(heading(single), separator('|'),terminator('\r\n'),quote('\"')),overwrite)
+						output(sort(tbl_SELEIDs_by_Segment, sele_seg),,'~thor_data400::data_insight::data_metrics::tbl_SELEIDs_by_Segment_'+ filedate +'.csv', csv(heading(single), separator('|'),terminator('\r\n'),quote('\"')), overwrite, expire(10))
+						,output(sort(tbl_PROXIDs_by_Segment, prox_seg),,'~thor_data400::data_insight::data_metrics::tbl_PROXIDs_by_Segment_'+ filedate +'.csv', csv(heading(single), separator('|'),terminator('\r\n'),quote('\"')), overwrite, expire(10))
+						,output(sort(tbl_src_dates_first_seen_Corps, corp_state_origin,-first_seen),,'~thor_data400::data_insight::data_metrics::tbl_src_dates_first_seen_Corps_'+ filedate +'.csv', csv(heading(single), separator('|'),terminator('\r\n'),quote('\"')), overwrite, expire(10))
+						,output(sort(tbl_src_dates_last_seen_Corps, corp_state_origin,-last_seen),,'~thor_data400::data_insight::data_metrics::tbl_src_dates_last_seen_Corps_'+ filedate +'.csv', csv(heading(single), separator('|'),terminator('\r\n'),quote('\"')), overwrite, expire(10))
 						,despray_bip_selid_tbl
 						,despray_bip_proxid_tbl
 						,despray_corp_fseen_tbl

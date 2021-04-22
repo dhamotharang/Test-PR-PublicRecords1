@@ -13,7 +13,6 @@ EXPORT rMetaData := RECORD
 	STRING1   lexid_ind := ''; //Active, Deceased, Emerging, Inactive, Suspect, ACtive (but Best SSN undetermined)
 	UNSIGNED4 Best_DOB_GLB  := 0;
 	UNSIGNED4 Best_DOB_nonGLB := 0;
-	STRING2   crlf :='\r\n';
 END;
 
 EXPORT rFraudFlags := RECORD
@@ -34,7 +33,6 @@ EXPORT rNames := RECORD
 	STRING1   name_ind := 'C'; //Current Or Former
 	boolean   Allowed_for_GLB := true;
 	boolean   Allowed_for_nonGLB := false;
-	STRING2   crlf :='\r\n';
 END;
 
 EXPORT rAddress := RECORD
@@ -57,7 +55,6 @@ EXPORT rAddress := RECORD
 	UNSIGNED4 Address_Date_Last_Seen_for_nonGLB := 0;
 	boolean   Allowed_for_GLB  := true;
 	boolean   Allowed_for_nonGLB := false;
-	STRING2   crlf :='\r\n';
 END;
 
 EXPORT rPhone := RECORD
@@ -68,20 +65,17 @@ EXPORT rPhone := RECORD
 	STRING1   phone_ind := 'C'; //Include 2 years of phone history as well for the LexID.  Gong History and "below the line" phones in PhonesPlus
 	boolean   Allowed_for_GLB := true;
 	boolean   Allowed_for_nonGLB;
-	STRING2   crlf :='\r\n';
 END;
 
 EXPORT rEmail := RECORD
 	UNSIGNED6 LexID;
 	STRING40  email;
-	STRING2   crlf :='\r\n';
 END;
 
 EXPORT rRelative := RECORD
 	UNSIGNED6 LexID1;
 	UNSIGNED6 LexID2;
 	STRING1   relation_ind := 'R'; //Relative or Associate
-	STRING2   crlf :='\r\n';
 END;
 
 END;

@@ -47,7 +47,7 @@ macro
 	#uniquename(send_fail_msg)
 
 	RoxieKeyBuild.Mac_Daily_Email_Local('UTIL','SUCC', filedate, %send_succ_msg%,if(email_target<>' ',email_target,UtilFile.Spray_Notification_Email_Address));
-	RoxieKeyBuild.Mac_Daily_Email_Local('UTIL','FAIL', filedate, %send_fail_msg%,if(email_target<>' ',email_target,'Sudhir.Kasavajjala@lexisnexisrisk.com'));
+	RoxieKeyBuild.Mac_Daily_Email_Local('UTIL','FAIL', filedate, %send_fail_msg%,if(email_target<>' ',email_target,UtilFile.Spray_Notification_Email_Address));
 
 	//Add DID to daily file then move into did superfile for keys
 	#uniquename(did_daily)

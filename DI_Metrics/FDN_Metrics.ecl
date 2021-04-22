@@ -1,9 +1,9 @@
 ﻿#CONSTANT	('Platform','FDN');
 
 IMPORT _control, FraudShared, data_services, STD; 
-export FDN_Metrics(string pHostname, string pTarget, string pContact ='\' \'') := function
+export FDN_Metrics(string pHostname, string pTarget, string pContact ='\' \'', STRING today = (STRING8)STD.Date.Today()) := function
 
-filedate := (STRING8)Std.Date.Today();
+filedate := today;
 
 //Input File
 key_in := PULL(FraudShared.Keys().main.id.qa);
@@ -299,18 +299,18 @@ despray_srt_unq_time_stamp_counts_tbl := STD.File.DeSpray('~thor_data400::data_i
 
 //if everything in the Sequential statement runs, it will send the Success email, else it will send the Failure email
 email_alert := SEQUENTIAL(
-					 output(srt_industry_counts_tbl,,'~thor_data400::data_insight::data_metrics::tbl_FDN_Industry_Counts_'+ filedate +'.csv', csv(heading(single), separator('|'),terminator('\r\n'),quote('\"')),overwrite)
-					,output(srt_unq_industry_counts_tbl,,'~thor_data400::data_insight::data_metrics::tbl_FDN_Unq_Industry_Counts_'+ filedate +'.csv', csv(heading(single), separator('|'),terminator('\r\n'),quote('\"')),overwrite)
-					,output(srt_customer_counts_tbl,,'~thor_data400::data_insight::data_metrics::tbl_FDN_Customer_Counts_'+ filedate +'.csv', csv(heading(single), separator('|'),terminator('\r\n'),quote('\"')),overwrite)
-					,output(srt_unq_customer_counts_tbl,,'~thor_data400::data_insight::data_metrics::tbl_FDN_Unq_Customer_Counts_'+ filedate +'.csv', csv(heading(single), separator('|'),terminator('\r\n'),quote('\"')),overwrite)
-					,output(srt_source_type_counts_tbl,,'~thor_data400::data_insight::data_metrics::tbl_FDN_Source_Type_Counts_'+ filedate +'.csv', csv(heading(single), separator('|'),terminator('\r\n'),quote('\"')),overwrite)
-					,output(srt_unq_source_type_counts_tbl,,'~thor_data400::data_insight::data_metrics::tbl_FDN_Unq_Source_Type_Counts_'+ filedate +'.csv', csv(heading(single), separator('|'),terminator('\r\n'),quote('\"')),overwrite)
-					,output(srt_entity_counts_tbl,,'~thor_data400::data_insight::data_metrics::tbl_FDN_Entity_Counts_'+ filedate +'.csv', csv(heading(single), separator('|'),terminator('\r\n'),quote('\"')),overwrite)
-					,output(srt_unq_entity_counts_tbl,,'~thor_data400::data_insight::data_metrics::tbl_FDN_Unq_Entity_Counts_'+ filedate +'.csv', csv(heading(single), separator('|'),terminator('\r\n'),quote('\"')),overwrite)
-					,output(srt_data_type_counts_tbl,,'~thor_data400::data_insight::data_metrics::tbl_FDN_Data_Type_Counts_'+ filedate +'.csv', csv(heading(single), separator('|'),terminator('\r\n'),quote('\"')),overwrite)
-					,output(srt_unq_data_type_counts_tbl,,'~thor_data400::data_insight::data_metrics::tbl_FDN_Unq_Data_Type_Counts_'+ filedate +'.csv', csv(heading(single), separator('|'),terminator('\r\n'),quote('\"')),overwrite)
-					,output(srt_time_stamp_counts_tbl,,'~thor_data400::data_insight::data_metrics::tbl_FDN_Time_Stamp_Counts_'+ filedate +'.csv', csv(heading(single), separator('|'),terminator('\r\n'),quote('\"')),overwrite)
-					,output(srt_unq_time_stamp_counts_tbl,,'~thor_data400::data_insight::data_metrics::tbl_FDN_Unq_Time_Stamp_Counts_'+ filedate +'.csv', csv(heading(single), separator('|'),terminator('\r\n'),quote('\"')),overwrite)
+					 output(srt_industry_counts_tbl,,'~thor_data400::data_insight::data_metrics::tbl_FDN_Industry_Counts_'+ filedate +'.csv', csv(heading(single), separator('|'),terminator('\r\n'),quote('\"')), overwrite, expire(10))
+					,output(srt_unq_industry_counts_tbl,,'~thor_data400::data_insight::data_metrics::tbl_FDN_Unq_Industry_Counts_'+ filedate +'.csv', csv(heading(single), separator('|'),terminator('\r\n'),quote('\"')), overwrite, expire(10))
+					,output(srt_customer_counts_tbl,,'~thor_data400::data_insight::data_metrics::tbl_FDN_Customer_Counts_'+ filedate +'.csv', csv(heading(single), separator('|'),terminator('\r\n'),quote('\"')), overwrite, expire(10))
+					,output(srt_unq_customer_counts_tbl,,'~thor_data400::data_insight::data_metrics::tbl_FDN_Unq_Customer_Counts_'+ filedate +'.csv', csv(heading(single), separator('|'),terminator('\r\n'),quote('\"')), overwrite, expire(10))
+					,output(srt_source_type_counts_tbl,,'~thor_data400::data_insight::data_metrics::tbl_FDN_Source_Type_Counts_'+ filedate +'.csv', csv(heading(single), separator('|'),terminator('\r\n'),quote('\"')), overwrite, expire(10))
+					,output(srt_unq_source_type_counts_tbl,,'~thor_data400::data_insight::data_metrics::tbl_FDN_Unq_Source_Type_Counts_'+ filedate +'.csv', csv(heading(single), separator('|'),terminator('\r\n'),quote('\"')), overwrite, expire(10))
+					,output(srt_entity_counts_tbl,,'~thor_data400::data_insight::data_metrics::tbl_FDN_Entity_Counts_'+ filedate +'.csv', csv(heading(single), separator('|'),terminator('\r\n'),quote('\"')), overwrite, expire(10))
+					,output(srt_unq_entity_counts_tbl,,'~thor_data400::data_insight::data_metrics::tbl_FDN_Unq_Entity_Counts_'+ filedate +'.csv', csv(heading(single), separator('|'),terminator('\r\n'),quote('\"')), overwrite, expire(10))
+					,output(srt_data_type_counts_tbl,,'~thor_data400::data_insight::data_metrics::tbl_FDN_Data_Type_Counts_'+ filedate +'.csv', csv(heading(single), separator('|'),terminator('\r\n'),quote('\"')), overwrite, expire(10))
+					,output(srt_unq_data_type_counts_tbl,,'~thor_data400::data_insight::data_metrics::tbl_FDN_Unq_Data_Type_Counts_'+ filedate +'.csv', csv(heading(single), separator('|'),terminator('\r\n'),quote('\"')), overwrite, expire(10))
+					,output(srt_time_stamp_counts_tbl,,'~thor_data400::data_insight::data_metrics::tbl_FDN_Time_Stamp_Counts_'+ filedate +'.csv', csv(heading(single), separator('|'),terminator('\r\n'),quote('\"')), overwrite, expire(10))
+					,output(srt_unq_time_stamp_counts_tbl,,'~thor_data400::data_insight::data_metrics::tbl_FDN_Unq_Time_Stamp_Counts_'+ filedate +'.csv', csv(heading(single), separator('|'),terminator('\r\n'),quote('\"')), overwrite, expire(10))
 					,despray_srt_industry_counts_tbl 
 					,despray_srt_unq_industry_counts_tbl 
 					,despray_srt_customer_counts_tbl 

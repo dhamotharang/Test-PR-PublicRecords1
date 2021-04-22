@@ -204,9 +204,9 @@ export constants := module
 										,string p_environment
 										,string p_loc = location) := MAP(vFileScope(p_loc) = 'uspr'
 																																			=> MAP(
-																																					p_cluster = 'fcra' and p_environment = 'cert' =>  'http://certfcraroxievip.sc.seisint.com:9876'
+																																					p_cluster = 'fcra' and p_environment = 'cert' =>  'http://certfcraroxievip.hpcc.risk.regn.net:9876'
 																																					,p_cluster = 'fcra' and p_environment = 'prod' =>  _Control.RoxieEnv.prod_batch_fcra
-																																					,p_cluster = 'nonfcra' and p_environment = 'cert' =>  'http://roxiestaging.sc.seisint.com:9876'
+																																					,p_cluster = 'nonfcra' and p_environment = 'cert' =>  'http://certstagingvip.hpcc.risk.regn.net:9876'
 																																					,p_cluster = 'nonfcra' and p_environment = 'prod' =>  _Control.RoxieEnv.prodvip
 																																					,'NA')
 																																	,vFileScope(p_loc) = 'usins'
@@ -219,6 +219,6 @@ export constants := module
 																																	,'NA'
 																																	);	
 	
-	export integer pythonversion := 2;
+	export integer pythonversion := 3;
 	
 end;

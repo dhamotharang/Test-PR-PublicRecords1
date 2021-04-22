@@ -1,3 +1,4 @@
+﻿import STD,dx_official_records;
 export Constants := module
 	
 	export Cluster		 := '~thor_200';
@@ -7,7 +8,7 @@ export Constants := module
 	export ak_keyname  := Cluster + '::key::official_records::autokey::';
 	export ak_logical(string filedate='')	:= Cluster+'::key::official_records::'+
 	                                         filedate+'::autokey::';
-	export ak_dataset	:= official_records.File_Autokey_Party;
+	export ak_dataset(boolean isDelta = false)	:= official_records.Data_Keys(isDelta).i_autokey_party;
 	export ak_skipSet	:= ['P','Q','S','F'];
 						//P in this set to skip personal phones
 						//Q in this set to skip business phones
@@ -20,4 +21,10 @@ export Constants := module
 	export stem			:= Cluster;
 	export srcType	:= 'official_records';
 	export qual			:= 'test';
+	//check the number of subfiles in superkey file to determine the build is delta update or full build
+	//threshold is 4
+	num_subfiles := nothor(STD.File.SuperFileContents(dx_official_records.names().i_party));
+  export DeltaBuild := if(count(num_subfiles) <= 4, true, false);
+													
 end;
+

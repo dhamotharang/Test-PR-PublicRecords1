@@ -291,9 +291,9 @@ export ArchiveFiles(string location, string environment, integer noofpartitions 
 		
 		GetFilesToDelete := normalize(MatchedFiles,left.filematches,FilesToDelete(left,right));
 		
-		return output(MatchedFiles);/*apply(GetFilesToDelete
+		return apply(GetFilesToDelete
 								,STD.File.DeleteLogicalFile('~'+name)
-								);*/
+								);
 	end;
 	
 	export CopyFiles := function

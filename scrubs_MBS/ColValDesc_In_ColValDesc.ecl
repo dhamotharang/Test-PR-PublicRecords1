@@ -1,3 +1,3 @@
-﻿import FraudShared;
-f0:=FraudShared.Files().Input.MBSColValDesc.Sprayed;
+﻿import FraudGovPlatform;
+f0:=FraudGovPlatform.Files().Input.MBSColValDesc.Sprayed;
 export ColValDesc_In_ColValDesc := f0;
