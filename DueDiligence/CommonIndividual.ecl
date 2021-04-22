@@ -2,10 +2,10 @@
 
 EXPORT CommonIndividual := MODULE
 
-	
+
 	EXPORT GetRelationshipAsInquired(inquiredInd, dsNameFromInquiredInd, relationToInquired) := FUNCTIONMACRO
-  
-    relationship := NORMALIZE(inquiredInd, LEFT.dsNameFromInquiredInd, 
+
+    relationship := NORMALIZE(inquiredInd, LEFT.dsNameFromInquiredInd,
                               TRANSFORM(DueDiligence.Layouts.Indv_Internal,
                                         SELF.seq := LEFT.seq;
                                         SELF.inquiredDID := LEFT.individual.did;
@@ -17,13 +17,13 @@ EXPORT CommonIndividual := MODULE
 
     RETURN relationship;
 	ENDMACRO;
-    
+
 
 
   EXPORT CreateRelatedPartyDataset(DATASET(DueDiligence.Layouts.Indv_Internal) inData) := FUNCTION
     //Need to convert the inquuired individual into a dataset in order to re-use modules created for indivuals and Business executives
     indivRelatedParty := PROJECT(inData, TRANSFORM({DATASET(DueDiligence.LayoutsInternal.RelatedParty) inquiredDS},
-                                                    SELF.inquiredDS := PROJECT(LEFT, TRANSFORM(DueDiligence.LayoutsInternal.RelatedParty, 
+                                                    SELF.inquiredDS := PROJECT(LEFT, TRANSFORM(DueDiligence.LayoutsInternal.RelatedParty,
                                                                                              SELF.seq := LEFT.seq;
                                                                                              SELF.did := LEFT.individual.did;
                                                                                              SELF.party := LEFT.individual;
@@ -33,19 +33,14 @@ EXPORT CommonIndividual := MODULE
 
     RETURN indivRelatedParty.inquiredDS;
   END;
-  
-  EXPORT GetIIDSSNFlags(DATASET(DueDiligence.Layouts.Indv_Internal) inData, STRING dataRestrictionMask,
-                        UNSIGNED1 dppa, UNSIGNED1 glba, INTEGER bsVersion, UNSIGNED8 bsOptions, BOOLEAN isFCRA,
-                        doxie.IDataAccess mod_access) := FUNCTION
-      
-      this_mod_access := MODULE(PROJECT(mod_access, doxie.IDataAccess))
-        EXPORT unsigned1 glb := glba;
-        EXPORT unsigned1 dppa := ^.dppa;
-        EXPORT string DataRestrictionMask := ^.dataRestrictionMask;
-      END;
-      
+
+  EXPORT GetIIDSSNFlags(DATASET(DueDiligence.Layouts.Indv_Internal) inData,
+                        doxie.IDataAccess mod_access,
+                        INTEGER bsVersion, UNSIGNED8 bsOptions, BOOLEAN isFCRA) := FUNCTION
+
+
       exactMatchLevel := risk_indicators.iid_constants.default_ExactMatchLevel;
-      
+
       ssnFlagsPrepSeq := PROJECT(inData, TRANSFORM(Risk_Indicators.Layout_output,
                                                     stringDate := (STRING)LEFT.historyDate;
                                                     SELF.seq := COUNTER;
@@ -66,19 +61,19 @@ EXPORT CommonIndividual := MODULE
                                                     SELF.addr_type := LEFT.individual.rec_type;
                                                     SELF.addr_status := LEFT.individual.err_stat;
                                                     SELF := LEFT.individual;
-                                                    SELF := [];));	
+                                                    SELF := [];));
 
       withSSNFlags := risk_indicators.iid_getSSNFlags(GROUP(ssnFlagsPrepseq, seq),
-                                                      this_mod_access, isFCRA, TRUE, exactMatchLevel, bsVersion, bsOptions);
-		
+                                                      mod_access, isFCRA, TRUE, exactMatchLevel, bsVersion, bsOptions);
+
       RETURN withSSNFlags;
   END;
-  
-  
+
+
   EXPORT GetAllRelationships(DATASET(DueDiligence.Layouts.Indv_Internal) inquiredData, BOOLEAN doNotUseFilterdData = FALSE) := FUNCTION
-  
+
       NormalizeRelationships(dsNameFromInquiredInd, relationshipToInquired) := FUNCTIONMACRO
-          RETURN NORMALIZE(inquiredData, LEFT.dsNameFromInquiredInd, 
+          RETURN NORMALIZE(inquiredData, LEFT.dsNameFromInquiredInd,
                             TRANSFORM(DueDiligence.LayoutsInternal.SlimRelationWithHistoryDate,
                                               SELF.seq := LEFT.seq;
                                               SELF.inquiredDID := LEFT.inquiredDID;
@@ -87,26 +82,26 @@ EXPORT CommonIndividual := MODULE
                                               SELF := RIGHT;
                                               SELF := [];));
       ENDMACRO;
-  
+
       parents := NormalizeRelationships(parents, DueDiligence.Constants.INQUIRED_INDIVIDUAL_PARENT);
       spouses := NormalizeRelationships(spouses, DueDiligence.Constants.INQUIRED_INDIVIDUAL_SPOUSE);
       associates := NormalizeRelationships(associates, DueDiligence.Constants.INQUIRED_INDIVIDUAL_OTHER_RELATION);
-      
+
       allInd := parents + spouses + associates;
 
 
-      //make sure there are no spouses or parents in the associates list      
+      //make sure there are no spouses or parents in the associates list
       filtAssoc := DEDUP(SORT(allInd, seq, did, -relationToInquired), seq, did);
 
-      
+
       RETURN IF(doNotUseFilterdData, allInd, filtAssoc);
-  END;  
-  
-  
+  END;
+
+
   EXPORT UpdateRelationships(DATASET(DueDiligence.Layouts.Indv_Internal) inquiredData, DATASET(DueDiligence.LayoutsInternal.RelatedParty) relatedPartyResults, DueDiligence.DataInterface.iAttributePerAssoc dataOptions) := FUNCTION
-  
-      getRelationInfo := GetAllRelationships(inquiredData, TRUE);                               
-                                              
+
+      getRelationInfo := GetAllRelationships(inquiredData, TRUE);
+
       rollRelatedPartyInput := ROLLUP(SORT(relatedPartyResults, seq, did),
                                       LEFT.seq = RIGHT.seq AND
                                       LEFT.did = RIGHT.did,
@@ -118,8 +113,8 @@ EXPORT CommonIndividual := MODULE
                                                 SELF.currParole := LEFT.currParole OR RIGHT.currParole;
                                                 SELF.felonyPast3Years := LEFT.felonyPast3Years OR RIGHT.felonyPast3Years;
                                                 SELF := LEFT;));
-                                              
-                                              
+
+
       updateRelationInfo := JOIN(getRelationInfo, rollRelatedPartyInput,
                                   LEFT.seq = RIGHT.seq AND
                                   LEFT.did = RIGHT.did,
@@ -130,39 +125,39 @@ EXPORT CommonIndividual := MODULE
                                             SELF.potentialSexOffender := RIGHT.potentialSO OR LEFT.potentialSexOffender;
                                             SELF.currentlyParoleOrProbation := RIGHT.currProbation OR RIGHT.currParole OR LEFT.currentlyParoleOrProbation;
                                             SELF.felonyPast3Yrs := RIGHT.felonyPast3Years OR LEFT.felonyPast3Yrs;
-                                            
+
                                             relly := DATASET([TRANSFORM(DueDiligence.Layouts.SlimRelation,
                                                                                   SELF.currentlyIncarcerated := RIGHT.currIncar OR LEFT.currentlyIncarcerated;
                                                                                   SELF.everIncarcerated := RIGHT.currIncar OR RIGHT.prevIncar OR LEFT.everIncarcerated;
                                                                                   SELF.potentialSexOffender := RIGHT.potentialSO OR LEFT.potentialSexOffender;
                                                                                   SELF.currentlyParoleOrProbation := RIGHT.currProbation OR RIGHT.currParole OR LEFT.currentlyParoleOrProbation;
                                                                                   SELF.felonyPast3Yrs := RIGHT.felonyPast3Years OR LEFT.felonyPast3Yrs;
-                                                                                  
+
                                                                                   SELF.offenseTrafficRelated := RIGHT.trafficOffenseFound OR LEFT.offenseTrafficRelated;
                                                                                   SELF.otherCriminalOffense := RIGHT.otherOffenseFound OR RIGHT.potentialSO OR LEFT.otherCriminalOffense;
 
-                                                                                  
+
                                                                                   SELF.headerFirstSeenDate := IF(dataOptions.includeHeaderData, RIGHT.headerFirstSeen, LEFT.headerFirstSeenDate);
-                                                                                  
+
                                                                                   SELF.validSSN := RIGHT.validSSN OR LEFT.validSSN;
                                                                                   SELF.ssnLowIssueDate := IF(dataOptions.includeSSNData, RIGHT.ssnLowIssue, LEFT.ssnLowIssueDate);
                                                                                   SELF.ssnMultiIdentities := IF(dataOptions.includeSSNData, RIGHT.ssnMultiIdentities, LEFT.ssnMultiIdentities);
                                                                                   SELF.ssnPerADL := IF(dataOptions.includeSSNData, RIGHT.ssnPerADL, LEFT.ssnPerADL);
                                                                                   SELF.hasSSN := RIGHT.hasSSN OR LEFT.hasSSN;
                                                                                   SELF.ssnRisk := RIGHT.ssnRisk OR LEFT.ssnRisk;
-                                                                                  
+
                                                                                   SELF := LEFT;)]);
-                                            
+
                                             SELF.spouses := IF(LEFT.relationToInquired = DueDiligence.Constants.INQUIRED_INDIVIDUAL_SPOUSE, relly);
                                             SELF.parents := IF(LEFT.relationToInquired = DueDiligence.Constants.INQUIRED_INDIVIDUAL_PARENT, relly);
                                             SELF.associates := IF(LEFT.relationToInquired = DueDiligence.Constants.INQUIRED_INDIVIDUAL_OTHER_RELATION, relly);
-                                                                                  
+
                                             SELF := LEFT;),
                                   LEFT OUTER);
-                                
-      
+
+
       sortRelation := SORT(updateRelationInfo, seq, inquiredDID, relationToInquired);
-      
+
       rollRelation := ROLLUP(sortRelation,
                               LEFT.seq = RIGHT.seq AND
                               LEFT.inquiredDID = RIGHT.inquiredDID,
@@ -172,42 +167,42 @@ EXPORT CommonIndividual := MODULE
                                         SELF.potentialSexOffender := LEFT.potentialSexOffender OR RIGHT.potentialSexOffender;
                                         SELF.currentlyParoleOrProbation := LEFT.currentlyParoleOrProbation OR RIGHT.currentlyParoleOrProbation;
                                         SELF.felonyPast3Yrs := LEFT.felonyPast3Yrs OR RIGHT.felonyPast3Yrs;
-                                        
+
                                         SELF.spouses := LEFT.spouses + RIGHT.spouses;
                                         SELF.parents := LEFT.parents + RIGHT.parents;
                                         SELF.associates := LEFT.associates + RIGHT.associates;
                                         SELF := LEFT;));
-      
-      
-      
+
+
+
       updateInquired := JOIN(inquiredData, rollRelation,
                               LEFT.seq = RIGHT.seq AND
                               LEFT.inquiredDID = RIGHT.inquiredDID,
                               TRANSFORM(DueDiligence.Layouts.Indv_Internal,
-                                        
+
                                         SELF.spouses := RIGHT.spouses;
                                         SELF.parents := RIGHT.parents;
                                         SELF.associates := RIGHT.associates;
-                                        
+
                                         SELF.numberOfSpouses := COUNT(RIGHT.spouses);
                                         SELF.numberOfParents := COUNT(RIGHT.parents);
                                         SELF.numberOfAssociates := COUNT(RIGHT.associates);
-                                        
+
                                         SELF.relationCurrentlyIncarcerated := RIGHT.currentlyIncarcerated OR LEFT.relationCurrentlyIncarcerated;
                                         SELF.relationEverIncarcerated := RIGHT.everIncarcerated OR LEFT.relationEverIncarcerated;
                                         SELF.relationPotentialSexOffender := RIGHT.potentialSexOffender OR LEFT.relationPotentialSexOffender;
                                         SELF.relationCurrentlyParoleOrProbation := RIGHT.currentlyParoleOrProbation OR LEFT.relationCurrentlyParoleOrProbation;
                                         SELF.relationFelonyPast3Years := RIGHT.felonyPast3Yrs OR LEFT.relationFelonyPast3Years;
-                                        
+
                                         SELF := LEFT;),
                               LEFT OUTER,
                               ATMOST(1));
-                              
-      
+
+
       RETURN updateInquired;
   END;
-  
-  
+
+
 
 
 END;  //END OF MODULE

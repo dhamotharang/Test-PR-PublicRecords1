@@ -4,7 +4,7 @@
 EXPORT CommonQueryXML := MODULE
 
     EXPORT mac_AddressFromRequest(reportedBy) := FUNCTIONMACRO
-        
+
         LOCAL indBusAddr := reportedBy.address;
         RETURN DATASET([TRANSFORM(DueDiligence.v3Layouts.Internal.Address,
                                   SELF.prim_range := TRIM(indBusAddr.streetnumber);
@@ -23,14 +23,14 @@ EXPORT CommonQueryXML := MODULE
                                   SELF.county := TRIM(indBusAddr.county);
                                   SELF := [];)]);
     ENDMACRO;
-		
+
     EXPORT mac_PopulateIndividualFromRequest(reportedBy, indvIndicator) := FUNCTIONMACRO
-        
+
         #if(indvIndicator <> DueDiligence.Constants.BUSINESS)
-            
+
             LOCAL personInfo := reportedBy.person;
             LOCAL addressFromReq := DueDiligence.CommonQueryXML.mac_AddressFromRequest(personInfo);
-            
+
             LOCAL ind_in := DATASET([TRANSFORM(DueDiligence.Layouts.IndInput,
                                                 SELF.lexID := (UNSIGNED6)TRIM(personInfo.lexID);
                                                 SELF.name := DATASET([TRANSFORM(DueDiligence.Layouts.Name,
@@ -51,14 +51,14 @@ EXPORT CommonQueryXML := MODULE
 
         RETURN ind_in;
     ENDMACRO;
-		
+
     EXPORT mac_PopulateBusinessFromRequest(reportedBy, busIndicator) := FUNCTIONMACRO
-        
+
         #if(busIndicator <> DueDiligence.Constants.INDIVIDUAL)
-            
+
             LOCAL businessInfo := reportedBy.business;
             LOCAL addressFromReq := DueDiligence.CommonQueryXML.mac_AddressFromRequest(businessInfo);
-            
+
             LOCAL bus_in := DATASET([TRANSFORM(DueDiligence.Layouts.BusInput,
                                                 SELF.lexID := (UNSIGNED6)TRIM(businessInfo.lexID);
                                                 SELF.companyName := TRIM(businessInfo.companyName);
@@ -73,22 +73,22 @@ EXPORT CommonQueryXML := MODULE
 
         RETURN bus_in;
     ENDMACRO;
-    
+
     EXPORT innerOuterBandResults(STRING innerValue, STRING outerValue, STRING defaultValue) := FUNCTION
         RETURN MAP(TRIM(innerValue) <> DueDiligence.Constants.EMPTY => innerValue,
                    TRIM(outerValue) <> DueDiligence.Constants.EMPTY => outerValue,
                    defaultValue);
     END;
-    
+
     EXPORT innerOuterBandUnsignedResults(UNSIGNED innerValue, UNSIGNED outerValue, UNSIGNED defaultValue) := FUNCTION
         RETURN MAP(innerValue > DueDiligence.Constants.NUMERIC_ZERO => innerValue,
                    outerValue > DueDiligence.Constants.NUMERIC_ZERO => outerValue,
                    defaultValue);
     END;
-		
+
     EXPORT mac_CreateInputFromXML(requestType, requestStoredName, requestedReport, serviceRequested) := MACRO
-				
-        //Can't have duplicate definitions of Stored with different default values, 
+
+        //Can't have duplicate definitions of Stored with different default values,
         //so add the default to #stored to eliminate the assignment of a default value.
         #STORED('DPPAPurpose', Business_Risk_BIP.Constants.Default_DPPA);
         #STORED('GLBPurpose',  Business_Risk_BIP.Constants.Default_GLBA);
@@ -98,19 +98,19 @@ EXPORT CommonQueryXML := MODULE
         debugIndicator := FALSE : STORED('debugMode');
         intermediates := FALSE : STORED('intermediateVariables');
 
-        //Get XML input 
+        //Get XML input
         requestIn := DATASET([], requestType) : STORED(requestStoredName, FEW);
 
         firstRow := requestIn[1] : INDEPENDENT; // Since this is realtime AND not batch, should only have one row on input.
 
         optionsIn := GLOBAL(firstRow.options);
-        userIn := GLOBAL(firstRow.user);  
+        userIn := GLOBAL(firstRow.user);
         reportByIn := GLOBAL(firstRow.reportBy);
 
         //Fields for test seeds
         BOOLEAN executeTestSeeds := userIn.testDataEnabled;
         STRING testSeedTableName := userIn.testDataTableName;
-        
+
         //CCPA fields
         UNSIGNED1 LexIdSourceOptout := 1 : STORED('LexIdSourceOptout');
         STRING TransactionID := '' : STORED('_TransactionId');
@@ -121,30 +121,30 @@ EXPORT CommonQueryXML := MODULE
         UNSIGNED1 outerBandDPPAPurpose := Business_Risk_BIP.Constants.Default_DPPA : STORED('DPPAPurpose');
         UNSIGNED1 outerBandGLBPurpose := Business_Risk_BIP.Constants.Default_GLBA : STORED('GLBPurpose');
         outerBandHistoryDate := DueDiligence.Constants.NUMERIC_ZERO : STORED('HistoryDateYYYYMMDD');
-        STRING6 outerBandSSNMASK := Business_Risk_BIP.Constants.Default_SSNMask : STORED('SSNMask');  
+        STRING6 outerBandSSNMASK := Business_Risk_BIP.Constants.Default_SSNMask : STORED('SSNMask');
         STRING outerBandDRM := AutoStandardI.GlobalModule().DataRestrictionMask;
         STRING outerBandDPM := AutoStandardI.GlobalModule().DataPermissionMask;
 
-        
+
         //The general rule for picking these options is to look in the inner band (ie the User section) first
-        //If the inner band fields are not populated look in the outer band or the Default from the Global Module         
+        //If the inner band fields are not populated look in the outer band or the Default from the Global Module
         dppa := DueDiligence.CommonQueryXML.innerOuterBandUnsignedResults((UNSIGNED1)userIn.DLPurpose, outerBandDPPAPurpose, Business_Risk_BIP.Constants.Default_DPPA);
         glba := DueDiligence.CommonQueryXML.innerOuterBandUnsignedResults((UNSIGNED1)userIn.GLBPurpose, outerBandGLBPurpose, Business_Risk_BIP.Constants.Default_GLBA);
-        drm	:= DueDiligence.CommonQueryXML.innerOuterBandResults(userIn.DataRestrictionMask, outerBandDRM, AutoStandardI.Constants.DataRestrictionMask_default); 
+        drm	:= DueDiligence.CommonQueryXML.innerOuterBandResults(userIn.DataRestrictionMask, outerBandDRM, AutoStandardI.Constants.DataRestrictionMask_default);
         dpm := DueDiligence.CommonQueryXML.innerOuterBandResults(userIn.DataPermissionMask, outerBandDPM, AutoStandardI.Constants.DataPermissionMask_default);
-        STRING6 DDssnMask := DueDiligence.CommonQueryXML.innerOuterBandResults(userIn.SSNMask, outerBandSSNMASK, DueDiligence.Constants.EMPTY); //*** EXPECTING ALL/LAST4/FIRST5 from MBS   
+        STRING6 DDssnMask := DueDiligence.CommonQueryXML.innerOuterBandResults(userIn.SSNMask, outerBandSSNMASK, DueDiligence.Constants.EMPTY); //*** EXPECTING ALL/LAST4/FIRST5 from MBS
 
         //since the initial version can be defaulted, default options for person and business reports only; attributes need to be requested
         defaultVersion := MAP(TRIM(STD.Str.ToUpperCase(optionsIn.DDAttributesVersionRequest)) <> DueDiligence.Constants.EMPTY => TRIM(STD.Str.ToUpperCase(optionsIn.DDAttributesVersionRequest)),
                               serviceRequested = DueDiligence.Constants.BUSINESS => DueDiligence.Constants.BUS_REQ_ATTRIBUTE_V3,
                               serviceRequested = DueDiligence.Constants.INDIVIDUAL => DueDiligence.Constants.IND_REQ_ATTRIBUTE_V3,
                               DueDiligence.Constants.EMPTY);
-                              
-                    
-                    
+
+
+
         requestedVersion := defaultVersion;
         includeReport := requestedReport;
-        displayAttributeText := optionsIn.displayText;       
+        displayAttributeText := optionsIn.displayText;
 
         requestedSource := MAP(STD.Str.ToUpperCase(TRIM(optionsIn.IncludeSpecialAttributes)) = 'NONE' => DueDiligence.Constants.REQUESTED_SOURCE_ENUM.NONE,
                                 STD.Str.ToUpperCase(TRIM(optionsIn.IncludeSpecialAttributes)) = 'ONLINE' => DueDiligence.Constants.REQUESTED_SOURCE_ENUM.ONLINE,
@@ -156,37 +156,37 @@ EXPORT CommonQueryXML := MODULE
                                                                               SELF.attributeModules := LEFT.name;
                                                                               SELF := [];));
 
-        
+
         wseq := PROJECT(requestIn, TRANSFORM({INTEGER4 seq, RECORDOF(requestIn)}, SELF.seq := COUNTER, SELF := LEFT));
 
         input := PROJECT(wseq, TRANSFORM(DueDiligence.Layouts.Input,
 
                                           version := requestedVersion;
                                           reportBy := LEFT.reportBy;
-                                          
+
                                           populatedInd := DueDiligence.CommonQueryXML.mac_PopulateIndividualFromRequest(reportBy, serviceRequested);
                                           populatedBus := DueDiligence.CommonQueryXML.mac_PopulateBusinessFromRequest(reportBy, serviceRequested);
-                                          
-                                          
+
+
                                           useHistDate := (UNSIGNED4)(INTFORMAT(LEFT.options.HistoryDate.Year, 4, 1) + INTFORMAT(LEFT.options.HistoryDate.Month, 2, 1) + INTFORMAT(LEFT.options.HistoryDate.Day, 2, 1));
                                           histDate := IF(useHistDate > 0, useHistDate, (UNSIGNED4)outerBandHistoryDate);
-                                                                          
+
                                           SELF.seq := LEFT.seq;
                                           SELF.accountNumber := userIn.accountNumber;
                                           SELF.requestedVersion := version;
                                           SELF.requestedModules := requestedAttributes;
-                                          
-                                          
+
+
                                           SELF.rawBusiness := populatedBus[1];
                                           SELF.rawPerson := populatedInd[1];
                                           SELF.historyDateYYYYMMDD := histDate;
-                                          
+
                                           //only default if we are in the context of a report request and ProductRequestType is empty
-                                          SELF.productRequested := MAP(reportByIn.ProductRequestType = '' AND serviceRequested != DueDiligence.Constants.ATTRIBUTES => DueDiligence.ConstantsQuery.VALID_PRODUCT_DUE_DILIGENCE_ONLY, 
-                                                                       STD.Str.ToLowerCase(reportByIn.ProductRequestType) = DueDiligence.ConstantsQuery.VALID_PRODUCT_DUE_DILIGENCE_REPORT_DEFAULT AND serviceRequested != DueDiligence.Constants.ATTRIBUTES => DueDiligence.ConstantsQuery.VALID_PRODUCT_DUE_DILIGENCE_ONLY, 
+                                          SELF.productRequested := MAP(reportByIn.ProductRequestType = '' AND serviceRequested != DueDiligence.Constants.ATTRIBUTES => DueDiligence.ConstantsQuery.VALID_PRODUCT_DUE_DILIGENCE_ONLY,
+                                                                       STD.Str.ToLowerCase(reportByIn.ProductRequestType) = DueDiligence.ConstantsQuery.VALID_PRODUCT_DUE_DILIGENCE_REPORT_DEFAULT AND serviceRequested != DueDiligence.Constants.ATTRIBUTES => DueDiligence.ConstantsQuery.VALID_PRODUCT_DUE_DILIGENCE_ONLY,
                                                                        STD.Str.ToLowerCase(reportByIn.ProductRequestType));
-                                          
-                                          
+
+
                                           //Citizenship fields
                                           #IF(serviceRequested = DueDiligence.Constants.ATTRIBUTES)
                                             SELF.modelName := reportBy.person.citizenship.citizenshipModelName;
@@ -195,12 +195,12 @@ EXPORT CommonQueryXML := MODULE
                                             SELF.dlState := reportBy.person.citizenship.dlState;
                                             SELF.email := reportBy.person.citizenship.email;
                                           #END
-                                          
-                                          SELF := [];));                                                                           
+
+                                          SELF := [];));
     ENDMACRO;
-    
+
     SHARED mac_GetAttrModsWithResults(results, cleanData) := FUNCTIONMACRO
-        
+
         LOCAL attrsWithMods := JOIN(results, cleanData,
                                     LEFT.seq = RIGHT.seq,
                                     TRANSFORM({RECORDOF(results), BOOLEAN includeAll, BOOLEAN useMods, SET OF STRING15 requestedMods},
@@ -210,22 +210,22 @@ EXPORT CommonQueryXML := MODULE
                                               SELF := LEFT;),
                                     LEFT OUTER,
                                     ATMOST(1));
-                                
+
         RETURN UNGROUP(attrsWithMods);
     ENDMACRO;
-    
+
     EXPORT GetIndividualV3Attributes(DATASET(DueDiligence.v3Layouts.DDOutput.PersonResults) results, DATASET(DueDiligence.Layouts.Input) cleanData) := FUNCTION
-    
+
         checkWhichAttrs := mac_GetAttrModsWithResults(results, cleanData);
-				
+
         personAttributes := NORMALIZE(checkWhichAttrs, DueDiligence.Constants.NUMBER_OF_INDIVIDUAL_ATTRIBUTES, TRANSFORM(iesp.share.t_NameValuePair,
-                                                                  
+
                                                                   useEconomic := LEFT.includeAll OR (LEFT.useMods AND DueDiligence.ConstantsQuery.MODULE_ECONOMIC IN LEFT.requestedMods);
                                                                   useGeo := LEFT.includeAll OR (LEFT.useMods AND DueDiligence.ConstantsQuery.MODULE_GEOGRAPHIC IN LEFT.requestedMods);
                                                                   useLegal := LEFT.includeAll OR (LEFT.useMods AND DueDiligence.ConstantsQuery.MODULE_LEGAL IN LEFT.requestedMods);
                                                                   useIdentity := LEFT.includeAll OR (LEFT.useMods AND DueDiligence.ConstantsQuery.MODULE_IDENTITY IN LEFT.requestedMods);
                                                                   useNetwork := LEFT.includeAll OR (LEFT.useMods AND DueDiligence.ConstantsQuery.MODULE_NETWORK IN LEFT.requestedMods);
-                                                                  
+
                                                                   SELF := CASE(COUNTER,
                                                                                 1  => IF(useEconomic, DueDiligence.Common.createNVPair('PerAssetOwnProperty', LEFT.PerAssetOwnProperty)),
                                                                                 2  => IF(useEconomic, DueDiligence.Common.createNVPair('PerAssetOwnAircraft', LEFT.PerAssetOwnAircraft)),
@@ -251,24 +251,24 @@ EXPORT CommonQueryXML := MODULE
                                                                                 22 => IF(useNetwork, DueDiligence.Common.createNVPair('PerBusAssociations', LEFT.PerBusAssociations)),
                                                                                       DueDiligence.Common.createNVPair(DueDiligence.Constants.INVALID, DueDiligence.Constants.INVALID));));
 
-	
-	
+
+
         RETURN personAttributes(value <> DueDiligence.Constants.EMPTY);
     END;
-		
-		
+
+
     EXPORT GetIndividualV3AttributeFlags(DATASET(DueDiligence.v3Layouts.DDOutput.PersonResults) results, DATASET(DueDiligence.Layouts.Input) cleanData) := FUNCTION
-		
+
         checkWhichAttrs := mac_GetAttrModsWithResults(results, cleanData);
-        
+
         personFlags := NORMALIZE(checkWhichAttrs, DueDiligence.Constants.NUMBER_OF_INDIVIDUAL_ATTRIBUTES, TRANSFORM(iesp.share.t_NameValuePair,
-                                                                  
+
                                                                   useEconomic := LEFT.includeAll OR (LEFT.useMods AND DueDiligence.ConstantsQuery.MODULE_ECONOMIC IN LEFT.requestedMods);
                                                                   useGeo := LEFT.includeAll OR (LEFT.useMods AND DueDiligence.ConstantsQuery.MODULE_GEOGRAPHIC IN LEFT.requestedMods);
                                                                   useLegal := LEFT.includeAll OR (LEFT.useMods AND DueDiligence.ConstantsQuery.MODULE_LEGAL IN LEFT.requestedMods);
                                                                   useIdentity := LEFT.includeAll OR (LEFT.useMods AND DueDiligence.ConstantsQuery.MODULE_IDENTITY IN LEFT.requestedMods);
                                                                   useNetwork := LEFT.includeAll OR (LEFT.useMods AND DueDiligence.ConstantsQuery.MODULE_NETWORK IN LEFT.requestedMods);
-                                                                  
+
                                                                   SELF := CASE(COUNTER,
                                                                                 1  => IF(useEconomic, DueDiligence.Common.createNVPair('PerAssetOwnProperty_Flag', LEFT.PerAssetOwnProperty_Flag)),
                                                                                 2  => IF(useEconomic, DueDiligence.Common.createNVPair('PerAssetOwnAircraft_Flag', LEFT.PerAssetOwnAircraft_Flag)),
@@ -293,22 +293,22 @@ EXPORT CommonQueryXML := MODULE
                                                                                 21 => IF(useNetwork, DueDiligence.Common.createNVPair('PerProfLicense_Flag', LEFT.PerProfLicense_Flag)),
                                                                                 22 => IF(useNetwork, DueDiligence.Common.createNVPair('PerBusAssociations_Flag', LEFT.PerBusAssociations_Flag)),
                                                                                       DueDiligence.Common.createNVPair(DueDiligence.Constants.INVALID, DueDiligence.Constants.INVALID));));
-		
+
         RETURN personFlags(value <> DueDiligence.Constants.EMPTY);
     END;
-		
-		
+
+
     EXPORT GetBusinessV3Attributes(DATASET(DueDiligence.v3Layouts.DDOutput.BusinessResults) results, DATASET(DueDiligence.Layouts.Input) cleanData) := FUNCTION
-        
+
       checkWhichAttrs := mac_GetAttrModsWithResults(results, cleanData);
-      
+
       businessAttributes := NORMALIZE(checkWhichAttrs, DueDiligence.Constants.NUMBER_OF_BUSINESS_ATTRIBUTES, TRANSFORM(iesp.share.t_NameValuePair,
-                                                                  
+
                                                                   useEconomic := LEFT.includeAll OR (LEFT.useMods AND DueDiligence.ConstantsQuery.MODULE_ECONOMIC IN LEFT.requestedMods);
                                                                   useOperating := LEFT.includeAll OR (LEFT.useMods AND DueDiligence.ConstantsQuery.MODULE_OPERATING IN LEFT.requestedMods);
                                                                   useLegal := LEFT.includeAll OR (LEFT.useMods AND DueDiligence.ConstantsQuery.MODULE_LEGAL IN LEFT.requestedMods);
                                                                   useNetwork := LEFT.includeAll OR (LEFT.useMods AND DueDiligence.ConstantsQuery.MODULE_NETWORK IN LEFT.requestedMods);
-                                                                  
+
                                                                   SELF := CASE(COUNTER,
                                                                                 1  => IF(useEconomic, DueDiligence.Common.createNVPair('BusAssetOwnProperty', LEFT.BusAssetOwnProperty)),
                                                                                 2  => IF(useEconomic, DueDiligence.Common.createNVPair('BusAssetOwnAircraft', LEFT.BusAssetOwnAircraft)),
@@ -336,23 +336,23 @@ EXPORT CommonQueryXML := MODULE
                                                                                 24 => IF(useNetwork, DueDiligence.Common.createNVPair('BusBEOAccessToFundsProperty', LEFT.BusBEOAccessToFundsProperty)),
                                                                                 25 => IF(useNetwork, DueDiligence.Common.createNVPair('BusLinkedBusinesses', LEFT.BusLinkedBusinesses)),
                                                                                       DueDiligence.Common.createNVPair(DueDiligence.Constants.INVALID, DueDiligence.Constants.INVALID));));
-																																																							
-				
+
+
         RETURN businessAttributes(value <> DueDiligence.Constants.EMPTY);
     END;
-		
-		
+
+
     EXPORT GetBusinessV3AttributeFlags(DATASET(DueDiligence.v3Layouts.DDOutput.BusinessResults) results, DATASET(DueDiligence.Layouts.Input) cleanData) := FUNCTION
-			
+
         checkWhichAttrs := mac_GetAttrModsWithResults(results, cleanData);
-        
+
         businessFlags := NORMALIZE(checkWhichAttrs, DueDiligence.Constants.NUMBER_OF_BUSINESS_ATTRIBUTES, TRANSFORM(iesp.share.t_NameValuePair,
-                                                                  
+
                                                                   useEconomic := LEFT.includeAll OR (LEFT.useMods AND DueDiligence.ConstantsQuery.MODULE_ECONOMIC IN LEFT.requestedMods);
                                                                   useOperating := LEFT.includeAll OR (LEFT.useMods AND DueDiligence.ConstantsQuery.MODULE_OPERATING IN LEFT.requestedMods);
                                                                   useLegal := LEFT.includeAll OR (LEFT.useMods AND DueDiligence.ConstantsQuery.MODULE_LEGAL IN LEFT.requestedMods);
                                                                   useNetwork := LEFT.includeAll OR (LEFT.useMods AND DueDiligence.ConstantsQuery.MODULE_NETWORK IN LEFT.requestedMods);
-                                                                  
+
                                                                   SELF := CASE(COUNTER,
                                                                                 1  => IF(useEconomic, DueDiligence.Common.createNVPair('BusAssetOwnProperty_Flag', LEFT.BusAssetOwnProperty_Flag)),
                                                                                 2  => IF(useEconomic, DueDiligence.Common.createNVPair('BusAssetOwnAircraft_Flag', LEFT.BusAssetOwnAircraft_Flag)),
@@ -380,12 +380,12 @@ EXPORT CommonQueryXML := MODULE
                                                                                 24 => IF(useNetwork, DueDiligence.Common.createNVPair('BusBEOAccessToFundsProperty_Flag', LEFT.BusBEOAccessToFundsProperty_Flag)),
                                                                                 25 => IF(useNetwork, DueDiligence.Common.createNVPair('BusLinkedBusinesses_Flag', LEFT.BusLinkedBusinesses_Flag)),
                                                                                       DueDiligence.Common.createNVPair(DueDiligence.Constants.INVALID, DueDiligence.Constants.INVALID));));
-												
+
         RETURN businessFlags(value <> DueDiligence.Constants.EMPTY);
     END;
-    
+
     EXPORT GetCitizenshipScoreIndicators(DATASET(DueDiligence.v3Layouts.DDOutput.PersonResults) results) := FUNCTION
-    
+
         citizenshipIndicators := NORMALIZE(UNGROUP(results), DueDiligence.Citizenship.Constants.NUMBER_OF_INDICATORS, TRANSFORM(iesp.share.t_NameValuePair,
                                                                   SELF := CASE(COUNTER,
                                                                                 1  => DueDiligence.Common.createNVPairIntegerValue('LexID', LEFT.lexID),
@@ -419,17 +419,17 @@ EXPORT CommonQueryXML := MODULE
                                                                                       DueDiligence.Common.createNVPair(DueDiligence.Constants.INVALID, DueDiligence.Constants.INVALID));));
         RETURN citizenshipIndicators;
     END;
-    
+
     EXPORT mac_GetESPReturnData(inputWithSeq, cleanInputData, results, iespLayout, indvOrBus, includeReport, attrs, attrsFlags, reqVersion, customerPassThruInput) := FUNCTIONMACRO
-        
+
         LOCAL products := STD.Str.ToLowerCase(cleanInputData[1].productRequested);
         LOCAL reqProduct := DueDiligence.CommonQuery.getProductEnum(products);
-      
-        LOCAL returnData := JOIN(inputWithSeq, results, 
+
+        LOCAL returnData := JOIN(inputWithSeq, results,
                                   LEFT.seq = RIGHT.seq,
                                   TRANSFORM(iespLayout,
-                                            SELF.result.inputecho := LEFT.reportBy;	
-                                            SELF.result.AttributeGroup.attributes := attrs;                                      
+                                            SELF.result.inputecho := LEFT.reportBy;
+                                            SELF.result.AttributeGroup.attributes := attrs;
                                             SELF.result.AttributeGroup.AttributeLevelHits := attrsFlags;
                                             SELF.result.AttributeGroup.Name := IF(reqProduct IN DueDiligence.ConstantsQuery.DUEDILIGENCE_PRODUCTS, reqVersion, DueDiligence.Constants.EMPTY);
                                             SELF.result.AdditionalInput := customerPassThruInput;
@@ -438,73 +438,73 @@ EXPORT CommonQueryXML := MODULE
                                                                     'SELF.result.businessID := (STRING)RIGHT.busLexID;' +
                                                                     'SELF.result.BusinessLexIDMatch := (UNSIGNED1)RIGHT.busLexIDMatch;',
                                                                     DueDiligence.Constants.EMPTY))
-                                                                    
+
                                             #EXPAND(IF(indvOrBus = DueDiligence.Constants.BUSINESS AND includeReport = DueDiligence.Constants.STRING_TRUE,
                                                                     'SELF.result := RIGHT.report;',
                                                                     DueDiligence.Constants.EMPTY))
-                                                                    
+
 
                                             #EXPAND(IF(indvOrBus = DueDiligence.Constants.INDIVIDUAL,
                                                                     'SELF.result.uniqueID := (STRING)RIGHT.perLexID;' +
                                                                     'SELF.result.PersonLexIDMatch := (UNSIGNED1)RIGHT.perLexIDMatch;',
                                                                     DueDiligence.Constants.EMPTY))
-                                                                    
+
                                             #EXPAND(IF(indvOrBus = DueDiligence.Constants.INDIVIDUAL AND includeReport = DueDiligence.Constants.STRING_TRUE,
                                                                     'SELF.result.personReport := RIGHT.personReport;',
                                                                     DueDiligence.Constants.EMPTY))
-                                                                    
+
                                             #EXPAND(IF(indvOrBus = DueDiligence.Constants.INDIVIDUAL AND includeReport = DueDiligence.Constants.STRING_FALSE,
                                                                     'SELF.result.CitizenshipResults.CitizenshipAttributes := IF(RIGHT.citizenshipScore <> DueDiligence.Constants.EMPTY, DueDiligence.CommonQueryXML.GetCitizenshipScoreIndicators(results), DATASET([], iesp.share.t_NameValuePair));' +
                                                                     'SELF.result.CitizenshipResults.CitizenshipScore := IF(RIGHT.citizenshipScore <> DueDiligence.Constants.EMPTY, RIGHT.citizenshipScore, DueDiligence.Constants.EMPTY);',
-                                                                    DueDiligence.Constants.EMPTY))                        
-                                                                       
+                                                                    DueDiligence.Constants.EMPTY))
+
                                             SELF := LEFT;
-                                            SELF := [];));																																		
-				
+                                            SELF := [];));
+
         RETURN returnData;
     ENDMACRO;
-    
-    EXPORT mac_v3PersonXML(rawReqWithSeq, cleanData, compliance, ssnMaskVal, additionalInfo, 
+
+    EXPORT mac_v3PersonXML(rawReqWithSeq, cleanData, compliance, additionalInfo,
                             responseLayout, includeReport, debugIn, intermediatesIn) := FUNCTIONMACRO
-        
+
         LOCAL boolReport := IF(includeReport = DueDiligence.Constants.STRING_TRUE, TRUE, FALSE);
-        LOCAL results := DueDiligence.CommonQuery.v3PersonResults(cleanData, compliance, ssnMaskVal, boolReport, debugIn, intermediatesIn);
-        
+        LOCAL results := DueDiligence.CommonQuery.v3PersonResults(cleanData, compliance, boolReport, debugIn, intermediatesIn);
+
         LOCAL indIndex := DueDiligence.CommonQueryXML.GetIndividualV3Attributes(results, cleanData);
         LOCAL indIndexHits := DueDiligence.CommonQueryXML.GetIndividualV3AttributeFlags(results, cleanData);
-        
+
         LOCAL finalPerson := DueDiligence.CommonQueryXML.mac_GetESPReturnData(rawReqWithSeq, cleanData, results, responseLayout, DueDiligence.Constants.INDIVIDUAL,
                                                                               includeReport, indIndex, indIndexHits, cleanData[1].requestedVersion, additionalInfo);
-        
+
         RETURN finalPerson;
     ENDMACRO;
-    
-    EXPORT mac_v3BusinessXML(rawReqWithSeq, cleanData, compliance, ssnMaskVal, additionalInfo, responseLayout, includeReport, debugIn) := FUNCTIONMACRO
-        
+
+    EXPORT mac_v3BusinessXML(rawReqWithSeq, cleanData, compliance, additionalInfo, responseLayout, includeReport, debugIn) := FUNCTIONMACRO
+
         LOCAL boolReport := IF(includeReport = DueDiligence.Constants.STRING_TRUE, TRUE, FALSE);
-        LOCAL results := DueDiligence.CommonQuery.v3BusinessResults(cleanData, compliance, ssnMaskVal, boolReport, debugIn);
-        
+        LOCAL results := DueDiligence.CommonQuery.v3BusinessResults(cleanData, compliance, boolReport, debugIn);
+
         LOCAL busIndex := DueDiligence.CommonQueryXML.GetBusinessV3Attributes(results, cleanData);
         LOCAL busIndexHits := DueDiligence.CommonQueryXML.GetBusinessV3AttributeFlags(results, cleanData);
-        
+
         LOCAL finalBusiness := DueDiligence.CommonQueryXML.mac_GetESPReturnData(rawReqWithSeq, cleanData, results, responseLayout, DueDiligence.Constants.BUSINESS,
                                                                                 includeReport, busIndex, busIndexHits, cleanData[1].requestedVersion, additionalInfo);
-        
+
         RETURN finalBusiness;
     ENDMACRO;
-    
-    
-    
-    EXPORT mac_processV3XMLRequest(rawReqWithSeq, cleanData, compliance, ssnMaskVal, 
+
+
+
+    EXPORT mac_processV3XMLRequest(rawReqWithSeq, cleanData, compliance,
                                 additionalInfo, responseLayout, includeReport, debugIn, intermediatesIn) := FUNCTIONMACRO
-  
+
         busDebug := IF(cleanData[1].containsPersonReq = FALSE AND cleanData[1].containsCitizenshipReq = FALSE, debugIn, FALSE);
         perDebug := IF(cleanData[1].containsPersonReq OR cleanData[1].containsCitizenshipReq, debugIn, FALSE);
-  
+
         ddFinal := IF(cleanData[1].containsPersonReq OR cleanData[1].containsCitizenshipReq,
-                      DueDiligence.CommonQueryXML.mac_v3PersonXML(rawReqWithSeq, cleanData, compliance, ssnMaskVal, additionalInfo, responseLayout, includeReport, perDebug, intermediatesIn),
-                      DueDiligence.CommonQueryXML.mac_v3BusinessXML(rawReqWithSeq, cleanData, compliance, ssnMaskVal, additionalInfo, responseLayout, includeReport, busDebug));
-        
+                      DueDiligence.CommonQueryXML.mac_v3PersonXML(rawReqWithSeq, cleanData, compliance, additionalInfo, responseLayout, includeReport, perDebug, intermediatesIn),
+                      DueDiligence.CommonQueryXML.mac_v3BusinessXML(rawReqWithSeq, cleanData, compliance, additionalInfo, responseLayout, includeReport, busDebug));
+
         RETURN ddFinal;
     ENDMACRO;
 
