@@ -62,7 +62,8 @@
     DATASET(rAdlSoapOut),
     onFail(xFormSoapError(LEFT)),
     HEADING(options,'</Row></did_batch_in>'),
-    PARALLEL(ParallelRequests), 
+    //PARALLEL(ParallelRequests), 
+    PARALLEL(2), //Getting a 'Expression is not constant: ParallelRequests' when running - for now default to 2
     MERGE(BatchSize));
     
   //JOIN back to make sure to return the same amount of records as came in
