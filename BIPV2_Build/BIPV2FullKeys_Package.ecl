@@ -61,7 +61,8 @@ module
   export Xlinkrefs_l_address3           := tools.macf_FilesIndex('BizLinkFull.Key_BizHead_L_ADDRESS3.Key         ' ,bizknames.refs_l_address3         );
   export Xlinkrefs_l_phone              := tools.macf_FilesIndex('BizLinkFull.Key_BizHead_L_PHONE.Key            ' ,bizknames.refs_l_phone            );
   export Xlinkrefs_l_fein               := tools.macf_FilesIndex('BizLinkFull.Key_BizHead_L_FEIN.Key             ' ,bizknames.refs_l_fein             );
-  export Xlinkrefs_l_contact            := tools.macf_FilesIndex('BizLinkFull.Key_BizHead_L_CONTACT.Key          ' ,bizknames.refs_l_contact          );
+  export Xlinkrefs_l_contact_st         := tools.macf_FilesIndex('BizLinkFull.Key_BizHead_L_CONTACT_ST.Key       ' ,bizknames.refs_l_contact_st       );
+  export Xlinkrefs_l_contact_zip        := tools.macf_FilesIndex('BizLinkFull.Key_BizHead_L_CONTACT_ZIP.Key      ' ,bizknames.refs_l_contact_zip      );
   export Xlinkrefs_l_url                := tools.macf_FilesIndex('BizLinkFull.Key_BizHead_L_URL.Key              ' ,bizknames.refs_l_url              );
   export Xlinkrefs_l_email              := tools.macf_FilesIndex('BizLinkFull.Key_BizHead_L_EMAIL.Key            ' ,bizknames.refs_l_email            );
   export Xlinkrefs_l_contact_did        := tools.macf_FilesIndex('BizLinkFull.Key_BizHead_L_CONTACT_DID.Key      ' ,bizknames.refs_l_contact_did      );
@@ -130,33 +131,35 @@ module
     ,if(pKey in [0 ,26] ,sequential(output(26 ,named('KeyNumber'),overwrite) ,output(choosen(Xlinkrefs_l_address3         .logical ,100),named('Xlinkrefs_l_address3'          ))))
     ,if(pKey in [0 ,27] ,sequential(output(27 ,named('KeyNumber'),overwrite) ,output(choosen(Xlinkrefs_l_phone            .logical ,100),named('Xlinkrefs_l_phone'             ))))
     ,if(pKey in [0 ,28] ,sequential(output(28 ,named('KeyNumber'),overwrite) ,output(choosen(Xlinkrefs_l_fein             .logical ,100),named('Xlinkrefs_l_fein'              ))))
-    ,if(pKey in [0 ,29] ,sequential(output(29 ,named('KeyNumber'),overwrite) ,output(choosen(Xlinkrefs_l_contact          .logical ,100),named('Xlinkrefs_l_contact'           ))))
-    ,if(pKey in [0 ,30] ,sequential(output(30 ,named('KeyNumber'),overwrite) ,output(choosen(Xlinkrefs_l_url              .logical ,100),named('Xlinkrefs_l_url'               ))))
-    ,if(pKey in [0 ,31] ,sequential(output(31 ,named('KeyNumber'),overwrite) ,output(choosen(Xlinkrefs_l_email            .logical ,100),named('Xlinkrefs_l_email'             ))))
-    ,if(pKey in [0 ,32] ,sequential(output(32 ,named('KeyNumber'),overwrite) ,output(choosen(Xlinkrefs_l_contact_did      .logical ,100),named('Xlinkrefs_l_contact_did'       ))))
-    ,if(pKey in [0 ,33] ,sequential(output(33 ,named('KeyNumber'),overwrite) ,output(choosen(Xlinkrefs_l_contact_ssn      .logical ,100),named('Xlinkrefs_l_contact_ssn'       ))))
-    ,if(pKey in [0 ,34] ,sequential(output(34 ,named('KeyNumber'),overwrite) ,output(choosen(Xlinkrefs_l_source           .logical ,100),named('Xlinkrefs_l_source'            ))))
-    ,if(pKey in [0 ,35] ,sequential(output(35 ,named('KeyNumber'),overwrite) ,output(choosen(Xlinkwheel_city_clean        .logical ,100),named('Xlinkwheel_city_clean'         ))))
-    ,if(pKey in [0 ,36] ,sequential(output(36 ,named('KeyNumber'),overwrite) ,output(choosen(Xlinkwheel_quick_city_clean  .logical ,100),named('Xlinkwheel_quick_city_clean'   ))))
-    ,if(pKey in [0 ,37] ,sequential(output(37 ,named('KeyNumber'),overwrite) ,output(choosen(Xlinkword_cnp_name           .logical ,100),named('Xlinkword_cnp_name'            ))))
-    ,if(pKey in [0 ,38] ,sequential(output(38 ,named('KeyNumber'),overwrite) ,output(choosen(Xlinkword_company_url        .logical ,100),named('Xlinkword_company_url'         ))))
-    ,if(pKey in [0 ,39] ,sequential(output(39 ,named('KeyNumber'),overwrite) ,output(choosen(Xlinksup_proxid              .logical ,100),named('Xlinksup_proxid'               ))))
-    ,if(pKey in [0 ,40] ,sequential(output(40 ,named('KeyNumber'),overwrite) ,output(choosen(Xlinksup_seleid              .logical ,100),named('Xlinksup_seleid'               ))))
-    ,if(pKey in [0 ,41] ,sequential(output(41 ,named('KeyNumber'),overwrite) ,output(choosen(Xlinksup_orgid               .logical ,100),named('Xlinksup_orgid'                ))))
-    ,if(pKey in [0 ,42] ,sequential(output(42 ,named('KeyNumber'),overwrite) ,output(choosen(Xlinksup_rcid                .logical ,100),named('Xlinksup_rcid'                 ))))
-    ,if(pKey in [0 ,43] ,sequential(output(43 ,named('KeyNumber'),overwrite) ,output(choosen(HrchyProxid                  .logical ,100),named('HrchyProxid'                   ))))
-    ,if(pKey in [0 ,44] ,sequential(output(44 ,named('KeyNumber'),overwrite) ,output(choosen(HrchyLgid                    .logical ,100),named('HrchyLgid'                     ))))
-    ,if(pKey in [0 ,45] ,sequential(output(45 ,named('KeyNumber'),overwrite) ,output(choosen(AML_Addr                     .logical ,100),named('AML_Addr'                      ))))
-    ,if(pKey in [0 ,46] ,sequential(output(46 ,named('KeyNumber'),overwrite) ,output(choosen(biz_preferred                .logical ,100),named('biz_preferred'                 ))))
-    ,if(pKey in [0 ,47] ,sequential(output(47 ,named('KeyNumber'),overwrite) ,output(choosen(Xlinkrefs_l_sic              .logical ,100),named('Xlinkrefs_l_sic'               ))))
-    ,if(pKey in [0 ,48] ,sequential(output(48 ,named('KeyNumber'),overwrite) ,output(choosen(bip2ConsumerKey              .logical ,100),named('bip2ConsumerKey'               ))))
-    ,if(pKey in [0 ,49] ,sequential(output(49 ,named('KeyNumber'),overwrite) ,output(choosen(consumer2BipKey              .logical ,100),named('consumer2BipKey'               ))))
-    ,if(pKey in [0 ,50] ,sequential(output(50 ,named('KeyNumber'),overwrite) ,output(choosen(seg_linkids                  .logical ,100),named('seg_linkids'                   ))))
-    ,if(pKey in [0 ,51] ,sequential(output(51 ,named('KeyNumber'),overwrite) ,output(choosen(highRiskIndustriesPhone      .logical ,100),named('highRiskIndustriesPhone'       ))))
-    ,if(pKey in [0 ,52] ,sequential(output(52 ,named('KeyNumber'),overwrite) ,output(choosen(highRiskIndustriesAddr       .logical ,100),named('highRiskIndustriesAddr'        ))))
-    ,if(pKey in [0 ,53] ,sequential(output(53 ,named('KeyNumber'),overwrite) ,output(choosen(highRiskIndustriesCode       .logical ,100),named('highRiskIndustriesCode'        ))))
-    ,if(pKey in [0 ,54] ,sequential(output(54 ,named('KeyNumber'),overwrite) ,output(choosen(locid                        .logical ,100),named('locid'                         ))))
-    ,if(pKey in [0 ,55] ,sequential(output(55 ,named('KeyNumber'),overwrite) ,output(choosen(firmographicsScore           .logical ,100),named('firmographicsScore'            ))))
+    ,if(pKey in [0 ,29] ,sequential(output(29 ,named('KeyNumber'),overwrite) ,output(choosen(Xlinkrefs_l_contact_st       .logical ,100),named('Xlinkrefs_l_contact_st'        ))))
+    ,if(pKey in [0 ,30] ,sequential(output(30 ,named('KeyNumber'),overwrite) ,output(choosen(Xlinkrefs_l_contact_zip      .logical ,100),named('Xlinkrefs_l_contact_zip'       ))))
+
+    ,if(pKey in [0 ,31] ,sequential(output(31 ,named('KeyNumber'),overwrite) ,output(choosen(Xlinkrefs_l_url              .logical ,100),named('Xlinkrefs_l_url'               ))))
+    ,if(pKey in [0 ,32] ,sequential(output(32 ,named('KeyNumber'),overwrite) ,output(choosen(Xlinkrefs_l_email            .logical ,100),named('Xlinkrefs_l_email'             ))))
+    ,if(pKey in [0 ,33] ,sequential(output(33 ,named('KeyNumber'),overwrite) ,output(choosen(Xlinkrefs_l_contact_did      .logical ,100),named('Xlinkrefs_l_contact_did'       ))))
+    ,if(pKey in [0 ,34] ,sequential(output(34 ,named('KeyNumber'),overwrite) ,output(choosen(Xlinkrefs_l_contact_ssn      .logical ,100),named('Xlinkrefs_l_contact_ssn'       ))))
+    ,if(pKey in [0 ,35] ,sequential(output(35 ,named('KeyNumber'),overwrite) ,output(choosen(Xlinkrefs_l_source           .logical ,100),named('Xlinkrefs_l_source'            ))))
+    ,if(pKey in [0 ,36] ,sequential(output(36 ,named('KeyNumber'),overwrite) ,output(choosen(Xlinkwheel_city_clean        .logical ,100),named('Xlinkwheel_city_clean'         ))))
+    ,if(pKey in [0 ,37] ,sequential(output(37 ,named('KeyNumber'),overwrite) ,output(choosen(Xlinkwheel_quick_city_clean  .logical ,100),named('Xlinkwheel_quick_city_clean'   ))))
+    ,if(pKey in [0 ,38] ,sequential(output(38 ,named('KeyNumber'),overwrite) ,output(choosen(Xlinkword_cnp_name           .logical ,100),named('Xlinkword_cnp_name'            ))))
+    ,if(pKey in [0 ,39] ,sequential(output(39 ,named('KeyNumber'),overwrite) ,output(choosen(Xlinkword_company_url        .logical ,100),named('Xlinkword_company_url'         ))))
+    ,if(pKey in [0 ,40] ,sequential(output(40 ,named('KeyNumber'),overwrite) ,output(choosen(Xlinksup_proxid              .logical ,100),named('Xlinksup_proxid'               ))))
+    ,if(pKey in [0 ,41] ,sequential(output(41 ,named('KeyNumber'),overwrite) ,output(choosen(Xlinksup_seleid              .logical ,100),named('Xlinksup_seleid'               ))))
+    ,if(pKey in [0 ,42] ,sequential(output(42 ,named('KeyNumber'),overwrite) ,output(choosen(Xlinksup_orgid               .logical ,100),named('Xlinksup_orgid'                ))))
+    ,if(pKey in [0 ,43] ,sequential(output(43 ,named('KeyNumber'),overwrite) ,output(choosen(Xlinksup_rcid                .logical ,100),named('Xlinksup_rcid'                 ))))
+    ,if(pKey in [0 ,44] ,sequential(output(44 ,named('KeyNumber'),overwrite) ,output(choosen(HrchyProxid                  .logical ,100),named('HrchyProxid'                   ))))
+    ,if(pKey in [0 ,45] ,sequential(output(45 ,named('KeyNumber'),overwrite) ,output(choosen(HrchyLgid                    .logical ,100),named('HrchyLgid'                     ))))
+    ,if(pKey in [0 ,46] ,sequential(output(46 ,named('KeyNumber'),overwrite) ,output(choosen(AML_Addr                     .logical ,100),named('AML_Addr'                      ))))
+    ,if(pKey in [0 ,47] ,sequential(output(47 ,named('KeyNumber'),overwrite) ,output(choosen(biz_preferred                .logical ,100),named('biz_preferred'                 ))))
+    ,if(pKey in [0 ,48] ,sequential(output(48 ,named('KeyNumber'),overwrite) ,output(choosen(Xlinkrefs_l_sic              .logical ,100),named('Xlinkrefs_l_sic'               ))))
+    ,if(pKey in [0 ,49] ,sequential(output(49 ,named('KeyNumber'),overwrite) ,output(choosen(bip2ConsumerKey              .logical ,100),named('bip2ConsumerKey'               ))))
+    ,if(pKey in [0 ,50] ,sequential(output(50 ,named('KeyNumber'),overwrite) ,output(choosen(consumer2BipKey              .logical ,100),named('consumer2BipKey'               ))))
+    ,if(pKey in [0 ,51] ,sequential(output(51 ,named('KeyNumber'),overwrite) ,output(choosen(seg_linkids                  .logical ,100),named('seg_linkids'                   ))))
+    ,if(pKey in [0 ,52] ,sequential(output(52 ,named('KeyNumber'),overwrite) ,output(choosen(highRiskIndustriesPhone      .logical ,100),named('highRiskIndustriesPhone'       ))))
+    ,if(pKey in [0 ,53] ,sequential(output(53 ,named('KeyNumber'),overwrite) ,output(choosen(highRiskIndustriesAddr       .logical ,100),named('highRiskIndustriesAddr'        ))))
+    ,if(pKey in [0 ,54] ,sequential(output(54 ,named('KeyNumber'),overwrite) ,output(choosen(highRiskIndustriesCode       .logical ,100),named('highRiskIndustriesCode'        ))))
+    ,if(pKey in [0 ,55] ,sequential(output(55 ,named('KeyNumber'),overwrite) ,output(choosen(locid                        .logical ,100),named('locid'                         ))))
+    ,if(pKey in [0 ,56] ,sequential(output(56 ,named('KeyNumber'),overwrite) ,output(choosen(firmographicsScore           .logical ,100),named('firmographicsScore'            ))))
   );       
 /*
   regexfilter := pRegexFieldFilter;
@@ -188,7 +191,8 @@ module
   tls_Xlinkrefs_l_address3         := tools.macf_LayoutTools(recordof(Xlinkrefs_l_address3         .logical)  ,false,regexfilter,true,true);
   tls_Xlinkrefs_l_phone            := tools.macf_LayoutTools(recordof(Xlinkrefs_l_phone            .logical)  ,false,regexfilter,true,true);
   tls_Xlinkrefs_l_fein             := tools.macf_LayoutTools(recordof(Xlinkrefs_l_fein             .logical)  ,false,regexfilter,true,true);
-  tls_Xlinkrefs_l_contact          := tools.macf_LayoutTools(recordof(Xlinkrefs_l_contact          .logical)  ,false,regexfilter,true,true);
+  tls_Xlinkrefs_l_contact_st       := tools.macf_LayoutTools(recordof(Xlinkrefs_l_contact_st       .logical)  ,false,regexfilter,true,true);
+  tls_Xlinkrefs_l_contact_zip      := tools.macf_LayoutTools(recordof(Xlinkrefs_l_contact_zip      .logical)  ,false,regexfilter,true,true);
   tls_Xlinkrefs_l_url              := tools.macf_LayoutTools(recordof(Xlinkrefs_l_url              .logical)  ,false,regexfilter,true,true);
   tls_Xlinkrefs_l_email            := tools.macf_LayoutTools(recordof(Xlinkrefs_l_email            .logical)  ,false,regexfilter,true,true);
   tls_Xlinkrefs_l_contact_did      := tools.macf_LayoutTools(recordof(Xlinkrefs_l_contact_did      .logical)  ,false,regexfilter,true,true);
@@ -238,7 +242,8 @@ module
     ,if(count(tls_Xlinkrefs_l_address3       .setAllFields) > 0 ,output(tls_Xlinkrefs_l_address3       .setAllFields ,named('tls_Xlinkrefs_l_address3'          )))
     ,if(count(tls_Xlinkrefs_l_phone          .setAllFields) > 0 ,output(tls_Xlinkrefs_l_phone          .setAllFields ,named('tls_Xlinkrefs_l_phone'             )))
     ,if(count(tls_Xlinkrefs_l_fein           .setAllFields) > 0 ,output(tls_Xlinkrefs_l_fein           .setAllFields ,named('tls_Xlinkrefs_l_fein'              )))
-    ,if(count(tls_Xlinkrefs_l_contact        .setAllFields) > 0 ,output(tls_Xlinkrefs_l_contact        .setAllFields ,named('tls_Xlinkrefs_l_contact'           )))
+    ,if(count(tls_Xlinkrefs_l_contact_st     .setAllFields) > 0 ,output(tls_Xlinkrefs_l_contact_st     .setAllFields ,named('tls_Xlinkrefs_l_contact_st'        )))
+    ,if(count(tls_Xlinkrefs_l_contact_zip    .setAllFields) > 0 ,output(tls_Xlinkrefs_l_contact_zip    .setAllFields ,named('tls_Xlinkrefs_l_contact_zip'       )))
     ,if(count(tls_Xlinkrefs_l_url            .setAllFields) > 0 ,output(tls_Xlinkrefs_l_url            .setAllFields ,named('tls_Xlinkrefs_l_url'               )))
     ,if(count(tls_Xlinkrefs_l_email          .setAllFields) > 0 ,output(tls_Xlinkrefs_l_email          .setAllFields ,named('tls_Xlinkrefs_l_email'             )))
     ,if(count(tls_Xlinkrefs_l_contact_did    .setAllFields) > 0 ,output(tls_Xlinkrefs_l_contact_did    .setAllFields ,named('tls_Xlinkrefs_l_contact_did'       )))
