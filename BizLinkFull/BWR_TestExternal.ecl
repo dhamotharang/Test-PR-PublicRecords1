@@ -1,6 +1,6 @@
-﻿//This is the code to execute in a builder window
+//This is the code to execute in a builder window
 #OPTION('multiplePersistInstances', FALSE);
-#workunit('name','BizLinkFull.BWR_TestExternal - Test External Linking - Precision and Recall - SALT V4.4.1');
+#workunit('name','BizLinkFull.BWR_TestExternal - Test External Linking - Precision and Recall - SALT V4.4.4');
 IMPORT BizLinkFull,SALT44;
 // This is the 'thor only' version (no roxie)
   SmallJob := FALSE;
@@ -24,4 +24,4 @@ IMPORT BizLinkFull,SALT44;
   Errors;
   MyOutFile;
   Stats;
- 
+
