@@ -1,10 +1,9 @@
-﻿IMPORT BIPV2, Business_Risk_BIP, DueDiligence, STD, Watercraft, Doxie;
+﻿IMPORT BIPV2, Business_Risk_BIP, DueDiligence, Watercraft, doxie;
 
-EXPORT getBusWatercraft(DATASET(DueDiligence.layouts.Busn_Internal) BusnData, 
+EXPORT getBusWatercraft(DATASET(DueDiligence.layouts.Busn_Internal) BusnData,
 											 Business_Risk_BIP.LIB_Business_Shell_LIBIN Options,
-											 BIPV2.mod_sources.iParams linkingOptions,
-                                             doxie.IDataAccess mod_access = MODULE (doxie.IDataAccess) END) := FUNCTION
-										 
+											 BIPV2.mod_sources.iParams linkingOptions) := FUNCTION
+
 
 	watercraftRaw := Watercraft.Key_LinkIds.kFetch2(DueDiligence.CommonBusiness.GetLinkIDs(BusnData),
                                                   Business_Risk_BIP.Common.SetLinkSearchLevel(Options.LinkSearchLevel),
@@ -12,48 +11,48 @@ EXPORT getBusWatercraft(DATASET(DueDiligence.layouts.Busn_Internal) BusnData,
                                                   linkingOptions,
                                                   Business_Risk_BIP.Constants.Limit_Default,
                                                   Options.KeepLargeBusinesses);
-																							
+
 
 	//Add our sequence number to the Raw Watercraft records found for this Business
 	watercraftRaw_with_seq := DueDiligence.CommonBusiness.AppendSeq(watercraftRaw, BusnData, TRUE);
-  
+
   tempSlimWatercraft := PROJECT(watercraftRaw_with_seq, TRANSFORM({DueDiligence.LayoutsInternal.WatercraftSlimLayout, UNSIGNED4 dateFirstSeen},
                                                                SELF.watercraftKey := LEFT.watercraft_key;
                                                                SELF.sequenceKey := LEFT.sequence_key;
-                                                               SELF.stateOrigin := LEFT.state_origin; 
-                                                               
+                                                               SELF.stateOrigin := LEFT.state_origin;
+
                                                                SELF.seq := LEFT.seq;
                                                                SELF.ultid := LEFT.ultid;
                                                                SELF.orgid := LEFT.orgid;
                                                                SELF.seleid := LEFT.seleid;
                                                                SELF.historyDate := LEFT.historyDate;
-                                                               
+
                                                                SELF.dateFirstSeen := (UNSIGNED4)IF(LEFT.date_first_seen = DueDiligence.Constants.EMPTY, LEFT.date_vendor_first_reported, LEFT.date_first_seen);
                                                                SELF := [];));
-	
+
 	//Clean dates used in logic and/or attribute levels here so all comparisions flow through consistently
 	watercraftCleanDates := DueDiligence.Common.CleanDatasetDateFields(tempSlimWatercraft, 'dateFirstSeen');
-	
+
   //Filter records based on when we first seen the data
 	filteredWatercraft := DueDiligence.CommonDate.FilterRecordsSingleDate(watercraftCleanDates, dateFirstSeen);
-  
+
   slimWatercraft := PROJECT(filteredWatercraft, TRANSFORM(DueDiligence.LayoutsInternal.WatercraftSlimLayout, SELF := LEFT;));
-  
+
   //Get the details about the watercraft
-  watercraftDetails := DueDiligence.getSharedWatercraft(slimWatercraft, mod_access);  
-  
+  watercraftDetails := DueDiligence.getSharedWatercraft(slimWatercraft, PROJECT(Options, doxie.IDataAccess));
+
   addWaterCraft := JOIN(BusnData, watercraftDetails,
-                        #EXPAND(DueDiligence.Constants.mac_JOINLinkids_BusInternal()),												
-                        TRANSFORM(DueDiligence.Layouts.Busn_Internal, 
+                        #EXPAND(DueDiligence.Constants.mac_JOINLinkids_BusInternal()),
+                        TRANSFORM(DueDiligence.Layouts.Busn_Internal,
                                   SELF.watercraftCount := RIGHT.totalWatercraft;
                                   SELF.watercraftLength := RIGHT.maxWatercraftLength;
                                   SELF.busWatercraft := RIGHT.allwatercraft;
                                   SELF := LEFT),
                         LEFT OUTER);
-  
-  
 
- 
+
+
+
 	//********************
 	// DEBUGGING OUTPUTS
 	//*********************
@@ -64,8 +63,8 @@ EXPORT getBusWatercraft(DATASET(DueDiligence.layouts.Busn_Internal) BusnData,
 	// OUTPUT(slimWatercraft, NAMED('slimWatercraft'));
 	// OUTPUT(watercraftDetails, NAMED('watercraftDetails'));
 	// OUTPUT(addWaterCraft, NAMED('addWaterCraft'));
-  
 
- 
+
+
 	RETURN addWaterCraft;
 END;

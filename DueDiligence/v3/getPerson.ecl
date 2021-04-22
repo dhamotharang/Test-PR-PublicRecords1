@@ -20,7 +20,6 @@
     ddOptions - used to house any additional options for this product (can also be expanded for future needs):
                           includeCitizenship - boolean indicating whether to run citizenship product or not
                           includeReportData - boolean indicating report data is being requested along with attribute(s)
-                          ssnMask - string indicating how to mask SSNs if including report data EXPECTING: ALL/LAST4/FIRST5
                           inputUsage - how to use the input for any attribute/report calculations
                           bs - boca shell to use if including as to not retrieve another if calling system has already retrieved
     debugMode - boolean indicating additional outputs be returned for debugging purposes  NEVER TO BE ON IN PRODUCTION

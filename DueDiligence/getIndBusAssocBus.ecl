@@ -1,43 +1,42 @@
-﻿IMPORT BIPV2, Business_Risk_BIP, DueDiligence, Doxie;
+﻿IMPORT BIPV2, Business_Risk_BIP, DueDiligence;
 
 EXPORT getIndBusAssocBus(DATASET(DueDiligence.Layouts.Busn_Internal) businesses,
                           Business_Risk_BIP.LIB_Business_Shell_LIBIN options,
-                          BIPV2.mod_sources.iParams linkingOptions,
-                          doxie.IDataAccess mod_access = MODULE (doxie.IDataAccess) END) := FUNCTION
-     
-     
+                          BIPV2.mod_sources.iParams linkingOptions) := FUNCTION
+
+
     BOOLEAN includeAllBusinessData := FALSE;
     BOOLEAN includeReportData := FALSE;
-                          
+
     //get information to retrieve SIC/NAICS info
     linkedBus := DueDiligence.getBusLinkedBus(businesses, options, linkingOptions);
-  
+
     busReg := DueDiligence.getBusRegistration(linkedBus, options, includeAllBusinessData);
-    
-    busHeader := DueDiligence.getBusHeader(busReg, options, linkingOptions, includeAllBusinessData, includeReportData, mod_access);
-    
+
+    busHeader := DueDiligence.getBusHeader(busReg, options, linkingOptions, includeAllBusinessData, includeReportData);
+
     busSOS := DueDiligence.getBusSOSDetail(busHeader, options, includeAllBusinessData, includeReportData);
-    
+
     addrRisk := DueDiligence.getBusAddrData(busSOS, options, includeReportData);  //must be called after getBusSOSDetail & getBusRegistration
-    
-    
-        
-    
-   
+
+
+
+
+
    regulatoryAccess := MODULE(DueDiligence.DDInterface.iDDRegulatoryCompliance)
-                            EXPORT UNSIGNED3 glba := mod_access.glb;
-                            EXPORT UNSIGNED3 dppa := mod_access.dppa;
-                            EXPORT STRING drm := mod_access.DataRestrictionMask;
-                            EXPORT STRING dpm := mod_access.DataPermissionMask;
-                            
+                            EXPORT UNSIGNED3 glba := options.glb;
+                            EXPORT UNSIGNED3 dppa := options.dppa;
+                            EXPORT STRING drm := options.DataRestrictionMask;
+                            EXPORT STRING dpm := options.DataPermissionMask;
+
                             //CCPA Regulatory fields
-                            EXPORT UNSIGNED1 lexIDSourceOptOut := mod_access.lexid_source_optout;
-                            EXPORT STRING transactionID := mod_access.transaction_id;
-                            EXPORT UNSIGNED6 globalCompanyID := mod_access.global_company_id;
+                            EXPORT UNSIGNED1 lexIDSourceOptOut := options.lexid_source_optout;
+                            EXPORT STRING transactionID := options.transaction_id;
+                            EXPORT UNSIGNED6 globalCompanyID := options.global_company_id;
                         END;
-    
-    
-    
+
+
+
     transDataForV3 := PROJECT(businesses, TRANSFORM(DueDiligence.v3Layouts.Internal.BusinessTemp,
                                                     SELF.seq := LEFT.seq;
                                                     SELF.historyDate := LEFT.historydate;
@@ -45,18 +44,18 @@ EXPORT getIndBusAssocBus(DATASET(DueDiligence.Layouts.Busn_Internal) businesses,
                                                     SELF.inquiredBusiness.orgID := LEFT.busn_info.BIP_IDs.OrgID.LinkID;
                                                     SELF.inquiredBusiness.seleID := LEFT.busn_info.BIP_IDs.SeleID.LinkID;
                                                     SELF := [];));
-    
-    
+
+
     bestIndustryResults := DueDiligence.v3BusinessData.getIndustryBest(transDataForV3, regulatoryAccess);
     rawIndustryResults := DueDiligence.v3BusinessData.getIndustry(bestIndustryResults, regulatoryAccess);
-    
+
     newIndustryResults := PROJECT(addrRisk, TRANSFORM(DueDiligence.layouts.Busn_Internal,
-                                                      
+
                                                       industryForBus := rawIndustryResults(seq = LEFT.seq AND ultID = LEFT.busn_info.BIP_IDs.UltID.LinkID AND
                                                                                            orgID = LEFT.busn_info.BIP_IDs.OrgID.LinkID AND seleID = LEFT.busn_info.BIP_IDs.UltID.LinkID);
-                                                      
+
                                                       limitedIndustry := CHOOSEN(industryForBus, DueDiligence.Constants.MAX_SIC_NAIC);
-                                                      
+
                                                       SELF.numOfSicNaic := COUNT(limitedIndustry);
                                                       SELF.sicNaicSources := PROJECT(limitedIndustry, TRANSFORM(DueDiligence.Layouts.LayoutSICNAIC,
                                                                                                                 SELF.DateFirstSeen := LEFT.dateFirstSeen;
@@ -72,12 +71,12 @@ EXPORT getIndBusAssocBus(DATASET(DueDiligence.Layouts.Busn_Internal) businesses,
                                                                                                                 SELF.IsPrimary := LEFT.isBest;
                                                                                                                 SELF.riskiestLevel := LEFT.riskiestOverallLevel;
                                                                                                                 SELF := [];));
-                                                      
-                                                       
+
+
                                                       SELF := LEFT;));
-    
-    getBEOs := DueDiligence.getSharedBEOs(newIndustryResults, options, linkingOptions, mod_access); 
-    
+
+    getBEOs := DueDiligence.getSharedBEOs(newIndustryResults, options, linkingOptions);
+
     //populate the structure for the business
     associatedBusinesses := PROJECT(getBEOs, TRANSFORM(DueDiligence.LayoutsInternal.IndBusAssociations,
                                                         SELF.seq := LEFT.seq;
@@ -104,27 +103,27 @@ EXPORT getIndBusAssocBus(DATASET(DueDiligence.Layouts.Busn_Internal) businesses,
                                                                                               LEFT.adrBusnType = DueDiligence.Constants.CMPTYP_LIMITED_LIABILITY_PARTNERSHIP OR LEFT.hdBusnType = DueDiligence.Constants.CMPTYP_LIMITED_LIABILITY_PARTNERSHIP => DueDiligence.Constants.CMPTYP_LIMITED_LIABILITY_PARTNERSHIP,
                                                                                               DueDiligence.Constants.EMPTY);
                                                         SELF := [];));
-    
 
-      
-      
-      
-      
-                          
-    // OUTPUT(linkedBus, NAMED('linkedBus'));                
-    // OUTPUT(busReg, NAMED('busReg'));                
-    // OUTPUT(busHeader, NAMED('busHeader'));                
-    // OUTPUT(busSOS, NAMED('busSOS'));                
-    // OUTPUT(addrRisk, NAMED('addrRisk')); 
-    
-    // OUTPUT(transDataForV3, NAMED('transDataForV3'));         
-    // OUTPUT(bestIndustryResults, NAMED('bestIndustryResults'));         
-    // OUTPUT(rawIndustryResults, NAMED('rawIndustryResults'));         
-    // OUTPUT(newIndustryResults, NAMED('newIndustryResults'));         
-    
-    // OUTPUT(getBEOs, NAMED('getBEOs'));                
-    // OUTPUT(associatedBusinesses, NAMED('associatedBusinesses'));               
-                          
-                          
-    RETURN associatedBusinesses;                      
+
+
+
+
+
+
+    // OUTPUT(linkedBus, NAMED('linkedBus'));
+    // OUTPUT(busReg, NAMED('busReg'));
+    // OUTPUT(busHeader, NAMED('busHeader'));
+    // OUTPUT(busSOS, NAMED('busSOS'));
+    // OUTPUT(addrRisk, NAMED('addrRisk'));
+
+    // OUTPUT(transDataForV3, NAMED('transDataForV3'));
+    // OUTPUT(bestIndustryResults, NAMED('bestIndustryResults'));
+    // OUTPUT(rawIndustryResults, NAMED('rawIndustryResults'));
+    // OUTPUT(newIndustryResults, NAMED('newIndustryResults'));
+
+    // OUTPUT(getBEOs, NAMED('getBEOs'));
+    // OUTPUT(associatedBusinesses, NAMED('associatedBusinesses'));
+
+
+    RETURN associatedBusinesses;
 END;

@@ -7,10 +7,10 @@
 target_url_a := Gateway._shortcuts.dev155_roxie;
 target_url_b := Gateway._shortcuts.dev155_roxie;
 
-my_query := 'DueDiligence.DueDiligence_service';
+my_query := 'DueDiligence.DueDiligence_PersonRptService';
 
-//tids := [693, 703, 713, 723];
-testcases := dev_regression.bucket().get(my_query, 'compliance regression'); //(tid IN tids);
+tids := [2825];
+testcases := dev_regression.bucket().get(my_query, 'compliance regression');// (tid IN tids);
 OUTPUT(testcases, NAMED('testcases'));
 
 mod_test := MODULE (dev_regression.ISoapConfig)

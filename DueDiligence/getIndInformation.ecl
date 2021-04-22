@@ -1,13 +1,10 @@
 ﻿IMPORT Business_Risk_BIP, doxie, DueDiligence, Gateway, risk_indicators;
 
 
-EXPORT getIndInformation(Business_Risk_BIP.LIB_Business_Shell_LIBIN options,
-                                                doxie.IDataAccess mod_access = MODULE (doxie.IDataAccess) END) := MODULE
-
-
-
+EXPORT getIndInformation(Business_Risk_BIP.LIB_Business_Shell_LIBIN options) := MODULE
 
     SHARED GetBestData(DATASET(Risk_Indicators.Layout_Input) inData) := FUNCTION
+        mod_access := PROJECT(options, doxie.IDataAccess);
 
         UNSIGNED1 appendBest := 0;
         gateways := DATASET([], Gateway.Layouts.Config);
@@ -15,12 +12,12 @@ EXPORT getIndInformation(Business_Risk_BIP.LIB_Business_Shell_LIBIN options,
         INTEGER bsVersion := DueDiligence.ConstantsQuery.DEFAULT_BS_VERSION;
         UNSIGNED8 bsOptions := DueDiligence.ConstantsQuery.DEFAULT_BS_OPTIONS;
 
-        glbaOK := options.isValidGlb();
-        dppaOK := options.isValidDppa();
+        glbaOK := mod_access.isValidGlb();
+        dppaOK := mod_access.isValidDppa();
 
 
 
-        withDID := risk_indicators.iid_getDID_prepOutput(inData, options.dppa, options.glb, FALSE, bsVersion, options.DataRestrictionMask, appendBest, gateways, bsOptions,
+        withDID := risk_indicators.iid_getDID_prepOutput(inData, mod_access.dppa, mod_access.glb, FALSE, bsVersion, mod_access.DataRestrictionMask, appendBest, gateways, bsOptions,
                                                                                               mod_access := mod_access);
 
         //pick the DID with the highest score,
