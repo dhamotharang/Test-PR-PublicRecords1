@@ -21,6 +21,7 @@ END
 	STRING GLBPURPOSE: LABEL("GLB Purpose"),DEFAULT("^GLOBAL|GLBPURPOSE");
 	STRING DATARESTRICTIONMASK: LABEL("Data Restriction Mask"),DEFAULT("^GLOBAL|DATARESTRICTIONMASK");
 	STRING DATAPERMISSIONMASK: LABEL("Data Permission Mask"),DEFAULT("^GLOBAL|DATAPERMISSIONMASK");
+	STRING INDUSTRYCLASS: LABEL("Industry Class"),DEFAULT("^GLOBAL|INDUSTRYCLASS"), OPTIONAL;
 	STRING Appends: LABEL("ADL Appends Option"),DEFAULT("^GLOBAL|APPENDS");
 	STRING Verify: LABEL("ADL Verify Option"),DEFAULT("^GLOBAL|VERIFY");
 	ENUM("False","True") Deduped: LABEL("ADL Deduped Option"),DESCRIPTION("Dedup output records from ADL Best"),OPTIONAL,DEFAULT("True");
@@ -66,7 +67,7 @@ GENERATES INLINE
   ParallelRequests  := IF (%PARALLELREQUESTS% BETWEEN 1 AND 2, %PARALLELREQUESTS%,2);
  
   %^edsOutput% := AppendAdlBest.macAppendAdlBest(%dsInput%, %Lexid%, %UniqueId%, %^qPrefix%,
-    %^qDPPAPURPOSE%, %^qGLBPURPOSE%, %^qDATARESTRICTIONMASK%, %^qDATAPERMISSIONMASK%,
+    %^qDPPAPURPOSE%, %^qGLBPURPOSE%, %^qDATARESTRICTIONMASK%, %^qDATAPERMISSIONMASK%, %^qINDUSTRYCLASS%,
     %^qAppends%, %^qVerify%, %^qDeduped%, %^qIncludeRanking%, MaxResultsPerAcct, %^qPatriotProcess%,
     %^qAdlRoxieIP%, ParallelNodes, BatchSize, ParallelRequests);
 ENDGENERATES
