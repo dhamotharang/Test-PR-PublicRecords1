@@ -129,20 +129,6 @@ EXPORT fn_find_collisions_ex	(
 				3) informational: state1=state2 and beneft1<>benefit2: NOT IMPLEMENTED YET
 		***/
 		AND
-		(
-			(left.ProgramState <> right.ProgramState AND nac_V2.MatchAllowed(left.ProgramCode,right.ProgramCode))
-			OR
-			(left.GroupId = right.GroupId and 
-				nac_v2.GetCollisionCode(left.ProgramCode) = nac_v2.GetCollisionCode(right.ProgramCode)
-				and left.CaseId <> right.CaseId
-				and left.ClientId <> right.ClientId
-			)
-			OR
-			(left.GroupId <> right.GroupId and 
-				nac_v2.GetCollisionCode(left.ProgramCode) = nac_v2.GetCollisionCode(right.ProgramCode)
-			)
-		)
-		AND
 		#if('N' in matchset)
 			left.lname=right.lname and
 		  #if(fname_match = 1)
@@ -226,7 +212,20 @@ EXPORT fn_find_collisions_ex	(
 			#end
 		#end
 		
-		left.PrepRecSeq<>right.PrepRecSeq 			// do not join to self
+		(
+			(left.ProgramState <> right.ProgramState AND nac_V2.MatchAllowed(left.ProgramCode,right.ProgramCode))
+			OR
+			(left.GroupId = right.GroupId and 
+				nac_v2.GetCollisionCode(left.ProgramCode) = nac_v2.GetCollisionCode(right.ProgramCode)
+				and left.CaseId <> right.CaseId
+				and left.ClientId <> right.ClientId
+			)
+			OR
+			(left.GroupId <> right.GroupId and 
+				nac_v2.GetCollisionCode(left.ProgramCode) = nac_v2.GetCollisionCode(right.ProgramCode)
+			)
+		)
+		AND left.PrepRecSeq<>right.PrepRecSeq 			// do not join to self
 		,nac_V2.xCollisions_ex(left,right, priority_, matchset), SKEW(0.2) //		, KEEP(2)
 		#if('L' in matchset
 				OR 'N' in matchset
