@@ -37,7 +37,7 @@ Replace previous address with new address
 								self.Mailing_Street2 := Coalesce1(newbase.Mailing_Street2, base.Mailing_Street2);
 								self.Mailing_City := Coalesce1(newbase.Mailing_City, base.Mailing_City);
 								self.Mailing_State := Coalesce1(newbase.Mailing_State, base.Mailing_State);
-								self.Mailing_Zip := Coalesce1(newbase.Physical_Zip, base.Mailing_Zip);
+								self.Mailing_Zip := Coalesce1(newbase.Mailing_Zip, base.Mailing_Zip);
 
 								// clean addresses
 								self.prim_range := Coalesce1(newbase.prim_range, base.prim_range);

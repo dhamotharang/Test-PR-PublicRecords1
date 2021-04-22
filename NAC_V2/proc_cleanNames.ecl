@@ -1,4 +1,7 @@
-import ut, VersionControl,lib_stringlib,lib_fileservices,_control,did_add,_validate, address, NID, STD;
+﻿import ut, lib_stringlib,lib_fileservices,_control, address, NID, STD;
+
+name_suffixes := $.Mod_Validation.suffix_set;
+string FixSuffix(string sfx) := IF(sfx in name_suffixes, sfx, '');
 
 EXPORT proc_cleanNames(dataset(layout_Base2) basein) := FUNCTION
 
@@ -7,7 +10,7 @@ EXPORT proc_cleanNames(dataset(layout_Base2) basein) := FUNCTION
 										StandardizeName(left.FirstName)
 										,StandardizeName(left.MiddleName)
 										,StandardizeName(left.LastName)
-										,StandardizeName(left.NameSuffix)
+										,FixSuffix(StandardizeName(left.NameSuffix))
 										);
 									self := LEFT;
 							));
