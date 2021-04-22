@@ -44,6 +44,9 @@ r0 := record
 		//CCPA-97 Add 2 new fields for CCPA
 		unsigned4 global_sid;
 		unsigned8 record_sid;
+		UNSIGNED4 dt_effective_first;
+  		UNSIGNED4 dt_effective_last;
+  		UNSIGNED1 delta_ind;
 end;
 
 
@@ -153,6 +156,7 @@ r0 transform_party_aka(ds_CleanParsedAKA Linput) := transform
 		self.date_vendor_last_reported := Linput.date_vendor_last_reported;
 		self.global_sid := Linput.global_sid;
 		self.record_sid := Linput.record_sid;
+		self:=[];
 end;
 
 s2 := dedup(project(ds_CleanParsedAKA,transform_party_aka(left)),record,all,local);
