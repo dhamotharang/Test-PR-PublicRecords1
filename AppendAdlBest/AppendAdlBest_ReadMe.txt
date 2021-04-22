@@ -30,6 +30,7 @@ DPPA Purpose
 GLB Purpose
 Data Restriction Mask	
 Data Permission Mask
+Industry Class
 Appends - ADL Appends option, i.e 'BEST_ALL', 'BEST_EDA', etc.
 Verify - ADL Best Verify option, i.e. 'BEST_ALL', 'VERIFY_ALL', etc.
 Deduped - ADL Best Deduped option 
