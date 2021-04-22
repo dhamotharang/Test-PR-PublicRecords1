@@ -1,4 +1,4 @@
-import patriot,didville;
+﻿import patriot,didville;
 
 export Layout_Did_OutBatch := record
 	 unsigned6 did := 0;
@@ -9,4 +9,5 @@ export Layout_Did_OutBatch := record
 	 patriot.Layout_PatriotAppend;
 	 didville.layout_lookups;
 	 didville.layout_livingsits;
+   unsigned8 location_id := 0;
 end;
