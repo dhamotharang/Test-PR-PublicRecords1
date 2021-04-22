@@ -99,8 +99,6 @@ r1 := record
 	//CCPA-97 new fields for CCPA. However these fields are not in thor_data400::base::sanctn::np::party_aka_dba
 	STRING8 date_vendor_first_reported:='';
 	STRING8 date_vendor_last_reported:='';
-	unsigned4 global_sid:=0;
-	unsigned8 record_sid:=0;
 end;
 
 

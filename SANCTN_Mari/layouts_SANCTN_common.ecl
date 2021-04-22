@@ -58,10 +58,10 @@ export SANCTN_incident_did := RECORD
 END;
 
 export SANCTN_incident_bip := RECORD
-		dx_common.layout_metadata;
 		BIPV2.IDlayouts.l_xlink_ids;  //Added for BIP project
 		unsigned8 source_rec_id := 0; //Added for BIP project		
 		SANCTN_incident_did;
+		dx_common.layout_metadata;
 END;
 
 export SANCTN_party_base := RECORD
@@ -164,7 +164,6 @@ Standard.L_Address.detailed;
 END;
 
 export SANCTN_incident_text	:= RECORD
-		dx_common.layout_metadata;
 		STRING8 BATCH;
 		STRING1 DBCODE;
 		STRING8 INCIDENT_NUM;
@@ -172,10 +171,11 @@ export SANCTN_incident_text	:= RECORD
 		STRING3 SEQ;
 		STRING20 FIELD_NAME;
 		STRING FIELD_TXT;
+		dx_common.layout_metadata;
 END;
 
 export SANCTN_party_text	:= RECORD
-		dx_common.layout_metadata;
+		
 		STRING8 BATCH;
 		STRING1 DBCODE;
 		STRING8 INCIDENT_NUM;
@@ -183,11 +183,12 @@ export SANCTN_party_text	:= RECORD
 		STRING3 SEQ;
 		STRING20 FIELD_NAME;
 		STRING FIELD_TXT;
+		dx_common.layout_metadata;
 END;
 
 
 export Midex_cd := RECORD
-		dx_common.layout_metadata
+
 		STRING8		BATCH;
 		STRING1	 	DBCODE;
 		INTEGER		PRIMARY_KEY;
@@ -201,11 +202,12 @@ export Midex_cd := RECORD
 		STRING500	OTHER_DESC;
 		STRING80  STD_TYPE_DESC;   	//populate only if FIELD_NAME = 'LICENSECODE'
 		STRING20	CLN_LICENSE_NUMBER;
+		dx_common.layout_metadata
 END;
 
 
 export PARTY_AKA_DBA := RECORD
-		dx_common.layout_metadata;
+		
 		STRING8   BATCH;
 		STRING1 	DBCODE;	
 		STRING8   INCIDENT_NUM;
@@ -216,6 +218,7 @@ export PARTY_AKA_DBA := RECORD
 		STRING50 	LAST_NAME;
 		STRING100 AKA_DBA_TEXT;			// Concatenated format fo FML	for AKA names; else company
 		INTEGER		PARTY_KEY;
+		dx_common.layout_metadata;
 END;
 
 
