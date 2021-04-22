@@ -1,4 +1,4 @@
-unsigned record_limit :=  3;     //number of records to read from input file; 0 means ALL
+﻿unsigned record_limit :=  3;     //number of records to read from input file; 0 means ALL
 unsigned1 parallel_calls := 1;  //number of parallel soap calls to make [1..30]
 
 //===================  input-output files  ======================
@@ -144,7 +144,7 @@ indata := PROJECT(ds_input, t_f(LEFT,COUNTER));
 output(indata, named('indata'));
 
 
-roxieIP := 'http://roxiestaging.br.seisint.com:9876'; // staging vip
+roxieIP := 'http://certstagingvip.hpcc.risk.regn.net:9876'; // staging vip
 
 
 temp_layout := record

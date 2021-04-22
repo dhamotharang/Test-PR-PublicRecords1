@@ -2,10 +2,10 @@
 //W20200806-095657 Prod
 
 IMPORT _Control, doxie, header_quick, watchdog, data_services, mdr, std, ut;
-EXPORT NonFCRA_PeopleHeader_and_Prof_Licenses(string pHostname, string pTarget, string pContact ='\' \'') := function
+EXPORT NonFCRA_PeopleHeader_and_Prof_Licenses(string pHostname, string pTarget, string pContact ='\' \'', STRING today = (STRING8)STD.Date.Today()) := function
 #OPTION('multiplePersistInstances',FALSE); 
 
-filedate := (STRING8)Std.Date.Today();
+filedate := today;
 
 //person header key
 rs_Key_DID_PHDR := PULL(doxie.key_header);
@@ -117,11 +117,11 @@ despray_pls_ls_tbl := STD.File.DeSpray('~thor_data400::data_insight::data_metric
 
 //if everything in the Sequential statement runs, it will send the Success email, else it will send the Failure email
 email_alert := SEQUENTIAL(
-					output(tbl_PHDR_DID_by_vendor,,'~thor_data400::data_insight::data_metrics::Key_DID_PHDR_countDIDs_by_vendor_'+ filedate +'.csv', csv(heading(single), separator('|'),terminator('\r\n'),quote('\"')),overwrite)
-					,output(srt_tbl_src_dates_first_seen,,'~thor_data400::data_insight::data_metrics::tbl_Key_PHdr_Non_FCRA_DIDs_FirstSeen_'+ filedate +'.csv', csv(heading(single), separator('|'),terminator('\r\n'),quote('\"')),overwrite)
-					,output(srt_tbl_src_dates_last_seen,,'~thor_data400::data_insight::data_metrics::tbl_Key_PHdr_Non_FCRA_DIDs_LastSeen_'+ filedate +'.csv', csv(heading(single), separator('|'),terminator('\r\n'),quote('\"')),overwrite)
-					,output(srt_tbl_src_dates_first_seen(src='PL'),,'~thor_data400::data_insight::data_metrics::tbl_Key_PHdr_PLs_Non_FCRA_DIDs_FirstSeen_'+ filedate +'.csv', csv(heading(single), separator('|'),terminator('\r\n'),quote('\"')),overwrite)
-					,output(srt_tbl_src_dates_last_seen(src='PL'),,'~thor_data400::data_insight::data_metrics::tbl_Key_PHdr_PLs_Non_FCRA_DIDs_LastSeen_'+ filedate +'.csv', csv(heading(single), separator('|'),terminator('\r\n'),quote('\"')),overwrite)
+					output(tbl_PHDR_DID_by_vendor,,'~thor_data400::data_insight::data_metrics::Key_DID_PHDR_countDIDs_by_vendor_'+ filedate +'.csv', csv(heading(single), separator('|'),terminator('\r\n'),quote('\"')), overwrite, expire(10))
+					,output(srt_tbl_src_dates_first_seen,,'~thor_data400::data_insight::data_metrics::tbl_Key_PHdr_Non_FCRA_DIDs_FirstSeen_'+ filedate +'.csv', csv(heading(single), separator('|'),terminator('\r\n'),quote('\"')), overwrite, expire(10))
+					,output(srt_tbl_src_dates_last_seen,,'~thor_data400::data_insight::data_metrics::tbl_Key_PHdr_Non_FCRA_DIDs_LastSeen_'+ filedate +'.csv', csv(heading(single), separator('|'),terminator('\r\n'),quote('\"')), overwrite, expire(10))
+					,output(srt_tbl_src_dates_first_seen(src='PL'),,'~thor_data400::data_insight::data_metrics::tbl_Key_PHdr_PLs_Non_FCRA_DIDs_FirstSeen_'+ filedate +'.csv', csv(heading(single), separator('|'),terminator('\r\n'),quote('\"')), overwrite, expire(10))
+					,output(srt_tbl_src_dates_last_seen(src='PL'),,'~thor_data400::data_insight::data_metrics::tbl_Key_PHdr_PLs_Non_FCRA_DIDs_LastSeen_'+ filedate +'.csv', csv(heading(single), separator('|'),terminator('\r\n'),quote('\"')), overwrite, expire(10))
 					,despray_hdr_vnd_tbl
 					,despray_hdr_fs_tbl
 					,despray_hdr_ls_tbl

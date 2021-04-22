@@ -11,13 +11,14 @@ else_filter_find := '[Ã¢]';
 //else_filter_find := '[^[:print:]]';
 else_filter := '[^[:print:]]';
 
-SANCTN.layout_SANCTN_aka_dba_in clean_SANCTN_aka_dba(SANCTN_aka_dba input) := TRANSFORM
+SANCTN.layout_sanctn_aka_dba_base clean_SANCTN_aka_dba(SANCTN_aka_dba input) := TRANSFORM
 		self.LAST_NAME					:= ut.CleanSpacesAndUpper(input.LAST_NAME);
 		self.FIRST_NAME					:= ut.CleanSpacesAndUpper(input.FIRST_NAME);
 		self.MIDDLE_NAME				:= ut.CleanSpacesAndUpper(input.MIDDLE_NAME);
 	  self.AKA_DBA_TEXT       := if(input.COMPANY != '', ut.CleanSpacesAndUpper(input.COMPANY),
 																			STD.Str.CleanSpaces(TRIM(self.FIRST_NAME +' '+ self.MIDDLE_NAME+' '+self.LAST_NAME)));
 		self                     := input;
+		self:=[];
    
 end;
 

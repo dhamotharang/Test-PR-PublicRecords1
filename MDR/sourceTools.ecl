@@ -204,6 +204,7 @@ MODULE
 	export src_Daily_Utilities           := 'DU';    
 	export src_Dunn_Bradstreet           := 'D ';  // aka D&B DMI
 	export src_Dunn_Bradstreet_Fein      := 'DN';
+	export src_Dunn_Bradstreet_WorldBase := 'Z3';
 	export src_Dunndata_Consumer		      	 := 'A3';  //DF-23679 Dunndata Consumer Masterfile
 	export src_Dunn_Data_Email					 := 'DX';	 //EMAIL-103
 	export src_EBR                       := 'ER';  // Experian Business Reports	
@@ -467,7 +468,8 @@ MODULE
 	export src_Infutor_Motorcycle_Veh    := '2V';
 	export src_Vickers                   := 'V ';  // stock market insider trading info from Vickers   
 	export src_Voters_v2                 := 'VO';  // Voter Registrations
-    export src_MA_Census                 := 'UM';
+ export src_Voters_v2_block           := 'VB';
+ export src_MA_Census                 := 'UM';
 	export src_AK_Watercraft             := '#W';  // Watercrafts (boats, etc.) registrations ----v
 	export src_AL_Watercraft             := 'LW';
 	export src_AR_Watercraft             := 'RW';
@@ -577,7 +579,7 @@ MODULE
 		,src_WY_DL                     ,src_CO_Experian_DL            ,src_DE_Experian_DL            ,src_ID_Experian_DL            
 		,src_IL_Experian_DL            ,src_KY_Experian_DL            ,src_LA_Experian_DL            ,src_MD_Experian_DL            
 		,src_MS_Experian_DL            ,src_ND_Experian_DL            ,src_NH_Experian_DL            ,src_SC_Experian_DL            
-		,src_WV_Experian_DL            ,src_Dummy_Records             ,src_Dunn_Bradstreet           ,src_Dunn_Bradstreet_Fein      
+		,src_WV_Experian_DL            ,src_Dummy_Records             ,src_Dunn_Bradstreet           ,src_Dunn_Bradstreet_Fein								      
 		,src_EBR                       ,src_Edgar                     ,src_EMerge_Boat               ,src_EMerge_CCW                          ,src_EMerge_CCW_NY              
 		,src_EMerge_Cens               ,src_EMerge_Fish               ,src_EMerge_Hunt               ,src_EMerge_Master             
 		,src_Employee_Directories      ,src_Equifax                   ,src_Eq_Employer               ,src_Fares_Deeds_from_Asrs     
@@ -1781,6 +1783,7 @@ export set_NonDerog_FCRA_sources_v50 := [
 	export set_Dummy_Records2            := [src_Dummy_Records2            ];
 	export set_Dunn_Bradstreet           := [src_Dunn_Bradstreet           ];
 	export set_Dunn_Bradstreet_Fein      := [src_Dunn_Bradstreet_Fein      ];
+	export set_Dunn_Bradstreet_WorldBase := [src_Dunn_Bradstreet_WorldBase ];
 	export set_Dunndata_Consumer         := [src_Dunndata_Consumer         ];
 	export set_Dunn_Data_Email					 := [src_Dunn_Data_Email					 ];
 	export set_EBR                       := [src_EBR                       ];
@@ -2310,7 +2313,8 @@ export set_NonDerog_FCRA_sources_v50 := [
 	export SourceIsDPPA                       (string2 sr) := SourceGroup(sr)  in set_DPPA                       ;
 	export SourceIsDummy_Records              (string  sr) := sr               in set_Dummy_Records              ;
 	export SourceIsDunn_Bradstreet            (string  sr) := sr               in set_Dunn_Bradstreet            ;
-	export SourceIsDunn_Bradstreet_Fein       (string  sr) := sr               in set_Dunn_Bradstreet_Fein       ;
+	export SourceIsDunn_Bradstreet_Fein       (string  sr) := sr               in set_Dunn_Bradstreet_Fein           ;
+	export SourceIsDunn_Bradstreet_WorldBase  (string  sr) := sr               in set_Dunn_Bradstreet_WorldBase  ;
 	export SourceIsDunndata_Consumer          (string  sr) := sr               in set_Dunndata_Consumer          ;
 	export SourceIsDunn_Data_Email			      (string  sr) := sr               in set_Dunn_Data_Email			       ;
 	export SourceIsEBR                        (string  sr) := sr               in set_EBR                        ;
@@ -2855,6 +2859,7 @@ export set_NonDerog_FCRA_sources_v50 := [
 		,{src_Daily_Utilities						,'Daily Utilities'																					 }
 		,{src_Dunn_Bradstreet           ,'Dunn & Bradstreet'                                         }
 		,{src_Dunn_Bradstreet_Fein      ,'Dunn & Bradstreet Fein'                                    }
+		,{src_Dunn_Bradstreet_WorldBase ,'Dunn & Bradstreet WorldBase'                               }
 		,{src_Dunndata_Consumer         ,'Dunn Data Consumer Masterfile'                             }
 		,{src_Dunn_Data_Email						,'Dunn Data Email Addresses'																 }
 		,{src_EBR                       ,'Experian Business Reports'                                 }
@@ -3377,7 +3382,8 @@ export set_NonDerog_FCRA_sources_v50 := [
 		,src_Dummy_Records2            => 'Dummy Records2'                                        
 //		,src_Daily_Utilities					 => 'Daily Utilities'																			
 		,src_Dunn_Bradstreet           => 'Dunn & Bradstreet'                                    
-		,src_Dunn_Bradstreet_Fein      => 'Dunn & Bradstreet Fein'                               
+		,src_Dunn_Bradstreet_Fein      => 'Dunn & Bradstreet Fein'                                    
+		,src_Dunn_Bradstreet_WorldBase => 'Dunn & Bradstreet WorldBase'                              
 		,src_Dunndata_Consumer         => 'Dunn Data Consumer Masterfile'
 		,src_Dunn_Data_Email					 => 'Dunn Data Email Addresses'
 		,src_EBR                       => 'Experian Business Reports'                            

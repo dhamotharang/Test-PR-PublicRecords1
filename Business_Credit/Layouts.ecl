@@ -812,14 +812,20 @@ EXPORT	Layouts	:=	MODULE
 		BOOLEAN		active;
 	END;
 
+	EXPORT	rAccountBaseSeq	:=	RECORD
+		UNSIGNED4 seq_num := 0;
+		rAccountBase;
+	END;
+
 	EXPORT	rTradelineKey	:=	RECORD
 		STRING		Version;
 		STRING		Original_Version;
 		rAccountBase;
-        string     Raw_DBT_V5;
-        string     DBT_V5;
-		STRING3	   DBT;
-    END;
+		STRING	Raw_DBT_V5;
+		STRING	DBT_V5;
+		STRING3	DBT;
+	END;
+
 	
 	EXPORT	rBIClassification	:=	RECORD
 		STRING2		Record_Type;

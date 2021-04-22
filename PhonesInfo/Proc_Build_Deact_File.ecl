@@ -1,33 +1,30 @@
 ﻿IMPORT _control, std, ut;
 
-EXPORT Proc_Build_Deact_File(string version, string contacts/*, string eclsourceip, string thor_name*/) := FUNCTION
+EXPORT Proc_Build_Deact_File(string version, string eclsourceip, string thor_name, string contacts) := FUNCTION
+	
+	//DF-28845: Remove Old PhonesMetadata Keys from Daily Build			
 
-	//This build uses the PhonesInfo.File_Deact.History2 file for the input.	
-
-/*
-	//Spray Daily Raw File
+	//Spray Daily Raw File	
 	sprayDaily 					:= PhonesInfo.Spray_Deact2_Daily(version, eclsourceip, thor_name);
 		
-	//Project Daily Raw File to History Layout 
-	deactDaily 					:= project(distribute(PhonesInfo.File_Deact.Raw2), PhonesInfo.Layout_Deact.History2);														
+	//Project File to Maintain Filenames
+	ds_disconnect_daily := project(distribute(PhonesInfo.File_Deact.Raw2), PhonesInfo.Layout_Deact.History2);
 	
 	//Concat Daily Raw File to History File
-	concatRawHistory		:= output(dedup(sort(distribute(deactDaily + PhonesInfo.File_Deact.History2, hash(msisdn)), record, local), record, local),,'~thor_data400::in::phones::deact_daily_history_'+version,__compressed__);
+	concatRawHistory		:= output(dedup(sort(distribute(ds_disconnect_daily + PhonesInfo.File_Deact.History2, hash(msisdn)), record, local), record, local),,'~thor_data400::in::phones::deact2_daily_history_'+version,__compressed__);
 	
-	//Move History Files
-	moveRawHistory			:= Std.File.PromoteSuperFileList(['~thor_data400::in::phones::deact2_daily_history',
+	//Delete Old Base and History Files 
+	clearDelete 				:= sequential(nothor(fileservices.clearsuperfile('~thor_data400::base::phones::deact2_main_delete', true)),
+																		nothor(fileservices.clearsuperfile('~thor_data400::in::phones::deact2_daily_history_delete', true))
+																		);	
+																			
+	moveRawHistory			:= STD.File.PromoteSuperFileList(['~thor_data400::in::phones::deact2_daily_history',
 																												'~thor_data400::in::phones::deact2_daily_history_father',
 																												'~thor_data400::in::phones::deact2_daily_history_grandfather',
 																												'~thor_data400::in::phones::deact2_daily_history_delete'], '~thor_data400::in::phones::deact2_daily_history_'+version, true);						
-*/																												
+
 	//Build Base File
 	buildBase						:= output(PhonesInfo.Remap_Deact_File,,'~thor_data400::base::phones::deact2_main_'+version, __compressed__);
-	
-	//Delete Old Base and History Files 
-	clearDelete 				:= //sequential(
-																		nothor(fileservices.clearsuperfile('~thor_data400::base::phones::deact2_main_delete', true));//,
-																		/*nothor(fileservices.clearsuperfile('~thor_data400::in::phones::deact2_daily_history_delete', true))
-																		);*/	
 	
 	//Move Bases Files
 	moveBase						:= Std.File.PromoteSuperFileList(['~thor_data400::base::phones::deact2_main',
@@ -45,14 +42,11 @@ EXPORT Proc_Build_Deact_File(string version, string contacts/*, string eclsource
 																	);		
 	
 	//Run Actions
-	//The sprayDaily/concatRawHistory/moveRawHistory actions will be added, once the existing Phone Metadata Build has been replaced by the Phones Transaction Build.
-	//For now, the build will pull the PhonesInfo.File_Deact.History2 File from the PhonesInfo.Proc_Build_Disconnect_Full2 build to generate the new Digitial Segment Deact Base File.	
-
-	return sequential(//sprayDaily,
-										//concatRawHistory,
-										//moveRawHistory,
+	return sequential(sprayDaily,
+										concatRawHistory,
+										clearDelete,
+										moveRawHistory,
 										buildBase,
-										clearDelete, 
 										moveBase,
 										emailBuildNotice
 										);

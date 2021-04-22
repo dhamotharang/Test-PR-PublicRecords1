@@ -1,10 +1,10 @@
-import AutoStandardI,Doxie_Raw, AddressFeedback_Services,gateway;
+﻿import AutoStandardI,Doxie_Raw, AddressFeedback_Services,gateway;
 
 EXPORT mod_expandedPhoneRecords (doxie.expandedPhones.searchParams in_mod, DATASET(gateway.layouts.config) gateways = DATASET([], gateway.layouts.config)) := MODULE
 	EXPORT getPhonesRemote () := FUNCTION
 			serviceURL := gateways(Gateway.Configuration.IsNeutralRoxie(servicename))[1].URL;
 			serviceName := 'doxie.phone_noreconn_search';
-			// serviceURL := 'http://roxiestaging.br.seisint.com:9876';
+			// serviceURL := 'http://certstagingvip.hpcc.risk.regn.net:9876';
 
 			doxie.expandedPhones.soap_response_layout soapFailure() := TRANSFORM 
 				SELF := [];

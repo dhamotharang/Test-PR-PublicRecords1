@@ -1,12 +1,12 @@
 export MAC_Address(indataset,inbname,
-						infein,
-						phone,
-						inprim_name,inprim_range,inst,incity_name,inzip,insec_range,
-						inlookups,
-						inbdid,
-						inkeyname,outkey,by_lookup=TRUE,favor_lookup=0) :=
+            infein,
+            phone,
+            inprim_name,inprim_range,inst,incity_name,inzip,insec_range,
+            inlookups,
+            inbdid,
+            inkeyname,outkey,by_lookup=TRUE,favor_lookup=0) :=
 MACRO
-import autokey;
+import autokey, business_header;
 #uniquename(indata)
 %indata% := indataset;
 
@@ -17,19 +17,19 @@ import autokey;
 #uniquename(layout)
 %layout% := AutokeyB2.Layout_Address;
 
-  
+
 %layout%  %proj%(%indata% le) :=
 TRANSFORM
-	SELF.prim_name := ut.StripOrdinal(le.inprim_name);
-	SELF.prim_range := TRIM(ut.CleanPrimRange(le.inprim_range),LEFT);
-	SELF.st := le.inst;
-	SELF.city_code := HASH((qstring25)le.incity_name);
-	SELF.zip := le.inzip;
-	SELF.sec_range := le.insec_range;
-	SELF.bdid := le.inbdid;
-	SELF.cname_indic := business_header.CompanyCleanFields(le.inbname, true).indicative; 
-	SELF.cname_sec := business_header.CompanyCleanFields(le.inbname, true).secondary;
-	SELF.lookups := le.inlookups | ut.bit_set(0,0);
+  SELF.prim_name := ut.StripOrdinal(le.inprim_name);
+  SELF.prim_range := TRIM(ut.CleanPrimRange(le.inprim_range),LEFT);
+  SELF.st := le.inst;
+  SELF.city_code := HASH((qstring25)le.incity_name);
+  SELF.zip := le.inzip;
+  SELF.sec_range := le.insec_range;
+  SELF.bdid := le.inbdid;
+  SELF.cname_indic := business_header.CompanyCleanFields(le.inbname, true).indicative;
+  SELF.cname_sec := business_header.CompanyCleanFields(le.inbname, true).secondary;
+  SELF.lookups := le.inlookups | ut.bit_set(0,0);
 END;
 %p% := PROJECT(%indata%(inbname<>''), %proj%(LEFT));
 

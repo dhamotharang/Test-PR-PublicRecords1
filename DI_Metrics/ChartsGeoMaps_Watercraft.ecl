@@ -1,7 +1,7 @@
 ﻿IMPORT _control, watercraft, data_services, STD;
-export ChartsGeoMaps_Watercraft(string pHostname, string pTarget, string pContact ='\' \'') := function
+export ChartsGeoMaps_Watercraft(string pHostname, string pTarget, string pContact ='\' \'', STRING today = (STRING8)STD.Date.Today()) := function
 
-filedate := (STRING8)Std.Date.Today();
+filedate := today;
 
 boat_main := watercraft.file_base_main_prod;
 
@@ -29,8 +29,8 @@ Jessica's Feb 2019 WUIDs (prod):
 
 //if everything in the Sequential statement runs, it will send the Success email, else it will send the Failure email
 email_alert := SEQUENTIAL(
-					output(srt_veh_tbl,,'~thor_data400::data_insight::data_metrics::tbl_ChartsGeoMaps_Watercraft_By_Vehicle_Type_'+ filedate +'.csv', csv(heading(single), separator('|'),terminator('\r\n'),quote('\"')),overwrite)
-					,output(srt_prp_tbl,,'~thor_data400::data_insight::data_metrics::tbl_ChartsGeoMaps_Watercraft_By_Propulsion_Type_'+ filedate +'.csv', csv(heading(single), separator('|'),terminator('\r\n'),quote('\"')),overwrite)
+					output(srt_veh_tbl,,'~thor_data400::data_insight::data_metrics::tbl_ChartsGeoMaps_Watercraft_By_Vehicle_Type_'+ filedate +'.csv', csv(heading(single), separator('|'),terminator('\r\n'),quote('\"')), overwrite, expire(10))
+					,output(srt_prp_tbl,,'~thor_data400::data_insight::data_metrics::tbl_ChartsGeoMaps_Watercraft_By_Propulsion_Type_'+ filedate +'.csv', csv(heading(single), separator('|'),terminator('\r\n'),quote('\"')), overwrite, expire(10))
 					,despray_veh_tbl
 					,despray_prp_tbl):
 					Success(FileServices.SendEmail(pContact, 'ChartsGeoMaps Group: ChartsGeoMaps_Watercraft Build Succeeded', workunit + ': Build complete.' + filedate)),

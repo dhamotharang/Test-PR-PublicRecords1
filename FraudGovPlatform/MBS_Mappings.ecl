@@ -1,6 +1,6 @@
-﻿import FraudGovPlatform,FraudShared;
+﻿import FraudGovPlatform;
 MBSMappings         := FraudGovPlatform.Files().CustomerMappings;
-MBS                 := FraudShared.Files().Input.MBS.Sprayed;
+MBS                 := FraudGovPlatform.Files().Input.MBS.Sprayed;
 
 J_Mappings          := join (MBS, MBSMappings, left.fdn_file_info_id = right.fdn_file_info_id,
 transform({unsigned6 fdn_file_info_id, string20 contribution_source, string contribution_gc_id,integer8 contribution_billing_id, unsigned6 Customer_ID, string2 Customer_State, string Customer_Agency_Vertical_Type, string1 Customer_Program, unsigned3 file_type},

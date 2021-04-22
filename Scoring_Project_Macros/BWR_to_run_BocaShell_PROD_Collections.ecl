@@ -3,11 +3,10 @@ IMPORT  Scoring_Project_Macros, RiskWise, UT;
 
 //Here are the URLs to run data collections for testing non-FCRA OSS roxie
 // cert130 OSS - roxiecertossvip.sc.seisint.com:9876
-// cert128 702 - roxiestaging.sc.seisint.com:9876
+// cert128 702 - certstagingvip.hpcc.risk.regn.net:9876
 
 //******** Uncomment roxie to run ************
 // roxieIP := RiskWise.shortcuts.staging_neutral_roxieIP; // Staging/Cert
-// roxieIP := RiskWise.shortcuts.QA_neutral_roxieIP; //  QA Roxie --- 'http://roxieqavip.br.seisint.com:9876'; 
 // roxieIP := RiskWise.shortcuts.prod_batch_neutral;
 neutralroxieIP := RiskWise.shortcuts.prod_batch_neutral;
 fcra_roxieIP := RiskWise.shortcuts.prod_batch_fcra;

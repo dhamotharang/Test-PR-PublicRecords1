@@ -119,7 +119,7 @@ Business_Header_SS.MAC_Match_Flex(
 																	,FALSE
 																	);
 
-out4 := PROJECT(bdid_out, transform(SANCTN.layout_SANCTN_did, self := left));
+out4 := PROJECT(bdid_out, transform(SANCTN.layout_SANCTN_did, self := left;self:=[];));
 
 addGlobalSID := MDR.macGetGlobalSid(out4, 'Sanctn', '', 'global_sid'); //DF-25379: Populate Global_SIDs
 

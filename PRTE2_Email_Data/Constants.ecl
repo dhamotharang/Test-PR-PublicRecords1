@@ -3,7 +3,7 @@
 EXPORT Constants := MODULE
 
 		EXPORT in_prefix_name						:= '~prte::in::email_data::';
-	  EXPORT base_prefix_name					:= '~prte::base::email_data::';
+		EXPORT base_prefix_name					:= '~prte::base::email_data::';
 		EXPORT base_prefix_alpha				:= 'prct::base::ct::email_data_v2';
 		EXPORT qaVersion              	:= '::qa::';
 																 
@@ -26,6 +26,10 @@ EXPORT Constants := MODULE
 		
 		EXPORT boolean TRIAL_RUN_ONLY_NO_DOPS := PRTE2_Common.Constants.TRIAL_RUN_ONLY_NO_DOPS;
 		EXPORT boolean FULL_RUN_WITH_DOPS 		:= PRTE2_Common.Constants.FULL_RUN_WITH_DOPS;
+		
+		EXPORT dops_name:= 'EmailDataKeys';
+		EXPORT FCRA_dops_name:= 'FCRA_EmailDataKeys';
+		
 
 
 //P in this set to skip personal phones

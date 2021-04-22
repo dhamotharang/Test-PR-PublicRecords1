@@ -14,13 +14,13 @@ EXPORT PAW_Override_Findings(DATASET(Override_Layouts.Layout_Get_Orphans) orphan
 	payload_by_did := PULL(overrides.payload_keys.paw(did IN orphan_did_set));
 
 	paw_overrides_keys_ds := PROJECT(overrided_by_did, TRANSFORM(fcra.Layout_Override_PAW or {STRING version},
-																						SELF.version := 'paw_overrides_keys',
-																						SELF := LEFT));
+																SELF.version := 'paw_overrides_keys',
+																SELF := LEFT));
 																						
 	paw_payload_keys_ds := PROJECT(payload_by_did, TRANSFORM(fcra.Layout_Override_PAW or {STRING version},
-																						SELF.version := 'paw_payload_keys',
-																						SELF.flag_file_id := '';
-                                            SELF := LEFT));
+															SELF.version := 'paw_payload_keys',
+															SELF.flag_file_id := '';
+															SELF := LEFT));
 
 	cmbpaw := SORT(paw_overrides_keys_ds + paw_payload_keys_ds, RECORD);
 
@@ -162,17 +162,17 @@ EXPORT PAW_Override_Findings(DATASET(Override_Layouts.Layout_Get_Orphans) orphan
 		SELF.payload_company_phone         := payload.company_phone;
 		SELF.overrides_company_phone       := override.company_phone;
 		SELF.payload_company_fein          := payload.company_fein;
-		SELF.overrides_company_fein        := override.company_fein;;
+		SELF.overrides_company_fein        := override.company_fein;
 		SELF.payload_fname                 := payload.fname;
-		SELF.overrides_fname               := override.fname;;
+		SELF.overrides_fname               := override.fname;
 		SELF.payload_mname                 := payload.mname;
-		SELF.overrides_mname							 := override.mname;;
+		SELF.overrides_mname			   := override.mname;
 		SELF.payload_lname                 := payload.lname;
-		SELF.overrides_lname               := override.lname;;
+		SELF.overrides_lname               := override.lname;
 		SELF.payload_name_suffix           := payload.name_suffix;
-		SELF.overrides_name_suffix         := override.name_suffix;;
+		SELF.overrides_name_suffix         := override.name_suffix;
 		SELF.payload_prim_range            := payload.prim_range;
-		SELF.overrides_prim_range          := override.prim_range;;
+		SELF.overrides_prim_range          := override.prim_range;
 		SELF.payload_predir                := payload.predir;
 		SELF.overrides_predir              := override.predir;
 		SELF.payload_prim_name             := payload.prim_name;
@@ -194,7 +194,7 @@ EXPORT PAW_Override_Findings(DATASET(Override_Layouts.Layout_Get_Orphans) orphan
 		SELF.payload_email_address         := payload.email_address;
 		SELF.overrides_email_address       := override.email_address;
 		SELF.payload_source                := payload.source;
-		SELF.overrides_source              := override.source;;
+		SELF.overrides_source              := override.source;
 	
 		SELF.diff := ROWDIFF(payload,override);
 	END;
@@ -202,49 +202,33 @@ EXPORT PAW_Override_Findings(DATASET(Override_Layouts.Layout_Get_Orphans) orphan
 	matched_dids := JOIN(deduped_payload,deduped_overrides, LEFT.did = RIGHT.did and LEFT.contact_id != RIGHT.contact_id,xform_diff(LEFT,RIGHT));	
 	matched_keys := JOIN(deduped_payload,deduped_overrides, LEFT.contact_id = RIGHT.contact_id,xform_diff(LEFT,RIGHT));
 	matched_PII_data := JOIN(deduped_payload,deduped_overrides, LEFT.did = RIGHT.did 
-																																			 and  LEFT.bdid = RIGHT.bdid 
-                                                                       and left.fname = right.fname 
-																																			 and left.mname = right.mname
-																																			 and left.lname = right.lname
-																																			 and left.city  = right.city
-																																			 and left.state = right.state
-																																			 ,xform_diff(LEFT,RIGHT));	
+																and  LEFT.bdid = RIGHT.bdid 
+																and left.fname = right.fname 
+																and left.mname = right.mname
+																and left.lname = right.lname
+																and left.city  = right.city
+																and left.state = right.state
+																,xform_diff(LEFT,RIGHT));	
 
 	
 	combined_output := matched_dids + matched_keys + matched_PII_data;
-
-	orphan_layout := RECORD
-		deduped_overrides;
-		STRING datagroup;
-		STRING recid;
-		BOOLEAN found_in_payload;
-		STRING diff;
-	END;
-
-
-	orphan_layout orphan_xform(combined_output  l, deduped_overrides r) := TRANSFORM
+	
+	File_Override_Orphans.orphan_rec orphan_xform(combined_output  l, deduped_overrides r) := TRANSFORM
 		SELF.datagroup := overrides.Constants.getfileid(overrides.Constants.PAW);
-		SELF.diff := l.diff;
+		SELF.did := (STRING)r.did;
 		SELF.recid := (STRING) r.contact_id;
-		SELF.found_in_payload := FALSE;
-		SELF :=r;
+		SELF.flag_file_ID := r.flag_file_id;
 	END;
 		
 	true_orphans := JOIN(combined_output,deduped_overrides, LEFT.payload_did = RIGHT.did,orphan_xform(LEFT,RIGHT),RIGHT ONLY);
 
-	OUTPUT(true_orphans,NAMED('true_orphans'));
+	OUTPUT(true_orphans,NAMED('true_orphans_paw'));
 
-  #IF(overrides.Constants.GROWTH_CHECK_CALL)
-
-		PAW_Orphans_GrowthCheck_ds := PROJECT(true_orphans, TRANSFORM(overrides.File_Override_Orphans.orphan_rec,
-														SELF.datagroup := Constants.PAW, SELF.did := (STRING) LEFT.did, SELF := LEFT));
-
-		call_gc := GrowthCheck(filedate, Constants.PAW, PAW_Orphans_GrowthCheck_ds);														
-	
-		build_stats := call_gc.BuildStats;
-		//this forces an execute
-		build_stats;
-		stats_alerts := call_gc.StatsAlerts;
+  	#IF(overrides.Constants.GROWTH_CHECK_CALL)
+		build_stats := IF(COUNT(true_orphans) > 0, GrowthCheck(Constants.PAW).BuildStats(filedate, true_orphans));
+		build_stats; // this forces the call
+        		
+		stats_alerts :=  GrowthCheck(Constants.PAW).StatsAlerts;
 	
 		sent_email := IF (stats_alerts, FileServices.sendemail(EmailNotification.orphan_alert_list
 												, 'PAW Override True Orphans COUNT is higher than threshold count ' +  overrides.Constants.GetStatsThreshold(Constants.PAW) 
@@ -253,7 +237,6 @@ EXPORT PAW_Override_Findings(DATASET(Override_Layouts.Layout_Get_Orphans) orphan
 		result_orphans := IF(~stats_alerts,true_orphans);
 		RETURN WHEN (result_orphans, sent_email);
 	#ELSE
-	
 		RETURN true_orphans;
 	#END
 		

@@ -162,7 +162,7 @@ case(TRIM(code,ALL),
 	'TEL1028'  =>       'Terrorist Exclusion List',
 	'TFP1072'  =>       'OFAC Accuity Research',
 	'TW1016'  =>        'Taiwan',
-	'UGO1120'  =>       'US Government Officials',
+//	'UGO1120'  =>       'US Government Officials',
 	'UK1046'  =>        'UK Home Office',
 	'UN44'  =>          'United Nations Sanctions List',
 	'UNE1172'  =>       'UN Enhancements',
@@ -246,7 +246,7 @@ case(TRIM(code,ALL),
   'TEL1028'  =>       'Terrorist Exclusion List',
 	'TFP1072'  =>	u'Entities AccuityÃ‚Â® considers to be sanctioned based on OFAC regulations (subsidiaries, designated vessels, members of designated terrorist groups), but not included in OFAC\'s SDN list. Enhanced by AccuityÃ‚Â® with locations and SWIFT/BICs.',
   'TW1016'  =>        'Taiwan',
-	'UGO1120'  =>	'Members of the US Cabinet and White House staff',
+	//'UGO1120'  =>	'Members of the US Cabinet and White House staff',
 	'UK1046'  =>	'Terrorist groups and organizations banned under UK law',
   'UN44'  =>          'United Nations Sanctions List',
 	'UNE1172'  =>	u'Entities AccuityÃ‚Â® considers to be sanctioned based on UN regulations, but not specifically include in the UN List. Enhanced by AccuityÃ‚Â® with locations and SWIFT/BICs.',
@@ -316,7 +316,7 @@ code= 'SAP1056' => '78EB65FC-BDD4-4599-A2E2-AC2BC1804878', //SOUTH AFRICAN POLIC
 //code= 'ES1014'  => '0DD1F6D8-37DF-4DF4-B6C3-DC58698A909B', //Spain
 code= 'SECO42'  => '75DFF111-309D-4613-BE9C-9ED39FD725C1', //Swiss State Secretariat for Economic Affairs
 code= 'TW1016'  => 'B639C576-74D1-4B5A-AE5D-E73A0A75FC25', //Taiwan List
-code= 'UGO1120' => 'E142C34B-6F6D-46D3-A02B-9E1CF4EF3B87', //U.S. Government Officials
+//code= 'UGO1120' => 'E142C34B-6F6D-46D3-A02B-9E1CF4EF3B87', //U.S. Government Officials
 code= 'UK1046'  => 'E7B08E71-FC3B-4180-AEC8-89BADF913545', //UK HOME OFFICE
 //code= 'FMU1126' => '5B409771-F615-49D0-80E2-418AC07A1F5E', //UKRAINE FINANCIAL MONITORING
 code= 'CAC1146' => '5DD0626C-8099-4A21-99B6-47FFB535409D', //UN CHILDREN AND ARMED CONFLICT LIST

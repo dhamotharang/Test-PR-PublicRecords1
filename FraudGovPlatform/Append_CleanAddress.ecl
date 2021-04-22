@@ -1,6 +1,5 @@
-﻿IMPORT FraudShared;
-EXPORT Append_CleanAddress ( 
-    dataset(FraudShared.Layouts.Base.Main) FileBase ) 
+﻿EXPORT Append_CleanAddress ( 
+    dataset(FraudGovPlatform.Layouts.Base.Main) FileBase ) 
 := FUNCTION
             
     slim_in := Project( FileBase, TRANSFORM( fraudgovplatform.Layouts.Base.AddressCache, SELF := LEFT, SELF := [] ) );
@@ -15,7 +14,7 @@ EXPORT Append_CleanAddress (
                 LEFT.city = RIGHT.city  and  
                 LEFT.state = RIGHT.state and 
                 LEFT.zip = RIGHT.zip,
-            TRANSFORM(FraudShared.Layouts.Base.Main, 
+            TRANSFORM(FraudGovPlatform.Layouts.Base.Main, 
                 isFound := IF(  LEFT.street_1 = RIGHT.street_1 and 
                                 LEFT.street_2 = RIGHT.street_2  and 
                                 LEFT.city = RIGHT.city  and  

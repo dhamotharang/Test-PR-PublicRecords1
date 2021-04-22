@@ -1,7 +1,6 @@
-﻿Import FraudGovPlatform,FraudShared;
-EXPORT fn_validate_delta(
-    dataset(FraudShared.Layouts.Base.Main) FileBase,
-    dataset(FraudShared.Layouts.Base.Main) Previous_Build = $.Files().Base.Main_Orig.QA
+﻿EXPORT fn_validate_delta(
+    dataset(FraudGovPlatform.Layouts.Base.Main) FileBase,
+    dataset(FraudGovPlatform.Layouts.Base.Main) Previous_Build = $.Files().Base.Main_Orig.QA
 ) := FUNCTION
     dFileBase := DISTRIBUTE(FileBase, hash32(record_id));
     dPrevious_Build	:= DISTRIBUTE(Previous_Build, HASH32(record_id));
@@ -33,7 +32,7 @@ EXPORT fn_validate_delta(
             LOCAL);  
     
 
-    FraudShared.Layouts.Base.Main T_Did_Pii_Clean(FraudShared.Layouts.Base.Main L) := TRANSFORM
+    FraudGovPlatform.Layouts.Base.Main T_Did_Pii_Clean(FraudGovPlatform.Layouts.Base.Main L) := TRANSFORM
 
         DidMatch  := MAP(L.Rawlinkid < FirstRinId and L.did < FirstRinid  and L.Rawlinkid=L.did => TRUE
         ,L.Rawlinkid < FirstRinId and L.did < FirstRinid  and L.Rawlinkid<>L.did => FALSE

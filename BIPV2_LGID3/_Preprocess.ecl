@@ -1,4 +1,4 @@
-﻿import bipv2,bipv2_files,tools,bipv2_tools,wk_ut,std,mdr,BIPV2_Strata,strata, linkingtools,BIPV2_ForceLink;
+﻿import bipv2,bipv2_files,tools,bipv2_tools,wk_ut,std,mdr,BIPV2_Strata,strata, linkingtools,BIPV2_ForceLink,BIPV2_Field_Suppression;
 
 l_common  := BIPV2.CommonBase.Layout;
 l_base    := BIPV2_Files.files_lgid3.Layout_LGID3;
@@ -10,6 +10,7 @@ EXPORT _Preprocess(
   ,string                              pFilename         = BIPV2_Files.files_hrchy.FILENAME_HRCY_BASE_LF_FULL_BUILDING  //should be the filename from the above dataset
   ,boolean                             pDoStrata         = BIPV2_LGID3._Constants().doStrata
   ,boolean                             pCopy2StorageThor = BIPV2_LGID3._Constants().copy2storagethor
+  ,boolean                             pDoSuperfileStuff = true
 ) := 
 function
 	
@@ -39,12 +40,15 @@ function
     SELF := L;
   END;
 		
-  ds_init           := BIPV2_Tools.initParentID(ds_hrchy, proxid, lgid3);
+  ds_init           := BIPV2_Tools.initParentID(ds_hrchy, proxid, lgid3) : persist('~persist::BIPV2_LGID3::_Preprocess::ds_init');
 
   // -- patch lgid3 underlinks outside of salt
-  ds_patch_Underlinks := BIPV2_ForceLink.mac_ForceLink_Lgid3 (ds_init);
+  ds_patch_Underlinks := BIPV2_ForceLink.mac_ForceLink_Lgid3 (ds_init)  : persist('~persist::BIPV2_LGID3::_Preprocess::ds_patch_Underlinks');
 
-  preprocessResult  := PROJECT(ds_patch_Underlinks,toBase(LEFT));	
+  // -- Suppress overlinks.  turn off explosion(2nd param) because it has already been done in the proxid preprocess.
+  ds_suppress := BIPV2_Field_Suppression.mac_Suppress(ds_patch_Underlinks,false)  : persist('~persist::BIPV2_LGID3::_Preprocess::ds_suppress');
+
+  preprocessResult  := PROJECT(ds_suppress,toBase(LEFT));	
   
   kick_copy2_storage_thor  := BIPV2_Tools.Copy2_Storage_Thor('~' + nothor(std.file.superfilecontents(pFilename)[1].name) ,pversion ,'lgid3_preprocess');
   copy2StorageThor         := if(pCopy2StorageThor = true ,output(kick_copy2_storage_thor ,named('copy2_Storage_Thor__html')));  //copy orig file to storage thor
@@ -53,10 +57,10 @@ function
   
 	return_results := sequential(
      doStrata 
-		,BIPV2_Files.files_lgid3.clearBuilding
+		,if(pDoSuperfileStuff = true  ,BIPV2_Files.files_lgid3.clearBuilding)
 		,BIPV2_LGID3._getInitialChanges(pversion,ds_hrchy, preprocessResult)
 		,OUTPUT(preprocessResult,,f_init,COMPRESSED,OVERWRITE)
-		,BIPV2_Files.files_lgid3.updateBuilding(f_init)
+		,if(pDoSuperfileStuff = true  ,BIPV2_Files.files_lgid3.updateBuilding(f_init))
     ,copy2StorageThor
   );
   

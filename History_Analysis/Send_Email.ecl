@@ -1,8 +1,8 @@
 Import STD;
 
-Export Send_Email( string pVersion) := Module
+Export Send_Email( string pVersion, string contacts ) := Module
 
-    Shared server           := 'http://dataland_esp.br.seisint.com:8010';
+    Shared server           := 'http://prod_esp.br.seisint.com:8010';
 
 	Shared subject          := 'Prod History Report Version:' + pVersion;
     
@@ -22,9 +22,9 @@ Export Send_Email( string pVersion) := Module
 							+ ' The End.';
           
     // If job is executed successfully, an email will be sent to users in the corresponding list
-	Export build_success    := STD.System.Email.SendEmail(Mailing_List.developer, subject, body_success );
+	Export build_success    := STD.System.Email.SendEmail(contacts, subject, body_success );
 													
     // If job fails, an email will be sent to notify the users in corresponding list 
-	Export build_failure    := STD.System.Email.SendEmail(Mailing_List.developer, subject, body_failure );
+	Export build_failure    := STD.System.Email.SendEmail(contacts, subject, body_failure );
 
 	End;

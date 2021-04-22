@@ -18,7 +18,7 @@ IMPORT InsuranceHeader_PostProcess;
  
 	// for the requests that were NOT assigned a DID using distance, try segmentation
 	#UNIQUENAME(resultsSegmentation)
-	%resultsSegmentation% := PROJECT(trimRes,
+	%resultsSegmentation% := PROJECT(trimRes(results[1].weight>=weight_score),
              TRANSFORM(RECORDOF(LEFT), 
              resTemp := sort(LEFT.results, -weight);												
 						 integer withinWeightDist := resTemp[1].weight - distance;
@@ -54,7 +54,7 @@ IMPORT InsuranceHeader_PostProcess;
  		
                 self := left));         
               
-         resOut := %resultsSegmentation%;
+         resOut := %resultsSegmentation% & trimRes(results[1].weight<weight_score);
 				 // output(%trimReswSeg%, named('trimReswSeg'));
 				 // output(%trimResDeNorm%, named('trimResDeNorm'));
 				 

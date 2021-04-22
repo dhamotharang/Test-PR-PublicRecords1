@@ -141,14 +141,14 @@ lic_roll := rollup(dedp_lic,LEFT.BATCH_NUMBER = RIGHT.BATCH_NUMBER AND
 o_lic_roll := output(topn(lic_roll,200,-incident_number),,named('Sanctn_QA_Samples_License'));
 
 //Rebuttal data
-file_rebuttal := dataset( '~thor_data400::base::SANCTN::rebuttal',SANCTN.layout_SANCTN_rebuttal_in,thor);
-file_rebuttal_father := dataset( '~thor_data400::base::SANCTN::rebuttal_father',SANCTN.layout_SANCTN_rebuttal_in,thor);																			 
+file_rebuttal := dataset( '~thor_data400::base::SANCTN::rebuttal',SANCTN.layout_SANCTN_rebuttal_base,thor);
+file_rebuttal_father := dataset( '~thor_data400::base::SANCTN::rebuttal_father',SANCTN.layout_SANCTN_rebuttal_base,thor);																			 
 
 dist_file_rebuttal := distribute(file_rebuttal,HASH32(BATCH_NUMBER,INCIDENT_NUMBER));
 dist_file_rebuttal_father := distribute(file_rebuttal_father,HASH32(BATCH_NUMBER,INCIDENT_NUMBER));
 
 Layout_rebuttal_final := record
-SANCTN.layout_SANCTN_rebuttal_in;
+SANCTN.layout_SANCTN_rebuttal_base;
 	string4000       incident_text := '';
 	string8        	incident_date_clean := '';
 	string8       	fcr_date_clean := '';

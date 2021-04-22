@@ -1,7 +1,7 @@
-﻿import STD,ut,FraudShared,tools;
+﻿import STD,ut,tools;
 
 export Append_RinSource (
-        dataset(FraudShared.Layouts.Base.Main) pBaseFile = FraudShared.Files().Base.Main.Built 
+        dataset(FraudGovPlatform.Layouts.Base.Main) pBaseFile = FraudGovPlatform.Files().Base.Main.Built 
 ) := 
 FUNCTION 
 
@@ -10,7 +10,7 @@ FUNCTION
     ****************************************************************************/
 
         
-    FraudShared.Layouts.Base.Main appendLabel(FraudShared.Layouts.Base.Main L) := TRANSFORM
+    FraudGovPlatform.Layouts.Base.Main appendLabel(FraudGovPlatform.Layouts.Base.Main L) := TRANSFORM
         SELF.RIN_SourceLabel 
 					:= MAP(
 									L.RIN_Source = 1 	=> 'IDENTITY FILE',

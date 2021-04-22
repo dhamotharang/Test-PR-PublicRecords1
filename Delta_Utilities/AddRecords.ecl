@@ -43,7 +43,7 @@ export AddRecords(FullData,NewData,recref,MatchFields,DistSet='',isDist=false,is
 
     RecordLayout:=#expand(recref);
 
-    #APPEND(CommandString,'dAddRecords:=join(dFullData,dNewData,');
+	#APPEND(CommandString,'dAddRecords:=join(dFullData,dNewData,');
 	#append(CommandString,%'MatchString'%);
 	#APPEND(CommandString,',transform(right)');
 	#if(isLookup=false and isdist=false)

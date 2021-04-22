@@ -1,4 +1,4 @@
-﻿IMPORT STD,ut,FraudGovPlatform,FraudShared,_validate;
+﻿IMPORT STD,ut,FraudGovPlatform,_validate;
 EXPORT Mod_stats := MODULE
 
 	EXPORT ValidateDelimiter(string fname, string pSeparator, string pTerminator):= module
@@ -207,6 +207,7 @@ END;
 					,'field3'
 					,'field4'
 					,'field5'
+					,'field6'
 					);
 
 				self.value:=choose(c
@@ -215,6 +216,7 @@ END;
 					,l.field3
 					,l.field4
 					,l.field5
+					,l.field6
 					);
 
 				err_IdentityData:=choose(c
@@ -222,7 +224,8 @@ END;
 					,if(l.field2<>'','','E001') //Batch_Record_ID
 					,if(l.field3<>'','','E001') //Transaction_ID_Number
 					,if(l.field4<>'','','E001') //Reason_for_Transaction_Activity
-					,if (_Validate.Date.fIsValid(l.field5) and (unsigned)l.field5 <= (unsigned)(STRING8)Std.Date.Today(),'','E002') //Date_of_Transaction
+					,if(_Validate.Date.fIsValid(l.field5) and (unsigned)l.field5 <= (unsigned)(STRING8)Std.Date.Today(),'','E002') //Date_of_Transaction
+					,if(l.field6 in ['JR','SR','JR.','SR.','I','II','III','IV','V','VI','VII','VIII','IX','X',''],'','W001') //raw_Orig_Suffix
 					);
 
 				err_KnownFraud:=choose(c
@@ -231,6 +234,7 @@ END;
 					,if(l.field3<>'','','E001') //reported_time
 					,if(l.field4<>'','','E001') //reported_by
 					,'' //field5
+					,if(l.field6 in ['JR','SR','JR.','SR.','I','II','III','IV','V','VI','VII','VIII','IX','X',''],'','W001') //raw_Orig_Suffix
 					);			
 
 				err_Safelist:=choose(c
@@ -239,6 +243,7 @@ END;
 					,if(l.field3<>'','','E001') //reported_time
 					,if(l.field4<>'','','E001') //reported_by
 					,'' //field5
+					,if(l.field6 in ['JR','SR','JR.','SR.','I','II','III','IV','V','VI','VII','VIII','IX','X',''],'','W001') //raw_Orig_Suffix
 					);		
 
 				err_Deltabase:=choose(c
@@ -247,6 +252,7 @@ END;
 					,if(l.field3<>'','','E001') //user_added
 					,'' //field4
 					,'' //field5
+					,if(l.field6 in ['JR','SR','JR.','SR.','I','II','III','IV','V','VI','VII','VIII','IX','X',''],'','W001') //raw_Orig_Suffix
 					);											
 										
 				self.err :=	MAP (
@@ -260,10 +266,10 @@ END;
 				end;
 
 				norm :=	MAP (
-					 STD.Str.Contains( fname, 'Identity'		,	true )	=> 5
-					,STD.Str.Contains( fname, 'KnownRisk'		,	true )	=> 4
-					,STD.Str.Contains( fname, 'Safelist'		,	true )	=> 4
-					,STD.Str.Contains( fname, 'Delta'			,	true )	=> 3
+					 STD.Str.Contains( fname, 'Identity'		,	true )	=> 6//5
+					,STD.Str.Contains( fname, 'KnownRisk'		,	true )	=> 6//4
+					,STD.Str.Contains( fname, 'Safelist'		,	true )	=> 6//4
+					,STD.Str.Contains( fname, 'Delta'			,	true )	=> 6//3
 					,0	);
 
 			Shared err1:=normalize(withRC,norm,tr1(left,counter));
@@ -300,6 +306,7 @@ END;
 					SELF.field3 := LEFT.Transaction_ID;
 					SELF.field4 := LEFT.Reason_Description;
 					SELF.field5 := LEFT.Date_of_Transaction;
+					SELF.field6 := LEFT.raw_Orig_Suffix;
 					SELF := LEFT;SELF := []))).ValidationResults;
 																			
 				EXPORT Validate_KnownFraud := ValidateInputs(	fname, 
@@ -309,6 +316,7 @@ END;
 					SELF.field3 := LEFT.reported_time;
 					SELF.field4 := LEFT.reported_by;
 					SELF.field5 := '';
+					SELF.field6 := LEFT.raw_Orig_Suffix;
 					SELF := LEFT;SELF := []))).ValidationResults;	
 
 				EXPORT Validate_SafeList := ValidateInputs(	fname, 
@@ -318,6 +326,7 @@ END;
 					SELF.field3 := LEFT.reported_time;
 					SELF.field4 := LEFT.reported_by;
 					SELF.field5 := '';
+					SELF.field6 := LEFT.raw_Orig_Suffix;
 					SELF := LEFT;SELF := []))).ValidationResults;	
 
 				EXPORT Validate_Deltabase 	:= ValidateInputs( fname, 
@@ -327,6 +336,7 @@ END;
 					SELF.field3 := LEFT.reported_by;
 					SELF.field4 := '';
 					SELF.field5 := '';
+					SELF.field6 := LEFT.raw_Orig_Suffix;
 					SELF := LEFT;SELF := []))).ValidationResults;	
 
 				SHARED ErrorsFound	
@@ -376,10 +386,10 @@ END;
 		p1 := project(infile, transform(infile_r, self := left;));
 
 		MBS_Layout := Record
-			FraudShared.Layouts.Input.MBS;
+			FraudGovPlatform.Layouts.Input.MBS;
 			unsigned1 Deltabase := 0;
 		end;
-		MBS	:= project(FraudShared.Files().Input.MBS.sprayed(status = 1), transform(MBS_Layout, self.Deltabase := If(regexfind('DELTA', left.fdn_file_code, nocase),1,0); self := left));
+		MBS	:= project(FraudGovPlatform.Files().Input.MBS.sprayed(status = 1), transform(MBS_Layout, self.Deltabase := If(regexfind('DELTA', left.fdn_file_code, nocase),1,0); self := left));
 		
 		shared DeltabaseMbs 
 			:= join(	p1,

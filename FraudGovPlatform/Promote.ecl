@@ -1,4 +1,4 @@
-﻿import tools, STD, FraudShared;
+﻿import tools, STD,FraudShared;
 lay_builds 	:= tools.Layout_FilenameVersions.builds;
 lay_inputs	:= tools.Layout_FilenameVersions.Inputs;
 
@@ -9,8 +9,10 @@ export Promote(
 	,boolean pDelete = true
 	,boolean pIsTesting = false
 	,dataset(lay_inputs) pInputFilenames = 	Filenames(pversion).Input.dAll_filenames
+	,dataset(lay_inputs) pMBSInputFilenames = Filenames(pversion).Input.dMBS_filenames
 	,dataset(lay_builds) pBuildFilenames = 	Filenames(pversion).dAll_filenames
 											+ Keynames  (pversion).dAll_filenames
+											+ FraudShared.Keynames(pversion).dAll_filenames
 																					
 ) :=
 module
@@ -23,18 +25,21 @@ module
 		 STD.File.ClearSuperFile(FraudGovPlatform.Filenames().Sprayed._NACDelete, true),
 		 STD.File.ClearSuperFile(FraudGovPlatform.Filenames().Sprayed._RDPDelete, true),
 		 STD.File.ClearSuperFile(FraudGovPlatform.Filenames().Sprayed._InquiryLogsDelete, true),
+		 STD.File.ClearSuperFile(FraudGovPlatform.Filenames().Sprayed._DisposableEmailDomainsDelete, true),
 		 STD.File.AddSuperFile(FraudGovPlatform.Filenames().Sprayed._IdentityDataDelete, FraudGovPlatform.Filenames().Sprayed._IdentityDataPassed,addcontents := true),
 		 STD.File.AddSuperFile(FraudGovPlatform.Filenames().Sprayed._KnownFraudDelete, FraudGovPlatform.Filenames().Sprayed._KnownFraudPassed,addcontents := true),
 		 STD.File.AddSuperFile(FraudGovPlatform.Filenames().Sprayed._DeltabaseDelete, FraudGovPlatform.Filenames().Sprayed._DeltabasePassed,addcontents := true),
 		 STD.File.AddSuperFile(FraudGovPlatform.Filenames().Sprayed._NACDelete, FraudGovPlatform.Filenames().Sprayed._NACPassed,addcontents := true),
 		 STD.File.AddSuperFile(FraudGovPlatform.Filenames().Sprayed._RDPDelete, FraudGovPlatform.Filenames().Sprayed._RDPPassed,addcontents := true),
 		 STD.File.AddSuperFile(FraudGovPlatform.Filenames().Sprayed._InquiryLogsDelete, FraudGovPlatform.Filenames().Sprayed._InquiryLogsPassed,addcontents := true),
+		 STD.File.AddSuperFile(FraudGovPlatform.Filenames().Sprayed._DisposableEmailDomainsDelete, FraudGovPlatform.Filenames().Sprayed._DisposableEmailDomainsPassed,addcontents := true),
 		 STD.File.ClearSuperFile(FraudGovPlatform.Filenames().Sprayed._IdentityDataPassed),
 		 STD.File.ClearSuperFile(FraudGovPlatform.Filenames().Sprayed._KnownFraudPassed),
 		 STD.File.ClearSuperFile(FraudGovPlatform.Filenames().Sprayed._DeltabasePassed),
 		 STD.File.ClearSuperFile(FraudGovPlatform.Filenames().Sprayed._NACPassed),
 		 STD.File.ClearSuperFile(FraudGovPlatform.Filenames().Sprayed._RDPPassed),
-		 STD.File.ClearSuperFile(FraudGovPlatform.Filenames().Sprayed._InquiryLogsPassed),		 
+		 STD.File.ClearSuperFile(FraudGovPlatform.Filenames().Sprayed._InquiryLogsPassed),
+		 STD.File.ClearSuperFile(FraudGovPlatform.Filenames().Sprayed._DisposableEmailDomainsPassed),		 
 		 STD.File.FinishSuperFileTransaction()
 		);
 		export Rejected2Delete := SEQUENTIAL(
@@ -45,11 +50,13 @@ module
 		 STD.File.ClearSuperFile(FraudGovPlatform.Filenames().Sprayed._NACRejected, true),
 		 STD.File.ClearSuperFile(FraudGovPlatform.Filenames().Sprayed._RDPRejected, true),
 		 STD.File.ClearSuperFile(FraudGovPlatform.Filenames().Sprayed._InquiryLogsRejected, true),	
+		 STD.File.ClearSuperFile(FraudGovPlatform.Filenames().Sprayed._DisposableEmailDomainsRejected, true),	
 		 STD.File.FinishSuperFileTransaction()
 		);
 
 	end;
 	export inputfiles	:= tools.mod_PromoteInput(pversion,pInputFilenames,pFilter,pDelete,pIsTesting);
+	export MBSInputfiles := tools.mod_PromoteInput(pversion,pMBSInputFilenames,pFilter,pDelete,pIsTesting);
 	export buildfiles	:= tools.mod_PromoteBuild(pversion,pBuildFilenames,pFilter,pDelete,pIsTesting);
 	export rollbackinput := tools.mod_RollbackInput(pInputFilenames,pFilter,pDelete,pIsTesting);
 
@@ -64,18 +71,25 @@ module
 			, inputfiles.Using2Used
 			, inputfiles.New2Sprayed
 	);
+
+	export promote_MBSinputs := sequential(
+			  MBSinputfiles.Sprayed2Using
+			, MBSinputfiles.Using2Used
+			, MBSinputfiles.New2Sprayed
+	);
+
 	export promote_base := sequential(
 			  buildfiles.Built2QA
 	);
 
 	export promote_keys := sequential(
 			// Promote Shared Files
-			  FraudShared.Promote(pDelete := pDelete).buildfiles.Built2QA			
+			  buildfiles.Built2QA			
 			// Clean Up Shared Files	
-			, FraudShared.Promote().buildfiles.cleanup	
-			//Remove the Demo file from father sf, which was moved from qa as a promote routeine
-			, STD.File.RemoveSuperFile(FraudShared.Filenames().Base.Main.Father,	Filenames().Input.DemoData.Sprayed)
+			, buildfiles.cleanup	
+			//FraudGovPlatform the Demo file from father sf, which was moved from qa as a promote routeine
+			, STD.File.RemoveSuperFile(FraudGovPlatform.Filenames().Base.Main.Father,	Filenames().Input.DemoData.Sprayed)
 	);
 	
-	Export Clear_DemoData := STD.File.RemoveSuperFile(FraudShared.Filenames().Base.Main.Built,	Filenames().Input.DemoData.Sprayed);
+	Export Clear_DemoData := STD.File.RemoveSuperFile(FraudGovPlatform.Filenames().Base.Main.Built,	Filenames().Input.DemoData.Sprayed);
 end;

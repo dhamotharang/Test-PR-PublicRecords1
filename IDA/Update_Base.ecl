@@ -6,7 +6,7 @@ EXPORT Update_Base (string pversion='', boolean pUseProd=false, boolean pdaily=t
 
 //standardize input
 
-input := IDA.Files(pversion,pUseProd).input;
+input := IDA.Files(pversion,pUseProd).cleanedinput;
 
 Ida.layouts.base tMapping(ida.layouts.input L, C) := TRANSFORM
 
@@ -24,12 +24,12 @@ Ida.layouts.base tMapping(ida.layouts.input L, C) := TRANSFORM
 	SELF.orig_address2                := l.addressline2;
 	SELF.orig_city                    := l.city;
 	SELF.orig_state_province          := l.state;
-	SELF.orig_zip4                    := l.zip;
-	SELF.orig_zip5                    := '';
-  SELF.orig_dob                     := l.dob;
+	SELF.orig_zip4                    := '';
+	SELF.orig_zip5                    := l.zip;
+    SELF.orig_dob                     := l.dob;
 	SELF.orig_ssn                     := l.ssn;
-  SELF.orig_dl                      := l.dl;
-  SELF.orig_dlstate                 := l.dlstate;
+    SELF.orig_dl                      := l.dl;
+    SELF.orig_dlstate                 := l.dlstate;
 	SELF.orig_phone                   := l.phone;
 	SELF.clientassigneduniquerecordid := l.clientassigneduniquerecordid;
 	SELF.adl_ind                      := '';
@@ -42,7 +42,7 @@ Ida.layouts.base tMapping(ida.layouts.input L, C) := TRANSFORM
 	SELF := [];
 END;
 
-std_input := project(IDA.Files(pversion,pUseProd).input, tMapping(LEFT, counter));
+std_input := project(input, tMapping(LEFT, counter));
 
 
 //Clean names
@@ -65,8 +65,10 @@ cleanNames_t := project(cleanNames, transform({recordof(cleanNames), string orig
 																		self := left));			
 																					
 																			
-unsigned4	lFlags := AID.Common.eReturnValues.RawAID | AID.Common.eReturnValues.ACECacheRecords;		
-AID.MacAppendFromRaw_2Line(cleanNames_t,orig_addr1,orig_addr2,RawAID,cleanAddr, lFlags);
+																																							
+unsigned4	lFlags := AID.Common.eReturnValues.RawAID | AID.Common.eReturnValues.ACECacheRecords | AID.Common.eReturnValues.NoNewCacheFiles;
+AID.MacAppendFromRaw_2Line(cleanNames_t,orig_addr1,orig_addr2,RawAID,cleanAddr,lFlags);
+
 
 IDA.Layouts.base tr(cleanAddr l) := TRANSFORM
 	self.title := l.cln_title;
@@ -90,11 +92,6 @@ IDA.Layouts.base tr(cleanAddr l) := TRANSFORM
 END;
 
 cleanAdd_t := project(cleanAddr,tr(left));
-
-//Add to previous base
-// base_and_update := if(nothor(FileServices.GetSuperFileSubCount(IDA.Filenames(version, pUseProd).lBaseTemplate_built)) = 0
-											 // ,cleanAdd_t
-											 // ,cleanAdd_t + IDA.Files(version, pUseProd).base.built);
 
 new_base_d := distribute(cleanAdd_t, hash(orig_first_name,orig_last_name,orig_address1,orig_phone,orig_email,orig_dob));  
 new_base_s := sort(new_base_d,
@@ -131,27 +128,12 @@ IDA.Layouts.base t_rollup (new_base_s  le, new_base_s ri) := transform
  self := le;
 end;
 
-// base_f := rollup(new_base_s,
-									// left.orig_first_name = right.orig_first_name and				
-									// left.orig_last_name = right.orig_last_name and						
-									// left.orig_Zip5 = right.orig_Zip5	 and					
-									// left.orig_address1 = right.orig_address1 and				
-									// left.orig_phone = right.orig_phone and														
-									// left.orig_email = right.orig_email and
-									// left.orig_dob = right.orig_dob and
-									// left.orig_address2 = right.orig_address2 and
-									// left.orig_city = right.orig_city and
-									// left.orig_state_province = right.orig_state_province and
-									// left.orig_zip4  = right.orig_zip4 
-																	// ,t_rollup(left, right)
-																	// ,local);
-
 //DID
 
-matchset := ['A','Z','D','P'];
+matchset := ['A','Z','D','P','S'];
 	 did_add.MAC_Match_Flex
 	 (new_base_s, matchset,					
-	 ssn, clean_dob, fname, mname, lname, name_suffix, 
+	 orig_ssn, clean_dob, fname, mname, lname, name_suffix, 
 	 prim_range, prim_name, sec_range, zip, st, clean_phone, 
 	 DID,IDA.Layouts.base, false, DID_Score_field, 
 	 75, d_did)
@@ -161,12 +143,5 @@ Watchdog.Mac_append_ADL_ind(d_did, Updated_Base);
 
 daily_base:= Updated_Base;
 
-// accumulative_base := if(nothor(FileServices.GetSuperFileSubCount(IDA.Filenames(pversion, pUseProd).lBaseTemplate_built)) = 0
-// 											 ,Updated_Base
-// 											 ,Updated_Base + IDA.Files(pversion, pUseProd).base.built);
-	 
-// base_and_update := if(pdaily,daily_base,accumulative_base);
-									
-// return base_and_update;
 return daily_base;
 end;

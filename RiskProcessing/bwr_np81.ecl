@@ -1,4 +1,4 @@
-#workunit('name','NonFCRA-np81-process');
+﻿#workunit('name','NonFCRA-np81-process');
 #option ('hthorMemoryLimit', 1000)
 
 
@@ -42,7 +42,7 @@ Scoring.Layout_NP2O_Soapcall into_NP2O_input(f le) := transform
 	self.dppapurpose := 3;
 	self.glbpurpose := 1;
 
-//	self.gateways := dataset([{'Neutral', 'http://roxiebatch.br.seisint.com:9856'}], risk_indicators.Layout_Gateways_In);
+//	self.gateways := dataset([{'Neutral', 'http://roxiethorvip.hpcc.risk.regn.net:9856'}], risk_indicators.Layout_Gateways_In);
 
 self.gateways := dataset([{'attus','http://rw_data_prod:Password01@rwgateway.br.seisint.com:8090/wsGateway'},
 						 {'targus','http://rw_data_prod:Password01@gatewayprodesp.sc.seisint.com:7726/wsGateway/?ver_=1.70'}], risk_indicators.Layout_Gateways_In);
@@ -54,7 +54,7 @@ end;
 soap_in := project(f,into_NP2O_input(LEFT));
 output(soap_in,named('soapin'));
 
-roxieIP :='http://roxiebatch.br.seisint.com:9856' ; // nonfcra roxiebatch
+roxieIP :='http://roxiethorvip.hpcc.risk.regn.net:9856' ; // nonfcra roxiebatch
 
 //import risk_indicators;/
 

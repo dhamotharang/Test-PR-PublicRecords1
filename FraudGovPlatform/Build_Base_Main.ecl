@@ -1,7 +1,7 @@
-﻿import FraudShared, STD, data_services, ut,tools; 
+﻿import STD, data_services, ut,tools; 
 EXPORT Build_Base_Main  (
 	 string pversion
-	,dataset(FraudShared.Layouts.Base.Main) pBaseMainFile = IF(fraudgovplatform._Flags.FileExists.Base.MainOrigQA, fraudgovplatform.Files().Base.Main_Orig.QA, DATASET([], FraudShared.Layouts.Base.Main))
+	,dataset(FraudGovPlatform.Layouts.Base.Main) pBaseMainFile = IF(fraudgovplatform._Flags.FileExists.Base.MainOrigQA, fraudgovplatform.Files().Base.Main_Orig.QA, DATASET([], FraudGovPlatform.Layouts.Base.Main))
 	,dataset(fraudgovplatform.Layouts.Input.IdentityData) inIdentityData = fraudgovplatform.Files().Input.IdentityData.Sprayed
 	,dataset(fraudgovplatform.Layouts.Input.KnownFraud) inKnownFraud = fraudgovplatform.Files().Input.KnownFraud.Sprayed
 	,dataset(fraudgovplatform.Layouts.Input.Deltabase) inDeltabase = fraudgovplatform.Files().Input.Deltabase.Sprayed
@@ -10,7 +10,7 @@ module
 	
     dedup_IdentityData := fraudgovplatform.fn_dedup_identitydata(inIdentityData); // remove duplicate records with different transaction_id
 
-	Export IdentityData := project (dedup_IdentityData , transform(FraudShared.Layouts.Base.Main , 
+	Export IdentityData := project (dedup_IdentityData , transform(FraudGovPlatform.Layouts.Base.Main , 
 		self.ln_report_date := left.Date_of_Transaction;
 		self.Reported_Date := left.Date_of_Transaction;
 		self.Event_Date := left.Date_of_Transaction;
@@ -25,13 +25,15 @@ module
 		self.dt_last_seen := left.Process_Date;
 		self.dt_vendor_last_reported := left.FileDate;
 		self.dt_vendor_first_reported := left.FileDate;
+		SELF.start_date := STD.Str.FindReplace( STD.Str.FindReplace( left.start_date,':',''),'/','')[1..8] ; 
+		SELF.end_date := STD.Str.FindReplace( STD.Str.FindReplace( left.end_date,':',''),'/','')[1..8] ;
 		self:= left; 
 		self:= [];
 	)); 
 
 	dedup_KnownFraud := fraudgovplatform.fn_dedup_KnownFraud(inKnownFraud); // remove duplicate records with different customer_event_id
  
-	Export KnownFraud := project (dedup_KnownFraud , transform(FraudShared.Layouts.Base.Main , 
+	Export KnownFraud := project (dedup_KnownFraud , transform(FraudGovPlatform.Layouts.Base.Main , 
 		self.ln_report_date := left.reported_date;
 		self.event_date := if(left.event_date = '', left.reported_date, left.event_date);
 		self.transaction_id := left.customer_event_id;
@@ -52,7 +54,7 @@ module
 
 	dedup_deltabase := fraudgovplatform.fn_dedup_delta(inDeltabase); // remove records submitted by same user/date
 
-	Export Deltabase := project (dedup_deltabase, transform(FraudShared.Layouts.Base.Main , 
+	Export Deltabase := project (dedup_deltabase, transform(FraudGovPlatform.Layouts.Base.Main , 
 		v_datetime := STD.Str.FindReplace( STD.Str.FindReplace( left.reported_date,':',''),'-','');
 		v_date := v_datetime[1..8];
 		v_time := v_datetime[10..];
@@ -136,9 +138,9 @@ module
 
   	// Append Industry type description 
 	
-	Combined := join (addUID , FraudShared.Files().Input.MBSFdnIndType.Sprayed(status = 1), 
+	Combined := join (addUID , FraudGovPlatform.Files().Input.MBSFdnIndType.Sprayed(status = 1), 
 		left.classification_Permissible_use_access.ind_type = right.ind_type , 
-		transform (FraudShared.Layouts.Base.main , 
+		transform (FraudGovPlatform.Layouts.Base.main , 
 			self.classification_Permissible_use_access.ind_type_description := StringLib.StringToUppercase(right.description), 
 			self := left), left outer , lookup ); 
 																							 

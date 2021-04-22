@@ -149,8 +149,6 @@ OCTECT_WIDTH := 3;
   shared pFileKeyFDNMasterIDExcl 				:= File_FDNMasterIDBuild.FDNMasterIDExcl;
 	shared pFileKeyFDNMasterIDIndTypIncl 	:= File_FDNMasterIDBuild.FdnmasterIdIndTypIncl;
  	shared BaseMain_DID            				:= BaseMain(DID != 0);
-	shared BaseMain_BDID           				:= BaseMain(BDID != 0);
-	shared BaseMbs                 				:= BaseMain(classification_Permissible_use_access.fdn_file_info_id != 0);
   shared BaseMain_Email          				:= BaseMain(Email_Address != '');
 	shared BaseMain_Ip             				:= BaseMain(IP_Address != '');
 	shared BaseMain_ProfessionalID 				:= BaseMain(Professional_ID != '');
@@ -185,7 +183,6 @@ OCTECT_WIDTH := 3;
  export Main := module
 	tools.mac_FilesIndex('BaseMain,{record_id, UID},{BaseMain}',KeyNames(pversion).Main.ID,ID);
 	tools.mac_FilesIndex('BaseMain_DID,{DID , classification_Entity.Entity_type_id, classification_Entity.Entity_sub_type_id},{record_id , UID}',KeyNames(pversion).Main.DID,DID);
-	tools.mac_FilesIndex('BaseMain_BDID,{BDID , classification_Entity.Entity_type_id, classification_Entity.Entity_sub_type_id},{record_id , UID}',KeyNames(pversion).Main.BDID,BDID);
 	tools.mac_FilesIndex('BaseMain_Email,{Email_Address , classification_Entity.Entity_type_id, classification_Entity.Entity_sub_type_id},{record_id , UID}',KeyNames(pversion).Main.email,email);
 	tools.mac_FilesIndex('BaseMain_Ip,{IP_Address , classification_Entity.Entity_type_id, classification_Entity.Entity_sub_type_id},{record_id , UID}',KeyNames(pversion).Main.IP,IP);
 	tools.mac_FilesIndex('BaseMain_ProfessionalID,{Professional_ID , classification_Entity.Entity_type_id, classification_Entity.Entity_sub_type_id},{record_id , UID}',KeyNames(pversion).Main.ProfessionalID,ProfessionalID);
@@ -211,7 +208,6 @@ OCTECT_WIDTH := 3;
 	tools.mac_FilesIndex('BaseMain_ISP,{isp , Entity_type_id, Entity_sub_type_id},{record_id , UID}',KeyNames(pversion).Main.Isp,Isp);		
 	tools.mac_FilesIndex('BaseMain_IPRange,{digit1, digit2, digit3, digit4, digit5, digit6, digit7, digit8, digit9, digit10, digit11, digit12, classification_Entity.Entity_type_id, classification_Entity.Entity_sub_type_id},{record_id , UID}',KeyNames(pversion).Main.IPRange,IPRange);		
 	// MBS exclusions 
-	tools.mac_FilesIndex('BaseMbs,{classification_Permissible_use_access.fdn_file_info_id},{record_id , UID}',KeyNames(pversion).Main.Mbs,Mbs);
 	tools.mac_FilesIndex('MbsIndTypExclusion,{fdn_file_info_id},{MbsIndTypExclusion}',KeyNames(pversion).Main.MbsIndTypeExclusion,MbsIndTypeExclusion);
 	tools.mac_FilesIndex('MbsProdutInclude,{fdn_file_info_id},{MbsProdutInclude}',KeyNames(pversion).Main.MbsProductInclude,MbsProductInclude);
 	tools.mac_FilesIndex('MbsFDNMasterID,{gc_id},{MbsFDNMasterID}',KeyNames(pversion).Main.MbsFDNMasterID,MbsFDNMasterIDKey);

@@ -1,4 +1,4 @@
-#workunit('name','nonfcra-cbbl');
+﻿#workunit('name','nonfcra-cbbl');
 #option ('hthorMemoryLimit', 1000)
 
 /* **This process was set up for Chase.  Many output fields have been redefined and the 
@@ -61,7 +61,7 @@ end;
 soap_in := project(f,into_BC1O_input(LEFT));
 output(soap_in, named('soap_in'));
 
-roxieIP:='http://roxiebatch.br.seisint.com:9856';  // Roxiebatch
+roxieIP:='http://roxiethorvip.hpcc.risk.regn.net:9856';  // Roxiebatch
 
 Scoring.MAC_PROD_Soapcall(soap_in, RiskWise.Layout_BC1O, roxieIP, 'RiskWise.RiskWiseMainBC1O',s_f, parallel_threads);
 

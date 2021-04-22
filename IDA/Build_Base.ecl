@@ -9,18 +9,12 @@ module
 shared version:=IDA._Constants(pUseProd).filesdate:INDEPENDENT;
 
 shared	daily_base        := IDA.Update_Base      (version, pUseProd, true);
-// shared	accumulative_base := IDA.Update_Base      (version, pUseProd, false);
-	 
-// export buildbase    := IF(pDaily,daily_base,accumulative_base);
 
 	VersionControl.macBuildNewLogicalFile( 
 																				 IDA.Filenames(version,pUseProd).BaseDaily.new	
 																				,daily_base
 																				,Build_Daily_Base_File
 																			 )
-
-    
-
     export full_build :=
 		sequential(Build_Daily_Base_File
 		          ,STD.File.StartSuperFileTransaction()
@@ -30,21 +24,6 @@ shared	daily_base        := IDA.Update_Base      (version, pUseProd, true);
 				  ,STD.File.FinishSuperFileTransaction()
 
 );
-
-// 	VersionControl.macBuildNewLogicalFile( 
-// 																				 if(pDaily,IDA.Filenames(version,pUseProd).BaseDaily.new,IDA.Filenames(version,pUseProd).base.new)	
-// 																				,buildbase
-// 																				,Build_Base_File
-// 																			 );
-																			 
-// export full_build :=
-// 		sequential(Build_Base_File
-// 							,IDA.Promote(version,pUseProd,pDaily).BuildDailyFiles.New2Built
-// 							,IDA.Promote(version,pUseProd,pDaily).BuildDailyFiles.Built2QA
-							// ,IDA.Promote(version,pUseProd,pDaily).BuildAccumulativefiles.New2Built
-							// ,IDA.Promote(version,pUseProd,pDaily).BuildAccumulativefiles.Built2QA
-// );
-
 export All :=
 		if(IDA._Constants(pUseProd).IsValidversion(pversion)
 			,full_build

@@ -5,10 +5,8 @@ export fSpray(boolean pUseProd = false) := MODULE
 
 version:=IDA._Constants(pUseProd).filesdate;
 
-// RD:=STD.File.RemoteDirectory(IDA._Constants(pUseProd).Source_IP,IDA._Constants(pUseProd).spray_path );
-// RDF:=RD[1];
-RD:=IDA._Constants(false).RD;
-RDF:=IDA._Constants(false).RDF;
+RD:=IDA._Constants(pUseProd).RD;
+RDF:=IDA._Constants(pUseProd).RDF;
 
 
 
@@ -21,15 +19,15 @@ tools.Layout_Sprays.Info xForm(recordof(RDF) L) := transform
 								,0
 								,IDA.Filenames(version,pUseProd).lInputTemplate
 								,[{IDA.Filenames(version,pUseProd).lInputTemplate_built}] 
-								,'thor400_dev01'                                              
+								,ThorLib.Group()                                              
 								,REGEXFIND('[0-9]{8}'+'_'+'[0-9]{6}',L.name,0)                                             
 								,'[0-9]{8}'+'_'+'[0-9]{6}'                                                          
 								,'VARIABLE'                                                         
 								,''
 								,''
 								,'|'
-								,''               //'\\n,\\r\\n'
-								,','                     //''
+								,'\\n,\\r\\n'
+								,'"'                     //''
 								,true
 								}
 								,tools.Layout_Sprays.Info);
@@ -49,7 +47,7 @@ PrepSuper := SEQUENTIAL(STD.File.StartSuperFileTransaction()
 	 					 ,STD.File.addsuperfile(TRIM(IDA.Filenames(version,pUseProd).lInputTemplate_qa),TRIM(IDA.Filenames(version,pUseProd).lInputTemplate_built),,TRUE)
 						 ,STD.File.ClearSuperfile(TRIM(IDA.Filenames(version,pUseProd).lInputTemplate_father))
 						 ,STD.File.addsuperfile(TRIM(IDA.Filenames(version,pUseProd).lInputTemplate_father),TRIM(IDA.Filenames(version,pUseProd).lInputTemplate_qa),,TRUE)
-						 ,STD.File.ClearSuperfile(TRIM(IDA.Filenames(version,pUseProd).lInputTemplate_delete),true)
+						//  ,STD.File.ClearSuperfile(TRIM(IDA.Filenames(version,pUseProd).lInputTemplate_delete))
 						 ,STD.File.addsuperfile(TRIM(IDA.Filenames(version,pUseProd).lInputTemplate_delete),TRIM(IDA.Filenames(version,pUseProd).lInputTemplate_father),,TRUE)	
    						 ,STD.File.FinishSuperFileTransaction());
 											 

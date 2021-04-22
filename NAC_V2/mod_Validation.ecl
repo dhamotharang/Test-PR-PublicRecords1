@@ -216,7 +216,8 @@ EXPORT mod_Validation := MODULE
 3.       HOMELESS and GENERAL DELIVERY addresses will not result in error or warning messages
 4.       Missing street is just a warning
 **/
-
+	
+	boolean allowWarnings(string1 category) := category not in $.Mod_sets.Address_Category;
 	EXPORT AddressFile(Dataset(Layouts2.rAddressEx) ds) := 
 			PROJECT(ds, TRANSFORM(Layouts2.rAddressEx,
 					self.dsErrs := 
@@ -233,17 +234,17 @@ EXPORT mod_Validation := MODULE
 							// warnings
 							+ IF(left.AddressCategory != '' AND left.AddressCategory not in NAC_V2.Mod_sets.Address_Category, 
 									DATASET([{warningCodes.W108, 'W', 'F', FieldCode('W', warningCodes.W108), left.AddressCategory, left.ProgramState, left.RecordCode}], rErr))
-							+ IF(left.err_stat[1]<>'S' /*and nac_v2.fn_IsValidAddress(left.prepped_addr1)*/,			// address cleaned with errors
+							+ IF(allowWarnings(left.AddressCategory) AND left.err_stat[1]<>'S',
 											DATASET([{warningCodes.W116, 'W', 'R', FieldCode('W', warningCodes.W116), left.err_stat, left.ProgramState, left.RecordCode}], rErr))							
-							+ IF(NOT ValidStreet(left.Street1), 
+							+ IF(allowWarnings(left.AddressCategory) AND NOT ValidStreet(left.Street1), 
 									DATASET([{warningCodes.W112, 'W', 'F', ValidationCodes.fcStreet1, left.Street1, left.ProgramState, left.RecordCode}], rErr))
-							+ IF(left.Street2<>'' AND NOT ValidStreet(left.Street2), 
+							+ IF(allowWarnings(left.AddressCategory) AND left.Street2<>'' AND NOT ValidStreet(left.Street2), 
 									DATASET([{warningCodes.W112, 'W', 'F', ValidationCodes.fcStreet2, left.Street2, left.ProgramState, left.RecordCode}], rErr))
-							+ IF(NOT ValidCity(left.City), 
+							+ IF(allowWarnings(left.AddressCategory) AND NOT ValidCity(left.City), 
 									DATASET([{warningCodes.W113, 'W', 'F', FieldCode('W', warningCodes.W113), left.City, left.ProgramState, left.RecordCode}], rErr))
-							+ IF(NOT ValidState(left.state), 
+							+ IF(allowWarnings(left.AddressCategory) AND NOT ValidState(left.state), 
 									DATASET([{warningCodes.W114, 'W', 'F', FieldCode('W', warningCodes.W114), left.state, left.ProgramState, left.RecordCode}], rErr))
-							+ IF(NOT ValidZipCode(left.zipcode), 
+							+ IF(allowWarnings(left.AddressCategory) AND NOT ValidZipCode(left.zipcode), 
 									DATASET([{warningCodes.W115, 'W', 'F', FieldCode('W', warningCodes.W115), left.zip, left.ProgramState, left.RecordCode}], rErr))
 							;
 
@@ -347,7 +348,7 @@ EXPORT mod_Validation := MODULE
 										INNER, KEEP(1), LOCAL);
 										
 					// find address records with no matching client id								
-					ad2 := DISTRIBUTE(j2(ClientId<>''), Hash32(ProgramCode, ProgramState, CaseId, ClientId));
+					ad2 := DISTRIBUTE(j2(ClientId<>''), Hash32(GroupId, ProgramCode, ProgramState, CaseId, ClientId));
 					j3 := JOIN(ad2, cl, left.GroupId=right.GroupId
 															AND left.ProgramCode=right.ProgramCode
 															AND left.ProgramState=right.ProgramState
