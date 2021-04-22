@@ -1,7 +1,9 @@
 ﻿// #############################################################################################
 // eCrashAccidents for Insurance Claims Clarity
-// #############################################################################################  
-  Layout_InseCrashSlim t_eCrashSlim(Files_eCrash.DS_BASE_ECRASH L) := TRANSFORM
+// ############################################################################################# 
+eCrash_Reportable := BaseFile(allow_Sale_Of_Component_Data = TRUE);
+
+  Layout_InseCrashSlim t_eCrashSlim(eCrash_Reportable L) := TRANSFORM
     //fabricated
     SELF.accident_nbr := IF(L.source_id IN ['TM','TF'], L.state_report_number, L.case_identifier);
     SELF.accident_date := IF(L.incident_id[1..9] = '188188188', '20100901', L.crash_date);
@@ -15,4 +17,4 @@
                               );
     SELF := L;
   END;
-EXPORT Map_eCrashAccidents_To_ClaimsClarityBase := PROJECT(Files_eCrash.DS_BASE_ECRASH, t_eCrashSlim(LEFT));
+EXPORT Map_eCrashAccidents_To_ClaimsClarityBase := PROJECT(eCrash_Reportable, t_eCrashSlim(LEFT));

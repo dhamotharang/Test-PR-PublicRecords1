@@ -1,4 +1,4 @@
-import ut, risk_indicators, models, scoring, riskwise;
+﻿import ut, risk_indicators, models, scoring, riskwise;
 #workunit('name','Field Summary Rpt');
 #option ('hthorMemoryLimit', 1000);
 
@@ -55,7 +55,7 @@ p_f := PROJECT(f,t_f(LEFT,COUNTER));
 output(p_f);
 
 
-roxieIP := 'http://roxiebatch.br.seisint.com:9856'; // Roxiebatch
+roxieIP := 'http://roxiethorvip.hpcc.risk.regn.net:9856'; // Roxiebatch
 
 s := riskwise.RiskwiseMainFLGO_Soapcall(project(p_f, transform(riskwise.Layout_FLG1, self:=left)), roxieIP);
 

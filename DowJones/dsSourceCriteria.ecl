@@ -2016,7 +2016,16 @@ EXPORT dsSourceCriteria := DATASET([
 {'HMRC (UK) Anti-Money Laundering Non-Compliance List','2003'},
 {'Indian Home Affairs Ministry Banned Individual List','2004'},
 {'Ministry of Foreign Affairs (China) Public Statements','2005'},
-{'US Customs and Border Protection (CBP) Withhold Release Orders and Forced Labor Findings','2006'}
+{'US Customs and Border Protection (CBP) Withhold Release Orders and Forced Labor Findings','2006'},
+{'EC (CFSP) 2021/560 Somalia List','2007'},
+{'EC 2021/549 ISIL (Da\'esh) and Al-Qaida List','2008'},
+{'EC 2021/559 Somalia List','2009'},
+{'BIS Military Intelligence End User List','2010'},
+{'EC (CFSP) 2021/585 Iran List','2011'},
+{'EC (CFSP) 2021/595 Iran List','2012'},
+{'EC 2021/584 Iran List','2013'},
+{'EC 2021/587 Iran List','2014'},
+{'Finland National Asset Freeze List','2015'}
 
 ],r);
 

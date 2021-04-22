@@ -1,4 +1,4 @@
-EXPORT macro_run_rva_3_0_prescreen(archive_date) := macro
+﻿EXPORT macro_run_rva_3_0_prescreen(archive_date) := macro
 #workunit('name','FCRA-Credit Attributes 3.0');
 #option ('hthorMemoryLimit', 1000);
 #option ('linkCountedRows', false); 
@@ -81,7 +81,7 @@ l := RECORD
 END;
 
 
-fcraroxieIP := 'http://fcrabatch.sc.seisint.com:9876'; 
+fcraroxieIP := 'http://fcrathorvip.hpcc.risk.regn.net:9876'; 
 
 l t_f(f le, INTEGER c) := TRANSFORM
 	SELF.old_account_number := le.account;
@@ -97,7 +97,7 @@ l t_f(f le, INTEGER c) := TRANSFORM
 
   self.HistoryDateYYYYMM := archive_date; //999999;
 
-	self.gateways := dataset([{'neutralroxie', 'http://roxiebatch.br.seisint.com:9856'}], risk_indicators.Layout_Gateways_In);
+	self.gateways := dataset([{'neutralroxie', 'http://roxiethorvip.hpcc.risk.regn.net:9856'}], risk_indicators.Layout_Gateways_In);
 
 	self.DataRestrictionMask := '100001000101'; // to restrict fares, experian and transunion.  Advo also restricted because this is presreen 
 

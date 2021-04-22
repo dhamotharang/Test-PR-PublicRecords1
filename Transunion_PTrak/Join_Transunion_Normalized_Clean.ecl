@@ -6,7 +6,7 @@ EXPORT Join_Transunion_Normalized_Clean(STRING Full_filedate,STRING Update_filed
 
 Import ut;
 
-norm_data := Transunion_PTrak.Normalize_Transunion_Update;
+norm_data := Transunion_PTrak.Normalize_Transunion_Update(Full_filedate,Update_filedate);
 
 //filter data with blank names, names = ',' or length 1
 
@@ -16,7 +16,7 @@ d_norm_data 			:= DISTRIBUTE(norm_data , HASH(Name));
 //JOIN CLEAN NAMES BACK TO NORMALIZED DATA
 //-----------------------------------------------------------------
 //Clean Name
-	name_clean := Transunion_PTrak.Clean_Transunion_Name;
+	name_clean := Transunion_PTrak.Clean_Transunion_Name(Full_filedate,Update_filedate);
 
 	//Join Clean Name
 Transunion_PTrak.Layout_Transunion_Out.FinalNormCleanNameRec t_join_get_name (d_norm_data L, name_clean R) := TRANSFORM

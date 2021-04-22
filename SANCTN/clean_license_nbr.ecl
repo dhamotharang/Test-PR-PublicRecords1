@@ -22,6 +22,7 @@ clean_license_data := sort(PROJECT(SANCTN_license_nbr,get_SANCTN_license(LEFT)),
 SANCTN.layout_SANCTN_license_clean 	trans_lic_type(clean_license_data L, TransLicTypeLkp R) := transform
 	self.STD_TYPE_DESC :=  ut.CleanSpacesAndUpper(R.license_description);
 	self := L;
+	self:=[];
 end;
 
 ds_type_trans := JOIN(clean_license_data, TransLicTypeLkp,

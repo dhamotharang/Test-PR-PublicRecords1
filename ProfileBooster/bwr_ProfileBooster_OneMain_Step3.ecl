@@ -6,10 +6,10 @@
 
 #workunit('priority','high'); 
 
-import _Control, STD, ProfileBooster;
+IMPORT _Control, STD, ProfileBooster, SaltRoutines, SALT38;
 
 
-EXPORT bwr_ProfileBooster_OneMain_Step3(string IPaddr, string AbsolutePath, string NotifyList) := function
+EXPORT bwr_ProfileBooster_OneMain_Step3(string NotifyList, string OldSaltProfileName) := function
 
 onThor := _Control.Environment.onThor;
 
@@ -225,7 +225,7 @@ original_output2 := dataset('~thor400::out::profile_booster_attributes_' + if(on
 original_output3 := dataset('~thor400::out::profile_booster_attributes_' + if(onThor, 'thor_', 'roxie_') + 'part3', modified_batchoutflat_layout, csv(quote('"')));
 original_output4 := dataset('~thor400::out::profile_booster_attributes_' + if(onThor, 'thor_', 'roxie_') + 'part4', modified_batchoutflat_layout, csv(quote('"')));
 
-original_output_full := original_output1 + original_output2 + original_output3 + original_output4 : FAILURE(FileServices.SendEmail(EmailList,'OneMain Step3 failed', 'The failed workunit is:' + WORKUNIT + FAILMESSAGE));
+original_output_full := original_output1 + original_output2 + original_output3 + original_output4 : FAILURE(STD.System.Email.SendEmail(EmailList,'OneMain Step3 failed', 'The failed workunit is:' + WORKUNIT + FAILMESSAGE));
 dedup_original_output := dedup(sort(original_output_full(lexid<>0), lexid), lexid);	// REMOVE RECORDS WHERE LEXID = 0 (PULLID)
 
 
@@ -431,7 +431,7 @@ reducedInput := join(original_input, project_deduped, left.lexid=right.lexid, tr
 
  NewLexidCount := count(project_deduped) - count(reducedOutput);
  
- Assert(count(reducedOutput) = count(reducedInput),'FAIL COUNTS', FAIL): FAILURE(FileServices.SendEmail(EmailList,'OneMain Step3 Input Output file counts do not match', 'The failed workunit is:' + WORKUNIT + FAILMESSAGE));	
+ Assert(count(reducedOutput) = count(reducedInput),'FAIL COUNTS', FAIL): FAILURE(STD.System.Email.SendEmail(EmailList,'OneMain Step3 Input Output file counts do not match', 'The failed workunit is:' + WORKUNIT + FAILMESSAGE));	
 											
  output(NewLexidCount, NAMED('NewLexidCount'));
  output(choosen(original_input, 10), NAMED('original_input'));
@@ -457,20 +457,19 @@ reducedInput := join(original_input, project_deduped, left.lexid=right.lexid, tr
  
  t := table(original_output_full, {lexid, lexidcount := count(group)}, lexid); 
  output(t(lexidcount>1), named('count_output_with_lexid'));
- 	
  
- desprayPath := AbsolutePath  + '/' +  'LN_Output_springleaf_layout_ProfBooster.csv';
- desprayPathPII := AbsolutePath +  '/' + 'LN_Output_springleaf_layout_PII.csv';
+NewSaltProfileName := 'One_Main_Salt_Profile_' + ((STRING)STD.Date.Today())[1..6];
 
-STD.File.DeSpray('~thor400::profilebooster::LN_Output_springleaf_layout_ProfBooster.csv', IPaddr, desprayPath): FAILURE(FileServices.SendEmail(EmailList,'OneMain Step3 Despray failed', 'The failed workunit is:' + WORKUNIT + FAILMESSAGE));
-STD.File.DeSpray('~thor400::profilebooster::LN_Output_springleaf_layout_PII.csv', IPaddr, desprayPathPII): FAILURE(FileServices.SendEmail(EmailList,'OneMain Step3 PII Despray failed', 'The failed workunit is:' + WORKUNIT + FAILMESSAGE));	
-	
+SALT_AttributeResults :=  SALTRoutines.SALT_Profile_Run_Everything(reducedOutputListGen, 'SALT_Results', HPCCFileName := NewSaltProfileName);
+OUTPUT(SALT_AttributeResults, NAMED('Total_Fields_Profiled'));
+
+FullSaltAnalysis := IF(OldSaltProfileName = '', ProfileBooster.Fn_ProfileBooster_OneMain_Salt_Analysis(OldSaltProfileName, NewSaltProfileName, EmailList), 'Old salt profile not provided, could not perform salt analysis.');
 
 // email results of this bwr
-	
-	FileServices.SendEmail(EmailList, 'OneMain Step3 finished ' + WORKUNIT, 'Original Input count  ' + ded + '    Original Output count ' + ded2 +
-																																			' Duplicate LexID count ' + count(t(lexidcount>1)) + '  Reduced Input count ' + count(reducedInput) + '   Output count ' + count(reducedOutput) + '   New LexID Output count ' + NewLexidCount):
-	FAILURE(FileServices.SendEmail(EmailList,'OneMain Step3 failed', 'The failed workunit is:' + WORKUNIT + FAILMESSAGE));
+
+STD.System.Email.SendEmail(EmailList, 'OneMain Step3 finished ' + WORKUNIT, 'Original Input count  ' + ded + '    Original Output count ' + ded2 +
+																																		' Duplicate LexID count ' + count(t(lexidcount>1)) + '  Reduced Input count ' + count(reducedInput) + '   Output count ' + count(reducedOutput) + '   New LexID Output count ' + NewLexidCount):
+FAILURE(STD.System.Email.SendEmail(EmailList,'OneMain Step3 failed', 'The failed workunit is:' + WORKUNIT + FAILMESSAGE));
 
 
 

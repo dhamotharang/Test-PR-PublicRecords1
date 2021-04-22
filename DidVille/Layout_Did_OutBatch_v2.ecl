@@ -9,4 +9,5 @@ export Layout_Did_OutBatch_V2 := record
 	 patriot.Layout_PatriotAppend;
 	 didville.layout_lookups;
 	 didville.layout_livingsits;
+	 unsigned8 location_id := 0;
 end;

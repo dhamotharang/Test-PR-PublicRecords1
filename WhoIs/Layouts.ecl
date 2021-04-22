@@ -165,4 +165,8 @@ EXPORT layouts := MODULE
 		// UNSIGNED8 uniq_email_id := 0;   //unique email identifier		
 		END;
 		
+  EXPORT UniqueId := RECORD
+	UNSIGNED8 unique_id;
+	Base;
+	END;
 END;	

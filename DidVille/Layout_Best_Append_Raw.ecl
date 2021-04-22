@@ -1,4 +1,4 @@
-export Layout_Best_Append_Raw := RECORD
+﻿export Layout_Best_Append_Raw := RECORD
   string10 	best_phone := '';
   string9  	best_ssn := '';
   string9  	max_ssn := '';
@@ -15,6 +15,7 @@ export Layout_Best_Append_Raw := RECORD
   STRING6	best_addr_date := '';
   string8  	best_dob := '';
   string8  	best_dod := '';
+  UNSIGNED8 location_id := 0;
   STRING3 	verify_best_phone := '';
   STRING3 	verify_best_ssn := '';
   STRING3 	verify_best_address := '';

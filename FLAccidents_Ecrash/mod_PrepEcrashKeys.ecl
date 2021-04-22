@@ -117,6 +117,14 @@ dsAgencyBaseAll := dsAgencyBase + dsMissingAgencyAll;
 EXPORT AgencyBase :=  dsAgencyBaseAll;
 
 //***********************************************************************
+//           key_EcrashV2_agencysource
+//***********************************************************************
+dsAgencySourceBase := PROJECT(Files_eCrash.DS_BASE_CONSOLIDATION_MBSAgency, TRANSFORM(dx_Ecrash.Layouts.AGENCYSOURCE, 
+                                                                                      SELF.CONTRIB_SOURCE := LEFT.SOURCE_ID; 
+                                                                                      SELF := LEFT; 
+																																											SELF := [];));
+EXPORT AgencySourceBase	:= dsAgencySourceBase;																																								
+//***********************************************************************
 //           Key_ecrashV2_PhotoId
 //***********************************************************************
 ds_SupplementalBase := SupplementalBase(TRIM(Report_Type_Id, LEFT, RIGHT) IN ['A','DE'] OR

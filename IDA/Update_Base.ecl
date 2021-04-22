@@ -6,7 +6,7 @@ EXPORT Update_Base (string pversion='', boolean pUseProd=false, boolean pdaily=t
 
 //standardize input
 
-input := IDA.Files(pversion,pUseProd).input;
+input := IDA.Files(pversion,pUseProd).cleanedinput;
 
 Ida.layouts.base tMapping(ida.layouts.input L, C) := TRANSFORM
 
@@ -24,12 +24,12 @@ Ida.layouts.base tMapping(ida.layouts.input L, C) := TRANSFORM
 	SELF.orig_address2                := l.addressline2;
 	SELF.orig_city                    := l.city;
 	SELF.orig_state_province          := l.state;
-	SELF.orig_zip4                    := l.zip;
-	SELF.orig_zip5                    := '';
-  SELF.orig_dob                     := l.dob;
+	SELF.orig_zip4                    := '';
+	SELF.orig_zip5                    := l.zip;
+    SELF.orig_dob                     := l.dob;
 	SELF.orig_ssn                     := l.ssn;
-  SELF.orig_dl                      := l.dl;
-  SELF.orig_dlstate                 := l.dlstate;
+    SELF.orig_dl                      := l.dl;
+    SELF.orig_dlstate                 := l.dlstate;
 	SELF.orig_phone                   := l.phone;
 	SELF.clientassigneduniquerecordid := l.clientassigneduniquerecordid;
 	SELF.adl_ind                      := '';
@@ -42,7 +42,7 @@ Ida.layouts.base tMapping(ida.layouts.input L, C) := TRANSFORM
 	SELF := [];
 END;
 
-std_input := project(IDA.Files(pversion,pUseProd).input, tMapping(LEFT, counter));
+std_input := project(input, tMapping(LEFT, counter));
 
 
 //Clean names
@@ -65,8 +65,10 @@ cleanNames_t := project(cleanNames, transform({recordof(cleanNames), string orig
 																		self := left));			
 																					
 																			
-unsigned4	lFlags := AID.Common.eReturnValues.RawAID | AID.Common.eReturnValues.ACECacheRecords;		
-AID.MacAppendFromRaw_2Line(cleanNames_t,orig_addr1,orig_addr2,RawAID,cleanAddr, lFlags);
+																																							
+unsigned4	lFlags := AID.Common.eReturnValues.RawAID | AID.Common.eReturnValues.ACECacheRecords | AID.Common.eReturnValues.NoNewCacheFiles;
+AID.MacAppendFromRaw_2Line(cleanNames_t,orig_addr1,orig_addr2,RawAID,cleanAddr,lFlags);
+
 
 IDA.Layouts.base tr(cleanAddr l) := TRANSFORM
 	self.title := l.cln_title;
@@ -128,7 +130,7 @@ end;
 
 //DID
 
-matchset := ['A','Z','D','P'];
+matchset := ['A','Z','D','P','S'];
 	 did_add.MAC_Match_Flex
 	 (new_base_s, matchset,					
 	 orig_ssn, clean_dob, fname, mname, lname, name_suffix, 

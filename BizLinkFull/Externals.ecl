@@ -1,9 +1,9 @@
-﻿EXPORT Externals := MODULE
+EXPORT Externals := MODULE
   IMPORT SALT44,BizLinkFull;// Gather up the UID counts from each of the children - provides 'we also found' capability
 SHARED AllEfr0 := Mod_Ext_Data().EFR;
- 
+
 EXPORT EFRKeyName := '~'+'key::BizLinkFull::proxid::EFR';
- 
+
 // Need to compute the 'rolled up' counts for parents in hierarchy
   R1 := RECORD
     AllEFR0.Child_Id;
@@ -36,12 +36,12 @@ EXPORT EFRKeyName := '~'+'key::BizLinkFull::proxid::EFR';
   END;
   AllEFR3 := TABLE(AllEFR2,R3,ultid,Child_Id,ChildId_BMap,MERGE);
   AllEFR4 := AllEFR0 + PROJECT(AllEFR1,Ext_Layouts.EFRR_Layout) + PROJECT(AllEFR2,Ext_Layouts.EFRR_Layout) + PROJECT(AllEFR3,Ext_Layouts.EFRR_Layout);
- 
+
   m := GROUP(AllEfr4(~(proxid = 0 AND seleid = 0 AND orgid = 0 AND ultid = 0)),ultid,orgid,seleid,proxid,ALL);
   r := ROLLUP(m,GROUP,TRANSFORM(Ext_Layouts.EFR_Layout,
         SELF.ChildID_BMap := ROLLUP(ROWS(LEFT),TRANSFORM(Ext_Layouts.EFRR_Layout,SELF.ChildId_BMap := LEFT.ChildID_BMap | RIGHT.ChildId_BMap,SELF := RIGHT),ultid,orgid,seleid,proxid)[1].ChildId_BMap,
         SELF.Hits := PROJECT(ROWS(LEFT),Ext_Layouts.EFR_Child),SELF := LEFT));
- 
+
 EXPORT EFR := INDEX(r,{ultid,orgid,seleid,proxid},{r},EFRKeyName,OPT);
 // Results will be aggregated by UniqueID from the idstream
 EXPORT FetchEFR(DATASET(Process_Biz_Layouts.id_stream_layout) idstream) := FUNCTION
@@ -55,12 +55,13 @@ EXPORT FetchEFR(DATASET(Process_Biz_Layouts.id_stream_layout) idstream) := FUNCT
   RETURN TABLE(N,{ UniqueID, Child_Id, UNSIGNED Cnt := SUM(GROUP,Cnt)},UniqueId,Child_Id,FEW);
 END;
 EXPORT BuildEFR := BUILDINDEX(EFR, OVERWRITE);
- 
+
 EXPORT EFRStats := TABLE(AllEfr0,{ Child_ID,proxidCnt := COUNT(GROUP)}, Child_ID,FEW);
 // Act as a central construction point for building ALL the external files.
 // In reality - most of them will be individually built to different timescales
 EXPORT BuildAll := SEQUENTIAL(PARALLEL(Mod_Ext_Data().BuildAll),BuildEFR);
- 
+
+
 // Construct a fetch interface for a 'comp report' of all the external files
 EXPORT FetchParams := MODULE,VIRTUAL // Derive from here to change some of the default values
   EXPORT SET OF INTEGER2 ToFetch := [Ext_Layouts.ID_Ext_Data]; // Remove elements to prevent externals being fetched

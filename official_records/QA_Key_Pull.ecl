@@ -1,6 +1,4 @@
-import ut;
-
-export QA_Key_Pull := function
+﻿export QA_Key_Pull := function
 
 //cng 20070416 - dataland W20070418-163126 - stats and qa pull added as seperate BWR b/c of issues with STRATA stat naming convention
 
@@ -10,6 +8,10 @@ new_file_document := distribute(dataset('~thor_200::base::official_records_docum
 old_file_document := distribute(dataset('~thor_200::base::official_records_document_father', official_records.Layout_Moxie_Document, flat),hash32(official_record_key));
 new_file_party := distribute(dataset('~thor_200::base::official_records_party', official_records.Layout_Moxie_Party, flat),hash32(official_record_key));
 old_file_party := distribute(dataset('~thor_200::base::official_records_party_father', official_records.Layout_Moxie_Party, flat),hash32(official_record_key));
+
+//DF-28176 dedup on official_record_key to avoid many to many join 
+old_file_document_dedup := dedup(sort(old_file_document,official_record_key,local),official_record_key,local); 
+old_file_party_dedup := dedup(sort(old_file_party,official_record_key,local),official_record_key,local); 
 
 new_keys_layout :=
 record
@@ -25,7 +27,7 @@ new_keys_layout join_files_doc(official_records.Layout_Moxie_Document l, officia
 		self := l;
 	end;
 
-new_document_keys := join(new_file_document, old_file_document, left.official_record_key = right.official_record_key,
+new_document_keys := join(new_file_document, old_file_document_dedup, left.official_record_key = right.official_record_key,
 							join_files_doc(left, right), left only, local) : persist('~thor_200::persist::official_records_document_qa_keys');
 
 new_keys_layout join_files_par(official_records.Layout_Moxie_Party l, official_records.Layout_Moxie_Party r) :=
@@ -34,7 +36,7 @@ new_keys_layout join_files_par(official_records.Layout_Moxie_Party l, official_r
 		self := l;
 	end;
 							
-new_party_keys := join(new_file_party, old_file_party, left.official_record_key = right.official_record_key,
+new_party_keys := join(new_file_party, old_file_party_dedup, left.official_record_key = right.official_record_key,
 							join_files_par(left, right), left only, local) : persist('~thor_200::persist::official_records_party_qa_keys');
 
 keyout := output(choosesets(new_document_keys, 

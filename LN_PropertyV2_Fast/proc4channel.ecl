@@ -296,7 +296,11 @@ buildKey	:=	sequential( LN_PropertyV2_Fast.BuildLogger.update(filedate,'key_buil
 												  parallel(Move_keys_orig, Move_keys_new),
 													LN_PropertyV2_Fast.Proc_FCRA_Field_Deprecation_Stats(isFast),				//DF-21968
 													autokeys,
-												  if(isFast,parallel(to_qa_orig_isFast, To_qa_fcra_isFast, promotedelta),
+												  if(isFast,
+                                sequential(
+                                    parallel(to_qa_orig_isFast, To_qa_fcra_isFast, promotedelta),
+                                    LN_PropertyV2_Fast.verify_fakeid_are_unique, // DF-28906 - IIR-2644 check duplicate fakeID,
+                                    output('No Duplicate FakeID')),
 													          parallel(to_qa_orig_notFast, To_qa_fcra_notFast));
 													deeds_boolean_keys,
 													assessor_boolean_keys,		

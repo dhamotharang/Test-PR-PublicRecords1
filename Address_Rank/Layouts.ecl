@@ -62,7 +62,8 @@ EXPORT Layouts := MODULE
 		STRING1			property_owner;						//(Y/N)
 		STRING1			long_term_hit;						//(Y/N)
 		STRING1			short_term_hit;						//(Y/N)
-		STRING1			owner_occupied_hit;				//(Y/N)	
+		STRING1			owner_occupied_hit;				//(Y/N)
+    UNSIGNED8   location_id := 0;
 	END;
 	EXPORT BatchOut_wInputEcho := RECORD
 		BatchShare.Layouts.ShareAcct;

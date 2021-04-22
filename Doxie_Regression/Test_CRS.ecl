@@ -1,4 +1,4 @@
-#workunit('name','crs soapcall')
+﻿#workunit('name','crs soapcall')
 import doxie_cbrs,doxie,ut,watchdog;
 
 myFile := dataset('~thor_data400::BASE::Watchdog_Best',watchdog.Layout_Best,thor);
@@ -41,7 +41,7 @@ END;
 servicename := 'Doxie.Comprehensive_Report_Service';
 
 fromsoap := soapcall(dids_ds, 
-										'http://roxiestaging.br.seisint.com:9876',
+										'http://certstagingvip.hpcc.risk.regn.net:9876',
 									  servicename, 
 										{dids_ds},
 									  dataset(rec_out), PARALLEL(1), onFail(ft(LEFT)),

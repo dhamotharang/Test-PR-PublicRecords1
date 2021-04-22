@@ -11,12 +11,13 @@ else_filter_find := '[Ã¢]';
 //else_filter_find := '[^[:print:]]';
 else_filter := '[^[:print:]]';
 
-SANCTN.layout_SANCTN_rebuttal_in clean_SANCTN_rebuttal(SANCTN_rebuttal_text input) := TRANSFORM
+SANCTN.layout_SANCTN_rebuttal_base clean_SANCTN_rebuttal(SANCTN_rebuttal_text input) := TRANSFORM
 
 	  self.PARTY_TEXT       := IF(regexfind(else_filter_find,input.party_text) = false,input.party_text,
 		                            regexreplace(else_filter,input.party_text,'',NOCASE));
 
    self                     := input;
+   self:=[];
    
 end;
 

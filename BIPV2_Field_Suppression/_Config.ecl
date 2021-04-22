@@ -13,6 +13,7 @@ export _Config(
 		,pIsTesting						:= Tools._Constants.IsDataland
 	))
 	
-  export Suppression_File := LinkingTools.mac_Suppression_File_Management('~BIPV2_Field_Suppression::');
+  export Suppression_File           := LinkingTools.mac_Suppression_File_Management('~BIPV2_Field_Suppression::'        );  //for proxid and lgid3 suppression
+  export Hierarchy_Suppression_File := LinkingTools.mac_Suppression_File_Management('~BIPV2_Field_Suppression::hrchy::' );  //for suppression of hierarchy
   
 end;

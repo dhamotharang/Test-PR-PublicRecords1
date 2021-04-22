@@ -784,6 +784,7 @@ EXPORT tools_dotid(dataset(l_as_linking) ds_as_linking = dataset([],l_as_linking
         (     mdr.sourceTools.SourceIsDunn_Bradstreet     (psource) 
           or  mdr.sourceTools.SourceIsInfutor_NARB        (psource) 
           or  mdr.sourceTools.SourceIsDunn_Bradstreet_Fein(psource)
+          or  mdr.sourceTools.SourceIsDataBridge          (psource) 
         ) 
         and length(trim(psic)) in [4,8]
       )

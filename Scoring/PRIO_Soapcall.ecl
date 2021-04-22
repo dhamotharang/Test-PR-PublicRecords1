@@ -1,6 +1,6 @@
-import RiskWise;
+﻿import RiskWise;
 
-export PRIO_Soapcall(dataset(layout_PRIO_soapcall) indata, string roxieIP='http://oroxievip.sc.seisint.com:9876', parallel_threads) := function
+export PRIO_Soapcall(dataset(layout_PRIO_soapcall) indata, string roxieIP='http://prdrroxiethorvip.hpcc.risk.regn.net:9876', parallel_threads) := function
 	
 errx := record
 	string errorcode := '';

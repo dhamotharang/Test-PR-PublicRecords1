@@ -1,4 +1,4 @@
-IMPORT FraudShared,_Validate,Std,ut,tools,Data_Services;
+IMPORT _Validate,Std,ut,tools,Data_Services;
 EXPORT Build_Base_UnitTests(
 	string pversion,
 	string pversion_previous = ''
@@ -15,8 +15,8 @@ module
 			pversion_previous );
 
 
-	pBaseMainFile := FraudShared.Files(pversion).Base.Main.New;
-	pPreviousMain := FraudShared.Files(vVersion_previous).Base.Main.New;
+	pBaseMainFile := FraudGovPlatform.Files(pversion).Base.Main.New;
+	pPreviousMain := FraudGovPlatform.Files(vVersion_previous).Base.Main.New;
 
 
 	FirstRinID := FraudGovPlatform.Constants().FirstRinID;

@@ -1,5 +1,4 @@
-﻿IMPORT FraudShared;
-EXPORT Functions :=  MODULE 
+﻿EXPORT Functions :=  MODULE 
 	
 	EXPORT     fSlashedMDYtoCYMD(string pDateIn) 
 				:=          intformat((integer2)regexreplace('.*/.*/([0-9]+)',pDateIn,'$1'),4,1) 
@@ -9,7 +8,7 @@ EXPORT Functions :=  MODULE
 
 	EXPORT Classification (
 
-			 dataset(FraudShared.Layouts.Base.Main) pBaseFile ) := 
+			 dataset(FraudGovPlatform.Layouts.Base.Main) pBaseFile ) := 
 						 
 	FUNCTION 
 
@@ -20,9 +19,9 @@ EXPORT Functions :=  MODULE
 		MBS_Layout := RECORD
 			string12 			Customer_ID;
 			string100			Source;
-			FraudShared.Layouts.Classification.source			classification_source; 
-			FraudShared.Layouts.Classification.Activity		classification_Activity;
-			FraudShared.Layouts.Classification.Entity			classification_Entity;
+			FraudGovPlatform.Layouts.Classification.source			classification_source; 
+			FraudGovPlatform.Layouts.Classification.Activity		classification_Activity;
+			FraudGovPlatform.Layouts.Classification.Entity			classification_Entity;
 		END;
 
 		MBS_CVD_T := PROJECT (MBS_CVD_Rec , transform(MBS_Layout , 
@@ -70,7 +69,7 @@ EXPORT Functions :=  MODULE
 		JCVD := join (dBaseFile , MBS_CVD_T, 
 		left.Customer_ID = right.Customer_ID
 		and  left.Source = right.Source,
-								transform (FraudShared.Layouts.Base.Main ,
+								transform (FraudGovPlatform.Layouts.Base.Main ,
 										self.classification_source.Primary_source_Entity := right.classification_source.Primary_source_Entity; 
 										self.classification_source.Expectation_of_Victim_Entities := right.classification_source.Expectation_of_Victim_Entities; 
 										self.classification_source.Industry_segment := right.classification_source.Industry_segment; 
@@ -96,12 +95,12 @@ EXPORT Functions :=  MODULE
 										self.classification_Entity.investigated_count := right.classification_Entity.investigated_count; 
 										self:= left ) , left outer , lookup );
 
-		MBS := FraudShared.Files().Input.MBS.Sprayed; 
+		MBS := Files().Input.MBS.Sprayed; 
 
 		JMbs  := join (JCVD , MBS(status = 1) , 
 		left.source = right.fdn_file_code and 
 		left.Customer_ID = (string)right.gc_id,
-										transform (FraudShared.Layouts.Base.Main,
+										transform (FraudGovPlatform.Layouts.Base.Main,
 										v_deceitful_confidence_id := if( regexfind('DELTA', left.source, nocase),left.classification_Activity.confidence_that_activity_was_deceitful_id, right.confidence_that_activity_was_deceitful);
 										v_deceitful_confidence_desc := MAP(	
 													v_deceitful_confidence_id=1=>'PROBABLE',
@@ -322,7 +321,7 @@ EXPORT Functions :=  MODULE
 	END;
 
 
-	Current_Build := IF(_Flags.FileExists.Base.Main, FraudShared.Files().Base.Main.Built, DATASET([], FraudShared.Layouts.Base.Main));
+	Current_Build := IF(_Flags.FileExists.Base.Main, FraudGovPlatform.Files().Base.Main.Built, DATASET([], FraudGovPlatform.Layouts.Base.Main));
 	
 	EXPORT LastRinID := MAX(Current_Build(DID >= FraudGovPlatform.Constants().FirstRinID), DID);
 
