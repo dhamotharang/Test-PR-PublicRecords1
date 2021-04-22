@@ -1,8 +1,14 @@
-﻿EXPORT ScrubsPlus_PassFile(inputFile,DatasetName,ScrubsModule,ScrubsProfileName,ScopeName='',filedate,emailList='', UseOnFail=false,SubmitInWu=false)	:=	FUNCTIONMACRO 
-IMPORT tools,std,ut,SALT311;
+﻿/*2017-08-30T13:57:38Z (ddittman_prod)
+C:\Users\dittda01\AppData\Roaming\HPCC Systems\eclide\ddittman_prod\Dataland\Scrubs\ScrubsPlus\2017-08-30T13_57_38Z.ecl
+*/
 
+
+
+EXPORT ScrubsPlus(DatasetName,ScrubsModule,ScrubsProfileName,ScopeName='',filedate,emailList='', UseOnFail=false, SubmitInWu=false)	:=	FUNCTIONMACRO 
+IMPORT tools,std,ut,SALT311;
 	folder						:=	#EXPAND(ScrubsModule);
-	inFile						:=	inputFile;
+	inName						:=	IF(TRIM(ScopeName,ALL)<>'',TRIM(ScopeName,ALL)+'_In_'+DatasetName,'In_'+DatasetName);
+	inFile						:=	folder.#EXPAND(inName);
 	scrubs_name				:=	IF(TRIM(scopename,ALL)<>'',TRIM(scopename,ALL)+'_Scrubs','Scrubs');
 	scope_datasetName	:=	IF(TRIM(scopename,ALL)<>'',scopename+'_'+DatasetName,ScrubsProfileName);
 	profilename				:=	ScrubsProfileName;
@@ -18,8 +24,6 @@ IMPORT tools,std,ut,SALT311;
 	ErrorSummary			:=	OUTPUT(U.SummaryStats, NAMED(Prefix+'_ErrorSummary'));										//	Show errors by field and type
 	EyeballSomeErrors	:=	OUTPUT(CHOOSEN(U.AllErrors, 1000), NAMED(Prefix+'_EyeballSomeErrors'));		//	Just eyeball some errors
 	SomeErrorValues		:=	OUTPUT(CHOOSEN(U.BadValues, 1000), NAMED(Prefix+'_SomeErrorValues'));			//	See my error field values
-	
-	
 	
 	LoadStats					:=	U.OrbitStats(); 
 	Orbit_stats			:=project(LoadStats,transform(Salt311.ScrubsOrbitLayout,self.RulePcnt := (decimal5_2) (((real)left.Rulecnt/(real)left.RecordsTotal) * 100.00);self:=left;));
@@ -81,7 +85,6 @@ IMPORT tools,std,ut,SALT311;
 	dWithScrubs	:=	PROJECT(N.BitmapInfile,tWithScrubsResults(LEFT));
 	ErroredRecords					:= count(dWithScrubs(bFailedScrubs));
 	PcntErroredRec					:= (String)((decimal5_2)((((real)ErroredRecords)/((real)TotalRecs))*100));
-	//This will output a file with bitmap(s) and a processed file with all on fail flags activated for the rules
 	
 	LoadProfile:=dataset('~thor_data400::Scrubs::'+ScrubsProfileName+'::ProfileStorage',Scrubs.Layouts.ProfileRule_Rec,thor,opt);
 	
@@ -102,13 +105,15 @@ IMPORT tools,std,ut,SALT311;
 	IdentifyExceedSevere			:=	IdentifyExceedThreshold(Severity='1');
 	
 	NumExceedThreshold:=count(IdentifyExceedThreshold);
-	NumExceedSevere:=count(IdentifyExceedSevere);	
+	NumExceedSevere:=count(IdentifyExceedSevere);
 	
-	bitfile_name			:=	'~thor_data::'+scope_datasetName+'::Scrubs_Bits'+if(filedate <> '','::'+filedate,'');
-	processedfile_name		:=	'~thor_data::'+scope_datasetName+'::Processed_File'+if(filedate <> '','::'+filedate,'');
-	CreateBitmaps		:=	OUTPUT( N.BitmapInfile,,bitfile_name, OVERWRITE, compressed, named(scope_datasetName+'_BitFile_'),EXPIRE(7)); // long term storage
+																			 
+	//This will output a file with bitmap(s) and a processed file with all on fail flags activated for the rules
+	bitfile_name		:=	'~thor_data::'+scope_datasetName+'::Scrubs_Bits'+if(filedate<>'','::'+filedate,'');
+	processedfile_name		:=	'~thor_data::'+scope_datasetName+'::Processed_File'+if(filedate<>'','::'+filedate,'');
+	CreateBitmaps		:=	OUTPUT( N.BitmapInfile,,bitfile_name, OVERWRITE, compressed, named(scope_datasetName+'_BitFile_')); // long term storage
 	#if(UseOnFail)
-	CreateProcessed		:=	OUTPUT( N.ProcessedInfile,,processedfile_name, OVERWRITE, compressed, named(scope_datasetName+'_ProcessedInfile_'),EXPIRE(7)); // long term storage	
+	CreateProcessed		:=	OUTPUT( N.ProcessedInfile,,processedfile_name, OVERWRITE, compressed, named(scope_datasetName+'_ProcessedInfile_')); // long term storage	
 	#end
 	DS := DATASET(bitfile_name,S.Bitmap_Layout,FLAT); // Read in my data (which has bitmap appended
 	//This will translate the bitmap(s)
@@ -136,7 +141,6 @@ IMPORT tools,std,ut,SALT311;
 																			'Percent Errored Records:'+PcntErroredRec+'\n'+
 																			'Total Number of Removed Recs:'+TotalRemovedRecs+'\n'+
 																			'Workunit:'+tools.fun_GetWUBrowserString()+'\n')));
-																			
 	#IF(SubmitInWu = true)
 	SubmitStats						:=	Scrubs.OrbitProfileStatsPost310(profilename,'ScrubsAlerts',Orbit_stats,filedate,profilename).SubmitStatsInWU;
 	#ELSE
@@ -158,9 +162,7 @@ IMPORT tools,std,ut,SALT311;
 
 
 
-
-
-	return	ORDERED(
+	return	ordered(
 		parallel(ErrorSummary,
 		EyeballSomeErrors,
 		SomeErrorValues,
