@@ -84,6 +84,7 @@ r0 transform_party(ds_party Linput) := transform
 		self.date_vendor_last_reported := Linput.date_vendor_last_reported;
 		self.global_sid := Linput.global_sid;
 		self.record_sid := Linput.record_sid;
+		self:=[];
 
 end;
 
