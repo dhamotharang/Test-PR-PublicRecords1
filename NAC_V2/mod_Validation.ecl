@@ -58,8 +58,9 @@ EXPORT mod_Validation := MODULE
 										DATASET([{errcodes.E109, 'E', 'F', FieldCode('E',errcodes.E109), name, state, RecordCode}], rErr)); 
 	//shared ValidLastName(string name, string2 state, string4 RecordCode) := IF(NOT IsValidName(name),
 	shared ValidLastName(string name, string2 state, string4 RecordCode) := IF(name='',
-										DATASET([{errcodes.E110, 'E', 'F', FieldCode('E',errcodes.E110), name, state, RecordCode}], rErr)); 
-	shared suffix_set := ['I','II', 'III','IV','V','VI', 'JR', 'SR'];
+										DATASET([{errcodes.E110, 'E', 'F', FieldCode('E',errcodes.E110), name, state, RecordCode}], rErr));
+										
+	export suffix_set := ['I','II', 'III','IV','V','VI','VII', 'JR', 'SR', 'JNR', 'SNR'];
 	
 	shared ValidSsn(string9 ssn, string1 ssnType, string2 state, string4 RecordCode) := 
 				IF(ssnType = Mod_Sets.Actual_Type AND NOT REGEXFIND('^\\d{9}$', TRIM(ssn)), 
@@ -151,8 +152,8 @@ EXPORT mod_Validation := MODULE
 									DATASET([{warningCodes.W105, 'W', 'F', ValidationCodes.fcFirstName, left.FirstName, left.ProgramState, left.RecordCode}], rErr))
 							+	IF(left.MiddleName<> '' and HasInvalidChar(left.MiddleName),
 									DATASET([{warningCodes.W105, 'W', 'F', ValidationCodes.fcMiddleName, left.MiddleName, left.ProgramState, left.RecordCode}], rErr))
-							+	IF(left.NameSuffix<> '' and 
-										Trim(STD.Str.RemoveSuffix(Std.Str.ToUpperCase(left.NameSuffix),'.')) NOT IN suffix_set,
+							+	IF(left.NameSuffix<> '' and TRIM(left.NameSuffix) NOT IN suffix_set,
+									//	Trim(STD.Str.RemoveSuffix(Std.Str.ToUpperCase(left.NameSuffix),'.')) NOT IN suffix_set,
 									DATASET([{warningCodes.W105, 'W', 'F', ValidationCodes.fcSuffixName, left.NameSuffix, left.ProgramState, left.RecordCode}], rErr))
 
 							+ IF(left.Race = '' OR left.Race not in Mod_sets.Race, 
