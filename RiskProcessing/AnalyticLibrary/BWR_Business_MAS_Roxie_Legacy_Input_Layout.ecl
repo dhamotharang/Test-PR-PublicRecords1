@@ -8,6 +8,8 @@ roxieIP := RiskWise.Shortcuts.prod_batch_analytics_roxie;
 
 InputFile :=  '~hmccarl::in::bshell_test_inputs';
 
+RiskWise.shortcuts.check_thread_count(Threads);
+
 /* Data Setting 	NonFCRA 	
 DRMFares = 0 //FARES - bit 1
 DRMExperian =	0 - //FARES bit 6
