@@ -58,6 +58,8 @@ EXPORT PfResSnapshotSearchRecords (PhoneFinder_Services.Layouts.PFResSnapShotSea
     SELF.PhoneFinderSearchParameters.Address.State := r.submitted_state;
     SELF.PhoneFinderSearchParameters.Address.Zip5 := r.submitted_zip;
     SELF.PrimaryPhone.PhoneNumber := r.phonenumber;
+    SELF.PrimaryPhone.PhoneVerified := (UNSIGNED)r.phone_verified;
+    SELF.PrimaryPhone.VerificationType := r.verification_type;
     SELF.PrimaryPhone.RiskIndicator := r.risk_indicator;
     SELF.PrimaryPhone.PhoneType := r.phone_type;
     SELF.PrimaryPhone.PhoneStatus := r.phone_status;
