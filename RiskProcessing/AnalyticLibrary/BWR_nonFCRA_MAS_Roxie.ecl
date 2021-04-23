@@ -9,6 +9,8 @@ roxieIP := RiskWise.Shortcuts.prod_batch_analytics_roxie;
 InputFile := '~mas::uatsamples::consumer_nonfcra_100k_07102019.csv ';
 //InputFile := '~mas::uatsamples::consumer_nonfcra_1m_07092019.csv';
 
+RiskWise.shortcuts.check_thread_count(Threads);
+
 /*
 Data Setting 		NonFCRA
 DRMFares = 0 //FARES - bit 1

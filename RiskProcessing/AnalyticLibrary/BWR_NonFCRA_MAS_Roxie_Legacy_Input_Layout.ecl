@@ -8,6 +8,8 @@ roxieIP := RiskWise.Shortcuts.prod_batch_analytics_roxie;
 
 InputFile :=  '~nmontpetit::in::pii_tmx_fraud_policy_test_190108_190115';
 
+RiskWise.shortcuts.check_thread_count(Threads);
+
 
 /*
 Data Setting 		NonFCRA

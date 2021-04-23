@@ -8,6 +8,8 @@ roxieIP := RiskWise.Shortcuts.prod_batch_analytics_roxie;
 InputFile := '~mas::uatsamples::business_nfcra_100k_07102019.csv'; //100k file
 // InputFile := '~mas::uatsamples::business_nfcra_1m_07092019.csv'; //1m file
 
+RiskWise.shortcuts.check_thread_count(Threads);
+
 /* Data Setting 	NonFCRA 	
 DRMFares = 0 //FARES - bit 1
 DRMExperian =	0 - //FARES bit 6
