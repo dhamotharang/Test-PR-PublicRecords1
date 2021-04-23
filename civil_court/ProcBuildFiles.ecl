@@ -9,7 +9,7 @@ EXPORT ProcBuildFiles(
 
 	fUpdateCurrDevVerLogical := SEQUENTIAL(
 		IF(
-			STD.File.LogicalFileSuperowners(vCurrDevVerLogical) = vDevVerSuper[2..],
+			STD.File.LogicalFileSuperowners(vCurrDevVerLogical)[1].name = vDevVerSuper[2..],
 			SEQUENTIAL(
 				STD.File.StartSuperFileTransaction(),
 				STD.File.RemoveSuperFile(vDevVerSuper,vCurrDevVerLogical),
