@@ -1,8 +1,6 @@
 ﻿IMPORT Std, FraudgovKEL, FraudGovPlatform, data_services, ut,doxie,Suppress;
-#CONSTANT ('Platform','FraudGov');
-RunKelDemo :=false:stored('RunKelDemo');
 
-FileIn := If(RunKelDemo=false,'fraudgov::base::built::Main','fraudgov::in::sprayed::demodata');
+FileIn := 'fraudgov::base::built::Main';
 
 fraudgov_dataset_Input := dataset(data_services.foreign_prod+FileIn, FraudGovPlatform.Layouts.Base.Main, thor); 
 
