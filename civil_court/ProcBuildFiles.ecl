@@ -10,10 +10,12 @@ EXPORT ProcBuildFiles(
 	fUpdateCurrDevVerLogical := SEQUENTIAL(
 		IF(
 			STD.File.LogicalFileSuperowners(vCurrDevVerLogical)[1].name = vDevVerSuper[2..],
-			SEQUENTIAL(
-				STD.File.StartSuperFileTransaction(),
-				STD.File.RemoveSuperFile(vDevVerSuper,vCurrDevVerLogical),
-				STD.File.FinishSuperFileTransaction()
+			NOTHOR(
+				SEQUENTIAL(
+					STD.File.StartSuperFileTransaction(),
+					STD.File.RemoveSuperFile(vDevVerSuper,vCurrDevVerLogical),
+					STD.File.FinishSuperFileTransaction()
+				)
 			)
 		),
 		OUTPUT(
@@ -24,12 +26,12 @@ EXPORT ProcBuildFiles(
 	);
 	
 	fCreateDevVerSuper := IF (
-		NOT STD.File.SuperFileExists(vDevVerSuper),
+		NOT NOTHOR(STD.File.SuperFileExists(vDevVerSuper)),
 		STD.File.CreateSuperFile(vDevVerSuper)
 	);
 
 	fPlaceInDevVerSuper := IF(
-		STD.File.GetSuperFileSubName(vDevVerSuper, 1, TRUE) != vCurrDevVerLogical,
+		NOTHOR(STD.File.GetSuperFileSubName(vDevVerSuper, 1, TRUE)) != vCurrDevVerLogical,
 		SEQUENTIAL(
 			STD.File.StartSuperFileTransaction(),
 			STD.File.AddSuperFile(vDevVerSuper, vCurrDevVerLogical),
