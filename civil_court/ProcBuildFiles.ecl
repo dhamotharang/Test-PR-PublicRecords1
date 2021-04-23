@@ -7,22 +7,16 @@ EXPORT ProcBuildFiles(
 	vCurrDevVerLogical := '~thor_data400::civil_court::current_development_version';
 	vDevVerSuper := '~thor_data400::civil_court::development_version';
 
-	fUpdateCurrDevVerLogical := SEQUENTIAL(
-		IF(
-			STD.File.LogicalFileSuperowners(vCurrDevVerLogical)[1].name = vDevVerSuper[2..],
-			NOTHOR(
-				SEQUENTIAL(
-					STD.File.StartSuperFileTransaction(),
-					STD.File.RemoveSuperFile(vDevVerSuper,vCurrDevVerLogical),
-					STD.File.FinishSuperFileTransaction()
-				)
-			)
-		),
-		OUTPUT(
-			DATASET([{pVersion}],{STRING version}),,
-			vCurrDevVerLogical,
-			OVERWRITE	
-		)
+	fClearDevVerSuper := SEQUENTIAL(
+		STD.File.StartSuperFileTransaction(),
+		STD.File.ClearSuperFile(vDevVerSuper),
+		STD.File.FinishSuperFileTransaction()
+	);
+
+	fUpdateCurrDevVerLogical := OUTPUT(
+		DATASET([{pVersion}],{STRING version}),,
+		vCurrDevVerLogical,
+		OVERWRITE	
 	);
 	
 	fCreateDevVerSuper := IF (
@@ -50,6 +44,7 @@ EXPORT ProcBuildFiles(
 	);
 
 	RETURN SEQUENTIAL(
+		fClearDevVerSuper,
 		fUpdateCurrDevVerLogical,
 		fCreateDevVerSuper,
 		fPlaceInDevVerSuper
