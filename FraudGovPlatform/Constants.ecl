@@ -19,8 +19,7 @@ MODULE
 */
 	EXPORT          TYPE_STR	       := 'AK';
   
-  #STORED('Platform','FraudGov');  
-  EXPORT	ak_dataset       := FraudGovPlatform.File_Autokey();
+   EXPORT	ak_dataset       := FraudGovPlatform.File_Autokey();
 	EXPORT	ak_qa_keyname    := FraudGovPlatform._Dataset().thor_cluster_files + 'key::fraudgov::qa::autokey::';
 	EXPORT	AUTOKEY_SKIP_SET := autokey_buildskipset;
 

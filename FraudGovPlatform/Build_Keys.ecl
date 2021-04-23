@@ -36,7 +36,12 @@ export Build_Keys(
 	tools.mac_WriteIndex('TheKeys.Main.SerialNumber.New'										,BuildSerialNumberKey	 							);
 	tools.mac_WriteIndex('TheKeys.Main.User.New'														,BuildUserKey				 								);
 	tools.mac_WriteIndex('TheKeys.Main.Zip.New'															,BuildZipKey	 											);
-												  
+	//kel
+	tools.mac_WriteIndex('TheKeys.Main.EntityProfile.New',BuildEntityProfileKey);
+	tools.mac_WriteIndex('TheKeys.Main.ConfigAttributes.New',BuildConfigAttributesKey);
+	tools.mac_WriteIndex('TheKeys.Main.ConfigRules.New',BuildConfigRulesKey);
+	tools.mac_WriteIndex('TheKeys.Main.DisposableEmailDomains.New',BuildDisposableEmailDomainsKey);
+	
 	export full_build :=
 	sequential(
 		 parallel(
@@ -70,7 +75,21 @@ export Build_Keys(
 		)
 		,Promote(pversion).buildfiles.New2Built
 	);
+	
+	export full_build_kel :=
+		 parallel(
+			 BuildEntityProfileKey
+			,BuildConfigAttributesKey
+			,BuildConfigRulesKey
+			,BuildDisposableEmailDomainsKey
+		 )
+		;
 		
+	export Kel :=
+	if(tools.fun_IsValidVersion(pversion)
+		,full_build_kel
+		,output('No Valid version parameter passed, skipping Build_Keys atribute')
+	);
 	export All :=
 	if(tools.fun_IsValidVersion(pversion)
 		,full_build
