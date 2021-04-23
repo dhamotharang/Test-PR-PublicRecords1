@@ -1,10 +1,6 @@
 ﻿import std;
 
 export MI_as_DL(dataset(DriversV2.Layouts_DL_MI_In.Layout_MI_Cleaned) pFile_MI_Input) := function
-
-	TrimUpper(STRING s):= FUNCTION
-	 RETURN std.str.touppercase(std.str.cleanspaces(s));
-  END;
 	
 	DriversV2.Layouts_DL_MI_In.Layout_MI_Cleaned_Ext trfNormAddr(pFile_MI_Input l, integer c) := transform
 		self.addr_type        := choose(c,'R','M');
@@ -16,8 +12,8 @@ export MI_as_DL(dataset(DriversV2.Layouts_DL_MI_In.Layout_MI_Cleaned) pFile_MI_I
 	end;
 
 	norm_file := normalize( pFile_MI_Input,
-												  if(TrimUpper(left.Street_Address)<>'' and TrimUpper(left.Mailing_Street_address) <> '' and
-												     TrimUpper(left.Street_Address) <>  TrimUpper(left.Mailing_Street_address)and 
+												  if(DriversV2.functions.TrimUpper(left.Street_Address)<>'' and DriversV2.functions.TrimUpper(left.Mailing_Street_address) <> '' and
+												     DriversV2.functions.TrimUpper(left.Street_Address) <>  DriversV2.functions.TrimUpper(left.Mailing_Street_address)and 
 														 trim(left.Street_Address + left.City + left.State,all) <> '',2,1)
 												  ,trfNormAddr(left,counter)
 											   );
@@ -29,11 +25,9 @@ DriversV2.Layout_DL_Extended tMI_To_Common(DriversV2.Layouts_DL_MI_In.Layout_MI_
 		self.dt_last_seen     				    := (unsigned8)l.process_date div 100;
 		self.dt_vendor_first_reported     := (unsigned8)l.process_date div 100;
 		self.dt_vendor_last_reported	    := (unsigned8)l.process_date div 100;
-		self.dateReceived		  				    := (integer)l.process_date;	
-		self.name											    := TrimUpper(TrimUpper(l.First_Name)+' '+ TrimUpper(l.Middle_Name)+' '+ 
-																									 TrimUpper(l.Last_Name)+' '+ TrimUpper(l.Name_Suffix) );
-		self.RawFullName							    := TrimUpper(TrimUpper(l.First_Name)+' '+ TrimUpper(l.Middle_Name)+' '+ 
-																									 TrimUpper(l.Last_Name)+' '+ TrimUpper(l.Name_Suffix) );																							 
+		self.dateReceived		  				    := (integer)l.process_date;
+		self.name											    := std.str.cleanspaces(trim(l.First_Name)+' '+ trim(l.Middle_Name)+' '+trim(l.Last_Name)+' '+ trim(l.Name_Suffix) );
+		self.RawFullName							    := std.str.cleanspaces(trim(l.First_Name)+' '+ trim(l.Middle_Name)+' '+trim(l.Last_Name)+' '+ trim(l.Name_Suffix) );																						 
 		self.dl_number        				    := l.Customer_DLN_PID;
 		self.title 											  := l.clean_name_prefix;
 		self.fname 											  := l.clean_fname;		                             

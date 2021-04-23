@@ -33,10 +33,6 @@
 		string3   clean_name_score;
 	end;
 	
-	export Layout_MI_TempDel:= record
-	Layout_MI_Cleaned-clean_name_prefix-clean_fname-clean_mname-clean_lname-clean_name_suffix-clean_name_score;
-	end;
-	
 	export Layout_MI_Cleaned_Ext := record
 	  Layout_MI_Cleaned;
 		string1 addr_type;
