@@ -26,6 +26,14 @@ EXPORT reportBusExecs(DATASET(DueDiligence.layouts.Busn_Internal) inData,
 
                                                     SELF.did := LEFT.party.did;
                                                     SELF.SSN := LEFT.party.ssn;
+                                                    
+                                                    sortTitles := SORT(LEFT.party.positions, -lastSeen, -firstSeen, title);
+
+                                                    SELF.titles := PROJECT(sortTitles, TRANSFORM(iesp.duediligenceshared.t_DDRPositionTitles,
+                                                    SELF.Title := LEFT.title;
+                                                    SELF.FirstReported := iesp.ECL2ESP.toDate(LEFT.firstSeen);
+                                                    SELF.LastReported := iesp.ECL2ESP.toDate(LEFT.lastSeen);))[..iesp.constants.DDRAttributesConst.MaxTitles];
+                                                    
                                                     SELF := LEFT;
                                                     SELF := [];));
 
