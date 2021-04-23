@@ -16,7 +16,7 @@ EXPORT ProcBuildFiles(
 	fUpdateCurrDevVerLogical := OUTPUT(
 		DATASET([{pVersion}],{STRING version}),,
 		vCurrDevVerLogical,
-		OVERWRITE	
+		OVERWRITE
 	);
 	
 	fCreateDevVerSuper := IF (
