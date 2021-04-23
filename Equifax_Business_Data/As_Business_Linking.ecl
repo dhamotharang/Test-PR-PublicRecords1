@@ -144,9 +144,9 @@ EXPORT As_Business_Linking (
 					trim(l.efx_locamountcd)='' => '',
 					'');	 						 						 						 					
 		    self.employee_count_org_raw      := if(trim(l.efx_corpempcnt) = '' OR trim(l.efx_corpempcnt) = '0',temp_emp_count_range_org,trim(l.efx_corpempcnt));
-        self.revenue_org_raw             := if(trim(l.efx_corpamount) = '' OR trim(l.efx_corpempcnt) = '0',temp_rev_range_org,trim(l.efx_corpamount));
-        self.employee_count_local_raw    := if(trim(l.efx_locempcnt) = '' OR trim(l.efx_corpempcnt) = '0',temp_emp_count_range_loc,trim(l.efx_locempcnt));
-		    self.revenue_local_raw           := if(trim(l.efx_locamount) = '' OR trim(l.efx_corpempcnt) = '0',temp_rev_range_loc,trim(l.efx_locamount));
+        self.revenue_org_raw             := if(trim(l.efx_corpamount) = '' OR trim(l.efx_corpamount) = '0',temp_rev_range_org,trim(l.efx_corpamount));
+        self.employee_count_local_raw    := if(trim(l.efx_locempcnt) = '' OR trim(l.efx_locempcnt) = '0',temp_emp_count_range_loc,trim(l.efx_locempcnt));
+		    self.revenue_local_raw           := if(trim(l.efx_locamount) = '' OR trim(l.efx_locamount) = '0',temp_rev_range_loc,trim(l.efx_locamount));
 				self 							   						 := l;
 				self 							   						 := [];
 		end;
