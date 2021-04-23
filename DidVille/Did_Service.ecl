@@ -187,13 +187,16 @@ res_ready := didville.did_service_common_function(precs, appends, verify, fuzzy,
 patriot.MAC_AppendPatriot(res_ready, mod_access, did,fname,mname,lname,res_w_pat,ptys,false)
 res := if(patriotproc, res_w_pat, res_ready);
 
-pj1 := JOIN(res(name_match AND known), patriot.key_did_patriot_file,
+pj1_pre := JOIN(res(name_match AND known), patriot.key_did_patriot_file,
   keyed(LEFT.did=RIGHT.did),
   TRANSFORM(patriot.Layout_Patriot, SELF := RIGHT));
-pj2 := JOIN(ptys, patriot.key_patriot_file,
+pj1 := dx_common.Incrementals.mac_Rollup(pj1_pre);
+
+pj2_pre := JOIN(ptys, patriot.key_patriot_file,
   keyed(LEFT.pty_key=RIGHT.pty_key) AND
   ut.namematch(left.fname,left.mname,left.lname,right.fname,right.mname,right.lname)<3,
   TRANSFORM(patriot.Layout_Patriot, SELF := RIGHT));
+pj2 := dx_common.Incrementals.mac_Rollup(pj2_pre);
 
 patrecs_suppressed := Suppress.MAC_SuppressSource(pj1+pj2, mod_access);
 patrecs := IF(patriotproc, patrecs_suppressed);
