@@ -26,12 +26,12 @@ EXPORT ProcBuildFiles(
 	);
 	
 	fCreateDevVerSuper := IF (
-		NOT STD.File.SuperFileExists(vDevVerSuper),
+		NOT NOTHOR(STD.File.SuperFileExists(vDevVerSuper)),
 		STD.File.CreateSuperFile(vDevVerSuper)
 	);
 
 	fPlaceInDevVerSuper := IF(
-		STD.File.GetSuperFileSubName(vDevVerSuper, 1, TRUE) != vCurrDevVerLogical,
+		NOTHOR(STD.File.GetSuperFileSubName(vDevVerSuper, 1, TRUE)) != vCurrDevVerLogical,
 		SEQUENTIAL(
 			STD.File.StartSuperFileTransaction(),
 			STD.File.AddSuperFile(vDevVerSuper, vCurrDevVerLogical),
