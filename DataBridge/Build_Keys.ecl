@@ -4,7 +4,7 @@ export Build_Keys(string pversion) :=
 module
 
  		RoxieKeyBuild.Mac_SK_BuildProcess_v3_local(dx_DataBridge.Key_LinkIds.Key
-																							 ,DataBridge.Files().Base.Built
+																							 ,DataBridge.Files().Base.Built(ultid <> 0)
 																							 ,dx_DataBridge.Names().LinkIds.QA
 																							 ,dx_DataBridge.Names(pversion,false).LinkIds.New
 																							 ,BuildLinkIdsKey);  
