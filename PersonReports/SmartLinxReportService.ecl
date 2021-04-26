@@ -168,6 +168,10 @@ EXPORT SmartLinxReportService () := MACRO
   #constant ('CurrentOnly', false); //TODO: check (property?)
   noSmartRollup := false : stored('NoSmartRollup');
 
+// set to ensure address hierarchy always on.
+ #CONSTANT('UseAddressHierarchy', true); 
+
+  //
   // these are set for UCC report; not exposed in doxie CRS; in UCC report they are set to true
   //#constant('IncludeMultipleSecured', false);
   //#constant('ReturnRolledDebtors', false);
@@ -275,7 +279,8 @@ EXPORT SmartLinxReportService () := MACRO
     EXPORT STRING ScoreModel := first_row.options.ProgressivePhones.ScoreModel;
      EXPORT BOOLEAN UsePremiumSourceA := first_row.options.ProgressivePhones.UsePremiumSourceA;
      EXPORT UNSIGNED1 PremiumSourceAlimit := first_row.options.ProgressivePhones.PremiumSourceAlimit;
-     EXPORT BOOLEAN IncludePersonRiskIndicatorSection := first_row.options.IncludePersonRiskIndicatorSection;
+     EXPORT BOOLEAN IncludePersonRiskIndicatorSection := first_row.options.IncludePersonRiskIndicatorSection;     
+     EXPORT BOOLEAN DoAddrHierarchy := true : STORED('UseAddressHierarchy');
   end;
 
 
@@ -297,7 +302,6 @@ EXPORT SmartLinxReportService () := MACRO
     Self.Individual := L;
   end;
   results := PROJECT (recs, SetResponse (Left));
-
   // ROYALTIES
   Royalty.RoyaltyFares.MAC_SetD(recs.Foreclosures, royalties_fares);
   Royalty.MAC_RoyaltyEmail(recs.Emailaddresses, royalties_email, source);
@@ -306,7 +310,7 @@ EXPORT SmartLinxReportService () := MACRO
                if(report_mod.email_version=2,recs.EmailV2Royalties, royalties_email) +                             
                if (report_mod.IncludeProgressivePhone and report_mod.UsePremiumSourceA 
                       and ~doxie.compliance.isPhoneMartRestricted(report_mod.DataRestrictionMask)
-                      and mod_access.isValidGLB(), royaltiesEquifaxPhones);
+                      and mod_access.isValidGLB(), royaltiesEquifaxPhones);                
   output (results, named ('Results'));
   output (royalties, named ('RoyaltySet'));
 
