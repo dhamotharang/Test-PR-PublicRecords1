@@ -1,4 +1,4 @@
-﻿IMPORT ut, FLAccidents_Ecrash, eCrash_Services, std,iesp;
+﻿IMPORT ut, dx_eCrash, eCrash_Services, std,iesp;
 
 EXPORT RawDeltaBaseSQL(eCrash_Services.IParam.searchrecords in_mod) := MODULE
 
@@ -142,7 +142,7 @@ EXPORT RawDeltaBaseSQL(eCrash_Services.IParam.searchrecords in_mod) := MODULE
 		EXPORT Normalized_recs := 	GetNormzd_aliasrecs(in_mod);
 		
 		shared STRING GetDeltabaseDateAdded() := FUNCTION
-			DateAddedRaw := FLAccidents_Ecrash.Key_eCrashV2_DeltaDate(delta_text = 'DELTADATE');
+			DateAddedRaw := dx_eCrash.Key_DeltaDate(delta_text = 'DELTADATE');
 			DateAdded := dateFormatted(
 				ut.date_math(DateAddedRaw[1].date_added[1..8], -1)
 			);
@@ -433,7 +433,7 @@ EXPORT RawDeltaBaseSQL(eCrash_Services.IParam.searchrecords in_mod) := MODULE
 			  RETURN eCrash_Services.ConstantsDeltaBase.Document_Select + ' report_id IN ( ' + ReportId + ' )  AND date_added > "' + DateAdded + '" AND ' + DocumentReportType + SQL_LIMIT;
     END;
 
-		EXPORT GetDocumentsSQL(FLAccidents_Ecrash.Key_eCrashv2_Supplemental SearchBy, STRING DateAdded, STRING DocumentType) := FUNCTION
+		EXPORT GetDocumentsSQL(dx_eCrash.Key_Supplemental SearchBy, STRING DateAdded, STRING DocumentType) := FUNCTION
 		  CaseIdentifier := IF(
 				TRIM(SearchBy.accident_nbr) = '', 
 				'(case_identifier IS NULL OR case_identifier = "")',

@@ -1,11 +1,11 @@
-﻿import AutoKeyI, FLAccidents, AutokeyB2;
+﻿import AutoKeyI, dx_eCrash, AutokeyB2;
 
 export AutoKey_IDs(IParam.autokey_search in_mod) := function
 		
-		ak_keyname := FLAccidents.Constants.eV2_keyname;
-		ak_dataset := FLAccidents.Constants.eV2_dataset;
-		ak_skipSet := FLAccidents.Constants.ak_skipset;
-		ak_typestr := FLAccidents.Constants.ak_typeStr;
+		ak_keyname := dx_eCrash.Constants.ak_keyname;
+		ak_dataset := dx_eCrash.Constants.ak_dataset;
+		ak_skipSet := dx_eCrash.Constants.ak_skipset;
+		ak_typestr := dx_eCrash.Constants.ak_typeStr;
 		
 		tempmod := module(project(in_mod,AutoKeyI.AutoKeyStandardFetchArgumentInterface,opt))
 			export string autokey_keyname_root := ak_keyname;
