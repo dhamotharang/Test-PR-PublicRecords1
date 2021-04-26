@@ -162,7 +162,10 @@ EXPORT Raw := MODULE
     // don't want to go through cortera.keyfetch2 to avoid mac_append_contact.
     BIPV2.IDmacros.mac_IndexFetch2(link_ids, key_link_id, cortera_brecs, 
       BIPV2.IDconstants.Fetch_Level_ProxID, 25000, BIPV2.IDconstants.JoinTypes.KeepJoin);
-    cortera_recs := JOIN(cortera_brecs, key_exec_link_id,
+
+    dx_cortera.mac_incremental_rollup(cortera_brecs, cortera_rolledup_brecs);
+
+    cortera_recs := JOIN(cortera_rolledup_brecs, key_exec_link_id,  // Executive key should only have new records (adds) , as names are normalized from the same base record. Deletes are only applicable to base record.
       KEYED(LEFT.link_id = RIGHT.link_id AND LEFT.Persistent_record_id = RIGHT.Persistent_record_id)
       AND (RIGHT.did = inlexID),
     TRANSFORM(l_cortera,
@@ -182,6 +185,7 @@ EXPORT Raw := MODULE
       mac_blank_exec(10);
       SELF := LEFT),
     ATMOST(1000), KEEP(100));
+   
     RETURN cortera_recs;
   END;
 END;
