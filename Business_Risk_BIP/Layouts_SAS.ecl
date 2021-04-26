@@ -1,6 +1,4 @@
-﻿IMPORT SALT28;
-
-EXPORT Layouts_SAS := MODULE
+﻿EXPORT Layouts_SAS := MODULE
 
  SHARED layout_DFI := RECORD
 		STRING1 dfi_LargeBusiness;
@@ -8806,7 +8804,7 @@ EXPORT Layouts_SAS := MODULE
     STRING6 asset_vehicle_count_oth;
     STRING9 asset_vehicle_value;
     STRING6 ind_naics_best;
-    STRING4 ind_sic_best;
+    STRING8 ind_sic_best;
     STRING6 empl_ct_best;
     STRING6 empl_ct_best_range;
 		STRING2 ownership_type;

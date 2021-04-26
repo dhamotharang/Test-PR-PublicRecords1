@@ -350,8 +350,9 @@ EXPORT mod_BusinessShellVersionLogic(Business_Risk_BIP.LIB_Business_Shell_LIBIN 
         // Sorting logic for SIC/NAIC codes in older Business Shell versions:
         SICSources_sorted := SORT((SICSources(IsPrimary = TRUE)), -(Source = 'DF'), -(Source = 'ER'), -(TRIM(Source) = 'Y') , -(Source = 'OS'), -(Source = 'BR'), -(Source = 'FH'), -(Source = 'C#'), -(Source = 'DN'), -DateLastSeen, -DateFirstSeen, -RecordCount)[1];
         // Sorting logic for v31 and higher:
+        // Experian(EQ & Q3) sources are removed as they are restricted from SB credit use cases
         SICSources_v31_past24Months := apply24MonthFilterSICNAIC( SICSources, HistoryDate );
-        SICSources_v31_sorted := SORT( SICSources_v31_past24Months, -(IsPrimary = TRUE), -(Source = 'DF'), -(Source = 'Z1'), -(TRIM(Source) = 'D'), -(Source = 'RQ'), -(Source = 'Z2'), -(Source = 'RR'), -(Source = 'DN'), -(Source = 'ER'), -(Source = 'Q3'), -(Source = 'L0'), -(TRIM(Source) = 'Y'), -DateLastSeen, -DateFirstSeen, -RecordCount )[1];
+        SICSources_v31_sorted := SORT( SICSources_v31_past24Months, -(IsPrimary = TRUE), -(Source = 'D'), -(Source = 'DN'), -(TRIM(Source) = 'RQ'), -(Source = 'DF'), -(Source = 'Z1'), -(Source = 'Z2'), -(Source = 'RR'), -(Source = 'L0'), -(TRIM(Source) = 'Y'), -DateLastSeen, -DateFirstSeen, -RecordCount )[1];
         SICSources_v31_sorted_trueBiz := IF( VerInputIDTruebiz = '1', SICSources_v31_sorted ); 
         RETURN IF( busShellVersion >= Business_Risk_BIP.Constants.BusShellVersion_v31, SICSources_v31_sorted_trueBiz, SICSources_sorted );        
     END;

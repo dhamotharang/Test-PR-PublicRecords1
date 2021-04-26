@@ -1,4 +1,4 @@
-﻿IMPORT BIPV2, SALT28, UCCv2_Services;
+﻿IMPORT BIPV2, SALT28, UCCv2_Services, Business_Risk_BIP;
 
 EXPORT Layouts := MODULE
 
@@ -715,7 +715,7 @@ EXPORT Layouts := MODULE
 
 	SHARED LayoutFirmographic := RECORD
 		STRING3 FirmAgeEstablished;
-		STRING4 FirmSICCode;
+		STRING8 FirmSICCode;
 		STRING6 FirmNAICSCode;
 		STRING6 FirmEmployeeCount;
 		STRING6 FirmEmployeeRangeCount;
