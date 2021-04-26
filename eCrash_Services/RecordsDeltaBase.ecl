@@ -1,7 +1,7 @@
 ﻿/*2015-06-24T16:52:16Z (Sai Nagula)
 Open State search and Drivers exchange report grouping.
 */
-IMPORT FLAccidents_Ecrash, ut, doxie;
+IMPORT dx_eCrash, ut, doxie;
 
 EXPORT RecordsDeltaBase(IParam.searchrecords in_mod)  := MODULE
 

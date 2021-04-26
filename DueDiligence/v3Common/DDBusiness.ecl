@@ -5,10 +5,10 @@ EXPORT DDBusiness := MODULE
 
     EXPORT GetKfetch2LinkIDs(DATASET(DueDiligence.v3Layouts.Internal.BusinessTemp) inData) := FUNCTION
         RETURN PROJECT(inData, TRANSFORM(BIPV2.IDlayouts.l_xlink_ids2,
-                                          SELF.UniqueID		:= LEFT.seq;
-                                          SELF.UltID			:= LEFT.inquiredBusiness.ultID;
-                                          SELF.OrgID			:= LEFT.inquiredBusiness.orgID;
-                                          SELF.SeleID			:= LEFT.inquiredBusiness.seleID;
+                                          SELF.UniqueID   := LEFT.seq;
+                                          SELF.UltID      := LEFT.inquiredBusiness.ultID;
+                                          SELF.OrgID      := LEFT.inquiredBusiness.orgID;
+                                          SELF.SeleID     := LEFT.inquiredBusiness.seleID;
                                           SELF := [];));
     END;
 
@@ -21,26 +21,26 @@ EXPORT DDBusiness := MODULE
 
     EXPORT AppendSeq(rawData, datasetToJoinTo, rawIncludesUniqueID) := FUNCTIONMACRO
 
-		//create the where clause based on if rawData has uniqueID or not
-		LOCAL whereClause := 'LEFT.UltID = RIGHT.inquiredBusiness.ultID AND ' +
+    //create the where clause based on if rawData has uniqueID or not
+    LOCAL whereClause := 'LEFT.UltID = RIGHT.inquiredBusiness.ultID AND ' +
                          'LEFT.OrgID = RIGHT.inquiredBusiness.orgID AND ' +
                          'LEFT.SeleID = RIGHT.inquiredBusiness.seleID' +
                          IF(rawIncludesUniqueID, ' AND LEFT.uniqueID = RIGHT.seq', DueDiligence.Constants.EMPTY);
 
-		//if rawData has uniqueID field, assuming unquieness - otherwise remove duplicate rows
-		//should only have duplicate rows if a given business was added to the file twice
-		LOCAL uniqueRawRows := IF(rawIncludesUniqueID = FALSE, DEDUP(rawData, ALL), rawData);
+    //if rawData has uniqueID field, assuming unquieness - otherwise remove duplicate rows
+    //should only have duplicate rows if a given business was added to the file twice
+    LOCAL uniqueRawRows := IF(rawIncludesUniqueID = FALSE, DEDUP(rawData, ALL), rawData);
 
-		LOCAL joinResult := JOIN(uniqueRawRows, datasetToJoinTo,
-												#EXPAND(whereClause),
-												TRANSFORM({RECORDOF(LEFT), UNSIGNED4 seq, UNSIGNED4 historyDate},
-																	SELF.seq := RIGHT.seq;
-																	SELF.historyDate := RIGHT.historyDate;
-																	SELF := LEFT),
-												FEW);
+    LOCAL joinResult := JOIN(uniqueRawRows, datasetToJoinTo,
+                        #EXPAND(whereClause),
+                        TRANSFORM({RECORDOF(LEFT), UNSIGNED4 seq, UNSIGNED4 historyDate},
+                                  SELF.seq := RIGHT.seq;
+                                  SELF.historyDate := RIGHT.historyDate;
+                                  SELF := LEFT),
+                        FEW);
 
-		RETURN joinResult;
-	ENDMACRO;
+    RETURN joinResult;
+  ENDMACRO;
 
 
   EXPORT GetBEOAsSlimPerson(DATASET(DueDiligence.v3Layouts.Internal.BusinessTemp) inData, BOOLEAN onlyUniqueBEOs) := FUNCTION
@@ -88,20 +88,21 @@ EXPORT DDBusiness := MODULE
   EXPORT GetBusinessShellOptions(DueDiligence.DDInterface.iDDRegulatoryCompliance regulatoryAccess) := FUNCTION
 
     options := MODULE(Business_Risk_BIP.LIB_Business_Shell_LIBIN)
-        EXPORT UNSIGNED1	dppa 				:= regulatoryAccess.dppa;
-        EXPORT UNSIGNED1	glb 				:= regulatoryAccess.glba;
-        EXPORT STRING			DataRestrictionMask	:= regulatoryAccess.drm;
-        EXPORT STRING			DataPermissionMask	:= regulatoryAccess.dpm;
-        EXPORT STRING5		industry_class			:= regulatoryAccess.industryClass;
-        EXPORT UNSIGNED1	LinkSearchLevel			:= Business_Risk_BIP.Constants.LinkSearch.SeleID;
-        EXPORT UNSIGNED1	BusShellVersion			:= Business_Risk_BIP.Constants.Default_BusShellVersion;
-        EXPORT UNSIGNED1	MarketingMode				:= Business_Risk_BIP.Constants.Default_MarketingMode;
-        EXPORT STRING50		AllowedSources			:= Business_Risk_BIP.Constants.Default_AllowedSources;
-        EXPORT UNSIGNED1	BIPBestAppend	 			:= Business_Risk_BIP.Constants.BIPBestAppend.OverwriteWithBest;  //Get whatever we think is the best data
-        EXPORT unsigned1	lexid_source_optout	:= regulatoryAccess.lexIDSourceOptOut;
-        EXPORT string			transaction_id			:= IF(regulatoryAccess.transactionID <> '', regulatoryAccess.transactionID, regulatoryAccess.batchUID);
-        EXPORT unsigned6	global_company_id		:= regulatoryAccess.globalCompanyID;
-    END;
+        EXPORT UNSIGNED1  dppa        := regulatoryAccess.dppa;
+        EXPORT UNSIGNED1  glb         := regulatoryAccess.glba;
+        EXPORT STRING     DataRestrictionMask := regulatoryAccess.drm;
+        EXPORT STRING     DataPermissionMask  := regulatoryAccess.dpm;
+        EXPORT STRING5    industry_class      := regulatoryAccess.industryClass;
+        EXPORT string     ssn_mask            := regulatoryAccess.SSN_MASK;
+        EXPORT UNSIGNED1  LinkSearchLevel     := Business_Risk_BIP.Constants.LinkSearch.SeleID;
+        EXPORT UNSIGNED1  BusShellVersion     := Business_Risk_BIP.Constants.Default_BusShellVersion;
+        EXPORT UNSIGNED1  MarketingMode       := Business_Risk_BIP.Constants.Default_MarketingMode;
+        EXPORT STRING50   AllowedSources      := Business_Risk_BIP.Constants.Default_AllowedSources;
+        EXPORT UNSIGNED1  BIPBestAppend       := Business_Risk_BIP.Constants.BIPBestAppend.OverwriteWithBest;  //Get whatever we think is the best data
+        EXPORT unsigned1  lexid_source_optout := regulatoryAccess.lexIDSourceOptOut;
+        EXPORT string     transaction_id      := IF(regulatoryAccess.transactionID <> '', regulatoryAccess.transactionID, regulatoryAccess.batchUID);
+        EXPORT unsigned6  global_company_id   := regulatoryAccess.globalCompanyID;
+      END;
 
     RETURN options;
   END;
@@ -203,7 +204,7 @@ EXPORT DDBusiness := MODULE
         RETURN PROJECT(inData, TRANSFORM(DueDiligence.v3Layouts.InternalBusinessIndustry.IndustrySlim,
 
                                          sic := TRIM(LEFT.SICCode, ALL);
-																				 lengthOfSic := LENGTH(sic);
+                                         lengthOfSic := LENGTH(sic);
 
                                          sicIndustry := MAP(sic = DueDiligence.Constants.EMPTY => sic,
                                                             sic IN DueDiligence.ConstantsIndustry.SIC_CIB_RETAIL => DueDiligence.ConstantsIndustry.CASH_INTENSIVE_BUSINESS_RETAIL,
@@ -231,7 +232,7 @@ EXPORT DDBusiness := MODULE
 
 
                                          naic := TRIM(LEFT.naicsCode, ALL);
-																				 naic2 := naic[1..2];
+                                         naic2 := naic[1..2];
 
                                          naicsIndustry := MAP(naic = DueDiligence.Constants.EMPTY => naic,
                                                                naic IN DueDiligence.ConstantsIndustry.NAICS_CIB_RETAIL => DueDiligence.ConstantsIndustry.CASH_INTENSIVE_BUSINESS_RETAIL,

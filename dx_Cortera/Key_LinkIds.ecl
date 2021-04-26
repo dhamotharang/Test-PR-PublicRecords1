@@ -46,7 +46,8 @@ EXPORT Key_LinkIds := MODULE
   FUNCTION
 
      BIPV2.IDmacros.mac_IndexFetch2(inputs, Key, fetched, Level, joinLimit, JoinType);
-     $.mac_check_access(fetched, out, mod_access, append_contact);
+     $.mac_incremental_rollup(fetched, pre_out);
+     $.mac_append_contacts(pre_out, out, mod_access, append_contact);
      RETURN out;
   END;
  

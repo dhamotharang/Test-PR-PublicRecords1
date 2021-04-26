@@ -29,8 +29,37 @@ EXPORT out_rec SmartLinxReport (dataset (doxie.layout_references) dids,
 //****************************************************************************************************
   persMod := module (project (mod_smartlinx, personreports.IParam.personal)) end;
 	pers := PersonReports.Person_records (dids, mod_access, persMod, IsFCRA);
- 	best_rec_esdl :=       pers.bestrecs_esdl[1]; // best record  this is a record not a dataset???????
-	best_rec :=            pers.bestrecs[1];
+   // verified field value already added at this point in next line
+      bestAddr := pers.SubjectAddresses;
+      // initialAddrList := pers.address_orig_debug(did = subject_did);
+    //
+ 	tmpbest_rec_esdl :=       pers.bestrecs_esdl[1]; // best record  this is a record not a dataset???????
+	Old_best_rec :=            pers.bestrecs[1];
+    // boolean doAddressHier := mod_smartlinx.DoAddrHierarchy;
+     // updating both best recs to use address hierarchy 'address' results.                                         
+     best_rec :=  if (mod_smartlinx.DoAddrHierarchy,
+                                        PROJECT(Old_best_rec, TRANSFORM(RECORDOF(Old_best_rec),
+                               SELF.prim_range :=  bestAddr[1].AddressEx.StreetNumber;
+                               SELF.prim_name := bestAddr[1].AddressEx.Streetname;
+                               SELF.city_name :=  bestAddr[1].AddressEx.City;
+                               SELF.postdir := bestAddr[1].AddressEx.StreetPostDirection;
+                               SELF.predir :=  bestAddr[1].AddressEx.StreetPreDirection;
+                               SELF.st := bestAddr[1].addressEx.State;
+                               SELF.zip := bestAddr[1].AddressEx.zip5;
+                               SELF.zip4 := BestAddr[1].AddressEx.zip4;
+                               SELF.suffix := BestAddr[1].AddressEx.StreetSuffix;
+                               SELF.unit_desig := bestAddr[1].AddressEx.UnitDesignation;
+                               SELF.sec_range := BestAddr[1].AddressEx.UnitNumber;
+                               SELF := LEFT;)),
+                               Old_best_rec);
+                                                 
+      best_rec_esdl  :=  if (mod_smartlinx.DoAddrHierarchy,
+                                            PROJECT(tmpBest_rec_esdl,  TRANSFORM(iesp.bpsreport.t_BpsReportBestInfo,
+                                            SELF.Address := bestAddr[1].Addressex; // set address to Addr hierarchy 1st one.                                                 
+                                            SELF := LEFT;)),
+                                            tmpBest_rec_esdl);
+                                             
+                                                                                             
 	iesp.smartlinxreport.t_SLRBestInfo  additionalBest() := transform
 	 	self.ssn := if (mod_smartlinx.smart_rollup and best_rec.valid_ssn='G',SmartRollup.fn_smart_getSsnMetadata(best_rec.did,best_rec.ssn,best_rec.valid_ssn,mod_smartlinx.include_hri)[1]);
 		self.age := best_rec.age;
@@ -62,35 +91,32 @@ EXPORT out_rec SmartLinxReport (dataset (doxie.layout_references) dids,
 	p_aka_entities   := SmartRollup.fn_smart_aka_entities(s_akas, subject_akas);
 	s_akas_count     := count(s_akas);
   p_akas           := choosen (s_Akas, iesp.Constants.SMART.MaxAKA);
-  subject_addrs    := IF (mod_smartlinx.include_bpsaddress, pers.SubjectAddresses, dataset([],iesp.bpsreport.t_BpsReportAddress) );
-	//=======================================================================
-	//temporary fix to use Verified as Current indicator based on TNT value.
-	//product wanted Current to match doxie.HeaderFileRollupService for current addresses.
-	subject_addrs_rolled := SmartRollup.fn_smart_rollup_addr(subject_addrs,subject_did);
-
-	tnt_rec := record
+  
+   // this is sorted by address_seq_no based on  pers.SubjectAddresses
+   subject_addrs     := IF (mod_smartlinx.include_bpsaddress, pers.SubjectAddresses, dataset([],  iesp.bpsreport.t_BpsReportAddress));   
+	seq_rec := record
 	  integer seq := 0;
 	  string15 did := '';
 		string8 dt_last_seen := '';
 	  string1 tnt := '';
 		unsigned6 hhid;
-	  iesp.bpsreport.t_BpsReportAddress
+	  iesp.bpsreport.t_BpsReportAddress;
   end;
-	tnt_rec fillPlus(subject_addrs l, integer cnt) := transform
+	seq_rec fillPlus(subject_addrs l, integer cnt) := transform
 	  self.did := (string)subject_did;
 		self.dt_last_seen := iesp.ecl2esp.DateToString(l.DateLastSeen);
-		self.seq := cnt;
-		self.tnt := '';
+		self.seq := cnt;  // this saves the address_seq_no field from being in this layout
+		//self.tnt := '';
 		self.hhid := 0;
 		self := l;
 	end;
-	subject_addrs_plus := project(subject_addrs_rolled, fillPlus(left,counter));
-
+	
+     subject_addrs_plus := project(subject_addrs, fillPlus(left,counter));
 	subject_addrs_hhid := join(subject_addrs_plus,dx_header.key_did_hhid(),
                   keyed((integer)left.did = right.did),
-                  transform(tnt_rec, self.hhid := right.hhid_relat, self := left), left outer, atmost(ut.limits.HHID_PER_PERSON));
-
-  doxie.MAC_getTNTValue(subject_addrs_hhid,
+                  transform(seq_rec, self.hhid := right.hhid_relat, self := left), left outer, atmost(ut.limits.HHID_PER_PERSON));
+                  
+ doxie.MAC_getTNTValue(subject_addrs_hhid,
     pers.bestrecs,
     subject_addrs_TNT_dups,
     mod_access,
@@ -100,39 +126,33 @@ EXPORT out_rec SmartLinxReport (dataset (doxie.layout_references) dids,
     secrangefield := addressEx.UnitNumber,
     statefield := addressEx.State);
 
-	tnt_rec keepBestTNT(tnt_rec le, tnt_rec ri) := transform
-  self.tnt := MAP(le.tnt = 'B' or ri.tnt = 'B' => 'B',
+     seq_rec compressSeq(seq_rec le, seq_rec ri) := TRANSFORM 
+      // setting TNT in order to set verified field below for other users of this module
+       self.tnt := MAP(le.tnt = 'B' or ri.tnt = 'B' => 'B',
                   le.tnt = 'V' or ri.tnt = 'V' => 'V',
                   le.tnt = 'C' or ri.tnt = 'C' => 'C',
                   le.tnt = 'P' or ri.tnt = 'P' => 'P',
                   le.tnt = 'R' or ri.tnt = 'R' => 'R', 'H');
               SELF := le;
   END;
-  subject_addrs_TNT := ROLLUP(SORT(subject_addrs_TNT_dups, seq), left.seq = right.seq, keepBestTNT(LEFT, RIGHT));
 
-	iesp.bpsreport.t_BpsReportAddress setCurrent(tnt_rec l ) := transform
-	    //self.verified := if (l.verified = false, l.tnt in ['B','C','V'], l.verified);  //change made 10/29/2012
-	    self.verified := l.tnt in ['B','C','V'];  //changed back 8/13/13 bug 111602
+         subject_addrs_TNTsort := ROLLUP(SORT(subject_addrs_TNT_dups, seq), LEFT.seq = RIGHT.seq, compressSeq(LEFT, RIGHT)); 
+	iesp.smartlinxreport.t_SLRAddressBpsSeq setSequence( seq_rec  l, integer c ) := transform
+	     self.addressSequence := c;                
+          self.verified := l.tnt in ['B','C','V'];
 			self := l;
 	end;
-	iesp.smartlinxreport.t_SLRAddressBpsSeq setSequence(iesp.bpsreport.t_BpsReportAddress l, integer c ) := transform
-	    self.addressSequence := c; 
-			self := l;
-	end;
-	// end of current indicator temp fix using TNT value.
-	//=======================================================================
 
-	s_addresses := project(subject_addrs_TNT, setCurrent(LEFT));
-	s_addressesSequence := project(s_addresses, setSequence(LEFT,COUNTER));
-	s_addresses_current := s_addresses(verified=true);
-	s_addresses_prior := s_addresses(verified=false);
+	s_addressesSequence := project( subject_addrs_TNTsort, setSequence(LEFT,COUNTER));   
+     s_addresses_current := s_addressesSequence(addressSequence = 1);
+	s_addresses_prior := s_addressesSequence(addressSequence  <> 1);
 	s_addresses_current_count := count(s_addresses_current);
 	s_addresses_prior_count := count(s_addresses_prior);
 	tmp_addresses   := choosen (SmartRollup.fn_smart_getAddrMetadata.addresses(s_addressesSequence,doBadSecRange,mod_smartlinx),iesp.Constants.SMART.MaxAddress);
 	tmp_p_addresses      := choosen (SmartRollup.fn_smart_getPhonesPlusMetadata.byPhone(tmp_addresses),iesp.Constants.SMART.MaxAddress);
 	p_addressesWSourceCounts := choosen(SmartRollup.fn_smart_getAddrMetadata.AddAddressSourceCounts(subject_did,tmp_p_addresses,mod_smartlinx),iesp.Constants.Smart.MaxAddress);
-	p_addresses_current := p_addressesWSourceCounts(verified=true);
-	p_addresses_prior   := p_addressesWSourceCounts(verified=false);
+     p_addresses_current :=  p_addressesWSourceCounts(addressSequence = 1);
+     p_addresses_prior   := p_addressesWSourceCounts(addressSequence <> 1);
 	subject_imposters := IF (mod_smartlinx.include_imposters, pers.imposters,dataset([],iesp.bps_share.t_BpsReportImposter));
 	s_imposters        := SmartRollup.fn_smart_rollup_imposters(subject_imposters);
 	p_imposter_entities := choosen(SmartRollup.fn_smart_imposter_entities(subject_imposters),  iesp.Constants.SMART.MaxImposters);
@@ -371,16 +391,13 @@ EXPORT out_rec SmartLinxReport (dataset (doxie.layout_references) dids,
 		 associates       := IF (mod_smartlinx.include_associates,  pers.AssociatesSlim, dataset([],iesp.bpsreport.t_BpsReportAssociateSlim));
 		 s_associates     := SmartRollup.fn_smart_OtherPersonAssoc(associates,subject_did,mod_smartlinx);
 		 s_associates_count := count(s_associates);
-     p_associates     := choosen (s_associates, iesp.constants.SMART.MaxAssociates);     
+     p_associates     := choosen (s_associates, iesp.constants.SMART.MaxAssociates); 
      
      american_student_input := PROJECT (mod_smartlinx, American_Student_Services.IParam.reportParams);
 
 		 boolean onlyCurrent := true;  //request only current student records.
      p_education := if(mod_smartlinx.include_students,
-                        choosen(American_Student_Services.Functions.get_report_recs(dids,
-												                                                            american_student_input,
-																																										onlyCurrent),
-																																										iesp.Constants.MaxCountASLSearch));
+                        choosen(American_Student_Services.Functions.get_report_recs(dids,  american_student_input,onlyCurrent),iesp.Constants.MaxCountASLSearch));
      p_education_count := count(p_education);
 
 		 // Key risk indicator
@@ -390,8 +407,7 @@ EXPORT out_rec SmartLinxReport (dataset (doxie.layout_references) dids,
 
 		 p_worldcompliance := IF(mod_smartlinx.include_kris,PROJECT(s_kris.WorldCompRecs,TRANSFORM(iesp.smartlinxsearchcore.t_SLRResultMatch,SELF := LEFT)),
 																			dataset([],iesp.smartlinxsearchcore.t_SLRResultMatch));                                                                          
-            p_personIdentityFinal := smartRollup.fn_getPersonIdentity(dids, Mod_smartLinx);                  
-                                                                                                                                          
+            p_personIdentityFinal := smartRollup.fn_getPersonIdentity(dids, Mod_smartLinx);                                                                                                         
            iesp.smartlinxReport.t_SLRPersonRiskIndicatorSection  testXform() := TRANSFORM                 
                 self.PersonIdentityRisks := //choosen(
                                                                   dataset([{true,'P','Test'}]
@@ -502,7 +518,7 @@ EXPORT out_rec SmartLinxReport (dataset (doxie.layout_references) dids,
      // ASSOCIATES *******************************************************************************************
      // PEOPLE ASSOCS
      
-      Self.Relatives                         := p_relatives;          
+      Self.Relatives                         := p_relatives;    
       Self.Associates                        := p_associates;   // Simplified version of compreport, no distributed call to central records, no hash, no versioning of single sources, non-FCRA
       Self.Neighbors                         := p_neighbors;
    	// BUSINESS ASSOCS
@@ -521,6 +537,11 @@ EXPORT out_rec SmartLinxReport (dataset (doxie.layout_references) dids,
 		self := [];
  END;
   individual := dataset ([Format ()]); // is supposed to produce one row only (usebestdid = true)
-  // output(best_rec_smart, named('best_rec_smart'));
+   // output(doAddressHier, named('doAddressHierDebug'));
+    // output(initialAddrList, named('initialAddrList'));
+    // output(subject_addrs_plus, named('subject_addrs_plus'));
+    // output(subject_addrs_hhid, named('subject_addrs_hhid'));
+    // output(subject_addrs_TNT_dups, named('subject_addrs_TNT_dups'));
+    // output(subject_addrs_TNTsort, named('subject_addrs_TNTsort'));
 	return individual;
 END;

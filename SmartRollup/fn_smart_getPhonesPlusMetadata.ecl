@@ -1,4 +1,4 @@
-import AutoStandardI,doxie,doxie_raw,iesp, personreports;
+﻿import AutoStandardI,doxie,doxie_raw,iesp, personreports;
 
 export fn_smart_getPhonesPlusMetadata := MODULE
 
@@ -69,7 +69,7 @@ export fn_smart_getPhonesPlusMetadata := MODULE
                                 SELF := LEFT));
     END;
 
-    iesp.smartlinxreport.t_SLRAddress getPhonesPlusMetadata(fn_smart_getAddrMetadata.outLayout L) := TRANSFORM
+    iesp.smartlinxreport.t_SLRAddressSeq getPhonesPlusMetadata(fn_smart_getAddrMetadata.outLayout L) := TRANSFORM
       esdlPhones_temp  := NORMALIZE(PROJECT(L.bpsPhones,getPhones(LEFT)),LEFT.Phones,TRANSFORM(iesp.dirassistwireless.t_DirAssistWirelessSearchRecord,SELF:=RIGHT));
       esdlPhones := CHOOSEN(esdlPhones_temp, iesp.Constants.BR.MaxPhonesPlus);
       SELF.Phones := PROJECT(esdlPhones,TRANSFORM(iesp.dirassistwireless.t_DirAssistWirelessSearchRecord,

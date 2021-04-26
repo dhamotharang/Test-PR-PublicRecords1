@@ -19,7 +19,7 @@ Modified to remove call to delta_ec.delta_report_data deltabase.  RR-14857
    Output: iesp.retrieveimage.ECrashRetrieveImageResponseEx (xml)
 */
 
-IMPORT AutoStandardI, iesp, FLAccidents_Ecrash, Gateway, doxie, eCrash_Services, Std;
+IMPORT AutoStandardI, iesp, dx_eCrash, Gateway, doxie, eCrash_Services, Std;
 
 EXPORT ImageSearchService() := FUNCTION
 	GatewaysIn := Gateway.Configuration.Get();
@@ -58,14 +58,14 @@ EXPORT ImageSearchService() := FUNCTION
 	ErrorCodeImageNonReleasable := 406;
 	
 	SuperReportIdToReportId := CHOOSEN(
-		FLAccidents_Ecrash.Key_eCrashV2_ReportId(KEYED(report_id = RequestReportId)),
+		dx_eCrash.Key_ReportId(KEYED(report_id = RequestReportId)),
 		1
 	);
 	
 	//All of the records in ReportHashKeysFromKey have the same accident_nbr, report_code, jurisdiction_state, jurisdiction, accident_date, orig_accnbr
 	ReportHashKeysFromKey := JOIN(
 		SuperReportIdToReportId,
-		FLAccidents_Ecrash.Key_eCrashv2_Supplemental,
+		dx_eCrash.Key_Supplemental,
 		KEYED(LEFT.super_report_id = RIGHT.super_report_id),
 		TRANSFORM(RIGHT),
 		LIMIT(eCrash_Services.constants.MAX_REPORT_NUMBER, FAIL(203, doxie.ErrorCodes(203)))
@@ -111,7 +111,7 @@ EXPORT ImageSearchService() := FUNCTION
 		(UNSIGNED8)report_id
 	);
 	
-	AgencyInfo := FLAccidents_Ecrash.key_EcrashV2_agency(
+	AgencyInfo := dx_eCrash.key_Agency(
 		KEYED(
 			agency_state_abbr = SuperReportRow[1].jurisdiction_state 
 			AND agency_name = SuperReportRow[1].jurisdiction

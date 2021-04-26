@@ -1,13 +1,13 @@
-﻿IMPORT Data_Services, doxie, DueDiligence, Risk_Indicators, Seed_Files, STD;
+﻿IMPORT Data_Services, doxie, Risk_Indicators, Seed_Files, STD;
 
 EXPORT keys_Citizenship := MODULE
 
 
 
-	SHARED middleName := 'testseed::' + doxie.Version_SuperKey + '::Citizenship::'; 
+	SHARED middleName := 'testseed::' + doxie.Version_SuperKey + '::Citizenship::';
 	SHARED locateProd := Data_Services.Data_location.Prefix('NONAMEGIVEN') + 'thor_data400::key::' + middleName;
-  
-  
+
+
   SHARED GetIndex(seed, fileName) := FUNCTIONMACRO
     newRecord := RECORD
       DATA16 hashvalue := seed_files.Hash_InstantID(STD.Str.ToUpperCase(TRIM(seed.inFirstName)), // fname,
@@ -19,11 +19,11 @@ EXPORT keys_Citizenship := MODULE
                                                     Risk_Indicators.nullstring); // company_name -- not used in person
       seed;
     END;
-    
-    
+
+
     newTable := TABLE(seed, newRecord);
-    
-    
+
+
     RETURN INDEX(newTable,{inDatasetName, hashvalue}, {newTable}, locateProd + fileName);
   ENDMACRO;
 
@@ -35,21 +35,21 @@ EXPORT keys_Citizenship := MODULE
 
   //==========================================================
   // Attributes Section
-  //==========================================================	
+  //==========================================================
   EXPORT RiskIndicatorsSection := FUNCTION
     seedFile := Seed_Files.files_Citizenship.Section_RiskIndicators;
-  
+
     RETURN GetIndex(seedFile, 'RiskIndicators');
   END;
-  
-  
+
+
   //==========================================================
   // Input Echo Section
-  //==========================================================	
+  //==========================================================
   EXPORT InputEchoSection := FUNCTION
     seedFile := Seed_Files.files_Citizenship.Section_InputEcho;
-  
+
     RETURN GetIndex(seedFile, 'InputEcho');
   END;
-  
+
 END;

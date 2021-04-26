@@ -258,7 +258,7 @@ subj_addr_census := if (in_params.include_censusdata,
 
 // TODO: add properties, etc. here
 EXPORT x_SubjectAddresses := if (~IsFCRA, sort (subj_addr_census, -DateLastSeen, -DateFirstSeen, Address.Zip4, Address.StreetNumber));
-EXPORT SubjectAddresses := if (~IsFCRA, project (x_SubjectAddresses, iesp.bpsreport.t_BpsReportAddress));
+EXPORT SubjectAddresses := if (~IsFCRA, project (sort(x_SubjectAddresses,   if (address_seq_no > 0,0,1), address_seq_no),iesp.bpsreport.t_BpsReportAddress));
 
 
 // -------------------------------- slim --------------------------------
