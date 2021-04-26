@@ -65,14 +65,14 @@ EXPORT getTradelines(DATASET(Business_Risk_BIP.Layouts.Shell) Shell,
 	END;
 	// Get all unique SIC Codes along with dates
 	EBRSIC := TABLE(EBR_recs,
-			{Seq,
-			 LinkID := Business_Risk_BIP.Common.GetLinkSearchLevel(Options.LinkSearchLevel, SeleID),
-			 Source := MDR.SourceTools.src_EBR,
-			 STRING6 DateFirstSeen := Business_Risk_BIP.Common.groupMinDate6(date_first_seen, HistoryDate),
-			 STRING6 DateLastSeen := Business_Risk_BIP.Common.groupMaxDate6(date_last_seen, HistoryDate),
-			 UNSIGNED4 RecordCount := COUNT(GROUP),
-			 STRING10 SICCode := STD.Str.Filter((STRING)SIC_Code, '0123456789')[1..4],
-			 BOOLEAN IsPrimary := TRUE // There is only 1 SIC field on this source, mark it as primary
+    {Seq,
+		  LinkID := Business_Risk_BIP.Common.GetLinkSearchLevel(Options.LinkSearchLevel, SeleID),
+		  Source := MDR.SourceTools.src_EBR,
+		  STRING6 DateFirstSeen := Business_Risk_BIP.Common.groupMinDate6(date_first_seen, HistoryDate),
+		  STRING6 DateLastSeen := Business_Risk_BIP.Common.groupMaxDate6(date_last_seen, HistoryDate),
+		  UNSIGNED4 RecordCount := COUNT(GROUP),
+     STRING10 SICCode := IF( Options.BusShellVersion >= Business_Risk_BIP.Constants.BusShellVersion_v31,(STD.Str.Filter((STRING)SIC_Code, '0123456789'))[1..8],(STD.Str.Filter((STRING)SIC_Code, '0123456789'))[1..4]),
+		  BOOLEAN IsPrimary := TRUE // There is only 1 SIC field on this source, mark it as primary
 			 },
 			 Seq, Business_Risk_BIP.Common.GetLinkSearchLevel(Options.LinkSearchLevel, SeleID), SIC_Code
 			 );

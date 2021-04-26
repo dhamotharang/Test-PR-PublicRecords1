@@ -613,13 +613,13 @@ EXPORT getCortera(DATASET(Business_Risk_BIP.Layouts.Shell) Shell,
 
 	CorteraSIC := TABLE(CorteraRecs,
 			{Seq,
-			 LinkID := Business_Risk_BIP.Common.GetLinkSearchLevel(link_search_level, SeleID),
-			 Source := MDR.SourceTools.src_Cortera,
-			 STRING6 DateFirstSeen := Business_Risk_BIP.Common.groupMinDate6(dt_first_seen, HistoryDate),
-			 STRING6 DateLastSeen := Business_Risk_BIP.Common.groupMaxDate6(dt_last_seen, HistoryDate),
-			 UNSIGNED4 RecordCount := COUNT(GROUP),
-			 STRING10 SICCode := (STD.Str.Filter((STRING)primary_sic, '0123456789'))[1..4],
-			 BOOLEAN IsPrimary := TRUE
+     LinkID := Business_Risk_BIP.Common.GetLinkSearchLevel(link_search_level, SeleID),
+     Source := MDR.SourceTools.src_Cortera,
+     STRING6 DateFirstSeen := Business_Risk_BIP.Common.groupMinDate6(dt_first_seen, HistoryDate),
+     STRING6 DateLastSeen := Business_Risk_BIP.Common.groupMaxDate6(dt_last_seen, HistoryDate),
+     UNSIGNED4 RecordCount := COUNT(GROUP),
+     STRING10 SICCode := IF( Options.BusShellVersion >= Business_Risk_BIP.Constants.BusShellVersion_v31,(STD.Str.Filter((STRING)primary_sic, '0123456789'))[1..8],(STD.Str.Filter((STRING)primary_sic, '0123456789'))[1..4]),
+     BOOLEAN IsPrimary := TRUE
 			 },
 			 Seq, Business_Risk_BIP.Common.GetLinkSearchLevel(link_search_level, SeleID), ((STRING)primary_sic)[1..4]
 			 );
