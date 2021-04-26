@@ -109,8 +109,8 @@ EXPORT fn_smart_getAddrMetadata := MODULE
 		addrMetadata := Advo_Services.Advo_Batch_Service_Records(DATASET([getAddr()]),doBadSecRange);
 		RETURN PROJECT(addrMetadata,toESDL(LEFT));
 	END;
-	EXPORT AddAddressSourceCounts(unsigned6 DIDVal,
-                                                                dataset (iesp.smartlinxreport.t_SLRAddress) addresses,
+	EXPORT AddAddressSourceCounts(unsigned6 DIDVal,                                                               
+                                                                dataset(  iesp.smartlinxreport.t_SLRAddressSeq) addresses,
 												PersonReports.IParam._smartlinxreport param) := function
 
 	      HeaderRecsDS := project(addresses, transform( PersonReports.layouts.header_recPlusSource, 
@@ -137,8 +137,8 @@ EXPORT fn_smart_getAddrMetadata := MODULE
 						           left.address.zip5 = right.address.zip5 and
 								 left.address.streetName = right.address.StreetName and
 								 left.address.StreetNumber = right.address.StreetNumber and
-								 left.address.UnitNumber = right.address.UnitNumber,							
-								 transform(iesp.smartlinxreport.t_SLRAddress,
+								 left.address.UnitNumber = right.address.UnitNumber,															
+                                            transform(iesp.smartlinxreport.t_SLRAddressSeq,
 								    self.address.SourceCount := right.SourceCount;
 								    self.address.sources := choosen(project(right.sources, transform(iesp.smartlinxreport.t_SLRSources,
 										                                                                            self._type := left._type;

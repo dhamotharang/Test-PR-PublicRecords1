@@ -416,6 +416,7 @@ EXPORT IParam := MODULE
   EXPORT _smartlinxreport := INTERFACE (doxie.IDataAccess, emails, liens, watercrafts, old_smartlinxreport)
     EXPORT boolean include_BlankDOD := TRUE;
     EXPORT boolean smart_rollup := TRUE;
+    EXPORT boolean DoAddrHierarchy := FALSE;
   END;
 
 END;
