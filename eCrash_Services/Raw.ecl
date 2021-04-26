@@ -1,20 +1,18 @@
 ﻿/*2016-07-11T18:11:51Z (Dmitriy Lazarenko)
 adding a comment on why we have limit of 7000 here
 */
-IMPORT FLAccidents_Ecrash, ut, doxie,lib_stringlib,std, iesp, eCrash_Services;
+IMPORT dx_eCrash, ut, doxie,lib_stringlib,std, iesp, eCrash_Services;
 
 EXPORT Raw(eCrash_Services.IParam.searchrecords in_mod) := MODULE
-		shared 	accnbr_key:=FLAccidents_Ecrash.key_EcrashV2_Unrestricted_accnbrV1;
-		shared 	dol_key:=FLAccidents_Ecrash.key_EcrashV2_dol;
-		shared 	partial_accnbr_key := FLAccidents_Ecrash.Key_EcrashV2_Partial_Report_Nbr;
-		shared 	location_key := FLAccidents_Ecrash.Key_eCrashv2_StAndLocation;
-		shared  preferredName_key := FLAccidents_Ecrash.Key_eCrashv2_PrefName_State;
-		shared reportLinkKey := FLAccidents_Ecrash.Key_eCrashv2_ReportLinkId;
-		shared lastName_key := FLAccidents_Ecrash.Key_EcrashV2_LastName;
-		shared VinNbr_key := FLAccidents_Ecrash.key_ecrashV2_VinNbr;
-		shared DlnNbrDLState_key := FLAccidents_Ecrash.key_ecrashV2_DlnNbrDLState;
-		shared OfficerBadgeNbr_key := FLAccidents_Ecrash.key_ecrashV2_OfficerBadgeNbr;
-		shared LicensePlateNbr_key := FLAccidents_Ecrash.key_ecrashV2_LicensePlateNbr;
+		shared accnbr_key:= dx_eCrash.key_UnrestrictedAccNbrV1;
+		shared dol_key:= dx_eCrash.key_dol;
+		shared location_key := dx_eCrash.Key_StAndLocation;
+		shared preferredName_key := dx_eCrash.Key_PrefNameState;
+		shared lastName_key := dx_eCrash.Key_LastName;
+		shared VinNbr_key := dx_eCrash.key_VinNbr;
+		shared DlnNbrDLState_key := dx_eCrash.key_DlnNbrDLState;
+		shared OfficerBadgeNbr_key := dx_eCrash.key_OfficerBadgeNbr;
+		shared LicensePlateNbr_key := dx_eCrash.key_LicensePlateNbr;
 		
 		shared boolean hasJurisdictionInfo    := COUNT(in_mod.agencies(JurisdictionState <> '' AND Jurisdiction <> '')) > 0;
 		
@@ -84,81 +82,6 @@ EXPORT Raw(eCrash_Services.IParam.searchrecords in_mod) := MODULE
 													 rpn_recs_res1);	
 
 				RETURN rpn_recs_res;
-		END;
-		
-		EXPORT byPartialReportNumber(dataset(tmp_dtrange_rec) ds_date_range, boolean hasInputDOL) := FUNCTION
-				boolean isPartial := length(in_mod.reportnumber) = 4;
-				partial_report_number := if(isPartial, in_mod.reportnumber, in_mod.reportnumber[1..4]);
-				
-				by_partial_rptNum := PROJECT(in_mod.agencies, TRANSFORM(eCrash_Services.Layouts.search, 
-																												SELF.reportnumber := partial_report_number;
-																												SELF.isdeepdive 	:= false;																												
-																												SELF := LEFT;));
-				
-				
-			eCrash_Services.Layouts.search xformToAccnbr(by_partial_rptNum L, partial_accnbr_key R):=transform
-					self.reportnumber := R.l_accnbr;
-					self.isdeepdive:=false;
-					self.jurisdiction := L.jurisdiction;
-					self.jurisdictionstate := L.JurisdictionState;
-					self.primaryagency := L.primaryagency;
-					self := R;
-					self := [];
-				end;
-				
-					//BAP - kevin says needs cleanup, but not yet.
-				partial_rpn_recs_res1:= join(by_partial_rptNum,partial_accnbr_key,
-													keyed(right.partial_report_nbr=left.reportnumber) and
-													keyed(right.report_code in eCrash_Services.constants.ecrash_src_codes) and 
-													keyed (right.jurisdiction != '') and
-													wild (right.jurisdiction_state) and
-													wild (right.accident_date) and
-													(eCrash_Services.Constants.valid_match(right.jurisdiction_state,left.JurisdictionState)) and 
-													(eCrash_Services.Constants.valid_match(STD.Str.ToUpperCase(right.jurisdiction),left.jurisdiction)),
-													xformToAccnbr(left, right),limit(eCrash_Services.constants.MAX_PARTIAL_NUMBER, fail(203, doxie.ErrorCodes(203))));
-										
-				partial_rpn_recs_res_w_jur:= join(by_partial_rptNum,partial_accnbr_key,
-													keyed(right.partial_report_nbr=left.reportnumber) and
-													keyed(right.report_code in eCrash_Services.constants.ecrash_src_codes) and
-													keyed(right.jurisdiction_state = left.jurisdictionState) and
-													keyed(right.jurisdiction = left.jurisdiction),
-													xformToAccnbr(left, right),limit(eCrash_Services.constants.MAX_PARTIAL_NUMBER, fail(203, doxie.ErrorCodes(203))));
-													
-				partial_recs := if(hasJurisdictionInfo, partial_rpn_recs_res_w_jur, partial_rpn_recs_res1);
-
-				ds_date_range_search_ds := JOIN(in_mod.agencies, ds_date_range, TRUE, TRANSFORM(tmp_dtrange_rec_withAgencies, 
-																					SELF.daterange := RIGHT.daterange;
-																					SELF := LEFT;), ALL);
-				
-				eCrash_Services.Layouts.search xformToAccnbrWithDOL(ds_date_range_search_ds L, partial_accnbr_key R):=transform
-					self.reportnumber := R.l_accnbr;
-					self.isdeepdive:=false;
-					self.jurisdiction := L.jurisdiction;
-					self.jurisdictionstate := L.JurisdictionState;
-					self := L;
-				end;
-				
-				partial_rpn_recs_w_fuzzydol:=	join(ds_date_range_search_ds, partial_accnbr_key,
-																				keyed (right.partial_report_nbr=partial_report_number) and 
-																				keyed (right.report_code in eCrash_Services.constants.ecrash_src_codes) and 
-																				keyed (right.accident_date=left.daterange) and
-																				keyed (right.jurisdiction != '') and
-																				wild (right.jurisdiction_state) and
-																				(eCrash_Services.Constants.valid_match(right.jurisdiction_state,left.JurisdictionState)) and 
-																				(eCrash_Services.Constants.valid_match(STD.Str.ToUpperCase(right.jurisdiction),left.jurisdiction)),
-																				xformToAccnbrWithDOL(left, right),limit(eCrash_Services.Constants.MAX_ACCIDENTS_PER_DAY, fail(203, doxie.ErrorCodes(203))));
-																				
-				partial_rpn_recs_res := if(hasInputDOL, partial_rpn_recs_w_fuzzydol, partial_recs);
-				
-				filter_partial_rpn_res := if(isPartial,
-																			partial_rpn_recs_res,
-																			partial_rpn_recs_res(containsReportNumber(reportnumber, in_mod.reportnumber)));
-				
-				dup_partial_recs := dedup(sort(filter_partial_rpn_res, reportnumber, JurisdictionState, jurisdiction, agencyid, agencyori, -primaryagency), reportnumber, JurisdictionState, jurisdiction, agencyid, agencyori, primaryagency);
-				//BAP above indexes have no payload so they use the byReportNumber to lookup payload
-				partial_rpn_res := byReportNumber(dup_partial_recs);
-				
-				RETURN partial_rpn_res;
 		END;
 		
 		EXPORT byDOL(string start_date, string end_date) := FUNCTION
@@ -437,7 +360,7 @@ EXPORT Raw(eCrash_Services.IParam.searchrecords in_mod) := MODULE
 		EXPORT byVin() := FUNCTION
 			
 			vin_rec := RECORD
-				FLAccidents_Ecrash.Layouts.key_slim_layout;
+				dx_eCrash.Layouts.SEARCH_KEYS;
 				boolean primaryagency;
 			end;
 			
@@ -483,7 +406,7 @@ EXPORT Raw(eCrash_Services.IParam.searchrecords in_mod) := MODULE
 		EXPORT byDriversLicenseNum() := FUNCTION
 		
 			dl_rec := RECORD
-				FLAccidents_Ecrash.Layouts.key_slim_layout;
+				dx_eCrash.Layouts.SEARCH_KEYS;
 				boolean primaryagency;
 			end;
 		
@@ -527,7 +450,7 @@ EXPORT Raw(eCrash_Services.IParam.searchrecords in_mod) := MODULE
 		EXPORT byOfficerBadge() := FUNCTION
 			
 			OffBadge_rec := RECORD
-				FLAccidents_Ecrash.Layouts.key_slim_layout;
+				dx_eCrash.Layouts.SEARCH_KEYS;
 				boolean primaryagency;
 			end;
 			
@@ -571,7 +494,7 @@ EXPORT Raw(eCrash_Services.IParam.searchrecords in_mod) := MODULE
 		EXPORT byLicensePlate() := FUNCTION
 			
 			LicensePlate_rec := RECORD
-				FLAccidents_Ecrash.Layouts.key_slim_layout;
+				dx_eCrash.Layouts.SEARCH_KEYS;
 				boolean primaryagency;
 			end;
 			
@@ -610,75 +533,6 @@ EXPORT Raw(eCrash_Services.IParam.searchrecords in_mod) := MODULE
 																		self := right),limit(eCrash_Services.constants.MAX_REPORT_NUMBER, fail(203, doxie.ErrorCodes(203))));
 	
 			RETURN licensePlate_recs_exact;
-			
-		END;
-
-		EXPORT getAssociatedReports(dataset(eCrash_Services.Layouts.recs_with_penalty) intialSearchResults) := FUNCTION
-		
-		  filtered_recs := intialSearchResults(ReportLinkID <> '');
-			
-			associated_report_links := 	join(filtered_recs,reportLinkKey,
-																			 keyed(right.ReportLinkID=left.ReportLinkID) and
-																			 right.report_type_id<>left.report_type_id,
-																			 transform(recordof(reportLinkKey),
-																			 self := right),limit(eCrash_Services.constants.MAX_REPORT_NUMBER, fail(203, doxie.ErrorCodes(203))));
-																		 
-      
-			associated_report_links_full_recs := join(associated_report_links,accnbr_key,
-																								keyed(right.l_accnbr=left.accident_nbr) and
-																								keyed(right.report_code in eCrash_Services.constants.ecrash_src_codes) and
-																								keyed(right.jurisdiction_state = left.jurisdiction_state) and
-																								right.ReportLinkID = left.ReportLinkID and
-																								right.report_type_id = left.report_type_id,
-																								transform(recordof(accnbr_key),
-																								self := right),limit(eCrash_Services.constants.MAX_REPORT_NUMBER, fail(203, doxie.ErrorCodes(203))));
-																								
-      associated_reports_keys := project(associated_report_links_full_recs,eCrash_Services.Layouts.recs_with_penalty);
-			
-			//OUTPUT(associated_reports_keys,named('associatedReports_keys'));
-																								
-			eCrash_Services.Layouts.recs_with_report_association xformDeltaAssociatedReports(eCrash_Services.Layouts.recs_with_penalty l) := TRANSFORM 
-				SELF.recs := RecordsDeltaBase(in_mod).getAssociatedReports(l);
-			END;
-			
-			delta_associated_parent_reports := project(filtered_recs,xformDeltaAssociatedReports(LEFT));
-			
-			delta_associated_reports := NORMALIZE(delta_associated_parent_reports, LEFT.recs, TRANSFORM(RIGHT));
-			
-			delta_merged_associated_reports := associated_reports_keys + delta_associated_reports;
-																								
-      RecordsSorted := SORT(delta_merged_associated_reports, 
-					fname,
-					lname,
-					accident_date,
-					jurisdiction_state,
-					jurisdiction,
-					//all the TM and TF reports have orig_accnbr and addl_report_number switched
-					IF(report_code = 'EA', orig_accnbr, addl_report_number),
-					IF(report_code = 'EA', addl_report_number, orig_accnbr), 
-					report_type_id,
-					if (report_code = 'TM', 1, 0), //TM has the least priority
-					-(UNSIGNED8)report_id,
-						-isDelta,
-					-date_added,
-					if(record_type = 'DRIVER', 0, 1) //DRIVER records have more information
-				);
-				
-			final_recs := DEDUP(
-									   RecordsSorted,
-										 fname,
-										 lname,
-										 accident_date,
-									 	 jurisdiction_state,
-										 jurisdiction,
-										 IF(report_code = 'EA', orig_accnbr, addl_report_number),
-										 IF(report_code = 'EA', addl_report_number, orig_accnbr),
-										 report_type_id
-									   ); 
-			
-			//output(associated_reports_keys,named('associated_recs_from_keys'));
-      
-		  return final_recs;
 			
 		END;
 		

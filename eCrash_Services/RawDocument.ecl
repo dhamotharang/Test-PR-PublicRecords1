@@ -1,11 +1,11 @@
-﻿import FLAccidents_Ecrash, ut, doxie,eCrash_Services;
+﻿import dx_eCrash, ut, doxie,eCrash_Services;
 EXPORT RawDocument(IParam.searchrecords in_mod) := MODULE
 
 EXPORT GetReportDocuments(string RequestReportId, string DocumentType='') := FUNCTION
 
 		DeltaBaseService := eCrash_Services.DeltaBaseSoapCall(in_mod);
 		DeltaBaseSql := eCrash_Services.RawDeltaBaseSQL(in_mod);	
-		SuperReportIdToReportId := CHOOSEN(FLAccidents_Ecrash.Key_eCrashV2_ReportId(KEYED(report_id = RequestReportId)), 1);
+		SuperReportIdToReportId := CHOOSEN(dx_eCrash.Key_ReportId(KEYED(report_id = RequestReportId)), 1);
 		SuperReportId := if(exists(SuperReportIdToReportId),SuperReportIdToReportId[1].Super_report_id,'');
 		//SuperReportId := (string11)SuperReportIdToReportId.Super_report_id;
 		//All of the records in ReportHashKeysFromKey have the same accident_nbr, report_code, jurisdiction_state, jurisdiction, accident_date, orig_accnbr
@@ -13,13 +13,13 @@ EXPORT GetReportDocuments(string RequestReportId, string DocumentType='') := FUN
 		ReportHashKeysFromKey := 
 			JOIN(
 				SuperReportIdToReportId,
-				FLAccidents_Ecrash.Key_eCrashv2_Supplemental,
+				dx_eCrash.Key_Supplemental,
 				KEYED(LEFT.super_report_id = RIGHT.super_report_id),
 				TRANSFORM(RIGHT),
 				LIMIT(constants.MAX_REPORT_NUMBER, FAIL(203, doxie.ErrorCodes(203)))
 			);
 		
-		DeltaBaseDateAddedRaw := FLAccidents_Ecrash.Key_eCrashV2_DeltaDate(delta_text = 'DELTADATE');
+		DeltaBaseDateAddedRaw := dx_eCrash.Key_DeltaDate(delta_text = 'DELTADATE');
 		DeltaBaseDateAdded := ut.date_math(DeltaBaseDateAddedRaw[1].date_added[1..8], -1);
 		DeltaBaseDateAddedSql := DeltaBaseSql.dateFormatted(DeltaBaseDateAdded);
 
@@ -32,7 +32,7 @@ EXPORT GetReportDocuments(string RequestReportId, string DocumentType='') := FUN
 			EmptyReportDeltabaseRow
 		);
 		
-		PayloadRowByDeltabaseRaw := FLAccidents_Ecrash.key_EcrashV2_Unrestricted_accnbrv1(
+		PayloadRowByDeltabaseRaw := dx_eCrash.key_UnrestrictedAccNbrv1(
 			KEYED(
 				l_accnbr = ReportDeltabaseRow[1].l_accnbr AND
 				//report_code IN ReportCodeDeltabase AND    //WE NEED to comment this out because if for example we found
@@ -61,7 +61,7 @@ EXPORT GetReportDocuments(string RequestReportId, string DocumentType='') := FUN
 		
   DeltaDocumentDataById :=  if (TRIM(ReportIdString, LEFT, RIGHT) = '', EmptyDocumentData, DeltaBaseService.GetDocumentData(deltabaseDocReportIdSql));
 		
-		DeltabaseSuperReport := project(ReportDeltabaseRow,TRANSFORM(recordof(FLAccidents_Ecrash.Key_eCrashv2_Supplemental), SELF.accident_nbr:=LEFT.l_accnbr, self.addl_report_number:=LEFT.formattedStateReportNumber, SELF:=LEFT,SELF:=[]));	//project(ReportDeltabaseRow,TRANSFORM(FLAccidents_Ecrash.Key_eCrashv2_Supplemental, SELF:=LEFT));
+		DeltabaseSuperReport := project(ReportDeltabaseRow,TRANSFORM(recordof(dx_eCrash.Key_Supplemental), SELF.accident_nbr:=LEFT.l_accnbr, self.addl_report_number:=LEFT.formattedStateReportNumber, SELF:=LEFT,SELF:=[]));	//project(ReportDeltabaseRow,TRANSFORM(dx_eCrash.Key_eCrashv2_Supplemental, SELF:=LEFT));
 		
 	  //OUTPUT(DeltabaseSuperReport, named('DeltabaseSuperReport_temp'));
 	 deltabaseDocBySupplementalSql := if (EXISTS(ReportHashKeysFromKey),DeltaBaseSql.GetDocumentsSQL(ReportHashKeysFromKey[1],DeltaBaseDateAddedSql, DocumentType),DeltaBaseSql.GetDocumentsSQL(DeltabaseSuperReport[1],DeltaBaseDateAddedSql, DocumentType));
@@ -72,7 +72,7 @@ EXPORT GetReportDocuments(string RequestReportId, string DocumentType='') := FUN
 		
 		//OUTPUT(DeltabaseDocuments,named('DeltabaseDocuments'));
 		
-		DocumentKey := FLAccidents_Ecrash.Key_ecrashV2_PhotoId;
+		DocumentKey := dx_eCrash.Key_PhotoId;
 		PayloadDocumentsTemp := CHOOSEN(
 		 DocumentKey(keyed(Super_report_id=FinalSuperReportId) 
 			           and keyed(Document_id <> '') 
@@ -81,7 +81,7 @@ EXPORT GetReportDocuments(string RequestReportId, string DocumentType='') := FUN
 			constants.MAX_REPORT_NUMBER
 		);
 		
-		Layouts.DocumentData transformPayload(FLAccidents_Ecrash.Key_ecrashV2_PhotoId l) := TRANSFORM
+		Layouts.DocumentData transformPayload(dx_eCrash.Key_PhotoId l) := TRANSFORM
 			self.documentId := l.document_id;
 			self.hashKey := l.document_hash_key;
 			self.dateAdded := l.date_created;
