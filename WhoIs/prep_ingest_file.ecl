@@ -178,15 +178,15 @@ END;
 		SELF.Date_Vendor_Last_Reported 	:= version;
 		SELF.current_rec 	:= TRUE;
 		
-		SELF.name         := MAP(fnValidName(le.name) = false => '',
-														fnValidCName(le.name) = false => '',
+		SELF.name         := MAP(fnValidName(trim(le.name)) = false => '',
+														fnValidCName(trim(le.name)) = false => '',
 														REGEXFIND(':',le.name)=>'',
 														NOT REGEXFIND('[A-Z]',le.name) => '',
 														REGEXFIND('C/O',le.name)=> REGEXREPLACE('C/O',le.name,''),
 														TRIM(le.name,LEFT,RIGHT));
 
-		SELF.organization := MAP(fnValidName(le.organization) = false => '',
-														fnValidCName(le.organization) = false => '',
+		SELF.organization := MAP(fnValidName(trim(le.organization)) = false => '',
+														fnValidCName(trim(le.organization)) = false => '',
 														REGEXFIND(':',le.organization)=>'',
 														NOT REGEXFIND('[A-Z]',le.organization) => '',
 														TRIM(le.organization) = TRIM(self.name) => '',
