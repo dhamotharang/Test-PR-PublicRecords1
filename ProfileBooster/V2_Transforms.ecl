@@ -83,7 +83,7 @@ EXPORT V2_Transforms := MODULE
 		dob 				:= dob_val;
     fullhistorydate := risk_indicators.iid_constants.myGetDate(le.historydate);
 		SELF.dob 		:= if((unsigned)le.dob<=0, dob, le.dob);
-    SELF.EmrgDob := if((unsigned)le.EmrgDob<=0, dob, le.EmrgDob);
+    SELF.EmrgDob := if((unsigned)le.EmrgDob<=0, ProfileBooster.V2_Common.convertDateTo8((STRING)dob), le.EmrgDob);
     SELF.ProspectAge 			:= if((unsigned)le.dob<=0, risk_indicators.years_apart((unsigned)fullhistorydate, (unsigned)dob), (unsigned)le.ProspectAge);
  		
     SELF.title := if(le.title='',ri.title, le.title);
@@ -118,8 +118,8 @@ EXPORT V2_Transforms := MODULE
   EXPORT ProfileBooster.V2_Layouts.Layout_PB2_Shell xfmAddLexIDKey(ProfileBooster.V2_Layouts.Layout_PB2_Shell le, dx_ProfileBooster.Layouts.i_lexid ri ) := TRANSFORM
 		// SELF.email_address	:= ri.emailAddress;
  		dob_val 		:= riskwise.cleandob(ri.PurchDOB);
-		dob 				:= dob_val;
-		SELF.dob 		:= if((unsigned)le.dob<=0, dob, le.dob);
+    dob 				:= if((unsigned)le.dob<=0, dob_val, le.dob);
+    SELF.dob 		:= dob;
     fullhistorydate := risk_indicators.iid_constants.myGetDate(le.historydate);
 		SELF.ProspectAge 			:= if((unsigned)le.dob<=0, risk_indicators.years_apart((unsigned)fullhistorydate, (unsigned)dob), (unsigned)le.ProspectAge);
  		SELF.gender := if(le.gender='' AND ri.PurchGender<>'', ri.PurchGender, le.gender);
@@ -240,7 +240,7 @@ EXPORT V2_Transforms := MODULE
                                     // ri.LifeAstPurchNewMsnc < 0 => le.LifeAstPurchNewMsnc,
                                                                    // MIN(ri.LifeAstPurchNewMsnc,le.LifeAstPurchNewMsnc));
     SELF.LifeAddrCnt := ri.LifeAddrCnt;
-    SELF.LifeAddrCurrToPrevValRatio5y := ri.LifeAddrCurrToPrevValRatio5y;
+    // SELF.LifeAddrCurrToPrevValRatio5y := ri.LifeAddrCurrToPrevValRatio5y;
     SELF.LifeAddrEconTrajType := ri.LifeAddrEconTrajType;
     SELF.LifeAddrEconTrajIndx := ri.LifeAddrEconTrajIndx;
     SELF.ProfLicFlagEv := ri.ProfLicFlagEv;
@@ -253,30 +253,46 @@ EXPORT V2_Transforms := MODULE
     SELF.BusUCCFilingCntEv := ri.BusUCCFilingCntEv;
     SELF.BusUCCFilingActiveCnt := ri.BusUCCFilingActiveCnt;
     
-    OlderErmgRecord := (ri.EmrgDt_first_seen <= le.EmrgDt_first_seen and ri.EmrgDt_first_seen>0) or le.EmrgDt_first_seen<=0;
-  	self.EmrgDt_first_seen   := IF(OlderErmgRecord,ri.EmrgDt_first_seen,le.EmrgDt_first_seen);
-		self.EmrgSrc             := IF(OlderErmgRecord,ri.EmrgSrc,le.EmrgSrc);
-		self.EmrgDob			       := MAP(OlderErmgRecord and (unsigned)ri.EmrgDob>0 => ri.EmrgDob,
-                                    (unsigned)le.EmrgDob>0                     => le.EmrgDob,
-                                                                                  le.Dob);
-		self.EmrgAge   			     := IF(OlderErmgRecord,ri.EmrgAge,le.EmrgAge);
-		self.EmrgPrimaryRange    := IF(OlderErmgRecord,ri.EmrgPrimaryRange,le.EmrgPrimaryRange);
-		self.EmrgPredirectional	 := IF(OlderErmgRecord,ri.EmrgPredirectional,le.EmrgPredirectional);
-		self.EmrgPrimaryName	   := IF(OlderErmgRecord,ri.EmrgPrimaryName,le.EmrgPrimaryName);
-		self.EmrgSuffix	         := IF(OlderErmgRecord,ri.EmrgSuffix,le.EmrgSuffix);	
-		self.EmrgPostdirectional := IF(OlderErmgRecord,ri.EmrgPostdirectional,le.EmrgPostdirectional);
-		self.EmrgUnitDesignation := IF(OlderErmgRecord,ri.EmrgUnitDesignation,le.EmrgUnitDesignation);
-		self.EmrgSecondaryRange	 := IF(OlderErmgRecord,ri.EmrgSecondaryRange,le.EmrgSecondaryRange);
-		self.EmrgCity_Name	     := IF(OlderErmgRecord,ri.EmrgCity_Name,le.EmrgCity_Name);	
-		self.EmrgSt			         := IF(OlderErmgRecord,ri.EmrgSt,le.EmrgSt);
-		self.EmrgZIP5			       := IF(OlderErmgRecord,ri.EmrgZIP5,le.EmrgZIP5);
-		self.EmrgZIP4		         := IF(OlderErmgRecord,ri.EmrgZIP4,le.EmrgZIP4);
-	
-    SELF.EmrgAtOrAfter21Flag := IF(OlderErmgRecord,ri.EmrgAtOrAfter21Flag,le.EmrgAtOrAfter21Flag);
+    OlderErmgRecord := ((UNSIGNED)ri.EmrgDt_first_seen <= (UNSIGNED)le.EmrgDt_first_seen 
+                        and (UNSIGNED)ri.EmrgDt_first_seen>0
+                       ) 
+                       or le.EmrgDt_first_seen<=0;
+    EmrgDt_first_seen        := IF(OlderErmgRecord,ri.EmrgDt_first_seen,le.EmrgDt_first_seen);
+    SELF.EmrgDt_first_seen   := EmrgDt_first_seen;
+    EmrgDob			             := MAX((unsigned)ProfileBooster.V2_Common.convertDateTo8((STRING)ri.EmrgDob),
+                                    (unsigned)ProfileBooster.V2_Common.convertDateTo8((STRING)le.EmrgDob),
+                                    (unsigned)ProfileBooster.V2_Common.convertDateTo8((STRING)dob));
+    SELF.EmrgDob			       := (STRING)EmrgDob;
+    EmrgAge                  := IF((UNSIGNED)EmrgDt_first_seen<=0 OR (UNSIGNED)EmrgDob<=0,
+                                -99998,
+                                risk_indicators.years_apart((UNSIGNED)EmrgDt_first_seen, (UNSIGNED)EmrgDob));
+    SELF.EmrgAge   			     := EmrgAge;
+    SELF.EmrgAtOrAfter21Flag := MAP(EmrgAge < 0          => -99998,
+                                    EmrgAge > 21         => 1,
+                                    EmrgAge > 0          => 0,
+                                                            -99998);
+    SELF.EmrgAge25to59Flag   := MAP(EmrgDt_first_seen<=0 => -99998,
+                                    EmrgAge <= 0         => -99998,
+                                    EmrgAge >= 25 AND EmrgAge < 60 => 1,
+                                                            0);
+
+    SELF.EmrgSrc             := IF(OlderErmgRecord,ri.EmrgSrc,le.EmrgSrc);
+    SELF.EmrgPrimaryRange    := IF(OlderErmgRecord,ri.EmrgPrimaryRange,le.EmrgPrimaryRange);
+    SELF.EmrgPredirectional	 := IF(OlderErmgRecord,ri.EmrgPredirectional,le.EmrgPredirectional);
+    SELF.EmrgPrimaryName	   := IF(OlderErmgRecord,ri.EmrgPrimaryName,le.EmrgPrimaryName);
+    SELF.EmrgSuffix	         := IF(OlderErmgRecord,ri.EmrgSuffix,le.EmrgSuffix);	
+    SELF.EmrgPostdirectional := IF(OlderErmgRecord,ri.EmrgPostdirectional,le.EmrgPostdirectional);
+    SELF.EmrgUnitDesignation := IF(OlderErmgRecord,ri.EmrgUnitDesignation,le.EmrgUnitDesignation);
+    SELF.EmrgSecondaryRange	 := IF(OlderErmgRecord,ri.EmrgSecondaryRange,le.EmrgSecondaryRange);
+    SELF.EmrgCity_Name	     := IF(OlderErmgRecord,ri.EmrgCity_Name,le.EmrgCity_Name);	
+    SELF.EmrgSt			         := IF(OlderErmgRecord,ri.EmrgSt,le.EmrgSt);
+    SELF.EmrgZIP5			       := IF(OlderErmgRecord,ri.EmrgZIP5,le.EmrgZIP5);
+    SELF.EmrgZIP4		         := IF(OlderErmgRecord,ri.EmrgZIP4,le.EmrgZIP4);
+      
     SELF.EmrgRecordType      := IF(OlderErmgRecord,ri.EmrgRecordType,le.EmrgRecordType);
-    SELF.EmrgAddrType        := IF(OlderErmgRecord,ri.EmrgAddrType,le.EmrgAddrType);
-    SELF.EmrgLexIDsAtEmrgAddrCnt1Y := IF(OlderErmgRecord,ri.EmrgLexIDsAtEmrgAddrCnt1Y,le.EmrgLexIDsAtEmrgAddrCnt1Y);
-    SELF.EmrgAge25to59Flag   := IF(OlderErmgRecord,ri.EmrgAge25to59Flag,le.EmrgAge25to59Flag);
+    SELF.EmrgAddrType        := '-99998';
+    SELF.EmrgLexIDsAtEmrgAddrCnt1Y := -99998;
+    
     
     SELF.DrgCnt7Y := ri.DrgCnt7Y;
     SELF.DrgSeverityIndx7Y := ri.DrgSeverityIndx7Y;
@@ -328,6 +344,229 @@ EXPORT V2_Transforms := MODULE
 	END;  
   
      EXPORT ProfileBooster.V2_Layouts.Layout_PB2_Shell xfmAddHouseholdInfo(ProfileBooster.V2_Layouts.Layout_PB2_Shell le, dx_ProfileBooster.Layouts.i_lexid ri) := TRANSFORM
+        dob_val 		:= riskwise.cleandob(ri.PurchDOB);
+        dob 				:= if((unsigned)le.dob<=0, dob_val, le.dob);
+        SELF.dob 		:= dob;
+        fullhistorydate := risk_indicators.iid_constants.myGetDate(le.historydate);
+        SELF.ProspectAge 			:= if((unsigned)le.dob<=0, risk_indicators.years_apart((unsigned)fullhistorydate, (unsigned)dob), (unsigned)le.ProspectAge);
+        SELF.gender := if(le.gender='' AND ri.PurchGender<>'', ri.PurchGender, le.gender);
+        SELF.marital_status := if(le.marital_status='' and le.title='',IF(ri.PurchMarried='M','Y','N'),le.marital_status);
+        historydate := (unsigned3)fullhistorydate[1..6];    
+        PB20VehDtFirstSeen := if(ri.PL_VehicleMinDate<=0,(unsigned3)((STRING8)le.dt_first_seen)[1..6],(unsigned3)((STRING8)ri.PL_VehicleMinDate)[1..6]);
+        PB20DunnDtFirstSeen := if(ri.PL_PurchMinDate<=0,(unsigned3)((STRING8)le.dt_first_seen)[1..6],(unsigned3)((STRING8)ri.PL_PurchMinDate)[1..6]);
+        dt_first_seen 		    := MIN(IF(PB20VehDtFirstSeen<=0,999999,PB20VehDtFirstSeen),
+                                    IF(PB20DunnDtFirstSeen<=0,999999,PB20DunnDtFirstSeen),
+                                    IF((unsigned3)((STRING8)le.dt_first_seen)[1..6]<=0,999999,(unsigned3)((STRING8)le.dt_first_seen)[1..6]));
+        SELF.dt_first_seen 		:= IF(dt_first_seen=999999,0,dt_first_seen);
+        PB20VehDtLastSeen := if(ri.PL_VehicleMaxDate=-99997,(unsigned3)((STRING8)le.dt_last_seen)[1..6],(unsigned3)((STRING8)ri.PL_VehicleMaxDate)[1..6]);
+        PB20DunnDtLastSeen := if(ri.PL_PurchMaxDate=-99997,(unsigned3)((STRING8)le.dt_last_seen)[1..6],(unsigned3)((STRING8)ri.PL_PurchMaxDate)[1..6]);
+        SELF.dt_last_seen			:= MAX(PB20VehDtLastSeen,PB20DunnDtLastSeen,(unsigned3)((STRING8)le.dt_last_seen)[1..6]);
+        SELF.DemEduCollCurrFlag := ri.DemEduCollCurrFlag;
+        SELF.DemEduCollFlagEv := ri.DemEduCollFlagEv;
+        SELF.DemEduCollNewLevelEv := ri.DemEduCollNewLevelEv;
+        SELF.DemEduCollNewPvtFlag := ri.DemEduCollNewPvtFlag;
+        SELF.DemEduCollNewTierIndx := ri.DemEduCollNewTierIndx;
+        SELF.DemEduCollLevelHighEv := ri.DemEduCollLevelHighEv;
+        SELF.DemEduCollRecNewInstTypeEv := ri.DemEduCollRecNewInstTypeEv;
+        SELF.DemEduCollTierHighEv := ri.DemEduCollTierHighEv;
+        SELF.DemEduCollRecNewMajorTypeEv := ri.DemEduCollRecNewMajorTypeEv;
+        SELF.DemEduCollEvidFlagEv := ri.DemEduCollEvidFlagEv;  
+        SELF.DemEduCollSrcNewRecOldMsncEv := ri.DemEduCollSrcNewRecOldMsncEv;
+        SELF.DemEduCollSrcNewRecNewMsncEv := ri.DemEduCollSrcNewRecNewMsncEv;
+        SELF.DemEduCollRecSpanEv := ri.DemEduCollRecSpanEv;
+        SELF.DemEduCollRecNewClassEv := ri.DemEduCollRecNewClassEv;
+        SELF.DemEduCollSrcNewExpGradYr := ri.DemEduCollSrcNewExpGradYr;
+        SELF.DemEduCollInstPvtFlagEv := ri.DemEduCollInstPvtFlagEv;
+        SELF.DemEduCollMajorMedicalFlagEv := ri.DemEduCollMajorMedicalFlagEv;
+        SELF.DemEduCollMajorPhysSciFlagEv := ri.DemEduCollMajorPhysSciFlagEv;
+        SELF.DemEduCollMajorSocSciFlagEv := ri.DemEduCollMajorSocSciFlagEv;
+        SELF.DemEduCollMajorLibArtsFlagEv := ri.DemEduCollMajorLibArtsFlagEv;
+        SELF.DemEduCollMajorTechnicalFlagEv := ri.DemEduCollMajorTechnicalFlagEv;
+        SELF.DemEduCollMajorBusFlagEv := ri.DemEduCollMajorBusFlagEv;
+        SELF.DemEduCollMajorEduFlagEv := ri.DemEduCollMajorEduFlagEv;
+        SELF.DemEduCollMajorLawFlagEv := ri.DemEduCollMajorLawFlagEv;
+        // SELF.DemBankingIndx := ri.DemBankingIndx;
+        // SELF.PurchNewAmt := ri.PurchNewAmt;
+        // SELF.PurchTotEv := ri.PurchTotEv;
+        // SELF.PurchCntEv := ri.PurchCntEv;
+        // SELF.PurchNewMsnc := ri.PurchNewMsnc;
+        // SELF.PurchOldMsnc := ri.PurchOldMsnc;
+        // SELF.PurchItemCntEv := ri.PurchItemCntEv;
+        // SELF.PurchAmtAvg := (INTEGER3)ri.PurchAmtAvg;
+        SELF.AstVehAutoCntEv := ri.AstVehAutoCntEv;
+        SELF.AstVehAutoCarCntEv := ri.AstVehAutoCarCntEv;
+        SELF.AstVehAutoSUVCntEv := ri.AstVehAutoSUVCntEv;
+        SELF.AstVehAutoTruckCntEv := ri.AstVehAutoTruckCntEv;
+        SELF.AstVehAutoVanCntEv := ri.AstVehAutoVanCntEv;
+        SELF.AstVehAutoNewTypeIndx := (INTEGER3)ri.AstVehAutoNewTypeIndx;
+        SELF.AstVehAutoExpCntEv := ri.AstVehAutoExpCntEv;
+        SELF.AstVehAutoEliteCntEv := ri.AstVehAutoEliteCntEv;
+        SELF.AstVehAutoLuxuryCntEv := ri.AstVehAutoLuxuryCntEv;
+        SELF.AstVehAutoOrigOwnCntEv := ri.AstVehAutoOrigOwnCntEv;
+        SELF.AstVehAutoMakeCntEv := ri.AstVehAutoMakeCntEv;
+        SELF.AstVehAutoFreqMake := ri.AstVehAutoFreqMake;
+        SELF.AstVehAutoFreqMakeCntEv := ri.AstVehAutoFreqMakeCntEv;
+        SELF.AstVehAuto2ndFreqMake := ri.AstVehAuto2ndFreqMake;
+        SELF.AstVehAuto2ndFreqMakeCntEv := ri.AstVehAuto2ndFreqMakeCntEv;
+        SELF.AstVehAutoEmrgPriceAvg := ri.AstVehAutoEmrgPriceAvg;
+        SELF.AstVehAutoEmrgPriceMax := ri.AstVehAutoEmrgPriceMax;
+        SELF.AstVehAutoEmrgPriceMin := ri.AstVehAutoEmrgPriceMin;
+        SELF.AstVehAutoNewPrice := ri.AstVehAutoNewPrice;
+        SELF.AstVehAutoEmrgPriceDiff := ri.AstVehAutoEmrgPriceDiff;
+        SELF.AstVehAutoLastAgeAvg := ri.AstVehAutoLastAgeAvg;
+        SELF.AstVehAutoLastAgeMax := ri.AstVehAutoLastAgeMax;
+        SELF.AstVehAutoLastAgeMin := ri.AstVehAutoLastAgeMin;
+        SELF.AstVehAutoEmrgAgeAvg := ri.AstVehAutoEmrgAgeAvg;
+        SELF.AstVehAutoEmrgAgeMax := ri.AstVehAutoEmrgAgeMax;
+        SELF.AstVehAutoEmrgAgeMin := ri.AstVehAutoEmrgAgeMin;
+        SELF.AstVehAutoEmrgSpanAvg := ri.AstVehAutoEmrgSpanAvg;
+        SELF.AstVehAutoNewMsnc := ri.AstVehAutoNewMsnc;
+        SELF.AstVehAutoTimeOwnSpanAvg := ri.AstVehAutoTimeOwnSpanAvg;
+        SELF.AstVehOtherCntEv := ri.AstVehOtherCntEv;
+        SELF.AstVehOtherATVCntEv := ri.AstVehOtherATVCntEv;
+        SELF.AstVehOtherCamperCntEv := ri.AstVehOtherCamperCntEv;
+        SELF.AstVehOtherCommCntEv := ri.AstVehOtherCommCntEv;
+        SELF.AstVehOtherMtrCntEv := ri.AstVehOtherMtrCntEv;
+        SELF.AstVehOtherScooterCntEv := ri.AstVehOtherScooterCntEv;
+        SELF.AstVehOtherNewTypeIndx := ri.AstVehOtherNewTypeIndx;
+        SELF.AstVehOtherOrigOwnCntEv := ri.AstVehOtherOrigOwnCntEv;
+        SELF.AstVehOtherNewMsnc := ri.AstVehOtherNewMsnc;
+        SELF.AstVehOtherPriceAvg := ri.AstVehOtherPriceAvg;
+        SELF.AstVehOtherPriceMax := ri.AstVehOtherPriceMax;
+        SELF.AstVehOtherPriceMin := ri.AstVehOtherPriceMin;
+        SELF.AstVehOtherNewPrice := ri.AstVehOtherNewPrice;	
+        SELF.IntSportPersonFlagEv := ri.IntSportPersonFlagEv;
+        SELF.IntSportPersonFlag1Y := ri.IntSportPersonFlag1Y;
+        SELF.IntSportPersonFlag5Y := ri.IntSportPersonFlag5Y;
+        SELF.IntSportPersonTravelerFlagEv := ri.IntSportPersonTravelerFlagEv;
+        SELF.AstCurrFlag := ri.AstCurrFlag;
+        // SELF.AstPropCurrFlag := ri.AstPropCurrFlag;
+        // SELF.AstPropCurrCntEv := ri.AstPropCurrCntEv;
+        // SELF.AstPropCurrValTot := ri.AstPropCurrValTot;
+        // SELF.AstPropCurrAVMTot := ri.AstPropCurrAVMTot;
+        // SELF.AstPropSaleNewMsnc := ri.AstPropSaleNewMsnc;
+        // SELF.AstPropCntEv := ri.AstPropCntEv;
+        // SELF.AstPropSoldCntEv := ri.AstPropSoldCntEv;
+        // SELF.AstPropSoldCnt1Y := ri.AstPropSoldCnt1Y;
+        // SELF.AstPropSoldNewRatio := ri.AstPropSoldNewRatio;
+        // SELF.AstPropPurchCnt1Y := ri.AstPropPurchCnt1Y;
+        PPCurrOwnedCnt := le.PPCurrOwnedCnt+if(ri.AstVehAutoCntEv<=0,0,ri.AstVehAutoCntEv)
+                                                +if(ri.AstVehOtherCntEv<=0,0,ri.AstVehOtherCntEv)
+                                                +if(ri.AstPropAirCrftCntEv<=0,0,ri.AstPropAirCrftCntEv)
+                                                +if(ri.AstPropWtrcrftCntEv<=0,0,ri.AstPropWtrcrftCntEv);
+        SELF.PPCurrOwnedCnt := PPCurrOwnedCnt;    
+        SELF.AstPropAirCrftCntEv := ri.AstPropAirCrftCntEv;
+        SELF.AstPropWtrcrftCntEv := ri.AstPropWtrcrftCntEv; 
+        // SELF.LifeMoveNewMsnc := ri.LifeMoveNewMsnc; Calculated in Verification
+        SELF.LifeNameLastChngFlag := ri.LifeNameLastChngFlag;
+        SELF.LifeNameLastChngFlag1Y := ri.LifeNameLastChngFlag1Y;
+        SELF.LifeNameLastCntEv := ri.LifeNameLastCntEv;
+        SELF.LifeNameLastChngNewMsnc := ri.LifeNameLastChngNewMsnc;
+        SELF.LifeAstPurchOldMsnc := ri.LifeAstPurchOldMsnc;//MAX(ri.LifeAstPurchOldMsnc,le.LifeAstPurchOldMsnc);
+        SELF.LifeAstPurchNewMsnc := IF(ri.LifeAstPurchNewMsnc=99998,-99998,ri.LifeAstPurchNewMsnc);//MAP(le.LifeAstPurchNewMsnc < 0 => ri.LifeAstPurchNewMsnc,
+                                        // ri.LifeAstPurchNewMsnc < 0 => le.LifeAstPurchNewMsnc,
+                                                                      // MIN(ri.LifeAstPurchNewMsnc,le.LifeAstPurchNewMsnc));
+        SELF.LifeAddrCnt := ri.LifeAddrCnt;
+        // SELF.LifeAddrCurrToPrevValRatio5y := ri.LifeAddrCurrToPrevValRatio5y;
+        SELF.LifeAddrEconTrajType := ri.LifeAddrEconTrajType;
+        SELF.LifeAddrEconTrajIndx := ri.LifeAddrEconTrajIndx;
+        SELF.ProfLicFlagEv := ri.ProfLicFlagEv;
+        SELF.ProfLicActivNewIndx := ri.ProfLicActivNewIndx;
+        SELF.BusAssocFlagEv := ri.BusAssocFlagEv;
+        SELF.BusAssocOldMSnc := ri.BusAssocOldMSnc;
+        SELF.BusLeadershipTitleFlag := ri.BusLeadershipTitleFlag;
+        SELF.BusAssocCntEv := ri.BusAssocCntEv;
+        SELF.ProfLicActvNewTitleType := ri.ProfLicActvNewTitleType;
+        SELF.BusUCCFilingCntEv := ri.BusUCCFilingCntEv;
+        SELF.BusUCCFilingActiveCnt := ri.BusUCCFilingActiveCnt;
+        
+        OlderErmgRecord := ((UNSIGNED)ri.EmrgDt_first_seen <= (UNSIGNED)le.EmrgDt_first_seen 
+                            and (UNSIGNED)ri.EmrgDt_first_seen>0
+                           ) 
+                           or le.EmrgDt_first_seen<=0;
+        EmrgDt_first_seen        := IF(OlderErmgRecord,ri.EmrgDt_first_seen,le.EmrgDt_first_seen);
+        SELF.EmrgDt_first_seen   := EmrgDt_first_seen;
+        EmrgDob			             := MAX((unsigned)ProfileBooster.V2_Common.convertDateTo8((STRING)ri.EmrgDob),
+                                        (unsigned)ProfileBooster.V2_Common.convertDateTo8((STRING)le.EmrgDob),
+                                        (unsigned)ProfileBooster.V2_Common.convertDateTo8((STRING)dob));
+        SELF.EmrgDob			       := (STRING)EmrgDob;
+        EmrgAge                  := IF((UNSIGNED)EmrgDt_first_seen<=0 OR (UNSIGNED)EmrgDob<=0,
+                                    -99998,
+                                    risk_indicators.years_apart((UNSIGNED)EmrgDt_first_seen, (UNSIGNED)EmrgDob));
+        SELF.EmrgAge   			     := EmrgAge;
+        SELF.EmrgAtOrAfter21Flag := MAP(EmrgAge < 0          => -99998,
+                                        EmrgAge > 21         => 1,
+                                        EmrgAge > 0          => 0,
+                                                                -99998);
+        SELF.EmrgAge25to59Flag   := MAP(EmrgDt_first_seen<=0 => -99998,
+                                        EmrgAge <= 0         => -99998,
+                                        EmrgAge >= 25 AND EmrgAge < 60 => 1,
+                                                                0);
+
+        SELF.EmrgSrc             := IF(OlderErmgRecord,ri.EmrgSrc,le.EmrgSrc);
+        SELF.EmrgPrimaryRange    := IF(OlderErmgRecord,ri.EmrgPrimaryRange,le.EmrgPrimaryRange);
+        SELF.EmrgPredirectional	 := IF(OlderErmgRecord,ri.EmrgPredirectional,le.EmrgPredirectional);
+        SELF.EmrgPrimaryName	   := IF(OlderErmgRecord,ri.EmrgPrimaryName,le.EmrgPrimaryName);
+        SELF.EmrgSuffix	         := IF(OlderErmgRecord,ri.EmrgSuffix,le.EmrgSuffix);	
+        SELF.EmrgPostdirectional := IF(OlderErmgRecord,ri.EmrgPostdirectional,le.EmrgPostdirectional);
+        SELF.EmrgUnitDesignation := IF(OlderErmgRecord,ri.EmrgUnitDesignation,le.EmrgUnitDesignation);
+        SELF.EmrgSecondaryRange	 := IF(OlderErmgRecord,ri.EmrgSecondaryRange,le.EmrgSecondaryRange);
+        SELF.EmrgCity_Name	     := IF(OlderErmgRecord,ri.EmrgCity_Name,le.EmrgCity_Name);	
+        SELF.EmrgSt			         := IF(OlderErmgRecord,ri.EmrgSt,le.EmrgSt);
+        SELF.EmrgZIP5			       := IF(OlderErmgRecord,ri.EmrgZIP5,le.EmrgZIP5);
+        SELF.EmrgZIP4		         := IF(OlderErmgRecord,ri.EmrgZIP4,le.EmrgZIP4);
+          
+        SELF.EmrgRecordType      := IF(OlderErmgRecord,ri.EmrgRecordType,le.EmrgRecordType);
+        SELF.EmrgAddrType        := '-99998';
+        SELF.EmrgLexIDsAtEmrgAddrCnt1Y := -99998;
+        
+        SELF.DrgCnt7Y := ri.DrgCnt7Y;
+        SELF.DrgSeverityIndx7Y := ri.DrgSeverityIndx7Y;
+        SELF.DrgCnt1Y := ri.DrgCnt1Y;
+        SELF.DrgNewMsnc7Y := ri.DrgNewMsnc7Y;
+        SELF.DrgCrimFelCnt7Y := ri.DrgCrimFelCnt7Y;
+        SELF.DrgCrimFelCnt1Y := ri.DrgCrimFelCnt1Y;
+        SELF.DrgCrimFelNewMsnc7Y := ri.DrgCrimFelNewMsnc7Y;
+        SELF.DrgCrimNFelCnt7Y := ri.DrgCrimNFelCnt7Y;
+        SELF.DrgCrimNFelCnt1Y := ri.DrgCrimNFelCnt1Y;
+        SELF.DrgCrimNFelNewMsnc7Y := ri.DrgCrimNFelNewMsnc7Y;
+        SELF.DrgEvictCnt7Y := ri.DrgEvictCnt7Y;
+        SELF.DrgEvictCnt1Y := ri.DrgEvictCnt1Y;
+        SELF.DrgEvictNewMsnc7Y := ri.DrgEvictNewMsnc7Y;
+        SELF.DrgLnJCnt7Y := ri.DrgLnJCnt7Y;
+        SELF.DrgLnJCnt1Y := ri.DrgLnJCnt1Y;
+        SELF.DrgLnJNewMsnc7Y := ri.DrgLnJNewMsnc7Y;
+        SELF.DrgLnJAmtTot7Y := ri.DrgLnJAmtTot7Y;
+        SELF.DrgBkCnt10Y := ri.DrgBkCnt10Y;
+        SELF.DrgBkCnt1Y := ri.DrgBkCnt1Y;
+        SELF.DrgBkNewMsnc10Y := ri.DrgBkNewMsnc10Y;
+        // SELF.DrgFrClCnt7Y := ri.DrgFrClCnt7Y;
+        // SELF.DrgFrClCnt1Y := ri.DrgFrClCnt1Y;
+        // SELF.DrgFrClNewMsnc := ri.DrgFrClNewMsnc;
+        SELF.ShortTermShopNewMsnc := ri.ShortTermShopNewMsnc;
+        SELF.ShortTermShopOldMsnc := ri.ShortTermShopOldMsnc;
+        SELF.ShortTermShopCntEv := ri.ShortTermShopCntEv;
+        SELF.ShortTermShopCnt6M := ri.ShortTermShopCnt6M;
+        SELF.ShortTermShopCnt5Y := ri.ShortTermShopCnt5Y;
+        SELF.ShortTermShopCnt1Y := ri.ShortTermShopCnt1Y;
+        SELF.HHID := ri.HHID;
+
+        SELF.CurrAddrAVMVal := ri.CurrAddrAVMVal;
+        SELF.CurrAddrAVMValA1Y := ri.CurrAddrAVMValA1Y;
+        SELF.CurrAddrAVMRatio1Y := (STRING10)ri.CurrAddrAVMRatio1Y;
+        SELF.CurrAddrAVMValA5Y := ri.CurrAddrAVMValA5Y;
+        SELF.CurrAddrAVMRatio5Y := (STRING10)ri.CurrAddrAVMRatio5Y;
+        SELF.CurrAddrMedAVMCtyRatio := (STRING10)ri.CurrAddrMedAVMCtyRatio;
+        SELF.CurrAddrMedAVMCenTractRatio := (STRING10)ri.CurrAddrMedAVMCenTractRatio;
+        SELF.CurrAddrMedAVMCenBlockRatio := (STRING10)ri.CurrAddrMedAVMCenBlockRatio;
+        SELF.CurrAddrBusRegCnt := ri.CurrAddrBusRegCnt;
+        
+        SELF.AddrCurrFull := ri.AddrCurrFull;
+        SELF.curr_addr_rawaid := ri.curr_addr_rawaid;
+        SELF.AddrPrevFull := ri.AddrPrevFull;    
+        SELF.prev_addr_rawaid := ri.prev_addr_rawaid;
+        
+        //HOUSEHOLD
         notDid2 := le.did2 != ri.did;
         SELF.PurchNewAmt := IF(notDid2, ri.PurchNewAmt, le.PurchNewAmt);
         SELF.PurchTotEv := IF(notDid2, ri.PurchTotEv, le.PurchTotEv);
@@ -415,10 +654,6 @@ EXPORT V2_Transforms := MODULE
 		self				:= le;
 	END;
 
-  EXPORT ProfileBooster.V2_Layouts.Layout_PB2_Shell rollEmergence(ProfileBooster.V2_Layouts.Layout_PB2_Shell le, ProfileBooster.V2_Layouts.Layout_PB2_Shell ri) := transform
-		SELF.emrglexidsatemrgaddrcnt1y := le.emrglexidsatemrgaddrcnt1y + ri.emrglexidsatemrgaddrcnt1y;
-		self				:= le;
-	END;
   
   EXPORT Relationship.Layout_GetRelationship.DIDs_layout xfm_getEmailDIDs(ProfileBooster.V2_Layouts.Layout_PB2_Shell le) := TRANSFORM
     SELF.DID := le.DID;

@@ -11,7 +11,7 @@ EXPORT V2_Search_Function( DATASET(ProfileBooster.V2_Layouts.Layout_PB2_In) PB2_
 													string modelname = ''
 													) := FUNCTION
 
-BOOLEAN DEBUG := FALSE;
+  BOOLEAN DEBUG := FALSE;
 
 	isFCRA 			:= false;
 	GLBA 				:= 0;
@@ -116,7 +116,7 @@ BOOLEAN DEBUG := FALSE;
   // #END
   
   // PB2_In := PB2_Input(LexID=0)+bestInfoLexID;
-  PB2_In := PB2_Input;
+  PB2_In := PB2_Input;//SWITCH THIS BEFORE FINALIZING CODE
 	// ********************************************************************
 	// Transform PB input to Layout_Input so we can call iid_getDID_prepOutput
 	// ********************************************************************
@@ -139,30 +139,30 @@ BOOLEAN DEBUG := FALSE;
 														);
 
 	Risk_Indicators.Layout_Input prep_for_thor(my_dataset_with_address_cache l) := TRANSFORM
-		self.did 		:= (integer)l.LexId;
-		self.score := if((integer)l.lexid<>0, 100, 0);  // hard code the DID score if DID is passed in on input
-		self.seq 		:= l.seq;   
-    self.HistoryDate 	:= if(l.historydate=0, risk_indicators.iid_constants.default_history_date, l.HistoryDate);
+		self.did 			 := (integer)l.LexId;
+		self.score 			 := if((integer)l.lexid<>0, 100, 0);  // hard code the DID score if DID is passed in on input
+		self.seq 			 := l.seq;   
+    	self.HistoryDate 	 := if(l.historydate=0, risk_indicators.iid_constants.default_history_date, l.HistoryDate);
 
-		self.ssn 		:= l.ssn;
-		dob_val 		:= riskwise.cleandob(l.dob);
-		dob 				:= dob_val;
-		self.dob 		:= if((unsigned)dob=0, '', dob);
+		self.ssn 			 := l.ssn;
+		dob_val 			 := riskwise.cleandob(l.dob);
+		dob 				 := dob_val;
+		self.dob 			 := if((unsigned)dob=0, '', dob);
 
-		fname  			:= l.Name_First ;
-		mname  			:= l.Name_Middle;
-		lname  			:= l.Name_Last ;
-		suffix 			:= l.Name_Suffix ;
-		self.fname  := stringlib.stringtouppercase(fname);
-		self.mname  := stringlib.stringtouppercase(mname);
-		self.lname  := stringlib.stringtouppercase(lname);
-		self.suffix := stringlib.stringtouppercase(suffix);
-		self.Phone10				 := StringLib.StringFilter(l.Phone10, '0123456789');		
+		fname  				 := l.Name_First ;
+		mname  				 := l.Name_Middle;
+		lname  				 := l.Name_Last ;
+		suffix 				 := l.Name_Suffix ;
+		self.fname 	 		 := stringlib.stringtouppercase(fname);
+		self.mname  		 := stringlib.stringtouppercase(mname);
+		self.lname  		 := stringlib.stringtouppercase(lname);
+		self.suffix 		 := stringlib.stringtouppercase(suffix);
+		self.Phone10		 := StringLib.StringFilter(l.Phone10, '0123456789');		
 		
-		addr_value 	:= trim(l.street_addr);
+		addr_value 			 := trim(l.street_addr);
 		self.in_streetAddress:= addr_value;
-		self.in_city         := l.City_name;
-		self.in_state        := l.st;
+		self.in_city    	 := l.City_name;
+		self.in_state   	 := l.st;
 		self.in_zipCode      := l.z5;	
 		
 		self.prim_range      := l.aidwork_acecache.prim_range;
@@ -178,7 +178,7 @@ BOOLEAN DEBUG := FALSE;
 		self.zip4            := l.aidwork_acecache.zip4;
 		self.lat             := l.aidwork_acecache.geo_lat;
 		self.long            := l.aidwork_acecache.geo_long;
-		self.addr_type 			 := risk_indicators.iid_constants.override_addr_type(l.street_addr, l.aidwork_acecache.rec_type[1],l.aidwork_acecache.cart);
+		self.addr_type 		 := risk_indicators.iid_constants.override_addr_type(l.street_addr, l.aidwork_acecache.rec_type[1],l.aidwork_acecache.cart);
 		self.addr_status     := l.aidwork_acecache.err_stat;
 		self.county          := l.aidwork_acecache.county[3..5]; //bytes 1-2 are state code, 3-5 are county number
 		self.geo_blk         := l.aidwork_acecache.geo_blk;		
@@ -462,7 +462,7 @@ BOOLEAN DEBUG := FALSE;
 	withEmail_dedp := dedup(sort(rolledDeceased,did), did);
 	RelativeMax := 300;
 	withEmail_dids := PROJECT(rolledDeceased, mod_transforms.xfm_getEmailDIDs(LEFT));
-		// TRANSFORM(Relationship.Layout_GetRelationship.DIDs_layout, SELF.DID := LEFT.DID));
+
 	rellyids := Relationship.proc_GetRelationshipNeutral(withEmail_dids,TopNCount:=RelativeMax,
 		RelativeFlag:=TRUE,AssociateFlag:=TRUE,doAtmost:=TRUE,MaxCount:=RelativeMax, doThor := onThor).result; 
 	
@@ -480,16 +480,16 @@ BOOLEAN DEBUG := FALSE;
 		relativeDIDs := relativeDIDs_roxie;
 	#END
 
-//merge Prospect rec, Household recs, Relatives recs into one file
+	//merge Prospect rec, Household recs, Relatives recs into one file
 	allDIDs := rolledDeceased + hhDIDs + relativeDIDs;
 	
     // adds back values for the household recs
-    allDIDs_WithPBLexIDKey_Thor := JOIN(DISTRIBUTE(allDIDs,did), DISTRIBUTE(PB20LexIDKey,did),
-                  LEFT.did = RIGHT.did,
+    allDIDs_WithPBLexIDKey_Thor := JOIN(DISTRIBUTE(allDIDs,did2), DISTRIBUTE(PB20LexIDKey,did),
+                  LEFT.did2 = RIGHT.did,
                   mod_transforms.xfmAddHouseholdInfo(LEFT,RIGHT), LEFT OUTER, KEEP(1), LOCAL);
 
     allDIDs_WithPBLexIDKey_Roxie := JOIN(allDIDs, PB20LexIDKey,
-                  LEFT.did = RIGHT.did,
+                  LEFT.did2 = RIGHT.did,
                   mod_transforms.xfmAddHouseholdInfo(LEFT,RIGHT), LEFT OUTER, KEEP(1));
 
     #IF(onThor)
@@ -570,44 +570,47 @@ BOOLEAN DEBUG := FALSE;
 	slimShell := project(withCurrAddressKey,transform(ProfileBooster.V2_Layouts.Layout_PB2_Slim,self:= left));
 	slimShell2 := project(withCurrAddressKey,transform(ProfileBooster.V2_Layouts.Layout_PB2_Slim_emergence,self:= left));
 
-	Emergence := ProfileBooster.V2_getEmrgAddress(slimShell2);
+	EmrgAddress := ProfileBooster.V2_getEmrgAddress(slimShell2);
 
-	ProfileBooster.V2_Layouts.Layout_PB2_Shell xfmAddEmergence(ProfileBooster.V2_Layouts.Layout_PB2_Shell le, Emergence ri ) := TRANSFORM
-	 	SELF.EmrgLexIDsAtEmrgAddrCnt1Y := ri.EmrgLexIDsAtEmrgAddrCnt1Yb-1;
+	ProfileBooster.V2_Layouts.Layout_PB2_Shell xfmAddEmergence(ProfileBooster.V2_Layouts.Layout_PB2_Shell le, EmrgAddress ri ) := TRANSFORM
+	 	SELF.EmrgLexIDsAtEmrgAddrCnt1Y := ri.EmrgLexIDsAtEmrgAddrCnt1Y;
+		SELF.EmrgAddrType			   := ri.EmrgAddrType;
     	self 						   := le;  
 		self 						   := [];
 	END;  
+	output(withCurrAddressKey,, '~jfrancis::profile_booster20::withCurrAddressKey', OVERWRITE);
+	output(EmrgAddress,, '~jfrancis::profile_booster20::EmrgAddress', OVERWRITE);
 
-	withEmergence_roxie := JOIN(withCurrAddressKey, Emergence,
+	withEmergence_roxie := JOIN(withCurrAddressKey, EmrgAddress,
 						  LEFT.emrgprimaryrange=RIGHT.emrgprimaryrange AND 	
                           LEFT.emrgpredirectional=RIGHT.emrgpredirectional AND
                           LEFT.emrgprimaryname=RIGHT.emrgprimaryname AND
-                          LEFT.emrgprimaryname<>'' AND
+                          RIGHT.emrgprimaryname<>'' AND
                           LEFT.emrgsuffix=RIGHT.emrgsuffix AND
                           LEFT.emrgpostdirectional=RIGHT.emrgpostdirectional AND
                           LEFT.emrgunitdesignation=RIGHT.emrgunitdesignation AND
                           LEFT.emrgsecondaryrange=RIGHT.emrgsecondaryrange AND
-                          LEFT.emrgzip5=RIGHT.emrgzip5,
+                          LEFT.emrgzip5=RIGHT.emrgzip5 AND
+						  RIGHT.emrgzip5<>'',
 						  xfmAddEmergence(left,right), LEFT OUTER, keep(1));
 	withEmergence_thor := JOIN(DISTRIBUTE(withCurrAddressKey,HASH64(emrgzip5,emrgprimaryrange,emrgpredirectional,emrgprimaryname,emrgsuffix,emrgpostdirectional,emrgunitdesignation,emrgsecondaryrange)), 
-							   DISTRIBUTE(Emergence,HASH64(emrgzip5,emrgprimaryrange,emrgpredirectional,emrgprimaryname,emrgsuffix,emrgpostdirectional,emrgunitdesignation,emrgsecondaryrange)),
+							   DISTRIBUTE(EmrgAddress,HASH64(emrgzip5,emrgprimaryrange,emrgpredirectional,emrgprimaryname,emrgsuffix,emrgpostdirectional,emrgunitdesignation,emrgsecondaryrange)),
 						  LEFT.emrgprimaryrange=RIGHT.emrgprimaryrange AND 	
                           LEFT.emrgpredirectional=RIGHT.emrgpredirectional AND
                           LEFT.emrgprimaryname=RIGHT.emrgprimaryname AND
-                          LEFT.emrgprimaryname<>'' AND
+                          RIGHT.emrgprimaryname<>'' AND
                           LEFT.emrgsuffix=RIGHT.emrgsuffix AND
                           LEFT.emrgpostdirectional=RIGHT.emrgpostdirectional AND
                           LEFT.emrgunitdesignation=RIGHT.emrgunitdesignation AND
                           LEFT.emrgsecondaryrange=RIGHT.emrgsecondaryrange AND
-                          LEFT.emrgzip5=RIGHT.emrgzip5,
+                          LEFT.emrgzip5=RIGHT.emrgzip5 AND
+						  RIGHT.emrgzip5<>'',
 						  xfmAddEmergence(left,right), LEFT OUTER, keep(1), local);
 	#IF(onThor)
 		withEmergence := withEmergence_thor;
 	#ELSE
 		withEmergence := withEmergence_roxie;
 	#END
-
-
 
   PropertyCommon := ProfileBooster.V2_getProperty(uniqueDIDs,slimShell,DataRestrictionMask,DataPermissionMask);
 
@@ -628,22 +631,22 @@ BOOLEAN DEBUG := FALSE;
 	finalSort 	:= sort(withPropertyCommon, seq, rec_type, did2);  //sort prospect record to the top (rec_type = 1)
     finalRollup := rollup(finalSort, rollFinal(left,right), seq);  
   
-   getPurchaseBehaviorAttributes := ROLLUP(finalSort, mod_transforms.xfmPurchaseBehaviorRollup(LEFT, RIGHT), seq);
+//    getPurchaseBehaviorAttributes := ROLLUP(finalSort, mod_transforms.xfmPurchaseBehaviorRollup(LEFT, RIGHT), seq);
    
-   withPurchaseBehavior := JOIN(finalRollup, getPurchaseBehaviorAttributes,  
-   												LEFT.seq = RIGHT.seq,
-   												TRANSFORM(ProfileBooster.V2_Layouts.Layout_PB2_Shell,
-                                                SELF.HHPurchNewAmt := RIGHT.HHPurchNewAmt;
-                                                SELF.HHPurchTotEv := RIGHT.HHPurchTotEv;
-                                                SELF.HHPurchCntEv := RIGHT.HHPurchCntEv;
-                                                SELF.HHPurchNewMsnc := RIGHT.HHPurchNewMsnc;
-                                                SELF.HHPurchOldMsnc := RIGHT.HHPurchOldMsnc;
-                                                SELF.HHPurchItemCntEv := RIGHT.HHPurchItemCntEv;
-                                                SELF.HHPurchAmtAvg := MAP(RIGHT.HHPurchTotEv < 0 => RIGHT.HHPurchTotEv,
-                                                                                                        RIGHT.HHPurchCntEv < 0 => RIGHT.HHPurchCntEv,
-                                                                                                        RIGHT.HHPurchTotEv / RIGHT.HHPurchCntEv);
-                                                SELF := LEFT), 
-                                                LEFT OUTER);
+//    withPurchaseBehavior := JOIN(finalRollup, getPurchaseBehaviorAttributes,  
+//    												LEFT.seq = RIGHT.seq,
+//    												TRANSFORM(ProfileBooster.V2_Layouts.Layout_PB2_Shell,
+//                                                 SELF.HHPurchNewAmt 		:= RIGHT.HHPurchNewAmt;
+//                                                 SELF.HHPurchTotEv 		:= RIGHT.HHPurchTotEv;
+//                                                 SELF.HHPurchCntEv 		:= RIGHT.HHPurchCntEv;
+//                                                 SELF.HHPurchNewMsnc 	:= RIGHT.HHPurchNewMsnc;
+//                                                 SELF.HHPurchOldMsnc 	:= RIGHT.HHPurchOldMsnc;
+//                                                 SELF.HHPurchItemCntEv 	:= RIGHT.HHPurchItemCntEv;
+//                                                 SELF.HHPurchAmtAvg 		:= MAP(RIGHT.HHPurchTotEv < 0 => RIGHT.HHPurchTotEv,
+//                                                                           	   RIGHT.HHPurchCntEv < 0 => RIGHT.HHPurchCntEv,
+//                                                                                RIGHT.HHPurchTotEv / RIGHT.HHPurchCntEv);
+//                                                 SELF := LEFT), 
+//                                                 LEFT OUTER);
    
 /*   //append relatives' average income
    	withRelaIncome := join(finalRollup, tRelaIncome,  
@@ -674,8 +677,8 @@ BOOLEAN DEBUG := FALSE;
 	// *******************************************************************************************************************
 	// Now that we have all necessary data in the PB2Shell, pass it to the attributes function to produce the attributes
 	// *******************************************************************************************************************
-  attributes := if(std.Str.ToUpperCase(AttributesVersion) in ProfileBooster.Constants.setValidAttributeVersionsV2 OR domodel, //if valid attributes version requested, go get attributes
-									 ProfileBooster.V2_getAttributes(withPurchaseBehavior, DataPermissionMask),
+  	attributes := if(std.Str.ToUpperCase(AttributesVersion) in ProfileBooster.Constants.setValidAttributeVersionsV2 OR domodel, //if valid attributes version requested, go get attributes
+									 ProfileBooster.V2_getAttributes(finalRollup, DataPermissionMask),
 									 emptyAttr);  
 									 
 	withIncome := ProfileBooster.V2_estimatedIncome(attributes);
@@ -698,31 +701,30 @@ BOOLEAN DEBUG := FALSE;
                                       // DATASET([],ProfileBooster.V2_Layouts.Layout_PB_BatchOut)),
                         // withBankingExperiance);
 		// #END                        
-  with_mover_model := withIncome;  
+  	with_mover_model := withIncome;  
   
 	//Blank out the fields calculated outside of V2_getAttributes for any minors
 	ProfileBooster.V2_Layouts.Layout_PB2_BatchOut Blank_minors(ProfileBooster.V2_Layouts.Layout_PB2_BatchOut le) := TRANSFORM
 		isMinor := le.attributes.version2.DemAge = '0'; //is zero if is a minor
 		self.attributes.version2.DemEstInc := if(isMinor, '-99999', le.attributes.version2.DemEstInc);
 		self.attributes.version2.DemBankingIndx := if(isMinor, '-99999', le.attributes.version2.DemBankingIndx);
-		self.attributes.version2.HHEstimatedIncomeTotal := if(isMinor, -99999, le.attributes.version2.HHEstimatedIncomeTotal);
+		self.attributes.version2.HHEstimatedIncomeRange := if(isMinor, -99999, le.attributes.version2.HHEstimatedIncomeRange);
 		self := le;
 	END;
 
 	BlankMinors := PROJECT(with_mover_model, Blank_minors(left));                   
 
- 	Xfm1Result := PROJECT(BlankMinors, mod_transforms.xfm_PB20_mod1(LEFT), LOCAL);	
-  Xfm2Result := PROJECT(Xfm1Result, mod_transforms.xfm_PB20_mod2(LEFT), LOCAL);	
-  Xfm3Result := PROJECT(Xfm2Result, mod_transforms.xfm_PB20_mod3(LEFT), LOCAL);	
-  Xfm4Result := PROJECT(Xfm3Result, mod_transforms.xfm_PB20_mod4(LEFT), LOCAL);
-  //Apply defaults for missing LexIDs
-  PB20 := Xfm4Result(lexid<>0);
-  // PB11Corrected := PROJECT(Xfm4Result(lexid=0),mod_transforms.xfm_PB11_mod5(LEFT), LOCAL);
-  PB20Corrected := PROJECT(Xfm4Result(lexid=0),mod_transforms.xfm_PB20_mod5(LEFT), LOCAL);
-  
-  finalResult := PB20+PB20Corrected;
+ 	Xfm1Result := PROJECT(BlankMinors, mod_transforms.xfm_PB20_mod1(LEFT));	
+	Xfm2Result := PROJECT(Xfm1Result, mod_transforms.xfm_PB20_mod2(LEFT));	
+	Xfm3Result := PROJECT(Xfm2Result, mod_transforms.xfm_PB20_mod3(LEFT));	
+	Xfm4Result := PROJECT(Xfm3Result, mod_transforms.xfm_PB20_mod4(LEFT));
+	//Apply defaults for missing LexIDs
+	PB20 := Xfm4Result(lexid<>0);
+	PB20Corrected := PROJECT(Xfm4Result(lexid=0),mod_transforms.xfm_PB20_mod5(LEFT));
+	
+	finalResult := PB20+PB20Corrected;
 
-  Final := PROJECT(finalResult, mod_transforms.xfm_Final(LEFT));
+	Final := PROJECT(finalResult, mod_transforms.xfm_Final(LEFT));
 
 	// output(p_address,,'~dvstemp::out::property_thor_testing_inputs::p_address_' + thorlib.wuid());
 	// output(ids_only,,'~dvstemp::out::property_thor_testing_inputs::ids_only_' + thorlib.wuid());
@@ -807,17 +809,40 @@ BOOLEAN DEBUG := FALSE;
 	// output(withBankingExperiance, named('withBankingExperiance'));
 	// output(choosen(withEmail, 100), named('V2SF_withEmail'));
 	// output(choosen(PB20LexIDKey, 100), named('V2SF_PB20LexIDKey'));
-	output(choosen(withLexIDKey, 100), named('V2SF_withLexIDKey'));
+	// output(choosen(withLexIDKey, 100), named('V2SF_withLexIDKey'));
 	// output(count(withLexIDKey), named('V2SF_withLexIDKey_Cnt'));
 	// output(count(withLexIDKey(dt_first_seen<>0)), named('V2SF_withLexIDKey_Cnt_DFSeen'));
 	// output(count(withLexIDKey(dt_last_seen<>201901)), named('V2SF_withLexIDKey_Cnt_DLSeen'));
-  output(choosen(withVerification, 100), named('V2SF_withVerification'));
-  // output(withLexIDKey,,'~jfrancis::out::PB20_withLexIDKey_ROXIE',CSV(HEADING(single), QUOTE('"')),OVERWRITE);
+//   output(choosen(withVerification, 100), named('V2SF_withVerification'));
+  output(withLexIDKey,,'~jfrancis::out::PB20_withLexIDKey_ROXIE',CSV(HEADING(single), QUOTE('"')),OVERWRITE);
+  output(count(withLexIDKey), named('V2SF_withLexIDKey_Cnt'));
+  output(count(withLexIDKey(EmrgSrc='')), named('V2SF_withLexIDKey_Src_Cnt'));
+  output(count(withLexIDKey(EmrgDt_First_seen=0)), named('V2SF_withLexIDKey_DFS_Cnt'));
+  output(count(withLexIDKey(EmrgDob IN ['','0'])), named('V2SF_withLexIDKey_EmrgDob_Cnt'));
+
   // output(finalRollup,,'~jfrancis::out::PB20_finalRollup_ROXIE',CSV(HEADING(single), QUOTE('"')),OVERWRITE);
-  output(choosen(withWatchdog, 100), named('V2SF_withWatchdog'));
-  output(choosen(withInfutorNARC, 100), named('V2SF_withInfutorNARC'));
-  output(choosen(withCurrAddressKey, 100), named('V2SF_withCurrAddressKey'));
-  output(choosen(withEmergence, 100), named('V2SF_withEmergence'));  
+//   output(choosen(withWatchdog, 100), named('V2SF_withWatchdog'));
+//   output(choosen(withInfutorNARC, 100), named('V2SF_withInfutorNARC'));
+//   output(choosen(withCurrAddressKey, 100), named('V2SF_withCurrAddressKey'));
+//testdids := [116416395,1491629798,1947534553,1947534553,1013490369,1652613103,1924810543
+//,890019878
+//,555976628
+//,826730747
+//,133491844
+//,1684222038
+//,447469508
+//,1491629798
+//,116416395
+//,1947534553
+//,1947534553
+//,1013490369
+//,1652613103
+//];
+
+  // output(choosen(EmrgAddress, 100), named('V2SF_EmrgAddress'));
+  // output(choosen(withEmergence(did in testdids), 100), named('V2SF_withEmergence'));  
+  // output(choosen(withEmergence_Thor(did in testdids), 100), named('V2SF_withEmergenceThor'));  
+  // output(choosen(withEmergence_Roxie(did in testdids), 100), named('V2SF_withEmergenceRoxie'));  
   // output(count(withCurrAddressKey), named('V2SF_withCurrAddressKey_Cnt'));
   // output(count(withCurrAddressKey(CurrAddrLat<>'')), named('V2SF_withCurrAddressKeyADDRLAT_Cnt'));
   // output(choosen(withInputAddressKey, 100), named('V2SF_withInputAddressKey'));

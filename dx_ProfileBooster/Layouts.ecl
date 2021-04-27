@@ -403,9 +403,9 @@ EXPORT Layouts := MODULE
 		// string12 		geoLink;
 		ProspectDemographicEducation;      
 		ProspectInterests;
-		ProspectLifeEvents;
+		ProspectLifeEvents -LifeAddrCurrToPrevValRatio5Y;
 		ProspectAsset;      
-		ProspectCurrAddrCharac;
+		ProspectCurrAddrCharac -curraddrlat -curraddrlng;
 		ProspectPurchaseBehavior;
 		ProspectPurchaseBehaviorExtended;
 		ProspectVehicleExtended;
