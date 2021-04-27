@@ -159,7 +159,10 @@ EXPORT Append_RID(
                                             ut.CleanSpacesandUpper(left.reason_cleared_code)= ut.CleanSpacesandUpper(right.reason_cleared_code) and 
                                             ut.CleanSpacesandUpper(left.geo_lat)= ut.CleanSpacesandUpper(right.geo_lat) and 
                                             ut.CleanSpacesandUpper(left.geo_long)= ut.CleanSpacesandUpper(right.geo_long) and 
-											left.source_rec_id = right.source_rec_id,
+											left.source_rec_id = right.source_rec_id  and 
+											ut.CleanSpacesandUpper(left.Duration) = ut.CleanSpacesandUpper(right.Duration) and
+											ut.CleanSpacesandUpper(left.TransactionStatus) = ut.CleanSpacesandUpper(right.TransactionStatus) and
+											ut.CleanSpacesandUpper(left.Reason) = ut.CleanSpacesandUpper(right.Reason),
 											transform(FraudGovPlatform.Layouts.Base.Main, 
 												SELF.Record_ID := if( left.source = right.source and left.source_rec_id = right.source_rec_id, RIGHT.Record_ID, LEFT.Record_ID); 
 												SELF:=LEFT; SELF:=[]),

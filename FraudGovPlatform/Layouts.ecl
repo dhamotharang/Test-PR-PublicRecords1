@@ -565,23 +565,6 @@ EXPORT Layouts := MODULE
 			string    bill_country_code;
 		END;
 
-		Export	MbsVelocityRules		:= record
-			unsigned6 ruleNum;
-			unsigned6	gc_id;
-			string60	fragment;
-			string100 fragment_description;
-			string60	contributionType;
-			string100	contributionTypeDescription;
-			unsigned2 fragment_weight;
-			unsigned2	category_weight;
-			unsigned2	minCnt;
-			unsigned2	maxTime;
-			string20	timeUnit;
-			unsigned2	status;
-			string25	date_added;
-			string25	date_changed;
-			string60	user_added;
-			string60	user_changed;
 		END;
 	END;
 
@@ -870,6 +853,7 @@ EXPORT Layouts := MODULE
 			string10	investigator_id := '';	
 			string3	cleared_fraud := ''; 
 			string250	reason_cleared_code := ''; 
+
 			//  Other fields
 			unsigned4	global_sid := 0;
 			unsigned8	record_sid := 0;
