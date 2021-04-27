@@ -571,104 +571,104 @@ prop_common_distr := distribute(prop_common, did);
 		self.HHTeenagerMmbrCnt							:= le.HHTeenagerMmbrCnt + ri.HHTeenagerMmbrCnt;
 		self.HHYoungAdultMmbrCnt						:= le.HHYoungAdultMmbrCnt + ri.HHYoungAdultMmbrCnt;
 		self.HHMiddleAgeMmbrCnt							:= le.HHMiddleAgeMmbrCnt + ri.HHMiddleAgeMmbrCnt;
-		self.HHSeniorMmbrCnt								:= le.HHSeniorMmbrCnt + ri.HHSeniorMmbrCnt;
-		self.HHElderlyMmbrCnt								:= le.HHElderlyMmbrCnt + ri.HHElderlyMmbrCnt;
-		self.HHMmbrAgeMed								    := le.HHMmbrAgeMed + ri.HHMmbrAgeMed;
-		self.HHMmbrAgeAvg								    := le.HHMmbrAgeAvg + ri.HHMmbrAgeAvg;
+		self.HHSeniorMmbrCnt							:= le.HHSeniorMmbrCnt + ri.HHSeniorMmbrCnt;
+		self.HHElderlyMmbrCnt							:= le.HHElderlyMmbrCnt + ri.HHElderlyMmbrCnt;
+		self.HHMmbrAgeMed								:= le.HHMmbrAgeMed + ri.HHMmbrAgeMed;
+		self.HHMmbrAgeAvg								:= le.HHMmbrAgeAvg + ri.HHMmbrAgeAvg;
 		self.HHComplexTotalCnt							:= le.HHComplexTotalCnt + ri.HHComplexTotalCnt;
 		self.HHUnitsInComplexCnt						:= le.HHUnitsInComplexCnt + ri.HHUnitsInComplexCnt;
-		self.HHMmbrCnt											:= le.HHMmbrCnt + ri.HHMmbrCnt;
-		self.HHEstimatedIncomeTotal					:= le.HHEstimatedIncomeTotal;  //need to add code when model is complete
-		self.HHEstimatedIncomeAvg				   	:= le.HHEstimatedIncomeAvg;  //need to add code when model is complete
-		self.HHMmbrWEduCollCnt				      := le.HHMmbrWEduCollCnt + ri.HHMmbrWEduCollCnt;
-		self.HHMmbrWEduCollEvidEvCnt		    := le.HHMmbrWEduCollEvidEvCnt + ri.HHMmbrWEduCollEvidEvCnt;
-		self.HHMmbrWEduColl4YrCnt		        := le.HHMmbrWEduColl4YrCnt + ri.HHMmbrWEduColl4YrCnt;
-		self.HHMmbrWEduCollGradCnt		      := le.HHMmbrWEduCollGradCnt + ri.HHMmbrWEduCollGradCnt;
-		self.HHMmbrWCollPvtCnt				      := le.HHMmbrWCollPvtCnt + ri.HHMmbrWCollPvtCnt;
+		self.HHMmbrCnt									:= le.HHMmbrCnt + ri.HHMmbrCnt;
+		self.HHEstimatedIncomeRange					    := le.HHEstimatedIncomeRange;  //need to add code when model is complete
+		// self.HHEstimatedIncomeAvg				   	:= le.HHEstimatedIncomeAvg;  //need to add code when model is complete
+		self.HHMmbrWEduCollCnt				            := le.HHMmbrWEduCollCnt + ri.HHMmbrWEduCollCnt;
+		self.HHMmbrWEduCollEvidEvCnt		            := le.HHMmbrWEduCollEvidEvCnt + ri.HHMmbrWEduCollEvidEvCnt;
+		self.HHMmbrWEduColl4YrCnt		                := le.HHMmbrWEduColl4YrCnt + ri.HHMmbrWEduColl4YrCnt;
+		self.HHMmbrWEduCollGradCnt		                := le.HHMmbrWEduCollGradCnt + ri.HHMmbrWEduCollGradCnt;
+		self.HHMmbrWCollPvtCnt				            := le.HHMmbrWCollPvtCnt + ri.HHMmbrWCollPvtCnt;
 		//College tier is 1-6 where 1 indicates highest tier. Keep highest tier (lowest value) but excluding 0.  
-		self.HHMmbrCollTierHighest				  := map(le.HHMmbrCollTierHighest = 0	=> ri.HHMmbrCollTierHighest,
+		self.HHMmbrCollTierHighest				        := map(le.HHMmbrCollTierHighest = 0	=> ri.HHMmbrCollTierHighest,
 																							 ri.HHMmbrCollTierHighest = 0	=> le.HHMmbrCollTierHighest,
 																																									 min(le.HHMmbrCollTierHighest, ri.HHMmbrCollTierHighest)); 
-		self.HHMmbrCollTierAvg					    := le.HHMmbrCollTierAvg + ri.HHMmbrCollTierAvg;
-		self.HHPropCurrOwnerMmbrCnt					:= le.HHPropCurrOwnerMmbrCnt + ri.HHPropCurrOwnerMmbrCnt;
+		self.HHMmbrCollTierAvg					        := le.HHMmbrCollTierAvg + ri.HHMmbrCollTierAvg;
+		self.HHPropCurrOwnerMmbrCnt					    := le.HHPropCurrOwnerMmbrCnt + ri.HHPropCurrOwnerMmbrCnt;
 		self.HHPropCurrOwnedCnt							:= le.HHPropCurrOwnedCnt + ri.HHPropCurrOwnedCnt;
 		self.HHPropCurrAVMHighest						:= max(le.HHPropCurrAVMHighest, ri.HHPropCurrAVMHighest);
-		self.HHPPCurrOwnedCnt								:= le.HHPPCurrOwnedCnt + ri.HHPPCurrOwnedCnt;
+		self.HHPPCurrOwnedCnt							:= le.HHPPCurrOwnedCnt + ri.HHPPCurrOwnedCnt;
 		self.HHPPCurrOwnedAutoCnt						:= le.HHPPCurrOwnedAutoCnt + ri.HHPPCurrOwnedAutoCnt;
-		self.HHPPCurrOwnedMtrcycleCnt				:= le.HHPPCurrOwnedMtrcycleCnt + ri.HHPPCurrOwnedMtrcycleCnt;
-		self.HHPPCurrOwnedAircrftCnt				:= le.HHPPCurrOwnedAircrftCnt + ri.HHPPCurrOwnedAircrftCnt;
-		self.HHPPCurrOwnedWtrcrftCnt				:= le.HHPPCurrOwnedWtrcrftCnt + ri.HHPPCurrOwnedWtrcrftCnt;
+		self.HHPPCurrOwnedMtrcycleCnt			 	    := le.HHPPCurrOwnedMtrcycleCnt + ri.HHPPCurrOwnedMtrcycleCnt;
+		self.HHPPCurrOwnedAircrftCnt				    := le.HHPPCurrOwnedAircrftCnt + ri.HHPPCurrOwnedAircrftCnt;
+		self.HHPPCurrOwnedWtrcrftCnt				    := le.HHPPCurrOwnedWtrcrftCnt + ri.HHPPCurrOwnedWtrcrftCnt;
 		
     self.HHMmbrWDrgCnt7Y								:= le.HHMmbrWDrgCnt7Y + ri.HHMmbrWDrgCnt7Y;
 		self.HHMmbrWDrgCnt1Y						    := le.HHMmbrWDrgCnt1Y + ri.HHMmbrWDrgCnt1Y;
-		self.HHDrgNewMsnc7Y					        := le.HHDrgNewMsnc7Y + ri.HHDrgNewMsnc7Y;
-		self.HHMmbrWCrimFelCnt7Y			      := le.HHMmbrWCrimFelCnt7Y + ri.HHMmbrWCrimFelCnt7Y;
-		self.HHMmbrWCrimFelCnt1Y					  := le.HHMmbrWCrimFelCnt1Y + ri.HHMmbrWCrimFelCnt1Y;
-		self.HHMmbrWCrimFelNewMsnc7Y			  := le.HHMmbrWCrimFelNewMsnc7Y + ri.HHMmbrWCrimFelNewMsnc7Y;
-		self.HHMmbrWCrimNFelCnt7Y				    := le.HHMmbrWCrimNFelCnt7Y + ri.HHMmbrWCrimNFelCnt7Y;
-		self.HHMmbrWCrimNFelCnt1Y		        := le.HHMmbrWCrimNFelCnt1Y + ri.HHMmbrWCrimNFelCnt1Y;
-		self.HHMmbrWCrimNFelNewMsnc7Y				:= le.HHMmbrWCrimNFelNewMsnc7Y + ri.HHMmbrWCrimNFelNewMsnc7Y;
-		self.HHMmbrWEvictCnt7Y		          := le.HHMmbrWEvictCnt7Y + ri.HHMmbrWEvictCnt7Y;
-		self.HHMmbrWEvictCnt1Y					    := le.HHMmbrWEvictCnt1Y + ri.HHMmbrWEvictCnt1Y;
-		self.HHMmbrWEvictNewMsnc7Y					:= le.HHMmbrWEvictNewMsnc7Y + ri.HHMmbrWEvictNewMsnc7Y;
-		self.HHMmbrWLnJCnt7Y				        := le.HHMmbrWLnJCnt7Y + ri.HHMmbrWLnJCnt7Y;
-		self.HHMmbrWLnJCnt1Y				        := le.HHMmbrWLnJCnt1Y + ri.HHMmbrWLnJCnt1Y;
-		self.HHMmbrLnJAmtTot7Y						  := le.HHMmbrLnJAmtTot7Y + ri.HHMmbrLnJAmtTot7Y;
-		self.HHMmbrWLnJNewMsnc7Y			      := le.HHMmbrWLnJNewMsnc7Y + ri.HHMmbrWLnJNewMsnc7Y;
-		self.HHMmbrWBkCnt10Y			          := le.HHMmbrWBkCnt10Y + ri.HHMmbrWBkCnt10Y;
-		self.HHMmbrWBkCnt1Y			            := le.HHMmbrWBkCnt1Y + ri.HHMmbrWBkCnt1Y;
-		self.HHMmbrWBkCnt2Y		            	:= le.HHMmbrWBkCnt2Y + ri.HHMmbrWBkCnt2Y;
-		self.HHMmbrWBkNewMsnc10Y			      := le.HHMmbrWBkNewMsnc10Y + ri.HHMmbrWBkNewMsnc10Y;
-		self.HHMmbrWFrClCnt7Y			          := le.HHMmbrWFrClCnt7Y + ri.HHMmbrWFrClCnt7Y;
-		self.HHMmbrWFrClNewMSnc7Y			      := le.HHMmbrWFrClNewMSnc7Y + ri.HHMmbrWFrClNewMSnc7Y;
+		self.HHDrgNewMsnc7Y					            := le.HHDrgNewMsnc7Y + ri.HHDrgNewMsnc7Y;
+		self.HHMmbrWCrimFelCnt7Y			            := le.HHMmbrWCrimFelCnt7Y + ri.HHMmbrWCrimFelCnt7Y;
+		self.HHMmbrWCrimFelCnt1Y					    := le.HHMmbrWCrimFelCnt1Y + ri.HHMmbrWCrimFelCnt1Y;
+		self.HHMmbrWCrimFelNewMsnc7Y			        := le.HHMmbrWCrimFelNewMsnc7Y + ri.HHMmbrWCrimFelNewMsnc7Y;
+		self.HHMmbrWCrimNFelCnt7Y				        := le.HHMmbrWCrimNFelCnt7Y + ri.HHMmbrWCrimNFelCnt7Y;
+		self.HHMmbrWCrimNFelCnt1Y		                := le.HHMmbrWCrimNFelCnt1Y + ri.HHMmbrWCrimNFelCnt1Y;
+		self.HHMmbrWCrimNFelNewMsnc7Y			    	:= le.HHMmbrWCrimNFelNewMsnc7Y + ri.HHMmbrWCrimNFelNewMsnc7Y;
+		self.HHMmbrWEvictCnt7Y		                    := le.HHMmbrWEvictCnt7Y + ri.HHMmbrWEvictCnt7Y;
+		self.HHMmbrWEvictCnt1Y					        := le.HHMmbrWEvictCnt1Y + ri.HHMmbrWEvictCnt1Y;
+		self.HHMmbrWEvictNewMsnc7Y					    := le.HHMmbrWEvictNewMsnc7Y + ri.HHMmbrWEvictNewMsnc7Y;
+		self.HHMmbrWLnJCnt7Y				            := le.HHMmbrWLnJCnt7Y + ri.HHMmbrWLnJCnt7Y;
+		self.HHMmbrWLnJCnt1Y				            := le.HHMmbrWLnJCnt1Y + ri.HHMmbrWLnJCnt1Y;
+		self.HHMmbrLnJAmtTot7Y						    := le.HHMmbrLnJAmtTot7Y + ri.HHMmbrLnJAmtTot7Y;
+		self.HHMmbrWLnJNewMsnc7Y			            := le.HHMmbrWLnJNewMsnc7Y + ri.HHMmbrWLnJNewMsnc7Y;
+		self.HHMmbrWBkCnt10Y			                := le.HHMmbrWBkCnt10Y + ri.HHMmbrWBkCnt10Y;
+		self.HHMmbrWBkCnt1Y			                    := le.HHMmbrWBkCnt1Y + ri.HHMmbrWBkCnt1Y;
+		self.HHMmbrWBkCnt2Y		            	        := le.HHMmbrWBkCnt2Y + ri.HHMmbrWBkCnt2Y;
+		self.HHMmbrWBkNewMsnc10Y			            := le.HHMmbrWBkNewMsnc10Y + ri.HHMmbrWBkNewMsnc10Y;
+		self.HHMmbrWFrClCnt7Y			                := le.HHMmbrWFrClCnt7Y + ri.HHMmbrWFrClCnt7Y;
+		self.HHMmbrWFrClNewMSnc7Y			            := le.HHMmbrWFrClNewMSnc7Y + ri.HHMmbrWFrClNewMSnc7Y;
     
-		self.HHInterestSportPersonMmbrCnt		:= le.HHInterestSportPersonMmbrCnt + ri.HHInterestSportPersonMmbrCnt;	
+		self.HHInterestSportPersonMmbrCnt		        := le.HHInterestSportPersonMmbrCnt + ri.HHInterestSportPersonMmbrCnt;	
 		self.RaATeenageMmbrCnt							:= le.RaATeenageMmbrCnt + ri.RaATeenageMmbrCnt;
 		self.RaAYoungAdultMmbrCnt						:= le.RaAYoungAdultMmbrCnt + ri.RaAYoungAdultMmbrCnt;
 		self.RaAMiddleAgeMmbrCnt						:= le.RaAMiddleAgeMmbrCnt + ri.RaAMiddleAgeMmbrCnt;
-		self.RaASeniorMmbrCnt								:= le.RaASeniorMmbrCnt + ri.RaASeniorMmbrCnt;
+		self.RaASeniorMmbrCnt							:= le.RaASeniorMmbrCnt + ri.RaASeniorMmbrCnt;
 		self.RaAElderlyMmbrCnt							:= le.RaAElderlyMmbrCnt + ri.RaAElderlyMmbrCnt;
-		self.RaAHHCnt												:= if(le.RaAHHCnt <> 0, le.RaAHHCnt, ri.RaAHHCnt); //this count is summed already so just keep whichever is populated
-		self.RaAMmbrCnt											:= le.RaAMmbrCnt + ri.RaAMmbrCnt;
+		self.RaAHHCnt									:= if(le.RaAHHCnt <> 0, le.RaAHHCnt, ri.RaAHHCnt); //this count is summed already so just keep whichever is populated
+		self.RaAMmbrCnt									:= le.RaAMmbrCnt + ri.RaAMmbrCnt;
 		self.RaAMedIncomeRange							:= if(le.RaAMedIncomeRange <> 0, le.RaAMedIncomeRange, ri.RaAMedIncomeRange);	//Med income will be same for all relatives records at this point so just take whichever is populated
-		self.RaACollegeAttendedMmbrCnt			:= le.RaACollegeAttendedMmbrCnt + ri.RaACollegeAttendedMmbrCnt;
-		self.RaACollege2yrAttendedMmbrCnt		:= le.RaACollege2yrAttendedMmbrCnt + ri.RaACollege2yrAttendedMmbrCnt;
-		self.RaACollege4yrAttendedMmbrCnt		:= le.RaACollege4yrAttendedMmbrCnt + ri.RaACollege4yrAttendedMmbrCnt;
-		self.RaACollegeGradAttendedMmbrCnt	:= le.RaACollegeGradAttendedMmbrCnt + ri.RaACollegeGradAttendedMmbrCnt;
-		self.RaACollegePrivateMmbrCnt				:= le.RaACollegePrivateMmbrCnt + ri.RaACollegePrivateMmbrCnt;
-		self.RaACollegeTopTierMmbrCnt				:= le.RaACollegeTopTierMmbrCnt + ri.RaACollegeTopTierMmbrCnt;
-		self.RaACollegeMidTierMmbrCnt				:= le.RaACollegeMidTierMmbrCnt + ri.RaACollegeMidTierMmbrCnt;
-		self.RaACollegeLowTierMmbrCnt				:= le.RaACollegeLowTierMmbrCnt + ri.RaACollegeLowTierMmbrCnt;
-		self.RaAPropCurrOwnerMmbrCnt				:= le.RaAPropCurrOwnerMmbrCnt + ri.RaAPropCurrOwnerMmbrCnt;
-		self.RaAPropOwnerAVMHighest					:= max(le.RaAPropOwnerAVMHighest, ri.RaAPropOwnerAVMHighest);
+		self.RaACollegeAttendedMmbrCnt			        := le.RaACollegeAttendedMmbrCnt + ri.RaACollegeAttendedMmbrCnt;
+		self.RaACollege2yrAttendedMmbrCnt		        := le.RaACollege2yrAttendedMmbrCnt + ri.RaACollege2yrAttendedMmbrCnt;
+		self.RaACollege4yrAttendedMmbrCnt		        := le.RaACollege4yrAttendedMmbrCnt + ri.RaACollege4yrAttendedMmbrCnt;
+		self.RaACollegeGradAttendedMmbrCnt	            := le.RaACollegeGradAttendedMmbrCnt + ri.RaACollegeGradAttendedMmbrCnt;
+		self.RaACollegePrivateMmbrCnt				    := le.RaACollegePrivateMmbrCnt + ri.RaACollegePrivateMmbrCnt;
+		self.RaACollegeTopTierMmbrCnt				    := le.RaACollegeTopTierMmbrCnt + ri.RaACollegeTopTierMmbrCnt;
+		self.RaACollegeMidTierMmbrCnt				    := le.RaACollegeMidTierMmbrCnt + ri.RaACollegeMidTierMmbrCnt;
+		self.RaACollegeLowTierMmbrCnt			  	    := le.RaACollegeLowTierMmbrCnt + ri.RaACollegeLowTierMmbrCnt;
+		self.RaAPropCurrOwnerMmbrCnt				    := le.RaAPropCurrOwnerMmbrCnt + ri.RaAPropCurrOwnerMmbrCnt;
+		self.RaAPropOwnerAVMHighest					    := max(le.RaAPropOwnerAVMHighest, ri.RaAPropOwnerAVMHighest);
 		// self.RaAPropOwnerAVMMed							:= ave(groupAVMOwned, RaAPropOwnerAVMHighest);
-		self.RaAPPCurrOwnerMmbrCnt					:= le.RaAPPCurrOwnerMmbrCnt + ri.RaAPPCurrOwnerMmbrCnt;
-		self.RaAPPCurrOwnerAutoMmbrCnt 			:= le.RaAPPCurrOwnerAutoMmbrCnt + ri.RaAPPCurrOwnerAutoMmbrCnt;
-		self.RaAPPCurrOwnerMtrcycleMmbrCnt 	:= le.RaAPPCurrOwnerMtrcycleMmbrCnt + ri.RaAPPCurrOwnerMtrcycleMmbrCnt;
-		self.RaAPPCurrOwnerAircrftMmbrCnt 	:= le.RaAPPCurrOwnerAircrftMmbrCnt + ri.RaAPPCurrOwnerAircrftMmbrCnt;
-		self.RaAPPCurrOwnerWtrcrftMmbrCnt		:= le.RaAPPCurrOwnerWtrcrftMmbrCnt + ri.RaAPPCurrOwnerWtrcrftMmbrCnt;
-		self.RaACrtRecMmbrCnt								:= le.RaACrtRecMmbrCnt + ri.RaACrtRecMmbrCnt;
+		self.RaAPPCurrOwnerMmbrCnt				  	    := le.RaAPPCurrOwnerMmbrCnt + ri.RaAPPCurrOwnerMmbrCnt;
+		self.RaAPPCurrOwnerAutoMmbrCnt 			        := le.RaAPPCurrOwnerAutoMmbrCnt + ri.RaAPPCurrOwnerAutoMmbrCnt;
+		self.RaAPPCurrOwnerMtrcycleMmbrCnt 	            := le.RaAPPCurrOwnerMtrcycleMmbrCnt + ri.RaAPPCurrOwnerMtrcycleMmbrCnt;
+		self.RaAPPCurrOwnerAircrftMmbrCnt 	            := le.RaAPPCurrOwnerAircrftMmbrCnt + ri.RaAPPCurrOwnerAircrftMmbrCnt;
+		self.RaAPPCurrOwnerWtrcrftMmbrCnt		        := le.RaAPPCurrOwnerWtrcrftMmbrCnt + ri.RaAPPCurrOwnerWtrcrftMmbrCnt;
+		self.RaACrtRecMmbrCnt							:= le.RaACrtRecMmbrCnt + ri.RaACrtRecMmbrCnt;
 		self.RaACrtRecMmbrCnt12Mo						:= le.RaACrtRecMmbrCnt12Mo + ri.RaACrtRecMmbrCnt12Mo;
-		self.RaACrtRecFelonyMmbrCnt					:= le.RaACrtRecFelonyMmbrCnt + ri.RaACrtRecFelonyMmbrCnt;
-		self.RaACrtRecFelonyMmbrCnt12Mo			:= le.RaACrtRecFelonyMmbrCnt12Mo + ri.RaACrtRecFelonyMmbrCnt12Mo;
-		self.RaACrtRecMsdmeanMmbrCnt				:= le.RaACrtRecMsdmeanMmbrCnt + ri.RaACrtRecMsdmeanMmbrCnt;
-		self.RaACrtRecMsdmeanMmbrCnt12Mo		:= le.RaACrtRecMsdmeanMmbrCnt12Mo + ri.RaACrtRecMsdmeanMmbrCnt12Mo;
-		self.RaACrtRecEvictionMmbrCnt				:= le.RaACrtRecEvictionMmbrCnt + ri.RaACrtRecEvictionMmbrCnt;
-		self.RaACrtRecEvictionMmbrCnt12Mo		:= le.RaACrtRecEvictionMmbrCnt12Mo + ri.RaACrtRecEvictionMmbrCnt12Mo;
-		self.RaACrtRecLienJudgMmbrCnt				:= le.RaACrtRecLienJudgMmbrCnt + ri.RaACrtRecLienJudgMmbrCnt;
-		self.RaACrtRecLienJudgMmbrCnt12Mo		:= le.RaACrtRecLienJudgMmbrCnt12Mo + ri.RaACrtRecLienJudgMmbrCnt12Mo;
-		self.RaACrtRecLienJudgAmtMax				:= max(le.RaACrtRecLienJudgAmtMax, ri.RaACrtRecLienJudgAmtMax);
-		self.RaACrtRecBkrptMmbrCnt36Mo			:= le.RaACrtRecBkrptMmbrCnt36Mo + ri.RaACrtRecBkrptMmbrCnt36Mo;
+		self.RaACrtRecFelonyMmbrCnt					    := le.RaACrtRecFelonyMmbrCnt + ri.RaACrtRecFelonyMmbrCnt;
+		self.RaACrtRecFelonyMmbrCnt12Mo			        := le.RaACrtRecFelonyMmbrCnt12Mo + ri.RaACrtRecFelonyMmbrCnt12Mo;
+		self.RaACrtRecMsdmeanMmbrCnt				    := le.RaACrtRecMsdmeanMmbrCnt + ri.RaACrtRecMsdmeanMmbrCnt;
+		self.RaACrtRecMsdmeanMmbrCnt12Mo		        := le.RaACrtRecMsdmeanMmbrCnt12Mo + ri.RaACrtRecMsdmeanMmbrCnt12Mo;
+		self.RaACrtRecEvictionMmbrCnt				    := le.RaACrtRecEvictionMmbrCnt + ri.RaACrtRecEvictionMmbrCnt;
+		self.RaACrtRecEvictionMmbrCnt12Mo		        := le.RaACrtRecEvictionMmbrCnt12Mo + ri.RaACrtRecEvictionMmbrCnt12Mo;
+		self.RaACrtRecLienJudgMmbrCnt				    := le.RaACrtRecLienJudgMmbrCnt + ri.RaACrtRecLienJudgMmbrCnt;
+		self.RaACrtRecLienJudgMmbrCnt12Mo		        := le.RaACrtRecLienJudgMmbrCnt12Mo + ri.RaACrtRecLienJudgMmbrCnt12Mo;
+		self.RaACrtRecLienJudgAmtMax				    := max(le.RaACrtRecLienJudgAmtMax, ri.RaACrtRecLienJudgAmtMax);
+		self.RaACrtRecBkrptMmbrCnt36Mo			        := le.RaACrtRecBkrptMmbrCnt36Mo + ri.RaACrtRecBkrptMmbrCnt36Mo;
 		self.RaAOccProfLicMmbrCnt						:= le.RaAOccProfLicMmbrCnt + ri.RaAOccProfLicMmbrCnt;
-		self.RaAOccBusinessAssocMmbrCnt			:= le.RaAOccBusinessAssocMmbrCnt + ri.RaAOccBusinessAssocMmbrCnt;
-		self.RaAInterestSportPersonMmbrCnt	:= le.RaAInterestSportPersonMmbrCnt + ri.RaAInterestSportPersonMmbrCnt;		
+		self.RaAOccBusinessAssocMmbrCnt			        := le.RaAOccBusinessAssocMmbrCnt + ri.RaAOccBusinessAssocMmbrCnt;
+		self.RaAInterestSportPersonMmbrCnt	            := le.RaAInterestSportPersonMmbrCnt + ri.RaAInterestSportPersonMmbrCnt;		
 		self := le;  //for all prospect attributes, keep all values from the left (first) record  
 	end;
 	
 	finalSort 	:= sort(withEconTraj, seq, rec_type, did2);  //sort prospect record to the top (rec_type = 1)
   finalRollup := rollup(finalSort, rollFinal(left,right), seq);
   //DEBUGGING
-  lexidset := [1653020855,2659294463,599717915,1287522558,1952185820,719039845,2661278680,246971484,2643889651,952420953,1376746128];
+//   lexidset := [1653020855,2659294463,599717915,1287522558,1952185820,719039845,2661278680,246971484,2643889651,952420953,1376746128];
 
   // OUTPUT(CHOOSEN(PB2_In,100),named('V2GP_PB2_In'));
   // OUTPUT(CHOOSEN(p_address,100),named('V2GP_p_address'));
@@ -689,8 +689,9 @@ prop_common_distr := distribute(prop_common, did);
   // OUTPUT(COUNT(finalRollup),named('V2GP_Out_finalRollupCnt'));
 
   // OUTPUT(prop_common,,'~jfrancis::profilebooster20::V2_getProperty_prop_common_' + thorlib.wuid(),CSV(HEADING(single), QUOTE('"')));
-  // OUTPUT(econTraj,,'~jfrancis::profilebooster20::V2_getProperty_econTraj_' + thorlib.wuid(),CSV(HEADING(single), QUOTE('"')));
-  // OUTPUT(withEconTraj,,'~jfrancis::profilebooster20::V2_getProperty_withEconTraj_' + thorlib.wuid(),CSV(HEADING(single), QUOTE('"')));
+  // OUTPUT(BSappended,,'~jfrancis::profilebooster20::V2_getProperty_BSappended' ,CSV(HEADING(single), QUOTE('"')));
+  // OUTPUT(econTraj,,'~jfrancis::profilebooster20::V2_getProperty_econTraj' ,CSV(HEADING(single), QUOTE('"')));
+  // OUTPUT(withEconTraj,,'~jfrancis::profilebooster20::V2_getProperty_withEconTraj' ,CSV(HEADING(single), QUOTE('"')));
   
   RETURN finalRollup;
 END;

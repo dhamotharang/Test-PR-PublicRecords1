@@ -13,8 +13,7 @@ address_rank_key := dx_header.key_addr_hist();
 
 	//search Infutor by DID to verify input name, address, phone
 	ProfileBooster.V2_Key_Layouts.Layout_PB2_Shell getInfutor(PBShell le, infutorcid_key ri) := transform	
-		EmrgDt_first_seen        := IF(ri.dt_first_seen=0,'99998888',ProfileBooster.V2_Key_Common.convertDateTo8((STRING)ri.dt_first_seen));
-		self.EmrgDt_first_seen   := (UNSIGNED6)ProfileBooster.V2_Key_Common.convertDateTo8(EmrgDt_first_seen);
+		self.EmrgDt_first_seen   := (UNSIGNED6)ProfileBooster.V2_Key_Common.convertDateTo8((STRING)ri.dt_first_seen);
 		self.EmrgSrc             := MDR.sourceTools.src_InfutorCID;
 		//No DOB in InfutorCID
 		self.EmrgPrimaryRange    := ri.prim_range;
@@ -54,8 +53,8 @@ address_rank_key := dx_header.key_addr_hist();
   
 //search Gong by DID to verify input name, address, phone
 	ProfileBooster.V2_Key_Layouts.Layout_PB2_Shell getGong(PBShell le, gonghistorydid_key ri) := transform	
-		OlderErmgRecord := (UNSIGNED6)(((STRING)ri.dt_first_seen)[1..6]) <= (UNSIGNED6)(((STRING)le.EmrgDt_first_seen)[1..6]) OR ProfileBooster.V2_Key_Common.convertDateTo8((STRING)le.EmrgDt_first_seen) IN ['0','99998','99998888']; 
-		EmrgDt_first_seen        := IF(ri.dt_first_seen='0',ProfileBooster.V2_Key_Common.convertDateTo8((STRING)le.EmrgDt_first_seen),ProfileBooster.V2_Key_Common.convertDateTo8((STRING)ri.dt_first_seen));
+		OlderErmgRecord := (UNSIGNED6)(((STRING)ri.dt_first_seen)[1..6]) <= (UNSIGNED6)(((STRING)le.EmrgDt_first_seen)[1..6]) OR ProfileBooster.V2_Key_Common.convertDateTo8((STRING)le.EmrgDt_first_seen) = '0'; 
+		EmrgDt_first_seen        := IF((STRING)ri.dt_first_seen='0',ProfileBooster.V2_Key_Common.convertDateTo8((STRING)le.EmrgDt_first_seen),ProfileBooster.V2_Key_Common.convertDateTo8((STRING)ri.dt_first_seen));
 		self.EmrgDt_first_seen   := IF(OlderErmgRecord,(UNSIGNED6)ProfileBooster.V2_Key_Common.convertDateTo8((STRING)ri.dt_first_seen),(UNSIGNED6)EmrgDt_first_seen);
 		self.EmrgSrc             := IF(OlderErmgRecord,ri.src,le.EmrgSrc);
 		//No DOB in Gong
@@ -96,20 +95,20 @@ address_rank_key := dx_header.key_addr_hist();
 
 	//search header by DID to verify input name, address, phone, SSN	
 	ProfileBooster.V2_Key_Layouts.Layout_PB2_Shell getHeader(ProfileBooster.V2_Key_Layouts.Layout_PB2_Shell le, header_key ri) := transform
-		OlderErmgRecord := (UNSIGNED6)(((STRING)ri.dt_first_seen)[1..6]) <= (UNSIGNED6)(((STRING)le.EmrgDt_first_seen)[1..6]) OR ProfileBooster.V2_Key_Common.convertDateTo8((STRING)le.EmrgDt_first_seen) IN ['0','99998','99998888']; 
+		OlderErmgRecord := (UNSIGNED6)(((STRING)ri.dt_first_seen)[1..6]) <= (UNSIGNED6)(((STRING)le.EmrgDt_first_seen)[1..6]) OR ProfileBooster.V2_Key_Common.convertDateTo8((STRING)le.EmrgDt_first_seen) = '0';  
 		EmrgDt_first_seen        := IF((STRING)ri.dt_first_seen='0',ProfileBooster.V2_Key_Common.convertDateTo8((STRING)le.EmrgDt_first_seen),ProfileBooster.V2_Key_Common.convertDateTo8((STRING)ri.dt_first_seen));
 		self.EmrgDt_first_seen   := IF(OlderErmgRecord,(UNSIGNED6)ProfileBooster.V2_Key_Common.convertDateTo8((STRING)ri.dt_first_seen),(UNSIGNED6)EmrgDt_first_seen);
-		// OlderErmgRecord := (UNSIGNED6)((ProfileBooster.V2_Key_Common.convertDateTo8((STRING)ri.dt_first_seen))[1..6]) <= (UNSIGNED6)((ProfileBooster.V2_Key_Common.convertDateTo8((STRING)le.EmrgDt_first_seen))[1..6]) OR ProfileBooster.V2_Key_Common.convertDateTo8((STRING)le.EmrgDt_first_seen) IN ['0','99998','99998888']; 
+		// OlderErmgRecord := (UNSIGNED6)((ProfileBooster.V2_Key_Common.convertDateTo8((STRING)ri.dt_first_seen))[1..6]) <= (UNSIGNED6)((ProfileBooster.V2_Key_Common.convertDateTo8((STRING)le.EmrgDt_first_seen))[1..6]) OR ProfileBooster.V2_Key_Common.convertDateTo8((STRING)le.EmrgDt_first_seen) = '0';  
 		// EmrgDt_first_seen        := IF(ProfileBooster.V2_Key_Common.convertDateTo8((STRING)ri.dt_first_seen)='0',(UNSIGNED6)ProfileBooster.V2_Key_Common.convertDateTo8((STRING)le.EmrgDt_first_seen),(UNSIGNED6)ProfileBooster.V2_Key_Common.convertDateTo8((STRING)ri.dt_first_seen));
 		// self.EmrgDt_first_seen   := IF(OlderErmgRecord,(UNSIGNED6)ProfileBooster.V2_Key_Common.convertDateTo8((STRING)ri.dt_first_seen),(UNSIGNED6)EmrgDt_first_seen);
 		self.EmrgSrc             := IF(OlderErmgRecord,ri.src,le.EmrgSrc);
-		EmrgDob	:= MAP(~OlderErmgRecord or ri.dob=0           => le.EmrgDob, 
+		EmrgDob	:= MAP(~OlderErmgRecord or ProfileBooster.V2_Common.convertDateTo8((STRING)ri.dob)='0' => le.EmrgDob, 
 		               ri.src=mdr.sourceTools.src_TUCS_Ptrack => le.EmrgDob, 
-															     (STRING)ri.dob);
+															     ProfileBooster.V2_Common.convertDateTo8((STRING)ri.dob));
 		self.EmrgDob			 := EmrgDob;
 		fullhistorydate := risk_indicators.iid_constants.myGetDate(le.historydate);
 		//first attempt at calculating EmrgAge
-		self.EmrgAge   			 := if(ri.src=mdr.sourceTools.src_TUCS_Ptrack, -99997, risk_indicators.years_apart((unsigned)EmrgDt_first_seen, (unsigned)EmrgDob));
+		self.EmrgAge   			 := if(ri.src=mdr.sourceTools.src_TUCS_Ptrack, -99998, risk_indicators.years_apart((unsigned)EmrgDt_first_seen, (unsigned)EmrgDob));
 		self.EmrgPrimaryRange    := IF(OlderErmgRecord,ri.prim_range,le.EmrgPrimaryRange);
 		self.EmrgPredirectional	 := IF(OlderErmgRecord,ri.predir,le.EmrgPredirectional);
 		self.EmrgPrimaryName	 := IF(OlderErmgRecord,ri.prim_name,le.EmrgPrimaryName);
@@ -175,19 +174,16 @@ address_rank_key := dx_header.key_addr_hist();
 									getHeader(left, right), left outer, keep(200), local);
 
   	ProfileBooster.V2_Key_Layouts.Layout_PB2_Shell getQHeader(ProfileBooster.V2_Key_Layouts.Layout_PB2_Shell le, quickheader_key ri) := transform
-		OlderErmgRecord := (UNSIGNED6)(((STRING)ri.dt_first_seen)[1..6]) <= (UNSIGNED6)(((STRING)le.EmrgDt_first_seen)[1..6]) OR ProfileBooster.V2_Key_Common.convertDateTo8((STRING)le.EmrgDt_first_seen) IN ['0','99998','99998888']; 
+		OlderErmgRecord := (UNSIGNED6)(((STRING)ri.dt_first_seen)[1..6]) <= (UNSIGNED6)(((STRING)le.EmrgDt_first_seen)[1..6]) OR ProfileBooster.V2_Key_Common.convertDateTo8((STRING)le.EmrgDt_first_seen) = '0';  
 		EmrgDt_first_seen        := IF((STRING)ri.dt_first_seen='0',ProfileBooster.V2_Key_Common.convertDateTo8((STRING)le.EmrgDt_first_seen),ProfileBooster.V2_Key_Common.convertDateTo8((STRING)ri.dt_first_seen));
 		self.EmrgDt_first_seen   := IF(OlderErmgRecord,(UNSIGNED6)ProfileBooster.V2_Key_Common.convertDateTo8((STRING)ri.dt_first_seen),(UNSIGNED6)EmrgDt_first_seen);
-		// OlderErmgRecord := (UNSIGNED6)(((STRING)ri.dt_first_seen)[1..6]) <= (UNSIGNED6)(((STRING)le.EmrgDt_first_seen)[1..6]) OR ProfileBooster.V2_Key_Common.convertDateTo8((STRING)le.EmrgDt_first_seen) IN ['0','99998','99998888']; 
-		// EmrgDt_first_seen := IF(OlderErmgRecord,ProfileBooster.V2_Key_Common.convertDateTo8((STRING)ri.dt_first_seen),ProfileBooster.V2_Key_Common.convertDateTo8((STRING)le.EmrgDt_first_seen));
-		// self.EmrgDt_first_seen   := IF(OlderErmgRecord,(UNSIGNED6)ProfileBooster.V2_Key_Common.convertDateTo8((STRING)ri.dt_first_seen),(UNSIGNED6)EmrgDt_first_seen);
 		self.EmrgSrc             := IF(OlderErmgRecord,ri.src,le.EmrgSrc);
-		EmrgDob	:= MAP(~OlderErmgRecord or ri.dob=0           => le.EmrgDob, 
+		EmrgDob	:= MAP(~OlderErmgRecord or ProfileBooster.V2_Common.convertDateTo8((STRING)ri.dob)='0' => le.EmrgDob, 
 		               ri.src=mdr.sourceTools.src_TUCS_Ptrack => le.EmrgDob, 
-															     (STRING)ri.dob);
+															     ProfileBooster.V2_Common.convertDateTo8((STRING)ri.dob));
 		self.EmrgDob			 := EmrgDob;
     	fullhistorydate := risk_indicators.iid_constants.myGetDate(le.historydate);
-		self.EmrgAge   			 := if(ri.src=mdr.sourceTools.src_TUCS_Ptrack, 0, risk_indicators.years_apart((unsigned)EmrgDt_first_seen, (unsigned)EmrgDob));
+		self.EmrgAge   			 := if(ri.src=mdr.sourceTools.src_TUCS_Ptrack, -99998, risk_indicators.years_apart((unsigned)EmrgDt_first_seen, (unsigned)EmrgDob));
 		self.EmrgPrimaryRange    := IF(OlderErmgRecord,ri.prim_range,le.EmrgPrimaryRange);
 		self.EmrgPredirectional	 := IF(OlderErmgRecord,ri.predir,le.EmrgPredirectional);
 		self.EmrgPrimaryName	 := IF(OlderErmgRecord,ri.prim_name,le.EmrgPrimaryName);
@@ -271,7 +267,7 @@ address_rank_key := dx_header.key_addr_hist();
 		self.HHID							:= if(le.HHID <> 0, le.HHID, ri.HHID);		//keep whichever is populated	
 		self.VerifiedCurrResMatchIndex	:= if(ri.VerifiedCurrResMatchIndex = '1', ri.VerifiedCurrResMatchIndex, le.VerifiedCurrResMatchIndex);
 		
-		OlderErmgRecord := (UNSIGNED6)(((STRING)ri.EmrgDt_first_seen)[1..6]) <= (UNSIGNED6)(((STRING)le.EmrgDt_first_seen)[1..6]) OR ProfileBooster.V2_Key_Common.convertDateTo8((STRING)le.EmrgDt_first_seen) IN ['0','99998','99998888'];
+		OlderErmgRecord := (UNSIGNED6)(((STRING)ri.EmrgDt_first_seen)[1..6]) <= (UNSIGNED6)(((STRING)le.EmrgDt_first_seen)[1..6]) OR ProfileBooster.V2_Key_Common.convertDateTo8((STRING)le.EmrgDt_first_seen) = '0'; 
 		self.EmrgDt_first_seen   := IF(OlderErmgRecord,(UNSIGNED6)ProfileBooster.V2_Key_Common.convertDateTo8((STRING)ri.EmrgDt_first_seen),(UNSIGNED6)ProfileBooster.V2_Key_Common.convertDateTo8((STRING)le.EmrgDt_first_seen));
 		self.EmrgSrc             := IF(OlderErmgRecord,ri.EmrgSrc,le.EmrgSrc);
 		EmrgDob					 := IF(OlderErmgRecord,ri.EmrgDob,le.EmrgDob);
@@ -290,14 +286,7 @@ address_rank_key := dx_header.key_addr_hist();
 		self.EmrgSt			     := IF(OlderErmgRecord,ri.EmrgSt,le.EmrgSt);
 		self.EmrgZIP5			 := IF(OlderErmgRecord,ri.EmrgZIP5,le.EmrgZIP5);
 		self.EmrgZIP4		     := IF(OlderErmgRecord,ri.EmrgZIP4,le.EmrgZIP4);
-		
-		// self.EmrgAtOrAfter21Flag := IF(EmrgAge>=21,1,0);
-		
-		// emrgatorafter21flag 	
-		// emrgage25to59flag 	
-		// emrgrecordtype 	
-		// emrgaddresshrindex 	
-		// emrglexidsatemrgaddrcnt1y 	
+		 	
 		self									:= le;
 	end;
 	

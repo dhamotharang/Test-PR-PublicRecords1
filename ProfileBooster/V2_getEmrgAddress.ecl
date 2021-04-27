@@ -12,9 +12,23 @@ EXPORT V2_getEmrgAddress(DATASET(ProfileBooster.V2_Layouts.Layout_PB2_Slim_emerg
         SELF := [];
     END;
 
-    withLexIDEmrg := JOIN(slimShell,
-                          lexidKey,
-                          LEFT.did2<>RIGHT.did AND
+    // withLexIDEmrg_roxie := JOIN(slimShell,
+    //                             lexidKey,
+    //                       LEFT.did2<>ri.did AND
+    //                       LEFT.emrgprimaryrange=RIGHT.emrgprimaryrange AND 	
+    //                       LEFT.emrgpredirectional=RIGHT.emrgpredirectional AND
+    //                       LEFT.emrgprimaryname=RIGHT.emrgprimaryname AND
+    //                       LEFT.emrgprimaryname<>'' AND
+    //                       LEFT.emrgsuffix=RIGHT.emrgsuffix AND
+    //                       LEFT.emrgpostdirectional=RIGHT.emrgpostdirectional AND
+    //                       LEFT.emrgunitdesignation=RIGHT.emrgunitdesignation AND
+    //                       LEFT.emrgsecondaryrange=RIGHT.emrgsecondaryrange AND
+    //                       LEFT.emrgzip5=RIGHT.emrgzip5 AND 
+    //                       LEFT.emrgzip5<>'' AND
+    //                       RIGHT.emrgdt_first_seen BETWEEN STD.Date.AdjustDate(LEFT.emrgdt_first_seen,0,-6,0) AND STD.Date.AdjustDate(LEFT.emrgdt_first_seen,0,6,0),
+    //                       xfm_AddEmergence(LEFT,RIGHT),KEEP(1000));
+    withLexIDEmrg_thor := JOIN(DISTRIBUTE(slimShell,HASH64(emrgprimaryrange,emrgpredirectional,emrgprimaryname,emrgsuffix,emrgpostdirectional,emrgunitdesignation,emrgzip5)),
+                          DISTRIBUTE(lexidKey,HASH64(emrgprimaryrange,emrgpredirectional,emrgprimaryname,emrgsuffix,emrgpostdirectional,emrgunitdesignation,emrgzip5)),
                           LEFT.emrgprimaryrange=RIGHT.emrgprimaryrange AND 	
                           LEFT.emrgpredirectional=RIGHT.emrgpredirectional AND
                           LEFT.emrgprimaryname=RIGHT.emrgprimaryname AND
@@ -24,50 +38,30 @@ EXPORT V2_getEmrgAddress(DATASET(ProfileBooster.V2_Layouts.Layout_PB2_Slim_emerg
                           LEFT.emrgunitdesignation=RIGHT.emrgunitdesignation AND
                           LEFT.emrgsecondaryrange=RIGHT.emrgsecondaryrange AND
                           LEFT.emrgzip5=RIGHT.emrgzip5 AND 
+                          LEFT.emrgzip5<>'' AND
                           RIGHT.emrgdt_first_seen BETWEEN STD.Date.AdjustDate(LEFT.emrgdt_first_seen,0,-6,0) AND STD.Date.AdjustDate(LEFT.emrgdt_first_seen,0,6,0),
-                          xfm_AddEmergence(LEFT,RIGHT));
+                          xfm_AddEmergence(LEFT,RIGHT),KEEP(1000), local);
     
+    // #IF(onThor)
+		withLexIDEmrg := withLexIDEmrg_thor;
+	// #ELSE
+	// 	withLexIDEmrg := withLexIDEmrg_roxie;
+	// #END
+
     withLexIDEmrg_sorted :=  sort(withLexIDEmrg, emrgzip5,emrgprimaryrange,emrgpredirectional,emrgprimaryname,emrgsuffix,
                                                              emrgpostdirectional,emrgunitdesignation,emrgsecondaryrange);
 
-    // withLexIDEmrg_distributed := distribute(withLexIDEmrg_sorted, HASH64(emrgzip5,emrgprimaryrange,emrgpredirectional,emrgprimaryname,emrgsuffix,
-    //                                                        emrgpostdirectional,emrgunitdesignation,emrgsecondaryrange));
-	   
-
-    d_addr := TABLE(withLexIDEmrg_sorted, {emrgzip5,emrgprimaryrange,emrgpredirectional,emrgprimaryname,emrgsuffix,
-                                           emrgpostdirectional,emrgunitdesignation,emrgsecondaryrange,EmrgLexIDsAtEmrgAddrCnt1Yb := count(group)},
-                                           emrgzip5,emrgprimaryrange,emrgpredirectional,emrgprimaryname,emrgsuffix,
-                                           emrgpostdirectional,emrgunitdesignation,emrgsecondaryrange);
-    
-    emergenceLayout := RECORD
-    	STRING10 		EmrgPrimaryRange;
-		STRING6  		EmrgPredirectional;
-		STRING28 		EmrgPrimaryName;
-		STRING6  		EmrgSuffix;
-		STRING6  		EmrgPostdirectional;
-		STRING10 		EmrgUnitDesignation;
-		STRING8  		EmrgSecondaryRange;
-		STRING6  		EmrgZIP5;
-		// STRING6  		EmrgZIP4;
-		STRING25 		EmrgCity_Name;
-		STRING6  		EmrgSt;
-   		INTEGER3		EmrgLexIDsAtEmrgAddrCnt1Yb;
-		STRING6  		EmrgAddrType;
+    ProfileBooster.V2_Layouts.Layout_PB2_Slim_emergence rollEmergence(ProfileBooster.V2_Layouts.Layout_PB2_Slim_emergence le, ProfileBooster.V2_Layouts.Layout_PB2_Slim_emergence ri) := TRANSFORM
+        SELF.EmrgLexIDsAtEmrgAddrCnt1Y := le.EmrgLexIDsAtEmrgAddrCnt1Y + ri.EmrgLexIDsAtEmrgAddrCnt1Y;
+        SELF := le;
+        SELF := [];
     END;
 
-    emergenceLayout xfm_AddAddrType(d_addr le, addressKey ri) := TRANSFORM
-        SELF.EmrgPrimaryRange := le.EmrgPrimaryRange;
-		SELF.EmrgPredirectional := le.EmrgPredirectional;
-		SELF.EmrgPrimaryName := le.EmrgPrimaryName;
-		SELF.EmrgSuffix := le.EmrgSuffix;
-		SELF.EmrgPostdirectional := le.EmrgPostdirectional;
-		SELF.EmrgUnitDesignation := le.EmrgUnitDesignation;
-		SELF.EmrgSecondaryRange := le.EmrgSecondaryRange;
-		SELF.EmrgZIP5 := le.EmrgZIP5;
-		// SELF.EmrgZIP4 := (STRING)le.EmrgZIP4;
-		// SELF.EmrgCity_Name := le.EmrgCity_Name;
-		// SELF.EmrgSt := le.EmrgSt;
-   		SELF.EmrgLexIDsAtEmrgAddrCnt1Yb := le.EmrgLexIDsAtEmrgAddrCnt1Yb-1;
+	d_addr := ROLLUP(withLexIDEmrg_sorted, rollEmergence(LEFT,RIGHT),emrgzip5,emrgprimaryrange,emrgpredirectional,emrgprimaryname,emrgsuffix,
+                                                                     emrgpostdirectional,emrgunitdesignation,emrgsecondaryrange);   
+
+    ProfileBooster.V2_Layouts.Layout_PB2_Slim_emergence xfm_AddAddrType(d_addr le, addressKey ri) := TRANSFORM
+   		SELF.EmrgLexIDsAtEmrgAddrCnt1Y := le.EmrgLexIDsAtEmrgAddrCnt1Y;
         SELF.EmrgAddrType := IF(ri.AddrType IN ['F','G','H','P','R','S','U'], ri.AddrType, '-99997');
         SELF := le;
         SELF := [];
@@ -82,14 +76,9 @@ EXPORT V2_getEmrgAddress(DATASET(ProfileBooster.V2_Layouts.Layout_PB2_Slim_emerg
                             LEFT.emrgpostdirectional=RIGHT.postdirectional AND
                             LEFT.emrgunitdesignation=RIGHT.unitdesignation AND
                             LEFT.emrgsecondaryrange=RIGHT.secondaryrange AND
-                            LEFT.emrgzip5=RIGHT.zip5,
+                            LEFT.emrgzip5=RIGHT.zip5 AND
+                            LEFT.emrgzip5<>'',
                             xfm_AddAddrType(LEFT,RIGHT), LEFT OUTER, KEEP(1));
 
-    //DEBUGGING OUTPUTS
-    // OUTPUT(CHOOSEN(withLexIDEmrg,100),named('V2GEA_withLexIDEmrg'));
-    // OUTPUT(CHOOSEN(withLexIDEmrg_sorted,100),named('V2GEA_withLexIDEmrg_sorted'));
-    // OUTPUT(CHOOSEN(rolledEmergence,100),named('V2GEA_rolledEmergence'));
-    OUTPUT(CHOOSEN(d_addr,100),named('V2GEA_d_addr'));
-    OUTPUT(CHOOSEN(withAddressType,100),named('V2GEA_withAddressType'));
     RETURN withAddressType;
 END;

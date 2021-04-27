@@ -17,13 +17,16 @@ END;
 EXPORT string8 convertDateTo8(string d1) := FUNCTION
   IMPORT STD ;
   dateLength := LENGTH(TRIM(d1));
-  Result := MAP(dateLength = 4 => d1 + '0101',
+  ResultPre := MAP(dateLength = 4 => d1 + '0101',
                 dateLength = 6 => d1 + '01',
 				dateLength = 8 => d1,
 				                  '0');
+  ResultYear := ResultPre[1..4];
+  ResultMonth := IF(ResultPre[5..6]='00','01',ResultPre[5..6]);
+  ResultDay := IF(ResultPre[7..8]='00','01',ResultPre[7..8]);
+  Result := ResultYear+ResultMonth+ResultDay;
   RETURN Result;
 END;
-
 
 EXPORT STRING6 getProfLicActiveNewTitleType(string occupation, integer category) := FUNCTION
 //   IMPORT STD ;

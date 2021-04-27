@@ -1,6 +1,6 @@
 ﻿import ProfileBooster, MDR, dx_header, risk_indicators, dx_ProfileBooster, STD, address;
 
-#OPTION('multiplePersistInstances', TRUE); // TRUE - to allow multiple files/jobs to run at same time
+#OPTION('multiplePersistInstances', FALSE); // TRUE - to allow multiple files/jobs to run at same time
 #OPTION('expandSelectCreateRow', TRUE);
 #OPTION('outputLimit', 2000);
 #OPTION('outputLimitMb', 1000);
@@ -58,6 +58,7 @@ export V2_Key_File_LexID(STRING8 history_date) := function
 // END;
   // base := DATASET('~jfrancis::in::pb20::sampleWatchdog.csv',testLayout,CSV(heading(single), quote('"')));
   base := DATASET('~jfrancis::in::pb20::sampleHeaderAllDids.csv',dx_Header.layout_key_header,CSV(heading(single), quote('"')));
+  // base := dx_Header.key_header();
   // base := DATASET('~jfrancis::in::pb20::sampleHeader.csv',dx_Header.layout_key_header,CSV(heading(single), quote('"')));
   distributed_allDIDs := distribute(base(dt_first_seen<=(unsigned)risk_indicators.iid_constants.myGetDate((integer)history_date[1..6])), hash(did));
 
@@ -195,7 +196,7 @@ export V2_Key_File_LexID(STRING8 history_date) := function
                   SELF.LifeAstPurchOldMsnc := LEFT.attributes.version2.LifeAstPurchOldMsnc;
                   SELF.LifeAstPurchNewMsnc := LEFT.attributes.version2.LifeAstPurchNewMsnc;
                   SELF.LifeAddrCnt := LEFT.attributes.version2.LifeAddrCnt;
-                  SELF.LifeAddrCurrToPrevValRatio5Y := LEFT.attributes.version2.LifeAddrCurrToPrevValRatio5Y;
+                  // SELF.LifeAddrCurrToPrevValRatio5Y := LEFT.attributes.version2.LifeAddrCurrToPrevValRatio5Y;
                   SELF.LifeAddrEconTrajType := LEFT.attributes.version2.LifeAddrEconTrajType;
                   SELF.LifeAddrEconTrajIndx := LEFT.attributes.version2.LifeAddrEconTrajIndx;
                   SELF.AstCurrFlag := LEFT.attributes.version2.AstCurrFlag;
@@ -219,8 +220,8 @@ export V2_Key_File_LexID(STRING8 history_date) := function
                   SELF.CurrAddrBuildYr := LEFT.attributes.version2.CurrAddrBuildYr;
                   SELF.CurrAddrBedCnt := LEFT.attributes.version2.CurrAddrBedCnt;
                   SELF.CurrAddrBldgSize := LEFT.attributes.version2.CurrAddrBldgSize;
-                  SELF.CurrAddrLat := LEFT.attributes.version2.CurrAddrLat;
-                  SELF.CurrAddrLng := LEFT.attributes.version2.CurrAddrLng;
+                  // SELF.CurrAddrLat := LEFT.attributes.version2.CurrAddrLat;
+                  // SELF.CurrAddrLng := LEFT.attributes.version2.CurrAddrLng;
                   SELF.CurrAddrIsCollegeFlag := LEFT.attributes.version2.CurrAddrIsCollegeFlag;
                   SELF.CurrAddrAVMVal := LEFT.attributes.version2.CurrAddrAVMVal;
                   SELF.CurrAddrAVMValA1Y := LEFT.attributes.version2.CurrAddrAVMValA1Y;
@@ -392,38 +393,40 @@ export V2_Key_File_LexID(STRING8 history_date) := function
 /* ********************
  *  KEL Section *
  ********************* */
-PP1 := PROJECT(PB_Search_Function_THOR, TRANSFORM(ProfileBooster.ProfileBoosterV2_KEL.ECL_Functions.Layouts.LayoutInputPII, 
-	SELF.P_InpArchDt := history_date[1..6]+'01';
-	SELF.P_InpLexID := (INTEGER7)LEFT.LexID;
-	SELF.P_LexID := (INTEGER7)LEFT.LexID;
-	SELF.G_ProcUID := COUNTER;
-	SELF.P_InpAcct := LEFT.AcctNo;
-  SELF.P_InpClnArchDt := (STRING)history_date[1..6]+'01';
-	SELF := LEFT;
-	SELF := [];
-	), LOCAL);	
-PP := DISTRIBUTE(PP1, P_LexID);
+// PP1 := PROJECT(PB_Search_Function_THOR, TRANSFORM(ProfileBooster.ProfileBoosterV2_KEL.ECL_Functions.Layouts.LayoutInputPII, 
+// 	SELF.P_InpArchDt := history_date[1..6]+'01';
+// 	SELF.P_InpLexID := (INTEGER7)LEFT.LexID;
+// 	SELF.P_LexID := (INTEGER7)LEFT.LexID;
+// 	SELF.G_ProcUID := COUNTER;
+// 	SELF.P_InpAcct := LEFT.AcctNo;
+//   SELF.P_InpClnArchDt := (STRING)history_date[1..6]+'01';
+// 	SELF := LEFT;
+// 	SELF := [];
+// 	), LOCAL);	
+// PP := DISTRIBUTE(PP1, P_LexID);
 
-GLBA := 1; 
-DPPA := 1; 
+// GLBA := 1; 
+// DPPA := 1; 
 
-Options := MODULE(ProfileBooster.ProfileBoosterV2_KEL.Interface_Options)
-	EXPORT STRING AttributeSetName := 'Development KEL Attributes';
-	EXPORT STRING VersionName := 'Version 1.0';
-	EXPORT BOOLEAN isFCRA := FALSE;
-	EXPORT STRING ArchiveDate := history_date;
-	EXPORT STRING InputFileName := '';
-	EXPORT STRING Data_Restriction_Mask := DataRestrictionMask;
-	EXPORT STRING Data_Permission_Mask := DataPermissionMask;
-	EXPORT UNSIGNED GLBAPurpose := GLBA;
-	EXPORT UNSIGNED DPPAPurpose := DPPA;
-	EXPORT INTEGER ScoreThreshold := Score_threshold;
-	EXPORT BOOLEAN OutputMasterResults := FALSE;
-	EXPORT BOOLEAN isMarketing := TRUE; // When TRUE enables Marketing Restrictions
-END;
+// Options := MODULE(ProfileBooster.ProfileBoosterV2_KEL.Interface_Options)
+// 	EXPORT STRING AttributeSetName := 'Development KEL Attributes';
+// 	EXPORT STRING VersionName := 'Version 1.0';
+// 	EXPORT BOOLEAN isFCRA := FALSE;
+// 	EXPORT STRING ArchiveDate := history_date;
+// 	EXPORT STRING InputFileName := '';
+// 	EXPORT STRING Data_Restriction_Mask := DataRestrictionMask;
+// 	EXPORT STRING Data_Permission_Mask := DataPermissionMask;
+// 	EXPORT UNSIGNED GLBAPurpose := GLBA;
+// 	EXPORT UNSIGNED DPPAPurpose := DPPA;
+// 	EXPORT INTEGER ScoreThreshold := Score_threshold;
+// 	EXPORT BOOLEAN OutputMasterResults := FALSE;
+// 	EXPORT BOOLEAN isMarketing := TRUE; // When TRUE enables Marketing Restrictions
+// END;
 
-pbKelResult:= DISTRIBUTE(ProfileBooster.ProfileBoosterV2_KEL.FnThor_GetPB20Attributes(PP, Options),lexid); 
-finalWithKEL := JOIN(final(did<>0), pbKelResult(lexid<>-99999),
+// pbKelResult:= DISTRIBUTE(ProfileBooster.ProfileBoosterV2_KEL.FnThor_GetPB20Attributes(PP, Options),lexid); 
+finalWithKEL := final;
+/*
+JOIN(final(did<>0), pbKelResult(lexid<>-99999),
                      LEFT.did=RIGHT.lexid,
                      TRANSFORM(dx_ProfileBooster.Layouts.i_lexid,
                      //PROSPECT PURCHASE BEHAVIOUR
@@ -435,9 +438,9 @@ finalWithKEL := JOIN(final(did<>0), pbKelResult(lexid<>-99999),
                      SELF.PurchItemCntEv := RIGHT.PurchItemCntEv;
                      SELF.PurchAmtAvg := RIGHT.PurchAmtAvg;
                      SELF.PurchAge := RIGHT.PurchAge;
-                     // SELF.PurchDOB := RIGHT.PurchDOB;
+                     SELF.PurchDOB := RIGHT.PurchDOB;
                      SELF.PurchMarried := RIGHT.PurchMaritalStatus;
-                     // SELF.PurchGender := RIGHT.PurchGender;
+                     SELF.PurchGender := RIGHT.PurchGender;
                      SELF.PL_PurchMinDate := RIGHT.PL_PurchMinDate;
                      SELF.PL_PurchMaxDate := RIGHT.PL_PurchMaxDate;
                      SELF.PL_VehicleMinDate := RIGHT.PL_VehicleMinDate;
@@ -454,6 +457,7 @@ finalWithKEL := JOIN(final(did<>0), pbKelResult(lexid<>-99999),
                      SELF := RIGHT;
                      SELF := LEFT;
                      ), LEFT OUTER, KEEP(1), LOCAL);
+*/
 /*
  **********************
  *  Debugging Section *

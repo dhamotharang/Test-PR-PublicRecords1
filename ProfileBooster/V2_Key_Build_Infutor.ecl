@@ -10,7 +10,6 @@ export V2_Key_Build_Infutor := function
 																self.marital_status  := stringlib.stringtouppercase(left.orig_married),
 																self.gender 		 := stringlib.stringtouppercase(left.orig_gender), 
 																self.dob			 := left.clean_DOB,
-                                                                // self.dt_first_seen   := left.date_first_seen;
 																self.global_sid      := left.global_sid,
 																self.record_sid      := left.record_sid),
 											local);

@@ -684,7 +684,7 @@ EXPORT V2_getAttributes(DATASET(ProfileBooster.V2_Layouts.Layout_PB2_Shell) PB2S
     self.attributes.version2.IntSportPersonTravelerFlagEv	  := IF(noDid or isMinor, -99999, le.IntSportPersonTravelerFlagEv);	
     
     EmrgAge	                                                := MAP(noDid or isMinor                      => -99999, 
-                                                                   le.EmrgRecordType = ''                => -99998,
+                                                                   le.EmrgRecordType = '' or le.EmrgAge < 0 => -99998,
                                                                                                             MIN(le.EmrgAge,ProfileBooster.V2_Constants.Max99));	
     self.attributes.version2.EmrgAge                        := EmrgAge;
     self.attributes.version2.EmrgAtOrAfter21Flag	          := MAP(noDid or isMinor                      => -99999, 
@@ -735,8 +735,8 @@ EXPORT V2_getAttributes(DATASET(ProfileBooster.V2_Layouts.Layout_PB2_Shell) PB2S
     self.attributes.version2.HHSeniorMmbrCnt								:= IF(noDid or isMinor, -99999, MIN(HHSeniorMmbrCnt,ProfileBooster.V2_Constants.Max255));
     self.attributes.version2.HHElderlyMmbrCnt								:= IF(noDid or isMinor, -99999, MIN(HHElderlyMmbrCnt,ProfileBooster.V2_Constants.Max255));
     self.attributes.version2.HHMmbrCnt											:= IF(noDid or isMinor, -99999, MIN(le.HHMmbrCnt+1,ProfileBooster.V2_Constants.Max255)); //add 1 to include the prospect  
-    self.attributes.version2.HHEstimatedIncomeTotal					:= IF(noDid or isMinor, -99999, le.HHEstimatedIncomeTotal);
-    self.attributes.version2.HHEstimatedIncomeAvg					  := IF(noDid or isMinor, -99999, le.HHEstimatedIncomeAvg);
+    self.attributes.version2.HHEstimatedIncomeRange					:= IF(noDid or isMinor, -99999, le.HHEstimatedIncomeRange);
+    // self.attributes.version2.HHEstimatedIncomeAvg					  := IF(noDid or isMinor, -99999, le.HHEstimatedIncomeAvg);
     self.attributes.version2.HHMmbrWEduCollCnt 			        := IF(noDid or isMinor, -99999, MIN(le.HHMmbrWEduCollCnt,ProfileBooster.V2_Constants.Max255));
     self.attributes.version2.HHMmbrWEduCollEvidEvCnt 		    := IF(noDid or isMinor, -99999, MIN(le.HHMmbrWEduCollEvidEvCnt,ProfileBooster.V2_Constants.Max255));
     self.attributes.version2.HHMmbrWEduColl2YrCnt		        := IF(noDid or isMinor, -99999, MIN(le.HHMmbrWEduColl2YrCnt,ProfileBooster.V2_Constants.Max255));
@@ -1011,8 +1011,8 @@ EXPORT V2_getAttributes(DATASET(ProfileBooster.V2_Layouts.Layout_PB2_Shell) PB2S
   // attr := verificationFinal;
 
   //DEBUGGING
-  OUTPUT(CHOOSEN(PB2Shell, 100), named('V2_getAttr_In'));
-  OUTPUT(CHOOSEN(attr, 100), named('V2_getAttr_Out'));
+  // OUTPUT(CHOOSEN(PB2Shell, 100), named('V2_getAttr_In'));
+  // OUTPUT(CHOOSEN(attr, 100), named('V2_getAttr_Out'));
                                               
   return attr;	
 	

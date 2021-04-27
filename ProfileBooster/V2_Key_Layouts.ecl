@@ -65,6 +65,8 @@ EXPORT V2_Key_Layouts := MODULE
     STRING6 student_file_type := ProfileBooster.ProfileBoosterV2_KEL.ECL_Functions.Constants.NO_DATA_FOUND;
     STRING6 src := ProfileBooster.ProfileBoosterV2_KEL.ECL_Functions.Constants.NO_DATA_FOUND;
     ProspectDemographicEducation;
+	dx_ProfileBooster.Layouts.ProspectEmergence;
+	dx_ProfileBooster.Layouts.ProspectEmergenceHelpers;
   END;
   EXPORT Layout_PB2_Slim_vehicles := RECORD
 	Layout_PB2_Slim;
