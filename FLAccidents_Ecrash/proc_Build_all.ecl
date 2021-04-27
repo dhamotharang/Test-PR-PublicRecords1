@@ -47,7 +47,7 @@ string timestamp := mod_Utilities.StrSysSeconds : independent;
 orbit_date := (integer) filedate[1..8];
 prOrbitCreateBuild := map(ut.Weekday(orbit_date) = 'SUNDAY' and morning = 'yes' =>  Orbit3.proc_Orbit3_CreateBuild ( 'Accident Reports - ECrashV2 National',filedate),
 									        ut.Weekday(orbit_date) = 'FRIDAY' and morning = 'no' =>  Orbit3.proc_Orbit3_CreateBuild ( 'Accident Reports - ECrashV2 National',filedate), 
-									        ut.Weekday(orbit_date)  in [ 'MONDAY','TUESDAY','WEDNESDAY','THURSDAY']  =>  Orbit3.proc_Orbit3_CreateBuild_AddItem ( 'Accident Reports - ECrashV2 National',filedate), 
+									        ut.Weekday(orbit_date)  in [ 'MONDAY','TUESDAY','WEDNESDAY','THURSDAY']  =>  Orbit3.proc_Orbit3_CreateBuild ( 'Accident Reports - ECrashV2 National',filedate), 
 									        output('No_Orbit_Entry_needed_PREcrashV2')
 								         );												 
 insOrbitCreateBuildEcrashCruDelta := if(ut.Weekday(orbit_date) not in ['SATURDAY','SUNDAY'] and morning = 'no', 
