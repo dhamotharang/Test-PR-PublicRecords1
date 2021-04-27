@@ -1,4 +1,4 @@
-﻿import std, PromoteSupers, wk_ut;
+﻿import std, PromoteSupers, wk_ut,INQL_V2;
 
 export proc_BuildBases(string version = '', boolean isFCRA = false, boolean pDaily = true) := function
 	
@@ -9,13 +9,16 @@ export proc_BuildBases(string version = '', boolean isFCRA = false, boolean pDai
 	
   notify_post_ecl					:= 'notify(INQL_v2._CRON_ECL(\'BASE POST\',' + isFCRA + ',true).EVENT_NAME, \'*\');';
 	     	
-  nonfcra_daily_build    		:= 		sequential(
-																		 INQL_v2.Build_Base(nonfcra_daily_version, false, true).inql_all  						
-																		,INQL_v2.Build_Base(nonfcra_daily_version, false, true).SBA_all		
-																		,INQL_v2.Build_Base(nonfcra_daily_version, false, true).Batch_PIIs_all
-																		,INQL_v2.MOVE_FILES(false,true,'weekly').Base_To_Building
-																		,wk_ut.CreateWuid(notify_post_ecl, INQL_v2._Constants.NONFCRA_THOR, INQL_v2._Constants.NON_FCRA_ESP)
-																		);
+  nonfcra_daily_build    		:= sequential(
+	                                             IF( INQL_v2._Flags(isFCRA,version).NonFCRA_Daily_Base_Consolidate_ToBuild,
+												     INQL_v2.Build_Base(nonfcra_daily_version, false, true).inql_all,
+													 INQL_v2.Build_Base(nonfcra_daily_version, false, true).inql_delta)
+													,INQL_v2.Build_Base(nonfcra_daily_version, false, true).inql_DidVille
+													,INQL_v2.Build_Base(nonfcra_daily_version, false, true).SBA_all		
+													,INQL_v2.Build_Base(nonfcra_daily_version, false, true).Batch_PIIs_all
+													,INQL_v2.MOVE_FILES(false,true,'weekly').Base_To_Building
+													,wk_ut.CreateWuid(notify_post_ecl, INQL_v2._Constants.NONFCRA_THOR, INQL_v2._Constants.NON_FCRA_ESP)
+												);
 	
 	nonfcra_history_build 		:= 	sequential(
 																			 INQL_v2.Build_Base(nonfcra_weekly_version, false, false).inql_all
