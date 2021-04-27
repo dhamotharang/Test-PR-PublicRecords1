@@ -71,17 +71,18 @@ EXPORT Update_Base (string version, boolean isFCRA = false, boolean pDaily = tru
 
 //  fcra and nonfcra-without-didvile daily base 	
     CurrBase_NO_DidVille    := CurrBase_with_DIDVILLE(search_info.function_description <> 'DIDVILLE.DIDBATCHSERVICERAW');
-    CurrBase        				:= if(isFCRA, CurrBase_with_DIDVILLE, CurrBase_NO_DidVille);		
-		prevBase        				:= inql_v2.Flush_DeployedData(isFCRA).bld;
-		newBase         				:= CurrBase + prevBase;
+        Export DeltaBase        		:= if(isFCRA, CurrBase_with_DIDVILLE, CurrBase_NO_DidVille);		
+		prevBase        				:= inql_v2.Flush_DeployedData(isFCRA).bld;	
+		newBase         				:= Deltabase + prevBase;
 		filtered_newBase 				:= distribute(FN_Filter_Base(newBase));
 		export INQL_ALL 				:= filtered_newBase;
+		
 
 //  nonfcra-didville-only daily base
-		CurrBase_DidVille_Only 	:= CurrBase_with_DIDVILLE(search_info.function_description = 'DIDVILLE.DIDBATCHSERVICERAW');
-		prevBaseDidVille 				:= inql_v2.Flush_DeployedData(false,true).bld;
-		newBaseDidVille  				:= CurrBase_DidVille_Only + prevBaseDidVille;
-    export INQL_DidVille 		:= newBaseDidVille;
+	EXPORT DeltaBase_DidVille_Only     	:= CurrBase_with_DIDVILLE(search_info.function_description = 'DIDVILLE.DIDBATCHSERVICERAW');
+		   prevBaseDidVille 			:= inql_v2.Flush_DeployedData(false,true).bld;
+		   newBaseDidVille  			:= DeltaBase_DidVille_Only + prevBaseDidVille;
+    export INQL_DidVille 	        	:= newBaseDidVille;
 		
 //  non-fcra weekly base		
 		INQL_v2.File_MBSApp_base(version, isDidville).Append(outMBSBaseAppend);
@@ -94,7 +95,7 @@ EXPORT Update_Base (string version, boolean isFCRA = false, boolean pDaily = tru
 //  fcra weekly base    
 		fcra_full_base := INQL_v2.files(true, false).INQL_base.built + INQL_v2.files(true, true).INQL_base.built;
 		INQL_v2.File_MBSApp_Base().FCRA_Append(fcra_full_base,fcra_full_base_mbs);
-    fcra_full_base_new  := project(fcra_full_base_mbs, transform(INQL_v2.Layouts.Common_ThorAdditions, self := left));
+        fcra_full_base_new  := project(fcra_full_base_mbs, transform(INQL_v2.Layouts.Common_ThorAdditions, self := left));
     
 		export INQL_HIST     := if(isfcra,distribute(fcra_full_base_new), nonfcra_full_base_new);
     
