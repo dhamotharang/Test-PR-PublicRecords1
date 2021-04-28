@@ -31,13 +31,16 @@ EXPORT out_rec SmartLinxReport (dataset (doxie.layout_references) dids,
 	pers := PersonReports.Person_records (dids, mod_access, persMod, IsFCRA);
    // verified field value already added at this point in next line
       bestAddr := pers.SubjectAddresses;
-      // initialAddrList := pers.address_orig_debug(did = subject_did);
+      initialAddrList := pers.address_original(did = subject_did);
+      // done to keep TNT value since addressHierarchy is turned on for this smart linx report service query.
+      initialAddrListSlim :=  IF (mod_smartlinx.DoAddrHierarchy,  PROJECT(initialAddrList(did = subject_did), TRANSFORM({INTEGER3 address_seq_no; STRING1 tnt;}, SELF := LEFT))
+                                                  );
     //
  	tmpbest_rec_esdl :=       pers.bestrecs_esdl[1]; // best record  this is a record not a dataset???????
 	Old_best_rec :=            pers.bestrecs[1];
     // boolean doAddressHier := mod_smartlinx.DoAddrHierarchy;
      // updating both best recs to use address hierarchy 'address' results.                                         
-     best_rec :=  if (mod_smartlinx.DoAddrHierarchy,
+     best_rec :=  IF (mod_smartlinx.DoAddrHierarchy,
                                         PROJECT(Old_best_rec, TRANSFORM(RECORDOF(Old_best_rec),
                                SELF.prim_range :=  bestAddr[1].AddressEx.StreetNumber;
                                SELF.prim_name := bestAddr[1].AddressEx.Streetname;
@@ -137,13 +140,21 @@ EXPORT out_rec SmartLinxReport (dataset (doxie.layout_references) dids,
   END;
 
          subject_addrs_TNTsort := ROLLUP(SORT(subject_addrs_TNT_dups, seq), LEFT.seq = RIGHT.seq, compressSeq(LEFT, RIGHT)); 
+         subject_addrs_TNTAddressHier :=  JOIN(subject_addrs_TNTsort, InitialAddrListSlim,
+                                                                                    LEFT.seq = RIGHT.Address_seq_no,
+                                                                                    TRANSFORM(seq_rec,
+                                                                                    SELF.tnt := RIGHT.TNT;
+                                                                                    SELF := LEFT), LIMIT(0), KEEP(1));
+                                                                                    
+       subject_addrs_tntSortFinal := IF (mod_smartlinx.DoAddrHierarchy,   subject_addrs_TNTAddressHier,  subject_addrs_TNTsort);
 	iesp.smartlinxreport.t_SLRAddressBpsSeq setSequence( seq_rec  l, integer c ) := transform
 	     self.addressSequence := c;                
-          self.verified := l.tnt in ['B','C','V'];
+          self.verified := if (mod_smartlinx.DoAddrHierarchy, l.tnt in['B','V'],
+                                         l.tnt in ['B','C','V']);
 			self := l;
 	end;
 
-	s_addressesSequence := project( subject_addrs_TNTsort, setSequence(LEFT,COUNTER));   
+	s_addressesSequence := project( subject_addrs_tntSortFinal, setSequence(LEFT,COUNTER));   
      s_addresses_current := s_addressesSequence(addressSequence = 1);
 	s_addresses_prior := s_addressesSequence(addressSequence  <> 1);
 	s_addresses_current_count := count(s_addresses_current);
@@ -539,9 +550,11 @@ EXPORT out_rec SmartLinxReport (dataset (doxie.layout_references) dids,
   individual := dataset ([Format ()]); // is supposed to produce one row only (usebestdid = true)
    // output(doAddressHier, named('doAddressHierDebug'));
     // output(initialAddrList, named('initialAddrList'));
+ 
     // output(subject_addrs_plus, named('subject_addrs_plus'));
     // output(subject_addrs_hhid, named('subject_addrs_hhid'));
     // output(subject_addrs_TNT_dups, named('subject_addrs_TNT_dups'));
     // output(subject_addrs_TNTsort, named('subject_addrs_TNTsort'));
+    // output(subject_addrs_TNTAddressHier, named('subject_addrs_TNTAddressHier'));
 	return individual;
 END;
