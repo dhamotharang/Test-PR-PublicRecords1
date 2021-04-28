@@ -13,7 +13,7 @@ roxieIP := riskwise.shortcuts.prod_batch_analytics_roxie;
 
 unsigned record_limit 	:= 0;   //number of records to process from input file; 0 means ALL
 unsigned eyeball        := 10;  //number of records to display in outputs
-unsigned Threads        := 11;  //number of threads to use in the soapcall (11 = 33 on 3-way)
+unsigned Threads        := 3;   // when running 1 file threads =7, when running 2 files threads=3 //to prevent overloading IDA production systems
 unsigned retrys         := 0 ;  //number of retrys in the soapcall
 
 //fail if we're going to be running too many threads

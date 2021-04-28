@@ -3,22 +3,24 @@
 //as we are targeting their production system. Try to keep the load around 40 TPS.                            //
 //============================================================================================================//
 
-#workunit('name', 'RiskView V5 and IDA attrs');
+#workunit('name', 'IDA RiskView 50');
 
 IMPORT IESP, RiskWise, RiskView, Risk_Indicators, gateway, Data_Services, STD;
 
-eyeball := 100;
-
-recordsToRun := 0; // Set to 0 or -1 to run ALL records in the file
-threads := 10; // 1 - 30
-Riskwise.shortcuts.check_thread_count(threads, 60);
-
+//----------------
+//  ROXIE TARGET
+//----------------
+FCRARoxieIP := RiskWise.shortcuts.prod_batch_fcra;
+NeutralRoxieIP := RiskWise.shortcuts.prod_batch_neutral;
 // FCRARoxieIP := RiskWise.shortcuts.Dev156;
 // NeutralRoxieIP := RiskWise.shortcuts.staging_neutral_roxieIP;
 
-FCRARoxieIP := RiskWise.shortcuts.prod_batch_fcra;
-NeutralRoxieIP := RiskWise.shortcuts.prod_batch_neutral;
+eyeball := 100;
+recordsToRun := 0; // Set to 0 or -1 to run ALL records in the file
+threads := 3; // when running 1 file threads =7, when running 2 files threads=3 //to prevent overloading IDA production systems
+Riskwise.shortcuts.check_thread_count(threads, 40); // if total thread count is over 40 prevent the job from kicking off
 
+//Models being requested
 model1 := 'RVA1503_0'; // Riskview 50 Auto Flagship model (RVA1503_0)
 model2 := 'RVB1503_0'; // Riskview 50 Bankcard Flagship model (RVB1503_0)
 model3 := 'RVG1502_0'; // Riskview 50 Short term lending Flagship model (RVG1502_0)
@@ -47,7 +49,8 @@ DataRestrictionMask := '100001000100010000000000'; // to restrict fares, experia
 OverrideHistoryDate := '0'; // set to '0' to use the history date located on our inputFile, 
                             // set to blank to run current mode
                             // set to anything else to use this historydate
-                            
+            
+//---------------- FILE NAMES -----------------
 //We shouldn't return IDA attrs to customers so put a note in the file name so we know what's in it
 file_suffix1 := IF(attributesVersion = 'riskviewattrv5nfs1', 'with_IDA_attrs_', '');
 file_suffix2 := IF(IncludeLiensJudgments, 'with_JuLi_', '');
@@ -195,7 +198,7 @@ END;
 
 soapResults_raw := SOAPCALL(soapInput, 
 				FCRARoxieIP,
-				'RiskView.Search_Service.166', 
+				'RiskView.Search_Service', 
 				{soapInput}, 
 				DATASET(xlayout),
         RETRY(1), TIMEOUT(500),
