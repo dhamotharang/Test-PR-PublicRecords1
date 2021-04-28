@@ -336,10 +336,10 @@ company_fein_base               := {UNSIGNED6 linkid;DATASET(BIPV2_Best.Layouts.
 company_url_base                := {UNSIGNED6 linkid;DATASET(BIPV2_Best.Layouts.company_url_case_layout) company_url};
 company_incorporation_date_base := {UNSIGNED6 linkid;DATASET(BIPV2_Best.Layouts.company_incorporation_date_layout) company_incorporation_date;};
 company_duns_number_base        := {UNSIGNED6 linkid;DATASET(BIPV2_Best.Layouts.duns_number_case_layout) duns_number;};
-sic_code_base                   := {UNSIGNED6 linkid;DATASET(BIPV2_Best.Layouts.sic_code_case_layout) sic_code;};
-naics_code_base                 := {UNSIGNED6 linkid;DATASET(BIPV2_Best.Layouts.naics_code_case_layout) naics_code;};
-employee_count_base             := {UNSIGNED6 linkid;DATASET(BIPV2_Best.Layouts.employee_count_case_layout) employee_count;};
-sales_base                      := {UNSIGNED6 linkid;DATASET(BIPV2_Best.Layouts.sales_case_layout) sales;};
+sic_code_base                   := {UNSIGNED6 linkid;DATASET(BIPV2_Best.Layouts.sic_code_case_base_layout) sic_code;};
+naics_code_base                 := {UNSIGNED6 linkid;DATASET(BIPV2_Best.Layouts.naics_code_case_base_layout) naics_code;};
+employee_count_base             := {UNSIGNED6 linkid;DATASET(BIPV2_Best.Layouts.employee_count_case_base_layout) employee_count;};
+sales_base                      := {UNSIGNED6 linkid;DATASET(BIPV2_Best.Layouts.sales_case_base_layout) sales;};
 dba_base                        := {UNSIGNED6 linkid;DATASET(BIPV2_Best.Layouts.dba_name_case_layout) dba_name;};
 //****************Denormalize name
 company_name_flat_ded := DEDUP(SORT(DISTRIBUTE(company_name_flat,HASH(linkid)),linkid,LOCAL),linkid,LOCAL);
@@ -478,7 +478,7 @@ duns_denorm := DENORMALIZE(duns_number_flat_ded,duns_number_grp,LEFT.linkid=RIGH
 sic_code_flat_ded := DEDUP(SORT(DISTRIBUTE(norm_sic,HASH(linkid)),linkid,LOCAL),linkid,LOCAL);
 sic_code_grp      := SORT(DISTRIBUTE(norm_sic,HASH(linkid)),linkid,LOCAL);
 sic_code_base t_sic_denorm(sic_code_grp le,DATASET(RECORDOF(sic_code_grp)) ri) := TRANSFORM
-  BIPV2_Best.Layouts.sic_code_case_layout t_sic(sic_code_grp le,DATASET(RECORDOF(sic_code_grp)) ri) := TRANSFORM
+  BIPV2_Best.Layouts.sic_code_case_base_layout t_sic(sic_code_grp le,DATASET(RECORDOF(sic_code_grp)) ri) := TRANSFORM
     SELF := le;
   END;
   SELF.sic_code := SORT(DEDUP(SORT(DENORMALIZE(ri,ri,LEFT.company_sic_code1=RIGHT.company_sic_code1,GROUP,t_sic(LEFT, ROWS(RIGHT))),RECORD),ALL),company_sic_code1_method)(company_sic_code1_method>0)[1..20];
@@ -489,7 +489,7 @@ sic_denorm := DENORMALIZE(sic_code_flat_ded,sic_code_grp,LEFT.linkid=RIGHT.linki
 naics_code_flat_ded := DEDUP(SORT(DISTRIBUTE(norm_naics,HASH(linkid)),linkid,LOCAL),linkid,LOCAL);
 naics_code_grp      := SORT(DISTRIBUTE(norm_naics,HASH(linkid)),linkid,LOCAL);
 naics_code_base t_naics_denorm(naics_code_grp le,DATASET(RECORDOF(naics_code_grp)) ri) := TRANSFORM
-  BIPV2_Best.Layouts.naics_code_case_layout t_naics(naics_code_grp le,DATASET(RECORDOF(naics_code_grp)) ri) := TRANSFORM
+  BIPV2_Best.Layouts.naics_code_case_base_layout t_naics(naics_code_grp le,DATASET(RECORDOF(naics_code_grp)) ri) := TRANSFORM
     SELF := le;
   END;
   SELF.naics_code := SORT(DEDUP(SORT(DENORMALIZE(ri,ri,LEFT.company_naics_code1=RIGHT.company_naics_code1,GROUP,t_naics(LEFT, ROWS(RIGHT))),RECORD),ALL),company_naics_code1_method)(company_naics_code1_method>0)[1..20];
@@ -500,7 +500,7 @@ naics_denorm := DENORMALIZE(naics_code_flat_ded,naics_code_grp,LEFT.linkid=RIGHT
 employee_count_flat_ded := DEDUP(SORT(DISTRIBUTE(norm_employee_count,HASH(linkid)),linkid,LOCAL),linkid,LOCAL);
 employee_count_grp      := SORT(DISTRIBUTE(norm_employee_count,HASH(linkid)),linkid,LOCAL);
 employee_count_base t_employee_cnt_denorm(employee_count_grp le,DATASET(RECORDOF(employee_count_grp)) ri) := TRANSFORM
-  BIPV2_Best.Layouts.employee_count_case_layout t_employee_count(employee_count_grp le,DATASET(RECORDOF(employee_count_grp)) ri) := TRANSFORM
+  BIPV2_Best.Layouts.employee_count_case_base_layout t_employee_count(employee_count_grp le,DATASET(RECORDOF(employee_count_grp)) ri) := TRANSFORM
     SELF := le;
   END;
   SELF.employee_count := SORT(DEDUP(SORT(DENORMALIZE(ri,ri,LEFT.employee_count=RIGHT.employee_count,GROUP,t_employee_count(LEFT, ROWS(RIGHT))),RECORD),ALL),employee_count_method)(employee_count_method>0);
@@ -511,7 +511,7 @@ employee_count_denorm := DENORMALIZE(employee_count_flat_ded,employee_count_grp,
 sales_flat_ded := DEDUP(SORT(DISTRIBUTE(norm_sales,HASH(linkid)),linkid,LOCAL),linkid,LOCAL);
 sales_grp      := SORT(DISTRIBUTE(norm_sales,HASH(linkid)),linkid,LOCAL);
 sales_base t_sales_denorm(sales_grp le,DATASET(RECORDOF(sales_grp)) ri) := TRANSFORM
-  BIPV2_Best.Layouts.sales_case_layout t_sales(sales_grp le,DATASET(RECORDOF(sales_grp)) ri) := TRANSFORM
+  BIPV2_Best.Layouts.sales_case_base_layout t_sales(sales_grp le,DATASET(RECORDOF(sales_grp)) ri) := TRANSFORM
     SELF := le;
   END;
   SELF.sales := SORT(DEDUP(SORT(DENORMALIZE(ri,ri,LEFT.sales=RIGHT.sales,GROUP,t_sales(LEFT, ROWS(RIGHT))),RECORD),ALL),sales_method)(sales_method>0);

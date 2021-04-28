@@ -66,6 +66,6 @@ module(
   export Add_Extra_Source_Fields := true;                    // -- add the extra source fields for sic,naics,employees,contact name. also executive ind & age for contacts.
   
   export Pull_From_Best_File    := true;                    // -- pull sic,naics,employees & revenue from the best file instead of the individual source files.
-  export Best_Has_Source_Fields := false;                   // -- pull sic,naics,employees & revenue from the best file instead of the individual source files.
+  export Best_Has_Source_Fields := true;                   // -- pull sic,naics,employees & revenue from the best file instead of the individual source files.
 
 end;

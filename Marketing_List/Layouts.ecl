@@ -26,20 +26,24 @@ module
     string60                  business_email      ;
     integer                   annual_revenue      ;
     string2                   src_revenue         ;
+    unsigned                  revenue_sources     ; //number of sources competing to populate the annual_revenue field
     integer                   number_of_employees ;
     string2                   src_employees       ;
+    unsigned                  employees_sources   ; //number of sources competing to populate the number_of_employees field
     string4                   SIC_Primary         ;
     string4                   SIC2                ;
     string4                   SIC3                ;
     string4                   SIC4                ;
     string4                   SIC5                ;
     string2                   src_sics            ;
+    unsigned                  sic_sources         ; //number of sources competing to populate the sic/naics codes
     string6                   NAICS_Primary       ;
     string6                   NAICS2              ;
     string6                   NAICS3              ;
     string6                   NAICS4              ;
     string6                   NAICS5              ;
     string2                   src_naics           ;
+    unsigned                  naics_sources       ; //number of sources competing to populate the sic/naics codes
   end;
 
   // export business_information := 
@@ -74,6 +78,7 @@ module
     unsigned4             Age                   ;
     unsigned              executive_ind         ;
     string2               src_name              ;
+    unsigned              name_sources          ;
 
    // -- new
     unsigned4             dt_first_seen         ;
@@ -152,20 +157,24 @@ module
     string60              business_email      ;
     unsigned              annual_revenue      ;
     string2               src_revenue         ;
+    unsigned              revenue_sources     ; //number of sources competing to populate the annual_revenue field
     unsigned              number_of_employees ;
     string2               src_employees       ;
+    unsigned              employees_sources   ; //number of sources competing to populate the number_of_employees field
     string4               SIC_Primary         ;
     string4               SIC2                ;
     string4               SIC3                ;
     string4               SIC4                ;
     string4               SIC5                ;
     string2               src_sics            ;
+    unsigned              sic_sources         ; //number of sources competing to populate the sic/naics codes
     string6               NAICS_Primary       ;
     string6               NAICS2              ;
     string6               NAICS3              ;
     string6               NAICS4              ;
     string6               NAICS5              ;
     string2               src_naics           ;
+    unsigned              naics_sources       ; //number of sources competing to populate the sic/naics codes
 
   end;
 
