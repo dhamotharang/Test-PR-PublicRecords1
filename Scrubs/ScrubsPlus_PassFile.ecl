@@ -104,8 +104,8 @@ IMPORT tools,std,ut,SALT311;
 	NumExceedThreshold:=count(IdentifyExceedThreshold);
 	NumExceedSevere:=count(IdentifyExceedSevere);	
 	
-	bitfile_name		:=	'~thor_data::'+scope_datasetName+'::Scrubs_Bits'+if(filedate<>'','::'+filedate,'');;
-	processedfile_name		:=	'~thor_data::'+scope_datasetName+'::Processed_File'+if(filedate<>'','::'+filedate,'');;
+	bitfile_name		:=	'~thor_data::'+scope_datasetName+'::Scrubs_Bits'+if(filedate<>'','::'+filedate,'');
+	processedfile_name		:=	'~thor_data::'+scope_datasetName+'::Processed_File'+if(filedate<>'','::'+filedate,'');
 	CreateBitmaps		:=	OUTPUT( N.BitmapInfile,,bitfile_name, OVERWRITE, compressed, named(scope_datasetName+'_BitFile_'),EXPIRE(7)); // long term storage
 	#if(UseOnFail)
 	CreateProcessed		:=	OUTPUT( N.ProcessedInfile,,processedfile_name, OVERWRITE, compressed, named(scope_datasetName+'_ProcessedInfile_'),EXPIRE(7)); // long term storage	
