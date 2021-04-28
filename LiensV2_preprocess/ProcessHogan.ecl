@@ -170,7 +170,8 @@ sysdate := (string)STD.date.today();
 	
 	LiensV2.Layout_Liens_Hogan xfmDefName(CleanDef L) := TRANSFORM
 		isCompany 	:= IF(L.INDIVBUSUN ='I' AND (TRIM(L.AKA_YN) = '' OR L.AKA_YN = 'I'),'0','1');
-		self.clean_def_pname				:= MAP(L.nametype IN person_flags and L.generation <> '' => L.cln_title+L.cln_fname+L.cln_mname+L.cln_lname+L.generation+'  ',
+		//DF-29156 - Use OKC generation when available instead of cln suffix.
+		self.clean_def_pname				:= MAP(L.nametype IN person_flags and L.generation <> '' => L.cln_title+L.cln_fname+L.cln_mname+L.cln_lname+L.generation+'  ', 
 		                                   L.nametype IN person_flags and L.generation  = '' => L.cln_title+L.cln_fname+L.cln_mname+L.cln_lname+L.cln_suffix+'  ',
 		                                   '');
 		self.clean_def_cname				:= IF(isCompany = '1' OR L.nametype IN business_flags, L.DEFNAME,'');
