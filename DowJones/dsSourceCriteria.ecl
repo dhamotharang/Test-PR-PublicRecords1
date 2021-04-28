@@ -2025,7 +2025,18 @@ EXPORT dsSourceCriteria := DATASET([
 {'EC (CFSP) 2021/595 Iran List','2012'},
 {'EC 2021/584 Iran List','2013'},
 {'EC 2021/587 Iran List','2014'},
-{'Finland National Asset Freeze List','2015'}
+{'Finland National Asset Freeze List','2015'},
+{'EC (CFSP) 2021/613 ISIL (Da\'esh) and Al-Qaeda List','2016'},
+{'EC (CFSP) 2021/636 Central African Republic List','2017'},
+{'EC (CFSP) 2021/639 Myanmar/Burma List','2018'},
+{'EC 2021/589 ISIL (Da\'esh) and Al-Qaida List','2019'},
+{'EC 2021/612 ISIL (Da\'esh) and Al-Qaida List','2020'},
+{'EC 2021/628 Central African Republic List','2021'},
+{'EC 2021/638 Myanmar/Burma List','2022'},
+{'OFAC - Non-SDN CCMC Identifiers List','2023'},
+{'US Department of Defense FY99 NDAA 1237 Report','2024'},
+{'US Executive Order 13959','2025'},
+{'FCA (UK) Unregistered Cryptoasset Businesses List','2026'}
 
 ],r);
 

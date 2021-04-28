@@ -1430,6 +1430,9 @@
 				trim(kword, left, right) = 'PTCMVM-AJC' =>SubGroup_Constants.numKeywordsID.KEYWORD_PTCMVM_AJC,
 				trim(kword, left, right) = 'PTCMVM-DWN' =>SubGroup_Constants.numKeywordsID.KEYWORD_PTCMVM_DWN,
 				trim(kword, left, right) = 'FINMA-DU' =>SubGroup_Constants.numKeywordsID.KEYWORD_FINMA_DU,
+				trim(kword, left, right) = 'ARGBA-MW' =>SubGroup_Constants.numKeywordsID.KEYWORD_ARGBA_MW,
+				trim(kword, left, right) = 'ARMS-MW' =>SubGroup_Constants.numKeywordsID.KEYWORD_ARMS_MW,
+				trim(kword, left, right) = 'ARRNR-MW' =>SubGroup_Constants.numKeywordsID.KEYWORD_ARRNR_MW,
 								
 				//When setting the keyword export use underscores for dashes (ex: For RBI-SANC, use RBI_SANC)	
 				

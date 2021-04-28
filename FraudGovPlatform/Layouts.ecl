@@ -565,24 +565,6 @@ EXPORT Layouts := MODULE
 			string    bill_country_code;
 		END;
 
-		Export	MbsVelocityRules		:= record
-			unsigned6 ruleNum;
-			unsigned6	gc_id;
-			string60	fragment;
-			string100 fragment_description;
-			string60	contributionType;
-			string100	contributionTypeDescription;
-			unsigned2 fragment_weight;
-			unsigned2	category_weight;
-			unsigned2	minCnt;
-			unsigned2	maxTime;
-			string20	timeUnit;
-			unsigned2	status;
-			string25	date_added;
-			string25	date_changed;
-			string60	user_added;
-			string60	user_changed;
-		END;
 	END;
 
 	EXPORT address_cleaner :=
@@ -3509,4 +3491,215 @@ end;
 
  END;
  //End BocaShell Layout
+ 
+ export keybuild  
+:= 
+   record ,maxLength(60000)
+// primary record 
+	unsigned8 	 			Record_ID;
+	string12 				  Customer_ID; // global company id
+	string12 				  Sub_Customer_ID ;// company id 
+	string60          Vendor_ID ;
+  string60          offender_key; 
+	string12    		  Sub_Sub_Customer_ID;
+	string20    			Customer_Event_ID;
+	string12     			Sub_Customer_Event_ID;
+	string12    			Sub_Sub_Customer_Event_ID;
+	string12 					LN_Product_ID;
+	string12 					LN_Sub_Product_ID;
+	string12 					LN_Sub_Sub_Product_ID;
+	string12 					LN_Product_Key;// (ID)
+	string8 					LN_Report_Date;
+	string10 					LN_Report_Time;
+	string8						Reported_Date;
+	string10  				Reported_Time;
+	string8 					Event_Date;
+	string10  				Event_End_Date;
+	string75  				Event_Location;
+	string75 					Event_Type_1;
+	string75  				Event_Type_2;
+	string75  				Event_Type_3;
+//ENTITY CHARACTERISTICS
+	string20 					Household_ID;
+	string250    			Reason_Description;
+	string25					Investigation_Referral_Case_ID;
+	string8						Investigation_Referral_Date_Opened;
+	string8						Investigation_Referral_Date_Closed;
+	string20					Customer_Fraud_Code_1;
+	string20					Customer_Fraud_Code_2;
+	string25					Type_of_Referral;
+	string50					Referral_Reason;
+	string25					Disposition;
+	string3						Mitigated;
+	string10					Mitigated_Amount;
+	string20					External_Referral_or_CaseNumber;
+	string5						Fraud_Point_Score;
+// Entity 
+// Person 
+	string20					  Customer_Person_ID;
+	string50						raw_title;
+	string100						raw_First_Name;
+	string60						raw_Middle_Name;
+	string100						raw_Last_Name;
+	string10 						raw_Orig_Suffix;
+	string100           raw_Full_name; 
+	string10						SSN;
+	string10						DOB;
+	string25						Drivers_License;
+	string2 						Drivers_License_State;
+	string8						  Person_Date;
+	string10						Name_Type;
+	string10            income; 
+	string5             own_or_rent; 
+	unsigned8           Rawlinkid;  
+// Address 
+	string100						Street_1;
+	string50						Street_2;
+	string100						City;
+	string10						State;
+	string10						Zip;
+	string20						GPS_coordinates;
+	string10						Address_Date;
+	string10						Address_Type;
+	unsigned6 				  Appended_Provider_ID ;
+  unsigned8           lnpid; 
+	string100    				Business_Name;
+	string10						TIN;
+	string10						FEIN;
+	string10						NPI;
+	string25						Business_Type_1;
+	string25						Business_Type_2;
+	string10						Business_Date;
+	// CONTACT NUMBER
+	//string						Contact_Number;
+	string12           phone_number ; 
+	string12           cell_phone; 
+	string12           Work_phone ; 
+	string10					 Contact_Type;
+	string8						 Contact_Date;
+	string25					 Carrier;
+	string25					 Contact_Location;
+	string25					 Contact;   // Individual or business associated with number
+	string25					 Call_records;
+	string1 					 In_service;
+// EMAIL ADDRESS
+	string50					Email_Address ;
+	string10					Email_Address_Type ;
+	string8						Email_Date ;
+	string						Host ;
+	string25					Alias ;
+	string25					Location ;
+// IP ADDRESS
+	string25					IP_Address;
+	string8						IP_Address_Date;
+	string10					Version;
+	string10					Class;
+	string10					Subnet_mask;
+	string2						Reserved;
+	string75					ISP;
+// DEVICE
+	string50					Device_ID;
+	string8 					Device_Date;
+	string20					Unique_number;// (IMEI, MEID, ESN, IMSI)   
+	string25					MAC_Address;
+	string20					Serial_Number;
+	string25					Device_Type ; 
+	string25          Device_identification_Provider; 
+// TRANSACTION (case, claim, policy,...)
+	string					  Transaction_ID;
+	string10					Transaction_Type;
+	string12					Amount_of_Loss;
+// LICENSED PROFESSIONAL (LP)
+	string12					Professional_ID; //(NPI, EIN, PTIN, state bar number)
+	string50					Profession_Type;
+	string12					Corresponding_Professional_IDs;
+	string2						Licensed_PR_State;
+//Vehicle
+  string25        VIN := ''; 
+	// Classification // per source mapped at record level
+  Classification.source                  classification_source; 
+	Classification.Activity                classification_Activity;
+	Classification.Entity                  classification_Entity;
+	Classification.Permissible_use_access  classification_Permissible_use_access;
+  unsigned8         UID ; 
+	string100		      Source; 
+	unsigned4         process_date ; 
+	unsigned4         dt_first_seen;
+	unsigned4         dt_last_seen;
+	unsigned4         dt_vendor_last_reported;
+	unsigned4         dt_vendor_first_reported;
+	unsigned6         source_rec_id;
+	//clean person
+	Address.Layout_Clean_Name						cleaned_name;     
+	unsigned8       	NID:=0;       // name cleaner ID
+	unsigned2       	name_ind:=0;  // name indicator bitmap
+	//Clean address 
+	Address.Layout_Clean182_fips				clean_address						;
+	string100         address_1 ;   
+	string50          address_2 ; 
+	unsigned8         RawAID := 0;     //address id 
+	unsigned8         AceAID := 0; 
+	unsigned2         Address_ind:=0;  // address indicator bitmap
+	unsigned6 				did ; 
+	unsigned1					did_score;	
+// Business 
+  string100       	clean_business_name;
+	unsigned6 				Bdid ; 
+	unsigned1					bdid_score ; 
+	bipv2.IDlayouts.l_xlink_ids;
+	clean_phones      clean_phones ; 	
+// FraudGovPlatform	IDDT & KNFD 	
+	string1						head_of_household_indicator := '';
+	string20					relationship_indicator := '';
+	string3						county := ''; //   County/Parish ???
+	address_cleaner		additional_address;	
+	string10					clean_SSN :='';
+	string10					clean_Zip :='';
+	string25					clean_IP_Address :='';
+	string10					clean_dob :='';
+
+// FraudGovPlatform	IdentityData
+	string1						Race := '';
+	string1						Ethnicity := '';
+	string20					bank_routing_number_1 := '';
+	string20					bank_account_number_1 := '';
+	string20					bank_routing_number_2 := '';
+	string20					bank_account_number_2 := '';
+
+// FraudGovPlatform	KnownFraud
+	string30					reported_by := '';
+	string60					name_risk_code := '';
+	string60					ssn_risk_code := '';
+	string60					dob_risk_code := '';
+	string60					drivers_license_risk_code := '';
+	string60					physical_address_risk_code := '';
+	string60					phone_risk_code := '';
+	string60					cell_phone_risk_code := '';
+	string60					work_phone_risk_code := '';
+	string60					bank_account_1_risk_code := '';
+	string60					bank_account_2_risk_code := '';
+	string60					email_address_risk_code := '';
+	string30					ip_address_fraud_code := '';
+	string60					business_risk_code := '';
+	string60					mailing_address_risk_code := '';
+	string60	 				device_risk_code := '';	
+	string60					identity_risk_code := '';
+	string10					tax_preparer_id := '';
+	string8						start_date := '';
+	string8						end_date := '';
+	string10  					amount_paid := '';
+	string10					region_code := '';
+	string10					investigator_id := '';
+	string3						cleared_fraud := ''; 
+	string250					reason_cleared_code := ''; 
+
+//  Other fields	
+	unsigned4					global_sid := 0;
+	unsigned8 					record_sid := 0; 	
+	unsigned2					RIN_Source := 0;
+	clean_Drivers_License 		clean_Drivers_License;
+	string10					geo_lat := '';
+	string11					geo_long := '';	
+	string20					RIN_SourceLabel := '';
+end; 
 END;

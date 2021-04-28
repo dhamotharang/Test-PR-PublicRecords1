@@ -1329,6 +1329,9 @@
 		export string KEYWORD_PTCMVM_AJC						:= '1011';
 		export string KEYWORD_PTCMVM_DWN						:= '1012';
 		export string KEYWORD_FINMA_DU							:= '1013';
+		export string KEYWORD_ARGBA_MW							:= '1014';
+		export string KEYWORD_ARMS_MW								:= '1015';
+		export string KEYWORD_ARRNR_MW							:= '1016';
 		
 		//When setting the keyword export use underscores for dashes (ex: For RBI-SANC, use RBI_SANC)	
 	end;

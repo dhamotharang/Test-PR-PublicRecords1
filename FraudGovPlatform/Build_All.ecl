@@ -3,7 +3,7 @@
 /* DOCUMENTATION: https://confluence.rsi.lexisnexis.com/display/GTG/OTTO+-+Data+Build
 /* AUTHORS: DATA ENGINEERING (SESHA NOOKALA, OSCAR BARRIENTOS)
 /**************************************************************************************************************************************************/
-import tools, FraudShared, FraudGovPlatform_Validation, STD,_control;
+import tools, FraudGovPlatform_Validation, STD,_control;
 
 export Build_All(
 	 string version 	
@@ -48,8 +48,6 @@ Build_Kel_Ecl :=
 				sequential(
 					FraudGovPlatform.Promote(version).promote_base,
 					FraudGovPlatform.promote(version).promote_sprayed_files,
-					FraudShared.Build_Keys(version).All,
-					FraudShared.Build_AutoKeys(version),
 					FraudGovPlatform.Build_Base_Pii(version).All,
 					_Control.fSubmitNewWorkunit(Build_Kel_Ecl,ECLThorName)
 				),

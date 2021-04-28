@@ -235,9 +235,9 @@ export Build_all_V2(pVersion, pUseProd, gcid, pLexidThreshold, pHistMode, gcid_n
 
 	export step1 := sequential(
 			check_supers
-			,if(pOrbEnv = 'QA', ChangeRecdItemStatusSprayedQA, ChangeRecdItemStatusSprayedPROD)
-			,if(pOrbEnv = 'QA', CreateNewBuildQA, CreateNewBuildPROD)
-			,AddComponent			
+			// ,if(pOrbEnv = 'QA', ChangeRecdItemStatusSprayedQA, ChangeRecdItemStatusSprayedPROD)
+			// ,if(pOrbEnv = 'QA', CreateNewBuildQA, CreateNewBuildPROD)
+			// ,AddComponent			
 			,FileServices.ClearSuperFile(UPI_DataBuild.Filenames_V2(pVersion_unique,pUseProd,gcid,pHistMode).batch_lInputTemplate) // if processing new input - clear out anything that might still be in the *in* superfile
 			,FileServices.AddSuperFile(UPI_DataBuild.Filenames_V2(pVersion_unique,pUseProd,gcid,pHistMode).batch_lInputTemplate,UPI_DataBuild._Dataset(pUseProd).thor_cluster_files + 'from_batch::' + gcid + '::' + trim(pBatch_jobID,all) + '::' + pVersion)
 																	
@@ -291,7 +291,7 @@ export Build_all_V2(pVersion, pUseProd, gcid, pLexidThreshold, pHistMode, gcid_n
 
 			,FileServices.FinishSuperFileTransaction() 
 			
-			,if(pOrbEnv = 'QA', ChangeBuildStatusQA, ChangeBuildStatusPROD)
+			// ,if(pOrbEnv = 'QA', ChangeBuildStatusQA, ChangeBuildStatusPROD)
 
 ); 
 end;

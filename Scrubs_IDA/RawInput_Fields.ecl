@@ -42,8 +42,8 @@ EXPORT MakeFT_Invalid_MName(SALT311.StrType s0) := FUNCTION
   s2 := SALT311.stringcleanspaces( SALT311.stringsubstituteout(s1,' ',' ') ); // Insert spaces but avoid doubles
   RETURN  s2;
 END;
-EXPORT InValidFT_Invalid_MName(SALT311.StrType s) := WHICH(LENGTH(TRIM(s))<>LENGTH(TRIM(SALT311.StringFilter(s,'ABCDEFGHIJKLMNOPQRSTUVWXYZ. '))),~(LENGTH(TRIM(s)) >= 0 AND LENGTH(TRIM(s)) <= 2),~(SALT311.WordCount(SALT311.StringSubstituteOut(s,' ',' ')) = 0 OR SALT311.WordCount(SALT311.StringSubstituteOut(s,' ',' ')) = 1));
-EXPORT InValidMessageFT_Invalid_MName(UNSIGNED1 wh) := CHOOSE(wh,SALT311.HygieneErrors.NotInChars('ABCDEFGHIJKLMNOPQRSTUVWXYZ. '),SALT311.HygieneErrors.NotLength('0..2'),SALT311.HygieneErrors.NotWords('0,1'),SALT311.HygieneErrors.Good);
+EXPORT InValidFT_Invalid_MName(SALT311.StrType s) := WHICH(LENGTH(TRIM(s))<>LENGTH(TRIM(SALT311.StringFilter(s,'ABCDEFGHIJKLMNOPQRSTUVWXYZ. '))),~(LENGTH(TRIM(s)) >= 0 AND LENGTH(TRIM(s)) <= 15),~(SALT311.WordCount(SALT311.StringSubstituteOut(s,' ',' ')) = 0 OR SALT311.WordCount(SALT311.StringSubstituteOut(s,' ',' ')) = 1));
+EXPORT InValidMessageFT_Invalid_MName(UNSIGNED1 wh) := CHOOSE(wh,SALT311.HygieneErrors.NotInChars('ABCDEFGHIJKLMNOPQRSTUVWXYZ. '),SALT311.HygieneErrors.NotLength('0..15'),SALT311.HygieneErrors.NotWords('0,1'),SALT311.HygieneErrors.Good);
 
 EXPORT MakeFT_Invalid_LName(SALT311.StrType s0) := FUNCTION
   s1 := SALT311.stringfilter(s0,'ABCDEFGHIJKLMNOPQRSTUVWXYZ.- '); // Only allow valid symbols
@@ -126,11 +126,11 @@ EXPORT InValidFT_Invalid_Phone(SALT311.StrType s) := WHICH(LENGTH(TRIM(s))<>LENG
 EXPORT InValidMessageFT_Invalid_Phone(UNSIGNED1 wh) := CHOOSE(wh,SALT311.HygieneErrors.NotInChars('0123456789'),SALT311.HygieneErrors.NotLength('0,10'),SALT311.HygieneErrors.Good);
 
 EXPORT MakeFT_Invalid_Clientassigneduniquerecordid(SALT311.StrType s0) := FUNCTION
-  s1 := SALT311.stringfilter(s0,'nfr0123456789'); // Only allow valid symbols
+  s1 := SALT311.stringfilter(s0,'abcdefghijklmnopqrstuvwxyz0123456789'); // Only allow valid symbols
   RETURN  s1;
 END;
-EXPORT InValidFT_Invalid_Clientassigneduniquerecordid(SALT311.StrType s) := WHICH(LENGTH(TRIM(s))<>LENGTH(TRIM(SALT311.StringFilter(s,'nfr0123456789'))));
-EXPORT InValidMessageFT_Invalid_Clientassigneduniquerecordid(UNSIGNED1 wh) := CHOOSE(wh,SALT311.HygieneErrors.NotInChars('nfr0123456789'),SALT311.HygieneErrors.Good);
+EXPORT InValidFT_Invalid_Clientassigneduniquerecordid(SALT311.StrType s) := WHICH(LENGTH(TRIM(s))<>LENGTH(TRIM(SALT311.StringFilter(s,'abcdefghijklmnopqrstuvwxyz0123456789'))));
+EXPORT InValidMessageFT_Invalid_Clientassigneduniquerecordid(UNSIGNED1 wh) := CHOOSE(wh,SALT311.HygieneErrors.NotInChars('abcdefghijklmnopqrstuvwxyz0123456789'),SALT311.HygieneErrors.Good);
 
 EXPORT MakeFT_Invalid_Emailaddress(SALT311.StrType s0) := FUNCTION
   RETURN  s0;
