@@ -1,5 +1,4 @@
 ﻿IMPORT FraudgovKEL, FraudGovPlatform,doxie,Suppress;
-RunKelDemo :=false:stored('RunKelDemo');
 
 /*
 edina_layout_input := RECORD
