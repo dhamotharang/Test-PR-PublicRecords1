@@ -1,4 +1,4 @@
-﻿export MOVE_FILES(boolean fcra = false, boolean pDaily = false, string buildingType='') := module
+﻿export MOVE_FILES(boolean fcra = false, boolean pDaily = false, string buildingType='', boolean delta=false) := module
 	
 	shared FS 		:= fileservices;
 	
@@ -45,10 +45,20 @@
 					// FS.FinishSuperFileTransaction()
 						// );
 						
-	export Base_To_Building := sequential(
-					FS.StartSuperFileTransaction(),
+delta_list			:=	nothor(FS.SuperFileContents(Base_SF))(regexfind('delta',name));
+all_list				:=	nothor(FS.SuperFileContents(Base_SF));
+tobuilding_list := 	if(delta,delta_list,all_list);
+
+export Base_To_Building:=	sequential(FS.StartSuperFileTransaction(),
 						nothor(FS.ClearSuperFile('~' + regexreplace('::built', Base_SF, '::building_'+buildingType))),
-						nothor(FS.AddSuperFile('~' + regexreplace('::built', Base_SF, '::building_'+buildingType), '~' + Base_SF, addcontents := true)),
+						nothor(apply(tobuilding_list,FS.AddSuperFile('~' + regexreplace('::built', Base_SF, '::building_'+buildingType), '~' + name))),
+					FS.FinishSuperFileTransaction()
+						);
+	
+	export Base_To_Building_didville := sequential(
+					FS.StartSuperFileTransaction(),
+						nothor(FS.ClearSuperFile('~' + regexreplace('::built', Base_SF, '::building_'+buildingType+'::didville'))),
+						nothor(FS.AddSuperFile('~' + regexreplace('::built', Base_SF, '::building_'+buildingType+'::didville'), '~' + Base_SF, addcontents := true)),
 					FS.FinishSuperFileTransaction()
 						);
 end;

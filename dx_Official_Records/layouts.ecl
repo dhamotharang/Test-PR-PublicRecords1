@@ -1,72 +1,67 @@
 ﻿EXPORT layouts := MODULE
-EXPORT Party := RECORD
-	
-	string60	official_record_key;
-	string2		state_origin;
-	string30	county_name;
-	string8		doc_filed_dt;
-	string60	doc_type_desc;
-	string50	entity_type_desc;
-  string80	entity_nm;
-  string5		title1;
-  string20	fname1;
-  string20	mname1;
-  string20	lname1;
-  string5		suffix1;
-  string70 	cname1;
-  string1		master_party_type_cd;
 
+  EXPORT Party := RECORD
+    STRING60 official_record_key;
+    STRING2 state_origin;
+    STRING30 county_name;
+    STRING8 doc_filed_dt;
+    STRING60 doc_type_desc;
+    STRING50 entity_type_desc;
+    STRING80 entity_nm;
+    STRING5 title1;
+    STRING20 fname1;
+    STRING20 mname1;
+    STRING20 lname1;
+    STRING5 suffix1;
+    STRING70 cname1;
+    STRING1 master_party_type_cd;
   END;
-	
-	EXPORT Document := RECORD
-	
-	string60	official_record_key;
-	string2		state_origin;
-	string30	county_name;
-  string25	doc_instrument_or_clerk_filing_num;
-	string8		doc_filed_dt;
-  string60	doc_type_desc;
-	string60	legal_desc_1;
-  string6		doc_page_count;
-  string30	doc_amend_desc;
-  string8		execution_dt;
-	string25	consideration_amt;
-  string10	transfer_;
-  string10	mortgage;
-  string10	intangible_tax_amt;
-  string10	book_num;
-  string10	page_num;
-  string60	book_type_desc;
-	string25	prior_doc_file_num;
-  string60	prior_doc_type_desc;
-  string10	prior_book_num;
-  string10	prior_page_num;
-  string60	prior_book_type_desc;
+  
+  EXPORT Document := RECORD
+    STRING60 official_record_key;
+    STRING2 state_origin;
+    STRING30 county_name;
+    STRING25 doc_instrument_or_clerk_filing_num;
+    STRING8 doc_filed_dt;
+    STRING60 doc_type_desc;
+    STRING60 legal_desc_1;
+    STRING6 doc_page_count;
+    STRING30 doc_amend_desc;
+    STRING8 execution_dt;
+    STRING25 consideration_amt;
+    STRING10 transfer_;
+    STRING10 mortgage;
+    STRING10 intangible_tax_amt;
+    STRING10 book_num;
+    STRING10 page_num;
+    STRING60 book_type_desc;
+    STRING25 prior_doc_file_num;
+    STRING60 prior_doc_type_desc;
+    STRING10 prior_book_num;
+    STRING10 prior_page_num;
+    STRING60 prior_book_type_desc;
+  END;
+  
+  // An interim record layout with just the fields needed to build the autokeys
+  EXPORT ak_rec := RECORD
+    STRING60 official_record_key;
+    STRING20 fname;
+    STRING20 mname;
+    STRING20 lname;
+    STRING70 cname;
+    STRING25 city;
+    STRING2 per_state;
+    STRING2 bus_state;
+    UNSIGNED1 zero := 0;
+    UNSIGNED6 zeroDID := 0;
+    UNSIGNED6 zeroBDID := 0;
+    STRING1 blank := '';
+    STRING1 blank_prim_name := '';
+    STRING1 blank_prim_range := '';
+    STRING1 blank_st := '';
+    STRING1 blank_city := '';
+    STRING1 blank_zip5 := '';
+    STRING1 blank_sec_range := '';
+  END;
 
-  END;
-	
-	// An interim record layout with just the fields needed to build the autokeys
-EXPORT ak_rec := record
-	string60  official_record_key;
-	string20  fname;
-	string20  mname;
-	string20  lname;
-	string70  cname;
-	string25  city;
-	string2		per_state;
-	string2		bus_state;
-	unsigned1 zero             := 0;
-	unsigned6 zeroDID          := 0;
-	unsigned6 zeroBDID         := 0;
-	string1   blank            := '';
-	string1   blank_prim_name  := '';
-	string1   blank_prim_range := '';
-	string1   blank_st         := '';
-	string1   blank_city       := '';
-	string1   blank_zip5       := '';
-	string1   blank_sec_range  := '';
 END;
-
-	END;
-  
-  
