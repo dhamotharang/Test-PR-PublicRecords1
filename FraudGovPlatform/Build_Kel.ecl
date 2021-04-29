@@ -61,10 +61,10 @@ BuildStatusReport :=
 
 			
 	Export	All := Sequential(
-										Build_Keys(pVersion).Kel
 										,Build_Base_Kel(pVersion).All
 										,Promote(pversion).buildfiles.New2Built
 										,Promote(pversion,,true).buildfiles.Built2QA
+										,Build_Keys(pVersion).Kel
 										,Build_Keys(pversion).All
 										,Build_AutoKeys(pversion)
 										,Build_Keys_UnitTest(pversion).ALL,

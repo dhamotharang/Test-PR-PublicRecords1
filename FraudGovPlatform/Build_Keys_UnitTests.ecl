@@ -14,12 +14,10 @@ vVersion_previous :=
 		pversion_previous );
 
 //AmountPaid
-
 AmountPaid := FraudShared.Key_AmountPaid('FraudGov'); 
 AmountPaid_DS	:=	Dataset([],recordof(AmountPaid));
 AmountPaid_Current := Index(AmountPaid_DS,{amount_paid,entity_type_id,entity_sub_type_id},{record_id,uid},'~thor_data400::key::fraudgov::'+pversion+'::amountpaid');
 AmountPaid_Previous := Index(AmountPaid_DS,{amount_paid,entity_type_id,entity_sub_type_id},{record_id,uid},'~thor_data400::key::fraudgov::'+vVersion_previous+'::amountpaid');
-
 
 //Auto_address
 Auto_Address := FraudShared.Key_Auto_Address('FraudGov');
@@ -129,13 +127,11 @@ BankName_DS	:=	Dataset([],recordof(BankName));
 BankName_Current := Index(BankName_DS,{bank_name,entity_type_id,entity_sub_type_id},{record_id,uid},'~thor_data400::key::fraudgov::'+pversion+'::BankName',opt);
 BankName_Previous := Index(BankName_DS,{bank_name,entity_type_id,entity_sub_type_id},{record_id,uid},'~thor_data400::key::fraudgov::'+vVersion_previous+'::BankName',opt);
 
-
 //BankRoutingNumber
 BankRoutingNumber := FraudShared.Key_BankRoutingNumber('FraudGov');
 BankRoutingNumber_DS	:=	Dataset([],recordof(BankRoutingNumber));
 BankRoutingNumber_Current := Index(BankRoutingNumber_DS,{bank_routing_number ,entity_type_id,entity_sub_type_id},{record_id,uid},'~thor_data400::key::fraudgov::'+pversion+'::BankRoutingNumber',opt);
 BankRoutingNumber_Previous := Index(BankRoutingNumber_DS,{bank_routing_number ,entity_type_id,entity_sub_type_id},{record_id,uid},'~thor_data400::key::fraudgov::'+vVersion_previous+'::BankRoutingNumber',opt);
-
 
 //CityState
 CityState := FraudShared.Key_CityState('FraudGov');
@@ -143,13 +139,11 @@ CityState_DS	:=	Dataset([],recordof(CityState));
 CityState_Current := Index(CityState_DS,{p_city_name,st,entity_type_id,entity_sub_type_id},{record_id,uid},'~thor_data400::key::fraudgov::'+pversion+'::CityState');
 CityState_Previous := Index(CityState_DS,{p_city_name,st,entity_type_id,entity_sub_type_id},{record_id,uid},'~thor_data400::key::fraudgov::'+vVersion_previous+'::CityState');
 
-
 //CustomerId
 CustomerId := FraudShared.Key_CustomerId('FraudGov');
 CustomerId_DS	:=	Dataset([],recordof(CustomerId));
 CustomerId_Current := Index(CustomerId_DS,{customer_id,entity_type_id,entity_sub_type_id},{record_id,uid},'~thor_data400::key::fraudgov::'+pversion+'::CustomerId');
 CustomerId_Previous := Index(CustomerId_DS,{customer_id,entity_type_id,entity_sub_type_id},{record_id,uid},'~thor_data400::key::fraudgov::'+vVersion_previous+'::CustomerId');
-
 
 //Deviceid
 Deviceid := FraudShared.Key_Deviceid('FraudGov');
@@ -199,7 +193,6 @@ Id_DS	:=	Dataset([],recordof(Id));
 Id_Current := Index(Id_DS,{record_id,uid},{Id_DS},'~thor_data400::key::fraudgov::'+pversion+'::id');
 Id_Previous := Index(Id_DS,{record_id,uid},{Id_DS},'~thor_data400::key::fraudgov::'+vVersion_previous+'::id');
 
-
 //IpRange
 IpRange := FraudShared.Key_IpRange('FraudGov');
 IpRange_DS	:=	Dataset([],recordof(iprange));
@@ -212,13 +205,11 @@ Isp_DS	:=	Dataset([],recordof(isp));
 Isp_Current := Index(Isp_DS,{Isp,entity_type_id,entity_sub_type_id},{Isp_DS},'~thor_data400::key::fraudgov::'+pversion+'::Isp');
 Isp_Previous := Index(Isp_DS,{Isp,entity_type_id,entity_sub_type_id},{Isp_DS},'~thor_data400::key::fraudgov::'+vVersion_previous+'::Isp');
 
-
 //MacAddress
 MacAddress := FraudShared.Key_MacAddress('FraudGov');
 MacAddress_DS	:=	Dataset([],recordof(MacAddress));
 MacAddress_Current := Index(MacAddress_DS,{mac_address,entity_type_id,entity_sub_type_id},{MacAddress_DS},'~thor_data400::key::fraudgov::'+pversion+'::MacAddress');
 MacAddress_Previous := Index(MacAddress_DS,{mac_address,entity_type_id,entity_sub_type_id},{MacAddress_DS},'~thor_data400::key::fraudgov::'+vVersion_previous+'::MacAddress');
-
 
 //MbsFdnIndType
 MbsFdnIndType := FraudShared.Key_MbsFdnIndType('FraudGov');
@@ -250,7 +241,6 @@ Mbsproductinclude_DS	:=	Dataset([],recordof(Mbsproductinclude));
 Mbsproductinclude_Current := Index(Mbsproductinclude_DS,{fdn_file_info_id},{Mbsproductinclude_DS},'~thor_data400::key::fraudgov::'+pversion+'::mbsproductinclude');
 Mbsproductinclude_Previous := Index(Mbsproductinclude_DS,{fdn_file_info_id},{Mbsproductinclude_DS},'~thor_data400::key::fraudgov::'+vVersion_previous+'::mbsproductinclude');
 
-
 //ReportedDate
 ReportedDate := FraudShared.Key_ReportedDate('FraudGov');
 ReportedDate_DS	:=	Dataset([],recordof(ReportedDate));
@@ -263,7 +253,6 @@ SerialNumber_DS	:=	Dataset([],recordof(SerialNumber));
 SerialNumber_Current := Index(SerialNumber_DS,{Serial_Number,entity_type_id,entity_sub_type_id},{SerialNumber_DS},'~thor_data400::key::fraudgov::'+pversion+'::SerialNumber');
 SerialNumber_Previous := Index(SerialNumber_DS,{Serial_Number,entity_type_id,entity_sub_type_id},{SerialNumber_DS},'~thor_data400::key::fraudgov::'+vVersion_previous+'::SerialNumber');
 
-
 //User
 User := FraudShared.Key_User('FraudGov');
 User_DS	:=	Dataset([],recordof(User));
@@ -275,7 +264,6 @@ Zip := FraudShared.Key_Zip('FraudGov');
 Zip_DS	:=	Dataset([],recordof(Zip));
 Zip_Current := Index(Zip_DS,{zip,entity_type_id,entity_sub_type_id},{Zip_DS},'~thor_data400::key::fraudgov::'+pversion+'::Zip');
 Zip_Previous := Index(Zip_DS,{zip,entity_type_id,entity_sub_type_id},{Zip_DS},'~thor_data400::key::fraudgov::'+vVersion_previous+'::Zip');
-
 
 ds:= dataset([
 								{'AmountPaid',count(AmountPaid_Current),count(AmountPaid_Previous)}
@@ -378,5 +366,4 @@ ds:= dataset([
 		,output('No Valid version parameter passed, skipping Build_Base_KnownFraud atribute')
 	);
 
-			
 END;
