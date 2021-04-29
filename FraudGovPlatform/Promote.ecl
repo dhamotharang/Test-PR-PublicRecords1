@@ -81,9 +81,13 @@ module
 			  buildfiles.Built2QA
 	);
 
+	AutoKeyB2.MAC_AcceptSK_to_QA(_Dataset().autokeytemplate	, moveToQA);
+
 	export promote_keys := sequential(
-			// Promote Shared Files
-			  buildfiles.Built2QA			
+			// Promote Autokeys
+			  moveToQA,
+			// Promote FraudGoV Keys
+			, buildfiles.Built2QA			
 			// Clean Up Shared Files	
 			, buildfiles.cleanup	
 			//FraudGovPlatform the Demo file from father sf, which was moved from qa as a promote routeine

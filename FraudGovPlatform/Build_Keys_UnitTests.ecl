@@ -5,8 +5,8 @@ EXPORT Build_Keys_UnitTests(
 ) := 
 module
 
-v := STD.File.GetSuperFileSubName('~fraudgov::base::qa::main', 1);
-qa_version  := (string)STD.Str.SplitWords(v,'::')[3]:independent;
+v := STD.File.GetSuperFileSubName('~thor_data400::key::fraudgov::qa::id', 1);
+qa_version  := (string)STD.Str.SplitWords(v,'::')[4]:independent;
 
 vVersion_previous := 
 	if (pversion_previous = '', 
@@ -20,11 +20,6 @@ AmountPaid_DS	:=	Dataset([],recordof(AmountPaid));
 AmountPaid_Current := Index(AmountPaid_DS,{amount_paid,entity_type_id,entity_sub_type_id},{record_id,uid},'~thor_data400::key::fraudgov::'+pversion+'::amountpaid');
 AmountPaid_Previous := Index(AmountPaid_DS,{amount_paid,entity_type_id,entity_sub_type_id},{record_id,uid},'~thor_data400::key::fraudgov::'+vVersion_previous+'::amountpaid');
 
-//Appproviderid
-Appproviderid := FraudShared.Key_Appproviderid('FraudGov'); 
-Appproviderid_DS	:=	Dataset([],recordof(Appproviderid));
-Appproviderid_Current := Index(Appproviderid_DS,{appended_provider_id,entity_type_id,entity_sub_type_id},{record_id,uid},'~thor_data400::key::fraudgov::'+pversion+'::appproviderid');
-Appproviderid_Previous := Index(Appproviderid_DS,{appended_provider_id,entity_type_id,entity_sub_type_id},{record_id,uid},'~thor_data400::key::fraudgov::'+vVersion_previous+'::appproviderid');
 
 //Auto_address
 Auto_Address := FraudShared.Key_Auto_Address('FraudGov');
@@ -141,12 +136,6 @@ BankRoutingNumber_DS	:=	Dataset([],recordof(BankRoutingNumber));
 BankRoutingNumber_Current := Index(BankRoutingNumber_DS,{bank_routing_number ,entity_type_id,entity_sub_type_id},{record_id,uid},'~thor_data400::key::fraudgov::'+pversion+'::BankRoutingNumber',opt);
 BankRoutingNumber_Previous := Index(BankRoutingNumber_DS,{bank_routing_number ,entity_type_id,entity_sub_type_id},{record_id,uid},'~thor_data400::key::fraudgov::'+vVersion_previous+'::BankRoutingNumber',opt);
 
-//Bdid
-Bdid := FraudShared.Key_Bdid('FraudGov');
-Bdid_DS	:=	Dataset([],recordof(Bdid));
-Bdid_Current := Index(Bdid_DS,{bdid,entity_type_id,entity_sub_type_id},{record_id,uid},'~thor_data400::key::fraudgov::'+pversion+'::bdid');
-Bdid_Previous := Index(Bdid_DS,{bdid,entity_type_id,entity_sub_type_id},{record_id,uid},'~thor_data400::key::fraudgov::'+vVersion_previous+'::bdid');
-
 
 //CityState
 CityState := FraudShared.Key_CityState('FraudGov');
@@ -155,23 +144,12 @@ CityState_Current := Index(CityState_DS,{p_city_name,st,entity_type_id,entity_su
 CityState_Previous := Index(CityState_DS,{p_city_name,st,entity_type_id,entity_sub_type_id},{record_id,uid},'~thor_data400::key::fraudgov::'+vVersion_previous+'::CityState');
 
 
-//County
-County := FraudShared.Key_County('FraudGov');
-County_DS	:=	Dataset([],recordof(County));
-County_Current := Index(County_DS,{County,entity_type_id,entity_sub_type_id},{record_id,uid},'~thor_data400::key::fraudgov::'+pversion+'::County');
-County_Previous := Index(County_DS,{County,entity_type_id,entity_sub_type_id},{record_id,uid},'~thor_data400::key::fraudgov::'+vVersion_previous+'::County');
-
 //CustomerId
 CustomerId := FraudShared.Key_CustomerId('FraudGov');
 CustomerId_DS	:=	Dataset([],recordof(CustomerId));
 CustomerId_Current := Index(CustomerId_DS,{customer_id,entity_type_id,entity_sub_type_id},{record_id,uid},'~thor_data400::key::fraudgov::'+pversion+'::CustomerId');
 CustomerId_Previous := Index(CustomerId_DS,{customer_id,entity_type_id,entity_sub_type_id},{record_id,uid},'~thor_data400::key::fraudgov::'+vVersion_previous+'::CustomerId');
 
-//CustomerProgram
-CustomerProgram := FraudShared.Key_CustomerProgram('FraudGov');
-CustomerProgram_DS	:=	Dataset([],recordof(CustomerProgram));
-CustomerProgram_Current := Index(CustomerProgram_DS,{ind_type_description,entity_type_id,entity_sub_type_id},{record_id,uid},'~thor_data400::key::fraudgov::'+pversion+'::CustomerProgram');
-CustomerProgram_Previous := Index(CustomerProgram_DS,{ind_type_description,entity_type_id,entity_sub_type_id},{record_id,uid},'~thor_data400::key::fraudgov::'+vVersion_previous+'::CustomerProgram');
 
 //Deviceid
 Deviceid := FraudShared.Key_Deviceid('FraudGov');
@@ -222,12 +200,6 @@ Id_Current := Index(Id_DS,{record_id,uid},{Id_DS},'~thor_data400::key::fraudgov:
 Id_Previous := Index(Id_DS,{record_id,uid},{Id_DS},'~thor_data400::key::fraudgov::'+vVersion_previous+'::id');
 
 
-//Ip
-Ip := FraudShared.Key_Ip('FraudGov');
-Ip_DS	:=	Dataset([],recordof(ip));
-Ip_Current := Index(Ip_DS,{ip_address,entity_type_id,entity_sub_type_id},{Ip_DS},'~thor_data400::key::fraudgov::'+pversion+'::ip');
-Ip_Previous := Index(Ip_DS,{ip_address,entity_type_id,entity_sub_type_id},{Ip_DS},'~thor_data400::key::fraudgov::'+vVersion_previous+'::ip');
-
 //IpRange
 IpRange := FraudShared.Key_IpRange('FraudGov');
 IpRange_DS	:=	Dataset([],recordof(iprange));
@@ -240,41 +212,6 @@ Isp_DS	:=	Dataset([],recordof(isp));
 Isp_Current := Index(Isp_DS,{Isp,entity_type_id,entity_sub_type_id},{Isp_DS},'~thor_data400::key::fraudgov::'+pversion+'::Isp');
 Isp_Previous := Index(Isp_DS,{Isp,entity_type_id,entity_sub_type_id},{Isp_DS},'~thor_data400::key::fraudgov::'+vVersion_previous+'::Isp');
 
-//ClusterDetails
-ClusterDetails := FraudGovPlatform.Key_ClusterDetails;
-ClusterDetails_DS	:=	Dataset([],recordof(ClusterDetails));
-ClusterDetails_Current := Index(ClusterDetails_DS,{customer_id_,industry_type_,entity_context_uid_,tree_uid_},{ClusterDetails_DS},'~thor_data400::key::fraudgov::grand'+pversion+'::kel::ClusterDetails');
-ClusterDetails_Previous := Index(ClusterDetails_DS,{customer_id_,industry_type_,entity_context_uid_,tree_uid_},{ClusterDetails_DS},'~thor_data400::key::fraudgov::grand'+vVersion_previous+'::kel::ClusterDetails');
-
-//ElementPivot
-ElementPivot := FraudGovPlatform.Key_ElementPivot;
-ElementPivot_DS	:=	Dataset([],recordof(ElementPivot));
-ElementPivot_Current := Index(ElementPivot_DS,{customer_id_,industry_type_,entity_context_uid_},{ElementPivot_DS},'~thor_data400::key::fraudgov::grand'+pversion+'::kel::ElementPivot');
-ElementPivot_Previous := Index(ElementPivot_DS,{customer_id_,industry_type_,entity_context_uid_},{ElementPivot_DS},'~thor_data400::key::fraudgov::grand'+vVersion_previous+'::kel::ElementPivot');
-
-//ScoreBreakdown
-ScoreBreakdown := FraudGovPlatform.Key_ScoreBreakdown;
-ScoreBreakdown_DS	:=	Dataset([],recordof(ScoreBreakdown));
-ScoreBreakdown_Current := Index(ScoreBreakdown_DS,{customer_id_,industry_type_,entity_context_uid_},{ScoreBreakdown_DS},'~thor_data400::key::fraudgov::grand'+pversion+'::kel::ScoreBreakdown');
-ScoreBreakdown_Previous := Index(ScoreBreakdown_DS,{customer_id_,industry_type_,entity_context_uid_},{ScoreBreakdown_DS},'~thor_data400::key::fraudgov::grand'+vVersion_previous+'::kel::ScoreBreakdown');
-
-//WeightingChart
-WeightingChart := FraudGovPlatform.Key_WeightingChart;
-WeightingChart_DS	:=	Dataset([],recordof(WeightingChart));
-WeightingChart_Current := Index(WeightingChart_DS,{field,entitytype},{WeightingChart_DS},'~thor_data400::key::fraudgov::'+pversion+'::kel::WeightingChart');
-WeightingChart_Previous := Index(WeightingChart_DS,{field,entitytype},{WeightingChart_DS},'~thor_data400::key::fraudgov::'+vVersion_previous+'::kel::WeightingChart');
-
-//Linkids
-Linkids := FraudShared.Key_Linkids('FraudGov');
-Linkids_DS	:=	Dataset([],recordof(linkids));
-Linkids_Current := Index(Linkids_DS,{ultid,orgid,seleid,proxid,powid,empid,dotid},{Linkids_DS},'~thor_data400::key::fraudgov::'+pversion+'::linkids');
-Linkids_Previous := Index(Linkids_DS,{ultid,orgid,seleid,proxid,powid,empid,dotid},{Linkids_DS},'~thor_data400::key::fraudgov::'+vVersion_previous+'::linkids');
-
-//Lnpid
-Lnpid := FraudShared.Key_Lnpid('FraudGov');
-Lnpid_DS	:=	Dataset([],recordof(Lnpid));
-Lnpid_Current := Index(Lnpid_DS,{lnpid,entity_type_id,entity_sub_type_id},{record_id,uid},'~thor_data400::key::fraudgov::'+pversion+'::lnpid');
-Lnpid_Previous := Index(Lnpid_DS,{lnpid,entity_type_id,entity_sub_type_id},{record_id,uid},'~thor_data400::key::fraudgov::'+vVersion_previous+'::lnpid');
 
 //MacAddress
 MacAddress := FraudShared.Key_MacAddress('FraudGov');
@@ -282,17 +219,6 @@ MacAddress_DS	:=	Dataset([],recordof(MacAddress));
 MacAddress_Current := Index(MacAddress_DS,{mac_address,entity_type_id,entity_sub_type_id},{MacAddress_DS},'~thor_data400::key::fraudgov::'+pversion+'::MacAddress');
 MacAddress_Previous := Index(MacAddress_DS,{mac_address,entity_type_id,entity_sub_type_id},{MacAddress_DS},'~thor_data400::key::fraudgov::'+vVersion_previous+'::MacAddress');
 
-//Mbs
-Mbs := FraudShared.Key_Mbs('FraudGov');
-Mbs_DS	:=	Dataset([],recordof(Mbs));
-Mbs_Current := Index(Mbs_DS,{fdn_file_info_id},{Mbs_DS},'~thor_data400::key::fraudgov::'+pversion+'::mbs');
-Mbs_Previous := Index(Mbs_DS,{fdn_file_info_id},{Mbs_DS},'~thor_data400::key::fraudgov::'+vVersion_previous+'::mbs');
-
-//MbsDeltaBase
-MbsDeltaBase := FraudShared.Key_MbsDeltaBase('FraudGov');
-MbsDeltaBase_DS	:=	Dataset([],recordof(MbsDeltaBase));
-MbsDeltaBase_Current := Index(MbsDeltaBase_DS,{gc_id,ind_type},{MbsDeltaBase_DS},'~thor_data400::key::fraudgov::'+pversion+'::mbsdeltabase');
-MbsDeltaBase_Previous := Index(MbsDeltaBase_DS,{gc_id,ind_type},{MbsDeltaBase_DS},'~thor_data400::key::fraudgov::'+vVersion_previous+'::mbsdeltabase');
 
 //MbsFdnIndType
 MbsFdnIndType := FraudShared.Key_MbsFdnIndType('FraudGov');
@@ -324,23 +250,6 @@ Mbsproductinclude_DS	:=	Dataset([],recordof(Mbsproductinclude));
 Mbsproductinclude_Current := Index(Mbsproductinclude_DS,{fdn_file_info_id},{Mbsproductinclude_DS},'~thor_data400::key::fraudgov::'+pversion+'::mbsproductinclude');
 Mbsproductinclude_Previous := Index(Mbsproductinclude_DS,{fdn_file_info_id},{Mbsproductinclude_DS},'~thor_data400::key::fraudgov::'+vVersion_previous+'::mbsproductinclude');
 
-//mbsvelocityrules
-mbsvelocityrules := FraudShared.Key_mbsvelocityrules('FraudGov');
-mbsvelocityrules_DS	:=	Dataset([],recordof(mbsvelocityrules));
-mbsvelocityrules_Current := Index(mbsvelocityrules_DS,{gc_id},{mbsvelocityrules_DS},'~thor_data400::key::fraudgov::'+pversion+'::mbsvelocityrules');
-mbsvelocityrules_Previous := Index(mbsvelocityrules_DS,{gc_id},{mbsvelocityrules_DS},'~thor_data400::key::fraudgov::'+vVersion_previous+'::mbsvelocityrules');
-
-//Npi
-Npi := FraudShared.Key_Npi('FraudGov');
-Npi_DS	:=	Dataset([],recordof(Npi));
-Npi_Current := Index(Npi_DS,{npi,entity_type_id,entity_sub_type_id},{record_id,uid},'~thor_data400::key::fraudgov::'+pversion+'::npi');
-Npi_Previous := Index(Npi_DS,{npi,entity_type_id,entity_sub_type_id},{record_id,uid},'~thor_data400::key::fraudgov::'+vVersion_previous+'::npi');
-
-//Professionalid
-Professionalid := FraudShared.Key_Professionalid('FraudGov');
-Professionalid_DS	:=	Dataset([],recordof(Professionalid));
-Professionalid_Current := Index(Professionalid_DS,{professional_id,entity_type_id,entity_sub_type_id},{record_id,uid},'~thor_data400::key::fraudgov::'+pversion+'::professionalid');
-Professionalid_Previous := Index(Professionalid_DS,{professional_id,entity_type_id,entity_sub_type_id},{record_id,uid},'~thor_data400::key::fraudgov::'+vVersion_previous+'::professionalid');
 
 //ReportedDate
 ReportedDate := FraudShared.Key_ReportedDate('FraudGov');
@@ -354,11 +263,6 @@ SerialNumber_DS	:=	Dataset([],recordof(SerialNumber));
 SerialNumber_Current := Index(SerialNumber_DS,{Serial_Number,entity_type_id,entity_sub_type_id},{SerialNumber_DS},'~thor_data400::key::fraudgov::'+pversion+'::SerialNumber');
 SerialNumber_Previous := Index(SerialNumber_DS,{Serial_Number,entity_type_id,entity_sub_type_id},{SerialNumber_DS},'~thor_data400::key::fraudgov::'+vVersion_previous+'::SerialNumber');
 
-//Tin
-Tin := FraudShared.Key_Tin('FraudGov');
-Tin_DS	:=	Dataset([],recordof(Tin));
-Tin_Current := Index(Tin_DS,{tin,entity_type_id,entity_sub_type_id},{record_id,uid},'~thor_data400::key::fraudgov::'+pversion+'::tin');
-Tin_Previous := Index(Tin_DS,{tin,entity_type_id,entity_sub_type_id},{record_id,uid},'~thor_data400::key::fraudgov::'+vVersion_previous+'::tin');
 
 //User
 User := FraudShared.Key_User('FraudGov');
@@ -374,8 +278,7 @@ Zip_Previous := Index(Zip_DS,{zip,entity_type_id,entity_sub_type_id},{Zip_DS},'~
 
 
 ds:= dataset([
-//								{'AmountPaid',count(AmountPaid_Current),count(AmountPaid_Previous)}
-								{'Appproviderid',count(Appproviderid_Current),count(Appproviderid_Previous)}
+								{'AmountPaid',count(AmountPaid_Current),count(AmountPaid_Previous)}
 								,{'Auto_Address',count(Auto_Address_Current),count(Auto_Address_Previous)}
 								,{'Auto_addressb2',count(Auto_addressb2_Current),count(Auto_addressb2_Previous)}
 								,{'Auto_citystname',count(Auto_citystname_Current),count(Auto_citystname_Previous)}
@@ -384,7 +287,6 @@ ds:= dataset([
 								,{'Auto_name',count(Auto_name_Current),count(Auto_name_Previous)}
 								,{'Auto_nameb2',count(Auto_nameb2_Current),count(Auto_nameb2_Previous)}
 								,{'Auto_namewords2',count(Auto_namewords2_Current),count(Auto_namewords2_Previous)}
-								//,{'Auto_Payload',count(Auto_Payload_Current),count(Auto_Payload_Previous)}
 								,{'Auto_phone2',count(Auto_phone2_Current),count(Auto_phone2_Previous)}
 								,{'Auto_phoneb2',count(Auto_phoneb2_Current),count(Auto_phoneb2_Previous)}
 								,{'Auto_ssn2',count(Auto_ssn2_Current),count(Auto_ssn2_Previous)}
@@ -395,11 +297,8 @@ ds:= dataset([
 								,{'BankAccount',count(BankAccount_Current),count(BankAccount_Previous)}
 								,{'BankName',count(BankName_Current),count(BankName_Previous)}
 								,{'BankRoutingNumber',count(BankRoutingNumber_Current),count(BankRoutingNumber_Previous)}
-								,{'Bdid',count(Bdid_Current),count(Bdid_Previous)}
 								,{'CityState',count(CityState_Current),count(CityState_Previous)}
-								,{'County',count(County_Current),count(County_Previous)}
 								,{'CustomerId',count(CustomerId_Current),count(CustomerId_Previous)}
-								,{'CustomerProgram',count(CustomerProgram_Current),count(CustomerProgram_Previous)}
 								,{'Deviceid',count(Deviceid_Current),count(Deviceid_Previous)}
 								,{'Did',count(Did_Current),count(Did_Previous)}
 								,{'DriversLicense',count(DriversLicense_Current),count(DriversLicense_Previous)}						
@@ -408,31 +307,39 @@ ds:= dataset([
 								,{'Host',count(Host_Current),count(Host_Previous)}
 								,{'HouseholdId',count(HouseholdId_Current),count(HouseholdId_Previous)}
 								,{'ID',count(Id_Current),count(Id_Previous)}
-								,{'Ip',count(Ip_Current),count(Ip_Previous)}
 								,{'IpRange',count(IpRange_Current),count(IpRange_Previous)}
 								,{'Isp',count(Isp_Current),count(Isp_Previous)}
-								// ,{'ClusterDetails',count(ClusterDetails_Current),count(ClusterDetails_Previous)}
-								// ,{'ElementPivot',count(ElementPivot_Current),count(ElementPivot_Previous)}
-								// ,{'ScoreBreakdown',count(ScoreBreakdown_Current),count(ScoreBreakdown_Previous)}
-								// ,{'WeightingChart',count(WeightingChart_Current),count(WeightingChart_Previous)}
-								,{'Linkids',count(Linkids_Current),count(Linkids_Previous)}
-								,{'Lnpid',count(Lnpid_Current),count(Lnpid_Previous)}		
 								,{'MacAddress',count(MacAddress_Current),count(MacAddress_Previous)}		
-								,{'Mbs',count(Mbs_Current),count(Mbs_Previous)}
-								,{'MbsDeltaBase',count(MbsDeltaBase_Current),count(MbsDeltaBase_Previous)}
 								,{'MbsFdnIndType',count(MbsFdnIndType_Current),count(MbsFdnIndType_Previous)}
 								,{'mbsfdnmasteridexclusion',count(mbsfdnmasteridexclusion_Current),count(mbsfdnmasteridexclusion_Previous)}
 								,{'mbsfdnmasteridindtypeinclusion',count(mbsfdnmasteridindtypeinclusion_Current),count(mbsfdnmasteridindtypeinclusion_Previous)}
 								,{'mbsindtypeexclusion',count(mbsindtypeexclusion_Current),count(mbsindtypeexclusion_Previous)}
 								,{'Mbsproductinclude',count(Mbsproductinclude_Current),count(Mbsproductinclude_Previous)}
-								,{'mbsvelocityrules',count(mbsvelocityrules_Current),count(mbsvelocityrules_Previous)}
-								,{'Npi',count(Npi_Current),count(Npi_Previous)}
-								,{'Professionalid',count(Professionalid_Current),count(Professionalid_Previous)}
 								,{'ReportedDate',count(ReportedDate_Current),count(ReportedDate_Previous)}		
 								,{'SerialNumber',count(SerialNumber_Current),count(SerialNumber_Previous)}		
-								,{'Tin',count(Tin_Current),count(Tin_Previous)}		
 								,{'User',count(User_Current),count(User_Previous)}
 								,{'Zip',count(Zip_Current),count(Zip_Previous)}											
+
+								// DEPRECATED
+								// ,{'Appproviderid',count(Appproviderid_Current),count(Appproviderid_Previous)}
+								// ,{'Auto_Payload',count(Auto_Payload_Current),count(Auto_Payload_Previous)}
+								// ,{'Bdid',count(Bdid_Current),count(Bdid_Previous)}
+								// ,{'County',count(County_Current),count(County_Previous)}
+								// ,{'CustomerProgram',count(CustomerProgram_Current),count(CustomerProgram_Previous)}
+								// ,{'Ip',count(Ip_Current),count(Ip_Previous)}
+								// ,{'ClusterDetails',count(ClusterDetails_Current),count(ClusterDetails_Previous)}
+								// ,{'ElementPivot',count(ElementPivot_Current),count(ElementPivot_Previous)}
+								// ,{'ScoreBreakdown',count(ScoreBreakdown_Current),count(ScoreBreakdown_Previous)}
+								// ,{'WeightingChart',count(WeightingChart_Current),count(WeightingChart_Previous)}
+								// ,{'Linkids',count(Linkids_Current),count(Linkids_Previous)}
+								// ,{'Lnpid',count(Lnpid_Current),count(Lnpid_Previous)}		
+								// ,{'Mbs',count(Mbs_Current),count(Mbs_Previous)}
+								// ,{'MbsDeltaBase',count(MbsDeltaBase_Current),count(MbsDeltaBase_Previous)}
+								// ,{'mbsvelocityrules',count(mbsvelocityrules_Current),count(mbsvelocityrules_Previous)}
+								// ,{'Npi',count(Npi_Current),count(Npi_Previous)}
+								// ,{'Professionalid',count(Professionalid_Current),count(Professionalid_Previous)}
+								// ,{'Tin',count(Tin_Current),count(Tin_Previous)}										
+
 								]
 						,{string keyname,unsigned Current,unsigned Previous});
 	res_tbl := table(ds,{keyname,Current,Previous,difference:=(Unsigned6)Current-Previous},few);
@@ -450,7 +357,7 @@ ds:= dataset([
 		self.unittest := left.keyname,
 		self.beforec := left.Previous,
 		self.afterc := left.Current,
-		self.result := if ( (DECIMAL5_2)(( left.difference / left.Previous) * 100) BETWEEN 0 AND 5 ,'Passed', if(left.difference < 0 , 'Failed', 'Review')),
+		self.result := if ( (DECIMAL5_2)(( left.difference / left.Previous) * 100) BETWEEN 0 AND 5 ,'Passed','Review'),
 		self.value := (string)left.difference + ' (' + (string)(DECIMAL5_2)(Round(( left.difference / left.Previous) * 100,2)) + '% '+if(left.difference >= 0, 'Up','Down')+')',
 		self := left;));
 
@@ -472,4 +379,4 @@ ds:= dataset([
 	);
 
 			
-END; 
+END;

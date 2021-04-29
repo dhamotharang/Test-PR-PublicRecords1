@@ -1,7 +1,4 @@
-﻿/*2017-04-18T23:56:58Z (Oscar Barrientos)
-
-*/
-import  autokey, AutoKeyI,AutokeyB2;
+﻿import  autokey, AutoKeyI,AutokeyB2;
 
 export Build_Autokeys(
 
@@ -112,11 +109,6 @@ FUNCTION
 							                                     AutoKeyI.BuildI_Indv.DoBuild,
 							                                     AutoKeyI.BuildI_Biz.DoBuild)); 
 
-	AutoKeyB2.MAC_AcceptSK_to_QA(_Dataset().autokeytemplate	, moveToQA);
-
-	return SEQUENTIAL(
-		 Build_autokeys
-		,moveToQA
-	);
+	return Build_autokeys;
 
 end;
