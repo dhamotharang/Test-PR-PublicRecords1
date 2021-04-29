@@ -197,6 +197,6 @@ EXPORT ProcBuildSpray(
 			'~thor_data400::in::civil::pa_bucks_thru_' + pVersion + '.doc.all'
 			'~thor_data400::in::civil::pa_bucks_doc'
 		)
-	)
+	);
 
 END;
