@@ -1,11 +1,19 @@
 ﻿IMPORT STD;
+	
+// #############################################################################################
+//                      MBS eCrash Agency 
+// #############################################################################################  
   dAgency := Infiles.dAgency;
-  SuppressIncidents := IncidentsAfterSuppression(Source_id IN ['EA','TM','TF']):INDEPENDENT;
 
-  //EA, Coplogic, TF, TM
+// #############################################################################################
+//                      EA Coplogic, TF, TM
+// #############################################################################################  
+  SuppressIncidents := IncidentsAfterSuppression(Source_id IN ['EA','TM','TF']):INDEPENDENT;
   dIncidentCombinedEcrash := DISTRIBUTE(SuppressIncidents(~(work_type_id IN ['2','3'])), HASH32(agency_id, source_id));
-   
-  //EA CRU
+	
+// #############################################################################################
+//                      EA CRU
+// ############################################################################################# 
   dIncidentCRU := DISTRIBUTE(SuppressIncidents(work_type_id IN ['2','3']), HASH32(agency_id));
 	
 // #############################################################################################
@@ -23,8 +31,11 @@
   jIncEcrash_Agency := JOIN(dIncidentCombinedEcrash, dAgency, 
                             LEFT.agency_id = RIGHT.agency_id AND 
                             LEFT.contrib_source = RIGHT.source_id, 
-                            tIncAgency(LEFT, RIGHT), LOOKUP);                                                         
-
+                            tIncAgency(LEFT, RIGHT), LOOKUP);  
+	
+// #############################################################################################
+//                  Join MBS Agency & Incident CRU
+// ############################################################################################# 
   Layout_Infiles_Fixed.incident tCruIncAgency(dIncidentCRU L, dAgency R) := TRANSFORM
     SELF.agency_name := IF(L.agency_id = R.agency_id, R.Agency_Name, '');
     SELF := L;
@@ -34,9 +45,14 @@
                          LEFT.agency_id = RIGHT.agency_id, 
                          tCruIncAgency(LEFT, RIGHT), LEFT OUTER, LOOKUP);
 
+// #############################################################################################
+//                Filter out terminated records (PRRecon - 49)
+// #############################################################################################
   Incidents := jIncEcrash_Agency(is_terminated_agency = FALSE) + jIncCru_Agency;
 
-  //Suppress the DE records basing on the drivers_exchange_flag in the agency file. 
+// #############################################################################################
+//  Suppress the DE records basing on the drivers_exchange_flag in the agency file. 
+// ############################################################################################# 
   suppressAgencies := DISTRIBUTED(Infiles.agency(drivers_exchange_flag ='0'), HASH32(agency_id));
   uSuppressAgencies := DEDUP(SORT(suppressAgencies, Agency_id, LOCAL), Agency_id, LOCAL);
 
@@ -45,139 +61,148 @@
                                    TRIM(LEFT.report_type_id, LEFT, RIGHT) = 'DE',
                                    MANY LOOKUP, LEFT ONLY );  
               
-  Layout_VehIncidents.SlimIncidents RemoveNulls(Incidents_DE_Suppression L) := TRANSFORM
+  Layout_VehIncidents.SlimIncidents tCleanIncidents(Incidents_DE_Suppression L) := TRANSFORM
      acc_nbr := IF(L.source_id IN ['TM','TF'], STD.Str.ToUpperCase(L.State_Report_number), STD.Str.ToUpperCase(L.Case_identIFier));
      t_scrub := STD.Str.Filter(acc_nbr,'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789');
-     accident_nbr := IF(t_scrub IN ['UNK', 'UNKNOWN'], 'UNK'+ l.incident_id, t_scrub); 
-     jurisdiction_state := IF(L.case_identifier = '11030001','GA', L.Loss_state_Abbr);
-     jurisdiction := IF(L.incident_id[1..9]='188188188' ,'LN Test PD', TRIM(L.agency_name, LEFT, RIGHT));
-     t_accident_date := STD.Str.FilterOut(TRIM(L.crash_date, LEFT, RIGHT),'-');
-     accident_date := IF(L.incident_id[1..9] ='188188188','20100901', t_accident_date);
-     Sent_to_HPCC_DateTime := STD.Str.FilterOut(TRIM(L.Sent_to_HPCC_DateTime, LEFT, RIGHT),'-');
-     jurisdiction_nbr := IF(L.incident_id[1..9]='188188188','1536035', L.AGENCY_ID);
-    SELF.agency_id := IF(STD.Str.ToUpperCase(TRIM(L.agency_id, LEFT, RIGHT))= 'NULL', '', L.agency_id);
-    SELF.Work_Type_ID := IF(STD.Str.ToUpperCase(TRIM(L.Work_Type_ID, LEFT, RIGHT))= 'NULL', '', L.Work_Type_ID);
-    SELF.vehicle_incident_id := IF(STD.Str.ToUpperCase(TRIM(L.incident_id, LEFT, RIGHT))= 'NULL','',L.incident_id);
-    SELF.accident_nbr := IF(STD.Str.ToUpperCase(TRIM(accident_nbr, LEFT, RIGHT))= 'NULL', '', accident_nbr);
-    SELF.Sent_to_HPCC_DateTime := IF(STD.Str.ToUpperCase(TRIM(Sent_to_HPCC_DateTime, LEFT, RIGHT))= 'NULL', '', Sent_to_HPCC_DateTime);
-    SELF.accident_date := IF(STD.Str.ToUpperCase(TRIM(accident_date, LEFT, RIGHT))='NULL', '', accident_date);
-    SELF.report_code := IF(STD.Str.ToUpperCase(TRIM(L.Source_id, LEFT, RIGHT))='NULL', '', L.Source_id);
-    SELF.report_id := IF(STD.Str.ToUpperCase(TRIM(L.report_id, LEFT, RIGHT))IN ['NULL', 'NUL'], '', L.report_id);
-    SELF.report_type_id := IF(STD.Str.ToUpperCase(TRIM(L.report_type_id, LEFT, RIGHT)) IN ['NULL', 'NUL'],'',L.report_type_id);
-    SELF.jurisdiction_state := IF(STD.Str.ToUpperCase(TRIM(jurisdiction_state, LEFT, RIGHT))='NULL','',jurisdiction_state);
-    SELF.jurisdiction_nbr := IF(STD.Str.ToUpperCase(TRIM(jurisdiction_nbr, LEFT, RIGHT))='NULL', '', jurisdiction_nbr);
-    SELF.jurisdiction := IF(STD.Str.ToUpperCase(TRIM(jurisdiction, LEFT, RIGHT))='NULL', '', jurisdiction);
-    SELF.cru_order_id := IF(STD.Str.ToUpperCase(TRIM(L.cru_order_id, LEFT, RIGHT))='NULL','', L.cru_order_id);
-    SELF.ORI_number := IF(STD.Str.ToUpperCase(TRIM(L.ORI_number, LEFT, RIGHT))='NULL', '', L.ORI_number);
-    SELF.Crash_City := IF(STD.Str.ToUpperCase(TRIM(L.Crash_City, LEFT, RIGHT))='NULL', '', L.Crash_City);
-    SELF.Loss_Street := IF(STD.Str.ToUpperCase(TRIM(L.Loss_Street, LEFT, RIGHT))='NULL', '', L.Loss_Street);
-    SELF.Loss_cross_street := IF(STD.Str.ToUpperCase(TRIM(L.Loss_cross_street, LEFT, RIGHT))= 'NULL', '', L.Loss_cross_street);
+     t_accident_nbr := IF(t_scrub IN ['UNK', 'UNKNOWN'], 'UNK'+ l.incident_id, t_scrub); 
+     t_jurisdiction_state := IF(L.case_identifier = '11030001','GA', L.Loss_state_Abbr);
+     t_jurisdiction := IF(L.incident_id[1..9]='188188188' ,'LN Test PD', TRIM(L.agency_name, LEFT, RIGHT));
+     accidentdate := STD.Str.FilterOut(TRIM(L.crash_date, LEFT, RIGHT),'-');
+     t_accident_date := IF(L.incident_id[1..9] ='188188188','20100901', accidentdate);
+     t_Sent_to_HPCC_DateTime := STD.Str.FilterOut(TRIM(L.Sent_to_HPCC_DateTime, LEFT, RIGHT),'-');
+     t_jurisdiction_nbr := IF(L.incident_id[1..9]='188188188','1536035', L.AGENCY_ID);
+    SELF.vehicle_incident_id := L.incident_id;
+    SELF.accident_nbr := t_accident_nbr;
+    SELF.Sent_to_HPCC_DateTime := t_Sent_to_HPCC_DateTime;
+    SELF.accident_date := t_accident_date;
+    SELF.report_code := L.Source_id;
+    SELF.jurisdiction_state := t_jurisdiction_state;
+    SELF.jurisdiction_nbr := t_jurisdiction_nbr;
+    SELF.jurisdiction := t_jurisdiction;
     SELF.vehicle_incident_id_latest := '';
     SELF := L;
     SELF := [];
   END;
-  CleanIncidents := PROJECT(Incidents_DE_Suppression,RemoveNulls(LEFT)):INDEPENDENT;
+  CleanIncidents := PROJECT(Incidents_DE_Suppression, tCleanIncidents(LEFT)):INDEPENDENT;	
 
-  //   drop any TM's that came after TF's
+// #############################################################################################
+//   Drop any TM's that came after TF's
+// #############################################################################################
   TMReports := DISTRIBUTE(CleanIncidents(report_code = 'TM'), HASH32(accident_nbr));
   TFReports := DISTRIBUTE(CleanIncidents(report_code = 'TF'), HASH32(accident_nbr));
-
   Jn_TM_Reports := JOIN(TMReports, TFReports, 
                         LEFT.accident_nbr = RIGHT.accident_nbr AND 
                         LEFT.ORI_Number = RIGHT.ORI_Number AND 
                         TRIM(LEFT.jurisdiction_state,  LEFT, RIGHT) = TRIM(RIGHT.jurisdiction_state,  LEFT, RIGHT) AND 
                         TRIM(LEFT.report_type_id,  LEFT, RIGHT)  = TRIM(RIGHT.report_type_id,  LEFT, RIGHT) AND 
                         LEFT.Sent_to_HPCC_DateTime >= RIGHT.Sent_to_HPCC_DateTime,
-                        TRANSFORM(LEFT) , LEFT ONLY, LOCAL) ;     
-
-  IncidentsAfterTMTF := CleanIncidents(report_code IN ['EA']) + Jn_TM_Reports  + TFReports:INDEPENDENT;
+                        TRANSFORM(LEFT), LEFT ONLY, LOCAL) ;  
+												
+  EAReports := CleanIncidents(report_code = 'EA');
 	
-  //Meow Key
+  IncidentsAfterTMTF := EAReports + Jn_TM_Reports + TFReports:INDEPENDENT;
+
+// #############################################################################################
+//                     Join Insurance CRU Meow Key & eCrash Incidents
+// #############################################################################################
   iMeowKey := INDEX(DATASET([], Layout_VehIncidents.MeowLayout), {idfield}, {Layout_VehIncidents.MeowLayout -{idfield}},
-	                  '~foreign::'+ Constants.alpha_ip + '::thor_data400::key::ecrash_cru::qa::idfield::meow');
-       
-  MeowKey := DISTRIBUTE(PULL(iMeowKey(report_code IN ['EA','TM','TF'])), HASH32(vehicle_incident_id));
+	                  '~foreign::'+ Constants.alpha_ip + '::thor_data400::key::ecrash_cru::qa::idfield::meow');       
+  fMewoKeyEcrash := PULL(iMeowKey(report_code IN ['EA','TM','TF'])); 
+	dMeowKey := DISTRIBUTE(fMewoKeyEcrash, HASH32(vehicle_incident_id));
+	sMeowKey := SORT(dMeowKey, vehicle_incident_id, LOCAL);
+	uMeowKey := DEDUP(sMeowKey, vehicle_incident_id, LOCAL);
     
-  dMeowKey := DISTRIBUTE(DEDUP(SORT(MeowKey, vehicle_incident_id, LOCAL), vehicle_incident_id, LOCAL), HASH32(l_accnbr)) : INDEPENDENT;
-      
-  Layout_VehIncidents.SlimIncidents trecs(IncidentsAfterTMTF L, dMeowKey R) := TRANSFORM
+  dMeowKeyByAccnbr := DISTRIBUTE(uMeowKey, HASH32(l_accnbr)):INDEPENDENT;
+	
+  Layout_VehIncidents.SlimIncidents tIncMeowTMTF(IncidentsAfterTMTF L, dMeowKeyByAccnbr R) := TRANSFORM
     SELF.vehicle_incident_id_latest :=  R.vehicle_incident_id; 
     SELF := L;
   END;
 
   TMTFIncidents := IncidentsAfterTMTF(report_code IN ['TM', 'TF']);
   NonTMTFIncidents := IncidentsAfterTMTF(report_code NOT IN ['TM', 'TF']);
-  TMTFMeow := dMeowKey(report_code IN ['TM', 'TF']);
-  NonTMTFMeow := dMeowKey(report_code NOT IN ['TM', 'TF']);      
+  TMTFMeow := dMeowKeyByAccnbr(report_code IN ['TM', 'TF']);
+  NonTMTFMeow := dMeowKeyByAccnbr(report_code NOT IN ['TM', 'TF']);      
   
-	JnIncidentsTMTF := JOIN(TMTFIncidents, TMTFMeow,
-                          TRIM(LEFT.accident_nbr, LEFT, RIGHT) = TRIM(RIGHT.l_accnbr, LEFT, RIGHT) AND 
-                          TRIM(LEFT.jurisdiction_state, LEFT, RIGHT) = TRIM(RIGHT.jurisdiction_state, LEFT, RIGHT) AND
-                          TRIM(LEFT.jurisdiction_nbr, LEFT, RIGHT) = TRIM(RIGHT.jurisdiction_nbr, LEFT, RIGHT) AND
-                          TRIM(LEFT.report_code, LEFT, RIGHT) = TRIM(RIGHT.report_code, LEFT, RIGHT) AND 
-                          TRIM(LEFT.report_type_id, LEFT, RIGHT) = TRIM(RIGHT.report_type_id, LEFT, RIGHT),
-                          trecs( LEFT, RIGHT), LEFT OUTER, LOCAL);
+	jInc_MeowTMTF := JOIN(TMTFIncidents, TMTFMeow,
+                        TRIM(LEFT.accident_nbr, LEFT, RIGHT) = TRIM(RIGHT.l_accnbr, LEFT, RIGHT) AND 
+                        TRIM(LEFT.jurisdiction_state, LEFT, RIGHT) = TRIM(RIGHT.jurisdiction_state, LEFT, RIGHT) AND
+                        TRIM(LEFT.jurisdiction_nbr, LEFT, RIGHT) = TRIM(RIGHT.jurisdiction_nbr, LEFT, RIGHT) AND
+                        TRIM(LEFT.report_code, LEFT, RIGHT) = TRIM(RIGHT.report_code, LEFT, RIGHT) AND 
+                        TRIM(LEFT.report_type_id, LEFT, RIGHT) = TRIM(RIGHT.report_type_id, LEFT, RIGHT),
+                        tIncMeowTMTF(LEFT, RIGHT), LEFT OUTER, LOCAL):INDEPENDENT;
 
-  MatchedTMTF := JnIncidentsTMTF(TRIM(vehicle_incident_id_latest, LEFT, RIGHT) <> '');
-  NonMatchingTMTF := JnIncidentsTMTF(TRIM(vehicle_incident_id_latest, LEFT, RIGHT) = '');
+  MatchedTMTF := jInc_MeowTMTF(TRIM(vehicle_incident_id_latest, LEFT, RIGHT) <> '');
+  NonMatchingTMTF := jInc_MeowTMTF(TRIM(vehicle_incident_id_latest, LEFT, RIGHT) = '');
   NonMatchingTM := NonMatchingTMTF(report_code IN ['TM']);
-  NonMatchingTF := JnIncidentsTMTF(report_code IN ['TF']);
+  NonMatchingTF := jInc_MeowTMTF(report_code IN ['TF']);
 
-  Layout_VehIncidents.SlimIncidents trecs1(NonMatchingTM L, NonMatchingTF R) := TRANSFORM
+  Layout_VehIncidents.SlimIncidents tNonMatchTMTF(NonMatchingTM L, NonMatchingTF R) := TRANSFORM
     SELF.vehicle_incident_id_latest := R.vehicle_incident_id; 
     SELF := L;
   END;
-  jnNonMatchIncidentsTMTF := JOIN(NonMatchingTM,NonMatchingTF, 
-                                  TRIM(LEFT.accident_nbr, LEFT, RIGHT) = TRIM(RIGHT.accident_nbr, LEFT, RIGHT) AND 
-                                  TRIM(LEFT.ORI_Number, LEFT, RIGHT) = TRIM(RIGHT.ORI_Number, LEFT, RIGHT) AND 
-                                  TRIM(LEFT.jurisdiction_state, LEFT, RIGHT) = TRIM(RIGHT.jurisdiction_state, LEFT, RIGHT) AND
-                                  TRIM(LEFT.report_type_id, LEFT, RIGHT) = TRIM(RIGHT.report_type_id, LEFT, RIGHT), 
-                                  trecs1( LEFT, RIGHT), LEFT OUTER, LOCAL);
-  MatchedIncidentsTMTF := jnNonMatchIncidentsTMTF(TRIM(vehicle_incident_id_latest, LEFT, RIGHT) <> '');
+  jNonMatchTM_NonMatchTF := JOIN(NonMatchingTM, NonMatchingTF, 
+                                 TRIM(LEFT.accident_nbr, LEFT, RIGHT) = TRIM(RIGHT.accident_nbr, LEFT, RIGHT) AND 
+                                 TRIM(LEFT.ORI_Number, LEFT, RIGHT) = TRIM(RIGHT.ORI_Number, LEFT, RIGHT) AND 
+                                 TRIM(LEFT.jurisdiction_state, LEFT, RIGHT) = TRIM(RIGHT.jurisdiction_state, LEFT, RIGHT) AND
+                                 TRIM(LEFT.report_type_id, LEFT, RIGHT) = TRIM(RIGHT.report_type_id, LEFT, RIGHT), 
+                                 tNonMatchTMTF(LEFT, RIGHT), LEFT OUTER, LOCAL);
+  MatchedIncidentsTMTF := jNonMatchTM_NonMatchTF(TRIM(vehicle_incident_id_latest, LEFT, RIGHT) <> '');
 
-  JnIncidentNonTMTF := JOIN(NonTMTFIncidents, NonTMTFMeow,
+  jInc_MeowNonTMTF := JOIN(NonTMTFIncidents, NonTMTFMeow,
                             TRIM(LEFT.accident_nbr, LEFT, RIGHT) = TRIM(RIGHT.l_accnbr, LEFT, RIGHT) AND 
                             (INTEGER)LEFT.accident_date = (INTEGER)RIGHT.accident_date AND
                             TRIM(LEFT.jurisdiction_state, LEFT, RIGHT) = TRIM(RIGHT.jurisdiction_state, LEFT, RIGHT) AND
                             TRIM(LEFT.report_code, LEFT, RIGHT) = TRIM(RIGHT.report_code, LEFT, RIGHT) AND 
                             TRIM(LEFT.report_type_id, LEFT, RIGHT) = TRIM(RIGHT.report_type_id, LEFT, RIGHT),
-                            trecs( LEFT, RIGHT), LEFT OUTER, LOCAL):INDEPENDENT;
+                            tIncMeowTMTF(LEFT, RIGHT), LEFT OUTER, LOCAL):INDEPENDENT;
                                         
-  MatchedInicdentOthers := JnIncidentNonTMTF(TRIM(vehicle_incident_id_latest, LEFT, RIGHT) <> '');                                        
-  dsJnEmptyIncidentId := JnIncidentNonTMTF(TRIM(vehicle_incident_id_latest, LEFT, RIGHT) = '');
+  MatchedInicdentOthers := jInc_MeowNonTMTF(TRIM(vehicle_incident_id_latest, LEFT, RIGHT) <> '');                                        
+  dsJnEmptyIncidentId := jInc_MeowNonTMTF(TRIM(vehicle_incident_id_latest, LEFT, RIGHT) = '');
                       
-  CruIncidents := JnIncidentNonTMTF(Work_Type_ID IN ['2','3'] AND TRIM(vehicle_incident_id_latest, LEFT, RIGHT) = '') ;
-  NonCruIncidents := JnIncidentNonTMTF(Work_Type_ID NOT IN ['2','3'] AND TRIM(vehicle_incident_id_latest, LEFT, RIGHT) = '') ;
+  CruIncidents := jInc_MeowNonTMTF(Work_Type_ID IN ['2','3'] AND TRIM(vehicle_incident_id_latest, LEFT, RIGHT) = '');
+  NonCruIncidents := jInc_MeowNonTMTF(Work_Type_ID NOT IN ['2','3'] AND TRIM(vehicle_incident_id_latest, LEFT, RIGHT) = '');
 
-  JnIncidentsCru := JOIN(CruIncidents, NonTMTFMeow,
-                         TRIM(LEFT.accident_nbr, LEFT, RIGHT) = TRIM(RIGHT.l_accnbr, LEFT, RIGHT) AND 
-                         TRIM(LEFT.jurisdiction_state, LEFT, RIGHT) = TRIM(RIGHT.jurisdiction_state, LEFT, RIGHT) AND
-                         TRIM(LEFT.report_code, LEFT, RIGHT) = TRIM(RIGHT.report_code, LEFT, RIGHT) AND
-                         TRIM(LEFT.jurisdiction_nbr, LEFT, RIGHT) = TRIM(RIGHT.jurisdiction_nbr, LEFT, RIGHT) AND
-                         TRIM(LEFT.cru_order_id  , LEFT, RIGHT) = TRIM(RIGHT.cru_order_id, LEFT, RIGHT) AND 
-                         TRIM(LEFT.report_type_id, LEFT, RIGHT) = TRIM(RIGHT.report_type_id, LEFT, RIGHT),
-                         trecs(LEFT, RIGHT), LEFT OUTER, LOCAL);
+  jIncCru_NonTMTFMeow := JOIN(CruIncidents, NonTMTFMeow,
+                              TRIM(LEFT.accident_nbr, LEFT, RIGHT) = TRIM(RIGHT.l_accnbr, LEFT, RIGHT) AND 
+                              TRIM(LEFT.jurisdiction_state, LEFT, RIGHT) = TRIM(RIGHT.jurisdiction_state, LEFT, RIGHT) AND
+                              TRIM(LEFT.report_code, LEFT, RIGHT) = TRIM(RIGHT.report_code, LEFT, RIGHT) AND
+                              TRIM(LEFT.jurisdiction_nbr, LEFT, RIGHT) = TRIM(RIGHT.jurisdiction_nbr, LEFT, RIGHT) AND
+                              TRIM(LEFT.cru_order_id  , LEFT, RIGHT) = TRIM(RIGHT.cru_order_id, LEFT, RIGHT) AND 
+                              TRIM(LEFT.report_type_id, LEFT, RIGHT) = TRIM(RIGHT.report_type_id, LEFT, RIGHT),
+                              tIncMeowTMTF(LEFT, RIGHT), LEFT OUTER, LOCAL):INDEPENDENT;
                             
-  MatchedIncidentsCru := JnIncidentsCru(TRIM(vehicle_incident_id_latest, LEFT, RIGHT) <> '');    
-  FinalNonMatchingIncidents := JnIncidentsCru(TRIM(vehicle_incident_id_latest, LEFT, RIGHT) = '') + NonCruIncidents + jnNonMatchIncidentsTMTF(TRIM(vehicle_incident_id_latest, LEFT, RIGHT) = '') + NonMatchingTMTF(report_code not IN ['TM']) :persist('~thor_data400::ecrash::persist::FinalNonMatchinginIncidents') ;
-
-  Layout_VehIncidents.SlimIncidents trecs4(FinalNonMatchingIncidents L, dMeowKey R) := TRANSFORM
+  MatchedIncidentsCru := jIncCru_NonTMTFMeow(TRIM(vehicle_incident_id_latest, LEFT, RIGHT) <> ''); 
+	
+	fIncCru_NonTMTFMeow := jIncCru_NonTMTFMeow(TRIM(vehicle_incident_id_latest, LEFT, RIGHT) = '');
+	fNonMatchTM_NonMatchTF := jNonMatchTM_NonMatchTF(TRIM(vehicle_incident_id_latest, LEFT, RIGHT) = '');
+	fNonMatchingTMTF := NonMatchingTMTF(report_code NOT IN ['TM']);
+  FinalNonMatchingIncidents := fIncCru_NonTMTFMeow +
+	                             NonCruIncidents + 
+															 fNonMatchTM_NonMatchTF + 
+															 fNonMatchingTMTF :PERSIST('~thor_data400::ecrash::persist::FinalNonMatchinginIncidents');
+  fFinalNonMatchingIncidents := FinalNonMatchingIncidents(report_code IN ['EA'] AND work_type_id IN ['0','1','2','3']);
+	
+  Layout_VehIncidents.SlimIncidents tFinalNonMatchInc(fFinalNonMatchingIncidents L, dMeowKeyByAccnbr R) := TRANSFORM
     SELF.vehicle_incident_id_latest := R.vehicle_incident_id; 
     SELF := L;
   END;
-  JnFinalNonMatchingIncidents  := JOIN(FinalNonMatchingIncidents(report_code IN ['EA'] AND work_type_id IN ['0','1','2','3']), NonTMTFMeow,
-                                       TRIM(LEFT.accident_date, LEFT, RIGHT) = TRIM(RIGHT.accident_date, LEFT, RIGHT) AND 
-                                       TRIM(LEFT.jurisdiction_state, LEFT, RIGHT) = TRIM(RIGHT.jurisdiction_state, LEFT, RIGHT) AND
-                                       TRIM(LEFT.report_code, LEFT, RIGHT) = TRIM(RIGHT.report_code, LEFT, RIGHT) AND
-                                       TRIM(LEFT.report_type_id, LEFT, RIGHT) = TRIM(RIGHT.report_type_id, LEFT, RIGHT) AND
-                                       TRIM(LEFT.crash_city, LEFT, RIGHT) = TRIM(RIGHT.vehicle_incident_city, LEFT, RIGHT) AND
-                                       TRIM(LEFT.loss_street, LEFT, RIGHT) = TRIM(RIGHT.accident_street, LEFT, RIGHT) AND
-                                       TRIM(LEFT.loss_cross_street, LEFT, RIGHT) = TRIM(RIGHT.accident_cross_street, LEFT, RIGHT) AND
-                                       (LEFT.report_code NOT IN ['TM','TF'] OR TRIM(LEFT.ori_number, LEFT, RIGHT) = TRIM(RIGHT.agency_ori, LEFT, RIGHT)), 
-                                       trecs4( LEFT, RIGHT), LEFT OUTER);
+  jFinalNonMatchingIncidents := JOIN(fFinalNonMatchingIncidents, NonTMTFMeow,
+                                     TRIM(LEFT.accident_date, LEFT, RIGHT) = TRIM(RIGHT.accident_date, LEFT, RIGHT) AND 
+                                     TRIM(LEFT.jurisdiction_state, LEFT, RIGHT) = TRIM(RIGHT.jurisdiction_state, LEFT, RIGHT) AND
+                                     TRIM(LEFT.report_code, LEFT, RIGHT) = TRIM(RIGHT.report_code, LEFT, RIGHT) AND
+                                     TRIM(LEFT.report_type_id, LEFT, RIGHT) = TRIM(RIGHT.report_type_id, LEFT, RIGHT) AND
+                                     TRIM(LEFT.crash_city, LEFT, RIGHT) = TRIM(RIGHT.vehicle_incident_city, LEFT, RIGHT) AND
+                                     TRIM(LEFT.loss_street, LEFT, RIGHT) = TRIM(RIGHT.accident_street, LEFT, RIGHT) AND
+                                     TRIM(LEFT.loss_cross_street, LEFT, RIGHT) = TRIM(RIGHT.accident_cross_street, LEFT, RIGHT) AND
+                                     (LEFT.report_code NOT IN ['TM','TF'] OR TRIM(LEFT.ori_number, LEFT, RIGHT) = TRIM(RIGHT.agency_ori, LEFT, RIGHT)), 
+                                     tFinalNonMatchInc( LEFT, RIGHT), LEFT OUTER);
                                     
-  FinalMatchedIncidents := JnFinalNonMatchingIncidents(TRIM(vehicle_incident_id_latest, LEFT, RIGHT) <> '');
+  FinalMatchedIncidents := jFinalNonMatchingIncidents(TRIM(vehicle_incident_id_latest, LEFT, RIGHT) <> '');
 
   MatchedIncidents := MatchedTMTF + MatchedIncidentsTMTF + MatchedInicdentOthers + MatchedIncidentsCru + FinalMatchedIncidents;
-
-EXPORT Map_eCrashAccidents_To_CRUVehicleIncidentsBase := DEDUP(SORT(DISTRIBUTE(MatchedIncidents, HASH32(vehicle_incident_id)), vehicle_incident_id, LOCAL), vehicle_incident_id, LOCAL);
+	dMatchedIncidents := DISTRIBUTE(MatchedIncidents, HASH32(vehicle_incident_id));
+	sMatchedIncidents := SORT(dMatchedIncidents, vehicle_incident_id, LOCAL);
+	uMatchedIncidents := DEDUP(sMatchedIncidents, vehicle_incident_id, LOCAL);
+	
+EXPORT Map_eCrashAccidents_To_CRUVehicleIncidentsBase := uMatchedIncidents;
