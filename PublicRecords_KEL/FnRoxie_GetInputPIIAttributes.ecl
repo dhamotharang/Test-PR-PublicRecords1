@@ -4,11 +4,11 @@ EXPORT FnRoxie_GetInputPIIAttributes(DATASET(PublicRecords_KEL.ECL_Functions.Lay
             PublicRecords_KEL.Interface_Options Options,
 						DATASET(PublicRecords_KEL.ECL_Functions.Layouts_FDC().Layout_FDC) FDCDataset) := FUNCTION
             		
-	LayoutInputPIIAttributes := RECORDOF(PublicRecords_KEL.Q_Input_Attributes_V1_Dynamic(DATASET([], PublicRecords_KEL.ECL_Functions.Layouts.LayoutInputPII), 0, PublicRecords_KEL.CFG_Compile.Permit__NONE, Options.isFCRA,).res0);
+	LayoutInputPIIAttributes := PublicRecords_KEL.KEL_Queries_MAS_Consumer.L_Compile.Input_Attributes_V1_Dynamic_Res0_Layout;
 
 	
 	InputPIIAttributesResults := NOCOMBINE(JOIN(RepInput, FDCDataset, LEFT.G_ProcUID = RIGHT.G_ProcUID, TRANSFORM(LayoutInputPIIAttributes,
-		PIIAttributes := PublicRecords_KEL.Q_Input_Attributes_V1_Dynamic(DATASET(LEFT), (INTEGER) LEFT.P_InpClnArchDt[1..8], Options.KEL_Permissions_Mask, Options.isFCRA, DATASET(RIGHT)).Res0;
+		PIIAttributes := PublicRecords_KEL.KEL_Queries_MAS_Consumer.Q_Input_Attributes_V1_Dynamic(DATASET(LEFT), (INTEGER) LEFT.P_InpClnArchDt[1..8], Options.KEL_Permissions_Mask, Options.isFCRA, DATASET(RIGHT)).Res0;
 		SELF := PIIAttributes[1]), 
 	LEFT OUTER, ATMOST(100), KEEP(1)));
 		

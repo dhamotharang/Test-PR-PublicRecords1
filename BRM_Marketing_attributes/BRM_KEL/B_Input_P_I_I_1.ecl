@@ -4,8 +4,8 @@ IMPORT CFG_Compile,E_Address,E_Address_Slim,E_Address_Summary,E_Email,E_Geo_Link
 IMPORT * FROM KEL15.Null;
 EXPORT B_Input_P_I_I_1(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG_Compile __cfg = CFG_Compile) := MODULE
   SHARED VIRTUAL TYPEOF(E_Input_P_I_I(__in,__cfg).__Result) __E_Input_P_I_I := E_Input_P_I_I(__in,__cfg).__Result;
-  SHARED __EE700636 := __E_Input_P_I_I;
-  EXPORT __ST137170_Layout := RECORD
+  SHARED __EE708314 := __E_Input_P_I_I;
+  EXPORT __ST142906_Layout := RECORD
     KEL.typ.nuid UID;
     KEL.typ.ntyp(E_Person().Typ) Subject_;
     KEL.typ.nstr P___Inp_Acct_;
@@ -89,6 +89,50 @@ EXPORT B_Input_P_I_I_1(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG
     KEL.typ.ntyp(E_Name_Summary().Typ) Name_Summ_;
     KEL.typ.ntyp(E_Phone_Summary().Typ) Telephone_Summary_;
     KEL.typ.ntyp(E_Address_Summary().Typ) Location_Summary_;
+    KEL.typ.nstr Current_Addr_Prim_Rng_;
+    KEL.typ.nstr Current_Addr_Pre_Dir_;
+    KEL.typ.nstr Current_Addr_Prim_Name_;
+    KEL.typ.nstr Current_Addr_Sffx_;
+    KEL.typ.nstr Current_Addr_Sec_Rng_;
+    KEL.typ.nstr Current_Addr_State_;
+    KEL.typ.nstr Current_Addr_Zip5_;
+    KEL.typ.nstr Current_Addr_Zip4_;
+    KEL.typ.nstr Current_Addr_State_Code_;
+    KEL.typ.nstr Current_Addr_Cnty_;
+    KEL.typ.nstr Current_Addr_Geo_;
+    KEL.typ.nstr Current_Addr_City_;
+    KEL.typ.nstr Current_Addr_Post_Dir_;
+    KEL.typ.nstr Current_Addr_Lat_;
+    KEL.typ.nstr Current_Addr_Lng_;
+    KEL.typ.nstr Current_Addr_Unit_Designation_;
+    KEL.typ.nstr Current_Addr_Type_;
+    KEL.typ.nstr Current_Addr_Status_;
+    KEL.typ.nkdate Current_Addr_Date_First_Seen_;
+    KEL.typ.nkdate Current_Addr_Date_Last_Seen_;
+    KEL.typ.nstr Current_Addr_Full_;
+    KEL.typ.ntyp(E_Address().Typ) Current_Address_;
+    KEL.typ.nstr Previous_Addr_Prim_Rng_;
+    KEL.typ.nstr Previous_Addr_Pre_Dir_;
+    KEL.typ.nstr Previous_Addr_Prim_Name_;
+    KEL.typ.nstr Previous_Addr_Sffx_;
+    KEL.typ.nstr Previous_Addr_Sec_Rng_;
+    KEL.typ.nstr Previous_Addr_State_;
+    KEL.typ.nstr Previous_Addr_Zip5_;
+    KEL.typ.nstr Previous_Addr_Zip4_;
+    KEL.typ.nstr Previous_Addr_State_Code_;
+    KEL.typ.nstr Previous_Addr_Cnty_;
+    KEL.typ.nstr Previous_Addr_Geo_;
+    KEL.typ.nstr Previous_Addr_City_;
+    KEL.typ.nstr Previous_Addr_Post_Dir_;
+    KEL.typ.nstr Previous_Addr_Lat_;
+    KEL.typ.nstr Previous_Addr_Lng_;
+    KEL.typ.nstr Previous_Addr_Unit_Designation_;
+    KEL.typ.nstr Previous_Addr_Type_;
+    KEL.typ.nstr Previous_Addr_Status_;
+    KEL.typ.nkdate Previous_Addr_Date_First_Seen_;
+    KEL.typ.nkdate Previous_Addr_Date_Last_Seen_;
+    KEL.typ.nstr Previous_Addr_Full_;
+    KEL.typ.ntyp(E_Address().Typ) Previous_Address_;
     KEL.typ.nstr Input_Account_Value_;
     KEL.typ.epoch Archive___Date_ := 0;
     KEL.typ.epoch Date_First_Seen_ := 0;
@@ -97,10 +141,10 @@ EXPORT B_Input_P_I_I_1(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG
     KEL.typ.epoch Vault_Date_Last_Seen_ := 0;
     KEL.typ.int __RecordCount := 0;
   END;
-  SHARED __ST137170_Layout __ND1369455__Project(E_Input_P_I_I(__in,__cfg).Layout __PP700207) := TRANSFORM
-    __CC13527 := '-99999';
-    SELF.Input_Account_Value_ := FN_Compile(__cfg).FN_Is_Blank(__ECAST(KEL.typ.nstr,__PP700207.P___Inp_Acct_),__ECAST(KEL.typ.nstr,__CN(__CC13527)));
-    SELF := __PP700207;
+  SHARED __ST142906_Layout __ND1378189__Project(E_Input_P_I_I(__in,__cfg).Layout __PP707665) := TRANSFORM
+    __CC13587 := '-99999';
+    SELF.Input_Account_Value_ := FN_Compile(__cfg).FN_Is_Blank(__ECAST(KEL.typ.nstr,__PP707665.P___Inp_Acct_),__ECAST(KEL.typ.nstr,__CN(__CC13587)));
+    SELF := __PP707665;
   END;
-  EXPORT __ENH_Input_P_I_I_1 := PROJECT(__EE700636,__ND1369455__Project(LEFT));
+  EXPORT __ENH_Input_P_I_I_1 := PROJECT(__EE708314,__ND1378189__Project(LEFT));
 END;

@@ -4,8 +4,8 @@ IMPORT B_Sele_Person_5,CFG_Compile,E_Business_Org,E_Business_Sele,E_Business_Sel
 IMPORT * FROM KEL15.Null;
 EXPORT B_Sele_Person_4(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG_Compile __cfg = CFG_Compile) := MODULE
   SHARED VIRTUAL TYPEOF(B_Sele_Person_5(__in,__cfg).__ENH_Sele_Person_5) __ENH_Sele_Person_5 := B_Sele_Person_5(__in,__cfg).__ENH_Sele_Person_5;
-  SHARED __EE892753 := __ENH_Sele_Person_5;
-  EXPORT __ST149244_Layout := RECORD
+  SHARED __EE900563 := __ENH_Sele_Person_5;
+  EXPORT __ST155024_Layout := RECORD
     KEL.typ.ntyp(E_Business_Sele().Typ) Legal_;
     KEL.typ.ntyp(E_Person().Typ) Contact_;
     KEL.typ.nint Ult_I_D_;
@@ -24,10 +24,10 @@ EXPORT B_Sele_Person_4(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG
     KEL.typ.epoch Vault_Date_Last_Seen_ := 0;
     KEL.typ.int __RecordCount := 0;
   END;
-  SHARED __ST149244_Layout __ND892963__Project(B_Sele_Person_5(__in,__cfg).__ST152250_Layout __PP892754) := TRANSFORM
-    __BS892810 := __T(__PP892754.Contact_Info_);
-    SELF.Is_Executive_Ever_ := EXISTS(__BS892810(__T(__OP2(__T(__PP892754.Contact_Info_).Is_Executive_,=,__CN(TRUE)))));
-    SELF := __PP892754;
+  SHARED __ST155024_Layout __ND900773__Project(B_Sele_Person_5(__in,__cfg).__ST158030_Layout __PP900564) := TRANSFORM
+    __BS900620 := __T(__PP900564.Contact_Info_);
+    SELF.Is_Executive_Ever_ := EXISTS(__BS900620(__T(__OP2(__T(__PP900564.Contact_Info_).Is_Executive_,=,__CN(TRUE)))));
+    SELF := __PP900564;
   END;
-  EXPORT __ENH_Sele_Person_4 := PROJECT(__EE892753,__ND892963__Project(LEFT));
+  EXPORT __ENH_Sele_Person_4 := PROJECT(__EE900563,__ND900773__Project(LEFT));
 END;

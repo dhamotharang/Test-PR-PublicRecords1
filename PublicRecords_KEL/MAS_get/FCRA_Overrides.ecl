@@ -12,7 +12,7 @@ SHARED Layouts_FDC  := PublicRecords_KEL.ECL_Functions.Layouts_FDC(Options);
 SHARED NotRegulated := PublicRecords_KEL.ECL_Functions.Constants.NotRegulated;
 SHARED BlankString  := PublicRecords_KEL.ECL_Functions.Constants.BlankString;
 SHARED SetDPMBitmap := PublicRecords_KEL.ECL_Functions.Fn_KEL_DPMBitmap.SetValue;
-SHARED CFG_File     := PublicRecords_KEL.CFG_Compile;
+SHARED CFG_File     := PublicRecords_KEL.KEL_Queries_MAS_Shared.C_Compile;
 SHARED GLBARegulatedDeathMasterRecord(STRING glb_flag) := glb_flag = 'Y';
 SHARED DPPARegulatedWaterCraftRecord(STRING dppa_flag) := IF(TRIM(dppa_flag, LEFT, RIGHT) = 'Y', TRUE, FALSE);	
 SHARED LN_PropertyV2_Src(STRING ln_fares_id) := MDR.sourceTools.fProperty(ln_fares_id);

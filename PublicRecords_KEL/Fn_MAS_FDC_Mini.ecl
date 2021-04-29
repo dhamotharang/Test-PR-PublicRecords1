@@ -59,7 +59,7 @@ EXPORT Fn_MAS_FDC_Mini(DATASET(PublicRecords_KEL.ECL_Functions.Layouts.LayoutInp
 	
 	Layouts_FDC  := PublicRecords_KEL.ECL_Functions.Layouts_FDC(Options);
 	Common       := PublicRecords_KEL.ECL_Functions.Common(Options, JoinFlags);
-	CFG_File     := PublicRecords_KEL.CFG_Compile;
+	CFG_File     := PublicRecords_KEL.KEL_Queries_MAS_Shared.C_Compile;
 	Regulated    := PublicRecords_KEL.ECL_Functions.Constants.Regulated;
 	NotRegulated := PublicRecords_KEL.ECL_Functions.Constants.NotRegulated;
 	BlankString  := PublicRecords_KEL.ECL_Functions.Constants.BlankString;

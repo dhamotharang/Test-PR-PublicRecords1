@@ -4,8 +4,8 @@ IMPORT B_Address_2,CFG_Compile,E_Address,E_Geo_Link,E_Zip_Code FROM BRM_Marketin
 IMPORT * FROM KEL15.Null;
 EXPORT B_Address_1(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG_Compile __cfg = CFG_Compile) := MODULE
   SHARED VIRTUAL TYPEOF(B_Address_2(__in,__cfg).__ENH_Address_2) __ENH_Address_2 := B_Address_2(__in,__cfg).__ENH_Address_2;
-  SHARED __EE1244156 := __ENH_Address_2;
-  EXPORT __ST133638_Layout := RECORD
+  SHARED __EE1251966 := __ENH_Address_2;
+  EXPORT __ST139330_Layout := RECORD
     KEL.typ.nuid UID;
     KEL.typ.nstr Primary_Range_;
     KEL.typ.nstr Predirectional_;
@@ -46,9 +46,9 @@ EXPORT B_Address_1(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG_Com
     KEL.typ.epoch Vault_Date_Last_Seen_ := 0;
     KEL.typ.int __RecordCount := 0;
   END;
-  SHARED __ST133638_Layout __ND1244607__Project(B_Address_2(__in,__cfg).__ST137606_Layout __PP1244157) := TRANSFORM
-    SELF.Is_P_O_Box_ := __OR(__PP1244157.Is_P_O_Box_Zip_,__CN(__PP1244157.Is_P_O_Box_A_D_V_O_));
-    SELF := __PP1244157;
+  SHARED __ST139330_Layout __ND1252417__Project(B_Address_2(__in,__cfg).__ST143386_Layout __PP1251967) := TRANSFORM
+    SELF.Is_P_O_Box_ := __OR(__PP1251967.Is_P_O_Box_Zip_,__CN(__PP1251967.Is_P_O_Box_A_D_V_O_));
+    SELF := __PP1251967;
   END;
-  EXPORT __ENH_Address_1 := PROJECT(__EE1244156,__ND1244607__Project(LEFT));
+  EXPORT __ENH_Address_1 := PROJECT(__EE1251966,__ND1252417__Project(LEFT));
 END;

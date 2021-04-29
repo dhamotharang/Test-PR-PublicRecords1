@@ -4,8 +4,8 @@ IMPORT B_Sele_Phone_Number_6,CFG_Compile,E_Business_Org,E_Business_Sele,E_Busine
 IMPORT * FROM KEL15.Null;
 EXPORT B_Sele_Phone_Number_5(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG_Compile __cfg = CFG_Compile) := MODULE
   SHARED VIRTUAL TYPEOF(B_Sele_Phone_Number_6(__in,__cfg).__ENH_Sele_Phone_Number_6) __ENH_Sele_Phone_Number_6 := B_Sele_Phone_Number_6(__in,__cfg).__ENH_Sele_Phone_Number_6;
-  SHARED __EE868735 := __ENH_Sele_Phone_Number_6;
-  EXPORT __ST152350_Layout := RECORD
+  SHARED __EE876545 := __ENH_Sele_Phone_Number_6;
+  EXPORT __ST158130_Layout := RECORD
     KEL.typ.nbool Header_Hit_Flag_;
     KEL.typ.nstr Source_;
     KEL.typ.nkdate My_Date_First_Seen_;
@@ -18,7 +18,7 @@ EXPORT B_Sele_Phone_Number_5(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefaul
     KEL.typ.epoch Vault_Date_Last_Seen_ := 0;
     KEL.typ.int __RecordCount := 0;
   END;
-  EXPORT __ST152312_Layout := RECORD
+  EXPORT __ST158092_Layout := RECORD
     KEL.typ.ntyp(E_Business_Sele().Typ) Legal_;
     KEL.typ.ntyp(E_Phone().Typ) Phone_Number_;
     KEL.typ.ndataset(E_Sele_Phone_Number(__in,__cfg).Best_Phone_Details_Layout) Best_Phone_Details_;
@@ -26,7 +26,7 @@ EXPORT B_Sele_Phone_Number_5(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefaul
     KEL.typ.ndataset(E_Sele_Phone_Number(__in,__cfg).Marketability_Layout) Marketability_;
     KEL.typ.ndataset(E_Sele_Phone_Number(__in,__cfg).S_I_C_Codes_Layout) S_I_C_Codes_;
     KEL.typ.ndataset(E_Sele_Phone_Number(__in,__cfg).N_A_I_C_S_Codes_Layout) N_A_I_C_S_Codes_;
-    KEL.typ.ndataset(__ST152350_Layout) Data_Sources_;
+    KEL.typ.ndataset(__ST158130_Layout) Data_Sources_;
     KEL.typ.nbool Input_Phone_Match_;
     KEL.typ.epoch Archive___Date_ := 0;
     KEL.typ.epoch Date_First_Seen_ := 0;
@@ -35,10 +35,10 @@ EXPORT B_Sele_Phone_Number_5(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefaul
     KEL.typ.epoch Vault_Date_Last_Seen_ := 0;
     KEL.typ.int __RecordCount := 0;
   END;
-  SHARED __ST152312_Layout __ND868740__Project(B_Sele_Phone_Number_6(__in,__cfg).__ST154437_Layout __PP868736) := TRANSFORM
-    __EE868789 := __PP868736.Data_Sources_;
-    SELF.Data_Sources_ := __BN(PROJECT(__T(__EE868789),__ST152350_Layout),__NL(__EE868789));
-    SELF := __PP868736;
+  SHARED __ST158092_Layout __ND876550__Project(B_Sele_Phone_Number_6(__in,__cfg).__ST160217_Layout __PP876546) := TRANSFORM
+    __EE876599 := __PP876546.Data_Sources_;
+    SELF.Data_Sources_ := __BN(PROJECT(__T(__EE876599),__ST158130_Layout),__NL(__EE876599));
+    SELF := __PP876546;
   END;
-  EXPORT __ENH_Sele_Phone_Number_5 := PROJECT(__EE868735,__ND868740__Project(LEFT));
+  EXPORT __ENH_Sele_Phone_Number_5 := PROJECT(__EE876545,__ND876550__Project(LEFT));
 END;

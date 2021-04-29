@@ -174,7 +174,7 @@ BOOLEAN Default_IncludeMinors := TRUE;
 			OverrideExperianRestriction,
 			'', /* IntendedPurpose - For FCRA Products Only */
 			Industry_Class,
-			PublicRecords_KEL.CFG_Compile,
+			PublicRecords_KEL.KEL_Queries_MAS_Shared.C_Compile,
 			FALSE, /*IsInsuranceProduct*/
 			FinalAllowedSources);
 		

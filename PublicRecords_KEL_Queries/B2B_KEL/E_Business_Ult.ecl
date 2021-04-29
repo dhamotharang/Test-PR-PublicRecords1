@@ -1,4 +1,4 @@
-﻿//HPCC Systems KEL Compiler Version 1.5.0
+﻿//HPCC Systems KEL Compiler Version 1.5.0rc1
 IMPORT KEL15 AS KEL;
 IMPORT PublicRecords_KEL;
 IMPORT CFG_Compile FROM PublicRecords_KEL_Queries.B2B_KEL;

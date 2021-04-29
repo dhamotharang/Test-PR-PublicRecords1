@@ -54,7 +54,7 @@ EXPORT LIB_B2B_attributes (
             Options.OverrideExperianRestriction,
             '', /* IntendedPurpose - For FCRA Products Only */
             Options.industry_class,
-            PublicRecords_KEL.CFG_Compile,
+            PublicRecords_KEL.KEL_Queries_MAS_Shared.C_Compile,
             FALSE, /*IsInsuranceProduct*/
             PublicRecords_KEL.ECL_Functions.Constants.DEFAULT_ALLOWED_SOURCES_NONFCRA);
 
@@ -83,14 +83,7 @@ EXPORT LIB_B2B_attributes (
   RecordsWithSeleID := BusinessInput(B_LexIDLegal > 0);
   RecordsWithoutSeleID := BusinessInput(B_LexIDLegal <= 0);
 
-	LayoutBusinessSeleIDAttributes := RECORDOF(PublicRecords_KEL_Queries.B2B_KEL.Q_Non_F_C_R_A_Business_Sele_I_D_Attributes_V1_Dynamic(
-																	0, // UltID
-																	0, // OrgID
-																	0, // SeleID
-																	DATASET([], PublicRecords_KEL.ECL_Functions.Layouts.LayoutInputPII),
-																	DATASET([], PublicRecords_KEL.ECL_Functions.Layouts.LayoutInputBII),
-																	0, // ArchiveDate
-																	PublicRecords_KEL.CFG_Compile.Permit__NONE).res0); //DPM
+	LayoutBusinessSeleIDAttributes := PublicRecords_KEL_Queries.B2B_KEL.L_Compile.Non_F_C_R_A_Business_Sele_I_D_Attributes_V1_Dynamic_Res0_Layout; //DPM
 
   BusinessSeleAttributes_Results := PROJECT(BusinessInput, TRANSFORM(
           {INTEGER G_ProcBusUID, LayoutBusinessSeleIDAttributes},

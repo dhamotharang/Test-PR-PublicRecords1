@@ -4,8 +4,8 @@ IMPORT B_Business_Sele_Overflow_6,CFG_Compile,E_Business_Sele_Overflow FROM BRM_
 IMPORT * FROM KEL15.Null;
 EXPORT B_Business_Sele_Overflow_5(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG_Compile __cfg = CFG_Compile) := MODULE
   SHARED VIRTUAL TYPEOF(B_Business_Sele_Overflow_6(__in,__cfg).__ENH_Business_Sele_Overflow_6) __ENH_Business_Sele_Overflow_6 := B_Business_Sele_Overflow_6(__in,__cfg).__ENH_Business_Sele_Overflow_6;
-  SHARED __EE867228 := __ENH_Business_Sele_Overflow_6;
-  EXPORT __ST151331_Layout := RECORD
+  SHARED __EE875038 := __ENH_Business_Sele_Overflow_6;
+  EXPORT __ST157111_Layout := RECORD
     KEL.typ.nuid UID;
     KEL.typ.nint Ult_I_D_;
     KEL.typ.nint Org_I_D_;
@@ -33,12 +33,12 @@ EXPORT B_Business_Sele_Overflow_5(CFG_Compile.FDCDataset __in = CFG_Compile.FDCD
     KEL.typ.epoch Vault_Date_Last_Seen_ := 0;
     KEL.typ.int __RecordCount := 0;
   END;
-  SHARED __ST151331_Layout __ND867108__Project(B_Business_Sele_Overflow_6(__in,__cfg).__ST153693_Layout __PP866650) := TRANSFORM
-    __EE867103 := __PP866650.S_O_S_Domestic_Filing_;
-    SELF.S_O_S_Dom_Date_First_Seen_ := KEL.Aggregates.MinNN(__EE867103,__T(__EE867103).S_O_S_Incorporation_Date_);
-    __EE867122 := __PP866650.S_O_S_Foreign_Filing_;
-    SELF.S_O_S_Frgn_Date_First_Seen_ := KEL.Aggregates.MinNN(__EE867122,__T(__EE867122).S_O_S_Foreign_State_Date_);
-    SELF := __PP866650;
+  SHARED __ST157111_Layout __ND874918__Project(B_Business_Sele_Overflow_6(__in,__cfg).__ST159473_Layout __PP874460) := TRANSFORM
+    __EE874913 := __PP874460.S_O_S_Domestic_Filing_;
+    SELF.S_O_S_Dom_Date_First_Seen_ := KEL.Aggregates.MinNN(__EE874913,__T(__EE874913).S_O_S_Incorporation_Date_);
+    __EE874932 := __PP874460.S_O_S_Foreign_Filing_;
+    SELF.S_O_S_Frgn_Date_First_Seen_ := KEL.Aggregates.MinNN(__EE874932,__T(__EE874932).S_O_S_Foreign_State_Date_);
+    SELF := __PP874460;
   END;
-  EXPORT __ENH_Business_Sele_Overflow_5 := PROJECT(__EE867228,__ND867108__Project(LEFT));
+  EXPORT __ENH_Business_Sele_Overflow_5 := PROJECT(__EE875038,__ND874918__Project(LEFT));
 END;

@@ -8,10 +8,10 @@ EXPORT FnRoxie_NSumAttributes(DATASET(PublicRecords_KEL.ECL_Functions.Layouts.La
 	WithInputParms := InputData(P_InpClnNameFirst <>''  AND P_InpClnNameLast <> '' AND P_InpClnDOB <> '');
 	WithOutInputParms := InputData(P_InpClnNameFirst = ''  OR P_InpClnNameLast = '' OR P_InpClnDOB = '');
 
-	LayoutNSumAttributes := {UNSIGNED G_ProcUID, BOOLEAN ResultsFound, RECORDOF(PublicRecords_KEL.Q_Non_F_C_R_A_Name_Summary_Attributes_V1_Dynamic('', '', 0, DATASET([], PublicRecords_KEL.ECL_Functions.Layouts.LayoutInputPII), 0, PublicRecords_KEL.CFG_Compile.Permit__NONE).res0)};
+	LayoutNSumAttributes := {UNSIGNED G_ProcUID, BOOLEAN ResultsFound, PublicRecords_KEL.KEL_Queries_MAS_NonFCRA.L_Compile.Non_F_C_R_A_Name_Summary_Attributes_V1_Dynamic_Res0_Layout};
 
 	NSumAttributesRaw := NOCOMBINE(JOIN(WithInputParms, FDCDataset,  LEFT.G_ProcUID = RIGHT.G_ProcUID, TRANSFORM(LayoutNSumAttributes,
-		NameSummaryAttrs := PublicRecords_KEL.Q_Non_F_C_R_A_Name_Summary_Attributes_V1_Dynamic(
+		NameSummaryAttrs := PublicRecords_KEL.KEL_Queries_MAS_NonFCRA.Q_Non_F_C_R_A_Name_Summary_Attributes_V1_Dynamic(
 																		LEFT.P_InpClnNameFirst,
 																		LEFT.P_InpClnNameLast,
 																		(INTEGER)LEFT.P_InpClnDOB,

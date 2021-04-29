@@ -118,7 +118,7 @@ EXPORT BRM_Marketing_Attr_Batch_Services() := MACRO
 			Override_Experian_Restriction,//OverrideExperianRestriction
 			'',//PermissiblePurpose - For FCRA Products Only
 			Industry_Class,
-			PublicRecords_KEL.CFG_Compile);
+			PublicRecords_KEL.KEL_Queries_MAS_Shared.C_Compile);
 		
 		// BIP Append Options
    EXPORT UNSIGNED BIPAppendScoreThreshold := MAP(NOT BIPAppend_ReAppend => 0, // 
