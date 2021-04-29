@@ -181,4 +181,22 @@ EXPORT ProcBuildSpray(
 		'~thor_data400::in::civil::ca_san_bernardino'
 	);
 
+	EXPORT sprayPaBuck(
+		STRING pNameFileMask = '*_BUCKS_WKLY_DOCK_UPD.txt',
+		STRING pDocFileMask = '*_BUCKS_WKLY_NAME_UPD.txt'
+	) := SEQUENTIAL (
+		doSprayUp(
+			'Bucks County PA Name',
+			pNameFileMask,
+			'~thor_data400::in::civil::pa_bucks_thru_' + pVersion + '.name.all',
+			'~thor_data400::in::civil::pa_bucks_name'
+		),
+		doSprayUp(
+			'Bucks County PA Name',
+			pDocFileMask
+			'~thor_data400::in::civil::pa_bucks_thru_' + pVersion + '.doc.all'
+			'~thor_data400::in::civil::pa_bucks_doc'
+		)
+	)
+
 END;
