@@ -1,6 +1,4 @@
 ﻿IMPORT FraudgovKEL, FraudGovPlatform,doxie,Suppress;
-RunKelDemo :=false:stored('RunKelDemo');
-
 /*
 RECORD
   unsigned8 record_id;

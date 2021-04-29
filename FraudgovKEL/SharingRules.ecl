@@ -1,5 +1,4 @@
-﻿#constant('Platform','FraudGov');
-import FraudGovPlatform;
+﻿import FraudGovPlatform;
 import FraudgovKEL;
 
 //OttoRules := FraudGovPlatform.Files('').input.mbsfdnmasteridindtypeinclusion.sprayed(inclusion_type = 'GCID' AND status = 1);

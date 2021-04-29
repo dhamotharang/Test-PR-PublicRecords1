@@ -1,8 +1,6 @@
 ﻿IMPORT FraudgovKEL, FraudGovPlatform,doxie,Suppress;
-RunKelDemo :=false:stored('RunKelDemo');
 
-PersonIPMetadataPrep1 :=  If(RunKelDemo=false,FraudGovPlatform.files(,FraudgovKEL.Constants.useOtherEnvironmentDali).base.IPMetaData.built
-															,FraudGovPlatform.files(,FraudgovKEL.Constants.useOtherEnvironmentDali).base.IPMetaData_Demo.built);
+PersonIPMetadataPrep1 :=  FraudGovPlatform.files(,FraudgovKEL.Constants.useOtherEnvironmentDali).base.IPMetaData.built;
 
 PersonIPMetadataPrep2 := PROJECT(PersonIPMetadataPrep1, TRANSFORM(RECORDOF(LEFT), SELF.edgecountry := MAP(LEFT.edgecountry = '' => '0', LEFT.edgecountry), SELF := LEFT));
 

@@ -1,6 +1,6 @@
-IMPORT AutokeyB2;
+﻿IMPORT AutokeyB2;
 
-fakepf := DATASET([], FraudShared.Layouts_key.Autokey);
+fakepf := DATASET([], FraudGovPlatform.Layouts_key.Autokey);
 
 ak_qa_keyname := Constants().ak_qa_keyname;
 
