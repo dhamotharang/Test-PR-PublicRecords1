@@ -4,8 +4,8 @@ IMPORT B_Address_4,CFG_Compile,E_Address,E_Geo_Link,E_Zip_Code FROM BRM_Marketin
 IMPORT * FROM KEL15.Null;
 EXPORT B_Address_3(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG_Compile __cfg = CFG_Compile) := MODULE
   SHARED VIRTUAL TYPEOF(B_Address_4(__in,__cfg).__ENH_Address_4) __ENH_Address_4 := B_Address_4(__in,__cfg).__ENH_Address_4;
-  SHARED __EE898013 := __ENH_Address_4;
-  EXPORT __ST141923_Layout := RECORD
+  SHARED __EE905823 := __ENH_Address_4;
+  EXPORT __ST147703_Layout := RECORD
     KEL.typ.nuid UID;
     KEL.typ.nstr Primary_Range_;
     KEL.typ.nstr Predirectional_;
@@ -47,5 +47,5 @@ EXPORT B_Address_3(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG_Com
     KEL.typ.epoch Vault_Date_Last_Seen_ := 0;
     KEL.typ.int __RecordCount := 0;
   END;
-  EXPORT __ENH_Address_3 := PROJECT(__EE898013,__ST141923_Layout);
+  EXPORT __ENH_Address_3 := PROJECT(__EE905823,__ST147703_Layout);
 END;

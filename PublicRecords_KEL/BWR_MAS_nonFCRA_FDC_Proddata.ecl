@@ -206,7 +206,7 @@ mod_ConfigTestJob(STD.Date.Date_t _dtArchiveDate = STD.Date.Today()) := MODULE
 						OverrideExperianRestriction := Override_Experian_Restriction, 
 						IntendedPurpose  := '',
 						IndustryClass  := '',
-						KELPermissions      := PublicRecords_KEL.CFG_Compile, 
+						KELPermissions      := PublicRecords_KEL.KEL_Queries_MAS_Shared.C_Compile, 
 						IsInsuranceProduct  := Is_Insurance_Product,
 						AllowedSources := FinalAllowedSources);
 	END;		

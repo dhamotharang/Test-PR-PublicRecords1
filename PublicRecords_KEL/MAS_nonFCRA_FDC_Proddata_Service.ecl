@@ -372,7 +372,7 @@ export MAS_nonFCRA_FDC_Proddata_Service() := MACRO
 				OverrideExperianRestriction, 
 				'', // IntendedPurpose
 				'', // IndustryClass
-				PublicRecords_KEL.CFG_Compile,
+				PublicRecords_KEL.KEL_Queries_MAS_Shared.C_Compile,
 				IsInsuranceProduct,
 				FinalAllowedSources);
 				

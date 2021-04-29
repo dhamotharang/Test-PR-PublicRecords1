@@ -34,7 +34,7 @@ EXPORT FnRoxie_GetMiniFDCAttributes(DATASET(PublicRecords_KEL.ECL_Functions.Layo
 									
 	LayoutPersonAttributes := RECORD
 		INTEGER g_uid;
-		Dataset({RECORDOF(PublicRecords_KEL.Q_Mini_Attributes_V1_Roxie_Dynamic([], 0, PublicRecords_KEL.CFG_Compile.Permit__NONE, Options.IsFCRA).res0)}) attributes;
+		Dataset(PublicRecords_KEL.KEL_Queries_MAS_Shared.L_Compile.Mini_Attributes_V1_Roxie_Dynamic_Res0_Layout) attributes;
 	END;
 
 	
@@ -53,14 +53,14 @@ EXPORT FnRoxie_GetMiniFDCAttributes(DATASET(PublicRecords_KEL.ECL_Functions.Layo
 	PersonAttributesRaw := NOCOMBINE(PROJECT(MiniAttributesInput,
 		TRANSFORM(LayoutPersonAttributes,
 			SELF.g_uid := LEFT.g_uid;
-			PersonResults := PublicRecords_KEL.Q_Mini_Attributes_V1_Roxie_Dynamic(LEFT.ids, (INTEGER)(LEFT.P_InpClnArchDt[1..8]), Options.KEL_Permissions_Mask, Options.IsFCRA, LEFT.FDCDataset).res0;	
+			PersonResults := PublicRecords_KEL.KEL_Queries_MAS_Shared.Q_Mini_Attributes_V1_Roxie_Dynamic(LEFT.ids, (INTEGER)(LEFT.P_InpClnArchDt[1..8]), Options.KEL_Permissions_Mask, Options.IsFCRA, LEFT.FDCDataset).res0;	
 			SELF.attributes := PersonResults;
 			SELF := [])));
 
 		
 	Final := RECORD
 		INTEGER g_uid;
-		RECORDOF(PublicRecords_KEL.Q_Mini_Attributes_V1_Roxie_Dynamic([], 0, PublicRecords_KEL.CFG_Compile.Permit__NONE, Options.IsFCRA).res0);
+		RECORDOF(PublicRecords_KEL.KEL_Queries_MAS_Shared.L_Compile.Mini_Attributes_V1_Roxie_Dynamic_Res0_Layout);
 	END;
 	
 	Final Normalize_Final(RecordOF(LayoutPersonAttributes.attributes) ri, LayoutPersonAttributes le) := TRANSFORM

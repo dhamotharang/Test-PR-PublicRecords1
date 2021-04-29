@@ -8,10 +8,10 @@ EXPORT FnRoxie_GetSSNSumInputPIIAttributes (DATASET(PublicRecords_KEL.ECL_Functi
 	WithInputParms := InputData(P_InpClnSSN <> '');
 	WithOutInputParms := InputData(P_InpClnSSN = '');
 	
-	LayoutSSNSumAttributes := {UNSIGNED G_ProcUID, BOOLEAN ResultsFound, RECORDOF(PublicRecords_KEL.Q_Non_F_C_R_A_S_S_N_Summary_Attributes_V1_Dynamic('', DATASET([], PublicRecords_KEL.ECL_Functions.Layouts.LayoutInputPII), 0, PublicRecords_KEL.CFG_Compile.Permit__NONE).res0)};
+	LayoutSSNSumAttributes := {UNSIGNED G_ProcUID, BOOLEAN ResultsFound, PublicRecords_KEL.KEL_Queries_MAS_NonFCRA.L_Compile.Non_F_C_R_A_S_S_N_Summary_Attributes_V1_Dynamic_Res0_Layout};
 
 	SSNSumInputPIIAttributesRaw := NOCOMBINE(JOIN(WithInputParms, FDCDataset,  LEFT.G_ProcUID = RIGHT.G_ProcUID, TRANSFORM(LayoutSSNSumAttributes,
-		SSNSummaryAttrs := PublicRecords_KEL.Q_Non_F_C_R_A_S_S_N_Summary_Attributes_V1_Dynamic(
+		SSNSummaryAttrs := PublicRecords_KEL.KEL_Queries_MAS_NonFCRA.Q_Non_F_C_R_A_S_S_N_Summary_Attributes_V1_Dynamic(
 																		LEFT.P_InpClnSSN,
 																		DATASET(LEFT), 
 																		(INTEGER) LEFT.P_InpClnArchDt[1..8], 

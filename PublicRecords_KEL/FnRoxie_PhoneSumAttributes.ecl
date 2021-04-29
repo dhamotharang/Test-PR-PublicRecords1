@@ -8,10 +8,10 @@ EXPORT FnRoxie_PhoneSumAttributes(DATASET(PublicRecords_KEL.ECL_Functions.Layout
 	GoodInputOnly := InputData(NOT P_InpClnPhoneHome = '');
 	BadInputOnly := InputData(P_InpClnPhoneHome = '');
 
-	LayoutPhoneSumAttributes := {UNSIGNED G_ProcUID, BOOLEAN ResultsFound, RECORDOF(PublicRecords_KEL.Q_Non_F_C_R_A_Phone_Summary_Attributes_V1_Dynamic('', DATASET([], PublicRecords_KEL.ECL_Functions.Layouts.LayoutInputPII), 0, PublicRecords_KEL.CFG_Compile.Permit__NONE).res0)};
+	LayoutPhoneSumAttributes := {UNSIGNED G_ProcUID, BOOLEAN ResultsFound, PublicRecords_KEL.KEL_Queries_MAS_NonFCRA.L_Compile.Non_F_C_R_A_Phone_Summary_Attributes_V1_Dynamic_Res0_Layout};
 
 	PhoneSumAttributesRaw := NOCOMBINE(JOIN(GoodInputOnly, FDCDataset,  LEFT.G_ProcUID = RIGHT.G_ProcUID, TRANSFORM(LayoutPhoneSumAttributes,
-		PhoneSummaryAttrs := PublicRecords_KEL.Q_Non_F_C_R_A_Phone_Summary_Attributes_V1_Dynamic(
+		PhoneSummaryAttrs := PublicRecords_KEL.KEL_Queries_MAS_NonFCRA.Q_Non_F_C_R_A_Phone_Summary_Attributes_V1_Dynamic(
 																		LEFT.P_InpClnPhoneHome,
 																		DATASET(LEFT), 
 																		(INTEGER) LEFT.P_InpClnArchDt[1..8], 

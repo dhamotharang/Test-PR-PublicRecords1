@@ -155,7 +155,7 @@ STRING100 Default_data_permission_mask := '';
 			FALSE, /*OverrideExperianRestriction*/
 			'', /* IntendedPurpose - For FCRA Products Only */
 			Industry_Class,
-			PublicRecords_KEL.CFG_Compile,
+			PublicRecords_KEL.KEL_Queries_MAS_Shared.C_Compile,
 			FALSE, /*IsInsuranceProduct*/
 			FinalAllowedSources);
 		EXPORT UNSIGNED1 LexIdSourceOptout := _LexIdSourceOptout;
@@ -178,7 +178,8 @@ STRING100 Default_data_permission_mask := '';
 
 	JoinFlags := PublicRecords_KEL.Internal_Join_Interface_Options(PublicRecords_KEL.Join_Interface_Options);
 
-	ResultSet := PublicRecords_KEL.FnRoxie_GetAttrs(ds_input, Options, JoinFlags);		
+	ResultSet := PublicRecords_KEL.FnRoxie_GetAttrsNonFCRA(ds_input, Options, JoinFlags);		
+	//calls  LIB_nonFCRAPersonAttributes
 		
 	FinalResults := PROJECT(ResultSet, 
 		TRANSFORM(PublicRecords_KEL.ECL_Functions.Layout_Person_NonFCRA,

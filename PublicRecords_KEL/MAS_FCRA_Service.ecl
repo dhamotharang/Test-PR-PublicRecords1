@@ -123,7 +123,7 @@ EXPORT MAS_FCRA_Service() := MACRO
 			FALSE, /*OverrideExperianRestriction*/
 			Intended_Purpose,
 			Industry_Class,
-			PublicRecords_KEL.CFG_Compile,
+			PublicRecords_KEL.KEL_Queries_MAS_Shared.C_Compile,
 			FALSE, /*IsInsuranceProduct*/
 			FinalAllowedSources);
 		
@@ -141,7 +141,8 @@ EXPORT MAS_FCRA_Service() := MACRO
 
 	IF(options.RetainInputLexid = FALSE AND options.BestPIIAppend = TRUE, FAIL('Insufficient Input'));
 
-  ResultSet := PublicRecords_KEL.FnRoxie_GetAttrs(ds_input, Options, JoinFlags);
+  ResultSet := PublicRecords_KEL.FnRoxie_GetAttrsFCRA(ds_input, Options, JoinFlags);
+//calls LIB_FCRAPersonAttributes
 
 	FinalResults := PROJECT(ResultSet, 
 		TRANSFORM(PublicRecords_KEL.ECL_Functions.Layout_Person_FCRA,

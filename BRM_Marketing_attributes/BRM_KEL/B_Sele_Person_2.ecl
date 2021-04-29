@@ -4,8 +4,8 @@ IMPORT B_Sele_Person_3,CFG_Compile,E_Business_Org,E_Business_Sele,E_Business_Sel
 IMPORT * FROM KEL15.Null;
 EXPORT B_Sele_Person_2(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG_Compile __cfg = CFG_Compile) := MODULE
   SHARED VIRTUAL TYPEOF(B_Sele_Person_3(__in,__cfg).__ENH_Sele_Person_3) __ENH_Sele_Person_3 := B_Sele_Person_3(__in,__cfg).__ENH_Sele_Person_3;
-  SHARED __EE1208364 := __ENH_Sele_Person_3;
-  EXPORT __ST141178_Layout := RECORD
+  SHARED __EE1216174 := __ENH_Sele_Person_3;
+  EXPORT __ST146958_Layout := RECORD
     KEL.typ.ntyp(E_Business_Sele().Typ) Legal_;
     KEL.typ.ntyp(E_Person().Typ) Contact_;
     KEL.typ.nint Ult_I_D_;
@@ -22,5 +22,5 @@ EXPORT B_Sele_Person_2(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG
     KEL.typ.epoch Vault_Date_Last_Seen_ := 0;
     KEL.typ.int __RecordCount := 0;
   END;
-  EXPORT __ENH_Sele_Person_2 := PROJECT(__EE1208364,__ST141178_Layout);
+  EXPORT __ENH_Sele_Person_2 := PROJECT(__EE1216174,__ST146958_Layout);
 END;

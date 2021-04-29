@@ -76,6 +76,10 @@ EXPORT FnRoxie_GetBusAttrs(DATASET(PublicRecords_KEL.ECL_Functions.Input_Bus_Lay
 	FDCDataset := PublicRecords_KEL.Fn_MAS_FDC( MiniAttributes, Options, JoinFlags, CheckTDSPhone, FDCDatasetMini );
 
 	BusinessAttributes := PublicRecords_KEL.Library.LIB_BusinessAttributes_Function(CheckTDSPhone, Prep_RepInput, FDCDataset, Options);
+	//input bii
+	//sele
+	//prox
+
 
 	// Get consumer attributes
 	// After KS-6866, these are not populating correctly in the case the 6th rep LexID matches the rep 1 lexid, likely due to the mini attributes.
