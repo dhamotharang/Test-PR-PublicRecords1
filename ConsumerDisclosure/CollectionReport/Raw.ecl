@@ -32,10 +32,7 @@ EXPORT Raw := MODULE
     // -- Sanctions - SANCTN.key_MIDEX_RPT_NBR and SANCTN.Key_SANCTN_party appear to have the same layout and contents except for contact_name and dba_name
     sanct_ids_did := JOIN(dids, SANCTN.Key_SANCTN_DID, KEYED(LEFT.did = RIGHT.did), LIMIT($.Constants.MaxCollectionRecords, SKIP));
     MIDEX_Services.Macros.MAC_midexPayloadKeyField(sanct_ids_did, sanct_ids, BATCH_NUMBER, INCIDENT_NUMBER, PARTY_NUMBER, MIDEX_PRT_NBR);
-    sanct_recs_pre := JOIN(sanct_ids, SANCTN.key_MIDEX_RPT_NBR, KEYED(LEFT.midex_rpt_nbr = RIGHT.midex_rpt_nbr), TRANSFORM(RIGHT), KEEP(10), LIMIT(0));
-    sanct_recs_rolled := dx_common.Incrementals.mac_Rollup(sanct_recs_pre);
-    sanct_recs := DEDUP(SORT(sanct_recs_rolled, midex_rpt_nbr), midex_rpt_nbr);
-
+    sanct_recs := JOIN(sanct_ids, SANCTN.key_MIDEX_RPT_NBR, KEYED(LEFT.midex_rpt_nbr = RIGHT.midex_rpt_nbr), TRANSFORM(RIGHT), KEEP(1), LIMIT(0));
     RETURN sanct_recs;
   END;
   EXPORT GetVehicleIds(DATASET(doxie.layout_references) dids) := FUNCTION
