@@ -60,8 +60,6 @@ parallel(Kel_Shell_QA.AC_automated_file(logical_file_name,unique_field, inut_fil
 				 Kel_Shell_QA.AC_automated_file(logical_file_name,unique_field, inut_file_records, Tag, filtered_lay,'Derogs - Lien and Judgment History'),
 				 Kel_Shell_QA.AC_automated_file(logical_file_name,unique_field, inut_file_records, Tag, filtered_lay,'Derogs - Landlord Tenant Dispute'),
 				 Kel_Shell_QA.AC_automated_file(logical_file_name,unique_field, inut_file_records, Tag, filtered_lay,'PII Corroboration'),
-				 Kel_Shell_QA.AC_automated_file(logical_file_name,unique_field, inut_file_records, Tag, filtered_lay,'Property Ownership'),
-				 Kel_Shell_QA.AC_automated_file(logical_file_name,unique_field, inut_file_records, Tag, filtered_lay,'Property Sales'),
 				 Kel_Shell_QA.AC_automated_file(logical_file_name,unique_field, inut_file_records, Tag, filtered_lay,'Inquiry History'),
 				 Kel_Shell_QA.AC_automated_file(logical_file_name,unique_field, inut_file_records, Tag, filtered_lay,'Inquiry Velocity'),
 				 Kel_Shell_QA.AC_automated_file(logical_file_name,unique_field, inut_file_records, Tag, filtered_lay,'Utility'),
@@ -74,7 +72,9 @@ parallel(Kel_Shell_QA.AC_automated_file(logical_file_name,unique_field, inut_fil
 				 Kel_Shell_QA.AC_automated_file(logical_file_name,unique_field, inut_file_records, Tag, filtered_lay,'Inferred Performance'),
 				 Kel_Shell_QA.AC_automated_file(logical_file_name,unique_field, inut_file_records, Tag, filtered_lay,'Verification'),
 				 Kel_Shell_QA.AC_automated_file(logical_file_name,unique_field, inut_file_records, Tag, filtered_lay,'EmergingID'),
-				 Kel_Shell_QA.AC_automated_file(logical_file_name,unique_field, inut_file_records, Tag, filtered_lay,'Property')
+				 Kel_Shell_QA.AC_automated_file(logical_file_name,unique_field, inut_file_records, Tag, filtered_lay,'Property'),
+				 Kel_Shell_QA.AC_automated_file(logical_file_name,unique_field, inut_file_records, Tag, filtered_lay,'CFPB Race'),
+				 Kel_Shell_QA.AC_automated_file(logical_file_name,unique_field, inut_file_records, Tag, filtered_lay,'Best PII Characteristics')
 				 );
 
 

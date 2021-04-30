@@ -1,6 +1,7 @@
 ﻿IMPORT R, ut, python3;
 EXPORT string test(Recordof(Kel_Shell_QA.Layouts.AC_Lay) data_row,string cond, string def_par, set of string lay_set):= embed(python3)
 from __future__ import division
+from decimal import Decimal
 import re
 import time
 time1 = time.time()
