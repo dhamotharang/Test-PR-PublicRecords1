@@ -561,10 +561,10 @@ wInfutorcid_roxie := PROJECT(wInfutorcid_roxie_flagged, TRANSFORM(ProfileBooster
 
 	//each unique address now has assigned sequence. drop any bad addresses (0 or 9x), sort by seq / address seq and keep only first two.
 	// dedupAddrs := dedup(sort(wAddrSeq(address_history_seq <> 255), seq, address_history_seq),seq, keep(2));
-	goodAddrs := group(sort(wAddrSeq(address_history_seq <> 255), seq, address_history_seq), seq);
+	goodAddrs := group(sort(wAddrSeq(address_history_seq <> 255), seq, address_history_seq, -curr_z5), seq);
 
-	//reassign the sequence number in case there are holes (eg - change 1,3,4... to 1,2,3...)
-  	reseqAddrs := iterate(goodAddrs, transform(ProfileBooster.V2_Layouts.Layout_PB2_Shell, SELF.address_history_seq := counter, SELF := right));
+//reassign the sequence number in case there are holes (eg - change 1,3,4... to 1,2,3...)
+  reseqAddrs := iterate(goodAddrs, transform(ProfileBooster.V2_Layouts.Layout_PB2_Shell, self.address_history_seq := counter, self := right),STABLE);
  
 	aid_key := AID_Build.Key_AID_Base;
 
@@ -884,10 +884,12 @@ wInfutorcid_roxie := PROJECT(wInfutorcid_roxie_flagged, TRANSFORM(ProfileBooster
 // OUTPUT(JOIN_rolled_email,,'~jfrancis::profilebooster20::V2_getVerification_ROXIE_' + thorlib.wuid(),CSV(HEADING(single), QUOTE('"')));
 // OUTPUT(with_hdr_addr_cache,,'~jfrancis::profilebooster20::V2_getVerification_with_hdr_addr_cache_' + thorlib.wuid(),CSV(HEADING(single), QUOTE('"')));
 // OUTPUT(rolledAddrs,,'~jfrancis::profilebooster20::V2_getVerification_rolledAddrs_' + thorlib.wuid(),CSV(HEADING(single), QUOTE('"')));
-// OUTPUT(goodAddrs(did=168219),,'~jfrancis::profilebooster20::V2_getVerification_goodAddrs168219_' + thorlib.wuid(),CSV(HEADING(single), QUOTE('"')));
+// OUTPUT(goodAddrs,,'~jfrancis::profilebooster20::V2_getVerification_goodAddrs',CSV(HEADING(single), QUOTE('"')),OVERWRITE);
 // OUTPUT(COUNT(JOIN_rolled_email), NAMED('V2GV_Out_Cnt'));
 // OUTPUT(CHOOSEN(JOIN_rolled_email,100), NAMED('V2GV_Out'));
-
+// OUTPUT(JOIN_rolled_email,,'~jfrancis::profilebooster20::V2_getVerification_JOIN_rolled_email',CSV(HEADING(single), QUOTE('"')),OVERWRITE);
+// OUTPUT(wVerification,,'~jfrancis::profilebooster20::V2_getVerification_wVerification',CSV(HEADING(single), QUOTE('"')),OVERWRITE);
+// OUTPUT(allHeader,,'~jfrancis::profilebooster20::V2_getVerification_allHeader',CSV(HEADING(single), QUOTE('"')),OVERWRITE);
 return JOIN_rolled_email;
 
 END;
