@@ -87,7 +87,7 @@ Input_Gateways := (NeutralRoxie_GW + Targus_GW)(URL <> '');
 RecordsToRun := 0;
 eyeball := 100;
 
-OutputFile := '~bbraaten::out::PersonFCRA_Roxie_100k_Current_RR_20200728_'+ ThorLib.wuid();
+OutputFile := '~USERNAME::out::PersonFCRA_Roxie_100k_Current_TICKETNUMBER_'+ ThorLib.wuid();
 
 prii_layout := RECORD
     STRING Account             ;

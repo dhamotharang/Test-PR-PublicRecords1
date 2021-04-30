@@ -110,7 +110,7 @@ Input_Gateways := (DeltaBase_GW + NetAcuity_GW + OFAC_GW + Targus_GW + Insurance
 RecordsToRun := 0;
 eyeball := 120;
 
-OutputFile := '~bbraaten::out::PersonNonFCRA_Roxie_100k_Current_KS-6233_'+ ThorLib.wuid();
+OutputFile := '~USERNAME::out::PersonNonFCRA_Roxie_100k_Current_TICKETNUMBER_'+ ThorLib.wuid();
 
 prii_layout := RECORD
     STRING Account             ;
