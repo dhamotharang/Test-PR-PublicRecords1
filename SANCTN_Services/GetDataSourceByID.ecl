@@ -31,7 +31,8 @@ EXPORT out_rec GetDataSourceByID (GROUPED DATASET (Sanctn_Services.layouts.id) i
     TRANSFORM(RIGHT),
     KEEP(SANCTN_Services.Constants.INCIDENT_RECORDS_MAX * 2)); // 1:M relation, doubled to account for delta updates
 
-  src_fetched := dx_common.Incrementals.mac_Rollup(src_fetched_raw);
+  src_fetched := CHOOSEN(dx_common.Incrementals.mac_Rollup(src_fetched_raw), SANCTN_Services.Constants.INCIDENT_RECORDS_MAX);
+
   // rollup Incident info
   inc_sort := SORT (src_fetched, RECORD, except order_number, incident_text);
   inc_grp := GROUP (inc_sort, RECORD, except order_number, incident_text);
