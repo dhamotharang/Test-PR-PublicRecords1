@@ -127,6 +127,20 @@ ArchiveDate(string datevalue_in1, string datevalue_in2 = '' ):= function
 return If(date1 = '', datechooser(datevalue2), date1);	
 	
 end;	
+
+	DOBPaddingLayout := RECORD
+		UNSIGNED4 DOB;
+		STRING8 DOBPadded;
+	END;
+	CleanDateOfBirth(UNSIGNED4 dob_in) := FUNCTION
+		Result := MAP(
+			STD.Date.IsValidDate(dob_in)										=> ROW({dob_in, ''}, DOBPaddingLayout),
+			STD.Date.IsValidDate((UNSIGNED4)(((STRING)dob_in)[1..6] + '01'))	=> ROW({(((STRING)dob_in)[1..6] + '01'), 'YYYYMM01'}, DOBPaddingLayout),
+			STD.Date.IsValidDate((UNSIGNED4)(((STRING)dob_in)[1..4] + '0101'))	=> ROW({(((STRING)dob_in)[1..4] + '0101'), 'YYYY0101'}, DOBPaddingLayout),
+																					ROW({dob_in, ''}, DOBPaddingLayout));
+		
+		RETURN Result;
+	END;
 	
 	// FDCMiniPop := IF(COUNT(FDCDataset_Mini) = 0, TRUE, FALSE);//Do we need to go get this data?
 
@@ -1327,6 +1341,12 @@ Doxie_Files__Key_Offenders_Records_Regular :=
 					SELF.DPMBitmap := SetDPMBitmap( Source := _src, FCRA_Restricted := Options.isFCRA, GLBA_Restricted := NotRegulated, Pre_GLB_Restricted := NotRegulated, DPPA_Restricted := NotRegulated, DPPA_State := BlankString, KELPermissions := CFG_File),
 					self.Archive_Date :=  ArchiveDate((string)right.fcra_date);
 					self.fcra_date :=   archivedate(right.fcra_date);
+					DOBCleaned := CleanDateOfBirth((UNSIGNED)RIGHT.dob);
+					SELF.dob := (STRING)DOBCleaned.dob;
+					SELF.DOBPadded := DOBCleaned.DOBPadded;
+					DOB_AliasCleaned := CleanDateOfBirth((UNSIGNED)RIGHT.dob_alias);
+					SELF.dob_alias := (STRING)DOB_AliasCleaned.dob;
+					SELF.DOB_AliasPadded := DOB_AliasCleaned.DOBPadded;
 					SELF := RIGHT,
 					SELF := LEFT,
 					SELF := []), 
@@ -1350,6 +1370,12 @@ Doxie_Files__Key_Offenders_Records_Inferred :=
 					SELF.DPMBitmap := SetDPMBitmap( Source := _src, FCRA_Restricted := Options.isFCRA, GLBA_Restricted := NotRegulated, Pre_GLB_Restricted := NotRegulated, DPPA_Restricted := NotRegulated, DPPA_State := BlankString, KELPermissions := CFG_File),
 					self.Archive_Date :=  ArchiveDate((string)right.fcra_date);
 					self.fcra_date :=   archivedate(right.fcra_date);
+					DOBCleaned := CleanDateOfBirth((UNSIGNED)RIGHT.dob);
+					SELF.dob := (STRING)DOBCleaned.dob;
+					SELF.DOBPadded := DOBCleaned.DOBPadded;
+					DOB_AliasCleaned := CleanDateOfBirth((UNSIGNED)RIGHT.dob_alias);
+					SELF.dob_alias := (STRING)DOB_AliasCleaned.dob;
+					SELF.DOB_AliasPadded := DOB_AliasCleaned.DOBPadded;
 					SELF := RIGHT,
 					SELF := LEFT,
 					SELF := []), 
@@ -2248,6 +2274,9 @@ Bankruptcy_Files__Key_Search_Records_pre	:= Bankruptcy_Files__Key_Search_Records
 					SELF.Src := RIGHT.src,
 					SELF.DPMBitmap := SetDPMBitmap( Source := RIGHT.src, FCRA_Restricted := Options.isFCRA, GLBA_Restricted := GLBARegulatedDeathMasterRecord(RIGHT.glb_flag), Pre_GLB_Restricted := NotRegulated, DPPA_Restricted := NotRegulated, DPPA_State := BlankString, KELPermissions := CFG_File),
 					self.Archive_Date :=  ArchiveDate((string)right.dod8);
+					DOB8Cleaned := CleanDateOfBirth((UNSIGNED)RIGHT.dob8);
+					SELF.dob8 := (STRING)DOB8Cleaned.dob;
+					SELF.DOB8Padded := DOB8Cleaned.DOBPadded;
 					self.dod8 :=  archivedate((string)right.dod8);
 					SELF := RIGHT, 
 					SELF := LEFT,
@@ -2289,6 +2318,9 @@ Bankruptcy_Files__Key_Search_Records_pre	:= Bankruptcy_Files__Key_Search_Records
 					SELF.dl_number := IF(STD.Str.FilterOut(RIGHT.dl_number, '1') = '', '', RIGHT.dl_number); // Filter any repeating 1's to be blank, bad data
 					SELF.DPMBitmap := SetDPMBitmap( Source := RIGHT.Source_Code, FCRA_Restricted := Options.isFCRA, GLBA_Restricted := NotRegulated, Pre_GLB_Restricted := NotRegulated, DPPA_Restricted := NotRegulated, DPPA_State := RIGHT.st, KELPermissions := CFG_File),
 					self.Archive_Date :=  ArchiveDate((string)right.dt_first_seen, (string)right.dt_vendor_first_reported);
+					DOBCleaned := CleanDateOfBirth(RIGHT.dob);
+					SELF.dob := DOBCleaned.dob;
+					SELF.DOBPadded := DOBCleaned.DOBPadded;
 					self.dt_first_seen :=  (integer)archivedate((string)right.dt_first_seen);
 					SELF := RIGHT, 
 					SELF := LEFT,
@@ -2317,6 +2349,9 @@ Bankruptcy_Files__Key_Search_Records_pre	:= Bankruptcy_Files__Key_Search_Records
 					SELF.dl_number := IF(STD.Str.FilterOut(RIGHT.dl_number, '1') = '', '', RIGHT.dl_number); // Filter any repeating 1's to be blank, bad data
 					SELF.DPMBitmap := SetDPMBitmap( Source := RIGHT.Source_Code, FCRA_Restricted := Options.isFCRA, GLBA_Restricted := NotRegulated, Pre_GLB_Restricted := NotRegulated, DPPA_Restricted := NotRegulated, DPPA_State := RIGHT.st, KELPermissions := CFG_File),
 					self.Archive_Date :=  ArchiveDate((string)right.dt_first_seen, (string)right.dt_vendor_first_reported);
+					DOBCleaned := CleanDateOfBirth(RIGHT.dob);
+					SELF.dob := DOBCleaned.dob;
+					SELF.DOBPadded := DOBCleaned.DOBPadded;
 					self.dt_first_seen := (integer) archivedate( (string)right.dt_first_seen);
 					SELF := RIGHT, 
 					SELF := LEFT,
@@ -2652,6 +2687,9 @@ Bankruptcy_Files__Key_Search_Records_pre	:= Bankruptcy_Files__Key_Search_Records
 					SELF.Src := MDR.sourceTools.src_Phones_Plus,
 					SELF.DPMBitmap := SetDPMBitmap( Source := MDR.sourceTools.src_Phones_Plus, FCRA_Restricted := Options.isFCRA, GLBA_Restricted := GLBARegulatedPhonesPlusRecord(RIGHT.glb_dppa_flag), Pre_GLB_Restricted := NotRegulated, DPPA_Restricted := NotRegulated, DPPA_State := RIGHT.state, KELPermissions := CFG_File),
 					self.Archive_Date :=  ArchiveDate((string)right.datefirstseen, (string)right.datevendorfirstreported);
+					DOBCleaned := CleanDateOfBirth((UNSIGNED)RIGHT.dob);
+					SELF.dob := (STRING)DOBCleaned.dob;
+					SELF.DOBPadded := DOBCleaned.DOBPadded;
 					self.datefirstseen :=  (integer)ArchiveDate((string)right.datefirstseen);
 					SELF := RIGHT, 
 					SELF := []), 
@@ -2904,6 +2942,9 @@ Risk_Indicators__Correlation_Risk__key_addr_dob_summary_Denorm :=
 				TRANSFORM(Layouts_FDC.Layout_Risk_Indicators__Correlation_Risk__key_addr_dob_summary_Denorm,
 					SELF.UIDAppend := LEFT.UIDAppend,
 					SELF.G_ProcUID := LEFT.G_ProcUID,
+					DOBCleaned := CleanDateOfBirth(RIGHT.dob);
+					SELF.dob := DOBCleaned.dob;
+					SELF.DOBPadded := DOBCleaned.DOBPadded;
 					SELF := RIGHT,
 					SELF := LEFT,
 					SELF := []), 
@@ -3007,6 +3048,9 @@ Risk_Indicators__Correlation_Risk__key_addr_dob_summary_Denorm :=
             TRANSFORM(Layouts_FDC.Layout_ssn_dob_summary_key_records,
                 SELF.UIDAppend := LEFT.UIDAppend,
                 SELF.G_ProcUID := LEFT.G_ProcUID,
+				DOBCleaned := CleanDateOfBirth(RIGHT.dob);
+				SELF.dob := DOBCleaned.dob;
+				SELF.DOBPadded := DOBCleaned.DOBPadded;
                 SELF := RIGHT,
                 SELF := LEFT,
                 SELF := []), 
@@ -3018,7 +3062,7 @@ Risk_Indicators__Correlation_Risk__key_addr_dob_summary_Denorm :=
                 SELF.DPMBitmap := SetDPMBitmap(Source := RIGHT.Src, FCRA_Restricted := Options.isFCRA, GLBA_Restricted := NotRegulated, Pre_GLB_Restricted := NotRegulated, DPPA_Restricted := NotRegulated, DPPA_State := BlankString, KELPermissions := CFG_File);
                 self.Archive_Date :=  ArchiveDate((string)right.dt_first_seen);
                 self.dt_first_seen :=  (integer)archivedate( (string)right.dt_first_seen);
-								SELF := RIGHT, 
+				SELF := RIGHT, 
                 SELF := LEFT, 
                 SELF := []));
 	
@@ -3106,6 +3150,9 @@ Risk_Indicators__Correlation_Risk__key_addr_dob_summary_Denorm :=
             TRANSFORM(Layouts_FDC.Layout_name_dob_summary_key_records,
                 SELF.UIDAppend := LEFT.UIDAppend,
                 SELF.G_ProcUID := LEFT.G_ProcUID,
+				DOBCleaned := CleanDateOfBirth(RIGHT.dob);
+				SELF.dob := DOBCleaned.dob;
+				SELF.DOBPadded := DOBCleaned.DOBPadded;
                 SELF := RIGHT,
                 SELF := LEFT,
                 SELF := []), 
@@ -3270,6 +3317,9 @@ Risk_Indicators__Correlation_Risk__key_addr_dob_summary_Denorm :=
             TRANSFORM(Layouts_FDC.Layout_phone_dob_summary_key_records,
                 SELF.UIDAppend := LEFT.UIDAppend,
                 SELF.G_ProcUID := LEFT.G_ProcUID,
+				DOBCleaned := CleanDateOfBirth(RIGHT.dob);
+				SELF.dob := DOBCleaned.dob;
+				SELF.DOBPadded := DOBCleaned.DOBPadded;
                 SELF := RIGHT,
                 SELF := LEFT,
                 SELF := []), 
@@ -4905,6 +4955,9 @@ Key_SexOffender_SPK := IF( Options.isFCRA, SexOffender.Key_SexOffender_SPK(TRUE)
 					SELF.P_LexID := LEFT.P_LexID,
 					SELF.Src := PublicRecords_KEL.ECL_Functions.Constants.FraudPoint3Source;
 					SELF.DPMBitmap := SetDPMBitmap( Source := SELF.Src, FCRA_Restricted := Options.isFCRA, GLBA_Restricted := NotRegulated, Pre_GLB_Restricted := NotRegulated, DPPA_Restricted := NotRegulated, DPPA_State := BlankString, KELPermissions := CFG_File),
+					DOBCleaned := CleanDateOfBirth((UNSIGNED)RIGHT.dob);
+					SELF.dob := (STRING)DOBCleaned.dob;
+					SELF.DOBPadded := DOBCleaned.DOBPadded;
 					SELF := RIGHT,
 					SELF := LEFT,
 					SELF := []), 
@@ -4944,6 +4997,9 @@ Key_AccLogs_FCRA_Address :=
 					SELF.Src := MDR.sourceTools.src_InquiryAcclogs,
 					SELF.DPMBitmap := SetDPMBitmap( Source := MDR.sourceTools.src_InquiryAcclogs, FCRA_Restricted := Options.isFCRA, GLBA_Restricted := NotRegulated, Pre_GLB_Restricted := NotRegulated, DPPA_Restricted := NotRegulated, DPPA_State := BlankString, KELPermissions := CFG_File),
 					self.Archive_Date := ArchiveDate((string) SELF.DateOfInquiry);
+					DOBCleaned := CleanDateOfBirth((UNSIGNED)RIGHT.person_q.dob);
+					SELF.person_q.dob := (STRING)DOBCleaned.dob;
+					SELF.DOBPadded := DOBCleaned.DOBPadded;
 					SELF := RIGHT, 
 					SELF := LEFT,
 					SELF := []), 
@@ -4989,6 +5045,9 @@ Key_AccLogs_FCRA_Address :=
 					SELF.Src := MDR.sourceTools.src_InquiryAcclogs;
 					SELF.DPMBitmap := SetDPMBitmap( Source := MDR.sourceTools.src_InquiryAcclogs, FCRA_Restricted := Options.isFCRA, GLBA_Restricted := NotRegulated, Pre_GLB_Restricted := NotRegulated, DPPA_Restricted := NotRegulated, DPPA_State := BlankString, KELPermissions := CFG_File),
 					self.Archive_Date := ArchiveDate((string)SELF.DateOfInquiry);
+					DOBCleaned := CleanDateOfBirth((UNSIGNED)RIGHT.person_q.dob);
+					SELF.person_q.dob := (STRING)DOBCleaned.dob;
+					SELF.DOBPadded := DOBCleaned.DOBPadded;
 					SELF := RIGHT, 
 					SELF := LEFT,
 					SELF := []), 
@@ -5051,6 +5110,9 @@ Key_AccLogs_FCRA_SSN :=
 					SELF.Src := MDR.sourceTools.src_InquiryAcclogs,
 					SELF.DPMBitmap := SetDPMBitmap( Source := MDR.sourceTools.src_InquiryAcclogs, FCRA_Restricted := Options.isFCRA, GLBA_Restricted := NotRegulated, Pre_GLB_Restricted := NotRegulated, DPPA_Restricted := NotRegulated, DPPA_State := BlankString, KELPermissions := CFG_File),
 					self.Archive_Date := ArchiveDate((string)SELF.DateOfInquiry);
+					DOBCleaned := CleanDateOfBirth((UNSIGNED)RIGHT.person_q.dob);
+					SELF.person_q.dob := (STRING)DOBCleaned.dob;
+					SELF.DOBPadded := DOBCleaned.DOBPadded;
 					SELF := RIGHT, 
 					SELF := LEFT,
 					SELF := []), 
@@ -5090,6 +5152,9 @@ Key_AccLogs_FCRA_SSN :=
 					SELF.Src := MDR.sourceTools.src_InquiryAcclogs,
 					SELF.DPMBitmap := SetDPMBitmap( Source := MDR.sourceTools.src_InquiryAcclogs, FCRA_Restricted := Options.isFCRA, GLBA_Restricted := NotRegulated, Pre_GLB_Restricted := NotRegulated, DPPA_Restricted := NotRegulated, DPPA_State := BlankString, KELPermissions := CFG_File),
 					self.Archive_Date := ArchiveDate((string)SELF.DateOfInquiry);
+					DOBCleaned := CleanDateOfBirth((UNSIGNED)RIGHT.person_q.dob);
+					SELF.person_q.dob := (STRING)DOBCleaned.dob;
+					SELF.DOBPadded := DOBCleaned.DOBPadded;
 					SELF := RIGHT, 
 					SELF := LEFT,
 					SELF := []), 
@@ -5154,6 +5219,9 @@ Key_AccLogs_FCRA_SSN :=
 					SELF.IsDeltaBaseRecord := False,
 					SELF.DPMBitmap := SetDPMBitmap( Source := MDR.sourceTools.src_InquiryAcclogs, FCRA_Restricted := Options.isFCRA, GLBA_Restricted := NotRegulated, Pre_GLB_Restricted := NotRegulated, DPPA_Restricted := NotRegulated, DPPA_State := BlankString, KELPermissions := CFG_File),
 					self.Archive_Date := ArchiveDate((string)SELF.DateOfInquiry);
+					DOBCleaned := CleanDateOfBirth((UNSIGNED)RIGHT.person_q.dob);
+					SELF.person_q.dob := (STRING)DOBCleaned.dob;
+					SELF.DOBPadded := DOBCleaned.DOBPadded;
 					SELF := RIGHT, 
 					SELF := LEFT,
 					SELF := []), 
@@ -5186,6 +5254,9 @@ Key_AccLogs_FCRA_SSN :=
 					SELF.Src := MDR.sourceTools.src_InquiryAcclogs,
 					SELF.DPMBitmap := SetDPMBitmap( Source := MDR.sourceTools.src_InquiryAcclogs, FCRA_Restricted := Options.isFCRA, GLBA_Restricted := NotRegulated, Pre_GLB_Restricted := NotRegulated, DPPA_Restricted := NotRegulated, DPPA_State := BlankString, KELPermissions := CFG_File),
 					self.Archive_Date := ArchiveDate((string)SELF.DateOfInquiry);
+					DOBCleaned := CleanDateOfBirth((UNSIGNED)RIGHT.person_q.dob);
+					SELF.person_q.dob := (STRING)DOBCleaned.dob;
+					SELF.DOBPadded := DOBCleaned.DOBPadded;
 					SELF := RIGHT, 
 					SELF := LEFT,
 					SELF := []), 
@@ -5224,6 +5295,9 @@ Key_AccLogs_FCRA_SSN :=
 					SELF.IsDeltaBaseRecord := False,
 					SELF.DPMBitmap := SetDPMBitmap( Source := MDR.sourceTools.src_InquiryAcclogs, FCRA_Restricted := Options.isFCRA, GLBA_Restricted := NotRegulated, Pre_GLB_Restricted := NotRegulated, DPPA_Restricted := NotRegulated, DPPA_State := BlankString, KELPermissions := CFG_File),
 					self.Archive_Date := ArchiveDate((string)SELF.DateOfInquiry);
+					DOBCleaned := CleanDateOfBirth((UNSIGNED)RIGHT.person_q.dob);
+					SELF.person_q.dob := (STRING)DOBCleaned.dob;
+					SELF.DOBPadded := DOBCleaned.DOBPadded;
 					SELF := RIGHT, 
 					SELF := LEFT,
 					SELF := []), 
@@ -5250,6 +5324,9 @@ Key_AccLogs_FCRA_SSN :=
 					SELF.DateOfInquiry := RIGHT.Search_Info.DateTime[1..8] + RIGHT.Search_Info.DateTime[10..] + '0';
 					SELF.DPMBitmap := SetDPMBitmap( Source := MDR.sourceTools.src_InquiryAcclogs, FCRA_Restricted := Options.isFCRA, GLBA_Restricted := NotRegulated, Pre_GLB_Restricted := NotRegulated, DPPA_Restricted := NotRegulated, DPPA_State := BlankString, KELPermissions := CFG_File),
 					self.Archive_Date := ArchiveDate((string)SELF.DateOfInquiry);
+					DOBCleaned := CleanDateOfBirth((UNSIGNED)RIGHT.person_q.dob);
+					SELF.person_q.dob := (STRING)DOBCleaned.dob;
+					SELF.DOBPadded := DOBCleaned.DOBPadded;
 					SELF := RIGHT, 
 					SELF := LEFT,
 					SELF := []), 
@@ -5288,6 +5365,9 @@ Key_AccLogs_FCRA_SSN :=
 					SELF.IsDeltaBaseRecord := False,
 					SELF.DPMBitmap := SetDPMBitmap( Source := MDR.sourceTools.src_InquiryAcclogs, FCRA_Restricted := Options.isFCRA, GLBA_Restricted := NotRegulated, Pre_GLB_Restricted := NotRegulated, DPPA_Restricted := NotRegulated, DPPA_State := BlankString, KELPermissions := CFG_File),
 					self.Archive_Date :=  archivedate(SELF.DateOfInquiry);
+					DOBCleaned := CleanDateOfBirth((UNSIGNED)RIGHT.person_q.dob);
+					SELF.person_q.dob := (STRING)DOBCleaned.dob;
+					SELF.DOBPadded := DOBCleaned.DOBPadded;
 					SELF := RIGHT, 
 					SELF := LEFT,
 					SELF := []), 
@@ -5314,6 +5394,9 @@ Key_AccLogs_FCRA_SSN :=
 					SELF.DateOfInquiry := RIGHT.Search_Info.DateTime[1..8]+RIGHT.Search_Info.DateTime[10..]+'0';
 					SELF.DPMBitmap := SetDPMBitmap( Source := MDR.sourceTools.src_InquiryAcclogs, FCRA_Restricted := Options.isFCRA, GLBA_Restricted := NotRegulated, Pre_GLB_Restricted := NotRegulated, DPPA_Restricted := NotRegulated, DPPA_State := BlankString, KELPermissions := CFG_File),
 					self.Archive_Date :=  ArchiveDate((string)SELF.DateOfInquiry);
+					DOBCleaned := CleanDateOfBirth((UNSIGNED)RIGHT.person_q.dob);
+					SELF.person_q.dob := (STRING)DOBCleaned.dob;
+					SELF.DOBPadded := DOBCleaned.DOBPadded;
 					SELF := RIGHT, 
 					SELF := LEFT,
 					SELF := []), 
@@ -5352,6 +5435,9 @@ Key_AccLogs_FCRA_SSN :=
 					SELF.IsDeltaBaseRecord := False,//no fein deltabase
 					SELF.DPMBitmap := SetDPMBitmap( Source := MDR.sourceTools.src_InquiryAcclogs, FCRA_Restricted := Options.isFCRA, GLBA_Restricted := NotRegulated, Pre_GLB_Restricted := NotRegulated, DPPA_Restricted := NotRegulated, DPPA_State := BlankString, KELPermissions := CFG_File),
 					self.Archive_Date :=  ArchiveDate((string)SELF.DateOfInquiry);
+					DOBCleaned := CleanDateOfBirth((UNSIGNED)RIGHT.bususer_q.dob);
+					SELF.bususer_q.dob := (STRING)DOBCleaned.dob;
+					SELF.DOBPadded := DOBCleaned.DOBPadded;
 					SELF := RIGHT, 
 					SELF := LEFT,
 					SELF := []), 
@@ -5378,6 +5464,9 @@ Key_AccLogs_FCRA_SSN :=
 					SELF.DateOfInquiry := RIGHT.Search_Info.DateTime[1..8]+RIGHT.Search_Info.DateTime[10..]+'0';
 					SELF.DPMBitmap := SetDPMBitmap( Source := MDR.sourceTools.src_InquiryAcclogs, FCRA_Restricted := Options.isFCRA, GLBA_Restricted := NotRegulated, Pre_GLB_Restricted := NotRegulated, DPPA_Restricted := NotRegulated, DPPA_State := BlankString, KELPermissions := CFG_File),
 					self.Archive_Date :=  ArchiveDate((string)SELF.DateOfInquiry);
+					DOBCleaned := CleanDateOfBirth((UNSIGNED)RIGHT.bususer_q.dob);
+					SELF.bususer_q.dob := (STRING)DOBCleaned.dob;
+					SELF.DOBPadded := DOBCleaned.DOBPadded;
 					SELF := RIGHT, 
 					SELF := LEFT,
 					SELF := []), 
@@ -5421,12 +5510,18 @@ Key_AccLogs_FCRA_SSN :=
 																								transform(Layouts_FDC.Layout_Inquiry_AccLogs__Inquiry_Table_LinkIds, 
 																									SELF.IsUpdateRecord := FALSE, 
 																									SELF.IsDeltaBaseRecord := False,//no bip deltabase
+																									DOBCleaned := CleanDateOfBirth((UNSIGNED)LEFT.bususer_q.dob);
+																									SELF.bususer_q.dob := (STRING)DOBCleaned.dob;
+																									SELF.DOBPadded := DOBCleaned.DOBPadded;
 																									self := left, 
 																									self := []));  //to help with debugging and data questions
 	Inquiry_LinkIds_Update := Project(Inquiry_AccLogs__Key_Inquiry_LinkIds_Update(#EXPAND(PublicRecords_KEL.ECL_Functions.AccLogs_Constants.inquiry_is_ok_nonFCRA)),
 																								transform(Layouts_FDC.Layout_Inquiry_AccLogs__Inquiry_Table_LinkIds, 
 																								SELF.IsUpdateRecord := TRUE, 
 																								SELF.IsDeltaBaseRecord := False,//no bip deltabase
+																								DOBCleaned := CleanDateOfBirth((UNSIGNED)LEFT.bususer_q.dob);
+																								SELF.bususer_q.dob := (STRING)DOBCleaned.dob;
+																								SELF.DOBPadded := DOBCleaned.DOBPadded;
 																								self := left, 
 																								self := []));  //to help with debugging and data questions
 	
@@ -5471,6 +5566,9 @@ Key_AccLogs_FCRA_SSN :=
 					SELF.IsDeltaBaseRecord := False,
 					SELF.DPMBitmap := SetDPMBitmap( Source := MDR.sourceTools.src_InquiryAcclogs, FCRA_Restricted := Options.isFCRA, GLBA_Restricted := NotRegulated, Pre_GLB_Restricted := NotRegulated, DPPA_Restricted := NotRegulated, DPPA_State := BlankString, KELPermissions := CFG_File),
 					self.Archive_Date :=  ArchiveDate((string)SELF.DateOfInquiry);
+					DOBCleaned := CleanDateOfBirth((UNSIGNED)RIGHT.person_q.dob);
+					SELF.person_q.dob := (STRING)DOBCleaned.dob;
+					SELF.DOBPadded := DOBCleaned.DOBPadded;
 					SELF := RIGHT, 
 					SELF := LEFT,
 					SELF := []), 
@@ -5497,6 +5595,9 @@ Key_AccLogs_FCRA_SSN :=
 					SELF.DateOfInquiry := RIGHT.Search_Info.DateTime[1..8] + RIGHT.Search_Info.DateTime[10..] + '0';
 					SELF.DPMBitmap := SetDPMBitmap( Source := MDR.sourceTools.src_InquiryAcclogs, FCRA_Restricted := Options.isFCRA, GLBA_Restricted := NotRegulated, Pre_GLB_Restricted := NotRegulated, DPPA_Restricted := NotRegulated, DPPA_State := BlankString, KELPermissions := CFG_File),
 					self.Archive_Date := ArchiveDate((string)SELF.DateOfInquiry);
+					DOBCleaned := CleanDateOfBirth((UNSIGNED)RIGHT.person_q.dob);
+					SELF.person_q.dob := (STRING)DOBCleaned.dob;
+					SELF.DOBPadded := DOBCleaned.DOBPadded;
 					SELF := RIGHT, 
 					SELF := LEFT,
 					SELF := []), 
@@ -5535,6 +5636,9 @@ Key_AccLogs_FCRA_SSN :=
 					SELF.IsDeltaBaseRecord := False,
 					SELF.DPMBitmap := SetDPMBitmap( Source := MDR.sourceTools.src_InquiryAcclogs, FCRA_Restricted := Options.isFCRA, GLBA_Restricted := NotRegulated, Pre_GLB_Restricted := NotRegulated, DPPA_Restricted := NotRegulated, DPPA_State := BlankString, KELPermissions := CFG_File),
 					self.Archive_Date := ArchiveDate((string)SELF.DateOfInquiry);
+					DOBCleaned := CleanDateOfBirth((UNSIGNED)RIGHT.person_q.dob);
+					SELF.person_q.dob := (STRING)DOBCleaned.dob;
+					SELF.DOBPadded := DOBCleaned.DOBPadded;
 					SELF := RIGHT, 
 					SELF := LEFT,
 					SELF := []), 
@@ -5561,6 +5665,9 @@ Key_AccLogs_FCRA_SSN :=
 					SELF.DateOfInquiry := RIGHT.Search_Info.DateTime[1..8] + RIGHT.Search_Info.DateTime[10..] + '0';
 					SELF.DPMBitmap := SetDPMBitmap( Source := MDR.sourceTools.src_InquiryAcclogs, FCRA_Restricted := Options.isFCRA, GLBA_Restricted := NotRegulated, Pre_GLB_Restricted := NotRegulated, DPPA_Restricted := NotRegulated, DPPA_State := BlankString, KELPermissions := CFG_File),
 					self.Archive_Date :=  ArchiveDate((string)SELF.DateOfInquiry);
+					DOBCleaned := CleanDateOfBirth((UNSIGNED)RIGHT.person_q.dob);
+					SELF.person_q.dob := (STRING)DOBCleaned.dob;
+					SELF.DOBPadded := DOBCleaned.DOBPadded;
 					SELF := RIGHT, 
 					SELF := LEFT,
 					SELF := []), 

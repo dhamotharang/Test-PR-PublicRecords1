@@ -124,6 +124,19 @@ return If(date1 = '', datechooser(datevalue2), date1);
 	
 end;	
 	
+	DOBPaddingLayout := RECORD
+		UNSIGNED4 DOB;
+		STRING8 DOBPadded;
+	END;
+	CleanDateOfBirth(UNSIGNED4 dob_in) := FUNCTION
+		Result := MAP(
+			STD.Date.IsValidDate(dob_in)										=> ROW({dob_in, ''}, DOBPaddingLayout),
+			STD.Date.IsValidDate((UNSIGNED4)(((STRING)dob_in)[1..6] + '01'))	=> ROW({(((STRING)dob_in)[1..6] + '01'), 'YYYYMM01'}, DOBPaddingLayout),
+			STD.Date.IsValidDate((UNSIGNED4)(((STRING)dob_in)[1..4] + '0101'))	=> ROW({(((STRING)dob_in)[1..4] + '0101'), 'YYYY0101'}, DOBPaddingLayout),
+																					ROW({dob_in, ''}, DOBPaddingLayout));
+		
+		RETURN Result;
+	END;
 	
 
 	Input_pre_override := Input_all((INTEGER)p_inpclnarchdt > 0); //inputs without contacts
@@ -395,7 +408,7 @@ end;
 					SELF.hhid_relat := LEFT.hhid_relat,
 					SELF.Src := PublicRecords_KEL.ECL_Functions.Constants.HouseHoldKeys,
 					SELF.DPMBitmap := SetDPMBitmap( Source := SELF.Src, FCRA_Restricted := Options.isFCRA, GLBA_Restricted := NotRegulated, Pre_GLB_Restricted := NotRegulated , DPPA_Restricted := NotRegulated, DPPA_State :='', KELPermissions := CFG_File),
-					self.Archive_Date :=  '';		//no dates.						
+					self.Archive_Date :=  '';		//no dates.		
 					SELF := RIGHT,
 					SELF := LEFT,
 					SELF := []),
@@ -541,7 +554,7 @@ end;
 																																	SELF.P_LexID := LEFT.P_LexID,
 																																	SELF.src := MDR.SourceTools.src_Best_Person,
 																																	SELF.DPMBitmap := SetDPMBitmap( Source := SELF.src, FCRA_Restricted := Options.isFCRA ,  KELPermissions := CFG_File);
-																																	self.Archive_Date :=  '';		//not archivable																																
+																																	self.Archive_Date :=  '';		//not archivable	
 																																	self.rec  := left.rec, 
 																																	self := []));
 																													SELF := LEFT,
@@ -576,7 +589,10 @@ end;
 					SELF.src := PublicRecords_KEL.ECL_Functions.Constants.Watchdog_NonEN_FCRA,
 					//source for FCRA best person has to be the below string for DRM bit Risk_Indicators.iid_constants.posEquifaxRestriction to work
 					SELF.DPMBitmap := SetDPMBitmap( Source :=  SELF.src, FCRA_Restricted := Options.isFCRA, GLBA_Restricted := NotRegulated, Pre_GLB_Restricted := NotRegulated, DPPA_Restricted := NotRegulated, DPPA_State := BlankString, KELPermissions := CFG_File),
-					self.Archive_Date :=  '';		//not archivable					
+					self.Archive_Date :=  '';		//not archivable	
+					DOBCleaned := CleanDateOfBirth((UNSIGNED)RIGHT.dob);
+					SELF.dob := DOBCleaned.dob;
+					SELF.DOBPadded := DOBCleaned.DOBPadded;
 					SELF := RIGHT,
 					SELF := LEFT,
 					SELF := []), 
@@ -597,7 +613,10 @@ end;
 					SELF.src := PublicRecords_KEL.ECL_Functions.Constants.Watchdog_NonEQ_FCRA,
 					//source for FCRA best person has to be the below string for DRM bit Risk_Indicators.iid_constants.posEquifaxRestriction to work
 					SELF.DPMBitmap := SetDPMBitmap( Source :=  SELF.src, FCRA_Restricted := Options.isFCRA, GLBA_Restricted := NotRegulated, Pre_GLB_Restricted := NotRegulated, DPPA_Restricted := NotRegulated, DPPA_State := BlankString, KELPermissions := CFG_File),
-					self.Archive_Date :=  '';		//not archivable					
+					self.Archive_Date :=  '';		//not archivable	
+					DOBCleaned := CleanDateOfBirth((UNSIGNED)RIGHT.dob);
+					SELF.dob := DOBCleaned.dob;
+					SELF.DOBPadded := DOBCleaned.DOBPadded;
 					SELF := RIGHT,
 					SELF := LEFT,
 					SELF := []), 
@@ -693,6 +712,9 @@ end;
 					SELF.UIDAppend := LEFT.UIDAppend,
 					SELF.G_ProcUID := LEFT.G_ProcUID,
 					SELF.P_LexID := LEFT.P_LexID,
+					DOBCleaned := CleanDateOfBirth((UNSIGNED)RIGHT.dob);
+					SELF.dob := DOBCleaned.dob;
+					SELF.DOBPadded := DOBCleaned.DOBPadded;
 					SELF.DPMBitmap := SetDPMBitmap( Source := PublicRecords_KEL.ECL_Functions.Constants.SetQuickHeaderSource(right.src), FCRA_Restricted := Options.isFCRA, GLBA_Restricted := NotRegulated, Pre_GLB_Restricted := PublicRecords_KEL.ECL_Functions.Constants.PreGLBRegulatedRecord(right.Src, right.dt_nonglb_last_seen, right.dt_first_seen), DPPA_Restricted := NotRegulated, DPPA_State := PublicRecords_KEL.ECL_Functions.Constants.GetDPPAState(PublicRecords_KEL.ECL_Functions.Constants.SetQuickHeaderSource(right.src)),Marketing_State := right.st, KELPermissions := CFG_File, Is_Consumer_Header := TRUE),
 					SELF.HeaderRec := FALSE,
 					SELF := RIGHT,
@@ -765,6 +787,9 @@ end;
 					SELF.UIDAppend := LEFT.UIDAppend,
 					SELF.G_ProcUID := LEFT.G_ProcUID,
 					SELF.P_LexID := LEFT.P_LexID,
+					DOBCleaned := CleanDateOfBirth((UNSIGNED)RIGHT.dob);
+					SELF.dob := DOBCleaned.dob;
+					SELF.DOBPadded := DOBCleaned.DOBPadded;
 					SELF.HeaderRec := TRUE,
 					SELF.DPMBitmap := SetDPMBitmap( Source := right.src, FCRA_Restricted := Options.isFCRA, GLBA_Restricted := NotRegulated, Pre_GLB_Restricted := PublicRecords_KEL.ECL_Functions.Constants.PreGLBRegulatedRecord(right.Src, right.dt_nonglb_last_seen, right.dt_first_seen), DPPA_Restricted := NotRegulated, DPPA_State := PublicRecords_KEL.ECL_Functions.Constants.GetDPPAState(right.src), Marketing_State := right.st, KELPermissions := CFG_file, Is_Consumer_Header := TRUE),
 					SELF := RIGHT,
