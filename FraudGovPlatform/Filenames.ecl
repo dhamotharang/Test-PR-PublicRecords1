@@ -77,7 +77,6 @@ module
 		export MBSColValDesc	:= tools.mod_FilenamesInput(Template('MBSColValDesc'),pversion);
 		export MBSmarketAppend	:= tools.mod_FilenamesInput(Template('MBSmarketAppend'),pversion);
 		export MbsFdnMasterIDIndTypeInclusion:= tools.mod_FilenamesInput(Template('MbsFdnMasterIDIndTypeInclusion'),pversion);
-		export MbsVelocityRules	:=	tools.mod_FilenamesInput(Template('MbsVelocityRules'),pversion);
 
 
 		export IdentityData	:= tools.mod_FilenamesInput(Template('IdentityData'),pversion);
