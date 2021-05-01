@@ -81,11 +81,12 @@ module
 			  buildfiles.Built2QA
 	);
 
+	import autokey, AutoKeyI,AutokeyB2,RoxieKeyBuild;
 	AutoKeyB2.MAC_AcceptSK_to_QA(_Dataset().autokeytemplate	, moveToQA);
 
 	export promote_keys := sequential(
 			// Promote Autokeys
-			  moveToQA,
+			  moveToQA
 			// Promote FraudGoV Keys
 			, buildfiles.Built2QA			
 			// Clean Up Shared Files	
