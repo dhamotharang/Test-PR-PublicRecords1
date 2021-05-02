@@ -44,7 +44,7 @@ Build_Kel_Ecl :=
 		FraudGovPlatform.Health_CheckUp(version).ALL,
 		FraudGovPlatform.Build_Input(version).ALL,
 		FraudGovPlatform.Build_Base(version).ALL,
-		FraudGovPlatform.Build_Base_UnitTest(version).ALL,
+		FraudGovPlatform.Build_Base_UnitTests(version).ALL,
 		FraudGovPlatform.Promote(version).promote_base,
 		FraudGovPlatform.promote(version).promote_sprayed_files,
 		FraudGovPlatform.Build_Base_Pii(version).All,
