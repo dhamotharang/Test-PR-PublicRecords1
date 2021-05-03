@@ -24,6 +24,6 @@ export all := sequential(
 									parallel(hdr_if_knowx, teaser_did, teaser_search), 
 									parallel(mv_hdr_if_knowx, mv_teaser_did, mv_teaser_search), 
 									parallel(mv_hdr_if_knowx_qa, mv_hdr_did_qa, mv_hdr_search_qa),
-									RoxieKeybuild.updateversion('InfutorKeys',filedate,'goulmi01@lexisnexisrisk.com',,'N|B')
+									RoxieKeybuild.updateversion('InfutorKeys',filedate,'harry.gist@lexisnexisrisk.com, Abednego.Escobal@lexisnexisrisk.com',,'N|B')
 									);
 end;
