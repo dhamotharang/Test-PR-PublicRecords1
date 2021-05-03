@@ -94,22 +94,14 @@ export UpdateRecordsAD(FullData,NewData,recref,MatchFields,UpdateFields,process_
 	#append(CommandString,'PrevBase:=max(dFullData,record_sid);\n');
     //#append(CommandString,'');
 	#append(CommandString,'dUpdateRecordsAdds:=project(dUpdateRecordsTemp(updated),\n');
-    #append(CommandString,'transform(RecordLayout,self.record_sid:=0; self:=Left.NewRec;));\n');
+    #append(CommandString,'transform(RecordLayout,self.record_sid:=left.record_sid; self:=Left.NewRec;));\n');
 	#append(CommandString,'dUpdateRecordsDeletes:=project(dUpdateRecordsTemp(updated),\n');
     #append(CommandString,'transform(RecordLayout,self.record_sid:=left.record_sid; self:=Left.OldRec;));\n');
 
-	#append(CommandString,'RecordLayout tCreateAdds(RecordLayout L, RecordLayout R):=TRANSFORM\n');
-    #append(CommandString,'SELF.Record_Sid:=IF (l.Record_Sid=0, PrevBase+1+thorlib.node(), l.Record_Sid+thorlib.nodes());\n');
-    #append(CommandString,'self:=R;\n');
-    #append(CommandString,'end;\n');
-    
-    
-    #append(CommandString,'FinalAdds:=iterate(dUpdateRecordsAdds,tCreateAdds(left,right),local);\n');
-	
 	
 	%CommandString%;
 //
-    return FinalAdds+dUpdateRecordsDeletes;
+    return dUpdateRecordsAdds+dUpdateRecordsDeletes;
 	//return %'CommandString'%;
 
 endmacro;

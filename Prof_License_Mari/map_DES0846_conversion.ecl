@@ -63,31 +63,33 @@ EXPORT map_DES0846_conversion(STRING pVersion) := FUNCTION
 		//raw_license_type should be what is in the input file. Cathy Tio 1/25/13
 		TrimLicenseType				:= ut.CleanSpacesAndUpper(L.LIC);
 		SELF.RAW_LICENSE_TYPE	:= TrimLicenseType;
- 		SELF.STD_LICENSE_TYPE	:= MAP(StringLib.StringFind(TrimLicenseType,'CERTIFIED GENERAL REAL PROPERTY APPRAISE',1)= 1 => 'CGRPA',
-   														StringLib.StringFind(TrimLicenseType,'CERTIFIED RESIDENTIAL REAL PROPERTY APPR',1)= 1 => 'CGRPA',
-   														StringLib.StringFind(TrimLicenseType,'LICENSED REAL PROPERTY APPRAISER',1)= 1 => 'LRPA',
-   														StringLib.StringFind(TrimLicenseType,'NONRESIDENT BROKER',1)= 1 => 'NB',
-   														StringLib.StringFind(TrimLicenseType,'NONRESIDENT SALESPERSON',1)= 1 => 'NS',
-   														StringLib.StringFind(TrimLicenseType,'RESIDENT BROKER',1)= 1 => 'RB',
+ 		SELF.STD_LICENSE_TYPE	:= MAP(TrimLicenseType='CERTIFIED GENERAL REAL PROPERTY APPRAISE' => 'CGRPA',
+   														TrimLicenseType='CERTIFIED RESIDENTIAL REAL PROPERTY APPR' => 'CGRPA',
+															TrimLicenseType='CERT. RESIDENTIAL REAL PROPERTY APPR' => 'CGRPA',
+   														TrimLicenseType='LICENSED REAL PROPERTY APPRAISER' => 'LRPA',
+   														TrimLicenseType='NONRESIDENT BROKER' => 'NB',
+   														TrimLicenseType='NONRESIDENT SALESPERSON' => 'NS',
+   														TrimLicenseType='RESIDENT BROKER' => 'RB',
    														/*In new input files, all brokers have license numbers starting with RB 1/25/13*/
-   														StringLib.StringFind(TrimLicenseType,'BROKER',1)= 1 => 'RB',
+   														TrimLicenseType='BROKER' => 'RB',
    														// /*This is new in new input files 1/25/13*/
-   														StringLib.StringFind(TrimLicenseType,'ASSOCIATE BROKER',1)= 1 => 'RA',
-   														StringLib.StringFind(TrimLicenseType,'RESIDENT SALESPERSON',1)= 1 => 'RS',
+   														TrimLicenseType='ASSOCIATE BROKER' => 'RA',
+   														TrimLicenseType='RESIDENT SALESPERSON' => 'RS',
    														/*In new input files, all salespersons have license numbers starting with RS 1/25/13*/
-   														StringLib.StringFind(TrimLicenseType,'SALESPERSON',1)= 1 => 'RS',
-   														StringLib.StringFind(TrimLicenseType,'APPRAISER TRAINEE',1)= 1 => 'AT',
-   														StringLib.StringFind(TrimLicenseType,'BRANCH OFFICE PERMIT',1)= 1 => 'BOP',
-   														StringLib.StringFind(TrimLicenseType,'MAIN OFFICE PERMIT',1)= 1 => 'MOP',
-   														StringLib.StringFind(TrimLicenseType,'INACTIVE NONRESIDENT BROKER',1)= 1 => 'INB',
-   														StringLib.StringFind(TrimLicenseType,'INACTIVE NONRESIDENT SALESPERSON',1)= 1 => 'INS',
-   														StringLib.StringFind(TrimLicenseType,'INACTIVE RESIDENT BROKER',1)= 1 => 'IRB',
-   														StringLib.StringFind(TrimLicenseType,'INACTIVE RESIDENT SALESPERSON',1)= 1 => 'IRS',
-   														StringLib.StringFind(TrimLicenseType,'TEMPORARY PRACTICE PERMIT',1)= 1 => 'TPP',
+   														TrimLicenseType='SALESPERSON' => 'RS',
+   													  TrimLicenseType='APPRAISER TRAINEE' => 'AT',
+   														TrimLicenseType='BRANCH OFFICE PERMIT' => 'BOP',
+   														TrimLicenseType='MAIN OFFICE PERMIT' => 'MOP',
+   														TrimLicenseType='INACTIVE NONRESIDENT BROKER' => 'INB',
+   														TrimLicenseType='INACTIVE NONRESIDENT SALESPERSON' => 'INS',
+   														TrimLicenseType='INACTIVE RESIDENT BROKER' => 'IRB',
+   														TrimLicenseType='INACTIVE RESIDENT SALESPERSON' => 'IRS',
+   														TrimLicenseType='TEMPORARY PRACTICE PERMIT' => 'TPP',
+															TrimLicenseType='REAL ESTATE INSTRUCTOR' => 'RT',
    														/*New type since 20130702*/
-   														StringLib.StringFind(TrimLicenseType,'CERTIFIED ASSESSOR',1)= 1 => 'CA',
+   														TrimLicenseType='CERTIFIED ASSESSOR' => 'CA',
    														/*New type  20140811*/
-    													StringLib.StringFind(TrimLicenseType,'APPRAISAL MANAGEMENT COMPANY',1)= 1 => 'AMC',
+    													TrimLicenseType='APPRAISAL MANAGEMENT COMPANY' => 'AMC',
   														' ');
 
 														
@@ -120,20 +122,20 @@ EXPORT map_DES0846_conversion(STRING pVersion) := FUNCTION
 		SELF.NAME_DBA_SUFX		:= ut.CleanSpacesAndUpper(REGEXREPLACE('[^a-zA-Z0-9_]',tmpNameDBASufx, ''));
 		SELF.DBA_FLAG					:= IF(TRIM(SELF.NAME_DBA) != ' ', 1, 0); // 1: true  0: false
 		
-		SELF.NAME_FIRST				:= IF(StringLib.StringToUpperCase(ClnNameFull[6..25]) != ' ',
-																StringLib.StringToUpperCase(ClnNameFull[6..25]),
-																//'');  //for build 20121207 and before
-																ut.CleanSpacesAndUpper(L.FIRST_NAME));
-		SELF.NAME_MID					:= IF(StringLib.StringToUpperCase(ClnNameFull[26..45]) != ' ',
-																StringLib.StringToUpperCase(ClnNameFull[26..45]),
-																//'');  //for build 20121207 and before
-																ut.CleanSpacesAndUpper(L.MIDDLE_NAME));
-		SELF.NAME_LAST				:= IF(StringLib.StringToUpperCase(ClnNameFull[46..65]) != ' ' AND
-																LENGTH(TRIM(ClnNameFull[46..65]))<>1,
-																StringLib.StringToUpperCase(ClnNameFull[46..65]),
-																//'');  //for build 20121207 and before
-																ut.CleanSpacesAndUpper(L.LAST_NAME));
-		SELF.NAME_SUFX				:= StringLib.StringToUpperCase(ClnNameFull[66..70]);
+		// SELF.NAME_FIRST				:= IF(StringLib.StringToUpperCase(ClnNameFull[6..25]) != ' ',
+																// StringLib.StringToUpperCase(ClnNameFull[6..25]),
+																// '');  //for build 20121207 and before
+																// ut.CleanSpacesAndUpper(L.FIRST_NAME));
+		// SELF.NAME_MID					:= IF(StringLib.StringToUpperCase(ClnNameFull[26..45]) != ' ',
+																// StringLib.StringToUpperCase(ClnNameFull[26..45]),
+																// '');  //for build 20121207 and before
+																// ut.CleanSpacesAndUpper(L.MIDDLE_NAME));
+		// SELF.NAME_LAST				:= IF(StringLib.StringToUpperCase(ClnNameFull[46..65]) != ' ' AND
+																// LENGTH(TRIM(ClnNameFull[46..65]))<>1,
+																// StringLib.StringToUpperCase(ClnNameFull[46..65]),
+																// '');  //for build 20121207 and before
+																// ut.CleanSpacesAndUpper(L.LAST_NAME));
+		// SELF.NAME_SUFX				:= StringLib.StringToUpperCase(ClnNameFull[66..70]);
 		
 		SELF.LICENSE_NBR			:= StringLib.StringToUpperCase(TRIM(L.SLNUM,LEFT,RIGHT));
 		SELF.LICENSE_STATE		:= src_st;
@@ -143,11 +145,18 @@ EXPORT map_DES0846_conversion(STRING pVersion) := FUNCTION
 	//Default issue date is 17530101
  		SELF.CURR_ISSUE_DTE		:= '17530101';
 
-		SELF.ORIG_ISSUE_DTE		:= IF(L.ISSUEDT = ' ','17530101',
-																Prof_License_Mari.DateCleaner.fmt_dateMMDDYYYY(L.ISSUEDT));
+		// SELF.ORIG_ISSUE_DTE		:= IF(L.ISSUEDT = ' ','17530101',
+																// Prof_License_Mari.DateCleaner.fmt_dateMMDDYYYY(L.ISSUEDT));
+																
+		tmpOrigIssueDate 						:= Prof_License_Mari.DateCleaner.ToYYYYMMDD(L.ISSUEDT);
+		SELF.ORIG_ISSUE_DTE					:= IF(tmpOrigIssueDate < '20000101','20' + tmpOrigIssueDate[3..],tmpOrigIssueDate);
+																
+		tmpExpireDate 						:= Prof_License_Mari.DateCleaner.ToYYYYMMDD(L.EXPDT);
+		SELF.EXPIRE_DTE 					:= IF(tmpExpireDate < '20000101','20' + tmpExpireDate[3..],tmpExpireDate);
 
-		SELF.EXPIRE_DTE					:= IF(L.EXPDT = ' ','17530101',
-																Prof_License_Mari.DateCleaner.fmt_dateMMDDYYYY(L.EXPDT));
+		// SELF.EXPIRE_DTE					:= IF(L.EXPDT = ' ','17530101',
+																// Prof_License_Mari.DateCleaner.fmt_dateMMDDYYYY(L.EXPDT));
+																
 		SELF.NAME_ORG_ORIG		:= StringLib.StringToUpperCase(TRIM(L.ORG_NAME,LEFT,RIGHT));
 		SELF.NAME_FORMAT			:= IF(ClnNameFull<>'','L','F');
 
@@ -164,7 +173,7 @@ EXPORT map_DES0846_conversion(STRING pVersion) := FUNCTION
 		SELF.ADDR_ZIP5_1		  := IF(LENGTH(TRIM(L.ZIP))=4,'0'+TRIM(L.ZIP,LEFT,RIGHT)[1..5],TRIM(L.ZIP,LEFT,RIGHT)[1..5]);
 		SELF.ADDR_ZIP4_1		  := IF(StringLib.StringFind(L.ZIP,'-',1)>0,TRIM(L.ZIP,LEFT,RIGHT)[7..11],
 																 TRIM(L.ZIP,LEFT,RIGHT)[6..10]);
-		SELF.ADDR_CNTY_1			:= StringLib.StringToUpperCase(TRIM(L.COUNTY,LEFT,RIGHT));
+		// SELF.ADDR_CNTY_1			:= StringLib.StringToUpperCase(TRIM(L.COUNTY,LEFT,RIGHT));
 
 		SELF.ADDR_BUS_IND			:= IF(TRIM(L.CITY_1+L.STATE_1+L.ZIP)<>'','B','');
 		SELF.ADDR_CNTRY_1			:= StringLib.StringToUpperCase(TRIM(L.COUNTRY_1,LEFT,RIGHT));
@@ -226,7 +235,8 @@ EXPORT map_DES0846_conversion(STRING pVersion) := FUNCTION
 
 	add_super := Prof_License_Mari.fAddNewUpdate(ds_map_lic_trans);
 	
-	move_to_used := PARALLEL(Prof_License_Mari.func_move_file.MyMoveFile(code, 'apr', 'using', 'used'),
+	move_to_used := PARALLEL(
+														Prof_License_Mari.func_move_file.MyMoveFile(code, 'apr', 'using', 'used'),
 														Prof_License_Mari.func_move_file.MyMoveFile(code, 're', 'using', 'used')
 														);
 
