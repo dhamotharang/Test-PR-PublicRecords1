@@ -52,18 +52,18 @@ EXPORT InValidFT_invalid_name(SALT311.StrType s,SALT311.StrType middle_name,SALT
 EXPORT InValidMessageFT_invalid_name(UNSIGNED1 wh) := CHOOSE(wh,SALT311.HygieneErrors.CustomFail('scrubs.functions.fn_populated_strings'),SALT311.HygieneErrors.Good);
  
 EXPORT MakeFT_invalid_city(SALT311.StrType s0) := FUNCTION
-  s1 := SALT311.stringfilter(s0,'ABCDEFGHIJKLMNOPQRSTUVWXYZ '); // Only allow valid symbols
+  s1 := SALT311.stringfilter(s0,'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-#,.\'@& '); // Only allow valid symbols
   RETURN  s1;
 END;
-EXPORT InValidFT_invalid_city(SALT311.StrType s) := WHICH(LENGTH(TRIM(s))<>LENGTH(TRIM(SALT311.StringFilter(s,'ABCDEFGHIJKLMNOPQRSTUVWXYZ '))));
-EXPORT InValidMessageFT_invalid_city(UNSIGNED1 wh) := CHOOSE(wh,SALT311.HygieneErrors.NotInChars('ABCDEFGHIJKLMNOPQRSTUVWXYZ '),SALT311.HygieneErrors.Good);
+EXPORT InValidFT_invalid_city(SALT311.StrType s) := WHICH(LENGTH(TRIM(s))<>LENGTH(TRIM(SALT311.StringFilter(s,'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-#,.\'@& '))));
+EXPORT InValidMessageFT_invalid_city(UNSIGNED1 wh) := CHOOSE(wh,SALT311.HygieneErrors.NotInChars('ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-#,.\'@& '),SALT311.HygieneErrors.Good);
  
 EXPORT MakeFT_invalid_street(SALT311.StrType s0) := FUNCTION
-  s1 := SALT311.stringfilter(s0,'/#-,.0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ '); // Only allow valid symbols
+  s1 := SALT311.stringfilter(s0,'\\-/#,.\'=%:&(;)0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ '); // Only allow valid symbols
   RETURN  s1;
 END;
-EXPORT InValidFT_invalid_street(SALT311.StrType s) := WHICH(LENGTH(TRIM(s))<>LENGTH(TRIM(SALT311.StringFilter(s,'/#-,.0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ '))));
-EXPORT InValidMessageFT_invalid_street(UNSIGNED1 wh) := CHOOSE(wh,SALT311.HygieneErrors.NotInChars('/#-,.0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ '),SALT311.HygieneErrors.Good);
+EXPORT InValidFT_invalid_street(SALT311.StrType s) := WHICH(LENGTH(TRIM(s))<>LENGTH(TRIM(SALT311.StringFilter(s,'\\-/#,.\'=%:&(;)0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ '))));
+EXPORT InValidMessageFT_invalid_street(UNSIGNED1 wh) := CHOOSE(wh,SALT311.HygieneErrors.NotInChars('\\-/#,.\'=%:&(;)0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ '),SALT311.HygieneErrors.Good);
  
 EXPORT MakeFT_invalid_state(SALT311.StrType s0) := FUNCTION
   RETURN  s0;
