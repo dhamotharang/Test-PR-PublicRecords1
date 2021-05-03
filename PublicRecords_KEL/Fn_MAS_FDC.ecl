@@ -2888,14 +2888,14 @@ Bankruptcy_Files__Key_Search_Records_pre	:= Bankruptcy_Files__Key_Search_Records
 			Common.DoFDCJoin_AlloyMedia_student_list__key_DID =True AND
 			LEFT.P_LexID > 0 AND
 				KEYED(LEFT.P_LexID = (UNSIGNED)RIGHT.did) and
-				ArchiveDate((string)right.date_first_seen, (string)right.date_vendor_first_reported) <= LEFT.P_InpClnArchDt[1..8],
+				ArchiveDate((string)right.date_vendor_first_reported) <= LEFT.P_InpClnArchDt[1..8],
 				TRANSFORM(Layouts_FDC.Layout_AlloyMedia_student_list__key_DID,
 					SELF.UIDAppend := LEFT.UIDAppend,
 					SELF.G_ProcUID := LEFT.G_ProcUID,
 					SELF.P_LexID := LEFT.P_LexID,
 					SELF.DPMBitmap := SetDPMBitmap( Source := RIGHT.source, FCRA_Restricted := Options.isFCRA, GLBA_Restricted := NotRegulated, Pre_GLB_Restricted := NotRegulated , DPPA_Restricted := NotRegulated, DPPA_State :='', KELPermissions := CFG_File),
-					self.Archive_Date :=  ArchiveDate((string)right.date_first_seen, (string)right.date_vendor_first_reported);
-					self.date_first_seen :=  archivedate((string)right.date_first_seen);
+					self.Archive_Date :=  ArchiveDate((string)right.date_vendor_first_reported);
+					self.date_vendor_first_reported :=  archivedate((string)right.date_vendor_first_reported);
 					SELF := RIGHT,
 					SELF := LEFT,
 					SELF := []),
