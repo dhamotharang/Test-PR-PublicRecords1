@@ -159,8 +159,8 @@ EXPORT Layouts := MODULE
 			string10	business_date;
 			string60	business_risk_code;
 			string1		Customer_Program;
-			string8		start_date;
-			string8		end_date;
+			string75	start_date;
+			string75	end_date;
 			string10  	amount_paid;
 			string10	region_code;
 			string10	investigator_id;
@@ -819,7 +819,6 @@ EXPORT Layouts := MODULE
 			string10	clean_Zip :='';
 			string25	clean_IP_Address :='';
 			string10	clean_dob :='';
-
 			// FraudGovPlatform	IdentityData
 			string1	Race := '';
 			string1	Ethnicity := '';
@@ -827,7 +826,6 @@ EXPORT Layouts := MODULE
 			string20	bank_account_number_1 := '';
 			string20	bank_routing_number_2 := '';
 			string20	bank_account_number_2 := '';
-
 			// FraudGovPlatform	KnownFraud
 			string30	reported_by := '';
 			string60	name_risk_code := '';
@@ -847,8 +845,8 @@ EXPORT Layouts := MODULE
 			string60	device_risk_code := '';
 			string60	identity_risk_code := '';
 			string10	tax_preparer_id := '';
-			string8	start_date := '';
-			string8	end_date := '';
+			string75	start_date := '';
+			string75	end_date := '';
 			string10	amount_paid := '';
 			string10	region_code := '';
 			string10	investigator_id := '';	
@@ -863,6 +861,10 @@ EXPORT Layouts := MODULE
 			string10	geo_lat := '';
 			string11	geo_long := '';	
 			string20	RIN_SourceLabel := '';
+			//RDP Fields
+			string10	Duration;
+			string30	TransactionStatus;
+			string		Reason;			
 		END; 
 
 		EXPORT AddressCache := record
@@ -883,6 +885,7 @@ EXPORT Layouts := MODULE
 		END;
 		
 	END;
+
 	EXPORT CustomerSettings := record 
 		string20 	Customer_Id;
 		string2 	Customer_State;
@@ -896,6 +899,7 @@ EXPORT Layouts := MODULE
 		string 		Customer_Email; // Emails Separated by semicolon ";"
 		unsigned6 	fdn_file_info_id;
 	end;
+
 
 	EXPORT CustomerMappings := RECORD
 		unsigned6	fdn_file_info_id;
@@ -932,11 +936,14 @@ EXPORT Layouts := MODULE
 		export SkipValidationByGCID	 := RECORD
 			string Gc_ID;
 		end;
-
-
+		
 		export CustomerActiveSprays := record 
 			string20 	Customer_Id;
 			string20	File_type;
+		end;
+
+		export RefreshProdDashVersion := Record
+		boolean RefreshVersion;
 		end;
 	end;
 

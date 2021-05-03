@@ -475,15 +475,18 @@ export Main
 	string60					device_risk_code := '';
 	string60					identity_risk_code := '';
 	string10					tax_preparer_id := '';
-	string8						start_date := '';
-	string8						end_date := '';
-	string10  				amount_paid := '';
+	string75					start_date := '';
+	string75					end_date := '';
+	string10  					amount_paid := '';
 	string10					region_code := '';
 	string10					investigator_id := '';	
 	string3						cleared_fraud := ''; 
 	string250					reason_cleared_code := ''; 
 	unsigned4					global_sid := 0;
 	unsigned8					record_sid := 0; 	
+	string10					Duration := '';
+	string30					TransactionStatus := '';
+	string						Reason := ''; 
 
 end; 
 

@@ -203,9 +203,9 @@ module
 						ut.CleanSpacesandUpper(left.Event_Type_3)= ut.CleanSpacesandUpper(right.Event_Type_3) and
 						ut.CleanSpacesandUpper(left.Household_ID)= ut.CleanSpacesandUpper(right.Household_ID) and
 						ut.CleanSpacesandUpper(left.Reason_Description)= ut.CleanSpacesandUpper(right.Reason_Description) and
-						ut.CleanSpacesandUpper(left.Investigation_Referral_Case_ID                                  )= ut.CleanSpacesandUpper(right.Investigation_Referral_Case_ID) and
-						ut.CleanSpacesandUpper(left.Investigation_Referral_Date_Opened                     )= ut.CleanSpacesandUpper(right.Investigation_Referral_Date_Opened) and
-						ut.CleanSpacesandUpper(left.Investigation_Referral_Date_Closed                        )= ut.CleanSpacesandUpper(right.Investigation_Referral_Date_Closed) and
+						ut.CleanSpacesandUpper(left.Investigation_Referral_Case_ID)= ut.CleanSpacesandUpper(right.Investigation_Referral_Case_ID) and
+						ut.CleanSpacesandUpper(left.Investigation_Referral_Date_Opened)= ut.CleanSpacesandUpper(right.Investigation_Referral_Date_Opened) and
+						ut.CleanSpacesandUpper(left.Investigation_Referral_Date_Closed)= ut.CleanSpacesandUpper(right.Investigation_Referral_Date_Closed) and
 						ut.CleanSpacesandUpper(left.Customer_Fraud_Code_1)= ut.CleanSpacesandUpper(right.Customer_Fraud_Code_1) and
 						ut.CleanSpacesandUpper(left.Customer_Fraud_Code_2)= ut.CleanSpacesandUpper(right.Customer_Fraud_Code_2) and
 						ut.CleanSpacesandUpper(left.Type_of_Referral)= ut.CleanSpacesandUpper(right.Type_of_Referral) and
@@ -234,7 +234,7 @@ module
 						ut.CleanSpacesandUpper(left.Street_1)= ut.CleanSpacesandUpper(right.Street_1) and
 						ut.CleanSpacesandUpper(left.Street_2)= ut.CleanSpacesandUpper(right.Street_2) and
 						ut.CleanSpacesandUpper(left.City)= ut.CleanSpacesandUpper(right.City) and
-						ut.CleanSpacesandUpper(left.State        )= ut.CleanSpacesandUpper(right.State) and
+						ut.CleanSpacesandUpper(left.State)= ut.CleanSpacesandUpper(right.State) and
 						ut.CleanSpacesandUpper(left.Zip)= ut.CleanSpacesandUpper(right.Zip) and
 						ut.CleanSpacesandUpper(left.GPS_coordinates)= ut.CleanSpacesandUpper(right.GPS_coordinates) and
 						ut.CleanSpacesandUpper(left.Address_Date)= ut.CleanSpacesandUpper(right.Address_Date) and
@@ -243,7 +243,7 @@ module
 						left.lnpid = right.lnpid and
 						ut.CleanSpacesandUpper(left.Business_Name)= ut.CleanSpacesandUpper(right.Business_Name) and
 						ut.CleanSpacesandUpper(left.TIN)= ut.CleanSpacesandUpper(right.TIN) and
-						ut.CleanSpacesandUpper(left.FEIN         )= ut.CleanSpacesandUpper(right.FEIN) and
+						ut.CleanSpacesandUpper(left.FEIN)= ut.CleanSpacesandUpper(right.FEIN) and
 						ut.CleanSpacesandUpper(left.NPI)= ut.CleanSpacesandUpper(right.NPI) and
 						ut.CleanSpacesandUpper(left.Business_Type_1)= ut.CleanSpacesandUpper(right.Business_Type_1) and
 						ut.CleanSpacesandUpper(left.Business_Type_2)= ut.CleanSpacesandUpper(right.Business_Type_2) and
@@ -267,7 +267,7 @@ module
 						ut.CleanSpacesandUpper(left.IP_Address)= ut.CleanSpacesandUpper(right.IP_Address) and
 						ut.CleanSpacesandUpper(left.IP_Address_Date)= ut.CleanSpacesandUpper(right.IP_Address_Date) and
 						ut.CleanSpacesandUpper(left.Version)= ut.CleanSpacesandUpper(right.Version) and
-						ut.CleanSpacesandUpper(left.Class        )= ut.CleanSpacesandUpper(right.Class) and
+						ut.CleanSpacesandUpper(left.Class)= ut.CleanSpacesandUpper(right.Class) and
 						ut.CleanSpacesandUpper(left.Subnet_mask)= ut.CleanSpacesandUpper(right.Subnet_mask) and
 						ut.CleanSpacesandUpper(left.Reserved)= ut.CleanSpacesandUpper(right.Reserved) and
 						ut.CleanSpacesandUpper(left.ISP)= ut.CleanSpacesandUpper(right.ISP) and
@@ -328,7 +328,10 @@ module
 						ut.CleanSpacesandUpper(left.reason_cleared_code)= ut.CleanSpacesandUpper(right.reason_cleared_code) and 
 						ut.CleanSpacesandUpper(left.geo_lat)= ut.CleanSpacesandUpper(right.geo_lat) and 
 						ut.CleanSpacesandUpper(left.geo_long)= ut.CleanSpacesandUpper(right.geo_long) and 
-						left.source_rec_id = right.source_rec_id,
+						left.source_rec_id = right.source_rec_id and 
+						ut.CleanSpacesandUpper(left.Duration) = ut.CleanSpacesandUpper(right.Duration) and
+						ut.CleanSpacesandUpper(left.TransactionStatus) = ut.CleanSpacesandUpper(right.TransactionStatus) and
+						ut.CleanSpacesandUpper(left.Reason) = ut.CleanSpacesandUpper(right.Reason),
 						LEFT ONLY
 						);
 
@@ -422,4 +425,4 @@ module
 	);
 
 			
-END; 
+END;
