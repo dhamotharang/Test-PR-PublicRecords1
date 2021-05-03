@@ -1,4 +1,4 @@
-import bankruptcyv2, ut;
+﻿import bankruptcyv2, ut;
 
 export Mac_Spray_BK_Input_Files_CourtLookup(Courtfile,filedate,group_name = '') := macro
 
@@ -33,7 +33,7 @@ export Mac_Spray_BK_Input_Files_CourtLookup(Courtfile,filedate,group_name = '') 
 
 %updatedops% := if(ut.weekday((integer)filedate) <> 'SATURDAY' and 
 				 ut.weekday((integer)filedate) <> 'SUNDAY',
-				 RoxieKeyBuild.updateversion('BKCourtKeys',filedate,'christopher.brodeur@lexisnexis.com,intel357@bellsouth.net',,'N|F'),output('No_dops_update_on_weekends'));
+				 RoxieKeyBuild.updateversion('BKCourtKeys',filedate,'Christopher.Brodeur@lexisnexisrisk.com,Manuel.Tarectecan@lexisnexisrisk.com',,'N|F'),output('No_dops_update_on_weekends'));
 
 /////////////////////////////////////////////////////////////////////////////////
 //Diff Files:

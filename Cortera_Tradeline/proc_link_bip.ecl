@@ -1,5 +1,5 @@
 ﻿IMPORT Cortera;
-EXPORT proc_link_bip(DATASET($.Layout_Tradeline_base) tradelines = $.Files.Base) := FUNCTION
+EXPORT proc_link_bip(DATASET($.Layout_Tradeline_base) tradelines = $.Files().Base.Tradeline.Built) := FUNCTION
 
 	key := DISTRIBUTE(PULL(Cortera.Key_Header_Link_Id(current=true)), link_id);
 	b := DISTRIBUTE(tradelines, Link_id);

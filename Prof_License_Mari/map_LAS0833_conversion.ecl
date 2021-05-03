@@ -25,7 +25,7 @@ EXPORT map_LAS0833_conversion(STRING pVersion) := FUNCTION
 	
 	//Remove bad records before processing
 	ValidFile	:= re_all(TRIM(org_name,LEFT,RIGHT) != ' ' 
-	                 AND StringLib.StringToUpperCase(LIC)[1..3] = 'APR'
+	                 AND StringLib.StringToUpperCase(slnum)[1..3] = 'APR'
 									 AND NOT REGEXFIND(Prof_License_Mari.filters.BadNameFilter, StringLib.StringToUpperCase(ORG_NAME)));
   ut.CleanFields(ValidFile, clnValidFile);
 	maribase_plus_dbas := RECORD,MAXLENGTH(5200)
@@ -86,6 +86,11 @@ EXPORT map_LAS0833_conversion(STRING pVersion) := FUNCTION
 																 tempRawType[1..9]='BROK.CORP' => 'BROKCORP',
 																 tempRawType[1..8]='SALE.ACT' => 'SALEACT',
 																 tempRawType[1..8]='SALE.INA' => 'SALEINACT',
+																 tempRawType='APPRAISER TRAINEE' => 'TA',
+																 tempRawType='CERTIFIED GENERAL APPRAISER LICENSE' => 'CGAL',
+																 tempRawType='CERTIFIED RESIDENTIAL APPRAISER LICENSE' => 'CRAL',
+																 tempRawType='APPRAISAL MANAGEMENT COMPANY' => 'AT',
+																 tempRawType='TEMPORARY APPRAISER' => 'AT',
 																 ' ');														 
 		SELF.STD_LICENSE_TYPE := tempStdLicType;
 

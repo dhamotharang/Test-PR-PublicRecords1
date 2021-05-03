@@ -115,6 +115,11 @@ export Proc_Build_BW_Base(string pFileDate) := function
 		self.global_sid                 :=  0;
 		self.record_sid                 :=  0;
 		self.did                        :=  0;
+		//Added for DF-28226
+		self.dt_effective_first := 0;
+   self.dt_effective_last := 0;
+   self.delta_ind := 0; // 0 - main record, 1 - incremental
+
 		self														:=	pInput;
 	end;
 
@@ -257,6 +262,10 @@ export Proc_Build_BW_Base(string pFileDate) := function
 		self.global_sid                 :=  0;
 		self.record_sid                 :=  0;
 		self.did                        :=  0;
+		//Added for DF-28226
+		self.dt_effective_first := 0;
+   self.dt_effective_last := 0;
+   self.delta_ind := 0; // 0 - main record, 1 - incremental
 		self														:= r;
 	end;
 	

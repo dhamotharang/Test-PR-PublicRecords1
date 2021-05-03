@@ -1,4 +1,4 @@
-import dea,text_search,RoxieKeybuild;
+﻿import dea,text_search,RoxieKeybuild;
 
 export BWR_dea_build_Boolean(string filedate) := function
 
@@ -19,8 +19,8 @@ Roxiekeybuild.Mac_SK_BuildProcess_v2_local(
 
 retval := sequential(
 									Text_Search.Build_From_DocSeg_Records(ret,info),
-									build_key,
-									Text_Search.Boolean_Move_To_QA(inskeyname,inlkeyname),
+									//build_key,
+									//Text_Search.Boolean_Move_To_QA(inskeyname,inlkeyname),
 									fileservices.deletelogicalfile('~thor_data400::persist::dea::boolean')
 									
 									);

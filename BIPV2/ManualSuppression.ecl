@@ -160,9 +160,9 @@ export ManualSuppression := module
 			dopsupdate :=  dops.updateversion('BipV2SuppressionKeys',Version,BIPV2_Build.mod_email.emailList,,'N');
 			
 			return sequential(
-			                    buildEntitySupressionKey
-			                   ,parallel(promoteSuppression,promoteSuppressionKey,promoteEntitySupressionKey)
-						    ,if(not Tools._Constants.IsDataland,evaluate(dopsupdate),output('Not a prod environment'))
+			                    //buildEntitySupressionKey
+			                    parallel(promoteSuppression,promoteSuppressionKey/*,promoteEntitySupressionKey*/)
+						    // ,if(not Tools._Constants.IsDataland,evaluate(dopsupdate),output('Not a prod environment'))
 						   );
 	end;
 	

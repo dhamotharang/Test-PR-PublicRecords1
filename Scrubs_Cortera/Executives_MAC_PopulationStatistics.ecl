@@ -1,5 +1,5 @@
 ﻿ 
-EXPORT Executives_MAC_PopulationStatistics(infile,Ref='',Input_link_id = '',Input_name = '',Input_alternate_business_name = '',Input_address = '',Input_address2 = '',Input_city = '',Input_state = '',Input_country = '',Input_postalcode = '',Input_phone = '',Input_fax = '',Input_latitude = '',Input_longitude = '',Input_url = '',Input_fein = '',Input_position_type = '',Input_ultimate_linkid = '',Input_ultimate_name = '',Input_loc_date_last_seen = '',Input_primary_sic = '',Input_sic_desc = '',Input_primary_naics = '',Input_naics_desc = '',Input_segment_id = '',Input_segment_desc = '',Input_year_start = '',Input_ownership = '',Input_total_employees = '',Input_employee_range = '',Input_total_sales = '',Input_sales_range = '',Input_executive_name1 = '',Input_title1 = '',Input_executive_name2 = '',Input_title2 = '',Input_executive_name3 = '',Input_title3 = '',Input_executive_name4 = '',Input_title4 = '',Input_executive_name5 = '',Input_title5 = '',Input_executive_name6 = '',Input_title6 = '',Input_executive_name7 = '',Input_title7 = '',Input_executive_name8 = '',Input_title8 = '',Input_executive_name9 = '',Input_title9 = '',Input_executive_name10 = '',Input_title10 = '',Input_status = '',Input_is_closed = '',Input_closed_date = '',Input_processdate = '',Input_version = '',Input_persistent_record_id = '',Input_dt_first_seen = '',Input_dt_last_seen = '',Input_dt_vendor_first_reported = '',Input_dt_vendor_last_reported = '',Input_prim_name = '',Input_p_city_name = '',Input_v_city_name = '',Input_executive_name = '',Input_exec_title = '',OutFile) := MACRO
+EXPORT Executives_MAC_PopulationStatistics(infile,Ref='',Input_link_id = '',Input_name = '',Input_alternate_business_name = '',Input_address = '',Input_address2 = '',Input_city = '',Input_state = '',Input_country = '',Input_postalcode = '',Input_phone = '',Input_fax = '',Input_latitude = '',Input_longitude = '',Input_url = '',Input_fein = '',Input_position_type = '',Input_ultimate_linkid = '',Input_ultimate_name = '',Input_loc_date_last_seen = '',Input_primary_sic = '',Input_sic_desc = '',Input_primary_naics = '',Input_naics_desc = '',Input_segment_id = '',Input_segment_desc = '',Input_year_start = '',Input_ownership = '',Input_total_employees = '',Input_employee_range = '',Input_total_sales = '',Input_sales_range = '',Input_executive_name1 = '',Input_title1 = '',Input_executive_name2 = '',Input_title2 = '',Input_executive_name3 = '',Input_title3 = '',Input_executive_name4 = '',Input_title4 = '',Input_executive_name5 = '',Input_title5 = '',Input_executive_name6 = '',Input_title6 = '',Input_executive_name7 = '',Input_title7 = '',Input_executive_name8 = '',Input_title8 = '',Input_executive_name9 = '',Input_title9 = '',Input_executive_name10 = '',Input_title10 = '',Input_status = '',Input_is_closed = '',Input_closed_date = '',Input_processdate = '',Input_version = '',Input_persistent_record_id = '',Input_dt_first_seen = '',Input_dt_last_seen = '',Input_dt_vendor_first_reported = '',Input_dt_vendor_last_reported = '',Input_prim_name = '',Input_p_city_name = '',Input_v_city_name = '',Input_executive_name = '',Input_executive_title = '',OutFile) := MACRO
   IMPORT SALT311,Scrubs_Cortera;
   #uniquename(of)
   %of% := RECORD
@@ -398,10 +398,10 @@ EXPORT Executives_MAC_PopulationStatistics(infile,Ref='',Input_link_id = '',Inpu
         IF( le.Input_executive_name = (TYPEOF(le.Input_executive_name))'','',':executive_name')
     #END
  
-+    #IF( #TEXT(Input_exec_title)='' )
++    #IF( #TEXT(Input_executive_title)='' )
       '' 
     #ELSE
-        IF( le.Input_exec_title = (TYPEOF(le.Input_exec_title))'','',':exec_title')
+        IF( le.Input_executive_title = (TYPEOF(le.Input_executive_title))'','',':executive_title')
     #END
 ;
   END;

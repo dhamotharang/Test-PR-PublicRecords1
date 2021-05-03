@@ -29,11 +29,9 @@ export MAC_Dups_Note(infile,outformat,outfile,outdups,uniqueIDField='uniqueid',m
 #EXPAND(REGEXREPLACE(u'[|]',REGEXREPLACE(u'([^|]+)',REGEXREPLACE(u'\266_[^\266]+_\266',
 	#FOR (AllFields)
 		#FOR (Field)
-			#IF(%'@isRecord'%='1')
-				u'\266_'+
-			#ELSIF(%'@isEnd'%='1')
+			#IF(%'@isEnd'%='1')
 				u'_\266'+
-			#ELSIF(%'@isDataset'%='1')
+			#ELSIF(%'@isDataset'%='1' OR %'@isRecord'%='1')
 				u'|'+%'@name'%+u'\266_'+
 			#ELSIF(StringLib.StringToLowerCase(%'@name'%)<>StringLib.StringToLowerCase(#TEXT(uniqueIDField)))
         u'|'+%'@name'%+
@@ -49,4 +47,3 @@ export MAC_Dups_Note(infile,outformat,outfile,outdups,uniqueIDField='uniqueid',m
 	outfile := PROJECT(%noted%(uniqueIDField=__shadow_ref),TRANSFORM(outformat,SELF := LEFT)) + PROJECT(%ds_pass%,TRANSFORM(outformat,SELF:=LEFT));
   outdups := TABLE(%noted%(uniqueIDField<>__shadow_ref),{uniqueIDField,__shadow_ref});	
   ENDMACRO;
- 

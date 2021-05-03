@@ -12,7 +12,9 @@ EXPORT Empty_PhoneFinderReport(string version, string etype):= FUNCTION
 																output(dataset([], PhoneFinderReportDelta.Layout_PhoneFinder.RiskIndicators_History),, root + suffix + '_' + version, __compressed__),
 													if(etype = 'transaction',
 																output(dataset([], PhoneFinderReportDelta.Layout_PhoneFinder.Transactions_History),, root + suffix + '_' + version, __compressed__),
-																output('error')))));
+													if(etype = 'sources',
+																output(dataset([], PhoneFinderReportDelta.Layout_PhoneFinder.Transactions_History),, root + suffix + '_' + version, __compressed__),
+																output('error'))))));
 	
 	addFile 	:= sequential(FileServices.StartSuperFileTransaction(),
 																								FileServices.RemoveOwnedSubFiles(root + suffix +'_daily', true),

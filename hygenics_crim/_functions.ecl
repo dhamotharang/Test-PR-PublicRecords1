@@ -63,7 +63,27 @@ export CleanAddress(string pcitystzip) := FUNCTION
                     step4
                    );
  return clnAddress;
-end;																 
+end;	
+
+export rightPadDate(string8 pdate) := FUNCTION  //added for DF-28911
+
+ trim_pdate := trim(pdate,left,right);
+ 
+ length_date := length(trim_pdate);
+ 
+ // length_date values: 0,1,2,3,4,5,6,7,8
+ pad_dates := map(length_date = 0 => '',
+                  length_date = 1 => '',
+                  length_date = 2 => '',
+									length_date = 3 => '',
+									length_date = 4 => trim_pdate+'0000',
+									length_date = 5 => trim_pdate+'000',
+									length_date = 6 => trim_pdate+'00',
+									length_date = 7 => trim_pdate+'0', pdate); 
+									
+ return map(regexfind('[0-9]{8}',pad_dates) = true => pad_dates,'');  
+ 
+ end;
 
 export statusToFilter := ['PLAINTIFF', 'JUVENILE CLASS: A','JUVENILE CLASS: N','JUVENILE CLASS: JA','JUVENILE CLASS: J'];
 
@@ -1383,7 +1403,14 @@ export fn_offender_key_Alternate(string source, string IDS, string DOB) := funct
 end;
 
 export fn_shorten_sourcename(string psourcename) := function
-		result1 :=  
+		result1 :=  		
+		
+		      // added for IE county phase3
+		      regexreplace('JUSTICE \\(WEB\\)',                           // added by tp
+					regexreplace('MC CRIMINAL',                                 // added by tp
+          regexreplace('CLERK OF THE CRC',		                        // added by tp			
+					regexreplace('MC \\(TRAFFIC\\)',                            // added by tp
+					regexreplace('CRIMINAL COURT',                              // added by tp		
 		
 		      // added for IE AOC phase2
 					regexreplace('SUPREME COURT JUDICIAL BRANCH',                // added by tp
@@ -1436,7 +1463,11 @@ export fn_shorten_sourcename(string psourcename) := function
 																								// added for AOC phase2																							  
 																								 ,'MAGC'),'_FUGTV')
 																								 ,'METH'),'DC'),'JUD'),'VIOL_REG')
-																								   ,'DPS'),'OFND'),'SUP CT JUD BRNCH');   // added by tp
+																								   ,'DPS'),'OFND'),'SUP CT JUD BRNCH')   // added by tp
+																									 
+		                                            // added for county phase3
+			                                           ,'CRIM CT'),'MCT'),'CO_CRC'),'MC_CR'),'JUST WEB'); // added by tp
+																									 
 			
 					
 	space_count := 
@@ -1665,6 +1696,19 @@ export fn_shorten_sourcename(string psourcename) := function
 								 psourcename = 'OH MONTGOMERY MUNICIPAL COURTS WESTERN DIVISION_IE'   => 'OHMONTGOMRY_MC_WDIV',       //added by tp
 								 psourcename = 'OH WARREN WAYNESVILLE MAYORS COURT_IE'                => 'OHWARNWAYNSVIL_MYRSC',      //added by tp
 								 psourcename = 'FL MIAMI DADE COUNTY AND CIRCUIT TRAFFIC_IE'          => 'FLMIADADE_CTY_AND_CRT',     //added by tp
+
+
+                // added for IE county phase3
+                psourcename = 'OH HANCOCK FINDLAY MUNICIPAL COURT_IE'                   => 'OH_HANCOCK_FNDLAY_MC',    //added by tp
+                psourcename = 'VA VIRGINIA BEACH CIRCUIT COURT_IE'                      => 'VA_VA_BEACH_CRC',         //added by tp   
+                psourcename = 'TX FORT BEND STAFFORD MUNICIPAL COURT_IE'                => 'TX_FRT_BEND_STFRD_MC',    //added by tp
+                psourcename = 'OH MAHONING STRUTHERS MUNICIPAL COURT_IE'                => 'OHMAHNING STRTHRS MC',    //added by tp
+                psourcename = 'OH PICKAWAY CIRCLEVILLE MUNICIPAL COURT_IE'              => 'OH_PIKWY_CRCLVILE_MC',    //added by tp
+                psourcename = 'OH RICHLAND ONTARIO MAYORS COURT_IE'                     => 'OHRICHLNDONTRIO_MYRS',    //added by tp
+                psourcename = 'OH MONTGOMERY MORAINE MAYORS COURT_IE'                   => 'OHMNTGMRY_MRAINE_MRS',    //added by tp
+                psourcename = 'OH FAYETTE WASHINGTON COURT HOUSE MUNICIPAL COURT_IE'    => 'OHFAYETE_WASHNGTN_MC',    //added by tp
+                psourcename = 'NM BERNALILLO ALBUQUERQUE METROPOLITAN COURT_IE'         => 'NMBRNALILO_ALBQ_MTRO',    //added by tp
+                psourcename = 'TX ANGELINA COUNTY COURT_IE'                             => 'TX ANGELINA CTY',         //added by tp
 
 								 result2);
 								 
@@ -2854,7 +2898,8 @@ psourcename = 'FL CLAY COUNTY CLERK OF COURT_IE'                   => 'I0061',
 psourcename = 'FL INDIAN RIVER CLERK OF COURT_IE'                  => 'I0062',  
 psourcename = 'FL MIAMI DADE COUNTY AND CIRCUIT COURTS(WEB)_IE'    => 'I0063',  
 psourcename = 'FL MIAMI DADE COUNTY AND CIRCUIT TRAFFIC_IE'     => 'I0064',  
-psourcename = 'FL MONROE CIRCUIT COURT_IE'                      => 'I0065',  
+psourcename = 'FL MONROE CLERK OF COURTS_IE'                      => 'I0065',
+// psourcename = 'FL MONROE CIRCUIT COURT_IE'                      => 'I0065',  
 psourcename = 'FL ORANGE COUNTY CLERK OF COURTS TRAFFIC_IE'     => 'I0066',  
 psourcename = 'FL PINELLAS CIRCUIT CLERK OF COURTS_IE'          => 'I0067',  
 psourcename = 'FL SAINT LUCIE CLERK OF COURTS_IE'               => 'I0068',  
@@ -2912,6 +2957,48 @@ psourcename = 'OR ADMINISTRATIVE OFFICE OF COURTS (OECI)_IE'                    
 psourcename = 'WI ADMIN OFFICE OF COURTS CRIMINAL_IE'                                      => 'I0115',
 psourcename = 'WI ADMIN OFFICE OF COURTS TRAFFIC_IE'                                       => 'I0116',
 	
+//-------------------------------IE County Batch 3 20200811 ---------------------------------------------------	
+
+psourcename = 'FL DUVAL CLERK OF COURTS_IE'                                      					 => 'I0117',	
+psourcename = 'NM BERNALILLO ALBUQUERQUE METROPOLITAN COURT_IE'                            => 'I0118',		
+psourcename = 'OH SUMMIT AKRON MUNICIPAL COURT (TRAFFIC)_IE'                               => 'I0119',		
+psourcename = 'CA CONTRA COSTA SUPERIOR COURT_IE'                                          => 'I0120',		
+psourcename = 'FL OSCEOLA CLERK OF THE CIRCUIT COURT_IE'                                   => 'I0121',		
+psourcename = 'OH SUMMIT CLERK OF COURTS_IE'                                               => 'I0122',		
+psourcename = 'TX GRAYSON JUSTICE OF THE PEACE_IE'                                         => 'I0123',		
+psourcename = 'AZ PIMA JUSTICE COURT (WEB)_IE'                                             => 'I0124',		
+psourcename = 'AZ PIMA SUPERIOR COURT_IE'                                                  => 'I0125',		
+psourcename = 'SC CHARLESTON SUMMARY COURT_IE'                                             => 'I0126',		
+psourcename = 'TN SHELBY CRIMINAL COURT_IE'                                                => 'I0127',		
+psourcename = 'GA DEKALB SUPERIOR COURT_IE'                                                => 'I0128',		
+psourcename = 'TX ANGELINA JUSTICE OF THE PEACE_IE'                                        => 'I0129',	
+psourcename = 'TX ROCKWALL JUSTICE OF THE PEACE_IE'                                        => 'I0130',		
+psourcename = 'FL LEVY CLERK OF COURT_IE'                                                  => 'I0131',	
+psourcename = 'OH FULTON EASTERN DISTRICT COURT_IE'                                        => 'I0132',		
+psourcename = 'OH FULTON WESTERN DISTRICT COURT_IE'                                        => 'I0133',		
+psourcename = 'OH HANCOCK FINDLAY MUNICIPAL COURT_IE'                                      => 'I0134',		
+psourcename = 'VA VIRGINIA BEACH CIRCUIT COURT_IE'                                         => 'I0135',		
+psourcename = 'OH PICKAWAY CIRCLEVILLE MUNICIPAL COURT_IE'                                 => 'I0136',		
+psourcename = 'TN SHELBY GENERAL SESSIONS COURT_IE'                                        => 'I0137',		
+psourcename = 'TX HIDALGO DISTRICT COURTS_IE'                                              => 'I0138',		
+psourcename = 'OH PIKE COUNTY COURT_IE'                                                    => 'I0139',		
+psourcename = 'OH SUMMIT STOW MUNICIPAL COURT CRIMINAL_IE'                                 => 'I0140',		
+psourcename = 'MI OAKLAND CIRCUIT COURT_IE'                                                => 'I0141',	
+psourcename = 'TX MONTGOMERY DISTRICT COURT_IE'                                            => 'I0142',		
+psourcename = 'TX FORT BEND STAFFORD MUNICIPAL COURT_IE'                                   => 'I0143',		
+psourcename = 'OH MAHONING STRUTHERS MUNICIPAL COURT_IE'                                   => 'I0144',		
+psourcename = 'OH DEFIANCE MUNICIPAL COURT_IE'                                             => 'I0145',		
+psourcename = 'OH ASHTABULA MUNICIPAL COURT_IE'                                            => 'I0146',	
+psourcename = 'OH FAYETTE WASHINGTON COURT HOUSE MUNICIPAL COURT_IE'                       => 'I0147',		
+psourcename = 'SC SUMTER CIRCUIT COURT_IE'                                                 => 'I0148',		
+psourcename = 'OH CARROLL MUNICIPAL COURT_IE'                                              => 'I0149',		
+psourcename = 'OH MONTGOMERY MORAINE MAYORS COURT_IE'                                      => 'I0150',		
+psourcename = 'TX HAYS JUSTICE OF THE PEACE_IE'                                            => 'I0151',		
+psourcename = 'OH RICHLAND ONTARIO MAYORS COURT_IE'                                        => 'I0152',		
+psourcename = 'TX ANGELINA COUNTY COURT_IE'                                                => 'I0153',		
+psourcename = 'OH LORAIN COURT OF COMMON PLEAS_IE'                                         => 'I0154',		
+psourcename = 'OK GARFIELD DISTRICT COURT_IE'                                              => 'I0155',		
+psourcename = 'SC BEAUFORT CIRCUIT COURT_IE'                                               => 'I0156',		
 	
 /************************************************IE DATA END*************************************************************/
  '');                                                                            											
@@ -4059,7 +4146,8 @@ vendor_code = 'I0061' => 'FL CLAY COUNTY CLERK OF COURT',
 vendor_code = 'I0062' => 'FL INDIAN RIVER CLERK OF COURT',
 vendor_code = 'I0063' => 'FL MIAMI DADE COUNTY AND CIRCUIT COURTS(WEB)',
 vendor_code = 'I0064' => 'FL MIAMI DADE COUNTY AND CIRCUIT TRAFFIC',
-vendor_code = 'I0065' => 'FL MONROE CIRCUIT COURT',
+vendor_code = 'I0065' => 'FL MONROE CLERK OF COURTS',
+//vendor_code = 'I0065' => 'FL MONROE CIRCUIT COURT', - NAME WAS CHANGED 20200710 
 vendor_code = 'I0066' => 'FL ORANGE COUNTY CLERK OF COURTS TRAFFIC',
 vendor_code = 'I0067' => 'FL PINELLAS CIRCUIT CLERK OF COURTS',
 vendor_code = 'I0068' => 'FL SAINT LUCIE CLERK OF COURTS',
@@ -4115,6 +4203,49 @@ vendor_code = 'I0113' => 'OK DISTRICT COURTS (WEB)',
 vendor_code = 'I0114' => 'OR ADMINISTRATIVE OFFICE OF COURTS (OECI)',
 vendor_code = 'I0115' => 'WI ADMIN OFFICE OF COURTS CRIMINAL',
 vendor_code = 'I0116' => 'WI ADMIN OFFICE OF COURTS TRAFFIC',
+
+
+//-------------------------------IE County Batch 3 20200811 ---------------------------------------------------	
+vendor_code = 'I0117' => 'FL DUVAL CLERK OF COURTS',                                      					
+vendor_code = 'I0118' => 'NM BERNALILLO ALBUQUERQUE METROPOLITAN COURT',                             		
+vendor_code = 'I0119' => 'OH SUMMIT AKRON MUNICIPAL COURT (TRAFFIC)',                                		
+vendor_code = 'I0120' => 'CA CONTRA COSTA SUPERIOR COURT',                                           		
+vendor_code = 'I0121' => 'FL OSCEOLA CLERK OF THE CIRCUIT COURT',                                    		
+vendor_code = 'I0122' => 'OH SUMMIT CLERK OF COURTS',                                                		
+vendor_code = 'I0123' => 'TX GRAYSON JUSTICE OF THE PEACE',                                          		
+vendor_code = 'I0124' => 'AZ PIMA JUSTICE COURT (WEB)',                                              		
+vendor_code = 'I0125' => 'AZ PIMA SUPERIOR COURT',                                                   		
+vendor_code = 'I0126' => 'SC CHARLESTON SUMMARY COURT',                                              		
+vendor_code = 'I0127' => 'TN SHELBY CRIMINAL COURT',                                                		
+vendor_code = 'I0128' => 'GA DEKALB SUPERIOR COURT',                                                 		
+vendor_code = 'I0129' => 'TX ANGELINA JUSTICE OF THE PEACE',                                         	
+vendor_code = 'I0130' => 'TX ROCKWALL JUSTICE OF THE PEACE',                                         		
+vendor_code = 'I0131' => 'FL LEVY CLERK OF COURT',                                                   	
+vendor_code = 'I0132' => 'OH FULTON EASTERN DISTRICT COURT',                                         		
+vendor_code = 'I0133' => 'OH FULTON WESTERN DISTRICT COURT',                                         		
+vendor_code = 'I0134' => 'OH HANCOCK FINDLAY MUNICIPAL COURT',                                       		
+vendor_code = 'I0135' => 'VA VIRGINIA BEACH CIRCUIT COURT',                                          		
+vendor_code = 'I0136' => 'OH PICKAWAY CIRCLEVILLE MUNICIPAL COURT',                                  		
+vendor_code = 'I0137' => 'TN SHELBY GENERAL SESSIONS COURT',                                         		
+vendor_code = 'I0138' => 'TX HIDALGO DISTRICT COURTS',                                               		
+vendor_code = 'I0139' => 'OH PIKE COUNTY COURT',                                                     		
+vendor_code = 'I0140' => 'OH SUMMIT STOW MUNICIPAL COURT CRIMINAL',                                  		
+vendor_code = 'I0141' => 'MI OAKLAND CIRCUIT COURT',                                                 	
+vendor_code = 'I0142' => 'TX MONTGOMERY DISTRICT COURT',                                             		
+vendor_code = 'I0143' => 'TX FORT BEND STAFFORD MUNICIPAL COURT',                                    		
+vendor_code = 'I0144' => 'OH MAHONING STRUTHERS MUNICIPAL COURT',                                    		
+vendor_code = 'I0145' => 'OH DEFIANCE MUNICIPAL COURT',                                              		
+vendor_code = 'I0146' => 'OH ASHTABULA MUNICIPAL COURT',                                             	
+vendor_code = 'I0147' => 'OH FAYETTE WASHINGTON COURT HOUSE MUNICIPAL COURT',                        		
+vendor_code = 'I0148' => 'SC SUMTER CIRCUIT COURT',                                                  		
+vendor_code = 'I0149' => 'OH CARROLL MUNICIPAL COURT',                                               		
+vendor_code = 'I0150' => 'OH MONTGOMERY MORAINE MAYORS COURT',                                       		
+vendor_code = 'I0151' => 'TX HAYS JUSTICE OF THE PEACE',                                             		
+vendor_code = 'I0152' => 'OH RICHLAND ONTARIO MAYORS COURT',                                         		
+vendor_code = 'I0153' => 'TX ANGELINA COUNTY COURT',                                                 		
+vendor_code = 'I0154' => 'OH LORAIN COURT OF COMMON PLEAS',                                          		
+vendor_code = 'I0155' => 'OK GARFIELD DISTRICT COURT',                                               		
+vendor_code = 'I0156' => 'SC BEAUFORT CIRCUIT COURT',                                               		
 
  
  //************************LN Sources****************************/

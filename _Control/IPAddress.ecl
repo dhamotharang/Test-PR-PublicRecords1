@@ -38,7 +38,7 @@
 	export	string	prod_watch_dev  := '10.173.219.13';	
 	// export	string	prod_watch_sasha := '';
 	
-	export  string NewLogTHOR_dali      := '10.241.50.45';
+	export  string NewLogTHOR_dali       := '10.173.50.45';
 	export  string FCRALogTHOR_dali      := '10.173.52.1';
 
 	export  string bair_prod_ESP       := '10.240.32.15';

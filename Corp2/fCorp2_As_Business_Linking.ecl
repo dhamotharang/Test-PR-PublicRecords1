@@ -460,6 +460,7 @@ function
 													,if(company_address.sec_range<>'',0,1), company_address.sec_range
 													,if(company_phone<>'',0,1), company_phone
 													,if(company_fein<>'',0,1), company_fein
+													,if(company_status_raw<>'',0,1), company_status_raw
 													,dt_vendor_last_reported
 													,dt_vendor_first_reported
 													,dt_last_seen
@@ -477,7 +478,9 @@ function
 															 (right.company_phone							= ''  or
 																left.company_phone 							= right.company_phone) and
 															 (right.company_fein 							= ''  or
-															  left.company_fein 							= right.company_fein)
+															  left.company_fein 							= right.company_fein) and
+                               (right.company_status_raw 							= ''  or
+															  left.company_status_raw 							= right.company_status_raw)
 															 ,Rollup_Corp(left, right),
 																local);		
 		

@@ -23,8 +23,7 @@ doDOPS 	:= is_running_in_prod AND NOT skipDOPS;
 	PerformUpdateOrNot	:= IF(doDOPS,PARALLEL(updatedops),NoUpdate);
 //---------------------------------------------------------------------------------------
 	
-	updateorbit		:= Orbit3.proc_Orbit3_CreateBuild('PRTE2- Criminal Offense', filedate, 'N', true, true, false, _control.MyInfo.EmailAddressNormal);  
-
+  updateorbit   := Orbit3.proc_Orbit3_CreateBuild('PRTE2- Criminal Offense', filedate, 'PN', email_list:= _control.MyInfo.EmailAddressNormal);
 
   key_validation :=  output(dops.ValidatePRCTFileLayout(filedate, prte2.Constants.ipaddr_prod, prte2.Constants.ipaddr_roxie_nonfcra,Constants.dops_name, 'N'), named(Constants.dops_name+'Validation'));
 
@@ -34,7 +33,8 @@ doDOPS 	:= is_running_in_prod AND NOT skipDOPS;
 			move_qa_key_charge,
 			PerformUpdateOrNot,
 			key_validation,
-		  updateorbit); 
+		  updateorbit
+		); 
 	End;
 	
 	

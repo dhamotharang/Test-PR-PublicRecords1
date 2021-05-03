@@ -204,6 +204,7 @@ MODULE
 	export src_Daily_Utilities           := 'DU';    
 	export src_Dunn_Bradstreet           := 'D ';  // aka D&B DMI
 	export src_Dunn_Bradstreet_Fein      := 'DN';
+	export src_Dunn_Bradstreet_WorldBase := 'Z3';
 	export src_Dunndata_Consumer		      	 := 'A3';  //DF-23679 Dunndata Consumer Masterfile
 	export src_Dunn_Data_Email					 := 'DX';	 //EMAIL-103
 	export src_EBR                       := 'ER';  // Experian Business Reports	
@@ -335,6 +336,7 @@ MODULE
 	export src_NPPES                     := 'NP';  // US National Provider & Plan Enumeration System
 	export src_OIG                       := 'ZO';  // US Office of Inspector General
 	export src_One_Click_Data            := 'OC';	
+	export src_One_Key                   := 'Y7';  // New supplier of data for SKA (src_SKA), from IQVIA
 	export src_OPM                       := '33';  // Office Of Personnel Management
 	export src_OSHAIR                    := 'OS';  // US Occupational Safety & Health Administration, incident reports
 	export src_OutwardMedia 						 						:= 'OM';
@@ -466,7 +468,8 @@ MODULE
 	export src_Infutor_Motorcycle_Veh    := '2V';
 	export src_Vickers                   := 'V ';  // stock market insider trading info from Vickers   
 	export src_Voters_v2                 := 'VO';  // Voter Registrations
-    export src_MA_Census                 := 'UM';
+ export src_Voters_v2_block           := 'VB';
+ export src_MA_Census                 := 'UM';
 	export src_AK_Watercraft             := '#W';  // Watercrafts (boats, etc.) registrations ----v
 	export src_AL_Watercraft             := 'LW';
 	export src_AR_Watercraft             := 'RW';
@@ -510,6 +513,7 @@ MODULE
 	export src_MO_Watercraft_LN          := ')W';
 	export src_Infutor_Watercraft				 := 'W1';
 	export src_Whois_domains             := 'W ';
+	// export src_Whois_domains_email       := 'W0';   // New WhoIs Email&Domain Info
 	export src_Wired_Assets_Email 			 := 'W@';
 	export src_Wired_Assets_Owned 			 := 'WO';
 	export src_Wired_Assets_Royalty			 := 'WR'; 
@@ -522,10 +526,8 @@ MODULE
 	export src_ZOOM                      := 'ZM';
 	export src_BKFS_Nod                  := 'B7';  //Black Knight Foreclosure Nod info
 	export src_BKFS_Reo                  := 'I5';  //Black Knight Foreclosure Deed(Reo) info
-	export src_BKFS_Assignment_Refresh   := 'B1';  //Black Knight Assignment of Mortgage info
-	export src_BKFS_Release_Refresh	     := 'B2';  //Black Knight Release of Mortgage info
-	export src_BKFS_Assignment_Update	   := 'B3';  //Black Knight Assignment of Mortgage info
-	export src_BKFS_Release_Update	     := 'B4';  //Black Knight Release of Mortgage info
+	export src_BKFS_Assignment   				 := 'B1';  //Black Knight Assignment of Mortgage info
+	export src_BKFS_Release	     				 := 'B2';  //Black Knight Release of Mortgage info
 	export WH_src                        := 'WH';  // WH=Weekly Equifax Header. Also see src_Equifax_Weekly
 	
 
@@ -577,7 +579,7 @@ MODULE
 		,src_WY_DL                     ,src_CO_Experian_DL            ,src_DE_Experian_DL            ,src_ID_Experian_DL            
 		,src_IL_Experian_DL            ,src_KY_Experian_DL            ,src_LA_Experian_DL            ,src_MD_Experian_DL            
 		,src_MS_Experian_DL            ,src_ND_Experian_DL            ,src_NH_Experian_DL            ,src_SC_Experian_DL            
-		,src_WV_Experian_DL            ,src_Dummy_Records             ,src_Dunn_Bradstreet           ,src_Dunn_Bradstreet_Fein      
+		,src_WV_Experian_DL            ,src_Dummy_Records             ,src_Dunn_Bradstreet           ,src_Dunn_Bradstreet_Fein								      
 		,src_EBR                       ,src_Edgar                     ,src_EMerge_Boat               ,src_EMerge_CCW                          ,src_EMerge_CCW_NY              
 		,src_EMerge_Cens               ,src_EMerge_Fish               ,src_EMerge_Hunt               ,src_EMerge_Master             
 		,src_Employee_Directories      ,src_Equifax                   ,src_Eq_Employer               ,src_Fares_Deeds_from_Asrs     
@@ -591,7 +593,8 @@ MODULE
 		,src_Liens_v2                  ,src_CA_Liquor_Licenses        ,src_CT_Liquor_Licenses        ,src_IN_Liquor_Licenses        
 		,src_LA_Liquor_Licenses        ,src_OH_Liquor_Licenses        ,src_PA_Liquor_Licenses        ,src_TX_Liquor_Licenses        
 		,src_LnPropV2_Fares_Asrs       ,src_LnPropV2_Fares_Deeds      ,src_LnPropV2_Lexis_Asrs       ,src_LnPropV2_Lexis_Deeds_Mtgs 
-		,src_Lobbyists                 ,src_MartinDale_Hubbell        ,src_Miscellaneous             ,src_Phones_Plus               
+		,src_Lobbyists                 ,src_MartinDale_Hubbell        ,src_Miscellaneous             ,src_One_Key
+		,src_Phones_Plus               
 		,src_Professional_License      ,src_Redbooks                  ,src_CA_Sales_Tax              ,src_IA_Sales_Tax              
 		,src_SDA                       ,src_SDAA                      ,src_SEC_Broker_Dealer         ,src_Sheila_Greco              
 		,src_SKA                       ,src_Spoke                     ,src_Targus_White_pages        ,src_Tax_practitioner          
@@ -664,7 +667,8 @@ MODULE
 		,src_Liens_and_Judgments       ,src_Liens_v2                  ,src_CA_Liquor_Licenses        ,src_CT_Liquor_Licenses        
 		,src_IN_Liquor_Licenses        ,src_LA_Liquor_Licenses        ,src_OH_Liquor_Licenses        ,src_PA_Liquor_Licenses        
 		,src_TX_Liquor_Licenses        ,src_LnPropV2_Fares_Asrs       ,src_LnPropV2_Fares_Deeds      ,src_LnPropV2_Lexis_Asrs       
-		,src_LnPropV2_Lexis_Deeds_Mtgs ,src_Lobbyists                 ,src_MartinDale_Hubbell        ,src_OSHAIR                    
+		,src_LnPropV2_Lexis_Deeds_Mtgs ,src_Lobbyists                 ,src_MartinDale_Hubbell        ,src_One_Key
+		,src_OSHAIR                    
 		,src_Professional_License      ,src_Redbooks                  ,src_CA_Sales_Tax              ,src_IA_Sales_Tax              
 		,src_SDA                       ,src_SDAA                      ,src_SEC_Broker_Dealer         ,src_Sheila_Greco              
 		,src_SKA                       ,src_Spoke                     ,src_Tax_practitioner          ,src_TXBUS                     
@@ -749,8 +753,9 @@ MODULE
 	];
 
     //DF-24277 - Remove source "NC" from DMV restricted sources
+	//DF-27961 - Remove source "SC" from DMV restricted sources used in Header DMV Restricted Key
 	export set_DMV_restricted             := [
-		 src_CT_DL ,src_FL_DL ,src_LA_DL ,src_MI_DL ,src_MO_DL ,src_OH_DL ,src_TX_DL ,src_WV_DL ,/*src_NC_DL , */src_SC_Experian_DL   
+		 src_CT_DL ,src_FL_DL ,src_LA_DL ,src_MI_DL ,src_MO_DL ,src_OH_DL ,src_TX_DL ,src_WV_DL /*,src_NC_DL , src_SC_Experian_DL*/ 
 		,src_FL_Veh ,src_MO_Veh ,src_OH_Veh ,src_TX_Veh ,src_SC_Experian_Veh //, src_WV_Veh
 	];
 
@@ -1300,7 +1305,8 @@ export set_NonDerog_FCRA_sources_v50 := [
 		,src_CA_Liquor_Licenses        ,src_CT_Liquor_Licenses        ,src_IN_Liquor_Licenses        ,src_LA_Liquor_Licenses        
 		,src_OH_Liquor_Licenses        ,src_PA_Liquor_Licenses        ,src_TX_Liquor_Licenses        ,src_LnPropV2_Fares_Asrs       
 		,src_LnPropV2_Fares_Deeds      ,src_LnPropV2_Lexis_Asrs       ,src_LnPropV2_Lexis_Deeds_Mtgs ,src_Lobbyists                 
-		,src_MartinDale_Hubbell        ,src_Miscellaneous             ,src_Phones_Plus               ,src_Professional_License      
+		,src_MartinDale_Hubbell        ,src_Miscellaneous             ,src_One_Key                   ,src_Phones_Plus
+		,src_Professional_License      
 		,src_Redbooks                  ,src_CA_Sales_Tax              ,src_IA_Sales_Tax              ,src_SDA                       
 		,src_SDAA                      ,src_SEC_Broker_Dealer         ,src_Sheila_Greco              ,src_SKA                       
 		,src_Spoke                     ,src_Targus_White_pages        ,src_Tax_practitioner          ,src_TUCS_Ptrack               
@@ -1420,7 +1426,9 @@ export set_NonDerog_FCRA_sources_v50 := [
       src_TN_Watercraft,						src_TX_Watercraft,            	src_US_Coastguard,       src_US_Coastguard,
       src_UT_Watercraft,						src_VA_Watercraft,            	src_Voters_v2,           src_WI_Watercraft,
       src_WV_Watercraft,            src_WY_Watercraft,              src_OR_Watercraft,			 src_Death_Restricted,
-			src_AK_Fishing_boats,					src_AlloyMedia_student_list, src_Experian_Credit_Header,    src_MA_Census		/*,
+	  src_AK_Fishing_boats,					src_AlloyMedia_student_list, src_Experian_Credit_Header,    src_MA_Census
+	  //,src_OKC_Students_List
+	  /*,
 			src_Death_CA, 								src_Death_CT, 									src_Death_FL,							src_Death_GA,
 			src_Death_KY, 								src_Death_MA, 									src_Death_ME, 						src_Death_MI,
 			src_Death_MN, 								src_Death_MT, 									src_Death_NC, 						src_Death_NV,
@@ -1525,7 +1533,7 @@ export set_NonDerog_FCRA_sources_v50 := [
 		,src_IRS_5500                  ,src_IRS_Non_Profit
     ,src_Liens_v2                  //other src_liens_v2_***???    //,src_Liens_and_Judgments???
     //LN propertyv2 (see below)
-    ,src_OSHAIR                    
+    ,src_One_Key                   ,src_OSHAIR                    
 		,src_Professional_License      ,src_SKA                       ,src_TXBUS
 		//,src_UCC??? 
     ,src_UCCV2                     //,src_UCCV2_WA_Hist???
@@ -1775,6 +1783,7 @@ export set_NonDerog_FCRA_sources_v50 := [
 	export set_Dummy_Records2            := [src_Dummy_Records2            ];
 	export set_Dunn_Bradstreet           := [src_Dunn_Bradstreet           ];
 	export set_Dunn_Bradstreet_Fein      := [src_Dunn_Bradstreet_Fein      ];
+	export set_Dunn_Bradstreet_WorldBase := [src_Dunn_Bradstreet_WorldBase ];
 	export set_Dunndata_Consumer         := [src_Dunndata_Consumer         ];
 	export set_Dunn_Data_Email					 := [src_Dunn_Data_Email					 ];
 	export set_EBR                       := [src_EBR                       ];
@@ -1903,6 +1912,7 @@ export set_NonDerog_FCRA_sources_v50 := [
 	export set_NPPES                     := [src_NPPES                     ];
 	export set_OIG                       := [src_OIG                       ];
 	export set_One_Click_Data            := [src_One_Click_Data            ];
+	export set_One_Key                   := [src_One_Key                   ];
 	export set_OPM                       := [src_OPM                       ];
 	export set_OSHAIR                    := [src_OSHAIR                    ];
 	export set_OutwardMedia		           	:= [src_OutwardMedia			         ];
@@ -2082,10 +2092,8 @@ export set_NonDerog_FCRA_sources_v50 := [
 	export set_Zumigo_GetLineId  				 := [src_Zumigo_GetLineId 				 ];
 	export set_BKFS_Nod                  := [src_BKFS_Nod                  ];
 	export set_BKFS_Reo                  := [src_BKFS_Reo                  ];
-	export set_BKFS_Assignment_Refresh   := [src_BKFS_Assignment_Refresh   ];
-	export set_BKFS_Release_Refresh      := [src_BKFS_Release_Refresh      ];
-	export set_BKFS_Assignment_Update	   := [src_BKFS_Assignment_Update    ];
-	export set_BKFS_Release_Update	     := [src_BKFS_Release_Update       ];
+	export set_BKFS_Assignment				   := [src_BKFS_Assignment				   ];
+	export set_BKFS_Release					     := [src_BKFS_Release				       ];
 	export set_credit_header_bureau      := set_Transunion + set_Experian_Credit_Header +
 	                                        set_Equifax_Direct + set_Equifax_Quick + set_Equifax_Weekly;
 
@@ -2305,7 +2313,8 @@ export set_NonDerog_FCRA_sources_v50 := [
 	export SourceIsDPPA                       (string2 sr) := SourceGroup(sr)  in set_DPPA                       ;
 	export SourceIsDummy_Records              (string  sr) := sr               in set_Dummy_Records              ;
 	export SourceIsDunn_Bradstreet            (string  sr) := sr               in set_Dunn_Bradstreet            ;
-	export SourceIsDunn_Bradstreet_Fein       (string  sr) := sr               in set_Dunn_Bradstreet_Fein       ;
+	export SourceIsDunn_Bradstreet_Fein       (string  sr) := sr               in set_Dunn_Bradstreet_Fein           ;
+	export SourceIsDunn_Bradstreet_WorldBase  (string  sr) := sr               in set_Dunn_Bradstreet_WorldBase  ;
 	export SourceIsDunndata_Consumer          (string  sr) := sr               in set_Dunndata_Consumer          ;
 	export SourceIsDunn_Data_Email			      (string  sr) := sr               in set_Dunn_Data_Email			       ;
 	export SourceIsEBR                        (string  sr) := sr               in set_EBR                        ;
@@ -2450,6 +2459,7 @@ export set_NonDerog_FCRA_sources_v50 := [
 	export SourceIsOIG                        (string  sr) := sr               in set_OIG           	           ;
   export SourceIsOKC_Probate                (string  sr) := sr               in set_OKC_Probate		             ;	
 	export SourceIsOne_Click_Data             (string  sr) := sr               in set_One_Click_Data	           ;
+	export SourceIsOne_Key                    (string  sr) := sr               in set_One_Key       	           ;
 	export SourceIsOKC_Student_List           (string  sr) := sr               in set_OKC_Student_List           ;
 	export SourceIsOPM                        (string  sr) := sr               in set_OPM                        ;
 	#if(_Control.ThisEnvironment.IsPlatformThor = true)
@@ -2638,10 +2648,8 @@ export set_NonDerog_FCRA_sources_v50 := [
 	export SourceIsZOOM                       (string  sr) := sr               in set_ZOOM                       ;
 	export SourceIsBKFS_Nod                   (string  sr) := sr               in set_BKFS_Nod                   ;
 	export SourceIsBKFS_Reo                   (string  sr) := sr               in set_BKFS_Reo                   ;
-	export SourceIsBKFS_Assignment_Refresh    (string  sr) := sr               in set_BKFS_Assignment_Refresh    ;
-	export SourceIsBKFS_Release_Refresh       (string  sr) := sr               in set_BKFS_Release_Refresh       ;
-	export SourceIsBKFS_Assignment_Update     (string  sr) := sr               in set_BKFS_Assignment_Update     ;
-	export SourceIsBKFS_Release_Update        (string  sr) := sr               in set_BKFS_Release_Update        ;
+	export SourceIsBKFS_Assignment				    (string  sr) := sr               in set_BKFS_Assignment				     ;
+	export SourceIsBKFS_Release				        (string  sr) := sr               in set_BKFS_Release				       ;
 	export SourceNot4Despray                  (string2 sr) := SourceGroup(sr)  in ['none']                       ;
 
 
@@ -2851,6 +2859,7 @@ export set_NonDerog_FCRA_sources_v50 := [
 		,{src_Daily_Utilities						,'Daily Utilities'																					 }
 		,{src_Dunn_Bradstreet           ,'Dunn & Bradstreet'                                         }
 		,{src_Dunn_Bradstreet_Fein      ,'Dunn & Bradstreet Fein'                                    }
+		,{src_Dunn_Bradstreet_WorldBase ,'Dunn & Bradstreet WorldBase'                               }
 		,{src_Dunndata_Consumer         ,'Dunn Data Consumer Masterfile'                             }
 		,{src_Dunn_Data_Email						,'Dunn Data Email Addresses'																 }
 		,{src_EBR                       ,'Experian Business Reports'                                 }
@@ -2983,6 +2992,7 @@ export set_NonDerog_FCRA_sources_v50 := [
 		,{src_One_Click_Data            ,'One Click Data'                                            }
     ,{src_OKC_Probate               ,'OKC Probate'                                               }
 		,{src_OKC_Student_List          ,'OKC Student List'                                          }
+		,{src_One_Key                   ,'OneKey - IQVIA'                                            }
 		,{src_OPM			                  ,'OPM'   		                     														 }
 		,{src_OSHAIR                    ,'OSHAIR'                                                    }
 		,{src_OutwardMedia			        ,'Outward Media Email'                                       }
@@ -3153,10 +3163,8 @@ export set_NonDerog_FCRA_sources_v50 := [
 		,{src_ZOOM                      ,'ZOOM'                                                      }
 		,{src_BKFS_Nod                  ,'Black Knight Foreclosure Nod'                              }
 		,{src_BKFS_Reo                  ,'Black Knight Foreclosure Reo'                              }
-		,{src_BKFS_Assignment_Refresh   ,'Black Knight Mortgage Assignment Refresh'                  }
-		,{src_BKFS_Release_Refresh      ,'Black Knight Mortgage Release Refresh'                     }
-		,{src_BKFS_Assignment_Update    ,'Black Knight Mortgage Assignment Update'                   }
-		,{src_BKFS_Release_Update       ,'Black Knight Mortgage Release Update'                      }
+		,{src_BKFS_Assignment 				  ,'Black Knight Mortgage Assignment'					                 }
+		,{src_BKFS_Release				      ,'Black Knight Mortgage Release'				                     }
 	], layout_description);            
 
                                      
@@ -3374,7 +3382,8 @@ export set_NonDerog_FCRA_sources_v50 := [
 		,src_Dummy_Records2            => 'Dummy Records2'                                        
 //		,src_Daily_Utilities					 => 'Daily Utilities'																			
 		,src_Dunn_Bradstreet           => 'Dunn & Bradstreet'                                    
-		,src_Dunn_Bradstreet_Fein      => 'Dunn & Bradstreet Fein'                               
+		,src_Dunn_Bradstreet_Fein      => 'Dunn & Bradstreet Fein'                                    
+		,src_Dunn_Bradstreet_WorldBase => 'Dunn & Bradstreet WorldBase'                              
 		,src_Dunndata_Consumer         => 'Dunn Data Consumer Masterfile'
 		,src_Dunn_Data_Email					 => 'Dunn Data Email Addresses'
 		,src_EBR                       => 'Experian Business Reports'                            
@@ -3507,6 +3516,7 @@ export set_NonDerog_FCRA_sources_v50 := [
 		,src_One_Click_Data            => 'One Click Data'                                       
     ,src_OKC_Probate               => 'OKC Probate' 
 		,src_OKC_Student_List					 => 'OKC Student List'
+		,src_One_Key                   => 'OneKey - IQVIA'
 		,src_OPM			                 => 'Office of Personnel Management'
 		,src_OSHAIR                    => 'OSHAIR'                                               
 		,src_OutwardMedia			         => 'Outward Media Email'                                  
@@ -3677,10 +3687,8 @@ export set_NonDerog_FCRA_sources_v50 := [
 		,src_ZOOM                      => 'ZOOM' 
 		,src_BKFS_Nod                  => 'Black Knight Foreclosure Nod' 
 		,src_BKFS_Reo                  => 'Black Knight Foreclosure Reo'
-		,src_BKFS_Assignment_Refresh   => 'Black Knight Mortgage Assignment Refresh'
-		,src_BKFS_Release_Refresh		   => 'Black Knight Mortgage Release Refresh'
-		,src_BKFS_Assignment_Update    => 'Black Knight Mortgage Assignment Update'
-		,src_BKFS_Release_Update       => 'Black Knight Mortgage Release Update'
+		,src_BKFS_Assignment				   => 'Black Knight Mortgage Assignment'
+		,src_BKFS_Release						   => 'Black Knight Mortgage Release'
 		,'?' + pSource
 	);
 

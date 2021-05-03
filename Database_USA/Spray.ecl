@@ -2,8 +2,8 @@
 
 EXPORT Spray(
 	 STRING		pversion			= ''
-	,STRING		pServerIP			= 'uspr-edata11.risk.regn.net'
-	,STRING		pDirectory		= '/data/business/Database_USA/' + pversion[1..8] 
+	,STRING		pServerIP			
+	,STRING		pDirectory		
 	,STRING		pFileType			= 'LexisNexis_Exec@Home_Database*.txt'
 	,STRING		pGroupName		= STD.System.Thorlib.Group( )
 	,BOOLEAN	pIsTesting		= FALSE

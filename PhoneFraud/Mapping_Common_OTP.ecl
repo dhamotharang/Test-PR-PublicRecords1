@@ -44,7 +44,7 @@ inFile := PhoneFraud.File_OTP.Raw(trim(_Functions.rmNull(otp_id), left, right)<>
 		self.date_added 						:= _Functions.clNum(l.date_added)[1..8];
 		self.time_added 						:= _Functions.clNum(l.date_added)[9..];
 		self         								:= l;
-	end;
+	END;
 	
 	cmnMap 			:= project(inFile, fixFields(left));
 	
@@ -54,7 +54,7 @@ inFile := PhoneFraud.File_OTP.Raw(trim(_Functions.rmNull(otp_id), left, right)<>
 	PhoneFraud.Layout_OTP.Base fixFields2(srt_phone l, srt_phone r):= transform
 		self.otp_phone := if(trim(l.otp_phone, left, right)='', trim(r.otp_phone, left, right), l.otp_phone);	
 		self := l;
-	end;
+	END;
 	
 	fixField 		:= join(srt_phone(otp_phone=''), srt_phone(otp_phone<>''),
 											left.otp_id = right.otp_id and
@@ -62,8 +62,9 @@ inFile := PhoneFraud.File_OTP.Raw(trim(_Functions.rmNull(otp_id), left, right)<>
 											fixFields2(left, right), left outer, local);
 	
 	concatF			:= fixField+cmnMap(otp_phone<>'');	
-	concatFile	:= concatF + PhoneFraud.File_OTP.Base;	
-	ddConcat 		:= dedup(sort(distribute(concatFile, hash(transaction_id)), transaction_id, date_file_loaded, local), transaction_id, local);
+	concatFile	:= concatF+ PhoneFraud.File_OTP.Base;	//-20200921 change to delta update
+    //concatFile	:= join(concatF, distribute(PhoneFraud.File_OTP.Base, hash(transaction_id)), left.transaction_id = right.transaction_id, left only);
+	ddConcat 		:= dedup(sort(distribute(concatFile, hash(transaction_id)), transaction_id, date_file_loaded, local), transaction_id, local) - PhoneFraud.File_OTP.Base;
 	
 	RETURN ddConcat;
 

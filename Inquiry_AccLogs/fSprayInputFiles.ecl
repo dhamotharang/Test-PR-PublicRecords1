@@ -83,7 +83,7 @@ end;
 export fSprayInputFiles(dataset({FsFilenameRecord}) filelist, boolean fcra = false) := function
 	
 	pServerIP		:= _control.IPAddress.bctlpedata10;
-	pGroupName	:= if(fcra, 'thor20_52', 'thor120_50_a'); //ThorLib.Group();
+	pGroupName	:= if(fcra, 'thor20_52', 'thor200_50a'); //ThorLib.Group();
 	pPrefix			:= if(fcra, '~thor10_231', '~thor100_21');
 	directory 	:= '/data/inquiry_data_01/spraying';	
 	

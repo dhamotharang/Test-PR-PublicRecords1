@@ -1,12 +1,15 @@
-﻿IMPORT Cortera, UT, PromoteSupers, std, Prte2, PRTE2_Cortera, Address, AID, AID_Support;
+﻿IMPORT Cortera, UT, PromoteSupers, std, Prte2, PRTE2_Cortera, Address, AID, AID_Support,mdr;
 EXPORT Proc_build_base := FUNCTION
 
-//Input Files
+
 PRTE2.CleanFields(PRTE2_Cortera.Files.Input_Boca, ds_clean_Boca);
 PRTE2.CleanFields(PRTE2_Cortera.Files.Input_INS, ds_clean_INS);
 
-    //Address Cleaning
-    AddrClean := PRTE2.AddressCleaner(ds_clean_Boca,
+combine_files_clean := ds_clean_Boca + ds_clean_INS;
+
+
+    
+    AddrClean := PRTE2.AddressCleaner(combine_files_clean,
                                       ['address'],
                                       ['BLANK'],
                                       ['city'],
@@ -15,7 +18,7 @@ PRTE2.CleanFields(PRTE2_Cortera.Files.Input_INS, ds_clean_INS);
                                       ['clean_address'],
                                       ['temp_rawaid']);
 
-    ds_Boca_out := Project(AddrClean, Transform(PRTE2_cortera.Layouts.rlayout,
+    ds_out := Project(AddrClean, Transform(PRTE2_cortera.Layouts.rlayout,
                                                  self.rawaid      :=  left.temp_rawaid;
                                                  self.prim_range  :=  left.Clean_Address.prim_range;
                                                  self.predir      :=  left.Clean_Address.predir;
@@ -44,10 +47,9 @@ PRTE2.CleanFields(PRTE2_Cortera.Files.Input_INS, ds_clean_INS);
                                                  self.geo_match   :=  left.Clean_Address.geo_match;
                                                  self.err_stat    :=  left.Clean_Address.err_stat; 
     
-    //Populate BDID
+    
     SELF.bdid   := prte2.fn_AppendFakeID.bdid(left.Name, left.Clean_Address.prim_range, left.Clean_Address.prim_name, left.Clean_Address.v_city_name, left.Clean_Address.st, left.Clean_Address.zip, left.cust_name);
     
-    //Fake ID
     vLinkingIds := prte2.fn_AppendFakeID.LinkIds(left.name, left.link_fein, left.link_inc_date, left.Clean_Address.prim_range, left.Clean_Address.prim_name, left.Clean_Address.sec_range, left.Clean_Address.v_city_name, left.Clean_Address.st, left.Clean_Address.zip, left.cust_name);
     
       SELF.powid  := vLinkingIds.powid;
@@ -63,17 +65,17 @@ PRTE2.CleanFields(PRTE2_Cortera.Files.Input_INS, ds_clean_INS);
     
     SELF := Left;
     SELF := [];));
+		
+		ds_out2 := mdr.macGetGlobalSID(ds_out,'Cortera','','global_sid');
     
-    //Combine Boca and Insurance Files
-    combine_files_clean := ds_Boca_out + ds_clean_INS;
-    Header_File := Project(combine_files_clean,
+    Header_File := Project(ds_out2,
                                        Transform(PRTE2_cortera.Layouts.base,
                                                  SElF := LEFT,
                                                  SELF := []
                                                 )
                                       );
     
-Attribute_File := Project(combine_files_clean,
+    Attribute_File := Project(ds_out2,
                                             Transform(PRTE2_cortera.Layouts.Attributes_Out, 
                                                       SELF.current_rec := true;
                                                       SELF.ultimate_linkid   := LEFT.LINK_ID;
@@ -81,7 +83,6 @@ Attribute_File := Project(combine_files_clean,
                                                       SELF := []
                                                      )
                                            );
-    //Build Base
     PromoteSupers.MAC_SF_BuildProcess(Header_File, Constants.Base_Prefix + 'header', bld_base_hdr, ,, true);
     PromoteSupers.MAC_SF_BuildProcess(Attribute_File, Constants.Base_Prefix + 'Attributes', bld_base_attr, ,, true);
  return sequential(bld_base_hdr, bld_base_attr);

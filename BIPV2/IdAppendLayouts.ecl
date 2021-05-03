@@ -1,6 +1,7 @@
 ﻿import AutoStandardI;
 import BIPV2;
 import Doxie;
+import BizLinkFull;
 
 export IdAppendLayouts := module
 	
@@ -44,6 +45,12 @@ export IdAppendLayouts := module
 		appendInput.request_id,
 		BIPV2.IDlayouts.l_xlink_ids,
 		parentIds,
+	};
+
+	export IdsOnlyDebug := {
+		IdsOnly,
+		BizLinkFull.Config_BIP.KeysBitmapType keys_used,
+		BizLinkFull.Config_BIP.KeysBitmapType keys_failed
 	};
 
 	shared errorRec := {
@@ -141,6 +148,12 @@ export IdAppendLayouts := module
 		svcAppendOutv2,
 	};
 
+	export AppendOutputDebug := {
+		AppendOutput,
+		BizLinkFull.Config_BIP.KeysBitmapType keys_used,
+		BizLinkFull.Config_BIP.KeysBitmapType keys_failed
+		};
+		
 	// Error code and message added to capture soapcall errors.
 	export AppendWithRecsOutput := {
 		svcAppendRecsOut,

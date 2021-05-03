@@ -158,20 +158,20 @@ EXPORT layouts := MODULE
 			AccountMonitoring.product_files.people_at_work.base_file_b.company_name;
 		END;
 		SHARED property_documentid_record := RECORD
-			AccountMonitoring.product_files.property.layout_search_file_b.prim_range;
-			AccountMonitoring.product_files.property.layout_search_file_b.predir;
-			AccountMonitoring.product_files.property.layout_search_file_b.prim_name;
-			AccountMonitoring.product_files.property.layout_search_file_b.suffix;
-			AccountMonitoring.product_files.property.layout_search_file_b.postdir;
-			AccountMonitoring.product_files.property.layout_search_file_b.unit_desig;
-			AccountMonitoring.product_files.property.layout_search_file_b.sec_range;
-			AccountMonitoring.product_files.property.layout_search_file_b.p_city_name;
-			AccountMonitoring.product_files.property.layout_search_file_b.st;
-			AccountMonitoring.product_files.property.layout_search_file_b.zip;
+			AccountMonitoring.product_files.property.Property_search_key_sorted.prim_range;
+			AccountMonitoring.product_files.property.Property_search_key_sorted.predir;
+			AccountMonitoring.product_files.property.Property_search_key_sorted.prim_name;
+			AccountMonitoring.product_files.property.Property_search_key_sorted.suffix;
+			AccountMonitoring.product_files.property.Property_search_key_sorted.postdir;
+			AccountMonitoring.product_files.property.Property_search_key_sorted.unit_desig;
+			AccountMonitoring.product_files.property.Property_search_key_sorted.sec_range;
+			AccountMonitoring.product_files.property.Property_search_key_sorted.p_city_name;
+			AccountMonitoring.product_files.property.Property_search_key_sorted.st;
+			AccountMonitoring.product_files.property.Property_search_key_sorted.zip;
 		END;
 		SHARED litigiousdebtor_documentid_record := RECORD
-			AccountMonitoring.product_files.litigiousdebtor.litigiousdebtor_file_slim.courtstate;
-			AccountMonitoring.product_files.litigiousdebtor.litigiousdebtor_file_slim.docketnumber;
+			AccountMonitoring.product_files.litigiousdebtor.litigiousdebtor_key.courtstate;
+			AccountMonitoring.product_files.litigiousdebtor.litigiousdebtor_key.docketnumber;
 		END;
 		SHARED liens_documentid_record := RECORD
 			AccountMonitoring.product_files.liens.main_file.tmsid;
@@ -180,8 +180,8 @@ EXPORT layouts := MODULE
 			doxie_files.File_Offenders.offender_key;
 		END;
 		SHARED phonefeedback_documentid_record := RECORD
-			PhonesFeedback.Layouts_PhonesFeedback.Layout_PhonesFeedback_base.did;
-			PhonesFeedback.Layouts_PhonesFeedback.Layout_PhonesFeedback_base.phone_number;
+			PhonesFeedback.Key_PhonesFeedback_phone().did;
+			PhonesFeedback.Key_PhonesFeedback_phone().phone_number;
 		END;
 		SHARED foreclosure_documentid_record := RECORD
 			Property.Layout_Fares_Foreclosure.situs1_zip;
@@ -197,10 +197,10 @@ EXPORT layouts := MODULE
 			Header.Layout_Header.did;
 		END;
 		SHARED didupdate_documentid_record := RECORD
-			AccountMonitoring.product_files.header_files.doxie_key_rid_did.did;
+			AccountMonitoring.product_files.header_files.r_doxie_key_rid_did.did;
 		END;		
 		SHARED bdidupdate_documentid_record := RECORD
-			AccountMonitoring.product_files.header_files.business_header_key_rcid.bdid;
+			AccountMonitoring.product_files.header_files.r_business_header_key_rcid.bdid;
 		END;
 		SHARED phoneownership_documentid_record := RECORD
 			PhonesInfo.Layout_Common.portedMetadata_Main.deact_start_dt;
@@ -233,9 +233,9 @@ EXPORT layouts := MODULE
 		END;
 		
 		SHARED inquiry_documentid_record := RECORD
-			AccountMonitoring.product_files.inquiry.inquiryLinkid_key.search_info.transaction_id;
-			AccountMonitoring.product_files.inquiry.inquiryLinkid_key.search_info.sequence_number;
-			AccountMonitoring.product_files.inquiry.inquiryLinkid_key.search_info.datetime;
+			AccountMonitoring.product_files.inquiry.inquiryLinkid_key_monitor.search_info.transaction_id;
+			AccountMonitoring.product_files.inquiry.inquiryLinkid_key_monitor.search_info.sequence_number;
+			AccountMonitoring.product_files.inquiry.inquiryLinkid_key_monitor.search_info.datetime;
 		END;
 		
 		SHARED corp_documentid_record := RECORD

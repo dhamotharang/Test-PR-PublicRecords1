@@ -80,8 +80,14 @@ EXPORT Preprocessor := MODULE
 		END;
 		
 		EXPORT Prepped_Stliclookup_file	:= FUNCTION
-			std_input := project(Files(pversion,pUseProd).stliclookup_input_new, 
-				transform(layouts.stliclookup_layout, self := Left, self := []));
+			std_input := project(Files(pversion,pUseProd).stliclookup_input_alpha, 
+				transform(layouts.stliclookup_layout, 			
+					self.state 			:= left.lic_state;
+					self.stlicClass := left.lic_class_type;
+					self.status 		:= left.lic_status;
+					self.qualifier1 := left.lic_qualifier1;
+					self.qualifier2 := left.lic_qualifier2;
+					self						:= left));
 			return std_input;
 		END;
 		

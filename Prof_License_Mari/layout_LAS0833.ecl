@@ -1,10 +1,10 @@
-// LAS0833 / Louisiana Real Estate Appraiser Board / Real Estate Appraisers//
+﻿// LAS0833 / Louisiana Real Estate Appraiser Board / Real Estate Appraisers//
 export layout_LAS0833 := record, maxlength(2000)
 	string30    SLNUM;
 	string150   ORG_NAME;
 	string50    LIC;
 	string50    LICSTAT;
-	string20    STATREASON;
+	// string20    STATREASON;
 	string50    ADDRESS1_1;
 	string50    ADDRESS2_1;
 	string30    CITY_1;

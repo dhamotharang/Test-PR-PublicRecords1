@@ -172,6 +172,8 @@ END;
 		string1		AddressType := '';
 		base - [case_id];
 		string4	GroupId;
+		string5		case_name_suffix;
+		string5		client_name_suffix;
 	END;
 		
 	export slim1 := RECORD

@@ -1,4 +1,4 @@
-﻿import _control, bipv2, MDR, ut, MDR, BKForeclosure, Std;
+﻿import _control, bipv2, MDR, ut, MDR, BKForeclosure, Std, dx_Property;
 
 foreclosureIn 				:= property.File_Foreclosure_In;  //contains both new and base file data
 addGSForeclosureIn		:= MDR.macGetGlobalSid(foreclosureIn,'Foreclosure','','global_sid'); //DF-25926: Add Global_SID
@@ -237,7 +237,7 @@ foreclosureBase := denormalize(foreclosureInDist, foreclosureNormalizedDist,
 
 
 //Combine BlackKnight base files, mapped to Foreclosure_base layout, with Core Logic base file. Project CL into base and add source code
-ForceclosureBaseV2 := PROJECT(foreclosureBase,TRANSFORM(Property.Layout_Fares_Foreclosure_v2, 
+ForceclosureBaseV2 := PROJECT(foreclosureBase,TRANSFORM(dx_property.Layout_Fares_Foreclosure_v2, 
 																												SELF.SOURCE := IF(TRIM(LEFT.SOURCE) IN ['B7','I5'],LEFT.SOURCE,MDR.sourceTools.src_Foreclosures); //make sure not overwritting BK records although there shouldn't be any
 																												SELF := LEFT; SELF := [])); //To combine BK and CL
 

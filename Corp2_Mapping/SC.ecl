@@ -244,7 +244,7 @@ export SC := MODULE;
 		// MAP EVENTS
 		//********************************************************************
 		Corp2_mapping.LayoutsCommon.Events CorpTXNTransform(Corp2_Raw_SC.Layouts.TempCorpTXNLayout  l):=transform,
-		skip(corp2.t2u(l.tranid)='LAR')	
+		skip(corp2.t2u(l.tranid) in ['LAR','CER','COC'])	
 				self.corp_key															:= state_fips + '-' + corp2.t2u(l.corpdbid);
 				self.corp_vendor													:= state_fips;
 				self.corp_state_origin										:= state_origin;			
@@ -529,11 +529,11 @@ export SC := MODULE;
    																			 ,fileservices.addsuperfile(Corp2_Mapping._Dataset().thor_cluster_Files + 'in::'+Corp2_Mapping._Dataset().NameMapped +'::sprayed::main'		,Corp2_Mapping._Dataset().thor_cluster_Files + 'in::corp2::'+version+'::main_'	+state_origin)																 
    																			 ,fileservices.addsuperfile(corp2_mapping._Dataset().thor_cluster_Files + 'in::'+corp2_mapping._Dataset().NameMapped+'::sprayed::Ar'			,corp2_mapping._Dataset().thor_cluster_Files + 'in::corp2::'+version+'::Ar_' 		+state_origin)
    																			 ,if (count(Main_BadRecords) <> 0 or count(Event_BadRecords) <> 0
-   																					  ,corp2_mapping.Send_Email(state_origin ,version,count(Main_BadRecords)<>0,,,,count(Main_BadRecords),,count(mapEvent),,count(Main_ApprovedRecords),count(mapAR),count(mapEvent),).RecordsRejected																				 
-   																						,corp2_mapping.Send_Email(state_origin ,version,count(Main_BadRecords)<>0,,,,count(Main_BadRecords),,count(mapEvent),,count(Main_ApprovedRecords),count(mapAR),count(mapEvent),).MappingSuccess																				 
+   																					  ,corp2_mapping.Send_Email(state_origin ,version,count(Main_BadRecords)<>0,,count(Event_BadRecords)<>0,,count(Main_BadRecords),,count(Event_BadRecords),,count(Main_ApprovedRecords),count(mapAR),count(mapEvent),).RecordsRejected																				 
+   																						,corp2_mapping.Send_Email(state_origin ,version,count(Main_BadRecords)<>0,,count(Event_BadRecords)<>0,,count(Main_BadRecords),,count(Event_BadRecords),,count(Main_ApprovedRecords),count(mapAR),count(mapEvent),).MappingSuccess																				 
    																						)
    																			 ,if (IsScrubErrors
-   																					 ,Corp2_Mapping.Send_Email(state_origin,version,Main_IsScrubErrors,,Event_IsScrubErrors,).FieldsInvalidPerScrubs
+   																					 ,Corp2_Mapping.Send_Email(state_origin,version,Main_IsScrubErrors,,Event_IsScrubErrors).FieldsInvalidPerScrubs
    																					 )
    																			 ) //if Fail_Build <> true																			
    													 ,SEQUENTIAL (write_fail_event

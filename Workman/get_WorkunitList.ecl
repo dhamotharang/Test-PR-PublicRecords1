@@ -14,6 +14,7 @@ EXPORT get_WorkunitList(
   ,boolean  pOnline       = true
   ,boolean  pArchived     = false
   ,string   pesp          = _Config.LocalEsp
+  ,boolean  pUseGlobal    = true
 ) := 
 function
 
@@ -58,6 +59,7 @@ function
       ,pOnline
       ,pArchived 
       ,pesp
+      ,pUseGlobal
     )
   );
   

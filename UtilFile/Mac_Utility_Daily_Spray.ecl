@@ -1,7 +1,7 @@
-﻿/*2015-05-29T23:55:02Z (Wendy Ma_prod)
+﻿﻿/*2015-05-29T23:55:02Z (Wendy Ma_prod)
 skip adding daily canadian file to the superfile if it is empty
 */
-import RoxieKeybuild,misc2,idl_header,header,Orbit3;
+import RoxieKeybuild,misc2,idl_header,header,Orbit3,ut;
 export Mac_Utility_Daily_Spray(sourceIP,sourcefile,filedate,group_name='\'thor400_44\'',email_target='\' \'') := 
 macro
 	#uniquename(spray_utils)
@@ -47,7 +47,7 @@ macro
 	#uniquename(send_fail_msg)
 
 	RoxieKeyBuild.Mac_Daily_Email_Local('UTIL','SUCC', filedate, %send_succ_msg%,if(email_target<>' ',email_target,UtilFile.Spray_Notification_Email_Address));
-	RoxieKeyBuild.Mac_Daily_Email_Local('UTIL','FAIL', filedate, %send_fail_msg%,if(email_target<>' ',email_target,'Sudhir.Kasavajjala@lexisnexisrisk.com'));
+	RoxieKeyBuild.Mac_Daily_Email_Local('UTIL','FAIL', filedate, %send_fail_msg%,if(email_target<>' ',email_target,UtilFile.Spray_Notification_Email_Address));
 
 	//Add DID to daily file then move into did superfile for keys
 	#uniquename(did_daily)
@@ -72,39 +72,31 @@ macro
 						FileServices.RemoveOwnedSubFiles('~thor_data400::in::utility::sprayed::daily'),
 						FileServices.ClearSuperFile('~thor_data400::in::utility::sprayed::daily'));
    
-   	//reDID if the prod header version is newer than the last utility
-    boolean isnewheader := header.IsNewProdHeaderVersion('Utility');
+   //reDID and update phonetype file on Sunday
+	pBuildType	:=	IF(ut.weekday((integer)filedate[1..8]) = 'SUNDAY',
+			       utilfile.Constants.buildType.FullBuild,
+			       utilfile.Constants.buildType.Daily);					 
+  boolean isDelta		:=	pBuildType=utilfile.Constants.buildType.Daily;	
 	#uniquename(util_redid)
-	%util_redid% := utilfile.utility_DID(filedate);
+	%util_redid% := utilfile.utility_DID(filedate);	
 	#uniquename(util_daily_redid)
 	%util_daily_redid% := utilfile.daily_reDID(filedate);
-	//keep the existing file and add daily did file if the prod header version is older than the last utility
+	//keep the existing file and add daily did file in delta build 
 	#uniquename(add_daily_did)
 	%add_daily_did% := fileservices.addsuperfile('~thor_data400::base::utility_DID','~thor_data400::in::utility::'+filedate+'::daily_did');
-	#uniquename(add_daily_did_to_daily_redid)
+  #uniquename(add_daily_did_to_daily_redid)
 	%add_daily_did_to_daily_redid% := fileservices.addsuperfile('~thor_data400::base::utility::daily_redid','~thor_data400::in::utility::'+filedate+'::daily_did');
 	#uniquename(run_redid)
-	%run_redid% := if(isnewheader, %util_redid%, %add_daily_did%);
-	#uniquename(run_daily_redid)
-	%run_daily_redid% := if(isnewheader, %util_daily_redid%, %add_daily_did_to_daily_redid%);
-	//update utility flag file
-	#uniquename(util_headerVer_update)
-    %util_headerVer_update% := if(isnewheader,header.PostDID_HeaderVer_Update('Utility'),output('No re-did')); 
-  #uniquename(build_phonetype)
-	%build_phonetype% := utilfile.proc_build_phonetype(filedate); 
-		#uniquename(build_util_keys)
-	%build_util_keys% := utilfile.proc_build_util_keys(filedate);
+	%run_redid% := if(~isDelta, sequential(%util_redid%,%util_daily_redid%),sequential(%add_daily_did%,%add_daily_did_to_daily_redid%));
+	#uniquename(build_phonetype)
+	%build_phonetype% := if(~isDelta, utilfile.proc_build_phonetype(filedate), output('no_phonetype_update_in_deltabuild'));
 	#uniquename(build_util_bus_base)
 	%build_util_bus_base% := utilfile.build_util_bus_base(filedate).all;
-	#uniquename(build_util_bus_keys)
-	%build_util_bus_keys% := utilfile.proc_build_util_bus_keys(filedate);
-	#uniquename(accept_keys)
-	%accept_keys% := utilfile.Proc_AcceptSK_toQA;
-	#uniquename(keys_relationship)
-	%keys_relationship% := UtilFile.Proc_Create_Relationships(filedate); 
-	
+	#uniquename(build_util_keys)
+	%build_util_keys% := utilfile.proc_build_keys(filedate,isDelta);	
 	#uniquename(updatedops)
-	%updatedops% := RoxieKeyBuild.updateversion('UtilityDailyKeys',filedate,'Sudhir.Kasavajjala@lexisnexisrisk.com',,'N');
+	pUpdateFlag		:=	IF(isDelta,'D','F');
+	%updatedops% := RoxieKeyBuild.updateversion('UtilityDailyKeys',filedate,'Sudhir.Kasavajjala@lexisnexisrisk.com',,'N',,updateflag:=pUpdateFlag); 
   #uniquename(updatefcradops)
 	%updatefcradops% := RoxieKeyBuild.updateversion('UtilityhvalKeys',filedate,'Sudhir.Kasavajjala@lexisnexisrisk.com',,'N|F');
 	
@@ -141,7 +133,6 @@ macro
 ///////////SCRUBS REPORTS//////////////
 	
 	#uniquename(util_daily_stats)
-    // %util_daily_stats% := UtilFile.Out_Base_Dev_Stats(filedate);
 		// modified so that the last thing this build does is submit strata so that the build can finish correctly if strata fails
 		   %util_daily_stats% := output(_control.fSubmitNewWorkunit('#workunit(\'name\',\'Utility Strata - '+filedate+'\');\r\n'+
        'UtilFile.Out_Base_Dev_Stats(\''+filedate+'\');\r\n'
@@ -158,7 +149,7 @@ macro
 	
 	#uniquename(orbit_non_fcra)
 	#uniquename(orbit_fcra)
-	%orbit_non_fcra% := if(ut.Weekday((integer)filedate) <> 'SATURDAY' and ut.Weekday((integer)filedate) <> 'SUNDAY'
+	%orbit_non_fcra% := if(ut.Weekday((integer)filedate) <> 'SATURDAY'
 											,Orbit3.proc_Orbit3_CreateBuild ( 'Utility',filedate,'N')
 											,output('No Orbit Entries Needed for weekend builds'));
 	%orbit_fcra% := if(ut.Weekday((integer)filedate) <> 'SATURDAY' and ut.Weekday((integer)filedate) <> 'SUNDAY'
@@ -167,16 +158,12 @@ macro
  /*Scrubs Alerts and Reports*/					
 
 
- sequential(%spray_utils%, %did_daily%,%super_utils%,
-%util_didScrubsReport%,
+ sequential(%spray_utils%, %did_daily%,%super_utils%,%util_didScrubsReport%,
 					%out_daily_samples_util_type_1%,%out_daily_samples_util_type_2%,%out_daily_samples_util_type_3%,
-					%add_daily%, %clear_daily%, %run_redid%, %run_daily_redid%, %util_headerVer_update%,%build_phonetype%,
-          %build_util_keys%, %build_util_bus_base%, %build_util_bus_keys%, %accept_keys%, %keys_relationship%,
-		  %despraydaily%, %do_build_hval%, %do_build_datecorrect%,%updatedops%, %updatefcradops%,
-			%orbit_non_fcra%, %orbit_fcra%,%util_daily_stats%)
+					%add_daily%, %clear_daily%, %run_redid%, %build_phonetype%,%build_util_bus_base%,%build_util_keys%, 
+					%despraydaily%, %do_build_hval%, %do_build_datecorrect%,%updatedops%, %updatefcradops%,
+			    %orbit_non_fcra%, %orbit_fcra%,%util_daily_stats%)
 	 : success(%send_succ_msg%),
-		 failure(%send_fail_msg%); 
-
- 
+		 failure(%send_fail_msg%);
 
 endmacro;

@@ -2,6 +2,17 @@
 import STD;
 import BIPV2;
 import Bipv2_Best;
+import BIPV2_Statuses;
+
+base_rec        := layout_Entity_Report.base_rec;
+slim_rec        := layout_Entity_Report.slim_rec;
+prox_range_rec  := layout_Entity_Report.prox_range_rec;
+fein_range_rec  := layout_Entity_Report.fein_range_rec;
+source_type_rec := layout_Entity_Report.source_type_rec;
+count_rec       := layout_Entity_Report.count_rec;
+tally_rec       := layout_Entity_Report.tally_rec;
+report_rec      := layout_Entity_Report.report_rec;
+percent_rec     := layout_Entity_Report.percent_rec;
 
 EXPORT EntityReport(dataset(BIPV2.CommonBase.Layout) header_raw,
                     dataset(Bipv2_Best.Layouts.base) best_raw,
@@ -14,226 +25,17 @@ EXPORT EntityReport(dataset(BIPV2.CommonBase.Layout) header_raw,
 	 // The following 3 lines removes those from the stats. - see Bob Pressel
 	 raw_cleaned := BIPV2.CommonBase.clean(header_rec);
 	 null_cleaned := BIPV2.CommonBase.clean(dataset([],BIPV2.CommonBase.Layout));
-  clean_adjusted := join(raw_cleaned, null_cleaned, left=right, left only, lookup); 
+  shared clean_adjusted := join(raw_cleaned, null_cleaned, left=right, left only, lookup); 
   shared header_clean := distribute(clean_adjusted, hash32(seleid)): independent;
+  
+  // -- recalc new gold
+  shared ds_recalc_gold_clean := BIPV2_Statuses.mac_Calculate_Gold(clean_adjusted);
+  shared header_clean_newgold := distribute(ds_recalc_gold_clean, hash32(seleid)): independent;
+  shared header_rec_newgold   := distribute(join(header_raw,table(ds_recalc_gold_clean(sele_gold = 'G')  ,{seleid} ,seleid ,merge),left.seleid = right.seleid  ,transform(recordof(left),self.sele_gold := if(right.seleid != 0,'G',''),self := left ),left outer ,hash) ,hash32(seleid));
  
   shared header_layout := Bipv2.commonbase.layout;
   shared seleidType := typeof(header_layout.seleid);
  
-  shared base_rec := {
-    String state;
-    header_layout.sele_gold;
-    header_layout.seleid_status_private;
-    header_layout.seleid_status_public;
-    header_layout.source;
-  };
- 
-  shared slim_rec := {
-    header_layout.rcid;
-    header_layout.seleid;
-    base_rec;
-    header_layout.proxid;
-    header_layout.company_fein;
-    header_layout.company_phone;
-    header_layout.duns_number;
-    header_layout.active_enterprise_number;
-    header_layout.company_charter_number;	
-    header_layout.dt_first_seen;
-    header_layout.dt_last_seen;
-    header_layout.contact_did;
-    header_layout.company_sic_code1;
-    header_layout.company_sic_code2;
-    header_layout.company_sic_code3;
-    header_layout.company_sic_code4;
-    header_layout.company_sic_code5;
-    header_layout.company_naics_code1;
-    header_layout.company_naics_code2;
-    header_layout.company_naics_code3;
-    header_layout.company_naics_code4;
-    header_layout.company_naics_code5;
-    header_layout.company_name;
-    string address;
-  };
- 
-  shared prox_range_rec := {
-    unsigned4 ProxId_1;
-    unsigned4 ProxId_2;
-    unsigned4 ProxId_3to4;
-    unsigned4 ProxId_5to10;
-    unsigned4 ProxId_11to25;
-    unsigned4 ProxId_26to100;
-    unsigned4 ProxId_101to500;
-    unsigned4 ProxId_501to2000;
-    unsigned4 ProxId_2001_Plus;
-  };
- 
-  shared fein_range_rec := {			
-    unsigned4 FEIN_1;
-    unsigned4 FEIN_2;
-    unsigned4 FEIN_3to4;
-    unsigned4 FEIN_5to10;
-    unsigned4 FEIN_11to25;
-    unsigned4 FEIN_26to100;
-    unsigned4 FEIN_101to500;
-    unsigned4 FEIN_501to2000;
-    unsigned4 FEIN_2001_Plus;
-  };
-						
-  shared source_type_rec := {
-    unsigned4 src_pub;
-    unsigned4 src_bur;
-    unsigned4 src_dir;
-    unsigned4 src_pub_bur;
-    unsigned4 src_pub_dir;
-    unsigned4 src_bur_dir;
-    unsigned4 src_pub_bur_dir;
-    unsigned4 src_Tel_only;
-    unsigned4 src_none;
-		};
- 
-  shared count_rec := {
-    unsigned5 seleid_tot;
-    unsigned5 seleid_cnt;
-    unsigned5 proxid_tot;
-    unsigned5 lexid_tot;
-    unsigned5 lexid_cnt;
-    unsigned5 private_active_cnt;		
-    unsigned5 private_inactive_cnt;
-    unsigned5 private_defunct_cnt;
-    unsigned5 public_active_cnt;		
-    unsigned5 public_inactive_cnt;
-    unsigned5 public_defunct_cnt;
-    unsigned4 gold_cnt;
-    unsigned4 charter_number_cnt;			
-    unsigned4 duns_number_cnt;
-    unsigned4 enterprise_number_cnt;
-    unsigned4 phone_cnt;
-    unsigned4 nonprofit_cnt;
-    unsigned4 cortera_cnt;
-    unsigned4 sec_of_state_cnt;
-    unsigned4 recent_0to6m_cnt;
-    unsigned4 recent_6to12_cnt;
-    unsigned4 recent_12to18m_cnt;
-    unsigned4 recent_18to24m_cnt;
-    unsigned4 recent_inactive_2to3y_cnt;
-    unsigned4 recent_inactive_3to5y_cnt;
-    unsigned4 recent_inactive_5y_plus_cnt;
-    unsigned4 recent_defunct_2to3y_cnt;
-    unsigned4 recent_defunct_3to5y_cnt;
-    unsigned4 recent_defunct_5y_plus_cnt;
-    unsigned4 recent_unknown_cnt;
-    unsigned4 sbfe_cnt;
-    unsigned4 contact_did_cnt;
-    unsigned4 sic_cnt;
-    unsigned4 naics_cnt;
-    unsigned5 proxid_cnt;
-    prox_range_rec;
-    unsigned4 fein_cnt;
-    fein_range_rec;
-    source_type_rec;
-  };
- 
-  shared  tally_rec := record			
-    header_layout.seleid;
-    base_rec;
-    count_rec;
-    source_type_rec;
-  end;
-  
-  shared report_rec := record			
-    string    State;
-    unsigned5 records;	
-    unsigned5 seleids;
-    source_type_rec;
-    real Recs_per_Sele;
-    real Prox_per_Sele;
-    real Lexid_per_Sele;
-    unsigned5 Active_Public;		
-    unsigned5 Inactive_Public;
-    unsigned5 Defunct_Public;
- 
-    unsigned5 FEIN_cnt;
-    unsigned4 Charter_Num;			
-    unsigned4 Duns_Num;
-    unsigned4 Enterprise_Num;
-    unsigned4 Phone;
-    unsigned4 LexId;
-    unsigned4 SIC;
-    unsigned4 NAICS;
-    unsigned4 Sec_of_State;
-    unsigned4 SBFE;
-    unsigned4 Cortera;
-    unsigned4 Non_Profit;
-    unsigned5 proxid_cnt;
-    prox_range_rec;			
-    fein_range_rec;
-    unsigned5 Active_Private;		
-    unsigned5 Inactive_Private;
-    unsigned5 Defunct_Private;
-    unsigned4 recent_0to6m;
-    unsigned4 recent_6to12;
-    unsigned4 recent_12to18m;
-    unsigned4 recent_18to24m;
-    unsigned4 recent_inactive_2to3y;
-    unsigned4 recent_inactive_3to5y;
-    unsigned4 recent_inactive_5y_plus;	
-    unsigned4 recent_defunct_2to3y;
-    unsigned4 recent_defunct_3to5y;
-    unsigned4 recent_defunct_5y_plus;
-    unsigned4 recent_unknown;
-  end;
- 
-  shared  percent_rec := {				
-    String3 State;
-    unsigned5 Seleids;	
-    real Active_Public;		
-    real Inactive_Public;
-    real Defunct_Public;
-    real FEIN_Total;
-    real Charter_Num;			
-    real Duns_Num;
-    real Enterprise_Num;
-    real Phone;
-    real LexId;
-    real SIC;
-    real NAICS;
-    real Sec_of_State;
-    real SBFE;
-    real Cortera;
-    real Non_Profit;
-    real ProxID_1;
-    real ProxID_2;
-    real ProxID_3to4;
-    real ProxID_5to10;
-    real ProxID_11to25;
-    real ProxID_26to100;
-    real ProxID_101to500;
-    real ProxID_501to2000;
-    real ProxID_2001_Plus;
-    real FEIN_1;
-    real FEIN_2;
-    real FEIN_3to4;
-    real FEIN_5to10;
-    real FEIN_11to25;
-    real FEIN_26to100;
-    real FEIN_101to500;
-    real FEIN_501to2000;
-    real FEIN_2001_Plus;
-    real Active_Private;		
-    real Inactive_Private;
-    real Defunct_Private;
-    real recent_0to6m;
-    real recent_6to12;
-    real recent_12to18m;
-    real recent_18to24m;
-    real recent_inactive_2to3y;
-    real recent_inactive_3to5y;
-    real recent_inactive_5y_plus;
-    real recent_defunct_2to3y;
-    real recent_defunct_3to5y;
-    real recent_defunct_5y_plus;
-    real recent_unknown;
-  };
 
   // ********************** State start **************************
   // The state for a company seleid is determined by the following
@@ -397,15 +199,22 @@ EXPORT EntityReport(dataset(BIPV2.CommonBase.Layout) header_raw,
     self := l;
   end;
  	
-  shared clean_slim_recs := project(header_clean, toSlimTrans(left), local);
-  export raw_slim_recs := project(header_rec, toSlimTrans(left), local);
+  shared clean_slim_recs          := project(header_clean           , toSlimTrans(left), local);
+  shared clean_slim_recs_newgold  := project(header_clean_newgold   , toSlimTrans(left), local);
+  export raw_slim_recs            := project(header_rec             , toSlimTrans(left), local);
+  export raw_slim_recs_newgold    := project(header_rec_newgold     , toSlimTrans(left), local);
 
-  stateInfo := determineStatesForSeleids(header_rec);
-  export all_clean_recs_with_state := join(clean_slim_recs, stateInfo, left.seleid=right.seleid, 
-                   transform(slim_rec, self.state:=right.state, self:=left;), left outer, local); 
- 
+  shared stateInfo                  := determineStatesForSeleids(header_rec);
+  export all_clean_recs_with_state  := join(clean_slim_recs, stateInfo, left.seleid=right.seleid, transform(slim_rec, self.state:=right.state, self:=left;), left outer, local); 
+  export active_clean_recs_with_state   := all_clean_recs_with_state(seleid_status_private='');
+  export inactive_clean_recs_with_state := all_clean_recs_with_state(seleid_status_private='I');
+  export defunct_clean_recs_with_state  := all_clean_recs_with_state(seleid_status_private='D');
   export gold_clean_recs_with_state := all_clean_recs_with_state(sele_gold='G');
  
+  shared stateInfo_newgold                  := determineStatesForSeleids(header_rec_newgold);
+  export all_clean_recs_with_state_newgold  := join(clean_slim_recs_newgold, stateInfo_newgold, left.seleid=right.seleid, transform(slim_rec, self.state:=right.state, self:=left;), left outer, local); 
+  export gold_clean_recs_with_state_newgold := all_clean_recs_with_state_newgold(sele_gold='G');
+  
   shared MONTHS_6  := 183;
   shared MONTHS_12 := 365;
   shared MONTHS_18 := 548;
@@ -787,13 +596,19 @@ EXPORT EntityReport(dataset(BIPV2.CommonBase.Layout) header_raw,
     export allPercentSummary := sort(project(percentAllReport, transform(named_percent_rec, self.name:=name; self:=left)), -seleids);
   end;
  
-  export allStats  := calculateStatsByState(all_clean_recs_with_state,  'All');
-  export goldStats := calculateStatsByState(gold_clean_recs_with_state, 'Gold');
+  export allStats      := calculateStatsByState(all_clean_recs_with_state,     'All');
+  export activeStats   := calculateStatsByState(active_clean_recs_with_state,  'Active');
+  export inactiveStats := calculateStatsByState(inactive_clean_recs_with_state,'Inactive');
+  export defunctStats  := calculateStatsByState(defunct_clean_recs_with_state, 'Defunct');
+  export goldStats     := calculateStatsByState(gold_clean_recs_with_state,    'Gold');
  
-  segDsCleanCatagories := BIPV2_PostProcess.segmentation_category.perSeleid(header_clean, (string) reportDate); 
-  noSegRecords := join(header_rec, segDsCleanCatagories, left.seleid=right.seleid, transform(left), left only, local);
-  noSegOnlyCatagories := BIPV2_PostProcess.segmentation_category.perSeleid(distribute(noSegRecords,hash32(seleid)), (string) reportDate);  
-  segCatagories := segDsCleanCatagories + noSegOnlyCatagories;
+  export allStats_newgold  := calculateStatsByState(all_clean_recs_with_state_newgold,  'All');
+  export goldStats_newgold := calculateStatsByState(gold_clean_recs_with_state_newgold, 'Gold');
+
+  segDsCleanCatagories  := BIPV2_PostProcess.segmentation_category.perSeleid(header_clean, (string) reportDate); 
+  noSegRecords          := join(header_rec, segDsCleanCatagories, left.seleid=right.seleid, transform(left), left only, local);
+  noSegOnlyCatagories   := BIPV2_PostProcess.segmentation_category.perSeleid(distribute(noSegRecords,hash32(seleid)), (string) reportDate);  
+  shared segCatagories  := segDsCleanCatagories + noSegOnlyCatagories;
 	
   shared generateSegStats(dataset(slim_rec) slim) := function
 					 SC := BIPV2_PostProcess.segmentation_category;
@@ -817,29 +632,85 @@ EXPORT EntityReport(dataset(BIPV2.CommonBase.Layout) header_raw,
   export rawSegStats   := generateSegStats(raw_slim_recs);
   export cleanSegStats := generateSegStats(clean_slim_recs);
 	
-  export segSortOrder(x) := functionmacro
-             return sort(x, state='NO SEG', state='Defunct', state='Inactive Noise', state='Inactive H-Merge', state='Inactive Valid', state='Active Noise',state='Active C-Merge', state='Active Valid', state='Gold', state='ALL');
-    endmacro;
+  segDsCleanCatagories_newgold  := BIPV2_PostProcess.segmentation_category.perSeleid(header_clean_newgold, (string) reportDate  ,true); 
+  noSegRecords_newgold          := join(header_rec_newgold, segDsCleanCatagories_newgold, left.seleid=right.seleid, transform(left), left only, local);
+  noSegOnlyCatagories_newgold   := BIPV2_PostProcess.segmentation_category.perSeleid(distribute(noSegRecords_newgold,hash32(seleid)), (string) reportDate ,true);  
+  shared segCatagories_newgold  := segDsCleanCatagories_newgold + noSegOnlyCatagories_newgold;
+
+// -- use new active status score fields in categories
+  shared generateSegStats_withscores(dataset(slim_rec) slim) := 
+  function
+    SC := BIPV2_PostProcess.segmentation_category;
+    allRecsWithSeg := join(slim, segCatagories_newgold, left.seleid=right.seleid, 
+      transform(recordof(slim),
+        self.state := map(
+            right.seleid    = 0                                                                         => 'NO SEG'
+           ,right.category  = SC.category.Gold                                                          => 'Gold'
+           ,right.category  = SC.category.Active    and right.subCategory = SC.subCategory.High_Valid   => 'Active High Valid'
+           ,right.category  = SC.category.Active    and right.subCategory = SC.subCategory.Medium_Valid => 'Active Medium Valid'
+           ,right.category  = SC.category.Active    and right.subCategory = SC.subCategory.Low_Valid    => 'Active Low Valid'
+           ,right.category  = SC.category.Active    and right.subCategory = SC.subCategory.C_Merge      => 'Active C-Merge'
+           ,right.category  = SC.category.Active    and right.subCategory = SC.subCategory.Noise        => 'Active Noise'
+           ,right.category  = SC.category.Inactive  and right.subCategory = SC.subCategory.Valid        => 'Inactive Valid'
+           ,right.category  = SC.category.Inactive  and right.subCategory = SC.subCategory.H_Merge      => 'Inactive H-Merge'
+           ,right.category  = SC.category.Inactive  and right.subCategory = SC.subCategory.Noise        => 'Inactive Noise'
+           ,right.category  = SC.category.Defunct                                                       => 'Defunct'
+           ,                                                                                               'BLANK'
+        );
+        self := left;),
+      left outer, keep(1), local);
+    return calculateStatsByState(allRecsWithSeg, 'Seg');
+  end;
+	 
+  export rawSegStats_scores   := generateSegStats_withscores(raw_slim_recs_newgold   );
+  export cleanSegStats_scores := generateSegStats_withscores(clean_slim_recs_newgold );
+
+  export segSortOrder(x) := 
+  functionmacro
+             return sort(x
+              ,state='NO SEG'
+              ,state='Defunct'
+              ,state='Inactive Noise'
+              ,state='Inactive H-Merge'
+              ,state='Inactive Valid'
+              ,state='Active Noise'
+              ,state='Active C-Merge'
+              ,state='Active Valid'
+              ,state='Active Low Valid'
+              ,state='Active Medium Valid'
+              ,state='Active High Valid'
+              ,state='Gold'
+              ,state='ALL'
+  );
+  endmacro;
 
   export formatBySegment(dataset(report_rec) report) := function
         format := project(report, {report_rec -SBFE -source_type_rec}); 
         return segSortOrder(format);
   end;
-		
+
   export formatBySegmentSourceMakeup(dataset(report_rec) report) := function
       format := project(report, transform({report.state, report.records,	report.seleids, source_type_rec}, self:=left)); 
       return segSortOrder(format);
 		end ;
 
-		export formatBySegmentSourceMakeupSBFE(dataset(report_rec) report) := function
+	export formatBySegmentSourceMakeupSBFE(dataset(report_rec) report) := function
 						format := project(report, transform({report.state, report.records,	report.seleids, source_type_rec, report.SBFE}, self:=left)); 
 						return segSortOrder(format);
   end ;
-	
+
   export formatCntActiveOnly(dataset(report_rec) report) := function 
       return project(report, {report_rec -seleids -SBFE -Inactive_Private -Defunct_Private -recent_defunct_2to3y -recent_defunct_3to5y -recent_defunct_5y_plus -recent_inactive_2to3y -recent_inactive_3to5y -recent_inactive_5y_plus -recent_unknown -source_type_rec });
 		end ;
-		
+
+  export formatCntInactiveOnly(dataset(report_rec) report) := function 
+      return project(report, {report_rec -seleids -SBFE -Active_Private -Defunct_Private  -recent_defunct_2to3y -recent_defunct_3to5y -recent_defunct_5y_plus -source_type_rec });
+		end ;
+
+  export formatCntDefunctOnly(dataset(report_rec) report) := function 
+      return project(report, {report_rec -seleids -SBFE  -Active_Private -Inactive_Private  -recent_inactive_2to3y -recent_inactive_3to5y -recent_inactive_5y_plus -source_type_rec });
+		end ;
+    
 		export formatCntAll(dataset(report_rec) report) := function 
       return project(report, {report_rec -seleids  -SBFE -source_type_rec});
   end ;
@@ -847,10 +718,17 @@ EXPORT EntityReport(dataset(BIPV2.CommonBase.Layout) header_raw,
   export formatPercentActiveOnly(dataset(percent_rec) report) := function
       return project(report, {percent_rec -seleids -SBFE -Inactive_Private -Defunct_Private -recent_defunct_2to3y -recent_defunct_3to5y -recent_defunct_5y_plus -recent_inactive_2to3y -recent_inactive_3to5y -recent_inactive_5y_plus -recent_unknown});
   end ;
+
+  export formatPercentInactiveOnly(dataset(percent_rec) report) := function
+      return project(report, {percent_rec -seleids -SBFE -Active_Private -Defunct_Private -recent_defunct_2to3y -recent_defunct_3to5y -recent_defunct_5y_plus});
+  end ;
+
+  export formatPercentDefunctOnly(dataset(percent_rec) report) := function
+      return project(report, {percent_rec -seleids -SBFE -Active_Private -Inactive_Private -recent_inactive_2to3y -recent_inactive_3to5y -recent_inactive_5y_plus});
+  end ;
 	
   export formatPercentAll(dataset(percent_rec) report) := function
       return project(report, {percent_rec -SBFE -seleids });
   end ;	
-
 
 end;

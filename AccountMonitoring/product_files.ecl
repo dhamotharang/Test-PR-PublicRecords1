@@ -1,12 +1,12 @@
-﻿/*2011-07-06T18:43:20Z (Chris Albee_prod)
+﻿﻿/*2011-07-06T18:43:20Z (Chris Albee_prod)
 Add BK daily files.
 */
 IMPORT AccountMonitoring,BankruptcyV2, Business_Header, CellPhone, CourtLink, Corrections, Did_Add, Doxie, 
 			 Data_Services, Gong, Gong_Neustar, Header, Header_Quick, Header_Services, LiensV2, LN_PropertyV2, NID, PAW, 
-			 PhonesFeedback, Phonesplus, POE, Property, Risk_Indicators, ut, UtilFile, Watchdog, 
+			 PhonesFeedback, Phonesplus, POE, Risk_Indicators, ut, UtilFile, Watchdog, 
 			 hygenics_crim, business_header_ss, PhonesInfo, BIPV2_Best, 
 			 Business_Credit, Business_Credit_Scoring, UCCV2, SAM, Inquiry_AccLogs, Corp2,
-			 VehicleV2, FAA, Watercraft, Phonesplus_v2;
+			 VehicleV2, FAA, Watercraft, Phonesplus_v2, dx_PhonesInfo, dx_Phone_TCPA, dx_Property;
 			 
 EXPORT product_files := MODULE
 
@@ -48,70 +48,6 @@ EXPORT product_files := MODULE
 			utilfile.Layout_DID_Out.did;
 		END;
 		
-		// |||||||||||||||||||||||||||  BASE FILES  ||||||||||||||||||||||||||
-		
-		// =========================== ORIGINALLY: ===========================
-		// Base_Header_file := Header.File_headers(did <> 0);
-		// ===================================================================
-		
-		EXPORT person_header_filename_raw := 'thor_data400::base::header_prod';
-		EXPORT person_header_filename := AccountMonitoring.constants.DATA_LOCATION + person_header_filename_raw;
-		
-		SHARED file_headers_undist := 
-			DATASET(
-				person_header_filename,
-		    Header.Layout_Header_v2, 
-				THOR
-			);
-
-		EXPORT file_headers := 
-			DISTRIBUTE(
-				file_headers_undist,
-				HASH64(did)
-			);
-
-		EXPORT Layout_Base_Header_V2_file := RECORD
-			Header.Layout_Header_v2.fname;
-			Header.Layout_Header_v2.mname;
-			Header.Layout_Header_v2.lname;
-			Header.Layout_Header_v2.prim_range;
-			Header.Layout_Header_v2.prim_name;
-			Header.Layout_Header_v2.sec_range;
-			Header.Layout_Header_v2.city_name;
-			Header.Layout_Header_v2.st;
-			Header.Layout_Header_v2.zip;
-			Header.Layout_Header_v2.phone;
-			Header.Layout_Header_v2.dt_last_seen;
-			Header.Layout_Header_v2.dt_vendor_last_reported;
-			Header.Layout_Header_v2.did;
-			Header.Layout_Header_v2.src;
-      
-		END;
-		
-		EXPORT Base_Header_file_slim := 
-			PROJECT(file_headers, Layout_Base_Header_V2_file)
-			      : INDEPENDENT; //PERSIST('acctmon::header::base_header_file');
-						
-		// =========================== ORIGINALLY: ===========================
-		// base_quick_header := header_quick.file_header_quick(did <> 0);
-		// ===================================================================
-		
-		EXPORT quick_header_filename_raw := 'thor_data400::base::quick_header';
-		EXPORT quick_header_filename := AccountMonitoring.constants.DATA_LOCATION + quick_header_filename_raw;
-		
-		SHARED base_quick_header_undist := 
-			DATASET(
-				quick_header_filename, 
-				Header.Layout_Header, 
-				THOR, OPT
-			)(did <> 0);
-		
-		EXPORT base_quick_header :=
-			DISTRIBUTE(
-				base_quick_header_undist, 
-				HASH64(did)
-			);
-
 		EXPORT layout_base_quick_header := RECORD
 			Header.Layout_Header.fname;
 			Header.Layout_Header.mname;
@@ -128,83 +64,18 @@ EXPORT product_files := MODULE
 			Header.Layout_Header.did;
 			Header.Layout_Header.src;
 		END;
-		
-		EXPORT base_quick_header_slim :=
-			PROJECT(base_quick_header, layout_base_quick_header)
-				      : INDEPENDENT; //PERSIST('acctmon::header::base_quick_header');
-						
-		// =========================== ORIGINALLY: ===========================
-		// base_file_util_daily :=  UtilFile.file_util_daily(did <> '');
-		// ===================================================================		
-		
-		EXPORT daily_utility_filename_raw := 'thor_data400::base::utility::daily_redid';
-		EXPORT daily_utility_filename := AccountMonitoring.constants.DATA_LOCATION + daily_utility_filename_raw;
-		
-		EXPORT base_file_util_daily_undist :=  
-			DATASET(
-				daily_utility_filename,
-				utilfile.Layout_DID_Out, 
-				THOR
-			)(record_date >= utilfile.StartDate, did <> '');
-		
-		EXPORT base_file_util_daily := 
-			DISTRIBUTE(
-				base_file_util_daily_undist,
-				HASH64(did)
-			);
-				
-		EXPORT base_file_util_daily_slim := 
-			PROJECT(base_file_util_daily, layout_base_file_util_daily)
-			        : INDEPENDENT; //PERSIST('acctmon::header::base_file_util_daily');
-
-
+	
 		// ||||||||||||||||||||||||||||  KEY FILES  ||||||||||||||||||||||||||
 		
 		// In lieu of: doxie.key_header
-		
-		// NOTE! Attempting to invoke did_add.get_EnvVariable incites the system to throw the following:
-		// "INTERNAL: Expected a parent/container context.  Likely to be caused by executing something 
-		// invalid inside a NOTHOR." Use the superkey reference for now.
-		// *** adding INDEPENDENT to get_EnvVariable call to avoid referenced error above ***
-
-	
-		EXPORT header_build_version         := TRIM( did_add.get_EnvVariable('header_build_version') ):INDEPENDENT;
-
-		EXPORT doxie_key_header_keyname_raw := 'thor_data400::key::header::' + header_build_version + '::data';
-		EXPORT doxie_key_header_keyname     := AccountMonitoring.constants.DATA_LOCATION + doxie_key_header_keyname_raw;
-
-		EXPORT doxie_key_header_superkeyname_raw := 'thor_data400::key::header_' + doxie.version_superkey;
-		EXPORT doxie_key_header_superkeyname     := AccountMonitoring.constants.DATA_LOCATION + doxie_key_header_superkeyname_raw;
-
-		// Define a Duplicate Index; see the ECL Language Guide, p. 68
-		SHARED doxie_key_header_undist := 
-			INDEX(
-				doxie.key_header,  
-				// doxie_key_header_keyname
-				doxie_key_header_superkeyname
-			)(did <> 0);
-			
-		SHARED doxie_key_header :=
-			DISTRIBUTE(
-				PROJECT(doxie_key_header_undist, layout_base_header), 
-				HASH64(did)
-			);
-      
-		EXPORT doxie_key_header_slim := DEDUP(SORT(doxie_key_header, 
-																							 did, fname, lname, prim_range, prim_name, sec_range, st, zip, phone, -dt_last_seen, -dt_vendor_last_reported, LOCAL),
-																				  did, fname, lname, prim_range, prim_name, sec_range, st, zip, phone, LOCAL) 
-																		: INDEPENDENT; //PERSIST('acctmon::header::doxie_key_header_slim');
-
-//----------------------------------------------RoxieVersionPersonHeader-----------------------------------------------------------------
-
-		EXPORT r_doxie_key_header_superkeyname_raw := 'batchr3::monitor::personheader_' + doxie.version_superkey;
-		EXPORT r_doxie_key_header_superkeyname     :=  Data_Services.Default_Data_Location + r_doxie_key_header_superkeyname_raw; /*AccountMonitoring.constants.DATA_LOCATION*/
-
+		EXPORT r_doxie_key_header_superfile 		  := 'thor_data400::key::header_' + doxie.version_superkey;
+		EXPORT r_doxieKeyHeader_for_monitor 			:= 'monitor::personheader';
+		EXPORT r_doxie_key_header_superkeyname    :=  AccountMonitoring.constants.MONITOR_KEY_CLUSTER + r_doxieKeyHeader_for_monitor + '_qa'; 
+				
 		// Define a Duplicate Index; see the ECL Language Guide, p. 68
 		SHARED r_doxie_key_header_undist := 
 			pull(INDEX(
 				doxie.key_header,  
-				// doxie_key_header_keyname
 				r_doxie_key_header_superkeyname
 			))(did <> 0);
 			
@@ -219,157 +90,118 @@ EXPORT product_files := MODULE
 																				  did, fname, lname, prim_range, prim_name, sec_range, st, zip, phone, LOCAL) 
 																		: INDEPENDENT; 
 
-//----------------------------------------------EndRoxieVersionPersonHeader------------------------------------------------------------------
-	
-		
 		// DIDUPDATE FILES
-		EXPORT doxie_key_rid_did_keyname_raw := 'thor_data400::key::header::' + header_build_version + '::rid_did';
-		EXPORT doxie_key_rid_did_keyname     := AccountMonitoring.constants.DATA_LOCATION + doxie_key_rid_did_keyname_raw;
-		
-		EXPORT doxie_key_rid_did_superkeyname_raw := 'thor_data400::key::rid_did_' + doxie.version_superkey;
-		EXPORT doxie_key_rid_did_superkeyname     := AccountMonitoring.constants.DATA_LOCATION + doxie_key_rid_did_superkeyname_raw;
+		EXPORT r_doxie_key_rid_did_superfile 			:= 'thor_data400::key::rid_did_' + doxie.version_superkey;
+		EXPORT r_doxieKeyRid_did_for_monitor 			:= 'monitor::doxie_rid_did';
+		EXPORT r_doxie_key_rid_did_superkeyname   :=  AccountMonitoring.constants.MONITOR_KEY_CLUSTER + r_doxieKeyRid_did_for_monitor + '_qa'; 
 
-		SHARED doxie_key_rid_did_undist := 
+		SHARED r_doxie_key_rid_did_undist := 
 			INDEX(
 				doxie.Key_Did_Rid,  
-				doxie_key_rid_did_keyname
-				// doxie_key_rid_did_superkeyname
+				r_doxie_key_rid_did_superkeyname
 			)(rid <> did);
 
-		EXPORT doxie_key_rid_did := 
+		EXPORT r_doxie_key_rid_did := 
 			DISTRIBUTE(
-				doxie_key_rid_did_undist, 
+				r_doxie_key_rid_did_undist, 
 				HASH64(rid)
-			): INDEPENDENT; //PERSIST('acctmon::header::doxie_key_rid_did');
+			): INDEPENDENT; 
 
+		EXPORT r_doxie_key_rid_did_split_superfile 			  := 'thor_data400::key::rid_did_split_' + doxie.version_superkey;
+		EXPORT r_doxieKeyRid_did_split_for_monitor 				:= 'monitor::doxie_rid_did_split';
+		EXPORT r_doxie_key_rid_did_split_superkeyname     :=  AccountMonitoring.constants.MONITOR_KEY_CLUSTER + r_doxieKeyRid_did_split_for_monitor + '_qa'; 
 
-		EXPORT doxie_key_rid_did_split_keyname_raw := 'thor_data400::key::header::' + header_build_version + '::rid_did_split';
-		EXPORT doxie_key_rid_did_split_keyname     := AccountMonitoring.constants.DATA_LOCATION + doxie_key_rid_did_split_keyname_raw;
-
-		EXPORT doxie_key_rid_did_split_superkeyname_raw := 'thor_data400::key::rid_did_split_' + doxie.version_superkey;
-		EXPORT doxie_key_rid_did_split_superkeyname     := AccountMonitoring.constants.DATA_LOCATION + doxie_key_rid_did_split_superkeyname_raw;
-
-		SHARED doxie_key_rid_did_split_undist := 
+	  SHARED r_doxie_key_rid_did_split_undist := 
 			INDEX(
 				doxie.Key_Did_Rid_Split,  
-				doxie_key_rid_did_split_keyname
-				// doxie_key_rid_did_split_superkeyname
+				r_doxie_key_rid_did_split_superkeyname
 			)(rid <> did);
 
-		EXPORT doxie_key_rid_did_split := 
+		EXPORT r_doxie_key_rid_did_split := 
 			DISTRIBUTE(
-				doxie_key_rid_did_split_undist, 
+				r_doxie_key_rid_did_split_undist, 
 				HASH64(rid)
-			): INDEPENDENT; //PERSIST('acctmon::header::doxie_key_rid_did_split');
-		
+			): INDEPENDENT; 
+			
 		// BDIDUPDATE FILES
-		EXPORT bheader_build_version := TRIM(did_add.get_EnvVariable('bheader_build_version')):INDEPENDENT;
-		
-		EXPORT business_header_key_rcid_keyname_raw := 'thor_data400::key::business_header::' + bheader_build_version + '::search::rcid';
-		EXPORT business_header_key_rcid_keyname     := AccountMonitoring.constants.DATA_LOCATION + business_header_key_rcid_keyname_raw;
-		
-		EXPORT business_header_key_rcid_superkeyname_raw := 'thor_data400::key::business_header.rcid_' + business_header_ss.key_version;
-		EXPORT business_header_key_rcid_superkeyname     := AccountMonitoring.constants.DATA_LOCATION + business_header_key_rcid_superkeyname_raw;
+		EXPORT r_business_header_rcid_superfile 		:= 'thor_data400::key::business_header.rcid_' + business_header_ss.key_version;
+		EXPORT r_business_header_rcid_for_monitor  	:= 'monitor::business_header_rcid';
+		EXPORT r_business_header_rcid_superkeyname  :=  AccountMonitoring.constants.MONITOR_KEY_CLUSTER + r_business_header_rcid_for_monitor + '_qa'; 
 
-		SHARED business_header_key_rcid_undist := 
+		SHARED r_business_header_key_rcid_undist := 
 			INDEX(
 				Business_Header.Key_Business_Header_RCID,  
-				business_header_key_rcid_keyname
-				// business_header_key_rcid_superkeyname
+				r_business_header_rcid_superkeyname
 			)(rcid <> bdid);
 
-		EXPORT business_header_key_rcid := 
+		EXPORT r_business_header_key_rcid := 
 			DISTRIBUTE(
-				business_header_key_rcid_undist, 
+				r_business_header_key_rcid_undist, 
 				HASH64(rcid)
 			): INDEPENDENT; //PERSIST('acctmon::header::business_header_key_rcid');
 		
 		
 		// BIP Best Header FILES
-		EXPORT bipbest_build_version := TRIM(did_add.get_EnvVariable('bip_build_version')):INDEPENDENT;
-
-		EXPORT bipbest_header_keyname_raw := 'thor_data400::key::bipv2_best::' + bipbest_build_version + '::linkids';
-		EXPORT bipbest_header_keyname     := AccountMonitoring.constants.DATA_LOCATION + bipbest_header_keyname_raw;
-		
-		EXPORT bipbest_header_superkeyname_raw := 'thor_data400::key::bipv2_best::' + doxie.Version_SuperKey + '::linkids';
-		EXPORT bipbest_header_superkeyname     := AccountMonitoring.constants.DATA_LOCATION + bipbest_header_superkeyname_raw;
-
-		SHARED bipbest_header_key_undist := 
+	  EXPORT r_bipbest_header_superfile 		:= 'thor_data400::key::bipv2_best::' + doxie.Version_SuperKey + '::linkids';
+		EXPORT r_bipbest_header_for_monitor  	:= 'monitor::bipbest_header';
+		EXPORT r_bipbest_header_superkeyname  :=  AccountMonitoring.constants.MONITOR_KEY_CLUSTER + r_bipbest_header_for_monitor + '_qa'; 
+																					
+		SHARED r_bipbest_header_key_undist := 
 			INDEX(
 				BIPV2_Best.Key_LinkIds.key,  
-				bipbest_header_superkeyname
+				r_bipbest_header_superkeyname
 			)(proxid = 0);  // Proxid of zero are deemed the Best record
 
-		EXPORT bipbest_header_key :=
+		EXPORT r_bipbest_header_key :=
 			DISTRIBUTE(
-				bipbest_header_key_undist(seleid !=0),
+				r_bipbest_header_key_undist(seleid !=0),
 				HASH64(seleid)
 				): INDEPENDENT; //PERSIST('acctmon::bipbestheader::key_bipv2_best');
 				
 		// In lieu of: header_quick.key_DID
+		EXPORT r_quick_header_superfile 			:= 'thor_data400::key::' + header_quick.str_SegmentName + 'DID_' + Doxie.Version_SuperKey;
+		EXPORT r_quick_header_for_monitor 		:= 'monitor::quick_headerDID';
+		EXPORT r_quick_header_superkeyname    :=  AccountMonitoring.constants.MONITOR_KEY_CLUSTER + r_quick_header_for_monitor + '_qa'; 
 
-		// NOTE! Attempting to invoke did_add.get_EnvVariable incites the system to throw the following:
-		// "INTERNAL: Expected a parent/container context.  Likely to be caused by executing something 
-		// invalid inside a NOTHOR." Use the superkey reference for now.
-		
-		EXPORT quick_build_version      := TRIM( did_add.get_EnvVariable('quick_build_version') ):INDEPENDENT;
-
-		EXPORT quick_header_keyname_raw := 'thor_data400::key::headerquick::' + quick_build_version + '::did';
-		EXPORT quick_header_keyname     := AccountMonitoring.constants.DATA_LOCATION + quick_header_keyname_raw;
-
-		EXPORT quick_header_superkeyname_raw := 'thor_data400::key::' + header_quick.str_SegmentName + 'DID_' + Doxie.Version_SuperKey;
-		EXPORT quick_header_superkeyname     := AccountMonitoring.constants.DATA_LOCATION + quick_header_superkeyname_raw;
-		
-		SHARED quick_header_key_DID_undist := 
+		SHARED r_quick_header_key_DID_undist := 
 			INDEX(
 				header_quick.key_DID, 
-				// quick_header_keyname 
-				quick_header_superkeyname
+				r_quick_header_superkeyname
 			)(did <> 0);
 		
-		SHARED quick_header_key_DID :=
+		SHARED r_quick_header_key_DID :=
 			DISTRIBUTE(
-				PROJECT(quick_header_key_DID_undist, layout_base_quick_header), 
+				PROJECT(r_quick_header_key_DID_undist, layout_base_quick_header), 
 				HASH64(did)
 			);
 
-		EXPORT quick_header_key_DID_slim := DEDUP(SORT(quick_header_key_DID, 
+		EXPORT r_quick_header_key_DID_slim := DEDUP(SORT(r_quick_header_key_DID, 
 																								   did, fname, lname, prim_range, prim_name, sec_range, st, zip, phone, -dt_last_seen, -dt_vendor_last_reported, LOCAL),
 																						  did, fname, lname, prim_range, prim_name, sec_range, st, zip, phone, LOCAL) 
 																				: INDEPENDENT; //PERSIST('acctmon::header::quick_header_key_DID_slim');
-							
-							
+
 		// In lieu of: utilfile.key_util_daily_did
-
-		// NOTE! Attempting to invoke did_add.get_EnvVariable incites the system to throw the following:
-		// "INTERNAL: Expected a parent/container context.  Likely to be caused by executing something 
-		// invalid inside a NOTHOR." Use the superkey reference for now.
-
-		EXPORT utility_build_version     := TRIM( did_add.get_EnvVariable('utility_build_version') ):INDEPENDENT;
-
-		EXPORT daily_utility_keyname_raw := 'thor_data400::key::utility::' + utility_build_version + '::daily.did';
-		EXPORT daily_utility_keyname     := AccountMonitoring.constants.DATA_LOCATION + daily_utility_keyname_raw;
-
-		EXPORT daily_utility_superkeyname_raw := 'thor_data400::key::utility::daily.did_' + doxie.Version_SuperKey;
-		EXPORT daily_utility_superkeyname     := AccountMonitoring.constants.DATA_LOCATION + daily_utility_superkeyname_raw;
+		EXPORT r_daily_utility_superfile 					  := 'thor_data400::key::utility::daily.did_' + Doxie.Version_SuperKey;
+		EXPORT r_daily_utility_for_monitor 					:= 'monitor::daily_utility';
+		EXPORT r_daily_utility_superkeyname     		:=  AccountMonitoring.constants.MONITOR_KEY_CLUSTER + r_daily_utility_for_monitor + '_qa'; 
 		
-		SHARED daily_utility_key_DID_undist := 
+		SHARED r_daily_utility_key_DID_undist := 
 			INDEX(
 				utilfile.key_util_daily_did,
-				// daily_utility_keyname
-				daily_utility_superkeyname
+				r_daily_utility_superkeyname
 			)(record_date >= utilfile.StartDate, did <> '');
 		
-		SHARED daily_utility_key_DID := 
+		SHARED r_daily_utility_key_DID := 
 			DISTRIBUTE(
-				PROJECT(daily_utility_key_DID_undist, layout_base_file_util_daily),
+				PROJECT(r_daily_utility_key_DID_undist, layout_base_file_util_daily),
 				HASH64((UNSIGNED6)did)
 			);
 			
-		EXPORT daily_utility_key_DID_slim := DEDUP(SORT(daily_utility_key_DID, 
+		EXPORT r_daily_utility_key_DID_slim := DEDUP(SORT(r_daily_utility_key_DID, 
 																									  did, fname, lname, prim_range, prim_name, sec_range, st, zip, phone, -record_date, LOCAL),
 																						   did, fname, lname, prim_range, prim_name, sec_range, st, zip, phone, LOCAL) 
 																				 : INDEPENDENT; //PERSIST('acctmon::header::daily_utility_key_DID_slim');
+
 	END;
 	
 	EXPORT address := MODULE
@@ -421,13 +253,7 @@ EXPORT product_files := MODULE
 		EXPORT business_best_filename := AccountMonitoring.constants.DATA_LOCATION + business_best_filename_raw;
 		EXPORT base_business_file := DATASET(business_best_filename, Business_Header.Layout_BH_Best, THOR)
 		                                     : INDEPENDENT; //PERSIST('acctmon::address::business_file');
-					
-		EXPORT base_header_file := Header_Files.Base_Header_file_slim;
-		
-		EXPORT base_quick_header := header_files.base_quick_header_slim;
 				
-		EXPORT base_file_util_daily := header_files.base_file_util_daily_slim;
-						
 	END;
 	
 	EXPORT bankruptcy := MODULE
@@ -508,80 +334,71 @@ EXPORT product_files := MODULE
 																	: INDEPENDENT;	
 	END;
 	
-	EXPORT deceased := MODULE
-	
-		// =========================== ORIGINALLY: ===========================
-		// base_file := Header.File_DID_Death_MasterV2;
-		// ===================================================================
+  EXPORT deceased := MODULE
 
-		// NOTE: Due to poor synchronization between Prod_Dali and RoxieBatch (i.e., Prod_Dali
-		// will have an updated Deathmaster file for 2-3 days before the same file version is
-		// written to RoxieBatch), read from Prod_Dali the most recent version that exists on
-		// RoxieBatch.
-		EXPORT deathmaster_build_version := TRIM( did_add.get_EnvVariable('Deathmaster_Build_Version') ) : INDEPENDENT;
-		
-		// UNRESTRICTED BASEFILE
-		EXPORT base_filename_raw := 'thor_data400::base::did_death_masterV3_ssa_' + deathmaster_build_version;
-		EXPORT base_filename     := AccountMonitoring.constants.DATA_LOCATION + base_filename_raw;
-		EXPORT base_superfilename_raw := 'thor_data400::base::did_death_masterV3_ssa';
-		EXPORT base_superfilename     := AccountMonitoring.constants.DATA_LOCATION + base_superfilename_raw;
-		EXPORT base_file := DATASET(base_filename, Header.Layout_Did_Death_MasterV3, flat);// : PERSIST('acctmon::deceased::by_DID');
-		
-		// RESTRICTED BASEFILE
-		EXPORT base_filename_raw_restricted := 'thor_data400::base::did_death_masterV3_' + deathmaster_build_version;
-		EXPORT base_filename_restricted     := AccountMonitoring.constants.DATA_LOCATION + base_filename_raw_restricted;
-		EXPORT base_superfilename_raw_restricted := 'thor_data400::base::did_death_masterV3';
-		EXPORT base_superfilename_restricted     := AccountMonitoring.constants.DATA_LOCATION + base_superfilename_raw_restricted;
-		EXPORT base_file_restricted := DATASET(base_filename_restricted, Header.Layout_Did_Death_MasterV3, flat) : INDEPENDENT; //PERSIST('acctmon::deceased::by_DID_restricted');
- 		// FUTURE => EXPORT base_file_restricted := base_file(src != 'D$'):INDEPENDENT;
-		
-		// DeathMaster - Batch Deceased Monitoring DPM File Settings
-		EXPORT Layout_DeathSourceDPM := RECORD
-			UNSIGNED6 pid := 0;
-			STRING DPM := '000000000000000000000000000000';
-		END;					
-		EXPORT DeathSourceDPM_superfilename_raw := 'thor_data400::acctmon::deceased::RestrictedDeathSource_DPM';
-		EXPORT DeathSourceDPM_superfilename := AccountMonitoring.constants.DATA_LOCATION + DeathSourceDPM_superfilename_raw;
-		EXPORT DeathSourceDPM := DATASET(DeathSourceDPM_superfilename, Layout_DeathSourceDPM, CSV, OPT);
-	END;
+    // =========================== ORIGINALLY: ===========================
+    // base_file := Header.File_DID_Death_MasterV2;
+    // ===================================================================
+
+    // NOTE: Due to poor synchronization between Prod_Dali and RoxieBatch (i.e., Prod_Dali
+    // will have an updated Deathmaster file for 2-3 days before the same file version is
+    // written to RoxieBatch), read from Prod_Dali the most recent version that exists on
+    // RoxieBatch.
+    EXPORT deathmaster_build_version := TRIM( did_add.get_EnvVariable('Deathmaster_Build_Version') ) : INDEPENDENT;
+
+    // UNRESTRICTED BASEFILE
+    EXPORT base_filename_raw := 'thor_data400::base::did_death_masterV3_ssa_' + deathmaster_build_version;
+    EXPORT base_filename     := AccountMonitoring.constants.DATA_LOCATION + base_filename_raw;
+    EXPORT base_superfilename_raw := 'thor_data400::base::did_death_masterV3_ssa';
+    EXPORT base_superfilename     := AccountMonitoring.constants.DATA_LOCATION + base_superfilename_raw;
+    EXPORT base_file := DATASET(base_filename, Header.Layout_Did_Death_MasterV3, flat);// : PERSIST('acctmon::deceased::by_DID');
+
+  END;
 	
 	EXPORT foreclosure := MODULE
 
-		// =========================== ORIGINALLY: ===========================
-		// export File_Foreclosure_Base := PROJECT(File_Foreclosure_Base_v2, Layout_Fares_Foreclosure);
-		// ===================================================================	
-		EXPORT base_filename_raw := 'thor_data400::base::foreclosure';
-		EXPORT base_filename := AccountMonitoring.constants.DATA_LOCATION + base_filename_raw;
-		EXPORT base_file_raw := DATASET(base_filename, Property.Layout_Fares_Foreclosure_v2, THOR);
-		EXPORT base_file     := PROJECT(base_file_raw, Property.Layout_Fares_Foreclosure);
+		EXPORT Foreclosure_fid_superfile := 'thor_data400::key::foreclosure_fid_'+doxie.Version_SuperKey;
+		EXPORT Foreclosure_fid_superkey_monitor := 'monitor::foreclosure::foreclosure_fid';
+		EXPORT Foreclosure_fid_superkeyname := AccountMonitoring.constants.MONITOR_KEY_CLUSTER + Foreclosure_fid_superkey_monitor+ '_qa';
 		
-		EXPORT Layout_Base_Header_file_slim := RECORD
-			Property.Layout_Fares_Foreclosure.foreclosure_id;
-			Property.Layout_Fares_Foreclosure.situs1_prim_range;
-			Property.Layout_Fares_Foreclosure.situs1_predir;
-			Property.Layout_Fares_Foreclosure.situs1_prim_name;
-			Property.Layout_Fares_Foreclosure.situs1_addr_suffix;
-			Property.Layout_Fares_Foreclosure.situs1_postdir;
-			Property.Layout_Fares_Foreclosure.situs1_sec_range;
-			Property.Layout_Fares_Foreclosure.situs1_p_city_name;
-			Property.Layout_Fares_Foreclosure.situs1_st;
-			Property.Layout_Fares_Foreclosure.situs1_zip;
-			Property.Layout_Fares_Foreclosure.recording_date;
-			Property.Layout_Fares_Foreclosure.filing_date;
-			Property.Layout_Fares_Foreclosure.deed_category;
-			Property.Layout_Fares_Foreclosure.document_type;
-			Property.Layout_Fares_Foreclosure.name1_did;
-		END;
+		EXPORT key_Foreclosure_fid := 
+			PULL(INDEX(
+				dx_Property.Key_Foreclosures_FID,  
+				Foreclosure_fid_superkeyname
+			));
+			
+		EXPORT key_Foreclosure_fid_dist :=
+			DISTRIBUTE(
+				key_Foreclosure_fid, 
+				HASH64(situs1_zip,situs1_prim_range,situs1_prim_name,situs1_addr_suffix,situs1_predir)
+			): INDEPENDENT;
 
-		EXPORT base_file_slim := 
-			PROJECT(
-				DISTRIBUTE(
-					base_file, 
-					HASH64(situs1_zip,situs1_prim_range,situs1_prim_name,situs1_addr_suffix,situs1_predir)
-				),
-				Layout_Base_Header_file_slim
-			) : INDEPENDENT; //PERSIST('acctmon::foreclosure::base_file_slim');
+		EXPORT NOD_fid_superfile := 'thor_data400::key::nod::'+doxie.Version_SuperKey+'::fid';
+		EXPORT NOD_fid_superkey_monitor := 'monitor::foreclosure::nod_fid';
+		EXPORT NOD_fid_superkeyname := AccountMonitoring.constants.MONITOR_KEY_CLUSTER + NOD_fid_superkey_monitor+ '_qa';
 		
+		EXPORT key_NOD_fid := 
+			PULL(INDEX(
+				dx_Property.Key_NOD_FID,  
+				NOD_fid_superkeyname
+			));
+			
+		EXPORT key_NOD_fid_dist :=
+			DISTRIBUTE(
+				key_NOD_fid, 
+				HASH64(situs1_zip,situs1_prim_range,situs1_prim_name,situs1_addr_suffix,situs1_predir)
+			): INDEPENDENT;
+
+    
+		EXPORT Foreclosure_delta_rid_superfile := 'thor_data400::key::foreclosure::'+doxie.Version_SuperKey+'::delta_rid';
+		EXPORT Foreclosure_delta_rid_superkey_monitor := 'monitor::foreclosure::delta_rid';
+		EXPORT Foreclosure_delta_rid_superkeyname := AccountMonitoring.constants.MONITOR_KEY_CLUSTER + Foreclosure_delta_rid_superkey_monitor+ '_qa';
+
+		EXPORT key_Foreclosure_delta_rid := 
+			INDEX(
+				dx_Property.Key_Foreclosure_Delta_Rid,  
+				Foreclosure_delta_rid_superkeyname
+			);
 	END;
 	
 	EXPORT people_at_work := MODULE
@@ -828,14 +645,7 @@ EXPORT product_files := MODULE
 				base_file_cell_undist,
 				hash64(did)
 			) : INDEPENDENT; //PERSIST('acctmon::phone::base_file_cell');
-			
-			
-		EXPORT base_header_file := Header_Files.Base_Header_file_slim;
-		
-		EXPORT base_quick_header := header_files.base_quick_header_slim;
-				
-		EXPORT base_file_util_daily := header_files.base_file_util_daily_slim;
-			      
+	     
 		// =========================== ORIGINALLY: ===========================
 		// base_file_neighbor := watchdog.Key_watchdog_glb;
 		// ===================================================================
@@ -854,20 +664,55 @@ EXPORT product_files := MODULE
 		// ===================================================================
 		// For SwitchType
 		// ===================================================================
-		
-		EXPORT neustar_filename_raw := 'thor_data400::base::neustarupdate';
-		EXPORT neustar_filename := AccountMonitoring.constants.DATA_LOCATION + neustar_filename_raw;
-		
-		EXPORT base_file_neustar :=  
-			DISTRIBUTE(
-				DATASET(
-					neustar_filename,
-					CellPhone.layoutNeuStar,CSV(TERMINATOR('\n'), SEPARATOR('|'))
-				),
-				HASH64(CellPhone)
-			) : INDEPENDENT; //PERSIST('acctmon::phone::base_file_neustar');
+	  EXPORT phones_type_superfile	:= 'thor_data400::key::Phones_type_'+doxie.Version_SuperKey;
+    EXPORT phones_type_for_superkey_monitor := 'monitor::Phones_type';
+	  EXPORT phones_type_superkeyname := AccountMonitoring.constants.MONITOR_KEY_CLUSTER + phones_type_for_superkey_monitor + '_qa';
+	
+		EXPORT key_phones_type := 
+			PULL(INDEX(
+				dx_PhonesInfo.Key_Phones_Type,  
+				phones_type_superkeyname
+			));
 			
-		// Telcordia Settings - Switch Type / Phone Type
+		EXPORT key_phones_type_dist :=
+			DISTRIBUTE(
+				key_phones_type, 
+				HASH64(phone)
+			): INDEPENDENT;
+
+    EXPORT Phones_Lerg6_superfile := 'thor_data400::key::phones_lerg6_'+doxie.Version_SuperKey;
+		EXPORT Phones_Lerg6_for_superkey_monitor := 'monitor::phones_lerg6';
+		EXPORT phones_lerg6_superkeyname := AccountMonitoring.constants.MONITOR_KEY_CLUSTER + Phones_Lerg6_for_superkey_monitor+ '_qa';
+		
+		EXPORT key_Phones_Lerg6 := 
+			PULL(INDEX(
+				dx_PhonesInfo.Key_Phones_Lerg6,  
+				phones_lerg6_superkeyname
+			));
+			
+		EXPORT key_Phones_Lerg6_dist :=
+			DISTRIBUTE(
+				key_Phones_Lerg6, 
+				HASH64(npa, nxx, block_id)
+			): INDEPENDENT;
+
+    EXPORT carrier_reference_superfile := 'thor_data400::key::phonesmetadata::carrier_reference_'+doxie.Version_SuperKey;
+		EXPORT carrier_reference_for_superkey_monitor := 'monitor::phonesmetadata::carrier_reference';
+		EXPORT carrier_reference_superkeyname := AccountMonitoring.constants.MONITOR_KEY_CLUSTER + carrier_reference_for_superkey_monitor + '_qa';
+
+		EXPORT key_carrier_reference := 
+			PULL(INDEX(
+				dx_PhonesInfo.Key_Source_Reference.ocn_name,  
+				carrier_reference_superkeyname
+			));
+			
+		EXPORT key_carrier_reference_dist :=
+			DISTRIBUTE(
+				key_carrier_reference, 
+				HASH64(ocn)
+			): INDEPENDENT;															 
+			
+		// Settings - Switch Type / Phone Type
 		EXPORT SET OF STRING3 Toll_Free_Area_Codes := ['800','811','822','833','844','855','866','877','888','899'];
 		EXPORT STRING1 POTS                       := 'P'; // "Plain Old Telephone Service"
 		EXPORT STRING1 PAGER                      := 'G';
@@ -878,32 +723,9 @@ EXPORT product_files := MODULE
 		EXPORT STRING1 WEATHER                    := 'W';
 		EXPORT STRING1 TOLL_FREE                  := '8';
 		EXPORT STRING1 UNKNOWN_TYPE               := 'U';		
+		EXPORT STRING1 CABLE                      := 'B';
 		
-		EXPORT fn_GetPhoneTypeCode(STRING3 npa, STRING3 COCType, STRING4 SSC) :=	FUNCTION
-			phone_type_code := IF(npa IN Toll_Free_Area_Codes OR REGEXFIND('I',SSC), 
-														 TOLL_FREE,
-														 MAP(COCType IN ['EOC','PMC','RCC','SP1','SP2'] AND 
-																 REGEXFIND('(C|R|S)',SSC)                       => CELL_PHONE,
-																 REGEXFIND('B',      SSC)                       => PAGER,
-																 REGEXFIND('N',      SSC)                       => POTS,
-																 REGEXFIND('V',      SSC)                       => VOIP,
-																 REGEXFIND('T',      SSC)                       => TIME,
-																 REGEXFIND('W',      SSC)                       => WEATHER,
-																 REGEXFIND('8',      SSC)                       => PUERTO_RICO_VIRGIN_ISLANDS,
-																 /* ELSE.....................................*/ UNKNOWN_TYPE)
-														);
-			RETURN phone_type_code;
-		END;
-		
-		EXPORT telcordia_tds_keyfilename_raw := 'thor_data400::key::telcordia_tds_' + doxie.Version_SuperKey;
-		EXPORT telcordia_tds_keyfilename     := AccountMonitoring.constants.DATA_LOCATION + telcordia_tds_keyfilename_raw;
 
-		SHARED telcordia_tds_undist := INDEX(Risk_Indicators.key_Telcordia_tds, 
-																				 telcordia_tds_keyfilename);
-
-		EXPORT telcordia_tds := DISTRIBUTE(telcordia_tds_undist,
-																			 HASH64(npa, nxx, tb)) : INDEPENDENT; //PERSIST('acctmon::phone::telcordia_tds');
-				
 	END; // Phone module
 	
 	EXPORT property := MODULE
@@ -915,39 +737,17 @@ EXPORT product_files := MODULE
 		//																		ln_fares_id NOT IN LN_PropertyV2.Suppress_LNFaresID);
 		// ===================================================================
 		
-		// Search file.
-		EXPORT layout_search_file_b := RECORD
-			LN_PropertyV2.Layout_DID_Out.ln_fares_id;
-			LN_PropertyV2.Layout_DID_Out.fname;
-			LN_PropertyV2.Layout_DID_Out.mname;
-			LN_PropertyV2.Layout_DID_Out.lname;
-			LN_PropertyV2.Layout_DID_Out.name_suffix;
-			LN_PropertyV2.Layout_DID_Out.cname;
-			LN_PropertyV2.Layout_DID_Out.prim_range;
-			LN_PropertyV2.Layout_DID_Out.predir;
-			LN_PropertyV2.Layout_DID_Out.prim_name;
-			LN_PropertyV2.Layout_DID_Out.suffix;
-			LN_PropertyV2.Layout_DID_Out.postdir;
-			LN_PropertyV2.Layout_DID_Out.unit_desig;
-			LN_PropertyV2.Layout_DID_Out.sec_range;
-			LN_PropertyV2.Layout_DID_Out.p_city_name;
-			LN_PropertyV2.Layout_DID_Out.st;
-			LN_PropertyV2.Layout_DID_Out.zip;
-			LN_PropertyV2.Layout_DID_Out.did;
-			LN_PropertyV2.Layout_DID_Out.bdid;
-			LN_PropertyV2.Layout_DID_Out.prop_addr_propagated_ind;
-			LN_PropertyV2.Layout_DID_Out.dt_last_seen;
-			LN_PropertyV2.Layout_DID_Out.dt_vendor_last_reported;
-			LN_PropertyV2.Layout_DID_Out.app_ssn;
-			LN_PropertyV2.Layout_DID_Out.process_date;
-		END;
+		// Search file.		
+		EXPORT Property_search_Roxiesuperfile:= 'thor_data400::key::ln_propertyv2::qa::search.fid';
+		EXPORT Property_search_keyname_monitor := 'monitor::LN_PropertyV2::Search_fid';
+		EXPORT Property_search_superkey_monitor := AccountMonitoring.constants.MONITOR_KEY_CLUSTER + Property_search_keyname_monitor + '_qa';
 		
-		EXPORT search_filename_raw := 'thor_data400::base::ln_propertyv2::search';
-		EXPORT search_filename     := AccountMonitoring.constants.DATA_LOCATION + search_filename_raw;
-		EXPORT search_file         := DATASET(search_filename, LN_PropertyV2.Layout_DID_Out, THOR);
-		EXPORT search_file_cleaned := 
-			search_file
-				( NOT ( LENGTH(TRIM(cname)) BETWEEN 1 AND 3 OR
+    SHARED Property_search_key_undist := INDEX(
+												LN_PropertyV2.key_search_fid(),  
+												Property_search_superkey_monitor
+												);
+    
+    SHARED Property_search_key_filtered := Property_search_key_undist( NOT ( LENGTH(TRIM(cname)) BETWEEN 1 AND 3 OR
 							 ( TRIM(prim_range)  = '' AND 
 								 TRIM(prim_name)   = '' AND 
 								 TRIM(v_city_name) = '' AND 
@@ -956,78 +756,71 @@ EXPORT product_files := MODULE
 							) AND
 				 (source_code[2] = 'P') AND
 				 ln_fares_id NOT IN LN_PropertyV2.Suppress_LNFaresID );
-		
-		EXPORT search_file_cleaned_slim := PROJECT(search_file_cleaned,layout_search_file_b);
 
-		EXPORT search_file_dist_slim := 
-			DISTRIBUTE(search_file_cleaned_slim,
+		SHARED Property_search_key_dist := 
+			DISTRIBUTE(Property_search_key_filtered,
 			           HASH32(did, bdid, app_ssn, lname, fname, 
-								        prim_range, prim_name, suffix, p_city_name, st, zip));
-												
-		EXPORT search_file_slim := 
-			DEDUP(SORT(search_file_dist_slim,
+								prim_range, prim_name, suffix, p_city_name, st, zip)): INDEPENDENT;
+	  
+		EXPORT Property_search_key_sorted := DEDUP(SORT(Property_search_key_dist,
 								 did, bdid, app_ssn, lname, fname, 
-								 prim_range, prim_name, suffix, p_city_name, st, zip, -process_date, 
+								 prim_range, prim_name, suffix, p_city_name, st, zip, -process_date, RECORD,
 								 LOCAL),
 						did, bdid, app_ssn, lname, fname, 
 						prim_range, prim_name, suffix, p_city_name, st, zip, 
-						LOCAL)
-			: /*INDEPENDENT;*/ PERSIST('acctmon::property::search_file_slim');
-	
+						LOCAL);
+
 		// Deeds file.
-		EXPORT layout_deeds_file_b := RECORD
-			LN_PropertyV2.layout_addl_fares_deed.ln_fares_id;
-			LN_PropertyV2.layout_addl_fares_deed.fares_refi_flag;
-		END;
-		
-		EXPORT deeds_filename_raw := 'thor_data400::base::ln_propertyv2::Addl::fares_deed';
-		EXPORT deeds_filename     := AccountMonitoring.constants.DATA_LOCATION + deeds_filename_raw;
-		EXPORT deeds_file         := DATASET(deeds_filename, LN_PropertyV2.layout_addl_fares_deed, THOR);
-		
-		SHARED deeds_file_slim := PROJECT(deeds_file,layout_deeds_file_b);
-
-		EXPORT deeds_file_dist := 
-			DISTRIBUTE(deeds_file_slim, HASH64(ln_fares_id)) : /*INDEPENDENT;*/ PERSIST('acctmon::property::deeds_file_slim');
 	
-		// Linkid key
-		property_build_version         := TRIM(did_add.get_EnvVariable('Property_Build_Version') ):INDEPENDENT;
-		
-		EXPORT SearchLinkid_keyname_raw := 'thor_data400::key::ln_propertyv2::' + property_build_version + '::search.linkids';
-		EXPORT SearchLinkid_keyname     := AccountMonitoring.constants.DATA_LOCATION + SearchLinkid_keyname_raw;
-			
-		EXPORT SearchLinkid_superkeyname_raw 	:= 'thor_data400::key::ln_propertyv2' + doxie.Version_SuperKey + '::search.linkids';
-		EXPORT SearchLinkid_superkeyname     	:= AccountMonitoring.constants.DATA_LOCATION + SearchLinkid_superkeyname_raw;
+		EXPORT Property_deed_Roxiesuperfile := 'thor_data400::key::ln_propertyv2::qa::addlfaresdeed.fid';
+		EXPORT Property_deed_keyname_monitor := 'monitor::LN_PropertyV2::addlfaresdeed.fid';
+		EXPORT Property_deed_superkey_monitor := AccountMonitoring.constants.MONITOR_KEY_CLUSTER + Property_deed_keyname_monitor + '_qa';
 
-		SHARED SearchLinkid_key_undist := 
+		SHARED Property_deed_key_undist := INDEX(
+										LN_PropertyV2.key_addl_fares_deed_fid,  
+										Property_deed_superkey_monitor
+										);
+
+		EXPORT Property_deed_key_dist := 
+			DISTRIBUTE(Property_deed_key_undist, HASH64(ln_fares_id)) : INDEPENDENT;
+	
+		// Linkid key		
+		EXPORT Property_SearchLinkid_Roxie_superfile := 'thor_data400::key::ln_propertyv2::qa::search.linkids';
+		EXPORT Property_SearchLinkid_keyname_monitor     := 'monitor::LN_PropertyV2::search.linkids';
+		EXPORT Property_SearchLinkid_superkey_monitor := AccountMonitoring.constants.MONITOR_KEY_CLUSTER + Property_SearchLinkid_keyname_monitor + '_qa';
+
+		SHARED Property_SearchLinkid_superkey_undist := 
 				INDEX(
 					LN_PropertyV2.Key_LinkIds.key,  
-					SearchLinkid_keyname
+					Property_SearchLinkid_superkey_monitor
 				);
 
-		EXPORT SearchLinkid_key :=
+		EXPORT Property_SearchLinkid_superkey_dist :=
 				DISTRIBUTE(
-					SearchLinkid_key_undist, 
+					Property_SearchLinkid_superkey_undist, 
 					HASH64(seleid)
 					): INDEPENDENT; //PERSIST('acctmon::property::search_linkid');
 		
 		
-	END;
+	END; // End Property Module
 	
 	EXPORT litigiousdebtor := MODULE
-		
-		EXPORT layout_search_file_b := RECORD
-			CourtLink.Layouts.Base.debtor_lname;
-			CourtLink.Layouts.Base.debtor_fname;
-			CourtLink.Layouts.Base.CourtState;
-			CourtLink.Layouts.Base.DocketNumber;
-		END;
-		
-		EXPORT litigiousdebtor_filename_raw    := 'thor_data400::base::courtlink::qa::litdebt';
-		EXPORT litigiousdebtor_filename        := AccountMonitoring.constants.DATA_LOCATION + litigiousdebtor_filename_raw;
-		EXPORT litigiousdebtor_file            := DATASET(litigiousdebtor_filename, CourtLink.Layouts.Base, THOR);
-		
-		EXPORT litigiousdebtor_file_slim := DISTRIBUTE(litigiousdebtor_file, HASH32(debtor_lname, debtor_fname, CourtState, DocketNumber)) 
-		                                    : INDEPENDENT; //PERSIST('acctmon::litigiousdebtor::search_file_slim');
+
+    EXPORT litigiousdebtor_Roxie_SuperFile := 'thor_data400::key::courtlink::qa::courtid_docket';
+    EXPORT litigiousdebtor_superkey_monitor := 'monitor::litigiousdebtor::courtid_docket';
+    EXPORT litigiousdebtor_superkey     := AccountMonitoring.constants.MONITOR_KEY_CLUSTER + litigiousdebtor_superkey_monitor + '_qa';
+
+    SHARED litigiousdebtor_key_undist := 
+        INDEX(
+              CourtLink.key_CourtID_Docket,
+              litigiousdebtor_superkey
+            );
+
+    EXPORT litigiousdebtor_key :=
+        DISTRIBUTE(
+                  litigiousdebtor_key_undist, 
+                  HASH32(debtor_lname, NID.PreferredFirstNew(debtor_fname), CourtState)
+                ): INDEPENDENT; //PERSIST('acctmon::litigiousdebtor::search_file_slim');
 	END;
 
 	EXPORT liens := MODULE
@@ -1292,19 +1085,18 @@ EXPORT product_files := MODULE
 	
 	EXPORT phonefeedback := MODULE
 		
-		EXPORT phonefeedback_filename_raw := 'thor_data400::base::PhonesFeedback';
-		EXPORT phonefeedback_filename := AccountMonitoring.constants.DATA_LOCATION + phonefeedback_filename_raw;
-		
-		EXPORT base_file_phonefeedback :=  
-			DISTRIBUTE(
-				DATASET(
-					phonefeedback_filename,
-					PhonesFeedback.Layouts_PhonesFeedback.Layout_PhonesFeedback_base,
-					THOR
-				),
-				HASH64(did)
-			) : INDEPENDENT; //PERSIST('acctmon::phonefeedback::base_file');
-			
+		EXPORT phonefeedback_phone_keyname := 'thor_data400::key::phonesFeedback::'+doxie.Version_SuperKey+'::phone';
+		EXPORT PhonesFeedback_Phone_superkey_monitor := 'monitor::PhonesFeedback::Phone';
+		EXPORT PhonesFeedback_superkey     := AccountMonitoring.constants.MONITOR_KEY_CLUSTER + PhonesFeedback_Phone_superkey_monitor + '_qa';
+
+		SHARED PhonesFeedback_key_undist := INDEX(
+											PhonesFeedback.Key_PhonesFeedback_phone(),  
+											PhonesFeedback_superkey
+											);
+
+		EXPORT PhonesFeedback_key_monitor := DISTRIBUTE(PhonesFeedback_key_undist(did != 0), 
+																						HASH64(did)
+																					): INDEPENDENT;			
 	END;
 
 	EXPORT workplace := MODULE
@@ -1387,24 +1179,41 @@ EXPORT product_files := MODULE
 							: INDEPENDENT; //PERSIST('acctmon::workplace::base_file_slim');
 
 	END; // end workplace module
-	
+
 	EXPORT PhoneOwnership := MODULE
-		EXPORT pphone_superkeyname := AccountMonitoring.constants.DATA_LOCATION + 'thor_data400::key::phones_ported_metadata_'+doxie.Version_SuperKey;
-		pphone_build_version         := TRIM( did_add.get_EnvVariable('pphones_build_version') ):INDEPENDENT;
-		key_pphone_keyname_raw := 'thor_data400::key::'+pphone_build_version+'::phones_ported_metadata';
-		key_pphone_keyname     := AccountMonitoring.constants.DATA_LOCATION + key_pphone_keyname_raw;
-		// Define a Duplicate Index; this points to the logical key file
-		EXPORT key_pphone := 
-			INDEX(
-				PhonesInfo.Key_Phones.Ported_Metadata,  
-				key_pphone_keyname
-			);
+
+	  EXPORT phones_transaction_superfile	:= 'thor_data400::key::Phones_transaction_'+doxie.Version_SuperKey;
+    EXPORT phones_transaction_for_superkey_monitor := 'monitor::Phones_transaction';
+	  EXPORT phones_transaction_superkeyname := AccountMonitoring.constants.MONITOR_KEY_CLUSTER + phones_transaction_for_superkey_monitor + '_qa';
+	
+		EXPORT key_phones_transaction := 
+			PULL(INDEX(
+				dx_PhonesInfo.Key_Phones_Transaction,  
+				phones_transaction_superkeyname
+			));
 			
-		EXPORT key_pphone_dist :=
+		EXPORT key_phones_transaction_dist :=
 			DISTRIBUTE(
-				key_pphone, 
+				key_phones_transaction, 
 				HASH64(phone)
 			): INDEPENDENT;
+
+    EXPORT phones_WDNC_superfile  := 'thor_data400::key::tcpa::'+doxie.Version_SuperKey+'::phone_history';
+	  EXPORT phones_WDNC_for_superkey_monitor := 'monitor::Phones_WDNC';
+	  EXPORT phones_WDNC_superkeyname := AccountMonitoring.constants.MONITOR_KEY_CLUSTER + phones_WDNC_for_superkey_monitor + '_qa';
+	  
+	  EXPORT key_phones_WDNC := 
+	      PULL(INDEX(
+	        dx_Phone_TCPA.Key_TCPA_Phone_History(),  
+	        phones_WDNC_superkeyname
+	      ));
+	      
+	  EXPORT key_phones_WDNC_dist :=
+	      DISTRIBUTE(
+	        key_phones_WDNC, 
+	        HASH64(phone)
+	      ): INDEPENDENT;
+
 	END; //end of phone ownership
 	
 	EXPORT sbfe := MODULE
@@ -1415,7 +1224,7 @@ EXPORT product_files := MODULE
 // Duplicate of Roxie Key 
 	
 		EXPORT r_sbfeLinkid_superkeyname_raw := 'batchr3::monitor::sbfe::linkids_' + doxie.Version_SuperKey;
-		EXPORT r_sbfeLinkid_superkeyname     := Data_Services.Default_Data_Location + r_sbfeLinkid_superkeyname_raw;
+		EXPORT r_sbfeLinkid_superkeyname     := AccountMonitoring.constants.DATA_LOCATION + r_sbfeLinkid_superkeyname_raw;
 
 		SHARED r_sbfeLinkid_key_undist := 
 			pull(INDEX(
@@ -1434,7 +1243,7 @@ EXPORT product_files := MODULE
 // Duplicate of Roxie Key	
   
 		EXPORT r_sbfeTrade_superkeyname_raw := 'batchr3::monitor::sbfe::tradeline_' + doxie.Version_SuperKey;
-		EXPORT r_sbfeTrade_superkeyname     := Data_Services.Default_Data_Location + r_sbfeTrade_superkeyname_raw;
+		EXPORT r_sbfeTrade_superkeyname     := AccountMonitoring.constants.DATA_LOCATION + r_sbfeTrade_superkeyname_raw;
 
 		SHARED r_sbfeTrade_key_undist := 
 			pull(INDEX(
@@ -1452,7 +1261,7 @@ EXPORT product_files := MODULE
 // Duplicate of Roxie Key	
 		
 		EXPORT r_sbfeScore_superkeyname_raw := 'batchr3::monitor::sbfescoring::scoringindex_' + doxie.Version_SuperKey ;
-		EXPORT r_sbfeScore_superkeyname     := Data_Services.Default_Data_Location + r_sbfeScore_superkeyname_raw;
+		EXPORT r_sbfeScore_superkeyname     := AccountMonitoring.constants.DATA_LOCATION + r_sbfeScore_superkeyname_raw;
 
 		SHARED r_sbfeScore_key_undist := 
 			pull(INDEX(
@@ -1541,49 +1350,31 @@ EXPORT product_files := MODULE
 		
 		EXPORT inquiry := MODULE
 	
-			EXPORT inquiry_build_version := TRIM(did_add.get_EnvVariable('inquiry_build_version')):INDEPENDENT;
+      EXPORT inquiryLinkid_Roxie_SuperFile := 'thor_data400::key::inquiry_table::LinkIds_' + doxie.Version_SuperKey;
+      EXPORT inquiryLinkid_superkey_monitor := 'monitor::inquiry::linkids';
+      EXPORT inquiryLinkid_superkey     := AccountMonitoring.constants.MONITOR_KEY_CLUSTER + inquiryLinkid_superkey_monitor + '_qa';
+
+      SHARED inquiryLinkid_key_undist := INDEX(
+																							Inquiry_AccLogs.Key_Inquiry_LinkIds.key,  
+																							inquiryLinkid_superkey
+																							);
+
+      EXPORT inquiryLinkid_key_monitor := DISTRIBUTE(inquiryLinkid_key_undist, 
+                                             HASH64(seleid)
+                                            ): INDEPENDENT; //PERSIST('acctmon::inquiry::key_linkid');
+      // Update Linkid key
+      EXPORT inquiryUpdLinkid_Roxie_SuperFile := 'thor_data400::key::inquiry_table::' + doxie.version_superkey  + '::linkids_update';
+      EXPORT inquiryUpdLinkid_superkey_monitor := 'monitor::inquiry_table::linkids_update' ;
+      EXPORT inquiryUpdLinkid_superkey     := AccountMonitoring.constants.MONITOR_KEY_CLUSTER + inquiryUpdLinkid_superkey_monitor + '_qa';
 			
-			// Linkid key
-			EXPORT inquiryLinkid_keyname_raw := 'thor_data400::key::inquiry::' + inquiry_build_version + '::linkids';
-			EXPORT inquiryLinkid_keyname     := AccountMonitoring.constants.DATA_LOCATION + inquiryLinkid_keyname_raw;
-			
-			EXPORT inquiryLinkid_superkeyname_raw  := 'thor_data400::key::inquiry_table::linkids_' + doxie.Version_SuperKey;
-			EXPORT inquiryLinkid_superkeyname     	:= AccountMonitoring.constants.DATA_LOCATION + inquiryLinkid_superkeyname_raw;
+      SHARED inquiryUpdLinkid_key_undist := INDEX(
+																									Inquiry_AccLogs.Key_Inquiry_LinkIds_Update.key,  
+																									inquiryUpdLinkid_superkey
+																									);
 
-			SHARED inquiryLinkid_key_undist := 
-				INDEX(
-					Inquiry_AccLogs.Key_Inquiry_LinkIds.key,  
-					inquiryLinkid_keyname
-				);
-
-			EXPORT inquiryLinkid_key :=
-				DISTRIBUTE(
-					inquiryLinkid_key_undist, 
-					HASH64(seleid)
-					): INDEPENDENT; //PERSIST('acctmon::inquiry_table::key_linkid');
-							
-			// Update Linkid key
-				
-			EXPORT inquiry_update_version := TRIM(did_add.get_EnvVariable('inquiry_update_build_version')):INDEPENDENT;
-	
-			EXPORT inquiryUpdLinkid_keyname_raw := 'thor_data400::key::inquiry::' + inquiry_update_version + '::linkids_update';
-			EXPORT inquiryUpdLinkid_keyname     := AccountMonitoring.constants.DATA_LOCATION + inquiryUpdLinkid_keyname_raw;
-			
-			EXPORT inquiryUpdLinkid_superkeyname_raw  := 'thor_data400::key::inquiry_table::' + doxie.Version_SuperKey + '::linkids_update';
-			EXPORT inquiryUpdLinkid_superkeyname     	:= AccountMonitoring.constants.DATA_LOCATION + inquiryUpdLinkid_superkeyname_raw;
-
-			SHARED inquiryUpdLinkid_key_undist := 
-				INDEX(
-					Inquiry_AccLogs.Key_Inquiry_LinkIds_Update.key,  
-					inquiryUpdLinkid_keyname
-				);
-
-			EXPORT inquiryUpdLinkid_key :=
-				DISTRIBUTE(
-					inquiryUpdLinkid_key_undist, 
-					HASH64(seleid)
-					): INDEPENDENT; //PERSIST('acctmon::inquiry_table::key_linkid_update');
-					
+      EXPORT inquiryUpdLinkid_key_monitor := DISTRIBUTE(inquiryUpdLinkid_key_undist, 
+	                                              HASH64(seleid)
+                                               ): INDEPENDENT; //PERSIST('acctmon::inquiry_table::key_linkid_update');					
 		END;
 		
 		EXPORT corp := MODULE
@@ -1729,7 +1520,7 @@ EXPORT product_files := MODULE
    
 		EXPORT emailLexid_superfile := 'thor_200::key::email_datav2::' + doxie.Version_SuperKey + '::did'; // - a superfile name referenced in dx_Email.Key_Did, to be used as RoxieSuperFile in fn_UpdateSuperFiles() process
 		EXPORT emailLexid_for_superkey_monitor := 'monitor::email_datav2::did';
-		EXPORT emailLexid_superkeyname := AccountMonitoring.constants.filename_cluster + emailLexid_for_superkey_monitor + '_qa'; // superfile used by monitoring process
+		EXPORT emailLexid_superkeyname := AccountMonitoring.constants.MONITOR_KEY_CLUSTER + emailLexid_for_superkey_monitor + '_qa'; // superfile used by monitoring process
 
 		emaillexid_key_undist := 
 			PULL(INDEX( 
@@ -1745,7 +1536,7 @@ EXPORT product_files := MODULE
    
 		EXPORT emailaddr_superfile := 'thor_200::key::email_datav2::' + doxie.Version_SuperKey + '::email_addresses'; // - a superfile name referenced in dx_Email.Key_Email_Address, to be used as RoxieSuperFile in fn_UpdateSuperFiles() process
 		EXPORT emailaddr_for_superkey_monitor := 'monitor::email_datav2::email_addresses';
-		EXPORT emailaddr_superkeyname := AccountMonitoring.constants.filename_cluster + emailaddr_for_superkey_monitor + '_qa'; // superfile used by monitoring process
+		EXPORT emailaddr_superkeyname := AccountMonitoring.constants.MONITOR_KEY_CLUSTER + emailaddr_for_superkey_monitor + '_qa'; // superfile used by monitoring process
 
 		emailaddr_key_undist := 
 			PULL(INDEX( 
@@ -1761,7 +1552,7 @@ EXPORT product_files := MODULE
    
 		EXPORT emailmain_superfile := 'thor_200::key::email_datav2::' + doxie.Version_SuperKey + '::payload'; // - a superfile name referenced in dx_Email.Key_email_payload, to be used as RoxieSuperFile in fn_UpdateSuperFiles() process
 		EXPORT emailmain_for_superkey_monitor := 'monitor::email_datav2::payload';
-		EXPORT emailmain_superkeyname := AccountMonitoring.constants.filename_cluster + emailmain_for_superkey_monitor + '_qa'; // superfile used by monitoring process
+		EXPORT emailmain_superkeyname := AccountMonitoring.constants.MONITOR_KEY_CLUSTER + emailmain_for_superkey_monitor + '_qa'; // superfile used by monitoring process
 
 		payload_key_undist := 
 			PULL(INDEX( 
@@ -1776,5 +1567,4 @@ EXPORT product_files := MODULE
 				): INDEPENDENT; //PERSIST?
    
   END;
-		
 END;

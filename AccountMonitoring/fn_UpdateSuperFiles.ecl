@@ -37,13 +37,16 @@ IMPORT dops, AccountMonitoring, STD, _Control, Data_Services;
 
 EXPORT fn_UpdateSuperFiles(AccountMonitoring.types.productMask product_mask = 
                             AccountMonitoring.types.productMask.allProducts, // all
-                            STRING roxie_esp_server = dops.constants.vESPSet('nonfcra','prod')[1], // prod //'10.173.104.101' 
+                            STRING roxie_esp_server_env = 'prod', // prod, cert 
+														STRING roxie_esp_server_cluster = 'nonfcra', // nonfcra, fcra
                             STRING roxie_vip_server =  _Control.RoxieEnv.prodvip,
                             STRING roxie_port = '8010'
                             
                             ) := FUNCTION
-                  
-  liveClust := dops.GetRoxieClusterInfo(roxie_esp_server).LiveCluster(roxie_vip_server); 
+
+	// Determine roxie server from vip to use for package file pull
+	roxie_esp_server := dops.GetRoxieClusterInfo().fESPAssociatedToCluster(roxie_esp_server_cluster,roxie_esp_server_env)[1].esp; // return the cluster that is currently live behind VIP  
+  liveClust := dops.GetRoxieClusterInfo(roxie_esp_server).LiveCluster(roxie_vip_server);
   roxiePack := dops.GetRoxiePackage(roxie_esp_server,roxie_port,liveClust).Keys();                               
 
   Superfiles := AccountMonitoring.config_UpdateSuperFiles(product_mask);
@@ -80,10 +83,12 @@ EXPORT fn_UpdateSuperFiles(AccountMonitoring.types.productMask product_mask =
    
   CGM_LogicalFilesFinal := GLOBAL(ROLLUP(CGM_LogicalFilesGroup,GROUP,RollFiles(LEFT,ROWS(LEFT))),FEW);
            
-/*        output(liveClust,named('liveClust'));
-          output(choosen(roxiePack,4000),named('roxiePack'));
-          output(CGM_LogicalFiles,named('CGM_LogicalFiles'));
-          output(CGM_LogicalFilesFinal,named('CGM_LogicalFilesFinal'));
+	/*				 
+        output(roxie_esp_server,named('roxie_esp_server'));
+				output(liveClust,named('liveClust'));
+        output(choosen(roxiePack,4000),named('roxiePack'));
+        output(CGM_LogicalFiles,named('CGM_LogicalFiles'));
+        output(CGM_LogicalFilesFinal,named('CGM_LogicalFilesFinal'));
 */
   update_monitor_file :=
         SEQUENTIAL(updateMonitorFiles(CGM_LogicalFilesFinal)

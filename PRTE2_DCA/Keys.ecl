@@ -1,4 +1,4 @@
-IMPORT  doxie,mdr, PRTE2_DCA, BIPV2;
+﻿IMPORT  doxie,mdr, PRTE2_DCA, BIPV2;
 
 EXPORT keys := MODULE
 
@@ -30,12 +30,11 @@ EXPORT keys := MODULE
 	
 	
 	EXPORT key_bdid := 
-		INDEX(Files.file_bdid(bdid!=0), 
+		INDEX(Files.file_bdid, 
 					{bdid}, 
 					{Files.file_bdid}, 
 					Constants.dca_keyname   + doxie.Version_SuperKey +  '::bdid');
 
-//empty keys
 	EXPORT key_entnum := 
 		INDEX(Files.file_entnum, 
 					{enterprise_num}, 
@@ -77,6 +76,7 @@ EXPORT keys := MODULE
 					{root,sub}, 
 					{Files.file_root_sub}, 
 					Constants.dca_keyname   + doxie.Version_SuperKey +  '::root_sub');
-//empty keys end
 
+//CCPA Phase 2
+	EXPORT key_contacts_bdid := INDEX(Files.contacts_bdid, {bdid}, {Files.contacts_bdid}, Constants.dca_keyname   + doxie.Version_SuperKey +  '::contacts_bdid');
 END;

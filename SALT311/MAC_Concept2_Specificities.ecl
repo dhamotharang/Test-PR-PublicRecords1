@@ -36,8 +36,8 @@ EXPORT MAC_Concept2_Specificities(addfield,infile1,infield1,countfield1,ed_thres
 						);	
 #uniquename(file2)
 %file2%:=IF(ed_threshold2>0 AND LENGTH(TRIM((SALT311.StrType)infile2[1].infield2))<ed_threshold2,
-            JOIN(%file1%,infile2,LEFT.infield1=(TYPEOF (infile1.infield1))RIGHT.infield2,TRANSFORM(%r%,SELF.addfield:=LEFT.addfield+#IF(%is_eandp_cnt2%) (RIGHT.#EXPAND(%e1_e_cnt2%)+RIGHT.p_cnt-RIGHT.#EXPAND(%e1_countfield2%)) #ELSE RIGHT.#EXPAND(%e1_countfield2%) #END;;SELF:=LEFT;),LEFT OUTER,SMART)
-            ,JOIN(%file1%,infile2,LEFT.infield1=(TYPEOF (infile1.infield1))RIGHT.infield2,TRANSFORM(%r%,SELF.addfield:=LEFT.addfield+#IF(%is_eandp_cnt2%) (RIGHT.#EXPAND(%e1_e_cnt2%)+RIGHT.p_cnt-RIGHT.countfield2) #ELSE RIGHT.countfield2 #END;;SELF:=LEFT;),LEFT OUTER,SMART)
+            JOIN(%file1%,infile2,(SALT311.StrType)LEFT.infield1=(SALT311.StrType)RIGHT.infield2,TRANSFORM(%r%,SELF.addfield:=LEFT.addfield+#IF(%is_eandp_cnt2%) (RIGHT.#EXPAND(%e1_e_cnt2%)+RIGHT.p_cnt-RIGHT.#EXPAND(%e1_countfield2%)) #ELSE RIGHT.#EXPAND(%e1_countfield2%) #END;;SELF:=LEFT;),LEFT OUTER,SMART)
+            ,JOIN(%file1%,infile2,(SALT311.StrType)LEFT.infield1=(SALT311.StrType)RIGHT.infield2,TRANSFORM(%r%,SELF.addfield:=LEFT.addfield+#IF(%is_eandp_cnt2%) (RIGHT.#EXPAND(%e1_e_cnt2%)+RIGHT.p_cnt-RIGHT.countfield2) #ELSE RIGHT.countfield2 #END;;SELF:=LEFT;),LEFT OUTER,SMART)
 						);
 outfile:=%file2%;
 ENDMACRO;

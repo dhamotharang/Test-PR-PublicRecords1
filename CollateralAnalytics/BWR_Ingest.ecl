@@ -6,8 +6,8 @@ IMPORT CollateralAnalytics,SALT311;
 //Set incremental to TRUE to run an incremental ingest mode
 MyDelta := DATASET([],CollateralAnalytics.Layout_CollateralAnalytics);
 ingestMod := CollateralAnalytics.Ingest(FALSE, MyDelta);
-f_AllRecords := '~temp::record_sid::CollateralAnalytics::ingest::AllRecords';
-f_ActiveRecords := '~temp::record_sid::CollateralAnalytics::ingest::ActiveRecords';
+f_AllRecords := '~temp::rid::CollateralAnalytics::ingest::AllRecords';
+f_ActiveRecords := '~temp::rid::CollateralAnalytics::ingest::ActiveRecords';
 O := OUTPUT(ingestMod.AllRecords_Notag,,f_AllRecords,COMPRESSED,OVERWRITE); // Remove _Notag to keep 'what happened' byte
 N_U := OUTPUT(ingestMod.NewRecords_Notag+ingestMod.UpdatedRecords_Notag,,f_ActiveRecords,COMPRESSED,OVERWRITE); // Remove _Notag to keep 'what happened' byte
 PARALLEL(

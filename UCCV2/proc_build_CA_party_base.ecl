@@ -43,14 +43,18 @@ layout_party tBDName_Address(File_ca_BusinessDebtor_in pInput)
    transform
 	 
      self.Orig_name 					:=	pInput.bd_name;
-		 self.Orig_address1				:=	pInput.bd_st_address ;
-		 self.Orig_city						:=	pInput.bd_city ;
+		 self.Orig_address1				:=	pInput.bd_st_address;
+		 self.Orig_address2				:=	if(pInput.bd_city != '',
+																					ut.CleanSpacesAndUpper(trim(pInput.bd_city) + ', ' + trim(pInput.bd_state) + ' ' + trim(pInput.bd_zip)),
+																					ut.CleanSpacesAndUpper(trim(pInput.bd_state) + ' ' + trim(pInput.bd_zip))
+																			);	
+		 self.Orig_city						:=	pInput.bd_city;
 		 self.Orig_state					:=	pInput.bd_state;
-		 self.Orig_zip5						:=	pInput.bd_zip  ;
+		 self.Orig_zip5						:=	pInput.bd_zip ;
 		 self.Orig_zip4						:=	pInput.bd_zip_extn;
-		 self.Orig_country				:=	pInput.bd_country_code ;
-		 self.Orig_postal_code		:=	if(pInput.bd_country_code<>'USA',pInput.bd_zip,'');
-		 self.foreign_indc	 		 	:=	if(pInput.bd_country_code<>'USA','Y','N');
+		 self.Orig_country				:=	if(pInput.bd_country <> 'UNITED STATES',pInput.bd_country,'');
+		 self.Orig_postal_code		:=	if(pInput.bd_country <> 'UNITED STATES',pInput.bd_zip,'');
+		 self.foreign_indc	 		 	:=	if(pInput.bd_country <> 'UNITED STATES','Y','N');
 		 self.party_type     			:=	'D';
 		 self		           				:= 	pInput;
 		 self											:=	[];	 
@@ -60,14 +64,18 @@ layout_party tBSName_Address(File_ca_BusinessSecuredParty_in pInput)
    := 
    transform
      self.Orig_name 					:=	pInput.bs_name;
-		 self.Orig_address1				:=	pInput.bs_st_address ;
-		 self.Orig_city						:=	pInput.bs_city ;
+		 self.Orig_address1				:=	pInput.bs_st_address;
+		 self.Orig_address2				:=	if(pInput.bs_city != '',
+																		 ut.CleanSpacesAndUpper(trim(pInput.bs_city) + ', ' + trim(pInput.bs_state) + ' ' + trim(pInput.bs_zip)),
+																		 ut.CleanSpacesAndUpper(trim(pInput.bs_state) + ' ' + trim(pInput.bs_zip))
+																			);	
+		 self.Orig_city						:=	pInput.bs_city;
 		 self.Orig_state					:=	pInput.bs_state;
-		 self.Orig_zip5						:=	pInput.bs_zip  ;
+		 self.Orig_zip5						:=	pInput.bs_zip ;
 		 self.Orig_zip4						:=	pInput.bs_zip_extn;
-		 self.Orig_country				:=	pInput.bs_country_code ;
-		 self.Orig_postal_code		:=	if(pInput.bs_country_code<>'USA',pInput.bs_zip,'');
-		 self.foreign_indc	 			:=	if(pInput.bs_country_code<>'USA','Y','N');
+		 self.Orig_country				:=	if(pInput.bs_country <> 'UNITED STATES',pInput.bs_country,'');
+		 self.Orig_postal_code		:=	if(pInput.bs_country <> 'UNITED STATES',pInput.bs_zip,'');
+		 self.foreign_indc	 			:=	if(pInput.bs_country <> 'UNITED STATES','Y','N');
 		 self.party_type     			:=	'S';
 		 self		            			:= 	pInput;
 		 self											:=	[];
@@ -84,14 +92,18 @@ layout_party tpDName_Address(File_ca_PersonDebtor_in pInput)
 		 self.fname								:=	pInput.pd_first_name;
 		 self.mname								:=	pInput.pd_middle_name;
 		 self.name_suffix					:=	pInput.pd_suffix; 		 
-		 self.Orig_address1				:=	pInput.pd_st_address ;
+		 self.Orig_address1				:=	pInput.pd_st_address;
+		 self.Orig_address2				:=	if(pInput.pd_city != '',
+																		 ut.CleanSpacesAndUpper(trim(pInput.pd_city) + ', ' + trim(pInput.pd_state) + ' ' + trim(pInput.pd_zip)),
+																		 ut.CleanSpacesAndUpper(trim(pInput.pd_state) + ' ' + trim(pInput.pd_zip))
+																			);	
 		 self.Orig_city						:=	pInput.pd_city ;
 		 self.Orig_state					:=	pInput.pd_state;
 		 self.Orig_zip5						:=	pInput.pd_zip  ;
 		 self.Orig_zip4						:=	pInput.pd_zip_extn;
-		 self.Orig_country				:=	pInput.pd_country_code ;
-		 self.Orig_postal_code		:=	if(pInput.pd_country_code<>'USA',pInput.pd_zip,'');
-		 self.foreign_indc	  		:=	if(pInput.pd_country_code<>'USA','Y','N');
+		 self.Orig_country				:=	if(pInput.pd_country <> 'UNITED STATES',pInput.pd_country,'');
+		 self.Orig_postal_code		:=	if(pInput.pd_country <> 'UNITED STATES',pInput.pd_zip,'');
+		 self.foreign_indc	  		:=	if(pInput.pd_country <> 'UNITED STATES','Y','N');
 		 self.party_type      		:=	'D';
 		 self		            			:= 	pInput;
 		 self											:=	[];
@@ -109,14 +121,18 @@ layout_party tpSName_Address(File_ca_PersonSecuredP_in pInput)
 		 self.fname								:=	pInput.ps_first_name;
 		 self.mname								:=	pInput.ps_middle_name;
 		 self.name_suffix					:=	pInput.ps_suffix; 		 
-		 self.Orig_address1				:=	pInput.ps_st_address ;
-		 self.Orig_city						:=	pInput.ps_city ;
+		 self.Orig_address1				:=	pInput.ps_st_address;
+		 self.Orig_address2				:=	if(pInput.ps_city != '',
+																		 ut.CleanSpacesAndUpper(trim(pInput.ps_city) + ', ' + trim(pInput.ps_state) + ' ' + trim(pInput.ps_zip)),
+																		 ut.CleanSpacesAndUpper(trim(pInput.ps_state) + ' ' + trim(pInput.ps_zip))
+																			);	
+		 self.Orig_city						:=	pInput.ps_city;
 		 self.Orig_state					:=	pInput.ps_state;
-		 self.Orig_zip5						:=	pInput.ps_zip  ;
+		 self.Orig_zip5						:=	pInput.ps_zip ;
 		 self.Orig_zip4						:=	pInput.ps_zip_extn;
-		 self.Orig_country				:=	pInput.ps_country_code ;
-		 self.Orig_postal_code		:=	if(pInput.ps_country_code<>'USA',pInput.ps_zip,'');
-		 self.foreign_indc	  		:=	if(pInput.ps_country_code<>'USA','Y','N');
+		 self.Orig_country				:=	if(pInput.ps_country <> 'UNITED STATES',pInput.ps_country,'');
+		 self.Orig_postal_code		:=	if(pInput.ps_country <> 'UNITED STATES',pInput.ps_zip,'');
+		 self.foreign_indc	  		:=	if(pInput.ps_country <> 'UNITED STATES','Y','N');
 		 self.party_type      		:=	'S';
 		 self		            			:= 	pInput;
 		 self											:=	[];

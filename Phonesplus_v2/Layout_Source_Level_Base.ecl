@@ -1,8 +1,9 @@
 ﻿EXPORT Layout_Source_Level_Base := RECORD
 		data16   	   	CellPhoneIDKey := (data)0; 
 		string2     	source := '';	
+		unsigned8 		src_bitmap := 0; //bitmap flag corresponding to two-digit source code
 		boolean		  	household_flag := false;  
-		
+		unsigned8 		rules := 0;  //bitmap of rules in rollup up phonesplus_v2 keys		
 		string10		 	CellPhone := '';
 		string3			 	npa;
 		string7			 	phone7;
@@ -58,6 +59,7 @@
 		string20     	lname;
 		string5      	name_suffix;
 		string3      	name_score := '0';
+		string8 			dob := '';			
 		Unsigned8			rawAID := 0;
 		Unsigned8   	cleanAID := 0;
 		boolean     	current_rec := false;

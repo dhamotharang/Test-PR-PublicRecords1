@@ -1,4 +1,4 @@
-////////////////////////////////////////////////////////////////////////////////////////////////
+﻿////////////////////////////////////////////////////////////////////////////////////////////////
 // -- fun_CopyFiles() function
 // --
 // -- Example of copying one file from production to dataland
@@ -44,6 +44,8 @@ export fun_CopyFiles(
 	,boolean													pDeleteSrcFiles		    = false
 	,boolean													pSkipSuperfileStuff	  = false
   ,string                           pFileDescription      = workunit
+  ,integer                          ptransferbuffersize   = 100000000
+  ,integer                          pMaxConnections       = 400
 ) :=
 function
 	Layout_fun_CopyFiles.Out twillcopy(Layout_fun_CopyFiles.Input l) :=
@@ -98,11 +100,13 @@ function
                         ,if(IsALocalCopy = true ,'',srcdali)//srcdali//took out srcdali and it works, at least for copying within an environment	
                         ,
                         ,
-                        ,
+                        ,pMaxConnections
                         ,pOverwrite
                         ,true
                         ,
                         ,pShouldCompress
+                        ,
+                        ,ptransferbuffersize
                       )
                       ,if(pDeleteSrcFiles = true  ,sequential(Tools.fun_ClearfilesFromSupers(dataset([{srclogicalname}], Layout_Names), false),mod_Utilities.DeleteLogical(srclogicalname)))
                       ,fileservices.setfiledescription(destinationlogicalname,pFileDescription)

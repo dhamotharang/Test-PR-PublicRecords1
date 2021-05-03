@@ -1,4 +1,4 @@
-import ut,lib_fileservices,STD;
+﻿import ut,lib_fileservices,STD;
 EXPORT DeleteFiles(string location, string environment, string deleteenv,boolean onlydbfiles = false) := module
 	export rundatetime := ut.GetTimeDate() : independent;
 	
@@ -139,8 +139,8 @@ EXPORT DeleteFiles(string location, string environment, string deleteenv,boolean
 		end;
 		
 		Layout_DeleteFiles GetMatchedFiles(GetPatternstoApply l) := transform
-			counttocompare := if (count(thorbackup.SetDeleteFileCount(trim(superfile,left,right)=trim(l.name,left,right))) > 0, // check if the superfile exists in the threshold setup list
-														thorbackup.constants.yogurt(l.name).no_of_files_to_keep, // if yes get the filecnt to keep from list
+			counttocompare := if (count(thorbackup.SetDeleteFileCount(trim(filepattern,left,right)=trim(l.subname,left,right))) > 0, // check if the superfile exists in the threshold setup list
+														thorbackup.constants.yogurt(l.subname).no_of_files_to_keep, // if yes get the filecnt to keep from list
 															thorbackup.constants.yogurt().no_of_files_to_keep);
 												
 			self.superfile := l.name;

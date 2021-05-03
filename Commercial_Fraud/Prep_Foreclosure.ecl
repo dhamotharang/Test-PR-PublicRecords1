@@ -1,8 +1,8 @@
-import property,address,aid;
+﻿import property,address,aid;
 // should be only recent foreclosure, up till 6 months ago
 export Prep_Foreclosure(
 
-	 dataset(property.Layout_Fares_Foreclosure_v2) pForeclosure			= Property.file_foreclosure
+	 dataset(property.Layout_Fares_Foreclosure_v2) pForeclosure			= Property.File_Foreclosure_Base_v2
 	,boolean																		pShouldRecaculatePersist	= _Dataset().ShouldRecaculatePersist
 ) := 
 function

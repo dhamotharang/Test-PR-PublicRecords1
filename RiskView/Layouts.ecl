@@ -564,6 +564,7 @@ export layout_checkingindicators := record
   string3 CheckTimeOldest;
   string3 CheckTimeNewest;
   string2 CheckNegTimeOldest;
+  string2 CheckNegTimeNewest;
   string2 CheckNegRiskDecTimeNewest;
   string2 CheckNegPaidTimeNewest;
   string4 CheckCountTotal;
@@ -571,6 +572,17 @@ export layout_checkingindicators := record
   string7 CheckAmountTotalSinceNegPaid;
   string7 CheckAmountTotal03Month;
 end;
+
+export layout_FIS_custom_attributes := RECORD
+  STRING1 rv3ConfirmationSubjectFound;
+  STRING3 rv3AddrChangeCount60Month;
+  STRING3 rv3AddrChangeCount12Month;
+  STRING3 rv3AddrInputTimeOldest;
+  STRING3 rv3SourceNonDerogCount;
+  STRING3 rv3AssetPropCurrentCount;
+  STRING2 rv3SSNDeceased;
+  STRING2 rv3AssetIndex;
+END;
 
 export layout_riskview_attributes_5 := record
 	string3 Attribute_Index  := '0'; // for now, only 0 is valid attribute index, in the future we can default this.
@@ -763,8 +775,6 @@ export layout_riskview_attributes_5 := record
 	string3	PhoneInputSubjectCount	;
 	string2	PhoneInputMobile 	;
 	string1	AlertRegulatoryCondition	;
-  layout_checkingindicators;
-	Risk_Indicators.Layouts_Derog_Info.LNR_AttrIbutes;
 end;
 
 
@@ -863,6 +873,9 @@ export layout_riskview5 := record
 	string3 Custom5_reason5;
 	
 	layout_riskview_attributes_5;
+  layout_checkingindicators;
+  layout_FIS_custom_attributes;
+	Risk_Indicators.Layouts_Derog_Info.LNR_AttrIbutes;
 	
 	string4 Alert1;
 	string4 Alert2;
@@ -1031,6 +1044,9 @@ export attributes_internal_layout := record
 	unsigned seq;
 	unsigned did;
 	layout_riskview_attributes_5;
+  layout_checkingindicators;
+  layout_FIS_custom_attributes;
+  Risk_Indicators.Layouts_Derog_Info.LNR_AttrIbutes;
 	Risk_Indicators.Layouts_Derog_Info.LJ_Attributes;
 	Risk_Indicators.Layouts_Derog_Info.LJ_DataSets;
 end;
@@ -1132,7 +1148,7 @@ export layout_RV5capOneBatch_searchResults := record
 	string30  AcctNo;
 	string12  LexID;
 	layout_RV5capOneBatch_modelResults-seq;  //Seq was used in the service to join the model results back to attribute results.
-	layout_riskview_attributes_5 -Risk_Indicators.Layouts_Derog_Info.LNR_AttrIbutes; //CapOne is not running Juli so remove from output
+	layout_riskview_attributes_5; 
   layout_riskview5_alerts-ConsumerStatementText;
   STRING12 inquiry_lexid := '';
 end;

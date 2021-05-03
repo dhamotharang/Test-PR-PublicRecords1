@@ -6,12 +6,12 @@ persistPrefix := if (isFast,'property_fast','ln_property');
 
 // owners when using LN data
 fs0   := LN_PropertyV2_Fast.CleanSearch(false);
-fs1   := LN_PropertyV2_Fast.CleanSearch(true);
+fs1   := LN_PropertyV2_Fast.CleanSearch(true, true);
 
 fs		:= if(isFast,fs1,fs0);
-fa		:= if(isFast,LN_PropertyV2_Fast.Files.base.assessment,ln_propertyv2.File_Assessment);
-fd		:= if(isFast,LN_PropertyV2_Fast.Files.base.deed_mortg,ln_propertyv2.File_Deed);
-fafd	:= if(isFast,LN_PropertyV2_Fast.Files.base.addl_frs_d,ln_propertyv2.File_addl_fares_deed);
+fa		:= if(isFast,LN_PropertyV2_Fast.Files.basedelta.assessment,ln_propertyv2.File_Assessment);
+fd		:= if(isFast,LN_PropertyV2_Fast.Files.basedelta.deed_mortg,ln_propertyv2.File_Deed);
+fafd	:= if(isFast,LN_PropertyV2_Fast.Files.basedelta.addl_frs_d,ln_propertyv2.File_addl_fares_deed);
 
 all_prop_ddp := doxie_ln.Fn_ComputeOwnerForKeyv2(fs,fa,fd,fafd).records;
 

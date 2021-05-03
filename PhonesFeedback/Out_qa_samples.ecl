@@ -1,7 +1,7 @@
-export Out_qa_samples := function
+﻿export Out_qa_samples(string filedate) := function
 
-File_phonefeed_base := index(PhonesFeedback.Key_PhonesFeedback_phone,'~thor_data400::key::phonesfeedback::qa::phone');
-File_phonefeed_base_father := index(PhonesFeedback.Key_PhonesFeedback_phone,'~thor_data400::key::phonesfeedback::father::phone');
+File_phonefeed_base := index(PhonesFeedback.Key_PhonesFeedback_phone(),'~thor_data400::key::phonesfeedback::'+filedate+'::phone');
+File_phonefeed_base_father := index(PhonesFeedback.Key_PhonesFeedback_phone(),'~thor_data400::key::phonesfeedback::father::phone');
 
 File_phonefeed_base_dst := distribute(File_phonefeed_base,HASH32(phone_number));
 File_phonefeed_base_father_dst := distribute(File_phonefeed_base_father,HASH32(phone_number));

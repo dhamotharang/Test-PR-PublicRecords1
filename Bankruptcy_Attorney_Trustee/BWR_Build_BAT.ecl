@@ -9,7 +9,7 @@ DoBuild := Bankruptcy_Attorney_Trustee.Build_All(filedate);
 SampleRecs_Attorney := choosen(sort(Bankruptcy_Attorney_Trustee.Files.Attorneys_Base,record),1000);
 SampleRecs_Trustee := choosen(sort(Bankruptcy_Attorney_Trustee.Files.Trustees_Base,record),1000);
 				
-create_orbit_build:= Orbit3.Proc_Orbit3_CreateBuild_npf ('Bankruptcy Attorney Trustee',filedate);
+create_orbit_build:= Orbit3.Proc_Orbit3_CreateBuild('Bankruptcy Attorney Trustee',filedate,is_npf:=true);
 
 sequential(
 			DoBuild

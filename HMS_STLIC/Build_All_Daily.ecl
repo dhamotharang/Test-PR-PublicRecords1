@@ -1,4 +1,4 @@
-﻿IMPORT versioncontrol, _control, ut, tools,HMS_STLIC,STD;
+﻿IMPORT versioncontrol, _control, ut, tools,HMS_STLIC,STD, Orbit3;
 EXPORT Build_all_daily(string pversion, boolean pUseProd = false) := FUNCTION
 
 	spray_  		 := VersionControl.fSprayInputFiles(fSpray(pversion,pUseProd));
@@ -108,12 +108,13 @@ EXPORT Build_all_daily(string pversion, boolean pUseProd = false) := FUNCTION
 								FileServices.RemoveOwnedSubFiles('~thor400_data::temp_in::hms_stl::hms_npi',true),
 								FileServices.RemoveOwnedSubFiles('~thor400_data::temp_in::hms_stl::hms_phone',true),
 								FileServices.RemoveOwnedSubFiles('~thor400_data::temp_in::hms_stl::hms_specialty',true),
-								FileServices.RemoveOwnedSubFiles('~thor400_data::temp_in::hms_stl::hms_stliclookup',true),
+								FileServices.RemoveOwnedSubFiles('~thor400_data::from_alpha::hms_stl::hms_stliclookup',true),
 
 			
 					// ),
 					
 					FileServices.FinishSuperFileTransaction()
+					,Orbit3.proc_Orbit3_CreateBuild_AddItem('HMS State Licenses',pversion )
 						// End Archive sequential
 					): success(Send_Email(pversion,pUseProd).BuildSuccess), failure(send_email(pversion,pUseProd).BuildFailure
 

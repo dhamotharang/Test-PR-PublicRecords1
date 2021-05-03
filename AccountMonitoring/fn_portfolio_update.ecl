@@ -90,7 +90,7 @@ EXPORT fn_portfolio_update(UNSIGNED1 pseudo_environment,
 		
 		portfolio_update_with_DIDs := 
 			JOIN( 
-				   portfolio_update_for_new_entites, DISTRIBUTED(DID_values),
+				   portfolio_update_for_new_entites, DID_values,
 				   LEFT.seq = RIGHT.seq,
 				   TRANSFORM( layouts.DIDMetaRec,
 					           SELF.did := IF(LEFT.did = 0, RIGHT.did, LEFT.did),

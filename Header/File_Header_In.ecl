@@ -70,7 +70,7 @@ shared monthly_file1 := project(monthly_file,transform(header.layout_eq_src,self
 
 //EQ and EH (EQ history restored) are concatenated in EQ source key but if both sources are sequenced independent of one another,
 //two entities will endup with the same uid causing queries to randomly display the wrong one - bug 80773
-max_uid:=max(eq_hist.file.base,uid);
+max_uid:=max(eq_hist.file.base,uid);  //32318498250
 shared seed:=if(pFastHeader,999999999999,max_uid);
 
 src_rec:=header.layouts_SeqdSrc.EQ_src_rec;

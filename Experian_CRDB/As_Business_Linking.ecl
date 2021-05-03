@@ -60,9 +60,8 @@ EXPORT As_Business_Linking ( boolean pUseOtherEnviron 		= _Constants().IsDatalan
 				self.dppa						             := false;
 				string temp_employees            := if(trim(l.estimated_number_of_employees) != '0',trim(l.estimated_number_of_employees),'');
 				string sales_sign                := if(trim(l.estimated_annual_sales_amount_sign) = '-',trim(l.estimated_annual_sales_amount_sign),'');
-		    string temp_sales                := if(trim(l.estimated_annual_sales_amount) != '' AND trim(l.estimated_annual_sales_amount) != '0',sales_sign +(STRING)((INTEGER)trim(l.estimated_annual_sales_amount) * 1000),'');
-				self.employee_count_local_raw    := if(temp_employees != '0', temp_employees, '');
-				self.revenue_local_raw           := if(temp_sales != '0', temp_sales, '');
+		    self.employee_count_local_raw    := if(temp_employees != '0', temp_employees, '');
+				self.revenue_local_raw           := if((STRING)((INTEGER)(l.estimated_annual_sales_amount)) != '0',sales_sign + trim(l.estimated_annual_sales_amount),'');
 				self 							   						 := l;
 				self 							   						 := [];
 		end;											

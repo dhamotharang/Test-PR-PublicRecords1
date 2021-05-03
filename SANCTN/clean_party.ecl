@@ -225,6 +225,7 @@ layout_party_clean 	clean_SANCTN_party(j_party input) := TRANSFORM
    self.err_stat 			:= CleanAddress[179..182];
 
    self := input;
+   self:=[];
    
 end;
 

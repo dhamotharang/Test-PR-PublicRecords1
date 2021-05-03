@@ -1,13 +1,13 @@
-﻿import	STD, Address, Nid, ut, _validate, header, did_add;
+﻿import	STD, Address, Nid, ut, _validate;
 
 		integer YYYYMMDDToDays(string pInput) := 
 									 (((integer)(pInput[1..4])*365) + ((integer)(pInput[5..6])*30)+ ((integer)(pInput[7..8])));
 
 
-EXPORT proc_CleanClients(dataset(layouts2.rClientEx) basein) := FUNCTION
+EXPORT proc_CleanClients(dataset(layouts2.rClientEx) clients) := FUNCTION
 
 
-	base := PROJECT(basein, TRANSFORM(layouts2.rClientEx,
+	base := PROJECT(DISTRIBUTE(clients, hash32(clientid,caseid)), TRANSFORM(layouts2.rClientEx,
 									SELF.Prepped_Name := Address.NameFromComponents(
 										StandardizeName(left.FirstName)
 										,StandardizeName(left.MiddleName)
@@ -34,7 +34,7 @@ EXPORT proc_CleanClients(dataset(layouts2.rClientEx) basein) := FUNCTION
 							));
 
 //<tkirk-start/////////////////////////////////////////////////////////
-	UniqueNames := dedup(table(base,{Gender,Prepped_name,prefname
+	UniqueNames := dedup(table(base,{Prepped_name,Gender,prefname
 										,title,fname,mname,lname,name_suffix,FirstName,MiddleName,LastName}),
 										Prepped_name,Gender,all);
 ///////////////////////////////////////////////////////////
@@ -128,8 +128,8 @@ end;
 	end;
 	UniqueNamesClean:=nofold(project(UniqueNamesClean1,tCleanNamesNoLast(left)));
 ////////////////////////////////////////////////////
-	NamesAppended:=join(distribute(base, hash64(Prepped_name))
-						,distribute(UniqueNamesClean,   hash64(Prepped_name))
+	NamesAppended:=join(distribute(base, hash32(Prepped_name))
+						,distribute(UniqueNamesClean,   hash32(Prepped_name))
 								,   
 								left.Prepped_name=right.Prepped_name
 								and left.Gender=right.Gender

@@ -16,7 +16,8 @@ fcra.Layout_Override_Gong proj_recs(ds l) := transform
 	self := l;
 end;
 
-kf := project(ds,proj_recs(left));
+//DF-28168 - filter out records with blank flag_file_id
+kf := project(ds(flag_file_id<>''),proj_recs(left));
 
 //DF-22458 FCRA Consumer Data Field Deprecation - thor_data400::key::override::fcra::gong::qa::ffid														
 ut.MAC_CLEAR_FIELDS(kf, kf_cleared, Gong_Neustar.Constants.fields_to_clear);

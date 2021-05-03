@@ -1,4 +1,4 @@
-// NCS0841 / North Carolina Appraisal Board	/ Real Estate Appraisers //
+﻿// NCS0841 / North Carolina Appraisal Board	/ Real Estate Appraisers //
 
 export layout_NCS0841 := MODULE
 	export raw := RECORD

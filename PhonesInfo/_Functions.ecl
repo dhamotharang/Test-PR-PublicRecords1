@@ -144,23 +144,7 @@ EXPORT _Functions := MODULE
 			string  ref_operator_fullname;
 			string  ref_name;
 		end;
-		/*
-		cmLayout compFM(srt_main l, srt_icon r):= transform
-			self.ic_spid 								:= l.spid;
-			self.ic_operator_fullname 	:= l.operator_full_name;
-			self.ic_name								:= PhonesInfo._Functions.fn_standardName(l.operator_full_name);
-			self.ref_spid								:= r.spid;
-			self.ref_operator_fullname 	:= r.operator_fullname;
-			self.ref_name								:= PhonesInfo._Functions.fn_standardName(r.operator_fullname);
-		end;
 
-		joinRecM 	:= join(srt_main, srt_icon,
-											left.spid = right.spid and
-											PhonesInfo._Functions.fn_standardName(left.operator_full_name) = PhonesInfo._Functions.fn_standardName(right.operator_fullname),
-											compFM(left, right), local);
-
-		dedupRec1 := dedup(sort(distribute(joinRecM, hash(ic_spid)), record, local), record, local);
-		*/
 		cmLayout compFL(srt_icon l, srt_main r):= transform
 			self.ic_spid 								:= l.spid;
 			self.ic_operator_fullname 	:= l.operator_fullname;
@@ -267,9 +251,67 @@ EXPORT _Functions := MODULE
 	END;
 	
 	/////////////////////////////////////////////////////////////////////////////////////
-	//LERG6//////////////////////////////////////////////////////////////////////////////	
+	//CARRIER REFERENCE//////////////////////////////////////////////////////////////////	
 	/////////////////////////////////////////////////////////////////////////////////////
 	
+	//Determine Canadian Territory
+	EXPORT fn_isCanTerr(string terr):= FUNCTION
+	
+		setCanTerr			:=	[	'AB','BC','MB','NB','NL','NT','NS','NU','ON','PE',
+													'QC','SK','YT' ];
+	
+		isTerr					:= if(terr in setCanTerr,
+													TRUE,
+													FALSE);
+		
+		return isTerr;
+	
+	END;
+	
+	//Determine US State/Territory
+	EXPORT fn_isUSStateTerr(string state):= FUNCTION
+	
+		setUSStates			:= [ 'AL','AK','AZ','AR','CA','CO','CT','DE','DC','FL',
+												 'GA','HI','ID','IL','IN','IA','KS','KY','LA','ME',
+												 'MD','MA','MI','MN','MS','MO','MT','NE','NV','NH',
+												 'NJ','NM','NY','NC','ND','OH','OK','OR','PA','RI',
+												 'SC','SD','TN','TX','UT','VT','VA','WA','WV','WI',
+												 'WY','US' ];
+		
+		setUSTerr				:= [ 'AS','FM','GU','MH','MP','NN','PW','PR','VI' ];
+		
+		setUS						:= setUSStates + setUSTerr;
+	
+		isState					:= if(state in setUS,
+													TRUE,
+													FALSE);
+		
+		return isState;
+	
+	END;
+	
+	EXPORT fn_maxHistFileDt(string oFlag):= function
+
+		dtLayout := record
+			string filename;
+		end;
+
+		ds 				:= project(PhonesInfo.File_Lerg.Lerg1Hist, dtLayout);						//Lerg1 History File
+
+		dtLayout rTr(ds l):= transform
+			trimDate 			:= trim(l.filename, left, right);
+			parseDate			:= trimDate[length(trimDate)-7..];
+			fdate					:= parseDate;
+			self.filename := fDate;
+		end;
+
+		findDate	:= project(ds, rTr(left));
+		findMax		:=(string)max(findDate(std.date.isValidDate((unsigned)(filename[1..8]))), (unsigned)filename); //Pull Highest Filedate
+
+		return findMax;
+
+	END;
+
 	EXPORT fn_maxLerg6FileDt(dataset(dx_PhonesInfo.Layouts.lerg6Main) ds):= function
 
 		dtLayout := record

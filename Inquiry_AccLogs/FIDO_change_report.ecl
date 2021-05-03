@@ -1,4 +1,4 @@
-Import wk_ut,_Control;
+﻿Import wk_ut,_Control,INQL_V2;
 EXPORT FIDO_change_report := Module;
  
 ECL := 	
@@ -35,6 +35,6 @@ ECL :=
 				'SendFIDOchangesRep;';
 				
 Thor:= 'thor400_44';
-EXPORT proc_FIDO_chg_report := wk_ut.CreateWuid(ECL,THOR,_Control.IPAddress.prod_thor_esp);
+EXPORT proc_FIDO_chg_report := wk_ut.CreateWuid(ECL,THOR,INQL_v2._Constants.PROD_ESP);
 
 End;

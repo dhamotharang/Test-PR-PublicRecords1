@@ -57,10 +57,10 @@ EXPORT Layouts := module
 			unsigned8		source_rid;
 			unsigned8		header_rid;
 			string1 		delete_flag;
-			unsigned8 	did;
-       integer2   xlink_weight;          //Insurance added field due to CPPA - DF-26077
-       unsigned2  xlink_score;           //Insurance added field due to CPPA - DF-26077
-       integer1   xlink_distance;        //Insurance added field due to CPPA - DF-26077
+			unsigned6   did;                   //We are now receiving "did" as unsigned6 - DF-27723
+			integer2    xlink_weight;          //Insurance added field due to CPPA - DF-26077
+			unsigned2   xlink_score;           //Insurance added field due to CPPA - DF-26077
+			integer1    xlink_distance;        //Insurance added field due to CPPA - DF-26077
 			unsigned6 	dotid;
 			unsigned6 	empid;
 			unsigned6 	powid;
@@ -68,12 +68,12 @@ EXPORT Layouts := module
 			unsigned6 	seleid;
 			unsigned6 	orgid;
 			unsigned6 	ultid;
-       unsigned4  global_sid;            //Insurance added field due to CPPA - DF-26077
-       unsigned8  record_sid;            //Insurance added field due to CPPA - DF-26077
-       unsigned8  aid;                   //Insurance added field due to CPPA - DF-26077
-       unsigned2  dali;                  //Insurance added field due to CPPA - DF-26077
-       unsigned6  locid;                 //Insurance added field due to CPPA - DF-26077
-       unsigned8  nid;                   //Insurance added field due to CPPA - DF-26077
+      unsigned4   global_sid;            //Insurance added field due to CPPA - DF-26077
+      unsigned8   record_sid;            //Insurance added field due to CPPA - DF-26077
+      unsigned8   aid;                   //Insurance added field due to CPPA - DF-26077
+      unsigned2   dali;                  //Insurance added field due to CPPA - DF-26077
+      unsigned6   locid;                 //Insurance added field due to CPPA - DF-26077
+      unsigned8   nid;                   //Insurance added field due to CPPA - DF-26077
 		end;
 		
 		export sprayed_slim := record

@@ -21,7 +21,6 @@ EXPORT Ingest(BOOLEAN incremental=FALSE
   SHARED Base0 := PROJECT(dsBase,TRANSFORM(WithRT,SELF.__Tpe:=RecordType.Old,SELF:=LEFT));
  
   SHARED WithRT MergeData(WithRT le, WithRT ri) := TRANSFORM // Pick the data for the new record
-    SELF.global_sid := ri.global_sid; // Derived(NEW)
     SELF.process_date := MAP ( le.__Tpe = 0 => ri.process_date,
                      ri.__Tpe = 0 => le.process_date,
                      (UNSIGNED)le.process_date < (UNSIGNED)ri.process_date => ri.process_date, // Want the highest value
@@ -43,10 +42,6 @@ EXPORT Ingest(BOOLEAN incremental=FALSE
                      (UNSIGNED)le.date_vendor_last_reported < (UNSIGNED)ri.date_vendor_last_reported => ri.date_vendor_last_reported, // Want the highest value
                      le.date_vendor_last_reported);
     SELF.ca_id := ri.ca_id; // Derived(NEW)
-    SELF.mls_geo_full_address := ri.mls_geo_full_address; // Derived(NEW)
-    SELF.mls_geo_city := ri.mls_geo_city; // Derived(NEW)
-    SELF.mls_geo_state := ri.mls_geo_state; // Derived(NEW)
-    SELF.mls_geo_zip_code := ri.mls_geo_zip_code; // Derived(NEW)
     SELF.ca_assessed_improvements := ri.ca_assessed_improvements; // Derived(NEW)
     SELF.ca_assessed_land := ri.ca_assessed_land; // Derived(NEW)
     SELF.ca_assessed_val := ri.ca_assessed_val; // Derived(NEW)
@@ -68,7 +63,6 @@ EXPORT Ingest(BOOLEAN incremental=FALSE
     SELF.ca_sold_date_1 := ri.ca_sold_date_1; // Derived(NEW)
     SELF.ca_sold_price_1 := ri.ca_sold_price_1; // Derived(NEW)
     SELF.mls_air_conditioning_type := ri.mls_air_conditioning_type; // Derived(NEW)
-    SELF.mls_air_conditioning_code := ri.mls_air_conditioning_code; // Derived(NEW)
     SELF.mls_apn := ri.mls_apn; // Derived(NEW)
     SELF.mls_bath_total := ri.mls_bath_total; // Derived(NEW)
     SELF.mls_baths_full := ri.mls_baths_full; // Derived(NEW)
@@ -77,20 +71,15 @@ EXPORT Ingest(BOOLEAN incremental=FALSE
     SELF.mls_block_number := ri.mls_block_number; // Derived(NEW)
     SELF.mls_building_square_footage := ri.mls_building_square_footage; // Derived(NEW)
     SELF.mls_construction_type := ri.mls_construction_type; // Derived(NEW)
-    SELF.mls_construction_code := ri.mls_construction_code; // Derived(NEW)
     SELF.mls_dom := ri.mls_dom; // Derived(NEW)
     SELF.mls_exterior_wall_type := ri.mls_exterior_wall_type; // Derived(NEW)
-    SELF.mls_exterior_wall_code := ri.mls_exterior_wall_code; // Derived(NEW)
     SELF.mls_fireplace_type := ri.mls_fireplace_type; // Derived(NEW)
-    SELF.mls_fireplace_code := ri.mls_fireplace_code; // Derived(NEW)
     SELF.mls_fireplace_yn := ri.mls_fireplace_yn; // Derived(NEW)
     SELF.mls_first_floor_square_footage := ri.mls_first_floor_square_footage; // Derived(NEW)
     SELF.mls_flood_zone_panel := ri.mls_flood_zone_panel; // Derived(NEW)
     SELF.mls_floor_type := ri.mls_floor_type; // Derived(NEW)
-    SELF.mls_floor_code := ri.mls_floor_code; // Derived(NEW)
     SELF.mls_foundation := ri.mls_foundation; // Derived(NEW)
     SELF.mls_fuel_type := ri.mls_fuel_type; // Derived(NEW)
-    SELF.mls_fuel_code := ri.mls_fuel_code; // Derived(NEW)
     SELF.mls_garage := ri.mls_garage; // Derived(NEW)
     SELF.mls_geo_county := ri.mls_geo_county; // Derived(NEW)
     SELF.mls_geo_fips := ri.mls_geo_fips; // Derived(NEW)
@@ -117,14 +106,11 @@ EXPORT Ingest(BOOLEAN incremental=FALSE
     SELF.mls_number_of_rooms := ri.mls_number_of_rooms; // Derived(NEW)
     SELF.mls_number_of_units := ri.mls_number_of_units; // Derived(NEW)
     SELF.mls_parking_type := ri.mls_parking_type; // Derived(NEW)
-    SELF.mls_parking_code := ri.mls_parking_code; // Derived(NEW)
     SELF.mls_pool_type := ri.mls_pool_type; // Derived(NEW)
-    SELF.mls_pool_code := ri.mls_pool_code; // Derived(NEW)
     SELF.mls_pool_yn := ri.mls_pool_yn; // Derived(NEW)
     SELF.mls_prop_style := ri.mls_prop_style; // Derived(NEW)
     SELF.mls_property_condition := ri.mls_property_condition; // Derived(NEW)
     SELF.mls_property_type := ri.mls_property_type; // Derived(NEW)
-    SELF.mls_property_code := ri.mls_property_code; // Derived(NEW)
     SELF.mls_roof_cover := ri.mls_roof_cover; // Derived(NEW)
     SELF.mls_sale_date_pr := ri.mls_sale_date_pr; // Derived(NEW)
     SELF.mls_sale_price_pr := ri.mls_sale_price_pr; // Derived(NEW)
@@ -140,6 +126,17 @@ EXPORT Ingest(BOOLEAN incremental=FALSE
     SELF.mls_zoning := ri.mls_zoning; // Derived(NEW)
     SELF.mls_remarks := ri.mls_remarks; // Derived(NEW)
     SELF.rawaid := ri.rawaid; // Derived(NEW)
+    SELF.prim_range := ri.prim_range; // Derived(NEW)
+    SELF.predir := ri.predir; // Derived(NEW)
+    SELF.prim_name := ri.prim_name; // Derived(NEW)
+    SELF.addr_suffix := ri.addr_suffix; // Derived(NEW)
+    SELF.postdir := ri.postdir; // Derived(NEW)
+    SELF.unit_desig := ri.unit_desig; // Derived(NEW)
+    SELF.sec_range := ri.sec_range; // Derived(NEW)
+    SELF.p_city_name := ri.p_city_name; // Derived(NEW)
+    SELF.v_city_name := ri.v_city_name; // Derived(NEW)
+    SELF.st := ri.st; // Derived(NEW)
+    SELF.zip := ri.zip; // Derived(NEW)
     SELF.zip4 := ri.zip4; // Derived(NEW)
     SELF.cart := ri.cart; // Derived(NEW)
     SELF.cr_sort_sz := ri.cr_sort_sz; // Derived(NEW)
@@ -165,28 +162,28 @@ EXPORT Ingest(BOOLEAN incremental=FALSE
   END;
  
   // Ingest Files: Rollup to get unique new records
-  DistIngest0 := DISTRIBUTE(FilesToIngest0, HASH32(prim_range,predir,prim_name,addr_suffix,postdir
-             ,unit_desig,sec_range,p_city_name,v_city_name,st,zip));
-  SortIngest0 := SORT(DistIngest0,prim_range,predir,prim_name,addr_suffix,postdir
-             ,unit_desig,sec_range,p_city_name,v_city_name,st,zip, __Tpe, record_sid, LOCAL);
-  GroupIngest0 := GROUP(SortIngest0,prim_range,predir,prim_name,addr_suffix,postdir
-             ,unit_desig,sec_range,p_city_name,v_city_name,st,zip, LOCAL, ORDERED, STABLE);
+  DistIngest0 := DISTRIBUTE(FilesToIngest0, HASH32(mls_geo_full_address,mls_geo_city,mls_geo_state
+             ,mls_geo_zip_code));
+  SortIngest0 := SORT(DistIngest0,mls_geo_full_address,mls_geo_city,mls_geo_state
+             ,mls_geo_zip_code, __Tpe, rid, LOCAL);
+  GroupIngest0 := GROUP(SortIngest0,mls_geo_full_address,mls_geo_city,mls_geo_state
+             ,mls_geo_zip_code, LOCAL, ORDERED, STABLE);
   SHARED AllIngestRecs0 := UNGROUP(ROLLUP(GroupIngest0,TRUE,MergeData(LEFT,RIGHT)));
  
   // Existing Base: combine delta with base file
-  DistBase0 := DISTRIBUTE(Base0+Delta0, HASH32(prim_range,predir,prim_name,addr_suffix,postdir
-             ,unit_desig,sec_range,p_city_name,v_city_name,st,zip));
-  SortBase0 := SORT(DistBase0,prim_range,predir,prim_name,addr_suffix,postdir
-             ,unit_desig,sec_range,p_city_name,v_city_name,st,zip, __Tpe, record_sid, LOCAL);
-  GroupBase0 := GROUP(SortBase0,prim_range,predir,prim_name,addr_suffix,postdir
-             ,unit_desig,sec_range,p_city_name,v_city_name,st,zip, LOCAL, ORDERED, STABLE);
+  DistBase0 := DISTRIBUTE(Base0+Delta0, HASH32(mls_geo_full_address,mls_geo_city,mls_geo_state
+             ,mls_geo_zip_code));
+  SortBase0 := SORT(DistBase0,mls_geo_full_address,mls_geo_city,mls_geo_state
+             ,mls_geo_zip_code, __Tpe, rid, LOCAL);
+  GroupBase0 := GROUP(SortBase0,mls_geo_full_address,mls_geo_city,mls_geo_state
+             ,mls_geo_zip_code, LOCAL, ORDERED, STABLE);
   SHARED AllBaseRecs0 := UNGROUP(ROLLUP(GroupBase0,TRUE,MergeData(LEFT,RIGHT)));
  
   // Everything: combine ingest and base recs
-  Sort0 := SORT(AllBaseRecs0+AllIngestRecs0,prim_range,predir,prim_name,addr_suffix,postdir
-             ,unit_desig,sec_range,p_city_name,v_city_name,st,zip, __Tpe,record_sid,LOCAL);
-  Group0 := GROUP(Sort0,prim_range,predir,prim_name,addr_suffix,postdir
-             ,unit_desig,sec_range,p_city_name,v_city_name,st,zip,LOCAL, ORDERED, STABLE);
+  Sort0 := SORT(AllBaseRecs0+AllIngestRecs0,mls_geo_full_address,mls_geo_city,mls_geo_state
+             ,mls_geo_zip_code, __Tpe,rid,LOCAL);
+  Group0 := GROUP(Sort0,mls_geo_full_address,mls_geo_city,mls_geo_state
+             ,mls_geo_zip_code,LOCAL, ORDERED, STABLE);
   SHARED AllRecs0 := UNGROUP(ROLLUP(Group0,TRUE,MergeData(LEFT,RIGHT)));
  
   //Now need to update 'rid' numbers on new records
@@ -194,13 +191,13 @@ EXPORT Ingest(BOOLEAN incremental=FALSE
   // Do not use PROJECT,COUNTER because it is very slow if any of the fields are not fixed length
   NR := AllRecs0(__Tpe=RecordType.New);
   ORe := AllRecs0(__Tpe<>RecordType.New);
-  PrevBase := MAX(ORe,record_sid);
+  PrevBase := MAX(ORe,rid);
   WithRT AddNewRid(WithRT le, WithRT ri) := TRANSFORM
-    SELF.record_sid := IF ( le.record_sid=0, PrevBase+1+thorlib.node(), le.record_sid+thorlib.nodes() );
+    SELF.rid := IF ( le.rid=0, PrevBase+1+thorlib.node(), le.rid+thorlib.nodes() );
     SELF := ri;
   END;
-  NR1 := ITERATE(NR(record_sid=0),AddNewRid(LEFT,RIGHT),LOCAL);
-  SHARED AllRecs := ORe+NR1+NR(record_sid<>0) : PERSIST('~temp::CollateralAnalytics::Ingest_Cache',EXPIRE(CollateralAnalytics.Config.PersistExpire));
+  NR1 := ITERATE(NR(rid=0),AddNewRid(LEFT,RIGHT),LOCAL);
+  SHARED AllRecs := ORe+NR1+NR(rid<>0) : PERSIST('~temp::CollateralAnalytics::Ingest_Cache',EXPIRE(CollateralAnalytics.Config.PersistExpire));
   SHARED UpdateStatsFull := SORT(TABLE(AllRecs, {__Tpe,SALT311.StrType INGESTSTATUS:=RTToText(AllRecs.__Tpe),UNSIGNED Cnt:=COUNT(GROUP)}, __Tpe, FEW),__Tpe, FEW);
   SHARED UpdateStatsInc := SORT(UpdateStatsFull(__Tpe = RecordType.New), __Tpe, INGESTSTATUS, FEW);
   EXPORT UpdateStats := IF(incremental, UpdateStatsInc, UpdateStatsFull);
@@ -217,8 +214,8 @@ EXPORT Ingest(BOOLEAN incremental=FALSE
   EXPORT AllRecords := IF(incremental, NewRecords, PROJECT(AllRecs, NoFlagsRec));
   EXPORT AllRecords_NoTag := PROJECT(AllRecords,Layout_CollateralAnalytics); // Records in 'pure' format
  
-f := TABLE(dsBase,{record_sid}) : GLOBAL;
-rcid_clusters := SALT311.MOD_ClusterStats.Counts(f,record_sid);
+f := TABLE(dsBase,{rid}) : GLOBAL;
+rcid_clusters := SALT311.MOD_ClusterStats.Counts(f,rid);
 DuplicateRids0 := COUNT(dsBase) - SUM(rcid_clusters,NumberOfClusters); // Should be zero
 d := DATASET([{DuplicateRids0}],{UNSIGNED2 DuplicateRids0});
 EXPORT ValidityStats := OUTPUT(d,NAMED('ValidityStatistics'));

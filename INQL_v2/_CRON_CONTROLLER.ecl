@@ -33,8 +33,9 @@ _process(string prProcess ,boolean prFCRA, boolean prDaily) := Function
 		+');';
 
 	_cronWhen_ECL := Case( prProcess, 
-												'PRODR3 EXTRACT' => 	':WHEN(CRON(\'55 12 * * *\'))\n' 
-												,			               	':WHEN(Inql_V2._CRON_ECL(\'' + prProcess + '\',' + _prFCRA + ',' + _prDaily + ').EVENT_NAME)\n'
+												'PRODR3 EXTRACT'    => 	':WHEN(CRON(\'55 12 * * *\'))\n',
+												'FILES CONSOLIDATE' => 	':WHEN(CRON(\'00 06 * * 1\'))\n' 
+												,			                 	':WHEN(Inql_V2._CRON_ECL(\'' + prProcess + '\',' + _prFCRA + ',' + _prDaily + ').EVENT_NAME)\n'
 												);
 
 	schedule_ECL       :=  STD.Str.FindReplace( _createWUID_ECL, 'CRON_WHEN', _cronWhen_ECL); 
@@ -51,14 +52,17 @@ NonFCRAProcesses      := Sequential(_process('FILES SPRAY', false,true)
 																	 ,_process('BASE PREP', false,true)   // Daily Base Pre-process
 																	 ,_process('BASE POST', false,true)   // Daily Base post-process
 																	 ,_process('BASE BUILD', false,false) // Weekly Base
-																	 ,_process('BATCHR3 BUILD', false,true)																	 
+																	 ,_process('BATCHR3 BUILD', false,true)				
+																	 ,_process('FILES CONSOLIDATE', false,true)	
 															 );
 
 FCRAProcesses      		:= Sequential(_process('FILES SPRAY', true,true)
 																	 ,_process('FILES SCRUB', true,true)
 																	 ,_process('BASE PREP', true,true)   // Daily Base pre-process
 																	 ,_process('BASE POST', true,true)   // Daily Base post-process																	 
-																	 ,_process('BATCHR3 BUILD', true,true)																	 
+																	 ,_process('BATCHR3 BUILD', true,true)		
+ 																	 ,_process('FILES CONSOLIDATE', true,true)	
+
 															 );
 															 
 ProdProcesses      		:= Sequential(
@@ -71,6 +75,7 @@ ProdProcesses      		:= Sequential(
 																	 ,_process('KEYS BUILD', false,false) // NFCRA Weekly Keys 
 																	 ,_process('STATS REPORTS', false,false) // NFCRA Weekly Stats 																	 
 																	 ,_process('STATS REPORTS', true,false)  // FCRA Weekly Stats		
+																	 ,_process('FIDO CHANGE REPORT', false,true) // FIDO Change Daily Report
 																	 );
 
 Controller        		:= Case(_Control.ThisEnvironment.ThisDaliIp 

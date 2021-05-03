@@ -1,4 +1,4 @@
-import Text_Search,Liensv2,header,Roxiekeybuild;
+﻿import Text_Search,Liensv2,header,Roxiekeybuild;
 
 export bwr_build_watercraft(string filedate) := function
 
@@ -51,9 +51,9 @@ Roxiekeybuild.Mac_SK_BuildProcess_v2_local(uidkey,
 // Return value
 retval := sequential 
 							(
-							parallel(Text_Search.Build_From_DocSeg_Records(dist_ret,info),
-							uid_key),
-							Text_Search.Boolean_Move_To_QA(suidkey,luidkey),
+							Text_Search.Build_From_DocSeg_Records(dist_ret,info),
+							//uid_key,
+							//Text_Search.Boolean_Move_To_QA(suidkey,luidkey),
 							fileservices.deletelogicalfile('~thor_data400::persist::watercraft::boolean')
 							);
 							

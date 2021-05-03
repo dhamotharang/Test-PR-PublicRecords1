@@ -1,5 +1,3 @@
-import	Codes,PropertyCharacteristics;
-
 export	Populate_Default_Data	:=
 module
 	
@@ -538,4 +536,386 @@ pOutDataset := %dDefault%;
 	
 	endmacro;
 	
+export	Mac_Populate_Attribute_Default_Data_F_and_G(pInDataset,pOutDataset)	:=
+	macro
+	#uniquename(dAttributeDefault_fips)
+	%dAttributeDefault_fips%  := PROJECT(PropertyFieldFillinByLA2.file_base,
+																					TRANSFORM(recordof(PropertyFieldFillinByLA2.file_base),
+																					fips_state := codes.st2FipsCode(left.st);
+																					self.fips_county	:= fips_state;
+																					SELF := LEFT));
+	#uniquename(dAttributeDefault)
+		// Dedup the dataset to make sure that we have condense dataset for a given fipscode, census tract and zipcode
+		%dAttributeDefault%	:=	dedup(sort(distribute(%dAttributeDefault_fips%,hash(prim_range, prim_name, sec_range, zip, addr_suffix, predir, postdir, geo_blk)),
+																				prim_range, prim_name, sec_range, zip, addr_suffix, predir, postdir, geo_blk,local),
+																					prim_range, prim_name, sec_range, zip, addr_suffix, predir, postdir, geo_blk, local 
+																				);
+
+// Append sequence number
+// #uniquename(dAttributeDefault)
+// ut.MAC_Sequence_Records(pInDataset,property_rid,dPropertySeqNum);																				
+																				
+	#uniquename(tAttributeDefault)
+	// Slim down the layout to keep only fields required for field fill-in
+rSlimFillInFields_layout	:=
+record
+	pInDataset.property_rid;
+	pInDataset.prim_range;
+	pInDataset.predir;
+	pInDataset.prim_name;
+	pInDataset.addr_suffix;
+	pInDataset.postdir;
+	pInDataset.unit_desig;
+	pInDataset.sec_range;
+	pInDataset.p_city_name;
+	pInDataset.v_city_name;
+	pInDataset.st;
+	pInDataset.zip;
+	pInDataset.zip4;
+	pInDataset.county;
+	pInDataset.geo_blk;
+	
+	pInDataset.no_of_baths;
+	pInDataset.src_no_of_baths;
+	
+	pInDataset.no_of_bedrooms;
+	pInDataset.src_no_of_bedrooms;
+	
+	pInDataset.no_of_stories;
+	pInDataset.src_no_of_stories;
+	
+	pInDataset.no_of_fireplaces;
+	pInDataset.src_no_of_fireplaces;
+	
+	pInDataset.no_of_rooms;
+	pInDataset.src_no_of_rooms;
+	
+	pInDataset.garage_square_footage;
+	pInDataset.src_garage_square_footage;
+	
+	pInDataset.building_square_footage;
+	pInDataset.src_building_square_footage;
+	
+	pInDataset.total_assessed_value;
+	pInDataset.src_total_assessed_value;
+	
+	pInDataset.year_built;
+	pInDataset.src_year_built;
+
+	pInDataset.air_conditioning_type;
+	pInDataset.src_air_conditioning_type;
+	
+	pInDataset.heating;
+	pInDataset.src_heating;
+	
+	pInDataset.exterior_wall;
+	pInDataset.src_exterior_wall;
+	
+	pInDataset.construction_type;
+	pInDataset.src_construction_type;
+	
+	pInDataset.floor_type;
+	pInDataset.src_floor_type;
+	
+	pInDataset.roof_cover;
+	pInDataset.src_roof_cover;
+	
+	pInDataset.foundation;
+	pInDataset.src_foundation;
+	
+	pInDataset.garage;
+	pInDataset.src_garage;
+
+/*	Futute Phase		
+	pInDataset.basement_square_footage;
+	pInDataset.src_basement_square_footage;
+	
+	pInDataset.basement_finish;
+	pInDataset.src_basement_finish;
+
+	pInDataset.fuel_type;
+	pInDataset.src_fuel_type;	
+	
+	dPropertySeqNum.sewer;
+	dPropertySeqNum.src_sewer;
+	
+	dPropertySeqNum.water;
+	dPropertySeqNum.src_water;
+	
+	dPropertySeqNum.pool_type;
+	dPropertySeqNumt.src_pool_type;
+	
+	pInDataset.style_type;
+	dPropertySeqNum.src_style_type;
+	
+*/	
+end;
+
+// dLNslimFillInFields	:=	project(pInDataset,rSlimFillInFields_layout);	
+	
+PropertyCharacteristics.Layouts.TempBase	%tAttributeDefault%(pInDataset le, %dAttributeDefault%	ri)	:=
+		transform
+		  string vBaths  					:= (string) PropertyCharacteristics.Functions.round2decimal(ri.baths);
+			string vStories 				:= (string) PropertyCharacteristics.Functions.round2decimal(ri.stories);
+			string vBedrooms				:= (string)	ri.bedrooms;
+			string vRooms						:= (string)	ri.rooms;
+			string vBuilding_sqft		:= (string) ri.buildingarea;
+			string vAssessedAmount	:= (string) ri.assessedAmount;
+			string vFireplaces			:= (string) ri.Fireplaces;
+			string vGarage_SqFt 		:= (string) ri.garage_sqft;
+			// string vBasement_SqFt 	:= (string) ri.basement_sqft;
+			
+			vCurrentYear   					:= (integer)ut.getdate[1..4] + 1;
+			vYearBuilt 							:= if(ri.BuildingAge != 0,
+																			(string) (vCurrentYear - ri.buildingAge),
+																			 ''
+																		); 																						
+			
+		  self.no_of_baths					:=	if(trim(le.no_of_baths,left,right)=	'',
+																					if(	PropertyCharacteristics.Functions.fn_remove_zeroes(vBaths) != '',
+																									vBaths,	''
+																									),
+																			le.no_of_baths
+																		);
+																		
+			self.src_no_of_baths			:=	if(	le.src_no_of_baths	!=	'',	le.src_no_of_baths,
+																			if(self.no_of_baths	!=	'','DEFLT','')
+																		);
+																		
+			self.no_of_bedrooms				:=	if(	trim(le.no_of_bedrooms,left,right)	=	'',
+																			if(	PropertyCharacteristics.Functions.fn_remove_zeroes(vBedrooms)	!=	'',
+																						vBedrooms,''
+																						),
+																			le.no_of_bedrooms
+																		);
+																		
+			self.src_no_of_bedrooms		:=	if(	le.src_no_of_bedrooms	!=	'', le.src_no_of_bedrooms,
+																			if(self.no_of_bedrooms	!=	'','DEFLT','')
+																		);
+			self.no_of_stories				:=	if(	trim(le.no_of_stories,left,right)	=	'',
+																			if(	PropertyCharacteristics.Functions.fn_remove_zeroes(vStories)	!=	'',
+																						vStories, ''
+																						),
+																			le.no_of_stories
+																		);
+																		
+			self.src_no_of_stories		:=	if(	le.src_no_of_stories	!=	'',	le.src_no_of_stories,
+																			if(self.no_of_stories	!=	'','DEFLT','')
+																		);
+			self.no_of_fireplaces			:=	if(	trim(le.no_of_fireplaces,left,right)	=	'',
+																				if( PropertyCharacteristics.Functions.fn_remove_zeroes(vFireplaces)	!=	'',
+																							vFireplaces, ''
+																					),
+																			le.no_of_fireplaces
+																		);
+    		
+			self.src_no_of_fireplaces	:=	if(	le.src_no_of_fireplaces	!=	'',	le.src_no_of_fireplaces,
+																			if(self.no_of_fireplaces	!=	'','DEFLT','')
+																		);
+
+			self.no_of_rooms					:= if(trim(le.no_of_rooms,left,right)= '',
+																			if(PropertyCharacteristics.Functions.fn_remove_zeroes(vRooms) != '',
+																						vRooms,	''
+																						),	
+																			le.no_of_rooms);
+																					
+																						
+			self.src_no_of_rooms			:= if(le.src_no_of_rooms != '',le.src_no_of_rooms,
+																		if(self.no_of_rooms != '', 'DEFLT','')
+																		);
+																							
+			self.garage_square_footage					:= if(trim(le.garage_square_footage)	= '',
+																								if(PropertyCharacteristics.Functions.fn_remove_zeroes(vGarage_SqFt) !=  '',
+																										vGarage_SqFt, ''
+																										),
+																							le.garage_square_footage
+																							);
+																							
+																							
+			self.src_garage_square_footage			:= if(le.src_garage_square_footage != '',le.src_garage_square_footage,
+																									if(self.garage_square_footage != '', 'DEFLT','')
+																							);
+																						
+			self.building_square_footage				:=	if(PropertyCharacteristics.Functions.fn_remove_zeroes(le.building_square_footage) = '',
+																								if(PropertyCharacteristics.Functions.fn_remove_zeroes(vBuilding_sqft) != '',
+																										vBuilding_sqft, ''
+																										),
+																								le.building_square_footage
+																							);
+																								
+																								
+			self.src_building_square_footage		:= if(le.src_building_square_footage != '',	le.src_building_square_footage,
+																								if(self.building_square_footage != '', 'DEFLT','')
+																								);
+																								
+			self.total_assessed_value							:= if(PropertyCharacteristics.Functions.fn_remove_zeroes(le.total_assessed_value) = '',
+																							 if(PropertyCharacteristics.Functions.fn_remove_zeroes(vAssessedAmount) != '',
+																											vAssessedAmount,''
+																										),
+																									le.total_assessed_value
+																							);
+																												
+			self.src_total_assessed_value					:= if(le.src_total_assessed_value != '', le.src_total_assessed_value,
+																								if(self.total_assessed_value != '', 'DEFLT','')
+																								);
+																								
+			
+			self.year_built											:= if(PropertyCharacteristics.Functions.fn_remove_zeroes(le.year_built) = '',
+																								if(PropertyCharacteristics.Functions.fn_remove_zeroes(vYearBuilt) != '',
+																										vYearBuilt, ''
+																										),
+																								le.year_built
+																							);
+																								
+			self.src_year_built									:= if(le.src_year_built != '',le.src_year_built,
+																								if(self.year_built != '', 'DEFLT','')
+																								);	
+			
+																							
+
+			self.air_conditioning_type						:= if(trim(le.air_conditioning_type)	= '',
+																									if(trim(ri.air_conditioning_type_code) !=  '',
+																										ri.air_conditioning_type_code, ''
+																										),
+																											le.air_conditioning_type
+																									);
+																									
+			self.src_air_conditioning_type				:= if(le.src_air_conditioning_type != '',le.src_air_conditioning_type,
+																									if(self.air_conditioning_type != '', 'DEFLT','')
+																							);
+	
+			self.heating													:= if(trim(le.heating)	= '',
+																									if(trim(ri.heating_code) !=  '',
+																										ri.heating_code, ''
+																										),
+																											le.heating
+																									);
+																									
+			self.src_heating											:= if(le.src_heating != '',le.src_heating,
+																									if(self.heating != '', 'DEFLT','')
+																							);
+	
+			self.exterior_wall										:= if(trim(le.exterior_wall)	= '',
+																									if(trim(ri.exterior_walls_code) !=  '',
+																										ri.exterior_walls_code, ''
+																										),
+																											le.exterior_wall
+																									);
+																									
+			self.src_exterior_wall								:= if(le.src_exterior_wall != '',le.src_exterior_wall,
+																									if(self.exterior_wall != '', 'DEFLT','')
+																							);
+	
+			self.construction_type								:= if(trim(le.construction_type)	= '',
+																									if(trim(ri.construction_type_code) !=  '',
+																										ri.construction_type_code, ''
+																										),
+																											le.construction_type
+																									);
+																									
+			self.src_construction_type						:= if(le.src_construction_type != '',le.src_construction_type,
+																									if(self.construction_type != '', 'DEFLT','')
+																							);
+	
+			self.floor_type												:= if(trim(le.floor_type)	= '',
+																									if(trim(ri.floor_cover_code) !=  '',
+																										ri.floor_cover_code, ''
+																										),
+																											le.floor_type
+																									);
+																									
+			self.src_floor_type										:= if(le.src_floor_type != '',le.src_floor_type,
+																									if(self.floor_type != '', 'DEFLT','')
+																							);
+	
+			self.roof_cover												:= if(trim(le.roof_cover)	= '',
+																									if(trim(ri.roof_cover_code) !=  '',
+																										ri.roof_cover_code, ''
+																										),
+																											le.roof_cover
+																									);
+																									
+			self.src_roof_cover										:= if(le.src_roof_cover != '',le.src_roof_cover,
+																									if(self.roof_cover != '', 'DEFLT','')
+																							);
+	
+			self.foundation												:= if(trim(le.foundation)	= '',
+																									if(trim(ri.foundation_code) !=  '',
+																										ri.foundation_code, ''
+																										),
+																											le.foundation
+																									);
+																									
+			self.src_foundation										:= if(le.src_foundation != '',le.src_foundation,
+																									if(self.foundation != '', 'DEFLT','')
+																							);
+	
+			self.garage														:= if(trim(le.garage)	= '',
+																									if(trim(ri.garage_code) !=  '',
+																										ri.garage_code, ''
+																										),
+																											le.garage
+																									);
+																									
+			self.src_garage												:= if(le.src_garage != '',le.src_garage,
+																									if(self.garage != '', 'DEFLT','')
+																							);
+		
+/* Future Phase		
+    	self.basement_square_footage					:= if(trim(le.basement_square_footage)	= '',
+																								if(PropertyCharacteristics.Functions.fn_remove_zeroes(vBasement_SqFt) !=  '',
+																										vBasement_SqFt, ''
+																										),
+																							le.basement_square_footage
+																							);
+																							
+																							
+			self.src_basement_square_footage			:= if(le.src_basement_square_footage != '',le.src_basement_square_footage,
+																									if(self.basement_square_footage != '', 'DEFLT','')
+																							);
+			
+			self.basement_finish									:= if(trim(le.basement_finish)	= '',
+																									if(trim(ri.basement_code) !=  '',
+																										ri.basement_code, ''
+																										),
+																											le.basement_finish
+																									);
+																									
+			self.src_basement_finish							:= if(le.src_basement_finish != '',le.src_basement_finish,
+																									if(self.basement_finish != '', 'DEFLT','')
+																							);
+	
+			self.fuel_type												:= if(trim(le.fuel_type)	= '',
+																									if(trim(ri.fuel_type_code) !=  '',
+																										ri.fuel_type_code, ''
+																										),
+																											le.fuel_type
+																									);
+																									
+			self.src_fuel_type										:= if(le.src_fuel_type != '',le.src_fuel_type,
+																									if(self.fuel_type != '', 'DEFLT','')
+																							);
+	
+*/
+			
+			self						:=	le;
+		end;
+		
+		#uniquename(dDefault)
+		%dDefault%	:=	join(	pInDataset,	%dAttributeDefault%,
+													 left.prim_range 			= right.prim_range
+                           and left.prim_name 	= right.prim_name
+                           and left.sec_range 	= right.sec_range
+                           and left.zip 				= right.zip 
+                           and left.addr_suffix = right.addr_suffix
+                           and left.predir 			= right.predir 
+                           and left.postdir 		= right.postdir
+													 and left.geo_blk 		= right.geo_blk,
+                          %tAttributeDefault%(left,right), left outer, nolocal	);
+				
+		
+pOutDataset := %dDefault%;
+	
+	endmacro;
+
 end;

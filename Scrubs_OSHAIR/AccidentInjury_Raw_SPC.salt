@@ -1,0 +1,33 @@
+﻿OPTIONS:-gh
+MODULE:Scrubs_OSHAIR
+FILENAME:AccidentInjury_Raw_in_OSHAIR
+NAMESCOPE:AccidentInjury_Raw
+
+FIELDTYPE:invalid_numeric:CUSTOM(Scrubs.Functions.fn_numeric > 0)
+FIELDTYPE:invalid_numeric_blank:CUSTOM(Scrubs_OSHAIR.Functions.fn_numeric_or_blank > 0)
+FIELDTYPE:invalid_date_time:CUSTOM(Scrubs_Oshair.Functions.fn_date_time > 0)
+FIELDTYPE:invalid_sex:CUSTOM(Scrubs_Oshair.Functions.fn_sex_code > 0)
+FIELDTYPE:invalid_degree_of_inj:CUSTOM(Scrubs_Oshair.Functions.fn_degree_inj > 0)
+FIELDTYPE:invalid_task_assigned:CUSTOM(Scrubs_Oshair.Functions.fn_task_assigned > 0)
+FIELDTYPE:invalid_alpha_numeric:CUSTOM(Scrubs.Functions.fn_alphaNum_or_blank > 0)
+
+FIELD:summary_nr:TYPE(STRING9):LIKE(invalid_numeric):0,0
+FIELD:rel_insp_nr:TYPE(STRING9):LIKE(invalid_numeric):0,0
+FIELD:age:TYPE(STRING2):LIKE(invalid_numeric):0,0
+FIELD:sex:TYPE(STRING1):LIKE(invalid_sex):0,0
+FIELD:nature_of_inj:TYPE(STRING2):LIKE(invalid_numeric_blank):0,0
+FIELD:part_of_body:TYPE(STRING2):LIKE(invalid_numeric_blank):0,0
+FIELD:src_of_injury:TYPE(STRING2):LIKE(invalid_numeric_blank):0,0
+FIELD:event_type:TYPE(STRING2):LIKE(invalid_numeric_blank):0,0
+FIELD:evn_factor:TYPE(STRING2):LIKE(invalid_numeric_blank):0,0
+FIELD:hum_factor:TYPE(STRING2):LIKE(invalid_numeric_blank):0,0
+FIELD:occ_code:TYPE(STRING3):LIKE(invalid_numeric_blank):0,0
+FIELD:degree_of_inj:TYPE(STRING1):LIKE(invalid_degree_of_inj):0,0
+FIELD:task_assigned:TYPE(STRING1):LIKE(invalid_task_assigned):0,0
+FIELD:hazsub:TYPE(STRING4):LIKE(invalid_alpha_numeric):0,0
+FIELD:const_op:TYPE(STRING2):LIKE(invalid_numeric_blank):0,0
+FIELD:const_op_cause:TYPE(STRING2):LIKE(invalid_numeric_blank):0,0
+FIELD:fat_cause:TYPE(STRING2):LIKE(invalid_numeric_blank):0,0
+FIELD:fall_distance:TYPE(STRING4):LIKE(invalid_numeric_blank):0,0
+FIELD:fall_ht:TYPE(STRING4):LIKE(invalid_numeric_blank):0,0
+FIELD:injury_line_nr:TYPE(STRING250):LIKE(invalid_numeric):0,0

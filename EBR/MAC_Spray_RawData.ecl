@@ -1,31 +1,55 @@
-import EBR;
-
-export Mac_Spray_RawData(source_IP,source_path,filedate,file_name,group_name) := 
-macro
-#uniquename(spray_main)
-#uniquename(super_main)
-#uniquename(recSize)
-#uniquename(splitRecs)
-#uniquename(Create_Superfiles)
-#uniquename(CreateSuperFiles)
+﻿IMPORT STD, EBR;
 
 
-#workunit('name','EBR Spray');
+EXPORT Mac_Spray_RawData(
+	source_IP,
+	source_path,
+	filedate,
+	file_name,
+	group_name 
+) := MACRO
 
-%recSize% := 503;
+	#UNIQUENAME(recSize);
+	#UNIQUENAME(Create_Superfiles);
+	#UNIQUENAME(CreateSuperFiles);
+	#UNIQUENAME(spray_main);
+	#UNIQUENAME(super_main);
+	#UNIQUENAME(splitRecs);
+	#UNIQUENAME(do_spray_raw_data);
 
-%Create_Superfiles% := FileServices.CreateSuperFile('~thor_data400::in::ebr::RawData',false);
+	#WORKUNIT('name','EBR Spray');
 
-%CreateSuperFiles% 	:= if (~FileServices.SuperFileExists('~thor_data400::in::ebr::RawData'),%Create_Superfiles%); 
+	%recSize% := 503;
 
-%spray_main% 				:= FileServices.SprayFixed(source_IP, source_path + file_name, %recSize%, group_name, '~thor_data400::in::ebr::RawData_'+ filedate ,-1,,,true,true,true);
+	%Create_Superfiles% := STD.File.CreateSuperFile('~thor_data400::in::ebr::RawData');
+	%CreateSuperFiles%  := IF (~STD.File.SuperFileExists('~thor_data400::in::ebr::RawData'),%Create_Superfiles%);
+ 
+	%spray_main% := STD.File.SprayFixed(
+		source_IP,
+		source_path + file_name,
+		%recSize%,
+		group_name,
+		'~thor_data400::in::ebr::RawData_'+ filedate,,,,
+		TRUE,
+		TRUE,
+		TRUE
+	);
 
-%super_main% 				:= sequential(FileServices.StartSuperFileTransaction(),
-																	//FileServices.ClearSuperFile('~thor_data400::in::ebr::RawData'),
-																	FileServices.AddSuperFile('~thor_data400::in::ebr::RawData','~thor_data400::in::ebr::RawData_'+ filedate),
-																	FileServices.FinishSuperFileTransaction()
-																	);
-																	
-sequential(output('spray data...'),%CreateSuperFiles%, %spray_main%, %super_main%);
+	%super_main% := SEQUENTIAL(
+		STD.File.StartSuperFileTransaction(),
+		//STD.File.ClearSuperFile('~thor_data400::in::ebr::RawData'),
+		STD.File.AddSuperFile('~thor_data400::in::ebr::RawData','~thor_data400::in::ebr::RawData_'+ filedate),
+		STD.File.FinishSuperFileTransaction()
+	);
 
-endmacro;
+	%do_spray_raw_data% := SEQUENTIAL(
+		OUTPUT('spray data...'),
+		%CreateSuperFiles%,
+		%spray_main%,
+		%super_main%
+	);
+
+	%do_spray_raw_data%;
+
+ENDMACRO
+;

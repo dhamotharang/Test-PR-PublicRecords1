@@ -1,8 +1,8 @@
 import LN_PropertyV2,ut; 
 
-EXPORT CleanSearch(boolean isFast) := FUNCTION
+EXPORT CleanSearch(boolean isFast, boolean deltaonly = false) := FUNCTION
 
-d1	:=	LN_PropertyV2_Fast.Files.base.search_prp;
+d1	:=	if (deltaonly, LN_PropertyV2_Fast.Files.basedelta.search_prp, LN_PropertyV2_Fast.Files.base.search_prp);
 d0  :=  LN_PropertyV2.File_Search_did;
 
 search		:= if (isFast,d1,d0);

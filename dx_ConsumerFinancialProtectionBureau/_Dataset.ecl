@@ -1,8 +1,5 @@
-import versioncontrol;
+import versioncontrol, data_services;
 
 export _Dataset(boolean pUseProd = false) := module
-	export thor_cluster_Files			:= 	if(pUseProd 
-																			,VersionControl.foreign_prod + 'thor::',
-																			'~thor::' //this is the one I'm allowed to use
-																		);
+	export thor_cluster_Files			:= 	if(pUseProd ,VersionControl.foreign_prod + 'thor::', data_services.data_location.prefix('CFPB')+'thor::');
 end;

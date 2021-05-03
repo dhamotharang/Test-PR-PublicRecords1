@@ -1,4 +1,4 @@
-﻿IMPORT suppress, data_services;
+﻿﻿IMPORT suppress, data_services;
 
 /*
  * A MACRO to suppress records from consumers who have opted out. Records are suppressed based on:

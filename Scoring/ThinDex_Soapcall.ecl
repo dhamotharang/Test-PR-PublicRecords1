@@ -1,6 +1,6 @@
-import models;
+﻿import models;
 
-export ThinDex_Soapcall(dataset(Layout_Thindex_Soapcall) indata, string roxieIP='http://roxiestaging.br.seisint.com:9876') := function;
+export ThinDex_Soapcall(dataset(Layout_Thindex_Soapcall) indata, string roxieIP='http://certstagingvip.hpcc.risk.regn.net:9876') := function;
 	
 errx := record
 	string errorcode := '';

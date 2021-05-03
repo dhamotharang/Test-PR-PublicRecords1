@@ -91,7 +91,7 @@ module
 	) :=
 	function
 	
-		dPreprocess					:= fPreProcess(pRawFileInput,pversion	) : persist(pPersistname);
+		dPreprocess					:= fPreProcess(pRawFileInput,pversion	) : persist(pPersistname, REFRESH(TRUE), SINGLE);
 
 		return dPreprocess;
 	

@@ -1,4 +1,4 @@
-﻿Import Data_Services, doxie, FCRA, ut,misc;
+﻿Import Data_Services, doxie, FCRA, ut,misc,dx_Vendor_Src, Prof_LicenseV2;
 
 export key_proflic_did (boolean IsFCRA = false) := function
   // Found out from Danny Bello that the exclusion of INFUTOR only happens when it's FCRA data
@@ -16,10 +16,11 @@ export key_proflic_did (boolean IsFCRA = false) := function
     self     := l;
   end;
 
-  nFCRA_out_df := project(df (~IsFCRA or orbit_source not in FCRA.compliance.proflicenses.restricted_sources), trfProject(left));
-
+  pre_nFCRA_out_df := project(df (~IsFCRA or orbit_source not in FCRA.compliance.proflicenses.restricted_sources), trfProject(left));
+	nFCRA_out_df := Prep_Build.prepBase_Did(pre_nFCRA_out_df);
+	
 	// For FCRA, only allow sources that have info in vendor source info key
-	allSources   := table(misc.Key_VendorSrc().Vendor_Source,{source_code},source_code,merge,few);
+  allSources   := table(dx_Vendor_Src.Key_Vendor_Src(TRUE),{source_code},source_code,merge,few);
 	FCRA_out_df  := join(nFCRA_out_df,allSources,left.vendor=right.source_code,transform(left),lookup);
 	
 	//DF-21372 blank out following field in thor_data400::key::prolicv2::fcra::qa::prolicense_did

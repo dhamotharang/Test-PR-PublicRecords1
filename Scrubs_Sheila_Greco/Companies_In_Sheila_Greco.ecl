@@ -1,0 +1,66 @@
+IMPORT Sheila_Greco,Scrubs_Sheila_Greco;
+
+
+DS := Sheila_Greco.Files().base.companies.qa;
+layout := Scrubs_Sheila_Greco.Companies_Layout_Sheila_Greco;
+
+layout flatten(ds L) := TRANSFORM
+    self.rawfields_maincompanyid		:=	L.rawfields.maincompanyid;
+    Self.rawfields_companyname			:=	L.rawfields.companyname;
+    Self.rawfields_ticker			    :=	L.rawfields.ticker;
+    Self.rawfields_fortunerank			:=	L.rawfields.fortunerank;
+    Self.rawfields_primaryindustry		:=	L.rawfields.primaryindustry;
+    Self.rawfields_address1			    :=	L.rawfields.address1;
+    Self.rawfields_address2			    :=	L.rawfields.address2;
+    Self.rawfields_city			        :=	L.rawfields.city;
+    Self.rawfields_state			    :=	L.rawfields.state;
+    Self.rawfields_zip			        :=	L.rawfields.zip;
+    Self.rawfields_country			    :=	L.rawfields.country;
+    Self.rawfields_region			    :=	L.rawfields.region;
+    Self.rawfields_phone			    :=	L.rawfields.phone;
+    Self.rawfields_extension			:=	L.rawfields.extension;
+    Self.rawfields_weburl			    :=	L.rawfields.weburl;
+    Self.rawfields_sales			    :=	L.rawfields.sales;
+    Self.rawfields_employees			:=	L.rawfields.employees;
+    Self.rawfields_competitors			:=	L.rawfields.competitors;
+    Self.rawfields_divisionname			:=	L.rawfields.divisionname;
+    Self.rawfields_siccode			    :=	L.rawfields.siccode;
+    Self.rawfields_auditor			    :=	L.rawfields.auditor;
+    Self.rawfields_entrydate			:=	L.rawfields.entrydate;
+    Self.rawfields_lastupdate			:=	L.rawfields.lastupdate;
+    Self.rawfields_entrystaffid			:=	L.rawfields.entrystaffid;
+    Self.rawfields_description			:=	L.rawfields.description;
+    Self.clean_address_prim_range		:=	L.clean_address.prim_range;
+    Self.clean_address_predir			:=	L.clean_address.predir;
+    Self.clean_address_prim_name		:=	L.clean_address.prim_name;
+    Self.clean_address_addr_suffix		:=	L.clean_address.addr_suffix;
+    Self.clean_address_postdir			:=	L.clean_address.postdir;
+    Self.clean_address_unit_desig		:=	L.clean_address.unit_desig;
+    Self.clean_address_sec_range		:=	L.clean_address.sec_range;
+    Self.clean_address_p_city_name		:=	L.clean_address.p_city_name;
+    Self.clean_address_v_city_name		:=	L.clean_address.v_city_name;
+    Self.clean_address_st			    :=	L.clean_address.st;
+    Self.clean_address_zip			    :=	L.clean_address.zip;
+    Self.clean_address_zip4			    :=	L.clean_address.zip4;
+    Self.clean_address_cart			    :=	L.clean_address.cart;
+    Self.clean_address_cr_sort_sz		:=	L.clean_address.cr_sort_sz;
+    Self.clean_address_lot			    :=	L.clean_address.lot;
+    Self.clean_address_lot_order		:=	L.clean_address.lot_order;
+    Self.clean_address_dbpc			    :=	L.clean_address.dbpc;
+    Self.clean_address_chk_digit		:=	L.clean_address.chk_digit;
+    Self.clean_address_rec_type			:=	L.clean_address.rec_type;
+    Self.clean_address_fips_state		:=	L.clean_address.fips_state;
+    Self.clean_address_fips_county		:=	L.clean_address.fips_county;
+    Self.clean_address_geo_lat			:=	L.clean_address.geo_lat;
+    Self.clean_address_geo_long			:= L.clean_address.geo_long;
+    Self.clean_address_msa			    :=	L.clean_address.msa;
+    Self.clean_address_geo_blk			:=	L.clean_address.geo_blk;
+    Self.clean_address_geo_match		:=	L.clean_address.geo_match;
+    Self.clean_address_err_stat			:=	L.clean_address.err_stat;
+    Self.clean_dates_entrydate			:= L.clean_dates.entrydate;
+    Self.clean_dates_lastupdate			:= L.clean_dates.lastupdate;
+    Self.clean_phones_phone			    :=	L.clean_phones.phone;    
+    self := L;
+END;
+
+EXPORT Companies_In_Sheila_Greco := PROJECT(DS,flatten(left));

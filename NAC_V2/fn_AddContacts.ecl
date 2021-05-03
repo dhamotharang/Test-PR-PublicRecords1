@@ -16,18 +16,19 @@ EXPORT fn_AddContacts(DATASET($.layout_Base2) base,
 			DATASET($.Layouts2.rStateContactEx) contacts = $.Files2.dsContactRecords)
 		:= FUNCTION
 		
-		b1 := DISTRIBUTE(base, hash32(GroupId));
-		c1 := DISTRIBUTE(contacts(UpdateType<>'D'), hash32(GroupId));
+		//b1 := DISTRIBUTE(base, hash32(GroupId));
+		//c1 := DISTRIBUTE(contacts(UpdateType<>'D'), hash32(GroupId));
+		c1 := contacts(UpdateType<>'D');
 		
 	// add default contact
 		b2 := IF(EXISTS(c1(ClientId='',CaseId='',ProgramCounty='',ProgramRegion='')),
-			JOIN(b1, c1(ClientId='',CaseId='',ProgramCounty='',ProgramRegion=''),
+			JOIN(base, c1(ClientId='',CaseId='',ProgramCounty='',ProgramRegion=''),
 								left.GroupId=right.GroupId
 								and left.ProgramState=right.ProgramState
 								and left.ProgramCode=right.ProgramCode,
 								xContact(LEFT,RIGHT),
-								LEFT OUTER, KEEP(1), LOCAL),
-						b1);
+								LEFT OUTER, LOOKUP),
+						base);
 							
 	// add regional contacts
 		b3 := IF(EXISTS(c1(ProgramRegion<>'')),		
@@ -37,7 +38,7 @@ EXPORT fn_AddContacts(DATASET($.layout_Base2) base,
 							and left.ProgramCode=right.ProgramCode
 							and left.RegionCode=right.ProgramRegion,
 							xContact(LEFT,RIGHT),
-							LEFT OUTER, KEEP(1), LOCAL),
+							LEFT OUTER, LOOKUP),
 						b2);
 
 	// add county contacts
@@ -48,7 +49,7 @@ EXPORT fn_AddContacts(DATASET($.layout_Base2) base,
 							and left.ProgramCode=right.ProgramCode
 							and left.CountyName=right.ProgramCounty,
 							xContact(LEFT,RIGHT),
-							LEFT OUTER, KEEP(1), LOCAL),
+							LEFT OUTER, LOOKUP),
 						b3);
 						
 	// add case specific contacts
@@ -59,7 +60,7 @@ EXPORT fn_AddContacts(DATASET($.layout_Base2) base,
 							and left.ProgramCode=right.ProgramCode
 							and left.CaseId=right.CaseId,
 							xContact(LEFT,RIGHT),
-							LEFT OUTER, KEEP(1), LOCAL),
+							LEFT OUTER, LOOKUP),
 						b4);
 		
 		// add client specific contacts
@@ -70,7 +71,7 @@ EXPORT fn_AddContacts(DATASET($.layout_Base2) base,
 							and left.ProgramCode=right.ProgramCode
 							and left.ClientId=right.ClientId,
 							xContact(LEFT,RIGHT),
-							LEFT OUTER, KEEP(1), LOCAL),
+							LEFT OUTER, LOOKUP),
 						b5);
 
 	return b6;

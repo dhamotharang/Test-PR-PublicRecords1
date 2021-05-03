@@ -1,0 +1,9 @@
+﻿OPTIONS:-gh
+MODULE:Scrubs_OSHAIR
+FILENAME:AccidentAbstract_Raw_in_OSHAIR
+NAMESCOPE:AccidentAbstract_Raw
+
+FIELDTYPE:invalid_numeric:CUSTOM(Scrubs.Functions.fn_numeric > 0)
+
+FIELD:summary_nr:TYPE(STRING9):LIKE(invalid_numeric):0,0
+FIELD:line_nr:TYPE(STRING4):LIKE(invalid_numeric):0,0

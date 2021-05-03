@@ -2,6 +2,6 @@
 
 EXPORT fn_RunScrubs(string pversion, string emailList):=function
 
-	return Scrubs.ScrubsPlus('PhonesFeedback','Scrubs_PhonesFeedback','Scrubs_PhonesFeedback','',pVersion,emailList,false);
+	return Scrubs.ScrubsPlus_PassFile(Scrubs_PhonesFeedback.In_PhonesFeedback(pversion),'PhonesFeedback','Scrubs_PhonesFeedback','Scrubs_PhonesFeedback','',pVersion,emailList,false);
 
 end;

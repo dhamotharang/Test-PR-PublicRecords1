@@ -1,6 +1,7 @@
-IMPORT _Control,PRTE2_Prof_License_Mari;
+﻿IMPORT _Control,PRTE2_Prof_License_Mari;
 
 EXPORT Constants := MODULE
+    EXPORT dops_name                :='VehicleV2Keys';
 
 		EXPORT in_prefix_name           := '~prte::in::vehicle::';
     EXPORT base_prefix_name         := '~prte::base::vehicle::';

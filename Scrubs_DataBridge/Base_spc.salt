@@ -8,6 +8,7 @@ NAMESCOPE:Base
 FIELDTYPE:invalid_mandatory:LENGTHS(1..)
 FIELDTYPE:invalid_generaldate:CUSTOM(Scrubs_DataBridge.Functions.fn_general_date > 0)
 FIELDTYPE:invalid_pastdate:CUSTOM(Scrubs_DataBridge.Functions.fn_past_yyyymmdd > 0)
+FIELDTYPE:invalid_trans_date:CUSTOM(Scrubs_DataBridge.Functions.fn_trans_date > 0)
 FIELDTYPE:invalid_record_type:ENUM(C|H)
 FIELDTYPE:invalid_numeric:CUSTOM(Scrubs_DataBridge.Functions.fn_numeric > 0)
 FIELDTYPE:invalid_st:CUSTOM(Scrubs_DataBridge.Functions.fn_verify_state > 0)
@@ -105,7 +106,7 @@ FIELD:sic6_2:TYPE(STRING6):LIKE(invalid_sic):0,0
 FIELD:sic6_3:TYPE(STRING6):LIKE(invalid_sic):0,0
 FIELD:sic6_4:TYPE(STRING6):LIKE(invalid_sic):0,0
 FIELD:sic6_5:TYPE(STRING6):LIKE(invalid_sic):0,0
-// FIELD:transaction_date:TYPE(STRING6):0,0
+FIELD:transaction_date:TYPE(STRING6):LIKE(invalid_trans_date):0,0
 FIELD:database_site_id:TYPE(STRING10):LIKE(invalid_numeric):0,0
 FIELD:database_individual_id:TYPE(STRING10):LIKE(invalid_numeric):0,0
 FIELD:email:TYPE(STRING50):LIKE(invalid_email):0,0

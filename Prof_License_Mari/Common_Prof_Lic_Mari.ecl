@@ -14,7 +14,7 @@ export SourcesFolder := '~thor_data400::in::proflic_mari::';
 export DestFolder := '~thor_data400::out::proflic_mari::';
 
 // export espserverIPport	:= _Control.IPAddress.prod_thor_esp;
-export sourceIP		 	:=	_Control.IPAddress.bctlpedata12;
+export sourceIP		 	:=	_Control.IPAddress.bctlpedata10;
 export sourcepath		:=	'/data/data_build_5_2/MARI/in/';
 export destpath			:= '/data/data_build_5_2/MARI/extract/';	
 export MariDestpath		:=  '~thor_data400::in::proflic_mari::';	

@@ -1,0 +1,1 @@
+﻿﻿EXPORT KeyName_4030_Judgement_Delta_rid := trim(GetSegmentKeyName_Delta_RID('4030'));

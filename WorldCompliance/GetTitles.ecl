@@ -1,4 +1,4 @@
-import STD;
+﻿import STD;
 
 rTitleEx := RECORD
 	unsigned8	id;
@@ -154,7 +154,7 @@ honors := ['DR.','DR','MR.','MR','MRS.','MS.','MS','SIR','SIR.',
 					/* Military */		'GENERAL','GEN','GEN.','LT. GEN.','ADMIRAL','BRIGADIER','CDR','CDR.','LT COL','LTC','COLONEL','COL','COL.','MAJOR','MAJ','MAJ.',
 																'CAPTAIN','CAPT','CAPT.','LIEUTENANT','LT','LT.','LTC','LTC.','SERGEANT','SGT','SGT.','CPL','CPL.','CPRL.','PFC','PFC.'];					
 					
-boolean CheckDeceased(unicode s) := s = 'DECEASED' OR
+boolean CheckDeceased(unicode s) := REGEXFIND(U'^(DECEASED|Deceased) +' ,s) OR 
 			REGEXFIND(U'\\DECEASED (IN|ON|-) +',s,NOCASE);
 
 boolean CheckRelative(string s) := 

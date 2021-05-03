@@ -66,11 +66,13 @@ filestocopyds := dataset([
 ,{'thor_data400::key::vehiclev2::did_qa','','',''}
 ,{'thor_data400::key::vehiclev2::main_key_qa','','',''}
 ,{'thor_data400::key::vehiclev2::party_key_qa','','',''}
+,{'thor_data400::key::vehiclev2::linkids_qa','','',''}
 ,{'thor_data400::key::watercraft_did_qa','','',''}
 ,{'thor_data400::key::watercraft_sid_qa','','',''}
 ,{'thor_data400::key::watchdog_qa','','',''}
-			]
-															,rampscopy.layouts.filestocopy);
+,{'thor::key::new_suppression::qa::opt_out','','',''}
+]
+,rampscopy.layouts.filestocopy);
 
 // change these settings below to be prod settings instead
 // dops.xFerRoxieFiles(filestocopyds

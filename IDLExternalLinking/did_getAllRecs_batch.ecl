@@ -5,9 +5,8 @@
 		To have access to collapsed DIDs you have to join with the inputDID after 
 	   the final results is returned
 */
-import InsuranceHeader_xlink;
-
 EXPORT did_getAllRecs_batch(infile, in_DID, in_Uniqueid ):= FUNCTIONMACRO
+import InsuranceHeader_xlink, SALT311;
 	asIndex := IF(thorlib.nodes() < 400 OR COUNT(infile) < 15000000, TRUE, FALSE);
 	
 	payloadKey := InsuranceHeader_xlink.key_InsuranceHeader_did;
@@ -43,12 +42,12 @@ EXPORT did_getAllRecs_batch(infile, in_DID, in_Uniqueid ):= FUNCTIONMACRO
 	
 		// get data with incremental using key.  MAC_DatasetAsof does not return poisoned rec, so we need to add them at the end
   JEntKeyed0 := JOIN(infile_emptyResult, payloadKey, LEFT.inputDID = RIGHT.s_DID, xJoinPayload(LEFT,RIGHT), LEFT OUTER, KEEP(10000), LIMIT(0));
-  JEntKeyed1 := SALT37.MAC_DatasetAsof(JEntKeyed0, RID, s_DID, In_UniqueID, DT_EFFECTIVE_FIRST, DT_EFFECTIVE_LAST, , 'YYYYMMDD', FALSE);
+  JEntKeyed1 := SALT311.MAC_DatasetAsof(JEntKeyed0, RID, s_DID, In_UniqueID, DT_EFFECTIVE_FIRST, DT_EFFECTIVE_LAST, , 'YYYYMMDD', FALSE);
   JEntKeyed  := JEntKeyed1(s_DID > 0) & JOIN(infile_emptyResult, JEntKeyed1(s_DID > 0), LEFT.In_UniqueID = RIGHT.In_UniqueID AND LEFT.inputDID = RIGHT.s_DID, TRANSFORM(LEFT), LEFT ONLY);
 	
 	 // get data with incremental using pull key
   JEntPull0 := JOIN(infile_emptyResult, PULL(payloadKey), LEFT.inputDID = RIGHT.s_DID, xJoinPayload(LEFT,RIGHT), LEFT OUTER, HASH, KEEP(10000), LIMIT(0));
-  JEntPull1 := SALT37.MAC_DatasetAsof(JEntPull0, RID, s_DID, In_UniqueID, DT_EFFECTIVE_FIRST, DT_EFFECTIVE_LAST, , 'YYYYMMDD', TRUE);
+  JEntPull1 := SALT311.MAC_DatasetAsof(JEntPull0, RID, s_DID, In_UniqueID, DT_EFFECTIVE_FIRST, DT_EFFECTIVE_LAST, , 'YYYYMMDD', TRUE);
   JEntPull  := JEntPull1(s_DID > 0) & JOIN(infile_emptyResult, JEntPull1(s_DID > 0), LEFT.In_UniqueID = RIGHT.In_UniqueID AND LEFT.inputDID = RIGHT.s_DID, TRANSFORM(LEFT), LEFT ONLY, HASH);
  
   resultsEnt := IF(asIndex, JEntKeyed, JEntPull);
@@ -57,10 +56,10 @@ EXPORT did_getAllRecs_batch(infile, in_DID, in_Uniqueid ):= FUNCTIONMACRO
  
 		// get history DIDs and apply incremental for index and pull file
   JRecKeyed_10 := JOIN(resultsEnt_notfound, idHistKey, LEFT.inputDID = RIGHT.RID, xJoinHist(LEFT,RIGHT), LEFT OUTER);
-  JRecKeyed_11 := SALT37.MAC_DatasetAsof(JRecKeyed_10, RID, DID, In_UniqueID, DT_EFFECTIVE_FIRST, DT_EFFECTIVE_LAST, , 'YYYYMMDD', FALSE);
+  JRecKeyed_11 := SALT311.MAC_DatasetAsof(JRecKeyed_10, RID, DID, In_UniqueID, DT_EFFECTIVE_FIRST, DT_EFFECTIVE_LAST, , 'YYYYMMDD', FALSE);
   JRecKeyed_1  := JRecKeyed_11(DID > 0) & JOIN(resultsEnt_notfound, JRecKeyed_11(DID > 0), LEFT.In_UniqueID = RIGHT.In_UniqueID AND LEFT.inputDID = RIGHT.RID, TRANSFORM(LEFT), LEFT ONLY);
   JRecPull_10 := JOIN(resultsEnt_notfound, PULL(idHistKey), LEFT.inputDID = RIGHT.RID, xJoinHist(LEFT,RIGHT), LEFT OUTER, HASH);
-  JRecPull_11 := SALT37.MAC_DatasetAsof(JRecPull_10, RID, DID, In_UniqueID, DT_EFFECTIVE_FIRST, DT_EFFECTIVE_LAST, , 'YYYYMMDD', TRUE);
+  JRecPull_11 := SALT311.MAC_DatasetAsof(JRecPull_10, RID, DID, In_UniqueID, DT_EFFECTIVE_FIRST, DT_EFFECTIVE_LAST, , 'YYYYMMDD', TRUE);
   JRecPull_1  := JRecPull_11(DID > 0) & JOIN(resultsEnt_notfound, JRecPull_11(DID > 0), LEFT.In_UniqueID = RIGHT.In_UniqueID AND LEFT.inputDID = RIGHT.RID, TRANSFORM(LEFT), LEFT ONLY, HASH);
  
   resultsIDHist := IF(asIndex, JRecKeyed_1, JRecPull_1);
@@ -69,10 +68,10 @@ EXPORT did_getAllRecs_batch(infile, in_DID, in_Uniqueid ):= FUNCTIONMACRO
  
 		// get data for history DIDs with incremental
   JRecKeyed_20 := JOIN(resultsIDHist_found, payloadKey, LEFT.DID = RIGHT.s_DID, xJoinPayload(LEFT,RIGHT), LEFT OUTER, KEEP(10000), LIMIT(0));
-  JRecKeyed_21 := SALT37.MAC_DatasetAsof(JRecKeyed_20, RID, s_DID, In_UniqueID, DT_EFFECTIVE_FIRST, DT_EFFECTIVE_LAST, , 'YYYYMMDD', FALSE);
+  JRecKeyed_21 := SALT311.MAC_DatasetAsof(JRecKeyed_20, RID, s_DID, In_UniqueID, DT_EFFECTIVE_FIRST, DT_EFFECTIVE_LAST, , 'YYYYMMDD', FALSE);
   JRecKeyed_2  := JRecKeyed_21(s_DID > 0) & JOIN(resultsIDHist_found, JRecKeyed_21(s_DID > 0), LEFT.In_UniqueID = RIGHT.In_UniqueID AND LEFT.DID = RIGHT.s_DID, TRANSFORM(LEFT), LEFT ONLY);
   JRecPull_20 := JOIN(resultsIDHist_found, PULL(payloadKey), LEFT.DID = RIGHT.s_DID, xJoinPayload(LEFT,RIGHT), LEFT OUTER, HASH, KEEP(10000), LIMIT(0));
-  JRecPull_21 := SALT37.MAC_DatasetAsof(JRecPull_20, RID, s_DID, In_UniqueID, DT_EFFECTIVE_FIRST, DT_EFFECTIVE_LAST, , 'YYYYMMDD', TRUE);
+  JRecPull_21 := SALT311.MAC_DatasetAsof(JRecPull_20, RID, s_DID, In_UniqueID, DT_EFFECTIVE_FIRST, DT_EFFECTIVE_LAST, , 'YYYYMMDD', TRUE);
   JRecPull_2  := JRecPull_21(s_DID > 0) & JOIN(resultsIDHist_found, JRecPull_21(s_DID > 0), LEFT.In_UniqueID = RIGHT.In_UniqueID AND LEFT.DID = RIGHT.s_DID, TRANSFORM(LEFT), LEFT ONLY, HASH);
  
   resultsIDHistAll := IF(asIndex, JRecKeyed_2, JRecPull_2);

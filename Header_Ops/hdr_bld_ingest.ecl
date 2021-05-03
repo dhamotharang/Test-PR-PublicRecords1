@@ -1,35 +1,46 @@
 ﻿import std,header,dops,wk_ut;
-       
-operatorEmailList    := Header.email_list.BocaDevelopersEx;
-extraNotifyEmailList := '';
+
+EXPORT hdr_bld_ingest(string8 build_version, boolean incremental) := MODULE
+         
+operatorEmailList := Header.email_list.BocaDevelopersEx;
+
+bldtype := '_' + if(incremental,'inc','mon');
+ingest_status_fn := 'headeringest'+bldtype;
 
 setup_ingest := sequential(
-            Header.BWR_IngestSetup(operatorEmailList,false),
-            Header.Inputs_Set(),
-            nothor(Header_ops.fn_SetIKBInput()),
-            Header.BWR_IngestSetup(operatorEmailList,true)
+            Header.mac_runIfNotCompleted (ingest_status_fn, build_version, Header.BWR_IngestSetup(operatorEmailList,false),10),
+            Header.mac_runIfNotCompleted (ingest_status_fn, build_version, Header.Inputs_Set(),20),
+            Header.mac_runIfNotCompleted (ingest_status_fn, build_version, nothor(Header_ops.fn_SetIKBInput()),30),
+            Header.mac_runIfNotCompleted (ingest_status_fn, build_version, Header.BWR_IngestSetup(operatorEmailList,true),40),
             );       
 
 dops_datasetname:='PersonHeaderKeys';
 build_component:='PREPROCESS:INGEST';
-dlog(string8 build_version) :=dops.TrackBuild().fSetInfoinWorktunit(dops_datasetname,build_version,build_component);
+dlog :=dops.TrackBuild().fSetInfoinWorktunit(dops_datasetname,build_version,build_component);
 
 percent_nbm_change_threshold:=100;
 
-ecl(string build_version) := '\n'
+ecl := '\n'
 + '#WORKUNIT(\'protect\',true);\n'
 + '#WORKUNIT(\'name\',\'' + build_version + ' Header Ingest STAT\');\n\n'
-+ 'Header.Header_Ingest_Stats_Report(\'' + build_version + '\',' + percent_nbm_change_threshold + ');';
++ 'Header.Header_Ingest_Stats_Report(\'' + build_version + '\',' + percent_nbm_change_threshold + ');\n'
+;
 
-sf_name(boolean incremental) := Header_Ops._Constant.ingest_build_sf(incremental);
-update_status(unsigned2 new_status, string8 build_version, boolean incremental) := Header.LogBuildStatus(sf_name(incremental),build_version,new_status).Write;
+step1 := setup_ingest;
+step2 := Header.proc_header_ingest(incremental,build_version).run;
+step3 := if(~incremental, Header.REPORT_shifts_over_time_test());
+step4 := wk_ut.CreateWuid(ECL,'hthor_eclcc',wk_ut._constants.ProdEsp);
+step5 := output('Header Ingest completed');
 
-EXPORT hdr_bld_ingest(string8 build_version, boolean incremental, unsigned2 status) := sequential(
-    if(~incremental, dlog(build_version)),
-    if(status<1,sequential(setup_ingest, update_status(1, build_version, incremental))),
-    if(status<2,sequential(Header.proc_Header(build_version,operatorEmailList,extraNotifyEmailList).run_ingest(incremental),update_status(2, build_version, incremental))),
-    if(status<3,sequential(wk_ut.CreateWuid(ECL(build_version),'hthor_eclcc',wk_ut._constants.ProdEsp),update_status(3, build_version, incremental))),
+ EXPORT seq := sequential(
+    if(~incremental, dlog),
+    Header.mac_runIfNotCompleted (ingest_status_fn,build_version, step1,100),
+    Header.mac_runIfNotCompleted (ingest_status_fn,build_version, step2,200),
+    Header.mac_runIfNotCompleted (ingest_status_fn,build_version, step3,300),
+    Header.mac_runIfNotCompleted (ingest_status_fn,build_version, step4,400),
 //In order to keep consistency across all builds and 
-//reserving status to add future steps, the end status is set as 9
-    if(status<9,update_status(9, build_version, incremental))
+//reserving status to add future steps, the end status is set as 900    
+    Header.mac_runIfNotCompleted (ingest_status_fn,build_version, step5,900)
     );
+
+END;

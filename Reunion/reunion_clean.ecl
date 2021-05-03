@@ -1,4 +1,4 @@
-IMPORT infutor,ut,header_slimsort,did_add,didville,business_header_ss,business_header,address;
+﻿IMPORT infutor,ut,header_slimsort,did_add,didville,business_header_ss,business_header,address;
 
 LexIdThreshold := 75;
 // Macro takes either of the two input formats, re-formats and cleans the data
@@ -67,32 +67,40 @@ macPrepForClean(dIn,sVendor,dOut):=MACRO
 	dOut:=PROJECT(dIn,%tMap%(LEFT));
 ENDMACRO;
 
-macPrepForClean(reunion.files.dRawIn01(),'1',dPrep01);
-macPrepForClean(reunion.files.dRawIn02(),'2',dPrep02);
-macPrepForClean(reunion.files.dRawIn03(),'3',dPrep03);
-macPrepForClean(reunion.files.dRawIn04(),'4',dPrep04);
-macPrepForClean(reunion.files.dRawIn05(),'5',dPrep05);
-macPrepForClean(reunion.files.dRawIn06(),'6',dPrep06);
+macPrepForClean(reunion.files(1).dRawIn01(),'1',dPrep01);
+macPrepForClean(reunion.files(1).dRawIn02(),'2',dPrep02);
+macPrepForClean(reunion.files(1).dRawIn03(),'3',dPrep03);
+macPrepForClean(reunion.files(1).dRawIn04(),'4',dPrep04);
+macPrepForClean(reunion.files(1).dRawIn05(),'5',dPrep05);
+macPrepForClean(reunion.files(1).dRawIn06(),'6',dPrep06);
+
+// recs := 1000;
+// macPrepForClean(choosen(reunion.files(1).dRawIn01(), recs),'1',dPrep01);
+// macPrepForClean(choosen(reunion.files(1).dRawIn02(), recs),'2',dPrep02);
+// macPrepForClean(choosen(reunion.files(1).dRawIn03(), recs),'3',dPrep03);
+// macPrepForClean(choosen(reunion.files(1).dRawIn04(), recs),'4',dPrep04);
+// macPrepForClean(choosen(reunion.files(1).dRawIn05(), recs),'5',dPrep05);
+// macPrepForClean(choosen(reunion.files(1).dRawIn06(), recs),'6',dPrep06);
 
 // Prep the two input files for DID lookup
-dCleanPrep01:=dPrep01:PERSIST('~thor::persist::mylife::01_prep');
-dCleanPrep02:=dPrep02:PERSIST('~thor::persist::mylife::02_prep');
-dCleanPrep03:=dPrep03:PERSIST('~thor::persist::mylife::03_prep');
-dCleanPrep04:=dPrep04:PERSIST('~thor::persist::mylife::04_prep');
-dCleanPrep05:=dPrep05:PERSIST('~thor::persist::mylife::05_prep');
-dCleanPrep06:=dPrep06:PERSIST('~thor::persist::mylife::06_prep');
+dCleanPrep01:=dPrep01:PERSIST('~thor::persist::mylife::01_prep', EXPIRE(10), refresh(false));
+dCleanPrep02:=dPrep02:PERSIST('~thor::persist::mylife::02_prep', EXPIRE(10), refresh(false));
+dCleanPrep03:=dPrep03:PERSIST('~thor::persist::mylife::03_prep', EXPIRE(10), refresh(false));
+dCleanPrep04:=dPrep04:PERSIST('~thor::persist::mylife::04_prep', EXPIRE(10), refresh(false));
+dCleanPrep05:=dPrep05:PERSIST('~thor::persist::mylife::05_prep', EXPIRE(10), refresh(false));
+dCleanPrep06:=dPrep06:PERSIST('~thor::persist::mylife::06_prep', EXPIRE(10), refresh(false));
 
 dAllPrepped:=(dCleanPrep01+dCleanPrep02+dCleanPrep03+dCleanPrep04+dCleanPrep05+dCleanPrep06)(TRIM(fname+lname)<>'');
 
 ssMatchSet:=['A','P','Z','D','Q'];
 
 // First pass.pulling as exact as possible.
-did_add.MAC_Match_Flex(dAllPrepped,ssMatchSet,'',clean_dob,fname,mname,lname,name_suffix,prim_range,prim_name,sec_range,zip,st,clean_phone,DID,reunion.layouts.lClean,true,did_score,LexIdThreshold,dMatches01)
+did_add.MAC_Match_Flex(dAllPrepped,ssMatchSet,'',clean_dob,fname,mname,lname,name_suffix,prim_range,prim_name,sec_range,zip,st,clean_phone,DID,reunion.layouts.lClean,true,did_score,LexIdThreshold,dMatches01);
 dMatched01:=dMatches01(did<>0);
 
 //Second pass against the remainder from the first, dropping the day from the DOB
 dNotMatched01:=dMatches01(did =0);
-did_add.MAC_Match_Flex(dNotMatched01,ssMatchSet,'',clean_dob_yyyymm,fname,mname,lname,name_suffix,prim_range,prim_name,sec_range,zip,st,clean_phone,DID,reunion.layouts.lClean,true,did_score,LexIdThreshold,dMatches02)
+did_add.MAC_Match_Flex(dNotMatched01,ssMatchSet,'',clean_dob_yyyymm,fname,mname,lname,name_suffix,prim_range,prim_name,sec_range,zip,st,clean_phone,DID,reunion.layouts.lClean,true,did_score,LexIdThreshold,dMatches02);
 
 dMatched02:=dMatches02(did<>0);
 dNotMatched02:=dMatches02(did =0);
@@ -101,11 +109,4 @@ dNotMatched02:=dMatches02(did =0);
 business_header_ss.MAC_Add_BDID_Flex(dNotMatched02,ssMatchSet,orig_fsn,prim_range,prim_name,zip,sec_range,st,clean_phone,foo,bdid,reunion.layouts.lClean,true,bdid_score,dMatches03);
 dMatched03:=dMatches03;
 
-EXPORT reunion_clean:=(dMatched01+dMatched02+dMatched03):PERSIST('~thor::persist::mylife::did');
-
-/*
-lClean:=reunion.layouts.lClean;
-
-EXPORT reunion_clean:=DATASET('~thor::persist::mylife::did',lClean,THOR);
-
-*/
+EXPORT reunion_clean(unsigned1 mode):=(dMatched01+dMatched02+dMatched03):PERSIST('~thor::persist::mylife::did::' + reunion.Constants.sMode(mode), EXPIRE(10), REFRESH(FALSE));

@@ -59,5 +59,47 @@ export IDL_Header := RECORD
 
  END;
  
+ 
+	// copied from BIPV2.IDlayouts 
+			
+			shared type_id 			:= unsigned6;
+		 shared type_score		:= unsigned2;	//1-100.  measure of how unique a match is (requires a minimal level of strength in the match)
+		 shared type_weight	:= unsigned2; //range no fixed.  SALT generated.  measure of combined specificities of matching fields and concepts.  measure of strength of match.  (regardless of uniqueness)
+
+		 export LZ_l_xlink_ids := record
+
+					type_id 		DotID			:= 0;
+					type_score	DotScore	:= 0;
+					type_weight	DotWeight	:= 0;
+				 
+					// in BIP2.0, these will always be 0
+					type_id 		EmpID			:= 0;
+					type_score	EmpScore	:= 0;
+					type_weight	EmpWeight	:= 0;
+					
+					// in BIP2.0, these will always be 0
+					type_id 		POWID			:= 0;
+					type_score	POWScore	:= 0;
+					type_weight	POWWeight	:= 0;
+					
+					type_id 		ProxID		:= 0;
+					type_score	ProxScore	:= 0;
+					type_weight	ProxWeight:= 0;
+					
+					type_id 		SELEID		:= 0;
+					type_score	SELEScore	:= 0;
+					type_weight	SELEWeight:= 0;	
+					
+					type_id 		OrgID			:= 0;
+					type_score	OrgScore	:= 0;
+					type_weight	OrgWeight	:= 0;
+					
+					type_id 		UltID			:= 0;
+					type_score	UltScore	:= 0;
+					type_weight	UltWeight	:= 0;	
+
+		 end;
+			//
+ 
 END;
 

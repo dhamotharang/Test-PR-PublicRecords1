@@ -1,41 +1,10 @@
-﻿import business_header, header_services, mdr, ut;
+﻿import business_header, header_services, mdr, ut, Suppress;
 
 /////////////////////////////////////////////////////////////////////////
 in_hdr := File_Prep_BC_CleanAddr_KeyBuild;
+Suppression_Layout := Suppress.applyRegulatory.layout_in;
 
-Suppression_Layout := header_services.Supplemental_Data.layout_in;
-
-header_services.Supplemental_Data.mac_verify('didaddressbusiness_sup.txt',Suppression_Layout,supp_ds_func);
- 
-Suppression_In := supp_ds_func();
-
-dSuppressedIn := project(Suppression_In, header_services.Supplemental_Data.in_to_out(left));
-
-rHashDIDAddress := header_services.Supplemental_Data.layout_out;
-
-rFullOut_HashDIDAddress := record
- business_header.Layout_Business_Contact_Plus;
- rHashDIDAddress;
-end;
-
-rFullOut_HashDIDAddress tHashDIDAddress(business_header.Layout_Business_Contact_Plus l) := transform                            
- self.hval := hashmd5(intformat(l.bdid,15,1),(string)l.state,(string)l.zip,(string)l.city,
-									(string)l.prim_name,(string)l.prim_range,(string)l.predir,(string)l.addr_suffix,(string)l.postdir,(string)l.sec_range);
- self := l;
-end;
-
-dHeader_withMD5 := project(in_hdr, tHashDIDAddress(left));
-
-business_header.Layout_Business_Contact_Plus tSuppress(dHeader_withMD5 l) := transform
- self := l;
-end;
-
-full_out_suppress := join(dHeader_withMD5,
-													dSuppressedIn,
-                          left.hval = right.hval,
-													tSuppress(left),
-													left only,
-													lookup);
+full_out_suppress := project(Business_Header.Prep_Build.applyDidAddressBusiness_sup2(in_hdr), Business_Header.Layout_Business_Contact_Plus);
 
 //**********************************************
 //*   BDID Only
@@ -45,9 +14,9 @@ header_services.Supplemental_Data.mac_verify('businesscontactsall_sup.txt', Supp
  
 Contacts_All_Suppression_In := contacts_all_supp_ds_func();
 
-dContactsAllSuppressedIn := project(Contacts_All_Suppression_In, header_services.Supplemental_Data.in_to_out(left));
+dContactsAllSuppressedIn := project(Contacts_All_Suppression_In, Suppress.applyRegulatory.in_to_out(left));
 
-rHashBDID := header_services.Supplemental_Data.layout_out;
+rHashBDID := Suppress.applyRegulatory.layout_out;
 
 rFullOut_HashBDID := record
  Business_Header.Layout_Business_Contact_Plus;
@@ -82,9 +51,9 @@ header_services.Supplemental_Data.mac_verify('businesscontacts_sup.txt', Suppres
  
 Contact_Suppression_In := contact_supp_ds_func();
 
-dContactSuppressedIn := project(Contact_Suppression_In, header_services.Supplemental_Data.in_to_out(left));
+dContactSuppressedIn := project(Contact_Suppression_In, Suppress.applyRegulatory.in_to_out(left));
 
-rHashBDIDDID := header_services.Supplemental_Data.layout_out;
+rHashBDIDDID := Suppress.applyRegulatory.layout_out;
 
 rFullOut_HashBDIDDID := record
  Business_Header.Layout_Business_Contact_Plus;
@@ -119,9 +88,9 @@ header_services.Supplemental_Data.mac_verify(	'businesscontactsbytitle_sup.txt',
 BCbytitle_Suppression_In := BCbytitle_ds_func();
 
 dBCbytitle_SuppressedIn := PROJECT(	BCbytitle_Suppression_In, 
-																		header_services.Supplemental_Data.in_to_out(left));
+																		Suppress.applyRegulatory.in_to_out(left));
 
-rHashVal := header_services.Supplemental_Data.layout_out;
+rHashVal := Suppress.applyRegulatory.layout_out;
 
 BCbytitle_withHash := RECORD
 	Business_Header.Layout_Business_Contact_Plus;

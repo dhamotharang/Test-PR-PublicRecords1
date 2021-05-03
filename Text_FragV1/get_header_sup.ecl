@@ -1,4 +1,4 @@
-import header, header_services, doxie_build ;
+﻿import header, header_services, doxie_build, DriversV2, suppress ;
 
 export get_header_sup(dataset(recordof(header.Layout_Header)) in_hdr0) := FUNCTION
 
@@ -7,51 +7,10 @@ in_hdr2 := project(in_hdr1,transform(recordof(in_hdr1)
 									,self.name_suffix:=if(left.name_suffix[1..2]='UN','',left.name_suffix)
 									,self:=left));
 in_hdr  := in_hdr2(rid not in header.fraud_records);
-in_base_ := in_hdr;
 
-layout_hashed := {
-							data16 hval_id_1;
-							data16 hval_id_2 ;
-							data16 hval_address ;
-							header.Layout_Header ;							
-						} ;
-					
-layout_hashed xTohash(header.Layout_Header L) := transform
-       self.hval_id_1 := HASHMD5(	intformat((unsigned6)l.did,15,1),TRIM((string14)l.vendor_id, left, right));      
-       self.hval_id_2 := HASHMD5(	intformat((unsigned6)l.did,15,1),TRIM((string14)l.vendor_id, left, right),intformat((unsigned4)l.dob,8,1),Trim((string9)l.ssn));      
-		 self.hval_address := hashmd5(intformat(l.did,15,1),(string)l.st,(string)l.zip,(string)l.city_name,
-									(string)l.prim_name,(string)l.prim_range,(string)l.predir,(string)l.suffix,(string)l.postdir,(string)l.sec_range);
-		 self := L ;
-end ;
+full_LongSuppress := DriversV2.regulatory.applyDriversLicenseSup_DIDVend(in_hdr);
 
-in_base := project (in_base_, xTohash(left)) ;
-
-Suppression_Layout 	:= header_services.Supplemental_Data.layout_in;
-header_services.Supplemental_Data.mac_verify('driverslicense_sup.txt',Suppression_Layout, dl_supp_ds_func);
-DL_Suppression_In 	:= dl_supp_ds_func();
-DLSuppressedIn 			:= PROJECT(	DL_Suppression_In,header_services.Supplemental_Data.in_to_out(left));
-
-full_ShortSuppress := join(in_Base,DLSuppressedIn,left.hval_id_1=right.hval, left only,lookup);
-
-full_LongSuppress := full_ShortSuppress ;
-
-// Start of code to suppress data based on an MD5 Hash of DID+Address
-
-header_services.Supplemental_Data.mac_verify('didaddress_sup.txt',Suppression_Layout,supp_ds_func);
- 
-Suppression_In := supp_ds_func();
-
-dSuppressedIn := project(Suppression_In, header_services.Supplemental_Data.in_to_out(left));
-
-header.layout_header tSuppress(full_LongSuppress l) := transform
- self := l;
-end;
-// dSuppressedIn substituted below with full_LongSuppress
-
-full_out_suppress := join(full_LongSuppress, dSuppressedIn,
-                          left.hval_address=right.hval,
-													tSuppress(left),
-													left only,lookup);
+full_out_suppress :=  project(Header.Prep_Build.applyDidAddressSup(full_LongSuppress), header.layout_header);						  	
 												
 fix_addr_suffix    := header.fn_addr_suffix_corrections(full_out_suppress);
 remove_old_records := header.fn_remove_old_records(fix_addr_suffix);
@@ -154,31 +113,7 @@ layout_ff := Record
 		 string1 nl := '\n' ;
 END ;
 
-header_services.Supplemental_Data.mac_verify('ff_sup.txt',layout_ff, ff_sup_attr); // 
- 
-Base_ff_sup := ff_sup_attr();
-
-
-ff_base := JOIN(fix_name_suffix, Base_ff_sup,
-                    hashmd5((string9)left.ssn) = right.hval_ssn 
-                    AND
-						  hashmd5(intformat(left.did,15,1)) != right.hval_did,
-						  TRANSFORM(LEFT),
-						  LEFT ONLY, ALL) ;
-
-///
-
-header_services.Supplemental_Data.mac_verify('ridrec_sup.txt',Suppression_Layout, base_sup_attr); // 
- 
-Base_rid_sup_in := base_sup_attr() ;
-
-base_rid_sup := PROJECT(Base_rid_sup_in ,header_services.Supplemental_Data.in_to_out(left));
-
-rid_base := JOIN(ff_base, base_rid_sup,
-                 hashmd5(intformat((unsigned6)left.rid,15,1)) = right.hval,                    
-						     TRANSFORM(LEFT),
-						    LEFT ONLY, ALL) ;
-						 
+rid_base :=  Header.Prep_Build.applyRidRecSup(fix_name_suffix);						  	
 						  
 base_file_inj := 	rid_base ;					  
 

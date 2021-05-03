@@ -1,4 +1,4 @@
-export	fileNames	:=
+﻿export	fileNames	:=
 module
 	//OLD CODE
 	export  cluster           := '~thor_data400';
@@ -67,6 +67,7 @@ module
 		export	AddlFaresTax			:=	LN_Propertyv2.cluster	+	'base::ln_propertyV2::addl::fares_tax';
 		export	AddlLegal					:=	LN_Propertyv2.cluster	+	'base::ln_propertyV2::addl::legal';
 		export	AddlNames					:=	LN_Propertyv2.cluster	+	'base::ln_propertyV2::addl::ln_names';
+		export	AddlNameInfo			:=	LN_Propertyv2.cluster	+	'base::ln_propertyV2::addl::name_info';
 		export	Assessment				:=	LN_Propertyv2.cluster	+	'base::ln_propertyV2::assesor';
 		export	DeedMortgage			:=	LN_Propertyv2.cluster	+	'base::ln_propertyV2::deed';
 		export	Search						:=	LN_Propertyv2.cluster	+	'base::ln_propertyV2::search';

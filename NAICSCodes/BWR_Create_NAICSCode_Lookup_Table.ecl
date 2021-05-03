@@ -2,32 +2,32 @@
 
 export BWR_Create_NAICSCode_Lookup_Table(
 	 string															        pversion
-	,string															        pDirectory	 = '/data/temp/boneill/training/' + pversion
-	,string															        pServerIP		 = _control.IPAddress.bctlpedata11
-	,string															        pFilename		 = 'NAICS2017.csv'
-  ,string															        pGroupName	 = STD.System.Thorlib.Group( )	  		
-	,boolean														        pIsTesting	 = false
-	,boolean														        pOverwrite 	 = false																												
-	,dataset(NAICSCodes.Layouts.Sprayed_Input	) pSprayedFile = Files().Input.using                  
-	,dataset(NAICSCodes.Layouts.NAICSLookup )   pLookupFile  = Files().NAICSLookup.qa
+	,string															        pDirectory	       = '/data/temp/boneill/training/' +pversion
+	,string															        pServerIP		       = _control.IPAddress.bctlpedata11
+	,string															        pFilename		       = 'NAICS2017Codes.csv'
+	,string															        pDnbDmiFilename    = 'naics_code_dnb_dmi.csv'
+  ,string															        pGroupName	       = STD.System.Thorlib.Group( )	  		
+	,boolean														        pIsTesting	       = false
+	,boolean														        pOverwrite 	       = false
+	,dataset(Layouts.Sprayed_Input)             pSprayedFile       = Files().Input.NAICS.using
+	,dataset(Layouts.Sprayed_Input_DnbDmI)      pSprayedDnbDmiFile = Files().Input.DnbDmi.using
 ) :=
 function
 
 	full_build :=
 	sequential(
-		NAICSCodes.Create_Supers,
-		NAICSCodes.Spray(pversion,pServerIP,pDirectory,pFilename,pGroupName,pIsTesting,pOverwrite),
-		NAICSCodes.Build_Lookup_NAICSCodes(pversion,pIsTesting,pSprayedFile,pLookupFile),
-		NAICSCodes.Promote().Inputfiles.using2used,
-		NAICSCodes.Promote().Buildfiles.Built2QA
+		Create_Supers,		
+		Spray(pversion,pServerIP,pDirectory,pFilename,pDnbDmiFileName,pGroupName,pIsTesting,pOverwrite),
+		Build_Lookup_NAICSCodes(pversion,pIsTesting,pSprayedFile,pSprayedDnbDmiFile),
+		Promote().Inputfiles.using2used,
+		Promote().Buildfiles.Built2QA
 	) 
 	: success(Send_Emails(pversion,,TRUE).buildsuccess), 
 	    failure(send_emails(pversion,,TRUE).buildfailure)
 			;
 	
 	return
-		if(tools.fun_IsValidVersion(pversion)
-			,
+		if(tools.fun_IsValidVersion(pversion),
 			full_build
 			,output('No Valid version parameter passed, skipping Create NAICS Lookup Table')
 		)

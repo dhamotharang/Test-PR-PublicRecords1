@@ -13,7 +13,7 @@ EXPORT Functions := MODULE
 
 
 	EXPORT CountInjuries(STRING Report_Injury_Status) := MODULE
-	  SHARED STRING UpStringInjury := stringlib.StringToUpperCase(Report_Injury_Status);
+	  SHARED STRING UpStringInjury := STD.Str.ToUpperCase(Report_Injury_Status);
 
 		EXPORT INTEGER FatalCnt	 := IF(STD.Str.FindCount(UpStringInjury, FLAccidents_Ecrash.Constants.FATAL) > 0, 1, 0);
 
@@ -50,15 +50,15 @@ EXPORT Functions := MODULE
   EXPORT UnknownCT(STRING NewCTString) := FUNCTION
     //Remove all known collision types out of the string and see if we have anything left over, if we do, then
 		//we have a collision type that is unknown
-	  PipeRemoved   						:= stringlib.StringFindReplace(NewCTString, '|', '');
-	  FrontRearRemoved  				:= stringlib.StringFindReplace(PipeRemoved, FLAccidents_Ecrash.Constants.FRONTREAR, ''); 
-    FrontFrontRemoved 				:= stringlib.StringFindReplace(FrontRearRemoved, FLAccidents_Ecrash.Constants.FRONTFRONT, '');
-    AngleRemoved							:= stringlib.StringFindReplace(FrontFrontRemoved, FLAccidents_Ecrash.Constants.ANGLE, '');
-		SideSwipeSameRemoved			:= stringlib.StringFindReplace(AngleRemoved, FLAccidents_Ecrash.Constants.SIDESWIPESAME, '');
-		SideSwipeOppositeRemoved 	:= stringlib.StringFindReplace(SideSwipeSameRemoved, FLAccidents_Ecrash.Constants.SIDESWIPEOPPOSITE, '');
-		RearSideRemoved						:= stringlib.StringFindReplace(SideSwipeOppositeRemoved, FLAccidents_Ecrash.Constants.REARSIDE, '');
-		RearRearRemoved						:= stringlib.StringFindReplace(RearSideRemoved, FLAccidents_Ecrash.Constants.REARREAR, '');
-		OtherRemoved							:= stringlib.StringFindReplace(RearRearRemoved, FLAccidents_Ecrash.Constants.OTHER, '');	
+	  PipeRemoved   						:= STD.Str.FindReplace(NewCTString, '|', '');
+	  FrontRearRemoved  				:= STD.Str.FindReplace(PipeRemoved, FLAccidents_Ecrash.Constants.FRONTREAR, ''); 
+    FrontFrontRemoved 				:= STD.Str.FindReplace(FrontRearRemoved, FLAccidents_Ecrash.Constants.FRONTFRONT, '');
+    AngleRemoved							:= STD.Str.FindReplace(FrontFrontRemoved, FLAccidents_Ecrash.Constants.ANGLE, '');
+		SideSwipeSameRemoved			:= STD.Str.FindReplace(AngleRemoved, FLAccidents_Ecrash.Constants.SIDESWIPESAME, '');
+		SideSwipeOppositeRemoved 	:= STD.Str.FindReplace(SideSwipeSameRemoved, FLAccidents_Ecrash.Constants.SIDESWIPEOPPOSITE, '');
+		RearSideRemoved						:= STD.Str.FindReplace(SideSwipeOppositeRemoved, FLAccidents_Ecrash.Constants.REARSIDE, '');
+		RearRearRemoved						:= STD.Str.FindReplace(RearSideRemoved, FLAccidents_Ecrash.Constants.REARREAR, '');
+		OtherRemoved							:= STD.Str.FindReplace(RearRearRemoved, FLAccidents_Ecrash.Constants.OTHER, '');	
 		
 		INTEGER Cnt := IF(OtherRemoved > '' OR NewCTString = '', 1, 0);
     RETURN Cnt;
@@ -89,25 +89,25 @@ EXPORT Functions := MODULE
 // So to find Unknown Vehicle Types, I need to remove all the known types out of the string and see if there is anything left.
 // If so, it is truly an unknown vehicle type.	
 	EXPORT UnknownVT(STRING NewBTString) := FUNCTION
-	    PipeRemoved 						:= stringlib.StringFindReplace(NewBTString, '|', '');
-			PassengerCarRemoved 		:= stringlib.StringFindReplace(PipeRemoved, FLAccidents_Ecrash.Constants.PASSENGERCAR, '');
-			SUVRemoved							:= stringlib.StringFindReplace(PassengerCarRemoved, FLAccidents_Ecrash.Constants.SUV, '');
-			PASSENGERVANRemoved			:= stringlib.StringFindReplace(SUVRemoved, FLAccidents_Ecrash.Constants.PASSENGERVAN, '');
-			CARGOVANRemoved					:= stringlib.StringFindReplace(PASSENGERVANRemoved, FLAccidents_Ecrash.Constants.CARGOVAN, '');
-			PICKUPRemoved						:= stringlib.StringFindReplace(CARGOVANRemoved, FLAccidents_Ecrash.Constants.PICKUP, '');
-			MOTORHOMERemoved				:= stringlib.StringFindReplace(PICKUPRemoved, FLAccidents_Ecrash.Constants.MOTORHOME, '');
-			SCHOOLBUSRemoved				:= stringlib.StringFindReplace(MOTORHOMERemoved, FLAccidents_Ecrash.Constants.SCHOOLBUS, '');
-			TRANSITBUSRemoved				:= stringlib.StringFindReplace(SCHOOLBUSRemoved, FLAccidents_Ecrash.Constants.TRANSITBUS, '');
-			MOTORCOACHRemoved				:= stringlib.StringFindReplace(TRANSITBUSRemoved, FLAccidents_Ecrash.Constants.MOTORCOACH, '');
-			OTHERBUSRemoved					:= stringlib.StringFindReplace(MOTORCOACHRemoved, FLAccidents_Ecrash.Constants.OTHERBUS, '');
-			MOPEDRemoved						:= stringlib.StringFindReplace(OTHERBUSRemoved, FLAccidents_Ecrash.Constants.MOPED, '');
-			LOWSPEEDVEHICLERemoved	:= stringlib.StringFindReplace(MOPEDRemoved, FLAccidents_Ecrash.Constants.LOWSPEEDVEHICLE, '');
-			ATVRemoved							:= stringlib.StringFindReplace(LOWSPEEDVEHICLERemoved, FLAccidents_Ecrash.Constants.ATV, '');
-			SNOWMOBILERemoved				:= stringlib.StringFindReplace(ATVRemoved, FLAccidents_Ecrash.Constants.SNOWMOBILE, '');
-			OTHERLIGHTTRUCKRemoved	:= stringlib.StringFindReplace(SNOWMOBILERemoved, FLAccidents_Ecrash.Constants.OTHERLIGHTTRUCK, '');
-			MEDIUMHEAVYTRUCKRemoved	:= stringlib.StringFindReplace(OTHERLIGHTTRUCKRemoved, FLAccidents_Ecrash.Constants.MEDIUMHEAVYTRUCK, '');
-			OTHERRemoved						:= stringlib.StringFindReplace(MEDIUMHEAVYTRUCKRemoved, FLAccidents_Ecrash.Constants.OTHER, '');
-			MOTORCYCLERemoved				:= stringlib.StringFindReplace(OTHERRemoved, FLAccidents_Ecrash.Constants.MOTORCYCLE, '');
+	    PipeRemoved 						:= STD.Str.FindReplace(NewBTString, '|', '');
+			PassengerCarRemoved 		:= STD.Str.FindReplace(PipeRemoved, FLAccidents_Ecrash.Constants.PASSENGERCAR, '');
+			SUVRemoved							:= STD.Str.FindReplace(PassengerCarRemoved, FLAccidents_Ecrash.Constants.SUV, '');
+			PASSENGERVANRemoved			:= STD.Str.FindReplace(SUVRemoved, FLAccidents_Ecrash.Constants.PASSENGERVAN, '');
+			CARGOVANRemoved					:= STD.Str.FindReplace(PASSENGERVANRemoved, FLAccidents_Ecrash.Constants.CARGOVAN, '');
+			PICKUPRemoved						:= STD.Str.FindReplace(CARGOVANRemoved, FLAccidents_Ecrash.Constants.PICKUP, '');
+			MOTORHOMERemoved				:= STD.Str.FindReplace(PICKUPRemoved, FLAccidents_Ecrash.Constants.MOTORHOME, '');
+			SCHOOLBUSRemoved				:= STD.Str.FindReplace(MOTORHOMERemoved, FLAccidents_Ecrash.Constants.SCHOOLBUS, '');
+			TRANSITBUSRemoved				:= STD.Str.FindReplace(SCHOOLBUSRemoved, FLAccidents_Ecrash.Constants.TRANSITBUS, '');
+			MOTORCOACHRemoved				:= STD.Str.FindReplace(TRANSITBUSRemoved, FLAccidents_Ecrash.Constants.MOTORCOACH, '');
+			OTHERBUSRemoved					:= STD.Str.FindReplace(MOTORCOACHRemoved, FLAccidents_Ecrash.Constants.OTHERBUS, '');
+			MOPEDRemoved						:= STD.Str.FindReplace(OTHERBUSRemoved, FLAccidents_Ecrash.Constants.MOPED, '');
+			LOWSPEEDVEHICLERemoved	:= STD.Str.FindReplace(MOPEDRemoved, FLAccidents_Ecrash.Constants.LOWSPEEDVEHICLE, '');
+			ATVRemoved							:= STD.Str.FindReplace(LOWSPEEDVEHICLERemoved, FLAccidents_Ecrash.Constants.ATV, '');
+			SNOWMOBILERemoved				:= STD.Str.FindReplace(ATVRemoved, FLAccidents_Ecrash.Constants.SNOWMOBILE, '');
+			OTHERLIGHTTRUCKRemoved	:= STD.Str.FindReplace(SNOWMOBILERemoved, FLAccidents_Ecrash.Constants.OTHERLIGHTTRUCK, '');
+			MEDIUMHEAVYTRUCKRemoved	:= STD.Str.FindReplace(OTHERLIGHTTRUCKRemoved, FLAccidents_Ecrash.Constants.MEDIUMHEAVYTRUCK, '');
+			OTHERRemoved						:= STD.Str.FindReplace(MEDIUMHEAVYTRUCKRemoved, FLAccidents_Ecrash.Constants.OTHER, '');
+			MOTORCYCLERemoved				:= STD.Str.FindReplace(OTHERRemoved, FLAccidents_Ecrash.Constants.MOTORCYCLE, '');
 			
 			INTEGER Cnt := IF(MOTORCYCLERemoved > '', 1, 0);
 			
@@ -115,11 +115,11 @@ EXPORT Functions := MODULE
 	END;
 	
 	EXPORT UnknownFHE(STRING NewFHEString) := FUNCTION
-	    PipeRemoved             := stringlib.StringFindReplace(NewFHEString, '|', '');
-			PEDESTRIANRemoved				:= stringlib.StringFindReplace(PipeRemoved, FLAccidents_Ecrash.Constants.PEDESTRIAN, '');
-	    BICYCLERemoved 					:= stringlib.StringFindReplace(PEDESTRIANRemoved, FLAccidents_Ecrash.Constants.BICYCLE, '');
-	    ANIMALRemoved  					:= stringlib.StringFindReplace(BICYCLERemoved, FLAccidents_Ecrash.Constants.ANIMAL, '');
-	    TRAINRemoved						:= stringlib.StringFindReplace(ANIMALRemoved, FLAccidents_Ecrash.Constants.TRAIN, '');
+	    PipeRemoved             := STD.Str.FindReplace(NewFHEString, '|', '');
+			PEDESTRIANRemoved				:= STD.Str.FindReplace(PipeRemoved, FLAccidents_Ecrash.Constants.PEDESTRIAN, '');
+	    BICYCLERemoved 					:= STD.Str.FindReplace(PEDESTRIANRemoved, FLAccidents_Ecrash.Constants.BICYCLE, '');
+	    ANIMALRemoved  					:= STD.Str.FindReplace(BICYCLERemoved, FLAccidents_Ecrash.Constants.ANIMAL, '');
+	    TRAINRemoved						:= STD.Str.FindReplace(ANIMALRemoved, FLAccidents_Ecrash.Constants.TRAIN, '');
 			
 			INTEGER Cnt := IF(TRAINRemoved > '', 1, 0);
 
@@ -148,7 +148,7 @@ EXPORT Functions := MODULE
 																							mname = 'NOV' => '11',
 																							mname = 'DEC' => '12',
 																							'00');
-	STRING Stdmmonth := ConvertMonth(stringlib.stringtouppercase( mm ));
+	STRING Stdmmonth := ConvertMonth(STD.Str.ToUpperCase( mm ));
 	STRING day := pDate[1..2];
 
 	RETURN Stdyear+Stdmmonth+day;
@@ -215,4 +215,9 @@ EXPORT Functions := MODULE
     '');
   END;
 	
+  EXPORT BOOLEAN IsActiveDate(UNSIGNED4 TodaysDate, UNSIGNED4 startDt, UNSIGNED4 terminationDt) := FUNCTION
+    B1 := TodaysDate BETWEEN startDt AND terminationDt;
+   RETURN B1;
+  END; 
+
 END;

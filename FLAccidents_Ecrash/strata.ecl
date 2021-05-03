@@ -1,8 +1,8 @@
-import strata, ut;
+﻿import strata;
 
 export strata(string filedate) := function
 
-d :=FLAccidents_Ecrash.BaseFile;
+d := BaseFile;
 
 
 rPopulationStats_File_ECrash

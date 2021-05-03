@@ -1,4 +1,4 @@
-import header,ut,Std,prte2_VotersV2;
+import header,ut,Std,prte2_VotersV2,MDR;
 
 Layout_in := VotersV2.Layouts_Voters.Layout_Voters_Base_new;
 
@@ -49,6 +49,12 @@ export Voters_As_Header(dataset(Layout_in) pVoters = dataset([],Layout_in), bool
 		self.county     := choose(c,l.fips_county,l.mail_fips_county);
 		self.cbsa       := choose(c,l.msa + '0',  l.mail_msa + '0');
 		self.geo_blk    := choose(c,l.geo_blk,    l.mail_geo_blk);
+  self.src        := IF (
+                         (l.source_state in ['IN','MN','MT','TN'] OR 
+                          l.source_state = 'UT' AND l.date_first_seen > '20180114'),
+                         MDR.sourceTools.src_Voters_v2_block,
+                         l.src );
+                         
 		self            := l;
 	end;
 

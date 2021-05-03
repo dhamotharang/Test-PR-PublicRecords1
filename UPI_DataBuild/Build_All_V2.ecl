@@ -1,5 +1,5 @@
 ﻿import versioncontrol, _control, ut, tools, UPI_DataBuild, HealthcareNoMatchHeader_InternalLinking, HealthcareNoMatchHeader_Ingest, Workman;
-export Build_all_V2(pVersion, pUseProd, gcid, pLexidThreshold, pHistMode, gcid_name, pBatch_jobID, pAppendOption) := functionmacro
+export Build_all_V2(pVersion, pUseProd, gcid, pLexidThreshold, pHistMode, gcid_name, pBatch_jobID, pAppendOption, pReceivingID, crk_suffix, pOrbEnv) := functionmacro
 	return module
 	export check_supers	:= function
 		superFile_frombatch 						:= if(pHistMode = 'A',FileServices.SuperFileExists('~ushc::crk::from_batch::' + gcid),
@@ -163,11 +163,84 @@ export Build_all_V2(pVersion, pUseProd, gcid, pLexidThreshold, pHistMode, gcid_n
 		
 	export pVersion_unique			:= pVersion + '_' + trim(pBatch_jobID);
 	
+	export pMasterBuild					:= 'G' + gcid + '_' + crk_suffix;
+	export Orbit_token					:= if(pOrbEnv = 'QA', UPI_DataBuild.Orbit_Login(), UPI_DataBuild.Orbit_LoginPROD());
+	
+	export createNewBuildQA			:= 	UPI_DataBuild.Orbit_CreateBuild(
+																						pMasterBuild
+																					 ,UPI_DataBuild.Orbit_Tracking.OrbitBuildInProgress
+																					 ,pVersion_unique
+																					 ,''
+																					 ,pMasterBuild
+																					 ,orbit_token
+																					 ,pOrbEnv):independent;
+	
+	export createNewBuildPROD		:= 	UPI_DataBuild.Orbit_CreateBuild(
+																						pMasterBuild
+																					 ,UPI_DataBuild.Orbit_TrackingPROD.OrbitBuildInProgress
+																					 ,pVersion_unique
+																					 ,''
+																					 ,pMasterBuild
+																					 ,orbit_token
+																					 ,pOrbEnv):independent;
+																					 
+	export addComponent					:= UPI_DataBuild.Orbit_AddComponentsToABuild ( 		
+																						pMasterBuild
+																					 ,pVersion_unique
+																					 ,pReceivingID
+																					 ,orbit_token
+																					 ,pOrbEnv):independent;
+																					 
+	export changeBuildStatusQA	:= UPI_DataBuild.Orbit_UpdateBuildStatus (		
+																						pMasterBuild
+																					 ,UPI_DataBuild.Orbit_Tracking.OrbitBuilt
+																					 ,pVersion_unique
+																					 ,orbit_token
+																					 ,//comment
+																					 ,pOrbEnv
+																					 ):independent;
+																					 
+	export changeBuildStatusPROD:= UPI_DataBuild.Orbit_UpdateBuildStatus (		
+																						pMasterBuild
+																					 ,UPI_DataBuild.Orbit_TrackingPROD.OrbitBuilt
+																					 ,pVersion_unique
+																					 ,orbit_token
+																					 ,//comment
+																					 ,pOrbEnv
+																					 ):independent;
+																					 
+	export changeRecdItemStatusSprayedQA	:= UPI_DataBuild.Orbit_UpdateReceiveItem (
+																					 pReceivingID
+																					,UPI_DataBuild.Orbit_Tracking.OrbitSprayed
+																					,orbit_token
+																					,pOrbEnv):independent;
+
+	export changeRecdItemStatusSprayedPROD	:= UPI_DataBuild.Orbit_UpdateReceiveItem (
+																					 pReceivingID
+																					,UPI_DataBuild.Orbit_TrackingPROD.OrbitSprayed
+																					,orbit_token
+																					,pOrbEnv):independent;
+																					
+	export changeRecdItemStatusBuiltQA	:= UPI_DataBuild.Orbit_UpdateReceiveItem (
+																					 pReceivingID
+																					,UPI_DataBuild.Orbit_Tracking.OrbitBuilt
+																					,orbit_token
+																					,pOrbEnv):independent;
+																					
+	export changeRecdItemStatusBuiltPROD	:= UPI_DataBuild.Orbit_UpdateReceiveItem (
+																					 pReceivingID
+																					,UPI_DataBuild.Orbit_TrackingPROD.OrbitBuilt
+																					,orbit_token
+																					,pOrbEnv):independent;
+
 	export step1 := sequential(
 			check_supers
+			// ,if(pOrbEnv = 'QA', ChangeRecdItemStatusSprayedQA, ChangeRecdItemStatusSprayedPROD)
+			// ,if(pOrbEnv = 'QA', CreateNewBuildQA, CreateNewBuildPROD)
+			// ,AddComponent			
 			,FileServices.ClearSuperFile(UPI_DataBuild.Filenames_V2(pVersion_unique,pUseProd,gcid,pHistMode).batch_lInputTemplate) // if processing new input - clear out anything that might still be in the *in* superfile
 			,FileServices.AddSuperFile(UPI_DataBuild.Filenames_V2(pVersion_unique,pUseProd,gcid,pHistMode).batch_lInputTemplate,UPI_DataBuild._Dataset(pUseProd).thor_cluster_files + 'from_batch::' + gcid + '::' + trim(pBatch_jobID,all) + '::' + pVersion)
-			
+																	
 			,UPI_DataBuild.Build_Base_V2.process_input_file(pVersion_unique,pUseProd,gcid,pLexidThreshold,pHistMode,gcid_name,pBatch_jobID,pAppendOption).process_input_all
 			,UPI_DataBuild.Promote_V2.promote_processed_input(pVersion_unique,pUseProd,gcid,pHistMode).buildfiles.Built2QA
 			
@@ -177,7 +250,7 @@ export Build_all_V2(pVersion, pUseProd, gcid, pLexidThreshold, pHistMode, gcid_n
 			,UPI_DataBuild.Build_Base_V2.Build_temp_header(pVersion_unique,pUseProd,gcid,pHistMode,gcid_name,pBatch_jobID).temp_header_all
 			,UPI_DataBuild.Promote_V2.promote_temp_header(pVersion_unique,pUseProd,gcid,pHistMode).buildfiles.Built2QA
 	);
-	// export step2	:= output(pVersion_crk_macro(gcid, pVersion));
+
 	export step2	:= HealthcareNoMatchHeader_InternalLinking.MAC_AppendCRK(
 				gcid
 			 ,pVersion_unique
@@ -216,7 +289,10 @@ export Build_all_V2(pVersion, pUseProd, gcid, pLexidThreshold, pHistMode, gcid_n
 			,FileServices.RemoveOwnedSubFiles(UPI_DataBuild.Filenames_V2(pVersion_unique,pUseProd,gcid,pHistMode).batch_lInputTemplate,true)
 			,FileServices.ClearSuperFile(UPI_DataBuild.Filenames_V2(pVersion_unique,pUseProd,gcid,pHistMode).batch_lInputTemplate)
 
-			,FileServices.FinishSuperFileTransaction()
-);
+			,FileServices.FinishSuperFileTransaction() 
+			
+			// ,if(pOrbEnv = 'QA', ChangeBuildStatusQA, ChangeBuildStatusPROD)
+
+); 
 end;
 endmacro;

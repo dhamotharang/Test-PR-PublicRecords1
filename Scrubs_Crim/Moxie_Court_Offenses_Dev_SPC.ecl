@@ -1,3 +1,4 @@
+﻿OPTIONS:-gh
 MODULE:Scrubs_Crim
 FILENAME:crim
 NAMESCOPE:Moxie_Court_Offenses_Dev
@@ -10,8 +11,8 @@ FIELDTYPE:Invalid_Char:ALLOW(ABCDEFGHIJKLMNOPQRSTUVWXYZ)
 FIELDTYPE:Invalid_Data_Type:ENUM(2|5)
 FIELDTYPE:Invalid_FCRAConFlag:ENUM(Y|N|U|)
 FIELDTYPE:Invalid_FCRATrafficFlag:ENUM(N|Y|)
-FIELDTYPE:Invalid_FCRADateFlag:ENUM(S|D|)
-FIELDTYPE:Invalid_ConOverDateFlag:ENUM(D|F|O|A|S|)
+FIELDTYPE:Invalid_FCRADateFlag:ENUM(S|D|M|F|)
+FIELDTYPE:Invalid_ConOverDateFlag:ENUM(D|F|O|A|S|M|)
 FIELDTYPE:Invalid_OffenseScore:ENUM(U|F|M|I|)
 FIELDTYPE:Invalid_Num:ALLOW(0123456789)
 FIELDTYPE:Invalid_CourtOffLev:CUSTOM(Scrubs_Crim.fn_CourtOffensesV3Check>0,vendor)

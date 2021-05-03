@@ -1023,15 +1023,17 @@ module
 		export va_raw :=
 	module
 
-		export Corps          := VersionControl.mInputFileNameVersions(lthor + 'in::corp2::@version@::Corps::va',landing_zone,,,,,pGroupname,,,'VARIABLE',,8192 ,'\\t',,',');
-		export LLC            := VersionControl.mInputFileNameVersions(lthor + 'in::corp2::@version@::LLC::va',landing_zone,,,,,pGroupname,,,'VARIABLE',,8192 ,'\\t',,',');
-		export LP             := VersionControl.mInputFileNameVersions(lthor + 'in::corp2::@version@::LP::va',landing_zone,,,,,pGroupname,,,'VARIABLE',,8192 ,'\\t',,',');
-		export Merger         := VersionControl.mInputFileNameVersions(lthor + 'in::corp2::@version@::Merger::va',landing_zone,,,,,pGroupname,,,'VARIABLE',,8192 ,'\\t',,',');
-		export NamesHist      := VersionControl.mInputFileNameVersions(lthor + 'in::corp2::@version@::NamesHist::va',landing_zone,,,,,pGroupname,,,'VARIABLE',,8192 ,'\\t',,',');
-		export Officer        := VersionControl.mInputFileNameVersions(lthor + 'in::corp2::@version@::Officer::va',landing_zone,,,,,pGroupname,,,'VARIABLE',,8192 ,'\\t',,',');
-		export Amendmt        := VersionControl.mInputFileNameVersions(lthor + 'in::corp2::@version@::Amendment::va',landing_zone,,,,,pGroupname,,,'VARIABLE',,8192 ,'\\t',,',');
-		export ResrvdName     := VersionControl.mInputFileNameVersions(lthor + 'in::corp2::@version@::ResrvdName::va',landing_zone,,,,,pGroupname,,,'VARIABLE',,8192 ,'\\t',,',');
-		export Tables         := VersionControl.mInputFileNameVersions(lthor + 'in::corp2::@version@::Tables::va',landing_zone,,,,,pGroupname,,,'VARIABLE',,8192 ,'\\t',,',');
+		export Corps          := VersionControl.mInputFileNameVersions(lthor + 'in::corp2::@version@::Corps::va',landing_zone,,,,,pGroupname,,,'VARIABLE',,,'\\,','\\n',);
+		export LLC            := VersionControl.mInputFileNameVersions(lthor + 'in::corp2::@version@::LLC::va',landing_zone,,,,,pGroupname,,,'VARIABLE',,,'\\,','\\n',);
+		export LP             := VersionControl.mInputFileNameVersions(lthor + 'in::corp2::@version@::LP::va',landing_zone,,,,,pGroupname,,,'VARIABLE',,,'\\,','\\n',);
+		export Merger         := VersionControl.mInputFileNameVersions(lthor + 'in::corp2::@version@::Merger::va',landing_zone,,,,,pGroupname,,,'VARIABLE',,,'\\,','\\n',);
+		export NamesHist      := VersionControl.mInputFileNameVersions(lthor + 'in::corp2::@version@::NamesHist::va',landing_zone,,,,,pGroupname,,,'VARIABLE',,,'\\,','\\n',);
+		export Officer        := VersionControl.mInputFileNameVersions(lthor + 'in::corp2::@version@::Officer::va',landing_zone,,,,,pGroupname,,,'VARIABLE',,,'\\,','\\n',);
+		export Amendmt        := VersionControl.mInputFileNameVersions(lthor + 'in::corp2::@version@::Amendment::va',landing_zone,,,,,pGroupname,,,'VARIABLE',,,'\\,','\\n',);
+		export ResrvdName     := VersionControl.mInputFileNameVersions(lthor + 'in::corp2::@version@::ResrvdName::va',landing_zone,,,,,pGroupname,,,'VARIABLE',,,'\\,','\\n',);
+    export BT             := VersionControl.mInputFileNameVersions(lthor + 'in::corp2::@version@::BT::va',landing_zone,,,,,pGroupname,,,'VARIABLE',,,'\\,','\\n',);
+		export GP             := VersionControl.mInputFileNameVersions(lthor + 'in::corp2::@version@::GP::va',landing_zone,,,,,pGroupname,,,'VARIABLE',,,'\\,','\\n',);
+		export PSA            := VersionControl.mInputFileNameVersions(lthor + 'in::corp2::@version@::PSA::va',landing_zone,,,,,pGroupname,,,'VARIABLE',,,'\\,','\\n',);
 
 		export dAll_filenames :=
 			  corps.dAll_filenames 
@@ -1042,7 +1044,9 @@ module
       + Officer.dAll_filenames
 			+ Amendmt.dAll_filenames
 			+ ResrvdName.dAll_filenames
-			+ Tables.dAll_filenames
+			+ BT.dAll_filenames
+			+ GP.dAll_filenames	
+			+ PSA.dAll_filenames
 			;
 
 	end;

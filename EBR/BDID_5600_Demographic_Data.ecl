@@ -1,4 +1,4 @@
-import _control, ut, Business_Header, Business_Header_SS, did_add, Mdr, Std;
+﻿import _control, ut, Business_Header, Business_Header_SS, did_add, Mdr, Std;
 
 //////////////////////////////////////////////////////////////////////////////////////////////
 // -- Value Types
@@ -13,7 +13,8 @@ Layout_5600_Demographic_Data_Base Convert2Base(File_in l) :=
 transform
 	self.date_first_seen	:= '';
 	self.date_last_seen 	:= self.date_first_seen;
-	self 				:= l;
+	self 				:= 	l;
+	self				:=	[];
 end;
 
 File_in2base := project(File_in, Convert2Base(left));

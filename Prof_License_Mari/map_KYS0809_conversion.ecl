@@ -116,7 +116,7 @@ EXPORT map_KYS0809_conversion(STRING pVersion) := FUNCTION
 		//Populating MARI Name Fields
 		SELF.NAME_MARI_ORG	  := SELF.NAME_OFFICE;
 		SELF.PHN_MARI_1				:= IF(TRIM(pInput.TELE_1,LEFT,RIGHT) != '',StringLib.StringFilter(pInput.TELE_1,'0123456789'),'');
-		SELF.PHN_PHONE_1    	:= IF(TRIM(pInput.TELE_1,LEFT,RIGHT) != '',StringLib.StringFilter(pInput.TELE_1,'0123456789'),'');;
+		SELF.PHN_PHONE_1    	:= IF(TRIM(pInput.TELE_1,LEFT,RIGHT) != '',StringLib.StringFilter(pInput.TELE_1,'0123456789'),'');
 
 		/*Default issue date is 17530101
 		Expire date is 6/30 each year based on last update date*/

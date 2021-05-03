@@ -1,4 +1,4 @@
-﻿IMPORT  PRTE2_DCA, PRTE2, PromoteSupers, Address, ut, AID, AID_Support, std;
+﻿IMPORT  PRTE2_DCA, PRTE2, PromoteSupers, Address, ut, AID, AID_Support, std, mdr ;
 
 EXPORT proc_build_base(String filedate) := FUNCTION
 
@@ -70,7 +70,7 @@ Transform(Layouts.Layout_base,
 			SELF.mailing_address.geo_blk      :=  left.mail_address.geo_blk;
 			SELF.mailing_address.geo_match    :=  left.mail_address.geo_match;
 			SELF.mailing_address.err_stat    	:=  left.mail_address.err_stat;
-			//SELF.mailing_rawaid               :=  left.mail_address.rawaid.rawaid;      
+			SELF.mailing_rawaid               :=  left.mail_address_rawaid;
 			SELF.mailing_address.fips_state 	:=  left.mailing_address.fips_state;		
 			SELF.mailing_addr_1 							:=  left.addr_1;
 			SELF.mailing_addr_2								:=  left.addr_2;			
@@ -191,7 +191,8 @@ Transform(Layouts.Layout_base,
 			SELF.companies.address2.Postal_Code_2	:= left.Postal_Code_2A;
 			SELF.companies.address2.Country				:= left.CountryA;
 			SELF.companies.address2.Postal_Code_3	:= left.Postal_Code_3A;
-			//default company fields
+		
+		//default company fields
 			SELF.companies.parent_enterprise_number 	:= [];
 			SELF.companies.ultimate_enterprise_number := [];
 			SELF.companies.company_type 							:= [];
@@ -219,18 +220,27 @@ Transform(Layouts.Layout_base,
 			//clean_dates
 			 SELF.clean_dates.update_date := left.update_date;
 
-			//generating fake BDID AND DID  
-			 SELF.did 		:= prte2.fn_AppendFakeID.did(left.exec1_fname, left.exec1_lname, left.link_ssn, left.link_dob, left.cust_name);	
+			// generating fake BDID AND DID  
+			 // SELF.did 			:= prte2.fn_AppendFakeID.did(left.exec1_fname, left.exec1_lname, left.link_ssn, left.link_dob, left.cust_name);	
+			 self.exec1_did := if(left.exec1_did > 0, left.exec1_did,  prte2.fn_AppendFakeID.did(left.exec1_fname, left.exec1_lname, left.exec1_link_ssn, left.exec1_link_dob, left.cust_name));	
+			 self.exec2_did	:= if(left.exec2_did > 0, left.exec2_did,  prte2.fn_AppendFakeID.did(left.exec2_fname, left.exec2_lname, left.exec2_link_ssn, left.exec2_link_dob, left.cust_name));	
+			 self.exec3_did	:= if(left.exec3_did > 0, left.exec3_did,  prte2.fn_AppendFakeID.did(left.exec3_fname, left.exec3_lname, left.exec3_link_ssn, left.exec3_link_dob, left.cust_name));	
+			 self.exec4_did	:= if(left.exec4_did > 0, left.exec4_did,  prte2.fn_AppendFakeID.did(left.exec4_fname, left.exec4_lname, left.exec4_link_ssn, left.exec4_link_dob, left.cust_name));	
+			 self.exec5_did	:= if(left.exec5_did > 0, left.exec5_did,  prte2.fn_AppendFakeID.did(left.exec5_fname, left.exec5_lname, left.exec5_link_ssn, left.exec5_link_dob, left.cust_name));	
+
 			 SELF.bdid 	:= prte2.fn_AppendFakeID.bdid(left.Name,	SELF.physical_address.prim_range,	SELF.physical_address.prim_name, SELF.physical_address.v_city_name, SELF.physical_address.st, SELF.physical_address.zip, left.cust_name); 
-      //generating linkids
+      
+			//generating linkids
        vLinkingIds := prte2.fn_AppendFakeID.LinkIds(left.name, left.link_fein, left.link_inc_date, SELF.physical_address.prim_range, SELF.physical_address.prim_name, 
                                                    SELF.physical_address.sec_range, SELF.physical_address.v_city_name, SELF.physical_address.st, SELF.physical_address.zip, left.cust_name);
                       
-       SELF.powid	:= vLinkingIds.powid;
+       SELF.powid		:= vLinkingIds.powid;
        SELF.proxid	:= vLinkingIds.proxid;
        SELF.seleid	:= vLinkingIds.seleid;
-       SELF.orgid	:= vLinkingIds.orgid;
-       SELF.ultid	:= vLinkingIds.ultid;	 
+       SELF.orgid		:= vLinkingIds.orgid;
+       SELF.ultid		:= vLinkingIds.ultid;	 
+			 
+			 self.file_type	:= left.type_orig;
 			
 			 SELF := left;
 			 SELF := [];
@@ -240,8 +250,11 @@ Transform(Layouts.Layout_base,
 	file_clean_sort := sort(d_out(addr_type_flag='M'), row_id); //addr_type_flag flag is 'M' or 'P'
 	
 	df_base := PROJECT(file_clean_sort, PRTE2_DCA.Layouts.layout_base);
+	
+	//Populate global sids
+	assign_global_sid := MDR.macGetGlobalSid(df_base, 'DCA', 'file_type', 'global_sid');
 
-	PromoteSupers.MAC_SF_BuildProcess(df_base,Constants.base_dca, writefile);
+	PromoteSupers.MAC_SF_BuildProcess(assign_global_sid,Constants.base_dca, writefile);
 
 	Return writefile;
 		

@@ -2,14 +2,14 @@
 
 EXPORT Layouts := MODULE
 
-	EXPORT companies := DCAV2.Layouts.input.companies;
-	EXPORT layout_entnum := DCAV2.Layouts.base.keybuildentnum;
-	EXPORT killreport_clean := DCAV2.Layouts.input.killreport_clean - enterprise_nbr - __filename;
-	EXPORT mergeracquis_clean := DCAV2.Layouts.input.MergerAcquis_clean - __filename;
-	EXPORT layout_clean182_fips := Address.Layout_Clean182_fips;
-	EXPORT clean_phones := DCAV2.Layouts.clean_phones;
-	EXPORT clean_dates :=  DCAV2.Layouts.clean_dates;
- EXPORT layout_base_companies := DCAV2.Layouts.base.companies;
+	EXPORT companies 							:= DCAV2.Layouts.input.companies;
+	EXPORT layout_entnum 					:= DCAV2.Layouts.base.keybuildentnum;
+	EXPORT killreport_clean 			:= DCAV2.Layouts.input.killreport_clean - enterprise_nbr - __filename;
+	EXPORT mergeracquis_clean 		:= DCAV2.Layouts.input.MergerAcquis_clean - __filename;
+	EXPORT layout_clean182_fips 	:= Address.Layout_Clean182_fips;
+	EXPORT clean_phones 					:= DCAV2.Layouts.clean_phones;
+	EXPORT clean_dates 						:=  DCAV2.Layouts.clean_dates;
+  EXPORT layout_base_companies 	:= DCAV2.Layouts.base.companies;
 
 	EXPORT layout_linkids := RECORD
 		unsigned6 ultid;
@@ -457,30 +457,51 @@ EXPORT Layouts := MODULE
 		string7 Naics10;
 		string150 Naics_Text10;
 		string8 Update_Date;
+	
+	//EXEC1	
+		string8 exec1_link_dob;
+		string9 exec1_link_ssn;
+		unsigned6 exec1_did;
 		string5 exec1_title;
 		string20 exec1_fname;
 		string20 exec1_mname;
 		string20 exec1_lname;
 		string5 exec1_name_suffix;
 		string3 exec1_score;
+	//EXEC2
+		string8 exec2_link_dob;
+		string9 exec2_link_ssn;
+		unsigned6 exec2_did;
 		string5 exec2_title;
 		string20 exec2_fname;
 		string20 exec2_mname;
 		string20 exec2_lname;
 		string5 exec2_name_suffix;
 		string3 exec2_score;
+	//EXEC3
+		string8 exec3_link_dob;
+		string9 exec3_link_ssn;
+		unsigned6 exec3_did;
 		string5 exec3_title;
 		string20 exec3_fname;
 		string20 exec3_mname;
 		string20 exec3_lname;
 		string5 exec3_name_suffix;
 		string3 exec3_score;
+	//EXEC4
+		string8 exec4_link_dob;
+		string9 exec4_link_ssn;
+		unsigned6 exec4_did;
 		string5 exec4_title;
 		string20 exec4_fname;
 		string20 exec4_mname;
 		string20 exec4_lname;
 		string5 exec4_name_suffix;
 		string3 exec4_score;
+	//EXEC5
+		string8 exec5_link_dob;
+		string9 exec5_link_ssn;
+		unsigned6 exec5_did;
 		string5 exec5_title;
 		string20 exec5_fname;
 		string20 exec5_mname;
@@ -519,8 +540,8 @@ EXPORT Layouts := MODULE
 		string3 exec10_score;
 		string150 cust_name;
 		string20 bug_num;
-		string8 link_dob;
-		string9 link_ssn;
+		// string8 link_dob;
+		// string9 link_ssn;
 		string link_fein;
 		string8 link_inc_date;
 	END;
@@ -555,6 +576,7 @@ EXPORT Layouts := MODULE
 		unsigned6 dotid; 
 		PRTE2.Layouts.DEFLT_CPA;
 		unsigned8 row_id;
+		string file_type;
 	END;
    
 //the rest are used to build empty keys	
@@ -865,5 +887,101 @@ EXPORT Layouts := MODULE
 			STRING1  blank_sec_range  := '';
 	END;
 		
-		
+//CCPA Phase 2
+shared orig_addr := RECORD
+    string30 po_box_bldg;
+    string70 street;
+    string70 foreign_po;
+    string80 misc__adr;
+    string15 postal_code_1;
+    string30 city;
+    string2 state;
+    string15 zip;
+    string20 province;
+    string15 postal_code_2;
+    string30 country;
+    string15 postal_code_3;
+   END;
+
+shared lexecutives := RECORD
+				string200 name;
+				string65 title;
+				string3 code;
+			END;
+
+shared contacts := RECORD
+				string9 enterprise_num;
+				string2 level;
+				string150 name;
+				orig_addr address1;
+				string50 phone;
+				string50 fax;
+				string50 telex;
+				orig_addr address2;
+				lexecutives executive;
+				string8 update_date;
+			END;
+
+shared layout_clean_name := RECORD
+				string5 title;
+				string20 fname;
+				string20 mname;
+				string20 lname;
+				string5 name_suffix;
+				string3 name_score;
+			END;
+
+
+export contact_bdid := RECORD
+				unsigned6 bdid;
+				unsigned6 rid;
+				unsigned6 did;
+				unsigned1 did_score;
+				unsigned1 bdid_score;
+				unsigned6 dotid;
+				unsigned2 dotscore;
+				unsigned2 dotweight;
+				unsigned6 empid;
+				unsigned2 empscore;
+				unsigned2 empweight;
+				unsigned6 powid;
+				unsigned2 powscore;
+				unsigned2 powweight;
+				unsigned6 proxid;
+				unsigned2 proxscore;
+				unsigned2 proxweight;
+				unsigned6 seleid;
+				unsigned2 selescore;
+				unsigned2 seleweight;
+				unsigned6 orgid;
+				unsigned2 orgscore;
+				unsigned2 orgweight;
+				unsigned6 ultid;
+				unsigned2 ultscore;
+				unsigned2 ultweight;
+				unsigned4 date_first_seen;
+				unsigned4 date_last_seen;
+				unsigned4 date_vendor_first_reported;
+				unsigned4 date_vendor_last_reported;
+				unsigned8 physical_rawaid;
+				unsigned8 physical_aceaid;
+				unsigned8 mailing_rawaid;
+				unsigned8 mailing_aceaid;
+				unsigned1 record_type;
+				string6 file_type;
+				unsigned3 lncagid;
+				unsigned3 lncaghid;
+				unsigned2 lncaiid;
+				contacts rawfields;
+				string4 birth_year;
+				string9 human_link_id;
+				string6 gender;
+				layout_clean_name 		clean_name;
+				layout_clean182_fips 	physical_address;
+				layout_clean182_fips 	mailing_address;
+				clean_phones 					clean_phones;
+				unsigned4 global_sid;
+				unsigned8 record_sid;
+			END;
+
 END;

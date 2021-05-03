@@ -1,13 +1,15 @@
-import std;
+﻿import std, FLAccidents_Ecrash;
 
-layouts.keybuild_SSv2 copyNames(layouts.keybuild_SSv2 le) := TRANSFORM
+layouts.keybuild_SSv2 copyNames(layouts.keybuild_SSv2  le) := TRANSFORM
 		SELF.fname := le.orig_fname;
 		SELF.lname := le.orig_lname;
 		self.mname := le.orig_mname;
 		self := Le;
 	END;
 	 
-m_base_file:= PROJECT(File_KeybuildV2.out(trim(lname, left, right) <> trim(orig_lname, left, right) and  (STD.STr.CountWords(lname,' ') > 1 or STD.STr.CountWords(orig_lname,' ') > 1 ) and orig_lname <> '' ),copyNames(LEFT));
+m_base_file:= PROJECT(File_KeybuildV2.out(trim(lname, left, right) <> trim(orig_lname, left, right) 
+																					and(STD.STr.CountWords(lname,' ') > 1 or STD.STr.CountWords(orig_lname,' ') > 1 ) 
+																					and orig_lname <> '' ),copyNames(LEFT));
 	
 cmbnd_base_file := m_base_file + File_KeybuildV2.out;
 	

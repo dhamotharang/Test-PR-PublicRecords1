@@ -314,12 +314,15 @@ EXPORT Update_Base (string filedate, boolean pUseProd = false) := MODULE
 	END;
 	
 	EXPORT Individual_Base := FUNCTION
-		hist_base	:= Mark_history(Enclarity.Files(filedate,pUseProd).individual_base.built, Enclarity.layouts.individual_base);
+		prep_hist	:= project(Enclarity.Files(filedate,pUseProd).individual_base.built, transform(Enclarity.Layouts.individual_base_temp,
+														self.cpa_optout := if(left.dotid = 1, 'Y',''), self := left));
+		// hist_base	:= Mark_history(Enclarity.Files(filedate,pUseProd).individual_base.built, Enclarity.layouts.individual_base_temp);
+		hist_base	:= Mark_history(prep_hist, Enclarity.layouts.individual_base_temp);
 													
 		std_input := Enclarity.StandardizeInputFile(filedate, pUseProd).Individual(Files(filedate,pUseProd).individual_input);
 		sort_std	:= sort(distribute(std_input, hash(group_key, last_name, first_name, prefix_name, orig_fullname, suffix_name, suffix_other)), group_key, last_name, first_name, prefix_name, orig_fullname, suffix_name, suffix_other, local);
 										
-fn_cleanName(dataset(enclarity.Layouts.individual_base) d) := FUNCTION
+fn_cleanName(dataset(enclarity.Layouts.individual_base_temp) d) := FUNCTION
 
 	NID.Mac_CleanParsedNames(d, cleanNames
 													, firstname:=first_name,middlename:=middle_name,lastname:=last_name
@@ -339,7 +342,7 @@ fn_cleanName(dataset(enclarity.Layouts.individual_base) d) := FUNCTION
 																						,SuffixIn IN setValidSuffix => SuffixIn
 																						,'');
 																			
-	enclarity.layouts.individual_base tr(cleanNames L) := TRANSFORM
+	enclarity.layouts.individual_base_temp tr(cleanNames L) := TRANSFORM
 		SELF.title 				:= IF(l.nameType='P' and L.cln_title IN ['MR','MS'], L.cln_title, '');
 		SELF.fname 				:= if(l.nameType='P',L.cln_fname,'');
 		SELF.mname 				:= if(l.nameType='P',L.cln_mname,'');
@@ -357,7 +360,7 @@ END;
 											 ,cleanNames + hist_base);
 											 
 		track_ancillaries:= record
-			enclarity.Layouts.individual_base;
+			enclarity.Layouts.individual_base_temp;
 			integer addr	:= 0;
 			integer	dob		:= 0;
 			integer	ssn		:= 0;
@@ -1045,7 +1048,7 @@ end;
 		all_lnpid1	:= dedup(sort(all_lnpid, record, local), record, local);
 		sort_lnpid	:= fn_rollup(all_lnpid1);
 		
-		pre_final_base	:= project(sort_lnpid, enclarity.Layouts.individual_base);		
+		pre_final_base	:= project(sort_lnpid, transform(enclarity.Layouts.individual_base, self.dotid := if(left.cpa_optout = 'Y', 1, 0), self := left));		
 		get_historical_mo_provs	:= pre_final_base(lic_state = 'MO' and record_type = 'H');
 		non_historical_provs		:= pre_final_base(record_type = 'C');
 		non_mo_historical				:= pre_final_base(lic_state <> 'MO' and record_type = 'H');
@@ -1082,7 +1085,7 @@ end;
 			SELF						 							:= L;
 		END;
 	
-		with_ccpa := project(good_recs, add_sid (left));
+		with_ccpa := distribute(project(good_recs, add_sid (left)));
 
 		RETURN with_ccpa;
 	END;

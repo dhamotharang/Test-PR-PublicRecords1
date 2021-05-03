@@ -1,4 +1,4 @@
-import riskwise, Scoring;
+﻿import riskwise, Scoring;
 
 prii_layout := RECORD
 	STRING AccountNumber;
@@ -42,7 +42,7 @@ end;
 soap_in := project(f,into_NP2O_input(LEFT));
 output(soap_in);
 
-roxieIP :='http://oroxievip.sc.seisint.com:9876' ; // DR roxie
+roxieIP :='http://prdrroxiethorvip.hpcc.risk.regn.net:9876' ; // DR roxie
 
 s_f := Scoring.NP2O_Soapcall(soap_in, roxieIP);
 try_2 := JOIN(soap_in, s_f(errorcode<>''), LEFT.account=RIGHT.account, TRANSFORM(Scoring.Layout_NP2O_Soapcall,SELF := LEFT));

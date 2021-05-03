@@ -21,7 +21,7 @@ EXPORT Get_Dataset_Versions(
 		RECURSE := TRUE;
 
 		// Header Keys
-		header_key := PROJECT(FileServices.SuperFileContents(AccountMonitoring.product_files.header_files.doxie_key_header_superkeyname),
+		header_key := PROJECT(FileServices.SuperFileContents(AccountMonitoring.product_files.header_files.r_doxie_key_header_superkeyname),
 			TRANSFORM(Final_Layout,
 				SELF.product := 'HEADER_KEY',
 				SELF.subfile := '',
@@ -29,7 +29,7 @@ EXPORT Get_Dataset_Versions(
 					'thor_data400::key::header::(.*)::data',
 					LEFT.name,1,NOCASE)));
 		
-		quick_header_key := PROJECT(FileServices.SuperFileContents(AccountMonitoring.product_files.header_files.quick_header_superkeyname),
+		quick_header_key := PROJECT(FileServices.SuperFileContents(AccountMonitoring.product_files.header_files.r_quick_header_superkeyname),
 			TRANSFORM(Final_Layout,
 				SELF.product := 'QUICK_HEADER_KEY',
 				SELF.subfile := '',
@@ -37,7 +37,7 @@ EXPORT Get_Dataset_Versions(
 					'thor_data400::key::headerquick::(.*)::did',
 					LEFT.name,1,NOCASE)));
 		
-		daily_utility_key := PROJECT(FileServices.SuperFileContents(AccountMonitoring.product_files.header_files.daily_utility_superkeyname),
+		daily_utility_key := PROJECT(FileServices.SuperFileContents(AccountMonitoring.product_files.header_files.r_daily_utility_superkeyname),
 			TRANSFORM(Final_Layout,
 				SELF.product := 'DAILY_UTILITY_KEY',
 				SELF.subfile := '',
@@ -97,28 +97,28 @@ EXPORT Get_Dataset_Versions(
 					'base::business_header::(.*)::best$',
 					LEFT.name,1,NOCASE)));
 
-		Address_Person_Header := PROJECT(FileServices.SuperFileContents(AccountMonitoring.product_files.header_files.person_header_filename),
+		Address_Person_Header := PROJECT(FileServices.SuperFileContents(AccountMonitoring.product_files.header_files.r_doxie_key_header_superkeyname),
 			TRANSFORM(Final_Layout,
 				SELF.product := 'ADDRESS',
 				SELF.subfile := 'PERSON HEADER',
 				SELF.version := REGEXFIND(
-					'base::header(.*)$',
+					'key::header(.*)$',
 					LEFT.name,1,NOCASE)));
 		
-		Address_Quick_Header := PROJECT(FileServices.SuperFileContents(AccountMonitoring.product_files.header_files.quick_header_filename),
+		Address_Quick_Header := PROJECT(FileServices.SuperFileContents(AccountMonitoring.product_files.header_files.r_quick_header_superkeyname),
 			TRANSFORM(Final_Layout,
 				SELF.product := 'ADDRESS',
 				SELF.subfile := 'QUICK HEADER',
 				SELF.version := REGEXFIND(
-					AccountMonitoring.product_files.header_files.quick_header_filename_raw + '_(.*)$',
+					'key::headerquick(.*)$',
 					LEFT.name,1,NOCASE)));
 		
-		Address_Daily_Utility := PROJECT(FileServices.SuperFileContents(AccountMonitoring.product_files.header_files.daily_utility_filename,RECURSE),
+		Address_Daily_Utility := PROJECT(FileServices.SuperFileContents(AccountMonitoring.product_files.header_files.r_daily_utility_superkeyname,RECURSE),
 			TRANSFORM(Final_Layout,
 				SELF.product := 'ADDRESS',
 				SELF.subfile := 'DAILY UTILITY',
 				SELF.version := REGEXFIND(
-					'in::utility::(.*)::daily_did$',
+					'key::utility::(.*)::daily_did$',
 					LEFT.name,1,NOCASE)));
 					
 		Address :=
@@ -145,28 +145,28 @@ EXPORT Get_Dataset_Versions(
 					AccountMonitoring.product_files.phone.plus_filename_subfile + '_(.*)$',
 					LEFT.name,1,NOCASE)));
 		
-		Phone_Person_Header := PROJECT(FileServices.SuperFileContents(AccountMonitoring.product_files.header_files.person_header_filename),
+		Phone_Person_Header := PROJECT(FileServices.SuperFileContents(AccountMonitoring.product_files.header_files.r_doxie_key_header_superkeyname),
 			TRANSFORM(Final_Layout,
 				SELF.product := 'PHONE',
 				SELF.subfile := 'PERSON HEADER',
 				SELF.version := REGEXFIND(
-					'base::header(.*)$',
+					'key::header(.*)$',
 					LEFT.name,1,NOCASE)));
 		
-		Phone_Quick_Header := PROJECT(FileServices.SuperFileContents(AccountMonitoring.product_files.header_files.quick_header_filename),
+		Phone_Quick_Header := PROJECT(FileServices.SuperFileContents(AccountMonitoring.product_files.header_files.r_quick_header_superkeyname),
 			TRANSFORM(Final_Layout,
 				SELF.product := 'PHONE',
 				SELF.subfile := 'QUICK HEADER',
 				SELF.version := REGEXFIND(
-					AccountMonitoring.product_files.header_files.quick_header_filename_raw + '_(.*)$',
+					'key::headerquick(.*)$',
 					LEFT.name,1,NOCASE)));
 		
-		Phone_Daily_Utility := PROJECT(FileServices.SuperFileContents(AccountMonitoring.product_files.header_files.daily_utility_filename,RECURSE),
+		Phone_Daily_Utility := PROJECT(FileServices.SuperFileContents(AccountMonitoring.product_files.header_files.r_daily_utility_superkeyname,RECURSE),
 			TRANSFORM(Final_Layout,
 				SELF.product := 'PHONE',
 				SELF.subfile := 'DAILY UTILITY',
 				SELF.version := REGEXFIND(
-					'in::utility::(.*)::daily_did$',
+					'key::utility::(.*)::daily_did$',
 					LEFT.name,1,NOCASE)));
 
 		Phone_Person_Best := PROJECT(FileServices.SuperFileContents(AccountMonitoring.product_files.phone.person_best_filename),
@@ -185,14 +185,30 @@ EXPORT Get_Dataset_Versions(
 					'base::paw::(.*)::data$',
 					LEFT.name,1,NOCASE)));
 
-		Phone_Neustar := PROJECT(FileServices.SuperFileContents(AccountMonitoring.product_files.phone.neustar_filename),
+		Phones_Type := PROJECT(FileServices.SuperFileContents(AccountMonitoring.product_files.phone.phones_type_superkeyname),
 			TRANSFORM(Final_Layout,
 				SELF.product := 'PHONE',
-				SELF.subfile := 'NEUSTAR',
+				SELF.subfile := 'Phones_type',
 				SELF.version := REGEXFIND(
-					'in::cellphones::neustar::(.*)::wireline-to-wireless-norange.txt',
-					LEFT.name,1,NOCASE)));
-					
+				'thor_data400::key::(.*)::phones_type',
+				LEFT.name,1,NOCASE)));
+
+		Phones_Lerg6 := PROJECT(FileServices.SuperFileContents(AccountMonitoring.product_files.phone.phones_lerg6_superkeyname),
+			TRANSFORM(Final_Layout,
+				SELF.product := 'PHONE',
+				SELF.subfile := 'phones_lerg6',
+				SELF.version := REGEXFIND(
+				'thor_data400::key::(.*)::phones_lerg6',
+				LEFT.name,1,NOCASE)));					
+
+		carrier_reference := PROJECT(FileServices.SuperFileContents(AccountMonitoring.product_files.phone.carrier_reference_superkeyname),
+			TRANSFORM(Final_Layout,
+				SELF.product := 'PHONE',
+				SELF.subfile := 'carrier_reference',
+				SELF.version := REGEXFIND(
+				'thor_data400::key::(.*)::phonesmetadata::carrier_reference',
+				LEFT.name,1,NOCASE)));
+
 		Phone :=
 			Phone_Gong +
 			Phone_Plus +
@@ -201,7 +217,9 @@ EXPORT Get_Dataset_Versions(
 			Phone_Daily_Utility +
 			Phone_Person_Best +
 			Phone_PAW +
-			Phone_Neustar;
+			Phones_Type+
+			Phones_Lerg6+
+			carrier_reference;
 		
 		// Liens
 
@@ -404,23 +422,23 @@ EXPORT Get_Dataset_Versions(
 			Criminal_Punishments;
 			
 		// Property
-		Property_Search := PROJECT(FileServices.SuperFileContents(AccountMonitoring.product_files.property.search_filename),
+		Property_Search := PROJECT(FileServices.SuperFileContents(AccountMonitoring.product_files.property.Property_search_superkey_monitor),
 			TRANSFORM(Final_Layout,
 				SELF.product := 'PROPERTY',
 				SELF.subfile := 'SEARCH',
 				SELF.version := REGEXFIND(
-					AccountMonitoring.product_files.property.search_filename_raw + '(.*)$',
+					'thor_data400::key::ln_propertyv2::(.*)::search.fid',
 					LEFT.name,1,NOCASE)));
 
-		Property_Deeds := PROJECT(FileServices.SuperFileContents(AccountMonitoring.product_files.property.deeds_filename),
+		Property_Deeds := PROJECT(FileServices.SuperFileContents(AccountMonitoring.product_files.property.Property_deed_superkey_monitor),
 			TRANSFORM(Final_Layout,
 				SELF.product := 'PROPERTY',
 				SELF.subfile := 'DEEDS',
 				SELF.version := REGEXFIND(
-					AccountMonitoring.product_files.property.deeds_filename_raw + '(.*)$',
+					'thor_data400::key::ln_propertyv2::(.*)::addlfaresdeed.fid',
 					LEFT.name,1,NOCASE)));
 	
-		Property_SearchLinkid := PROJECT(FileServices.SuperFileContents(AccountMonitoring.product_files.property.SearchLinkid_superkeyname),
+		Property_SearchLinkid := PROJECT(FileServices.SuperFileContents(AccountMonitoring.product_files.property.Property_SearchLinkid_superkey_monitor),
 			TRANSFORM(Final_Layout,
 				SELF.product := 'PROPERTY',
 				SELF.subfile := 'LINKID',
@@ -443,32 +461,50 @@ EXPORT Get_Dataset_Versions(
 					LEFT.name,1,NOCASE)));
 
 		// Possible Litigious Debtors
-		PossLitDebt := PROJECT(FileServices.SuperFileContents(AccountMonitoring.product_files.litigiousdebtor.litigiousdebtor_filename),
+		PossLitDebt := PROJECT(FileServices.SuperFileContents(AccountMonitoring.product_files.litigiousdebtor.litigiousdebtor_superkey),
 			TRANSFORM(Final_Layout,
 				SELF.product := 'POSSLITDEBT',
 				SELF.subfile := '',
 				SELF.version := REGEXFIND(
-					'base::courtlink::(.*)::litdebt$',
+					'thor_data400::key::courtlink::(.*)::courtid_docket',
 					LEFT.name,1,NOCASE)));
 		
 		// Phones Feedback
-		PhoneFeedback := PROJECT(FileServices.SuperFileContents(AccountMonitoring.product_files.phonefeedback.phonefeedback_filename),
+		PhoneFeedback := PROJECT(FileServices.SuperFileContents(AccountMonitoring.product_files.phonefeedback.PhonesFeedback_superkey),
 			TRANSFORM(Final_Layout,
 				SELF.product := 'PHONEFEEDBACK',
 				SELF.subfile := '',
-				SELF.version := REGEXFIND(
-					AccountMonitoring.product_files.phonefeedback.phonefeedback_filename_raw + '_(.*)$',
+			SELF.version := REGEXFIND(
+					'thor_data400::key::phonesFeedback::(.*)::phone',
 					LEFT.name,1,NOCASE)));
 
 		// Foreclosure
-		Foreclosure := PROJECT(FileServices.SuperFileContents(AccountMonitoring.product_files.foreclosure.base_filename),
+		Foreclosure_fid := PROJECT(FileServices.SuperFileContents(AccountMonitoring.product_files.foreclosure.Foreclosure_fid_superkeyname),
 			TRANSFORM(Final_Layout,
 				SELF.product := 'FORECLOSURE',
-				SELF.subfile := '',
+				SELF.subfile := 'FORECLOSURE_FID',
 				SELF.version := REGEXFIND(
-					AccountMonitoring.product_files.foreclosure.base_filename_raw + '_(.*)$',
+					'thor_data400::key::foreclosure::(.*)::fid',
 					LEFT.name,1,NOCASE)));
 					
+			Nod_fid := PROJECT(FileServices.SuperFileContents(AccountMonitoring.product_files.foreclosure.Nod_fid_superkeyname),
+			TRANSFORM(Final_Layout,
+				SELF.product := 'FORECLOSURE',
+				SELF.subfile := 'NOD_FID',
+				SELF.version := REGEXFIND(
+					'thor_data400::key::nod::(.*)::fid',
+					LEFT.name,1,NOCASE)));
+					
+			Foreclosure_Delta_rid := PROJECT(FileServices.SuperFileContents(AccountMonitoring.product_files.foreclosure.Foreclosure_delta_rid_superkeyname),
+			TRANSFORM(Final_Layout,
+				SELF.product := 'FORECLOSURE',
+				SELF.subfile := 'DELTA_RID',
+				SELF.version := REGEXFIND(
+						'thor_data400::key::foreclosure::(.*)::delta_rid',
+					LEFT.name,1,NOCASE)));
+
+		Foreclosure := Foreclosure_fid + Nod_fid + Foreclosure_Delta_rid;
+
 		// Workplace
 		Workplace := PROJECT(FileServices.SuperFileContents(AccountMonitoring.product_files.workplace.base_filename),
 			TRANSFORM(Final_Layout,
@@ -479,7 +515,7 @@ EXPORT Get_Dataset_Versions(
 					LEFT.name,1,NOCASE)));
 		
 		// DIDUpdate
-		rid_did_key := PROJECT(FileServices.SuperFileContents(AccountMonitoring.product_files.header_files.doxie_key_rid_did_superkeyname),
+		rid_did_key := PROJECT(FileServices.SuperFileContents(AccountMonitoring.product_files.header_files.r_doxie_key_rid_did_superkeyname),
 			TRANSFORM(Final_Layout,
 				SELF.product := 'DIDUPDATE',
 				SELF.subfile := 'RID_DID',
@@ -487,7 +523,7 @@ EXPORT Get_Dataset_Versions(
 					'thor_data400::key::header::(.*)::rid_did',
 					LEFT.name,1,NOCASE)));
 		
-		rid_did_split_key := PROJECT(FileServices.SuperFileContents(AccountMonitoring.product_files.header_files.doxie_key_rid_did_split_superkeyname),
+		rid_did_split_key := PROJECT(FileServices.SuperFileContents(AccountMonitoring.product_files.header_files.r_doxie_key_rid_did_split_superkeyname),
 			TRANSFORM(Final_Layout,
 				SELF.product := 'DIDUPDATE',
 				SELF.subfile := 'RID_DID_SPLIT',
@@ -500,7 +536,7 @@ EXPORT Get_Dataset_Versions(
 			rid_did_split_key;
 			
 		// BDIDUpdate
-		BDIDUpdate := PROJECT(FileServices.SuperFileContents(AccountMonitoring.product_files.header_files.business_header_key_rcid_superkeyname),
+		BDIDUpdate := PROJECT(FileServices.SuperFileContents(AccountMonitoring.product_files.header_files.r_business_header_rcid_superkeyname),
 			TRANSFORM(Final_Layout,
 				SELF.product := 'BDIDUPDATE',
 				SELF.subfile := '',
@@ -509,16 +545,60 @@ EXPORT Get_Dataset_Versions(
 					LEFT.name,1,NOCASE)));
 		
 		// Phone Ownership
-		PhoneOwnership := PROJECT(FileServices.SuperFileContents(AccountMonitoring.product_files.PhoneOwnership.pphone_superkeyname),
+
+		Phones_transaction := PROJECT(FileServices.SuperFileContents(AccountMonitoring.product_files.phoneownership.phones_transaction_superkeyname),
 			TRANSFORM(Final_Layout,
 				SELF.product := 'PHONEOWNERSHIP',
-				SELF.subfile := '',
+				SELF.subfile := 'phones_transaction',
 				SELF.version := REGEXFIND(
-					'thor_data400::key::::(.*)::phones_ported_metadata',
-					LEFT.name,1,NOCASE)));
+				'thor_data400::key::(.*)::phones_transaction',
+				LEFT.name,1,NOCASE)));	
+
+		PPhones_Type := PROJECT(FileServices.SuperFileContents(AccountMonitoring.product_files.phone.phones_type_superkeyname),
+			TRANSFORM(Final_Layout,
+				SELF.product := 'PHONEOWNERSHIP',
+				SELF.subfile := 'Phones_type',
+				SELF.version := REGEXFIND(
+				'thor_data400::key::(.*)::phones_type',
+				LEFT.name,1,NOCASE)));
+
+		PPhones_Lerg6 := PROJECT(FileServices.SuperFileContents(AccountMonitoring.product_files.phone.phones_lerg6_superkeyname),
+			TRANSFORM(Final_Layout,
+				SELF.product := 'PHONEOWNERSHIP',
+				SELF.subfile := 'phones_lerg6',
+				SELF.version := REGEXFIND(
+				'thor_data400::key::(.*)::phones_lerg6',
+				LEFT.name,1,NOCASE)));
+
+		pcarrier_reference := PROJECT(FileServices.SuperFileContents(AccountMonitoring.product_files.phone.carrier_reference_superkeyname),
+			TRANSFORM(Final_Layout,
+				SELF.product := 'PHONEOWNERSHIP',
+				SELF.subfile := 'carrier_reference',
+				SELF.version := REGEXFIND(
+				'thor_data400::key::(.*)::phonesmetadata::carrier_reference',
+				LEFT.name,1,NOCASE)));
+
+		Phones_WDNC := PROJECT(FileServices.SuperFileContents(AccountMonitoring.product_files.PhoneOwnership.phones_WDNC_superkeyname),
+			TRANSFORM(Final_Layout,
+				SELF.product := 'PHONEOWNERSHIP',
+				SELF.subfile := 'Phone_TCPA',
+				SELF.version := REGEXFIND(
+				'thor_data400::key::tcpa::(.*)::phone_history',
+				LEFT.name,1,NOCASE)));
+
+
+
+		PhoneOwnership := 
+		PPhones_Type +
+		PPhones_Lerg6 +
+		Phones_transaction +
+		pcarrier_reference +
+		Phones_WDNC;
+
+
 		
 		// BipBest Update
-		BipBestUpdate := PROJECT(FileServices.SuperFileContents(AccountMonitoring.product_files.header_files.bipbest_header_superkeyname),
+		BipBestUpdate := PROJECT(FileServices.SuperFileContents(AccountMonitoring.product_files.header_files.r_bipbest_header_superkeyname),
 			TRANSFORM(Final_Layout,
 				SELF.product := 'BIPBESTUPDATE',
 				SELF.subfile := '',
@@ -589,7 +669,7 @@ EXPORT Get_Dataset_Versions(
 		govtDebarred := govtdebarred_Linkid;
 		
 		// Inquiry
-		Inquiry_Linkid := PROJECT(FileServices.SuperFileContents(AccountMonitoring.product_files.inquiry.inquiryLinkid_superkeyname),
+		Inquiry_Linkid := PROJECT(FileServices.SuperFileContents(AccountMonitoring.product_files.inquiry.inquiryLinkid_superkey),
 			TRANSFORM(Final_Layout,
 				SELF.product := 'INQUIRY',
 				SELF.subfile := 'LINKID',
@@ -597,7 +677,7 @@ EXPORT Get_Dataset_Versions(
 					'thor_data400::key::inquiry::(.*)::linkids',
 					LEFT.name,1,NOCASE)));
 					
-		InquiryUpdate_Linkid := PROJECT(FileServices.SuperFileContents(AccountMonitoring.product_files.inquiry.inquiryUpdLinkid_superkeyname),
+		InquiryUpdate_Linkid := PROJECT(FileServices.SuperFileContents(AccountMonitoring.product_files.inquiry.inquiryUpdLinkid_superkey),
 			TRANSFORM(Final_Layout,
 				SELF.product := 'INQUIRY',
 				SELF.subfile := 'LINKID_UPDATE',

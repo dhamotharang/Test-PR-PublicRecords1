@@ -1,4 +1,4 @@
-import VersionControl,_Control,ut,lib_fileservices;
+﻿import VersionControl,_Control,ut,lib_fileservices, STD;
 
 
 EXPORT fn_ValidIn (  boolean	pIsTesting	= false
@@ -23,7 +23,7 @@ check_bct := regexreplace('[*]',regexreplace('[?]{3}',FLAccidents_Ecrash.Constan
 
 
 
-vIncident_chk := map  ( name[1..StringLib.Stringfind(name,'.',5)-1] not in [check_ala,check_bct]   => FAIL('FILE NAMING CONVENTION DONT MATCH') ,
+vIncident_chk := map  ( name[1..STD.Str.Find(name,'.',5)-1] not in [check_ala,check_bct]   => FAIL('FILE NAMING CONVENTION DONT MATCH') ,
                         size = 0 => FAIL('size is 0'), Output('Incident file '+name +'looks good')
 												);
 												

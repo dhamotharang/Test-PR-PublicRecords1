@@ -142,7 +142,7 @@ export IdAppendThorLocal(
 	           ,(results[1].proxid > 0 or results_seleid[1].seleid > 0 or results_ultid[1].ultid > 0)), //filter not necessary here, but might save some work
 	(integer)keep_count,
 	transform(
-		{%OutFile1%.reference, %OutFile1%.results.proxid, %OutFile1%.results.weight, %OutFile1%.results.score, %OutFile1%.results.seleid, %OutFile1%.results.orgid, %OutFile1%.results.ultid, %OutFile1%.results.powid
+		{%OutFile1%.reference, %OutFile1%.results.proxid, %OutFile1%.results.weight, %OutFile1%.results.score, %OutFile1%.results.keys_used, %OutFile1%.results.keys_failed, %OutFile1%.results.seleid, %OutFile1%.results.orgid, %OutFile1%.results.ultid, %OutFile1%.results.powid
 		  , unsigned4 seleweight, unsigned4 selescore, unsigned4 orgweight, unsigned4 orgscore, unsigned4 ultweight, unsigned4 ultscore, UNSIGNED4 powweight, UNSIGNED4 powscore
 			//part 1 of 2 of the street force hack, but not harmful if left in 
 		  ,%OutFile1%.results.prim_Range, %OutFile1%.results.prim_Rangeweight, %OutFile1%.results.prim_name, %OutFile1%.results.prim_nameweight
@@ -275,7 +275,9 @@ export IdAppendThorLocal(
 		self.ultimate_proxid := map(isProxResolved => left.results[counter].ultimate_proxid,
 		                            isSeleResolved and not isSeleWrong => left.results_seleid[counter].ultimate_proxid,
 		                            0);
-
+		self.keys_used := left.results[counter].keys_used;
+		self.keys_failed := left.results[counter].keys_failed;
+																
 		self:= left.results[counter];    
 		)
 	)((score >= (integer)score_threshold or selescore >= (integer)score_threshold or ultscore >= (integer)score_threshold), (proxid > 0 or seleid > 0 or ultid > 0));// proxid > 0 also because of case where threshold is zero (without this you get keep_count records even with no IDs on them)
@@ -335,6 +337,8 @@ export IdAppendThorLocal(
 			self.sele_proxid := right.sele_proxid,
 			self.org_proxid := right.org_proxid,
 			self.ultimate_proxid := right.ultimate_proxid,
+			self.keys_used := right.keys_used,
+			self.keys_failed := right.keys_failed,
 				
 		  self := left
 		),
@@ -342,15 +346,24 @@ export IdAppendThorLocal(
 		left outer
   );
 
-	passThru0 := project(infile(proxid != 0 or seleid != 0),
+	passThruIn := project(infile(proxid != 0 or seleid != 0),
 		transform(BizLinkFull.Process_Biz_Layouts.id_stream_layout,
 			self.uniqueId := left.request_id,
 			self.proxid := left.proxid,
 			self.seleid := if(left.proxid != 0, 0, left.seleid);
 			self := left;
 			self := []));
-	passThru := if(reAppend, dataset([], recordof(passThru0)),
-	               BizLinkFull.Process_Biz_Layouts.id_stream_complete(passThru0));
+	passThruIds := if(reAppend, dataset([], recordof(passThruIn)),
+	               BizLinkFull.Process_Biz_Layouts.id_stream_complete(passThruIn));
+	passThruMissingIds := passThruIds(ultid = 0 and (seleid != 0 or proxid != 0));
+	passThruHistoric := BizLinkFull.Process_Biz_Layouts.id_stream_historic(passThruMissingIds);
+	passThruRenew :=
+		join(passThruMissingIds, passThruHistoric,
+			left.uniqueid = right.uniqueid,
+			transform(recordof(left),
+				self := if(right.ultid != 0, right, left)),
+			keep(1), left outer);
+	passThru := passThruIds(not (ultid = 0 and (seleid != 0 or proxid != 0))) + passThruRenew;
 
 	postPassThru := project(passThru, transform(recordof(%outfile20%),
 		self.request_id := left.uniqueid,

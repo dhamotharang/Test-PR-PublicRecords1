@@ -1,14 +1,15 @@
-import AutoKeyB2;
+﻿import AutoKeyB2,Std;
 
-string filedate := official_records.Version_Development;
+export Proc_Build_Autokey(string filedate = (string8)Std.Date.Today(), boolean isDelta = false) := function
 
-export Proc_Build_Autokey := function
-
-ak_dataset := Constants.ak_dataset;
+ak_dataset := Constants.ak_dataset(isDelta);
 ak_keyname := Constants.ak_keyname;
 ak_logical := Constants.ak_logical(filedate);
 ak_skipSet := Constants.ak_skipSet;
 ak_typeStr := Constants.ak_typeStr;
+
+PreviousKey:=index(official_records.Key_Official_Records_Payload,'~thor_200::key::official_records::autokey::payload_qa');
+PrevMaxFakeID := if(isdelta,MAX(PreviousKey,fakeid),0);		
 
 AutoKeyB2.MAC_Build (ak_dataset
 					,fname,mname,lname
@@ -36,11 +37,9 @@ AutoKeyB2.MAC_Build (ak_dataset
 					,ak_logical
 					,outaction,false
 					,ak_skipSet,true,ak_typeStr
-					,true,,,zero);
+					,true,,,zero,,,,,,,,,,isDelta,PrevMaxFakeID);
 
-AutoKeyB2.MAC_AcceptSK_to_QA(ak_keyname, mymove,, ak_skipset);
-
-retval := sequential(outaction,mymove);
+retval := outaction;
 
 return retval;
 

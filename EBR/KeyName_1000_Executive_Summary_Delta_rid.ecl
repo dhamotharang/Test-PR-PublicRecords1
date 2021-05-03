@@ -1,0 +1,1 @@
+﻿EXPORT KeyName_1000_Executive_Summary_Delta_rid := trim(GetSegmentKeyName_Delta_RID('1000'));

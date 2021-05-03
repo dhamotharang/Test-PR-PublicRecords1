@@ -1,10 +1,11 @@
 ﻿EXPORT layouts := MODULE
-
+//DF-27472 Initial Roxie Release
 	EXPORT i_source_level_payload := RECORD 
 				data16   	   	cellphoneidkey; 
-				string2     	source;	
+				string2     	source;	//two-digit code 
+				unsigned8 		src_bitmap; //bitmap flag corresponding to two-digit source code
 				boolean		  	household_flag;  
-				
+				unsigned8 		rules;  //bitmap of rules in rollup up phonesplus_v2 keys
 				string10		 	cellphone;
 				string3			 	npa;
 				string7			 	phone7;
@@ -60,6 +61,7 @@
 				string20     	lname;
 				string5      	name_suffix;
 				string3      	name_score;
+				string8 			dob;				
 				Unsigned8			rawAID;
 				Unsigned8   	cleanAID;
 				boolean     	current_rec;

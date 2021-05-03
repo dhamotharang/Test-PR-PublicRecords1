@@ -30,6 +30,16 @@ EXPORT Functions := MODULE
     RETURN IF(isValidDate, 1, 0);
   END;
 	
+	//*******************************************************************************
+  //fn_trans_date: 	returns true if valid transaction date, else false
+  //*******************************************************************************
+  EXPORT fn_trans_date(STRING sDate) := FUNCTION
+	  //DataBridge only sends a 6-digit date, so the 01 is added for validation purposes
+	  in_date := sDate + '01';
+		isValidDate := IF(Scrubs.fn_valid_pastDate(in_date)>0 ,true ,false);
+
+		RETURN IF(isValidDate, 1, 0);
+  END;
   //****************************************************************************
   //fn_numeric_or_blank: 	returns true if only populated with numbers or blanks
   //****************************************************************************  

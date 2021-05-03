@@ -9,7 +9,7 @@ EXPORT _mac_Fraghunter_Find_Fragments(
 ) := 
 functionmacro
 
-  IMPORT SALT311;
+  IMPORT SALT44;
   
   // -- Set Template vars, id source(id number 1)
   #uniquename(hdrkey  )
@@ -27,9 +27,9 @@ functionmacro
 	x_hdr := JOIN(  DISTRIBUTE(%hdrkey% ,pId) ,DISTRIBUTE(p_hdr ,pId  ) ,LEFT.pId = RIGHT.pId ,TRANSFORM({unsigned6 uniqueid,recordof(left)}  ,SELF.uniqueid := RIGHT.uniqueid  ,SELF := LEFT ),LOCAL);
 	
 	//Propagate fields
-  DSAfter_cnp_btype         := SALT311.MAC_Field_Prop_Do(x_hdr                ,cnp_btype          ,pId);
-  DSAfter_company_fein      := SALT311.MAC_Field_Prop_Do(DSAfter_cnp_btype    ,company_fein       ,pId);
-  DSAfter_company_sic_code1 := SALT311.MAC_Field_Prop_Do(DSAfter_company_fein ,company_sic_code1  ,pId);
+  DSAfter_cnp_btype         := SALT44.MAC_Field_Prop_Do(x_hdr                ,cnp_btype          ,pId);
+  DSAfter_company_fein      := SALT44.MAC_Field_Prop_Do(DSAfter_cnp_btype    ,company_fein       ,pId);
+  DSAfter_company_sic_code1 := SALT44.MAC_Field_Prop_Do(DSAfter_company_fein ,company_sic_code1  ,pId);
 	
 	//Find fragments
   SmallJob      := TRUE;
@@ -40,7 +40,7 @@ functionmacro
   // Mapping := 'UniqueID:rcid,zip_cases:zip';
   Mapping := 'zip_cases:zip';
 
-  MyInfile := SALT311.FromFlat(DSAfter_company_sic_code1,BizLinkFull.Process_Biz_Layouts.InputLayout,Mapping);
+  MyInfile := SALT44.FromFlat(DSAfter_company_sic_code1,BizLinkFull.Process_Biz_Layouts.InputLayout,Mapping);
 
   BizLinkFull.MAC_Meow_Biz_Batch(
      MyInfile,UniqueId,/* MY_proxid */,/* MY_seleid */,/* MY_orgid */,/* MY_ultid */

@@ -42,7 +42,7 @@ t  := record
 			
 end; 
 
-Update_In := distribute(Transunion_PTrak.Normalize_Transunion_Update,hash(VendorDocumentIdentifier )) ; 
+Update_In := distribute(Transunion_PTrak.Normalize_Transunion_Update(Full_filedate,Update_filedate),hash(VendorDocumentIdentifier )) ; 
 
 base_in   := Transunion_PTrak.File_Transunion_DID_Out ; 
 base_d    := dedup(distribute(base_in, hash(VendorDocumentIdentifier )),VendorDocumentIdentifier,

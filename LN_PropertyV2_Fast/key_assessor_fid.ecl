@@ -9,7 +9,7 @@ KeyName 			:= 'thor_data400::key::'+keyPrefix+'::';
 KeyName_fcra  := 'thor_data400::key::'+keyPrefix+'::fcra::';
 
 file_in0	:= LN_PropertyV2_Fast.CleanAssessment(LN_PropertyV2.File_Assessment,false);
-file_in1	:= LN_PropertyV2_Fast.CleanAssessment(LN_PropertyV2_Fast.Files.base.assessment,true);
+file_in1	:= LN_PropertyV2_Fast.CleanAssessment(LN_PropertyV2_Fast.Files.basedelta.assessment,true);
 file_in2	:= if(isFast,file_in1, file_in0);
 file_in := file_in2(trim(ln_fares_id) != '');
 

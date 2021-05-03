@@ -8,7 +8,9 @@ EXPORT Map_Transactions(string8 version) := FUNCTION
 	//DF-23286: Update Keys
 	//DF-23827: Update Transaction File
 	
-	dx_PhoneFinderReportDelta.Layout_PhoneFinder.Transactions_Main trT(inFile l):= transform
+	//DF-27818: Add "identity_count" field to OtherPhones & Transactions Base Files
+	//dx_PhoneFinderReportDelta.Layout_PhoneFinder.Transactions_Main trT(inFile l):= transform
+	PhoneFinderReportDelta.Layout_PhoneFinder.Transactions_Main_Temp trT(inFile l):= transform
 		self.date_file_loaded 				:= version;
 		self.transaction_date					:= if(Std.Date.IsValidDate((unsigned)(PhoneFinderReportDelta._Functions.keepNum(l.transaction_date)[1..8])),
 																				PhoneFinderReportDelta._Functions.keepNum(l.transaction_date)[1..8],
@@ -47,12 +49,15 @@ EXPORT Map_Transactions(string8 version) := FUNCTION
 		self.phone_forwarded					:= PhoneFinderReportDelta._Functions.rmNull(l.phone_forwarded);
 		self.date_added								:= PhoneFinderReportDelta._Functions.keepNum(l.date_added)[1..8];
 		self.time_added								:= PhoneFinderReportDelta._Functions.keepNum(l.date_added)[9..];
+		self.verification_type				:= PhoneFinderReportDelta._Functions.rmNull(l.verification_type);	
+		self.phone_star_rating				:= PhoneFinderReportDelta._Functions.keepNum(l.phone_star_rating);	
 		self 													:= l;
 	end;
 	
 	mapTranMain 		:= project(inFile, trT(left));
 	concatFile			:= mapTranMain + PhoneFinderReportDelta.File_PhoneFinder.Transactions_Main;		//DF-23286
-	ddConcat 				:= dedup(sort(distribute(concatFile(transaction_date<>''), hash(transaction_id)), transaction_id, company_id, -(date_added+time_added), local), transaction_id, company_id, local); //Dedup Records & Filter for Transaction_Date<>''
+  //DF-27859 keep the earliest records for delta update changes
+	ddConcat 				:= dedup(sort(distribute(concatFile(transaction_date<>''), hash(transaction_id)), transaction_id, company_id, date_file_loaded,date_added,time_added, local), transaction_id, company_id, local); //Dedup Records & Filter for Transaction_Date<>''
 	
 	return ddConcat;  
 	

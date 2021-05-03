@@ -13,6 +13,7 @@ EXPORT _Flags(BOOLEAN pUseProd = FALSE) := MODULE
 			EXPORT Nurses1              := COUNT(NOTHOR(FileServices.SuperFileContents(ALC.Filenames(, pUseProd).Nurses1_lInputTemplate))) > 0;
 			EXPORT Nurses2              := COUNT(NOTHOR(FileServices.SuperFileContents(ALC.Filenames(, pUseProd).Nurses2_lInputTemplate))) > 0;
 			EXPORT Nurses3              := COUNT(NOTHOR(FileServices.SuperFileContents(ALC.Filenames(, pUseProd).Nurses3_lInputTemplate))) > 0;
+			EXPORT Nurses4              := COUNT(NOTHOR(FileServices.SuperFileContents(ALC.Filenames(, pUseProd).Nurses4_lInputTemplate))) > 0;
 			EXPORT Pharmacists          := COUNT(NOTHOR(FileServices.SuperFileContents(ALC.Filenames(, pUseProd).Pharmacists_lInputTemplate))) > 0;
 			EXPORT Pilots               := COUNT(NOTHOR(FileServices.SuperFileContents(ALC.Filenames(, pUseProd).Pilots_lInputTemplate))) > 0;
 			EXPORT Professionals1       := COUNT(NOTHOR(FileServices.SuperFileContents(ALC.Filenames(, pUseProd).Professionals1_lInputTemplate))) > 0;

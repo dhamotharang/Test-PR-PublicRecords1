@@ -1,1275 +1,1280 @@
-IMPORT SALT36;
+﻿IMPORT SALT311;
 IMPORT Scrubs; // Import modules for FieldTypes attribute definitions
 EXPORT Fields := MODULE
  
+EXPORT NumFields := 290;
+ 
 // Processing for each FieldType
-EXPORT SALT36.StrType FieldTypeName(UNSIGNED2 i) := CHOOSE(i,'invalid_corp_key','invalid_corp_vendor','invalid_state_origin','invalid_name_type_code','invalid_forgn_dom_code','invalid_flag_code','invalid_name_type_desc','invalid_mandatory','invalid_numeric','invalid_charter_nbr','invalid_for_dom_ind','invalid_recordorigin','invalid_date','invalid_alphablank','invalid_org_structure_desc');
-EXPORT FieldTypeNum(SALT36.StrType fn) := CASE(fn,'invalid_corp_key' => 1,'invalid_corp_vendor' => 2,'invalid_state_origin' => 3,'invalid_name_type_code' => 4,'invalid_forgn_dom_code' => 5,'invalid_flag_code' => 6,'invalid_name_type_desc' => 7,'invalid_mandatory' => 8,'invalid_numeric' => 9,'invalid_charter_nbr' => 10,'invalid_for_dom_ind' => 11,'invalid_recordorigin' => 12,'invalid_date' => 13,'invalid_alphablank' => 14,'invalid_org_structure_desc' => 15,0);
+EXPORT SALT311.StrType FieldTypeName(UNSIGNED2 i) := CHOOSE(i,'invalid_corp_key','invalid_corp_vendor','invalid_state_origin','invalid_name_type_code','invalid_forgn_dom_code','invalid_flag_code','invalid_name_type_desc','invalid_mandatory','invalid_numeric','invalid_charter_nbr','invalid_for_dom_ind','invalid_recordorigin','invalid_date','invalid_alphablank','invalid_org_structure_desc');
+EXPORT FieldTypeNum(SALT311.StrType fn) := CASE(fn,'invalid_corp_key' => 1,'invalid_corp_vendor' => 2,'invalid_state_origin' => 3,'invalid_name_type_code' => 4,'invalid_forgn_dom_code' => 5,'invalid_flag_code' => 6,'invalid_name_type_desc' => 7,'invalid_mandatory' => 8,'invalid_numeric' => 9,'invalid_charter_nbr' => 10,'invalid_for_dom_ind' => 11,'invalid_recordorigin' => 12,'invalid_date' => 13,'invalid_alphablank' => 14,'invalid_org_structure_desc' => 15,0);
  
-EXPORT MakeFT_invalid_corp_key(SALT36.StrType s0) := FUNCTION
-  s1 := SALT36.stringfilter(s0,'0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ-'); // Only allow valid symbols
+EXPORT MakeFT_invalid_corp_key(SALT311.StrType s0) := FUNCTION
+  s1 := SALT311.stringfilter(s0,'0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ-'); // Only allow valid symbols
   RETURN  s1;
 END;
-EXPORT InValidFT_invalid_corp_key(SALT36.StrType s) := WHICH(LENGTH(TRIM(s))<>LENGTH(TRIM(SALT36.StringFilter(s,'0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ-'))),~(LENGTH(TRIM(s)) >= 4));
-EXPORT InValidMessageFT_invalid_corp_key(UNSIGNED1 wh) := CHOOSE(wh,SALT36.HygieneErrors.NotInChars('0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ-'),SALT36.HygieneErrors.NotLength('4..'),SALT36.HygieneErrors.Good);
+EXPORT InValidFT_invalid_corp_key(SALT311.StrType s) := WHICH(LENGTH(TRIM(s))<>LENGTH(TRIM(SALT311.StringFilter(s,'0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ-'))),~(LENGTH(TRIM(s)) >= 4));
+EXPORT InValidMessageFT_invalid_corp_key(UNSIGNED1 wh) := CHOOSE(wh,SALT311.HygieneErrors.NotInChars('0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ-'),SALT311.HygieneErrors.NotLength('4..'),SALT311.HygieneErrors.Good);
  
-EXPORT MakeFT_invalid_corp_vendor(SALT36.StrType s0) := FUNCTION
+EXPORT MakeFT_invalid_corp_vendor(SALT311.StrType s0) := FUNCTION
   RETURN  s0;
 END;
-EXPORT InValidFT_invalid_corp_vendor(SALT36.StrType s) := WHICH(((SALT36.StrType) s) NOT IN ['11']);
-EXPORT InValidMessageFT_invalid_corp_vendor(UNSIGNED1 wh) := CHOOSE(wh,SALT36.HygieneErrors.NotInEnum('11'),SALT36.HygieneErrors.Good);
+EXPORT InValidFT_invalid_corp_vendor(SALT311.StrType s) := WHICH(((SALT311.StrType) s) NOT IN ['11','11']);
+EXPORT InValidMessageFT_invalid_corp_vendor(UNSIGNED1 wh) := CHOOSE(wh,SALT311.HygieneErrors.NotInEnum('11|11'),SALT311.HygieneErrors.Good);
  
-EXPORT MakeFT_invalid_state_origin(SALT36.StrType s0) := FUNCTION
+EXPORT MakeFT_invalid_state_origin(SALT311.StrType s0) := FUNCTION
   RETURN  s0;
 END;
-EXPORT InValidFT_invalid_state_origin(SALT36.StrType s) := WHICH(((SALT36.StrType) s) NOT IN ['DC']);
-EXPORT InValidMessageFT_invalid_state_origin(UNSIGNED1 wh) := CHOOSE(wh,SALT36.HygieneErrors.NotInEnum('DC'),SALT36.HygieneErrors.Good);
+EXPORT InValidFT_invalid_state_origin(SALT311.StrType s) := WHICH(((SALT311.StrType) s) NOT IN ['DC','DC']);
+EXPORT InValidMessageFT_invalid_state_origin(UNSIGNED1 wh) := CHOOSE(wh,SALT311.HygieneErrors.NotInEnum('DC|DC'),SALT311.HygieneErrors.Good);
  
-EXPORT MakeFT_invalid_name_type_code(SALT36.StrType s0) := FUNCTION
+EXPORT MakeFT_invalid_name_type_code(SALT311.StrType s0) := FUNCTION
   RETURN  s0;
 END;
-EXPORT InValidFT_invalid_name_type_code(SALT36.StrType s) := WHICH(((SALT36.StrType) s) NOT IN ['01','04']);
-EXPORT InValidMessageFT_invalid_name_type_code(UNSIGNED1 wh) := CHOOSE(wh,SALT36.HygieneErrors.NotInEnum('01|04'),SALT36.HygieneErrors.Good);
+EXPORT InValidFT_invalid_name_type_code(SALT311.StrType s) := WHICH(((SALT311.StrType) s) NOT IN ['01','04','07']);
+EXPORT InValidMessageFT_invalid_name_type_code(UNSIGNED1 wh) := CHOOSE(wh,SALT311.HygieneErrors.NotInEnum('01|04|07'),SALT311.HygieneErrors.Good);
  
-EXPORT MakeFT_invalid_forgn_dom_code(SALT36.StrType s0) := FUNCTION
+EXPORT MakeFT_invalid_forgn_dom_code(SALT311.StrType s0) := FUNCTION
   RETURN  s0;
 END;
-EXPORT InValidFT_invalid_forgn_dom_code(SALT36.StrType s) := WHICH(((SALT36.StrType) s) NOT IN ['D','F',' ']);
-EXPORT InValidMessageFT_invalid_forgn_dom_code(UNSIGNED1 wh) := CHOOSE(wh,SALT36.HygieneErrors.NotInEnum('D|F| '),SALT36.HygieneErrors.Good);
+EXPORT InValidFT_invalid_forgn_dom_code(SALT311.StrType s) := WHICH(((SALT311.StrType) s) NOT IN ['D','F',' ']);
+EXPORT InValidMessageFT_invalid_forgn_dom_code(UNSIGNED1 wh) := CHOOSE(wh,SALT311.HygieneErrors.NotInEnum('D|F| '),SALT311.HygieneErrors.Good);
  
-EXPORT MakeFT_invalid_flag_code(SALT36.StrType s0) := FUNCTION
+EXPORT MakeFT_invalid_flag_code(SALT311.StrType s0) := FUNCTION
   RETURN  s0;
 END;
-EXPORT InValidFT_invalid_flag_code(SALT36.StrType s) := WHICH(((SALT36.StrType) s) NOT IN ['Y','N',' ']);
-EXPORT InValidMessageFT_invalid_flag_code(UNSIGNED1 wh) := CHOOSE(wh,SALT36.HygieneErrors.NotInEnum('Y|N| '),SALT36.HygieneErrors.Good);
+EXPORT InValidFT_invalid_flag_code(SALT311.StrType s) := WHICH(((SALT311.StrType) s) NOT IN ['Y','N',' ']);
+EXPORT InValidMessageFT_invalid_flag_code(UNSIGNED1 wh) := CHOOSE(wh,SALT311.HygieneErrors.NotInEnum('Y|N| '),SALT311.HygieneErrors.Good);
  
-EXPORT MakeFT_invalid_name_type_desc(SALT36.StrType s0) := FUNCTION
+EXPORT MakeFT_invalid_name_type_desc(SALT311.StrType s0) := FUNCTION
   RETURN  s0;
 END;
-EXPORT InValidFT_invalid_name_type_desc(SALT36.StrType s) := WHICH(((SALT36.StrType) s) NOT IN ['LEGAL','TRADE NAME']);
-EXPORT InValidMessageFT_invalid_name_type_desc(UNSIGNED1 wh) := CHOOSE(wh,SALT36.HygieneErrors.NotInEnum('LEGAL|TRADE NAME'),SALT36.HygieneErrors.Good);
+EXPORT InValidFT_invalid_name_type_desc(SALT311.StrType s) := WHICH(((SALT311.StrType) s) NOT IN ['LEGAL','TRADE NAME','RESERVED']);
+EXPORT InValidMessageFT_invalid_name_type_desc(UNSIGNED1 wh) := CHOOSE(wh,SALT311.HygieneErrors.NotInEnum('LEGAL|TRADE NAME|RESERVED'),SALT311.HygieneErrors.Good);
  
-EXPORT MakeFT_invalid_mandatory(SALT36.StrType s0) := FUNCTION
+EXPORT MakeFT_invalid_mandatory(SALT311.StrType s0) := FUNCTION
   RETURN  s0;
 END;
-EXPORT InValidFT_invalid_mandatory(SALT36.StrType s) := WHICH(~(LENGTH(TRIM(s)) >= 1));
-EXPORT InValidMessageFT_invalid_mandatory(UNSIGNED1 wh) := CHOOSE(wh,SALT36.HygieneErrors.NotLength('1..'),SALT36.HygieneErrors.Good);
+EXPORT InValidFT_invalid_mandatory(SALT311.StrType s) := WHICH(~(LENGTH(TRIM(s)) >= 1));
+EXPORT InValidMessageFT_invalid_mandatory(UNSIGNED1 wh) := CHOOSE(wh,SALT311.HygieneErrors.NotLength('1..'),SALT311.HygieneErrors.Good);
  
-EXPORT MakeFT_invalid_numeric(SALT36.StrType s0) := FUNCTION
-  s1 := SALT36.stringfilter(s0,'0123456789'); // Only allow valid symbols
+EXPORT MakeFT_invalid_numeric(SALT311.StrType s0) := FUNCTION
+  s1 := SALT311.stringfilter(s0,'0123456789'); // Only allow valid symbols
   RETURN  s1;
 END;
-EXPORT InValidFT_invalid_numeric(SALT36.StrType s) := WHICH(LENGTH(TRIM(s))<>LENGTH(TRIM(SALT36.StringFilter(s,'0123456789'))),~(LENGTH(TRIM(s)) >= 1));
-EXPORT InValidMessageFT_invalid_numeric(UNSIGNED1 wh) := CHOOSE(wh,SALT36.HygieneErrors.NotInChars('0123456789'),SALT36.HygieneErrors.NotLength('1..'),SALT36.HygieneErrors.Good);
+EXPORT InValidFT_invalid_numeric(SALT311.StrType s) := WHICH(LENGTH(TRIM(s))<>LENGTH(TRIM(SALT311.StringFilter(s,'0123456789'))),~(LENGTH(TRIM(s)) >= 1));
+EXPORT InValidMessageFT_invalid_numeric(UNSIGNED1 wh) := CHOOSE(wh,SALT311.HygieneErrors.NotInChars('0123456789'),SALT311.HygieneErrors.NotLength('1..'),SALT311.HygieneErrors.Good);
  
-EXPORT MakeFT_invalid_charter_nbr(SALT36.StrType s0) := FUNCTION
-  s1 := SALT36.stringfilter(s0,'0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ'); // Only allow valid symbols
+EXPORT MakeFT_invalid_charter_nbr(SALT311.StrType s0) := FUNCTION
+  s1 := SALT311.stringfilter(s0,'0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ'); // Only allow valid symbols
   RETURN  s1;
 END;
-EXPORT InValidFT_invalid_charter_nbr(SALT36.StrType s) := WHICH(LENGTH(TRIM(s))<>LENGTH(TRIM(SALT36.StringFilter(s,'0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ'))),~(LENGTH(TRIM(s)) >= 1));
-EXPORT InValidMessageFT_invalid_charter_nbr(UNSIGNED1 wh) := CHOOSE(wh,SALT36.HygieneErrors.NotInChars('0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ'),SALT36.HygieneErrors.NotLength('1..'),SALT36.HygieneErrors.Good);
+EXPORT InValidFT_invalid_charter_nbr(SALT311.StrType s) := WHICH(LENGTH(TRIM(s))<>LENGTH(TRIM(SALT311.StringFilter(s,'0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ'))),~(LENGTH(TRIM(s)) >= 1));
+EXPORT InValidMessageFT_invalid_charter_nbr(UNSIGNED1 wh) := CHOOSE(wh,SALT311.HygieneErrors.NotInChars('0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ'),SALT311.HygieneErrors.NotLength('1..'),SALT311.HygieneErrors.Good);
  
-EXPORT MakeFT_invalid_for_dom_ind(SALT36.StrType s0) := FUNCTION
+EXPORT MakeFT_invalid_for_dom_ind(SALT311.StrType s0) := FUNCTION
   RETURN  s0;
 END;
-EXPORT InValidFT_invalid_for_dom_ind(SALT36.StrType s) := WHICH(((SALT36.StrType) s) NOT IN ['D','F',' ']);
-EXPORT InValidMessageFT_invalid_for_dom_ind(UNSIGNED1 wh) := CHOOSE(wh,SALT36.HygieneErrors.NotInEnum('D|F| '),SALT36.HygieneErrors.Good);
+EXPORT InValidFT_invalid_for_dom_ind(SALT311.StrType s) := WHICH(((SALT311.StrType) s) NOT IN ['D','F',' ']);
+EXPORT InValidMessageFT_invalid_for_dom_ind(UNSIGNED1 wh) := CHOOSE(wh,SALT311.HygieneErrors.NotInEnum('D|F| '),SALT311.HygieneErrors.Good);
  
-EXPORT MakeFT_invalid_recordorigin(SALT36.StrType s0) := FUNCTION
+EXPORT MakeFT_invalid_recordorigin(SALT311.StrType s0) := FUNCTION
   RETURN  s0;
 END;
-EXPORT InValidFT_invalid_recordorigin(SALT36.StrType s) := WHICH(((SALT36.StrType) s) NOT IN ['C']);
-EXPORT InValidMessageFT_invalid_recordorigin(UNSIGNED1 wh) := CHOOSE(wh,SALT36.HygieneErrors.NotInEnum('C'),SALT36.HygieneErrors.Good);
+EXPORT InValidFT_invalid_recordorigin(SALT311.StrType s) := WHICH(((SALT311.StrType) s) NOT IN ['C','C']);
+EXPORT InValidMessageFT_invalid_recordorigin(UNSIGNED1 wh) := CHOOSE(wh,SALT311.HygieneErrors.NotInEnum('C|C'),SALT311.HygieneErrors.Good);
  
-EXPORT MakeFT_invalid_date(SALT36.StrType s0) := FUNCTION
-  s1 := SALT36.stringfilter(s0,'0123456789'); // Only allow valid symbols
+EXPORT MakeFT_invalid_date(SALT311.StrType s0) := FUNCTION
+  s1 := SALT311.stringfilter(s0,'0123456789'); // Only allow valid symbols
   RETURN  s1;
 END;
-EXPORT InValidFT_invalid_date(SALT36.StrType s) := WHICH(LENGTH(TRIM(s))<>LENGTH(TRIM(SALT36.StringFilter(s,'0123456789'))),~Scrubs.fn_valid_pastDate(s)>0,~(LENGTH(TRIM(s)) >= 0 AND LENGTH(TRIM(s)) <= 8));
-EXPORT InValidMessageFT_invalid_date(UNSIGNED1 wh) := CHOOSE(wh,SALT36.HygieneErrors.NotInChars('0123456789'),SALT36.HygieneErrors.CustomFail('Scrubs.fn_valid_pastDate'),SALT36.HygieneErrors.NotLength('0..8'),SALT36.HygieneErrors.Good);
+EXPORT InValidFT_invalid_date(SALT311.StrType s) := WHICH(LENGTH(TRIM(s))<>LENGTH(TRIM(SALT311.StringFilter(s,'0123456789'))),~Scrubs.fn_valid_pastDate(s)>0,~(LENGTH(TRIM(s)) >= 0 AND LENGTH(TRIM(s)) <= 8));
+EXPORT InValidMessageFT_invalid_date(UNSIGNED1 wh) := CHOOSE(wh,SALT311.HygieneErrors.NotInChars('0123456789'),SALT311.HygieneErrors.CustomFail('Scrubs.fn_valid_pastDate'),SALT311.HygieneErrors.NotLength('0..8'),SALT311.HygieneErrors.Good);
  
-EXPORT MakeFT_invalid_alphablank(SALT36.StrType s0) := FUNCTION
-  s1 := SALT36.stringfilter(s0,' ABCDEFGHIJKLMNOPQRSTUVWXYZ'); // Only allow valid symbols
+EXPORT MakeFT_invalid_alphablank(SALT311.StrType s0) := FUNCTION
+  s1 := SALT311.stringfilter(s0,' ABCDEFGHIJKLMNOPQRSTUVWXYZ'); // Only allow valid symbols
   RETURN  s1;
 END;
-EXPORT InValidFT_invalid_alphablank(SALT36.StrType s) := WHICH(LENGTH(TRIM(s))<>LENGTH(TRIM(SALT36.StringFilter(s,' ABCDEFGHIJKLMNOPQRSTUVWXYZ'))));
-EXPORT InValidMessageFT_invalid_alphablank(UNSIGNED1 wh) := CHOOSE(wh,SALT36.HygieneErrors.NotInChars(' ABCDEFGHIJKLMNOPQRSTUVWXYZ'),SALT36.HygieneErrors.Good);
+EXPORT InValidFT_invalid_alphablank(SALT311.StrType s) := WHICH(LENGTH(TRIM(s))<>LENGTH(TRIM(SALT311.StringFilter(s,' ABCDEFGHIJKLMNOPQRSTUVWXYZ'))));
+EXPORT InValidMessageFT_invalid_alphablank(UNSIGNED1 wh) := CHOOSE(wh,SALT311.HygieneErrors.NotInChars(' ABCDEFGHIJKLMNOPQRSTUVWXYZ'),SALT311.HygieneErrors.Good);
  
-EXPORT MakeFT_invalid_org_structure_desc(SALT36.StrType s0) := FUNCTION
-  s1 := SALT36.stringfilter(s0,' ABCDEFGHIJKLMNOPQRSTUVWXYZ-'); // Only allow valid symbols
+EXPORT MakeFT_invalid_org_structure_desc(SALT311.StrType s0) := FUNCTION
+  s1 := SALT311.stringfilter(s0,' ABCDEFGHIJKLMNOPQRSTUVWXYZ-'); // Only allow valid symbols
   RETURN  s1;
 END;
-EXPORT InValidFT_invalid_org_structure_desc(SALT36.StrType s) := WHICH(LENGTH(TRIM(s))<>LENGTH(TRIM(SALT36.StringFilter(s,' ABCDEFGHIJKLMNOPQRSTUVWXYZ-'))));
-EXPORT InValidMessageFT_invalid_org_structure_desc(UNSIGNED1 wh) := CHOOSE(wh,SALT36.HygieneErrors.NotInChars(' ABCDEFGHIJKLMNOPQRSTUVWXYZ-'),SALT36.HygieneErrors.Good);
+EXPORT InValidFT_invalid_org_structure_desc(SALT311.StrType s) := WHICH(LENGTH(TRIM(s))<>LENGTH(TRIM(SALT311.StringFilter(s,' ABCDEFGHIJKLMNOPQRSTUVWXYZ-'))));
+EXPORT InValidMessageFT_invalid_org_structure_desc(UNSIGNED1 wh) := CHOOSE(wh,SALT311.HygieneErrors.NotInChars(' ABCDEFGHIJKLMNOPQRSTUVWXYZ-'),SALT311.HygieneErrors.Good);
  
-EXPORT SALT36.StrType FieldName(UNSIGNED2 i) := CHOOSE(i,'dt_vendor_first_reported','dt_vendor_last_reported','dt_first_seen','dt_last_seen','corp_ra_dt_first_seen','corp_ra_dt_last_seen','corp_key','corp_supp_key','corp_vendor','corp_vendor_county','corp_vendor_subcode','corp_state_origin','corp_process_date','corp_orig_sos_charter_nbr','corp_legal_name','corp_ln_name_type_cd','corp_ln_name_type_desc','corp_supp_nbr','corp_name_comment','corp_address1_type_cd','corp_address1_type_desc','corp_address1_line1','corp_address1_line2','corp_address1_line3','corp_address1_effective_date','corp_address2_type_cd','corp_address2_type_desc','corp_address2_line1','corp_address2_line2','corp_address2_line3','corp_address2_effective_date','corp_phone_number','corp_phone_number_type_cd','corp_phone_number_type_desc','corp_fax_nbr','corp_email_address','corp_web_address','corp_filing_reference_nbr','corp_filing_date','corp_filing_cd','corp_filing_desc','corp_status_cd','corp_status_desc','corp_status_date','corp_standing','corp_status_comment','corp_ticker_symbol','corp_stock_exchange','corp_inc_state','corp_inc_county','corp_inc_date','corp_anniversary_month','corp_fed_tax_id','corp_state_tax_id','corp_term_exist_cd','corp_term_exist_exp','corp_term_exist_desc','corp_foreign_domestic_ind','corp_forgn_state_cd','corp_forgn_state_desc','corp_forgn_sos_charter_nbr','corp_forgn_date','corp_forgn_fed_tax_id','corp_forgn_state_tax_id','corp_forgn_term_exist_cd','corp_forgn_term_exist_exp','corp_forgn_term_exist_desc','corp_orig_org_structure_cd','corp_orig_org_structure_desc','corp_for_profit_ind','corp_public_or_private_ind','corp_sic_code','corp_naic_code','corp_orig_bus_type_cd','corp_orig_bus_type_desc','corp_entity_desc','corp_certificate_nbr','corp_internal_nbr','corp_previous_nbr','corp_microfilm_nbr','corp_amendments_filed','corp_acts','corp_partnership_ind','corp_mfg_ind','corp_addl_info','corp_taxes','corp_franchise_taxes','corp_tax_program_cd','corp_tax_program_desc','corp_ra_full_name','corp_ra_fname','corp_ra_mname','corp_ra_lname','corp_ra_suffix','corp_ra_title_cd','corp_ra_title_desc','corp_ra_fein','corp_ra_ssn','corp_ra_dob','corp_ra_effective_date','corp_ra_resign_date','corp_ra_no_comp','corp_ra_no_comp_igs','corp_ra_addl_info','corp_ra_address_type_cd','corp_ra_address_type_desc','corp_ra_address_line1','corp_ra_address_line2','corp_ra_address_line3','corp_ra_phone_number','corp_ra_phone_number_type_cd','corp_ra_phone_number_type_desc','corp_ra_fax_nbr','corp_ra_email_address','corp_ra_web_address','corp_prep_addr1_line1','corp_prep_addr1_last_line','corp_prep_addr2_line1','corp_prep_addr2_last_line','ra_prep_addr_line1','ra_prep_addr_last_line','cont_filing_reference_nbr','cont_filing_date','cont_filing_cd','cont_filing_desc','cont_type_cd','cont_type_desc','cont_full_name','cont_fname','cont_mname','cont_lname','cont_suffix','cont_title1_desc','cont_title2_desc','cont_title3_desc','cont_title4_desc','cont_title5_desc','cont_fein','cont_ssn','cont_dob','cont_status_cd','cont_status_desc','cont_effective_date','cont_effective_cd','cont_effective_desc','cont_addl_info','cont_address_type_cd','cont_address_type_desc','cont_address_line1','cont_address_line2','cont_address_line3','cont_address_effective_date','cont_address_county','cont_phone_number','cont_phone_number_type_cd','cont_phone_number_type_desc','cont_fax_nbr','cont_email_address','cont_web_address','corp_acres','corp_action','corp_action_date','corp_action_employment_security_approval_date','corp_action_pending_cd','corp_action_pending_desc','corp_action_statement_of_intent_date','corp_action_tax_dept_approval_date','corp_acts2','corp_acts3','corp_additional_principals','corp_address_office_type','corp_agent_assign_date','corp_agent_commercial','corp_agent_country','corp_agent_county','corp_agent_status_cd','corp_agent_status_desc','corp_agent_id','corp_agriculture_flag','corp_authorized_partners','corp_comment','corp_consent_flag_for_protected_name','corp_converted','corp_converted_from','corp_country_of_formation','corp_date_of_organization_meeting','corp_delayed_effective_date','corp_directors_from_to','corp_dissolved_date','corp_farm_exemptions','corp_farm_qual_date','corp_farm_status_cd','corp_farm_status_date','corp_farm_status_desc','corp_fiscal_year_month','corp_foreign_fiduciary_capacity_in_state','corp_governing_statute','corp_has_members','corp_has_vested_managers','corp_home_incorporated_county','corp_home_state_name','corp_is_professional','corp_is_non_profit_irs_approved','corp_last_renewal_date','corp_last_renewal_year','corp_license_type','corp_llc_managed_desc','corp_llc_managed_ind','corp_management_desc','corp_management_type','corp_manager_managed','corp_merged_corporation_id','corp_merged_fein','corp_merger_allowed_flag','corp_merger_date','corp_merger_desc','corp_merger_effective_date','corp_merger_id','corp_merger_indicator','corp_merger_name','corp_merger_type_converted_to_cd','corp_merger_type_converted_to_desc','corp_naics_desc','corp_name_effective_date','corp_name_reservation_date','corp_name_reservation_desc','corp_name_reservation_expiration_date','corp_name_reservation_nbr','corp_name_reservation_type','corp_name_status_cd','corp_name_status_date','corp_name_status_desc','corp_non_profit_irs_approved_purpose','corp_non_profit_solicit_donations','corp_nbr_of_amendments','corp_nbr_of_initial_llc_members','corp_nbr_of_partners','corp_operating_agreement','corp_opt_in_llc_act_desc','corp_opt_in_llc_act_ind','corp_organizational_comments','corp_partner_contributions_total','corp_partner_terms','corp_percentage_voters_required_to_approve_amendments','corp_profession','corp_province','corp_public_mutual_corporation','corp_purpose','corp_ra_required_flag','corp_registered_counties','corp_regulated_ind','corp_renewal_date','corp_standing_other','corp_survivor_corporation_id','corp_tax_base','corp_tax_standing','corp_termination_cd','corp_termination_desc','corp_termination_date','corp_trademark_business_mark_type','corp_trademark_cancelled_date','corp_trademark_class_desc1','corp_trademark_class_desc2','corp_trademark_class_desc3','corp_trademark_class_desc4','corp_trademark_class_desc5','corp_trademark_class_desc6','corp_trademark_classification_nbr','corp_trademark_disclaimer1','corp_trademark_disclaimer2','corp_trademark_expiration_date','corp_trademark_filing_date','corp_trademark_first_use_date','corp_trademark_first_use_date_in_state','corp_trademark_keywords','corp_trademark_logo','corp_trademark_name_expiration_date','corp_trademark_nbr','corp_trademark_renewal_date','corp_trademark_status','corp_trademark_used_1','corp_trademark_used_2','corp_trademark_used_3','cont_owner_percentage','cont_country','cont_country_mailing','cont_nondislosure','cont_prep_addr_line1','cont_prep_addr_last_line','recordorigin');
-EXPORT FieldNum(SALT36.StrType fn) := CASE(fn,'dt_vendor_first_reported' => 0,'dt_vendor_last_reported' => 1,'dt_first_seen' => 2,'dt_last_seen' => 3,'corp_ra_dt_first_seen' => 4,'corp_ra_dt_last_seen' => 5,'corp_key' => 6,'corp_supp_key' => 7,'corp_vendor' => 8,'corp_vendor_county' => 9,'corp_vendor_subcode' => 10,'corp_state_origin' => 11,'corp_process_date' => 12,'corp_orig_sos_charter_nbr' => 13,'corp_legal_name' => 14,'corp_ln_name_type_cd' => 15,'corp_ln_name_type_desc' => 16,'corp_supp_nbr' => 17,'corp_name_comment' => 18,'corp_address1_type_cd' => 19,'corp_address1_type_desc' => 20,'corp_address1_line1' => 21,'corp_address1_line2' => 22,'corp_address1_line3' => 23,'corp_address1_effective_date' => 24,'corp_address2_type_cd' => 25,'corp_address2_type_desc' => 26,'corp_address2_line1' => 27,'corp_address2_line2' => 28,'corp_address2_line3' => 29,'corp_address2_effective_date' => 30,'corp_phone_number' => 31,'corp_phone_number_type_cd' => 32,'corp_phone_number_type_desc' => 33,'corp_fax_nbr' => 34,'corp_email_address' => 35,'corp_web_address' => 36,'corp_filing_reference_nbr' => 37,'corp_filing_date' => 38,'corp_filing_cd' => 39,'corp_filing_desc' => 40,'corp_status_cd' => 41,'corp_status_desc' => 42,'corp_status_date' => 43,'corp_standing' => 44,'corp_status_comment' => 45,'corp_ticker_symbol' => 46,'corp_stock_exchange' => 47,'corp_inc_state' => 48,'corp_inc_county' => 49,'corp_inc_date' => 50,'corp_anniversary_month' => 51,'corp_fed_tax_id' => 52,'corp_state_tax_id' => 53,'corp_term_exist_cd' => 54,'corp_term_exist_exp' => 55,'corp_term_exist_desc' => 56,'corp_foreign_domestic_ind' => 57,'corp_forgn_state_cd' => 58,'corp_forgn_state_desc' => 59,'corp_forgn_sos_charter_nbr' => 60,'corp_forgn_date' => 61,'corp_forgn_fed_tax_id' => 62,'corp_forgn_state_tax_id' => 63,'corp_forgn_term_exist_cd' => 64,'corp_forgn_term_exist_exp' => 65,'corp_forgn_term_exist_desc' => 66,'corp_orig_org_structure_cd' => 67,'corp_orig_org_structure_desc' => 68,'corp_for_profit_ind' => 69,'corp_public_or_private_ind' => 70,'corp_sic_code' => 71,'corp_naic_code' => 72,'corp_orig_bus_type_cd' => 73,'corp_orig_bus_type_desc' => 74,'corp_entity_desc' => 75,'corp_certificate_nbr' => 76,'corp_internal_nbr' => 77,'corp_previous_nbr' => 78,'corp_microfilm_nbr' => 79,'corp_amendments_filed' => 80,'corp_acts' => 81,'corp_partnership_ind' => 82,'corp_mfg_ind' => 83,'corp_addl_info' => 84,'corp_taxes' => 85,'corp_franchise_taxes' => 86,'corp_tax_program_cd' => 87,'corp_tax_program_desc' => 88,'corp_ra_full_name' => 89,'corp_ra_fname' => 90,'corp_ra_mname' => 91,'corp_ra_lname' => 92,'corp_ra_suffix' => 93,'corp_ra_title_cd' => 94,'corp_ra_title_desc' => 95,'corp_ra_fein' => 96,'corp_ra_ssn' => 97,'corp_ra_dob' => 98,'corp_ra_effective_date' => 99,'corp_ra_resign_date' => 100,'corp_ra_no_comp' => 101,'corp_ra_no_comp_igs' => 102,'corp_ra_addl_info' => 103,'corp_ra_address_type_cd' => 104,'corp_ra_address_type_desc' => 105,'corp_ra_address_line1' => 106,'corp_ra_address_line2' => 107,'corp_ra_address_line3' => 108,'corp_ra_phone_number' => 109,'corp_ra_phone_number_type_cd' => 110,'corp_ra_phone_number_type_desc' => 111,'corp_ra_fax_nbr' => 112,'corp_ra_email_address' => 113,'corp_ra_web_address' => 114,'corp_prep_addr1_line1' => 115,'corp_prep_addr1_last_line' => 116,'corp_prep_addr2_line1' => 117,'corp_prep_addr2_last_line' => 118,'ra_prep_addr_line1' => 119,'ra_prep_addr_last_line' => 120,'cont_filing_reference_nbr' => 121,'cont_filing_date' => 122,'cont_filing_cd' => 123,'cont_filing_desc' => 124,'cont_type_cd' => 125,'cont_type_desc' => 126,'cont_full_name' => 127,'cont_fname' => 128,'cont_mname' => 129,'cont_lname' => 130,'cont_suffix' => 131,'cont_title1_desc' => 132,'cont_title2_desc' => 133,'cont_title3_desc' => 134,'cont_title4_desc' => 135,'cont_title5_desc' => 136,'cont_fein' => 137,'cont_ssn' => 138,'cont_dob' => 139,'cont_status_cd' => 140,'cont_status_desc' => 141,'cont_effective_date' => 142,'cont_effective_cd' => 143,'cont_effective_desc' => 144,'cont_addl_info' => 145,'cont_address_type_cd' => 146,'cont_address_type_desc' => 147,'cont_address_line1' => 148,'cont_address_line2' => 149,'cont_address_line3' => 150,'cont_address_effective_date' => 151,'cont_address_county' => 152,'cont_phone_number' => 153,'cont_phone_number_type_cd' => 154,'cont_phone_number_type_desc' => 155,'cont_fax_nbr' => 156,'cont_email_address' => 157,'cont_web_address' => 158,'corp_acres' => 159,'corp_action' => 160,'corp_action_date' => 161,'corp_action_employment_security_approval_date' => 162,'corp_action_pending_cd' => 163,'corp_action_pending_desc' => 164,'corp_action_statement_of_intent_date' => 165,'corp_action_tax_dept_approval_date' => 166,'corp_acts2' => 167,'corp_acts3' => 168,'corp_additional_principals' => 169,'corp_address_office_type' => 170,'corp_agent_assign_date' => 171,'corp_agent_commercial' => 172,'corp_agent_country' => 173,'corp_agent_county' => 174,'corp_agent_status_cd' => 175,'corp_agent_status_desc' => 176,'corp_agent_id' => 177,'corp_agriculture_flag' => 178,'corp_authorized_partners' => 179,'corp_comment' => 180,'corp_consent_flag_for_protected_name' => 181,'corp_converted' => 182,'corp_converted_from' => 183,'corp_country_of_formation' => 184,'corp_date_of_organization_meeting' => 185,'corp_delayed_effective_date' => 186,'corp_directors_from_to' => 187,'corp_dissolved_date' => 188,'corp_farm_exemptions' => 189,'corp_farm_qual_date' => 190,'corp_farm_status_cd' => 191,'corp_farm_status_date' => 192,'corp_farm_status_desc' => 193,'corp_fiscal_year_month' => 194,'corp_foreign_fiduciary_capacity_in_state' => 195,'corp_governing_statute' => 196,'corp_has_members' => 197,'corp_has_vested_managers' => 198,'corp_home_incorporated_county' => 199,'corp_home_state_name' => 200,'corp_is_professional' => 201,'corp_is_non_profit_irs_approved' => 202,'corp_last_renewal_date' => 203,'corp_last_renewal_year' => 204,'corp_license_type' => 205,'corp_llc_managed_desc' => 206,'corp_llc_managed_ind' => 207,'corp_management_desc' => 208,'corp_management_type' => 209,'corp_manager_managed' => 210,'corp_merged_corporation_id' => 211,'corp_merged_fein' => 212,'corp_merger_allowed_flag' => 213,'corp_merger_date' => 214,'corp_merger_desc' => 215,'corp_merger_effective_date' => 216,'corp_merger_id' => 217,'corp_merger_indicator' => 218,'corp_merger_name' => 219,'corp_merger_type_converted_to_cd' => 220,'corp_merger_type_converted_to_desc' => 221,'corp_naics_desc' => 222,'corp_name_effective_date' => 223,'corp_name_reservation_date' => 224,'corp_name_reservation_desc' => 225,'corp_name_reservation_expiration_date' => 226,'corp_name_reservation_nbr' => 227,'corp_name_reservation_type' => 228,'corp_name_status_cd' => 229,'corp_name_status_date' => 230,'corp_name_status_desc' => 231,'corp_non_profit_irs_approved_purpose' => 232,'corp_non_profit_solicit_donations' => 233,'corp_nbr_of_amendments' => 234,'corp_nbr_of_initial_llc_members' => 235,'corp_nbr_of_partners' => 236,'corp_operating_agreement' => 237,'corp_opt_in_llc_act_desc' => 238,'corp_opt_in_llc_act_ind' => 239,'corp_organizational_comments' => 240,'corp_partner_contributions_total' => 241,'corp_partner_terms' => 242,'corp_percentage_voters_required_to_approve_amendments' => 243,'corp_profession' => 244,'corp_province' => 245,'corp_public_mutual_corporation' => 246,'corp_purpose' => 247,'corp_ra_required_flag' => 248,'corp_registered_counties' => 249,'corp_regulated_ind' => 250,'corp_renewal_date' => 251,'corp_standing_other' => 252,'corp_survivor_corporation_id' => 253,'corp_tax_base' => 254,'corp_tax_standing' => 255,'corp_termination_cd' => 256,'corp_termination_desc' => 257,'corp_termination_date' => 258,'corp_trademark_business_mark_type' => 259,'corp_trademark_cancelled_date' => 260,'corp_trademark_class_desc1' => 261,'corp_trademark_class_desc2' => 262,'corp_trademark_class_desc3' => 263,'corp_trademark_class_desc4' => 264,'corp_trademark_class_desc5' => 265,'corp_trademark_class_desc6' => 266,'corp_trademark_classification_nbr' => 267,'corp_trademark_disclaimer1' => 268,'corp_trademark_disclaimer2' => 269,'corp_trademark_expiration_date' => 270,'corp_trademark_filing_date' => 271,'corp_trademark_first_use_date' => 272,'corp_trademark_first_use_date_in_state' => 273,'corp_trademark_keywords' => 274,'corp_trademark_logo' => 275,'corp_trademark_name_expiration_date' => 276,'corp_trademark_nbr' => 277,'corp_trademark_renewal_date' => 278,'corp_trademark_status' => 279,'corp_trademark_used_1' => 280,'corp_trademark_used_2' => 281,'corp_trademark_used_3' => 282,'cont_owner_percentage' => 283,'cont_country' => 284,'cont_country_mailing' => 285,'cont_nondislosure' => 286,'cont_prep_addr_line1' => 287,'cont_prep_addr_last_line' => 288,'recordorigin' => 289,0);
+EXPORT SALT311.StrType FieldName(UNSIGNED2 i) := CHOOSE(i,'dt_vendor_first_reported','dt_vendor_last_reported','dt_first_seen','dt_last_seen','corp_ra_dt_first_seen','corp_ra_dt_last_seen','corp_key','corp_supp_key','corp_vendor','corp_vendor_county','corp_vendor_subcode','corp_state_origin','corp_process_date','corp_orig_sos_charter_nbr','corp_legal_name','corp_ln_name_type_cd','corp_ln_name_type_desc','corp_supp_nbr','corp_name_comment','corp_address1_type_cd','corp_address1_type_desc','corp_address1_line1','corp_address1_line2','corp_address1_line3','corp_address1_effective_date','corp_address2_type_cd','corp_address2_type_desc','corp_address2_line1','corp_address2_line2','corp_address2_line3','corp_address2_effective_date','corp_phone_number','corp_phone_number_type_cd','corp_phone_number_type_desc','corp_fax_nbr','corp_email_address','corp_web_address','corp_filing_reference_nbr','corp_filing_date','corp_filing_cd','corp_filing_desc','corp_status_cd','corp_status_desc','corp_status_date','corp_standing','corp_status_comment','corp_ticker_symbol','corp_stock_exchange','corp_inc_state','corp_inc_county','corp_inc_date','corp_anniversary_month','corp_fed_tax_id','corp_state_tax_id','corp_term_exist_cd','corp_term_exist_exp','corp_term_exist_desc','corp_foreign_domestic_ind','corp_forgn_state_cd','corp_forgn_state_desc','corp_forgn_sos_charter_nbr','corp_forgn_date','corp_forgn_fed_tax_id','corp_forgn_state_tax_id','corp_forgn_term_exist_cd','corp_forgn_term_exist_exp','corp_forgn_term_exist_desc','corp_orig_org_structure_cd','corp_orig_org_structure_desc','corp_for_profit_ind','corp_public_or_private_ind','corp_sic_code','corp_naic_code','corp_orig_bus_type_cd','corp_orig_bus_type_desc','corp_entity_desc','corp_certificate_nbr','corp_internal_nbr','corp_previous_nbr','corp_microfilm_nbr','corp_amendments_filed','corp_acts','corp_partnership_ind','corp_mfg_ind','corp_addl_info','corp_taxes','corp_franchise_taxes','corp_tax_program_cd','corp_tax_program_desc','corp_ra_full_name','corp_ra_fname','corp_ra_mname','corp_ra_lname','corp_ra_suffix','corp_ra_title_cd','corp_ra_title_desc','corp_ra_fein','corp_ra_ssn','corp_ra_dob','corp_ra_effective_date','corp_ra_resign_date','corp_ra_no_comp','corp_ra_no_comp_igs','corp_ra_addl_info','corp_ra_address_type_cd','corp_ra_address_type_desc','corp_ra_address_line1','corp_ra_address_line2','corp_ra_address_line3','corp_ra_phone_number','corp_ra_phone_number_type_cd','corp_ra_phone_number_type_desc','corp_ra_fax_nbr','corp_ra_email_address','corp_ra_web_address','corp_prep_addr1_line1','corp_prep_addr1_last_line','corp_prep_addr2_line1','corp_prep_addr2_last_line','ra_prep_addr_line1','ra_prep_addr_last_line','cont_filing_reference_nbr','cont_filing_date','cont_filing_cd','cont_filing_desc','cont_type_cd','cont_type_desc','cont_full_name','cont_fname','cont_mname','cont_lname','cont_suffix','cont_title1_desc','cont_title2_desc','cont_title3_desc','cont_title4_desc','cont_title5_desc','cont_fein','cont_ssn','cont_dob','cont_status_cd','cont_status_desc','cont_effective_date','cont_effective_cd','cont_effective_desc','cont_addl_info','cont_address_type_cd','cont_address_type_desc','cont_address_line1','cont_address_line2','cont_address_line3','cont_address_effective_date','cont_address_county','cont_phone_number','cont_phone_number_type_cd','cont_phone_number_type_desc','cont_fax_nbr','cont_email_address','cont_web_address','corp_acres','corp_action','corp_action_date','corp_action_employment_security_approval_date','corp_action_pending_cd','corp_action_pending_desc','corp_action_statement_of_intent_date','corp_action_tax_dept_approval_date','corp_acts2','corp_acts3','corp_additional_principals','corp_address_office_type','corp_agent_assign_date','corp_agent_commercial','corp_agent_country','corp_agent_county','corp_agent_status_cd','corp_agent_status_desc','corp_agent_id','corp_agriculture_flag','corp_authorized_partners','corp_comment','corp_consent_flag_for_protected_name','corp_converted','corp_converted_from','corp_country_of_formation','corp_date_of_organization_meeting','corp_delayed_effective_date','corp_directors_from_to','corp_dissolved_date','corp_farm_exemptions','corp_farm_qual_date','corp_farm_status_cd','corp_farm_status_date','corp_farm_status_desc','corp_fiscal_year_month','corp_foreign_fiduciary_capacity_in_state','corp_governing_statute','corp_has_members','corp_has_vested_managers','corp_home_incorporated_county','corp_home_state_name','corp_is_professional','corp_is_non_profit_irs_approved','corp_last_renewal_date','corp_last_renewal_year','corp_license_type','corp_llc_managed_desc','corp_llc_managed_ind','corp_management_desc','corp_management_type','corp_manager_managed','corp_merged_corporation_id','corp_merged_fein','corp_merger_allowed_flag','corp_merger_date','corp_merger_desc','corp_merger_effective_date','corp_merger_id','corp_merger_indicator','corp_merger_name','corp_merger_type_converted_to_cd','corp_merger_type_converted_to_desc','corp_naics_desc','corp_name_effective_date','corp_name_reservation_date','corp_name_reservation_desc','corp_name_reservation_expiration_date','corp_name_reservation_nbr','corp_name_reservation_type','corp_name_status_cd','corp_name_status_date','corp_name_status_desc','corp_non_profit_irs_approved_purpose','corp_non_profit_solicit_donations','corp_nbr_of_amendments','corp_nbr_of_initial_llc_members','corp_nbr_of_partners','corp_operating_agreement','corp_opt_in_llc_act_desc','corp_opt_in_llc_act_ind','corp_organizational_comments','corp_partner_contributions_total','corp_partner_terms','corp_percentage_voters_required_to_approve_amendments','corp_profession','corp_province','corp_public_mutual_corporation','corp_purpose','corp_ra_required_flag','corp_registered_counties','corp_regulated_ind','corp_renewal_date','corp_standing_other','corp_survivor_corporation_id','corp_tax_base','corp_tax_standing','corp_termination_cd','corp_termination_desc','corp_termination_date','corp_trademark_business_mark_type','corp_trademark_cancelled_date','corp_trademark_class_desc1','corp_trademark_class_desc2','corp_trademark_class_desc3','corp_trademark_class_desc4','corp_trademark_class_desc5','corp_trademark_class_desc6','corp_trademark_classification_nbr','corp_trademark_disclaimer1','corp_trademark_disclaimer2','corp_trademark_expiration_date','corp_trademark_filing_date','corp_trademark_first_use_date','corp_trademark_first_use_date_in_state','corp_trademark_keywords','corp_trademark_logo','corp_trademark_name_expiration_date','corp_trademark_nbr','corp_trademark_renewal_date','corp_trademark_status','corp_trademark_used_1','corp_trademark_used_2','corp_trademark_used_3','cont_owner_percentage','cont_country','cont_country_mailing','cont_nondislosure','cont_prep_addr_line1','cont_prep_addr_last_line','recordorigin');
+EXPORT SALT311.StrType FlatName(UNSIGNED2 i) := CHOOSE(i,'dt_vendor_first_reported','dt_vendor_last_reported','dt_first_seen','dt_last_seen','corp_ra_dt_first_seen','corp_ra_dt_last_seen','corp_key','corp_supp_key','corp_vendor','corp_vendor_county','corp_vendor_subcode','corp_state_origin','corp_process_date','corp_orig_sos_charter_nbr','corp_legal_name','corp_ln_name_type_cd','corp_ln_name_type_desc','corp_supp_nbr','corp_name_comment','corp_address1_type_cd','corp_address1_type_desc','corp_address1_line1','corp_address1_line2','corp_address1_line3','corp_address1_effective_date','corp_address2_type_cd','corp_address2_type_desc','corp_address2_line1','corp_address2_line2','corp_address2_line3','corp_address2_effective_date','corp_phone_number','corp_phone_number_type_cd','corp_phone_number_type_desc','corp_fax_nbr','corp_email_address','corp_web_address','corp_filing_reference_nbr','corp_filing_date','corp_filing_cd','corp_filing_desc','corp_status_cd','corp_status_desc','corp_status_date','corp_standing','corp_status_comment','corp_ticker_symbol','corp_stock_exchange','corp_inc_state','corp_inc_county','corp_inc_date','corp_anniversary_month','corp_fed_tax_id','corp_state_tax_id','corp_term_exist_cd','corp_term_exist_exp','corp_term_exist_desc','corp_foreign_domestic_ind','corp_forgn_state_cd','corp_forgn_state_desc','corp_forgn_sos_charter_nbr','corp_forgn_date','corp_forgn_fed_tax_id','corp_forgn_state_tax_id','corp_forgn_term_exist_cd','corp_forgn_term_exist_exp','corp_forgn_term_exist_desc','corp_orig_org_structure_cd','corp_orig_org_structure_desc','corp_for_profit_ind','corp_public_or_private_ind','corp_sic_code','corp_naic_code','corp_orig_bus_type_cd','corp_orig_bus_type_desc','corp_entity_desc','corp_certificate_nbr','corp_internal_nbr','corp_previous_nbr','corp_microfilm_nbr','corp_amendments_filed','corp_acts','corp_partnership_ind','corp_mfg_ind','corp_addl_info','corp_taxes','corp_franchise_taxes','corp_tax_program_cd','corp_tax_program_desc','corp_ra_full_name','corp_ra_fname','corp_ra_mname','corp_ra_lname','corp_ra_suffix','corp_ra_title_cd','corp_ra_title_desc','corp_ra_fein','corp_ra_ssn','corp_ra_dob','corp_ra_effective_date','corp_ra_resign_date','corp_ra_no_comp','corp_ra_no_comp_igs','corp_ra_addl_info','corp_ra_address_type_cd','corp_ra_address_type_desc','corp_ra_address_line1','corp_ra_address_line2','corp_ra_address_line3','corp_ra_phone_number','corp_ra_phone_number_type_cd','corp_ra_phone_number_type_desc','corp_ra_fax_nbr','corp_ra_email_address','corp_ra_web_address','corp_prep_addr1_line1','corp_prep_addr1_last_line','corp_prep_addr2_line1','corp_prep_addr2_last_line','ra_prep_addr_line1','ra_prep_addr_last_line','cont_filing_reference_nbr','cont_filing_date','cont_filing_cd','cont_filing_desc','cont_type_cd','cont_type_desc','cont_full_name','cont_fname','cont_mname','cont_lname','cont_suffix','cont_title1_desc','cont_title2_desc','cont_title3_desc','cont_title4_desc','cont_title5_desc','cont_fein','cont_ssn','cont_dob','cont_status_cd','cont_status_desc','cont_effective_date','cont_effective_cd','cont_effective_desc','cont_addl_info','cont_address_type_cd','cont_address_type_desc','cont_address_line1','cont_address_line2','cont_address_line3','cont_address_effective_date','cont_address_county','cont_phone_number','cont_phone_number_type_cd','cont_phone_number_type_desc','cont_fax_nbr','cont_email_address','cont_web_address','corp_acres','corp_action','corp_action_date','corp_action_employment_security_approval_date','corp_action_pending_cd','corp_action_pending_desc','corp_action_statement_of_intent_date','corp_action_tax_dept_approval_date','corp_acts2','corp_acts3','corp_additional_principals','corp_address_office_type','corp_agent_assign_date','corp_agent_commercial','corp_agent_country','corp_agent_county','corp_agent_status_cd','corp_agent_status_desc','corp_agent_id','corp_agriculture_flag','corp_authorized_partners','corp_comment','corp_consent_flag_for_protected_name','corp_converted','corp_converted_from','corp_country_of_formation','corp_date_of_organization_meeting','corp_delayed_effective_date','corp_directors_from_to','corp_dissolved_date','corp_farm_exemptions','corp_farm_qual_date','corp_farm_status_cd','corp_farm_status_date','corp_farm_status_desc','corp_fiscal_year_month','corp_foreign_fiduciary_capacity_in_state','corp_governing_statute','corp_has_members','corp_has_vested_managers','corp_home_incorporated_county','corp_home_state_name','corp_is_professional','corp_is_non_profit_irs_approved','corp_last_renewal_date','corp_last_renewal_year','corp_license_type','corp_llc_managed_desc','corp_llc_managed_ind','corp_management_desc','corp_management_type','corp_manager_managed','corp_merged_corporation_id','corp_merged_fein','corp_merger_allowed_flag','corp_merger_date','corp_merger_desc','corp_merger_effective_date','corp_merger_id','corp_merger_indicator','corp_merger_name','corp_merger_type_converted_to_cd','corp_merger_type_converted_to_desc','corp_naics_desc','corp_name_effective_date','corp_name_reservation_date','corp_name_reservation_desc','corp_name_reservation_expiration_date','corp_name_reservation_nbr','corp_name_reservation_type','corp_name_status_cd','corp_name_status_date','corp_name_status_desc','corp_non_profit_irs_approved_purpose','corp_non_profit_solicit_donations','corp_nbr_of_amendments','corp_nbr_of_initial_llc_members','corp_nbr_of_partners','corp_operating_agreement','corp_opt_in_llc_act_desc','corp_opt_in_llc_act_ind','corp_organizational_comments','corp_partner_contributions_total','corp_partner_terms','corp_percentage_voters_required_to_approve_amendments','corp_profession','corp_province','corp_public_mutual_corporation','corp_purpose','corp_ra_required_flag','corp_registered_counties','corp_regulated_ind','corp_renewal_date','corp_standing_other','corp_survivor_corporation_id','corp_tax_base','corp_tax_standing','corp_termination_cd','corp_termination_desc','corp_termination_date','corp_trademark_business_mark_type','corp_trademark_cancelled_date','corp_trademark_class_desc1','corp_trademark_class_desc2','corp_trademark_class_desc3','corp_trademark_class_desc4','corp_trademark_class_desc5','corp_trademark_class_desc6','corp_trademark_classification_nbr','corp_trademark_disclaimer1','corp_trademark_disclaimer2','corp_trademark_expiration_date','corp_trademark_filing_date','corp_trademark_first_use_date','corp_trademark_first_use_date_in_state','corp_trademark_keywords','corp_trademark_logo','corp_trademark_name_expiration_date','corp_trademark_nbr','corp_trademark_renewal_date','corp_trademark_status','corp_trademark_used_1','corp_trademark_used_2','corp_trademark_used_3','cont_owner_percentage','cont_country','cont_country_mailing','cont_nondislosure','cont_prep_addr_line1','cont_prep_addr_last_line','recordorigin');
+EXPORT FieldNum(SALT311.StrType fn) := CASE(fn,'dt_vendor_first_reported' => 0,'dt_vendor_last_reported' => 1,'dt_first_seen' => 2,'dt_last_seen' => 3,'corp_ra_dt_first_seen' => 4,'corp_ra_dt_last_seen' => 5,'corp_key' => 6,'corp_supp_key' => 7,'corp_vendor' => 8,'corp_vendor_county' => 9,'corp_vendor_subcode' => 10,'corp_state_origin' => 11,'corp_process_date' => 12,'corp_orig_sos_charter_nbr' => 13,'corp_legal_name' => 14,'corp_ln_name_type_cd' => 15,'corp_ln_name_type_desc' => 16,'corp_supp_nbr' => 17,'corp_name_comment' => 18,'corp_address1_type_cd' => 19,'corp_address1_type_desc' => 20,'corp_address1_line1' => 21,'corp_address1_line2' => 22,'corp_address1_line3' => 23,'corp_address1_effective_date' => 24,'corp_address2_type_cd' => 25,'corp_address2_type_desc' => 26,'corp_address2_line1' => 27,'corp_address2_line2' => 28,'corp_address2_line3' => 29,'corp_address2_effective_date' => 30,'corp_phone_number' => 31,'corp_phone_number_type_cd' => 32,'corp_phone_number_type_desc' => 33,'corp_fax_nbr' => 34,'corp_email_address' => 35,'corp_web_address' => 36,'corp_filing_reference_nbr' => 37,'corp_filing_date' => 38,'corp_filing_cd' => 39,'corp_filing_desc' => 40,'corp_status_cd' => 41,'corp_status_desc' => 42,'corp_status_date' => 43,'corp_standing' => 44,'corp_status_comment' => 45,'corp_ticker_symbol' => 46,'corp_stock_exchange' => 47,'corp_inc_state' => 48,'corp_inc_county' => 49,'corp_inc_date' => 50,'corp_anniversary_month' => 51,'corp_fed_tax_id' => 52,'corp_state_tax_id' => 53,'corp_term_exist_cd' => 54,'corp_term_exist_exp' => 55,'corp_term_exist_desc' => 56,'corp_foreign_domestic_ind' => 57,'corp_forgn_state_cd' => 58,'corp_forgn_state_desc' => 59,'corp_forgn_sos_charter_nbr' => 60,'corp_forgn_date' => 61,'corp_forgn_fed_tax_id' => 62,'corp_forgn_state_tax_id' => 63,'corp_forgn_term_exist_cd' => 64,'corp_forgn_term_exist_exp' => 65,'corp_forgn_term_exist_desc' => 66,'corp_orig_org_structure_cd' => 67,'corp_orig_org_structure_desc' => 68,'corp_for_profit_ind' => 69,'corp_public_or_private_ind' => 70,'corp_sic_code' => 71,'corp_naic_code' => 72,'corp_orig_bus_type_cd' => 73,'corp_orig_bus_type_desc' => 74,'corp_entity_desc' => 75,'corp_certificate_nbr' => 76,'corp_internal_nbr' => 77,'corp_previous_nbr' => 78,'corp_microfilm_nbr' => 79,'corp_amendments_filed' => 80,'corp_acts' => 81,'corp_partnership_ind' => 82,'corp_mfg_ind' => 83,'corp_addl_info' => 84,'corp_taxes' => 85,'corp_franchise_taxes' => 86,'corp_tax_program_cd' => 87,'corp_tax_program_desc' => 88,'corp_ra_full_name' => 89,'corp_ra_fname' => 90,'corp_ra_mname' => 91,'corp_ra_lname' => 92,'corp_ra_suffix' => 93,'corp_ra_title_cd' => 94,'corp_ra_title_desc' => 95,'corp_ra_fein' => 96,'corp_ra_ssn' => 97,'corp_ra_dob' => 98,'corp_ra_effective_date' => 99,'corp_ra_resign_date' => 100,'corp_ra_no_comp' => 101,'corp_ra_no_comp_igs' => 102,'corp_ra_addl_info' => 103,'corp_ra_address_type_cd' => 104,'corp_ra_address_type_desc' => 105,'corp_ra_address_line1' => 106,'corp_ra_address_line2' => 107,'corp_ra_address_line3' => 108,'corp_ra_phone_number' => 109,'corp_ra_phone_number_type_cd' => 110,'corp_ra_phone_number_type_desc' => 111,'corp_ra_fax_nbr' => 112,'corp_ra_email_address' => 113,'corp_ra_web_address' => 114,'corp_prep_addr1_line1' => 115,'corp_prep_addr1_last_line' => 116,'corp_prep_addr2_line1' => 117,'corp_prep_addr2_last_line' => 118,'ra_prep_addr_line1' => 119,'ra_prep_addr_last_line' => 120,'cont_filing_reference_nbr' => 121,'cont_filing_date' => 122,'cont_filing_cd' => 123,'cont_filing_desc' => 124,'cont_type_cd' => 125,'cont_type_desc' => 126,'cont_full_name' => 127,'cont_fname' => 128,'cont_mname' => 129,'cont_lname' => 130,'cont_suffix' => 131,'cont_title1_desc' => 132,'cont_title2_desc' => 133,'cont_title3_desc' => 134,'cont_title4_desc' => 135,'cont_title5_desc' => 136,'cont_fein' => 137,'cont_ssn' => 138,'cont_dob' => 139,'cont_status_cd' => 140,'cont_status_desc' => 141,'cont_effective_date' => 142,'cont_effective_cd' => 143,'cont_effective_desc' => 144,'cont_addl_info' => 145,'cont_address_type_cd' => 146,'cont_address_type_desc' => 147,'cont_address_line1' => 148,'cont_address_line2' => 149,'cont_address_line3' => 150,'cont_address_effective_date' => 151,'cont_address_county' => 152,'cont_phone_number' => 153,'cont_phone_number_type_cd' => 154,'cont_phone_number_type_desc' => 155,'cont_fax_nbr' => 156,'cont_email_address' => 157,'cont_web_address' => 158,'corp_acres' => 159,'corp_action' => 160,'corp_action_date' => 161,'corp_action_employment_security_approval_date' => 162,'corp_action_pending_cd' => 163,'corp_action_pending_desc' => 164,'corp_action_statement_of_intent_date' => 165,'corp_action_tax_dept_approval_date' => 166,'corp_acts2' => 167,'corp_acts3' => 168,'corp_additional_principals' => 169,'corp_address_office_type' => 170,'corp_agent_assign_date' => 171,'corp_agent_commercial' => 172,'corp_agent_country' => 173,'corp_agent_county' => 174,'corp_agent_status_cd' => 175,'corp_agent_status_desc' => 176,'corp_agent_id' => 177,'corp_agriculture_flag' => 178,'corp_authorized_partners' => 179,'corp_comment' => 180,'corp_consent_flag_for_protected_name' => 181,'corp_converted' => 182,'corp_converted_from' => 183,'corp_country_of_formation' => 184,'corp_date_of_organization_meeting' => 185,'corp_delayed_effective_date' => 186,'corp_directors_from_to' => 187,'corp_dissolved_date' => 188,'corp_farm_exemptions' => 189,'corp_farm_qual_date' => 190,'corp_farm_status_cd' => 191,'corp_farm_status_date' => 192,'corp_farm_status_desc' => 193,'corp_fiscal_year_month' => 194,'corp_foreign_fiduciary_capacity_in_state' => 195,'corp_governing_statute' => 196,'corp_has_members' => 197,'corp_has_vested_managers' => 198,'corp_home_incorporated_county' => 199,'corp_home_state_name' => 200,'corp_is_professional' => 201,'corp_is_non_profit_irs_approved' => 202,'corp_last_renewal_date' => 203,'corp_last_renewal_year' => 204,'corp_license_type' => 205,'corp_llc_managed_desc' => 206,'corp_llc_managed_ind' => 207,'corp_management_desc' => 208,'corp_management_type' => 209,'corp_manager_managed' => 210,'corp_merged_corporation_id' => 211,'corp_merged_fein' => 212,'corp_merger_allowed_flag' => 213,'corp_merger_date' => 214,'corp_merger_desc' => 215,'corp_merger_effective_date' => 216,'corp_merger_id' => 217,'corp_merger_indicator' => 218,'corp_merger_name' => 219,'corp_merger_type_converted_to_cd' => 220,'corp_merger_type_converted_to_desc' => 221,'corp_naics_desc' => 222,'corp_name_effective_date' => 223,'corp_name_reservation_date' => 224,'corp_name_reservation_desc' => 225,'corp_name_reservation_expiration_date' => 226,'corp_name_reservation_nbr' => 227,'corp_name_reservation_type' => 228,'corp_name_status_cd' => 229,'corp_name_status_date' => 230,'corp_name_status_desc' => 231,'corp_non_profit_irs_approved_purpose' => 232,'corp_non_profit_solicit_donations' => 233,'corp_nbr_of_amendments' => 234,'corp_nbr_of_initial_llc_members' => 235,'corp_nbr_of_partners' => 236,'corp_operating_agreement' => 237,'corp_opt_in_llc_act_desc' => 238,'corp_opt_in_llc_act_ind' => 239,'corp_organizational_comments' => 240,'corp_partner_contributions_total' => 241,'corp_partner_terms' => 242,'corp_percentage_voters_required_to_approve_amendments' => 243,'corp_profession' => 244,'corp_province' => 245,'corp_public_mutual_corporation' => 246,'corp_purpose' => 247,'corp_ra_required_flag' => 248,'corp_registered_counties' => 249,'corp_regulated_ind' => 250,'corp_renewal_date' => 251,'corp_standing_other' => 252,'corp_survivor_corporation_id' => 253,'corp_tax_base' => 254,'corp_tax_standing' => 255,'corp_termination_cd' => 256,'corp_termination_desc' => 257,'corp_termination_date' => 258,'corp_trademark_business_mark_type' => 259,'corp_trademark_cancelled_date' => 260,'corp_trademark_class_desc1' => 261,'corp_trademark_class_desc2' => 262,'corp_trademark_class_desc3' => 263,'corp_trademark_class_desc4' => 264,'corp_trademark_class_desc5' => 265,'corp_trademark_class_desc6' => 266,'corp_trademark_classification_nbr' => 267,'corp_trademark_disclaimer1' => 268,'corp_trademark_disclaimer2' => 269,'corp_trademark_expiration_date' => 270,'corp_trademark_filing_date' => 271,'corp_trademark_first_use_date' => 272,'corp_trademark_first_use_date_in_state' => 273,'corp_trademark_keywords' => 274,'corp_trademark_logo' => 275,'corp_trademark_name_expiration_date' => 276,'corp_trademark_nbr' => 277,'corp_trademark_renewal_date' => 278,'corp_trademark_status' => 279,'corp_trademark_used_1' => 280,'corp_trademark_used_2' => 281,'corp_trademark_used_3' => 282,'cont_owner_percentage' => 283,'cont_country' => 284,'cont_country_mailing' => 285,'cont_nondislosure' => 286,'cont_prep_addr_line1' => 287,'cont_prep_addr_last_line' => 288,'recordorigin' => 289,0);
+EXPORT SET OF SALT311.StrType FieldRules(UNSIGNED2 i) := CHOOSE(i,['ALLOW','CUSTOM','LENGTHS'],['ALLOW','CUSTOM','LENGTHS'],['ALLOW','CUSTOM','LENGTHS'],['ALLOW','CUSTOM','LENGTHS'],['ALLOW','CUSTOM','LENGTHS'],['ALLOW','CUSTOM','LENGTHS'],['ALLOW','LENGTHS'],[],['ENUM'],[],[],['ENUM'],['ALLOW','CUSTOM','LENGTHS'],['ALLOW','LENGTHS'],['LENGTHS'],['ENUM'],['ENUM'],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],['ENUM'],[],['ALLOW','CUSTOM','LENGTHS'],[],[],[],[],[],[],['ENUM'],['ALLOW'],[],[],['ALLOW','CUSTOM','LENGTHS'],[],[],[],[],[],[],['ALLOW'],['ENUM'],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],['ENUM'],[]);
+EXPORT BOOLEAN InBaseLayout(UNSIGNED2 i) := CHOOSE(i,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,FALSE);
  
 //Individual field level validation
  
-EXPORT Make_dt_vendor_first_reported(SALT36.StrType s0) := MakeFT_invalid_date(s0);
-EXPORT InValid_dt_vendor_first_reported(SALT36.StrType s) := InValidFT_invalid_date(s);
+EXPORT Make_dt_vendor_first_reported(SALT311.StrType s0) := MakeFT_invalid_date(s0);
+EXPORT InValid_dt_vendor_first_reported(SALT311.StrType s) := InValidFT_invalid_date(s);
 EXPORT InValidMessage_dt_vendor_first_reported(UNSIGNED1 wh) := InValidMessageFT_invalid_date(wh);
  
-EXPORT Make_dt_vendor_last_reported(SALT36.StrType s0) := MakeFT_invalid_date(s0);
-EXPORT InValid_dt_vendor_last_reported(SALT36.StrType s) := InValidFT_invalid_date(s);
+EXPORT Make_dt_vendor_last_reported(SALT311.StrType s0) := MakeFT_invalid_date(s0);
+EXPORT InValid_dt_vendor_last_reported(SALT311.StrType s) := InValidFT_invalid_date(s);
 EXPORT InValidMessage_dt_vendor_last_reported(UNSIGNED1 wh) := InValidMessageFT_invalid_date(wh);
  
-EXPORT Make_dt_first_seen(SALT36.StrType s0) := MakeFT_invalid_date(s0);
-EXPORT InValid_dt_first_seen(SALT36.StrType s) := InValidFT_invalid_date(s);
+EXPORT Make_dt_first_seen(SALT311.StrType s0) := MakeFT_invalid_date(s0);
+EXPORT InValid_dt_first_seen(SALT311.StrType s) := InValidFT_invalid_date(s);
 EXPORT InValidMessage_dt_first_seen(UNSIGNED1 wh) := InValidMessageFT_invalid_date(wh);
  
-EXPORT Make_dt_last_seen(SALT36.StrType s0) := MakeFT_invalid_date(s0);
-EXPORT InValid_dt_last_seen(SALT36.StrType s) := InValidFT_invalid_date(s);
+EXPORT Make_dt_last_seen(SALT311.StrType s0) := MakeFT_invalid_date(s0);
+EXPORT InValid_dt_last_seen(SALT311.StrType s) := InValidFT_invalid_date(s);
 EXPORT InValidMessage_dt_last_seen(UNSIGNED1 wh) := InValidMessageFT_invalid_date(wh);
  
-EXPORT Make_corp_ra_dt_first_seen(SALT36.StrType s0) := MakeFT_invalid_date(s0);
-EXPORT InValid_corp_ra_dt_first_seen(SALT36.StrType s) := InValidFT_invalid_date(s);
+EXPORT Make_corp_ra_dt_first_seen(SALT311.StrType s0) := MakeFT_invalid_date(s0);
+EXPORT InValid_corp_ra_dt_first_seen(SALT311.StrType s) := InValidFT_invalid_date(s);
 EXPORT InValidMessage_corp_ra_dt_first_seen(UNSIGNED1 wh) := InValidMessageFT_invalid_date(wh);
  
-EXPORT Make_corp_ra_dt_last_seen(SALT36.StrType s0) := MakeFT_invalid_date(s0);
-EXPORT InValid_corp_ra_dt_last_seen(SALT36.StrType s) := InValidFT_invalid_date(s);
+EXPORT Make_corp_ra_dt_last_seen(SALT311.StrType s0) := MakeFT_invalid_date(s0);
+EXPORT InValid_corp_ra_dt_last_seen(SALT311.StrType s) := InValidFT_invalid_date(s);
 EXPORT InValidMessage_corp_ra_dt_last_seen(UNSIGNED1 wh) := InValidMessageFT_invalid_date(wh);
  
-EXPORT Make_corp_key(SALT36.StrType s0) := MakeFT_invalid_corp_key(s0);
-EXPORT InValid_corp_key(SALT36.StrType s) := InValidFT_invalid_corp_key(s);
+EXPORT Make_corp_key(SALT311.StrType s0) := MakeFT_invalid_corp_key(s0);
+EXPORT InValid_corp_key(SALT311.StrType s) := InValidFT_invalid_corp_key(s);
 EXPORT InValidMessage_corp_key(UNSIGNED1 wh) := InValidMessageFT_invalid_corp_key(wh);
  
-EXPORT Make_corp_supp_key(SALT36.StrType s0) := s0;
-EXPORT InValid_corp_supp_key(SALT36.StrType s) := 0;
+EXPORT Make_corp_supp_key(SALT311.StrType s0) := s0;
+EXPORT InValid_corp_supp_key(SALT311.StrType s) := 0;
 EXPORT InValidMessage_corp_supp_key(UNSIGNED1 wh) := '';
  
-EXPORT Make_corp_vendor(SALT36.StrType s0) := MakeFT_invalid_corp_vendor(s0);
-EXPORT InValid_corp_vendor(SALT36.StrType s) := InValidFT_invalid_corp_vendor(s);
+EXPORT Make_corp_vendor(SALT311.StrType s0) := MakeFT_invalid_corp_vendor(s0);
+EXPORT InValid_corp_vendor(SALT311.StrType s) := InValidFT_invalid_corp_vendor(s);
 EXPORT InValidMessage_corp_vendor(UNSIGNED1 wh) := InValidMessageFT_invalid_corp_vendor(wh);
  
-EXPORT Make_corp_vendor_county(SALT36.StrType s0) := s0;
-EXPORT InValid_corp_vendor_county(SALT36.StrType s) := 0;
+EXPORT Make_corp_vendor_county(SALT311.StrType s0) := s0;
+EXPORT InValid_corp_vendor_county(SALT311.StrType s) := 0;
 EXPORT InValidMessage_corp_vendor_county(UNSIGNED1 wh) := '';
  
-EXPORT Make_corp_vendor_subcode(SALT36.StrType s0) := s0;
-EXPORT InValid_corp_vendor_subcode(SALT36.StrType s) := 0;
+EXPORT Make_corp_vendor_subcode(SALT311.StrType s0) := s0;
+EXPORT InValid_corp_vendor_subcode(SALT311.StrType s) := 0;
 EXPORT InValidMessage_corp_vendor_subcode(UNSIGNED1 wh) := '';
  
-EXPORT Make_corp_state_origin(SALT36.StrType s0) := MakeFT_invalid_state_origin(s0);
-EXPORT InValid_corp_state_origin(SALT36.StrType s) := InValidFT_invalid_state_origin(s);
+EXPORT Make_corp_state_origin(SALT311.StrType s0) := MakeFT_invalid_state_origin(s0);
+EXPORT InValid_corp_state_origin(SALT311.StrType s) := InValidFT_invalid_state_origin(s);
 EXPORT InValidMessage_corp_state_origin(UNSIGNED1 wh) := InValidMessageFT_invalid_state_origin(wh);
  
-EXPORT Make_corp_process_date(SALT36.StrType s0) := MakeFT_invalid_date(s0);
-EXPORT InValid_corp_process_date(SALT36.StrType s) := InValidFT_invalid_date(s);
+EXPORT Make_corp_process_date(SALT311.StrType s0) := MakeFT_invalid_date(s0);
+EXPORT InValid_corp_process_date(SALT311.StrType s) := InValidFT_invalid_date(s);
 EXPORT InValidMessage_corp_process_date(UNSIGNED1 wh) := InValidMessageFT_invalid_date(wh);
  
-EXPORT Make_corp_orig_sos_charter_nbr(SALT36.StrType s0) := MakeFT_invalid_charter_nbr(s0);
-EXPORT InValid_corp_orig_sos_charter_nbr(SALT36.StrType s) := InValidFT_invalid_charter_nbr(s);
+EXPORT Make_corp_orig_sos_charter_nbr(SALT311.StrType s0) := MakeFT_invalid_charter_nbr(s0);
+EXPORT InValid_corp_orig_sos_charter_nbr(SALT311.StrType s) := InValidFT_invalid_charter_nbr(s);
 EXPORT InValidMessage_corp_orig_sos_charter_nbr(UNSIGNED1 wh) := InValidMessageFT_invalid_charter_nbr(wh);
  
-EXPORT Make_corp_legal_name(SALT36.StrType s0) := MakeFT_invalid_mandatory(s0);
-EXPORT InValid_corp_legal_name(SALT36.StrType s) := InValidFT_invalid_mandatory(s);
+EXPORT Make_corp_legal_name(SALT311.StrType s0) := MakeFT_invalid_mandatory(s0);
+EXPORT InValid_corp_legal_name(SALT311.StrType s) := InValidFT_invalid_mandatory(s);
 EXPORT InValidMessage_corp_legal_name(UNSIGNED1 wh) := InValidMessageFT_invalid_mandatory(wh);
  
-EXPORT Make_corp_ln_name_type_cd(SALT36.StrType s0) := MakeFT_invalid_name_type_code(s0);
-EXPORT InValid_corp_ln_name_type_cd(SALT36.StrType s) := InValidFT_invalid_name_type_code(s);
+EXPORT Make_corp_ln_name_type_cd(SALT311.StrType s0) := MakeFT_invalid_name_type_code(s0);
+EXPORT InValid_corp_ln_name_type_cd(SALT311.StrType s) := InValidFT_invalid_name_type_code(s);
 EXPORT InValidMessage_corp_ln_name_type_cd(UNSIGNED1 wh) := InValidMessageFT_invalid_name_type_code(wh);
  
-EXPORT Make_corp_ln_name_type_desc(SALT36.StrType s0) := MakeFT_invalid_name_type_desc(s0);
-EXPORT InValid_corp_ln_name_type_desc(SALT36.StrType s) := InValidFT_invalid_name_type_desc(s);
+EXPORT Make_corp_ln_name_type_desc(SALT311.StrType s0) := MakeFT_invalid_name_type_desc(s0);
+EXPORT InValid_corp_ln_name_type_desc(SALT311.StrType s) := InValidFT_invalid_name_type_desc(s);
 EXPORT InValidMessage_corp_ln_name_type_desc(UNSIGNED1 wh) := InValidMessageFT_invalid_name_type_desc(wh);
  
-EXPORT Make_corp_supp_nbr(SALT36.StrType s0) := s0;
-EXPORT InValid_corp_supp_nbr(SALT36.StrType s) := 0;
+EXPORT Make_corp_supp_nbr(SALT311.StrType s0) := s0;
+EXPORT InValid_corp_supp_nbr(SALT311.StrType s) := 0;
 EXPORT InValidMessage_corp_supp_nbr(UNSIGNED1 wh) := '';
  
-EXPORT Make_corp_name_comment(SALT36.StrType s0) := s0;
-EXPORT InValid_corp_name_comment(SALT36.StrType s) := 0;
+EXPORT Make_corp_name_comment(SALT311.StrType s0) := s0;
+EXPORT InValid_corp_name_comment(SALT311.StrType s) := 0;
 EXPORT InValidMessage_corp_name_comment(UNSIGNED1 wh) := '';
  
-EXPORT Make_corp_address1_type_cd(SALT36.StrType s0) := s0;
-EXPORT InValid_corp_address1_type_cd(SALT36.StrType s) := 0;
+EXPORT Make_corp_address1_type_cd(SALT311.StrType s0) := s0;
+EXPORT InValid_corp_address1_type_cd(SALT311.StrType s) := 0;
 EXPORT InValidMessage_corp_address1_type_cd(UNSIGNED1 wh) := '';
  
-EXPORT Make_corp_address1_type_desc(SALT36.StrType s0) := s0;
-EXPORT InValid_corp_address1_type_desc(SALT36.StrType s) := 0;
+EXPORT Make_corp_address1_type_desc(SALT311.StrType s0) := s0;
+EXPORT InValid_corp_address1_type_desc(SALT311.StrType s) := 0;
 EXPORT InValidMessage_corp_address1_type_desc(UNSIGNED1 wh) := '';
  
-EXPORT Make_corp_address1_line1(SALT36.StrType s0) := s0;
-EXPORT InValid_corp_address1_line1(SALT36.StrType s) := 0;
+EXPORT Make_corp_address1_line1(SALT311.StrType s0) := s0;
+EXPORT InValid_corp_address1_line1(SALT311.StrType s) := 0;
 EXPORT InValidMessage_corp_address1_line1(UNSIGNED1 wh) := '';
  
-EXPORT Make_corp_address1_line2(SALT36.StrType s0) := s0;
-EXPORT InValid_corp_address1_line2(SALT36.StrType s) := 0;
+EXPORT Make_corp_address1_line2(SALT311.StrType s0) := s0;
+EXPORT InValid_corp_address1_line2(SALT311.StrType s) := 0;
 EXPORT InValidMessage_corp_address1_line2(UNSIGNED1 wh) := '';
  
-EXPORT Make_corp_address1_line3(SALT36.StrType s0) := s0;
-EXPORT InValid_corp_address1_line3(SALT36.StrType s) := 0;
+EXPORT Make_corp_address1_line3(SALT311.StrType s0) := s0;
+EXPORT InValid_corp_address1_line3(SALT311.StrType s) := 0;
 EXPORT InValidMessage_corp_address1_line3(UNSIGNED1 wh) := '';
  
-EXPORT Make_corp_address1_effective_date(SALT36.StrType s0) := s0;
-EXPORT InValid_corp_address1_effective_date(SALT36.StrType s) := 0;
+EXPORT Make_corp_address1_effective_date(SALT311.StrType s0) := s0;
+EXPORT InValid_corp_address1_effective_date(SALT311.StrType s) := 0;
 EXPORT InValidMessage_corp_address1_effective_date(UNSIGNED1 wh) := '';
  
-EXPORT Make_corp_address2_type_cd(SALT36.StrType s0) := s0;
-EXPORT InValid_corp_address2_type_cd(SALT36.StrType s) := 0;
+EXPORT Make_corp_address2_type_cd(SALT311.StrType s0) := s0;
+EXPORT InValid_corp_address2_type_cd(SALT311.StrType s) := 0;
 EXPORT InValidMessage_corp_address2_type_cd(UNSIGNED1 wh) := '';
  
-EXPORT Make_corp_address2_type_desc(SALT36.StrType s0) := s0;
-EXPORT InValid_corp_address2_type_desc(SALT36.StrType s) := 0;
+EXPORT Make_corp_address2_type_desc(SALT311.StrType s0) := s0;
+EXPORT InValid_corp_address2_type_desc(SALT311.StrType s) := 0;
 EXPORT InValidMessage_corp_address2_type_desc(UNSIGNED1 wh) := '';
  
-EXPORT Make_corp_address2_line1(SALT36.StrType s0) := s0;
-EXPORT InValid_corp_address2_line1(SALT36.StrType s) := 0;
+EXPORT Make_corp_address2_line1(SALT311.StrType s0) := s0;
+EXPORT InValid_corp_address2_line1(SALT311.StrType s) := 0;
 EXPORT InValidMessage_corp_address2_line1(UNSIGNED1 wh) := '';
  
-EXPORT Make_corp_address2_line2(SALT36.StrType s0) := s0;
-EXPORT InValid_corp_address2_line2(SALT36.StrType s) := 0;
+EXPORT Make_corp_address2_line2(SALT311.StrType s0) := s0;
+EXPORT InValid_corp_address2_line2(SALT311.StrType s) := 0;
 EXPORT InValidMessage_corp_address2_line2(UNSIGNED1 wh) := '';
  
-EXPORT Make_corp_address2_line3(SALT36.StrType s0) := s0;
-EXPORT InValid_corp_address2_line3(SALT36.StrType s) := 0;
+EXPORT Make_corp_address2_line3(SALT311.StrType s0) := s0;
+EXPORT InValid_corp_address2_line3(SALT311.StrType s) := 0;
 EXPORT InValidMessage_corp_address2_line3(UNSIGNED1 wh) := '';
  
-EXPORT Make_corp_address2_effective_date(SALT36.StrType s0) := s0;
-EXPORT InValid_corp_address2_effective_date(SALT36.StrType s) := 0;
+EXPORT Make_corp_address2_effective_date(SALT311.StrType s0) := s0;
+EXPORT InValid_corp_address2_effective_date(SALT311.StrType s) := 0;
 EXPORT InValidMessage_corp_address2_effective_date(UNSIGNED1 wh) := '';
  
-EXPORT Make_corp_phone_number(SALT36.StrType s0) := s0;
-EXPORT InValid_corp_phone_number(SALT36.StrType s) := 0;
+EXPORT Make_corp_phone_number(SALT311.StrType s0) := s0;
+EXPORT InValid_corp_phone_number(SALT311.StrType s) := 0;
 EXPORT InValidMessage_corp_phone_number(UNSIGNED1 wh) := '';
  
-EXPORT Make_corp_phone_number_type_cd(SALT36.StrType s0) := s0;
-EXPORT InValid_corp_phone_number_type_cd(SALT36.StrType s) := 0;
+EXPORT Make_corp_phone_number_type_cd(SALT311.StrType s0) := s0;
+EXPORT InValid_corp_phone_number_type_cd(SALT311.StrType s) := 0;
 EXPORT InValidMessage_corp_phone_number_type_cd(UNSIGNED1 wh) := '';
  
-EXPORT Make_corp_phone_number_type_desc(SALT36.StrType s0) := s0;
-EXPORT InValid_corp_phone_number_type_desc(SALT36.StrType s) := 0;
+EXPORT Make_corp_phone_number_type_desc(SALT311.StrType s0) := s0;
+EXPORT InValid_corp_phone_number_type_desc(SALT311.StrType s) := 0;
 EXPORT InValidMessage_corp_phone_number_type_desc(UNSIGNED1 wh) := '';
  
-EXPORT Make_corp_fax_nbr(SALT36.StrType s0) := s0;
-EXPORT InValid_corp_fax_nbr(SALT36.StrType s) := 0;
+EXPORT Make_corp_fax_nbr(SALT311.StrType s0) := s0;
+EXPORT InValid_corp_fax_nbr(SALT311.StrType s) := 0;
 EXPORT InValidMessage_corp_fax_nbr(UNSIGNED1 wh) := '';
  
-EXPORT Make_corp_email_address(SALT36.StrType s0) := s0;
-EXPORT InValid_corp_email_address(SALT36.StrType s) := 0;
+EXPORT Make_corp_email_address(SALT311.StrType s0) := s0;
+EXPORT InValid_corp_email_address(SALT311.StrType s) := 0;
 EXPORT InValidMessage_corp_email_address(UNSIGNED1 wh) := '';
  
-EXPORT Make_corp_web_address(SALT36.StrType s0) := s0;
-EXPORT InValid_corp_web_address(SALT36.StrType s) := 0;
+EXPORT Make_corp_web_address(SALT311.StrType s0) := s0;
+EXPORT InValid_corp_web_address(SALT311.StrType s) := 0;
 EXPORT InValidMessage_corp_web_address(UNSIGNED1 wh) := '';
  
-EXPORT Make_corp_filing_reference_nbr(SALT36.StrType s0) := s0;
-EXPORT InValid_corp_filing_reference_nbr(SALT36.StrType s) := 0;
+EXPORT Make_corp_filing_reference_nbr(SALT311.StrType s0) := s0;
+EXPORT InValid_corp_filing_reference_nbr(SALT311.StrType s) := 0;
 EXPORT InValidMessage_corp_filing_reference_nbr(UNSIGNED1 wh) := '';
  
-EXPORT Make_corp_filing_date(SALT36.StrType s0) := s0;
-EXPORT InValid_corp_filing_date(SALT36.StrType s) := 0;
+EXPORT Make_corp_filing_date(SALT311.StrType s0) := s0;
+EXPORT InValid_corp_filing_date(SALT311.StrType s) := 0;
 EXPORT InValidMessage_corp_filing_date(UNSIGNED1 wh) := '';
  
-EXPORT Make_corp_filing_cd(SALT36.StrType s0) := s0;
-EXPORT InValid_corp_filing_cd(SALT36.StrType s) := 0;
+EXPORT Make_corp_filing_cd(SALT311.StrType s0) := s0;
+EXPORT InValid_corp_filing_cd(SALT311.StrType s) := 0;
 EXPORT InValidMessage_corp_filing_cd(UNSIGNED1 wh) := '';
  
-EXPORT Make_corp_filing_desc(SALT36.StrType s0) := s0;
-EXPORT InValid_corp_filing_desc(SALT36.StrType s) := 0;
+EXPORT Make_corp_filing_desc(SALT311.StrType s0) := s0;
+EXPORT InValid_corp_filing_desc(SALT311.StrType s) := 0;
 EXPORT InValidMessage_corp_filing_desc(UNSIGNED1 wh) := '';
  
-EXPORT Make_corp_status_cd(SALT36.StrType s0) := s0;
-EXPORT InValid_corp_status_cd(SALT36.StrType s) := 0;
+EXPORT Make_corp_status_cd(SALT311.StrType s0) := s0;
+EXPORT InValid_corp_status_cd(SALT311.StrType s) := 0;
 EXPORT InValidMessage_corp_status_cd(UNSIGNED1 wh) := '';
  
-EXPORT Make_corp_status_desc(SALT36.StrType s0) := s0;
-EXPORT InValid_corp_status_desc(SALT36.StrType s) := 0;
+EXPORT Make_corp_status_desc(SALT311.StrType s0) := s0;
+EXPORT InValid_corp_status_desc(SALT311.StrType s) := 0;
 EXPORT InValidMessage_corp_status_desc(UNSIGNED1 wh) := '';
  
-EXPORT Make_corp_status_date(SALT36.StrType s0) := s0;
-EXPORT InValid_corp_status_date(SALT36.StrType s) := 0;
+EXPORT Make_corp_status_date(SALT311.StrType s0) := s0;
+EXPORT InValid_corp_status_date(SALT311.StrType s) := 0;
 EXPORT InValidMessage_corp_status_date(UNSIGNED1 wh) := '';
  
-EXPORT Make_corp_standing(SALT36.StrType s0) := s0;
-EXPORT InValid_corp_standing(SALT36.StrType s) := 0;
+EXPORT Make_corp_standing(SALT311.StrType s0) := s0;
+EXPORT InValid_corp_standing(SALT311.StrType s) := 0;
 EXPORT InValidMessage_corp_standing(UNSIGNED1 wh) := '';
  
-EXPORT Make_corp_status_comment(SALT36.StrType s0) := s0;
-EXPORT InValid_corp_status_comment(SALT36.StrType s) := 0;
+EXPORT Make_corp_status_comment(SALT311.StrType s0) := s0;
+EXPORT InValid_corp_status_comment(SALT311.StrType s) := 0;
 EXPORT InValidMessage_corp_status_comment(UNSIGNED1 wh) := '';
  
-EXPORT Make_corp_ticker_symbol(SALT36.StrType s0) := s0;
-EXPORT InValid_corp_ticker_symbol(SALT36.StrType s) := 0;
+EXPORT Make_corp_ticker_symbol(SALT311.StrType s0) := s0;
+EXPORT InValid_corp_ticker_symbol(SALT311.StrType s) := 0;
 EXPORT InValidMessage_corp_ticker_symbol(UNSIGNED1 wh) := '';
  
-EXPORT Make_corp_stock_exchange(SALT36.StrType s0) := s0;
-EXPORT InValid_corp_stock_exchange(SALT36.StrType s) := 0;
+EXPORT Make_corp_stock_exchange(SALT311.StrType s0) := s0;
+EXPORT InValid_corp_stock_exchange(SALT311.StrType s) := 0;
 EXPORT InValidMessage_corp_stock_exchange(UNSIGNED1 wh) := '';
  
-EXPORT Make_corp_inc_state(SALT36.StrType s0) := MakeFT_invalid_state_origin(s0);
-EXPORT InValid_corp_inc_state(SALT36.StrType s) := InValidFT_invalid_state_origin(s);
+EXPORT Make_corp_inc_state(SALT311.StrType s0) := MakeFT_invalid_state_origin(s0);
+EXPORT InValid_corp_inc_state(SALT311.StrType s) := InValidFT_invalid_state_origin(s);
 EXPORT InValidMessage_corp_inc_state(UNSIGNED1 wh) := InValidMessageFT_invalid_state_origin(wh);
  
-EXPORT Make_corp_inc_county(SALT36.StrType s0) := s0;
-EXPORT InValid_corp_inc_county(SALT36.StrType s) := 0;
+EXPORT Make_corp_inc_county(SALT311.StrType s0) := s0;
+EXPORT InValid_corp_inc_county(SALT311.StrType s) := 0;
 EXPORT InValidMessage_corp_inc_county(UNSIGNED1 wh) := '';
  
-EXPORT Make_corp_inc_date(SALT36.StrType s0) := MakeFT_invalid_date(s0);
-EXPORT InValid_corp_inc_date(SALT36.StrType s) := InValidFT_invalid_date(s);
+EXPORT Make_corp_inc_date(SALT311.StrType s0) := MakeFT_invalid_date(s0);
+EXPORT InValid_corp_inc_date(SALT311.StrType s) := InValidFT_invalid_date(s);
 EXPORT InValidMessage_corp_inc_date(UNSIGNED1 wh) := InValidMessageFT_invalid_date(wh);
  
-EXPORT Make_corp_anniversary_month(SALT36.StrType s0) := s0;
-EXPORT InValid_corp_anniversary_month(SALT36.StrType s) := 0;
+EXPORT Make_corp_anniversary_month(SALT311.StrType s0) := s0;
+EXPORT InValid_corp_anniversary_month(SALT311.StrType s) := 0;
 EXPORT InValidMessage_corp_anniversary_month(UNSIGNED1 wh) := '';
  
-EXPORT Make_corp_fed_tax_id(SALT36.StrType s0) := s0;
-EXPORT InValid_corp_fed_tax_id(SALT36.StrType s) := 0;
+EXPORT Make_corp_fed_tax_id(SALT311.StrType s0) := s0;
+EXPORT InValid_corp_fed_tax_id(SALT311.StrType s) := 0;
 EXPORT InValidMessage_corp_fed_tax_id(UNSIGNED1 wh) := '';
  
-EXPORT Make_corp_state_tax_id(SALT36.StrType s0) := s0;
-EXPORT InValid_corp_state_tax_id(SALT36.StrType s) := 0;
+EXPORT Make_corp_state_tax_id(SALT311.StrType s0) := s0;
+EXPORT InValid_corp_state_tax_id(SALT311.StrType s) := 0;
 EXPORT InValidMessage_corp_state_tax_id(UNSIGNED1 wh) := '';
  
-EXPORT Make_corp_term_exist_cd(SALT36.StrType s0) := s0;
-EXPORT InValid_corp_term_exist_cd(SALT36.StrType s) := 0;
+EXPORT Make_corp_term_exist_cd(SALT311.StrType s0) := s0;
+EXPORT InValid_corp_term_exist_cd(SALT311.StrType s) := 0;
 EXPORT InValidMessage_corp_term_exist_cd(UNSIGNED1 wh) := '';
  
-EXPORT Make_corp_term_exist_exp(SALT36.StrType s0) := s0;
-EXPORT InValid_corp_term_exist_exp(SALT36.StrType s) := 0;
+EXPORT Make_corp_term_exist_exp(SALT311.StrType s0) := s0;
+EXPORT InValid_corp_term_exist_exp(SALT311.StrType s) := 0;
 EXPORT InValidMessage_corp_term_exist_exp(UNSIGNED1 wh) := '';
  
-EXPORT Make_corp_term_exist_desc(SALT36.StrType s0) := s0;
-EXPORT InValid_corp_term_exist_desc(SALT36.StrType s) := 0;
+EXPORT Make_corp_term_exist_desc(SALT311.StrType s0) := s0;
+EXPORT InValid_corp_term_exist_desc(SALT311.StrType s) := 0;
 EXPORT InValidMessage_corp_term_exist_desc(UNSIGNED1 wh) := '';
  
-EXPORT Make_corp_foreign_domestic_ind(SALT36.StrType s0) := MakeFT_invalid_for_dom_ind(s0);
-EXPORT InValid_corp_foreign_domestic_ind(SALT36.StrType s) := InValidFT_invalid_for_dom_ind(s);
+EXPORT Make_corp_foreign_domestic_ind(SALT311.StrType s0) := MakeFT_invalid_for_dom_ind(s0);
+EXPORT InValid_corp_foreign_domestic_ind(SALT311.StrType s) := InValidFT_invalid_for_dom_ind(s);
 EXPORT InValidMessage_corp_foreign_domestic_ind(UNSIGNED1 wh) := InValidMessageFT_invalid_for_dom_ind(wh);
  
-EXPORT Make_corp_forgn_state_cd(SALT36.StrType s0) := MakeFT_invalid_alphablank(s0);
-EXPORT InValid_corp_forgn_state_cd(SALT36.StrType s) := InValidFT_invalid_alphablank(s);
+EXPORT Make_corp_forgn_state_cd(SALT311.StrType s0) := MakeFT_invalid_alphablank(s0);
+EXPORT InValid_corp_forgn_state_cd(SALT311.StrType s) := InValidFT_invalid_alphablank(s);
 EXPORT InValidMessage_corp_forgn_state_cd(UNSIGNED1 wh) := InValidMessageFT_invalid_alphablank(wh);
  
-EXPORT Make_corp_forgn_state_desc(SALT36.StrType s0) := s0;
-EXPORT InValid_corp_forgn_state_desc(SALT36.StrType s) := 0;
+EXPORT Make_corp_forgn_state_desc(SALT311.StrType s0) := s0;
+EXPORT InValid_corp_forgn_state_desc(SALT311.StrType s) := 0;
 EXPORT InValidMessage_corp_forgn_state_desc(UNSIGNED1 wh) := '';
  
-EXPORT Make_corp_forgn_sos_charter_nbr(SALT36.StrType s0) := s0;
-EXPORT InValid_corp_forgn_sos_charter_nbr(SALT36.StrType s) := 0;
+EXPORT Make_corp_forgn_sos_charter_nbr(SALT311.StrType s0) := s0;
+EXPORT InValid_corp_forgn_sos_charter_nbr(SALT311.StrType s) := 0;
 EXPORT InValidMessage_corp_forgn_sos_charter_nbr(UNSIGNED1 wh) := '';
  
-EXPORT Make_corp_forgn_date(SALT36.StrType s0) := MakeFT_invalid_date(s0);
-EXPORT InValid_corp_forgn_date(SALT36.StrType s) := InValidFT_invalid_date(s);
+EXPORT Make_corp_forgn_date(SALT311.StrType s0) := MakeFT_invalid_date(s0);
+EXPORT InValid_corp_forgn_date(SALT311.StrType s) := InValidFT_invalid_date(s);
 EXPORT InValidMessage_corp_forgn_date(UNSIGNED1 wh) := InValidMessageFT_invalid_date(wh);
  
-EXPORT Make_corp_forgn_fed_tax_id(SALT36.StrType s0) := s0;
-EXPORT InValid_corp_forgn_fed_tax_id(SALT36.StrType s) := 0;
+EXPORT Make_corp_forgn_fed_tax_id(SALT311.StrType s0) := s0;
+EXPORT InValid_corp_forgn_fed_tax_id(SALT311.StrType s) := 0;
 EXPORT InValidMessage_corp_forgn_fed_tax_id(UNSIGNED1 wh) := '';
  
-EXPORT Make_corp_forgn_state_tax_id(SALT36.StrType s0) := s0;
-EXPORT InValid_corp_forgn_state_tax_id(SALT36.StrType s) := 0;
+EXPORT Make_corp_forgn_state_tax_id(SALT311.StrType s0) := s0;
+EXPORT InValid_corp_forgn_state_tax_id(SALT311.StrType s) := 0;
 EXPORT InValidMessage_corp_forgn_state_tax_id(UNSIGNED1 wh) := '';
  
-EXPORT Make_corp_forgn_term_exist_cd(SALT36.StrType s0) := s0;
-EXPORT InValid_corp_forgn_term_exist_cd(SALT36.StrType s) := 0;
+EXPORT Make_corp_forgn_term_exist_cd(SALT311.StrType s0) := s0;
+EXPORT InValid_corp_forgn_term_exist_cd(SALT311.StrType s) := 0;
 EXPORT InValidMessage_corp_forgn_term_exist_cd(UNSIGNED1 wh) := '';
  
-EXPORT Make_corp_forgn_term_exist_exp(SALT36.StrType s0) := s0;
-EXPORT InValid_corp_forgn_term_exist_exp(SALT36.StrType s) := 0;
+EXPORT Make_corp_forgn_term_exist_exp(SALT311.StrType s0) := s0;
+EXPORT InValid_corp_forgn_term_exist_exp(SALT311.StrType s) := 0;
 EXPORT InValidMessage_corp_forgn_term_exist_exp(UNSIGNED1 wh) := '';
  
-EXPORT Make_corp_forgn_term_exist_desc(SALT36.StrType s0) := s0;
-EXPORT InValid_corp_forgn_term_exist_desc(SALT36.StrType s) := 0;
+EXPORT Make_corp_forgn_term_exist_desc(SALT311.StrType s0) := s0;
+EXPORT InValid_corp_forgn_term_exist_desc(SALT311.StrType s) := 0;
 EXPORT InValidMessage_corp_forgn_term_exist_desc(UNSIGNED1 wh) := '';
  
-EXPORT Make_corp_orig_org_structure_cd(SALT36.StrType s0) := s0;
-EXPORT InValid_corp_orig_org_structure_cd(SALT36.StrType s) := 0;
+EXPORT Make_corp_orig_org_structure_cd(SALT311.StrType s0) := s0;
+EXPORT InValid_corp_orig_org_structure_cd(SALT311.StrType s) := 0;
 EXPORT InValidMessage_corp_orig_org_structure_cd(UNSIGNED1 wh) := '';
  
-EXPORT Make_corp_orig_org_structure_desc(SALT36.StrType s0) := MakeFT_invalid_org_structure_desc(s0);
-EXPORT InValid_corp_orig_org_structure_desc(SALT36.StrType s) := InValidFT_invalid_org_structure_desc(s);
+EXPORT Make_corp_orig_org_structure_desc(SALT311.StrType s0) := MakeFT_invalid_org_structure_desc(s0);
+EXPORT InValid_corp_orig_org_structure_desc(SALT311.StrType s) := InValidFT_invalid_org_structure_desc(s);
 EXPORT InValidMessage_corp_orig_org_structure_desc(UNSIGNED1 wh) := InValidMessageFT_invalid_org_structure_desc(wh);
  
-EXPORT Make_corp_for_profit_ind(SALT36.StrType s0) := MakeFT_invalid_flag_code(s0);
-EXPORT InValid_corp_for_profit_ind(SALT36.StrType s) := InValidFT_invalid_flag_code(s);
+EXPORT Make_corp_for_profit_ind(SALT311.StrType s0) := MakeFT_invalid_flag_code(s0);
+EXPORT InValid_corp_for_profit_ind(SALT311.StrType s) := InValidFT_invalid_flag_code(s);
 EXPORT InValidMessage_corp_for_profit_ind(UNSIGNED1 wh) := InValidMessageFT_invalid_flag_code(wh);
  
-EXPORT Make_corp_public_or_private_ind(SALT36.StrType s0) := s0;
-EXPORT InValid_corp_public_or_private_ind(SALT36.StrType s) := 0;
+EXPORT Make_corp_public_or_private_ind(SALT311.StrType s0) := s0;
+EXPORT InValid_corp_public_or_private_ind(SALT311.StrType s) := 0;
 EXPORT InValidMessage_corp_public_or_private_ind(UNSIGNED1 wh) := '';
  
-EXPORT Make_corp_sic_code(SALT36.StrType s0) := s0;
-EXPORT InValid_corp_sic_code(SALT36.StrType s) := 0;
+EXPORT Make_corp_sic_code(SALT311.StrType s0) := s0;
+EXPORT InValid_corp_sic_code(SALT311.StrType s) := 0;
 EXPORT InValidMessage_corp_sic_code(UNSIGNED1 wh) := '';
  
-EXPORT Make_corp_naic_code(SALT36.StrType s0) := s0;
-EXPORT InValid_corp_naic_code(SALT36.StrType s) := 0;
+EXPORT Make_corp_naic_code(SALT311.StrType s0) := s0;
+EXPORT InValid_corp_naic_code(SALT311.StrType s) := 0;
 EXPORT InValidMessage_corp_naic_code(UNSIGNED1 wh) := '';
  
-EXPORT Make_corp_orig_bus_type_cd(SALT36.StrType s0) := s0;
-EXPORT InValid_corp_orig_bus_type_cd(SALT36.StrType s) := 0;
+EXPORT Make_corp_orig_bus_type_cd(SALT311.StrType s0) := s0;
+EXPORT InValid_corp_orig_bus_type_cd(SALT311.StrType s) := 0;
 EXPORT InValidMessage_corp_orig_bus_type_cd(UNSIGNED1 wh) := '';
  
-EXPORT Make_corp_orig_bus_type_desc(SALT36.StrType s0) := s0;
-EXPORT InValid_corp_orig_bus_type_desc(SALT36.StrType s) := 0;
+EXPORT Make_corp_orig_bus_type_desc(SALT311.StrType s0) := s0;
+EXPORT InValid_corp_orig_bus_type_desc(SALT311.StrType s) := 0;
 EXPORT InValidMessage_corp_orig_bus_type_desc(UNSIGNED1 wh) := '';
  
-EXPORT Make_corp_entity_desc(SALT36.StrType s0) := s0;
-EXPORT InValid_corp_entity_desc(SALT36.StrType s) := 0;
+EXPORT Make_corp_entity_desc(SALT311.StrType s0) := s0;
+EXPORT InValid_corp_entity_desc(SALT311.StrType s) := 0;
 EXPORT InValidMessage_corp_entity_desc(UNSIGNED1 wh) := '';
  
-EXPORT Make_corp_certificate_nbr(SALT36.StrType s0) := s0;
-EXPORT InValid_corp_certificate_nbr(SALT36.StrType s) := 0;
+EXPORT Make_corp_certificate_nbr(SALT311.StrType s0) := s0;
+EXPORT InValid_corp_certificate_nbr(SALT311.StrType s) := 0;
 EXPORT InValidMessage_corp_certificate_nbr(UNSIGNED1 wh) := '';
  
-EXPORT Make_corp_internal_nbr(SALT36.StrType s0) := s0;
-EXPORT InValid_corp_internal_nbr(SALT36.StrType s) := 0;
+EXPORT Make_corp_internal_nbr(SALT311.StrType s0) := s0;
+EXPORT InValid_corp_internal_nbr(SALT311.StrType s) := 0;
 EXPORT InValidMessage_corp_internal_nbr(UNSIGNED1 wh) := '';
  
-EXPORT Make_corp_previous_nbr(SALT36.StrType s0) := s0;
-EXPORT InValid_corp_previous_nbr(SALT36.StrType s) := 0;
+EXPORT Make_corp_previous_nbr(SALT311.StrType s0) := s0;
+EXPORT InValid_corp_previous_nbr(SALT311.StrType s) := 0;
 EXPORT InValidMessage_corp_previous_nbr(UNSIGNED1 wh) := '';
  
-EXPORT Make_corp_microfilm_nbr(SALT36.StrType s0) := s0;
-EXPORT InValid_corp_microfilm_nbr(SALT36.StrType s) := 0;
+EXPORT Make_corp_microfilm_nbr(SALT311.StrType s0) := s0;
+EXPORT InValid_corp_microfilm_nbr(SALT311.StrType s) := 0;
 EXPORT InValidMessage_corp_microfilm_nbr(UNSIGNED1 wh) := '';
  
-EXPORT Make_corp_amendments_filed(SALT36.StrType s0) := s0;
-EXPORT InValid_corp_amendments_filed(SALT36.StrType s) := 0;
+EXPORT Make_corp_amendments_filed(SALT311.StrType s0) := s0;
+EXPORT InValid_corp_amendments_filed(SALT311.StrType s) := 0;
 EXPORT InValidMessage_corp_amendments_filed(UNSIGNED1 wh) := '';
  
-EXPORT Make_corp_acts(SALT36.StrType s0) := s0;
-EXPORT InValid_corp_acts(SALT36.StrType s) := 0;
+EXPORT Make_corp_acts(SALT311.StrType s0) := s0;
+EXPORT InValid_corp_acts(SALT311.StrType s) := 0;
 EXPORT InValidMessage_corp_acts(UNSIGNED1 wh) := '';
  
-EXPORT Make_corp_partnership_ind(SALT36.StrType s0) := s0;
-EXPORT InValid_corp_partnership_ind(SALT36.StrType s) := 0;
+EXPORT Make_corp_partnership_ind(SALT311.StrType s0) := s0;
+EXPORT InValid_corp_partnership_ind(SALT311.StrType s) := 0;
 EXPORT InValidMessage_corp_partnership_ind(UNSIGNED1 wh) := '';
  
-EXPORT Make_corp_mfg_ind(SALT36.StrType s0) := s0;
-EXPORT InValid_corp_mfg_ind(SALT36.StrType s) := 0;
+EXPORT Make_corp_mfg_ind(SALT311.StrType s0) := s0;
+EXPORT InValid_corp_mfg_ind(SALT311.StrType s) := 0;
 EXPORT InValidMessage_corp_mfg_ind(UNSIGNED1 wh) := '';
  
-EXPORT Make_corp_addl_info(SALT36.StrType s0) := s0;
-EXPORT InValid_corp_addl_info(SALT36.StrType s) := 0;
+EXPORT Make_corp_addl_info(SALT311.StrType s0) := s0;
+EXPORT InValid_corp_addl_info(SALT311.StrType s) := 0;
 EXPORT InValidMessage_corp_addl_info(UNSIGNED1 wh) := '';
  
-EXPORT Make_corp_taxes(SALT36.StrType s0) := s0;
-EXPORT InValid_corp_taxes(SALT36.StrType s) := 0;
+EXPORT Make_corp_taxes(SALT311.StrType s0) := s0;
+EXPORT InValid_corp_taxes(SALT311.StrType s) := 0;
 EXPORT InValidMessage_corp_taxes(UNSIGNED1 wh) := '';
  
-EXPORT Make_corp_franchise_taxes(SALT36.StrType s0) := s0;
-EXPORT InValid_corp_franchise_taxes(SALT36.StrType s) := 0;
+EXPORT Make_corp_franchise_taxes(SALT311.StrType s0) := s0;
+EXPORT InValid_corp_franchise_taxes(SALT311.StrType s) := 0;
 EXPORT InValidMessage_corp_franchise_taxes(UNSIGNED1 wh) := '';
  
-EXPORT Make_corp_tax_program_cd(SALT36.StrType s0) := s0;
-EXPORT InValid_corp_tax_program_cd(SALT36.StrType s) := 0;
+EXPORT Make_corp_tax_program_cd(SALT311.StrType s0) := s0;
+EXPORT InValid_corp_tax_program_cd(SALT311.StrType s) := 0;
 EXPORT InValidMessage_corp_tax_program_cd(UNSIGNED1 wh) := '';
  
-EXPORT Make_corp_tax_program_desc(SALT36.StrType s0) := s0;
-EXPORT InValid_corp_tax_program_desc(SALT36.StrType s) := 0;
+EXPORT Make_corp_tax_program_desc(SALT311.StrType s0) := s0;
+EXPORT InValid_corp_tax_program_desc(SALT311.StrType s) := 0;
 EXPORT InValidMessage_corp_tax_program_desc(UNSIGNED1 wh) := '';
  
-EXPORT Make_corp_ra_full_name(SALT36.StrType s0) := s0;
-EXPORT InValid_corp_ra_full_name(SALT36.StrType s) := 0;
+EXPORT Make_corp_ra_full_name(SALT311.StrType s0) := s0;
+EXPORT InValid_corp_ra_full_name(SALT311.StrType s) := 0;
 EXPORT InValidMessage_corp_ra_full_name(UNSIGNED1 wh) := '';
  
-EXPORT Make_corp_ra_fname(SALT36.StrType s0) := s0;
-EXPORT InValid_corp_ra_fname(SALT36.StrType s) := 0;
+EXPORT Make_corp_ra_fname(SALT311.StrType s0) := s0;
+EXPORT InValid_corp_ra_fname(SALT311.StrType s) := 0;
 EXPORT InValidMessage_corp_ra_fname(UNSIGNED1 wh) := '';
  
-EXPORT Make_corp_ra_mname(SALT36.StrType s0) := s0;
-EXPORT InValid_corp_ra_mname(SALT36.StrType s) := 0;
+EXPORT Make_corp_ra_mname(SALT311.StrType s0) := s0;
+EXPORT InValid_corp_ra_mname(SALT311.StrType s) := 0;
 EXPORT InValidMessage_corp_ra_mname(UNSIGNED1 wh) := '';
  
-EXPORT Make_corp_ra_lname(SALT36.StrType s0) := s0;
-EXPORT InValid_corp_ra_lname(SALT36.StrType s) := 0;
+EXPORT Make_corp_ra_lname(SALT311.StrType s0) := s0;
+EXPORT InValid_corp_ra_lname(SALT311.StrType s) := 0;
 EXPORT InValidMessage_corp_ra_lname(UNSIGNED1 wh) := '';
  
-EXPORT Make_corp_ra_suffix(SALT36.StrType s0) := s0;
-EXPORT InValid_corp_ra_suffix(SALT36.StrType s) := 0;
+EXPORT Make_corp_ra_suffix(SALT311.StrType s0) := s0;
+EXPORT InValid_corp_ra_suffix(SALT311.StrType s) := 0;
 EXPORT InValidMessage_corp_ra_suffix(UNSIGNED1 wh) := '';
  
-EXPORT Make_corp_ra_title_cd(SALT36.StrType s0) := s0;
-EXPORT InValid_corp_ra_title_cd(SALT36.StrType s) := 0;
+EXPORT Make_corp_ra_title_cd(SALT311.StrType s0) := s0;
+EXPORT InValid_corp_ra_title_cd(SALT311.StrType s) := 0;
 EXPORT InValidMessage_corp_ra_title_cd(UNSIGNED1 wh) := '';
  
-EXPORT Make_corp_ra_title_desc(SALT36.StrType s0) := s0;
-EXPORT InValid_corp_ra_title_desc(SALT36.StrType s) := 0;
+EXPORT Make_corp_ra_title_desc(SALT311.StrType s0) := s0;
+EXPORT InValid_corp_ra_title_desc(SALT311.StrType s) := 0;
 EXPORT InValidMessage_corp_ra_title_desc(UNSIGNED1 wh) := '';
  
-EXPORT Make_corp_ra_fein(SALT36.StrType s0) := s0;
-EXPORT InValid_corp_ra_fein(SALT36.StrType s) := 0;
+EXPORT Make_corp_ra_fein(SALT311.StrType s0) := s0;
+EXPORT InValid_corp_ra_fein(SALT311.StrType s) := 0;
 EXPORT InValidMessage_corp_ra_fein(UNSIGNED1 wh) := '';
  
-EXPORT Make_corp_ra_ssn(SALT36.StrType s0) := s0;
-EXPORT InValid_corp_ra_ssn(SALT36.StrType s) := 0;
+EXPORT Make_corp_ra_ssn(SALT311.StrType s0) := s0;
+EXPORT InValid_corp_ra_ssn(SALT311.StrType s) := 0;
 EXPORT InValidMessage_corp_ra_ssn(UNSIGNED1 wh) := '';
  
-EXPORT Make_corp_ra_dob(SALT36.StrType s0) := s0;
-EXPORT InValid_corp_ra_dob(SALT36.StrType s) := 0;
+EXPORT Make_corp_ra_dob(SALT311.StrType s0) := s0;
+EXPORT InValid_corp_ra_dob(SALT311.StrType s) := 0;
 EXPORT InValidMessage_corp_ra_dob(UNSIGNED1 wh) := '';
  
-EXPORT Make_corp_ra_effective_date(SALT36.StrType s0) := s0;
-EXPORT InValid_corp_ra_effective_date(SALT36.StrType s) := 0;
+EXPORT Make_corp_ra_effective_date(SALT311.StrType s0) := s0;
+EXPORT InValid_corp_ra_effective_date(SALT311.StrType s) := 0;
 EXPORT InValidMessage_corp_ra_effective_date(UNSIGNED1 wh) := '';
  
-EXPORT Make_corp_ra_resign_date(SALT36.StrType s0) := s0;
-EXPORT InValid_corp_ra_resign_date(SALT36.StrType s) := 0;
+EXPORT Make_corp_ra_resign_date(SALT311.StrType s0) := s0;
+EXPORT InValid_corp_ra_resign_date(SALT311.StrType s) := 0;
 EXPORT InValidMessage_corp_ra_resign_date(UNSIGNED1 wh) := '';
  
-EXPORT Make_corp_ra_no_comp(SALT36.StrType s0) := s0;
-EXPORT InValid_corp_ra_no_comp(SALT36.StrType s) := 0;
+EXPORT Make_corp_ra_no_comp(SALT311.StrType s0) := s0;
+EXPORT InValid_corp_ra_no_comp(SALT311.StrType s) := 0;
 EXPORT InValidMessage_corp_ra_no_comp(UNSIGNED1 wh) := '';
  
-EXPORT Make_corp_ra_no_comp_igs(SALT36.StrType s0) := s0;
-EXPORT InValid_corp_ra_no_comp_igs(SALT36.StrType s) := 0;
+EXPORT Make_corp_ra_no_comp_igs(SALT311.StrType s0) := s0;
+EXPORT InValid_corp_ra_no_comp_igs(SALT311.StrType s) := 0;
 EXPORT InValidMessage_corp_ra_no_comp_igs(UNSIGNED1 wh) := '';
  
-EXPORT Make_corp_ra_addl_info(SALT36.StrType s0) := s0;
-EXPORT InValid_corp_ra_addl_info(SALT36.StrType s) := 0;
+EXPORT Make_corp_ra_addl_info(SALT311.StrType s0) := s0;
+EXPORT InValid_corp_ra_addl_info(SALT311.StrType s) := 0;
 EXPORT InValidMessage_corp_ra_addl_info(UNSIGNED1 wh) := '';
  
-EXPORT Make_corp_ra_address_type_cd(SALT36.StrType s0) := s0;
-EXPORT InValid_corp_ra_address_type_cd(SALT36.StrType s) := 0;
+EXPORT Make_corp_ra_address_type_cd(SALT311.StrType s0) := s0;
+EXPORT InValid_corp_ra_address_type_cd(SALT311.StrType s) := 0;
 EXPORT InValidMessage_corp_ra_address_type_cd(UNSIGNED1 wh) := '';
  
-EXPORT Make_corp_ra_address_type_desc(SALT36.StrType s0) := s0;
-EXPORT InValid_corp_ra_address_type_desc(SALT36.StrType s) := 0;
+EXPORT Make_corp_ra_address_type_desc(SALT311.StrType s0) := s0;
+EXPORT InValid_corp_ra_address_type_desc(SALT311.StrType s) := 0;
 EXPORT InValidMessage_corp_ra_address_type_desc(UNSIGNED1 wh) := '';
  
-EXPORT Make_corp_ra_address_line1(SALT36.StrType s0) := s0;
-EXPORT InValid_corp_ra_address_line1(SALT36.StrType s) := 0;
+EXPORT Make_corp_ra_address_line1(SALT311.StrType s0) := s0;
+EXPORT InValid_corp_ra_address_line1(SALT311.StrType s) := 0;
 EXPORT InValidMessage_corp_ra_address_line1(UNSIGNED1 wh) := '';
  
-EXPORT Make_corp_ra_address_line2(SALT36.StrType s0) := s0;
-EXPORT InValid_corp_ra_address_line2(SALT36.StrType s) := 0;
+EXPORT Make_corp_ra_address_line2(SALT311.StrType s0) := s0;
+EXPORT InValid_corp_ra_address_line2(SALT311.StrType s) := 0;
 EXPORT InValidMessage_corp_ra_address_line2(UNSIGNED1 wh) := '';
  
-EXPORT Make_corp_ra_address_line3(SALT36.StrType s0) := s0;
-EXPORT InValid_corp_ra_address_line3(SALT36.StrType s) := 0;
+EXPORT Make_corp_ra_address_line3(SALT311.StrType s0) := s0;
+EXPORT InValid_corp_ra_address_line3(SALT311.StrType s) := 0;
 EXPORT InValidMessage_corp_ra_address_line3(UNSIGNED1 wh) := '';
  
-EXPORT Make_corp_ra_phone_number(SALT36.StrType s0) := s0;
-EXPORT InValid_corp_ra_phone_number(SALT36.StrType s) := 0;
+EXPORT Make_corp_ra_phone_number(SALT311.StrType s0) := s0;
+EXPORT InValid_corp_ra_phone_number(SALT311.StrType s) := 0;
 EXPORT InValidMessage_corp_ra_phone_number(UNSIGNED1 wh) := '';
  
-EXPORT Make_corp_ra_phone_number_type_cd(SALT36.StrType s0) := s0;
-EXPORT InValid_corp_ra_phone_number_type_cd(SALT36.StrType s) := 0;
+EXPORT Make_corp_ra_phone_number_type_cd(SALT311.StrType s0) := s0;
+EXPORT InValid_corp_ra_phone_number_type_cd(SALT311.StrType s) := 0;
 EXPORT InValidMessage_corp_ra_phone_number_type_cd(UNSIGNED1 wh) := '';
  
-EXPORT Make_corp_ra_phone_number_type_desc(SALT36.StrType s0) := s0;
-EXPORT InValid_corp_ra_phone_number_type_desc(SALT36.StrType s) := 0;
+EXPORT Make_corp_ra_phone_number_type_desc(SALT311.StrType s0) := s0;
+EXPORT InValid_corp_ra_phone_number_type_desc(SALT311.StrType s) := 0;
 EXPORT InValidMessage_corp_ra_phone_number_type_desc(UNSIGNED1 wh) := '';
  
-EXPORT Make_corp_ra_fax_nbr(SALT36.StrType s0) := s0;
-EXPORT InValid_corp_ra_fax_nbr(SALT36.StrType s) := 0;
+EXPORT Make_corp_ra_fax_nbr(SALT311.StrType s0) := s0;
+EXPORT InValid_corp_ra_fax_nbr(SALT311.StrType s) := 0;
 EXPORT InValidMessage_corp_ra_fax_nbr(UNSIGNED1 wh) := '';
  
-EXPORT Make_corp_ra_email_address(SALT36.StrType s0) := s0;
-EXPORT InValid_corp_ra_email_address(SALT36.StrType s) := 0;
+EXPORT Make_corp_ra_email_address(SALT311.StrType s0) := s0;
+EXPORT InValid_corp_ra_email_address(SALT311.StrType s) := 0;
 EXPORT InValidMessage_corp_ra_email_address(UNSIGNED1 wh) := '';
  
-EXPORT Make_corp_ra_web_address(SALT36.StrType s0) := s0;
-EXPORT InValid_corp_ra_web_address(SALT36.StrType s) := 0;
+EXPORT Make_corp_ra_web_address(SALT311.StrType s0) := s0;
+EXPORT InValid_corp_ra_web_address(SALT311.StrType s) := 0;
 EXPORT InValidMessage_corp_ra_web_address(UNSIGNED1 wh) := '';
  
-EXPORT Make_corp_prep_addr1_line1(SALT36.StrType s0) := s0;
-EXPORT InValid_corp_prep_addr1_line1(SALT36.StrType s) := 0;
+EXPORT Make_corp_prep_addr1_line1(SALT311.StrType s0) := s0;
+EXPORT InValid_corp_prep_addr1_line1(SALT311.StrType s) := 0;
 EXPORT InValidMessage_corp_prep_addr1_line1(UNSIGNED1 wh) := '';
  
-EXPORT Make_corp_prep_addr1_last_line(SALT36.StrType s0) := s0;
-EXPORT InValid_corp_prep_addr1_last_line(SALT36.StrType s) := 0;
+EXPORT Make_corp_prep_addr1_last_line(SALT311.StrType s0) := s0;
+EXPORT InValid_corp_prep_addr1_last_line(SALT311.StrType s) := 0;
 EXPORT InValidMessage_corp_prep_addr1_last_line(UNSIGNED1 wh) := '';
  
-EXPORT Make_corp_prep_addr2_line1(SALT36.StrType s0) := s0;
-EXPORT InValid_corp_prep_addr2_line1(SALT36.StrType s) := 0;
+EXPORT Make_corp_prep_addr2_line1(SALT311.StrType s0) := s0;
+EXPORT InValid_corp_prep_addr2_line1(SALT311.StrType s) := 0;
 EXPORT InValidMessage_corp_prep_addr2_line1(UNSIGNED1 wh) := '';
  
-EXPORT Make_corp_prep_addr2_last_line(SALT36.StrType s0) := s0;
-EXPORT InValid_corp_prep_addr2_last_line(SALT36.StrType s) := 0;
+EXPORT Make_corp_prep_addr2_last_line(SALT311.StrType s0) := s0;
+EXPORT InValid_corp_prep_addr2_last_line(SALT311.StrType s) := 0;
 EXPORT InValidMessage_corp_prep_addr2_last_line(UNSIGNED1 wh) := '';
  
-EXPORT Make_ra_prep_addr_line1(SALT36.StrType s0) := s0;
-EXPORT InValid_ra_prep_addr_line1(SALT36.StrType s) := 0;
+EXPORT Make_ra_prep_addr_line1(SALT311.StrType s0) := s0;
+EXPORT InValid_ra_prep_addr_line1(SALT311.StrType s) := 0;
 EXPORT InValidMessage_ra_prep_addr_line1(UNSIGNED1 wh) := '';
  
-EXPORT Make_ra_prep_addr_last_line(SALT36.StrType s0) := s0;
-EXPORT InValid_ra_prep_addr_last_line(SALT36.StrType s) := 0;
+EXPORT Make_ra_prep_addr_last_line(SALT311.StrType s0) := s0;
+EXPORT InValid_ra_prep_addr_last_line(SALT311.StrType s) := 0;
 EXPORT InValidMessage_ra_prep_addr_last_line(UNSIGNED1 wh) := '';
  
-EXPORT Make_cont_filing_reference_nbr(SALT36.StrType s0) := s0;
-EXPORT InValid_cont_filing_reference_nbr(SALT36.StrType s) := 0;
+EXPORT Make_cont_filing_reference_nbr(SALT311.StrType s0) := s0;
+EXPORT InValid_cont_filing_reference_nbr(SALT311.StrType s) := 0;
 EXPORT InValidMessage_cont_filing_reference_nbr(UNSIGNED1 wh) := '';
  
-EXPORT Make_cont_filing_date(SALT36.StrType s0) := s0;
-EXPORT InValid_cont_filing_date(SALT36.StrType s) := 0;
+EXPORT Make_cont_filing_date(SALT311.StrType s0) := s0;
+EXPORT InValid_cont_filing_date(SALT311.StrType s) := 0;
 EXPORT InValidMessage_cont_filing_date(UNSIGNED1 wh) := '';
  
-EXPORT Make_cont_filing_cd(SALT36.StrType s0) := s0;
-EXPORT InValid_cont_filing_cd(SALT36.StrType s) := 0;
+EXPORT Make_cont_filing_cd(SALT311.StrType s0) := s0;
+EXPORT InValid_cont_filing_cd(SALT311.StrType s) := 0;
 EXPORT InValidMessage_cont_filing_cd(UNSIGNED1 wh) := '';
  
-EXPORT Make_cont_filing_desc(SALT36.StrType s0) := s0;
-EXPORT InValid_cont_filing_desc(SALT36.StrType s) := 0;
+EXPORT Make_cont_filing_desc(SALT311.StrType s0) := s0;
+EXPORT InValid_cont_filing_desc(SALT311.StrType s) := 0;
 EXPORT InValidMessage_cont_filing_desc(UNSIGNED1 wh) := '';
  
-EXPORT Make_cont_type_cd(SALT36.StrType s0) := s0;
-EXPORT InValid_cont_type_cd(SALT36.StrType s) := 0;
+EXPORT Make_cont_type_cd(SALT311.StrType s0) := s0;
+EXPORT InValid_cont_type_cd(SALT311.StrType s) := 0;
 EXPORT InValidMessage_cont_type_cd(UNSIGNED1 wh) := '';
  
-EXPORT Make_cont_type_desc(SALT36.StrType s0) := s0;
-EXPORT InValid_cont_type_desc(SALT36.StrType s) := 0;
+EXPORT Make_cont_type_desc(SALT311.StrType s0) := s0;
+EXPORT InValid_cont_type_desc(SALT311.StrType s) := 0;
 EXPORT InValidMessage_cont_type_desc(UNSIGNED1 wh) := '';
  
-EXPORT Make_cont_full_name(SALT36.StrType s0) := s0;
-EXPORT InValid_cont_full_name(SALT36.StrType s) := 0;
+EXPORT Make_cont_full_name(SALT311.StrType s0) := s0;
+EXPORT InValid_cont_full_name(SALT311.StrType s) := 0;
 EXPORT InValidMessage_cont_full_name(UNSIGNED1 wh) := '';
  
-EXPORT Make_cont_fname(SALT36.StrType s0) := s0;
-EXPORT InValid_cont_fname(SALT36.StrType s) := 0;
+EXPORT Make_cont_fname(SALT311.StrType s0) := s0;
+EXPORT InValid_cont_fname(SALT311.StrType s) := 0;
 EXPORT InValidMessage_cont_fname(UNSIGNED1 wh) := '';
  
-EXPORT Make_cont_mname(SALT36.StrType s0) := s0;
-EXPORT InValid_cont_mname(SALT36.StrType s) := 0;
+EXPORT Make_cont_mname(SALT311.StrType s0) := s0;
+EXPORT InValid_cont_mname(SALT311.StrType s) := 0;
 EXPORT InValidMessage_cont_mname(UNSIGNED1 wh) := '';
  
-EXPORT Make_cont_lname(SALT36.StrType s0) := s0;
-EXPORT InValid_cont_lname(SALT36.StrType s) := 0;
+EXPORT Make_cont_lname(SALT311.StrType s0) := s0;
+EXPORT InValid_cont_lname(SALT311.StrType s) := 0;
 EXPORT InValidMessage_cont_lname(UNSIGNED1 wh) := '';
  
-EXPORT Make_cont_suffix(SALT36.StrType s0) := s0;
-EXPORT InValid_cont_suffix(SALT36.StrType s) := 0;
+EXPORT Make_cont_suffix(SALT311.StrType s0) := s0;
+EXPORT InValid_cont_suffix(SALT311.StrType s) := 0;
 EXPORT InValidMessage_cont_suffix(UNSIGNED1 wh) := '';
  
-EXPORT Make_cont_title1_desc(SALT36.StrType s0) := s0;
-EXPORT InValid_cont_title1_desc(SALT36.StrType s) := 0;
+EXPORT Make_cont_title1_desc(SALT311.StrType s0) := s0;
+EXPORT InValid_cont_title1_desc(SALT311.StrType s) := 0;
 EXPORT InValidMessage_cont_title1_desc(UNSIGNED1 wh) := '';
  
-EXPORT Make_cont_title2_desc(SALT36.StrType s0) := s0;
-EXPORT InValid_cont_title2_desc(SALT36.StrType s) := 0;
+EXPORT Make_cont_title2_desc(SALT311.StrType s0) := s0;
+EXPORT InValid_cont_title2_desc(SALT311.StrType s) := 0;
 EXPORT InValidMessage_cont_title2_desc(UNSIGNED1 wh) := '';
  
-EXPORT Make_cont_title3_desc(SALT36.StrType s0) := s0;
-EXPORT InValid_cont_title3_desc(SALT36.StrType s) := 0;
+EXPORT Make_cont_title3_desc(SALT311.StrType s0) := s0;
+EXPORT InValid_cont_title3_desc(SALT311.StrType s) := 0;
 EXPORT InValidMessage_cont_title3_desc(UNSIGNED1 wh) := '';
  
-EXPORT Make_cont_title4_desc(SALT36.StrType s0) := s0;
-EXPORT InValid_cont_title4_desc(SALT36.StrType s) := 0;
+EXPORT Make_cont_title4_desc(SALT311.StrType s0) := s0;
+EXPORT InValid_cont_title4_desc(SALT311.StrType s) := 0;
 EXPORT InValidMessage_cont_title4_desc(UNSIGNED1 wh) := '';
  
-EXPORT Make_cont_title5_desc(SALT36.StrType s0) := s0;
-EXPORT InValid_cont_title5_desc(SALT36.StrType s) := 0;
+EXPORT Make_cont_title5_desc(SALT311.StrType s0) := s0;
+EXPORT InValid_cont_title5_desc(SALT311.StrType s) := 0;
 EXPORT InValidMessage_cont_title5_desc(UNSIGNED1 wh) := '';
  
-EXPORT Make_cont_fein(SALT36.StrType s0) := s0;
-EXPORT InValid_cont_fein(SALT36.StrType s) := 0;
+EXPORT Make_cont_fein(SALT311.StrType s0) := s0;
+EXPORT InValid_cont_fein(SALT311.StrType s) := 0;
 EXPORT InValidMessage_cont_fein(UNSIGNED1 wh) := '';
  
-EXPORT Make_cont_ssn(SALT36.StrType s0) := s0;
-EXPORT InValid_cont_ssn(SALT36.StrType s) := 0;
+EXPORT Make_cont_ssn(SALT311.StrType s0) := s0;
+EXPORT InValid_cont_ssn(SALT311.StrType s) := 0;
 EXPORT InValidMessage_cont_ssn(UNSIGNED1 wh) := '';
  
-EXPORT Make_cont_dob(SALT36.StrType s0) := s0;
-EXPORT InValid_cont_dob(SALT36.StrType s) := 0;
+EXPORT Make_cont_dob(SALT311.StrType s0) := s0;
+EXPORT InValid_cont_dob(SALT311.StrType s) := 0;
 EXPORT InValidMessage_cont_dob(UNSIGNED1 wh) := '';
  
-EXPORT Make_cont_status_cd(SALT36.StrType s0) := s0;
-EXPORT InValid_cont_status_cd(SALT36.StrType s) := 0;
+EXPORT Make_cont_status_cd(SALT311.StrType s0) := s0;
+EXPORT InValid_cont_status_cd(SALT311.StrType s) := 0;
 EXPORT InValidMessage_cont_status_cd(UNSIGNED1 wh) := '';
  
-EXPORT Make_cont_status_desc(SALT36.StrType s0) := s0;
-EXPORT InValid_cont_status_desc(SALT36.StrType s) := 0;
+EXPORT Make_cont_status_desc(SALT311.StrType s0) := s0;
+EXPORT InValid_cont_status_desc(SALT311.StrType s) := 0;
 EXPORT InValidMessage_cont_status_desc(UNSIGNED1 wh) := '';
  
-EXPORT Make_cont_effective_date(SALT36.StrType s0) := s0;
-EXPORT InValid_cont_effective_date(SALT36.StrType s) := 0;
+EXPORT Make_cont_effective_date(SALT311.StrType s0) := s0;
+EXPORT InValid_cont_effective_date(SALT311.StrType s) := 0;
 EXPORT InValidMessage_cont_effective_date(UNSIGNED1 wh) := '';
  
-EXPORT Make_cont_effective_cd(SALT36.StrType s0) := s0;
-EXPORT InValid_cont_effective_cd(SALT36.StrType s) := 0;
+EXPORT Make_cont_effective_cd(SALT311.StrType s0) := s0;
+EXPORT InValid_cont_effective_cd(SALT311.StrType s) := 0;
 EXPORT InValidMessage_cont_effective_cd(UNSIGNED1 wh) := '';
  
-EXPORT Make_cont_effective_desc(SALT36.StrType s0) := s0;
-EXPORT InValid_cont_effective_desc(SALT36.StrType s) := 0;
+EXPORT Make_cont_effective_desc(SALT311.StrType s0) := s0;
+EXPORT InValid_cont_effective_desc(SALT311.StrType s) := 0;
 EXPORT InValidMessage_cont_effective_desc(UNSIGNED1 wh) := '';
  
-EXPORT Make_cont_addl_info(SALT36.StrType s0) := s0;
-EXPORT InValid_cont_addl_info(SALT36.StrType s) := 0;
+EXPORT Make_cont_addl_info(SALT311.StrType s0) := s0;
+EXPORT InValid_cont_addl_info(SALT311.StrType s) := 0;
 EXPORT InValidMessage_cont_addl_info(UNSIGNED1 wh) := '';
  
-EXPORT Make_cont_address_type_cd(SALT36.StrType s0) := s0;
-EXPORT InValid_cont_address_type_cd(SALT36.StrType s) := 0;
+EXPORT Make_cont_address_type_cd(SALT311.StrType s0) := s0;
+EXPORT InValid_cont_address_type_cd(SALT311.StrType s) := 0;
 EXPORT InValidMessage_cont_address_type_cd(UNSIGNED1 wh) := '';
  
-EXPORT Make_cont_address_type_desc(SALT36.StrType s0) := s0;
-EXPORT InValid_cont_address_type_desc(SALT36.StrType s) := 0;
+EXPORT Make_cont_address_type_desc(SALT311.StrType s0) := s0;
+EXPORT InValid_cont_address_type_desc(SALT311.StrType s) := 0;
 EXPORT InValidMessage_cont_address_type_desc(UNSIGNED1 wh) := '';
  
-EXPORT Make_cont_address_line1(SALT36.StrType s0) := s0;
-EXPORT InValid_cont_address_line1(SALT36.StrType s) := 0;
+EXPORT Make_cont_address_line1(SALT311.StrType s0) := s0;
+EXPORT InValid_cont_address_line1(SALT311.StrType s) := 0;
 EXPORT InValidMessage_cont_address_line1(UNSIGNED1 wh) := '';
  
-EXPORT Make_cont_address_line2(SALT36.StrType s0) := s0;
-EXPORT InValid_cont_address_line2(SALT36.StrType s) := 0;
+EXPORT Make_cont_address_line2(SALT311.StrType s0) := s0;
+EXPORT InValid_cont_address_line2(SALT311.StrType s) := 0;
 EXPORT InValidMessage_cont_address_line2(UNSIGNED1 wh) := '';
  
-EXPORT Make_cont_address_line3(SALT36.StrType s0) := s0;
-EXPORT InValid_cont_address_line3(SALT36.StrType s) := 0;
+EXPORT Make_cont_address_line3(SALT311.StrType s0) := s0;
+EXPORT InValid_cont_address_line3(SALT311.StrType s) := 0;
 EXPORT InValidMessage_cont_address_line3(UNSIGNED1 wh) := '';
  
-EXPORT Make_cont_address_effective_date(SALT36.StrType s0) := s0;
-EXPORT InValid_cont_address_effective_date(SALT36.StrType s) := 0;
+EXPORT Make_cont_address_effective_date(SALT311.StrType s0) := s0;
+EXPORT InValid_cont_address_effective_date(SALT311.StrType s) := 0;
 EXPORT InValidMessage_cont_address_effective_date(UNSIGNED1 wh) := '';
  
-EXPORT Make_cont_address_county(SALT36.StrType s0) := s0;
-EXPORT InValid_cont_address_county(SALT36.StrType s) := 0;
+EXPORT Make_cont_address_county(SALT311.StrType s0) := s0;
+EXPORT InValid_cont_address_county(SALT311.StrType s) := 0;
 EXPORT InValidMessage_cont_address_county(UNSIGNED1 wh) := '';
  
-EXPORT Make_cont_phone_number(SALT36.StrType s0) := s0;
-EXPORT InValid_cont_phone_number(SALT36.StrType s) := 0;
+EXPORT Make_cont_phone_number(SALT311.StrType s0) := s0;
+EXPORT InValid_cont_phone_number(SALT311.StrType s) := 0;
 EXPORT InValidMessage_cont_phone_number(UNSIGNED1 wh) := '';
  
-EXPORT Make_cont_phone_number_type_cd(SALT36.StrType s0) := s0;
-EXPORT InValid_cont_phone_number_type_cd(SALT36.StrType s) := 0;
+EXPORT Make_cont_phone_number_type_cd(SALT311.StrType s0) := s0;
+EXPORT InValid_cont_phone_number_type_cd(SALT311.StrType s) := 0;
 EXPORT InValidMessage_cont_phone_number_type_cd(UNSIGNED1 wh) := '';
  
-EXPORT Make_cont_phone_number_type_desc(SALT36.StrType s0) := s0;
-EXPORT InValid_cont_phone_number_type_desc(SALT36.StrType s) := 0;
+EXPORT Make_cont_phone_number_type_desc(SALT311.StrType s0) := s0;
+EXPORT InValid_cont_phone_number_type_desc(SALT311.StrType s) := 0;
 EXPORT InValidMessage_cont_phone_number_type_desc(UNSIGNED1 wh) := '';
  
-EXPORT Make_cont_fax_nbr(SALT36.StrType s0) := s0;
-EXPORT InValid_cont_fax_nbr(SALT36.StrType s) := 0;
+EXPORT Make_cont_fax_nbr(SALT311.StrType s0) := s0;
+EXPORT InValid_cont_fax_nbr(SALT311.StrType s) := 0;
 EXPORT InValidMessage_cont_fax_nbr(UNSIGNED1 wh) := '';
  
-EXPORT Make_cont_email_address(SALT36.StrType s0) := s0;
-EXPORT InValid_cont_email_address(SALT36.StrType s) := 0;
+EXPORT Make_cont_email_address(SALT311.StrType s0) := s0;
+EXPORT InValid_cont_email_address(SALT311.StrType s) := 0;
 EXPORT InValidMessage_cont_email_address(UNSIGNED1 wh) := '';
  
-EXPORT Make_cont_web_address(SALT36.StrType s0) := s0;
-EXPORT InValid_cont_web_address(SALT36.StrType s) := 0;
+EXPORT Make_cont_web_address(SALT311.StrType s0) := s0;
+EXPORT InValid_cont_web_address(SALT311.StrType s) := 0;
 EXPORT InValidMessage_cont_web_address(UNSIGNED1 wh) := '';
  
-EXPORT Make_corp_acres(SALT36.StrType s0) := s0;
-EXPORT InValid_corp_acres(SALT36.StrType s) := 0;
+EXPORT Make_corp_acres(SALT311.StrType s0) := s0;
+EXPORT InValid_corp_acres(SALT311.StrType s) := 0;
 EXPORT InValidMessage_corp_acres(UNSIGNED1 wh) := '';
  
-EXPORT Make_corp_action(SALT36.StrType s0) := s0;
-EXPORT InValid_corp_action(SALT36.StrType s) := 0;
+EXPORT Make_corp_action(SALT311.StrType s0) := s0;
+EXPORT InValid_corp_action(SALT311.StrType s) := 0;
 EXPORT InValidMessage_corp_action(UNSIGNED1 wh) := '';
  
-EXPORT Make_corp_action_date(SALT36.StrType s0) := s0;
-EXPORT InValid_corp_action_date(SALT36.StrType s) := 0;
+EXPORT Make_corp_action_date(SALT311.StrType s0) := s0;
+EXPORT InValid_corp_action_date(SALT311.StrType s) := 0;
 EXPORT InValidMessage_corp_action_date(UNSIGNED1 wh) := '';
  
-EXPORT Make_corp_action_employment_security_approval_date(SALT36.StrType s0) := s0;
-EXPORT InValid_corp_action_employment_security_approval_date(SALT36.StrType s) := 0;
+EXPORT Make_corp_action_employment_security_approval_date(SALT311.StrType s0) := s0;
+EXPORT InValid_corp_action_employment_security_approval_date(SALT311.StrType s) := 0;
 EXPORT InValidMessage_corp_action_employment_security_approval_date(UNSIGNED1 wh) := '';
  
-EXPORT Make_corp_action_pending_cd(SALT36.StrType s0) := s0;
-EXPORT InValid_corp_action_pending_cd(SALT36.StrType s) := 0;
+EXPORT Make_corp_action_pending_cd(SALT311.StrType s0) := s0;
+EXPORT InValid_corp_action_pending_cd(SALT311.StrType s) := 0;
 EXPORT InValidMessage_corp_action_pending_cd(UNSIGNED1 wh) := '';
  
-EXPORT Make_corp_action_pending_desc(SALT36.StrType s0) := s0;
-EXPORT InValid_corp_action_pending_desc(SALT36.StrType s) := 0;
+EXPORT Make_corp_action_pending_desc(SALT311.StrType s0) := s0;
+EXPORT InValid_corp_action_pending_desc(SALT311.StrType s) := 0;
 EXPORT InValidMessage_corp_action_pending_desc(UNSIGNED1 wh) := '';
  
-EXPORT Make_corp_action_statement_of_intent_date(SALT36.StrType s0) := s0;
-EXPORT InValid_corp_action_statement_of_intent_date(SALT36.StrType s) := 0;
+EXPORT Make_corp_action_statement_of_intent_date(SALT311.StrType s0) := s0;
+EXPORT InValid_corp_action_statement_of_intent_date(SALT311.StrType s) := 0;
 EXPORT InValidMessage_corp_action_statement_of_intent_date(UNSIGNED1 wh) := '';
  
-EXPORT Make_corp_action_tax_dept_approval_date(SALT36.StrType s0) := s0;
-EXPORT InValid_corp_action_tax_dept_approval_date(SALT36.StrType s) := 0;
+EXPORT Make_corp_action_tax_dept_approval_date(SALT311.StrType s0) := s0;
+EXPORT InValid_corp_action_tax_dept_approval_date(SALT311.StrType s) := 0;
 EXPORT InValidMessage_corp_action_tax_dept_approval_date(UNSIGNED1 wh) := '';
  
-EXPORT Make_corp_acts2(SALT36.StrType s0) := s0;
-EXPORT InValid_corp_acts2(SALT36.StrType s) := 0;
+EXPORT Make_corp_acts2(SALT311.StrType s0) := s0;
+EXPORT InValid_corp_acts2(SALT311.StrType s) := 0;
 EXPORT InValidMessage_corp_acts2(UNSIGNED1 wh) := '';
  
-EXPORT Make_corp_acts3(SALT36.StrType s0) := s0;
-EXPORT InValid_corp_acts3(SALT36.StrType s) := 0;
+EXPORT Make_corp_acts3(SALT311.StrType s0) := s0;
+EXPORT InValid_corp_acts3(SALT311.StrType s) := 0;
 EXPORT InValidMessage_corp_acts3(UNSIGNED1 wh) := '';
  
-EXPORT Make_corp_additional_principals(SALT36.StrType s0) := s0;
-EXPORT InValid_corp_additional_principals(SALT36.StrType s) := 0;
+EXPORT Make_corp_additional_principals(SALT311.StrType s0) := s0;
+EXPORT InValid_corp_additional_principals(SALT311.StrType s) := 0;
 EXPORT InValidMessage_corp_additional_principals(UNSIGNED1 wh) := '';
  
-EXPORT Make_corp_address_office_type(SALT36.StrType s0) := s0;
-EXPORT InValid_corp_address_office_type(SALT36.StrType s) := 0;
+EXPORT Make_corp_address_office_type(SALT311.StrType s0) := s0;
+EXPORT InValid_corp_address_office_type(SALT311.StrType s) := 0;
 EXPORT InValidMessage_corp_address_office_type(UNSIGNED1 wh) := '';
  
-EXPORT Make_corp_agent_assign_date(SALT36.StrType s0) := s0;
-EXPORT InValid_corp_agent_assign_date(SALT36.StrType s) := 0;
+EXPORT Make_corp_agent_assign_date(SALT311.StrType s0) := s0;
+EXPORT InValid_corp_agent_assign_date(SALT311.StrType s) := 0;
 EXPORT InValidMessage_corp_agent_assign_date(UNSIGNED1 wh) := '';
  
-EXPORT Make_corp_agent_commercial(SALT36.StrType s0) := s0;
-EXPORT InValid_corp_agent_commercial(SALT36.StrType s) := 0;
+EXPORT Make_corp_agent_commercial(SALT311.StrType s0) := s0;
+EXPORT InValid_corp_agent_commercial(SALT311.StrType s) := 0;
 EXPORT InValidMessage_corp_agent_commercial(UNSIGNED1 wh) := '';
  
-EXPORT Make_corp_agent_country(SALT36.StrType s0) := s0;
-EXPORT InValid_corp_agent_country(SALT36.StrType s) := 0;
+EXPORT Make_corp_agent_country(SALT311.StrType s0) := s0;
+EXPORT InValid_corp_agent_country(SALT311.StrType s) := 0;
 EXPORT InValidMessage_corp_agent_country(UNSIGNED1 wh) := '';
  
-EXPORT Make_corp_agent_county(SALT36.StrType s0) := s0;
-EXPORT InValid_corp_agent_county(SALT36.StrType s) := 0;
+EXPORT Make_corp_agent_county(SALT311.StrType s0) := s0;
+EXPORT InValid_corp_agent_county(SALT311.StrType s) := 0;
 EXPORT InValidMessage_corp_agent_county(UNSIGNED1 wh) := '';
  
-EXPORT Make_corp_agent_status_cd(SALT36.StrType s0) := s0;
-EXPORT InValid_corp_agent_status_cd(SALT36.StrType s) := 0;
+EXPORT Make_corp_agent_status_cd(SALT311.StrType s0) := s0;
+EXPORT InValid_corp_agent_status_cd(SALT311.StrType s) := 0;
 EXPORT InValidMessage_corp_agent_status_cd(UNSIGNED1 wh) := '';
  
-EXPORT Make_corp_agent_status_desc(SALT36.StrType s0) := s0;
-EXPORT InValid_corp_agent_status_desc(SALT36.StrType s) := 0;
+EXPORT Make_corp_agent_status_desc(SALT311.StrType s0) := s0;
+EXPORT InValid_corp_agent_status_desc(SALT311.StrType s) := 0;
 EXPORT InValidMessage_corp_agent_status_desc(UNSIGNED1 wh) := '';
  
-EXPORT Make_corp_agent_id(SALT36.StrType s0) := s0;
-EXPORT InValid_corp_agent_id(SALT36.StrType s) := 0;
+EXPORT Make_corp_agent_id(SALT311.StrType s0) := s0;
+EXPORT InValid_corp_agent_id(SALT311.StrType s) := 0;
 EXPORT InValidMessage_corp_agent_id(UNSIGNED1 wh) := '';
  
-EXPORT Make_corp_agriculture_flag(SALT36.StrType s0) := s0;
-EXPORT InValid_corp_agriculture_flag(SALT36.StrType s) := 0;
+EXPORT Make_corp_agriculture_flag(SALT311.StrType s0) := s0;
+EXPORT InValid_corp_agriculture_flag(SALT311.StrType s) := 0;
 EXPORT InValidMessage_corp_agriculture_flag(UNSIGNED1 wh) := '';
  
-EXPORT Make_corp_authorized_partners(SALT36.StrType s0) := s0;
-EXPORT InValid_corp_authorized_partners(SALT36.StrType s) := 0;
+EXPORT Make_corp_authorized_partners(SALT311.StrType s0) := s0;
+EXPORT InValid_corp_authorized_partners(SALT311.StrType s) := 0;
 EXPORT InValidMessage_corp_authorized_partners(UNSIGNED1 wh) := '';
  
-EXPORT Make_corp_comment(SALT36.StrType s0) := s0;
-EXPORT InValid_corp_comment(SALT36.StrType s) := 0;
+EXPORT Make_corp_comment(SALT311.StrType s0) := s0;
+EXPORT InValid_corp_comment(SALT311.StrType s) := 0;
 EXPORT InValidMessage_corp_comment(UNSIGNED1 wh) := '';
  
-EXPORT Make_corp_consent_flag_for_protected_name(SALT36.StrType s0) := s0;
-EXPORT InValid_corp_consent_flag_for_protected_name(SALT36.StrType s) := 0;
+EXPORT Make_corp_consent_flag_for_protected_name(SALT311.StrType s0) := s0;
+EXPORT InValid_corp_consent_flag_for_protected_name(SALT311.StrType s) := 0;
 EXPORT InValidMessage_corp_consent_flag_for_protected_name(UNSIGNED1 wh) := '';
  
-EXPORT Make_corp_converted(SALT36.StrType s0) := s0;
-EXPORT InValid_corp_converted(SALT36.StrType s) := 0;
+EXPORT Make_corp_converted(SALT311.StrType s0) := s0;
+EXPORT InValid_corp_converted(SALT311.StrType s) := 0;
 EXPORT InValidMessage_corp_converted(UNSIGNED1 wh) := '';
  
-EXPORT Make_corp_converted_from(SALT36.StrType s0) := s0;
-EXPORT InValid_corp_converted_from(SALT36.StrType s) := 0;
+EXPORT Make_corp_converted_from(SALT311.StrType s0) := s0;
+EXPORT InValid_corp_converted_from(SALT311.StrType s) := 0;
 EXPORT InValidMessage_corp_converted_from(UNSIGNED1 wh) := '';
  
-EXPORT Make_corp_country_of_formation(SALT36.StrType s0) := s0;
-EXPORT InValid_corp_country_of_formation(SALT36.StrType s) := 0;
+EXPORT Make_corp_country_of_formation(SALT311.StrType s0) := s0;
+EXPORT InValid_corp_country_of_formation(SALT311.StrType s) := 0;
 EXPORT InValidMessage_corp_country_of_formation(UNSIGNED1 wh) := '';
  
-EXPORT Make_corp_date_of_organization_meeting(SALT36.StrType s0) := s0;
-EXPORT InValid_corp_date_of_organization_meeting(SALT36.StrType s) := 0;
+EXPORT Make_corp_date_of_organization_meeting(SALT311.StrType s0) := s0;
+EXPORT InValid_corp_date_of_organization_meeting(SALT311.StrType s) := 0;
 EXPORT InValidMessage_corp_date_of_organization_meeting(UNSIGNED1 wh) := '';
  
-EXPORT Make_corp_delayed_effective_date(SALT36.StrType s0) := s0;
-EXPORT InValid_corp_delayed_effective_date(SALT36.StrType s) := 0;
+EXPORT Make_corp_delayed_effective_date(SALT311.StrType s0) := s0;
+EXPORT InValid_corp_delayed_effective_date(SALT311.StrType s) := 0;
 EXPORT InValidMessage_corp_delayed_effective_date(UNSIGNED1 wh) := '';
  
-EXPORT Make_corp_directors_from_to(SALT36.StrType s0) := s0;
-EXPORT InValid_corp_directors_from_to(SALT36.StrType s) := 0;
+EXPORT Make_corp_directors_from_to(SALT311.StrType s0) := s0;
+EXPORT InValid_corp_directors_from_to(SALT311.StrType s) := 0;
 EXPORT InValidMessage_corp_directors_from_to(UNSIGNED1 wh) := '';
  
-EXPORT Make_corp_dissolved_date(SALT36.StrType s0) := s0;
-EXPORT InValid_corp_dissolved_date(SALT36.StrType s) := 0;
+EXPORT Make_corp_dissolved_date(SALT311.StrType s0) := s0;
+EXPORT InValid_corp_dissolved_date(SALT311.StrType s) := 0;
 EXPORT InValidMessage_corp_dissolved_date(UNSIGNED1 wh) := '';
  
-EXPORT Make_corp_farm_exemptions(SALT36.StrType s0) := s0;
-EXPORT InValid_corp_farm_exemptions(SALT36.StrType s) := 0;
+EXPORT Make_corp_farm_exemptions(SALT311.StrType s0) := s0;
+EXPORT InValid_corp_farm_exemptions(SALT311.StrType s) := 0;
 EXPORT InValidMessage_corp_farm_exemptions(UNSIGNED1 wh) := '';
  
-EXPORT Make_corp_farm_qual_date(SALT36.StrType s0) := s0;
-EXPORT InValid_corp_farm_qual_date(SALT36.StrType s) := 0;
+EXPORT Make_corp_farm_qual_date(SALT311.StrType s0) := s0;
+EXPORT InValid_corp_farm_qual_date(SALT311.StrType s) := 0;
 EXPORT InValidMessage_corp_farm_qual_date(UNSIGNED1 wh) := '';
  
-EXPORT Make_corp_farm_status_cd(SALT36.StrType s0) := s0;
-EXPORT InValid_corp_farm_status_cd(SALT36.StrType s) := 0;
+EXPORT Make_corp_farm_status_cd(SALT311.StrType s0) := s0;
+EXPORT InValid_corp_farm_status_cd(SALT311.StrType s) := 0;
 EXPORT InValidMessage_corp_farm_status_cd(UNSIGNED1 wh) := '';
  
-EXPORT Make_corp_farm_status_date(SALT36.StrType s0) := s0;
-EXPORT InValid_corp_farm_status_date(SALT36.StrType s) := 0;
+EXPORT Make_corp_farm_status_date(SALT311.StrType s0) := s0;
+EXPORT InValid_corp_farm_status_date(SALT311.StrType s) := 0;
 EXPORT InValidMessage_corp_farm_status_date(UNSIGNED1 wh) := '';
  
-EXPORT Make_corp_farm_status_desc(SALT36.StrType s0) := s0;
-EXPORT InValid_corp_farm_status_desc(SALT36.StrType s) := 0;
+EXPORT Make_corp_farm_status_desc(SALT311.StrType s0) := s0;
+EXPORT InValid_corp_farm_status_desc(SALT311.StrType s) := 0;
 EXPORT InValidMessage_corp_farm_status_desc(UNSIGNED1 wh) := '';
  
-EXPORT Make_corp_fiscal_year_month(SALT36.StrType s0) := s0;
-EXPORT InValid_corp_fiscal_year_month(SALT36.StrType s) := 0;
+EXPORT Make_corp_fiscal_year_month(SALT311.StrType s0) := s0;
+EXPORT InValid_corp_fiscal_year_month(SALT311.StrType s) := 0;
 EXPORT InValidMessage_corp_fiscal_year_month(UNSIGNED1 wh) := '';
  
-EXPORT Make_corp_foreign_fiduciary_capacity_in_state(SALT36.StrType s0) := s0;
-EXPORT InValid_corp_foreign_fiduciary_capacity_in_state(SALT36.StrType s) := 0;
+EXPORT Make_corp_foreign_fiduciary_capacity_in_state(SALT311.StrType s0) := s0;
+EXPORT InValid_corp_foreign_fiduciary_capacity_in_state(SALT311.StrType s) := 0;
 EXPORT InValidMessage_corp_foreign_fiduciary_capacity_in_state(UNSIGNED1 wh) := '';
  
-EXPORT Make_corp_governing_statute(SALT36.StrType s0) := s0;
-EXPORT InValid_corp_governing_statute(SALT36.StrType s) := 0;
+EXPORT Make_corp_governing_statute(SALT311.StrType s0) := s0;
+EXPORT InValid_corp_governing_statute(SALT311.StrType s) := 0;
 EXPORT InValidMessage_corp_governing_statute(UNSIGNED1 wh) := '';
  
-EXPORT Make_corp_has_members(SALT36.StrType s0) := s0;
-EXPORT InValid_corp_has_members(SALT36.StrType s) := 0;
+EXPORT Make_corp_has_members(SALT311.StrType s0) := s0;
+EXPORT InValid_corp_has_members(SALT311.StrType s) := 0;
 EXPORT InValidMessage_corp_has_members(UNSIGNED1 wh) := '';
  
-EXPORT Make_corp_has_vested_managers(SALT36.StrType s0) := s0;
-EXPORT InValid_corp_has_vested_managers(SALT36.StrType s) := 0;
+EXPORT Make_corp_has_vested_managers(SALT311.StrType s0) := s0;
+EXPORT InValid_corp_has_vested_managers(SALT311.StrType s) := 0;
 EXPORT InValidMessage_corp_has_vested_managers(UNSIGNED1 wh) := '';
  
-EXPORT Make_corp_home_incorporated_county(SALT36.StrType s0) := s0;
-EXPORT InValid_corp_home_incorporated_county(SALT36.StrType s) := 0;
+EXPORT Make_corp_home_incorporated_county(SALT311.StrType s0) := s0;
+EXPORT InValid_corp_home_incorporated_county(SALT311.StrType s) := 0;
 EXPORT InValidMessage_corp_home_incorporated_county(UNSIGNED1 wh) := '';
  
-EXPORT Make_corp_home_state_name(SALT36.StrType s0) := s0;
-EXPORT InValid_corp_home_state_name(SALT36.StrType s) := 0;
+EXPORT Make_corp_home_state_name(SALT311.StrType s0) := s0;
+EXPORT InValid_corp_home_state_name(SALT311.StrType s) := 0;
 EXPORT InValidMessage_corp_home_state_name(UNSIGNED1 wh) := '';
  
-EXPORT Make_corp_is_professional(SALT36.StrType s0) := s0;
-EXPORT InValid_corp_is_professional(SALT36.StrType s) := 0;
+EXPORT Make_corp_is_professional(SALT311.StrType s0) := s0;
+EXPORT InValid_corp_is_professional(SALT311.StrType s) := 0;
 EXPORT InValidMessage_corp_is_professional(UNSIGNED1 wh) := '';
  
-EXPORT Make_corp_is_non_profit_irs_approved(SALT36.StrType s0) := s0;
-EXPORT InValid_corp_is_non_profit_irs_approved(SALT36.StrType s) := 0;
+EXPORT Make_corp_is_non_profit_irs_approved(SALT311.StrType s0) := s0;
+EXPORT InValid_corp_is_non_profit_irs_approved(SALT311.StrType s) := 0;
 EXPORT InValidMessage_corp_is_non_profit_irs_approved(UNSIGNED1 wh) := '';
  
-EXPORT Make_corp_last_renewal_date(SALT36.StrType s0) := s0;
-EXPORT InValid_corp_last_renewal_date(SALT36.StrType s) := 0;
+EXPORT Make_corp_last_renewal_date(SALT311.StrType s0) := s0;
+EXPORT InValid_corp_last_renewal_date(SALT311.StrType s) := 0;
 EXPORT InValidMessage_corp_last_renewal_date(UNSIGNED1 wh) := '';
  
-EXPORT Make_corp_last_renewal_year(SALT36.StrType s0) := s0;
-EXPORT InValid_corp_last_renewal_year(SALT36.StrType s) := 0;
+EXPORT Make_corp_last_renewal_year(SALT311.StrType s0) := s0;
+EXPORT InValid_corp_last_renewal_year(SALT311.StrType s) := 0;
 EXPORT InValidMessage_corp_last_renewal_year(UNSIGNED1 wh) := '';
  
-EXPORT Make_corp_license_type(SALT36.StrType s0) := s0;
-EXPORT InValid_corp_license_type(SALT36.StrType s) := 0;
+EXPORT Make_corp_license_type(SALT311.StrType s0) := s0;
+EXPORT InValid_corp_license_type(SALT311.StrType s) := 0;
 EXPORT InValidMessage_corp_license_type(UNSIGNED1 wh) := '';
  
-EXPORT Make_corp_llc_managed_desc(SALT36.StrType s0) := s0;
-EXPORT InValid_corp_llc_managed_desc(SALT36.StrType s) := 0;
+EXPORT Make_corp_llc_managed_desc(SALT311.StrType s0) := s0;
+EXPORT InValid_corp_llc_managed_desc(SALT311.StrType s) := 0;
 EXPORT InValidMessage_corp_llc_managed_desc(UNSIGNED1 wh) := '';
  
-EXPORT Make_corp_llc_managed_ind(SALT36.StrType s0) := s0;
-EXPORT InValid_corp_llc_managed_ind(SALT36.StrType s) := 0;
+EXPORT Make_corp_llc_managed_ind(SALT311.StrType s0) := s0;
+EXPORT InValid_corp_llc_managed_ind(SALT311.StrType s) := 0;
 EXPORT InValidMessage_corp_llc_managed_ind(UNSIGNED1 wh) := '';
  
-EXPORT Make_corp_management_desc(SALT36.StrType s0) := s0;
-EXPORT InValid_corp_management_desc(SALT36.StrType s) := 0;
+EXPORT Make_corp_management_desc(SALT311.StrType s0) := s0;
+EXPORT InValid_corp_management_desc(SALT311.StrType s) := 0;
 EXPORT InValidMessage_corp_management_desc(UNSIGNED1 wh) := '';
  
-EXPORT Make_corp_management_type(SALT36.StrType s0) := s0;
-EXPORT InValid_corp_management_type(SALT36.StrType s) := 0;
+EXPORT Make_corp_management_type(SALT311.StrType s0) := s0;
+EXPORT InValid_corp_management_type(SALT311.StrType s) := 0;
 EXPORT InValidMessage_corp_management_type(UNSIGNED1 wh) := '';
  
-EXPORT Make_corp_manager_managed(SALT36.StrType s0) := s0;
-EXPORT InValid_corp_manager_managed(SALT36.StrType s) := 0;
+EXPORT Make_corp_manager_managed(SALT311.StrType s0) := s0;
+EXPORT InValid_corp_manager_managed(SALT311.StrType s) := 0;
 EXPORT InValidMessage_corp_manager_managed(UNSIGNED1 wh) := '';
  
-EXPORT Make_corp_merged_corporation_id(SALT36.StrType s0) := s0;
-EXPORT InValid_corp_merged_corporation_id(SALT36.StrType s) := 0;
+EXPORT Make_corp_merged_corporation_id(SALT311.StrType s0) := s0;
+EXPORT InValid_corp_merged_corporation_id(SALT311.StrType s) := 0;
 EXPORT InValidMessage_corp_merged_corporation_id(UNSIGNED1 wh) := '';
  
-EXPORT Make_corp_merged_fein(SALT36.StrType s0) := s0;
-EXPORT InValid_corp_merged_fein(SALT36.StrType s) := 0;
+EXPORT Make_corp_merged_fein(SALT311.StrType s0) := s0;
+EXPORT InValid_corp_merged_fein(SALT311.StrType s) := 0;
 EXPORT InValidMessage_corp_merged_fein(UNSIGNED1 wh) := '';
  
-EXPORT Make_corp_merger_allowed_flag(SALT36.StrType s0) := s0;
-EXPORT InValid_corp_merger_allowed_flag(SALT36.StrType s) := 0;
+EXPORT Make_corp_merger_allowed_flag(SALT311.StrType s0) := s0;
+EXPORT InValid_corp_merger_allowed_flag(SALT311.StrType s) := 0;
 EXPORT InValidMessage_corp_merger_allowed_flag(UNSIGNED1 wh) := '';
  
-EXPORT Make_corp_merger_date(SALT36.StrType s0) := s0;
-EXPORT InValid_corp_merger_date(SALT36.StrType s) := 0;
+EXPORT Make_corp_merger_date(SALT311.StrType s0) := s0;
+EXPORT InValid_corp_merger_date(SALT311.StrType s) := 0;
 EXPORT InValidMessage_corp_merger_date(UNSIGNED1 wh) := '';
  
-EXPORT Make_corp_merger_desc(SALT36.StrType s0) := s0;
-EXPORT InValid_corp_merger_desc(SALT36.StrType s) := 0;
+EXPORT Make_corp_merger_desc(SALT311.StrType s0) := s0;
+EXPORT InValid_corp_merger_desc(SALT311.StrType s) := 0;
 EXPORT InValidMessage_corp_merger_desc(UNSIGNED1 wh) := '';
  
-EXPORT Make_corp_merger_effective_date(SALT36.StrType s0) := s0;
-EXPORT InValid_corp_merger_effective_date(SALT36.StrType s) := 0;
+EXPORT Make_corp_merger_effective_date(SALT311.StrType s0) := s0;
+EXPORT InValid_corp_merger_effective_date(SALT311.StrType s) := 0;
 EXPORT InValidMessage_corp_merger_effective_date(UNSIGNED1 wh) := '';
  
-EXPORT Make_corp_merger_id(SALT36.StrType s0) := s0;
-EXPORT InValid_corp_merger_id(SALT36.StrType s) := 0;
+EXPORT Make_corp_merger_id(SALT311.StrType s0) := s0;
+EXPORT InValid_corp_merger_id(SALT311.StrType s) := 0;
 EXPORT InValidMessage_corp_merger_id(UNSIGNED1 wh) := '';
  
-EXPORT Make_corp_merger_indicator(SALT36.StrType s0) := s0;
-EXPORT InValid_corp_merger_indicator(SALT36.StrType s) := 0;
+EXPORT Make_corp_merger_indicator(SALT311.StrType s0) := s0;
+EXPORT InValid_corp_merger_indicator(SALT311.StrType s) := 0;
 EXPORT InValidMessage_corp_merger_indicator(UNSIGNED1 wh) := '';
  
-EXPORT Make_corp_merger_name(SALT36.StrType s0) := s0;
-EXPORT InValid_corp_merger_name(SALT36.StrType s) := 0;
+EXPORT Make_corp_merger_name(SALT311.StrType s0) := s0;
+EXPORT InValid_corp_merger_name(SALT311.StrType s) := 0;
 EXPORT InValidMessage_corp_merger_name(UNSIGNED1 wh) := '';
  
-EXPORT Make_corp_merger_type_converted_to_cd(SALT36.StrType s0) := s0;
-EXPORT InValid_corp_merger_type_converted_to_cd(SALT36.StrType s) := 0;
+EXPORT Make_corp_merger_type_converted_to_cd(SALT311.StrType s0) := s0;
+EXPORT InValid_corp_merger_type_converted_to_cd(SALT311.StrType s) := 0;
 EXPORT InValidMessage_corp_merger_type_converted_to_cd(UNSIGNED1 wh) := '';
  
-EXPORT Make_corp_merger_type_converted_to_desc(SALT36.StrType s0) := s0;
-EXPORT InValid_corp_merger_type_converted_to_desc(SALT36.StrType s) := 0;
+EXPORT Make_corp_merger_type_converted_to_desc(SALT311.StrType s0) := s0;
+EXPORT InValid_corp_merger_type_converted_to_desc(SALT311.StrType s) := 0;
 EXPORT InValidMessage_corp_merger_type_converted_to_desc(UNSIGNED1 wh) := '';
  
-EXPORT Make_corp_naics_desc(SALT36.StrType s0) := s0;
-EXPORT InValid_corp_naics_desc(SALT36.StrType s) := 0;
+EXPORT Make_corp_naics_desc(SALT311.StrType s0) := s0;
+EXPORT InValid_corp_naics_desc(SALT311.StrType s) := 0;
 EXPORT InValidMessage_corp_naics_desc(UNSIGNED1 wh) := '';
  
-EXPORT Make_corp_name_effective_date(SALT36.StrType s0) := s0;
-EXPORT InValid_corp_name_effective_date(SALT36.StrType s) := 0;
+EXPORT Make_corp_name_effective_date(SALT311.StrType s0) := s0;
+EXPORT InValid_corp_name_effective_date(SALT311.StrType s) := 0;
 EXPORT InValidMessage_corp_name_effective_date(UNSIGNED1 wh) := '';
  
-EXPORT Make_corp_name_reservation_date(SALT36.StrType s0) := s0;
-EXPORT InValid_corp_name_reservation_date(SALT36.StrType s) := 0;
+EXPORT Make_corp_name_reservation_date(SALT311.StrType s0) := s0;
+EXPORT InValid_corp_name_reservation_date(SALT311.StrType s) := 0;
 EXPORT InValidMessage_corp_name_reservation_date(UNSIGNED1 wh) := '';
  
-EXPORT Make_corp_name_reservation_desc(SALT36.StrType s0) := s0;
-EXPORT InValid_corp_name_reservation_desc(SALT36.StrType s) := 0;
+EXPORT Make_corp_name_reservation_desc(SALT311.StrType s0) := s0;
+EXPORT InValid_corp_name_reservation_desc(SALT311.StrType s) := 0;
 EXPORT InValidMessage_corp_name_reservation_desc(UNSIGNED1 wh) := '';
  
-EXPORT Make_corp_name_reservation_expiration_date(SALT36.StrType s0) := s0;
-EXPORT InValid_corp_name_reservation_expiration_date(SALT36.StrType s) := 0;
+EXPORT Make_corp_name_reservation_expiration_date(SALT311.StrType s0) := s0;
+EXPORT InValid_corp_name_reservation_expiration_date(SALT311.StrType s) := 0;
 EXPORT InValidMessage_corp_name_reservation_expiration_date(UNSIGNED1 wh) := '';
  
-EXPORT Make_corp_name_reservation_nbr(SALT36.StrType s0) := s0;
-EXPORT InValid_corp_name_reservation_nbr(SALT36.StrType s) := 0;
+EXPORT Make_corp_name_reservation_nbr(SALT311.StrType s0) := s0;
+EXPORT InValid_corp_name_reservation_nbr(SALT311.StrType s) := 0;
 EXPORT InValidMessage_corp_name_reservation_nbr(UNSIGNED1 wh) := '';
  
-EXPORT Make_corp_name_reservation_type(SALT36.StrType s0) := s0;
-EXPORT InValid_corp_name_reservation_type(SALT36.StrType s) := 0;
+EXPORT Make_corp_name_reservation_type(SALT311.StrType s0) := s0;
+EXPORT InValid_corp_name_reservation_type(SALT311.StrType s) := 0;
 EXPORT InValidMessage_corp_name_reservation_type(UNSIGNED1 wh) := '';
  
-EXPORT Make_corp_name_status_cd(SALT36.StrType s0) := s0;
-EXPORT InValid_corp_name_status_cd(SALT36.StrType s) := 0;
+EXPORT Make_corp_name_status_cd(SALT311.StrType s0) := s0;
+EXPORT InValid_corp_name_status_cd(SALT311.StrType s) := 0;
 EXPORT InValidMessage_corp_name_status_cd(UNSIGNED1 wh) := '';
  
-EXPORT Make_corp_name_status_date(SALT36.StrType s0) := s0;
-EXPORT InValid_corp_name_status_date(SALT36.StrType s) := 0;
+EXPORT Make_corp_name_status_date(SALT311.StrType s0) := s0;
+EXPORT InValid_corp_name_status_date(SALT311.StrType s) := 0;
 EXPORT InValidMessage_corp_name_status_date(UNSIGNED1 wh) := '';
  
-EXPORT Make_corp_name_status_desc(SALT36.StrType s0) := s0;
-EXPORT InValid_corp_name_status_desc(SALT36.StrType s) := 0;
+EXPORT Make_corp_name_status_desc(SALT311.StrType s0) := s0;
+EXPORT InValid_corp_name_status_desc(SALT311.StrType s) := 0;
 EXPORT InValidMessage_corp_name_status_desc(UNSIGNED1 wh) := '';
  
-EXPORT Make_corp_non_profit_irs_approved_purpose(SALT36.StrType s0) := s0;
-EXPORT InValid_corp_non_profit_irs_approved_purpose(SALT36.StrType s) := 0;
+EXPORT Make_corp_non_profit_irs_approved_purpose(SALT311.StrType s0) := s0;
+EXPORT InValid_corp_non_profit_irs_approved_purpose(SALT311.StrType s) := 0;
 EXPORT InValidMessage_corp_non_profit_irs_approved_purpose(UNSIGNED1 wh) := '';
  
-EXPORT Make_corp_non_profit_solicit_donations(SALT36.StrType s0) := s0;
-EXPORT InValid_corp_non_profit_solicit_donations(SALT36.StrType s) := 0;
+EXPORT Make_corp_non_profit_solicit_donations(SALT311.StrType s0) := s0;
+EXPORT InValid_corp_non_profit_solicit_donations(SALT311.StrType s) := 0;
 EXPORT InValidMessage_corp_non_profit_solicit_donations(UNSIGNED1 wh) := '';
  
-EXPORT Make_corp_nbr_of_amendments(SALT36.StrType s0) := s0;
-EXPORT InValid_corp_nbr_of_amendments(SALT36.StrType s) := 0;
+EXPORT Make_corp_nbr_of_amendments(SALT311.StrType s0) := s0;
+EXPORT InValid_corp_nbr_of_amendments(SALT311.StrType s) := 0;
 EXPORT InValidMessage_corp_nbr_of_amendments(UNSIGNED1 wh) := '';
  
-EXPORT Make_corp_nbr_of_initial_llc_members(SALT36.StrType s0) := s0;
-EXPORT InValid_corp_nbr_of_initial_llc_members(SALT36.StrType s) := 0;
+EXPORT Make_corp_nbr_of_initial_llc_members(SALT311.StrType s0) := s0;
+EXPORT InValid_corp_nbr_of_initial_llc_members(SALT311.StrType s) := 0;
 EXPORT InValidMessage_corp_nbr_of_initial_llc_members(UNSIGNED1 wh) := '';
  
-EXPORT Make_corp_nbr_of_partners(SALT36.StrType s0) := s0;
-EXPORT InValid_corp_nbr_of_partners(SALT36.StrType s) := 0;
+EXPORT Make_corp_nbr_of_partners(SALT311.StrType s0) := s0;
+EXPORT InValid_corp_nbr_of_partners(SALT311.StrType s) := 0;
 EXPORT InValidMessage_corp_nbr_of_partners(UNSIGNED1 wh) := '';
  
-EXPORT Make_corp_operating_agreement(SALT36.StrType s0) := s0;
-EXPORT InValid_corp_operating_agreement(SALT36.StrType s) := 0;
+EXPORT Make_corp_operating_agreement(SALT311.StrType s0) := s0;
+EXPORT InValid_corp_operating_agreement(SALT311.StrType s) := 0;
 EXPORT InValidMessage_corp_operating_agreement(UNSIGNED1 wh) := '';
  
-EXPORT Make_corp_opt_in_llc_act_desc(SALT36.StrType s0) := s0;
-EXPORT InValid_corp_opt_in_llc_act_desc(SALT36.StrType s) := 0;
+EXPORT Make_corp_opt_in_llc_act_desc(SALT311.StrType s0) := s0;
+EXPORT InValid_corp_opt_in_llc_act_desc(SALT311.StrType s) := 0;
 EXPORT InValidMessage_corp_opt_in_llc_act_desc(UNSIGNED1 wh) := '';
  
-EXPORT Make_corp_opt_in_llc_act_ind(SALT36.StrType s0) := s0;
-EXPORT InValid_corp_opt_in_llc_act_ind(SALT36.StrType s) := 0;
+EXPORT Make_corp_opt_in_llc_act_ind(SALT311.StrType s0) := s0;
+EXPORT InValid_corp_opt_in_llc_act_ind(SALT311.StrType s) := 0;
 EXPORT InValidMessage_corp_opt_in_llc_act_ind(UNSIGNED1 wh) := '';
  
-EXPORT Make_corp_organizational_comments(SALT36.StrType s0) := s0;
-EXPORT InValid_corp_organizational_comments(SALT36.StrType s) := 0;
+EXPORT Make_corp_organizational_comments(SALT311.StrType s0) := s0;
+EXPORT InValid_corp_organizational_comments(SALT311.StrType s) := 0;
 EXPORT InValidMessage_corp_organizational_comments(UNSIGNED1 wh) := '';
  
-EXPORT Make_corp_partner_contributions_total(SALT36.StrType s0) := s0;
-EXPORT InValid_corp_partner_contributions_total(SALT36.StrType s) := 0;
+EXPORT Make_corp_partner_contributions_total(SALT311.StrType s0) := s0;
+EXPORT InValid_corp_partner_contributions_total(SALT311.StrType s) := 0;
 EXPORT InValidMessage_corp_partner_contributions_total(UNSIGNED1 wh) := '';
  
-EXPORT Make_corp_partner_terms(SALT36.StrType s0) := s0;
-EXPORT InValid_corp_partner_terms(SALT36.StrType s) := 0;
+EXPORT Make_corp_partner_terms(SALT311.StrType s0) := s0;
+EXPORT InValid_corp_partner_terms(SALT311.StrType s) := 0;
 EXPORT InValidMessage_corp_partner_terms(UNSIGNED1 wh) := '';
  
-EXPORT Make_corp_percentage_voters_required_to_approve_amendments(SALT36.StrType s0) := s0;
-EXPORT InValid_corp_percentage_voters_required_to_approve_amendments(SALT36.StrType s) := 0;
+EXPORT Make_corp_percentage_voters_required_to_approve_amendments(SALT311.StrType s0) := s0;
+EXPORT InValid_corp_percentage_voters_required_to_approve_amendments(SALT311.StrType s) := 0;
 EXPORT InValidMessage_corp_percentage_voters_required_to_approve_amendments(UNSIGNED1 wh) := '';
  
-EXPORT Make_corp_profession(SALT36.StrType s0) := s0;
-EXPORT InValid_corp_profession(SALT36.StrType s) := 0;
+EXPORT Make_corp_profession(SALT311.StrType s0) := s0;
+EXPORT InValid_corp_profession(SALT311.StrType s) := 0;
 EXPORT InValidMessage_corp_profession(UNSIGNED1 wh) := '';
  
-EXPORT Make_corp_province(SALT36.StrType s0) := s0;
-EXPORT InValid_corp_province(SALT36.StrType s) := 0;
+EXPORT Make_corp_province(SALT311.StrType s0) := s0;
+EXPORT InValid_corp_province(SALT311.StrType s) := 0;
 EXPORT InValidMessage_corp_province(UNSIGNED1 wh) := '';
  
-EXPORT Make_corp_public_mutual_corporation(SALT36.StrType s0) := s0;
-EXPORT InValid_corp_public_mutual_corporation(SALT36.StrType s) := 0;
+EXPORT Make_corp_public_mutual_corporation(SALT311.StrType s0) := s0;
+EXPORT InValid_corp_public_mutual_corporation(SALT311.StrType s) := 0;
 EXPORT InValidMessage_corp_public_mutual_corporation(UNSIGNED1 wh) := '';
  
-EXPORT Make_corp_purpose(SALT36.StrType s0) := s0;
-EXPORT InValid_corp_purpose(SALT36.StrType s) := 0;
+EXPORT Make_corp_purpose(SALT311.StrType s0) := s0;
+EXPORT InValid_corp_purpose(SALT311.StrType s) := 0;
 EXPORT InValidMessage_corp_purpose(UNSIGNED1 wh) := '';
  
-EXPORT Make_corp_ra_required_flag(SALT36.StrType s0) := s0;
-EXPORT InValid_corp_ra_required_flag(SALT36.StrType s) := 0;
+EXPORT Make_corp_ra_required_flag(SALT311.StrType s0) := s0;
+EXPORT InValid_corp_ra_required_flag(SALT311.StrType s) := 0;
 EXPORT InValidMessage_corp_ra_required_flag(UNSIGNED1 wh) := '';
  
-EXPORT Make_corp_registered_counties(SALT36.StrType s0) := s0;
-EXPORT InValid_corp_registered_counties(SALT36.StrType s) := 0;
+EXPORT Make_corp_registered_counties(SALT311.StrType s0) := s0;
+EXPORT InValid_corp_registered_counties(SALT311.StrType s) := 0;
 EXPORT InValidMessage_corp_registered_counties(UNSIGNED1 wh) := '';
  
-EXPORT Make_corp_regulated_ind(SALT36.StrType s0) := s0;
-EXPORT InValid_corp_regulated_ind(SALT36.StrType s) := 0;
+EXPORT Make_corp_regulated_ind(SALT311.StrType s0) := s0;
+EXPORT InValid_corp_regulated_ind(SALT311.StrType s) := 0;
 EXPORT InValidMessage_corp_regulated_ind(UNSIGNED1 wh) := '';
  
-EXPORT Make_corp_renewal_date(SALT36.StrType s0) := s0;
-EXPORT InValid_corp_renewal_date(SALT36.StrType s) := 0;
+EXPORT Make_corp_renewal_date(SALT311.StrType s0) := s0;
+EXPORT InValid_corp_renewal_date(SALT311.StrType s) := 0;
 EXPORT InValidMessage_corp_renewal_date(UNSIGNED1 wh) := '';
  
-EXPORT Make_corp_standing_other(SALT36.StrType s0) := s0;
-EXPORT InValid_corp_standing_other(SALT36.StrType s) := 0;
+EXPORT Make_corp_standing_other(SALT311.StrType s0) := s0;
+EXPORT InValid_corp_standing_other(SALT311.StrType s) := 0;
 EXPORT InValidMessage_corp_standing_other(UNSIGNED1 wh) := '';
  
-EXPORT Make_corp_survivor_corporation_id(SALT36.StrType s0) := s0;
-EXPORT InValid_corp_survivor_corporation_id(SALT36.StrType s) := 0;
+EXPORT Make_corp_survivor_corporation_id(SALT311.StrType s0) := s0;
+EXPORT InValid_corp_survivor_corporation_id(SALT311.StrType s) := 0;
 EXPORT InValidMessage_corp_survivor_corporation_id(UNSIGNED1 wh) := '';
  
-EXPORT Make_corp_tax_base(SALT36.StrType s0) := s0;
-EXPORT InValid_corp_tax_base(SALT36.StrType s) := 0;
+EXPORT Make_corp_tax_base(SALT311.StrType s0) := s0;
+EXPORT InValid_corp_tax_base(SALT311.StrType s) := 0;
 EXPORT InValidMessage_corp_tax_base(UNSIGNED1 wh) := '';
  
-EXPORT Make_corp_tax_standing(SALT36.StrType s0) := s0;
-EXPORT InValid_corp_tax_standing(SALT36.StrType s) := 0;
+EXPORT Make_corp_tax_standing(SALT311.StrType s0) := s0;
+EXPORT InValid_corp_tax_standing(SALT311.StrType s) := 0;
 EXPORT InValidMessage_corp_tax_standing(UNSIGNED1 wh) := '';
  
-EXPORT Make_corp_termination_cd(SALT36.StrType s0) := s0;
-EXPORT InValid_corp_termination_cd(SALT36.StrType s) := 0;
+EXPORT Make_corp_termination_cd(SALT311.StrType s0) := s0;
+EXPORT InValid_corp_termination_cd(SALT311.StrType s) := 0;
 EXPORT InValidMessage_corp_termination_cd(UNSIGNED1 wh) := '';
  
-EXPORT Make_corp_termination_desc(SALT36.StrType s0) := s0;
-EXPORT InValid_corp_termination_desc(SALT36.StrType s) := 0;
+EXPORT Make_corp_termination_desc(SALT311.StrType s0) := s0;
+EXPORT InValid_corp_termination_desc(SALT311.StrType s) := 0;
 EXPORT InValidMessage_corp_termination_desc(UNSIGNED1 wh) := '';
  
-EXPORT Make_corp_termination_date(SALT36.StrType s0) := s0;
-EXPORT InValid_corp_termination_date(SALT36.StrType s) := 0;
+EXPORT Make_corp_termination_date(SALT311.StrType s0) := s0;
+EXPORT InValid_corp_termination_date(SALT311.StrType s) := 0;
 EXPORT InValidMessage_corp_termination_date(UNSIGNED1 wh) := '';
  
-EXPORT Make_corp_trademark_business_mark_type(SALT36.StrType s0) := s0;
-EXPORT InValid_corp_trademark_business_mark_type(SALT36.StrType s) := 0;
+EXPORT Make_corp_trademark_business_mark_type(SALT311.StrType s0) := s0;
+EXPORT InValid_corp_trademark_business_mark_type(SALT311.StrType s) := 0;
 EXPORT InValidMessage_corp_trademark_business_mark_type(UNSIGNED1 wh) := '';
  
-EXPORT Make_corp_trademark_cancelled_date(SALT36.StrType s0) := s0;
-EXPORT InValid_corp_trademark_cancelled_date(SALT36.StrType s) := 0;
+EXPORT Make_corp_trademark_cancelled_date(SALT311.StrType s0) := s0;
+EXPORT InValid_corp_trademark_cancelled_date(SALT311.StrType s) := 0;
 EXPORT InValidMessage_corp_trademark_cancelled_date(UNSIGNED1 wh) := '';
  
-EXPORT Make_corp_trademark_class_desc1(SALT36.StrType s0) := s0;
-EXPORT InValid_corp_trademark_class_desc1(SALT36.StrType s) := 0;
+EXPORT Make_corp_trademark_class_desc1(SALT311.StrType s0) := s0;
+EXPORT InValid_corp_trademark_class_desc1(SALT311.StrType s) := 0;
 EXPORT InValidMessage_corp_trademark_class_desc1(UNSIGNED1 wh) := '';
  
-EXPORT Make_corp_trademark_class_desc2(SALT36.StrType s0) := s0;
-EXPORT InValid_corp_trademark_class_desc2(SALT36.StrType s) := 0;
+EXPORT Make_corp_trademark_class_desc2(SALT311.StrType s0) := s0;
+EXPORT InValid_corp_trademark_class_desc2(SALT311.StrType s) := 0;
 EXPORT InValidMessage_corp_trademark_class_desc2(UNSIGNED1 wh) := '';
  
-EXPORT Make_corp_trademark_class_desc3(SALT36.StrType s0) := s0;
-EXPORT InValid_corp_trademark_class_desc3(SALT36.StrType s) := 0;
+EXPORT Make_corp_trademark_class_desc3(SALT311.StrType s0) := s0;
+EXPORT InValid_corp_trademark_class_desc3(SALT311.StrType s) := 0;
 EXPORT InValidMessage_corp_trademark_class_desc3(UNSIGNED1 wh) := '';
  
-EXPORT Make_corp_trademark_class_desc4(SALT36.StrType s0) := s0;
-EXPORT InValid_corp_trademark_class_desc4(SALT36.StrType s) := 0;
+EXPORT Make_corp_trademark_class_desc4(SALT311.StrType s0) := s0;
+EXPORT InValid_corp_trademark_class_desc4(SALT311.StrType s) := 0;
 EXPORT InValidMessage_corp_trademark_class_desc4(UNSIGNED1 wh) := '';
  
-EXPORT Make_corp_trademark_class_desc5(SALT36.StrType s0) := s0;
-EXPORT InValid_corp_trademark_class_desc5(SALT36.StrType s) := 0;
+EXPORT Make_corp_trademark_class_desc5(SALT311.StrType s0) := s0;
+EXPORT InValid_corp_trademark_class_desc5(SALT311.StrType s) := 0;
 EXPORT InValidMessage_corp_trademark_class_desc5(UNSIGNED1 wh) := '';
  
-EXPORT Make_corp_trademark_class_desc6(SALT36.StrType s0) := s0;
-EXPORT InValid_corp_trademark_class_desc6(SALT36.StrType s) := 0;
+EXPORT Make_corp_trademark_class_desc6(SALT311.StrType s0) := s0;
+EXPORT InValid_corp_trademark_class_desc6(SALT311.StrType s) := 0;
 EXPORT InValidMessage_corp_trademark_class_desc6(UNSIGNED1 wh) := '';
  
-EXPORT Make_corp_trademark_classification_nbr(SALT36.StrType s0) := s0;
-EXPORT InValid_corp_trademark_classification_nbr(SALT36.StrType s) := 0;
+EXPORT Make_corp_trademark_classification_nbr(SALT311.StrType s0) := s0;
+EXPORT InValid_corp_trademark_classification_nbr(SALT311.StrType s) := 0;
 EXPORT InValidMessage_corp_trademark_classification_nbr(UNSIGNED1 wh) := '';
  
-EXPORT Make_corp_trademark_disclaimer1(SALT36.StrType s0) := s0;
-EXPORT InValid_corp_trademark_disclaimer1(SALT36.StrType s) := 0;
+EXPORT Make_corp_trademark_disclaimer1(SALT311.StrType s0) := s0;
+EXPORT InValid_corp_trademark_disclaimer1(SALT311.StrType s) := 0;
 EXPORT InValidMessage_corp_trademark_disclaimer1(UNSIGNED1 wh) := '';
  
-EXPORT Make_corp_trademark_disclaimer2(SALT36.StrType s0) := s0;
-EXPORT InValid_corp_trademark_disclaimer2(SALT36.StrType s) := 0;
+EXPORT Make_corp_trademark_disclaimer2(SALT311.StrType s0) := s0;
+EXPORT InValid_corp_trademark_disclaimer2(SALT311.StrType s) := 0;
 EXPORT InValidMessage_corp_trademark_disclaimer2(UNSIGNED1 wh) := '';
  
-EXPORT Make_corp_trademark_expiration_date(SALT36.StrType s0) := s0;
-EXPORT InValid_corp_trademark_expiration_date(SALT36.StrType s) := 0;
+EXPORT Make_corp_trademark_expiration_date(SALT311.StrType s0) := s0;
+EXPORT InValid_corp_trademark_expiration_date(SALT311.StrType s) := 0;
 EXPORT InValidMessage_corp_trademark_expiration_date(UNSIGNED1 wh) := '';
  
-EXPORT Make_corp_trademark_filing_date(SALT36.StrType s0) := s0;
-EXPORT InValid_corp_trademark_filing_date(SALT36.StrType s) := 0;
+EXPORT Make_corp_trademark_filing_date(SALT311.StrType s0) := s0;
+EXPORT InValid_corp_trademark_filing_date(SALT311.StrType s) := 0;
 EXPORT InValidMessage_corp_trademark_filing_date(UNSIGNED1 wh) := '';
  
-EXPORT Make_corp_trademark_first_use_date(SALT36.StrType s0) := s0;
-EXPORT InValid_corp_trademark_first_use_date(SALT36.StrType s) := 0;
+EXPORT Make_corp_trademark_first_use_date(SALT311.StrType s0) := s0;
+EXPORT InValid_corp_trademark_first_use_date(SALT311.StrType s) := 0;
 EXPORT InValidMessage_corp_trademark_first_use_date(UNSIGNED1 wh) := '';
  
-EXPORT Make_corp_trademark_first_use_date_in_state(SALT36.StrType s0) := s0;
-EXPORT InValid_corp_trademark_first_use_date_in_state(SALT36.StrType s) := 0;
+EXPORT Make_corp_trademark_first_use_date_in_state(SALT311.StrType s0) := s0;
+EXPORT InValid_corp_trademark_first_use_date_in_state(SALT311.StrType s) := 0;
 EXPORT InValidMessage_corp_trademark_first_use_date_in_state(UNSIGNED1 wh) := '';
  
-EXPORT Make_corp_trademark_keywords(SALT36.StrType s0) := s0;
-EXPORT InValid_corp_trademark_keywords(SALT36.StrType s) := 0;
+EXPORT Make_corp_trademark_keywords(SALT311.StrType s0) := s0;
+EXPORT InValid_corp_trademark_keywords(SALT311.StrType s) := 0;
 EXPORT InValidMessage_corp_trademark_keywords(UNSIGNED1 wh) := '';
  
-EXPORT Make_corp_trademark_logo(SALT36.StrType s0) := s0;
-EXPORT InValid_corp_trademark_logo(SALT36.StrType s) := 0;
+EXPORT Make_corp_trademark_logo(SALT311.StrType s0) := s0;
+EXPORT InValid_corp_trademark_logo(SALT311.StrType s) := 0;
 EXPORT InValidMessage_corp_trademark_logo(UNSIGNED1 wh) := '';
  
-EXPORT Make_corp_trademark_name_expiration_date(SALT36.StrType s0) := s0;
-EXPORT InValid_corp_trademark_name_expiration_date(SALT36.StrType s) := 0;
+EXPORT Make_corp_trademark_name_expiration_date(SALT311.StrType s0) := s0;
+EXPORT InValid_corp_trademark_name_expiration_date(SALT311.StrType s) := 0;
 EXPORT InValidMessage_corp_trademark_name_expiration_date(UNSIGNED1 wh) := '';
  
-EXPORT Make_corp_trademark_nbr(SALT36.StrType s0) := s0;
-EXPORT InValid_corp_trademark_nbr(SALT36.StrType s) := 0;
+EXPORT Make_corp_trademark_nbr(SALT311.StrType s0) := s0;
+EXPORT InValid_corp_trademark_nbr(SALT311.StrType s) := 0;
 EXPORT InValidMessage_corp_trademark_nbr(UNSIGNED1 wh) := '';
  
-EXPORT Make_corp_trademark_renewal_date(SALT36.StrType s0) := s0;
-EXPORT InValid_corp_trademark_renewal_date(SALT36.StrType s) := 0;
+EXPORT Make_corp_trademark_renewal_date(SALT311.StrType s0) := s0;
+EXPORT InValid_corp_trademark_renewal_date(SALT311.StrType s) := 0;
 EXPORT InValidMessage_corp_trademark_renewal_date(UNSIGNED1 wh) := '';
  
-EXPORT Make_corp_trademark_status(SALT36.StrType s0) := s0;
-EXPORT InValid_corp_trademark_status(SALT36.StrType s) := 0;
+EXPORT Make_corp_trademark_status(SALT311.StrType s0) := s0;
+EXPORT InValid_corp_trademark_status(SALT311.StrType s) := 0;
 EXPORT InValidMessage_corp_trademark_status(UNSIGNED1 wh) := '';
  
-EXPORT Make_corp_trademark_used_1(SALT36.StrType s0) := s0;
-EXPORT InValid_corp_trademark_used_1(SALT36.StrType s) := 0;
+EXPORT Make_corp_trademark_used_1(SALT311.StrType s0) := s0;
+EXPORT InValid_corp_trademark_used_1(SALT311.StrType s) := 0;
 EXPORT InValidMessage_corp_trademark_used_1(UNSIGNED1 wh) := '';
  
-EXPORT Make_corp_trademark_used_2(SALT36.StrType s0) := s0;
-EXPORT InValid_corp_trademark_used_2(SALT36.StrType s) := 0;
+EXPORT Make_corp_trademark_used_2(SALT311.StrType s0) := s0;
+EXPORT InValid_corp_trademark_used_2(SALT311.StrType s) := 0;
 EXPORT InValidMessage_corp_trademark_used_2(UNSIGNED1 wh) := '';
  
-EXPORT Make_corp_trademark_used_3(SALT36.StrType s0) := s0;
-EXPORT InValid_corp_trademark_used_3(SALT36.StrType s) := 0;
+EXPORT Make_corp_trademark_used_3(SALT311.StrType s0) := s0;
+EXPORT InValid_corp_trademark_used_3(SALT311.StrType s) := 0;
 EXPORT InValidMessage_corp_trademark_used_3(UNSIGNED1 wh) := '';
  
-EXPORT Make_cont_owner_percentage(SALT36.StrType s0) := s0;
-EXPORT InValid_cont_owner_percentage(SALT36.StrType s) := 0;
+EXPORT Make_cont_owner_percentage(SALT311.StrType s0) := s0;
+EXPORT InValid_cont_owner_percentage(SALT311.StrType s) := 0;
 EXPORT InValidMessage_cont_owner_percentage(UNSIGNED1 wh) := '';
  
-EXPORT Make_cont_country(SALT36.StrType s0) := s0;
-EXPORT InValid_cont_country(SALT36.StrType s) := 0;
+EXPORT Make_cont_country(SALT311.StrType s0) := s0;
+EXPORT InValid_cont_country(SALT311.StrType s) := 0;
 EXPORT InValidMessage_cont_country(UNSIGNED1 wh) := '';
  
-EXPORT Make_cont_country_mailing(SALT36.StrType s0) := s0;
-EXPORT InValid_cont_country_mailing(SALT36.StrType s) := 0;
+EXPORT Make_cont_country_mailing(SALT311.StrType s0) := s0;
+EXPORT InValid_cont_country_mailing(SALT311.StrType s) := 0;
 EXPORT InValidMessage_cont_country_mailing(UNSIGNED1 wh) := '';
  
-EXPORT Make_cont_nondislosure(SALT36.StrType s0) := s0;
-EXPORT InValid_cont_nondislosure(SALT36.StrType s) := 0;
+EXPORT Make_cont_nondislosure(SALT311.StrType s0) := s0;
+EXPORT InValid_cont_nondislosure(SALT311.StrType s) := 0;
 EXPORT InValidMessage_cont_nondislosure(UNSIGNED1 wh) := '';
  
-EXPORT Make_cont_prep_addr_line1(SALT36.StrType s0) := s0;
-EXPORT InValid_cont_prep_addr_line1(SALT36.StrType s) := 0;
+EXPORT Make_cont_prep_addr_line1(SALT311.StrType s0) := s0;
+EXPORT InValid_cont_prep_addr_line1(SALT311.StrType s) := 0;
 EXPORT InValidMessage_cont_prep_addr_line1(UNSIGNED1 wh) := '';
  
-EXPORT Make_cont_prep_addr_last_line(SALT36.StrType s0) := s0;
-EXPORT InValid_cont_prep_addr_last_line(SALT36.StrType s) := 0;
+EXPORT Make_cont_prep_addr_last_line(SALT311.StrType s0) := s0;
+EXPORT InValid_cont_prep_addr_last_line(SALT311.StrType s) := 0;
 EXPORT InValidMessage_cont_prep_addr_last_line(UNSIGNED1 wh) := '';
  
-EXPORT Make_recordorigin(SALT36.StrType s0) := MakeFT_invalid_recordorigin(s0);
-EXPORT InValid_recordorigin(SALT36.StrType s) := InValidFT_invalid_recordorigin(s);
+EXPORT Make_recordorigin(SALT311.StrType s0) := MakeFT_invalid_recordorigin(s0);
+EXPORT InValid_recordorigin(SALT311.StrType s) := InValidFT_invalid_recordorigin(s);
 EXPORT InValidMessage_recordorigin(UNSIGNED1 wh) := InValidMessageFT_invalid_recordorigin(wh);
  
 // This macro will compute and count field level differences based upon a pivot expression
 export MAC_CountDifferencesByPivot(in_left,in_right,pivot_exp,bad_pivots,out_counts) := MACRO
-  IMPORT SALT36,Scrubs_Corp2_Mapping_DC_Main;
+  IMPORT SALT311,Scrubs_Corp2_Mapping_DC_Main;
 //Find those highly occuring pivot values to remove them from consideration
 #uniquename(tr)
   %tr% := table(in_left+in_right,{ val := pivot_exp; });
@@ -1579,7 +1584,7 @@ Bad_Pivots := %t2%(Cnt>100);
     BOOLEAN Diff_cont_prep_addr_last_line;
     BOOLEAN Diff_recordorigin;
     UNSIGNED Num_Diffs;
-    SALT36.StrType Val {MAXLENGTH(1024)};
+    SALT311.StrType Val {MAXLENGTH(1024)};
   END;
 #uniquename(fd)
   %dl% %fd%(in_left le,in_right ri) := TRANSFORM
@@ -1873,7 +1878,7 @@ Bad_Pivots := %t2%(Cnt>100);
     SELF.Diff_cont_prep_addr_line1 := le.cont_prep_addr_line1 <> ri.cont_prep_addr_line1;
     SELF.Diff_cont_prep_addr_last_line := le.cont_prep_addr_last_line <> ri.cont_prep_addr_last_line;
     SELF.Diff_recordorigin := le.recordorigin <> ri.recordorigin;
-    SELF.Val := (SALT36.StrType)evaluate(le,pivot_exp);
+    SELF.Val := (SALT311.StrType)evaluate(le,pivot_exp);
     SELF.Num_Diffs := 0+ IF( SELF.Diff_dt_vendor_first_reported,1,0)+ IF( SELF.Diff_dt_vendor_last_reported,1,0)+ IF( SELF.Diff_dt_first_seen,1,0)+ IF( SELF.Diff_dt_last_seen,1,0)+ IF( SELF.Diff_corp_ra_dt_first_seen,1,0)+ IF( SELF.Diff_corp_ra_dt_last_seen,1,0)+ IF( SELF.Diff_corp_key,1,0)+ IF( SELF.Diff_corp_supp_key,1,0)+ IF( SELF.Diff_corp_vendor,1,0)+ IF( SELF.Diff_corp_vendor_county,1,0)+ IF( SELF.Diff_corp_vendor_subcode,1,0)+ IF( SELF.Diff_corp_state_origin,1,0)+ IF( SELF.Diff_corp_process_date,1,0)+ IF( SELF.Diff_corp_orig_sos_charter_nbr,1,0)+ IF( SELF.Diff_corp_legal_name,1,0)+ IF( SELF.Diff_corp_ln_name_type_cd,1,0)+ IF( SELF.Diff_corp_ln_name_type_desc,1,0)+ IF( SELF.Diff_corp_supp_nbr,1,0)+ IF( SELF.Diff_corp_name_comment,1,0)+ IF( SELF.Diff_corp_address1_type_cd,1,0)+ IF( SELF.Diff_corp_address1_type_desc,1,0)+ IF( SELF.Diff_corp_address1_line1,1,0)+ IF( SELF.Diff_corp_address1_line2,1,0)+ IF( SELF.Diff_corp_address1_line3,1,0)+ IF( SELF.Diff_corp_address1_effective_date,1,0)+ IF( SELF.Diff_corp_address2_type_cd,1,0)+ IF( SELF.Diff_corp_address2_type_desc,1,0)+ IF( SELF.Diff_corp_address2_line1,1,0)+ IF( SELF.Diff_corp_address2_line2,1,0)+ IF( SELF.Diff_corp_address2_line3,1,0)+ IF( SELF.Diff_corp_address2_effective_date,1,0)+ IF( SELF.Diff_corp_phone_number,1,0)+ IF( SELF.Diff_corp_phone_number_type_cd,1,0)+ IF( SELF.Diff_corp_phone_number_type_desc,1,0)+ IF( SELF.Diff_corp_fax_nbr,1,0)+ IF( SELF.Diff_corp_email_address,1,0)+ IF( SELF.Diff_corp_web_address,1,0)+ IF( SELF.Diff_corp_filing_reference_nbr,1,0)+ IF( SELF.Diff_corp_filing_date,1,0)+ IF( SELF.Diff_corp_filing_cd,1,0)+ IF( SELF.Diff_corp_filing_desc,1,0)+ IF( SELF.Diff_corp_status_cd,1,0)+ IF( SELF.Diff_corp_status_desc,1,0)+ IF( SELF.Diff_corp_status_date,1,0)+ IF( SELF.Diff_corp_standing,1,0)+ IF( SELF.Diff_corp_status_comment,1,0)+ IF( SELF.Diff_corp_ticker_symbol,1,0)+ IF( SELF.Diff_corp_stock_exchange,1,0)+ IF( SELF.Diff_corp_inc_state,1,0)+ IF( SELF.Diff_corp_inc_county,1,0)+ IF( SELF.Diff_corp_inc_date,1,0)+ IF( SELF.Diff_corp_anniversary_month,1,0)+ IF( SELF.Diff_corp_fed_tax_id,1,0)+ IF( SELF.Diff_corp_state_tax_id,1,0)+ IF( SELF.Diff_corp_term_exist_cd,1,0)+ IF( SELF.Diff_corp_term_exist_exp,1,0)+ IF( SELF.Diff_corp_term_exist_desc,1,0)+ IF( SELF.Diff_corp_foreign_domestic_ind,1,0)+ IF( SELF.Diff_corp_forgn_state_cd,1,0)+ IF( SELF.Diff_corp_forgn_state_desc,1,0)+ IF( SELF.Diff_corp_forgn_sos_charter_nbr,1,0)+ IF( SELF.Diff_corp_forgn_date,1,0)+ IF( SELF.Diff_corp_forgn_fed_tax_id,1,0)+ IF( SELF.Diff_corp_forgn_state_tax_id,1,0)+ IF( SELF.Diff_corp_forgn_term_exist_cd,1,0)+ IF( SELF.Diff_corp_forgn_term_exist_exp,1,0)+ IF( SELF.Diff_corp_forgn_term_exist_desc,1,0)+ IF( SELF.Diff_corp_orig_org_structure_cd,1,0)+ IF( SELF.Diff_corp_orig_org_structure_desc,1,0)+ IF( SELF.Diff_corp_for_profit_ind,1,0)+ IF( SELF.Diff_corp_public_or_private_ind,1,0)+ IF( SELF.Diff_corp_sic_code,1,0)+ IF( SELF.Diff_corp_naic_code,1,0)+ IF( SELF.Diff_corp_orig_bus_type_cd,1,0)+ IF( SELF.Diff_corp_orig_bus_type_desc,1,0)+ IF( SELF.Diff_corp_entity_desc,1,0)+ IF( SELF.Diff_corp_certificate_nbr,1,0)+ IF( SELF.Diff_corp_internal_nbr,1,0)+ IF( SELF.Diff_corp_previous_nbr,1,0)+ IF( SELF.Diff_corp_microfilm_nbr,1,0)+ IF( SELF.Diff_corp_amendments_filed,1,0)+ IF( SELF.Diff_corp_acts,1,0)+ IF( SELF.Diff_corp_partnership_ind,1,0)+ IF( SELF.Diff_corp_mfg_ind,1,0)+ IF( SELF.Diff_corp_addl_info,1,0)+ IF( SELF.Diff_corp_taxes,1,0)+ IF( SELF.Diff_corp_franchise_taxes,1,0)+ IF( SELF.Diff_corp_tax_program_cd,1,0)+ IF( SELF.Diff_corp_tax_program_desc,1,0)+ IF( SELF.Diff_corp_ra_full_name,1,0)+ IF( SELF.Diff_corp_ra_fname,1,0)+ IF( SELF.Diff_corp_ra_mname,1,0)+ IF( SELF.Diff_corp_ra_lname,1,0)+ IF( SELF.Diff_corp_ra_suffix,1,0)+ IF( SELF.Diff_corp_ra_title_cd,1,0)+ IF( SELF.Diff_corp_ra_title_desc,1,0)+ IF( SELF.Diff_corp_ra_fein,1,0)+ IF( SELF.Diff_corp_ra_ssn,1,0)+ IF( SELF.Diff_corp_ra_dob,1,0)+ IF( SELF.Diff_corp_ra_effective_date,1,0)+ IF( SELF.Diff_corp_ra_resign_date,1,0)+ IF( SELF.Diff_corp_ra_no_comp,1,0)+ IF( SELF.Diff_corp_ra_no_comp_igs,1,0)+ IF( SELF.Diff_corp_ra_addl_info,1,0)+ IF( SELF.Diff_corp_ra_address_type_cd,1,0)+ IF( SELF.Diff_corp_ra_address_type_desc,1,0)+ IF( SELF.Diff_corp_ra_address_line1,1,0)+ IF( SELF.Diff_corp_ra_address_line2,1,0)+ IF( SELF.Diff_corp_ra_address_line3,1,0)+ IF( SELF.Diff_corp_ra_phone_number,1,0)+ IF( SELF.Diff_corp_ra_phone_number_type_cd,1,0)+ IF( SELF.Diff_corp_ra_phone_number_type_desc,1,0)+ IF( SELF.Diff_corp_ra_fax_nbr,1,0)+ IF( SELF.Diff_corp_ra_email_address,1,0)+ IF( SELF.Diff_corp_ra_web_address,1,0)+ IF( SELF.Diff_corp_prep_addr1_line1,1,0)+ IF( SELF.Diff_corp_prep_addr1_last_line,1,0)+ IF( SELF.Diff_corp_prep_addr2_line1,1,0)+ IF( SELF.Diff_corp_prep_addr2_last_line,1,0)+ IF( SELF.Diff_ra_prep_addr_line1,1,0)+ IF( SELF.Diff_ra_prep_addr_last_line,1,0)+ IF( SELF.Diff_cont_filing_reference_nbr,1,0)+ IF( SELF.Diff_cont_filing_date,1,0)+ IF( SELF.Diff_cont_filing_cd,1,0)+ IF( SELF.Diff_cont_filing_desc,1,0)+ IF( SELF.Diff_cont_type_cd,1,0)+ IF( SELF.Diff_cont_type_desc,1,0)+ IF( SELF.Diff_cont_full_name,1,0)+ IF( SELF.Diff_cont_fname,1,0)+ IF( SELF.Diff_cont_mname,1,0)+ IF( SELF.Diff_cont_lname,1,0)+ IF( SELF.Diff_cont_suffix,1,0)+ IF( SELF.Diff_cont_title1_desc,1,0)+ IF( SELF.Diff_cont_title2_desc,1,0)+ IF( SELF.Diff_cont_title3_desc,1,0)+ IF( SELF.Diff_cont_title4_desc,1,0)+ IF( SELF.Diff_cont_title5_desc,1,0)+ IF( SELF.Diff_cont_fein,1,0)+ IF( SELF.Diff_cont_ssn,1,0)+ IF( SELF.Diff_cont_dob,1,0)+ IF( SELF.Diff_cont_status_cd,1,0)+ IF( SELF.Diff_cont_status_desc,1,0)+ IF( SELF.Diff_cont_effective_date,1,0)+ IF( SELF.Diff_cont_effective_cd,1,0)+ IF( SELF.Diff_cont_effective_desc,1,0)+ IF( SELF.Diff_cont_addl_info,1,0)+ IF( SELF.Diff_cont_address_type_cd,1,0)+ IF( SELF.Diff_cont_address_type_desc,1,0)+ IF( SELF.Diff_cont_address_line1,1,0)+ IF( SELF.Diff_cont_address_line2,1,0)+ IF( SELF.Diff_cont_address_line3,1,0)+ IF( SELF.Diff_cont_address_effective_date,1,0)+ IF( SELF.Diff_cont_address_county,1,0)+ IF( SELF.Diff_cont_phone_number,1,0)+ IF( SELF.Diff_cont_phone_number_type_cd,1,0)+ IF( SELF.Diff_cont_phone_number_type_desc,1,0)+ IF( SELF.Diff_cont_fax_nbr,1,0)+ IF( SELF.Diff_cont_email_address,1,0)+ IF( SELF.Diff_cont_web_address,1,0)+ IF( SELF.Diff_corp_acres,1,0)+ IF( SELF.Diff_corp_action,1,0)+ IF( SELF.Diff_corp_action_date,1,0)+ IF( SELF.Diff_corp_action_employment_security_approval_date,1,0)+ IF( SELF.Diff_corp_action_pending_cd,1,0)+ IF( SELF.Diff_corp_action_pending_desc,1,0)+ IF( SELF.Diff_corp_action_statement_of_intent_date,1,0)+ IF( SELF.Diff_corp_action_tax_dept_approval_date,1,0)+ IF( SELF.Diff_corp_acts2,1,0)+ IF( SELF.Diff_corp_acts3,1,0)+ IF( SELF.Diff_corp_additional_principals,1,0)+ IF( SELF.Diff_corp_address_office_type,1,0)+ IF( SELF.Diff_corp_agent_assign_date,1,0)+ IF( SELF.Diff_corp_agent_commercial,1,0)+ IF( SELF.Diff_corp_agent_country,1,0)+ IF( SELF.Diff_corp_agent_county,1,0)+ IF( SELF.Diff_corp_agent_status_cd,1,0)+ IF( SELF.Diff_corp_agent_status_desc,1,0)+ IF( SELF.Diff_corp_agent_id,1,0)+ IF( SELF.Diff_corp_agriculture_flag,1,0)+ IF( SELF.Diff_corp_authorized_partners,1,0)+ IF( SELF.Diff_corp_comment,1,0)+ IF( SELF.Diff_corp_consent_flag_for_protected_name,1,0)+ IF( SELF.Diff_corp_converted,1,0)+ IF( SELF.Diff_corp_converted_from,1,0)+ IF( SELF.Diff_corp_country_of_formation,1,0)+ IF( SELF.Diff_corp_date_of_organization_meeting,1,0)+ IF( SELF.Diff_corp_delayed_effective_date,1,0)+ IF( SELF.Diff_corp_directors_from_to,1,0)+ IF( SELF.Diff_corp_dissolved_date,1,0)+ IF( SELF.Diff_corp_farm_exemptions,1,0)+ IF( SELF.Diff_corp_farm_qual_date,1,0)+ IF( SELF.Diff_corp_farm_status_cd,1,0)+ IF( SELF.Diff_corp_farm_status_date,1,0)+ IF( SELF.Diff_corp_farm_status_desc,1,0)+ IF( SELF.Diff_corp_fiscal_year_month,1,0)+ IF( SELF.Diff_corp_foreign_fiduciary_capacity_in_state,1,0)+ IF( SELF.Diff_corp_governing_statute,1,0)+ IF( SELF.Diff_corp_has_members,1,0)+ IF( SELF.Diff_corp_has_vested_managers,1,0)+ IF( SELF.Diff_corp_home_incorporated_county,1,0)+ IF( SELF.Diff_corp_home_state_name,1,0)+ IF( SELF.Diff_corp_is_professional,1,0)+ IF( SELF.Diff_corp_is_non_profit_irs_approved,1,0)+ IF( SELF.Diff_corp_last_renewal_date,1,0)+ IF( SELF.Diff_corp_last_renewal_year,1,0)+ IF( SELF.Diff_corp_license_type,1,0)+ IF( SELF.Diff_corp_llc_managed_desc,1,0)+ IF( SELF.Diff_corp_llc_managed_ind,1,0)+ IF( SELF.Diff_corp_management_desc,1,0)+ IF( SELF.Diff_corp_management_type,1,0)+ IF( SELF.Diff_corp_manager_managed,1,0)+ IF( SELF.Diff_corp_merged_corporation_id,1,0)+ IF( SELF.Diff_corp_merged_fein,1,0)+ IF( SELF.Diff_corp_merger_allowed_flag,1,0)+ IF( SELF.Diff_corp_merger_date,1,0)+ IF( SELF.Diff_corp_merger_desc,1,0)+ IF( SELF.Diff_corp_merger_effective_date,1,0)+ IF( SELF.Diff_corp_merger_id,1,0)+ IF( SELF.Diff_corp_merger_indicator,1,0)+ IF( SELF.Diff_corp_merger_name,1,0)+ IF( SELF.Diff_corp_merger_type_converted_to_cd,1,0)+ IF( SELF.Diff_corp_merger_type_converted_to_desc,1,0)+ IF( SELF.Diff_corp_naics_desc,1,0)+ IF( SELF.Diff_corp_name_effective_date,1,0)+ IF( SELF.Diff_corp_name_reservation_date,1,0)+ IF( SELF.Diff_corp_name_reservation_desc,1,0)+ IF( SELF.Diff_corp_name_reservation_expiration_date,1,0)+ IF( SELF.Diff_corp_name_reservation_nbr,1,0)+ IF( SELF.Diff_corp_name_reservation_type,1,0)+ IF( SELF.Diff_corp_name_status_cd,1,0)+ IF( SELF.Diff_corp_name_status_date,1,0)+ IF( SELF.Diff_corp_name_status_desc,1,0)+ IF( SELF.Diff_corp_non_profit_irs_approved_purpose,1,0)+ IF( SELF.Diff_corp_non_profit_solicit_donations,1,0)+ IF( SELF.Diff_corp_nbr_of_amendments,1,0)+ IF( SELF.Diff_corp_nbr_of_initial_llc_members,1,0)+ IF( SELF.Diff_corp_nbr_of_partners,1,0)+ IF( SELF.Diff_corp_operating_agreement,1,0)+ IF( SELF.Diff_corp_opt_in_llc_act_desc,1,0)+ IF( SELF.Diff_corp_opt_in_llc_act_ind,1,0)+ IF( SELF.Diff_corp_organizational_comments,1,0)+ IF( SELF.Diff_corp_partner_contributions_total,1,0)+ IF( SELF.Diff_corp_partner_terms,1,0)+ IF( SELF.Diff_corp_percentage_voters_required_to_approve_amendments,1,0)+ IF( SELF.Diff_corp_profession,1,0)+ IF( SELF.Diff_corp_province,1,0)+ IF( SELF.Diff_corp_public_mutual_corporation,1,0)+ IF( SELF.Diff_corp_purpose,1,0)+ IF( SELF.Diff_corp_ra_required_flag,1,0)+ IF( SELF.Diff_corp_registered_counties,1,0)+ IF( SELF.Diff_corp_regulated_ind,1,0)+ IF( SELF.Diff_corp_renewal_date,1,0)+ IF( SELF.Diff_corp_standing_other,1,0)+ IF( SELF.Diff_corp_survivor_corporation_id,1,0)+ IF( SELF.Diff_corp_tax_base,1,0)+ IF( SELF.Diff_corp_tax_standing,1,0)+ IF( SELF.Diff_corp_termination_cd,1,0)+ IF( SELF.Diff_corp_termination_desc,1,0)+ IF( SELF.Diff_corp_termination_date,1,0)+ IF( SELF.Diff_corp_trademark_business_mark_type,1,0)+ IF( SELF.Diff_corp_trademark_cancelled_date,1,0)+ IF( SELF.Diff_corp_trademark_class_desc1,1,0)+ IF( SELF.Diff_corp_trademark_class_desc2,1,0)+ IF( SELF.Diff_corp_trademark_class_desc3,1,0)+ IF( SELF.Diff_corp_trademark_class_desc4,1,0)+ IF( SELF.Diff_corp_trademark_class_desc5,1,0)+ IF( SELF.Diff_corp_trademark_class_desc6,1,0)+ IF( SELF.Diff_corp_trademark_classification_nbr,1,0)+ IF( SELF.Diff_corp_trademark_disclaimer1,1,0)+ IF( SELF.Diff_corp_trademark_disclaimer2,1,0)+ IF( SELF.Diff_corp_trademark_expiration_date,1,0)+ IF( SELF.Diff_corp_trademark_filing_date,1,0)+ IF( SELF.Diff_corp_trademark_first_use_date,1,0)+ IF( SELF.Diff_corp_trademark_first_use_date_in_state,1,0)+ IF( SELF.Diff_corp_trademark_keywords,1,0)+ IF( SELF.Diff_corp_trademark_logo,1,0)+ IF( SELF.Diff_corp_trademark_name_expiration_date,1,0)+ IF( SELF.Diff_corp_trademark_nbr,1,0)+ IF( SELF.Diff_corp_trademark_renewal_date,1,0)+ IF( SELF.Diff_corp_trademark_status,1,0)+ IF( SELF.Diff_corp_trademark_used_1,1,0)+ IF( SELF.Diff_corp_trademark_used_2,1,0)+ IF( SELF.Diff_corp_trademark_used_3,1,0)+ IF( SELF.Diff_cont_owner_percentage,1,0)+ IF( SELF.Diff_cont_country,1,0)+ IF( SELF.Diff_cont_country_mailing,1,0)+ IF( SELF.Diff_cont_nondislosure,1,0)+ IF( SELF.Diff_cont_prep_addr_line1,1,0)+ IF( SELF.Diff_cont_prep_addr_last_line,1,0)+ IF( SELF.Diff_recordorigin,1,0);
   END;
 // Now need to remove bad pivots from comparison

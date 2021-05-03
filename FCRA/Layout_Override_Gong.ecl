@@ -51,6 +51,9 @@ unsigned2 disc_cnt6 := 0;
 unsigned2 disc_cnt12 := 0;
 unsigned2 disc_cnt18 := 0;
 unsigned8	persistent_record_id := 0;
+// CCPA-1050 - Add CCPA fields
+unsigned4 global_sid := 0;
+unsigned8 record_sid := 0;
 string20 flag_file_id;
 string2 src;
 end;

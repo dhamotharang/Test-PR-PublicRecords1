@@ -1,4 +1,4 @@
-﻿import	AID,codes,ut,PropertyCharacteristics,Scrubs_Property_Characteristics, PropertyFieldFillInByLA2,PromoteSupers;
+﻿import	AID,codes,ut,PropertyCharacteristics,Scrubs_Property_Characteristics, PropertyFieldFillInByLA2,PromoteSupers,mdr;
 
 export	Proc_Build_Base(string	pVersion, string emailList='')	:=
 function	
@@ -35,10 +35,18 @@ function
 																				)
 														);
 	
-	// Add the Fares and Fidelity records to the rolled up MLS&Fidelity file
-	dAll	:=	dCombinedRollup	+	dOKCMLSFilter	+	PropertyCharacteristics.LNProperty2Base;
 
 	
+	//Generate Source E
+	dCollateralAnalyticsOnly:=PropertyCharacteristics.fnGenerateCollateralAnalytics;
+
+//Generate Source F (Default Data inclusion is inside function)
+	dBestofAll:=PropertyCharacteristics.fnGenerateBestofAll(dCollateralAnalyticsOnly,dLNMLS(vendor_source = 'C'),dLNMLS(vendor_source = 'D'));
+	dBestofAllNoMLS:=PropertyCharacteristics.fnGenerateBestofAllNoMLS(dLNMLS(vendor_source = 'C'),dLNMLS(vendor_source = 'D'));
+
+	// Add the Fares and Fidelity records to the rolled up MLS&amp;Fidelity file
+	dAll	:=	dCombinedRollup	+	dOKCMLSFilter	+	PropertyCharacteristics.LNProperty2Base + dCollateralAnalyticsOnly + dBestofAll + dBestofAllNoMLS;
+
 	// Create unique id and reformat to base layout
 	ut.MAC_Sequence_Records(dAll,property_rid,dPropSeqNum);
 	
@@ -57,7 +65,8 @@ dOKCTY_srt := sort(distribute(dOKCTY_sfr,hash(prim_range, prim_name, sec_range, 
 
 PropertyCharacteristics.Populate_Default_Data.Mac_Populate_Attribute_Default_Data(dOKCTY_srt,dPropAttributeDefaultData);
 
-// combine_base := dOthers + dOKCTY + dPropAttributeDefaultData;
+//DF-23789 Adding Source E (MLS/Collateral Analytics only) and Source F (Best of all with Default Data)
+
 dPropAttrDefaultData	:=	
 														project( dOthers + dOKCTY + dPropAttributeDefaultData,
 																			transform(	PropertyCharacteristics.Layouts.TempBase,
@@ -93,13 +102,16 @@ dPropAttrDefaultData	:=
 	// Project to the base file layout
 	dBase	:=	project(dPropAttrDefaultDataDist,PropertyCharacteristics.Layouts.Base);
 	
+	//Add Global Sid Information DF-23789
+	
+	addGlobalSID 	:= mdr.macGetGlobalSID(dBase,'PropertyInformation','vendor_source','global_sid'); //DF-25302: Populate Global_SID
+
 	// output base file
-	PromoteSupers.Mac_SF_BuildProcess(dBase,'~thor_data400::base::propertyinfo',buildBase,,,true,pVersion);
+	PromoteSupers.Mac_SF_BuildProcess(addGlobalSID,'~thor_data400::base::propertyinfo',buildBase,,,true,pVersion);
 	
 	Scrubs := Scrubs_Property_Characteristics.fnRunScrubs(pversion, emailList);
 	
-	return	sequential(buildBase
-										,Scrubs
+	return	sequential(buildBase,Scrubs
 										);
 
 end;

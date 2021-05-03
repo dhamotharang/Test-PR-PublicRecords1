@@ -1,5 +1,5 @@
 import header,doxie,ut,data_services;
-res := header.file_relative_title.file;
+res := dataset([],header.Layout_Relatives_v2.main_rel_title);
 
 rel_title_layout := RECORD
    unsigned1 title;
@@ -22,6 +22,4 @@ export Key_Relatives_v2 := INDEX(res_k,
 {person1,same_lname,number_cohabits,recent_cohabit,person2},
 {res_k}, 
 data_services.Data_Location.Relatives+'thor_data400::key::relatives_v2_' + 
-version_superkey);
-
-
+version_superkey):DEPRECATED('DATA IS STALE. PLEASE MIGRATE TO: Relationshi\\key_relatives_v3.ecl');

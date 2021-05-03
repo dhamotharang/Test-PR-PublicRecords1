@@ -3,7 +3,7 @@ IMPORT SALT311;
 EXPORT Executives_GenerationMod := MODULE(SALT311.iGenerationMod)
  
   // SALT Version info
-  EXPORT salt_VERSION := 'V3.11.4';
+  EXPORT salt_VERSION := 'V3.11.11';
   EXPORT salt_MODULE := 'SALT311'; // Optional override by HACK:SALTMODULE
   EXPORT salt_TOOLSMODULE := 'SALTTOOLS30'; // Optional override by HACK:SALTTOOLSMODULE
  
@@ -22,7 +22,7 @@ EXPORT Executives_GenerationMod := MODULE(SALT311.iGenerationMod)
   EXPORT spc_FILENAME := 'Cortera';
   EXPORT spc_INGESTSTATUS := '';
   EXPORT spc_EXTERNAL_MAPPING := 'UniqueID:';
-  EXPORT spc_EXTERNAL_BATCH_PARAM := ',/* MY_ */,link_id,name,alternate_business_name,address,address2,city,state,country,postalcode,phone,fax,latitude,longitude,url,fein,position_type,ultimate_linkid,ultimate_name,loc_date_last_seen,primary_sic,sic_desc,primary_naics,naics_desc,segment_id,segment_desc,year_start,ownership,total_employees,employee_range,total_sales,sales_range,executive_name1,title1,executive_name2,title2,executive_name3,title3,executive_name4,title4,executive_name5,title5,executive_name6,title6,executive_name7,title7,executive_name8,title8,executive_name9,title9,executive_name10,title10,status,is_closed,closed_date,processdate,version,persistent_record_id,dt_first_seen,dt_last_seen,dt_vendor_first_reported,dt_vendor_last_reported,prim_name,p_city_name,v_city_name,executive_name,exec_title';
+  EXPORT spc_EXTERNAL_BATCH_PARAM := ',/* MY_ */,link_id,name,alternate_business_name,address,address2,city,state,country,postalcode,phone,fax,latitude,longitude,url,fein,position_type,ultimate_linkid,ultimate_name,loc_date_last_seen,primary_sic,sic_desc,primary_naics,naics_desc,segment_id,segment_desc,year_start,ownership,total_employees,employee_range,total_sales,sales_range,executive_name1,title1,executive_name2,title2,executive_name3,title3,executive_name4,title4,executive_name5,title5,executive_name6,title6,executive_name7,title7,executive_name8,title8,executive_name9,title9,executive_name10,title10,status,is_closed,closed_date,processdate,version,persistent_record_id,dt_first_seen,dt_last_seen,dt_vendor_first_reported,dt_vendor_last_reported,prim_name,p_city_name,v_city_name,executive_name,executive_title';
   EXPORT spc_HAS_TWOSTEP := FALSE;
   EXPORT spc_HAS_PARTITION := FALSE;
   EXPORT spc_HAS_FIELDTYPES := TRUE;
@@ -132,7 +132,7 @@ EXPORT Executives_GenerationMod := MODULE(SALT311.iGenerationMod)
     + 'FIELD:p_city_name:LIKE(Alpha):0,0\n'
     + 'FIELD:v_city_name:LIKE(Alpha):0,0\n'
     + 'FIELD:executive_name:LIKE(Alpha):0,0\n'
-    + 'FIELD:exec_title:LIKE(Alpha):0,0'
+    + 'FIELD:executive_title:LIKE(Alpha):0,0'
     ;
  
   // Structured values

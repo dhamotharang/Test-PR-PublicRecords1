@@ -13,35 +13,7 @@ EXPORT proc_payload(STRING8 filedate)  := FUNCTION
 
   head_bldg := header.fn_block_records.filter(head_bldg0);
 
-  header_services.Supplemental_Data.mac_verify('didaddress_sup.txt',header_services.Supplemental_Data.layout_in,supp_ds_func);
- 
-  Suppression_In := supp_ds_func();
-
-  dSuppressedIn := project(Suppression_In, header_services.Supplemental_Data.in_to_out(left));
-
-  rHashDIDAddress := header_services.Supplemental_Data.layout_out;
-
-  rFullOut_HashDIDAddress := record
-  head_bldg;
-  rHashDIDAddress;
-  end;
-
-  rFullOut_HashDIDAddress tHashDIDAddress(head_bldg l) := transform                            
-  self.hval := hashmd5(intformat(l.did,15,1),(string)l.st,(string)l.zip,(string)l.city_name,
-									(string)l.prim_name,(string)l.prim_range,(string)l.predir,(string)l.suffix,(string)l.postdir,(string)l.sec_range);
-  self := l;
-  end;
-
-  dHeader_withMD5 := project(head_bldg, tHashDIDAddress(left));
-
-  head_bldg tSuppress(dHeader_withMD5 l, dSuppressedIn r) := transform
-  self := l;
-  end;
-
-  full_out_suppress := join(dHeader_withMD5,dSuppressedIn,
-                          left.hval=right.hval,
-						  tSuppress(left,right),
-						  left only,lookup);
+	full_out_suppress :=  Header.Prep_Build.applyDidAddressSup(head_bldg);						  	
 
   full_out_suppress0:=full_out_suppress(phone<>'');
 

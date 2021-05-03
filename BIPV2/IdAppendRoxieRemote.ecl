@@ -5,18 +5,18 @@ import Doxie;
 export IdAppendRoxieRemote(
 		dataset(BIPV2.IdAppendLayouts.AppendInput) inputDs
 		,unsigned scoreThreshold = 75
-		,unsigned weightThreshold = 0
+		,unsigned weightThreshold = IdConstants.APPEND_WEIGHT_THRESHOLD_ROXIE
 		,boolean primForce = false
 		,boolean reAppend = true
 		,boolean primForcePost = false 
 		,boolean useFuzzy = true
-		,boolean doZipExpansion = true
+		,boolean doZipExpansion = false
 		,string svcAppendUrl = ''
 		,string svcName = ''
         ,unsigned soapTimeout = 30
         ,unsigned soapTimeLimit = 0
         ,unsigned soapRetries = 3
-				,boolean segmentation = true
+		,boolean segmentation = true
 	) := module
 
 	shared disableSaltForce := not primForce;
@@ -65,7 +65,7 @@ export IdAppendRoxieRemote(
 		return soapDs;
 	end;
 
-	shared BIPV2.IDAppendLayouts.AppendOutput setError(IdAppendLayouts.SoapRequest l) := transform
+	shared BIPV2.IDAppendLayouts.AppendOutputDebug setError(IdAppendLayouts.SoapRequest l) := transform
 		self.error_code := FAILCODE;
 		self.error_msg := FAILMESSAGE;
 		self := L;
@@ -82,7 +82,7 @@ export IdAppendRoxieRemote(
 		soapResult := soapcall(
 			soapInputDs
 			,urlBipAppend, servicename, {soapInputDs}
-			,dataset(BIPV2.IDAppendLayouts.AppendOutput)
+			,dataset(BIPV2.IDAppendLayouts.AppendOutputDebug)
 			,xpath(servicename + 'Response/Results/Result/Dataset[1]/Row')
 			,onfail(setError(left)), parallel(1)
 			,merge(1), timeout(soapTimeout), timelimit(soapTimeLimit), retry(soapRetries)

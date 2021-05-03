@@ -1,4 +1,4 @@
-#workunit('name','Field Summary Rpt');
+﻿#workunit('name','Field Summary Rpt');
 
 prii_layout := RECORD
 	STRING Account;
@@ -47,7 +47,7 @@ p_f := PROJECT(f,t_f(LEFT,COUNTER));
 output(p_f);
 
 
-roxieIP := 'http://oroxievip.sc.seisint.com:9876'; // DR Roxie
+roxieIP := 'http://prdrroxiethorvip.hpcc.risk.regn.net:9876';// DR Roxie
 
 s := riskwise.RiskwiseMainFLGO_Soapcall(project(p_f, transform(riskwise.Layout_FLG1, self:=left)), roxieIP);
 

@@ -29,6 +29,13 @@ INLINE MODULE
 	EXPORT	Collateral									:=  'CL';	//	Collateral Segment (CL)
 	EXPORT	MemberSpecific							:=  'MS';	//	Member Specific Field (MS)
 	EXPORT	AccountModificationHistory	:=  'AH';	//	Account Modification History Segment (AH)
+	EXPORT	DigitalFootPrintSegment						:=  'DF';	//	DigitalFootPrintSegment		(DF)	
+	EXPORT	MerchantProcessingDataSegment				:=  'MD';	//	MerchantProcessingDataSegment(MD)	
+	EXPORT	MerchantCardTransaction						:=  'CT';	//	MerchantCardTransaction			(CT)
+	EXPORT	MerchantChargeback							:=  'MT';	//	MerchantChargeback		(MT)		
+	EXPORT	MerchantRefund_MR							:=  'MR';	//	MerchantRefund_MR		(MR)		
+	EXPORT	MerchantClassificationCode					:=  'MC';	//	MerchantClassificationCode	(MC)	
+	EXPORT	MerchantDestinationMedia					:=  'DM';	//	MerchantDestinationMedia	(DM)	
 	EXPORT	AccountTrailer							:=  'ZZ';	//	Trailer Segment (ZZ)
 	EXPORT	FileFooter									:=  'FZ';	//	File Footer/Trailer Segment (FZ)
 
@@ -45,6 +52,13 @@ INLINE MODULE
 	EXPORT	CL													:=  Collateral;
 	EXPORT	MS													:=  MemberSpecific;
 	EXPORT	AH													:=  AccountModificationHistory;
+	EXPORT	DF													:=  DigitalFootPrintSegment;
+	EXPORT	MD													:=  MerchantProcessingDataSegment;
+	EXPORT	CT													:=  MerchantCardTransaction;
+	EXPORT	MT													:=  MerchantChargeback;
+	EXPORT	MR													:=  MerchantRefund_MR;
+	EXPORT	MC													:=  MerchantClassificationCode;
+	EXPORT	DM													:=  MerchantDestinationMedia;
 	EXPORT	ZZ													:=  AccountTrailer;
 	EXPORT	FZ													:=  FileFooter;
 	

@@ -8,13 +8,13 @@ EXPORT Convert_Base_toHeader (string pVersion, boolean pUseProd, string gcid, st
 		EXPORT Build_it := FUNCTION
 		
 			pBaseFile		:= map(												 
-											pHistMode = 'N'	=> dataset([],upi_databuild.Layouts_V2.base),
+											pHistMode = 'N'	=> dataset([],UPI_DataBuild.Layouts_V2.base),
 											NOTHOR(FileServices.GetSuperFileSubCount(UPI_DataBuild.Filenames_V2(pVersion, pUseProd, gcid, pHistMode).member_lBaseTemplate_built)) = 0 =>
-														dataset([],upi_databuild.Layouts_V2.base),
+														dataset([],UPI_DataBuild.Layouts_V2.base),
 											UPI_DataBuild.Files_V2(pVersion,pUseProd,gcid,pHistMode).member_base.qa);
 												 
 			header_layout := record
-				upi_databuild.Layouts_V2.as_header;
+				UPI_DataBuild.Layouts_V2.as_header;
 				unsigned1	__tpe;
 			end;
 
@@ -24,6 +24,8 @@ EXPORT Convert_Base_toHeader (string pVersion, boolean pUseProd, string gcid, st
 				SELF.dt_vendor_first_reported	   	:= (unsigned)_validate.date.fCorrectedDateString(trim(stringlib.stringfilterout((string)l.dt_vendor_first_reported,'-.>$!%*@=?&\''),left,right),false);
 				SELF.dt_vendor_last_reported	   	:= (unsigned)_validate.date.fCorrectedDateString(trim(stringlib.stringfilterout((string)l.dt_vendor_last_reported,'-.>$!%*@=?&\''),left,right),false);
 				SELF.lexid												:= L.lexid;
+				SELF.old_lexid										:= L.prev_lexid;
+				SELF.old_crk											:= L.prev_crk;
 				SELF															:= L;
 				SELF															:= [];
 			END;

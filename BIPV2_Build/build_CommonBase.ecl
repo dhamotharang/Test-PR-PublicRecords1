@@ -1,4 +1,4 @@
-IMPORT BIPV2, BIPV2_Files,BIPV2_PostProcess,wk_ut,tools,std,BIPV2_Tools;
+﻿IMPORT BIPV2, BIPV2_Files,BIPV2_PostProcess,wk_ut,tools,std,BIPV2_Tools;
 l_base          := BIPV2.CommonBase.Layout;
 in_default      := PROJECT(BIPV2_Files.files_empid().DS_BASE, l_base);
 // f_default        := BIPV2_Files.files_CommonBase.filePrefix   + '::' + BIPV2.KeySuffix;  //so superfile and logical files have the same naming convention
@@ -48,9 +48,9 @@ MODULE
   
   // Take action
   ds1 := descendant_counts(input);
-  shared ds        := BIPV2_PostProcess.proc_segmentation(pversion ,ds1    ,pPopulateStatus := true ).patched; //put in seg stats into file itself.  do this for now.  the output of the stats will come later
-  shared ds_test   := BIPV2_PostProcess.proc_segmentation(pversion ,input  ,pPopulateStatus := true ,pGoldOutputModifier := 'test_buildcommonbase').patched_test; //put in seg stats into file itself.  do this for now.  the output of the stats will come later
-  ds_filter := table(ds,{seleid,st,v_city_name,prim_range,prim_name,cnp_name,fname,lname,company_fein})( 
+  shared ds_commonbase  := BIPV2_PostProcess.proc_segmentation(pversion ,ds1    ,pPopulateStatus := true ).patched; //put in seg stats into file itself.  do this for now.  the output of the stats will come later
+  shared ds_test        := BIPV2_PostProcess.proc_segmentation(pversion ,input  ,pPopulateStatus := true ,pGoldOutputModifier := 'test_buildcommonbase').patched_test; //put in seg stats into file itself.  do this for now.  the output of the stats will come later
+  ds_filter := table(ds_commonbase,{seleid,st,v_city_name,prim_range,prim_name,cnp_name,fname,lname,company_fein})( 
   (    seleid = 22731126692 
   or (
             st          = 'UT'
@@ -120,7 +120,7 @@ MODULE
     set_womble:=set(table(dsb,{rcid},rcid),rcid);
 */ 
   shared set_prox :=[283437004];//BH-113
-  shared ds_filt2      := ds(seleid not in set_filt_seleids and rcid not in set_rcid and proxid not in set_prox
+  shared ds_filt2      := ds_commonbase(seleid not in set_filt_seleids and rcid not in set_rcid and proxid not in set_prox
 /*                  and dotid not in [448534092,  //here temporarily for the BH-55 and will be removed in sprint44. 
                     1457098055,411933513,357925529,992837402,2239542081,186174785,334506045,225222253,
                     180910334,165395637,186638861,1212808209,213440582,1450796602,713523008,1626582526,
@@ -169,18 +169,17 @@ MODULE
   
   
   SHARED ds_header      := BIPV2_Tools.Propagate_DID(ds_filt2);
-  SHARED ds_header_test := ds_filt2_test;//BIPV2_Tools.Propagate_DID(ds_filt2);
   shared ds_header_out := dataset(f_out,bipv2.CommonBase.layout,thor);
   /* ---------------------- Strata Quick ID Check --------------------------------*/
   import BIPV2_Strata,strata;
   export strata_ID_Check_Pre (dataset(l_base) pDataset = input        ,boolean pIsTesting = false) := BIPV2_Strata.mac_BIP_ID_Check(pDataset,'CommonBase','Input' ,pversion,pIsTesting);
   export strata_ID_Check_Post(dataset(l_base) pDataset = ds_header_out,boolean pIsTesting = false) := BIPV2_Strata.mac_BIP_ID_Check(pDataset,'CommonBase','Output',pversion,pIsTesting);
   export out := OUTPUT(ds_header,,f_out,OVERWRITE,COMPRESSED);
-  export out_test := OUTPUT(ds_header_test,,f_out,OVERWRITE,COMPRESSED);
   supr := SEQUENTIAL(BIPV2_Files.files_CommonBase.updateBuilding(f_out)
                     ,BIPV2_Build.Promote(pversion,,,false,BIPV2.Filenames(pversion).Common_Base.dall_filenames).new2built/*, BIPV2.CommonBase.updateSuperfiles(f_out)*/);
   EXPORT run_base := SEQUENTIAL(strata_ID_Check_Pre(),out,strata_ID_Check_Post(), supr);
-  EXPORT run_base_test := SEQUENTIAL(out_test);
+  
+  EXPORT run_base_testing := SEQUENTIAL(strata_ID_Check_Pre(,true),out,strata_ID_Check_Post(,true)/*, supr*/);
   
   // Header History
   EXPORT run_hist := BIPV2_Files.files_CommonBase.BuildHistoryKey(ds_header_out,pversion);
@@ -190,5 +189,32 @@ MODULE
   export copyempid2StorageThor    := if(not wk_ut._constants.IsDev ,output(kick_copy2_storage_thor ,named('copy2_Storage_Thor__html')));  //copy orig file to storage thor
 
   EXPORT run := SEQUENTIAL(run_base, run_hist,copyempid2StorageThor,doCollectData);
+  EXPORT run_test := SEQUENTIAL(run_base_testing/*, run_hist,copyempid2StorageThor,doCollectData*/);
+
+  // -- test new gold stuff
+  import BIPV2_statuses;
+  
+  SHARED ds_test_clean                         := bipv2.CommonBase.CLEAN             (ds_filt2_test                                                                                   ) : persist('~persist::BIPV2_Build::build_CommonBase::ds_test_clean'                       );
+  SHARED ds_reset_new_statuses_seleid_private  := BIPV2_tools.mac_Set_Statuses       (ds_test_clean                         ,seleid,seleid_status_private ,seleid_status_private_score) : persist('~persist::BIPV2_Build::build_CommonBase::ds_reset_new_statuses_seleid_private');
+  SHARED ds_reset_new_statuses_seleid_public   := BIPV2_tools.mac_Set_Statuses       (ds_reset_new_statuses_seleid_private  ,seleid,seleid_status_public  ,seleid_status_public_score ) : persist('~persist::BIPV2_Build::build_CommonBase::ds_reset_new_statuses_seleid_public' );
+  SHARED ds_reset_new_gold                     := BIPV2_statuses.mac_Calculate_Gold  (ds_reset_new_statuses_seleid_public   ,pShow_Work := true                                       ) : persist('~persist::BIPV2_Build::build_CommonBase::ds_reset_new_gold'                   );
+  SHARED ds_reset_new_gold_table               := table(ds_reset_new_gold  ,{seleid  ,sele_gold  ,seleid_status_private  ,seleid_status_public ,seleid_status_private_score  ,seleid_status_public_score } ,seleid ,merge);
+
+
+  SHARED ds_header_test(boolean pPreserve_gold = false) := join(ds_filt2_test ,ds_reset_new_gold_table  ,left.seleid = right.seleid ,transform(recordof(left)
+    ,self.sele_gold                   := if(pPreserve_gold = false  ,right.sele_gold  ,left.sele_gold) 
+    ,self.seleid_status_private       := if(right.seleid != 0 ,right.seleid_status_private        ,'I') // if cluster doesn't exist in clean version of file, then it is inactive.
+    ,self.seleid_status_public        := if(right.seleid != 0 ,right.seleid_status_public         ,'I') 
+    ,self.seleid_status_private_score := if(right.seleid != 0 ,right.seleid_status_private_score  ,1  ) 
+    ,self.seleid_status_public_score  := if(right.seleid != 0 ,right.seleid_status_public_score   ,1  ) 
+    ,self                             := left
+  ),left outer ,hash);
+    
+  export out_gold_test                := OUTPUT(ds_header_test(     ),,f_out,OVERWRITE,COMPRESSED);
+  export out_gold_test_preserve       := OUTPUT(ds_header_test(true ),,f_out,OVERWRITE,COMPRESSED);
+  
+  EXPORT run_gold_test                := SEQUENTIAL(out_gold_test         );
+  EXPORT run_gold_test_preserve_gold  := SEQUENTIAL(out_gold_test_preserve);
+
   
 END;

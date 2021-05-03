@@ -154,14 +154,19 @@ executive_out_new := JOIN(rHeader_0010_File_combined_2(Cust_Name !=''),
                                             SELF.orgid	:= left.orgid;
                                             SELF.ultid	:= left.ultid;
 																						SELF.global_sid:=  LEFT.global_sid;
-																					  SELF := RIGHT;));	
+																					  SELF := RIGHT;
+																						//ED HERE
+																						self:=[];
+																						));	
 	
 executive_out_old := JOIN(rHeader_0010_File_combined_2(Cust_Name = ''),
                                  clean_IN_1000_Executive_Summary(cust_name =''), 
                                  LEFT.file_number = RIGHT.file_number,
                                  TRANSFORM(Layouts.File_1000_Executive_Summary,
                                              SELF.global_sid:=  LEFT.global_sid;
-																					   SELF := RIGHT;));	
+																					   SELF := RIGHT;
+																						 	self:=[];
+																						 ));	
 
 executive_out:=	executive_out_old + executive_out_new;
 
@@ -177,14 +182,18 @@ trade_payment_tot_out_new := JOIN(rHeader_0010_File_combined_2(Cust_Name !=''),
                                            SELF.orgid	:= left.orgid;
                                            SELF.ultid	:= left.ultid;
 																					 SELF.global_sid:= Left.global_sid;
-																					 SELF := RIGHT;));
+																					 SELF := RIGHT;
+																					 	self:=[];
+																						));
 
 trade_payment_tot_out_old := JOIN(rHeader_0010_File_combined_2(Cust_Name =''),
                                  clean_IN_Trade_Pay_Tot(Cust_name=''), 
                                  LEFT.file_number = RIGHT.file_number,
                                  TRANSFORM(Layouts.File_2015_Trade_Payment_Totals,
 																           SELF.global_sid:=Left.global_sid;
-																					 SELF := RIGHT;));
+																					 SELF := RIGHT;
+																					 	self:=[];
+																						));
  
  trade_payment_tot_out:=trade_payment_tot_out_old + trade_payment_tot_out_new;
  

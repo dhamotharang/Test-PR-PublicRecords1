@@ -6,7 +6,11 @@ EXPORT Map_OtherPhones(string8 version) := FUNCTION
 	
 	//DF-23251: Add 'dx_' Prefix to Index Definitions
 	//DF-23286: Update Keys
-	dx_PhoneFinderReportDelta.Layout_PhoneFinder.OtherPhones_Main trOPh(inFile l):= transform
+	
+	//DF-27818: Add "identity_count" field to OtherPhones & Transactions Base Files
+	//DF-28194: Add "carrier" field to OtherPhones Base File
+	//dx_PhoneFinderReportDelta.Layout_PhoneFinder.OtherPhones_Main trOPh(inFile l):= transform
+	PhoneFinderReportDelta.Layout_PhoneFinder.OtherPhones_Main_Temp trOPh(inFile l):= transform
 		self.date_file_loaded := version;
 		self.risk_indicator		:= PhoneFinderReportDelta._Functions.rmNull(l.risk_indicator);
 		self.orig_phonenumber := l.phonenumber;
@@ -18,12 +22,15 @@ EXPORT Map_OtherPhones(string8 version) := FUNCTION
 		self.phone_forwarded	:= PhoneFinderReportDelta._Functions.rmNull(l.phone_forwarded);
 		self.date_added				:= PhoneFinderReportDelta._Functions.keepNum(l.date_added)[1..8];
 		self.time_added				:= PhoneFinderReportDelta._Functions.keepNum(l.date_added)[9..];
+		self.carrier					:= PhoneFinderReportDelta._Functions.rmNull(l.carrier);
+		self.phone_star_rating:= PhoneFinderReportDelta._Functions.keepNum(l.phone_star_rating);
 		self 									:= l;
 	end;
 	
 	mapOPhMain 	:= project(inFile, trOPh(left));
 	concatFile	:= mapOPhMain + PhoneFinderReportDelta.File_PhoneFinder.OtherPhones_Main;	//DF-23286	
-	ddConcat 		:= dedup(sort(distribute(concatFile, hash(transaction_id)), transaction_id, sequence_number, -(date_added+time_added), local), transaction_id, sequence_number, local);
+  //DF-27859 keep the earliest records for delta update changes
+	ddConcat 		:= dedup(sort(distribute(concatFile, hash(transaction_id)), transaction_id, sequence_number, date_file_loaded,date_added,time_added, local), transaction_id, sequence_number, local);
 	
 	return ddConcat; 
 

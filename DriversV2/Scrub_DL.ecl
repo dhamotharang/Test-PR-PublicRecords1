@@ -1,6 +1,6 @@
 ﻿IMPORT _Control, DriversV2, Scrubs, Scrubs_DL_CT, Scrubs_DL_FL, Scrubs_DL_MA, Scrubs_DL_ME_MEDCERT, Scrubs_DL_MI, 
-        Scrubs_DL_MO_MEDCERT, Scrubs_DL_NE, Scrubs_DL_NC, Scrubs_DL_NV, Scrubs_DL_OH, Scrubs_DL_TN, Scrubs_DL_TN_CONV, 
-				Scrubs_DL_TN_WDL, Scrubs_DL_TX, Scrubs_DL_WI, Scrubs_DL_WY_MEDCERT; 
+        Scrubs_DL_MO_MEDCERT, Scrubs_DL_NE, Scrubs_DL_NC, Scrubs_DL_NV, Scrubs_DL_OH, 
+				Scrubs_DL_TN, Scrubs_DL_TN_CONV, Scrubs_DL_TN_WDL, Scrubs_DL_TX, Scrubs_DL_WI, Scrubs_DL_WY_MEDCERT; 
        //,Scrubs_DL_NC_CHG
        // ,Scrubs_DL_MO
 			 
@@ -76,7 +76,7 @@ EXPORT Scrub_DL(STRING pversion) := MODULE
 	EXPORT NE          := MAC_Scrubs_Report(pversion, 'Scrubs_DL_NE',         'In_NE',         'DL_NE');
   EXPORT NC          := MAC_Scrubs_Report(pversion, 'Scrubs_DL_NC',         'In_NC',         'DL_NC');
   EXPORT NV          := MAC_Scrubs_Report(pversion, 'Scrubs_DL_NV',         'In_NV',         'DL_NV');
-  EXPORT OH          := MAC_Scrubs_Report(pversion, 'Scrubs_DL_OH',         'In_OH',         'DL_OH');
+  EXPORT OH          := Scrubs.ScrubsPlus('OH(pversion)','Scrubs_DL_OH','Scrubs_DL_OH', '', pversion,DriversV2.Email_Notification_Lists.Stats,false);
   EXPORT TN          := MAC_Scrubs_Report(pversion, 'Scrubs_DL_TN',         'In_TN',         'DL_TN');
   EXPORT TX          := MAC_Scrubs_Report(pversion, 'Scrubs_DL_TX',         'In_TX',         'DL_TX');
   EXPORT WI          := MAC_Scrubs_Report(pversion, 'Scrubs_DL_WI',         'In_WI',         'DL_WI');

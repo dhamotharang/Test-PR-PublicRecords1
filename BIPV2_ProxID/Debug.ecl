@@ -528,7 +528,7 @@ iComp  := map( iComp1            >= MatchThreshold                              
           );
 SELF.Conf := iComp;/*HACKScoreAssignment*/
 END;
-SHARED AppendAttribs(DATASET(layout_sample_matches) am,DATASET(match_candidates(ih).layout_attribute_matches) ia) := FUNCTION
+EXPORT AppendAttribs(DATASET(layout_sample_matches) am,DATASET(match_candidates(ih).layout_attribute_matches) ia) := FUNCTION
   Layout_Sample_Matches add_attr(am le, ia ri) := TRANSFORM
     SELF.Attribute_Conf := ri.Conf;
     SELF.Matching_Attributes := ri.Source_Id;

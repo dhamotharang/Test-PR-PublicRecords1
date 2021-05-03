@@ -3,7 +3,7 @@ import LN_PropertyV2,LN_PropertyV2_Fast,doxie, ln_property, ut;
 export Key_Assessor_ParcelNum(boolean isFast = false) := FUNCTION
 
 ds := if (isFast,
-		LN_PropertyV2_Fast.CleanAssessment(LN_PropertyV2_Fast.Files.base.assessment,true),
+		LN_PropertyV2_Fast.CleanAssessment(LN_PropertyV2_Fast.Files.basedelta.assessment,true),
 		LN_PropertyV2_Fast.CleanAssessment(LN_PropertyV2.File_Assessment,false)
 		);
 

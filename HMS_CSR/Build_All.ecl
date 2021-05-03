@@ -33,7 +33,7 @@ EXPORT Build_all(string pversion, boolean pUseProd = false) := FUNCTION
 						,FileServices.StartSuperFileTransaction()
 						
 						//update ORBIT 
-						,Orbit3.Proc_Orbit3_CreateBuild_npf ('HMS_CSR',pVersion),
+						,Orbit3.Proc_Orbit3_CreateBuild('HMS_CSR',pVersion, is_npf := true),
 						
 						//Clean Up Base Files
 						FileServices.RemoveOwnedSubFiles('~thor400_data::base::hms_csr::hms_csrcredential',true),

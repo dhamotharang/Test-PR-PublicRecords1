@@ -1,4 +1,4 @@
-import Data_Services;
+﻿import Data_Services;
 
 lVINAFileBaseName := '~thor_Data400::in::VehReg_VINA_Info_';
 
@@ -42,15 +42,18 @@ VehLic.Layout_VINA tr(File_raw_VINA l) := transform
 						if(w1 in specia_case
 						,		w3+' '+w4+' '+w5
 						,w2+' '+w3+' '+w4+' '+w5));
+	//DF-28271 - Use series description if series_description_temp is blank
+	series_description_temp1:= if (series_description_temp='',trim(l.series_description, left, right),'');
 
 
 	self.model_description  := if(series_description_temp = '' and StringLib.stringfind(model_description_temp,'/', 1) <> 0 
 	                             and model_description_temp not in ['1/2 TON', '3/4 TON'], 
 	                             model_description_temp[1..StringLib.stringfind(model_description_temp,'/', 1)-1], model_description_temp);
     
+	//DF-28271 - Use series description if series_description_temp is blank
 	self.series_description := if(series_description_temp = '' and StringLib.stringfind(model_description_temp,'/', 1) <> 0 
 	                             and model_description_temp not in ['1/2 TON', '3/4 TON'], 
-	                             model_description_temp[StringLib.stringfind(model_description_temp,'/', 1)+1..],  series_description_temp);
+	                             model_description_temp[StringLib.stringfind(model_description_temp,'/', 1)+1..],  series_description_temp1);
 
 	self :=l;
 end;

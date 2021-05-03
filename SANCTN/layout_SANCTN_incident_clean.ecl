@@ -1,6 +1,7 @@
-import SANCTN, lib_stringlib;
+import SANCTN, lib_stringlib,dx_common;
 
 export layout_SANCTN_incident_clean := record
+	dx_common.layout_metadata;
 	SANCTN.layout_SANCTN_incident_in;
 	string255  incident_text := '';
 	string8    incident_date_clean := '';

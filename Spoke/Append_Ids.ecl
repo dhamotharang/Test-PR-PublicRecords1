@@ -1,4 +1,4 @@
-import Address, BIPV2, Ut, lib_stringlib, _Control, business_header,_Validate,
+﻿import Address, BIPV2, Ut, lib_stringlib, _Control, business_header,_Validate,
 Header, Header_Slimsort, didville, ut, DID_Add,Business_Header_SS,Business_HeaderV2, MDR;
 
 export Append_Ids :=
@@ -141,13 +141,15 @@ module
 			self.sec_range		:= l.Clean_Company_address.sec_range		;
 			self.state				:= l.Clean_Company_address.st						;
 			self.phone				:= l.clean_phones.Company_Phone_Number	;
-			self.bdid					:= 0																		;
-			self.bdid_score		:= 0																		;
 			self.fname				:= l.clean_contact_name.fname						;
 			self.mname				:= l.clean_contact_name.mname						;
 			self.lname				:= l.clean_contact_name.lname						;
 			self.p_city_name	:= l.clean_company_address.p_city_name	;			
-			self							:= l																		;
+			self.bdid					:= 0																		;	// Initializing the BDIDs to zero, so they get refreshed below MAC_Add_BDID_Flex call.
+			self.bdid_score		:= 0																		;
+			self							:= []																		;	// Jira# DF-27417, All the BdidSlim layout fields are mapped above except BIP fields 
+																																	// that are getting initialized to zero with this statement, so they get refreshed below MAC_Add_BDID_Flex call.
+																				
 		end;   
 		
 		dSlimForBdiding := project(dAddUniqueId, tSlimForBdiding(left));

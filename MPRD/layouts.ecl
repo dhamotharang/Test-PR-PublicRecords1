@@ -1,4 +1,4 @@
-import Address, BIPV2, AID;
+﻿import Address, BIPV2, AID;
 export layouts:=module
 	
 	export clean_name	:= RECORD
@@ -194,6 +194,7 @@ export layouts:=module
 		unsigned8 medicare_optout_st;	// added 6.6
 		string1		medicare_assign_ind;	// added 6.6
 		unsigned8 medicare_assign_ind_st;	// added 6.6
+		string1		opt_out_flag;
 		test_flag;
   end;
 		

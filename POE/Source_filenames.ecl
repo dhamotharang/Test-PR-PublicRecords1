@@ -1,4 +1,4 @@
-import corp2,jigsaw,spoke,zoom,one_click_data,teletrack,garnishments,POEsFromEmails,POEsFromUtilities,SalesChannel,thrive;
+﻿import corp2,jigsaw,spoke,zoom,one_click_data,teletrack,garnishments,POEsFromEmails,POEsFromUtilities,SalesChannel,thrive,Database_USA,DataBridge,OPM;
 
 export Source_filenames :=
 		corp2.Filenames							().Base_xtnd.Cont.dall_filenames
@@ -13,4 +13,7 @@ export Source_filenames :=
 	+	POEsFromUtilities.Filenames	().Base.dall_filenames
 	+	SalesChannel.Filenames			().Base.dall_filenames
 	+	Thrive.Filenames  					().Base.dall_filenames
+	+	Database_USA.Filenames			().Base.dall_filenames
+	+	DataBridge.Filenames				().Base.dall_filenames
+	+ OPM.Filenames								().Base.dall_filenames
 	;

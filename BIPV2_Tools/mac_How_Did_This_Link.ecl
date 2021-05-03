@@ -13,11 +13,14 @@ Examples:
 BIPV2_Tools.mac_How_Did_This_Link(87324387,'LIBERTY BAY CREDIT UNION' ,'SMITH & BRINK'                        );
 BIPV2_Tools.mac_How_Did_This_Link(29825   ,'BRITLEY'                  ,'(7[- ]11|7[- ]ELEVEN|seven[- ]eleven)');
 
-my_id       := 2301108            ;
+my_id       := 134146476918 ;//658
+regexname1  := ''           ;
+regexname2  := ''           ;
 my_id_type  := 'seleid'           ;
-regexname1  := 'ASCHER CHARITABLE';
-regexname2  := 'BARBARA J SMELEK' ;
-keyversion  := 'built'            ;
+
+#workunit('name'  ,my_id_type + ': ' + (string)my_id + ' ' + regexname1 + ',' + regexname2 + ' how did this link');
+
+keyversion  := 'qa'            ;
 
 BIPV2_Tools.mac_How_Did_This_Link(
    my_id 

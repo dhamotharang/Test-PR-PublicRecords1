@@ -1,4 +1,5 @@
 ﻿// Module contains support functions. They help to add or remove candidates from the attribute file containting underlink clusters.
+import ut;
 export ManualUnderLinks := module
 
 	export recLayout := record
@@ -17,6 +18,7 @@ export ManualUnderLinks := module
 
 	/* -- File contains ManualOverLink records -- */
 	export dataIn_file := dataset(superfile, recLayout, flat, opt);
+	export dataIn_file_prod := dataset(ut.foreign_prod + superfile[2..], recLayout, flat, opt);
 
 	/* -- UpdateUnderLinkSuperFile -- */
 	export updateUnderLinkSuperFile(string inFile) := function

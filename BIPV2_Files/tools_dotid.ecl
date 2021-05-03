@@ -179,6 +179,9 @@ EXPORT tools_dotid(dataset(l_as_linking) ds_as_linking = dataset([],l_as_linking
     self.revenue_local_derived         := if(L.revenue_local_raw='' or L.source=MDR.sourceTools.src_Dunn_Bradstreet,0,temp_revenue_local);
     self.employee_count_local_derived  := if(L.employee_count_local_raw='' or L.source=MDR.sourceTools.src_Dunn_Bradstreet,0,temp_emp_count_local);
 	  self.employee_count_org_derived    := if(L.employee_count_org_raw='' or L.source=MDR.sourceTools.src_Dunn_Bradstreet,0,temp_emp_count);
+    self.seleid_status_private_score   := 1;
+    self.seleid_status_public_score    := 1;
+    
 		self := L; 
 	end;
 	
@@ -187,7 +190,6 @@ EXPORT tools_dotid(dataset(l_as_linking) ds_as_linking = dataset([],l_as_linking
 	export dataset(l_dot) SetPrimNameDerived(dataset(l_dot) ds_in) := function
 		return BIPV2.fn_derive_pn(ds_in);
 	end;
-	
 	
 	// Set parsed company name fields and detect corporations
 	export dataset(l_dot) SetCompanyFields(dataset(l_dot) ds_in) := function
@@ -263,101 +265,33 @@ EXPORT tools_dotid(dataset(l_as_linking) ds_as_linking = dataset([],l_as_linking
 			self:=left));
 	end;
 	
-	
-	// "Helper Files" -- these files are used below to help interpret the duns_number and vl_id fields.  If the as_linking
-	// data we're processing came from prod then we need to use helpers from dataland, and if the data came from dataland
-	// then the helpers need to come from dataland.  We almost always want prod!
-	// shared const boolean build_helpers := force_build_helpers or _Control.ThisEnvironment.Name<>'Dataland';
-	
-	// pPersistname := 'thor_data400::persist::BIPV2::file_current_Duns';
-	// #IF(_Control.ThisEnvironment.Name='Prod_Thor')
-		// import dnb_dmi;
-		// pFile_DNB_Base	:= dnb_dmi.files().base.companies.qa;
-		// current_date		:= ut.GetDate;
-		// yearsold2				:= (unsigned)current_date[1..4] - 2;
-		// yrson2					:= (string)yearsold2 + current_date[5..];
-		// du							:= pFile_DNB_Base(active_duns_number = 'Y', rawfields.duns_number != '', date_last_seen>(unsigned)yrson2);
-		// export ds_active_duns := table(du,{string9 duns_number := rawfields.duns_number},rawfields.duns_number) : persist('~'+pPersistname);
-    
-    // new stuff
-    // export get_duns_numbers(pDuns_file = 'dnb_dmi.files().base.companies.qa') := 
-    // functionmacro
-      // import BIPV2_Company_Names,ut;
-      
-      // pFile_DNB_Base	:= pDuns_file;
-      // current_date		:= ut.GetDate;
-      // yearsold2				:= (unsigned)current_date[1..4] - 2;
-      // yrson2					:= (string)yearsold2 + current_date[5..];
-      // ds_dmi_slim := table(pFile_DNB_Base(rawfields.duns_number != '') ,{string9 duns_number := rawfields.duns_number,string business_name := stringlib.stringtouppercase(trim(rawfields.business_name)),string trade_style := stringlib.stringtouppercase(trim(rawfields.trade_style)),date_last_seen,active_duns_number,string record_type := DNB_DMI.Utilities.RTToText(record_type)},rawfields.duns_number,rawfields.business_name, rawfields.trade_style,date_last_seen,active_duns_number,record_type,merge);
-      // ds_dmi_norm := normalize(ds_dmi_slim  ,2,transform({string duns_number,string company_name,unsigned4 date_last_seen,string status}
-        // ,self.company_name  := if(counter = 1 ,left.business_name  ,left.trade_style) 
-        // ,self.status        := map( left.active_duns_number = 'N' or  left.record_type = 'Deleted'           => 'Deleted'  //deleted
-                                   // ,left.active_duns_number = 'Y' and left.date_last_seen<=(unsigned)yrson2  => 'Historic' //old/historic
-                                   // ,                                                                            'Active'   //active
-                               // )                                
-        // ,self := left
-      // ))(company_name != '');
-      // ds_dmi_dedup := dedup( sort(  distribute(ds_dmi_norm ,hash64(duns_number,company_name)) ,duns_number,company_name,-date_last_seen,local) ,duns_number,company_name,local);
-      // ds_dmi_rid    := project(ds_dmi_dedup ,transform({unsigned rid,recordof(left)},self.rid := 0,self := left));
-      // ut.MAC_Sequence_Records(ds_dmi_rid,rid,ds_dmi_pop_rid);
-		  // BIPV2_Company_Names.functions.mac_go(ds_dmi_pop_rid, ds_add_cnp_name, rid, company_name, false, false);
-
-      // ds_result_prep := project(ds_add_cnp_name  ,transform({string duns_number,string company_name,string cnp_name,unsigned4 date_last_seen,string status},self := left));
-
-      // ds_result := dedup( sort(  distribute(ds_result_prep ,hash64(duns_number,cnp_name)) ,duns_number,cnp_name,-date_last_seen,local) ,duns_number,cnp_name,local);
-      
-      // return ds_result;
-    
-    // endmacro;
-    
-    // pPersistname := 'thor_data400::persist::BIPV2::file_current_Duns';
-    // export ds_active_duns_new := get_duns_numbers() : persist('~'+pPersistname + '.new');
-	// #ELSE
-		// export ds_active_duns := dataset(ut.foreign_prod+pPersistname, {string9 duns_number}, thor);
-		// export ds_active_duns_new := dataset(ut.foreign_prod+pPersistname+ '.new', {string duns_number,string company_name,string date_last_seen,string status}, thor);
-	// #END
-	
+  import _Control;
 	pPersistname		:= 'thor_data400::persist::BIPV2::file_current_LNCA';
-	#IF(_Control.ThisEnvironment.Name='Prod_Thor')
+	// #IF(_Control.ThisEnvironment.Name='Prod_Thor')
 		import dcav2;
-		pFile_LNCA_Base	:= dcav2.files().base.companies.qa(record_type in [dcav2.Utilities.RecordType.Updated,dcav2.Utilities.RecordType.New]);
+    set_updated_new := [dcav2.Utilities.RecordType.Updated,dcav2.Utilities.RecordType.New];
+		pFile_LNCA_Base	:= dcav2.files().base.companies.qa(record_type in set_updated_new);
 		du							:= pFile_LNCA_Base(rawfields.enterprise_num != '');
 		export ds_active_entnum := table(du,{string9 enterprise_num := rawfields.enterprise_num},rawfields.enterprise_num) : persist('~'+pPersistname);
-	#ELSE
-		export ds_active_entnum := dataset(Data_Services.foreign_prod+pPersistname, {string9 enterprise_num}, thor);
-	#END
+	// #ELSE
+		// export ds_active_entnum := dataset(Data_Services.foreign_prod+pPersistname, {string9 enterprise_num}, thor);
+	// #END
 	
 	pPersistname		:= 'thor_data400::persist::BIPV2::file_current_SOS';
-	#IF(_Control.ThisEnvironment.Name='Prod_Thor')
+	// #IF(_Control.ThisEnvironment.Name='Prod_Thor')
 		import corp2, paw;
 		pCorpInactives	:= PAW.fCorpInactives();
 		du							:= table(pCorpInactives,{corp_key},corp_key,local);
 		export ds_DEAD_SOS := table(du,{corp_key},corp_key) : persist('~'+pPersistname);
-	#ELSE
-		import corp2, paw;
-		export ds_DEAD_SOS := dataset(Data_Services.foreign_prod+pPersistname, {string30 corp_key}, thor);
-	#END
+	// #ELSE
+		// import corp2, paw;
+		// export ds_DEAD_SOS := dataset(Data_Services.foreign_prod+pPersistname, {string30 corp_key}, thor);
+	// #END
 	
 	
-	// Source-specific field interpretations...
-/*	
-	export dataset(l_dot) SetDunsOld(dataset(l_dot) ds_in) := function
-		l_dot toDuns(l_dot L, ds_active_duns R) := transform
-			self.active_duns_number	:= R.duns_number; // either it matched or it's null (due to left outer)
-			self.hist_duns_number		:= if(R.duns_number='', L.duns_number, ''); // no-match is either Historic or not a DUNS
-			self := L;
-		end;
-		return ds_in(duns_number='') + join(
-			distribute(ds_in(duns_number<>''),hash32(duns_number)), distribute(ds_active_duns,hash32(duns_number)),
-			trim(left.duns_number) = trim(right.duns_number) and MDR.sourceTools.SourceIsDunn_Bradstreet(left.source),
-			toDuns(left,right),
-			left outer, local
-		);
-	end;
-*/
 	import BIPV2_Tools,bipv2;
   export Set_Duns := BIPV2_Tools.SetDuns;
-
+ 
 	export dataset(l_dot) SetEnterprise(dataset(l_dot) ds_in) := function
 		l_dot toEnt(l_dot L, ds_active_entnum R) := transform
 			self.active_enterprise_number	:= if(R.enterprise_num != '', R.enterprise_num, '');
@@ -625,9 +559,9 @@ EXPORT tools_dotid(dataset(l_as_linking) ds_as_linking = dataset([],l_as_linking
     
     ds_setaddr_res := table(ds_residential,{cnp_name,fname,mname,lname,contact_did,contact_job_title_raw,contact_job_title_derived},cnp_name,fname,mname,lname,contact_did,contact_job_title_raw,contact_job_title_derived,merge);
     ds_setaddr_res_name_only := table(ds_setaddr_res,{cnp_name},cnp_name,merge);
-    ds_setaddr_res_clean := project(ds_setaddr_res_name_only  ,transform({recordof(left)/*,Address.Layout_Clean_Name clean_cname*/},/*self.clean_cname := Address.CleanPersonFML73_fields(left.cnp_name).CleanNameRecord,*/self := left));
+    ds_setaddr_res_clean := project(ds_setaddr_res_name_only  ,transform({recordof(left)},self := left));
     
-    ds_joinback := join(ds_setaddr_res,ds_setaddr_res_clean,left.cnp_name = right.cnp_name,transform({recordof(left)/*,Address.Layout_Clean_Name clean_cname*/},self := right,self := left),hash);
+    ds_joinback := join(ds_setaddr_res,ds_setaddr_res_clean,left.cnp_name = right.cnp_name,transform({recordof(left)},self := right,self := left),hash);
     ds_joinback_rid := project(ds_joinback,transform({unsigned6 rid,string coname,recordof(left)},self.rid := counter,self.coname := left.cnp_name,self := left)); 
     CompanyNameAnalysis.Mac_isVanityName(ds_joinback_rid,coname,outvanity,outvanity2,rid,,pDebugOutputs);
     outvanity_persist := outvanity(vanity = true)  : persist('~persist::BIPV2_Files::tools_dotid.Set_Vanity_Owner_Did.outvanity_persist' + pPersistUnique);
@@ -659,7 +593,7 @@ EXPORT tools_dotid(dataset(l_as_linking) ds_as_linking = dataset([],l_as_linking
         
 		return withDid_out + ds_rest;
 	end;
- 
+
  // -- SetFeins -- use old base file to set feins properly by taking into account deletions/corrections
   export SetFeins(
 
@@ -674,9 +608,11 @@ EXPORT tools_dotid(dataset(l_as_linking) ds_as_linking = dataset([],l_as_linking
     
 		isDunns(string src) := (MDR.sourcetools.sourceisDunn_Bradstreet(src) or 
                             MDR.sourcetools.SourceIsDunn_Bradstreet_Fein(src));
-															
-    ds_updates_with_fein    := pDs_Fein(company_fein != '');
-    ds_updates_without_fein := pDs_Fein(company_fein  = '');
+		
+    Ds_Fein_fix := project(pDs_Fein ,transform(recordof(left),self.company_fein := if(trim(left.company_fein) not in ['999999999']  ,left.company_fein,''),self := left));
+    
+    ds_updates_with_fein    := Ds_Fein_fix(company_fein != '');
+    ds_updates_without_fein := Ds_Fein_fix(company_fein  = '');
 		
     ds_base_with_deleted_fein    := pDs_Base(deleted_fein != '' and isDunns(source));
 
@@ -848,6 +784,7 @@ EXPORT tools_dotid(dataset(l_as_linking) ds_as_linking = dataset([],l_as_linking
         (     mdr.sourceTools.SourceIsDunn_Bradstreet     (psource) 
           or  mdr.sourceTools.SourceIsInfutor_NARB        (psource) 
           or  mdr.sourceTools.SourceIsDunn_Bradstreet_Fein(psource)
+          or  mdr.sourceTools.SourceIsDataBridge          (psource) 
         ) 
         and length(trim(psic)) in [4,8]
       )
@@ -870,6 +807,37 @@ EXPORT tools_dotid(dataset(l_as_linking) ds_as_linking = dataset([],l_as_linking
 		end;
 		return project(ds_in, tCleanSIC(left));
 	end;
+  
+  
+	export dataset(l_dot) RemoveBogusNames(dataset(l_dot) ds_in) := 
+  function
+      filterexamples := ds_in(
+                            BIPV2_Tools.BogusNames.BogusNames(company_name  )
+                         // or BIPV2_Tools.BogusNames.BogusNames(dba_name     )
+                         or BIPV2_Tools.BogusNames.BogusNames(lname         )
+                         or BIPV2_Tools.BogusNames.BogusNames(mname         )
+                         or BIPV2_Tools.BogusNames.BogusNames(fname         )
+                      );
+      
+      filterout :=    ds_in(
+                          ~(BIPV2_Tools.BogusNames.BogusNames(company_name  )
+                         // or BIPV2_Tools.BogusNames.BogusNames(dba_name     )
+                         or BIPV2_Tools.BogusNames.BogusNames(lname         )
+                         or BIPV2_Tools.BogusNames.BogusNames(mname         )
+                         or BIPV2_Tools.BogusNames.BogusNames(fname         )
+                      ));
+
+      return when(filterout
+        ,parallel(
+           output(count(ds_in    )                    ,named('BIPV2_Files_tools_dotid_RemoveBogusNames_Count_In'            ))
+          ,output(count(filterout)                    ,named('BIPV2_Files_tools_dotid_RemoveBogusNames_Count_Out'           ))
+          ,output(count(ds_in    ) - count(filterout) ,named('BIPV2_Files_tools_dotid_RemoveBogusNames_Count_Removed'       ))
+          ,output(choosen(filterexamples,100)         ,named('BIPV2_Files_tools_dotid_RemoveBogusNames_FilteredOut_Examples'))
+        )
+      );
+  
+  end;
+
 	// rerun selected routines on an existing DOT file
 	export dataset(l_dot) reclean(dataset(l_dot) ds_in) := function
 		ds_cnp	:= SetCompanyFields     (ds_in    );
@@ -880,8 +848,9 @@ EXPORT tools_dotid(dataset(l_as_linking) ds_as_linking = dataset([],l_as_linking
     ds_pr		:= SetPrimRangeDerived  (ds_pn    ,'reclean');
     ds_at   := SetAddrType          (ds_pr    );
     ds_owner:= Set_Vanity_Owner_Did (ds_at    ,false,'reclean');
-    ds_sic  := SetSICNAICS          (ds_owner    );
-		return ds_sic;
+    ds_sic  := SetSICNAICS          (ds_owner );
+    ds_filt := RemoveBogusNames     (ds_sic   );
+		return ds_filt;
 	end;
 	
 	export city_samp(ds_in, st_field, city_field) := functionmacro
@@ -976,6 +945,7 @@ EXPORT tools_dotid(dataset(l_as_linking) ds_as_linking = dataset([],l_as_linking
   functionmacro
   
     ds_base := pDs_Append;
+ 
     ds_contacts     := ds_base(    fname != '' and lname != '') ;
     ds_Not_contacts := ds_base(not(fname != '' and lname != ''));
     new_layout := {unsigned6 orig_contact_did, string9 new_contact_ssn,recordof(ds_base)};
@@ -996,7 +966,7 @@ EXPORT tools_dotid(dataset(l_as_linking) ds_as_linking = dataset([],l_as_linking
 			lib_StringLib,
 			Census_Data,
 			Watchdog;
-    ds_Append_DID  		:= tools.mac_Append_DID(ds_contacts_save_did	,'fname','mname','lname','name_suffix',['prim_range'],['prim_name'],['zip'],['sec_range'],['st'],['contact_phone']
+   ds_Append_DID  		:= tools.mac_Append_DID(ds_contacts_save_did	,'fname','mname','lname','name_suffix',['prim_range'],['prim_name'],['zip'],['sec_range'],['st'],['contact_phone']
       ,'contact_did','','rcid','contact_ssn',,,'',,false);
     import did_add;    
     // Watchdog.mac_Append_Ssn(pDataset,did,subject_ssn,out_dataset,false);
@@ -1016,7 +986,7 @@ EXPORT tools_dotid(dataset(l_as_linking) ds_as_linking = dataset([],l_as_linking
     : persist('~persist::BIPV2_Files::tools_dotid.APPEND_DID.ds_return');
     
     return ds_return;
-    
+
   endmacro;
   
   export ds_redid := APPEND_DID(bipv2.CommonBase.ds_base);
@@ -1071,46 +1041,46 @@ EXPORT tools_dotid(dataset(l_as_linking) ds_as_linking = dataset([],l_as_linking
     ;
   
     return sort(ds_table,source,field);
-/*     ds_slim  := table(pDs_Append_Did,{string source := BIPV2.mod_sources.TranslateSource_aggregate(source),ingest_status,contact_did,string9 contact_ssn := new_contact_ssn,orig_contact_did,string9 orig_contact_ssn := contact_ssn});
-       ds_table := table(ds_slim ,{source,ingest_status,string field := 'contact_did',unsigned countgroup := count(group)  
-         ,unsigned total_new   := sum(group,if(contact_did != 0,1,0))  
-         ,unsigned total_old   := sum(group,if(orig_contact_did != 0,1,0))  
-         ,unsigned gained      := sum(group,if(contact_did != 0 and orig_contact_did = 0,1,0))  
-         ,unsigned lost        := sum(group,if(contact_did  = 0 and orig_contact_did != 0,1,0))  
-         ,unsigned changed     := sum(group,if(contact_did != 0 and orig_contact_did != 0 and contact_did != orig_contact_did,1,0))  
-         ,unsigned same        := sum(group,if(contact_did != 0 and orig_contact_did != 0 and contact_did  = orig_contact_did,1,0))  
-         },source,ingest_status,merge)
-         +
-       table(ds_slim ,{source,ingest_status,string field := 'contact_ssn',unsigned countgroup := count(group)  
-         ,unsigned total_new   := sum(group,if(contact_ssn != '',1,0))  
-         ,unsigned total_old   := sum(group,if(orig_contact_ssn != '',1,0))  
-         ,unsigned gained      := sum(group,if(contact_ssn != '' and orig_contact_ssn = '',1,0))  
-         ,unsigned lost        := sum(group,if(contact_ssn  = '' and orig_contact_ssn != '',1,0))  
-         ,unsigned changed     := sum(group,if(contact_ssn != '' and orig_contact_ssn != '' and contact_ssn != orig_contact_ssn,1,0))  
-         ,unsigned same        := sum(group,if(contact_ssn != '' and orig_contact_ssn != '' and contact_ssn  = orig_contact_ssn,1,0))  
-         },source,ingest_status,merge)
-         +
-       table(ds_slim ,{string source := 'Total',string9 ingest_status := '',string field := 'contact_did',unsigned countgroup := count(group)  
-         ,unsigned total_new   := sum(group,if(contact_did != 0,1,0))  
-         ,unsigned total_old   := sum(group,if(orig_contact_did != 0,1,0))  
-         ,unsigned gained      := sum(group,if(contact_did != 0 and orig_contact_did = 0,1,0))  
-         ,unsigned lost        := sum(group,if(contact_did  = 0 and orig_contact_did != 0,1,0))  
-         ,unsigned changed     := sum(group,if(contact_did != 0 and orig_contact_did != 0 and contact_did != orig_contact_did,1,0))  
-         ,unsigned same        := sum(group,if(contact_did != 0 and orig_contact_did != 0 and contact_did  = orig_contact_did,1,0))  
-         },'Total',merge)
-         +
-       table(ds_slim ,{string source := 'Total',string9 ingest_status := '',string field := 'contact_ssn',unsigned countgroup := count(group)  
-         ,unsigned total_new   := sum(group,if(contact_ssn != '',1,0))  
-         ,unsigned total_old   := sum(group,if(orig_contact_ssn != '',1,0))  
-         ,unsigned gained      := sum(group,if(contact_ssn != '' and orig_contact_ssn = '',1,0))  
-         ,unsigned lost        := sum(group,if(contact_ssn  = '' and orig_contact_ssn != '',1,0))  
-         ,unsigned changed     := sum(group,if(contact_ssn != '' and orig_contact_ssn != '' and contact_ssn != orig_contact_ssn,1,0))  
-         ,unsigned same        := sum(group,if(contact_ssn != '' and orig_contact_ssn != '' and contact_ssn  = orig_contact_ssn,1,0))  
-         },'Total',merge)
-       ;
+//      ds_slim  := table(pDs_Append_Did,{string source := BIPV2.mod_sources.TranslateSource_aggregate(source),ingest_status,contact_did,string9 contact_ssn := new_contact_ssn,orig_contact_did,string9 orig_contact_ssn := contact_ssn});
+       // ds_table := table(ds_slim ,{source,ingest_status,string field := 'contact_did',unsigned countgroup := count(group)  
+         // ,unsigned total_new   := sum(group,if(contact_did != 0,1,0))  
+         // ,unsigned total_old   := sum(group,if(orig_contact_did != 0,1,0))  
+         // ,unsigned gained      := sum(group,if(contact_did != 0 and orig_contact_did = 0,1,0))  
+         // ,unsigned lost        := sum(group,if(contact_did  = 0 and orig_contact_did != 0,1,0))  
+         // ,unsigned changed     := sum(group,if(contact_did != 0 and orig_contact_did != 0 and contact_did != orig_contact_did,1,0))  
+         // ,unsigned same        := sum(group,if(contact_did != 0 and orig_contact_did != 0 and contact_did  = orig_contact_did,1,0))  
+         // },source,ingest_status,merge)
+         // +
+       // table(ds_slim ,{source,ingest_status,string field := 'contact_ssn',unsigned countgroup := count(group)  
+         // ,unsigned total_new   := sum(group,if(contact_ssn != '',1,0))  
+         // ,unsigned total_old   := sum(group,if(orig_contact_ssn != '',1,0))  
+         // ,unsigned gained      := sum(group,if(contact_ssn != '' and orig_contact_ssn = '',1,0))  
+         // ,unsigned lost        := sum(group,if(contact_ssn  = '' and orig_contact_ssn != '',1,0))  
+         // ,unsigned changed     := sum(group,if(contact_ssn != '' and orig_contact_ssn != '' and contact_ssn != orig_contact_ssn,1,0))  
+         // ,unsigned same        := sum(group,if(contact_ssn != '' and orig_contact_ssn != '' and contact_ssn  = orig_contact_ssn,1,0))  
+         // },source,ingest_status,merge)
+         // +
+       // table(ds_slim ,{string source := 'Total',string9 ingest_status := '',string field := 'contact_did',unsigned countgroup := count(group)  
+         // ,unsigned total_new   := sum(group,if(contact_did != 0,1,0))  
+         // ,unsigned total_old   := sum(group,if(orig_contact_did != 0,1,0))  
+         // ,unsigned gained      := sum(group,if(contact_did != 0 and orig_contact_did = 0,1,0))  
+         // ,unsigned lost        := sum(group,if(contact_did  = 0 and orig_contact_did != 0,1,0))  
+         // ,unsigned changed     := sum(group,if(contact_did != 0 and orig_contact_did != 0 and contact_did != orig_contact_did,1,0))  
+         // ,unsigned same        := sum(group,if(contact_did != 0 and orig_contact_did != 0 and contact_did  = orig_contact_did,1,0))  
+         // },'Total',merge)
+         // +
+       // table(ds_slim ,{string source := 'Total',string9 ingest_status := '',string field := 'contact_ssn',unsigned countgroup := count(group)  
+         // ,unsigned total_new   := sum(group,if(contact_ssn != '',1,0))  
+         // ,unsigned total_old   := sum(group,if(orig_contact_ssn != '',1,0))  
+         // ,unsigned gained      := sum(group,if(contact_ssn != '' and orig_contact_ssn = '',1,0))  
+         // ,unsigned lost        := sum(group,if(contact_ssn  = '' and orig_contact_ssn != '',1,0))  
+         // ,unsigned changed     := sum(group,if(contact_ssn != '' and orig_contact_ssn != '' and contact_ssn != orig_contact_ssn,1,0))  
+         // ,unsigned same        := sum(group,if(contact_ssn != '' and orig_contact_ssn != '' and contact_ssn  = orig_contact_ssn,1,0))  
+         // },'Total',merge)
+       // ;
      
-       return sort(ds_table,source,ingest_status,field);
-*/
+       // return sort(ds_table,source,ingest_status,field);
+// 
     
     // return Strata.macf_CreateXMLStats (return_dataset ,'BIPV2','PrepIngest'  ,pversion	,pEmail_List	,'Stats' ,'ReDid'	,pIsTesting,pOverwrite);
     // BIPV2_Strata.mac_BIP_ID_Check(pDataset,'POWID','Preprocess',pversion,pIsTesting)

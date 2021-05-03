@@ -1,4 +1,4 @@
-﻿import Business_Header, AID_Build, ut, mdr;
+﻿import Business_Header, AID_Build, ut, mdr,bipv2_tools;
 
 EXPORT BL_Init(
 
@@ -6,7 +6,7 @@ EXPORT BL_Init(
 	//,string																pPersistname									= persistnames().BLInit
 	,string																pPersistname									= '~thor_data400::persist::BIPV2::BL_Init'
 	,boolean															pShouldRecalculatePersist			= true													
-
+  ,boolean                              pShowFilteredBogusNames       = false
 ) :=
 function
 
@@ -39,7 +39,14 @@ function
 	bad_urls := ['HTTP:','HTTP://','HTTPS://','HTTPS:','HTTP://WWW','HTTP://WWW.','HTTPS://WWW','HTTPS://WWW.','WWW','WWW.'];
 
 	//*** populate all derived fields using the BL_Tables.	
-	Layout_BL_Full SetDescFields(dAll_Sources_AceAId l) := transform 																					
+	{boolean filterout,Layout_BL_Full} SetDescFields(dAll_Sources_AceAId l) := transform 			
+      filterout                           :=    BIPV2_Tools.BogusNames.BogusNames(l.company_name      )
+                                             // or BIPV2_Tools.BogusNames.BogusNames(l.dba_name          )
+                                             or BIPV2_Tools.BogusNames.BogusNames(l.contact_name.lname)
+                                             or BIPV2_Tools.BogusNames.BogusNames(l.contact_name.mname)
+                                             or BIPV2_Tools.BogusNames.BogusNames(l.contact_name.fname)
+                                             ;
+                                             
 			boolean bad_phone 									:= if(trim(l.company_phone) in ut.set_BadPhones, true, false);
 			unsigned4 dt_first_seen_tmp					:= (unsigned4)business_header.validatedate((string8)l.dt_first_seen						,if(length(trim((string8)l.dt_first_seen						)) = 8,0,1));
 			unsigned4 dt_last_seen_tmp					:= (unsigned4)business_header.validatedate((string8)l.dt_last_seen						,if(length(trim((string8)l.dt_last_seen							)) = 8,0,1));
@@ -50,12 +57,13 @@ function
         (     mdr.sourceTools.SourceIsDunn_Bradstreet     (l.source) 
           or  mdr.sourceTools.SourceIsInfutor_NARB        (l.source) 
           or  mdr.sourceTools.SourceIsDunn_Bradstreet_Fein(l.source)
+          or  mdr.sourceTools.SourceIsDataBridge          (l.source) 
         ) 
         and length(trim(psic)) in [4,8]
       )
       or length(trim(psic)) = 4
       ;
-                                  
+      self.filterout                      := filterout                                                             ;                            
 			self.Company_name_type_derived			:= BIPV2.BL_Tables.CompanyNameTypeDesc    (l.Company_name_type_raw      );
 			self.Company_address_type_derived		:= BIPV2.BL_Tables.AddrType               (l.Company_address_type_raw   );
 			self.Company_org_structure_derived	:= BIPV2.BL_Tables.CompanyOrgStructure    (l.Company_org_structure_raw  );
@@ -65,7 +73,7 @@ function
 			self.Contact_job_title_derived			:= BIPV2.BL_Tables.ContactTitle           (l.Contact_job_title_raw      );
 			self.Contact_status_derived					:= BIPV2.BL_Tables.ContactStatus          (l.Contact_status_raw         );
 			//*** Blank out wrong length FEIN's (Valid length of FEINs is 9), as per bug# 151785
-			self.company_fein										:= if (length(stringlib.stringcleanspaces(l.company_fein)) = 9, stringlib.stringcleanspaces(l.company_fein), '');   //*** Bug: 151785 - TIN format not correct for specific example
+			self.company_fein										:= if (length(stringlib.stringcleanspaces(l.company_fein)) = 9 and trim(l.company_fein) not in ['999999999'], stringlib.stringcleanspaces(l.company_fein), '');   //*** Bug: 151785 - TIN format not correct for specific example
 			self.company_sic_code1							:= if (trim(l.company_sic_code1  ) != '' and ut.fn_valid_SICCode  (l.company_sic_code1  ) = 1 and isgoodsic   (l.company_sic_code1    ) = true, trim(l.company_sic_code1   )   ,'');
 			self.company_sic_code2							:= if (trim(l.company_sic_code2  ) != '' and ut.fn_valid_SICCode  (l.company_sic_code2  ) = 1 and isgoodsic   (l.company_sic_code2    ) = true, trim(l.company_sic_code2   )   ,'');
 			self.company_sic_code3							:= if (trim(l.company_sic_code3  ) != '' and ut.fn_valid_SICCode  (l.company_sic_code3  ) = 1 and isgoodsic   (l.company_sic_code3    ) = true, trim(l.company_sic_code3   )   ,'');
@@ -117,7 +125,7 @@ function
 	
 	dAll_Sources := project(dAll_Sources_AceAId, SetDescFields(left));
 	
-	dBizHdr_Source_Ingest := distribute(Bipv2.Filters.Input.Business_headers(dAll_Sources)): PERSIST(pPersistname);
+	dBizHdr_Source_Ingest := distribute(Bipv2.Filters.Input.Business_headers(project(dAll_Sources(filterout = false),Layout_BL_Full))): PERSIST(pPersistname);
 	
 
 /*
@@ -125,6 +133,13 @@ function
 																											, persists().BHInit
 										);
 */	
-	return dBizHdr_Source_Ingest;
+	return when(dBizHdr_Source_Ingest ,if(pShowFilteredBogusNames = true  
+                                      ,parallel(
+                                        output(count  (dAll_Sources(filterout = true )      )  ,named('CountBogusFilteredOutNames')     )
+                                       ,output(count  (dAll_Sources(filterout = false)      )  ,named('CountGoodNames'            )     )
+                                       ,output(choosen(dAll_Sources(filterout = true  ) ,300)  ,named('BogusFilteredOutNames'     ),all )
+                                      )
+                                    )
+  );
 
 end;

@@ -15,14 +15,17 @@ EXPORT map_NDS0855_conversion(STRING pVersion) := FUNCTION
 	Cmvtranslation	:= Prof_License_Mari.files_References.cmvtranslation(SOURCE_UPD =src_cd);
 	oCmvtranslation	:= OUTPUT(Cmvtranslation);
 	
-  SufxPattern         := ' JR| SR| JR.| SR.|JR,|SR,| III| II| IV| VI';		
-			
+  Sufx_Pattern      := '( SR.| SR | SR$|^SR$| JR.| JR |^JR$| JR$| III| II| IV |IV$| VI | VII)';	
+
+  //Pattern for DBA
+  DBApattern	:= '^(.*)(DBA |C/O |D B A |D/B/A |AKA |T/A )(.*)';
+
 	//Move to using
 	move_to_using				:= PARALLEL(Prof_License_Mari.func_move_file.MyMoveFile(code, 're','sprayed','using');	
 																	);
 
 	//ND input files
-	re									:= Prof_License_Mari.files_NDS0855.RE(ut.CleanSpacesAndUpper(ORG_NAME) NOT IN ['','NAME'] AND
+	re									:= Prof_License_Mari.files_NDS0855.RE(NOT REGEXFIND(Prof_License_Mari.filters.BadNameFilter, StringLib.StringToUppercase(TRIM(LAST_NAME,LEFT,RIGHT)))  AND
 	                                                          LICSTAT<>'');
 	oRe									:= OUTPUT(re);
 
@@ -83,33 +86,84 @@ EXPORT map_NDS0855_conversion(STRING pVersion) := FUNCTION
 
 		SELF.TYPE_CD					:= 'MD';
 		
-    TrimOrgName           := ut.CleanSpacesAndUpper(L.ORG_NAME);
+    // TrimOrgName           := ut.CleanSpacesAndUpper(L.ORG_NAME);
+		TrimFirstName         := ut.CleanSpacesAndUpper(L.First_NAME);
+		TrimLastName          := ut.CleanSpacesAndUpper(L.Last_NAME);
+		TrimMidName           := ut.CleanSpacesAndUpper(L.Mid_NAME);
+		
+		
 		TrimOfficeName        := ut.CleanSpacesAndUpper(L.OFFICENAME);
 		TrimFirmName          := ut.CleanSpacesAndUpper(L.fname);
 
 		TrimAddress1          := ut.CleanSpacesAndUpper(L.ADDRESS1);
-		TrimCityStZip         := ut.CleanSpacesAndUpper(L.CITYSTZIP);
-		
+		TrimCity              := ut.CleanSpacesAndUpper(L.CITY);
+		TrimState             := ut.CleanSpacesAndUpper(L.STATE);
+		TrimZip               := ut.CleanSpacesAndUpper(L.ZIP);
+
 		//Remove nickname. Parse name using F M. and L, Sx. pattern
-		tmpNick_Name          := IF(REGEXFIND('^(.*) AKA ([A-Z]+)\\s(.*)$', TrimOrgName),REGEXFIND('^(.*) AKA ([A-Z]+)\\s(.*)$', TrimOrgName,2,NOCASE),Prof_License_Mari.fGetNickname(TrimOrgName,'nick'));		
-		rmv_NickName          := MAP(REGEXFIND('^(.*) AKA ([A-Z]+)\\s(.*)$', TrimOrgName) => REGEXFIND('^(.*) AKA ([A-Z]+)\\s(.*)$', TrimOrgName,1,NOCASE) + ' ' + REGEXFIND('^(.*) AKA ([A-Z]+)\\s(.*)$', TrimOrgname,3,NOCASE),
-		                             Prof_License_Mari.fGetNickname(L.ORG_NAME,'nick') != '' => Prof_License_Mari.fGetNickname(TrimOrgName,'strip_nick'),
-																 TrimOrgName);
-    
-		tmpSufxName           := IF(REGEXFIND(SufxPattern,rmv_NickName),REGEXFIND(SufxPattern,rmv_NickName,0),'');
-    stripSufxName         := IF(REGEXFIND(SufxPattern,rmv_NickName),REGEXREPLACE(SufxPattern,rmv_NickName,''),rmv_NickName);
 		
-		TmpLastName           := IF(REGEXFIND('^(.*), (.*)',stripSufxName),REGEXFIND('^(.*), (.*)',stripSufxName,1),'');
-		ClnNameFull           := Address.CleanPersonLFM73(stripSufxName);
-		CleanNameFull         := IF(LENGTH(TRIM(ClnNameFUll[6..25]))<2 OR LENGTH(TRIM(ClnNameFUll[46..65]))<2 OR TRIM(ClnNameFULL[46..65])!=TRIM(TmpLastName),NID.CleanPerson73(stripSufxName),ClnNameFull);		
+			// If individual AND NOT identified as a corporation names, parse into (FMLS) fmt
+		TrimNAME_LAST			:= IF(L.LAST_NAME = 'NULL','',ut.CleanSpacesAndUpper(L.LAST_NAME));
+		TmpNAME_LAST			:= IF(REGEXFIND(Sufx_Pattern,TrimNAME_LAST),REGEXREPLACE(Sufx_Pattern,TrimNAME_LAST,''),TrimNAME_LAST);
 	
-		//Parse name
-		SELF.NAME_FIRST			  := TRIM(CleanNameFull[6..25],LEFT,RIGHT);
-  	SELF.NAME_MID				  := TRIM(CleanNameFull[26..45],LEFT,RIGHT);	
-		SELF.NAME_LAST				:= TRIM(CleanNameFull[46..65],LEFT,RIGHT);
-		SELF.NAME_SUFX				:= IF(tmpSufxName !='',TRIM(tmpSufxName,LEFT,RIGHT),TRIM(StringLib.StringToUpperCase(CleanNameFull[66..70]),LEFT,RIGHT));
-		SELF.NAME_NICK				:= TRIM(tmpNick_Name,LEFT,RIGHT);
-		SELF.NAME_ORG         := StringLib.StringCleanSpaces(SELF.NAME_LAST+' '+SELF.NAME_FIRST);
+		TrimNAME_FIRST		:= IF(L.FIRST_NAME = 'NULL','',ut.CleanSpacesAndUpper(L.FIRST_NAME));
+		TmpNAME_FIRST 		:= IF(REGEXFIND(Sufx_Pattern,TrimNAME_FIRST),REGEXREPLACE(Sufx_Pattern,TrimNAME_FIRST,''),TrimNAME_FIRST);
+
+		TrimNAME_MID			:= IF(L.MID_NAME = 'NULL','',ut.CleanSpacesAndUpper(L.MID_NAME));
+		TmpNAME_MID 			:= IF(REGEXFIND(Sufx_Pattern,TrimNAME_MID),REGEXREPLACE(Sufx_Pattern,TrimNAME_MID,''),TrimNAME_MID);
+
+		// TrimNAME_FULL     := ut.CleanSpacesAndUpper(L.FULLNAME);
+		// TmpNAME_FULL 			:= IF(REGEXFIND(Sufx_Pattern,TrimNAME_FULL),REGEXREPLACE(Sufx_Pattern,TrimNAME_FULL,''),TrimNAME_FULL);
+		
+		TrimNAME_SUFX			:= ut.CleanSpacesAndUpper(L.SUFFIX_NAME);
+		TmpSuffix         := MAP(REGEXFIND(Sufx_Pattern,TrimNAME_LAST)=>TRIM(REGEXFIND(Sufx_Pattern,TrimNAME_LAST,0),LEFT,RIGHT),
+														 REGEXFIND(Sufx_Pattern,TrimNAME_MID)=>TRIM(REGEXFIND(Sufx_Pattern,TrimNAME_MID,0),LEFT,RIGHT),
+														 REGEXFIND(Sufx_Pattern,TrimNAME_FIRST)=>TRIM(REGEXFIND(Sufx_Pattern,TrimNAME_FIRST,0),LEFT,RIGHT),
+														 // REGEXFIND(Sufx_Pattern,TrimNAME_FULL)=>TRIM(REGEXFIND(Sufx_Pattern,TrimNAME_FULL,0),LEFT,RIGHT),
+														 TrimNAME_SUFX);
+		
+		// Identify NICKNAME IN the various format 
+		tempFNick							:= Prof_License_Mari.fGetNickname(TmpNAME_FIRST,'nick');
+		tempLNick							:= Prof_License_Mari.fGetNickname(TmpNAME_LAST,'nick');
+		tempMNick							:= Prof_License_Mari.fGetNickname(TmpNAME_MID,'nick');
+		// tempFullNick          := Prof_License_Mari.fGetNickname(TmpNAME_FULL,'nick');
+		
+		removeFNick						:= Prof_License_Mari.fGetNickname(TmpNAME_FIRST,'strip_nick');
+		removeLNick						:= Prof_License_Mari.fGetNickname(TmpNAME_LAST,'strip_nick');
+		removeMNick						:= Prof_License_Mari.fGetNickname(TmpNAME_MID,'strip_nick');
+		// removeFullNick        := Prof_License_Mari.fGetNickname(TmpNAME_FULL,'strip_nick');
+
+		stripNickFName				:= StringLib.StringCleanSpaces(Prof_License_Mari.mod_clean_name_addr.strippunctName(removeFNick));
+		stripNickLName				:= StringLib.StringCleanSpaces(Prof_License_Mari.mod_clean_name_addr.strippunctName(removeLNick));
+		stripNickMName				:= StringLib.StringCleanSpaces(Prof_License_Mari.mod_clean_name_addr.strippunctName(removeMNick));
+		// stripNickFullName			:= StringLib.StringCleanSpaces(Prof_License_Mari.mod_clean_name_addr.strippunctName(removeFullNick));
+		
+		GoodFullName					:= ut.CleanSpacesAndUpper(stripNickLName + ' ' +  stripNickFName + ' ' + stripNickMName);
+		ParsedName						:= Prof_License_Mari.mod_clean_name_addr.cleanLFMName(GoodFullName);			
+		re_ParsedName         := IF(LENGTH(TRIM(ParsedName[46..65]))<2 and NID.CleanPerson73(GoodFullName) <> '',NID.CleanPerson73(GoodFullName),ParsedName);		
+						
+		GoodFirstName					:= IF(TmpNAME_LAST != '' AND tempFNick != '',stripNickFName,
+															 IF(TmpNAME_LAST != '' AND tempFNick = '',TmpNAME_FIRST,
+															 TRIM(re_ParsedName[6..25],LEFT,RIGHT)));
+		GoodMidName   				:= IF(TmpNAME_LAST != '' AND tempMNick != '',stripNickMName,
+															 IF(TmpNAME_MID != '' AND tempMNick = '',TmpNAME_MID,			                           
+															 TRIM(re_ParsedName[26..45],LEFT,RIGHT)));													 
+		GoodLastName					:= IF(TmpNAME_LAST != '' AND tempLNick != '',stripNickLName,
+															 IF(TmpNAME_LAST != '' AND tempLNick = '',TmpNAME_LAST,
+															 TRIM(re_ParsedName[46..65],LEFT,RIGHT)));		
+		ConcatNAME_FULL 			:= StringLib.StringCleanSpaces(GoodLastName +' '+GoodFirstName);
+	
+		SELF.NAME_ORG_PREFX		:= '';
+		SELF.NAME_ORG		 			:= ConcatNAME_FULL;
+		SELF.NAME_ORG_SUFX	  := '';
+		SELF.NAME_FIRST		   	:= GoodFirstName;
+		SELF.NAME_MID					:= Stringlib.stringFilterOut(GoodMidName,'.');
+		SELF.NAME_LAST		   	:= GoodLastName;
+		SELF.NAME_NICK				:= MAP(TmpNAME_LAST != '' AND tempFNick != '' => StringLib.StringCleanSpaces(tempFNick),
+																 TmpNAME_LAST != '' AND tempLNick != '' => StringLib.StringCleanSpaces(tempLNick),
+																 TmpNAME_LAST != '' AND tempMNick != '' => StringLib.StringCleanSpaces(tempMNick),
+																 '');
+		SELF.NAME_SUFX				:= TRIM(TmpSuffix,LEFT,RIGHT);		
 		SELF.LICENSE_NBR	   	:= 'NR';
 		SELF.LICENSE_STATE	 	:= src_st;
 		SELF.RAW_LICENSE_STATUS	:= ut.CleanSpacesAndUpper(L.LICSTAT);
@@ -129,7 +183,10 @@ EXPORT map_NDS0855_conversion(STRING pVersion) := FUNCTION
 		SELF.DISP_TYPE_CD			:= IF(SELF.RAW_LICENSE_STATUS IN ['R','REVOKED'], 'R','');
 		
 		//Fix the last name if the parser return a 1 character last name
-		stdOfficeName					:= IF(TrimFirmName = ' ',Prof_License_Mari.mod_clean_name_addr.StdCorpSuffix(TrimOfficeName),TrimOfficeName);
+	  getCorpOnly				    := IF(REGEXFIND(DBApattern, TrimOfficeName), Prof_License_Mari.mod_clean_name_addr.GetCorpName(TrimOfficeName)
+													      ,TrimOfficeName);		 //get names without DBA names																
+		stdOfficeName					:= IF(TrimFirmName = ' ',Prof_License_Mari.mod_clean_name_addr.StdCorpSuffix(getCorpOnly),getCorpOnly);
+								
 		clnOfficeName					:= IF(REGEXFIND('(.COM|.NET|.ORG)',StdOfficeName),Prof_License_Mari.mod_clean_name_addr.cleanInternetName(StdOfficeName),
 		                            StringLib.StringCleanSpaces(Prof_License_Mari.mod_clean_name_addr.strippunctName(stdOfficeName)));
 		SELF.NAME_OFFICE			:= MAP(REGEXFIND(' COMPANY',clnOfficeName) => REGEXREPLACE(' COMPANY',clnOfficeName,' CO'),
@@ -152,12 +209,12 @@ EXPORT map_NDS0855_conversion(STRING pVersion) := FUNCTION
 																 '17530101');
 		
 		SELF.ADDR_BUS_IND			:= IF(TRIM(TrimAddress1) != ' ','B',' ');
-		SELF.NAME_ORG_ORIG		:= TrimOrgName;
+		SELF.NAME_ORG_ORIG		:= ut.CleanSpacesAndUpper(L.last_name) + ', ' + ut.CleanSpacesAndUpper(L.first_name) + ' ' + ut.CleanSpacesAndUpper(L.mid_name);
 		SELF.NAME_FORMAT			:= 'L';						//Name format changed from F to L starting from 20140529
 		SELF.NAME_MARI_ORG		:= IF(TRIM(SELF.NAME_OFFICE) != ' ',TRIM(SELF.NAME_OFFICE,LEFT,RIGHT),' ');
 		
 		//Clean address to parse out city, state, zip
-		ClnAddress	:= Prof_License_Mari.mod_clean_name_addr.cleanAddress(TrimAddress1, TrimCityStZip);
+		ClnAddress	:= Prof_License_Mari.mod_clean_name_addr.cleanAddress(TrimAddress1, TrimCity + ' ' + TrimState + ' ' + TrimZip);
 		SELF.ADDR_ADDR1_1			:= StringLib.StringCleanSpaces(TRIM(ClnAddress[1..10],LEFT,RIGHT)+' '+TRIM(ClnAddress[11..12],LEFT,RIGHT)+' '
 															+TRIM(ClnAddress[13..40],LEFT,RIGHT)+' '+TRIM(ClnAddress[41..44],LEFT,RIGHT)+' '
 															+TRIM(ClnAddress[45..46],LEFT,RIGHT));
@@ -194,7 +251,9 @@ EXPORT map_NDS0855_conversion(STRING pVersion) := FUNCTION
 													 + SELF.std_source_upd
 												   + SELF.NAME_ORG_ORIG
 												   + ut.CleanSpacesAndUpper(TrimAddress1)
-													 + ut.CleanSpacesAndUpper(TrimCityStZip);
+													 + ut.CleanSpacesAndUpper(TrimCity)
+													 + ut.CleanSpacesAndUpper(TrimState)
+													 + ut.CleanSpacesAndUpper(TrimZip);
 
  		tmpCmcSlpk_1					:= REGEXREPLACE(x'00',tmpCmcSlpk,'');
    	tmpCmcSlpk_2					:= REGEXREPLACE(x'0a',tmpCmcSlpk_1,'');

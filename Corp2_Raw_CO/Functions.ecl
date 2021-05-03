@@ -1,4 +1,4 @@
-IMPORT corp2, corp2_mapping, corp2_raw_co;
+﻿IMPORT corp2, corp2_mapping, corp2_raw_co;
 
 EXPORT Functions := Module
 
@@ -11,7 +11,7 @@ EXPORT Functions := Module
 
 		RETURN map(uc_s in ['CS','CU'] 																													=> 'D',
 							 uc_s in ['DC55','DC55-PBC','DC56','DC56-PBC'] 																=> 'D',
-							 uc_s in ['DLCA','DLLC','DLLLP','DLLP','DLP','DLPA']													=> 'D',
+							 uc_s in ['DLCA','DLCA-PBC','DLLC','DLLLP','DLLP','DLP','DLPA']								=> 'D',
 							 uc_s in ['DNC','DNCDT','DNCIC','DNCSL','DNCWC']															=> 'D',
 							 uc_s in ['DPC','DPCCU','DPCDT','DPCIC','DPC-PBC','DPC-PBC','DPCSL','DPCWC']	=> 'D',
 							 uc_s in ['DT'] 																															=> 'D',
@@ -45,6 +45,7 @@ EXPORT Functions := Module
 								'DC56'			=>'DOMESTIC CO-OP (STATUE 56)',
 								'DC56-PBC'	=>'COOPERATIVE-PUBLIC BENEFIT CORPORATION',
 								'DLCA'			=>'LIMITED COOPERATIVE ASSOCIATION',
+								'DLCA-PBC'	=>'LIMITED COOPERATIVE ASSOCIATION-PUBLIC BENEFIT CORPORATION',
 								'DLLC'			=>'DOMESTIC LIMITED LIABILITY COMPANY',
 								'DLLLP'			=>'DOMESTIC LIMITED LIABILITY LIMITED PARTNERSHIP',
 								'DLLP'			=>'DOMESTIC LIMITED LIABILITY PARTNERSHIP',

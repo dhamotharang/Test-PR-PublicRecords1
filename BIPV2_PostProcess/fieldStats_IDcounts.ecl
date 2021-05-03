@@ -1,9 +1,11 @@
-
+﻿
 import strata, BIPV2_Files,BIPv2_HRCHY,BIPV2,SALT28,ut;
 
 EXPORT fieldStats_IDcounts(
 
-   dataset(BIPV2.CommonBase.layout ) pInfile  = BIPV2.CommonBase.DS_CLEAN
+   dataset(BIPV2.CommonBase.layout ) pInfile        = BIPV2.CommonBase.DS_CLEAN
+  ,dataset(BIPV2.CommonBase.layout ) pInfileFather  = bipv2.CommonBase.DS_LOCAL_STATIC_CLEAN
+   
 
 ) := module
 
@@ -146,7 +148,7 @@ export XTabProxIDsInHrchy  := choosen(sort(xtabs,-nodes_total),1000);
 
 
 
-old0 := project(bipv2.CommonBase.DS_LOCAL_STATIC_CLEAN/*during the build this will contain the previous base file*/,transform(bipv2.CommonBase.layout,self := left,self := []));//change to static so it works when we change the layout, but project to new layout//the old header is the one in the superfile this time.  the new one is just now building cuz we are inside the build.
+old0 := project(pInfileFather/*during the build this will contain the previous base file*/,transform(bipv2.CommonBase.layout,self := left,self := []));//change to static so it works when we change the layout, but project to new layout//the old header is the one in the superfile this time.  the new one is just now building cuz we are inside the build.
 new := pInfile;
 old := if(count(new) < 100000, choosen(old0, count(new)), old0);//this line just allows me to test on a smaller dataset.  assumes in new has < 100k, then we are testing.
 

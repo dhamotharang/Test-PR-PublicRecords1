@@ -1,6 +1,5 @@
-﻿/*2005-05-26T17:10:28Z (Dave QI)
-layout change
-*/
+﻿IMPORT dx_common;
+
 export Layout_Patriot := 
 RECORD
 	STRING10 pty_key;
@@ -83,8 +82,7 @@ RECORD
 	STRING7 geo_blk;
 	STRING1 geo_match;
 	STRING4 err_stat;
-	//Added for CCPA-393
-	UNSIGNED4 global_sid;
-	UNSIGNED8 record_sid;
+	//DF-28226 - fields defined for delta build
+	dx_common.layout_metadata;
 	UNSIGNED6 did;
 END;

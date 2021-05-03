@@ -13,6 +13,7 @@
   ,boolean  pOnline       = true
   ,boolean  pArchived     = false
   ,string   pesp          = WsWorkunits._Config.LocalEsp
+  ,boolean  pUseGlobal    = true
 ) := 
 function
 
@@ -60,8 +61,24 @@ function
     
   ));
 
-  
-  return ds_WuidList;
+  ds_WuidList2 := project(ds_norm,transform(WsWorkunits.Layouts.WsWorkunitRecord,
+    self.wuid           := left.wuid;
+    self.owner          := left.owner;
+    self.cluster        := left.cluster;
+    self.roxiecluster   := left.roxiecluster;
+    self.job            := left.jobname;
+    self.state          := left.state;
+    self.priority       := '';//not sure yet how this maps
+    self.priorityvalue  := 0;//not sure how this maps
+    self.created        := '';
+    self.modified       := '';
+    self.online         := ~left.Archived;
+    self.protected      := left.protected;
+    
+  ));
+
+ 
+  return if(pUseGlobal  = true  ,ds_WuidList  ,ds_WuidList2);
 
 end;
 

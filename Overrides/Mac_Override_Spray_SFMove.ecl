@@ -18,15 +18,15 @@ macro
 	// after spraying header add datetime to each record
 		#uniquename(new_rec)
 		%new_rec% := record
-			fcra.Layout_Override_Header;
-			string date_created := '';
+			fcra.Layout_Override_Header_In;
+			//string date_created := '';
 		end;
 		
 		#uniquename(headerds)
-		%headerds% := dataset('~thor_data400::in::override::fcra::'+filedate+'::'+datasetname+'::withoutdatetime',fcra.Layout_Override_Header,csv(separator('\t'),quote('\"'),terminator('\r\n')),opt);
+		%headerds% := dataset('~thor_data400::in::override::fcra::'+filedate+'::'+datasetname+'::withoutdatetime',fcra.Layout_Override_Header_In - [date_created],csv(separator('\t'),quote('\"'),terminator('\r\n')),opt);
 		
 		#uniquename(get_create_date)
-		%new_rec% %get_create_date%(fcra.Layout_Override_Header l) := transform
+		%new_rec% %get_create_date%(fcra.Layout_Override_Header_In - [date_created] l) := transform
 			self.date_created :=  ut.GetDate + ut.getTime();
 			self := l;
 		end;

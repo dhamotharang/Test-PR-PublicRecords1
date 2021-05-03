@@ -1,4 +1,4 @@
-EXPORT Layouts_GA_raw := module
+﻿EXPORT Layouts_GA_raw := module
 
 export aa := record                           
    string License_No;      
@@ -22,18 +22,25 @@ end  ;
 
 export medraw := 
 record                             
-   string  Client;                 
+//   string  Client;                 
    string  Full_Name;              
-   string  License;                
-   string  Expiration;             
-   string  Address_1;              
-   string  Address_2;              
-   string  City;                   
-   string  State;                  
-   string  ZIP;                    
+   string  LicenseType;
+   string  License;  
    string  Status;                 
    string  Date_of_First_License;  
+   string  Expiration; 
    string  Designation;            
+   string  Address_1;              
+   string  Address_2; 
+   string  Address_3;              
+   string  Address_4;              
+
+   string  City;                   
+   string  State;                  
+   string  ZIP;
+  string County;
+  // string  Status;                 
+  // string  Designation;            
    string  Speciality;             
    string  PBO;                    
    string  PBDate;                 

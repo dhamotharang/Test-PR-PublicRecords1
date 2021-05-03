@@ -70,11 +70,11 @@ Email_Data.Layout_Email.Base t_map_to_common (domain_d pInput) := transform
 	
 	self.Date_Vendor_First_Reported :=  (string8)pInput.date_vendor_first_reported;
 	self.Date_Vendor_Last_Reported  := (string8)pInput.date_vendor_last_reported;
-	self.append_email_username 						:= stringlib.stringtouppercase(Fn_Clean_Email_Username(self.orig_email));
-	self.append_domain 										:= stringlib.stringtouppercase(pInput.domain);
-	self.append_domain_type 								:= stringlib.stringtouppercase(pInput.domain_type);
-	self.append_domain_root 								:= stringlib.stringtouppercase(pInput.domain_root);
-	self.append_domain_ext 								:= stringlib.stringtouppercase(pInput.domain_ext);
+	self.append_email_username 						:= ut.CleanSpacesAndUpper(Fn_Clean_Email_Username(self.orig_email));
+	self.append_domain 										:= ut.CleanSpacesAndUpper(Email_Data.Fn_Clean_Email_Domain(pInput.domain));
+	self.append_domain_type 								:= ut.CleanSpacesAndUpper(pInput.domain_type);
+	self.append_domain_root 								:= ut.CleanSpacesAndUpper(pInput.domain_root);
+	self.append_domain_ext 								:= ut.CleanSpacesAndUpper(pInput.domain_ext);
 	self.append_is_tld_state								:= pInput.is_tld_state;
 	self.append_is_tld_generic 						:= pInput.is_tld_generic;
 	self.append_is_tld_country 						:= pInput.is_tld_country;

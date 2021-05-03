@@ -1,32 +1,24 @@
-﻿import tools, std;
+﻿import $, dx_Cortera_Tradeline, tools;
 
 lay_builds 	:= tools.Layout_FilenameVersions.builds;
+lay_inputs	:= tools.Layout_FilenameVersions.Inputs;
 
 export Promote(
 
 	 string								pversion				= 	''
 	,string								pFilter					= 	''
-	,boolean							pDelete					= 	false
+	,boolean							pDelete					= 	true
 	,boolean							pIsTesting			= 	false
-	,dataset(lay_builds)	pBuildFilenames = 	$.keynames	(pversion).dAll_filenames
-) := module
-	
-	//export inputfiles	:= tools.mod_PromoteInput(pversion,pInputFilenames,pFilter,pDelete,pIsTesting);
-	export buildfiles	:= tools.mod_PromoteBuild(pversion,pBuildFilenames,pFilter,pDelete,pIsTesting);
-	
-	shared set of string	GetSFList(string sfBase) := [
-							sfBase,
-							sfBase+'::father',
-							sfBase+'::grandfather',
-							sfBase+'::delete'];
+	,boolean							pClearSFile			=		true
+	,boolean							pIsDeltaBuild		=		false
+	,dataset(lay_inputs)	pInputFilenames = 	$.Filenames	(pversion).Input.dAll_filenames
+	,dataset(lay_builds)	pBuildFilenames = 	$.Filenames	(pversion).Base.dAll_filenames
+																					+ dx_Cortera_Tradeline.keynames	(pversion).dAll_filenames
 
-	export sfBase := '~thor::cortera::tradeline';
-	export sfAdds := '~thor::cortera::tradeline_adds';
-	export sfDels := '~thor::cortera::tradeline_dels';
+) :=
+module
 	
-	export PromoteBase(string lfn) := NOTHOR(Std.File.PromoteSuperFileList(GetSFList(sfBase), lfn, true));
-	export PromoteAdds(string lfn) := NOTHOR(Std.File.PromoteSuperFileList(GetSFList(sfAdds), lfn, true));
-	export PromoteDels(string lfn) := NOTHOR(Std.File.PromoteSuperFileList(GetSFList(sfDels), lfn, true));
-	
+	export inputfiles	:= tools.mod_PromoteInput(pversion,pInputFilenames,pFilter,pDelete,pIsTesting);
+	export buildfiles	:= tools.mod_PromoteBuild(pversion,pBuildFilenames,pFilter,pDelete,pIsTesting,,pClearSFile,,,,,pIsDeltaBuild);	
 
 end;

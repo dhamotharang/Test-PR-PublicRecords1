@@ -1,50 +1,74 @@
-import doxie, tools;
+﻿IMPORT doxie, tools, dx_FraudDefenseNetwork;
 
-export Keys(
-	 string pversion = ''
-   ,dataset(Layouts.Base.Main)		      pBaseMainBuilt		  =	Files(pversion).Base.Main.Built	
+EXPORT Keys(STRING pversion = '',
+            DATASET(Layouts.Base.Main) pBaseMainBuilt =	Files(pversion).Base.Main.Built) := MODULE
 
-) := module
-  shared pFileKeybuild           := FraudDefenseNetwork.File_KeyBuild(pBaseMainBuilt);
-	shared pFileKeyFDNMasterID     := FraudDefenseNetwork.File_FDNMasterIDBuild.FDNMasterID;
-  shared pFileKeyFDNMasterIDExcl := FraudDefenseNetwork.File_FDNMasterIDBuild.FDNMasterIDExcl;
- 	shared BaseMain                := project(pFileKeybuild, FraudDefenseNetwork.Layouts_Key.Main);
-	shared BaseMain_DID            := BaseMain(DID != 0);
-	shared BaseMain_BDID           := BaseMain(BDID != 0);
-	shared BaseMbs                 := BaseMain(classification_Permissible_use_access.fdn_file_info_id != 0);
-  shared BaseMain_Email          := BaseMain(Email_Address != '');
-	shared BaseMain_Ip             := BaseMain(IP_Address != '');
-	shared BaseMain_ProfessionalID := BaseMain(Professional_ID != '');
-	shared BaseMain_DeviceID       := BaseMain(Device_ID != '');
-	shared BaseMain_TIN            := BaseMain(TIN != '');
-	shared BaseMain_NPI            := BaseMain(NPI != '');
-	shared BaseMain_AppProviderID  := BaseMain(Appended_Provider_ID != 0);
-	shared BaseMain_LNPID          := BaseMain(LNPID != 0);
-	shared MbsGcExclusion          := project(Files().Input.MbsGcIdExclusion.Sprayed ,Layouts_Key.MbsGcIdExclusion) ; 
-	shared MbsIndTypExclusion      := project(Files().Input.MbsIndtypeExclusion.Sprayed,Layouts_Key.MbsindtypeExclusion) ;  
-	shared MbsProdutInclude        := project(Files().Input.MbsProductInclude.Sprayed,Layouts_Key.MbsProductInclude) ;  
-	shared MbsFDNMasterID          := project(pFileKeyFDNMasterID,Layouts_Key.FDNMasterID);  
-	shared MbsFDNMasterIDExcl      := project(pFileKeyFDNMasterIDExcl,Layouts_Key.MbsFdnMasterIdExcl);  
+  SHARED pFileKeybuild           				:= File_KeyBuild(pBaseMainBuilt);
+  EXPORT BaseMain           						:= PROJECT(pFileKeybuild, TRANSFORM({RECORD,MAXLENGTH(60000) dx_FraudDefenseNetwork.Layouts.Main, UNSIGNED8 __internal_fpos__:=0 END}
+																									,SELF.county	:=	IF(LEFT.clean_address.fips_county='' OR REGEXFIND('E',LEFT.clean_address.fips_county,NOCASE),LEFT.county,LEFT.clean_address.fips_county)
+																									,SELF					:= LEFT)
+																									);
+  SHARED pFileKeyFDNMasterID     				:= File_FDNMasterIDBuild.FDNMasterID;
+  SHARED pFileKeyFDNMasterIDExcl 				:= File_FDNMasterIDBuild.FDNMasterIDExcl;
+	SHARED pFileKeyFDNMasterIDIndTypIncl 	:= File_FDNMasterIDBuild.FdnmasterIdIndTypIncl;
+	
+	EXPORT BaseMain_ID             := PROJECT(BaseMain, TRANSFORM(dx_FraudDefenseNetwork.Layouts.ID,
+																													      SELF := LEFT;
+																													      ));
+	EXPORT BaseMain_DID            := PROJECT(BaseMain(DID <> 0), TRANSFORM(dx_FraudDefenseNetwork.Layouts.DID,
+																													                SELF.entity_type_id := LEFT.classification_Entity.Entity_type_id;
+																													                SELF.entity_sub_type_id := LEFT.classification_Entity.Entity_sub_type_id;
+																																					SELF := LEFT;
+																													                ));
+	SHARED BaseMbs                 := BaseMain(classification_Permissible_use_access.fdn_file_info_id <> 0);
+  EXPORT BaseMain_Email          := PROJECT(BaseMain(Email_Address <> ''), TRANSFORM(dx_FraudDefenseNetwork.Layouts.EMAIL,
+																													                           SELF.entity_type_id := LEFT.classification_Entity.Entity_type_id;
+																													                           SELF.entity_sub_type_id := LEFT.classification_Entity.Entity_sub_type_id;
+																																					           SELF := LEFT;
+																													                           ));
+	EXPORT BaseMain_Ip             := PROJECT(BaseMain(IP_Address <> ''), TRANSFORM(dx_FraudDefenseNetwork.Layouts.IP,
+																													                        SELF.entity_type_id := LEFT.classification_Entity.Entity_type_id;
+																													                        SELF.entity_sub_type_id := LEFT.classification_Entity.Entity_sub_type_id;
+																																					        SELF := LEFT;
+																													                        ));
+	EXPORT BaseMain_ProfessionalID := PROJECT(BaseMain(Professional_ID <> ''), TRANSFORM(dx_FraudDefenseNetwork.Layouts.PROFESSIONALID,
+																													                             SELF.entity_type_id := LEFT.classification_Entity.Entity_type_id;
+																													                             SELF.entity_sub_type_id := LEFT.classification_Entity.Entity_sub_type_id;
+																																					             SELF := LEFT;
+																													                             ));
+	EXPORT BaseMain_DeviceID       := PROJECT(BaseMain(Device_ID <> ''), TRANSFORM(dx_FraudDefenseNetwork.Layouts.DEVICEID,
+																													                       SELF.entity_type_id := LEFT.classification_Entity.Entity_type_id;
+																													                       SELF.entity_sub_type_id := LEFT.classification_Entity.Entity_sub_type_id;
+																																					       SELF := LEFT;
+																													                       ));
+	EXPORT BaseMain_TIN            := PROJECT(BaseMain(TIN <> ''), TRANSFORM(dx_FraudDefenseNetwork.Layouts.TIN,
+																													                 SELF.entity_type_id := LEFT.classification_Entity.Entity_type_id;
+																													                 SELF.entity_sub_type_id := LEFT.classification_Entity.Entity_sub_type_id;
+																																		       SELF := LEFT;
+																													                 ));
+																																					 
+	EXPORT BaseMain_NPI            := PROJECT(BaseMain(NPI <> ''), TRANSFORM(dx_FraudDefenseNetwork.Layouts.NPI,
+																													                 SELF.entity_type_id := LEFT.classification_Entity.Entity_type_id;
+																													                 SELF.entity_sub_type_id := LEFT.classification_Entity.Entity_sub_type_id;
+																																		       SELF := LEFT;
+																													                 ));
+	EXPORT BaseMain_AppProviderID  := PROJECT(BaseMain(Appended_Provider_ID <> 0), TRANSFORM(dx_FraudDefenseNetwork.Layouts.APP_PROVIDERID,
+																													                                 SELF.entity_type_id := LEFT.classification_Entity.Entity_type_id;
+																													                                 SELF.entity_sub_type_id := LEFT.classification_Entity.Entity_sub_type_id;
+																																		                       SELF := LEFT;
+																													                                 ));
+	EXPORT BaseMain_LNPID          := PROJECT(BaseMain(LNPID <> 0), TRANSFORM(dx_FraudDefenseNetwork.Layouts.LNPID,
+																													                  SELF.entity_type_id := LEFT.classification_Entity.Entity_type_id;
+																													                  SELF.entity_sub_type_id := LEFT.classification_Entity.Entity_sub_type_id;
+																																		        SELF := LEFT;
+																													                  ));
+	EXPORT BaseMain_LINKIDs        := PROJECT(BaseMain(ULTID > 0), TRANSFORM(dx_FraudDefenseNetwork.Layouts.LINKIDS,
+																			                                     SELF := LEFT;
+																			                                     SELF := [];
+																													                 ));
+	EXPORT MbsIndTypExclusion      := PROJECT(Files().Input.MbsIndtypeExclusion.Sprayed, dx_FraudDefenseNetwork.Layouts.MBS_INDTYPE_EXCLUSION)(status=1);  
+	EXPORT MbsProdutInclude        := PROJECT(Files().Input.MbsProductInclude.Sprayed, dx_FraudDefenseNetwork.Layouts.MBS_PRODUCT_INCLUDE)(status=1);  
+	EXPORT MbsFDNMasterID          := PROJECT(pFileKeyFDNMasterID, dx_FraudDefenseNetwork.Layouts.MBS_FDN_MASTERID);  
+	EXPORT MbsFDNMasterIDExcl      := PROJECT(pFileKeyFDNMasterIDExcl,  dx_FraudDefenseNetwork.Layouts.MBS_FDN_MASTERID_EXCL);  
 
- export Main := module
-		tools.mac_FilesIndex('BaseMain,{record_id, UID},{BaseMain}',KeyNames(pversion).Main.ID,ID);
-		tools.mac_FilesIndex('BaseMain_DID,{DID , classification_Entity.Entity_type_id, classification_Entity.Entity_sub_type_id},{record_id , UID}',KeyNames(pversion).Main.DID,DID);
-		tools.mac_FilesIndex('BaseMain_BDID,{BDID , classification_Entity.Entity_type_id, classification_Entity.Entity_sub_type_id},{record_id , UID}',KeyNames(pversion).Main.BDID,BDID);
-	  tools.mac_FilesIndex('BaseMain_Email,{Email_Address , classification_Entity.Entity_type_id, classification_Entity.Entity_sub_type_id},{record_id , UID}',KeyNames(pversion).Main.email,email);
-	  tools.mac_FilesIndex('BaseMain_Ip,{IP_Address , classification_Entity.Entity_type_id, classification_Entity.Entity_sub_type_id},{record_id , UID}',KeyNames(pversion).Main.IP,IP);
-	  tools.mac_FilesIndex('BaseMain_ProfessionalID,{Professional_ID , classification_Entity.Entity_type_id, classification_Entity.Entity_sub_type_id},{record_id , UID}',KeyNames(pversion).Main.ProfessionalID,ProfessionalID);
-	  tools.mac_FilesIndex('BaseMain_DeviceID,{Device_ID , classification_Entity.Entity_type_id, classification_Entity.Entity_sub_type_id},{record_id , UID}',KeyNames(pversion).Main.DeviceID,DeviceID);
-	  tools.mac_FilesIndex('BaseMain_TIN,{TIN , classification_Entity.Entity_type_id, classification_Entity.Entity_sub_type_id},{record_id , UID}',KeyNames(pversion).Main.TIN,TIN);
-	  tools.mac_FilesIndex('BaseMain_NPI,{NPI , classification_Entity.Entity_type_id, classification_Entity.Entity_sub_type_id},{record_id , UID}',KeyNames(pversion).Main.NPI,NPI);
-	  tools.mac_FilesIndex('BaseMain_AppProviderID,{Appended_Provider_ID , classification_Entity.Entity_type_id, classification_Entity.Entity_sub_type_id},{record_id , UID}',KeyNames(pversion).Main.AppProviderID,AppProviderID);
-	  tools.mac_FilesIndex('BaseMain_LNPID,{LNPID , classification_Entity.Entity_type_id, classification_Entity.Entity_sub_type_id},{record_id , UID}',KeyNames(pversion).Main.LNPID,LNPID);
-    // MBS exclusions 
-		tools.mac_FilesIndex('BaseMbs,{classification_Permissible_use_access.fdn_file_info_id},{record_id , UID}',KeyNames(pversion).Main.Mbs,Mbs);
-    tools.mac_FilesIndex('MbsGcExclusion,{fdn_file_info_id},{MbsGcExclusion}',KeyNames(pversion).Main.MbsGcIdExclusion,MbsGcIdExclusion);
-    tools.mac_FilesIndex('MbsIndTypExclusion,{fdn_file_info_id},{MbsIndTypExclusion}',KeyNames(pversion).Main.MbsIndTypeExclusion,MbsIndTypeExclusion);
-	  tools.mac_FilesIndex('MbsProdutInclude,{fdn_file_info_id},{MbsProdutInclude}',KeyNames(pversion).Main.MbsProductInclude,MbsProductInclude);
-	  tools.mac_FilesIndex('MbsFDNMasterID,{gc_id},{MbsFDNMasterID}',KeyNames(pversion).Main.MbsFDNMasterID,MbsFDNMasterIDKey);
-	  tools.mac_FilesIndex('MbsFDNMasterIDExcl,{fdn_file_info_id},{MbsFDNMasterIDExcl}',KeyNames(pversion).Main.MbsFDNMasterIDExcl,MbsFDNMasterIDExclKey);
-
-	end; 	
-end;
+END;

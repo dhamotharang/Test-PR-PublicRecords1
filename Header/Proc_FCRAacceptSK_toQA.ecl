@@ -26,7 +26,7 @@ all_keys := sequential(
 
 											,out7
 											,out8
-											,if(isFull,out9)
+											,out9
 											,out10
 											,out11
 											);

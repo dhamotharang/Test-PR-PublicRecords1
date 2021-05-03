@@ -1,8 +1,8 @@
-EXPORT SoapcallTroy() := FUNCTION
+﻿EXPORT SoapcallTroy() := FUNCTION
   IMPORT doxie;
   #OPTION('soapTraceLevel', '8');
 
-  STRING remoteIP     := 'http://roxieqavip.br.seisint.com:9876';
+  STRING remoteIP     := 'http://certstagingvip.hpcc.risk.regn.net:9876';
   STRING ServiceName  := 'doxie.Troy_Service';
 
   string5 Zip1 := '' : stored('Zip1');

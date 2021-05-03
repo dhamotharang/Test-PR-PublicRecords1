@@ -2,50 +2,69 @@
 
 EXPORT Build_Marketing_Stats (
 
-   pversion             = 'bipv2.KeySuffix'                                           // -- build date
-  ,pToday               = 'bipv2.KeySuffix_mod2.MostRecentWithIngestVersionDate'      // -- in case you want to run as of a date in the past.  default to date of newest data.
-  ,pCurrentSprint       = '\'\''                                                      // -- Sprint #. Default will use the pversion to figure it out, but you can override that here.
-  ,pKeyLinkidsMarketing = 'BIPV2.Key_BH_Linking_Ids.kFetch2_thor(,,,true,,\'built\')' // -- Linkids key filtered for only marketing sources.  Uses the 'built' version by default because that contains the latest one in the build.
+   pversion             = 'bipv2.KeySuffix'                                             // -- build date
+  ,pToday               = 'bipv2.KeySuffix_mod2.MostRecentWithIngestVersionDate'        // -- in case you want to run as of a date in the past.  default to date of newest data.
+  ,pCurrentSprint       = '\'\''                                                        // -- Sprint #. Default will use the pversion to figure it out, but you can override that here.
+  ,pKeyLinkidsMarketing = 'BIPV2.Key_BH_Linking_Ids.kFetch2_thor(,,,true,,\'built\')'   // -- Linkids key filtered for only marketing sources.  Uses the 'built' version by default because that contains the latest one in the build.
+  ,pKeyLinkidsFull      = 'BIPV2.Key_BH_Linking_Ids.kFetch2_thor(,,,false,,\'built\')'  // -- Linkids key filtered for only marketing sources.  Uses the 'built' version by default because that contains the latest one in the build.
+  ,pBIP_Clean_Base      = 'BIPV2.commonbase.ds_clean'                                   // -- clean base file(contacts new status score fields).  to use to recalc gold the new way.
 
 ) := 
 functionmacro
 
-  import BIPV2_PostProcess,STD,BIPV2;
+  import BIPV2_PostProcess,STD,BIPV2,BIPV2_Statuses;
 
   CurrentSprint := if(trim(pCurrentSprint) != '' 
                       ,pCurrentSprint
-                      ,'Sprint ' + BIPV2.KeySuffix_mod2.SprintNumber(pversion)
+                      ,'Sprint ' + (string)BIPV2.KeySuffix_mod2.SprintNumber(pversion)
                    );
 
-  ds_linkids_marketing := project(pKeyLinkidsMarketing  ,transform(BIPV2.CommonBase.layout,self := left,self := []))
-    : persist('~persist::BIPV2_PostProcess::Build_Marketing_Stats::ds_linkids_marketing');
+  ds_linkids_marketing_prep := project(pKeyLinkidsMarketing  ,transform(BIPV2.CommonBase.layout,self := left,self := []));
+  ds_linkids_full_prep      := project(pKeyLinkidsFull       ,transform(BIPV2.CommonBase.layout,self := left,self := []));
+
+  // full base file contains new status score fields.  need these to calculate new gold
+  // sele_gold does not contain new value for gold though, so that needs to be calculated
   
+  // -- calc new gold on base file with all records.
+  ds_bip_base       := BIPV2_Statuses.mac_Calculate_Gold(pBIP_Clean_Base);
+  ds_bip_base_slim  := table(ds_bip_base  ,{seleid,sele_gold} ,seleid,sele_gold ,merge);
+
+  // -- patch new gold onto marketing and full linkids datasets.  don't need scores for marketing data fill rates yet
+  ds_linkids_marketing := join(ds_linkids_marketing_prep  ,ds_bip_base_slim(sele_gold = 'G')  ,left.seleid = right.seleid ,transform(recordof(left),self.sele_gold := if(right.seleid != 0  ,'G',''),self := left)  ,left outer,hash) : persist('~persist::BIPV2_PostProcess::Build_Marketing_Stats::ds_linkids_marketing'  );
+  ds_linkids_full      := join(ds_linkids_full_prep       ,ds_bip_base_slim(sele_gold = 'G')  ,left.seleid = right.seleid ,transform(recordof(left),self.sele_gold := if(right.seleid != 0  ,'G',''),self := left)  ,left outer,hash) : persist('~persist::BIPV2_PostProcess::Build_Marketing_Stats::ds_linkids_full'       );
+
   #UNIQUENAME(ProxFree)
   #UNIQUENAME(PowFree )
   #UNIQUENAME(SeleFree)
+  #UNIQUENAME(SeleFreeGold)
   #UNIQUENAME(OrgFree )
   #UNIQUENAME(ProxProb)
   #UNIQUENAME(PowProb )
   #UNIQUENAME(SeleProb)
+  #UNIQUENAME(SeleProbGold)
   #UNIQUENAME(OrgProb )
   
   BIPV2_PostProcess.macPartition(ds_linkids_marketing, ProxID, %ProxFree%, %ProxProb%)
   BIPV2_PostProcess.macPartition(ds_linkids_marketing, POWID,  %PowFree%,  %PowProb% )
   BIPV2_PostProcess.macPartition(ds_linkids_marketing, SELEID, %SeleFree%, %SeleProb%)
+  BIPV2_PostProcess.macPartition(ds_linkids_full     , SELEID, %SeleFreeGold%, %SeleProbGold%)
   BIPV2_PostProcess.macPartition(ds_linkids_marketing, OrgID,  %OrgFree%,  %OrgProb% )
 
   // Gold Segmentation
-  modgoldSELEV2_marketing      := BIPV2_PostProcess.segmentation_gold (%SeleFree% ,'SELEID'   ,pToday ,'_V2_BIPV2_PostProcess__Build_Marketing_Stats');
-  modProxV2_marketing          := BIPV2_PostProcess.segmentation      (%ProxFree% ,'PROXID'   ,pToday       );
-  modPowV2_marketing           := BIPV2_PostProcess.segmentation      (%PowFree%  ,'POWID'    ,pToday       );
-  modSeleV2_marketing          := BIPV2_PostProcess.segmentation      (%SeleFree% ,'SELEID'   ,pToday       );
-  modorgV2_marketing           := BIPV2_PostProcess.segmentation      (%OrgFree%  ,'ORGID'    ,pToday       );
+  modgoldSELEV2_marketing      := BIPV2_PostProcess.segmentation_gold (%SeleFreeGold% ,'SELEID'   ,pToday ,'_V2_BIPV2_PostProcess__Build_Marketing_Stats' );
+  modProxV2_marketing          := BIPV2_PostProcess.segmentation      (%ProxFree% ,'PROXID'   ,pToday                                                 );
+  modPowV2_marketing           := BIPV2_PostProcess.segmentation      (%PowFree%  ,'POWID'    ,pToday                                                 );
+  modSeleV2_marketing          := BIPV2_PostProcess.segmentation      (%SeleFree% ,'SELEID'   ,pToday                                                 );
+  modorgV2_marketing           := BIPV2_PostProcess.segmentation      (%OrgFree%  ,'ORGID'    ,pToday                                                 );
+
+  ds_recalcd_gold := project(modgoldSELEV2_marketing._gold,    transform(BIPV2_PostProcess.layouts.laysegmentation, self := left, self.inactive := left.inactives[1].inactive, self := []));
+  ds_get_orig_gold := join(ds_recalcd_gold  ,table(%SeleFree%(sele_gold = 'G') ,{seleid} ,seleid ,merge)  ,left.ID = right.seleid ,transform(recordof(left),self := left)  ,hash ,keep(1));
 
   Proxstats_marketing          := BIPV2_PostProcess.fieldstats_prox  (pversion  ,ds_linkids_marketing ,modProxV2_marketing.result);
   Powstats_marketing           := BIPV2_PostProcess.fieldstats_pow   (pversion  ,ds_linkids_marketing ,modPowV2_marketing.result );
   Selestats_marketing          := BIPV2_PostProcess.fieldstats_sele  (pversion  ,ds_linkids_marketing ,modSeleV2_marketing.result);
   orgstats_marketing           := BIPV2_PostProcess.fieldstats_org   (pversion  ,ds_linkids_marketing ,modOrgV2_marketing.result );
-  SelestatsGold_marketing      := BIPV2_PostProcess.fieldstats_sele  (pversion  ,ds_linkids_marketing ,pSegStats := project(modgoldSELEV2_marketing._gold,    transform(BIPV2_PostProcess.layouts.laysegmentation, self := left, self.inactive := left.inactives[1].inactive, self := [])));
+  SelestatsGold_marketing      := BIPV2_PostProcess.fieldstats_sele  (pversion  ,ds_linkids_marketing ,pSegStats := ds_get_orig_gold);
 
   // activeStats_prox           := output(Proxstats.active_fieldStats         , named('V2_FieldStats_Active_PROX'           ));
   // activeStats_pow            := output(Powstats.active_fieldStats          , named('V2_FieldStats_Active_POW'            ));
@@ -57,18 +76,18 @@ functionmacro
   // inactiveStats_sele         := output(Selestats.inactive_fieldStats       , named('V2_FieldStats_Inactive_SELE'         ));
   // inactiveStats_org          := output(orgstats.inactive_fieldStats        , named('V2_FieldStats_Inactive_ORG'          ));
 
-  V2FieldStatsActivePROX_marketing	    :=Proxstats_marketing.active_fieldStats     ; 
-  V2FieldStatsInactivePROX_marketing    :=Proxstats_marketing.inactive_fieldStats   ; 
-   
-  V2FieldStatsActivePOW_marketing	      :=Powstats_marketing.active_fieldStats      ; 
-  V2FieldStatsInactivePOW_marketing     :=Powstats_marketing.inactive_fieldStats    ; 
-
-  V2FieldStatsActiveSELE_marketing	    :=Selestats_marketing.active_fieldStats     ; 
-  V2FieldStatsInactiveSELE_marketing    :=Selestats_marketing.inactive_fieldStats   ; 
-  V2FieldStatsActiveSELEGold_marketing  :=SelestatsGold_marketing.active_fieldStats ;
-
-  V2FieldStatsActiveORG_marketing	      :=orgstats_marketing.active_fieldStats      ; 
-  V2FieldStatsInactiveORG_marketing	    :=orgstats_marketing.inactive_fieldStats    ; 
+  V2FieldStatsActivePROX_marketing	    :=  Proxstats_marketing.active_fieldStats     ; 
+  V2FieldStatsInactivePROX_marketing    :=  Proxstats_marketing.inactive_fieldStats   ; 
+    
+  V2FieldStatsActivePOW_marketing	      :=  Powstats_marketing.active_fieldStats      ; 
+  V2FieldStatsInactivePOW_marketing     :=  Powstats_marketing.inactive_fieldStats    ; 
+  
+  V2FieldStatsActiveSELE_marketing	    :=  Selestats_marketing.active_fieldStats     ; 
+  V2FieldStatsInactiveSELE_marketing    :=  Selestats_marketing.inactive_fieldStats   ; 
+  V2FieldStatsActiveSELEGold_marketing  :=  SelestatsGold_marketing.active_fieldStats ;
+  
+  V2FieldStatsActiveORG_marketing	      :=  orgstats_marketing.active_fieldStats      ; 
+  V2FieldStatsInactiveORG_marketing	    :=  orgstats_marketing.inactive_fieldStats    ; 
 
   PAM	:=  V2FieldStatsActivePROX_marketing      [1];
   PIM :=  V2FieldStatsInactivePROX_marketing    [1];
@@ -96,7 +115,7 @@ functionmacro
   Data_Fill_Rates_marketing :=dataset([
      {'Current Build Fill Rates for Marketing','','','','','','','','','','','','','','','','','','','',''}
     ,{BIPV2_PostProcess.FormatDate(pVersion),'PROXID','','SELEID','','','ORGID','','POWID','','',                                         '','PROXID','','SELEID','','','ORGID','','POWID',''}
-    ,{'','Active','Inactive','Active','Inactive','Act Gold','Active','Inactive','Active','Inactive','',      '','Active','Inactive','Active','Inactive','Act Gold','Active','Inactive','Active','Inactive'}
+    ,{''               ,'Active'                      ,'Inactive'                     ,'Active'                       ,'Inactive'                     ,'Act Gold'                     ,'Active'                       ,'Inactive'                     ,'Active'                       ,'Inactive'                    ,'' ,''               ,'Active'                ,'Inactive'              ,'Active'                ,'Inactive'              ,'Act Gold'              ,'Active'                ,'Inactive'              ,'Active'                ,'Inactive'              }
     ,{'Address','','','','','','','','','','','Address','','','','','','','','',''}
     ,{'Street'         ,PAM.prim_name          /PATM  ,PIM.prim_name           /PITM  ,SAM.prim_name           /SATM  ,SIM.prim_name           /SITM  ,SGM.prim_name           /SGTM  ,OAM.prim_name           /OATM  ,OIM.prim_name           /OITM  ,WAM.prim_name           /WATM  ,WIM.prim_name          /WITM  ,'' ,'Street'         ,PAM.prim_name           ,PIM.prim_name           ,SAM.prim_name           ,SIM.prim_name           ,SGM.prim_name           ,OAM.prim_name           ,OIM.prim_name           ,WAM.prim_name           ,WIM.prim_name           }
     ,{'City'           ,PAM.v_city_name        /PATM  ,PIM.v_city_name         /PITM  ,SAM.v_city_name         /SATM  ,SIM.v_city_name         /SITM  ,SGM.v_city_name         /SGTM  ,OAM.v_city_name         /OATM  ,OIM.v_city_name         /OITM  ,WAM.v_city_name         /WATM  ,WIM.v_city_name        /WITM  ,'' ,'City'           ,PAM.v_city_name         ,PIM.v_city_name         ,SAM.v_city_name         ,SIM.v_city_name         ,SGM.v_city_name         ,OAM.v_city_name         ,OIM.v_city_name         ,WAM.v_city_name         ,WIM.v_city_name         }
@@ -116,7 +135,7 @@ functionmacro
     ,{'Ticker'         ,PAM.company_ticker     /PATM  ,PIM.company_ticker      /PITM  ,SAM.company_ticker      /SATM  ,SIM.company_ticker      /SITM  ,SGM.company_ticker      /SGTM  ,OAM.company_ticker      /OATM  ,OIM.company_ticker      /OITM  ,WAM.company_ticker      /WATM  ,WIM.company_ticker     /WITM  ,'' ,'Ticker'         ,PAM.company_ticker      ,PIM.company_ticker      ,SAM.company_ticker      ,SIM.company_ticker      ,SGM.company_ticker      ,OAM.company_ticker      ,OIM.company_ticker      ,WAM.company_ticker      ,WIM.company_ticker      }
     ,{'URL'            ,PAM.company_url        /PATM  ,PIM.company_url         /PITM  ,SAM.company_url         /SATM  ,SIM.company_url         /SITM  ,SGM.company_url         /SGTM  ,OAM.company_url         /OATM  ,OIM.company_url         /OITM  ,WAM.company_url         /WATM  ,WIM.company_url        /WITM  ,'' ,'URL'            ,PAM.company_url         ,PIM.company_url         ,SAM.company_url         ,SIM.company_url         ,SGM.company_url         ,OAM.company_url         ,OIM.company_url         ,WAM.company_url         ,WIM.company_url         }
 
-    ,{'WU: ' + workunit  ,'','','','','','','','','','','Totals:',PATM, PITM, SATM, SITM, SGTM, OATM, OITM, WATM, WITM}
+    ,{'WU: '+workunit  ,''                            ,''                             ,''                             ,''                             ,''                             ,''                             ,''                             ,''                             ,''                           ,''  ,'Totals:'        ,PATM                    ,PITM                    ,SATM                    ,SITM                    ,SGTM                    ,OATM                    ,OITM                    ,WATM                    ,WITM                    }
     ,{CurrentSprint,'','','','','','','','','','','','','','','','','','','',''}
     ,{'Build: ' + pVersion,'','','','','','','','','','','','','','','','','','','',''}
   ],BIPV2_PostProcess.layouts.Data_Fill_Rates);

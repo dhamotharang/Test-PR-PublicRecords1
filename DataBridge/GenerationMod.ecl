@@ -3,7 +3,7 @@ IMPORT SALT311;
 EXPORT GenerationMod := MODULE(SALT311.iGenerationMod)
  
   // SALT Version info
-  EXPORT salt_VERSION := 'V3.11.1';
+  EXPORT salt_VERSION := 'V3.11.8';
   EXPORT salt_MODULE := 'SALT311'; // Optional override by HACK:SALTMODULE
   EXPORT salt_TOOLSMODULE := 'SALTTOOLS30'; // Optional override by HACK:SALTTOOLSMODULE
  
@@ -22,7 +22,7 @@ EXPORT GenerationMod := MODULE(SALT311.iGenerationMod)
   EXPORT spc_FILENAME := 'Base';
   EXPORT spc_INGESTSTATUS := '';
   EXPORT spc_EXTERNAL_MAPPING := 'UniqueID:record_sid';
-  EXPORT spc_EXTERNAL_BATCH_PARAM := ',/* MY_seleid */,dt_first_seen,dt_last_seen,dt_vendor_first_reported,dt_vendor_last_reported,process_date,dotid,dotscore,dotweight,empid,empscore,empweight,powid,powscore,powweight,proxid,proxscore,proxweight,selescore,seleweight,orgid,orgscore,orgweight,ultid,ultscore,ultweight,record_type,global_sid,clean_company_name,clean_telephone_num,mail_score_desc,name_gender_desc,title_desc_1,title_desc_2,title_desc_3,title_desc_4,sic8_desc_1,sic8_desc_2,sic8_desc_3,sic8_desc_4,sic6_desc_1,sic6_desc_2,sic6_desc_3,sic6_desc_4,sic6_desc_5,name,company,address,address2,city,state,scf,zip,zip4,mail_score,area_code,telephone_number,name_gender,name_prefix,name_first,name_middle_initial,name_last,suffix,title_code_1,title_code_2,title_code_3,title_code_4,web_address,sic8_1,sic8_2,sic8_3,sic8_4,sic6_1,sic6_2,sic6_3,sic6_4,sic6_5,email,email_present_flag,site_source1,site_source2,site_source3,site_source4,site_source5,site_source6,site_source7,site_source8,site_source9,site_source10,individual_source1,individual_source2,individual_source3,individual_source4,individual_source5,individual_source6,individual_source7,individual_source8,individual_source9,individual_source10,email_status,title,fname,mname,lname,name_score,prim_range,predir,prim_name,addr_suffix,postdir,unit_desig,sec_range,p_city_name,v_city_name,st,cart,cr_sort_sz,lot,lot_order,dbpc,chk_digit,rec_type,fips_state,fips_county,geo_lat,geo_long,msa,geo_blk,geo_match,err_stat,raw_aid,ace_aid,prep_address_line1,prep_address_line_last';
+  EXPORT spc_EXTERNAL_BATCH_PARAM := ',/* MY_seleid */,dt_first_seen,dt_last_seen,dt_vendor_first_reported,dt_vendor_last_reported,process_date,dotid,dotscore,dotweight,empid,empscore,empweight,powid,powscore,powweight,proxid,proxscore,proxweight,selescore,seleweight,orgid,orgscore,orgweight,ultid,ultscore,ultweight,record_type,global_sid,clean_company_name,clean_telephone_num,mail_score_desc,name_gender_desc,title_desc_1,title_desc_2,title_desc_3,title_desc_4,sic8_desc_1,sic8_desc_2,sic8_desc_3,sic8_desc_4,sic6_desc_1,sic6_desc_2,sic6_desc_3,sic6_desc_4,sic6_desc_5,name,company,address,address2,city,state,scf,zip_code5,zip_code4,mail_score,area_code,telephone_number,name_gender,name_prefix,name_first,name_middle_initial,name_last,suffix,title_code_1,title_code_2,title_code_3,title_code_4,web_address,sic8_1,sic8_2,sic8_3,sic8_4,sic6_1,sic6_2,sic6_3,sic6_4,sic6_5,email,email_present_flag,site_source1,site_source2,site_source3,site_source4,site_source5,site_source6,site_source7,site_source8,site_source9,site_source10,individual_source1,individual_source2,individual_source3,individual_source4,individual_source5,individual_source6,individual_source7,individual_source8,individual_source9,individual_source10,email_status,title,fname,mname,lname,name_score,prim_range,predir,prim_name,addr_suffix,postdir,unit_desig,sec_range,p_city_name,v_city_name,st,zip,zip4,cart,cr_sort_sz,lot,lot_order,dbpc,chk_digit,rec_type,fips_state,fips_county,geo_lat,geo_long,msa,geo_blk,geo_match,err_stat,raw_aid,ace_aid,prep_address_line1,prep_address_line_last';
   EXPORT spc_HAS_TWOSTEP := FALSE;
   EXPORT spc_HAS_PARTITION := FALSE;
   EXPORT spc_HAS_FIELDTYPES := FALSE;
@@ -98,8 +98,8 @@ EXPORT GenerationMod := MODULE(SALT311.iGenerationMod)
     + 'FIELD:city:0,0\n'
     + 'FIELD:state:0,0\n'
     + 'FIELD:scf:0,0\n'
-    + 'FIELD:zip:0,0\n'
-    + 'FIELD:zip4:0,0\n'
+    + 'FIELD:zip_code5:0,0\n'
+    + 'FIELD:zip_code4:0,0\n'
     + 'FIELD:mail_score:0,0\n'
     + 'FIELD:area_code:0,0\n'
     + 'FIELD:telephone_number:0,0\n'
@@ -161,6 +161,8 @@ EXPORT GenerationMod := MODULE(SALT311.iGenerationMod)
     + 'FIELD:p_city_name:DERIVED:0,0\n'
     + 'FIELD:v_city_name:DERIVED:0,0\n'
     + 'FIELD:st:DERIVED:0,0\n'
+    + 'FIELD:zip:DERIVED:0,0\n'
+    + 'FIELD:zip4:DERIVED:0,0\n'
     + 'FIELD:cart:DERIVED:0,0\n'
     + 'FIELD:cr_sort_sz:DERIVED:0,0\n'
     + 'FIELD:lot:DERIVED:0,0\n'

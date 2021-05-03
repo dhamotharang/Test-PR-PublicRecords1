@@ -1,4 +1,4 @@
-import versioncontrol, _control, ut, Roxiekeybuild,lib_stringlib;
+﻿import versioncontrol, _control, ut, Roxiekeybuild,lib_stringlib,scrubs_diversity_certification,scrubs, Diversity_Certification;
 
 export Build_All(string	pversion ,string fileDate) := module
 		export spray_files 		:= fSprayFiles(fileDate);
@@ -40,14 +40,17 @@ export Build_All(string	pversion ,string fileDate) := module
 																					,InputSF_prebuild2
 																					,InputSF_prebuild3
 																				 );
-		dops_update 					:= Roxiekeybuild.updateversion('DiversityCertKeys',pVersion,'saritha.myana@lexisnexis.com'); 															
+		run_scrubs						:= scrubs_Diversity_Certification.fn_RunScrubs(pversion, Diversity_Certification.Email_Notification_Lists.BuildFailure);
+		dops_update 					:= Roxiekeybuild.updateversion('DiversityCertKeys',pVersion,'saritha.myana@lexisnexis.com');														
 									
 		export full_build 	  := sequential( nothor(apply(filenames().Base.dAll_filenames, apply(dSuperfiles, versioncontrol.mUtilities.createsuper(name))))
 																				,nothor(apply(filenames().Input.dAll_superfilenames, versioncontrol.mUtilities.createsuper(name)))
 																				,CreateTempKeyBuildIfNotExist
 																				,spray_files
 																				,PreBuild
-																				,Build_KeyBuild_File
+																				,run_scrubs
+																				,if(scrubs.mac_ScrubsFailureTest('Scrubs_Diversity_Certification_Input',pversion),
+																				sequential(Build_KeyBuild_File
 																				,KeyBuild_main
 																				,Build_Base_File
 																				,Proc_Build_AutoKeys(pversion)
@@ -59,6 +62,7 @@ export Build_All(string	pversion ,string fileDate) := module
 																				,output(choosen(Files().keybuildSF(bdid<>0) , 1000), named ('keybuild_SampleRecords'))
 																				,output(choosen(Files().Base.qa(bdid<>0) , 1000), named ('BaseFile_SampleRecords'))
 																				,dops_update
+																				),OUTPUT('Scrubs Failed due to reject warning(s)',NAMED('Scrubs_Failure')))
 																				) : success(send_email(pversion).buildsuccess), failure(send_email(pversion).buildfailure);
    
 		export All := if( VersionControl.IsValidVersion(pversion)

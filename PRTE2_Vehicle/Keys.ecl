@@ -1,4 +1,4 @@
-import ut, std, nid, doxie, prte2_vehicle, BIPv2, AutoStandardI, mdr;
+﻿import ut, std, nid, doxie, prte2_vehicle, BIPv2, AutoStandardI, mdr;
 
 EXPORT Keys := module
 
@@ -87,23 +87,7 @@ export bocashell_vehicles := index(dedup(file_bocashell_vehicles,all), {did}, {f
 dsPartySeq := project(files.Party_Building, layouts.source_rec);
 export Source_Rec_ID := index(dsPartySeq(source_rec_id <>0 ), {source_rec_id}, {dsPartySeq}, Constants.key_prefix + doxie.Version_SuperKey + '::source_rec_id');
 
-
-party_linkids_rec := record
-recordof(files.party_clean_sequence);
-string70	std_lienholder_name;
-end;
-
-//Party Linkids
-party_linkid_prj := project(files.Party_Clean_Sequence, transform({recordof(files.party_clean_sequence),string70	std_lienholder_name},
-																																		self.std_lienholder_name := if(left.Orig_Name_Type = '7',left.Append_Clean_CName,'');
-																																		self := left));
-
-export Party_Key_Linkids	:=	index(party_linkid_prj,
-																								{Vehicle_Key, iteration_key, sequence_key}, {party_linkid_prj},
-																								Constants.key_prefix + doxie.Version_SuperKey + '::party_Key::linkids');
-																								
-
-
+																					
 //Linkids 
 export linkids := module
  BipParty := project(files.party_building, transform({recordof(Files.party_building)} -[SRC_FIRST_DATE, SRC_LAST_DATE], self := left));

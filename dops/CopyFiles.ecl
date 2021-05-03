@@ -138,7 +138,9 @@ EXPORT CopyFiles(string srcesp
 									+ if (usecredentials
 											,' username=' + dUserCreds[1].username + ' password='+ dUserCreds[1].password
 											,''
-											);
+											)
+									+ ' transferbuffersize=10000000 ';
+										
 
 			self := l;
 		end;

@@ -1,6 +1,70 @@
-IMPORT NAC;
+﻿IMPORT NAC, Std;
 EXPORT fn_ReNormalizeCollisions_1(DATASET(Nac.Layouts.Collisions) c) := FUNCTION
 
+string uc(string s) := Std.Str.ToUpperCase(s);
+
+Layout_Slim := RECORD
+
+	unsigned1 pri:=0
+	,string6 matchset:=''
+	,string10 MatchCodes
+	,unsigned6 LexID:=0
+	,string30 SearchLastName
+	,string25 SearchFirstName
+	,string25 SearchMiddleName
+	//,string5 SearchSuffixName := ''
+	,string30 ClientLastName
+	,string25 ClientFirstName
+	,string25 ClientMiddleName
+	//,string5 ClientSuffixName := ''
+	,string20 SearchClientID
+	,string20 ClientID
+		,string6  SearchBenefitMonth
+
+	,string2 BenefitState
+	,string2 CaseState
+	,string1 SearchBenefitType
+	,string1 CaseBenefitType
+
+	,string9 SearchSSN
+	,string9 ClientSSN
+	,string8 SearchDOB
+	,string8 ClientDOB
+	
+	,string20 CaseID
+	,string20 SearchCaseID
+	,string		addr1
+	,string		addr2
+	,string1 SearchEligibilityStatus
+	,string1 ClientEligibilityStatus
+	,unsigned4 SearchProcessDate
+	,unsigned4 ClientProcessDate
+	,unsigned4 SearchNCFFileDate
+	,unsigned4 ClientNCFFileDate
+	,string1  ExceptionReasonCode := '';
+END;
+
+Layout_Slim xSlim (Nac.Layouts.Collisions c) := TRANSFORM
+	self.Addr1 := IF(c.SearchAddress1StreetAddress1='',
+								StandardizeName(TRIM(c.SearchAddress2StreetAddress1) + ', ' +
+													TRIM(c.SearchAddress2City) + ', ' + c.SearchAddress2State + ' ' + c.SearchAddress2Zip[1..5]),	
+								StandardizeName(TRIM(c.SearchAddress1StreetAddress1) + ', ' +
+													TRIM(c.SearchAddress1City) + ', ' + c.SearchAddress1State + ' ' + c.SearchAddress1Zip[1..5])
+								);	
+	self.Addr2 := IF(c.CasePhysicalStreet1='',
+					StandardizeName(TRIM(c.CaseMailStreet1) + ', ' +
+													TRIM(c.CaseMailCity) + ', ' + c.CaseMailState + ' ' + c.CaseMailZip[1..5]),
+					StandardizeName(TRIM(c.CasePhysicalStreet1) + ', ' +
+													TRIM(c.CasePhysicalCity) + ', ' + c.CasePhysicalState + ' ' + c.CasePhysicalZip[1..5])	
+								);	
+	self.SearchLastName := uc(c.SearchLastName);
+	self.SearchFirstName := uc(c.SearchFirstName);
+	self.SearchMiddleName := uc(c.SearchMiddleName);
+	self.ClientLastName := uc(c.ClientLastName);
+	self.ClientFirstName := uc(c.ClientFirstName);
+	self.ClientMiddleName := uc(c.ClientMiddleName);
+	self := c;
+END;
 
 	Nac.Layouts.Collisions xCollisions(Nac.Layouts.Collisions c, integer n) := TRANSFORM
 	
@@ -59,11 +123,12 @@ EXPORT fn_ReNormalizeCollisions_1(DATASET(Nac.Layouts.Collisions) c) := FUNCTION
 						self := c;
 	END;
 
-	diff := c(benefitstate<>casestate);
-	same := c(benefitstate=casestate);
+	diff := c(benefitstate<>casestate OR SearchClientID <= clientid);
+	same := c(benefitstate=casestate, SearchClientID > clientid);
 	
-	fixed := NORMALIZE(same, 2, xCollisions(LEFT, COUNTER));
+	//fixed := NORMALIZE(same, 2, xCollisions(LEFT, COUNTER));
+	fixed := PROJECT(same, xCollisions(LEFT, 2));
 
-	return diff + fixed;
+	return PROJECT(diff + fixed, xSlim(LEFT));
 
 END;

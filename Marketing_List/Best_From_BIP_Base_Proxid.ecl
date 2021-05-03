@@ -10,8 +10,9 @@
 import BIPV2,ut;
 EXPORT Best_From_BIP_Base_Proxid(
 
-   dataset(recordof(Marketing_List.Source_Files().bip_base) ) pDataset_Base = Marketing_List.Source_Files().bip_base
-  ,dataset(Marketing_List.Layouts.business_information_prep ) pBest_Prep    = Marketing_List.Best_From_BIP_Best_Proxid()
+   string                                                     pversion        = BIPV2.KeySuffix
+  ,dataset(recordof(Marketing_List.Source_Files().bip_base) ) pDataset_Base   = Marketing_List.Source_Files().bip_base
+  ,dataset(Marketing_List.Layouts.business_information_prep ) pBest_Prep      = Marketing_List.Best_From_BIP_Best_Proxid()
  ,boolean                                                     pDebug          = false
  ,set of unsigned6                                            pSampleProxids  = []
 ) :=
@@ -58,10 +59,18 @@ function
 
    // -- get age, dt_xxx_seen
    ds_base_age_prep := table(ds_base_filt(dt_first_seen != 0 or dt_last_seen != 0) ,{proxid  ,unsigned4 dt_first_seen := min(group,if(dt_first_seen = 0  ,99999999 ,dt_first_seen))  ,unsigned4 dt_last_seen := max(group,dt_last_seen)} ,proxid ,merge );
-   ds_base_age  := project(ds_base_age_prep ,transform({recordof(left),string3 age_of_company}
-      ,dt_first_seen := if(left.dt_first_seen = 99999999  ,0  ,left.dt_first_seen);
-       self.dt_first_seen   := if(dt_first_seen  = 0 and left.dt_last_seen != 0 ,left.dt_last_seen  ,     dt_first_seen);
-       self.dt_last_seen    := if(dt_first_seen != 0 and left.dt_last_seen  = 0 ,     dt_first_seen ,left.dt_last_seen );
+   ds_base_age  := project(ds_base_age_prep ,transform({recordof(left),string3 age_of_company},
+
+       dt_first_seen := if(left.dt_first_seen = 99999999  ,0  ,Marketing_List.Validate_Date(left.dt_first_seen,pversion));
+       dt_last_seen  := if(left.dt_last_seen  = 99999999  ,0  ,Marketing_List.Validate_Date(left.dt_last_seen ,pversion));
+      
+       self.dt_first_seen   := if((dt_first_seen  = 0 and dt_last_seen != 0) or (dt_first_seen > dt_last_seen and dt_last_seen != 0),dt_last_seen   ,dt_first_seen);  //if self.dt_first_seen is zero, then both are zero
+       self.dt_last_seen    := map( self.dt_first_seen = 0 
+                                    or (dt_first_seen = 0 and dt_last_seen != 0) or (dt_first_seen != 0 and dt_last_seen = 0) => self.dt_first_seen //both are zero or one of them is zero.  self.dt_first_seen took care of that
+                                   ,dt_first_seen > dt_last_seen                                                              => dt_first_seen  
+                                   ,                                                                                             dt_last_seen 
+                               );
+       
        self.age_of_company  := if(self.dt_first_seen > 17760704  ,(string3)ut.Age(self.dt_first_seen) ,'');
        self.proxid          := left.proxid
        
@@ -77,7 +86,7 @@ function
    
   output_debug := parallel(
    
-    output('---------------------Marketing_List.Best_From_BIP_Base_Proxid---------------------'             ,named('Marketing_List_Best_From_BIP_Base_Proxid'           ),all)
+    output('---------------------Marketing_List.Best_From_BIP_Base_Proxid---------------------'             ,named('Marketing_List_Best_From_BIP_Base_Proxid'          ),all)
    ,output(choosen(pDataset_Base          (count(pSampleProxids) = 0 or proxid in pSampleProxids    ),300)  ,named('Best_From_BIP_Base_Proxid_pDataset_Base'           ),all)
    ,output(choosen(pBest_Prep             (count(pSampleProxids) = 0 or proxid in pSampleProxids    ),300)  ,named('Best_From_BIP_Base_Proxid_pBest_Prep'              ),all)
    ,output(choosen(ds_base_filt           (count(pSampleProxids) = 0 or proxid in pSampleProxids    ),300)  ,named('Best_From_BIP_Base_Proxid_ds_base_filt'            ),all)

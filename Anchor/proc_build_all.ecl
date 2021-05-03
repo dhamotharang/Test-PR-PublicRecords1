@@ -2,7 +2,7 @@
 
 //Version = input filedate
 EXPORT proc_build_all(STRING version) := FUNCTION
-  #workunit('name', 'Yogurt: Anchor email build');
+  //#workunit('name', 'Yogurt: Anchor email build');
 	
 	//Run Spray
 	spray_all := Anchor.SprayFiles(version);

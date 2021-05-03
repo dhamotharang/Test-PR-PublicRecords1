@@ -45,6 +45,7 @@ SANCTN.layout_SANCTN_incident_clean clean_SANCTN_incident(j_incident input) := T
 	 self.cln_load_date			 	 := if(input.LOAD_DATE = '','',Prof_License_Mari.DateCleaner.ToYYYYMMDD(trim(input.LOAD_DATE,left,right)));
 
    self                     := input;
+   self:=[];
    
 end;
 

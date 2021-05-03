@@ -1,4 +1,4 @@
-import RoxieKeyBuild, PromoteSupers, doxie;
+﻿import RoxieKeyBuild, PromoteSupers, doxie;
 
 export proc_build_cwp_keys(string filedate) := function
 
@@ -10,6 +10,10 @@ RoxieKeyBuild.Mac_SK_BuildProcess_v2_local(
                      key_fdids,'',
 				 '~thor_data400::key::canadianwp::'+filedate+'::fdids',bld_fdid);
 				 
+RoxieKeyBuild.Mac_SK_BuildProcess_v2_local(
+                     key_did,'',
+				 '~thor_data400::key::canadianwp::'+filedate+'::did',bld_did);
+
 RoxieKeyBuild.Mac_SK_BuildProcess_v2_local(
                      CanadianPhones.Key_CWP_Addr,'',
 				 '~thor_data400::key::canadianwp::'+filedate+'::addr',bld_addr);
@@ -26,6 +30,9 @@ RoxieKeyBuild.Mac_SK_BuildProcess_v2_local(
 RoxieKeyBuild.Mac_SK_Move_to_Built_v2('~thor_data400::key::canadianwp_fdids',
 				'~thor_data400::key::canadianwp::'+filedate+'::fdids',mv_fdid_to_blt);
 				
+RoxieKeyBuild.Mac_SK_Move_to_Built_v2('~thor_data400::key::canadianwp_did',
+				'~thor_data400::key::canadianwp::'+filedate+'::did',mv_did_to_blt);
+				
 RoxieKeyBuild.Mac_SK_Move_to_Built_v2('~thor_data400::key::canadianwp_addr',
 				'~thor_data400::key::canadianwp::'+filedate+'::addr',mv_addr_to_blt);
 
@@ -37,6 +44,7 @@ RoxieKeyBuild.Mac_SK_Move_to_Built_v2('~thor_data400::key::canadianwp_phone_payl
 /////////////////////////////////////////////////////////////////////////////////	
 
 PromoteSupers.MAC_SK_Move_v2('~thor_data400::key::canadianwp_fdids', 'Q', mv_fdid_to_qa);
+PromoteSupers.MAC_SK_Move_v2('~thor_data400::key::canadianwp_did', 'Q', mv_did_to_qa);
 PromoteSupers.MAC_SK_Move_v2('~thor_data400::key::canadianwp_addr', 'Q', mv_addr_to_qa);
 PromoteSupers.MAC_SK_Move_v2('~thor_data400::key::canadianwp_phone_payload', 'Q', mv_phone_payload_to_qa);
 
@@ -54,6 +62,7 @@ emailN := fileservices.sendemail('tgibson@seisint.com',
 								 
 'CANADIAN PHONES: BUILD SUCCESS vs.'+ filedate,					
 'thor_data400::key::canadianwp_fdids_qa 					thor_data400::key::canadianwp::'+filedate+'::fdids,\n' +
+'thor_data400::key::canadianwp_did_qa 					thor_data400::key::canadianwp::'+filedate+'::did,\n' +
 'thor_data400::key::canadianwp_addr_qa 						thor_data400::key::canadianwp::'+filedate+'::addr,\n' + 
 'thor_data400::key::canadianwp_phone_payload_qa 			thor_data400::key::canadianwp::'+filedate+'::phone_payload,\n' + 
 'thor_data400::key::canadianwp::qa::autokey::address		thor_data400::key::canadianwp::'+filedate+'::autokey::address,\n' + 
@@ -81,12 +90,15 @@ emailN := fileservices.sendemail('tgibson@seisint.com',
 return sequential(
 				     
 					parallel(bld_fdid,
+								bld_did,
 							  bld_addr,
 							  bld_phone_payload),
 					parallel(mv_fdid_to_blt,
+								mv_did_to_blt,
 							  mv_addr_to_blt,
 							  mv_phone_payload_to_blt),
 					parallel(mv_fdid_to_qa,
+								mv_did_to_qa,
 							  mv_addr_to_qa,
 							  mv_phone_payload_to_qa),
 					bld_autokeys,

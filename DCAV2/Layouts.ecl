@@ -953,6 +953,8 @@ MODULE
 			Address.Layout_Clean182_fips				physical_address						;
 			Address.Layout_Clean182_fips				mailing_address							;
 			clean_phones												clean_phones								;
+			//*** Adding CCPA project fields as per Jira# CCPA-12, CCPA-1029
+			CCPA_fields																											;			
 		END;
 
 		//old layout, but with increased enterprise num, root, sub, level, parent num, jv1_ & jv2_
