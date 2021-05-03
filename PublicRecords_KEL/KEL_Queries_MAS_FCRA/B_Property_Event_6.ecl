@@ -1,11 +1,11 @@
-﻿//HPCC Systems KEL Compiler Version 1.5.0rc1
+//HPCC Systems KEL Compiler Version 1.5.0rc1
 IMPORT KEL15 AS KEL;
 IMPORT B_Property_Event_7,CFG_Compile,E_Property,E_Property_Event,E_Zip_Code,FN_Compile FROM PublicRecords_KEL.KEL_Queries_MAS_FCRA;
 IMPORT * FROM KEL15.Null;
 EXPORT B_Property_Event_6(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG_Compile __cfg = CFG_Compile) := MODULE
   SHARED VIRTUAL TYPEOF(B_Property_Event_7(__in,__cfg).__ENH_Property_Event_7) __ENH_Property_Event_7 := B_Property_Event_7(__in,__cfg).__ENH_Property_Event_7;
-  SHARED __EE3961076 := __ENH_Property_Event_7;
-  EXPORT __ST194342_Layout := RECORD
+  SHARED __EE4716464 := __ENH_Property_Event_7;
+  EXPORT __ST205712_Layout := RECORD
     KEL.typ.nuid UID;
     KEL.typ.nstr L_N_Fares_I_D_;
     KEL.typ.nstr Primary_Range_;
@@ -79,12 +79,12 @@ EXPORT B_Property_Event_6(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, 
     KEL.typ.epoch Vault_Date_Last_Seen_ := 0;
     KEL.typ.int __RecordCount := 0;
   END;
-  SHARED __ST194342_Layout __ND3961430__Project(B_Property_Event_7(__in,__cfg).__ST195748_Layout __PP3961077) := TRANSFORM
-    __CC13330 := KEL.Routines.MinN(FN_Compile(__cfg).FN_G_E_T_B_U_I_L_D_D_A_T_E(__ECAST(KEL.typ.nstr,__CN('property_build_version'))),__CN(__cfg.CurrentDate));
-    SELF.Is_Current_Assessment_Record_ := __AND(__PP3961077.Is_Assessment_,__OP2(FN_Compile(__cfg).FN_A_B_S_Y_E_A_R_S_B_E_T_W_E_E_N(__ECAST(KEL.typ.nkdate,KEL.era.ToDate(__PP3961077.Date_First_Seen_)),__ECAST(KEL.typ.nkdate,__CC13330)),<=,__CN(1)));
-    __CC71476 := ['G','T','WD','DE','GD','SW','TD','X','BS','SD','CP','LW','SV','CH','OT','PA','PR','JT','ID','EX','LD','CS','RD','CD','FD','LT','CM','AD','AG','LH','D','PD','LC','AS','RC','CO','DG','MD','DC','RA'];
-    SELF.Property_Purchase_Record_ := __OR(__OP2(__PP3961077.Document_Type_Code_,IN,__CN(__CC71476)),__OP2(__PP3961077.Sale_Price_,>,__CN(0)));
-    SELF := __PP3961077;
+  SHARED __ST205712_Layout __ND4716818__Project(B_Property_Event_7(__in,__cfg).__ST207645_Layout __PP4716465) := TRANSFORM
+    __CC13403 := KEL.Routines.MinN(FN_Compile(__cfg).FN_G_E_T_B_U_I_L_D_D_A_T_E(__ECAST(KEL.typ.nstr,__CN('property_build_version'))),__CN(__cfg.CurrentDate));
+    SELF.Is_Current_Assessment_Record_ := __AND(__PP4716465.Is_Assessment_,__OP2(FN_Compile(__cfg).FN_A_B_S_Y_E_A_R_S_B_E_T_W_E_E_N(__ECAST(KEL.typ.nkdate,KEL.era.ToDate(__PP4716465.Date_First_Seen_)),__ECAST(KEL.typ.nkdate,__CC13403)),<=,__CN(1)));
+    __CC72135 := ['G','T','WD','DE','GD','SW','TD','X','BS','SD','CP','LW','SV','CH','OT','PA','PR','JT','ID','EX','LD','CS','RD','CD','FD','LT','CM','AD','AG','LH','D','PD','LC','AS','RC','CO','DG','MD','DC','RA'];
+    SELF.Property_Purchase_Record_ := __OR(__OP2(__PP4716465.Document_Type_Code_,IN,__CN(__CC72135)),__OP2(__PP4716465.Sale_Price_,>,__CN(0)));
+    SELF := __PP4716465;
   END;
-  EXPORT __ENH_Property_Event_6 := PROJECT(__EE3961076,__ND3961430__Project(LEFT));
+  EXPORT __ENH_Property_Event_6 := PROJECT(__EE4716464,__ND4716818__Project(LEFT));
 END;

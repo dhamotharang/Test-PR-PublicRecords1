@@ -1,4 +1,4 @@
-﻿//HPCC Systems KEL Compiler Version 1.5.0rc1
+//HPCC Systems KEL Compiler Version 1.5.0rc1
 IMPORT KEL15 AS KEL;
 IMPORT PublicRecords_KEL;
 IMPORT CFG_Compile FROM PublicRecords_KEL.KEL_Queries_MAS_Consumer;
@@ -40,9 +40,8 @@ EXPORT E_S_S_N_Summary(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG
   EXPORT PublicRecords_KEL_ECL_Functions_Dataset_FDC_Dataset_Risk_Indicators__Key_SSN_Addr_Summary_Invalid := __d0_Norm((KEL.typ.uid)ssn = 0);
   SHARED __d0_Prefiltered := __d0_Norm((KEL.typ.uid)ssn <> 0);
   SHARED __d0 := __SourceFilter(KEL.FromFlat.Convert(__d0_Prefiltered,InLayout,__Mapping0,'PublicRecords_KEL.ECL_Functions.Dataset_FDC'));
-  SHARED Dob_Date_Of_Birth_1Rule(STRING a) := MAP(KEL.Routines.IsValidDate((KEL.typ.kdate)(a[1..8]))=>a[1..8],KEL.Routines.IsValidDate((KEL.typ.kdate)(a[1..6]+'01'))=>a[1..6]+'01',KEL.Routines.IsValidDate((KEL.typ.kdate)(a[1..4]+'0101'))=>a[1..4]+'0101','0');
   SHARED Date_Last_Seen_1Rule(STRING a) := MAP(KEL.Routines.IsValidDate((KEL.typ.kdate)(a[1..8]))=>a[1..8],KEL.Routines.IsValidDate((KEL.typ.kdate)(a[1..6]+'01'))=>a[1..6]+'01',KEL.Routines.IsValidDate((KEL.typ.kdate)(a[1..4]+'0101'))=>a[1..4]+'0101','0');
-  SHARED __Mapping1 := 'ssn(OVERRIDE:UID|OVERRIDE:S_S_N_:\'\'),addressprimaryname(DEFAULT:Address_Primary_Name_:\'\'),addressprimaryrange(DEFAULT:Address_Primary_Range_:\'\'),addresszip(DEFAULT:Address_Zip_:\'\'),addresssource(DEFAULT:Address_Source_:\'\'),addressrecordcount(DEFAULT:Address_Record_Count_:0),dob(OVERRIDE:Dob_Date_Of_Birth_:DATE:Dob_Date_Of_Birth_1Rule),dobdateofbirthpadded(DEFAULT:Dob_Date_Of_Birth_Padded_:\'\'),src(OVERRIDE:Dob_Source_:\'\'),record_count(OVERRIDE:Dob_Record_Count_:0),namefirstname(DEFAULT:Name_First_Name_:\'\'),namelastname(DEFAULT:Name_Last_Name_:\'\'),namesource(DEFAULT:Name_Source_:\'\'),namerecordcount(DEFAULT:Name_Record_Count_:0),phonenumber(DEFAULT:Phone_Number_:0),phonesource(DEFAULT:Phone_Source_:\'\'),phonerecordcount(DEFAULT:Phone_Record_Count_:0),archive_date(OVERRIDE:Archive___Date_:EPOCH),dt_first_seen(OVERRIDE:Date_First_Seen_:EPOCH),dt_last_seen(OVERRIDE:Date_Last_Seen_:EPOCH:Date_Last_Seen_1Rule),hybridarchivedate(DEFAULT:Hybrid_Archive_Date_:EPOCH),vaultdatelastseen(DEFAULT:Vault_Date_Last_Seen_:EPOCH),DPMBitmap(OVERRIDE:__Permits:PERMITS)';
+  SHARED __Mapping1 := 'ssn(OVERRIDE:UID|OVERRIDE:S_S_N_:\'\'),addressprimaryname(DEFAULT:Address_Primary_Name_:\'\'),addressprimaryrange(DEFAULT:Address_Primary_Range_:\'\'),addresszip(DEFAULT:Address_Zip_:\'\'),addresssource(DEFAULT:Address_Source_:\'\'),addressrecordcount(DEFAULT:Address_Record_Count_:0),dob(OVERRIDE:Dob_Date_Of_Birth_:DATE),dobpadded(OVERRIDE:Dob_Date_Of_Birth_Padded_:\'\'),src(OVERRIDE:Dob_Source_:\'\'),record_count(OVERRIDE:Dob_Record_Count_:0),namefirstname(DEFAULT:Name_First_Name_:\'\'),namelastname(DEFAULT:Name_Last_Name_:\'\'),namesource(DEFAULT:Name_Source_:\'\'),namerecordcount(DEFAULT:Name_Record_Count_:0),phonenumber(DEFAULT:Phone_Number_:0),phonesource(DEFAULT:Phone_Source_:\'\'),phonerecordcount(DEFAULT:Phone_Record_Count_:0),archive_date(OVERRIDE:Archive___Date_:EPOCH),dt_first_seen(OVERRIDE:Date_First_Seen_:EPOCH),dt_last_seen(OVERRIDE:Date_Last_Seen_:EPOCH:Date_Last_Seen_1Rule),hybridarchivedate(DEFAULT:Hybrid_Archive_Date_:EPOCH),vaultdatelastseen(DEFAULT:Vault_Date_Last_Seen_:EPOCH),DPMBitmap(OVERRIDE:__Permits:PERMITS)';
   SHARED __d1_Norm := NORMALIZE(__in,LEFT.Dataset_Risk_Indicators__Key_SSN_dob_Summary,TRANSFORM(RECORDOF(__in.Dataset_Risk_Indicators__Key_SSN_dob_Summary),SELF:=RIGHT));
   EXPORT PublicRecords_KEL_ECL_Functions_Dataset_FDC_Dataset_Risk_Indicators__Key_SSN_dob_Summary_Invalid := __d1_Norm((KEL.typ.uid)ssn = 0);
   SHARED __d1_Prefiltered := __d1_Norm((KEL.typ.uid)ssn <> 0);
@@ -191,7 +190,7 @@ EXPORT E_S_S_N_Summary(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG
     {'SSNSummary','PublicRecords_KEL.ECL_Functions.Dataset_FDC','AddressSource',COUNT(__d1(__NL(Address_Source_))),COUNT(__d1(__NN(Address_Source_)))},
     {'SSNSummary','PublicRecords_KEL.ECL_Functions.Dataset_FDC','AddressRecordCount',COUNT(__d1(__NL(Address_Record_Count_))),COUNT(__d1(__NN(Address_Record_Count_)))},
     {'SSNSummary','PublicRecords_KEL.ECL_Functions.Dataset_FDC','dob',COUNT(__d1(__NL(Dob_Date_Of_Birth_))),COUNT(__d1(__NN(Dob_Date_Of_Birth_)))},
-    {'SSNSummary','PublicRecords_KEL.ECL_Functions.Dataset_FDC','DobDateOfBirthPadded',COUNT(__d1(__NL(Dob_Date_Of_Birth_Padded_))),COUNT(__d1(__NN(Dob_Date_Of_Birth_Padded_)))},
+    {'SSNSummary','PublicRecords_KEL.ECL_Functions.Dataset_FDC','DOBPadded',COUNT(__d1(__NL(Dob_Date_Of_Birth_Padded_))),COUNT(__d1(__NN(Dob_Date_Of_Birth_Padded_)))},
     {'SSNSummary','PublicRecords_KEL.ECL_Functions.Dataset_FDC','src',COUNT(__d1(__NL(Dob_Source_))),COUNT(__d1(__NN(Dob_Source_)))},
     {'SSNSummary','PublicRecords_KEL.ECL_Functions.Dataset_FDC','record_count',COUNT(__d1(__NL(Dob_Record_Count_))),COUNT(__d1(__NN(Dob_Record_Count_)))},
     {'SSNSummary','PublicRecords_KEL.ECL_Functions.Dataset_FDC','NameFirstName',COUNT(__d1(__NL(Name_First_Name_))),COUNT(__d1(__NN(Name_First_Name_)))},

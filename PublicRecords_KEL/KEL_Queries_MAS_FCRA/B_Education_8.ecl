@@ -1,11 +1,11 @@
-﻿//HPCC Systems KEL Compiler Version 1.5.0rc1
+//HPCC Systems KEL Compiler Version 1.5.0rc1
 IMPORT KEL15 AS KEL;
 IMPORT CFG_Compile,E_Education FROM PublicRecords_KEL.KEL_Queries_MAS_FCRA;
 IMPORT * FROM KEL15.Null;
 EXPORT B_Education_8(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG_Compile __cfg = CFG_Compile) := MODULE
   SHARED VIRTUAL TYPEOF(E_Education(__in,__cfg).__Result) __E_Education := E_Education(__in,__cfg).__Result;
-  SHARED __EE268800 := __E_Education;
-  EXPORT __ST196054_Layout := RECORD
+  SHARED __EE302611 := __E_Education;
+  EXPORT __ST207951_Layout := RECORD
     KEL.typ.nuid UID;
     KEL.typ.nstr College_Name_;
     KEL.typ.nstr L_N_College_Name_;
@@ -22,10 +22,10 @@ EXPORT B_Education_8(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG_C
     KEL.typ.epoch Vault_Date_Last_Seen_ := 0;
     KEL.typ.int __RecordCount := 0;
   END;
-  SHARED __ST196054_Layout __ND3904312__Project(E_Education(__in,__cfg).Layout __PP268674) := TRANSFORM
-    __BS268750 := __T(__PP268674.College_Characteristics_);
-    SELF.Edu_Rec_Flag_ := EXISTS(__BS268750(__T(__OP2(__T(__PP268674.College_Characteristics_).File_Type_,IN,__CN(['M','C','H','O'])))));
-    SELF := __PP268674;
+  SHARED __ST207951_Layout __ND4649399__Project(E_Education(__in,__cfg).Layout __PP302485) := TRANSFORM
+    __BS302561 := __T(__PP302485.College_Characteristics_);
+    SELF.Edu_Rec_Flag_ := EXISTS(__BS302561(__T(__OP2(__T(__PP302485.College_Characteristics_).File_Type_,IN,__CN(['M','C','H','O'])))));
+    SELF := __PP302485;
   END;
-  EXPORT __ENH_Education_8 := PROJECT(__EE268800,__ND3904312__Project(LEFT));
+  EXPORT __ENH_Education_8 := PROJECT(__EE302611,__ND4649399__Project(LEFT));
 END;

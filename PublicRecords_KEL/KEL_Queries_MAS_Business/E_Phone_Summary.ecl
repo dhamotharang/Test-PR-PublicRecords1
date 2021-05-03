@@ -1,4 +1,4 @@
-﻿//HPCC Systems KEL Compiler Version 1.5.0rc1
+//HPCC Systems KEL Compiler Version 1.5.0rc1
 IMPORT KEL15 AS KEL;
 IMPORT PublicRecords_KEL;
 IMPORT CFG_Compile FROM PublicRecords_KEL.KEL_Queries_MAS_Business;
@@ -67,9 +67,8 @@ EXPORT E_Phone_Summary(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG
   EXPORT PublicRecords_KEL_ECL_Functions_Dataset_FDC_Dataset_RiskTable__Key_Phone_Lname_Header_Summary_Invalid := __d3_Norm((KEL.typ.uid)Phone10 = 0);
   SHARED __d3_Prefiltered := __d3_Norm((KEL.typ.uid)Phone10 <> 0);
   SHARED __d3 := __SourceFilter(PROJECT(KEL.FromFlat.Convert(__d3_Prefiltered,InLayout,__Mapping3,'PublicRecords_KEL.ECL_Functions.Dataset_FDC'),__Mapping3_Transform(LEFT)));
-  SHARED Date_Of_Birth_4Rule(STRING a) := MAP(KEL.Routines.IsValidDate((KEL.typ.kdate)(a[1..8]))=>a[1..8],KEL.Routines.IsValidDate((KEL.typ.kdate)(a[1..6]+'01'))=>a[1..6]+'01',KEL.Routines.IsValidDate((KEL.typ.kdate)(a[1..4]+'0101'))=>a[1..4]+'0101','0');
   SHARED Date_Last_Seen_4Rule(STRING a) := MAP(KEL.Routines.IsValidDate((KEL.typ.kdate)(a[1..8]))=>a[1..8],KEL.Routines.IsValidDate((KEL.typ.kdate)(a[1..6]+'01'))=>a[1..6]+'01',KEL.Routines.IsValidDate((KEL.typ.kdate)(a[1..4]+'0101'))=>a[1..4]+'0101','0');
-  SHARED __Mapping4 := 'phone(OVERRIDE:UID|OVERRIDE:Phone10_:\'\'),primaryname(DEFAULT:Primary_Name_:\'\'),primaryrange(DEFAULT:Primary_Range_:\'\'),zip(DEFAULT:Zip_:\'\'),dob(OVERRIDE:Date_Of_Birth_:DATE:Date_Of_Birth_4Rule),dateofbirthpadded(DEFAULT:Date_Of_Birth_Padded_:\'\'),lastname(DEFAULT:Last_Name_:\'\'),record_count(OVERRIDE:Record_Count_:0),src(OVERRIDE:Source_:\'\'),archive_date(OVERRIDE:Archive___Date_:EPOCH),dt_first_seen(OVERRIDE:Date_First_Seen_:EPOCH),dt_last_seen(OVERRIDE:Date_Last_Seen_:EPOCH:Date_Last_Seen_4Rule),hybridarchivedate(DEFAULT:Hybrid_Archive_Date_:EPOCH),vaultdatelastseen(DEFAULT:Vault_Date_Last_Seen_:EPOCH),DPMBitmap(OVERRIDE:__Permits:PERMITS)';
+  SHARED __Mapping4 := 'phone(OVERRIDE:UID|OVERRIDE:Phone10_:\'\'),primaryname(DEFAULT:Primary_Name_:\'\'),primaryrange(DEFAULT:Primary_Range_:\'\'),zip(DEFAULT:Zip_:\'\'),dob(OVERRIDE:Date_Of_Birth_:DATE),dobpadded(OVERRIDE:Date_Of_Birth_Padded_:\'\'),lastname(DEFAULT:Last_Name_:\'\'),record_count(OVERRIDE:Record_Count_:0),src(OVERRIDE:Source_:\'\'),archive_date(OVERRIDE:Archive___Date_:EPOCH),dt_first_seen(OVERRIDE:Date_First_Seen_:EPOCH),dt_last_seen(OVERRIDE:Date_Last_Seen_:EPOCH:Date_Last_Seen_4Rule),hybridarchivedate(DEFAULT:Hybrid_Archive_Date_:EPOCH),vaultdatelastseen(DEFAULT:Vault_Date_Last_Seen_:EPOCH),DPMBitmap(OVERRIDE:__Permits:PERMITS)';
   SHARED InLayout __Mapping4_Transform(InLayout __r) := TRANSFORM
     SELF.Header_Hit_Flag_ := __CN(FALSE);
     SELF := __r;
@@ -265,7 +264,7 @@ EXPORT E_Phone_Summary(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG
     {'PhoneSummary','PublicRecords_KEL.ECL_Functions.Dataset_FDC','PrimaryRange',COUNT(__d4(__NL(Primary_Range_))),COUNT(__d4(__NN(Primary_Range_)))},
     {'PhoneSummary','PublicRecords_KEL.ECL_Functions.Dataset_FDC','Zip',COUNT(__d4(__NL(Zip_))),COUNT(__d4(__NN(Zip_)))},
     {'PhoneSummary','PublicRecords_KEL.ECL_Functions.Dataset_FDC','dob',COUNT(__d4(__NL(Date_Of_Birth_))),COUNT(__d4(__NN(Date_Of_Birth_)))},
-    {'PhoneSummary','PublicRecords_KEL.ECL_Functions.Dataset_FDC','DateOfBirthPadded',COUNT(__d4(__NL(Date_Of_Birth_Padded_))),COUNT(__d4(__NN(Date_Of_Birth_Padded_)))},
+    {'PhoneSummary','PublicRecords_KEL.ECL_Functions.Dataset_FDC','DOBPadded',COUNT(__d4(__NL(Date_Of_Birth_Padded_))),COUNT(__d4(__NN(Date_Of_Birth_Padded_)))},
     {'PhoneSummary','PublicRecords_KEL.ECL_Functions.Dataset_FDC','LastName',COUNT(__d4(__NL(Last_Name_))),COUNT(__d4(__NN(Last_Name_)))},
     {'PhoneSummary','PublicRecords_KEL.ECL_Functions.Dataset_FDC','record_count',COUNT(__d4(__NL(Record_Count_))),COUNT(__d4(__NN(Record_Count_)))},
     {'PhoneSummary','PublicRecords_KEL.ECL_Functions.Dataset_FDC','Src',COUNT(__d4(__NL(Source_))),COUNT(__d4(__NN(Source_)))},
