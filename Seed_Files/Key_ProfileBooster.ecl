@@ -1,4 +1,4 @@
-Import Data_Services, ut;
+﻿IMPORT Data_Services, Seed_Files;
 
 d := Seed_Files.file_ProfileBooster;
 
@@ -8,4 +8,4 @@ newrec := record
 end;
 newtable := table(d, newrec);
 
-export Key_ProfileBooster := index(newtable,{dataset_name,hashvalue}, {newtable}, Data_Services.Data_location.Prefix('NONAMEGIVEN')+'thor_data400::key::testseed::qa::profilebooster');
+EXPORT Key_ProfileBooster := index(newtable,{dataset_name,hashvalue}, {newtable}, Data_Services.Data_location.Prefix('NONAMEGIVEN')+'thor_data400::key::testseed::qa::profilebooster');

@@ -1,4 +1,4 @@
-﻿import ut, FCRA, Doxie, RoxieKeyBuild,_Control, AVM_V2, header, data_Services;
+﻿import ut, FCRA, Doxie, RoxieKeyBuild,_Control, AVM_V2, header, data_Services, STD;
 EXPORT reDID(string filedate, boolean runondev = false ) := module
 
 	export ReDID_Wrapper(filetype
@@ -136,13 +136,14 @@ EXPORT reDID(string filedate, boolean runondev = false ) := module
 														_Control.RoxieEnv.staging_neutral_roxieIP);
 	
 	export isNewHeader := if (_Control.ThisEnvironment.Name = 'Prod_Thor' or runondev,
-															Header.IsNewProdHeaderVersion('overrides',,roxieip),
-															false);
-	
+													Header.IsNewProdHeaderVersion('overrides',,roxieip),
+													false);
+
 	export postprocess := function
 			return sequential(
 												header.PostDID_HeaderVer_Update('overrides',,roxieip),
 												fileservices.RemoveOwnedSubfiles('~thor_data400::key::rid_did2_qa_foroverride', true)
+												,STD.File.ClearSuperFile('~thor_data400::key::rid_did2_qa_foroverride')
 													);
 	end;
 
@@ -159,14 +160,18 @@ EXPORT reDID(string filedate, boolean runondev = false ) := module
 		ReDID_Wrapper('liensv2_party','fcra',FCRA.Layout_Override_Liens_Party_In,did,flag_file_id,,liensv2_partyredid,isxml := true);
 		ReDID_Wrapper('aircraft','fcra',fcra.layout_override_aircraft,did_out,flag_file_id,,aircraftredid);
 		ReDID_Wrapper('watercraft','fcra',fcra.key_override_watercraft.sid_rec,did,flag_file_id,,watercraftredid);
-		ReDID_Wrapper('proflic','fcra',fcra.layout_override_proflic,did,flag_file_id,,proflicredid);
+		//CCPA-1042 - Add CCPA fields to Override ProfLic key, but not to input file yet
+		ReDID_Wrapper('proflic','fcra',fcra.layout_override_proflic_in,did,flag_file_id,,proflicredid);
 		ReDID_Wrapper('american_student','fcra',fcra.Layout_Override_Student_In,did,flag_file_id,,american_studentredid);
 		ReDID_Wrapper('gong','fcra',fcra.Layout_Override_Gong_In,l_did,flag_file_id,,gongredid);
 		ReDID_Wrapper('impulse','fcra',fcra.Layout_Override_impulse_In,did,flag_file_id,,impulseredid);
 		ReDID_Wrapper('infutor','fcra',fcra.Layout_Override_Infutor,did,flag_file_id,,infutorredid);
-		ReDID_Wrapper('email_data','fcra',FCRA.Layout_Override_Email_Data,did,flag_file_id,,email_dataredid);
-		ReDID_Wrapper('Inquiries','fcra',FCRA.Layout_Override_Inquiries,Person_Q.Appended_ADL ,flag_file_id,,Inquiriesredid);
-		ReDID_Wrapper('paw','fcra',FCRA.Layout_Override_PAW,did,flag_file_id,,pawredid);
+		//CCPA-1044 - Add CCPA fields to Override Email Data key, but not to input file yet
+		ReDID_Wrapper('email_data','fcra',FCRA.Layout_Override_Email_Data_In,did,flag_file_id,,email_dataredid);
+		//CCPA-1048 - Add CCPA fields to Override Inquires key, but not to input file yet
+		ReDID_Wrapper('Inquiries','fcra',FCRA.Layout_Override_Inquiries_In,Person_Q.Appended_ADL ,flag_file_id,,Inquiriesredid);
+		//CCPA-1052 - Add CCPA fields to Override PAW key, but not to input file yet
+		ReDID_Wrapper('paw','fcra',FCRA.Layout_Override_PAW_In,did,flag_file_id,,pawredid);
 		ReDID_Wrapper('ssn_table','fcra',FCRA.Layout_Override_SSN_Table,combo.bestdid,flag_file_id,,ssn_tableredid);
 		ReDID_Wrapper('alloy','fcra',FCRA.Layout_Override_Alloy_In,did,flag_file_id,,alloyredid);
 		ReDID_Wrapper('american_student_new','fcra',FCRA.Layout_Override_Student_New_In,did,flag_file_id,,american_student_newredid);
@@ -182,6 +187,8 @@ EXPORT reDID(string filedate, boolean runondev = false ) := module
 		ReDID_Wrapper('ucc_party','fcra',FCRA.key_override_ucc.party_rec,did,flag_file_id,,uccpartyredid);
 		ReDID_Wrapper('consumerstatement_lexid','fcra',FCRA.Layout_Override_CnsmrStmt_In,lexid ,ssn,,cslexidredid);
 		ReDID_Wrapper('consumerstatement_ssn','fcra',FCRA.Layout_Override_CnsmrStmt_In,lexid ,ssn,,csssnredid);
+		// 
+		// ReDID_Wrapper('proflic_mari','fcra',FCRA.Key_Override_Proflic_Mari_ffid.Layout_Override_Proflic_Mari,did,flag_file_id,,mariredid);
 		ReDID_Wrapper('proflic_mari','fcra',FCRA.Key_Override_Proflic_Mari_ffid.Layout_Override_Proflic_Mari,did,flag_file_id,,mariredid);
 		ReDID_Wrapper('thrive','fcra',FCRA.Layout_Override_thrive,did,flag_file_id,,thriveredid);	
 		ReDID_Wrapper('address_data','fcra',AVM_V2.layouts.Layout_Override_AVM_Address,did,flag_file_id,,addressdataredid);	
@@ -244,5 +251,5 @@ EXPORT reDID(string filedate, boolean runondev = false ) := module
 						);
  
 	end;
- 
+
 end;

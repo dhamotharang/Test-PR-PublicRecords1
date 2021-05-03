@@ -1,9 +1,12 @@
-﻿import Canadianphones, ut,Roxiekeybuild, Canadianphones_V2, Scrubs_CanadianPhones;
+﻿import Canadianphones, ut,Roxiekeybuild, Canadianphones_V2, Scrubs_CanadianPhones, DOPS;
 
 
 
-export BWR_SprayFile_BuildKeys(string filedate) := function
-#workunit('name','Canadian Phones & V2 - ' + filedate);
+export BWR_SprayFile_BuildKeys(STRING  pVersion,
+															STRING  pSource,
+															STRING  pHostname
+															) := function
+#workunit('name','Canadian Phones & V2 - ' + pVersion);
 
 
 //READ ME////READ ME////READ ME////READ ME////READ ME////READ ME////READ ME////READ ME////READ ME////READ ME////READ ME//
@@ -16,34 +19,32 @@ export BWR_SprayFile_BuildKeys(string filedate) := function
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //Actions: Spray Input Files, SuperFile Moves, Process Input Files, Build keys, Pull and Distribute QA Samples
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-//filedate := '20100727';
-//vsDate   := ut.GetDate;
-dops_update := Roxiekeybuild.updateversion('CanadianPhonesKeys',filedate,'kevin.reeder@lexisnexisrisk.com',,'N');
-dops_update_v2 := Roxiekeybuild.updateversion('CanadianPhonesV2Keys',filedate,'kevin.reeder@lexisnexisrisk.com',,'N');
+//pVersion := '20100727';
+//pSource  := '/data/Builds/builds/CanadianPhones/data'
+//pHostname := 'bctlpedata12.risk.regn.net'
+
+dops_update := DOPS.updateversion('CanadianPhonesKeys',pVersion,'kevin.reeder@lexisnexisrisk.com;Jason.Allerdings@lexisnexisrisk.com',,'N');
+dops_update_v2 := DOPS.updateversion('CanadianPhonesV2Keys',pVersion,'kevin.reeder@lexisnexisrisk.com;Jason.Allerdings@lexisnexisrisk.com',,'N');
 
 return sequential(
-CanadianPhones.spray_CanadianWhitepages(filedate)
+CanadianPhones.spray_CanadianWhitepages(pVersion, pSource,	pHostname)
 //,Canadianphones.map_CanadianWhitepages **infousa residences - no longer updating, historical data only**
 //,Canadianphones.map_infoUSACanBus **infousa residences - no longer updating, historical data only**
-,Canadianphones.map_axciomCanBus(filedate)
-,Canadianphones.map_axciomCanRes(filedate) 
-,Scrubs_CanadianPhones.Axciom_Bus_Proc_Submit_Stats(filedate)			//BUG201215
-,Scrubs_CanadianPhones.Axciom_Res_Proc_Submit_Stats(filedate)			//BUG201215
-,CanadianPhones.strata_popCanadianPhonesBaseBus
-,CanadianPhones.strata_popCanadianPhonesBaseRes
-,CanadianPhones.proc_build_cwp_keys(filedate) 
+//,Canadianphones.map_axciomCanBus(pVersion) - no longer updating, historical data only
+//,Canadianphones.map_axciomCanRes(pVersion) - no longer updating, historical data only
+,Canadianphones.map_InfutorWP(pVersion)
+,Scrubs_CanadianPhones.PreBuildScrubs(pVersion)
+,CanadianPhones.strata_popCanadianPhonesInfutor(pVersion).all
+,CanadianPhones.proc_build_cwp_keys(pVersion) 
 ,dops_update
 ,CanadianPhones.sample_CanadianBase
-,CanadianPhones_V2.map_axciomCanBus(filedate)
-,CanadianPhones_V2.map_axciomCanRes(filedate)
+,CanadianPhones_V2.map_InfutorWP_v2(pVersion)
 ,CanadianPhones_V2.proc_build_base
-,CanadianPhones_V2.proc_build_cwp_keys(filedate)
-,CanadianPhones_V2.strata_popFileCanadianPhonesV2Base(filedate)
+,CanadianPhones_V2.proc_build_cwp_keys(pVersion)
+,CanadianPhones_V2.strata_popFileCanadianPhonesV2Base(pVersion)
 ,dops_update_v2
-,fileservices.clearsuperfile(CanadianPhones.thor_cluster + 'in::axciombus')
-,fileservices.clearsuperfile(CanadianPhones.thor_cluster + 'in::axciomres')
-,fileservices.clearsuperfile(CanadianPhones.thor_cluster + 'in::axciombus_v2')
-,fileservices.clearsuperfile(CanadianPhones.thor_cluster + 'in::axciomres_v2')
+,fileservices.clearsuperfile(CanadianPhones.thor_cluster + 'in::InfutorWP')
+,fileservices.clearsuperfile(CanadianPhones.thor_cluster + 'in::InfutorWP_v2')
 );
 
 end;

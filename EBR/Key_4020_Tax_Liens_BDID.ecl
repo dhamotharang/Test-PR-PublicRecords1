@@ -1,4 +1,9 @@
-import doxie;
+﻿import doxie;
+
+// ---------------------------------------------------------------
+// For delta rollup logic (dx_common.mac_incremental_rollup) use:
+//  $.mod_delta_rid.key_4020_delta_rid
+// ---------------------------------------------------------------
 
 f := File_4020_Tax_Liens_Base_bdid(bdid <> 0);
 

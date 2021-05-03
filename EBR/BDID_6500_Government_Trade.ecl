@@ -1,4 +1,4 @@
-import _control, ut, Business_Header, Business_Header_SS, did_add, Mdr, Std;
+﻿import _control, ut, Business_Header, Business_Header_SS, did_add, Mdr, Std;
 
 //////////////////////////////////////////////////////////////////////////////////////////////
 // -- Value Types
@@ -14,6 +14,7 @@ transform
 	self.date_first_seen		:= business_header.validatedate(l.date_reported);
 	self.date_last_seen 		:= self.date_first_seen;
 	self 					:= l;
+	self					:= [];
 end;
 
 File_in2base := project(File_in, Convert2Base(left));

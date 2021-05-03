@@ -113,10 +113,15 @@ EXPORT CONSTANTS := MODULE
 	EXPORT STRING POSSIBLE          := 'POSSIBLE';
 	EXPORT STRING UNKNOWN						:= 'UNKNOWN';
 	EXPORT STRING NOINJURY					:= 'NOINJURY';
+	
+//Max Count for Citations Child Records
+  EXPORT Max_Citations_ChildRec_Count := 50;
 
+//No of days to expire the Thor Extract file
+  EXPORT ThorFile_Dupe_Days_To_Expire := 7;
+  EXPORT ThorFile_NAHDB_Days_To_Expire := 30;
+	
 END;
-
-
 
 
 

@@ -1,0 +1,45 @@
+﻿OPTIONS:-gh
+MODULE:Scrubs_Equifax_Business_Data
+FILENAME:Equifax_Business_Data
+NAMESCOPE:Contacts
+//FIELDTYPE DEFINITIONS
+//-------------------------
+// FIELDTYPE:invalid_mandatory:LENGTHS(1..)
+// FIELDTYPE:invalid_title:CUSTOM(Scrubs_Equifax_Business_Data.Functions.fn_verify_title > 0)
+// FIELDTYPE:invalid_title_desc:CUSTOM(Scrubs_Equifax_Business_Data.Functions.fn_verify_title_desc > 0)
+FIELDTYPE:invalid_last_name:ALLOW( ,.-'AaBbCcDdEeFfGgHhIiJjKkLlMmNnOoPpQqRrSsTtUuVvWwXxYyZz)
+FIELDTYPE:invalid_first_name:ALLOW( ,.-'AaBbCcDdEeFfGgHhIiJjKkLlMmNnOoPpQqRrSsTtUuVvWwXxYyZz)
+
+FIELDTYPE:invalid_mandatory:LENGTHS(1..)
+FIELDTYPE:invalid_title:CUSTOM(Scrubs_Equifax_Business_Data.Functions.fn_verify_title > 0)
+FIELDTYPE:invalid_title_desc:CUSTOM(Scrubs_Equifax_Business_Data.Functions.fn_verify_title_desc > 0)
+// FIELDTYPE:invalid_last_name:ALLOW(0123456789+_`/@:"&[]() ,.-'AaBbCcDdEeFfGgHhIiJjKkLlMmNnOoPpQqRrSsTtUuVvWwXxYyZz)
+// FIELDTYPE:invalid_first_name:ALLOW(0123456789+_`/@:"&[]() ,.-'AaBbCcDdEeFfGgHhIiJjKkLlMmNnOoPpQqRrSsTtUuVvWwXxYyZz)
+
+FIELDTYPE:invalid_efx_id:ALLOW(0123456789):LENGTHS(1..10)
+FIELDTYPE:invalid_efx_titlecd:LENGTHS(0..2)
+// FIELDTYPE:invalid_efx_date:ALLOW(-0123456789):LENGTHS(0,10)
+FIELDTYPE:invalid_efx_date:CUSTOM(Scrubs_Equifax_Business_Data.Functions.fn_valid_Load_Date > 0)
+
+//--------------------------------------------------------------- 
+//FIELDS TO SCRUB -- Commented out fields are not being scrubbed
+//---------------------------------------------------------------
+// FIELD:EFX_id:TYPE(STRING198):LIKE(invalid_mandatory):0,0
+// FIELD:EFX_CONTCT:TYPE(STRING198):LIKE(invalid_mandatory):0,0
+// FIELD:EFX_TITLECD:TYPE(STRING75):LIKE(invalid_title):0,0
+// FIELD:EFX_TITLEDESC:TYPE(STRING75):LIKE(invalid_title_desc):0,0
+// FIELD:EFX_TITLECD:TYPE(STRING198):LIKE(invalid_title):0,0
+// FIELD:EFX_TITLEDESC:TYPE(STRING198):LIKE(invalid_title_desc):0,0
+// FIELD:EFX_LASTNAM:TYPE(STRING198):LIKE(invalid_last_name):0,0
+// FIELD:EFX_FSTNAM:TYPE(STRING198):LIKE(invalid_first_name):0,0
+// FIELD:EFX_EMAIL:TYPE(STRING198):0,0
+// FIELD:EFX_DATE:TYPE(STRING198):0,0
+
+FIELD:EFX_id:TYPE(STRING198):LIKE(invalid_efx_id):0,0
+FIELD:EFX_CONTCT:TYPE(STRING198):LIKE(invalid_mandatory):0,0
+FIELD:EFX_TITLECD:TYPE(STRING198):LIKE(invalid_title):0,0
+FIELD:EFX_TITLEDESC:TYPE(STRING198):LIKE(invalid_title_desc):0,0
+FIELD:EFX_LASTNAM:TYPE(STRING198):LIKE(invalid_last_name):0,0
+FIELD:EFX_FSTNAM:TYPE(STRING198):LIKE(invalid_first_name):0,0
+FIELD:EFX_EMAIL:TYPE(STRING198):0,0
+FIELD:EFX_DATE:TYPE(STRING198):LIKE(invalid_efx_date):0,0

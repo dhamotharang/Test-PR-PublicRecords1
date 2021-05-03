@@ -1,9 +1,19 @@
-import ut, header_slimsort, did_add, didville, header,address;
+﻿import ut, header_slimsort, did_add, didville, header,address;
 
 export proc_clean_and_did(dataset(marriage_divorce_v2.layout_mar_div_intermediate) in0) :=
 module
 
-append_puid      	 := marriage_divorce_v2.fn_append_puid(in0);
+// The default for _Flag.Reclean is FALSE.  This is so recleaning of certain fields in the previous base 
+// will be skipped with each build.  
+PrevBase := project(marriage_divorce_v2.file_mar_div_intermediate
+										,transform(marriage_divorce_v2.layout_mar_div_intermediate
+										,self.touched := if(_Flag.Reclean, '', left.touched);
+										,self := left));
+
+// New Input Data + the previous Intermediate Base file
+in1 := in0 + PrevBase;
+
+append_puid      	 := marriage_divorce_v2.fn_append_puid(in1);
 cleaned_dates      := marriage_divorce_v2.fn_fix_dates(append_puid);
 patch_vendor       := marriage_divorce_v2.fn_patch_vendor(cleaned_dates);
 fix_xml_data       := marriage_divorce_v2.fn_ln_xml_address_patch(patch_vendor);
@@ -94,28 +104,22 @@ marriage_divorce_v2.layout_mar_div_intermediate t_clean(marriage_divorce_v2.layo
  self.ca_party1    := if(previously_cleaned=false or is_xml_rec=true,v_ca_party1,le.ca_party1);
  self.ca_party2    := if(previously_cleaned=false or is_xml_rec=true,v_ca_party2,le.ca_party2);
 
- //This denotes a record has been cleaned
- //Setting this to blank in proc_build_file_and_keys will re-clean everything
- //Otherwise it'll skip re-cleaning where touched='Y'
+ //Touched is set to 'Y' here since at this point the new input records will have been cleaned
+ //in this transform (and previous base records were already cleaned in a prior build).  If there 
+ //is a need to reclean the previous base file records, then set _Flag.Reclean to TRUE.
  self.touched      := 'Y';
   
  self := le;
 
 end;
 
-p_clean := project(out_suppress,t_clean(left)) : persist('~thor_data400::persist::mar_div_clean_new');
+p_clean := project(out_suppress,t_clean(left)); 
 
 
 //Re-sequence records irregardless of whether it's already been cleaned
 ut.MAC_Sequence_Records(p_clean,record_id,p_clean_seq) 
 
 export base_file_intermediate := p_clean_seq : persist('~thor_data400::persist::mar_div_sequenced_new');
-
-marriage_divorce_v2.layout_mar_div_base t_map_to_base(marriage_divorce_v2.layout_mar_div_intermediate le) := transform
- self := le;
-end;
-
-export base_file := project(base_file_intermediate,t_map_to_base(left));
 
 did_prep_rec := record
  unsigned3 dt_first_seen;
@@ -203,7 +207,7 @@ did_prep_rec t_did_prep_rec(marriage_divorce_v2.layout_mar_div_intermediate le, 
 
 end;
 
-p_did_prep_rec := normalize(base_file_intermediate,4,t_did_prep_rec(left,counter))(pname<>'') : persist('~thor_data400::persist::mar_div_normalize');
+p_did_prep_rec := normalize(base_file_intermediate,4,t_did_prep_rec(left,counter))(pname<>''); 
 
 
 did_prep_id_rec := record
@@ -359,7 +363,7 @@ redefine_rec t_dob_or_age(redefine_rec le) := transform
  self            := le;
 end;
 
-p_redefine2 := project(p_redefine,t_dob_or_age(left)): persist('~thor_200::persist::mar_div_pre_did_new');
+p_redefine2 := project(p_redefine,t_dob_or_age(left)); 
 
 matchset := ['A','Z','D','Q','G','S'];
 #stored('is_xADL2',false); 

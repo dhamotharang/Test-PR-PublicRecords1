@@ -1,6 +1,6 @@
 ﻿//This is the code to execute in a builder window
 #OPTION('multiplePersistInstances', FALSE);
-#workunit('name','DataBridge.BWR_Ingest - Ingest - SALT V3.11.1');
+#workunit('name','DataBridge.BWR_Ingest - Ingest - SALT V3.11.8');
 IMPORT DataBridge,SALT311;
 //If you are not ingesting as part of a header build you can use the below;
 //Set incremental to TRUE to run an incremental ingest mode

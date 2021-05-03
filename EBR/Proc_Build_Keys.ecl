@@ -1,4 +1,4 @@
-import Promotesupers;
+﻿import Promotesupers;
 
 export Proc_Build_Keys(string filedate) := function
 
@@ -100,8 +100,9 @@ Postbuild_superfile_manipulation := sequential(
    ,post_7010_SNP_Data
 );
 
-Build_Keys_Bdid 		:= Proc_Build_Keys_bdid(filedate) 	: success(output('EBR Proc_Build_Keys_bdid Build Succeeded - ' + filedate));
-Build_Keys_Linkids 	:= Proc_Build_Keys_Linkids(filedate): success(output('EBR Proc_Build_Keys_Linkids Build Succeeded - ' + filedate));
+Build_Keys_Bdid 			:= Proc_Build_Keys_bdid(filedate) 							: success(output('EBR Proc_Build_Keys_bdid Build Succeeded - ' + filedate));
+Build_Keys_Linkids 		:= Proc_Build_Keys_Linkids(filedate)						: success(output('EBR Proc_Build_Keys_Linkids Build Succeeded - ' + filedate));
+Build_Keys_Delta_RIDs	:= Proc_Build_Keys_Delta_Rids(filedate)					: success(output('EBR Proc_Build_Keys_Delta_Rids Build Succeeded - ' + filedate));
 
 //////////////////////////////////////////////////////////////////////////////////////////////
 // -- Execute all
@@ -110,6 +111,7 @@ retval := sequential(
 	 Prebuild_superfile_manipulation
 	,Build_Keys_Bdid
 	,Build_Keys_Linkids
+	,Build_Keys_Delta_RIDs
 	,Postbuild_superfile_manipulation
 );
 

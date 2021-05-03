@@ -1,6 +1,10 @@
 import address;
 
-reunion.layouts.l_tax t1(reunion.assessments le) := transform
+EXPORT mapping_reunion_tax(unsigned1 mode = 1, STRING sVersion = reunion.constants.sVersion) := MODULE
+
+tax := reunion.assessments(mode, sVersion).all;
+
+reunion.layouts.l_tax t1(tax le) := transform
  self.main_adl                   := intformat(le.did,12,1);
  self.state                      := le.state_code;
  self.county                     := le.county_name;
@@ -58,12 +62,12 @@ reunion.layouts.l_tax t1(reunion.assessments le) := transform
  self.legal_description          := le.legal_brief_description;
 end;
 
-p1      := project(reunion.assessments,t1(left));
+p1      := project(tax ,t1(left));
 //p1_dist := distribute(p1,hash(main_adl));
 //p1_dupd := dedup(p1_dist,record,all,local);
 // restrict to most recent assessment year
-tax := DEDUP(SORT(DISTRIBUTE(p1, HASH32(main_adl, property_street, property_zip)),
+EXPORT all := DEDUP(SORT(DISTRIBUTE(p1, HASH32(main_adl, property_street, property_zip)),
 						main_adl, property_street, property_zip, -assessment_year, LOCAL), main_adl, property_street, property_zip, LOCAL);
 
 
-export mapping_reunion_tax := tax;
+END;

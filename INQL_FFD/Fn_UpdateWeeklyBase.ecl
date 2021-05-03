@@ -17,7 +17,7 @@ EXPORT Fn_UpdateWeeklyBase (string pVersion = '') := function
 																, self.formatted_dob        						:= left.dob;
 																, self.formatted_phone_nbr           		:= left.phone_nbr;     
 																, self.formatted_eu_phone_nbr           := left.eu_phone_nbr;
-																, self.ppc                              := INQL_FFD._Functions.Convert_PPC(left.ppc);
+																//, self.ppc                              := INQL_FFD._Functions.Convert_PPC(left.ppc);
 																, self.name_score                       := '';
 																,	self                        					:= left;
 																,	self                     							:= [];)
@@ -26,8 +26,8 @@ EXPORT Fn_UpdateWeeklyBase (string pVersion = '') := function
 	appended_did_ssn    := INQL_FFD._Functions.Append_DID_SSN(formatted);
 
   appended_base       :=  project(appended_did_ssn, transform(INQL_FFD.Layouts.Base,
-																		self.appended_did         := left.appendadl,
-																		self.appended_ssn         := left.appendssn,
+																		self.appended_did         := if(left.appendadl=0,(unsigned)left.lex_id,left.appendadl);
+																		self.appended_ssn         := left.appendssn;
 																		self := left;
 																		self := [];
 																		)); 

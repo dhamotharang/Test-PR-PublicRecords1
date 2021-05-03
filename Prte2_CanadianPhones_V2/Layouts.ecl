@@ -1,5 +1,11 @@
 ﻿Import prte2;
 EXPORT Layouts := MODULE
+Export did_layout:=record
+  unsigned6 did;
+  unsigned6 fdid;
+  unsigned4 global_sid;
+  unsigned8 record_sid;
+ END;
 
 Export zipprlname := RECORD
   string6 zip;
@@ -189,7 +195,8 @@ Export address:=RECORD
   unsigned6 did;
  END;
 
-Export fdid:=RECORD
+ 
+Export fdid:= RECORD
   unsigned6 fdid;
   string8 date_first_reported;
   string8 date_last_reported;
@@ -291,11 +298,12 @@ Export fdid:=RECORD
   string9 postal_mode;
   string9 postal_bag_bundle;
   string1 transaction_code;
-	string1 listing_type;
+  string1 listing_type;
 	Prte2.layouts.DEFLT_CPA;
-  //unsigned4 global_sid;
- // unsigned8 record_sid;
+  unsigned6 did;
+  integer3 did_score;
  END;
+
  end;
 
 

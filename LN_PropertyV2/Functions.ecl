@@ -1,4 +1,4 @@
-import	ut;
+﻿import	ut;
 
 export	Functions	:= module
 
@@ -6,9 +6,9 @@ export	Functions	:= module
 	export	fDropZip4(string	pLineLast)	:=	regexreplace('(^| )([0-9]{5})[-]?[0-9]{4}($| .*)',pLineLast,'\\1\\2\\3');
 	
 	// Clean name
-	export	fCleanName(string	pName)			:=	map(	ut.fnTrim2Upper(pName)[1..3]	=	'SG'	=>	ut.fnTrim2Upper(pName)[4..],
-																									ut.fnTrim2Upper(pName)				=	'SG'	=>	'',
-																									ut.fnTrim2Upper(pName)
+	export	fCleanName(string	pName)			:=	map(	ut.CleanSpacesAndUpper(pName)[1..3]	=	'SG'	=>	ut.CleanSpacesAndUpper(pName)[4..],
+																									ut.CleanSpacesAndUpper(pName)				=	'SG'	=>	'',
+																									ut.CleanSpacesAndUpper(pName)
 																								);
 	
 	// Clean fields
@@ -18,7 +18,7 @@ export	Functions	:= module
 		#EXPORTXML(doCleanFieldMetaInfo,recordof(pInputFile))
 
 		#uniquename(myCleanFunction)
-		string	%myCleanFunction%(string	x)	:=	ut.fnTrim2Upper(stringlib.stringcleanspaces(regexreplace('[^ -~]+',x,' ')));
+		string	%myCleanFunction%(string	x)	:=	ut.CleanSpacesAndUpper(stringlib.stringcleanspaces(regexreplace('[^ -~]+',x,' ')));
 
 		#uniquename(tra)
 		pInputFile	%tra%(pInputFile	le)	:=

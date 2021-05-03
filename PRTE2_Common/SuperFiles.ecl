@@ -40,6 +40,25 @@ EXPORT SuperFiles := MODULE
 			SimpleCreateIf(baseName + '::' + suffixName + '_built')
 			));
 
+	// --------------------------------------------------------------		
+	EXPORT Create_PromoteSupers(STRING basename, INTEGER num_gens = 3) := 
+		NOTHOR(SEQUENTIAL (
+				SimpleCreateIf(basename);
+				SimpleCreateIf(basename + '_FATHER');
+				IF(num_gens = 3,SimpleCreateIf(basename + '_GRANDFATHER'));
+				));
+		
+	// --------------------------------------------------------------
+	EXPORT ClearIF(STRING sfName) := IF(STD.File.FileExists(sfName), Clear(sfName));
+	EXPORT ClearOrCreate(STRING sfName) := IF(STD.File.FileExists(sfName), Clear(sfName), SimpleCreateIf(sfName) );
+	EXPORT Clear3Gen(STRING baseName, STRING suffixName) := 
+	NOTHOR(SEQUENTIAL (
+		ClearIF(baseName + '::grandfather::' + suffixName),
+		ClearIF(baseName + '::father::' + suffixName),
+		ClearIF(baseName + '::qa::' + suffixName),
+		ClearIF(baseName + '::built::' + suffixName)
+		));
+
 	// --------------------------------------------------------------
 	EXPORT Delete(STRING baseName, STRING suffixName) := 
 		NOTHOR(SEQUENTIAL (
@@ -55,11 +74,7 @@ EXPORT SuperFiles := MODULE
 			ProtectedDeleteIf(baseName + '::' + suffixName + '_qa'),
 			ProtectedDeleteIf(baseName + '::' + suffixName + '_built')
 			));
-			
-	// --------------------------------------------------------------
-	EXPORT ClearIF(STRING sfName) := IF(STD.File.FileExists(sfName), Clear(sfName));
-	EXPORT ClearOrCreate(STRING sfName) := IF(STD.File.FileExists(sfName), Clear(sfName), SimpleCreateIf(sfName) );
-	
+
 	// --------------------------------------------------------------
 	SHARED removeTildeFN(STRING fn2)	:= REGEXREPLACE('~',fn2,'', NOCASE);
 

@@ -4,7 +4,7 @@ export file_search_autokey(boolean isFast) := function
 
 //filter excludes care-of's from the autokeys
 
-dParty := LN_PropertyV2_Fast.CleanSearch(isFast)(source_code[1]!='C');
+dParty := LN_PropertyV2_Fast.CleanSearch(isFast, isfast)(source_code[1]!='C');
 
 rec := record
 	dparty.phone_number;

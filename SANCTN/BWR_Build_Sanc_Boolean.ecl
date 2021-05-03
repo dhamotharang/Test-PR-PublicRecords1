@@ -1,13 +1,4 @@
-
-
-
-
-
-
-
-
-
-import SANCTN,ut;
+﻿import SANCTN,ut;
 import text_search;
 
 
@@ -160,8 +151,8 @@ docs := inc_docs + party_docs + inc_segkeys + party_segkeys : persist('~thor_dat
 stuff := sequential(
 
 Text_Search.Build_From_DocSeg_Records(docs(content <> ''),info),
-	build_key,
-	Text_Search.Boolean_Move_To_QA(inskeyname,inlkeyname),
+	//build_key,
+	//Text_Search.Boolean_Move_To_QA(inskeyname,inlkeyname),
 	fileservices.deletelogicalfile('~thor_data400::persist::sanctn::boolean')
 );
 

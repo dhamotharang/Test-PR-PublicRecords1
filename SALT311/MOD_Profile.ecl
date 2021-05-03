@@ -173,11 +173,11 @@
 		
 		// Optimized Layout
 		EXPORT optLayout := SALT311.MAC_Character_Counts.EclRecord(AllProfiles,'Layout_Sample');
-		EXPORT out_optLayout := OUTPUT(optLayout,NAMED(pfx+'OptimizedLayout'));
+		EXPORT out_optLayout := OUTPUT(optLayout,NAMED(pfx+'OptimizedLayout'),ALL);
 		
 		// Field Types
 		EXPORT Types := SALT311.MAC_Character_Counts.FieldTypes(AllProfiles,99.9);
-		EXPORT out_Types := OUTPUT(Types,NAMED(pfx+'Types'));
+		EXPORT out_Types := OUTPUT(Types,NAMED(pfx+'Types'),ALL);
 		
 		// Outputs
 		EXPORT out := PARALLEL(
@@ -195,3 +195,4 @@
 	RETURN %M%;
 ENDMACRO;
 	
+

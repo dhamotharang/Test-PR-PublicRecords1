@@ -114,6 +114,7 @@ EXPORT map_FLS0280_conversion(STRING pVersion) := FUNCTION
 										 REGEXFIND('^(NORTHMARQ)$',trimName,NOCASE) => 'N:NORTHMARQ',  
 										 REGEXFIND('^(NAI/MERIN HUNTER CODMAN)$',trimName,NOCASE) => 'O2:NAI/MERIN HUNTER CODMAN',  
 										 REGEXFIND('^(MR JULIO MESTAS)$',trimName,NOCASE) => 'FL:JULIO MESTAS',  
+										 REGEXFIND('^(JR PUENTE Y CORTEZ)$',trimName,NOCASE) => 'FL:PUENTE Y CORTEZ',
 										 REGEXFIND('^(MILDRED MARCH)$',trimName,NOCASE) => 'FL:MILDRED MARCH',  
 										 REGEXFIND('^(MARIE ALICE PIERRE)$',trimName,NOCASE) => 'FML:MARIE ALICE PIERRE',  
 										 REGEXFIND('^(L\'HERMITAGE)$',trimName,NOCASE) => 'N:L\'HERMITAGE',  
@@ -163,7 +164,7 @@ EXPORT map_FLS0280_conversion(STRING pVersion) := FUNCTION
 			//Remove left over title after removing the name
 			preAddr3 := REGEXREPLACE('(OFFICE MANAGER|, BROKER|[0-9]* , MNGR|MANAGING BROKER|GATES/LEGAL|' + 
 			                         'LIC REAL ESTATE BROKER|GENERAL DELIVERY|' +
-															 'MR |MR\\. | OR VALERIE LOWERISON|M\\.PELLERIN|C BERGER)', preAddr2, '');
+															 'MR |JR |MR\\. | OR VALERIE LOWERISON|M\\.PELLERIN|C BERGER)', preAddr2, '');
 			//More cleaning
 			preAddr4 := REGEXREPLACE('- CUBE', preAddr3, 'CUBE');
 			preAddr5 := REGEXREPLACE('C/O-IPS', preAddr4, 'IPS');
@@ -205,22 +206,27 @@ EXPORT map_FLS0280_conversion(STRING pVersion) := FUNCTION
 		move_to_using		:= PARALLEL(
 							Prof_License_Mari.func_move_file.MyMoveFile(code, 'lic64', 'sprayed', 'using');
 							Prof_License_Mari.func_move_file.MyMoveFile(code, 're1', 'sprayed', 'using');
-							Prof_License_Mari.func_move_file.MyMoveFile(code, 're2', 'sprayed', 'using');
-							Prof_License_Mari.func_move_file.MyMoveFile(code, 're3', 'sprayed', 'using');
-							Prof_License_Mari.func_move_file.MyMoveFile(code, 're4', 'sprayed', 'using');
-							Prof_License_Mari.func_move_file.MyMoveFile(code, 're5', 'sprayed', 'using');
+							// Prof_License_Mari.func_move_file.MyMoveFile(code, 're2', 'sprayed', 'using');
+							// Prof_License_Mari.func_move_file.MyMoveFile(code, 're3', 'sprayed', 'using');
+							// Prof_License_Mari.func_move_file.MyMoveFile(code, 're4', 'sprayed', 'using');
+							// Prof_License_Mari.func_move_file.MyMoveFile(code, 're5', 'sprayed', 'using');
 							Prof_License_Mari.func_move_file.MyMoveFile(code, 'corp', 'sprayed', 'using');
 			);
 
 	MD_Lic_types := ['25BK','25BK001','25SL','25ZH072','25ZH073', '64GA','64IR', '64RD','64RH','64RI','64RZ','64TP'];
-	GR_Lic_types := ['25BO','25PR' ,'25CQ','641', '642', '64MC', '64PVDR'];
+	GR_Lic_types := ['25BO','25PR' ,'25CQ','641', '642', '64MC', '64FMC', '64PVDR'];
 	defineTypes  := ['25BK','25BK001','25SL','64RD','64RI','64RZ'];
 
 	//input files
 	lic64	                  := Prof_License_Mari.files_FLS0280.lic64;
 	Olic64		:= output(lic64);
-	re_individual_plus_corp	:= Prof_License_Mari.files_FLS0280.re;
-	Ocorp 		:= output(re_individual_plus_corp);
+	re_individual	:= Prof_License_Mari.files_FLS0280.re;
+	Ore 		:= output(re_individual);
+
+	corp	:= Prof_License_Mari.files_FLS0280.re;
+	Ocorp 		:= output(corp);
+
+  re_individual_plus_corp := re_individual + corp;
 
 	Cmvtranslation	:= Prof_License_Mari.files_References.cmvtranslation(SOURCE_UPD =src_cd);
 	Ocmv := output(Cmvtranslation);
@@ -712,9 +718,15 @@ EXPORT map_FLS0280_conversion(STRING pVersion) := FUNCTION
 																 StringLib.stringfind(TRIM(tmpNAME_OFFICE1,LEFT,RIGHT),'INDIVIDUAL',1)> 0 => stringlib.stringfindreplace(tmpNAME_OFFICE1,'INDIVIDUAL',''),
 																 tmpNAME_OFFICE1);		
 		cleanNAME_OFFICE1			:= Prof_License_Mari.mod_clean_name_addr.strippunctName(tempNAME_OFFICE1);
+		
 		self.NAME_OFFICE			:= MAP(StringLib.stringfind(TRIM(cleanNAME_OFFICE1,LEFT,RIGHT),'JUDY B SPAKE DBA',1)> 0 => StringLib.StringFindReplace(cleanNAME_OFFICE1,'JUDY B SPAKE DBA','JUDY B SPAKE'),
 																 StringLib.stringfind(TRIM(cleanNAME_OFFICE1,LEFT,RIGHT),'DBA',1)> 0 => Prof_License_Mari.mod_clean_name_addr.GetCorpName(cleanNAME_OFFICE1),
 																 StringLib.stringfind(TRIM(cleanNAME_OFFICE1,LEFT,RIGHT),' AKA ',1)> 0 => Prof_License_Mari.mod_clean_name_addr.GetCorpName(cleanNAME_OFFICE1),
+																 TRIM(cleanNAME_OFFICE1,all) = TRIM(SELF.name_first,all) + TRIM(SELF.name_last,all) => '',
+																 TRIM(cleanNAME_OFFICE1,all) = TRIM(SELF.name_first,all) + TRIM(SELF.name_mid,all) + TRIM(SELF.name_last,all) => '',
+																 TRIM(cleanNAME_OFFICE1,all) = TRIM(SELF.name_last,all) + TRIM(SELF.name_first,all) => '',
+																 TRIM(cleanNAME_OFFICE1) = TRIM(SELF.NAME_ORG) => '',
+																 TRIM(cleanNAME_OFFICE1) = TRIM(TrimNAME_ORG) => '',
 																 stringlib.stringcleanspaces(cleanNAME_OFFICE1));
 
 /* 		self.NAME_OFFICE		:= MAP(StringLib.stringfind(TRIM(cleanNAME_OFFICE,LEFT,RIGHT),'JUDY B SPAKE DBA',1)> 0 => StringLib.StringFindReplace(cleanNAME_OFFICE,'JUDY B SPAKE DBA','JUDY B SPAKE'),
@@ -732,11 +744,14 @@ EXPORT map_FLS0280_conversion(STRING pVersion) := FUNCTION
 		self.OFF_LICENSE_NBR 	:= pInput.office_lic_numr;
 		
 		// Reformatting dates from MM/DD/YYYY to YYYYMMDD
-		SELF.CURR_ISSUE_DTE		:= IF(pInput.EFFC_DATE<>'',Prof_License_Mari.DateCleaner.fmt_dateMMDDYYYY(pInput.EFFC_DATE),'17530101');
-		tempIssueDte        	:= IF(pInput.orig_lic_date != '',Prof_License_Mari.DateCleaner.norm_date3(pInput.orig_lic_date),
-																'');
-		SELF.ORIG_ISSUE_DTE		:= IF(tempIssueDte != '',Prof_License_Mari.DateCleaner.fmt_dateMMDDYYYY(tempIssueDte),'17530101');	
-		SELF.EXPIRE_DTE				:= IF(pInput.EXP_DATE != '',Prof_License_Mari.DateCleaner.fmt_dateMMDDYYYY(pInput.EXP_DATE),'17530101');
+		SELF.CURR_ISSUE_DTE				:= IF(pInput.EFFC_DATE<>'',Prof_License_Mari.DateCleaner.ToYYYYMMDD(pInput.EFFC_DATE),'17530101');
+		// tempIssueDte        		:= IF(pInput.orig_lic_date != '',Prof_License_Mari.DateCleaner.norm_date3(pInput.orig_lic_date),
+																// '');														
+		// SELF.ORIG_ISSUE_DTE		:= IF(tempIssueDte != '',Prof_License_Mari.DateCleaner.ToYYYYMMDD(tempIssueDte),'17530101');	
+		SELF.ORIG_ISSUE_DTE				:= IF(pInput.ORIG_LIC_DATE <>'',Prof_License_Mari.DateCleaner.ToYYYYMMDD(pInput.ORIG_LIC_DATE),'17530101');
+		// SELF.EXPIRE_DTE				:= IF(pInput.EXP_DATE != '',Prof_License_Mari.DateCleaner.ToYYYYMMDD(pInput.EXP_DATE),'17530101');
+		tmpExpireDate 						:= Prof_License_Mari.DateCleaner.ToYYYYMMDD(pInput.EXP_DATE);
+		SELF.EXPIRE_DTE 					:= IF(tmpExpireDate < '20000101','20' + tmpExpireDate[3..],tmpExpireDate);
 		
 				// assign two holders for raw data per mari business rules
 		SELF.NAME_ORG_ORIG		:= TrimNAME_ORG;
@@ -1247,10 +1262,10 @@ EXPORT map_FLS0280_conversion(STRING pVersion) := FUNCTION
 	
 	move_to_used	:= parallel(Prof_License_Mari.func_move_file.MyMoveFile(code, 'lic64', 'using', 'used'),
 														Prof_License_Mari.func_move_file.MyMoveFile(code, 're1', 'using', 'used'),
-														Prof_License_Mari.func_move_file.MyMoveFile(code, 're2', 'using', 'used'),
-														Prof_License_Mari.func_move_file.MyMoveFile(code, 're3', 'using', 'used'),
-														Prof_License_Mari.func_move_file.MyMoveFile(code, 're4', 'using', 'used'),
-														Prof_License_Mari.func_move_file.MyMoveFile(code, 're5', 'using', 'used'),
+														// Prof_License_Mari.func_move_file.MyMoveFile(code, 're2', 'using', 'used'),
+														// Prof_License_Mari.func_move_file.MyMoveFile(code, 're3', 'using', 'used'),
+														// Prof_License_Mari.func_move_file.MyMoveFile(code, 're4', 'using', 'used'),
+														// Prof_License_Mari.func_move_file.MyMoveFile(code, 're5', 'using', 'used'),
 														Prof_License_Mari.func_move_file.MyMoveFile(code, 'corp', 'using', 'used')
 														);
 
@@ -1262,6 +1277,6 @@ EXPORT map_FLS0280_conversion(STRING pVersion) := FUNCTION
 	notify_invalid_address := Prof_License_Mari.fNotifyError.NameInAddressFields(code,src_cd,pVersion,
 	                            Prof_License_Mari.Email_Notification_Lists.BaseFileConversion);
 	
-	RETURN SEQUENTIAL(move_to_using, Olic64, Ocorp, Ocmv, d_final, add_super, move_to_used, notify_missing_codes, notify_invalid_address);
+	RETURN SEQUENTIAL(move_to_using, Olic64, Ore, Ocorp, Ocmv, d_final, add_super, move_to_used, notify_missing_codes, notify_invalid_address);
 
 END;

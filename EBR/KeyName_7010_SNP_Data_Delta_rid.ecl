@@ -1,0 +1,1 @@
+﻿EXPORT KeyName_7010_SNP_Data_Delta_rid := trim(GetSegmentKeyName_Delta_RID('7010'));

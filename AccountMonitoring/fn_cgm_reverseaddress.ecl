@@ -1,4 +1,4 @@
-
+﻿
 import Business_Header,Watchdog,ut;
  
 EXPORT DATASET(layouts.history) fn_cgm_reverseaddress(
@@ -22,7 +22,7 @@ EXPORT DATASET(layouts.history) fn_cgm_reverseaddress(
 		// doxie.key_header	
 		key_header_dist_addr := 
 			DISTRIBUTE(
-				AccountMonitoring.product_files.header_files.doxie_key_header_slim,
+				AccountMonitoring.product_files.header_files.r_doxie_key_header_slim,
 				HASH64(prim_name, st, zip, prim_range, sec_range)
 			) : INDEPENDENT;
 
@@ -117,7 +117,7 @@ EXPORT DATASET(layouts.history) fn_cgm_reverseaddress(
 				),
 				pid,rid,local
 			);
-			
+		
 		return temp_rolled_hashes;
 		
 	end;

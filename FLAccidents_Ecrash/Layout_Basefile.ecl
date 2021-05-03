@@ -16,7 +16,7 @@
 	STRING10 court_date;
 	STRING9 court_time;
 	//PRtcc datatype update
-	STRING100 citation_detail1;
+	STRING200 citation_detail1;
 	
 	STRING3 local_code;
 	//PRtcc datatype update
@@ -100,6 +100,12 @@
 	STRING11 agency_id;
 	STRING100 agency_name;
 	STRING11 agency_ori;
+	
+	//PR Recon COPPR-49
+	BOOLEAN is_Terminated_Agency;
+		//PR Recon COPPR-63
+	BOOLEAN allow_Sale_Of_Component_Data; 
+	
 	STRING19 sent_to_hpcc_datetime;
 	STRING4 corrected_incident;
 	STRING9 cru_order_id;
@@ -244,7 +250,7 @@
 	STRING60 injured_taken_to;
 	STRING7 incident_transported_for_medical_care;
 	//PRtcc datatype update
-	STRING1 photographs_taken;
+	STRING7 photographs_taken;
 	STRING100 photographed_by;
 	
 	STRING20 photographer_id;
@@ -366,7 +372,7 @@
 	STRING40 safety_equipment_restraint2;
 	STRING40 safety_equipment_helmet;
 	STRING100 air_bag_deployed;
-	STRING20 ejection;
+	STRING100 ejection;
 	STRING30 drivers_license_jurisdiction;
 	STRING30 dl_number_class;
 	STRING3 dl_number_cdl;
@@ -382,8 +388,8 @@
 	//PRtcc datatype update for code and description
 	STRING alcohol_test_status;
 	STRING alcohol_test_type;
-	
-	STRING25 alcohol_test_result;
+	//Data Ingestion Enum Field
+	STRING  alcohol_test_result;
 	STRING7 law_enforcement_suspects_drug_use;
 	STRING20 drug_test_given;
 	STRING100 non_motorist_actions_prior_to_crash1;
@@ -923,7 +929,17 @@
 	STRING10 Dispatch_Date;
 	STRING10 Drug_Involvement;
 	STRING7 Alcohol_Involved;
-	STRING10 Dui_Suspected;
 	//Data Ingestion New Enum fields
+	STRING Dui_Suspected;
 	STRING Drug_Test_Result;
-	END;
+	//Data Ingestion CR-1273
+  STRING64 Geo_Coded_Latitude;
+	STRING64 Geo_Coded_Longitude;
+	//PRtCC CR-1237
+  STRING Marijuana_Use_Suspected;
+	//PRtCC CR-1262 
+  STRING Direction_Of_Impact;
+	STRING Event_Sequence;
+  STRING1 is_Suppressed;
+	DATASET(Layout_Infiles_Fixed.Citations_ChildRec) Citation_Details {MAXCOUNT(Constants.Max_Citations_ChildRec_Count)};
+END;

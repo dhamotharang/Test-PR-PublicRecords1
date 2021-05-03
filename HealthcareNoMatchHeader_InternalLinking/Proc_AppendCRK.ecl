@@ -1,5 +1,5 @@
 ﻿#OPTION('multiplePersistInstances', FALSE);
-IMPORT HealthcareNoMatchHeader_InternalLinking, STD;
+IMPORT HealthcareNoMatchHeader_InternalLinking, HealthcareNoMatchHeader_Ingest, STD;
 EXPORT  Proc_AppendCRK( 
           STRING	pSrc  = '' 
           ,DATASET(HealthcareNoMatchHeader_InternalLinking.Layout_Header) pInputFile
@@ -46,6 +46,25 @@ EXPORT  Proc_AppendCRK(
                     ),
                     LOCAL
                   );
-                
-  RETURN  dAppendCRK;
+
+  dOldCRK :=  HealthcareNoMatchHeader_Ingest.Files(pSrc).CRK;
+  
+  HealthcareNoMatchHeader_InternalLinking.Layout_Header tUpdateChangeFlags(dAppendCRK pNew, dOldCRK pOld)  :=  TRANSFORM
+    SELF.lexID_changed  :=  IF(pNew.lexid<>pOld.lexid AND pOld.rid>0,'Y','N');
+    SELF.old_lexid      :=  IF(pNew.lexid<>pOld.lexid AND pOld.rid>0,pOld.lexid,pNew.lexid);
+    SELF.crk_changed    :=  IF(pNew.crk<>pOld.crk AND pOld.rid>0,'Y','N');
+    SELF.old_crk        :=  IF(pNew.crk<>pOld.crk AND pOld.rid>0,pOld.crk,pNew.crk);
+    SELF                :=  pNew;
+  END;
+
+  dUpdateChangeFlags  :=  JOIN(
+                            DISTRIBUTE(dAppendCRK,HASH(rid)),
+                            DISTRIBUTE(dOldCRK,HASH(rid)),
+                              LEFT.rid  = RIGHT.rid,
+                            tUpdateChangeFlags(LEFT,RIGHT),
+                            LOCAL,
+                            LEFT OUTER
+                          );
+
+  RETURN  dUpdateChangeFlags;
 END;

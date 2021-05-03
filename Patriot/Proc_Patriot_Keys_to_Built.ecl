@@ -1,4 +1,4 @@
-import RoxieKeyBuild,Patriot;
+﻿import RoxieKeyBuild,Patriot;
 
 export Proc_Patriot_Keys_to_built(string filedate) :=
 function
@@ -10,7 +10,10 @@ RoxieKeyBuild.MAC_SK_Move_to_Built_v2('~thor_data400::key::patriot_did_file','~t
 RoxieKeyBuild.MAC_SK_Move_to_Built_v2('~thor_data400::key::patriot_bdid_file','~thor_Data400::key::patriot::'+filedate+'::bdid_file',mv6)
 RoxieKeyBuild.MAC_SK_Move_to_Built_v2('~thor_data400::key::patriot_key','~thor_Data400::key::patriot::'+filedate+'::patriot_key',mv7,true)
 RoxieKeyBuild.MAC_SK_Move_to_Built_v2('~thor_Data400::key::patriot_phoneticnames','~thor_Data400::key::patriot::'+filedate+'::phoneticnames',mv8, true);
+RoxieKeyBuild.MAC_SK_Move_to_Built_v2('~thor_Data400::key::patriot_file::delta_rid','~thor_Data400::key::patriot::'+filedate+'::file::delta_rid',mv9, true);  //DF-28226
+RoxieKeyBuild.MAC_SK_Move_to_Built_v2('~thor_Data400::key::baddids::delta_rid','~thor_Data400::key::patriot::'+filedate+'::baddids::delta_rid',mv10, true);  //DF-28226
+RoxieKeyBuild.MAC_SK_Move_to_Built_v2('~thor_Data400::key::annotated_names::delta_rid','~thor_Data400::key::patriot::'+filedate+'::annotated_names::delta_rid',mv11, true);  //DF-28226
 
-return sequential(mv1,mv2,mv3,mv4,mv5,mv6,mv7,mv8);
+return sequential(mv1,mv2,mv3,mv4,mv5,mv6,mv7,mv8,mv9,mv10,mv11);
 
 end;

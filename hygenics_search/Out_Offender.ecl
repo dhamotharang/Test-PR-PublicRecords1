@@ -23,7 +23,7 @@ fcra_all					:= fcra_v1(vendor not in hygenics_search.sCourt_Vendors_To_Omit
 /////////////////////////////////////////////////////////////
 	
 	fcra_filtered removeInfo(fcra_filtered l):= transform
-		self.fcra_conviction_flag						:= '';
+	//	self.fcra_conviction_flag						:= '';
 		self.fcra_traffic_flag							:= '';
 		self.fcra_date											:= '';
 		self.fcra_date_type									:= '';
@@ -371,9 +371,44 @@ corrections.layout_offender RemF(dCrimOffender2FixedReady l):= transform
   deduped_NonFCRAPID := dedup(sort(distribute(NonFCRA_records_dedup,HASH(offender_persistent_id)),offender_persistent_id,-src_upload_date,local),offender_persistent_id,local);
   deduped_FCRAPID :=    dedup(sort(distribute(FCRA_records_dedup,HASH(offender_persistent_id)),offender_persistent_id,-src_upload_date,local),offender_persistent_id,local);
   
+  //nonFCRA  
+	recordof(deduped_NonFCRAPID) tr_rightPadDatesNonFCRA(deduped_NonFCRAPID l) := transform  //DF-28911
+	
+  self.process_date := hygenics_crim._functions.rightPadDate(l.process_date);	
+	self.file_date := hygenics_crim._functions.rightPadDate(l.file_date);	
+	self.case_date := hygenics_crim._functions.rightPadDate(l.case_date);	
+	self.dob := hygenics_crim._functions.rightPadDate(l.dob);	
+	self.dob_alias := hygenics_crim._functions.rightPadDate(l.dob_alias);	
+	self.src_upload_date := hygenics_crim._functions.rightPadDate(l.src_upload_date);	
+	self.fcra_date := hygenics_crim._functions.rightPadDate(l.fcra_date);	
+	self.conviction_override_date := hygenics_crim._functions.rightPadDate(l.conviction_override_date);	 
+  self := l;
+  end;
 
-  PromoteSupers.MAC_SF_BuildProcess(deduped_NonFCRAPID,'~thor_Data400::base::corrections_offenders_' + doxie_build.buildstate, outOffnd, 2,,TRUE);
-	PromoteSupers.MAC_SF_BuildProcess(deduped_FCRAPID,'~thor_data400::base::fcra_corrections_offenders_' + doxie_build.buildstate, outOffnd2, 2,,TRUE);			 
+  pad_dates_deduped_NonFCRAPID := PROJECT(deduped_NonFCRAPID,tr_rightPadDatesNonFCRA(left));
+	
+	//FCRA	
+	recordof(deduped_FCRAPID) tr_rightPadDatesFCRA(deduped_FCRAPID l) := transform  //DF-28911
+	
+  self.process_date := hygenics_crim._functions.rightPadDate(l.process_date);	
+	self.file_date := hygenics_crim._functions.rightPadDate(l.file_date);	
+	self.case_date := hygenics_crim._functions.rightPadDate(l.case_date);	
+	self.dob := hygenics_crim._functions.rightPadDate(l.dob);	
+	self.dob_alias := hygenics_crim._functions.rightPadDate(l.dob_alias);	
+	self.src_upload_date := hygenics_crim._functions.rightPadDate(l.src_upload_date);	
+	self.fcra_date := hygenics_crim._functions.rightPadDate(l.fcra_date);	
+	self.conviction_override_date := hygenics_crim._functions.rightPadDate(l.conviction_override_date);	 
+  self := l;
+  end;
+
+  pad_dates_deduped_FCRAPID := PROJECT(deduped_FCRAPID,tr_rightPadDatesFCRA(left));
+
+
+//  PromoteSupers.MAC_SF_BuildProcess(deduped_NonFCRAPID,'~thor_Data400::base::corrections_offenders_' + doxie_build.buildstate, outOffnd, 2,,TRUE);   
+//	PromoteSupers.MAC_SF_BuildProcess(deduped_FCRAPID,'~thor_data400::base::fcra_corrections_offenders_' + doxie_build.buildstate, outOffnd2, 2,,TRUE);		 
+
+  PromoteSupers.MAC_SF_BuildProcess(pad_dates_deduped_NonFCRAPID,'~thor_Data400::base::corrections_offenders_' + doxie_build.buildstate, outOffnd, 2,,TRUE);  //DF-28911
+	PromoteSupers.MAC_SF_BuildProcess(pad_dates_deduped_FCRAPID,'~thor_data400::base::fcra_corrections_offenders_' + doxie_build.buildstate, outOffnd2, 2,,TRUE);	 //DF-28911
 	PromoteSupers.MAC_SF_BuildProcess(hygenics_crim.File_AddressCacheInput,'~thor_data400::base::crim::address_cache_' + doxie_build.buildstate, outOffnd3, 2,,TRUE);
 							 
 export Out_Offender := sequential(

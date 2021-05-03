@@ -1,6 +1,17 @@
-﻿import CanadianPhones, autokey, ut;
+﻿import CanadianPhones, autokey, ut, did_add;
 
 canadianWP := CanadianPhones.file_CanadianWhitePagesBase;
+
+temprec := RECORD
+	CanadianPhones.layoutCanadianWhitepagesBase;
+	UNSIGNED6 did := 0;
+  INTEGER3  DID_Score :=0;
+END;
+
+	//CCPA-1030
+	matchset := ['A', 'Z'];
+	did_add.MAC_Match_Flex(canadianWP, matchset, '', '', fname, mname, lname, name_suffix, 
+  prim_range, prim_name, sec_range, zip, state, '' , did, temprec, TRUE, DID_Score,75, dCanadianPhonesWDID);
 
 slim_canadianWP := RECORD
   string8 Date_first_reported;
@@ -100,14 +111,17 @@ slim_canadianWP := RECORD
 	string9  Postal_Mode;
 	string9  Postal_Bag_Bundle;	
 	string1  Transaction_Code;
-    string1  listing_type;
+  string1  listing_type;
 	unsigned6 fdid;
 	//Added for CCPA-88
 	unsigned4 global_sid;
 	unsigned8 record_sid;
+	//Added for CCPA-1059
+  UNSIGNED6 did;
+  INTEGER3  DID_Score;
 END;
 
-slim_canadianWP xpand_canadianWP(canadianWP le,integer cntr) :=  TRANSFORM 
+slim_canadianWP xpand_canadianWP(dCanadianPhonesWDID le,integer cntr) :=  TRANSFORM 
 	SELF.fdid := cntr + autokey.did_adder(''); 
 	self.firstname	 	:= le.fname;
 	self.middlename		:= le.mname;
@@ -115,7 +129,7 @@ slim_canadianWP xpand_canadianWP(canadianWP le,integer cntr) :=  TRANSFORM
 	SELF := le; 
 END;
 
-cProject := PROJECT(canadianWP,xpand_canadianWP(LEFT,COUNTER));
+cProject := PROJECT(dCanadianPhonesWDID,xpand_canadianWP(LEFT,COUNTER));
 
 
 ut.mac_suppress_by_phonetype(cProject,phonenumber,state,ph_out1,false);

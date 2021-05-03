@@ -7,20 +7,24 @@ export fun_UpdateDOPS(
 	,boolean								pShouldUpdateRoxiePage	= true
 	,string									pEnvironment						= ''		//	'N' - nonfcra, 'F' - FCRA
   ,string                 pupdateflag             = 'F'
+  ,string                 pl_inloc                = dops.constants.location
 ) :=
 function
 	
 	roxieemailbody	:= fun_RoxieEmailBody(pall_superkeynames,pversion);
-	alert						:= if(regexfind('keys', roxieemailbody[1..4], nocase), ' Package Completed ', ' ALERT KEY VERSION MISMATCH ');
+	alert						:= if(regexfind('keys', roxieemailbody[1..4], nocase)
+                          ,' Package Completed '
+                          ,' ALERT KEY VERSION MISMATCH '
+                     );
 	
 	roxiefilename := 'pkgfile::'+pPackageName+'::'+pversion+'::';
-	file_list := fileservices.LogicalFileList()(regexfind(roxiefilename	, name		, nocase));
+	file_list     := fileservices.LogicalFileList()(regexfind(roxiefilename	, name		, nocase));
 	
 	update_roxie := if(		regexfind('keys', roxieemailbody[1..4], nocase)
 										and count(nothor(file_list)) = 0
 										and pShouldUpdateRoxiePage
                     and tools._Constants.Isdataland = false
-														, dops.updateversion(pPackageName, pversion, pEmailAddresses,,l_inenvment := pEnvironment,l_updateflag := pupdateflag)
+														, dops.updateversion(pPackageName, pversion, pEmailAddresses,,l_inenvment := pEnvironment,l_updateflag := pupdateflag,l_inloc := pl_inloc)
 									);
 	
 	return sequential(

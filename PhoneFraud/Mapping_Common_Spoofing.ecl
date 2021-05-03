@@ -26,11 +26,27 @@ EXPORT Mapping_Common_Spoofing(string8 version) := FUNCTION
 		self.date_added						:= _Functions.clNum(l.date_added)[1..8];
 		self.time_added						:= _Functions.clNum(l.date_added)[9..];
 		self         							:= l;
-	end;
+	END;
 	 
 	phoneNorm 	:= normalize(inFile, 3, spoofTr(left,counter))(phone<>'');
-	concatFile	:= phoneNorm + PhoneFraud.File_Spoofing.Base;	
-	ddConcat 		:= dedup(sort(distribute(concatFile, hash(id)), id, phone_origin, date_file_loaded, local), record, except date_file_loaded, local);
+	concatFile	:= phoneNorm + PhoneFraud.File_Spoofing.Base; //-20200921 change to delta update
+/*     concatFile	:= join(phoneNorm, distribute(PhoneFraud.File_Spoofing.Base, hash(id)),   
+        left.phone = right.phone and
+		left.phone_origin = right.phone_origin and					
+		left.id = right.id and										
+		left.reference_id = right.reference_id and
+		left.mode_type = right.mode_type and
+		left.account_name = right.account_name and
+		left.event_date = right.event_date and
+		left.event_time = right.event_time and						
+		left.ip_address = right.ip_address and
+		left.neustar_lower_bound = right.neustar_lower_bound and
+		left.neustar_upper_bound = right.neustar_upper_bound and
+		left.vendor = right.vendor and
+		left.date_added = right.date_added and						
+		left.time_added = right.time_added	  
+          , left only); */
+	ddConcat 		:= dedup(sort(distribute(concatFile, hash(id)), id, phone_origin, date_file_loaded, local), record, except date_file_loaded, local) - PhoneFraud.File_Spoofing.Base;
 	
 	RETURN ddConcat;
 

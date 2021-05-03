@@ -1,4 +1,4 @@
-IMPORT corp2;
+﻿IMPORT corp2;
 	
 EXPORT Functions := MODULE
 
@@ -12,7 +12,7 @@ EXPORT Functions := MODULE
 			uc_ro 		:= corp2.t2u(recordorigin);
 			 
 			isValidCD := if(uc_ro = 'C',
-											map(uc_s in ['01','O','04','H'] => true, 
+											map(uc_s in ['01','O','04','06','H'] => true, 
 													false
 												 ),
 												true //For contact records, corp_ln_name_type_cd doesn't have to exist
@@ -21,13 +21,12 @@ EXPORT Functions := MODULE
 			 RETURN if(isValidCD,1,0);
 
 		END;
-
-
 		
 		//Below table needs to be updated when we see new status_desc in Raw updates!
-		EXPORT set_valid_status_desc := ['TERMINATED','CESSATION','DISSOLVED','WITHDRAWAL','MERGED','CANCELLATION',
-																		 'INACTIVE','ACTIVE','WITHDRAWN','EXPIRED','CANCELLED','EXPIRATION PENDING',
-																		 'CESSATED','HOLD','CONVERTED','PENDING MERGER','DOMESTICATED','REDOMESTICATED',                                              
-																		 'REVOKED',''];
+		EXPORT set_valid_status_desc := ['ACTIVE', 'CANCELLED', 'CANCELLATION', 'CESSATED', 'CESSATION', 'CONVERTED', 'DISSOLVED',
+																		 'DOMESTICATED', 'EXPIRATION', 'EXPIRED', 'EXPIRATION PENDING', 'HOLD', 'INACTIVE', 'MERGED', 
+																		 'PENDING CANCELLATION', 'PENDING CESSATION','PENDING DISSOLUTION', 'PENDING MERGER', 
+																		 'PENDING WITHDRAWAL', 'PENDING', 'REDOMESTICATED', 'REVOKED','TERMINATED', 'WITHDRAWAL', 
+																		 'WITHDRAWN',''];
 													 
 END;

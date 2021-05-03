@@ -1,4 +1,4 @@
-﻿import versioncontrol, _control;
+﻿import versioncontrol, _control, Scrubs_LitigiousDebtor;
 
 export Build_All(
     string	pversion
@@ -41,6 +41,7 @@ export Build_All(
 								,spray_files
 								,Promote().Input.Sprayed2Using
 								,Build_Base_File
+								,Scrubs_LitigiousDebtor.Fn_RunScrubs(pversion)
 								,Promote().Input.Using2Used
 								,Promote(pversion).New2Built
 								,Promote().Built2QA

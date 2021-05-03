@@ -1,0 +1,26 @@
+﻿OPTIONS:-gh
+MODULE:Scrubs_PhoneFinder
+FILENAME:PhoneFinder
+NAMESCOPE:Identities
+
+
+FIELDTYPE:Invalid_No:ALLOW(0123456789\\N)
+FIELDTYPE:Invalid_ID:ALLOW(0123456789R\\N)
+FIELDTYPE:Invalid_State:ALLOW(ABCDEFGHIJKLMNOPQRSTUVWXYZ\\ ):LENGTHS(0,2)
+FIELDTYPE:Invalid_AlphaChar:ALLOW(0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ&#\\(\\)_\|:;* .,/+-@\\')
+FIELDTYPE:Invalid_AlphaNumChar:ALLOW(0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ&#\\(\\)_\|:;* .,/+-@\\')
+FIELDTYPE:Invalid_Zip:LIKE(Invalid_No):LENGTHS(0,2,5)
+FIELDTYPE:Invalid_Date:CUSTOM(Scrubs_PhoneFinder.Functions.Split_Date > 0)
+FIELDTYPE:Invalid_File:CUSTOM(Scrubs_PhoneFinder.Functions.Check_File > 0)
+
+FIELD:transaction_id:TYPE(STRING16):LIKE(Invalid_ID):0,0R
+FIELD:sequence_number:TYPE(INTEGER5):LIKE(Invalid_No):0,0
+FIELD:lexid:TYPE(STRING32):LIKE(Invalid_No):0,0
+FIELD:full_name:TYPE(STRING128):LIKE(Invalid_AlphaChar):0,0
+FIELD:full_address:TYPE(STRING128):LIKE(Invalid_AlphaNumChar):0,0
+FIELD:city:TYPE(STRING64):LIKE(Invalid_AlphaChar):0,0
+FIELD:state:TYPE(STRING16):LIKE(Invalid_State):0,0
+FIELD:zip:TYPE(STRING10):LIKE(Invalid_Zip):0,0
+FIELD:verified_carrier:TYPE(INTEGER1):LIKE(Invalid_No):0,0
+FIELD:date_added:TYPE(STRING20):LIKE(Invalid_Date):0,0
+FIELD:filename:TYPE(STRING255):LIKE(Invalid_File):0,0

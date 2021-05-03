@@ -1,33 +1,26 @@
 ﻿IMPORT Orbit3,_control, header;
 
-EXPORT fn_orbit_entries(boolean isCreate, string filedate) := function    
+hdr_bld_step8_4_orbit_entries(string filedate) := function    
 
     is_hash_month := filedate[5..6] in ['03','06','09','12'];   
     
-    skipcreatebuild := if(isCreate, false, true);
-    skipupdatebuild := if(isCreate, true, false);
-       
     return parallel(
-            Orbit3.Proc_Orbit3_CreateBuild('Show Sources', filedate, 'N', skipcreatebuild, skipupdatebuild, true, Header.email_list.BocaDevelopers);
-            // - Orbit3.Proc_Orbit3_CreateBuild('FCRA_Header', filedate, 'F', skipcreatebuild, skipupdatebuild, true, Header.email_list.BocaDevelopers);
-            Orbit3.Proc_Orbit3_CreateBuild('FCRA_AddressRawAIDKeys', filedate, 'F', skipcreatebuild, skipupdatebuild, true, Header.email_list.BocaDevelopers);            
-            Orbit3.Proc_Orbit3_CreateBuild('Header', filedate, 'N', skipcreatebuild, skipupdatebuild, true, Header.email_list.BocaDevelopers);
-            Orbit3.Proc_Orbit3_CreateBuild('RelativesV3', filedate, 'N',skipcreatebuild, skipupdatebuild, true, Header.email_list.BocaDevelopers);
-            Orbit3.Proc_Orbit3_CreateBuild('PersonXLAB', filedate, 'N', skipcreatebuild, skipupdatebuild, true, Header.email_list.BocaDevelopers);
-            Orbit3.Proc_Orbit3_CreateBuild('personAncillarykeys', filedate, 'N', skipcreatebuild, skipupdatebuild, true, Header.email_list.BocaDevelopers);
-            Orbit3.Proc_Orbit3_CreateBuild('Slimsorts', filedate, 'N', skipcreatebuild, skipupdatebuild, true, Header.email_list.BocaDevelopers);
-            Orbit3.Proc_Orbit3_CreateBuild('PowerSearchBoolean', filedate, 'B', skipcreatebuild, skipupdatebuild, true, Header.email_list.BocaDevelopers);
-            Orbit3.Proc_Orbit3_CreateBuild('Remote Linking', filedate, 'N', skipcreatebuild, skipupdatebuild, true, Header.email_list.BocaDevelopers);
-            // - Orbit3.Proc_Orbit3_CreateBuild('Header_IKB', filedate, 'N', skipcreatebuild, skipupdatebuild, true, Header.email_list.BocaDevelopers);
-            if(is_hash_month, Orbit3.Proc_Orbit3_CreateBuild('Header Hashes', filedate, 'N', skipcreatebuild, skipupdatebuild, true, Header.email_list.BocaDevelopers))
+            Orbit3.Proc_Orbit3_CreateBuild('Show Sources', filedate, 'N', email_list := Header.email_list.BocaDevelopers);
+            Orbit3.Proc_Orbit3_CreateBuild('FCRA_AddressRawAIDKeys', filedate, 'F', email_list := Header.email_list.BocaDevelopers);            
+            Orbit3.Proc_Orbit3_CreateBuild('Header', filedate, 'N', email_list := Header.email_list.BocaDevelopers);
+            Orbit3.Proc_Orbit3_CreateBuild('RelativesV3', filedate, 'N', email_list := Header.email_list.BocaDevelopers);
+            Orbit3.Proc_Orbit3_CreateBuild('PersonXLAB', filedate, 'N', email_list := Header.email_list.BocaDevelopers);
+            Orbit3.Proc_Orbit3_CreateBuild('personAncillarykeys', filedate, 'N', email_list := Header.email_list.BocaDevelopers);
+            Orbit3.Proc_Orbit3_CreateBuild('Slimsorts', filedate, 'N', email_list := Header.email_list.BocaDevelopers);
+            Orbit3.Proc_Orbit3_CreateBuild('PowerSearchBoolean', filedate, 'B', email_list := Header.email_list.BocaDevelopers);
+            Orbit3.Proc_Orbit3_CreateBuild('Remote Linking', filedate, 'N', email_list := Header.email_list.BocaDevelopers);
+            if(is_hash_month, Orbit3.Proc_Orbit3_CreateBuild('Header Hashes', filedate, 'N', email_list := Header.email_list.BocaDevelopers))
             );
 end;
 
-filedate := '20191226'; // RUN ON HTHOR
+filedate := '20200827'; // RUN ON HTHOR
 
-// fn_orbit_entries(true, filedate);
-fn_orbit_entries(false, filedate);
-
+// hdr_bld_step8_4_orbit_entries(filedate);
 
 // W:\Projects\Header\15-05a_BuildAssistScripts\personheader_create_orbit_entries.ecl
 /*
@@ -37,6 +30,14 @@ version
 create entries
 update for QA
 
+20200526 W20200626-092143 - create
+20200526 W20200626-092429 - update
+20200419 W20200522-140402 - create
+20200419 W20200522-140634 - update
+20200223 W20200326-131435 - create
+20200223 W20200326-131516 - update
+20200119 W20200224-105819 - create
+20200119 W20200224-111402 - update
 20191226 W20200128-102242 - create
 20191128 W20200103-135944 - create
 20191128 W20200103-140359 - update

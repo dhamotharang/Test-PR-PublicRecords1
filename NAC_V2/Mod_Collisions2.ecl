@@ -1,19 +1,56 @@
-import ut, header, Std;
+﻿import ut, header, Std;
 
 EXPORT Mod_Collisions2(dataset(Layout_Base2) Base) := MODULE
+/**
+suppress address if:
+1) it does not clean correctly
+2) It hais an invalid prim name
+3) The address category is not blank
+**/ 
 
-shared FileBase := project(Base
-								,transform(NAC_V2.Layout_Base2
-									,self.prim_name
-											:= if(NAC_V2.fn_IsValidAddress(left.prim_name)
-																			,left.prim_name
-																			,'')
-									,self:=left));
+shared FileBase := $.fn_suppress_addr(Base);
 
-SHARED threashold:=enum(unsigned1,Low,Medium,High);
-SHARED score_threashold:=threashold;
-SHARED ssn_threashold:=threashold;
-SHARED dob_threashold:=threashold;
+shared threashold:=enum(unsigned1,Low,Medium,High);
+shared score_threashold:=threashold;
+shared ssn_threashold:=threashold;
+shared dob_threashold:=threashold;
+
+/*
+Best Match
+// L             LexId
+Exact Matches
+// N             Name: last name, first or preferred first
+// S             Full SSN
+// D             DOB
+Address Matches
+// A             Address: prim range & prim name
+// C             City/State 
+// Z             Zip 
+Fuzzy Matches
+// P             Fuzzy SSN
+// B             Fuzzy DOB
+// V             Partial name (Last Name + First Initial)
+// W             Last Name only
+Future Use
+// H             Phone
+*/
+/*
+Search Types
+Match Set				Priority
+L									0							LexId
+NSD								1							Name, SSN, DOB
+VSD								2							Partial Name, SSN, DOB
+NSB								3							Name, SSN, Fuzzy DOB
+VSB								4							Partial Name, SSN, Fuzzy DOB
+NPD								5							Name, Fuzzy SSN, DOB
+VPD								6							Partial Name, Fuzzy SSN, DOB
+NPB								7							Name, Fuzzy SSN, Fuzzy DOB
+VPB								8							Partial Name, Fuzzy SSN, Fuzzy DOB
+NDAZ							9							Name, DOB, Address, Zip
+NDAC							10						Name, DOB, Address, City
+S									50						SSN
+
+*/
 
 //////////////////////////////////
 matchset:=['N','S','D'];
@@ -194,33 +231,27 @@ concat_all :=
 			+ S_col
 			+ L_col
 			;
-concat_all_d := DISTRIBUTE(concat_all, hash32(BenefitState,SearchBenefitType,SearchCaseID));
+concat_all_d := DISTRIBUTE(concat_all, hash32(SearchGroupId,SearchCaseID,SearchClientID));
 concat_srt
 					:=
 							sort(concat_all_d
-									,BenefitState
-										,SearchBenefitType			
-										,SearchGroupId			
+									,SearchGroupId			
 										,SearchCaseID
 										,SearchClientID
+									  ,BenefitState
+										,SearchBenefitType			
 										,SearchEligibilityStatus
-										,SearchLastName
-										,SearchFirstName
-										,SearchMiddleName
 										,SearchSSN
 										,SearchDOB
-									,CaseState
-										,CaseBenefitType			
-										,CaseGroupId			
+									,CaseGroupId			
 										,CaseID
 										,ClientID
+									  ,CaseState
+										,CaseBenefitType			
 										,ClientEligibilityStatus
-										,ClientLastName
-										,ClientFirstName
-										,ClientMiddleName
 										,ClientSSN
 										,ClientDOB
-									,StartDate,EndDate
+									,-StartDate			//,EndDate  Choose match with most recent start date
 										,pri
 										,LexID
 										,OrigSearchSequenceNumber
@@ -230,41 +261,36 @@ concat_srt
 										;
 				d	:=
 							dedup(concat_srt
-									,BenefitState
-										,SearchBenefitType			
-										,SearchGroupId			
+									,SearchGroupId			
 										,SearchCaseID
 										,SearchClientID
+									  ,BenefitState
+										,SearchBenefitType			
 										,SearchEligibilityStatus
-										,SearchLastName
-										,SearchFirstName
-										,SearchMiddleName
 										,SearchSSN
 										,SearchDOB
-									,CaseState
-										,CaseBenefitType			
-										,CaseGroupId			
+									,CaseGroupId			
 										,CaseID
 										,ClientID
+									  ,CaseState
+										,CaseBenefitType			
 										,ClientEligibilityStatus
-										,ClientLastName
-										,ClientFirstName
-										,ClientMiddleName
 										,ClientSSN
 										,ClientDOB
-									,StartDate,EndDate
+									//,StartDate,EndDate
 										,LOCAL
 										)
 										;
-			c := DISTRIBUTE(d, hash32(benefitstate,SearchBenefitType,searchcaseid,searchclientid));
-			c1 := SORT(c, 	benefitstate, SearchBenefitType, searchgroupid, searchcaseid, searchclientid,SearchEligibilityStatus,SearchLastName,
+			c := DISTRIBUTE(d, hash32(SearchGroupId,SearchCaseID,SearchClientID));
+			c1 := SORT(c, 	SearchGroupId,SearchCaseID,SearchClientID,
+											benefitstate, SearchBenefitType, SearchEligibilityStatus,SearchLastName,
 											casestate, CaseBenefitType, CaseGroupId, caseid, clientid,ClientEligibilityStatus,ClientLastName, startdate, LOCAL);
 								
 	c2 := ROLLUP(c1, 
-									left.benefitstate=right.benefitstate AND left.SearchBenefitType=right.SearchBenefitType and
-											left.searchGroupId=right.searchGroupId AND
+										left.searchGroupId=right.searchGroupId AND
 											left.searchcaseid=right.searchcaseid AND
 											left.searchclientid=right.searchclientid AND
+									left.benefitstate=right.benefitstate AND left.SearchBenefitType=right.SearchBenefitType and
 										  left.SearchEligibilityStatus=right.SearchEligibilityStatus AND
 										  left.SearchLastName=right.SearchLastName
 									AND left.casestate=right.casestate AND left.CaseBenefitType=right.CaseBenefitType

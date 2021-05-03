@@ -1,34 +1,57 @@
-﻿import _control, std;
-EXPORT Spray(string8 version) := function
+﻿IMPORT $, tools, _control;
 
-//bugatti_hdr_20170321_output.dat
-//bugatti_stats_20170321_output.dat
-//srcdir := '/data/projects/cortera/data/'+version+'/';
-srcdir := '/data/projects/cortera/tradeline/data/'+version+'/';
+EXPORT Spray(
+	 string		pversion				= ''
+	//,string		pServerIP				= if(_control.ThisEnvironment.Name='Dataland', _control.IPAddress.bctlpedata12,_control.IPAddress.bctlpedata10)
+	,string		pServerIP				= _control.IPAddress.bctlpedata10
+	,string		pDirectory			= '/data/projects/cortera/tradeline/data/'+pversion[1..8]
+	,string		pFilenamehdr		= 'bugatti_incr_*output.dat'
+	,string		pFilenamestats	= 'bugatti_delete_*output.dat'
+	,string		pGroupName			= ThorLib.Group()
+	,boolean	pIsTesting			= false
+	,boolean	pOverwrite			= false
+	,boolean	pExistSprayed		= _Flags.ExistCurrentSprayed
+	,string		pNameOutput			= _Constants().Name + ' Spray Info'	
+) :=
+FUNCTION
+	FilesToSpray := DATASET([
+		{
+			 pServerIP
+			,pDirectory
+			,pFilenamehdr
+			,0
+			,Filenames(pversion).Input.Adds.logical
+			,[ {Filenames().Input.Adds.sprayed	}	]
+			,pGroupName
+			,''
+			,'[0-9]{8}'
+			,'VARIABLE'
+			,''
+			,_Constants().max_record_size
+			,'|'
+	 	}
+		,{
+			 pServerIP
+			,pDirectory
+			,pFilenamestats
+			,0
+			,Filenames(pversion).Input.Dels.logical
+			,[ {Filenames().Input.Dels.sprayed	}	]
+			,pGroupName
+			,''
+			,'[0-9]{8}'
+			,'VARIABLE'
+			,''
+			,_Constants().max_record_size
+			,'|'
+	 	}
 
-root := '~thor::cortera::in::';
-ip :=  IF(_control.ThisEnvironment.Name='Dataland', _control.IPAddress.bctlpedata12, _control.IPAddress.bctlpedata10 ) ;
-clusta := IF(_control.ThisEnvironment.Name='Dataland','thor400_sta01','thor400_44');
-
-
-sprayfile(string filename) := 
-
-		STD.File.SprayVariable(ip,
-							srcdir + filename,
-							8192,'|',,,
-							clusta,
-							root + Std.Str.tolowercase(filename),
-							,,,true,false,true
-						);
-
-
-return
-	SEQUENTIAL(
-		PARALLEL(
-			sprayfile('bugatti_incr_' + version + '_output.dat'),
-			sprayfile('bugatti_delete_' + version + '_output.dat')
-			),
-		Cortera_Tradeline.Promote().PromoteAdds(root+'bugatti_incr_' + version + '_output.dat'),
-		Cortera_Tradeline.Promote().PromoteDels(root+'bugatti_delete_' + version + '_output.dat')
+	], tools.Layout_Sprays.Info);
+		
+	RETURN sequential(
+		IF(	pDirectory != ''
+				and not pExistSprayed
+				,tools.fun_Spray(FilesToSpray,,,pOverwrite,,false,pIsTesting,,_Constants().Name + ' ' + pversion,pNameOutput,,pReplicate := not _Constants().IsDataland))
 	);
-end;
+END;
+

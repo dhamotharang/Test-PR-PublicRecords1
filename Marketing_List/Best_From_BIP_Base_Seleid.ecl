@@ -9,8 +9,8 @@
 */
 import BIPV2,ut;
 EXPORT Best_From_BIP_Base_Seleid(
-
-   dataset(recordof(Marketing_List.Source_Files().bip_base) ) pDataset_Base   = Marketing_List.Source_Files().bip_base
+   string                                                     pversion        = BIPV2.KeySuffix
+  ,dataset(recordof(Marketing_List.Source_Files().bip_base) ) pDataset_Base   = Marketing_List.Source_Files().bip_base
   ,dataset(Marketing_List.Layouts.business_information_prep ) pBest_Prep      = Marketing_List.Best_From_BIP_Best_Seleid()
   ,boolean                                                    pDebug          = false
   ,set of unsigned6                                           pSampleProxids  = []
@@ -62,17 +62,25 @@ function
 
    // -- get age, dt_xxx_seen
    ds_base_age_prep := table(ds_base_filt(dt_first_seen != 0 or dt_last_seen != 0) ,{seleid  ,unsigned4 dt_first_seen := min(group,if(dt_first_seen = 0  ,99999999 ,dt_first_seen))  ,unsigned4 dt_last_seen := max(group,dt_last_seen)} ,seleid ,merge );
-   ds_base_age  := project(ds_base_age_prep ,transform({recordof(left),string3 age_of_company}
-      ,dt_first_seen := if(left.dt_first_seen = 99999999  ,0  ,left.dt_first_seen);
-       self.dt_first_seen   := if(dt_first_seen  = 0 and left.dt_last_seen != 0 ,left.dt_last_seen  ,     dt_first_seen);
-       self.dt_last_seen    := if(dt_first_seen != 0 and left.dt_last_seen  = 0 ,     dt_first_seen ,left.dt_last_seen );
+   ds_base_age  := project(ds_base_age_prep ,transform({recordof(left),string3 age_of_company},
+       dt_first_seen := if(left.dt_first_seen = 99999999  ,0  ,Marketing_List.Validate_Date(left.dt_first_seen,pversion));
+       dt_last_seen  := if(left.dt_last_seen  = 99999999  ,0  ,Marketing_List.Validate_Date(left.dt_last_seen ,pversion));
+      
+       self.dt_first_seen   := if((dt_first_seen  = 0 and dt_last_seen != 0) or (dt_first_seen > dt_last_seen and dt_last_seen != 0),dt_last_seen   ,dt_first_seen);  //if self.dt_first_seen is zero, then both are zero
+       self.dt_last_seen    := map( self.dt_first_seen = 0 
+                                    or (dt_first_seen = 0 and dt_last_seen != 0) or (dt_first_seen != 0 and dt_last_seen = 0) => self.dt_first_seen //both are zero or one of them is zero.  dt_first_seen took care of that
+                                   ,dt_first_seen > dt_last_seen                                                              => dt_first_seen  
+                                   ,                                                                                             dt_last_seen 
+                               );
        self.age_of_company  := if(self.dt_first_seen > 17760704  ,(string3)ut.Age(self.dt_first_seen) ,'');
        self.seleid          := left.seleid
        
    ));
    
    // -- get latest business email
-   ds_base_email_prep := table(ds_base_filt(trim(contact_email) != '')  ,{seleid,dt_last_seen,string60 business_email := contact_email} ,seleid,dt_last_seen ,contact_email,merge);
+   ds_base_email_filtered := ds_base_filt(Marketing_List.Validate_Email(contact_email) != '');
+   
+   ds_base_email_prep := table(ds_base_email_filtered  ,{seleid,dt_last_seen,string60 business_email := contact_email} ,seleid,dt_last_seen ,contact_email,merge);
    ds_base_email      := dedup(sort(distribute(ds_base_email_prep ,hash(seleid)) ,seleid,-dt_last_seen,business_email,local) ,seleid,local);
    
    // -- append dt_xxx_seen ,age_of_company , and business email

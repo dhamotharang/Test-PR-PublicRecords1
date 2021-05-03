@@ -29,6 +29,7 @@ EXPORT raw := RECORD //layout size (952)
   STRING8 ID;                 //Changed from length of 7
   STRING8 PERSID;             //Changed from length of 7, 10
   STRING3 OWNER;
+  STRING1 a_c_d;
   STRING1 EMAILAVAIL;        //Added as part of new layout
 END;
 
@@ -62,6 +63,7 @@ EXPORT raw_b := RECORD //layout size (606)
   STRING8 ID;                 //Changed from length of 7
   STRING10 PERSID;            //Changed from length of 7
   STRING10 NIXIE_DATE;
+  STRING1 a_c_d;
 END;
 
 EXPORT parse_ska_b := RECORD

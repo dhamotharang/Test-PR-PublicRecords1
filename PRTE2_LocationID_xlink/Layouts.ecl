@@ -1,5 +1,14 @@
 ﻿EXPORT Layouts := module
 
+export key_loc_id_map:= RECORD
+ unsigned6 locid;
+  unsigned8 cleanaid;
+  unsigned8 rawaid;
+  string80 line1;
+  string60 linelast;
+  unsigned8 __internal_fpos__;
+ END;
+
 
 	export Key_meow := 			RECORD
 		unsigned6 locid;

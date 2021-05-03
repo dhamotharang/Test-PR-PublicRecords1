@@ -7,6 +7,7 @@ EXPORT proc_Promote2QA_Alpha(
   ,pCompileTest     = 'false'
   ,pdoParallel      = 'true'
   ,pLESP            = '\'alpha_prod_thor_esp.risk.regn.net\''
+  ,pds_debug        = '\'dataset([],WsWorkunits.Layouts.DebugValues)\''
 ) :=
 functionmacro
   
@@ -25,6 +26,7 @@ functionmacro
       ,pOutputSuperfile  := '~bipv2_build::qa::workunit_history' 
       ,pCompileOnly      := pCompileTest
       ,pDont_Wait        := pdoParallel
+      ,pDebugValues      := pds_debug
   );
 
   return kickbuild;

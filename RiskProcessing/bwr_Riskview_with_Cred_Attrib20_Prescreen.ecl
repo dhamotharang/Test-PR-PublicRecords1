@@ -1,4 +1,4 @@
-#workunit('name','FCRA-Credit Attributes 2.0 - Prescreen');
+﻿#workunit('name','FCRA-Credit Attributes 2.0 - Prescreen');
 
 eyeball := 10;
 
@@ -100,7 +100,7 @@ l := RECORD
 END;
 
 
-fcraroxieIP := 'http://fcrabatch.sc.seisint.com:9876'; 
+fcraroxieIP := 'http://fcrathorvip.hpcc.risk.regn.net:9876'; 
 
 l t_f(f le, INTEGER c) := TRANSFORM
 	SELF.old_account_number := le.account;
@@ -121,7 +121,7 @@ l t_f(f le, INTEGER c) := TRANSFORM
 //  self.scores := dataset([{'Models.RVBankCard_Service', fcraroxieIP,params}], models.Layout_Score_Chooser); 
 //	self.scores := dataset([{'Models.RVRetail_Service', fcraroxieIP,params}], models.Layout_Score_Chooser); 
 //	self.scores := dataset([{'Models.RVTelecom_Service', fcraroxieIP,params}], models.Layout_Score_Chooser); 
-	self.gateways := dataset([{'neutralroxie', 'http://roxiebatch.br.seisint.com:9856'}], risk_indicators.Layout_Gateways_In);
+	self.gateways := dataset([{'neutralroxie', 'http://roxiethorvip.hpcc.risk.regn.net:9856'}], risk_indicators.Layout_Gateways_In);
 
 	self.DataRestrictionMask := '100001000100'; // to restrict fares, experian and transunion 
 	self.DataPermissionMask := '00000000000000';

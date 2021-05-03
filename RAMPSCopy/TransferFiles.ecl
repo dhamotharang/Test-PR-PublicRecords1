@@ -115,7 +115,8 @@ EXPORT TransferFiles(string destenv = '',integer noofgens = 2, boolean useeclccc
 									+ ' srcname=~'+rampscopy.constants(destenv).rampsfile 
 									+ ' nosplit=1 '
 									+ 'wrap=1 '
-									+ 'transferbuffersize=1000000 '
+									//+ 'transferbuffersize=1000000 '
+									+ 'transferbuffersize=10000000 '
 									+ 'srcdali=' + rampscopy.constants(destenv).boca.srcdali + ' '
 									+ if (usecredentials
 											,' username=' + dUserCreds[1].username + ' password='+ dUserCreds[1].password

@@ -1,4 +1,4 @@
-Import Worldcheck_Bridger,ut;
+﻿Import Worldcheck_Bridger,ut;
 Import std;
 EXPORT Functions := MODULE
 
@@ -672,6 +672,7 @@ export GetResidence(dataset(Layouts.rPersons) infile) := FUNCTION
 
 END;
 
+
 export rComments GetCountryNotes := FUNCTION
 		//countries := GetCountries(infile)(CountryType NOT IN ['Citizenship','Resident of']);
 		countries := AllCountries(CountryType NOT IN ['Citizenship','Resident of']);
@@ -1040,7 +1041,8 @@ export GetDescriptions := FUNCTION
 									
 		dsc := ROLLUP(dsc3, id, TRANSFORM(r,
 								self.id := LEFT.id;
-								self.description := LEFT.description + '; ' + RIGHT.description;), local);
+								self.description := if (((length(LEFT.description)+length(RIGHT.description))> 253), LEFT.description, LEFT.description + '; ' + RIGHT.description);),local);
+
 		
 		return dsc;
 END;

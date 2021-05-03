@@ -1,4 +1,4 @@
-import lib_stringlib, watercraft, watercraft_preprocess, ut, STD;
+﻿import lib_stringlib, watercraft, watercraft_preprocess, ut, STD;
 
 // Translates ne_phase01_update.mp
 
@@ -148,7 +148,7 @@ watercraft.Layout_Watercraft_Main_Base main_mapping_format(wDatasetwithflag L) :
 	self.watercraft_key		:=	if(trim(L.YEAR,left,right) >= '1972' and length(trim(L.HULL_ID,left,right)) = 12 and L.is_hull_id_in_MIC, trim(L.HULL_ID,left,right), if(L.HULL_ID = '',
 	                             (trim(L.MAKE,left,right) + trim(L.YEAR,left,right) + trim(L.NAME,left,right))[1..30], (trim(L.HULL_ID,left,right) + 
 																trim(L.MAKE,left,right) + trim(L.YEAR,left,right))[1..30]));
-	self.sequence_key			:=	L.REG_DATE;
+	self.sequence_key			:=	IF(TRIM(L.REG_DATE) = '', L.TITLE_DATE, L.REG_DATE);
 	self.state_origin			:=	'NE';
 	self.source_code			:=	'AW';
 	self.st_registration					:=	L.STATEABREV;
@@ -161,16 +161,28 @@ watercraft.Layout_Watercraft_Main_Base main_mapping_format(wDatasetwithflag L) :
 	self.watercraft_length				:=	L.TOTAL_INCH;
 	self.model_year								:=	L.YEAR;
 	self.watercraft_make_description	:=	L.MAKE;
-	self.watercraft_color_1_code			:=	L.COLOR;
-	self.watercraft_color_1_description	:=	watercraft_color_desc(L.COLOR);
-	self.watercraft_color_2_code				:=	L.Secondary_Color;
-	self.watercraft_color_2_description	:=	watercraft_color_desc(L.Secondary_Color);
+	self.watercraft_model_description	:= L.MODEL_DESC;
+	//self.watercraft_color_1_code			:=	L.COLOR;
+	self.watercraft_color_1_description	:=	L.COLOR;
+	//self.watercraft_color_2_code				:=	L.Secondary_Color;
+	self.watercraft_color_2_description	:=	L.SECONDARY_COLOR;
 	IsValidRegDate											:=	STD.DATE.IsValidDate((integer)L.REG_DATE);
 	self.registration_date							:=	If(IsValidRegDate,L.REG_DATE,'');
+	IsValidExpireDate										:=	STD.DATE.IsValidDate((integer)L.REG_EXPIRE);
+	self.registration_expiration_date		:=	IF(IsValidExpireDate,L.REG_EXPIRE,'');
 	self.title_state										:=	L.TITLE_STATE;
 	self.title_number										:=	L.TITLE_NUMBER;
 	IsValidTitleDate										:=	STD.DATE.IsValidDate((integer)L.TITLE_DATE);
 	self.title_issue_date								:=	If(IsValidTitleDate,L.TITLE_DATE,'');
+	self.title_type_code								:=	L.TITLE_TYPE;
+	self.title_type_description					:=	MAP(L.TITLE_TYPE = 'C' => 'CORRECTED TITLE',
+																							L.TITLE_TYPE = 'D' => 'DUPLICATE TITLE',
+																							L.TITLE_TYPE = 'N' => 'NON-TRANSFERABLE TITLE',
+																							L.TITLE_TYPE = 'O' => 'ORIGINAL TITLE',
+																							L.TITLE_TYPE = 'R' => 'REBUILD TITLE',
+																							'');
+	IsValidPurchase											:= STD.DATE.IsValidDate((integer)L.ACQUISITION);
+	self.purchase_date									:= IF(IsValidPurchase, L.ACQUISITION,'');
 	self := L;
 	self := [];
 END;

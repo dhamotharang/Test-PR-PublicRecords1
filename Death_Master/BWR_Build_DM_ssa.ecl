@@ -1,4 +1,4 @@
-#workunit('name','Death Master Boolean');
+﻿#workunit('name','Death Master Boolean');
 
 import Text_Search,Death_Master;
 
@@ -32,9 +32,9 @@ build_key := buildindex(sdid_map,{src,doc,state_death_id,__filepos},inlkeyname, 
 
 
 retval := sequential(
-					build_key,
+					//build_key,
 					Text_Search.Build_From_DocSeg_Records(ret,info),
-					Text_Search.Boolean_Move_To_QA(inskeyname,inlkeyname),
+					//Text_Search.Boolean_Move_To_QA(inskeyname,inlkeyname),
 					fileservices.deletelogicalfile('~thor_data400::persist::death_master_ssa::boolean')
 					);
 

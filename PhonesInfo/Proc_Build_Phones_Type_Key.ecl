@@ -1,8 +1,8 @@
-﻿IMPORT _control, Dops, Doxie, dx_PhonesInfo, PromoteSupers, RoxieKeyBuild, Std, Ut, Orbit3;
+﻿IMPORT _control, Dops, Doxie, dx_PhonesInfo, PromoteSupers, RoxieKeyBuild, Scrubs, Scrubs_PhonesInfo, Std, Ut, Orbit3;
 
 	//DF-24397: Create Dx-Prefixed Keys
 	
-EXPORT Proc_Build_Phones_Type_Key(string version):= function
+EXPORT Proc_Build_Phones_Type_Key(string version, string contacts):= function
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////	
 //Create Phones Type Base File///////////////////////////////////////////////////////////////////////////////
@@ -39,14 +39,26 @@ EXPORT Proc_Build_Phones_Type_Key(string version):= function
 	PromoteSupers.Mac_SK_Move_v2('~thor_data400::key::phones_type','Q',mvQAPhonesTransaction,'4');																 
 															
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////	
+//Run Scrub Reports//////////////////////////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////																				 
+	scrubsRun		:= scrubs.ScrubsPlus('PhonesInfo', 'Scrubs_PhonesInfo', 'Scrubs_PhonesInfo_PhonesTypeMain', 'PhonesTypeMain', version, contacts, false);
+			
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//Provide QA Samples/////////////////////////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	qaSamples		:= PhonesInfo.Sample_PhonesMetadata(contacts);
+			
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////	
 //Run Build & Send Notification Emails///////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	sendEmail		:= sequential(buildComBase,
 														clearDelete, 
 														moveComBase,
-														bkPhonesTransaction, mvBltPhonesTransaction, mvQAPhonesTransaction):
-														Success(FileServices.SendEmail(_control.MyInfo.EmailAddressNotify + ';judy.tao@lexisnexisrisk.com' /*+ ';gregory.rose@lexisnexisrisk.com' + ';darren.knowles@lexisnexisrisk.com'*/, 'PhonesInfo Phone Type Key Build Succeeded', workunit + ': Build complete.')),
-														Failure(FileServices.SendEmail(_control.MyInfo.EmailAddressNotify + ';judy.tao@lexisnexisrisk.com' /*+ ';gregory.rose@lexisnexisrisk.com' + ';darren.knowles@lexisnexisrisk.com'*/, 'PhonesInfo Phone Type Key Build Failed', workunit + '\n' + FAILMESSAGE)
+														bkPhonesTransaction, mvBltPhonesTransaction, mvQAPhonesTransaction,
+														scrubsRun,
+														qaSamples):
+														Success(FileServices.SendEmail(contacts, 'PhonesInfo Phone Type Key Build Succeeded', workunit + ': Build complete.')),
+														Failure(FileServices.SendEmail(contacts, 'PhonesInfo Phone Type Key Build Failed', workunit + '\n' + FAILMESSAGE)
 														);
 	return sendEmail;														
 

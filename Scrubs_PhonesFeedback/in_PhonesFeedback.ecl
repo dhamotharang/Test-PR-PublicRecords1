@@ -1,2 +1,3 @@
 ﻿import PhonesFeedback;
-EXPORT in_PhonesFeedback := PhonesFeedback.File_PhonesFeedback_base;
+
+EXPORT in_PhonesFeedback(String filedate) := dataset(PhonesFeedback.Cluster + 'base::PhonesFeedback_'+filedate,PhonesFeedback.Layouts_PhonesFeedback.Layout_PhonesFeedback_base,thor);

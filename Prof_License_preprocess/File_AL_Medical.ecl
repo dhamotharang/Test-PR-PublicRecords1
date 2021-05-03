@@ -18,9 +18,9 @@ Layout_PhyA_raw :=  record
    string Fax;
    string  Expiration_Date; 
 	 string  Date_Issued;     
-	 string Status; 
-	 string HAS_QACSC;
-   string QACSC_License_Type;
+	// string Status; 
+	// string HAS_QACSC;
+   //string QACSC_License_Type;
 	 string QACSC_Number;
 	 string QACSC_Issued;
 	 string QACSC_Expiration;
@@ -29,14 +29,14 @@ Layout_PhyA_raw :=  record
 	 string Schedule_IIIN;
 	 string Schedule_IV;
 	 string Schedule_V;
-    string HAS_LPSP;
+ /*   string HAS_LPSP;
    string LPSP_License_Type;
 	 string LPSP_Number;
 	 string LPSP_Issued;
 	 string LPSP_Expiration;
 	 string LPSP_Status;
 	 string Schedule_II;
-	 string Schedule_IIN;
+	 string Schedule_IIN;*/
 
    string lf;               
 end;                         
@@ -62,9 +62,10 @@ Layout_Phys_raw := record
 	 string  Telephone; 
 	 string Fax;
 	 string  Expiration_Date;
-	 string  Date_Issued;     
-	 string Status;  
-	string HAS_ACSC;
+	 string  Date_Issued;  
+    string Original_Issue_Date;
+//	 string Status;  
+//	string HAS_ACSC;
    string QACSC_License;
 	 string QACSC_Number;
 	 string QACSC_Issued;

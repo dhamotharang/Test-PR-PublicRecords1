@@ -1,2 +1,3 @@
-﻿import Phonesinfo;
-EXPORT DeactRaw2_layout_Phonesinfo := PhonesInfo.Layout_Deact.Raw2;
+﻿IMPORT PhonesInfo;
+
+EXPORT DeactRaw2_Layout_Phonesinfo := PhonesInfo.Layout_Deact.Raw2;

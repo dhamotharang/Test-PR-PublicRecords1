@@ -39,12 +39,6 @@ export Layouts := module
 			string mailing_city;
 			string mailing_st;
 			string mailing_zip;
-			//string contact_did1;
-			//string contact_dob1;
-			//string contact_ssn1;
-			//string contact_lname;
-			//string contact_fname;
-			//string contact_title;
 			string dt_vendor_first_reported;
 			string dt_vendor_last_reported;
 			string dt_first_seen;
@@ -55,17 +49,9 @@ export Layouts := module
 			string rel1_fein;
 			string rel1_inc_date;
 			string rel1_type;
-			//string rel2_fein;	
-			//string rel2_inc_date;	
 			string rel2_type;	
-			//string rel3_fein;	
-			//string rel3_inc_date;
 			string rel3_type;
-			//string rel4_fein;
-			//string rel4_inc_date;
 			string rel4_type;
-			//string rel5_fein;
-			//string rel5_inc_date;
 			string rel5_type;
 			string rel6_type;		// New field added for Historical data
 			string rel7_type;		// New field added for Historical data
@@ -89,7 +75,13 @@ export Layouts := module
 			string vendor_st;			// New field added for Historical data
 			string cust_name;
 			string bug_num;
-			string Aircraft;
+			string employee_count;
+      string employee_count_data_permits;
+      string employee_count_method;
+      string sales;
+      string sales_data_permits;
+      string sales_method;
+     	string Aircraft;
 			string CorpFilings;
 			string DeathMaster;
 			string MVR;

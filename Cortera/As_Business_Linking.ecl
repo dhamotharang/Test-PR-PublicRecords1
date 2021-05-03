@@ -1,6 +1,6 @@
 ﻿import ut, business_header, mdr, std, cortera;
 
-asBusinessLinkingBase := dataset('~thor::cortera::executives', cortera.Layout_Executives, thor);
+asBusinessLinkingBase := Cortera.Files().Base.Executives.QA; //dataset('~thor_data400::cortera::executives', cortera.Layout_Executives, thor);
 
 EXPORT As_Business_Linking() := FUNCTION
 
@@ -84,18 +84,18 @@ EXPORT As_Business_Linking() := FUNCTION
 		self.phone_score := if((integer)self.company_phone=0,0,1);
 		
 		// contact info
-		self.contact_name.title					:= hdr.cln_title;
-		self.contact_name.fname					:= hdr.cln_fname;
-		self.contact_name.mname					:= hdr.cln_mname;
-		self.contact_name.lname					:= hdr.cln_lname;
-		self.contact_name.name_suffix		:= hdr.cln_suffix;
-		self.contact_did    := hdr.LexId;
-		self.contact_type_raw := 'EXECUTIVE';
-		self.contact_job_title_raw := hdr.EXEC_TITLE;
+		self.contact_name.title					:= hdr.title;
+		self.contact_name.fname					:= hdr.fname;
+		self.contact_name.mname					:= hdr.mname;
+		self.contact_name.lname					:= hdr.lname;
+		self.contact_name.name_suffix		:= hdr.name_suffix;
+		self.contact_did   							:= hdr.did;
+		self.contact_type_raw 					:= 'EXECUTIVE';
+		self.contact_job_title_raw			:= hdr.Executive_Title;
 		
 		self.company_foreign_domestic := IF(hdr.country='US','D','F');
 
-		self.source_record_id            := ((unsigned8)hdr.link_id << 32) | HASH32(self.company_name,SELF.company_phone,hdr.EXECUTIVE_NAME,hdr.EXEC_TITLE);   
+		self.source_record_id            := ((unsigned8)hdr.link_id << 32) | HASH32(self.company_name,SELF.company_phone,hdr.EXECUTIVE_NAME,hdr.Executive_Title);   
 		string temp_employees            := if(trim(hdr.total_employees) = '' OR trim(hdr.total_employees) = '0', trim(hdr.employee_range), trim(hdr.total_employees));
 		string temp_sales                := if(trim(hdr.total_sales) = '' OR trim(hdr.total_sales) = '0', trim(hdr.sales_range), trim(hdr.total_sales));
     self.employee_count_local_raw    := if(temp_employees != '0', 

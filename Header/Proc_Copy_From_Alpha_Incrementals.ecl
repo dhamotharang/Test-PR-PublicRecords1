@@ -9,9 +9,9 @@ shared lastUpdatesFCRAqa_SF:='~thor_data400::key::fcra::header::address_rank_qa'
 shared lastUpdatesWklyQA_SF:='~thor_data400::key::header::qa::addr_unique_expanded';
 
 // Gets the version from the latest QA file on Thor
-export lastestIkbVersionOnThor  := nothor(regexfind('[0-9]{8}', std.file.superfilecontents(lastUpdatedLabQA_SF)[1].name, 0)) : independent;
-export lastestFCRAversionOnThor := nothor(regexfind('[0-9]{8}', std.file.superfilecontents(lastUpdatesFCRAqa_SF)[1].name, 0)) : independent;
-export lastestWklyversionOnThor := nothor(regexfind('[0-9]{8}', std.file.superfilecontents(lastUpdatesWklyQA_SF)[1].name, 0)) : independent;
+export lastestIkbVersionOnThor  := nothor(regexfind('[0-9]{8}[a-z]?', std.file.superfilecontents(lastUpdatedLabQA_SF)[1].name, 0)) : independent;
+export lastestFCRAversionOnThor := nothor(regexfind('[0-9]{8}[a-z]?', std.file.superfilecontents(lastUpdatesFCRAqa_SF)[1].name, 0)) : independent;
+export lastestWklyversionOnThor := nothor(regexfind('[0-9]{8}[a-z]?', std.file.superfilecontents(lastUpdatesWklyQA_SF)[1].name, 0)) : independent;
 
 
 // generic function to get the FIRST subfie in the super
@@ -34,42 +34,41 @@ SHARED getFileVersion(string sf,boolean alp=false) := FUNCTION
     frName:=sfc[1].name;
     fd1 := if(alp,regexfind('::2[0-9]{7}[a-z]{0,1}ib:',frName,0),regexfind('::2[0-9]{7}[a-z]{0,1}:',frName,0));
     filedt := if(alp,fd1[3..(length(fd1)-3)],fd1[3..(length(fd1)-1)]);
-    output(dataset([{frName,filedt}],{string lg_ck, string fldt}),named('checked_file'),extend);
+    output(dataset([{frName,filedt}],{string lg_ck, string fldt}),named('version_check_file'),extend);
     
     return filedt;
-        // return '20181005';
 
 END;
 
 EXPORT  filedate := getFileVersion(ut.foreign_aprod+'thor_data400::key::insuranceheader_xlink::inc_boca::did::refs::relative',true):INDEPENDENT ;
 
-SHARED fc(string f1, string f2):= sequential(
-    output(dataset([{f1,'thor400_44',f2}],{string src,string clsr, string trg}),named('copy_report'),extend),
-    if(~test_copy,if(~std.file.FileExists(f2),STD.File.Copy('~'+f1,'thor400_44',f2,,,,,true,true,,true))));
+ aDali := _control.IPAddress.aprod_thor_dali;
+SHARED lc := '~foreign::' + aDali + '::';
+EXPORT get_alogical(string sf):=nothor(fileservices.GetSuperFileSubName(lc+sf,1));
 
-SHARED fc8(string f1, string f2):= sequential(
-    output(dataset([{f1,'thor400_36',f2}],{string src,string clsr, string trg}),named('copy_report'),extend),
-    if(~test_copy,if(~std.file.FileExists(f2),STD.File.Copy('~'+f1,'thor400_36',f2,,,,,true,true,,true))));
+EXPORT fileCopy(string f1, string f2, string dCluster='thor400_44',boolean fromAlpha=false):= sequential(
+    output(dataset([{f1,dCluster,f2}],{string src,string clsr, string trg}),named('copy_report'),extend),
+    if(~test_copy,if(~std.file.FileExists(f2),STD.File.Copy(IF(fromAlpha,lc,'~')+f1,dCluster,f2,,,,400,TRUE,,TRUE,TRUE,,10000000))));
+
+SHARED fc(string f1, string f2):= fileCopy(f1,f2,'thor400_44');
+SHARED fc8(string f1, string f2):= fileCopy(f1,f2,'thor400_36');
 
 EXPORT copy_addr_uniq_keys_from_alpha(string filedt) := function
   
-  aDali := _control.IPAddress.aprod_thor_dali;
-  lc := '~foreign::' + aDali + '::';
-  get_alogical(string sf):=nothor(fileservices.GetSuperFileSubName(lc+sf,1));
     
   AddrSFKeyName(boolean fcra)  := '~thor_data400::key::' + if(fcra, 'fcra::', '') + 'header::qa::addr_unique_expanded';
   AddrDSFKeyName(boolean fcra) := '~thor_data400::key::' + if(fcra, 'fcra::', '') + 'header::delete::addr_unique_expanded';
   AddrLFKeyName(boolean fcra)  := '~thor_data400::key::' + if(fcra, 'fcra::', '') + 'header::' + filedt + '::addr_unique_expanded';
 
   copyKeys := sequential(
-     fc(get_alogical('thor_data400::key::insuranceheader_incremental::fcra::qa::addr_unique_expanded'), AddrLFKeyName(true))
-    ,fc(get_alogical('thor_data400::key::insuranceheader_incremental::qa::addr_unique_expanded'), AddrLFKeyName(false))
+      fc(get_alogical('thor_data400::key::insuranceheader_incremental::fcra::qa::addr_unique_expanded'), AddrLFKeyName(true))     
+     ,fc(get_alogical('thor_data400::key::insuranceheader_incremental::qa::addr_unique_expanded'), AddrLFKeyName(false))
     );
     
   moveKeys := sequential(    
         STD.File.StartSuperFileTransaction( )
-       ,nothor(STD.file.PromoteSuperFileList([AddrSFKeyName(true), AddrDSFKeyName(true)], AddrLFKeyName(true))) //Fcra
-       ,nothor(STD.file.PromoteSuperFileList([AddrSFKeyName(false), AddrDSFKeyName(false)], AddrLFKeyName(false))) //NFcra
+       ,nothor(STD.file.PromoteSuperFileList([AddrSFKeyName(true), AddrDSFKeyName(true)], AddrLFKeyName(true),TRUE)) //Fcra
+       ,nothor(STD.file.PromoteSuperFileList([AddrSFKeyName(false), AddrDSFKeyName(false)], AddrLFKeyName(false),TRUE)) //NFcra
        ,STD.File.FinishSuperFileTransaction( )
        );
   
@@ -79,10 +78,6 @@ END;
 
 EXPORT copy_ca_minors_from_alpha(string filedt) := function
   
-  aDali := _control.IPAddress.aprod_thor_dali;
-  lc := '~foreign::' + aDali + '::';
-  get_alogical(string sf):=nothor(fileservices.GetSuperFileSubName(lc+sf,1));
-
   prefix := 'thor_data400::base::insuranceheader_incremental::minors::';  
   currentSF := prefix + 'current';
   deleteSF  := prefix + 'delete';
@@ -112,19 +107,15 @@ EXPORT copy_from_alpha(string filedt) := function
                ,'~thor_data400::key::insuranceheader_segmentation::' + filedt + '::did_ind'
                ,bldSegmentation);
 
-    // aDali := '10.194.126.207';//_control.IPAddress.adataland_dali;
-    aDali := _control.IPAddress.aprod_thor_dali;
-
-    lc := '~foreign::' + aDali + '::';
-    get_alogical(string sf):=nothor(fileservices.GetSuperFileSubName(lc+sf,1));
     
     // incremental key prefix
     aPref := 'thor_data400::key::insuranceheader_xlink::inc_boca::';
+    aPrefLoc := 'thor_data400::key::insuranceheader_xlink::';
 
     // Copy foreign keys to local thor
     copy_incremental_keys := sequential(
-
-     bldSegmentation // creates blank segmentation did_ind key    
+     fc(get_alogical('thor_data400::key::insuranceheader_segmentation::did_ind_qa'),'~thor_data400::key::insuranceheader_segmentation::' + filedt + '::did_ind')
+    ,fc(get_alogical(aPrefLoc + 'locid_qa')      ,'~' + aPrefLoc + filedt + '::locid')  
     ,fc(get_alogical(aPref+'did::refs::address') ,fName(filedt, '::did::refs::address'))
     ,fc(get_alogical(aPref+'did::refs::dln')     ,fName(filedt, '::did::refs::dln'))
     ,fc(get_alogical(aPref+'did::refs::dob')     ,fName(filedt, '::did::refs::dob'))
@@ -138,8 +129,12 @@ EXPORT copy_from_alpha(string filedt) := function
     ,fc(get_alogical(aPref+'did::refs::zip_pr')  ,fName(filedt, '::did::refs::zip_pr'))
     ,fc(get_alogical(aPref+'did::sup::rid')      ,fName(filedt, '::did::sup::rid'))
     ,fc(get_alogical(aPref+'header')             ,fName(filedt, '::idl'))
+    ,fc(get_alogical(aPref+'header_vin')         ,fName(filedt, '::idl_vin'))
+    ,fc(get_alogical(aPref+'header_relative')    ,fName(filedt, '::idl_relative'))
+    ,fc(get_alogical(aPref+'did::refs::vin')     ,fName(filedt, '::did::refs::vin'))
        
     //copy to cluster - thor400_36
+    ,fc8('~thor_data400::key::insuranceheader_segmentation::' + filedt + '::did_ind' ,'~thor400_36::key::insuranceheader_segmentation::' + filedt + '::did_ind')
     ,fc8(fName(filedt, '::did::refs::address') ,fName8(filedt, '::did::refs::address'))
     ,fc8(fName(filedt, '::did::refs::dln')     ,fName8(filedt, '::did::refs::dln'))
     ,fc8(fName(filedt, '::did::refs::dob')     ,fName8(filedt, '::did::refs::dob'))
@@ -153,6 +148,9 @@ EXPORT copy_from_alpha(string filedt) := function
     ,fc8(fName(filedt, '::did::refs::zip_pr')  ,fName8(filedt, '::did::refs::zip_pr'))
     ,fc8(fName(filedt, '::did::sup::rid')      ,fName8(filedt, '::did::sup::rid'))
     ,fc8(fName(filedt, '::idl')                ,fName8(filedt, '::idl'))
+    ,fc8(fName(filedt, '::idl_vin')            ,fName8(filedt, '::idl_vin'))
+    ,fc8(fName(filedt, '::idl_relative')       ,fName8(filedt, '::idl_relative'))
+    ,fc8(fName(filedt, '::did::refs::vin')     ,fName8(filedt, '::did::refs::vin'))
     );
 
     return copy_incremental_keys;
@@ -203,7 +201,6 @@ SHARED updateSupers(string kNm,boolean skipIncSFupdate=false,string kNml=kNm, st
 
 // Remove incrementals from 'qa', update 'inc' superfiles and add new incrementals to the 'qa' superfiles
 EXPORT update_inc_superfiles(boolean skipIncSFupdate=false, string filedt) := function
-
     return sequential(
      updateSupers('::did::refs::address',skipIncSFupdate, ,filedt)
     ,updateSupers('::did::refs::dln',skipIncSFupdate, ,filedt)
@@ -216,8 +213,11 @@ EXPORT update_inc_superfiles(boolean skipIncSFupdate=false, string filedt) := fu
     ,updateSupers('::did::refs::ssn',skipIncSFupdate, ,filedt)
     ,updateSupers('::did::refs::ssn4',skipIncSFupdate, ,filedt)
     ,updateSupers('::did::refs::zip_pr',skipIncSFupdate, ,filedt)
-    ,updateSupers('::did::sup::rid',skipIncSFupdate, ,filedt)
-    ,updateSupers('::did'          ,skipIncSFupdate, ,filedt)    
+    ,updateSupers('::did::sup::rid' ,skipIncSFupdate, ,filedt)
+    ,updateSupers('::did'           ,skipIncSFupdate, ,filedt)
+    ,updateSupers('::did::refs::vin',skipIncSFupdate, ,filedt)    
+    ,updateSupers('::header_vin'       ,skipIncSFupdate, '::idl_vin', filedt)  
+    ,updateSupers('::header_relative'  ,skipIncSFupdate, '::idl_relative', filedt)
     );
 END;
 
@@ -253,23 +253,20 @@ SHARED udops(string3 skipPackage='000') := sequential(
                        ))
 );
 
-SHARED orbit_update_entries(boolean isCreate, string skipPackage='000') := function
+SHARED orbit_update_entries(string skipPackage='000') := function
 
-    skipcreatebuild := if(isCreate, false, true);
-    skipupdatebuild := if(isCreate, true, false);
-
-    RETURN sequential(
-                        if(skipPackage[1]='0',Orbit3.Proc_Orbit3_CreateBuild('PersonXLAB_Inc', filedate, 'N', skipcreatebuild, skipupdatebuild, true, Header.email_list.BocaDevelopers)),
-                        if(skipPackage[2]='0',Orbit3.Proc_Orbit3_CreateBuild('FCRA_Header', filedate, 'F', skipcreatebuild, skipupdatebuild, true, Header.email_list.BocaDevelopers)),
-                        if(skipPackage[3]='0',Orbit3.Proc_Orbit3_CreateBuild('Header_IKB', filedate, 'N', skipcreatebuild, skipupdatebuild, true, Header.email_list.BocaDevelopers))
-                      );
+    RETURN sequential(    
+      if(skipPackage[1]='0', Orbit3.Proc_Orbit3_CreateBuild('PersonXLAB_Inc', filedate, 'N',email_list := Header.email_list.BocaDevelopers)),
+      if(skipPackage[2]='0', Orbit3.Proc_Orbit3_CreateBuild('FCRA_Header', filedate, 'F', email_list := Header.email_list.BocaDevelopers)),
+      if(skipPackage[3]='0', Orbit3.Proc_Orbit3_CreateBuild('Header_IKB', filedate, 'N', email_list := Header.email_list.BocaDevelopers))
+    );
 
 END;
 
 // run on hthor
 EXPORT Refresh_copy(string filedt) :=  FUNCTION
 
-    ok_LAB_to_copy := filedt <>'' AND ~test_copy AND (~std.file.fileexists('~thor_data400::key::insuranceheader_xlink::'+filedt+'::did::refs::idl'));
+    ok_LAB_to_copy := filedt <>'' AND ~test_copy AND (~std.file.fileexists('~thor_data400::key::insuranceheader_xlink::'+filedt+'::idl'));
     cpLab := if(ok_LAB_to_copy
              ,copy_from_alpha(filedt)
              ,output('No LAB copy. see outputs')             
@@ -290,10 +287,62 @@ EXPORT Refresh_copy(string filedt) :=  FUNCTION
     return sequential(cpCAminor, cpLab, cpUniqEx);
 END;
 
+inspr(string spr, string newLogical):=FUNCTION
+    spr_cntns:=nothor(STD.File.SuperFileContents(spr));
+    RETURN (newLogical in set(spr_cntns,name));
+END;
+
+update_segmentation_supers(string spr0, string newLogical) := function
+
+    spr:='~'+ case( spr0, 
+                  'thor_data400::key::insuranceheader_segmentation::qa::did_ind'=>
+                  'thor_data400::key::insuranceheader_segmentation::did_ind_qa',
+                  'thor400_44::key::insuranceheader_segmentation::qa::did_ind'=>
+                  'thor400_44::key::insuranceheader_segmentation::did_ind_qa',
+                  'thor400_44::key::insuranceheader_segmentation::built::did_ind'=>
+                  'thor400_44::key::insuranceheader_segmentation::did_ind_built',
+                  'thor400_36::key::insuranceheader_segmentation::qa::did_ind'=>
+                  'thor400_36::key::insuranceheader_segmentation::did_ind_qa'
+                  ,spr0);
+    
+    return if(~inspr(spr,newLogical)
+          ,sequential(
+            output(dataset([{spr,'~'+newLogical,'Updating'}],{string super, string new_logical,string comment}),named('cp_built_update'),extend)
+           ,std.file.RemoveOwnedSubFiles(spr,TRUE)
+           ,std.file.clearsuperfile     (spr)
+           ,if(std.file.SuperFileExists('~'+newLogical)
+             ,std.file.addsuperfile       (spr   , '~'+newLogical ,,true)
+             ,std.file.addsuperfile       (spr   , '~'+newLogical       )
+             );)
+          ,output(dataset([{spr,'~'+newLogical,'Already up-to-date'}],{string super, string new_logical, string comment}),named('cp_built_update'),extend)
+          );
+end;
+
+ver(string nm,string new_ver, string clstr='') :=    
+    regexreplace('<<version>>',if(clstr=''
+                                 ,nm
+                                 ,regexreplace('thor_data400',nm,clstr)),new_ver);
+
+nm := 'thor_data400::key::insuranceheader_segmentation::<<version>>::did_ind';
+aPrefLoc := '~thor_data400::key::insuranceheader_xlink::';
+father := aPrefLoc + 'father::locid';
+qa     := aPrefLoc + 'qa::locid';
+
 EXPORT movetoQA(string filedt) := sequential(
     // The following can only copy after the key is built in Boca
     fc8(fName(filedt, '::did'), fName8(filedt, '::did')),
     update_inc_superfiles(,filedt),
+    update_segmentation_supers(ver(nm,'father','thor400_44'), ver(nm,'qa','thor400_44')),
+    update_segmentation_supers(ver(nm,'qa','thor400_44'), ver(nm,filedt,'thor_data400')),
+    update_segmentation_supers(ver(nm,'qa','thor400_36'), ver(nm,filedt,'thor400_36')),
+    update_segmentation_supers(ver(nm,'qa','thor_data400'), ver(nm,filedt,'thor_data400')),
+    update_segmentation_supers(ver(nm,'built','thor400_44'), ver(nm,filedt,'thor_data400')),
+    STD.File.StartSuperFileTransaction(),
+    STD.File.ClearSuperFile(father, true),
+    STD.File.AddSuperFile(father,qa, addcontents := true),
+    STD.File.ClearSuperFile(qa),
+    STD.File.AddSuperFile(qa, aPrefLoc + filedt + '::locid'),
+    STD.File.FinishSuperFileTransaction(),
     );
         
 EXPORT deploy(string emailList,string rpt_qa_email_list,string skipPackage='000') := sequential(  
@@ -315,8 +364,32 @@ EXPORT deploy(string emailList,string rpt_qa_email_list,string skipPackage='000'
     +'gabriel.marcan@lexisnexisrisk.com\n'
     +'\nThank you,'),          
     
-    orbit_update_entries(true,skipPackage),   //Create
-    orbit_update_entries(false,skipPackage),  //Update
+    orbit_update_entries(skipPackage),   //Create
     udops(skipPackage)
 );
+EXPORT copy_insurance_best:= FUNCTION
+
+  fPattern:='thor_data400::key::insuranceheader_best::<<version>>::did';
+  super_qa := regexreplace('<<version>>',fPattern,'qa');
+  super_fa := regexreplace('<<version>>',fPattern,'father');
+  logical_pattern := regexreplace('<<version>>',fPattern,'.*');
+  logicalRemote:=get_alogical(super_qa);
+
+  newLogical:=regexfind(logical_pattern,logicalRemote,0);
+  doReport:=output(dataset([{super_qa,super_fa,'~'+newLogical}],{string qa,string father, string newLogical}),NAMED('super_report'),EXTEND);
+  doCopy:=fileCopy(newLogical,'~'+newLogical,,TRUE);
+  newLogicalNotInQA:=count( nothor(STD.File.SuperFileContents('~'+super_qa))(name=newLogical))=0;
+  doUpdateSupers:= IF(newLogicalNotInQA,
+                   SEQUENTIAL(
+                             STD.File.PromoteSuperFileList( ['~'+super_qa,'~'+super_fa], deltail:=TRUE ),
+                             STD.File.AddSuperFile('~'+super_qa,'~'+newLogical)
+                   ),OUTPUT('No super update (latest file already in super):'+newLogical));
+
+  RETURN sequential(
+   
+   output( nothor(STD.File.SuperFileContents('~'+super_qa)));
+   output(newLogical);
+   doReport,doCopy,doUpdateSupers);
+END;
+
 END;

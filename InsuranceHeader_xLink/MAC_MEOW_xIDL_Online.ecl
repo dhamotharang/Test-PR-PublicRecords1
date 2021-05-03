@@ -1,9 +1,9 @@
 ﻿ 
-EXPORT MAC_MEOW_xIDL_Online(infile,Ref='',Input_SNAME = '',Input_FNAME = '',Input_MNAME = '',Input_LNAME = '',Input_DERIVED_GENDER = '',Input_PRIM_RANGE = '',Input_PRIM_NAME = '',Input_SEC_RANGE = '',Input_CITY = '',Input_ST = '',Input_ZIP = '',Input_SSN5 = '',Input_SSN4 = '',Input_DOB = '',Input_PHONE = '',Input_DL_STATE = '',Input_DL_NBR = '',Input_SRC = '',Input_SOURCE_RID = '',Input_DT_FIRST_SEEN = '',Input_DT_LAST_SEEN = '',Input_DT_EFFECTIVE_FIRST = '',Input_DT_EFFECTIVE_LAST = '',Input_MAINNAME = '',Input_FULLNAME = '',Input_ADDR1 = '',Input_LOCALE = '',Input_ADDRESS = '',Input_fname2 = '',Input_lname2 = '',Soapcall_RoxieIP = '',Soapcall_Timeout = 3600,Soapcall_Time_Limit = 0,Soapcall_Retry = 0,Soapcall_Parallel = 2,OutFile,Stats='',In_MaxIds=50,In_LeadThreshold=0, In_disableForce = 'InsuranceHeader_xLink.Config.DOB_NotUseForce' /*HACK18*/) := MACRO
-  IMPORT SALT37,InsuranceHeader_xLink;
+EXPORT MAC_MEOW_xIDL_Online(infile,Ref='',Input_SNAME = '',Input_FNAME = '',Input_MNAME = '',Input_LNAME = '',Input_DERIVED_GENDER = '',Input_PRIM_RANGE = '',Input_PRIM_NAME = '',Input_SEC_RANGE = '',Input_CITY = '',Input_ST = '', Input_ZipCases='', Input_ZIP = '',Input_SSN5 = '',Input_SSN4 = '', Input_SSN = '', Input_DOB = '',Input_PHONE = '',Input_DL_STATE = '',Input_DL_NBR = '',Input_SRC = '',Input_SOURCE_RID = '',Input_DT_FIRST_SEEN = '',Input_DT_LAST_SEEN = '',Input_DT_EFFECTIVE_FIRST = '',Input_DT_EFFECTIVE_LAST = '',Input_MAINNAME = '',Input_FULLNAME = '',Input_ADDR1 = '',Input_LOCALE = '',Input_ADDRESS = '',Input_fname2 = '',Input_lname2 = '',Input_VIN = '',serviceName='MEOW_xIDL_Service' /*Hack37a*/, Soapcall_RoxieIP = '' /*HACK37a*/,Soapcall_Timeout = 3600,Soapcall_Time_Limit = 0,Soapcall_Retry = 0,Soapcall_Parallel = 2,OutFile,Stats='',In_MaxIds=50,In_LeadThreshold=0, In_disableForce = 'InsuranceHeader_xLink.Config.DOB_NotUseForce' /*HACK18*/) := MACRO
+  IMPORT SALT311,InsuranceHeader_xLink;
   ServiceModule := 'InsuranceHeader_xLink.';
 #uniquename(into)
-InsuranceHeader_xLink.Process_xIDL_Layouts().InputLayout %into%(infile le) := TRANSFORM
+{InsuranceHeader_xLink.Process_xIDL_Layouts().InputLayout, string ssn, string5 zip} %into%(infile le) := TRANSFORM
   SELF.UniqueId := le.Ref;
   SELF.MaxIds := In_MaxIds;
   SELF.LeadThreshold := In_LeadThreshold;
@@ -58,10 +58,15 @@ InsuranceHeader_xLink.Process_xIDL_Layouts().InputLayout %into%(infile le) := TR
   #ELSE
     SELF.ST := (TYPEOF(SELF.ST))'';
   #END
-  #IF ( #TEXT(Input_ZIP) <> '' )
-    SELF.ZIP := (TYPEOF(SELF.ZIP))le.Input_ZIP;
+  #IF ( #TEXT(Input_ZIPCases) <> '' )
+    SELF.ZIP_cases := le.Input_ZIPCases;
   #ELSE
-    SELF.ZIP := (TYPEOF(SELF.ZIP))'';
+    SELF.ZIP_cases := DATASET([],InsuranceHeader_xLink.Process_xIDL_Layouts().layout_ZIP_cases);
+  #END
+  #IF ( #TEXT(Input_ZIP) <> '' )
+    SELF.ZIP := le.Input_ZIP;
+  #ELSE
+    SELF.ZIP := (TYPEOF(SELF.Zip))'';
   #END
   #IF ( #TEXT(Input_SSN5) <> '' )
     SELF.SSN5 := (TYPEOF(SELF.SSN5))le.Input_SSN5;
@@ -72,6 +77,11 @@ InsuranceHeader_xLink.Process_xIDL_Layouts().InputLayout %into%(infile le) := TR
     SELF.SSN4 := (TYPEOF(SELF.SSN4))le.Input_SSN4;
   #ELSE
     SELF.SSN4 := (TYPEOF(SELF.SSN4))'';
+  #END
+  #IF ( #TEXT(Input_SSN) <> '' )
+    SELF.SSN := (TYPEOF(SELF.SSN))le.Input_SSN;
+  #ELSE
+    SELF.SSN := (TYPEOF(SELF.SSN))'';
   #END
   #IF ( #TEXT(Input_DOB) <> '' )
     SELF.DOB := (TYPEOF(SELF.DOB))le.Input_DOB;
@@ -158,6 +168,11 @@ InsuranceHeader_xLink.Process_xIDL_Layouts().InputLayout %into%(infile le) := TR
   #ELSE
     SELF.lname2 := (TYPEOF(SELF.lname2))'';
   #END
+  #IF ( #TEXT(Input_VIN) <> '' )
+    SELF.VIN := (TYPEOF(SELF.VIN))le.Input_VIN;
+  #ELSE
+    SELF.VIN := (TYPEOF(SELF.VIN))'';
+  #END
 END;
 #uniquename(Soapcall_RoxieIP_temp)
   #IF ( #TEXT(Soapcall_RoxieIP) <> '' )
@@ -168,7 +183,7 @@ END;
 #uniquename(pr)
   %pr% := PROJECT(infile,%into%(LEFT)); // Into roxie input format
 #uniquename(res_out)
-SALT37.MAC_Soapcall(%pr%,InsuranceHeader_xLink.Process_xIDL_Layouts().OutputLayout, %Soapcall_RoxieIP_temp%, ServiceModule+'MEOW_xIDL_Service', %res_out%,,,Soapcall_Timeout,Soapcall_Time_Limit,Soapcall_Retry,Soapcall_Parallel);
+SALT311.MAC_Soapcall(%pr%,InsuranceHeader_xLink.Process_xIDL_Layouts().OutputLayout, %Soapcall_RoxieIP_temp%, ServiceModule+serviceName /*HACK37b*/, %res_out%,,true,Soapcall_Timeout,Soapcall_Time_Limit,Soapcall_Retry,Soapcall_Parallel);
 OutFile := %res_out%;
   #IF (#TEXT(Stats)<>'')
     Stats := InsuranceHeader_xLink.Process_xIDL_Layouts().ScoreSummary(OutFile);

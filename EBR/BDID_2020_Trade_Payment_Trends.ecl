@@ -1,4 +1,4 @@
-import _control, ut, Business_Header, Business_Header_SS, did_add, Mdr, Std;
+﻿import _control, ut, Business_Header, Business_Header_SS, did_add, Mdr, Std;
 
 //////////////////////////////////////////////////////////////////////////////////////////////
 // -- Value Types
@@ -33,7 +33,8 @@ transform
 									l.DBT_61_90_PCT4,		l.DBT_61_90_PCT5,		l.DBT_61_90_PCT6);
 	self.DBT_91_PLUS_PCT	:= choose(cnt,	l.DBT_91_PLUS_PCT1,		l.DBT_91_PLUS_PCT2,		l.DBT_91_PLUS_PCT3,
 									l.DBT_91_PLUS_PCT4,		l.DBT_91_PLUS_PCT5,		l.DBT_91_PLUS_PCT6);
-	self 				:= l;
+	self 				:= 	l;
+	self				:=	[];
 end;
 
 File_in2base := normalize(File_in, 6, Convert2Base(left, counter));

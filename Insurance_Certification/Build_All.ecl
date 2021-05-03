@@ -1,4 +1,4 @@
-IMPORT versioncontrol, _control, ut, Roxiekeybuild;
+IMPORT versioncontrol, _control, ut, Roxiekeybuild,scrubs,Scrubs_Insurance_Cert;
 
 EXPORT Build_All(STRING	pversion) := MODULE
 		EXPORT spray_files	:= fSpray(pversion);
@@ -25,9 +25,13 @@ EXPORT Build_All(STRING	pversion) := MODULE
 		NewBasePol			:=	project(files(pversion).keybuild_Pol.logical
 												,TRANSFORM(layouts_policy.Base,SELF := LEFT;));
    	VersionControl.macBuildNewLogicalFile( Filenames('Policy',pversion).base.new 
-																					,NewBasePol,  Build_PolBase_File );	
+																					,NewBasePol,  Build_PolBase_File );
+
+	run_scrubs := Scrubs_Insurance_Cert.Fn_RunScrubs(pversion,'charles.pettola@lexisnexis.com');
 																					
-	  dops_update := Roxiekeybuild.updateversion('InsuranceCertKeys',pVersion,'charles.pettola@lexisnexis.com',,'N');																					
+	  dops_update := if(scrubs.mac_ScrubsFailureTest('Scrubs_Insurance_Cert_Cert,Scrubs_Insurance_Cert_Pol',pversion)
+	  					,Roxiekeybuild.updateversion('InsuranceCertKeys',pVersion,'charles.pettola@lexisnexis.com',,'N')
+						,OUTPUT('Dops update failed due to Scrubs reject warning(s)',NAMED('Dops_status')));																					
 								
 		full_build 	:= SEQUENTIAL( 
 				 				   nothor(APPLY(filenames('Certification',pversion).Base.dAll_filenames, APPLY(dSuperfiles, versioncontrol.mUtilities.createsuper(name))))
@@ -40,6 +44,7 @@ EXPORT Build_All(STRING	pversion) := MODULE
 									,Build_PolKeyBuild_File
 									,Build_CertBase_File 
 									,Build_PolBase_File 
+									,run_scrubs
 									,FileServices.ClearSuperFile(filenames('Certification',pversion).keybuild.built,true)
 									,FileServices.ClearSuperFile(filenames('Policy',pversion).keybuild.built,true)
 							    ,FileServices.AddSuperFile(filenames('Certification',pversion).keybuild.built,
@@ -50,7 +55,7 @@ EXPORT Build_All(STRING	pversion) := MODULE
 						      ,PromoteFiles(pversion).fPromote_New2Built
 						      ,PromoteFiles(pversion).fPromote_Built2QA
 									,Proc_AutokeyBuild_BDID(pversion)    /* Build BDID & DID AutoKeys   */
-									,Proc_Build_Keys(pversion)					 /* Build Roxie Keys            */
+									,Proc_Build_Keys(pversion)			 /* Build Roxie Keys  */
 									,out_STRATApopulation_stats(pversion)
 									,out_STRATApopulation_stats_Policy(pversion)
 									,dops_update

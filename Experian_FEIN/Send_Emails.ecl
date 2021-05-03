@@ -1,18 +1,22 @@
-IMPORT STD, VersionControl, tools, _Control;
+IMPORT STD, VersionControl, tools;
 
-EXPORT Send_Emails(STRING pAddresses, STRING pVersion, STRING pMessage = '') := MODULE
-	SHARED addresses := STD.Str.SplitWords(pAddresses, ','); 
+EXPORT Send_Emails(
+	STRING pAddresses,
+	STRING pVersion,
+	STRING pMessage = ''
+) := MODULE
+	SHARED addresses := STD.Str.SplitWords(pAddresses, ',');
 
-	EXPORT Get_Primary_Addresses := IF( _Control.MyInfo.EmailAddressNotify = addresses[1], addresses[1],  _Control.MyInfo.EmailAddressNotify + ';' + addresses[1] + ';');
+	EXPORT Get_Primary_Addresses := addresses[1];
 
 	EXPORT Call_Email_Notification := tools.mod_Email_Notification_Lists(
-            Get_Primary_Addresses,
-			Get_Primary_Addresses + ';' + addresses[2] + ';',
-            Get_Primary_Addresses + ';' + addresses[2] + ';',
-            Get_Primary_Addresses,,
-            Get_Primary_Addresses + ';' + addresses[2] + ';'+ addresses[3] + ';'
-    );
- 
+		Get_Primary_Addresses,
+		Get_Primary_Addresses + ';' + addresses[2] + ';',
+		Get_Primary_Addresses + ';' + addresses[2] + ';',
+		Get_Primary_Addresses,,
+		Get_Primary_Addresses + ';' + addresses[2] + ';' + addresses[3] + ';'
+	);
+
 	EXPORT BuildSuccess := tools.fun_SendEmail(
 		Call_Email_Notification.BuildSuccess,
 		_Dataset().Name + ' Build Succeeded ' + pVersion,

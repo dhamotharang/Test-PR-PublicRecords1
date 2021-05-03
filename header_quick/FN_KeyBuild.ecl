@@ -14,145 +14,19 @@ EXPORT FN_KeyBuild(
 
 	header_in := PROJECT(header_in0,t_set_src(left));
 
-	Suppression_Layout := suppress.ApplyRegulatory.layout_in;
-	header_services.Supplemental_Data.mac_verify('didaddress_sup.txt',Suppression_Layout,supp_ds_func); 
- 
-	Suppression_In := supp_ds_func();
-
-	dSuppressedInOut := PROJECT(Suppression_In, suppress.Applyregulatory.in_to_out(left));
-
-	rHashDIDAddress := header_services.Supplemental_Data.layout_out;
-
-	rFullOut_HashDIDAddress := RECORD
-		header.Layout_Header;
-		rHashDIDAddress;
-	END;
-
-	//***//***// TEST CODE FOR SUPPRESSION - 20070605
-
-	rFullOut_HashDIDAddress tHashDIDAddress(header_in l) := TRANSFORM                            
-		self.hval :=  hashmd5(
-			intformat(l.did,15,1),
-			(STRING)l.st,
-			(STRING)l.zip,
-			(STRING)l.city_name,
-			(STRING)l.prim_name,
-			(STRING)l.prim_range,
-			(STRING)l.predir,
-			(STRING)l.suffix,
-			(STRING)l.postdir,
-			(STRING)l.sec_range
-		);
-		self := l;
-	END;
-
-dHeader_withMD5 := PROJECT(header_in, tHashDIDAddress(left));
-
-header.Layout_Header tSuppress(dHeader_withMD5 l, dSuppressedInOut r) := TRANSFORM
-	self := l;
-END;
-
-full_out_suppress := join(dHeader_withMD5,dSuppressedInOut,
-                          left.hval=right.hval,
-						  tSuppress(left,right),
-						  left only,lookup);
+	full_out_suppress :=  Header.Prep_Build.applyDidAddressSup(header_in);						  	
 
 full_ShortSuppress := DriversV2.Regulatory.applyDriversLicenseSup_DIDVend(full_out_suppress);
 
 j1 := DriversV2.Regulatory.applyDriversLicenseAllSup_DIDVendDOBSSN(full_ShortSuppress);
 
-string_header_layout := {
-			string15  did;
-			string15  rid;
-			string1   pflag1;
-			string1   pflag2;
-			string1   pflag3;
-			string2   src;
-			string8   dt_first_seen;
-			string8   dt_last_seen;
-			string8   dt_vendor_last_reported;
-			string8   dt_vendor_first_reported;
-			string8   dt_nonglb_last_seen;
-			string1   rec_type;
-			string18  vendor_id;
-			string10  phone;
-			string9   ssn;
-			string10  dob;
-			string5   title;
-			string20  fname;
-			string20  mname;
-			string20  lname;
-			string5   name_suffix;
-			string10  prim_range;
-			string2   predir;
-			string28  prim_name;
-			string4   suffix;
-			string2   postdir;
-			string10  unit_desig;
-			string8   sec_range;
-			string25  city_name;
-			string2   st;
-			string5   zip;
-			string4   zip4;
-			string3   county;
-			string7   geo_blk;
-			string5   cbsa;
-			string1   tnt;
-			string1   valid_SSN;
-			string1   jflag1;
-			string1   jflag2;
-			string1   jflag3;	
-			string2   eor;
-	};
-	
-header_services.Supplemental_Data.mac_verify('file_qh_inj.txt',string_header_layout,supplementalData);
-
-header.layout_header  ReformatInput(string_header_layout l) := TRANSFORM
-	SELF.did := (unsigned6) l.did;
-	SELF.rid := (unsigned6) l.rid;
-	SELF.dt_first_seen := (unsigned3) l.dt_first_seen;
-	SELF.dt_last_seen := (unsigned3) l.dt_last_seen;
-	SELF.dt_vendor_last_reported := (unsigned3) l.dt_vendor_last_reported;
-	SELF.dt_vendor_first_reported := (unsigned3) l.dt_vendor_first_reported;
-	SELF.dt_nonglb_last_seen := (unsigned3) l.dt_nonglb_last_seen;
-	SELF.dob := (integer4) l.dob;
-	SELF := l;
-END;
-
-dsModified := PROJECT(supplementalData(), ReformatInput(LEFT));
+dsmodified := Header_Quick.Prep_Build.applyQH();
 
 //// this is full dataset as of full_LongSuppress := j1 + dsModified;
 full_LongSuppress_pre := j1 + dsModified;
 /////////////////////////////////////////////////////////
 
-layout_ff := Record
-     data16 hval_did ;
-     data16 hval_ssn ;
-		 string1 nl := '\n' ;
-END ;
-
-header_services.Supplemental_Data.mac_verify('ff_sup.txt',layout_ff, ff_sup_attr); // 
- 
-Base_ff_sup := ff_sup_attr();
-
-
-full_LongSuppress_1 := JOIN(full_LongSuppress_pre, Base_ff_sup,
-                    hashmd5((string9)left.ssn) = right.hval_ssn 
-                    AND
-						  hashmd5(intformat(left.did,15,1)) != right.hval_did, 
-						TRANSFORM(LEFT),
-						LEFT ONLY, ALL) ;
-						
-header_services.Supplemental_Data.mac_verify('ridrec_sup.txt',Suppression_Layout, base_sup_attr); // 
- 
-Base_rid_sup_in := base_sup_attr() ;
-
-base_rid_sup := PROJECT(Base_rid_sup_in ,header_services.Supplemental_Data.in_to_out(left));
-
-rid_base := JOIN(full_LongSuppress_1, base_rid_sup,
-                 hashmd5(intformat((unsigned6)left.rid,15,1)) = right.hval,                    
-						     TRANSFORM(LEFT),
-						    LEFT ONLY, ALL) ;
+rid_base :=  Header.Prep_Build.applyRidRecSup(full_LongSuppress_pre);						  	
 						 
 						  
 full_LongSuppress := 	rid_base ;						
@@ -207,7 +81,8 @@ RETURN SEQUENTIAL(
 			SEQUENTIAL(B3,M3,MQ3),
 			SEQUENTIAL(B4,M4,MQ4),
 			SEQUENTIAL(B5,M5,MQ5)
-			), 615)
+			), 615),
+		build_source_key_prep(filedate)
 	);
 
 END;

@@ -1,4 +1,4 @@
-﻿import tools,mdr,BIPV2;
+﻿import tools,mdr,BIPV2,ut;
 
 export _Config(
 	 boolean	pUseOtherEnvironment	= false
@@ -54,5 +54,18 @@ module(
   export set_sources_of_industry_codes      := set(ds_sources_of_industry_codes       ,source);
   export set_sources_of_number_of_employees := set(ds_sources_of_number_of_employees  ,source);
   export set_sources_of_sales_revenue       := set(ds_sources_of_sales_revenue        ,source);
+
+  export set_bad_phones := ['2222222222', '3333333333', '4444444444', '5555555555', '6666666666', '7777777777', '8888888888', '9999999999', '9876543210'] 
+                           + ut.set_BadPhones
+  ;
+  
+  export set_valid_lexid_segs := ['CORE'  ,'C_MERGE' ,'NO_SSN' ,'AMBIG'];
+  
+  export business_terms_regex := '\\b(EXT|INC|FAX|CELL|FX|LLC|COMPANY|BUSINESS|BUSINESSES|EXTENSION|NEW|USE|CARRYOUT|TRUSTEE|BOTH|TAX)\\b';
+
+  export Add_Extra_Source_Fields := true;                    // -- add the extra source fields for sic,naics,employees,contact name. also executive ind & age for contacts.
+  
+  export Pull_From_Best_File    := true;                    // -- pull sic,naics,employees & revenue from the best file instead of the individual source files.
+  export Best_Has_Source_Fields := false;                   // -- pull sic,naics,employees & revenue from the best file instead of the individual source files.
 
 end;

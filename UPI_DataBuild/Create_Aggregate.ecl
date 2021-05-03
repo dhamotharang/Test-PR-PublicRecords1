@@ -1,6 +1,6 @@
 ﻿import versioncontrol, _control, ut, tools, std, UPI_DataBuild;
 
-export Create_Aggregate(boolean pUseProd, string gcid, string pHistMode, dataset(upi_databuild.layouts_v2.jobID_list) pBatch_jobID_list, string pVersion_start, string pVersion_end) := module
+export Create_Aggregate(boolean pUseProd, string gcid, string pHistMode, dataset(UPI_DataBuild.layouts_v2.jobID_list) pBatch_jobID_list, string pVersion_start, string pVersion_end) := module
 	
 	export pVersion 		:= if(pVersion_start <> '', pVersion_start, (string)std.date.today());
 	export pBatch_jobID	:= if(UPI_DataBuild.Aggregate_Report(pUseProd, gcid, pHistMode, pBatch_jobID_list, pVersion_start, pVersion_end).pBatch_jobID_set <> [], UPI_DataBuild.Aggregate_Report(pUseProd, gcid, pHistMode, pBatch_jobID_list, pVersion_start, pVersion_end).pBatch_jobID_set[1], '999999');

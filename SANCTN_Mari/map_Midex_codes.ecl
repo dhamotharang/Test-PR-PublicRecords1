@@ -72,6 +72,7 @@ SANCTN_Mari.layouts_SANCTN_common.Midex_cd			mapCds(ds_MidexCd L)  := TRANSFORM
 																	IF(self.FIELD_NAME = 'LICENSECODE', Prof_license_mari.fCleanLicenseNbr(self.CODE_VALUE),
 																	''))));
 		self.STD_TYPE_DESC := '';
+		self:=[];
 END;                   
 		     
 ds_Codes	:= project(ds_MidexCd,mapCds(left));

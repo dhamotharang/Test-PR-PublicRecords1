@@ -8,7 +8,7 @@ KeyName 			:= 'thor_data400::key::'+keyPreFix+'::';
 KeyName_fcra  := 'thor_data400::key::'+keyPreFix+'::fcra::';
 
 file_in0 	:= LN_PropertyV2.File_addl_legal(ln_fares_id not in LN_PropertyV2.Suppress_LNFaresID);
-file_in1 	:= LN_PropertyV2_Fast.Files.base.addl_legal(ln_fares_id not in LN_PropertyV2.Suppress_LNFaresID);
+file_in1 	:= LN_PropertyV2_Fast.Files.basedelta.addl_legal(ln_fares_id not in LN_PropertyV2.Suppress_LNFaresID);
 
 file_in		:= if(isFast,file_in1, file_in0);
 

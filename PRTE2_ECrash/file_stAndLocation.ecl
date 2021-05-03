@@ -218,6 +218,7 @@ Parse_Accident_Location := project(ds, transform(SlimAccident,
 Slim_Accident_Rec	:=	RECORD
 	String100	Partial_Accident_Location := '';
 	FLAccidents_Ecrash.Layouts.key_slim_layout;
+	// string3 contrib_source;
 END;
 
 Slim_Accident_Rec SlimLocation(SlimAccident l, integer cnt) := transform

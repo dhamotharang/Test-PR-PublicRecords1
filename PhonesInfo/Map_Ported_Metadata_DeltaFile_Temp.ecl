@@ -3,7 +3,9 @@
 //Delete records are kept
 //History is not kept
 
-import std, ut;	
+IMPORT std, ut;	
+
+//DF-28036: Convert 6-Digit Spids to 4-Character Spids
 
 EXPORT Map_Ported_Metadata_DeltaFile_Temp(string version):= FUNCTION 
 
@@ -69,7 +71,7 @@ EXPORT Map_Ported_Metadata_DeltaFile_Temp(string version):= FUNCTION
 	inputTelo 			:= project(concatDailyTelo, fixTeloFile(left, counter));
 	
 	//Append Spid
-	srtCRef 				:= sort(distribute(PhonesInfo.File_Source_Reference.Main, hash(ocn)), ocn, local);
+	srtCRef 				:= sort(distribute(PhonesInfo.File_Source_Reference.Main(is_current=TRUE), hash(ocn)), ocn, local);
 	srtTInput				:= sort(distribute(inputTelo, hash(ocn)), ocn, local);
 	
 	tempLayout addSpidTr(srtTInput l, srtCRef r):= transform

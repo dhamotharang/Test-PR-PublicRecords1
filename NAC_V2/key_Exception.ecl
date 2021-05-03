@@ -14,12 +14,7 @@ rExceptionKey := RECORD
  END;
 
 
-d1 := PROJECT(Files2.dsExceptionRecords(replaced=0), TRANSFORM(rExceptionKey,
-																							//self.sourcegroupid := left.groupid;
-																							// temporary:
-																							self.sourcegroupid := left.sourceprogramstate + '01';
-																							self.matchedgroupid := left.matchedstate + '01';
-																							self := left;));
+d1 := PROJECT(Files2.dsExceptionRecords(replaced=0),rExceptionKey);
 																							
 d2 := NORMALIZE(d1(SourceProgramState=MatchedState and SourceProgramCode=MatchedProgramCode), 2, TRANSFORM({d1},
 										self.MatchedClientId := CHOOSE(COUNTER, left.MatchedClientId, left.SourceClientId);

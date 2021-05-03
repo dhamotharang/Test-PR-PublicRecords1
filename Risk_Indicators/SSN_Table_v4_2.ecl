@@ -7,10 +7,8 @@ h_full := if(isFCRA,doxie_build.file_FCRA_header_building,doxie_build.file_heade
 h_quick := project( header_quick.file_header_quick (~iid_constants.filtered_source(src, st)), transform(header.Layout_Header, self.src := IF(left.src in ['QH', 'WH'], MDR.sourceTools.src_Equifax, left.src), self := left));
 headerprod_building := ungroup(h_full + h_quick);
 
-valid_header_uncorrected := if(isFCRA, headerprod_building(~fcra.Restricted_Header_Src(src, vendor_id[1]) AND
-																			((src='BA' AND FCRA.bankrupt_is_ok(todays_date,(string)dt_first_seen)) OR
-																				(src='L2' AND FCRA.lien_is_ok(todays_date,(string)dt_first_seen)) OR src NOT IN ['BA','L2'])),
-																	headerprod_building);
+valid_header_uncorrected := if(isFCRA, header.fn_fcra_filter_src(headerprod_building), headerprod_building);
+
 /* ****************************************************
  *                  Apply Corrections                 *
  ****************************************************** */

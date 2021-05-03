@@ -7,7 +7,7 @@ EXPORT GetOldFiles(string environment,integer noofdays = 0, string in_cluster = 
 	export TodaysDate := (STRING8)Std.Date.Today() : independent;
 	
 	export GetFullListWithPattern() := function
-		fulllogicallist := fileservices.logicalfilelist();
+		fulllogicallist := STD.File.logicalfilelist();
 		
 		rWithPattern	:=
 		record
@@ -51,7 +51,7 @@ EXPORT GetOldFiles(string environment,integer noofdays = 0, string in_cluster = 
 		
 		ds := if (in_cluster <> '' , preds(cluster = in_cluster), preds(cluster in thorbackup.Constants.allowedclusters(environment).clusterset))(~regexfind('[	]',name));
 		
-		dsfromdb := sort(thorbackup.GetDeleteFilesFromDB(),-filename);
+		dsfromdb := sort(thorbackup.GetDeleteFilesFromDB(excludedeletedfiles := '2'),-filename);
 		
 		typeof(ds) getfilesnotindb(ds l, dsfromdb r) := transform
 			self := l;
@@ -63,12 +63,13 @@ EXPORT GetOldFiles(string environment,integer noofdays = 0, string in_cluster = 
 													left.modified[1..10] = right.modified[1..10],
 													getfilesnotindb(left,right),
 													left only
-													),name);// : independent;
+													),name) : independent;
 		
 		//supers := sort(fileservices.Logicalfilesupersublist(),-subname);
 		notinsuper_recs := record
 			ds;
 			boolean insuper;
+			integer cnt := 0;
 		end;
 		
 		/*
@@ -83,14 +84,23 @@ EXPORT GetOldFiles(string environment,integer noofdays = 0, string in_cluster = 
 		
 		notinsuper_recs notinsuper(filesnotindb l, Fulllist r) := transform
 			self.insuper := false;
+			
 			self := l;
 		end;
 		
-		getnotinsuper := join(filesnotindb, Fulllist,
+		getnotinsuperfull := join(filesnotindb, Fulllist,
 													trim(left.name,left,right) = trim(right.subname,left,right),
 													notinsuper(left,right),
 													left only
 													);
+		
+		notinsuper_recs xGetCounter(getnotinsuperfull l, integer c) := transform
+			self.cnt := c;
+			self := l;
+		end;
+		// get only 100 records to process
+		// so it is faster
+		getnotinsuper := project(getnotinsuperfull(size >= thorbackup.Constants.deletethresholdsize),xGetCounter(left,counter))(cnt <= 100); 
 		
 		dGetWUDetails := dops.WorkunitTimingDetails(thorbackup.Constants.esp.bocaprodthor,'','',false).GetDetails() : independent;
 		
@@ -114,13 +124,16 @@ EXPORT GetOldFiles(string environment,integer noofdays = 0, string in_cluster = 
 			self.owner := l.owner;
 		end;
 		
-		getpatternswithdfuinfo := project(getnotinsuper,proj_recs(left))(size >= thorbackup.Constants.deletethresholdsize) : independent;
+		getpatternswithdfuinfo := project(getnotinsuper,proj_recs(left)) : independent;
 		
 		layout_filelist xGetPatternsWithnoCount(getpatternswithdfuinfo l) := transform
 			// DUS-314
 			jname := if (l.dfuinfo[1].wuid[1..1] = 'W'
 										,l.dfuinfo[1].JobName
-										,dGetWUDetails(regexfind(l.dfuinfo[1].wuid,dfujobid,nocase))[1].job
+										,if (trim(l.dfuinfo[1].wuid) <> ''
+												,dGetWUDetails(regexfind(l.dfuinfo[1].wuid,dfujobid,nocase))[1].job
+												,'dataopsowner:'+l.owner
+												) // this means unable to get owner info from file
 										); // DUS-314
 			self.owner := if (l.owner <> ''
 												,if (regexfind('dataopsowner',jname)
@@ -131,7 +144,7 @@ EXPORT GetOldFiles(string environment,integer noofdays = 0, string in_cluster = 
 			self := l;
 		end;
 	
-		getpatternswithnocount := project(getpatternswithdfuinfo,xGetPatternsWithnoCount(left));
+		getpatternswithnocount := project(getpatternswithdfuinfo,xGetPatternsWithnoCount(left));// : independent;
 		
 		rPatternCounts2	:=
 		record
@@ -153,7 +166,7 @@ EXPORT GetOldFiles(string environment,integer noofdays = 0, string in_cluster = 
 																					,left.filepattern = right.filepattern
 																				,populatecountinoriginal(left,right));
 		
-		integer totcount := count(filesnotindb) : independent;
+		integer totcount := count(filesnotindb);
 		integer baskets := totcount / thorbackup.Constants.getnooffiles().nfiles; // total soapcalls
 		
 		layout_filelist numbertherecords(olderfileswithpatterns l,integer c) := transform

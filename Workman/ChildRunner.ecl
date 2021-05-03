@@ -139,11 +139,11 @@ functionmacro
   StartExistingDataset        := dataset(StartFilename  ,WorkMan.layouts.wks_slim ,flat,opt);
 
   child_wuid1                 := StartExistingDataset   [if(count(StartExistingDataset  ) = 0,1,count(StartExistingDataset  ))].wuid     ;
-  child_iteration1            := StartExistingDataset   [if(count(StartExistingDataset  ) = 0,1,count(StartExistingDataset  ))].iteration;
+  child_iteration1            := trim(StartExistingDataset   [if(count(StartExistingDataset  ) = 0,1,count(StartExistingDataset  ))].iteration);
   child_iteration1_status     := StartExistingDataset   [if(count(StartExistingDataset  ) = 0,1,count(StartExistingDataset  ))].state    ;
   
   latest_completed_wuid       := outputfilename_dataset [if(count(outputfilename_dataset) = 0,1,count(outputfilename_dataset))].wuid     ;
-  latest_completed_iteration  := outputfilename_dataset [if(count(outputfilename_dataset) = 0,1,count(outputfilename_dataset))].iteration;
+  latest_completed_iteration  := trim(outputfilename_dataset [if(count(outputfilename_dataset) = 0,1,count(outputfilename_dataset))].iteration);
 
   Child_Wuid                  := map(STD.File.FileExists(StartFilename ) and DoesFileExist       => child_wuid1 
                                     // ,STD.File.FileExists(OutputFilename)                         => latest_completed_wuid
@@ -158,9 +158,11 @@ functionmacro
   // -- figure out start iteration #
   ds_output_superfile                := dataset(pOutputSuperfile,WorkMan.layouts.wks_slim,flat,opt);
   ds_previous_builds                 := ds_output_superfile(version <= pversion,pBuildName = '' or StringLib.StringToLowerCase(Build_name) = StringLib.StringToLowerCase(pBuildName));
-  ds_previous_build_final_iterations := topn(ds_previous_builds,1,-version,-(unsigned)trim(iteration));
-  latest_previous_iteration          := (string)max(ds_previous_build_final_iterations  ,(unsigned)trim(iteration));  //weird behaviour when I index it(doesn't give you the last iteration), but using max seems to work
-  // latest_previous_iteration          := (string)ds_previous_build_final_iterations[1].iteration;
+  ds_max_version                     := max(ds_previous_builds  ,version);
+  ds_previous_build_final_iterations  := ds_previous_builds(version = ds_max_version);  // using sort or topn doesn't work.  dataset becomes null when trying to access it.  use max, and no sorting at all seems to work
+  latest_previous_iteration          := trim((string)max(ds_previous_build_final_iterations  ,(unsigned)trim(iteration)  ));  //weird behaviour when I index it(doesn't give you the last iteration), but using max seems to work
+  // latest_previous_iteration_slim     := choosen(ds_previous_build_final_iterations,1); //no worky
+  // latest_previous_iteration          := max(latest_previous_iteration_slim,iteration);
 
   #IF(#TEXT(pStartIteration) = '' or #TEXT(pStartIteration) = '\'\'') // it is blank
     default_start_iteration            := map(
@@ -679,7 +681,10 @@ functionmacro
 #IF(pTestingIters = true)
 
     ,output(ds_previous_builds                                ,named('ds_previous_builds'                 ),overwrite)
+    ,output(ds_max_version                                    ,named('ds_max_version'                 ),overwrite)
+
     ,output(ds_previous_build_final_iterations                ,named('ds_previous_build_final_iterations' ),overwrite)
+    ,output(latest_previous_iteration_slim                    ,named('latest_previous_iteration_slim'     ),overwrite)
     ,output(latest_previous_iteration                         ,named('latest_previous_iteration'          ),overwrite)
     ,output(ds_iteration_info                                 ,named('ds_iteration_calculation_info'      ),overwrite)
     ,output(Iteration                                        ,named('Iteration'      ),overwrite)

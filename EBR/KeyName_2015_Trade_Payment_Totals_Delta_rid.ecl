@@ -1,0 +1,1 @@
+﻿EXPORT KeyName_2015_Trade_Payment_Totals_Delta_rid := trim(GetSegmentKeyName_Delta_RID('2015'));

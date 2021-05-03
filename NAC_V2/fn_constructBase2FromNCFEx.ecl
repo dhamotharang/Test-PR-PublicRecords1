@@ -18,7 +18,11 @@
 				
 				self.Prepped_addr1 := addr.Prepped_addr1;
 				self.Prepped_addr2 := addr.Prepped_addr2;
-				self.AddressType := addr.AddressType;
+				self.AddressType := MAP(
+										addr.AddressType='' AND self.Mailing_Street1 <> ''  => 'M',
+										addr.AddressType='' AND self.Physical_Street1 <> '' => 'P',
+										addr.AddressType <> '' => addr.AddressType,
+										'B');
 
 				self.prim_range := addr.prim_range;
 				self.predir := addr.predir;
@@ -63,6 +67,7 @@ JoinAddresses(DATASET($.layout_Base2) base, DATASET($.Layouts2.rAddressEx) addre
 					and left.ProgramCode=right.ProgramCode
 					and left.CaseId=right.CaseId
 					and left.ClientId=right.ClientId,
+					//AND left.filename=right.filename,
 					xAddress(LEFT,RIGHT),
 					Inner, KEEP(2), LOCAL);
 		// No client matches
@@ -72,6 +77,7 @@ JoinAddresses(DATASET($.layout_Base2) base, DATASET($.Layouts2.rAddressEx) addre
 					and left.ProgramCode=right.ProgramCode
 					and left.CaseId=right.CaseId
 					and left.ClientId=right.ClientId,
+					//AND left.filename=right.filename,
 					TRANSFORM(nac_v2.Layout_Base2, self := left;),
 					LEFT Only, LOCAL);
 		// case matched
@@ -80,6 +86,7 @@ JoinAddresses(DATASET($.layout_Base2) base, DATASET($.Layouts2.rAddressEx) addre
 					and left.ProgramState=right.ProgramState
 					and left.ProgramCode=right.ProgramCode
 					and left.CaseId=right.CaseId,
+					//AND left.filename=right.filename,
 					xAddress(LEFT,RIGHT),
 					Inner, KEEP(2), LOCAL);
 		// No case matches
@@ -88,39 +95,42 @@ JoinAddresses(DATASET($.layout_Base2) base, DATASET($.Layouts2.rAddressEx) addre
 					and left.ProgramState=right.ProgramState
 					and left.ProgramCode=right.ProgramCode
 					and left.CaseId=right.CaseId,
+					//AND left.filename=right.filename,
 					TRANSFORM(nac_v2.Layout_Base2, self := left;),
 					LEFT Only, LOCAL);
 		
 		return ds_cl_match + ds_ca_match + ds_ca_nomatch;
 END;
 
+/**
+In order to support superfiles, we no longer dedup here.
+The records are now deduped when the file is processed. Dedup occurs only within a file.
 
-EXPORT fn_constructBase2FromNCFEx(DATASET($.Layouts2.rNac2Ex) ds, string8 version) := FUNCTION
+**/
 
-	ca1 := DISTRIBUTE(PROJECT(ds(RecordCode = 'CA01'), TRANSFORM(Nac_V2.Layouts2.rCaseEx,
+EXPORT fn_constructBase2FromNCFEx(DATASET($.Layouts2.rNac2Ex) nacin, string8 version) := FUNCTION
+
+	ca1 := DISTRIBUTE(PROJECT(nacin(RecordCode = 'CA01'), TRANSFORM(Nac_V2.Layouts2.rCaseEx,
 										self := LEFT.CaseRec;
 										self.RecordCode := left.RecordCode;
 										)), hash32(CaseId));
-										
-	cases := DEDUP(SORT(ca1(errors=0), CaseId,ProgramState,ProgramCode,GroupId, local),
-									CaseId,ProgramState,ProgramCode,GroupId, local);
 
-	cl1 := DISTRIBUTE(PROJECT(ds(RecordCode = 'CL01'), TRANSFORM(Nac_V2.Layouts2.rClientEx,
+	cases := $.fn_rollupCases(ca1(errors=0));
+
+	cl1 := PROJECT(nacin(RecordCode = 'CL01'), TRANSFORM(Nac_V2.Layouts2.rClientEx,
 											self := LEFT.ClientRec;
 											self.RecordCode := left.RecordCode;
 											)
-										), HASH32(ClientId));
+										);
 
-	clients := DEDUP(SORT(cl1(errors=0), ClientId,CaseId,ProgramState,ProgramCode,GroupId, local),
-									ClientId,CaseId,ProgramState,ProgramCode,GroupId, local);
+	clients := $.fn_rollupClients(cl1(errors=0));
 
-	ad1 := DISTRIBUTE(PROJECT(ds(RecordCode = 'AD01'), TRANSFORM(Nac_V2.Layouts2.rAddressEx,
+	ad1 := DISTRIBUTE(PROJECT(nacin(RecordCode = 'AD01'), TRANSFORM(Nac_V2.Layouts2.rAddressEx,
 												self := LEFT.AddressRec;
 												self.RecordCode := left.RecordCode;
 												self := [])), HASH32(CaseId, ClientId));
 
-	addresses := DEDUP(SORT(ad1(errors=0), CaseId,ClientId,ProgramState,ProgramCode,GroupId,AddressType, local),
-									CaseId,ClientId,ProgramState,ProgramCode,GroupId,AddressType, local);
+	addresses := $.fn_rollupAddresses(ad1(errors=0));
 
 	ds1 := PROJECT(cases, TRANSFORM(layout_Base2,
 								self.ProgramState := left.ProgramState;
@@ -146,12 +156,13 @@ EXPORT fn_constructBase2FromNCFEx(DATASET($.Layouts2.rNac2Ex) ds, string8 versio
 								self := [];
 								));
 
-	ds2 := JOIN(DISTRIBUTE(ds1, HASH32(GroupId, ProgramState,ProgramCode,CaseId)),
-				DISTRIBUTE(clients, HASH32(GroupId, ProgramState,ProgramCode,CaseId)),
+	ds2 := JOIN(DISTRIBUTE(ds1, HASH32(GroupId,CaseId,ProgramCode,ProgramState)),
+							DISTRIBUTE(clients, HASH32(GroupId,CaseId,ProgramCode,ProgramState)),
 								left.GroupId=right.GroupId
-								AND left.ProgramState=right.ProgramState
+								AND left.CaseId=right.CaseId
 								AND left.ProgramCode=right.ProgramCode
-								AND left.CaseId=right.CaseId,
+								AND left.ProgramState=right.ProgramState,
+								//AND left.filename=right.filename,
 				TRANSFORM(layout_Base2,
 					self.case_Last_Name := if(right.HHIndicator='Y', right.LastName, left.LastName);
 					self.case_First_Name := if(right.HHIndicator='Y', right.FirstName, left.FirstName);
@@ -168,11 +179,13 @@ EXPORT fn_constructBase2FromNCFEx(DATASET($.Layouts2.rNac2Ex) ds, string8 versio
 					self.case_Monthly_Allotment := left.case_Monthly_Allotment;
 					self.case_Phone1 := left.case_Phone1;
 					self.case_Phone2 := left.case_Phone2;
-					self.case_Email := left.case_Email;
-					self.filename := left.filename;
-					self.OrigGroupId := left.OrigGroupId;
-					self.Created := left.Created;
-					self.Updated := left.Updated;
+					// use client record if available
+					self.OrigGroupId := $.Coalesce(right.OrigGroupId, left.OrigGroupId);
+					self.Created := if(right.Created=0, left.Created, right.Created);
+					self.Updated := if(right.Updated=0, left.Updated, right.Updated);
+					self.filename := $.Coalesce(right.filename, left.filename);
+					self.NCF_FileDate := (unsigned4)self.filename[11..18];
+					self.NCF_FileTime := self.filename[20..25];
 										
 					// add client information
 					self.eligibility_status_indicator := right.Eligibility;
@@ -192,35 +205,19 @@ EXPORT fn_constructBase2FromNCFEx(DATASET($.Layouts2.rNac2Ex) ds, string8 versio
 					self.EndDate := IF(right.PeriodType='M',fn_LastDayOfMonth(right.EndDate), (integer)right.EndDate);
 					
 					// create unique id. For backward compatibility, this is limited to 6 bytes
-					day := ((unsigned)(right.filename[15..16]))*31 + ((unsigned)(right.filename[17..18]));
-					year := ((unsigned)(right.filename[11..14])) - 2020; // nothing before 2020
-					id := (day * 40) + year;		// good for 40 years
+					year2020 := Std.Date.FromJulianYMD(2020,1,1); 	// nothing before 2020
+					year := Std.Date.FromJulianYMD((unsigned)(right.filename[11..14]),(unsigned)(right.filename[15..16]),(unsigned)(right.filename[17..18]));
+					days := year - year2020;		// good for 50 years
 					self.PrepRecSeq := if(right.filename='',0,
-						HASH32(right.GroupId,right.ProgramCode,right.Caseid,right.ClientId,right.filename[11..18]) | 
-										(id << 32) );
+						HASH32(right.GroupId,right.ProgramCode,TRIM(right.ClientId,right,left),TRIM(right.CaseId,right,left))
+										| (days << 32) );
 
 					self := right;
 					self := left;
 					), LEFT OUTER, LOCAL);
 					
-	// add head of household as case name
-	ds3 := JOIN(DISTRIBUTE(ds2(case_last_name=''), HASH32(ProgramState,ProgramCode,CaseId)),
-				DISTRIBUTE(clients(HHIndicator='Y'), HASH32(ProgramState,ProgramCode,CaseId)),
-								left.GroupId=right.GroupId
-								AND left.ProgramState=right.ProgramState
-								AND left.ProgramCode=right.ProgramCode
-								AND left.CaseId=right.CaseId,
-				TRANSFORM(layout_Base2,
-					self.case_Last_Name := if(right.HHIndicator='Y', right.LastName, left.LastName);
-					self.case_First_Name := if(right.HHIndicator='Y', right.FirstName, left.FirstName);
-					self.case_Middle_Name := if(right.HHIndicator='Y', right.MiddleName, left.MiddleName);
-					self.case_Name_Suffix := if(right.HHIndicator='Y', right.NameSuffix, left.NameSuffix);
-					self := left;
-					), LEFT OUTER, KEEP(1), LOCAL);
-					
-	ds4 := ds2(case_last_name<>'') + ds3;
 	
-	ds5 := JoinAddresses(ds4, addresses);
+	ds5 := JoinAddresses(ds2, addresses);
 
 	return ds5;
 

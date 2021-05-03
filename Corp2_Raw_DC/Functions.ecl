@@ -1,4 +1,4 @@
-IMPORT corp2, corp2_mapping;
+﻿IMPORT corp2, corp2_mapping;
 
 EXPORT Functions := Module
 			
@@ -29,10 +29,13 @@ EXPORT Functions := Module
 											OrgSt_dec='LIMITED LIABILITY PARTNERSHIP FOREIGN'												 =>'LIMITED LIABILITY PARTNERSHIP FOREIGN',
 											OrgSt_dec='LIMITED PARTNERSHIP DOMESTIC'																 =>'LIMITED PARTNERSHIP DOMESTIC',
 											OrgSt_dec='LIMITED PARTNERSHIP FOREIGN'																	 =>'LIMITED PARTNERSHIP FOREIGN',
+											OrgSt_dec='NAME RESERVATION DOMESTIC'																	   =>'NAME RESERVATION DOMESTIC' ,
+											OrgSt_dec='NAME RESERVATION DOMESTIC NON-PROFIT'												 =>'NAME RESERVATION DOMESTIC NON-PROFIT' ,
+											OrgSt_dec='NAME RESERVATION FOREIGN'																	   =>'NAME RESERVATION FOREIGN',
 											OrgSt_dec='NON-PROFIT CORPORATION DOMESTIC'															 =>'NON-PROFIT CORPORATION DOMESTIC',
 											OrgSt_dec='NON-PROFIT CORPORATION FOREIGN'															 =>'NON-PROFIT CORPORATION FOREIGN',
 											OrgSt_dec='NON-PROFIT CORPORATION FOREIGN NON-PROFIT'										 =>'NON-PROFIT CORPORATION FOREIGN NON-PROFIT',
-											OrgSt_dec='NONREGISTERED NONFILING ENTITY NONE'													 =>'NONREGISTERED NONFILING ENTITY NONE',
+											OrgSt_dec='NONREGISTERED NONFILING ENTITY NONE'													 =>'NONREGISTERED NONFILING ENTITY NONE',											
 											OrgSt_dec='PROFESSIONAL LIMITED LIABILITY COMPANY DOMESTIC'							 =>'PROFESSIONAL LIMITED LIABILITY COMPANY DOMESTIC',
 											OrgSt_dec='PROFESSIONAL LIMITED LIABILITY COMPANY DOMESTIC PROFESSIONAL' =>'PROFESSIONAL LIMITED LIABILITY COMPANY DOMESTIC PROFESSIONAL',
 											OrgSt_dec='STATUTORY TRUST DOMESTIC'																		 =>'STATUTORY TRUST DOMESTIC',
@@ -112,8 +115,10 @@ EXPORT Functions := Module
 	//fGetNameAddress: Returns "Name & Address" separated by a "pipe".
 	//********************************************************************	
 	EXPORT fGetNameAddress(STRING state_origin, STRING state_desc, STRING s) := FUNCTION
-	
-		uc_s  							:= corp2.t2u(s);
+	    
+    //DF-27872: Removes the slash found in the zip values 
+		stripInvalids       := regexreplace('\\x5C|\\x2F', s,''); 
+		uc_s  							:= corp2.t2u(stripInvalids);	
 		name					  		:= corp2.t2u(stringlib.splitwords(uc_s,'|',false)[1]);
 		addr								:= stringlib.splitwords(uc_s,'|',false)[2];
 		zip				 	 				:= Corp2_Mapping.fCleanZip(state_origin,state_desc,addr).Zip;
@@ -151,7 +156,9 @@ EXPORT Functions := Module
 	//********************************************************************		
 	EXPORT fGetBusAddress(STRING state_origin, STRING state_desc, STRING s) := FUNCTION
 	
-		uc_s  							:= corp2.t2u(s);
+	  //DF-27872: Removes the slash found in the zip values
+		stripInvalids       := regexreplace('\\x5C|\\x2F', s,'');
+		uc_s  							:= corp2.t2u(stripInvalids);
 		zip				 	 				:= Corp2_Mapping.fCleanZip(state_origin,state_desc,uc_s).Zip;
 		addr_wo_zip					:= if(zip<>'',regexreplace(zip,uc_s,''),uc_s);
 		addr_parts_by_comma	:= stringlib.splitwords(addr_wo_zip,',',false);

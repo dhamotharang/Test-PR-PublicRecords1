@@ -1,4 +1,4 @@
-/*
+﻿/*
   test ingest of limited set of sources to isolate problems 
   might need to sandbox the as linking mappers to comment out the #OPTION('multiplePersistInstances',FALSE);
   if you want to separate your persist names from any production processes, i.e. you want to make them unique.
@@ -26,4 +26,6 @@ BIPV2_Ingest._Test_Ingest(
    ds_aslinkings   //as linking mapper(s) for sources you are testing
   ,set_sources     //set of source codes for sources you are testing.
   ,ds_bip_base
+  ,pShould_Reclean_base_file  := true //can speed it up by setting to false
+  ,pShould_Xlink_file         := true //can speed it up by setting to false
 );

@@ -66,10 +66,10 @@ Sales_desc = Sales description (27% pop).  Sample values:  revenue, sales, inter
   ds_oshair_prep    := table(ds_oshair_base_filt  ,{source_rec_id,unsigned6 dt_last_seen := (unsigned6)dt_last_seen,                             activity_number         ,pID,Number_In_Establishment }); // not used in sales calculations
 
   ds_cortera_prep   :=  
-                        table(ds_cortera_base_filt  ,{unsigned6 source_rec_id := ((unsigned8)link_id << 32) | HASH32(name                    ,clean_phone  ,EXECUTIVE_NAME,EXEC_TITLE)  ,unsigned6 dt_last_seen := (unsigned6)dt_last_seen,link_id,pID,TOTAL_EMPLOYEES,TOTAL_SALES }) 
-                      + table(ds_cortera_base_filt  ,{unsigned6 source_rec_id := ((unsigned8)link_id << 32) | HASH32(name                    ,clean_fax    ,EXECUTIVE_NAME,EXEC_TITLE)  ,unsigned6 dt_last_seen := (unsigned6)dt_last_seen,link_id,pID,TOTAL_EMPLOYEES,TOTAL_SALES })
-                      + table(ds_cortera_base_filt  ,{unsigned6 source_rec_id := ((unsigned8)link_id << 32) | HASH32(alternate_business_name ,clean_phone  ,EXECUTIVE_NAME,EXEC_TITLE)  ,unsigned6 dt_last_seen := (unsigned6)dt_last_seen,link_id,pID,TOTAL_EMPLOYEES,TOTAL_SALES })
-                      + table(ds_cortera_base_filt  ,{unsigned6 source_rec_id := ((unsigned8)link_id << 32) | HASH32(alternate_business_name ,clean_fax    ,EXECUTIVE_NAME,EXEC_TITLE)  ,unsigned6 dt_last_seen := (unsigned6)dt_last_seen,link_id,pID,TOTAL_EMPLOYEES,TOTAL_SALES })
+                        table(ds_cortera_base_filt  ,{unsigned6 source_rec_id := ((unsigned8)link_id << 32) | HASH32(name                    ,clean_phone  ,EXECUTIVE_NAME,Executive_Title)  ,unsigned6 dt_last_seen := (unsigned6)dt_last_seen,link_id,pID,TOTAL_EMPLOYEES,TOTAL_SALES }) 
+                      + table(ds_cortera_base_filt  ,{unsigned6 source_rec_id := ((unsigned8)link_id << 32) | HASH32(name                    ,clean_fax    ,EXECUTIVE_NAME,Executive_Title)  ,unsigned6 dt_last_seen := (unsigned6)dt_last_seen,link_id,pID,TOTAL_EMPLOYEES,TOTAL_SALES })
+                      + table(ds_cortera_base_filt  ,{unsigned6 source_rec_id := ((unsigned8)link_id << 32) | HASH32(alternate_business_name ,clean_phone  ,EXECUTIVE_NAME,Executive_Title)  ,unsigned6 dt_last_seen := (unsigned6)dt_last_seen,link_id,pID,TOTAL_EMPLOYEES,TOTAL_SALES })
+                      + table(ds_cortera_base_filt  ,{unsigned6 source_rec_id := ((unsigned8)link_id << 32) | HASH32(alternate_business_name ,clean_fax    ,EXECUTIVE_NAME,Executive_Title)  ,unsigned6 dt_last_seen := (unsigned6)dt_last_seen,link_id,pID,TOTAL_EMPLOYEES,TOTAL_SALES })
                       ;
 
   ds_infutor_prep     := table(ds_infutor_base_filt   ,{rcid         ,unsigned6 dt_last_seen := (unsigned6)dt_last_seen,record_id  ,pID,unsigned number_of_employees := mapinfutoremp(trim(employee_code)) }); // not used in sales calculations
@@ -98,11 +98,13 @@ Sales_desc = Sales description (27% pop).  Sample values:  revenue, sales, inter
   best_emp_seleid   := dedup(sort(distribute(ds_add_sales_ranking(number_of_employees > 0,emp_rank_order            > 0)  ,hash(pID))  ,pID,emp_rank_order           ,-dt_last_seen,-number_of_employees ,local) ,pID,local) : persist('~persist::Marketing_List::Get_Sales_And_Employees::best_emp_seleid'        );
   best_sales_seleid := dedup(sort(distribute(ds_add_sales_ranking(annual_revenue      > 0,annual_revenue_rank_order > 0)  ,hash(pID))  ,pID,annual_revenue_rank_order,-dt_last_seen,-annual_revenue      ,local) ,pID,local) : persist('~persist::Marketing_List::Get_Sales_And_Employees::best_sales_seleid'      );
 
-  ds_out := join(best_emp_seleid  ,best_sales_seleid  ,left.pID = right.pID ,transform(recordof(left)
+  ds_out := join(best_emp_seleid  ,best_sales_seleid  ,left.pID = right.pID ,transform({recordof(left),string2 src_revenue,string2 src_employees}
     ,self.number_of_employees       := if(left.pID  != 0  ,left.number_of_employees  ,-1)
     ,self.emp_rank_order            := left.emp_rank_order
+    ,self.src_employees             := left.source
     ,self.annual_revenue            := if(right.pID != 0  ,right.annual_revenue      ,-1)
     ,self.source                    := right.source
+    ,self.src_revenue               := right.source
     ,self.annual_revenue_rank_order := right.annual_revenue_rank_order
     ,self.pID                       := if(left.pID != 0  ,left.pID            ,right.pID          )
     ,self.dt_last_seen              := if(left.pID != 0  ,left.dt_last_seen   ,right.dt_last_seen )
@@ -189,9 +191,9 @@ Sales_desc = Sales description (27% pop).  Sample values:  revenue, sales, inter
   );
   
   #IF(pDebug = true)
-    return when(best_sales_seleid ,outputdebug);
+    return when(ds_out ,outputdebug);
   #ELSE
-    return best_sales_seleid;
+    return ds_out;
   #END
 
 endmacro;

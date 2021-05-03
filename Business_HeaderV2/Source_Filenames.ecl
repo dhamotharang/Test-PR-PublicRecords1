@@ -39,6 +39,7 @@
 	,lobbyists
 	,martindale_hubbell
 	// ,naturaldisaster_readiness
+	,OneKey
 	,oshair
 	,phonesplus
 	,prof_license
@@ -128,8 +129,6 @@ module
 	export sdaa													:= VersionControl.mBuildFilenameVersionsOld(prod + sdacluster+'Base::SDAA'            																);
 	export SEC 													:= VersionControl.mBuildFilenameVersionsOld(prod + 'thor_data400::base::sec_bd_info'               										);
 	export SEC2													:= VersionControl.mBuildFilenameVersionsOld(prod + 'thor_data400::base::sec_broker_dealer'            								);
-	export SKA_Nixie										:= VersionControl.mBuildFilenameVersionsOld(prod + 'thor_data400::base::ska_nixie'                 										);
-	export ska_verified									:= VersionControl.mBuildFilenameVersionsOld(prod + 'thor_data400::base::ska_verified'              										);
 	export txbus												:= VersionControl.mBuildFilenameVersionsOld(prod + txbuscluster + 'base::txbus::basefile'          										);
 	export ucc_party 										:= VersionControl.mBuildFilenameVersionsOld(prod + ucccluster+'base::ucc::party_aid'        															);
 	export vickers_13d13g								:= VersionControl.mBuildFilenameVersionsOld(prod + 'thor_data400::base::vickers_13d13g_base'       										);
@@ -150,6 +149,7 @@ module
 		+ Advo.Filenames().base.dall_filenames
 		+ bbb2.Filenames().Base.Member.dall_filenames
 		+ bbb2.Filenames().Base.NonMember.dall_filenames
+		//+ busdata.Filenames_SKA().Base.dall_filenames					// Replaced with Onekey - Jira# DF-26195
 		+ busreg.Filenames().Base.Companies.dall_filenames
 		+ busreg.Filenames().Base.Contacts.dall_filenames
 		+ Credit_Unions.Filenames().base.dAll_filenames
@@ -169,6 +169,7 @@ module
 		+ martindale_hubbell.filenames().base.organizations.dall_filenames
 		+ martindale_hubbell.filenames().base.Affiliated_individuals.dall_filenames
 		// + naturaldisaster_readiness.filenames().keybuild.dall_filenames
+		+ OneKey.Filenames().dAll_Basefilenames							// Modified code to replace ska with OneKey as per Jira# DF-26195
 		+ Redbooks.filenames().base.combined.dall_filenames
 		+ spoke.filenames().base.dall_filenames
 		+ sheila_greco.filenames().base.dall_filenames
@@ -238,8 +239,6 @@ module
 		+ sdaa.dall_filenames
 		+ SEC.dall_filenames
 		+ SEC2.dall_filenames
-		+ SKA_Nixie.dall_filenames
-		+ ska_verified.dall_filenames
 		+ txbus.dall_filenames
 		+ ucc_party.dall_filenames
 		+ vickers_13d13g.dall_filenames

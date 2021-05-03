@@ -123,7 +123,7 @@ def dDebug():
 			+'  SELF.salt_partition_score := if(le.SALT_Partition = ri.SALT_Partition OR le.SALT_Partition=\'\' OR ri.SALT_Partition = \'\'  ,0,-9999);/*HACKDebug02*/\n'
 			+'  SELF.left_cnp_number := le.cnp_number;','set partition fields in match sample join'),
 		('debug', 'END;[ \n\t]*SHARED AppendAttribs.*END;[ \n\t]*EXPORT Layout_RolledEntity', 'HACKDebug03','END;\n'
-      + 'SHARED AppendAttribs(DATASET(layout_sample_matches) am,DATASET(match_candidates(ih).layout_attribute_matches) ia) := FUNCTION\n'
+      + 'EXPORT AppendAttribs(DATASET(layout_sample_matches) am,DATASET(match_candidates(ih).layout_attribute_matches) ia) := FUNCTION\n'
       + '  Layout_Sample_Matches add_attr(am le, ia ri) := TRANSFORM\n'
       + '    SELF.Attribute_Conf := ri.Conf;\n'
       + '    SELF.Matching_Attributes := ri.Source_Id;\n'

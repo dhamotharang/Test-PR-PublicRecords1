@@ -1,7 +1,9 @@
+﻿import Flaccidents_Ecrash;
+
 EXPORT Constants := module
 //person_type
 EXPORT set_ptype          := ['P1','P2','P3','P4','P5','P6','P7','P8','P9'];
-EXPORT set_person_type		:= ['\\PASSENGER', '3PASSENGER','Ã¢?Â¢THEY ENTERED: PASSENGER','BICYCLE',
+EXPORT set_person_type		:= ['\\PASSENGER', '3PASSENGER','ÃƒÂ¢?Ã‚Â¢THEY ENTERED: PASSENGER','BICYCLE',
 															'BICYCLIST', 'BYCICLIST', 'INJURED PASSENGER', 'OASSENGER', 'PAASENGER',
 															'PAS', 'PASEENGER', 'PASENGER', 'PASS', 'PASSANGER',
 															'PASSE', 'PASSEBGER', 'PASSEDNGER', 'PASSEENGER', 'PASSEGER',
@@ -24,5 +26,12 @@ EXPORT ak_keyname 	:= KeyName_ecrashv2 +'::autokey::@version@::';
 EXPORT ak_logical(string filedate) := KeyName_ecrashv2 + '::' + filedate + '::autokey::'; 
 EXPORT ak_skip_set 	:= ['P','Q','S','F']; 
 EXPORT ak_typestr 	:= '\'AK\''; 
+
+//Agency Exclusion List--DF-27464
+EXPORT Agency_ori_jurisdiction_list := Flaccidents_Ecrash.Agency_Exclusion.Agency_ori_jurisdiction_list;
+EXPORT Agency_ori_exclusion_list := Flaccidents_Ecrash.Agency_Exclusion.Agency_ori_exclusion_list ;
+EXPORT Agency_ori_list := Flaccidents_Ecrash.Agency_Exclusion.Agency_ori_list;
+
+EXPORT dataset_name := 'EcrashV2Keys';
 
 END;

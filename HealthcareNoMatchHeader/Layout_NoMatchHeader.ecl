@@ -63,4 +63,8 @@
   UNSIGNED8 record_sid;
   STRING10  batch_jobid;
   STRING12  batch_seq_number;
+  STRING1   lexID_changed :=  '';
+  UNSIGNED8 old_lexid :=  0;
+  STRING1   crk_changed :=  '';
+  STRING50  old_crk :=  '';
 END;

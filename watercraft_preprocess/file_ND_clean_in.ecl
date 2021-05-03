@@ -1,4 +1,4 @@
-import watercraft, watercraft_preprocess, ut, lib_StringLib;
+﻿import watercraft, watercraft_preprocess, ut, lib_StringLib;
 
 fIn_raw := watercraft_preprocess.Files_raw.ND;
 
@@ -7,7 +7,7 @@ CompSuffix		:= '(FARM|SUPPLY|SERVICE$|REPAIR|FUND |COOPERATIVE|CONSTRUCTORS| CO$
 									'TELEPHONE|REALTY|RECREATION|FIRE DEPT|SCHOOL$| LTD$|LAKE|ENTERPRISE|CENTER$|SPORT|PARK|COMMUNITY|^CITY)';
 
 //Trim and uppercase all fields prior to mapping
-Watercraft.layout_ND_new14Q2 CleanTrimRaw(fIn_raw L) := TRANSFORM
+Watercraft.layout_ND_20Q3 CleanTrimRaw(fIn_raw L) := TRANSFORM
 self.STATEDATA	:= ut.CleanSpacesAndUpper(L.STATEDATA);
 self.REG_NUM		:= ut.CleanSpacesAndUpper(L.REG_NUM);
 self.HULL_ID		:= ut.CleanSpacesAndUpper(REGEXREPLACE('^[^A-Z0-9]',L.HULL_ID,''));

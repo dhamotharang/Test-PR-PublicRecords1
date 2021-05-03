@@ -13,6 +13,8 @@ program_cleaned normalize_program(StrategicCodes L) := TRANSFORM
    self.Activity_Number						:=	(integer)l.activity_nr;
    self.program_type							:=	ut.CleanSpacesAndUpper(l.prog_type);
    self.program_value							:=	ut.CleanSpacesAndUpper(l.prog_value); //Jira--DF-20163--fixing the strata error  !! ( ex: ' AMPUTATIONS' & ' ENF TARGETED' program values have white space( cleaning them & eliminationg dups !!) 
+   self                          	:= 	l;
+	 self														:=	[];
 end;
 ds_programs 	:= 	project(StrategicCodes,normalize_program(LEFT));
 

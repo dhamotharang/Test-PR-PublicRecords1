@@ -48,7 +48,7 @@ CopyFiles1(data_services.foreign_prod + 'prte::key::fraudgov::' + prev_version +
 CopyFiles1(data_services.foreign_prod + 'prte::key::fraudgov::' + prev_version + '::ip','~prte::key::fraudgov::' + current_version + '::ip',dest_cluster); 
 CopyFiles1(data_services.foreign_prod + 'prte::key::fraudgov::' + prev_version + '::iprange','~prte::key::fraudgov::' + current_version + '::iprange',dest_cluster); 
 CopyFiles1(data_services.foreign_prod + 'prte::key::fraudgov::' + prev_version + '::isp','~prte::key::fraudgov::' + current_version + '::isp',dest_cluster); 
-CopyFiles1(data_services.foreign_prod + 'prte::key::fraudgov::' + prev_version + '::kel::clusterdetails','~prte::key::fraudgov::' + current_version + '::kel::clusterdetails',dest_cluster); 
+
 CopyFiles1(data_services.foreign_prod + 'prte::key::fraudgov::' + prev_version + '::kel::elementpivot','~prte::key::fraudgov::' + current_version + '::kel::elementpivot',dest_cluster); 
 CopyFiles1(data_services.foreign_prod + 'prte::key::fraudgov::' + prev_version + '::kel::scorebreakdown','~prte::key::fraudgov::' + current_version + '::kel::scorebreakdown',dest_cluster); 
 CopyFiles1(data_services.foreign_prod + 'prte::key::fraudgov::' + prev_version + '::linkids','~prte::key::fraudgov::' + current_version + '::linkids',dest_cluster); 
@@ -69,8 +69,11 @@ CopyFiles1(data_services.foreign_prod + 'prte::key::fraudgov::' + prev_version +
 CopyFiles1(data_services.foreign_prod + 'prte::key::fraudgov::' + prev_version + '::tin','~prte::key::fraudgov::' + current_version + '::tin',dest_cluster);
 CopyFiles1(data_services.foreign_prod + 'prte::key::fraudgov::' + prev_version + '::user','~prte::key::fraudgov::' + current_version + '::user',dest_cluster);
 CopyFiles1(data_services.foreign_prod + 'prte::key::fraudgov::' + prev_version + '::zip','~prte::key::fraudgov::' + current_version + '::zip',dest_cluster);
-
 CopyFiles1(data_services.foreign_prod + 'prte::key::fraudgov::' + prev_version + '::kel::weightingchart','~prte::key::fraudgov::' + current_version + '::kel::weightingchart',dest_cluster); 
+CopyFiles1(data_services.foreign_prod + 'prte::key::fraudgov::' + prev_version + '::kel::configrules','~prte::key::fraudgov::' + current_version + '::kel::configrules',dest_cluster); 
+CopyFiles1(data_services.foreign_prod + 'prte::key::fraudgov::' + prev_version + '::kel::configattributes','~prte::key::fraudgov::' + current_version + '::kel::configattributes',dest_cluster); 
+CopyFiles1(data_services.foreign_prod + 'prte::key::fraudgov::' + prev_version + '::kel::entityprofile','~prte::key::fraudgov::' + current_version + '::kel::entityprofile',dest_cluster); 
+CopyFiles1(data_services.foreign_prod + 'prte::key::fraudgov::' + prev_version + '::kel::clusterdetails','~prte::key::fraudgov::' + current_version + '::kel::clusterdetails',dest_cluster); 
 
 RETURN 'Success';	
 	END;

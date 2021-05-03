@@ -12,7 +12,7 @@ module
 	data_env_name := Data_Services.data_env.GetString(data_env);
 	
 	shared Prefix  := data_services.Data_location.Prefix (dx_PhonesPlus.Constants.dataset_name) 
-										+	'~thor_data400::key::' + dx_PhonesPlus.Constants.dataset_name 
+										+	'thor_data400::key::' + dx_PhonesPlus.Constants.dataset_name 
 										+ if(trim(data_env_name)<>'', '::' + data_env_name, '');
 
 	export Source_Level_Payload_Template	:= Prefix + '::@version@::source_level_payload';

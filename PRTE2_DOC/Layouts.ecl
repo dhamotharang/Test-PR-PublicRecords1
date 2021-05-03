@@ -1,15 +1,40 @@
-﻿Import hygenics_crim, corrections, address, Criminal_Records, ut, doxie;
+﻿Import hygenics_crim, corrections, address, Criminal_Records, ut, doxie,PRTE2_crim_offense_cat, aid_build ;
 EXPORT Layouts := module
 
+ export rFinal := RECORD
+    AID_BUILD.layouts.rFinal;
+  end;
+
+Export combined_desc_lookup_layout := record
+string2 data_type;
+string75 off_desc;
+unsigned8 offense_category;
+end;
+
+
 EXPORT layout_offender := hygenics_crim.layout_offender;
-EXPORT layout_offender_plus := hygenics_crim.layout_offender or {string100 cust_name, string20 bug_num,		string8		link_dob,	string9	link_ssn};
+EXPORT layout_offender_plus := hygenics_crim.layout_offender or {unsigned8 aceaid, unsigned8 rawaid, string100 cust_name, string20 bug_num,	string8 link_dob,	string9	link_ssn};
 EXPORT layout_offenses_base_plus := corrections.layout_offense_common or {string100 cust_name, string20 bug_num};
+
+Export layout_offenses_base_plus_2:=Record
+layout_offenses_base_plus;
+string Category;
+end;
+
 EXPORT layout_offense_common := corrections.layout_offense_common;
 EXPORT Layout_CrimPunishment := corrections.Layout_CrimPunishment;
 EXPORT layout_punishment_plus := Layout_CrimPunishment or {string100 cust_name, string20 bug_num};
 EXPORT layout_activity := hygenics_crim.layout_activity;
 EXPORT Layout_Base_CourtOffenses := corrections.layout_courtoffenses;
 EXPORT layout_court_offenses_base_plus := Layout_Base_CourtOffenses or {string100 cust_name, string20 bug_num};
+
+Export layout_court_offenses_base_plus_2:=Record
+layout_court_offenses_base_plus;
+string Category;
+end;
+
+
+
 EXPORT layout_corrections_keys := RECORD(layout_offender)
 	unsigned6 i_did;
 	zero := 0;

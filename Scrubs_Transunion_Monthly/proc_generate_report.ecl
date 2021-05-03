@@ -5,7 +5,8 @@ o := 'Scrubs_Transunion_Monthly';		// orbit profile name
 m := 'Transunion';
 
 loc := data_services.Data_location.Prefix('PersonHeader');
-v_tn := regexfind('w201.*-',nothor(fileservices.SuperFileContents(TransunionCred.Superfile_list.base))[1].name,0)[2..9];
+v_tn := regexfind('w20.*-',nothor(fileservices.SuperFileContents(TransunionCred.Superfile_list.base))[1].name,0)[2..9];
+
 
 N := S.Scrubs.FromNone(F);
 U := S.Scrubs.FromExpanded(N.ExpandedInFile);

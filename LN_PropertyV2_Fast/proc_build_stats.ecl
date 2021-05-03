@@ -1,4 +1,4 @@
-export proc_build_stats(filedate,zDoStatsReference,isFast):= macro
+﻿export proc_build_stats(filedate,zDoStatsReference,isFast):= macro
   import LN_PropertyV2;
 	#uniquename(zDoPopulationStats);
 	#uniquename(zDoPopulationStatsforNewData);
@@ -14,6 +14,7 @@ export proc_build_stats(filedate,zDoStatsReference,isFast):= macro
 	#uniquename(File_Delta_Addl_Fares_Tax);
 	#uniquename(File_Delta_AddlNames);
 	#uniquename(File_Delta_Addl_Legal);
+	#uniquename(File_Delta_Addl_Name_Info);
 
 	#uniquename(File_Full_Assessment);
 	#uniquename(File_Full_Deed);
@@ -22,6 +23,7 @@ export proc_build_stats(filedate,zDoStatsReference,isFast):= macro
 	#uniquename(File_Full_Addl_Fares_Tax);
 	#uniquename(File_Full_AddlNames);
 	#uniquename(File_Full_Addl_Legal);
+	#uniquename(File_Full_Addl_Name_Info);
 	
 	#uniquename(whichAssess);												 
 	#uniquename(whichDeed);
@@ -30,6 +32,7 @@ export proc_build_stats(filedate,zDoStatsReference,isFast):= macro
 	#uniquename(whichAddlDd);
 	#uniquename(whichAddlLgl);
 	#uniquename(whichAddlNms);
+	#uniquename(whichAddlNmInf);
 	
 	//Delta Update - Logical Files
 	File_Delta_Assessment 			:= dataset('~thor_data400::base::property_fast::assessment_'+filedate, LN_PropertyV2.Layouts.layout_property_common_model_base_scrubs, flat);
@@ -38,7 +41,8 @@ export proc_build_stats(filedate,zDoStatsReference,isFast):= macro
 	File_Delta_Addl_Fares_Deed 	:= dataset('~thor_data400::base::property_fast::addl_frs_deed_mortgage_'+filedate, LN_PropertyV2.layout_addl_fares_deed, flat);
 	File_Delta_Addl_Fares_Tax		:= dataset('~thor_data400::base::property_fast::addl_frs_assessment_'+filedate, LN_PropertyV2.layout_addl_fares_tax, flat);
 	File_Delta_AddlNames				:= dataset('~thor_data400::base::property_fast::addl::ln_names_'+filedate, LN_PropertyV2.layout_addl_names, flat);
-	File_Delta_Addl_Legal				:= dataset('~thor_data400::base::property_fast::addl::legal_'+filedate, LN_PropertyV2.layout_addl_legal, flat); 			
+	File_Delta_Addl_Legal				:= dataset('~thor_data400::base::property_fast::addl::legal_'+filedate, LN_PropertyV2.layout_addl_legal, flat);
+	File_Delta_Addl_Name_Info		:= dataset('~thor_data400::base::property_fast::addl::name_info_'+filedate, LN_PropertyV2.layout_addl_name_info, flat);
 	
 	//Full Update - Logical Files
 	File_Full_Assessment 				:= dataset('~thor_data400::base::ln_propertyv2::assesor_'+filedate, LN_PropertyV2.Layouts.layout_property_common_model_base_scrubs, flat);
@@ -47,7 +51,8 @@ export proc_build_stats(filedate,zDoStatsReference,isFast):= macro
 	File_Full_Addl_Fares_Deed 	:= dataset('~thor_data400::base::ln_propertyv2::addl::fares_deed_'+filedate, LN_PropertyV2.layout_addl_fares_deed, flat);
 	File_Full_Addl_Fares_Tax		:= dataset('~thor_data400::base::ln_propertyv2::addl::fares_tax_'+filedate, LN_PropertyV2.layout_addl_fares_tax, flat);
 	File_Full_AddlNames					:= dataset('~thor_data400::base::ln_propertyv2::addl::ln_names_'+filedate, LN_PropertyV2.layout_addl_names, flat);
-	File_Full_Addl_Legal				:= dataset('~thor_data400::base::ln_propertyv2::addl::legal_'+filedate, LN_PropertyV2.layout_addl_legal, flat); 
+	File_Full_Addl_Legal				:= dataset('~thor_data400::base::ln_propertyv2::addl::legal_'+filedate, LN_PropertyV2.layout_addl_legal, flat);
+	File_Full_Addl_Name_Info		:= dataset('~thor_data400::base::ln_propertyv2::addl::name_info_'+filedate, LN_PropertyV2.layout_addl_name_info, flat);
 	
 	/*Super Files
 	whichAssess 	:= if(isFast, LN_PropertyV2_Fast.Files.base.assessment, project(LN_PropertyV2.File_Assessment, LN_PropertyV2.Layouts.layout_property_common_model_base_scrubs));	
@@ -66,6 +71,7 @@ export proc_build_stats(filedate,zDoStatsReference,isFast):= macro
 	whichAddlTax								:= if(isFast, File_Delta_Addl_Fares_Tax, File_Full_Addl_Fares_Tax);
 	whichAddlNms								:= if(isFast, File_Delta_AddlNames, File_Full_AddlNames);
 	whichAddlLgl								:= if(isFast, File_Delta_Addl_Legal, File_Full_Addl_Legal);
+	whichAddlNmInf							:= if(isFast, File_Delta_Addl_Name_Info, File_Full_Addl_Name_Info);
 	
 %File_Assessment% 		:= project(whichAssess, 
 														transform(LN_PropertyV2.layout_property_common_model_base,
@@ -94,6 +100,7 @@ export proc_build_stats(filedate,zDoStatsReference,isFast):= macro
 																								 ,whichAddlLgl
 																								 ,whichAddlNms
 																								 ,whichParty
+																								 //,whichAddlNmInf //May be needed for future use for new BK data
 																								 ,filedate
 																								 ,zDoPopulationStats
 																								 ,isFast);								   

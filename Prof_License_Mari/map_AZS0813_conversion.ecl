@@ -308,60 +308,7 @@ EXPORT map_AZS0813_conversion(string pVersion) := function
 		SELF.PROCESS_DATE		:= thorlib.wuid()[2..9];
 		self.TYPE_CD			:= 'MD';
 
-		tempFirstName			:= TRIM(REGEXREPLACE('""',REGEXREPLACE('\'\'',L.FIRST_NAME,'"'),''));
-		tempFNick 				:= Prof_License_Mari.fGetNickname(REGEXREPLACE('\'',tempFirstName,'"'),'nick');	
-		stripNickFName		:= Prof_License_Mari.fGetNickname(REGEXREPLACE('\'',tempFirstName,'"'),'strip_nick');
-		tempMidName				:= TRIM(REGEXREPLACE('""',L.MIDDLE_NAME,''));
-		tempMNick 				:= Prof_License_Mari.fGetNickname(REGEXREPLACE('\'',tempMidName,'"'),'nick');	
-		stripNickMName		:= Prof_License_Mari.fGetNickname(REGEXREPLACE('\'',tempMidName,'"'),'strip_nick');
-		tempLName					:= StringLib.StringCleanSpaces(REGEXREPLACE('(""|,)',REGEXREPLACE('\'\'',L.LAST_NAME,'"'),' '));
-		tempLastName			:= IF(REGEXFIND('(.*) (SR|JR|II|III|IV)(\\.?)$',tempLName,NOCASE),
-														REGEXFIND('(.*) (SR|JR|II|III|IV)(\\.?)$',tempLName,1,NOCASE),
-														tempLName);
-		tempSufxName			:= IF(REGEXFIND('(.*) (SR|JR|II|III|IV)(\\.?)$',tempLName,NOCASE),
-														REGEXFIND('(.*) (SR|JR|II|III|IV)(\\.?)$',tempLName,2,NOCASE),
-														'');
-							
-		self.NAME_ORG		  := IF(TRIM(L.LAST_NAME)!=' ',
-														ut.CleanSpacesAndUpper(tempLastName)+' '+
-														ut.CleanSpacesAndUpper(stripNickFName),
-													  ' ');
-														
 
-		self.NAME_DBA			:= IF(TRIM(L.LAST_NAME) != ' ' AND TRIM(L.EMPLOYER_DBA) != ' '
-													, StringLib.StringToUpperCase(TRIM(L.EMPLOYER_DBA,LEFT,RIGHT)), ' ');
-		self.DBA_FLAG			:= If(trim(self.NAME_DBA,left,right) != '',1,0); //1=TRUE, 0=FALSE
-		
-		tmpNameOffice					:= ut.CleanSpacesAndUpper(L.EMPLOYER_LEGAL_NAME);
-		prepNameOffice				:= Prof_License_mari.mod_clean_name_addr.strippunctName(tmpNameOffice);
-		clnNameOffice					:= StringLib.StringCleanSpaces(prepNameOffice);
-		self.NAME_OFFICE			:= MAP(clnNameOffice!='' => clnNameOffice,
-																 REGEXFIND('^C/O TERRAMOR PROPERTIES$', L.MAILING_ADDRESS2, NOCASE)
-																	 => 'TERRAMOR PROPERTIES',
-																 REGEXFIND('^C/O NATIONAL PROPERTY SERVICES$', L.MAILING_ADDRESS2, NOCASE)
-																	 => 'NATIONAL PROPERTY SERVICES',
-																 '');
-
-
-		SELF.NAME_CONTACT_FIRST := IF(REGEXFIND('C/O RICHARD BRANDT',L.MAILING_ADDRESS2,NOCASE),'RICHARD','');
-		SELF.NAME_CONTACT_LAST  := IF(REGEXFIND('C/O RICHARD BRANDT',L.MAILING_ADDRESS2,NOCASE),'BRANDT','');
-
-
-		//Add the logic to set office_parse 5/15/13
-		self.OFFICE_PARSE	:= MAP(SELF.NAME_OFFICE != ''  
-														 AND (Prof_License_Mari.func_is_company(SELF.NAME_OFFICE)
-														 OR REGEXFIND('(CORP| CO$)',SELF.NAME_OFFICE)) =>'GR',
-														 SELF.NAME_OFFICE != ''  AND 
-														 NOT Prof_License_Mari.func_is_company(SELF.NAME_OFFICE) =>'MD',
-														 '');
- 		self.NAME_FIRST		:= ut.CleanSpacesAndUpper(stripNickFName);
-		self.NAME_MID			:= ut.CleanSpacesAndUpper(stripNickMName);
-		self.NAME_LAST		:= ut.CleanSpacesAndUpper(tempLastName);
-		SELF.NAME_NICK 		:= MAP(tempFNick<>'' => ut.CleanSpacesAndUpper(REGEXREPLACE('\\.',tempFNick,'')),
-		                         tempFNick<>'' => ut.CleanSpacesAndUpper(REGEXREPLACE('\\.',tempMNick,'')),
-														 '');
-		SELF.NAME_SUFX		:= tempSufxName;
-		
 		cln_lic_nbr				:= REGEXREPLACE('\\*',L.LIC_NUMBER,'');
 		self.LICENSE_NBR	:= StringLib.StringToUpperCase(TRIM(cln_lic_nbr,LEFT,RIGHT));
 		self.OFF_LICENSE_NBR	:= StringLib.StringToUpperCase(TRIM(L.EMPLOYER_LIC_NUMBER,LEFT,RIGHT));
@@ -421,9 +368,61 @@ EXPORT map_AZS0813_conversion(string pVersion) := function
 		cleanExpireDte				:= IF(prep_expire_dte = '  /  /  ', '17530101',ut.date_slashed_MMDDYYYY_to_YYYYMMDD(prep_expire_dte));		
 		self.EXPIRE_DTE				:= IF(cleanExpireDte='', '17530101',cleanExpireDte);		
 		
+		//Name Parsing
+		tempFirstName			:= TRIM(REGEXREPLACE('""',REGEXREPLACE('\'\'',L.FIRST_NAME,'"'),''));
+		tempFNick 				:= Prof_License_Mari.fGetNickname(REGEXREPLACE('\'',tempFirstName,'"'),'nick');	
+		stripNickFName		:= Prof_License_Mari.fGetNickname(REGEXREPLACE('\'',tempFirstName,'"'),'strip_nick');
+		tempMidName				:= TRIM(REGEXREPLACE('""',L.MIDDLE_NAME,''));
+		tempMNick 				:= Prof_License_Mari.fGetNickname(REGEXREPLACE('\'',tempMidName,'"'),'nick');	
+		stripNickMName		:= Prof_License_Mari.fGetNickname(REGEXREPLACE('\'',tempMidName,'"'),'strip_nick');
+		tempLName					:= StringLib.StringCleanSpaces(REGEXREPLACE('(""|,)',REGEXREPLACE('\'\'',L.LAST_NAME,'"'),' '));
+		tempLastName			:= IF(REGEXFIND('(.*) (SR|JR|II|III|IV)(\\.?)$',tempLName,NOCASE),
+														REGEXFIND('(.*) (SR|JR|II|III|IV)(\\.?)$',tempLName,1,NOCASE),
+														tempLName);
+		tempSufxName			:= IF(REGEXFIND('(.*) (SR|JR|II|III|IV)(\\.?)$',tempLName,NOCASE),
+														REGEXFIND('(.*) (SR|JR|II|III|IV)(\\.?)$',tempLName,2,NOCASE),
+														'');
+							
+ 		self.NAME_FIRST		:= ut.CleanSpacesAndUpper(stripNickFName);
+		self.NAME_MID			:= ut.CleanSpacesAndUpper(stripNickMName);
+		self.NAME_LAST		:= ut.CleanSpacesAndUpper(tempLastName);
+		SELF.NAME_NICK 		:= MAP(tempFNick<>'' => ut.CleanSpacesAndUpper(REGEXREPLACE('\\.',tempFNick,'')),
+		                         tempFNick<>'' => ut.CleanSpacesAndUpper(REGEXREPLACE('\\.',tempMNick,'')),
+														 '');
+		SELF.NAME_SUFX		:= tempSufxName;
+		
+		self.NAME_ORG		  := IF(self.NAME_LAST+ self.NAME_FIRST!=' ',
+														self.NAME_LAST+' '+ self.NAME_FIRST,
+													  ' ');
+		self.NAME_ORG_ORIG		:= TRIM(tempLName + ', ' + tempFirstName + ' ' + tempMidName);												
+		
+		self.NAME_DBA			:= IF(TRIM(L.LAST_NAME) != ' ' AND TRIM(L.EMPLOYER_DBA) != ' '
+													, StringLib.StringToUpperCase(TRIM(L.EMPLOYER_DBA,LEFT,RIGHT)), ' ');
+		self.DBA_FLAG			:= If(trim(self.NAME_DBA,left,right) != '',1,0); //1=TRUE, 0=FALSE
+		
+		//Clean Office Name
+		tmpNameOffice					:= ut.CleanSpacesAndUpper(L.EMPLOYER_LEGAL_NAME);
+		prepNameOffice				:= Prof_License_mari.mod_clean_name_addr.strippunctName(tmpNameOffice);
+		clnNameOffice					:= StringLib.StringCleanSpaces(prepNameOffice);
+		self.NAME_OFFICE			:= MAP(REGEXFIND('^C/O TERRAMOR PROPERTIES$', L.MAILING_ADDRESS2, NOCASE)
+																	 => 'TERRAMOR PROPERTIES',
+																 REGEXFIND('^C/O NATIONAL PROPERTY SERVICES$', L.MAILING_ADDRESS2, NOCASE)
+																	 => 'NATIONAL PROPERTY SERVICES',
+																 TRIM(clnNameOffice,ALL) = TRIM(SELF.NAME_ORG_ORIG,ALL) =>'', 
+																 TRIM(clnNameOffice,ALL) = TRIM(SELF.NAME_FIRST + SELF.NAME_MID + SELF.NAME_LAST,ALL) =>'', 
+																 TRIM(clnNameOffice,ALL) = TRIM(SELF.NAME_FIRST + SELF.NAME_LAST,ALL) =>'', 
+																 TRIM(clnNameOffice,ALL) = TRIM(REGEXREPLACE(',',SELF.NAME_ORG_ORIG,' '),ALL) => '',
+																 clnNameOffice);			
+		self.OFFICE_PARSE	:= MAP(SELF.NAME_OFFICE != ''  
+												 AND (Prof_License_Mari.func_is_company(SELF.NAME_OFFICE)
+												 OR REGEXFIND('(CORP| CO$)',SELF.NAME_OFFICE)) =>'GR',
+												 SELF.NAME_OFFICE != ''  AND 
+												 NOT Prof_License_Mari.func_is_company(SELF.NAME_OFFICE) =>'MD',
+												 '');
+												 
+		
 		self.ADDR_BUS_IND			:= IF(TRIM(L.MAILING_ADDRESS1,LEFT,RIGHT) != ' ','B',' ');
-		//self.NAME_ORG_ORIG		:= self.NAME_ORG;
-		self.NAME_ORG_ORIG		:= TRIM(tempLName + ', ' + tempFirstName + ' ' + tempMidName);
+
 		//Populate NAME_FORMAT BUG # 124107
 		SELF.NAME_FORMAT			:= 'L';
 		
@@ -488,6 +487,12 @@ EXPORT map_AZS0813_conversion(string pVersion) := function
 		
 	//Expected codes [CO,BR,IN]
 		self.AFFIL_TYPE_CD		:= IF(self.TYPE_CD = 'MD','IN','CO');
+		
+
+		SELF.NAME_CONTACT_FIRST := IF(REGEXFIND('C/O RICHARD BRANDT',L.MAILING_ADDRESS2,NOCASE),'RICHARD','');
+		SELF.NAME_CONTACT_LAST  := IF(REGEXFIND('C/O RICHARD BRANDT',L.MAILING_ADDRESS2,NOCASE),'BRANDT','');
+
+		
 		
 		/* fields used to create cmc_slpk unique key are :
 		license number

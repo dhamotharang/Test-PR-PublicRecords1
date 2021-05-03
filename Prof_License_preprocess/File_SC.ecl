@@ -1,4 +1,4 @@
-EXPORT File_SC  :=  module
+﻿EXPORT File_SC  :=  module
 
 export medical := module
 
@@ -277,6 +277,7 @@ Layout_social := record
    string  City;
    string StateCode;
    string  ZIPCode;
+   string BusinessPhone;
    string FirstEffectiveDate;
    string ExpirationDate;
    string CredentialTypePrefix;

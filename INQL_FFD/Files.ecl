@@ -1,4 +1,4 @@
-﻿IMPORT tools;
+﻿IMPORT tools, data_services;
 
 EXPORT Files(boolean isDaily = true, boolean isFCRA = true, string pVersion = '') := MODULE
  
@@ -21,5 +21,7 @@ EXPORT Files(boolean isDaily = true, boolean isFCRA = true, string pVersion = ''
 /* Base File pVersions */
  tools.mac_FilesBase(INQL_FFD.Filenames(isDaily,isFCRA,pVersion).Base, INQL_FFD.Layouts.Base,popt:=true, Base);
 	
+ export PPC_Mapping
+		:=dataset(INQL_FFD.Filenames().PPC_Mapping,INQL_FFD.layouts.PPC_Mapping,csv(separator(','),quote(''),terminator('|\n'),heading(1)), opt);
  
 END;

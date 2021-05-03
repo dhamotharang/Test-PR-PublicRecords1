@@ -1,6 +1,6 @@
-export Spray_New_PullSSN_File(sourceIP,sourcefile,filedate,group_name= '') := macro
+﻿export Spray_New_PullSSN_File(sourceIP,sourcefile,filedate,group_name= '') := macro
 
-#workunit('name','LN_Opt_Out Spray '+filedate)
+//#workunit('name','LN_Opt_Out Spray '+filedate)
 
 
 recordsize:=61;

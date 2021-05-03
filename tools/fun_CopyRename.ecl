@@ -1,4 +1,4 @@
-/*
+﻿/*
   fun_CopyRename: allows you to copy files within an environment, or across environments.  Key thing is, it allows you to rename the file(s) so they don't have to be the same name as the source file
                   especially important within an environment.
   always run on destination environment.  So if copy to dataland from prod, run on dataland
@@ -24,6 +24,8 @@ export fun_CopyRename(
   ,string                                         pSrcDali          = if(pToDataland	, 'prod_dali.br.seisint.com:7070'              //_Control.IPAddress.prod_thor_dali this didn't work
                                                                                       , _Control.IPAddress.dataland_dali
                                                                       )                          
+  ,integer                                        ptransferbuffersize   = 100000000
+  ,integer                                        pMaxConnections       = 400
 
 ) :=
 function
@@ -47,7 +49,7 @@ function
 	
 	passtofunction := project(all_files_to_copy(filter), tgetsuperfiles(left));
 	
-	whattodo := tools.fun_CopyFiles(passtofunction,,pIsTesting,pShouldCompress,pOverwrite,pDeleteSrcFiles,pSkipSuperStuff,pFileDescription);
+	whattodo := tools.fun_CopyFiles(passtofunction,,pIsTesting,pShouldCompress,pOverwrite,pDeleteSrcFiles,pSkipSuperStuff,pFileDescription,ptransferbuffersize,pMaxConnections);
 	
 	return whattodo;
 

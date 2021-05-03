@@ -15,8 +15,15 @@ EXPORT Files(	STRING	pFilename	=	'',
 	EXPORT	CollateralSegment_CL := DATASET(pFilename, Business_Credit.Layouts.CollateralSegment, CSV(HEADING(0), SEPARATOR(['\t']), QUOTE(''))) (Segment_Identifier = Constants().CL);
 	EXPORT	MemberSpecificSegment_MS := DATASET(pFilename, Business_Credit.Layouts.MemberSpecificSegment, CSV(HEADING(0), SEPARATOR(['\t']), QUOTE(''))) (Segment_Identifier = Constants().MS);
 	EXPORT	AccountModificationHistorySegment_AH := DATASET(pFilename, Business_Credit.Layouts.AccountModificationHistorySegment, CSV(HEADING(0), SEPARATOR(['\t']), QUOTE(''))) (Segment_Identifier = Constants().AH);
-	EXPORT	TrailerSegment_ZZ := DATASET(pFilename, Business_Credit.Layouts.TrailerSegment, CSV(HEADING(0), SEPARATOR(['\t']), QUOTE(''))) (Segment_Identifier = Constants().ZZ);
+	EXPORT	DigitalFootPrintSegment_DF := DATASET(pFilename, Business_Credit.Layouts.DigitalFootPrintSegment, CSV(HEADING(0), SEPARATOR(['\t']), QUOTE(''))) (Segment_Identifier = Constants().DF);
+	EXPORT	MerchantProcessingDataSegment_MD := DATASET(pFilename, Business_Credit.Layouts.MerchantProcessingDataSegment, CSV(HEADING(0), SEPARATOR(['\t']), QUOTE(''))) (Segment_Identifier = Constants().MD);
+	EXPORT	MerchantCardTransaction_CT := DATASET(pFilename, Business_Credit.Layouts.MerchantCardTransaction, CSV(HEADING(0), SEPARATOR(['\t']), QUOTE(''))) (Segment_Identifier = Constants().CT);
+	EXPORT	MerchantChargeback_MT := DATASET(pFilename, Business_Credit.Layouts.MerchantChargeback, CSV(HEADING(0), SEPARATOR(['\t']), QUOTE(''))) (Segment_Identifier = Constants().MT);
+	EXPORT	MerchantRefund_MR := DATASET(pFilename, Business_Credit.Layouts.MerchantRefund, CSV(HEADING(0), SEPARATOR(['\t']), QUOTE(''))) (Segment_Identifier = Constants().MR);
+	EXPORT	MerchantClassificationCode_MC := DATASET(pFilename, Business_Credit.Layouts.MerchantClassificationCode, CSV(HEADING(0), SEPARATOR(['\t']), QUOTE(''))) (Segment_Identifier = Constants().MC);
+	EXPORT	MerchantDestinationMedia_DM := DATASET(pFilename, Business_Credit.Layouts.MerchantDestinationMedia, CSV(HEADING(0), SEPARATOR(['\t']), QUOTE(''))) (Segment_Identifier = Constants().DM);
 	EXPORT	FileFooterTrailerSegment_FZ := DATASET(pFilename, Business_Credit.Layouts.FileFooterTrailerSegment, CSV(HEADING(0), SEPARATOR(['\t']), QUOTE(''))) (Segment_Identifier = Constants().FZ);
+	EXPORT	TrailerSegment_ZZ := DATASET(pFilename, Business_Credit.Layouts.TrailerSegment, CSV(HEADING(0), SEPARATOR(['\t']), QUOTE(''))) (Segment_Identifier = Constants().ZZ);
 
 	EXPORT	FA	:=	FileHeaderSegment_FA;
 	EXPORT	AA	:=	HeaderSegment_AA;
@@ -31,6 +38,13 @@ EXPORT Files(	STRING	pFilename	=	'',
 	EXPORT	CL	:=	CollateralSegment_CL;
 	EXPORT	MS	:=	MemberSpecificSegment_MS;
 	EXPORT	AH	:=	AccountModificationHistorySegment_AH;
+	EXPORT	DF	:=	DigitalFootPrintSegment_DF;
+	EXPORT	MD	:=	MerchantProcessingDataSegment_MD;
+	EXPORT	CT	:=	MerchantCardTransaction_CT;
+	EXPORT	MT	:=	MerchantChargeback_MT;
+	EXPORT	MR	:=	MerchantRefund_MR;
+	EXPORT	MC	:=	MerchantClassificationCode_MC;
+	EXPORT	DM	:=	MerchantDestinationMedia_DM;
 	EXPORT	ZZ	:=	TrailerSegment_ZZ;
 	EXPORT	FZ	:=	FileFooterTrailerSegment_FZ;
 
@@ -47,6 +61,13 @@ EXPORT Files(	STRING	pFilename	=	'',
 	EXPORT	CollateralSegment_CL_Virtual := DATASET(pFilename, Business_Credit.Layouts.CL_Virtual, CSV(HEADING(0), SEPARATOR(['\t']), QUOTE(''))) (Segment_Identifier = Constants().CL);
 	EXPORT	MemberSpecificSegment_MS_Virtual := DATASET(pFilename, Business_Credit.Layouts.MS_Virtual, CSV(HEADING(0), SEPARATOR(['\t']), QUOTE(''))) (Segment_Identifier = Constants().MS);
 	EXPORT	AccountModificationHistorySegment_AH_Virtual := DATASET(pFilename, Business_Credit.Layouts.AH_Virtual, CSV(HEADING(0), SEPARATOR(['\t']), QUOTE(''))) (Segment_Identifier = Constants().AH);
+	EXPORT	DigitalFootPrintSegment_DF_Virtual := DATASET(pFilename, Business_Credit.Layouts.DF_Virtual, CSV(HEADING(0), SEPARATOR(['\t']), QUOTE(''))) (Segment_Identifier = Constants().DF);
+	EXPORT	MerchantProcessingDataSegment_MD_Virtual := DATASET(pFilename, Business_Credit.Layouts.MD_Virtual, CSV(HEADING(0), SEPARATOR(['\t']), QUOTE(''))) (Segment_Identifier = Constants().MD);
+	EXPORT	MerchantCardTransaction_CT_Virtual := DATASET(pFilename, Business_Credit.Layouts.CT_Virtual, CSV(HEADING(0), SEPARATOR(['\t']), QUOTE(''))) (Segment_Identifier = Constants().CT);
+	EXPORT	MerchantChargeback_MT_Virtual := DATASET(pFilename, Business_Credit.Layouts.MT_Virtual, CSV(HEADING(0), SEPARATOR(['\t']), QUOTE(''))) (Segment_Identifier = Constants().MT);
+	EXPORT	MerchantRefund_MR_Virtual := DATASET(pFilename, Business_Credit.Layouts.MR_Virtual, CSV(HEADING(0), SEPARATOR(['\t']), QUOTE(''))) (Segment_Identifier = Constants().MR);
+	EXPORT	MerchantClassificationCode_MC_Virtual := DATASET(pFilename, Business_Credit.Layouts.MC_Virtual, CSV(HEADING(0), SEPARATOR(['\t']), QUOTE(''))) (Segment_Identifier = Constants().MC);
+	EXPORT	MerchantDestinationMedia_DM_Virtual := DATASET(pFilename, Business_Credit.Layouts.DM_Virtual, CSV(HEADING(0), SEPARATOR(['\t']), QUOTE(''))) (Segment_Identifier = Constants().DM);
 	EXPORT	TrailerSegment_ZZ_Virtual := DATASET(pFilename, Business_Credit.Layouts.ZZ_Virtual, CSV(HEADING(0), SEPARATOR(['\t']), QUOTE(''))) (Segment_Identifier = Constants().ZZ);
 	EXPORT	FileFooterTrailerSegment_FZ_Virtual := DATASET(pFilename, Business_Credit.Layouts.FZ_Virtual, CSV(HEADING(0), SEPARATOR(['\t']), QUOTE(''))) (Segment_Identifier = Constants().FZ);
 
@@ -63,6 +84,13 @@ EXPORT Files(	STRING	pFilename	=	'',
 	EXPORT	CL_Virtual	:=	CollateralSegment_CL_Virtual;
 	EXPORT	MS_Virtual	:=	MemberSpecificSegment_MS_Virtual;
 	EXPORT	AH_Virtual	:=	AccountModificationHistorySegment_AH_Virtual;
+	EXPORT	DF_Virtual	:=	DigitalFootPrintSegment_DF_Virtual;
+	EXPORT	MD_Virtual	:=	MerchantProcessingDataSegment_MD_Virtual;
+	EXPORT	CT_Virtual	:=	MerchantCardTransaction_CT_Virtual;
+	EXPORT	MT_Virtual	:=	MerchantChargeback_MT_Virtual;
+	EXPORT	MR_Virtual	:=	MerchantRefund_MR_Virtual;
+	EXPORT	MC_Virtual	:=	MerchantClassificationCode_MC_Virtual;
+	EXPORT	DM_Virtual	:=	MerchantDestinationMedia_DM_Virtual;
 	EXPORT	ZZ_Virtual	:=	TrailerSegment_ZZ_Virtual;
 	EXPORT	FZ_Virtual	:=	FileFooterTrailerSegment_FZ_Virtual;
 
@@ -111,6 +139,14 @@ EXPORT Files(	STRING	pFilename	=	'',
 																IF(pFilename='',Filenames(,pUseProd).Out.memberSpecific.QA,pFilename)
 																,Business_Credit.Layouts.rMemberSpecific,THOR,__compressed__)
 																(SBFE_Contributor_Number NOT IN Quarantined_SBFE_Contributor_Number_Set);
+	EXPORT	digitalfootprint	:=	DATASET(
+																IF(pFilename='',Filenames(,pUseProd).Out.digitalfootprint.QA,pFilename)
+																,Business_Credit.Layouts.rDigitalFootprint,THOR,__compressed__)
+																(SBFE_Contributor_Number NOT IN Quarantined_SBFE_Contributor_Number_Set);
+	EXPORT	merchantprocessing	:=	DATASET(
+																IF(pFilename='',Filenames(,pUseProd).Out.merchantprocessing.QA,pFilename)
+																,Business_Credit.Layouts.rMerchantProcessing,THOR,__compressed__)
+																(SBFE_Contributor_Number NOT IN Quarantined_SBFE_Contributor_Number_Set);	
 	EXPORT	SBFEIDCache				:=	IF(pFilename<>'',
 																	DATASET(pFilename,Business_Credit.Layouts.rSBFEIDCache,THOR,__compressed__),
 																	IF(NOTHOR(FileServices.GetSuperFileSubCount(Filenames().SBFEIDCache) <> 0),

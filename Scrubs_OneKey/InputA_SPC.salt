@@ -1,0 +1,99 @@
+﻿OPTIONS:-gh
+MODULE:Scrubs_OneKey
+FILENAME:OneKey
+NAMESCOPE:InputA
+// Uncomment up to NINES for internal or external adl
+// IDFIELD:EXISTS:<NameOfIDField>
+// RIDFIELD:<NameOfRidField>
+// RECORDS:<NumberOfRecordsInDataFile>
+// POPULATION:<ExpectedNumberOfEntitiesInDataFile>
+// NINES:<Precision required 3 = 99.9%, 2 = 99% etc>
+// Uncomment Process if doing external adl
+// PROCESS:<ProcessName>
+// FIELDTYPE statements can be used to clean up (or check the cleaning) of individual fields
+// BESTTYPE statements declare methods of generating the best value for a given cluster; this can also improve linking
+// FUZZY can be used to create new types of FUZZY linking
+// Remember to generate specificities and update the 0,0 placeholders below before running any sort of linking.
+// If the actual specificity for a field is <1, round it up to 1 rather than down to 0.  If your cluster is running
+// a shared repository, calling SALTTOOLS30.mac_Patch_SPC from the bottom of BWR_Specificities may be a convenience.
+
+//FIELDTYPE DEFINITIONS
+FIELDTYPE:invalid_numeric_nonzero:CUSTOM(Scrubs_OneKey.Functions.fn_numeric_nonzero>0)
+FIELDTYPE:invalid_mandatory:CUSTOM(Scrubs_OneKey.Functions.fn_populated_strings>0)
+
+FIELDTYPE:invalid_source:ENUM(SK|09)
+FIELDTYPE:invalid_record_type:ENUM(C|H)
+FIELDTYPE:invalid_frst_nm:CUSTOM(Scrubs_OneKey.Functions.fn_populated_strings>0,mid_nm,last_nm)
+FIELDTYPE:invalid_mid_nm:CUSTOM(Scrubs_OneKey.Functions.fn_populated_strings>0,frst_nm,last_nm)
+FIELDTYPE:invalid_last_nm:CUSTOM(Scrubs_OneKey.Functions.fn_populated_strings>0,frst_nm,mid_nm)
+FIELDTYPE:invalid_prim_prfsn_cd:CUSTOM(Scrubs_OneKey.Functions.fn_str1_xor_str2>0,prim_prfsn_desc)
+FIELDTYPE:invalid_prim_prfsn_desc:CUSTOM(Scrubs_OneKey.Functions.fn_str1_xor_str2>0,prim_prfsn_cd)
+FIELDTYPE:invalid_prim_spcl_cd:CUSTOM(Scrubs_OneKey.Functions.fn_str1_xor_str2>0,prim_spcl_desc)
+FIELDTYPE:invalid_prim_spcl_desc:CUSTOM(Scrubs_OneKey.Functions.fn_str1_xor_str2>0,prim_spcl_cd)
+FIELDTYPE:invalid_sec_spcl_cd:CUSTOM(Scrubs_OneKey.Functions.fn_str1_xor_str2>0,sec_spcl_desc)
+FIELDTYPE:invalid_sec_spcl_desc:CUSTOM(Scrubs_OneKey.Functions.fn_str1_xor_str2>0,sec_spcl_cd)
+FIELDTYPE:invalid_tert_spcl_cd:CUSTOM(Scrubs_OneKey.Functions.fn_str1_xor_str2>0,tert_spcl_desc)
+FIELDTYPE:invalid_tert_spcl_desc:CUSTOM(Scrubs_OneKey.Functions.fn_str1_xor_str2>0,tert_spcl_cd)
+FIELDTYPE:invalid_sub_spcl_cd:CUSTOM(Scrubs_OneKey.Functions.fn_str1_xor_str2>0,sub_spcl_desc)
+FIELDTYPE:invalid_sub_spcl_desc:CUSTOM(Scrubs_OneKey.Functions.fn_str1_xor_str2>0,sub_spcl_cd)
+FIELDTYPE:invalid_titl_typ_id:CUSTOM(Scrubs_OneKey.Functions.fn_str1_xor_str2>0,titl_typ_desc)
+FIELDTYPE:invalid_titl_typ_desc:CUSTOM(Scrubs_OneKey.Functions.fn_str1_xor_str2>0,titl_typ_id)
+FIELDTYPE:invalid_ok_wkp_id:CUSTOM(Scrubs_OneKey.Functions.fn_onekey_id>0)
+FIELDTYPE:invalid_city_nm:CUSTOM(Scrubs_OneKey.Functions.fn_populated_strings>0)
+FIELDTYPE:invalid_st_cd:CUSTOM(Scrubs_OneKey.Functions.fn_Valid_StateAbbrev>0)
+FIELDTYPE:invalid_zip5_cd:CUSTOM(Scrubs_OneKey.Functions.fn_numeric>0,5)
+FIELDTYPE:invalid_hcp_affil_xid:CUSTOM(Scrubs_OneKey.Functions.fn_hcp_affil_xid>0,hcp_hce_id,hco_hce_id,titl_typ_id)
+FIELDTYPE:invalid_delta_cd:ENUM(D|I|U|)
+
+
+//FIELD DEFINITIONS
+FIELD:hcp_hce_id:TYPE(STRING15):LIKE(invalid_numeric_nonzero):0,0
+FIELD:ok_indv_id:TYPE(STRING32):0,0
+FIELD:ska_uid:TYPE(STRING15):0,0
+FIELD:frst_nm:TYPE(STRING40):LIKE(invalid_frst_nm):0,0
+FIELD:mid_nm:TYPE(STRING40):LIKE(invalid_mid_nm):0,0
+FIELD:last_nm:TYPE(STRING40):LIKE(invalid_last_nm):0,0
+FIELD:sfx_cd:TYPE(STRING10):0,0
+FIELD:gender_cd:TYPE(STRING10):0,0
+FIELD:prim_prfsn_cd:TYPE(STRING10):LIKE(invalid_prim_prfsn_cd):0,0
+FIELD:prim_prfsn_desc:TYPE(STRING50):LIKE(invalid_prim_prfsn_desc):0,0
+FIELD:prim_spcl_cd:TYPE(STRING10):LIKE(invalid_prim_spcl_cd):0,0
+FIELD:prim_spcl_desc:TYPE(STRING75):LIKE(invalid_prim_spcl_desc):0,0
+FIELD:sec_spcl_cd:TYPE(STRING10):LIKE(invalid_sec_spcl_cd):0,0
+FIELD:sec_spcl_desc:TYPE(STRING75):LIKE(invalid_sec_spcl_desc):0,0
+FIELD:tert_spcl_cd:TYPE(STRING10):LIKE(invalid_tert_spcl_cd):0,0
+FIELD:tert_spcl_desc:TYPE(STRING75):LIKE(invalid_tert_spcl_desc):0,0
+FIELD:sub_spcl_cd:TYPE(STRING10):LIKE(invalid_sub_spcl_cd):0,0
+FIELD:sub_spcl_desc:TYPE(STRING50):LIKE(invalid_sub_spcl_desc):0,0
+FIELD:titl_typ_id:TYPE(STRING10):LIKE(invalid_titl_typ_id):0,0
+FIELD:titl_typ_desc:TYPE(STRING50):LIKE(invalid_titl_typ_desc):0,0
+FIELD:hco_hce_id:TYPE(STRING15):LIKE(invalid_numeric_nonzero):0,0
+FIELD:ok_wkp_id:TYPE(STRING35):LIKE(invalid_ok_wkp_id):0,0
+FIELD:ska_id:TYPE(STRING15):LIKE(invalid_numeric_nonzero):0,0
+FIELD:bus_nm:TYPE(STRING150):LIKE(invalid_mandatory):0,0
+FIELD:dba_nm:TYPE(STRING150):0,0
+FIELD:addr_id:TYPE(STRING10):0,0
+FIELD:str_front_id:TYPE(STRING10):0,0
+FIELD:addr_ln_1_txt:TYPE(STRING80):0,0
+FIELD:addr_ln_2_txt:TYPE(STRING80):0,0
+FIELD:city_nm:TYPE(STRING50):LIKE(invalid_city_nm):0,0
+FIELD:st_cd:TYPE(STRING2):LIKE(invalid_st_cd):0,0
+FIELD:zip5_cd:TYPE(STRING5):LIKE(invalid_zip5_cd):0,0
+FIELD:zip4_cd:TYPE(STRING4):0,0
+FIELD:fips_cnty_cd:TYPE(STRING10):0,0
+FIELD:fips_cnty_desc:TYPE(STRING50):0,0
+FIELD:telephn_nbr:TYPE(STRING15):0,0
+FIELD:cot_id:TYPE(STRING15):0,0
+FIELD:cot_clas_id:TYPE(STRING15):0,0
+FIELD:cot_clas_desc:TYPE(STRING50):0,0
+FIELD:cot_fclt_typ_id:TYPE(STRING15):0,0
+FIELD:cot_fclt_typ_desc:TYPE(STRING50):0,0
+FIELD:cot_spcl_id:TYPE(STRING15):0,0
+FIELD:cot_spcl_desc:TYPE(STRING50):0,0
+FIELD:email_ind_flag:TYPE(STRING1):0,0
+FIELD:hcp_affil_xid:TYPE(STRING50):LIKE(invalid_hcp_affil_xid):0,0
+FIELD:delta_cd:TYPE(STRING1):LIKE(invalid_delta_cd):0,0
+// CONCEPT statements should be used to group together interellated fields; such as address
+// RELATIONSHIP is used to find non-obvious relationships between the clusters
+// SOURCEFIELD is used if a field of the file denotes a source of the records in that file
+// LINKPATH is used to define access paths for external linking

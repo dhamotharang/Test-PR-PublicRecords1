@@ -1,4 +1,4 @@
-import LN_property,LN_mortgage,LN_PropertyV2;
+﻿import LN_property,LN_mortgage,LN_PropertyV2;
 
 export Replace_LN_searchAddlnames := module 
 
@@ -113,6 +113,30 @@ addl_legal_deeds_joined    := join(concat_addl_legal_dist,deed_replace_dist,left
 concat_addl_names_replace := addl_legal_assessor_joined + addl_legal_deeds_joined;
 
 Repl_Addl_Names := dedup(concat_addl_names_replace,record);
+
+return Repl_Addl_Names;
+
+end;
+
+//******************** replace addlnameinfo ********************************************************
+export Replace_Addl_Name_Info(dataset(recordof(LN_PropertyV2.layout_addl_name_info)) inAddlNmInfoRepl,
+															dataset(recordof(LN_PropertyV2.layout_addl_name_info)) inAddlNmInfo,
+															dataset(recordof(LN_PropertyV2.Layout_Deed_Mortgage_Common_Model_BASE)) inDeeds
+															) := function
+
+//distribute the files
+concat_addl_nm_info_dist := distribute(inAddlNmInfo	+	inAddlNmInfoRepl,hash(ln_fares_id));
+
+deed_replace_dist := distribute(indeeds,hash(ln_fares_id));
+
+//get the good records in supplemental files
+LN_PropertyV2.layout_addl_name_info tDeedformat(LN_PropertyV2.layout_addl_name_info L,LN_PropertyV2.Layout_Deed_Mortgage_Common_Model_Base R) := transform
+  self := L;
+end;
+
+addl_nm_info_deeds_joined    := join(concat_addl_nm_info_dist,deed_replace_dist,left.ln_fares_id = right.ln_fares_id,tDeedformat(left,right),local);
+
+Repl_Addl_Names := dedup(addl_nm_info_deeds_joined,record);
 
 return Repl_Addl_Names;
 

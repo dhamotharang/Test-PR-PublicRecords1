@@ -1,7 +1,7 @@
-﻿IMPORT ut,RoxieKeyBuild,AutoKeyB2, PRTE2_DOC, PRTE,_control, doxie_build,PRTE2_Common;
+﻿IMPORT ut,RoxieKeyBuild,AutoKeyB2, PRTE2_DOC, PRTE,_control, doxie_build,PRTE2_Common,dops,Prte2;
 
-EXPORT proc_build_keys(string filedate) := FUNCTION
-
+EXPORT proc_build_keys(string filedate, boolean skipDOPS=FALSE, string emailTo='') := FUNCTION
+	
 RoxieKeyBuild.MAC_SK_BuildProcess_v2_local( keys.key_criminal_offenders_did(true),
 	'~prte::key::criminal_offenders::fcra::@version@::did',
 	'~prte::key::criminal_offenders::fcra::' + filedate + '::did', build_key_criminal_offendersfcra_did);	
@@ -266,14 +266,16 @@ AutoKey.MAC_Build_Version(files.file_corrections_keys,fname,mname,lname,
 						[]); 
 autokey.MAC_AcceptSK_to_QA(constants.corrections_keys_root,autokeymove);
 
-//---------- making DOPS optional and only in PROD build -------------------------------
-	is_running_in_prod 	:= PRTE2_Common.Constants.is_running_in_prod;
-	NoUpdate 						:= OUTPUT('Skipping DOPS update because we are not in PROD'); 
-	updatedops   		 		:= PRTE.UpdateVersion('DOCKeys', filedate,_control.MyInfo.EmailAddressNormal,'B','N','N'); 
-	updatedops_fcra  		:= PRTE.UpdateVersion('FCRA_DOCKeys',filedate,_control.MyInfo.EmailAddressNormal,'B','F','N');
-	PerformUpdateOrNot	:= IF(is_running_in_prod,parallel(updatedops,updatedops_fcra),NoUpdate);
+ is_running_in_prod 	:= PRTE2_Common.Constants.is_running_in_prod;
+ doDOPS              := is_running_in_prod AND NOT skipDOPS;
+ DOPS_Comment		 		:= OUTPUT('Skipping DOPS process');
+ updatedops					:= PRTE.UpdateVersion(constants.dops_name,filedate,_control.MyInfo.EmailAddressNormal,l_inloc:='B',l_inenvment:='N',l_includeboolean :='N');
+ updatedops_fcra			:= PRTE.UpdateVersion(constants.FCRA_dops_name,filedate,_control.MyInfo.EmailAddressNormal,l_inloc:='B',l_inenvment:='F',l_includeboolean :='N');
 
-RETURN 		sequential(			build_key_criminal_offendersfcra_did, 
+key_validations :=  parallel(output(dops.ValidatePRCTFileLayout(filedate, prte2.Constants.ipaddr_prod, prte2.Constants.ipaddr_roxie_nonfcra,Constants.dops_name, 'N'), named(Constants.dops_name+'Validation')),
+                    output(dops.ValidatePRCTFileLayout(filedate, prte2.Constants.ipaddr_prod, prte2.Constants.ipaddr_roxie_fcra,Constants.fcra_dops_name, 'F'), named(Constants.fcra_dops_name+'Validation')));	
+
+RETURN 		sequential(build_key_criminal_offendersfcra_did, 
 			build_key_criminal_offensesfcra_offender_key, 
 			build_key_criminal_punishmentfcra_offender_punishment_type, 
 			build_key_correctionsfcraactivity_public, 
@@ -328,8 +330,10 @@ RETURN 		sequential(			build_key_criminal_offendersfcra_did,
 			move_qa_key_corrections_offenses_public, 
 			move_qa_key_corrections_punishment_public, retval ,
 			corrections_keys_outaction,autokeymove,
-			proc_fcra_field_depreciation_stats
-			//PerformUpdateOrNot 
+			proc_fcra_field_depreciation_stats,
+			key_validations,
+	    if(not doDOPS, DOPS_Comment, parallel(updatedops, updatedops_fcra))		
+		
 			);
 
 END;

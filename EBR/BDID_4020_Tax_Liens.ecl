@@ -1,4 +1,4 @@
-import _control, ut, Business_Header, Business_Header_SS, did_add, Mdr, Std;
+﻿import _control, ut, Business_Header, Business_Header_SS, did_add, Mdr, Std;
 
 //////////////////////////////////////////////////////////////////////////////////////////////
 // -- Value Types
@@ -13,7 +13,8 @@ Layout_4020_Tax_Liens_Base Convert2Base(File_in l) :=
 transform
 	self.date_first_seen		:= business_header.validatedate(l.date_filed);
 	self.date_last_seen 		:= self.date_first_seen;
-	self 					:= l;
+	self 					:= 	l;
+	self					:=	[];
 end;
 
 File_in2base := project(File_in, Convert2Base(left));

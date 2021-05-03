@@ -1,4 +1,4 @@
-import _control, ut, Business_Header, Business_Header_SS, did_add, Mdr, Std;
+﻿import _control, ut, Business_Header, Business_Header_SS, did_add, Mdr, Std;
 
 //////////////////////////////////////////////////////////////////////////////////////////////
 // -- Value Types
@@ -22,7 +22,8 @@ transform
 	self.INQ_COUNT			:= choose(cnt,	
 		l.INQ_COUNT_1,	l.INQ_COUNT_2,	l.INQ_COUNT_3,	l.INQ_COUNT_4,	l.INQ_COUNT_5,	l.INQ_COUNT_6,
 		l.INQ_COUNT_7,	l.INQ_COUNT_8,	l.INQ_COUNT_9);
-	self 				:= l;
+	self 				:= 	l;
+	self				:=	[];
 end;
 
 File_in2base := normalize(File_in, 9, Convert2Base(left, counter));

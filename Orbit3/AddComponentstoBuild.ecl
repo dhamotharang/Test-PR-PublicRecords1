@@ -1,9 +1,8 @@
-import ut;
+﻿import ut,STD;
 
 EXPORT AddComponentsToBuild(string			pLoginToken,
 																	string			pBuildName,
 																	string			pBuildVersion,
-																	string			pEmailList,
 																	dataset(Orbit3.Layouts.OrbitBuildInstanceLayout)	pBuildCandidates
 																 ) := function
 
@@ -33,6 +32,9 @@ rUpdateBuildRequest	:= RECORD
 	END;
 	
 	 rBuildrequest := RECORD
+      #IF(STD.System.Util.PlatformVersionCheck('7.8')) 
+	 Orbit3.Layouts.AdditionalNamespacesLayout;
+	 #END
 		rUpdateBuildRequest	request	{XPATH('request') };
 	END;
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////	
@@ -73,13 +75,15 @@ rFault  :=	record
 		rAddBuildInstanceComponentRslt		AddBuildInstanceComponentResponse		{xpath('AddBuildInstanceComponentResponse'), 		maxlength(300000)};
        rFault		FaultRecord													{xpath('Fault')};
 end;
+
+
 ///////////////////////////////////////////////////////////////////////////////
 	lResponse	:=  SOAPCALL (         
 			Orbit3.EnvironmentVariables.serviceurl,
 		'AddBuildInstanceComponent',
 		rBuildrequest,
 		rStatus,
-		NAMESPACE(Orbit3.EnvironmentVariables.namespace ),
+     	NAMESPACE(Orbit3.EnvironmentVariables.namespace ),
 		LITERAL,
 		SOAPACTION(Orbit3.EnvironmentVariables.soapactionprefix + 'PR/AddBuildInstanceComponent'),
 		LOG

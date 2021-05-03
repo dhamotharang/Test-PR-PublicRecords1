@@ -1,0 +1,1 @@
+﻿﻿EXPORT KeyName_4020_Tax_Liens_Delta_rid := trim(GetSegmentKeyName_Delta_RID('4020'));

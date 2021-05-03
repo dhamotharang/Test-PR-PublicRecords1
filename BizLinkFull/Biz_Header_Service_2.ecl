@@ -41,7 +41,7 @@
 </message>
 */
 EXPORT Biz_Header_Service_2 := MACRO
-IMPORT SALT311,BizLinkFull;
+IMPORT SALT44,BizLinkFull;
 IMPORT BIPV2;
 IMPORT BIPV2_Company_Names;
 IMPORT lib_ziplib;
@@ -50,36 +50,36 @@ IMPORT RiskWise;
 THISMODULE:=BizLinkFull;
 //�
   UNSIGNED e_proxid := 0 : STORED('proxid',FORMAT(SEQUENCE(1)));
-  SALT311.StrType Input_company_name := '' : STORED('company_name',FORMAT(SEQUENCE(2)));
-  SALT311.StrType Input_prim_range := '' : STORED('prim_range',FORMAT(FIELDWIDTH(10),SEQUENCE(3)));
-  SALT311.StrType Input_prim_name := '' : STORED('prim_name',FORMAT(SEQUENCE(4)));
-  SALT311.StrType Input_sec_range := '' : STORED('sec_range',FORMAT(SEQUENCE(5)));
-  SALT311.StrType Input_city := '' : STORED('city',FORMAT(SEQUENCE(6)));
-  SALT311.StrType Input_st := '' : STORED('st',FORMAT(SEQUENCE(7)));
-  SALT311.StrType Input_company_phone := '' : STORED('company_phone',FORMAT(SEQUENCE(10)));
-  SALT311.StrType Input_company_url := '' : STORED('company_url',FORMAT(SEQUENCE(11)));
-  SALT311.StrType Input_contact_did := '' : STORED('contact_did',FORMAT(SEQUENCE(12)));
-  SALT311.StrType Input_title := '' : STORED('title',FORMAT(SEQUENCE(13)));
-  SALT311.StrType Input_fname := '' : STORED('fname',FORMAT(SEQUENCE(14)));
-  SALT311.StrType Input_mname := '' : STORED('mname',FORMAT(SEQUENCE(15)));
-  SALT311.StrType Input_lname := '' : STORED('lname',FORMAT(SEQUENCE(16)));
-  SALT311.StrType Input_name_suffix := '' : STORED('name_suffix',FORMAT(SEQUENCE(17)));
-  SALT311.StrType Input_contact_email := '' : STORED('contact_email',FORMAT(SEQUENCE(18)));
-  SALT311.StrType Input_contact_ssn := '' : STORED('contact_ssn',FORMAT(SEQUENCE(19)));
-  SALT311.StrType Input_company_fein := '' : STORED('company_fein',FORMAT(SEQUENCE(20)));
-  SALT311.StrType Input_company_sic_code1 := '' : STORED('company_sic_code1',FORMAT(SEQUENCE(21)));
-  SALT311.StrType Input_active_duns_number := '' : STORED('active_duns_number',FORMAT(SEQUENCE(22)));
-  SALT311.StrType Input_source := '' : STORED('source',FORMAT(SEQUENCE(23)));
-  SALT311.StrType Input_source_record_id := '' : STORED('source_record_id',FORMAT(SEQUENCE(24)));
-  SALT311.StrType Input_source_docid := '' : STORED('source_docid',FORMAT(SEQUENCE(25)));
-  SALT311.StrType Input_parent_proxid := '' : STORED('parent_proxid',FORMAT(SEQUENCE(26)));
-  SALT311.StrType Input_sele_proxid := '' : STORED('sele_proxid',FORMAT(SEQUENCE(27)));
-  SALT311.StrType Input_org_proxid := '' : STORED('org_proxid',FORMAT(SEQUENCE(28)));
-  SALT311.StrType Input_ultimate_proxid := '' : STORED('ultimate_proxid',FORMAT(SEQUENCE(29)));
-  SALT311.StrType Input_has_lgid := '' : STORED('has_lgid',FORMAT(SEQUENCE(30)));
-  SALT311.StrType Input_empid := '' : STORED('empid',FORMAT(FEW,SEQUENCE(31)));
+  SALT44.StrType Input_company_name := '' : STORED('company_name',FORMAT(SEQUENCE(2)));
+  SALT44.StrType Input_prim_range := '' : STORED('prim_range',FORMAT(FIELDWIDTH(10),SEQUENCE(3)));
+  SALT44.StrType Input_prim_name := '' : STORED('prim_name',FORMAT(SEQUENCE(4)));
+  SALT44.StrType Input_sec_range := '' : STORED('sec_range',FORMAT(SEQUENCE(5)));
+  SALT44.StrType Input_city := '' : STORED('city',FORMAT(SEQUENCE(6)));
+  SALT44.StrType Input_st := '' : STORED('st',FORMAT(SEQUENCE(7)));
+  SALT44.StrType Input_company_phone := '' : STORED('company_phone',FORMAT(SEQUENCE(10)));
+  SALT44.StrType Input_company_url := '' : STORED('company_url',FORMAT(SEQUENCE(11)));
+  SALT44.StrType Input_contact_did := '' : STORED('contact_did',FORMAT(SEQUENCE(12)));
+  SALT44.StrType Input_title := '' : STORED('title',FORMAT(SEQUENCE(13)));
+  SALT44.StrType Input_fname := '' : STORED('fname',FORMAT(SEQUENCE(14)));
+  SALT44.StrType Input_mname := '' : STORED('mname',FORMAT(SEQUENCE(15)));
+  SALT44.StrType Input_lname := '' : STORED('lname',FORMAT(SEQUENCE(16)));
+  SALT44.StrType Input_name_suffix := '' : STORED('name_suffix',FORMAT(SEQUENCE(17)));
+  SALT44.StrType Input_contact_email := '' : STORED('contact_email',FORMAT(SEQUENCE(18)));
+  SALT44.StrType Input_contact_ssn := '' : STORED('contact_ssn',FORMAT(SEQUENCE(19)));
+  SALT44.StrType Input_company_fein := '' : STORED('company_fein',FORMAT(SEQUENCE(20)));
+  SALT44.StrType Input_company_sic_code1 := '' : STORED('company_sic_code1',FORMAT(SEQUENCE(21)));
+  SALT44.StrType Input_active_duns_number := '' : STORED('active_duns_number',FORMAT(SEQUENCE(22)));
+  SALT44.StrType Input_source := '' : STORED('source',FORMAT(SEQUENCE(23)));
+  SALT44.StrType Input_source_record_id := '' : STORED('source_record_id',FORMAT(SEQUENCE(24)));
+  SALT44.StrType Input_source_docid := '' : STORED('source_docid',FORMAT(SEQUENCE(25)));
+  SALT44.StrType Input_parent_proxid := '' : STORED('parent_proxid',FORMAT(SEQUENCE(26)));
+  SALT44.StrType Input_sele_proxid := '' : STORED('sele_proxid',FORMAT(SEQUENCE(27)));
+  SALT44.StrType Input_org_proxid := '' : STORED('org_proxid',FORMAT(SEQUENCE(28)));
+  SALT44.StrType Input_ultimate_proxid := '' : STORED('ultimate_proxid',FORMAT(SEQUENCE(29)));
+  SALT44.StrType Input_has_lgid := '' : STORED('has_lgid',FORMAT(SEQUENCE(30)));
+  SALT44.StrType Input_empid := '' : STORED('empid',FORMAT(FEW,SEQUENCE(31)));
   UNSIGNED e_powid := 0 : STORED('powid',FORMAT(SEQUENCE(32)));
-  SALT311.StrType Input_isContact := '' : STORED('isContact',FORMAT(SEQUENCE(33)));
+  SALT44.StrType Input_isContact := '' : STORED('isContact',FORMAT(SEQUENCE(33)));
   UNSIGNED Input_UniqueID := 1 : STORED('UniqueID',FORMAT(SEQUENCE(34)));
   UNSIGNED InputMaxIds0 := 0 : STORED('MaxIds',FORMAT(SEQUENCE(35)));
   BOOLEAN FullMatch := FALSE : STORED('MatchAllInOneRecord',FORMAT(SEQUENCE(36)));
@@ -145,9 +145,9 @@ Input_Data := DATASET([{(TYPEOF(Template.UniqueID))Input_UniqueID,Input_MaxIds,I
   ,(TYPEOF(Template.source))Input_source
   ,(TYPEOF(Template.source_record_id))Input_source_record_id
   ,(TYPEOF(Template.source_docid))Input_source_docid
-  ,(TYPEOF(Template.company_name))THISMODULE.Fields.Make_company_name((SALT311.StrType)Input_company_name)
-  ,(TYPEOF(Template.company_name_prefix))THISMODULE.Fields.Make_company_name_prefix((SALT311.StrType)BizLinkFull.fn_company_name_prefix(dCnpName[1].cnp_name))
-  ,(TYPEOF(Template.cnp_name))THISMODULE.Fields.Make_cnp_name((SALT311.StrType)dCnpName[1].cnp_name)
+  ,(TYPEOF(Template.company_name))THISMODULE.Fields.Make_company_name((SALT44.StrType)Input_company_name)
+  ,(TYPEOF(Template.company_name_prefix))THISMODULE.Fields.Make_company_name_prefix((SALT44.StrType)BizLinkFull.fn_company_name_prefix(dCnpName[1].cnp_name))
+  ,(TYPEOF(Template.cnp_name))THISMODULE.Fields.Make_cnp_name((SALT44.StrType)dCnpName[1].cnp_name)
   ,(TYPEOF(Template.cnp_number))dCnpName[1].cnp_number
   ,(TYPEOF(Template.cnp_btype))dCnpName[1].cnp_btype
   ,(TYPEOF(Template.cnp_lowv))dCnpName[1].cnp_lowv
@@ -155,33 +155,33 @@ Input_Data := DATASET([{(TYPEOF(Template.UniqueID))Input_UniqueID,Input_MaxIds,I
   ,(TYPEOF(Template.company_phone_3))sPhone3
   ,(TYPEOF(Template.company_phone_3_ex))sPhone3_ex
   ,(TYPEOF(Template.company_phone_7))sPhone7
-  ,IF(THISMODULE.Fields.Invalid_company_fein((SALT311.StrType)Input_company_fein)=0,(TYPEOF(Template.company_fein))Input_company_fein,(TYPEOF(Template.company_fein))'')
+  ,IF(THISMODULE.Fields.Invalid_company_fein((SALT44.StrType)Input_company_fein)=0,(TYPEOF(Template.company_fein))Input_company_fein,(TYPEOF(Template.company_fein))'')
   ,(TYPEOF(Template.company_sic_code1))Input_company_sic_code1
   ,(TYPEOF(Template.active_duns_number))Input_active_duns_number
   ,(TYPEOF(Template.prim_range))Input_prim_range
-  ,(TYPEOF(Template.prim_name))THISMODULE.Fields.Make_prim_name((SALT311.StrType)Input_prim_name)
-  ,(TYPEOF(Template.sec_range))THISMODULE.Fields.Make_sec_range((SALT311.StrType)Input_sec_range)
-  ,(TYPEOF(Template.city))THISMODULE.Fields.Make_city((SALT311.StrType)sCity)
-  ,(TYPEOF(Template.city_clean))THISMODULE.Fields.Make_city_clean((SALT311.StrType)'')
-  ,(TYPEOF(Template.st))THISMODULE.Fields.Make_st((SALT311.StrType)sState)
+  ,(TYPEOF(Template.prim_name))THISMODULE.Fields.Make_prim_name((SALT44.StrType)Input_prim_name)
+  ,(TYPEOF(Template.sec_range))THISMODULE.Fields.Make_sec_range((SALT44.StrType)Input_sec_range)
+  ,(TYPEOF(Template.city))THISMODULE.Fields.Make_city((SALT44.StrType)sCity)
+  ,(TYPEOF(Template.city_clean))THISMODULE.Fields.Make_city_clean((SALT44.StrType)'')
+  ,(TYPEOF(Template.st))THISMODULE.Fields.Make_st((SALT44.StrType)sState)
   ,dZipWeights
-  ,(TYPEOF(Template.company_url))THISMODULE.Fields.Make_company_url((SALT311.StrType)Input_company_url)
+  ,(TYPEOF(Template.company_url))THISMODULE.Fields.Make_company_url((SALT44.StrType)Input_company_url)
   ,(TYPEOF(Template.isContact))Input_isContact
   ,(TYPEOF(Template.contact_did))Input_contact_did
   ,(TYPEOF(Template.title))Input_title
-  ,(TYPEOF(Template.fname))THISMODULE.Fields.Make_fname((SALT311.StrType)Input_fname)
-  ,(TYPEOF(Template.fname_preferred))THISMODULE.Fields.Make_fname_preferred((SALT311.StrType)sFNamePreferred)
-  ,(TYPEOF(Template.mname))THISMODULE.Fields.Make_mname((SALT311.StrType)Input_mname)
-  ,(TYPEOF(Template.lname))THISMODULE.Fields.Make_lname((SALT311.StrType)Input_lname)
-  ,(TYPEOF(Template.name_suffix))THISMODULE.Fields.Make_name_suffix((SALT311.StrType)Input_name_suffix)
+  ,(TYPEOF(Template.fname))THISMODULE.Fields.Make_fname((SALT44.StrType)Input_fname)
+  ,(TYPEOF(Template.fname_preferred))THISMODULE.Fields.Make_fname_preferred((SALT44.StrType)sFNamePreferred)
+  ,(TYPEOF(Template.mname))THISMODULE.Fields.Make_mname((SALT44.StrType)Input_mname)
+  ,(TYPEOF(Template.lname))THISMODULE.Fields.Make_lname((SALT44.StrType)Input_lname)
+  ,(TYPEOF(Template.name_suffix))THISMODULE.Fields.Make_name_suffix((SALT44.StrType)Input_name_suffix)
   ,(TYPEOF(Template.contact_ssn))Input_contact_ssn
-  ,(TYPEOF(Template.contact_email))THISMODULE.Fields.Make_contact_email((SALT311.StrType)Input_contact_email)
+  ,(TYPEOF(Template.contact_email))THISMODULE.Fields.Make_contact_email((SALT44.StrType)Input_contact_email)
   ,(TYPEOF(Template.sele_flag))sSortFlag
   ,(TYPEOF(Template.org_flag))sSortFlag
   ,(TYPEOF(Template.ult_flag))sSortFlag
   ,(TYPEOF(Template.fallback_value))0
-  ,(TYPEOF(Template.CONTACTNAME))(THISMODULE.Fields.Make_fname((SALT311.StrType)Input_fname)+' '+THISMODULE.Fields.Make_mname((SALT311.StrType)Input_mname)+' '+THISMODULE.Fields.Make_lname((SALT311.StrType)Input_lname))
-  ,(TYPEOF(Template.STREETADDRESS))(TRIM(Input_prim_range)+' '+THISMODULE.Fields.Make_prim_name((SALT311.StrType)Input_prim_name)+' '+THISMODULE.Fields.Make_sec_range((SALT311.StrType)Input_sec_range))
+  ,(TYPEOF(Template.CONTACTNAME))(THISMODULE.Fields.Make_fname((SALT44.StrType)Input_fname)+' '+THISMODULE.Fields.Make_mname((SALT44.StrType)Input_mname)+' '+THISMODULE.Fields.Make_lname((SALT44.StrType)Input_lname))
+  ,(TYPEOF(Template.STREETADDRESS))(TRIM(Input_prim_range)+' '+THISMODULE.Fields.Make_prim_name((SALT44.StrType)Input_prim_name)+' '+THISMODULE.Fields.Make_sec_range((SALT44.StrType)Input_sec_range))
   ,RecordsOnly,FullMatch,e_rcid,e_proxid,e_seleid,e_orgid,e_ultid,e_powid}],THISMODULE.Process_Biz_Layouts.InputLayout);
 //�
 

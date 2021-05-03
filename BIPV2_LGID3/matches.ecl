@@ -68,7 +68,7 @@ SHARED match_candidates(ih).layout_matches match_join(match_candidates(ih).layou
                         le.company_inc_state_isnull OR ri.company_inc_state_isnull OR le.company_inc_state_weight100 = 0 => 0,
                         le.company_inc_state = ri.company_inc_state  => le.company_inc_state_weight100,
                         SALT311.Fn_Fail_Scale(AVE(le.company_inc_state_weight100,ri.company_inc_state_weight100),s.company_inc_state_switch));
-  INTEGER2 company_inc_state_score := IF ( company_inc_state_score_temp > Config.company_inc_state_Force * 100 OR active_duns_number_score > Config.company_inc_state_OR1_active_duns_number_Force*100 OR duns_number_score > Config.company_inc_state_OR2_duns_number_Force*100 OR duns_number_concept_score > Config.company_inc_state_OR3_duns_number_concept_Force*100 OR company_fein_score > Config.company_inc_state_OR4_company_fein_Force*100 OR sbfe_id_score > Config.company_inc_state_OR5_sbfe_id_Force*100, company_inc_state_score_temp, SKIP ); // Enforce FORCE parameter
+  INTEGER2 company_inc_state_score := IF ( company_inc_state_score_temp >= Config.company_inc_state_Force * 100 OR active_duns_number_score > Config.company_inc_state_OR1_active_duns_number_Force*100 OR duns_number_score > Config.company_inc_state_OR2_duns_number_Force*100 OR duns_number_concept_score > Config.company_inc_state_OR3_duns_number_concept_Force*100 OR company_fein_score > Config.company_inc_state_OR4_company_fein_Force*100 OR sbfe_id_score > Config.company_inc_state_OR5_sbfe_id_Force*100, company_inc_state_score_temp, SKIP ); // Enforce FORCE parameter
   // Get propagation scores for individual propagated fields
   INTEGER2 company_inc_state_score_prop := MAX(le.company_inc_state_prop,ri.company_inc_state_prop)*company_inc_state_score; // Score if either field propogated
   INTEGER2 Lgid3IfHrchy_score_prop := MAX(le.Lgid3IfHrchy_prop,ri.Lgid3IfHrchy_prop)*Lgid3IfHrchy_score; // Score if either field propogated
@@ -80,7 +80,11 @@ SHARED match_candidates(ih).layout_matches match_join(match_candidates(ih).layou
   INTEGER2 cnp_number_score_prop := MAX(le.cnp_number_prop,ri.cnp_number_prop)*cnp_number_score; // Score if either field propogated
   SELF.Conf_Prop := (0 + company_inc_state_score_prop + Lgid3IfHrchy_score_prop + active_duns_number_score_prop + duns_number_score_prop + duns_number_concept_score_prop + company_name_score_prop + company_charter_number_score_prop + cnp_number_score_prop) / 100; // Score based on propogated fields
   iComp := (company_inc_state_score + Lgid3IfHrchy_score + IF(duns_number_concept_score>0,MAX(duns_number_concept_score,active_duns_number_score + duns_number_score),active_duns_number_score + duns_number_score) + sbfe_id_score + company_name_score + company_fein_score + company_charter_number_score + cnp_number_score + cnp_btype_score) / 100 + outside;
-  SELF.Conf := IF( iComp>=LowerMatchThreshold OR iComp-SELF.Conf_Prop >= LowerMatchThreshold OR (le.LGID3 = ri.LGID3 AND (iComp >= IntraMatchThreshold OR iComp-SELF.Conf_Prop >= IntraMatchThreshold)),iComp,SKIP ); // Remove failing records asap
+  SELF.Conf := map( iComp>=LowerMatchThreshold OR iComp-SELF.Conf_Prop >= LowerMatchThreshold OR (le.LGID3 = ri.LGID3 AND (iComp >= IntraMatchThreshold OR iComp-SELF.Conf_Prop >= IntraMatchThreshold))
+    => iComp
+    ,company_fein_score > 0
+    or company_charter_number_score > 0 => 40
+  ,SKIP ); // Remove failing records asap
 END;
 //Allow rule numbers to be converted to readable text.
 EXPORT RuleText(UNSIGNED n) :=  MAP (

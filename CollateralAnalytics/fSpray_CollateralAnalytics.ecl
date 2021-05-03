@@ -5,7 +5,7 @@
 EXPORT fSpray_CollateralAnalytics( 
 	STRING		pVersionDate		=	'',
 	STRING		pServerIP				= Constants().serverIP,
-	STRING		pDirectory			= Constants().Directory,
+	STRING		pDirectory			= Constants().Directory.Main,
 	STRING		pFilename				=	'*',
 	STRING		pGroupName			=	_Dataset().groupname,
 	BOOLEAN		pIsTesting			=	FALSE,
@@ -18,9 +18,9 @@ FilesToSpray := DATASET([
 		//	
 		{
 			pServerIP, 																//	SourceIP
-			pDirectory,//+'/',							//	SourceDirectory
+			pDirectory+pVersionDate,//+'/',							//	SourceDirectory
 			//pFilename,																//	directory_filter
-			'CA_MLS_INSURANCE_'+pVersionDate+'.txt',
+			pFilename,
 			0, 																				//	record_size
 			CollateralAnalytics.Filenames(pVersionDate).input.new(pVersionDate),	//	Thor_filename_template
 			[ {CollateralAnalytics.Filenames(pVersionDate).input.sprayed	}	],		//	dSuperfilenames

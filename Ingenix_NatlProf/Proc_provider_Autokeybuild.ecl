@@ -1,8 +1,9 @@
-import Ingenix_NatlProf, AutoKeyB2, RoxieKeyBuild; 
+﻿import Ingenix_NatlProf, AutoKeyB2, RoxieKeyBuild; 
 
 export Proc_provider_Autokeybuild(string filedate) := function
 
-	base_prov := Ingenix_NatlProf.file_SearchAutokey_provider;
+	pre_base_prov := Ingenix_NatlProf.file_SearchAutokey_provider;
+	base_prov := dedup(sort(pre_base_prov, providerid, addressid, birthdate, phonenumber, filetyp, skew(0.5,0.5)), record):persist('~thor_data400::persist::ingenix::provider_autokey_dedup');
 
 	skip_set  := Ingenix_NatlProf.Constants.autokey_skip_set_prov;
 

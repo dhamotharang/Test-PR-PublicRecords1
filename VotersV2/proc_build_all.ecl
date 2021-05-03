@@ -17,9 +17,9 @@ export proc_build_all(string filedate) := function
 	RoxieKeyBuild.Mac_Daily_Email_Local('EMERGES VOTE','FAIL',fileDate,sendFailMsg,mailTarget);
 
   //DF-26929 - MA recs were determined to be Census records and not Voter Regs and thus need removed
-  voter_reg := VotersV2.Transulate_Voters_Codes;
-	PromoteSupers.MAC_SF_BuildProcess(voter_reg(source_state != 'MA'),VotersV2.Cluster+'base::Voters_Reg',aVotersMainBuild,2,,true);
-	PromoteSupers.MAC_SF_BuildProcess(voter_reg(source_state = 'MA'),VotersV2.Cluster+'base::MA_Census',aCensusMainBuild,2,,true);
+  voter_reg := VotersV2.Translate_Voters_Codes;
+	PromoteSupers.MAC_SF_BuildProcess(voter_reg(source_state != 'MA'),VotersV2.Cluster+'base::Voters_Reg',aVotersMainBuild,3,,true);
+	PromoteSupers.MAC_SF_BuildProcess(voter_reg(source_state = 'MA'),VotersV2.Cluster+'base::MA_Census',aCensusMainBuild,3,,true);
   voter_hist      := VotersV2.Mapping_Voters_VoteHistory;
   voter_hist_only := VotersV2.Extract_Census_History(voter_reg, voter_hist).VoteHistOnly;
   census_hist     := VotersV2.Extract_Census_History(voter_reg, voter_hist).VoteHistCensus;
@@ -45,17 +45,21 @@ export proc_build_all(string filedate) := function
 																	Orbit3.proc_Orbit3_CreateBuild_AddItem('FCRA Voter Registrations',filedate,'F')
 																);
 	return if(thorlib.wuid()[2..5] <= VotersV2._Flags.stop_year,
-	          sequential(build_base,
+	          sequential(
+						           
+                       Scrubs.ScrubsPlus('Voters','Scrubs_Voters','Scrubs_Voters_In_Reg' ,'In_Reg' ,filedate,mailTarget),
+						           build_base,
                        build_census,
                        Scrubs.ScrubsPlus('Voters','Scrubs_Voters','Scrubs_Voters_Base_History','Base_History',filedate,mailTarget),
                        Scrubs.ScrubsPlus('Voters','Scrubs_Voters','Scrubs_Voters_Base_Reg' ,'Base_Reg' ,filedate,mailTarget),
-										build_keys,
-										build_gender,
-										parallel(update_dops,build_stats),
-										SampleRecs,
-										orbit_update,
-										send_mail('Emerges Voters Build','Base files, keys & stats completed successfully!'),
-										getretval),
+										   build_keys,
+										   build_gender,
+										   parallel(update_dops,build_stats),
+										   SampleRecs,
+										   orbit_update,
+										   send_mail('Emerges Voters Build','Base files, keys & stats completed successfully!'),
+											 getretval
+										   ),
 					 sequential(
 							send_mail('STOP IMMEDIATELY - Emerges Voters Build',
 												'It has been a year since Data Fabrication has verified that the layout ' +

@@ -1,4 +1,4 @@
-import tools;
+﻿import tools;
 export Keynames(
 	 string		pversion							= ''
 	,boolean	pUseOtherEnvironment	= false
@@ -22,8 +22,11 @@ module
 	export HierEntNum 			:= tools.mod_FilenamesBuild(lLogicalTmplt					+ 'hierarchy_entnum'									,pversion	);
 	export EntNum						:= tools.mod_FilenamesBuild(lLogicalTmplt					+ 'entnum'														,pversion	);
 	export EntNumNonFilt		:= tools.mod_FilenamesBuild(lLogicalTmplt					+ 'entnum_NonFilt'										,pversion	);
-
-  export LinkIds				  := tools.mod_FilenamesBuild(lLogicalTmplt		      + 'linkIds'			                      ,pversion );
+	
+	export LinkIds				  := tools.mod_FilenamesBuild(lLogicalTmplt		      + 'linkIds'			                      ,pversion );
+	
+	// Creating a BDID key on Contacts base file. Added for CCPA phase 2 requirement as per Jira# CCPA-1029
+	export ContactBDID			:= tools.mod_FilenamesBuild(lLogicalTmplt					+ 'contacts_bdid'											,pversion );
 
 	export autokeyroot	 		:= tools.mod_FilenamesBuild(lsuperautoTmplt																							,pversion	,llogicalautoTmplt																							);
 
@@ -46,6 +49,7 @@ module
 		+ EntNum.dAll_filenames
 		+ EntNumNonFilt.dAll_filenames
 		+ LinkIds.dAll_filenames
+		+ ContactBDID.dAll_filenames
 		;
 
 	export dAll_filenames := 
@@ -66,6 +70,7 @@ module
 		+ stnameb2.dAll_filenames
 		+ zipb2.dAll_filenames
 		+ LinkIds.dAll_filenames
+		+ ContactBDID.dAll_filenames
 		;
 
 end;

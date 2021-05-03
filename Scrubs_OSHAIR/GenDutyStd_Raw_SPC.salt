@@ -1,0 +1,11 @@
+﻿OPTIONS:-gh
+MODULE:Scrubs_OSHAIR
+FILENAME:GenDutyStd_Raw_In_OSHAIR
+NAMESCOPE:GenDutyStd_Raw
+
+FIELDTYPE:invalid_numeric:CUSTOM(Scrubs.Functions.fn_numeric > 0)
+FIELDTYPE:invalid_alpha_numeric:CUSTOM(Scrubs.Functions.fn_alphanum > 0)
+
+FIELD:activity_nr:TYPE(STRING9):LIKE(invalid_numeric):0,0
+FIELD:citation_id:TYPE(STRING7):LIKE(invalid_alpha_numeric):0,0
+FIELD:line_nr:TYPE(STRING6):LIKE(invalid_numeric):0,0

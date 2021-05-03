@@ -8,6 +8,13 @@ EXPORT	Layouts	:=	MODULE
 		STRING	ActionType;
 	END;
 	
+	EXPORT	rFiletypeToActionGroup	:=	RECORD
+		STRING2	FILETYPEID;
+		STRING2	ActionGroup;
+		STRING	filing_type_desc;
+		STRING	ActionType;      
+	END;
+	
 	EXPORT	rSourceInformationReport	:=	RECORD
 		STRING2		StateOfService;
 		STRING		AreaOfService;
@@ -27,6 +34,7 @@ EXPORT	Layouts	:=	MODULE
 		STRING		DispositionScore;
 		STRING		SevenYrVolume;
 		STRING		MaxCollectDate;
+    // STRING		MaxintervalDate; // remove before promoting and testing Sudhir's file.
 		STRING		VisitWithin90;
 		BOOLEAN		IsActive;
 	END;

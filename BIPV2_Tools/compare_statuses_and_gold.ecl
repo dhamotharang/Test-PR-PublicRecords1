@@ -39,34 +39,35 @@ EXPORT compare_statuses_and_gold(
   ,pCurrentLgid3KeyVersion    = 'BIPV2.KeySuffix'
   ,pFatherLgid3KeyVersion     = 'BIPV2.KeySuffix_mod2.PreviousBuildDate'
   ,pTesting                   = 'false'                                   //if testing, then use clean2 which doesn't do suppression.  this allows the persists to not recalculate on reruns.  makes it quicker for testing.
+  ,pActive_Fieldname2         = 'seleid_status_private'
 ) :=
 functionmacro
 
-  import tools,BIPV2,Advo,BIPV2_Tools;
+  import tools,BIPV2,Advo,BIPV2_Tools,BIPV2_Statuses;
   
-  old_version := pFather_Version;
-  new_version := pCurrent_Version;
+  old_version := pFather_Version [1..8];
+  new_version := pCurrent_Version[1..8];
 
   old_sprint := BIPV2.KeySuffix_mod2.SprintNumber(old_version);
   new_sprint := BIPV2.KeySuffix_mod2.SprintNumber(new_version);
 
-  ds_new  := pDs_Base  : persist('~persist::BIPV2_Tools::compare_statuses_and_gold::ds_new'); 
+  ds_new  := BIPV2_Statuses.mac_Calculate_Gold(pDs_Base)  : persist('~persist::BIPV2_Tools::compare_statuses_and_gold::ds_new'); 
   ds_old  := pDs_Father : persist('~persist::BIPV2_Tools::compare_statuses_and_gold::ds_old');
 
   ds_new_agg := BIPV2_Tools.Agg_Slim(ds_new ,seleid) : persist('~persist::BIPV2_Tools::compare_statuses_and_gold::ds_new_agg');
   ds_old_agg := BIPV2_Tools.Agg_Slim(ds_old ,seleid) : persist('~persist::BIPV2_Tools::compare_statuses_and_gold::ds_old_agg');
 
   // -- get samples of base files
-  ds_built := table(ds_new ,{seleid,source,company_status_derived,dt_last_seen,dt_first_seen,dt_vendor_first_reported,dt_vendor_last_reported,ultid,orgid,proxid,powid}) : persist('~persist::BIPV2_Tools::compare_statuses_and_gold::ds_built'); 
-  ds_base  := table(ds_old ,{seleid,source,company_status_derived,dt_last_seen,dt_first_seen,dt_vendor_first_reported,dt_vendor_last_reported,ultid,orgid,proxid,powid}) : persist('~persist::BIPV2_Tools::compare_statuses_and_gold::ds_base');
+  ds_built := table(ds_new ,{seleid,pActive_Fieldname2,source,company_status_derived,dt_last_seen,dt_first_seen,dt_vendor_first_reported,dt_vendor_last_reported,ultid,orgid,proxid,powid}) : persist('~persist::BIPV2_Tools::compare_statuses_and_gold::ds_built'); 
+  ds_base  := table(ds_old ,{seleid,pActive_Fieldname2,source,company_status_derived,dt_last_seen,dt_first_seen,dt_vendor_first_reported,dt_vendor_last_reported,ultid,orgid,proxid,powid}) : persist('~persist::BIPV2_Tools::compare_statuses_and_gold::ds_base');
   // ds_built := topn(bipv2.CommonBase.ds_base,10000000,seleid)  : persist('~persist::BIPV2_Tools::compare_statuses_and_gold::ds_built'); 
   // ds_base  := join(bipv2.CommonBase.ds_father ,table(ds_built ,{seleid} ,seleid ,merge) ,left.seleid = right.seleid ,transform(left)  ,hash) : persist('~persist::BIPV2_Tools::compare_statuses_and_gold::ds_base');
 
 
   // -- Set the statuses for those files, showing underlying sources and dates used for each ID
-  ds_get_statuses_built := BIPV2_Tools.mac_Set_Statuses(ds_built  ,pShow_Work := true                      ) : persist('~persist::BIPV2_Tools::compare_statuses_and_gold::ds_get_statuses_built');
+  ds_get_statuses_built := BIPV2_Statuses.mac_Set_Statuses(ds_built  ,pShow_Work := true,pToday := new_version,pOldWay := true ,pActive_Fieldname  := pActive_Fieldname2) : persist('~persist::BIPV2_Tools::compare_statuses_and_gold::ds_get_statuses_built');
   // ds_get_statuses_base  := dataset('~persist::BIPV2_Tools::compare_statuses_and_gold::ds_get_statuses_base__p499438766' ,recordof(ds_get_statuses_built),flat);
-  ds_get_statuses_base  := BIPV2_Tools.mac_Set_Statuses(ds_base   ,pShow_Work := true,pToday := old_version) : persist('~persist::BIPV2_Tools::compare_statuses_and_gold::ds_get_statuses_base' );  //keeps rebuilding this even though nothing has changed
+  ds_get_statuses_base  := BIPV2_Statuses.mac_Set_Statuses(ds_base   ,pShow_Work := true,pToday := old_version,pOldWay := true ,pActive_Fieldname  := pActive_Fieldname2) : persist('~persist::BIPV2_Tools::compare_statuses_and_gold::ds_get_statuses_base' );  //keeps rebuilding this even though nothing has changed
 
 
 
@@ -82,8 +83,8 @@ functionmacro
     // ,self.old_recs.src_recs := right.src_recs
     ,self.old_recs          := dataset(right)
     ,self.seleid            := if(left.seleid != 0  ,left.seleid  ,right.seleid)
-    ,self.new_status        := left.seleid_status
-    ,self.old_status        := right.seleid_status
+    ,self.new_status        := left.pActive_Fieldname2
+    ,self.old_status        := right.pActive_Fieldname2
   )  ,full outer  ,hash);
 
   ds_proj_all := project(ds_join_all  ,transform(
@@ -224,20 +225,20 @@ functionmacro
   /* 
       -------------------------------------- GOLD STUFF ----------------------------------------------
   */
-  new_segs := BIPV2_PostProcess.proc_segmentation(new_version,ds_new,pPopulateStatus := false                                                     ,pUseClean2 := pTesting,pLgid3KeyVersion := pCurrentLgid3KeyVersion);
+  new_segs := BIPV2_PostProcess.proc_segmentation(new_version,ds_new,pPopulateStatus := false,pToday := new_version                               ,pUseClean2 := pTesting,pLgid3KeyVersion := pCurrentLgid3KeyVersion ,pPreserveGold := true);
   old_segs := BIPV2_PostProcess.proc_segmentation(old_version,ds_old,pPopulateStatus := false,pToday := old_version,pGoldOutputModifier := '_Old' ,pUseClean2 := pTesting,pLgid3KeyVersion := pFatherLgid3KeyVersion );
 
   // ds_new_golds := new_segs.modgoldSELEV2.Gold;
   // ds_old_golds := old_segs.modgoldSELEV2.Gold;
 
   // test_gold_summarys  := new_segs.modgoldSELEV2.ds_src_status_dt_rollup;
-  ds_append_gold_field_new := new_segs.modgoldSELEV2_all.ds_append_gold_field  : persist('~persist::BIPV2_Tools::compare_statuses_and_gold::ds_append_gold_field_new');
-  ds_append_gold_field_old := old_segs.modgoldSELEV2_all.ds_append_gold_field  : persist('~persist::BIPV2_Tools::compare_statuses_and_gold::ds_append_gold_field_old');
+  ds_append_gold_field_new := new_segs.modgoldSELEV2_all.ds_append_gold_field       : persist('~persist::BIPV2_Tools::compare_statuses_and_gold::ds_append_gold_field_new');
+  ds_append_gold_field_old := old_segs.modgoldSELEV2_all_old.ds_append_gold_field   : persist('~persist::BIPV2_Tools::compare_statuses_and_gold::ds_append_gold_field_old');
 
 
-  ds_find_gold_diffs := join(ds_append_gold_field_new ,ds_append_gold_field_old ,left.id = right.id ,transform(
+  ds_find_gold_diffs := join(ds_append_gold_field_new ,ds_append_gold_field_old ,left.seleid = right.seleid ,transform(
      {unsigned6 seleid ,boolean isgold_new ,boolean isgold_old ,dataset(recordof(ds_append_gold_field_new.gold_calculation)) gold_calc_new,dataset(recordof(ds_append_gold_field_new.gold_calculation)) gold_calc_old,dataset(recordof(ds_append_gold_field_new.src_dt_status)) new_sources  ,dataset(recordof(ds_append_gold_field_new.src_dt_status)) old_sources}
-    ,self.seleid      := if(left.id != 0 ,left.id  ,right.id)
+    ,self.seleid      := if(left.seleid != 0 ,left.seleid  ,right.seleid)
     ,self.isgold_new  := left.isgold
     ,self.isgold_old  := right.isgold
     ,self.new_sources := sort(left.src_dt_status ,-dt_last_seen,company_status_derived,source)
@@ -262,7 +263,14 @@ functionmacro
 
 
   ds_norm_gold_calculations_diff  := normalize(ds_find_gold_diffs_all ,left.gold_calc_diff          ,transform(recordof(left.gold_calc_diff         ),self := right));
-  ds_norm_gold_calc_sources_diff  := normalize(ds_find_gold_diffs_all((isgold_new = true and exists(new_sources) and ~exists(old_sources)) or (isgold_new = true and isgold_old = false and exists(old_sources))) ,left.gold_calc_sources_diff  
+  
+  ds_norm_gold_calc_sources_diff  := normalize(ds_find_gold_diffs_all(  
+
+         (isgold_new = true and exists(new_sources) and ~exists(old_sources)) 
+      or (isgold_new = true and isgold_old = false  and  exists(old_sources))
+    ) 
+      
+    ,left.gold_calc_sources_diff  
     ,transform({unsigned6 seleid,recordof(left.gold_calc_sources_diff )},self.seleid := left.seleid,self := right));
 
   ds_norm_gold_calculations_table_diff  := table(ds_norm_gold_calculations_diff ,{calculation,result  ,unsigned cnt := count(group)}  ,calculation,result ,merge);
@@ -422,9 +430,9 @@ functionmacro
 
   ds_active_stats := dataset([
      {'-----------Overall stats------------------','---------------'}
-    ,{'New file (Sprint ' + trim(new_sprint) + ', ' + trim(new_version) + ')' ,ut.fIntWithCommas(count(ds_get_statuses_built(trim(seleid_status) = '')))  }
-    ,{'Old file (Sprint ' + trim(old_sprint) + ', ' + trim(old_version) + ')' ,ut.fIntWithCommas(count(ds_get_statuses_base (trim(seleid_status) = '')))  }  
-    ,{'Overall difference(+/-)'                                               ,ut.fIntWithCommas(count(ds_get_statuses_built(trim(seleid_status) = '')) - count(ds_get_statuses_base (trim(seleid_status) = '')))  }
+    ,{'New file (Sprint ' + trim(new_sprint) + ', ' + trim(new_version) + ')' ,ut.fIntWithCommas(count(ds_get_statuses_built(trim(pActive_Fieldname2) = '')))  }
+    ,{'Old file (Sprint ' + trim(old_sprint) + ', ' + trim(old_version) + ')' ,ut.fIntWithCommas(count(ds_get_statuses_base (trim(pActive_Fieldname2) = '')))  }  
+    ,{'Overall difference(+/-)'                                               ,ut.fIntWithCommas(count(ds_get_statuses_built(trim(pActive_Fieldname2) = '')) - count(ds_get_statuses_base (trim(pActive_Fieldname2) = '')))  }
     ,{'Total Clusters gained'                                                 ,ut.fIntWithCommas(count(ds_proj_all((trim(new_status) = '' and exists(new_recs(seleid != 0))) and ((trim(old_status) != '' and exists(old_recs(seleid != 0))) or ~exists(old_recs(seleid != 0)  )))))  }
     ,{'Total clusters lost'                                                   ,ut.fIntWithCommas(count(ds_proj_all((trim(old_status) = '' and exists(old_recs(seleid != 0))) and ((trim(new_status) != '' and exists(new_recs(seleid != 0))) or ~exists(new_recs(seleid != 0)  )))))  }
     ,{'Total Active Clusters in common'                                       ,ut.fIntWithCommas(count(ds_proj_all (trim(new_status) = '' and trim(old_status) = '' and exists(new_recs(seleid != 0)) and exists(old_recs(seleid != 0)))))  }
@@ -443,9 +451,9 @@ functionmacro
 
   ds_inactive_stats := dataset([
      {'-----------Overall stats------------------','---------------'}
-    ,{'New file (Sprint ' + trim(new_sprint) + ', ' + trim(new_version) + ')' ,ut.fIntWithCommas(count(ds_get_statuses_built(trim(seleid_status) = 'I')))  }
-    ,{'Old file (Sprint ' + trim(old_sprint) + ', ' + trim(old_version) + ')' ,ut.fIntWithCommas(count(ds_get_statuses_base (trim(seleid_status) = 'I')))  }  
-    ,{'Overall difference(+/-)'                                               ,ut.fIntWithCommas(count(ds_get_statuses_built(trim(seleid_status) = 'I')) - count(ds_get_statuses_base(trim(seleid_status) = 'I')) ) }
+    ,{'New file (Sprint ' + trim(new_sprint) + ', ' + trim(new_version) + ')' ,ut.fIntWithCommas(count(ds_get_statuses_built(trim(pActive_Fieldname2) = 'I')))  }
+    ,{'Old file (Sprint ' + trim(old_sprint) + ', ' + trim(old_version) + ')' ,ut.fIntWithCommas(count(ds_get_statuses_base (trim(pActive_Fieldname2) = 'I')))  }  
+    ,{'Overall difference(+/-)'                                               ,ut.fIntWithCommas(count(ds_get_statuses_built(trim(pActive_Fieldname2) = 'I')) - count(ds_get_statuses_base(trim(pActive_Fieldname2) = 'I')) ) }
     ,{'Total Clusters gained'                                                 ,ut.fIntWithCommas(count(ds_seleid_new_inactive_cluster) + count(ds_seleid_changed_status_active_To_inActive) + count(ds_seleid_changed_status_Defunct_To_inActive))  }
     ,{'Total clusters lost'                                                   ,ut.fIntWithCommas(count(ds_seleid_lost_inactive_cluster) +  count(ds_seleid_changed_status_Inactive_To_Active) + count(ds_seleid_changed_status_Inactive_To_Defunct)) }
     ,{'Total Inactive Clusters in common'                                     ,ut.fIntWithCommas(count(ds_proj_all(trim(new_status) = 'I' and trim(old_status) = 'I')))  }
@@ -464,9 +472,9 @@ functionmacro
 
   ds_defunct_stats := dataset([
      {'-----------Overall stats------------------','---------------'}
-    ,{'New file (Sprint ' + trim(new_sprint) + ', ' + trim(new_version) + ')' ,ut.fIntWithCommas(count(ds_get_statuses_built(trim(seleid_status) = 'D'))) }
-    ,{'Old file (Sprint ' + trim(old_sprint) + ', ' + trim(old_version) + ')' ,ut.fIntWithCommas(count(ds_get_statuses_base (trim(seleid_status) = 'D'))) }  
-    ,{'Overall difference(+/-)'                                               ,ut.fIntWithCommas(count(ds_get_statuses_built(trim(seleid_status) = 'D')) - count(ds_get_statuses_base (trim(seleid_status) = 'D')) ) }
+    ,{'New file (Sprint ' + trim(new_sprint) + ', ' + trim(new_version) + ')' ,ut.fIntWithCommas(count(ds_get_statuses_built(trim(pActive_Fieldname2) = 'D'))) }
+    ,{'Old file (Sprint ' + trim(old_sprint) + ', ' + trim(old_version) + ')' ,ut.fIntWithCommas(count(ds_get_statuses_base (trim(pActive_Fieldname2) = 'D'))) }  
+    ,{'Overall difference(+/-)'                                               ,ut.fIntWithCommas(count(ds_get_statuses_built(trim(pActive_Fieldname2) = 'D')) - count(ds_get_statuses_base (trim(pActive_Fieldname2) = 'D')) ) }
     ,{'Total Clusters gained'                                                 ,ut.fIntWithCommas(count(ds_seleid_new_defunct_cluster) + count(ds_seleid_changed_status_active_To_Defunct + ds_seleid_changed_status_inactive_To_defunct) ) }
     ,{'Total clusters lost'                                                   ,ut.fIntWithCommas(count(ds_seleid_lost_defunct_cluster) +  count(ds_seleid_changed_status_defunct_To_Active) + count(ds_seleid_changed_status_defunct_To_Inactive) )}
     ,{'Total Defunct Clusters in common'                                      ,ut.fIntWithCommas(count(ds_proj_all(trim(new_status) = 'D' and trim(old_status) = 'D')) ) }
@@ -559,10 +567,20 @@ functionmacro
     ,output(sort(ds_gold_calculations_summary                                                             ,-(unsigned)STD.Str.FilterOut(total_seleids,',') )  ,named('Details_Of_All_Gold_Seleids'                        ),all)
     ,output(sort(ds_src_status_breakdown                                                                  ,-(unsigned)STD.Str.FilterOut(total_seleids,',') )  ,named('Details_Of_All_Active_Seleids'                      ),all)
      
+// Get samples of clusters that were gold because of being in the hierarchy, but are not considered gold anymore. 
+// Get samples of clusters that were not gold before because there were not lgid3 linkable, but are now gold.  For thin records(not lgid3 linkable), may need to add requirements to have at least cnp_name, or fein, or corpkey, etc.
 
     ,output('--------------Gold Status Changes Examples---------------------------------' ,named('____Gold_Status_Changes_Examples____'))
     ,output(choosen(ds_find_gold_diffs_all(isgold_new = true   and exists(new_sources)  and ~exists(old_sources)                          ),300)  ,named('Brand_new_Gold_Seleids'                  ),all)
     ,output(choosen(ds_find_gold_diffs_all(isgold_new = true   and isgold_old = false   and  exists(old_sources)                          ),300)  ,named('Seleids_switched_from_Non_Gold_to_Gold'  ),all)
+
+
+    ,output(choosen(ds_find_gold_diffs_all(isgold_new = true   and isgold_old = false   and  exists(old_sources) and gold_calc_new(trim(calculation) = 'AND (inHrchy OR isLgid3Linkable)')[1].result = false ),300)  ,named('Seleids_switched_from_Non_Gold_to_Gold_not_Lgid3Linkable'  ),all)
+
+
+    ,output(choosen(ds_find_gold_diffs_all(isgold_old = true   and isgold_new = false   and  exists(new_sources) and gold_calc_new(regexfind('AND inHrchy'        ,calculation,nocase))[1].result = true  ),300)  ,named('Seleids_switched_from_Gold_to_Non_gold_inHrchy'         ),all)
+    ,output(choosen(ds_find_gold_diffs_all(isgold_old = true   and isgold_new = false   and  exists(new_sources) and gold_calc_new(regexfind('AND isLgid3Linkable',calculation,nocase))[1].result = true  ),300)  ,named('Seleids_switched_from_Gold_to_Non_gold_Lgid3Linkable'   ),all)
+
     ,output(choosen(ds_find_gold_diffs_all(isgold_old = true   and isgold_new = false   and  exists(new_sources)                          ),300)  ,named('Seleids_switched_from_Gold_to_Non_gold'  ),all)
     ,output(choosen(ds_find_gold_diffs_all(isgold_new = false  and exists(new_sources)  and ~exists(old_sources)                          ),300)  ,named('Brand_new_Not_Gold_Seleids'              ),all)
     ,output(choosen(ds_find_gold_diffs_all(isgold_old = true   and ~exists(new_sources)                                                   ),300)  ,named('Gold_Seleids_that_disappeared'           ),all)

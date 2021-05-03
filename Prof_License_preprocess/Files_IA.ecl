@@ -1,4 +1,4 @@
-EXPORT Files_IA := module
+﻿EXPORT Files_IA := module
 
 medicalrec := record                       
    string  LastName;         
@@ -6,13 +6,14 @@ medicalrec := record
    string  MiddleName;       
    string Suffix;            
    string  AddressLine1;     
-   string  AddressLine2;     
+//   string  AddressLine2;     
    string  City;             
    string  State;            
-   string  Zipcode;          
+   string  Zipcode; 
+   string County;            
    string LicenseType;       
    string BirthYear;         
-   string County;            
+//   string County;            
    string  BusinessPhone;    
    string  ExpirationDate;   
    string  MedicalSchool;    

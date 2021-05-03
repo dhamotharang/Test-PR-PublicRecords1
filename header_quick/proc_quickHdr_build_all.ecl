@@ -90,7 +90,7 @@ EXPORT proc_quickHdr_build_all (
 			bld_prepped,
 			output(Header.Mod_CreditBureau_address.stats,named('nlr_counts')),
 			bld_key,
-			_control.fSubmitNewWorkunit('#workunit(\'name\',\'Scrubs_Equifax_Monthly\');\r\n'+'Scrubs_Equifax_Monthly.proc_generate_report();','thor400_60')
+			_control.fSubmitNewWorkunit('#workunit(\'name\',\'Scrubs_Equifax_Monthly\');\r\n'+'Scrubs_Equifax_Monthly.proc_generate_report();','thor400_44_eclcc')
 		),
 		output('No Monthly Files available')
 	);
@@ -106,10 +106,10 @@ EXPORT proc_quickHdr_build_all (
 		header_quick._config(sourceIP, sourcePathMonthly).set_v_version(overwriteMonthlyFileDate),
 		header_quick._config(sourceIP, sourcePathWeekly).set_v_eq_as_of_date(overwriteWeeklyFileDate),
 		Header.mac_runIfNotCompleted ('QuickHeader',filedate, doWeekly,200),
-		Header.mac_runIfNotCompleted ('QuickHeader',filedate, doMonthly,300),
-		Header.mac_runIfNotCompleted ('QuickHeader',filedate, notify('Build_Header_Ingest', '*'),400),
-		Header.mac_runIfNotCompleted ('QuickHeader',filedate, header_quick.Inputs_Clear,500),
-		Header.mac_runIfNotCompleted ('QuickHeader',filedate, header_quick.Inputs_Set(filedate),600),
+		Header.mac_runIfNotCompleted ('QuickHeader',filedate, doMonthly,300),		
+		Header.mac_runIfNotCompleted ('QuickHeader',filedate, header_quick.Inputs_Clear,400),
+		Header.mac_runIfNotCompleted ('QuickHeader',filedate, header_quick.Inputs_Set(filedate),500),
+		Header.mac_runIfNotCompleted ('QuickHeader',filedate, notify('Build_Header_Ingest', '*'),600),
 		Header.mac_runIfNotCompleted ('QuickHeader',filedate, buildAll, 700),
 		Header.mac_runIfNotCompleted ('QuickHeader',filedate,QA_sample, 800) /*,Source_Check_rep*/
 	);

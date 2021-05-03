@@ -1,10 +1,11 @@
-export out_STRATA_population_stats(pAssess
+﻿export out_STRATA_population_stats(pAssess
                                   ,pDeed
 																	,pAddlftax
 																	,pAddlfdeed
 																	,pAddllegal
 																	,pAddlnames
                                   ,pParty
+																	//,pAddlNameInfo
 																	,pVersion
 																	,zOut
 																	,isFast) := MACRO
@@ -34,6 +35,8 @@ import STRATA;
 	#uniquename(dPopulationStats_paddlnames);
 	#uniquename(rPopulationStats_pParty);
 	#uniquename(dPopulationStats_pParty);
+	//#uniquename(rPopulationStats_pAddlNameInfo);
+	//#uniquename(dPopulationStats_pAddlNameInfo);
 	
 	#uniquename(zAssesStats);
 	#uniquename(zAssesPlusStats);
@@ -45,6 +48,7 @@ import STRATA;
 	#uniquename(zaddllegalStats);
 	#uniquename(zaddlnamesStats);
 	#uniquename(zPartyStats);
+	#uniquename(zaddlNameInfoStats);
 
 	//DETERMINE FULL OR DELTA FILE
 		%buildPrefix% 			:= if(isFast, 'LN Property V2 Delta', 'LN Property V2');
@@ -849,7 +853,16 @@ import STRATA;
 				ln_estate_trust_date_CountNonBlank									 := sum(group,if(pParty.ln_estate_trust_date<>'',1,0));
 				ln_goverment_type_CountNonBlank											 := sum(group,if(pParty.ln_goverment_type<>'',1,0));
 		end;
-
+		
+		//ADDL NAME INFO -future use
+	/*	%rPopulationStats_pAddlNameInfo% := record
+				CountGroup                              := count(group);
+				string3  grouping                       := 'ALL';
+				ln_fares_id_CountNonBlank               := sum(group,if(pAddlNameInfo.ln_fares_id<>'',1,0));
+				other_borrower_names_CountNonBlank      := sum(group,if(pAddlNameInfo.other_borrower_names<>'',1,0));
+				other_lender_names_CountNonBlank        := sum(group,if(pAddlNameInfo.other_lender_names<>'',1,0));    
+		end;
+	*/
 
 	//OUTPUT ASSESS STATS
 		%dPopulationStats_pAsses% 		:= table(pAssess
@@ -991,8 +1004,22 @@ import STRATA;
 													 ,%zaddlnamesStats%
 													 ,'view'
 													 ,'Population');
-					 				 
-zOut := parallel(%zAssesStats%,%zAssesPlusStats%,%zPartyStats%,%zdeedStats%,%zaddlftaxStats%,%zaddlftaxPlusStats%,%zaddlfdeedStats%,%zaddlfdeedPlusStats%,%zaddllegalStats%,%zaddlnamesStats% )
+													 
+	//OUTPUT ADDL NAMES INFO STATS
+/* 	%dPopulationStats_pAddlNameInfo% 		:= table(pAddlNameInfo
+																						,%rPopulationStats_pAddlNameInfo%
+																						,few);
+																				
+	STRATA.createXMLStats(%dPopulationStats_pAddlNameInfo%
+													 ,%buildPrefix%
+													 ,'addl name info'
+													 ,pVersion
+													 ,''
+													 ,%zaddlNameInfoStats%
+													 ,'view'
+													 ,'Population');
+*/					 				 
+zOut := parallel(%zAssesStats%,%zAssesPlusStats%,%zPartyStats%,%zdeedStats%,%zaddlftaxStats%,%zaddlftaxPlusStats%,%zaddlfdeedStats%,%zaddlfdeedPlusStats%,%zaddllegalStats%,%zaddlnamesStats%/*,%zaddlNameInfoStats% */)
 
 /*zOut := parallel(output(%dPopulationStats_pAsses%, named('assess')),
 									output(%dPopulationStats_pAssesPlus%, named('assessPlus')),

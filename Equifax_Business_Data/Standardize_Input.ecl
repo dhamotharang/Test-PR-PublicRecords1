@@ -367,9 +367,8 @@ EXPORT fPreProcess(DATASET(Equifax_Business_Data.Layouts.Sprayed_Input) pRawInpu
 							,STRING  pPersistname = Equifax_Business_Data.Persistnames().StandardizeInput
 	           ) := FUNCTION
 						 
-		dPreprocess	:= fPreProcess(pRawFileInput, pversion) : 
-		// PERSIST(pPersistname)
-		PERSIST(pPersistname, REFRESH(TRUE), SINGLE)
+		dPreprocess	:= fPreProcess(pRawFileInput, pversion)  
+		: PERSIST(pPersistname,SINGLE)
 		;
 
 		RETURN dPreprocess;

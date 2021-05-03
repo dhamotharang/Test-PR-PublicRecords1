@@ -1,19 +1,20 @@
-// DES0846 / Delaware Division of Professional Regulation / Multiple Professions //
+﻿// DES0846 / Delaware Division of Professional Regulation / Multiple Professions //
 EXPORT layout_DES0846 := RECORD
 
-	string20			SLNUM;
+	
 	string120			ORG_NAME;
-	string50			FIRST_NAME;
-	string20			MIDDLE_NAME;
-	string50			LAST_NAME;
+	string20			SLNUM;
 	string100			LIC;
+	string20			LIC_STAT;
+	// string50			FIRST_NAME;
+	// string20			MIDDLE_NAME;
+	// string50			LAST_NAME;
+	string10			ISSUEDT;
+	string10			EXPDT;
 	string50			CITY_1;
 	string2				STATE_1;
 	string10			ZIP;
-	string20			LIC_STAT;
-	string10			ISSUEDT;
-	string10			EXPDT;
-	string50			COUNTY;
+	// string50			COUNTY;
 	string50			COUNTRY_1;
 	
 END;

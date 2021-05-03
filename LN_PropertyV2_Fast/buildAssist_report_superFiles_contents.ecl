@@ -1,4 +1,4 @@
-// Lists content of archive, raw and prep super files
+﻿// Lists content of archive, raw and prep super files
 // ensure result limit is high enough (take 1000 or more)
 import std;
 FsLogicalFileNameRecord := RECORD 
@@ -35,6 +35,7 @@ end;
 						+addToReport(LN_PropertyV2_Fast.FileNames.prep.addl_frs_a,'prep')
 						+addToReport(LN_PropertyV2_Fast.FileNames.prep.addl_frs_d,'prep')
 						+addToReport(LN_PropertyV2_Fast.FileNames.prep.search_prp,'prep')
+						//+addToReport(LN_PropertyV2_Fast.FileNames.prep.addl_name_info,'prep') //Additional BK A&R file
 						// RAW
 						+addToReport(LN_PropertyV2_Fast.FileNames.raw.bk.assessment,'raw')
 						+addToReport(LN_PropertyV2_Fast.FileNames.raw.bk.deed,'raw')
@@ -44,7 +45,9 @@ end;
 						+addToReport(LN_PropertyV2_Fast.FileNames.raw.bk.mortgage_repl,'raw')
 						+addToReport(LN_PropertyV2_Fast.FileNames.raw.frs.assessment,'raw')
 						+addToReport(LN_PropertyV2_Fast.FileNames.raw.frs.assessment_ptu,'raw')
-						+addToReport(LN_PropertyV2_Fast.FileNames.raw.frs.deed,'raw')				
+						+addToReport(LN_PropertyV2_Fast.FileNames.raw.frs.deed,'raw')
+						// +addToReport(LN_PropertyV2_Fast.FileNames.raw.BK_AR.assignment,'raw') //New BK Mortgage Assignment file
+						// +addToReport(LN_PropertyV2_Fast.FileNames.raw.BK_AR.release,'raw')	//New BK Mortgage Release file
 						 // ARCHIVE
 						+addToReport(LN_PropertyV2_Fast.FileNames.raw.bk.assessment+'_archive','archive')
 						+addToReport(LN_PropertyV2_Fast.FileNames.raw.bk.deed+'_archive','archive')

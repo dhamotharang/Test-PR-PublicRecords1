@@ -2,10 +2,52 @@
 
 export Build_Keys(string pversion) :=
 module
+ 
+	companies_dist 	:= distribute(Equifax_Business_Data.Files().Base.Companies.Built,hash64(efx_id));
+	sortCompanies   := sort(companies_dist(efx_id != ''), efx_id, -dt_last_seen, record_type, normCompany_type, local);
+  contacts_dist 	:= distribute(Equifax_Business_Data.Files().Base.Contacts.Built,hash64(efx_id));
+	sortContacts    := sort(contacts_dist(efx_id != ''), efx_id, -dt_last_seen, local);
+			
+	dx_Equifax_Business_Data.Layout_KeyBase AppendCompanyInfo(Layouts.Base l, Layouts.Base_contacts r) :=
+	transform
+	  self.contact_dt_first_seen							:= r.dt_first_seen;
+		self.contact_dt_last_seen							  := r.dt_last_seen;
+		self.contact_dt_vendor_first_reported	  := r.dt_vendor_first_reported;
+		self.contact_dt_vendor_last_reported		:= r.dt_vendor_last_reported;
+		self.contact_record_type					      := r.record_type; 
+	  self.contact_title					            := r.clean_name.title;
+	  self.contact_fname					            := r.clean_name.fname;
+	  self.contact_mname					            := r.clean_name.mname;
+	  self.contact_lname					            := r.clean_name.lname;
+	  self.contact_name_suffix		            := r.clean_name.name_suffix;
+	  self.contact_name_score			            := r.clean_name.name_score;
+		self.contact_raw_aid							      := r.raw_aid;
+		self.contact_ace_aid							      := r.ace_aid;
+		self.efx_contct                         := r.efx_contct;
+		self.efx_titlecd                        := r.efx_titlecd;
+		self.efx_titledesc                      := r.efx_titledesc;
+		self.efx_lastnam                        := r.efx_lastnam;
+		self.efx_fstnam                         := r.efx_fstnam;
+		self.efx_email                          := r.efx_email;
+		self.efx_date                           := r.efx_date;
+		self.exploded_title_description         := r.exploded_title_description;
+		self := l;
+		self := [];
+	end;		
+	
+	// Get all company records that are in the valid date range window, then select best one after join
+	contacts_getcompanyinfo := join(
+														 sortCompanies
+														,sortContacts
+														,left.efx_id = right.efx_id 
+														,AppendCompanyInfo(left,right)
+														,left outer
+														,local
+											      );
 
   // Build New Key file
 	RoxieKeyBuild.Mac_SK_BuildProcess_v3_local( dx_Equifax_Business_Data.Key_LinkIds.Key
-																						 ,Equifax_Business_Data.Files().Base.Built
+																						 ,contacts_getcompanyinfo
 																						 ,dx_Equifax_Business_Data.keynames().LinkIds.QA
 																						 ,dx_Equifax_Business_Data.keynames(pversion,false).LinkIds.New
 																				 		 ,BuildLinkIdsKey);  
@@ -270,7 +312,7 @@ module
 	export full_build :=
 	
 	sequential(
-			 BuildLinkIdsKey
+			BuildLinkIdsKey
 		  ,Promote(pversion).BuildFiles.New2Built
 			,DeltaCommands
 	);

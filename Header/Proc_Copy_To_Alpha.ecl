@@ -1,43 +1,66 @@
-﻿IMPORT ut,Data_Services,_control,data_services, dops, wk_ut;
+﻿IMPORT ut,Data_Services,_control,data_services,STD,DOPS;
+EXPORT Proc_Copy_To_Alpha(string pversion='') := MODULE
 
-EXPORT Proc_Copy_To_Alpha(string pversion) := FUNCTION
+        aEsp                 := _control.IPAddress.aprod_thor_esp;
+        bEsp                 := data_services.foreign_prod;
+        aCluster             := 'thor400_112';
+        
+        l := bEsp;//Data_Services.Data_location.person_header;
+        SHARED old_copy_to_alpha(string lfn):= fileservices.RemotePull(
 
-	flagFileName 	:= 'thor_data400::flag::personHeader::boca::hhid_copy_';
-	createFlagFile := output(dataset([{pversion}],{string9 version}),,'~'+flagFileName,overwrite);
+                                'http://'+aEsp+':8010/FileSpray',
+                                bEsp+lfn,aCluster,
+                                '~'+lfn,
+                                /*tmOut*/,/*maxConn*/,/*ovrt*/,/*relct*/,/*asSuper*/,/*frcPsh*/,/*bfrSz*/,/*wrp*/,true) ;
 
-	lfn1 := 'thor_data400::base::hhid_'+pversion;
-	lfn2 := 'thor_data400::key::header::hhid::'+pversion+'::did.ver';
-	lfn3 := 'thor_data400::key::header::hhid::'+pversion+'::hhid.ver';
-	lfn4 := 'thor400_44::base::hss_household_'+pversion;
-	lfn5 := 'thor_data400::key::header::'+pversion+'::hhid';
-	lfn6 := flagFileName;
+        SHARED copy_to_alpha(dataset(DOPS.Layout_filelist) filesToCopy):=DOPS.CopyFiles(
+
+            _control.IPAddress.prod_thor_esp,    //  string srcesp
+            _control.IPAddress.aprod_thor_esp,   // ,string destesp
+            _control.IPAddress.prod_thor_dali,   // ,string srcdali
+            _control.IPAddress.aprod_thor_dali,  // ,string destdali
+            'thor400_112',                       // ,string destcluster
+            ,                                    // ,set of string insrccluster = []
+            ,                                    // ,string filepattern = ''
+            filesToCopy,// ,dataset(dops.Layout_filelist) ds = dataset([],dops.Layout_filelist)
+            ,// ,string dstSubNameSuffix = ''
+            workunit, //,string uniquearbitrarystring = 'uniquenameforthisjob' // this string will be used in filename
+                                                            // to uniquely represent the filename CopyFileList_FileName
+            true// ,boolean copywithsoap = false
+            // ,boolean usecredentials = false
+
+        ).RUN;
+
+        EXPORT hhid:=ORDERED(
+
+                                 copy_to_alpha(dataset([
+                
+                    {'thor_data400::base::hhid_'+pversion                                  ,''},
+                    {'thor_data400::key::header::hhid::'+pversion+'::did.ver'              ,''},
+                    {'thor_data400::key::header::hhid::'+pversion+'::hhid.ver'             ,''},
+                    {'thor400_44::base::hss_household_'+pversion                           ,''},
+                    {'thor_data400::key::header::'+pversion+'::hhid'                       ,''},
+                    {'thor_data400::key::header::'+pversion+'::city_name.st.percent_chance',''}
+
+                    ],DOPS.Layout_filelist)),
+                    
+                    Header.Monitor_cron_job_in_Alpharetta.check;
+                    
+        );
+        GetLogical(STRING super):=NOTHOR(STD.File.SuperFileContents(super)[1].name);
+        
+        EXPORT watchdog:= ORDERED(
+
+                                        copy_to_alpha(dataset([
                         
-	string srcesp       := _control.IPAddress.prod_thor_esp;
-	string destesp      := _control.IPAddress.aprod_thor_esp;
-	string srcdali      := _control.IPAddress.prod_thor_dali;
-	string destdali     := _control.IPAddress.aprod_thor_dali;
-	string destcluster  := 'thor400_112';
-	set of string insrccluster := ['thor400_44'];
-	string filepattern := '';
-	dataset(dops.Layout_filelist) ds := dataset([{lfn1, ''}, {lfn2, ''}, {lfn3, ''}, {lfn4, ''}, {lfn5, ''}, {lfn6, ''}],dops.Layout_filelist);
-	string dstSubNameSuffix := '';
-	string uniquearbitrarystring := 'Header_hhid_files';
-	boolean copywithsoap   := false;
-	boolean usecredentials := true;
+                        {GetLogical('~thor_data400::key::watchdog_QA'              ),''},
+                        {GetLogical('~thor_data400::key::header.minors_hash_QA'    ),''},
+                        {GetLogical('~thor_data400::key::did_death_masterv2_ssa_QA'),''}
+                    
+                    ],DOPS.Layout_filelist)),
 
-	ECL := '\n'
-		+'#WORKUNIT(\'name\',\'Copy hhid files to Alpha\');\n'
-		+'#WORKUNIT(\'protect\',true);\n\n'
-		+'import Dops;\n\n'
-        +'set of string insrccluster := [\'thor400_44\'];\n\n'
-        +'boolean copywithsoap   := false;\n\n'
-        +'boolean usecredentials := true;\n\n'
-        +'dataset(dops.Layout_filelist) ds := dataset([{\'' + lfn1 + '\', \'\'}, {\'' + lfn2 + '\', \'\'}, {\'' + lfn3 + '\', \'\'}, {\'' + lfn4 + '\', \'\'}, {\'' + lfn5 + '\', \'\'}, {\'' + lfn6 + '\', \'\'}],dops.Layout_filelist);\n\n'
-		+'Dops.CopyFiles(\'' + srcesp + '\',\'' + destesp + '\',\'' + srcdali + '\',\'' + destdali + '\',\'' + destcluster + '\', insrccluster,\'' +  filepattern + '\',ds,\'' +  dstSubNameSuffix + '\',\'' + uniquearbitrarystring + '\',copywithsoap,usecredentials).Run;\n\n';
-		
-	return sequential(				
-		createFlagFile,
-		wk_ut.CreateWuid(ECL,'hthor',wk_ut._constants.ProdEsp)
-	);
+                    Header.Monitor_cron_job_in_Alpharetta.check;
+
+        );
 
 end;

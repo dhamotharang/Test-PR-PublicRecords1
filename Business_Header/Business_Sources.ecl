@@ -32,6 +32,7 @@
 	,ln_propertyv2
 	,lobbyists
 	,martindale_hubbell
+	,onekey
 	,oshair
 	,prof_license
 	,Redbooks
@@ -61,7 +62,7 @@ module
 		+ Bankruptcy_Attorney_Trustee.Attorney_As_Business_Header		
 		+ bbb2.BBB_As_Business_Header
 		+ busdata.Accurint_Tradeshow_As_Business_Header
-		+ busdata.SKA_As_Business_Header
+		//+ busdata.SKA_As_Business_Header						// Replaced with OneKey mapper below
 		+ BusReg.BusReg_As_Business_Header().Busreg
 		+ CALBUS.CALBUS_As_Business_Header
 		+ Corp2.As_Business_Header.corp
@@ -102,6 +103,7 @@ module
 		+ ln_propertyv2.LN_Propertyv2_as_Business_Header()
 		//+ lobbyists.Cleaned_Lobbyists_As_Business_Header		//Not being updated, and the base file is missing. So, removing the code since the data already exists in the Business header file.
 		+ martindale_hubbell.As_Business_Header().Organizations
+		+ OneKey.OneKey_As_Business_Header							// DF-26195 - SK&A Record Layout Changes Final - SKA is now OneKey.
 		+ OSHAIR.OSHAIR_Inspection_As_Business_Header
 		+ Prof_License.Prof_License_As_Business_Header()
 		+ RedBooks.As_Business_Header()
@@ -126,7 +128,7 @@ module
 		+ BankruptcyV2.Bankruptv2_As_Business_Contact
 		+ Bankruptcy_Attorney_Trustee.Attorney_As_Business_Contact
 		+ BusData.Accurint_Tradeshow_As_Business_Contact
-		+ BusData.SKA_As_Business_Contact
+		//+ BusData.SKA_As_Business_Contact							// Replaced with OneKey mapper below
 		+ BusReg.BusReg_As_Business_Contact().Busreg
 		+ CALBUS.Calbus_As_Business_Contact
 		+ Corp2.As_Business_Contact.cont
@@ -163,6 +165,7 @@ module
 		+ ln_propertyv2.LN_Propertyv2_as_Business_Contact()
 		//+ lobbyists.Cleaned_Lobbyists_As_Business_Contact    //Not being updated, and the base file is missing. So, removing the code since the data already exists in the Business header file.
 		+ Martindale_Hubbell.As_Business_Contact().Individuals
+		+ OneKey.OneKey_As_Business_Contact						// DF-26195 - SK&A Record Layout Changes Final - SKA is now OneKey.
 		+ Prof_License.Prof_License_As_Business_Contact()
 		+ RedBooks.As_Business_Contact()
 		+ SDA_SDAA.SDA_SDAA_As_Business_contact

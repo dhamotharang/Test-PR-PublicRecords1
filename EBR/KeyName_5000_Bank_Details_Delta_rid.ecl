@@ -1,0 +1,1 @@
+﻿﻿EXPORT KeyName_5000_Bank_Details_Delta_rid := trim(GetSegmentKeyName_Delta_RID('5000'));

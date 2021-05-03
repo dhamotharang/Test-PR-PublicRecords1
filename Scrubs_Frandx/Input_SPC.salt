@@ -1,0 +1,62 @@
+﻿OPTIONS:-gh
+MODULE:Scrubs_Frandx
+FILENAME:Frandx
+NAMESCOPE:Input
+// Uncomment up to NINES for internal or external adl
+// IDFIELD:EXISTS:<NameOfIDField>
+// RIDFIELD:<NameOfRidField>
+// RECORDS:<NumberOfRecordsInDataFile>
+// POPULATION:<ExpectedNumberOfEntitiesInDataFile>
+// NINES:<Precision required 3 = 99.9%, 2 = 99% etc>
+// Uncomment Process if doing external adl
+// PROCESS:<ProcessName>
+// FIELDTYPE statements can be used to clean up (or check the cleaning) of individual fields
+// BESTTYPE statements declare methods of generating the best value for a given cluster; this can also improve linking
+// FUZZY can be used to create new types of FUZZY linking
+// Remember to generate specificities and update the 0,0 placeholders below before running any sort of linking.
+// If the actual specificity for a field is <1, round it up to 1 rather than down to 0.  If your cluster is running
+// a shared repository, calling SALTTOOLS30.mac_Patch_SPC from the bottom of BWR_Specificities may be a convenience.
+
+//FIELDTYPE DEFINITIONS
+FIELDTYPE:invalid_alpha:CUSTOM(Scrubs.Functions.fn_ASCII_printable>0)
+FIELDTYPE:invalid_company_name:CUSTOM(Scrubs.Functions.fn_ASCII_printable>0)
+FIELDTYPE:invalid_franchisee_id:CUSTOM(Scrubs.Functions.fn_numeric>0,6)
+FIELDTYPE:invalid_fruns:CUSTOM(Scrubs.Functions.fn_numeric>0,5)
+FIELDTYPE:invalid_industry_type:ENUM(NON-FOOD|FOOD)
+FIELDTYPE:invalid_nonempty_number:CUSTOM(Scrubs.Functions.fn_numeric>0)
+FIELDTYPE:invalid_numeric:ALLOW(0123456789)
+FIELDTYPE:invalid_phone:CUSTOM(Scrubs.Functions.fn_verify_optional_phone>0)
+FIELDTYPE:invalid_relationship_code:ENUM(ST|AD|AR)
+FIELDTYPE:invalid_secondary_phone:CUSTOM(Scrubs.Functions.fn_verify_optional_phone>0)
+FIELDTYPE:invalid_sic_code:CUSTOM(Scrubs.functions.fn_valid_SicCode > 0)
+FIELDTYPE:invalid_state:CUSTOM(Scrubs.Functions.fn_verify_state>0)
+FIELDTYPE:invalid_unit_flag:ENUM(U|H|UN|HQ))
+FIELDTYPE:invalid_zip_code:CUSTOM(Scrubs.Functions.fn_numeric>0,5)
+FIELDTYPE:invalid_zip_code4:CUSTOM(Scrubs.Functions.fn_numeric_optional>0,4)
+
+//FIELD DEFINITIONS
+FIELD:address1:TYPE(STRING):LIKE(invalid_alpha):0,0
+FIELD:address2:TYPE(STRING):0,0
+FIELD:brand_name:TYPE(STRING):LIKE(invalid_alpha):0,0
+FIELD:city:TYPE(STRING):LIKE(invalid_alpha):0,0
+FIELD:company_name:TYPE(STRING):LIKE(invalid_company_name):0,0
+FIELD:exec_full_name:TYPE(STRING):0,0
+FIELD:franchisee_id:TYPE(STRING):LIKE(invalid_franchisee_id):0,0
+FIELD:fruns:TYPE(STRING):LIKE(invalid_fruns):0,0
+FIELD:industry:TYPE(STRING):LIKE(invalid_alpha):0,0
+FIELD:industry_type:TYPE(STRING):LIKE(invalid_industry_type):0,0
+FIELD:phone:TYPE(STRING):LIKE(invalid_phone):0,0
+FIELD:phone_extension:TYPE(STRING):LIKE(invalid_numeric):0,0
+FIELD:record_id:TYPE(STRING):LIKE(invalid_nonempty_number):0,0
+FIELD:relationship_code:TYPE(STRING):LIKE(invalid_relationship_code):0,0
+FIELD:secondary_phone:TYPE(STRING):LIKE(invalid_secondary_phone):0,0
+FIELD:sector:TYPE(STRING):LIKE(invalid_alpha):0,0
+FIELD:sic_code:TYPE(STRING):LIKE(invalid_sic_code):0,0
+FIELD:state:TYPE(STRING):LIKE(invalid_state):0,0
+FIELD:unit_flag:TYPE(STRING):LIKE(invalid_unit_flag):0,0
+FIELD:zip_code:TYPE(STRING):LIKE(invalid_zip_code):0,0
+FIELD:zip_code4:TYPE(STRING):LIKE(invalid_zip_code4):0,0
+// CONCEPT statements should be used to group together interellated fields; such as address
+// RELATIONSHIP is used to find non-obvious relationships between the clusters
+// SOURCEFIELD is used if a field of the file denotes a source of the records in that file
+// LINKPATH is used to define access paths for external linking

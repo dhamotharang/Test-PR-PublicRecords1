@@ -2,119 +2,86 @@
 
 /*
 
-	Perform preliminary processing
-		1.	Field level validation
-		2.	Set dates
+	Perform preliminary processing on a new file or superfile
+    1. Remove duplicate record types. The last record in the file is used	
+    2. Field level validation
+		2. Rollup up records in the case of 
 
 */
 
+string uc(string s) := Std.Str.ToUpperCase(s);
+string fix(string s) := Std.Str.CleanSpaces(uc(Std.Str.SubstituteIncluded(s,'._',' ')));
 
-RightNow := Std.Date.Today();
+GetCases(string ilfn) := PROJECT(
+		SORT(DISTRIBUTE($.ExtractRecords(ilfn).cases, hash32(CaseId)),
+					CaseId, filename, seqnum, LOCAL),
+				TRANSFORM($.Layouts2.rCaseEx,
+					self.ProgramState := uc(left.ProgramState);
+					self.CountyName := uc(left.CountyName);
+					self := left;
+			));
 
-GetFileName(string ilfn) := FUNCTION
-		s1 := Std.Str.FindReplace(ilfn, '::', ' ');
-		n := Std.Str.WordCount(s1);
-		return Std.Str.GetNthWord(s1, n);
-END;
-																	
-EXPORT PreprocessNCF2(string ilfn) := function
-
-	r1 := RECORD
-		string	text;
-	END;
-	ds := dataset(ilfn, r1, CSV)(LENGTH(TRIM(text,left,right)) > 4);
-
-	nacin := PROJECT(ds, TRANSFORM(Nac_V2.Layouts2.rNac2,
-				string4 rc := left.text[1..4];
-				len := MIN(LENGTH(left.text), 484);
-				string484 text := left.text[5..len] + IF(len < 484, Std.Str.Repeat(' ', 484-len), '');
-				self.CaseRec := IF(rc='CA01', TRANSFER(text, Nac_V2.Layouts2.rCase - RecordCode));
-				self.ClientRec := IF(rc='CL01', TRANSFER(text, Nac_V2.Layouts2.rClient - RecordCode));
-				self.AddressRec := IF(rc='AD01', TRANSFER(text, Nac_V2.Layouts2.rAddress - RecordCode));
-				self.StateContactRec := IF(rc='SC01', TRANSFER(text, Nac_V2.Layouts2.rStateContact - RecordCode));
-				self.ExceptionRec := IF(rc='EX01', TRANSFER(text, Nac_V2.Layouts2.rException - RecordCode));
-				self.BadRec := IF(rc NOT IN Nac_V2.Layouts2.validRecordCodes, TRANSFER(text, Nac_V2.Layouts2.rBadRecord - RecordCode));
-				self.RecordCode := rc;
-				));
+GetClients(string ilfn) := PROJECT(
+		SORT(DISTRIBUTE($.ExtractRecords(ilfn).clients, hash32(ClientId,CaseId)),
+					ClientId, CaseId, Eligibility, filename, seqnum, LOCAL),
+				//	ClientId, CaseId, Eligibility, filename, LOCAL),
+				TRANSFORM($.Layouts2.rClientEx,
+					self.ProgramState := uc(left.ProgramState);
+					self.LastName := fix(left.LastName);
+					self.FirstName := fix(left.FirstName);
+					self.MiddleName := fix(left.MiddleName);
+					self.NameSuffix := fix(left.NameSuffix);
+					self.Email := TRIM(left.email,left,right);
+					self := left;
+			));
 				
-	fname := GetFileName(ilfn);
-	gid := Std.Str.ToUpperCase(fname[6..9]);
+GetAddresses(string ilfn) := PROJECT(
+		SORT(DISTRIBUTE($.ExtractRecords(ilfn).addresses, hash32(CaseId, ClientId)),
+					CaseId, ClientId, AddressType, filename, seqnum, LOCAL),
+					TRANSFORM($.Layouts2.rAddressEx,
+						self.ProgramState := uc(left.ProgramState);
+						self.Street1 := uc(left.Street1);
+						self.Street2 := uc(left.Street2);
+						self.City := uc(left.City);
+						self.State := uc(left.State);						
+						self := left;
+			));
 
-	cases := 	Nac_V2.mod_Validation.CaseFile(
-							PROJECT(nacin(RecordCode = 'CA01'), TRANSFORM(Nac_V2.Layouts2.rCaseEx,
-										self := LEFT.CaseRec;
-										self.RecordCode := left.RecordCode;
-										self.GroupId := gid;
-										self.OrigGroupId := gid;
-										self.filename := fname;
-										self.Created := RightNow;
-										self.Updated := RightNow;
-										self := [];
-										)),
-							);
+GetContacts(string ilfn) := DEDUP(SORT(DISTRIBUTE(
+				PROJECT($.ExtractRecords(ilfn).contacts,
+						TRANSFORM($.Layouts2.rStateContactEx;
+							self.ProgramState := uc(left.ProgramState);
+							self.ContactName := fix(left.ContactName);
+							self := left;
+						)),
+				hash32(contactname)),
+				contactname, programstate, programcode, programregion, programcounty, caseid, clientid,updatetype,
+				filename, seqnum, local),
+				contactname, programstate, programcode, programregion, programcounty, caseid, clientid,updatetype,
+				right, local);
 
-	 clients1 := 	NAC_V2.proc_CleanClients(
-									Nac_V2.mod_Validation.ClientFile(
-										PROJECT(nacin(RecordCode = 'CL01'), TRANSFORM(Nac_V2.Layouts2.rClientEx,
-											self := LEFT.ClientRec;
-											self.RecordCode := left.RecordCode;
-											self.GroupId := gid;
-											self.OrigGroupId := gid;
-											self.filename := fname;
-											self.Created := RightNow;
-											self.Updated := RightNow;
-											self := [];
-											)
-										),
-									)
-								);
+GetExceptions(string ilfn) := $.ExtractRecords(ilfn).exceptions;
+																	
+EXPORT PreprocessNCF2(string ilfn) := function	
+
+	cases := 	Nac_V2.mod_Validation.CaseFile(GetCases(ilfn));
+
+	clients1 := 	NAC_V2.proc_CleanClients(
+									Nac_V2.mod_Validation.ClientFile(GetClients(ilfn)));
 
 	// address validation requires cleaned addresses
-	 addresses1 := 	Nac_V2.mod_Validation.AddressFile(
-										Nac_V2.proc_cleanAddr(
-											PROJECT(nacin(RecordCode = 'AD01'), TRANSFORM(Nac_V2.Layouts2.rAddressEx,
-												self := LEFT.AddressRec;
-												self.RecordCode := left.RecordCode;
-												self.GroupId := gid;
-												self.OrigGroupId := gid;
-												self.filename := fname;
-												self.Created := RightNow;
-												self.Updated := RightNow;
-												self := []))
-										)
-								);
+	addresses1 := 	Nac_V2.mod_Validation.AddressFile(
+										Nac_V2.proc_cleanAddr(GetAddresses(ilfn)));
 
-	 contacts := 	Nac_V2.mod_Validation.StateContactFile(
-										PROJECT(nacin(RecordCode = 'SC01'), TRANSFORM(Nac_V2.Layouts2.rStateContactEx,
-										self := LEFT.StateContactRec;
-										self.RecordCode := left.RecordCode;
-										self.GroupId := gid;
-										self.OrigGroupId := gid;
-										self.filename := fname;
-										self.Created := RightNow;
-										self.Updated := RightNow;
-										self := [];
-										)));
+	contacts := 	Nac_V2.mod_Validation.StateContactFile(GetContacts(ilfn));
 									
-	 exceptions := 	Nac_V2.mod_Validation.ExceptionFile(
-										PROJECT(nacin(RecordCode = 'EX01'), TRANSFORM(Nac_V2.Layouts2.rExceptionEx,
-										self := LEFT.ExceptionRec;
-										self.RecordCode := left.RecordCode;
-										self.SourceGroupId := gid;
-										self.filename := fname;
-										self.Created := RightNow;
-										self.Updated := RightNow;
-										self := [];
-										)));
+	exceptions := Nac_V2.mod_Validation.ExceptionFile(GetExceptions(ilfn));
 										
 	clients := nac_v2.mod_Validation.VerifyRelatedClients(cases, clients1);
 	addresses := nac_v2.mod_Validation.VerifyRelatedAddresses(cases, clients, addresses1);
 	
-		bad :=		Nac_V2.mod_Validation.ValidateRecordCode(
-								PROJECT(nacin(RecordCode NOT IN Nac_V2.Layouts2.validRecordCodes), TRANSFORM(Nac_V2.Layouts2.rBadRecord,
-										self := LEFT.BadRec;
-										self.RecordCode := left.RecordCode;
-							)));
+	bad :=		Nac_V2.mod_Validation.ValidateRecordCode(
+								 $.ExtractRecords(ilfn).BadRecords);
 
 	
   recombined := PROJECT(cases, TRANSFORM(nac_v2.Layouts2.rNac2Ex,

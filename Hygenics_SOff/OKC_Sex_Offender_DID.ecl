@@ -457,7 +457,8 @@ Ds_OKC_Sex_Off_WithDidSsn := Project(Ds_OKC_Sex_Off_with_did_ssn,trf(left));
 									(l.ssn='584621400' and l.did='002232356551') or
 									(l.ssn='401358777' and l.did='001034909614') or
 									(l.ssn='056465978' and l.did='002363964777') or
-									(l.ssn='412376589' and l.did='000329196451') ,
+									(l.ssn='412376589' and l.did='000329196451') or
+									(l.ssn='214217006' and l.did='068388543832') ,
 							'',
 							l.ssn);
 		self.did		:= if((l.ssn='353561176' and l.did='2275932305') or 
@@ -478,7 +479,8 @@ Ds_OKC_Sex_Off_WithDidSsn := Project(Ds_OKC_Sex_Off_with_did_ssn,trf(left));
 									(l.ssn='584621400' and l.did='002232356551') or
 									(l.ssn='401358777' and l.did='001034909614') or
 									(l.ssn='056465978' and l.did='002363964777') or
-									(l.ssn='412376589' and l.did='000329196451') ,
+									(l.ssn='412376589' and l.did='000329196451') or
+									(l.ssn='214217006' and l.did='068388543832') ,
 							'',
 							l.did);
 		self.did_score	:= if((l.ssn='353561176' and l.did='2275932305') or 
@@ -499,7 +501,8 @@ Ds_OKC_Sex_Off_WithDidSsn := Project(Ds_OKC_Sex_Off_with_did_ssn,trf(left));
 									(l.ssn='584621400' and l.did='002232356551') or
 									(l.ssn='401358777' and l.did='001034909614') or
 									(l.ssn='056465978' and l.did='002363964777') or
-									(l.ssn='412376589' and l.did='000329196451') ,
+									(l.ssn='412376589' and l.did='000329196451') or
+									(l.ssn='214217006' and l.did='068388543832') ,
 							'',
 							l.did_score);
 		self 			:= l;

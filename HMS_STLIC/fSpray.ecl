@@ -5,6 +5,7 @@ export fSpray(
 								STRING		pVersion              = '',
 								BOOLEAN   pUseProd              = false,
 								STRING		pServerIP							= _control.IPAddress.bctlpedata10, //'bctlpedata10.br.seisint.com'
+								STRING		pServerIP2						= _control.IPAddress.bctlpedata12, //'bctlpedata10.br.seisint.com'
 								STRING		pAddressFilename			= '*address*.tab',
 								STRING		pCSRFilename					= '*csr*.tab',
 								STRING		pDEAFilename					= '*dea*.tab',
@@ -17,7 +18,8 @@ export fSpray(
 								STRING		pNPIFilename					= '*npi*.tab',
 								STRING		pPhoneFilename		= '*phone*.tab',
 								STRING		pSpecialtyFilename			= '*specialty*.tab',
-								STRING		pStlicLookupFilename		= '*stliclookup*.tab',
+								// STRING		pStlicLookupFilename		= '*stliclookup*.tab',
+								STRING		pStlicLookupFilename		= '*stliclookup*' + pversion,
 								STRING		pDirectory						= '/data/hms/hms_stl/data/',
 								STRING		pGroupName						= IF((tools._Constants.IsDataland),'thor400_dev01','thor400_44'),
 								BOOLEAN		pIsTesting						= false,
@@ -109,20 +111,6 @@ export fSpray(
 		,'[0-9]{8}'                                     
 		,'VARIABLE'                                     
  	},
-	/*
-	{
-		pServerIP	                  
-		,pDirectory + pVersion + '/'             
-		,pLexisNexisEntityFilename
-		,0                        
-		,_Dataset(pUseProd).thor_cluster_Files+ 'temp_in::' + _Dataset().Name + '::lexisnexis_entity::' + pVersion 
-		,[{_Dataset(pUseProd).thor_cluster_Files+'temp_in::' + _Dataset().Name + '::lexisnexis_entity' }]       
-		,pGroupName                                    
-		,pVersion                                      
-		,'[0-9]{8}'                                    
-		,'VARIABLE'                                    
- 	},
-	*/ //No longer receiving this file
 	{
 		pServerIP	                
 		,pDirectory + pVersion + '/'             
@@ -172,16 +160,20 @@ export fSpray(
 		,'VARIABLE'                                         
  	},
 	{
-		pServerIP	                   
-		,pDirectory + pVersion + '/'             
+		// pServerIP	                   
+		// ,pDirectory + pVersion + '/'             
+		pServerIP2	                   
+		,pDirectory + '/'             
 		,pStlicLookupFilename    
 		,0                     
-		,_Dataset(pUseProd).thor_cluster_Files+ 'temp_in::' + _Dataset().Name + '::hms_stliclookup_' + pVersion   
-		,[{_Dataset(pUseProd).thor_cluster_Files+'temp_in::' + _Dataset().Name + '::hms_stliclookup' }]           
+		// ,_Dataset(pUseProd).thor_cluster_Files+ 'temp_in::' + _Dataset().Name + '::hms_stliclookup_' + pVersion   
+		// ,[{_Dataset(pUseProd).thor_cluster_Files+'temp_in::' + _Dataset().Name + '::hms_stliclookup' }]           
+		,_Dataset(pUseProd).thor_cluster_Files+ 'from_alpha::' + _Dataset().Name + '::hms_stliclookup_' + pVersion   
+		,[{_Dataset(pUseProd).thor_cluster_Files+'from_alpha::' + _Dataset().Name + '::hms_stliclookup' }]           
 		,pGroupName                                       
 		,pVersion                                          
 		,'[0-9]{8}'                                               
 		,'VARIABLE'                                         
- 	}
+ 	} 
 ], VersionControl.Layout_Sprays.Info);
 

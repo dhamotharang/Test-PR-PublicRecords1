@@ -9,7 +9,7 @@ EXPORT fn_patch_blank_fname(DATASET(reunion.layouts.lMainRaw) in_main):=FUNCTION
    UNSIGNED count_:=1;
   END;
 
-  dHeaderFormatted:=SORT(DISTRIBUTE(PROJECT(reunion.files.file_header_nonglb_dppa(fname<>''),lPatch),HASH(did)),did,fname,LOCAL);
+  dHeaderFormatted:=SORT(DISTRIBUTE(PROJECT(reunion.files(1).infutor_header(fname<>''),lPatch),HASH(did)),did,fname,LOCAL);
   dRolled:=DEDUP(SORT(ROLLUP(dHeaderFormatted,LEFT.did=RIGHT.did AND LEFT.fname=RIGHT.fname,TRANSFORM(lPatch,SELF.count_:=LEFT.count_+1;SELF:=LEFT;),LOCAL),did,-count_,LOCAL),did,LOCAL);
   dJoined:=JOIN(dCandidates,dRolled,LEFT.did=RIGHT.did,TRANSFORM(RECORDOF(dCandidates),SELF.fname:=RIGHT.fname;SELF:=LEFT;),LEFT OUTER,KEEP(1),LOCAL);
   dPatched:=dNotCandidates+dJoined;

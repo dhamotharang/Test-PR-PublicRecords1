@@ -81,7 +81,8 @@ end;
 //////////////////////////////////////////////////////////////////
 //reFormat Entity Parent Records
 export Parent := module
-	export GWL:= 	Accuity.Functions.mapEntity(Inputs.gwl(type NOT IN ['01', '02','06']),normalizd.gwl.Supplemental);
+//	export GWL:= 	Accuity.Functions.mapEntity(Inputs.gwl(type NOT IN ['01', '02','06']),normalizd.gwl.Supplemental);
+	export GWL:= 	Accuity.Functions.mapEntity(Inputs.gwl(type NOT IN ['01', '02']),normalizd.gwl.Supplemental);
 	export MSB:= 	Accuity.Functions.mapEntity(Inputs.msb,normalizd.msb.Supplemental);
 	export OFAC:= 	Accuity.Functions.mapEntity(Inputs.ofac,normalizd.ofac.Supplemental); 
 	export GEO:= 	Accuity.Functions.mapEntity(Inputs.gwl(type IN ['01', '02']),normalizd.gwl.Supplemental);
@@ -207,7 +208,7 @@ export source_EU_33     := allsources(accuityDataSource='EU 33');    //European 
 export source_EUE_1170  := allsources(accuityDataSource='EUE 1170'); //European Union Enhancements List
 export source_FBI_35    := allsources(accuityDataSource='FBI 35');   //FBI Most Wanted
 export source_FDJ_1152  := allsources(accuityDataSource='FDJ 1152'); //FATF Deficient Jurisdictions List
-export source_FMU_1126  := allsources(accuityDataSource='FMU 1126'); //UKRAINE FINANCIAL MONITORING
+//export source_FMU_1126  := allsources(accuityDataSource='FMU 1126'); //UKRAINE FINANCIAL MONITORING
 export source_FR_1010   := allsources(accuityDataSource='FR 1010');  //France
 export source_GO_36     := allsources(accuityDataSource='GO 36');    //World Government Officials List
 export source_HK_37     := allsources(accuityDataSource='HK 37');    //Hong Kong Monetary Authority List
@@ -244,7 +245,7 @@ export source_SL_1136   := allsources(accuityDataSource='SL 1136');  //SLOVAKIAN
 export source_TEL_1028  := allsources(accuityDataSource='TEL 1028'); //Terrorist Exclusion List
 export source_TFP_1072  := allsources(accuityDataSource='TFP 1072'); //Accuity Research (OFAC)
 export source_TW_1016   := allsources(accuityDataSource='TW 1016');  //Taiwan
-export source_UGO_1120  := allsources(accuityDataSource='UGO 1120'); //U.S. Government Officials
+//export source_UGO_1120  := allsources(accuityDataSource='UGO 1120'); //U.S. Government Officials
 export source_UK_1046   := allsources(accuityDataSource='UK 1046');  //UK HOME OFFICE
 export source_UN_44     := allsources(accuityDataSource='UN 44');    //United Nations Sanctions List
 export source_UNE_1172  := allsources(accuityDataSource='UNE 1172'); //United Nations Enhancements List

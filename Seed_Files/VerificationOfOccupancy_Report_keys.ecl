@@ -1,5 +1,5 @@
 ﻿
-IMPORT Data_Services, ut,doxie, risk_indicators, VerificationOfOccupancy;
+IMPORT Data_Services, doxie, risk_indicators, STD;
 
 EXPORT VerificationOfOccupancy_Report_keys := MODULE
 
@@ -8,8 +8,8 @@ EXPORT VerificationOfOccupancy_Report_keys := MODULE
 	d := Seed_Files.VerificationOfOccupancy_Report_files.Summary;
 	newrec := record
 		data16 hashvalue := seed_files.Hash_InstantID(
-																									trim((string15)stringlib.stringtouppercase(d.fname)),
-																									trim((string20)stringlib.stringtouppercase(d.lname)),
+																									trim((string15)STD.Str.ToUpperCase(d.fname)),
+																									trim((string20)STD.Str.ToUpperCase(d.lname)),
 																									trim((string9)d.in_ssn),
 																									risk_indicators.nullstring,
 																									trim((string9)d.zip),
@@ -27,8 +27,8 @@ EXPORT VerificationOfOccupancy_Report_keys := MODULE
 											
 	d := Seed_Files.VerificationOfOccupancy_Report_files.TargetSummary;
 	newrec := record
-		data16 hashvalue := seed_files.Hash_InstantID(trim((string15)stringlib.stringtouppercase(d.fname)),
-																									trim((string20)stringlib.stringtouppercase(d.lname)),
+		data16 hashvalue := seed_files.Hash_InstantID(trim((string15)STD.Str.ToUpperCase(d.fname)),
+																									trim((string20)STD.Str.ToUpperCase(d.lname)),
 																									trim((string9)d.in_ssn),
 																									risk_indicators.nullstring,
 																									trim((string9)d.zip),
@@ -44,8 +44,8 @@ EXPORT VerificationOfOccupancy_Report_keys := MODULE
 											
 	d := Seed_Files.VerificationOfOccupancy_Report_files.Sources;
 	newrec := record
-		data16 hashvalue := seed_files.Hash_InstantID(trim((string15)stringlib.stringtouppercase(d.fname)),
-																									trim((string20)stringlib.stringtouppercase(d.lname)),
+		data16 hashvalue := seed_files.Hash_InstantID(trim((string15)STD.Str.ToUpperCase(d.fname)),
+																									trim((string20)STD.Str.ToUpperCase(d.lname)),
 																									trim((string9)d.in_ssn),
 																									risk_indicators.nullstring,
 																									trim((string9)d.zip),
@@ -62,8 +62,8 @@ EXPORT VerificationOfOccupancy_Report_keys := MODULE
 		
 	d := Seed_Files.VerificationOfOccupancy_Report_files.OwnedProperties;
 	newrec := record
-		data16 hashvalue := seed_files.Hash_InstantID(trim((string15)stringlib.stringtouppercase(d.fname)),
-																									trim((string20)stringlib.stringtouppercase(d.lname)),
+		data16 hashvalue := seed_files.Hash_InstantID(trim((string15)STD.Str.ToUpperCase(d.fname)),
+																									trim((string20)STD.Str.ToUpperCase(d.lname)),
 																									trim((string9)d.in_ssn),
 																									risk_indicators.nullstring,
 																									trim((string9)d.zip),
@@ -79,8 +79,8 @@ EXPORT VerificationOfOccupancy_Report_keys := MODULE
 		
 	d := Seed_Files.VerificationOfOccupancy_Report_files.OwnedPropertiesAsOf;
 	newrec := record
-		data16 hashvalue := seed_files.Hash_InstantID(trim((string15)stringlib.stringtouppercase(d.fname)),
-																									trim((string20)stringlib.stringtouppercase(d.lname)),
+		data16 hashvalue := seed_files.Hash_InstantID(trim((string15)STD.Str.ToUpperCase(d.fname)),
+																									trim((string20)STD.Str.ToUpperCase(d.lname)),
 																									trim((string9)d.in_ssn),
 																									risk_indicators.nullstring,
 																									trim((string9)d.zip),
@@ -97,8 +97,8 @@ EXPORT VerificationOfOccupancy_Report_keys := MODULE
 		
 	d := Seed_Files.VerificationOfOccupancy_Report_files.PhoneAndUtility;
 	newrec := record
-		data16 hashvalue := seed_files.Hash_InstantID(trim((string15)stringlib.stringtouppercase(d.fname)),
-																									trim((string20)stringlib.stringtouppercase(d.lname)),
+		data16 hashvalue := seed_files.Hash_InstantID(trim((string15)STD.Str.ToUpperCase(d.fname)),
+																									trim((string20)STD.Str.ToUpperCase(d.lname)),
 																									trim((string9)d.in_ssn),
 																									risk_indicators.nullstring,
 																									trim((string9)d.zip),
@@ -117,8 +117,8 @@ EXPORT VerificationOfOccupancy_Report_keys := MODULE
 	
 	d := Seed_Files.VerificationOfOccupancy_Report_files.AssociatedIdentities;
 	newrec := record
-		data16 hashvalue := seed_files.Hash_InstantID(trim((string15)stringlib.stringtouppercase(d.fname)),
-																									trim((string20)stringlib.stringtouppercase(d.lname)),
+		data16 hashvalue := seed_files.Hash_InstantID(trim((string15)STD.Str.ToUpperCase(d.fname)),
+																									trim((string20)STD.Str.ToUpperCase(d.lname)),
 																									trim((string9)d.in_ssn),
 																									risk_indicators.nullstring,
 																									trim((string9)d.zip),

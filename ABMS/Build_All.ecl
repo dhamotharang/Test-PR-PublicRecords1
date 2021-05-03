@@ -19,6 +19,7 @@ EXPORT Build_All(
 	STRING																	pFilenameTypeOfPractice			= 'typeofprac*.txt',
 	STRING																	pFilenameSchools						= 'zschoolspi*.txt',
 	STRING																	pFilenameSpecialty					= 'zspecialtypi*.txt',
+	STRING																	pFilenameRaw_input					= 'ABMS_Data.txt',
 	STRING																	pGroupName									= _Dataset().groupname,
 	DATASET(Layouts.Base.Main)							pBaseMainFile								=	IF(_Flags.Update.Main, Files().Base.Main.QA, DATASET([], Layouts.Base.Main)),
 	DATASET(Layouts.Base.Career)						pBaseCareerFile							=	IF(_Flags.Update.Career, Files().Base.Career.QA, DATASET([], Layouts.Base.Career)),
@@ -37,6 +38,7 @@ EXPORT Build_All(
 	DATASET(Layouts.Input.Membership)				pUpdateMembershipFile				=	Files().Input.Membership.Sprayed,
 	DATASET(Layouts.Input.TypeOfPractice)		pUpdateTypeOfPracticeFile		=	Files().Input.TypeOfPractice.Sprayed,
 	DATASET(Layouts.Input.Schools)					pUpdateSchoolsFile					=	Files().Input.Schools.Sprayed,
+	DATASET(Layouts.Input.Raw_input)				pUpdateAll									= Files().Input.Raw_input.Sprayed,
 	DATASET(Layouts.Base.Main)							pBaseMainBuilt							= Files(pversion).Base.Main.Built,
 	DATASET(Layouts.Base.Career)						pBaseCareerBuilt						= Files(pversion).Base.Career.Built,
 	DATASET(Layouts.Base.Cert)							pBaseCertBuilt							= Files(pversion).Base.Cert.Built,
@@ -46,23 +48,26 @@ EXPORT Build_All(
 
 	EXPORT spray_files := SprayFiles(pServerIP,
 		                               pDirectory,
-		                               pFilenameAddress,
-		                               pFilenameBIOG,
-		                               pFilenameCareer,
-		                               pFilenameCert,
-		                               pFilenameContact,
-		                               pFilenameDeceased,
-		                               pFilenameEducation,
-																	 pFilenameMembership,
-		                               pFilenameMOCParticipation,
-		                               pFilenameTypeOfPractice,
-		                               pFilenameSchools,
-		                               pFilenameSpecialty,
+		                               // pFilenameAddress,
+		                               // pFilenameBIOG,
+		                               // pFilenameCareer,
+		                               // pFilenameCert,
+		                               // pFilenameContact,
+		                               // pFilenameDeceased,
+		                               // pFilenameEducation,
+																	 // pFilenameMembership,
+		                               // pFilenameMOCParticipation,
+		                               // pFilenameTypeOfPractice,
+		                               // pFilenameSchools,
+		                               // pFilenameSpecialty,
+																	 pFilenameRaw_input,
 		                               pversion,
 		                               pGroupName,
 		                               pIsTesting,
 		                               pOverwrite,
 		                               pReplicate);
+	
+	EXPORT create_input_files	:= ABMS.Preprocess_rawfile(pversion, puseprod := false);
 	//Added ;michael.gould@lexisnexisrisk.com
 	EXPORT dops_update := RoxieKeyBuild.updateversion('ABMSKeys', pversion, _Control.MyInfo.EmailAddressNotify + ';michael.gould@lexisnexisrisk.com;darren.knowles@lexisnexisrisk.com', , 'N'); 															
 
@@ -70,6 +75,7 @@ EXPORT Build_All(
 
 	EXPORT full_build := SEQUENTIAL(Create_Supers,
 																	spray_files,
+																	create_input_files,
 																	Build_Base(pversion,
 																						 pBaseMainFile,
 																						 pBaseCareerFile,
@@ -112,7 +118,7 @@ EXPORT Build_All(
 																													pBaseTypeOfPracticeBuilt).All,
 																	orbitUpdate		
 																 ) : SUCCESS(Send_Emails(pversion).Roxie),
-																		 FAILURE(Send_Emails(pversion).BuildFailure);
+																		FAILURE(Send_Emails(pversion).BuildFailure);
 	
 	EXPORT All := IF(tools.fun_IsValidVersion(pversion),
 		               full_build,

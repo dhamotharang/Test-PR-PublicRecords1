@@ -2,7 +2,7 @@
 
 EXPORT SprayBVdeltaFile(
 	STRING		pVersionDate	=	'',
-	BOOLEAN		pPromote			= FALSE,
+	BOOLEAN		pShouldClearSuperfileFirst			= TRUE,
 	STRING		pServerIP			  = _Constants.serverIP,
 	STRING		pDirectory			= _Constants.Directory_delta + pVersionDate,
 	STRING		pGroupName			=	_Constants.Groupname,															
@@ -48,11 +48,10 @@ RETURN tools.fun_Spray
 					,							// pEmailNotificationList
 					,'BV Delta Event spray' + ' ' + pVersionDate	// pEmailSubjectDataset
 					,pNameOutput 	// pOutputName
-					,TRUE 				// pShouldClearSuperfileFirst
+					,pShouldClearSuperfileFirst 				// pShouldClearSuperfileFirst
 					,FALSE 				// pSplitEmails
 					,FALSE 				// pShouldSprayZeroByteFiles
 					,FALSE				// pShouldSprayMultipleFilesAs1
 				);
 
 END;
-

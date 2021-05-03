@@ -1,4 +1,4 @@
-IMPORT Business_Header, ut, header_services;
+﻿IMPORT Business_Header, ut, header_services, Suppress;
 
 export Emp_out(
 
@@ -123,43 +123,10 @@ END;
 
 
 in_hdr := PROJECT(Employees_Join, ToOut(LEFT));
+Suppression_Layout := Suppress.applyRegulatory.layout_in;
 
-Suppression_Layout := header_services.Supplemental_Data.layout_in;
 
-header_services.Supplemental_Data.mac_verify(	'didaddressbusiness_sup.txt',
-																							Suppression_Layout,supp_ds_func);
- 
-Suppression_In := supp_ds_func();
-
-dSuppressedIn := PROJECT(	Suppression_In, 
-													header_services.Supplemental_Data.in_to_out(left));
-
-rHashDIDAddress := header_services.Supplemental_Data.layout_out;
-
-rFullOut_HashDIDAddress := record
- Business_Header.Layout_Employment_Out;
- rHashDIDAddress;
-end;
-
-rFullOut_HashDIDAddress tHashDIDAddress(Business_Header.Layout_Employment_Out l) := transform                            
- self.hval := hashmd5(	l.bdid,(string)l.state,(string)l.zip,(string)l.city,
-												(string)l.prim_name,(string)l.prim_range,(string)l.predir,
-												(string)l.addr_suffix,(string)l.postdir,(string)l.sec_range);
- self := l;
-end;
-
-dHeader_withMD5 := PROJECT(in_hdr, tHashDIDAddress(left));
-
-Business_Header.Layout_Employment_Out tSuppress(dHeader_withMD5 l, dSuppressedIn r) := transform
- self := l;
-end;
-
-full_out_suppress := JOIN( 	dHeader_withMD5,
-														dSuppressedIn,
-														left.hval = right.hval,
-														tSuppress(left,right),
-														left only,
-														lookup );
+	full_out_suppress := Business_Header.Prep_Build.applyDidAddressBusiness_sup(in_hdr);
 
 
 header_services.Supplemental_Data.mac_verify(	'employment_sup.txt',
@@ -169,9 +136,9 @@ header_services.Supplemental_Data.mac_verify(	'employment_sup.txt',
 Emp_ONLY_Suppression_In := emp_ONLY_supp_ds_func();
 
 dEmpONLYSuppressedIn := PROJECT(	Emp_ONLY_Suppression_In, 
-																header_services.Supplemental_Data.in_to_out(left));
+																Suppress.applyRegulatory.in_to_out(left));
 
-EmpHashBDIDFormat := header_services.Supplemental_Data.layout_out;
+EmpHashBDIDFormat := Suppress.applyRegulatory.layout_out;
 
 EmpFullOut_HashBDID := RECORD
 	Business_Header.Layout_Employment_Out;
@@ -195,7 +162,6 @@ emp_ONLY_full_out_suppress := JOIN(	EmpONLYHeader_withMD5,
 																		EmpONLYSuppress(left),
 																		left only,
 																		lookup);
-																			
 
 			
 	header_services.Supplemental_Data.mac_verify(	'businesscontactsbytitle_sup.txt',
@@ -205,9 +171,9 @@ emp_ONLY_full_out_suppress := JOIN(	EmpONLYHeader_withMD5,
 	BCbytitle_Suppression_In := BCbytitle_ds_func();
 
 	dBCbytitle_SuppressedIn := PROJECT(	BCbytitle_Suppression_In, 
-																	header_services.Supplemental_Data.in_to_out(left));
+																	Suppress.applyRegulatory.in_to_out(left));
 
-	rHashVal := header_services.Supplemental_Data.layout_out;
+	rHashVal := Suppress.applyRegulatory.layout_out;
 	
 	rEmp_withHash := RECORD
 		Business_Header.Layout_Employment_Out;
@@ -239,9 +205,9 @@ header_services.Supplemental_Data.mac_verify(	'employmentall_sup.txt',
 Emp_All_Suppression_In := emp_all_supp_ds_func();
 
 dEmpAllSuppressedIn := PROJECT(	Emp_All_Suppression_In, 
-																header_services.Supplemental_Data.in_to_out(left));
+																Suppress.applyRegulatory.in_to_out(left));
 
-rHashBDID := header_services.Supplemental_Data.layout_out;
+rHashBDID := Suppress.applyRegulatory.layout_out;
 
 rFullOut_HashBDID := RECORD
 	Business_Header.Layout_Employment_Out;

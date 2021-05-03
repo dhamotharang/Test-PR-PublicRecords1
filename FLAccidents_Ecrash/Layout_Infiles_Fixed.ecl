@@ -1,14 +1,25 @@
 ﻿EXPORT Layout_Infiles_Fixed := MODULE 
-	EXPORT agency_cmbnd := RECORD
-		STRING11   Agency_ori;
-		STRING3    Agency_State_Abbr;
-		STRING100  Agency_Name;
-		STRING11   MBSI_Agency_ID;
-		STRING5    Cru_Agency_ID;
-		UNSIGNED3  Cru_State_Number;
-		STRING2    Source_ID;
-		STRING2    Append_Overwrite_Flag;
-	END;
+
+	// EXPORT agency := RECORD
+		// STRING11 Agency_ID;
+	  // STRING100 Agency_Name;
+		// STRING10 Agency_State_Abbr;
+	  // STRING11 Agency_ori;
+	  // STRING1 Allow_Open_Search;
+	  // STRING2 Append_Overwrite_Flag;
+	  // STRING1 Drivers_Exchange_Flag;   
+	  // STRING3 Source_ID;
+	  // STRING10 Orig_Source_Start_Date; 
+	  // UNSIGNED4 Source_Start_Date; 
+	  // STRING10 Orig_Source_End_Date; 
+	  // UNSIGNED4 Source_End_Date; 
+	  // STRING20 Orig_Source_Termination_Date; 	  
+	  // UNSIGNED4 Source_Termination_Date; 	  
+	  // STRING1 Source_Resale_Allowed; 
+	  // STRING1 Source_Auto_Renew; 
+	  // STRING1 Source_Allow_Sale_Of_Component_Data; 
+	  // STRING1 Source_Allow_Extract_Of_Vehicle_Data; 
+	// END; 
 
 	EXPORT citation := RECORD
 		STRING11 Citation_ID;
@@ -22,7 +33,7 @@
 		STRING10 Court_Date;
 		STRING9 Court_Time;
 		//PRTCC update datatype
-		STRING100 Citation_Detail1;
+		STRING200 Citation_Detail1;
 		
 		STRING3 Local_Code;
 		//PRTCC update datatype
@@ -273,7 +284,7 @@
 		STRING60 Injured_Taken_To;
 		STRING7 Incident_Transported_for_Medical_Care;
 		//PRTCC update datatype
-		STRING1 Photographs_Taken;
+		STRING7 Photographs_Taken;
 		STRING100 Photographed_By;
 		
 		STRING20 Photographer_ID;
@@ -469,6 +480,15 @@
 		STRING10 Dispatch_Date;
 		STRING10 Drug_Involvement;
 		STRING7 Alcohol_Involved;
+		//Data Ingestion CR-1273
+		STRING64 Geo_Coded_Latitude;
+		STRING64 Geo_Coded_Longitude;
+		//PRtCC CR-1262 
+    STRING Direction_Of_Impact;
+		STRING1 is_Suppressed;
+		//Prrecon-49
+		BOOLEAN is_Terminated_Agency;
+		BOOLEAN allow_Sale_Of_Component_Data; 		
 	END;
 	
 	EXPORT incident_ori := RECORD
@@ -492,7 +512,7 @@
 		STRING40 Safety_Equipment_Restraint2;
 		STRING40 Safety_Equipment_Helmet;
 		STRING100 Air_Bag_Deployed;
-		STRING20 Ejection;
+		STRING100 Ejection;
 		STRING30 Drivers_License_Jurisdiction;
 		STRING30 DL_Number_Class;
 		STRING3 DL_Number_CDL;
@@ -508,8 +528,8 @@
 		//PRtcc datatype update for code and description
 		STRING Alcohol_Test_Status;
 		STRING Alcohol_Test_Type;
-		
-		STRING25 Alcohol_Test_Result;
+		//Data Ingestion Enum Field
+		STRING Alcohol_Test_Result;
 		STRING7 Law_Enforcement_Suspects_Drug_Use;
 		STRING20 Drug_Test_Given;
 		STRING100 Non_Motorist_Actions_Prior_to_Crash1;
@@ -660,10 +680,12 @@
 		STRING Pedestrian_Actions_At_Time_Of_Crash;
 		STRING Pedalcyclist_Actions_At_Time_Of_Crash;
 		STRING Passenger_Actions_At_Time_Of_Crash;
-		//Data Ingestion New fields
-		STRING10 Dui_Suspected;
+		//Data Ingestion New Enum fields
+		STRING Dui_Suspected;
 		//Data Ingestion New Enum fields
 		STRING Drug_Test_Result;
+		//PRtCC CR-1237
+    STRING Marijuana_Use_Suspected;
 	END;
 
 	EXPORT vehicl := RECORD
@@ -896,6 +918,19 @@
 		STRING Report_Vehicle_Body_Type;
 		//PRtCC new Enum fields
 		STRING Report_Road_Condition;
+		//Data Ingestion CR-1262 
+    STRING Event_Sequence;
+	END;
+
+	EXPORT Citations_ChildRec := RECORD
+		STRING7 Citation_Issued;
+		STRING7 Citation_Type;
+		STRING200 Citation_Detail1;
+		STRING64 Citation_Status;
+		STRING60 Violation_Code1;
+		STRING60 Violation_Code2;
+		STRING60 Violation_Code3;
+		STRING60 Violation_Code4;
 	END;
 
 	EXPORT cmbnd := RECORD 
@@ -910,7 +945,7 @@
 		STRING10 Court_Date;
 		STRING9 Court_Time;
 		//PRTCC update datatype
-		STRING100 Citation_Detail1;
+		STRING200 Citation_Detail1;
 		
 		STRING3 Local_Code;
 		//PRTCC update datatype
@@ -1142,7 +1177,7 @@
 		STRING60 Injured_Taken_To;
 		STRING7 Incident_Transported_for_Medical_Care;
 		//PRTCC update datatype
-		STRING1 Photographs_Taken;		
+		STRING7 Photographs_Taken;		
 		STRING100 Photographed_By;
 		
 		STRING20 Photographer_ID;
@@ -1278,7 +1313,7 @@
 		STRING40 Safety_Equipment_Restraint2;
 		STRING40 Safety_Equipment_Helmet;
 		STRING100 Air_Bag_Deployed;
-		STRING20 Ejection;
+		STRING100 Ejection;
 		STRING30 Drivers_License_Jurisdiction;
 		STRING30 DL_Number_Class;
 		STRING3 DL_Number_CDL;
@@ -1294,8 +1329,8 @@
 		//PRtcc datatype update for code and description
 		STRING Alcohol_Test_Status;
 		STRING Alcohol_Test_Type;
-		
-		STRING25 Alcohol_Test_Result;
+		//Data Ingestion Enum Field
+		STRING Alcohol_Test_Result;
 		STRING7 Law_Enforcement_Suspects_Drug_Use;
 		STRING20 Drug_Test_Given;
 		STRING100 Non_Motorist_Actions_Prior_to_Crash1;
@@ -1744,11 +1779,29 @@
 		STRING10 Dispatch_Date;
 		STRING10 Drug_Involvement;
 		STRING7 Alcohol_Involved;
-		STRING10 Dui_Suspected;
 		//Data Ingestion New Enum fields
+	  STRING  Dui_Suspected;
 		STRING Drug_Test_Result;
+		//Data Ingestion CR-1273
+		STRING64 Geo_Coded_Latitude;
+		STRING64 Geo_Coded_Longitude;
+		//PRtCC CR-1237
+    STRING Marijuana_Use_Suspected;
+		//PRtCC CR-1262 
+    STRING Direction_Of_Impact;
+		STRING Event_Sequence;
+		STRING1 is_Suppressed;
+	  //Prrecon-49
+		BOOLEAN is_Terminated_Agency;
+		BOOLEAN allow_Sale_Of_Component_Data; 		
+	  DATASET(Citations_ChildRec) Citation_Details {MAXCOUNT(Constants.Max_Citations_ChildRec_Count)};
 	END;
 	
+	EXPORT Citations_WithChildRec := RECORD
+    Citation;
+	  DATASET(Citations_ChildRec) Citation_Details {MAXCOUNT(Constants.Max_Citations_ChildRec_Count)};
+	END;
+		
 	EXPORT property_damage := RECORD
 		STRING11 Property_Damage_ID;
 		STRING11 Incident_ID;
@@ -1765,6 +1818,20 @@
 		STRING10 property_owner_zip_code;
 		STRING7 property_owner_notified;
 	END; 
+	
+	EXPORT Document := RECORD
+		STRING11 document_id,
+		STRING11 incident_id,
+		STRING64 document_hash_key,
+		STRING19 date_created,
+		STRING1 is_deleted,
+		STRING3 report_type,
+		STRING3 page_count,
+		STRING3 extension;
+		//COPPR-69 New field
+		STRING3 report_source;
+  END;
+
 	EXPORT DidSlim := RECORD 
 		STRING10 prim_range;
 		STRING2 predir;

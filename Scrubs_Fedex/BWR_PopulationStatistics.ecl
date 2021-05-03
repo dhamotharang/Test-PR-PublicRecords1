@@ -1,0 +1,7 @@
+﻿//This is the code to execute in a builder window
+#OPTION('multiplePersistInstances', FALSE);
+#workunit('name','Scrubs_Fedex.BWR_PopulationStatistics - Population Statistics - SALT V3.11.9');
+IMPORT Scrubs_Fedex,SALT311;
+// In the line below substitute the file you want statistics for; and substitute any field names you can
+  Scrubs_Fedex.MAC_PopulationStatistics(YourFileName,/*Reference Field*/,/* file_date_field */,/* record_id_field */,/* record_type_field */,/* first_name_field */,/* middle_initial_field */,/* last_name_field */,/* full_name_field */,/* company_name_field */,/* address_line1_field */,/* address_line2_field */,/* city_field */,/* state_field */,/* zip_field */,/* country_field */,/* phone_field */,/* append_prepaddr1_field */,/* append_prepaddr2_field */,/* append_rawaid_field */,/* nametype_field */,/* business_indicator_field */,/* prim_range_field */,/* predir_field */,/* prim_name_field */,/* addr_suffix_field */,/* postdir_field */,/* unit_desig_field */,/* sec_range_field */,/* p_city_name_field */,/* v_city_name_field */,/* st_field */,/* zip5_field */,/* zip6_field */,/* zip4_field */,/* cart_field */,/* cr_sort_sz_field */,/* lot_field */,/* lot_order_field */,/* dbpc_field */,/* chk_digit_field */,/* rec_type_field */,/* county_field */,/* geo_lat_field */,/* geo_long_field */,/* msa_field */,/* geo_blk_field */,/* geo_match_field */,/* err_stat_field */,outfile);
+  OUTPUT(outfile,NAMED('PopulationStatistics'));

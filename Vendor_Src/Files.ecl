@@ -19,8 +19,8 @@ EXPORT Files(STRING pversion = '', BOOLEAN pUseProd = FALSE) := MODULE
 	EXPORT MasterList_input      		            := DATASET(Filenames(pversion,pUseProd).MasterList_lInputTemplate, layouts.MasterList, CSV(SEPARATOR([',']), TERMINATOR(['\n','\r\n']), QUOTE(['"']),HEADING(1)));
 	EXPORT MasterList_history                   := DATASET(Filenames(pversion,pUseProd).MasterList_lInputFatherTemplate, layouts.MasterList, CSV(SEPARATOR([',']), TERMINATOR(['\n','\r\n']), QUOTE(['"']),HEADING(1)));
 	
-	EXPORT CollegeLocator_input       		      := DATASET(Filenames(pversion,pUseProd).CollegeLocator_lInputTemplate, layouts.MasterList, CSV(SEPARATOR(['|']), TERMINATOR(['\n','\r\n']), QUOTE(['"']),HEADING(1)));
-	EXPORT CollegeLocator_father                := DATASET(Filenames(pversion,pUseProd).CollegeLocator_lInputFatherTemplate, layouts.MasterList, CSV(SEPARATOR(['|']), TERMINATOR(['\n','\r\n']), QUOTE(['"']),HEADING(1)));
+	EXPORT CollegeLocator_input       		      := DATASET(Filenames(pversion,pUseProd).CollegeLocator_lInputTemplate, layouts.College_Locator, CSV(SEPARATOR(['|']), TERMINATOR(['\n','\r\n']), QUOTE(['"']),HEADING(1)));
+	EXPORT CollegeLocator_father                := DATASET(Filenames(pversion,pUseProd).CollegeLocator_lInputFatherTemplate, layouts.College_Locator, CSV(SEPARATOR(['|']), TERMINATOR(['\n','\r\n']), QUOTE(['"']),HEADING(1)));
 	
   
 //Manualy																		

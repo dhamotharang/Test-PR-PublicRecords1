@@ -1,4 +1,4 @@
-﻿IMPORT email_data, dx_email, ut, STD;
+﻿﻿﻿IMPORT email_data, dx_email, ut, STD, MDR;
 
 EXPORT Map_BV_Delta_Domain_Lookup(STRING version) := FUNCTION
 
@@ -13,7 +13,9 @@ EXPORT Map_BV_Delta_Domain_Lookup(STRING version) := FUNCTION
 
 	// Transform BV Delta to domain lookup layout
 	dx_email.Layouts.i_Domain_lkp Xform_Delta(Email_Event.Layouts.BV_Delta_raw L) := TRANSFORM
-	  SELF.domain_name := email_data.Fn_Clean_Email_Domain(ut.CleanSpacesAndUpper(L.email_address));
+	  triEmailAddress  := ut.CleanSpacesAndUpper(L.email_address);
+  	tmpdomain_name   := email_data.Fn_Clean_Email_Domain(triEmailAddress);
+		SELF.domain_name := TRIM(ut.fn_KeepPrintableChars(tmpdomain_name),LEFT,RIGHT);
 	  SELF.create_date := '';
 	  SELF.expire_date := '';
 		StdDatestamp		 := STD.Date.ConvertDateFormatMultiple(L.date_added,fmtsin,fmtout);
@@ -32,6 +34,7 @@ EXPORT Map_BV_Delta_Domain_Lookup(STRING version) := FUNCTION
 														'UNKNOWN'); 
 	  SELF.domain_status := tmpDomain_status;
 	  SELF.verifies_account := IF(email_status = 'ACCEPT_ALL','FALSE', '');
+		SELF.source  := MDR.sourceTools.src_BrightVerify_email;
 	  SELF.process_date  := thorlib.wuid()[2..9];
 	  SELF.email_rec_key := 0;
 	  SELF := L;

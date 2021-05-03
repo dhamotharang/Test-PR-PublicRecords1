@@ -22,8 +22,8 @@ EXPORT Standardize_V2 (string pVersion, boolean pUseProd, string gcid, unsigned1
 			SELF.history_mode							:= (string)pHistMode;
 			SELF.append_option						:= (string)pAppendOption;
 			SELF.current_input						:= 'Y';
-			SELF.prev_lexid								:= L.input_lexid;
-			SELF.prev_crk									:= L.input_crk;
+			SELF.prev_lexid								:= 0;
+			SELF.prev_crk									:= '';
 			SELF.crk_changed							:= '';
 			SELF.lexid_changed						:= '';
 			SELF  :=  L;

@@ -1,4 +1,4 @@
-import VersionControl, govdata, marketing_best,paw, risk_indicators,aca;
+﻿import VersionControl, govdata, paw, risk_indicators,aca,tools;
 export Send_Email(
 	
 	 string		pversion
@@ -8,7 +8,7 @@ export Send_Email(
 ) :=
 module
 
-	export BuildSuccess	:= fileservices.sendemail(
+	export BuildSuccess	:= tools.fun_SendEmail(
 													Email_Notificaton_Lists.BuildSuccess,
 													'Business Header Build ' + pversion + ' Completed\n',
 													'Don\'t forget to build the hri key on unix\n' +
@@ -17,11 +17,11 @@ module
 													'Then login as hozed on rigel and execute: localdist -d hri\n' +
 													workunit);
 
-	export BuildFailure	:= fileservices.sendemail(
+	export BuildFailure	:= tools.fun_SendEmail(
 													Email_Notificaton_Lists.BuildFailure,
 													'Business Header Build ' + pversion + ' Failed',
 													workunit + '\n' + failmessage);
-	export BasesFinished := fileservices.sendemail(
+	export BasesFinished := tools.fun_SendEmail(
 													Email_Notificaton_Lists.BuildSuccess,
 													'Business Header Build Base Files Created ' + pversion,
 													workunit);
@@ -37,6 +37,7 @@ module
 		/////////////////////////////////////////////////////////////
 		export BusinessEmail	:= VersionControl.fCheckRoxiePackage(lemails,'BusinessHeaderKeys'	,lpackage.BusinessHeaderKeys	,pversion,,pShouldUpdateRoxiePage,'N');
 
+		//Jira# DF-28406, Marketing_Best - Remove deprecated key; Commented the Marketing_Best code since the keys are deprecated from roxie.
 		export All := sequential(
 			 BusinessEmail
 			,ACA.Send_Emails(pversion,,pShouldUpdateRoxiePage).Roxie				
@@ -44,7 +45,7 @@ module
 			,Risk_Indicators.Send_Emails(pversion,,pShouldUpdateRoxiePage).NonFCRAAddressHRIEmail			
 			,paw.SendEmail(pversion,,pShouldUpdateRoxiePage).Roxie				
 			,govdata.Send_Emails(pversion,pShouldUpdateRoxiePage)
-			,Marketing_Best.Send_Emails(pversion,,pShouldUpdateRoxiePage).Roxie
+			//,Marketing_Best.Send_Emails(pversion,,pShouldUpdateRoxiePage).Roxie
 		);
 	end;
 	

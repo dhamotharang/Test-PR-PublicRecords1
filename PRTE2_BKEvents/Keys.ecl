@@ -1,4 +1,4 @@
-import doxie;
+﻿import doxie;
 
 EXPORT Keys := module
 
@@ -16,7 +16,8 @@ RETURN index(KeyRec,
 					  ,CaseKey,CaseType,BKCaseNumber,BKCaseNumberURL,ProceedingsCaseNumber
 					  ,ProceedingsCaseNumberURL,PacerCaseID,AttachmentURL,EntryNumber
 						,EnteredDate,Pacer_EnteredDate,FiledDate,Score,DocketText
-						,CatEvent_Description,CatEvent_Category,RecPos},
+						,CatEvent_Description,CatEvent_Category,record_sid
+						,global_sid,dt_effective_first,dt_effective_last,delta_ind},
 						if(isFCRA, constants.KEY_PREFIX_FCRA, constants.KEY_PREFIX) + doxie.Version_SuperKey + '::courtcode.casenumber.caseId.payload');
 												
 END;

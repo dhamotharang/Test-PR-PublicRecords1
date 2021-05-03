@@ -8,7 +8,7 @@ EXPORT Create_asHeader_V2 (string pVersion, boolean pUseProd, string gcid, strin
 		EXPORT Build_it := FUNCTION
 		
 			pBaseFile		:= IF(NOTHOR(FileServices.GetSuperFileSubCount(UPI_DataBuild.Filenames_V2(pVersion, pUseProd, gcid, pHistMode).processed_input_lBaseTemplate_built)) = 0
-												 ,dataset([],upi_databuild.Layouts_V2.input_processing)
+												 ,dataset([],UPI_DataBuild.Layouts_V2.input_processing)
 												 ,UPI_DataBuild.Files_V2(pVersion,pUseProd,gcid,pHistMode).processed_input.built);
 
 			UPI_DataBuild.Layouts_V2.as_header xformAH(UPI_DataBuild.Layouts_V2.input_processing L) := TRANSFORM
@@ -17,6 +17,8 @@ EXPORT Create_asHeader_V2 (string pVersion, boolean pUseProd, string gcid, strin
 				SELF.dt_vendor_first_reported	   	:= (unsigned)_validate.date.fCorrectedDateString(trim(stringlib.stringfilterout((string)l.dt_vendor_first_reported,'-.>$!%*@=?&\''),left,right),false);
 				SELF.dt_vendor_last_reported	   	:= (unsigned)_validate.date.fCorrectedDateString(trim(stringlib.stringfilterout((string)l.dt_vendor_last_reported,'-.>$!%*@=?&\''),left,right),false);
 				SELF.lexid												:= L.lexid;
+				SELF.old_lexid										:= L.prev_lexid;
+				SELF.old_crk											:= L.prev_crk;
 				SELF															:= L;
 				SELF															:= [];
 			END;

@@ -1,6 +1,10 @@
-﻿import address, doxie, doxie_build, header_services, ut, watchdog, prte, PRTE2_Header, NID;
+﻿import address, doxie, doxie_build, header_services, ut, watchdog, prte, PRTE2_Header, NID, Risk_Indicators;
 
-h := doxie_build.File_FCRA_header_building; 
+fcra_hdr := doxie_build.File_FCRA_header_building; 
+//added filter to remove BA and L2 records
+valid_header_uncorrected := Header.fn_fcra_filter_src(fcra_hdr);
+
+h := Risk_Indicators.Header_Corrections_Function(valid_header_uncorrected);
 
 layout_prep_for_keys := record
   h.zip;

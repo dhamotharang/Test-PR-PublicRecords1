@@ -229,8 +229,8 @@ export _proc_empid(
       
       eclInit_prep		:= 'import BIPV2_Files,BIPV2_build;\niteration := \'@iteration@\';\npversion  := \'@version@\';\n#OPTION(\'multiplePersistInstances\',FALSE);\n#workunit(\'name\',\'BIPV2_EmpID \' + pversion + \' Init \');\n#workunit(\'priority\',\'high\');\n' ;
       eclSpec_prep		:= 'import BIPV2_Files,BIPV2_build;\niteration := \'@iteration@\';\npversion  := \'@version@\';\n#OPTION(\'multiplePersistInstances\',FALSE);\nlih := BIPV2_Files.files_empid(\'BIPV2_EmpID\').DS_BUILDING;\n#workunit(\'name\',\'BIPV2_EmpID \' + pversion + \' Specificities \');\n#workunit(\'priority\',\'high\');\n'    ;
-      eclIter_prep		:= 'import BIPV2_Files,BIPV2_build;\niteration := \'@iteration@\';\npversion  := \'@version@\';\n#OPTION(\'multiplePersistInstances\',FALSE);\nlih := BIPV2_Files.files_empid(\'BIPV2_EmpID\').DS_BUILDING;\n#workunit(\'name\',\'BIPV2_EmpID \' + pversion + \' iter \' + iteration);\n#workunit(\'priority\',\'high\');\n' ;    
-      eclPost_prep		:= 'import BIPV2_build;\n#workunit(\'name\',\'BIPV2_EmpID @version@ PostProcess\');\n';
+      eclIter_prep		:= 'import BIPV2_Files,BIPV2_build;\niteration := \'@iteration@\';\npversion  := \'@version@\';\n#OPTION(\'multiplePersistInstances\',FALSE);\nlih := BIPV2_Files.files_empid(\'BIPV2_EmpID\').DS_BUILDING;\n#workunit(\'name\',\'BIPV2_EmpID \' + pversion + \' iter \' + iteration);\n#workunit(\'priority\',\'high\');\n#workunit(\'protect\' ,true);\n' ;    
+      eclPost_prep		:= 'import BIPV2_build;\n#workunit(\'name\',\'BIPV2_EmpID @version@ PostProcess\');\n#workunit(\'protect\' ,true);\n';
      
       eclInit		:= eclInit_prep + 'BIPV2_EmpID._proc_empid(                                   ).initFromEmpID_Down('  + #TEXT(p_Init_File)+ ');';
       eclSpec		:= eclSpec_prep + 'BIPV2_EmpID._proc_empid(lih,iteration,\'' + pversion + '\' ).runSpecBuild;';

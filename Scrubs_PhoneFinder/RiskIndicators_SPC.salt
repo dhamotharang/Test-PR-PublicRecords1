@@ -1,0 +1,22 @@
+﻿OPTIONS:-gh
+MODULE:Scrubs_PhoneFinder
+FILENAME:PhoneFinder
+NAMESCOPE:RiskIndicators
+
+FIELDTYPE:Invalid_No:ALLOW(0123456789-\\N)
+FIELDTYPE:Invalid_ID:ALLOW(0123456789R\\N)
+FIELDTYPE:Invalid_Alpha:ALLOW(ABCDEFGHIJKLMNOPQRSTUVWXYZ\\ )
+FIELDTYPE:Invalid_AlphaChar:ALLOW(ABCDEFGHIJKLMNOPQRSTUVWXYZ .,/-\\')
+FIELDTYPE:Invalid_Risk:CUSTOM(Scrubs_PhoneFinder.Functions.Risk_Check > 0)
+FIELDTYPE:Invalid_Date:CUSTOM(Scrubs_PhoneFinder.Functions.Split_Date > 0)
+FIELDTYPE:Invalid_File:CUSTOM(Scrubs_PhoneFinder.Functions.Check_File > 0)
+
+FIELD:transaction_id:TYPE(STRING16):LIKE(Invalid_ID):0,0
+FIELD:phone_id:TYPE(INTEGER5):LIKE(Invalid_No):0,0
+FIELD:sequence_number:TYPE(INTEGER5):LIKE(Invalid_No):0,0
+FIELD:date_added:TYPE(STRING20):LIKE(Invalid_Date):0,0
+FIELD:risk_indicator_id:TYPE(INTEGER5):LIKE(Invalid_No):0,0
+FIELD:risk_indicator_level:TYPE(STRING16):LIKE(Invalid_Alpha):0,0
+FIELD:risk_indicator_text:TYPE(STRING256):0,0
+FIELD:risk_indicator_category:TYPE(STRING32):LIKE(Invalid_Risk):0,0
+FIELD:filename:TYPE(STRING255):LIKE(Invalid_File):0,0

@@ -1,0 +1,1 @@
+﻿EXPORT KeyName_6500_Government_Trade_Delta_rid := trim(GetSegmentKeyName_Delta_RID('6500'));

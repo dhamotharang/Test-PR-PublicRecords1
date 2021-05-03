@@ -58,7 +58,7 @@
 		,state_field := state
 		,phone_field := phone10
 		,fein_field := fein
-		,outrec := BIPV2.IdAppendLayouts.IdsOnly
+		,outrec := BIPV2.IdAppendLayouts.IdsOnlyDebug
 		,bool_outrec_has_score := true
 		,keep_count := '1'
 		,score_threshold := score_threshold
@@ -92,10 +92,14 @@
 	res := if(includeBest, postBest, postAppend);
 	resv1 := project(res, transform(BIPV2.IdAppendLayouts.svcAppendOut, self := left));
 
+	emptyHeader := dataset([], BIPV2.IdAppendLayouts.svcAppendRecsOut);
+
+#IF(BIPV2.IdConstants.USE_LOCAL_KEYS)
 	postHeader := BIPV2.IdAppendLocal.FetchRecords(withAppend, fetchLevel, dnbFullRemove
 	                                               ,mod_access := modAccess);
-
-	emptyHeader := dataset([], BIPV2.IdAppendLayouts.svcAppendRecsOut);
+#ELSE
+	postHeader := emptyHeader;
+#END
 
 	// Catch failures so roxiepipe won't fail.
 	// Return dataset with request ids in case of failure, turning an error into a no hit.

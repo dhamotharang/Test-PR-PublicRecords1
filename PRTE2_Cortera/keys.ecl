@@ -11,8 +11,11 @@ EXPORT Keys := MODULE
   EXPORT Header_Link_Id := INDEX(files.Key_hdr (link_id > 0), {link_id}, {files.Key_hdr},
          Data_Services.Data_location.Prefix('DEFAULT')+ constants.key_prefix + doxie.Version_SuperKey + '::hdr_linkid');
 
-  
-  
+ 
+  EXPORT Exec_Link_Id := INDEX(files.execlinkid (link_id > 0), {link_id,persistent_record_id}, {files.execlinkid},
+         Data_Services.Data_location.Prefix('DEFAULT')+ constants.key_prefix + doxie.Version_SuperKey + '::executive_linkid'); 
+ 
+  	
   EXPORT LinkIds := MODULE
   
    //DEFINE THE INDEX

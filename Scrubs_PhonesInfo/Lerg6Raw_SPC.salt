@@ -1,0 +1,60 @@
+﻿OPTIONS:-gh
+MODULE:Scrubs_Phonesinfo
+FILENAME:Phonesinfo
+NAMESCOPE:Lerg6Raw
+
+FIELDTYPE:Invalid_Alpha:ALLOW(ABCDEFGHIJKLMNOPQRSTUVWXYZ- ) 
+FIELDTYPE:Invalid_BlockID:ALLOW(0123456789A) 
+FIELDTYPE:Invalid_Char:ALLOW(ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-/' )
+FIELDTYPE:Invalid_CocTypeCode:ENUM(700|AIN|ATC|BLG|BRD|CDA|CTV|ENP|EOC|FGB|HVL|INP|N11|ONA|PLN|PMC|RCC|RTG|SIC|SP1|SP2|TST|UFA|VOI)
+FIELDTYPE:Invalid_Filename:ALLOW(ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789_.:)
+FIELDTYPE:Invalid_Num:ALLOW(0123456789 )
+FIELDTYPE:Invalid_Nxx:ALLOW(0123456789+)
+FIELDTYPE:Invalid_RcTyCode:ENUM(Z|S|+| ) 
+FIELDTYPE:Invalid_StatusCode:ENUM(E|M|D| ) 
+FIELDTYPE:Invalid_SccTypeCode:ALLOW(ABCIJMNORSTVWXZ8)
+FIELDTYPE:Invalid_TBlockInd:ENUM(I|N|S|Y)  
+FIELDTYPE:Invalid_TdCode:ALLOW(0123456789NA)
+FIELDTYPE:Invalid_TestRespCode:ENUM(A|M| )
+FIELDTYPE:Invalid_YesNo:ENUM(Y|N)
+
+FIELD:lata:LIKE(Invalid_Num):TYPE(STRING):0,0
+FIELD:lata_name:LIKE(Invalid_Alpha):TYPE(STRING):0,0
+FIELD:status:LIKE(Invalid_StatusCode):TYPE(STRING):0,0
+FIELD:eff_date:TYPE(STRING):0,0
+FIELD:npa:LIKE(Invalid_Num):TYPE(STRING):0,0
+FIELD:nxx:LIKE(Invalid_Nxx):TYPE(STRING):0,0
+FIELD:block_id:LIKE(Invalid_BlockID):TYPE(STRING):0,0
+FIELD:filler1:TYPE(STRING):0,0
+FIELD:coc_type:LIKE(Invalid_CocTypeCode):TYPE(STRING):0,0
+FIELD:ssc:LIKE(Invalid_SccTypeCode):TYPE(STRING):0,0
+FIELD:dind:LIKE(Invalid_YesNo):TYPE(STRING):0,0
+FIELD:td_eo:LIKE(Invalid_TdCode):TYPE(STRING):0,0
+FIELD:td_at:LIKE(Invalid_TdCode):TYPE(STRING):0,0
+FIELD:portable:LIKE(Invalid_YesNo):TYPE(STRING):0,0
+FIELD:aocn:LIKE(Invalid_Char):TYPE(STRING):0,0
+FIELD:filler2:TYPE(STRING):0,0
+FIELD:ocn:LIKE(Invalid_Char):TYPE(STRING):0,0
+FIELD:loc_name:LIKE(Invalid_Char):TYPE(STRING):0,0
+FIELD:loc:LIKE(Invalid_Char):TYPE(STRING):0,0
+FIELD:loc_state:LIKE(Invalid_Alpha):TYPE(STRING):0,0
+FIELD:rc_abbre:LIKE(Invalid_Char):TYPE(STRING):0,0
+FIELD:rc_ty:LIKE(Invalid_RcTyCode):TYPE(STRING):0,0
+FIELD:line_fr:LIKE(Invalid_Num):TYPE(STRING):0,0
+FIELD:line_to:LIKE(Invalid_Num):TYPE(STRING):0,0
+FIELD:switch:LIKE(Invalid_Char):TYPE(STRING):0,0
+FIELD:sha_indicator:LIKE(Invalid_Num):TYPE(STRING):0,0
+FIELD:filler3:TYPE(STRING):0,0
+FIELD:test_line_num:LIKE(Invalid_Num):TYPE(STRING):0,0
+FIELD:test_line_response:LIKE(Invalid_TestRespCode):TYPE(STRING):0,0
+FIELD:test_line_exp_date:TYPE(STRING):0,0
+FIELD:blk_1000_pool:LIKE(Invalid_TBlockInd):TYPE(STRING):0,0
+FIELD:rc_lata:LIKE(Invalid_Num):TYPE(STRING):0,0
+FIELD:filler4:TYPE(STRING):0,0
+FIELD:creation_date:TYPE(STRING):0,0
+FIELD:filler5:TYPE(STRING):0,0
+FIELD:e_status_date:TYPE(STRING):0,0
+FIELD:filler6:TYPE(STRING):0,0
+FIELD:last_modified_date:TYPE(STRING):0,0
+FIELD:filler7:TYPE(STRING):0,0
+FIELD:filename:LIKE(Invalid_Filename):TYPE(STRING255):0,0

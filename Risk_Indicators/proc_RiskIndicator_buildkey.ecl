@@ -194,9 +194,10 @@ RoxieKeyBuild.MAC_SK_Move_To_Built_v2('~thor_data400::key::death_master::fcra::@
 RoxieKeyBuild.MAC_SK_Move_To_Built_v2('~thor_data400::key::death_master::fcra::@version@::adl_risk_table_v4_filtered', 
 									'~thor_data400::key::death_master::fcra::'+%version_date%+'::adl_risk_table_v4_filtered', b7, '2');	
 
-									
-full1 := 	sequential(	parallel(a1,a2,a3,a4,a5,a7,a9,a10,a11,a12,a13,a14,a15,a16,a17,a18,a19,a20,a21,a22,a23,a24,a25,a26,a27),
-					  					parallel(b1,b2,b3,b4,b5,b7,b9,b10,b11,b12,b13,b14,b15,b16,b17,b18,b19,b20,b21,b22,b23,b24,b25,b26,b27)
+//No need to build indexes a9-a13
+//see https://jira.rsi.lexisnexis.com/browse/DF-28403									
+full1 := 	sequential(	parallel(a1,a2,a3,a4,a5,a7,/*a9,a10,a11,a12,a13,*/a14,a15,a16,a17,a18,a19,a20,a21,a22,a23,a24,a25,a26,a27),
+					  					parallel(b1,b2,b3,b4,b5,b7,/*b9,b10,b11,b12,b13,*/b14,b15,b16,b17,b18,b19,b20,b21,b22,b23,b24,b25,b26,b27)
 										);					
 
 	///////////////////////// Move Non-FCRA KEYS /////////////////////////
@@ -230,15 +231,14 @@ full1 := 	sequential(	parallel(a1,a2,a3,a4,a5,a7,a9,a10,a11,a12,a13,a14,a15,a16,
 	RoxieKeyBuild.Mac_SK_Move_V2('~thor_data400::key::death_master::fcra::@version@::ssn_table_v4_filtered', 'Q', move5, 2);
   RoxieKeyBuild.Mac_SK_Move_V2('~thor_data400::key::death_master::fcra::@version@::adl_risk_table_v4_filtered', 'Q', move7, 2);
 
-	move_qa	:=	parallel(move1,move2,move3,move4,move5,move7,move9,move10,move11,move12,move13,move14,move15,move16,move17,move18,move19,move20,move21,move22,move23,move24,move25,move26,move27);
+	move_qa	:=	parallel(move1,move2,move3,move4,move5,move7,/*move9,move10,move11,move12,move13,*/move14,move15,move16,move17,move18,move19,move20,move21,move22,move23,move24,move25,move26,move27);
                        
 //// Please do not add automatic update of DOPS 
 
 //  Build Orbit entry with Build In Progress status
-
-
-   oRiskIndicator       := Orbit3.proc_Orbit3_CreateBuild_AddItem ('Risk Indicator', filedate,'N', ,true,true);  
-	 oFcra_Risk_Indicator := Orbit3.proc_Orbit3_CreateBuild_AddItem ('FCRA_Risk_Indicator',filedate,'F', ,true,true);   
+STRING leMailTarget := 'jose.bello@lexisnexis.com;gregory.rose@lexisnexisrisk.com;Gabriel.Marcan@lexisnexis.com;Harry.Gist@lexisnexis.com;Debendra.Kumar@lexisnexisrisk.com';
+oRiskIndicator       := Orbit3.proc_Orbit3_CreateBuild_AddItem ( 'Risk Indicator',filedate,'N',leMailTarget,runaddcomponentsonly := false);
+oFcra_Risk_Indicator := Orbit3.proc_Orbit3_CreateBuild_AddItem ( 'FCRA_Risk_Indicator',filedate,'F',leMailTarget,runaddcomponentsonly := false);
 
 return sequential(full1,move_qa,Scrubs_Risk_Indicators.fn_GenerateStats(filedate),Scrubs_Risk_Indicators.fn_RunScrubs(filedate,''),oRiskIndicator,oFcra_Risk_Indicator);
 END;				

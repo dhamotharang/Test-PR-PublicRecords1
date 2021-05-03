@@ -26,7 +26,7 @@ EXPORT Move_Keys(string infiledate, boolean isprte = false) := function
         move_key('property_search_v2',infiledate,'fcra','ffid',property_search_v2retval);
         move_key('pii',infiledate,'fcra','ssn',piissnretval,true);
         move_key('pii',infiledate,'fcra','did',piididretval,true);
-        move_key('aircraft',infiledate,'fcra','ffid',aircraftretval);
+        //move_key('aircraft',infiledate,'fcra','ffid',aircraftretval);
 				move_key('watercraft',infiledate,'fcra','ffid',watercraftretval);
         move_key('watercraft',infiledate,'fcra','watercraft_sid',watercraft_sidretval);
         move_key('watercraft',infiledate,'fcra','watercraft_cid',watercraft_cguardretval);
@@ -70,8 +70,8 @@ EXPORT Move_Keys(string infiledate, boolean isprte = false) := function
 				move_key('property_deed',infiledate,'fcra','ffid',property_deedretval);
 				move_key('property_search',infiledate,'fcra','ffid',property_searchretval);
 				move_key('property_ownership',infiledate,'fcra','did',property_ownershipretval);
-				move_key('ucc_main',infiledate,'fcra','ffid',ucc_mainretval);
-        move_key('ucc_party',infiledate,'fcra','ffid',ucc_partyretval);
+				//move_key('ucc_main',infiledate,'fcra','ffid',ucc_mainretval);
+        //move_key('ucc_party',infiledate,'fcra','ffid',ucc_partyretval);
 				move_key('consumerstatement',infiledate,'fcra','lexid',cons_lexidretval);
 				move_key('consumerstatement',infiledate,'fcra','ssn',cons_ssnretval);
 				move_key('thrive',infiledate,'fcra','ffid',thriveretval);
@@ -104,7 +104,7 @@ EXPORT Move_Keys(string infiledate, boolean isprte = false) := function
         ,property_search_v2retval*/
         ,piissnretval
         ,piididretval
-        ,aircraftretval
+        //,aircraftretval
         ,watercraftretval
 				,watercraft_sidretval
         ,watercraft_cguardretval
@@ -148,8 +148,8 @@ EXPORT Move_Keys(string infiledate, boolean isprte = false) := function
 				,property_deedretval
 				,property_searchretval
 				,property_ownershipretval
-				,ucc_mainretval
-				,ucc_partyretval
+				//,ucc_mainretval
+				//,ucc_partyretval
 				,cons_lexidretval
 				,cons_ssnretval
 				,thriveretval

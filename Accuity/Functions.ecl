@@ -57,7 +57,7 @@ export string10 fSlashedMDYtoCYMD(string pDateIn) :=  function
 	
 	return MAP(
 		length(TRIM(pDateIn,LEFT,RIGHT))=4 => pDateIn + '/00/00',
-		FixCentury(ut.ConvertDateMultiple(pDateIn, fmts, fmtout))
+		FixCentury(Std.date.ConvertDateFormatMultiple(pDateIn, fmts, fmtout))
 	);
 	
 END;
@@ -207,8 +207,8 @@ export normAliases(dataset(Accuity.Layouts.input.rEntity) infile) := function
 							infile});
 	
 		ds1 := normalize(tbl_aka,left.akacount,transform({string id,Worldcheck_Bridger.Layout_Worldcheck_Entity_Exported.layout_aliases},
-			fullname := left.AKAs[counter].alias;
-			alias_type:= left.AKAs[counter].alias_type;
+			fullname := if (counter < 256, left.AKAs[counter].alias,SKIP);
+			alias_type:= if (counter < 256, left.AKAs[counter].alias_type,SKIP);
 
 			self.id 				:= left.id;
 			self.type 			:= map(alias_type = 'Alias' => 'AKA',

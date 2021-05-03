@@ -1,4 +1,4 @@
-#workunit('name','NonFCRA-nd11 process');
+﻿#workunit('name','NonFCRA-nd11 process');
 #option ('hthorMemoryLimit', 1000)
 
 /* *** Note that Neticuity is turned ON *** needs to use Cert gateway  */
@@ -59,7 +59,7 @@ Scoring.Layout_CDXO_Soapcall into_CDXO_input(f le) := transform
 //	self.HistoryDateYYYYMM:=(integer)'200607';
 	self.dppapurpose := 3;
 	self.glbpurpose := 1;
-	self.gateways := dataset([{'neutralroxie', 'http://roxiebatch.br.seisint.com:9856'},
+	self.gateways := dataset([{'neutralroxie', 'http://roxiethorvip.hpcc.risk.regn.net:9856'},
 						{'netacuity', 'http://rw_data_prod:Password01@rwgatewaycert.sc.seisint.com:7726/WsGateway'}], risk_indicators.Layout_Gateways_In);
 	self := le;
 	self := [];
@@ -69,7 +69,7 @@ soap_in := project(f,into_CDXO_input(LEFT));
 output(soap_in, named('soap_in'));
 
 
-roxieIP:='http://roxiebatch.br.seisint.com:9856';  //Regular Roxie
+roxieIP:='http://roxiethorvip.hpcc.risk.regn.net:9856';  //Regular Roxie
 
 Scoring.MAC_PROD_Soapcall(soap_in, RiskWise.Layout_CDXO, roxieIP, 'RiskWise.RiskWiseMainCDXO',s_f,parallel_threads);
 try_2 := JOIN(soap_in, s_f(errorcode<>''), LEFT.account=RIGHT.account, TRANSFORM(Scoring.Layout_CDXO_Soapcall,SELF := LEFT));

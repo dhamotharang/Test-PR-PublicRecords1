@@ -2,7 +2,7 @@
 
 //#workunit('name','Get pphone_build_version');
 
-EXPORT Holiday_Rmv_Logical_From_Super (string build_version):= function
+EXPORT Holiday_Rmv_Logical_From_Super (string build_version, string contacts):= function
 
 string stripped_b_version := build_version[1..8];
 
@@ -24,12 +24,12 @@ bversion := output (stripped_b_version);
 
 //find super to clear
 super_ds := dataset([
-{'thor_data400::key::phones_ported_metadata_delete'},
-{'thor_data400::key::phones_ported_metadata_great_grandfather'},
-{'thor_data400::key::phones_ported_metadata_grandfather'},
-{'thor_data400::key::phones_ported_metadata_father'},
-{'thor_data400::key::phones_ported_metadata_built'},
-{'thor_data400::key::phones_ported_metadata_qa'}
+{'thor_data400::key::phones_transaction_delete'},
+{'thor_data400::key::phones_transaction_great_grandfather'},
+{'thor_data400::key::phones_transaction_grandfather'},
+{'thor_data400::key::phones_transaction_father'},
+{'thor_data400::key::phones_transaction_built'},
+{'thor_data400::key::phones_transaction_qa'}
 ],{string superfile});
 
 super_logical_recs_lo := record
@@ -58,7 +58,7 @@ updateSuperFile := sequential(
 																													);
 							  
 clear_super := if ( count(sup_2_clear) > 0, sequential (updateSuperfile,
-                                                        FileServices.SendEmail(_control.MyInfo.EmailAddressNotify + ';judy.tao@lexisnexisrisk.com' + ';darren.knowles@lexisnexisrisk.com', 'PhonesInfo Ported & Metadata Key Build Holiday Save Logical', workunit + ' Removing thor_data400::key::'+prod_version+'::phones_ported_metadata From Super')
+                                                        FileServices.SendEmail(contacts, 'PhonesInfo Ported & Metadata Key Build Holiday Save Logical', workunit + ' Removing thor_data400::key::'+prod_version+'::phones_ported_metadata From Super')
                                                         ));
 
 process_save_logical := sequential (output (stripped_b_version),

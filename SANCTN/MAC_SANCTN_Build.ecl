@@ -65,7 +65,7 @@ PromoteSupers.MAC_SF_BuildProcess(combined_incident_data, SANCTN.cluster_name +'
 
 %build_keys%  := SANCTN.proc_build_SANCTN_keys(filedate);
 							 
-%updatedops% := dops.updateversion('SanctnKeys',filedate,'skasavajjala@seisint.com',,'N|B');
+%updatedops% := dops.updateversion('SanctnKeys',filedate,'Harry.Gist@lexisnexisrisk.com',,'N|B');
 
 %qa_samp%    := SANCTN.out_incident_party_samples;
 

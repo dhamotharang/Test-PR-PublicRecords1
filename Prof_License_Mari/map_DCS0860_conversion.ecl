@@ -89,6 +89,7 @@ maribase_plus_DBAs	xformToCommon(Prof_License_Mari.layout_dcs0860.Common L):= TR
 																 'REAL ESTATE ORGANIZATION' => 'REO',
 																 'REAL ESTATE SALESPERSON' => 'SP',
 																 'REAL ESTATE BROKER' => 'BR',
+																 'REAL ESTATE BROKER OFFICER' => 'BO',
  																 '');
 		
 		SELF.STD_LICENSE_TYPE 	:= IF(SELF.RAW_LICENSE_TYPE <> '', SELF.RAW_LICENSE_TYPE,'ABF');		
@@ -101,8 +102,8 @@ maribase_plus_DBAs	xformToCommon(Prof_License_Mari.layout_dcs0860.Common L):= TR
 		
 		SELF.Std_License_Desc	 	:= ut.CleanSpacesAndUpper(L.Shrt_Dscr);
 		SELF.Raw_License_Status	:= ut.CleanSpacesAndUpper(L.Status_Code);
-		SELF.Std_License_Status	:= 'A';
-		SELF.Std_Status_Desc	  := 'ACTIVE';
+		// SELF.Std_License_Status	:= 'A';
+		// SELF.Std_Status_Desc	  := '';
 		
 		//Reformatting date to YYYYMMDD
 		SELF.CURR_ISSUE_DTE		  := '17530101';
@@ -342,6 +343,8 @@ END;
 		
 inFileLic	:= PROJECT(GoodNameRec,xformToCommon(LEFT));
 
+
+
 // Populate STD_PROF_CD field via translation on license type field
 maribase_plus_DBAs 	trans_lic_type(inFileLic L, cmvTransLkp R) := TRANSFORM
 		SELF.Std_Prof_CD := R.DM_Value1;
@@ -354,19 +357,29 @@ ds_map_lic_trans := JOIN(inFileLic, cmvTransLkp,
 												AND RIGHT.dm_Name1 = 'PROFCODE',
 												trans_lic_type(LEFT, RIGHT),LEFT OUTER, LOOKUP);
 																		
+	// Populate STD_LICENSE_STATUS field via translation on RAW_LICENSE_STATUS field
+maribase_plus_DBAs trans_lic_status(ds_map_lic_trans L, cmvTransLkp R) := TRANSFORM
+		SELF.STD_LICENSE_STATUS := R.DM_VALUE1;
+		SELF := L;
+	END;
 
+	ds_map_stat_trans := JOIN(ds_map_lic_trans, cmvTransLkp,
+								TRIM(LEFT.raw_license_status,LEFT,RIGHT)= TRIM(RIGHT.fld_value,LEFT,RIGHT)
+									AND RIGHT.fld_name='LIC_STATUS',
+								trans_lic_status(LEFT,RIGHT),LEFT OUTER,LOOKUP);
+								
 // Normalized DBA records
 MariBase_DBAs := RECORD,MAXLENGTH(5000)
   MariBase_plus_DBAs;
   STRING60 Tmp_DBA;
 END;
 
-MariBase_DBAs	NormIT(ds_map_lic_trans L, INTEGER C) := TRANSFORM
+MariBase_DBAs	NormIT(ds_map_stat_trans L, INTEGER C) := TRANSFORM
 		SELF := L;
 		SELF.Tmp_DBA := CHOOSE(C, L.DBA1, L.DBA2, L.DBA3, L.DBA4, L.DBA5);
 END;
 
-NormDBAs 	:= DEDUP(NORMALIZE(ds_map_lic_trans, 5, NormIT(LEFT, COUNTER)), ALL,RECORD);
+NormDBAs 	:= DEDUP(NORMALIZE(ds_map_stat_trans, 5, NormIT(LEFT, COUNTER)), ALL,RECORD);
 
 NoDBARecs	:= NormDBAs(Tmp_DBA = '' AND DBA1 = '' AND DBA2 = '' AND DBA3 = '' AND DBA4 = '' AND DBA5 = '');
 DBARecs 	:= NormDBAs(Tmp_DBA != '');

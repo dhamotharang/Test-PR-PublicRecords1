@@ -8,6 +8,6 @@ export Email_Notification_Lists(boolean	pIsTesting = _Constants().IsTesting ) :=
 	export BuildSuccess := if(pIsTesting, myInfo, all_hands);
 	export BuildFailure := all_hands;
 	export Roxie        := if(pIsTesting, myInfo, RoxieKeyBuild.Email_Notification_List + all_hands);
-	export ScrubsPlus   := if(pIsTesting, myInfo, all_hands + ';Rosemary.Murphy@lexisnexisrisk.com;Kevin.Reeder@lexisnexisrisk.com;Audra.Mireles@lexisnexisrisk.com');
+	export ScrubsPlus   := if(pIsTesting, myInfo, all_hands + ';Rosemary.Murphy@lexisnexisrisk.com;Kevin.Reeder@lexisnexisrisk.com;Audra.Mireles@lexisnexisrisk.com;Cherry.Austero@lexisnexisrisk.com');
 
 end; 

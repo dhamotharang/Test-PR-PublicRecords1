@@ -22,6 +22,10 @@ EXPORT Functions := MODULE
 
   //****************************************************************************
   //fn_numeric_optional: 	returns true if only populated with numbers or empty
+	//                      If the string contains all numbers the size provided must 
+	//                      equal the length of the string.  Use ALLOW in spc file 
+	//                      if your optional numeric string has varying lengths.
+	//                      EXAMPLE: FIELDTYPE:Numeric_Optional:ALLOW(0123456789)
   //****************************************************************************
   EXPORT fn_numeric_optional(STRING nmbr, UNSIGNED1 size = 0) := FUNCTION
     RETURN IF(LENGTH(TRIM(nmbr, ALL)) IN [0,size] AND Stringlib.StringFilterOut(nmbr, '0123456789') = '',1,0);
@@ -55,6 +59,13 @@ EXPORT Functions := MODULE
   EXPORT fn_alpha(STRING alpha, UNSIGNED1 size = 0) := FUNCTION
     RETURN IF(IF(size = 0, LENGTH(TRIM(alpha, ALL)) > 0, LENGTH(TRIM(alpha, ALL)) = size) AND
               Stringlib.StringFilterOut(alpha, 'AaBbCcDdEeFfGgHhIiJjKkLlMmNnOoPpQqRrSsTtUuVvWwXxYyZz') = '',1,0);
+  END;
+	
+	//****************************************************************************
+  //fn_alphaNum_or_blank: 	returns true if only populated with letters, numbers or blank
+  //****************************************************************************
+  EXPORT fn_alphaNum_or_blank(STRING s) := FUNCTION
+    RETURN IF(Stringlib.StringFilterOut(s, ' 1234567890AaBbCcDdEeFfGgHhIiJjKkLlMmNnOoPpQqRrSsTtUuVvWwXxYyZz') = '',1,0);
   END;
   
   //****************************************************************************
@@ -382,6 +393,14 @@ EXPORT Functions := MODULE
     RETURN IF(regexfind('^[-]?\\d+\\.\\d+$', geo_clean) OR geo_clean = '', 1, 0);
   END;
 
+  //****************************************************************************
+  //fn_Valid_Country3Abbrev: returns true if there is a valid country
+  //                         abbreviation or if the code is empty.
+  //****************************************************************************
+  EXPORT fn_Valid_Country3Abbrev(STRING cntry) := FUNCTION
+    RETURN IF(cntry = '' OR ut.Country_ISO3_To_Name(cntry) != '', 1, 0);
+  END;
+
 
     
 
@@ -442,4 +461,49 @@ END;
 //***************END BUSINESS SECTION**********************//
 //*********************************************************//
     
+    EXPORT fn_valid_email(string em) := FUNCTION
+
+    cleanEm         := TRIM(em,ALL);
+    rgxEmail        := '^[a-zA-Z0-9.!#$%&\'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$';
+    isValidEmail    := REGEXFIND(rgxEmail, cleanEm);
+    isBlank         := LENGTH(cleanEm) = 0;
+
+    RETURN if(
+                isValidEmail OR isBlank
+                ,1
+                ,0
+            );
+
+    END;
+
+    EXPORT fn_Valid_Phone2(string no) := FUNCTION 
+        cNo := TRIM(no,ALL);
+        isPhoneValid := LENGTH(STD.str.filter(cNo,'0123456789')) = 10
+                AND STD.str.findCount(cNo[LENGTH(cNo)-6..LENGTH(cNo)],cNo[LENGTH(cNo)-6]) < 7
+                AND cNo[LENGTH(cNo)-3..LENGTH(cNo)] NOT IN ['0000','9999']
+                AND cNo[LENGTH(cNo)-6] NOT IN ['0','1']
+                AND cNo[..3] NOT IN ['800','811','822','833','844','855','866','877','888','899'];
+        isBlank := no = '';
+
+        RETURN IF(
+            isPhoneValid OR isBlank,
+            1,
+            0
+        );
+
+    END;
+
+    EXPORT fn_valid_IP(string ip) := FUNCTION
+
+        cleanIp      := TRIM(ip,whitespace);
+        isIPV4      := STD.str.filterOut(cleanIp, '0123456789') = '...';
+        isMinMaxLength := LENGTH(cleanIp) > 6 AND LENGTH(cleanIP) < 16;
+        isBlank     := LENGTH(cleanIp) = 0;
+
+        RETURN if(
+                    (isIPV4 AND isMinMaxLength) or isBlank
+                    ,1
+                    ,0
+                );
+    END;
 END; //End Functions Module

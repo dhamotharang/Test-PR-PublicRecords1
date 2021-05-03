@@ -1,18 +1,10 @@
-Import Data_Services, doxie, ut;
+﻿Import Data_Services, doxie, ut;
 
-base := PhonesFeedback.File_PhonesFeedback_base;
- 
-key_base := base(phone_number <> '0' and phone_number <> ' ');				   
+export Key_PhonesFeedback_phone(dataset(phonesFeedback.Layouts_PhonesFeedback.Layout_PhonesFeedback_base)	phoneFile = DATASET([],phonesFeedback.Layouts_PhonesFeedback.Layout_PhonesFeedback_base)) := function
 
-export Key_PhonesFeedback_phone := index(key_base,
-										  {phone_number},
-										  {key_base},
-										  ut.foreign_prod + 'thor_data400::key::phonesFeedback::'+doxie.Version_SuperKey+'::phone');										  
-										  
-
-
-
-										 
-										  									  
-										  
-										  									  
+return index(	phoneFile,
+							{phone_number},
+							{phoneFile},
+							data_services.data_location.Prefix('phonesFeedback') + 'thor_data400::key::phonesFeedback::'+doxie.Version_SuperKey+'::phone');
+							
+end;

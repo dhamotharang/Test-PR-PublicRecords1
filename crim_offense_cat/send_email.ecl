@@ -1,4 +1,4 @@
-import versioncontrol,_control,uspis_hotlist, std;
+﻿import versioncontrol,_control,uspis_hotlist, std;
 
 export Send_Email(
 	
@@ -9,8 +9,8 @@ export Send_Email(
 ):= module
 
 	export notificationlist := if(VersionControl._Flags.IsDataland
-																,_Control.myinfo.EmailAddressNotify
-																,'Alan.Jaramillo@LexisNexisRisk.com; Charles.Pettola@lexisnexisrisk.com;'  + _Control.myinfo.EmailAddressNotify
+																,'Alan.Jaramillo@LexisNexisRisk.com; Christopher.Brodeur@lexisnexisrisk.com;'
+																,'Alan.Jaramillo@LexisNexisRisk.com; Christopher.Brodeur@lexisnexisrisk.com;'
 															);
 							
 	export build_success := STD.System.Email.sendemail(
