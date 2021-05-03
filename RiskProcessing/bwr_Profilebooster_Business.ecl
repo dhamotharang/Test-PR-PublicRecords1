@@ -9,12 +9,18 @@ IMPORT PublicRecords_KEL,BRM_Marketing_attributes,RiskWise,Data_Services;
  * recordsToRun: Number of records to run through the service. Set to *
  *    0 to run all.                                                   *
  * threads: Number of parallel threads to run. Set to 1 - 30.         *
- * roxieIP: IP Address of the non-FCRA roxie.                         *
+ * roxieIP: IP Address of the non-FCRA roxie.
+ * BIPAppendReAppend: Switch to True or False based on input.
+                             i.BII only = True
+                             ii. SeleId only = False
+                             iii.BII + SeleId = False                         *
  **********************************************************************/
  
 recordsToRun := 0;
 eyeball      := 10;
 threads      := 30;
+//check thread count
+RiskWise.shortcuts.check_thread_count(threads,40);
 
 RoxieIP := RiskWise.shortcuts.prod_batch_analytics_roxie;      // Production
 
@@ -50,7 +56,9 @@ OutputFile := '~tfuerstenberg::out::profilebooster_bus_test_'+ ThorLib.wuid();
 		EXPORT UNSIGNED BIPAppendScoreThreshold :=75;
 		EXPORT UNSIGNED BIPAppendWeightThreshold :=0;
 		EXPORT BOOLEAN BIPAppendPrimForce :=false;
-		EXPORT BOOLEAN BIPAppendReAppend :=false;
+    
+    //BIPAppendReAppend depends on the input supplied as explained above in Options Note.
+		EXPORT BOOLEAN BIPAppendReAppend :=True;
 		EXPORT BOOLEAN BIPAppendIncludeAuthRep :=false;
 		// CCPA Options
 		EXPORT UNSIGNED1 LexIdSourceOptout := 1;
