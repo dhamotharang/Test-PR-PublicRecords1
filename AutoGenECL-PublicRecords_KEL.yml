@@ -1,6 +1,6 @@
 AutoGenECL-PublicRecords_KEL:
   image: 
-    name: openjdk:14-alpine # OpenJDK 14
+    name: gitlab.ins.risk.regn.net:4567/risk-engineering/vault/openjdk:14-alpine # OpenJDK 14
   before_script:
     # Install the required software/updates - For some reason the default versions are quite old, so specify the "edge" for latest and greatest
     - apk update --repository http://dl-cdn.alpinelinux.org/alpine/edge/main/
