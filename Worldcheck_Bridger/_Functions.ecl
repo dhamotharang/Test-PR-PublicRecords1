@@ -1435,6 +1435,7 @@
 				trim(kword, left, right) = 'ARRNR-MW' =>SubGroup_Constants.numKeywordsID.KEYWORD_ARRNR_MW,
 				trim(kword, left, right) = 'IDMA' =>SubGroup_Constants.numKeywordsID.KEYWORD_IDMA,
 				trim(kword, left, right) = 'TWMPB-CV' =>SubGroup_Constants.numKeywordsID.KEYWORD_TWMPB_CV,
+				trim(kword, left, right) = 'NS-CCMC-EO13959' =>SubGroup_Constants.numKeywordsID.KEYWORD_NS_CCMC_EO13959,
 								
 				//When setting the keyword export use underscores for dashes (ex: For RBI-SANC, use RBI_SANC)	
 				
