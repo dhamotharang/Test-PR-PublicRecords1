@@ -1,11 +1,11 @@
-﻿//HPCC Systems KEL Compiler Version 1.5.0rc1
+//HPCC Systems KEL Compiler Version 1.5.0rc1
 IMPORT KEL15 AS KEL;
 IMPORT CFG_Compile,E_U_C_C FROM PublicRecords_KEL.KEL_Queries_MAS_Business;
 IMPORT * FROM KEL15.Null;
 EXPORT B_U_C_C_13(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG_Compile __cfg = CFG_Compile) := MODULE
   SHARED VIRTUAL TYPEOF(E_U_C_C(__in,__cfg).__Result) __E_U_C_C := E_U_C_C(__in,__cfg).__Result;
-  SHARED __EE243140 := __E_U_C_C;
-  EXPORT __ST210551_Layout := RECORD
+  SHARED __EE247640 := __E_U_C_C;
+  EXPORT __ST215067_Layout := RECORD
     KEL.typ.nstr R_M_S_I_D_;
     KEL.typ.nstr Filing_Jurisdiction_;
     KEL.typ.nstr Filing_Number_;
@@ -31,10 +31,10 @@ EXPORT B_U_C_C_13(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG_Comp
     KEL.typ.epoch Vault_Date_Last_Seen_ := 0;
     KEL.typ.int __RecordCount := 0;
   END;
-  EXPORT __ST210547_Layout := RECORD
+  EXPORT __ST215063_Layout := RECORD
     KEL.typ.nuid UID;
     KEL.typ.nstr T_M_S_I_D_;
-    KEL.typ.ndataset(__ST210551_Layout) Sub_Filing_;
+    KEL.typ.ndataset(__ST215067_Layout) Sub_Filing_;
     KEL.typ.ndataset(E_U_C_C(__in,__cfg).Collateral_Layout) Collateral_;
     KEL.typ.ndataset(E_U_C_C(__in,__cfg).Data_Sources_Layout) Data_Sources_;
     KEL.typ.epoch Archive___Date_ := 0;
@@ -44,14 +44,14 @@ EXPORT B_U_C_C_13(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG_Comp
     KEL.typ.epoch Vault_Date_Last_Seen_ := 0;
     KEL.typ.int __RecordCount := 0;
   END;
-  SHARED __ST210547_Layout __ND243369__Project(E_U_C_C(__in,__cfg).Layout __PP242968) := TRANSFORM
-    __EE242999 := __PP242968.Sub_Filing_;
-    __ST210551_Layout __ND243267__Project(E_U_C_C(__in,__cfg).Sub_Filing_Layout __PP243263) := TRANSFORM
-      SELF.Max_Filing_Date_ := KEL.Routines.MaxN(__PP243263.Filing_Date_,__PP243263.Original_Filing_Date_);
-      SELF := __PP243263;
+  SHARED __ST215063_Layout __ND247869__Project(E_U_C_C(__in,__cfg).Layout __PP247468) := TRANSFORM
+    __EE247499 := __PP247468.Sub_Filing_;
+    __ST215067_Layout __ND247767__Project(E_U_C_C(__in,__cfg).Sub_Filing_Layout __PP247763) := TRANSFORM
+      SELF.Max_Filing_Date_ := KEL.Routines.MaxN(__PP247763.Filing_Date_,__PP247763.Original_Filing_Date_);
+      SELF := __PP247763;
     END;
-    SELF.Sub_Filing_ := __PROJECT(__EE242999,__ND243267__Project(LEFT));
-    SELF := __PP242968;
+    SELF.Sub_Filing_ := __PROJECT(__EE247499,__ND247767__Project(LEFT));
+    SELF := __PP247468;
   END;
-  EXPORT __ENH_U_C_C_13 := PROJECT(__EE243140,__ND243369__Project(LEFT));
+  EXPORT __ENH_U_C_C_13 := PROJECT(__EE247640,__ND247869__Project(LEFT));
 END;

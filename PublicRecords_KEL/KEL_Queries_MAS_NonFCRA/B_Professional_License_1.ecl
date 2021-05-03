@@ -1,11 +1,11 @@
-﻿//HPCC Systems KEL Compiler Version 1.5.0rc1
+//HPCC Systems KEL Compiler Version 1.5.0rc1
 IMPORT KEL15 AS KEL;
 IMPORT B_Professional_License_2,B_Professional_License_4,CFG_Compile,E_Professional_License FROM PublicRecords_KEL.KEL_Queries_MAS_NonFCRA;
 IMPORT * FROM KEL15.Null;
 EXPORT B_Professional_License_1(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG_Compile __cfg = CFG_Compile) := MODULE
   SHARED VIRTUAL TYPEOF(B_Professional_License_2(__in,__cfg).__ENH_Professional_License_2) __ENH_Professional_License_2 := B_Professional_License_2(__in,__cfg).__ENH_Professional_License_2;
-  SHARED __EE6489128 := __ENH_Professional_License_2;
-  EXPORT __ST171150_Layout := RECORD
+  SHARED __EE8286666 := __ENH_Professional_License_2;
+  EXPORT __ST178941_Layout := RECORD
     KEL.typ.nuid UID;
     KEL.typ.nstr License_Number_;
     KEL.typ.nstr License_State_;
@@ -28,5 +28,5 @@ EXPORT B_Professional_License_1(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDef
     KEL.typ.epoch Vault_Date_Last_Seen_ := 0;
     KEL.typ.int __RecordCount := 0;
   END;
-  EXPORT __ENH_Professional_License_1 := PROJECT(__EE6489128,__ST171150_Layout);
+  EXPORT __ENH_Professional_License_1 := PROJECT(__EE8286666,__ST178941_Layout);
 END;

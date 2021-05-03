@@ -1,4 +1,4 @@
-﻿//HPCC Systems KEL Compiler Version 1.5.0rc1
+//HPCC Systems KEL Compiler Version 1.5.0rc1
 IMPORT KEL15 AS KEL;
 IMPORT PublicRecords_KEL;
 IMPORT CFG_Compile FROM PublicRecords_KEL.KEL_Queries_MAS_Consumer;
@@ -55,9 +55,8 @@ EXPORT E_Address_Summary(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, C
   EXPORT PublicRecords_KEL_ECL_Functions_Dataset_FDC_Dataset_Risk_Indicators__Correlation_Risk__key_addr_name_summary_Invalid := __d0_UID_Mapped(UID = 0);
   SHARED __d0_Prefiltered := __d0_UID_Mapped(UID <> 0);
   SHARED __d0 := __SourceFilter(KEL.FromFlat.Convert(__d0_Prefiltered,InLayout,__Mapping0,'PublicRecords_KEL.ECL_Functions.Dataset_FDC'));
-  SHARED Dob_Date_Of_Birth_1Rule(STRING a) := MAP(KEL.Routines.IsValidDate((KEL.typ.kdate)(a[1..8]))=>a[1..8],KEL.Routines.IsValidDate((KEL.typ.kdate)(a[1..6]+'01'))=>a[1..6]+'01',KEL.Routines.IsValidDate((KEL.typ.kdate)(a[1..4]+'0101'))=>a[1..4]+'0101','0');
   SHARED Date_Last_Seen_1Rule(STRING a) := MAP(KEL.Routines.IsValidDate((KEL.typ.kdate)(a[1..8]))=>a[1..8],KEL.Routines.IsValidDate((KEL.typ.kdate)(a[1..6]+'01'))=>a[1..6]+'01',KEL.Routines.IsValidDate((KEL.typ.kdate)(a[1..4]+'0101'))=>a[1..4]+'0101','0');
-  SHARED __Mapping1 := 'UID(DEFAULT:UID),prim_name(OVERRIDE:Primary_Name_:\'\'),prim_range(OVERRIDE:Primary_Range_:\'\'),zip(OVERRIDE:Zip_:\'\'),namefirstname(DEFAULT:Name_First_Name_:\'\'),namelastname(DEFAULT:Name_Last_Name_:\'\'),namesource(DEFAULT:Name_Source_:\'\'),namerecordcount(DEFAULT:Name_Record_Count_:0),dob(OVERRIDE:Dob_Date_Of_Birth_:DATE:Dob_Date_Of_Birth_1Rule),dobdateofbirthpadded(DEFAULT:Dob_Date_Of_Birth_Padded_:\'\'),src(OVERRIDE:Dob_Source_:\'\'),record_count(OVERRIDE:Dob_Record_Count_:0),archive_date(OVERRIDE:Archive___Date_:EPOCH),dt_first_seen(OVERRIDE:Date_First_Seen_:EPOCH),dt_last_seen(OVERRIDE:Date_Last_Seen_:EPOCH:Date_Last_Seen_1Rule),hybridarchivedate(DEFAULT:Hybrid_Archive_Date_:EPOCH),vaultdatelastseen(DEFAULT:Vault_Date_Last_Seen_:EPOCH),DPMBitmap(OVERRIDE:__Permits:PERMITS)';
+  SHARED __Mapping1 := 'UID(DEFAULT:UID),prim_name(OVERRIDE:Primary_Name_:\'\'),prim_range(OVERRIDE:Primary_Range_:\'\'),zip(OVERRIDE:Zip_:\'\'),namefirstname(DEFAULT:Name_First_Name_:\'\'),namelastname(DEFAULT:Name_Last_Name_:\'\'),namesource(DEFAULT:Name_Source_:\'\'),namerecordcount(DEFAULT:Name_Record_Count_:0),dob(OVERRIDE:Dob_Date_Of_Birth_:DATE),dobpadded(OVERRIDE:Dob_Date_Of_Birth_Padded_:\'\'),src(OVERRIDE:Dob_Source_:\'\'),record_count(OVERRIDE:Dob_Record_Count_:0),archive_date(OVERRIDE:Archive___Date_:EPOCH),dt_first_seen(OVERRIDE:Date_First_Seen_:EPOCH),dt_last_seen(OVERRIDE:Date_Last_Seen_:EPOCH:Date_Last_Seen_1Rule),hybridarchivedate(DEFAULT:Hybrid_Archive_Date_:EPOCH),vaultdatelastseen(DEFAULT:Vault_Date_Last_Seen_:EPOCH),DPMBitmap(OVERRIDE:__Permits:PERMITS)';
   SHARED __d1_Norm := NORMALIZE(__in,LEFT.Dataset_Risk_Indicators__Correlation_Risk__key_addr_dob_summary,TRANSFORM(RECORDOF(__in.Dataset_Risk_Indicators__Correlation_Risk__key_addr_dob_summary),SELF:=RIGHT));
   SHARED __d1_Out := RECORD
     RECORDOF(PublicRecords_KEL.ECL_Functions.Dataset_FDC.Dataset_Risk_Indicators__Correlation_Risk__key_addr_dob_summary);
@@ -170,7 +169,7 @@ EXPORT E_Address_Summary(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, C
     {'AddressSummary','PublicRecords_KEL.ECL_Functions.Dataset_FDC','NameSource',COUNT(__d1(__NL(Name_Source_))),COUNT(__d1(__NN(Name_Source_)))},
     {'AddressSummary','PublicRecords_KEL.ECL_Functions.Dataset_FDC','NameRecordCount',COUNT(__d1(__NL(Name_Record_Count_))),COUNT(__d1(__NN(Name_Record_Count_)))},
     {'AddressSummary','PublicRecords_KEL.ECL_Functions.Dataset_FDC','dob',COUNT(__d1(__NL(Dob_Date_Of_Birth_))),COUNT(__d1(__NN(Dob_Date_Of_Birth_)))},
-    {'AddressSummary','PublicRecords_KEL.ECL_Functions.Dataset_FDC','DobDateOfBirthPadded',COUNT(__d1(__NL(Dob_Date_Of_Birth_Padded_))),COUNT(__d1(__NN(Dob_Date_Of_Birth_Padded_)))},
+    {'AddressSummary','PublicRecords_KEL.ECL_Functions.Dataset_FDC','DOBPadded',COUNT(__d1(__NL(Dob_Date_Of_Birth_Padded_))),COUNT(__d1(__NN(Dob_Date_Of_Birth_Padded_)))},
     {'AddressSummary','PublicRecords_KEL.ECL_Functions.Dataset_FDC','src',COUNT(__d1(__NL(Dob_Source_))),COUNT(__d1(__NN(Dob_Source_)))},
     {'AddressSummary','PublicRecords_KEL.ECL_Functions.Dataset_FDC','record_count',COUNT(__d1(__NL(Dob_Record_Count_))),COUNT(__d1(__NN(Dob_Record_Count_)))},
     {'AddressSummary','PublicRecords_KEL.ECL_Functions.Dataset_FDC','Archive_Date',COUNT(__d1(Archive___Date_=0)),COUNT(__d1(Archive___Date_!=0))},

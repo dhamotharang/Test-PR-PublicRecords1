@@ -1,11 +1,11 @@
-﻿//HPCC Systems KEL Compiler Version 1.5.0rc1
+//HPCC Systems KEL Compiler Version 1.5.0rc1
 IMPORT KEL15 AS KEL;
 IMPORT CFG_Compile,E_Email,FN_Compile FROM PublicRecords_KEL.KEL_Queries_MAS_NonFCRA;
 IMPORT * FROM KEL15.Null;
 EXPORT B_Email_3(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG_Compile __cfg = CFG_Compile) := MODULE
   SHARED VIRTUAL TYPEOF(E_Email(__in,__cfg).__Result) __E_Email := E_Email(__in,__cfg).__Result;
-  SHARED __EE465069 := __E_Email;
-  EXPORT __ST181692_Layout := RECORD
+  SHARED __EE523319 := __E_Email;
+  EXPORT __ST190329_Layout := RECORD
     KEL.typ.nuid UID;
     KEL.typ.nstr Email_Address_;
     KEL.typ.ndataset(E_Email(__in,__cfg).Email_Rec_Key_Layout) Email_Rec_Key_;
@@ -33,11 +33,11 @@ EXPORT B_Email_3(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG_Compi
     KEL.typ.epoch Vault_Date_Last_Seen_ := 0;
     KEL.typ.int __RecordCount := 0;
   END;
-  SHARED __ST181692_Layout __ND4161478__Project(E_Email(__in,__cfg).Layout __PP464874) := TRANSFORM
-    __CC13266 := KEL.Routines.MinN(FN_Compile(__cfg).FN_G_E_T_B_U_I_L_D_D_A_T_E(__ECAST(KEL.typ.nstr,__CN('email_build_version'))),__CN(__cfg.CurrentDate));
-    __CC38646 := 2556;
-    SELF.Emails7y_ := __OP2(FN_Compile(__cfg).FN_A_B_S_D_A_Y_S_B_E_T_W_E_E_N(__ECAST(KEL.typ.nkdate,__CC13266),__ECAST(KEL.typ.nkdate,KEL.era.ToDate(__PP464874.Date_Last_Seen_))),<,__CN(__CC38646));
-    SELF := __PP464874;
+  SHARED __ST190329_Layout __ND4933554__Project(E_Email(__in,__cfg).Layout __PP523124) := TRANSFORM
+    __CC13339 := KEL.Routines.MinN(FN_Compile(__cfg).FN_G_E_T_B_U_I_L_D_D_A_T_E(__ECAST(KEL.typ.nstr,__CN('email_build_version'))),__CN(__cfg.CurrentDate));
+    __CC39298 := 2556;
+    SELF.Emails7y_ := __OP2(FN_Compile(__cfg).FN_A_B_S_D_A_Y_S_B_E_T_W_E_E_N(__ECAST(KEL.typ.nkdate,__CC13339),__ECAST(KEL.typ.nkdate,KEL.era.ToDate(__PP523124.Date_Last_Seen_))),<,__CN(__CC39298));
+    SELF := __PP523124;
   END;
-  EXPORT __ENH_Email_3 := PROJECT(__EE465069,__ND4161478__Project(LEFT));
+  EXPORT __ENH_Email_3 := PROJECT(__EE523319,__ND4933554__Project(LEFT));
 END;

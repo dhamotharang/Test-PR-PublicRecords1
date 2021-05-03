@@ -1,11 +1,11 @@
-﻿//HPCC Systems KEL Compiler Version 1.5.0rc1
+//HPCC Systems KEL Compiler Version 1.5.0rc1
 IMPORT KEL15 AS KEL;
 IMPORT CFG_Compile,E_Business_Org,E_Business_Sele,E_Business_Sele_Overflow,E_Business_Ult,E_Input_B_I_I,FN_Compile FROM PublicRecords_KEL.KEL_Queries_MAS_Business;
 IMPORT * FROM KEL15.Null;
 EXPORT B_Input_B_I_I_10(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG_Compile __cfg = CFG_Compile) := MODULE
   SHARED VIRTUAL TYPEOF(E_Input_B_I_I(__in,__cfg).__Result) __E_Input_B_I_I := E_Input_B_I_I(__in,__cfg).__Result;
-  SHARED __EE258809 := __E_Input_B_I_I;
-  EXPORT __ST209776_Layout := RECORD
+  SHARED __EE263309 := __E_Input_B_I_I;
+  EXPORT __ST214292_Layout := RECORD
     KEL.typ.nuid UID;
     KEL.typ.ntyp(E_Business_Sele().Typ) Legal_;
     KEL.typ.nint G___Proc_Bus_U_I_D_;
@@ -79,11 +79,11 @@ EXPORT B_Input_B_I_I_10(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CF
     KEL.typ.epoch Vault_Date_Last_Seen_ := 0;
     KEL.typ.int __RecordCount := 0;
   END;
-  SHARED __ST209776_Layout __ND1876258__Project(E_Input_B_I_I(__in,__cfg).Layout __PP258468) := TRANSFORM
-    __CC13602 := '-99999';
-    __CC13607 := '-99998';
-    SELF.Bus_Input_Name_Clean_Value_ := FN_Compile(__cfg).FN_Is_Blank2_Fields(__ECAST(KEL.typ.nstr,__PP258468.B___Inp_Name_),__ECAST(KEL.typ.nstr,__CN(__CC13602)),__ECAST(KEL.typ.nstr,__PP258468.B___Inp_Cln_Name_),__ECAST(KEL.typ.nstr,__CN(__CC13607)));
-    SELF := __PP258468;
+  SHARED __ST214292_Layout __ND1876713__Project(E_Input_B_I_I(__in,__cfg).Layout __PP262968) := TRANSFORM
+    __CC13675 := '-99999';
+    __CC13680 := '-99998';
+    SELF.Bus_Input_Name_Clean_Value_ := FN_Compile(__cfg).FN_Is_Blank2_Fields(__ECAST(KEL.typ.nstr,__PP262968.B___Inp_Name_),__ECAST(KEL.typ.nstr,__CN(__CC13675)),__ECAST(KEL.typ.nstr,__PP262968.B___Inp_Cln_Name_),__ECAST(KEL.typ.nstr,__CN(__CC13680)));
+    SELF := __PP262968;
   END;
-  EXPORT __ENH_Input_B_I_I_10 := PROJECT(__EE258809,__ND1876258__Project(LEFT));
+  EXPORT __ENH_Input_B_I_I_10 := PROJECT(__EE263309,__ND1876713__Project(LEFT));
 END;

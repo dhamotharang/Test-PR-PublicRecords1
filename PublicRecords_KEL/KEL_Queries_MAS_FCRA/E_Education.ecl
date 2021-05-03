@@ -1,4 +1,4 @@
-﻿//HPCC Systems KEL Compiler Version 1.5.0rc1
+//HPCC Systems KEL Compiler Version 1.5.0rc1
 IMPORT KEL15 AS KEL;
 IMPORT PublicRecords_KEL;
 IMPORT CFG_Compile FROM PublicRecords_KEL.KEL_Queries_MAS_FCRA;
@@ -62,7 +62,7 @@ EXPORT E_Education(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG_Com
   EXPORT PublicRecords_KEL_ECL_Functions_Dataset_FDC_Dataset_American_student_list__key_DID_Invalid := __d0_UID_Mapped(UID = 0);
   SHARED __d0_Prefiltered := __d0_UID_Mapped(UID <> 0);
   SHARED __d0 := __SourceFilter(PROJECT(KEL.FromFlat.Convert(__d0_Prefiltered,InLayout,__Mapping0,'PublicRecords_KEL.ECL_Functions.Dataset_FDC'),__Mapping0_Transform(LEFT)));
-  SHARED __Mapping1 := 'UID(DEFAULT:UID),sequence_number(OVERRIDE:Sequence_:\'\'),key_code(OVERRIDE:Key_:\'\'),rawaid(OVERRIDE:Raw_A_I_D_:\'\'),school_name(OVERRIDE:College_Name_:\'\'),ln_college_name(OVERRIDE:L_N_College_Name_:\'\'),public_private_code(OVERRIDE:College_Code_:\'\'|OVERRIDE:College_Type_:\'\'),file_type(OVERRIDE:File_Type_:\'\'),school_size_code(OVERRIDE:School_Size_Code_:\'\'),competitive_code(OVERRIDE:Competitive_Code_:\'\'),tuition_code(OVERRIDE:Tuition_Code_:\'\'),tier(OVERRIDE:Tier_:\'\'),tier2(OVERRIDE:Tier2_:\'\'),source(OVERRIDE:Source_:\'\'),archive_date(OVERRIDE:Archive___Date_:EPOCH),date_first_seen(OVERRIDE:Date_First_Seen_:EPOCH),date_last_seen(OVERRIDE:Date_Last_Seen_:EPOCH),hybridarchivedate(DEFAULT:Hybrid_Archive_Date_:EPOCH),vaultdatelastseen(DEFAULT:Vault_Date_Last_Seen_:EPOCH),DPMBitmap(OVERRIDE:__Permits:PERMITS)';
+  SHARED __Mapping1 := 'UID(DEFAULT:UID),sequence_number(OVERRIDE:Sequence_:\'\'),key_code(OVERRIDE:Key_:\'\'),rawaid(OVERRIDE:Raw_A_I_D_:\'\'),school_name(OVERRIDE:College_Name_:\'\'),ln_college_name(OVERRIDE:L_N_College_Name_:\'\'),public_private_code(OVERRIDE:College_Code_:\'\'|OVERRIDE:College_Type_:\'\'),file_type(OVERRIDE:File_Type_:\'\'),school_size_code(OVERRIDE:School_Size_Code_:\'\'),competitive_code(OVERRIDE:Competitive_Code_:\'\'),tuition_code(OVERRIDE:Tuition_Code_:\'\'),tier(OVERRIDE:Tier_:\'\'),tier2(OVERRIDE:Tier2_:\'\'),source(OVERRIDE:Source_:\'\'),archive_date(OVERRIDE:Archive___Date_:EPOCH),date_vendor_first_reported(OVERRIDE:Date_First_Seen_:EPOCH),date_vendor_last_reported(OVERRIDE:Date_Last_Seen_:EPOCH),hybridarchivedate(DEFAULT:Hybrid_Archive_Date_:EPOCH),vaultdatelastseen(DEFAULT:Vault_Date_Last_Seen_:EPOCH),DPMBitmap(OVERRIDE:__Permits:PERMITS)';
   SHARED __d1_Norm := NORMALIZE(__in,LEFT.Dataset_AlloyMedia_student_list__Key_DID,TRANSFORM(RECORDOF(__in.Dataset_AlloyMedia_student_list__Key_DID),SELF:=RIGHT));
   SHARED __d1_Out := RECORD
     RECORDOF(PublicRecords_KEL.ECL_Functions.Dataset_FDC.Dataset_AlloyMedia_student_list__Key_DID);

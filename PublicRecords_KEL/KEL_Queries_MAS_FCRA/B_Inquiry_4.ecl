@@ -1,11 +1,11 @@
-﻿//HPCC Systems KEL Compiler Version 1.5.0rc1
+//HPCC Systems KEL Compiler Version 1.5.0rc1
 IMPORT KEL15 AS KEL;
 IMPORT B_Inquiry_5,B_Inquiry_9,CFG_Compile,E_Inquiry FROM PublicRecords_KEL.KEL_Queries_MAS_FCRA;
 IMPORT * FROM KEL15.Null;
 EXPORT B_Inquiry_4(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG_Compile __cfg = CFG_Compile) := MODULE
   SHARED VIRTUAL TYPEOF(B_Inquiry_5(__in,__cfg).__ENH_Inquiry_5) __ENH_Inquiry_5 := B_Inquiry_5(__in,__cfg).__ENH_Inquiry_5;
-  SHARED __EE3998083 := __ENH_Inquiry_5;
-  EXPORT __ST186788_Layout := RECORD
+  SHARED __EE4763573 := __ENH_Inquiry_5;
+  EXPORT __ST196693_Layout := RECORD
     KEL.typ.nint Lex_I_D_;
     KEL.typ.nstr First_Name_;
     KEL.typ.nstr Last_Name_;
@@ -31,14 +31,14 @@ EXPORT B_Inquiry_4(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG_Com
     KEL.typ.epoch Vault_Date_Last_Seen_ := 0;
     KEL.typ.int __RecordCount := 0;
   END;
-  EXPORT __ST186761_Layout := RECORD
+  EXPORT __ST196666_Layout := RECORD
     KEL.typ.nuid UID;
     KEL.typ.nstr Transaction_I_D_;
     KEL.typ.nstr Sequence_Number_;
     KEL.typ.ndataset(E_Inquiry(__in,__cfg).Search_Info_Layout) Search_Info_;
     KEL.typ.ndataset(E_Inquiry(__in,__cfg).Permissions_Layout) Permissions_;
     KEL.typ.ndataset(E_Inquiry(__in,__cfg).Bus_Intel_Layout) Bus_Intel_;
-    KEL.typ.ndataset(__ST186788_Layout) Person_Info_;
+    KEL.typ.ndataset(__ST196693_Layout) Person_Info_;
     KEL.typ.ndataset(E_Inquiry(__in,__cfg).Business_Info_Layout) Business_Info_;
     KEL.typ.nint Fraudpoint_Score_;
     KEL.typ.ndataset(E_Inquiry(__in,__cfg).Data_Sources_Layout) Data_Sources_;
@@ -64,18 +64,18 @@ EXPORT B_Inquiry_4(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG_Com
     KEL.typ.epoch Vault_Date_Last_Seen_ := 0;
     KEL.typ.int __RecordCount := 0;
   END;
-  SHARED __ST186761_Layout __ND3998456__Project(B_Inquiry_9(__in,__cfg).__ST197345_Layout __PP3998084) := TRANSFORM
-    __EE3998159 := __PP3998084.Person_Info_;
-    __ST186788_Layout __ND3998164__Project(E_Inquiry(__in,__cfg).Person_Info_Layout __PP3998160) := TRANSFORM
-      SELF.Transaction_I_D_ := __PP3998084.Transaction_I_D_;
-      SELF := __PP3998160;
+  SHARED __ST196666_Layout __ND4763946__Project(B_Inquiry_9(__in,__cfg).__ST209855_Layout __PP4763574) := TRANSFORM
+    __EE4763649 := __PP4763574.Person_Info_;
+    __ST196693_Layout __ND4763654__Project(E_Inquiry(__in,__cfg).Person_Info_Layout __PP4763650) := TRANSFORM
+      SELF.Transaction_I_D_ := __PP4763574.Transaction_I_D_;
+      SELF := __PP4763650;
     END;
-    SELF.Person_Info_ := __PROJECT(__EE3998159,__ND3998164__Project(LEFT));
-    __CC39196 := ['CHARGEBACK DEFENDER','CHARGEBACK DEFENDER SCORE ATTRIBUTES','RISKWISE CHARGEBACK DEFENDER (SCORE ONLY CD02)','RISKWISE CHARGEBACK DEFENDER W/ RC JOINT APP (FDSL)','RISKWISE CHARGEBACK DEFENDER W/ RC SINGLE APP (FDS7)','RISKWISE CUSTOM CANADIAN CHARGEBACK DEFENDER','RISKWISE CUSTOM CHARGEBACK DEFENDER (CB61)','RISKWISE CUSTOM CHARGEBACK DEFENDER (ND03)','RISKWISE CUSTOM CHARGEBACK DEFENDER (ND05)','RISKWISE CUSTOM CHARGEBACK DEFENDER (ND11)','RISKWISE CUSTOM CHARGEBACK DEFENDER W/ IP DOMAIN (ND10)'];
-    __CC39164 := ['COMMUNICATIONS'];
-    SELF.Is_Valid_Velocity_Inquiry_F_C_R_A_ := __AND(__AND(__AND(__AND(__AND(__AND(__OP2(__PP3998084.Agein_Days_,<=,__CN(365)),__CN(NOT (__PP3998084.Is_Collection_))),__CN(NOT (__PP3998084.Is_Batch_Monitoring_Method_))),__PP3998084.Is_Product_Code_Ok_),__CN(NOT (__PP3998084.Inquiry_Function_Description_ IN __CC39196))),__CN(NOT (__PP3998084.Inquiry_Industry_ IN __CC39164))),__PP3998084.Is_Fcra_Ok_);
-    SELF.Is_Valid_Velocity_Inquiry_Non_F_C_R_A_ := __AND(__AND(__AND(__AND(__AND(__OP2(__PP3998084.Agein_Days_,<=,__CN(365)),__CN(NOT (__PP3998084.Is_Collection_))),__CN(NOT (__PP3998084.Is_Batch_Monitoring_Method_))),__PP3998084.Is_Product_Code_Ok_),__CN(NOT (__PP3998084.Inquiry_Function_Description_ IN __CC39196))),__PP3998084.Is_Non_Fcra_Ok_);
-    SELF := __PP3998084;
+    SELF.Person_Info_ := __PROJECT(__EE4763649,__ND4763654__Project(LEFT));
+    __CC39848 := ['CHARGEBACK DEFENDER','CHARGEBACK DEFENDER SCORE ATTRIBUTES','RISKWISE CHARGEBACK DEFENDER (SCORE ONLY CD02)','RISKWISE CHARGEBACK DEFENDER W/ RC JOINT APP (FDSL)','RISKWISE CHARGEBACK DEFENDER W/ RC SINGLE APP (FDS7)','RISKWISE CUSTOM CANADIAN CHARGEBACK DEFENDER','RISKWISE CUSTOM CHARGEBACK DEFENDER (CB61)','RISKWISE CUSTOM CHARGEBACK DEFENDER (ND03)','RISKWISE CUSTOM CHARGEBACK DEFENDER (ND05)','RISKWISE CUSTOM CHARGEBACK DEFENDER (ND11)','RISKWISE CUSTOM CHARGEBACK DEFENDER W/ IP DOMAIN (ND10)'];
+    __CC39816 := ['COMMUNICATIONS'];
+    SELF.Is_Valid_Velocity_Inquiry_F_C_R_A_ := __AND(__AND(__AND(__AND(__AND(__AND(__OP2(__PP4763574.Agein_Days_,<=,__CN(365)),__CN(NOT (__PP4763574.Is_Collection_))),__CN(NOT (__PP4763574.Is_Batch_Monitoring_Method_))),__PP4763574.Is_Product_Code_Ok_),__CN(NOT (__PP4763574.Inquiry_Function_Description_ IN __CC39848))),__CN(NOT (__PP4763574.Inquiry_Industry_ IN __CC39816))),__PP4763574.Is_Fcra_Ok_);
+    SELF.Is_Valid_Velocity_Inquiry_Non_F_C_R_A_ := __AND(__AND(__AND(__AND(__AND(__OP2(__PP4763574.Agein_Days_,<=,__CN(365)),__CN(NOT (__PP4763574.Is_Collection_))),__CN(NOT (__PP4763574.Is_Batch_Monitoring_Method_))),__PP4763574.Is_Product_Code_Ok_),__CN(NOT (__PP4763574.Inquiry_Function_Description_ IN __CC39848))),__PP4763574.Is_Non_Fcra_Ok_);
+    SELF := __PP4763574;
   END;
-  EXPORT __ENH_Inquiry_4 := PROJECT(__EE3998083,__ND3998456__Project(LEFT));
+  EXPORT __ENH_Inquiry_4 := PROJECT(__EE4763573,__ND4763946__Project(LEFT));
 END;
