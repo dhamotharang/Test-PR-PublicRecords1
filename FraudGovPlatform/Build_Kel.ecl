@@ -67,8 +67,8 @@ BuildStatusReport :=
 										,Build_Keys(pVersion).Kel
 										,Build_Keys(pversion).All
 										,Build_AutoKeys(pversion)
-										,Build_Keys_UnitTests(pversion).ALL
-										,Promote(pversion,,true).promote_keys
+										,FraudGovPlatform.Build_Keys_UnitTests(pversion).ALL
+										,FraudGovPlatform.Promote(pversion,,true).promote_keys
 										,Orbit3.proc_Orbit3_CreateBuild_AddItem('FraudGov',pversion)
 										,_Control.fSubmitNewWorkunit(GenerateDashboards,ThorName)
 										,_Control.fSubmitNewWorkunit(BuildStatusReport,ECLThorName)
