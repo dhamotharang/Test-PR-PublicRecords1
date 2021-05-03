@@ -722,10 +722,3 @@ QUERY: NonFCRAAddressSummaryAttributesV1Dynamic(STRING PrimaryName_in,STRING Pri
    	USING DPM
 		USE InputPIIDataset(FLAT, 
 			InputPII(UID = G_ProcUID, Subject = P_LexID, InputCleanSSN = P_InpClnSSN, InputCleanEmail = P_InpClnEmail, InputCleanPhone = P_InpClnPhoneHome, SocialSummary = P_InpClnSSN, TelephoneSummary = P_InpClnPhoneHome));
-
-
-// Error:    general error (java.lang.IndexOutOfBoundsException: Index: 0, Size: 0) (0, 0), 1001, <none>
-QUERY: IndexBuildEntity(DATE P_InpClnArchDt, PERMITS DPM) <= 
-		Person
-	ASOF DynamicArchive(P_InpClnArchDt) 
-	USING DPM;
