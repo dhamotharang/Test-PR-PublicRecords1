@@ -1,4 +1,4 @@
-Import FraudShared,riskwise,risk_indicators,data_services,CriminalRecords_BatchService,DeathV2_Services,models,AppendIpMetadata,std,AppendRelativesAddressMatch,Advo,didville,PhonesInfo,
+﻿Import riskwise,risk_indicators,data_services,CriminalRecords_BatchService,DeathV2_Services,models,AppendIpMetadata,std,AppendRelativesAddressMatch,Advo,didville,PhonesInfo,
 gateway,riskprocessing,_control,Autokey_batch,DriversV2_Services;
 
 EXPORT fSOAPAppend(boolean	UpdatePii   = _Flags.Update.Pii)	:= MODULE
@@ -501,61 +501,30 @@ Shared pii_input	:= if(UpdatePii,pii_updates,pii_current):independent;
 													,self.reported_date := left.reported_date
 													,self:=right)):independent;
 
-			BestInfo_Update	:= if(UpdatePii,dedup((BestInfo_base_map + BestInfo_base),all),BestInfo_base_map);
+			shared BestInfo_base_map2	:= Join(BestInfo_base_map , sort(DLHistory, -dt_last_seen), 
+											left.did=right.did and
+											(( 	(Unsigned8) left.reported_date[1..6] between right.dt_first_seen and right.dt_last_seen ) OR 
+											(
+												(Unsigned8) left.reported_date[1..6] >= right.dt_first_seen and 
+												(Unsigned8) left.reported_date[1..6] >= right.dt_last_seen
+											)),
+											Transform(Layouts.BestInfo
+													,self.best_drivers_license_state := right.orig_state
+													,self.best_drivers_license := right.dl_number
+													,self.best_drivers_license_exp := right.expiration_date
+													,self.best_drivers_dt_first_seen := right.dt_first_seen
+													,self.best_drivers_dt_last_seen := right.dt_last_seen
+													,self:=left), 
+													left outer,
+													keep(1)):independent;			
 
-			Append_DLN := Best_DLN(BestInfo_Update).All;
+			BestInfo_Update	:= if(UpdatePii,dedup((BestInfo_base_map2 + BestInfo_base),all),BestInfo_base_map2);
 
-			Export all := Append_DLN;
+			
+
+			Export all := BestInfo_Update;
 								
 	END;
-	
-	EXPORT PrepaidPhone	:= MODULE
-		Phone_key := pull(PhonesInfo.Key_Phones_Type)(prepaid='1');
-	//get transactions between phone vendor dates
-		jPhone1 := join(distribute(Phone_key,hash(phone))
-					,distribute(pii_input(home_phone<>''),hash(home_phone))
-					,left.phone=right.home_phone
-					and 
-					((unsigned8)right.reported_date between left.vendor_first_reported_dt and left.vendor_last_reported_dt)				
-					,Transform(Layouts.PrepaidPhone
-							,self.phone:=right.home_phone
-							,self.reported_date:=right.reported_date
-							,self.vendor_first_reported_dt:=left.vendor_first_reported_dt
-							,self.vendor_last_reported_dt :=left.vendor_last_reported_dt
-							,self.prepaid := left.prepaid
-							,self.record_id :=right.record_id
-							,self.fdn_file_info_id	:=right.fdn_file_info_id
-							,self:=right)
-					,right outer,local);
-
-		dPhone1 := dedup(sort(jPhone1(prepaid='1'),record_id,-vendor_last_reported_dt,local),record_id,local);
-	//get remaining prepaid matches
-		pii_input_2 := Join(pii_input(home_phone<>''),dPhone1,left.record_id=right.record_id,left only);
-
-		jPhone2 := join(distribute(Phone_key,hash(phone))
-								,distribute(pii_input_2,hash(home_phone))
-								,left.phone=right.home_phone
-								and 
-								((unsigned8)right.reported_date >= left.vendor_first_reported_dt)				
-								,Transform(Layouts.PrepaidPhone
-										,self.phone:=right.home_phone
-										,self.reported_date:=right.reported_date
-										,self.vendor_first_reported_dt:=left.vendor_first_reported_dt
-										,self.vendor_last_reported_dt :=left.vendor_last_reported_dt
-										,self.prepaid := left.prepaid
-										,self.record_id :=right.record_id
-										,self.fdn_file_info_id	:=right.fdn_file_info_id
-										,self:=right)
-								,right outer,local);
-								
-		dPhone2 := dedup(sort(jPhone2(prepaid='1'),record_id,-vendor_last_reported_dt,local),record_id,local);
-
-		Phone_final := dPhone1 + dPhone2;
-
-		Export All	:= If(UpdatePii, dedup((Phone_final + PrepaidPhone_Base),all) , Phone_final);
-		 
-	END;
-	
 
 	EXPORT PrepaidPhone	:= MODULE
 		Phone_key := pull(PhonesInfo.Key_Phones_Type)(prepaid='1');

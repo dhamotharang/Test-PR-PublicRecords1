@@ -14,7 +14,7 @@ EXPORT SprayAndQualifyNAC( string pversion ) := FUNCTION
 	copy := (string)(FraudGovPlatform.Filenames().Sprayed.FileSprayed+'::'+ Customer_Settings[1].Customer_Id + '_' + Customer_Settings[1].Customer_State + '_' + Customer_Settings[1].Customer_Agency_Vertical_Type + '_' + Customer_Settings[1].Customer_Program + '_' + trim(Customer_Settings[1].Contribution_Source) + '_' + DateSearch + '_' + Std.Date.SecondsToString(Std.date.CurrentSeconds(true), '%H%M%S')):independent ;
 	outputwork  := sequential(
 		FS.StartSuperFileTransaction(),
-		nothor(FS.Copy('~'+fn,'thor400_44',copy, allowoverwrite := true)),
+		nothor(FS.Copy('~'+fn,thorlib.group(),copy, allowoverwrite := true)),
 		nothor(FS.AddSuperFile(sf, copy)),
 		FS.FinishSuperFileTransaction());
 	

@@ -16,6 +16,7 @@ new_rec:=record
 	string20 customer_id;
 	string20 file_type;
 end;
+
 Proj_dsFileListSorted := project(dsFileListSorted, transform(new_rec,
 	self.customer_id := regexfind('([0-9])\\d+',left.name,0);
 	self.file_type := regexfind('IDENTITY|KNOWNRISK|SAFELIST',left.name,0,nocase);
