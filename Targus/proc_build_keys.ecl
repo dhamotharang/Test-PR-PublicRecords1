@@ -1,4 +1,4 @@
-import ut, roxiekeybuild;
+﻿import ut, roxiekeybuild;
 
 export proc_build_Keys(string versionDate) := function
 
@@ -26,8 +26,8 @@ export proc_build_Keys(string versionDate) := function
 		fileservices.finishsuperfiletransaction()
 		);
 
-	updateDOPS := roxiekeybuild.updateversion('TargusKeys',versionDate,'kgummadi@seisint.com',,'N');
-	update_FCRA_DOPS := roxiekeybuild.updateversion('FCRA_TargusKeys',versionDate,'kgummadi@seisint.com',,'F');
+	updateDOPS := roxiekeybuild.updateversion('TargusKeys',versionDate,'kgummadi@seisint.com, harry.gist@lexisnexisrisk.com, Abednego.Escobal@lexisnexisrisk.com',,'N');
+	update_FCRA_DOPS := roxiekeybuild.updateversion('FCRA_TargusKeys',versionDate,'kgummadi@seisint.com, harry.gist@lexisnexisrisk.com, Abednego.Escobal@lexisnexisrisk.com',,'F');
 	
 	/* **ROXIE KEY NOTIFICATION EMAIL********************************************************************************************************** */	
 	email := fileservices.sendemail('RoxieBuilds@seisint.com;kgummadi@seisint.com',
