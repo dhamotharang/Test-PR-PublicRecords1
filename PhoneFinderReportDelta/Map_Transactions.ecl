@@ -49,6 +49,8 @@ EXPORT Map_Transactions(string8 version) := FUNCTION
 		self.phone_forwarded					:= PhoneFinderReportDelta._Functions.rmNull(l.phone_forwarded);
 		self.date_added								:= PhoneFinderReportDelta._Functions.keepNum(l.date_added)[1..8];
 		self.time_added								:= PhoneFinderReportDelta._Functions.keepNum(l.date_added)[9..];
+		self.verification_type				:= PhoneFinderReportDelta._Functions.rmNull(l.verification_type);	
+		self.phone_star_rating				:= PhoneFinderReportDelta._Functions.keepNum(l.phone_star_rating);	
 		self 													:= l;
 	end;
 	
