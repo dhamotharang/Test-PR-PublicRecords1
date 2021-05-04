@@ -2,7 +2,7 @@
 
 EXPORT Email_Notification_Lists := MODULE
    developer := 'jennifer.hennigar@lexisnexisrisk.com;';
-   tester := _Control.MyInfo.EmailAddressNotify+ '; Senthilkumar.Periasamy@lexisnexisrisk.com;';
+   tester := 'kevin.reeder@lexisnexisrisk.com; Sudhir.Kasavajjala@lexisnexisrisk.com; Senthilkumar.Periasamy@lexisnexisrisk.com;';
 	 quality_assurance := 'lisa.brolsma@lnssi.com;';
 	 qa2							:= 'cassandra.howser@lexisnexisrisk.com;';
    all_hands := developer + tester + quality_assurance + qa2;

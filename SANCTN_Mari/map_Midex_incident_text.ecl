@@ -22,6 +22,7 @@ SANCTN_Mari.layouts_SANCTN_common.SANCTN_incident_text mapIncidentTxt(ds_Inciden
 		TrimText 					:= ut.CleanSpacesAndUpper(L.TXT);
 		replace_tilde 		:= STD.Str.FindReplace(TrimText,'~','\r');
 		self.FIELD_TXT		:= STD.Str.FindReplace(replace_tilde, '&AMP;','&');
+		self:=[];
 END;
 
 ds_Text	:= project(ds_IncidentTxt,mapIncidentTxt(left));

@@ -1,4 +1,4 @@
-import STD;
+﻿import STD;
 EXPORT ManualDeleteFiles(string filesowner) := module
 
 	export GetFileList(string filepattern, integer l_cnt) := function
@@ -110,7 +110,9 @@ EXPORT ManualDeleteFiles(string filesowner) := module
 			self.filecnt := r.filecnt;
 		end;
 		
-		return normalize(MatchedFiles,left.filematches,FilesToDelete(left,right));
+		normrecs := dedup(normalize(MatchedFiles,left.filematches,FilesToDelete(left,right)),name) : independent;
+		
+		return normrecs;
 		// Users will manually set files to delete in UI, compile the list and consider
 		// for deletion
 		
@@ -119,10 +121,14 @@ EXPORT ManualDeleteFiles(string filesowner) := module
 	export run() := function
 		return if (thorlib.daliServers() = thorbackup.constants.esp.yogurtthorforboca+':7070',
 									if (regexfind('hthor', thorlib.cluster())
-										,apply(GetFilesToDelete(),
+										,sequential
+											(
+												output(GetFilesToDelete(),,'~yogurt::files::todelete',overwrite)
+												,apply(GetFilesToDelete(),
 											if (fileservices.fileexists('~'+name)
 												,fileservices.deletelogicalfile('~'+name)
-											)),
+											))
+											),
 										fail('Run on 	hthor')),
 									fail('Job should be run on http://'+thorbackup.constants.esp.yogurtthorforboca+':8010')
 							);

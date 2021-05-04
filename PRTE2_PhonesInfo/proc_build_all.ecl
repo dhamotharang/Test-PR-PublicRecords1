@@ -1,11 +1,6 @@
-﻿EXPORT proc_build_all(string filedate) := FUNCTION
+﻿EXPORT proc_build_all (string filedate, boolean skipDOPS=FALSE, string emailTo='') := FUNCTION
 
-	build_base_file	:=	proc_build_base(filedate);
-
-	build_keys :=	proc_build_keys(filedate);
+	run_all := SEQUENTIAL(fSpray,proc_build_base, proc_build_keys(filedate, skipDops, emailTo));
 	
-	return_val := 	sequential(	build_base_file, build_keys) ;
-
-	return return_val;
-
+RETURN run_all;
 END;

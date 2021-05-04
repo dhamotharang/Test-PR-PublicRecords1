@@ -1,13 +1,12 @@
-﻿import address, BIPV2;
+﻿IMPORT address, BIPV2, dx_common;
 
-export Layouts := module
-	
+EXPORT Layouts := MODULE
+  
 	////////////////////////////////////////////////////////////////////////
-	// -- Base Layouts
+	// -- Input Layouts
 	////////////////////////////////////////////////////////////////////////
-	export Input := module
-	
-    	export Layout_Header := record
+	EXPORT Input := MODULE
+      	EXPORT Layout_Header := RECORD
         integer4    LINK_ID;                	//	NUMBER(9)	9-digit unique number assigned by Cortera to a company in its database.
         string100   NAME;                    	//	VARCHAR2(100)	Business/Company name 
         string100   ALTERNATE_BUSINESS_NAME;	//	VARCHAR2(100)	Alternate name on file 
@@ -62,11 +61,11 @@ export Layouts := module
         string1    	STATUS;                   //	CHAR(1)	Possible Values: 'A' - Active, 'D' - Dormant  (Dormant means we have not seen any activity within 30 months)
         string1    	IS_CLOSED;                //	CHAR(1)	Possible Values: 'Y' - Yes
         string9    	CLOSED_DATE;
-    	end;
-    	
-    	Number	:= string;
+    	END;
+      
+			Number	:= string;
     	Ratio   := string;
-    	export Layout_Attributes := record
+    	EXPORT Layout_Attributes := RECORD
         integer4  ULTIMATE_LINKID;
         string    CORTERA_SCORE;
         string    CPR_SCORE;
@@ -400,12 +399,13 @@ export Layouts := module
         Ratio     TOP5_PERCPROV90_SLOPE_0T6; 
         Ratio     TOP5_PERCPROV90_SLOPE_6T12; 
         Ratio     TOP5_PERCPROVOUTSTANDING_ADJUSTEDSLOPE_0T12;
-     end;
-      
- end;
+     END;      
+ END;
 
-  //*** Cortera Header Base layout
- export Layout_Header_Out := RECORD
+ ////////////////////////////////////////////////////////////////////////
+ // -- Cortera Header Base layout
+ ////////////////////////////////////////////////////////////////////////
+ EXPORT Layout_Header_Out := RECORD
     Input.Layout_Header;                 //*** Raw vendor fields
     
     unsigned4 processDate;
@@ -449,11 +449,14 @@ export Layouts := module
 
     unsigned6 bdid := 0;
     unsigned1 bdid_score := 0;
-    BIPV2.IDlayouts.l_xlink_ids; 
- end;
+    BIPV2.IDlayouts.l_xlink_ids;
+		dx_common.layout_metadata;           // Added for Delta build process. CCPA fields are also part of this.
+ END;
  
- //*** Cortera Attributes Base layout
- export Layout_Attributes_Out := record
+ ////////////////////////////////////////////////////////////////////////
+ // -- Cortera Attributes Base layout
+ ////////////////////////////////////////////////////////////////////////
+ EXPORT Layout_Attributes_Out := RECORD
     Input.Layout_Attributes;
     string100 NAME;                     //*** VARCHAR2(100) Business/Company name 
     unsigned4 processDate;
@@ -493,11 +496,14 @@ export Layouts := module
 
     unsigned6 bdid := 0;
     unsigned1 bdid_score := 0;
-    BIPV2.IDlayouts.l_xlink_ids; 
- end;
+    BIPV2.IDlayouts.l_xlink_ids;
+		dx_common.layout_metadata;           // Added for Delta build process. CCPA fields are also part of this.
+ END;
  
- //*** Cortera Executive LinkID Key layout
- export Layout_ExecLinkID := record
+ ////////////////////////////////////////////////////////////////////////
+ // -- Cortera Executive LinkID Key layout
+ ////////////////////////////////////////////////////////////////////////
+ EXPORT Layout_ExecLinkID := RECORD
     integer4  link_id;
     unsigned8 persistent_record_id;
     unsigned6 did;
@@ -509,14 +515,15 @@ export Layouts := module
     string20  lname;
     string5   name_suffix;
     string1   ln_entity_type;
-    unsigned8 record_sid;
-    unsigned4 global_sid;
     string    executive_name;
     string    executive_title;
- end;
+		dx_common.layout_metadata;           // Added for Delta build process. CCPA fields are also part of this.
+ END;
  
- //*** Cortera Executive Base layout
- export Layout_Executives := RECORD
+ ////////////////////////////////////////////////////////////////////////
+ // -- Cortera Executive Base layout
+ ////////////////////////////////////////////////////////////////////////
+ EXPORT Layout_Executives := RECORD
     Layout_Header_Out;
     INTEGER1  name_sequence;
     string    Executive_Name {maxlength(250)};   // VARCHAR2(250) Executive Name
@@ -530,8 +537,20 @@ export Layouts := module
     string1   ln_entity_type := '';
     unsigned6 did := 0;
     unsigned1 did_Score := 0;
-    unsigned8 record_sid := 0;
-    unsigned4 global_sid := 0;
-  end;
+  END;
+  
+	////////////////////////////////////////////////////////////////////////
+  // -- Layout Key Delta RID
+  ////////////////////////////////////////////////////////////////////////
+  EXPORT Layout_Delta_Rid := RECORD
+		dx_common.layout_ridkey;
+  END;
+  
+	////////////////////////////////////////////////////////////////////////
+  // -- Layout Key Build Version
+  ////////////////////////////////////////////////////////////////////////
+  EXPORT Layout_Version := RECORD
+		dx_common.layout_build_version;
+  END;
 
-end;
+END;

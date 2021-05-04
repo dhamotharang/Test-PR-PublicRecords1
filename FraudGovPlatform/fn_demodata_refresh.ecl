@@ -1,10 +1,10 @@
-﻿import STD,ut,FraudShared,tools;
+﻿import STD,ut,tools;
 //Ensure transaction dates are recent so they will appear in web. GRP-5276, GRP-5144
 export fn_demodata_refresh (
           string pversion
         ) := 
 Function 
-		Demo := dataset('~fraudgov::base::main_demo_anon',fraudshared.Layouts.base.main,thor);
+		Demo := dataset('~fraudgov::base::main_demo_anon',FraudGovPlatform.Layouts.base.main,thor);
 		pmain := project(Demo,transform(recordof(left)
 						,self.reported_date := (string)std.date.adjustdate((unsigned)(pversion[1..6]+left.reported_date[7..8]),,-1)
 						,self.event_date		:= (string)std.date.adjustdate((unsigned)(pversion[1..6]+left.reported_date[7..8]),,-1)

@@ -1,7 +1,7 @@
 ﻿import STD, ut;
 
 GetReplacedRecords(dataset(Gong_Neustar.layout_gongMaster) adds, dataset(Gong_Neustar.layout_gongMaster) mstr, string8 filedate) := 
-
+//These are records in master file, but not in refresh file
  JOIN(mstr, adds, 
 				//	LEFT.record_id=RIGHT.record_id AND
 //					LEFT.add_date=RIGHT.add_date AND
@@ -80,9 +80,7 @@ GetUpdates(dataset(Gong_Neustar.layout_gongMaster) adds, dataset(Gong_Neustar.la
 						),
 				LEFT OUTER, KEEP(1)); 
 				
-//InBoth(dataset(layout_gongMaster) updates, dataset(layout_gongMaster) replaced) := FUNCTIO
-
-EXPORT MergeFullRefresh(dataset(layout_gongMaster) refresh, dataset(layout_gongMaster) mstr) := FUNCTION
+ EXPORT MergeFullRefresh(dataset(layout_gongMaster) refresh, dataset(layout_gongMaster) mstr) := FUNCTION
 
   string8 filedate := refresh[1].filedate[1..8];
 	curr := mstr(current_record_flag='Y');
@@ -90,11 +88,13 @@ EXPORT MergeFullRefresh(dataset(layout_gongMaster) refresh, dataset(layout_gongM
 
 	updates := GetUpdates(refresh, curr);
 	replaced := GetReplacedRecords(refresh, curr, filedate);
-	
-	master7 := updates & replaced & notcurr;
-		
-		// rollup duplicate records
-	master8 := gong_neustar.fn_rollup(master7);
+
+	master7 := updates & replaced & notcurr;	
+	// DF-28737 Assign persistent record id to new records
+	master7_pid := Gong_Neustar.Mac_Assign_UniqueId(master7, persistent_record_id);
+
+	// rollup duplicate records
+	master8 := gong_neustar.fn_rollup(master7_pid);
 	
 	return master8;
 

@@ -6,6 +6,57 @@ IMPORT Address,BIPV2;
 EXPORT Layouts := MODULE
 
   EXPORT Input := MODULE
+	
+		EXPORT raw_input	:= RECORD
+			STRING2		record_type;
+			STRING10	abms_id;
+			STRING25	client_id;
+			STRING4		board_code; // aka member_board_id
+			STRING50	last_name;
+			STRING50	first_name;
+			STRING50	middle_name;
+			STRING10	name_suffix;
+			STRING1		gender;
+			STRING1		birth_date_suppress_ind; // 0 - public, 1 - private
+			UNSIGNED6	address_id;
+			STRING100	org1; // aka address_line_1
+			STRING100	line1; // aka address_line_2
+			STRING100	line2; // aka address_line_3
+			STRING100	line3; // aka address_line_4
+			STRING30	city;
+			STRING2		state;
+			STRING20	full_zip;
+			STRING50	country;
+			STRING1		address_type; // H - home, P - professional, or blank
+			STRING10	address_update_date;
+			STRING1		address_suppress_ind; // 0 - public, 2 - street only, 3 - private
+			STRING8		degree_id;
+			STRING6		degree_code;
+			STRING4		degree_year;
+			STRING4		birth_year;
+			STRING2		birth_month;
+			STRING2		birth_day;
+			STRING10	dod;
+			STRING1		deceased_suppress_ind; // 0 - public, 1 - private
+			STRING8		moc_cert_id;
+			STRING1		cert_type_ind; // G - general, S - subspecialty
+			STRING10	biog_cert_id;
+			STRING1		recert_ind; // I - initial, R - recertification, D - designation
+			STRING2		duration_type; // TL - time limited, L - lifetime, M - MOC
+			STRING2		cert_month;
+			STRING2		cert_day;
+			STRING4		cert_year;
+			STRING2		expiration_month;
+			STRING2		expiration_day;
+			STRING4		expiration_year;
+			STRING10	reverification_date;
+			STRING3		participation; // Y - yes, N - no, NR - not required - aka meetingMOCrequirements
+			STRING8		MOCpathway_id;
+			STRING2		cert_status_id;	
+			STRING2		occupation_status;
+			STRING4		occupation_status_notify_date;
+			STRING10	npi;
+		END;
 
 		EXPORT Address := RECORD
 			STRING8   biog_number;                  // Biography number.

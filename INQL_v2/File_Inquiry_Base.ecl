@@ -15,7 +15,7 @@ export history := project(historyDS, INQL_V2.Layouts.common_indexes);
 
  Vk:=sc[findex..lindex];
 	
- VP:=did_add.get_EnvVariable('inquiry_build_version','http://roxiestaging.br.seisint.com:9876')[1..8];
+ VP:=did_add.get_EnvVariable('inquiry_build_version','http://certstagingvip.hpcc.risk.regn.net:9876')[1..8];
  FileHistory:=if(vk=vp
          ,dataset('~thor_data400::out::inquiry_tracking::weekly_historical',INQL_V2.Layouts.Common_ThorAdditions_non_FCRA,thor)
          ,dataset('~thor_data400::out::inquiry_tracking::weekly_historical_father',INQL_V2.Layouts.Common_ThorAdditions_non_FCRA,thor)

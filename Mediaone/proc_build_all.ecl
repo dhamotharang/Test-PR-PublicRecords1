@@ -1,12 +1,12 @@
 ﻿IMPORT _control,ut,RoxieKeyBuild,Orbit3;
 
 EXPORT proc_build_all(STRING version,STRING torun='ALL') := FUNCTION
-  #workunit('name', 'Yogurt: Mediaone build')
+  
 	
   ut.mac_sf_buildprocess(Mediaone.proc_build_base(version),'~thor::base::mediaone',buildnewbasefile,3,,true);
 	
-	orbit_update := Orbit3.Proc_Orbit3_CreateBuild_npf('Mediaone',version);
-	
+	orbit_update := Orbit3.Proc_Orbit3_CreateBuild('Mediaone',(string)version,is_npf := true);
+
   SEQUENTIAL
 	(
 	  IF(torun IN ['ALL','BASE'],

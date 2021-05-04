@@ -1,0 +1,10 @@
+﻿OPTIONS:-gh
+MODULE:Scrubs_Phone_TCPA
+FILENAME:Phone_TCPA
+NAMESCOPE:Wireless_to_Wireline2_NoRange
+
+FIELDTYPE:Invalid_Num:ALLOW(0123456789)
+
+FIELD:cellphone:LIKE(Invalid_Num):TYPE(STRING10):0,0
+FIELD:lf:TYPE(STRING1):0,0
+FIELD:filename:TYPE(STRING255):0,0

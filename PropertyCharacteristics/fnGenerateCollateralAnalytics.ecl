@@ -553,4 +553,5 @@ PropertyCharacteristics.Layouts.TempBase tFilterInvalid(PropertyCharacteristics.
     dPropAddrCollapseAceAID	:=	PropertyCharacteristics.Functions.fnCollapseAceAID(FilteredCA);
     PropertyCharacteristics.Mac_Property_Rollup(dPropAddrCollapseAceAID,dCombinedRollup,true,true);
     
-    export fnGenerateCollateralAnalytics:=dCombinedRollup;
+   
+export fnGenerateCollateralAnalytics:=dCombinedRollup;

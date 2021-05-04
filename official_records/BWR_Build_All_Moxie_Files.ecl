@@ -1,7 +1,7 @@
 ﻿import Official_Records, Lib_FileServices,RoxieKeybuild,orbit_report,dops,Scrubs_Official_Records;
 export BWR_Build_All_Moxie_Files := function
 #workunit('name','Official Records Build All' );
-
+#option ('multiplePersistInstances',FALSE); 
 leMailTarget := 'jtao@seisint.com;skasavajjala@seisint.com;jason.allerdings@lexisnexisrisk.com';
 
 fSendMail(string pSubject,string pBody)
@@ -13,8 +13,11 @@ official_records.Out_Moxie_Dev_Population_Stats(official_records.File_Moxie_Part
 								               ,official_records.File_Moxie_Document_Dev
 								               ,official_records.Version_Development
            									   ,DoTheSTRATAStats)
+//setting delta build trigger
+boolean isDelta		:= official_records.Constants.Deltabuild;	
+pUpdateFlag		:=	if(isDelta,'D','F');
+dops_update := dops.updateversion('OfficialRecordsKeys',filedate,'skasavajjala@seisint.com',,'N',,l_updateflag:=pUpdateFlag);
 
-dops_update := dops.updateversion('OfficialRecordsKeys',filedate,'skasavajjala@seisint.com',,'N');
 orbit_report.Orecs_Stats(getretval);
 build_all :=
 sequential
@@ -39,9 +42,12 @@ sequential
 		
 			 ),
 	fSendMail('Official Records 2 of 2','Moxie job complete'),
-	
-	official_records.Out_Keys,
-	official_records.Proc_Build_Autokey,
+	//build keys
+	official_records.Proc_Build_Keys(filedate,isDelta),
+	official_records.Proc_Build_Autokey(filedate,isDelta),
+	//move files
+	official_records.Promote_keys(filedate,'key',pIsDeltaBuild:=isDelta).BuildFiles.New2Built,
+  official_records.Promote_keys(filedate,'key',pIsDeltaBuild:=isDelta).BuildFiles.Built2QA,
 	fSendMail('Official Records','Key build complete'),
 	
 	official_records.official_records_party_stats,

@@ -19,17 +19,14 @@ string8 filedate_wd := fd[1].fdate : stored('filedate_wd');
 set_inputs := output('Setting input files...') : success(watchdog.Input_set);
 
 string dops_pkg_wdog := 'WatchdogKeys';
-string dops_pkg_mktg := 'MarketingHeaderKeys';
 
 string env_flag_nb  := 'N|B';
-string env_flag_n := 'N';
 
 string email_notification := 'Sudhir.Kasavajjala@lexisnexisrisk.com';
 
 send_bad_email := fileservices.SendEmail(email_notification,'Watchdog-marketing Build FAILED','');
 send_email := fileservices.SendEmail(email_notification,'Watchdog-marketing Build FINISHED','');
-updatedops          := RoxieKeyBuild.updateversion(dops_pkg_mktg,filedate_wd,email_notification,,env_flag_n);
-create_build := Orbit3.proc_Orbit3_CreateBuild('Watchdog Marketing Best',filedate_wd);
+
 
 update_wdog := RoxieKeyBuild.updateversion(dops_pkg_wdog,filedate_wd,email_notification,,env_flag_nb);
 create_build_wdog := Orbit3.proc_Orbit3_CreateBuild('Watchdog Best',filedate_wd,env_flag_nb);
@@ -53,9 +50,7 @@ out_all := sequential(
                         Watchdog_V2.Proc_Build_Merged_Key(filedate_wd),
                         _control.fSubmitNewWorkunit('Header.Proc_Copy_To_Alpha().watchdog;','hthor_eclcc'),
                         send_email,
-                        updatedops,
                         update_wdog,
-                        create_build,
                         create_build_wdog/*,
                         keydiff_nfcra,
                         keydiff_marketing*/

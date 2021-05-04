@@ -19,16 +19,16 @@ EXPORT As_Business_Linking (
 				self.company_rawaid			         := l.phy_raw_aid;
 				self.company_name 			         := l.Company_Name;
 				self.company_name_type_raw       := l.BusinessTypeDesc;
-				self.company_sic_code1           := l.Primary_SIC;
-				self.company_sic_code2           := l.SIC02;
-				self.company_sic_code3           := l.SIC03;
-				self.company_sic_code4           := l.SIC04;
-				self.company_sic_code5           := l.SIC05;
-				self.company_naics_code1          := l.NAICS01;
-				self.company_naics_code2          := l.NAICS02;
-				self.company_naics_code3          := l.NAICS03;
-				self.company_naics_code4          := l.NAICS04;
-				self.company_naics_code5          := l.NAICS05;
+				self.company_sic_code1:= If(ut.fn_SIC_functions.fn_validate_SICCode(l.Primary_SIC[1..4]) = 1,ut.CleanSpacesAndUpper(l.Primary_SIC[1..4]),''); 
+				self.company_sic_code2 := If(ut.fn_SIC_functions.fn_validate_SICCode(l.SIC02[1..4]) = 1,ut.CleanSpacesAndUpper(l.SIC02[1..4]),'');
+				self.company_sic_code3 := If(ut.fn_SIC_functions.fn_validate_SICCode(l.SIC03[1..4]) = 1,ut.CleanSpacesAndUpper(l.SIC03[1..4]),'');
+				self.company_sic_code4 := If(ut.fn_SIC_functions.fn_validate_SICCode(l.SIC04[1..4]) = 1,ut.CleanSpacesAndUpper(l.SIC04[1..4]),'');
+				self.company_sic_code5 := If(ut.fn_SIC_functions.fn_validate_SICCode(l.SIC05[1..4]) = 1,ut.CleanSpacesAndUpper(l.SIC05[1..4]),'');
+        self.company_naics_code1 := If(ut.fn_NAICS_functions.fn_validate_NAICSCode(l.NAICS01) = 1,ut.CleanSpacesAndUpper(l.NAICS01),'');
+        self.company_naics_code2 := If(ut.fn_NAICS_functions.fn_validate_NAICSCode(l.NAICS02) = 1,ut.CleanSpacesAndUpper(l.NAICS02),'');
+        self.company_naics_code3 := If(ut.fn_NAICS_functions.fn_validate_NAICSCode(l.NAICS03) = 1,ut.CleanSpacesAndUpper(l.NAICS03),'');
+        self.company_naics_code4 := If(ut.fn_NAICS_functions.fn_validate_NAICSCode(l.NAICS04) = 1,ut.CleanSpacesAndUpper(l.NAICS04),'');
+        self.company_naics_code5 := If(ut.fn_NAICS_functions.fn_validate_NAICSCode(l.NAICS05) = 1,ut.CleanSpacesAndUpper(l.NAICS05),'');
 				self.company_org_structure_raw   := l.business_status_code;
 				self.company_address_type_raw    := choose(cnt ,'PHYSICAL'
 																										   ,'MAILING'

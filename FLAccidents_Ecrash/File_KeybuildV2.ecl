@@ -1,4 +1,4 @@
-﻿IMPORT FLAccidents, ut, STD;
+﻿IMPORT STD;
 
 EXPORT File_KeybuildV2 := MODULE
 
@@ -59,14 +59,14 @@ EXPORT File_KeybuildV2 := MODULE
 	SHARED fAlphaAccidents := ALLAlphaAccidents(STD.Str.ToUpperCase(TRIM(orig_agency_ori, ALL)) NOT IN Agency_exclusion.CRU_Agency_ori_list AND
 																							STD.Str.ToUpperCase(TRIM(agency_ori, ALL)) NOT IN Agency_exclusion.CRU_Agency_ori_list);
 	SHARED ActiveAlphaAccidents := PROJECT(fAlphaAccidents, TRANSFORM(Layout_eCrash.Accidents_Alpha, SELF := LEFT;));
-	EXPORT Alpha := ActiveAlphaAccidents;	
+	EXPORT CRU := ActiveAlphaAccidents;	
 
 // ###########################################################################
 //  ALL Accidents report data
 // ###########################################################################
 	SHARED eCrashAccidents := AllAccidents(CRU_inq_name_type NOT IN ['2', '3'] AND 
 	                                report_code NOT IN InteractiveReports AND 
-																	TRIM(vendor_code, LEFT, RIGHT) <> 'COPLOGIC');
+																	TRIM(vendor_code, LEFT, RIGHT) <> 'COPLOGIC'):INDEPENDENT;
 
 // ###########################################################################
 //  ALL Accidents report data for eCrash Keys / Queries
@@ -84,12 +84,4 @@ EXPORT File_KeybuildV2 := MODULE
 																																 );
 	EXPORT prout := PROJECT(EcrashAgencyExclusion, TRANSFORM(Layout_eCrash.Consolidation, SELF := LEFT;));
 
-// ###########################################################################
-//  ALL Accidents report data for eCrash Search Records
-// ###########################################################################
-	SHARED SearchRecs := out(report_code IN ['EA', 'TM', 'TF'] AND 
-	                         work_type_id NOT IN ['2', '3'] AND 
-												   (TRIM(report_type_id, ALL) IN ['A', 'DE'] OR STD.str.ToUpperCase(TRIM(vendor_code, LEFT, RIGHT)) = 'CMPD'));
-	EXPORT eCrashSearchRecs := DISTRIBUTE(PROJECT(SearchRecs, Layouts.key_search_layout), HASH32(accident_nbr)):INDEPENDENT;
-	
-END; 
+END;

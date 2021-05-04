@@ -1,12 +1,12 @@
-IMPORT STD, EBR;
+﻿IMPORT STD, EBR;
+
 
 EXPORT Mac_Spray_RawData(
 	source_IP,
 	source_path,
 	filedate,
 	file_name,
-	group_name,
-	retval 
+	group_name 
 ) := MACRO
 
 	#UNIQUENAME(recSize);
@@ -49,7 +49,7 @@ EXPORT Mac_Spray_RawData(
 		%super_main%
 	);
 
-	retval := %do_spray_raw_data%;
+	%do_spray_raw_data%;
 
 ENDMACRO
 ;

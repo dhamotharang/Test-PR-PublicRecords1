@@ -13,7 +13,7 @@ EXPORT Constants_MBSAgency := MODULE
 	
 	EXPORT ThorDest := Constants.DestinationCluster;
 
-	EXPORT LocationPrefix := Files_eCrash.LOCATION_PREFIX;
+	EXPORT LocationPrefix := '~';
 	
 	EXPORT AgencyLZPathPrefix := '/data/super_credit/ecrash/incoming/mbs';
 	EXPORT AgencyLZFilename := 'mbs_ecrash_v_agency_hpcc_export.txt';
@@ -57,5 +57,12 @@ EXPORT Constants_MBSAgency := MODULE
    EXPORT UNSIGNED1 EMAIL_TYPE_SUCCESS := 0;
    EXPORT UNSIGNED1 EMAIL_TYPE_FAILURE := 1;
    EXPORT UNSIGNED1 EMAIL_TYPE_BILLING := 2;
+	 
+// ###########################################################################
+//                   MBS Date Defaults
+// ###########################################################################	 
+	 EXPORT UNSIGNED4 DEFAULT_SOURCE_START_DATE := 20000101;
+	 EXPORT UNSIGNED4 DEFAULT_SOURCE_END_DATE := 99991231;
+	 EXPORT UNSIGNED4 DEFAULT_SOURCE_TERMINATION_DATE := 99991231;
 	
 END;

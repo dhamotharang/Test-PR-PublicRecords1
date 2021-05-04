@@ -1,4 +1,4 @@
-#workunit('name','Fraudpoint-score-rcodes');
+﻿#workunit('name','Fraudpoint-score-rcodes');
 #option ('hthorMemoryLimit', 1000)
 #option ('linkCountedRows', false) 
 
@@ -112,7 +112,7 @@ self.ExcludeIbehavior := true;  // set this back to false if they would like to 
 	self.DataRestrictionMask := '000000000000';  // to allow use of both Equifax and Experian, this is the default value for all legacy scoring products
 	
 	self.model := 'fp3710_0';	// set to blank if you don't want the new model
-	//self.gateways := dataset([{'neutralroxie', 'http://roxiebatch.br.seisint.com:9856'}], risk_indicators.Layout_Gateways_In);
+	//self.gateways := dataset([{'neutralroxie', 'http://roxiethorvip.hpcc.risk.regn.net:9856'}], risk_indicators.Layout_Gateways_In);
 	SELF := le;
 	self := [];
 end;

@@ -3,7 +3,9 @@ import BIPV2;
 import BIPV2_Best;
 import BIPV2_Company_Names;
 import BIPV2_Contacts;
+import Consumer_Header_Best;
 import doxie;
+import dx_Consumer_Header;
 import ut;
 
 export IdAppendLocal := module
@@ -92,18 +94,32 @@ export IdAppendLocal := module
 				left outer, keep(1));
 
 		// use did to get contact names from person header
-		gm := AutoStandardI.GlobalModule();												 
-		doxie.mac_best_records(withContact, contact_did, getNames, ut.dppa_ok(gm.DPPAPurpose), ut.glb_ok(gm.GLBPurpose), , doxie.DataRestriction.fixed_DRM);
-		withNames :=
-			join(withContact(contact_did != 0), getNames,
-				left.contact_did = right.did,
-				transform(recordof(withContact),
-					self.contact_fname := right.fname,
-					self.contact_mname := right.mname,
-					self.contact_lname := right.lname,
-					self := left),
-				left outer, keep(1))
-			 + withContact(contact_did = 0);
+		gm := AutoStandardI.GlobalModule();
+		#IF(BIPV2.IdConstants.USE_DX_CONSUMER_BEST)			
+			getNames := dx_Consumer_Header.mac_append_best(withContact, contact_did, defaultDataAccess, 1);					 
+			withNames :=
+				join(withContact(contact_did != 0), getNames,
+					left.contact_did = right.did,
+					transform(recordof(withContact),
+						self.contact_fname := right.fnames_ranked[1].fname,
+						self.contact_mname := right.mnames_ranked[1].mname,
+						self.contact_lname := right.lnames_ranked[1].lname,
+						self := left),
+					left outer, keep(1))
+				+ withContact(contact_did = 0);
+		#ELSE
+			doxie.mac_best_records(withContact, contact_did, getNames, ut.dppa_ok(gm.DPPAPurpose), ut.glb_ok(gm.GLBPurpose), , doxie.DataRestriction.fixed_DRM);
+			withNames :=
+				join(withContact(contact_did != 0), getNames,
+					left.contact_did = right.did,
+					transform(recordof(withContact),
+						self.contact_fname := right.fname,
+						self.contact_mname := right.mname,
+						self.contact_lname := right.lname,
+						self := left),
+					left outer, keep(1))
+				+ withContact(contact_did = 0);
+		#END
 
 		return withNames;
 

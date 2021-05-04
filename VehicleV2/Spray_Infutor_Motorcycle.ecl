@@ -1,173 +1,189 @@
 ﻿//Spray Infutor Motorcycle file. Use thor40_241 for dataland cluster
-IMPORT _control,lib_fileservices,Address;
+IMPORT STD, Address;
 
- EXPORT Spray_Infutor_Motorcycle(string	pProcessDate,
-																 string	pGroupName	=	'thor400_36',
-																 boolean	pOverwrite	=	true
-																 )	:=
- FUNCTION
-
-	STRING		vSourceIP		:=	_control.IPAddress.bctlpedata11;
-	//STRING		vSourceIP		:=	_control.IPAddress.edata10;
-	STRING		vDirectory	:=	'/data/hds_2/vehreg/in/infutor/motorcycle/';
-	//STRING		vDirectory	:=	'/data_build_5_2/INFUTOR/MOTORCYCLE/';
-	STRING		vfileName		:=	'NARVM*.txt';
-	STRING		vDelim			:= 	'\\t';
-	vMaxRecordSize				:=  8192;
+EXPORT Spray_Infutor_Motorcycle(
+	STRING pSourceIP, 
+	STRING pDirectory,
+	STRING pVersion,
+	STRING pfileName = 'NARVM*.txt',
+	STRING pDelimiter = '\\t',
+	UNSIGNED pMaxRecordSize = 8192,
+	STRING pGroupName = STD.System.Thorlib.Group(),
+	BOOLEAN pOverwrite = TRUE
+) := FUNCTION
 
 	// check if file exists in UNIX
-	checkFileExists				:=	if(	count(FileServices.remotedirectory(vSourceIP,vDirectory,vfileName,false)(size	<>	0))	=	1,
-																true,
-																false
-															)	:	independent;
+	checkFileExists := IF(COUNT(STD.File.RemoteDirectory(pSourceIP,pDirectory,pfileName,false)(size <> 0)) = 1,TRUE,FALSE) : INDEPENDENT;
 
-	// obtain the file date from the file name
-	pFileDate							:=	if(checkFileExists,FileServices.remotedirectory(vSourceIP,vDirectory,vfileName,false)[1].name[6..13],'')	:	independent;
-
-	vRawLogicalFileName		:=	'~thor_data400::in::vehiclev2::inf_nondppa::motorcycle_raw::'	+	pFileDate;
-	vRawSuperFileName			:=	'~thor_data400::in::vehiclev2::inf_nondppa::motorcycle_raw';
-	vPrepLogicalFileName	:=	'~thor_data400::in::vehiclev2::inf_nondppa::motorcycle_'	+	pFileDate;
-	vPrepSuperFileName		:=	'~thor_data400::in::vehiclev2::inf_nondppa::motorcycle';
-	vPrepSuperFileFather	:=	'~thor_data400::in::vehiclev2::inf_nondppa::motorcycle_father';
-	vPrepSuperFileBldg		:=	'~thor_data400::in::vehiclev2::inf_nondppa::motorcycle_building';
+	vRawLogicalFileName := '~thor_data400::in::vehiclev2::inf_nondppa::motorcycle_raw::' + pVersion;
+	vRawSuperFileName := '~thor_data400::in::vehiclev2::inf_nondppa::motorcycle_raw';
+	vPrepLogicalFileName := '~thor_data400::in::vehiclev2::inf_nondppa::motorcycle_' + pVersion;
+	vPrepSuperFileName := '~thor_data400::in::vehiclev2::inf_nondppa::motorcycle';
+	vPrepSuperFileFather := '~thor_data400::in::vehiclev2::inf_nondppa::motorcycle_father';
+	vPrepSuperFileBldg := '~thor_data400::in::vehiclev2::inf_nondppa::motorcycle_building';
 
 	//createSuperFiles and remove logical file from superfile if it is an overwrite
-	superFilePrePorcessing := sequential(	fileservices.startsuperfiletransaction(),
-																				IF(NOT FileServices.SuperFileExists(vRawSuperFileName),
-																					 FileServices.CreateSuperFile(vRawSuperFileName)),
-																				IF(NOT FileServices.SuperFileExists(vPrepSuperFileName),
-																					 FileServices.CreateSuperFile(vPrepSuperFileName)),
-																				IF(NOT FileServices.SuperFileExists(vPrepSuperFileFather),
-																					 FileServices.CreateSuperFile(vPrepSuperFileFather)),
-																				IF(NOT FileServices.SuperFileExists(vPrepSuperFileBldg),
-																					 FileServices.CreateSuperFile(vPrepSuperFileBldg)),
-																				IF(pOverwrite AND fileservices.FindSuperFileSubName(vRawSuperFileName,vRawLogicalFileName)>0,
-																					 fileservices.removesuperfile(vRawSuperFileName,vRawLogicalFileName)),
-																				IF(pOverwrite AND fileservices.FindSuperFileSubName(vPrepSuperFileName,vPrepLogicalFileName)>0,
-																					 fileservices.removesuperfile(vPrepSuperFileName,vPrepLogicalFileName)),
-																				IF(pOverwrite AND fileservices.FindSuperFileSubName(vPrepSuperFileBldg,vPrepLogicalFileName)>0,
-																					 fileservices.removesuperfile(vPrepSuperFileBldg,vPrepLogicalFileName)),
-																				IF(pOverwrite AND fileservices.FindSuperFileSubName(vPrepSuperFileFather,vPrepLogicalFileName)>0,
-																					 fileservices.removesuperfile(vPrepSuperFileFather,vPrepLogicalFileName)),
-																				fileservices.finishsuperfiletransaction()
-																			);
-						
-	sprayInfutorMotorcycle:=	lib_fileservices.fileservices.SprayVariable(vSourceIP,
-																																				vDirectory+vfileName,
-																																				vMaxRecordSize,
-																																				vDelim,
-																																				'\r\n',
-																																				'',
-																																				pGroupName,
-																																				vRawLogicalFileName,
-																																				,
-																																				,
-																																				,
-																																				pOverwrite,
-																																				,
-																																				TRUE
-																																				);
-	
-	addToRawSuper			:=	sequential(fileservices.startsuperfiletransaction(),
-																   fileservices.addsuperfile(vRawSuperFileName,vRawLogicalFileName),
-																	 fileservices.finishsuperfiletransaction()
-																	 );							 
+	superFilePrePorcessing := SEQUENTIAL(
+		STD.File.StartSuperFileTransaction(),
+		IF(
+			NOT STD.File.SuperFileExists(vRawSuperFileName),
+			STD.File.CreateSuperFile(vRawSuperFileName)
+		),
+		IF(
+			NOT STD.File.SuperFileExists(vPrepSuperFileName),
+			STD.File.CreateSuperFile(vPrepSuperFileName)
+		),
+		IF(
+			NOT STD.File.SuperFileExists(vPrepSuperFileFather),
+			STD.File.CreateSuperFile(vPrepSuperFileFather)
+		),
+		IF(
+			NOT STD.File.SuperFileExists(vPrepSuperFileBldg),
+			STD.File.CreateSuperFile(vPrepSuperFileBldg)
+		),
+		IF(
+			pOverwrite AND STD.File.FindSuperFileSubName(vRawSuperFileName,vRawLogicalFileName) > 0,
+			STD.File.RemoveSuperFile(vRawSuperFileName,vRawLogicalFileName)
+		),
+		IF(
+			pOverwrite AND STD.File.FindSuperFileSubName(vPrepSuperFileName,vPrepLogicalFileName) > 0,
+			STD.File.RemoveSuperFile(vPrepSuperFileName,vPrepLogicalFileName)
+		),
+		IF(
+			pOverwrite AND STD.File.FindSuperFileSubName(vPrepSuperFileBldg,vPrepLogicalFileName) > 0,
+			STD.File.RemoveSuperFile(vPrepSuperFileBldg,vPrepLogicalFileName)
+		),
+		IF(
+			pOverwrite AND STD.File.FindSuperFileSubName(vPrepSuperFileFather,vPrepLogicalFileName) > 0,
+			STD.File.RemoveSuperFile(vPrepSuperFileFather,vPrepLogicalFileName)
+		),
+		STD.File.FinishSuperFileTransaction()
+	);
+
+	sprayInfutorMotorcycle:= STD.File.SprayDelimited(
+		pSourceIP,
+		pDirectory + '/' + pfileName,
+		pMaxRecordSize,
+		pDelimiter,
+		'\r\n',
+		'',
+		pGroupName,
+		vRawLogicalFileName,
+		,
+		,
+		,
+		pOverwrite,
+		,
+		TRUE
+	);
+
+	addToRawSuper := SEQUENTIAL(
+		STD.File.StartSuperFileTransaction(),
+		STD.File.AddSuperFile(vRawSuperFileName,vRawLogicalFileName),
+		STD.File.FinishSuperFileTransaction()
+	);
 
 
 	dInfutorRaw := VehicleV2.Files.In.Infutor_Motorcycle.Raw;
-	
+
 	// Create Infutor_VIN VIN's only file
-	removeInfutorVinCandidates	:=	if(	fileservices.findsuperfilesubname('~thor_data400::in::vehiclev2::vina_candidates','~thor_data400::in::vehiclev2::inf_nondppa_motorcycle::vina_candidates')	!=	0,
-																			sequential(	fileservices.startsuperfiletransaction(),
-																										fileservices.removesuperfile('~thor_data400::in::vehiclev2::vina_candidates','~thor_data400::in::vehiclev2::inf_nondppa_motorcycle::vina_candidates'),
-																										fileservices.finishsuperfiletransaction()
-																									)
-																);
-	
-	rVinCandidates_layout	:=
-	record
-		string22	VIN;
-		string1		lf;
-	end;
+	removeInfutorVinCandidates := IF(
+		STD.File.FindSuperFileSubName('~thor_data400::in::vehiclev2::vina_candidates','~thor_data400::in::vehiclev2::inf_nondppa_motorcycle::vina_candidates') != 0,
+		SEQUENTIAL(
+		STD.File.StartSuperFileTransaction(),
+			STD.File.RemoveSuperFile('~thor_data400::in::vehiclev2::vina_candidates','~thor_data400::in::vehiclev2::inf_nondppa_motorcycle::vina_candidates'),
+			STD.File.FinishSuperFileTransaction()
+		)
+	);
 
-	rVinCandidates_layout	tVinCandidates(dInfutorRaw pInput)	:=
-	transform
-		self.vin	:=	pInput.internal1;
-		self			:=	[];
-	end;
-	
-	dInfutorVinCandidates		:=	project(dInfutorRaw,tVinCandidates(left));
-	
-	outInfutorVinCandidates	:=	output(dInfutorVinCandidates,,'~thor_data400::in::vehiclev2::inf_nondppa_motorcycle::vina_candidates',overwrite,__compressed__);
-
-	addInfutorVinCandidates	:=	sequential(	fileservices.startsuperfiletransaction(),
-																				fileservices.addsuperfile('~thor_data400::in::vehiclev2::vina_candidates','~thor_data400::in::vehiclev2::inf_nondppa_motorcycle::vina_candidates'),
-																				fileservices.finishsuperfiletransaction()
-																			);
-	
-	// Add process date and state origin - prep the raw sprayed file and add it to the superfile
-	VehicleV2.Layout_Infutor_Motorcycle.Prepped	tPrepInfutorRaw(dInfutorRaw	pInput)	:= TRANSFORM
-		SELF.ProcessDate					:=	pProcessDate;
-		SELF.source_code					:=	'2V';     //source code for INFUTOR VIN, defined in MDR.sourceTools
-		//state_origin should be the state code of the state the vehicle is registered at. 
-		//It is not available in Infutor. Instead we use the state code of owner's address.
-		SELF.state_origin					:=	stringlib.stringtouppercase(pInput.STATE);
-		SELF											:=	pInput;
-		SELF											:=	[];		
-		
+	rVinCandidates_layout := RECORD
+		STRING22	VIN;
+		STRING1		lf;
 	END;
-	
-	dPrepInfutorRaw					:=	project(dInfutorRaw,tPrepInfutorRaw(left));
+
+	rVinCandidates_layout tVinCandidates(dInfutorRaw pInput) := TRANSFORM
+		SELF.vin := pInput.internal1;
+		SELF := [];
+	END;
+
+	dInfutorVinCandidates := PROJECT(dInfutorRaw,tVinCandidates(left));
+
+	outInfutorVinCandidates := OUTPUT(dInfutorVinCandidates,,'~thor_data400::in::vehiclev2::inf_nondppa_motorcycle::vina_candidates',overwrite,__compressed__);
+
+	addInfutorVinCandidates := SEQUENTIAL(
+		STD.File.StartSuperFileTransaction(),
+		STD.File.AddSuperFile('~thor_data400::in::vehiclev2::vina_candidates','~thor_data400::in::vehiclev2::inf_nondppa_motorcycle::vina_candidates'),
+		STD.File.FinishSuperFileTransaction()
+	);
+
+	// Add process date and state origin - prep the raw sprayed file and add it to the superfile
+	VehicleV2.Layout_Infutor_Motorcycle.Prepped tPrepInfutorRaw(dInfutorRaw pInput) := TRANSFORM
+		SELF.ProcessDate := pVersion;
+		SELF.source_code := '2V';     //source code for INFUTOR VIN, defined in MDR.sourceTools
+		//state_origin should be the state code of the state the vehicle is registered at.
+		//It is not available in Infutor. Instead we use the state code of owner's address.
+		SELF.state_origin := stringlib.stringtouppercase(pInput.STATE);
+		SELF := pInput;
+		SELF := [];
+	END;
+
+	dPrepInfutorRaw := PROJECT(dInfutorRaw,tPrepInfutorRaw(left));
 
 	// Append name type indicators depending on the names
- 	Address.Mac_Is_Business_Parsed(	dPrepInfutorRaw,
-																	dInfutorOwner1NameInd,
-																	fname,
-																	mi,
-																	lname,
-																	suffix,
-																	,
-																	Append_OwnerNameTypeInd
-   																);
+	Address.Mac_Is_Business_Parsed(
+		dPrepInfutorRaw,
+		dInfutorOwner1NameInd,
+		fname,
+		mi,
+		lname,
+		suffix,
+		,
+		Append_OwnerNameTypeInd
+	);
 	
-	removeInfutorPrepped	:=	if(	fileservices.findsuperfilesubname(vPrepSuperFileBldg,vPrepLogicalFileName)	!=	0,
-																	sequential(	fileservices.startsuperfiletransaction(),
-																								fileservices.removesuperfile(vPrepSuperFileBldg,vPrepLogicalFileName),
-																								fileservices.finishsuperfiletransaction()
-																							)
-																);
-	
-	outInfutorPrepped				:=	output(project(dInfutorOwner1NameInd,VehicleV2.Layout_Infutor_Motorcycle.PREPPED),,vPrepLogicalFileName,overwrite,__compressed__);
-	
-	addInfutorPreppedToSuper	:=	sequential(	fileservices.startsuperfiletransaction(),
-																							fileservices.clearsuperfile(vPrepSuperFileFather,true),
-																							fileservices.addsuperfile(vPrepSuperFileFather,vPrepSuperFileName,,true),
-																							fileservices.clearsuperfile(vPrepSuperFileName),
-																							fileservices.addsuperfile(vPrepSuperFileName,vPrepLogicalFileName),
-																							fileservices.finishsuperfiletransaction(),
-																							fileservices.clearsuperfile(vRawSuperFileName,true)
-																						);
+	removeInfutorPrepped := IF(
+		STD.File.FindSuperFileSubName(vPrepSuperFileBldg,vPrepLogicalFileName)	!=	0,
+		SEQUENTIAL(
+			STD.File.StartSuperFileTransaction(),
+			STD.File.RemoveSuperFile(vPrepSuperFileBldg,vPrepLogicalFileName),
+			STD.File.FinishSuperFileTransaction()
+		)
+	);
 
-	addInfutorToBldg	:=	if(	fileservices.getsuperfilesubcount(vPrepSuperFileBldg)	>	0,
-														output('Nothing added to Infutor Building superfile'),
-														fileservices.addsuperfile(vPrepSuperFileBldg,vPrepLogicalFileName)
-													 );
+	outInfutorPrepped := OUTPUT(project(dInfutorOwner1NameInd,VehicleV2.Layout_Infutor_Motorcycle.PREPPED),,vPrepLogicalFileName,overwrite,__compressed__);
+	
+	addInfutorPreppedToSuper := SEQUENTIAL(
+		STD.File.StartSuperFileTransaction(),
+		STD.File.ClearSuperFile(vPrepSuperFileFather,true),
+		STD.File.AddSuperFile(vPrepSuperFileFather,vPrepSuperFileName,,true),
+		STD.File.ClearSuperFile(vPrepSuperFileName),
+		STD.File.AddSuperFile(vPrepSuperFileName,vPrepLogicalFileName),
+		STD.File.FinishSuperFileTransaction(),
+		STD.File.ClearSuperFile(vRawSuperFileName,true)
+	);
 
-	SprayFile 				:= if(checkfileexists	AND	
-	                        (NOT FileServices.SuperFileExists(vPrepSuperFileName) OR
-	                        FileServices.FindSuperfileSubname(vPrepSuperFileName,vPrepLogicalFileName)=0),
-	                        sequential(	superFilePrePorcessing,
-																			sprayInfutorMotorcycle,
-																			addToRawSuper,
-																			removeInfutorVinCandidates,
-																			outInfutorVinCandidates,
-																			addInfutorVinCandidates,
-																			removeInfutorPrepped,
-																			outInfutorPrepped,
-																			addInfutorPreppedToSuper,
-																			addInfutorToBldg
-																		),
-													output('No New Infutor Motorcycle file available for spray'));
+	addInfutorToBldg := IF(
+		fileservices.getsuperfilesubcount(vPrepSuperFileBldg) > 0,
+		OUTPUT('Nothing added to Infutor Building superfile'),
+		STD.File.AddSuperFile(vPrepSuperFileBldg,vPrepLogicalFileName)
+	);
+
+	SprayFile := IF(
+		checkfileexists AND (NOT STD.File.SuperFileExists(vPrepSuperFileName) OR STD.File.FindSuperFileSubName(vPrepSuperFileName,vPrepLogicalFileName)=0),
+		SEQUENTIAL(
+			superFilePrePorcessing,
+			sprayInfutorMotorcycle,
+			addToRawSuper,
+			removeInfutorVinCandidates,
+			outInfutorVinCandidates,
+			addInfutorVinCandidates,
+			removeInfutorPrepped,
+			outInfutorPrepped,
+			addInfutorPreppedToSuper,
+			addInfutorToBldg
+		),
+		OUTPUT('No New Infutor Motorcycle file available for spray')
+	);
 
 	RETURN SprayFile;
 

@@ -1,7 +1,7 @@
-﻿import ut, std, FraudShared;
+﻿import ut, std;
 export QA_Records(
 
-	 dataset(FraudShared.Layouts.Base.Main                ) pBaseMain          = FraudShared.Files().Base.Main         .QA
+	 dataset(Layouts.Base.Main                ) pBaseMain          = Files().Base.Main         .QA
 	
 ) :=
 function
@@ -36,7 +36,7 @@ didSample     :=  join (didkey_qa,didkey_father,left.did=right.did,transform(rec
 distdid := distribute( didSample,hash32( did));
 
 
-newbase := FraudShared.Files().Base.Main         .QA;
+newbase := Files().Base.Main         .QA;
 
 distmain := distribute ( newbase ( did <> 0 ), hash32( did));
 

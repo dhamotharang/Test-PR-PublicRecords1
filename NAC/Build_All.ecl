@@ -54,12 +54,19 @@ Build_NAC:=if(NewHeader
 											,BuildBase)
 								);
 
+clear_consortium := sequential(
+							 FileServices.StartSuperFileTransaction()
+							,FileServices.AddSuperFile('~nac::in::consortium_history','~nac::in::consortium',,true)
+							,FileServices.ClearSuperFile('~nac::in::consortium')
+							,FileServices.FinishSuperFileTransaction()
+							);
 
 buildIt := sequential(
 									Move_temp_in
 									,ByPassedRecords
 									,Build_NAC
 									,NAC.Mod_despray(version,ip,rootDir).Odespray
+									,clear_consortium
 									);
 
 return buildIt;

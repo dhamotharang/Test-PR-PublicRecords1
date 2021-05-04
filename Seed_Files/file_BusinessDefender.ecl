@@ -1,1 +1,2 @@
-export file_BusinessDefender := dataset('~thor_data400::base::testseed_businessdefender',seed_files.Layout_BusinessDefender,csv);
+﻿IMPORT Data_Services,Seed_Files;
+EXPORT file_BusinessDefender := DATASET(Data_Services.Data_location.Prefix('NONAMEGIVEN')+'~thor_data400::base::testseed_businessdefender',Seed_Files.Layout_BusinessDefender,CSV(HEADING(1)));

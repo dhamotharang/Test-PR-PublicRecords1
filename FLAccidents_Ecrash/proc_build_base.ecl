@@ -1,31 +1,55 @@
-﻿//ECrash Morning deployments
-// The following flags to be set to Y
-// isprodready is set to Y and Autopkg is set to Y only on Sunday.
-import RoxieKeybuild,ut;
-export Proc_Build_base(string filedate):= function 
+﻿IMPORT RoxieKeyBuild;
+#OPTION('multiplePersistInstances', FALSE);
 
-string_rec	:=
-	record
-		string10	processdate;
-	end;
+EXPORT Proc_Build_Base(STRING FileDate ) := FUNCTION
 
-desp_flag	:=	sequential(	output(dataset([{filedate}],string_rec),,'~thor_data400::out::ecrash_spversion',overwrite),
-														fileservices.Despray(	'~thor_data400::out::ecrash_spversion','10.173.14.14',
-																									'/super_credit/ecrash/bin/ecrashflag.txt',,,,TRUE
-																								)
+// ###########################################################################
+//                           Create Super Files 
+// ###########################################################################
+   CreateSF := CreateSuperFiles;
+	 
+// ###########################################################################
+//                  Promotion of eCrash Base files
+// ###########################################################################
+   RoxieKeyBuild.Mac_SF_BuildProcess_V2(Map_eCrashAccidents_To_SupplementalBase, Files_eCrash.BASE_ECRASH_PREFIX, Files_eCrash.SUFFIX_BASE_SUPPLEMENTAL, FileDate, BuildSupplemental, 3, FALSE, TRUE); 
+   RoxieKeyBuild.Mac_SF_BuildProcess_V2(Map_eCrashAccidents_To_eCrashBase, Files_eCrash.BASE_ECRASH_PREFIX, Files_eCrash.SUFFIX_BASE_ECRASH, FileDate, BuildeCrash, 3, FALSE, TRUE); 
+   RoxieKeyBuild.Mac_SF_BuildProcess_V2(Map_eCrashAccidents_To_ClaimsClarityBase,Files_eCrash.BASE_ECRASH_PREFIX, Files_eCrash.SUFFIX_BASE_ClaimsClarity, FileDate, BuildClaimsClarity, 3, FALSE, TRUE); 
+   RoxieKeyBuild.Mac_SF_BuildProcess_V2(Map_eCrashAccidents_To_DocumentBase, Files_eCrash.BASE_ECRASH_PREFIX, Files_eCrash.SUFFIX_BASE_DOCUMENT, FileDate, BuildDocument, 3, FALSE, TRUE); 
+   RoxieKeyBuild.Mac_SF_BuildProcess_V2(Map_eCrashAccidents_To_CRUVehicleIncidentsBase, Files_eCrash.BASE_ECRASH_PREFIX, Files_eCrash.SUFFIX_BASE_CRUVehicleIncidents, FileDate, BuildCRUVehicleIncidents, 3, FALSE, TRUE); 
+
+// ###########################################################################
+//                   Promotion of Consolidation eCrash Base files
+// ###########################################################################
+   RoxieKeyBuild.Mac_SF_BuildProcess_V2(Infiles.Agencycmbnd, Files_eCrash.BASE_ECRASH_PREFIX, Files_eCrash.SUFFIX_CONSOLIDATION_MBSAgency, FileDate, BuildConsolidationMBSAgency, 3, FALSE, TRUE);
+   RoxieKeyBuild.Mac_SF_BuildProcess_V2(File_KeybuildV2.CRU, Files_eCrash.BASE_ECRASH_PREFIX, Files_eCrash.SUFFIX_CONSOLIDATION_CRU, FileDate, BuildConsolidationeCRU, 3, FALSE, TRUE); 
+   RoxieKeyBuild.Mac_SF_BuildProcess_V2(File_KeybuildV2.out, Files_eCrash.BASE_ECRASH_PREFIX, Files_eCrash.SUFFIX_CONSOLIDATION_ECRASH, FileDate, BuildConsolidationeCrash, 3, FALSE, TRUE); 
+   RoxieKeyBuild.Mac_SF_BuildProcess_V2(File_KeybuildV2.prout, Files_eCrash.BASE_ECRASH_PREFIX, Files_eCrash.SUFFIX_CONSOLIDATION_PR, FileDate, BuildConsolidationPR, 3, FALSE, TRUE); 
+	 
+// ###########################################################################
+//                  Validation of eCrash & Supplemental Base
+// ##########################################################################
+    ValidateEcrashSuppBase := fn_Validate_eCrashSuppBase();
+
+// ###########################################################################
+//                  Validation of CRU Base & Trigger CRU build
+// ##########################################################################
+    ValidateCRUBase := fn_Validate_CRUBase(FileDate);	
+
+// ###########################################################################
+//                  Ecrash Base Builds
+// ##########################################################################
+	 BuildBase := SEQUENTIAL(
+	                         BuildSupplemental, 
+	                         BuildeCrash,
+													 BuildClaimsClarity, 
+													 BuildDocument, 
+													 BuildConsolidationMBSAgency,
+													 ValidateEcrashSuppBase,
+													 BuildCRUVehicleIncidents,
+													 BuildConsolidationeCRU,
+													 BuildConsolidationeCrash,
+													 BuildConsolidationPR, 
+                           ValidateCRUBase
 													);
-
-Spray_ECrash := Sequential(FLAccidents_Ecrash.Spray_In(false), FLAccidents_Ecrash.Spray_In_Iyetek(false)): success( Sequential(desp_flag,FileServices.sendemail('DataReceiving@lexisnexis.com; sudhir.kasavajjala@lexisnexis.com','ECrash File Status' + filedate, 'Please archive ECrash files on LZ /super_credit/ecrash/build/'+ filedate))), failure(FileServices.sendemail('skasavajjala@seisint.com', '	ECrash Spray failure', failmessage));
-
-
-
-build_all := sequential(
-			 Spray_ECrash
-      ,FLAccidents_Ecrash.map_basefile(filedate)
-	  ,FLAccidents_Ecrash.Map_base_Iyetek(filedate)
-		//	,FLAccidents.map_basefile_inquiry(filedate)
-			) : success(Send_Email(filedate,'V2').buildsuccess), failure(Send_Email(filedate,'V1').buildfailure);
-
-return build_all;
-
-end;	
+	 RETURN BuildBase;	 
+END;

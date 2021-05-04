@@ -36,6 +36,8 @@ FUNCTION
 		SELF.rawlinkid	:= L.Lexid_Discovered;
 		SELF.IP_Address	:= STD.Str.FindReplace(L.ConsumerIPAddress,'"','');
 		SELF.RIN_Source := 9; //https://confluence.rsi.lexisnexis.com/display/GTG/Data+Source+Identification
+		SELF.start_date := L.TransactionDate;
+		SELF.end_date := L.EndDate;
 		SELF := L;
 		SELF := [];
 	END;

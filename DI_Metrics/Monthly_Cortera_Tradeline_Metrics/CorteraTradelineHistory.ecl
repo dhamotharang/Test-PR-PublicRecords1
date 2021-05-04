@@ -13,9 +13,9 @@
 // See below end of this macro for requirements.
 IMPORT DI_Metrics, STD;
 
-EXPORT CorteraTradeLineHistory(destinationIP, destinationpath, emailContact = 'DataInsightAutomation@lexisnexisrisk.com', timePeriod) := FUNCTIONMACRO
- 
-  filedate := (STRING8)Std.Date.Today();
+EXPORT CorteraTradeLineHistory(destinationIP, destinationpath, emailContact = 'DataInsightAutomation@lexisnexisrisk.com', timePeriod, today) := FUNCTIONMACRO
+
+  filedate := (STRING8)today;
 
   // tradeline_data_in   := PULL(Cortera_Tradeline.Key_LinkIds.Key);
   tradeline_data_in   := DI_Metrics.Monthly_Cortera_Tradeline_Metrics.Cortera_Tradeline_Key_LinkIds_alias;
@@ -23,7 +23,7 @@ EXPORT CorteraTradeLineHistory(destinationIP, destinationpath, emailContact = 'D
 
   // For unit-testing, etc.:
   // seleids_to_look_at := [46,51];
-  // tradeline_data_filt := tradeline_data_in(status = '' and ar_date != '' and seleid IN seleids_to_look_at); 
+  // tradeline_data_filt := tradeline_data_in(seleid IN seleids_to_look_at); 
   
   layout_tradeline_data_slim := RECORD
     UNSIGNED6 ultid;        //  ---- UltID, OrgID, and SeleID together identify 
@@ -49,9 +49,9 @@ EXPORT CorteraTradeLineHistory(destinationIP, destinationpath, emailContact = 'D
         SELF.ar_date      := LEFT.ar_date,
         SELF.current_ar   := (INTEGER)TRIM(LEFT.current_ar,LEFT,RIGHT),
         SELF.aging_91plus := (INTEGER)TRIM(LEFT.aging_91plus,LEFT,RIGHT),
-        SELF.weekly       := LEFT.dt_vendor_first_reported,
-        SELF.monthly      := LEFT.dt_vendor_first_reported DIV 100,
-        SELF.yearly       := LEFT.dt_vendor_first_reported DIV 10000
+        SELF.weekly       := (UNSIGNED4)LEFT.ar_date,
+        SELF.monthly      := (UNSIGNED4)LEFT.ar_date DIV 100,
+        SELF.yearly       := (UNSIGNED4)LEFT.ar_date DIV 10000
       )
     );
 
@@ -61,7 +61,7 @@ EXPORT CorteraTradeLineHistory(destinationIP, destinationpath, emailContact = 'D
   // then can we get an accurate count of Tradelines for each timePeriod.
 
   // Generate a table of timePeriods based on a small sample of the Tradelines file.
-  tradeline_data_small := CHOOSEN(tradeline_data_slim,100000); // ***** THIS MIGHT BE A PROBLEM; DEDUP THE ENTIRE RECORD INSTEAD. *****
+  tradeline_data_small := CHOOSEN(DISTRIBUTE(tradeline_data_slim, HASH32(RANDOM())),1000000); // ***** THIS MIGHT BE A PROBLEM; DEDUP THE ENTIRE RECORD INSTEAD. *****
   tbl_timePeriods      := SORT( TABLE( tradeline_data_small, {Date := timePeriod}, timePeriod ), Date );
 
   tradeline_data_vendor_rptd_range :=
@@ -79,19 +79,55 @@ EXPORT CorteraTradeLineHistory(destinationIP, destinationpath, emailContact = 'D
       ultid, orgid, seleid, account_key
     );
 
+  // Add two years (per J. Bozik, Z. Fredenberg) to dt_vndr_last_rptd to account for those Tradelines 
+  // we haven't heard from in up to two years but may yet be still active.
+  YYYYMMDD := 8;
+  YYYYMM   := 6;
+  YYYY     := 4;
+  
+  tradeline_data_vendor_rptd_range_extended :=
+    PROJECT(
+      tradeline_data_vendor_rptd_range,
+      TRANSFORM( RECORDOF(tradeline_data_vendor_rptd_range),
+        SELF.dt_vndr_last_rptd :=
+          CASE( LENGTH((STRING)LEFT.dt_vndr_last_rptd),
+            YYYYMMDD => LEFT.dt_vndr_last_rptd + 20000,
+            YYYYMM   => LEFT.dt_vndr_last_rptd + 200,
+            YYYY     => LEFT.dt_vndr_last_rptd + 2,
+            LEFT.dt_vndr_last_rptd
+          ),
+        SELF := LEFT
+      )
+    );
+
+  tradeline_data_vendor_rptd_range_corrected :=
+    PROJECT(
+      tradeline_data_vendor_rptd_range_extended,
+      TRANSFORM( RECORDOF(tradeline_data_vendor_rptd_range),
+        SELF.dt_vndr_last_rptd :=
+          CASE( LENGTH((STRING)LEFT.dt_vndr_last_rptd),
+            YYYYMMDD => IF( LEFT.dt_vndr_last_rptd < (STD.Date.Today())          , LEFT.dt_vndr_last_rptd, STD.Date.Today() ),
+            YYYYMM   => IF( LEFT.dt_vndr_last_rptd < (STD.Date.Today() DIV 100)  , LEFT.dt_vndr_last_rptd, STD.Date.Today() DIV 100 ),
+            YYYY     => IF( LEFT.dt_vndr_last_rptd < (STD.Date.Today() DIV 10000), LEFT.dt_vndr_last_rptd, STD.Date.Today() DIV 10000 ),
+            LEFT.dt_vndr_last_rptd
+          ),
+        SELF := LEFT
+      )
+    );
+
   tradeline_data_with_missing_dates :=
     NORMALIZE(
-      tradeline_data_vendor_rptd_range,
+      tradeline_data_vendor_rptd_range_corrected,
       COUNT(tbl_timePeriods),
       TRANSFORM( RECORDOF(tradeline_data_vendor_rptd_range),
         SELF.Date := tbl_timePeriods[COUNTER].Date,
         SELF := LEFT
       )
     );
-  
+
   tradeline_data_with_valid_dates := 
     tradeline_data_with_missing_dates(Date BETWEEN dt_vndr_first_rptd AND dt_vndr_last_rptd);
-  
+
   // 0.a.  To get all unique Tradelines for each timePeriod (for calculating other metrics
   // besides the number of unique TLs per timePeriod), sort on timePeriod DESCENDING so
   // that we see the latest, accumulated account_keys at the top of the stack. Also, sort 
@@ -132,7 +168,7 @@ EXPORT CorteraTradeLineHistory(destinationIP, destinationpath, emailContact = 'D
       },
       Date
     );
-    
+
   // 1. Count and sum up some more metrics for new and unique Tradelines over time:
   //    TtlValTLsAllSeleIDs      --Total tradeline $ value across all unique SELEIDs over time
   //    TtlValTLsGT91Days        --Total tradeline $ value aging_91plus across unique SELEIDs over time

@@ -38,6 +38,8 @@ Layout_Slim := RECORD
 	,string8	CaseEndDate
 	,string		addr1
 	,string		addr2
+	,string1 SearchEligibilityStatus
+	,string1 ClientEligibilityStatus
 	,unsigned4 SearchProcessDate
 	,unsigned4 ClientProcessDate
 	,unsigned4 SearchNCFFileDate

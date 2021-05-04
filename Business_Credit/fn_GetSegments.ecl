@@ -1,12 +1,14 @@
-IMPORT	Business_Credit, MDR, ut;
+﻿IMPORT	Business_Credit, MDR;
+
 EXPORT	fn_GetSegments	:=	MODULE
 
-	SHARED	dValidRecords	:=	Business_Credit.Files().active;
-
+	//SHARED	dValidRecords	:=	Business_Credit.Files().active;
+SHARED	dValidRecords	:=	Business_Credit.Files().active;
 	EXPORT	accountBase	:=	FUNCTION
 		
 		Business_Credit.Layouts.rAccountBase	tAccountBase(dValidRecords	pInput)	:=	TRANSFORM
 			SELF.Sbfe_Contributor_Number	:=	pInput.portfolioHeader.Sbfe_Contributor_Number;
+			self.Overall_File_Format_Version:=	pInput.portfolioHeader.Overall_File_Format_Version;
 			SELF.Extracted_Date						:=	pInput.portfolioHeader.Extracted_Date;
 			SELF.Cycle_End_Date						:=	pInput.portfolioHeader.Cycle_End_Date;
 			SELF													:=	pInput;

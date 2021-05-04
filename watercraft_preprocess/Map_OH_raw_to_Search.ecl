@@ -1,10 +1,10 @@
-import lib_stringlib, watercraft, watercraft_preprocess, ut, STD;
+﻿import lib_stringlib, watercraft, watercraft_preprocess, ut, STD;
 
 // translates oh_phase01.mp Ab intio graph into ECL
 
 process_date := (string8)STD.Date.Today();
-Watercraft.Macro_Clean_Hull_ID(watercraft_preprocess.file_OH_clean_in, watercraft.Layout_OH, hull_clean_in)
-watercraft.Macro_Is_hull_id_in_MIC(hull_clean_in, watercraft.Layout_OH, wDatasetwithflag)
+Watercraft.Macro_Clean_Hull_ID(watercraft_preprocess.file_OH_clean_in, watercraft.layout_OH_20Q3, hull_clean_in)
+watercraft.Macro_Is_hull_id_in_MIC(hull_clean_in, watercraft.layout_OH_20Q3, wDatasetwithflag)
 
 Watercraft_preprocess.Layout_Watercraft_Search_Common search_mapping_format(wDatasetwithflag L)
  :=  TRANSFORM

@@ -13,7 +13,7 @@
 		string 	  src;
 	end;
 
-	lidbDelt									:= project(DeltabaseGateway.File_Deltabase_Gateway.Historic_Results_Base(source in ['ATT_DQ_IRS'] and stringlib.stringfind(device_mgmt_status, 'BAD', 1)=0), 	//Deltabase Gateway File
+	lidbDelt									:= project(DeltabaseGateway.File_Deltabase_Gateway.Historic_Results_LIDB_Base, 	//Deltabase Gateway File
 																				transform({compNameRespLayout},
 																										self.dt_first_reported	:= (integer)left.date_file_loaded;	
 																										self.dt_last_reported		:= (integer)left.date_file_loaded;

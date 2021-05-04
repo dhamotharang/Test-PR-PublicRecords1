@@ -9,7 +9,7 @@ EXPORT ProcessUnverified := FUNCTION
 	END;
 	
 	l_AddSeq AssignSeq(GlobalWatchLists_Preprocess.Layouts.rUnverified L, INTEGER Ctr) := TRANSFORM
-		self.ent_key	:= 'UVE' + INTFORMAT(Ctr, 2, 1);
+		self.ent_key	:= 'UVE' + INTFORMAT(Ctr, 3, 1);
 		self := L;
 		self := [];
 	END;

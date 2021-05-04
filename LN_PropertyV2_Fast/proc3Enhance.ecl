@@ -1,7 +1,7 @@
 ﻿#OPTION('multiplePersistInstances',FALSE);
 #OPTION('remoteKeyedLookup', FALSE);
 
-IMPORT ut,LN_PropertyV2,LN_PropertyV2_Fast,PropertyScrubs, nid,ln_propertyv2_addressenhancements, InsuranceHeader_Property_Transactions_DeedsMortgages, PromoteSupers, STD, codes;
+IMPORT ut,LN_PropertyV2,LN_PropertyV2_Fast,PropertyScrubs, nid,ln_propertyv2_addressenhancements, InsuranceHeader_Property_Transactions_DeedsMortgages, PromoteSupers, STD, codes, LocationID_xLink;
 
 //combine, clean and enrich
 EXPORT proc3Enhance( string versionDate, boolean isFast = FALSE, string8 forceDeltaStartDate = '' ) := FUNCTION
@@ -169,12 +169,6 @@ EXPORT proc3Enhance( string versionDate, boolean isFast = FALSE, string8 forceDe
 	// -- PROCEED WITH BUILD --- //
   // populate ln_derived fields
 
-	dcodesv3 := Codes.File_Codes_V3_In(file_name = 'PROPERTY_ASSESSMENT', field_name = 'FLOOR2SUB') :independent;
-	
-	fncodesv3desc(string code_field, string vendor) := function 
-		file_desc := dcodesv3(code = code_field, field_name2[1]=vendor); 
-		return  file_desc[1].long_desc;
-	END ;
 
   recordof(cmbindAssesEmtpyLnFields) tPopulateLnFields(cmbindAssesEmtpyLnFields L) := TRANSFORM
 		SELF.ln_block										:= if(l.legal_block='',LN_PropertyV2_Fast.Functions_LN_Fields.ExtractBlock(L.legal_brief_description),'');
@@ -185,7 +179,9 @@ EXPORT proc3Enhance( string versionDate, boolean isFast = FALSE, string8 forceDe
 		SELF.ln_condo_indicator					:= LN_PropertyV2_Fast.Functions_LN_Fields.ExtractCondo(L);
 		SELF.ln_mobile_home_indicator		:= LN_PropertyV2_Fast.Functions_LN_Fields.ExtractMH(L);
 		SELF.ln_land_use_category 			:= LN_PropertyV2_Fast.Functions_LN_Fields.ExtractLuseCat(L);
-    SELF.ln_subfloor                := fncodesv3desc(L.floor_cover_code, if(L.vendor_source_flag in ['F','S'], 'F',''));
+    SELF.ln_subfloor                := LN_PropertyV2.fn_codesv3_desc(
+                                      'FLOOR2SUB', L.floor_cover_code,'PROPERTY_ASSESSMENT',
+                                       if(L.vendor_source_flag in ['F','S'], 'F',''));
 		
 		//
 		self.ln_ownership_rights 				:= LN_PropertyV2_Fast.Functions_LN_Owner_Fields.ExtractAssesOwnRghts(L);
@@ -253,6 +249,10 @@ EXPORT proc3Enhance( string versionDate, boolean isFast = FALSE, string8 forceDe
 										//dataset('~thor_data400::persist::ln_propertyv2::property_didf',LN_PropertyV2.Layout_DID_Out,thor)(process_date<=versionDate)
 									 + if(NOT(isFast),LN_PropertyV2_fast.irs_dummy_recs_search); // DF-19080, records were being added on every build creating duplicates
 
+	searchwithlocidTemp := project(search_withdid_,{unsigned6 locid := 0, LN_PropertyV2.Layout_DID_Out});
+  LocationID_xLink.Append(searchwithlocidTemp, prim_range, predir, prim_name, suffix, postdir, sec_range, v_city_name, st, zip, dSearchAIDwLocID);
+	dSearchwithall	:=	project(dSearchAIDwLocID,transform(LN_PropertyV2.Layout_DID_Out, self.location_id := left.locid, self := left));
+
 	assesswBitmap 	:= project(reclean.j_tax(process_date<=versionDate),ln_propertyV2.layouts.layout_property_common_model_base_scrubs); //(Jira DF-18820)
 	deedswbitmap  	:= project(reclean.j_deed(process_date<=versionDate),ln_propertyV2.layouts.layout_deed_mortgage_common_model_base_scrubs); //(Jira DF-18820)
 
@@ -276,8 +276,8 @@ EXPORT proc3Enhance( string versionDate, boolean isFast = FALSE, string8 forceDe
 	
 	// Deed property linking (Jira SLP-1)
 	
-	set_addr_tx_id	:= InsuranceHeader_Property_Transactions_DeedsMortgages.proc_dproptx(,,search_withdid_,deedswbitmap);
-	search_withdid	:= if(not(isfast),InsuranceHeader_Property_Transactions_DeedsMortgages.AppendID(search_withdid_),search_withdid_);
+	set_addr_tx_id	:= InsuranceHeader_Property_Transactions_DeedsMortgages.proc_dproptx(,,dSearchwithall,deedswbitmap);
+	search_withdid	:= if(not(isfast),InsuranceHeader_Property_Transactions_DeedsMortgages.AppendID(dSearchwithall),dSearchwithall);
 	
 	// To implement true delta (Jira DF-11862), need to concatenate base logical files before sending to build macro
 

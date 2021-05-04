@@ -84,6 +84,8 @@ self.BUS_GEO_BLK			:= Left.busaddress.geo_blk;
 self.BUS_GEO_MATCH		:= Left.busaddress.geo_match;
 self.BUS_ERR_STAT			:= Left.busaddress.err_stat;
 
+self.append_busrawaid:=if(self.bus_v_city_name = '',0,Left.busaddress_rawaid);
+
 SELF.Append_MailAddrFirst := 	Left.Append_MailAddrFirst; 
 SELF.Append_MailAddrLast	:=	Left.Append_MailAddrLast;
 self.MAIL_PRIM_RANGE 	:= Left.MailAddress.prim_range;
@@ -113,6 +115,8 @@ self.MAIL_MSA					:= Left.MailAddress.msa;
 self.MAIL_GEO_BLK			:= Left.MailAddress.geo_blk;
 self.MAIL_GEO_MATCH		:= Left.MailAddress.geo_match;
 self.MAIL_ERR_STAT		:= Left.MailAddress.err_stat;
+
+self.append_mailrawaid:=if(self.mail_v_city_name = '',0,Left.mailaddress_rawaid);
 
 self.link_ssn :=Left.link_ssn;
 self.link_dob:=Left.link_dob;

@@ -1,1 +1,1 @@
-﻿EXPORT SuccessEMail := 'Christopher.Brodeur@lexisnexisrisk.com,Abednego.Escobal@lexisnexisrisk.com';
+﻿EXPORT SuccessEMail := 'Christopher.Brodeur@lexisnexisrisk.com,Kranthi.Kumar@lexisnexisrisk.com,Abednego.Escobal@lexisnexisrisk.com';

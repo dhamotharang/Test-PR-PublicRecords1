@@ -42,10 +42,13 @@ EXPORT DO := FUNCTION
 	
 					
   MakeSuperFiles ('~PRTE::BASE::inquiry@version@');
+ 
+	FileServices.CreateSuperFile ('~prte::in::inquiry::persons_1');
 
-  FileServices.CreateSuperFile ('~PRTE::IN::inquiry_base');
+  FileServices.CreateSuperFile ('~prte::in::inquiry::business_1');
+	
+	FileServices.CreateSuperFile ('~prte::in::inquiry::business_2');
 
-  FileServices.CreateSuperFile ('~PRTE::IN::inquiry_ins');
 
 RETURN 'SUCCESS';
 

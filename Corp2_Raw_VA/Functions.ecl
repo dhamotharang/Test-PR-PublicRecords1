@@ -11,7 +11,13 @@ EXPORT Functions := Module
 																				'TN','TT','ND','NE','TX','UT','VA','VI','VT','WA','WI','WV','WY',''] => true,false);
 		END;
 		
-
+		//Per CI:Vendor is sending below Foreign codes & will be populated in "corp_forgn_state_desc" field(corresponding "corp_forgn_state_cd" will have blank)
+    EXPORT Special_Codes(string s) := FUNCTION
+		 RETURN map (corp2.t2u(s) in ['AF','AI','AU','BE','BG','BH','BL','BM','BR','CB','CH','CONFEDERATED SALISH AND KOOTENAI TR',          
+																	'CQ','CR','CY','DN','EASTERN BAND OF CHEROKEE INDIANS','EG','ES','ET','FEDERAL','FI','FR','GB',
+																	'GE','GH','HK','IR','IS','IT','JP','KN','KO','LB','LC','LU','MU','NG','NL','NO','NT','NZ','PH',
+																	'PO','SA','SG','SL','SV','SW','TC','TU','VG','U.S. GOVERNMENT','ZA'] => true,false);
+	END;																				
 		//****************************************************************************
 		//State_Description: returns whether the state is a valid us state.
 		//****************************************************************************

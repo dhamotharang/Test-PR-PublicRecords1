@@ -120,14 +120,17 @@ EXPORT Print := MODULE
 																				string2 st='XX', boolean reject = false,  
 																				DATASET(NAC_V2.Layouts2.rItemSummary) programs,
 																				DATASET(NAC_V2.Layouts2.rItemSummary) types,
-																				BOOLEAN print_report_workunit) := FUNCTION
+																				BOOLEAN show_email_message) := FUNCTION
 
-// GroupID := STD.Str.ToLowerCase(lfn[6..9]);
-// boolean IsOnboarding(string gid) := NAC_V2.dNAC2Config(GroupID=gid)[1].Onboarding in ['y','Y'];
-// IsOnboardingMessage := IF(IsOnboarding(GroupID) = TRUE, GroupID + ' is in Production,the Incoming file will be FULLY ingested', GroupID + ' is onboarding, the Incoming file is STAGED for file validation only');
-// submit_cmd := 'NAC_V2.fn_Process_Daily_Internal_Report('+ '\'' + TRIM(lfn) + '\'' + ');' ;
-// troubleshooting_workunit := wk_ut.CreateWuid(submit_cmd, 'thor400_44_sla_eclcc', 'prod_esp.br.seisint.com');
-// workunit_message := IF(print_report_workunit, 'Troubleshooting Workunit: ' + troubleshooting_workunit,'');
+GroupID := STD.Str.ToLowerCase(lfn[6..9]);
+
+boolean IsOnboarding(string gid) := NAC_V2.dNAC2Config(GroupID=gid)[1].Onboarding in ['y','Y'];
+IsOnboardingMessage := IF(IsOnboarding(GroupID) = FALSE, 
+		STD.Str.toUpperCase(GroupID) + ' is in Production, file will be FULLY ingested. ', 
+		STD.Str.toUpperCase(GroupID) + ' is onboarding, file is STAGED for file validation only. ');
+
+internal_use_message := IF(show_email_message, '*** For Internal Use only ***', '');
+onboarding_message := IF(show_email_message, IsOnboardingMessage, '');
 
   d_prog := programs(itemcode = 'D');  // DSNAP
 	UNSIGNED4	d_count :=  d_prog[1].counts;  
@@ -203,11 +206,8 @@ EXPORT Print := MODULE
 
 
 				ds := DATASET([{lfn}], dRow) 
-							& DATASET([{''}], dRow) 
-						//	& DATASET([{IsOnboardingMessage}], dRow) 	
-							& DATASET([{''}], dRow) 
-					//		& DATASET([{workunit_message}], dRow) 
-							& DATASET([{''}], dRow) 
+						 	& DATASET([{internal_use_message}], dRow) 
+							& DATASET([{onboarding_message}], dRow) 	
 							& NCR_Header
 							& PROJECT(SORT(NCR_Samples(errs, nTotal, st),textValue), TRANSFORM(dRow,
 										self.text := (string6)left.state + (string6)left.RecordCode +
@@ -390,7 +390,7 @@ EXPORT Print := MODULE
 
 		records := rr_cases + rr_clients + rr_addresses + rr_contacts + rr_exceptions + rr_badRecords;
 	
-		return SORT(CHOOSEN(records, 1000),errorcode);		// HHSCO-35
+		RETURN CHOOSEN(SORT(records, errorcode), 1000);		// HHSCO-35
 			
 	END;
 

@@ -1,4 +1,4 @@
-#workunit('name','FCRA-RiskView Process');
+﻿#workunit('name','FCRA-RiskView Process');
 #option ('hthorMemoryLimit', 1000)
 
 
@@ -86,7 +86,7 @@ l := RECORD
 END;
 
 
-fcraroxieIP := 'http://fcrabatch.sc.seisint.com:9876'; 
+fcraroxieIP := 'http://fcrathorvip.hpcc.risk.regn.net:9876'; 
 
 
 l t_f(f le, INTEGER c) := TRANSFORM
@@ -110,7 +110,7 @@ paramsA := dataset([{'Custom', 'aid605_1'},{'monthlyincome_value',le.TOTAL_NET_I
 		//					{'Models.RVRetail_Service', fcraroxieIP,paramsR},{'Models.RVTelecom_Service', fcraroxieIP,paramsT},
 			//				{'Models.RVMoney_Service', fcraroxieIP,paramsM},{'Models.RVPrescreen_Service', fcraroxieIP,paramsP}], models.Layout_Score_Chooser); 
  
-	self.gateways := dataset([{'neutralroxie', 'http://roxiebatch.br.seisint.com:9856'}], risk_indicators.Layout_Gateways_In);
+	self.gateways := dataset([{'neutralroxie', 'http://roxiethorvip.hpcc.risk.regn.net:9856'}], risk_indicators.Layout_Gateways_In);
 	SELF := le;
 	self := [];
 end;

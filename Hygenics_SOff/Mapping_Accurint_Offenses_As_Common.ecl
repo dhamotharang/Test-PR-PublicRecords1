@@ -381,6 +381,7 @@ o2 defCategory(o2 l):= transform
 						'FALSE PRETENSES \\(ATTEMPT\\)|'+
 						'RESISTING ARREST|'+
 						', FALSE PRETENSES|'+
+						'PURJURY|'+
 
 						
 						'WITHIN 500\'',
@@ -1689,6 +1690,9 @@ o2 defCategory(o2 l):= transform
 						
 						'INDICENT LIBERTIES|'+
             'ATT_INDEC_LIBERTIES|'+
+						
+						'UNDER/16 MIAMI DADE FL|'+
+
 
 						'WITH A 10, 13 AND 14 Y/O FEMALE' 											
 						,
@@ -1919,6 +1923,8 @@ o2 defCategory(o2 l):= transform
             'CRIMINAL EXPSURE T HIV|'+
 
             'PUBLIC SEXUAL INDEC-CONTACT|'+
+						
+						'PUBLIC_INDECENCY|'+ 
 						
 						'RITUAL AB INGEST/APPLY URINE/2'
 
@@ -3283,6 +3289,9 @@ o2 defCategory(o2 l):= transform
 						'SUSPENDED DL|'+	
 						'LEGEND DRUGS|'+	
 						
+
+            'AGRAVETED|'+	
+				
 						'16-6-4-\\(B\\)'						
 						,						
 						trim(l.offense_description, left, right),
@@ -3368,6 +3377,24 @@ o2 defCategory(o2 l):= transform
 					trim(l.offense_description, left, right) = 'MATERIAL' 						=> 'OTH',		
           trim(l.offense_description, left, right) = 'INHALENTS' 						=> 'OTH',		
           trim(l.offense_description, left, right) = 'THREATENING:' 				=> 'OTH',		
+					
+					trim(l.offense_description, left, right) = '15.031 PC' 				=> 'OTH',                                         
+					trim(l.offense_description, left, right) = '16-12-100.2(D)' 				=> 'OTH',                                    
+					trim(l.offense_description, left, right) = '200.368 (F)' 				=> 'OTH',                                       
+					trim(l.offense_description, left, right) = '21.11(A)(1) PC' 				=> 'OTH',                                    
+					trim(l.offense_description, left, right) = '22.011(A)(1) PC' 				=> 'OTH',                                   
+					trim(l.offense_description, left, right) = '22.011(A)(2) PC' 				=> 'OTH',                                   
+					trim(l.offense_description, left, right) = '22.021 PC' 				=> 'OTH',                                         
+					trim(l.offense_description, left, right) = '22.021(A)(2)(B) PC' 				=> 'OTH',                                
+					trim(l.offense_description, left, right) = '25.02(C) PC' 				=> 'OTH',                                       
+					trim(l.offense_description, left, right) = '33.021(B) PC' 				=> 'OTH',                                      
+					trim(l.offense_description, left, right) = '647.6 PC;' 				=> 'OTH',           
+					trim(l.offense_description, left, right) = 'B1' 				=> 'OTH',                                                
+					trim(l.offense_description, left, right) = 'INDICTMENT NUMBER CP870011443' 				=> 'OTH',                     
+					trim(l.offense_description, left, right) = 'KANSAS' 				=> 'OTH',                                            
+
+          trim(l.offense_description, left, right) = '3699:39-13-PT5 S' 				=> 'OTH', 
+          trim(l.offense_description, left, right) = 'TDCJ;ID (PC 22.011(A)(2)' 				=> 'OTH',
 
 					
 					trim(l.offense_description, left, right) in ['ARRALC196360022020121115','ATTEMPT 1ST DEGREE','BARKIM196660118920131111','BARSAM196851116020120808','BEADAN197550719520130828','BLADAV196750822320130712','BLADAV196750823020130712','BONALB198460015420130101','BONALB198460016420130101',

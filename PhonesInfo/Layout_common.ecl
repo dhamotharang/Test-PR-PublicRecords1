@@ -2,6 +2,7 @@
 
 	//DF-23525: Phones Metadata - Split Key into Transaction & Phone Type
 	//DF-24397: Create Dx-Prefixed Keys
+	//DF-28941: Add Alt_Spid & LAlt_Spid Fields to DB
 
 EXPORT Layout_common := module
 
@@ -28,9 +29,6 @@ EXPORT Layout_common := module
 		string255 filename;
 	end;
 	
-	//Carrier Reference Layout
-	//dx_PhonesInfo.Layout.sourceRefBase
-	
 	//Ported Base File
 	export portedMain := record
 		string5			source;
@@ -55,6 +53,8 @@ EXPORT Layout_common := module
 		string6			port_end_time;
 		unsigned8   remove_port_dt;
 		boolean			is_ported;
+		string10		alt_spid;
+		string10		lalt_spid;
 	end;
 	
 	export inFile := record
@@ -165,6 +165,8 @@ EXPORT Layout_common := module
 		string2			is_react									:= '';
 		unsigned8		call_forward_dt						:= 0;
 		string15		caller_id									:= '';
+		string10		alt_spid									:= '';
+		string10		lalt_spid									:= '';
 	end;
 	
 	//Phones Metadata Base Layout: DF-26977
@@ -174,10 +176,51 @@ EXPORT Layout_common := module
 		string 	  src;
 	end;
 	
-	//Phones Transaction Base Layout
-	//dx_PhonesInfo.Layouts.Phones_Transaction_Main;
+	//PhonesInfo.Layout_iConectiv.Intermediate
+	EXPORT Intermediate := RECORD
+	  unsigned  groupid			:= 0;
+		string1   action_code := '';			
+		string3   country_code;
+		string10  phone;
+		string1   dial_type;
+		string6   spid;
+		string1   service_type;
+		string10  routing_code;
+		string    porting_dt;
+		string2   country_abbr;
+		string255 filename;											//Original File Name Received
+		string		file_dt_time;									//File Name Date and Time - Sort Files
+		string		vendor_first_reported_dt;			//File Date First Added
+		string		vendor_last_reported_dt;			//File Date Last Updated
+		string		port_start_dt;								//Port Start Date
+		string	 	port_end_dt;									//Port End Date (Last Update)
+		string 		remove_port_dt;								//Disconnect Date
+		boolean		is_ported := false;
+		string    alt_spid;
+		string    lalt_spid;
+	END;
 	
-	//Phones Type Base Layout
-	//dx_PhonesInfo.Layouts.Phones_Type_Main;
+	//PhonesInfo.Layout_iConectiv.Main
+	EXPORT Main := RECORD
+		string3   country_code;
+		string10  phone;
+		string1   dial_type;
+		string6   spid;
+		string		service_provider;
+		string1   service_type;
+		string10  routing_code;
+		string    porting_dt;
+		string2   country_abbr;
+		string255 filename;											//Original File Name Received
+		string		file_dt_time;									//File Name Date and Time - Sort Files
+		string		vendor_first_reported_dt;			//File Date First Added
+		string		vendor_last_reported_dt;			//File Date Last Updated
+		string		port_start_dt;								//Port Start Date
+		string	 	port_end_dt;									//Port End Date (Last Update)
+		string 		remove_port_dt;								//Disconnect Date
+		boolean		is_ported;										//Latest Active Record
+		string 		alt_spid;											
+		string 		lalt_spid;
+	END;
 
 end;

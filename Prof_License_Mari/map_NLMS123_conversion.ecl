@@ -482,7 +482,7 @@ maribase_plus_dbas	transformToCommon_CO(Layout_clean_name pInput) := TRANSFORM
 	SELF.DATE_VENDOR_LAST_REPORTED		:= process_dte;
 	SELF.PROCESS_DATE									:= thorlib.wuid()[2..9];
 	SELF.STD_SOURCE_UPD	:= src_cd;
-	SELF.STD_SOURCE_DESC	:= 'NATIONWIDE MORTGAGE LICENSING SYSTEM & REGISTRY';
+	SELF.STD_SOURCE_DESC	:= 'NMLS CONSUMER ACCESS';
 	
 	tempLicNum           := ut.CleanSpacesAndUpper(pInput.LICENSE_NBR);
 	SELF.LICENSE_NBR	   := IF(tempLicNum != ' ',tempLicNum,'NR');
@@ -994,7 +994,7 @@ maribase_plus_dbas		transformToCommon_Indv(rRawIndividual_layout pInput) := TRAN
 	SELF.DATE_VENDOR_LAST_REPORTED		:= process_dte;
 	SELF.PROCESS_DATE									:= thorlib.wuid()[2..9];
 	SELF.STD_SOURCE_UPD	:= src_cd;
-	SELF.STD_SOURCE_DESC	:= 'NATIONWIDE MORTGAGE LICENSING SYSTEM & REGISTRY';
+	SELF.STD_SOURCE_DESC	:= 'NMLS CONSUMER ACCESS';
 	tempLicNum           := ut.CleanSpacesAndUpper(Prof_License_Mari.mod_clean_name_addr.strippunctName(pInput.LICENSE_NBR));
 	SELF.LICENSE_NBR	   := IF(tempLicNum != ' ',tempLicNum,'NR');
 

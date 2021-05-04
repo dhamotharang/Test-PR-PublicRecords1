@@ -104,7 +104,7 @@ EXPORT Map_Ported_Metadata_DeltaFile_PDV(string version):= FUNCTION
 	end;
 
 	addFlag 			:= iterate(gpTyp, addFL(LEFT,RIGHT));
-	addFlag_ug 		:= project(ungroup(addFlag), PhonesInfo.Layout_iConectiv.Intermediate);
+	addFlag_ug 		:= project(ungroup(addFlag), PhonesInfo.Layout_Common.Intermediate);
 	
 	//////////////////////////////////////////
 	//PROCESS - DAILY FILE////////////////////
@@ -115,7 +115,7 @@ EXPORT Map_Ported_Metadata_DeltaFile_PDV(string version):= FUNCTION
 	inFile_g2			:= group(inFile_s2, phone);
 	
 	//Treat Adds and Updates the Same
-		PhonesInfo.Layout_iConectiv.Intermediate iter1(inFile_g2 l, inFile_g2 r) := transform
+		PhonesInfo.Layout_Common.Intermediate iter1(inFile_g2 l, inFile_g2 r) := transform
 			//Conditions to determine when to rollup into one record
 				consecutiveA 				:= l.action_code = 'A' and r.action_code = 'A';
 				sameSpid 						:= l.spid = r.spid;
@@ -137,7 +137,7 @@ EXPORT Map_Ported_Metadata_DeltaFile_PDV(string version):= FUNCTION
 	aggrTrans_d 	:= distribute(tagGroups_ug, hash(groupid));
 	aggrTrans_s		:= sort(aggrTrans_d, groupid, port_start_dt, file_dt_time, if(action_code in ['A','U'], 1, 2) ,local);
 	
-		PhonesInfo.Layout_iConectiv.Intermediate roll(aggrTrans_s l, aggrTrans_s r) := transform
+		PhonesInfo.Layout_Common.Intermediate roll(aggrTrans_s l, aggrTrans_s r) := transform
 				self.is_ported										:= if(l.is_ported or r.is_ported, true, 														r.is_ported);
 				self.vendor_first_reported_dt 		:= (string)ut.min2((unsigned)l.vendor_first_reported_dt, 						(unsigned)r.vendor_first_reported_dt);
 				self.vendor_last_reported_dt 			:= (string)max((unsigned)l.vendor_last_reported_dt, 								(unsigned)r.vendor_last_reported_dt);
@@ -152,7 +152,7 @@ EXPORT Map_Ported_Metadata_DeltaFile_PDV(string version):= FUNCTION
 													roll(left, right), local);
 	
 	//Reformat to iConectiv Base Layout (Service Providers will now be populated in the Metadata Base)
-		PhonesInfo.Layout_iConectiv.Main remED(aggrTrans_r l):= transform
+		PhonesInfo.Layout_Common.Main remED(aggrTrans_r l):= transform
 				self.port_end_dt									:= if(l.is_ported, '', l.port_end_dt);
 				self.service_provider							:= '';
 				self															:= l;

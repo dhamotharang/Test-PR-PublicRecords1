@@ -6,10 +6,9 @@
 
 IMPORT _Control, corrections, data_services, Doxie_files, STD, ut;
 
-export FCRA_Criminal(string pHostname, string pTarget, string pContact ='\' \'') := function
+export FCRA_Criminal(string pHostname, string pTarget, string pContact ='\' \'', STRING today = (STRING8)STD.Date.Today()) := function
 
-filedate := (STRING8)Std.Date.Today();
-rpt_yyyymmdd := filedate[1..8];
+filedate := today;
 
 rs_key_FCRA_CrimOffender := PULL(Doxie_files.key_Offenders(TRUE));
 tbl_FCRA_CrimOffender_records := TABLE(rs_key_FCRA_CrimOffender, {datasource, orig_state, record_count := count(group)}, datasource, orig_state, few);
@@ -55,9 +54,9 @@ despray_court_src_tbl := STD.File.DeSpray('~thor_data400::data_insight::data_met
 																				pTarget + '/tbl_FCRA_CourtOffenses_offenses_bySource_'+ filedate +'.csv'
 																				,,,,true);
 
-despray_doc_tbl := STD.File.DeSpray('~thor_data400::data_insight::data_metrics::tbl_FCRA_DOCOffenses_records'+ filedate +'.csv',
+despray_doc_tbl := STD.File.DeSpray('~thor_data400::data_insight::data_metrics::tbl_FCRA_DOCOffenses_records_'+ filedate +'.csv',
 																		pHostname, 
-																		pTarget + '/tbl_FCRA_DOCOffenses_records'+ filedate +'.csv'
+																		pTarget + '/tbl_FCRA_DOCOffenses_records_'+ filedate +'.csv'
 																		,,,,true);
 
 despray_doc_src_tbl := STD.File.DeSpray('~thor_data400::data_insight::data_metrics::tbl_FCRA_DOCOffenses_offenses_bySource_'+ filedate +'.csv',
@@ -67,12 +66,12 @@ despray_doc_src_tbl := STD.File.DeSpray('~thor_data400::data_insight::data_metri
 
 //if everything in the Sequential statement runs, it will send the Success email, else it will send the Failure email
 email_alert := SEQUENTIAL(
-					output(sort(tbl_FCRA_CrimOffender_records, datasource, orig_state),,'~thor_data400::data_insight::data_metrics::tbl_FCRA_CrimOffender_records_by_src_'+ filedate +'.csv', csv(heading(single), separator('|'),terminator('\r\n'),quote('\"')),overwrite)
-					,output(sort(tbl_FCRA_CrimOffender_DIDs_bySource, datasource, orig_state),,'~thor_data400::data_insight::data_metrics::tbl_FCRA_CrimOffender_DIDs_bySource_'+ filedate +'.csv', csv(heading(single), separator('|'),terminator('\r\n'),quote('\"')),overwrite)
-					,output(sort(tbl_FCRA_CourtOffenses_records, data_type,state_origin),,'~thor_data400::data_insight::data_metrics::tbl_FCRA_CourtOffenses_records_'+ filedate +'.csv', csv(heading(single), separator('|'),terminator('\r\n'),quote('\"')),overwrite)
-					,output(sort(tbl_FCRA_CourtOffenses_offenses_bySource, data_type,state_origin,offense_score),,'~thor_data400::data_insight::data_metrics::tbl_FCRA_CourtOffenses_offenses_bySource_'+ filedate +'.csv', csv(heading(single), separator('|'),terminator('\r\n'),quote('\"')),overwrite)
-					,output(sort(tbl_FCRA_DOCOffenses_records, data_type,orig_state),,'~thor_data400::data_insight::data_metrics::tbl_FCRA_DOCOffenses_records'+ filedate +'.csv', csv(heading(single), separator('|'),terminator('\r\n'),quote('\"')),overwrite)
-					,output(sort(tbl_FCRA_DOCOffenses_offenses_bySource, data_type,orig_state,offense_score),,'~thor_data400::data_insight::data_metrics::tbl_FCRA_DOCOffenses_offenses_bySource_'+ filedate +'.csv', csv(heading(single), separator('|'),terminator('\r\n'),quote('\"')),overwrite)
+					output(sort(tbl_FCRA_CrimOffender_records, datasource, orig_state),,'~thor_data400::data_insight::data_metrics::tbl_FCRA_CrimOffender_records_by_src_'+ filedate +'.csv', csv(heading(single), separator('|'),terminator('\r\n'),quote('\"')), overwrite, expire(10))
+					,output(sort(tbl_FCRA_CrimOffender_DIDs_bySource, datasource, orig_state),,'~thor_data400::data_insight::data_metrics::tbl_FCRA_CrimOffender_DIDs_bySource_'+ filedate +'.csv', csv(heading(single), separator('|'),terminator('\r\n'),quote('\"')), overwrite, expire(10))
+					,output(sort(tbl_FCRA_CourtOffenses_records, data_type,state_origin),,'~thor_data400::data_insight::data_metrics::tbl_FCRA_CourtOffenses_records_'+ filedate +'.csv', csv(heading(single), separator('|'),terminator('\r\n'),quote('\"')), overwrite, expire(10))
+					,output(sort(tbl_FCRA_CourtOffenses_offenses_bySource, data_type,state_origin,offense_score),,'~thor_data400::data_insight::data_metrics::tbl_FCRA_CourtOffenses_offenses_bySource_'+ filedate +'.csv', csv(heading(single), separator('|'),terminator('\r\n'),quote('\"')), overwrite, expire(10))
+					,output(sort(tbl_FCRA_DOCOffenses_records, data_type,orig_state),,'~thor_data400::data_insight::data_metrics::tbl_FCRA_DOCOffenses_records_'+ filedate +'.csv', csv(heading(single), separator('|'),terminator('\r\n'),quote('\"')), overwrite, expire(10))
+					,output(sort(tbl_FCRA_DOCOffenses_offenses_bySource, data_type,orig_state,offense_score),,'~thor_data400::data_insight::data_metrics::tbl_FCRA_DOCOffenses_offenses_bySource_'+ filedate +'.csv', csv(heading(single), separator('|'),terminator('\r\n'),quote('\"')), overwrite, expire(10))
 					,despray_crim_src_tbl
 					,despray_crim_did_tbl
 					,despray_court_tbl

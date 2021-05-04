@@ -165,6 +165,8 @@ EXPORT Layout_eCrash := MODULE
 				
 		//PR Recon COPPR-49
 		BOOLEAN is_Terminated_Agency;
+		//PR Recon COPPR-63
+		BOOLEAN allow_Sale_Of_Component_Data; 
 		
 		STRING100 Insurance_Company_Standardized ;
 		STRING1 is_available_for_public;
@@ -458,6 +460,10 @@ EXPORT Layout_eCrash := MODULE
     Consolidation_AgencyOri.next_street;
     Consolidation_AgencyOri.addl_report_number;
     Consolidation_AgencyOri.agency_ori;
+		
+		//PR Recon COPPR-63
+    Consolidation_AgencyOri.allow_Sale_Of_Component_Data;
+		
     Consolidation_AgencyOri.insurance_company_standardized;
     Consolidation_AgencyOri.is_available_for_public;
     Consolidation_AgencyOri.report_status;
@@ -586,7 +592,7 @@ EXPORT Layout_eCrash := MODULE
 	END;
 
   EXPORT Accidents_Alpha := RECORD
-    Consolidation_AgencyOri AND NOT [orig_agency_ori, Direction_Of_Impact, Event_Sequence];
+    Consolidation_AgencyOri AND NOT [orig_agency_ori, Direction_Of_Impact, Event_Sequence, allow_Sale_Of_Component_Data];
   END;
 
 END;

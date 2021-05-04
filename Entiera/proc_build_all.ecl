@@ -22,7 +22,7 @@ DoBuild := Proc_build_Entiera(pVersion);
 //Create Sample Records for QA.
 SampleRecs := Output(choosen(sort(dataset(Entiera.Entiera_Constants(pVersion).Cluster+'base::entiera::basefile',Entiera.Layouts.Base,flat),-process_date),1000));
 					
-create_orbit_build:= Orbit3.Proc_Orbit3_CreateBuild_npf ('Email Addresses',pVersion);					
+create_orbit_build := Orbit3.Proc_Orbit3_CreateBuild('Email Addresses',pVersion,is_npf:=true);					
 					
 retval := sequential(//DoSpray
 								zCheckDate,

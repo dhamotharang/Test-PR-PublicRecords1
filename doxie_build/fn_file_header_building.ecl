@@ -8,7 +8,15 @@ in_hdr1 := Header.fn_blank_phone(in_hdr0 + Header.file_TUCS_did + Header.File_TN
 not_from_raw := in_hdr1(  src in ['TS','TU','LT'] );
 yes_from_raw := in_hdr1(~(src in ['TS','TU','LT']));
 
-header.macGetCleanAddr(not_from_raw, RawAID, true, not_from_raw_recleaned);
+header.macGetCleanAddr(not_from_raw, RawAID, true, not_from_raw_recleaned_);
+
+fn_cleanup(string pIn) := function
+ pOut1 := trim(regexreplace('[!$^*<>?]',pIn,' '),left,right);
+ pOut  := trim(stringlib.stringfindreplace(pOut1,'\'',''),left,right);
+ return pOut;
+end;
+
+not_from_raw_recleaned := project(not_from_raw_recleaned_, transform({not_from_raw_recleaned_}, self.sec_range	:= fn_cleanup(left.sec_range), self := left;));
 
 not_from_raw_recleaned_TS     := not_from_raw_recleaned(src = 'TS');
 not_from_raw_recleaned_not_TS := not_from_raw_recleaned(src <> 'TS');

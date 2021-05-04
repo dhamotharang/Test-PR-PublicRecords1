@@ -1,6 +1,6 @@
 ﻿import doxie_files, doxie, ut, Data_Services, fcra,PRTE2_Prof_License_Mari, BIPV2,autokey,AutoKeyB2,AutoKeyI,fcra;
 
-EXPORT Keys := module
+EXPORT Keys:= module
 
 export key_disciplinary		:= index(files.dsDisciplinary,{INDIVIDUAL_NMLS_ID},{files.dsDisciplinary},Data_Services.Data_location.Prefix('mari')+ constants.KEY_PREFIX + doxie.Version_SuperKey+'::disciplinary_actions');
 export key_indv_detail		:= index(files.dsDetail,{INDIVIDUAL_NMLS_ID}, {files.dsDetail}, Data_Services.Data_location.Prefix('mari')+ constants.KEY_PREFIX + doxie.Version_SuperKey+'::individual_detail');
@@ -59,64 +59,7 @@ END;
 //CREATE AUTOKEYS
 export autokeys(string filedate) := function
 
-layouts.tempSlimRec  	xformSearch(recordof(files.dsSearch) L, integer cnt) := transform
-self.cnt := cnt;
-self.mari_rid							:= L.mari_rid;
-self.create_dte						:= L.create_dte;                  
-self.last_upd_dte  				:= L.last_upd_dte; 
-self.stamp_dte  					:= L.stamp_dte;
-self.date_vendor_first_reported		:= L.date_vendor_first_reported;
-self.date_vendor_last_reported		:= L.date_vendor_last_reported;
-self.date_first_seen			:= L.date_first_seen;
-self.date_last_seen				:= L.date_last_seen;
-self.did									:= L.did;
-self.bdid									:= L.bdid;
-self.std_prof_cd					:= L.std_prof_cd;
-self.std_source_upd				:= L.std_source_upd;
-self.type_cd							:= L.type_cd;
-self.fname								:= L.fname;
-self.mname								:= L.mname;
-self.lname								:= L.lname;
-self.name_suffix					:= L.name_suffix;
-self.party_birth					:= L.birth_dte;
-self.license_nbr					:= L.license_nbr;	
-self.cln_license_nbr			:= L.cln_license_nbr;
-self.off_license_nbr			:= L.off_license_nbr;
-self.license_state				:= L.license_state;
-self.cmc_slpk							:= L.cmc_slpk;		
-self.pcmc_slpk						:= L.pcmc_slpk;
-self.tax_type							:= 	choose(cnt,L.tax_type_1,L.tax_type_2,L.tax_type_1,L.tax_type_2);
-self.ssn_taxid						:= 	choose(cnt,L.ssn_taxid_1,L.ssn_taxid_2,L.ssn_taxid_1,L.ssn_taxid_2);
-
-//Each company name should be associated to 2 addreasses(Bussines/Mailing)
-self.company							:= 	choose(cnt,L.name_company,L.name_company,L.name_company_dba,L.name_company_dba);
-self.party_phone 					:= 	choose(cnt,L.phn_mari_1,L.phn_mari_2,L.phn_mari_1,L.phn_mari_2);
-self.addr_ind							:=  choose(cnt,L.addr_bus_ind,L.addr_mail_ind,L.addr_bus_ind,L.addr_mail_ind);
-self.prim_range 					:= 	choose(cnt,l.Bus_prim_range,l.Mail_prim_range);
-self.predir								:=  choose(cnt,l.Bus_predir,l.Mail_predir,l.Bus_predir,l.Mail_predir);
-self.prim_name 						:= 	choose(cnt,l.Bus_prim_name,l.Mail_prim_name,l.Bus_prim_name,l.Mail_prim_name);
-self.addr_suffix					:=  choose(cnt,l.Bus_addr_suffix,l.Mail_addr_suffix,l.Bus_addr_suffix,l.Mail_addr_suffix);
-self.postdir							:= 	choose(cnt,l.Bus_postdir,l.Mail_postdir,l.Bus_postdir,l.Mail_postdir);
-self.unit_desig						:=	choose(cnt,l.Bus_unit_desig,l.Mail_unit_desig,l.Bus_unit_desig,l.Mail_unit_desig);
-self.sec_range 						:=  choose(cnt,l.Bus_sec_range,l.Mail_sec_range,l.Bus_sec_range,l.Mail_sec_range);
-self.p_city_name					:=	choose(cnt,l.Bus_p_city_name,l.Mail_p_city_name,l.Bus_p_city_name,l.Mail_p_city_name);
-self.city_name						:= 	choose(cnt,l.Bus_v_city_name,l.Mail_v_city_name,l.Bus_v_city_name,l.Mail_v_city_name);
-self.st 									:= 	choose(cnt,l.Bus_state,l.Mail_state,l.Bus_state,l.Mail_state);
-self.zip5									:= 	choose(cnt,l.Bus_zip5,l.Mail_zip5,l.Bus_zip5,l.Mail_zip5);
-self.zip4									:=  choose(cnt,l.Bus_zip4,l.Mail_zip4,l.Bus_zip4,l.Mail_zip4);
-self.brkr_license_nbr			:= L.brkr_license_nbr;
-self.nmls_id							:= L.nmls_id;
-self.foreign_nmls_id			:= L.foreign_nmls_id;
-self.federal_regulator		:= L.federal_regulator;
-self	:=L;
-end;
-NormNameAddr := dedup(sort(normalize(files.dsSearch,4,xformSearch(LEFT,COUNTER)), cnt), EXCEPT cnt, all, local);
-
-//filter out 2nd record if address is blank
-dsBusAddr := NormNameAddr(cnt = 1 or (cnt = 3 and company <> ''));
-dsMailAddr := NormNameAddr((cnt = 2 or cnt = 4) and (prim_range + predir + prim_name + addr_suffix + postdir + unit_desig + sec_range + city_name + st + zip5 + party_phone +tax_type ) <> '');
-comb_recs := project(dsBusAddr + dsMailAddr, transform(Layouts.SlimRec, self := left)):persist('~prte::temp::proflic_mari::normalized_recs');
-ak_dataset := dedup(comb_recs,record,all,local);
+ak_dataset := project(build_aid.ak_dataset,layouts.slimrec);
 
 ak_keyname	:= Constants.ak_keyname;
 ak_logical	:= Constants.ak_logical(filedate);

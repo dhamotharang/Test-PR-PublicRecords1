@@ -1,8 +1,7 @@
 ﻿EXPORT Mac_GetOverrides(ds_input, dsOut) := MACRO
-IMPORT _Control,iesp,ConsumerDisclosure;
+IMPORT _Control,iesp;
 
 	service_name	:= 'ConsumerDisclosure.FCRADataService';
-	//serviceURL	:= _Control.RoxieEnv.prod_batch_fcra ;
 	serviceURL		:= _Control.RoxieEnv.staging_fcra_roxieIP ;
 
 	nodes			:= 50;
@@ -200,7 +199,7 @@ IMPORT _Control,iesp,ConsumerDisclosure;
 					,merge):independent;
 		
 		
-		Override_Layouts.Layout_Get_Orphans out_xform(dsOut_1 L):=TRANSFORM
+		Overrides.Override_Layouts.Layout_Get_Orphans out_xform(dsOut_1 L):=TRANSFORM
 			SELF.datagroup		 := L.Datagroup; 
 			SELF.did					 := L.lexid;
 			SELF.RECID 				 := trim(L.RecID_);
