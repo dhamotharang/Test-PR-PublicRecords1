@@ -44,6 +44,9 @@
 			string32 	phone_forwarded;
 			string20 	date_added;
 			integer5	identity_count;
+			string5   phone_verified;
+			string32  verification_type;
+			string5		phone_star_rating;
 	end;
 
 	export Transactions_Raw := record
@@ -96,6 +99,9 @@
 			string8		date_added;
 			string6		time_added;
 			integer5	identity_count;
+			string5   phone_verified;
+			string32  verification_type;
+			string5		phone_star_rating;
 	end;
 	
 	export Transactions_History := record
@@ -121,6 +127,7 @@
 			string20 	date_added;
 			integer5	identity_count;
 			string30	carrier;
+			string5		phone_star_rating;
 	end;
 	
 	export OtherPhones_Raw := record
@@ -148,6 +155,7 @@
 			string6		time_added;
 			integer5	identity_count;
 			string30	carrier;
+			string5		phone_star_rating;
 	end;
 	
 	export OtherPhones_History := record

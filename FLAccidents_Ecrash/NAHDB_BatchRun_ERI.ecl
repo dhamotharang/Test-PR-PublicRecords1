@@ -1,6 +1,6 @@
 ﻿import Address,ut,_control,std,Prof_License_preprocess; 
 
-EXPORT NAHDB_BatchRun_ERI(string filedate) := function 
+export NAHDB_BatchRun_ERI(string filedate) := function 
 
 layoutNahdbBatch := Record
 string STATE;
@@ -71,13 +71,13 @@ string match_flag,
 string date_vendor_last_reported
 	
 end; 
-filein := dedup(dataset('~thor_data::in::nahdb::name', layoutNahdbBatch, CSV(Terminator (['\n','\r\n']), Heading(1), Quote('"'), Separator([',']))),all);
+filein := dedup(dataset('~thor_data::in::nahdb::name', layoutNahdbBatch, csv(terminator (['\n','\r\n']), heading(1), quote('"'), separator([',']))),all);
 
 layoutNahdbBatch convdatestr ( filein l ) := transform
-self.BIRTH_DT := Prof_License_preprocess.dateconv( STD.Str.FilterOut ( TRIM(l.BIRTH_DT) , '-/'));
-self.ACCIDENT_DT := Prof_License_preprocess.dateconv( STD.Str.FilterOut ( TRIM(l.ACCIDENT_DT) , '-/'));
-self.ADMIT_DT := Prof_License_preprocess.dateconv( STD.Str.FilterOut ( TRIM(l.ADMIT_DT) , '-/'));
-self.DISCHARGE_DT := Prof_License_preprocess.dateconv( STD.Str.FilterOut ( TRIM(l.DISCHARGE_DT) , '-/'));
+self.BIRTH_DT := Prof_License_preprocess.dateconv( STD.Str.FilterOut ( trim(l.BIRTH_DT) , '-/'));
+self.ACCIDENT_DT := Prof_License_preprocess.dateconv( STD.Str.FilterOut ( trim(l.ACCIDENT_DT) , '-/'));
+self.ADMIT_DT := Prof_License_preprocess.dateconv( STD.Str.FilterOut ( trim(l.ADMIT_DT) , '-/'));
+self.DISCHARGE_DT := Prof_License_preprocess.dateconv( STD.Str.FilterOut ( trim(l.DISCHARGE_DT) , '-/'));
 self.FIRST_NAME := STD.Str.ToUpperCase ( l.FIRST_NAME);
 self.LAST_NAME := STD.Str.ToUpperCase ( l.LAST_NAME);
 self  := l;
@@ -86,13 +86,8 @@ end;
 fileinfmt := project( filein, convdatestr(left));
 
 // Bug #DF-23776
-//Add Sequence number to the in file
-
-
- // filter out I7 or Interactive reports 
-
-
-																 
+// Add Sequence number to the in file
+// filter out I7 or Interactive reports																 
 // Bug #.DF-23776
 // 1.	Exclude any potential result rows where the reason_id is one of these values
 
@@ -103,7 +98,7 @@ EA_ds := dataset('~thor_data400::persist::ecrash_ssV2', Layout_eCrash.Consolidat
 
  accidents0:= EA_ds(report_code in EA_natl_keyed_inquiry_set); 
  
- accidents1 := PROJECT(accidents0,transform(recordof(accidents0),self.record_type := trim(regexreplace('\\t|\\n| ',left.record_type,'')),self.cru_jurisdiction_nbr  :=   regexreplace('\\^M',left.cru_jurisdiction_nbr,''),
+ accidents1 := project(accidents0,transform(recordof(accidents0),self.record_type := trim(regexreplace('\\t|\\n| ',left.record_type,'')),self.cru_jurisdiction_nbr  :=   regexreplace('\\^M',left.cru_jurisdiction_nbr,''),
              self := left));
 
 
@@ -112,11 +107,9 @@ EA_ds := dataset('~thor_data400::persist::ecrash_ssV2', Layout_eCrash.Consolidat
 																																																									 report_code = 'A' => 2,3),carrier_name,local), vin,did,orig_accnbr,accident_date,jurisdiction_state,jurisdiction,cru_order_id,report_type_id, local); 
 
 
- //vin match 
-
+ //vin match
 vin_match:= dedup(join(accidentDedup, distribute(fileinfmt,hash(LAST_NAME,FIRST_NAME,BIRTH_DT)),
-                
-				trim(left.orig_lname,left,right) = trim(right.LAST_NAME,left,right)  and 
+      	trim(left.orig_lname,left,right) = trim(right.LAST_NAME,left,right)  and 
 				trim(left.orig_fname,left,right) = trim(right.FIRST_NAME,left,right)  and 
 				trim(left.dob,left,right) = trim(right.BIRTH_DT,left,right)  and
 				trim(left.accident_date,left,right)  between  ut.getDateOffset ( -30, trim(right.ACCIDENT_DT) ) and  trim( right.DISCHARGE_DT),
@@ -170,28 +163,16 @@ vin_match:= dedup(join(accidentDedup, distribute(fileinfmt,hash(LAST_NAME,FIRST_
 					 self := right 
 				   ), right outer,local),all);
 
-
 // remove multiple vin records caused due to VIN lookup from batch
-
 out := project(vin_match,transform(layoutOut, self.source_id := if (left.acc_dol ='', '', left.source_id), self := left)) ; 
 
 //Add rowid to the output file
-//// Bug #.DF-23776
-
-
-
-
-
-
-										
-return sequential(FLAccidents_Ecrash.Spray_nahdb_ERI(filedate), 
-              /*   count(fileinfmt),
-			    count(out); */
-                 count(out(acc_dol <>'')); 
-              
-                 output(out,,'~thor_data::out::nahdb_batch_name_'+filedate,csv(
-                 HEADING('STATE|ID|FIRST_NAME|MIDDILE_NAME|LAST_NAME|ADDRESS1|ADDRESS2|CITY|ST|ZIPCODE|BIRTH_DT|ACCIDENT_DT|ADMIT_DT|DISCHARGE_DT|MobilePhone|HomePhone|WorkPhone|acc_vin| order_id	| sequence_nbr|	 reason_id| acct_nbr	| vehicle_incident_id| vehicle_unit_number |	vendor_code| work_type_id|  orig_lname | orig_fname | orig_mname |  vehicle_owner| dob| driver_license_nbr| dlnbr_st| vehicle_year|  vehicle_make|  vehicle_model| tag_nbr| tagnbr_st| report_type_id| loss_type| acc_dol| accident_location|  acc_city|	 vehicle_incident_city| acc_st	| jurisdiction| orig_accnbr|	 accident_nbr| addl_report_number| acc_county| crash_county| cru_jurisdiction_nbr| agency_ori| carrier_name|	  Insurance_policy_num|	    Insurance_policy_Eff_Date|    Insurance_policy_Exp_Date| source_id|	 report_code|	 match_flag|	 date_vendor_last_reported   \n','',SINGLE),
-                 SEPARATOR('|'), TERMINATOR('\n')),OVERWRITE),
-						     fileservices.despray('~thor_data::out::nahdb_batch_name_'+filedate, _control.IPAddress.bctlpedata10, '/data/hds_180/cjr/'+filedate+'/nahdb_out_name_'+filedate+'.csv',,,,TRUE)); 
+//// Bug #.DF-23776										
+return sequential(Spray_nahdb_ERI(filedate),
+                 count(out(acc_dol <>'')),              
+                 output(out,,'~thor_data::out::nahdb_batch_name_'+filedate,
+								 csv(heading('STATE|ID|FIRST_NAME|MIDDILE_NAME|LAST_NAME|ADDRESS1|ADDRESS2|CITY|ST|ZIPCODE|BIRTH_DT|ACCIDENT_DT|ADMIT_DT|DISCHARGE_DT|MobilePhone|HomePhone|WorkPhone|acc_vin| order_id	| sequence_nbr|	 reason_id| acct_nbr	| vehicle_incident_id| vehicle_unit_number |	vendor_code| work_type_id|  orig_lname | orig_fname | orig_mname |  vehicle_owner| dob| driver_license_nbr| dlnbr_st| vehicle_year|  vehicle_make|  vehicle_model| tag_nbr| tagnbr_st| report_type_id| loss_type| acc_dol| accident_location|  acc_city|	 vehicle_incident_city| acc_st	| jurisdiction| orig_accnbr|	 accident_nbr| addl_report_number| acc_county| crash_county| cru_jurisdiction_nbr| agency_ori| carrier_name|	  Insurance_policy_num|	    Insurance_policy_Eff_Date|    Insurance_policy_Exp_Date| source_id|	 report_code|	 match_flag|	 date_vendor_last_reported   \n','',SINGLE),
+                     separator('|'), terminator('\n')), overwrite, __compressed__, expire(Constants.ThorFile_NAHDB_Days_To_Expire)),
+						     STD.File.DeSpray('~thor_data::out::nahdb_batch_name_'+filedate, _control.IPAddress.bctlpedata10, '/data/hds_180/cjr/'+filedate+'/nahdb_out_name_'+filedate+'.csv',,,,true)); 
 
 end; 

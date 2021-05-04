@@ -1,6 +1,7 @@
-﻿IMPORT _Control;
+﻿IMPORT _Control, Data_Services;
+lfnx := 'nac::nac2::groups_config';
 lfn := IF(_Control.Config.IsDev,
-					'~nac::nac2::groups_config_dataland',
-					'~nac::nac2::groups_config_prod');
+					Data_Services.foreign_prod + lfnx,
+					'~' + lfnx);
 
-EXPORT dNAC2Config := dataset(lfn, $.rNAC2Config, thor);;
+EXPORT dNAC2Config := dataset(lfn, $.rNAC2Config, thor);

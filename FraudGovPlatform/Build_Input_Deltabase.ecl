@@ -1,7 +1,7 @@
-﻿IMPORT tools,STD, FraudGovPlatform_Validation, FraudShared, ut, _Validate,IDLExternalLinking,InsuranceHeader_xlink,SALT37;
+﻿IMPORT tools,STD, FraudGovPlatform_Validation, ut, _Validate,IDLExternalLinking,InsuranceHeader_xlink,SALT37;
 EXPORT Build_Input_Deltabase(
 	 string pversion
-	,dataset(FraudShared.Layouts.Input.mbs) MBS_Sprayed = FraudShared.Files().Input.MBS.sprayed
+	,dataset(Layouts.Input.mbs) MBS_Sprayed = Files().Input.MBS.sprayed
 	,dataset(Layouts.Input.Deltabase) Deltabase_Sprayed =  files().Input.Deltabase.sprayed	
 	,dataset(Layouts.Input.Deltabase) ByPassed_Deltabase_Sprayed = files().Input.ByPassed_Deltabase.sprayed	
 ) :=

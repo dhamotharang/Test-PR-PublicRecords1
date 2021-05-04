@@ -6,7 +6,7 @@ EXPORT Join_Transunion_Normalized_Clean(STRING Full_filedate,STRING Update_filed
 
 Import ut;
 
-norm_data := Transunion_PTrak.Normalize_Transunion_Update;
+norm_data := Transunion_PTrak.Normalize_Transunion_Update(Full_filedate,Update_filedate);
 
 //filter data with blank names, names = ',' or length 1
 
@@ -16,7 +16,7 @@ d_norm_data 			:= DISTRIBUTE(norm_data , HASH(Name));
 //JOIN CLEAN NAMES BACK TO NORMALIZED DATA
 //-----------------------------------------------------------------
 //Clean Name
-	name_clean := Transunion_PTrak.Clean_Transunion_Name;
+	name_clean := Transunion_PTrak.Clean_Transunion_Name(Full_filedate,Update_filedate);
 
 	//Join Clean Name
 Transunion_PTrak.Layout_Transunion_Out.FinalNormCleanNameRec t_join_get_name (d_norm_data L, name_clean R) := TRANSFORM
@@ -75,7 +75,7 @@ Transunion_PTrak.Layout_Transunion_Out.LayoutTransunionBaseOut t_output_formatti
 	 STRING28  v_prim_name 			:= L.CleanAddress[13..40];
 	 STRING5   v_zip       			:= L.CleanAddress[117..121];
 	 STRING4   v_zip4      			:= L.CleanAddress[122..125];
-	 STRING9   v_sss_unformatted  	:= IF(L.FileType = 'F', TRIM(StringLib.StringFindReplace(L.SSNFirst5Digit + L.SSNLast4Digit, '-',''), left, right), L.SSNFull);
+	 STRING9   v_sss_unformatted  	:= L.SSNFull;
 	 STRING7   v_phone_unformatted 	:= TRIM(StringLib.StringFindReplace(L.TelephoneNumber, '-',''), left, right);
 	 STRING8   v_dob_unformatted	:= L.CurrentName.Dob_YYYY + INTFORMAT((UNSIGNED1)L.CurrentName.Dob_MM, 2,1) + INTFORMAT((UNSIGNED1)L.CurrentName.Dob_DD, 2,1);
 	 

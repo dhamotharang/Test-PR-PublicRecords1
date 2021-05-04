@@ -1,10 +1,12 @@
-﻿IMPORT	Business_Credit, Business_Credit_Scoring,	doxie,	Std,ut;
+﻿IMPORT	Business_Credit, Business_Credit_Scoring, STD;
+
 EXPORT	key_tradeline(STRING pVersion	=	(STRING8)Std.Date.Today(),
 											Constants().buildType	pBuildType	=	Constants().buildType.Daily)	:=	FUNCTION
 
 	
-	
-    CalculationsForDBTV5:=business_credit.CalculateDBTV5(Business_Credit.fn_GetSegments.accountBase(active));
+    addSeqNum := PROJECT(Business_Credit.fn_GetSegments.accountBase(active), TRANSFORM(Business_Credit.Layouts.rAccountBaseSeq, SELF.seq_num := 0; SELF := LEFT;));
+    
+    CalculationsForDBTV5:=business_credit.CalculateDBTV5(addSeqNum);
     
     Loadfile:=project(CalculationsForDBTV5,transform(business_credit.layouts.rTradelineKey,
 		SELF.Version					:=	left.process_date;
@@ -61,4 +63,5 @@ EXPORT	key_tradeline(STRING pVersion	=	(STRING8)Std.Date.Today(),
 													dTradelinesDist(Version=pVersion),
 													dTradelinesDist);
 	RETURN	INDEX(dKeyResult,{Sbfe_Contributor_Number,Contract_Account_Number,Account_Type_Reported,Cycle_End_Date},{dKeyResult},Business_Credit.keynames().Tradeline.QA);
+
 END;

@@ -1,4 +1,4 @@
-import BIPV2, BIPV2_Files,  DCAV2, DNB_DMI, Frandx, mdr;
+﻿import BIPV2, BIPV2_Files,  DCAV2, DNB_DMI, Frandx, mdr ,BIPV2_Field_Suppression;
 
 
 EXPORT mod_Build(
@@ -14,11 +14,13 @@ MODULE
 lj := BIPv2_HRCHY.PrepSources.LNCA(head, lncad);
 fj := BIPv2_HRCHY.PrepSources.FRAN(head, frand);
 dj := BIPv2_HRCHY.PrepSources.DUNS(head, dunsd);
-aj := dedup(lj + dj + fj, all) : persist('~thor_data400::BIPv2_HRCHY::mod_Build.aj');
+aj := project(dedup(lj + dj + fj, all),transform({unsigned rid,recordof(left)},self.rid := counter,self := left)) : persist('~thor_data400::BIPv2_HRCHY::mod_Build.aj');
 
+// -- suppress hierarchy
+ds_suppress := BIPV2_Field_Suppression.mac_Suppress_Hierarchy(aj) : persist('~persist::BIPv2_HRCHY::mod_Build.ds_suppress');
 
 //***** IDENTIFY COMMON HRCHY TYPES THAT CAN BE PATCHED
-d2 := BIPv2_HRCHY.PrepSources.Patch(aj);
+d2 := BIPv2_HRCHY.PrepSources.Patch(project(ds_suppress,recordof(dj)));
 
 //***** HANDLE OVERLAPPING SOURCES
 d3 := BIPv2_HRCHY.PrepSources.HandleDups(d2) : persist('~thor_data400::BIPv2_HRCHY::mod_Build.d3' );

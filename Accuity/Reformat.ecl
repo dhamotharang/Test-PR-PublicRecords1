@@ -245,7 +245,7 @@ export source_SL_1136   := allsources(accuityDataSource='SL 1136');  //SLOVAKIAN
 export source_TEL_1028  := allsources(accuityDataSource='TEL 1028'); //Terrorist Exclusion List
 export source_TFP_1072  := allsources(accuityDataSource='TFP 1072'); //Accuity Research (OFAC)
 export source_TW_1016   := allsources(accuityDataSource='TW 1016');  //Taiwan
-export source_UGO_1120  := allsources(accuityDataSource='UGO 1120'); //U.S. Government Officials
+//export source_UGO_1120  := allsources(accuityDataSource='UGO 1120'); //U.S. Government Officials
 export source_UK_1046   := allsources(accuityDataSource='UK 1046');  //UK HOME OFFICE
 export source_UN_44     := allsources(accuityDataSource='UN 44');    //United Nations Sanctions List
 export source_UNE_1172  := allsources(accuityDataSource='UNE 1172'); //United Nations Enhancements List

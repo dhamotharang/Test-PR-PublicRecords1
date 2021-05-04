@@ -51,26 +51,20 @@ spray_csv_transact :=sequential(
 							output(csvFile + ' sprayed and added to superfile')
 							);
 
-
+// DF-28230 Delta build
+isDeltaBuild := ~isfullreplace;  // DF-28230 add delta build capability
 // Build base file and perform superfile transaction
-
-Roxiekeybuild.Mac_SF_BuildProcess_v2(
-										if (isfullreplace,
-											fcra_opt_out.clean_opt_out_data(filedate)(trim(source_flag) <> '5'),
-										dedup(fcra_opt_out.clean_opt_out_data(filedate) + 
-										if(NOTHOR(fileservices.superfileexists('~thor_data400::base::fcra::qa::optout'))
-										,file_infile_appended(trim(source_flag) <> '5')),record,all)
-										),
-                       '~thor_data400::base::fcra',if(isfullreplace,'optout_monthly','optout_weekly'),filedate,bld_file, 3,,true);
+bld_file := $.Proc_Build_Base(filedate, isDeltaBuild);
 
 // Build Roxie Keys
-
-buildkeys := fcra_opt_out.proc_build_keys(filedate);
+buildkeys := fcra_opt_out.proc_build_keys(filedate, isDeltaBuild);
 
 // dops update
-
-dops_update := RoxieKeybuild.updateversion('FCRA_OptOutKeys',filedate,'avenkatachalam@seisint.com,kevin.devore@lexisnexis.com,abednego.escobal@lexisnexisrisk.com',,'F');
-
+// DF-28230
+dops_update := IF(isDeltaBuild,
+					RoxieKeybuild.updateversion('FCRA_OptOutKeys',filedate,'abednego.escobal@lexisnexisrisk.com',,'F',updateflag:='D'),
+					RoxieKeybuild.updateversion('FCRA_OptOutKeys',filedate,'abednego.escobal@lexisnexisrisk.com',,'F')
+);
 
 // sample records for QA
 
@@ -80,7 +74,7 @@ new_records_sample_for_qa	:= output(choosen(fcra_opt_out.file_infile_appended(da
 
 // orbit creation
 
-orbit_update := Orbit3.proc_Orbit3_CreateBuild_AddItem('FCRA Suppressions',(string)filedate,'F');
+orbit_update := Orbit3.proc_Orbit3_CreateBuild_AddItem('FCRA Opt-out',(string)filedate,'F');
 
 // Actions
 
@@ -93,13 +87,6 @@ retval := sequential(if (fileflag = 'B' or fileflag = 'E',spray_super_transact),
 						fileservices.clearsuperfile('~thor_data400::in::fcra::processed::alpharetta::opt_out')
 						)),*/
 					bld_file,
-					// add the respective super to main super which is used to build index
-					fileservices.clearsuperfile('~thor_data400::base::fcra::qa::optout'),
-					if (isfullreplace,
-						fileservices.addsuperfile('~thor_data400::base::fcra::qa::optout','~thor_data400::base::fcra::qa::optout_monthly'),
-						fileservices.addsuperfile('~thor_data400::base::fcra::qa::optout','~thor_data400::base::fcra::qa::optout_weekly')
-						),
-						
 					buildkeys,
 					Scrubs_FCRA_Opt_Out.fnRunScrubs(filedate,''),
 					dops_update,

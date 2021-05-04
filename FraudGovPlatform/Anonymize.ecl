@@ -1,4 +1,4 @@
-﻿import FraudShared, Anonymizer, Address,Std;
+﻿import Anonymizer, Address,Std;
 EXPORT Anonymize  := Module
 
 	Shared nodes				:= thorlib.nodes();	

@@ -33,8 +33,8 @@ EXPORT MakeFT_Invalid_Rec_ID(SALT311.StrType s0) := FUNCTION
   s1 := SALT311.stringfilter(s0,'0123456789_'); // Only allow valid symbols
   RETURN  s1;
 END;
-EXPORT InValidFT_Invalid_Rec_ID(SALT311.StrType s) := WHICH(LENGTH(TRIM(s))<>LENGTH(TRIM(SALT311.StringFilter(s,'0123456789_'))),~(LENGTH(TRIM(s)) = 18));
-EXPORT InValidMessageFT_Invalid_Rec_ID(UNSIGNED1 wh) := CHOOSE(wh,SALT311.HygieneErrors.NotInChars('0123456789_'),SALT311.HygieneErrors.NotLength('18'),SALT311.HygieneErrors.Good);
+EXPORT InValidFT_Invalid_Rec_ID(SALT311.StrType s) := WHICH(LENGTH(TRIM(s))<>LENGTH(TRIM(SALT311.StringFilter(s,'0123456789_'))),~(LENGTH(TRIM(s)) = 15));
+EXPORT InValidMessageFT_Invalid_Rec_ID(UNSIGNED1 wh) := CHOOSE(wh,SALT311.HygieneErrors.NotInChars('0123456789_'),SALT311.HygieneErrors.NotLength('15'),SALT311.HygieneErrors.Good);
 
 EXPORT MakeFT_Invalid_Date(SALT311.StrType s0) := FUNCTION
   RETURN  s0;
@@ -47,16 +47,16 @@ EXPORT MakeFT_Invalid_FName(SALT311.StrType s0) := FUNCTION
   s2 := SALT311.stringcleanspaces( SALT311.stringsubstituteout(s1,' ',' ') ); // Insert spaces but avoid doubles
   RETURN  s2;
 END;
-EXPORT InValidFT_Invalid_FName(SALT311.StrType s) := WHICH(LENGTH(TRIM(s))<>LENGTH(TRIM(SALT311.StringFilter(s,'ABCDEFGHIJKLMNOPQRSTUVWXYZ- '))),~(LENGTH(TRIM(s)) >= 2 AND LENGTH(TRIM(s)) <= 15),~(SALT311.WordCount(SALT311.StringSubstituteOut(s,' ',' ')) = 0 OR SALT311.WordCount(SALT311.StringSubstituteOut(s,' ',' ')) = 1));
-EXPORT InValidMessageFT_Invalid_FName(UNSIGNED1 wh) := CHOOSE(wh,SALT311.HygieneErrors.NotInChars('ABCDEFGHIJKLMNOPQRSTUVWXYZ- '),SALT311.HygieneErrors.NotLength('2..15'),SALT311.HygieneErrors.NotWords('0,1'),SALT311.HygieneErrors.Good);
+EXPORT InValidFT_Invalid_FName(SALT311.StrType s) := WHICH(LENGTH(TRIM(s))<>LENGTH(TRIM(SALT311.StringFilter(s,'ABCDEFGHIJKLMNOPQRSTUVWXYZ- '))),~(LENGTH(TRIM(s)) >= 2 AND LENGTH(TRIM(s)) <= 20),~(SALT311.WordCount(SALT311.StringSubstituteOut(s,' ',' ')) = 0 OR SALT311.WordCount(SALT311.StringSubstituteOut(s,' ',' ')) = 1));
+EXPORT InValidMessageFT_Invalid_FName(UNSIGNED1 wh) := CHOOSE(wh,SALT311.HygieneErrors.NotInChars('ABCDEFGHIJKLMNOPQRSTUVWXYZ- '),SALT311.HygieneErrors.NotLength('2..20'),SALT311.HygieneErrors.NotWords('0,1'),SALT311.HygieneErrors.Good);
 
 EXPORT MakeFT_Invalid_MName(SALT311.StrType s0) := FUNCTION
   s1 := SALT311.stringfilter(s0,'ABCDEFGHIJKLMNOPQRSTUVWXYZ. '); // Only allow valid symbols
   s2 := SALT311.stringcleanspaces( SALT311.stringsubstituteout(s1,' ',' ') ); // Insert spaces but avoid doubles
   RETURN  s2;
 END;
-EXPORT InValidFT_Invalid_MName(SALT311.StrType s) := WHICH(LENGTH(TRIM(s))<>LENGTH(TRIM(SALT311.StringFilter(s,'ABCDEFGHIJKLMNOPQRSTUVWXYZ. '))),~(LENGTH(TRIM(s)) >= 0 AND LENGTH(TRIM(s)) <= 2),~(SALT311.WordCount(SALT311.StringSubstituteOut(s,' ',' ')) = 0 OR SALT311.WordCount(SALT311.StringSubstituteOut(s,' ',' ')) = 1));
-EXPORT InValidMessageFT_Invalid_MName(UNSIGNED1 wh) := CHOOSE(wh,SALT311.HygieneErrors.NotInChars('ABCDEFGHIJKLMNOPQRSTUVWXYZ. '),SALT311.HygieneErrors.NotLength('0..2'),SALT311.HygieneErrors.NotWords('0,1'),SALT311.HygieneErrors.Good);
+EXPORT InValidFT_Invalid_MName(SALT311.StrType s) := WHICH(LENGTH(TRIM(s))<>LENGTH(TRIM(SALT311.StringFilter(s,'ABCDEFGHIJKLMNOPQRSTUVWXYZ. '))),~(LENGTH(TRIM(s)) >= 0 AND LENGTH(TRIM(s)) <= 15),~(SALT311.WordCount(SALT311.StringSubstituteOut(s,' ',' ')) = 0 OR SALT311.WordCount(SALT311.StringSubstituteOut(s,' ',' ')) = 1));
+EXPORT InValidMessageFT_Invalid_MName(UNSIGNED1 wh) := CHOOSE(wh,SALT311.HygieneErrors.NotInChars('ABCDEFGHIJKLMNOPQRSTUVWXYZ. '),SALT311.HygieneErrors.NotLength('0..15'),SALT311.HygieneErrors.NotWords('0,1'),SALT311.HygieneErrors.Good);
 
 EXPORT MakeFT_Invalid_LName(SALT311.StrType s0) := FUNCTION
   s1 := SALT311.stringfilter(s0,'ABCDEFGHIJKLMNOPQRSTUVWXYZ.- '); // Only allow valid symbols
@@ -147,11 +147,11 @@ EXPORT InValidFT_Invalid_Phone(SALT311.StrType s) := WHICH(LENGTH(TRIM(s))<>LENG
 EXPORT InValidMessageFT_Invalid_Phone(UNSIGNED1 wh) := CHOOSE(wh,SALT311.HygieneErrors.NotInChars('0123456789'),SALT311.HygieneErrors.NotLength('0,10'),SALT311.HygieneErrors.Good);
 
 EXPORT MakeFT_Invalid_Clientassigneduniquerecordid(SALT311.StrType s0) := FUNCTION
-  s1 := SALT311.stringfilter(s0,'0123456789'); // Only allow valid symbols
-  RETURN  MakeFT_Invalid_Num(s1);
+  s1 := SALT311.stringfilter(s0,'abcdefghijklmnopqrstuvwxyz0123456789'); // Only allow valid symbols
+  RETURN  s1;
 END;
-EXPORT InValidFT_Invalid_Clientassigneduniquerecordid(SALT311.StrType s) := WHICH(LENGTH(TRIM(s))<>LENGTH(TRIM(SALT311.StringFilter(s,'0123456789'))),~(LENGTH(TRIM(s)) = 15 OR LENGTH(TRIM(s)) = 16));
-EXPORT InValidMessageFT_Invalid_Clientassigneduniquerecordid(UNSIGNED1 wh) := CHOOSE(wh,SALT311.HygieneErrors.NotInChars('0123456789'),SALT311.HygieneErrors.NotLength('15,16'),SALT311.HygieneErrors.Good);
+EXPORT InValidFT_Invalid_Clientassigneduniquerecordid(SALT311.StrType s) := WHICH(LENGTH(TRIM(s))<>LENGTH(TRIM(SALT311.StringFilter(s,'abcdefghijklmnopqrstuvwxyz0123456789'))),~(LENGTH(TRIM(s)) = 17 OR LENGTH(TRIM(s)) = 18 OR LENGTH(TRIM(s)) = 19));
+EXPORT InValidMessageFT_Invalid_Clientassigneduniquerecordid(UNSIGNED1 wh) := CHOOSE(wh,SALT311.HygieneErrors.NotInChars('abcdefghijklmnopqrstuvwxyz0123456789'),SALT311.HygieneErrors.NotLength('17,18,19'),SALT311.HygieneErrors.Good);
 
 EXPORT MakeFT_Invalid_Emailaddress(SALT311.StrType s0) := FUNCTION
   RETURN  s0;
@@ -211,8 +211,8 @@ EXPORT MakeFT_Invalid_AID(SALT311.StrType s0) := FUNCTION
   s1 := SALT311.stringfilter(s0,'0123456789'); // Only allow valid symbols
   RETURN  MakeFT_Invalid_Num(s1);
 END;
-EXPORT InValidFT_Invalid_AID(SALT311.StrType s) := WHICH(LENGTH(TRIM(s))<>LENGTH(TRIM(SALT311.StringFilter(s,'0123456789'))),~(LENGTH(TRIM(s)) = 12));
-EXPORT InValidMessageFT_Invalid_AID(UNSIGNED1 wh) := CHOOSE(wh,SALT311.HygieneErrors.NotInChars('0123456789'),SALT311.HygieneErrors.NotLength('12'),SALT311.HygieneErrors.Good);
+EXPORT InValidFT_Invalid_AID(SALT311.StrType s) := WHICH(LENGTH(TRIM(s))<>LENGTH(TRIM(SALT311.StringFilter(s,'0123456789'))),~(LENGTH(TRIM(s)) = 12 OR LENGTH(TRIM(s)) = 13));
+EXPORT InValidMessageFT_Invalid_AID(UNSIGNED1 wh) := CHOOSE(wh,SALT311.HygieneErrors.NotInChars('0123456789'),SALT311.HygieneErrors.NotLength('12,13'),SALT311.HygieneErrors.Good);
 
 
 EXPORT SALT311.StrType FieldName(UNSIGNED2 i) := CHOOSE(i,'persistent_record_id','src','dt_first_seen','dt_last_seen','dt_vendor_first_reported','dt_vendor_last_reported','did','did_score','orig_first_name','orig_middle_name','orig_last_name','orig_suffix','orig_address1','orig_address2','orig_city','orig_state_province','orig_zip4','orig_zip5','orig_dob','orig_ssn','orig_dl','orig_dlstate','orig_phone','clientassigneduniquerecordid','adl_ind','orig_email','orig_ipaddress','orig_filecategory','title','fname','mname','lname','name_suffix','nid','prim_range','predir','prim_name','addr_suffix','postdir','unit_desig','sec_range','p_city_name','v_city_name','st','zip','zip4','cart','cr_sort_sz','lot','lot_order','dbpc','chk_digit','rec_type','fips_st','fips_county','geo_lat','geo_long','msa','geo_blk','geo_match','err_stat','rawaid','aceaid','clean_phone','clean_dob');

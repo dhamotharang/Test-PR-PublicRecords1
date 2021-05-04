@@ -1,3 +1,3 @@
-﻿import FraudShared;
-f0:=FraudShared.Files().Input.MBSFdnIndType.Sprayed;
+﻿import FraudGovPlatform;
+f0:=FraudGovPlatform.Files().Input.MBSFdnIndType.Sprayed;
 export IndType_In_IndType := f0;

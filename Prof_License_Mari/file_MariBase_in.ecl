@@ -3,7 +3,9 @@
 FileName	:=	data_services.foreign_prod+'thor_data400::in::proflic_mari::';
 
 fixS0900	:= 	PROJECT(dataset(FileName + 'S0900',	Prof_License_Mari.layout_base_in, thor),													// ** NMLS
-															TRANSFORM(Prof_License_Mari.layouts.base, SELF:=LEFT,SELF:=[]));
+															TRANSFORM(Prof_License_Mari.layouts.base, 
+															SELF.STD_SOURCE_DESC	:= IF(LEFT.STD_SOURCE_DESC = 'NATIONWIDE MORTGAGE LICENSING SYSTEM & REGISTRY','NMLS CONSUMER ACCESS',LEFT.STD_SOURCE_DESC),SELF:=LEFT, SELF:=[]));
+
 
 concatenated_basefiles :=  PROJECT(dataset(FileName + 'cmrflat',Prof_License_Mari.layout_base_in,thor),							// ** FullDump
 																				 TRANSFORM(Prof_License_Mari.layouts.base,SELF:=LEFT,SELF:=[]))

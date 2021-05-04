@@ -1,4 +1,4 @@
-import LNSmallBusiness, ut;
+import Data_Services,Seed_Files;
 
 d :=  seed_files.file_LNSmallBusiness;
 
@@ -17,4 +17,4 @@ end;
 
 withHash := table( d, seed_layout );
 
-export Key_LNSmallBusiness := index(withHash,{hashvalue}, {withHash}, '~thor_data400::key::testseed::qa::lnsmallbusiness');
+export Key_LNSmallBusiness := index(withHash,{hashvalue}, {withHash}, data_services.data_location.prefix() + 'thor_data400::key::testseed::qa::lnsmallbusiness');

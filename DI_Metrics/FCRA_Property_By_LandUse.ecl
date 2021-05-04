@@ -4,10 +4,9 @@
 
 IMPORT _Control, census_data, LN_PropertyV2, LN_PropertyV2_Fast, data_services, STD, ut;
 
-export FCRA_Property_By_LandUse(string pHostname, string pTarget, string pContact ='\' \'') := function
+export FCRA_Property_By_LandUse(string pHostname, string pTarget, string pContact ='\' \'', STRING today = (STRING8)STD.Date.Today()) := function
 
-filedate := (STRING8)Std.Date.Today();
-rpt_yyyymmdd := filedate[1..8];
+filedate := today;
 
 //FCRA keys:
 tax_key1 := LN_PropertyV2.key_assessor_fid(true);
@@ -97,7 +96,7 @@ despray_fcra_tax_tbl := STD.File.DeSpray('~thor_data400::data_insight::data_metr
 
 //if everything in the Sequential statement runs, it will send the Success email, else it will send the Failure email
 email_alert := SEQUENTIAL(
-					output(sort(tbl_Key_Tax_FCRA_2010_props, -new_recording_date, state_code, standardized_land_use_code, skew(1.0)),,'~thor_data400::data_insight::data_metrics::tbl_FCRA_Key_Tax_2010_properties_by_StandLandUse_'+ filedate +'.csv', csv(heading(single), separator('|'),terminator('\r\n'),quote('\"')),overwrite)
+					output(sort(tbl_Key_Tax_FCRA_2010_props, -new_recording_date, state_code, standardized_land_use_code, skew(1.0)),,'~thor_data400::data_insight::data_metrics::tbl_FCRA_Key_Tax_2010_properties_by_StandLandUse_'+ filedate +'.csv', csv(heading(single), separator('|'),terminator('\r\n'),quote('\"')),overwrite,expire(10))
 					,despray_fcra_tax_tbl):
 					Success(FileServices.SendEmail(pContact, 'FCRA Group: FCRA_Property_By_LandUse Build Succeeded', workunit + ': Build complete.' + filedate)),
 					Failure(FileServices.SendEmail(pContact, 'FCRA Group: FCRA_Property_By_LandUse Build Failed', workunit + filedate + '\n' + FAILMESSAGE)

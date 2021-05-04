@@ -1,6 +1,6 @@
-import RiskWise;
+﻿import RiskWise;
 
-export SC1O_Soapcall(dataset(layout_SC1O_soapcall) indata, string roxieIP='http://roxiestaging.br.seisint.com:9876') := function
+export SC1O_Soapcall(dataset(layout_SC1O_soapcall) indata, string roxieIP='http://certstagingvip.hpcc.risk.regn.net:9876') := function
 	
 errx := record
 	string errorcode := '';

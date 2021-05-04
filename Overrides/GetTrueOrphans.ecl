@@ -20,12 +20,18 @@ EXPORT  GetTrueOrphans(STRING filedate) := FUNCTION
 	GongTrueOrphans := Overrides.Gong_Override_Findings(dsOut_C(datagroup = 'GONG'), filedate);
 	
 	// PAW
+	PAW_TrueOrphans := Overrides.PAW_Override_Findings(dsOut_C(datagroup = 'PAW'), filedate);	
 	
 	// ALLOY
 	
+	//STUDENT
+	Student_TrueOrphans := Overrides.American_Student_Override_Findings(dsOut_C(datagroup = 'STUDENT'), filedate);
+	
 	BaseTrueOrphans := (
 					GongTrueOrphans
-					//+ Paw
+				  + PAW_TrueOrphans
+					
+					+Student_TrueOrphans
 	): PERSIST('~thor_data400::persist::override_trueorphans');
 	
 	RETURN BaseTrueOrphans;

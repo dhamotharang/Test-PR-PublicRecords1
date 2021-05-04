@@ -1,18 +1,28 @@
-﻿IMPORT Std, FraudgovKEL, FraudShared, data_services, ut,doxie,Suppress;
-#CONSTANT ('Platform','FraudGov');
-RunKelDemo :=false:stored('RunKelDemo');
+﻿IMPORT Std, FraudgovKEL, FraudGovPlatform, data_services, ut,doxie,Suppress;
 
-FileIn := If(RunKelDemo=false,'fraudgov::base::built::Main','fraudgov::in::sprayed::demodata');
+FileIn := 'fraudgov::base::built::Main';
 
-fraudgov_dataset_Input := dataset(data_services.foreign_prod+FileIn, FraudShared.Layouts.Base.Main, thor); 
+fraudgov_dataset_Input := dataset(data_services.foreign_prod+FileIn, FraudGovPlatform.Layouts.Base.Main, thor); 
 
 // Supress CCPA
 mod_access := MODULE(doxie.IDataAccess) END; // default mod_access
 Supress_CCPA := Suppress.MAC_SuppressSource(fraudgov_dataset_Input, mod_access, did, NULL,TRUE);			
 
-fraudgov_dataset_base_prep	:= Supress_CCPA;
+fraudgov_dataset_base_prep1	:= Supress_CCPA;
 
-//PULL(FraudShared.files(,FraudgovKEL.Constants.useOtherEnvironmentDali).base.Main.built);
+ // Temporarily blank systemic values that turn into high frequency elements that skew builds, this HAS to be taken out in the next build to be implemented in the KEL 
+ // FILTER for the transaction events for each element
+
+Set_phonenumber:=['0000000000','7272727272','9999999999'];
+Set_ip_address:=['173.227.98.2             ','66.195.212.58            ','12.217.192.66            ','205.145.107.14           ','65.14.78.162             ','209.208.213.164          ','104.184.176.239          ','23.118.118.71            ','127.0.0.1                ','170.142.177.33           ','184.174.153.253          ','50.241.243.201           ','96.77.0.145              ','50.238.201.98            ','73.85.192.101            ','69.195.195.10            ','74.11.179.130            ','108.188.173.130          ','67.187.77.172            ','72.17.66.234             ','173.9.153.125            ','205.145.107.100          ','50.248.48.217            ','67.78.204.50             ','167.29.4.150             ','96.74.49.17              ','104.255.147.247          ','174.135.146.254          ','71.42.22.96              ','66.195.212.2             ','50.192.147.13            ','205.145.107.51           ','74.95.104.137            ','23.24.162.209            ','209.37.158.242           ','12.1.141.234             ','20.185.99.32             ','170.141.40.16            ','75.130.86.142            ','47.206.50.114            ','73.46.83.150             ','162.197.160.140          ','75.130.69.30             ','64.132.139.138           ','108.189.180.38           ','50.244.178.9             ','137.27.25.250            ','108.189.134.244          ','107.144.112.26           ','205.145.107.52           ','205.145.107.101          ','216.177.207.162          ','73.0.224.22              ','108.189.37.100           ','205.145.107.53           ','164.51.138.233           ','205.176.168.161          ','50.243.116.49            ','96.33.254.90             ','108.188.168.249          ','50.77.117.145            ','205.176.168.149          ','97.76.210.2              ','108.191.34.230           ','63.246.254.48            ','24.159.68.115            ','74.123.16.23             ','75.130.85.114            ','96.4.217.18              ','50.248.109.113           ','68.47.227.68             ','107.77.253.6             ','107.77.253.11            ','73.205.150.165           ','96.33.106.226            ','107.77.253.8             ','107.77.253.2             ','107.77.253.4             ','162.216.32.162           ','107.77.253.1             ','107.77.253.3             ','107.77.253.9             ','107.77.253.12            ','205.145.107.58           ','107.77.241.1             ','104.192.238.139          ','107.77.253.10            ','173.12.248.213           ','107.77.253.7             ','198.203.181.181          ','107.77.241.9             ','107.77.241.10            ','107.77.253.5             ','107.77.241.8             ','107.77.241.2             ','47.44.219.18             ','107.77.241.12            ','107.77.241.3             ','107.77.241.5             ','107.77.241.11            ','107.77.241.7             ','66.195.212.26            ','24.151.207.175           ','172.223.140.119          ','107.77.241.4             ','205.176.6.154            ','12.27.113.250            ','73.27.11.129             ','205.176.150.131          '];
+
+fraudgov_dataset_base_prep	:= PROJECT(fraudgov_dataset_base_prep1, 
+                                 TRANSFORM(RECORDOF(LEFT),
+								  SELF.clean_phones.phone_number := MAP(LEFT.clean_phones.phone_number in Set_phonenumber => '', LEFT.clean_phones.phone_number),
+								  SELF.ip_address := MAP(LEFT.ip_address in Set_ip_address => '',LEFT.ip_address),
+								  SELF := LEFT));
+
+//PULL(FraudGovPlatform.files(,FraudgovKEL.Constants.useOtherEnvironmentDali).base.Main.built);
  
 
 // Prep!!!
@@ -29,7 +39,7 @@ Layout_Clean_Name := 	record
 	string  name_score			;
 end;
 
-Main         :=  FraudShared.Layouts.Base.Main - cleaned_name;
+Main         :=  FraudGovPlatform.Layouts.Base.Main - cleaned_name;
 
 fraudgov_dataset_base := PROJECT(fraudgov_dataset_base_prep, 
                        TRANSFORM({
@@ -95,4 +105,4 @@ Set_Addresses := [12638153115695167395,10246789559473286115];
 
 tempFinal := DATASET('~foreign::10.173.14.201::temp::fraudgov', RECORDOF(Final), THOR);//(did in Set_incarcerated OR did in Set_deceased or did % 1000000 = 1 or OttoAddressId in Set_Addresses);
 
-EXPORT fraudgov := Final;//final; // tempFinal; // 
+EXPORT fraudgov := final; // tempFinal; // 

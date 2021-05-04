@@ -7,6 +7,7 @@ r := Orbit3.Layouts.rPlatformStatus;
                                                                               Env = 'N|T|F'  => dataset([{'Non FCRA Roxie',platform_status},{'Customer Test Roxie Production',platform_status},{'FCRA Roxie Production',platform_status}],r),
                                         Env = 'N|B' => dataset([{'Non FCRA Roxie',platform_status},{'Boolean Roxie Production',platform_status}],r),
                                         Env = 'F' => dataset([{'FCRA Roxie Production',platform_status}],r),
+										Env = 'T' => dataset([{'Customer Test Roxie Production',platform_status}],r),
 																				Env = 'B' => dataset([{'Boolean Roxie Production',platform_status}],r),
 																				Env = 'HC' => dataset([{'HC',platform_status}],r),
 																				dataset([{'Non FCRA Roxie',platform_status}],r)
@@ -16,6 +17,7 @@ r := Orbit3.Layouts.rPlatformStatus;
 	                                              Env = 'N|T|F'  => 'NonFCRA, Customer Test and FCRA',
 	                       Env = 'N|B' => 'NonFCRA and Boolean',
 	                       Env = 'F' => 'FCRA',
+						   Env = 'T' => 'Customer Test',
 												 Env = 'B' => 'Boolean',
 												 Env = 'HC' => 'HealthCare',
 												 'NonFCRA'

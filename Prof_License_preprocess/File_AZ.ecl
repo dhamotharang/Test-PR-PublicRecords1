@@ -33,21 +33,16 @@ end;
 export ostp := dataset(ut.foreign_prod+'thor_data400::in::prolic::az::osteopath::raw',Layout_Ost,CSV( heading(1),separator(','),terminator(['\n']),Quote('')));
 
 Layout_acu := record
-   string  Last_Name;
    string  First_Name;
-   string License_Number;
-   string Status_of_License;
+   string  Last_Name;
+   string License_Issue_Date;
    string License_Expiration_Date;
-   string  Title;
-   string Prefix;
-   string Middle_Name;
-   string  Suffix;
-   string  BusinessName;
    string  Address1;
-   string  Address2;
-   string  City;
-   string State;
-   string  ZIP;
+   string Email;
+    string License_Number;
+    string Discipline;
+    string License_Type;  
+   string Status_of_License;  
    string lf;
 end;
 

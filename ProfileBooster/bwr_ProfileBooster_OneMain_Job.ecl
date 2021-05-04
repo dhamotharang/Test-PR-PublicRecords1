@@ -14,4 +14,6 @@
 
 AbsolutePathtemp := '/data/Builds/builds/OneMain/data';  
 
-ProfileBooster.ProcBuild_ProfileBooster_OneMain( IPaddr := IPaddrTemp,  AbsolutePath := AbsolutePathtemp,  NotifyList := NotifyListtemp);
+OldSaltProfileNameTemp := ''; // should be formatted as the file name without ~
+
+ProfileBooster.ProcBuild_ProfileBooster_OneMain( IPaddr := IPaddrTemp,  AbsolutePath := AbsolutePathtemp,  NotifyList := NotifyListtemp, OldSaltProfileName := OldSaltProfileNameTemp);

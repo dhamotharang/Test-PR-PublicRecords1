@@ -8,7 +8,8 @@ EXPORT fn_Skip_Modules (
 	boolean SkipDeltabase = false,
 	boolean SkipRDP = false,
 	boolean SkipDashboards = false,
-	boolean SkipDashboardVersion =false
+	boolean SkipDashboardVersion =false,
+	boolean SkipDedi =false
 ) := FUNCTION 
 
 	d:=dataset([{
@@ -20,7 +21,8 @@ EXPORT fn_Skip_Modules (
 				SkipDeltabase,
 				SkipRDP,
 				SkipDashboards,
-				SkipDashboardVersion
+				SkipDashboardVersion,
+				SkipDEDI
 				}],
 			FraudGovPlatform.Layouts.Flags.SkipModules);
 

@@ -1,9 +1,9 @@
 ﻿//--- FAA Aircraft Chart ---//
 
 IMPORT _control,FAA, data_services, STD, ut; 
-export ChartsGeoMaps_FAA(string pHostname, string pTarget, string pContact ='\' \'') := function
+export ChartsGeoMaps_FAA(string pHostname, string pTarget, string pContact ='\' \'', STRING today = (STRING8)STD.Date.Today()) := function
 
-filedate := (STRING8)Std.Date.Today();
+filedate := today;
 
 //FAA Aircraft Base File
 faa_aircraft := faa.file_aircraft_registration_out;
@@ -47,7 +47,7 @@ despray_faa_acft_tbl := STD.File.DeSpray('~thor_data400::data_insight::data_metr
 
 //if everything in the Sequential statement runs, it will send the Success email, else it will send the Failure email
 email_alert := SEQUENTIAL(
-					output(srt_acft_tbl,,'~thor_data400::data_insight::data_metrics::tbl_ChartsGeoMaps_FAA_Aircraft_By_Type_'+ filedate +'.csv', csv(heading(single), separator('|'),terminator('\r\n'),quote('\"')),overwrite)
+					output(srt_acft_tbl,,'~thor_data400::data_insight::data_metrics::tbl_ChartsGeoMaps_FAA_Aircraft_By_Type_'+ filedate +'.csv', csv(heading(single), separator('|'),terminator('\r\n'),quote('\"')), overwrite, expire(10))
 					,despray_faa_acft_tbl):
 					Success(FileServices.SendEmail(pContact, 'ChartsGeoMaps Group: ChartsGeoMaps_FAA Build Succeeded', workunit + ': Build complete.' + filedate)),
 					Failure(FileServices.SendEmail(pContact, 'ChartsGeoMaps Group: ChartsGeoMaps_FAA Build Failed', workunit + filedate + '\n' + FAILMESSAGE)

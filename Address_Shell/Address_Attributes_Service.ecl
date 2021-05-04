@@ -1,4 +1,4 @@
-/*--SOAP--
+﻿/*--SOAP--
 <message name="Address_Attributes_Service">
 	<part name="AddressAttributesReportRequest" type="tns:XmlDataSet" cols="110" rows="50" />
 	<part name="gateways" type="tns:XmlDataSet" cols="110" rows="25"/>
@@ -62,7 +62,7 @@ Sample Gateway XML:
   &lt;/row&gt;
   &lt;row&gt;
     &lt;servicename&gt;reportservice&lt;/servicename&gt;
-    &lt;url&gt;http://roxiestaging.br.seisint.com:9876&lt;/url&gt;
+    &lt;url&gt;http://certstagingvip.hpcc.risk.regn.net:9876&lt;/url&gt;
   &lt;/row&gt;
 &lt;/gateways&gt;
 </pre>
@@ -229,7 +229,7 @@ END;
   </row>
   <row>
     <servicename>reportservice</servicename>
-    <url>http://roxiestaging.br.seisint.com:9876</url>
+    <url>http://certstagingvip.hpcc.risk.regn.net:9876</url>
   </row>
 </gateways>
 */

@@ -1,3 +1,3 @@
-﻿import FraudShared;
-f0:=FraudShared.Files().Input.MBSSourceGcExclusion.Sprayed;
+﻿import FraudGovPlatform;
+f0:=FraudGovPlatform.Files().Input.MBSSourceGcExclusion.Sprayed;
 export SourceGcExclusion_In_SourceGcExclusion := f0;

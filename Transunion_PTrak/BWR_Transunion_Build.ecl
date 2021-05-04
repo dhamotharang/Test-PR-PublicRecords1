@@ -2,8 +2,9 @@
 //Use the same date for both parameters when there is no full file date
 export BWR_Transunion_Build (full_filedate = '', update_filedate = '') := MACRO
 
+buildtype:= if(full_filedate <>'', 'full', 'updates');
 #workunit('protect',true);
-#workunit('name','Yogurt:Transunion_PTrak Build ' + update_filedate);
+#workunit('name','Yogurt:Transunion_PTrak Build ' + buildtype + ' ' + update_filedate);
 #workunit('priority','high');
 #OPTION('multiplePersistInstances',FALSE);
   
@@ -14,7 +15,7 @@ export BWR_Transunion_Build (full_filedate = '', update_filedate = '') := MACRO
 							: 	success(OUTPUT('Transunion PTrak Base Files updated successfully.')), 
 								failure(OUTPUT('Failed to spray update file'));
 								
-	Proc_Clean_Address		:= Transunion_PTrak.Clean_Transunion_Address  						 
+	Proc_Clean_Address		:= Transunion_PTrak.Clean_Transunion_Address (full_filedate, update_filedate)  						 
 							: 	success(OUTPUT('Cash address was updated successfully.')), 
 								failure(OUTPUT('Failed to update cash address file'));
 														
@@ -33,7 +34,8 @@ export BWR_Transunion_Build (full_filedate = '', update_filedate = '') := MACRO
 								
 	strata_rep := Transunion_PTrak.strata(update_filedate);
 	SEQUENTIAL(
-	   Proc_Spray_Update
+	   output(buildtype + ' - Transunion_PTrak Build')
+	  ,Proc_Spray_Update
 	  ,Proc_Clean_Address
 	   ,Proc_DID
 	   ,proc_promonitor

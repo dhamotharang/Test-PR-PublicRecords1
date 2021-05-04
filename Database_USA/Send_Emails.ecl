@@ -4,11 +4,11 @@ lay_builds 	:= tools.Layout_FilenameVersions.builds;
 
 EXPORT Send_Emails(	
 	 STRING								pversion
+	,STRING								pEmailList							
+	,STRING								pRoxieEmailList					
 	,BOOLEAN							pUseOtherEnvironment 		= FALSE
 	,BOOLEAN							pShouldUpdateRoxiePage	= TRUE   
 	,DATASET(lay_builds)	pBuildFilenames					= dx_Database_USA.names(pversion,pUseOtherEnvironment).dAll_filenames
-	,STRING								pEmailList							= Database_USA.Email_Notification_Lists(NOT pShouldUpdateRoxiePage).BuildSuccess
-	,STRING								pRoxieEmailList					= Database_USA.Email_Notification_Lists(NOT pShouldUpdateRoxiePage).Roxie
 	,STRING								pBuildName							= Database_USA._Constants().Name
 	,STRING								pPackageName						= 'DatabaseUSAKeys'
 	,STRING								pBuildMessage						= 'Base Files Finished'

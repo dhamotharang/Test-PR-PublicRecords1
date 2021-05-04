@@ -1,6 +1,6 @@
 IMPORT _Control.IPAddress;
 
-EXPORT Base_FirmographicsScore := DATASET('~thor400_36::firmo_models_results::qa', {
+EXPORT Base_FirmographicsScore := DATASET('~thor400_36::BIPv2::base::firmo_models_results::qa', {
   unsigned6 ultid;
   unsigned6 orgid;
   unsigned6 seleid;

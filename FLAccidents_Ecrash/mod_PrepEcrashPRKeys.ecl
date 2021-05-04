@@ -1,12 +1,14 @@
 ﻿IMPORT STD, dx_Ecrash;
 
-EXPORT mod_PrepEcrashPRKeys(DATASET(Layout_eCrash.Consolidation) proutIn = FLAccidents_Ecrash.File_KeybuildV2.prout) := MODULE
+EXPORT mod_PrepEcrashPRKeys(DATASET(Layout_eCrash.Consolidation) proutIn = Files_eCrash.Ds_Base_Consolidation_PR) := MODULE
+
+SHARED proutReportable := proutIn(allow_Sale_Of_Component_Data = TRUE):INDEPENDENT;
 
 //***********************************************************************
 //                 key_EcrashV2_accnbr
 //***********************************************************************
-Ecrash := proutIn(report_code IN ['EA','TM','TF']);//for ecrash iyetek they need report number displayed even no vin and name
-Filter_CRU := proutIn(report_code NOT IN ['EA','TM','TF']);
+Ecrash := proutReportable(report_code IN ['EA','TM','TF']);//for ecrash iyetek they need report number displayed even no vin and name
+Filter_CRU := proutReportable(report_code NOT IN ['EA','TM','TF']);
 
 crash_accnbr_base := 	Ecrash + Filter_CRU (vin+driver_license_nbr+tag_nbr+lname <>''); 
 						
@@ -29,11 +31,11 @@ EXPORT dep_accnbr_base := PROJECT(unq_accnbr_base, TRANSFORM(dx_Ecrash.Layouts.A
 //                 key_EcrashV2_accnbrv1
 //***********************************************************************
 // eCrash & CRU Reports
-EcrashAndCru_v1 := proutIn(report_code IN ['EA','TM','TF'] AND  
+EcrashAndCru_v1 := proutReportable(report_code IN ['EA','TM','TF'] AND  
                          (work_type_id IN ['2','3'] OR ( (work_type_id IN ['0','1']  AND 
                          (TRIM(report_type_id,ALL) IN ['A','DE'] OR STD.str.ToUpperCase(TRIM(vendor_code,LEFT,RIGHT)) = 'CMPD'))) ) ); 
 // CRU Inq/Natational Accident Reports
-Filter_CRU_v1 := proutIn(report_code not in ['EA','TM','TF']);
+Filter_CRU_v1 := proutReportable(report_code not in ['EA','TM','TF']);
 				
 // eCrash Reports:  normalize addl_report_number for ecrash TM,TF and EA work type 1,0
 NormAddlRpt_v1 := PROJECT(EcrashAndCru_v1(TRIM(addl_report_number,LEFT,RIGHT) NOT IN ['','0','UNK', 'UNKNOWN'] AND work_type_id NOT IN ['2','3']), 
@@ -54,7 +56,7 @@ EXPORT dep_accnbrv1_base := PROJECT(unq_accnbrv1_base, TRANSFORM(dx_Ecrash.Layou
 //***********************************************************************
 //                 key_EcrashV2_accnbr_father
 //***********************************************************************
-allrecs := proutIn(vin+driver_license_nbr+tag_nbr+lname <>'');
+allrecs := proutReportable(vin+driver_license_nbr+tag_nbr+lname <>'');
 
 crash_accnbr_father_base := allrecs(accident_nbr<>'');
 
@@ -75,7 +77,7 @@ EXPORT dep_accnbr_father_base := PROJECT(unq_accnbr_father_base, TRANSFORM(dx_Ec
 //***********************************************************************
 //                    Key_EcrashV2_bdid
 //***********************************************************************
-dst_bdid_base := DISTRIBUTE(proutIn(b_did<>'',b_did<>'000000000000'), HASH32(b_did, orig_accnbr));
+dst_bdid_base := DISTRIBUTE(proutReportable(b_did<>'',b_did<>'000000000000'), HASH32(b_did, orig_accnbr));
 srt_bdid_base := SORT(dst_bdid_base, b_did, orig_accnbr, LOCAL);
 unq_bdid_base := DEDUP(srt_bdid_base, b_did, orig_accnbr, LOCAL);  
 EXPORT ded_bdid_base := PROJECT(unq_bdid_base, TRANSFORM(dx_Ecrash.Layouts.BDID,
@@ -86,7 +88,7 @@ EXPORT ded_bdid_base := PROJECT(unq_bdid_base, TRANSFORM(dx_Ecrash.Layouts.BDID,
 //***********************************************************************
 //                     Key_EcrashV2_did
 //***********************************************************************
-dDIDBase := DISTRIBUTE(proutIn(DID <> '', DID <> '000000000000'), HASH32(DID, Orig_Accnbr));
+dDIDBase := DISTRIBUTE(proutReportable(DID <> '', DID <> '000000000000'), HASH32(DID, Orig_Accnbr));
 sDIDBase := SORT(dDIDBase, DID, Orig_Accnbr, Vin, LOCAL);
 uDIDBase := DEDUP(sDIDBase, DID, Orig_Accnbr, Vin, LOCAL);  
 
@@ -108,7 +110,7 @@ EXPORT DIDBase := PROJECT(uDIDBase, xformDID(LEFT));
 //***********************************************************************
 //                    Key_EcrashV2_DLNbr
 //***********************************************************************
-ecrash_dlnbr_base := proutIn(driver_license_nbr<>'');
+ecrash_dlnbr_base := proutReportable(driver_license_nbr<>'');
 
 dst_dlnbr_base := DISTRIBUTE(ecrash_dlnbr_base, HASH32(driver_license_nbr, orig_accnbr));
 srt_dlnbr_base := SORT(dst_dlnbr_base, driver_license_nbr, orig_accnbr, LOCAL);
@@ -120,7 +122,7 @@ EXPORT dep_dlnbr_base := PROJECT(unq_dlnbr_base, TRANSFORM(dx_Ecrash.Layouts.DLN
 //***********************************************************************
 //                    Key_EcrashV2_tagnbr
 //***********************************************************************
-ecrash_tagnbr_base := proutIn(tag_nbr<>'');
+ecrash_tagnbr_base := proutReportable(tag_nbr<>'');
 
 dst_tagnbr_base := DISTRIBUTE(ecrash_tagnbr_base, HASH32(tag_nbr, orig_accnbr));
 srt_tagnbr_base := SORT(dst_tagnbr_base, tag_nbr, orig_accnbr, LOCAL);
@@ -133,7 +135,7 @@ EXPORT dep_tagnbr_base := PROJECT(unq_tagnbr_base, TRANSFORM(dx_Ecrash.Layouts.T
 //***********************************************************************
 //                     Key_EcrashV2_vin
 //***********************************************************************
-Vinallrecs := proutIn(Vin <> '' AND Vin <> '0' );
+Vinallrecs := proutReportable(Vin <> '' AND Vin <> '0' );
 dVinBase := DISTRIBUTE(Vinallrecs, HASH32(Vin, Orig_Accnbr));
 sVinBase := SORT(dVinBase, Vin, Orig_Accnbr, LOCAL);
 uVinBase := DEDUP(sVinBase, Vin, Orig_Accnbr, LOCAL);  

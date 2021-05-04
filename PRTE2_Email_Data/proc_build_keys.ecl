@@ -1,4 +1,4 @@
-﻿import RoxieKeyBuild,PRTE, _control, STD,prte2,tools, PRTE2_Common, strata;
+﻿import RoxieKeyBuild,PRTE, _control, STD,prte2,tools, PRTE2_Common, strata, dops;
 
 EXPORT proc_build_keys(string filedate, boolean skipDOPS=FALSE, string emailTo='') := function
 is_running_in_prod 		:= PRTE2_Common.Constants.is_running_in_prod;
@@ -45,6 +45,8 @@ cnt_email_data_fcra := OUTPUT(strata.macf_pops(Keys.key_did(true),,,,,,FALSE,['o
   	PerformUpdateOrNot 	:= IF(doDOPS,parallel(updatedops,updatedops_fcra),NoUpdate);
 //--------------------------------------------------------------------------------------
 
+key_validations :=  parallel(output(dops.ValidatePRCTFileLayout(filedate, prte2.Constants.ipaddr_prod, prte2.Constants.ipaddr_roxie_nonfcra,Constants.dops_name, 'N'), named(Constants.dops_name+'Validation')),
+                    output(dops.ValidatePRCTFileLayout(filedate, prte2.Constants.ipaddr_prod, prte2.Constants.ipaddr_roxie_fcra,Constants.fcra_dops_name, 'F'), named(Constants.fcra_dops_name+'Validation')));	
 
 // -- Actions
 buildKey	:=	sequential(
@@ -53,7 +55,9 @@ buildKey	:=	sequential(
 												,to_qa
 												,build_autokeys
 												,cnt_email_data_fcra
+												,key_validations
 												,PerformUpdateOrNot
+											  ,build_orbit(filedate)
 												);	
 
 return	buildKey;

@@ -3,7 +3,7 @@ EXPORT Constants := MODULE
 
 	EXPORT STRING statsAlert_threshold := '100';
 	
-	
+	EXPORT BOOLEAN GROWTH_CHECK_CALL               := TRUE;
     EXPORT ADVO                                    := 'ADVO';
     EXPORT AIRCRAFT                            := 'AIRCRAFT';
     EXPORT AIRCRAFT_DETAILS            := 'AIRCRAFT_DETAILS';
@@ -180,7 +180,10 @@ EXPORT Constants := MODULE
 
 	EXPORT GetStatsThreshold(STRING datagroup) := FUNCTION
 		threshold_limit := CASE(datagroup 
-				,GONG 												=> '50'
+				,GONG 												=> '10'
+				,PAW 												=> '10'
+				
+				,STUDENT										=> '10'          
 				,statsAlert_threshold
 			);
 		RETURN threshold_limit;	

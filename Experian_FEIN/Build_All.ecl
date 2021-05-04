@@ -1,4 +1,4 @@
-﻿IMPORT ut, VersionControl, dops, tools, _control, Scrubs, STD, Scrubs_Experian_FEIN;
+﻿IMPORT ut, VersionControl, dops, tools, Scrubs, STD, Scrubs_Experian_FEIN;
 
 EXPORT Build_All(
 	STRING  pVersion,
@@ -43,7 +43,7 @@ EXPORT Build_All(
 			Send_Emails(pAddresses, pVersion).Get_Primary_Addresses,,
 			'N'
 		),
-		Build_Strata(pVersion,pOverwrite,,,pIsTesting),
+		Build_Strata(pVersion,pAddresses,pOverwrite,,,pIsTesting),
 		Promote().Inputfiles.using2used,
 		Promote().Buildfiles.Built2QA,
 		QA_Records(),

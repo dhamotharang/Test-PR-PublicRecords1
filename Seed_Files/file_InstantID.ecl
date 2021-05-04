@@ -1,2 +1,2 @@
-﻿Import seed_files;
-export file_InstantID := dataset('~thor_data400::base::testseed_instantid',seed_files.Layout_InstantID,csv(maxlength(8192),quote('"')) );
+﻿IMPORT Data_Services,Seed_Files;
+EXPORT file_InstantID := DATASET(Data_Services.Data_location.Prefix('NONAMEGIVEN')+'~thor_data400::base::testseed_instantid',Seed_Files.Layout_InstantID,CSV(MAXLENGTH(8192),QUOTE('"'),HEADING(1)) );

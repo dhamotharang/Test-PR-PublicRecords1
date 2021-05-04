@@ -1,7 +1,7 @@
-﻿IMPORT Header, FraudShared, ut;
+﻿IMPORT Header, ut;
 EXPORT Append_RID(
-                 dataset(FraudShared.Layouts.Base.Main) Current_Build
-                ,dataset(FraudShared.Layouts.Base.Main) Previous_Build = $.Files().Base.Main_Orig.QA
+                 dataset(FraudGovPlatform.Layouts.Base.Main) Current_Build
+                ,dataset(FraudGovPlatform.Layouts.Base.Main) Previous_Build = $.Files().Base.Main_Orig.QA
 ) := FUNCTION
 
 
@@ -160,7 +160,7 @@ EXPORT Append_RID(
                                             ut.CleanSpacesandUpper(left.geo_lat)= ut.CleanSpacesandUpper(right.geo_lat) and 
                                             ut.CleanSpacesandUpper(left.geo_long)= ut.CleanSpacesandUpper(right.geo_long) and 
 											left.source_rec_id = right.source_rec_id,
-											transform(FraudShared.Layouts.Base.Main, 
+											transform(FraudGovPlatform.Layouts.Base.Main, 
 												SELF.Record_ID := if( left.source = right.source and left.source_rec_id = right.source_rec_id, RIGHT.Record_ID, LEFT.Record_ID); 
 												SELF:=LEFT; SELF:=[]),
 											LEFT OUTER,
@@ -175,7 +175,7 @@ EXPORT Append_RID(
 		
 		MAC_Sequence_Records(new_recs, record_id,new_RIDs, max_rid);
 									 
-		prj_new_RIDs := project(new_RIDs, transform(FraudShared.Layouts.Base.Main, self := left));
+		prj_new_RIDs := project(new_RIDs, transform(FraudGovPlatform.Layouts.Base.Main, self := left));
 
 		return prj_new_RIDs + old_RIDs;
 

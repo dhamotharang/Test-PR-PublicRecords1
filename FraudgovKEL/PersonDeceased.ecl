@@ -1,8 +1,6 @@
 ﻿IMPORT FraudgovKEL, FraudGovPlatform,doxie,Suppress;
-RunKelDemo :=false:stored('RunKelDemo');
 
-PersonDeceasedFile := If(RunKelDemo=false,FraudGovPlatform.files(,FraudgovKEL.Constants.useOtherEnvironmentDali).base.Death.built
-												,FraudGovPlatform.files(,FraudgovKEL.Constants.useOtherEnvironmentDali).base.Death_Demo.built);
+PersonDeceasedFile := FraudGovPlatform.files(,FraudgovKEL.Constants.useOtherEnvironmentDali).base.Death.built;
 								
 // Supress CCPA
 mod_access := MODULE(doxie.IDataAccess) END; // default mod_access

@@ -17,7 +17,12 @@
 //	0 match either
 //  1 match first name
 //  2 match preferred name 
+/**
+This is only used for V_P_B
+Since all the matches are fuzzy, the self join has too much skew
+Hence, we normalize it over the benefit month
 
+**/
 
 EXPORT fn_find_collisions_ex	(
 	infile1
@@ -29,21 +34,7 @@ EXPORT fn_find_collisions_ex	(
 	,fname_match=0
 	) := FUNCTIONMACRO
 	
-	matchChars:=
-					 if('L' in matchset,'L','')
-					+if('N' in matchset,'N','')
-					+if('V' in matchset,'V','')
-					+if('W' in matchset,'W','')
-					+if('S' in matchset,'S','')
-					+if('P' in matchset,'P','')
-					+if('D' in matchset,'D','')
-					+if('B' in matchset,'B','')
-					+if('A' in matchset,'A','')
-					+if('C' in matchset,'C','')
-					+if('Z' in matchset,'Z','')
-					+if('H' in matchset,'H','')
-					;	
-	
+
 	infile2 := infile1;
 	infile := NORMALIZE(infile2, Std.Date.MonthsBetween(left.StartDate, left.EndDate) + 1, TRANSFORM(nac_V2.Layout_Base2_Ex,
 												self.BenefitMonth := ((string)Std.Date.AdjustCalendar(left.StartDate, 0, COUNTER -1 , 0))[1..6];
@@ -97,6 +88,7 @@ EXPORT fn_find_collisions_ex	(
 			#end
 			true)  //the one just keeps the commas from messing it up
 		,
+			// START Distribution
 		#if('L' in matchset)
 			did
 		#elseif('S' in matchset)
@@ -118,7 +110,7 @@ EXPORT fn_find_collisions_ex	(
 			   hash32(BenefitMonth,lname)
 			#end
 		#else
-			hash32(lname)
+			hash32(BenefitMonth,lname)
 		#end
 		);
 
@@ -127,6 +119,16 @@ EXPORT fn_find_collisions_ex	(
 
 	match:=join(inf_dis,inf_dis,
 
+		left.BenefitMonth = right.BenefitMonth and
+		left.lname=right.lname
+		//(left.StartDate <= Right.EndDate AND right.StartDate <= left.Enddate)
+		/***
+			collision options:
+				1) inter state: state1 <> state2
+				2) intra state: state1=state2 and benefit1=benefit2 and caseid1<>caseid2
+				3) informational: state1=state2 and beneft1<>benefit2: NOT IMPLEMENTED YET
+		***/
+		AND
 		#if('N' in matchset)
 			left.lname=right.lname and
 		  #if(fname_match = 1)
@@ -139,24 +141,7 @@ EXPORT fn_find_collisions_ex	(
 			#end
 		#end
 
-
-		#if('L' in matchset)
-			left.did=right.did and
-		#end
-/*
-		#if('N' in matchset)
-			WHICH(left.fname=right.fname,
-			left.fname=right.prefname,
-			left.prefname=right.prefname) > 0 and
-		#end
-*/
-		//#if('D' not in matchset)
-		//	ut.nneq(left.name_suffix,right.name_suffix)		and
-		//#end
-
 		#if('V' in matchset)
-			left.BenefitMonth = right.BenefitMonth and
-			left.lname=right.lname and
 		  #if(fname_match = 1)
 				 left.fname<>right.fname and
 			   left.fname[1]=right.fname[1] and
@@ -165,12 +150,10 @@ EXPORT fn_find_collisions_ex	(
 				 left.fname[1]<>right.fname[1] and
 			   left.prefname[1]=right.prefname[1] and
 			#else
-				(left.fname[1]=right.fname[1] or
-					left.prefname[1]=right.prefname[1]) and
-				 left.fname<>right.fname and
-				 left.prefname<>right.prefname and
+				((left.fname[1]=right.fname[1] and left.fname<>right.fname) OR
+				 (left.prefname[1]=right.prefname[1] and left.prefname<>right.prefname)) and
 			#end
-			nac_v2.NNEQ_Suffix(left.name_suffix,right.name_suffix)		and
+			nac_v2.NNEQ_Suffix(left.name_suffix,right.name_suffix) and
 		#end
 
 		#if('S' in matchset)
@@ -229,31 +212,20 @@ EXPORT fn_find_collisions_ex	(
 			#end
 		#end
 		
-		// disregard the following check for version 2
-		//left.eligibility_status_indicator = right.eligibility_status_indicator and
-		left.PrepRecSeq<>right.PrepRecSeq and
-		//(left.StartDate <= Right.EndDate AND right.StartDate <= left.Enddate)
-		/***
-			collision options:
-				1) inter state: state1 <> state2
-				2) intra state: state1=state2 and benefit1=benefit2 and caseid1<>caseid2
-				3) informational: state1=state2 and beneft1<>benefit2: NOT IMPLEMENTED YET
-		***/
-		
-		(left.ProgramState <> right.ProgramState
+		(
+			(left.ProgramState <> right.ProgramState AND nac_V2.MatchAllowed(left.ProgramCode,right.ProgramCode))
 			OR
-			(left.ProgramState = right.ProgramState and 
-				NAC_V2.GetCollisionCode(left.ProgramCode) = NAC_V2.GetCollisionCode(right.ProgramCode)
+			(left.GroupId = right.GroupId and 
+				nac_v2.GetCollisionCode(left.ProgramCode) = nac_v2.GetCollisionCode(right.ProgramCode)
+				and left.CaseId <> right.CaseId
 				and left.ClientId <> right.ClientId
-				and left.CaseId <> right.CaseId)
-			//OR
-			//(left.ProgramState=right.ProgramState and 
-			//	left.ProgramCode<>right.ProgramCode)
-		) 
-		
-
-		//true	//the one just keeps the "and" from messing it up
-		//,tr(left,right)
+			)
+			OR
+			(left.GroupId <> right.GroupId and 
+				nac_v2.GetCollisionCode(left.ProgramCode) = nac_v2.GetCollisionCode(right.ProgramCode)
+			)
+		)
+		AND left.PrepRecSeq<>right.PrepRecSeq 			// do not join to self
 		,nac_V2.xCollisions_ex(left,right, priority_, matchset), SKEW(0.2) //		, KEEP(2)
 		#if('L' in matchset
 				OR 'N' in matchset

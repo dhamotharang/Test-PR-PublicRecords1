@@ -4,7 +4,11 @@ import FraudGovPlatform_Analytics;
 //IMPORT KEL12 AS KEL;
 IMPORT Std;
 
-ModelingAttributeOutput := FraudgovKEL.KEL_EventShell.ModelingStats;//(t_srcagencyuid = 20995239);
+ModelingAttributeOutput := FraudgovKEL.KEL_EventShell.ModelingStats;
+                             /* // TN Profiles
+                             (t_srcagencyuid = 20995239 and t_srcagencyprogtype = 1029 AND 
+                             (p1_aotidcurrprofflag = 1 OR p9_aotaddrcurrprofflag = 1 OR p15_aotssncurrprofflag = 1 OR p20_aotdlcurrprofflag = 1 OR p16_aotphncurrprofflag = 1 OR p17_aotemailcurrprofflag = 1 OR p18_aotipaddrcurrprofflag = 1 OR p19_aotbnkacctcurrprofflag));
+							 */ 
 //ModelingAttributeOutput := DATASET('~fraudgov::temp::modelingstats', RECORDOF(FraudgovKEL.KEL_EventShell.ModelingStats), THOR)(t_srcagencyuid = 20995239 and t_srcagencyprogtype = 1029);
 //output(ModelingAttributeOutput,,'~fraudgov::temp::modelingstats', overwrite);
 
@@ -47,10 +51,8 @@ EventStatsPrep := FraudGovPlatform_Analytics.macPivotOttoOutput(ModelingAttribut
 'p1_aotidkractshrdsrcagencycntev,p1_aotidkractshrdnewsrcagencydescev,p1_aotidkrgenfrdactshrdsrcagencycntev,p1_aotidkrgenfrdactshrdnewsrcagencydescev,p1_aotidkrstolidactshrdsrcagencycntev,' +
 'p1_aotidkrstolidactshrdnewsrcagencydescev,p1_aotidkrappfrdactshrdsrcagencycntev,p1_aotidkrappfrdactshrdnewsrcagencydescev,p1_aotidkrothfrdactshrdsrcagencycntev,p1_aotidkrothfrdactshrdnewsrcagencydescev,p9_aotaddrkractshrdsrcagencycntev,' +
 'p9_aotaddrkractshrdnewsrcagencydescev,p15_aotssnkractshrdsrcagencycntev,p15_aotssnkractshrdnewsrcagencydescev,p16_aotphnkractshrdsrcagencycntev,p16_aotphnkractshrdnewsrcagencydescev,p17_aotemailkractshrdsrcagencycntev,' +
-'p17_aotemailkractshrdnewsrcagencydescev,p18_aotipaddrkractshrdsrcagencycntev,p18_aotipaddrkractshrdnewsrcagencydescev,p19_aotbnkacctkractshrdsrcagencycntev,p19_aotbnkacctkractshrdnewsrcagencydescev,p20_aotdlkractshrdsrcagencycntev,p20_aotdlkractshrdnewsrcagencydescev'
+'p17_aotemailkractshrdnewsrcagencydescev,p18_aotipaddrkractshrdsrcagencycntev,p18_aotipaddrkractshrdnewsrcagencydescev,p19_aotbnkacctkractshrdsrcagencycntev,p19_aotbnkacctkractshrdnewsrcagencydescev,p20_aotdlkractshrdsrcagencycntev,p20_aotdlkractshrdnewsrcagencydescev,t9_addrnotinagcyjurstflag'
 );
-
-
 
 
 //EventStatsPrep;
@@ -79,7 +81,7 @@ FieldGroupedValuesWithFieldValueObservations :=
 
 // Sort the field values so that the high observation lexidis are first and then
 // dedupe to keep (n) number of rows per field/value combination
-FieldGroupedValuesPrep := UNGROUP(DEDUP(SORT(FieldGroupedValuesWithFieldValueObservations,field,value,-fieldvaluecount, LOCAL),field,value, KEEP(10), LOCAL));
+FieldGroupedValuesPrep := UNGROUP(DEDUP(SORT(FieldGroupedValuesWithFieldValueObservations,field,value,-fieldvaluecount, LOCAL),field,value, KEEP(5), LOCAL));
 
 //output(FieldGroupedValuesPrep, named('FieldGroupedValuesPrep'));
 

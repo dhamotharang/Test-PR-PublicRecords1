@@ -49,13 +49,14 @@
 															
 	temp_cert	:= record
 		starting_file.board_code;
-		ABMS.layouts.input.cert;
+		starting_file.biog_cert_id;
+		ABMS.layouts.input.cert - [biog_cert_id];
 	end;
 
 	cert_input_d		:= project(cert_status_only,		transform(temp_cert,
 											self.board_code							:= Left.board_code,
 											self.biog_number						:= Left.abms_id,
-											self.biog_cert_id						:= Left.biog_cert_id,
+											self.biog_cert_id						:= '0',
 											self.cert_name							:= '', // for now - will lookup in table in next step
 											self.cert_type_ind					:= Left.cert_type_ind,
 											self.recert_ind							:= Left.recert_ind,
@@ -79,7 +80,7 @@
 	cert_input_c		:= project(cert_inact_only,		transform(temp_cert,
 											self.board_code							:= Left.board_code,
 											self.biog_number						:= Left.abms_id,
-											self.biog_cert_id						:= Left.biog_cert_id,
+											self.biog_cert_id						:= '0',
 											self.cert_name							:= '', // for now - will lookup in table in next step
 											self.cert_type_ind					:= Left.cert_type_ind,
 											self.recert_ind							:= Left.recert_ind,
@@ -103,7 +104,7 @@
 	cert_input_b		:= project(cert_exp_only,		transform(temp_cert,
 											self.board_code							:= Left.board_code,
 											self.biog_number						:= Left.abms_id,
-											self.biog_cert_id						:= Left.biog_cert_id,
+											self.biog_cert_id						:= '0',
 											self.cert_name							:= '', // for now - will lookup in table in next step
 											self.cert_type_ind					:= Left.cert_type_ind,
 											self.recert_ind							:= Left.recert_ind,
@@ -127,7 +128,7 @@
 	cert_input_a		:= project(cert_only,		transform(temp_cert,
 											self.board_code							:= Left.board_code,
 											self.biog_number						:= Left.abms_id,
-											self.biog_cert_id						:= Left.biog_cert_id,
+											self.biog_cert_id						:= '0',
 											self.cert_name							:= '', // for now - will lookup in table in next step
 											self.cert_type_ind					:= Left.cert_type_ind,
 											self.recert_ind							:= Left.recert_ind,

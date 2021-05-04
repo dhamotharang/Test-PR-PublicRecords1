@@ -20,7 +20,7 @@ EXPORT Build_All(
 	STRING																	pFilenameSchools						= 'zschoolspi*.txt',
 	STRING																	pFilenameSpecialty					= 'zspecialtypi*.txt',
 	STRING																	pFilenameRaw_input					= 'ABMS_Data.txt',
-	STRING																	pGroupName									= 'thor400_dev01',
+	STRING																	pGroupName									= _Dataset().groupname,
 	DATASET(Layouts.Base.Main)							pBaseMainFile								=	IF(_Flags.Update.Main, Files().Base.Main.QA, DATASET([], Layouts.Base.Main)),
 	DATASET(Layouts.Base.Career)						pBaseCareerFile							=	IF(_Flags.Update.Career, Files().Base.Career.QA, DATASET([], Layouts.Base.Career)),
 	DATASET(Layouts.Base.Cert)							pBaseCertFile								=	IF(_Flags.Update.Cert, Files().Base.Cert.QA, DATASET([], Layouts.Base.Cert)),

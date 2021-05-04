@@ -1,211 +1,254 @@
-﻿IMPORT SALT311;
+IMPORT SALT44;
 EXPORT Layout_Specificities := MODULE
 SHARED L := Layout_BizHead;
+
 EXPORT parent_proxid_ChildRec := RECORD
   TYPEOF(l.parent_proxid) parent_proxid;
   UNSIGNED8 cnt;
   UNSIGNED4 id;
 END;
+
 EXPORT sele_proxid_ChildRec := RECORD
   TYPEOF(l.sele_proxid) sele_proxid;
   UNSIGNED8 cnt;
   UNSIGNED4 id;
 END;
+
 EXPORT org_proxid_ChildRec := RECORD
   TYPEOF(l.org_proxid) org_proxid;
   UNSIGNED8 cnt;
   UNSIGNED4 id;
 END;
+
 EXPORT ultimate_proxid_ChildRec := RECORD
   TYPEOF(l.ultimate_proxid) ultimate_proxid;
   UNSIGNED8 cnt;
   UNSIGNED4 id;
 END;
+
 EXPORT source_ChildRec := RECORD
   TYPEOF(l.source) source;
   UNSIGNED8 cnt;
   UNSIGNED4 id;
 END;
+
 EXPORT source_record_id_ChildRec := RECORD
   TYPEOF(l.source_record_id) source_record_id;
   UNSIGNED8 cnt;
   UNSIGNED4 id;
 END;
+
 EXPORT company_name_ChildRec := RECORD
   TYPEOF(l.company_name) company_name;
   UNSIGNED8 cnt;
   UNSIGNED4 id;
 END;
+
 EXPORT company_name_prefix_ChildRec := RECORD
   TYPEOF(l.company_name_prefix) company_name_prefix;
   UNSIGNED8 cnt;
   UNSIGNED4 id;
 END;
+
 EXPORT cnp_name_ChildRec := RECORD
   TYPEOF(l.cnp_name) cnp_name;
   UNSIGNED8 cnt;
   UNSIGNED4 id;
 END;
+
 EXPORT cnp_number_ChildRec := RECORD
   TYPEOF(l.cnp_number) cnp_number;
   UNSIGNED8 cnt;
   UNSIGNED4 id;
 END;
+
 EXPORT cnp_btype_ChildRec := RECORD
   TYPEOF(l.cnp_btype) cnp_btype;
   UNSIGNED8 cnt;
   UNSIGNED4 id;
 END;
+
 EXPORT cnp_lowv_ChildRec := RECORD
   TYPEOF(l.cnp_lowv) cnp_lowv;
   UNSIGNED8 cnt;
   UNSIGNED4 id;
 END;
+
 EXPORT company_phone_3_ChildRec := RECORD
   TYPEOF(l.company_phone_3) company_phone_3;
   UNSIGNED8 cnt;
   UNSIGNED4 id;
 END;
+
 EXPORT company_phone_3_ex_ChildRec := RECORD
   TYPEOF(l.company_phone_3_ex) company_phone_3_ex;
   UNSIGNED8 cnt;
   UNSIGNED4 id;
 END;
+
 EXPORT company_phone_7_ChildRec := RECORD
   TYPEOF(l.company_phone_7) company_phone_7;
   UNSIGNED8 cnt;
   UNSIGNED4 id;
 END;
+
 EXPORT company_fein_ChildRec := RECORD
   TYPEOF(l.company_fein) company_fein;
   UNSIGNED8 cnt;
   UNSIGNED4 id;
 END;
+
 EXPORT company_sic_code1_ChildRec := RECORD
   TYPEOF(l.company_sic_code1) company_sic_code1;
   UNSIGNED8 cnt;
   UNSIGNED4 id;
 END;
+
 EXPORT prim_range_ChildRec := RECORD
   TYPEOF(l.prim_range) prim_range;
   UNSIGNED8 cnt;
   UNSIGNED4 id;
 END;
+
 EXPORT prim_name_ChildRec := RECORD
   TYPEOF(l.prim_name) prim_name;
   UNSIGNED8 cnt;
   UNSIGNED4 id;
 END;
+
 EXPORT sec_range_ChildRec := RECORD
   TYPEOF(l.sec_range) sec_range;
   UNSIGNED8 cnt;
   UNSIGNED4 id;
 END;
+
 EXPORT city_ChildRec := RECORD
   TYPEOF(l.city) city;
   UNSIGNED8 cnt;
   UNSIGNED4 id;
 END;
+
 EXPORT city_clean_ChildRec := RECORD
   TYPEOF(l.city_clean) city_clean;
   UNSIGNED8 cnt;
   UNSIGNED4 id;
 END;
+
 EXPORT st_ChildRec := RECORD
   TYPEOF(l.st) st;
   UNSIGNED8 cnt;
   UNSIGNED4 id;
 END;
+
 EXPORT zip_ChildRec := RECORD
   TYPEOF(l.zip) zip;
   UNSIGNED8 cnt;
   UNSIGNED4 id;
 END;
+
 EXPORT company_url_ChildRec := RECORD
   TYPEOF(l.company_url) company_url;
   UNSIGNED8 cnt;
   UNSIGNED4 id;
 END;
+
 EXPORT isContact_ChildRec := RECORD
   TYPEOF(l.isContact) isContact;
   UNSIGNED8 cnt;
   UNSIGNED4 id;
 END;
+
 EXPORT contact_did_ChildRec := RECORD
   TYPEOF(l.contact_did) contact_did;
   UNSIGNED8 cnt;
   UNSIGNED4 id;
 END;
+
 EXPORT title_ChildRec := RECORD
   TYPEOF(l.title) title;
   UNSIGNED8 cnt;
   UNSIGNED4 id;
 END;
+
 EXPORT fname_ChildRec := RECORD
   TYPEOF(l.fname) fname;
   UNSIGNED8 cnt;
   UNSIGNED4 id;
 END;
+
 EXPORT fname_preferred_ChildRec := RECORD
   TYPEOF(l.fname_preferred) fname_preferred;
   UNSIGNED8 cnt;
   UNSIGNED4 id;
 END;
+
 EXPORT mname_ChildRec := RECORD
   TYPEOF(l.mname) mname;
   UNSIGNED8 cnt;
   UNSIGNED4 id;
 END;
+
 EXPORT lname_ChildRec := RECORD
   TYPEOF(l.lname) lname;
   UNSIGNED8 cnt;
   UNSIGNED4 id;
 END;
+
 EXPORT name_suffix_ChildRec := RECORD
   TYPEOF(l.name_suffix) name_suffix;
   UNSIGNED8 cnt;
   UNSIGNED4 id;
 END;
+
 EXPORT contact_ssn_ChildRec := RECORD
   TYPEOF(l.contact_ssn) contact_ssn;
   UNSIGNED8 cnt;
   UNSIGNED4 id;
 END;
+
 EXPORT contact_email_ChildRec := RECORD
   TYPEOF(l.contact_email) contact_email;
   UNSIGNED8 cnt;
   UNSIGNED4 id;
 END;
+
 EXPORT sele_flag_ChildRec := RECORD
   TYPEOF(l.sele_flag) sele_flag;
   UNSIGNED8 cnt;
   UNSIGNED4 id;
 END;
+
 EXPORT org_flag_ChildRec := RECORD
   TYPEOF(l.org_flag) org_flag;
   UNSIGNED8 cnt;
   UNSIGNED4 id;
 END;
+
 EXPORT ult_flag_ChildRec := RECORD
   TYPEOF(l.ult_flag) ult_flag;
   UNSIGNED8 cnt;
   UNSIGNED4 id;
 END;
+
 EXPORT fallback_value_ChildRec := RECORD
   TYPEOF(l.fallback_value) fallback_value;
   UNSIGNED8 cnt;
   UNSIGNED4 id;
 END;
+
 EXPORT CONTACTNAME_ChildRec := RECORD
   UNSIGNED4 CONTACTNAME;
   UNSIGNED8 cnt;
   UNSIGNED4 id;
 END;
+
 EXPORT STREETADDRESS_ChildRec := RECORD
   UNSIGNED4 STREETADDRESS;
   UNSIGNED8 cnt;
   UNSIGNED4 id;
 END;
+
+
 EXPORT R := RECORD,MAXLENGTH(32000)
  UNSIGNED1 dummy;
   REAL4 parent_proxid_specificity;

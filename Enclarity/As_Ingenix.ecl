@@ -1223,7 +1223,7 @@ EXPORT As_Ingenix (STRING filedate, boolean pUseProd = true) := MODULE
 		prep1:=project(InMSch,tr1(left));
 		
 		sort_prep1		:= sort(distribute(prep1, hash(group_key)), group_key, local);
-		sort_InIndi	:= sort(distribute(InIndi, hash(group_key)), group_key, -dt_vendor_last_reported, local);
+		sort_InIndi	:= sort(distribute(InIndi(bdid > 0), hash(group_key)), group_key, -dt_vendor_last_reported, local);
 
 		prep2:=join(dedup(sort_prep1,all),sort_InIndi
 							,left.group_key=right.group_key
@@ -1254,7 +1254,7 @@ EXPORT As_Ingenix (STRING filedate, boolean pUseProd = true) := MODULE
 								,self:=left),left outer, local);
 								
 		sort_prep2		:= sort(distribute(prep2, hash(group_key)), group_key, local);
-		sort_InAsso	:= sort(distribute(InAsso, hash(group_key)), group_key, -dt_vendor_last_reported, local);
+		sort_InAsso	:= sort(distribute(InAsso(bdid > 0), hash(group_key)), group_key, -dt_vendor_last_reported, local);
 
 		prep3:=join(dedup(sort_prep2,all),sort_InAsso
 							,left.group_key=right.group_key
@@ -1285,7 +1285,7 @@ EXPORT As_Ingenix (STRING filedate, boolean pUseProd = true) := MODULE
 								,self:=left),left outer, local);
 
 		sort_prep3		:= sort(distribute(prep3, hash(group_key)), group_key, local);
-		sort_InFac		:= sort(distribute(InFac, hash(group_key)), group_key, -dt_vendor_last_reported, local);
+		sort_InFac		:= sort(distribute(InFac(bdid > 0), hash(group_key)), group_key, -dt_vendor_last_reported, local);
 		
 		prep4:=join(dedup(sort_prep3,all),sort_InFac
 							,left.group_key=right.group_key

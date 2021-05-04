@@ -1,5 +1,4 @@
-﻿IMPORT FraudShared;
-EXPORT Functions := 
+﻿EXPORT Functions := 
 	module 
 	
 Export     fSlashedMDYtoCYMD(string pDateIn) 
@@ -16,15 +15,15 @@ Export     fHypenYMDtoCYMD(string pDateIn)
 	
 Export Classification (
 
-           dataset(FraudShared.Layouts.Base.Main) pBaseFile ) := 
+           dataset(Layouts.Base.Main) pBaseFile ) := 
 					 
 function 
 
-      MBSPrimary := FraudShared.Files().Input.MBS.Sprayed; 
+      MBSPrimary := Files().Input.MBS.Sprayed; 
 			
 	JMbs  := join (pBaseFile , MBSPrimary(status = 1) , trim(StringLib.StringToUppercase(left.source),left,right) = trim(StringLib.StringToUppercase(right.fdn_file_code),left,right) , 
 	
-	               transform (FraudShared.Layouts.Base.Main , 
+	               transform (Layouts.Base.Main , 
 								  
 												self.classification_Permissible_use_access.fdn_file_info_id                            := right.fdn_file_info_id ; 
 												self.classification_Permissible_use_access.fdn_file_code                               := StringLib.StringToUppercase(right.fdn_file_code) ; 

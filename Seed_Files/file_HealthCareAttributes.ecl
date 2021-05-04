@@ -1,4 +1,4 @@
-IMPORT ut;
+﻿IMPORT Data_Services,Seed_Files;
 
 r := RECORD
   string20 dataset_name;
@@ -16,4 +16,4 @@ r := RECORD
  END;
 
 //Please rename the input file appropriately
-EXPORT file_HealthCareAttributes := DATASET('~thor_data400::base::testseed_healthcareattributes', r, CSV(HEADING(single), QUOTE('"')));
+EXPORT file_HealthCareAttributes := DATASET(Data_Services.Data_location.Prefix('NONAMEGIVEN')+'~thor_data400::base::testseed_healthcareattributes', r, CSV(HEADING(single), QUOTE('"')));

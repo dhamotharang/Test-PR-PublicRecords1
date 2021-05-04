@@ -128,7 +128,7 @@ string l_testenv = 'NA') := function
 
 	missingkeys := emailme_function(email_t,datasetname,'FAILURE:'+(string8)STD.Date.Today(),uversion,'Missing Keys:' + builtkeys);
 
-	invaliddaliip := emailme_function(email_t,datasetname,'FAILURE:'+(string8)STD.Date.Today(),uversion,'Dali IP Mismatch: lib_thorlib.thorlib.daliServers() = ' + dops.constants.daliip + ' does not match with ' + dops.constants.devdaliip + ' or ' + dops.constants.proddaliip);
+	invaliddaliip := emailme_function(email_t,datasetname,'FAILURE:'+(string8)STD.Date.Today(),uversion,'Dali IP Mismatch: lib_thorlib.thorlib.daliServers() = ' + dops.constants.daliip + ' does not match with devdaliips in dops.constants.devdaliip or proddaliips in dops.constants.proddaliip');
 	
 	clustertorun := if (regexfind('eclcc',STD.System.Job.Target()),
 													map( l_dopsenv = 'prod' => 'hthor_eclcc'

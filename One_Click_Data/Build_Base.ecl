@@ -1,11 +1,11 @@
-//Defines full build process
+﻿//Defines full build process
 import _control, versioncontrol;
 
 export Build_Base(
 
 	 string														pversion
 	,boolean													pIsTesting			= false
-	,dataset(Layouts.Input.Sprayed	)	pSprayedFile		= Files().input.Sprayed
+	,dataset(Layouts.Input.Sprayed	)	pSprayedFile		= Files().input.Using
 	,dataset(Layouts.Base						)	pBaseFile				= Files().base.qa									
 ) :=
 module
@@ -25,10 +25,8 @@ module
 
 	export full_build :=
 		sequential(
-			 Promote().Inputfiles.Sprayed2Using
-			,Build_Base_File
-			,Promote().Inputfiles.Using2Used
-			,Promote(pversion).buildfiles.New2Built
+			 Build_Base_File
+			 ,Promote(pversion).buildfiles.New2Built
 		) : success(send_email(pversion).buildsuccess), failure(send_email(pversion).buildfailure);
 
 	export All :=

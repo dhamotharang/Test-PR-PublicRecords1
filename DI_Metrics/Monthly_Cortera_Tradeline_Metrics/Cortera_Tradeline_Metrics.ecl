@@ -9,21 +9,24 @@
 
 IMPORT _control, Cortera_Tradeline, DI_Metrics, STD;
 
-EXPORT Cortera_Tradeline_Metrics(STRING destinationIP, STRING destinationpath, STRING emailContact = 'DataInsightAutomation@lexisnexisrisk.com') := FUNCTION
+EXPORT Cortera_Tradeline_Metrics(STRING destinationIP, 
+                                 STRING destinationpath, 
+                                 STRING emailContact = 'DataInsightAutomation@lexisnexisrisk.com',
+                                 STRING today = (STRING)STD.Date.Today()) := FUNCTION
 
   build_all := SEQUENTIAL(
 
-     DI_Metrics.Monthly_Cortera_Tradeline_Metrics.CorteraTradelineGrowth(destinationIP, destinationpath, emailContact, weekly)
+     DI_Metrics.Monthly_Cortera_Tradeline_Metrics.CorteraTradelineGrowth(destinationIP, destinationpath, emailContact, weekly, today)
 
-    ,DI_Metrics.Monthly_Cortera_Tradeline_Metrics.CorteraTradelineGrowth(destinationIP, destinationpath, emailContact, monthly)
+    ,DI_Metrics.Monthly_Cortera_Tradeline_Metrics.CorteraTradelineGrowth(destinationIP, destinationpath, emailContact, monthly, today)
 
-    ,DI_Metrics.Monthly_Cortera_Tradeline_Metrics.CorteraTradelineGrowth(destinationIP, destinationpath, emailContact, yearly)
+    ,DI_Metrics.Monthly_Cortera_Tradeline_Metrics.CorteraTradelineGrowth(destinationIP, destinationpath, emailContact, yearly, today)
 
-    ,DI_Metrics.Monthly_Cortera_Tradeline_Metrics.CorteraTradelineHistory(destinationIP, destinationpath, emailContact, weekly)
+    ,DI_Metrics.Monthly_Cortera_Tradeline_Metrics.CorteraTradelineHistory(destinationIP, destinationpath, emailContact, weekly, today)
 
-    ,DI_Metrics.Monthly_Cortera_Tradeline_Metrics.CorteraTradelineHistory(destinationIP, destinationpath, emailContact, monthly)
+    ,DI_Metrics.Monthly_Cortera_Tradeline_Metrics.CorteraTradelineHistory(destinationIP, destinationpath, emailContact, monthly, today)
 
-    ,DI_Metrics.Monthly_Cortera_Tradeline_Metrics.CorteraTradelineHistory(destinationIP, destinationpath, emailContact, yearly)
+    ,DI_Metrics.Monthly_Cortera_Tradeline_Metrics.CorteraTradelineHistory(destinationIP, destinationpath, emailContact, yearly, today)
 
   );
 

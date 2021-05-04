@@ -1,4 +1,4 @@
-prii_layout := RECORD
+﻿prii_layout := RECORD
 	STRING Account;
 	STRING First;
 	STRING Middle;
@@ -39,7 +39,7 @@ p_f := PROJECT(f,t_f(LEFT,COUNTER));
 output(p_f);
 
 
-roxieIP := 'http://roxiestaging.br.seisint.com:9876'; // staging vip
+roxieIP := 'http://certstagingvip.hpcc.risk.regn.net:9876'; // staging vip
 
 s := riskwise.RiskwiseMainFLGO_Soapcall(project(p_f, transform(riskwise.Layout_FLG1, self:=left)), roxieIP);
 
