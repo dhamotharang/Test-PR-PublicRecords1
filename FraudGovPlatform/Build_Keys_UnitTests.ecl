@@ -1,11 +1,11 @@
-IMPORT FraudShared,_Validate,Std,ut,tools,Data_Services;
+IMPORT FraudShared,_Validate,Std,ut,tools,Data_Services,_Control,FraudGovPlatform_Validation;
 EXPORT Build_Keys_UnitTests(
 	string pversion,
 	string pversion_previous  = ''
 ) := 
 module
 
-v := STD.File.GetSuperFileSubName('~thor_data400::key::fraudgov::qa::id', 1);
+v := STD.File.GetSuperFileSubName('~thor_data400::key::fraudgov::father::id', 1);
 qa_version  := (string)STD.Str.SplitWords(v,'::')[4]:independent;
 
 vVersion_previous := 
@@ -352,11 +352,31 @@ ds:= dataset([
 
 	tools.mac_WriteFile(fraudgovplatform.Filenames(pversion).Base.KeysUnitTests.New,keys_tests,Build_Base_Test,pCompress:=true,pHeading:=false,pOverwrite:=true);
 
+
+	ECLThorName	:= IF(_control.ThisEnvironment.Name <> 'Prod_Thor', FraudGovPlatform_Validation.Constants.ThorName_Dev,	FraudGovPlatform_Validation.Constants.ThorName_Prod);
+
+	BuildStatusReport := 
+	'import ut,FraudGovPlatform,FraudGovPlatform_Validation;\n'
+	+'wuname := \'FraudGov Build Status Report\';\n'
+	+'#WORKUNIT(\'name\', wuname);\n'
+	+'#WORKUNIT(\'protect\', true);\n'
+	+'#OPTION(\'defaultSkewError\', 1);\n'
+	+'email(string msg):=fileservices.sendemail(\n'
+	+'   FraudGovPlatform_Validation.Mailing_List().Alert\n'
+	+' 	 ,\'FraudGov Build Status Report\'\n'
+	+' 	 ,msg\n'
+	+' 	 +\'Build wuid \'+workunit\n'
+	+' 	 );\n\n'
+	+'FraudGovPlatform.Build_Summary(\''+pversion+'\').send:failure(email(\'Build Status Report failed\'));\n'
+	;
+
 	// Return
 	export full_build :=
 		sequential(
 			Build_Base_Test
 			, Promote(pversion).buildfiles.New2Built
+			, Promote(pversion).buildfiles.Built2QA
+			,_Control.fSubmitNewWorkunit(BuildStatusReport,ECLThorName)
 			, if(EXISTS(keys_tests( result  = 'Failed')),FAIL('Unit Test Failed'))
 		);
 		
