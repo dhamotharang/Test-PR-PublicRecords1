@@ -1,10 +1,8 @@
-﻿IMPORT Business_Risk_BIP, Doxie, DueDiligence, Header, Relationship, RelationshipIdentifier_Services;
+﻿IMPORT Business_Risk_BIP, DueDiligence, Header, Relationship, RelationshipIdentifier_Services;
 
 
 EXPORT getIndRelationships(DATASET(DueDiligence.Layouts.Indv_Internal) inData,
-                           Business_Risk_BIP.LIB_Business_Shell_LIBIN options,
-                           doxie.IDataAccess mod_access = MODULE (doxie.IDataAccess) END) := FUNCTION
-
+                           Business_Risk_BIP.LIB_Business_Shell_LIBIN options) := FUNCTION
 
 
     NO_DIRECT_RELATION := [Header.relative_titles.num_associate, Header.relative_titles.num_Neighbor, Header.relative_titles.num_Business, Header.relative_titles.num_transactionalAssociate];
@@ -169,7 +167,7 @@ EXPORT getIndRelationships(DATASET(DueDiligence.Layouts.Indv_Internal) inData,
 
     uniqueRelly := DEDUP(SORT(rellyIndv, individual.did), individual.did);
 
-    bestRellyData := DueDiligence.getIndInformation(options, mod_access).GetIndividualBestDataWithLexID(uniqueRelly);
+    bestRellyData := DueDiligence.getIndInformation(options).GetIndividualBestDataWithLexID(uniqueRelly);
 
     addBestRellyData := JOIN(rellyIndv, bestRellyData,
                              LEFT.individual.did = RIGHT.individual.did,

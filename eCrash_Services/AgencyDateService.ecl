@@ -10,7 +10,7 @@
    Output: iesp.getagencyproperties.t_GetAgencyPropertiesResponse (xml)
 */
 
-import eCrash_Services,AutoStandardI, iesp, FLAccidents_Ecrash, Risk_Indicators, lib_stringlib, ut, Gateway;
+import eCrash_Services,AutoStandardI, iesp, dx_eCrash, Risk_Indicators, lib_stringlib, ut, Gateway;
 EXPORT AgencyDateService() := FUNCTION
 
   Layout_AgencyPropertyRequest := iesp.getagencyproperties.t_GetAgencyPropertiesRequest;
@@ -34,7 +34,7 @@ EXPORT AgencyDateService() := FUNCTION
 	InSourceID 		:= Request.Options.SourceID;
 	IsSourceIDInput := InSourceID <>'' ;
 	
-	eCrash_Services.Layouts.AgencyDateRecord getAgencyLastUploadDates(FLAccidents_Ecrash.Key_eCrashv2_agencyId_sentdate L) := TRANSFORM
+	eCrash_Services.Layouts.AgencyDateRecord getAgencyLastUploadDates(dx_eCrash.Key_AgencyIdSentDate L) := TRANSFORM
 		SELF.lastUploadDate := L.MaxSent_to_hpcc_date;
 		SELF.agencyID := L.jurisdiction_nbr;
 		SELF.sourceID := L.contrib_source;
@@ -54,7 +54,7 @@ EXPORT AgencyDateService() := FUNCTION
 	agencyDeltaLastUploadDate := DeltaBaseService.GetAgencyLastReportDate(DeltaSqlString);
 	
 	
-	agencyLastUploadKey :=  CHOOSEN(FLAccidents_Ecrash.Key_eCrashv2_agencyId_sentdate(keyed(jurisdiction_nbr=InAgencyID) and if(IsSourceIDInput,contrib_source = InSourceID,TRUE) ), eCrash_Services.Constants.MAX_SOURCES_PER_AGENCY);
+	agencyLastUploadKey :=  CHOOSEN(dx_eCrash.Key_AgencyIdSentDate(keyed(jurisdiction_nbr=InAgencyID) and if(IsSourceIDInput,contrib_source = InSourceID,TRUE) ), eCrash_Services.Constants.MAX_SOURCES_PER_AGENCY);
 	agencyLastUploadDate := PROJECT(agencyLastUploadKey,getAgencyLastUploadDates(LEFT));
 	
 	agencyData := TOPN(agencyDeltaLastUploadDate + agencyLastUploadDate , 1, -lastUploadDate); 	

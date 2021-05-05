@@ -4,7 +4,7 @@ Added Name criss cross validation for VIN/LicensePlate/TagNumber/OfficerBadge se
 /*2017-10-03T22:31:05Z (Dmitriy Lazarenko)
 [ECH-5359] removing partial report search capabilities. Cleaning up paths (adding "eCrash_Services." prefix where needed)
 */
-import FLAccidents_Ecrash, ut, AutoStandardI, iesp, AutoKeyI, lib_stringlib, doxie, Std, Gateway, eCrash_Services;
+import dx_eCrash, ut, AutoStandardI, iesp, AutoKeyI, lib_stringlib, doxie, Std, Gateway, eCrash_Services;
 
 //** Added the fix for bug 138974
 
@@ -16,7 +16,7 @@ EXPORT Records(eCrash_Services.IParam.searchrecords in_mod) := MODULE
 		EXPORT AppendSourceID() := FUNCTION
 
 			
-			appriss_agency_key := FLAccidents_Ecrash.key_EcrashV2_agency;
+			appriss_agency_key := dx_eCrash.key_Agency;
 
 		  dsAgency := in_mod.Agencies;
 

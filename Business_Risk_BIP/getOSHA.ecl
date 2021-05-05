@@ -1,4 +1,4 @@
-﻿IMPORT BIPV2, Business_Risk_BIP, dx_OSHAIR, MDR, UT;
+﻿IMPORT BIPV2, Business_Risk_BIP, dx_OSHAIR, MDR,STD;
 
 EXPORT getOSHA(DATASET(Business_Risk_BIP.Layouts.Shell) Shell,
 											 Business_Risk_BIP.LIB_Business_Shell_LIBIN Options,
@@ -75,7 +75,7 @@ EXPORT getOSHA(DATASET(Business_Risk_BIP.Layouts.Shell) Shell,
 			 STRING6 DateFirstSeen := Business_Risk_BIP.Common.groupMinDate6(inspection_opening_date, HistoryDate),
 			 STRING6 DateLastSeen := Business_Risk_BIP.Common.groupMaxDate6(inspection_close_date, HistoryDate),
 			 UNSIGNED4 RecordCount := COUNT(GROUP),
-			 STRING10 NAICCode := (StringLib.StringFilter((STRING)NAICField, '0123456789'))[1..6],
+			 STRING10 NAICCode := (STD.Str.Filter((STRING)NAICField, '0123456789'))[1..6],
 			 BOOLEAN IsPrimary := PrimaryNAIC // NAIC1 is the primary NAIC in DCA data, all others are not primary
 			 },
 			 Seq, Business_Risk_BIP.Common.GetLinkSearchLevel(Options.LinkSearchLevel, SeleID), ((STRING)NAICField)[1..6]
@@ -99,14 +99,14 @@ EXPORT getOSHA(DATASET(Business_Risk_BIP.Layouts.Shell) Shell,
 
 	// Get all unique SIC Codes along with dates
 	OSHASIC := TABLE(OSHA,
-			{Seq,
-			 LinkID := Business_Risk_BIP.Common.GetLinkSearchLevel(Options.LinkSearchLevel, SeleID),
-			 Source := MDR.SourceTools.src_OSHAIR,
-			 STRING6 DateFirstSeen := Business_Risk_BIP.Common.groupMinDate6(inspection_opening_date, HistoryDate),
-			 STRING6 DateLastSeen := Business_Risk_BIP.Common.groupMaxDate6(inspection_close_date, HistoryDate),
-			 UNSIGNED4 RecordCount := COUNT(GROUP),
-			 STRING10 SICCode := (StringLib.StringFilter((STRING)SIC_Code, '0123456789'))[1..4],
-			 BOOLEAN IsPrimary := TRUE // There is only 1 SIC field on this source, mark it as primary
+    {Seq,
+		  LinkID := Business_Risk_BIP.Common.GetLinkSearchLevel(Options.LinkSearchLevel, SeleID),
+		  Source := MDR.SourceTools.src_OSHAIR,
+		  STRING6 DateFirstSeen := Business_Risk_BIP.Common.groupMinDate6(inspection_opening_date, HistoryDate),
+		  STRING6 DateLastSeen := Business_Risk_BIP.Common.groupMaxDate6(inspection_close_date, HistoryDate),
+		  UNSIGNED4 RecordCount := COUNT(GROUP),
+     STRING10 SICCode := IF( Options.BusShellVersion >= Business_Risk_BIP.Constants.BusShellVersion_v31,(STD.Str.Filter((STRING)SIC_Code, '0123456789'))[1..8],(STD.Str.Filter((STRING)SIC_Code, '0123456789'))[1..4]),
+		  BOOLEAN IsPrimary := TRUE // There is only 1 SIC field on this source, mark it as primary
 			 },
 			 Seq, Business_Risk_BIP.Common.GetLinkSearchLevel(Options.LinkSearchLevel, SeleID), ((STRING)SIC_Code)[1..4]
 			 );

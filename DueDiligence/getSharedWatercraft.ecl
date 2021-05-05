@@ -5,45 +5,45 @@
 			Watercraft.key_watercraft_wid
 */
 EXPORT getSharedWatercraft(DATASET(DueDiligence.LayoutsInternal.WatercraftSlimLayout) inWatercraft,
-                                                      doxie.IDataAccess mod_access = MODULE (doxie.IDataAccess) END) := FUNCTION
-   
+                                                      doxie.IDataAccess mod_access) := FUNCTION
+
    watercraftDetails_unsuppressed := JOIN(inWatercraft, watercraft.key_watercraft_wid(),
                              KEYED(LEFT.stateOrigin = RIGHT.state_origin AND
                                    LEFT.watercraftKey = RIGHT.watercraft_key AND
-                                   LEFT.sequenceKey = RIGHT.sequence_key),		 
+                                   LEFT.sequenceKey = RIGHT.sequence_key),
                              TRANSFORM({unsigned4 global_sid, DueDiligence.LayoutsInternal.WatercraftSlimLayout},
                                        SELF.global_sid := RIGHT.global_sid;
                                        SELF.year := RIGHT.model_year;
                                        SELF.model := RIGHT.watercraft_model_description;
                                        SELF.make := RIGHT.watercraft_make_description;
                                        SELF.vesselType := RIGHT.vehicle_type_description;
-                                       SELF.propulsion := RIGHT.propulsion_description;   
-                                       
+                                       SELF.propulsion := RIGHT.propulsion_description;
+
                                        SELF.purchasePrice := (UNSIGNED8)RIGHT.purchase_price;
                                        SELF.hullTypeDescription := RIGHT.hull_type_description;
 
-                                       vesselLength := (UNSIGNED2)RIGHT.watercraft_length; 
+                                       vesselLength := (UNSIGNED2)RIGHT.watercraft_length;
                                        SELF.vesselTotalLength := vesselLength;
                                        SELF.vesselLengthFeet := vesselLength DIV 12;
                                        SELF.vesselLengthInches := vesselLength % 12;
-                                                                    
+
                                        SELF.registrationNumber := RIGHT.registration_number;
                                        SELF.registrationState := RIGHT.st_registration;
-                                       
+
                                        SELF.titleState := RIGHT.title_state;
-                                       
+
                                        SELF.oldestTitleDate := (UNSIGNED4)RIGHT.title_issue_date;
                                        SELF.newestTitleDate := (UNSIGNED4)RIGHT.title_issue_date;
                                        SELF.oldestRegistrationDate := (UNSIGNED4)RIGHT.registration_date;
                                        SELF.newestRegistrationDate := (UNSIGNED4)RIGHT.registration_date;
-                                       
-                                       SELF := LEFT;), 
+
+                                       SELF := LEFT;),
                              ATMOST(LEFT.watercraftKey = RIGHT.watercraft_key AND
-                                    LEFT.stateOrigin = RIGHT.state_origin AND  
+                                    LEFT.stateOrigin = RIGHT.state_origin AND
                                     LEFT.sequenceKey = RIGHT.sequence_key, DueDiligence.Constants.MAX_ATMOST_1000));
-                                    
+
     watercraftDetails := Suppress.Suppress_ReturnOldLayout(watercraftDetails_unsuppressed, mod_access, DueDiligence.LayoutsInternal.WatercraftSlimLayout);
-    
+
     slimSort := SORT(watercraftDetails, seq, #EXPAND(BIPv2.IDmacros.mac_ListTop3Linkids()), did, stateOrigin, watercraftKey, -sequenceKey);
     waterRoll := ROLLUP(slimSort,
                           #EXPAND(DueDiligence.Constants.mac_JOINLinkids_Results()) AND
@@ -57,37 +57,37 @@ EXPORT getSharedWatercraft(DATASET(DueDiligence.LayoutsInternal.WatercraftSlimLa
                                     SELF.vesselTotalLength := boat.vesselTotalLength;
                                     SELF.propulsion := IF(LEFT.propulsion = DueDiligence.Constants.Empty, RIGHT.propulsion, LEFT.propulsion);
                                     SELF.registrationNumber := IF(LEFT.registrationNumber = DueDiligence.Constants.Empty, RIGHT.registrationNumber, LEFT.registrationNumber);
-                                    
+
                                     SELF.titleState := IF(LEFT.titleState = DueDiligence.Constants.Empty, RIGHT.titleState, LEFT.titleState);
 
-                                    SELF.oldestTitleDate := IF(LEFT.oldestTitleDate > 0 AND RIGHT.oldestTitleDate > 0, MIN(LEFT.oldestTitleDate, RIGHT.oldestTitleDate), MAX(LEFT.oldestTitleDate, RIGHT.oldestTitleDate)); 
+                                    SELF.oldestTitleDate := IF(LEFT.oldestTitleDate > 0 AND RIGHT.oldestTitleDate > 0, MIN(LEFT.oldestTitleDate, RIGHT.oldestTitleDate), MAX(LEFT.oldestTitleDate, RIGHT.oldestTitleDate));
                                     SELF.newestTitleDate := MAX(LEFT.newestTitleDate, RIGHT.newestTitleDate);
-                                    SELF.oldestRegistrationDate := IF(LEFT.oldestRegistrationDate > 0 AND RIGHT.oldestRegistrationDate > 0, MIN(LEFT.oldestRegistrationDate, RIGHT.oldestRegistrationDate), MAX(LEFT.oldestRegistrationDate, RIGHT.oldestRegistrationDate)); 
+                                    SELF.oldestRegistrationDate := IF(LEFT.oldestRegistrationDate > 0 AND RIGHT.oldestRegistrationDate > 0, MIN(LEFT.oldestRegistrationDate, RIGHT.oldestRegistrationDate), MAX(LEFT.oldestRegistrationDate, RIGHT.oldestRegistrationDate));
                                     SELF.newestRegistrationDate := MAX(LEFT.newestRegistrationDate, RIGHT.newestRegistrationDate);
-                                    
+
                                     SELF.registrationState := IF(LEFT.registrationState = DueDiligence.Constants.EMPTY, RIGHT.registrationState, LEFT.registrationState);
-                                    
+
                                     SELF := LEFT;));
-                                    
+
     limitWatercraft := GROUP(SORT(waterRoll, seq, #EXPAND(BIPv2.IDmacros.mac_ListTop3Linkids()), did, -vesselTotalLength), seq, #EXPAND(BIPv2.IDmacros.mac_ListTop3Linkids()), did);
-    limitedWater := DueDiligence.Common.GetMaxRecords(limitWatercraft, DueDiligence.Constants.MAX_WATERCRAFT);                                 
-                                    
+    limitedWater := DueDiligence.Common.GetMaxRecords(limitWatercraft, DueDiligence.Constants.MAX_WATERCRAFT);
+
     reformatWater := PROJECT(limitedWater, TRANSFORM(DueDiligence.LayoutsInternal.SharedWatercraftSlim,
                                                   SELF.allWatercraft := DATASET([TRANSFORM(DueDiligence.Layouts.WatercraftDataLayout, SELF := LEFT; SELF := [];)]);
                                                   SELF.totalWatercraft := 1;
                                                   SELF.maxWatercraftLength := LEFT.vesselLengthFeet;
-                                                  SELF := LEFT;));                                
+                                                  SELF := LEFT;));
 
     sortWater := SORT(reformatWater, seq, #EXPAND(BIPv2.IDmacros.mac_ListTop3Linkids()), did);
-   
+
     rollWaterToBusOrPer := ROLLUP(sortWater,
                                    #EXPAND(DueDiligence.Constants.mac_JOINLinkids_Results()) AND
                                    LEFT.did = RIGHT.did,
                                    TRANSFORM(DueDiligence.LayoutsInternal.SharedWatercraftSlim,
                                               SELF.allWatercraft := LEFT.allWatercraft + RIGHT.allWatercraft;
-                                              SELF.totalWatercraft := LEFT.totalWatercraft + RIGHT.totalWatercraft;  
+                                              SELF.totalWatercraft := LEFT.totalWatercraft + RIGHT.totalWatercraft;
                                               SELF.maxWatercraftLength := MAX(LEFT.maxWatercraftLength, RIGHT.maxWatercraftLength),
-                                              SELF :=  LEFT));  
+                                              SELF :=  LEFT));
 
 
     // OUTPUT(watercraftDetails, NAMED('sharedWatercraftDetails'));

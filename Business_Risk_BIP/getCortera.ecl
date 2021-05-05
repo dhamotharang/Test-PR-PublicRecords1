@@ -1,4 +1,4 @@
-﻿IMPORT BIPV2, Cortera, doxie, dx_Cortera, MDR, Risk_Indicators, STD, UT;
+﻿IMPORT BIPV2, Business_Risk_BIP, Cortera, doxie, dx_Cortera, MDR, Risk_Indicators, STD, UT;
 
 EXPORT getCortera(DATASET(Business_Risk_BIP.Layouts.Shell) Shell,
                           Business_Risk_BIP.LIB_Business_Shell_LIBIN Options,
@@ -118,13 +118,15 @@ EXPORT getCortera(DATASET(Business_Risk_BIP.Layouts.Shell) Shell,
 
 	CorteraRecs_DD := DEDUP(SORT(CorteraRecs, Seq, ultimate_linkid), Seq, ultimate_linkid);
 
-	CorteraAttributes_InHouse_Raw := JOIN(CorteraRecs_DD, dx_Cortera.Key_Attributes_Link_Id,
+	CorteraAttributes_InHouse_Raw_pre := JOIN(CorteraRecs_DD, dx_Cortera.Key_Attributes_Link_Id,
     KEYED( LEFT.ultimate_linkid = RIGHT.ultimate_linkid) AND LEFT.Ultid=RIGHT.UltID AND LEFT.OrgID=RIGHT.OrgID AND LEFT.SeleID=RIGHT.SeleID ,
 					TRANSFORM({RECORDOF(RIGHT), UNSIGNED4 Seq, UNSIGNED6 HistoryDate},
 											SELF.Seq := LEFT.Seq;
 											SELF.HistoryDate := LEFT.HistoryDate;
 											SELF := RIGHT),
 					ATMOST(Business_Risk_BIP.Constants.Limit_Default));
+  
+  dx_Cortera.mac_incremental_rollup(CorteraAttributes_InHouse_Raw_pre, CorteraAttributes_InHouse_Raw, current_rec);
 
   // First, filter off records after our historydate. We will use this data to determine how long a business has been on Cortera attributes
   CorteraAttributes_InHouse_All := Business_Risk_BIP.Common.FilterRecords(CorteraAttributes_InHouse_Raw, dt_vendor_first_reported, 0, MDR.SourceTools.src_Cortera, AllowedSourcesSet);
@@ -611,13 +613,13 @@ EXPORT getCortera(DATASET(Business_Risk_BIP.Layouts.Shell) Shell,
 
 	CorteraSIC := TABLE(CorteraRecs,
 			{Seq,
-			 LinkID := Business_Risk_BIP.Common.GetLinkSearchLevel(link_search_level, SeleID),
-			 Source := MDR.SourceTools.src_Cortera,
-			 STRING6 DateFirstSeen := Business_Risk_BIP.Common.groupMinDate6(dt_first_seen, HistoryDate),
-			 STRING6 DateLastSeen := Business_Risk_BIP.Common.groupMaxDate6(dt_last_seen, HistoryDate),
-			 UNSIGNED4 RecordCount := COUNT(GROUP),
-			 STRING10 SICCode := (STD.Str.Filter((STRING)primary_sic, '0123456789'))[1..4],
-			 BOOLEAN IsPrimary := TRUE
+     LinkID := Business_Risk_BIP.Common.GetLinkSearchLevel(link_search_level, SeleID),
+     Source := MDR.SourceTools.src_Cortera,
+     STRING6 DateFirstSeen := Business_Risk_BIP.Common.groupMinDate6(dt_first_seen, HistoryDate),
+     STRING6 DateLastSeen := Business_Risk_BIP.Common.groupMaxDate6(dt_last_seen, HistoryDate),
+     UNSIGNED4 RecordCount := COUNT(GROUP),
+     STRING10 SICCode := IF( Options.BusShellVersion >= Business_Risk_BIP.Constants.BusShellVersion_v31,(STD.Str.Filter((STRING)primary_sic, '0123456789'))[1..8],(STD.Str.Filter((STRING)primary_sic, '0123456789'))[1..4]),
+     BOOLEAN IsPrimary := TRUE
 			 },
 			 Seq, Business_Risk_BIP.Common.GetLinkSearchLevel(link_search_level, SeleID), ((STRING)primary_sic)[1..4]
 			 );

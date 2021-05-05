@@ -15,7 +15,6 @@ NOTE: Logic is currently being moved to DueDiligence.v3.getPerson
 */
 
 EXPORT getIndAttributes(DATASET(DueDiligence.Layouts.Indv_Internal) inData,
-                        STRING6 ssnMask,
                         BOOLEAN includeReport,
                         Business_Risk_BIP.LIB_Business_Shell_LIBIN options,
                         BIPV2.mod_sources.iParams linkingOptions,
@@ -26,11 +25,6 @@ EXPORT getIndAttributes(DATASET(DueDiligence.Layouts.Indv_Internal) inData,
     INTEGER bsVersion := DueDiligence.ConstantsQuery.DEFAULT_BS_VERSION;
     UNSIGNED8 bsOptions := DueDiligence.ConstantsQuery.DEFAULT_BS_OPTIONS;
     BOOLEAN isFCRA := DueDiligence.Constants.DEFAULT_IS_FCRA;
-
-    UNSIGNED1 dppa := options.dppa;
-    UNSIGNED1 glba := options.glb;
-    STRING dataRestrictionMask := options.DataRestrictionMask;
-
 
     //convert the incoming data to the DueDiligence.Layouts.Indv_Internal used
     //for processing an individual
@@ -50,19 +44,19 @@ EXPORT getIndAttributes(DATASET(DueDiligence.Layouts.Indv_Internal) inData,
     indProfLic := DueDiligence.getIndProfessionalData(indGeoRisk, mod_access);
 
     //get relatives of the inquired individual
-    indRelationships := DueDiligence.getIndRelationships(indProfLic, options, mod_access);
+    indRelationships := DueDiligence.getIndRelationships(indProfLic, options);
 
     //get business associations
-    indBusAssoc := DueDiligence.getIndBusAssoc(indRelationships, options, linkingOptions, mod_access);
+    indBusAssoc := DueDiligence.getIndBusAssoc(indRelationships, options, linkingOptions);
 
     //get header information
-    indHeader := DueDiligence.getIndHeader(indBusAssoc, dataRestrictionMask, dppa, glba, isFCRA, bsVersion, includeReport, mod_access);
+    indHeader := DueDiligence.getIndHeader(indBusAssoc, mod_access, isFCRA, bsVersion, includeReport);
 
     //get information pertaining to SSN
-    indSSNData := DueDiligence.getIndSSNData(indHeader, dataRestrictionMask, dppa, glba, isFCRA, bsVersion, bsOptions, mod_access);
+    indSSNData := DueDiligence.getIndSSNData(indHeader, mod_access, isFCRA, bsVersion, bsOptions);
 
     //get property information
-    indProperty := DueDiligence.getIndProperty(indSSNData, dataRestrictionMask);
+    indProperty := DueDiligence.getIndProperty(indSSNData, mod_access.DataRestrictionMask);
 
     //get watercraft information
     indWatercraft := DueDiligence.getIndWatercraft(indProperty, mod_access);
@@ -80,13 +74,13 @@ EXPORT getIndAttributes(DATASET(DueDiligence.Layouts.Indv_Internal) inData,
     indPerAssoc := DueDiligence.getIndPerAssoc(indCriminalData);
 
     //get identity risk
-    indIDRisk := DueDiligence.getIndIdentityRisk(indPerAssoc, dataRestrictionMask, dppa, glba, isFCRA, bsVersion, bsOptions, mod_access);
+    indIDRisk := DueDiligence.getIndIdentityRisk(indPerAssoc, mod_access, isFCRA, bsVersion, bsOptions);
 
     //populate the attributes and flags
     indKRI := DueDiligence.getIndKRI(indIDRisk);
 
     //if a person report is being requested, populate the report
-    indReportData :=  IF(includeReport, DueDiligence.getIndReport(indKRI, options, linkingOptions, ssnMask, mod_access), indKRI);
+    indReportData :=  IF(includeReport, DueDiligence.getIndReport(indKRI, options, linkingOptions), indKRI);
 
     //populate the attributes and flags for those without a DID
     indNoDIDKRI := DueDiligence.getIndKRINoDID(noDIDFound);

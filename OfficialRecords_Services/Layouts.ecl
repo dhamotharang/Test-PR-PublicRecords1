@@ -1,17 +1,16 @@
-import official_records,iesp;
-	
-export Layouts := MODULE
+IMPORT dx_official_records, iesp;
+EXPORT Layouts := MODULE
+  
+  EXPORT search := RECORD
+    STRING60 official_record_key;
+  END;
 
-	export search := record
-		string60 official_record_key;
-	end;
+  EXPORT raw_rec := RECORD
+    dx_Official_Records.layouts.Party;
+  END;
+  
+  EXPORT t_OfficialRecRecordWithPenalty := RECORD
+    iesp.officialrecord.t_OfficialRecRecord;
+  END;
 
-	export raw_rec := record
-	  recordof(official_records.Key_Party_ORID);
-	end;
-
-	export t_OfficialRecRecordWithPenalty := record
-		iesp.officialrecord.t_OfficialRecRecord;
-	end;
-
-end;
+END;

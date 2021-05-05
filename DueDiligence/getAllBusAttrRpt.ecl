@@ -99,7 +99,7 @@ EXPORT getAllBusAttrRpt(DATASET(DueDiligence.v3Layouts.Internal.BusinessTemp) v3
     linkingOpts := DueDiligence.v3Common.DDBusiness.GetLinkingOptions(regulatoryAccess);
 
 
-    prevBusAttrs := DueDiligence.getBusAttributes(addRaw, ddOptions.ssnMask, //TODO: use ssn-mask from options
+    prevBusAttrs := DueDiligence.getBusAttributes(addRaw,
                                                   ddOptions.includeReportData, options,
                                                   linkingOpts, debugMode);
 

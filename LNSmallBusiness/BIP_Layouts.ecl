@@ -28,7 +28,7 @@ EXPORT BIP_Layouts := MODULE
 		STRING8   Bus_Sec_Range;
 		STRING9   Bus_FEIN;
 		STRING10  Bus_Phone10;
-		STRING4   Bus_SIC_Code;
+		STRING8   Bus_SIC_Code;
 		STRING6   Bus_NAIC_Code;
 		STRING120 Bus_Structure;
 		STRING8   Bus_Years_in_Business;
@@ -458,7 +458,7 @@ EXPORT BIP_Layouts := MODULE
 		STRING9 OutBestBusFEIN;
 		STRING10 OutBestBusPhone;
 		STRING6 OutBestNAICS;
-		STRING4 OutBestSIC;
+		STRING8 OutBestSIC;
 		STRING1 LNHitInd;
 		STRING1 LNInputInd;
 		STRING2 VerificationBusInputName;
@@ -769,7 +769,7 @@ EXPORT BIP_Layouts := MODULE
 		STRING9 OutBestBusTIN;
 		STRING10 OutBestBusPhone;
 		STRING6 OutBestNAICS;
-		STRING4 OutBestSIC;
+		STRING8 OutBestSIC;
 		STRING2 VerificationBusInputName;
 		STRING2 VerificationBusInputAddr;
 		STRING2 VerificationBusInputPhone;

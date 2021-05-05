@@ -51,6 +51,8 @@
 			string32 	phone_forwarded;
 			string8		date_added;
 			string6		time_added;
+			string5   phone_verified;
+			string32  verification_type;
 	end;
 	
 	export Transactions_Index := record
@@ -77,6 +79,7 @@
 			integer1 	verified_carrier;
 			string8		date_added;
 			string6		time_added;
+			string5		phone_star_rating;
 	end;
 	
 	export OtherPhones_Index := record
