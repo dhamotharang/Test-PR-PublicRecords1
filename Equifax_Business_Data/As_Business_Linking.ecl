@@ -1,11 +1,14 @@
-﻿#OPTION('multiplePersistInstances',FALSE);
+﻿// #OPTION('multiplePersistInstances',FALSE);
 import ut, business_header, mdr, lib_stringlib, email_data, _validate;
 
 EXPORT As_Business_Linking (	
-	 boolean pUseOtherEnviron = _Constants().IsDataland
-	,dataset(Equifax_Business_Data.layouts.Base) pBase = Equifax_Business_Data.files(,pUseOtherEnviron).base.Companies.qa
-  ,boolean IsPersist = true	
-	) := function		
+
+	 boolean                                      pUseOtherEnviron  = _Constants().IsDataland
+	,dataset(Equifax_Business_Data.layouts.Base)  pBase             = Equifax_Business_Data.files(,pUseOtherEnviron).base.Companies.qa
+  ,boolean                                      IsPersist         = true	
+
+) := 
+function		
 																
 		//COMPANY MAPPING
 		business_header.layout_business_linking.linking_interface	trfMapBLInterface(Equifax_Business_Data.layouts.Base l) := transform																				
@@ -143,10 +146,21 @@ EXPORT As_Business_Linking (
 					trim(l.efx_locamountcd)='K' => '1000000000+',					
 					trim(l.efx_locamountcd)='' => '',
 					'');	 						 						 						 					
-		    self.employee_count_org_raw      := if(trim(l.efx_corpempcnt) = '' OR trim(l.efx_corpempcnt) = '0',temp_emp_count_range_org,trim(l.efx_corpempcnt));
-        self.revenue_org_raw             := if(trim(l.efx_corpamount) = '' OR trim(l.efx_corpempcnt) = '0',temp_rev_range_org,trim(l.efx_corpamount));
-        self.employee_count_local_raw    := if(trim(l.efx_locempcnt) = '' OR trim(l.efx_corpempcnt) = '0',temp_emp_count_range_loc,trim(l.efx_locempcnt));
-		    self.revenue_local_raw           := if(trim(l.efx_locamount) = '' OR trim(l.efx_corpempcnt) = '0',temp_rev_range_loc,trim(l.efx_locamount));
+        revenue_org_raw             := map(trim(l.efx_corpamount) = '' OR trim(l.efx_corpamount) = '0' and regexfind('(revenue|sales)',l.efx_corpamounttp ,nocase)  => temp_rev_range_org       
+                                               ,regexfind('(revenue|sales)',l.efx_corpamounttp ,nocase) and (unsigned8)l.efx_corpamount < 700000000                 => trim(l.efx_corpamount)
+                                               ,                                                                                                                            ''
+                                            );
+        revenue_local_raw           := map(trim(l.efx_locamount ) = '' OR trim(l.efx_locamount ) = '0' and regexfind('(revenue|sales)',l.efx_locamounttp ,nocase) => temp_rev_range_loc       
+                                                       ,regexfind('(revenue|sales)',l.efx_locamounttp ,nocase) and (unsigned8)l.efx_locamount < 700000000         => trim(l.efx_locamount)
+                                                       ,                                                                                                                          ''
+                                                    );
+        // -- if local revenue is > org revenue, then both are bad.  although if org revenue is zero, local revenue can be populated.
+        self.revenue_org_raw             := if((unsigned8)revenue_org_raw < (unsigned8)revenue_local_raw and (unsigned8)revenue_org_raw > 0 ,''  ,revenue_org_raw   );
+		    self.revenue_local_raw           := if((unsigned8)revenue_org_raw < (unsigned8)revenue_local_raw and (unsigned8)revenue_org_raw > 0 ,''  ,revenue_local_raw );
+
+        self.employee_count_org_raw      := if(trim(l.efx_corpempcnt) = '' OR trim(l.efx_corpempcnt) = '0',temp_emp_count_range_org ,trim(l.efx_corpempcnt));        
+        self.employee_count_local_raw    := if(trim(l.efx_locempcnt ) = '' OR trim(l.efx_corpempcnt) = '0',temp_emp_count_range_loc ,trim(l.efx_locempcnt ));
+        
 				self 							   						 := l;
 				self 							   						 := [];
 		end;
@@ -199,10 +213,6 @@ EXPORT As_Business_Linking (
 				,company_ticker              
 				,company_ticker_exchange     
 				,company_inc_state           
-				,dt_first_seen               
-				,dt_last_seen                
-				,dt_vendor_last_reported     
-				,dt_vendor_first_reported    
 				,current					           
 				,dppa						             
         ,company_foreign_domestic  
@@ -223,6 +233,10 @@ EXPORT As_Business_Linking (
 				,company_fein 
         ,duns_number 	
 				,contact_ssn 
+        ,employee_count_org_raw
+        ,revenue_org_raw
+        ,employee_count_local_raw
+        ,revenue_local_raw
 				,LOCAL );
 	
 	business_header.layout_business_linking.linking_interface RollupLinking(
@@ -284,10 +298,6 @@ EXPORT As_Business_Linking (
 				,company_ticker              
 				,company_ticker_exchange     
 				,company_inc_state           
-				,dt_first_seen               
-				,dt_last_seen                
-				,dt_vendor_last_reported     
-				,dt_vendor_first_reported    
 				,current					           
 				,dppa						             
         ,company_foreign_domestic  
@@ -308,6 +318,10 @@ EXPORT As_Business_Linking (
 				,company_fein 
         ,duns_number 	
 				,contact_ssn 
+        ,employee_count_org_raw
+        ,revenue_org_raw
+        ,employee_count_local_raw
+        ,revenue_local_raw
 				,LOCAL );
 
     from_persist   := dedup(sort(distribute(from_base_Rollup,hash(vl_id,company_name)),record, local),record, local)
@@ -316,7 +330,12 @@ EXPORT As_Business_Linking (
     from_nopersist := dedup(sort(distribute(from_base_Rollup,hash(vl_id,company_name)),record, local),record, local);
 													 													 													
     from_dedp      := if(IsPersist, from_persist, from_nopersist);
+    
+    // -- fix big outliers in revenue.  
+    ds_fix_org_revenue    := Equifax_Business_Data._Fix_Revenue(from_dedp          ,revenue_org_raw   );
+    ds_fix_local_revenue  := Equifax_Business_Data._Fix_Revenue(ds_fix_org_revenue ,revenue_local_raw );
 
-		return from_dedp;
+
+		return ds_fix_local_revenue;
 		
 end;
