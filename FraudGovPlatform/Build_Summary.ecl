@@ -108,7 +108,50 @@ EXPORT Build_Summary(string pversion) := MODULE
 	END;
 	SHARED ComparisonColTable := PROJECT(Source_Comparison,FnMakeComparisonColTable(LEFT));	
 
-		 
+	SHARED BaseUnitTests := FraudGovPlatform.Files().Base.BaseUnitTests.Built;
+	tableColumns_Layout FnMakeBaseUnitTestColTable(BaseUnitTests L) := TRANSFORM
+				color := map(
+						STD.Str.ToUpperCase(L.result) = 'PASSED' => '#00FF00', 	//GREEN
+						STD.Str.ToUpperCase(L.result) = 'REVIEW' => '#FFFF00',  //YELLOW
+						STD.Str.ToUpperCase(L.result) = 'FAILED' => '#FFFF00', 	//RED
+						'#FFFFFF'
+						);
+
+				font := map(
+						STD.Str.ToUpperCase(L.result) = 'FAILED' => '#FFFFFF', 	//WHITE
+						'#000000'												//BLACK
+						);
+
+				SELF.column1 := '<tr><th class="importTableHeader" bgcolor="#f6f6f6">' + (string)L.unittest + '</th>';
+				SELF.column2 := '<td class="importTableCell" bgcolor="'+color+'"><font color="'+font+'">' + STD.Str.ToUpperCase(L.result) + '</font></td>';
+				SELF.column3 := '<td class="importTableCell"align="right">' + L.value + '</td></tr>';
+				SELF.column4 := '';
+				SELF.column5 := '';
+	END;
+	SHARED BaseUnitTestColTable := PROJECT(BaseUnitTests,FnMakeBaseUnitTestColTable(LEFT));	
+
+	SHARED KeysUnitTests := FraudGovPlatform.Files().Base.KeysUnitTests.Built;
+	tableColumns_Layout FnMakeKeysUnitTestColTable(KeysUnitTests L) := TRANSFORM
+				color := map(
+						STD.Str.ToUpperCase(L.result) = 'PASSED' => '#00FF00', 	//GREEN
+						STD.Str.ToUpperCase(L.result) = 'REVIEW' => '#FFFF00',  //YELLOW
+						STD.Str.ToUpperCase(L.result) = 'FAILED' => '#FFFF00', 	//RED
+						'#FFFFFF'
+						);
+
+				font := map(
+						STD.Str.ToUpperCase(L.result) = 'FAILED' => '#FFFFFF', 	//WHITE
+						'#000000'												//BLACK
+						);
+
+				SELF.column1 := '<tr><th class="importTableHeader" bgcolor="#f6f6f6">' + (string)L.unittest + ' - ' + L.rule + '</th>';
+				SELF.column2 := '<td class="importTableCell" bgcolor="'+color+'"><font color="'+font+'">' + STD.Str.ToUpperCase(L.result) + '</font></td>';
+				SELF.column3 := '<td class="importTableCell"align="right">' + (string)L.beforec + '</td>';
+				SELF.column4 := '<td class="importTableCell"align="right">' + (string)L.afterc + '</td>';
+				SELF.column5 := '<td class="importTableCell"align="right">' + L.value + '</td></tr>';
+	END;
+	SHARED KeysUnitTestColTable := PROJECT(KeysUnitTests,FnMakeKeysUnitTestColTable(LEFT));
+
 	html := '	<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd"><html><head>'
 +'	                                                                                                                  '
 +'	      <title>RIN Buid Status Report</title>                                                                       '
@@ -248,8 +291,8 @@ EXPORT Build_Summary(string pversion) := MODULE
 +'	                                                   <tr>                                                                                                              '
 +'	                                                      <td align="left" valign="top">                                                                                 '
 +'	                                                         <h2 style="color:#202020;display:block;font-family:Arial;font-size:30px;font-weight:bold;margin-top:0;margin-right:0;margin-bottom:5px;margin-left:0;text-align:left;">RIN Build Status Report</h2>'
-+'																													 <h3 style="color:#c2c2a3;display:block;font-family:Arial;font-size:15px;margin-top:0;margin-right:0;margin-bottom:5px;margin-left:0;text-align:left;">RISK INTELLIGENCE NETWORK</h3>'
-+'   																												 <p>Date of Report: ' + pversion +'</p>																	 '
++'															 <h3 style="color:#c2c2a3;display:block;font-family:Arial;font-size:15px;margin-top:0;margin-right:0;margin-bottom:5px;margin-left:0;text-align:left;">RISK INTELLIGENCE NETWORK</h3>'
++'   														 <p>Date of Report: ' + pversion +'</p>																	 '
 +'	                                                      </td>                                                                                                          '
 +'                                                        <td align="center" valign="top" width="90">                                                                    '
 +'	                                                         <img src="http://portal.mxlogic.com/images/transparent.gif">                                                '
@@ -271,8 +314,8 @@ EXPORT Build_Summary(string pversion) := MODULE
 +'	                                                                  <tr>                                                                                               '
 +'	                                                                     <th class="importTableHeader" bgcolor="#f6f6f6">GC_ID</th>                                      '
 +'	                                                                     <th class="importTableHeader" bgcolor="#f6f6f6">Source</th>                                     '
-+'																		 																	 <th class="importTableHeader" bgcolor="#f6f6f6">FileName</th>                                   '
-+'																																			 <th class="importTableHeader" bgcolor="#f6f6f6" align="right">New Records</th>                  '
++'																		 <th class="importTableHeader" bgcolor="#f6f6f6">FileName</th>                                   '
++'																		 <th class="importTableHeader" bgcolor="#f6f6f6" align="right">New Records</th>                  '
 +'	                                                                  </tr>                                                                                              '
 +'	                                                                  <tr>                                                                                               '
 + fMakeHTMLTable (SummaryColTable) 
@@ -292,9 +335,9 @@ EXPORT Build_Summary(string pversion) := MODULE
 +'	                                                                  <tr>                                                                                               '
 +'	                                                                     <th class="importTableHeader" bgcolor="#f6f6f6">GC_ID</th>                                      '
 +'	                                                                     <th class="importTableHeader" bgcolor="#f6f6f6">Source</th>                                     '
-+'																		 																	 <th class="importTableHeader" bgcolor="#f6f6f6" align="right">Before</th>                       '
-+'																																			 <th class="importTableHeader" bgcolor="#f6f6f6" align="right">After</th>                        '
-+'																																			 <th class="importTableHeader" bgcolor="#f6f6f6" align="right">New Records</th>                  '
++'																		 <th class="importTableHeader" bgcolor="#f6f6f6" align="right">Before</th>                       '
++'																		 <th class="importTableHeader" bgcolor="#f6f6f6" align="right">After</th>                        '
++'																		 <th class="importTableHeader" bgcolor="#f6f6f6" align="right">New Records</th>                  '
 +'	                                                                  </tr>                                                                                              '
 +'	                                                                  <tr>                                                                                               '
 + fMakeHTMLTable (ComparisonColTable) 
@@ -303,7 +346,49 @@ EXPORT Build_Summary(string pversion) := MODULE
 +'	                                                            </table>                                                                                                 '
 +'	                                                         </div>                                                                                                      '
 +'	                                                      </td>                                                                                                          '
-+'	                                                   </tr>                                                                                                             '
++'	                                                   </tr>																											 '
++'	                                                   <tr>                                                                                                              '
++'	                                                      <td valign="top">                                                                                              '
++'	                                                         <div mc:edit="std_content00">                                                                               '
++'	                                                            <h2>Base Unit Tests</h2>                                                                                 '
++'	                                                            <p>The purpose is to validate that each unit of the software code performs as expected.</p>                          '
++'	                                                            <table class="importTableContent" border="1px" bordercolor="#DDDDDD" cellpadding="2px" cellspacing="0" width="100%">'
++'	                                                               <tbody>                                                                                               '
++'	                                                                  <tr>                                                                                               '
++'	                                                                     <th class="importTableHeader" bgcolor="#f6f6f6">Unit Test</th>                                  '
++'	                                                                     <th class="importTableHeader" bgcolor="#f6f6f6">Result</th>                                     '
++'																		 <th class="importTableHeader" bgcolor="#f6f6f6" align="right">Value</th>                       '
++'	                                                                  </tr>                                                                                              '
++'	                                                                  <tr>                                                                                               '
++ fMakeHTMLTable (BaseUnitTestColTable) 
++'	                                                                  </tr>                                                                                              '
++'	                                                               </tbody>                                                                                              '
++'	                                                            </table>                                                                                                 '
++'	                                                         </div>                                                                                                      '
++'	                                                      </td>                                                                                                          '
++'	                                                   </tr>   																											 '
++'													   <tr>                                                                                                              '
++'	                                                      <td valign="top">                                                                                              '
++'	                                                         <div mc:edit="std_content00">                                                                               '
++'	                                                            <h2>Keys Unit Tests</h2>                                                                                 '
++'	                                                            <p>The purpose is to validate that each key do not drop counts .</p>                          			 '
++'	                                                            <table class="importTableContent" border="1px" bordercolor="#DDDDDD" cellpadding="2px" cellspacing="0" width="100%">'
++'	                                                               <tbody>                                                                                               '
++'	                                                                  <tr>                                                                                               '
++'	                                                                     <th class="importTableHeader" bgcolor="#f6f6f6">Unit Test</th>                                  '
++'	                                                                     <th class="importTableHeader" bgcolor="#f6f6f6">Result</th>                                     '
++'																		 <th class="importTableHeader" bgcolor="#f6f6f6" align="right">Before</th>                       '
++'																		 <th class="importTableHeader" bgcolor="#f6f6f6" align="right">After</th>                        '
++'																		 <th class="importTableHeader" bgcolor="#f6f6f6" align="right">Difference</th>                   '
++'	                                                                  </tr>                                                                                              '
++'	                                                                  <tr>                                                                                               '
++ fMakeHTMLTable (KeysUnitTestColTable) 
++'	                                                                  </tr>                                                                                              '
++'	                                                               </tbody>                                                                                              '
++'	                                                            </table>                                                                                                 '
++'	                                                         </div>                                                                                                      '
++'	                                                      </td>                                                                                                          '
++'	                                                   </tr>   																											 '
 +'	                                                </tbody>                                                                                                             '
 +'	                                             </table>                                                                                                                '
 +'	                                             <!-- // End Module: Standard Content \\ -->                                                                             '

@@ -1,4 +1,4 @@
-IMPORT _Validate,Std,ut,tools,Data_Services;
+   IMPORT _Validate,Std,ut,tools;
 EXPORT Build_Base_UnitTests(
 	string pversion,
 	string pversion_previous = ''
@@ -15,8 +15,8 @@ module
 			pversion_previous );
 
 
-	pBaseMainFile := FraudGovPlatform.Files(pversion).Base.Main.New;
-	pPreviousMain := FraudGovPlatform.Files(vVersion_previous).Base.Main.New;
+	pBaseMainFile := FraudGovPlatform.Files(pversion).Base.Main_Orig.New;
+	pPreviousMain := FraudGovPlatform.Files(vVersion_previous).Base.Main_Orig.New;
 
 
 	FirstRinID := FraudGovPlatform.Constants().FirstRinID;
@@ -85,7 +85,7 @@ module
 
 	st4 := sort(with_pii_4, cleaned_name.fname, cleaned_name.lname, clean_ssn, did);
 	dst4 := dedup(st4, cleaned_name.fname, cleaned_name.lname, clean_ssn, did);
-	tdst4 := table(dst4, {cleaned_name.fname, cleaned_name.lname, clean_ssn,did, cnt := count(group)}, 
+	tdst4 := table(dst4, {cleaned_name.fname, cleaned_name.lname, clean_ssn, did, cnt := count(group)}, 
 		cleaned_name.fname, cleaned_name.lname, clean_ssn, did , merge);
 
 
@@ -103,7 +103,7 @@ module
 
 	st5 := sort(with_pii_5, cleaned_name.fname, cleaned_name.lname, clean_dob,clean_phones.phone_number, did);
 	dst5 := dedup(st5, cleaned_name.fname, cleaned_name.lname, clean_dob, clean_phones.phone_number,did);
-	tdst5 := table(dst5, {cleaned_name.fname, cleaned_name.lname, clean_dob,clean_phones.phone_number,did, cnt := count(group)}, 
+	tdst5 := table(dst5, {cleaned_name.fname, cleaned_name.lname, clean_dob,clean_phones.phone_number, did, cnt := count(group)}, 
 		cleaned_name.fname, cleaned_name.lname, clean_dob,clean_phones.phone_number, did , merge);		
 
 	with_pii_6 := pBaseMainFile
@@ -120,7 +120,7 @@ module
 
 	st6 := sort(with_pii_6, cleaned_name.fname, cleaned_name.lname, clean_dob,clean_phones.cell_phone, did);
 	dst6 := dedup(st6, cleaned_name.fname, cleaned_name.lname, clean_dob, clean_phones.cell_phone,did);
-	tdst6 := table(dst6, {cleaned_name.fname, cleaned_name.lname, clean_dob,clean_phones.cell_phone,did, cnt := count(group)}, 
+	tdst6 := table(dst6, {cleaned_name.fname, cleaned_name.lname, clean_dob,clean_phones.cell_phone, did, cnt := count(group)}, 
 		cleaned_name.fname, cleaned_name.lname, clean_dob,clean_phones.cell_phone, did , merge);				
 
 
@@ -139,7 +139,7 @@ module
 
 	st7 := sort(with_pii_7, cleaned_name.fname, cleaned_name.lname, clean_address.prim_range,clean_address.prim_name, clean_address.v_city_name, clean_address.st , did);
 	dst7 := dedup(st7, cleaned_name.fname, cleaned_name.lname, clean_address.prim_range,clean_address.prim_name, clean_address.v_city_name, clean_address.st,did);
-	tdst7 := table(dst7, {cleaned_name.fname, cleaned_name.lname, clean_address.prim_range,clean_address.prim_name, clean_address.v_city_name, clean_address.st,did, cnt := count(group)}, 
+	tdst7 := table(dst7, {cleaned_name.fname, cleaned_name.lname, clean_address.prim_range,clean_address.prim_name, clean_address.v_city_name, clean_address.st, did, cnt := count(group)}, 
 		cleaned_name.fname, cleaned_name.lname, clean_address.prim_range,clean_address.prim_name, clean_address.v_city_name, clean_address.st, did , merge);
 
 
@@ -156,8 +156,34 @@ module
 
 	st8 := sort(with_pii_8, cleaned_name.fname, cleaned_name.lname, clean_address.prim_range,clean_address.prim_name, clean_address.zip , did);
 	dst8 := dedup(st8, cleaned_name.fname, cleaned_name.lname, clean_address.prim_range,clean_address.prim_name,clean_address.zip,did);
-	tdst8 := table(dst8, {cleaned_name.fname, cleaned_name.lname, clean_address.prim_range,clean_address.prim_name,clean_address.zip,did, cnt := count(group)}, 
-		cleaned_name.fname, cleaned_name.lname, clean_address.prim_range,clean_address.prim_name,clean_address.zip, did , merge);
+	tdst8 := table(dst8, {cleaned_name.fname, cleaned_name.lname, clean_address.prim_range,clean_address.prim_name,clean_address.zip, did, cnt := count(group)}, 
+		cleaned_name.fname, cleaned_name.lname, clean_address.prim_range,clean_address.prim_name,clean_address.zip, did, merge);
+
+	with_pii_9 := pBaseMainFile(
+				_Validate.Date.fIsValid(clean_dob) and 	
+				(unsigned)clean_dob <= (unsigned)(STRING8)Std.Date.Today() and	
+				clean_dob != '' and 
+				clean_dob != '00000000' and 
+				(length(STD.Str.CleanSpaces(clean_ssn))=9 and 
+				regexfind('^[0-9]*$',STD.Str.CleanSpaces(clean_ssn)) =true ) and
+				cleaned_name.fname !='' and 
+				cleaned_name.lname !='' and 
+				clean_address.prim_range != '' and 
+				clean_address.prim_name != '' and 
+				clean_address.zip != ''	 and 
+				clean_address.v_city_name != '' and 
+				clean_address.st != ''
+
+		);		
+
+	st9 := sort(with_pii_9, cleaned_name.fname, cleaned_name.lname,clean_dob, clean_ssn, clean_address.prim_range,clean_address.prim_name, clean_address.v_city_name, clean_address.st,clean_address.zip , did);
+	dst9 := dedup(st9, cleaned_name.fname, cleaned_name.lname,clean_dob, clean_ssn, clean_address.prim_range,clean_address.prim_name,clean_address.v_city_name, clean_address.st,clean_address.zip,did);
+	tdst9 := table(dst9, {cleaned_name.fname, cleaned_name.lname, clean_dob, clean_ssn, clean_address.prim_range,clean_address.prim_name,clean_address.v_city_name, clean_address.st,clean_address.zip, did, cnt := count(group)}, 
+		cleaned_name.fname, cleaned_name.lname, clean_dob, clean_ssn, clean_address.prim_range,clean_address.prim_name,clean_address.v_city_name, clean_address.st, clean_address.zip, did, merge);
+
+
+
+	without_mbs := count(pBaseMainFile( classification_Permissible_use_access.gc_id = 0 )):persist('~fraudgov::unittests::without_mbs');		
 
 	//check that we don't lose DIDs from previous file -  use a 1% treshld for RINIDs
 
@@ -167,18 +193,22 @@ module
 	newRecords := join(dPreviousMain, dBaseMainFile, left.record_id = right.record_id, right only, local);	
 	oldRecords := join(dPreviousMain, dBaseMainFile, left.record_id = right.record_id, inner, local);	
 
-	updatedRinIDs := join(dPreviousMain, dBaseMainFile, left.record_id = right.record_id and left.did != right.did and left.did >= FirstRinID, local);	
+	updatedRinIDs := join(dPreviousMain, dBaseMainFile, left.record_id = right.record_id and left.did != right.did and left.did >= FirstRinID, local):persist('~fraudgov::unittests::rinid_changed');		
 	
 	a := COUNT(dPreviousMain);
 	b := COUNT(updatedRinIDs);
 	c := (b/a)*100;	
 
-	updatedLexids := join(dPreviousMain, dBaseMainFile, left.record_id = right.record_id and left.did != right.did and left.did > 0 and left.did < FirstRinID, local);	
+	updatedLexids := join(dPreviousMain, dBaseMainFile, left.record_id = right.record_id and left.did != right.did and left.did > 0 and left.did < FirstRinID, local):persist('~fraudgov::unittests::lexid_changed');		
 	e := COUNT(updatedLexids);
 
+	d_Previous_Build  := distribute(pPreviousMain,hash32(Customer_ID,Sub_Customer_ID,Vendor_ID,offender_key,Sub_Sub_Customer_ID,Customer_Event_ID,Sub_Customer_Event_ID,Sub_Sub_Customer_Event_ID,LN_Product_ID,LN_Sub_Product_ID,LN_Sub_Sub_Product_ID,LN_Product_Key,LN_Report_Date,LN_Report_Time,Reported_Date,Reported_Time,Event_Date,Event_End_Date,Event_Location,Event_Type_1,Event_Type_2,Event_Type_3,Household_ID,Reason_Description,Investigation_Referral_Case_ID,Investigation_Referral_Date_Opened,Investigation_Referral_Date_Closed,Customer_Fraud_Code_1,Customer_Fraud_Code_2,Type_of_Referral,Referral_Reason,Disposition,Mitigated,Mitigated_Amount,External_Referral_or_CaseNumber,Fraud_Point_Score,Customer_Person_ID,raw_title,raw_First_Name,raw_Middle_Name,raw_Last_Name,raw_Orig_Suffix,raw_Full_name,SSN,DOB,Drivers_License,Drivers_License_State,Person_Date,Name_Type,income,own_or_rent,Rawlinkid,Street_1,Street_2,City,State,Zip,GPS_coordinates,Address_Date,Address_Type,Appended_Provider_ID,lnpid,Business_Name,TIN,FEIN,NPI,Business_Type_1,Business_Type_2,Business_Date,phone_number,cell_phone,Work_phone,Contact_Type,Contact_Date,Carrier,Contact_Location,Contact,Call_records,In_service,Email_Address,Email_Address_Type,Email_Date,Host,Alias,Location,IP_Address,IP_Address_Date,Version,Class,Subnet_mask,Reserved,ISP,Device_ID,Device_Date,Unique_number,MAC_Address,Serial_Number,Device_Type,Device_identification_Provider,Transaction_ID,Transaction_Type,Amount_of_Loss,Professional_ID,Profession_Type,Corresponding_Professional_IDs,Licensed_PR_State,vin,head_of_household_indicator,relationship_indicator,county,additional_address.Street_1,additional_address.Street_2,additional_address.City,additional_address.State,additional_address.Zip,additional_address.Address_Type,Race,Ethnicity,bank_routing_number_1,bank_account_number_1,bank_routing_number_2,bank_account_number_2,reported_by,name_risk_code,ssn_risk_code,dob_risk_code,drivers_license_risk_code,physical_address_risk_code,phone_risk_code,cell_phone_risk_code,work_phone_risk_code,bank_account_1_risk_code,bank_account_2_risk_code,email_address_risk_code,ip_address_fraud_code,business_risk_code,mailing_address_risk_code,device_risk_code,identity_risk_code,tax_preparer_id,start_date,end_date,amount_paid,region_code,investigator_id,cleared_fraud,reason_cleared_code,geo_lat,geo_long, source_rec_id,Duration,TransactionStatus,Reason));
+	d_Current_Build := distribute(pBaseMainFile,hash32(Customer_ID,Sub_Customer_ID,Vendor_ID,offender_key,Sub_Sub_Customer_ID,Customer_Event_ID,Sub_Customer_Event_ID,Sub_Sub_Customer_Event_ID,LN_Product_ID,LN_Sub_Product_ID,LN_Sub_Sub_Product_ID,LN_Product_Key,LN_Report_Date,LN_Report_Time,Reported_Date,Reported_Time,Event_Date,Event_End_Date,Event_Location,Event_Type_1,Event_Type_2,Event_Type_3,Household_ID,Reason_Description,Investigation_Referral_Case_ID,Investigation_Referral_Date_Opened,Investigation_Referral_Date_Closed,Customer_Fraud_Code_1,Customer_Fraud_Code_2,Type_of_Referral,Referral_Reason,Disposition,Mitigated,Mitigated_Amount,External_Referral_or_CaseNumber,Fraud_Point_Score,Customer_Person_ID,raw_title,raw_First_Name,raw_Middle_Name,raw_Last_Name,raw_Orig_Suffix,raw_Full_name,SSN,DOB,Drivers_License,Drivers_License_State,Person_Date,Name_Type,income,own_or_rent,Rawlinkid,Street_1,Street_2,City,State,Zip,GPS_coordinates,Address_Date,Address_Type,Appended_Provider_ID,lnpid,Business_Name,TIN,FEIN,NPI,Business_Type_1,Business_Type_2,Business_Date,phone_number,cell_phone,Work_phone,Contact_Type,Contact_Date,Carrier,Contact_Location,Contact,Call_records,In_service,Email_Address,Email_Address_Type,Email_Date,Host,Alias,Location,IP_Address,IP_Address_Date,Version,Class,Subnet_mask,Reserved,ISP,Device_ID,Device_Date,Unique_number,MAC_Address,Serial_Number,Device_Type,Device_identification_Provider,Transaction_ID,Transaction_Type,Amount_of_Loss,Professional_ID,Profession_Type,Corresponding_Professional_IDs,Licensed_PR_State,vin,head_of_household_indicator,relationship_indicator,county,additional_address.Street_1,additional_address.Street_2,additional_address.City,additional_address.State,additional_address.Zip,additional_address.Address_Type,Race,Ethnicity,bank_routing_number_1,bank_account_number_1,bank_routing_number_2,bank_account_number_2,reported_by,name_risk_code,ssn_risk_code,dob_risk_code,drivers_license_risk_code,physical_address_risk_code,phone_risk_code,cell_phone_risk_code,work_phone_risk_code,bank_account_1_risk_code,bank_account_2_risk_code,email_address_risk_code,ip_address_fraud_code,business_risk_code,mailing_address_risk_code,device_risk_code,identity_risk_code,tax_preparer_id,start_date,end_date,amount_paid,region_code,investigator_id,cleared_fraud,reason_cleared_code,geo_lat,geo_long, source_rec_id,Duration,TransactionStatus,Reason));
+
+
 	missingRecords 
-			:= JOIN(	dPreviousMain, 
-						dBaseMainFile,
+			:= JOIN(	d_Previous_Build, 
+						d_Current_Build,
 						ut.CleanSpacesandUpper(left.Customer_ID)= ut.CleanSpacesandUpper(right.Customer_ID) and
 						ut.CleanSpacesandUpper(left.Sub_Customer_ID)= ut.CleanSpacesandUpper(right.Sub_Customer_ID) and
 						ut.CleanSpacesandUpper(left.Vendor_ID)= ut.CleanSpacesandUpper(right.Vendor_ID) and
@@ -337,21 +367,30 @@ module
 
 	f := COUNT(missingRecords);
 
-	missingRIDs := join(dPreviousMain, dBaseMainFile, left.record_id = right.record_id, left only, local);
+	missingRIDs := join(dPreviousMain, dBaseMainFile, left.record_id = right.record_id, left only, local):persist('~fraudgov::unittests::missing_RIDs');	
 	g:=COUNT(missingRIDs);
 
 	duplicateRIDs := table(dBaseMainFile, {record_id; cnt := count(group)}, record_id );
 	h:= COUNT(duplicateRIDs(cnt > 1));
+	RINID_N_S_D_col := tdst1(cnt > 1):persist('~fraudgov::unittests::RINID_N_S_D_col');
+	t1 := if(exists(RINID_N_S_D_col), 'Failed','Passed'); //RinId N_S_D_col
+	RINID_N_D_A_C_Z_col := tdst2(cnt > 1):persist('~fraudgov::unittests::RINID_N_D_A_C_Z_col');	
+	t2 := if(exists(RINID_N_D_A_C_Z_col), 'Failed','Passed'); //RinId N_D_A_C_Z_col
+	RINID_N_D_A_Z_col := tdst3(cnt > 1):persist('~fraudgov::unittests::RINID_N_D_A_Z_col');	
+	t3 := if(exists(RINID_N_D_A_Z_col), 'Failed','Passed'); //RinId N_D_A_Z_col
 
-	t1 := if(exists(tdst1(cnt > 1)), 'Failed','Passed'); //RinId N_S_D_col
-	t2 := if(exists(tdst2(cnt > 1)), 'Failed','Passed'); //RinId N_D_A_C_Z_col
-	t3 := if(exists(tdst3(cnt > 1)), 'Failed','Passed'); //RinId N_D_A_Z_col
-
-	t4 := if(exists(tdst4(cnt > 1)), 'Failed','Passed');
-	t5 := if(exists(tdst5(cnt > 1)), 'Failed','Passed');
-	t6 := if(exists(tdst6(cnt > 1)), 'Failed','Passed');
-	t7 := if(exists(tdst7(cnt > 1)), 'Failed','Passed');
-	t8 := if(exists(tdst8(cnt > 1)), 'Failed','Passed');
+	LEXID_N_S_col := tdst4(cnt > 1):persist('~fraudgov::unittests::LEXID_N_S_col');
+	t4 := if(exists(LEXID_N_S_col), 'Failed','Passed');
+	LEXID_N_D_P_col := tdst5(cnt > 1):persist('~fraudgov::unittests::Lexid_N_D_P_col');
+	t5 := if(exists(LEXID_N_D_P_col), 'Failed','Passed');
+	LEXID_N_D_C_col := tdst6(cnt > 1):persist('~fraudgov::unittests::Lexid_N_D_C_col');
+	t6 := if(exists(LEXID_N_D_C_col), 'Failed','Passed');
+	LEXID_N_D_A_C_Z_col := tdst7(cnt > 1):persist('~fraudgov::unittests::Lexid_N_D_A_C_Z_col');
+	t7 := if(exists(LEXID_N_D_A_C_Z_col), 'Failed','Passed');
+	LEXID_N_D_A_Z_col := tdst8(cnt > 1):persist('~fraudgov::unittests::Lexid_N_D_A_Z_col');
+	t8 := if(exists(LEXID_N_D_A_Z_col), 'Failed','Passed');
+	PII_Collapsed := tdst9(cnt > 1):persist('~fraudgov::unittests::Lexid_DID_Collapsed');
+	t9_ := if(exists(PII_Collapsed), 'Review','Passed');
 
 	// missing over 1%
 	t9  := if(c > 1, 'Failed','Passed');
@@ -359,7 +398,7 @@ module
 	t11 := if(f > 1, 'Failed','Passed');
 	t12 := if(g > 1, 'Failed','Passed');
 	t13 := if(h > 1, 'Failed','Passed');
-
+	t14 := if(without_mbs > 0, 'Failed','Passed');
 	myReport := RECORD
 		string unittest;
 		string result := '';
@@ -367,19 +406,21 @@ module
 	END;
 
 	export base_tests := dataset([
-		{'RinId N_S_D_col',t1,COUNT(tdst1(cnt > 1))},
-		{'RinId N_D_A_C_Z_col',t2,COUNT(tdst2(cnt > 1))},
-		{'RinId N_D_A_Z_col',t3,COUNT(tdst3(cnt > 1))},
-		{'Lexid N_S_col',t4,COUNT(tdst4(cnt > 1))},
-		{'Lexid N_D_P_col',t5,COUNT(tdst5(cnt > 1))},
-		{'Lexid N_D_C_col',t6,COUNT(tdst6(cnt > 1))},
-		{'Lexid N_D_A_C_Z_col',t7,COUNT(tdst7(cnt > 1))},
-		{'Lexid N_D_A_Z_col',t8,COUNT(tdst8(cnt > 1))},
-		{'RINIDs changed (Under 1% Threashold)',t9,b},
+		{'RinId N_S_D_col',t1,COUNT(RINID_N_S_D_col)},
+		{'RinId N_D_A_C_Z_col',t2,COUNT(RINID_N_D_A_C_Z_col)},
+		{'RinId N_D_A_Z_col',t3,COUNT(RINID_N_D_A_Z_col)},
+		{'Lexid N_S_col',t4,COUNT(LEXID_N_S_col)},
+		{'Lexid N_D_P_col',t5,COUNT(LEXID_N_D_P_col)},
+		{'Lexid N_D_C_col',t6,COUNT(LEXID_N_D_C_col)},
+		{'Lexid N_D_A_C_Z_col',t7,COUNT(LEXID_N_D_A_C_Z_col)},
+		{'LEXID_N_D_A_Z_col',t8,COUNT(LEXID_N_D_A_C_Z_col)},
+		{'PII_Collapsed',t9_,COUNT(PII_Collapsed)},
+		{'RINIDs changed (Under 1% Threashold)',t9,b},		
 		{'LEXIDs changed',t10,e},
 		{'Records Lost',t11, f},
 		{'RIDs Missing',t12,g},
 		{'RIDs Duplicates',t13,h},
+		{'Without MBS',t14,without_mbs},
 		{'Build Incremented',if(count(pBaseMainFile)>count(pPreviousMain),'Passed','Review'),count(pBaseMainFile)-count(pPreviousMain)},
 		{'Records Appended',if(count(newRecords)>1,'Passed','Review'),count(newRecords)},
 		{'New LEXIDs',if(count(newRecords(did > 0 and did < FirstRinID ))>1,'Passed','Review'),count(newRecords(did > 0 and did < FirstRinID ))},
@@ -425,4 +466,4 @@ module
 	);
 
 			
-END;
+END; 

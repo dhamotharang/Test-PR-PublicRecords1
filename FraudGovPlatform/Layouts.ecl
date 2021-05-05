@@ -883,6 +883,22 @@ EXPORT Layouts := MODULE
 			string200 domain;
 			string1	  dispsblemail;
 		END;
+
+		EXPORT BaseUnitTests := RECORD
+			string unittest;
+			string result;
+			string value;
+		END;
+		
+		EXPORT KeysUnitTests := RECORD
+			string unittest;
+			string rule;
+			string result;
+			unsigned8 beforec;
+			unsigned8 afterc;
+			string value;
+		END;
+
 		
 	END;
 

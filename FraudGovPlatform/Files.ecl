@@ -112,6 +112,9 @@ module
 		tools.mac_FilesBase(Filenames(pversion,pUseProd).Base.kel_EntityAttributes,Layouts.EntityAttributes, kel_EntityAttributes);
 		tools.mac_FilesBase(Filenames(pversion,pUseProd).Base.kel_GraphEdges,Layouts.GraphEdges, kel_GraphEdges);
 		tools.mac_FilesBase(Filenames(pversion,pUseProd).Base.kel_GraphVertices,Layouts.GraphVertices, kel_GraphVertices);
+
+		tools.mac_FilesBase(Filenames(pversion,pUseProd).Base.BaseUnitTests,Layouts.Base.BaseUnitTests,BaseUnitTests);
+		tools.mac_FilesBase(Filenames(pversion,pUseProd).Base.KeysUnitTests,Layouts.Base.KeysUnitTests,KeysUnitTests);
 	end;
 
 	export CustomerSettings := dataset(Filenames().CustomerSettings,Layouts.CustomerSettings,thor,opt);
