@@ -8,7 +8,7 @@ doxie_cbrs.mac_Selection_Declare()
 // in the various attributes and removing this default also.
 EXPORT all_base_records_prs(
   DATASET(doxie_cbrs.layout_references) bdids = DATASET([],doxie_cbrs.layout_references),
-  doxie.IDataAccess mod_access = MODULE(doxie.IDataAccess) END
+  doxie.IDataAccess mod_access
 ) := FUNCTION
 
 //
@@ -255,7 +255,6 @@ doxie_cbrs.layout_report_src.source_flags into_flags(srcr L, INTEGER C) := TRANS
     SKIP);
 END;
 
-//recflags1 := normalize(srcr,18,into_flags(LEFT,COUNTER));
 recflags1 := NORMALIZE(srcr,35,into_flags(LEFT,COUNTER))(Include_SourceFlags_val); // GCL - 20051026
 
 //***** SYNTAX REQUIRES THAT I CREATE A NAME FOR THE LAYOUT OF SOME (CANNOT ASSIGN TABLE OF UNNAMED...)
@@ -278,110 +277,7 @@ mac_give_name(srcr_plus_sections, srcr_named)
 mac_give_name(srcr_more_section, srcr_more_section_named)
 //mac_give_name(srcn, srcn_named)
 
-//***** THEIR LAYOUTS
-recbesr := RECORDOF(besr);
-rec_verification := RECORDOF(iesp.share.t_CompanyVerification);
-rec_phone_summary := RECORDOF(iesp.instantid.t_CompanyNameAddress);
-recupcr := RECORDOF(upcr);
-recsrcr := RECORDOF(srcr_named);
-recnmvr := RECORDOF(nmvr_named);
-recadvr := RECORDOF(advr_named);
-recphvr := RECORDOF(phvr_named);
-recidnr := RECORDOF(idnr.records);
-recbnkr := RECORDOF(bnkr_named);
-recbnkr_v2 := RECORDOF(bnkr_v2.records);
-recljur := RECORDOF(ljur.records);
-recljur_v2 := RECORDOF(ljur_v2.records);
-recprfr := RECORDOF(prfr.records);
-recprfr_v2 := RECORDOF(prfr_v2.records);
-recragr := RECORDOF(ragr.records);
-recexer := RECORDOF(exer.records);
-recconr := RECORDOF(conr.records);
-recpror := RECORDOF(pror); // using profile attribute
-recpror_v2 := RECORDOF(pror_v2.all_recs);
-recnodr := RECORDOF(nodr.records);
-recforr := RECORDOF(forr.records);
-recmvrr := RECORDOF(mvrr.records); // GCL - 20051026
-recmvrr_v2 := RECORDOF(mvrr_v2.records);
-recwctr := RECORDOF(wctr.records); // GCL - 20051026
-recairr := RECORDOF(airr.records); // GCL - 20051026
-recidor := RECORDOF(idor_named);
-recplir := RECORDOF(plir.records);
-recdcar := RECORDOF(dcar.records);
-recsalr := RECORDOF(salr.records);
-recindr := RECORDOF(indr.records);
-recsupr := liens_superior.Layout_Liens_Superior_LNI;
-recbasr := RECORDOF(basr.records);
-recdnbr := RECORDOF(dnbr);
-recebrr := RECORDOF(ebrr.records);
-recirsr := RECORDOF(irsr.records);
-recbrer := RECORDOF(brer.records);
-recsancr := RECORDOF(sancr);
-recsdivcert := iesp.diversitycertification.t_DiversityCertificationRecord;
-recsriskmetric := iesp.riskmetrics.t_RiskMetricsRecord;
-recslabor := iesp.laboraction_WHD.t_LaborActionWHDRecord;
-recsnatdis := iesp.naturaldisaster.t_NaturalDisasterRecord;
-recslnca := iesp.lncafirmographics.t_LNCARecord;
-recsequi := iesp.gateway_inviewreport.t_InviewReportResponse;
-recflag := RECORDOF(recflags1);
-recMoreCounts := RECORDOF(srcr_more_section_named);
-
-
-//***** THE COMBINED LAYOUT
-rec := RECORD, MAXLENGTH(doxie_crs.maxlength_report)
-  DATASET(recbesr) Best_Information;
-  DATASET(rec_verification) Company_Verification {xpath('CompanyVerification'), MAXCOUNT(con.max_verification)};
-  DATASET(rec_phone_summary) Phone_Summary{xpath('PhoneSummary'), MAXCOUNT(con.max_phone_summary)};
-  DATASET(recupcr) Ultimate_Parent_Information;
-  DATASET(recnmvr) Name_Variations;
-  DATASET(recadvr) Address_Variations;
-  DATASET(recphvr) Phone_Variations;
-  DATASET(recdcar) Parent_Company;
-  DATASET(recsalr) Sales;
-  DATASET(recindr) Industry_Information;
-  DATASET(recidnr) ID_Numbers;
-  DATASET(recbnkr) Bankruptcy;
-  DATASET(recbnkr_v2) Bankruptcy_v2;
-  DATASET(recljur) Liens_Judgments;
-  DATASET(recljur_v2) Liens_Judgments_v2;
-  DATASET(recprfr) Profile_Information;
-  DATASET(recprfr_v2) Profile_Information_v2;
-  DATASET(recbrer) Business_Registrations;
-  DATASET(recragr) Registered_Agents;
-  DATASET(recconr) Contacts;
-  DATASET(recexer) Executives;
-  //Only LEXIS no FARES
-  DATASET(recpror) Property;
-  DATASET(recpror_v2) Property_v2;
-  DATASET(recnodr) NoticeOfDefaults{xpath('NoticesOfDefaults/NoticeOfDefaults')};
-  DATASET(recforr) Foreclosures{xpath('Foreclosures/Foreclosure')};
-  DATASET(recmvrr) Motor_Vehicles; // GCL - 20051026
-  DATASET(recmvrr_v2) Motor_Vehicles_v2;
-  DATASET(recwctr) Watercrafts; // GCL - 20051026
-  DATASET(recairr) Aircrafts; // GCL - 20051026
-  DATASET(recidor) Internet;
-  DATASET(recplir) Professional_Licenses;
-  DATASET(recsupr) Superior_Liens;
-  DATASET(recbasr) Business_Associates;
-  DATASET(recebrr) Experian_Business_Reports;
-  DATASET(recirsr) IRS5500;
-  DATASET(recdnbr) DNB;
-  DATASET(recsancr)Business_Sanctions{xpath('BusinessSanctions/BusinessSanction')};
-  DATASET(recsdivcert) DiversityCertification{xpath('DiversityCertifications/DiversityCertification')};
-  DATASET(recsriskmetric) RiskMetrics{xpath('RiskMetrics/RiskMetric')};
-  DATASET(recslabor) LaborActionWHD{xpath('LaborActionsWHD/LaborActionWHD')};
-  DATASET(recsnatdis) NaturalDisaster{xpath('NaturalDisasters/NaturalDisaster')};
-  DATASET(recslnca) LNCAFirmographics{xpath('LNCAFirmographics/LNCAFirmographic')};
-  DATASET(recsequi) EquifaxBusinessReport{xpath('EquifaxBusinessReport')};
-  DATASET(recsrcr) Source_Counts; // TODO: why this is a dataset and not just a row?
-  DATASET(recflag) SOURCE_FLAGS;
-  DATASET(recMoreCounts) Source_Counts_more;
-END;
-
-
-//***** PROJECT THEM IN
-nada := DATASET([0], {UNSIGNED1 a});
-rec getall(nada l) := TRANSFORM
+doxie_cbrs.layout_report getall() := TRANSFORM
   SELF.Best_Information := GLOBAL(GROUP(besr));
   SELF.Company_Verification := IF(Include_BusinessRpt_Verification_val, GLOBAL(compverr));
   SELF.Phone_Summary := IF(Include_BusinessRpt_PhoneSummary_val, GLOBAL(phonesumr));
@@ -431,63 +327,7 @@ rec getall(nada l) := TRANSFORM
   SELF := [];
 END;
 
-res := PROJECT(nada, getall(LEFT));
+RETURN DATASET([getall()]);
 
-RETURN res;
-
-/*
-  Work in progress, will be deleted later...
-  doxie_cbrs.layout_report.outrec xt() := TRANSFORM
-    SELF.Best_Information := GLOBAL(GROUP(besr));
-    SELF.Company_Verification := IF(Include_BusinessRpt_Verification_val, GLOBAL(compverr));
-    SELF.Phone_Summary := IF(Include_BusinessRpt_PhoneSummary_val, GLOBAL(phonesumr));
-    SELF.Ultimate_Parent_Information := GLOBAL(upcr);
-    SELF.Name_Variations := GLOBAL(nmvr_named);
-    SELF.Address_Variations := GLOBAL(advr_named);
-    SELF.Phone_Variations := GLOBAL(phvr_named);
-    SELF.Parent_Company := GLOBAL(dcar.records);
-    // SELF.Sales := GLOBAL(salr.records);
-    SELF.Industry_Information := GLOBAL(indr.records);
-    SELF.ID_Numbers := GLOBAL(idnr.records);
-    SELF.Bankruptcy := GLOBAL(bnkr_named);
-    SELF.Bankruptcy_v2 := GLOBAL(bnkr_v2.records);
-    SELF.Liens_Judgments := GLOBAL(ljur.records);
-    SELF.Liens_Judgments_v2 := GLOBAL(ljur_v2.records);
-    SELF.Profile_Information := GLOBAL(prfr.records);
-    SELF.Profile_Information_v2 := GLOBAL(prfr_v2.records);
-    // SELF.Business_Registrations := GLOBAL(brer.records);
-    // SELF.Registered_Agents := GLOBAL(ragr.records);
-    // SELF.Contacts := GLOBAL(conr.records);
-    // SELF.Executives := GLOBAL(exer.records);
-    // SELF.Property := GLOBAL(pror);
-    // SELF.Property_v2 := GLOBAL(pror_v2.all_recs);
-    // SELF.NoticeOfDefaults := IF(Include_NoticeOfDefaults_val,GLOBAL(nodr.records));
-    // SELF.Foreclosures := IF(Include_Foreclosures_val,GLOBAL(forr.records));
-    // SELF.Motor_Vehicles := IF(NOT is_knowx,GLOBAL(mvrr.records)); // GCL - 20051026
-    // SELF.Motor_Vehicles_v2 := IF(NOT is_knowx,GLOBAL(UNGROUP(mvrr_v2.records)));
-    // SELF.Watercrafts := IF(NOT is_knowx,GLOBAL(wctr.records)); // GCL - 20051026
-    // SELF.Aircrafts := IF(NOT is_knowx,GLOBAL(airr.records)); // GCL - 20051026
-    // SELF.Internet := GLOBAL(idor_named);
-    // SELF.Professional_Licenses := GLOBAL(plir.records);
-    // SELF.Superior_Liens := DATASET([],liens_superior.Layout_Liens_Superior_LNI);
-    // SELF.Business_Associates := GLOBAL(basr.records);
-    // SELF.Experian_Business_Reports := IF(NOT is_knowx,GLOBAL(ebrr.records));
-    // SELF.IRS5500 := GLOBAL(irsr.records);
-    // SELF.DNB := GLOBAL(dnbr);
-    // SELF.Business_Sanctions := IF(Include_Sanctions_val, GLOBAL(sancr));
-    // SELF.DiversityCertification := IF(Include_DiversityCert_val,GLOBAL(divcert.records));
-    // SELF.RiskMetrics := IF(Include_RiskMetrics_val,GLOBAL(riskmet.records));
-    // SELF.LaborActionWHD := IF(Include_LaborActWHD_val,GLOBAL(laboract.records));
-    // SELF.NaturalDisaster := IF(Include_NatDisReady_val,GLOBAL(natdis.records));
-    // SELF.LNCAFirmographics := IF(Include_LNCA_val,GLOBAL(lncar.records));
-    // SELF.EquifaxBusinessReport := []; // supposed to be filled in by external caller.
-    // SELF.Source_Counts := GLOBAL(srcr_named);
-    // SELF.SOURCE_FLAGS := GLOBAL(recflags1);
-    // SELF.Source_Counts_more := GLOBAL(srcr_more_section_named);
-    SELF := [];
-  END;
-  res := DATASET([xt()]);
-  RETURN res;
-*/
 END;                           
 
