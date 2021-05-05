@@ -3430,58 +3430,58 @@ Risk_Indicators__Correlation_Risk__key_addr_dob_summary_Denorm :=
 																						self := []));
 					SELF := LEFT,
 					SELF := []));
-
-		// highriskaddrin := project(Input_Address_BusBest_Current_Previous_Emerging, transform(BIPV2_Build.key_high_risk_industries.AddrSearchLayout, 
-																													// self.prim_range := left.PrimaryRange,
-																													// self.predir := left.Predirectional,
-																													// self.prim_name := left.PrimaryName,
-																													// self.postdir := left.Postdirectional,
-																													// self.addr_suffix := left.AddrSuffix,
-																													// self.sec_range := left.SecondaryRange,
-																													// self.v_city_name := left.City,
-																													// self.st := left.State,
-																													// self.zip5 := left.ZIP5,
-																													// self.UniqueId := left.AddrHighRiskUID)); 
+		//make sure to filter out '' addresses before you call this function. blank prim_name and zip can cause issues in function
+		highriskaddrin := project(Input_Address_BusBest_Current_Previous_Emerging, transform(BIPV2_Build.key_high_risk_industries.AddrSearchLayout, 
+																													self.prim_range := left.PrimaryRange,
+																													self.predir := left.Predirectional,
+																													self.prim_name := left.PrimaryName,
+																													self.postdir := left.Postdirectional,
+																													self.addr_suffix := left.AddrSuffix,
+																													self.sec_range := left.SecondaryRange,
+																													self.v_city_name := left.City,
+																													self.st := left.State,
+																													self.zip5 := left.ZIP5,
+																													self.UniqueId := left.AddrHighRiskUID)); 
 
 		highriskphonein := project(Input_Best_Phone_nonFCRA, transform(BIPV2_Build.key_high_risk_industries.PhoneSearchLayout, 
 																													self.company_phone := left.Phone,
 																													self.UniqueId := left.UIDAppend));
 
-		// high_risk_industries_addr_search := IF(Common.DoFDCJoin_HighRiskAddress = TRUE,BIPV2_Build.key_high_risk_industries.Address_Search_Roxie(highriskaddrin));
+		high_risk_industries_addr_search := IF(Common.DoFDCJoin_HighRiskAddress = TRUE,BIPV2_Build.key_high_risk_industries.Address_Search_Roxie(highriskaddrin));
 		high_risk_industries_Phone_search := IF(Common.DoFDCJoin_HighRiskPhone = TRUE,BIPV2_Build.key_high_risk_industries.Phone_Search(highriskphonein));
 
-		// high_risk_industries_addr := join(Input_Address_BusBest_Current_Previous_Emerging, high_risk_industries_addr_search,  
-																			// left.AddrHighRiskUID = right.UniqueId,
-																		// transform(Layouts_FDC.Layout_BIPV2_Build__key_high_risk_industries_addr, 
-																									// self.UIDAppend := left.UIDAppend;
-																									// self.SIC_Code := if(right.code_type = 'SIC', right.code, ''), 
-																									// self.NAICS_Code := if(right.code_type = 'NAICS', right.code, ''), 
-																									// SELF.Archive_Date := ArchiveDate((string)right.dt_first_seen);
-																									// SELF.dt_first_seen := (integer)ArchiveDate((string)right.dt_first_seen);
-																									// SELF.SRC := PublicRecords_KEL.ECL_Functions.Constants.HighRiskIndustries;
-																									// SELF.DPMBitmap := SetDPMBitmap( Source := SELF.SRC, FCRA_Restricted := Options.isFCRA, GLBA_Restricted := NotRegulated, Pre_GLB_Restricted := NotRegulated, DPPA_Restricted := NotRegulated, DPPA_State := BlankString, KELPermissions := CFG_File),																				
-																									// self.prim_range := left.PrimaryRange,
-																									// self.predir := left.Predirectional,
-																									// self.prim_name := left.PrimaryName,
-																									// self.postdir := left.Postdirectional,
-																									// self.addr_suffix := left.AddrSuffix,
-																									// self.sec_range := left.SecondaryRange,
-																									// self.v_city_name := left.City,
-																									// self.st := left.State,
-																									// self.zip5 := left.ZIP5,																									
-																									// self := left,
-																									// self := right,
-																									// self := [])); 
+		high_risk_industries_addr := join(Input_Address_BusBest_Current_Previous_Emerging, high_risk_industries_addr_search,  
+																			left.AddrHighRiskUID = right.UniqueId,
+																		transform(Layouts_FDC.Layout_BIPV2_Build__key_high_risk_industries_addr, 
+																									self.UIDAppend := left.UIDAppend;
+																									self.SIC_Code := if(right.code_type = 'SIC', right.code, ''), 
+																									self.NAICS_Code := if(right.code_type = 'NAICS', right.code, ''), 
+																									SELF.Archive_Date := ArchiveDate((string)right.dt_first_seen);
+																									SELF.dt_first_seen := (integer)ArchiveDate((string)right.dt_first_seen);
+																									SELF.SRC := PublicRecords_KEL.ECL_Functions.Constants.HighRiskIndustries;
+																									SELF.DPMBitmap := SetDPMBitmap( Source := SELF.SRC, FCRA_Restricted := Options.isFCRA, GLBA_Restricted := NotRegulated, Pre_GLB_Restricted := NotRegulated, DPPA_Restricted := NotRegulated, DPPA_State := BlankString, KELPermissions := CFG_File),																				
+																									self.prim_range := left.PrimaryRange,
+																									self.predir := left.Predirectional,
+																									self.prim_name := left.PrimaryName,
+																									self.postdir := left.Postdirectional,
+																									self.addr_suffix := left.AddrSuffix,
+																									self.sec_range := left.SecondaryRange,
+																									self.v_city_name := left.City,
+																									self.st := left.State,
+																									self.zip5 := left.ZIP5,																									
+																									self := left,
+																									self := right,
+																									self := [])); 
 
-		// With_BIPV2_Build_HighRiskaddr := DENORMALIZE(With_UtilFile_Key_LinkIds, high_risk_industries_addr,
-					// ArchiveDate((string)right.dt_first_seen) <= LEFT.P_InpClnArchDt[1..8] and
-					// LEFT.UIDAppend = RIGHT.UIDAppend, GROUP,
-					// TRANSFORM(Layouts_FDC.Layout_FDC,
-							// SELF.Dataset_BIPV2_Build__key_high_risk_industries_addr := ROWS(RIGHT),	
-							// self := left, 
-							// self := []));
+		With_BIPV2_Build_HighRiskaddr := DENORMALIZE(With_UtilFile_Key_LinkIds, high_risk_industries_addr,
+					ArchiveDate((string)right.dt_first_seen) <= LEFT.P_InpClnArchDt[1..8] and
+					LEFT.UIDAppend = RIGHT.UIDAppend, GROUP,
+					TRANSFORM(Layouts_FDC.Layout_FDC,
+							SELF.Dataset_BIPV2_Build__key_high_risk_industries_addr := ROWS(RIGHT),	
+							self := left, 
+							self := []));
 		
-		With_BIPV2_Build_HighRiskphone := DENORMALIZE(With_UtilFile_Key_LinkIds, high_risk_industries_Phone_search,
+		With_BIPV2_Build_HighRiskphone := DENORMALIZE(With_BIPV2_Build_HighRiskaddr, high_risk_industries_Phone_search,
 					ArchiveDate((string)right.dt_first_seen) <= LEFT.P_InpClnArchDt[1..8] and
 					LEFT.UIDAppend = RIGHT.UniqueId, GROUP,
 					TRANSFORM(Layouts_FDC.Layout_FDC,
