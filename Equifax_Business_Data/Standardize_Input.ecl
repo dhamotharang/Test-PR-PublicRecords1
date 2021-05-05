@@ -346,7 +346,7 @@ EXPORT fPreProcess(DATASET(Equifax_Business_Data.Layouts.Sprayed_Input) pRawInpu
 			SELF.Record_Update_Refresh_Date := ut.CleanSpacesAndUpper(L.Record_Update_Refresh_date);
 																								
 			SELF.EFX_DATE_CREATED := ut.CleanSpacesAndUpper(L.EFX_DATE_CREATED);
-			SELF.process_date                       := STD.Date.CurrentDate(TRUE);
+			SELF.process_date                       := (unsigned8)pversion;
  		 	SELF.dt_first_seen											:= IF(_validate.date.fIsValid(date_first_seen) and _validate.date.fIsValid(date_first_seen,_validate.date.rules.DateInPast)	,(UNSIGNED4)date_first_seen, 0);
 			SELF.dt_last_seen												:= IF(_validate.date.fIsValid(date_first_seen) and _validate.date.fIsValid(date_first_seen,_validate.date.rules.DateInPast)	,(UNSIGNED4)date_first_seen, 0);
 			SELF.dt_vendor_first_reported						:= IF(_validate.date.fIsValid(pversion[1..8]), (UNSIGNED4)pversion[1..8], 0);
