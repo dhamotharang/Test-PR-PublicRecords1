@@ -19,10 +19,10 @@ export Mac_PCNSR_Monthly_Build(build_date) := macro
 %email_success% := DayBatchPCNSR.mac_Email_Local(build_date);
 %build_pcnsr_base% := DayBatchPCNSR.proc_clean_pcnsr;
 %build_pcnsr_keys% := DayBatchPCNSR.proc_build_keys(build_date);
-%accept_keys% := DayBatchPCNSR.Proc_AcceptSK_ToQA :success(%email_success%),failure(FileServices.sendemail('kgummadi@seisint.com;christopher.brodeur@lexisnexis.com','PCNSR Build Failure',failmessage));
+%accept_keys% := DayBatchPCNSR.Proc_AcceptSK_ToQA :success(%email_success%),failure(FileServices.sendemail('kgummadi@seisint.com, Christopher.Brodeur@lexisnexisrisk.com, harry.gist@lexisnexisrisk.com, Abednego.Escobal@lexisnexisrisk.com','PCNSR Build Failure',failmessage));
 //%strata_stats% := DayBatchPCNSR.Out_Base_PCNSR_Stats(build_date);
 %strata_stats% := DayBatchPCNSR.Targus_Base_PCNSR_Stats(build_date);
-%update_dops% := roxiekeybuild.updateversion('PCNSRKeys',build_date,'kgummadi@seisint.com;cbrodeur@seisint.com',,'N');
+%update_dops% := roxiekeybuild.updateversion('PCNSRKeys',build_date,'kgummadi@seisint.com, Christopher.Brodeur@lexisnexisrisk.com, harry.gist@lexisnexisrisk.com, Abednego.Escobal@lexisnexisrisk.com',,'N');
 %sample% := output(choosen(DayBatchPCNSR.File_PCNSR_keybuild,100),named('PostProcessMainSample'));
 orbit_update := Orbit3.proc_Orbit3_CreateBuild_AddItem('PCNSR',(string)build_date,'N');
 
