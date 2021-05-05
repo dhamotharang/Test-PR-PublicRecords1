@@ -344,6 +344,7 @@ EXPORT V2_Transforms := MODULE
 	END;  
   
      EXPORT ProfileBooster.V2_Layouts.Layout_PB2_Shell xfmAddHouseholdInfo(ProfileBooster.V2_Layouts.Layout_PB2_Shell le, dx_ProfileBooster.Layouts.i_lexid ri) := TRANSFORM
+        notDid2 := le.did2 != ri.did;        
         dob_val 		:= riskwise.cleandob(ri.PurchDOB);
         dob 				:= if((unsigned)le.dob<=0, dob_val, le.dob);
         SELF.dob 		:= dob;
@@ -393,7 +394,7 @@ EXPORT V2_Transforms := MODULE
         // SELF.PurchOldMsnc := ri.PurchOldMsnc;
         // SELF.PurchItemCntEv := ri.PurchItemCntEv;
         // SELF.PurchAmtAvg := (INTEGER3)ri.PurchAmtAvg;
-        SELF.AstVehAutoCntEv := ri.AstVehAutoCntEv;
+        SELF.AstVehAutoCntEv := IF(notDid2, ri.AstVehAutoCntEv, le.AstVehAutoCntEv);
         SELF.AstVehAutoCarCntEv := ri.AstVehAutoCarCntEv;
         SELF.AstVehAutoSUVCntEv := ri.AstVehAutoSUVCntEv;
         SELF.AstVehAutoTruckCntEv := ri.AstVehAutoTruckCntEv;
@@ -426,7 +427,7 @@ EXPORT V2_Transforms := MODULE
         SELF.AstVehOtherATVCntEv := ri.AstVehOtherATVCntEv;
         SELF.AstVehOtherCamperCntEv := ri.AstVehOtherCamperCntEv;
         SELF.AstVehOtherCommCntEv := ri.AstVehOtherCommCntEv;
-        SELF.AstVehOtherMtrCntEv := ri.AstVehOtherMtrCntEv;
+        SELF.AstVehOtherMtrCntEv := IF(notDid2, ri.AstVehOtherMtrCntEv, le.AstVehOtherMtrCntEv);
         SELF.AstVehOtherScooterCntEv := ri.AstVehOtherScooterCntEv;
         SELF.AstVehOtherNewTypeIndx := ri.AstVehOtherNewTypeIndx;
         SELF.AstVehOtherOrigOwnCntEv := ri.AstVehOtherOrigOwnCntEv;
@@ -435,7 +436,7 @@ EXPORT V2_Transforms := MODULE
         SELF.AstVehOtherPriceMax := ri.AstVehOtherPriceMax;
         SELF.AstVehOtherPriceMin := ri.AstVehOtherPriceMin;
         SELF.AstVehOtherNewPrice := ri.AstVehOtherNewPrice;	
-        SELF.IntSportPersonFlagEv := ri.IntSportPersonFlagEv;
+        SELF.IntSportPersonFlagEv := IF(notDid2, ri.IntSportPersonFlagEv, le.IntSportPersonFlagEv);
         SELF.IntSportPersonFlag1Y := ri.IntSportPersonFlag1Y;
         SELF.IntSportPersonFlag5Y := ri.IntSportPersonFlag5Y;
         SELF.IntSportPersonTravelerFlagEv := ri.IntSportPersonTravelerFlagEv;
@@ -455,8 +456,8 @@ EXPORT V2_Transforms := MODULE
                                                 +if(ri.AstPropAirCrftCntEv<=0,0,ri.AstPropAirCrftCntEv)
                                                 +if(ri.AstPropWtrcrftCntEv<=0,0,ri.AstPropWtrcrftCntEv);
         SELF.PPCurrOwnedCnt := PPCurrOwnedCnt;    
-        SELF.AstPropAirCrftCntEv := ri.AstPropAirCrftCntEv;
-        SELF.AstPropWtrcrftCntEv := ri.AstPropWtrcrftCntEv; 
+        SELF.AstPropAirCrftCntEv := IF(notDid2, ri.AstPropAirCrftCntEv, le.AstPropAirCrftCntEv);
+        SELF.AstPropWtrcrftCntEv := IF(notDid2, ri.AstPropWtrcrftCntEv, le.AstPropWtrcrftCntEv);
         // SELF.LifeMoveNewMsnc := ri.LifeMoveNewMsnc; Calculated in Verification
         SELF.LifeNameLastChngFlag := ri.LifeNameLastChngFlag;
         SELF.LifeNameLastChngFlag1Y := ri.LifeNameLastChngFlag1Y;
@@ -567,7 +568,6 @@ EXPORT V2_Transforms := MODULE
         SELF.prev_addr_rawaid := ri.prev_addr_rawaid;
         
         //HOUSEHOLD
-        notDid2 := le.did2 != ri.did;
         SELF.PurchNewAmt := IF(notDid2, ri.PurchNewAmt, le.PurchNewAmt);
         SELF.PurchTotEv := IF(notDid2, ri.PurchTotEv, le.PurchTotEv);
         SELF.PurchCntEv := IF(notDid2, ri.PurchCntEv, le.PurchCntEv);
@@ -575,9 +575,10 @@ EXPORT V2_Transforms := MODULE
         SELF.PurchOldMsnc := IF(notDid2, ri.PurchOldMsnc, le.PurchOldMsnc);
         SELF.PurchItemCntEv := IF(notDid2, ri.PurchItemCntEv, le.PurchItemCntEv);
         SELF.PurchAmtAvg := IF(notDid2, ri.PurchAmtAvg, le.PurchAmtAvg);
+        SELF.AstPropCurrCntEv := IF(notDid2, ri.AstPropCurrCntEv, le.AstPropCurrCntEv);
         SELF := le;
     END;
-    
+          
 /*   EXPORT ProfileBooster.V2_Layouts.Layout_PB2_Shell xfmAddCurrentAddressData(ProfileBooster.V2_Layouts.Layout_PB2_Shell le, dx_ProfileBooster.Layouts.i_address ri ) := TRANSFORM
    		fullhistorydate := risk_indicators.iid_constants.myGetDate(le.historydate);
    		// SELF.CurrAddrOwnershipIndx := ri.AddrOwnershipIndx;
@@ -749,6 +750,9 @@ EXPORT V2_Transforms := MODULE
     SELF.HHCollegeGradAttendedMmbrCnt := ri.HHCollegeGradAttendedMmbrCnt;
     SELF.HHCollegePrivateMmbrCnt := ri.HHCollegePrivateMmbrCnt;
     SELF.HHMmbrCollTierHighest := ri.HHMmbrCollTierHighest;
+    SELF.HHMmbrPropAVMTot := ri.HHMmbrPropAVMTot;
+    SELF.HHMmbrPropAVMTot1Y := ri.HHMmbrPropAVMTot1Y;
+    SELF.HHMmbrPropAVMTot5Y := ri.HHMmbrPropAVMTot5Y;
     SELF.HHPPCurrOwnedCnt := ri.HHPPCurrOwnedCnt;
     SELF.HHPPCurrOwnedAutoCnt := ri.HHPPCurrOwnedAutoCnt;
     SELF.HHPPCurrOwnedMtrcycleCnt := ri.HHPPCurrOwnedMtrcycleCnt;
@@ -816,13 +820,41 @@ EXPORT V2_Transforms := MODULE
 		self 					:= [];
 	END;
   
-    EXPORT ProfileBooster.V2_Layouts.Layout_PB2_Shell xfmPurchaseBehaviorRollup(ProfileBooster.V2_Layouts.Layout_PB2_Shell le, ProfileBooster.V2_Layouts.Layout_PB2_Shell ri) := transform
-		  SELF.HHPurchNewAmt := IF(le.dt_last_seen >= ri.dt_last_seen AND le.PurchNewAmt > 0, le.PurchNewAmt, ri.PurchNewAmt);
-		  SELF.HHPurchTotEv := le.PurchTotEv + IF(ri.PurchTotEv >= 0, ri.PurchTotEv, 0);
-		  SELF.HHPurchCntEv := le.PurchCntEv + IF(ri.PurchCntEv >= 0, ri.PurchCntEv, 0);
-          SELF.HHPurchNewMsnc := IF(le.PurchNewMsnc >= 0 AND ri.PurchNewMsnc >= 0, MIN(le.PurchNewMsnc, ri.PurchNewMsnc), MAX(le.PurchNewMsnc, ri.PurchNewMsnc, 0));
-          SELF.HHPurchOldMsnc := MAX(le.PurchOldMsnc, ri.PurchOldMsnc);
-		  SELF.HHPurchItemCntEv := le.PurchItemCntEv + IF(ri.PurchItemCntEv >= 0, ri.PurchItemCntEv, 0);
+    // EXPORT ProfileBooster.V2_Layouts.Layout_PB2_BatchOut xfmPurchaseBehaviorRollup(ProfileBooster.V2_Layouts.Layout_PB2_BatchOut le, ProfileBooster.V2_Layouts.Layout_PB2_BatchOut ri) := transform
+		  // SELF.HHPurchNewAmt := IF(le.dt_last_seen >= ri.dt_last_seen AND le.PurchNewAmt > 0, le.PurchNewAmt, ri.PurchNewAmt);
+		  // SELF.HHPurchTotEv := le.PurchTotEv + IF(ri.PurchTotEv >= 0, ri.PurchTotEv, 0);
+		  // SELF.HHPurchCntEv := le.PurchCntEv + IF(ri.PurchCntEv >= 0, ri.PurchCntEv, 0);
+          // SELF.HHPurchNewMsnc := IF(le.PurchNewMsnc >= 0 AND ri.PurchNewMsnc >= 0, MIN(le.PurchNewMsnc, ri.PurchNewMsnc), MAX(le.PurchNewMsnc, ri.PurchNewMsnc, 0));
+          // SELF.HHPurchOldMsnc := MAX(le.PurchOldMsnc, ri.PurchOldMsnc);
+		  // SELF.HHPurchItemCntEv := le.PurchItemCntEv + IF(ri.PurchItemCntEv >= 0, ri.PurchItemCntEv, 0);
+          // SELF.HHMmbrWIntSportCnt := le.IntSportPersonFlagEv + ri.IntSportPersonFlagEv;
+          // SELF.HHVehicleOwnedCnt := le.AstPropCurrCntEv + ri.AstPropCurrCntEv;
+          // SELF.HHAutoOwnedCnt := le.AstVehAutoCntEv + ri.AstVehAutoCntEv;
+          // SELF.HHMotorcycleOwnedCnt := le.AstVehOtherMtrCntEv + ri.AstVehOtherMtrCntEv;
+          // SELF.HHAircraftOwnedCnt := le.AstPropAirCrftCntEv + ri.AstPropAirCrftCntEv;
+          // SELF.HHWatercraftOwnedCnt := le.AstPropWtrcrftCntEv + ri.AstPropWtrcrftCntEv;
+          // SELF := le;
+	// END;   
+  
+  EXPORT ProfileBooster.V2_Layouts.Layout_PB2_BatchOut xfmHouseholdRollup(ProfileBooster.V2_Layouts.Layout_PB2_BatchOut le, ProfileBooster.V2_Layouts.Layout_PB2_BatchOut ri) := transform
+          SELF.attributes.version2.HHMmbrWAstPropCurrCnt					:= le.attributes.version2.HHMmbrWAstPropCurrCnt + ri.attributes.version2.HHMmbrWAstPropCurrCnt;
+          SELF.attributes.version2.HHAstPropCurrCnt							        := le.attributes.version2.HHAstPropCurrCnt + ri.attributes.version2.HHAstPropCurrCnt;
+          SELF.attributes.version2.HHMmbrPropAVMMax						    := MAX(le.attributes.version2.HHMmbrPropAVMMax, ri.attributes.version2.HHMmbrPropAVMMax);
+          SELF.attributes.version2.HHMmbrPropAVMTot						    := le.attributes.version2.HHMmbrPropAVMTot + ri.attributes.version2.HHMmbrPropAVMTot;
+          SELF.attributes.version2.HHMmbrPropAVMTot1Y						:= le.attributes.version2.HHMmbrPropAVMTot1Y + ri.attributes.version2.HHMmbrPropAVMTot1Y;
+          SELF.attributes.version2.HHMmbrPropAVMTot5Y	                    := le.attributes.version2.HHMmbrPropAVMTot5Y + ri.attributes.version2.HHMmbrPropAVMTot5Y;
+          SELF.attributes.version2.HHPurchNewAmt := IF(le.attributes.version2.PurchNewMsnc >= ri.attributes.version2.PurchNewMsnc AND le.attributes.version2.HHPurchNewAmt > 0, le.attributes.version2.HHPurchNewAmt, ri.attributes.version2.HHPurchNewAmt);
+		  SELF.attributes.version2.HHPurchTotEv := le.attributes.version2.HHPurchTotEv + IF(ri.attributes.version2.HHPurchTotEv >= 0, ri.attributes.version2.HHPurchTotEv, 0);
+		  SELF.attributes.version2.HHPurchCntEv := le.attributes.version2.HHPurchCntEv + IF(ri.attributes.version2.HHPurchCntEv >= 0, ri.attributes.version2.HHPurchCntEv, 0);
+          SELF.attributes.version2.HHPurchNewMsnc := IF(le.attributes.version2.HHPurchNewMsnc >= 0 AND ri.attributes.version2.HHPurchNewMsnc >= 0, MIN(le.attributes.version2.HHPurchNewMsnc, ri.attributes.version2.HHPurchNewMsnc), MAX(le.attributes.version2.HHPurchNewMsnc, ri.attributes.version2.HHPurchNewMsnc, 0));
+          SELF.attributes.version2.HHPurchOldMsnc := MAX(le.attributes.version2.HHPurchOldMsnc, ri.attributes.version2.HHPurchOldMsnc);
+		  SELF.attributes.version2.HHPurchItemCntEv := le.attributes.version2.HHPurchItemCntEv+ IF(ri.attributes.version2.HHPurchItemCntEv >= 0, ri.attributes.version2.HHPurchItemCntEv, 0);
+          SELF.attributes.version2.HHMmbrWIntSportCnt := le.attributes.version2.HHMmbrWIntSportCnt + ri.attributes.version2.HHMmbrWIntSportCnt;
+          SELF.attributes.version2.HHVehicleOwnedCnt := le.attributes.version2.HHVehicleOwnedCnt + ri.attributes.version2.HHVehicleOwnedCnt;
+          SELF.attributes.version2.HHAutoOwnedCnt := le.attributes.version2.HHAutoOwnedCnt + ri.attributes.version2.HHAutoOwnedCnt;
+          SELF.attributes.version2.HHMotorcycleOwnedCnt := le.attributes.version2.HHMotorcycleOwnedCnt + ri.attributes.version2.HHMotorcycleOwnedCnt;
+          SELF.attributes.version2.HHAircraftOwnedCnt := le.attributes.version2.HHAircraftOwnedCnt + ri.attributes.version2.HHAircraftOwnedCnt;
+          SELF.attributes.version2.HHWatercraftOwnedCnt := le.attributes.version2.HHWatercraftOwnedCnt + ri.attributes.version2.HHWatercraftOwnedCnt;
           SELF := le;
 	END;
   
@@ -1025,5 +1057,204 @@ EXPORT V2_Transforms := MODULE
      SELF.attributes.version2.LifeAddrEconTrajIndx := le.attributes.version2.LifeAddrEconTrajIndx;
      
      SELF := le;
+    END;
+    
+    EXPORT ProfileBooster.V2_Layouts.Layout_PB2_BatchOut xfm_addHouseholdAndRelativeAttrs(ProfileBooster.V2_Layouts.Layout_ProfileBoosterV2_WithAdditionalFields le) := TRANSFORM
+    noDid 	:= le.lexid = 0;
+    isMinor := le.DemAge = '0'; //check to see if person is a minor
+    noHHID := le.HHID = 0;
+    SELF.attributes.version2.HHMmbrWAstPropCurrCnt := MAP(noDid OR isMinor OR noHHID => -99999,
+                                                                    le.HHMmbrWAstPropCurrCnt_Count > 0 => le.HHMmbrWAstPropCurrCnt_Count, 
+                                                                    le.HHMmbrWAstPropCurrCnt_99998 > 0 => -99998,
+                                                                    le.HHMmbrWAstPropCurrCnt_99997 > 0 => -99997,
+                                                                    le.HHMmbrWAstPropCurrCnt_Count);        
+    SELF.attributes.version2.HHAstPropCurrCnt := MAP(noDid OR isMinor OR noHHID => -99999,
+                                                                    le.HHAstPropCurrCnt_Count > 0 => le.HHAstPropCurrCnt_Count, 
+                                                                    le.HHAstPropCurrCnt_99998 > 0 => -99998,
+                                                                    le.HHAstPropCurrCnt_99997 > 0 => -99997,
+                                                                    le.HHAstPropCurrCnt_Count);
+    SELF.attributes.version2.HHMmbrPropAVMMax := MAP(noDid OR isMinor OR noHHID => -99999,
+                                                                    le.HHMmbrPropAVMMax_Count > 0 => le.HHMmbrPropAVMMax_Count, 
+                                                                    le.HHMmbrPropAVMMax_99998 > 0 => -99998,
+                                                                    le.HHMmbrPropAVMMax_99997 > 0 => -99997,
+                                                                    le.HHMmbrPropAVMMax_Count);    
+    SELF.attributes.version2.HHMmbrPropAVMAvg := MAP(noDid OR isMinor OR noHHID => -99999,
+                                                                    le.HHMmbrPropAVMAvg_Count > 0 => le.HHMmbrPropAVMAvg_Count/le.HHMmbrCnt_Count, 
+                                                                    le.HHMmbrPropAVMAvg_99998 > 0 => -99998,
+                                                                    le.HHMmbrPropAVMAvg_99997 > 0 => -99997,
+                                                                    le.HHMmbrPropAVMAvg_Count/le.HHMmbrCnt_Count);                                                          
+    SELF.attributes.version2.HHMmbrPropAVMTot := MAP(noDid OR isMinor OR noHHID => -99999,
+                                                                    le.HHMmbrPropAVMTot_Count > 0 => le.HHMmbrPropAVMTot_Count, 
+                                                                    le.HHMmbrPropAVMTot_99998 > 0 => -99998,
+                                                                    le.HHMmbrPropAVMTot_99997 > 0 => -99997,
+                                                                    le.HHMmbrPropAVMTot_Count);    
+    SELF.attributes.version2.HHMmbrPropAVMTot1Y := MAP(noDid OR isMinor OR noHHID => -99999,
+                                                                    le.HHMmbrPropAVMTot1Y_Count > 0 => le.HHMmbrPropAVMTot1Y_Count, 
+                                                                    le.HHMmbrPropAVMTot1Y_99998 > 0 => -99998,
+                                                                    le.HHMmbrPropAVMTot1Y_99997 > 0 => -99997,
+                                                                    le.HHMmbrPropAVMTot1Y_Count);   
+    SELF.attributes.version2.HHMmbrPropAVMTot5Y := MAP(noDid OR isMinor OR noHHID => -99999,
+                                                                    le.HHMmbrPropAVMTot5Y_Count > 0 => le.HHMmbrPropAVMTot5Y_Count, 
+                                                                    le.HHMmbrPropAVMTot5Y_99998 > 0 => -99998,
+                                                                    le.HHMmbrPropAVMTot5Y_99997 > 0 => -99997,
+                                                                    le.HHMmbrPropAVMTot5Y_Count);    
+    SELF.attributes.version2.HHVehicleOwnedCnt := MAP(noDid OR isMinor OR noHHID => -99999,
+                                                                    le.HHVehicleOwnedCnt_Count > 0 => le.HHVehicleOwnedCnt_Count, 
+                                                                    le.HHVehicleOwnedCnt_99998 > 0 => -99998,
+                                                                    le.HHVehicleOwnedCnt_99997 > 0 => -99997,
+                                                                    le.HHVehicleOwnedCnt_Count);    
+    SELF.attributes.version2.HHAutoOwnedCnt := MAP(noDid OR isMinor OR noHHID => -99999,
+                                                                    le.HHAutoOwnedCnt_Count > 0 => le.HHAutoOwnedCnt_Count, 
+                                                                    le.HHAutoOwnedCnt_99998 > 0 => -99998,
+                                                                    le.HHAutoOwnedCnt_99997 > 0 => -99997,
+                                                                    le.HHAutoOwnedCnt_Count); 
+    SELF.attributes.version2.HHMotorcycleOwnedCnt := MAP(noDid OR isMinor OR noHHID => -99999,
+                                                                    le.HHMotorcycleOwnedCnt_Count > 0 => le.HHMotorcycleOwnedCnt_Count, 
+                                                                    le.HHMotorcycleOwnedCnt_99998 > 0 => -99998,
+                                                                    le.HHMotorcycleOwnedCnt_99997 > 0 => -99997,
+                                                                    le.HHMotorcycleOwnedCnt_Count);
+    SELF.attributes.version2.HHAircraftOwnedCnt := MAP(noDid OR isMinor OR noHHID => -99999,
+                                                                    le.HHAircraftOwnedCnt_Count > 0 => le.HHAircraftOwnedCnt_Count, 
+                                                                    le.HHAircraftOwnedCnt_99998 > 0 => -99998,
+                                                                    le.HHAircraftOwnedCnt_99997 > 0 => -99997,
+                                                                    le.HHAircraftOwnedCnt_Count);
+    SELF.attributes.version2.HHWatercraftOwnedCnt := MAP(noDid OR isMinor OR noHHID => -99999,
+                                                                    le.HHWatercraftOwnedCnt_Count > 0 => le.HHWatercraftOwnedCnt_Count, 
+                                                                    le.HHWatercraftOwnedCnt_99998 > 0 => -99998,
+                                                                    le.HHWatercraftOwnedCnt_99997 > 0 => -99997,
+                                                                    le.HHWatercraftOwnedCnt_Count);
+    SELF.attributes.version2.HHMmbrWIntSportCnt := MAP(noDid OR isMinor OR noHHID => -99999,
+                                                                    le.HHMmbrWIntSportCnt_Count > 0 => le.HHMmbrWIntSportCnt_Count, 
+                                                                    le.HHMmbrWIntSportCnt_99998 > 0 => -99998,
+                                                                    le.HHMmbrWIntSportCnt_99997 > 0 => -99997,
+                                                                    le.HHMmbrWIntSportCnt_Count);
+    SELF.attributes.version2.HHPurchNewAmt := MAP(noDid OR isMinor OR noHHID => -99999,
+                                                                    le.HHPurchNewAmt_Count > 0 => le.HHPurchNewAmt_Count, 
+                                                                    le.HHPurchNewAmt_99998 > 0 => -99998,
+                                                                    le.HHPurchNewAmt_99997 > 0 => -99997,
+                                                                    le.HHPurchNewAmt_Count);
+    SELF.attributes.version2.HHPurchTotEv := MAP(noDid OR isMinor OR noHHID => -99999,
+                                                                    le.HHPurchTotEv_Count > 0 => le.HHPurchTotEv_Count, 
+                                                                    le.HHPurchTotEv_99998 > 0 => -99998,
+                                                                    le.HHPurchTotEv_99997 > 0 => -99997,
+                                                                    le.HHPurchTotEv_Count);
+    SELF.attributes.version2.HHPurchCntEv := MAP(noDid OR isMinor OR noHHID => -99999,
+                                                                    le.HHPurchCntEv_Count > 0 => le.HHPurchCntEv_Count, 
+                                                                    le.HHPurchCntEv_99998 > 0 => -99998,
+                                                                    le.HHPurchCntEv_99997 > 0 => -99997,
+                                                                    le.HHPurchCntEv_Count);
+    SELF.attributes.version2.HHPurchNewMsnc := MAP(noDid OR isMinor OR noHHID => -99999,
+                                                                    le.HHPurchNewMsnc_Count > 0 => le.HHPurchNewMsnc_Count, 
+                                                                    le.HHPurchNewMsnc_99998 > 0 => -99998,
+                                                                    le.HHPurchNewMsnc_99997 > 0 => -99997,
+                                                                    le.HHPurchNewMsnc_Count);
+    SELF.attributes.version2.HHPurchOldMsnc := MAP(noDid OR isMinor OR noHHID => -99999,
+                                                                    le.HHPurchOldMsnc_Count > 0 => le.HHPurchOldMsnc_Count, 
+                                                                    le.HHPurchOldMsnc_99998 > 0 => -99998,
+                                                                    le.HHPurchOldMsnc_99997 > 0 => -99997,
+                                                                    le.HHPurchOldMsnc_Count);
+    SELF.attributes.version2.HHPurchItemCntEv := MAP(noDid OR isMinor OR noHHID => -99999,
+                                                                    le.HHPurchItemCntEv_Count > 0 => le.HHPurchItemCntEv_Count, 
+                                                                    le.HHPurchItemCntEv_99998 > 0 => -99998,
+                                                                    le.HHPurchItemCntEv_99997 > 0 => -99997,
+                                                                    le.HHPurchItemCntEv_Count);
+    SELF.attributes.version2.HHPurchAmtAvg := MAP(noDid OR isMinor OR noHHID => -99999,
+                                                                    le.HHPurchAmtAvg_Count > 0 => le.HHPurchAmtAvg_Count, 
+                                                                    le.HHPurchAmtAvg_99998 > 0 => -99998,
+                                                                    le.HHPurchAmtAvg_99997 > 0 => -99997,
+                                                                    le.HHPurchAmtAvg_Count);        
+    SELF.attributes.version2.HHTeenagerMmbrCnt := MAP(noDid OR isMinor OR noHHID => -99999,
+                                                                    le.HHTeenagerMmbrCnt_Count > 0 => le.HHTeenagerMmbrCnt_Count, 
+                                                                    le.HHTeenagerMmbrCnt_99998 > 0 => -99998,
+                                                                    le.HHTeenagerMmbrCnt_99997 > 0 => -99997,
+                                                                    le.HHTeenagerMmbrCnt_Count);      
+    SELF.attributes.version2.HHYoungAdultMmbrCnt := MAP(noDid OR isMinor OR noHHID => -99999,
+                                                                    le.HHYoungAdultMmbrCnt_Count > 0 => le.HHYoungAdultMmbrCnt_Count, 
+                                                                    le.HHYoungAdultMmbrCnt_99998 > 0 => -99998,
+                                                                    le.HHYoungAdultMmbrCnt_99997 > 0 => -99997,
+                                                                    le.HHYoungAdultMmbrCnt_Count);           
+    SELF.attributes.version2.HHMiddleAgeMmbrCnt := MAP(noDid OR isMinor OR noHHID => -99999,
+                                                                    le.HHMiddleAgeMmbrCnt_Count > 0 => le.HHMiddleAgeMmbrCnt_Count, 
+                                                                    le.HHMiddleAgeMmbrCnt_99998 > 0 => -99998,
+                                                                    le.HHMiddleAgeMmbrCnt_99997 > 0 => -99997,
+                                                                    le.HHMiddleAgeMmbrCnt_Count);         
+    SELF.attributes.version2.HHSeniorMmbrCnt := MAP(noDid OR isMinor OR noHHID => -99999,
+                                                                    le.HHSeniorMmbrCnt_Count > 0 => le.HHSeniorMmbrCnt_Count, 
+                                                                    le.HHSeniorMmbrCnt_99998 > 0 => -99998,
+                                                                    le.HHSeniorMmbrCnt_99997 > 0 => -99997,
+                                                                    le.HHSeniorMmbrCnt_Count);          
+    SELF.attributes.version2.HHElderlyMmbrCnt := MAP(noDid OR isMinor OR noHHID => -99999,
+                                                                    le.HHElderlyMmbrCnt_Count > 0 => le.HHElderlyMmbrCnt_Count, 
+                                                                    le.HHElderlyMmbrCnt_99998 > 0 => -99998,
+                                                                    le.HHElderlyMmbrCnt_99997 > 0 => -99997,
+                                                                    le.HHElderlyMmbrCnt_Count);      
+    SELF.attributes.version2.HHMmbrCnt := MAP(noDid OR isMinor OR noHHID => -99999,
+                                                                    le.HHMmbrCnt_Count > 0 => le.HHMmbrCnt_Count, 
+                                                                    le.HHMmbrCnt_99998 > 0 => -99998,
+                                                                    le.HHMmbrCnt_99997 > 0 => -99997,
+                                                                    le.HHMmbrCnt_Count);           
+    SELF.attributes.version2.HHMmbrAgeAvg	 := MAP(noDid OR isMinor OR noHHID => -99999,
+                                                                    le.HHMmbrAgeAvg_Count > 0 => le.HHMmbrAgeAvg_Count/le.HHMmbrCnt_Count, 
+                                                                    le.HHMmbrAgeAvg_99998 > 0 => -99998,
+                                                                    le.HHMmbrAgeAvg_99997 > 0 => -99997,
+                                                                    le.HHMmbrAgeAvg_Count/le.HHMmbrCnt_Count);          
+    SELF.attributes.version2.HHMmbrAgeMed	 := MAP(noDid OR isMinor OR noHHID => -99999,
+                                                                    le.HHMmbrAgeMed_Count > 0 => le.HHMmbrAgeMed_Count/le.HHMmbrCnt_Count, 
+                                                                    le.HHMmbrAgeMed_99998 > 0 => -99998,
+                                                                    le.HHMmbrAgeMed_99997 > 0 => -99997,
+                                                                    le.HHMmbrAgeMed_Count/le.HHMmbrCnt_Count);    
+    SELF.attributes.version2.HHComplexTotalCnt	 := MAP(noDid OR isMinor OR noHHID => -99999,
+                                                                    le.HHComplexTotalCnt_Count > 0 => le.HHMmbrAgeMed_Count, 
+                                                                    le.HHComplexTotalCnt_99998 > 0 => -99998,
+                                                                    le.HHComplexTotalCnt_99997 > 0 => -99997,
+                                                                    le.HHComplexTotalCnt_Count);       
+    SELF.attributes.version2.HHUnitsInComplexCnt	 := MAP(noDid OR isMinor OR noHHID => -99999,
+                                                                    le.HHUnitsInComplexCnt_Count > 0 => le.HHUnitsInComplexCnt_Count, 
+                                                                    le.HHUnitsInComplexCnt_99998 > 0 => -99998,
+                                                                    le.HHUnitsInComplexCnt_99997 > 0 => -99997,
+                                                                    le.HHUnitsInComplexCnt_Count);       
+    SELF.attributes.version2.HHMmbrWEduCollCnt := MAP(noDid OR isMinor OR noHHID => -99999,
+                                                                    le.HHMmbrWEduCollCnt_Count > 0 => le.HHMmbrWEduCollCnt_Count, 
+                                                                    le.HHMmbrWEduCollCnt_99998 > 0 => -99998,
+                                                                    le.HHMmbrWEduCollCnt_99997 > 0 => -99997,
+                                                                    le.HHMmbrWEduCollCnt_Count);          
+    SELF.attributes.version2.HHMmbrWEduCollEvidEvCnt := MAP(noDid OR isMinor OR noHHID => -99999,
+                                                                    le.HHMmbrWEduCollEvidEvCnt_Count > 0 => le.HHMmbrWEduCollEvidEvCnt_Count, 
+                                                                    le.HHMmbrWEduCollEvidEvCnt_99998 > 0 => -99998,
+                                                                    le.HHMmbrWEduCollEvidEvCnt_99997 > 0 => -99997,
+                                                                    le.HHMmbrWEduCollEvidEvCnt_Count);           
+    SELF.attributes.version2.HHMmbrWEduColl2YrCnt := MAP(noDid OR isMinor OR noHHID => -99999,
+                                                                    le.HHMmbrWEduColl2YrCnt_Count > 0 => le.HHMmbrWEduColl2YrCnt_Count, 
+                                                                    le.HHMmbrWEduColl2YrCnt_99998 > 0 => -99998,
+                                                                    le.HHMmbrWEduColl2YrCnt_99997 > 0 => -99997,
+                                                                    le.HHMmbrWEduColl2YrCnt_Count);            
+    SELF.attributes.version2.HHMmbrWEduColl4YrCnt := MAP(noDid OR isMinor OR noHHID => -99999,
+                                                                    le.HHMmbrWEduColl4YrCnt_Count > 0 => le.HHMmbrWEduColl4YrCnt_Count, 
+                                                                    le.HHMmbrWEduColl4YrCnt_99998 > 0 => -99998,
+                                                                    le.HHMmbrWEduColl4YrCnt_99997 > 0 => -99997,
+                                                                    le.HHMmbrWEduColl4YrCnt_Count);           
+    SELF.attributes.version2.HHMmbrWEduCollGradCnt := MAP(noDid OR isMinor OR noHHID => -99999,
+                                                                    le.HHMmbrWEduCollGradCnt_Count > 0 => le.HHMmbrWEduCollGradCnt_Count, 
+                                                                    le.HHMmbrWEduCollGradCnt_99998 > 0 => -99998,
+                                                                    le.HHMmbrWEduCollGradCnt_99997 > 0 => -99997,
+                                                                    le.HHMmbrWEduCollGradCnt_Count);       
+    SELF.attributes.version2.HHMmbrWCollPvtCnt := MAP(noDid OR isMinor OR noHHID => -99999,
+                                                                    le.HHMmbrWCollPvtCnt_Count > 0 => le.HHMmbrWCollPvtCnt_Count, 
+                                                                    le.HHMmbrWCollPvtCnt_99998 > 0 => -99998,
+                                                                    le.HHMmbrWCollPvtCnt_99997 > 0 => -99997,
+                                                                    le.HHMmbrWCollPvtCnt_Count);        
+    SELF.attributes.version2.HHMmbrCollTierHighest := MAP(noDid OR isMinor OR noHHID => -99999,
+                                                                    le.HHMmbrCollTierHighest_Count > 0 => le.HHMmbrCollTierHighest_Count, 
+                                                                    le.HHMmbrCollTierHighest_99998 > 0 => -99998,
+                                                                    le.HHMmbrCollTierHighest_99997 > 0 => -99997,
+                                                                    le.HHMmbrCollTierHighest_Count);    
+    SELF.attributes.version2.HHMmbrCollTierAvg := MAP(noDid OR isMinor OR noHHID => -99999,
+                                                                    le.HHMmbrCollTierAvg_Count > 0 => le.HHMmbrCollTierAvg_Count/le.HHMmbrCnt_Count,
+                                                                    le.HHMmbrCollTierAvg_99998 > 0 => -99998,
+                                                                    le.HHMmbrCollTierAvg_99997 > 0 => -99997,
+                                                                    le.HHMmbrCollTierAvg_Count/le.HHMmbrCnt_Count);
+    SELF.attributes.version2 := le;
+    SELF := le;
+    SELF := [];
     END;
 END;

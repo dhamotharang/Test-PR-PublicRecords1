@@ -268,9 +268,9 @@ EXPORT	Verification := RECORD
 		INTEGER3		HHAstPropCurrCnt := ProfileBooster.ProfileBoosterV2_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA_INT;
 		INTEGER4		HHMmbrPropAVMMax := ProfileBooster.ProfileBoosterV2_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA_INT;
 		INTEGER5	    HHMmbrPropAVMAvg := ProfileBooster.ProfileBoosterV2_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA_INT;
-		INTEGER5	    HHMmbrPropAVMTtl := ProfileBooster.ProfileBoosterV2_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA_INT;
-		INTEGER4		HHMemberPropAVMTtl1Y := ProfileBooster.ProfileBoosterV2_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA_INT;
-		INTEGER4		HHMemberPropAVMTtl5Y := ProfileBooster.ProfileBoosterV2_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA_INT;
+		INTEGER5	    HHMmbrPropAVMTot := ProfileBooster.ProfileBoosterV2_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA_INT;
+		INTEGER4		HHMmbrPropAVMTot1Y := ProfileBooster.ProfileBoosterV2_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA_INT;
+		INTEGER4		HHMmbrPropAVMTot5Y := ProfileBooster.ProfileBoosterV2_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA_INT;
 		INTEGER3		HHVehicleOwnedCnt := ProfileBooster.ProfileBoosterV2_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA_INT;
 		INTEGER3		HHAutoOwnedCnt := ProfileBooster.ProfileBoosterV2_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA_INT;
 		INTEGER3		HHMotorcycleOwnedCnt := ProfileBooster.ProfileBoosterV2_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA_INT;
@@ -713,6 +713,8 @@ EXPORT	Verification := RECORD
 		string30 	AcctNo;
 		unsigned6	Seq;
 		unsigned6 LexID;
+        unsigned1 rec_type; //1=Prospect, 2=Household, 3=Relative/Associate
+        unsigned6 DID2;
 		Layout_ProfileBooster 		attributes;
 	END;
 
@@ -1009,5 +1011,15 @@ EXPORT	Verification := RECORD
     dx_ProfileBooster.Layouts.Address_Extended;
     UNSIGNED8 rawaid;
 	END;
+
+EXPORT Layout_ProfileBoosterV2_WithAdditionalFields := RECORD
+string30  AcctNo;
+unsigned6	Seq;
+unsigned6	LexID;
+unsigned1 rec_type; //1=Prospect, 2=Household, 3=Relative/Associate
+unsigned6 DID2;
+ProfileBooster.Functions.buildNewLayout(Layout_ProfileBoosterV2);
+END;
+
 
 END;

@@ -1,4 +1,4 @@
-﻿IMPORT ProfileBooster, Risk_Indicators, _Control, LN_PropertyV2_Services, Doxie, Riskwise, avm_v2;
+﻿IMPORT ProfileBooster, Risk_Indicators, _Control, LN_PropertyV2_Services, Doxie, Riskwise, avm_v2, ut;
 onThor := _Control.Environment.OnThor;
 EXPORT V2_getProperty(DATASET(ProfileBooster.V2_Layouts.Layout_PB2_Shell) PB2_In,
                       DATASET(ProfileBooster.V2_Layouts.Layout_PB2_Slim) slimShell,
@@ -505,22 +505,30 @@ prop_common_distr := distribute(prop_common, did);
 	avms1Owned := dedup(sort(avm1Owned, seq, did, prim_range, prim_name, zip, -Input_Address_Information.avm_recording_date, -Input_Address_Information.avm_assessed_value_year),
 																			seq, did, prim_range, prim_name, zip);
 	
-	withAVMOwned := join(withAVM, avms1Owned,
+	withAVMOwned_pre := join(withAVM, avms1Owned,
 												left.seq = right.seq and
 												left.DID2 = right.DID,
-												transform(ProfileBooster.V2_Layouts.Layout_PB2_Shell,
+												transform({ProfileBooster.V2_Layouts.Layout_PB2_Shell, STRING DateDifference},
+                                                                    self.DateDifference := IF(left.dt_last_seen = 0, '-1', (string)ut.MonthsApart((string6)left.dt_last_seen,risk_indicators.iid_constants.myGetDate(left.historydate)[1..6]));
 																	self.AstPropCurrAVMTot 			:= if(left.rec_type = ProfileBooster.Constants.recType.Prospect, right.Input_Address_Information.avm_automated_valuation, 0);
 																	self.HHPropCurrAVMHighest 		:= if(left.rec_type in [ProfileBooster.Constants.recType.Prospect,ProfileBooster.Constants.recType.Household], right.Input_Address_Information.avm_automated_valuation, 0);
 																	self.RaAPropOwnerAVMHighest 	:= if(left.rec_type = ProfileBooster.Constants.recType.Relative, right.Input_Address_Information.avm_automated_valuation, 0);
-																	self.RaAPropOwnerAVMMed 			:= if(left.rec_type = ProfileBooster.Constants.recType.Relative, right.Input_Address_Information.avm_automated_valuation, 0);
+																	self.RaAPropOwnerAVMMed 	     := if(left.rec_type = ProfileBooster.Constants.recType.Relative, right.Input_Address_Information.avm_automated_valuation, 0);
+                                                                    self.HHMmbrPropAVMTot1Y           := if(left.rec_type in [ProfileBooster.Constants.recType.Prospect,ProfileBooster.Constants.recType.Household] AND ((INTEGER)self.DateDifference >= 0 AND (INTEGER)self.DateDifference <= 12), right.Input_Address_Information.avm_automated_valuation, 0);
+                                                                    self.HHMmbrPropAVMTot5Y           := if(left.rec_type in [ProfileBooster.Constants.recType.Prospect,ProfileBooster.Constants.recType.Household] AND ((INTEGER)self.DateDifference >= 0 AND (INTEGER)self.DateDifference <= 60), right.Input_Address_Information.avm_automated_valuation, 0);
 																	self := left), left outer, parallel);
 
+    withAVMOwned := PROJECT(withAVMOwned_pre, TRANSFORM(ProfileBooster.V2_Layouts.Layout_PB2_Shell, SELF := LEFT;));
+    
 	sortedAVMOwned :=  sort(withAVMOwned, seq, did2); 
 
 	groupAVMOwned := group(sortedAVMOwned(RaAPropOwnerAVMMed<>0), seq);	
 
 	ProfileBooster.V2_Layouts.Layout_PB2_Shell rollAVMOwned(sortedAVMOwned le, sortedAVMOwned ri) := TRANSFORM
 		self.AstPropCurrAVMTot					:= le.AstPropCurrAVMTot + ri.AstPropCurrAVMTot;
+		self.HHMmbrPropAVMTot					:= le.HHPropCurrAVMHighest + ri.HHPropCurrAVMHighest;
+		self.HHMmbrPropAVMTot1Y					:= le.HHMmbrPropAVMTot1Y + ri.HHMmbrPropAVMTot1Y;
+		self.HHMmbrPropAVMTot5Y					:= le.HHMmbrPropAVMTot5Y + ri.HHMmbrPropAVMTot5Y;
 		self.HHPropCurrAVMHighest					:= max(le.HHPropCurrAVMHighest, ri.HHPropCurrAVMHighest);
 		self.RaAPropOwnerAVMHighest				:= max(le.RaAPropOwnerAVMHighest, ri.RaAPropOwnerAVMHighest);
 		self								 							:= le;
@@ -693,5 +701,11 @@ prop_common_distr := distribute(prop_common, did);
   // OUTPUT(econTraj,,'~jfrancis::profilebooster20::V2_getProperty_econTraj' ,CSV(HEADING(single), QUOTE('"')));
   // OUTPUT(withEconTraj,,'~jfrancis::profilebooster20::V2_getProperty_withEconTraj' ,CSV(HEADING(single), QUOTE('"')));
   
+  // OUTPUT(CHOOSEN(AVMrecs, 100), NAMED('AVMrecs'));
+  // OUTPUT(CHOOSEN(withAVM, 100), NAMED('withAVM'));
+  // OUTPUT(CHOOSEN(withAVMOwned_pre, 100), NAMED('withAVMOwned_pre'));
+  // OUTPUT(CHOOSEN(withAVMOwned, 100), NAMED('withAVMOwned'));
+  // OUTPUT(CHOOSEN(rolledAVMOwned, 100), NAMED('rolledAVMOwned'));
+  // OUTPUT(CHOOSEN(finalRollup, 100), NAMED('finalRollupProperty'));
   RETURN finalRollup;
 END;

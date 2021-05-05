@@ -1,4 +1,4 @@
-IMPORT ProfileBooster, _Control, dx_ProfileBooster, STD;
+﻿IMPORT ProfileBooster, _Control, dx_ProfileBooster, STD;
 onThor := _Control.Environment.OnThor;
 
 EXPORT V2_getEmrgAddress(DATASET(ProfileBooster.V2_Layouts.Layout_PB2_Slim_emergence) slimShell) := FUNCTION
@@ -80,5 +80,11 @@ EXPORT V2_getEmrgAddress(DATASET(ProfileBooster.V2_Layouts.Layout_PB2_Slim_emerg
                             LEFT.emrgzip5<>'',
                             xfm_AddAddrType(LEFT,RIGHT), LEFT OUTER, KEEP(1));
 
+    //DEBUGGING OUTPUTS
+    // OUTPUT(CHOOSEN(withLexIDEmrg,100),named('V2GEA_withLexIDEmrg'));
+    // OUTPUT(CHOOSEN(withLexIDEmrg_sorted,100),named('V2GEA_withLexIDEmrg_sorted'));
+    // OUTPUT(CHOOSEN(rolledEmergence,100),named('V2GEA_rolledEmergence'));
+    // OUTPUT(CHOOSEN(d_addr,100),named('V2GEA_d_addr'));
+    // OUTPUT(CHOOSEN(withAddressType,100),named('V2GEA_withAddressType'));
     RETURN withAddressType;
 END;
