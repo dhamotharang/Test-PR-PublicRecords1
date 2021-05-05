@@ -1335,6 +1335,7 @@
 		export string KEYWORD_IDMA									:= '1017';
 		export string KEYWORD_TWMPB_CV							:= '1018';
 		export string KEYWORD_NS_CCMC_EO13959				:= '1019';
+		export string KEYWORD_ROONJN								:= '1020';
 		
 		//When setting the keyword export use underscores for dashes (ex: For RBI-SANC, use RBI_SANC)	
 	end;
