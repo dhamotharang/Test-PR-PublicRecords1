@@ -8,15 +8,16 @@ EXPORT DDInterface := MODULE
       EXPORT STRING drm := Risk_Indicators.iid_constants.default_DataRestriction;
       EXPORT STRING dpm := Risk_Indicators.iid_constants.default_DataPermission;
       EXPORT STRING10 industryClass := '';
-      
+      EXPORT STRING ssn_mask := '';
+
       //CCPA Regulatory fields
       EXPORT UNSIGNED1 lexIDSourceOptOut := 1;
       EXPORT STRING transactionID := '';
       EXPORT STRING batchUID := '';
       EXPORT UNSIGNED6 globalCompanyID := 0;
     END;
-    
-    
+
+
     EXPORT iDDPersonOptions := INTERFACE
       EXPORT BOOLEAN includeCitizenship := FALSE;
       EXPORT BOOLEAN includeReportData := FALSE;
@@ -24,8 +25,8 @@ EXPORT DDInterface := MODULE
       EXPORT UNSIGNED1 inputUsage := 0; //see DueDiligence.Constants.USE_INPUT_DATA_ENUM for values/explainations
       EXPORT DATASET(Risk_Indicators.Layout_Boca_Shell) bs := DATASET([], Risk_Indicators.Layout_Boca_Shell);
     END;
-    
-    
+
+
     EXPORT iDDv3PersonAttributes := INTERFACE
       EXPORT BOOLEAN includeAssetOwnProperty := FALSE;
       EXPORT BOOLEAN includeAssetOwnAircraft := FALSE;
@@ -39,7 +40,7 @@ EXPORT DDInterface := MODULE
       EXPORT BOOLEAN includeFederalLegalEvent := FALSE; //not yet implemented
       EXPORT BOOLEAN includeFederalLegalMatchLevel := FALSE;  //not yet implemented
       EXPORT BOOLEAN includeCivilLegalEvent := FALSE;
-      EXPORT BOOLEAN includeCivilLegalEventFilingAmount := FALSE;      
+      EXPORT BOOLEAN includeCivilLegalEventFilingAmount := FALSE;
       EXPORT BOOLEAN includeOffenseType := FALSE;
       EXPORT BOOLEAN includeAgeRange := FALSE;
       EXPORT BOOLEAN includeIdentityRisk := FALSE;
@@ -51,16 +52,16 @@ EXPORT DDInterface := MODULE
       EXPORT BOOLEAN includeBusAssociations := FALSE;
       EXPORT BOOLEAN includeAll := FALSE;
     END;
-    
-    
-    
+
+
+
     EXPORT iDDBusinessOptions := INTERFACE
       EXPORT BOOLEAN includeReportData := FALSE;
       EXPORT STRING10 ssnMask := '';
       EXPORT UNSIGNED1 inputUsage := 0; //see DueDiligence.Constants.USE_INPUT_DATA_ENUM for values/explainations
     END;
-    
-    
+
+
     EXPORT iDDv3BusinessAttributes := INTERFACE
       EXPORT BOOLEAN includeAssetOwnProperty := FALSE;
       EXPORT BOOLEAN includeAssetOwnAircraft := FALSE;
@@ -85,8 +86,8 @@ EXPORT DDInterface := MODULE
       EXPORT BOOLEAN includeOffenseType := FALSE;
       EXPORT BOOLEAN includeBEOProfLicense := FALSE;
       EXPORT BOOLEAN includeBEOUSResidency := FALSE;
-      EXPORT BOOLEAN includeBEOAccessToFundsProperty := FALSE; 
-      EXPORT BOOLEAN includeLinkedBusinesses := FALSE; //not yet implemented      
+      EXPORT BOOLEAN includeBEOAccessToFundsProperty := FALSE;
+      EXPORT BOOLEAN includeLinkedBusinesses := FALSE; //not yet implemented
       EXPORT BOOLEAN includeAll := FALSE;
     END;
 

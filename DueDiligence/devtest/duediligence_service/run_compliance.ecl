@@ -17,7 +17,7 @@ mod_test := MODULE (dev_regression.ISoapConfig)
   EXPORT string query_a := my_query + '.1';
   EXPORT string url_a := target_url_a;
 
-  EXPORT string query_b := my_query + '.2';
+  EXPORT string query_b := my_query + '.3';
   EXPORT string url_b := target_url_b;
 END;
 

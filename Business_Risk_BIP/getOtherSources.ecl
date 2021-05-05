@@ -141,14 +141,14 @@ EXPORT getOtherSources(DATASET(Business_Risk_BIP.Layouts.Shell) Shell,
 
 	// Get all unique SIC Codes along with dates
 	FBNSIC := TABLE(FBN,
-			{Seq,
-			 LinkID := Business_Risk_BIP.Common.GetLinkSearchLevel(link_search_level, SeleID),
-			 Source := MDR.SourceTools.src_FBNV2_BusReg,
-			 STRING6 DateFirstSeen := Business_Risk_BIP.Common.groupMinDate6(dt_first_seen, HistoryDate),
-			 STRING6 DateLastSeen := Business_Risk_BIP.Common.groupMaxDate6(dt_last_seen, HistoryDate),
-			 UNSIGNED4 RecordCount := COUNT(GROUP),
-			 STRING10 SICCode := (STD.Str.Filter((STRING)SIC_Code, '0123456789'))[1..4],
-			 BOOLEAN IsPrimary := TRUE // There is only 1 SIC field on this source, mark it as primary
+    {Seq,
+		  LinkID := Business_Risk_BIP.Common.GetLinkSearchLevel(link_search_level, SeleID),
+		  Source := MDR.SourceTools.src_FBNV2_BusReg,
+		  STRING6 DateFirstSeen := Business_Risk_BIP.Common.groupMinDate6(dt_first_seen, HistoryDate),
+		  STRING6 DateLastSeen := Business_Risk_BIP.Common.groupMaxDate6(dt_last_seen, HistoryDate),
+		  UNSIGNED4 RecordCount := COUNT(GROUP),
+     STRING10 SICCode := IF( shell_version >= Business_Risk_BIP.Constants.BusShellVersion_v31,(STD.Str.Filter((STRING)SIC_Code, '0123456789'))[1..8],(STD.Str.Filter((STRING)SIC_Code, '0123456789'))[1..4]),
+		  BOOLEAN IsPrimary := TRUE // There is only 1 SIC field on this source, mark it as primary
 			 },
 			 Seq, Business_Risk_BIP.Common.GetLinkSearchLevel(link_search_level, SeleID), ((STRING)SIC_Code)[1..4]
 			 );
@@ -819,14 +819,14 @@ EXPORT getOtherSources(DATASET(Business_Risk_BIP.Layouts.Shell) Shell,
 
 	// Get all unique NAIC Codes along with dates
 	YellowPagesSIC := TABLE(YellowPages,
-			{Seq,
-			 LinkID := Business_Risk_BIP.Common.GetLinkSearchLevel(link_search_level, SeleID),
-			 MySource := MDR.SourceTools.src_Yellow_Pages,
-			 STRING6 DateFirstSeen := Business_Risk_BIP.Common.groupMinDate6(pub_date, HistoryDate),
-			 STRING6 DateLastSeen := (STRING)'0', // This dataset doesn't contain a last seen date
-			 UNSIGNED4 RecordCount := COUNT(GROUP),
-			 STRING10 SICCode := (STD.Str.Filter((STRING)SIC_Code, '0123456789'))[1..4],
-			 BOOLEAN IsPrimary := TRUE // There is only 1 SIC field on this source, mark it as primary
+    {Seq,
+		  LinkID := Business_Risk_BIP.Common.GetLinkSearchLevel(link_search_level, SeleID),
+		  MySource := MDR.SourceTools.src_Yellow_Pages,
+		  STRING6 DateFirstSeen := Business_Risk_BIP.Common.groupMinDate6(pub_date, HistoryDate),
+		  STRING6 DateLastSeen := (STRING)'0', // This dataset doesn't contain a last seen date
+		  UNSIGNED4 RecordCount := COUNT(GROUP),
+     STRING10 SICCode := IF( shell_version >= Business_Risk_BIP.Constants.BusShellVersion_v31,(STD.Str.Filter((STRING)SIC_Code, '0123456789'))[1..8],(STD.Str.Filter((STRING)SIC_Code, '0123456789'))[1..4]),
+		  BOOLEAN IsPrimary := TRUE // There is only 1 SIC field on this source, mark it as primary
 			 },
 			 Seq, Business_Risk_BIP.Common.GetLinkSearchLevel(link_search_level, SeleID), ((STRING)SIC_Code)[1..4]
 			 );
@@ -1003,7 +1003,7 @@ EXPORT getOtherSources(DATASET(Business_Risk_BIP.Layouts.Shell) Shell,
       STRING6 DateFirstSeen := Business_Risk_BIP.Common.groupMinDate6( IF( dt_first_seen = 0, dt_vendor_first_reported, dt_first_seen ), HistoryDate),
       STRING6 DateLastSeen := Business_Risk_BIP.Common.groupMaxDate6( IF( dt_last_seen = 0, dt_vendor_last_reported, dt_last_seen ), HistoryDate),
       UNSIGNED4 RecordCount := COUNT(GROUP),
-      STRING10 SICCode := (STD.Str.Filter((STRING)sic8_1, '0123456789'))[1..4],
+      STRING10 SICCode := IF( shell_version >= Business_Risk_BIP.Constants.BusShellVersion_v31,(STD.Str.Filter((STRING)sic8_1, '0123456789'))[1..8],(STD.Str.Filter((STRING)sic8_1, '0123456789'))[1..4]),
       BOOLEAN IsPrimary := TRUE // There is only 1 SIC field on this source, mark it as primary
     },
     Seq, Business_Risk_BIP.Common.GetLinkSearchLevel(link_search_level, SeleID), ((STRING)sic8_1)[1..4]
@@ -1125,7 +1125,7 @@ EXPORT getOtherSources(DATASET(Business_Risk_BIP.Layouts.Shell) Shell,
       STRING6 DateFirstSeen := Business_Risk_BIP.Common.groupMinDate6( IF( dt_first_seen = 0, dt_vendor_first_reported, dt_first_seen ), HistoryDate),
       STRING6 DateLastSeen := Business_Risk_BIP.Common.groupMaxDate6( IF( dt_last_seen = 0, dt_vendor_last_reported, dt_last_seen ), HistoryDate),
       UNSIGNED4 RecordCount := COUNT(GROUP),
-      STRING10 SICCode := (STD.Str.Filter((STRING)sic_code, '0123456789'))[1..4],
+      STRING10 SICCode := IF( shell_version >= Business_Risk_BIP.Constants.BusShellVersion_v31,(STD.Str.Filter((STRING)sic_code, '0123456789'))[1..8],(STD.Str.Filter((STRING)sic_code, '0123456789'))[1..4]),
       BOOLEAN IsPrimary := TRUE // There is only 1 SIC field on this source, mark it as primary
     },
     Seq, Business_Risk_BIP.Common.GetLinkSearchLevel(link_search_level, SeleID), ((STRING)sic_code)[1..4]
@@ -1185,7 +1185,7 @@ EXPORT getOtherSources(DATASET(Business_Risk_BIP.Layouts.Shell) Shell,
       STRING6 DateFirstSeen := Business_Risk_BIP.Common.groupMinDate6(date_first_seen, HistoryDate),
       STRING6 DateLastSeen := Business_Risk_BIP.Common.groupMaxDate6(date_last_seen, HistoryDate),
       UNSIGNED4 RecordCount := COUNT(GROUP),
-      STRING10 SICCode := (STD.Str.Filter((STRING)sic_code, '0123456789'))[1..4],
+      STRING10 SICCode := IF( shell_version >= Business_Risk_BIP.Constants.BusShellVersion_v31,(STD.Str.Filter((STRING)sic_code, '0123456789'))[1..8],(STD.Str.Filter((STRING)sic_code, '0123456789'))[1..4]),
       BOOLEAN IsPrimary := TRUE // There is only 1 SIC field on this source, mark it as primary
     },
     Seq, Business_Risk_BIP.Common.GetLinkSearchLevel(link_search_level, SeleID), ((STRING)sic_code)[1..4]
@@ -1302,7 +1302,6 @@ EXPORT getOtherSources(DATASET(Business_Risk_BIP.Layouts.Shell) Shell,
   // OUTPUT( UtilSourcesRolled, NAMED('UtilSourcesRolled') );
   // OUTPUT( UtilAttrsStats, NAMED('UtilAttrsStats') );
   // OUTPUT( UtilAttrsStatsSources, NAMED('UtilAttrsStatsSources') );
-  // OUTPUT( withUtil, NAMED('withUtil') );
 
 	RETURN withErrorCodesYellowPages;
 END;

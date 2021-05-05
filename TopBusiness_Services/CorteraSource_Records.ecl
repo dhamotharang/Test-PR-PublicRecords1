@@ -29,10 +29,12 @@ EXPORT CorteraSource_Records (
   SHARED cortera_payload_all := JOIN(cortera_key_combinedSlim,dx_Cortera.Key_Header_Link_Id,	                                     
                                      KEYED((INTEGER4)LEFT.IDValue = RIGHT.link_id),
                                      TRANSFORM(RIGHT),
-                                     KEEP(1));
-                                     // For cases in which a idvalue has multiple linkids;
-	
-  dx_Cortera.mac_check_access(cortera_payload_all, SHARED cortera_payload, mod_access, /*append_contacts*/ TRUE);
+                                     KEEP(20)); // To handle the delta updates for the same link_id, later the records will be rolled up
+
+
+  dx_cortera.mac_incremental_rollup(cortera_payload_all, SHARED cortera_payload_rolledup_recs);
+  
+  dx_cortera.mac_append_contacts(cortera_payload_rolledup_recs, SHARED cortera_payload, mod_access, /*append_contacts*/ TRUE);
 	       
    // name not cleaned into subpart so just using name last field for whole name														 
 	 iesp.topbusinessOtherSources.t_OtherContact xform_contacts(recordof(cortera_payload) L, INTEGER C) := TRANSFORM

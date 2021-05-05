@@ -174,14 +174,14 @@ EXPORT getEBR(DATASET(Business_Risk_BIP.Layouts.Shell) Shell,
 	// Get all unique SIC Codes along with dates, for the primary and all 3 secondary SIC's
 	getEBR5600SIC(InputDataset, OutputTable, OutputTemp, OutputRolled, WithInput, WithOutput, SICField, PrimarySIC) := MACRO
 		OutputTable := TABLE(InputDataset,
-			{Seq,
-			 LinkID := Business_Risk_BIP.Common.GetLinkSearchLevel(link_search_level, SeleID),
-			 Source := MDR.SourceTools.src_EBR,
-			 STRING6 DateFirstSeen := Business_Risk_BIP.Common.groupMinDate6(date_first_seen, HistoryDate),
-			 STRING6 DateLastSeen := Business_Risk_BIP.Common.groupMaxDate6(date_last_seen, HistoryDate),
-			 UNSIGNED4 RecordCount := COUNT(GROUP),
-			 STRING10 SICCode := (STD.Str.Filter((STRING)SICField, '0123456789'))[1..4],
-			 BOOLEAN IsPrimary := PrimarySIC // SIC1 is the primary SIC in DNB DMI data, all others are not primary
+    {Seq,
+    LinkID := Business_Risk_BIP.Common.GetLinkSearchLevel(link_search_level, SeleID),
+    Source := MDR.SourceTools.src_EBR,
+    STRING6 DateFirstSeen := Business_Risk_BIP.Common.groupMinDate6(date_first_seen, HistoryDate),
+    STRING6 DateLastSeen := Business_Risk_BIP.Common.groupMaxDate6(date_last_seen, HistoryDate),
+    UNSIGNED4 RecordCount := COUNT(GROUP),
+    STRING10 SICCode := IF( Options.BusShellVersion >= Business_Risk_BIP.Constants.BusShellVersion_v31,(STD.Str.Filter((STRING)SICField, '0123456789'))[1..8],(STD.Str.Filter((STRING)SICField, '0123456789'))[1..4]),
+    BOOLEAN IsPrimary := PrimarySIC // SIC1 is the primary SIC in DNB DMI data, all others are not primary
 			 },
 			 Seq, Business_Risk_BIP.Common.GetLinkSearchLevel(link_search_level, SeleID), ((STRING)SICField)[1..4]
 			 );
@@ -406,7 +406,7 @@ EXPORT getEBR(DATASET(Business_Risk_BIP.Layouts.Shell) Shell,
       STRING6 DateFirstSeen := Business_Risk_BIP.Common.groupMinDate6(dt_first_seen, HistoryDate),
       STRING6 DateLastSeen := Business_Risk_BIP.Common.groupMaxDate6(dt_last_seen, HistoryDate),
       UNSIGNED4 RecordCount := COUNT(GROUP),
-      STRING10 SICCode := (STD.Str.Filter((STRING)primary_sic_code, '0123456789'))[1..4],
+      STRING10 SICCode := IF( Options.BusShellVersion >= Business_Risk_BIP.Constants.BusShellVersion_v31,(STD.Str.Filter((STRING)primary_sic_code, '0123456789'))[1..8],(STD.Str.Filter((STRING)primary_sic_code, '0123456789'))[1..4]),
       BOOLEAN IsPrimary := TRUE // There is only 1 SIC field on this source, mark it as primary
     },
     Seq, Business_Risk_BIP.Common.GetLinkSearchLevel(link_search_level, SeleID), ((STRING)primary_sic_code)[1..4]

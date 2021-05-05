@@ -6,10 +6,9 @@
 			LiensV2.Key_LinkIds.kFetch2
 */
 EXPORT getLienJundgementEviction(DATASET(DueDiligence.v3Layouts.Internal.BusinessTemp) inData,
-                                 DueDiligence.DDInterface.iDDRegulatoryCompliance regulatoryAccess,
-                                 STRING10 ssnMask) := FUNCTION
+                                 DueDiligence.DDInterface.iDDRegulatoryCompliance regulatoryAccess) := FUNCTION
 
-    
+
     options := DueDiligence.v3Common.DDBusiness.GetBusinessShellOptions(regulatoryAccess);
 
 
@@ -18,12 +17,12 @@ EXPORT getLienJundgementEviction(DATASET(DueDiligence.v3Layouts.Internal.Busines
                                                     0, /*ScoreThreshold --> 0 = Give me everything*/
                                                     Business_Risk_BIP.Constants.Limit_Default,
                                                     options.KeepLargeBusinesses);
-                                                    
-                                                    
+
+
     //add our sequence number to the Raw  records found for this Business
     businessLiensWithSeq := DueDiligence.v3Common.DDBusiness.AppendSeq(businessLiensRaw, inData, TRUE);
-  
-  
+
+
     //convert business data
     slimData := PROJECT(businessLiensWithSeq, TRANSFORM(DueDiligence.v3Layouts.InternalShared.LiensJudgementsEvictions,
                                                         SELF.ultID := LEFT.ultID;
@@ -33,19 +32,19 @@ EXPORT getLienJundgementEviction(DATASET(DueDiligence.v3Layouts.Internal.Busines
                                                         SELF.rmsid := LEFT.rmsid;
                                                         SELF.tmsid := LEFT.tmsid;
                                                         SELF := [];));
-                                                          
 
-    businessDetails := DueDiligence.v3SharedData.getLiensJudgementsEvictions(slimData, regulatoryAccess, ssnMask);
-    
-    
-                
-                          
-    
+
+    businessDetails := DueDiligence.v3SharedData.getLiensJudgementsEvictions(slimData, regulatoryAccess);
+
+
+
+
+
     // OUTPUT(businessLiensRaw, NAMED('businessLiensRaw'));
     // OUTPUT(businessLiensWithSeq, NAMED('businessLiensWithSeq'));
     // OUTPUT(slimData, NAMED('slimData'));
     // OUTPUT(businessDetails, NAMED('businessDetails'));
-    
-    
+
+
     RETURN businessDetails;
 END;

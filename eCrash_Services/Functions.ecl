@@ -1,4 +1,4 @@
-﻿import iesp, ut, FLAccidents_Ecrash, doxie, Std, eCrash_Services;
+﻿import iesp, ut, dx_eCrash, doxie, Std, eCrash_Services, dx_eCrash;
 
 export Functions := MODULE
 
@@ -90,15 +90,14 @@ export Functions := MODULE
 				 // does not fall between the source_start_date and the source_termination date
 				 // note: source_termination_date = 0 means not terminated
 	 			TODAYS_DATE := Std.Date.Today();
-     agency_key := FLAccidents_Ecrash.key_EcrashV2_agency;
-     recs_filtered := JOIN(recs, agency_key,
-	                     KEYED(LEFT.jurisdiction_state = RIGHT.Agency_State_Abbr) AND
-																						      LEFT.jurisdiction_nbr = RIGHT.MBSI_Agency_ID AND
-																									   LEFT.contrib_source = RIGHT.source_id AND
-																										  (UNSIGNED)RIGHT.source_start_date <= TODAYS_DATE AND 
-																									   ((UNSIGNED)RIGHT.source_termination_date = 0 OR 
-																										   (UNSIGNED) RIGHT.source_termination_date > TODAYS_DATE),
-																										  TRANSFORM(LEFT), LIMIT(10000, SKIP), KEEP (1));
+     agencySource_key := dx_eCrash.Key_AgencySource;
+     recs_filtered := JOIN(recs, agencySource_key,
+	                    									 KEYED(LEFT.jurisdiction_nbr = RIGHT.MBSI_Agency_ID AND 
+                                               LEFT.Contrib_Source = RIGHT.contrib_source) AND
+																							 (UNSIGNED)RIGHT.source_start_date <= TODAYS_DATE AND 
+																							 ((UNSIGNED)RIGHT.source_termination_date = 0 OR 
+																							  (UNSIGNED) RIGHT.source_termination_date > TODAYS_DATE),
+																							  TRANSFORM(LEFT), LIMIT(10000, SKIP), KEEP (1));
 					RETURN recs_filtered;
 		ENDMACRO;
 
@@ -304,47 +303,9 @@ export Functions := MODULE
 		return ReportsAllDeduped;
 	END;
 
-		
-	EXPORT GetSuperReportIdFromDeltabase(STRING SqlQuery, eCrash_Services.IParam.searchrecords InMod) := FUNCTION
-		Parties := eCrash_Services.RecordsDeltaBase(InMod).DeltaService.LookupIncidentPersons(SqlQuery);
-		
-		RETURN MIN(Parties, report_id);
-	END;
-	
-	EXPORT GetSuperReportId(eCrash_Services.Layouts.recs_with_penalty ReportRecord, eCrash_Services.IParam.searchrecords InMod) := FUNCTION
-			Payload := FLAccidents_Ecrash.key_EcrashV2_Unrestricted_accnbrv1(
-				KEYED(
-					l_accnbr = ReportRecord.l_accnbr AND
-					jurisdiction_state = ReportRecord.jurisdiction_state AND
-					jurisdiction = ReportRecord.jurisdiction 
-				) AND
-				WILD(report_code) AND
-				accident_date = ReportRecord.accident_date AND
-				orig_accnbr = ReportRecord.orig_accnbr AND
-				report_type_id = ReportRecord.report_type_id
-			);
-			
-			ReportRecordForSql := PROJECT(
-				ReportRecord, 
-				TRANSFORM(
-					eCrash_Services.Layouts.eCrashRecordStructure,
-					SELF := LEFT;
-				)
-			);
-
-			DeltaBaseSqlString := RecordsDeltaBase(InMod).deltaSQL.getImageRetrievalSql(ReportRecordForSql);
-			SuperReportId := IF(
-				EXISTS(Payload), 
-				Payload[1].super_report_id, 
-				GetSuperReportIdFromDeltabase(DeltaBaseSqlString, InMod)
-			);		
-				
-			RETURN SuperReportId;
-	END;
-
 	EXPORT GetReportPricingData(eCrash_Services.Layouts.recs_with_penalty ReportRecord, eCrash_Services.IParam.searchrecords InMod) := FUNCTION
 			Payload := LIMIT(
-				FLAccidents_Ecrash.key_EcrashV2_Unrestricted_accnbrv1(
+				dx_eCrash.Key_UnrestrictedAccNbrV1(
 					KEYED(
 						l_accnbr = ReportRecord.l_accnbr AND
 						jurisdiction_state = ReportRecord.jurisdiction_state AND
@@ -369,7 +330,10 @@ export Functions := MODULE
 			
 			DeltaBaseSqlString := eCrash_Services.RecordsDeltaBase(InMod).deltaSQL.getImageRetrievalSql(ReportRecordForSql);
 			Parties := eCrash_Services.RecordsDeltaBase(InMod).DeltaService.LookupIncidentPersons(DeltaBaseSqlString);
-			ReportOwnerDriverDeduped := OwnerDriverDedup(Parties);
+			ReportOwnerDriverDeduped0 := OwnerDriverDedup(Parties);
+
+			ReportOwnerDriverDeduped := filterOutTerminatedAgencyReports(ReportOwnerDriverDeduped0);
+
 			PayloadRecs := project(Payload,TRANSFORM(eCrash_Services.Layouts.eCrashRecordStructure, SELF:=LEFT, SELF := []));
 			
 			ReportsPageCountRaw := ReportOwnerDriverDeduped + PayloadRecs;
@@ -386,7 +350,9 @@ export Functions := MODULE
 														left.report_id = right.report_id,
 														transform(right),keep(1));
 														
-			deltabaseRecs := project(Parties,TRANSFORM(eCrash_Services.Layouts.eCrashRecordStructure, SELF.super_report_id := left.report_id, SELF:=LEFT));
+			deltabaseRecs0 := project(Parties,TRANSFORM(eCrash_Services.Layouts.eCrashRecordStructure, SELF.super_report_id := left.report_id, SELF:=LEFT));
+
+			deltabaseRecs := filterOutTerminatedAgencyReports(deltabaseRecs0);
 			
 			superReportRecsRaw :=PayloadRecs + deltabaseRecs; 
 			superReportRecsWithDeleted := PROJECT(
@@ -404,7 +370,7 @@ export Functions := MODULE
 			
 			supplementalRecsPageCount := TOPN(
 				CHOOSEN(
-					FLAccidents_Ecrash.Key_eCrashv2_Supplemental(super_report_id=superReportRecsFiltered[1].super_report_id),
+					dx_eCrash.Key_Supplemental(super_report_id=superReportRecsFiltered[1].super_report_id),
 					eCrash_Services.constants.MAX_REPORT_NUMBER
 				),	
 				1,
@@ -701,7 +667,7 @@ export Functions := MODULE
 				
   	EXPORT eCrash_Services.Layouts.GetSupplementalsResult getSupplementalsDeltabase(
 			STRING RequestReportId,
-			DATASET(RECORDOF(FLAccidents_Ecrash.Key_eCrashv2_Supplemental)) ReportHashKeysFromKey,
+			DATASET(RECORDOF(dx_eCrash.Key_Supplemental)) ReportHashKeysFromKey,
 			eCrash_Services.IParam.searchrecords InModuleDeltaBase
 		) := FUNCTION
 				
@@ -721,7 +687,7 @@ export Functions := MODULE
 	
 		ReportPayloadRow := JOIN(
 			LastReportHashKeysFromKey,
-			FLAccidents_Ecrash.key_EcrashV2_Unrestricted_accnbrv1,
+			dx_eCrash.Key_UnrestrictedAccNbrV1,
 			KEYED(
 				LEFT.accident_nbr = RIGHT.l_accnbr AND
 				LEFT.report_code = RIGHT.report_code AND 
@@ -741,7 +707,7 @@ export Functions := MODULE
 		DeltaBaseService := eCrash_Services.DeltaBaseSoapCall(InModuleDeltaBase);
 		DeltaBaseSql := eCrash_Services.RawDeltaBaseSQL(InModuleDeltaBase);				
 		
-		DeltaBaseDateAddedRaw := FLAccidents_Ecrash.Key_eCrashV2_DeltaDate(delta_text = 'DELTADATE');
+		DeltaBaseDateAddedRaw := dx_eCrash.Key_DeltaDate(delta_text = 'DELTADATE');
 		DeltaBaseDateAdded := ut.date_math(DeltaBaseDateAddedRaw[1].date_added[1..8], -1);
 		DeltaBaseDateAddedSql := DeltaBaseSql.dateFormatted(DeltaBaseDateAdded);
 		DeltabaseReportSelectSql := DeltaBaseSql.GetImageRetrievalSqlByReportId(TRIM(RequestReportId), DeltaBaseDateAddedSql);
@@ -762,7 +728,7 @@ export Functions := MODULE
 		//don't use JOIN here because it will return multiplication of rows and we don't need that. PayloadRowByDeltabase has to contain as many rows as many parties report has.
 		//all the records in the ReportDeltabaseRow have the same fields l_accnbr, report_code, etc (fiels we filter by) and that's why we use the first row from it.
 		PayloadRowByDeltabaseRaw := LIMIT(
-			FLAccidents_Ecrash.key_EcrashV2_Unrestricted_accnbrv1(
+			dx_eCrash.Key_UnrestrictedAccNbrV1(
 				KEYED(
 					l_accnbr = ReportDeltabaseRow[1].l_accnbr AND
 					//report_code IN ReportCodeDeltabase AND    //WE NEED to comment this out because if for example we found
@@ -786,7 +752,7 @@ export Functions := MODULE
 			IF(
 				LENGTH(TRIM(PayloadRowByDeltabase[1].super_report_id)) > 0,
 				LIMIT(
-					FLAccidents_Ecrash.Key_eCrashv2_Supplemental(
+					dx_eCrash.Key_Supplemental(
 						super_report_id = PayloadRowByDeltabase[1].super_report_id
 					),
 					eCrash_Services.constants.MAX_REPORT_NUMBER,
@@ -808,7 +774,10 @@ export Functions := MODULE
 			DATASET([], eCrash_Services.Layouts.eCrashRecordStructure)
 		);
 
-		ReportDeltabaseDriverOwnerDeduped := OwnerDriverDedup(ReportDeltabase);
+		ReportDeltabaseDriverOwnerDeduped0 := OwnerDriverDedup(ReportDeltabase);
+
+		ReportDeltabaseDriverOwnerDeduped := filterOutTerminatedAgencyReports(ReportDeltabaseDriverOwnerDeduped0);
+
 		ReportsAllRaw := PayloadRowByDeltabase + SuperReportRow + ReportDeltabaseDriverOwnerDeduped;
 				
 		IsEATFExist := EXISTS(ReportsAllRaw(report_code IN ['EA', 'TF'] AND is_deleted = 0));
@@ -883,7 +852,7 @@ export Functions := MODULE
 	//Returns the same result type as getSupplementalsDeltabase() except return datasets don't contain reports from deltabase.
 	//Any records generated by this function should always be marked as "releasable", so that they're always returned.
   EXPORT eCrash_Services.Layouts.GetSupplementalsResult getSupplementalsBypassDeltabase(
-			DATASET(RECORDOF(FLAccidents_Ecrash.Key_eCrashv2_Supplemental)) ReportHashKeysFromKey
+			DATASET(RECORDOF(dx_eCrash.Key_Supplemental)) ReportHashKeysFromKey
 		) := FUNCTION			
 
 		LastReport := TOPN(ReportHashKeysFromKey, 1, -(UNSIGNED)report_id);

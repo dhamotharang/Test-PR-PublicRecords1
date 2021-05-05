@@ -1,19 +1,18 @@
-﻿IMPORT BIPV2, Business_Risk_BIP, DueDiligence, Doxie;
+﻿IMPORT Business_Risk_BIP, DueDiligence;
 
 
 EXPORT getBusExec(DATASET(DueDiligence.Layouts.Busn_Internal) indata,
-                  Business_Risk_BIP.LIB_Business_Shell_LIBIN options,
-                  doxie.IDataAccess mod_access = MODULE (doxie.IDataAccess) END) := FUNCTION
+                  Business_Risk_BIP.LIB_Business_Shell_LIBIN options) := FUNCTION
 
 
 
-		//calculate the residency for each BEO
-    getExecResidency := DueDiligence.getBusExecResidency(indata, options, mod_access);	
+  //calculate the residency for each BEO
+  getExecResidency := DueDiligence.getBusExecResidency(indata, options);
 
-	
-  
-	// OUTPUT(getExecResidency, NAMED('getExecResidency'));
-	
-	
-	RETURN getExecResidency;
+
+
+  // OUTPUT(getExecResidency, NAMED('getExecResidency'));
+
+
+  RETURN getExecResidency;
 END;
