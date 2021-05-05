@@ -3,7 +3,7 @@ doxie_cbrs.mac_Selection_Declare()
 
 EXPORT proflic_records_dayton(DATASET(doxie_cbrs.layout_references) bdids) := FUNCTION
 
-  outrec := doxie_cbrs.layouts.proflic_record;
+  outrec := doxie_cbrs.layout_proflic.out_rec;
   mod_access := doxie.compliance.GetGlobalDataAccessModuleTranslated(AutoStandardI.GlobalModule());
 
   //GET ADDRESSES AND COMPANY NAME TUPLES FOR THE BDID

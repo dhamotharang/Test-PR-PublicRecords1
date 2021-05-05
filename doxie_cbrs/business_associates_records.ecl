@@ -48,12 +48,8 @@ dedup_relatives_mixed := DEDUP(relatives_mixed,bdid,ALL);
 
 gid_key := Business_Header.Key_BH_SuperGroup_BDID;
 
-gid_rel_rec := RECORD
-  UNSIGNED6 group_id;
-  dedup_relatives_mixed;
-END;
-
-TYPEOF(gid_rel_rec) add_gid(dedup_relatives_mixed L,gid_key R) := TRANSFORM
+out_rec := doxie_cbrs.layout_business_associates.out_rec;
+out_rec add_gid(dedup_relatives_mixed L,gid_key R) := TRANSFORM
   SELF := R;
   SELF := L;
 END;
@@ -65,11 +61,10 @@ rel_gid := JOIN(dedup_relatives_mixed,gid_key,
         
 dedup_rel_gid := DEDUP(rel_gid,group_id,ALL);
 
-
 bhkb := Business_Header.Key_BH_Best;
 
 // Get the best records for all relatives
-TYPEOF(dedup_rel_gid) SelectBest(dedup_rel_gid l, bhkb r) := TRANSFORM
+out_rec SelectBest(dedup_rel_gid l, bhkb r) := TRANSFORM
   SELF.zip := IF (r.zip > 0, INTFORMAT(r.zip,5,1), '');
   SELF.zip4 := IF(r.zip4 > 0, INTFORMAT(r.zip4,4,1), '');
   SELF.phone := IF(r.phone > 0, (STRING)r.phone, '');
