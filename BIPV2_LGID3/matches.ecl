@@ -82,8 +82,8 @@ SHARED match_candidates(ih).layout_matches match_join(match_candidates(ih).layou
   iComp := (company_inc_state_score + Lgid3IfHrchy_score + IF(duns_number_concept_score>0,MAX(duns_number_concept_score,active_duns_number_score + duns_number_score),active_duns_number_score + duns_number_score) + sbfe_id_score + company_name_score + company_fein_score + company_charter_number_score + cnp_number_score + cnp_btype_score) / 100 + outside;
   SELF.Conf := map( iComp>=LowerMatchThreshold OR iComp-SELF.Conf_Prop >= LowerMatchThreshold OR (le.LGID3 = ri.LGID3 AND (iComp >= IntraMatchThreshold OR iComp-SELF.Conf_Prop >= IntraMatchThreshold))
     => iComp
-    ,company_fein_score > 0
-    or company_charter_number_score > 0 => 40
+    // ,company_fein_score > 0
+    // or company_charter_number_score > 0 => 40
   ,SKIP ); // Remove failing records asap
 END;
 //Allow rule numbers to be converted to readable text.

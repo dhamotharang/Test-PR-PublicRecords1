@@ -17,7 +17,7 @@ functionmacro
   f_out (string istr)	:= BIPV2_Files.files_lgid3.FILE_SALT_OP             + '::' + pversion + '::it' + istr ;
 
   possibleMatches := output(BIPV2_LGID3.matches(InFile).PossibleMatches,,f_hist(piteration),overwrite,compressed);
-  saltMod         := BIPV2_LGID3.Proc_Iterate(piteration, InFile, f_out(''));
+  saltMod         := BIPV2_LGID3.Proc_Iterate(pversion,piteration, InFile, f_out(''));
   linking         := parallel(saltmod.DoAllAgain, possibleMatches);
 
 	/* ---------------------- SALT History ------------------------------- */

@@ -17,7 +17,7 @@ functionmacro
   overlinking_info := BIPV2_Tools.mac_Compile_Overlinking_Info(pID,pDataset,pBOW_field,pBOW_Index,pBOW_Function,pBOW_Mode,pBOW_Score_Mode,pName_Force);
 
   ds_sample := pDataset;
-  ds_overlinking := dataset('~base::BIPV2_Tools::mac_Compile_Overlinking_Info::' + pversion  ,recordof(overlinking_info),flat);
+  ds_overlinking := dataset('~base::BIPV2_Tools::mac_Compile_Overlinking_Info::'+ trim(#TEXT(pID)) + '::' + pversion  ,recordof(overlinking_info),flat);
 
   topn_cnt_salt_mismatches            := topn(ds_overlinking,100,-cnt_salt_mismatches                  );
   topn_cnt_substring_mismatch_lt3     := topn(ds_overlinking,100,-cnt_substring_mismatch_lt3           );
@@ -76,11 +76,11 @@ functionmacro
   + topn_count_addresss              
   + topn_count_company_phones        
   ;
-  ds_all_sample_proxids := table(ds_all_topns     ,{proxid} ,proxid);
+  ds_all_sample_proxids := table(ds_all_topns     ,{pID} ,pID);
 
-  ds_sample_filtered      := ds_sample(proxid in set(ds_all_sample_proxids,proxid)) : persist('~persist::lbentley::BH.221::ds_sample_filtered');
-  ds_sample_filtered_agg  := BIPV2_Tools.AggregateProxidElements(ds_sample_filtered   );
-  ds_sample_filtered_agg_counts := join(ds_sample_filtered_agg  ,dedup(sort(ds_all_topns,proxid),proxid) ,left.proxid = right.proxid ,transform({recordof(ds_sample_filtered_agg) or recordof(ds_all_topns) - sources},self := left,self := right),hash);
+  ds_sample_filtered      := ds_sample(pID in set(ds_all_sample_proxids,pID)) : persist('~persist::BIPV2_Tools::Output_Overlinking_Samples::ds_sample_filtered');
+  ds_sample_filtered_agg  := BIPV2_Tools.AggregateProxidElements(ds_sample_filtered ,pID   );
+  ds_sample_filtered_agg_counts := join(ds_sample_filtered_agg  ,dedup(sort(ds_all_topns,pID),pID) ,left.pID = right.pID ,transform({recordof(ds_sample_filtered_agg) or recordof(ds_all_topns) - sources},self := left,self := right),hash);
 
   topn_cnt_salt_mismatches_agg            := topn(ds_sample_filtered_agg_counts,100,-cnt_salt_mismatches                  );
   topn_cnt_substring_mismatch_lt3_agg     := topn(ds_sample_filtered_agg_counts,100,-cnt_substring_mismatch_lt3           );
@@ -122,7 +122,7 @@ functionmacro
     
   */
   return sequential(
-     output(overlinking_info ,,'~base::BIPV2_Tools::mac_Compile_Overlinking_Info::' + pversion,__compressed__,overwrite)
+     output(overlinking_info ,,'~base::BIPV2_Tools::mac_Compile_Overlinking_Info::'+ trim(#TEXT(pID)) + '::' + pversion,__compressed__,overwrite)
     ,parallel(
        output('-------------------------------------------------------------'   ,named('___________________________'     ))
       ,output('Most Likely Overlinked Clusters(Aggregated) by Counts Of....'    ,named('___'))
@@ -156,7 +156,7 @@ functionmacro
       ,output(topn(ds_overlinking,500,-count_all                            )   ,named('All_Fields_'                    ),all)
       // ,output(topn(ds_overlinking,500,-cnt_dotids                           )   ,named('Dotids_'                        ),all)//not sure why getting error with this
       #IF(#TEXT(pID) not in ['proxid','dotid']) 
-      ,output(topn(ds_overlinking,500,-cnt_proxids                          )   ,named('Proxids_'                       ),all)
+      // ,output(topn(ds_overlinking,500,-cnt_proxids                          )   ,named('Proxids_'                       ),all)
       #END  
       ,output(topn(ds_overlinking,500,-count_keys                           )   ,named('All_God_Keys_'                  ),all)
       ,output(topn(ds_overlinking,500,-count_cnp_name_raws                  )   ,named('Cnp_Names_'                     ),all)
