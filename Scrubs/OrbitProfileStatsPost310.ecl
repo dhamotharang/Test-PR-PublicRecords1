@@ -1,8 +1,8 @@
-﻿import Salt311, Orbit4SOA, ut,_control,std;
+﻿import Salt311, Orbit3SOA, ut,_control,std;
 EXPORT OrbitProfileStatsPost310 (string pProfileName = '', string pProfileType = 'ScrubsAlerts', dataset(Salt311.ScrubsOrbitLayout)ScrubsStats = dataset([], Salt311.ScrubsOrbitLayout), string versionDate = '', string FileType = '', string CustomTag = '', string maxThreshold = '10' , string minThreshold = '-10'):= module
 	ut.CleanFields(ScrubsStats,ScrubsStatsClean);
 Shared CleanStats:=ScrubsStatsClean;	
-EXPORT GetProfile:= Orbit4SOA.Orbit3GetProfileRules(pProfileType, pProfileName);
+EXPORT GetProfile:= Orbit3SOA.Orbit3GetProfileRules(pProfileType, pProfileName);
 				DefaultPass:=GetProfile(Name='Default')[1].PassPercentage;
 				DefaultConversion	:=	project(GetProfile,Transform(Scrubs.Layouts.OrbitLayoutStep1,
 																			self.passpercentage	:=	if(STD.Str.find(left.name,':POP',1)=0 and STD.Str.find(left.name,':SUMMARY',1)=0 and left.passpercentage = '',DefaultPass,left.passpercentage);
