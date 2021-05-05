@@ -299,10 +299,20 @@ functionmacro
     ds_sbfe_cnt_cnp_names := table(ds_sbfe_slim ,{pID,sbfe_id ,unsigned cnt := count(group)}  ,pID,sbfe_id ,merge);
     ds_sbfe_cnt_cnp_names_max := table(ds_sbfe_cnt_cnp_names ,{pID,unsigned cnt := max(group,cnt)}  ,pID ,merge);
    
-    // -- stats on max cnp_names per fein
+    // -- stats on max cnp_names per fein for sbfe
     ds_sbfe_fein_slim := table(pDataset(mdr.sourcetools.SourceIsBusiness_Credit(source),(unsigned)company_fein != 0),{pID,company_fein,cnp_name}  ,pID,company_fein,cnp_name ,merge);
     ds_sbfe_fein_cnt_cnp_names := table(ds_sbfe_fein_slim ,{pID,company_fein ,unsigned cnt := count(group)}  ,pID,company_fein ,merge);
     ds_sbfe_fein_cnt_cnp_names_max := table(ds_sbfe_fein_cnt_cnp_names ,{pID,unsigned cnt := max(group,cnt)}  ,pID ,merge);
+
+    // -- stats on max cnp_names per fein overall
+    ds_fein_slim := table(pDataset((unsigned)company_fein != 0),{pID,company_fein,cnp_name}  ,pID,company_fein,cnp_name ,merge);
+    ds_fein_cnt_cnp_names := table(ds_fein_slim ,{pID,company_fein ,unsigned cnt := count(group)}  ,pID,company_fein ,merge);
+    ds_fein_cnt_cnp_names_max := table(ds_fein_cnt_cnp_names ,{pID,unsigned cnt := max(group,cnt)}  ,pID ,merge);
+
+    // -- stats on max cnp_names per fein overall
+    ds_cnp_name_slim := table(pDataset((unsigned)company_fein != 0),{pID,cnp_name,company_fein}  ,pID,cnp_name,company_fein ,merge);
+    ds_cnp_name_cnt_feins := table(ds_cnp_name_slim ,{pID,cnp_name ,unsigned cnt := count(group)}  ,pID,cnp_name ,merge);
+    ds_cnp_name_cnt_feins_max := table(ds_cnp_name_cnt_feins ,{pID,unsigned cnt := max(group,cnt)}  ,pID ,merge);
 
     // -- D&B fein -- counts on number of feins within a cluster grouped by cnp_name
     ds_dnb_fein_slim := table(pDataset(mdr.sourcetools.SourceIsDunn_Bradstreet_Fein(source),trim(company_fein) != ''),{pID,cnp_name,company_fein}  ,pID,cnp_name,company_fein ,merge);
@@ -328,8 +338,18 @@ functionmacro
                                           ,transform({ds_dnb_fein_slim_nocluster2.pID,unsigned cnt_feins},self.cnt_feins := right.cnt,self := left)    ,hash);
     ds_dnb_fein_cnt_feins_nocluster_ids := table(ds_dnb_fein_cnt_feins_nocluster_id ,{pID,unsigned cnt := max(group,cnt_feins)} ,pID,merge);
     
-    ds_result_add_sbfe := join(result_prep  ,ds_sbfe_cnt_cnp_names_max  ,left.pID = right.pID ,transform({unsigned6 pID,dataset({string stat,unsigned cnt}) ds_misc_stats,recordof(left) - pID}
-      ,self.ds_misc_stats := dataset([{'Max cnp_names per sbfe_id',right.cnt}],{string stat,unsigned cnt})
+    ds_result_add_fein_overall := join(result_prep  ,ds_fein_cnt_cnp_names_max  ,left.pID = right.pID ,transform({unsigned6 pID,dataset({string stat,unsigned cnt}) ds_misc_stats,recordof(left) - pID}
+      ,self.ds_misc_stats := dataset([{'Max cnp_names per fein',right.cnt}],{string stat,unsigned cnt})
+      ,self               := left
+    ) ,left outer,hash);
+
+    ds_result_add_cnp_name_overall := join(ds_result_add_fein_overall  ,ds_cnp_name_cnt_feins_max  ,left.pID = right.pID ,transform(recordof(left)
+      ,self.ds_misc_stats := left.ds_misc_stats + dataset([{'Max feins per cnp_name',right.cnt}],{string stat,unsigned cnt})
+      ,self               := left
+    ) ,left outer,hash);
+
+    ds_result_add_sbfe := join(ds_result_add_cnp_name_overall  ,ds_sbfe_cnt_cnp_names_max  ,left.pID = right.pID ,transform(recordof(left)
+      ,self.ds_misc_stats := left.ds_misc_stats + dataset([{'Max cnp_names per sbfe_id',right.cnt}],{string stat,unsigned cnt})
       ,self               := left
     ) ,left outer,hash);
     

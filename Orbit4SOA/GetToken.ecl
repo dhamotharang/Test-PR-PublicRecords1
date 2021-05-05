@@ -5,8 +5,8 @@ module
 	/////////////////////////////////////////////////////////////////////////////
 	rLoginParms := record
 		string								ApplicationName					{xpath('ApplicationName'),				maxlength(3)}			:=  orbitAPP;//trim(ContributionScrubsOrbit3.Constants.ApplicationName,left,right);
-		string 								Username 								{xpath('Username'),								maxlength(32)}		:=	Orbit3SOA.EnvironmentVariables.username;
-		string								Password 								{xpath('Password'),								maxlength(32)}		:=	Orbit3SOA.EnvironmentVariables.password;
+		string 								Username 								{xpath('Username'),								maxlength(32)}		:=	Orbit4SOA.EnvironmentVariables.username;
+		string								Password 								{xpath('Password'),								maxlength(32)}		:=	Orbit4SOA.EnvironmentVariables.password;
 	end;
 	rLoginRequest	:=	record
 		rLoginParms 					loginRequest						{xpath('loginRequest')};
@@ -32,7 +32,7 @@ module
 	/////////////////////////////////////////////////////////////////////////////
 	export	typeof(rLvl2Reponse.Result) GetLoginToken()	:=
 	function
-		lResponse	:=	soapcall(Orbit3SOA.EnvironmentVariables.serviceurl, 
+		lResponse	:=	soapcall(Orbit4SOA.EnvironmentVariables.serviceurl, 
 													 'Login',
 													 rLoginRequest,
 													 rSOAPResponse,

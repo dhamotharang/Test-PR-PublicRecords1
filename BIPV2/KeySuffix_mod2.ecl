@@ -102,7 +102,8 @@ end;
 // export constant_ThisBuild_versionDate := '20210105'; // S90 BH-1096
 // export constant_ThisBuild_versionDate := '20210202'; // S91 BH-1097
 // export constant_ThisBuild_versionDate := '20210302'; // S92 BH-1098
-export constant_ThisBuild_versionDate := '20210402'; // S93 BH-1099
+// export constant_ThisBuild_versionDate := '20210402'; // S93 BH-1099
+export constant_ThisBuild_versionDate := '20210505'; // S94 BH-1100
 
 export ds :=
 dataset([
@@ -212,6 +213,7 @@ dataset([
 ,{  91, '' ,  '20210202',  '20210202', '', '',         '',         'Ingested S90 base , BH-845,BH-1122,BH-1123,BH-1040,BH-1091,BH-1058,LNK-5500. BH-1097 -- BIP Build 91 - February 2021'}
 ,{  92, '' ,  '20210302',  '20210302', '', '',         '',         'Ingested S91 base , BH-1174,BH-1178,BH-1192,BH-1121,BH-1130,BH-1157,BH-1165,BH-1171,LNK-6252,BH-1155,DF-28800,DF-28883. BH-1098 -- BIP Build 92 - March 2021'}
 ,{  93, '' ,  '20210402',  '20210402', '', '',         '',         'Ingested S92 base , BH-1099 -- BIP Build 93 - April 2021'}
+,{  94, '' ,  '20210505',  '20210505', '', '',         '',         'Ingested S93 base ,  BH-1233 Remove Duplicate records from as headers , BH-1100 -- BIP Build 94 - May 2021'}
 
 
 //						version,			ingest			ToThor			ToCertRox		ToProdRox		//these are not exact field names.  they just help w read and update.
