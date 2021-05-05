@@ -162,7 +162,7 @@ EXPORT tools_dotid(dataset(l_as_linking) ds_as_linking = dataset([],l_as_linking
     unsigned6 temp_revenue            := map(
                                              L.source=MDR.sourceTools.src_infutor_narb and L.revenue_org_raw[1..5]='Under'                                                => (unsigned6) STD.Str.FilterOut(L.revenue_org_raw[8..],',')
 																			      ,L.source=MDR.sourceTools.src_infutor_narb and L.revenue_org_raw[1]='$'                                                       => (unsigned6) STD.Str.Filter(L.revenue_org_raw[13..],'1234567890')
-																			      ,L.source=MDR.sourceTools.src_Equifax_Business_Data and STD.Str.Find(L.revenue_org_raw,'-',1)=0                               => (unsigned6) L.revenue_org_raw * 1000
+																			      ,L.source=MDR.sourceTools.src_Equifax_Business_Data and STD.Str.Find(L.revenue_org_raw,'[-+]',1)=0                            => (unsigned6) L.revenue_org_raw * 1000
 																			      ,L.source=MDR.sourceTools.src_Equifax_Business_Data                                                                           => (unsigned6) highValue
 																			      ,L.source in [MDR.sourceTools.src_DCA, MDR.sourceTools.src_Cortera,MDR.sourcetools.src_Experian_CRDB,MDR.sourceTools.src_EBR] => (unsigned6) L.revenue_org_raw
 																			      ,0
@@ -170,8 +170,8 @@ EXPORT tools_dotid(dataset(l_as_linking) ds_as_linking = dataset([],l_as_linking
     unsigned6 temp_revenue_local      := map(
                                              L.source=MDR.sourceTools.src_infutor_narb and L.revenue_local_raw[1..5]='Under'                                              => (unsigned6) STD.Str.FilterOut(L.revenue_local_raw[8..],',')
 																			      ,L.source=MDR.sourceTools.src_infutor_narb and L.revenue_local_raw[1]='$'                                                     => (unsigned6) STD.Str.Filter(L.revenue_local_raw[13..],'1234567890')
-																			      ,L.source=MDR.sourceTools.src_Equifax_Business_Data and STD.Str.Find(L.revenue_local_raw,'-',1)=0                             => (unsigned6) L.revenue_local_raw * 1000
-																			      ,L.source=MDR.sourceTools.src_Equifax_Business_Data                                                                           => highValueLocal
+																			      ,L.source=MDR.sourceTools.src_Equifax_Business_Data and STD.Str.Find(L.revenue_local_raw,'[-+]',1)=0                          => (unsigned6) L.revenue_local_raw * 1000
+																			      ,L.source=MDR.sourceTools.src_Equifax_Business_Data                                                                           => (unsigned6) highValueLocal
 																						,L.source in [MDR.sourceTools.src_DCA, MDR.sourceTools.src_Cortera,MDR.sourcetools.src_Experian_CRDB,MDR.sourceTools.src_EBR] => (unsigned6) L.revenue_local_raw
 																			      ,0
 																			 );

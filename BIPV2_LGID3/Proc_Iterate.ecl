@@ -1,6 +1,6 @@
 ﻿//Executable code
 IMPORT SALT311;
-EXPORT Proc_Iterate(STRING iter,DATASET(Layout_LGID3) InFile = BIPV2_LGID3.In_LGID3,STRING OutFileNameP = '~temp::LGID3::BIPV2_LGID3::it',UNSIGNED MatchThreshold = Config.MatchThreshold,BOOLEAN Debugging = true) := MODULE
+EXPORT Proc_Iterate(string pversion,STRING iter,DATASET(Layout_LGID3) InFile = BIPV2_LGID3.In_LGID3,STRING OutFileNameP = '~temp::LGID3::BIPV2_LGID3::it',UNSIGNED MatchThreshold = Config.MatchThreshold,BOOLEAN Debugging = true) := MODULE
 SHARED MM := BIPV2_LGID3.matches(InFile, MatchThreshold); // Get the matching module
 SHARED S := Specificities(InFile).Specificities[1];
 dsOSR := CHOOSEN(MM.MatchSampleRecords,10000);
@@ -61,7 +61,7 @@ EXPORT OutputFileName := OutFileNameP+iter;
 EXPORT OutputFile := OUTPUT(MM.patched_infile,,OutputFileName,COMPRESSED);// Change file for each iteration
 EXPORT OutputFileA := OUTPUT(MM.patched_infile,,OutputFileName,OVERWRITE,COMPRESSED);// Change file for each iteration
 /*HACKProcIterate01*/import bipv2;
-SHARED ChangeName := '~temp::LGID3::BIPV2_LGID3::changes_it'+iter+'_'+ bipv2.KeySuffix;
+SHARED ChangeName := '~temp::LGID3::BIPV2_LGID3::changes_it'+iter+'_'+ trim(pversion);
 EXPORT OutputChanges := SEQUENTIAL( OUTPUT(MM.IdChanges,,ChangeName,OVERWRITE,COMPRESSED),FileServices.AddSuperFile(MatchHistory.MatchHistoryName,ChangeName));
 EXPORT OutputChangesA := SEQUENTIAL( IF(FileServices.SuperFileExists(BIPV2_LGID3.MatchHistory.MatchHistoryName),FileServices.RemoveSuperFile(BIPV2_LGID3.MatchHistory.MatchHistoryName,ChangeName)),OUTPUT(MM.IdChanges,,ChangeName,OVERWRITE,COMPRESSED),FileServices.AddSuperFile(BIPV2_LGID3.MatchHistory.MatchHistoryName,ChangeName));
 //EXPORT LoopN(UNSIGNED N, UNSIGNED mt=Config.MatchThreshold) := LOOP(InFile,N,BIPV2_LGID3.matches(ROWS(LEFT), mt).patched_infile); // Loop N times
