@@ -11,12 +11,12 @@ EXPORT GetBuildStatusPostProfileSeverity(STRING pVersion, Dataset(Orbit3.Layouts
                                          BOOLEAN moreToDo = true,
                                          DATASET(Orbit3.Layouts.OrbitPlatformUpdateLayout) pPlatform = DATASET([], Orbit3.Layouts.OrbitPlatformUpdateLayout),
                                          BOOLEAN pExcludeFromScorecard = FALSE  ) :=  FUNCTION
-IMPORT STD,Orbit3,Orbit3SOA;
+IMPORT STD,Orbit3,Orbit4SOA;
 
 waitforit       := STD.System.Debug.Sleep(Orbit3.Constants().OrbitV3ProfileWaitTime);    //4 minutes
 buildStatusWait := STD.System.Debug.Sleep(Orbit3.Constants().OrbitV3BuildStatusWaitTime);    //15 minutes JOIN assessment often gets backlogged
 
-GetProfiles  := Orbit3SOA.GetProfileDS(dsProfiles);
+GetProfiles  := Orbit4SOA.GetProfileDS(dsProfiles);
 
 profileFetchComplete   := GetProfiles(ProfileStatus IN Orbit3.Constants().sStatus_Term);
 profileFetch           := profileFetchComplete(ProfileVersion = pVersion);
@@ -26,9 +26,9 @@ BOOLEAN IsStatusTerm   :=  COUNT(profileFetchComplete)      = COUNT(dsProfiles);
 BOOLEAN IsStatusTermDt :=  COUNT(profileFetch)              = COUNT(dsProfiles);
 BOOLEAN aProfileFailed :=  COUNT(profileErroredOut) > 0;
 
-BOOLEAN Req_Review     :=  Trim(Orbit3SOA.GetBuildInstanceStatus(pVersion,masterbuildname),ALL) = Orbit3.Constants().StatusNeedReview;
+BOOLEAN Req_Review     :=  Trim(Orbit4SOA.GetBuildInstanceStatus(pVersion,masterbuildname),ALL) = Orbit3.Constants().StatusNeedReview;
 //Check Conventinal build results where Orbit has already passed the build.
-BOOLEAN BAFU           :=  Trim(Orbit3SOA.GetBuildInstanceStatus(pVersion,masterbuildname),ALL) = Orbit3.Constants().STATUSBUILDCOMPLETE;
+BOOLEAN BAFU           :=  Trim(Orbit4SOA.GetBuildInstanceStatus(pVersion,masterbuildname),ALL) = Orbit3.Constants().STATUSBUILDCOMPLETE;
 
 SetOrbitToBAFU         :=  Orbit3.CreateOrUpdateBuildInstance( pVersion
                                                                ,masterbuildname
@@ -52,8 +52,8 @@ Small_Conventional_Build := parallel(Statout, output(dataset([{'Notification : O
 
 sleepAndCheckAgain := IF(NOT Req_Review, sequential(waitforit, IsStatusTerm));
 
-Run_3_Checks       :=  MAP( NOT IsStatusTermDt AND IsStatusTerm =>  ORDERED(Statout,FAIL(501, 'Orbit3 GetProfileDS is returning the wrong build instance. Orbit3SOA.GetBuildStatusPostProfileSeverity will resubmit up to three times'))
-                          , NOT IsStatusTermDt                  =>  ORDERED(Statout,FAIL(502, 'Orbit3 GetProfileDS is still processing. Orbit3SOA.GetBuildStatusPostProfileSeverity will resubmit up to three times'))
+Run_3_Checks       :=  MAP( NOT IsStatusTermDt AND IsStatusTerm =>  ORDERED(Statout,FAIL(501, 'Orbit3 GetProfileDS is returning the wrong build instance. Orbit4SOA.GetBuildStatusPostProfileSeverity will resubmit up to three times'))
+                          , NOT IsStatusTermDt                  =>  ORDERED(Statout,FAIL(502, 'Orbit3 GetProfileDS is still processing. Orbit4SOA.GetBuildStatusPostProfileSeverity will resubmit up to three times'))
                           , BAFU                                =>  Small_Conventional_Build
                           , moreToDo                            =>  Statout //just output the results
                           , output(dataset([{'Notification : ORBIT SUCCESSFULLY UPDATED ALL PROFILES; CHECKING' + ResultOutputPrefix + '  BUILD INSTANCE STATUS'}],{string message}),named('Orbit3_Notes'),extend)
@@ -65,11 +65,11 @@ FINAL_STATUS_CHECK := IF(NOT moreToDo, SEQUENTIAL(buildStatusWait //Wait for Orb
 
 //Only allow update of build that are in Progress, however, for conventional builds we have to check the profile status even if the build is in BAFU.
 // because Orbit can't prevent profile services from setting a build to BAFU after all profiles are assessed. Nothing else is restartable.
-Valid_build_status := Trim(Orbit3SOA.GetBuildInstanceStatus(pVersion,masterbuildname,'DataDevelopment-Ins@lexisnexis.com'),ALL) IN [Orbit3.Constants().StatusInProgress,Orbit3.Constants().STATUSBUILDCOMPLETE]  : INDEPENDENT;
+Valid_build_status := Trim(Orbit4SOA.GetBuildInstanceStatus(pVersion,masterbuildname,'DataDevelopment-Ins@lexisnexis.com'),ALL) IN [Orbit3.Constants().StatusInProgress,Orbit3.Constants().STATUSBUILDCOMPLETE]  : INDEPENDENT;
 
 Exec_Check         := IF(Valid_build_status, ORDERED(Run_3_Checks,FINAL_STATUS_CHECK),
                          FAIL(500, masterbuildname + ' Build Instance:' + pVersion +
-                            ' is not in Build_IN_PROGRESS\n~~~ Orbit3SOA.GetBuildStatusPostProfileSeverity ~~~\nCheck ' + ResultOutputPrefix + ' Profiles\n' +
+                            ' is not in Build_IN_PROGRESS\n~~~ Orbit4SOA.GetBuildStatusPostProfileSeverity ~~~\nCheck ' + ResultOutputPrefix + ' Profiles\n' +
                             ' Conventional builds set to Failed QA are equivalent to "Build Instance Requires Review"\n' +
                             ' except there were likely set by Orbit "Automatic update through profile test settings".\n' +
                             ' See serperate email Subject ~ "Build Instance for Build ' + masterbuildname +'" for details on status'));
