@@ -499,9 +499,9 @@ EXPORT V2_Search_Function( DATASET(ProfileBooster.V2_Layouts.Layout_PB2_In) PB2_
     #END
   
 //if a DID is both a household member and a relative, keep only the household record so relatives attributes are exclusive
-	unique_DIDs_roxie := dedup(sort(allDids_WithPBLexIDKey, seq, DID2, rec_type), seq, DID2);
+	unique_DIDs_roxie := dedup(sort(allDIDs, seq, DID2, rec_type), seq, DID2);
 	
-	distributed_allDIDs := distribute(allDids_WithPBLexIDKey, hash(seq, did2));
+	distributed_allDIDs := distribute(allDIDs, hash(seq, did2));
 	unique_DIDs_thor := dedup(sort(distributed_allDIDs, seq, DID2, rec_type, local), seq, DID2, local);//   : PERSIST('~PROFILEBOOSTER::unique_DIDs_thor');  // remove persists because low on disk space and it's rebuilding persist file each time anyway
 	
 	#IF(onThor)
@@ -509,7 +509,7 @@ EXPORT V2_Search_Function( DATASET(ProfileBooster.V2_Layouts.Layout_PB2_In) PB2_
 	#ELSE
 		uniqueDIDs := unique_DIDs_roxie;
 	#END
-  
+    
   ProfileBooster.V2_Layouts.Layout_PB2_Shell xfmAddCurrentAddressData(ProfileBooster.V2_Layouts.Layout_PB2_Shell le, PB20AddressKey ri ) := TRANSFORM
 		fullhistorydate := risk_indicators.iid_constants.myGetDate(le.historydate);
 		// SELF.CurrAddrOwnershipIndx := ri.AddrOwnershipIndx;
@@ -566,7 +566,7 @@ EXPORT V2_Search_Function( DATASET(ProfileBooster.V2_Layouts.Layout_PB2_In) PB2_
 		// withCurrAddressKey := withCurrAddressKey_roxie;
 	// #END
   
-//slim down the uniqueDIDs records to create a smaller layout to pass into all of the following searches
+  //slim down the uniqueDIDs records to create a smaller layout to pass into all of the following searches
 	slimShell := project(withCurrAddressKey,transform(ProfileBooster.V2_Layouts.Layout_PB2_Slim,self:= left));
 	slimShell2 := project(withCurrAddressKey,transform(ProfileBooster.V2_Layouts.Layout_PB2_Slim_emergence,self:= left));
 
@@ -612,6 +612,7 @@ EXPORT V2_Search_Function( DATASET(ProfileBooster.V2_Layouts.Layout_PB2_In) PB2_
 		withEmergence := withEmergence_roxie;
 	#END
 
+
   PropertyCommon := ProfileBooster.V2_getProperty(uniqueDIDs,slimShell,DataRestrictionMask,DataPermissionMask);
 
 //JOIN withPropertyCommon to uniqueDIDs? look at propcommon output
@@ -622,31 +623,10 @@ EXPORT V2_Search_Function( DATASET(ProfileBooster.V2_Layouts.Layout_PB2_In) PB2_
                              mod_transforms.xfm_addPropertyCommon(LEFT, RIGHT), 
                              left outer, keep(1), LOCAL);
                              
-  // At this point we have one record for the prospect, one for each household member and one for each relative - roll them up 
-  // here to sum all of the household and relatives attributes for the prospect record  
-  ProfileBooster.V2_Layouts.Layout_PB2_Shell rollFinal(ProfileBooster.V2_Layouts.Layout_PB2_Shell le, ProfileBooster.V2_Layouts.Layout_PB2_Shell ri) := transform
-		self := le;  //for all prospect attributes, keep all values from the left (first) record  
-	end;
 	
-	finalSort 	:= sort(withPropertyCommon, seq, rec_type, did2);  //sort prospect record to the top (rec_type = 1)
-    finalRollup := rollup(finalSort, rollFinal(left,right), seq);  
+	// finalSort 	:= sort(withPropertyCommon, seq, rec_type, did2);
+    // finalRollup := rollup(finalSort, rollFinal(left,right), seq);  
   
-//    getPurchaseBehaviorAttributes := ROLLUP(finalSort, mod_transforms.xfmPurchaseBehaviorRollup(LEFT, RIGHT), seq);
-   
-//    withPurchaseBehavior := JOIN(finalRollup, getPurchaseBehaviorAttributes,  
-//    												LEFT.seq = RIGHT.seq,
-//    												TRANSFORM(ProfileBooster.V2_Layouts.Layout_PB2_Shell,
-//                                                 SELF.HHPurchNewAmt 		:= RIGHT.HHPurchNewAmt;
-//                                                 SELF.HHPurchTotEv 		:= RIGHT.HHPurchTotEv;
-//                                                 SELF.HHPurchCntEv 		:= RIGHT.HHPurchCntEv;
-//                                                 SELF.HHPurchNewMsnc 	:= RIGHT.HHPurchNewMsnc;
-//                                                 SELF.HHPurchOldMsnc 	:= RIGHT.HHPurchOldMsnc;
-//                                                 SELF.HHPurchItemCntEv 	:= RIGHT.HHPurchItemCntEv;
-//                                                 SELF.HHPurchAmtAvg 		:= MAP(RIGHT.HHPurchTotEv < 0 => RIGHT.HHPurchTotEv,
-//                                                                           	   RIGHT.HHPurchCntEv < 0 => RIGHT.HHPurchCntEv,
-//                                                                                RIGHT.HHPurchTotEv / RIGHT.HHPurchCntEv);
-//                                                 SELF := LEFT), 
-//                                                 LEFT OUTER);
    
 /*   //append relatives' average income
    	withRelaIncome := join(finalRollup, tRelaIncome,  
@@ -673,15 +653,49 @@ EXPORT V2_Search_Function( DATASET(ProfileBooster.V2_Layouts.Layout_PB2_In) PB2_
 */
 	
 	emptyAttr := project(PB2_In, mod_transforms.xfm_tfEmpty(left)); 
+  
+        // adds back values for the household recs
+    uniqueDIDs_WithPBLexIDKey_Thor := JOIN(DISTRIBUTE(withPropertyCommon,did2), DISTRIBUTE(PB20LexIDKey,did),
+                  LEFT.did2 = RIGHT.did AND LEFT.did2 <> LEFT.did,
+                  mod_transforms.xfmAddHouseholdInfo(LEFT,RIGHT), LEFT OUTER, KEEP(1), LOCAL);
+
+    uniqueDIDs_WithPBLexIDKey_Roxie := JOIN(withPropertyCommon, PB20LexIDKey,
+                  LEFT.did2 = RIGHT.did AND LEFT.did2 <> LEFT.did,
+                  mod_transforms.xfmAddHouseholdInfo(LEFT,RIGHT), LEFT OUTER, KEEP(1));
+
+    #IF(onThor)
+        uniqueDIDs_WithPBLexIDKey := uniqueDIDs_WithPBLexIDKey_Thor;
+    #ELSE
+        uniqueDIDs_WithPBLexIDKey := uniqueDIDs_WithPBLexIDKey_Roxie;
+    #END
 			
 	// *******************************************************************************************************************
 	// Now that we have all necessary data in the PB2Shell, pass it to the attributes function to produce the attributes
 	// *******************************************************************************************************************
   	attributes := if(std.Str.ToUpperCase(AttributesVersion) in ProfileBooster.Constants.setValidAttributeVersionsV2 OR domodel, //if valid attributes version requested, go get attributes
-									 ProfileBooster.V2_getAttributes(finalRollup, DataPermissionMask),
+									 ProfileBooster.V2_getAttributes(uniqueDIDs_WithPBLexIDKey, DataPermissionMask),
 									 emptyAttr);  
-									 
-	withIncome := ProfileBooster.V2_estimatedIncome(attributes);
+                   
+  ProfileBooster.V2_Layouts.Layout_PB2_BatchOut rollFinal(ProfileBooster.V2_Layouts.Layout_PB2_BatchOut le, ProfileBooster.V2_Layouts.Layout_PB2_BatchOut ri) := transform
+		self := le;  //for all prospect attributes, keep all values from the left (first) record 
+        self := [];
+	end;
+	
+	finalSort 	:= sort(attributes, seq, rec_type, did2);  //sort prospect record to the top (rec_type = 1)
+    // finalRollup := rollup(finalSort, rollFinal(left,right), seq);  
+    
+    projectFinalSort := PROJECT(finalSort, TRANSFORM(ProfileBooster.V2_Layouts.Layout_ProfileBoosterV2_WithAdditionalFields, 
+    SELF := LEFT.attributes.version2;
+    SELF := LEFT;
+    SELF := []));
+    
+    hhRecs := projectFinalSort(rec_type = 1 OR rec_type = 2);
+    
+    rollupUnscorables := ProfileBooster.Functions.projectUnscorables(hhRecs, ProfileBooster.Constants.setAttributesForUnscorableRollup, ProfileBooster.V2_Layouts.Layout_ProfileBoosterV2_WithAdditionalFields);
+    
+    finalProject := PROJECT(rollupUnscorables, ProfileBooster.V2_Transforms.xfm_addHouseholdAndRelativeAttrs(LEFT));
+                                            
+	withIncome := ProfileBooster.V2_estimatedIncome(finalProject);
 	
 	// withHHIncome := ProfileBooster.V2_HHestimatedIncome(withIncome); //for production
 	
@@ -801,6 +815,7 @@ EXPORT V2_Search_Function( DATASET(ProfileBooster.V2_Layouts.Layout_PB2_In) PB2_
   // output(withEconTraj, named('withEconTraj'));
   // output(finalSort, named('finalSort'));
   // output(finalRollup, named('finalRollup'));
+  // output(allDids_WithPBLexIDKey, named('allDids_WithPBLexIDKey'));
   // output(withRelaIncome, named('withRelaIncome'));
   // output(withRelaHHcnt, named('withRelaHHcnt'));
   // output(attributes, named('attributes'));
@@ -821,28 +836,10 @@ EXPORT V2_Search_Function( DATASET(ProfileBooster.V2_Layouts.Layout_PB2_In) PB2_
   output(count(withLexIDKey(EmrgDob IN ['','0'])), named('V2SF_withLexIDKey_EmrgDob_Cnt'));
 
   // output(finalRollup,,'~jfrancis::out::PB20_finalRollup_ROXIE',CSV(HEADING(single), QUOTE('"')),OVERWRITE);
-//   output(choosen(withWatchdog, 100), named('V2SF_withWatchdog'));
-//   output(choosen(withInfutorNARC, 100), named('V2SF_withInfutorNARC'));
-//   output(choosen(withCurrAddressKey, 100), named('V2SF_withCurrAddressKey'));
-//testdids := [116416395,1491629798,1947534553,1947534553,1013490369,1652613103,1924810543
-//,890019878
-//,555976628
-//,826730747
-//,133491844
-//,1684222038
-//,447469508
-//,1491629798
-//,116416395
-//,1947534553
-//,1947534553
-//,1013490369
-//,1652613103
-//];
-
-  // output(choosen(EmrgAddress, 100), named('V2SF_EmrgAddress'));
-  // output(choosen(withEmergence(did in testdids), 100), named('V2SF_withEmergence'));  
-  // output(choosen(withEmergence_Thor(did in testdids), 100), named('V2SF_withEmergenceThor'));  
-  // output(choosen(withEmergence_Roxie(did in testdids), 100), named('V2SF_withEmergenceRoxie'));  
+  output(choosen(withWatchdog, 100), named('V2SF_withWatchdog'));
+  output(choosen(withInfutorNARC, 100), named('V2SF_withInfutorNARC'));
+  output(choosen(withCurrAddressKey, 100), named('V2SF_withCurrAddressKey'));
+  // output(choosen(withEmergence, 100), named('V2SF_withEmergence'));  
   // output(count(withCurrAddressKey), named('V2SF_withCurrAddressKey_Cnt'));
   // output(count(withCurrAddressKey(CurrAddrLat<>'')), named('V2SF_withCurrAddressKeyADDRLAT_Cnt'));
   // output(choosen(withInputAddressKey, 100), named('V2SF_withInputAddressKey'));
