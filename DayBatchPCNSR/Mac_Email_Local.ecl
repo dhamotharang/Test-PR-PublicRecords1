@@ -3,7 +3,7 @@
 /* **ROXIE KEY NOTIFICATION EMAIL********************************************************************************************************** */	
 
 
-email_success := fileservices.sendemail('RoxieBuilds@seisint.com;kgummadi@seisint.com;christopher.brodeur@lexisnexis.com',
+email_success := fileservices.sendemail('RoxieBuilds@seisint.com, kgummadi@seisint.com, Christopher.Brodeur@lexisnexisrisk.com, harry.gist@lexisnexisrisk.com, Abednego.Escobal@lexisnexisrisk.com',
 										'PCNSR Build Succeeded - ' + file_date,
 										'keys:   1)thor_data400::key::daybatch_pcnsr::pcnsr.did_qa(thor_data400::key::daybatch_pcnsr::'+file_date+'::pcnsr.did), \n' +                
   '2)thor_data400::key::daybatch_pcnsr::pcnsr.lz3_qa(thor_data400::key::daybatch_pcnsr::'+file_date+'::pcnsr.lz3) , \n' +                       
