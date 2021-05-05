@@ -1,0 +1,4 @@
+﻿EXPORT ReasonType_FIWN12103_0_SSN_OVERALL := RECORD
+  REAL4 Contribution;
+  STRING5 Reason_Code;
+END;
