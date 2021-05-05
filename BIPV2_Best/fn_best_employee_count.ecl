@@ -13,6 +13,7 @@
 
 	FinalFlatRec := record
 	  inDs.linkid;
+    inDs.source;
 	  unsigned6 employee_count;
 		integer permits_name;
 		integer method_name;

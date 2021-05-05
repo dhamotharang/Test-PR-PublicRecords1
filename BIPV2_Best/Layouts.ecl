@@ -139,14 +139,32 @@ EXPORT duns_number_case_layout := RECORD
   duns_number;
   unsigned1 score := 0 ;
 END;
+EXPORT sic_code_base:=RECORD
+  STRING8 company_sic_code1;
+  string2   source;
+  UNSIGNED2 company_sic_code1_data_permits;
+  UNSIGNED1 company_sic_code1_method;
+END;
 EXPORT sic_code:=RECORD
   STRING8 company_sic_code1;
   UNSIGNED2 company_sic_code1_data_permits;
   UNSIGNED1 company_sic_code1_method;
 END;
+
 EXPORT sic_code_case_layout:=RECORD
   sic_code;
   UNSIGNED1 score :=0;
+END;
+EXPORT sic_code_case_base_layout:=RECORD
+  sic_code_base;
+  UNSIGNED1 score :=0;
+END;
+
+EXPORT naics_code_base:=RECORD
+  STRING6 company_naics_code1;
+  string2   source;
+  UNSIGNED2 company_naics_code1_data_permits;
+  UNSIGNED1 company_naics_code1_method;
 END;
 EXPORT naics_code:=RECORD
   STRING6 company_naics_code1;
@@ -157,10 +175,27 @@ EXPORT naics_code_case_layout:=RECORD
   naics_code;
   UNSIGNED score := 0;
 END;
+EXPORT naics_code_case_base_layout:=RECORD
+  naics_code_base;
+  UNSIGNED score := 0;
+END;
+
+EXPORT employee_count_base:=RECORD
+  unsigned6 employee_count;
+  string2   source;
+  UNSIGNED2 employee_count_data_permits;
+  UNSIGNED1 employee_count_method;
+END;
 EXPORT employee_count:=RECORD
   unsigned6 employee_count;
   UNSIGNED2 employee_count_data_permits;
   UNSIGNED1 employee_count_method;
+END;
+EXPORT sales_base:=RECORD
+  unsigned6 sales;
+  string2   source;
+  UNSIGNED2 sales_data_permits;
+  UNSIGNED1 sales_method;
 END;
 EXPORT sales:=RECORD
   unsigned6 sales;
@@ -175,6 +210,15 @@ EXPORT sales_case_layout:=RECORD
   sales;
   UNSIGNED score := 0;
 END;
+EXPORT employee_count_case_base_layout:=RECORD
+  employee_count_base;
+  UNSIGNED score := 0;
+END;
+EXPORT sales_case_base_layout:=RECORD
+  sales_base;
+  UNSIGNED score := 0;
+END;
+
 export base := RECORD
     linkids;
     unsigned6 company_bdid;
@@ -185,11 +229,11 @@ export base := RECORD
     DATASET(company_url_case_layout) company_url;
     DATASET(company_incorporation_date_layout) company_incorporation_date;
     DATASET(duns_number_case_layout) duns_number;
-    DATASET(sic_code_case_layout) sic_code;
-    DATASET(naics_code_case_layout) naics_code;
+    DATASET(sic_code_case_base_layout) sic_code;
+    DATASET(naics_code_case_base_layout) naics_code;
     DATASET(dba_name_case_layout) dba_name;
-		DATASET(employee_count_case_layout) employee_count;
-	  DATASET(sales_case_layout) sales;
+		DATASET(employee_count_case_base_layout) employee_count;
+	  DATASET(sales_case_base_layout) sales;
     unsigned4 global_sid;
     unsigned8 record_sid;
   END;
@@ -230,7 +274,7 @@ EXPORT key_static := RECORD
     DATASET(sic_code_case_layout and not score) sic_code;
     DATASET(naics_code_case_layout and not score) naics_code;
 	  DATASET(dba_name_case_layout and not score) dba_name;
-	  DATASET(employee_count_case_layout and not score) employee_count;
+		DATASET(employee_count_case_layout and not score) employee_count;
 	  DATASET(sales_case_layout and not score) sales;
     unsigned4 global_sid;
     unsigned8 record_sid;

@@ -20,7 +20,7 @@ module
   export dca          := dcav2                .files(pversionSourceFiles,pUseOtherEnviron).base.companies  .logical ;
   export oshair       := OSHAIR               .Files(pversionSourceFiles,pUseOtherEnviron).base.Inspection .logical ;
   export accutrend    := BusReg               .files(pversionSourceFiles,pUseOtherEnviron).base.aid        .logical ;
-  export infutor      := Infutor_NARB.files(pversionSourceFiles,pUseOtherEnviron).base            .logical ;
+  export infutor      := Infutor_NARB         .files(pversionSourceFiles,pUseOtherEnviron).base            .logical ;
   export eq_biz       := Equifax_Business_Data.files(pversionSourceFiles,pUseOtherEnviron).base.companies  .logical ;
   export DataBridge   := DataBridge           .files(pversionSourceFiles,pUseOtherEnviron).base            .logical ;        
   export cortera      := Cortera              .Files(pversionSourceFiles,pUseOtherEnviron).base.Executives .logical ;                                                   ; // will pull the prod file on dataland automatically

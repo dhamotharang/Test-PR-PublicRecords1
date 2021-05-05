@@ -1,4 +1,4 @@
-import doxie, Tools, BIPV2;
+﻿import doxie, Tools, BIPV2;
 export Build_Keys(
    string                           pversion
   ,dataset(BIPV2_Best.Layouts.Base) pBestBase = BIPV2_Best.Files(pversion).base.built
@@ -9,10 +9,15 @@ module
   shared ds_commonbase  := table(pDs_Clean,{seleid,seleid_status_private,seleid_status_private_score},seleid,seleid_status_private,seleid_status_private_score,merge);
   shared dkeybuild      := join(Base ,ds_commonbase  ,left.seleid = right.seleid,transform(
      layouts.key
-    ,self.isdefunct := if(right.seleid_status_private = 'D'           ,true   ,false)
-    ,self.isactive  := if(right.seleid_status_private  in ['I','D']   ,false  ,true )
+    ,self.isdefunct                   := if(right.seleid_status_private = 'D'           ,true   ,false)
+    ,self.isactive                    := if(right.seleid_status_private  in ['I','D']   ,false  ,true )
     ,self.seleid_status_private_score := RIGHT.seleid_status_private_score
-    ,self           := left
+    // -- remove source fields for the following child datasets.  not ready for key yet.
+    ,self.sic_code                    := project(left.sic_code        ,BIPV2_Best.Layouts.sic_code_case_layout        and not score)
+    ,self.naics_code                  := project(left.naics_code      ,BIPV2_Best.Layouts.naics_code_case_layout      and not score)
+    ,self.employee_count              := project(left.employee_count  ,BIPV2_Best.Layouts.employee_count_case_layout  and not score)
+    ,self.sales                       := project(left.sales           ,BIPV2_Best.Layouts.sales_case_layout           and not score)
+    ,self                             := left
   ),hash,keep(1),left outer);//only 1 status per seleid
   
 	// shared dkeybuild		:= project(Base, transform(layouts.key, self := left, self := []));

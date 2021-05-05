@@ -1,4 +1,4 @@
-import BIPV2_Build,tools;
+﻿import BIPV2_Build,BIPV2,tools;
 
 
 pversion          := BIPV2.Keysuffix     ; //version of build you are rolling back
