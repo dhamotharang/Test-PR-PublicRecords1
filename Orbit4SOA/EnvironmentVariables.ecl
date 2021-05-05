@@ -16,12 +16,12 @@ export EnvironmentVariables := module
 	export statLandingZoneFilePrefix := 
 		if (_control.ThisEnvironment.Name = 'Prod_Thor', 
 			'C:\\Orbit\\ProfileStats\\ProfileStat-', 
-			'C:\\Orbit\\ProfileStats\\ProfileStat-'
+			'C:\\Orbit\\'
 		);
 	export statLandingZoneServer := 
 		if (_control.ThisEnvironment.Name = 'Prod_Thor', 
 			'BCTWPIORBIT101.risk.regn.net',// - Alpha //'10.237.6.40', - Boca
-			'10.121.145.164'
+			'10.176.142.45'
 		);
 
 end;

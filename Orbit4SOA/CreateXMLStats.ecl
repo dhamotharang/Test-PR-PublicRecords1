@@ -13,7 +13,7 @@ EXPORT createXMLStats(pStats
                       ,omit_output_to_screen = 'false'
                       ,pProfileType = '\'ProfilingDataBuilds\'') := macro
 
-import Orbit3SOA;
+import Orbit4SOA;
 
 #uniquename(buildSubSet)
 #uniquename(rout1)
@@ -41,7 +41,7 @@ string %clean%(string s) := stringlib.stringfindreplace(
 %profilename% := trim(%buildname%,all) + '_' + %buildSubSet% + '_' + %buildType% + '_' + %buildView%;
 
 %rout1% := if(~omit_output_to_screen, output(choosen(pStats,all),named(%buildView% + '_' + %buildType% + '_Route2')));
-%rout2% := Orbit3SOA.SubmitStat(pStats, %profilename%, pProfileType, %versionname%, %profilename%);
+%rout2% := Orbit4SOA.SubmitStat(pStats, %profilename%, pProfileType, %versionname%, %profilename%);
 
 #IF(pShouldExport = TRUE)
 EXPORT

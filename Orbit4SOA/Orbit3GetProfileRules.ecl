@@ -2,7 +2,7 @@
 
 EXPORT Orbit3GetProfileRules (string pProfileType, string pProfileName) := function
 
-	import Orbit3SOA;
+	import Orbit4SOA;
 
 	string passPercentagePath := TRIM(CASE(pProfileType, 
 		'Scrubs' => 'DynamicProperties/Property[Key="PassPercentage"]/Value',
@@ -25,7 +25,7 @@ EXPORT Orbit3GetProfileRules (string pProfileType, string pProfileName) := funct
 		rRecordRequest		RecordRequestGetProfileRules	{xpath('RecordRequestGetProfileRules') };
 	end;
 	rorbRequest := record
-		string 				LoginToken											{xpath('Token'),				maxlength(36)}		:=	Orbit3SOA.GetToken().GetLoginToken();
+		string 				LoginToken											{xpath('Token'),				maxlength(36)}		:=	Orbit4SOA.GetToken().GetLoginToken();
 		rReceivings		OrbRequest											{xpath('Request')};
 	end;
 	rRequestCapsule	:= record
@@ -45,14 +45,14 @@ EXPORT Orbit3GetProfileRules (string pProfileType, string pProfileName) := funct
 	end;
 	
 	retval := SOAPCALL(
-		Orbit3SOA.EnvironmentVariables.serviceurl,
+		Orbit4SOA.EnvironmentVariables.serviceurl,
 		'GetProfileRules',
 		rRequestCapsule,
 		dataset(ProfileRule_Rec),
 		XPATH('GetProfileRulesResponse/GetProfileRulesResult/Result/RecordResponseGetProfileRules/Result/ProfileRules/RuleModel'),
-		NAMESPACE(Orbit3SOA.EnvironmentVariables.namespace),
+		NAMESPACE(Orbit4SOA.EnvironmentVariables.namespace),
 		LITERAL,
-		SOAPACTION(Orbit3SOA.EnvironmentVariables.soapactionprefixPR + 'GetProfileRules')
+		SOAPACTION(Orbit4SOA.EnvironmentVariables.soapactionprefixPR + 'GetProfileRules')
 	);
 	output(toxml(row(rRequestCapsule)));
 	

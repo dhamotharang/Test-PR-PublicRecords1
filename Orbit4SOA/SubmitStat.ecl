@@ -26,11 +26,11 @@
 	%profileType% := %clean%(if(pProfileType = '', 'type', pProfileType));
 	%profileName% := %clean%(if(pProfileName = '', 'profile', pProfileName));
 	%profileVersion% := %clean%(if(pProfileVersion = '', 'version', pProfileVersion));
-	%thorFilename% := Orbit3SOA.EnvironmentVariables.statLogicalFilePrefix + %profileType% + '::' + %profileName% + '::' + %profileVersion% + '::' + thorlib.wuid() + '.csv';
-	%destFilename% := Orbit3SOA.EnvironmentVariables.statLandingZoneFilePrefix + %profileType% + '-' + %profileName% + '-' + %profileVersion% + '-' + thorlib.wuid() + '.csv';
+	%thorFilename% := Orbit4SOA.EnvironmentVariables.statLogicalFilePrefix + %profileType% + '::' + %profileName% + '::' + %profileVersion% + '::' + thorlib.wuid() + '.csv';
+	%destFilename% := Orbit4SOA.EnvironmentVariables.statLandingZoneFilePrefix + %profileType% + '-' + %profileName% + '-' + %profileVersion% + '-' + thorlib.wuid() + '.csv';
 
 	%saveToFile% := output(pScrubResult,, %thorFilename%, csv(heading(single),separator(','),terminator('\r\n'),quote('"'),maxlength(65535),notrim),named('StatData'+pFiletype),OVERWRITE); 	
-	%desprayToServer% := Lib_FileServices.FileServices.Despray(%thorFilename%, Orbit3SOA.EnvironmentVariables.statLandingZoneServer, %destFilename%,,,,true);
+	%desprayToServer% := Lib_FileServices.FileServices.Despray(%thorFilename%, Orbit4SOA.EnvironmentVariables.statLandingZoneServer, %destFilename%,,,,true);
 
 	rRecordRequest := record
 		string profileName 			{xpath('ProfileName')} := %profileName%;
@@ -42,7 +42,7 @@
 		rRecordRequest		RecordRequestSubmitStat	{xpath('RecordRequestSubmitStat') };
 	end;
 	rorbRequest := record
-		string 				LoginToken											{xpath('Token'),				maxlength(36)}		:=	Orbit3SOA.GetToken().GetLoginToken();
+		string 				LoginToken											{xpath('Token'),				maxlength(36)}		:=	Orbit4SOA.GetToken().GetLoginToken();
 		rReceivings		OrbRequest											{xpath('Request')};
 	end;
 	rRequestCapsule	:= record
@@ -50,20 +50,20 @@
 	end;	
 
 	outputRec := record
-		string faultcode {xpath('Fault/faultcode')};
-		string faultstring {xpath('Fault/faultstring')};
+		string faultcode {xpath('GetProfileRulesResponse/GetProfileRulesResult/Result/RecordResponseGetProfileRules/Status')};
+		string faultstring {xpath('GetProfileRulesResponse/GetProfileRulesResult/Result/RecordResponseGetProfileRules/Message')};
 	end;
 // output(toxml(row(rRequestCapsule)));
 	%submitStatToOrbit% := output(SOAPCALL(
-		Orbit3SOA.EnvironmentVariables.serviceurl,
+		Orbit4SOA.EnvironmentVariables.serviceurl,
 		'SubmitStat',
 		rRequestCapsule,
 		DATASET(outputRec),
 		RETRY(3),
 		TIMELIMIT(60),
-		NAMESPACE(Orbit3SOA.EnvironmentVariables.namespace),
+		NAMESPACE(Orbit4SOA.EnvironmentVariables.namespace),
 		LITERAL,
-		SOAPACTION(Orbit3SOA.EnvironmentVariables.soapactionprefixPR + 'SubmitStat')
+		SOAPACTION(Orbit4SOA.EnvironmentVariables.soapactionprefixPR + 'SubmitStat')
 	), NAMED('SubmitStatError'+pFiletype),OVERWRITE);
 // output(toxml(row(rRequestCapsule)));	
 	// return	%submitStatToOrbit%;
