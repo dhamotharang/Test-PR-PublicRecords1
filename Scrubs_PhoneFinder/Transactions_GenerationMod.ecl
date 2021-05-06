@@ -22,7 +22,7 @@ EXPORT Transactions_GenerationMod := MODULE(SALT311.iGenerationMod)
   EXPORT spc_FILENAME := 'PhoneFinder';
   EXPORT spc_INGESTSTATUS := '';
   EXPORT spc_EXTERNAL_MAPPING := 'UniqueID:';
-  EXPORT spc_EXTERNAL_BATCH_PARAM := ',/* MY_ */,transaction_id,transaction_date,user_id,product_code,company_id,source_code,batch_job_id,batch_acctno,response_time,reference_code,phonefinder_type,submitted_lexid,submitted_phonenumber,submitted_firstname,submitted_lastname,submitted_middlename,submitted_streetaddress1,submitted_city,submitted_state,submitted_zip,phonenumber,data_source,royalty_used,carrier,risk_indicator,phone_type,phone_status,ported_count,last_ported_date,otp_count,last_otp_date,spoof_count,last_spoof_date,phone_forwarded,date_added,filename';
+  EXPORT spc_EXTERNAL_BATCH_PARAM := ',/* MY_ */,transaction_id,transaction_date,user_id,product_code,company_id,source_code,batch_job_id,batch_acctno,response_time,reference_code,phonefinder_type,submitted_lexid,submitted_phonenumber,submitted_firstname,submitted_lastname,submitted_middlename,submitted_streetaddress1,submitted_city,submitted_state,submitted_zip,phonenumber,data_source,royalty_used,carrier,risk_indicator,phone_type,phone_status,ported_count,last_ported_date,otp_count,last_otp_date,spoof_count,last_spoof_date,phone_forwarded,date_added,identity_count,phone_verified,verification_type,phone_star_rating,filename';
   EXPORT spc_HAS_TWOSTEP := FALSE;
   EXPORT spc_HAS_PARTITION := FALSE;
   EXPORT spc_HAS_FIELDTYPES := TRUE;
@@ -49,6 +49,7 @@ EXPORT Transactions_GenerationMod := MODULE(SALT311.iGenerationMod)
     + 'FIELDTYPE:Invalid_Code:ALLOW(0123456789\\(\\). -\\\\N)\n'
     + 'FIELDTYPE:Invalid_Alpha:ALLOW(ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz\\\\ )\n'
     + 'FIELDTYPE:Invalid_AlphaChar:ALLOW(ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789\\\\(\\\\)_[] .,:;#/-&\\\\\'*)\n'
+    + 'FIELDTYPE:Invalid_Rating:ALLOW(0123456789\\\\N| )\n'
     + 'FIELDTYPE:Invalid_Risk:ENUM(PASS|FAIL|WARN|\\\\N|)\n'
     + 'FIELDTYPE:Invalid_Phone_Type:ENUM(POSSIBLE WIRELESS|LANDLINE|POSSIBLE VOIP|OTHER UNKNOWN|PAGER|CABLE|OTHER/UNKNOWN|\\\\N|)\n'
     + 'FIELDTYPE:Invalid_Phone_Status:ENUM(ACTIVE|INACTIVE|NOT AVAILABLE|\\\\N|)\n'
@@ -93,8 +94,12 @@ EXPORT Transactions_GenerationMod := MODULE(SALT311.iGenerationMod)
     + 'FIELD:spoof_count:TYPE(INTEGER5):LIKE(Invalid_No):0,0\n'
     + 'FIELD:last_spoof_date:TYPE(STRING20):LIKE(Invalid_Date):0,0\n'
     + 'FIELD:phone_forwarded:TYPE(STRING32):LIKE(Invalid_Forward):0,0\n'
-    + 'FIELD:date_added:TYPE(STRING20):LIKE(Invalid_Date):0,0\n'
-    + 'FIELD:filename:TYPE(STRING255):LIKE(Invalid_File):0,0\n'
+    + 'FIELD:date_added:TYPE(STRING20):0,0\n'
+    + 'FIELD:identity_count:TYPE(INTEGER5):LIKE(Invalid_No):0,0\n'
+    + 'FIELD:phone_verified:TYPE(STRING5):LIKE(Invalid_Code):0,0\n'
+    + 'FIELD:verification_type:TYPE(STRING32):LIKE(Invalid_AlphaChar):0,0\n'
+    + 'FIELD:phone_star_rating:TYPE(STRING5):LIKE(Invalid_Rating):0,0\n'
+    + 'FIELD:filename:TYPE(STRING255):0,0\n'
     ;
  
   // Structured values
