@@ -1,12 +1,11 @@
-﻿import tools,FraudShared;
+﻿import tools;
 
 export Create_Supers := sequential(
 	tools.mod_Utilities.createallsupers(
 		filenames().Input.dAll_filenames,
 		filenames().dAll_filenames +
 		keynames().dAll_filenames +
-		FraudGovPlatform.filenames().dAll_filenames +
-		FraudShared.keynames().dAll_filenames
+		FraudGovPlatform.filenames().dAll_filenames 
 		),		
 		// Input Files
 		tools.mod_Utilities.createsuper(_Dataset().thor_cluster_Files + 'in::passed::knownfraud'),

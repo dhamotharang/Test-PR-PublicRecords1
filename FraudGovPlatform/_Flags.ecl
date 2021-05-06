@@ -24,8 +24,7 @@ module
 			export MBSFdnHHID := count(nothor(FileServices.SuperFileContents(Filenames().Input.MBSFdnHHID.Sprayed))) > 0;
 			export MBSTableCol := count(nothor(FileServices.SuperFileContents(Filenames().Input.MBSTableCol.Sprayed))) > 0;
 			export MBSColValDesc := count(nothor(FileServices.SuperFileContents(Filenames().Input.MBSColValDesc.Sprayed))) > 0;
-			export MbsVelocityRules := count(nothor(FileServices.SuperFileContents(Filenames().Input.MbsVelocityRules.Sprayed))) > 0;
-
+			
 			export IdentityData := count(nothor(FileServices.SuperFileContents(Filenames().Input.IdentityData.Sprayed))) > 0;
 			export KnownFraud := count(nothor(FileServices.SuperFileContents(Filenames().Input.KnownFraud.Sprayed))) > 0;
 			export Deltabase := count(nothor(FileServices.SuperFileContents(Filenames().Input.Deltabase.Sprayed))) > 0;
