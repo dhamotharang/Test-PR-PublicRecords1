@@ -5,7 +5,7 @@ module
 
   // Build New Key file
 	RoxieKeyBuild.Mac_SK_BuildProcess_v3_local( dx_Infutor_NARB.Key_LinkIds.Key
-																						 ,Infutor_NARB.Files().Base.Built
+																						 ,Infutor_NARB.Files().Base.Built(ultid <> 0)
 																						 ,dx_Infutor_NARB.keynames().LinkIds.QA
 																						 ,dx_Infutor_NARB.keynames(pversion,false).LinkIds.New
 																				 		 ,BuildLinkIdsKey);  
