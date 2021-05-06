@@ -1,6 +1,7 @@
 ﻿EXPORT fIntWithCommas( pint) :=
 functionmacro
 
+  import std;
   myint         := pint;
   mystring      := trim((string)myint,all);
   
