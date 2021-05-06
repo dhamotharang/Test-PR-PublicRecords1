@@ -32,11 +32,25 @@ EXPORT DueDiligence_PersonRptService := MACRO
     regulatoryCompliance := DueDiligence.CommonQuery.GetCompliance(dppa, glba, drm, dpm, userIn.IndustryClass, lexIdSourceOptout, transactionID, batchUID, globalCompanyID, DDssnMask);
 
     //based on what was requested, call the appropriate attributes
-    ddResults := DueDiligence.CommonQueryXML.mac_v3PersonXML(wseq, cleanData, regulatoryCompliance, optionsIn.AdditionalInput,
-                                                             requestResponseLayout, DueDiligence.Constants.STRING_TRUE, debugIndicator, FALSE);
+    ddResults_temp := DueDiligence.CommonQueryXML.mac_v3PersonXML(wseq, cleanData, regulatoryCompliance, optionsIn.AdditionalInput,
+                                                                  requestResponseLayout, DueDiligence.Constants.STRING_TRUE, debugIndicator, FALSE);
 
 
 
+    ddResults := PROJECT(ddResults_temp, TRANSFORM(requestResponseLayout,
+
+                                                    inputEcho := LEFT.result.inputEcho;
+                                                    inputPerLexID := TRIM(inputEcho.person.lexID);
+                                                    calcdPerLexID := TRIM(LEFT.result.UniqueID);
+
+                                                    personLexIDChanged := inputPerLexID <> DueDiligence.Constants.EMPTY AND
+                                                                          calcdPerLexID <> DueDiligence.Constants.EMPTY AND
+                                                                          inputPerLexID <> calcdPerLexID;
+
+                                                    //if a lexID was passed in and we found a valid person and lexID changed
+                                                    SELF.result.lexIDChanged := personLexIDChanged;
+
+                                                    SELF := LEFT;));
 
     //********************************************************PERSON TEST SEED LOGIC HERE**********************************************************
     final_testSeeds := DueDiligence.TestSeeds.TestSeedFunction(input, testSeedTableName, optionsIn.AdditionalInput).GetPersonReportSeeds;

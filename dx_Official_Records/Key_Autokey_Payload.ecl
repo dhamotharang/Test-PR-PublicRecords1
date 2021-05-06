@@ -1,7 +1,7 @@
 IMPORT $, autokeyb2;
 
-fakepf := $.Constants.ak_dataset;
-fname  := $.Constants.ak_keyname;
+fakepf := DATASET([], $.layouts.ak_rec);
+fname  := $.names().i_ak_payload;
 
 autokeyb2.MAC_FID_Payload(fakepf,'','','','','','','','','',zeroDID,zeroBDID,fname,plk,'');
 
