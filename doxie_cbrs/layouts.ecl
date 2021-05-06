@@ -111,10 +111,6 @@ EXPORT layouts := MODULE
     internet_domains_record.domain_name;
   END;
   
-  EXPORT proflic_record := RECORD
-    Prof_LicenseV2.Layouts_ProfLic.Layout_Base - [global_sid, record_sid];
-  END;
-
   EXPORT best_info_record := RECORD
     $.layout_best_info;
     UNSIGNED name_source_id;

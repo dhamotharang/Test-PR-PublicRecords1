@@ -46,7 +46,7 @@ archiveNumYears := 5;  //number of years to go back (1-5) -- only used with sele
 roxieSelection := 2;  //1 = Dev154, 2 = Dev156, 3 = cert, 4 = prod
 
 //Choose version of query
-serviceVersionRequested := '.11';  
+serviceVersionRequested := '.2';  
 
 
 //Choose output selections
@@ -56,7 +56,7 @@ outputFileName := '~tgertken::out::' + STD.System.Job.wuid() + '_';
 returnOutputFiles := TRUE;                   
                     
                     
-
+threads := 2;
 
 
 
@@ -69,12 +69,13 @@ invalidRequest := MAP(inputData.isBusiness AND productsRequested IN ['Citizenshi
                       inputSelection = 1 AND inputData.includesIdentifyingInfo = FALSE => 'Input file does not contain ' + IF(inputData.isBusiness, 'BII', 'PII'),
                       inputSelection = 2 AND inputData.includesLexID = FALSE => 'Input file does not contain a lexID',
                       inputSelection = 3 AND inputData.includesIdentifyingInfo = FALSE AND inputData.includesLexID = FALSE => 'Input file does not contain ' + IF(inputData.isBusiness, 'BII', 'PII') + ' and lexID',
+                      recordLimit = 0 AND returnOutputFiles = FALSE => 'Nothing is being output when running the full file',
                       '');
  
 IF(invalidRequest <> '', FAIL(invalidRequest));                  
                     
                     
-
+RiskWise.shortcuts.check_thread_count(threads);
 
 
 
@@ -88,7 +89,7 @@ STRING8 currrentModeDate := '99999999';
 
 citizenshipModelToRun := 'CIT1808_0_0';
 
-threads := 2;
+
 debugOn := FALSE;  
 includeIntermediateVariables := FALSE;
 
@@ -181,8 +182,8 @@ rawInput := IF(recordLimit = 0,
 
 
 //filter data so we don't have duplicates based on run
-lexIDOnlyFilter := DEDUP(SORT(rawInput((UNSIGNED)lexID > 0), (UNSIGNED)lexID), (UNSIGNED)lexID);
-identOnlyFilter := DEDUP(SORT(rawInput, companyOrFirstName, altCompanyOrLastName, -middleName, -taxID, addr, city, state, zip, -phone1, -dateOfBirth), companyOrFirstName, altCompanyOrLastName, middleName, taxID, addr, city, state, zip);
+lexIDOnlyFilter := DEDUP(SORT(rawInput((UNSIGNED)lexID > 0), (UNSIGNED)lexID, seq), (UNSIGNED)lexID);
+identOnlyFilter := DEDUP(SORT(rawInput, companyOrFirstName, altCompanyOrLastName, -middleName, -taxID, addr, city, state, zip, -phone1, -dateOfBirth, seq), companyOrFirstName, altCompanyOrLastName, middleName, taxID, addr, city, state, zip);
 lexIDAndIdentFilter := DEDUP(rawInput, ALL);
 
 inputRecords := CASE(inputSelection,
@@ -202,15 +203,17 @@ END;
 
 
 appendZeroAtBeginning(STRING field, UNSIGNED lengthOfField) := FUNCTION
-  zeroPad := INTFORMAT((UNSIGNED)field, lengthOfField, 1);
+  stripField := STD.Str.Filter(field, DueDiligence.Constants.NUMERIC_VALUES);
+  zeroPad := INTFORMAT((UNSIGNED)stripField, lengthOfField, 1);
   RETURN IF(LENGTH(TRIM(field)) = 0, '', zeroPad);
 END;
 
 formatTaxID(STRING taxID) := FUNCTION
-  taxIDStrip := STD.Str.Filter(taxID, DueDiligence.Constants.NUMERIC_VALUES);
-  taxIDZeroPad := appendZeroAtBeginning(taxIDStrip, 9);
-  
-  RETURN taxIDZeroPad;
+  RETURN appendZeroAtBeginning(taxID, 9);
+END;
+
+formatZip5(STRING zip) := FUNCTION
+  RETURN appendZeroAtBeginning(zip, 5);
 END;
 
 
@@ -219,16 +222,14 @@ END;
 ddInput := PROJECT(inputRecords, TRANSFORM(DD_inLayout,
                                             sb := DATASET([TRANSFORM(iesp.duediligenceattributes.t_DDRAttributesReportBy,		
 	
-                                                          zipStrip := STD.Str.Filter(LEFT.Zip, DueDiligence.Constants.NUMERIC_VALUES);
-                                                                                                                    
-                                                          taxIDZeroPad := formatTaxID(LEFT.TaxID);
+                                                          taxIDZeroPad := appendZeroAtBeginning(LEFT.TaxID, 9);
                               
                                                           address := DATASET([TRANSFORM(iesp.share.t_Address,
                                                                                         SELF.StreetAddress1 := LEFT.Addr;
                                                                                         SELF.City := LEFT.City;
                                                                                         SELF.State := LEFT.State;
-                                                                                        SELF.Zip5 := appendZeroAtBeginning(zipStrip[1..5], 5);
-                                                                                        SELF.Zip4 := appendZeroAtBeginning(zipStrip[6..9], 4);
+                                                                                        SELF.Zip5 := appendZeroAtBeginning(LEFT.Zip[1..5], 5);
+                                                                                        SELF.Zip4 := appendZeroAtBeginning(LEFT.Zip[6..9], 4);
                                                                                         SELF := [];)])[1];
                                                                                         
                                                           personDOB := DATASET([TRANSFORM(iesp.share.t_Date,
@@ -405,7 +406,7 @@ piiPersonExpand := 'TRIM(LEFT.Phone1) = TRIM(RIGHT.inputPersonInfo.phone) AND ' 
                     'TRIM(LEFT.Addr[..50]) = TRIM(RIGHT.inputPersonInfo.address.streetAddress1) AND ' +
                     'TRIM(LEFT.City[..25]) = TRIM(RIGHT.inputPersonInfo.address.city) AND ' +
                     'TRIM(LEFT.State) = TRIM(RIGHT.inputPersonInfo.address.state) AND ' +
-                    'TRIM(STD.Str.Filter(LEFT.zip, DueDiligence.Constants.NUMERIC_VALUES)) = TRIM(RIGHT.inputPersonInfo.address.zip5 + RIGHT.inputPersonInfo.address.zip4) AND ' +
+                    'TRIM(formatZip5(LEFT.zip[..5])) = TRIM(RIGHT.inputPersonInfo.address.zip5 + RIGHT.inputPersonInfo.address.zip4) AND ' +
                     'TRIM(formatTaxID(LEFT.taxID)) = TRIM(RIGHT.inputPersonInfo.ssn) AND ' +
                     'TRIM(LEFT.CompanyOrFirstName[..20]) = TRIM(RIGHT.inputPersonInfo.name.first) AND ' +
                     'TRIM(LEFT.MiddleName[..20]) = TRIM(RIGHT.inputPersonInfo.name.middle) AND ' +
@@ -414,21 +415,23 @@ piiPersonExpand := 'TRIM(LEFT.Phone1) = TRIM(RIGHT.inputPersonInfo.phone) AND ' 
 lexIDPersonExpand := '(UNSIGNED)LEFT.lexID = (UNSIGNED)RIGHT.inputPersonInfo.lexID';
 
 
-piiBusinessExpand := //'TRIM(LEFT.Phone1) = TRIM(RIGHT.inputBusinessInfo.phone) AND ' +
+biiBusinessExpand := //'TRIM(LEFT.Phone1) = TRIM(RIGHT.inputBusinessInfo.phone) AND ' +
                       'TRIM(LEFT.Addr[..50]) = TRIM(RIGHT.inputBusinessInfo.address.streetAddress1) AND ' +
                       'TRIM(LEFT.City[..25]) = TRIM(RIGHT.inputBusinessInfo.address.city) AND ' +
                       'TRIM(LEFT.State) = TRIM(RIGHT.inputBusinessInfo.address.state) AND ' +
-                      'TRIM(STD.Str.Filter(LEFT.zip, DueDiligence.Constants.NUMERIC_VALUES)) = TRIM(RIGHT.inputBusinessInfo.address.zip5 + RIGHT.inputBusinessInfo.address.zip4) AND ' +
+                      'TRIM(formatZip5(LEFT.zip[..5])) = TRIM(RIGHT.inputBusinessInfo.address.zip5 + RIGHT.inputBusinessInfo.address.zip4) AND ' +
                       'TRIM(formatTaxID(LEFT.taxID)) = TRIM(RIGHT.inputBusinessInfo.fein) AND ' +
                       'TRIM(LEFT.CompanyOrFirstName) = TRIM(RIGHT.inputBusinessInfo.companyName) AND ' +
                       'TRIM(LEFT.AltCompanyOrLastName) = TRIM(RIGHT.inputBusinessInfo.alternateCompanyName)';
 
 
+
+
 lexIDBusinessExpand := '(UNSIGNED)LEFT.lexID = (UNSIGNED)RIGHT.inputBusinessInfo.lexID';
 
-joinCondition := MAP(runAsBusiness AND inputSelection = 1 => piiBusinessExpand,
+joinCondition := MAP(runAsBusiness AND inputSelection = 1 => biiBusinessExpand,
                      runAsBusiness AND inputSelection = 2 => lexIDBusinessExpand,
-                     runAsBusiness AND inputSelection = 3 => piiBusinessExpand + ' AND ' + lexIDBusinessExpand,
+                     runAsBusiness AND inputSelection = 3 => biiBusinessExpand + ' AND ' + lexIDBusinessExpand,
                      inputSelection = 1 => piiPersonExpand,
                      inputSelection = 2 => lexIDPersonExpand,
                      inputSelection = 3 => piiPersonExpand + ' AND ' + lexIDPersonExpand,
@@ -654,11 +657,11 @@ tbleLayout := RECORD
   UNSIGNED rowsInFinalOutputFile := COUNT(slimAttrs);
   UNSIGNED lexIDsChanged := COUNT(slimAttrs(lexIDChanged));
   #IF(runAsBusiness)
-    UNSIGNED noBusDataFound := COUNT(slimAttrs(busAssetOwnProperty = '-1'));
-    UNSIGNED busDataFound := COUNT(slimAttrs(busAssetOwnProperty <> '-1'));
+    UNSIGNED noBusDataFound := COUNT(slimAttrs(busMatchLevel = '-1'));
+    UNSIGNED busDataFound := COUNT(slimAttrs(busMatchLevel <> '-1'));
   #ELSE
-    UNSIGNED noPerDataFound := COUNT(slimAttrs(perAssetOwnProperty = '-1'));
-    UNSIGNED perDataFound := COUNT(slimAttrs(perAssetOwnProperty <> '-1'));
+    UNSIGNED noPerDataFound := COUNT(slimAttrs(perMatchLevel = '-1'));
+    UNSIGNED perDataFound := COUNT(slimAttrs(perMatchLevel <> '-1'));
   #END
   UNSIGNED ddResultsWithNoAttributes := COUNT(base(NOT EXISTS(ddAttributes.attributes)));
   UNSIGNED averageTiming := AVE(processedTimings, timeMS);

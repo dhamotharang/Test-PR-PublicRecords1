@@ -1,6 +1,6 @@
 // rename this -- something more along the lines of Report_alert_module
 
-IMPORT doxie, ut, Alerts;
+IMPORT doxie_cbrs, doxie, ut, Alerts;
   
 EXPORT alert_hashes(DATASET(doxie_cbrs.layout_report) rpt_records) := MODULE
   // may need to add these hashes to the input set if they are being accumulated
@@ -8,7 +8,7 @@ EXPORT alert_hashes(DATASET(doxie_cbrs.layout_report) rpt_records) := MODULE
 
   // when versioning is needed, need to calculate hashes based on the input version of each
   // section; then need to separately calculate output hashes based on current version
-  EXPORT output_hashes := PROJECT(rpt_records, alert_calcs(TRUE).calcHashes(LEFT));
+  EXPORT output_hashes := PROJECT(rpt_records, doxie_cbrs.alert_calcs(TRUE).calcHashes(LEFT));
 
   // for now, just use output_hashes for comparison
   SHARED cmp_hashes := output_hashes;

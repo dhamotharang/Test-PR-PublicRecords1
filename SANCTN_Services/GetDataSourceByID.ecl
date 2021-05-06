@@ -1,20 +1,20 @@
 ﻿// ========================================================
 // Returns SANCTN info from the source file; used as both search and report.
-// Result is:
+// Result is: 
 //   penalized (if search);
 //   masked in relation to SSN mask;
 //   ? pulled by ssn ?
 //   embedded table "party" is sorted by party name
 // ========================================================
 
-IMPORT census_data, codes, doxie, dx_common, SANCTN, Sanctn_Services, STD, suppress, ut;
+IMPORT census_data, codes, doxie, SANCTN, Sanctn_Services, STD, suppress, ut;
 
 shared OUT_REC := Sanctn_Services.layouts.SourceOutput;
 
 doxie.MAC_Header_Field_Declare (); // unfortunately: only to get input city name! Should be gone after interfaces are done
 
 shared GetBestCity (string25 vcity, string25 pcity) := MAP (
-  vcity = '' => pcity,
+  vcity = '' => pcity, 
   pcity = '' => vcity,
   ut.StringSimilar (vcity, city_value) <= ut.StringSimilar (pcity, city_value) => vcity, pcity
 );
@@ -23,17 +23,19 @@ shared GetBestCity (string25 vcity, string25 pcity) := MAP (
 EXPORT out_rec GetDataSourceByID (GROUPED DATASET (Sanctn_Services.layouts.id) in_ids,
                                   doxie.IDataAccess mod_access) := FUNCTION
 
-  in_rec := RECORDOF(SANCTN.Key_sanctn_incident);
-
+  in_rec := RECORDOF (SANCTN.Key_sanctn_incident);
+  // Fetch common info, calculating penalty for every record.
+  in_rec GetIncidentInfo (SANCTN.Key_sanctn_incident L) := TRANSFORM
+    SELF := L;
+  END;
   // CCPA no DID or personal info in key
-  src_fetched_raw := JOIN(in_ids, SANCTN.Key_sanctn_incident,
-    KEYED(LEFT.batch_number = RIGHT.batch_number AND LEFT.incident_number = RIGHT.incident_number),
-    TRANSFORM(RIGHT),
-    KEEP(SANCTN_Services.Constants.INCIDENT_RECORDS_MAX * 2)); // 1:M relation, doubled to account for delta updates
+  src_fetched := JOIN (in_ids, SANCTN.Key_sanctn_incident,
+                       keyed (Left.batch_number = Right.batch_number) AND
+                       keyed (Left.incident_number = Right.incident_number),
+                       transform (in_rec, SELF := Right),
+                       KEEP (Constants.INCIDENT_RECORDS_MAX)); // 1:M relation
 
-  src_fetched := CHOOSEN(dx_common.Incrementals.mac_Rollup(src_fetched_raw), SANCTN_Services.Constants.INCIDENT_RECORDS_MAX);
-
-  // rollup Incident info
+  // rollup Incident info 
   inc_sort := SORT (src_fetched, RECORD, except order_number, incident_text);
   inc_grp := GROUP (inc_sort, RECORD, except order_number, incident_text);
 
@@ -41,12 +43,12 @@ EXPORT out_rec GetDataSourceByID (GROUPED DATASET (Sanctn_Services.layouts.id) i
     // roll incident info: concatenate text which comes without breaks in order_number;
     IncInfo := Sanctn_Services.layouts.IncidentInfo;
     info_data := CHOOSEN (all_recs, Constants.TEXT_PER_INCIDENT);
-    info_proj := PROJECT (info_data, transform (IncInfo, Self.order_number := (unsigned2) Left.order_number, Self := Left));
+    info_proj := PROJECT (info_data, transform (IncInfo, Self.order_number := (unsigned2) Left.order_number, Self := Left)); 
     info_srt := SORT (info_proj, order_number);
 
     IncInfo RollText (IncInfo L, IncInfo R) := transform
       self.order_number := R.order_number; // note, this is not original sequence number anymore
-      // unfortunately, both needs to be trimmed...
+      // unfortunately, both needs to be trimmed...   
       self.incident_text := (trim (L.incident_text) + trim (R.incident_text))[1..SANCTN_Services.Constants.incident_text_length];
     end;
     info_rolled := ROLLUP (info_srt, (Left.order_number + 1 = Right.order_number), RollText (Left, Right));
@@ -54,29 +56,22 @@ EXPORT out_rec GetDataSourceByID (GROUPED DATASET (Sanctn_Services.layouts.id) i
     IncInfo AssignSequence (IncInfo L, integer C) := transform
       self.order_number := C;
       self.incident_text := L.incident_text;
-    end;
+    end; 
     SELF.info := PROJECT (info_rolled, AssignSequence (Left, COUNTER));
     SELF.is_suppressed := [];
     SELF := L;
   END;
   inc_compact := ROLLUP (inc_grp, GROUP, RollIncidentInfo (Left, ROWS (Left)));
 
-  clean_layout_w_metadata := RECORD
-    SANCTN_Services.layouts.layoutSanctnClean;
-    dx_common.layout_metadata.dt_effective_first;
-    dx_common.layout_metadata.dt_effective_last;
-    dx_common.layout_metadata.delta_ind;
-  END;
+	// retrieve parties: each party may have multiple entries here, depending on the number of parts in party info
+	party_subset_all := join(
+		inc_compact, SANCTN.Key_SANCTN_party,
+		keyed(left.batch_number=right.batch_number) and keyed(left.incident_number=right.incident_number),
+		transform(SANCTN_Services.layouts.layoutSanctnClean, self:=right),
+		limit(Constants.PARTY_PER_INCIDENT,skip)
+	);   
 
-  // retrieve parties: each party may have multiple entries here, depending on the number of parts in party info
-  party_subset_all_key_recs := join(inc_compact, SANCTN.Key_SANCTN_party,
-    keyed(left.batch_number=right.batch_number and left.incident_number = right.incident_number),
-    transform(clean_layout_w_metadata, SELF := RIGHT),
-    limit(SANCTN_Services.Constants.PARTY_PER_INCIDENT,skip));
-
-  party_subset_all_rolled := dx_common.Incrementals.mac_Rollup(party_subset_all_key_recs);
-  party_subset_all := PROJECT(party_subset_all_key_recs, SANCTN_Services.layouts.layoutSanctnClean);
-  party_subset := Suppress.MAC_FlagSuppressedSource(party_subset_all, mod_access, did, global_sid);
+  party_subset := Suppress.MAC_FlagSuppressedSource(party_subset_all, mod_access, did, global_sid); 
 
   // ---------------------------------------------------------------------
   // First roll each party's texts
@@ -91,12 +86,12 @@ EXPORT out_rec GetDataSourceByID (GROUPED DATASET (Sanctn_Services.layouts.id) i
     // county full name calculated after
     SELF.address.county := '';
     SELF.address := L;
-
+      
     // slim down to party text
     PartyInfo := Sanctn_Services.layouts.PartyInfo;
     info_data := CHOOSEN (all_recs, Constants.TEXT_PER_PARTY);
     info_proj := PROJECT (info_data, transform (PartyInfo, Self.order_number := (unsigned2) Left.order_number,
-                                                           Self.party_text := Left.party_text));
+                                                           Self.party_text := Left.party_text)); 
 
     //roll up party info by paragraphs
     info_srt := SORT (info_proj, order_number);
@@ -111,7 +106,7 @@ EXPORT out_rec GetDataSourceByID (GROUPED DATASET (Sanctn_Services.layouts.id) i
 
     // penalize:
     addr_penalt := doxie.FN_Tra_Penalty_Addr (L.predir, L.prim_range, L.prim_name, L.addr_suffix,
-                                              L.postdir, L.sec_range,
+                                              L.postdir, L.sec_range, 
                                               GetBestCity (L.v_city_name, L.p_city_name),
                                               L.st, L.zip5);
     SELF.penalt := addr_penalt +  doxie.FN_Tra_Penalty_Name (L.fname, L.mname, L.lname) + doxie.FN_Tra_Penalty_CName (L.cname);
@@ -136,7 +131,7 @@ EXPORT out_rec GetDataSourceByID (GROUPED DATASET (Sanctn_Services.layouts.id) i
     unsigned1 penalt;
     DATASET (Sanctn_Services.layouts.Party) parties {MAXCOUNT (Sanctn_Services.Constants.PARTY_PER_INCIDENT)};
     BOOLEAN is_suppressed;
-  END;
+  END; 
 
   rec_parties_rolled RollParties (prt_grp L, DATASET (recordof (prt_grp)) all_recs) := transform
     Self.parties := project (all_recs, Sanctn_Services.layouts.Party);
@@ -157,7 +152,7 @@ EXPORT out_rec GetDataSourceByID (GROUPED DATASET (Sanctn_Services.layouts.id) i
   END;
 
   ds_res := JOIN (inc_compact, party_ready,
-                  Left.batch_number=Right.batch_number and
+                  Left.batch_number=Right.batch_number and 
                   Left.incident_number = Right.incident_number,
                   AppendParty (Left, Right),
                   LEFT OUTER, keep (1), limit (0)); // at most 1 match

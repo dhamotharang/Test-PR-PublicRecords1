@@ -140,7 +140,7 @@ EXPORT driver_licenses_v2:=if(in_params.include_driverslicenses and ~IsFCRA,
 
 // same as doxie_crs.Comp_Addresses_Verified, but WITHOUT verification codes
 shared address_orig := doxie.Comp_Addresses; //doxie/Layout_Comp_Addresses
-
+export  address_original := doxie.Comp_Addresses;
 // some name variations are missing in the source addresses; try to append from complete residents' list
 // this may improve address-phone linking, since names can be used.
 address_expanded := $.Functions.Address (in_params).ExpandWithResidents (address_orig, src_residents);

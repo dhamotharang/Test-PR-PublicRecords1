@@ -458,7 +458,7 @@ EXPORT BIP_Layouts := MODULE
 		STRING9 OutBestBusFEIN;
 		STRING10 OutBestBusPhone;
 		STRING6 OutBestNAICS;
-		STRING4 OutBestSIC;
+		STRING8 OutBestSIC;
 		STRING1 LNHitInd;
 		STRING1 LNInputInd;
 		STRING2 VerificationBusInputName;

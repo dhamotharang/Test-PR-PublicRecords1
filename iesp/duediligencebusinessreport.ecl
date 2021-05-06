@@ -288,6 +288,7 @@ end;
 		
 export t_DDRBusinessResult := record
 	string12 BusinessId {xpath('BusinessId')};
+	boolean LexIDChanged {xpath('LexIDChanged')};
 	t_DDRBusinessReportBy InputEcho {xpath('InputEcho')};
 	iesp.duediligenceshared.t_DDRAttributeGroup AttributeGroup {xpath('AttributeGroup')};
 	t_DDRBusinessReport BusinessReport {xpath('BusinessReport')};
