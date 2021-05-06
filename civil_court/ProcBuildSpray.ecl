@@ -182,8 +182,8 @@ EXPORT ProcBuildSpray(
 	);
 
 	EXPORT sprayPaBuck(
-		STRING pNameFileMask = '*_BUCKS_WKLY_DOCK_UPD.txt',
-		STRING pDocFileMask = '*_BUCKS_WKLY_NAME_UPD.txt'
+		STRING pNameFileMask = 'pa_bucks_en_*_BUCKS_WKLY_DOCK_UPD.txt',
+		STRING pDocFileMask = 'pa_bucks_en_*_BUCKS_WKLY_NAME_UPD.txt'
 	) := SEQUENTIAL (
 		doSprayUp(
 			'Bucks County PA Name',
