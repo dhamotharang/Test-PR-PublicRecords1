@@ -67,6 +67,9 @@ Replace previous address with new address
 								self.geo_blk := Coalesce1(newbase.geo_blk, base.geo_blk);
 								self.geo_match := Coalesce1(newbase.geo_match, base.geo_match);
 								self.err_stat := Coalesce1(newbase.err_stat, base.err_stat);
+								
+								self.prepped_addr1 := newbase.prepped_addr1;
+								self.prepped_addr2 := newbase.prepped_addr2;
 						
 					self.created := IF(base.addressType='', Std.Date.Today(), base.created);
 					self.replaced := IF(newbase.addressType='', base.replaced, Std.Date.Today());
