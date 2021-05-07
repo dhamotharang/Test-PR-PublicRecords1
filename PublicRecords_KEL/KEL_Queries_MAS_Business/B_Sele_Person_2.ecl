@@ -4,8 +4,8 @@ IMPORT B_Sele_Person_3,CFG_Compile,E_Business_Org,E_Business_Sele,E_Business_Sel
 IMPORT * FROM KEL16.Null;
 EXPORT B_Sele_Person_2(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG_Compile __cfg = CFG_Compile) := MODULE
   SHARED VIRTUAL TYPEOF(B_Sele_Person_3(__in,__cfg).__ENH_Sele_Person_3) __ENH_Sele_Person_3 := B_Sele_Person_3(__in,__cfg).__ENH_Sele_Person_3;
-  SHARED __EE2866404 := __ENH_Sele_Person_3;
-  EXPORT __ST183653_Layout := RECORD
+  SHARED __EE2862376 := __ENH_Sele_Person_3;
+  EXPORT __ST184654_Layout := RECORD
     KEL.typ.ntyp(E_Business_Sele().Typ) Legal_;
     KEL.typ.ntyp(E_Person().Typ) Contact_;
     KEL.typ.nint Ult_I_D_;
@@ -17,7 +17,7 @@ EXPORT B_Sele_Person_2(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG
     KEL.typ.nkdate Assoc_Fs_Date_;
     KEL.typ.nint Datemonths_;
     KEL.typ.bool Is_Executive_Ever_ := FALSE;
-    KEL.typ.ndataset(B_Sele_Person_3(__in,__cfg).__ST792817_Layout) Relatives_;
+    KEL.typ.ndataset(B_Sele_Person_3(__in,__cfg).__ST791599_Layout) Relatives_;
     KEL.typ.nbool Two_Years_;
     KEL.typ.epoch Archive___Date_ := 0;
     KEL.typ.epoch Date_First_Seen_ := 0;
@@ -26,10 +26,10 @@ EXPORT B_Sele_Person_2(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG
     KEL.typ.epoch Vault_Date_Last_Seen_ := 0;
     KEL.typ.int __RecordCount := 0;
   END;
-  SHARED __ST183653_Layout __ND2866409__Project(B_Sele_Person_3(__in,__cfg).__ST193272_Layout __PP2866405) := TRANSFORM
-    __CC13531 := KEL.Routines.MinN(FN_Compile(__cfg).FN_G_E_T_B_U_I_L_D_D_A_T_E(__ECAST(KEL.typ.nstr,__CN('bip_build_version'))),__CN(__cfg.CurrentDate));
-    SELF.Datemonths_ := __FN2(KEL.Routines.MonthsBetween,__PP2866405.Assoc_Fs_Date_,__CC13531);
-    SELF := __PP2866405;
+  SHARED __ST184654_Layout __ND2862381__Project(B_Sele_Person_3(__in,__cfg).__ST194259_Layout __PP2862377) := TRANSFORM
+    __CC13402 := KEL.Routines.MinN(FN_Compile(__cfg).FN_G_E_T_B_U_I_L_D_D_A_T_E(__ECAST(KEL.typ.nstr,__CN('bip_build_version'))),__CN(__cfg.CurrentDate));
+    SELF.Datemonths_ := __FN2(KEL.Routines.MonthsBetween,__PP2862377.Assoc_Fs_Date_,__CC13402);
+    SELF := __PP2862377;
   END;
-  EXPORT __ENH_Sele_Person_2 := PROJECT(__EE2866404,__ND2866409__Project(LEFT));
+  EXPORT __ENH_Sele_Person_2 := PROJECT(__EE2862376,__ND2862381__Project(LEFT));
 END;

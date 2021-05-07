@@ -4,8 +4,8 @@ IMPORT CFG_Compile,E_Business_Org,E_Business_Sele,E_Business_Sele_Overflow,E_Bus
 IMPORT * FROM KEL16.Null;
 EXPORT B_Sele_Person_7(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG_Compile __cfg = CFG_Compile) := MODULE
   SHARED VIRTUAL TYPEOF(E_Sele_Person(__in,__cfg).__Result) __E_Sele_Person := E_Sele_Person(__in,__cfg).__Result;
-  SHARED __EE1907723 := __E_Sele_Person;
-  EXPORT __ST211215_Layout := RECORD
+  SHARED __EE1905318 := __E_Sele_Person;
+  EXPORT __ST212168_Layout := RECORD
     KEL.typ.ntyp(E_Business_Sele().Typ) Legal_;
     KEL.typ.ntyp(E_Person().Typ) Contact_;
     KEL.typ.nint Ult_I_D_;
@@ -21,12 +21,12 @@ EXPORT B_Sele_Person_7(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG
     KEL.typ.epoch Vault_Date_Last_Seen_ := 0;
     KEL.typ.int __RecordCount := 0;
   END;
-  SHARED __ST211215_Layout __ND1907687__Project(E_Sele_Person(__in,__cfg).Layout __PP316861) := TRANSFORM
-    __EE1907662 := __PP316861.Contact_Info_;
-    __CC13531 := KEL.Routines.MinN(FN_Compile(__cfg).FN_G_E_T_B_U_I_L_D_D_A_T_E(__ECAST(KEL.typ.nstr,__CN('bip_build_version'))),__CN(__cfg.CurrentDate));
-    __EE1907682 := __PP316861.Contact_Info_;
-    SELF.Assoc_Date_ := IF(__T(__OP2(KEL.Aggregates.MaxNN(__EE1907662,KEL.era.ToDate(__T(__EE1907662).Date_Last_Seen_)),>,__CC13531)),__ECAST(KEL.typ.nkdate,__CC13531),__ECAST(KEL.typ.nkdate,KEL.Aggregates.MaxNN(__EE1907682,KEL.era.ToDate(__T(__EE1907682).Date_Last_Seen_))));
-    SELF := __PP316861;
+  SHARED __ST212168_Layout __ND1905282__Project(E_Sele_Person(__in,__cfg).Layout __PP317854) := TRANSFORM
+    __EE1905257 := __PP317854.Contact_Info_;
+    __CC13402 := KEL.Routines.MinN(FN_Compile(__cfg).FN_G_E_T_B_U_I_L_D_D_A_T_E(__ECAST(KEL.typ.nstr,__CN('bip_build_version'))),__CN(__cfg.CurrentDate));
+    __EE1905277 := __PP317854.Contact_Info_;
+    SELF.Assoc_Date_ := IF(__T(__OP2(KEL.Aggregates.MaxNN(__EE1905257,KEL.era.ToDate(__T(__EE1905257).Date_Last_Seen_)),>,__CC13402)),__ECAST(KEL.typ.nkdate,__CC13402),__ECAST(KEL.typ.nkdate,KEL.Aggregates.MaxNN(__EE1905277,KEL.era.ToDate(__T(__EE1905277).Date_Last_Seen_))));
+    SELF := __PP317854;
   END;
-  EXPORT __ENH_Sele_Person_7 := PROJECT(__EE1907723,__ND1907687__Project(LEFT));
+  EXPORT __ENH_Sele_Person_7 := PROJECT(__EE1905318,__ND1905282__Project(LEFT));
 END;

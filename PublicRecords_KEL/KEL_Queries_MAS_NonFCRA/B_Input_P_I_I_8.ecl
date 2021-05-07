@@ -4,8 +4,8 @@ IMPORT CFG_Compile,E_Address,E_Address_Slim,E_Address_Summary,E_Email,E_Geo_Link
 IMPORT * FROM KEL16.Null;
 EXPORT B_Input_P_I_I_8(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG_Compile __cfg = CFG_Compile) := MODULE
   SHARED VIRTUAL TYPEOF(E_Input_P_I_I(__in,__cfg).__Result) __E_Input_P_I_I := E_Input_P_I_I(__in,__cfg).__Result;
-  SHARED __EE219570 := __E_Input_P_I_I;
-  EXPORT __ST177068_Layout := RECORD
+  SHARED __EE220667 := __E_Input_P_I_I;
+  EXPORT __ST178105_Layout := RECORD
     KEL.typ.nuid UID;
     KEL.typ.ntyp(E_Person().Typ) Subject_;
     KEL.typ.nstr P___Inp_Acct_;
@@ -13,7 +13,11 @@ EXPORT B_Input_P_I_I_8(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG
     KEL.typ.nstr P___Inp_Name_First_;
     KEL.typ.nstr P___Inp_Name_Mid_;
     KEL.typ.nstr P___Inp_Name_Last_;
-    KEL.typ.ntyp(E_Surname().Typ) Last_Name_;
+    KEL.typ.nstr P___Inp_Cln_Surname1_;
+    KEL.typ.nstr P___Inp_Cln_Surname2_;
+    KEL.typ.ntyp(E_Surname().Typ) Last_Name1_;
+    KEL.typ.ntyp(E_Surname().Typ) Last_Name2_;
+    KEL.typ.nstr Address_Geo_Link_;
     KEL.typ.nstr P___Inp_Addr_Line1_;
     KEL.typ.nstr P___Inp_Addr_Line2_;
     KEL.typ.nstr P___Inp_Addr_City_;
@@ -141,11 +145,11 @@ EXPORT B_Input_P_I_I_8(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG
     KEL.typ.epoch Vault_Date_Last_Seen_ := 0;
     KEL.typ.int __RecordCount := 0;
   END;
-  SHARED __ST177068_Layout __ND1582462__Project(E_Input_P_I_I(__in,__cfg).Layout __PP218912) := TRANSFORM
-    __CC13665 := '-99998';
-    __CC13660 := '-99999';
-    SELF.Input_S_S_N_Clean_Value_ := IF(__T(__OP2(__FN1(LENGTH,__ECAST(KEL.typ.nstr,__ECAST(KEL.typ.nint,__PP218912.P___Inp_Cln_S_S_N_))),>,__CN(9))),__ECAST(KEL.typ.nstr,__CN(__CC13665)),__ECAST(KEL.typ.nstr,FN_Compile(__cfg).FN_Is_Blank2_Fields(__ECAST(KEL.typ.nstr,__PP218912.P___Inp_S_S_N_),__ECAST(KEL.typ.nstr,__CN(__CC13660)),__ECAST(KEL.typ.nstr,__PP218912.P___Inp_Cln_S_S_N_),__ECAST(KEL.typ.nstr,__CN(__CC13665)))));
-    SELF := __PP218912;
+  SHARED __ST178105_Layout __ND1581111__Project(E_Input_P_I_I(__in,__cfg).Layout __PP219989) := TRANSFORM
+    __CC13536 := '-99998';
+    __CC13531 := '-99999';
+    SELF.Input_S_S_N_Clean_Value_ := IF(__T(__OP2(__FN1(LENGTH,__ECAST(KEL.typ.nstr,__ECAST(KEL.typ.nint,__PP219989.P___Inp_Cln_S_S_N_))),>,__CN(9))),__ECAST(KEL.typ.nstr,__CN(__CC13536)),__ECAST(KEL.typ.nstr,FN_Compile(__cfg).FN_Is_Blank2_Fields(__ECAST(KEL.typ.nstr,__PP219989.P___Inp_S_S_N_),__ECAST(KEL.typ.nstr,__CN(__CC13531)),__ECAST(KEL.typ.nstr,__PP219989.P___Inp_Cln_S_S_N_),__ECAST(KEL.typ.nstr,__CN(__CC13536)))));
+    SELF := __PP219989;
   END;
-  EXPORT __ENH_Input_P_I_I_8 := PROJECT(__EE219570,__ND1582462__Project(LEFT));
+  EXPORT __ENH_Input_P_I_I_8 := PROJECT(__EE220667,__ND1581111__Project(LEFT));
 END;
