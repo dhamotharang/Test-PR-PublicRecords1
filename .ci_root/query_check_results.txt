@@ -4,16 +4,16 @@ Sending Request to: http://uspr-dopsservices.risk.regn.net/demodopsservice.asmx
 Soapcall response
 Services Response OK: 767
 Loaded Fast Syntax Exceptions: 8
-Starting Syntax Check at: 2021-05-05T23:06:37.530Z
+Starting Syntax Check at: 2021-05-06T23:06:48.439Z
 Checking 733 Queries...
 ----------------------------------------------------------
 
   1   0%  [OK]       0.8s  Accident_Services.dolStateService
   2   0%  [OK]       1.1s  Accident_Services.ReportService
   3   0%  [OK]       1.3s  Accident_Services.SearchService
-  4   1%  [OK]       0.7s  Accident_Services.StateRestrictionsReportService
-  5   1%  [OK]       7.9s  addrBest.BestAddress_Batch_Service [w]
-  6   1%  [OK]      10.8s  AddrBest.BestAddr_ProgressivePhone_Service [w]
+  4   1%  [OK]       0.8s  Accident_Services.StateRestrictionsReportService
+  5   1%  [OK]       8.0s  addrBest.BestAddress_Batch_Service [w]
+  6   1%  [OK]      10.5s  AddrBest.BestAddr_ProgressivePhone_Service [w]
   7   1%  [OK]       0.1s  Address.AddressCleaningService
   8   1%  [OK]       0.1s  Address.AddressCleaning_Batch_Service
   9   1%  [OK]       0.1s  Address.CleanerSetTracingOffService
@@ -21,169 +21,169 @@ Checking 733 Queries...
  11   2%  [OK]       0.1s  Address.LIB_Cleaning [lib]
  12   2%  [OK]       0.1s  Address.NameCleaning_Batch_Service
  13   2%  [OK]       0.1s  address.service_addresscachedebug
- 14   2%  [OK]       0.5s  AddressFeedback_Services.ReportService
- 15   2%  [OK]       4.2s  AddressReport_Services.AddressSummaryService [w]
+ 14   2%  [OK]       0.6s  AddressFeedback_Services.ReportService
+ 15   2%  [OK]       4.1s  AddressReport_Services.AddressSummaryService [w]
  16   2%  [OK]       1.5s  AddressReport_Services.CountService
- 17   2%  [OK]       9.9s  AddressReport_Services.ReportService [w]
- 18   2%  [OK]       2.5s  Address_Attributes.Neighborhood_Report_Service
- 19   3%  [OK]       2.5s  Address_Attributes.Neighborhood_Search_Service
+ 17   2%  [OK]       9.8s  AddressReport_Services.ReportService [w]
+ 18   2%  [OK]       2.6s  Address_Attributes.Neighborhood_Report_Service
+ 19   3%  [OK]       2.6s  Address_Attributes.Neighborhood_Search_Service
  20   3%  [OK]       0.9s  Address_Attributes.Residential_Report_Service
  21   3%  [OK]       0.6s  Address_Attributes.Residential_Search_Service
  22   3%  [OK]       0.6s  Address_Attributes.SmartGrid_BatchService [w]
- 23   3%  [OK]       7.3s  Address_Rank.BatchService [w]
+ 23   3%  [OK]       7.4s  Address_Rank.BatchService [w]
  24   3%  [OK]      11.9s  Address_Services.RightAddressService [w]
  25   3%  [OK]       0.6s  Address_Services.SearchService
- 26   4%  [OK]       2.6s  Address_Shell.Address_Attributes_Batch_Service [w]
+ 26   4%  [OK]       2.7s  Address_Shell.Address_Attributes_Batch_Service [w]
  27   4%  [OK]       2.6s  Address_Shell.Address_Attributes_Service [w]
  28   4%  [OK]       2.5s  AddrFraud.AddressRisk_Service
  29   4%  [OK]       0.1s  Advo_Services.Advo_Batch_Service
  30   4%  [OK]       1.0s  American_Student_Services.SearchService
- 31   4%  [OK]      29.5s  AML.AML_Batch_Service [w]
- 32   4%  [OK]      29.3s  AML.AML_Service [w]
+ 31   4%  [OK]      29.1s  AML.AML_Batch_Service [w]
+ 32   4%  [OK]      29.1s  AML.AML_Service [w]
  33   5%  [OK]       1.2s  ATF_Services.SearchService
  34   5%  [OK]       1.2s  ATF_Services.SearchServiceFCRA
  35   5%  [OK]       0.1s  AutoHeaderV2.LexIDSearchSALTService
  36   5%  [OK]       0.1s  AutoHeaderV2.LexIDSearchService
- 37   5%  [OK]       0.6s  AutoHeaderV2.LIB_header [lib]
+ 37   5%  [OK]       0.5s  AutoHeaderV2.LIB_header [lib]
  38   5%  [OK]       2.5s  autoheaderv2.lib_header_saltplus [lib]
  39   5%  [OK]       0.1s  Banko.AdditionalEventsBatchService
  40   5%  [OK]       0.1s  Banko.AdditionalEventsBatchServiceFCRA
  41   6%  [OK]       1.5s  BankruptcyV2_Services.BankruptcyReportService
- 42   6%  [OK]       1.6s  BankruptcyV2_Services.BankruptcySearchService
- 43   6%  [OK]       1.6s  BankruptcyV2_Services.FocusSearchService
+ 42   6%  [OK]       1.5s  BankruptcyV2_Services.BankruptcySearchService
+ 43   6%  [OK]       1.7s  BankruptcyV2_Services.FocusSearchService
  44   6%  [OK]       1.2s  BankruptcyV3_Services.BankruptcyReportService
  45   6%  [OK]       1.3s  BankruptcyV3_Services.BankruptcyReportServiceFCRA
  46   6%  [OK]       1.2s  BankruptcyV3_Services.BankruptcySearchService
  47   6%  [OK]       1.5s  BankruptcyV3_Services.BankruptcySearchServiceFCRA
  48   7%  [OK]       0.9s  BatchServices.AccuityBankData_BatchService
- 49   7%  [OK]       4.5s  BatchServices.Accurint_Property_BatchService
- 50   7%  [OK]       4.5s  BatchServices.Accurint_Property_BatchServiceFCRA
- 51   7%  [OK]       4.2s  BatchServices.AKA_BatchService
- 52   7%  [OK]       7.6s  BatchServices.AppendDid_BatchService [w]
- 53   7%  [OK]       2.0s  BatchServices.Bankruptcy_BatchService
+ 49   7%  [OK]       4.4s  BatchServices.Accurint_Property_BatchService
+ 50   7%  [OK]       4.6s  BatchServices.Accurint_Property_BatchServiceFCRA
+ 51   7%  [OK]       4.5s  BatchServices.AKA_BatchService
+ 52   7%  [OK]       7.5s  BatchServices.AppendDid_BatchService [w]
+ 53   7%  [OK]       1.9s  BatchServices.Bankruptcy_BatchService
  54   7%  [OK]       2.5s  BatchServices.Bankruptcy_BatchServiceFCRA
  55   8%  [OK]       0.2s  BatchServices.BDID_Update_Batch_Service
- 56   8%  [OK]       2.0s  BatchServices.BkReport_BatchService
+ 56   8%  [OK]       1.9s  BatchServices.BkReport_BatchService
  57   8%  [OK]       2.1s  BatchServices.BkReport_BatchServiceFCRA
  58   8%  [OK]       1.4s  BatchServices.BusinessInView_BatchService [w]
  59   8%  [OK]       0.6s  BatchServices.Business_BatchService
  60   8%  [OK]       1.0s  BatchServices.CompaniesForPerson_BatchService
  61   8%  [OK]       0.4s  BatchServices.CourtLocator_BatchService
- 62   8%  [OK]       0.9s  BatchServices.DCALead_BatchService
+ 62   8%  [OK]       1.0s  BatchServices.DCALead_BatchService
  63   9%  [OK]       1.2s  BatchServices.Death_BatchService
  64   9%  [OK]       1.0s  BatchServices.DEA_BatchService [w]
  65   9%  [OK]       1.1s  BatchServices.email_BatchService
  66   9%  [OK]       0.5s  BatchServices.HRI_Address_Service
- 67   9%  [OK]      34.5s  BatchServices.IdentityRefundFraud_BatchService [w]
+ 67   9%  [OK]      35.1s  BatchServices.IdentityRefundFraud_BatchService [w]
  68   9%  [OK]       0.5s  BatchServices.IP_Metadata_BatchService
  69   9%  [OK]       2.1s  BatchServices.JudgmentsAndLiens_BatchService
  70  10%  [OK]       0.3s  BatchServices.OFAC_BatchService [w]
- 71  10%  [OK]       2.6s  BatchServices.OptOutBatchService
+ 71  10%  [OK]       2.7s  BatchServices.OptOutBatchService
  72  10%  [OK]       1.0s  BatchServices.OthersUsingSSN_BatchService
  73  10%  [OK]       0.5s  BatchServices.PAC_Indicator_BatchService
  74  10%  [OK]       3.2s  BatchServices.PhoneAttributes_BatchService
  75  10%  [OK]       7.4s  BatchServices.PhoneOwnership_BatchService
- 76  10%  [OK]       4.0s  batchservices.picklistbatchservice
- 77  11%  [OK]       1.0s  BatchServices.PossibleLitigiousDebtor_BatchService
- 78  11%  [OK]       4.7s  BatchServices.Property_BatchService
- 79  11%  [OK]       4.8s  BatchServices.Property_BatchServiceFCRA
- 80  11%  [OK]       5.9s  BatchServices.RealTimePhones_BatchService
- 81  11%  [OK]       6.2s  BatchServices.ResidentsService
- 82  11%  [OK]       0.6s  BatchServices.ReversePhoneHistoryService
+ 76  10%  [OK]       3.9s  batchservices.picklistbatchservice
+ 77  11%  [OK]       1.1s  BatchServices.PossibleLitigiousDebtor_BatchService
+ 78  11%  [OK]       4.8s  BatchServices.Property_BatchService
+ 79  11%  [OK]       4.7s  BatchServices.Property_BatchServiceFCRA
+ 80  11%  [OK]       6.1s  BatchServices.RealTimePhones_BatchService
+ 81  11%  [OK]       6.0s  BatchServices.ResidentsService
+ 82  11%  [OK]       0.7s  BatchServices.ReversePhoneHistoryService
  83  11%  [OK]       1.2s  BatchServices.RollupBusiness_BatchService
- 84  11%  [OK]       1.5s  BatchServices.SexOffenderCPS_BatchService
- 85  12%  [OK]       0.6s  BatchServices.SicCode_BatchService
+ 84  11%  [OK]       1.4s  BatchServices.SexOffenderCPS_BatchService
+ 85  12%  [OK]       0.7s  BatchServices.SicCode_BatchService
  86  12%  [OK]       0.4s  BatchServices.SSN_Issuance_BatchService
  87  12%  [OK]       7.3s  BatchServices.STR_BatchService [w]
- 88  12%  [OK]      35.9s  BatchServices.TaxRefundISv3_BatchService [w]
- 89  12%  [OK]      32.6s  BatchServices.TaxRefundIS_BatchService [w]
+ 88  12%  [OK]      35.7s  BatchServices.TaxRefundISv3_BatchService [w]
+ 89  12%  [OK]      31.5s  BatchServices.TaxRefundIS_BatchService [w]
  90  12%  [OK]       0.1s  BatchServices.Telecordia_BatchService
  91  12%  [OK]       2.0s  BatchServices.Trustee_BatchService
  92  13%  [OK]       1.6s  BatchServices.UCCLiens_BatchService
- 93  13%  [OK]       6.2s  BatchServices.WorkPlace_BatchService
- 94  13%  [OK]      10.1s  BestAddressAndPhone_Services.SearchService [w]
- 95  13%  [OK]       2.8s  BIPV2.IDfunctions_Service
+ 93  13%  [OK]       6.1s  BatchServices.WorkPlace_BatchService
+ 94  13%  [OK]      10.3s  BestAddressAndPhone_Services.SearchService [w]
+ 95  13%  [OK]       2.7s  BIPV2.IDfunctions_Service
  96  13%  [OK]       1.2s  BIPV2_Best.Best_Combined_Service
  97  13%  [OK]       0.2s  BIPV2_Company_Names.CompanyNameClean
- 98  13%  [OK]       0.1s  bipv2_company_names.svcbatchnamecleaner
- 99  14%  [OK]       5.8s  BIPV2_Crosswalk.svcCrosswalk
+ 98  13%  [OK]       0.2s  bipv2_company_names.svcbatchnamecleaner
+ 99  14%  [OK]       5.9s  BIPV2_Crosswalk.svcCrosswalk
 100  14%  [OK]       1.2s  bipv2_hrchy.showservice
-101  14%  [OK]       2.6s  BIPV2_LGID3.LGID3CompareService
+101  14%  [OK]       2.7s  BIPV2_LGID3.LGID3CompareService
 102  14%  [OK]       3.3s  BIPV2_ProxID.ProxidCompareService
 103  14%  [OK]       0.7s  BIPV2_Seleid_Relative.ASSOCRelationshipService
-104  14%  [OK]       2.5s  BizLinkFull.Biz_Header_Service_2
+104  14%  [OK]       2.7s  BizLinkFull.Biz_Header_Service_2
 105  14%  [OK]       1.6s  BizLinkFull.MEOW_Biz_Service
 106  14%  [OK]       3.8s  BizLinkFull.svcAppend
 107  15%  [OK]       2.2s  BizLinkFull.svcBatch
 108  15%  [OK]       0.8s  bizlinkfull.svcwheelcity
 109  15%  [OK]       2.2s  BLJ_V2_Services.BLJSearchService
-110  15%  [OK]       1.5s  BLJ_V2_Services.FocusSearchService
+110  15%  [OK]       1.6s  BLJ_V2_Services.FocusSearchService
 111  15%  [OK]       0.1s  Boolean_Services.EchoService
-112  15%  [OK]     226.3s  BRM_Marketing_attributes.BRM_Marketing_Attr_Batch_Services [nofast]
-113  15%  [OK]       9.5s  BS_Services.InstantIDService [w]
-114  16%  [OK]       6.5s  BusinessBatch_BIP.RollupService [w]
-115  16%  [OK]       7.0s  BusinessBatch_BIP.SingleViewService
+112  15%  [OK]     251.5s  BRM_Marketing_attributes.BRM_Marketing_Attr_Batch_Services [nofast]
+113  15%  [OK]       9.3s  BS_Services.InstantIDService [w]
+114  16%  [OK]       6.3s  BusinessBatch_BIP.RollupService [w]
+115  16%  [OK]       7.1s  BusinessBatch_BIP.SingleViewService
 116  16%  [OK]       8.6s  BusinessContactCard.ReportService [w]
 117  16%  [OK]       6.1s  businesscredit_services.bcd_businesssearch
-118  16%  [OK]      53.0s  businesscredit_services.bcd_smallbizcombinedreport [w]
-119  16%  [OK]      14.6s  BusinessCredit_Services.BusinessAuthRepSearchService [w]
-120  16%  [OK]       5.2s  BusinessCredit_Services.CreditBatchService
-121  17%  [OK]      48.2s  BusinessCredit_Services.CreditReportService [w]
-122  17%  [OK]      47.1s  BusinessInstantID20_Services.InstantID20_Batch_Service [w]
-123  17%  [OK]      48.4s  BusinessInstantID20_Services.InstantID20_Service [w]
-124  17%  [OK]       3.0s  businessmatchcode_services.matchcodebatchservice
+118  16%  [OK]      54.0s  businesscredit_services.bcd_smallbizcombinedreport [w]
+119  16%  [OK]      14.5s  BusinessCredit_Services.BusinessAuthRepSearchService [w]
+120  16%  [OK]       5.3s  BusinessCredit_Services.CreditBatchService
+121  17%  [OK]      49.9s  BusinessCredit_Services.CreditReportService [w]
+122  17%  [OK]      47.2s  BusinessInstantID20_Services.InstantID20_Batch_Service [w]
+123  17%  [OK]      47.3s  BusinessInstantID20_Services.InstantID20_Service [w]
+124  17%  [OK]       3.1s  businessmatchcode_services.matchcodebatchservice
 125  17%  [OK]       0.2s  Business_Header.BH_BDID_Batch_Raw_Service
 126  17%  [OK]       0.2s  Business_Header.BH_BDID_Batch_Service
 127  17%  [OK]       0.4s  Business_Header.BH_BDID_Service
-128  17%  [OK]       3.8s  Business_Header.BH_GID_RollupSearchService [w]
+128  17%  [OK]       3.9s  Business_Header.BH_GID_RollupSearchService [w]
 129  18%  [OK]       0.7s  Business_Header.BH_ProfileSearchService
-130  18%  [OK]       0.7s  Business_Header.BH_SearchService
-131  18%  [OK]       4.6s  Business_Risk.Business_Shell [w]
-132  18%  [OK]       4.5s  Business_Risk.InstantID_Batch_Service [w]
+130  18%  [OK]       0.8s  Business_Header.BH_SearchService
+131  18%  [OK]       4.7s  Business_Risk.Business_Shell [w]
+132  18%  [OK]       4.6s  Business_Risk.InstantID_Batch_Service [w]
 133  18%  [OK]       4.4s  Business_Risk.InstantID_Service
-134  18%  [OK]      25.6s  Business_Risk_BIP.Business_Shell_Batch_Service
-135  18%  [OK]      25.5s  Business_Risk_BIP.Business_Shell_Service
-136  19%  [OK]      66.4s  business_risk_bip.lib_b2b_attributes [nofast] [lib] [w]
-137  19%  [OK]      23.5s  Business_Risk_BIP.ProdData
-138  19%  [OK]       0.5s  CALBUS_Services.CalbusReportService
-139  19%  [OK]       0.9s  CALBUS_Services.CalbusSearchService
+134  18%  [OK]      26.1s  Business_Risk_BIP.Business_Shell_Batch_Service
+135  18%  [OK]      25.8s  Business_Risk_BIP.Business_Shell_Service
+136  19%  [OK]      67.2s  business_risk_bip.lib_b2b_attributes [nofast] [lib] [w]
+137  19%  [OK]      23.2s  Business_Risk_BIP.ProdData
+138  19%  [OK]       0.4s  CALBUS_Services.CalbusReportService
+139  19%  [OK]       0.8s  CALBUS_Services.CalbusSearchService
 140  19%  [OK]       0.7s  CALBUS_Services.FocusSearchService
 141  19%  [OK]       3.0s  CAN_PH.CanadianPhoneSearch
 142  19%  [OK]       1.1s  CarrierID_Services.searchservice
 143  20%  [OK]       1.1s  CCW_services.SearchService
 144  20%  [OK]       1.1s  CCW_services.SearchServiceFCRA
 145  20%  [OK]       0.4s  CensusBureau.CensusBureau_Phone_Service
-146  20%  [OK]       0.4s  CivilCourt_Services.ReportService
-147  20%  [OK]       0.8s  CivilCourt_Services.SearchService
-148  20%  [OK]       2.5s  ClerksofCourt.ID_Batch_Service
+146  20%  [OK]       0.3s  CivilCourt_Services.ReportService
+147  20%  [OK]       0.7s  CivilCourt_Services.SearchService
+148  20%  [OK]       2.4s  ClerksofCourt.ID_Batch_Service
 149  20%  [OK]       2.4s  ClerksofCourt.ID_Service
-150  20%  [OK]       3.3s  ClickData.Clickdata_Bests_Service
-151  21%  [OK]       3.4s  ClickData.Clickdata_Interactive_Best_Service
+150  20%  [OK]       3.1s  ClickData.Clickdata_Bests_Service
+151  21%  [OK]       3.3s  ClickData.Clickdata_Interactive_Best_Service
 152  21%  [OK]       3.1s  ClickData.ClickData_Relatives_Service
 153  21%  [OK]       0.2s  ClickData.ClickData_Relative_Batch
 154  21%  [OK]       0.2s  ClickData.ClickData_Relative_Search
 155  21%  [OK]       0.1s  clickdata.DoNotMailCallBatchService
-156  21%  [OK]       4.3s  COA_services.SearchService
+156  21%  [OK]       4.2s  COA_services.SearchService
 157  21%  [OK]       0.3s  Codes.Code_Lookup_Service
 158  22%  [OK]       1.7s  consumercreditreport_services.reportservicefcra
-159  22%  [OK]       3.7s  ConsumerDisclosure.CollectionReportService
-160  22%  [OK]       6.0s  ConsumerDisclosure.CollectionReportTier2Service
-161  22%  [OK]       2.2s  ConsumerDisclosure.FCRADataService [w]
+159  22%  [OK]       3.6s  ConsumerDisclosure.CollectionReportService
+160  22%  [OK]       5.9s  ConsumerDisclosure.CollectionReportTier2Service
+161  22%  [OK]       2.3s  ConsumerDisclosure.FCRADataService [w]
 162  22%  [OK]       0.9s  ConsumerDisclosure.FCRAInquiryHistoryService
 163  22%  [OK]       2.8s  ConsumerOptOut.ReportService
-164  22%  [OK]       1.4s  ConsumerProfile_Services.ReportServiceFCRA [w]
-165  23%  [OK]       0.6s  ConsumerStatement_Services.SearchService
-166  23%  [OK]       8.5s  ContactCard.ReportService [w]
+164  22%  [OK]       1.3s  ConsumerProfile_Services.ReportServiceFCRA [w]
+165  23%  [OK]       0.5s  ConsumerStatement_Services.SearchService
+166  23%  [OK]       8.4s  ContactCard.ReportService [w]
 167  23%  [OK]       0.7s  Corp2_services.CorpsReportService
 168  23%  [OK]       1.2s  Corp2_services.CorpsSearchService
 169  23%  [OK]       0.8s  Corp2_services.FocusSearchService
 170  23%  [OK]       1.5s  Corp2_services.SOS_Batch_service
 171  23%  [OK]       1.3s  CourtLink_Services.ContactRiskSearchService
-172  23%  [OK]       5.0s  CourtSearch_services.SearchService
+172  23%  [OK]       4.8s  CourtSearch_services.SearchService
 173  24%  [OK]       0.6s  CriminalImage_Services.ReportService
 174  24%  [OK]       1.5s  CriminalRecords_BatchService.BatchService
-175  24%  [OK]       4.7s  CriminalRecords_BatchService.BatchServiceFCRA
-176  24%  [OK]       1.3s  CriminalRecords_BatchService.Possible_Incarceration_Indicator_Batch_Service
+175  24%  [OK]       4.5s  CriminalRecords_BatchService.BatchServiceFCRA
+176  24%  [OK]       1.4s  CriminalRecords_BatchService.Possible_Incarceration_Indicator_Batch_Service
 177  24%  [OK]       4.5s  CriminalRecords_BatchService.Possible_Incarceration_Indicator_Batch_ServiceFCRA
 178  24%  [OK]       1.5s  CriminalRecords_Services.PossibleIncarcerationReportServiceFCRA
 179  24%  [OK]       1.3s  CriminalRecords_Services.ReportService
@@ -194,82 +194,82 @@ Checking 733 Queries...
 184  25%  [OK]       0.1s  Data_Services.UseAnIndexService
 185  25%  [OK]       0.7s  DCA_Services.Batch_Service [w]
 186  25%  [OK]       0.4s  DeadcoV2_Services.DeadcoReportService
-187  26%  [OK]       0.8s  DeadcoV2_Services.DeadcoSearchService
+187  26%  [OK]       0.7s  DeadcoV2_Services.DeadcoSearchService
 188  26%  [OK]       0.6s  DeadcoV2_Services.FocusSearchService
-189  26%  [OK]       0.9s  DeathV2_Services.FocusSearchService
-190  26%  [OK]       0.8s  DeathV2_Services.ReportService
+189  26%  [OK]       0.8s  DeathV2_Services.FocusSearchService
+190  26%  [OK]       0.7s  DeathV2_Services.ReportService
 191  26%  [OK]       1.0s  DeathV2_Services.SearchService
-192  26%  [OK]       0.9s  DeaV2_Services.DEASearchService [w]
+192  26%  [OK]       0.8s  DeaV2_Services.DEASearchService [w]
 193  26%  [OK]       0.6s  DeaV2_Services.FocusSearchService
 194  26%  [OK]       1.0s  DEA_Services.SearchService
 195  27%  [OK]       1.5s  DemoSearchTool.TestCaseSearchService [w]
 196  27%  [OK]       0.8s  DidVille.BestInfo_Batch_Service
-197  27%  [OK]       3.1s  DidVille.DID_Batch_Service
-198  27%  [OK]       7.5s  DidVille.Did_Batch_Service_Raw [w]
-199  27%  [OK]       3.0s  DidVille.DID_Batch_Service_v2
-200  27%  [OK]       1.0s  DidVille.DID_Did_Update_Batch_Service
-201  27%  [OK]       1.0s  DidVille.Did_Did_Update_Batch_Service2
+197  27%  [OK]       3.2s  DidVille.DID_Batch_Service
+198  27%  [OK]       7.8s  DidVille.Did_Batch_Service_Raw [w]
+199  27%  [OK]       3.1s  DidVille.DID_Batch_Service_v2
+200  27%  [OK]       1.1s  DidVille.DID_Did_Update_Batch_Service
+201  27%  [OK]       1.1s  DidVille.Did_Did_Update_Batch_Service2
 202  28%  [OK]       1.0s  DidVille.Did_Did_Update_Service
-203  28%  [OK]       0.4s  didville.DID_MaxInit_Batch_Service
-204  28%  [OK]       6.3s  DidVille.Did_Numeric_Service [w]
-205  28%  [OK]       6.3s  DidVille.Did_Score_Service [w]
-206  28%  [OK]       3.0s  DidVille.Did_Service
-207  28%  [OK]       2.2s  DidVille.Did_SSN_Batch_Service
+203  28%  [OK]       0.5s  didville.DID_MaxInit_Batch_Service
+204  28%  [OK]       6.6s  DidVille.Did_Numeric_Service [w]
+205  28%  [OK]       6.5s  DidVille.Did_Score_Service [w]
+206  28%  [OK]       3.2s  DidVille.Did_Service
+207  28%  [OK]       2.3s  DidVille.Did_SSN_Batch_Service
 208  28%  [OK]       0.1s  DidVille.Did_Unparsed_Name_Service
-209  29%  [OK]       1.0s  DidVille.did_zipset_service
+209  29%  [OK]       1.1s  DidVille.did_zipset_service
 210  29%  [OK]       0.1s  didville.did_zip_batch_service
 211  29%  [OK]       0.1s  DidVille.Did_Zip_Service
 212  29%  [OK]       0.1s  DidVille.LinkId_Update_Batch_Service
 213  29%  [OK]       0.5s  DidVille.Query_Expand_Service
-214  29%  [OK]       8.5s  didville.RAN_BestInfo_Batch_Service
+214  29%  [OK]       8.7s  didville.RAN_BestInfo_Batch_Service
 215  29%  [OK]       0.1s  DidVille.SSN_Append_Service
 216  29%  [OK]       0.9s  Diversity_Certification_Services.Batch_Service [w]
-217  30%  [OK]      14.5s  DMAP_Services.ReportService [w]
+217  30%  [OK]      14.6s  DMAP_Services.ReportService [w]
 218  30%  [OK]       0.8s  DNB_FEINV2_Services.DnbFeinReportService
 219  30%  [OK]       0.8s  DNB_FEINV2_Services.DnbFeinSearchService
-220  30%  [OK]       0.8s  DNB_FEINV2_Services.FocusSearchService
+220  30%  [OK]       0.9s  DNB_FEINV2_Services.FocusSearchService
 221  30%  [OK]       1.1s  DNB_Services.SearchService [w]
-222  30%  [OK]       6.8s  Doxie.central_records_service_neutral
-223  30%  [OK]      89.1s  Doxie.Comprehensive_Report_Service [nofast] [w]
-224  31%  [OK]       2.2s  Doxie.dl_Helper [w]
+222  30%  [OK]       6.7s  Doxie.central_records_service_neutral
+223  30%  [OK]      99.8s  Doxie.Comprehensive_Report_Service [nofast] [w]
+224  31%  [OK]       2.1s  Doxie.dl_Helper [w]
 225  31%  [OK]       0.8s  Doxie.dl_Search [w]
-226  31%  [OK]       5.5s  Doxie.DOC_Report
+226  31%  [OK]       5.3s  Doxie.DOC_Report
 227  31%  [OK]       4.2s  Doxie.DOC_Search
-228  31%  [OK]       4.2s  Doxie.DOC_Search_Events
+228  31%  [OK]       4.3s  Doxie.DOC_Search_Events
 229  31%  [OK]       4.1s  Doxie.DOC_Search_People
 230  31%  [OK]       0.2s  doxie.EchoService
 231  32%  [OK]       0.1s  Doxie.EnvironmentVariablesService
-232  32%  [OK]      15.5s  Doxie.HeaderFileRollupService [w]
-233  32%  [OK]       9.5s  Doxie.HeaderFileSearchService [w]
-234  32%  [OK]       6.0s  doxie.HeaderFileThinTeaserService
-235  32%  [OK]      12.8s  Doxie.HeaderSource_Service [w]
+232  32%  [OK]      15.4s  Doxie.HeaderFileRollupService [w]
+233  32%  [OK]       9.2s  Doxie.HeaderFileSearchService [w]
+234  32%  [OK]       6.1s  doxie.HeaderFileThinTeaserService
+235  32%  [OK]      12.9s  Doxie.HeaderSource_Service [w]
 236  32%  [OK]       0.2s  Doxie.Hri_Address_to_SicCode_Service
 237  32%  [OK]       1.0s  Doxie.Hri_SicCode_to_Address_Service
 238  32%  [OK]      10.1s  Doxie.ING_provider_report [w]
-239  33%  [OK]       9.5s  Doxie.ING_provider_search [w]
-240  33%  [OK]       9.6s  Doxie.ING_sanctions_report [w]
-241  33%  [OK]       9.3s  Doxie.ING_sanctions_search [w]
+239  33%  [OK]       9.4s  Doxie.ING_provider_search [w]
+240  33%  [OK]       9.8s  Doxie.ING_sanctions_report [w]
+241  33%  [OK]       9.4s  Doxie.ING_sanctions_search [w]
 242  33%  [OK]       0.2s  Doxie.LoadPlugins
-243  33%  [OK]       4.3s  Doxie.Nbr_Service
+243  33%  [OK]       4.2s  Doxie.Nbr_Service
 244  33%  [OK]       6.6s  Doxie.phone_noreconn_search [w]
 245  33%  [OK]       0.1s  doxie.phone_type_batch_service
-246  34%  [OK]       6.4s  Doxie.SexOffender_Report
+246  34%  [OK]       6.3s  Doxie.SexOffender_Report
 247  34%  [OK]       6.4s  Doxie.SexOffender_Search
-248  34%  [OK]       6.4s  Doxie.SexOffender_Search_Events
-249  34%  [OK]       6.3s  Doxie.SexOffender_Search_People
-250  34%  [OK]       0.6s  Doxie.Troy_Service
+248  34%  [OK]       6.5s  Doxie.SexOffender_Search_Events
+249  34%  [OK]       6.4s  Doxie.SexOffender_Search_People
+250  34%  [OK]       0.7s  Doxie.Troy_Service
 251  34%  [OK]       1.0s  Doxie.Vehicle_Helper [w]
-252  34%  [OK]       1.1s  Doxie.Vehicle_Report [w]
+252  34%  [OK]       1.0s  Doxie.Vehicle_Report [w]
 253  35%  [OK]       1.1s  Doxie.Vehicle_Search [w]
-254  35%  [OK]       7.2s  Doxie.WeAlsoFoundService [w]
-255  35%  [OK]       1.1s  Doxie.Wildcard_Search
-256  35%  [OK]       9.5s  doxie_cbrs.Business_Report_Service [w]
-257  35%  [OK]       6.3s  doxie_cbrs.Business_Report_Service_Raw [w]
-258  35%  [OK]       6.5s  doxie_cbrs.Business_Report_Source_Service [w]
-259  35%  [OK]       5.3s  doxie_cbrs.Profile_Report_Service [w]
-260  35%  [OK]       1.2s  DriversV2_Services.Batch_Service [w]
+254  35%  [OK]       7.1s  Doxie.WeAlsoFoundService [w]
+255  35%  [OK]       1.2s  Doxie.Wildcard_Search
+256  35%  [OK]       9.6s  doxie_cbrs.Business_Report_Service [w]
+257  35%  [OK]       6.4s  doxie_cbrs.Business_Report_Service_Raw [w]
+258  35%  [OK]       6.3s  doxie_cbrs.Business_Report_Source_Service [w]
+259  35%  [OK]       5.2s  doxie_cbrs.Profile_Report_Service [w]
+260  35%  [OK]       1.3s  DriversV2_Services.Batch_Service [w]
 261  36%  [OK]       0.7s  DriversV2_Services.DLReportService [w]
-262  36%  [OK]       1.0s  DriversV2_Services.DLSearchService [w]
+262  36%  [OK]       1.1s  DriversV2_Services.DLSearchService [w]
 263  36%  [OK]       0.9s  DriversV2_Services.FocusSearchService [w]
 264  36%  [OK]       0.7s  DriversVTSA_Services.DLSearchService
 265  36%  [OK]      11.6s  DueDiligence.DueDiligence_Batch_Service
@@ -284,100 +284,100 @@ Checking 733 Queries...
 274  37%  [OK]       0.8s  eCrash_Services.DocumentRetrievalService
 275  38%  [OK]       0.8s  eCrash_Services.ImageSearchService
 276  38%  [OK]       0.9s  eCrash_Services.SearchService
-277  38%  [OK]       0.7s  ECRulings_Services.SearchService
-278  38%  [OK]       0.9s  emailservice.batchservicefcra
+277  38%  [OK]       0.8s  ECRulings_Services.SearchService
+278  38%  [OK]       1.0s  emailservice.batchservicefcra
 279  38%  [OK]       0.8s  EmailService.EmailSearchService
-280  38%  [OK]       6.5s  EmailV2_Services.BatchService
-281  38%  [OK]       6.6s  EmailV2_Services.SearchService
-282  38%  [OK]       7.3s  ExecAtHomeV2.eah_batch_service
+280  38%  [OK]       6.7s  EmailV2_Services.BatchService
+281  38%  [OK]       6.7s  EmailV2_Services.SearchService
+282  38%  [OK]       7.5s  ExecAtHomeV2.eah_batch_service
 283  39%  [OK]       1.0s  faav2_pilotservices.batch_service
 284  39%  [OK]       0.9s  FaaV2_PilotServices.ReportService
 285  39%  [OK]       0.9s  FaaV2_PilotServices.ReportServiceFCRA
-286  39%  [OK]       1.1s  FaaV2_PilotServices.SearchService
+286  39%  [OK]       1.2s  FaaV2_PilotServices.SearchService
 287  39%  [OK]       1.1s  FaaV2_PilotServices.SearchServiceFCRA
 288  39%  [OK]       1.6s  FaaV2_Services.Batch_Service
-289  39%  [OK]       4.2s  FaaV2_Services.Batch_ServiceFCRA
+289  39%  [OK]       4.3s  FaaV2_Services.Batch_ServiceFCRA
 290  40%  [OK]       1.0s  FaaV2_Services.reportService
 291  40%  [OK]       1.0s  FaaV2_Services.ReportServiceFCRA
 292  40%  [OK]       1.2s  FaaV2_Services.searchService
-293  40%  [OK]       1.2s  FaaV2_Services.SearchServiceFCRA
+293  40%  [OK]       1.3s  FaaV2_Services.SearchServiceFCRA
 294  40%  [OK]       1.0s  FBNV2_services.batch_service
 295  40%  [OK]       0.8s  FBNV2_services.FBNReportService
 296  40%  [OK]       0.8s  FBNV2_services.FBNSearchService
 297  41%  [OK]       0.6s  FBNV2_services.FocusSearchService
-298  41%  [OK]       0.4s  FCC_Services.FCCReportService
+298  41%  [OK]       0.5s  FCC_Services.FCCReportService
 299  41%  [OK]       0.8s  FCC_Services.FCCSearchService
 300  41%  [OK]       0.5s  FCC_Services.FocusSearchService
-301  41%  [OK]      16.2s  FCRA.Comprehensive_Report_Service [w]
+301  41%  [OK]      16.4s  FCRA.Comprehensive_Report_Service [w]
 302  41%  [OK]       0.1s  FCRA.EchoService
-303  41%  [OK]       3.6s  FCRA.GongHistorySearchService [w]
+303  41%  [OK]       3.9s  FCRA.GongHistorySearchService [w]
 304  41%  [OK]       0.9s  FCRA.Overrides_Dashboard_Service
-305  42%  [OK]       1.2s  fcragateway_services.equifaxemsservice
+305  42%  [OK]       1.3s  fcragateway_services.equifaxemsservice
 306  42%  [OK]       1.2s  fcragateway_services.tufraudalertservice
 307  42%  [OK]       0.7s  FCRAProspectList_Services.batch_service
-308  42%  [OK]       7.2s  Fedex_Services.AddressPreFillService
+308  42%  [OK]       6.7s  Fedex_Services.AddressPreFillService
 309  42%  [OK]       0.8s  FFD_Services.ConsumerSearchService
 310  42%  [OK]       0.7s  FFD_Services.FetchPersonContextBatchServiceFCRA
-311  42%  [OK]       0.5s  Foreclosure_Services.BatchService
-312  43%  [OK]       1.2s  Foreclosure_Services.ReportService
+311  42%  [OK]       0.6s  Foreclosure_Services.BatchService
+312  43%  [OK]       1.3s  Foreclosure_Services.ReportService
 313  43%  [OK]       1.5s  Foreclosure_Services.SearchService
 314  43%  [OK]       0.5s  Foreclosure_Vacancy.BatchService
 315  43%  [OK]       0.5s  Foreclosure_Vacancy.InteractiveService
 316  43%  [OK]       0.5s  Foreclosure_Vacancy.RenewalService
 317  43%  [OK]       1.5s  FraudDefenseNetwork_Services.SearchService
-318  43%  [OK]       2.8s  Gateway.AvmService
-319  44%  [OK]       2.8s  gateway.caavmreportservice
+318  43%  [OK]       2.9s  Gateway.AvmService
+319  44%  [OK]       2.9s  gateway.caavmreportservice
 320  44%  [OK]       2.9s  gateway.netwisesearchservice
 321  44%  [OK]       2.8s  gateway.socialmedialocatorservice
-322  44%  [OK]      36.0s  GeoTriangulation_Services.BatchService
+322  44%  [OK]      35.7s  GeoTriangulation_Services.BatchService
 323  44%  [OK]       0.9s  Gong_Services.BatchServiceFCRA
-324  44%  [OK]       0.5s  Gong_Services.EDASurnameSearchService
-325  44%  [OK]       3.3s  Gong_Services.GongHistorySearchService
+324  44%  [OK]       0.4s  Gong_Services.EDASurnameSearchService
+325  44%  [OK]       3.2s  Gong_Services.GongHistorySearchService
 326  44%  [OK]       0.4s  Gong_Services.SurnameCountService
-327  45%  [OK]      11.8s  Govt_Collections_Services.Batch_Service [w]
-328  45%  [OK]      12.2s  Govt_Collections_Services.Report_Service [w]
+327  45%  [OK]      11.9s  Govt_Collections_Services.Batch_Service [w]
+328  45%  [OK]      12.1s  Govt_Collections_Services.Report_Service [w]
 329  45%  [OK]       1.2s  GSA_Services.BatchService [w]
 330  45%  [OK]       1.2s  GSA_Services.SearchService [w]
-331  45%  [OK]       1.3s  GSA_Services.SearchService_MultipleRequests [w]
+331  45%  [OK]       1.2s  GSA_Services.SearchService_MultipleRequests [w]
 332  45%  [OK]       0.1s  header_services.Address_Research
 333  45%  [OK]       0.1s  Header_Services.DID_Address_Hash
-334  46%  [OK]       9.4s  Header_Services.HeaderFileAdvancedAddressSearch [w]
+334  46%  [OK]       9.8s  Header_Services.HeaderFileAdvancedAddressSearch [w]
 335  46%  [OK]       0.5s  Header_Services.HeaderFileFAPMultiService
-336  46%  [OK]       9.6s  Header_Services.HeaderFileNeighborSearchService [w]
+336  46%  [OK]       9.9s  Header_Services.HeaderFileNeighborSearchService [w]
 337  46%  [OK]       0.4s  header_services.Phone_Research
 338  46%  [OK]       0.1s  Healthcare_Cleaners.MedicalSchoolCleanService
-339  46%  [OK]       9.3s  Healthcare_Ganga.BatchService [w]
-340  46%  [OK]       9.3s  healthcare_ganga.searchservice [w]
-341  47%  [OK]       9.4s  Healthcare_Header_Services.ResearchService
-342  47%  [OK]       1.2s  Healthcare_Provider_Services.ABMS_ReportService
+339  46%  [OK]       9.8s  Healthcare_Ganga.BatchService [w]
+340  46%  [OK]       9.5s  healthcare_ganga.searchservice [w]
+341  47%  [OK]       9.7s  Healthcare_Header_Services.ResearchService
+342  47%  [OK]       1.1s  Healthcare_Provider_Services.ABMS_ReportService
 343  47%  [OK]       1.1s  Healthcare_Provider_Services.ABMS_SearchService
-344  47%  [OK]       1.1s  Healthcare_Provider_Services.ABMS_SearchService_Batch [w]
+344  47%  [OK]       1.2s  Healthcare_Provider_Services.ABMS_SearchService_Batch [w]
 345  47%  [OK]       0.2s  Healthcare_Provider_Services.ABMS_Specialty_Lookup_Service
 346  47%  [OK]       1.5s  Healthcare_Provider_Services.CLIA_SearchService
 347  47%  [OK]       1.5s  Healthcare_Provider_Services.CLIA_SearchService_Batch
 348  47%  [OK]       1.5s  Healthcare_Provider_Services.NPI_ReportService
 349  48%  [OK]       1.5s  Healthcare_Provider_Services.NPI_ReportService_Batch
-350  48%  [OK]      14.1s  Healthcare_Provider_Services.report_service [w]
-351  48%  [OK]       9.5s  Healthcare_Provider_Services.SearchService [w]
-352  48%  [OK]       9.9s  Healthcare_Provider_Services.SearchService_Batch [w]
-353  48%  [OK]       0.8s  Healthcare_Services.Customer_Death_Search_Batch [w]
+350  48%  [OK]      14.0s  Healthcare_Provider_Services.report_service [w]
+351  48%  [OK]       9.3s  Healthcare_Provider_Services.SearchService [w]
+352  48%  [OK]      10.0s  Healthcare_Provider_Services.SearchService_Batch [w]
+353  48%  [OK]       0.9s  Healthcare_Services.Customer_Death_Search_Batch [w]
 354  48%  [OK]       1.0s  Healthcare_Services.Customer_License_Search_Batch [w]
-355  48%  [OK]      10.4s  Healthcare_Services.DisclosedEntity_BatchService [w]
+355  48%  [OK]      10.7s  Healthcare_Services.DisclosedEntity_BatchService [w]
 356  49%  [OK]      10.5s  Healthcare_Services.DisclosedEntity_SearchService [w]
-357  49%  [OK]       1.1s  Healthcare_Services.NCPDP_Batch
+357  49%  [OK]       1.0s  Healthcare_Services.NCPDP_Batch
 358  49%  [OK]       1.0s  Healthcare_Services.NCPDP_ReportService
 359  49%  [OK]       1.0s  Healthcare_Services.NCPDP_SearchService
 360  49%  [OK]       0.8s  Health_Facility_Services.xLNPID_Header_Service
 361  49%  [OK]       1.2s  Health_Provider_Services.MEOW_xLNPID_Service
 362  49%  [OK]       1.2s  Health_Provider_Services.xLNPID_Header_Service
 363  50%  [OK]       8.9s  HomesteadExemptionV2_Services.BatchService [w]
-364  50%  [OK]       8.6s  homesteadexemptionv2_services.searchservice [w]
+364  50%  [OK]       8.7s  homesteadexemptionv2_services.searchservice [w]
 365  50%  [OK]       1.1s  hunting_fishing_services.SearchService
 366  50%  [OK]       1.1s  hunting_fishing_services.SearchServiceFCRA
-367  50%  [OK]      11.2s  Identifier2.Identifier2_Service [w]
-368  50%  [OK]       7.0s  IdentityFraud_Services.IdentityFraudReportService [w]
-369  50%  [OK]       8.2s  IdentityManagement_Services.ReportService [w]
-370  50%  [OK]       6.2s  IdentityManagement_Services.SearchService
+367  50%  [OK]      11.3s  Identifier2.Identifier2_Service [w]
+368  50%  [OK]       7.1s  IdentityFraud_Services.IdentityFraudReportService [w]
+369  50%  [OK]       8.1s  IdentityManagement_Services.ReportService [w]
+370  50%  [OK]       6.4s  IdentityManagement_Services.SearchService
 371  51%  [OK]       0.1s  idl_adl_mapping.SearchService
 372  51%  [OK]       0.1s  Images.Image_All
 373  51%  [OK]       0.1s  Images.Image_Count
@@ -387,52 +387,52 @@ Checking 733 Queries...
 377  51%  [OK]       0.2s  Inquiry_AccLogs.CompanyID_IndustryLookup_Service
 378  52%  [OK]       0.1s  Inquiry_AccLogs.Function_Description_Lookup_Service
 379  52%  [OK]       5.2s  Inquiry_Services.AccLog_Batch_Service
-380  52%  [OK]       5.6s  Inquiry_Services.Log_Service
+380  52%  [OK]       5.5s  Inquiry_Services.Log_Service
 381  52%  [OK]       2.6s  Inquiry_Services.velocity_searchservice
 382  52%  [OK]       1.0s  InstantID_Archiving_Services.IIDI2_Report_Service
-383  52%  [OK]       1.0s  InstantID_Archiving_Services.IIDI2_Search_Service
+383  52%  [OK]       0.9s  InstantID_Archiving_Services.IIDI2_Search_Service
 384  52%  [OK]       0.9s  InstantID_Archiving_Services.Report_Service
 385  53%  [OK]       0.9s  InstantID_Archiving_Services.Search_Service
-386  53%  [OK]       0.9s  InstantID_Archiving_Services.SummaryReport_FlexId_Service
-387  53%  [OK]       0.9s  InstantID_Archiving_Services.SummaryReport_FraudPoint_Service
+386  53%  [OK]       1.0s  InstantID_Archiving_Services.SummaryReport_FlexId_Service
+387  53%  [OK]       1.0s  InstantID_Archiving_Services.SummaryReport_FraudPoint_Service
 388  53%  [OK]       1.0s  InstantID_Archiving_Services.SummaryReport_IIDI2_Service
-389  53%  [OK]       1.0s  InstantID_Archiving_Services.SummaryReport_InstantIDInternational_Service
-390  53%  [OK]       0.9s  InstantID_Archiving_Services.SummaryReport_InstantID_Service
+389  53%  [OK]       0.9s  InstantID_Archiving_Services.SummaryReport_InstantIDInternational_Service
+390  53%  [OK]       1.0s  InstantID_Archiving_Services.SummaryReport_InstantID_Service
 391  53%  [OK]       0.9s  InstantID_Archiving_Services.SummaryReport_RedFlags_Service
 392  53%  [OK]       0.3s  InsuranceHeader_RemoteLinking.Remote_InsuranceHeader_Service_Dempsey
 393  54%  [OK]       0.3s  InsuranceHeader_RemoteLinking.Remote_InsuranceHeader_Soapcall_Test_Service
 394  54%  [OK]       0.2s  InsuranceHeader_xLink.Consumer_Header_Best_Service
-395  54%  [OK]       2.1s  InsuranceHeader_xLink.Header_xlinking_Service
+395  54%  [OK]       2.2s  InsuranceHeader_xLink.Header_xlinking_Service
 396  54%  [OK]       2.2s  insuranceheader_xlink.meow_xlinking_service
 397  54%  [OK]       0.6s  Insurance_Certification_Services.Batch_Service [w]
 398  54%  [OK]       1.0s  internetdomain_services.SearchService
 399  54%  [OK]       0.9s  IntlIID.SearchService
 400  55%  [OK]       1.0s  IntlIID_GG2.SearchService
-401  55%  [OK]       8.8s  InView_Services.InViewReportService [w]
-402  55%  [OK]       3.3s  ISS.ConsumerAttributes_Service [w]
+401  55%  [OK]       8.6s  InView_Services.InViewReportService [w]
+402  55%  [OK]       3.4s  ISS.ConsumerAttributes_Service [w]
 403  55%  [OK]       1.3s  ISS.FCRAConsumerAttributes_Service
-404  55%  [OK]      10.1s  ISS.FCRAInsurview2_Batch_Service [w]
-405  55%  [OK]       8.5s  ISS.FcraInsurView2_Service [w]
-406  55%  [OK]       1.1s  ISS.FcraInsurView_Service
+404  55%  [OK]       9.9s  ISS.FCRAInsurview2_Batch_Service [w]
+405  55%  [OK]       8.4s  ISS.FcraInsurView2_Service [w]
+406  55%  [OK]       1.2s  ISS.FcraInsurView_Service
 407  56%  [OK]       0.8s  ISS.ISS_FCRA_Service
-408  56%  [OK]      25.5s  ISS.ISS_Service [w]
+408  56%  [OK]      25.2s  ISS.ISS_Service [w]
 409  56%  [OK]       0.7s  LaborActions_EBSA_Services.SearchService [w]
 410  56%  [OK]       0.8s  LaborActions_MSHA_Services.SearchService
 411  56%  [OK]       0.6s  LaborActions_WHD_Services.batch_service [w]
-412  56%  [OK]       1.7s  LiensV2_Services.FocusSearchService
-413  56%  [OK]       4.7s  LiensV2_Services.JudgmentsAndLiens_BatchServiceFCRA
+412  56%  [OK]       1.8s  LiensV2_Services.FocusSearchService
+413  56%  [OK]       4.9s  LiensV2_Services.JudgmentsAndLiens_BatchServiceFCRA
 414  56%  [OK]       1.9s  LiensV2_Services.LiensReportService
-415  57%  [OK]       2.2s  LiensV2_Services.LiensReportServiceFCRA
-416  57%  [OK]       4.7s  LiensV2_Services.LiensRetrievalServiceFCRA
-417  57%  [OK]       2.1s  LiensV2_Services.LiensSearchService
-418  57%  [OK]       2.0s  LiensV2_Services.LiensSearchServiceFCRA
-419  57%  [OK]       4.6s  LNSmallBusiness.SmallBusiness_Batch_Service [w]
-420  57%  [OK]      47.2s  LNSmallBusiness.SmallBusiness_BIP_Batch_Service
-421  57%  [OK]      49.9s  LNSmallBusiness.SmallBusiness_BIP_Combined_Service [w]
-422  58%  [OK]      46.2s  LNSmallBusiness.SmallBusiness_BIP_Service
-423  58%  [OK]      46.8s  LNSmallBusiness.SmallBusiness_Marketing_Batch_Service
-424  58%  [OK]      46.3s  LNSmallBusiness.SmallBusiness_Marketing_Service
-425  58%  [OK]       4.5s  LNSmallBusiness.SmallBusiness_Service [w]
+415  57%  [OK]       2.1s  LiensV2_Services.LiensReportServiceFCRA
+416  57%  [OK]       4.8s  LiensV2_Services.LiensRetrievalServiceFCRA
+417  57%  [OK]       2.0s  LiensV2_Services.LiensSearchService
+418  57%  [OK]       2.1s  LiensV2_Services.LiensSearchServiceFCRA
+419  57%  [OK]       4.8s  LNSmallBusiness.SmallBusiness_Batch_Service [w]
+420  57%  [OK]      48.1s  LNSmallBusiness.SmallBusiness_BIP_Batch_Service
+421  57%  [OK]      49.7s  LNSmallBusiness.SmallBusiness_BIP_Combined_Service [w]
+422  58%  [OK]      47.0s  LNSmallBusiness.SmallBusiness_BIP_Service
+423  58%  [OK]      46.9s  LNSmallBusiness.SmallBusiness_Marketing_Batch_Service
+424  58%  [OK]      45.9s  LNSmallBusiness.SmallBusiness_Marketing_Service
+425  58%  [OK]       4.6s  LNSmallBusiness.SmallBusiness_Service [w]
 426  58%  [OK]       1.7s  LN_PropertyV2_Services.FocusSearchService
 427  58%  [OK]       1.8s  LN_PropertyV2_Services.ReportService
 428  58%  [OK]       1.8s  LN_PropertyV2_Services.ReportServiceFCRA
@@ -442,94 +442,94 @@ Checking 733 Queries...
 432  59%  [OK]       0.3s  locationid_xlink.service_locationid
 433  59%  [OK]       0.3s  LocationID_xLink.Service_LocationIDSearch
 434  59%  [OK]       0.2s  Location_Services.AddressByAPNService
-435  59%  [OK]       6.8s  Location_Services.AddressHistory_Report_Service [w]
-436  59%  [OK]       6.7s  Location_Services.LocationReportService [w]
-437  60%  [OK]       7.0s  Location_Services.LocationSearchService [w]
+435  59%  [OK]       6.7s  Location_Services.AddressHistory_Report_Service [w]
+436  59%  [OK]       6.8s  Location_Services.LocationReportService [w]
+437  60%  [OK]       6.9s  Location_Services.LocationSearchService [w]
 438  60%  [OK]       4.5s  Location_Services.PropertyHistoryPlus_Service
 439  60%  [OK]       4.5s  Location_Services.PropertyHistoryWithHRI_Service
-440  60%  [OK]       4.3s  Location_Services.PropertyHistory_Report_Service
+440  60%  [OK]       4.4s  Location_Services.PropertyHistory_Report_Service
 441  60%  [OK]       0.3s  Lookup_Services.Areacode_SearchService
 442  60%  [OK]       0.3s  Lookup_Services.Zipcode_SearchService
-443  60%  [OK]       1.1s  marriage_divorce_v2_Services.Batch_Service
+443  60%  [OK]       1.2s  marriage_divorce_v2_Services.Batch_Service
 444  61%  [OK]       4.2s  marriage_divorce_v2_Services.Batch_ServiceFCRA
 445  61%  [OK]       1.0s  marriage_divorce_v2_Services.FocusSearchService
-446  61%  [OK]       1.1s  marriage_divorce_v2_Services.MDSearchService
+446  61%  [OK]       1.2s  marriage_divorce_v2_Services.MDSearchService
 447  61%  [OK]       1.1s  marriage_divorce_v2_Services.MDSearchServiceFCRA
-448  61%  [OK]      13.5s  MemberPoint.BatchService [w]
-449  61%  [OK]      13.1s  MemberPoint.ReportService [w]
+448  61%  [OK]      13.6s  MemberPoint.BatchService [w]
+449  61%  [OK]      13.8s  MemberPoint.ReportService [w]
 450  61%  [OK]       0.6s  MFindV2_Services.FocusSearchService
 451  62%  [OK]       0.4s  MFindV2_Services.MFindReportService
 452  62%  [OK]       0.7s  MFindV2_Services.MFindSearchService
 453  62%  [OK]       1.9s  MIDEX_Services.LicenseReportService
-454  62%  [OK]       1.8s  MIDEX_Services.LicenseSearchService
-455  62%  [OK]      24.5s  MIDEX_Services.MidexReportService [w]
-456  62%  [OK]       1.7s  MIDEX_Services.MidexSearchService
+454  62%  [OK]       1.9s  MIDEX_Services.LicenseSearchService
+455  62%  [OK]      23.6s  MIDEX_Services.MidexReportService [w]
+456  62%  [OK]       1.8s  MIDEX_Services.MidexSearchService
 457  62%  [OK]       0.1s  misc.VendorSrc_Lookup_Service
 458  62%  [OK]       0.1s  Models.AVM_Batch
-459  63%  [OK]       4.2s  Models.BusinessAdvisor_Service [w]
-460  63%  [OK]       4.5s  Models.CDM_Batch_Service
-461  63%  [OK]       8.9s  Models.ChargebackDefender_Service [w]
-462  63%  [OK]       8.1s  Models.FD_NonFCRA_Service [w]
-463  63%  [OK]      27.6s  Models.FraudAdvisor_Batch_Service [w]
-464  63%  [OK]      29.9s  Models.FraudAdvisor_Service [w]
+459  63%  [OK]       4.3s  Models.BusinessAdvisor_Service [w]
+460  63%  [OK]       4.4s  Models.CDM_Batch_Service
+461  63%  [OK]       9.3s  Models.ChargebackDefender_Service [w]
+462  63%  [OK]       8.3s  Models.FD_NonFCRA_Service [w]
+463  63%  [OK]      28.3s  Models.FraudAdvisor_Batch_Service [w]
+464  63%  [OK]      31.2s  Models.FraudAdvisor_Service [w]
 465  63%  [OK]       0.8s  Models.HealthCare_Attributes_Batch_Service
 466  64%  [OK]       0.9s  Models.HealthCare_Attributes_Service
-467  64%  [OK]      51.0s  Models.Healthcare_SocioEconomic_Batch_Service [w]
-468  64%  [OK]      22.9s  Models.Healthcare_SocioEconomic_Batch_Service_V2 [w]
-469  64%  [OK]      26.8s  Models.Healthcare_SocioEconomic_Batch_Service_V3 [w]
-470  64%  [OK]      48.4s  Models.Healthcare_SocioEconomic_Batch_Service_V4 [w]
-471  64%  [OK]      45.9s  Models.Healthcare_SocioEconomic_Batch_Service_V5 [w]
-472  64%  [OK]      45.0s  Models.Healthcare_SocioEconomic_RT_Service [w]
-473  65%  [OK]       2.7s  Models.ITA_Batch_Service
-474  65%  [OK]       2.7s  Models.ITA_Search_Service
+467  64%  [OK]      51.8s  Models.Healthcare_SocioEconomic_Batch_Service [w]
+468  64%  [OK]      24.4s  Models.Healthcare_SocioEconomic_Batch_Service_V2 [w]
+469  64%  [OK]      27.5s  Models.Healthcare_SocioEconomic_Batch_Service_V3 [w]
+470  64%  [OK]      46.0s  Models.Healthcare_SocioEconomic_Batch_Service_V4 [w]
+471  64%  [OK]      47.6s  Models.Healthcare_SocioEconomic_Batch_Service_V5 [w]
+472  64%  [OK]      45.7s  Models.Healthcare_SocioEconomic_RT_Service [w]
+473  65%  [OK]       2.8s  Models.ITA_Batch_Service
+474  65%  [OK]       2.9s  Models.ITA_Search_Service
 475  65%  [OK]       2.7s  Models.LeadIntegrity_Batch_Service
 476  65%  [OK]       3.0s  Models.LeadIntegrity_Service
-477  65%  [OK]       6.2s  Models.LIB_RiskView_V50 [lib]
+477  65%  [OK]       6.3s  Models.LIB_RiskView_V50 [lib]
 478  65%  [OK]       1.1s  Models.MVRInsurance_Service
-479  65%  [OK]       9.9s  Models.OrderScore_Service [w]
-480  65%  [OK]       2.8s  Models.ProspectSurvival_Batch_Service
-481  66%  [OK]       4.2s  Models.RecoverScore_Batch_Service [w]
-482  66%  [OK]       5.1s  Models.RiskViewReport_Service [w]
+479  65%  [OK]      10.0s  Models.OrderScore_Service [w]
+480  65%  [OK]       2.6s  Models.ProspectSurvival_Batch_Service
+481  66%  [OK]       4.3s  Models.RecoverScore_Batch_Service [w]
+482  66%  [OK]       5.0s  Models.RiskViewReport_Service [w]
 483  66%  [OK]       3.2s  Models.RiskView_Batch_Service [w]
 484  66%  [OK]       0.7s  Models.RiskView_CapOne_Batch_Service
-485  66%  [OK]       3.5s  Models.RiskView_Service
-486  66%  [OK]       3.7s  Models.RiskView_Testing_Service
+485  66%  [OK]       3.6s  Models.RiskView_Service
+486  66%  [OK]       3.6s  Models.RiskView_Testing_Service
 487  66%  [OK]       0.4s  Models.RITA_Batch_Service
-488  67%  [OK]      37.5s  Models.Runway_Service
+488  67%  [OK]      37.6s  Models.Runway_Service
 489  67%  [OK]       0.5s  Models.StudentAdvisor_Service
 490  67%  [OK]       0.6s  MX_Services.DocketSearchService
 491  67%  [OK]       0.6s  MX_Services.ProfessionSearchService
 492  67%  [OK]       0.6s  MX_Services.ProfLicenseSearchService
 493  67%  [OK]       3.7s  NAC_Services.BatchService
-494  67%  [OK]       3.8s  NAC_Services.SearchService
-495  68%  [OK]       3.6s  nac_v2_services.batchservice
-496  68%  [OK]       4.0s  nac_v2_services.searchservice
-497  68%  [OK]       1.1s  NationalAccident_Services.BatchService
+494  67%  [OK]       3.7s  NAC_Services.SearchService
+495  68%  [OK]       3.9s  nac_v2_services.batchservice
+496  68%  [OK]       3.8s  nac_v2_services.searchservice
+497  68%  [OK]       1.2s  NationalAccident_Services.BatchService
 498  68%  [OK]       1.1s  NationalAccident_Services.ReportService
 499  68%  [OK]       0.6s  NaturalDisaster_Readiness.Batch_Service [w]
 500  68%  [OK]       0.1s  nid.lib_pfirst [lib]
 501  68%  [OK]       0.6s  OfficialRecords_Services.ReportService
-502  68%  [OK]       0.8s  OfficialRecords_Services.SearchService
-503  69%  [OK]       0.7s  OSHAIR_Services.FocusSearchService
-504  69%  [OK]       0.4s  OSHAIR_Services.OSHAIRReportService
+502  68%  [OK]       0.7s  OfficialRecords_Services.SearchService
+503  69%  [OK]       0.6s  OSHAIR_Services.FocusSearchService
+504  69%  [OK]       0.5s  OSHAIR_Services.OSHAIRReportService
 505  69%  [OK]       0.8s  OSHAIR_Services.OSHAIRSearchService
 506  69%  [OK]       0.3s  Patriot.Patriot_Batch
 507  69%  [OK]       0.4s  Patriot.Patriot_Search
 508  69%  [OK]       0.9s  paw_services.BatchServiceFCRA
-509  69%  [OK]       1.1s  paw_services.Batch_Service
-510  70%  [OK]       7.3s  paw_services.PAWSearchService [w]
-511  70%  [OK]       0.1s  PersonContext.ServiceGetPersonContext
-512  70%  [OK]       9.5s  PersonReports.AssetReportService [w]
-513  70%  [OK]       9.3s  PersonReports.AssetReportServiceFCRA [w]
-514  70%  [OK]       9.5s  PersonReports.FinderReportService [w]
-515  70%  [OK]       9.4s  PersonReports.PrelitReportService [w]
+509  69%  [OK]       1.2s  paw_services.Batch_Service
+510  70%  [OK]       7.7s  paw_services.PAWSearchService [w]
+511  70%  [OK]       0.2s  PersonContext.ServiceGetPersonContext
+512  70%  [OK]       9.2s  PersonReports.AssetReportService [w]
+513  70%  [OK]       9.1s  PersonReports.AssetReportServiceFCRA [w]
+514  70%  [OK]       9.3s  PersonReports.FinderReportService [w]
+515  70%  [OK]       9.6s  PersonReports.PrelitReportService [w]
 516  70%  [OK]       9.7s  PersonReports.PrelitReportServiceFCRA [w]
-517  71%  [OK]       7.3s  PersonReports.RNAReportService [w]
-518  71%  [OK]      22.0s  PersonReports.SmartLinxReportService [w]
-519  71%  [OK]       6.5s  PersonSearch_Services.CheckSearchService [w]
+517  71%  [OK]       7.6s  PersonReports.RNAReportService [w]
+518  71%  [OK]      21.4s  PersonReports.SmartLinxReportService [w]
+519  71%  [OK]       6.3s  PersonSearch_Services.CheckSearchService [w]
 520  71%  [OK]       9.5s  PersonSearch_Services.PersonRollupService [w]
 521  71%  [OK]       9.4s  PersonSearch_Services.PersonSearchService [w]
-522  71%  [OK]       6.0s  PersonSearch_Services.PickListService
+522  71%  [OK]       6.2s  PersonSearch_Services.PickListService
 523  71%  [OK]       0.3s  PersonSlimReport_Services.Compare_PersonSlimReport
 524  71%  [OK]       0.3s  PersonSlimReport_Services.MonitorESP_create_PersonSlimReport
 525  72%  [OK]       0.3s  PersonSlimReport_Services.MonitorESP_demo_PersonSlimReport
@@ -538,99 +538,99 @@ Checking 733 Queries...
 528  72%  [OK]       0.3s  PersonSlimReport_Services.MonitorRoxie_demo_PersonSlimReport
 529  72%  [OK]       0.3s  PersonSlimReport_Services.MonitorRoxie_run_PersonSlimReport
 530  72%  [OK]       0.1s  PersonSlimReport_Services.Monitor_ActiveTemplate_PersonSlimReport
-531  72%  [OK]      10.5s  PersonSlimReport_Services.ReportService [w]
+531  72%  [OK]      10.6s  PersonSlimReport_Services.ReportService [w]
 532  73%  [OK]       0.7s  PhilipMorris.AgeVerificationService
-533  73%  [OK]       0.7s  PhilipMorris.AgeVerification_BatchService
+533  73%  [OK]       0.6s  PhilipMorris.AgeVerification_BatchService
 534  73%  [OK]       0.7s  PhilipMorris.SSNExpansionService
 535  73%  [OK]       0.7s  phonefinder_services.pfressnapshotsearchservice
-536  73%  [OK]      11.7s  PhoneFinder_Services.PhoneFinderBatchService [w]
-537  73%  [OK]      11.5s  PhoneFinder_Services.PhoneFinderReportService [w]
-538  73%  [OK]       7.4s  PhoneFinder_Services.PhonePickListService
-539  74%  [OK]       3.3s  Phones.PhoneMetaDataSearchService
+536  73%  [OK]      11.8s  PhoneFinder_Services.PhoneFinderBatchService [w]
+537  73%  [OK]      11.9s  PhoneFinder_Services.PhoneFinderReportService [w]
+538  73%  [OK]       7.6s  PhoneFinder_Services.PhonePickListService
+539  74%  [OK]       3.4s  Phones.PhoneMetaDataSearchService
 540  74%  [OK]       0.7s  PhonesFeedback_Services.ReportService [w]
 541  74%  [OK]       3.5s  phonesplus_batch.phonesplus_reverse_batch_service
-542  74%  [OK]       9.8s  Phone_Shell.Phone_Shell_Service [w]
+542  74%  [OK]      10.2s  Phone_Shell.Phone_Shell_Service [w]
 543  74%  [OK]       0.8s  PowerSearchServices.SearchService
 544  74%  [OK]       4.9s  ProfileBooster.Batch_Service
-545  74%  [OK]       4.9s  ProfileBooster.Search_Service
+545  74%  [OK]       5.3s  ProfileBooster.Search_Service
 546  74%  [OK]       0.9s  prof_licensev2_services.batchservicefcra
-547  75%  [OK]       9.6s  prof_LicenseV2_Services.Discpl_Batch_Service [w]
+547  75%  [OK]      10.0s  prof_LicenseV2_Services.Discpl_Batch_Service [w]
 548  75%  [OK]       0.9s  prof_LicenseV2_Services.FocusSearchService
-549  75%  [OK]       9.4s  prof_LicenseV2_Services.Medlic_Batch_Service [w]
-550  75%  [OK]       9.4s  prof_LicenseV2_Services.Medlic_PL_Combined_Batch_Service [w]
+549  75%  [OK]       9.7s  prof_LicenseV2_Services.Medlic_Batch_Service [w]
+550  75%  [OK]       9.9s  prof_LicenseV2_Services.Medlic_PL_Combined_Batch_Service [w]
 551  75%  [OK]       1.2s  prof_LicenseV2_Services.PL_Batch_Service
-552  75%  [OK]       9.5s  prof_LicenseV2_Services.Prof_LicenseReportService [w]
-553  75%  [OK]       9.3s  prof_LicenseV2_Services.Prof_LicenseSearchService [w]
-554  76%  [OK]      13.2s  progressive_phone.ContactPlusSearchService [w]
-555  76%  [OK]       9.8s  progressive_phone.progressive_phone_batch_service [w]
-556  76%  [OK]      10.1s  progressive_phone.progressive_phone_batch_with_details_service [w]
-557  76%  [OK]      10.2s  progressive_phone.progressive_phone_with_feedback_batch_service [w]
-558  76%  [OK]       9.9s  progressive_phone.progressive_phone_with_feedback_online_service [w]
+552  75%  [OK]       9.7s  prof_LicenseV2_Services.Prof_LicenseReportService [w]
+553  75%  [OK]       9.5s  prof_LicenseV2_Services.Prof_LicenseSearchService [w]
+554  76%  [OK]      13.6s  progressive_phone.ContactPlusSearchService [w]
+555  76%  [OK]      10.2s  progressive_phone.progressive_phone_batch_service [w]
+556  76%  [OK]      10.4s  progressive_phone.progressive_phone_batch_with_details_service [w]
+557  76%  [OK]      10.1s  progressive_phone.progressive_phone_with_feedback_batch_service [w]
+558  76%  [OK]      10.3s  progressive_phone.progressive_phone_with_feedback_online_service [w]
 559  76%  [OK]       0.4s  progressive_phone.reverse_phone_pt_disconnect_scrub_batch_service
 560  76%  [OK]       0.8s  PropertyCharacteristics_Services.BatchService [w]
-561  77%  [OK]       2.8s  PropertyCharacteristics_Services.ReportService
-562  77%  [OK]       8.1s  PropertyFraudDiscovery.BatchService [w]
-563  77%  [OK]       8.4s  PublicHousing_Services.BatchService [w]
+561  77%  [OK]       2.9s  PropertyCharacteristics_Services.ReportService
+562  77%  [OK]       7.9s  PropertyFraudDiscovery.BatchService [w]
+563  77%  [OK]       8.6s  PublicHousing_Services.BatchService [w]
 564  77%  [OK]      15.9s  PublicProfileServices.ReportService [w]
-565  77%  [OK]     387.0s  publicrecords_kel.library.lib_businessattributes [nofast] [lib]
-566  77%  [OK]     388.2s  PublicRecords_KEL.MAS_Business_nonFCRA_Service [nofast]
-567  77%  [OK]     402.6s  PublicRecords_KEL.MAS_FCRA_Service [nofast]
-568  77%  [OK]     285.6s  PublicRecords_KEL.MAS_nonFCRA_FDC_Proddata_Service [nofast] [w]
-569  78%  [OK]     434.3s  publicrecords_kel.mas_nonfcra_service [nofast]
-570  78%  [OK]       3.9s  PublicRecords_KEL.Neutral_Lexid_Service
-571  78%  [OK]       3.6s  RAMPS_Healthcare.ConsumerShellService
-572  78%  [OK]       7.6s  RateEvasion_Services.SearchService
+565  77%  [OK]     358.2s  publicrecords_kel.library.lib_businessattributes [nofast] [lib]
+566  77%  [OK]     418.8s  PublicRecords_KEL.MAS_Business_nonFCRA_Service [nofast]
+567  77%  [OK]     464.8s  PublicRecords_KEL.MAS_FCRA_Service [nofast]
+568  77%  [OK]     281.9s  PublicRecords_KEL.MAS_nonFCRA_FDC_Proddata_Service [nofast] [w]
+569  78%  [OK]     435.1s  publicrecords_kel.mas_nonfcra_service [nofast]
+570  78%  [OK]       3.7s  PublicRecords_KEL.Neutral_Lexid_Service
+571  78%  [OK]       3.5s  RAMPS_Healthcare.ConsumerShellService
+572  78%  [OK]       7.5s  RateEvasion_Services.SearchService
 573  78%  [OK]       0.2s  Relationship.service_GetRelationship
 574  78%  [OK]       8.6s  RelationshipIdentifier_Services.Batch_Service [w]
 575  78%  [OK]       8.2s  RelationshipIdentifier_Services.Report_Service [w]
-576  79%  [OK]       6.6s  RelationshipIdentifier_Services.Search_Service
-577  79%  [OK]      16.7s  Residency_Services.BatchService [w]
-578  79%  [OK]     142.5s  RiskIntelligenceNetwork_Services.BatchService [w]
-579  79%  [OK]     135.1s  RiskIntelligenceNetwork_Services.RealtimeAssessmentReportService [w]
-580  79%  [OK]     134.4s  RiskIntelligenceNetwork_Services.ReportService [w]
-581  79%  [OK]     139.5s  RiskIntelligenceNetwork_Services.SearchService [w]
+576  79%  [OK]       6.4s  RelationshipIdentifier_Services.Search_Service
+577  79%  [OK]      16.5s  Residency_Services.BatchService [w]
+578  79%  [OK]     137.1s  RiskIntelligenceNetwork_Services.BatchService [w]
+579  79%  [OK]     134.4s  RiskIntelligenceNetwork_Services.RealtimeAssessmentReportService [w]
+580  79%  [OK]     138.2s  RiskIntelligenceNetwork_Services.ReportService [w]
+581  79%  [OK]     135.1s  RiskIntelligenceNetwork_Services.SearchService [w]
 582  79%  [OK]      10.0s  RiskView.Batch_Service [w]
 583  80%  [OK]       6.1s  RiskView.RiskView5_CapOne_Batch_Service
-584  80%  [OK]       6.1s  RiskView.Riskview_Batch_Prospect_List
-585  80%  [OK]       8.4s  RiskView.Search_Service [w]
-586  80%  [OK]       4.7s  RiskWise.BC1O_Batch_Service
-587  80%  [OK]       8.2s  RiskWise.CBDO_Batch_Service [w]
+584  80%  [OK]       6.2s  RiskView.Riskview_Batch_Prospect_List
+585  80%  [OK]       8.8s  RiskView.Search_Service [w]
+586  80%  [OK]       4.5s  RiskWise.BC1O_Batch_Service
+587  80%  [OK]       8.1s  RiskWise.CBDO_Batch_Service [w]
 588  80%  [OK]       3.0s  RiskWise.CT1O_Batch_Service
-589  80%  [OK]       3.1s  RiskWise.IT1O_Batch_Service [w]
+589  80%  [OK]       3.2s  RiskWise.IT1O_Batch_Service [w]
 590  80%  [OK]       0.6s  RiskWise.NP2O_Batch_Service
-591  81%  [OK]       4.4s  RiskWise.PB1O_Batch_Service
-592  81%  [OK]       8.0s  RiskWise.PR2O_Batch_Service [w]
+591  81%  [OK]       4.6s  RiskWise.PB1O_Batch_Service
+592  81%  [OK]       8.1s  RiskWise.PR2O_Batch_Service [w]
 593  81%  [OK]       0.6s  RiskWise.PRIO_Batch_Service
-594  81%  [OK]       6.4s  RiskWise.ProdData
+594  81%  [OK]       6.3s  RiskWise.ProdData
 595  81%  [OK]       4.5s  RiskWise.RiskwiseMainBC1O
-596  81%  [OK]       8.1s  RiskWise.RiskWiseMainCBDO [w]
-597  81%  [OK]       9.7s  RiskWise.RiskWiseMainCDxO [w]
-598  82%  [OK]       2.9s  RiskWise.RiskWiseMainCT1O
-599  82%  [OK]       8.1s  RiskWise.RiskWiseMainDLLO [w]
+596  81%  [OK]       8.3s  RiskWise.RiskWiseMainCBDO [w]
+597  81%  [OK]       9.8s  RiskWise.RiskWiseMainCDxO [w]
+598  82%  [OK]       3.0s  RiskWise.RiskWiseMainCT1O
+599  82%  [OK]       8.2s  RiskWise.RiskWiseMainDLLO [w]
 600  82%  [OK]       0.3s  RiskWise.RiskWiseMainEF1O
 601  82%  [OK]       3.1s  RiskWise.RiskWiseMainFA2O
 602  82%  [OK]       0.3s  RiskWise.RiskWiseMainFLGO
 603  82%  [OK]       2.5s  RiskWise.RiskWiseMainHCLO
-604  82%  [OK]       0.6s  RiskWise.RiskWiseMainIDPO
+604  82%  [OK]       0.5s  RiskWise.RiskWiseMainIDPO
 605  83%  [OK]       0.5s  RiskWise.RiskWiseMainIPVO
-606  83%  [OK]       3.3s  RiskWise.RiskWiseMainIT1O [w]
+606  83%  [OK]       3.2s  RiskWise.RiskWiseMainIT1O [w]
 607  83%  [OK]       0.6s  RiskWise.RiskWiseMainNP2O
-608  83%  [OK]       0.6s  RiskWise.RiskWiseMainNPTO
+608  83%  [OK]       0.5s  RiskWise.RiskWiseMainNPTO
 609  83%  [OK]       0.5s  RiskWise.RiskWiseMainOFCO
 610  83%  [OK]       4.3s  RiskWise.RiskwiseMainPB1O
 611  83%  [OK]       0.3s  RiskWise.RiskWiseMainPI2O
-612  83%  [OK]       8.2s  RiskWise.RiskWiseMainPR2O [w]
+612  83%  [OK]       8.5s  RiskWise.RiskWiseMainPR2O [w]
 613  84%  [OK]       0.6s  RiskWise.RiskWiseMainPRIO
 614  84%  [OK]       0.6s  RiskWise.RiskWiseMainPRWO
-615  84%  [OK]       8.5s  RiskWise.RiskWiseMainSC1O [w]
-616  84%  [OK]       9.0s  RiskWise.RiskWiseMainSD1O [w]
-617  84%  [OK]       4.4s  Riskwise.RiskwiseMainSDBO
-618  84%  [OK]       7.9s  RiskWise.RiskwiseMainSS1O [w]
+615  84%  [OK]       8.6s  RiskWise.RiskWiseMainSC1O [w]
+616  84%  [OK]       9.3s  RiskWise.RiskWiseMainSD1O [w]
+617  84%  [OK]       4.5s  Riskwise.RiskwiseMainSDBO
+618  84%  [OK]       8.0s  RiskWise.RiskwiseMainSS1O [w]
 619  84%  [OK]       0.6s  RiskWise.RiskWiseMainWF2O
-620  85%  [OK]       8.2s  RiskWise.SC1O_Batch_Service [w]
-621  85%  [OK]       9.2s  RiskWise.SD1O_Batch_Service [w]
-622  85%  [OK]       4.2s  Riskwise.SDBO_Batch_Service
-623  85%  [OK]       0.4s  RiskWise.USO_Batch_Service
+620  85%  [OK]       8.5s  RiskWise.SC1O_Batch_Service [w]
+621  85%  [OK]       9.0s  RiskWise.SD1O_Batch_Service [w]
+622  85%  [OK]       4.5s  Riskwise.SDBO_Batch_Service
+623  85%  [OK]       0.5s  RiskWise.USO_Batch_Service
 624  85%  [OK]       0.6s  RiskWise.VRU_IdentityService [w]
 625  85%  [OK]       2.5s  RiskWiseFCRA.FCRAData_Service [w]
 626  85%  [OK]       1.6s  RiskWiseFCRA.ProdData_FCRA
@@ -638,74 +638,74 @@ Checking 733 Queries...
 628  86%  [OK]       0.5s  RiskWiseFCRA.RiskWiseMainNPTO
 629  86%  [OK]       0.5s  RiskWiseFCRA.RiskWiseMainPR2O
 630  86%  [OK]       0.5s  RiskWiseFCRA.RiskWiseMainPRWO
-631  86%  [OK]      38.5s  RiskWiseFCRA.RiskWiseMainSC1O [w]
-632  86%  [OK]      35.5s  RiskWiseFCRA.RiskWiseMainSD1O [w]
-633  86%  [OK]       0.4s  Risk_Indicators.BocaShell30_FCRA_Batch_Service
+631  86%  [OK]      39.5s  RiskWiseFCRA.RiskWiseMainSC1O [w]
+632  86%  [OK]      36.0s  RiskWiseFCRA.RiskWiseMainSD1O [w]
+633  86%  [OK]       0.5s  Risk_Indicators.BocaShell30_FCRA_Batch_Service
 634  86%  [OK]       0.5s  Risk_Indicators.BocaShell41_Batch_Service
-635  87%  [OK]       0.5s  Risk_Indicators.BocaShell41_FCRA_Batch_Service
+635  87%  [OK]       0.4s  Risk_Indicators.BocaShell41_FCRA_Batch_Service
 636  87%  [OK]       0.9s  Risk_Indicators.BocaShell50_Batch_Service
 637  87%  [OK]       0.9s  Risk_Indicators.BocaShell50_FCRA_Batch_Service
-638  87%  [OK]       1.0s  Risk_Indicators.BocaShell_NonFCRA_Batch_Service
-639  87%  [OK]       3.3s  Risk_Indicators.Boca_Shell [w]
-640  87%  [OK]       8.0s  Risk_Indicators.Boca_Shell_BtSt_Service [w]
+638  87%  [OK]       0.9s  Risk_Indicators.BocaShell_NonFCRA_Batch_Service
+639  87%  [OK]       3.4s  Risk_Indicators.Boca_Shell [w]
+640  87%  [OK]       8.2s  Risk_Indicators.Boca_Shell_BtSt_Service [w]
 641  87%  [OK]       0.4s  Risk_Indicators.Boca_Shell_FCRA
 642  88%  [OK]       0.4s  Risk_Indicators.CDIP3_Batch_Service
 643  88%  [OK]       0.5s  Risk_Indicators.CDIP4_Batch_Service
 644  88%  [OK]       0.4s  Risk_Indicators.CDIP_Batch_Service
 645  88%  [OK]      11.5s  Risk_Indicators.Collection_Shell_Service [w]
-646  88%  [OK]      11.5s  Risk_Indicators.Contactability_Batch_Service [w]
-647  88%  [OK]       2.8s  Risk_Indicators.flexid_batch_service
+646  88%  [OK]      12.0s  Risk_Indicators.Contactability_Batch_Service [w]
+647  88%  [OK]       3.0s  Risk_Indicators.flexid_batch_service
 648  88%  [OK]       0.9s  Risk_Indicators.flexid_service
 649  89%  [OK]       0.7s  Risk_Indicators.InstantID
-650  89%  [OK]       3.1s  Risk_Indicators.InstantID_Batch
+650  89%  [OK]       3.0s  Risk_Indicators.InstantID_Batch
 651  89%  [OK]       0.4s  Risk_Indicators.InstantID_Raw
-652  89%  [OK]      34.4s  Risk_Indicators.LIB_Boca_Shell_Function [lib] [w]
-653  89%  [OK]      35.3s  Risk_Indicators.LIB_Boca_Shell_Function_FCRA [lib] [w]
-654  89%  [OK]      11.0s  Risk_Indicators.LIB_InstantID_Function [lib] [w]
-655  89%  [OK]      10.1s  Risk_Indicators.LIB_InstantID_Function_FCRA [lib] [w]
-656  89%  [OK]       2.4s  Risk_Indicators.Neutral_DID_Service
-657  90%  [OK]       0.9s  Risk_Indicators.ProviderScoring_Batch_Service
+652  89%  [OK]      34.0s  Risk_Indicators.LIB_Boca_Shell_Function [lib] [w]
+653  89%  [OK]      36.0s  Risk_Indicators.LIB_Boca_Shell_Function_FCRA [lib] [w]
+654  89%  [OK]      10.9s  Risk_Indicators.LIB_InstantID_Function [lib] [w]
+655  89%  [OK]      10.3s  Risk_Indicators.LIB_InstantID_Function_FCRA [lib] [w]
+656  89%  [OK]       2.6s  Risk_Indicators.Neutral_DID_Service
+657  90%  [OK]       1.0s  Risk_Indicators.ProviderScoring_Batch_Service
 658  90%  [OK]       1.0s  Risk_Indicators.ProviderScoring_Service
 659  90%  [OK]       0.2s  Risk_Reporting.Intermediate_Log_Service
 660  90%  [OK]       0.2s  Risk_Reporting.Transaction_Log_Service
-661  90%  [OK]       4.3s  SAM_Services.Batch_Service
+661  90%  [OK]       4.5s  SAM_Services.Batch_Service
 662  90%  [OK]       0.7s  SANCTN_Services.FocusSearchService [w]
 663  90%  [OK]       0.6s  SANCTN_Services.SanctnSearchService [w]
 664  91%  [OK]       1.2s  SexOffender_Services.ReportService
-665  91%  [OK]       1.2s  SexOffender_Services.ReportServiceFCRA
-666  91%  [OK]       7.0s  SexOffender_Services.SearchService [w]
+665  91%  [OK]       1.1s  SexOffender_Services.ReportServiceFCRA
+666  91%  [OK]       7.2s  SexOffender_Services.SearchService [w]
 667  91%  [OK]       7.0s  SexOffender_Services.SearchServiceFCRA [w]
 668  91%  [OK]       4.5s  SexOffender_Services.SexOffenderCPS_BatchServiceFCRA
 669  91%  [OK]       0.7s  SiteSec_ISMS_Services.SearchService [w]
 670  91%  [OK]       2.4s  SNA.Attributes_Batch_Service
 671  92%  [OK]       1.0s  SNA.BusinessReport_Service
-672  92%  [OK]       2.9s  SNA.MortgageCollusion_Batch_Service [w]
+672  92%  [OK]       3.0s  SNA.MortgageCollusion_Batch_Service [w]
 673  92%  [OK]       3.0s  SSNBest_Services.BatchService
 674  92%  [OK]       0.7s  SSN_Services.SSNBatchConfirmDiscrepantService
-675  92%  [OK]      13.9s  Statewide_Services.CountService [w]
-676  92%  [OK]      13.0s  Statewide_Services.FAB_SearchService [w]
-677  92%  [OK]      12.1s  Statewide_Services.FAP_SearchService [w]
-678  92%  [OK]       9.2s  SupplierRisk_Services.SupplierRiskReport_Service [w]
-679  93%  [OK]       5.2s  Suspicious_Fraud_LN.Fraud_Defense_Manager_Batch_Service
-680  93%  [OK]       5.3s  Suspicious_Fraud_LN.Fraud_Defense_Manager_Service
+675  92%  [OK]      14.0s  Statewide_Services.CountService [w]
+676  92%  [OK]      12.6s  Statewide_Services.FAB_SearchService [w]
+677  92%  [OK]      12.2s  Statewide_Services.FAP_SearchService [w]
+678  92%  [OK]       9.3s  SupplierRisk_Services.SupplierRiskReport_Service [w]
+679  93%  [OK]       5.5s  Suspicious_Fraud_LN.Fraud_Defense_Manager_Batch_Service
+680  93%  [OK]       5.5s  Suspicious_Fraud_LN.Fraud_Defense_Manager_Service
 681  93%  [OK]       0.6s  Taxpro_Services.FocusSearchService
-682  93%  [OK]       0.8s  Taxpro_Services.TaxproSearchService
-683  93%  [OK]       4.3s  TeaserSearchServices.ReverseAddressTeaserService
-684  93%  [OK]       6.3s  TeaserSearchServices.ReversePhoneTeaserService
-685  93%  [OK]       6.5s  TeaserSearchServices.ThinTeaserRollupService [w]
-686  94%  [OK]       6.3s  TeaserSearchServices.ThinTeaserService [w]
+682  93%  [OK]       0.7s  Taxpro_Services.TaxproSearchService
+683  93%  [OK]       4.4s  TeaserSearchServices.ReverseAddressTeaserService
+684  93%  [OK]       6.4s  TeaserSearchServices.ReversePhoneTeaserService
+685  93%  [OK]       6.6s  TeaserSearchServices.ThinTeaserRollupService [w]
+686  94%  [OK]       6.4s  TeaserSearchServices.ThinTeaserService [w]
 687  94%  [OK]       0.5s  Text_FragV1.Fragment_AdvSrch_Service
-688  94%  [OK]       8.6s  TopBusiness_Services.BusinessReportComprehensive [w]
+688  94%  [OK]       8.5s  TopBusiness_Services.BusinessReportComprehensive [w]
 689  94%  [OK]       5.9s  TopBusiness_Services.BusinessSearch
-690  94%  [OK]       5.8s  TopBusiness_Services.SourceCountService [w]
-691  94%  [OK]       8.3s  TopBusiness_Services.SourceService [w]
+690  94%  [OK]       5.9s  TopBusiness_Services.SourceCountService [w]
+691  94%  [OK]       8.5s  TopBusiness_Services.SourceService [w]
 692  94%  [OK]       0.6s  TXBUSV2_Services.FocusSearchService
 693  95%  [OK]       0.8s  TXBUSV2_Services.TXBusReportService
 694  95%  [OK]       0.8s  TXBUSV2_Services.TxbusSearchService
 695  95%  [OK]       1.4s  UCCv2_Services.FocusSearchService
 696  95%  [OK]       1.4s  UCCv2_Services.UCCReportService
-697  95%  [OK]       1.6s  UCCv2_Services.UCCSearchService
-698  95%  [OK]      12.1s  UPS_Services.RightAddressService [w]
+697  95%  [OK]       1.7s  UCCv2_Services.UCCSearchService
+698  95%  [OK]      12.0s  UPS_Services.RightAddressService [w]
 699  95%  [OK]       0.6s  USAbizV2_Services.FocusSearchService
 700  95%  [OK]       0.8s  USAbizV2_Services.USABIZSearchService
 701  96%  [OK]       0.7s  utilfile_services.batchservice
@@ -713,43 +713,43 @@ Checking 733 Queries...
 703  96%  [OK]       1.5s  VehicleV2_Services.LicPlate_Batch_Service
 704  96%  [OK]       0.1s  VehicleV2_Services.PickerService
 705  96%  [OK]       0.8s  VehicleV2_Services.RealTime_Batch_Service
-706  96%  [OK]       7.7s  VehicleV2_Services.RealTime_Batch_Service_V2 [w]
-707  96%  [OK]       4.9s  VehicleV2_Services.VehicleRegSearchService
+706  96%  [OK]       7.8s  VehicleV2_Services.RealTime_Batch_Service_V2 [w]
+707  96%  [OK]       4.8s  VehicleV2_Services.VehicleRegSearchService
 708  97%  [OK]       1.1s  VehicleV2_Services.VehicleReportService
-709  97%  [OK]       4.6s  VehicleV2_Services.VehicleSearchService
-710  97%  [OK]       2.1s  VehicleV2_Services.Vin_Batch_Service
-711  97%  [OK]      14.2s  VerificationOfOccupancy.Batch_Service [w]
-712  97%  [OK]      14.1s  VerificationOfOccupancy.PAR_Search_Service [w]
-713  97%  [OK]      14.3s  VerificationOfOccupancy.Search_Service [w]
+709  97%  [OK]       4.9s  VehicleV2_Services.VehicleSearchService
+710  97%  [OK]       2.2s  VehicleV2_Services.Vin_Batch_Service
+711  97%  [OK]      14.1s  VerificationOfOccupancy.Batch_Service [w]
+712  97%  [OK]      14.3s  VerificationOfOccupancy.PAR_Search_Service [w]
+713  97%  [OK]      14.2s  VerificationOfOccupancy.Search_Service [w]
 714  97%  [OK]       0.2s  VINA.VinDecoderService
 715  98%  [OK]       0.6s  VotersV2_Services.Batch_Service
 716  98%  [OK]       0.6s  VotersV2_Services.FocusSearchService
 717  98%  [OK]       0.5s  VotersV2_Services.VotersReportService
-718  98%  [OK]       0.8s  VotersV2_Services.VotersSearchService
-719  98%  [OK]       2.0s  WatercraftV2_Services.Batch_Service
-720  98%  [OK]       4.6s  WatercraftV2_Services.Batch_ServiceFCRA
-721  98%  [OK]       1.0s  WatercraftV2_Services.FocusSearchService
-722  98%  [OK]       1.1s  WatercraftV2_Services.WatercraftReportService
+718  98%  [OK]       0.7s  VotersV2_Services.VotersSearchService
+719  98%  [OK]       1.9s  WatercraftV2_Services.Batch_Service
+720  98%  [OK]       4.4s  WatercraftV2_Services.Batch_ServiceFCRA
+721  98%  [OK]       1.1s  WatercraftV2_Services.FocusSearchService
+722  98%  [OK]       1.2s  WatercraftV2_Services.WatercraftReportService
 723  99%  [OK]       1.1s  WatercraftV2_Services.WatercraftReportServiceFCRA
 724  99%  [OK]       1.3s  WatercraftV2_Services.WatercraftSearchService
-725  99%  [OK]       1.4s  WatercraftV2_Services.WatercraftSearchServiceFCRA
+725  99%  [OK]       1.3s  WatercraftV2_Services.WatercraftSearchServiceFCRA
 726  99%  [OK]       0.1s  WeCares.SerialOffenderFinder
 727  99%  [OK]       0.1s  WeCares.SerialOffenderFinderService
 728  99%  [OK]       8.3s  WorkPlace_Services.Plus_SearchService [w]
 729  99%  [OK]       6.1s  WorkPlace_Services.ReportService
-730 100%  [OK]       5.8s  WorkPlace_Services.SearchService
-731 100%  [OK]       0.3s  WorldCheckServices.BatchService
+730 100%  [OK]       6.1s  WorkPlace_Services.SearchService
+731 100%  [OK]       0.2s  WorldCheckServices.BatchService
 732 100%  [OK]       0.1s  WorldCheckServices.InternationalService
 733 100%  [OK]       0.1s  WorldCheckServices.SearchService
 
 
 Warnings Exported: _syn_check_warnings.log
 
-Script Finished at: 2021-05-06T00:51:40.983Z
-Elapsed Time: 1 hrs, 45 mins, 3 secs
+Script Finished at: 2021-05-07T00:53:45.344Z
+Elapsed Time: 1 hrs, 46 mins, 57 secs
 
-Avg Query Time: 8.6s
-Max Query Time: 434.3s  [publicrecords_kel.mas_nonfcra_service]
+Avg Query Time: 8.8s
+Max Query Time: 464.8s  [PublicRecords_KEL.MAS_FCRA_Service]
 
 ----------------------------------------------------------
 Final Results: (733/733) Passed
