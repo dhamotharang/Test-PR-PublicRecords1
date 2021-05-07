@@ -1542,13 +1542,13 @@ RETURN SORT(TABLE(P,{Summary, Cnt := COUNT(GROUP)},Summary,FEW),-Cnt);
 END;
 
 EXPORT KeysBitmapDecode(Config_BIP.KeysBitmapType bitmap,STRING prefix='') := FUNCTION
-  MapLP(UNSIGNED1 code,STRING prefix='') := CASE(code,1=>IF(prefix<>'',prefix,'UBER'),2=>IF(prefix<>'',prefix+'L_CNPNAME_ZIP','L_CNPNAME_ZIP'),3=>IF(prefix<>'',prefix+'L_CNPNAME_ST','L_CNPNAME_ST'),4=>IF(prefix<>'',prefix+'L_CNPNAME','L_CNPNAME'),5=>IF(prefix<>'',prefix+'L_CNPNAME_FUZZY','L_CNPNAME_FUZZY'),6=>IF(prefix<>'',prefix+'L_ADDRESS1','L_ADDRESS1'),7=>IF(prefix<>'',prefix+'L_ADDRESS2','L_ADDRESS2'),8=>IF(prefix<>'',prefix+'L_ADDRESS3','L_ADDRESS3'),9=>IF(prefix<>'',prefix+'L_PHONE','L_PHONE'),10=>IF(prefix<>'',prefix+'L_FEIN','L_FEIN'),11=>IF(prefix<>'',prefix+'L_URL','L_URL'),12=>IF(prefix<>'',prefix+'L_CONTACT_ZIP','L_CONTACT_ZIP'),13=>IF(prefix<>'',prefix+'L_CONTACT_ST','L_CONTACT_ST'),14=>IF(prefix<>'',prefix+'L_CONTACT_SSN','L_CONTACT_SSN'),15=>IF(prefix<>'',prefix+'L_EMAIL','L_EMAIL'),16=>IF(prefix<>'',prefix+'L_SIC','L_SIC'),17=>IF(prefix<>'',prefix+'L_SOURCE','L_SOURCE'),18=>IF(prefix<>'',prefix+'L_CONTACT_DID','L_CONTACT_DID'),'');
+  MapLP(UNSIGNED1 code,STRING prefix='') := CASE(code,1=>IF(prefix<>'',prefix,'UBER'),2=>IF(prefix<>'',prefix+'L_CNPNAME_ZIP','L_CNPNAME_ZIP'),3=>IF(prefix<>'',prefix+'L_CNPNAME_ST','L_CNPNAME_ST'),4=>IF(prefix<>'',prefix+'L_CNPNAME','L_CNPNAME'),5=>IF(prefix<>'',prefix+'L_CNPNAME_FUZZY','L_CNPNAME_FUZZY'),6=>IF(prefix<>'',prefix+'L_ADDRESS1','L_ADDRESS1'),7=>IF(prefix<>'',prefix+'L_ADDRESS2','L_ADDRESS2'),8=>IF(prefix<>'',prefix+'L_ADDRESS3','L_ADDRESS3'),9=>IF(prefix<>'',prefix+'L_PHONE','L_PHONE'),10=>IF(prefix<>'',prefix+'L_FEIN','L_FEIN'),11=>IF(prefix<>'',prefix+'L_URL','L_URL'),12=>IF(prefix<>'',prefix+'L_CONTACT_ZIP','L_CONTACT_ZIP'),13=>IF(prefix<>'',prefix+'L_CONTACT_ST','L_CONTACT_ST'),14=>IF(prefix<>'',prefix+'L_CONTACT','L_CONTACT'),15=>IF(prefix<>'',prefix+'L_CONTACT_SSN','L_CONTACT_SSN'),16=>IF(prefix<>'',prefix+'L_EMAIL','L_EMAIL'),17=>IF(prefix<>'',prefix+'L_SIC','L_SIC'),18=>IF(prefix<>'',prefix+'L_SOURCE','L_SOURCE'),19=>IF(prefix<>'',prefix+'L_CONTACT_DID','L_CONTACT_DID'),'');
   REC := {STRING txt};
   ds := DATASET([{''}],REC);
   REC decode(REC le, UNSIGNED1 c) := TRANSFORM
     SELF.txt := le.txt+IF((bitmap&(1<<c-1))>0,MapLP(c,prefix),'');
   END;
-  N0 := NORMALIZE(ds,17,decode(LEFT,COUNTER));
+  N0 := NORMALIZE(ds,18,decode(LEFT,COUNTER));
   REC aggregateCodes(REC le, REC ri) := TRANSFORM
      SELF.txt := ri.txt + IF(le.txt<>'','|'+le.txt+'|','');
   END;
@@ -1739,7 +1739,7 @@ EXPORT CombineLinkpathScores(DATASET(LayoutScoredFetch) in_data, BOOLEAN In_disa
   RETURN DEDUP( SORT( rolled, Reference, -weight, LOCAL ), Reference, KEEP(Config_BIP.LinkpathCandidateCount),LOCAL);
 END;
 EXPORT KeysUsedToText(UNSIGNED4 k) := FUNCTION
-  list := IF(k&1 <>0,'UberKey,','') + IF(k&(1<<1)<>0,'L_CNPNAME_ZIP,','') + IF(k&(1<<2)<>0,'L_CNPNAME_ST,','') + IF(k&(1<<3)<>0,'L_CNPNAME,','') + IF(k&(1<<4)<>0,'L_CNPNAME_FUZZY,','') + IF(k&(1<<5)<>0,'L_ADDRESS1,','') + IF(k&(1<<6)<>0,'L_ADDRESS2,','') + IF(k&(1<<7)<>0,'L_ADDRESS3,','') + IF(k&(1<<8)<>0,'L_PHONE,','') + IF(k&(1<<9)<>0,'L_FEIN,','') + IF(k&(1<<10)<>0,'L_URL,','') + IF(k&(1<<11)<>0,'L_CONTACT_ZIP,','') + IF(k&(1<<12)<>0,'L_CONTACT_ST,','') + IF(k&(1<<13)<>0,'L_CONTACT_SSN,','') + IF(k&(1<<14)<>0,'L_EMAIL,','') + IF(k&(1<<15)<>0,'L_SIC,','') + IF(k&(1<<16)<>0,'L_SOURCE,','') + IF(k&(1<<17)<>0,'L_CONTACT_DID,','');
+  list := IF(k&1 <>0,'UberKey,','') + IF(k&(1<<1)<>0,'L_CNPNAME_ZIP,','') + IF(k&(1<<2)<>0,'L_CNPNAME_ST,','') + IF(k&(1<<3)<>0,'L_CNPNAME,','') + IF(k&(1<<4)<>0,'L_CNPNAME_FUZZY,','') + IF(k&(1<<5)<>0,'L_ADDRESS1,','') + IF(k&(1<<6)<>0,'L_ADDRESS2,','') + IF(k&(1<<7)<>0,'L_ADDRESS3,','') + IF(k&(1<<8)<>0,'L_PHONE,','') + IF(k&(1<<9)<>0,'L_FEIN,','') + IF(k&(1<<10)<>0,'L_URL,','') + IF(k&(1<<11)<>0,'L_CONTACT_ZIP,','') + IF(k&(1<<12)<>0,'L_CONTACT_ST,','') + IF(k&(1<<13)<>0,'L_CONTACT,','') + IF(k&(1<<14)<>0,'L_CONTACT_SSN,','') + IF(k&(1<<15)<>0,'L_EMAIL,','') + IF(k&(1<<16)<>0,'L_SIC,','') + IF(k&(1<<17)<>0,'L_SOURCE,','') + IF(k&(1<<18)<>0,'L_CONTACT_DID,','');
   RETURN list[1..LENGTH(TRIM(list))-1]; // Strim last ,
 end;
 EXPORT Layout_RolledEntity := RECORD,MAXLENGTH(63000)

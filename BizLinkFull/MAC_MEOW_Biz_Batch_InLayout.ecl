@@ -130,6 +130,14 @@ EXPORT MAC_MEOW_Biz_Batch_InLayout(infile,OutFile,AsIndex = 'true',In_UpdateIDs 
   #ELSE
     %OutputL_CONTACT_ST% := DATASET([],BizLinkFull.Process_Biz_Layouts.LayoutScoredFetch);
   #END
+  #UNIQUENAME(OutputL_CONTACT)
+  #IF(#TEXT(Input_fname_preferred)<>'' AND #TEXT(Input_lname)<>'')
+    #UNIQUENAME(HoldL_CONTACT)
+    %HoldL_CONTACT% := %ToProcess%(~BizLinkFull.Key_BizHead_L_CONTACT_ST.CanSearch(ROW(%ToProcess%)) AND ~BizLinkFull.Key_BizHead_L_CONTACT_ZIP.CanSearch(ROW(%ToProcess%)));
+    BizLinkFull.Key_BizHead_L_CONTACT.MAC_ScoredFetch_Batch(%HoldL_CONTACT%,UniqueId,fname_preferred,lname,mname,cnp_name_wb,zip_cases,st,fname,company_sic_code1,cnp_number,cnp_btype,cnp_lowv,prim_name,city,prim_range,sec_range,parent_proxid,sele_proxid,org_proxid,ultimate_proxid,sele_flag,org_flag,ult_flag,%OutputL_CONTACT%,AsIndex,In_disableForce)
+  #ELSE
+    %OutputL_CONTACT% := DATASET([],BizLinkFull.Process_Biz_Layouts.LayoutScoredFetch);
+  #END
   #UNIQUENAME(OutputL_CONTACT_SSN)
   #IF(#TEXT(Input_contact_ssn)<>'')
     #UNIQUENAME(HoldL_CONTACT_SSN)
@@ -171,7 +179,7 @@ EXPORT MAC_MEOW_Biz_Batch_InLayout(infile,OutFile,AsIndex = 'true',In_UpdateIDs 
     %OutputL_CONTACT_DID% := DATASET([],BizLinkFull.Process_Biz_Layouts.LayoutScoredFetch);
   #END
   #UNIQUENAME(AllRes)
-  %AllRes% := %OutputL_CNPNAME_ZIP%+%OutputL_CNPNAME_ST%+%OutputL_CNPNAME%+%OutputL_CNPNAME_FUZZY%+%OutputL_ADDRESS1%+%OutputL_ADDRESS2%+%OutputL_ADDRESS3%+%OutputL_PHONE%+%OutputL_FEIN%+%OutputL_URL%+%OutputL_CONTACT_ZIP%+%OutputL_CONTACT_ST%+%OutputL_CONTACT_SSN%+%OutputL_EMAIL%+%OutputL_SIC%+%OutputL_SOURCE%+%OutputL_CONTACT_DID%+%OutputNewIDs%;
+  %AllRes% := %OutputL_CNPNAME_ZIP%+%OutputL_CNPNAME_ST%+%OutputL_CNPNAME%+%OutputL_CNPNAME_FUZZY%+%OutputL_ADDRESS1%+%OutputL_ADDRESS2%+%OutputL_ADDRESS3%+%OutputL_PHONE%+%OutputL_FEIN%+%OutputL_URL%+%OutputL_CONTACT_ZIP%+%OutputL_CONTACT_ST%+%OutputL_CONTACT%+%OutputL_CONTACT_SSN%+%OutputL_EMAIL%+%OutputL_SIC%+%OutputL_SOURCE%+%OutputL_CONTACT_DID%+%OutputNewIDs%;
   #UNIQUENAME(All)
   %All% := BizLinkFull.Process_Biz_Layouts.CombineAllScores(%AllRes%, In_bGetAllScores, In_disableForce);
   #UNIQUENAME(OutFile0)
