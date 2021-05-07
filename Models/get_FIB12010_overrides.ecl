@@ -1,9 +1,6 @@
 ﻿IMPORT Models, Risk_Indicators, STD;
 
-EXPORT get_FIB12010_overrides(DATASET(Risk_Indicators.Layout_Boca_Shell) clam,
-                              //Assumes the base layout defined in luci generated code is always the same as Models.fib12010_0.Results.BaseLayout 
-                              DATASET(Models.fib12010_0.Results.BaseLayout) FIBN12010_0
-                             ) := FUNCTION
+EXPORT get_FIB12010_overrides(clam,Model_Results) := FUNCTIONMACRO
 Debug := false;
   //same layout that should be defined in Luci generated code
   ScoreMessageLayout := RECORD
@@ -61,9 +58,9 @@ END;
 
 
 #IF(Debug)
-Debug_layout doModel( clam le,  FIBN12010_0 rt ) := TRANSFORM
+Debug_layout doModel( clam le,  Model_Results rt ) := TRANSFORM
 #ELSE
-Models.fib12010_0.Results.BaseLayout doModel( clam le,  FIBN12010_0 rt ) := TRANSFORM
+RECORDOF (Model_Results) doModel( clam le,  Model_Results rt ) := TRANSFORM
 #END
 //ECL to SAS mapping
 add_input_advo_drop       := le.advo_input_addr.drop_indicator;
@@ -326,7 +323,7 @@ self.fp3_wc6                   := fp3_wc6;
 #END
 END;
 
-  model :=   JOIN(clam, FIBN12010_0,
+  model :=   JOIN(clam, Model_Results,
                 (STRING)LEFT.seq = RIGHT.TransactionID,
                 doModel(LEFT, RIGHT), LEFT OUTER,
                 ATMOST(Models.FraudAdvisor_Constants.LUCI_atmost)
@@ -334,4 +331,4 @@ END;
 	
 	RETURN model;
 
-END;
+ENDMACRO;
