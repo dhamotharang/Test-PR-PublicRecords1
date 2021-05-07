@@ -3,10 +3,10 @@ IMPORT Scrubs_PhoneFinder; // Import modules for FieldTypes attribute definition
 EXPORT OtherPhones_Scrubs := MODULE
  
 // The module to handle the case where no scrubs exist
-  EXPORT NumRules := 14;
-  EXPORT NumRulesFromFieldType := 14;
+  EXPORT NumRules := 15;
+  EXPORT NumRulesFromFieldType := 15;
   EXPORT NumRulesFromRecordType := 0;
-  EXPORT NumFieldsWithRules := 13;
+  EXPORT NumFieldsWithRules := 14;
   EXPORT NumFieldsWithPossibleEdits := 0;
   EXPORT NumRulesWithPossibleEdits := 0;
   EXPORT Expanded_Layout := RECORD(OtherPhones_Layout_PhoneFinder)
@@ -22,7 +22,8 @@ EXPORT OtherPhones_Scrubs := MODULE
     UNSIGNED1 phone_forwarded_Invalid;
     UNSIGNED1 verified_carrier_Invalid;
     UNSIGNED1 date_added_Invalid;
-    UNSIGNED1 filename_Invalid;
+    UNSIGNED1 identity_count_Invalid;
+    UNSIGNED1 phone_star_rating_Invalid;
   END;
   EXPORT  Bitmap_Layout := RECORD(OtherPhones_Layout_PhoneFinder)
     UNSIGNED8 ScrubsBits1;
@@ -43,7 +44,8 @@ EXPORT OtherPhones_Scrubs := MODULE
           ,'phone_forwarded:Invalid_AlphaChar:ALLOW'
           ,'verified_carrier:Invalid_No:ALLOW'
           ,'date_added:Invalid_Date:CUSTOM'
-          ,'filename:Invalid_File:CUSTOM'
+          ,'identity_count:Invalid_No:ALLOW'
+          ,'phone_star_rating:Invalid_Rating:ALLOW'
           ,'field:Number_Errored_Fields:SUMMARY'
           ,'field:Number_Perfect_Fields:SUMMARY'
           ,'rule:Number_Errored_Rules:SUMMARY'
@@ -64,7 +66,8 @@ EXPORT OtherPhones_Scrubs := MODULE
           ,OtherPhones_Fields.InvalidMessage_phone_forwarded(1)
           ,OtherPhones_Fields.InvalidMessage_verified_carrier(1)
           ,OtherPhones_Fields.InvalidMessage_date_added(1)
-          ,OtherPhones_Fields.InvalidMessage_filename(1)
+          ,OtherPhones_Fields.InvalidMessage_identity_count(1)
+          ,OtherPhones_Fields.InvalidMessage_phone_star_rating(1)
           ,'Fields with errors'
           ,'Fields without errors'
           ,'Rules with errors'
@@ -86,13 +89,14 @@ EXPORT FromNone(DATASET(OtherPhones_Layout_PhoneFinder) h) := MODULE
     SELF.phone_forwarded_Invalid := OtherPhones_Fields.InValid_phone_forwarded((SALT311.StrType)le.phone_forwarded);
     SELF.verified_carrier_Invalid := OtherPhones_Fields.InValid_verified_carrier((SALT311.StrType)le.verified_carrier);
     SELF.date_added_Invalid := OtherPhones_Fields.InValid_date_added((SALT311.StrType)le.date_added);
-    SELF.filename_Invalid := OtherPhones_Fields.InValid_filename((SALT311.StrType)le.filename);
+    SELF.identity_count_Invalid := OtherPhones_Fields.InValid_identity_count((SALT311.StrType)le.identity_count);
+    SELF.phone_star_rating_Invalid := OtherPhones_Fields.InValid_phone_star_rating((SALT311.StrType)le.phone_star_rating);
     SELF := le;
   END;
   EXPORT ExpandedInfile := PROJECT(h,toExpanded(LEFT,FALSE));
   EXPORT ProcessedInfile := PROJECT(PROJECT(h,toExpanded(LEFT,TRUE)),OtherPhones_Layout_PhoneFinder);
   Bitmap_Layout Into(ExpandedInfile le) := TRANSFORM
-    SELF.ScrubsBits1 := ( le.transaction_id_Invalid << 0 ) + ( le.sequence_number_Invalid << 1 ) + ( le.phone_id_Invalid << 2 ) + ( le.phonenumber_Invalid << 3 ) + ( le.risk_indicator_Invalid << 5 ) + ( le.phone_type_Invalid << 6 ) + ( le.phone_status_Invalid << 7 ) + ( le.listing_name_Invalid << 8 ) + ( le.porting_code_Invalid << 9 ) + ( le.phone_forwarded_Invalid << 10 ) + ( le.verified_carrier_Invalid << 11 ) + ( le.date_added_Invalid << 12 ) + ( le.filename_Invalid << 13 );
+    SELF.ScrubsBits1 := ( le.transaction_id_Invalid << 0 ) + ( le.sequence_number_Invalid << 1 ) + ( le.phone_id_Invalid << 2 ) + ( le.phonenumber_Invalid << 3 ) + ( le.risk_indicator_Invalid << 5 ) + ( le.phone_type_Invalid << 6 ) + ( le.phone_status_Invalid << 7 ) + ( le.listing_name_Invalid << 8 ) + ( le.porting_code_Invalid << 9 ) + ( le.phone_forwarded_Invalid << 10 ) + ( le.verified_carrier_Invalid << 11 ) + ( le.date_added_Invalid << 12 ) + ( le.identity_count_Invalid << 13 ) + ( le.phone_star_rating_Invalid << 14 );
     SELF := le;
   END;
   EXPORT BitmapInfile := PROJECT(ExpandedInfile,Into(LEFT));
@@ -126,7 +130,8 @@ EXPORT FromBits(DATASET(Bitmap_Layout) h) := MODULE
     SELF.phone_forwarded_Invalid := (le.ScrubsBits1 >> 10) & 1;
     SELF.verified_carrier_Invalid := (le.ScrubsBits1 >> 11) & 1;
     SELF.date_added_Invalid := (le.ScrubsBits1 >> 12) & 1;
-    SELF.filename_Invalid := (le.ScrubsBits1 >> 13) & 1;
+    SELF.identity_count_Invalid := (le.ScrubsBits1 >> 13) & 1;
+    SELF.phone_star_rating_Invalid := (le.ScrubsBits1 >> 14) & 1;
     SELF := le;
   END;
   EXPORT ExpandedInfile := PROJECT(h,Into(LEFT));
@@ -149,8 +154,9 @@ EXPORT FromExpanded(DATASET(Expanded_Layout) h) := MODULE
     phone_forwarded_ALLOW_ErrorCount := COUNT(GROUP,h.phone_forwarded_Invalid=1);
     verified_carrier_ALLOW_ErrorCount := COUNT(GROUP,h.verified_carrier_Invalid=1);
     date_added_CUSTOM_ErrorCount := COUNT(GROUP,h.date_added_Invalid=1);
-    filename_CUSTOM_ErrorCount := COUNT(GROUP,h.filename_Invalid=1);
-    AnyRule_WithErrorsCount := COUNT(GROUP, h.transaction_id_Invalid > 0 OR h.sequence_number_Invalid > 0 OR h.phone_id_Invalid > 0 OR h.phonenumber_Invalid > 0 OR h.risk_indicator_Invalid > 0 OR h.phone_type_Invalid > 0 OR h.phone_status_Invalid > 0 OR h.listing_name_Invalid > 0 OR h.porting_code_Invalid > 0 OR h.phone_forwarded_Invalid > 0 OR h.verified_carrier_Invalid > 0 OR h.date_added_Invalid > 0 OR h.filename_Invalid > 0);
+    identity_count_ALLOW_ErrorCount := COUNT(GROUP,h.identity_count_Invalid=1);
+    phone_star_rating_ALLOW_ErrorCount := COUNT(GROUP,h.phone_star_rating_Invalid=1);
+    AnyRule_WithErrorsCount := COUNT(GROUP, h.transaction_id_Invalid > 0 OR h.sequence_number_Invalid > 0 OR h.phone_id_Invalid > 0 OR h.phonenumber_Invalid > 0 OR h.risk_indicator_Invalid > 0 OR h.phone_type_Invalid > 0 OR h.phone_status_Invalid > 0 OR h.listing_name_Invalid > 0 OR h.porting_code_Invalid > 0 OR h.phone_forwarded_Invalid > 0 OR h.verified_carrier_Invalid > 0 OR h.date_added_Invalid > 0 OR h.identity_count_Invalid > 0 OR h.phone_star_rating_Invalid > 0);
     FieldsChecked_WithErrors := 0;
     FieldsChecked_NoErrors := 0;
     Rules_WithErrors := 0;
@@ -158,9 +164,9 @@ EXPORT FromExpanded(DATASET(Expanded_Layout) h) := MODULE
   END;
   SummaryStats0 := TABLE(h,r);
   SummaryStats0 xAddErrSummary(SummaryStats0 le) := TRANSFORM
-    SELF.FieldsChecked_WithErrors := IF(le.transaction_id_ALLOW_ErrorCount > 0, 1, 0) + IF(le.sequence_number_ALLOW_ErrorCount > 0, 1, 0) + IF(le.phone_id_ALLOW_ErrorCount > 0, 1, 0) + IF(le.phonenumber_Total_ErrorCount > 0, 1, 0) + IF(le.risk_indicator_ENUM_ErrorCount > 0, 1, 0) + IF(le.phone_type_ENUM_ErrorCount > 0, 1, 0) + IF(le.phone_status_ENUM_ErrorCount > 0, 1, 0) + IF(le.listing_name_ALLOW_ErrorCount > 0, 1, 0) + IF(le.porting_code_ENUM_ErrorCount > 0, 1, 0) + IF(le.phone_forwarded_ALLOW_ErrorCount > 0, 1, 0) + IF(le.verified_carrier_ALLOW_ErrorCount > 0, 1, 0) + IF(le.date_added_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.filename_CUSTOM_ErrorCount > 0, 1, 0);
+    SELF.FieldsChecked_WithErrors := IF(le.transaction_id_ALLOW_ErrorCount > 0, 1, 0) + IF(le.sequence_number_ALLOW_ErrorCount > 0, 1, 0) + IF(le.phone_id_ALLOW_ErrorCount > 0, 1, 0) + IF(le.phonenumber_Total_ErrorCount > 0, 1, 0) + IF(le.risk_indicator_ENUM_ErrorCount > 0, 1, 0) + IF(le.phone_type_ENUM_ErrorCount > 0, 1, 0) + IF(le.phone_status_ENUM_ErrorCount > 0, 1, 0) + IF(le.listing_name_ALLOW_ErrorCount > 0, 1, 0) + IF(le.porting_code_ENUM_ErrorCount > 0, 1, 0) + IF(le.phone_forwarded_ALLOW_ErrorCount > 0, 1, 0) + IF(le.verified_carrier_ALLOW_ErrorCount > 0, 1, 0) + IF(le.date_added_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.identity_count_ALLOW_ErrorCount > 0, 1, 0) + IF(le.phone_star_rating_ALLOW_ErrorCount > 0, 1, 0);
     SELF.FieldsChecked_NoErrors := NumFieldsWithRules - SELF.FieldsChecked_WithErrors;
-    SELF.Rules_WithErrors := IF(le.transaction_id_ALLOW_ErrorCount > 0, 1, 0) + IF(le.sequence_number_ALLOW_ErrorCount > 0, 1, 0) + IF(le.phone_id_ALLOW_ErrorCount > 0, 1, 0) + IF(le.phonenumber_ALLOW_ErrorCount > 0, 1, 0) + IF(le.phonenumber_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.risk_indicator_ENUM_ErrorCount > 0, 1, 0) + IF(le.phone_type_ENUM_ErrorCount > 0, 1, 0) + IF(le.phone_status_ENUM_ErrorCount > 0, 1, 0) + IF(le.listing_name_ALLOW_ErrorCount > 0, 1, 0) + IF(le.porting_code_ENUM_ErrorCount > 0, 1, 0) + IF(le.phone_forwarded_ALLOW_ErrorCount > 0, 1, 0) + IF(le.verified_carrier_ALLOW_ErrorCount > 0, 1, 0) + IF(le.date_added_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.filename_CUSTOM_ErrorCount > 0, 1, 0);
+    SELF.Rules_WithErrors := IF(le.transaction_id_ALLOW_ErrorCount > 0, 1, 0) + IF(le.sequence_number_ALLOW_ErrorCount > 0, 1, 0) + IF(le.phone_id_ALLOW_ErrorCount > 0, 1, 0) + IF(le.phonenumber_ALLOW_ErrorCount > 0, 1, 0) + IF(le.phonenumber_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.risk_indicator_ENUM_ErrorCount > 0, 1, 0) + IF(le.phone_type_ENUM_ErrorCount > 0, 1, 0) + IF(le.phone_status_ENUM_ErrorCount > 0, 1, 0) + IF(le.listing_name_ALLOW_ErrorCount > 0, 1, 0) + IF(le.porting_code_ENUM_ErrorCount > 0, 1, 0) + IF(le.phone_forwarded_ALLOW_ErrorCount > 0, 1, 0) + IF(le.verified_carrier_ALLOW_ErrorCount > 0, 1, 0) + IF(le.date_added_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.identity_count_ALLOW_ErrorCount > 0, 1, 0) + IF(le.phone_star_rating_ALLOW_ErrorCount > 0, 1, 0);
     SELF.Rules_NoErrors := NumRules - SELF.Rules_WithErrors;
     SELF := le;
   END;
@@ -175,8 +181,8 @@ EXPORT FromExpanded(DATASET(Expanded_Layout) h) := MODULE
   END;
   r into(h le,UNSIGNED c) := TRANSFORM
     SELF.Src :=  ''; // Source not provided
-    UNSIGNED1 ErrNum := CHOOSE(c,le.transaction_id_Invalid,le.sequence_number_Invalid,le.phone_id_Invalid,le.phonenumber_Invalid,le.risk_indicator_Invalid,le.phone_type_Invalid,le.phone_status_Invalid,le.listing_name_Invalid,le.porting_code_Invalid,le.phone_forwarded_Invalid,le.verified_carrier_Invalid,le.date_added_Invalid,le.filename_Invalid,100);
-    SELF.ErrorMessage := IF ( ErrNum = 0, SKIP, CHOOSE(c,OtherPhones_Fields.InvalidMessage_transaction_id(le.transaction_id_Invalid),OtherPhones_Fields.InvalidMessage_sequence_number(le.sequence_number_Invalid),OtherPhones_Fields.InvalidMessage_phone_id(le.phone_id_Invalid),OtherPhones_Fields.InvalidMessage_phonenumber(le.phonenumber_Invalid),OtherPhones_Fields.InvalidMessage_risk_indicator(le.risk_indicator_Invalid),OtherPhones_Fields.InvalidMessage_phone_type(le.phone_type_Invalid),OtherPhones_Fields.InvalidMessage_phone_status(le.phone_status_Invalid),OtherPhones_Fields.InvalidMessage_listing_name(le.listing_name_Invalid),OtherPhones_Fields.InvalidMessage_porting_code(le.porting_code_Invalid),OtherPhones_Fields.InvalidMessage_phone_forwarded(le.phone_forwarded_Invalid),OtherPhones_Fields.InvalidMessage_verified_carrier(le.verified_carrier_Invalid),OtherPhones_Fields.InvalidMessage_date_added(le.date_added_Invalid),OtherPhones_Fields.InvalidMessage_filename(le.filename_Invalid),'UNKNOWN'));
+    UNSIGNED1 ErrNum := CHOOSE(c,le.transaction_id_Invalid,le.sequence_number_Invalid,le.phone_id_Invalid,le.phonenumber_Invalid,le.risk_indicator_Invalid,le.phone_type_Invalid,le.phone_status_Invalid,le.listing_name_Invalid,le.porting_code_Invalid,le.phone_forwarded_Invalid,le.verified_carrier_Invalid,le.date_added_Invalid,le.identity_count_Invalid,le.phone_star_rating_Invalid,100);
+    SELF.ErrorMessage := IF ( ErrNum = 0, SKIP, CHOOSE(c,OtherPhones_Fields.InvalidMessage_transaction_id(le.transaction_id_Invalid),OtherPhones_Fields.InvalidMessage_sequence_number(le.sequence_number_Invalid),OtherPhones_Fields.InvalidMessage_phone_id(le.phone_id_Invalid),OtherPhones_Fields.InvalidMessage_phonenumber(le.phonenumber_Invalid),OtherPhones_Fields.InvalidMessage_risk_indicator(le.risk_indicator_Invalid),OtherPhones_Fields.InvalidMessage_phone_type(le.phone_type_Invalid),OtherPhones_Fields.InvalidMessage_phone_status(le.phone_status_Invalid),OtherPhones_Fields.InvalidMessage_listing_name(le.listing_name_Invalid),OtherPhones_Fields.InvalidMessage_porting_code(le.porting_code_Invalid),OtherPhones_Fields.InvalidMessage_phone_forwarded(le.phone_forwarded_Invalid),OtherPhones_Fields.InvalidMessage_verified_carrier(le.verified_carrier_Invalid),OtherPhones_Fields.InvalidMessage_date_added(le.date_added_Invalid),OtherPhones_Fields.InvalidMessage_identity_count(le.identity_count_Invalid),OtherPhones_Fields.InvalidMessage_phone_star_rating(le.phone_star_rating_Invalid),'UNKNOWN'));
     SELF.ErrorType := IF ( ErrNum = 0, SKIP, CHOOSE(c
           ,CHOOSE(le.transaction_id_Invalid,'ALLOW','UNKNOWN')
           ,CHOOSE(le.sequence_number_Invalid,'ALLOW','UNKNOWN')
@@ -190,12 +196,13 @@ EXPORT FromExpanded(DATASET(Expanded_Layout) h) := MODULE
           ,CHOOSE(le.phone_forwarded_Invalid,'ALLOW','UNKNOWN')
           ,CHOOSE(le.verified_carrier_Invalid,'ALLOW','UNKNOWN')
           ,CHOOSE(le.date_added_Invalid,'CUSTOM','UNKNOWN')
-          ,CHOOSE(le.filename_Invalid,'CUSTOM','UNKNOWN'),'UNKNOWN'));
-    SELF.FieldName := CHOOSE(c,'transaction_id','sequence_number','phone_id','phonenumber','risk_indicator','phone_type','phone_status','listing_name','porting_code','phone_forwarded','verified_carrier','date_added','filename','UNKNOWN');
-    SELF.FieldType := CHOOSE(c,'Invalid_ID','Invalid_No','Invalid_No','Invalid_Phone','Invalid_Risk','Invalid_Type','Invalid_Status','Invalid_AlphaChar','Invalid_Port','Invalid_AlphaChar','Invalid_No','Invalid_Date','Invalid_File','UNKNOWN');
-    SELF.FieldContents := CHOOSE(c,(SALT311.StrType)le.transaction_id,(SALT311.StrType)le.sequence_number,(SALT311.StrType)le.phone_id,(SALT311.StrType)le.phonenumber,(SALT311.StrType)le.risk_indicator,(SALT311.StrType)le.phone_type,(SALT311.StrType)le.phone_status,(SALT311.StrType)le.listing_name,(SALT311.StrType)le.porting_code,(SALT311.StrType)le.phone_forwarded,(SALT311.StrType)le.verified_carrier,(SALT311.StrType)le.date_added,(SALT311.StrType)le.filename,'***SALTBUG***');
+          ,CHOOSE(le.identity_count_Invalid,'ALLOW','UNKNOWN')
+          ,CHOOSE(le.phone_star_rating_Invalid,'ALLOW','UNKNOWN'),'UNKNOWN'));
+    SELF.FieldName := CHOOSE(c,'transaction_id','sequence_number','phone_id','phonenumber','risk_indicator','phone_type','phone_status','listing_name','porting_code','phone_forwarded','verified_carrier','date_added','identity_count','phone_star_rating','UNKNOWN');
+    SELF.FieldType := CHOOSE(c,'Invalid_ID','Invalid_No','Invalid_No','Invalid_Phone','Invalid_Risk','Invalid_Type','Invalid_Status','Invalid_AlphaChar','Invalid_Port','Invalid_AlphaChar','Invalid_No','Invalid_Date','Invalid_No','Invalid_Rating','UNKNOWN');
+    SELF.FieldContents := CHOOSE(c,(SALT311.StrType)le.transaction_id,(SALT311.StrType)le.sequence_number,(SALT311.StrType)le.phone_id,(SALT311.StrType)le.phonenumber,(SALT311.StrType)le.risk_indicator,(SALT311.StrType)le.phone_type,(SALT311.StrType)le.phone_status,(SALT311.StrType)le.listing_name,(SALT311.StrType)le.porting_code,(SALT311.StrType)le.phone_forwarded,(SALT311.StrType)le.verified_carrier,(SALT311.StrType)le.date_added,(SALT311.StrType)le.identity_count,(SALT311.StrType)le.phone_star_rating,'***SALTBUG***');
   END;
-  EXPORT AllErrors := NORMALIZE(h,13,Into(LEFT,COUNTER));
+  EXPORT AllErrors := NORMALIZE(h,14,Into(LEFT,COUNTER));
    bv := TABLE(AllErrors,{FieldContents, FieldName, Cnt := COUNT(GROUP)},FieldContents, FieldName,MERGE);
   EXPORT BadValues := TOPN(bv,1000,-Cnt);
   // Particular form of stats required for Orbit
@@ -220,7 +227,8 @@ EXPORT FromExpanded(DATASET(Expanded_Layout) h) := MODULE
           ,le.phone_forwarded_ALLOW_ErrorCount
           ,le.verified_carrier_ALLOW_ErrorCount
           ,le.date_added_CUSTOM_ErrorCount
-          ,le.filename_CUSTOM_ErrorCount
+          ,le.identity_count_ALLOW_ErrorCount
+          ,le.phone_star_rating_ALLOW_ErrorCount
           ,le.FieldsChecked_WithErrors
           ,le.FieldsChecked_NoErrors
           ,le.Rules_WithErrors
@@ -241,7 +249,8 @@ EXPORT FromExpanded(DATASET(Expanded_Layout) h) := MODULE
           ,le.phone_forwarded_ALLOW_ErrorCount
           ,le.verified_carrier_ALLOW_ErrorCount
           ,le.date_added_CUSTOM_ErrorCount
-          ,le.filename_CUSTOM_ErrorCount,0) / le.TotalCnt, CHOOSE(c - NumRules
+          ,le.identity_count_ALLOW_ErrorCount
+          ,le.phone_star_rating_ALLOW_ErrorCount,0) / le.TotalCnt, CHOOSE(c - NumRules
           ,IF(NumFieldsWithRules = 0, 0, le.FieldsChecked_WithErrors/NumFieldsWithRules * 100)
           ,IF(NumFieldsWithRules = 0, 0, le.FieldsChecked_NoErrors/NumFieldsWithRules * 100)
           ,IF(NumRules = 0, 0, le.Rules_WithErrors/NumRules * 100)
@@ -292,6 +301,9 @@ EXPORT FromExpanded(DATASET(Expanded_Layout) h) := MODULE
           ,'phone_forwarded:' + getFieldTypeText(h.phone_forwarded) + IF(TRIM(le.txt) > '', '_' + TRIM(le.txt), '') + ':' + suffix
           ,'verified_carrier:' + getFieldTypeText(h.verified_carrier) + IF(TRIM(le.txt) > '', '_' + TRIM(le.txt), '') + ':' + suffix
           ,'date_added:' + getFieldTypeText(h.date_added) + IF(TRIM(le.txt) > '', '_' + TRIM(le.txt), '') + ':' + suffix
+          ,'identity_count:' + getFieldTypeText(h.identity_count) + IF(TRIM(le.txt) > '', '_' + TRIM(le.txt), '') + ':' + suffix
+          ,'carrier:' + getFieldTypeText(h.carrier) + IF(TRIM(le.txt) > '', '_' + TRIM(le.txt), '') + ':' + suffix
+          ,'phone_star_rating:' + getFieldTypeText(h.phone_star_rating) + IF(TRIM(le.txt) > '', '_' + TRIM(le.txt), '') + ':' + suffix
           ,'filename:' + getFieldTypeText(h.filename) + IF(TRIM(le.txt) > '', '_' + TRIM(le.txt), '') + ':' + suffix,'UNKNOWN');
       SELF.rulecnt := CHOOSE(c
           ,le.populated_transaction_id_cnt
@@ -306,6 +318,9 @@ EXPORT FromExpanded(DATASET(Expanded_Layout) h) := MODULE
           ,le.populated_phone_forwarded_cnt
           ,le.populated_verified_carrier_cnt
           ,le.populated_date_added_cnt
+          ,le.populated_identity_count_cnt
+          ,le.populated_carrier_cnt
+          ,le.populated_phone_star_rating_cnt
           ,le.populated_filename_cnt,0);
       SELF.rulepcnt := CHOOSE(c
           ,le.populated_transaction_id_pcnt
@@ -320,10 +335,13 @@ EXPORT FromExpanded(DATASET(Expanded_Layout) h) := MODULE
           ,le.populated_phone_forwarded_pcnt
           ,le.populated_verified_carrier_pcnt
           ,le.populated_date_added_pcnt
+          ,le.populated_identity_count_pcnt
+          ,le.populated_carrier_pcnt
+          ,le.populated_phone_star_rating_pcnt
           ,le.populated_filename_pcnt,0);
       SELF.ErrorMessage := '';
     END;
-    FieldPopStats := NORMALIZE(hygiene_summaryStats,13,xNormHygieneStats(LEFT,COUNTER,'POP'));
+    FieldPopStats := NORMALIZE(hygiene_summaryStats,16,xNormHygieneStats(LEFT,COUNTER,'POP'));
  
   // record count stats
     SALT311.ScrubsOrbitLayout xTotalRecs(hygiene_summaryStats le, STRING inRuleDesc) := TRANSFORM
@@ -339,7 +357,7 @@ EXPORT FromExpanded(DATASET(Expanded_Layout) h) := MODULE
  
     mod_Delta := OtherPhones_Delta(prevDS, PROJECT(h, OtherPhones_Layout_PhoneFinder));
     deltaHygieneSummary := mod_Delta.DifferenceSummary;
-    DeltaFieldPopStats := NORMALIZE(deltaHygieneSummary(txt <> 'New'),13,xNormHygieneStats(LEFT,COUNTER,'DELTA'));
+    DeltaFieldPopStats := NORMALIZE(deltaHygieneSummary(txt <> 'New'),16,xNormHygieneStats(LEFT,COUNTER,'DELTA'));
     deltaStatName(STRING inTxt) := IF(STD.Str.Find(inTxt, 'Updates_') > 0,
                                       'Updates:count_Updates:DELTA',
                                       TRIM(inTxt) + ':count_' + TRIM(inTxt) + ':DELTA');
