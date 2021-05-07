@@ -4,9 +4,9 @@ export Build_Keys(string pversion) :=
 module
  
 	companies_dist 	:= distribute(Equifax_Business_Data.Files().Base.Companies.Built,hash64(efx_id));
-	sortCompanies   := sort(companies_dist(efx_id != ''), efx_id, -dt_last_seen, record_type, normCompany_type, local);
+	sortCompanies   := sort(companies_dist(efx_id != '' and ultid != 0), efx_id, -process_date, local);
   contacts_dist 	:= distribute(Equifax_Business_Data.Files().Base.Contacts.Built,hash64(efx_id));
-	sortContacts    := sort(contacts_dist(efx_id != ''), efx_id, -dt_last_seen, local);
+	sortContacts    := sort(contacts_dist (efx_id != '' and ultid != 0), efx_id, -process_date, local);
 			
 	dx_Equifax_Business_Data.Layout_KeyBase AppendCompanyInfo(Layouts.Base l, Layouts.Base_contacts r) :=
 	transform
@@ -31,19 +31,19 @@ module
 		self.efx_email                          := r.efx_email;
 		self.efx_date                           := r.efx_date;
 		self.exploded_title_description         := r.exploded_title_description;
-		self := l;
-		self := [];
+		self                                    := l;
+		self                                    := [];
 	end;		
 	
 	// Get all company records that are in the valid date range window, then select best one after join
-	contacts_getcompanyinfo := join(
-														 sortCompanies
-														,sortContacts
-														,left.efx_id = right.efx_id 
-														,AppendCompanyInfo(left,right)
-														,left outer
-														,local
-											      );
+	contacts_getcompanyinfo := join( sortCompanies
+																	,sortContacts
+																	,trim(left.efx_id,left,right) = trim(right.efx_id,left,right) and 
+																	 left.process_date            = right.process_date
+																	,AppendCompanyInfo(left,right)
+																	,left outer
+																	,local
+											           );
 
   // Build New Key file
 	RoxieKeyBuild.Mac_SK_BuildProcess_v3_local( dx_Equifax_Business_Data.Key_LinkIds.Key
