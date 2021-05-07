@@ -22,6 +22,7 @@ SANCTN_Mari.layouts_SANCTN_common.PARTY_AKA_DBA 	mapPartyAkaDba(ds_Party_aka_dba
 		self.LAST_NAME		:= ut.CleanSpacesAndUpper(L.LAST_NAME);
 		self.AKA_DBA_TEXT	:= if(L.COMPANY != '',ut.CleanSpacesAndUpper(L.COMPANY), STD.Str.CleanSpaces(TRIM(self.FIRST_NAME +' '+ self.MIDDLE_NAME+' '+self.LAST_NAME)));
 		self.PARTY_KEY		:= L.PARTYPK;
+		self:=[];
 		
 END;
 

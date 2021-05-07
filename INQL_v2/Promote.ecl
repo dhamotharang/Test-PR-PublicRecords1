@@ -21,6 +21,12 @@ EXPORT Promote(string     pVersion      =  ''
 			export buildfiles := tools.mod_PromoteBuild(pVersion,pBuildFilenames,pFilter,pDelete,pisTesting := false);//, pnGenerations := 3);    
 		end;
 		
+    export INQL_DidVille := module				
+			dataset(lay_builds)  pBuildFilenames := INQL_v2.Filenames(pVersion,  fcra, pDaily).INQL_Base_DIDVille.dAll_filenames;
+			export buildfiles := tools.mod_PromoteBuild(pVersion,pBuildFilenames,pFilter,pDelete,pisTesting := false);//, pnGenerations := 3);    
+		end;		
+		
+		
 		export SBA := module				
 			dataset(lay_builds)  pBuildFilenames := INQL_v2.Filenames(pVersion, fcra, pDaily).SBA_Base.dAll_filenames;
 			export buildfiles := tools.mod_PromoteBuild(pVersion,pBuildFilenames,pFilter,pDelete,pisTesting := false);//, pnGenerations := 3);    

@@ -22,7 +22,7 @@ EXPORT OtherPhones_GenerationMod := MODULE(SALT311.iGenerationMod)
   EXPORT spc_FILENAME := 'PhoneFinder';
   EXPORT spc_INGESTSTATUS := '';
   EXPORT spc_EXTERNAL_MAPPING := 'UniqueID:';
-  EXPORT spc_EXTERNAL_BATCH_PARAM := ',/* MY_ */,transaction_id,sequence_number,phone_id,phonenumber,risk_indicator,phone_type,phone_status,listing_name,porting_code,phone_forwarded,verified_carrier,date_added,filename';
+  EXPORT spc_EXTERNAL_BATCH_PARAM := ',/* MY_ */,transaction_id,sequence_number,phone_id,phonenumber,risk_indicator,phone_type,phone_status,listing_name,porting_code,phone_forwarded,verified_carrier,date_added,identity_count,carrier,phone_star_rating,filename';
   EXPORT spc_HAS_TWOSTEP := FALSE;
   EXPORT spc_HAS_PARTITION := FALSE;
   EXPORT spc_HAS_FIELDTYPES := TRUE;
@@ -45,6 +45,7 @@ EXPORT OtherPhones_GenerationMod := MODULE(SALT311.iGenerationMod)
     + '\n'
     + 'FIELDTYPE:Invalid_No:ALLOW(0123456789\\\\N)\n'
     + 'FIELDTYPE:Invalid_ID:ALLOW(0123456789R\\\\N)\n'
+    + 'FIELDTYPE:Invalid_Rating:ALLOW(0123456789\\\\N| )\n'
     + 'FIELDTYPE:Invalid_Risk:ENUM(PASS|FAIL|WARN|\\\\N|)\n'
     + 'FIELDTYPE:Invalid_Type:ENUM(LANDLINE|POSSIBLE WIRELESS|PAGER|POSSIBLE VOIP|WIRELESS|VOIP|OTHER/UNKNOWN|CABLE|\\\\N|)\n'
     + 'FIELDTYPE:Invalid_Status:ENUM(ACTIVE|NOT AVAILABLE|INACTIVE|\\\\N|)\n'
@@ -66,7 +67,10 @@ EXPORT OtherPhones_GenerationMod := MODULE(SALT311.iGenerationMod)
     + 'FIELD:phone_forwarded:TYPE(STRING32):LIKE(Invalid_AlphaChar):0,0\n'
     + 'FIELD:verified_carrier:TYPE(INTEGER1):LIKE(Invalid_No):0,0\n'
     + 'FIELD:date_added:TYPE(STRING20):LIKE(Invalid_Date):0,0\n'
-    + 'FIELD:filename:TYPE(STRING255):LIKE(Invalid_File):0,0\n'
+    + 'FIELD:identity_count:TYPE(INTEGER5):LIKE(Invalid_No):0,0\n'
+    + 'FIELD:carrier:TYPE(STRING30):0,0\n'
+    + 'FIELD:phone_star_rating:TYPE(STRING5):LIKE(Invalid_Rating):0,0\n'
+    + 'FIELD:filename:TYPE(STRING255):0,0'
     ;
  
   // Structured values

@@ -54,6 +54,18 @@ EXPORT Summary(SALT311.Str30Type  txt) := FUNCTION
     populated_date_added_pcnt := AVE(GROUP,IF(h.date_added = (TYPEOF(h.date_added))'',0,100));
     maxlength_date_added := MAX(GROUP,LENGTH(TRIM((SALT311.StrType)h.date_added)));
     avelength_date_added := AVE(GROUP,LENGTH(TRIM((SALT311.StrType)h.date_added)),h.date_added<>(typeof(h.date_added))'');
+    populated_identity_count_cnt := COUNT(GROUP,h.identity_count <> (TYPEOF(h.identity_count))'');
+    populated_identity_count_pcnt := AVE(GROUP,IF(h.identity_count = (TYPEOF(h.identity_count))'',0,100));
+    maxlength_identity_count := MAX(GROUP,LENGTH(TRIM((SALT311.StrType)h.identity_count)));
+    avelength_identity_count := AVE(GROUP,LENGTH(TRIM((SALT311.StrType)h.identity_count)),h.identity_count<>(typeof(h.identity_count))'');
+    populated_carrier_cnt := COUNT(GROUP,h.carrier <> (TYPEOF(h.carrier))'');
+    populated_carrier_pcnt := AVE(GROUP,IF(h.carrier = (TYPEOF(h.carrier))'',0,100));
+    maxlength_carrier := MAX(GROUP,LENGTH(TRIM((SALT311.StrType)h.carrier)));
+    avelength_carrier := AVE(GROUP,LENGTH(TRIM((SALT311.StrType)h.carrier)),h.carrier<>(typeof(h.carrier))'');
+    populated_phone_star_rating_cnt := COUNT(GROUP,h.phone_star_rating <> (TYPEOF(h.phone_star_rating))'');
+    populated_phone_star_rating_pcnt := AVE(GROUP,IF(h.phone_star_rating = (TYPEOF(h.phone_star_rating))'',0,100));
+    maxlength_phone_star_rating := MAX(GROUP,LENGTH(TRIM((SALT311.StrType)h.phone_star_rating)));
+    avelength_phone_star_rating := AVE(GROUP,LENGTH(TRIM((SALT311.StrType)h.phone_star_rating)),h.phone_star_rating<>(typeof(h.phone_star_rating))'');
     populated_filename_cnt := COUNT(GROUP,h.filename <> (TYPEOF(h.filename))'');
     populated_filename_pcnt := AVE(GROUP,IF(h.filename = (TYPEOF(h.filename))'',0,100));
     maxlength_filename := MAX(GROUP,LENGTH(TRIM((SALT311.StrType)h.filename)));
@@ -61,7 +73,7 @@ EXPORT Summary(SALT311.Str30Type  txt) := FUNCTION
   END;
     T := TABLE(h,SummaryLayout);
   R1 := RECORD
-    UNSIGNED LinkingPotential :=  + T.Populated_transaction_id_pcnt *   0.00 / 100 + T.Populated_sequence_number_pcnt *   0.00 / 100 + T.Populated_phone_id_pcnt *   0.00 / 100 + T.Populated_phonenumber_pcnt *   0.00 / 100 + T.Populated_risk_indicator_pcnt *   0.00 / 100 + T.Populated_phone_type_pcnt *   0.00 / 100 + T.Populated_phone_status_pcnt *   0.00 / 100 + T.Populated_listing_name_pcnt *   0.00 / 100 + T.Populated_porting_code_pcnt *   0.00 / 100 + T.Populated_phone_forwarded_pcnt *   0.00 / 100 + T.Populated_verified_carrier_pcnt *   0.00 / 100 + T.Populated_date_added_pcnt *   0.00 / 100 + T.Populated_filename_pcnt *   0.00 / 100;
+    UNSIGNED LinkingPotential :=  + T.Populated_transaction_id_pcnt *   0.00 / 100 + T.Populated_sequence_number_pcnt *   0.00 / 100 + T.Populated_phone_id_pcnt *   0.00 / 100 + T.Populated_phonenumber_pcnt *   0.00 / 100 + T.Populated_risk_indicator_pcnt *   0.00 / 100 + T.Populated_phone_type_pcnt *   0.00 / 100 + T.Populated_phone_status_pcnt *   0.00 / 100 + T.Populated_listing_name_pcnt *   0.00 / 100 + T.Populated_porting_code_pcnt *   0.00 / 100 + T.Populated_phone_forwarded_pcnt *   0.00 / 100 + T.Populated_verified_carrier_pcnt *   0.00 / 100 + T.Populated_date_added_pcnt *   0.00 / 100 + T.Populated_identity_count_pcnt *   0.00 / 100 + T.Populated_carrier_pcnt *   0.00 / 100 + T.Populated_phone_star_rating_pcnt *   0.00 / 100 + T.Populated_filename_pcnt *   0.00 / 100;
     T;
   END;
   RETURN TABLE(T,R1);
@@ -79,27 +91,27 @@ END;
 invRec invert(summary0 le, INTEGER C) := TRANSFORM
   SELF.FldNo := C;
   SELF.NumberOfRecords := le.NumberOfRecords;
-  SELF.FieldName := CHOOSE(C,'transaction_id','sequence_number','phone_id','phonenumber','risk_indicator','phone_type','phone_status','listing_name','porting_code','phone_forwarded','verified_carrier','date_added','filename');
-  SELF.populated_pcnt := CHOOSE(C,le.populated_transaction_id_pcnt,le.populated_sequence_number_pcnt,le.populated_phone_id_pcnt,le.populated_phonenumber_pcnt,le.populated_risk_indicator_pcnt,le.populated_phone_type_pcnt,le.populated_phone_status_pcnt,le.populated_listing_name_pcnt,le.populated_porting_code_pcnt,le.populated_phone_forwarded_pcnt,le.populated_verified_carrier_pcnt,le.populated_date_added_pcnt,le.populated_filename_pcnt);
-  SELF.maxlength := CHOOSE(C,le.maxlength_transaction_id,le.maxlength_sequence_number,le.maxlength_phone_id,le.maxlength_phonenumber,le.maxlength_risk_indicator,le.maxlength_phone_type,le.maxlength_phone_status,le.maxlength_listing_name,le.maxlength_porting_code,le.maxlength_phone_forwarded,le.maxlength_verified_carrier,le.maxlength_date_added,le.maxlength_filename);
-  SELF.avelength := CHOOSE(C,le.avelength_transaction_id,le.avelength_sequence_number,le.avelength_phone_id,le.avelength_phonenumber,le.avelength_risk_indicator,le.avelength_phone_type,le.avelength_phone_status,le.avelength_listing_name,le.avelength_porting_code,le.avelength_phone_forwarded,le.avelength_verified_carrier,le.avelength_date_added,le.avelength_filename);
+  SELF.FieldName := CHOOSE(C,'transaction_id','sequence_number','phone_id','phonenumber','risk_indicator','phone_type','phone_status','listing_name','porting_code','phone_forwarded','verified_carrier','date_added','identity_count','carrier','phone_star_rating','filename');
+  SELF.populated_pcnt := CHOOSE(C,le.populated_transaction_id_pcnt,le.populated_sequence_number_pcnt,le.populated_phone_id_pcnt,le.populated_phonenumber_pcnt,le.populated_risk_indicator_pcnt,le.populated_phone_type_pcnt,le.populated_phone_status_pcnt,le.populated_listing_name_pcnt,le.populated_porting_code_pcnt,le.populated_phone_forwarded_pcnt,le.populated_verified_carrier_pcnt,le.populated_date_added_pcnt,le.populated_identity_count_pcnt,le.populated_carrier_pcnt,le.populated_phone_star_rating_pcnt,le.populated_filename_pcnt);
+  SELF.maxlength := CHOOSE(C,le.maxlength_transaction_id,le.maxlength_sequence_number,le.maxlength_phone_id,le.maxlength_phonenumber,le.maxlength_risk_indicator,le.maxlength_phone_type,le.maxlength_phone_status,le.maxlength_listing_name,le.maxlength_porting_code,le.maxlength_phone_forwarded,le.maxlength_verified_carrier,le.maxlength_date_added,le.maxlength_identity_count,le.maxlength_carrier,le.maxlength_phone_star_rating,le.maxlength_filename);
+  SELF.avelength := CHOOSE(C,le.avelength_transaction_id,le.avelength_sequence_number,le.avelength_phone_id,le.avelength_phonenumber,le.avelength_risk_indicator,le.avelength_phone_type,le.avelength_phone_status,le.avelength_listing_name,le.avelength_porting_code,le.avelength_phone_forwarded,le.avelength_verified_carrier,le.avelength_date_added,le.avelength_identity_count,le.avelength_carrier,le.avelength_phone_star_rating,le.avelength_filename);
 END;
-EXPORT invSummary := NORMALIZE(summary0, 13, invert(LEFT,COUNTER));
+EXPORT invSummary := NORMALIZE(summary0, 16, invert(LEFT,COUNTER));
 // The character counts
 // Move everything into 'inverted list' form so processing can be done 'in library'
 SALT311.MAC_Character_Counts.X_Data_Layout Into(h le,unsigned C) := TRANSFORM
-  SELF.Fld := TRIM(CHOOSE(C,TRIM((SALT311.StrType)le.transaction_id),IF (le.sequence_number <> 0,TRIM((SALT311.StrType)le.sequence_number), ''),IF (le.phone_id <> 0,TRIM((SALT311.StrType)le.phone_id), ''),TRIM((SALT311.StrType)le.phonenumber),TRIM((SALT311.StrType)le.risk_indicator),TRIM((SALT311.StrType)le.phone_type),TRIM((SALT311.StrType)le.phone_status),TRIM((SALT311.StrType)le.listing_name),TRIM((SALT311.StrType)le.porting_code),TRIM((SALT311.StrType)le.phone_forwarded),IF (le.verified_carrier <> 0,TRIM((SALT311.StrType)le.verified_carrier), ''),TRIM((SALT311.StrType)le.date_added),TRIM((SALT311.StrType)le.filename)));
+  SELF.Fld := TRIM(CHOOSE(C,TRIM((SALT311.StrType)le.transaction_id),IF (le.sequence_number <> 0,TRIM((SALT311.StrType)le.sequence_number), ''),IF (le.phone_id <> 0,TRIM((SALT311.StrType)le.phone_id), ''),TRIM((SALT311.StrType)le.phonenumber),TRIM((SALT311.StrType)le.risk_indicator),TRIM((SALT311.StrType)le.phone_type),TRIM((SALT311.StrType)le.phone_status),TRIM((SALT311.StrType)le.listing_name),TRIM((SALT311.StrType)le.porting_code),TRIM((SALT311.StrType)le.phone_forwarded),IF (le.verified_carrier <> 0,TRIM((SALT311.StrType)le.verified_carrier), ''),TRIM((SALT311.StrType)le.date_added),IF (le.identity_count <> 0,TRIM((SALT311.StrType)le.identity_count), ''),TRIM((SALT311.StrType)le.carrier),TRIM((SALT311.StrType)le.phone_star_rating),TRIM((SALT311.StrType)le.filename)));
   SELF.FldNo := C;
 END;
-SHARED FldInv0 := NORMALIZE(h,13,Into(LEFT,COUNTER));
+SHARED FldInv0 := NORMALIZE(h,16,Into(LEFT,COUNTER));
 // Move everything into 'pairs' form so processing can be done 'in library'
 SALT311.MAC_Correlate.Data_Layout IntoP(h le,UNSIGNED C) := TRANSFORM
-  SELF.FldNo1 := 1 + (C / 13);
-  SELF.FldNo2 := 1 + (C % 13);
-  SELF.Fld1 := TRIM(CHOOSE(SELF.FldNo1,TRIM((SALT311.StrType)le.transaction_id),IF (le.sequence_number <> 0,TRIM((SALT311.StrType)le.sequence_number), ''),IF (le.phone_id <> 0,TRIM((SALT311.StrType)le.phone_id), ''),TRIM((SALT311.StrType)le.phonenumber),TRIM((SALT311.StrType)le.risk_indicator),TRIM((SALT311.StrType)le.phone_type),TRIM((SALT311.StrType)le.phone_status),TRIM((SALT311.StrType)le.listing_name),TRIM((SALT311.StrType)le.porting_code),TRIM((SALT311.StrType)le.phone_forwarded),IF (le.verified_carrier <> 0,TRIM((SALT311.StrType)le.verified_carrier), ''),TRIM((SALT311.StrType)le.date_added),TRIM((SALT311.StrType)le.filename)));
-  SELF.Fld2 := TRIM(CHOOSE(SELF.FldNo2,TRIM((SALT311.StrType)le.transaction_id),IF (le.sequence_number <> 0,TRIM((SALT311.StrType)le.sequence_number), ''),IF (le.phone_id <> 0,TRIM((SALT311.StrType)le.phone_id), ''),TRIM((SALT311.StrType)le.phonenumber),TRIM((SALT311.StrType)le.risk_indicator),TRIM((SALT311.StrType)le.phone_type),TRIM((SALT311.StrType)le.phone_status),TRIM((SALT311.StrType)le.listing_name),TRIM((SALT311.StrType)le.porting_code),TRIM((SALT311.StrType)le.phone_forwarded),IF (le.verified_carrier <> 0,TRIM((SALT311.StrType)le.verified_carrier), ''),TRIM((SALT311.StrType)le.date_added),TRIM((SALT311.StrType)le.filename)));
+  SELF.FldNo1 := 1 + (C / 16);
+  SELF.FldNo2 := 1 + (C % 16);
+  SELF.Fld1 := TRIM(CHOOSE(SELF.FldNo1,TRIM((SALT311.StrType)le.transaction_id),IF (le.sequence_number <> 0,TRIM((SALT311.StrType)le.sequence_number), ''),IF (le.phone_id <> 0,TRIM((SALT311.StrType)le.phone_id), ''),TRIM((SALT311.StrType)le.phonenumber),TRIM((SALT311.StrType)le.risk_indicator),TRIM((SALT311.StrType)le.phone_type),TRIM((SALT311.StrType)le.phone_status),TRIM((SALT311.StrType)le.listing_name),TRIM((SALT311.StrType)le.porting_code),TRIM((SALT311.StrType)le.phone_forwarded),IF (le.verified_carrier <> 0,TRIM((SALT311.StrType)le.verified_carrier), ''),TRIM((SALT311.StrType)le.date_added),IF (le.identity_count <> 0,TRIM((SALT311.StrType)le.identity_count), ''),TRIM((SALT311.StrType)le.carrier),TRIM((SALT311.StrType)le.phone_star_rating),TRIM((SALT311.StrType)le.filename)));
+  SELF.Fld2 := TRIM(CHOOSE(SELF.FldNo2,TRIM((SALT311.StrType)le.transaction_id),IF (le.sequence_number <> 0,TRIM((SALT311.StrType)le.sequence_number), ''),IF (le.phone_id <> 0,TRIM((SALT311.StrType)le.phone_id), ''),TRIM((SALT311.StrType)le.phonenumber),TRIM((SALT311.StrType)le.risk_indicator),TRIM((SALT311.StrType)le.phone_type),TRIM((SALT311.StrType)le.phone_status),TRIM((SALT311.StrType)le.listing_name),TRIM((SALT311.StrType)le.porting_code),TRIM((SALT311.StrType)le.phone_forwarded),IF (le.verified_carrier <> 0,TRIM((SALT311.StrType)le.verified_carrier), ''),TRIM((SALT311.StrType)le.date_added),IF (le.identity_count <> 0,TRIM((SALT311.StrType)le.identity_count), ''),TRIM((SALT311.StrType)le.carrier),TRIM((SALT311.StrType)le.phone_star_rating),TRIM((SALT311.StrType)le.filename)));
   END;
-SHARED Pairs0 := NORMALIZE(ENTH(h,Config.CorrelateSampleSize),13*13,IntoP(LEFT,COUNTER))(FldNo1<FldNo2);
+SHARED Pairs0 := NORMALIZE(ENTH(h,Config.CorrelateSampleSize),16*16,IntoP(LEFT,COUNTER))(FldNo1<FldNo2);
 SHARED FldIds := DATASET([{1,'transaction_id'}
       ,{2,'sequence_number'}
       ,{3,'phone_id'}
@@ -112,7 +124,10 @@ SHARED FldIds := DATASET([{1,'transaction_id'}
       ,{10,'phone_forwarded'}
       ,{11,'verified_carrier'}
       ,{12,'date_added'}
-      ,{13,'filename'}],SALT311.MAC_Character_Counts.Field_Identification);
+      ,{13,'identity_count'}
+      ,{14,'carrier'}
+      ,{15,'phone_star_rating'}
+      ,{16,'filename'}],SALT311.MAC_Character_Counts.Field_Identification);
 EXPORT AllProfiles := SALT311.MAC_Character_Counts.FN_Profile(FldInv0,FldIds);
  
 EXPORT SrcProfiles := SALT311.MAC_Character_Counts.Src_Profile(FldInv0,FldIds);
@@ -137,11 +152,14 @@ ErrorRecord NoteErrors(h le,UNSIGNED1 c) := TRANSFORM
     OtherPhones_Fields.InValid_phone_forwarded((SALT311.StrType)le.phone_forwarded),
     OtherPhones_Fields.InValid_verified_carrier((SALT311.StrType)le.verified_carrier),
     OtherPhones_Fields.InValid_date_added((SALT311.StrType)le.date_added),
+    OtherPhones_Fields.InValid_identity_count((SALT311.StrType)le.identity_count),
+    OtherPhones_Fields.InValid_carrier((SALT311.StrType)le.carrier),
+    OtherPhones_Fields.InValid_phone_star_rating((SALT311.StrType)le.phone_star_rating),
     OtherPhones_Fields.InValid_filename((SALT311.StrType)le.filename),
     0);
   SELF.FieldNum := IF(SELF.ErrorNum=0,SKIP,c); // Bail early to avoid creating record
 END;
-Errors := NORMALIZE(h,13,NoteErrors(LEFT,COUNTER));
+Errors := NORMALIZE(h,16,NoteErrors(LEFT,COUNTER));
 ErrorRecordsTotals := RECORD
   Errors.FieldNum;
   Errors.ErrorNum;
@@ -150,8 +168,8 @@ END;
 TotalErrors := TABLE(Errors,ErrorRecordsTotals,FieldNum,ErrorNum,FEW);
 PrettyErrorTotals := RECORD
   FieldNme := OtherPhones_Fields.FieldName(TotalErrors.FieldNum);
-  FieldType := CHOOSE(TotalErrors.FieldNum,'Invalid_ID','Invalid_No','Invalid_No','Invalid_Phone','Invalid_Risk','Invalid_Type','Invalid_Status','Invalid_AlphaChar','Invalid_Port','Invalid_AlphaChar','Invalid_No','Invalid_Date','Invalid_File');
-  ErrorMessage := CHOOSE(TotalErrors.FieldNum,OtherPhones_Fields.InValidMessage_transaction_id(TotalErrors.ErrorNum),OtherPhones_Fields.InValidMessage_sequence_number(TotalErrors.ErrorNum),OtherPhones_Fields.InValidMessage_phone_id(TotalErrors.ErrorNum),OtherPhones_Fields.InValidMessage_phonenumber(TotalErrors.ErrorNum),OtherPhones_Fields.InValidMessage_risk_indicator(TotalErrors.ErrorNum),OtherPhones_Fields.InValidMessage_phone_type(TotalErrors.ErrorNum),OtherPhones_Fields.InValidMessage_phone_status(TotalErrors.ErrorNum),OtherPhones_Fields.InValidMessage_listing_name(TotalErrors.ErrorNum),OtherPhones_Fields.InValidMessage_porting_code(TotalErrors.ErrorNum),OtherPhones_Fields.InValidMessage_phone_forwarded(TotalErrors.ErrorNum),OtherPhones_Fields.InValidMessage_verified_carrier(TotalErrors.ErrorNum),OtherPhones_Fields.InValidMessage_date_added(TotalErrors.ErrorNum),OtherPhones_Fields.InValidMessage_filename(TotalErrors.ErrorNum));
+  FieldType := CHOOSE(TotalErrors.FieldNum,'Invalid_ID','Invalid_No','Invalid_No','Invalid_Phone','Invalid_Risk','Invalid_Type','Invalid_Status','Invalid_AlphaChar','Invalid_Port','Invalid_AlphaChar','Invalid_No','Invalid_Date','Invalid_No','Unknown','Invalid_Rating','Unknown');
+  ErrorMessage := CHOOSE(TotalErrors.FieldNum,OtherPhones_Fields.InValidMessage_transaction_id(TotalErrors.ErrorNum),OtherPhones_Fields.InValidMessage_sequence_number(TotalErrors.ErrorNum),OtherPhones_Fields.InValidMessage_phone_id(TotalErrors.ErrorNum),OtherPhones_Fields.InValidMessage_phonenumber(TotalErrors.ErrorNum),OtherPhones_Fields.InValidMessage_risk_indicator(TotalErrors.ErrorNum),OtherPhones_Fields.InValidMessage_phone_type(TotalErrors.ErrorNum),OtherPhones_Fields.InValidMessage_phone_status(TotalErrors.ErrorNum),OtherPhones_Fields.InValidMessage_listing_name(TotalErrors.ErrorNum),OtherPhones_Fields.InValidMessage_porting_code(TotalErrors.ErrorNum),OtherPhones_Fields.InValidMessage_phone_forwarded(TotalErrors.ErrorNum),OtherPhones_Fields.InValidMessage_verified_carrier(TotalErrors.ErrorNum),OtherPhones_Fields.InValidMessage_date_added(TotalErrors.ErrorNum),OtherPhones_Fields.InValidMessage_identity_count(TotalErrors.ErrorNum),OtherPhones_Fields.InValidMessage_carrier(TotalErrors.ErrorNum),OtherPhones_Fields.InValidMessage_phone_star_rating(TotalErrors.ErrorNum),OtherPhones_Fields.InValidMessage_filename(TotalErrors.ErrorNum));
   TotalErrors.Cnt;
 END;
 ValErr := TABLE(TotalErrors,PrettyErrorTotals);

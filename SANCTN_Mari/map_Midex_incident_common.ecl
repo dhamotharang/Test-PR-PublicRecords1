@@ -55,9 +55,11 @@ SANCTN_Mari.layouts_SANCTN_common.SANCTN_incident_base clnIncidentToCommon(dLayo
 		self.date_vendor_last_reported 	:= '';
 		self.global_sid											 	:= 0;
 		self.record_sid											 	:= 0;
-		
+		self.dt_effective_first:=0;
+  		self.dt_effective_last:=0;
+  		self.delta_ind := 0;
 		self	:= input;
-		// self := [];
+		self := [];
 END;
 
 ds_NP_incident	:= project(ds_incident,clnIncidentToCommon(left));

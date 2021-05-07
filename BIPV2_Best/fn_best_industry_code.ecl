@@ -23,6 +23,7 @@
 	 
 	 FinalFlatRec := record
 	     inDs.linkid;
+       inDs.source;
 	     inDs.code_type1;
 			 integer permits_name;
 			 integer method_name;
