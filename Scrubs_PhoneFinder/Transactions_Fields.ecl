@@ -2,11 +2,11 @@
 IMPORT Scrubs_PhoneFinder; // Import modules for FieldTypes attribute definitions
 EXPORT Transactions_Fields := MODULE
  
-EXPORT NumFields := 36;
+EXPORT NumFields := 40;
  
 // Processing for each FieldType
-EXPORT SALT311.StrType FieldTypeName(UNSIGNED2 i) := CHOOSE(i,'Invalid_Binary','Invalid_No','Invalid_ID','Invalid_Code','Invalid_Alpha','Invalid_AlphaChar','Invalid_Risk','Invalid_Phone_Type','Invalid_Phone_Status','Invalid_Forward','Invalid_State','Invalid_Zip','Invalid_Phone','Invalid_Date','Invalid_File');
-EXPORT FieldTypeNum(SALT311.StrType fn) := CASE(fn,'Invalid_Binary' => 1,'Invalid_No' => 2,'Invalid_ID' => 3,'Invalid_Code' => 4,'Invalid_Alpha' => 5,'Invalid_AlphaChar' => 6,'Invalid_Risk' => 7,'Invalid_Phone_Type' => 8,'Invalid_Phone_Status' => 9,'Invalid_Forward' => 10,'Invalid_State' => 11,'Invalid_Zip' => 12,'Invalid_Phone' => 13,'Invalid_Date' => 14,'Invalid_File' => 15,0);
+EXPORT SALT311.StrType FieldTypeName(UNSIGNED2 i) := CHOOSE(i,'Invalid_Binary','Invalid_No','Invalid_ID','Invalid_Code','Invalid_Alpha','Invalid_AlphaChar','Invalid_Rating','Invalid_Risk','Invalid_Phone_Type','Invalid_Phone_Status','Invalid_Forward','Invalid_State','Invalid_Zip','Invalid_Phone','Invalid_Date','Invalid_File');
+EXPORT FieldTypeNum(SALT311.StrType fn) := CASE(fn,'Invalid_Binary' => 1,'Invalid_No' => 2,'Invalid_ID' => 3,'Invalid_Code' => 4,'Invalid_Alpha' => 5,'Invalid_AlphaChar' => 6,'Invalid_Rating' => 7,'Invalid_Risk' => 8,'Invalid_Phone_Type' => 9,'Invalid_Phone_Status' => 10,'Invalid_Forward' => 11,'Invalid_State' => 12,'Invalid_Zip' => 13,'Invalid_Phone' => 14,'Invalid_Date' => 15,'Invalid_File' => 16,0);
  
 EXPORT MakeFT_Invalid_Binary(SALT311.StrType s0) := FUNCTION
   s1 := SALT311.stringfilter(s0,'01\\\\N'); // Only allow valid symbols
@@ -49,6 +49,13 @@ EXPORT MakeFT_Invalid_AlphaChar(SALT311.StrType s0) := FUNCTION
 END;
 EXPORT InValidFT_Invalid_AlphaChar(SALT311.StrType s) := WHICH(LENGTH(TRIM(s))<>LENGTH(TRIM(SALT311.StringFilter(s,'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789\\(\\)_[] .,:;#/-&\\\\\'*'))));
 EXPORT InValidMessageFT_Invalid_AlphaChar(UNSIGNED1 wh) := CHOOSE(wh,SALT311.HygieneErrors.NotInChars('ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789\\(\\)_[] .,:;#/-&\\\\\'*'),SALT311.HygieneErrors.Good);
+ 
+EXPORT MakeFT_Invalid_Rating(SALT311.StrType s0) := FUNCTION
+  s1 := SALT311.stringfilter(s0,'0123456789\\\\N| '); // Only allow valid symbols
+  RETURN  s1;
+END;
+EXPORT InValidFT_Invalid_Rating(SALT311.StrType s) := WHICH(LENGTH(TRIM(s))<>LENGTH(TRIM(SALT311.StringFilter(s,'0123456789\\\\N| '))));
+EXPORT InValidMessageFT_Invalid_Rating(UNSIGNED1 wh) := CHOOSE(wh,SALT311.HygieneErrors.NotInChars('0123456789\\\\N| '),SALT311.HygieneErrors.Good);
  
 EXPORT MakeFT_Invalid_Risk(SALT311.StrType s0) := FUNCTION
   RETURN  s0;
@@ -107,11 +114,11 @@ END;
 EXPORT InValidFT_Invalid_File(SALT311.StrType s) := WHICH(~Scrubs_PhoneFinder.Functions.Check_File(s)>0);
 EXPORT InValidMessageFT_Invalid_File(UNSIGNED1 wh) := CHOOSE(wh,SALT311.HygieneErrors.CustomFail('Scrubs_PhoneFinder.Functions.Check_File'),SALT311.HygieneErrors.Good);
  
-EXPORT SALT311.StrType FieldName(UNSIGNED2 i) := CHOOSE(i,'transaction_id','transaction_date','user_id','product_code','company_id','source_code','batch_job_id','batch_acctno','response_time','reference_code','phonefinder_type','submitted_lexid','submitted_phonenumber','submitted_firstname','submitted_lastname','submitted_middlename','submitted_streetaddress1','submitted_city','submitted_state','submitted_zip','phonenumber','data_source','royalty_used','carrier','risk_indicator','phone_type','phone_status','ported_count','last_ported_date','otp_count','last_otp_date','spoof_count','last_spoof_date','phone_forwarded','date_added','filename');
-EXPORT SALT311.StrType FlatName(UNSIGNED2 i) := CHOOSE(i,'transaction_id','transaction_date','user_id','product_code','company_id','source_code','batch_job_id','batch_acctno','response_time','reference_code','phonefinder_type','submitted_lexid','submitted_phonenumber','submitted_firstname','submitted_lastname','submitted_middlename','submitted_streetaddress1','submitted_city','submitted_state','submitted_zip','phonenumber','data_source','royalty_used','carrier','risk_indicator','phone_type','phone_status','ported_count','last_ported_date','otp_count','last_otp_date','spoof_count','last_spoof_date','phone_forwarded','date_added','filename');
-EXPORT FieldNum(SALT311.StrType fn) := CASE(fn,'transaction_id' => 0,'transaction_date' => 1,'user_id' => 2,'product_code' => 3,'company_id' => 4,'source_code' => 5,'batch_job_id' => 6,'batch_acctno' => 7,'response_time' => 8,'reference_code' => 9,'phonefinder_type' => 10,'submitted_lexid' => 11,'submitted_phonenumber' => 12,'submitted_firstname' => 13,'submitted_lastname' => 14,'submitted_middlename' => 15,'submitted_streetaddress1' => 16,'submitted_city' => 17,'submitted_state' => 18,'submitted_zip' => 19,'phonenumber' => 20,'data_source' => 21,'royalty_used' => 22,'carrier' => 23,'risk_indicator' => 24,'phone_type' => 25,'phone_status' => 26,'ported_count' => 27,'last_ported_date' => 28,'otp_count' => 29,'last_otp_date' => 30,'spoof_count' => 31,'last_spoof_date' => 32,'phone_forwarded' => 33,'date_added' => 34,'filename' => 35,0);
-EXPORT SET OF SALT311.StrType FieldRules(UNSIGNED2 i) := CHOOSE(i,['ALLOW'],['CUSTOM'],[],['ALLOW'],['ALLOW'],['ALLOW'],['ALLOW'],['ALLOW'],['ALLOW'],['ALLOW'],['ALLOW'],['ALLOW'],['ALLOW'],['ALLOW'],['ALLOW'],['ALLOW'],[],['ALLOW'],['ALLOW','LENGTHS'],['ALLOW','LENGTHS'],['ALLOW','LENGTHS'],['ALLOW'],['ALLOW'],['ALLOW'],['ENUM'],['ENUM'],['ENUM'],['ALLOW'],['CUSTOM'],['ALLOW'],['CUSTOM'],['ALLOW'],['CUSTOM'],['ENUM'],['CUSTOM'],['CUSTOM'],[]);
-EXPORT BOOLEAN InBaseLayout(UNSIGNED2 i) := CHOOSE(i,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,FALSE);
+EXPORT SALT311.StrType FieldName(UNSIGNED2 i) := CHOOSE(i,'transaction_id','transaction_date','user_id','product_code','company_id','source_code','batch_job_id','batch_acctno','response_time','reference_code','phonefinder_type','submitted_lexid','submitted_phonenumber','submitted_firstname','submitted_lastname','submitted_middlename','submitted_streetaddress1','submitted_city','submitted_state','submitted_zip','phonenumber','data_source','royalty_used','carrier','risk_indicator','phone_type','phone_status','ported_count','last_ported_date','otp_count','last_otp_date','spoof_count','last_spoof_date','phone_forwarded','date_added','identity_count','phone_verified','verification_type','phone_star_rating','filename');
+EXPORT SALT311.StrType FlatName(UNSIGNED2 i) := CHOOSE(i,'transaction_id','transaction_date','user_id','product_code','company_id','source_code','batch_job_id','batch_acctno','response_time','reference_code','phonefinder_type','submitted_lexid','submitted_phonenumber','submitted_firstname','submitted_lastname','submitted_middlename','submitted_streetaddress1','submitted_city','submitted_state','submitted_zip','phonenumber','data_source','royalty_used','carrier','risk_indicator','phone_type','phone_status','ported_count','last_ported_date','otp_count','last_otp_date','spoof_count','last_spoof_date','phone_forwarded','date_added','identity_count','phone_verified','verification_type','phone_star_rating','filename');
+EXPORT FieldNum(SALT311.StrType fn) := CASE(fn,'transaction_id' => 0,'transaction_date' => 1,'user_id' => 2,'product_code' => 3,'company_id' => 4,'source_code' => 5,'batch_job_id' => 6,'batch_acctno' => 7,'response_time' => 8,'reference_code' => 9,'phonefinder_type' => 10,'submitted_lexid' => 11,'submitted_phonenumber' => 12,'submitted_firstname' => 13,'submitted_lastname' => 14,'submitted_middlename' => 15,'submitted_streetaddress1' => 16,'submitted_city' => 17,'submitted_state' => 18,'submitted_zip' => 19,'phonenumber' => 20,'data_source' => 21,'royalty_used' => 22,'carrier' => 23,'risk_indicator' => 24,'phone_type' => 25,'phone_status' => 26,'ported_count' => 27,'last_ported_date' => 28,'otp_count' => 29,'last_otp_date' => 30,'spoof_count' => 31,'last_spoof_date' => 32,'phone_forwarded' => 33,'date_added' => 34,'identity_count' => 35,'phone_verified' => 36,'verification_type' => 37,'phone_star_rating' => 38,'filename' => 39,0);
+EXPORT SET OF SALT311.StrType FieldRules(UNSIGNED2 i) := CHOOSE(i,['ALLOW'],['CUSTOM'],[],['ALLOW'],['ALLOW'],['ALLOW'],['ALLOW'],['ALLOW'],['ALLOW'],['ALLOW'],['ALLOW'],['ALLOW'],['ALLOW'],['ALLOW'],['ALLOW'],['ALLOW'],[],['ALLOW'],['ALLOW','LENGTHS'],['ALLOW','LENGTHS'],['ALLOW','LENGTHS'],['ALLOW'],['ALLOW'],['ALLOW'],['ENUM'],['ENUM'],['ENUM'],['ALLOW'],['CUSTOM'],['ALLOW'],['CUSTOM'],['ALLOW'],['CUSTOM'],['ENUM'],[],['ALLOW'],['ALLOW'],['ALLOW'],['ALLOW'],[],[]);
+EXPORT BOOLEAN InBaseLayout(UNSIGNED2 i) := CHOOSE(i,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,FALSE);
  
 //Individual field level validation
  
@@ -251,13 +258,29 @@ EXPORT Make_phone_forwarded(SALT311.StrType s0) := MakeFT_Invalid_Forward(s0);
 EXPORT InValid_phone_forwarded(SALT311.StrType s) := InValidFT_Invalid_Forward(s);
 EXPORT InValidMessage_phone_forwarded(UNSIGNED1 wh) := InValidMessageFT_Invalid_Forward(wh);
  
-EXPORT Make_date_added(SALT311.StrType s0) := MakeFT_Invalid_Date(s0);
-EXPORT InValid_date_added(SALT311.StrType s) := InValidFT_Invalid_Date(s);
-EXPORT InValidMessage_date_added(UNSIGNED1 wh) := InValidMessageFT_Invalid_Date(wh);
+EXPORT Make_date_added(SALT311.StrType s0) := s0;
+EXPORT InValid_date_added(SALT311.StrType s) := 0;
+EXPORT InValidMessage_date_added(UNSIGNED1 wh) := '';
  
-EXPORT Make_filename(SALT311.StrType s0) := MakeFT_Invalid_File(s0);
-EXPORT InValid_filename(SALT311.StrType s) := InValidFT_Invalid_File(s);
-EXPORT InValidMessage_filename(UNSIGNED1 wh) := InValidMessageFT_Invalid_File(wh);
+EXPORT Make_identity_count(SALT311.StrType s0) := MakeFT_Invalid_No(s0);
+EXPORT InValid_identity_count(SALT311.StrType s) := InValidFT_Invalid_No(s);
+EXPORT InValidMessage_identity_count(UNSIGNED1 wh) := InValidMessageFT_Invalid_No(wh);
+ 
+EXPORT Make_phone_verified(SALT311.StrType s0) := MakeFT_Invalid_Code(s0);
+EXPORT InValid_phone_verified(SALT311.StrType s) := InValidFT_Invalid_Code(s);
+EXPORT InValidMessage_phone_verified(UNSIGNED1 wh) := InValidMessageFT_Invalid_Code(wh);
+ 
+EXPORT Make_verification_type(SALT311.StrType s0) := MakeFT_Invalid_AlphaChar(s0);
+EXPORT InValid_verification_type(SALT311.StrType s) := InValidFT_Invalid_AlphaChar(s);
+EXPORT InValidMessage_verification_type(UNSIGNED1 wh) := InValidMessageFT_Invalid_AlphaChar(wh);
+ 
+EXPORT Make_phone_star_rating(SALT311.StrType s0) := MakeFT_Invalid_Rating(s0);
+EXPORT InValid_phone_star_rating(SALT311.StrType s) := InValidFT_Invalid_Rating(s);
+EXPORT InValidMessage_phone_star_rating(UNSIGNED1 wh) := InValidMessageFT_Invalid_Rating(wh);
+ 
+EXPORT Make_filename(SALT311.StrType s0) := s0;
+EXPORT InValid_filename(SALT311.StrType s) := 0;
+EXPORT InValidMessage_filename(UNSIGNED1 wh) := '';
  
 // This macro will compute and count field level differences based upon a pivot expression
 export MAC_CountDifferencesByPivot(in_left,in_right,pivot_exp,bad_pivots,out_counts) := MACRO
@@ -315,6 +338,10 @@ Bad_Pivots := %t2%(Cnt>100);
     BOOLEAN Diff_last_spoof_date;
     BOOLEAN Diff_phone_forwarded;
     BOOLEAN Diff_date_added;
+    BOOLEAN Diff_identity_count;
+    BOOLEAN Diff_phone_verified;
+    BOOLEAN Diff_verification_type;
+    BOOLEAN Diff_phone_star_rating;
     BOOLEAN Diff_filename;
     UNSIGNED Num_Diffs;
     SALT311.StrType Val {MAXLENGTH(1024)};
@@ -356,9 +383,13 @@ Bad_Pivots := %t2%(Cnt>100);
     SELF.Diff_last_spoof_date := le.last_spoof_date <> ri.last_spoof_date;
     SELF.Diff_phone_forwarded := le.phone_forwarded <> ri.phone_forwarded;
     SELF.Diff_date_added := le.date_added <> ri.date_added;
+    SELF.Diff_identity_count := le.identity_count <> ri.identity_count;
+    SELF.Diff_phone_verified := le.phone_verified <> ri.phone_verified;
+    SELF.Diff_verification_type := le.verification_type <> ri.verification_type;
+    SELF.Diff_phone_star_rating := le.phone_star_rating <> ri.phone_star_rating;
     SELF.Diff_filename := le.filename <> ri.filename;
     SELF.Val := (SALT311.StrType)evaluate(le,pivot_exp);
-    SELF.Num_Diffs := 0+ IF( SELF.Diff_transaction_id,1,0)+ IF( SELF.Diff_transaction_date,1,0)+ IF( SELF.Diff_user_id,1,0)+ IF( SELF.Diff_product_code,1,0)+ IF( SELF.Diff_company_id,1,0)+ IF( SELF.Diff_source_code,1,0)+ IF( SELF.Diff_batch_job_id,1,0)+ IF( SELF.Diff_batch_acctno,1,0)+ IF( SELF.Diff_response_time,1,0)+ IF( SELF.Diff_reference_code,1,0)+ IF( SELF.Diff_phonefinder_type,1,0)+ IF( SELF.Diff_submitted_lexid,1,0)+ IF( SELF.Diff_submitted_phonenumber,1,0)+ IF( SELF.Diff_submitted_firstname,1,0)+ IF( SELF.Diff_submitted_lastname,1,0)+ IF( SELF.Diff_submitted_middlename,1,0)+ IF( SELF.Diff_submitted_streetaddress1,1,0)+ IF( SELF.Diff_submitted_city,1,0)+ IF( SELF.Diff_submitted_state,1,0)+ IF( SELF.Diff_submitted_zip,1,0)+ IF( SELF.Diff_phonenumber,1,0)+ IF( SELF.Diff_data_source,1,0)+ IF( SELF.Diff_royalty_used,1,0)+ IF( SELF.Diff_carrier,1,0)+ IF( SELF.Diff_risk_indicator,1,0)+ IF( SELF.Diff_phone_type,1,0)+ IF( SELF.Diff_phone_status,1,0)+ IF( SELF.Diff_ported_count,1,0)+ IF( SELF.Diff_last_ported_date,1,0)+ IF( SELF.Diff_otp_count,1,0)+ IF( SELF.Diff_last_otp_date,1,0)+ IF( SELF.Diff_spoof_count,1,0)+ IF( SELF.Diff_last_spoof_date,1,0)+ IF( SELF.Diff_phone_forwarded,1,0)+ IF( SELF.Diff_date_added,1,0)+ IF( SELF.Diff_filename,1,0);
+    SELF.Num_Diffs := 0+ IF( SELF.Diff_transaction_id,1,0)+ IF( SELF.Diff_transaction_date,1,0)+ IF( SELF.Diff_user_id,1,0)+ IF( SELF.Diff_product_code,1,0)+ IF( SELF.Diff_company_id,1,0)+ IF( SELF.Diff_source_code,1,0)+ IF( SELF.Diff_batch_job_id,1,0)+ IF( SELF.Diff_batch_acctno,1,0)+ IF( SELF.Diff_response_time,1,0)+ IF( SELF.Diff_reference_code,1,0)+ IF( SELF.Diff_phonefinder_type,1,0)+ IF( SELF.Diff_submitted_lexid,1,0)+ IF( SELF.Diff_submitted_phonenumber,1,0)+ IF( SELF.Diff_submitted_firstname,1,0)+ IF( SELF.Diff_submitted_lastname,1,0)+ IF( SELF.Diff_submitted_middlename,1,0)+ IF( SELF.Diff_submitted_streetaddress1,1,0)+ IF( SELF.Diff_submitted_city,1,0)+ IF( SELF.Diff_submitted_state,1,0)+ IF( SELF.Diff_submitted_zip,1,0)+ IF( SELF.Diff_phonenumber,1,0)+ IF( SELF.Diff_data_source,1,0)+ IF( SELF.Diff_royalty_used,1,0)+ IF( SELF.Diff_carrier,1,0)+ IF( SELF.Diff_risk_indicator,1,0)+ IF( SELF.Diff_phone_type,1,0)+ IF( SELF.Diff_phone_status,1,0)+ IF( SELF.Diff_ported_count,1,0)+ IF( SELF.Diff_last_ported_date,1,0)+ IF( SELF.Diff_otp_count,1,0)+ IF( SELF.Diff_last_otp_date,1,0)+ IF( SELF.Diff_spoof_count,1,0)+ IF( SELF.Diff_last_spoof_date,1,0)+ IF( SELF.Diff_phone_forwarded,1,0)+ IF( SELF.Diff_date_added,1,0)+ IF( SELF.Diff_identity_count,1,0)+ IF( SELF.Diff_phone_verified,1,0)+ IF( SELF.Diff_verification_type,1,0)+ IF( SELF.Diff_phone_star_rating,1,0)+ IF( SELF.Diff_filename,1,0);
   END;
 // Now need to remove bad pivots from comparison
 #uniquename(L)
@@ -406,6 +437,10 @@ Bad_Pivots := %t2%(Cnt>100);
     Count_Diff_last_spoof_date := COUNT(GROUP,%Closest%.Diff_last_spoof_date);
     Count_Diff_phone_forwarded := COUNT(GROUP,%Closest%.Diff_phone_forwarded);
     Count_Diff_date_added := COUNT(GROUP,%Closest%.Diff_date_added);
+    Count_Diff_identity_count := COUNT(GROUP,%Closest%.Diff_identity_count);
+    Count_Diff_phone_verified := COUNT(GROUP,%Closest%.Diff_phone_verified);
+    Count_Diff_verification_type := COUNT(GROUP,%Closest%.Diff_verification_type);
+    Count_Diff_phone_star_rating := COUNT(GROUP,%Closest%.Diff_phone_star_rating);
     Count_Diff_filename := COUNT(GROUP,%Closest%.Diff_filename);
   END;
   out_counts := table(%Closest%,%AggRec%,true);
