@@ -146,21 +146,10 @@ function
 					trim(l.efx_locamountcd)='K' => '1000000000+',					
 					trim(l.efx_locamountcd)='' => '',
 					'');	 						 						 						 					
-        revenue_org_raw             := map(trim(l.efx_corpamount) = '' OR trim(l.efx_corpamount) = '0' and regexfind('(revenue|sales)',l.efx_corpamounttp ,nocase)  => temp_rev_range_org       
-                                               ,regexfind('(revenue|sales)',l.efx_corpamounttp ,nocase) and (unsigned8)l.efx_corpamount < 700000000                 => trim(l.efx_corpamount)
-                                               ,                                                                                                                            ''
-                                            );
-        revenue_local_raw           := map(trim(l.efx_locamount ) = '' OR trim(l.efx_locamount ) = '0' and regexfind('(revenue|sales)',l.efx_locamounttp ,nocase) => temp_rev_range_loc       
-                                                       ,regexfind('(revenue|sales)',l.efx_locamounttp ,nocase) and (unsigned8)l.efx_locamount < 700000000         => trim(l.efx_locamount)
-                                                       ,                                                                                                                          ''
-                                                    );
-        // -- if local revenue is > org revenue, then both are bad.  although if org revenue is zero, local revenue can be populated.
-        self.revenue_org_raw             := if((unsigned8)revenue_org_raw < (unsigned8)revenue_local_raw and (unsigned8)revenue_org_raw > 0 ,''  ,revenue_org_raw   );
-		    self.revenue_local_raw           := if((unsigned8)revenue_org_raw < (unsigned8)revenue_local_raw and (unsigned8)revenue_org_raw > 0 ,''  ,revenue_local_raw );
-
-        self.employee_count_org_raw      := if(trim(l.efx_corpempcnt) = '' OR trim(l.efx_corpempcnt) = '0',temp_emp_count_range_org ,trim(l.efx_corpempcnt));        
-        self.employee_count_local_raw    := if(trim(l.efx_locempcnt ) = '' OR trim(l.efx_corpempcnt) = '0',temp_emp_count_range_loc ,trim(l.efx_locempcnt ));
-        
+		    self.employee_count_org_raw      := if(trim(l.efx_corpempcnt) = '' OR trim(l.efx_corpempcnt) = '0',temp_emp_count_range_org,trim(l.efx_corpempcnt));
+        self.revenue_org_raw             := if(trim(l.efx_corpamount) = '' OR trim(l.efx_corpamount) = '0',temp_rev_range_org,trim(l.efx_corpamount));
+        self.employee_count_local_raw    := if(trim(l.efx_locempcnt) = '' OR trim(l.efx_locempcnt) = '0',temp_emp_count_range_loc,trim(l.efx_locempcnt));
+		    self.revenue_local_raw           := if(trim(l.efx_locamount) = '' OR trim(l.efx_locamount) = '0',temp_rev_range_loc,trim(l.efx_locamount));
 				self 							   						 := l;
 				self 							   						 := [];
 		end;
