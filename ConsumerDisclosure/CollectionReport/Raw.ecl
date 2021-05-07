@@ -1,4 +1,4 @@
-IMPORT bipv2, bizlinkfull, Business_Header, canadianphones_v2, doxie, domains, dx_Cortera, dx_email, experian_crdb, FBNV2, 
+IMPORT bipv2, bizlinkfull, Business_Header, canadianphones_v2, doxie, domains, dx_common, dx_Cortera, dx_email, experian_crdb, FBNV2, 
   midex_services, paw, patriot, sanctn, vehiclev2, STD;
 
 EXPORT Raw := MODULE
@@ -77,14 +77,16 @@ EXPORT Raw := MODULE
   ENDMACRO;
   EXPORT GetPatriotRecs(DATASET(doxie.layout_references) dids) := FUNCTION
     k_did := patriot.key_did_patriot_file;
-    ids := JOIN(dids, k_did,
+    ids_pre := JOIN(dids, k_did,
       KEYED(LEFT.did = RIGHT.did),
-      TRANSFORM({k_did.did; k_did.pty_key;}, SELF := RIGHT), 
-      KEEP(100), LIMIT(0));
-    recs := JOIN(ids, patriot.key_patriot_file,
+      TRANSFORM({k_did.did; k_did.pty_key; dx_common.layout_metadata;}, SELF := RIGHT), 
+      KEEP(200), LIMIT(0));
+    ids := DEDUP(SORT(dx_common.Incrementals.mac_Rollupv2(ids_pre), pty_key), pty_key);  
+    recs_pre := JOIN(ids, patriot.key_patriot_file,
       KEYED(LEFT.pty_key = RIGHT.pty_key) AND LEFT.did = RIGHT.did,
       TRANSFORM(RIGHT),
-      KEEP(1), LIMIT(0));
+      KEEP(10), LIMIT(0));
+    recs := dx_common.Incrementals.mac_Rollupv2(recs_pre);  
     RETURN recs;
   END;
   EXPORT GetInternetRecs(DATASET(doxie.layout_references) dids) := FUNCTION

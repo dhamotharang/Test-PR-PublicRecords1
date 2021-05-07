@@ -121,10 +121,10 @@ if(isInputSufficient = false,FAIL(301,doxie.ErrorCodes(301)));
 
 mod_MaxScores :=
 MODULE(DidVille.MaxScores.IMax)
-    export unsigned2 maxScoreFromSSN := checkInputMax(^.maxScoreFromSSN);
-    export unsigned2 maxScoreFromAddress := checkInputMax(^.maxScoreFromAddress);
-    export unsigned2 maxScoreFromDOB := checkInputMax(^.maxScoreFromDOB);
-    export unsigned2 maxScoreFromPhone := checkInputMax(^.maxScoreFromPhone);
+  export unsigned2 maxScoreFromSSN := checkInputMax(^.maxScoreFromSSN);
+  export unsigned2 maxScoreFromAddress := checkInputMax(^.maxScoreFromAddress);
+  export unsigned2 maxScoreFromDOB := checkInputMax(^.maxScoreFromDOB);
+  export unsigned2 maxScoreFromPhone := checkInputMax(^.maxScoreFromPhone);
 END;
 
 a2_val := if (addr2_val != '', addr2_val,city_val + ' ' + state_val + ' ' + zip_value);
@@ -184,19 +184,23 @@ res_ready := didville.did_service_common_function(precs, appends, verify, fuzzy,
                                                   soap_xadl_version_value,
                                                   IndustryClass_val := mod_access.industry_class);
 
-patriot.MAC_AppendPatriot(res_ready, mod_access, did,fname,mname,lname,res_w_pat,ptys,false)
+patriot.MAC_AppendPatriot(res_ready, mod_access, did,fname,mname,lname,res_w_pat,ptys)
 res := if(patriotproc, res_w_pat, res_ready);
 
-pj1 := JOIN(res(name_match AND known), patriot.key_did_patriot_file,
+pj1a := JOIN(res(name_match AND known), patriot.key_did_patriot_file,
   keyed(LEFT.did=RIGHT.did),
   TRANSFORM(patriot.Layout_Patriot, SELF := RIGHT));
-pj2 := JOIN(ptys, patriot.key_patriot_file,
+pj1 := dx_common.Incrementals.mac_Rollupv2(pj1a);
+
+pj2a := JOIN(ptys, patriot.key_patriot_file,
   keyed(LEFT.pty_key=RIGHT.pty_key) AND
   ut.namematch(left.fname,left.mname,left.lname,right.fname,right.mname,right.lname)<3,
   TRANSFORM(patriot.Layout_Patriot, SELF := RIGHT));
+pj2 := dx_common.Incrementals.mac_Rollupv2(pj2a);
 
-patrecs_suppressed := Suppress.MAC_SuppressSource(pj1+pj2, mod_access);
+patrecs_suppressed  := Suppress.MAC_SuppressSource(pj1+pj2, mod_access);
 patrecs := IF(patriotproc, patrecs_suppressed);
+
 patrecs_slim := project(patrecs, {patriot.Layout_Patriot - dx_common.layout_metadata});
 output(patrecs_slim);
 
