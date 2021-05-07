@@ -1,4 +1,4 @@
-﻿IMPORT BIPV2, Business_Credit, Business_Risk_BIP, Doxie, Inquiry_AccLogs, MDR, Models, UT, STD;
+﻿IMPORT BIPV2, Business_Risk_BIP, Doxie, Inquiry_AccLogs, MDR, Models, UT, STD;
 
 EXPORT Common := MODULE
 	// Grabs just the linking ID's and Unique Seq Number - this is needed to use the BIP kFetch
@@ -511,8 +511,8 @@ OUTPUT(converted, NAMED('Converted_Set'));
 	// The following takes the somewhat ugly Corporations Business Type data and attempts to normalize it up into nicer groups.
 	// A full table of the CorpV2 key was done to create this list which is exhaustive as of 11/17/2014, and then the Product Manager assisted with type classifications.
 	EXPORT GetBusinessType (STRING Corp_Address1_Type_CD, STRING Corp_Address1_Type_Desc) := FUNCTION
-		cd := TRIM(StringLib.StringToUpperCase(Corp_Address1_Type_CD));
-		desc := TRIM(StringLib.StringToUpperCase(Corp_Address1_Type_Desc));
+		cd := TRIM(STD.Str.ToUpperCase(Corp_Address1_Type_CD));
+		desc := TRIM(STD.Str.ToUpperCase(Corp_Address1_Type_Desc));
 		
 		cleanBusinessType := MAP(
 														cd = ''   AND desc = 'BUSINESS'                                  => 'B', // Business 
@@ -624,7 +624,7 @@ OUTPUT(converted, NAMED('Converted_Set'));
 	EXPORT capNum(field, minNum, maxNum) := MAX(MIN(field, maxNum), minNum);
 	
 	EXPORT commonIndustry(STRING Industry) := FUNCTION
-		In_Industry := StringLib.StringToUpperCase(TRIM(Industry, LEFT, RIGHT));
+		In_Industry := STD.Str.ToUpperCase(TRIM(Industry, LEFT, RIGHT));
 		Clean_Industry := MAP(In_Industry IN Inquiry_AccLogs.Shell_Constants.Collection_Industry			=> 'COL',
 													In_Industry IN Inquiry_AccLogs.Shell_Constants.Auto_Industry						=> 'AUTO',
 													In_Industry IN Inquiry_AccLogs.Shell_Constants.Banking_Industry5				=> 'BANK',
@@ -671,16 +671,16 @@ OUTPUT(converted, NAMED('Converted_Set'));
 													'92' => '92',
 																	'');
 		// These mappings were created by Haley Vicchio after researching SIC Code lists on the internet. Since SIC codes haven't changed groups since they were created it's fairly safe to hard code these lists.
-		SICGroupNumber := MAP(SICCode IN ['0111', '0112', '0115', '0116', '0119', '0131', '0132', '0133', '0134', '0139', '0161', '0171', '0172', '0173', '0174', '0175', '0179', 
+		SICGroupNumber := MAP(SICCode[1..4] IN ['0111', '0112', '0115', '0116', '0119', '0131', '0132', '0133', '0134', '0139', '0161', '0171', '0172', '0173', '0174', '0175', '0179', 
 																			'0181', '0182', '0191', '0211', '0212', '0213', '0214', '0219', '0241', '0251', '0252', '0253', '0254', '0259', '0271', '0272', '0273', 
 																			'0279', '0291', '0711', '0721', '0722', '0723', '0724', '0751', '0761', '0762', '0811', '0831', '0851', '0912', '0913', '0919', '0921', 
 																			'0971', '2411']																																																														=> '11',
-													SICCode IN ['1011', '1021', '1031', '1041', '1044', '1061', '1081', '1094', '1099', '1221', '1222', '1231', '1241', '1311', '1321', '1381', '1382', 
+													SICCode[1..4] IN ['1011', '1021', '1031', '1041', '1044', '1061', '1081', '1094', '1099', '1221', '1222', '1231', '1241', '1311', '1321', '1381', '1382', 
 																			'1389', '1411', '1422', '1423', '1429', '1442', '1446', '1455', '1459', '1474', '1475', '1479', '1481', ' 1499', '3295']									=> '21',
-													SICCode IN ['4911', '4923', '4924', '4925', '4931', '4932', '4939', '4941', '4952', '4961', '4971']																										=> '22',
-													SICCode IN ['1521', '1522', '1531', '1541', '1542', '1611', '1622', '1623', '1629', '1711', '1721', '1731', '1741', '1742', '1743', '1751', '1752', 
+													SICCode[1..4] IN ['4911', '4923', '4924', '4925', '4931', '4932', '4939', '4941', '4952', '4961', '4971']																										=> '22',
+													SICCode[1..4] IN ['1521', '1522', '1531', '1541', '1542', '1611', '1622', '1623', '1629', '1711', '1721', '1731', '1741', '1742', '1743', '1751', '1752', 
 																			'1761', '1771', '1781', '1791', '1793', '1794', '1795', '1796', '1799', '6552', '6553']																										=> '23',
-													SICCode IN ['2011', '2013', '2015', '2021', '2022', '2023', '2024', '2026', '2032', '2033', '2034', '2035', '2037', '2038', '2041', '2043', '2044', 
+													SICCode[1..4] IN ['2011', '2013', '2015', '2021', '2022', '2023', '2024', '2026', '2032', '2033', '2034', '2035', '2037', '2038', '2041', '2043', '2044', 
 																			'2045', '2046', '2047', '2048', '2051', '2052', '2053', '2061', '2062', '2063', '2064', '2065', '2066', '2067', '2068', '2074', '2075', 
 																			'2076', '2077', '2079', '2082', '2083', '2084', '2085', '2086', '2087', '2091', '2092', '2095', '2096', '2097', '2098', '2099', '2111', 
 																			'2121', '2131', '2141', '2211', '2221', '2231', '2241', '2251', '2252', '2253', '2254', '2257', '2258', '2259', '2261', '2262', '2269', 
@@ -707,39 +707,39 @@ OUTPUT(converted, NAMED('Converted_Set'));
 																			'3731', '3732', '3743', '3751', '3761', '3764', '3769', '3792', '3795', '3799', '3812', '3821', '3822', '3823', '3824', '3825', '3826', 
 																			'3827', '3829', '3841', '3842', '3843', '3844', '3845', '3851', '3861', '3873', '3911', '3914', '3915', '3931', '3942', '3944', '3949', 
 																			'3951', '3952', '3953', '3955', '3961', '3965', '3991', '3993', '3995', '3996', '3999', '8072']																						=> '31-33',
-													SICCode IN ['5012', '5013', '5014', '5015', '5021', '5023', '5031', '5032', '5033', '5039', '5043', '5044', '5045', '5046', '5047', '5048', '5049', 
+													SICCode[1..4] IN ['5012', '5013', '5014', '5015', '5021', '5023', '5031', '5032', '5033', '5039', '5043', '5044', '5045', '5046', '5047', '5048', '5049', 
 																			'5051', '5052', '5063', '5064', '5065', '5072', '5074', '5075', '5078', '5082', '5083', '5084', '5085', '5087', '5088', '5091', '5092', 
 																			'5093', '5094', '5099', '5111', '5112', '5113', '5122', '5131', '5136', '5137', '5139', '5141', '5142', '5143', '5144', '5145', '5146', 
 																			'5147', '5148', '5149', '5153', '5154', '5159', '5162', '5169', '5171', '5172', '5181', '5182', '5191', '5192', '5193', '5194', '5198', 
 																			'5199']																																																																		=> '42',
-													SICCode IN ['5211', '5231', '5251', '5261', '5271', '5311', '5331', '5399', '5411', '5421', '5431', '5441', '5451', '5461', '5499', '5511', '5521', 
+													SICCode[1..4] IN ['5211', '5231', '5251', '5261', '5271', '5311', '5331', '5399', '5411', '5421', '5431', '5441', '5451', '5461', '5499', '5511', '5521', 
 																			'5531', '5541', '5551', '5561', '5571', '5599', '5611', '5621', '5632', '5641', '5651', '5661', '5699', '5712', '5713', '5714', '5719', 
 																			'5722', '5731', '5734', '5735', '5736', '5912', '5921', '5932', '5941', '5942', '5943', '5944', '5945', '5946', '5947', '5948', '5949', 
 																			'5961', '5962', '5963', '5983', '5984', '5989', '5992', '5993', '5994', '5995', '5999']																										=> '44-45',
-													SICCode IN ['4011', '4013', '4111', '4119', '4121', '4131', '4141', '4142', '4151', '4173', '4212', '4213', '4214', '4215', '4221', '4222', '4225', 
+													SICCode[1..4] IN ['4011', '4013', '4111', '4119', '4121', '4131', '4141', '4142', '4151', '4173', '4212', '4213', '4214', '4215', '4221', '4222', '4225', 
 																			'4226', '4231', '4311', '4412', '4424', '4432', '4449', '4481', '4482', '4489', '4491', '4492', '4499', '4512', '4513', '4522', '4581', 
 																			'4612', '4613', '4619', '4731', '4783', '4785', '4789', '4922']																																						=> '48-49',
-													SICCode IN ['2711', '2721', '2731', '2732', '2741', '4812', '4813', '4822', '4832', '4833', '4841', '4899', '7372', '7374', '7375', '7383', '7812', 
+													SICCode[1..4] IN ['2711', '2721', '2731', '2732', '2741', '4812', '4813', '4822', '4832', '4833', '4841', '4899', '7372', '7374', '7375', '7383', '7812', 
 																			'7819', '7822', '7829', '7832', '7833']																																																		=> '51',
-													SICCode IN ['0741', '0742', '6011', '6019', '6021', '6022', '6029', '6035', '6036', '6061', '6062', '6081', '6082', '6091', '6099', '6111', '6140', 
+													SICCode[1..4] IN ['0741', '0742', '6011', '6019', '6021', '6022', '6029', '6035', '6036', '6061', '6062', '6081', '6082', '6091', '6099', '6111', '6140', 
 																			'6141', '6153', '6159', '6162', '6163', '6211', '6221', '6231', '6282', '6289', '6311', '6321', '6324', '6331', '6351', '6361', '6371', 
 																			'6399', '6411', '6722', '6726', '6733', '6799']																																														=> '52',
-													SICCode IN ['4741', '6512', '6513', '6514', '6515', '6517', '6519', '6531', '6792', '6794', '6798', '7352', '7353', '7359', '7377', '7513', '7514', 
+													SICCode[1..4] IN ['4741', '6512', '6513', '6514', '6515', '6517', '6519', '6531', '6792', '6794', '6798', '7352', '7353', '7359', '7377', '7513', '7514', 
 																			'7515', '7519', '7841']																																																										=> '53',
-													SICCode IN ['0781', '6541', '7221', '7291', '7311', '7312', '7313', '7319', '7331', '7335', '7336', '7371', '7373', '7376', '7379', '7389', '8111', 
+													SICCode[1..4] IN ['0781', '6541', '7221', '7291', '7311', '7312', '7313', '7319', '7331', '7335', '7336', '7371', '7373', '7376', '7379', '7389', '8111', 
 																			'8711', '8712', '8713', '8721', '8731', '8732', '8733', '8734', '8742', '8743', '8748']																										=> '54',
-													SICCode IN ['6712', '6719']																																																														=> '55',
-													SICCode IN ['0782', '0783', '4724', '4725', '4729', '4953', '4959', '7217', '7322', '7323', '7334', '7338', '7342', '7349', '7361', '7363', '7381', 
+													SICCode[1..4] IN ['6712', '6719']																																																														=> '55',
+													SICCode[1..4] IN ['0782', '0783', '4724', '4725', '4729', '4953', '4959', '7217', '7322', '7323', '7334', '7338', '7342', '7349', '7361', '7363', '7381', 
 																			'7382', '8741', '8744']																																																										=> '56',
-													SICCode IN ['7911', '8211', '8221', '8222', '8231', '8243', '8244', '8249', '8299']																																		=> '61',
-													SICCode IN ['8011', '8021', '8031', '8041', '8042', '8043', '8049', '8051', '8052', '8059', '8062', '8063', '8069', '8071', '8082', '8092', '8093', 
+													SICCode[1..4] IN ['7911', '8211', '8221', '8222', '8231', '8243', '8244', '8249', '8299']																																		=> '61',
+													SICCode[1..4] IN ['8011', '8021', '8031', '8041', '8042', '8043', '8049', '8051', '8052', '8059', '8062', '8063', '8069', '8071', '8082', '8092', '8093', 
 																			'8099', '8322', '8331', '8351', '8361']																																																		=> '62',
-													SICCode IN ['4493', '7922', ' 7929', '7933', '7941', '7948', '7991', '7992', '7993', '7996', '7997', '7999', '8412', '8422']													=> '71',
-													SICCode IN ['5812', '5813', '7011', '7021', '7032', '7033', '7041']																																										=> '72',
-													SICCode IN ['0752', '6732', '7211', '7212', '7213', '7215', '7216', '7218', '7219', '7231', '7241', '7251', '7299', '7378', '7384', '7521', '7532', 
+													SICCode[1..4] IN ['4493', '7922', ' 7929', '7933', '7941', '7948', '7991', '7992', '7993', '7996', '7997', '7999', '8412', '8422']													=> '71',
+													SICCode[1..4] IN ['5812', '5813', '7011', '7021', '7032', '7033', '7041']																																										=> '72',
+													SICCode[1..4] IN ['0752', '6732', '7211', '7212', '7213', '7215', '7216', '7218', '7219', '7231', '7241', '7251', '7299', '7378', '7384', '7521', '7532', 
 																			'7533', '7534', '7536', '7537', '7538', '7539', '7542', '7549', '7622', '7623', '7629', '7631', '7641', '7692', '7694', '7699', '8399', 
 																			'8611', '8621', '8631', '8641', '8651', '8661', '8699', '8811', '8999']																																		=> '81',
-													SICCode IN ['9111', '9121', '9231', '9199', '9211', '9221', '9222', '9223', '9224', '9229', '9311', '9411', '9431', '9441', '9451', '9511', '9512', 
+													SICCode[1..4] IN ['9111', '9121', '9231', '9199', '9211', '9221', '9222', '9223', '9224', '9229', '9311', '9411', '9431', '9441', '9451', '9511', '9512', 
 																			'9531', '9532', '9611', '9621', '9631', '9641', '9651', '9661', '9711', '9721']																														=> '92',
 																																																																																										'');
 		groupCode := MAP(NAICGroupNumber <> ''	=> NAICGroupNumber,
@@ -812,14 +812,14 @@ OUTPUT(converted, NAMED('Converted_Set'));
 			(STRING)MAX(GROUP, (INTEGER)((Business_Risk_BIP.Common.checkInvalidDate((STRING)DateLastSeenField, Business_Risk_BIP.Constants.MissingDate, HistoryDate))[1..6]))
 	ENDMACRO;
 	
-	EXPORT filterOutSpecialChars(STRING inputString, STRING AllowedSpecialChars = ', !@#$%^&*()-=+_') := StringLib.StringFilter(inputString, 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789' + AllowedSpecialChars);
+	EXPORT filterOutSpecialChars(STRING inputString, STRING AllowedSpecialChars = ', !@#$%^&*()-=+_') := STD.Str.Filter(inputString, 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789' + AllowedSpecialChars);
 	
-	EXPORT countDelimitedList(STRING inputString, STRING delimiter) := IF(TRIM(inputString) <> '', StringLib.StringFindCount(inputString, delimiter) + 1, 0);
+	EXPORT countDelimitedList(STRING inputString, STRING delimiter) := IF(TRIM(inputString) <> '', STD.Str.FindCount(inputString, delimiter) + 1, 0);
 
 	// The following rules were pulled from the NANPA Government Website June 2015
 	EXPORT validPhone(STRING10 Phone10) := 
-											 LENGTH(StringLib.StringFilter(Phone10, '0123456789')) = 10 AND // We have a 10 digit phone
-											 StringLib.StringFilterOut(Phone10, '0123456789') = '' AND // No non-numeric characters entered
+											 LENGTH(STD.Str.Filter(Phone10, '0123456789')) = 10 AND // We have a 10 digit phone
+											 STD.Str.FilterOut(Phone10, '0123456789') = '' AND // No non-numeric characters entered
 											 (INTEGER)Phone10[1] BETWEEN 2 AND 9 AND // NPA rules: First digit 2-9, second and third digits 0-9
 											 (INTEGER)Phone10[4] BETWEEN 2 AND 9 AND Phone10[5..6] <> '11' AND // NXX rules: First digit 2-9, second and third digits 0-9 + second and third digits not 11 (So as to form 911, 411, etc)
 											 (INTEGER)Phone10[4..10] NOT BETWEEN 5550100 AND 5550199; // Fictional numbers are between: NPA-555-0100 through NPA-555-0199
@@ -879,10 +879,10 @@ OUTPUT(converted, NAMED('Converted_Set'));
 	// be marked as current for the record to be classified as 'active'.
 	EXPORT BOOLEAN is_ActiveCorp(STRING record_type, STRING corp_status_cd, STRING corp_status_desc) := 
 		  (corp_status_cd IN ['A','U']) OR
-		  (stringlib.stringfind(corp_status_desc, 'ACTIVE', 1) > 0 AND 
-				stringlib.stringfind(corp_status_desc, 'INACTIVE', 1) = 0) OR
-			(corp_status_desc <> '' AND stringlib.stringfind(corp_status_desc, 'INACTIVE', 1) = 0 AND
-				stringlib.stringfind(corp_status_desc, 'DISSOLVED', 1) = 0) OR
+		  (STD.str.Find(corp_status_desc, 'ACTIVE', 1) > 0 AND 
+				STD.str.Find(corp_status_desc, 'INACTIVE', 1) = 0) OR
+			(corp_status_desc <> '' AND STD.str.Find(corp_status_desc, 'INACTIVE', 1) = 0 AND
+				STD.str.Find(corp_status_desc, 'DISSOLVED', 1) = 0) OR
 			(corp_status_cd = '' AND corp_status_desc = '');
   
   EXPORT STRING1 calcBNAP_narrow(BOOLEAN NameMatched, BOOLEAN AddressMatched, BOOLEAN PhoneMatched) := 

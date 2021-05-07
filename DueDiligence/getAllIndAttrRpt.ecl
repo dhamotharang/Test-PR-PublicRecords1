@@ -154,7 +154,7 @@ EXPORT getAllIndAttrRpt(DATASET(DueDiligence.v3Layouts.Internal.PersonTemp) v3In
     linkingOpts := DueDiligence.v3Common.DDBusiness.GetLinkingOptions(regulatoryAccess);
 
 
-    oldSharedInput := DueDiligence.getIndAttributes(addRIData, ddOptions.ssnMask, ddOptions.includeReportData,
+    oldSharedInput := DueDiligence.getIndAttributes(addRIData, ddOptions.includeReportData,
                                                       busOptions, linkingOpts, debugMode);
 
 

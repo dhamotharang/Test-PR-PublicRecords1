@@ -1,1 +1,0 @@
-export Name_Moxie_Document_Dev := '~thor_200::base::official_records_document_'+ Official_Records.Version_Development;

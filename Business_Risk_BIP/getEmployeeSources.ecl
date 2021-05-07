@@ -100,14 +100,14 @@ EXPORT getEmployeeSources(DATASET(Business_Risk_BIP.Layouts.Shell) Shell,
 	// Get all unique SIC Codes along with dates, for the primary and all 5 secondary SIC's
 	getDNBDMISIC(InputDataset, OutputTable, OutputTemp, OutputRolled, WithInput, WithOutput, SICField, PrimarySIC) := MACRO
 		OutputTable := TABLE(InputDataset,
-			{Seq,
-			 LinkID := Business_Risk_BIP.Common.GetLinkSearchLevel(link_search_level, SeleID),
-			 Source := MDR.SourceTools.src_Dunn_Bradstreet,
-			 STRING6 DateFirstSeen := Business_Risk_BIP.Common.groupMinDate6(date_first_seen, HistoryDate),
-			 STRING6 DateLastSeen := Business_Risk_BIP.Common.groupMaxDate6(date_last_seen, HistoryDate),
-			 UNSIGNED4 RecordCount := COUNT(GROUP),
-			 STRING10 SICCode := (STD.Str.Filter((STRING)SICField, '0123456789'))[1..4],
-			 BOOLEAN IsPrimary := PrimarySIC // SIC1 is the primary SIC in DNB DMI data, all others are not primary
+    {Seq,
+     LinkID := Business_Risk_BIP.Common.GetLinkSearchLevel(link_search_level, SeleID),
+     Source := MDR.SourceTools.src_Dunn_Bradstreet,
+     STRING6 DateFirstSeen := Business_Risk_BIP.Common.groupMinDate6(date_first_seen, HistoryDate),
+     STRING6 DateLastSeen := Business_Risk_BIP.Common.groupMaxDate6(date_last_seen, HistoryDate),
+     UNSIGNED4 RecordCount := COUNT(GROUP),
+     STRING10 SICCode := IF( shell_version >= Business_Risk_BIP.Constants.BusShellVersion_v31,(STD.Str.Filter((STRING)SICField, '0123456789'))[1..8],(STD.Str.Filter((STRING)SICField, '0123456789'))[1..4]),
+     BOOLEAN IsPrimary := PrimarySIC // SIC1 is the primary SIC in DNB DMI data, all others are not primary
 			 },
 			 Seq, Business_Risk_BIP.Common.GetLinkSearchLevel(link_search_level, SeleID), ((STRING)SICField)[1..4]
 			 );
@@ -186,17 +186,18 @@ EXPORT getEmployeeSources(DATASET(Business_Risk_BIP.Layouts.Shell) Shell,
 																	LEFT OUTER, KEEP(1), ATMOST(100), FEW);
 	// Get all unique SIC Codes along with dates
 	BusRegSIC := TABLE(BusReg,
-			{Seq,
-			 LinkID := Business_Risk_BIP.Common.GetLinkSearchLevel(link_search_level, SeleID),
-			 Source := MDR.SourceTools.src_Business_Registration,
-			 STRING6 DateFirstSeen := Business_Risk_BIP.Common.groupMinDate6(dt_first_seen, HistoryDate),
-			 STRING6 DateLastSeen := Business_Risk_BIP.Common.groupMaxDate6(dt_last_seen, HistoryDate),
-			 UNSIGNED4 RecordCount := COUNT(GROUP),
-			 STRING10 SICCode := (STD.Str.Filter((STRING)RawFields.SIC, '0123456789'))[1..4],
-			 BOOLEAN IsPrimary := TRUE // There is only 1 SIC field on this source, mark it as primary
+    {Seq,
+		  LinkID := Business_Risk_BIP.Common.GetLinkSearchLevel(link_search_level, SeleID),
+		  Source := MDR.SourceTools.src_Business_Registration,
+		  STRING6 DateFirstSeen := Business_Risk_BIP.Common.groupMinDate6(dt_first_seen, HistoryDate),
+		  STRING6 DateLastSeen := Business_Risk_BIP.Common.groupMaxDate6(dt_last_seen, HistoryDate),
+		  UNSIGNED4 RecordCount := COUNT(GROUP),
+     STRING10 SICCode := IF( shell_version >= Business_Risk_BIP.Constants.BusShellVersion_v31,(STD.Str.Filter((STRING)RawFields.SIC, '0123456789'))[1..8],(STD.Str.Filter((STRING)RawFields.SIC, '0123456789'))[1..4]),
+		  BOOLEAN IsPrimary := TRUE // There is only 1 SIC field on this source, mark it as primary
 			 },
 			 Seq, Business_Risk_BIP.Common.GetLinkSearchLevel(link_search_level, SeleID), ((STRING)RawFields.SIC)[1..4]
 			 );
+
 	// Get all unique NAIC Codes along with dates
 	BusRegNAIC := TABLE(BusReg,
 			{Seq,
@@ -362,14 +363,14 @@ EXPORT getEmployeeSources(DATASET(Business_Risk_BIP.Layouts.Shell) Shell,
 	// Get all unique SIC Codes along with dates, for the primary and all 9 secondary SIC's
 	getDCASIC(InputDataset, OutputTable, OutputTemp, OutputRolled, WithInput, WithOutput, SICField, PrimarySIC) := MACRO
 		OutputTable := TABLE(InputDataset,
-			{Seq,
-			 LinkID := Business_Risk_BIP.Common.GetLinkSearchLevel(link_search_level, SeleID),
-			 Source := MDR.SourceTools.src_DCA,
-			 STRING6 DateFirstSeen := Business_Risk_BIP.Common.groupMinDate6(date_first_seen, HistoryDate),
-			 STRING6 DateLastSeen := Business_Risk_BIP.Common.groupMaxDate6(date_last_seen, HistoryDate),
-			 UNSIGNED4 RecordCount := COUNT(GROUP),
-			 STRING10 SICCode := (STD.Str.Filter((STRING)SICField, '0123456789'))[1..4],
-			 BOOLEAN IsPrimary := PrimarySIC // SIC1 is the primary SIC in DCA data, all others are not primary
+    {Seq,
+     LinkID := Business_Risk_BIP.Common.GetLinkSearchLevel(link_search_level, SeleID),
+		  Source := MDR.SourceTools.src_DCA,
+		  STRING6 DateFirstSeen := Business_Risk_BIP.Common.groupMinDate6(date_first_seen, HistoryDate),
+		  STRING6 DateLastSeen := Business_Risk_BIP.Common.groupMaxDate6(date_last_seen, HistoryDate),
+		  UNSIGNED4 RecordCount := COUNT(GROUP),
+     STRING10 SICCode := IF( shell_version >= Business_Risk_BIP.Constants.BusShellVersion_v31,(STD.Str.Filter((STRING)SICField, '0123456789'))[1..8],(STD.Str.Filter((STRING)SICField, '0123456789'))[1..4]),
+		  BOOLEAN IsPrimary := PrimarySIC // SIC1 is the primary SIC in DCA data, all others are not primary
 			 },
 			 Seq, Business_Risk_BIP.Common.GetLinkSearchLevel(link_search_level, SeleID), ((STRING)SICField)[1..4]
 			 );
@@ -839,12 +840,11 @@ EXPORT getEmployeeSources(DATASET(Business_Risk_BIP.Layouts.Shell) Shell,
       STRING6 DateFirstSeen := Business_Risk_BIP.Common.groupMinDate6(dt_first_seen, HistoryDate),
       STRING6 DateLastSeen := Business_Risk_BIP.Common.groupMaxDate6(dt_last_seen, HistoryDate),
       UNSIGNED4 RecordCount := COUNT(GROUP),
-      STRING10 SICCode := (STD.Str.Filter((STRING)efx_primsic, '0123456789'))[1..4],
+      STRING10 SICCode := IF( shell_version >= Business_Risk_BIP.Constants.BusShellVersion_v31,(STD.Str.Filter((STRING)efx_primsic, '0123456789'))[1..8],(STD.Str.Filter((STRING)efx_primsic, '0123456789'))[1..4]),
       BOOLEAN IsPrimary := TRUE // There is only 1 SIC field on this source, mark it as primary
     },
     Seq, Business_Risk_BIP.Common.GetLinkSearchLevel(link_search_level, SeleID), ((STRING)efx_primsic)[1..4]
   );
-
   equifaxBusSICTemp :=
     PROJECT(
       EquifaxBusSIC,
@@ -1057,7 +1057,7 @@ EXPORT getEmployeeSources(DATASET(Business_Risk_BIP.Layouts.Shell) Shell,
       STRING6 DateFirstSeen := Business_Risk_BIP.Common.groupMinDate6( IF( dt_first_seen = 0, dt_vendor_first_reported, dt_first_seen ), HistoryDate),
       STRING6 DateLastSeen := Business_Risk_BIP.Common.groupMaxDate6( IF( dt_last_seen = 0, dt_vendor_last_reported, dt_last_seen ), HistoryDate),
       UNSIGNED4 RecordCount := COUNT(GROUP),
-      STRING10 SICCode := (STD.Str.Filter((STRING)sic1, '0123456789'))[1..4],
+      STRING10 SICCode := IF( Options.BusShellVersion >= Business_Risk_BIP.Constants.BusShellVersion_v31,(STD.Str.Filter((STRING)sic1, '0123456789'))[1..8],(STD.Str.Filter((STRING)sic1, '0123456789'))[1..4]),
       BOOLEAN IsPrimary := TRUE // There is only 1 SIC field on this source, mark it as primary
     },
     Seq, Business_Risk_BIP.Common.GetLinkSearchLevel(link_search_level, SeleID), ((STRING)sic1)[1..4]
@@ -1135,7 +1135,6 @@ EXPORT getEmployeeSources(DATASET(Business_Risk_BIP.Layouts.Shell) Shell,
   // OUTPUT( DEADCOBNAPRaw, NAMED('DEADCOBNAPRaw') );
   // OUTPUT( DEADCOBNAPRolled, NAMED('DEADCOBNAPRolled') );
   // OUTPUT( DEADCOStatsSources, NAMED('DEADCOStatsSources') );
-  // OUTPUT( withDEADCO, NAMED('withDEADCO') );
 
 	RETURN withErrorCodesABIUS;
 END;

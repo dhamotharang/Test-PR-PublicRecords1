@@ -1,35 +1,31 @@
-﻿IMPORT BIPV2, Business_Risk_BIP, DueDiligence, Doxie;
+﻿IMPORT BIPV2, Business_Risk_BIP, DueDiligence;
 
 EXPORT getIndReport(DATASET(DueDiligence.Layouts.Indv_Internal) inData,
                     Business_Risk_BIP.LIB_Business_Shell_LIBIN options,
-                    BIPV2.mod_sources.iParams linkingOptions,
-                    STRING6 ssnMask,
-                    doxie.IDataAccess mod_access = MODULE (doxie.IDataAccess) END) := FUNCTION
+                    BIPV2.mod_sources.iParams linkingOptions) := FUNCTION
 
 
-
-  
-    getInputBestInfo := DueDiligence.reportIndBestInfo(inData, ssnMask);
+    getInputBestInfo := DueDiligence.reportIndBestInfo(inData, options.ssn_mask);
 
     getPropertyReportData := DueDiligence.reportIndProperty(getInputBestInfo);
 
     getWatercraftReportData := DueDiligence.reportIndWatercraft(getPropertyReportData);
 
-    getProfessionalLicenseData := DueDiligence.reportIndProfLicense(getWatercraftReportData);  
+    getProfessionalLicenseData := DueDiligence.reportIndProfLicense(getWatercraftReportData);
 
-    getVehicleData := DueDiligence.reportIndVehicle(getProfessionalLicenseData);  
+    getVehicleData := DueDiligence.reportIndVehicle(getProfessionalLicenseData);
 
     getAircraftData := DueDiligence.reportIndAircraft(getVehicleData);
 
-    getBusinessAssociationReportData := DueDiligence.reportIndBusAssoc(getAircraftData, options, linkingOptions, mod_access);
-    
-    getIdentityReportData := DueDiligence.reportIndIdentity(getBusinessAssociationReportData, options, ssnMask, mod_access);
-    
-    getMobilityReportData := DueDiligence.reportIndMobility(getIdentityReportData, options, mod_access);
-    
-    getPersonAssociateReportData := DueDiligence.reportIndAssociates(getMobilityReportData, ssnMask);
-    
-    
+    getBusinessAssociationReportData := DueDiligence.reportIndBusAssoc(getAircraftData, options, linkingOptions);
+
+    getIdentityReportData := DueDiligence.reportIndIdentity(getBusinessAssociationReportData, options);
+
+    getMobilityReportData := DueDiligence.reportIndMobility(getIdentityReportData, options);
+
+    getPersonAssociateReportData := DueDiligence.reportIndAssociates(getMobilityReportData, options.ssn_mask);
+
+
 
 
 
@@ -44,5 +40,5 @@ EXPORT getIndReport(DATASET(DueDiligence.Layouts.Indv_Internal) inData,
     // OUTPUT(getPersonAssociateReportData, NAMED('getPersonAssociateReportData'));
 
 
-    RETURN getPersonAssociateReportData;     
+    RETURN getPersonAssociateReportData;
 END;

@@ -13,7 +13,7 @@ EXPORT getPersonLegal(DATASET(DueDiligence.v3Layouts.Internal.PersonTemp) inData
     
     //get legal data for all unique individuals
     rawLegalResults := DueDiligence.v3SharedData.getCriminalData(unqiuePeople);
-    rawCivilResults := DueDiligence.v3PersonData.getLienJundgementEviction(uniqueInquired, regulatoryAccess, ddOptions.ssnMask);
+    rawCivilResults := DueDiligence.v3PersonData.getLienJundgementEviction(uniqueInquired, regulatoryAccess);
     rawBankruptcyResults := DueDiligence.v3PersonData.getBankruptcy(uniqueInquired);
     
     //based on the legal data - populate requested attributes

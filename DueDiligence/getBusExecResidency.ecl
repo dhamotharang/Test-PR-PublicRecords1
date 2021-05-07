@@ -1,18 +1,13 @@
 ﻿IMPORT BIPV2, Business_Risk_BIP, DueDiligence, Doxie;
 
 EXPORT getBusExecResidency(DATASET(DueDiligence.Layouts.Busn_Internal) indata,
-                            Business_Risk_BIP.LIB_Business_Shell_LIBIN options,
-                            doxie.IDataAccess mod_access = MODULE (doxie.IDataAccess) END) := FUNCTION
+                            Business_Risk_BIP.LIB_Business_Shell_LIBIN options) := FUNCTION
 
-
+    mod_access := PROJECT(options, doxie.IDataAccess);
 
     INTEGER bsVersion := DueDiligence.ConstantsQuery.DEFAULT_BS_VERSION;
     UNSIGNED8 bsOptions := DueDiligence.ConstantsQuery.DEFAULT_BS_OPTIONS;
     BOOLEAN isFCRA := DueDiligence.Constants.DEFAULT_IS_FCRA;
-
-    UNSIGNED1 dppa := options.dppa;
-    UNSIGNED1 glba := options.glb;
-    STRING dataRestrictionMask := options.DataRestrictionMask;
 
 
     pullExecs := DueDiligence.CommonBusiness.getExecs(indata);
@@ -29,13 +24,13 @@ EXPORT getBusExecResidency(DATASET(DueDiligence.Layouts.Busn_Internal) indata,
 
 
     //get relatives of the inquired individual
-    inquiredRelatives := DueDiligence.getIndRelationships(indLayout, options, mod_access);
+    inquiredRelatives := DueDiligence.getIndRelationships(indLayout, options);
 
     //get header information
-    indHeader := DueDiligence.getIndHeader(inquiredRelatives, dataRestrictionMask, dppa, glba, isFCRA, bsVersion, FALSE, mod_access);
+    indHeader := DueDiligence.getIndHeader(inquiredRelatives, mod_access, isFCRA, bsVersion, FALSE);
 
     //get information pertaining to SSN
-    indSSNData := DueDiligence.getIndSSNData(indHeader, dataRestrictionMask, dppa, glba, isFCRA, bsVersion, bsOptions, mod_access);
+    indSSNData := DueDiligence.getIndSSNData(indHeader, mod_access, isFCRA, bsVersion, bsOptions);
 
     //add the best data to the execs with the residency score for the given exec
     combineExecs := JOIN(pullExecs, indSSNData,

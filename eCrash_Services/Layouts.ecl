@@ -1,4 +1,4 @@
-﻿IMPORT FLAccidents_Ecrash,iesp,eCrash_Services;
+﻿IMPORT dx_eCrash,iesp,eCrash_Services;
 
 //** Added the fix for bug 138974
 
@@ -65,7 +65,7 @@ EXPORT Layouts := MODULE
 		// ****** For resolving bug 138974 modified eCrashRecordStrure to add date_added , I have added date_added  to enable the query
 		// *** to pick up the latest report instance from delta base.
 		EXPORT eCrashRecordStructure := 		RECORD 
-			FLAccidents_Ecrash.key_EcrashV2_Unrestricted_accnbrV1;
+			dx_eCrash.key_UnrestrictedAccNbrV1;
 			String20 date_added := '';
 			STRING2 person_addr_st := '';
 			STRING100 address := '';
@@ -297,10 +297,10 @@ EXPORT Layouts := MODULE
 		END;
 		
 		EXPORT GetSupplementalsResult := RECORD
-			DATASET(RECORDOF(FLAccidents_Ecrash.Key_eCrashv2_Supplemental)) reportHashKeysFromKeyFinal;
+			DATASET(RECORDOF(dx_eCrash.Key_Supplemental)) reportHashKeysFromKeyFinal;
 			DATASET(eCrashRecordStructure) superReportRow;
 			DATASET(eCrashRecordStructure) deltabaseReportsAll;
-			DATASET(RECORDOF(FLAccidents_Ecrash.Key_eCrashv2_Supplemental)) reportsAllSlim;
+			DATASET(RECORDOF(dx_eCrash.Key_Supplemental)) reportsAllSlim;
 		END;
 		
 		EXPORT SearchParameters := RECORD

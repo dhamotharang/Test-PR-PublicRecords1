@@ -85,20 +85,22 @@ EXPORT LIB_B2B_attributes (
 																	0, // ArchiveDate
 																	PublicRecords_KEL.CFG_Compile.Permit__NONE).res0); //DPM
 
-  BusinessSeleAttributes_Results := PROJECT(BusinessInput, TRANSFORM(
-          {INTEGER G_ProcBusUID, LayoutBusinessSeleIDAttributes},
-          SELF.G_ProcBusUID := LEFT.G_ProcBusUID;
-          NonFCRABusinessSeleIDResults := PublicRecords_KEL_Queries.B2B_KEL.Q_Non_F_C_R_A_Business_Sele_I_D_Attributes_V1_Dynamic(
-            LEFT.B_LexIDUlt,
-            LEFT.B_LexIDOrg,
-            LEFT.B_LexIDLegal,
-            DATASET([], PublicRecords_KEL.ECL_Functions.Layouts.LayoutInputPII),
-            DATASET([], PublicRecords_KEL.ECL_Functions.Layouts.LayoutInputBII),
-            (INTEGER)LEFT.B_InpClnArchDt[1..8],
-            KEL_Options.KEL_Permissions_Mask,
-          FDCDataset).res0;
+  BusinessSeleAttributes_Results := NOCOMBINE(JOIN(BusinessInput, FDCDataset,
+                                              LEFT.G_ProcBusUID = RIGHT.G_ProcBusUID,
+                                              TRANSFORM({INTEGER G_ProcBusUID, LayoutBusinessSeleIDAttributes},
+                                                        NonFCRABusinessSeleIDResults := PublicRecords_KEL.Q_Non_F_C_R_A_Business_Sele_I_D_Attributes_V1_Dynamic(
+                                                          LEFT.B_LexIDUlt,
+                                                          LEFT.B_LexIDOrg,
+                                                          LEFT.B_LexIDLegal,
+                                                          DATASET([], PublicRecords_KEL.ECL_Functions.Layouts.LayoutInputPII),
+                                                          DATASET([], PublicRecords_KEL.ECL_Functions.Layouts.LayoutInputBII),
+                                                          (INTEGER)LEFT.B_InpClnArchDt[1..8],
+                                                          KEL_Options.KEL_Permissions_Mask, 
+                                                          DATASET(RIGHT)).res0;
+                                                        SELF.G_ProcBusUID := LEFT.G_ProcBusUID;
+                                                        SELF := NonFCRABusinessSeleIDResults[1]), 
+                                              LEFT OUTER, ATMOST(1000), KEEP(1)));
 
-          SELF := NonFCRABusinessSeleIDResults[1]));
 
   BusinessSeleIDAttributesRaw := KEL.Clean(BusinessSeleAttributes_Results, TRUE, TRUE, TRUE);
 
