@@ -2,7 +2,7 @@
 
 
 EXPORT DueDiligence_BusinessRptService := MACRO
-	
+
     requestName := 'DueDiligenceBusinessReportRequest';
     requestLayout := iesp.duediligencebusinessreport.t_DueDiligenceBusinessReportRequest;
 
@@ -13,42 +13,55 @@ EXPORT DueDiligence_BusinessRptService := MACRO
 
     //The following macro defines the field sequence on WsECL page of query.
     WSInput.MAC_DueDiligence_Service(requestName);
-    
-    
+
+
     DueDiligence.CommonQueryXML.mac_CreateInputFromXML(requestLayout, requestName, TRUE, DueDiligence.Constants.BUSINESS);
-    
-    validatedRequest := DueDiligence.CommonQuery.ValidateRequest(input, glba, dppa, DueDiligence.Constants.BUSINESS, TRUE);                              
-                          
+
+    validatedRequest := DueDiligence.CommonQuery.ValidateRequest(input, glba, dppa, DueDiligence.Constants.BUSINESS, TRUE);
+
     DueDiligence.CommonQuery.mac_FailOnError(validatedRequest(validRequest = FALSE));
 
-    
-    
+
+
     validRequest := validatedRequest(validRequest);
-    
+
     //clean the input of the valid requests for requested products Citizenship and Due Diligence (DueDiligence.Layouts.CleanedData)
     cleanData := DueDiligence.CommonQuery.GetCleanData(validRequest);
-   
+
     //retrieve options & compliance information
-    regulatoryCompliance := DueDiligence.CommonQuery.GetCompliance(dppa, glba, drm, dpm, userIn.IndustryClass, lexIdSourceOptout, transactionID, batchUID, globalCompanyID);
+    regulatoryCompliance := DueDiligence.CommonQuery.GetCompliance(dppa, glba, drm, dpm, userIn.IndustryClass, lexIdSourceOptout, transactionID, batchUID, globalCompanyID, DDssnMask);
 
-    //based on what was requested, call the appropriate attributes  
-    ddResults := DueDiligence.CommonQueryXML.mac_v3BusinessXML(wseq, cleanData, regulatoryCompliance, DDssnMask, optionsIn.AdditionalInput, 
-                                                               requestResponseLayout, DueDiligence.Constants.STRING_TRUE, FALSE);
+    //based on what was requested, call the appropriate attributes
+    ddResults_temp := DueDiligence.CommonQueryXML.mac_v3BusinessXML(wseq, cleanData, regulatoryCompliance, optionsIn.AdditionalInput,
+                                                                    requestResponseLayout, DueDiligence.Constants.STRING_TRUE, FALSE);
 
 
+    ddResults := PROJECT(ddResults_temp, TRANSFORM(requestResponseLayout,
 
-    
+                                                    inputEcho := LEFT.result.inputEcho;
+                                                    inputBusLexID := TRIM(inputEcho.business.lexID);
+                                                    calcdBusLexID := TRIM(LEFT.result.BusinessID);
 
-    IF(debugIndicator, OUTPUT(cleanData, NAMED('cleanData'))); //This is for debug mode 	
+                                                    businessLexIDChanged := inputBusLexID <> DueDiligence.Constants.EMPTY AND
+                                                                            calcdBusLexID <> DueDiligence.Constants.EMPTY AND
+                                                                            inputBusLexID <> calcdBusLexID;
+
+                                                    //if a lexID was passed in and we found a valid business and lexID changed
+                                                    SELF.result.lexIDChanged := businessLexIDChanged;
+
+                                                    SELF := LEFT;));
+
+
+    IF(debugIndicator, OUTPUT(cleanData, NAMED('cleanData'))); //This is for debug mode
     IF(debugIndicator, OUTPUT(wseq, NAMED('wseq'))); //This is for debug mode
-    
-    
-    OUTPUT(ddResults, NAMED('Results')); //This is the customer facing output    
+
+
+    OUTPUT(ddResults, NAMED('Results')); //This is the customer facing output
 
 ENDMACRO;
 
 
-/*--SOAP-- 
+/*--SOAP--
 <message name="duediligence.duediligence_businessrptservice">
 	<part name="duediligencereportrequest" sequence="1" type="tns:XmlDataset"/>
 	<part name="datapermissionmask" sequence="2" type="xsd:string"/>

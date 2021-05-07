@@ -1,26 +1,26 @@
-﻿IMPORT BIPV2, Business_Risk_BIP, DueDiligence, VehicleV2, Doxie;
+﻿IMPORT BIPV2, Business_Risk_BIP, DueDiligence, VehicleV2, doxie;
 
 /*
-	Following Keys being used:
+  Following Keys being used:
         VehicleV2.Key_Vehicle_linkids.kFetch
 */
 EXPORT getBusVehicle(DATASET(DueDiligence.layouts.Busn_Internal) indata,
-											 Business_Risk_BIP.LIB_Business_Shell_LIBIN options,
-											 BIPV2.mod_sources.iParams linkingOptions,
-                                             doxie.IDataAccess mod_access = MODULE (doxie.IDataAccess) END) := FUNCTION
+                       Business_Risk_BIP.LIB_Business_Shell_LIBIN options,
+                       BIPV2.mod_sources.iParams linkingOptions) := FUNCTION
 
+  mod_access := PROJECT(options, doxie.IDataAccess);
 
-	busnKeys := DueDiligence.CommonBusiness.GetLinkIDsForKFetch(indata);
+  busnKeys := DueDiligence.CommonBusiness.GetLinkIDsForKFetch(indata);
 
-	vehicleRaw := VehicleV2.Key_Vehicle_linkids.kFetch(busnKeys,,
+  vehicleRaw := VehicleV2.Key_Vehicle_linkids.kFetch(busnKeys,,
                                                       Business_Risk_BIP.Common.SetLinkSearchLevel(options.LinkSearchLevel),
                                                       0,
                                                       linkingOptions);
 
-	//Add back the Seq numbers
-	vehicleRawSeq := DueDiligence.CommonBusiness.AppendSeq(vehicleRaw, indata, FALSE);
+  //Add back the Seq numbers
+  vehicleRawSeq := DueDiligence.CommonBusiness.AppendSeq(vehicleRaw, indata, FALSE);
 
-	transformVehicles := PROJECT(vehicleRawSeq, TRANSFORM(DueDiligence.LayoutsInternal.VehicleSlimLayout,
+  transformVehicles := PROJECT(vehicleRawSeq, TRANSFORM(DueDiligence.LayoutsInternal.VehicleSlimLayout,
                                                           SELF.licensePlateType := LEFT.reg_license_plate_type_desc;
                                                           SELF.registeredState := LEFT.reg_license_state;
                                                           SELF.registeredDate := LEFT.reg_latest_effective_date;
@@ -33,7 +33,7 @@ EXPORT getBusVehicle(DATASET(DueDiligence.layouts.Busn_Internal) indata,
                                                           SELF := [];));
 
 
-  vehicleSummary := DueDiligence.getSharedVehicle(transformVehicles, options.dppa, mod_access);
+  vehicleSummary := DueDiligence.getSharedVehicle(transformVehicles, mod_access);
 
 
   addVehicleDetails := JOIN(indata, vehicleSummary,
@@ -53,5 +53,5 @@ EXPORT getBusVehicle(DATASET(DueDiligence.layouts.Busn_Internal) indata,
   // OUTPUT(CHOOSEN(transformVehicles, 100), NAMED('transformVehicles'));
   // OUTPUT(CHOOSEN(vehicleSummary, 100), NAMED('vehicleSummary'));
 
-	RETURN addVehicleDetails;
+  RETURN addVehicleDetails;
 END;

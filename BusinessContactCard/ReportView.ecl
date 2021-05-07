@@ -4,7 +4,7 @@ IMPORT Address, AutoStandardI, Doxie, iesp, PhonesFeedback_Services, Business_He
 EXPORT ReportView(DATASET(iesp.businesscontactcardreport.t_BCCReportBy) input_rec,
                   BusinessContactCard.IParam.options in_mod) := FUNCTION
 
-  SHARED mod_access := PROJECT(in_mod, Doxie.IDataAccess);
+  mod_access := PROJECT(in_mod, Doxie.IDataAccess);
   // ==================== Local constants and variables. ====================
   EMPTY_PHONESPLUS := DATASET([],BusinessContactCard.Layouts.rec_BCCPhonesPlusRecordWithFeedback_acctno);
   EMPTY_PHONES_FEEDBACK := DATASET([],PhonesFeedback_Services.Layouts.feedback_report);

@@ -116,7 +116,6 @@ EXPORT Business_Shell_Function(DATASET(Business_Risk_BIP.Layouts.Input) InputOri
 
   ds_KELB2B_Attributes := Business_Risk_BIP.getB2BAttributes(withBIP, mod_b2b, AllowedSourcesSet);
    //ds_KELB2B_Attributes := DATASET([], PublicRecords_KEL.ECL_Functions.Layouts.LayoutB2B);
-
   Phone := Business_Risk_BIP.getPhones(withBIP, Options, linkingOptions, AllowedSourcesSet);
 
   InputBasedSources := Business_Risk_BIP.getInputBasedSources(withBIP, Options, linkingOptions, AllowedSourcesSet);
@@ -3684,7 +3683,7 @@ EXPORT Business_Shell_Function(DATASET(Business_Risk_BIP.Layouts.Input) InputOri
     SICIndustrySet := SET(SICSources, SICIndustryGroup);
     NAICSet := SET(NAICSources, NAICCode);
     NAICIndustrySet := SET(NAICSources, NAICIndustryGroup);
-
+    //FirmSicCode now accepts both 4 digit and 8 digit sic code based on BusShellVersion.
     SELF.Firmographic.FirmSICCode := IF(BestSIC.SICCode = '', '-1', BestSIC.SICCode);
     SELF.Firmographic.FirmNAICSCode := IF(BestNAIC.NAICCode = '', '-1', BestNAIC.NAICCode);
     inputSICPopulated := (INTEGER)le.Clean_Input.SIC > 0;

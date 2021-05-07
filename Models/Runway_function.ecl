@@ -147,7 +147,16 @@ END;
 np31_iid_results := project(ungroup(clam), transform(np31_cvi_layout, self.seq := left.seq, self.score := '00', self := []));
 // np31_iid_results := dataset([], np31_cvi_layout);
 
-
+FPMod_params := MODULE(models.FraudAdvisor_Constants.FP_model_params)
+  EXPORT Grouped DATASET(risk_indicators.Layout_Boca_Shell) _clam := clam;
+  EXPORT Grouped DATASET(risk_indicators.layout_bocashell_btst_out) _clam_BtSt :=  GROUP(clambtst, Bill_To_Out.seq);
+  EXPORT DATASET(models.layouts.bs_with_ip) _clam_ip :=  UNGROUP(clam_ip);
+  EXPORT Grouped DATASET(Risk_Indicators.Layout_Output) IID_ret := GROUP(iid, seq);
+  EXPORT DATASET(riskwise.Layout_SkipTrace) _skiptrace := skiptrace;
+  EXPORT DATASET(easi.layout_census) _easicensus := census;
+  EXPORT DATASET(Models.Layout_FraudAttributes) _FDattributes := attributes;
+  // EXPORT DATASET(Risk_Indicators.layouts.layout_IDA_out) IDAattributes := IDA_attributes;
+END;
 
 ain509_0_0_score := Models.AIN509_0_0	(clam, ofac, incalif);
 // output(ain509_0_0_score, named('ain509_0_0_score'));
@@ -1013,11 +1022,27 @@ self := left), keep(1), left outer);
 // output(with_FD9607_1_0, named('with_FD9607_1_0'));
 
 
+FIWN12103_0_0_score := Models.getLuciModel(FPMod_params).FIWN12103_0;
+// output(FIWN12103_0_0_score, named('FIWN12103_0_0_score'));
+
+with_FIWN12103_0_0	:= join(with_FD9607_1_0, FIWN12103_0_0_score,
+left.seq=right.seq,
+transform(Models.layout_Runway,
+self.FIWN12103_0_0_score := right.score;
+self.FIWN12103_0_0_reason1 := if(exclude_reasons, '',  right.ri[1].hri);
+self.FIWN12103_0_0_reason2 := if(exclude_reasons, '',  right.ri[2].hri);
+self.FIWN12103_0_0_reason3 := if(exclude_reasons, '',  right.ri[3].hri);
+self.FIWN12103_0_0_reason4 := if(exclude_reasons, '',  right.ri[4].hri);
+self.FIWN12103_0_0_reason5 := if(exclude_reasons, '',  right.ri[5].hri);
+self.FIWN12103_0_0_reason6 := if(exclude_reasons, '',  right.ri[6].hri);
+self := left), keep(1), left outer);
+// output(with_FIWN12103_0_0, named('with_FIWN12103_0'));
+
 
 FP1109_0_0_score := Models.FP1109_0_0(Ungroup(clam_ip), num_reasons, criminal);
 // output(FP1109_0_0_score, named('FP1109_0_0_score'));
 
-with_FP1109_0_0	:= join(with_FD9607_1_0, FP1109_0_0_score,
+with_FP1109_0_0	:= join(with_FIWN12103_0_0, FP1109_0_0_score,
 left.seq=right.seq,
 transform(Models.layout_Runway,
 self.fp1109_0_0_score := right.score;
@@ -4845,6 +4870,13 @@ self.FD9607_1_0_reason2	:= if(model_environment in [1,3], left.FD9607_1_0_reason
 self.FD9607_1_0_reason3	:= if(model_environment in [1,3], left.FD9607_1_0_reason3	, '');
 self.FD9607_1_0_reason4	:= if(model_environment in [1,3], left.FD9607_1_0_reason4	, '');
 
+self.FIWN12103_0_0_score	:= if(model_environment in [1,3], left.FIWN12103_0_0_score	, '');
+self.FIWN12103_0_0_reason1	:= if(model_environment in [1,3], left.FIWN12103_0_0_reason1	, '');
+self.FIWN12103_0_0_reason2	:= if(model_environment in [1,3], left.FIWN12103_0_0_reason2	, '');
+self.FIWN12103_0_0_reason3	:= if(model_environment in [1,3], left.FIWN12103_0_0_reason3	, '');
+self.FIWN12103_0_0_reason4	:= if(model_environment in [1,3], left.FIWN12103_0_0_reason4	, '');
+self.FIWN12103_0_0_reason5	:= if(model_environment in [1,3], left.FIWN12103_0_0_reason5	, '');
+self.FIWN12103_0_0_reason6	:= if(model_environment in [1,3], left.FIWN12103_0_0_reason6	, '');
 
 self.FP1109_0_0_score	:= if(model_environment in [1,3], left.FP1109_0_0_score	, '');
 self.FP1109_0_0_reason1	:= if(model_environment in [1,3], left.FP1109_0_0_reason1	, '');

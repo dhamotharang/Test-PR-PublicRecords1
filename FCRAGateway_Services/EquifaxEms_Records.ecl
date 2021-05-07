@@ -49,7 +49,7 @@ EXPORT EquifaxEms_Records(dataset(iesp.mergedcreditreport_fcra.t_FcraMergedCredi
   no_of_bureaus_locked := COUNT(ems_soap_response.EmsResponse.CreditReports(LockFound or FreezeFound));
 
   // check if all bureaus has credit freeze or lock
-  isCompleteFreeze := no_of_bureaus = no_of_bureaus_locked;
+  isCompleteFreeze := no_of_bureaus = no_of_bureaus_locked AND no_of_bureaus > 0;
 
   // number of bureaus with no lock/freeze
   no_lf_bureaus_count := COUNT(ems_soap_response.EmsResponse.CreditReports(~LockFound AND ~FreezeFound));
@@ -178,7 +178,7 @@ EXPORT EquifaxEms_Records(dataset(iesp.mergedcreditreport_fcra.t_FcraMergedCredi
   final_response := IF(make_gateway_call and is_RL_partialMatch, Project(ems_soap_response, finalResp_xform(LEFT)));
 
   //If RL is a match for all records, its a DID match
-  final_validation_code := IF(is_RL_match, FCRAGateway_Services.Constants.ValidationCode.DID_MATCH, validation_code);
+  final_validation_code := IF(is_RL_match or is_RL_partialMatch, FCRAGateway_Services.Constants.ValidationCode.DID_MATCH, validation_code);
 
   validation_code_desc := FCRAGateway_Services.Constants.GetValidationCodeDesc(final_validation_code);
   validation_ok := FCRAGateway_Services.Functions.IsValidationOk(final_validation_code);
@@ -192,7 +192,7 @@ EXPORT EquifaxEms_Records(dataset(iesp.mergedcreditreport_fcra.t_FcraMergedCredi
     //Always return the header, royalties, gateway status, errors, and DID validation.
     self.response._header := ems_soap_response._header;
     self.response.emsResponse.errorInfo := ems_soap_response.emsResponse.errorInfo;
-    self.unique_validation := IF(~return_results, ROW({final_validation_code, validation_code_desc}, iesp.share.t_CodeMap));
+    self.unique_validation := ROW({final_validation_code, validation_code_desc}, iesp.share.t_CodeMap);
     self.Royalties := royalties;
 
     //If we were able to retrieve consumer data it means we were able to resolve a lexID.

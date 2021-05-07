@@ -1,4 +1,4 @@
-IMPORT bipv2, bizlinkfull, Business_Header, canadianphones_v2, doxie, domains, dx_Cortera, dx_email, experian_crdb, FBNV2, 
+IMPORT bipv2, bizlinkfull, Business_Header, canadianphones_v2, doxie, domains, dx_common, dx_Cortera, dx_email, experian_crdb, FBNV2, 
   midex_services, paw, patriot, sanctn, vehiclev2, STD;
 
 EXPORT Raw := MODULE
@@ -77,14 +77,16 @@ EXPORT Raw := MODULE
   ENDMACRO;
   EXPORT GetPatriotRecs(DATASET(doxie.layout_references) dids) := FUNCTION
     k_did := patriot.key_did_patriot_file;
-    ids := JOIN(dids, k_did,
+    ids_pre := JOIN(dids, k_did,
       KEYED(LEFT.did = RIGHT.did),
-      TRANSFORM({k_did.did; k_did.pty_key;}, SELF := RIGHT), 
-      KEEP(100), LIMIT(0));
-    recs := JOIN(ids, patriot.key_patriot_file,
+      TRANSFORM({k_did.did; k_did.pty_key; dx_common.layout_metadata;}, SELF := RIGHT), 
+      KEEP(200), LIMIT(0));
+    ids := DEDUP(SORT(dx_common.Incrementals.mac_Rollupv2(ids_pre), pty_key), pty_key);  
+    recs_pre := JOIN(ids, patriot.key_patriot_file,
       KEYED(LEFT.pty_key = RIGHT.pty_key) AND LEFT.did = RIGHT.did,
       TRANSFORM(RIGHT),
-      KEEP(1), LIMIT(0));
+      KEEP(10), LIMIT(0));
+    recs := dx_common.Incrementals.mac_Rollupv2(recs_pre);  
     RETURN recs;
   END;
   EXPORT GetInternetRecs(DATASET(doxie.layout_references) dids) := FUNCTION
@@ -162,7 +164,10 @@ EXPORT Raw := MODULE
     // don't want to go through cortera.keyfetch2 to avoid mac_append_contact.
     BIPV2.IDmacros.mac_IndexFetch2(link_ids, key_link_id, cortera_brecs, 
       BIPV2.IDconstants.Fetch_Level_ProxID, 25000, BIPV2.IDconstants.JoinTypes.KeepJoin);
-    cortera_recs := JOIN(cortera_brecs, key_exec_link_id,
+
+    dx_cortera.mac_incremental_rollup(cortera_brecs, cortera_rolledup_brecs);
+
+    cortera_recs := JOIN(cortera_rolledup_brecs, key_exec_link_id,  // Executive key should only have new records (adds) , as names are normalized from the same base record. Deletes are only applicable to base record.
       KEYED(LEFT.link_id = RIGHT.link_id AND LEFT.Persistent_record_id = RIGHT.Persistent_record_id)
       AND (RIGHT.did = inlexID),
     TRANSFORM(l_cortera,
@@ -182,6 +187,7 @@ EXPORT Raw := MODULE
       mac_blank_exec(10);
       SELF := LEFT),
     ATMOST(1000), KEEP(100));
+   
     RETURN cortera_recs;
   END;
 END;

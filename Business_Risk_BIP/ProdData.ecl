@@ -968,7 +968,7 @@ layout_watchlists_temp := record
 	SBFE := Business_Risk_BIP.PD_SBFE(LinkIDsFound, options, linkingOptions, AllowedSourcesSet).SBFE_data_raw;
 
 	// --------------- Cortera data ----------------
-	Cortera := Business_Risk_BIP.PD_Cortera(LinkIDsFound, kFetchLinkIDs, kFetchLinkSearchLevel, linkingOptions, options, AllowedSourcesSet);
+	Cortera := Business_Risk_BIP.PD_Cortera(LinkIDsFound, kFetchLinkIDs, kFetchLinkSearchLevel, options, AllowedSourcesSet);
 	CorteraRecs := Cortera.CorteraRecs;
 	Cortera_Attribute_recs := Cortera.Cortera_Attribute_recs;
 	Cortera_Tradelines := Business_Risk_BIP.PD_Cortera_Tradelines(LinkIDsFound, kFetchLinkIDs, kFetchLinkSearchLevel, linkingOptions, options, AllowedSourcesSet);

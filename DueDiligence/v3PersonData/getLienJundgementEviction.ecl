@@ -6,8 +6,7 @@
 			liensv2.key_liens_DID
 */
 EXPORT getLienJundgementEviction(DATASET(DueDiligence.v3Layouts.InternalPerson.SlimPersonDetails) inData,
-                                     DueDiligence.DDInterface.iDDRegulatoryCompliance regulatoryAccess,
-                                     STRING10 ssnMask) := FUNCTION
+                                     DueDiligence.DDInterface.iDDRegulatoryCompliance regulatoryAccess) := FUNCTION
 
 
     indivLienKeys := JOIN(inData, liensv2.key_liens_DID,
@@ -20,16 +19,16 @@ EXPORT getLienJundgementEviction(DATASET(DueDiligence.v3Layouts.InternalPerson.S
                                     SELF := [];),
                           KEEP(DueDiligence.Constants.MAX_500),
                           ATMOST(KEYED(LEFT.inquiredDID = RIGHT.did), DueDiligence.Constants.MAX_1000));
-                          
-
-
-    civilEventDetails := DueDiligence.v3SharedData.getLiensJudgementsEvictions(indivLienKeys, regulatoryAccess, ssnMask);
 
 
 
+    civilEventDetails := DueDiligence.v3SharedData.getLiensJudgementsEvictions(indivLienKeys, regulatoryAccess);
 
 
-    // OUTPUT(indivLienKeys, NAMED('indivLienKeys'));    
+
+
+
+    // OUTPUT(indivLienKeys, NAMED('indivLienKeys'));
     // OUTPUT(civilEventDetails, NAMED('civilEventDetails'));
 
     RETURN civilEventDetails;

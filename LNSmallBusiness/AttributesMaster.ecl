@@ -182,7 +182,7 @@ EXPORT AttributesMaster (Business_Risk_BIP.Layouts.Shell BusShell, UNSIGNED BusS
  EXPORT STRING2 BusinessActivity12Month := BusShell.Business_Activity.BusinessActivity12Month;
  EXPORT STRING3 BusinessAddrCount := BusShell.Business_Characteristics.BusinessAddrCount;
  EXPORT STRING3 FirmAgeEstablished := BusShell.Firmographic.FirmAgeEstablished;
- EXPORT STRING4 FirmSICCode   := BusShell.Firmographic.FirmSICCode;
+ EXPORT STRING8 FirmSICCode   := BusShell.Firmographic.FirmSICCode;
  EXPORT STRING6 FirmNAICSCode   := BusShell.Firmographic.FirmNAICSCode;
  EXPORT STRING6 FirmEmployeeCount   := Map(
                         BusShellVersion >= Business_Risk_BIP.Constants.BusShellVersion_v30 => BusShell.Firmographic.FirmEmployeeCount,
@@ -356,7 +356,7 @@ EXPORT AttributesMaster (Business_Risk_BIP.Layouts.Shell BusShell, UNSIGNED BusS
 	EXPORT STRING9 OutBestBusZip := BusShell.Best_Info.BestCompanyZip;
 	EXPORT STRING9 OutBestBusFEIN := BusShell.Best_Info.BestCompanyFEIN;
   EXPORT STRING6 OutBestNAICS := BusShell.Firmographic.FirmNAICSCode;
-  EXPORT STRING4 OutBestSIC := BusShell.Firmographic.FirmSICCode;
+  EXPORT STRING8 OutBestSIC := BusShell.Firmographic.FirmSICCode;
 	EXPORT STRING10 OutBestBusPhone := BusShell.Best_Info.BestCompanyPhone;
 	EXPORT STRING1 LNHitInd :=(STRING)Business_Risk_BIP.Common.capNum((INTEGER)BusShell.Verification.SourceIndex, 0, 1);
   EXPORT STRING1 LNInputInd := IF(
@@ -532,23 +532,6 @@ EXPORT AttributesMaster (Business_Risk_BIP.Layouts.Shell BusShell, UNSIGNED BusS
 	EXPORT STRING5 BusExecLinkInqOverlapCount3 := BusShell.Business_To_Executive_Link.BusExecLinkInquiryOverlapCount3;
 	EXPORT STRING5 BusExecLinkPropOverlapCount3 := BusShell.Business_To_Executive_Link.BusExecLinkPropertyOverlapCount3;
 
-	EXPORT STRING12 B2BProviderAvg12M := BusShell.B2B.AvgProviderCount12Mos;
-	EXPORT STRING2 B2BProviderDelta12M := BusShell.B2B.ProviderTrajectory12Mos;
-	EXPORT STRING2 B2BProviderDelta24M := BusShell.B2B.ProviderTrajectory24Mos;
-	EXPORT STRING2 B2BSpendCategories12M := BusShell.B2B.NumSpendCategories12Mos;
-	EXPORT STRING9 B2BSpendTotal12M := BusShell.B2B.TotalSpend12Mos;
-	EXPORT STRING2 B2BSpendDelta12M := BusShell.B2B.SpendTrajectory12Mos;
-	EXPORT STRING2 B2BSpendDelta24M := BusShell.B2B.SpendTrajectory24Mos;
-	EXPORT STRING9 B2BDBTAvg03 := BusShell.B2B.AveDaysBeyondTerms;
-	EXPORT STRING2 B2B30DBT12MInd := BusShell.B2B.AvgPctTradelinesGT30DPDIndex12Mos;
-	EXPORT STRING2 B2B60DBT12MInd := BusShell.B2B.AvgPctTradelinesGT60DPDIndex12Mos;
-	EXPORT STRING2 B2B90DBT12Ind := BusShell.B2B.AvgPctTradelinesGT90DPDIndex12Mos;
-	EXPORT STRING2 B2BDBT30Delta12M := BusShell.B2B.DaysBeyondTerms30Trajectory12Mos;
-	EXPORT STRING2 B2BDBT30Delta24M := BusShell.B2B.DaysBeyondTerms30Trajectory24Mos;
-	EXPORT STRING2 B2BDBT60Delta12M := BusShell.B2B.DaysBeyondTerms60Trajectory12Mos;
-	EXPORT STRING2 B2BDBT60Delta24M := BusShell.B2B.DaysBeyondTerms60Trajectory24Mos;
-	EXPORT STRING2 B2BPaid12M := BusShell.B2B.PaidInFull12Mos;
-	EXPORT STRING9 B2BBalanceAvg03M := BusShell.B2B.AvgPayments03Mos;
 
 	EXPORT STRING2 BusAddrPersonNameAltNameOverlap := BusShell.Business_To_Person_Link.BusAddrPersonAltNameOverlap;
 	EXPORT STRING3 InputFEINEntityCount := BusShell.Input_Characteristics.InputTINEntityCount;

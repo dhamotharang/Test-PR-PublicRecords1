@@ -10,7 +10,7 @@
    Output: iesp.retrievedocument.t_ECrashRetrieveDocumentResponseEx (xml)
 */
 
-IMPORT AutoStandardI, Iesp, FLAccidents_Ecrash, Risk_Indicators, lib_stringlib, Ut, Gateway, Doxie, Std;
+IMPORT AutoStandardI, Iesp, dx_eCrash, Risk_Indicators, lib_stringlib, Ut, Gateway, Doxie, Std;
 
 EXPORT DocumentRetrievalService() := FUNCTION
    GatewaysIn := dataset([], Risk_Indicators.Layout_Gateways_In) : stored ('Gateways', FEW);
@@ -84,11 +84,11 @@ EXPORT DocumentRetrievalService() := FUNCTION
 
 	HeaderImageOverflow := ROW(ExceptionImageOverflowLayout);
 	
-	SuperReportIdToReportId := CHOOSEN(FLAccidents_Ecrash.Key_eCrashV2_ReportId(KEYED(report_id = RequestReportId)), 1);
+	SuperReportIdToReportId := CHOOSEN(dx_eCrash.Key_ReportId(KEYED(report_id = RequestReportId)), 1);
 	
 	ReportHashKeysFromKey := JOIN(
 		SuperReportIdToReportId,
-		FLAccidents_Ecrash.Key_eCrashv2_Supplemental,
+		dx_eCrash.Key_Supplemental,
 		KEYED(LEFT.super_report_id = RIGHT.super_report_id),
 		TRANSFORM(RIGHT),
 		LIMIT(eCrash_Services.constants.MAX_REPORT_NUMBER, FAIL(203, doxie.ErrorCodes(203))));
