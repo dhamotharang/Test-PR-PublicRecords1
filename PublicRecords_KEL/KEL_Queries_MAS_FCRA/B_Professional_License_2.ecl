@@ -4,8 +4,8 @@ IMPORT B_Professional_License_3,B_Professional_License_4,CFG_Compile,E_Professio
 IMPORT * FROM KEL16.Null;
 EXPORT B_Professional_License_2(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG_Compile __cfg = CFG_Compile) := MODULE
   SHARED VIRTUAL TYPEOF(B_Professional_License_3(__in,__cfg).__ENH_Professional_License_3) __ENH_Professional_License_3 := B_Professional_License_3(__in,__cfg).__ENH_Professional_License_3;
-  SHARED __EE1512021 := __ENH_Professional_License_3;
-  EXPORT __ST157561_Layout := RECORD
+  SHARED __EE1511051 := __ENH_Professional_License_3;
+  EXPORT __ST158592_Layout := RECORD
     KEL.typ.nuid UID;
     KEL.typ.nstr License_Number_;
     KEL.typ.nstr License_State_;
@@ -28,5 +28,5 @@ EXPORT B_Professional_License_2(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDef
     KEL.typ.epoch Vault_Date_Last_Seen_ := 0;
     KEL.typ.int __RecordCount := 0;
   END;
-  EXPORT __ENH_Professional_License_2 := PROJECT(__EE1512021,__ST157561_Layout);
+  EXPORT __ENH_Professional_License_2 := PROJECT(__EE1511051,__ST158592_Layout);
 END;

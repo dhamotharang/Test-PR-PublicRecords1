@@ -4,8 +4,8 @@ IMPORT B_Person_Inquiry_7,CFG_Compile,E_Inquiry,E_Person,E_Person_Inquiry FROM P
 IMPORT * FROM KEL16.Null;
 EXPORT B_Person_Inquiry_6(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG_Compile __cfg = CFG_Compile) := MODULE
   SHARED VIRTUAL TYPEOF(B_Person_Inquiry_7(__in,__cfg).__ENH_Person_Inquiry_7) __ENH_Person_Inquiry_7 := B_Person_Inquiry_7(__in,__cfg).__ENH_Person_Inquiry_7;
-  SHARED __EE1630072 := __ENH_Person_Inquiry_7;
-  EXPORT __ST254525_Layout := RECORD
+  SHARED __EE1629129 := __ENH_Person_Inquiry_7;
+  EXPORT __ST255764_Layout := RECORD
     KEL.typ.nstr Transaction_I_D_;
     KEL.typ.str Method_ := '';
     KEL.typ.str Function_Description_ := '';
@@ -31,13 +31,13 @@ EXPORT B_Person_Inquiry_6(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, 
     KEL.typ.epoch Vault_Date_Last_Seen_ := 0;
     KEL.typ.int __RecordCount := 0;
   END;
-  EXPORT __ST175282_Layout := RECORD
+  EXPORT __ST176315_Layout := RECORD
     KEL.typ.ntyp(E_Person().Typ) Subject_;
     KEL.typ.ntyp(E_Inquiry().Typ) Transaction_;
     KEL.typ.nstr Transaction_I_D_;
     KEL.typ.nstr Sequence_Number_;
     KEL.typ.ndataset(E_Person_Inquiry(__in,__cfg).Data_Sources_Layout) Data_Sources_;
-    KEL.typ.ndataset(__ST254525_Layout) Gather_Inquiries_;
+    KEL.typ.ndataset(__ST255764_Layout) Gather_Inquiries_;
     KEL.typ.timestamp Archive___Date_ := 0;
     KEL.typ.timestamp Date_First_Seen_ := 0;
     KEL.typ.timestamp Date_Last_Seen_ := 0;
@@ -45,18 +45,18 @@ EXPORT B_Person_Inquiry_6(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, 
     KEL.typ.epoch Vault_Date_Last_Seen_ := 0;
     KEL.typ.int __RecordCount := 0;
   END;
-  SHARED __ST175282_Layout __ND1630058__Project(B_Person_Inquiry_7(__in,__cfg).__ST176588_Layout __PP1629855) := TRANSFORM
-    __EE1630056 := __PP1629855.Gather_Inquiries_;
-    __ST254525_Layout __ND1630020__Project(B_Person_Inquiry_7(__in,__cfg).__ST234540_Layout __PP1629880) := TRANSFORM
-      __CC39813 := ['BANKING','CARDS','CREDIT DECISIONING','CREDIT MONITORING','CREDIT UNION','FINANCE COMPANY','FS SERVICES PROVIDER','INVESTMENTS/SECURITIES','COMMERCIAL LENDING'];
-      SELF.Is_Banking_ := KEL.Routines.ToUpperCase(TRIM(__PP1629880.Industry_)) IN __CC39813;
-      __CC39816 := ['COMMUNICATIONS'];
-      SELF.Is_Communications_ := KEL.Routines.ToUpperCase(TRIM(__PP1629880.Industry_)) IN __CC39816;
-      SELF.Valid_Inquiries_ := __AND(__AND(__AND(__AND(__PP1629880.Is_Non_Fcra_Ok_,__CN(NOT (__PP1629880.Is_Batch_Monitoring_Method_))),__CN(__PP1629880.Exclude_Function_Description_)),__CN(NOT (__PP1629880.Is_Collection_))),__CN(NOT (__PP1629880.Is_High_Risk_)));
-      SELF := __PP1629880;
+  SHARED __ST176315_Layout __ND1629115__Project(B_Person_Inquiry_7(__in,__cfg).__ST177621_Layout __PP1628912) := TRANSFORM
+    __EE1629113 := __PP1628912.Gather_Inquiries_;
+    __ST255764_Layout __ND1629077__Project(B_Person_Inquiry_7(__in,__cfg).__ST235701_Layout __PP1628937) := TRANSFORM
+      __CC40242 := ['BANKING','CARDS','CREDIT DECISIONING','CREDIT MONITORING','CREDIT UNION','FINANCE COMPANY','FS SERVICES PROVIDER','INVESTMENTS/SECURITIES','COMMERCIAL LENDING'];
+      SELF.Is_Banking_ := KEL.Routines.ToUpperCase(TRIM(__PP1628937.Industry_)) IN __CC40242;
+      __CC40245 := ['COMMUNICATIONS'];
+      SELF.Is_Communications_ := KEL.Routines.ToUpperCase(TRIM(__PP1628937.Industry_)) IN __CC40245;
+      SELF.Valid_Inquiries_ := __AND(__AND(__AND(__AND(__PP1628937.Is_Non_Fcra_Ok_,__CN(NOT (__PP1628937.Is_Batch_Monitoring_Method_))),__CN(__PP1628937.Exclude_Function_Description_)),__CN(NOT (__PP1628937.Is_Collection_))),__CN(NOT (__PP1628937.Is_High_Risk_)));
+      SELF := __PP1628937;
     END;
-    SELF.Gather_Inquiries_ := __PROJECT(__EE1630056,__ND1630020__Project(LEFT));
-    SELF := __PP1629855;
+    SELF.Gather_Inquiries_ := __PROJECT(__EE1629113,__ND1629077__Project(LEFT));
+    SELF := __PP1628912;
   END;
-  EXPORT __ENH_Person_Inquiry_6 := PROJECT(__EE1630072,__ND1630058__Project(LEFT));
+  EXPORT __ENH_Person_Inquiry_6 := PROJECT(__EE1629129,__ND1629115__Project(LEFT));
 END;

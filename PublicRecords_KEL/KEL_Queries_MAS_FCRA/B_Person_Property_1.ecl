@@ -4,8 +4,8 @@ IMPORT B_Person_Property_2,B_Property_3,CFG_Compile,E_Person,E_Person_Property,E
 IMPORT * FROM KEL16.Null;
 EXPORT B_Person_Property_1(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG_Compile __cfg = CFG_Compile) := MODULE
   SHARED VIRTUAL TYPEOF(B_Person_Property_2(__in,__cfg).__ENH_Person_Property_2) __ENH_Person_Property_2 := B_Person_Property_2(__in,__cfg).__ENH_Person_Property_2;
-  SHARED __EE2100219 := __ENH_Person_Property_2;
-  EXPORT __ST153652_Layout := RECORD
+  SHARED __EE2093670 := __ENH_Person_Property_2;
+  EXPORT __ST154697_Layout := RECORD
     KEL.typ.ntyp(E_Person().Typ) Subject_;
     KEL.typ.ntyp(E_Property().Typ) Prop_;
     KEL.typ.nstr Primary_Range_;
@@ -18,7 +18,7 @@ EXPORT B_Person_Property_1(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault,
     KEL.typ.ndataset(E_Person_Property(__in,__cfg).Address_Components_Layout) Address_Components_;
     KEL.typ.ndataset(E_Person_Property(__in,__cfg).Reported_Dates_Layout) Reported_Dates_;
     KEL.typ.ndataset(E_Person_Property(__in,__cfg).Data_Sources_Layout) Data_Sources_;
-    B_Property_3(__in,__cfg).__ST160979_Layout Best_Most_Recent_Property_;
+    B_Property_3(__in,__cfg).__ST161996_Layout Best_Most_Recent_Property_;
     KEL.typ.ntyp(E_Property_Event().Typ) Best_Most_Recent_Property_Event_;
     KEL.typ.bool Is_Currently_Owned_ := FALSE;
     KEL.typ.bool Property_Is_Sold_ := FALSE;
@@ -29,5 +29,5 @@ EXPORT B_Person_Property_1(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault,
     KEL.typ.epoch Vault_Date_Last_Seen_ := 0;
     KEL.typ.int __RecordCount := 0;
   END;
-  EXPORT __ENH_Person_Property_1 := PROJECT(__EE2100219,__ST153652_Layout);
+  EXPORT __ENH_Person_Property_1 := PROJECT(__EE2093670,__ST154697_Layout);
 END;

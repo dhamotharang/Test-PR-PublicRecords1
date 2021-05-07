@@ -4,8 +4,8 @@ IMPORT B_Input_P_I_I_5,CFG_Compile,E_Address,E_Address_Slim,E_Address_Summary,E_
 IMPORT * FROM KEL16.Null;
 EXPORT B_Input_P_I_I_4(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG_Compile __cfg = CFG_Compile) := MODULE
   SHARED VIRTUAL TYPEOF(B_Input_P_I_I_5(__in,__cfg).__ENH_Input_P_I_I_5) __ENH_Input_P_I_I_5 := B_Input_P_I_I_5(__in,__cfg).__ENH_Input_P_I_I_5;
-  SHARED __EE1129126 := __ENH_Input_P_I_I_5;
-  EXPORT __ST172140_Layout := RECORD
+  SHARED __EE1127614 := __ENH_Input_P_I_I_5;
+  EXPORT __ST173403_Layout := RECORD
     KEL.typ.nuid UID;
     KEL.typ.ntyp(E_Person().Typ) Subject_;
     KEL.typ.nstr P___Inp_Acct_;
@@ -13,7 +13,11 @@ EXPORT B_Input_P_I_I_4(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG
     KEL.typ.nstr P___Inp_Name_First_;
     KEL.typ.nstr P___Inp_Name_Mid_;
     KEL.typ.nstr P___Inp_Name_Last_;
-    KEL.typ.ntyp(E_Surname().Typ) Last_Name_;
+    KEL.typ.nstr P___Inp_Cln_Surname1_;
+    KEL.typ.nstr P___Inp_Cln_Surname2_;
+    KEL.typ.ntyp(E_Surname().Typ) Last_Name1_;
+    KEL.typ.ntyp(E_Surname().Typ) Last_Name2_;
+    KEL.typ.nstr Address_Geo_Link_;
     KEL.typ.nstr P___Inp_Addr_Line1_;
     KEL.typ.nstr P___Inp_Addr_Line2_;
     KEL.typ.nstr P___Inp_Addr_City_;
@@ -147,12 +151,12 @@ EXPORT B_Input_P_I_I_4(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG
     KEL.typ.epoch Vault_Date_Last_Seen_ := 0;
     KEL.typ.int __RecordCount := 0;
   END;
-  SHARED __ST172140_Layout __ND1129715__Project(B_Input_P_I_I_5(__in,__cfg).__ST171812_Layout __PP1129127) := TRANSFORM
-    SELF.Name_Not_Populated_ := IF(FN_Compile(__cfg).FN_Name_Not_Populated_Check(__ECAST(KEL.typ.nstr,__PP1129127.P___Inp_Name_First_),__ECAST(KEL.typ.nstr,__PP1129127.P___Inp_Name_Mid_),__ECAST(KEL.typ.nstr,__PP1129127.P___Inp_Name_Last_)),TRUE,FALSE);
-    SELF.P___Inp_Addr_ := __OP2(IF(__T(__NT(__PP1129127.P___Inp_Addr_Line1_)),__ECAST(KEL.typ.nstr,__CN('')),__ECAST(KEL.typ.nstr,__OP2(__PP1129127.P___Inp_Addr_Line1_,+,__CN(' ')))),+,IF(__T(__NT(__PP1129127.P___Inp_Addr_Line2_)),__ECAST(KEL.typ.nstr,__CN('')),__ECAST(KEL.typ.nstr,__PP1129127.P___Inp_Addr_Line2_)));
-    __CC13660 := '-99999';
-    SELF.P___Inp_Val_Name_Bogus_Flag_ := MAP(__T(__AND(__AND(__OP2(__PP1129127.Input_First_Name_Value_,=,__CN(__CC13660)),__OP2(__PP1129127.Input_Middle_Name_Value_,=,__CN(__CC13660))),__OP2(__PP1129127.Input_Last_Name_Value_,=,__CN(__CC13660))))=>__CC13660,__T(__OP2(FN_Compile(__cfg).FN__fn_Bogus_Names(__ECAST(KEL.typ.nstr,__FN1(KEL.Routines.ToUpperCase,__PP1129127.P___Inp_Name_First_)),__ECAST(KEL.typ.nstr,__FN1(KEL.Routines.ToUpperCase,__PP1129127.Input_Middle_Name_Value_)),__ECAST(KEL.typ.nstr,__FN1(KEL.Routines.ToUpperCase,__PP1129127.Input_Last_Name_Value_))),=,__CAST(KEL.typ.str,__CN(1))))=>(KEL.typ.str)1,(KEL.typ.str)0);
-    SELF := __PP1129127;
+  SHARED __ST173403_Layout __ND1128219__Project(B_Input_P_I_I_5(__in,__cfg).__ST173067_Layout __PP1127615) := TRANSFORM
+    SELF.Name_Not_Populated_ := IF(FN_Compile(__cfg).FN_Name_Not_Populated_Check(__ECAST(KEL.typ.nstr,__PP1127615.P___Inp_Name_First_),__ECAST(KEL.typ.nstr,__PP1127615.P___Inp_Name_Mid_),__ECAST(KEL.typ.nstr,__PP1127615.P___Inp_Name_Last_)),TRUE,FALSE);
+    SELF.P___Inp_Addr_ := __OP2(IF(__T(__NT(__PP1127615.P___Inp_Addr_Line1_)),__ECAST(KEL.typ.nstr,__CN('')),__ECAST(KEL.typ.nstr,__OP2(__PP1127615.P___Inp_Addr_Line1_,+,__CN(' ')))),+,IF(__T(__NT(__PP1127615.P___Inp_Addr_Line2_)),__ECAST(KEL.typ.nstr,__CN('')),__ECAST(KEL.typ.nstr,__PP1127615.P___Inp_Addr_Line2_)));
+    __CC13531 := '-99999';
+    SELF.P___Inp_Val_Name_Bogus_Flag_ := MAP(__T(__AND(__AND(__OP2(__PP1127615.Input_First_Name_Value_,=,__CN(__CC13531)),__OP2(__PP1127615.Input_Middle_Name_Value_,=,__CN(__CC13531))),__OP2(__PP1127615.Input_Last_Name_Value_,=,__CN(__CC13531))))=>__CC13531,__T(__OP2(FN_Compile(__cfg).FN__fn_Bogus_Names(__ECAST(KEL.typ.nstr,__FN1(KEL.Routines.ToUpperCase,__PP1127615.P___Inp_Name_First_)),__ECAST(KEL.typ.nstr,__FN1(KEL.Routines.ToUpperCase,__PP1127615.Input_Middle_Name_Value_)),__ECAST(KEL.typ.nstr,__FN1(KEL.Routines.ToUpperCase,__PP1127615.Input_Last_Name_Value_))),=,__CAST(KEL.typ.str,__CN(1))))=>(KEL.typ.str)1,(KEL.typ.str)0);
+    SELF := __PP1127615;
   END;
-  EXPORT __ENH_Input_P_I_I_4 := PROJECT(__EE1129126,__ND1129715__Project(LEFT));
+  EXPORT __ENH_Input_P_I_I_4 := PROJECT(__EE1127614,__ND1128219__Project(LEFT));
 END;

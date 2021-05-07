@@ -4,15 +4,15 @@ IMPORT B_Name_Summary_1,B_Name_Summary_3,B_Name_Summary_4,CFG_Compile,E_Address,
 IMPORT * FROM KEL16.Null;
 EXPORT B_Name_Summary(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG_Compile __cfg = CFG_Compile) := MODULE
   SHARED VIRTUAL TYPEOF(B_Name_Summary_1(__in,__cfg).__ENH_Name_Summary_1) __ENH_Name_Summary_1 := B_Name_Summary_1(__in,__cfg).__ENH_Name_Summary_1;
-  SHARED __EE3205213 := __ENH_Name_Summary_1;
-  EXPORT __ST141449_Layout := RECORD
+  SHARED __EE3200085 := __ENH_Name_Summary_1;
+  EXPORT __ST142478_Layout := RECORD
     KEL.typ.nuid UID;
     KEL.typ.nstr First_Name_;
     KEL.typ.nstr Last_Name_;
     KEL.typ.nkdate Date_Of_Birth_;
     KEL.typ.nstr Date_Of_Birth_Padded_;
     KEL.typ.nint Record_Count_;
-    KEL.typ.ndataset(B_Name_Summary_1(__in,__cfg).__ST151788_Layout) Data_Sources_;
+    KEL.typ.ndataset(B_Name_Summary_1(__in,__cfg).__ST152825_Layout) Data_Sources_;
     KEL.typ.nstr P_I___Src_W_Inp_F_L_D_Emrg_Dt_List_Ev_;
     KEL.typ.nstr P_I___Src_W_Inp_F_L_D_Last_Dt_List_Ev_;
     KEL.typ.nstr P_I___Src_W_Inp_F_L_D_List_Ev_;
@@ -23,14 +23,14 @@ EXPORT B_Name_Summary(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG_
     KEL.typ.epoch Vault_Date_Last_Seen_ := 0;
     KEL.typ.int __RecordCount := 0;
   END;
-  SHARED __ST141449_Layout __ND3205144__Project(B_Name_Summary_1(__in,__cfg).__ST151780_Layout __PP3204966) := TRANSFORM
-    __CC14240 := '-99999';
-    __CC14242 := '-99998';
-    __EE3205137 := __PP3204966.Name_Summary_Source_List_Sorted_;
-    SELF.P_I___Src_W_Inp_F_L_D_Emrg_Dt_List_Ev_ := MAP(__T(__OR(__OR(__OP2(__PP3204966.P___Inp_Cln_Name_First_,IN,__CN([__CC14240,__CC14242])),__OP2(__PP3204966.P___Inp_Cln_Name_Last_,IN,__CN([__CC14240,__CC14242]))),__OP2(__PP3204966.P___Inp_Cln_D_O_B_,IN,__CN([__CC14240,__CC14242]))))=>__ECAST(KEL.typ.nstr,__CN(__CC14240)),__T(__OP2(__PP3204966.P_I___Src_W_Inp_F_L_D_List_Ev_,=,__CN(__CC14242)))=>__ECAST(KEL.typ.nstr,__CN(__CC14242)),__ECAST(KEL.typ.nstr,KEL.Aggregates.ConcatNN(__EE3205137,LEFT.Source_Date_First_Seen_,__CN('|'))));
-    __EE3205187 := __PP3204966.Name_Summary_Source_List_Sorted_;
-    SELF.P_I___Src_W_Inp_F_L_D_Last_Dt_List_Ev_ := MAP(__T(__OR(__OR(__OP2(__PP3204966.P___Inp_Cln_Name_First_,IN,__CN([__CC14240,__CC14242])),__OP2(__PP3204966.P___Inp_Cln_Name_Last_,IN,__CN([__CC14240,__CC14242]))),__OP2(__PP3204966.P___Inp_Cln_D_O_B_,IN,__CN([__CC14240,__CC14242]))))=>__ECAST(KEL.typ.nstr,__CN(__CC14240)),__T(__OP2(__PP3204966.P_I___Src_W_Inp_F_L_D_List_Ev_,=,__CN(__CC14242)))=>__ECAST(KEL.typ.nstr,__CN(__CC14242)),__ECAST(KEL.typ.nstr,KEL.Aggregates.ConcatNN(__EE3205187,LEFT.Source_Date_Last_Seen_,__CN('|'))));
-    SELF := __PP3204966;
+  SHARED __ST142478_Layout __ND3200016__Project(B_Name_Summary_1(__in,__cfg).__ST152817_Layout __PP3199838) := TRANSFORM
+    __CC14111 := '-99999';
+    __CC14113 := '-99998';
+    __EE3200009 := __PP3199838.Name_Summary_Source_List_Sorted_;
+    SELF.P_I___Src_W_Inp_F_L_D_Emrg_Dt_List_Ev_ := MAP(__T(__OR(__OR(__OP2(__PP3199838.P___Inp_Cln_Name_First_,IN,__CN([__CC14111,__CC14113])),__OP2(__PP3199838.P___Inp_Cln_Name_Last_,IN,__CN([__CC14111,__CC14113]))),__OP2(__PP3199838.P___Inp_Cln_D_O_B_,IN,__CN([__CC14111,__CC14113]))))=>__ECAST(KEL.typ.nstr,__CN(__CC14111)),__T(__OP2(__PP3199838.P_I___Src_W_Inp_F_L_D_List_Ev_,=,__CN(__CC14113)))=>__ECAST(KEL.typ.nstr,__CN(__CC14113)),__ECAST(KEL.typ.nstr,KEL.Aggregates.ConcatNN(__EE3200009,LEFT.Source_Date_First_Seen_,__CN('|'))));
+    __EE3200059 := __PP3199838.Name_Summary_Source_List_Sorted_;
+    SELF.P_I___Src_W_Inp_F_L_D_Last_Dt_List_Ev_ := MAP(__T(__OR(__OR(__OP2(__PP3199838.P___Inp_Cln_Name_First_,IN,__CN([__CC14111,__CC14113])),__OP2(__PP3199838.P___Inp_Cln_Name_Last_,IN,__CN([__CC14111,__CC14113]))),__OP2(__PP3199838.P___Inp_Cln_D_O_B_,IN,__CN([__CC14111,__CC14113]))))=>__ECAST(KEL.typ.nstr,__CN(__CC14111)),__T(__OP2(__PP3199838.P_I___Src_W_Inp_F_L_D_List_Ev_,=,__CN(__CC14113)))=>__ECAST(KEL.typ.nstr,__CN(__CC14113)),__ECAST(KEL.typ.nstr,KEL.Aggregates.ConcatNN(__EE3200059,LEFT.Source_Date_Last_Seen_,__CN('|'))));
+    SELF := __PP3199838;
   END;
-  EXPORT __ENH_Name_Summary := PROJECT(__EE3205213,__ND3205144__Project(LEFT));
+  EXPORT __ENH_Name_Summary := PROJECT(__EE3200085,__ND3200016__Project(LEFT));
 END;
