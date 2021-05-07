@@ -1,4 +1,4 @@
-﻿import BusinessInstantID20_Services,ut,iesp,LNSmallBusiness,Business_Risk_BIP,std;
+﻿import BusinessInstantID20_Services, Business_Risk_BIP, iesp, LNSmallBusiness, STD;
 
 // The following module obtains Attributes
 EXPORT mod_GetAttributes(DATASET(Business_Risk_BIP.Layouts.Shell) BusShell, 
@@ -31,7 +31,7 @@ EXPORT mod_GetAttributes(DATASET(Business_Risk_BIP.Layouts.Shell) BusShell,
     Dataset([Version101])(std.Str.ToUpperCase(Options.AttributesRequested[1].AttributeGroup)='SMALLBUSINESSATTRV101');
     
     // Create Version 2 Name/Value Pair Attributes
-    EXPORT NameValuePairsVersion2 := NORMALIZE(ds_Attributes, 316, LNSmallBusiness.SmallBusiness_BIP_Transforms.intoVersion2(LEFT, COUNTER));
+    EXPORT NameValuePairsVersion2 := NORMALIZE(ds_Attributes, 299, LNSmallBusiness.SmallBusiness_BIP_Transforms.intoVersion2(LEFT, COUNTER));
   
     EXPORT iesp.smallbusinessanalytics.t_SBAAttributesGroup Version2 := TRANSFORM
       SELF.Name := LNSmallBusiness.Constants.SMALL_BIZ_ATTR_V2_NAME;

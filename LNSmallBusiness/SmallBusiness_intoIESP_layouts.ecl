@@ -32,7 +32,7 @@ EXPORT SmallBusiness_intoIESP_layouts :=
           END;
 
         // Create Version 2 Name/Value Pair Attributes
-        NameValuePairsVersion2 := NORMALIZE(SBA_Results, 316, LNSmallBusiness.SmallBusiness_BIP_Transforms.intoVersion2(LEFT, COUNTER));
+        NameValuePairsVersion2 := NORMALIZE(SBA_Results, 299, LNSmallBusiness.SmallBusiness_BIP_Transforms.intoVersion2(LEFT, COUNTER));
         
         iesp.smallbusinessanalytics.t_SBAAttributesGroup xfm_SmallBiz_Version2(LNSmallBusiness.BIP_Layouts.IntermediateLayout le) := TRANSFORM
           SELF.Name := LNSmallBusiness.Constants.SMALL_BIZ_ATTR_V2_NAME;
