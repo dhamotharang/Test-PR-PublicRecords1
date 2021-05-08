@@ -117,6 +117,7 @@
 <p>company_url</p>
 <p>fname_preferred:lname:zip</p>
 <p>fname_preferred:lname:st</p>
+<p>fname_preferred:lname</p>
 <p>contact_ssn</p>
 <p>contact_email</p>
 <p>company_sic_code1:zip</p>

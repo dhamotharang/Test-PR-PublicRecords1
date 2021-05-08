@@ -28,7 +28,7 @@ function
   Buildrefs_l_phone              := tools.macf_writeindex('Key_BizHead_L_PHONE.Key         ,knames.refs_l_phone             .new'      );
   Buildrefs_l_sic                := tools.macf_writeindex('Key_BizHead_L_SIC.Key           ,knames.refs_l_sic               .new'      );
   Buildrefs_l_fein               := tools.macf_writeindex('Key_BizHead_L_FEIN.Key          ,knames.refs_l_fein              .new'      );
-  //Buildrefs_l_contact            := tools.macf_writeindex('Key_BizHead_L_CONTACT.Key       ,knames.refs_l_contact           .new'      );
+  Buildrefs_l_contact            := tools.macf_writeindex('Key_BizHead_L_CONTACT.Key       ,knames.refs_l_contact           .new'      );
   Buildrefs_l_contact_zip        := tools.macf_writeindex('Key_BizHead_L_CONTACT_ZIP.Key   ,knames.refs_l_contact_zip       .new'      );
   Buildrefs_l_contact_st         := tools.macf_writeindex('Key_BizHead_L_CONTACT_ST.Key    ,knames.refs_l_contact_st        .new'      );
   Buildrefs_l_url                := tools.macf_writeindex('Key_BizHead_L_URL.Key           ,knames.refs_l_url               .new'      );
@@ -64,7 +64,8 @@ function
           ,Buildrefs_l_address3         
           ,Buildrefs_l_phone  
           ,Buildrefs_l_sic
-          ,Buildrefs_l_fein             
+          ,Buildrefs_l_fein   
+          ,Buildrefs_l_contact
           ,Buildrefs_l_contact_zip 
           ,Buildrefs_l_contact_st          
           ,Buildrefs_l_url              
