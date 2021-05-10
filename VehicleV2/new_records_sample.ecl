@@ -1,3 +1,5 @@
+IMPORT STD;
+
 EXPORT new_records_sample(STRING process_date) := FUNCTION
 	dVehicleMain := DISTRIBUTE(
 		vehiclev2.file_VehicleV2_Main(source_code = 'AE'),
@@ -71,7 +73,7 @@ EXPORT new_records_sample(STRING process_date) := FUNCTION
 
 	RETURN SEQUENTIAL(
 		OUTPUT(zVehicleSamples,all,named('sample_vehicle_records')),
-		fileservices.sendemail(
+		STD.System.Email.SendEmail(
 			'QualityAssurance@seisint.com;kgummadi@seisint.com',
 			'Vehicle V2 sample records for build version ' + process_date,
 			'New Vehicle V2 QA sample records: http://prod_esp:8010/WsWorkunits/WUInfo?Wuid=' + WORKUNIT
