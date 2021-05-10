@@ -1,12 +1,12 @@
-﻿import versioncontrol, _control, ut, tools, UPI_DataBuild;
+﻿import versioncontrol, _control, ut, tools, MCI;
 
 EXPORT Cleanup_PipeFiles (string gcid, string pBatch_JobID) := FUNCTION
 
 		cleanupPipeFiles				:= sequential(
-																					FileServices.DeleteLogicalFile('~ushc::crk::' + trim(gcid, all) + '_' + trim(pBatch_jobID, all) + '_metrics'),
-																					FileServices.DeleteLogicalFile('~ushc::crk::' + trim(gcid, all) + '_' + trim(pBatch_jobID, all) + '_out_tobatch'),
-																					FileServices.DeleteLogicalFile('~ushc::crk::' + trim(gcid, all) + '_' + trim(pBatch_jobID, all) + '_linkhistory'),
-																					FileServices.DeleteLogicalFile('~ushc::crk::' + trim(gcid, all) + '_' + trim(pBatch_jobID, all) + '_aggregate'));
+																					FileServices.DeleteLogicalFile('~usgv::mci::' + trim(gcid, all) + '_' + trim(pBatch_jobID, all) + '_metrics'),
+																					FileServices.DeleteLogicalFile('~usgv::mci::' + trim(gcid, all) + '_' + trim(pBatch_jobID, all) + '_out_tobatch'),
+																					FileServices.DeleteLogicalFile('~usgv::mci::' + trim(gcid, all) + '_' + trim(pBatch_jobID, all) + '_linkhistory'),
+																					FileServices.DeleteLogicalFile('~usgv::mci::' + trim(gcid, all) + '_' + trim(pBatch_jobID, all) + '_aggregate'));
 		
 		RETURN cleanupPipeFiles;
 END;

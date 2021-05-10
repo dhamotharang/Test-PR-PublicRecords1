@@ -1,7 +1,7 @@
 ﻿import Address, Ut, lib_stringlib, _Control, business_header,_Validate, mdr,
 Header, Header_Slimsort, didville, DID_Add,Business_Header_SS, NID, AID, watchdog,
 VersionControl,lib_fileservices,Health_Provider_Services,Health_Facility_Services,
-BIPV2_Company_Names, HealthCareFacility, Std, UPI_DataBuild, HealthcareNoMatchHeader_Ingest;
+BIPV2_Company_Names, HealthCareFacility, Std, MCI, HealthcareNoMatchHeader_Ingest;
 
 EXPORT Update_Base_V2 (
 				string pVersion
@@ -18,8 +18,8 @@ EXPORT Update_Base_V2 (
 // 3 - Append LexID ONLY to records with LexID match and DO NOT append Customer Record Key for any records
 // 4 - Append ONLY Customer Record Key for all records - NO LEXID appends for any records
 										
-	EXPORT pNewFile 	:= UPI_DataBuild.Files_V2(pVersion, pUseProd, gcid, pHistMode).from_batch;
-	EXPORT pHistFile	:= UPI_DataBuild.Files_V2(pVersion, pUseProd, gcid, pHistMode).member_base.built;
+	EXPORT pNewFile 	:= MCI.Files_V2(pVersion, pUseProd, gcid, pHistMode).from_batch;
+	EXPORT pHistFile	:= MCI.Files_V2(pVersion, pUseProd, gcid, pHistMode).member_base.built;
 
 	EXPORT Clean_addr (pStdFile)	:= FUNCTIONMACRO
 	
@@ -414,7 +414,7 @@ EXPORT Update_Base_V2 (
 	
 	EXPORT mark_old (pBaseFile) := FUNCTIONMACRO
 	
-		old_base	:= project(pBaseFile, TRANSFORM(UPI_DataBuild.Layouts_V2.Input_processing, 
+		old_base	:= project(pBaseFile, TRANSFORM(MCI.Layouts_V2.Input_processing, 
 				SELF.current_input		:= 'N',
 				SELF.batch_seq_number := '',
 				SELF.batch_jobid			:= '',
@@ -425,7 +425,7 @@ EXPORT Update_Base_V2 (
 	
 	EXPORT Pre_Process_Input := FUNCTION
 					
-				stdInput0		:= UPI_DataBuild.Standardize_V2(pVersion, pUseProd, gcid, pLexidThreshold, pHistMode, gcid_name, pBatch_jobID, pAppendOption).common_stamping;
+				stdInput0		:= MCI.Standardize_V2(pVersion, pUseProd, gcid, pLexidThreshold, pHistMode, gcid_name, pBatch_jobID, pAppendOption).common_stamping;
 				
 				stdInput		:= Get_Preferred_Name(stdInput0); 
 				
@@ -440,11 +440,11 @@ EXPORT Update_Base_V2 (
 				pre_processed_input		:=  Append_LexID(pVersion, pUseProd, gcid, use_threshold, pHistMode, pBatch_jobID, pre_process_input).LexID_Append;
 
 								
-				previous_base		:= IF((NOTHOR(FileServices.GetSuperFileSubCount(UPI_DataBuild.Filenames_V2(pVersion, pUseProd, gcid, pHistMode).member_lBaseTemplate_built)) = 0)
+				previous_base		:= IF((NOTHOR(FileServices.GetSuperFileSubCount(MCI.Filenames_V2(pVersion, pUseProd, gcid, pHistMode).member_lBaseTemplate_built)) = 0)
 														OR pHistMode = 'N'
-														,dataset([],UPI_DataBuild.Layouts_V2.input_processing)
-														,mark_old(project(UPI_DataBuild.Files_V2(pVersion,pUseProd,gcid,pHistMode).member_base.qa, 
-																				transform(UPI_DataBuild.Layouts_V2.Input_processing, self := left, self := []))));
+														,dataset([],MCI.Layouts_V2.input_processing)
+														,mark_old(project(MCI.Files_V2(pVersion,pUseProd,gcid,pHistMode).member_base.qa, 
+																				transform(MCI.Layouts_V2.Input_processing, self := left, self := []))));
 												 						
 				stdInput			:= dist_and_sort_them_input(pre_processed_input);
 				
@@ -453,7 +453,7 @@ EXPORT Update_Base_V2 (
 				// Right now we don't care about historical only records, that will be handled after CRK results
 				// First we want to compare the new input to the old base to re-use source_rid for any previously
 				// processed individuals (where we can clearly identify as the same individual)
-				UPI_DataBuild.Layouts_V2.input_processing reuse_existing_source_rids(UPI_DataBuild.Layouts_V2.input_processing new_update, UPI_DataBuild.Layouts_v2.input_processing last_built_base) := TRANSFORM
+				MCI.Layouts_V2.input_processing reuse_existing_source_rids(MCI.Layouts_V2.input_processing new_update, MCI.Layouts_v2.input_processing last_built_base) := TRANSFORM
 					SELF.source_rid								:= last_built_base.source_rid;
 					SELF.prev_crk									:= last_built_base.prev_crk;
 					SELF.prev_lexid								:= last_built_base.prev_lexid;
@@ -476,7 +476,7 @@ EXPORT Update_Base_V2 (
 				with_existing_source_rids	:= assign_existing_source_rids(source_rid > 0);				
 				// Second join - this one is to identify the truly new records and assign new source_rids
 		
-				UPI_DataBuild.Layouts_V2.input_processing find_new_recs(UPI_DataBuild.Layouts_V2.input_processing new_update, UPI_DataBuild.Layouts_V2.input_processing last_built_base) := TRANSFORM
+				MCI.Layouts_V2.input_processing find_new_recs(MCI.Layouts_V2.input_processing new_update, MCI.Layouts_V2.input_processing last_built_base) := TRANSFORM
 					SELF.current_input						:= 'Y';
 					SELF.batch_jobid							:= new_update.batch_jobid;
 					SELF.batch_seq_number					:= new_update.batch_seq_number;
@@ -516,13 +516,13 @@ EXPORT Update_Base_V2 (
 				
 				crk_results				:= HealthcareNoMatchHeader_Ingest.Files(gcid).CRK;
 								
-				linked_input_file	:= UPI_DataBuild.Files_V2(pVersion,pUseProd,gcid,pHistMode).processed_input.new;
+				linked_input_file	:= MCI.Files_V2(pVersion,pUseProd,gcid,pHistMode).processed_input.new;
 				
-				previously_seen		:= IF(NOTHOR(FileServices.GetSuperFileSubCount(UPI_DataBuild.Filenames_V2(pVersion, pUseProd, gcid, pHistMode).member_lBaseTemplate_built)) = 0
+				previously_seen		:= IF(NOTHOR(FileServices.GetSuperFileSubCount(MCI.Filenames_V2(pVersion, pUseProd, gcid, pHistMode).member_lBaseTemplate_built)) = 0
 														OR pHistMode = 'N'
-														,dataset([],UPI_DataBuild.Layouts_V2.input_processing)
-														,mark_old(project(UPI_DataBuild.Files_V2(pVersion,pUseProd,gcid,pHistMode).member_base.qa, 
-																				transform(UPI_DataBuild.Layouts_V2.Input_processing, self := left, self := []))));
+														,dataset([],MCI.Layouts_V2.input_processing)
+														,mark_old(project(MCI.Files_V2(pVersion,pUseProd,gcid,pHistMode).member_base.qa, 
+																				transform(MCI.Layouts_V2.Input_processing, self := left, self := []))));
 
 								
 				linked_input_wCRK		:= linked_input_file(prev_crk <> '');
@@ -531,7 +531,7 @@ EXPORT Update_Base_V2 (
 				update_current_crk		:= join(sort(distribute(crk_results,hash(old_crk)),old_crk,local),
 																			sort(distribute(linked_input_wCRK,hash(prev_crk)),prev_crk,local)
 																			,LEFT.old_crk = RIGHT.prev_crk
-																			,TRANSFORM(UPI_DataBuild.Layouts_V2.Input_processing
+																			,TRANSFORM(MCI.Layouts_V2.Input_processing
 																					,SELF.input_crk			:= RIGHT.input_crk
 																					,SELF.input_lexid		:= RIGHT.input_lexid
 																					,SELF.prev_crk			:= LEFT.old_crk
@@ -553,7 +553,7 @@ EXPORT Update_Base_V2 (
 				update_new_CRK		:= join(sort(distribute(crk_results,hash(source_rid)),source_rid,local),	
 																	sort(distribute(linked_input_file,hash(source_rid)),source_rid,local)
 																	,LEFT.source_rid = RIGHT.source_rid
-																	,TRANSFORM(UPI_DataBuild.Layouts_V2.input_processing
+																	,TRANSFORM(MCI.Layouts_V2.input_processing
 																			,SELF.input_crk			:= RIGHT.input_crk
 																			,SELF.input_lexid		:= RIGHT.input_lexid
 																			,SELF.prev_crk			:= LEFT.old_crk
@@ -595,13 +595,13 @@ EXPORT Update_Base_V2 (
 				
 				crk_results				:= HealthcareNoMatchHeader_Ingest.Files(gcid).CRK;
 								
-				linked_input_file	:= UPI_DataBuild.Files_V2(pVersion,pUseProd,gcid,pHistMode).processed_input.new;
+				linked_input_file	:= MCI.Files_V2(pVersion,pUseProd,gcid,pHistMode).processed_input.new;
 				
-				previous_base		:= IF(NOTHOR(FileServices.GetSuperFileSubCount(UPI_DataBuild.Filenames_V2(pVersion, pUseProd, gcid, pHistMode).member_lBaseTemplate_built)) = 0
+				previous_base		:= IF(NOTHOR(FileServices.GetSuperFileSubCount(MCI.Filenames_V2(pVersion, pUseProd, gcid, pHistMode).member_lBaseTemplate_built)) = 0
 														OR pHistMode = 'N'
-														,dataset([],UPI_DataBuild.Layouts_V2.input_processing)
-														,mark_old(project(UPI_DataBuild.Files_V2(pVersion,pUseProd,gcid,pHistMode).member_base.qa, 
-																				transform(UPI_DataBuild.Layouts_V2.Input_processing, self := left, self := []))));
+														,dataset([],MCI.Layouts_V2.input_processing)
+														,mark_old(project(MCI.Files_V2(pVersion,pUseProd,gcid,pHistMode).member_base.qa, 
+																				transform(MCI.Layouts_V2.Input_processing, self := left, self := []))));
 																				
 				prev_and_new	:= previous_base + linked_input_file;
 																								
@@ -631,14 +631,14 @@ EXPORT Update_Base_V2 (
 		   	
    				this_batch_only	:= dedup(Add_CRK_Results_input, record);
    					
-   				prepReturn_file		:= UPI_DataBuild.ReturnToBatch(pVersion, pUseProd, gcid, this_batch_only, pAppendOption).batch_processing;
+   				prepReturn_file		:= MCI.ReturnToBatch(pVersion, pUseProd, gcid, this_batch_only, pAppendOption).batch_processing;
 						
 					RETURN sort(prepReturn_file, batch_seq_number);
 		END;
 
  		EXPORT Return_ToBatch := FUNCTION
    					
-					slimReturn	:= project(prepReturn, UPI_DataBuild.layouts_V2.to_batch);
+					slimReturn	:= project(prepReturn, MCI.layouts_V2.to_batch);
 					
 					sortReturn	:= sort(slimReturn, (integer)batch_seq_number);
 						
@@ -649,7 +649,7 @@ EXPORT Update_Base_V2 (
    	
    				this_batch_only	:= prepReturn;
    				
-   				prepMetrics		:= UPI_DataBuild.Metrics_Report(pVersion, pUseProd, gcid, this_batch_only, pHistMode).get_all;
+   				prepMetrics		:= MCI.Metrics_Report(pVersion, pUseProd, gcid, this_batch_only, pHistMode).get_all;
    				
    			RETURN prepMetrics;
    	END;
@@ -658,14 +658,14 @@ EXPORT Update_Base_V2 (
    	
    				this_batch_only	:= prepReturn;
    				
-   				slim_down				:= project(this_batch_only, UPI_DataBuild.Layouts_V2.slim_history);
+   				slim_down				:= project(this_batch_only, MCI.Layouts_V2.slim_history);
    				
    			RETURN slim_down;
    	END;
 	
   	EXPORT All_Data_Base := FUNCTION
    	
-   			new_base			:= project(Add_CRK_results_base, UPI_DataBuild.Layouts_V2.base); 
+   			new_base			:= project(Add_CRK_results_base, MCI.Layouts_V2.base); 
   			
    			RETURN sort(new_base, source_rid);
    	END;
