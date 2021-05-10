@@ -505,6 +505,12 @@ module
 				// -- JIRA - DF-28316 Remove More Accutrend (Src Code BR) Contact Records for LexID 562516533
 				or  (mdr.sourceTools.sourceIsBusiness_Registration(pInput.source) and trim(pInput.lname) = 'DAVIS' and trim(pInput.fname) = 'ROBERT' and
 						 trim(pInput.company_source_group) in ['200906210117RED BAR DYNAMICS LLC', '02-2124SALES MANAGEMENT ARCHITECTS', '03176344VIRTUAL DRIVER INTERACTIVE', '2007A0000143VITRUAL DRIVER INTERAC'])
+				// -- JIRA - DF-28868 Remove Accutrend (Src Code BR) Contact Records for LexID 948194525
+				or  (trim(pInput.company_source_group) in ['24-L10486314', '10486314ACADENY OF LOMBAT MORTIAL'] and regexfind('ACADENY OF LOMBAT',pInput.company_name,nocase))
+				// -- JIRA - DF-29192 Remove More Accutrend (Src Code BR) Contact Records for LexID 076948738251
+				or  (mdr.sourceTools.SourceIsBusiness_Registration(pInput.source) and trim(pInput.company_source_group) in ['2019221127MPV LAW'] and trim(pInput.fname) = 'MARTIN' and regexfind('MPV',pInput.company_name,nocase))
+				// -- JIRA - DF-28960 Remove Accutrend Records for LexID 2048347873- Shur
+				or  (mdr.sourceTools.SourceIsBusiness_Registration(pInput.source) and trim(pInput.company_source_group) in ['0400027886ADORABLE LABRADORS CORPO','2005159705AWESOME VENDING'] and trim(pInput.fname) = 'LINDSAY' and regexfind('ADORABLE|AWESOME',pInput.company_name,nocase))
 			;
 
 			boolean lFullFilter 		:= if(pFilterOut
@@ -1133,6 +1139,12 @@ module
 						 trim(pInput.company_source_group) in ['200906210117RED BAR DYNAMICS LLC', '02-2124SALES MANAGEMENT ARCHITECTS', '03176344VIRTUAL DRIVER INTERACTIVE', '2007A0000143VITRUAL DRIVER INTERAC'])
 				// -- JIRA - DF-28595 Dispute - RACHELLE PIERCE, 1976789508 association to ASSISTIVE TECHNOLOGY IN MOTION
 				or  (mdr.sourceTools.sourceIsBusiness_Registration(pInput.source) and trim(pInput.lname) = 'PIERCE' and trim(pInput.fname) = 'RACHELLE' and trim(pInput.company_source_group) in ['X00631178ASSISTIVE TECHNOLOGY IN M'])
+				// -- JIRA - DF-28868 Remove Accutrend (Src Code BR) Contact Records for LexID 948194525
+				or  (trim(pInput.company_source_group) in ['24-L10486314', '10486314ACADENY OF LOMBAT MORTIAL'] and regexfind('ACADENY OF LOMBAT',pInput.company_name,nocase))
+				// -- JIRA - DF-29192 Remove More Accutrend (Src Code BR) Contact Records for LexID 076948738251
+				or  (mdr.sourceTools.SourceIsBusiness_Registration(pInput.source) and trim(pInput.company_source_group) in ['2019221127MPV LAW'] and trim(pInput.fname) = 'MARTIN' and regexfind('MPV',pInput.company_name,nocase))
+				// -- JIRA - DF-28960 Remove Accutrend Records for LexID 2048347873- Shur
+				or  (mdr.sourceTools.SourceIsBusiness_Registration(pInput.source) and trim(pInput.company_source_group) in ['0400027886ADORABLE LABRADORS CORPO','2005159705AWESOME VENDING'] and trim(pInput.fname) = 'LINDSAY' and regexfind('ADORABLE|AWESOME',pInput.company_name,nocase))
 			;
 
 			boolean lFullFilter 		:= if(pFilterOut
@@ -1262,6 +1274,9 @@ module
 				
 				// -- JIRA - DF-28704 - PAW Overlinking - LexID 1181125067 - J Lawrence Huber Jr
 				filterbugDF28704 := l.bdid = 45964591 and l.did = 1181125067;
+				
+				// -- JIRA - DF-28739 - PAW/Business Contacts - overlinking
+				filterbugDF28739 := trimids(l.vendor_id) = '12-638553' and l.fname = 'BALBINO' and l.did = 2180363967;
 														
 				phone 				:= (unsigned6)ut.CleanPhone(header.fn_blank_bogus_phones((string)l.phone));  // Zero the phone if more than 10-digits
 				company_phone := (unsigned6)ut.CleanPhone(header.fn_blank_bogus_phones((string)l.company_phone));  // Zero the companyphone if more than 10-digits
@@ -1288,11 +1303,11 @@ module
 				self.DID									:= if(filterbug30402 or filterbug114192 or filterbugLNK563 or filterbugLNK1267 or
 																				filterbugDF22318 or filterbugDF23078 or filterbugLNK1501 or filterbugDF23926 or
 																				filterbugDF23188 or filterbugDF23549 or filterbugDF26722 or filterbugDF27867 or
-																				filterbugDF28296 or filterbugDF28462 or filterbugDF28704, 0, l.did);
+																				filterbugDF28296 or filterbugDF28462 or filterbugDF28704 or filterbugDF28739, 0, l.did);
 				self.ssn									:= if(filterbug30402 or filterbug114192 or filterbugLNK563 or filterbugLNK1267 or  
 																				filterbugDF22318 or filterbugDF23078 or filterbugLNK1501 or filterbugDF23926 or
 																				filterbugDF23188 or filterbugDF23549 or filterbugDF26722 or filterbugDF27867 or
-																				filterbugDF28296 or filterbugDF28462 or filterbugDF28704, 0, l.ssn);
+																				filterbugDF28296 or filterbugDF28462 or filterbugDF28704 or filterbugDF28739, 0, l.ssn);
 				//for bug 30494 & 30519.  20080424
 				self.dt_first_seen				:= (unsigned4)validatedate((string8)l.dt_first_seen						,if(length(trim((string8)l.dt_first_seen						)) = 8,0,1));
 				self.dt_last_seen					:= (unsigned4)validatedate((string8)l.dt_last_seen						,if(length(trim((string8)l.dt_last_seen							)) = 8,0,1));
@@ -1531,6 +1546,8 @@ module
 				filterbugDF28462 := l.bdid = 1059623428 and l.did = 559414197;
 				// -- JIRA - DF-28704 - PAW Overlinking - LexID 1181125067 - J Lawrence Huber Jr
 				filterbugDF28704 := l.bdid = 45964591 and l.did = 1181125067;
+				// -- JIRA - DF-28739 - PAW/Business Contacts - overlinking
+				filterbugDF28739 := trimids(l.vendor_id) = '12-638553' and l.fname = 'BALBINO' and l.did = 2180363967;
 				// --- Bug#35653 -  For the "Eq_employer" source first & last seen dates are set to zero/blank as the 
 				// dates coming in from the base file are harded coded.
 				ZeroEq_EmployerDate :=  (MDR.sourceTools.SourceIsEq_Employer(l.source));
@@ -1547,12 +1564,12 @@ module
 																				filterbugDF22318 or filterbugDF23078 or filterbugLNK1501 or
 																				filterbugDF23926 or filterbugDF23188 or filterbugDF23549 or 
 																				filterbugDF26722 or filterbugDF27867 or filterbugDF28296 or
-																				filterbugDF28462 or filterbugDF28704, 0, l.did)	;
+																				filterbugDF28462 or filterbugDF28704 or filterbugDF28739, 0, l.did)	;
 				self.ssn									:= if(filterbug30402 or filterbugLNK563 or filterbugLNK1267 or 
 																				filterbugDF22318 or filterbugDF23078 or filterbugLNK1501 or
 																				filterbugDF23926 or filterbugDF23188 or filterbugDF23549 or
 																				filterbugDF26722 or filterbugDF27867 or filterbugDF28296 or
-																				filterbugDF28462 or filterbugDF28704, 0, l.ssn)	;
+																				filterbugDF28462 or filterbugDF28704 or filterbugDF28739, 0, l.ssn)	;
 				self											:= l														;                              
 			end;
 			
