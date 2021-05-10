@@ -66,7 +66,7 @@ export Build_all(string    pVersion,string filedate) := function
 
     VersionControl.macBuildNewLogicalFile(OIG.Filenames(pversion).base.new,Base,Build_Base_File);
                         
-    dops_update           := Roxiekeybuild.updateversion('OIGKeys',pVersion,'saritha.myana@lexisnexis.com;Randy.Reyes@lexisnexisrisk.com;Manuel.Tarectecan@lexisnexisrisk.com;Abednego.Escobal@lexisnexisrisk.com',,'N'); 
+    dops_update           := Roxiekeybuild.updateversion('OIGKeys',pVersion,'saritha.myana@lexisnexis.com;harry.gist@lexisnexisrisk.com;Manuel.Tarectecan@lexisnexisrisk.com;Abednego.Escobal@lexisnexisrisk.com',,'N'); 
     
     orbit_update := Orbit3.proc_Orbit3_CreateBuild_AddItem('OIG',(string)pVersion,'N');
 	

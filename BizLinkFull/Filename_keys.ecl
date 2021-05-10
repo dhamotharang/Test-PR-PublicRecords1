@@ -26,6 +26,7 @@ EXPORT Filename_Keys := module
   EXPORT L_CNPNAME_FUZZY           := basename+'refs::l_cnpname_fuzzy';
   EXPORT L_CNPNAME_ST              := basename+'refs::l_cnpname_st';
   EXPORT L_CNPNAME_ZIP             := basename+'refs::l_cnpname_zip';
+  EXPORT L_CONTACT                 := basename+'refs::l_contact';
   EXPORT L_CONTACT_ZIP             := basename+'refs::l_contact_zip';
   EXPORT L_CONTACT_ST              := basename+'refs::l_contact_st';
   EXPORT L_CONTACT_DID             := basename+'refs::l_contact_did';
@@ -45,6 +46,7 @@ EXPORT Filename_Keys := module
   EXPORT EXT_L_CNPNAME_FUZZY       := basename+'l_cnpname_fuzzy::ext_data';
   EXPORT EXT_L_CNPNAME_ST          := basename+'l_cnpname_st::ext_data';
   EXPORT EXT_L_CNPNAME_ZIP         := basename+'l_cnpname_zip::ext_data';
+  EXPORT EXT_L_CONTACT             := basename+'l_contact::ext_data';
   EXPORT EXT_L_CONTACT_ZIP         := basename+'l_contact_zip::ext_data';
   EXPORT EXT_L_CONTACT_ST          := basename+'l_contact_st::ext_data';
   EXPORT EXT_L_CONTACT_DID         := basename+'l_contact_did::ext_data';
@@ -82,6 +84,7 @@ output(BizLinkFull.Key_BizHead_L_ADDRESS3.key);
 output(BizLinkFull.Key_BizHead_L_CNPNAME.key);
 output(BizLinkFull.Key_BizHead_L_CNPNAME_FUZZY.key);
 output(BizLinkFull.Key_BizHead_L_CNPNAME_ST.key);
+output(BizLinkFull.Key_BizHead_L_CONTACT.key);
 output(BizLinkFull.Key_BizHead_L_CONTACT_ZIP.key);
 output(BizLinkFull.Key_BizHead_L_CONTACT_ST.key);
 output(BizLinkFull.Key_BizHead_L_CONTACT_SSN.key);
