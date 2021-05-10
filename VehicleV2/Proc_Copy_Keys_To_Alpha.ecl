@@ -1,8 +1,9 @@
-IMPORT STD, dops;
+IMPORT STD, dops, Orbit3Insurance;
 
 EXPORT Proc_Copy_Keys_To_Alpha(
 	STRING pVersion,
-	STRING envment = 'nonfcra'
+	STRING envment = 'nonfcra',
+	STRING pContacts
 ) := FUNCTION
 
 	vAlphaDali := 'alpha_prod_thor_dali.risk.regn.net';
@@ -28,15 +29,15 @@ EXPORT Proc_Copy_Keys_To_Alpha(
 			envment = 'ct',
 			REGEXREPLACE(
 				vDatasetName + '_DATE',
-				'~'+l.logicalkeys,
-				'custtest::'+filedate
-			)
+				'~'+l.logicalkey,
+				'custtest::' + pVersion
+			),
 			REGEXREPLACE(
 				vDatasetName + '_DATE',
 				'~'+l.logicalkey,
 				pVersion
-			);
-		 )
+			)
+		);
 		STRING temp_filename := modified_filename[1..LENGTH(modified_filename)-1];
 		SELF.superfiles := l.superkey;
 		SELF.logicalfiles := IF(
@@ -76,7 +77,7 @@ EXPORT Proc_Copy_Keys_To_Alpha(
 							allowOverwrite := TRUE,
 							replicate := TRUE
 						),
-						OUTPUT(logicalfiles + ' Was successfully copied to ' + vAlphaEsp);
+						OUTPUT(logicalfiles + ' Was successfully copied to ' + vAlphaEsp)
 					)
 				),
 				OUTPUT(logicalfiles + ' does not exist')
@@ -87,9 +88,16 @@ EXPORT Proc_Copy_Keys_To_Alpha(
 	update_dops_alpha_non_fcra := dops.updateversion(
 		'VehicleV2Keys',
 		pVersion,
-		Email_Recipients,,
+		pContacts,,
 		'N|B',
 		l_inloc := 'A'
+	);
+
+	create_insurance_orbit_build_instance := Orbit3Insurance.Proc_Orbit3I_CreateBuild(
+		'Motor Vehicle Registrations',
+		pVersion,
+		'N|B',
+		email_list := STD.Str.FindReplace(pContacts, ',', ';')
 	);
 
 	RETURN SEQUENTIAL(
@@ -98,7 +106,10 @@ EXPORT Proc_Copy_Keys_To_Alpha(
 		IF( 
 			envment <> 'ct',
 			update_dops_alpha_non_fcra
+		),
+		IF(
+			envment <> 'ct',
+			create_insurance_orbit_build_instance	
 		)
 	);
-
-END
+END;

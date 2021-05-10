@@ -1,6 +1,4 @@
-﻿#workunit('name', 'Yogurt:Vehicle Picker File');
-
-import ut, Vehlic, VehicleV2, vehicle_wildcard,lib_fileservices, _control;
+﻿import ut, Vehlic, VehicleV2, vehicle_wildcard,lib_fileservices, _control;
 
 export	GetMakeModel(string	filedate)	:=
 function
