@@ -1,4 +1,4 @@
-﻿IMPORT lib_fileservices, _control, lib_STRINGlib, _Validate, did_add, didville, ut, std, UPI_DataBuild, 
+﻿IMPORT lib_fileservices, _control, lib_STRINGlib, _Validate, did_add, didville, ut, std, MCI, 
 				HealthcareNoMatchHeader_InternalLinking, HealthcareNoMatchHeader_Ingest, wk_ut, workman;
 
 TrimUpper(STRING s) := FUNCTION
@@ -6,12 +6,12 @@ TrimUpper(STRING s) := FUNCTION
 			END;  
 				
 EXPORT Append_LexID (string pVersion, boolean pUseProd, string gcid, unsigned1 pLexidThreshold, string pHistMode, string10 pBatch_jobid,
-						dataset(UPI_DataBuild.Layouts_V2.input_processing)pBaseFile):= MODULE
+						dataset(MCI.Layouts_V2.input_processing)pBaseFile):= MODULE
 
 	EXPORT LexID_append := FUNCTION
 			
 		temp_base_layout := record
-			UPI_DataBuild.Layouts_V2.input_processing;
+			MCI.Layouts_V2.input_processing;
 			string50 		temp_fname := '';
 			string50 		temp_mname := '';
 			string50 		temp_lname := '';
@@ -76,6 +76,6 @@ EXPORT Append_LexID (string pVersion, boolean pUseProd, string gcid, unsigned1 p
 				SELF            := left),
 				left outer, local);
 	   																					
-		RETURN project(denormRecs, UPI_DataBuild.Layouts_V2.Input_processing); // returning file in input_processing layout not base layout
+		RETURN project(denormRecs, MCI.Layouts_V2.Input_processing); // returning file in input_processing layout not base layout
 	END;
 END;

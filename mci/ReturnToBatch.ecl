@@ -1,7 +1,7 @@
-﻿IMPORT  ut, mdr, tools,_validate, Address, Ut, lib_stringlib, _Control, business_header, UPI_DataBuild,
+﻿IMPORT  ut, mdr, tools,_validate, Address, Ut, lib_stringlib, _Control, business_header, MCI,
 Header, Header_Slimsort, didville, ut, DID_Add,Business_Header_SS, NID, AID;
 
-EXPORT ReturnToBatch (string pVersion, boolean pUseProd = false, string gcid, dataset (UPI_DataBuild.Layouts_V2.input_processing) pBaseFile, string pAppendOption):= MODULE
+EXPORT ReturnToBatch (string pVersion, boolean pUseProd = false, string gcid, dataset (MCI.Layouts_V2.input_processing) pBaseFile, string pAppendOption):= MODULE
 					
 	EXPORT Batch_processing	:= FUNCTION
 	
@@ -12,7 +12,7 @@ EXPORT ReturnToBatch (string pVersion, boolean pUseProd = false, string gcid, da
 		// 4 - Append ONLY Customer Record Key for all records - NO LEXID appends for any records
 		// change flags null when input_lexid or input_crk fields are null/zero
 
-		UPI_DataBuild.layouts_V2.input_processing tMapping(UPI_DataBuild.layouts_V2.input_processing L) := TRANSFORM
+		MCI.layouts_V2.input_processing tMapping(MCI.layouts_V2.input_processing L) := TRANSFORM
 			self.batch_seq_number							:= L.batch_seq_number;
 			self.input_lexid									:= L.input_lexid;
 			self.input_crk										:= L.input_crk;

@@ -1,4 +1,4 @@
-﻿import _control, versioncontrol, UPI_DataBuild;
+﻿import _control, versioncontrol, MCI;
 
 EXPORT Build_asHeader_V2(
 			 string				pVersion
@@ -8,9 +8,9 @@ EXPORT Build_asHeader_V2(
 			,string100		gcid_name
 			,string10			batch_jobid) := module
 
-			shared dBuildasHeader := UPI_DataBuild.Create_asHeader_V2(pVersion,pUseProd,gcid,pHistMode,gcid_name,batch_jobid).Build_it;
+			shared dBuildasHeader := MCI.Create_asHeader_V2(pVersion,pUseProd,gcid,pHistMode,gcid_name,batch_jobid).Build_it;
 			VersionControl.macBuildNewLogicalFile(
-																			 UPI_DataBuild.Filenames_V2(pVersion, pUseProd, gcid, pHistMode).asHeader.new
+																			 MCI.Filenames_V2(pVersion, pUseProd, gcid, pHistMode).asHeader.new
 																		 	,dBuildasHeader
 																			,Build_asHeader_File
 																			);

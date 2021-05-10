@@ -1,19 +1,19 @@
-﻿IMPORT  ut, mdr, tools,_validate, Address, Ut, lib_stringlib, _Control, business_header, UPI_DataBuild,
+﻿IMPORT  ut, mdr, tools,_validate, Address, Ut, lib_stringlib, _Control, business_header, MCI,
 Header, Header_Slimsort, didville, ut, DID_Add,Business_Header_SS, NID, AID;
 
-EXPORT Aggregate_Report(boolean pUseProd, string gcid, string pHistMode, dataset (UPI_DataBuild.Layouts_V2.jobID_list) pBatch_jobID_list, string pVersion_start, string pVersion_end):= MODULE
+EXPORT Aggregate_Report(boolean pUseProd, string gcid, string pHistMode, dataset (MCI.Layouts_V2.jobID_list) pBatch_jobID_list, string pVersion_start, string pVersion_end):= MODULE
 
 	EXPORT AggregateRecord(metric1,metric2,metric3,metric4,metric5,metric6,metric7,metric8,metric9,metric10,metric11,metric12,metric13) := FUNCTIONMACRO
 	
    d := dataset([{min_lexid_score, max_lexid_score, ave_lexid_score, cnt_lexid_change, pct_lexid_change, 
 									distinct_lexid_cnt, dup_lexid_cnt, cnt_crk_change, pct_crk_change, distinct_crk_cnt, 
 									dup_crk_cnt, cnt_new_crk, match_crk_cnt}],
-                  UPI_DataBuild.Layouts_V2.aggregate_fields);       									
+                  MCI.Layouts_V2.aggregate_fields);       									
 
     return d;
 	endmacro;
 	
-	export startFile				:= sort(dataset('~ushc::crk::slim_history::' + gcid + '::qa', UPI_DataBuild.Layouts_V2.slim_history, thor), source_rid, batch_jobID);
+	export startFile				:= sort(dataset('~usgv::mci::slim_history::' + gcid + '::qa', MCI.Layouts_V2.slim_history, thor), source_rid, batch_jobID);
 
   export pBatch_jobID_set	:= set(pBatch_jobID_list,batch_jobID);
 	
@@ -105,11 +105,11 @@ EXPORT Aggregate_Report(boolean pUseProd, string gcid, string pHistMode, dataset
 	
 	export cnt_new_crk	:= function
 		crk_only					:= record
-			UPI_DataBuild.Layouts_V2.base.crk;
+			MCI.Layouts_V2.base.crk;
 		end;
 		
 		get_distinct_crk 	:= sort(distribute(dedup(project(pBaseFile, crk_only), all)), crk);
-		prev_base					:= UPI_DataBuild.Files_V2('',pUseProd,gcid,pHistMode).member_base.qa;
+		prev_base					:= MCI.Files_V2('',pUseProd,gcid,pHistMode).member_base.qa;
 		prev_distinct_crk	:= sort(distribute(dedup(project(prev_base, crk_only), all)), crk);
 
 		new_only 					:= join(prev_distinct_crk, get_distinct_crk,

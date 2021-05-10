@@ -1,13 +1,13 @@
-﻿IMPORT  ut, mdr, tools,_validate, Address, Ut, lib_stringlib, _Control, business_header, UPI_DataBuild,
+﻿IMPORT  ut, mdr, tools,_validate, Address, Ut, lib_stringlib, _Control, business_header, MCI,
 Header, Header_Slimsort, didville, ut, DID_Add,Business_Header_SS, NID, AID;
 
 EXPORT Standardize_V2 (string pVersion, boolean pUseProd, string gcid, unsigned1 pLexidThreshold, string1 pHistMode, string100 gcid_name, string10 batch_jobid, string1 pAppendOption):= MODULE
 					
 	EXPORT Common_stamping	:= FUNCTION
 	
-		pBaseFile	:= UPI_DataBuild.Files_V2(pVersion, pUseProd, gcid, pHistMode).from_batch;
+		pBaseFile	:= MCI.Files_V2(pVersion, pUseProd, gcid, pHistMode).from_batch;
 
-		UPI_DataBuild.layouts_V2.input_processing tMapping(UPI_DataBuild.layouts_V2.from_batch L) := TRANSFORM
+		MCI.layouts_V2.input_processing tMapping(MCI.layouts_V2.from_batch L) := TRANSFORM
 			SELF.Src											:= gcid;
 			SELF.gcid_name								:= gcid_name;
 			SELF.batch_jobid							:= batch_jobID;

@@ -1,8 +1,8 @@
-﻿import lib_fileservices, tools, Std, ut, wk_ut, UPI_DataBuild, HealthcareNoMatchHeader_Ingest;
+﻿import lib_fileservices, tools, Std, ut, wk_ut, MCI, HealthcareNoMatchHeader_Ingest;
 
 EXPORT NoSave_CleanUp := MODULE
 
-	export str_crk_unique 			:= 'USHC::CRK';
+	export str_crk_unique 			:= 'USGV::MCI';
 	export str_nosave 					:= '_NOSAVE';
 	export str_from_batch				:= 'FROM_BATCH';					
 	export str_processed_input	:= 'PROCESSED_INPUT';	
@@ -16,7 +16,7 @@ EXPORT NoSave_CleanUp := MODULE
 	export str_delim_secondary	:= '_';
 	export grace_period_days 		:= 5;
 	export days_till_delete_NA	:= 9999;
-	export email_to 						:= 'jennifer.hennigar@lexisnexisrisk.com';
+	export email_to 						:= 'sesha.nookala@lexisnexisrisk.com';
 	export send_email 					:= FALSE;						//SHOULD BE TRUE WHEN WE GO LIVE!!
 	export write_log 						:= FALSE; 						//SHOULD BE TRUE WHEN WE GO LIVE!!
 	export execute_deletes 			:= FALSE;	//SHOULD BE TRUE WHEN WE GO LIVE!!
