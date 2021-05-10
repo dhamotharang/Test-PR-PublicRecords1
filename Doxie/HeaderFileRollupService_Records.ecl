@@ -8,6 +8,9 @@ EXPORT HeaderFileRollupService_Records :=
     SHARED postProcessResults(DATASET(doxie.Layout_Rollup.header_rolled) rolledRecsIn, doxie.IDataAccess mod_access,
                                              boolean do_address_hierarchy) := FUNCTION
 
+      results_with_did:=rolledRecsIn[1].Results(did<>'');
+      results_without_did:=rolledRecsIn[1].Results(did='');
+
       dids := DATASET([{(UNSIGNED6)rolledRecsIn[1].Results[1].did}],doxie.layout_references);
      
 //append did to every address record for Address Hierarchy sorting      
@@ -40,7 +43,7 @@ EXPORT HeaderFileRollupService_Records :=
       childPhoneRecs := NORMALIZE(childAddrRecs,LEFT.phoneRecs,TRANSFORM(doxie.Layout_Rollup.PhoneRec,SELF:=RIGHT));
       dedup_phones   := PROJECT(childPhoneRecs,TRANSFORM(doxie.premium_phone.phone_rec,SELF.phone:=LEFT.phone));
 
-      results := PROJECT(rolledRecsIn[1].Results,TRANSFORM(doxie.Layout_Rollup.KeyRec_Seq,
+      results := PROJECT(results_with_did,TRANSFORM(doxie.Layout_Rollup.KeyRec_Seq,
                    childAddrRecsForDid := childAddrRecs(did = (integer) Left.did);
                    // Conditionally re-sort to preserve address hierarchy sort order
                    childAddrRecsForDidSorted := if(do_address_hierarchy,sort(childAddrRecsForDid,seq),childAddrRecsForDid); 
@@ -49,7 +52,7 @@ EXPORT HeaderFileRollupService_Records :=
                    SELF:=LEFT));
 
       doxie.Layout_Rollup.header_rolled rolledRecsOut() := TRANSFORM
-        SELF.Results := results;
+        SELF.Results := SORT(results+results_without_did,output_seq_no);
         SELF.Royalty := rolledRecsIn[1].Royalty;
         SELF.householdRecordsAvailable := rolledRecsIn[1].householdRecordsAvailable;
       END;
