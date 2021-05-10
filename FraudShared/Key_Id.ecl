@@ -309,15 +309,18 @@ r	:=RECORD,maxlength(60000)
   string60 device_risk_code;
 	string60 identity_risk_code;
   string10 tax_preparer_id;
-  string8 start_date;
-  string8 end_date;
+  string75 start_date;
+  string75 end_date;
   string10 amount_paid;
   string10 region_code;
   string10 investigator_id;
 	string3 cleared_fraud; 
 	string250 reason_cleared_code; 
 	unsigned4 global_sid;
-	unsigned8 record_sid; 	
+	unsigned8 record_sid;
+  string10	Duration;
+  string30	TransactionStatus;
+  string		Reason;    	
   unsigned8 __internal_fpos__;
  END;
 
