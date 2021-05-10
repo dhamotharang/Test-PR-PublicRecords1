@@ -78,7 +78,7 @@ EXPORT FUNCTIONS := MODULE
 
     EXPORT fn_valid_clientId(string id) := FUNCTION 
         cleanID     := TRIM(id, ALL);
-        rgx         := '^[a-z]{3}[0-9]{9,17}$';
+        rgx         := '^[a-z]{3}[0-9]{9,20}$';
         isValidId   := REGEXFIND(rgx, cleanID);
 
         RETURN if(
