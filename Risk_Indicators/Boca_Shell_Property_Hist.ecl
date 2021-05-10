@@ -1,9 +1,11 @@
-﻿import LN_PropertyV2, ut, RiskWise, Risk_Indicators;
+﻿import LN_PropertyV2, ut, RiskWise, Risk_Indicators, _Control;
+onThor := _Control.Environment.OnThor;
 
 export Boca_Shell_Property_Hist (GROUPED DATASET(Risk_Indicators.Layout_PropertyRecord) p_address,
                                  GROUPED DATASET(Risk_Indicators.Layout_Boca_Shell_ids) ids, 
 																 boolean includeRelatives = true,
-																 boolean filter_out_fares=false) := FUNCTION											
+																 boolean filter_out_fares=false) := FUNCTION
+                                 
 
 proprec := record
 	Risk_Indicators.Layouts.Layout_PropertyRecordv2 - layout_overrides;
@@ -30,7 +32,8 @@ TRANSFORM
 	SELF := le;
 	SELF := [];
 END;
-property_by_address_all := JOIN(p_address, KAF,
+
+property_by_address_all_roxie := JOIN(p_address, KAF,
 						LEFT.prim_name<>'' AND
 						keyed(LEFT.prim_name=RIGHT.prim_name) AND
 						keyed(LEFT.prim_range=RIGHT.prim_range) AND
@@ -38,8 +41,8 @@ property_by_address_all := JOIN(p_address, KAF,
 						keyed(LEFT.predir=RIGHT.predir) AND
 						keyed(LEFT.postdir=RIGHT.postdir) AND
 						keyed(LEFT.addr_suffix=RIGHT.suffix) AND
-						keyed(LEFT.sec_range=RIGHT.sec_range) and
-						keyed(right.source_code_2 = 'P'),
+						keyed(LEFT.sec_range=RIGHT.sec_range) AND
+						keyed(RIGHT.source_code_2 = 'P'),
 					   get_property_by_addr(LEFT,RIGHT), KEEP(100), LEFT OUTER,
 					   ATMOST(
 						   keyed(LEFT.prim_name=RIGHT.prim_name) AND
@@ -48,13 +51,44 @@ property_by_address_all := JOIN(p_address, KAF,
 						   keyed(LEFT.predir=RIGHT.predir) AND
 						   keyed(LEFT.postdir=RIGHT.postdir) AND
 						   keyed(LEFT.addr_suffix=RIGHT.suffix) AND
-						   keyed(LEFT.sec_range=RIGHT.sec_range) and
-						   keyed(right.source_code_2 = 'P'),
+						   keyed(LEFT.sec_range=RIGHT.sec_range) AND
+						   keyed(RIGHT.source_code_2 = 'P'),
 						   RiskWise.max_atmost
 					   ));
-
-
-property_by_address_filtered := JOIN(p_address, KAF,
+             
+property_by_address_all_thor := JOIN(DISTRIBUTE(p_address(prim_name<>''), HASH64(prim_name, prim_range, zip5, predir, postdir, addr_suffix, sec_range)), 
+                                    DISTRIBUTE(PULL(KAF(source_code_2='P')), HASH64(prim_name, prim_range, zip, predir, postdir, suffix, sec_range)),
+                                    // LEFT.prim_name<>'' AND
+                                    LEFT.prim_name=RIGHT.prim_name AND
+                                    LEFT.prim_range=RIGHT.prim_range AND
+                                    LEFT.zip5=RIGHT.zip AND
+                                    LEFT.predir=RIGHT.predir AND
+                                    LEFT.postdir=RIGHT.postdir AND
+                                    LEFT.addr_suffix=RIGHT.suffix AND
+                                    LEFT.sec_range=RIGHT.sec_range,
+                                     get_property_by_addr(LEFT,RIGHT), KEEP(100), LEFT OUTER,
+                                     ATMOST(
+                                       LEFT.prim_name=RIGHT.prim_name AND
+                                       LEFT.prim_range=RIGHT.prim_range AND
+                                       LEFT.zip5=RIGHT.zip AND
+                                       LEFT.predir=RIGHT.predir AND
+                                       LEFT.postdir=RIGHT.postdir AND
+                                       LEFT.addr_suffix=RIGHT.suffix AND
+                                       LEFT.sec_range=RIGHT.sec_range,
+                                       RiskWise.max_atmost
+                                     ), LOCAL) +
+                                     PROJECT(p_address(prim_name=''), TRANSFORM(proprec,
+                                             SELF.dataSrce := '0',
+                                             SELF := LEFT,
+                                             SELF := []));
+                                             
+#IF(onThor)
+	property_by_address_all_correct := property_by_address_all_thor;
+#ELSE
+	property_by_address_all_correct := UNGROUP(property_by_address_all_roxie);
+#END
+                                    
+property_by_address_filtered_roxie := JOIN(p_address, KAF,
 						right.ln_fares_id[1]<>'R' and
 						LEFT.prim_name<>'' AND
 						keyed(LEFT.prim_name=RIGHT.prim_name) AND
@@ -63,8 +97,8 @@ property_by_address_filtered := JOIN(p_address, KAF,
 						keyed(LEFT.predir=RIGHT.predir) AND
 						keyed(LEFT.postdir=RIGHT.postdir) AND
 						keyed(LEFT.addr_suffix=RIGHT.suffix) AND
-						keyed(LEFT.sec_range=RIGHT.sec_range) and
-						keyed(right.source_code_2 = 'P'),
+						keyed(LEFT.sec_range=RIGHT.sec_range) AND
+						keyed(RIGHT.source_code_2 = 'P'),
 					   get_property_by_addr(LEFT,RIGHT), KEEP(100), LEFT OUTER,
 					   ATMOST(
 						   keyed(LEFT.prim_name=RIGHT.prim_name) AND
@@ -73,13 +107,45 @@ property_by_address_filtered := JOIN(p_address, KAF,
 						   keyed(LEFT.predir=RIGHT.predir) AND
 						   keyed(LEFT.postdir=RIGHT.postdir) AND
 						   keyed(LEFT.addr_suffix=RIGHT.suffix) AND
-						   keyed(LEFT.sec_range=RIGHT.sec_range) and
-						   keyed(right.source_code_2 = 'P'),
+						   keyed(LEFT.sec_range=RIGHT.sec_range) AND
+						   keyed(RIGHT.source_code_2 = 'P'),
 						   RiskWise.max_atmost
 					   ));
+             
+property_by_address_filtered_thor := JOIN(DISTRIBUTE(p_address(prim_name<>''), HASH64(prim_name, prim_range, zip5, predir, postdir, addr_suffix, sec_range)),
+                                          DISTRIBUTE(PULL(KAF(ln_fares_id[1]<>'R' AND source_code_2='P')), HASH64(prim_name, prim_range, zip, predir, postdir, suffix, sec_range)),
+                                          // LEFT.prim_name <> '' AND
+                                          LEFT.prim_name=RIGHT.prim_name AND
+                                          LEFT.prim_range=RIGHT.prim_range AND
+                                          LEFT.zip5=RIGHT.zip AND
+                                          LEFT.predir=RIGHT.predir AND
+                                          LEFT.postdir=RIGHT.postdir AND
+                                          LEFT.addr_suffix=RIGHT.suffix AND
+                                          LEFT.sec_range=RIGHT.sec_range,
+                                           get_property_by_addr(LEFT,RIGHT), KEEP(100), LEFT OUTER,
+                                           ATMOST(
+                                             LEFT.prim_name=RIGHT.prim_name AND
+                                             LEFT.prim_range=RIGHT.prim_range AND
+                                             LEFT.zip5=RIGHT.zip AND
+                                             LEFT.predir=RIGHT.predir AND
+                                             LEFT.postdir=RIGHT.postdir AND
+                                             LEFT.addr_suffix=RIGHT.suffix AND
+                                             LEFT.sec_range=RIGHT.sec_range,
+                                             RiskWise.max_atmost
+                                           ), LOCAL) +
+                                           PROJECT(p_address(prim_name=''), TRANSFORM(proprec,
+                                                   SELF.dataSrce := '0',
+                                                   SELF := LEFT,
+                                                   SELF := []));
+                                           
+#IF(onThor)
+  property_by_address_filtered_correct := property_by_address_filtered_thor;
+#ELSE
+  property_by_address_filtered_correct := UNGROUP(property_by_address_filtered_roxie);
+#END
 
 // if filter_out_fares boolean, use the join which has the fares records filtered out
-property_by_address := if(filter_out_fares, property_by_address_filtered, property_by_address_all);
+property_by_address := if(filter_out_fares, property_by_address_filtered_correct, property_by_address_all_correct);
 
 proprec get_property_by_did(Risk_Indicators.Layout_Boca_Shell_ids le, kpd ri) :=
 TRANSFORM
@@ -88,24 +154,51 @@ TRANSFORM
 	SELF.dataSrce := '9';
 	SELF := [];
 END;
-property_by_did_all := JOIN(ids, kpd,
-						LEFT.did<>0 AND 
-						(includeRelatives or ~left.isrelat) and
-						keyed(LEFT.did=RIGHT.s_did) and
-						keyed(right.source_code_2 = 'P'),
-						get_property_by_did(LEFT,RIGHT), KEEP(100), ATMOST( keyed(LEFT.did=RIGHT.s_did) and keyed(right.source_code_2 = 'P'), RiskWise.max_atmost));
+
+property_by_did_all_roxie := JOIN(ids, kpd,
+                                  LEFT.did<>0 AND 
+                                  (includeRelatives or ~left.isrelat) and
+                                  keyed(LEFT.did=RIGHT.s_did) and
+                                  keyed(right.source_code_2 = 'P'),
+                                  get_property_by_did(LEFT,RIGHT), KEEP(100), 
+                                  ATMOST( keyed(LEFT.did=RIGHT.s_did) and keyed(right.source_code_2 = 'P'), RiskWise.max_atmost));
+            
+property_by_did_all_thor := JOIN(DISTRIBUTE(ids(did<>0), HASH64(did)),
+                                DISTRIBUTE(PULL(kpd(source_code_2='P')), HASH64(s_did)),
+                                // LEFT.did<>0 AND
+                                (includeRelatives or ~left.isrelat) and
+                                LEFT.did=RIGHT.s_did,
+                                get_property_by_did(LEFT,RIGHT), KEEP(100), 
+                                ATMOST(LEFT.did=RIGHT.s_did, RiskWise.max_atmost), LOCAL);
 
 
-property_by_did_filtered := JOIN(ids, kpd,
-						LEFT.did<>0 AND 
-						right.ln_fares_id[1]<>'R' and
-						(includeRelatives or ~left.isrelat) and
-						keyed(LEFT.did=RIGHT.s_did) and
-						keyed(right.source_code_2 = 'P'),
-						get_property_by_did(LEFT,RIGHT), KEEP(100), ATMOST( keyed(LEFT.did=RIGHT.s_did) and keyed(right.source_code_2 = 'P'), RiskWise.max_atmost));
+property_by_did_filtered_roxie := JOIN(ids, kpd,
+                                      LEFT.did<>0 AND 
+                                      right.ln_fares_id[1]<>'R' and
+                                      (includeRelatives or ~left.isrelat) and
+                                      keyed(LEFT.did=RIGHT.s_did) and
+                                      keyed(right.source_code_2 = 'P'),
+                                      get_property_by_did(LEFT,RIGHT), KEEP(100), ATMOST( keyed(LEFT.did=RIGHT.s_did) and keyed(right.source_code_2 = 'P'), RiskWise.max_atmost));
+                                      
+property_by_did_filtered_thor := JOIN(DISTRIBUTE(ids(did<>0), HASH64(did)), 
+                                      DISTRIBUTE(PULL(kpd(source_code_2 = 'P')), HASH64(s_did)),
+                                      // LEFT.did<>0 AND 
+                                      RIGHT.ln_fares_id[1]<>'R' AND
+                                      (includeRelatives or ~left.isrelat) and
+                                      LEFT.did=RIGHT.s_did,
+                                      get_property_by_did(LEFT,RIGHT), KEEP(100), 
+                                      ATMOST(LEFT.did=RIGHT.s_did, RiskWise.max_atmost), LOCAL);
+
+#IF(onThor)
+	property_by_did_all_correct := property_by_did_all_thor;
+  property_by_did_filtered_correct := property_by_did_filtered_thor;
+#ELSE
+	property_by_did_all_correct := property_by_did_all_roxie;
+  property_by_did_filtered_correct := property_by_did_filtered_roxie;
+#END
 
 // if filter_out_fares boolean, use the join which has the fares records filtered out
-property_by_did := if(filter_out_fares, property_by_did_filtered, property_by_did_all);
+property_by_did := if(filter_out_fares, property_by_did_filtered_correct, property_by_did_all_correct);
 
 proprec roll_property_fid(proprec le, proprec ri) :=
 TRANSFORM
@@ -128,7 +221,7 @@ property_fid := ROLLUP(SORT(pre_property_fid(own_fares_id != ''),
 					LEFT.own_fares_id=RIGHT.own_fares_id AND
 					(ut.NNEQ(LEFT.prim_name,RIGHT.prim_name) AND 
 					ut.NNEQ(LEFT.prim_range,RIGHT.prim_range)),
-				   roll_property_fid(LEFT,RIGHT));
+				   roll_property_fid(LEFT,RIGHT));          
 
 calc_napprop(boolean f,boolean l,boolean a) :=
 MAP(~f AND ~l AND ~a	=> 0,
@@ -169,23 +262,43 @@ END;
 
 // filter out those fares records that came from DID lookup, 
 // and have no property address even after the join tries to add one 
-property_searched := group(sort(
-							 JOIN(property_fid,
-							  kfs_nonFCRA,
-								keyed(LEFT.own_fares_id=RIGHT.ln_fares_id) AND
-								wild(right.which_orig) and
-								keyed(RIGHT.source_code_2='P') AND
-								(LEFT.prim_name='' OR LEFT.prim_name=RIGHT.prim_name) AND
-								(Left.prim_range='' OR LEFT.prim_range=RIGHT.prim_range) AND
-								(LEFT.zip5='' OR LEFT.zip5=RIGHT.zip) AND
-								(unsigned)(RIGHT.process_date[1..6]) < left.historydate,
-							  getSearch_nonFCRA(LEFT,RIGHT),LEFT OUTER, keep(100), ATMOST(
-								  keyed(LEFT.own_fares_id=RIGHT.ln_fares_id) AND
-								  wild(right.which_orig) and
-								  keyed(RIGHT.source_code_2='P'),
-								  RiskWise.max_atmost
-							   ))(prim_name<>'' AND zip5<>''),
-						seq),seq);
+property_searched_roxie := group(sort(
+                                 JOIN(property_fid,
+                                  kfs_nonFCRA,
+                                  keyed(LEFT.own_fares_id=RIGHT.ln_fares_id) AND
+                                  wild(right.which_orig) and
+                                  keyed(RIGHT.source_code_2='P') AND
+                                  (LEFT.prim_name='' OR LEFT.prim_name=RIGHT.prim_name) AND
+                                  (Left.prim_range='' OR LEFT.prim_range=RIGHT.prim_range) AND
+                                  (LEFT.zip5='' OR LEFT.zip5=RIGHT.zip) AND
+                                  (unsigned)(RIGHT.process_date[1..6]) < left.historydate,
+                                  getSearch_nonFCRA(LEFT,RIGHT),LEFT OUTER, keep(100), ATMOST(
+                                    keyed(LEFT.own_fares_id=RIGHT.ln_fares_id) AND
+                                    wild(right.which_orig) and
+                                    keyed(RIGHT.source_code_2='P'),
+                                    RiskWise.max_atmost
+                                   ))(prim_name<>'' AND zip5<>''),
+                              seq),seq);
+                    
+property_searched_thor := group(sort(
+                               JOIN(DISTRIBUTE(property_fid, HASH64(own_fares_id)),
+                                    DISTRIBUTE(PULL(kfs_nonFCRA(source_code_2='P')), HASH64(ln_fares_id)),
+                                    LEFT.own_fares_id=RIGHT.ln_fares_id AND
+                                    (LEFT.prim_name='' OR LEFT.prim_name=RIGHT.prim_name) AND
+                                    (Left.prim_range='' OR LEFT.prim_range=RIGHT.prim_range) AND
+                                    (LEFT.zip5='' OR LEFT.zip5=RIGHT.zip) AND
+                                    (unsigned)(RIGHT.process_date[1..6]) < left.historydate,
+                                    getSearch_nonFCRA(LEFT,RIGHT),LEFT OUTER, keep(100), ATMOST(
+                                      LEFT.own_fares_id=RIGHT.ln_fares_id,
+                                      RiskWise.max_atmost
+                                     ), LOCAL)(prim_name<>'' AND zip5<>''),
+                                seq),seq);
+                                
+#IF(onThor)
+	property_searched_correct := property_searched_thor;
+#ELSE
+	property_searched_correct := property_searched_roxie;
+#END
 
 proprec roll_prop_searched(proprec le, proprec ri) :=
 TRANSFORM
@@ -405,20 +518,44 @@ TRANSFORM
 END;
 
 
-pre_Assessments_added := JOIN (property_searched, kafid_nonFCRA,
-							keyed(LEFT.own_fares_id=RIGHT.ln_fares_id) and
-							(
-								(unsigned)right.tax_year <= (unsigned)(((string)left.historydate)[1..4])
-								AND (unsigned)right.assessed_value_year <= (unsigned)(((string)left.historydate)[1..4])
-								AND (unsigned)right.market_value_year <= (unsigned)(((string)left.historydate)[1..4]) 
-								AND (unsigned)right.sale_date[1..6] <= (unsigned)left.historydate
-								AND (unsigned)right.recording_date[1..6] <= (unsigned)left.historydate
-							) 
-							and	// see that all of these dates are less than history date
-							LEFT.own_fares_id[2]='A', 
-						add_assess_NonFCRA(LEFT,RIGHT), LEFT OUTER, keep(100), ATMOST(keyed(LEFT.own_fares_id=RIGHT.ln_fares_id), RiskWise.max_atmost));
+pre_Assessments_added_roxie := JOIN (property_searched_correct, kafid_nonFCRA,
+                                    keyed(LEFT.own_fares_id=RIGHT.ln_fares_id) and
+                                    (
+                                      (unsigned)right.tax_year <= (unsigned)(((string)left.historydate)[1..4])
+                                      AND (unsigned)right.assessed_value_year <= (unsigned)(((string)left.historydate)[1..4])
+                                      AND (unsigned)right.market_value_year <= (unsigned)(((string)left.historydate)[1..4]) 
+                                      AND (unsigned)right.sale_date[1..6] <= (unsigned)left.historydate
+                                      AND (unsigned)right.recording_date[1..6] <= (unsigned)left.historydate
+                                    ) 
+                                    and	// see that all of these dates are less than history date
+                                    LEFT.own_fares_id[2]='A', 
+                                    add_assess_NonFCRA(LEFT,RIGHT), LEFT OUTER, keep(100), ATMOST(keyed(LEFT.own_fares_id=RIGHT.ln_fares_id), RiskWise.max_atmost));
+            
+pre_Assessments_added_thor := JOIN (DISTRIBUTE(property_searched_correct, HASH64(own_fares_id)), 
+                                    DISTRIBUTE(PULL(kafid_nonFCRA), HASH64(ln_fares_id)),
+                                    LEFT.own_fares_id=RIGHT.ln_fares_id and
+                                    (
+                                      (unsigned)right.tax_year <= (unsigned)(((string)left.historydate)[1..4])
+                                      AND (unsigned)right.assessed_value_year <= (unsigned)(((string)left.historydate)[1..4])
+                                      AND (unsigned)right.market_value_year <= (unsigned)(((string)left.historydate)[1..4]) 
+                                      AND (unsigned)right.sale_date[1..6] <= (unsigned)left.historydate
+                                      AND (unsigned)right.recording_date[1..6] <= (unsigned)left.historydate
+                                    ) 
+                                    and	// see that all of these dates are less than history date
+                                    LEFT.own_fares_id[2]='A', 
+                                    add_assess_NonFCRA(LEFT,RIGHT), LEFT OUTER, keep(100), ATMOST(LEFT.own_fares_id=RIGHT.ln_fares_id, RiskWise.max_atmost), LOCAL);
+                                    
+#IF(onThor)
+	pre_Assessments_added_correct := group(sort(pre_Assessments_added_thor, seq),seq);
+  // pre_Assessments_added_noGroup := pre_Assessments_added_thor;
+#ELSE
+	pre_Assessments_added_correct := pre_Assessments_added_roxie;
+  // pre_Assessments_added_noGroup := pre_Assessments_added_roxie;
+#END
 
-assessments_added := rollup(sort(pre_assessments_added, own_fares_id, isRelat, prim_name, prim_range, zip5, sec_range, dataSrce), roll_prop_searched(LEFT,RIGHT), own_fares_id, prim_name, prim_range, zip5, sec_range);
+// assessments_added_sorted := sort(pre_Assessments_added_correct, own_fares_id, isRelat, prim_name, prim_range, zip5, sec_range, dataSrce);
+
+assessments_added := rollup(sort(pre_Assessments_added_correct, own_fares_id, isRelat, prim_name, prim_range, zip5, sec_range, dataSrce), roll_prop_searched(LEFT,RIGHT), own_fares_id, prim_name, prim_range, zip5, sec_range);
 
 proprec add_deeds_NonFCRA(proprec le, kdf_NonFCRA ri) :=
 TRANSFORM
@@ -516,16 +653,32 @@ TRANSFORM
 END;
 
 
-pre_Deeds_added := JOIN(assessments_added,kdf_NonFCRA,
-                                                RIGHT.proc_date<>0 AND // make sure we have a proc_date
-                                                keyed(LEFT.own_fares_id=RIGHT.ln_fares_id) AND
-                                                keyed(RIGHT.proc_date < left.historydate) AND
-                                                LEFT.own_fares_id[2] IN ['D','M'], 
-                                             add_deeds_NonFCRA(LEFT,RIGHT), LEFT OUTER, keep(100), 
-                                             ATMOST(keyed(LEFT.own_fares_id=RIGHT.ln_fares_id) AND 
-                                             keyed(RIGHT.proc_date < left.historydate), RiskWise.max_atmost));
+pre_Deeds_added_roxie := JOIN(assessments_added,kdf_NonFCRA,
+                              RIGHT.proc_date<>0 AND // make sure we have a proc_date
+                              keyed(LEFT.own_fares_id=RIGHT.ln_fares_id) AND
+                              keyed(RIGHT.proc_date < left.historydate) AND
+                              LEFT.own_fares_id[2] IN ['D','M'], 
+                              add_deeds_NonFCRA(LEFT,RIGHT), LEFT OUTER, keep(100), 
+                              ATMOST(keyed(LEFT.own_fares_id=RIGHT.ln_fares_id) AND 
+                              keyed(RIGHT.proc_date < left.historydate), RiskWise.max_atmost));
+                        
+pre_Deeds_added_thor := JOIN(DISTRIBUTE(assessments_added, HASH64(own_fares_id)),
+                             DISTRIBUTE(PULL(kdf_NonFCRA(proc_date<>0)), HASH64(ln_fares_id)),
+                              RIGHT.proc_date<>0 AND // make sure we have a proc_date
+                              LEFT.own_fares_id=RIGHT.ln_fares_id AND
+                              RIGHT.proc_date < left.historydate AND
+                              LEFT.own_fares_id[2] IN ['D','M'], 
+                              add_deeds_NonFCRA(LEFT,RIGHT), LEFT OUTER, keep(100), 
+                              ATMOST(LEFT.own_fares_id=RIGHT.ln_fares_id, RiskWise.max_atmost), LOCAL);
+                              
+#IF(onThor)
+	pre_Deeds_added_correct := group(sort(pre_Deeds_added_thor,seq),seq);
+#ELSE
+	pre_Deeds_added_correct := pre_Deeds_added_roxie;
+#END
 
-deeds_added := rollup(sort(pre_deeds_added,prim_name,prim_range,zip5,sec_range, dataSrce),roll_prop_searched(LEFT,RIGHT),prim_name,prim_range,zip5,sec_range);
+// deeds_added := rollup(sort(pre_Deeds_added_correct,prim_name,prim_range,zip5,sec_range,dataSrce),roll_prop_searched(LEFT,RIGHT),prim_name,prim_range,zip5,sec_range);
+deeds_added := rollup(sort(pre_Deeds_added_correct,prim_name,prim_range,zip5,sec_range,dataSrce,own_fares_id),roll_prop_searched(LEFT,RIGHT),prim_name,prim_range,zip5,sec_range);
 
 // distressed sale sorting and picking 2 most recent
 dd := deeds_added(applicant_sold);
@@ -619,6 +772,8 @@ Property := PROJECT(All_added, to_relat_prop(LEFT));
 // at this point.	
 
 Single_Property := SORT(group(sort(Property,seq),seq),prim_name,prim_range,zip5,sec_range,census_loose, dataSrce);
+
+
 //					was ROLLUP....get_max_prices(LEFT,RIGHT),prim_name,prim_range,zip5,sec_range);
 
 // output(pre_property_fid, named('pre_property_fid'));
@@ -626,8 +781,22 @@ Single_Property := SORT(group(sort(Property,seq),seq),prim_name,prim_range,zip5,
 // output(deeds_added, named('deeds_added'));
 // output(itera, named('itera'));
 // output(distressed, named('distressed'));
+// output(assessments_added, named('assessments_added'));
 // output(wDistressed, named('wDistressed'));
 // output(All_Added, named('All_Added'));
+// output(pre_Assessments_added_noGroup, named('pre_Assessments_added_noGroup'));
+
+
+// output(property_by_address_all_correct, named('property_by_address_all_correct'));
+// output(property_by_address_filtered_correct, named('property_by_address_filtered_correct'));
+// output(property_by_did_all_correct, named('property_by_did_all_correct'));
+// output(property_by_did_filtered_correct, named('property_by_did_filtered_correct'));
+// output(property_searched_correct, named('property_searched_correct'));
+// output(pre_Assessments_added_correct, named('pre_Assessments_added_correct'));
+// output(pre_Deeds_added_correct, named('pre_Deeds_added_correct'));
+// OUTPUT(Property, named('Property'));
+// output(assessments_added_sorted, named('assessments_added_sorted'));
+
 
 RETURN Single_Property;
 

@@ -1,4 +1,4 @@
-IMPORT fcra, Risk_Indicators;
+﻿IMPORT fcra, Risk_Indicators;
 
 
 EXPORT Transforms := MODULE
@@ -14,8 +14,8 @@ EXPORT Transforms := MODULE
       flagrecs := CHOOSEN (dedup (flags, ALL), Risk_Indicators.iid_constants.MAX_OVERRIDE_LIMIT);	
 
     // for each datagroup, add back the record_id we already have obtained from personContext search earlier
-      SELF.veh_correct_vin                := SET(flagrecs(file_id = FCRA.FILE_ID.VEHICLE),record_id) + le.veh_correct_vin;
-      SELF.veh_correct_ffid               := SET(flagrecs(file_id = FCRA.FILE_ID.VEHICLE),flag_file_id);
+      // SELF.veh_correct_vin                := SET(flagrecs(file_id = FCRA.FILE_ID.VEHICLE),record_id) + le.veh_correct_vin;
+      // SELF.veh_correct_ffid               := SET(flagrecs(file_id = FCRA.FILE_ID.VEHICLE),flag_file_id);
 
       SELF.bankrupt_correct_cccn          := SET(flagrecs(file_id = FCRA.FILE_ID.BANKRUPTCY),record_id) + le.bankrupt_correct_cccn ;
       SELF.bankrupt_correct_ffid          := SET(flagrecs(file_id = FCRA.FILE_ID.BANKRUPTCY),flag_file_id);
@@ -67,8 +67,8 @@ EXPORT Transforms := MODULE
 
       SELF.header_correct_record_id       := SET(flagrecs(file_id = FCRA.FILE_ID.hdr),record_id) + le.header_correct_record_id ;
       
-      SELF.ibehavior_correct_ffid					:= SET(flagrecs(file_id in [FCRA.FILE_ID.ibehavior_consumer,FCRA.FILE_ID.ibehavior_purchase]),flag_file_id) ;
-      SELF.ibehavior_correct_record_id		:= SET(flagrecs(file_id in [FCRA.FILE_ID.ibehavior_consumer,FCRA.FILE_ID.ibehavior_purchase]),record_id) + le.ibehavior_correct_record_id ;
+      // SELF.ibehavior_correct_ffid					:= SET(flagrecs(file_id in [FCRA.FILE_ID.ibehavior_consumer,FCRA.FILE_ID.ibehavior_purchase]),flag_file_id) ;
+      // SELF.ibehavior_correct_record_id		:= SET(flagrecs(file_id in [FCRA.FILE_ID.ibehavior_consumer,FCRA.FILE_ID.ibehavior_purchase]),record_id) + le.ibehavior_correct_record_id ;
       
       SELF := le;
     END;

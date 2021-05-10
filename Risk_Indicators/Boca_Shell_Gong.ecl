@@ -1,4 +1,5 @@
-﻿import riskwise, ut, dx_Gong, risk_indicators, doxie, Suppress;
+﻿import riskwise, ut, dx_Gong, risk_indicators, doxie, Suppress, _Control;
+onThor := _Control.Environment.OnThor;
 
 export Boca_Shell_Gong(GROUPED DATASET(risk_indicators.layout_bocashell_neutral) ids_wide, doxie.IDataAccess mod_access = MODULE (doxie.IDataAccess) END) := FUNCTION
 
@@ -57,12 +58,29 @@ Layout_Gong_CCPA addPhone(ids_wide le, key_history_did ri) := transform
 
 	self := le;
 END;
-gong_by_did_unsuppressed := join(ids_wide, key_history_did, left.did != 0 and keyed(left.did=right.l_did) and
-										// check date
-										((unsigned)RIGHT.dt_first_seen <= (unsigned)risk_indicators.iid_constants.myGetDate(left.historydate)),
-										addPhone(LEFT,RIGHT), left outer, atmost(left.did=right.l_did, Riskwise.max_atmost), keep(100));
 
-gong_by_did_flagged := Suppress.CheckSuppression(gong_by_did_unsuppressed, mod_access);
+gong_by_did_unsuppressed_roxie := join(ids_wide, key_history_did, keyed(left.did=right.l_did) and
+                                       // check date
+                                       ((unsigned)RIGHT.dt_first_seen <= (unsigned)risk_indicators.iid_constants.myGetDate(left.historydate)),
+                                       addPhone(LEFT,RIGHT), left outer, atmost(left.did=right.l_did, Riskwise.max_atmost), keep(100));
+                    
+gong_by_did_unsuppressed_thor := join(DISTRIBUTE(ids_wide, HASH64(did)), 
+                                      DISTRIBUTE(PULL(key_history_did), HASH64(l_did)),
+                                      left.did != 0 and
+                                      left.did=right.l_did and
+                                      // check date
+                                      ((unsigned)RIGHT.dt_first_seen <= (unsigned)risk_indicators.iid_constants.myGetDate(left.historydate)),
+                                      addPhone(LEFT,RIGHT), left outer, atmost(left.did=right.l_did, Riskwise.max_atmost), keep(100), LOCAL);
+                    
+#IF(onThor)
+	gong_by_did_unsuppressed_correct := gong_by_did_unsuppressed_thor;
+#ELSE
+	gong_by_did_unsuppressed_correct := gong_by_did_unsuppressed_roxie;
+#END
+
+// OUTPUT(gong_by_did_unsuppressed_correct, NAMED('gong_by_did_unsuppressed_correct'));
+
+gong_by_did_flagged := Suppress.CheckSuppression(gong_by_did_unsuppressed_correct, mod_access);
 
 gong_by_did1 := PROJECT(gong_by_did_flagged, TRANSFORM(Layout_Gong,
 	self.gong_did.gong_ADL_dt_first_seen_full := IF(left.is_suppressed, Suppress.OptOutMessage('STRING'), left.gong_did.gong_ADL_dt_first_seen_full );
@@ -82,6 +100,7 @@ gong_by_did1 := PROJECT(gong_by_did_flagged, TRANSFORM(Layout_Gong,
     SELF := LEFT;
 ));
 
+/*
 // make this check to telcordia it's own join instead of nested inside the previous transform
 gong_by_did := join(gong_by_did1, risk_indicators.Key_Telcordia_tpm_Slim,
 	left.gongPhone<>'' and
@@ -97,6 +116,39 @@ transform(layout_gong,
 	self := left;
 	),
 	left outer, keep(1))	;
+*/
+
+layout_gong gong_by_id_transform(gong_by_did1 le, risk_indicators.Key_Telcordia_tpm_Slim ri) := TRANSFORM
+  goodphone := ri.npa<>'';
+	// if the phone is valid according to telcordia, set the invalid_* fields blank
+	self.invalid_phone_from_did := if(goodPhone, '', le.gongphone);
+	self.invalid_gong_dt_first_seen := if(goodPhone, '', le.invalid_gong_dt_first_seen);
+	self.invalid_gong_dt_last_seen := if(goodPhone, '', le.invalid_gong_dt_last_seen);
+	self := le;
+END;
+
+gong_by_did_roxie := join(gong_by_did1, risk_indicators.Key_Telcordia_tpm_Slim,
+                          left.gongPhone<>'' and
+                          keyed(left.gongPhone[1..3]=right.npa) and
+                          keyed(left.gongPhone[4..6]=right.nxx) and
+                          KEYED(right.tb IN [left.gongPhone[7]]),
+                          gong_by_id_transform(LEFT, RIGHT),
+                          left outer, keep(1));
+                          
+gong_by_did_thor := join(DISTRIBUTE(gong_by_did1, HASH64(gongPhone)),
+                         DISTRIBUTE(PULL(risk_indicators.Key_Telcordia_tpm_Slim), HASH64(npa + nxx + tb)),
+                         left.gongPhone<>'' and
+                         left.gongPhone[1..3]=right.npa and
+                         left.gongPhone[4..6]=right.nxx and
+                         right.tb IN [left.gongPhone[7]],
+                         gong_by_id_transform(LEFT, RIGHT),
+                         left outer, keep(1), LOCAL);
+                          
+#IF(onThor)
+	gong_by_did_correct := GROUP(SORT(DISTRIBUTE(gong_by_did_thor, HASH64(seq)), seq, LOCAL), seq, LOCAL);
+#ELSE
+	gong_by_did_correct := gong_by_did_roxie;
+#END
 
 // bocashell 3 gong field rollups
 Layout_Gong getDates(Layout_Gong le, Layout_Gong ri) := transform
@@ -109,25 +161,25 @@ Layout_Gong getDates(Layout_Gong le, Layout_Gong ri) := transform
 																				trim(le.phones_on_file_created12months) + if(trim(ri.phones_on_file)='', '', ri.phones_on_file + ',') );
 	self := ri;
 end;
-getgongdates := rollup(sort(gong_by_did, seq, -gongPhone, -gong_did.gong_did_phone_ct), true, getDates(left,right));
+getgongdates := rollup(sort(gong_by_did_correct, seq, -gongPhone, -gong_did.gong_did_phone_ct), true, getDates(left,right));
 
 Layout_Gong getAddrs(Layout_Gong le, Layout_Gong ri) := transform
 	self.gong_did.gong_did_addr_ct := le.gong_did.gong_did_addr_ct + if(le.gongAddr=ri.gongAddr, 0, ri.gong_did.gong_did_addr_ct);
 	self := ri;
 end;
-getGongAddr := rollup(sort(gong_by_did, seq, -gongAddr, -gong_did.gong_did_addr_ct), true, getAddrs(left,right));
+getGongAddr := rollup(sort(gong_by_did_correct, seq, -gongAddr, -gong_did.gong_did_addr_ct), true, getAddrs(left,right));
 
 Layout_Gong getFirsts(Layout_Gong le, Layout_Gong ri) := transform
 	self.gong_did.gong_did_first_ct := le.gong_did.gong_did_first_ct + if(le.gongFirst=ri.gongFirst, 0, ri.gong_did.gong_did_first_ct);
 	self := ri;
 end;
-getGongFirst := rollup(sort(gong_by_did, seq,-gongFirst,-gong_did.gong_did_first_ct), true, getFirsts(left,right));
+getGongFirst := rollup(sort(gong_by_did_correct, seq,-gongFirst,-gong_did.gong_did_first_ct), true, getFirsts(left,right));
 
 Layout_Gong getLasts(Layout_Gong le, Layout_Gong ri) := transform
 	self.gong_did.gong_did_last_ct := le.gong_did.gong_did_last_ct + if(le.gongLast=ri.gongLast, 0, ri.gong_did.gong_did_last_ct);
 	self := ri;
 end;
-getGongLast := rollup(sort(gong_by_did, seq,-gongLast,-gong_did.gong_did_last_ct), true, getLasts(left,right));
+getGongLast := rollup(sort(gong_by_did_correct, seq,-gongLast,-gong_did.gong_did_last_ct), true, getLasts(left,right));
 
 Layout_Gong joinDateAddr(Layout_Gong le, Layout_Gong ri) := transform
 	self.gong_did.gong_ADL_dt_first_seen_full := le.gong_did.gong_ADL_dt_first_seen_full;
@@ -136,33 +188,51 @@ Layout_Gong joinDateAddr(Layout_Gong le, Layout_Gong ri) := transform
 	self.gong_did.gong_did_addr_ct := ri.gong_did.gong_did_addr_ct;
 	self := le;
 END;
-datephoneaddr := join(getgongdates, getgongaddr, left.seq=right.seq, joinDateAddr(LEFT,RIGHT), left outer, lookup);
+datephoneaddr_roxie := join(getgongdates, getgongaddr, left.seq=right.seq, joinDateAddr(LEFT,RIGHT), left outer, lookup);
+datephoneaddr_thor := GROUP(join(getgongdates, getgongaddr, left.seq=right.seq, joinDateAddr(LEFT,RIGHT), left outer), seq);
 
-
+#IF(onThor)
+	datephoneaddr := datephoneaddr_thor;
+#ELSE
+	datephoneaddr := datephoneaddr_roxie;
+#END
 
 Layout_Gong joinDateAddrFirst(Layout_Gong le, Layout_Gong ri) := transform
 	self.gong_did.gong_did_first_ct := ri.gong_did.gong_did_first_ct;
 	self := le;
 END;
-datephoneaddrfirst := join(datephoneaddr, getGongFirst, left.seq=right.seq, joinDateAddrFirst(LEFT,RIGHT), left outer, lookup);
+datephoneaddrfirst_roxie := join(datephoneaddr, getGongFirst, left.seq=right.seq, joinDateAddrFirst(LEFT,RIGHT), left outer, lookup);
+datephoneaddrfirst_thor := GROUP(join(datephoneaddr, getGongFirst, left.seq=right.seq, joinDateAddrFirst(LEFT,RIGHT), left outer), seq);
+
+#IF(onThor)
+	datephoneaddrfirst := datephoneaddrfirst_thor;
+#ELSE
+	datephoneaddrfirst := datephoneaddrfirst_roxie;
+#END
 
 Layout_Gong joinDateAddrFirstLast(Layout_Gong le, Layout_Gong ri) := transform
 	self.gong_did.gong_did_last_ct := ri.gong_did.gong_did_last_ct;
 	self := le;
 END;
-datephoneaddrfirstlast := join(datephoneaddrfirst, getGongLast, left.seq=right.seq, joinDateAddrFirstLast(LEFT,RIGHT), left outer, lookup);
+datephoneaddrfirstlast_roxie := join(datephoneaddrfirst, getGongLast, left.seq=right.seq, joinDateAddrFirstLast(LEFT,RIGHT), left outer, lookup);
+datephoneaddrfirstlast_thor := GROUP(join(datephoneaddrfirst, getGongLast, left.seq=right.seq, joinDateAddrFirstLast(LEFT,RIGHT), left outer), seq);
 
+#IF(onThor)
+	datephoneaddrfirstlast := datephoneaddrfirstlast_thor;
+#ELSE
+	datephoneaddrfirstlast := datephoneaddrfirstlast_roxie;
+#END
 
 // now calculate the invalid counts
 phone_slim := RECORD
-	gong_by_did.did;
-	gong_by_did.seq;
-	phone := gong_by_did.invalid_phone_from_did;
-	gong_by_did.historydate;
-	dt_first_seen := MIN(GROUP,IF((unsigned)gong_by_did.invalid_gong_dt_first_seen=0,999999,(unsigned)gong_by_did.invalid_gong_dt_first_seen));
-	dt_last_seen := MAX(GROUP,(unsigned)gong_by_did.invalid_gong_dt_last_seen);
+	gong_by_did_correct.did;
+	gong_by_did_correct.seq;
+	phone := gong_by_did_correct.invalid_phone_from_did;
+	gong_by_did_correct.historydate;
+	dt_first_seen := MIN(GROUP,IF((unsigned)gong_by_did_correct.invalid_gong_dt_first_seen=0,999999,(unsigned)gong_by_did_correct.invalid_gong_dt_first_seen));
+	dt_last_seen := MAX(GROUP,(unsigned)gong_by_did_correct.invalid_gong_dt_last_seen);
 END;
-d_phone := TABLE(gong_by_did((integer)invalid_phone_from_did<>0), phone_slim, seq, did, invalid_phone_from_did, historydate);
+d_phone := TABLE(gong_by_did_correct((integer)invalid_phone_from_did<>0), phone_slim, seq, did, invalid_phone_from_did, historydate);
 
 
 invalid_phone_stats := record
@@ -180,12 +250,39 @@ Layout_Gong addInvalidGong (datephoneaddrfirstlast le, invalid_phone_counts ri) 
 
 	SELF := le;
 END;
-invalidGong := JOIN (datephoneaddrfirstlast, invalid_phone_counts,
-                       LEFT.seq = RIGHT.seq,
-											 addInvalidGong(LEFT,RIGHT),
-											 LEFT OUTER, lookup);
+invalidGong_roxie := JOIN(datephoneaddrfirstlast, invalid_phone_counts,
+                           LEFT.seq = RIGHT.seq,
+                           addInvalidGong(LEFT,RIGHT),
+                           LEFT OUTER, lookup);
+                           
+invalidGong_thor := GROUP(JOIN(datephoneaddrfirstlast, invalid_phone_counts,
+                           LEFT.seq = RIGHT.seq,
+                           addInvalidGong(LEFT,RIGHT),
+                           LEFT OUTER), seq);
+                           
+#IF(onThor)
+	invalidGong := invalidGong_thor;
+#ELSE
+	invalidGong := invalidGong_roxie;
+#END
 
 // output(gong_by_did, named('gong_by_did_new'));
+
+// OUTPUT(gong_by_did_flagged, NAMED('gong_by_did_flagged'));
+// OUTPUT(gong_by_did_correct, NAMED('gong_by_did_correct'));
+
+// OUTPUT(getgongdates, NAMED('getgongdates'));
+// OUTPUT(getGongAddr, NAMED('getGongAddr'));
+// OUTPUT(getGongFirst, NAMED('getGongFirst'));
+// OUTPUT(getGongLast, NAMED('getGongLast'));
+// OUTPUT(datephoneaddr, NAMED('datephoneaddr'));
+// OUTPUT(datephoneaddrfirst, NAMED('datephoneaddrfirst'));
+// OUTPUT(datephoneaddrfirstlast, NAMED('datephoneaddrfirstlast'));
+// OUTPUT(d_phone, NAMED('d_phone'));
+// OUTPUT(invalid_phone_counts, NAMED('invalid_phone_counts'));
+
+// OUTPUT(sort(gong_by_did_correct, seq, -gongPhone, -gong_did.gong_did_phone_ct), NAMED('getgongdatesSort'));
+
 
 return invalidGong;
 END;

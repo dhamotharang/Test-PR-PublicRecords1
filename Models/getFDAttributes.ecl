@@ -1,4 +1,4 @@
-﻿import Easi, Risk_Indicators, Riskwise, ut, IdentityManagement_Services, STD, daybatchPCNSR, Models, Doxie, Suppress;
+﻿import Easi, Risk_Indicators, Riskwise, ut, IdentityManagement_Services, STD, daybatchPCNSR, Models, Doxie, Suppress, _control;
 
 export getFDAttributes(grouped DATASET(risk_indicators.Layout_Boca_Shell) clam,
 	grouped DATASET(Risk_Indicators.Layout_Output) iid,
@@ -11,6 +11,7 @@ export getFDAttributes(grouped DATASET(risk_indicators.Layout_Boca_Shell) clam,
   string DataPermission=risk_indicators.iid_constants.default_DataPermission,
   string32 appType = '',
   DATASET(Models.Layouts.Layout_Model_Request_In) ModelRequests = DATASET([],Models.Layouts.Layout_Model_Request_In),
+
   doxie.IDataAccess mod_access = MODULE (doxie.IDataAccess) END,
   DATASET(Risk_Indicators.layouts.layout_IDA_out) IDA_Attributes = DATASET([], Risk_Indicators.layouts.layout_IDA_out)
 	) := FUNCTION
@@ -55,12 +56,29 @@ Layout_EasiSeq := record
 	unsigned seq := 0;
 	used_census easi;
 ENd;
-easi_census := join(e_address, Easi.Key_Easi_Census,
+
+
+easi_census_roxie := join(e_address, Easi.Key_Easi_Census,
 										keyed(right.geolink=left.st+left.county+left.geo_blk),
 										transform(Layout_EasiSeq,
 															self.seq := left.seq,
 															self.easi := right),
 															ATMOST(keyed(right.geolink=left.st+left.county+left.geo_blk), Riskwise.max_atmost), KEEP(1));
+
+easi_census_thor := join(distribute(e_address, hash64(st + county + geo_blk)), 
+												 distribute(pull(Easi.Key_Easi_Census), hash64(geolink)),
+										right.geolink=left.st+left.county+left.geo_blk,
+										transform(Layout_EasiSeq,
+															self.seq := left.seq,
+															self.easi := right),
+															atmost(Riskwise.max_atmost), KEEP(1), local);
+
+#IF(_Control.Environment.onThor) 
+	easi_census := easi_census_thor;
+#ELSE
+	easi_census := easi_census_roxie;
+#END;
+
 
 
 used_ip := RECORD
@@ -104,7 +122,8 @@ layout_bseasi joinEm(wideClam le, easi_census ri) := transform
 	self.Easi2 := if(Hist2_Match, ri.easi, le.easi2);
 	self := le;
 END;
-clamEasi := group( sort(denormalize (wideClam, easi_census,	left.seq = right.seq, joinEm (LEFT,RIGHT)), seq), seq);
+
+clamEasi := denormalize (wideClam, easi_census,	left.seq = right.seq, joinEm (LEFT,RIGHT));
 
 layout_bseasi add_iid(clamEasi le, iid ri) := transform
 	self.iid_out := ri;
@@ -131,6 +150,7 @@ wIPs_with_IDA_Attributes := join(wIPs, IDA_Attributes, left.seq=right.seq, add_I
 Prep := project(ungroup(iid), transform(risk_indicators.Layout_input, self := left));
 
 skiptrace_call := riskwise.skip_trace(Prep, DPPA, GLB, DataRestriction,appType, DataPermission);
+
 
 
 Models.Layout_FraudAttributes intoAttributes(wIPs_with_IDA_Attributes le) := TRANSFORM
@@ -1232,7 +1252,7 @@ DL_is_compromised := trim(compromised_DL_hash_value) <> '';
   Self.threatmetrix.DITrueIpPerLexIDDCnt1M := le.iid_out.ThreatMetrix.TrueipPerTmxidInTxinqCnt1M	;
   Self.threatmetrix.DITrueIpPerLexIDDCntEv := le.iid_out.ThreatMetrix.TrueipPerTmxidInTxinqCnt	;
   Self.threatmetrix.DITrueIpPerLexIDDCnt1W := le.iid_out.ThreatMetrix.TrueipPerTmxidInTxinqCnt1W	;
-  Self.threatmetrix.DITrueIpGeoPerLexIDDCnt1W := le.iid_out.ThreatMetrix.TrueipgPerTmxidInTxinqDoCnt1W	;
+  Self.threatmetrix.DITrueIpGeoPerLexIDDCnt1W := le.iid_out.ThreatMetrix.TrueipgPerTmxidInTxinqDoCnt1W	;  
   
   //IDA_Attributes
   // Self.IDA_Attributes.ADDRESSHASEXTRAUNITNUMBER := IDA_Attributes.Indicators(Name='ADDRESSHASEXTRAUNITNUMBER').Value;
@@ -1933,6 +1953,7 @@ DL_is_compromised := trim(compromised_DL_hash_value) <> '';
   self := [];
 END;
 
+
 version1Temp := project(wIPs_with_IDA_Attributes, intoAttributes(left));
 
 // For Paro estincome and hownstatusflag attributes
@@ -1943,6 +1964,7 @@ xlayout := record
   STRING3 estincome := '';
   STRING6 refresh_date :='';  // for demographic data rollup
 end;
+
 
 	{xlayout, UNSIGNED4 global_sid} get_household(wIPs_with_IDA_Attributes le, daybatchPCNSR.Key_PCNSR_DID rt) := transform
         self.global_sid := rt.global_sid;
@@ -1955,19 +1977,37 @@ end;
     self := le;
 	end;
 
-	hous_recs_unsuppressed := join(wIPs_with_IDA_Attributes, DayBatchPCNSR.Key_PCNSR_DID, 
+	hous_recs_unsuppressed_roxie := join(wIPs_with_IDA_Attributes, DayBatchPCNSR.Key_PCNSR_DID, 
 					left.did!=0 and keyed(left.did=right.did), 
 					get_household(left, right), left outer,
           ATMOST(keyed(left.did=right.did), RiskWise.max_atmost), keep(50));
 
-    hous_recs := Suppress.Suppress_ReturnOldLayout(hous_recs_unsuppressed, mod_access, xlayout);
+	hous_recs_unsuppressed_thor := join(distribute(wIPs_with_IDA_Attributes, did), distribute(pull(DayBatchPCNSR.Key_PCNSR_DID), did), 
+					left.did!=0 and left.did=right.did, 
+					get_household(left, right), left outer,
+          ATMOST(RiskWise.max_atmost), keep(50));
+					
+#IF(_Control.Environment.onThor) 
+	hous_recs_unsuppressed := hous_recs_unsuppressed_thor;
+#ELSE
+	hous_recs_unsuppressed := hous_recs_unsuppressed_roxie;
+#END;
+
+  hous_recs := Suppress.Suppress_ReturnOldLayout(hous_recs_unsuppressed, mod_access, xlayout);
     
   xlayout roll_hous(xlayout le, xlayout rt) := transform
     self := if(le.refresh_date > rt.refresh_date, le, rt); 
   end;
-	
+
+#IF(_Control.Environment.onThor) 	
+	distr_house := distribute(hous_recs, seq);
+	groupedHouse   := group(sort(ungroup(distr_house),seq, local),seq, local);
+	wHouseHold   := rollup(groupedHouse, true, roll_hous(left, right));
+#ELSE
 	groupedHouse   := group(sort(ungroup(hous_recs),seq),seq);
 	wHouseHold   := rollup(groupedHouse, true, roll_hous(left, right));
+#END;
+	
 // End for Paro estincome and hownstatusflag attributes
 
 // Logic taken from IT1O function so that we can match what Paro had
@@ -1975,6 +2015,7 @@ dwelltype(STRING1 at) := MAP(at='F' => '', at='G' => 'S', at='H' => 'A', at='P' 
 invalidSet := ['E101','E212','E213','E214','E216','E302','E412','E413','E420','E421','E423','E500','E501','E502','E503','E600'];
 ambiguousSet := ['E422','E425','E427','E428','E429','E430','E431','E504'];	
 addrvalflag(STRING4 stat) := MAP(stat IN invalidSet => 'N', stat IN ambiguousSet => 'M', stat = '' => '', 'V');
+
 
 Models.Layout_FraudAttributes intoParoAttrs(wIPs_with_IDA_Attributes le, skiptrace_call rt) := TRANSFORM
   self.input.historydate := le.historydate;
@@ -2037,6 +2078,7 @@ Models.Layout_FraudAttributes intoParoAttrs(wIPs_with_IDA_Attributes le, skiptra
   
   self := [];
 END;
+
 
 ParoAttrsTemp := JOIN(wIPs_with_IDA_Attributes, skiptrace_call,
                       left.seq = right.seq,
