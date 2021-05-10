@@ -1,4 +1,4 @@
-﻿IMPORT dx_common;
+IMPORT dx_common;
 
 rec := dx_common.layout_ridkey;
 

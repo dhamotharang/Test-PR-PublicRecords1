@@ -1,7 +1,7 @@
 ﻿IMPORT AID_Build, ADVO, AlloyMedia_student_list,  American_student_list, AutoKey, AVM_V2, BankruptcyV3, BBB2, BIPV2, BIPV2_Best, BIPV2_Build, Business_Risk_BIP, BusReg, CalBus, CellPhone, Certegy, Corp2, 
 		Cortera_Tradeline, Data_Services, DCAV2, Death_Master,  Doxie, Doxie_Files, DriversV2, DMA, dx_BestRecords, dx_ConsumerFinancialProtectionBureau, dx_Cortera, dx_DataBridge, DX_Email, 
 		dx_Cortera_Tradeline, dx_Equifax_Business_Data, dx_Gong, dx_Header, dx_Infutor_NARB, dx_PhonesInfo, dx_PhonesPlus,dx_property, dx_Relatives_v3, EBR, Email_Data, emerges, Experian_CRDB, FAA, FBNv2, FLAccidents_Ecrash, Fraudpoint3, Gong, 
-		GovData, Header, Header_Quick, InfoUSA, IRS5500, InfutorCID, Inquiry_AccLogs, LiensV2, LN_PropertyV2, MDR, OSHAIR, Phonesplus_v2, Prof_License_Mari, 
+		GovData, Header, Header_Quick, InfoUSA, IRS5500, InfutorCID, Inquiry_AccLogs, LiensV2, LN_PropertyV2, MDR, OSHAIR, Phonesplus_v2, dx_prof_license_mari, 
 		Prof_LicenseV2, Relationship, Risk_Indicators, RiskView, RiskWise, SAM, SexOffender, STD, Suppress, Targus, thrive, USPIS_HotList, Utilfile, ut,
 		VehicleV2, Watercraft, Watchdog, UCCV2, YellowPages, dx_OSHAIR, drivers;
 
@@ -2578,9 +2578,9 @@ Bankruptcy_Files__Key_Search_Records_pre	:= Bankruptcy_Files__Key_Search_Records
           SELF := LEFT,
           SELF := []));	
 
-	// Prof_License_Mari.Key_Did has a parameter to say if FCRA or nonFCRA - same file layout		
-	Prof_License_Mari__Key_Did_Records_unsuppressed := 
-		JOIN(Input_FDC_RelativesLexids_HHIDLexids_LexIDs, Prof_License_Mari.Key_Did(Options.IsFCRA),
+	// dx_prof_license_mari.Key_Did has a parameter to say if FCRA or nonFCRA - same file layout		
+  Prof_License_Mari__Key_Did_Records_unsuppressed := 
+		JOIN(Input_FDC_RelativesLexids_HHIDLexids_LexIDs, dx_prof_license_mari.Key_Did(iType),
 				Common.DoFDCJoin_Prof_License_Mari__Key_Did = TRUE AND
 				LEFT.P_LexID > 0 AND
 				KEYED(LEFT.P_LexID = RIGHT.s_did) and
