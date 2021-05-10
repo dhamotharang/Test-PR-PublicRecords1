@@ -1,4 +1,4 @@
- import VersionControl, _control, OIG;
+﻿ import VersionControl, _control, OIG;
 
 export Send_Email(string pversion) := module
 		shared SuccessSubject	:= if(VersionControl.IsValidVersion(pversion)
@@ -11,11 +11,11 @@ export Send_Email(string pversion) := module
                                               '\nSee ' + OIG._Dataset().name 
 																);
    
-		export BuildSuccess		:= fileservices.sendemail('randy.reyes@lexisnexisrisk.com; manuel.tarectecan@lexisnexisrisk.com; abednego.escobal@lexisnexisrisk.com;' + _control.MyInfo.EmailAddressNotify,
+		export BuildSuccess		:= fileservices.sendemail('harry.gist@lexisnexisrisk.com; manuel.tarectecan@lexisnexisrisk.com; abednego.escobal@lexisnexisrisk.com;' ,
 																										SuccessSubject,
 																										SuccessBody
 																										);
-		export BuildFailure		:= fileservices.sendemail('saritha.myana@lexisnexis.com; randy.reyes@lexisnexisrisk.com; manuel.tarectecan@lexisnexisrisk.com; abednego.escobal@lexisnexisrisk.com' + _control.MyInfo.EmailAddressNotify,
+		export BuildFailure		:= fileservices.sendemail('saritha.myana@lexisnexisrisk.com; harry.gist@lexisnexisrisk.com; manuel.tarectecan@lexisnexisrisk.com; abednego.escobal@lexisnexisrisk.com' ,
 																										OIG._Dataset().name + ' Build ' + pversion + ' Failed on '+ _Control.ThisEnvironment.Name,
 																										workunit + '\n' + failmessage
 																										);
