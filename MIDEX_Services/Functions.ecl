@@ -1,6 +1,5 @@
-﻿IMPORT AutoStandardI, census_data, dx_common, iesp,liensv2_services, LN_PropertyV2_Services,
-  Midex_Services, Prof_License_Mari, SANCTN, SANCTN_Mari, STD, Suppress, ut;
-
+IMPORT AutoStandardI, census_data, dx_common, dx_prof_license_mari, iesp, liensv2_services, LN_PropertyV2_Services,
+       Midex_Services, SANCTN, SANCTN_Mari, STD, Suppress, ut;
 
 EXPORT Functions :=
   MODULE
@@ -865,7 +864,7 @@ EXPORT Functions :=
         ds_pubSanNMLS := PROJECT(ds_pubSanNMLS_pre_rolled, MIDEX_Services.Layouts.rec_NMLSIds);
 
         ds_profLicNMLS :=
-          JOIN(in_mod.MariRidNumbers, Prof_License_Mari.key_mari_payload,
+          JOIN(in_mod.MariRidNumbers, dx_prof_license_mari.key_mari_payload,
                KEYED(LEFT.mari_rid = RIGHT.mari_rid) AND
                RIGHT.nmls_id != 0 AND
                RIGHT.result_cd_1 = Midex_Services.Constants.RECORD_STATUS.LatestRecordUpdatingSource AND
@@ -883,7 +882,7 @@ EXPORT Functions :=
           DEDUP(SORT(ds_nonpubSanNMLS + ds_pubSanNMLS + ds_profLicNMLS, NMLSId), NMLSId);
 
         ds_MariRids_all :=
-          JOIN(ds_all_nmlsIds, Prof_License_Mari.key_nmls_id,
+          JOIN(ds_all_nmlsIds, dx_prof_license_mari.key_nmls_id,
                KEYED((UNSIGNED)LEFT.NMLSId = RIGHT.nmls_id),
                TRANSFORM(MIDEX_Services.Layouts.rec_NMLSWithDBAsAndMariRid,
                          SELF.NMLSId := RIGHT.NMLS_Id,
@@ -907,7 +906,7 @@ EXPORT Functions :=
             in_recs_deduped := DEDUP( SORT( in_recs(nmls_id != 0), nmls_id ), nmls_id );
 
             // get nmls records
-            nmls_recs_raw := JOIN(in_recs_deduped,Prof_License_Mari.key_nmls_id,
+						nmls_recs_raw := JOIN(in_recs_deduped,dx_prof_license_mari.key_nmls_id,
                                   KEYED(LEFT.nmls_id = RIGHT.nmls_id) AND
                                   // Bug 192775 - Memory exceeded error
                                   RIGHT.result_cd_1 = Midex_Services.Constants.RECORD_STATUS.LatestRecordUpdatingSource,
@@ -963,7 +962,7 @@ EXPORT Functions :=
 
             loc_recs_dedup := DEDUP(loc_recs,ALL);
 
-            rep_reg_recs := JOIN(nmls_recs,Prof_License_Mari.key_indv_detail,
+            rep_reg_recs := JOIN(nmls_recs,dx_Prof_License_Mari.key_individual_detail,
               KEYED(LEFT.nmls_id = RIGHT.individual_nmls_id),
               TRANSFORM(MIDEX_Services.Layouts.Represent_Registration_Layout,
                 SELF.nmls_id := LEFT.nmls_id,
@@ -1015,8 +1014,8 @@ EXPORT Functions :=
             END;
 
             reg_recs := ROLLUP(reg_group,GROUP,Roll_Regs(LEFT,ROWS(LEFT)));
-
-            discAction_recs := JOIN(nmls_recs,Prof_License_Mari.key_disciplinary,
+            
+            discAction_recs := JOIN(nmls_recs,dx_Prof_License_Mari.key_disciplinary_actions,
               KEYED(LEFT.nmls_id = RIGHT.individual_nmls_id),
               TRANSFORM(MIDEX_Services.Layouts.Action_Layout,
                 SELF.nmls_id := LEFT.nmls_id,
@@ -1030,8 +1029,8 @@ EXPORT Functions :=
                 SELF := []),
           LIMIT(iesp.Constants.MIDEX.MAX_COUNT_DISC_ACTIONS,SKIP));
             discAction_recs_dedup := DEDUP(discAction_recs,ALL);
-
-            regAction_recs := JOIN(nmls_recs,Prof_License_Mari.key_regulatory,
+            
+            regAction_recs := JOIN(nmls_recs,dx_Prof_License_Mari.key_regulatory_actions,
               KEYED(LEFT.nmls_id = RIGHT.nmls_id),
               TRANSFORM(MIDEX_Services.Layouts.Action_Layout,
                 SELF.nmls_id := LEFT.nmls_id,
