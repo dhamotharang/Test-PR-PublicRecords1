@@ -593,7 +593,7 @@ ssn_table_results1 := if(isFCRA, got_SSNTable_corr_proj, got_death_nonfcra_proj	
 			left.did<>right.did,
 			getMultipleUseSSNs(LEFT,RIGHT),
 						left outer,
-						atmost(riskwise.max_atmost), keep(100), LOCAL);
+						keep(100), LOCAL);
 
     #IF(onThor)
       multiple_use_ssns_with_wildcard_did := group(sort(multiple_use_ssns_with_wildcard_did_thor, seq), seq);
@@ -605,17 +605,37 @@ ssn_table_results1 := if(isFCRA, got_SSNTable_corr_proj, got_death_nonfcra_proj	
 		justDids := PROJECT(iids_dedp,
 			TRANSFORM(Relationship.Layout_GetRelationship.DIDs_layout, SELF.DID := LEFT.DID));
 		rellyids := Relationship.proc_GetRelationshipNeutral(justDids, topnCount:=500,
-			RelativeFlag :=TRUE,AssociateFlag:=TRUE,doAtmost:=TRUE,MaxCount:=RiskWise.max_atmost).result;
-
-		multiple_use_ssn_with_relative_flag := join(multiple_use_ssns_with_wildcard_did, rellyids,
-			left.did<>0 and
-			left.did=right.did1,
-				transform(temprec,
-					self.isRelative := left.wildcard_did<>0 and right.did2=left.wildcard_did,
-					self := left),
-						left outer);
-
-		with_relative_flag := dedup(sort(multiple_use_ssn_with_relative_flag, seq, ssn, wildcard_did, -isRelative), seq, ssn, wildcard_did);
+      RelativeFlag :=TRUE,AssociateFlag:=TRUE,doAtmost:=TRUE,MaxCount:=RiskWise.max_atmost,doThor:=onThor).result;  
+    
+    multiple_use_ssn_with_relative_flag_roxie := join(multiple_use_ssns_with_wildcard_did, rellyids, 
+                                                      left.did<>0 and
+                                                      left.did=right.did1,
+                                                      transform(temprec, 
+                                                        self.isRelative := left.wildcard_did<>0 and right.did2=left.wildcard_did, 
+                                                        self := left), 
+                                                      left outer);
+            
+    multiple_use_ssn_with_relative_flag_thor := join(DISTRIBUTE(multiple_use_ssns_with_wildcard_did(did<>0), HASH64(did)), 
+                                                     DISTRIBUTE(rellyids, HASH64(did1)), 
+                                                      // left.did<>0 and
+                                                      left.did=right.did1,
+                                                      transform(temprec, 
+                                                        self.isRelative := left.wildcard_did<>0 and right.did2=left.wildcard_did, 
+                                                        self := left), 
+                                                      left outer, LOCAL)
+                                                      +
+                                                      PROJECT(multiple_use_ssns_with_wildcard_did(did=0),
+                                                              TRANSFORM(temprec,
+                                                                        self.isRelative := FALSE, 
+                                                                        self := left));
+                                                                        
+  #IF(onThor)
+    multiple_use_ssn_with_relative_flag := GROUP(SORT(multiple_use_ssn_with_relative_flag_thor, seq), seq);
+  #ELSE
+    multiple_use_ssn_with_relative_flag := multiple_use_ssn_with_relative_flag_roxie;
+  #END
+  
+  	with_relative_flag := dedup(sort(multiple_use_ssn_with_relative_flag, seq, ssn, wildcard_did, -isRelative), seq, ssn, wildcard_did);
 
 		non_relative_stats := table(with_relative_flag, {seq, ssn,
 																	non_relative_adls_per_ssn := count(group, not isRelative),
@@ -785,7 +805,12 @@ risk_indicators.layout_output checkDC(risk_indicators.layout_output L) := transf
 	self.soclstate			:= Suppress.dateCorrect.st(L.ssn, L.soclstate);
 	self := L;
 end;
-ssn_flags2 := project(ssn_flags, checkDC(left));
+
+#IF(onThor)
+	ssn_flags2 := ssn_flags_thor;
+#ELSE
+	ssn_flags2 := project(ssn_flags, checkDC(left));
+#END
 
 return ssn_flags2;
 

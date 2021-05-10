@@ -246,7 +246,7 @@ rolled_personContext := rollup(PersonContext_sorted, left.lexid=right.lexid,
 		SELF.inquiries_correct_record_id    := left.inquiries_correct_record_id  +  right.inquiries_correct_record_id ;
 		SELF.ssn_correct_record_id          := left.ssn_correct_record_id  +  right.ssn_correct_record_id ;
 		SELF.header_correct_record_id       := left.header_correct_record_id  +  right.header_correct_record_id ;
-		SELF.ibehavior_correct_record_id		:= left.ibehavior_correct_record_id  +  right.ibehavior_correct_record_id ;
+		// SELF.ibehavior_correct_record_id		:= left.ibehavior_correct_record_id  +  right.ibehavior_correct_record_id ;
     SELF.death_correct_record_id        := left.death_correct_record_id  +  right.death_correct_record_id;
 
 		self := left;
@@ -288,7 +288,7 @@ with_personContext := join(input_with_DID, rolled_personContext, left.did=right.
 		SELF.inquiries_correct_record_id    := left.inquiries_correct_record_id  +  right.inquiries_correct_record_id ;
 		SELF.ssn_correct_record_id          := left.ssn_correct_record_id  +  right.ssn_correct_record_id ;
 		SELF.header_correct_record_id       := left.header_correct_record_id  +  right.header_correct_record_id ;
-		SELF.ibehavior_correct_record_id		:= left.ibehavior_correct_record_id  +  right.ibehavior_correct_record_id ;
+		// SELF.ibehavior_correct_record_id		:= left.ibehavior_correct_record_id  +  right.ibehavior_correct_record_id ;
     SELF.death_correct_record_id        := left.death_correct_record_id  +  right.death_correct_record_id;
 
 		
