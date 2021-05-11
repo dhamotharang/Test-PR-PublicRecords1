@@ -126,11 +126,10 @@ EXPORT InValidFT_Invalid_Phone(SALT311.StrType s) := WHICH(LENGTH(TRIM(s))<>LENG
 EXPORT InValidMessageFT_Invalid_Phone(UNSIGNED1 wh) := CHOOSE(wh,SALT311.HygieneErrors.NotInChars('0123456789'),SALT311.HygieneErrors.NotLength('0,10'),SALT311.HygieneErrors.Good);
 
 EXPORT MakeFT_Invalid_Clientassigneduniquerecordid(SALT311.StrType s0) := FUNCTION
-  s1 := SALT311.stringfilter(s0,'abcdefghijklmnopqrstuvwxyz0123456789'); // Only allow valid symbols
-  RETURN  s1;
+  RETURN  s0;
 END;
-EXPORT InValidFT_Invalid_Clientassigneduniquerecordid(SALT311.StrType s) := WHICH(LENGTH(TRIM(s))<>LENGTH(TRIM(SALT311.StringFilter(s,'abcdefghijklmnopqrstuvwxyz0123456789'))));
-EXPORT InValidMessageFT_Invalid_Clientassigneduniquerecordid(UNSIGNED1 wh) := CHOOSE(wh,SALT311.HygieneErrors.NotInChars('abcdefghijklmnopqrstuvwxyz0123456789'),SALT311.HygieneErrors.Good);
+EXPORT InValidFT_Invalid_Clientassigneduniquerecordid(SALT311.StrType s) := WHICH(~Scrubs_IDA.Functions.fn_valid_clientId(s)>0);
+EXPORT InValidMessageFT_Invalid_Clientassigneduniquerecordid(UNSIGNED1 wh) := CHOOSE(wh,SALT311.HygieneErrors.CustomFail('Scrubs_IDA.Functions.fn_valid_clientId'),SALT311.HygieneErrors.Good);
 
 EXPORT MakeFT_Invalid_Emailaddress(SALT311.StrType s0) := FUNCTION
   RETURN  s0;
@@ -148,7 +147,7 @@ EXPORT InValidMessageFT_Invalid_Ipaddress(UNSIGNED1 wh) := CHOOSE(wh,SALT311.Hyg
 EXPORT SALT311.StrType FieldName(UNSIGNED2 i) := CHOOSE(i,'firstname','middlename','lastname','suffix','addressline1','addressline2','city','state','zip','dob','ssn','dl','dlstate','phone','clientassigneduniquerecordid','emailaddress','ipaddress');
 EXPORT SALT311.StrType FlatName(UNSIGNED2 i) := CHOOSE(i,'firstname','middlename','lastname','suffix','addressline1','addressline2','city','state','zip','dob','ssn','dl','dlstate','phone','clientassigneduniquerecordid','emailaddress','ipaddress');
 EXPORT FieldNum(SALT311.StrType fn) := CASE(fn,'firstname' => 0,'middlename' => 1,'lastname' => 2,'suffix' => 3,'addressline1' => 4,'addressline2' => 5,'city' => 6,'state' => 7,'zip' => 8,'dob' => 9,'ssn' => 10,'dl' => 11,'dlstate' => 12,'phone' => 13,'clientassigneduniquerecordid' => 14,'emailaddress' => 15,'ipaddress' => 16,0);
-EXPORT SET OF SALT311.StrType FieldRules(UNSIGNED2 i) := CHOOSE(i,['ALLOW','LENGTHS','WORDS'],['ALLOW','LENGTHS','WORDS'],['ALLOW','LENGTHS','WORDS'],['ALLOW','WORDS'],['ALLOW','WORDS'],['ALLOW','WORDS'],['ALLOW','WORDS'],['CUSTOM'],['ALLOW','LENGTHS'],['CUSTOM'],['ALLOW','LENGTHS','WORDS'],['CUSTOM'],['CUSTOM'],['ALLOW','LENGTHS'],['ALLOW'],['CUSTOM'],['CUSTOM'],[]);
+EXPORT SET OF SALT311.StrType FieldRules(UNSIGNED2 i) := CHOOSE(i,['ALLOW','LENGTHS','WORDS'],['ALLOW','LENGTHS','WORDS'],['ALLOW','LENGTHS','WORDS'],['ALLOW','WORDS'],['ALLOW','WORDS'],['ALLOW','WORDS'],['ALLOW','WORDS'],['CUSTOM'],['ALLOW','LENGTHS'],['CUSTOM'],['ALLOW','LENGTHS','WORDS'],['CUSTOM'],['CUSTOM'],['ALLOW','LENGTHS'],['CUSTOM'],['CUSTOM'],['CUSTOM'],[]);
 EXPORT BOOLEAN InBaseLayout(UNSIGNED2 i) := CHOOSE(i,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,FALSE);
 
 //Individual field level validation
