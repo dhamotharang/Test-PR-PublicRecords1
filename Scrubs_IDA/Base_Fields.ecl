@@ -150,8 +150,8 @@ EXPORT MakeFT_Invalid_Clientassigneduniquerecordid(SALT311.StrType s0) := FUNCTI
   s1 := SALT311.stringfilter(s0,'abcdefghijklmnopqrstuvwxyz0123456789'); // Only allow valid symbols
   RETURN  s1;
 END;
-EXPORT InValidFT_Invalid_Clientassigneduniquerecordid(SALT311.StrType s) := WHICH(LENGTH(TRIM(s))<>LENGTH(TRIM(SALT311.StringFilter(s,'abcdefghijklmnopqrstuvwxyz0123456789'))),~(LENGTH(TRIM(s)) = 17 OR LENGTH(TRIM(s)) = 18 OR LENGTH(TRIM(s)) = 19));
-EXPORT InValidMessageFT_Invalid_Clientassigneduniquerecordid(UNSIGNED1 wh) := CHOOSE(wh,SALT311.HygieneErrors.NotInChars('abcdefghijklmnopqrstuvwxyz0123456789'),SALT311.HygieneErrors.NotLength('17,18,19'),SALT311.HygieneErrors.Good);
+EXPORT InValidFT_Invalid_Clientassigneduniquerecordid(SALT311.StrType s) := WHICH(LENGTH(TRIM(s))<>LENGTH(TRIM(SALT311.StringFilter(s,'abcdefghijklmnopqrstuvwxyz0123456789'))),~(LENGTH(TRIM(s)) >= 12 AND LENGTH(TRIM(s)) <= 20));
+EXPORT InValidMessageFT_Invalid_Clientassigneduniquerecordid(UNSIGNED1 wh) := CHOOSE(wh,SALT311.HygieneErrors.NotInChars('abcdefghijklmnopqrstuvwxyz0123456789'),SALT311.HygieneErrors.NotLength('12..20'),SALT311.HygieneErrors.Good);
 
 EXPORT MakeFT_Invalid_Emailaddress(SALT311.StrType s0) := FUNCTION
   RETURN  s0;
