@@ -406,6 +406,8 @@
 				trim(subcatname, left, right) = 'PEP NG-R' 	=> 'PEP Non-Government - Immediate Relative',
 				trim(subcatname, left, right) = 'PEP NG-A' 	=> 'PEP Non-Government - Close Associate',
 				trim(subcatname, left, right) = 'SOE' 		=> 'PEP State Owned Entity',
+				trim(subcatname, left, right) = 'SIE' 		=> 'PEP State Invested Enterprise',
+				trim(subcatname, left, right) = 'IOS' 		=> 'PEP Instrumentality of State',
 				trim(subcatname, left, right) in ['Non-PEP', ''] => 'Non-PEP',
 				'');
 				
