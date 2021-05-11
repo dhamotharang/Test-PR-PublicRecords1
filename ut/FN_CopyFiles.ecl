@@ -17,7 +17,7 @@ EXPORT FN_CopyFiles(STRING psname, // superfile name to copy
 								STRING destinationGroup = 'thor400_198_a', //cluster to drop file
 								STRING pDaliIP = _control.IPAddress.prod_thor_dali, // Dali IP for where data currently resides
 								STRING pEnvironmentVariable = '', // if you want to check prod roxie for new version (ex: iheader_build_version)
-								STRING pRoxieIP = 'http://roxiebatch.br.seisint.com:9856', // if you want to check prod roxie for new version (ex: http://Iroxievip.sc.seisint.com:9876 - alpha prod)
+								STRING pRoxieIP = 'http://' + _Control.RoxieEnv.boca_prodvip, // if you want to check prod roxie for new version (ex: http://Iroxievip.sc.seisint.com:9876 - alpha prod)
 								STRING emails = 'kevin.l.logemann@lexisnexis.com, DataFab-ALP@lexisnexis.com') := FUNCTION 
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
