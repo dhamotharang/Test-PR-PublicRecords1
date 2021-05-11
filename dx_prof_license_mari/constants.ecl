@@ -1,6 +1,6 @@
 EXPORT Constants := MODULE
   // autokey
-  EXPORT ak_keyname := dx_prof_license_mari.names().i_autokey_payload;
+  EXPORT ak_keyname := dx_prof_license_mari.names().ak_prefix+'::qa::';
   EXPORT ak_dataset := DATASET([], dx_prof_license_mari.layouts.i_autokey_payload);
   EXPORT set_skip := [];
   EXPORT TYPE_STR := 'ak';
