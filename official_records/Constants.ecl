@@ -22,9 +22,9 @@ export Constants := module
 	export srcType	:= 'official_records';
 	export qual			:= 'test';
 	//check the number of subfiles in superkey file to determine the build is delta update or full build
-	//threshold is 4
+	//threshold is 5
 	num_subfiles := nothor(STD.File.SuperFileContents(dx_official_records.names().i_party));
-  export DeltaBuild := if(count(num_subfiles) <= 4, true, false);
+  export DeltaBuild := if(count(num_subfiles) < 5, true, false);
 													
 end;
 
