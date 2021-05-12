@@ -7,8 +7,8 @@ EXPORT RawInput_Scrubs := MODULE
   EXPORT NumRulesFromFieldType := 31;
   EXPORT NumRulesFromRecordType := 0;
   EXPORT NumFieldsWithRules := 17;
-  EXPORT NumFieldsWithPossibleEdits := 0;
-  EXPORT NumRulesWithPossibleEdits := 0;
+  EXPORT NumFieldsWithPossibleEdits := 1;
+  EXPORT NumRulesWithPossibleEdits := 1;
   EXPORT Expanded_Layout := RECORD(RawInput_Layout_IDA)
     UNSIGNED1 firstname_Invalid;
     UNSIGNED1 middlename_Invalid;
@@ -25,11 +25,13 @@ EXPORT RawInput_Scrubs := MODULE
     UNSIGNED1 dlstate_Invalid;
     UNSIGNED1 phone_Invalid;
     UNSIGNED1 clientassigneduniquerecordid_Invalid;
+    BOOLEAN clientassigneduniquerecordid_wouldSkip;
     UNSIGNED1 emailaddress_Invalid;
     UNSIGNED1 ipaddress_Invalid;
   END;
   EXPORT  Bitmap_Layout := RECORD(RawInput_Layout_IDA)
     UNSIGNED8 ScrubsBits1;
+    UNSIGNED8 ScrubsCleanBits1;
   END;
   EXPORT Rule_Layout := RECORD(RawInput_Layout_IDA)
     STRING Rules {MAXLENGTH(1000)};
@@ -49,7 +51,7 @@ EXPORT RawInput_Scrubs := MODULE
           ,'dl:Invalid_DL:CUSTOM'
           ,'dlstate:Invalid_State:CUSTOM'
           ,'phone:Invalid_Phone:ALLOW','phone:Invalid_Phone:LENGTHS'
-          ,'clientassigneduniquerecordid:Invalid_Clientassigneduniquerecordid:ALLOW'
+          ,'clientassigneduniquerecordid:Invalid_Clientassigneduniquerecordid:CUSTOM'
           ,'emailaddress:Invalid_Emailaddress:CUSTOM'
           ,'ipaddress:Invalid_Ipaddress:CUSTOM'
           ,'field:Number_Errored_Fields:SUMMARY'
@@ -58,7 +60,9 @@ EXPORT RawInput_Scrubs := MODULE
           ,'rule:Number_Perfect_Rules:SUMMARY'
           ,'rule:Number_OnFail_Rules:SUMMARY'
           ,'record:Number_Errored_Records:SUMMARY'
-          ,'record:Number_Perfect_Records:SUMMARY','UNKNOWN');
+          ,'record:Number_Perfect_Records:SUMMARY'
+          ,'record:Number_Edited_Records:SUMMARY'
+          ,'rule:Number_Edited_Rules:SUMMARY','UNKNOWN');
   SHARED toErrorMessage(UNSIGNED c) := CHOOSE(c
           ,RawInput_Fields.InvalidMessage_firstname(1),RawInput_Fields.InvalidMessage_firstname(2),RawInput_Fields.InvalidMessage_firstname(3)
           ,RawInput_Fields.InvalidMessage_middlename(1),RawInput_Fields.InvalidMessage_middlename(2),RawInput_Fields.InvalidMessage_middlename(3)
@@ -83,7 +87,9 @@ EXPORT RawInput_Scrubs := MODULE
           ,'Rules without errors'
           ,'Rules with possible edits'
           ,'Records with at least one error'
-          ,'Records without errors','UNKNOWN');
+          ,'Records without errors'
+          ,'Edited records'
+          ,'Rules leading to edits','UNKNOWN');
 EXPORT FromNone(DATASET(RawInput_Layout_IDA) h) := MODULE
   SHARED Expanded_Layout toExpanded(h le, BOOLEAN withOnfail) := TRANSFORM
     SELF.firstname_Invalid := RawInput_Fields.InValid_firstname((SALT311.StrType)le.firstname);
@@ -101,6 +107,8 @@ EXPORT FromNone(DATASET(RawInput_Layout_IDA) h) := MODULE
     SELF.dlstate_Invalid := RawInput_Fields.InValid_dlstate((SALT311.StrType)le.dlstate);
     SELF.phone_Invalid := RawInput_Fields.InValid_phone((SALT311.StrType)le.phone);
     SELF.clientassigneduniquerecordid_Invalid := RawInput_Fields.InValid_clientassigneduniquerecordid((SALT311.StrType)le.clientassigneduniquerecordid);
+    SELF.clientassigneduniquerecordid := IF(SELF.clientassigneduniquerecordid_Invalid=0 OR NOT withOnfail, le.clientassigneduniquerecordid, SKIP); // ONFAIL(REJECT)
+    SELF.clientassigneduniquerecordid_wouldSkip := SELF.clientassigneduniquerecordid_Invalid > 0;
     SELF.emailaddress_Invalid := RawInput_Fields.InValid_emailaddress((SALT311.StrType)le.emailaddress);
     SELF.ipaddress_Invalid := RawInput_Fields.InValid_ipaddress((SALT311.StrType)le.ipaddress);
     SELF := le;
@@ -109,6 +117,7 @@ EXPORT FromNone(DATASET(RawInput_Layout_IDA) h) := MODULE
   EXPORT ProcessedInfile := PROJECT(PROJECT(h,toExpanded(LEFT,TRUE)),RawInput_Layout_IDA);
   Bitmap_Layout Into(ExpandedInfile le) := TRANSFORM
     SELF.ScrubsBits1 := ( le.firstname_Invalid << 0 ) + ( le.middlename_Invalid << 2 ) + ( le.lastname_Invalid << 4 ) + ( le.suffix_Invalid << 6 ) + ( le.addressline1_Invalid << 8 ) + ( le.addressline2_Invalid << 10 ) + ( le.city_Invalid << 12 ) + ( le.state_Invalid << 14 ) + ( le.zip_Invalid << 15 ) + ( le.dob_Invalid << 17 ) + ( le.ssn_Invalid << 18 ) + ( le.dl_Invalid << 20 ) + ( le.dlstate_Invalid << 21 ) + ( le.phone_Invalid << 22 ) + ( le.clientassigneduniquerecordid_Invalid << 24 ) + ( le.emailaddress_Invalid << 25 ) + ( le.ipaddress_Invalid << 26 );
+    SELF.ScrubsCleanBits1 := ( IF(le.clientassigneduniquerecordid_wouldSkip, 1, 0) << 0 );
     SELF := le;
   END;
   EXPORT BitmapInfile := PROJECT(ExpandedInfile,Into(LEFT));
@@ -147,6 +156,7 @@ EXPORT FromBits(DATASET(Bitmap_Layout) h) := MODULE
     SELF.clientassigneduniquerecordid_Invalid := (le.ScrubsBits1 >> 24) & 1;
     SELF.emailaddress_Invalid := (le.ScrubsBits1 >> 25) & 1;
     SELF.ipaddress_Invalid := (le.ScrubsBits1 >> 26) & 1;
+    SELF.clientassigneduniquerecordid_wouldSkip := le.ScrubsCleanBits1 >> 0;
     SELF := le;
   END;
   EXPORT ExpandedInfile := PROJECT(h,Into(LEFT));
@@ -193,21 +203,25 @@ EXPORT FromExpanded(DATASET(Expanded_Layout) h) := MODULE
     phone_ALLOW_ErrorCount := COUNT(GROUP,h.phone_Invalid=1);
     phone_LENGTHS_ErrorCount := COUNT(GROUP,h.phone_Invalid=2);
     phone_Total_ErrorCount := COUNT(GROUP,h.phone_Invalid>0);
-    clientassigneduniquerecordid_ALLOW_ErrorCount := COUNT(GROUP,h.clientassigneduniquerecordid_Invalid=1);
+    clientassigneduniquerecordid_CUSTOM_ErrorCount := COUNT(GROUP,h.clientassigneduniquerecordid_Invalid=1);
+    clientassigneduniquerecordid_CUSTOM_WouldSkipRecCount := COUNT(GROUP,h.clientassigneduniquerecordid_Invalid=1 AND h.clientassigneduniquerecordid_wouldSkip);
     emailaddress_CUSTOM_ErrorCount := COUNT(GROUP,h.emailaddress_Invalid=1);
     ipaddress_CUSTOM_ErrorCount := COUNT(GROUP,h.ipaddress_Invalid=1);
     AnyRule_WithErrorsCount := COUNT(GROUP, h.firstname_Invalid > 0 OR h.middlename_Invalid > 0 OR h.lastname_Invalid > 0 OR h.suffix_Invalid > 0 OR h.addressline1_Invalid > 0 OR h.addressline2_Invalid > 0 OR h.city_Invalid > 0 OR h.state_Invalid > 0 OR h.zip_Invalid > 0 OR h.dob_Invalid > 0 OR h.ssn_Invalid > 0 OR h.dl_Invalid > 0 OR h.dlstate_Invalid > 0 OR h.phone_Invalid > 0 OR h.clientassigneduniquerecordid_Invalid > 0 OR h.emailaddress_Invalid > 0 OR h.ipaddress_Invalid > 0);
+    AnyRule_WithEditsCount := COUNT(GROUP, h.clientassigneduniquerecordid_wouldSkip);
     FieldsChecked_WithErrors := 0;
     FieldsChecked_NoErrors := 0;
     Rules_WithErrors := 0;
     Rules_NoErrors := 0;
+    Rules_WithEdits := 0;
   END;
   SummaryStats0 := TABLE(h,r);
   SummaryStats0 xAddErrSummary(SummaryStats0 le) := TRANSFORM
-    SELF.FieldsChecked_WithErrors := IF(le.firstname_Total_ErrorCount > 0, 1, 0) + IF(le.middlename_Total_ErrorCount > 0, 1, 0) + IF(le.lastname_Total_ErrorCount > 0, 1, 0) + IF(le.suffix_Total_ErrorCount > 0, 1, 0) + IF(le.addressline1_Total_ErrorCount > 0, 1, 0) + IF(le.addressline2_Total_ErrorCount > 0, 1, 0) + IF(le.city_Total_ErrorCount > 0, 1, 0) + IF(le.state_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.zip_Total_ErrorCount > 0, 1, 0) + IF(le.dob_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.ssn_Total_ErrorCount > 0, 1, 0) + IF(le.dl_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.dlstate_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.phone_Total_ErrorCount > 0, 1, 0) + IF(le.clientassigneduniquerecordid_ALLOW_ErrorCount > 0, 1, 0) + IF(le.emailaddress_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.ipaddress_CUSTOM_ErrorCount > 0, 1, 0);
+    SELF.FieldsChecked_WithErrors := IF(le.firstname_Total_ErrorCount > 0, 1, 0) + IF(le.middlename_Total_ErrorCount > 0, 1, 0) + IF(le.lastname_Total_ErrorCount > 0, 1, 0) + IF(le.suffix_Total_ErrorCount > 0, 1, 0) + IF(le.addressline1_Total_ErrorCount > 0, 1, 0) + IF(le.addressline2_Total_ErrorCount > 0, 1, 0) + IF(le.city_Total_ErrorCount > 0, 1, 0) + IF(le.state_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.zip_Total_ErrorCount > 0, 1, 0) + IF(le.dob_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.ssn_Total_ErrorCount > 0, 1, 0) + IF(le.dl_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.dlstate_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.phone_Total_ErrorCount > 0, 1, 0) + IF(le.clientassigneduniquerecordid_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.emailaddress_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.ipaddress_CUSTOM_ErrorCount > 0, 1, 0);
     SELF.FieldsChecked_NoErrors := NumFieldsWithRules - SELF.FieldsChecked_WithErrors;
-    SELF.Rules_WithErrors := IF(le.firstname_ALLOW_ErrorCount > 0, 1, 0) + IF(le.firstname_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.firstname_WORDS_ErrorCount > 0, 1, 0) + IF(le.middlename_ALLOW_ErrorCount > 0, 1, 0) + IF(le.middlename_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.middlename_WORDS_ErrorCount > 0, 1, 0) + IF(le.lastname_ALLOW_ErrorCount > 0, 1, 0) + IF(le.lastname_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.lastname_WORDS_ErrorCount > 0, 1, 0) + IF(le.suffix_ALLOW_ErrorCount > 0, 1, 0) + IF(le.suffix_WORDS_ErrorCount > 0, 1, 0) + IF(le.addressline1_ALLOW_ErrorCount > 0, 1, 0) + IF(le.addressline1_WORDS_ErrorCount > 0, 1, 0) + IF(le.addressline2_ALLOW_ErrorCount > 0, 1, 0) + IF(le.addressline2_WORDS_ErrorCount > 0, 1, 0) + IF(le.city_ALLOW_ErrorCount > 0, 1, 0) + IF(le.city_WORDS_ErrorCount > 0, 1, 0) + IF(le.state_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.zip_ALLOW_ErrorCount > 0, 1, 0) + IF(le.zip_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.dob_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.ssn_ALLOW_ErrorCount > 0, 1, 0) + IF(le.ssn_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.ssn_WORDS_ErrorCount > 0, 1, 0) + IF(le.dl_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.dlstate_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.phone_ALLOW_ErrorCount > 0, 1, 0) + IF(le.phone_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.clientassigneduniquerecordid_ALLOW_ErrorCount > 0, 1, 0) + IF(le.emailaddress_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.ipaddress_CUSTOM_ErrorCount > 0, 1, 0);
+    SELF.Rules_WithErrors := IF(le.firstname_ALLOW_ErrorCount > 0, 1, 0) + IF(le.firstname_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.firstname_WORDS_ErrorCount > 0, 1, 0) + IF(le.middlename_ALLOW_ErrorCount > 0, 1, 0) + IF(le.middlename_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.middlename_WORDS_ErrorCount > 0, 1, 0) + IF(le.lastname_ALLOW_ErrorCount > 0, 1, 0) + IF(le.lastname_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.lastname_WORDS_ErrorCount > 0, 1, 0) + IF(le.suffix_ALLOW_ErrorCount > 0, 1, 0) + IF(le.suffix_WORDS_ErrorCount > 0, 1, 0) + IF(le.addressline1_ALLOW_ErrorCount > 0, 1, 0) + IF(le.addressline1_WORDS_ErrorCount > 0, 1, 0) + IF(le.addressline2_ALLOW_ErrorCount > 0, 1, 0) + IF(le.addressline2_WORDS_ErrorCount > 0, 1, 0) + IF(le.city_ALLOW_ErrorCount > 0, 1, 0) + IF(le.city_WORDS_ErrorCount > 0, 1, 0) + IF(le.state_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.zip_ALLOW_ErrorCount > 0, 1, 0) + IF(le.zip_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.dob_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.ssn_ALLOW_ErrorCount > 0, 1, 0) + IF(le.ssn_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.ssn_WORDS_ErrorCount > 0, 1, 0) + IF(le.dl_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.dlstate_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.phone_ALLOW_ErrorCount > 0, 1, 0) + IF(le.phone_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.clientassigneduniquerecordid_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.emailaddress_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.ipaddress_CUSTOM_ErrorCount > 0, 1, 0);
     SELF.Rules_NoErrors := NumRules - SELF.Rules_WithErrors;
+    SELF.Rules_WithEdits := IF(le.clientassigneduniquerecordid_CUSTOM_WouldSkipRecCount > 0, 1, 0);
     SELF := le;
   END;
   EXPORT SummaryStats := PROJECT(SummaryStats0, xAddErrSummary(LEFT));
@@ -238,7 +252,7 @@ EXPORT FromExpanded(DATASET(Expanded_Layout) h) := MODULE
           ,CHOOSE(le.dl_Invalid,'CUSTOM','UNKNOWN')
           ,CHOOSE(le.dlstate_Invalid,'CUSTOM','UNKNOWN')
           ,CHOOSE(le.phone_Invalid,'ALLOW','LENGTHS','UNKNOWN')
-          ,CHOOSE(le.clientassigneduniquerecordid_Invalid,'ALLOW','UNKNOWN')
+          ,CHOOSE(le.clientassigneduniquerecordid_Invalid,'CUSTOM','UNKNOWN')
           ,CHOOSE(le.emailaddress_Invalid,'CUSTOM','UNKNOWN')
           ,CHOOSE(le.ipaddress_Invalid,'CUSTOM','UNKNOWN'),'UNKNOWN'));
     SELF.FieldName := CHOOSE(c,'firstname','middlename','lastname','suffix','addressline1','addressline2','city','state','zip','dob','ssn','dl','dlstate','phone','clientassigneduniquerecordid','emailaddress','ipaddress','UNKNOWN');
@@ -272,7 +286,7 @@ EXPORT FromExpanded(DATASET(Expanded_Layout) h) := MODULE
           ,le.dl_CUSTOM_ErrorCount
           ,le.dlstate_CUSTOM_ErrorCount
           ,le.phone_ALLOW_ErrorCount,le.phone_LENGTHS_ErrorCount
-          ,le.clientassigneduniquerecordid_ALLOW_ErrorCount
+          ,le.clientassigneduniquerecordid_CUSTOM_ErrorCount
           ,le.emailaddress_CUSTOM_ErrorCount
           ,le.ipaddress_CUSTOM_ErrorCount
           ,le.FieldsChecked_WithErrors
@@ -281,7 +295,9 @@ EXPORT FromExpanded(DATASET(Expanded_Layout) h) := MODULE
           ,le.Rules_NoErrors
           ,NumRulesWithPossibleEdits
           ,le.AnyRule_WithErrorsCount
-          ,SELF.recordstotal - le.AnyRule_WithErrorsCount,0);
+          ,SELF.recordstotal - le.AnyRule_WithErrorsCount
+          ,le.AnyRule_WithEditsCount
+          ,le.Rules_WithEdits,0);
       SELF.rulepcnt := IF(c <= NumRules, 100 * CHOOSE(c
           ,le.firstname_ALLOW_ErrorCount,le.firstname_LENGTHS_ErrorCount,le.firstname_WORDS_ErrorCount
           ,le.middlename_ALLOW_ErrorCount,le.middlename_LENGTHS_ErrorCount,le.middlename_WORDS_ErrorCount
@@ -297,7 +313,7 @@ EXPORT FromExpanded(DATASET(Expanded_Layout) h) := MODULE
           ,le.dl_CUSTOM_ErrorCount
           ,le.dlstate_CUSTOM_ErrorCount
           ,le.phone_ALLOW_ErrorCount,le.phone_LENGTHS_ErrorCount
-          ,le.clientassigneduniquerecordid_ALLOW_ErrorCount
+          ,le.clientassigneduniquerecordid_CUSTOM_ErrorCount
           ,le.emailaddress_CUSTOM_ErrorCount
           ,le.ipaddress_CUSTOM_ErrorCount,0) / le.TotalCnt, CHOOSE(c - NumRules
           ,IF(NumFieldsWithRules = 0, 0, le.FieldsChecked_WithErrors/NumFieldsWithRules * 100)
@@ -306,9 +322,11 @@ EXPORT FromExpanded(DATASET(Expanded_Layout) h) := MODULE
           ,IF(NumRules = 0, 0, le.Rules_NoErrors/NumRules * 100)
           ,0
           ,IF(SELF.recordstotal = 0, 0, le.AnyRule_WithErrorsCount/SELF.recordstotal * 100)
-          ,IF(SELF.recordstotal = 0, 0, (SELF.recordstotal - le.AnyRule_WithErrorsCount)/SELF.recordstotal * 100),0));
+          ,IF(SELF.recordstotal = 0, 0, (SELF.recordstotal - le.AnyRule_WithErrorsCount)/SELF.recordstotal * 100)
+          ,IF(SELF.recordstotal = 0, 0, le.AnyRule_WithEditsCount/SELF.recordstotal * 100)
+          ,IF(NumRulesWithPossibleEdits = 0, 0, le.Rules_WithEdits/NumRulesWithPossibleEdits * 100),0));
     END;
-    SummaryInfo := NORMALIZE(SummaryStats,NumRules + 7,Into(LEFT,COUNTER));
+    SummaryInfo := NORMALIZE(SummaryStats,NumRules + 9,Into(LEFT,COUNTER));
     orb_r := RECORD
       AllErrors.Src;
       STRING RuleDesc := TRIM(AllErrors.FieldName)+':'+TRIM(AllErrors.FieldType)+':'+AllErrors.ErrorType;
