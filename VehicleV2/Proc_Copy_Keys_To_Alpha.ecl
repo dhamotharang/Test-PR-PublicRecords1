@@ -1,13 +1,15 @@
-IMPORT STD, dops, Orbit3Insurance;
+IMPORT STD, dops, Orbit3Insurance, ut;
 
 EXPORT Proc_Copy_Keys_To_Alpha(
-	STRING pVersion,
-	STRING envment = 'nonfcra',
-	STRING pContacts
+	STRING  pVersion,
+	STRING  pEnv = 'N',
+	STRING  pContacts,
+	BOOLEAN pTesting = FALSE
 ) := FUNCTION
+	dUserCreds := ut.Credentials().fGetAppUserInfo();	
 
-	vAlphaDali := 'alpha_prod_thor_dali.risk.regn.net';
-	vAlphaEsp := 'alpha_prod_thor_esp.risk.regn.net';
+	vRemoteUrl := 'http://alpha_prod_thor_esp.risk.regn.net:8010/FileSpray';
+
 	vDatasetName := 'VehicleV2Keys';
 	vDesiredKeysSet := [
 		'thor_data400::key::vehiclev2::vin_qa',
@@ -25,18 +27,10 @@ EXPORT Proc_Copy_Keys_To_Alpha(
 	END;
 
 	roxie_keys_layout replaceDate(roxie_keys_dataset l) := TRANSFORM
- 		STRING modified_filename := IF(
-			envment = 'ct',
-			REGEXREPLACE(
-				vDatasetName + '_DATE',
-				'~'+l.logicalkey,
-				'custtest::' + pVersion
-			),
-			REGEXREPLACE(
-				vDatasetName + '_DATE',
-				'~'+l.logicalkey,
-				pVersion
-			)
+ 		STRING modified_filename := REGEXREPLACE(
+			vDatasetName + '_DATE',
+			'~'+l.logicalkey,
+			pVersion
 		);
 		STRING temp_filename := modified_filename[1..LENGTH(modified_filename)-1];
 		SELF.superfiles := l.superkey;
@@ -49,66 +43,60 @@ EXPORT Proc_Copy_Keys_To_Alpha(
 
 	temp_dataset := PROJECT(roxie_keys_dataset, replaceDate(left));
 
-	output_dataset := OUTPUT(temp_dataset, NAMED(vDatasetName+'_copyfiles'));
-
-	final_dataset := DATASET(WORKUNIT(vDatasetName+'_copyfiles'), roxie_keys_layout);
-
-	copy_files := NOTHOR(
-		APPLY(
-			final_dataset,
+	copy_files :=APPLY(
+		temp_dataset, 
+		IF(
+			STD.File.FileExists(logicalfiles),
 			IF(
-				STD.File.FileExists(logicalfiles),
-				IF(
-					COUNT(
-						STD.File.LogicalFileList(
-							REGEXREPLACE('~', logicalfiles, ''),
-							foreigndali := vAlphaDali
-						)
-					) > 0,
-					OUTPUT(logicalfiles + ' already exists in ' + vAlphaDali),
-					SEQUENTIAL(
-						OUTPUT('Copying ' +logicalfiles+ ' to ' + vAlphaEsp),
-						STD.File.Copy(
-							logicalfiles,
-							'thor400_112',
-							logicalfiles,
-							'uspr-prod-thor-dali.risk.regn.net',
-							espServerIPPort := vAlphaEsp + ':8010/FileSpray',
-							allowOverwrite := TRUE,
-							replicate := TRUE
-						),
-						OUTPUT(logicalfiles + ' Was successfully copied to ' + vAlphaEsp)
+				COUNT(
+					STD.File.LogicalFileList(
+						REGEXREPLACE('~', logicalfiles, ''),
+						foreigndali := vRemoteUrl
 					)
-				),
-				OUTPUT(logicalfiles + ' does not exist')
-			)
+				) > 0,
+				OUTPUT(logicalfiles + ' already exists in ' + vRemoteUrl),
+				SEQUENTIAL(
+					OUTPUT('Copying ' +logicalfiles+ ' to ' + vRemoteUrl),
+					STD.File.RemotePull(
+						remoteEspFsURL := vRemoteUrl,
+						sourcelogicalname := logicalfiles,
+						destinationGroup := 'thor400_112',
+						destinationlogicalname := logicalfiles,
+						allowoverwrite := TRUE,
+						replicate := TRUE,
+						username := dUserCreds[1].username,
+						userPw := dUserCreds[1].password
+					),
+					OUTPUT(logicalfiles + ' Was successfully copied to ' + vRemoteUrl)
+				)
+			),
+			OUTPUT(logicalfiles + ' does not exist')
 		)
 	);
 
 	update_dops_alpha_non_fcra := dops.updateversion(
 		'VehicleV2Keys',
 		pVersion,
-		pContacts,,
-		'N|B',
+		pContacts,
+		l_inenvment := pEnv,
 		l_inloc := 'A'
 	);
 
 	create_insurance_orbit_build_instance := Orbit3Insurance.Proc_Orbit3I_CreateBuild(
 		'Motor Vehicle Registrations',
 		pVersion,
-		'N|B',
+		pEnv,
 		email_list := STD.Str.FindReplace(pContacts, ',', ';')
 	);
 
 	RETURN SEQUENTIAL(
-		output_dataset,
 		copy_files,
 		IF( 
-			envment <> 'ct',
+			NOT pTesting,
 			update_dops_alpha_non_fcra
 		),
 		IF(
-			envment <> 'ct',
+			NOT pTesting,
 			create_insurance_orbit_build_instance	
 		)
 	);
