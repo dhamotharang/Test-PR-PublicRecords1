@@ -53,15 +53,20 @@ processLeftOuterRes() := MACRO
   SELF := []
 ENDMACRO;
 
-runT(__tlabel, __inrecs, __key_recs, __delta_recs, __joinCond, __expected_recs, LEFTOUTER = FALSE) := FUNCTIONMACRO
+runT(__tlabel, __inrecs, __key_recs, __delta_recs, __joinCond, __expected_recs, LEFTOUTER = FALSE, GROUPBY = '') := FUNCTIONMACRO
   LOCAL __payload_recs := __key_recs + __delta_recs;
-  LOCAL __jrecs := JOIN(__inrecs, __payload_recs, __joinCond, 
+  LOCAL __jrecs_pre := JOIN(__inrecs, __payload_recs, __joinCond, 
     #IF(LEFTOUTER)
     TRANSFORM(out_rec, SELF := LEFT; SELF := RIGHT), LEFT OUTER
     #ELSE
     TRANSFORM(out_rec, SELF.ref := LEFT.ref; SELF := RIGHT)
     #END
     );
+  #IF(#TEXT(GROUPBY) <> '')
+    __jrecs := GROUP(SORT(__jrecs_pre, #EXPAND(GROUPBY), RECORD), #EXPAND(GROUPBY));
+  #ELSE
+    __jrecs := __jrecs_pre;
+  #END  
   #IF(LEFTOUTER)
     LOCAL __mac_res := dx_common.Incrementals.mac_Rollupv2(__jrecs, flag_deletes := TRUE);
     LOCAL __mac_res_post := PROJECT(__mac_res, TRANSFORM(RECORDOF(__expected_recs), processLeftOuterRes()));
@@ -70,11 +75,12 @@ runT(__tlabel, __inrecs, __key_recs, __delta_recs, __joinCond, __expected_recs, 
     // LOCAL __mac_res := dx_common.Incrementals.mac_Rollup(__jrecs);
     LOCAL __mac_res_post := __mac_res;
   #END
-  LOCAL __eval_recs := ut.CompareDatasets(SORT(__mac_res_post, RECORD), SORT(__expected_recs, RECORD));
+  LOCAL __eval_recs := ut.CompareDatasets(SORT(UNGROUP(__mac_res_post), RECORD), SORT(UNGROUP(__expected_recs), RECORD)); // <-- input must be ungroup for compare to work
   LOCAL __assert_cond := ~EXISTS(__eval_recs(__diff));
   IF(_DEBUG, output(__inrecs, named('inrecs_'+__tlabel)));
   IF(_DEBUG, output(__key_recs, named('key_recs_'+__tlabel)));
   IF(_DEBUG, output(__payload_recs, named('payload_recs_'+__tlabel)));
+  IF(_DEBUG, output(__jrecs_pre, named('jrecs_pre_'+__tlabel)));
   IF(_DEBUG, output(__jrecs, named('jrecs_'+__tlabel)));
   IF(_DEBUG, output(__mac_res, named('mac_res_'+__tlabel)));
   IF(_DEBUG, output(__mac_res_post, named('mac_res_post_'+__tlabel)));
@@ -340,6 +346,81 @@ expected_031 := DATASET([
   {1000, '19800204', 'JOHN', 'SMITH', '30005', 'YELLOW', 100, 20210101, 0, 0, 'REF1'}
   ,{1000, '19800204', 'JOHN', 'SMITH', '30005', 'YELLOW', 100, 20210101, 0, 0, 'REF2'}
 ], out_rec);
+
+// ********************************************
+// t032:  inner join, grouped by fname, lname, with duplicate rids in separate groups
+inrecs_032 := DATASET([
+  {1000, 'JOHN', 'SMITH', 'REF1'}
+  ,{2000, 'MARY', 'SMITH', 'REF2'}
+  ,{1000, 'JOHN', 'SMITH', 'REF3'}
+], in_rec);  
+key_recs_032 := DATASET([
+  {1000, '19800204', 'JOHN', 'SMITH', '30005', 'YELLOW', 100, 20210101, 0, 0}
+  ,{2000, '19830101', 'MARY', 'SMITH', '30005', 'YELLOW', 101, 20210101, 0, 0}
+  ,{1000, '19800204', 'J', 'SMITH', '30005', 'YELLOW', 100, 20210201, 0, 0}
+  ], key_rec);
+delta_recs_032 := DATASET([
+  {1000, '19800204', 'JOHN', 'SMITH', '30005', 'YELLOW', 100, 20210101, 20210201, 0}
+], key_rec);
+expected_032 := DATASET([
+  {1000, '19800204', 'J', 'SMITH', '30005', 'YELLOW', 100, 20210201, 0, 0, 'REF1'}
+  ,{1000, '19800204', 'J', 'SMITH', '30005', 'YELLOW', 100, 20210201, 0, 0, 'REF3'}
+  ,{2000, '19830101', 'MARY', 'SMITH', '30005', 'YELLOW', 101, 20210101, 0, 0, 'REF2'}
+], out_rec);
+
+// ********************************************
+// t033:  inner join, grouped by fname, lname, with duplicate rids in separate groups
+inrecs_033 := DATASET([
+  {1000, 'JOHN', 'SMITH', 'REF1'}
+  ,{2000, 'JOANNA', 'SMITH', 'REF2'}
+  ,{1000, 'JOHN', 'SMITH', 'REF3'}
+  ,{2000, 'JOANNA', 'SMITH', 'REF4'}
+  ,{1500, 'MOLLY', 'SMITH', 'REF5'}
+  ,{1000, 'JOHN', 'SMITH', 'REF6'}
+], in_rec);  
+key_recs_033 := DATASET([
+  {1000, '19800204', 'JOHN', 'SMITH', '30005', 'YELLOW', 100, 20210101, 0, 0}
+  ,{2000, '19830101', 'JOANNA', 'SMITH', '30005', 'YELLOW', 101, 20210101, 0, 0}
+  ,{1000, '19800204', 'J', 'SMITH', '30005', 'YELLOW', 100, 20210201, 0, 0}
+  ], key_rec);
+delta_recs_033 := DATASET([
+  {1000, '19800204', 'JOHN', 'SMITH', '30005', 'YELLOW', 100, 20210101, 20210201, 0}
+], key_rec);
+expected_033 := DATASET([
+  {1000, '19800204', 'J', 'SMITH', '30005', 'YELLOW', 100, 20210201, 0, 0, 'REF1'}
+  ,{1000, '19800204', 'J', 'SMITH', '30005', 'YELLOW', 100, 20210201, 0, 0, 'REF3'}
+  ,{1000, '19800204', 'J', 'SMITH', '30005', 'YELLOW', 100, 20210201, 0, 0, 'REF6'}
+  ,{2000, '19830101', 'JOANNA', 'SMITH', '30005', 'YELLOW', 101, 20210101, 0, 0, 'REF2'}
+  ,{2000, '19830101', 'JOANNA', 'SMITH', '30005', 'YELLOW', 101, 20210101, 0, 0, 'REF4'}
+], out_rec);
+
+// ********************************************
+// t034:  inner join, grouped by fname, lname and fav_color, with duplicate rids in separate groups
+inrecs_034 := DATASET([
+  {1000, 'JOHN', 'SMITH', 'REF1'}
+  ,{2000, 'JOANNA', 'SMITH', 'REF2'}
+  ,{1000, 'JOHN', 'SMITH', 'REF3'}
+  ,{2000, 'JOANNA', 'SMITH', 'REF4'}
+  ,{1500, 'MOLLY', 'SMITH', 'REF5'}
+  ,{1000, 'J', 'SMITH', 'REF6'}
+], in_rec);  
+key_recs_034 := DATASET([
+  {1000, '19800204', 'JOHN', 'SMITH', '30005', 'YELLOW', 100, 20210101, 0, 0}
+  ,{2000, '19830101', 'JOANNA', 'SMITH', '30005', 'GREEN', 101, 20210101, 0, 0}
+  
+  ], key_rec);
+delta_recs_034 := DATASET([
+  {1000, '19800204', 'JOHN', 'SMITH', '30005', 'YELLOW', 100, 20210101, 20210201, 3}
+  ,{1000, '19800204', 'J', 'SMITH', '30005', 'GREEN', 100, 20210201, 0, 2}
+], key_rec);
+expected_034 := DATASET([
+  {1000, '19800204', 'J', 'SMITH', '30005', 'GREEN', 100, 20210201, 0, 2, 'REF1'}
+  ,{1000, '19800204', 'J', 'SMITH', '30005', 'GREEN', 100, 20210201, 0, 2, 'REF3'}
+  ,{1000, '19800204', 'J', 'SMITH', '30005', 'GREEN', 100, 20210201, 0, 2, 'REF6'}
+  ,{2000, '19830101', 'JOANNA', 'SMITH', '30005', 'GREEN', 101, 20210101, 0, 0, 'REF2'}
+  ,{2000, '19830101', 'JOANNA', 'SMITH', '30005', 'GREEN', 101, 20210101, 0, 0, 'REF4'}
+], out_rec);
+
 
 // ********************************************
 // t050: left outer join, input with match, no dupes, no deltas
@@ -757,6 +838,54 @@ expected_068 := DATASET([
    ,{4000, '', 'DALE', 'DELETEME', '', '', 0, 0, 0, 0, 'REF5'}
 ], out_rec);
 
+// ********************************************
+// t069:  left outer join, grouped by fname, lname, with duplicate rids in separate groups
+inrecs_069 := DATASET([
+  {1000, 'J', 'SMITH', 'REF1'}
+  ,{2000, 'MARY', 'SMITH', 'REF2'}
+  ,{1000, 'JOHN', 'SMITH', 'REF3'}
+], in_rec);  
+key_recs_069 := DATASET([
+  {1000, '19800204', 'JOHN', 'SMITH', '30005', 'YELLOW', 100, 20210101, 0, 0}
+  ,{2000, '19830101', 'MARY', 'SMITH', '30005', 'YELLOW', 101, 20210101, 0, 0}
+  ], key_rec);
+delta_recs_069 := DATASET([
+  {1000, '19800204', 'JOHN', 'SMITH', '30005', 'YELLOW', 100, 20210101, 20210201, 3}
+  ,{1000, '19800204', 'J', 'SMITH', '30005', 'GREEN', 100, 20210201, 0, 2}
+], key_rec);
+expected_069 := DATASET([
+  {1000, '19800204', 'J', 'SMITH', '30005', 'GREEN', 100, 20210201, 0, 2, 'REF1'}
+  ,{1000, '19800204', 'JOHN', 'SMITH', '30005', 'GREEN', 100, 20210201, 0, 2, 'REF3'}
+  ,{2000, '19830101', 'MARY', 'SMITH', '30005', 'YELLOW', 101, 20210101, 0, 0, 'REF2'}
+], out_rec);
+
+// ********************************************
+// t070:  left outer join, grouped by fname, lname, with duplicate rids in separate groups
+inrecs_070 := DATASET([
+  {1000, 'JOHN', 'SMITH', 'REF1'}
+  ,{2000, 'JOANNA', 'SMITH', 'REF2'}
+  ,{1000, 'J', 'SMITH', 'REF3'}
+  ,{2000, 'JOANNA', 'SMITH', 'REF4'}
+  ,{1500, 'MOLLY', 'SMITH', 'REF5'}
+  ,{1000, 'JOHN', 'SMITH', 'REF6'}
+], in_rec);  
+key_recs_070 := DATASET([
+  {1000, '19800204', 'JOHN', 'SMITH', '30005', 'YELLOW', 100, 20210101, 0, 0}
+  ,{2000, '19830101', 'JOANNA', 'SMITH', '30005', 'YELLOW', 101, 20210101, 0, 0}
+  ], key_rec);
+delta_recs_070 := DATASET([
+  {1000, '19800204', 'JOHN', 'SMITH', '30005', 'YELLOW', 100, 20210101, 20210201, 3}
+  ,{1000, '19800204', 'J', 'SMITH', '30005', 'GREEN', 100, 20210201, 0, 2}
+], key_rec);
+expected_070 := DATASET([
+  {1000, '19800204', 'J', 'SMITH', '30005', 'GREEN', 100, 20210201, 0, 2, 'REF3'}
+  ,{2000, '19830101', 'JOANNA', 'SMITH', '30005', 'YELLOW', 101, 20210101, 0, 0, 'REF2'}
+  ,{2000, '19830101', 'JOANNA', 'SMITH', '30005', 'YELLOW', 101, 20210101, 0, 0, 'REF4'}
+  ,{1000, '19800204', 'JOHN', 'SMITH', '30005', 'GREEN', 100, 20210201, 0, 2, 'REF1'}
+  ,{1000, '19800204', 'JOHN', 'SMITH', '30005', 'GREEN', 100, 20210201, 0, 2, 'REF6'}
+  ,{1500, '', 'MOLLY', 'SMITH', '', '', 0, 0, 0, 0, 'REF5'}
+], out_rec);
+
 runT('000', inrecs_000, key_recs_000, delta_recs_000, LEFT.did = RIGHT.did, expected_000);
 runT('001', inrecs_001, key_recs_001, delta_recs_001, LEFT.did = RIGHT.did, expected_001);
 runT('002', inrecs_002, key_recs_002, delta_recs_002, LEFT.did = RIGHT.did, expected_002);
@@ -772,6 +901,9 @@ runT('020', inrecs_020, key_recs_020, delta_recs_020, LEFT.did = RIGHT.did, expe
 runT('021', inrecs_021, key_recs_021, delta_recs_021, LEFT.did = RIGHT.did, expected_021);
 runT('030', inrecs_030, key_recs_030, delta_recs_030, LEFT.did = RIGHT.did, expected_030);
 runT('031', inrecs_031, key_recs_031, delta_recs_031, LEFT.did = RIGHT.did, expected_031);
+runT('032', inrecs_032, key_recs_032, delta_recs_032, LEFT.did = RIGHT.did, expected_032, GROUPBY := 'fname,lname');
+runT('033', inrecs_033, key_recs_033, delta_recs_033, LEFT.did = RIGHT.did, expected_033, GROUPBY := 'fname,lname');
+runT('034', inrecs_034, key_recs_034, delta_recs_034, LEFT.did = RIGHT.did, expected_034, GROUPBY := 'fname,lname,fav_color');
 runT('050', inrecs_050, key_recs_050, delta_recs_050, LEFT.did = RIGHT.did, expected_050, LEFTOUTER := TRUE); 
 runT('051', inrecs_051, key_recs_051, delta_recs_051, LEFT.did = RIGHT.did, expected_051, LEFTOUTER := TRUE); 
 runT('052', inrecs_052, key_recs_052, delta_recs_052, LEFT.did = RIGHT.did, expected_052, LEFTOUTER := TRUE); 
@@ -791,5 +923,8 @@ runT('065', inrecs_065, key_recs_065, delta_recs_065, LEFT.did = RIGHT.did AND R
 runT('066', inrecs_066, key_recs_066, delta_recs_066, LEFT.did = RIGHT.did AND RIGHT.fav_color = 'YELLOW' AND (UNSIGNED)RIGHT.dob < 19810101, expected_066, LEFTOUTER := TRUE);
 runT('067', inrecs_067, key_recs_067, delta_recs_067, LEFT.did = RIGHT.did AND RIGHT.fav_color = 'AQUA', expected_067);
 runT('068', inrecs_068, key_recs_068, delta_recs_068, LEFT.did = RIGHT.did AND RIGHT.fav_color = 'AQUA', expected_068, LEFTOUTER := TRUE);
+runT('069', inrecs_069, key_recs_069, delta_recs_069, LEFT.did = RIGHT.did, expected_069, LEFTOUTER := TRUE, GROUPBY := 'fname,lname');
+runT('070', inrecs_070, key_recs_070, delta_recs_070, LEFT.did = RIGHT.did, expected_070, LEFTOUTER := TRUE, GROUPBY := 'fname,lname');
+
 
 
