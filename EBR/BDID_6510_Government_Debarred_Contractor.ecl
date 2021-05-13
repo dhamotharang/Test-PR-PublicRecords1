@@ -1,41 +1,31 @@
-import _control, ut, Business_Header, Business_Header_SS, did_add, AID, Address, idl_header, Mdr, Std;
+﻿import _control, ut, Business_Header, Business_Header_SS, did_add, AID, Address, idl_header, Mdr, Std;
 
 //////////////////////////////////////////////////////////////////////////////////////////////
 // -- Value Types
 //////////////////////////////////////////////////////////////////////////////////////////////
-File_in 			:= File_6510_Government_Debarred_Contractor_In;
-segment_code 		:= '6510';
+File_in 			:= 	ebr.File_6510_Government_Debarred_Contractor_In;
+segment_code 	:= 	'6510';
+File_Base			:=	ebr.File_6510_Government_Debarred_Contractor_Base_AID;
 
 //////////////////////////////////////////////////////////////////////////////////////////////
 // -- Convert the Input File to Base format
 //////////////////////////////////////////////////////////////////////////////////////////////
 Layout_6510_Government_Debarred_Contractor_Base_AID Convert2Base(File_in l) := 
 transform
-	self.date_first_seen		:=	if(business_header.validatedate(l.date_filed) != '', 
-																		business_header.validatedate(l.date_filed),
-																		business_header.validatedate(l.date_reported)
-																 );
-	self.date_last_seen 		:=	self.date_first_seen;
-	self										:=	l;
-	self										:=	[];
+	self.date_first_seen					:=	if(business_header.validatedate(l.date_filed) != '', 
+																					business_header.validatedate(l.date_filed),
+																					business_header.validatedate(l.date_reported)
+																			 );
+	self.date_last_seen 					:=	self.date_first_seen;
+	self.process_date_first_seen	:= 	(unsigned4)l.process_date;
+	self.dt_effective_first				:= 	(unsigned4)l.process_date;
+	self.process_date_last_seen 	:= 	self.process_date_first_seen;
+	self.record_type							:= 	'C';	
+	self													:=	l;
+	self													:=	[];
 end;
 
 File_in2base := project(File_in, Convert2Base(left));
-
-ebr.GetSegmentFile_Base(segment_code, File_Base, 'A');
-
-//////////////////////////////////////////////////////////////////////////////////////////////
-// -- Populate common base fields on update file
-//////////////////////////////////////////////////////////////////////////////////////////////
-Layout_6510_Government_Debarred_Contractor_Base_AID PopulateBaseFields(Layout_6510_Government_Debarred_Contractor_Base_AID l) := transform
-	self.bdid 										:= 0;
-	self.process_date_first_seen	:= (unsigned4)l.process_date;
-	self.process_date_last_seen		:= self.process_date_first_seen;
-	self.record_type							:= 'C';
-	self													:= l;
-end;
-
-File_In_common_fields := project(File_in2base, PopulateBaseFields(left));
 
 Layout_6510_Government_Debarred_Contractor_Base_AID BlankBDIDBase(Layout_6510_Government_Debarred_Contractor_Base_AID l) := transform
 	self.file_number	:= regexreplace('\n', l.file_number, ' ');
@@ -46,8 +36,8 @@ end;
 File_Base_blank_bdid := project(File_Base, BlankBDIDBase(left));
 
 File_Combined	:=	if(EBR.EBR_Init_Flag(segment_code) = false,
-												File_In_common_fields + File_Base_blank_bdid,
-												File_In_common_fields
+												File_in2base + File_Base_blank_bdid,
+												File_in2base
 										);
 
 HasAddress	:=	trim(File_Combined.prep_addr_line1, left,right) != '' and 
@@ -112,10 +102,6 @@ Layout_6510_Government_Debarred_Contractor_Base_AID  CleanUpName( dCleanName  l)
 																							l.name_flag = 'U' => l.clean_business_name.name_suffix, 
 																							''
 																						);
-	// self.CompanyName										:= if(l.name_flag = 'B',
-																								// l.co_bus_name,
-																								// ''
-																						// );	
 	self																:=	l;
 	self																:=	[];
 end;		
@@ -139,5 +125,4 @@ projectBase  := project(BDID_Append, tLayout_6510_Government_Debarred_Contractor
 
 addGlobalSID := mdr.macGetGlobalSID(projectBase,'EBR','','global_sid'); //DF-26349: Populate Global_SID Field
 
-export BDID_6510_Government_Debarred_Contractor := addGlobalSID
-	/*: persist(EBR_thor + 'TEMP::BDID_' + dataset_name + '_' + segment_code + '_' + decode_segments(segment_code))*/;
+export BDID_6510_Government_Debarred_Contractor := addGlobalSID;
