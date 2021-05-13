@@ -67,13 +67,12 @@ BuildStatusReport :=
 										,Build_Keys(pVersion).Kel
 										,Build_Keys(pversion).All
 										,Build_AutoKeys(pversion)
-										,FraudGovPlatform.Build_Keys_UnitTests(pversion).ALL
 										,FraudGovPlatform.Promote(pversion,,true).promote_keys
-										,Orbit3.proc_Orbit3_CreateBuild_AddItem('FraudGov',pversion)
-										,_Control.fSubmitNewWorkunit(GenerateDashboards,ThorName)
-										,_Control.fSubmitNewWorkunit(BuildStatusReport,ECLThorName)
-										,_Control.fSubmitNewWorkunit(BuildCoverageDates,ThorName)
-										,FraudGovPlatform.Send_Emails(pversion).Roxie										
+//										,Orbit3.proc_Orbit3_CreateBuild_AddItem('FraudGov',pversion)
+//										,_Control.fSubmitNewWorkunit(GenerateDashboards,ThorName)
+//										,_Control.fSubmitNewWorkunit(BuildStatusReport,ECLThorName)
+//										,_Control.fSubmitNewWorkunit(BuildCoverageDates,ThorName)
+//										,FraudGovPlatform.Send_Emails(pversion).Roxie										
 									);
 		
 End;		

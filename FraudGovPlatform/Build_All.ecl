@@ -44,11 +44,14 @@ Build_Kel_Ecl :=
 		FraudGovPlatform.Health_CheckUp(version).ALL,
 		FraudGovPlatform.Build_Input(version).ALL,
 		FraudGovPlatform.Build_Base(version).ALL,
-		FraudGovPlatform.Build_Base_UnitTests(version).ALL,
-		FraudGovPlatform.Promote(version).promote_base,
-		FraudGovPlatform.promote(version).promote_sprayed_files,
-		FraudGovPlatform.Build_Base_Pii(version).All,
-		_Control.fSubmitNewWorkunit(Build_Kel_Ecl,ECLThorName)
+		if ( FraudGovPlatform.Mac_TestRecordID(version) = 'Passed' and FraudGovPlatform.Mac_TestRinID(version) = 'Passed', 
+				sequential(
+					FraudGovPlatform.Promote(version).promote_base,
+					FraudGovPlatform.promote(version).promote_sprayed_files,
+					FraudGovPlatform.Build_Base_Pii(version).All,
+					_Control.fSubmitNewWorkunit(Build_Kel_Ecl,ECLThorName)
+				),
+				FAIL('Unit Test Failed'))
 	): success(FraudGovPlatform.Send_Emails(version).BuildSuccess), failure(FraudGovPlatform.Send_Emails(version).BuildFailure);
 
 	export All :=

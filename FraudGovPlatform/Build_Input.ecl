@@ -6,10 +6,10 @@ EXPORT Build_Input (
 module
 
 	// Modules
-	export Run_IdentityData := $.Build_Input_IdentityData(pversion, MBS_Sprayed).All:independent;
-	export Run_KnownFraud :=  $.Build_Input_KnownFraud(pversion, MBS_Sprayed).All:independent;
-	export Run_Deltabase := $.Build_Input_Deltabase(pversion, MBS_Sprayed).All:independent;
-	export Run_DisposableEmailDomains := $.Build_Input_DisposableEmailDomains(pversion).All:independent;
+	export Run_IdentityData := $.Build_Input_IdentityData(pversion, MBS_Sprayed).All:persist('~fraudgov::persist::prep::IdentityData');
+	export Run_KnownFraud :=  $.Build_Input_KnownFraud(pversion, MBS_Sprayed).All:persist('~fraudgov::persist::prep::KnownFraud');
+	export Run_Deltabase := $.Build_Input_Deltabase(pversion, MBS_Sprayed).All:persist('~fraudgov::persist::prep::Deltabase');
+	export Run_DisposableEmailDomains := $.Build_Input_DisposableEmailDomains(pversion).All:persist('~fraudgov::persist::prep::DisposableEmailDomains');
 	export Promote_Inputs := $.Promote(pversion).promote_inputs;
 
 	export All :=

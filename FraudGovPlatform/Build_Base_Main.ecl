@@ -1,4 +1,4 @@
-﻿import STD, data_services, ut,tools; 
+﻿import STD, ut,tools; 
 EXPORT Build_Base_Main  (
 	 string pversion
 	,dataset(FraudGovPlatform.Layouts.Base.Main) pBaseMainFile = IF(fraudgovplatform._Flags.FileExists.Base.MainOrigQA, fraudgovplatform.Files().Base.Main_Orig.QA, DATASET([], FraudGovPlatform.Layouts.Base.Main))
@@ -83,33 +83,33 @@ module
 	)); 
 
 	// Append RID
-	SHARED NewBaseRID := fraudgovplatform.Append_RID (IdentityData + KnownFraud + Deltabase,pBaseMainFile):independent;
+	SHARED NewBaseRID := fraudgovplatform.Append_RID (IdentityData + KnownFraud + Deltabase,pBaseMainFile);
 	
 	SHARED NewBaseDup	:= FraudGovPlatform.fn_dedup_main(NewBaseRID);
 	// Append Clean Values from Previous Build
-	EXPORT NewBasePreviousValues := fraudgovplatform.Append_PreviousValues(NewBaseDup,pBaseMainFile):independent;
+	EXPORT NewBasePreviousValues := fraudgovplatform.Append_PreviousValues(NewBaseDup,pBaseMainFile);
 
-	SHARED NewFile := distribute(pull(NewBasePreviousValues),hash32(record_id));
+	SHARED NewFile := distribute(pull(NewBasePreviousValues),hash32(record_id)):persist('~fraudgov::persist::built::Append_RID');
 	SHARED OldFile := distribute(pull(pBaseMainFile),hash32(record_id));
 
 	SHARED NewRecords := JOIN(NewFile, OldFile, left.record_id = right.record_id, LEFT ONLY, LOCAL);
-	SHARED OldRecords := JOIN(OldFile, NewFile, left.record_id = right.record_id, INNER, LOCAL); 
+	SHARED OldRecords := JOIN(OldFile, NewFile, left.record_id = right.record_id, INNER, LOCAL);
 
 	// Appends
-	AppendCleanName := fraudgovplatform.Append_CleanName(NewRecords):independent;
-	AppendCleanFields := fraudgovplatform.Standardize_Entity.Clean_InputFields (AppendCleanName):independent;
-	AppendCleanPhones := fraudgovplatform.Standardize_Entity.Clean_Phone (AppendCleanFields):independent;
-	AppendCleanAddress := fraudgovplatform.Append_CleanAddress(AppendCleanPhones):independent;
-	AppendCleanAdditionalAddress := fraudgovplatform.Append_CleanAdditionalAddress(AppendCleanAddress):independent;
-	AppendLexid := fraudgovplatform.Append_Lexid (AppendCleanAdditionalAddress):independent;
-	AppendSourceLabel := fraudgovplatform.Append_RinSource(AppendLexid):independent;
+	AppendCleanName := fraudgovplatform.Append_CleanName(NewRecords);
+	AppendCleanFields := fraudgovplatform.Standardize_Entity.Clean_InputFields (AppendCleanName);
+	AppendCleanPhones := fraudgovplatform.Standardize_Entity.Clean_Phone (AppendCleanFields);
+	AppendCleanAddress := fraudgovplatform.Append_CleanAddress(AppendCleanPhones);
+	AppendCleanAdditionalAddress := fraudgovplatform.Append_CleanAdditionalAddress(AppendCleanAddress);
+	AppendLexid := fraudgovplatform.Append_Lexid (AppendCleanAdditionalAddress);
+	AppendSourceLabel := fraudgovplatform.Append_RinSource(AppendLexid);
 	Appends := AppendSourceLabel;
 
 	SHARED NewBaseWithAppends := OldRecords + Appends;
 
 	// Apply to All
-	SHARED CombinedClassification := fraudgovplatform.Functions.Classification(NewBaseWithAppends):independent;
-	SHARED NewBaseRinID := fraudgovplatform.Append_RinID ( CombinedClassification, pBaseMainFile ):independent;
+	SHARED CombinedClassification := fraudgovplatform.Functions.Classification(NewBaseWithAppends):persist('~fraudgov::persist::built::Append_CleanFields');
+	SHARED NewBaseRinID := fraudgovplatform.Append_RinID ( CombinedClassification, pBaseMainFile ):persist('~fraudgov::persist::built::Append_RinID');
 
 	// Rollup Main Base 
 	pDataset_sort := sort(NewBaseRinID , record, -dt_last_seen,-process_date);
