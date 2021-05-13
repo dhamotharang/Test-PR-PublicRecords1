@@ -21,7 +21,8 @@ new_rec:=record
 end;
 Proj_dsFileListSorted := project(dsFileListSorted, transform(new_rec,
 	self.customer_id := regexfind('([0-9])\\d+',left.name,0);
-	self.file_type := regexfind('IDENTITY|KNOWNRISK|SAFELIST',left.name,0,nocase);
+	SplitWords := StringLib.SplitWords( StringLib.StringFindReplace(left.name, '.dat',''), '_', true );
+	self.file_type := SplitWords[5]; 
 	self:=left));
 	
 J_dsFileListSorted	:= join(Proj_dsFileListSorted, FraudGovPlatform.Files().Flags.CustomerActiveSprays,
@@ -49,6 +50,7 @@ CustomerSettings :=
 UpSt:=Customer_State;
 UpType := map(
 			 STD.Str.Contains( FileType, 'Identity', true )	=> 'IDENTITY'
+			,STD.Str.Contains( FileType, 'IdentityBatch', true )	=> 'IDENTITY'
 			,STD.Str.Contains( FileType, 'KnownRisk', true )	=> 'KNOWNRISK'
 			,STD.Str.Contains( FileType, 'SafeList', true )	=> 'SAFELIST'
 			,'UNKNOWN');
@@ -115,6 +117,7 @@ MoveToPass:=sequential(
 	,MoveSprayingToDone
 	,map(
 		 UpType = 'IDENTITY' => fileservices.AddSuperfile(IdentityData_Passed,FileSprayed)
+		,UpType = 'IDENTITYBATCH' => fileservices.AddSuperfile(IdentityData_Passed,FileSprayed)
 		,UpType = 'KNOWNRISK' => fileservices.AddSuperfile(KnownFraud_Passed,FileSprayed)
 		,UpType = 'SAFELIST' => fileservices.AddSuperfile(Safelist_Passed,FileSprayed)
 	 )
@@ -125,6 +128,7 @@ MoveToReject:=sequential(
 	,MoveSprayingToError
 	,map(
 		 UpType = 'IDENTITY' => fileservices.AddSuperfile(IdentityData_Rejected,FileSprayed) 
+		,UpType = 'IDENTITYBATCH' => fileservices.AddSuperfile(IdentityData_Rejected,FileSprayed) 
 		,UpType = 'KNOWNRISK' => fileservices.AddSuperfile(KnownFraud_Rejected,FileSprayed)
 		,UpType = 'SAFELIST' => fileservices.AddSuperfile(Safelist_Rejected,FileSprayed)
 	 ));
@@ -167,7 +171,7 @@ end;
 
 Proj_dsFileListSorted2 := project(dsFileListSorted2, transform(new_rec2,
 	self.customer_id := regexfind('([0-9])\\d+',left.name,0);
-	self.file_type := regexfind('IDENTITY|KNOWNRISK|SAFELIST',left.name,0,nocase);
+	self.file_type := regexfind('IDENTITY|IDENTITY|KNOWNRISK|SAFELIST',left.name,0,nocase);
 	self:=left));
 	
 J_dsFileListSorted2	:= join(Proj_dsFileListSorted2, FraudGovPlatform.Files().Flags.CustomerActiveSprays,

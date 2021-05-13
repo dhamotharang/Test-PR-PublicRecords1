@@ -2,7 +2,7 @@
 
 FileIn := 'fraudgov::base::built::Main';
 
-fraudgov_dataset_Input := dataset(data_services.foreign_prod+FileIn, FraudGovPlatform.Layouts.Base.Main, thor); 
+fraudgov_dataset_Input := dataset('~'+FileIn, FraudGovPlatform.Layouts.Base.Main, thor); 
 
 // Supress CCPA
 mod_access := MODULE(doxie.IDataAccess) END; // default mod_access

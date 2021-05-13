@@ -43,9 +43,10 @@ module
 		self.FileTime := fn[7];
 		self.ind_type := functions.ind_type_fn(fn[4]);
 		self.file_type := 3 ;
-		//https://confluence.rsi.lexisnexis.com/display/GTG/Data+Source+Identification: 
-		self.RIN_Source := map(	l.RIN_Source = 0 => 1, //identity
-								l.RIN_Source); // NAC or RDP							
+		//https://confluence.rsi.lexisnexis.com/display/GTG/Data+Dictionary: 
+		self.RIN_Source := map(	fn[5] = 'IDENTITY' => 1, // Identity
+								fn[5] = 'IDENTITYBATCH' => 13,  // RIN API
+								L.RIN_Source );	// RDP or NAC				
 		self:=l;
 		self:=[];
 	end;
