@@ -628,5 +628,6 @@
 	STRING PL_AstPropCurrAVMValList;
 	INTEGER4 PL_AstPropCurrAVMValTot;
 	INTEGER4 PL_AstPropCurrAVMValAvg;
-	
+	STRING6 PL_VerSSNLookupFlag;
+
 END;	

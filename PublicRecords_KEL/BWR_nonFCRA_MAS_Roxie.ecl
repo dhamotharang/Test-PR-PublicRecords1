@@ -32,6 +32,10 @@ DataRestrictionMask := '0000000000000000000000000000000000000000000000000';
 Include_Minors := TRUE;
 Retain_Input_Lexid := false;//keep what we have on input
 Append_PII := false;//keep what we have on input
+Overwrite_Redacted_SSN := FALSE;
+
+
+
 // CCPA Options;
 LexIdSourceOptout := 1;
 TransactionId := '';
@@ -164,6 +168,7 @@ soapLayout := RECORD
 	BOOLEAN TurnOffRelatives;	
 	BOOLEAN IncludeMinors;
 	BOOLEAN UseIngestDate;
+	BOOLEAN OverwriteRedactedSSN;
 	DATASET(PublicRecords_KEL.ECL_Functions.Constants.Layout_Allowed_Sources) AllowedSourcesDataset := DATASET([], PublicRecords_KEL.ECL_Functions.Constants.Layout_Allowed_Sources);
 	DATASET(PublicRecords_KEL.ECL_Functions.Constants.Layout_Allowed_Sources) ExcludeSourcesDataset := DATASET([], PublicRecords_KEL.ECL_Functions.Constants.Layout_Allowed_Sources);
 	UNSIGNED1 LexIdSourceOptout;
@@ -229,6 +234,7 @@ soapLayout trans (pp le):= TRANSFORM
 	SELF.IncludeMinors := Settings.IncludeMinors;
 	SELF.UseIngestDate := Settings.UseIngestDate;
 	SELF.IsMarketing := FALSE;
+	SELF.OverwriteRedactedSSN := Overwrite_Redacted_SSN;
 	SELF.TurnOffHouseHolds := TurnOffHouseHolds;
 	SELF.TurnOffRelatives := TurnOffRelatives;	
 	self.RetainInputLexid := Settings.RetainInputLexid;

@@ -449,5 +449,6 @@
 	string6 PL_AlrtSecurityFreezeFlag;
 	string6 PL_AlrtSecurityAlertFlag;
 	string6 PL_AlrtIDTheftFlag;
-	
+	STRING6 PL_VerSSNLookupFlag;
+
 END;

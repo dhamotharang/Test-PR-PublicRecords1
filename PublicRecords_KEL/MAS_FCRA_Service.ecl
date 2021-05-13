@@ -12,6 +12,7 @@
 	<part name="IsPrescreen" type="xsd:boolean"/>
 	<part name="RetainInputLexid" type="xsd:boolean"/>
 	<part name="AppendPII" type="xsd:boolean"/>
+	<part name="OverwriteRedactedSSN" type="xsd:boolean"/>
 	<part name="CaliforniaInPerson" type="xsd:boolean"/>
 	<part name="IndustryClass" type="xsd:string"/>
 	<part name="IntendedPurpose" type="xsd:string"/>
@@ -40,6 +41,7 @@ EXPORT MAS_FCRA_Service() := MACRO
 		'IsPrescreen',
 		'RetainInputLexid',
 		'AppendPII',
+		'OverwriteRedactedSSN',
 		'CaliforniaInPerson',
 		'IncludeMinors',
 		'IntendedPurpose',
@@ -69,7 +71,8 @@ EXPORT MAS_FCRA_Service() := MACRO
 	BOOLEAN Append_PII := FALSE : STORED('AppendPII');//keep what we have on input
 	BOOLEAN California_In_Person := FALSE : STORED('CaliforniaInPerson');//keep what we have on input
 	BOOLEAN Allow_Inferred_Performance := FALSE : STORED('AllowInferredPerformance');//keep what we have on input
-		
+	BOOLEAN Overwrite_Redacted_SSN := FALSE : STORED('OverwriteRedactedSSN'); // Overwrite redacted SSNs with SSN from Watchdog
+	
 	// Nulling out stored variables to not propagate to Attributes.kel
 	#CONSTANT('NetAcuityURL', ''); 
 	#CONSTANT('OFACURL', '');
@@ -131,7 +134,8 @@ EXPORT MAS_FCRA_Service() := MACRO
 		EXPORT BOOLEAN RetainInputLexid := Retain_Input_Lexid;
 		EXPORT BOOLEAN BestPIIAppend :=  Append_PII; //do not append best pii for running, always append best pii for prescreen
 		EXPORT BOOLEAN CaliforniaInPerson := California_In_Person; //do not append best pii for running
-		
+		EXPORT BOOLEAN OverwriteRedactedSSN := Overwrite_Redacted_SSN;
+
 		EXPORT BOOLEAN IncludeInferredPerformance := Allow_Inferred_Performance;
 
 	

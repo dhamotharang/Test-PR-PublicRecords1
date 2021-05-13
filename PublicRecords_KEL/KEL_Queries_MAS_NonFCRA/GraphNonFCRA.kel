@@ -715,7 +715,8 @@ QUERY: NonFCRAAddressSummaryAttributesV1Dynamic(STRING PrimaryName_in,STRING Pri
 		PL_VerSSNSrcEmrgDtListEv := PL_VerSSNSrcEmrgDtListEvNonFCRA,
 		PL_VerSSNSrcLastDtListEv := PL_VerSSNSrcLastDtListEvNonFCRA,
 		
-		PL_EmrgAge //,
+		PL_EmrgAge,
+		PL_VerSSNLookupFlag //,
 		//PL_VerRIRestrictedFlag := 0
 		} 
    	ASOF DynamicArchive(P_InpClnArchDt) 

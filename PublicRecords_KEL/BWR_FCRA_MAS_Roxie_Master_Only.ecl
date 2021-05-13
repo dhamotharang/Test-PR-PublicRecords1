@@ -34,6 +34,7 @@ DataRestrictionMask := '1000010000000100000000000000000000000000000000000';
 Include_Minors := TRUE;
 Retain_Input_Lexid := FALSE;//keep what we have on input
 Append_PII := FALSE;//keep what we have on input
+Overwrite_Redacted_SSN := false;
 
 Is_Prescreen := false;
 // Is_Prescreen := TRUE;
@@ -137,6 +138,7 @@ soapLayout := RECORD
 	BOOLEAN RetainInputLexid;
 	BOOLEAN appendpii;
 	BOOLEAN isprescreen;
+	BOOLEAN OverwriteRedactedSSN;
 	DATASET(Gateway.Layouts.Config) gateways := DATASET([], Gateway.Layouts.Config);
 	DATASET(PublicRecords_KEL.ECL_Functions.Constants.Layout_Allowed_Sources) AllowedSourcesDataset := DATASET([], PublicRecords_KEL.ECL_Functions.Constants.Layout_Allowed_Sources);
 	DATASET(PublicRecords_KEL.ECL_Functions.Constants.Layout_Allowed_Sources) ExcludeSourcesDataset := DATASET([], PublicRecords_KEL.ECL_Functions.Constants.Layout_Allowed_Sources);
@@ -174,6 +176,7 @@ soapLayout trans (pp le):= TRANSFORM
     SELF.IncludeMinors := Settings.IncludeMinors;
     SELF.isprescreen := is_prescreen;
     SELF.IsMarketing := FALSE;
+		SELF.OverwriteRedactedSSN := Overwrite_Redacted_SSN;
     SELF.OutputMasterResults := Output_Master_Results;
 		SELF.AllowedSourcesDataset := AllowedSourcesDataset;
 		SELF.ExcludeSourcesDataset := ExcludeSourcesDataset;

@@ -1534,7 +1534,9 @@ EXPORT FnRoxie_GetPersonAttributesNonFCRA(DATASET(PublicRecords_KEL.ECL_Function
 								LexIDNotOnFile => PublicRecords_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA_INT,
 								ResultsFound => (INTEGER)RIGHT.PL_AstPropCurrAVMValAvg,
 								PublicRecords_KEL.ECL_Functions.Constants.NO_DATA_FOUND_INT);										
-		
+			SELF.PL_VerSSNLookupFlag := MAP(LexIDNotOnFile => PublicRecords_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA,
+                ResultsFound => (STRING)RIGHT.PL_VerSSNLookupFlag, 
+                PublicRecords_KEL.ECL_Functions.Constants.NO_DATA_FOUND);
 			SELF := LEFT;
 			self := [];
 		),LEFT OUTER, KEEP(1)); 
@@ -1951,8 +1953,7 @@ EXPORT FnRoxie_GetPersonAttributesNonFCRA(DATASET(PublicRecords_KEL.ECL_Function
 			SELF.PL_AstPropCurrAVMValList := PublicRecords_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA;
 			SELF.PL_AstPropCurrAVMValTot := PublicRecords_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA_INT;
 			SELF.PL_AstPropCurrAVMValAvg := PublicRecords_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA_INT;
-
-			
+			SELF.PL_VerSSNLookupFlag := PublicRecords_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA;
 			
 			SELF := LEFT,
 			SElf := [])); 	

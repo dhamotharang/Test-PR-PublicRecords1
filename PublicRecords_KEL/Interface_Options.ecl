@@ -28,7 +28,7 @@ EXPORT Interface_Options := INTERFACE
 	EXPORT BOOLEAN TurnOffRelatives := FALSE;
 	EXPORT BOOLEAN TurnOffHouseHolds := FALSE;
 	EXPORT BOOLEAN UseIngestDate := FALSE;//used to archive by header first ingest date instead of dfs/vdfs
-	
+	EXPORT BOOLEAN OverwriteRedactedSSN := FALSE;
 	EXPORT BOOLEAN IncludeInferredPerformance := FALSE;
 		
 	EXPORT DATASET(Gateway.Layouts.Config) Gateways := DATASET([], Gateway.Layouts.Config);

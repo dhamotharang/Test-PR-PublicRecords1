@@ -14,6 +14,7 @@
 	<part name="RetainInputLexid" type="xsd:boolean"/>
 	<part name="UseIngestDate" type="xsd:boolean"/>
 	<part name="AppendPII" type="xsd:boolean"/>
+	<part name="OverwriteRedactedSSN" type="xsd:boolean"/>
 	<part name="IndustryClass" type="xsd:string"/>
 	<part name="AllowedSourcesDataset" type="tns:XmlDataSet" cols="100" rows="8"/>
 	<part name="ExcludeSourcesDataset" type="tns:XmlDataSet" cols="100" rows="8"/>
@@ -50,6 +51,7 @@ EXPORT MAS_nonFCRA_Service() := MACRO
 		'RetainInputLexid',
 		'UseIngestDate',
 		'AppendPII',
+		'OverwriteRedactedSSN',
 		'_TransactionId',
 		'_BatchUID',
 		'_GCID',
@@ -91,6 +93,9 @@ STRING100 Default_data_permission_mask := '';
 	BOOLEAN Retain_Input_Lexid := FALSE : STORED('RetainInputLexid');//keep what we have on input
 	BOOLEAN Append_PII := FALSE : STORED('AppendPII');//keep what we have on input	
 	
+	BOOLEAN Overwrite_Redacted_SSN := FALSE : STORED('OverwriteRedactedSSN'); // Overwrite redacted SSNs with SSN from Watchdog
+
+
 	gateways_in := Gateway.Configuration.Get();
 	Gateway.Layouts.Config gw_switch(gateways_in le) := TRANSFORM
 		SELF.servicename := le.servicename;
@@ -167,7 +172,8 @@ STRING100 Default_data_permission_mask := '';
 		
 		EXPORT BOOLEAN RetainInputLexid := Retain_Input_Lexid;
 		EXPORT BOOLEAN BestPIIAppend := Append_PII; //do not append best pii for running		
-		
+		EXPORT BOOLEAN OverwriteRedactedSSN := Overwrite_Redacted_SSN;
+
 		// Override Include* Entity/Association options here if certain entities can be turned off to speed up processing.
 		// This will bypass uneccesary key JOINS in PublicRecords_KEL.Fn_MAS_FCRA_FDC if the keys don't contribute to any 
 		// ENTITIES/ASSOCIATIONS being used by the query.
