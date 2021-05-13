@@ -609,11 +609,29 @@ Current_Address_Consumer_recs_Contacts := join(Current_Address_Consumer_recs, Cu
 																				self.g_procuid := left.g_procuid, 
 																				self := left, 
 																				self := []));
-
+ 	
+		Overwrite_Redacted_SSNs_NonFCRA := JOIN(Input_FDC, Best_SSN_NonFCRA,
+							LEFT.UIDAppend = RIGHT.UIDAppend
+							AND LEFT.P_LexID = RIGHT.P_LexID,
+							TRANSFORM(RECORDOF(RIGHT),
+							SELF.P_InpClnSSN := IF(Options.OverwriteRedactedSSN AND LEFT.P_InpClnSSN[1..5] = '00000' AND LEFT.P_InpClnSSN[6..9] = RIGHT.P_InpClnSSN[6..9], RIGHT.P_InpClnSSN, LEFT.P_InpClnSSN);
+							SELF := LEFT;
+							SELF := RIGHT;
+							SELF := [];), LEFT OUTER);    
+	
+		Overwrite_Redacted_SSNs_FCRA := JOIN(Input_FDC, Best_SSN_FCRA,
+							LEFT.UIDAppend = RIGHT.UIDAppend
+							AND LEFT.P_LexID = RIGHT.P_LexID,
+							TRANSFORM(RECORDOF(RIGHT),
+							SELF.P_InpClnSSN := IF(Options.OverwriteRedactedSSN AND LEFT.P_InpClnSSN[1..5] = '00000' AND LEFT.P_InpClnSSN[6..9] = RIGHT.P_InpClnSSN[6..9], RIGHT.P_InpClnSSN, LEFT.P_InpClnSSN);
+							SELF := LEFT;
+							SELF := RIGHT;
+							SELF := [];), LEFT OUTER);		
+							
 //for searching																		
-	Input_Best_SSN_nonFCRA := Dedup(Sort((Best_SSN_NonFCRA+Input_FDC)((integer)P_InpClnSSN>0), UIDAppend, P_InpClnSSN),UIDAppend, P_InpClnSSN);
+	Input_Best_SSN_nonFCRA := Dedup(Sort((Best_SSN_NonFCRA+Overwrite_Redacted_SSNs_NonFCRA)((integer)P_InpClnSSN>0), UIDAppend, P_InpClnSSN),UIDAppend, P_InpClnSSN);
 	Input_Best_Phone_nonFCRA := Dedup(Sort(Best_Phone_NonFCRA(phone <> '')+Input_Phone_All, UIDAppend, phone),UIDAppend, phone);
-	Input_Best_SSN_FCRA := Dedup(Sort((Best_SSN_FCRA+Input_FDC)((integer)P_InpClnSSN>0), UIDAppend, P_InpClnSSN),UIDAppend, P_InpClnSSN);
+	Input_Best_SSN_FCRA := Dedup(Sort((Best_SSN_FCRA+Overwrite_Redacted_SSNs_FCRA)((integer)P_InpClnSSN>0), UIDAppend, P_InpClnSSN),UIDAppend, P_InpClnSSN);
 /*************************************************************************************************************/
 
 	

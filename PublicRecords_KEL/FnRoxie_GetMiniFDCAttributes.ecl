@@ -247,9 +247,16 @@ ds_append_best := project(PersonAttributesWithLexID, transform(PublicRecords_KEL
 		self := left;
 		self := [];));
 
+	overwriteRedactedSSNs := project(PersonAttributesWithLexID, transform(PublicRecords_KEL.ECL_Functions.Layouts.LayoutInputPII, 
+		SELF.P_InpClnSSN := IF(LEFT.P_InpClnSSN[1..5] = '00000' AND LEFT.P_InpClnSSN[6..9] = LEFT.BestSSN[6..9], LEFT.BestSSN, LEFT.P_InpClnSSN);
+		self.PL_BestSSNAppendFlag:= IF(LEFT.P_InpClnSSN[1..5] = '00000' AND LEFT.P_InpClnSSN[6..9] = LEFT.BestSSN[6..9], TRUE, FALSE);
+		SELF := LEFT;
+		self := [];));
+		
 	MiniAttributesPre := IF(Options.BestPIIAppend  ,ds_append_best, //append best, append all like LI mode in boca she
 															IF((Options.IsPrescreen and Options.RetainInputLexid), prescreenappend, //prescreen append all but name components
-																	IF((Options.IsPrescreen and NOT Options.RetainInputLexid), appendssnonly ,PersonAttributesWithLexID)));//prescreen withno lexid on input, only append ssn if 4 digits or less, do not append the others
+																	IF((Options.IsPrescreen and NOT Options.RetainInputLexid), appendssnonly, //prescreen withno lexid on input, only append ssn if 4 digits or less, do not append the others
+																	IF(Options.OverwriteRedactedSSN, overwriteRedactedSSNs ,PersonAttributesWithLexID))));
 
 	MiniAttributes := SORT( MiniAttributesPre + PersonAttributesWithoutLexID, G_ProcUID ); 
 

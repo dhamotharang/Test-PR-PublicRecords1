@@ -411,7 +411,8 @@ QUERY: FCRAPersonAttributesV1Dynamic(Person LexID_in,
 		PL_AlrtSecurityFreezeFlag := IF(P_LexIDSeenFlagFCRA = '0', MISSING_INPUT_DATA, PL_AlrtSecurityFreezeFlag),
 		PL_AlrtSecurityAlertFlag := IF(P_LexIDSeenFlagFCRA = '0', MISSING_INPUT_DATA, PL_AlrtSecurityAlertFlag),
 		PL_AlrtIDTheftFlag := IF(P_LexIDSeenFlagFCRA = '0', MISSING_INPUT_DATA, PL_AlrtIDTheftFlag),	
-		PL_EmrgAge := IF(P_LexIDSeenFlagFCRA = '0', MISSING_INPUT_DATA_INT, PL_EmrgAge) //,
+		PL_EmrgAge := IF(P_LexIDSeenFlagFCRA = '0', MISSING_INPUT_DATA_INT, PL_EmrgAge),
+		PL_VerSSNLookupFlag  := IF(P_LexIDSeenFlagFCRA = '0', MISSING_INPUT_DATA, PL_VerSSNLookupFlag ) //,
 		//PL_VerRIRestrictedFlag := IF(P_LexIDSeenFlagFCRA = '0', 0, PL_VerRIRestrictedFlag)
 		} 
 	ASOF DynamicArchive(P_InpClnArchDt) 
