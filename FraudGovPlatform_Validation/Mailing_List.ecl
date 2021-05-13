@@ -1,37 +1,40 @@
 ﻿import _control;
 EXPORT Mailing_List(string st = '', string ut = '', string Customer_list = '') := module
 
-	shared Dev_list :=	'Oscar.Barrientos@lexisnexisrisk.com'
+	shared Dev_list :=					'Oscar.Barrientos@lexisnexisrisk.com'
 										// +	';Sesha.Nookala@lexisnexisrisk.com'
 										// +	';John.Santos@lexisnexisrisk.com'
 										// +	';Greg.Whitaker@lexisnexisrisk.com'
 										;
 
-	shared Data_QA_list := 'John.Santos@lexisnexisrisk.com';
+	shared Data_QA_list := 		Dev_list 
+										// +	'John.Santos@lexisnexisrisk.com'
+										;
 							
-	shared TN_UNEMPLOYMENT := 'Jeremy.Riley@lexisnexisrisk.com'
-										+	';'+Data_QA_list
-										+	';'+Dev_list
+	shared TN_UNEMPLOYMENT := 	Dev_list 
+										// +   ';Jeremy.Riley@lexisnexisrisk.com'
+										// +	';'+Data_QA_list
 										;
 
-	shared Batch_list	:=	Dev_list
-										+	';roberto.perez@lexisnexisrisk.com'
+	shared Batch_list	:=		Dev_list
+										// +	';roberto.perez@lexisnexisrisk.com'
 										;
 
-	shared Roxie_list :=	'Vishesh.Ved@lexisnexisrisk.com'
-										+	';'+Data_QA_list
-										+	';'+Dev_list
+	shared Roxie_list :=		Dev_list 	
+										// +	';Vishesh.Ved@lexisnexisrisk.com'
+										// +	';'+Data_QA_list
 										;
-	shared RinNetwork_list := 'riskintelligencenetwork.support@lexisnexisrisk.com'
+	shared RinNetwork_list := 	Dev_list
+										// +	'riskintelligencenetwork.support@lexisnexisrisk.com'
 										;										
-	shared Boca_Ops	:= 	'SupercomputerOps@lexisnexisrisk.com'
-										+	';'+Dev_list										
+	shared Boca_Ops	:= 			Dev_list 
+										// +	';SupercomputerOps@lexisnexisrisk.com'
 										;
 										
-	shared Analytics_list	:= 	'Julie.Carmigniani@lexisnexisrisk.com'
-											+';Michael.Sterling@lexisnexisrisk.com'
-											+	';'+Dev_list										
-											;
+	shared Analytics_list	:= 	Dev_list	
+										// +	';Julie.Carmigniani@lexisnexisrisk.com'
+										// +	';Michael.Sterling@lexisnexisrisk.com'											
+										;
 
 
 	shared fn_mail_recipiant(string recipiant) := function
