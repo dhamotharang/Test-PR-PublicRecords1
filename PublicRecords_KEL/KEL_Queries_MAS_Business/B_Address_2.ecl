@@ -5,9 +5,9 @@ IMPORT * FROM KEL16.Null;
 EXPORT B_Address_2(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG_Compile __cfg = CFG_Compile) := MODULE
   SHARED VIRTUAL TYPEOF(B_Address_3(__in,__cfg).__ENH_Address_3) __ENH_Address_3 := B_Address_3(__in,__cfg).__ENH_Address_3;
   SHARED VIRTUAL TYPEOF(E_Zip_Code(__in,__cfg).__Result) __E_Zip_Code := E_Zip_Code(__in,__cfg).__Result;
-  SHARED __EE2504504 := __ENH_Address_3;
-  SHARED __EE798707 := __E_Zip_Code;
-  SHARED __ST799360_Layout := RECORD
+  SHARED __EE2510496 := __ENH_Address_3;
+  SHARED __EE804699 := __E_Zip_Code;
+  SHARED __ST805352_Layout := RECORD
     KEL.typ.nuid UID;
     KEL.typ.nstr Primary_Range_;
     KEL.typ.nstr Predirectional_;
@@ -54,15 +54,15 @@ EXPORT B_Address_2(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG_Com
     KEL.typ.epoch Vault_Date_Last_Seen_ := 0;
     KEL.typ.int __RecordCount := 0;
   END;
-  __JC2504975(B_Address_5(__in,__cfg).__ST202951_Layout __EE2504504, E_Zip_Code(__in,__cfg).Layout __EE798707) := __EEQP(__EE2504504.Z_I_P5_,__EE798707.UID);
-  __ST799360_Layout __JT2504975(B_Address_5(__in,__cfg).__ST202951_Layout __l, E_Zip_Code(__in,__cfg).Layout __r) := TRANSFORM
+  __JC2510967(B_Address_5(__in,__cfg).__ST208943_Layout __EE2510496, E_Zip_Code(__in,__cfg).Layout __EE804699) := __EEQP(__EE2510496.Z_I_P5_,__EE804699.UID);
+  __ST805352_Layout __JT2510967(B_Address_5(__in,__cfg).__ST208943_Layout __l, E_Zip_Code(__in,__cfg).Layout __r) := TRANSFORM
     SELF.U_I_D__1_ := __r.UID;
     SELF.Data_Sources__1_ := __r.Data_Sources_;
     SELF := __l;
     SELF := __r;
   END;
-  SHARED __EE2504976 := JOIN(__EE2504504,__EE798707,__JC2504975(LEFT,RIGHT),__JT2504975(LEFT,RIGHT),LEFT OUTER,HASH);
-  EXPORT __ST174919_Layout := RECORD
+  SHARED __EE2510968 := JOIN(__EE2510496,__EE804699,__JC2510967(LEFT,RIGHT),__JT2510967(LEFT,RIGHT),LEFT OUTER,HASH);
+  EXPORT __ST180911_Layout := RECORD
     KEL.typ.nuid UID;
     KEL.typ.nstr Primary_Range_;
     KEL.typ.nstr Predirectional_;
@@ -103,11 +103,11 @@ EXPORT B_Address_2(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG_Com
     KEL.typ.epoch Vault_Date_Last_Seen_ := 0;
     KEL.typ.int __RecordCount := 0;
   END;
-  SHARED __ST174919_Layout __ND2505531__Project(__ST799360_Layout __PP2504512) := TRANSFORM
-    __BS2504838 := __T(__PP2504512.Address_Type_);
-    SELF.Is_P_O_Box_A_D_V_O_ := EXISTS(__BS2504838(__T(__OP2(__T(__PP2504512.Address_Type_).Address_Type_Code_,=,__CN('9')))));
-    SELF.Is_P_O_Box_Zip_ := __OP2(__PP2504512.Zip_Class_,=,__CN('P'));
-    SELF := __PP2504512;
+  SHARED __ST180911_Layout __ND2511523__Project(__ST805352_Layout __PP2510504) := TRANSFORM
+    __BS2510830 := __T(__PP2510504.Address_Type_);
+    SELF.Is_P_O_Box_A_D_V_O_ := EXISTS(__BS2510830(__T(__OP2(__T(__PP2510504.Address_Type_).Address_Type_Code_,=,__CN('9')))));
+    SELF.Is_P_O_Box_Zip_ := __OP2(__PP2510504.Zip_Class_,=,__CN('P'));
+    SELF := __PP2510504;
   END;
-  EXPORT __ENH_Address_2 := PROJECT(__EE2504976,__ND2505531__Project(LEFT));
+  EXPORT __ENH_Address_2 := PROJECT(__EE2510968,__ND2511523__Project(LEFT));
 END;

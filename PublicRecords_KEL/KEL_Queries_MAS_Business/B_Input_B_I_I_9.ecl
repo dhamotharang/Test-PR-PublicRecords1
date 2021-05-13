@@ -4,8 +4,8 @@ IMPORT B_Input_B_I_I_10,CFG_Compile,E_Business_Org,E_Business_Sele,E_Business_Se
 IMPORT * FROM KEL16.Null;
 EXPORT B_Input_B_I_I_9(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG_Compile __cfg = CFG_Compile) := MODULE
   SHARED VIRTUAL TYPEOF(B_Input_B_I_I_10(__in,__cfg).__ENH_Input_B_I_I_10) __ENH_Input_B_I_I_10 := B_Input_B_I_I_10(__in,__cfg).__ENH_Input_B_I_I_10;
-  SHARED __EE1878120 := __ENH_Input_B_I_I_10;
-  EXPORT __ST214454_Layout := RECORD
+  SHARED __EE1884112 := __ENH_Input_B_I_I_10;
+  EXPORT __ST220446_Layout := RECORD
     KEL.typ.nuid UID;
     KEL.typ.ntyp(E_Business_Sele().Typ) Legal_;
     KEL.typ.nint G___Proc_Bus_U_I_D_;
@@ -80,9 +80,9 @@ EXPORT B_Input_B_I_I_9(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG
     KEL.typ.epoch Vault_Date_Last_Seen_ := 0;
     KEL.typ.int __RecordCount := 0;
   END;
-  SHARED __ST214454_Layout __ND1878414__Project(B_Input_B_I_I_10(__in,__cfg).__ST215245_Layout __PP1878121) := TRANSFORM
-    SELF.B___Inp_Addr_ := __OP2(IF(__T(__NT(__PP1878121.B___Inp_Addr_Line1_)),__ECAST(KEL.typ.nstr,__CN('')),__ECAST(KEL.typ.nstr,__OP2(__PP1878121.B___Inp_Addr_Line1_,+,__CN(' ')))),+,IF(__T(__NT(__PP1878121.B___Inp_Addr_Line2_)),__ECAST(KEL.typ.nstr,__CN('')),__ECAST(KEL.typ.nstr,__PP1878121.B___Inp_Addr_Line2_)));
-    SELF := __PP1878121;
+  SHARED __ST220446_Layout __ND1884406__Project(B_Input_B_I_I_10(__in,__cfg).__ST221237_Layout __PP1884113) := TRANSFORM
+    SELF.B___Inp_Addr_ := __OP2(IF(__T(__NT(__PP1884113.B___Inp_Addr_Line1_)),__ECAST(KEL.typ.nstr,__CN('')),__ECAST(KEL.typ.nstr,__OP2(__PP1884113.B___Inp_Addr_Line1_,+,__CN(' ')))),+,IF(__T(__NT(__PP1884113.B___Inp_Addr_Line2_)),__ECAST(KEL.typ.nstr,__CN('')),__ECAST(KEL.typ.nstr,__PP1884113.B___Inp_Addr_Line2_)));
+    SELF := __PP1884113;
   END;
-  EXPORT __ENH_Input_B_I_I_9 := PROJECT(__EE1878120,__ND1878414__Project(LEFT));
+  EXPORT __ENH_Input_B_I_I_9 := PROJECT(__EE1884112,__ND1884406__Project(LEFT));
 END;

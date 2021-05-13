@@ -1,6 +1,6 @@
 //HPCC Systems KEL Compiler Version 1.6.0
 IMPORT KEL16 AS KEL;
-IMPORT $,Email_Data,NID,PublicRecords_KEL,Royalty,STD,address,header;
+IMPORT $,DID_Add,Email_Data,NID,PublicRecords_KEL,Risk_Indicators,Royalty,STD,address,header;
 IMPORT CFG_Compile FROM PublicRecords_KEL.KEL_Queries_MAS_FCRA;
 IMPORT * FROM KEL16.Null;
 EXPORT FN_Compile(CFG_Compile __cfg = CFG_Compile) := MODULE
@@ -136,9 +136,9 @@ EXPORT FN_Compile(CFG_Compile __cfg = CFG_Compile) := MODULE
     __Value := PublicRecords_KEL.ECL_Functions.Fn_STD_Str_FilterOut_ValidChars(Field);
     RETURN __BNT(__Value,__IsNull,KEL.typ.nstr);
   END;
-  SHARED __CC13549 := -99999;
+  SHARED __CC13555 := -99999;
   EXPORT KEL.typ.str FN_Validate_Flag(KEL.typ.nstr __PFieldToCheck) := FUNCTION
-    RETURN MAP(__T(__OR(__NT(__PFieldToCheck),__OP2(__PFieldToCheck,=,__CN(''))))=>(KEL.typ.str)__CC13549,__T(__OP2(FN__fn_Filter_Out_Valid_Chars(__ECAST(KEL.typ.nstr,__FN1(KEL.Routines.ToUpperCase,__FN1(KEL.Routines.TrimBoth,__PFieldToCheck)))),=,__CN('')))=>'0','1');
+    RETURN MAP(__T(__OR(__NT(__PFieldToCheck),__OP2(__PFieldToCheck,=,__CN(''))))=>(KEL.typ.str)__CC13555,__T(__OP2(FN__fn_Filter_Out_Valid_Chars(__ECAST(KEL.typ.nstr,__FN1(KEL.Routines.ToUpperCase,__FN1(KEL.Routines.TrimBoth,__PFieldToCheck)))),=,__CN('')))=>'0','1');
   END;
   EXPORT KEL.typ.nstr FN__fn_Bogus_Names(KEL.typ.nstr __PsNameFirst, KEL.typ.nstr __PsNameMid, KEL.typ.nstr __PsNameLast) := FUNCTION
     sNameFirst := __T(__PsNameFirst);
@@ -524,6 +524,20 @@ EXPORT FN_Compile(CFG_Compile __cfg = CFG_Compile) := MODULE
     IsFCRA := __T(__PIsFCRA);
     __Value := PublicRecords_KEL.MAS_get.MASGateway.InsurancePhoneFunctions.InsurancePhoneWrapper(GatewayURL, FirstName, LastName, StreetAddress, City, State, Zip, Phone10, GLBPurpose, IsFCRA);
     RETURN __Value;
+  END;
+  EXPORT KEL.typ.nint FN_S_S_N_Match_Score(KEL.typ.nstr __PSSN1, KEL.typ.nstr __PSSN2, KEL.typ.nbool __PFourOnly) := FUNCTION
+    SSN1 := __T(__PSSN1);
+    SSN2 := __T(__PSSN2);
+    FourOnly := __T(__PFourOnly);
+    __IsNull := __NL(__PSSN1) OR __NL(__PSSN2) OR __NL(__PFourOnly);
+    __Value := did_add.ssn_match_score(SSN1, SSN2, FourOnly);
+    RETURN __BNT(__Value,__IsNull,KEL.typ.nint);
+  END;
+  EXPORT KEL.typ.nbool FN_G_N(KEL.typ.nint __PI) := FUNCTION
+    I := __T(__PI);
+    __IsNull := __NL(__PI);
+    __Value := risk_indicators.iid_constants.gn(I);
+    RETURN __BNT(__Value,__IsNull,KEL.typ.nbool);
   END;
   EXPORT KEL.typ.str FN__map_Filing_Type(KEL.typ.nstr __PfilingType) := FUNCTION
     RETURN MAP(__T(__OP2(__FN1(KEL.Routines.ToUpperCase,__FN1(TRIM,__PfilingType)),IN,__CN(['UCC-3 TERMINATION','TERMINATION','UCC3 TERMINATION'])))=>'1',__T(__OP2(__FN1(KEL.Routines.ToUpperCase,__FN1(TRIM,__PfilingType)),=,__CN('CORRECTION')))=>'2',__T(__OP2(__FN1(KEL.Routines.ToUpperCase,__FN1(TRIM,__PfilingType)),=,__CN('AMENDMENT')))=>'3',__T(__OP2(__FN1(KEL.Routines.ToUpperCase,__FN1(TRIM,__PfilingType)),=,__CN('ASSIGNMENT')))=>'4',__T(__OP2(__FN1(KEL.Routines.ToUpperCase,__FN1(TRIM,__PfilingType)),=,__CN('CONTINUATION')))=>'5',__T(__OP2(__FN1(KEL.Routines.ToUpperCase,__FN1(TRIM,__PfilingType)),=,__CN('FILING OFFICER STATEMENT')))=>'6',__T(__OP2(__FN1(KEL.Routines.ToUpperCase,__FN1(TRIM,__PfilingType)),=,__CN('INITIAL FILING')))=>'7','7');

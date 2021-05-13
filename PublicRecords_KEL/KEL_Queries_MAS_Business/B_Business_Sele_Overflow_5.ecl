@@ -4,8 +4,8 @@ IMPORT B_Business_Sele_Overflow_6,CFG_Compile,E_Business_Sele_Overflow FROM Publ
 IMPORT * FROM KEL16.Null;
 EXPORT B_Business_Sele_Overflow_5(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG_Compile __cfg = CFG_Compile) := MODULE
   SHARED VIRTUAL TYPEOF(B_Business_Sele_Overflow_6(__in,__cfg).__ENH_Business_Sele_Overflow_6) __ENH_Business_Sele_Overflow_6 := B_Business_Sele_Overflow_6(__in,__cfg).__ENH_Business_Sele_Overflow_6;
-  SHARED __EE1980171 := __ENH_Business_Sele_Overflow_6;
-  EXPORT __ST204697_Layout := RECORD
+  SHARED __EE1986163 := __ENH_Business_Sele_Overflow_6;
+  EXPORT __ST210689_Layout := RECORD
     KEL.typ.nuid UID;
     KEL.typ.nint Ult_I_D_;
     KEL.typ.nint Org_I_D_;
@@ -37,13 +37,13 @@ EXPORT B_Business_Sele_Overflow_5(CFG_Compile.FDCDataset __in = CFG_Compile.FDCD
     KEL.typ.epoch Vault_Date_Last_Seen_ := 0;
     KEL.typ.int __RecordCount := 0;
   END;
-  SHARED __ST204697_Layout __ND1979977__Project(B_Business_Sele_Overflow_6(__in,__cfg).__ST208473_Layout __PP1979433) := TRANSFORM
-    __EE1979972 := __PP1979433.S_O_S_Domestic_Filing_;
-    SELF.S_O_S_Dom_Date_First_Seen_ := KEL.Aggregates.MinNN(__EE1979972,__T(__EE1979972).S_O_S_Incorporation_Date_);
-    __EE1979987 := __PP1979433.S_O_S_Domestic_Filing_;
-    SELF.S_O_S_Dom_Date_Last_Seen_ := KEL.Aggregates.MaxNN(__EE1979987,__T(__EE1979987).S_O_S_Incorporation_Date_);
-    __EE1980012 := __PP1979433.S_O_S_Domestic_Filing_;
-    __ST96803_Layout := RECORD
+  SHARED __ST210689_Layout __ND1985969__Project(B_Business_Sele_Overflow_6(__in,__cfg).__ST214465_Layout __PP1985425) := TRANSFORM
+    __EE1985964 := __PP1985425.S_O_S_Domestic_Filing_;
+    SELF.S_O_S_Dom_Date_First_Seen_ := KEL.Aggregates.MinNN(__EE1985964,__T(__EE1985964).S_O_S_Incorporation_Date_);
+    __EE1985979 := __PP1985425.S_O_S_Domestic_Filing_;
+    SELF.S_O_S_Dom_Date_Last_Seen_ := KEL.Aggregates.MaxNN(__EE1985979,__T(__EE1985979).S_O_S_Incorporation_Date_);
+    __EE1986004 := __PP1985425.S_O_S_Domestic_Filing_;
+    __ST100072_Layout := RECORD
       KEL.typ.nstr S_O_S_Key_;
       KEL.typ.nstr S_O_S_Incorporation_State_;
       KEL.typ.epoch Archive___Date_ := 0;
@@ -53,9 +53,9 @@ EXPORT B_Business_Sele_Overflow_5(CFG_Compile.FDCDataset __in = CFG_Compile.FDCD
       KEL.typ.epoch Vault_Date_Last_Seen_ := 0;
       KEL.typ.int __RecordCount := 0;
     END;
-    SELF.S_O_S_Domestic_Filing_Count_ := COUNT(PROJECT(TABLE(PROJECT(__T(__EE1980012),__ST96803_Layout),{KEL.typ.int __RecordCount := SUM(GROUP,__RecordCount),KEL.typ.epoch Archive___Date_ := KEL.era.SimpleRoll(GROUP,Archive___Date_,MIN,FALSE),KEL.typ.epoch Date_First_Seen_ := KEL.era.SimpleRoll(GROUP,Date_First_Seen_,MIN,FALSE),KEL.typ.epoch Date_Last_Seen_ := KEL.era.SimpleRoll(GROUP,Date_Last_Seen_,MAX,FALSE),KEL.typ.epoch Hybrid_Archive_Date_ := KEL.era.SimpleRoll(GROUP,Hybrid_Archive_Date_,MIN,FALSE),KEL.typ.epoch Vault_Date_Last_Seen_ := KEL.era.SimpleRoll(GROUP,Vault_Date_Last_Seen_,MAX,NMAX),S_O_S_Key_,S_O_S_Incorporation_State_},S_O_S_Key_,S_O_S_Incorporation_State_,MERGE),__ST96803_Layout));
-    __EE1980035 := __PP1979433.S_O_S_Foreign_Filing_;
-    __ST96835_Layout := RECORD
+    SELF.S_O_S_Domestic_Filing_Count_ := COUNT(PROJECT(TABLE(PROJECT(__T(__EE1986004),__ST100072_Layout),{KEL.typ.int __RecordCount := SUM(GROUP,__RecordCount),KEL.typ.epoch Archive___Date_ := KEL.era.SimpleRoll(GROUP,Archive___Date_,MIN,FALSE),KEL.typ.epoch Date_First_Seen_ := KEL.era.SimpleRoll(GROUP,Date_First_Seen_,MIN,FALSE),KEL.typ.epoch Date_Last_Seen_ := KEL.era.SimpleRoll(GROUP,Date_Last_Seen_,MAX,FALSE),KEL.typ.epoch Hybrid_Archive_Date_ := KEL.era.SimpleRoll(GROUP,Hybrid_Archive_Date_,MIN,FALSE),KEL.typ.epoch Vault_Date_Last_Seen_ := KEL.era.SimpleRoll(GROUP,Vault_Date_Last_Seen_,MAX,NMAX),S_O_S_Key_,S_O_S_Incorporation_State_},S_O_S_Key_,S_O_S_Incorporation_State_,MERGE),__ST100072_Layout));
+    __EE1986027 := __PP1985425.S_O_S_Foreign_Filing_;
+    __ST100104_Layout := RECORD
       KEL.typ.nstr S_O_S_Key_;
       KEL.typ.nstr S_O_S_Foreign_State_Code_;
       KEL.typ.epoch Archive___Date_ := 0;
@@ -65,12 +65,12 @@ EXPORT B_Business_Sele_Overflow_5(CFG_Compile.FDCDataset __in = CFG_Compile.FDCD
       KEL.typ.epoch Vault_Date_Last_Seen_ := 0;
       KEL.typ.int __RecordCount := 0;
     END;
-    SELF.S_O_S_Foreign_Filing_Count_ := COUNT(PROJECT(TABLE(PROJECT(__T(__EE1980035),__ST96835_Layout),{KEL.typ.int __RecordCount := SUM(GROUP,__RecordCount),KEL.typ.epoch Archive___Date_ := KEL.era.SimpleRoll(GROUP,Archive___Date_,MIN,FALSE),KEL.typ.epoch Date_First_Seen_ := KEL.era.SimpleRoll(GROUP,Date_First_Seen_,MIN,FALSE),KEL.typ.epoch Date_Last_Seen_ := KEL.era.SimpleRoll(GROUP,Date_Last_Seen_,MAX,FALSE),KEL.typ.epoch Hybrid_Archive_Date_ := KEL.era.SimpleRoll(GROUP,Hybrid_Archive_Date_,MIN,FALSE),KEL.typ.epoch Vault_Date_Last_Seen_ := KEL.era.SimpleRoll(GROUP,Vault_Date_Last_Seen_,MAX,NMAX),S_O_S_Key_,S_O_S_Foreign_State_Code_},S_O_S_Key_,S_O_S_Foreign_State_Code_,MERGE),__ST96835_Layout));
-    __EE1980047 := __PP1979433.S_O_S_Foreign_Filing_;
-    SELF.S_O_S_Frgn_Date_First_Seen_ := KEL.Aggregates.MinNN(__EE1980047,__T(__EE1980047).S_O_S_Foreign_State_Date_);
-    __EE1980061 := __PP1979433.S_O_S_Foreign_Filing_;
-    SELF.S_O_S_Frgn_Date_Last_Seen_ := KEL.Aggregates.MaxNN(__EE1980061,__T(__EE1980061).S_O_S_Foreign_State_Date_);
-    SELF := __PP1979433;
+    SELF.S_O_S_Foreign_Filing_Count_ := COUNT(PROJECT(TABLE(PROJECT(__T(__EE1986027),__ST100104_Layout),{KEL.typ.int __RecordCount := SUM(GROUP,__RecordCount),KEL.typ.epoch Archive___Date_ := KEL.era.SimpleRoll(GROUP,Archive___Date_,MIN,FALSE),KEL.typ.epoch Date_First_Seen_ := KEL.era.SimpleRoll(GROUP,Date_First_Seen_,MIN,FALSE),KEL.typ.epoch Date_Last_Seen_ := KEL.era.SimpleRoll(GROUP,Date_Last_Seen_,MAX,FALSE),KEL.typ.epoch Hybrid_Archive_Date_ := KEL.era.SimpleRoll(GROUP,Hybrid_Archive_Date_,MIN,FALSE),KEL.typ.epoch Vault_Date_Last_Seen_ := KEL.era.SimpleRoll(GROUP,Vault_Date_Last_Seen_,MAX,NMAX),S_O_S_Key_,S_O_S_Foreign_State_Code_},S_O_S_Key_,S_O_S_Foreign_State_Code_,MERGE),__ST100104_Layout));
+    __EE1986039 := __PP1985425.S_O_S_Foreign_Filing_;
+    SELF.S_O_S_Frgn_Date_First_Seen_ := KEL.Aggregates.MinNN(__EE1986039,__T(__EE1986039).S_O_S_Foreign_State_Date_);
+    __EE1986053 := __PP1985425.S_O_S_Foreign_Filing_;
+    SELF.S_O_S_Frgn_Date_Last_Seen_ := KEL.Aggregates.MaxNN(__EE1986053,__T(__EE1986053).S_O_S_Foreign_State_Date_);
+    SELF := __PP1985425;
   END;
-  EXPORT __ENH_Business_Sele_Overflow_5 := PROJECT(__EE1980171,__ND1979977__Project(LEFT));
+  EXPORT __ENH_Business_Sele_Overflow_5 := PROJECT(__EE1986163,__ND1985969__Project(LEFT));
 END;

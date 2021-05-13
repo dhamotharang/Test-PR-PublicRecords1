@@ -4,8 +4,8 @@ IMPORT B_Criminal_Offense_4,CFG_Compile,E_Criminal_Offense FROM PublicRecords_KE
 IMPORT * FROM KEL16.Null;
 EXPORT B_Criminal_Offense_3(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG_Compile __cfg = CFG_Compile) := MODULE
   SHARED VIRTUAL TYPEOF(B_Criminal_Offense_4(__in,__cfg).__ENH_Criminal_Offense_4) __ENH_Criminal_Offense_4 := B_Criminal_Offense_4(__in,__cfg).__ENH_Criminal_Offense_4;
-  SHARED __EE2486604 := __ENH_Criminal_Offense_4;
-  EXPORT __ST192215_Layout := RECORD
+  SHARED __EE2492596 := __ENH_Criminal_Offense_4;
+  EXPORT __ST198207_Layout := RECORD
     KEL.typ.nstr Case_Number_;
     KEL.typ.nkdate Case_Date_;
     KEL.typ.nstr Case_Type_Description_;
@@ -25,7 +25,7 @@ EXPORT B_Criminal_Offense_3(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault
     KEL.typ.epoch Vault_Date_Last_Seen_ := 0;
     KEL.typ.int __RecordCount := 0;
   END;
-  EXPORT __ST192168_Layout := RECORD
+  EXPORT __ST198160_Layout := RECORD
     KEL.typ.nuid UID;
     KEL.typ.nstr Offender_Key_;
     KEL.typ.nstr Offense_Type_;
@@ -71,7 +71,7 @@ EXPORT B_Criminal_Offense_3(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault
     KEL.typ.nstr Court_County_;
     KEL.typ.nstr Arrest_Offense_Level_Mapped_;
     KEL.typ.nstr Court_Offense_Level_Mapped_;
-    KEL.typ.ndataset(__ST192215_Layout) Offense_Charges_;
+    KEL.typ.ndataset(__ST198207_Layout) Offense_Charges_;
     KEL.typ.ndataset(E_Criminal_Offense(__in,__cfg).Criminal_Data_Sources_Layout) Criminal_Data_Sources_;
     KEL.typ.ndataset(E_Criminal_Offense(__in,__cfg).Court_Offense_Level_Layout) Court_Offense_Level_;
     KEL.typ.ndataset(E_Criminal_Offense(__in,__cfg).Fcra_Data_Layout) Fcra_Data_;
@@ -84,10 +84,10 @@ EXPORT B_Criminal_Offense_3(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault
     KEL.typ.epoch Vault_Date_Last_Seen_ := 0;
     KEL.typ.int __RecordCount := 0;
   END;
-  SHARED __ST192168_Layout __ND2486609__Project(B_Criminal_Offense_4(__in,__cfg).__ST200251_Layout __PP2486605) := TRANSFORM
-    __EE2486765 := __PP2486605.Offense_Charges_;
-    SELF.Offense_Charges_ := __PROJECT(__EE2486765,__ST192215_Layout);
-    SELF := __PP2486605;
+  SHARED __ST198160_Layout __ND2492601__Project(B_Criminal_Offense_4(__in,__cfg).__ST206243_Layout __PP2492597) := TRANSFORM
+    __EE2492757 := __PP2492597.Offense_Charges_;
+    SELF.Offense_Charges_ := __PROJECT(__EE2492757,__ST198207_Layout);
+    SELF := __PP2492597;
   END;
-  EXPORT __ENH_Criminal_Offense_3 := PROJECT(__EE2486604,__ND2486609__Project(LEFT));
+  EXPORT __ENH_Criminal_Offense_3 := PROJECT(__EE2492596,__ND2492601__Project(LEFT));
 END;
