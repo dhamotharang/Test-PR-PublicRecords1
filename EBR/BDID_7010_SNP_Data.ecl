@@ -3,7 +3,7 @@
 //////////////////////////////////////////////////////////////////////////////////////////////
 // -- Value Types
 //////////////////////////////////////////////////////////////////////////////////////////////
-File_in 			:= File_7010_SNP_Data_In;
+File_in 				:= File_7010_SNP_Data_In;
 segment_code 		:= '7010';
 
 //////////////////////////////////////////////////////////////////////////////////////////////
@@ -11,10 +11,13 @@ segment_code 		:= '7010';
 //////////////////////////////////////////////////////////////////////////////////////////////
 Layout_7010_SNP_Data_Base Convert2Base(File_in l) := 
 transform
-	self.date_first_seen		:= '';
-	self.date_last_seen 		:= self.date_first_seen;
-	self 					:= 	l;
-	self					:=	[];
+	self.date_first_seen					:= 	'';
+	self.date_last_seen 					:= 	self.date_first_seen;
+	self.process_date_first_seen	:= 	(unsigned4)l.process_date;
+	self.process_date_last_seen		:= 	self.process_date_first_seen;
+	self.record_type							:= 	'C';	
+	self 													:= 	l;
+	self													:=	[];
 end;
 
 File_in2base := project(File_in, Convert2Base(left));
@@ -34,5 +37,4 @@ projectBase  := project(BDID_Append, tLayout_7010_SNP_Data_Base(left));
 
 addGlobalSID := mdr.macGetGlobalSID(projectBase,'EBR','','global_sid'); //DF-26349: Populate Global_SID Field
 
-export BDID_7010_SNP_Data := addGlobalSID 
-	/*: persist(EBR_thor + 'TEMP::BDID_' + dataset_name + '_' + segment_code + '_' + decode_segments(segment_code))*/;
+export BDID_7010_SNP_Data := addGlobalSID;
