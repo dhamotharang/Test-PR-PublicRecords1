@@ -412,8 +412,8 @@ EXPORT L_Compile := MODULE
     KEL.typ.int P_L___Ast_Prop_Curr_Tax_Val_Tot_ := 0;
     KEL.typ.int P_L___Ast_Prop_Curr_W_A_V_M_Val_Cnt_ := 0;
     KEL.typ.nstr P_L___Ast_Prop_Curr_A_V_M_Val_List_;
-    KEL.typ.nint P_L___Ast_Prop_Curr_A_V_M_Val_Tot_;
-    KEL.typ.nfloat P_L___Ast_Prop_Curr_A_V_M_Val_Avg_;
+    KEL.typ.int P_L___Ast_Prop_Curr_A_V_M_Val_Tot_ := 0;
+    KEL.typ.float P_L___Ast_Prop_Curr_A_V_M_Val_Avg_ := 0.0;
     KEL.typ.int P_L___Ast_Prop_Sale_Cnt_Ev_ := 0;
     KEL.typ.nstr P_L___Ast_Prop_Sale_Amt_List_Ev_;
     KEL.typ.int P_L___Ast_Prop_Sale_Tot_Ev_ := 0;
@@ -654,6 +654,7 @@ EXPORT L_Compile := MODULE
     KEL.typ.nstr P_L___Ver_S_S_N_Src_Emrg_Dt_List_Ev_;
     KEL.typ.nstr P_L___Ver_S_S_N_Src_Last_Dt_List_Ev_;
     KEL.typ.nint P_L___Emrg_Age_;
+    KEL.typ.str P_L___Ver_S_S_N_Lookup_Flag_ := '';
     KEL.typ.epoch Archive___Date_ := 0;
     KEL.typ.epoch Date_First_Seen_ := 0;
     KEL.typ.epoch Date_Last_Seen_ := 0;

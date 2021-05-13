@@ -1,7 +1,7 @@
 //HPCC Systems KEL Compiler Version 1.6.0
 IMPORT KEL16 AS KEL;
 IMPORT PublicRecords_KEL;
-IMPORT B_Address_2,B_Address_3,B_Aircraft_Owner_1,B_Aircraft_Owner_2,B_Aircraft_Owner_3,B_Bankruptcy_1,B_Bankruptcy_2,B_Bankruptcy_3,B_Bankruptcy_4,B_Bankruptcy_5,B_Bankruptcy_6,B_Bankruptcy_7,B_Bankruptcy_8,B_Criminal_Offense_1,B_Criminal_Offense_2,B_Criminal_Offense_3,B_Criminal_Offense_4,B_Criminal_Offense_5,B_Criminal_Offense_6,B_Criminal_Offense_7,B_Education_1,B_Education_2,B_Education_3,B_Education_4,B_Education_5,B_Education_6,B_Education_7,B_Email_2,B_Email_3,B_Input_P_I_I,B_Input_P_I_I_1,B_Input_P_I_I_2,B_Input_P_I_I_3,B_Input_P_I_I_4,B_Input_P_I_I_5,B_Input_P_I_I_6,B_Input_P_I_I_7,B_Input_P_I_I_8,B_Inquiry_4,B_Inquiry_5,B_Inquiry_6,B_Inquiry_7,B_Lien_Judgment_13,B_Person,B_Person_1,B_Person_10,B_Person_11,B_Person_2,B_Person_3,B_Person_4,B_Person_5,B_Person_6,B_Person_7,B_Person_8,B_Person_9,B_Person_Lien_Judgment_12,B_Person_Property_1,B_Person_Property_2,B_Person_Property_3,B_Person_Property_4,B_Person_Property_5,B_Person_Property_6,B_Person_Property_7,B_Person_Property_8,B_Person_S_S_N_1,B_Person_S_S_N_2,B_Person_S_S_N_3,B_Person_S_S_N_4,B_Person_S_S_N_5,B_Person_S_S_N_6,B_Professional_License_1,B_Professional_License_2,B_Professional_License_3,B_Professional_License_4,B_Professional_License_5,B_Property_3,B_Property_Event_1,B_Property_Event_2,B_Property_Event_3,B_Property_Event_4,B_Property_Event_5,B_Property_Event_6,B_Property_Event_7,B_Property_Event_8,B_Watercraft_Owner_1,B_Watercraft_Owner_2,B_Watercraft_Owner_3,CFG_Compile,E_Address,E_Address_Slim,E_Address_Summary,E_Aircraft,E_Aircraft_Owner,E_Bankruptcy,E_Criminal_Offense,E_Education,E_Email,E_Geo_Link,E_Input_P_I_I,E_Inquiry,E_Lien_Judgment,E_Name_Summary,E_Person,E_Person_Address,E_Person_Bankruptcy,E_Person_Education,E_Person_Email,E_Person_Inquiry,E_Person_Lien_Judgment,E_Person_Offenses,E_Person_Property,E_Person_Property_Event,E_Person_S_S_N,E_Phone,E_Phone_Summary,E_Professional_License,E_Professional_License_Person,E_Property,E_Property_Event,E_S_S_N_Summary,E_Social_Security_Number,E_Surname,E_Watercraft,E_Watercraft_Owner,E_Zip_Code FROM PublicRecords_KEL.KEL_Queries_MAS_FCRA;
+IMPORT B_Address_2,B_Address_3,B_Aircraft_Owner_1,B_Aircraft_Owner_2,B_Aircraft_Owner_3,B_Bankruptcy_1,B_Bankruptcy_2,B_Bankruptcy_3,B_Bankruptcy_4,B_Bankruptcy_5,B_Bankruptcy_6,B_Bankruptcy_7,B_Bankruptcy_8,B_Criminal_Offense_1,B_Criminal_Offense_2,B_Criminal_Offense_3,B_Criminal_Offense_4,B_Criminal_Offense_5,B_Criminal_Offense_6,B_Criminal_Offense_7,B_Education_1,B_Education_2,B_Education_3,B_Education_4,B_Education_5,B_Education_6,B_Education_7,B_Email_2,B_Email_3,B_Input_P_I_I,B_Input_P_I_I_1,B_Input_P_I_I_2,B_Input_P_I_I_3,B_Input_P_I_I_4,B_Input_P_I_I_5,B_Input_P_I_I_6,B_Input_P_I_I_7,B_Input_P_I_I_8,B_Inquiry_4,B_Inquiry_5,B_Inquiry_6,B_Inquiry_7,B_Lien_Judgment_13,B_Person,B_Person_1,B_Person_10,B_Person_11,B_Person_2,B_Person_3,B_Person_4,B_Person_5,B_Person_6,B_Person_7,B_Person_8,B_Person_9,B_Person_Lien_Judgment_12,B_Person_Property_1,B_Person_Property_2,B_Person_Property_3,B_Person_Property_4,B_Person_Property_5,B_Person_Property_6,B_Person_Property_7,B_Person_Property_8,B_Person_S_S_N_4,B_Person_S_S_N_5,B_Person_S_S_N_6,B_Professional_License_1,B_Professional_License_2,B_Professional_License_3,B_Professional_License_4,B_Professional_License_5,B_Property_3,B_Property_Event_1,B_Property_Event_2,B_Property_Event_3,B_Property_Event_4,B_Property_Event_5,B_Property_Event_6,B_Property_Event_7,B_Property_Event_8,B_Watercraft_Owner_1,B_Watercraft_Owner_2,B_Watercraft_Owner_3,CFG_Compile,E_Address,E_Address_Slim,E_Address_Summary,E_Aircraft,E_Aircraft_Owner,E_Bankruptcy,E_Criminal_Offense,E_Education,E_Email,E_Geo_Link,E_Input_P_I_I,E_Inquiry,E_Lien_Judgment,E_Name_Summary,E_Person,E_Person_Address,E_Person_Bankruptcy,E_Person_Education,E_Person_Email,E_Person_Inquiry,E_Person_Lien_Judgment,E_Person_Offenses,E_Person_Property,E_Person_Property_Event,E_Person_S_S_N,E_Phone,E_Phone_Summary,E_Professional_License,E_Professional_License_Person,E_Property,E_Property_Event,E_S_S_N_Summary,E_Social_Security_Number,E_Surname,E_Watercraft,E_Watercraft_Owner,E_Zip_Code FROM PublicRecords_KEL.KEL_Queries_MAS_FCRA;
 IMPORT * FROM KEL16.Null;
 EXPORT Q_Inferred_Performance_Dynamic(KEL.typ.uid __PLexID_in, DATASET(RECORDOF(PublicRecords_KEL.ECL_Functions.Layouts.LayoutInputPII)) __PInputPIIDataset, KEL.typ.kdate __PP_InpClnArchDt, DATA57 __PDPM, CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault) := MODULE
   SHARED __cfg_Local := MODULE(CFG_Compile)
@@ -316,6 +316,7 @@ EXPORT Q_Inferred_Performance_Dynamic(KEL.typ.uid __PLexID_in, DATASET(RECORDOF(
     SHARED TYPEOF(B_Inquiry_6(__in,__cfg_Local).__ENH_Inquiry_6) __ENH_Inquiry_6 := B_Inquiry_6_Local.__ENH_Inquiry_6;
   END;
   SHARED B_Person_5_Local := MODULE(B_Person_5(__in,__cfg_Local))
+    SHARED TYPEOF(B_Input_P_I_I_6(__in,__cfg_Local).__ENH_Input_P_I_I_6) __ENH_Input_P_I_I_6 := B_Input_P_I_I_6_Local.__ENH_Input_P_I_I_6;
     SHARED TYPEOF(B_Person_6(__in,__cfg_Local).__ENH_Person_6) __ENH_Person_6 := B_Person_6_Local.__ENH_Person_6;
     SHARED TYPEOF(B_Person_S_S_N_6(__in,__cfg_Local).__ENH_Person_S_S_N_6) __ENH_Person_S_S_N_6 := B_Person_S_S_N_6_Local.__ENH_Person_S_S_N_6;
   END;
@@ -355,6 +356,7 @@ EXPORT Q_Inferred_Performance_Dynamic(KEL.typ.uid __PLexID_in, DATASET(RECORDOF(
     SHARED TYPEOF(E_Person_Address(__in,__cfg_Local).__Result) __E_Person_Address := E_Person_Address_Filtered.__Result;
     SHARED TYPEOF(E_Person_Bankruptcy(__in,__cfg_Local).__Result) __E_Person_Bankruptcy := E_Person_Bankruptcy_Filtered.__Result;
     SHARED TYPEOF(B_Person_Property_5(__in,__cfg_Local).__ENH_Person_Property_5) __ENH_Person_Property_5 := B_Person_Property_5_Local.__ENH_Person_Property_5;
+    SHARED TYPEOF(B_Person_S_S_N_5(__in,__cfg_Local).__ENH_Person_S_S_N_5) __ENH_Person_S_S_N_5 := B_Person_S_S_N_5_Local.__ENH_Person_S_S_N_5;
   END;
   SHARED B_Person_Property_4_Local := MODULE(B_Person_Property_4(__in,__cfg_Local))
     SHARED TYPEOF(B_Person_Property_5(__in,__cfg_Local).__ENH_Person_Property_5) __ENH_Person_Property_5 := B_Person_Property_5_Local.__ENH_Person_Property_5;
@@ -399,6 +401,7 @@ EXPORT Q_Inferred_Performance_Dynamic(KEL.typ.uid __PLexID_in, DATASET(RECORDOF(
     SHARED TYPEOF(E_Person_Inquiry(__in,__cfg_Local).__Result) __E_Person_Inquiry := E_Person_Inquiry_Filtered.__Result;
     SHARED TYPEOF(E_Person_Offenses(__in,__cfg_Local).__Result) __E_Person_Offenses := E_Person_Offenses_Filtered.__Result;
     SHARED TYPEOF(B_Person_Property_4(__in,__cfg_Local).__ENH_Person_Property_4) __ENH_Person_Property_4 := B_Person_Property_4_Local.__ENH_Person_Property_4;
+    SHARED TYPEOF(B_Person_S_S_N_4(__in,__cfg_Local).__ENH_Person_S_S_N_4) __ENH_Person_S_S_N_4 := B_Person_S_S_N_4_Local.__ENH_Person_S_S_N_4;
     SHARED TYPEOF(B_Professional_License_4(__in,__cfg_Local).__ENH_Professional_License_4) __ENH_Professional_License_4 := B_Professional_License_4_Local.__ENH_Professional_License_4;
     SHARED TYPEOF(E_Professional_License_Person(__in,__cfg_Local).__Result) __E_Professional_License_Person := E_Professional_License_Person_Filtered.__Result;
   END;
@@ -407,9 +410,6 @@ EXPORT Q_Inferred_Performance_Dynamic(KEL.typ.uid __PLexID_in, DATASET(RECORDOF(
     SHARED TYPEOF(E_Person_Property_Event(__in,__cfg_Local).__Result) __E_Person_Property_Event := E_Person_Property_Event_Filtered.__Result;
     SHARED TYPEOF(E_Property(__in,__cfg_Local).__Result) __E_Property := E_Property_Filtered.__Result;
     SHARED TYPEOF(B_Property_Event_4(__in,__cfg_Local).__ENH_Property_Event_4) __ENH_Property_Event_4 := B_Property_Event_4_Local.__ENH_Property_Event_4;
-  END;
-  SHARED B_Person_S_S_N_3_Local := MODULE(B_Person_S_S_N_3(__in,__cfg_Local))
-    SHARED TYPEOF(B_Person_S_S_N_4(__in,__cfg_Local).__ENH_Person_S_S_N_4) __ENH_Person_S_S_N_4 := B_Person_S_S_N_4_Local.__ENH_Person_S_S_N_4;
   END;
   SHARED B_Professional_License_3_Local := MODULE(B_Professional_License_3(__in,__cfg_Local))
     SHARED TYPEOF(B_Professional_License_4(__in,__cfg_Local).__ENH_Professional_License_4) __ENH_Professional_License_4 := B_Professional_License_4_Local.__ENH_Professional_License_4;
@@ -465,9 +465,6 @@ EXPORT Q_Inferred_Performance_Dynamic(KEL.typ.uid __PLexID_in, DATASET(RECORDOF(
     SHARED TYPEOF(B_Property_3(__in,__cfg_Local).__ENH_Property_3) __ENH_Property_3 := B_Property_3_Local.__ENH_Property_3;
     SHARED TYPEOF(B_Property_Event_3(__in,__cfg_Local).__ENH_Property_Event_3) __ENH_Property_Event_3 := B_Property_Event_3_Local.__ENH_Property_Event_3;
   END;
-  SHARED B_Person_S_S_N_2_Local := MODULE(B_Person_S_S_N_2(__in,__cfg_Local))
-    SHARED TYPEOF(B_Person_S_S_N_3(__in,__cfg_Local).__ENH_Person_S_S_N_3) __ENH_Person_S_S_N_3 := B_Person_S_S_N_3_Local.__ENH_Person_S_S_N_3;
-  END;
   SHARED B_Professional_License_2_Local := MODULE(B_Professional_License_2(__in,__cfg_Local))
     SHARED TYPEOF(B_Professional_License_3(__in,__cfg_Local).__ENH_Professional_License_3) __ENH_Professional_License_3 := B_Professional_License_3_Local.__ENH_Professional_License_3;
   END;
@@ -506,7 +503,6 @@ EXPORT Q_Inferred_Performance_Dynamic(KEL.typ.uid __PLexID_in, DATASET(RECORDOF(
     SHARED TYPEOF(E_Person_Email(__in,__cfg_Local).__Result) __E_Person_Email := E_Person_Email_Filtered.__Result;
     SHARED TYPEOF(E_Person_Offenses(__in,__cfg_Local).__Result) __E_Person_Offenses := E_Person_Offenses_Filtered.__Result;
     SHARED TYPEOF(B_Person_Property_2(__in,__cfg_Local).__ENH_Person_Property_2) __ENH_Person_Property_2 := B_Person_Property_2_Local.__ENH_Person_Property_2;
-    SHARED TYPEOF(B_Person_S_S_N_2(__in,__cfg_Local).__ENH_Person_S_S_N_2) __ENH_Person_S_S_N_2 := B_Person_S_S_N_2_Local.__ENH_Person_S_S_N_2;
     SHARED TYPEOF(B_Professional_License_2(__in,__cfg_Local).__ENH_Professional_License_2) __ENH_Professional_License_2 := B_Professional_License_2_Local.__ENH_Professional_License_2;
     SHARED TYPEOF(E_Professional_License_Person(__in,__cfg_Local).__Result) __E_Professional_License_Person := E_Professional_License_Person_Filtered.__Result;
     SHARED TYPEOF(B_Property_Event_2(__in,__cfg_Local).__ENH_Property_Event_2) __ENH_Property_Event_2 := B_Property_Event_2_Local.__ENH_Property_Event_2;
@@ -514,9 +510,6 @@ EXPORT Q_Inferred_Performance_Dynamic(KEL.typ.uid __PLexID_in, DATASET(RECORDOF(
   END;
   SHARED B_Person_Property_1_Local := MODULE(B_Person_Property_1(__in,__cfg_Local))
     SHARED TYPEOF(B_Person_Property_2(__in,__cfg_Local).__ENH_Person_Property_2) __ENH_Person_Property_2 := B_Person_Property_2_Local.__ENH_Person_Property_2;
-  END;
-  SHARED B_Person_S_S_N_1_Local := MODULE(B_Person_S_S_N_1(__in,__cfg_Local))
-    SHARED TYPEOF(B_Person_S_S_N_2(__in,__cfg_Local).__ENH_Person_S_S_N_2) __ENH_Person_S_S_N_2 := B_Person_S_S_N_2_Local.__ENH_Person_S_S_N_2;
   END;
   SHARED B_Professional_License_1_Local := MODULE(B_Professional_License_1(__in,__cfg_Local))
     SHARED TYPEOF(B_Professional_License_2(__in,__cfg_Local).__ENH_Professional_License_2) __ENH_Professional_License_2 := B_Professional_License_2_Local.__ENH_Professional_License_2;
@@ -541,7 +534,6 @@ EXPORT Q_Inferred_Performance_Dynamic(KEL.typ.uid __PLexID_in, DATASET(RECORDOF(
     SHARED TYPEOF(E_Person_Education(__in,__cfg_Local).__Result) __E_Person_Education := E_Person_Education_Filtered.__Result;
     SHARED TYPEOF(E_Person_Offenses(__in,__cfg_Local).__Result) __E_Person_Offenses := E_Person_Offenses_Filtered.__Result;
     SHARED TYPEOF(B_Person_Property_1(__in,__cfg_Local).__ENH_Person_Property_1) __ENH_Person_Property_1 := B_Person_Property_1_Local.__ENH_Person_Property_1;
-    SHARED TYPEOF(B_Person_S_S_N_1(__in,__cfg_Local).__ENH_Person_S_S_N_1) __ENH_Person_S_S_N_1 := B_Person_S_S_N_1_Local.__ENH_Person_S_S_N_1;
     SHARED TYPEOF(B_Professional_License_1(__in,__cfg_Local).__ENH_Professional_License_1) __ENH_Professional_License_1 := B_Professional_License_1_Local.__ENH_Professional_License_1;
     SHARED TYPEOF(E_Professional_License_Person(__in,__cfg_Local).__Result) __E_Professional_License_Person := E_Professional_License_Person_Filtered.__Result;
     SHARED TYPEOF(B_Property_Event_1(__in,__cfg_Local).__ENH_Property_Event_1) __ENH_Property_Event_1 := B_Property_Event_1_Local.__ENH_Property_Event_1;
@@ -550,9 +542,9 @@ EXPORT Q_Inferred_Performance_Dynamic(KEL.typ.uid __PLexID_in, DATASET(RECORDOF(
   SHARED TYPEOF(B_Input_P_I_I(__in,__cfg_Local).__ENH_Input_P_I_I) __ENH_Input_P_I_I := B_Input_P_I_I_Local.__ENH_Input_P_I_I;
   SHARED TYPEOF(E_Input_P_I_I(__in,__cfg_Local).__Result) __E_Input_P_I_I := E_Input_P_I_I_Filtered.__Result;
   SHARED TYPEOF(B_Person(__in,__cfg_Local).__ENH_Person) __ENH_Person := B_Person_Local.__ENH_Person;
-  SHARED __EE2436625 := __ENH_Person;
-  SHARED __EE2437018 := __EE2436625(__T(__OP2(__EE2436625.UID,=,__CN(__PLexID_in))));
-  SHARED __ST95843_Layout := RECORD
+  SHARED __EE2569509 := __ENH_Person;
+  SHARED __EE2569903 := __EE2569509(__T(__OP2(__EE2569509.UID,=,__CN(__PLexID_in))));
+  SHARED __ST99215_Layout := RECORD
     KEL.typ.int P_L___Drg_Crim_Fel_Cnt1_Y_F1_Y_ := 0;
     KEL.typ.int P_L___Drg_Lien_Cnt1_Y_F1_Y_ := 0;
     KEL.typ.int P_L___Drg_Bk_Cnt1_Y_F1_Y_ := 0;
@@ -564,10 +556,10 @@ EXPORT Q_Inferred_Performance_Dynamic(KEL.typ.uid __PLexID_in, DATASET(RECORDOF(
     KEL.typ.epoch Vault_Date_Last_Seen_ := 0;
     KEL.typ.int __RecordCount := 0;
   END;
-  SHARED __EE2437040 := PROJECT(TABLE(PROJECT(__EE2437018,__ST95843_Layout),{KEL.typ.int __RecordCount := SUM(GROUP,__RecordCount),KEL.typ.epoch Archive___Date_ := KEL.era.SimpleRoll(GROUP,Archive___Date_,MIN,FALSE),KEL.typ.epoch Date_First_Seen_ := KEL.era.SimpleRoll(GROUP,Date_First_Seen_,MIN,FALSE),KEL.typ.epoch Date_Last_Seen_ := KEL.era.SimpleRoll(GROUP,Date_Last_Seen_,MAX,FALSE),KEL.typ.epoch Hybrid_Archive_Date_ := KEL.era.SimpleRoll(GROUP,Hybrid_Archive_Date_,MIN,FALSE),KEL.typ.epoch Vault_Date_Last_Seen_ := KEL.era.SimpleRoll(GROUP,Vault_Date_Last_Seen_,MAX,NMAX),P_L___Drg_Crim_Fel_Cnt1_Y_F1_Y_,P_L___Drg_Lien_Cnt1_Y_F1_Y_,P_L___Drg_Bk_Cnt1_Y_F1_Y_,P_L___Drg_L_T_D1_Y_F1_Y_},P_L___Drg_Crim_Fel_Cnt1_Y_F1_Y_,P_L___Drg_Lien_Cnt1_Y_F1_Y_,P_L___Drg_Bk_Cnt1_Y_F1_Y_,P_L___Drg_L_T_D1_Y_F1_Y_,MERGE),__ST95843_Layout);
-  EXPORT Res0 := __UNWRAP(__EE2437040);
-  SHARED __EE2437048 := __ENH_Input_P_I_I;
-  SHARED __ST95879_Layout := RECORD
+  SHARED __EE2569925 := PROJECT(TABLE(PROJECT(__EE2569903,__ST99215_Layout),{KEL.typ.int __RecordCount := SUM(GROUP,__RecordCount),KEL.typ.epoch Archive___Date_ := KEL.era.SimpleRoll(GROUP,Archive___Date_,MIN,FALSE),KEL.typ.epoch Date_First_Seen_ := KEL.era.SimpleRoll(GROUP,Date_First_Seen_,MIN,FALSE),KEL.typ.epoch Date_Last_Seen_ := KEL.era.SimpleRoll(GROUP,Date_Last_Seen_,MAX,FALSE),KEL.typ.epoch Hybrid_Archive_Date_ := KEL.era.SimpleRoll(GROUP,Hybrid_Archive_Date_,MIN,FALSE),KEL.typ.epoch Vault_Date_Last_Seen_ := KEL.era.SimpleRoll(GROUP,Vault_Date_Last_Seen_,MAX,NMAX),P_L___Drg_Crim_Fel_Cnt1_Y_F1_Y_,P_L___Drg_Lien_Cnt1_Y_F1_Y_,P_L___Drg_Bk_Cnt1_Y_F1_Y_,P_L___Drg_L_T_D1_Y_F1_Y_},P_L___Drg_Crim_Fel_Cnt1_Y_F1_Y_,P_L___Drg_Lien_Cnt1_Y_F1_Y_,P_L___Drg_Bk_Cnt1_Y_F1_Y_,P_L___Drg_L_T_D1_Y_F1_Y_,MERGE),__ST99215_Layout);
+  EXPORT Res0 := __UNWRAP(__EE2569925);
+  SHARED __EE2569933 := __ENH_Input_P_I_I;
+  SHARED __ST99251_Layout := RECORD
     KEL.typ.str P___Inp_Cln_Arch_Dt_F6_M_ := '';
     KEL.typ.str P___Inp_Cln_Arch_Dt_F1_Y_ := '';
     KEL.typ.str P___Inp_Cln_Arch_Dt_F2_Y_ := '';
@@ -578,7 +570,7 @@ EXPORT Q_Inferred_Performance_Dynamic(KEL.typ.uid __PLexID_in, DATASET(RECORDOF(
     KEL.typ.epoch Vault_Date_Last_Seen_ := 0;
     KEL.typ.int __RecordCount := 0;
   END;
-  EXPORT Res1 := __UNWRAP(PROJECT(TABLE(PROJECT(__EE2437048,__ST95879_Layout),{KEL.typ.int __RecordCount := SUM(GROUP,__RecordCount),KEL.typ.epoch Archive___Date_ := KEL.era.SimpleRoll(GROUP,Archive___Date_,MIN,FALSE),KEL.typ.epoch Date_First_Seen_ := KEL.era.SimpleRoll(GROUP,Date_First_Seen_,MIN,FALSE),KEL.typ.epoch Date_Last_Seen_ := KEL.era.SimpleRoll(GROUP,Date_Last_Seen_,MAX,FALSE),KEL.typ.epoch Hybrid_Archive_Date_ := KEL.era.SimpleRoll(GROUP,Hybrid_Archive_Date_,MIN,FALSE),KEL.typ.epoch Vault_Date_Last_Seen_ := KEL.era.SimpleRoll(GROUP,Vault_Date_Last_Seen_,MAX,NMAX),P___Inp_Cln_Arch_Dt_F6_M_,P___Inp_Cln_Arch_Dt_F1_Y_,P___Inp_Cln_Arch_Dt_F2_Y_},P___Inp_Cln_Arch_Dt_F6_M_,P___Inp_Cln_Arch_Dt_F1_Y_,P___Inp_Cln_Arch_Dt_F2_Y_,MERGE),__ST95879_Layout));
+  EXPORT Res1 := __UNWRAP(PROJECT(TABLE(PROJECT(__EE2569933,__ST99251_Layout),{KEL.typ.int __RecordCount := SUM(GROUP,__RecordCount),KEL.typ.epoch Archive___Date_ := KEL.era.SimpleRoll(GROUP,Archive___Date_,MIN,FALSE),KEL.typ.epoch Date_First_Seen_ := KEL.era.SimpleRoll(GROUP,Date_First_Seen_,MIN,FALSE),KEL.typ.epoch Date_Last_Seen_ := KEL.era.SimpleRoll(GROUP,Date_Last_Seen_,MAX,FALSE),KEL.typ.epoch Hybrid_Archive_Date_ := KEL.era.SimpleRoll(GROUP,Hybrid_Archive_Date_,MIN,FALSE),KEL.typ.epoch Vault_Date_Last_Seen_ := KEL.era.SimpleRoll(GROUP,Vault_Date_Last_Seen_,MAX,NMAX),P___Inp_Cln_Arch_Dt_F6_M_,P___Inp_Cln_Arch_Dt_F1_Y_,P___Inp_Cln_Arch_Dt_F2_Y_},P___Inp_Cln_Arch_Dt_F6_M_,P___Inp_Cln_Arch_Dt_F1_Y_,P___Inp_Cln_Arch_Dt_F2_Y_,MERGE),__ST99251_Layout));
   EXPORT DBG_E_Input_P_I_I_PreEntity := __UNWRAP(E_Input_P_I_I_Params(__in,__cfg_Local).InData);
   EXPORT DBG_E_Input_P_I_I_Result := __UNWRAP(E_Input_P_I_I_Filtered.__Result);
   EXPORT DBG_E_Address_Result := __UNWRAP(E_Address_Filtered.__Result);
@@ -661,7 +653,6 @@ EXPORT Q_Inferred_Performance_Dynamic(KEL.typ.uid __PLexID_in, DATASET(RECORDOF(
   EXPORT DBG_E_Input_P_I_I_Intermediate_3 := __UNWRAP(B_Input_P_I_I_3_Local.__ENH_Input_P_I_I_3);
   EXPORT DBG_E_Person_Intermediate_3 := __UNWRAP(B_Person_3_Local.__ENH_Person_3);
   EXPORT DBG_E_Person_Property_Intermediate_3 := __UNWRAP(B_Person_Property_3_Local.__ENH_Person_Property_3);
-  EXPORT DBG_E_Person_S_S_N_Intermediate_3 := __UNWRAP(B_Person_S_S_N_3_Local.__ENH_Person_S_S_N_3);
   EXPORT DBG_E_Professional_License_Intermediate_3 := __UNWRAP(B_Professional_License_3_Local.__ENH_Professional_License_3);
   EXPORT DBG_E_Property_Intermediate_3 := __UNWRAP(B_Property_3_Local.__ENH_Property_3);
   EXPORT DBG_E_Property_Event_Intermediate_3 := __UNWRAP(B_Property_Event_3_Local.__ENH_Property_Event_3);
@@ -675,7 +666,6 @@ EXPORT Q_Inferred_Performance_Dynamic(KEL.typ.uid __PLexID_in, DATASET(RECORDOF(
   EXPORT DBG_E_Input_P_I_I_Intermediate_2 := __UNWRAP(B_Input_P_I_I_2_Local.__ENH_Input_P_I_I_2);
   EXPORT DBG_E_Person_Intermediate_2 := __UNWRAP(B_Person_2_Local.__ENH_Person_2);
   EXPORT DBG_E_Person_Property_Intermediate_2 := __UNWRAP(B_Person_Property_2_Local.__ENH_Person_Property_2);
-  EXPORT DBG_E_Person_S_S_N_Intermediate_2 := __UNWRAP(B_Person_S_S_N_2_Local.__ENH_Person_S_S_N_2);
   EXPORT DBG_E_Professional_License_Intermediate_2 := __UNWRAP(B_Professional_License_2_Local.__ENH_Professional_License_2);
   EXPORT DBG_E_Property_Event_Intermediate_2 := __UNWRAP(B_Property_Event_2_Local.__ENH_Property_Event_2);
   EXPORT DBG_E_Watercraft_Owner_Intermediate_2 := __UNWRAP(B_Watercraft_Owner_2_Local.__ENH_Watercraft_Owner_2);
@@ -686,7 +676,6 @@ EXPORT Q_Inferred_Performance_Dynamic(KEL.typ.uid __PLexID_in, DATASET(RECORDOF(
   EXPORT DBG_E_Input_P_I_I_Intermediate_1 := __UNWRAP(B_Input_P_I_I_1_Local.__ENH_Input_P_I_I_1);
   EXPORT DBG_E_Person_Intermediate_1 := __UNWRAP(B_Person_1_Local.__ENH_Person_1);
   EXPORT DBG_E_Person_Property_Intermediate_1 := __UNWRAP(B_Person_Property_1_Local.__ENH_Person_Property_1);
-  EXPORT DBG_E_Person_S_S_N_Intermediate_1 := __UNWRAP(B_Person_S_S_N_1_Local.__ENH_Person_S_S_N_1);
   EXPORT DBG_E_Professional_License_Intermediate_1 := __UNWRAP(B_Professional_License_1_Local.__ENH_Professional_License_1);
   EXPORT DBG_E_Property_Event_Intermediate_1 := __UNWRAP(B_Property_Event_1_Local.__ENH_Property_Event_1);
   EXPORT DBG_E_Watercraft_Owner_Intermediate_1 := __UNWRAP(B_Watercraft_Owner_1_Local.__ENH_Watercraft_Owner_1);
@@ -775,7 +764,6 @@ EXPORT Q_Inferred_Performance_Dynamic(KEL.typ.uid __PLexID_in, DATASET(RECORDOF(
     OUTPUT(DBG_E_Input_P_I_I_Intermediate_3,NAMED('DBG_E_Input_P_I_I_Intermediate_3_Q_Inferred_Performance_Dynamic')),
     OUTPUT(DBG_E_Person_Intermediate_3,NAMED('DBG_E_Person_Intermediate_3_Q_Inferred_Performance_Dynamic')),
     OUTPUT(DBG_E_Person_Property_Intermediate_3,NAMED('DBG_E_Person_Property_Intermediate_3_Q_Inferred_Performance_Dynamic')),
-    OUTPUT(DBG_E_Person_S_S_N_Intermediate_3,NAMED('DBG_E_Person_S_S_N_Intermediate_3_Q_Inferred_Performance_Dynamic')),
     OUTPUT(DBG_E_Professional_License_Intermediate_3,NAMED('DBG_E_Professional_License_Intermediate_3_Q_Inferred_Performance_Dynamic')),
     OUTPUT(DBG_E_Property_Intermediate_3,NAMED('DBG_E_Property_Intermediate_3_Q_Inferred_Performance_Dynamic')),
     OUTPUT(DBG_E_Property_Event_Intermediate_3,NAMED('DBG_E_Property_Event_Intermediate_3_Q_Inferred_Performance_Dynamic')),
@@ -789,7 +777,6 @@ EXPORT Q_Inferred_Performance_Dynamic(KEL.typ.uid __PLexID_in, DATASET(RECORDOF(
     OUTPUT(DBG_E_Input_P_I_I_Intermediate_2,NAMED('DBG_E_Input_P_I_I_Intermediate_2_Q_Inferred_Performance_Dynamic')),
     OUTPUT(DBG_E_Person_Intermediate_2,NAMED('DBG_E_Person_Intermediate_2_Q_Inferred_Performance_Dynamic')),
     OUTPUT(DBG_E_Person_Property_Intermediate_2,NAMED('DBG_E_Person_Property_Intermediate_2_Q_Inferred_Performance_Dynamic')),
-    OUTPUT(DBG_E_Person_S_S_N_Intermediate_2,NAMED('DBG_E_Person_S_S_N_Intermediate_2_Q_Inferred_Performance_Dynamic')),
     OUTPUT(DBG_E_Professional_License_Intermediate_2,NAMED('DBG_E_Professional_License_Intermediate_2_Q_Inferred_Performance_Dynamic')),
     OUTPUT(DBG_E_Property_Event_Intermediate_2,NAMED('DBG_E_Property_Event_Intermediate_2_Q_Inferred_Performance_Dynamic')),
     OUTPUT(DBG_E_Watercraft_Owner_Intermediate_2,NAMED('DBG_E_Watercraft_Owner_Intermediate_2_Q_Inferred_Performance_Dynamic')),
@@ -800,7 +787,6 @@ EXPORT Q_Inferred_Performance_Dynamic(KEL.typ.uid __PLexID_in, DATASET(RECORDOF(
     OUTPUT(DBG_E_Input_P_I_I_Intermediate_1,NAMED('DBG_E_Input_P_I_I_Intermediate_1_Q_Inferred_Performance_Dynamic')),
     OUTPUT(DBG_E_Person_Intermediate_1,NAMED('DBG_E_Person_Intermediate_1_Q_Inferred_Performance_Dynamic')),
     OUTPUT(DBG_E_Person_Property_Intermediate_1,NAMED('DBG_E_Person_Property_Intermediate_1_Q_Inferred_Performance_Dynamic')),
-    OUTPUT(DBG_E_Person_S_S_N_Intermediate_1,NAMED('DBG_E_Person_S_S_N_Intermediate_1_Q_Inferred_Performance_Dynamic')),
     OUTPUT(DBG_E_Professional_License_Intermediate_1,NAMED('DBG_E_Professional_License_Intermediate_1_Q_Inferred_Performance_Dynamic')),
     OUTPUT(DBG_E_Property_Event_Intermediate_1,NAMED('DBG_E_Property_Event_Intermediate_1_Q_Inferred_Performance_Dynamic')),
     OUTPUT(DBG_E_Watercraft_Owner_Intermediate_1,NAMED('DBG_E_Watercraft_Owner_Intermediate_1_Q_Inferred_Performance_Dynamic')),

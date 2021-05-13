@@ -4,6 +4,6 @@ IMPORT B_Input_P_I_I_7,B_Input_P_I_I_8,CFG_Compile,E_Address,E_Address_Slim,E_Ad
 IMPORT * FROM KEL16.Null;
 EXPORT B_Input_P_I_I_6(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG_Compile __cfg = CFG_Compile) := MODULE
   SHARED VIRTUAL TYPEOF(B_Input_P_I_I_7(__in,__cfg).__ENH_Input_P_I_I_7) __ENH_Input_P_I_I_7 := B_Input_P_I_I_7(__in,__cfg).__ENH_Input_P_I_I_7;
-  SHARED __EE1086329 := __ENH_Input_P_I_I_7;
-  EXPORT __ENH_Input_P_I_I_6 := __EE1086329;
+  SHARED __EE1094686 := __ENH_Input_P_I_I_7;
+  EXPORT __ENH_Input_P_I_I_6 := __EE1094686;
 END;

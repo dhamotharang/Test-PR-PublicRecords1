@@ -4,8 +4,8 @@ IMPORT B_Input_P_I_I_2,CFG_Compile,E_Address,E_Address_Slim,E_Address_Summary,E_
 IMPORT * FROM KEL16.Null;
 EXPORT B_Input_P_I_I_1(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG_Compile __cfg = CFG_Compile) := MODULE
   SHARED VIRTUAL TYPEOF(B_Input_P_I_I_2(__in,__cfg).__ENH_Input_P_I_I_2) __ENH_Input_P_I_I_2 := B_Input_P_I_I_2(__in,__cfg).__ENH_Input_P_I_I_2;
-  SHARED __EE1512728 := __ENH_Input_P_I_I_2;
-  EXPORT __ST150945_Layout := RECORD
+  SHARED __EE1544650 := __ENH_Input_P_I_I_2;
+  EXPORT __ST156969_Layout := RECORD
     KEL.typ.nuid UID;
     KEL.typ.ntyp(E_Person().Typ) Subject_;
     KEL.typ.nstr P___Inp_Acct_;
@@ -149,13 +149,13 @@ EXPORT B_Input_P_I_I_1(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG
     KEL.typ.epoch Vault_Date_Last_Seen_ := 0;
     KEL.typ.int __RecordCount := 0;
   END;
-  SHARED __ST150945_Layout __ND1512733__Project(B_Input_P_I_I_2(__in,__cfg).__ST155977_Layout __PP1512729) := TRANSFORM
+  SHARED __ST156969_Layout __ND1544655__Project(B_Input_P_I_I_2(__in,__cfg).__ST162043_Layout __PP1544651) := TRANSFORM
     SELF.C_U_R_R_E_N_T___D_A_T_E__2_Y_E_A_R_S_ := __cfg.CurrentDate;
     SELF.C_U_R_R_E_N_T___D_A_T_E__6_M_O_N_T_H_S_ := KEL.Routines.AdjustCalendar(__cfg.CurrentDate, -1, -6,0);
-    __CC13531 := '-99999';
-    __CC13536 := '-99998';
-    SELF.P___Inp_Cln_Arch_Dt_F1_Y_ := MAP(__PP1512729.P___Inp_Cln_Arch_Dt_Flag_Value_ <> '1'=>__CC13531,__PP1512729.C_U_R_R_E_N_T___D_A_T_E__1_Y_E_A_R_S_ > KEL.Routines.Today()=>__CC13536,KEL.Routines.DateToString(__PP1512729.C_U_R_R_E_N_T___D_A_T_E__1_Y_E_A_R_S_,'%Y%m%d'));
-    SELF := __PP1512729;
+    __CC13537 := '-99999';
+    __CC13542 := '-99998';
+    SELF.P___Inp_Cln_Arch_Dt_F1_Y_ := MAP(__PP1544651.P___Inp_Cln_Arch_Dt_Flag_Value_ <> '1'=>__CC13537,__PP1544651.C_U_R_R_E_N_T___D_A_T_E__1_Y_E_A_R_S_ > KEL.Routines.Today()=>__CC13542,KEL.Routines.DateToString(__PP1544651.C_U_R_R_E_N_T___D_A_T_E__1_Y_E_A_R_S_,'%Y%m%d'));
+    SELF := __PP1544651;
   END;
-  EXPORT __ENH_Input_P_I_I_1 := PROJECT(__EE1512728,__ND1512733__Project(LEFT));
+  EXPORT __ENH_Input_P_I_I_1 := PROJECT(__EE1544650,__ND1544655__Project(LEFT));
 END;

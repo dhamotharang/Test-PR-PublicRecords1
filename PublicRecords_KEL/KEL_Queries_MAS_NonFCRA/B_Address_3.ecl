@@ -4,8 +4,8 @@ IMPORT CFG_Compile,E_Address,E_Geo_Link,E_Zip_Code FROM PublicRecords_KEL.KEL_Qu
 IMPORT * FROM KEL16.Null;
 EXPORT B_Address_3(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG_Compile __cfg = CFG_Compile) := MODULE
   SHARED VIRTUAL TYPEOF(E_Address(__in,__cfg).__Result) __E_Address := E_Address(__in,__cfg).__Result;
-  SHARED __EE341267 := __E_Address;
-  EXPORT __ST164367_Layout := RECORD
+  SHARED __EE352450 := __E_Address;
+  EXPORT __ST170466_Layout := RECORD
     KEL.typ.nuid UID;
     KEL.typ.nstr Primary_Range_;
     KEL.typ.nstr Predirectional_;
@@ -43,12 +43,12 @@ EXPORT B_Address_3(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG_Com
     KEL.typ.epoch Vault_Date_Last_Seen_ := 0;
     KEL.typ.int __RecordCount := 0;
   END;
-  SHARED __ST164367_Layout __ND344171__Project(E_Address(__in,__cfg).Layout __PP340628) := TRANSFORM
-    __EE341072 := __PP340628.A_D_V_O_Summary_;
-    __BS341398 := __T(__EE341072);
-    __EE341418 := __BN(TOPN(__BS341398(__NN(__T(__EE341072).A_D_V_O_Date_First_Seen_)),1, -__T(__T(__EE341072).A_D_V_O_Date_First_Seen_),__T(Vacancy_Indicator_),__T(Throw_Back_Indicator_),__T(Seasonal_Delivery_Indicator_),__T(Style_Code_),__T(Drop_Indicator_),__T(College_Indicator_),__T(Only_Way_To_Get_Mail_Indicator_),__T(Residential_Or_Business_Indicator_),__T(Do_Not_Deliver_Indicator_),__T(A_D_V_O_Date_Last_Seen_)),__NL(__EE341072));
-    SELF.Bestchild_Advo_ := __EE341418;
-    SELF := __PP340628;
+  SHARED __ST170466_Layout __ND355354__Project(E_Address(__in,__cfg).Layout __PP351811) := TRANSFORM
+    __EE352255 := __PP351811.A_D_V_O_Summary_;
+    __BS352581 := __T(__EE352255);
+    __EE352601 := __BN(TOPN(__BS352581(__NN(__T(__EE352255).A_D_V_O_Date_First_Seen_)),1, -__T(__T(__EE352255).A_D_V_O_Date_First_Seen_),__T(Vacancy_Indicator_),__T(Throw_Back_Indicator_),__T(Seasonal_Delivery_Indicator_),__T(Style_Code_),__T(Drop_Indicator_),__T(College_Indicator_),__T(Only_Way_To_Get_Mail_Indicator_),__T(Residential_Or_Business_Indicator_),__T(Do_Not_Deliver_Indicator_),__T(A_D_V_O_Date_Last_Seen_)),__NL(__EE352255));
+    SELF.Bestchild_Advo_ := __EE352601;
+    SELF := __PP351811;
   END;
-  EXPORT __ENH_Address_3 := PROJECT(__EE341267,__ND344171__Project(LEFT));
+  EXPORT __ENH_Address_3 := PROJECT(__EE352450,__ND355354__Project(LEFT));
 END;

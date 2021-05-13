@@ -4,8 +4,8 @@ IMPORT B_Property_Event_4,B_Property_Event_6,CFG_Compile,E_Property,E_Property_E
 IMPORT * FROM KEL16.Null;
 EXPORT B_Property_Event_3(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG_Compile __cfg = CFG_Compile) := MODULE
   SHARED VIRTUAL TYPEOF(B_Property_Event_4(__in,__cfg).__ENH_Property_Event_4) __ENH_Property_Event_4 := B_Property_Event_4(__in,__cfg).__ENH_Property_Event_4;
-  SHARED __EE1258041 := __ENH_Property_Event_4;
-  EXPORT __ST162100_Layout := RECORD
+  SHARED __EE1288546 := __ENH_Property_Event_4;
+  EXPORT __ST168217_Layout := RECORD
     KEL.typ.nuid UID;
     KEL.typ.nstr L_N_Fares_I_D_;
     KEL.typ.nstr Primary_Range_;
@@ -78,5 +78,5 @@ EXPORT B_Property_Event_3(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, 
     KEL.typ.epoch Vault_Date_Last_Seen_ := 0;
     KEL.typ.int __RecordCount := 0;
   END;
-  EXPORT __ENH_Property_Event_3 := PROJECT(__EE1258041,__ST162100_Layout);
+  EXPORT __ENH_Property_Event_3 := PROJECT(__EE1288546,__ST168217_Layout);
 END;

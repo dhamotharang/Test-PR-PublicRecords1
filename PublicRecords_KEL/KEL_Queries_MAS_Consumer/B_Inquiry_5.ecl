@@ -4,8 +4,8 @@ IMPORT B_Inquiry_6,CFG_Compile,E_Inquiry,FN_Compile FROM PublicRecords_KEL.KEL_Q
 IMPORT * FROM KEL16.Null;
 EXPORT B_Inquiry_5(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG_Compile __cfg = CFG_Compile) := MODULE
   SHARED VIRTUAL TYPEOF(B_Inquiry_6(__in,__cfg).__ENH_Inquiry_6) __ENH_Inquiry_6 := B_Inquiry_6(__in,__cfg).__ENH_Inquiry_6;
-  SHARED __EE289067 := __ENH_Inquiry_6;
-  EXPORT __ST150935_Layout := RECORD
+  SHARED __EE295059 := __ENH_Inquiry_6;
+  EXPORT __ST156927_Layout := RECORD
     KEL.typ.nuid UID;
     KEL.typ.nstr Transaction_I_D_;
     KEL.typ.nstr Sequence_Number_;
@@ -35,17 +35,17 @@ EXPORT B_Inquiry_5(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG_Com
     KEL.typ.epoch Vault_Date_Last_Seen_ := 0;
     KEL.typ.int __RecordCount := 0;
   END;
-  SHARED __ST150935_Layout __ND289347__Project(B_Inquiry_6(__in,__cfg).__ST151588_Layout __PP289068) := TRANSFORM
-    __CC13218 := KEL.Routines.MinN(FN_Compile(__cfg).FN_G_E_T_B_U_I_L_D_D_A_T_E(__ECAST(KEL.typ.nstr,__CN('inquiry_build_version'))),__CN(__cfg.CurrentDate));
-    SELF.Agein_Days_ := FN_Compile(__cfg).FN_A_B_S_D_A_Y_S_B_E_T_W_E_E_N(__ECAST(KEL.typ.nkdate,FN_Compile(__cfg).FN_Time_Stamp_To_Date(__ECAST(KEL.typ.ntimestamp,KEL.era.EpochToNTimestamp(__PP289068.Date_First_Seen_)))),__ECAST(KEL.typ.nkdate,__CC13218));
-    __CC40197 := ['BATCH','MONITORING'];
-    SELF.Is_Batch_Monitoring_Method_ := KEL.Routines.ToUpperCase(TRIM(__PP289068.Inquiry_Method_)) IN __CC40197;
-    __CC40205 := ['COLLECTIONS','COLLECTION','COLLECTION LAW FIRM','DEBT BUYER','FIRST PARTY','THIRD PARTY'];
-    __CC40211 := ['COLLECTIONS','RECEIVABLES MANAGEMENT','1PC','3PC'];
-    SELF.Is_Collection_ := KEL.Routines.ToUpperCase(TRIM(__PP289068.Inquiry_Industry_)) IN __CC40205 OR KEL.Routines.ToUpperCase(TRIM(__PP289068.Inquiry_Vertical_)) IN __CC40211 OR __PP289068.Is_Length_Sub_Market_;
-    SELF.Is_Non_Fcra_Ok_ := FN_Compile(__cfg).FN_Is_Non_Fcra_Inquiry(__ECAST(KEL.typ.nstr,__CN(KEL.Routines.ToUpperCase(TRIM(__PP289068.Inquiry_Function_Description_)))));
-    SELF.Is_Product_Code_Ok_ := FN_Compile(__cfg).FN_Is_Valid_Inquiry_Product_Code(__ECAST(KEL.typ.nint,__PP289068.Inquiry_Product_Code_));
-    SELF := __PP289068;
+  SHARED __ST156927_Layout __ND295339__Project(B_Inquiry_6(__in,__cfg).__ST157580_Layout __PP295060) := TRANSFORM
+    __CC13224 := KEL.Routines.MinN(FN_Compile(__cfg).FN_G_E_T_B_U_I_L_D_D_A_T_E(__ECAST(KEL.typ.nstr,__CN('inquiry_build_version'))),__CN(__cfg.CurrentDate));
+    SELF.Agein_Days_ := FN_Compile(__cfg).FN_A_B_S_D_A_Y_S_B_E_T_W_E_E_N(__ECAST(KEL.typ.nkdate,FN_Compile(__cfg).FN_Time_Stamp_To_Date(__ECAST(KEL.typ.ntimestamp,KEL.era.EpochToNTimestamp(__PP295060.Date_First_Seen_)))),__ECAST(KEL.typ.nkdate,__CC13224));
+    __CC40258 := ['BATCH','MONITORING'];
+    SELF.Is_Batch_Monitoring_Method_ := KEL.Routines.ToUpperCase(TRIM(__PP295060.Inquiry_Method_)) IN __CC40258;
+    __CC40266 := ['COLLECTIONS','COLLECTION','COLLECTION LAW FIRM','DEBT BUYER','FIRST PARTY','THIRD PARTY'];
+    __CC40272 := ['COLLECTIONS','RECEIVABLES MANAGEMENT','1PC','3PC'];
+    SELF.Is_Collection_ := KEL.Routines.ToUpperCase(TRIM(__PP295060.Inquiry_Industry_)) IN __CC40266 OR KEL.Routines.ToUpperCase(TRIM(__PP295060.Inquiry_Vertical_)) IN __CC40272 OR __PP295060.Is_Length_Sub_Market_;
+    SELF.Is_Non_Fcra_Ok_ := FN_Compile(__cfg).FN_Is_Non_Fcra_Inquiry(__ECAST(KEL.typ.nstr,__CN(KEL.Routines.ToUpperCase(TRIM(__PP295060.Inquiry_Function_Description_)))));
+    SELF.Is_Product_Code_Ok_ := FN_Compile(__cfg).FN_Is_Valid_Inquiry_Product_Code(__ECAST(KEL.typ.nint,__PP295060.Inquiry_Product_Code_));
+    SELF := __PP295060;
   END;
-  EXPORT __ENH_Inquiry_5 := PROJECT(__EE289067,__ND289347__Project(LEFT));
+  EXPORT __ENH_Inquiry_5 := PROJECT(__EE295059,__ND295339__Project(LEFT));
 END;

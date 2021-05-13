@@ -4,8 +4,8 @@ IMPORT B_Aircraft_Owner_2,CFG_Compile,E_Aircraft,E_Aircraft_Owner,E_Person FROM 
 IMPORT * FROM KEL16.Null;
 EXPORT B_Aircraft_Owner_1(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG_Compile __cfg = CFG_Compile) := MODULE
   SHARED VIRTUAL TYPEOF(B_Aircraft_Owner_2(__in,__cfg).__ENH_Aircraft_Owner_2) __ENH_Aircraft_Owner_2 := B_Aircraft_Owner_2(__in,__cfg).__ENH_Aircraft_Owner_2;
-  SHARED __EE2550920 := __ENH_Aircraft_Owner_2;
-  EXPORT __ST151984_Layout := RECORD
+  SHARED __EE2618514 := __ENH_Aircraft_Owner_2;
+  EXPORT __ST157985_Layout := RECORD
     KEL.typ.ntyp(E_Aircraft().Typ) Plane_;
     KEL.typ.ntyp(E_Person().Typ) Owner_;
     KEL.typ.nint Registrant_Type_;
@@ -20,5 +20,5 @@ EXPORT B_Aircraft_Owner_1(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, 
     KEL.typ.epoch Vault_Date_Last_Seen_ := 0;
     KEL.typ.int __RecordCount := 0;
   END;
-  EXPORT __ENH_Aircraft_Owner_1 := PROJECT(__EE2550920,__ST151984_Layout);
+  EXPORT __ENH_Aircraft_Owner_1 := PROJECT(__EE2618514,__ST157985_Layout);
 END;
