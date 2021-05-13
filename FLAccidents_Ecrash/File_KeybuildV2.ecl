@@ -45,33 +45,33 @@ EXPORT File_KeybuildV2 := MODULE
 // Accident data for Insurance eCrash CRU Keys / Queries
 // ###########################################################################
 	SHARED InteractiveReports := ['I0', 'I1', 'I2', 'I3', 'I4', 'I5', 'I6', 'I7', 'I8', 'I9'];
-	SHARED AlphaIA := AllAccidents (report_code[1] = 'I' AND report_code NOT IN InteractiveReports); 
-	SHARED AlphaOther := AllAccidents (report_code[1] <> 'I');
-	SHARED AlphaCmbnd := AlphaOther + AlphaIA (reason_id IN ['HOLD', 'AFYI', 'ASSI', 'AUTO', 'CALL', 'PRAC', 'SEAR', 'SECR', 'WAIT', 'PRAI']);
-	SHARED AlphaOtherVendors := AlphaCmbnd(TRIM(vendor_code, LEFT, RIGHT) <> 'COPLOGIC');
-	SHARED AlphaCoplogic := AlphaCmbnd(TRIM(vendor_code, LEFT, RIGHT) = 'COPLOGIC' AND 
+	SHARED CRUInteractive := AllAccidents (report_code[1] = 'I' AND report_code NOT IN InteractiveReports); 
+	SHARED CRUOther := AllAccidents (report_code[1] <> 'I');
+	SHARED CRUCmbnd := CRUOther + CRUInteractive (reason_id IN ['HOLD', 'AFYI', 'ASSI', 'AUTO', 'CALL', 'PRAC', 'SEAR', 'SECR', 'WAIT', 'PRAI']);
+	SHARED CRUOtherVendors := CRUCmbnd(TRIM(vendor_code, LEFT, RIGHT) <> 'COPLOGIC');
+	SHARED CRUCoplogic := CRUCmbnd(TRIM(vendor_code, LEFT, RIGHT) = 'COPLOGIC' AND 
 	                                   ((TRIM(supplemental_report, LEFT, RIGHT) = '1' AND TRIM(super_report_id, LEFT, RIGHT) <> TRIM(report_id, LEFT, RIGHT)) OR 
 																		  (TRIM(supplemental_report, LEFT, RIGHT) = '0' AND TRIM(super_report_id, LEFT, RIGHT) = TRIM(report_id, LEFT, RIGHT)) OR 
 																		  (TRIM(supplemental_report, LEFT, RIGHT) = '' AND TRIM(super_report_id, LEFT, RIGHT) = TRIM(report_id, LEFT, RIGHT) )
 																		 )
 																		);
-	SHARED ALLAlphaAccidents := AlphaOtherVendors + AlphaCoplogic;																
-	SHARED fAlphaAccidents := ALLAlphaAccidents(STD.Str.ToUpperCase(TRIM(orig_agency_ori, ALL)) NOT IN Agency_exclusion.CRU_Agency_ori_list AND
+	SHARED ALLCRUAccidents := CRUOtherVendors + CRUCoplogic;																
+	SHARED fCRUAccidents := ALLCRUAccidents(STD.Str.ToUpperCase(TRIM(orig_agency_ori, ALL)) NOT IN Agency_exclusion.CRU_Agency_ori_list AND
 																							STD.Str.ToUpperCase(TRIM(agency_ori, ALL)) NOT IN Agency_exclusion.CRU_Agency_ori_list);
-	SHARED ActiveAlphaAccidents := PROJECT(fAlphaAccidents, TRANSFORM(Layout_eCrash.Accidents_Alpha, SELF := LEFT;));
-	EXPORT CRU := ActiveAlphaAccidents;	
+	SHARED ActiveCRUAccidents := PROJECT(fCRUAccidents, TRANSFORM(Layout_eCrash.Accidents_Alpha, SELF := LEFT;));
+	EXPORT AccidentReportsCRU := ActiveCRUAccidents;	
 
 // ###########################################################################
 //  ALL Accidents report data
 // ###########################################################################
 	SHARED eCrashAccidents := AllAccidents(CRU_inq_name_type NOT IN ['2', '3'] AND 
-	                                report_code NOT IN InteractiveReports AND 
-																	TRIM(vendor_code, LEFT, RIGHT) <> 'COPLOGIC'):INDEPENDENT;
+	                                       report_code NOT IN InteractiveReports AND 
+																	       TRIM(vendor_code, LEFT, RIGHT) <> 'COPLOGIC'):INDEPENDENT;
 
 // ###########################################################################
 //  ALL Accidents report data for eCrash Keys / Queries
 // ###########################################################################																	
-	EXPORT out := PROJECT(eCrashAccidents, TRANSFORM(Layout_eCrash.Consolidation, SELF := LEFT;));
+	EXPORT AccidentReportsEcrash := PROJECT(eCrashAccidents, TRANSFORM(Layout_eCrash.Consolidation, SELF := LEFT;));
 
 // ###########################################################################
 //  ALL Accidents report data for PR Keys / Queries
@@ -82,6 +82,6 @@ EXPORT File_KeybuildV2 := MODULE
 	SHARED EcrashAgencyExclusion := EcrashAgencyExclusionAgencyOri(STD.Str.ToUpperCase(TRIM(agency_ori, ALL)) NOT IN Agency_exclusion.Agency_ori_list AND
 																																 STD.Str.ToUpperCase(TRIM(agency_ori, ALL))[1..2] NOT IN Agency_exclusion.Agency_ori_jurisdiction_list
 																																 );
-	EXPORT prout := PROJECT(EcrashAgencyExclusion, TRANSFORM(Layout_eCrash.Consolidation, SELF := LEFT;));
+	EXPORT AccidentReportsPR := PROJECT(EcrashAgencyExclusion, TRANSFORM(Layout_eCrash.Consolidation, SELF := LEFT;));
 
 END;
