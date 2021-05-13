@@ -8,7 +8,7 @@ EXPORT Build_Input_IdentityData(
 module
 
 	inIdentityDataUpdate :=	  if( nothor(STD.File.GetSuperFileSubCount(Filenames().Sprayed.IdentityData)) > 0, 
-		Files(pversion).Sprayed.IdentityData, 
+				Build_Prepped_IdentityData(pversion),
 		dataset([],{string75 fn { virtual(logicalfilename)},FraudGovPlatform.Layouts.Sprayed.IdentityData})
 		)   
 		+ if (nothor(STD.File.GetSuperFileSubCount(Filenames().Sprayed.NAC)) > 0, 
@@ -44,9 +44,7 @@ module
 		self.ind_type := functions.ind_type_fn(fn[4]);
 		self.file_type := 3 ;
 		//https://confluence.rsi.lexisnexis.com/display/GTG/Data+Dictionary: 
-		self.RIN_Source := map(	fn[5] = 'IDENTITY' => 1, // Identity
-								fn[5] = 'IDENTITYBATCH' => 13,  // RIN API
-								L.RIN_Source );	// RDP or NAC				
+		self.RIN_Source := L.RIN_Source;			
 		self:=l;
 		self:=[];
 	end;
