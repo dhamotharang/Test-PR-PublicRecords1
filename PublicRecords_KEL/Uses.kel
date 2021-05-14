@@ -4708,20 +4708,6 @@ USE PublicRecords_KEL.ECL_Functions.Dataset_FDC(FDC,
 			OriginalSource = source,//source from dataset
 			HybridArchiveDate = FORMAT('YYYYMMDD'),
 			Archive_Date = FORMAT('YYYYMMDD')archive_date),		
-		Person(FILTER((UNSIGNED)did <> 0),
-			UID = did,
-			Title = title,
-			FirstName = fname,
-			MiddleName = mname,
-			LastName = lname,
-			NameSuffix = name_suffix,
-			DateOfBirth = dob,
-			DateOfBirthPadded = DOBPadded,
-			DateFirstSeen = FORMAT('YYYYMMDD', 'YYYYMM01', 'YYYY0101')datefirstseen, // Contains information for ASOF
-			DateLastSeen = FORMAT('YYYYMMDD', 'YYYYMM01', 'YYYY0101')datelastseen, // Contains information for ASOF
-			Source = Src,
-			HybridArchiveDate = FORMAT('YYYYMMDD'),
-			Archive_Date = FORMAT('YYYYMMDD')archive_date),//source from dataset
 		PersonPhone(FILTER((UNSIGNED)did != 0 AND (UNSIGNED)cellphone != 0),
 			Subject = did,
 			PhoneNumber = cellphone,
@@ -4753,21 +4739,22 @@ USE PublicRecords_KEL.ECL_Functions.Dataset_FDC(FDC,
 			// Source = Src,
 			// HybridArchiveDate = FORMAT('YYYYMMDD'),
 			// Archive_Date = FORMAT('YYYYMMDD')archive_date),
-		AddressPhone(FILTER((STRING28)prim_name != '' AND (UNSIGNED3)zip5 != 0 AND (UNSIGNED)cellphone != 0),
-			PrimaryName = prim_name,
-			ZIP5 = zip5,
-			PrimaryRange = prim_range,
-			SecondaryRange = sec_range,
-			Predirectional = predir,
-			Suffix = addr_suffix,
-			Postdirectional = postdir,
-			DateFirstSeen = FORMAT('YYYYMMDD', 'YYYYMM01', 'YYYY0101')datefirstseen, // Contains information for ASOF
-			DateLastSeen = FORMAT('YYYYMMDD', 'YYYYMM01', 'YYYY0101')datelastseen, // Contains information for ASOF
-			CurrentFlag = current_rec,
-			Source = Src, //source from MDR
-			OriginalSource = source, // source from dataset
-			HybridArchiveDate = FORMAT('YYYYMMDD'),
-			Archive_Date = FORMAT('YYYYMMDD')archive_date),
+		// AddressPhone(FILTER((STRING28)prim_name != '' AND (UNSIGNED3)zip5 != 0 AND (UNSIGNED)cellphone != 0),
+			// PrimaryName = prim_name,
+			// ZIP5 = zip5,
+			// PrimaryRange = prim_range,
+			// SecondaryRange = sec_range,
+			// Predirectional = predir,
+			// Suffix = addr_suffix,
+			// Postdirectional = postdir,
+			// PhoneNumber = cellphone
+			// DateFirstSeen = FORMAT('YYYYMMDD', 'YYYYMM01', 'YYYY0101')datefirstseen, // Contains information for ASOF
+			// DateLastSeen = FORMAT('YYYYMMDD', 'YYYYMM01', 'YYYY0101')datelastseen, // Contains information for ASOF
+			// CurrentFlag = current_rec,
+			// Source = Src, //source from MDR
+			// OriginalSource = source, // source from dataset
+			// HybridArchiveDate = FORMAT('YYYYMMDD'),
+			// Archive_Date = FORMAT('YYYYMMDD')archive_date),
 		PERMITS(DPMBitmap)),
 		
 	Dataset_American_student_list__key_DID(
