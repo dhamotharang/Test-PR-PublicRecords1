@@ -4,8 +4,8 @@ IMPORT CFG_Compile,E_Property,E_Property_Event,E_Zip_Code,FN_Compile FROM Public
 IMPORT * FROM KEL16.Null;
 EXPORT B_Property_Event_5(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG_Compile __cfg = CFG_Compile) := MODULE
   SHARED VIRTUAL TYPEOF(E_Property_Event(__in,__cfg).__Result) __E_Property_Event := E_Property_Event(__in,__cfg).__Result;
-  SHARED __EE424177 := __E_Property_Event;
-  EXPORT __ST211896_Layout := RECORD
+  SHARED __EE424132 := __E_Property_Event;
+  EXPORT __ST211851_Layout := RECORD
     KEL.typ.nuid UID;
     KEL.typ.nstr L_N_Fares_I_D_;
     KEL.typ.nstr Primary_Range_;
@@ -76,10 +76,10 @@ EXPORT B_Property_Event_5(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, 
     KEL.typ.epoch Vault_Date_Last_Seen_ := 0;
     KEL.typ.int __RecordCount := 0;
   END;
-  SHARED __ST211896_Layout __ND1987863__Project(E_Property_Event(__in,__cfg).Layout __PP423835) := TRANSFORM
-    __CC13280 := KEL.Routines.MinN(FN_Compile(__cfg).FN_G_E_T_B_U_I_L_D_D_A_T_E(__ECAST(KEL.typ.nstr,__CN('property_build_version'))),__CN(__cfg.CurrentDate));
-    SELF.Is_Current_Assessment_Record_ := __AND(__PP423835.Is_Assessment_,__OP2(FN_Compile(__cfg).FN_A_B_S_Y_E_A_R_S_B_E_T_W_E_E_N(__ECAST(KEL.typ.nkdate,KEL.era.ToDate(__PP423835.Date_First_Seen_)),__ECAST(KEL.typ.nkdate,__CC13280)),<=,__CN(1)));
-    SELF := __PP423835;
+  SHARED __ST211851_Layout __ND1987818__Project(E_Property_Event(__in,__cfg).Layout __PP423790) := TRANSFORM
+    __CC13235 := KEL.Routines.MinN(FN_Compile(__cfg).FN_G_E_T_B_U_I_L_D_D_A_T_E(__ECAST(KEL.typ.nstr,__CN('property_build_version'))),__CN(__cfg.CurrentDate));
+    SELF.Is_Current_Assessment_Record_ := __AND(__PP423790.Is_Assessment_,__OP2(FN_Compile(__cfg).FN_A_B_S_Y_E_A_R_S_B_E_T_W_E_E_N(__ECAST(KEL.typ.nkdate,KEL.era.ToDate(__PP423790.Date_First_Seen_)),__ECAST(KEL.typ.nkdate,__CC13235)),<=,__CN(1)));
+    SELF := __PP423790;
   END;
-  EXPORT __ENH_Property_Event_5 := PROJECT(__EE424177,__ND1987863__Project(LEFT));
+  EXPORT __ENH_Property_Event_5 := PROJECT(__EE424132,__ND1987818__Project(LEFT));
 END;

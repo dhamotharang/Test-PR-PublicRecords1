@@ -6,23 +6,23 @@ EXPORT B_Person_6(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG_Comp
   SHARED VIRTUAL TYPEOF(B_Input_P_I_I_7(__in,__cfg).__ENH_Input_P_I_I_7) __ENH_Input_P_I_I_7 := B_Input_P_I_I_7(__in,__cfg).__ENH_Input_P_I_I_7;
   SHARED VIRTUAL TYPEOF(B_Person_7(__in,__cfg).__ENH_Person_7) __ENH_Person_7 := B_Person_7(__in,__cfg).__ENH_Person_7;
   SHARED VIRTUAL TYPEOF(B_Person_Accident_7(__in,__cfg).__ENH_Person_Accident_7) __ENH_Person_Accident_7 := B_Person_Accident_7(__in,__cfg).__ENH_Person_Accident_7;
-  SHARED __EE1593948 := __ENH_Person_7;
-  SHARED __EE1593950 := __ENH_Input_P_I_I_7;
-  SHARED __ST249794_Layout := RECORD
+  SHARED __EE1593909 := __ENH_Person_7;
+  SHARED __EE1593911 := __ENH_Input_P_I_I_7;
+  SHARED __ST249755_Layout := RECORD
     KEL.typ.nuid UID;
     KEL.typ.nstr Lex_I_D_Segment_;
     KEL.typ.nstr Lex_I_D_Segment2_;
     KEL.typ.ndataset(E_Person(__in,__cfg).Full_Name_Layout) Full_Name_;
     KEL.typ.ndataset(E_Person(__in,__cfg).Reported_Dates_Of_Birth_Layout) Reported_Dates_Of_Birth_;
     KEL.typ.ndataset(E_Person(__in,__cfg).Reported_Dates_Of_Death_Layout) Reported_Dates_Of_Death_;
-    KEL.typ.ndataset(B_Person_7(__in,__cfg).__ST181126_Layout) Data_Sources_;
+    KEL.typ.ndataset(B_Person_7(__in,__cfg).__ST181081_Layout) Data_Sources_;
     KEL.typ.ndataset(E_Person(__in,__cfg).Conceal_Carry_Layout) Conceal_Carry_;
     KEL.typ.ndataset(E_Person(__in,__cfg).Hunt_Fish_Layout) Hunt_Fish_;
     KEL.typ.ndataset(E_Person(__in,__cfg).Consumer_Statement_Flags_Layout) Consumer_Statement_Flags_;
     KEL.typ.ndataset(E_Person(__in,__cfg).Thrive_Layout) Thrive_;
-    KEL.typ.ndataset(B_Person_7(__in,__cfg).__ST234047_Layout) All_Lien_Data_;
+    KEL.typ.ndataset(B_Person_7(__in,__cfg).__ST234002_Layout) All_Lien_Data_;
     KEL.typ.nkdate B_U_I_L_D___D_A_T_E_;
-    KEL.typ.ndataset(B_Person_7(__in,__cfg).__ST95059_Layout) Edu_Rec_Ver_Source_List_Pre_;
+    KEL.typ.ndataset(B_Person_7(__in,__cfg).__ST95014_Layout) Edu_Rec_Ver_Source_List_Pre_;
     KEL.typ.ntyp(E_Input_P_I_I().Typ) P_I_I_;
     KEL.typ.nstr P___Inp_Cln_S_S_N_;
     KEL.typ.str P___Lex_I_D_Seen_Flag_ := '';
@@ -165,31 +165,31 @@ EXPORT B_Person_6(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG_Comp
     KEL.typ.epoch Vault_Date_Last_Seen_ := 0;
     KEL.typ.int __RecordCount := 0;
   END;
-  __JC1593959(B_Person_7(__in,__cfg).__ST181096_Layout __EE1593948, B_Input_P_I_I_8(__in,__cfg).__ST182009_Layout __EE1593950) := __EEQP(__EE1593948.P_I_I_,__EE1593950.UID);
-  __ST249794_Layout __JT1593959(B_Person_7(__in,__cfg).__ST181096_Layout __l, B_Input_P_I_I_8(__in,__cfg).__ST182009_Layout __r) := TRANSFORM
+  __JC1593920(B_Person_7(__in,__cfg).__ST181051_Layout __EE1593909, B_Input_P_I_I_8(__in,__cfg).__ST181964_Layout __EE1593911) := __EEQP(__EE1593909.P_I_I_,__EE1593911.UID);
+  __ST249755_Layout __JT1593920(B_Person_7(__in,__cfg).__ST181051_Layout __l, B_Input_P_I_I_8(__in,__cfg).__ST181964_Layout __r) := TRANSFORM
     SELF.U_I_D__1_ := __r.UID;
     SELF.P___Inp_Cln_S_S_N__1_ := __r.P___Inp_Cln_S_S_N_;
     SELF := __l;
     SELF := __r;
   END;
-  SHARED __EE1594197 := JOIN(__EE1593948,__EE1593950,__JC1593959(LEFT,RIGHT),__JT1593959(LEFT,RIGHT),LEFT OUTER,SMART);
-  SHARED __EE1594199 := __ENH_Person_Accident_7;
-  SHARED __EE1596322 := __EE1594199(__EE1594199.Is_Accident_Record_ AND __NN(__EE1594199.Subject_));
-  SHARED __ST253991_Layout := RECORD
+  SHARED __EE1594158 := JOIN(__EE1593909,__EE1593911,__JC1593920(LEFT,RIGHT),__JT1593920(LEFT,RIGHT),LEFT OUTER,SMART);
+  SHARED __EE1594160 := __ENH_Person_Accident_7;
+  SHARED __EE1596283 := __EE1594160(__EE1594160.Is_Accident_Record_ AND __NN(__EE1594160.Subject_));
+  SHARED __ST253952_Layout := RECORD
     KEL.typ.nuid UID;
     KEL.typ.nstr Lex_I_D_Segment_;
     KEL.typ.nstr Lex_I_D_Segment2_;
     KEL.typ.ndataset(E_Person(__in,__cfg).Full_Name_Layout) Full_Name_;
     KEL.typ.ndataset(E_Person(__in,__cfg).Reported_Dates_Of_Birth_Layout) Reported_Dates_Of_Birth_;
     KEL.typ.ndataset(E_Person(__in,__cfg).Reported_Dates_Of_Death_Layout) Reported_Dates_Of_Death_;
-    KEL.typ.ndataset(B_Person_7(__in,__cfg).__ST181126_Layout) Data_Sources_;
+    KEL.typ.ndataset(B_Person_7(__in,__cfg).__ST181081_Layout) Data_Sources_;
     KEL.typ.ndataset(E_Person(__in,__cfg).Conceal_Carry_Layout) Conceal_Carry_;
     KEL.typ.ndataset(E_Person(__in,__cfg).Hunt_Fish_Layout) Hunt_Fish_;
     KEL.typ.ndataset(E_Person(__in,__cfg).Consumer_Statement_Flags_Layout) Consumer_Statement_Flags_;
     KEL.typ.ndataset(E_Person(__in,__cfg).Thrive_Layout) Thrive_;
-    KEL.typ.ndataset(B_Person_7(__in,__cfg).__ST234047_Layout) All_Lien_Data_;
+    KEL.typ.ndataset(B_Person_7(__in,__cfg).__ST234002_Layout) All_Lien_Data_;
     KEL.typ.nkdate B_U_I_L_D___D_A_T_E_;
-    KEL.typ.ndataset(B_Person_7(__in,__cfg).__ST95059_Layout) Edu_Rec_Ver_Source_List_Pre_;
+    KEL.typ.ndataset(B_Person_7(__in,__cfg).__ST95014_Layout) Edu_Rec_Ver_Source_List_Pre_;
     KEL.typ.ntyp(E_Input_P_I_I().Typ) P_I_I_;
     KEL.typ.nstr P___Inp_Cln_S_S_N_;
     KEL.typ.str P___Lex_I_D_Seen_Flag_ := '';
@@ -325,7 +325,7 @@ EXPORT B_Person_6(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG_Comp
     KEL.typ.nstr Previous_Addr_Full_;
     KEL.typ.ntyp(E_Address().Typ) Previous_Address_;
     KEL.typ.nstr Input_S_S_N_Clean_Value_;
-    KEL.typ.ndataset(B_Person_Accident_7(__in,__cfg).__ST181260_Layout) Person_Accident_;
+    KEL.typ.ndataset(B_Person_Accident_7(__in,__cfg).__ST181215_Layout) Person_Accident_;
     KEL.typ.epoch Archive___Date_ := 0;
     KEL.typ.epoch Date_First_Seen_ := 0;
     KEL.typ.epoch Date_Last_Seen_ := 0;
@@ -333,13 +333,13 @@ EXPORT B_Person_6(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG_Comp
     KEL.typ.epoch Vault_Date_Last_Seen_ := 0;
     KEL.typ.int __RecordCount := 0;
   END;
-  __JC1596339(__ST249794_Layout __EE1594197, B_Person_Accident_7(__in,__cfg).__ST181260_Layout __EE1596322) := __EEQP(__EE1594197.UID,__EE1596322.Subject_);
-  __ST253991_Layout __Join__ST253991_Layout(__ST249794_Layout __r, DATASET(B_Person_Accident_7(__in,__cfg).__ST181260_Layout) __recs) := TRANSFORM
+  __JC1596300(__ST249755_Layout __EE1594158, B_Person_Accident_7(__in,__cfg).__ST181215_Layout __EE1596283) := __EEQP(__EE1594158.UID,__EE1596283.Subject_);
+  __ST253952_Layout __Join__ST253952_Layout(__ST249755_Layout __r, DATASET(B_Person_Accident_7(__in,__cfg).__ST181215_Layout) __recs) := TRANSFORM
     SELF := __r;
     SELF.Person_Accident_ := __CN(__recs);
   END;
-  SHARED __EE1596340 := DENORMALIZE(DISTRIBUTE(__EE1594197,HASH(UID)),DISTRIBUTE(__EE1596322,HASH(Subject_)),__JC1596339(LEFT,RIGHT),GROUP,__Join__ST253991_Layout(LEFT,ROWS(RIGHT)),LOCAL);
-  EXPORT __ST188469_Layout := RECORD
+  SHARED __EE1596301 := DENORMALIZE(DISTRIBUTE(__EE1594158,HASH(UID)),DISTRIBUTE(__EE1596283,HASH(Subject_)),__JC1596300(LEFT,RIGHT),GROUP,__Join__ST253952_Layout(LEFT,ROWS(RIGHT)),LOCAL);
+  EXPORT __ST188258_Layout := RECORD
     KEL.typ.nkdate Date_Of_Birth_;
     KEL.typ.nstr Date_Of_Birth_Padded_;
     KEL.typ.nbool Header_Hit_Flag_;
@@ -353,7 +353,7 @@ EXPORT B_Person_6(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG_Comp
     KEL.typ.epoch Vault_Date_Last_Seen_ := 0;
     KEL.typ.int __RecordCount := 0;
   END;
-  EXPORT __ST188483_Layout := RECORD
+  EXPORT __ST188272_Layout := RECORD
     KEL.typ.nstr Source_;
     KEL.typ.nbool Header_Hit_Flag_;
     KEL.typ.nbool F_D_N_Indicator_;
@@ -365,7 +365,7 @@ EXPORT B_Person_6(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG_Comp
     KEL.typ.epoch Vault_Date_Last_Seen_ := 0;
     KEL.typ.int __RecordCount := 0;
   END;
-  EXPORT __ST95095_Layout := RECORD
+  EXPORT __ST95050_Layout := RECORD
     KEL.typ.nstr File_Type_;
     KEL.typ.nstr College_Code_;
     KEL.typ.nstr College_Type_;
@@ -379,7 +379,7 @@ EXPORT B_Person_6(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG_Comp
     KEL.typ.epoch Vault_Date_Last_Seen_ := 0;
     KEL.typ.int __RecordCount := 0;
   END;
-  EXPORT __ST102338_Layout := RECORD
+  EXPORT __ST102293_Layout := RECORD
     KEL.typ.nstr Translated_Source_Code_;
     KEL.typ.epoch Archive___Date_ := 0;
     KEL.typ.epoch Date_First_Seen_ := 0;
@@ -388,23 +388,23 @@ EXPORT B_Person_6(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG_Comp
     KEL.typ.epoch Vault_Date_Last_Seen_ := 0;
     KEL.typ.int __RecordCount := 0;
   END;
-  EXPORT __ST188452_Layout := RECORD
+  EXPORT __ST188241_Layout := RECORD
     KEL.typ.nuid UID;
     KEL.typ.nstr Lex_I_D_Segment_;
     KEL.typ.nstr Lex_I_D_Segment2_;
     KEL.typ.ndataset(E_Person(__in,__cfg).Full_Name_Layout) Full_Name_;
-    KEL.typ.ndataset(__ST188469_Layout) Reported_Dates_Of_Birth_;
+    KEL.typ.ndataset(__ST188258_Layout) Reported_Dates_Of_Birth_;
     KEL.typ.ndataset(E_Person(__in,__cfg).Reported_Dates_Of_Death_Layout) Reported_Dates_Of_Death_;
-    KEL.typ.ndataset(__ST188483_Layout) Data_Sources_;
+    KEL.typ.ndataset(__ST188272_Layout) Data_Sources_;
     KEL.typ.ndataset(E_Person(__in,__cfg).Conceal_Carry_Layout) Conceal_Carry_;
     KEL.typ.ndataset(E_Person(__in,__cfg).Hunt_Fish_Layout) Hunt_Fish_;
     KEL.typ.ndataset(E_Person(__in,__cfg).Consumer_Statement_Flags_Layout) Consumer_Statement_Flags_;
     KEL.typ.ndataset(E_Person(__in,__cfg).Thrive_Layout) Thrive_;
-    KEL.typ.ndataset(B_Person_Accident_7(__in,__cfg).__ST181260_Layout) Accident_Recs_;
-    KEL.typ.ndataset(B_Person_7(__in,__cfg).__ST234047_Layout) All_Lien_Data_;
+    KEL.typ.ndataset(B_Person_Accident_7(__in,__cfg).__ST181215_Layout) Accident_Recs_;
+    KEL.typ.ndataset(B_Person_7(__in,__cfg).__ST234002_Layout) All_Lien_Data_;
     KEL.typ.nkdate B_U_I_L_D___D_A_T_E_;
-    KEL.typ.ndataset(__ST95095_Layout) Edu_Rec_Ver_Source_List_;
-    KEL.typ.ndataset(B_Person_7(__in,__cfg).__ST95059_Layout) Edu_Rec_Ver_Source_List_Pre_;
+    KEL.typ.ndataset(__ST95050_Layout) Edu_Rec_Ver_Source_List_;
+    KEL.typ.ndataset(B_Person_7(__in,__cfg).__ST95014_Layout) Edu_Rec_Ver_Source_List_Pre_;
     KEL.typ.nstr L_T_D7_Y_New_Date_;
     KEL.typ.nstr Ln_J7_Y_New_Date_;
     KEL.typ.nstr Ln_J7_Y_Old_Date_;
@@ -415,7 +415,7 @@ EXPORT B_Person_6(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG_Comp
     KEL.typ.nstr P___Inp_Cln_Name_Last_Raw_;
     KEL.typ.nstr P___Inp_Cln_S_S_N_;
     KEL.typ.str P___Lex_I_D_Seen_Flag_ := '';
-    KEL.typ.ndataset(__ST102338_Layout) Translated_Sources_;
+    KEL.typ.ndataset(__ST102293_Layout) Translated_Sources_;
     KEL.typ.epoch Archive___Date_ := 0;
     KEL.typ.epoch Date_First_Seen_ := 0;
     KEL.typ.epoch Date_Last_Seen_ := 0;
@@ -423,49 +423,49 @@ EXPORT B_Person_6(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG_Comp
     KEL.typ.epoch Vault_Date_Last_Seen_ := 0;
     KEL.typ.int __RecordCount := 0;
   END;
-  SHARED __ST188452_Layout __ND1598109__Project(__ST253991_Layout __PP1597642) := TRANSFORM
-    __EE1596625 := __PP1597642.Reported_Dates_Of_Birth_;
-    __ST188469_Layout __ND1598101__Project(E_Person(__in,__cfg).Reported_Dates_Of_Birth_Layout __PP1596804) := TRANSFORM
-      SELF.Best_D_O_B_Rec_ := __OP2(__PP1596804.Best_,=,__CN(TRUE));
-      SELF := __PP1596804;
+  SHARED __ST188241_Layout __ND1598070__Project(__ST253952_Layout __PP1597603) := TRANSFORM
+    __EE1596586 := __PP1597603.Reported_Dates_Of_Birth_;
+    __ST188258_Layout __ND1598062__Project(E_Person(__in,__cfg).Reported_Dates_Of_Birth_Layout __PP1596765) := TRANSFORM
+      SELF.Best_D_O_B_Rec_ := __OP2(__PP1596765.Best_,=,__CN(TRUE));
+      SELF := __PP1596765;
     END;
-    SELF.Reported_Dates_Of_Birth_ := __PROJECT(__EE1596625,__ND1598101__Project(LEFT));
-    __EE1596629 := __PP1597642.Data_Sources_;
-    SELF.Data_Sources_ := __BN(PROJECT(__T(__EE1596629),__ST188483_Layout),__NL(__EE1596629));
-    __EE1596641 := __PP1597642.Person_Accident_;
-    SELF.Accident_Recs_ := __EE1596641;
-    __EE1596633 := __PP1597642.Edu_Rec_Ver_Source_List_Pre_;
-    __ST95095_Layout __ND1598120__Project(B_Person_7(__in,__cfg).__ST95059_Layout __PP1597644) := TRANSFORM
-      SELF.College_Code_Convert_ := MAP(__T(__OP2(__PP1597644.College_Code_,=,__CN('1')))=>__ECAST(KEL.typ.nstr,__CN('3')),__T(__OP2(__PP1597644.College_Code_,=,__CN('2')))=>__ECAST(KEL.typ.nstr,__CN('1')),__T(__OP2(__PP1597644.College_Code_,=,__CN('4')))=>__ECAST(KEL.typ.nstr,__CN('2')),__N(KEL.typ.str));
-      __CC14096 := '-99997';
-      SELF.Source_Date_First_Seen_ := IF(__T(__FN1(KEL.Routines.IsValidDate,__PP1597644.Date_First_Seen_Min_)),__ECAST(KEL.typ.nstr,__FN2(KEL.Routines.DateToString,__PP1597644.Date_First_Seen_Min_,__CN('%Y%m%d'))),__ECAST(KEL.typ.nstr,__CN(__CC14096)));
-      SELF.Source_Date_Last_Seen_ := IF(__T(__FN1(KEL.Routines.IsValidDate,__PP1597644.Date_Last_Seen_Max_)),__ECAST(KEL.typ.nstr,__FN2(KEL.Routines.DateToString,KEL.Routines.MinN(__PP1597644.Date_Last_Seen_Max_,__PP1597642.B_U_I_L_D___D_A_T_E_),__CN('%Y%m%d'))),__ECAST(KEL.typ.nstr,__CN(__CC14096)));
-      SELF := __PP1597644;
+    SELF.Reported_Dates_Of_Birth_ := __PROJECT(__EE1596586,__ND1598062__Project(LEFT));
+    __EE1596590 := __PP1597603.Data_Sources_;
+    SELF.Data_Sources_ := __BN(PROJECT(__T(__EE1596590),__ST188272_Layout),__NL(__EE1596590));
+    __EE1596602 := __PP1597603.Person_Accident_;
+    SELF.Accident_Recs_ := __EE1596602;
+    __EE1596594 := __PP1597603.Edu_Rec_Ver_Source_List_Pre_;
+    __ST95050_Layout __ND1598081__Project(B_Person_7(__in,__cfg).__ST95014_Layout __PP1597605) := TRANSFORM
+      SELF.College_Code_Convert_ := MAP(__T(__OP2(__PP1597605.College_Code_,=,__CN('1')))=>__ECAST(KEL.typ.nstr,__CN('3')),__T(__OP2(__PP1597605.College_Code_,=,__CN('2')))=>__ECAST(KEL.typ.nstr,__CN('1')),__T(__OP2(__PP1597605.College_Code_,=,__CN('4')))=>__ECAST(KEL.typ.nstr,__CN('2')),__N(KEL.typ.str));
+      __CC14051 := '-99997';
+      SELF.Source_Date_First_Seen_ := IF(__T(__FN1(KEL.Routines.IsValidDate,__PP1597605.Date_First_Seen_Min_)),__ECAST(KEL.typ.nstr,__FN2(KEL.Routines.DateToString,__PP1597605.Date_First_Seen_Min_,__CN('%Y%m%d'))),__ECAST(KEL.typ.nstr,__CN(__CC14051)));
+      SELF.Source_Date_Last_Seen_ := IF(__T(__FN1(KEL.Routines.IsValidDate,__PP1597605.Date_Last_Seen_Max_)),__ECAST(KEL.typ.nstr,__FN2(KEL.Routines.DateToString,KEL.Routines.MinN(__PP1597605.Date_Last_Seen_Max_,__PP1597603.B_U_I_L_D___D_A_T_E_),__CN('%Y%m%d'))),__ECAST(KEL.typ.nstr,__CN(__CC14051)));
+      SELF := __PP1597605;
     END;
-    SELF.Edu_Rec_Ver_Source_List_ := __PROJECT(__EE1596633,__ND1598120__Project(LEFT));
-    __EE1596930 := __PP1597642.All_Lien_Data_;
-    __BS1596953 := __T(__EE1596930);
-    __EE1596961 := __BS1596953(__T(__AND(__T(__EE1596930).Seen___In___Seven___Years_,__T(__EE1596930).Is_Landlord_Tenant_Dispute_)));
-    __CC14028 := '-99997';
-    SELF.L_T_D7_Y_New_Date_ := FN_Compile(__cfg).FN_Is_Blank(__ECAST(KEL.typ.nstr,__ECAST(KEL.typ.nstr,KEL.Aggregates.MaxN(__EE1596961,__EE1596961.Original_Filing_Date_))),__ECAST(KEL.typ.nstr,__CN(__CC14028)));
-    __EE1596972 := __PP1597642.All_Lien_Data_;
-    __BS1596995 := __T(__EE1596972);
-    __EE1597003 := __BS1596995(__T(__AND(__T(__EE1596972).Seen___In___Seven___Years_,__T(__EE1596972).Is_Over_All_Lien_Judgment_)));
-    SELF.Ln_J7_Y_New_Date_ := FN_Compile(__cfg).FN_Is_Blank(__ECAST(KEL.typ.nstr,__ECAST(KEL.typ.nstr,KEL.Aggregates.MaxN(__EE1597003,__EE1597003.Original_Filing_Date_))),__ECAST(KEL.typ.nstr,__CN(__CC14028)));
-    __EE1597321 := __EE1597003;
-    SELF.Ln_J7_Y_Old_Date_ := FN_Compile(__cfg).FN_Is_Blank(__ECAST(KEL.typ.nstr,__ECAST(KEL.typ.nstr,KEL.Aggregates.MinN(__EE1597321,__EE1597321.Original_Filing_Date_))),__ECAST(KEL.typ.nstr,__CN(__CC14028)));
-    __CC14021 := -99999;
-    __BS1597080 := __T(__PP1597642.All_Lien_Data_);
-    SELF.P_L___Drg_L_T_D_Cnt7_Y_ := IF(__PP1597642.P___Lex_I_D_Seen_Flag_ = '0',__CC14021,KEL.Routines.BoundsFold(COUNT(__BS1597080(__T(__AND(__T(__PP1597642.All_Lien_Data_).Seen___In___Seven___Years_,__OP2(__T(__PP1597642.All_Lien_Data_).Is_Landlord_Tenant_Dispute_,=,__CN(TRUE)))))),0,999));
-    __BS1597117 := __T(__PP1597642.All_Lien_Data_);
-    SELF.P_L___Drg_Ln_J_Cnt7_Y_ := IF(__PP1597642.P___Lex_I_D_Seen_Flag_ = '0',__CC14021,KEL.Routines.BoundsFold(COUNT(__BS1597117(__T(__AND(__T(__PP1597642.All_Lien_Data_).Seen___In___Seven___Years_,__T(__PP1597642.All_Lien_Data_).Is_Over_All_Lien_Judgment_)))),0,999));
-    SELF.P___Inp_Cln_Name_First_Raw_ := __PP1597642.P___Inp_Cln_Name_First_;
-    SELF.P___Inp_Cln_Name_Last_Raw_ := __PP1597642.P___Inp_Cln_Name_Last_;
-    __EE1596637 := __PP1597642.Data_Sources_;
-    __BS1597143 := __T(__EE1596637);
-    __EE1598162 := __BS1597143(__T(__AND(__T(__EE1596637).Header_Hit_Flag_,__OP2(__T(__EE1596637).Translated_Source_Code_,<>,__CN('')))));
-    SELF.Translated_Sources_ := __CN(PROJECT(TABLE(PROJECT(__EE1598162,__ST102338_Layout)(__NN(Translated_Source_Code_)),{KEL.typ.int __RecordCount := SUM(GROUP,__RecordCount),KEL.typ.epoch Archive___Date_ := KEL.era.SimpleRoll(GROUP,Archive___Date_,MIN,FALSE),KEL.typ.epoch Date_First_Seen_ := KEL.era.SimpleRoll(GROUP,Date_First_Seen_,MIN,FALSE),KEL.typ.epoch Date_Last_Seen_ := KEL.era.SimpleRoll(GROUP,Date_Last_Seen_,MAX,FALSE),KEL.typ.epoch Hybrid_Archive_Date_ := KEL.era.SimpleRoll(GROUP,Hybrid_Archive_Date_,MIN,FALSE),KEL.typ.epoch Vault_Date_Last_Seen_ := KEL.era.SimpleRoll(GROUP,Vault_Date_Last_Seen_,MAX,NMAX),Translated_Source_Code_},Translated_Source_Code_,MERGE),__ST102338_Layout));
-    SELF := __PP1597642;
+    SELF.Edu_Rec_Ver_Source_List_ := __PROJECT(__EE1596594,__ND1598081__Project(LEFT));
+    __EE1596891 := __PP1597603.All_Lien_Data_;
+    __BS1596914 := __T(__EE1596891);
+    __EE1596922 := __BS1596914(__T(__AND(__T(__EE1596891).Seen___In___Seven___Years_,__T(__EE1596891).Is_Landlord_Tenant_Dispute_)));
+    __CC13983 := '-99997';
+    SELF.L_T_D7_Y_New_Date_ := FN_Compile(__cfg).FN_Is_Blank(__ECAST(KEL.typ.nstr,__ECAST(KEL.typ.nstr,KEL.Aggregates.MaxN(__EE1596922,__EE1596922.Original_Filing_Date_))),__ECAST(KEL.typ.nstr,__CN(__CC13983)));
+    __EE1596933 := __PP1597603.All_Lien_Data_;
+    __BS1596956 := __T(__EE1596933);
+    __EE1596964 := __BS1596956(__T(__AND(__T(__EE1596933).Seen___In___Seven___Years_,__T(__EE1596933).Is_Over_All_Lien_Judgment_)));
+    SELF.Ln_J7_Y_New_Date_ := FN_Compile(__cfg).FN_Is_Blank(__ECAST(KEL.typ.nstr,__ECAST(KEL.typ.nstr,KEL.Aggregates.MaxN(__EE1596964,__EE1596964.Original_Filing_Date_))),__ECAST(KEL.typ.nstr,__CN(__CC13983)));
+    __EE1597282 := __EE1596964;
+    SELF.Ln_J7_Y_Old_Date_ := FN_Compile(__cfg).FN_Is_Blank(__ECAST(KEL.typ.nstr,__ECAST(KEL.typ.nstr,KEL.Aggregates.MinN(__EE1597282,__EE1597282.Original_Filing_Date_))),__ECAST(KEL.typ.nstr,__CN(__CC13983)));
+    __CC13976 := -99999;
+    __BS1597041 := __T(__PP1597603.All_Lien_Data_);
+    SELF.P_L___Drg_L_T_D_Cnt7_Y_ := IF(__PP1597603.P___Lex_I_D_Seen_Flag_ = '0',__CC13976,KEL.Routines.BoundsFold(COUNT(__BS1597041(__T(__AND(__T(__PP1597603.All_Lien_Data_).Seen___In___Seven___Years_,__OP2(__T(__PP1597603.All_Lien_Data_).Is_Landlord_Tenant_Dispute_,=,__CN(TRUE)))))),0,999));
+    __BS1597078 := __T(__PP1597603.All_Lien_Data_);
+    SELF.P_L___Drg_Ln_J_Cnt7_Y_ := IF(__PP1597603.P___Lex_I_D_Seen_Flag_ = '0',__CC13976,KEL.Routines.BoundsFold(COUNT(__BS1597078(__T(__AND(__T(__PP1597603.All_Lien_Data_).Seen___In___Seven___Years_,__T(__PP1597603.All_Lien_Data_).Is_Over_All_Lien_Judgment_)))),0,999));
+    SELF.P___Inp_Cln_Name_First_Raw_ := __PP1597603.P___Inp_Cln_Name_First_;
+    SELF.P___Inp_Cln_Name_Last_Raw_ := __PP1597603.P___Inp_Cln_Name_Last_;
+    __EE1596598 := __PP1597603.Data_Sources_;
+    __BS1597104 := __T(__EE1596598);
+    __EE1598123 := __BS1597104(__T(__AND(__T(__EE1596598).Header_Hit_Flag_,__OP2(__T(__EE1596598).Translated_Source_Code_,<>,__CN('')))));
+    SELF.Translated_Sources_ := __CN(PROJECT(TABLE(PROJECT(__EE1598123,__ST102293_Layout)(__NN(Translated_Source_Code_)),{KEL.typ.int __RecordCount := SUM(GROUP,__RecordCount),KEL.typ.epoch Archive___Date_ := KEL.era.SimpleRoll(GROUP,Archive___Date_,MIN,FALSE),KEL.typ.epoch Date_First_Seen_ := KEL.era.SimpleRoll(GROUP,Date_First_Seen_,MIN,FALSE),KEL.typ.epoch Date_Last_Seen_ := KEL.era.SimpleRoll(GROUP,Date_Last_Seen_,MAX,FALSE),KEL.typ.epoch Hybrid_Archive_Date_ := KEL.era.SimpleRoll(GROUP,Hybrid_Archive_Date_,MIN,FALSE),KEL.typ.epoch Vault_Date_Last_Seen_ := KEL.era.SimpleRoll(GROUP,Vault_Date_Last_Seen_,MAX,NMAX),Translated_Source_Code_},Translated_Source_Code_,MERGE),__ST102293_Layout));
+    SELF := __PP1597603;
   END;
-  EXPORT __ENH_Person_6 := PROJECT(PROJECT(__EE1596340,__ND1598109__Project(LEFT)),__ST188452_Layout);
+  EXPORT __ENH_Person_6 := PROJECT(PROJECT(__EE1596301,__ND1598070__Project(LEFT)),__ST188241_Layout);
 END;

@@ -4,8 +4,8 @@ IMPORT CFG_Compile,E_Person,E_Person_S_S_N,E_Social_Security_Number FROM PublicR
 IMPORT * FROM KEL16.Null;
 EXPORT B_Person_S_S_N_2(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG_Compile __cfg = CFG_Compile) := MODULE
   SHARED VIRTUAL TYPEOF(E_Person_S_S_N(__in,__cfg).__Result) __E_Person_S_S_N := E_Person_S_S_N(__in,__cfg).__Result;
-  SHARED __EE169601 := __E_Person_S_S_N;
-  EXPORT __ST149370_Layout := RECORD
+  SHARED __EE169556 := __E_Person_S_S_N;
+  EXPORT __ST149325_Layout := RECORD
     KEL.typ.ntyp(E_Person().Typ) Subject_;
     KEL.typ.ntyp(E_Social_Security_Number().Typ) Social_;
     KEL.typ.ndataset(E_Person_S_S_N(__in,__cfg).Valid_S_S_N_Layout) Valid_S_S_N_;
@@ -18,10 +18,10 @@ EXPORT B_Person_S_S_N_2(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CF
     KEL.typ.epoch Vault_Date_Last_Seen_ := 0;
     KEL.typ.int __RecordCount := 0;
   END;
-  SHARED __ST149370_Layout __ND192027__Project(E_Person_S_S_N(__in,__cfg).Layout __PP169507) := TRANSFORM
-    __BS169559 := __T(__PP169507.Data_Sources_);
-    SELF.Is_Best_S_S_N_ := EXISTS(__BS169559(__T(__OP2(__T(__PP169507.Data_Sources_).Source_,IN,__CN(['BP','NEN','NEQ'])))));
-    SELF := __PP169507;
+  SHARED __ST149325_Layout __ND191982__Project(E_Person_S_S_N(__in,__cfg).Layout __PP169462) := TRANSFORM
+    __BS169514 := __T(__PP169462.Data_Sources_);
+    SELF.Is_Best_S_S_N_ := EXISTS(__BS169514(__T(__OP2(__T(__PP169462.Data_Sources_).Source_,IN,__CN(['BP','NEN','NEQ'])))));
+    SELF := __PP169462;
   END;
-  EXPORT __ENH_Person_S_S_N_2 := PROJECT(__EE169601,__ND192027__Project(LEFT));
+  EXPORT __ENH_Person_S_S_N_2 := PROJECT(__EE169556,__ND191982__Project(LEFT));
 END;
