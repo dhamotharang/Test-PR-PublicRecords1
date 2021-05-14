@@ -1,9 +1,14 @@
 ﻿import ut, inql_ffd, std;
 
-EXPORT Update_Base (boolean isDaily = true, boolean isFCRA = true, string pVersion = '') := function
+EXPORT Update_Base (boolean isDaily = true, boolean isFCRA = true, string pVersion = '') := module //function
 
-	stdInput	:=	Files(isDaily, isFCRA, pVersion).InputBuilding;
-
+shared InputNonEncrypted	:= Files(isDaily, isFCRA, pVersion).InputBuilding;
+	
+shared InputEncrypted			:= Files(isDaily, isFCRA, pVersion).InputEncryptedBuilding;    
+shared InputDecrypted  		:= INQL_FFD.FN_File_Decryption(InputEncrypted);
+	
+shared stdInput  					:= INQL_FFD.FN_Join_Decrypted_File(InputNonEncrypted,InputDecrypted);
+	
 	inql_ffd._Functions.CleanFields(stdInput, cleaned_fields);
 
 	formatted	:=	project(cleaned_fields
@@ -59,12 +64,19 @@ EXPORT Update_Base (boolean isDaily = true, boolean isFCRA = true, string pVersi
 						self 											:= [];
 						)); 
   
+	shared base_with_group_rid    := INQL_FFD.FN_Append_Group_RID(appended_base).base_group_rid;	
+	shared base_no_decrypted      := INQL_FFD.FN_Clean_Decrypted(base_with_group_rid,InputDecrypted)
+	                                 :persist('~persist::uspr::inquiryhistory::base_no_decrypted');
+																	 
+	new_daily_base						    := project(base_no_decrypted,transform(inql_ffd.Layouts.Base,
+	                                                     self:=left;));
+																											 
   prev_daily_base               := 	if (Inql_FFD._Flags().LastFullKeyVersionApproved , 
 	                                      Files(isDaily, isFCRA, pVersion).base.qa(version > INQL_FFD.Fn_Get_Current_Version.fcra_full_keys_dops_prod),
 	                                      Files(isDaily, isFCRA, pVersion).base.qa
 																				);
 	
-  daily_base_updated 				    := appended_base + prev_daily_base;
+  daily_base_updated 				    := new_daily_base + prev_daily_base;
  	
   filtered_daily_base        		:= daily_base_updated
 																			(
@@ -74,8 +86,13 @@ EXPORT Update_Base (boolean isDaily = true, boolean isFCRA = true, string pVersi
 																			
  	remediated_base          			:= INQL_FFD.FN_Apply_FCRA_Remediation_Soft_Inquiry(filtered_daily_base).base_remediation;
   
-	daily_base  				  				:= dedup(distribute(remediated_base,hash(lex_id)),record, all);
+	export daily_base  				  	:= dedup(distribute(remediated_base ,hash(lex_id)),record, all);
 
-  return daily_base;
+  new_daily_base_encrypted      := distribute(project(base_no_decrypted(key_decrypted<>''),
+	                                                    transform(inql_ffd.Layouts.Base_Encrypted,self:=left;))
+	                                            ,hash(transaction_id));
+	prev_daily_base_encrypted     := inql_ffd.Files(true, true, pVersion).Base_Encrypted.qa
+	                                      (version > INQL_FFD.Fn_Get_Current_Version.fcra_full_keys_dops_prod);
+  export daily_base_encrypted		:= dedup(distribute(new_daily_base_encrypted + prev_daily_base_encrypted),record,all);
 	
 end;

@@ -8,7 +8,10 @@ export MOVE_FILES(boolean isUpdate = true, boolean isFCRA = true, string pVersio
 					FS.StartSuperFileTransaction(),
 					  nothor(FS.AddSuperFile(filenames(isUpdate, isFCRA, pVersion).InputBuilding,
 						                       filenames(isUpdate, isFCRA, pVersion).Input,addcontents := true)),
-						nothor(FS.ClearSuperFile(filenames(isUpdate, isFCRA, pVersion).Input, false)),											 
+						nothor(FS.ClearSuperFile(filenames(isUpdate, isFCRA, pVersion).Input, false)),	
+						nothor(FS.AddSuperFile(filenames(isUpdate, isFCRA, pVersion,True).InputBuilding,   
+						                       filenames(isUpdate, isFCRA, pVersion,True).Input,addcontents := true)),
+						nothor(FS.ClearSuperFile(filenames(isUpdate, isFCRA, pVersion,true).Input, false)),	
 					FS.FinishSuperFileTransaction()
 						);
 	
@@ -16,38 +19,47 @@ export MOVE_FILES(boolean isUpdate = true, boolean isFCRA = true, string pVersio
 				FS.StartSuperFileTransaction(),
 					nothor(FS.PromoteSuperFileList([filenames(isUpdate, isFCRA, pVersion).InputBuilding, 
 																					filenames(isUpdate, isFCRA, pVersion).InputBuilt])),
+					nothor(FS.PromoteSuperFileList([filenames(isUpdate, isFCRA, pVersion,true).InputBuilding, 
+																					filenames(isUpdate, isFCRA, pVersion,true).InputBuilt])),
 				FS.FinishSuperFileTransaction()
 					);	
 	
-	shared version_regexp  := '([0-9]{8}[a-z]?)';
-  shared LexidFileToRemove    := '~' + if(isUpdate, nothor(fileservices.GetSuperFileSubName(inql_ffd.keynames(true).Lexid.qa, 2)),
-																				 nothor(fileservices.GetSuperFileSubName(inql_ffd.keynames(true).Lexid.qa, 1))
-															);	
-  shared GroupRIDFileToRemove := '~' + if(isUpdate, nothor(fileservices.GetSuperFileSubName(inql_ffd.keynames(true).GroupRID.qa, 2)),
-																				 nothor(fileservices.GetSuperFileSubName(inql_ffd.keynames(true).GroupRID.qa, 1))
-															);			
-	shared filepos              := if(isUpdate,2,1); 	
-	
-	export Lexid					 := SEQUENTIAL(
+	shared lexid_delta_key:='~'+max(nothor(fileservices.SuperFileContents(inql_ffd.keynames(true).lexid.qa)),name);
+ 	shared group_rid_delta_key:='~'+max(nothor(fileservices.SuperFileContents(inql_ffd.keynames(true).Group_RID.qa)),name);
+	shared group_rid_encrypted_delta_key:='~'+max(nothor(fileservices.SuperFileContents(inql_ffd.keynames(true).group_rid_encrypted.qa)),name);
+  shared remove_previous_delta := sequential
+										(nothor(fileservices.RemoveSuperFile(inql_ffd.keynames(true).lexid.qa,lexid_delta_key));
+										 nothor(fileservices.RemoveSuperFile(inql_ffd.keynames(true).lexid.built,lexid_delta_key));
+										 nothor(fileservices.RemoveSuperFile(inql_ffd.keynames(true).group_rid.qa,group_rid_delta_key));	
+										 nothor(fileservices.RemoveSuperFile(inql_ffd.keynames(true).group_rid.built,group_rid_delta_key));	
+										 nothor(fileservices.RemoveSuperFile(inql_ffd.keynames(true).group_rid_encrypted.qa,group_rid_encrypted_delta_key));	
+										 nothor(fileservices.RemoveSuperFile(inql_ffd.keynames(true).group_rid_encrypted.built,group_rid_encrypted_delta_key));	
+										 );
+
+	export Lexid			:= SEQUENTIAL(
 													 nothor(fileservices.StartSuperFileTransaction()),
-													 nothor(fileservices.RemoveSuperFile(inql_ffd.keynames(true).Lexid.qa,LexidFileToRemove)),
-													 nothor(fileservices.RemoveSuperFile(inql_ffd.keynames(true).Lexid.built,LexidFileToRemove)),
-													 nothor(fileservices.addsuperfile(inql_ffd.keynames(true).Lexid.qa,inql_ffd.keynames(true,pVersion).Lexid.new,filepos)),
-													 nothor(fileservices.addsuperfile(inql_ffd.keynames(true).Lexid.built,inql_ffd.keynames(true,pVersion).Lexid.new,filepos)),
+													 nothor(fileservices.addsuperfile(inql_ffd.keynames(true).Lexid.qa,inql_ffd.keynames(true,pVersion).Lexid.new)),
+													 nothor(fileservices.addsuperfile(inql_ffd.keynames(true).Lexid.built,inql_ffd.keynames(true,pVersion).Lexid.new)),
 													 nothor(fileservices.FinishSuperFileTransaction())
 																			);
 
-	export GroupRID					 := SEQUENTIAL(
+  	export Group_RID 	 := SEQUENTIAL(
 													 nothor(fileservices.StartSuperFileTransaction()),
-													 nothor(fileservices.RemoveSuperFile(inql_ffd.keynames(true).GroupRID.qa,GroupRIDFileToRemove)),
-													 nothor(fileservices.RemoveSuperFile(inql_ffd.keynames(true).GroupRID.built,GroupRIDFileToRemove)),
-													 nothor(fileservices.addsuperfile(inql_ffd.keynames(true).GroupRID.qa,inql_ffd.keynames(true,pVersion).GroupRID.new,filepos)),
-													 nothor(fileservices.addsuperfile(inql_ffd.keynames(true).GroupRID.built,inql_ffd.keynames(true,pVersion).GroupRID.new,filepos)),
+													 nothor(fileservices.addsuperfile(inql_ffd.keynames(true).Group_RID.qa,inql_ffd.keynames(true,pVersion).Group_RID.new)),
+													 nothor(fileservices.addsuperfile(inql_ffd.keynames(true).Group_RID.built,inql_ffd.keynames(true,pVersion).Group_RID.new)),
 													 nothor(fileservices.FinishSuperFileTransaction())
 																			);
 
-
-// );
-	
+  export Group_RID_Encrypted := SEQUENTIAL(
+													 nothor(fileservices.StartSuperFileTransaction()),
+													 nothor(fileservices.addsuperfile(inql_ffd.keynames(true).Group_RID_Encrypted.qa,inql_ffd.keynames(true,pVersion).Group_RID_Encrypted.new)),
+													 nothor(fileservices.addsuperfile(inql_ffd.keynames(true).Group_RID_Encrypted.built,inql_ffd.keynames(true,pVersion).Group_RID_Encrypted.new)),
+													 nothor(fileservices.FinishSuperFileTransaction())
+																			);
+	export Delta_Keys  := sequential(
+	                               if(Inql_ffd._Flags().ExistDeltaKey,remove_previous_delta),
+	                               lexid,
+	                               group_rid,
+																 group_rid_encrypted);
  						
 end;
