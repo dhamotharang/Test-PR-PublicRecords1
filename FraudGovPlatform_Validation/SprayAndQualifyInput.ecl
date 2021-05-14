@@ -170,10 +170,12 @@ new_rec2:=record
 end;
 
 Proj_dsFileListSorted2 := project(dsFileListSorted2, transform(new_rec2,
-	self.customer_id := regexfind('([0-9])\\d+',left.name,0);
-	self.file_type := regexfind('IDENTITY|IDENTITY|KNOWNRISK|SAFELIST',left.name,0,nocase);
+	fn := StringLib.SplitWords( StringLib.StringFindReplace(left.name, '.dat',''), '_', true );
+	wd := StringLib.SplitWords( fn[1], '/', true );		
+	self.customer_id := wd[3];
+	self.file_type :=ut.CleanSpacesAndUpper(fn[5]);
 	self:=left));
-	
+
 J_dsFileListSorted2	:= join(Proj_dsFileListSorted2, FraudGovPlatform.Files().Flags.CustomerActiveSprays,
 		left.customer_id = right.customer_id and
 		left.file_type = right.file_type
