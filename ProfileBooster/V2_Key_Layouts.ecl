@@ -305,8 +305,7 @@ EXPORT	Verification := RECORD
 		INTEGER3		HHMmbrWBkCnt1Y := ProfileBooster.ProfileBoosterV2_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA_INT;
 		INTEGER3		HHMmbrWBkCnt2Y := ProfileBooster.ProfileBoosterV2_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA_INT;
 		INTEGER3		HHMmbrWBkNewMsnc10Y := ProfileBooster.ProfileBoosterV2_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA_INT;
-		INTEGER3		HHMmbrWFrClCnt7Y := ProfileBooster.ProfileBoosterV2_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA_INT;
-		INTEGER3		HHMmbrWFrClNewMSnc7Y := ProfileBooster.ProfileBoosterV2_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA_INT;
+		
 	END;
 	
 	EXPORT	HouseholdOccupationalRecords := RECORD

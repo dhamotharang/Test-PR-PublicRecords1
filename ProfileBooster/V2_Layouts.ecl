@@ -285,7 +285,7 @@ EXPORT	Verification := RECORD
 	EXPORT	HouseholdCourtRecords := RECORD
 		INTEGER3		HHMmbrWDrgCnt7Y := ProfileBooster.ProfileBoosterV2_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA_INT;
 		INTEGER3		HHMmbrWDrgCnt1Y := ProfileBooster.ProfileBoosterV2_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA_INT;
-		INTEGER3		HHDrgNewMsnc7Y := ProfileBooster.ProfileBoosterV2_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA_INT;
+		INTEGER3		HHMmbrDrgNewMsnc7Y := ProfileBooster.ProfileBoosterV2_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA_INT;
 		INTEGER3		HHMmbrWCrimFelCnt7Y := ProfileBooster.ProfileBoosterV2_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA_INT;
 		INTEGER3		HHMmbrWCrimFelCnt1Y := ProfileBooster.ProfileBoosterV2_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA_INT;
 		INTEGER3		HHMmbrWCrimFelNewMsnc7Y := ProfileBooster.ProfileBoosterV2_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA_INT;
@@ -303,8 +303,7 @@ EXPORT	Verification := RECORD
 		INTEGER3		HHMmbrWBkCnt1Y := ProfileBooster.ProfileBoosterV2_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA_INT;
 		INTEGER3		HHMmbrWBkCnt2Y := ProfileBooster.ProfileBoosterV2_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA_INT;
 		INTEGER3		HHMmbrWBkNewMsnc10Y := ProfileBooster.ProfileBoosterV2_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA_INT;
-		INTEGER3		HHMmbrWFrClCnt7Y := ProfileBooster.ProfileBoosterV2_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA_INT;
-		INTEGER3		HHMmbrWFrClNewMSnc7Y := ProfileBooster.ProfileBoosterV2_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA_INT;
+		
 	END;
 	
 	EXPORT	HouseholdOccupationalRecords := RECORD
@@ -729,7 +728,7 @@ EXPORT	Verification := RECORD
 		Risk_Indicators.Layout_Input;
 		unsigned1 rec_type := 1; //1=Prospect, 2=Household, 3=Relative/Associate
 		unsigned6 DID2 := 0;
-		unsigned8	HHID;
+		// unsigned8	HHID; removed duplicate attribute
 		string12	geoLink;
 		string12	relat_geoLink;
     	Layout_ProfileBoosterV2;
@@ -737,21 +736,21 @@ EXPORT	Verification := RECORD
 		dx_ProfileBooster.Layouts.ProspectEmergenceHelpers;
         STRING10 	hdr_prim_range;
 		STRING2  	hdr_predir;
-		STRING28  hdr_prim_name;
-		STRING4   hdr_addr_suffix;
-		STRING2   hdr_postdir;
-		STRING10  hdr_unit_desig;
-		STRING8   hdr_sec_range;
-		STRING5   hdr_z5;		
-		STRING4   hdr_zip4;
-		STRING25  hdr_city_name;
-		STRING2   hdr_st;
-		STRING1   hdr_addr_type;
-		STRING4   hdr_addr_status;	
+		STRING28    hdr_prim_name;
+		STRING4     hdr_addr_suffix;
+		STRING2     hdr_postdir;
+		STRING10    hdr_unit_desig;
+		STRING8     hdr_sec_range;
+		STRING5     hdr_z5;		
+		STRING4     hdr_zip4;
+		STRING25    hdr_city_name;
+		STRING2     hdr_st;
+		STRING1     hdr_addr_type;
+		STRING4     hdr_addr_status;	
 		STRING3 	hdr_county;
 		STRING7 	hdr_geo_blk;	
 		string40	hdr_addr1;
-		unsigned8 hdr_rawaid;	
+		unsigned8   hdr_rawaid;	
 		string20	hdr_lname;	
 		UNSIGNED3	hdr_date_first_seen;	
 		UNSIGNED3	hdr_date_last_seen;	
@@ -940,21 +939,9 @@ EXPORT	Verification := RECORD
 		Unsigned2 HHPPCurrOwnedMtrcycleCnt;
 		Unsigned2 HHPPCurrOwnedAircrftCnt;
 		Unsigned2 HHPPCurrOwnedWtrcrftCnt;
-		Unsigned2 HHCrtRecMmbrCnt;
-		Unsigned2 HHCrtRecMmbrCnt12Mo;
-		Unsigned2 HHCrtRecFelonyMmbrCnt;
-		Unsigned2 HHCrtRecFelonyMmbrCnt12Mo;
-		Unsigned2 HHCrtRecMsdmeanMmbrCnt;
-		Unsigned2 HHCrtRecMsdmeanMmbrCnt12Mo;
-		Unsigned2 HHCrtRecEvictionMmbrCnt;
-		Unsigned2 HHCrtRecEvictionMmbrCnt12Mo;
-		Unsigned2 HHCrtRecLienJudgMmbrCnt;
-		Unsigned2 HHCrtRecLienJudgMmbrCnt12Mo;
-		Unsigned8 HHDrgLnJAmtTot;
-		Unsigned8 HHCrtRecLienJudgAmtTtl;
-		Unsigned2 HHCrtRecBkrptMmbrCnt;
-		Unsigned2 HHCrtRecBkrptMmbrCnt12Mo;
-		Unsigned2 HHCrtRecBkrptMmbrCnt24Mo;
+
+		ProfileBooster.V2_Key_Layouts.HouseholdCourtRecords;
+
 		Unsigned2 HHOccProfLicMmbrCnt;
 		Unsigned2 HHOccBusinessAssocMmbrCnt;
 		Unsigned2 HHInterestSportPersonMmbrCnt;	

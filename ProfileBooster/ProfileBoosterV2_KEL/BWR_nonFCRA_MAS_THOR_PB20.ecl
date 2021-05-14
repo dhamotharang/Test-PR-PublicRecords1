@@ -293,8 +293,6 @@ IMPORT KEL12 AS KEL;
   integer3 hhmmbrwbkcnt1y;
   integer3 hhmmbrwbkcnt2y;
   integer3 hhmmbrwbknewmsnc10y;
-  integer3 hhmmbrwfrclcnt7y;
-  integer3 hhmmbrwfrclnewmsnc7y;
   integer3 hhmmbrwithprofliccnt;
   integer3 hhmmbrwbusassoccnt;
   integer3 hhmmbrwprofliccat1cnt;

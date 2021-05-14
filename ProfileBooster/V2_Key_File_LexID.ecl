@@ -13,98 +13,14 @@ export V2_Key_File_LexID(STRING8 history_date) := function
  	nines		 		:= 9999999;
   Score_threshold := 80;
 
-// testLayout := RECORD
-  // unsigned6 did;
-  // qstring10 phone;
-  // qstring9 ssn;
-  // integer4 dob;
-  // qstring5 title;
-  // qstring20 fname;
-  // qstring20 mname;
-  // qstring20 lname;
-  // qstring5 name_suffix;
-  // qstring10 prim_range;
-  // string2 predir;
-  // qstring28 prim_name;
-  // qstring4 suffix;
-  // string2 postdir;
-  // qstring10 unit_desig;
-  // qstring8 sec_range;
-  // qstring25 city_name;
-  // string2 st;
-  // qstring5 zip;
-  // qstring4 zip4;
-  // unsigned3 addr_dt_last_seen;
-  // qstring8 dod;
-  // qstring17 prpty_deed_id;
-  // qstring22 vehicle_vehnum;
-  // qstring22 bkrupt_crtcode_caseno;
-  // integer4 main_count;
-  // integer4 search_count;
-  // qstring15 dl_number;
-  // qstring12 bdid;
-  // integer4 run_date;
-  // integer4 total_records;
-  // unsigned8 rawaid;
-  // unsigned3 addr_dt_first_seen;
-  // string10 adl_ind;
-  // string1 valid_ssn;
-  // string1 glb_name;
-  // string1 glb_address;
-  // string1 glb_dob;
-  // string1 glb_ssn;
-  // string1 glb_phone;
-  // unsigned8 filepos;
-// END;
-  // base := DATASET('~jfrancis::in::pb20::sampleWatchdog.csv',testLayout,CSV(heading(single), quote('"')));
   base := DATASET('~jfrancis::in::pb20::sampleHeaderAllDids.csv',dx_Header.layout_key_header,CSV(heading(single), quote('"')));
   // base := dx_Header.key_header();
   // base := DATASET('~jfrancis::in::pb20::sampleHeader.csv',dx_Header.layout_key_header,CSV(heading(single), quote('"')));
-  distributed_allDIDs := distribute(base(dt_first_seen<=(unsigned)risk_indicators.iid_constants.myGetDate((integer)history_date[1..6])), hash(did));
+  distributed_allDIDs := distribute(base(did>0 AND dt_first_seen<=(unsigned)risk_indicators.iid_constants.myGetDate((integer)history_date[1..6])), hash64(did));
 
-  // HeaderWithEmergence := RECORD
-  //   dx_Header.layout_key_header;
-  //   dx_ProfileBooster.Layouts.ProspectEmergence;
-  //   dx_ProfileBooster.Layouts.ProspectEmergenceHelpers;
-  // END;
-// EXPORT	ProspectEmergence := RECORD
-// 		INTEGER3		EmrgAge := dx_ProfileBooster.Constants.MISSING_INPUT_DATA_INT;
-// 		INTEGER3		EmrgAtOrAfter21Flag := dx_ProfileBooster.Constants.MISSING_INPUT_DATA_INT;
-// 		INTEGER3		EmrgRecordType := dx_ProfileBooster.Constants.MISSING_INPUT_DATA_INT;
-// 		INTEGER3		EmrgAddressHRIndex := dx_ProfileBooster.Constants.MISSING_INPUT_DATA_INT;
-// 		INTEGER3		EmrgLexIDsAtEmrgAddrCnt1Y := dx_ProfileBooster.Constants.MISSING_INPUT_DATA_INT;
-// 		INTEGER3		EmrgAge25to59Flag := dx_ProfileBooster.Constants.MISSING_INPUT_DATA_INT;
-// 	END;
+	uniqueDIDs := dedup(sort(distributed_allDIDs, DID, -dt_first_seen, local), DID, local);//   : PERSIST('~PROFILEBOOSTER::unique_DIDs_thor');  // remove persists because low on disk space and it's rebuilding persist file each time anyway
 
-// 	EXPORT  ProspectEmergenceHelpers := RECORD
-// 		STRING      EmrgDOB := dx_ProfileBooster.Constants.MISSING_INPUT_DATA;
-// 		STRING2			EmrgSrc;
-// 		STRING   		EmrgAddrFull;
-// 		STRING10 		EmrgPrimaryRange;
-// 		STRING6  		EmrgPredirectional;
-// 		STRING28 		EmrgPrimaryName;
-// 		STRING6  		EmrgSuffix;
-// 		STRING6  		EmrgPostdirectional;
-// 		STRING10 		EmrgUnitDesignation;
-// 		STRING8  		EmrgSecondaryRange;
-// 		STRING6  		EmrgZIP5;
-// 		STRING6  		EmrgZIP4;
-// 		STRING25 		EmrgCity_Name;
-// 		STRING6  		EmrgSt;
-// 	END;
-  // dx_Header.layout_key_header rollHeaderForEmergence(dx_Header.layout_key_header le, dx_Header.layout_key_header ri) := TRANSFORM
-  //   OlderRecord := ri.date_first_seen<le.date_first_seen;
-  //   EmrgAge := IF(OlderRecord,)
-  //   SELF.EmrgAge := EmrgAge;
-  //   self.dob							:= if(ri.src=mdr.sourceTools.src_TUCS_Ptrack, '', (string)ri.dob);
-  //   self.ProspectAge 			:= if(ri.src=mdr.sourceTools.src_TUCS_Ptrack, 0, risk_indicators.years_apart((unsigned)fullhistorydate, (unsigned)ri.dob));
-		
-
-  // END;
-
-	uniqueDIDs := dedup(sort(distributed_allDIDs, DID, local), DID, local);//   : PERSIST('~PROFILEBOOSTER::unique_DIDs_thor');  // remove persists because low on disk space and it's rebuilding persist file each time anyway
-
-//slim down the uniqueDIDs records to create a smaller layout to pass into all of the following searches
+  //slim down the uniqueDIDs records to create a smaller layout to pass into all of the following searches
 	slimShell := project(uniqueDIDs,  
 												transform(ProfileBooster.V2_Key_Layouts.Layout_PB2_Slim,
                                   self.seq          := left.did;
@@ -122,8 +38,6 @@ export V2_Key_File_LexID(STRING8 history_date) := function
             SELF.AcctNo := (STRING)LEFT.did;
             SELF.seq := LEFT.did;
             SELF.LexID := LEFT.did;
-            // SELF.Name_Full;
-            // SELF.Name_Title;
             SELF.Name_First := LEFT.fname;
             SELF.Name_Middle := LEFT.mname;
             SELF.Name_Last := LEFT.lname;
@@ -143,18 +57,12 @@ export V2_Key_File_LexID(STRING8 history_date) := function
             SELF.City_name := LEFT.city_name;
             SELF.st := LEFT.st;
             SELF.z5 := LEFT.zip;
-            // SELF.country;
             SELF.HistoryDate := (integer)history_date[1..6];
             SELF := LEFT; 
             SELF := [];), local);
   DataRestrictionMask := Risk_Indicators.iid_constants.default_DataRestriction;
-  DataPermissionMask := Risk_Indicators.iid_constants.default_DataPermission;
-  AttributesVersion := 'PBATTRV1';
-  PB_Search_Function_THOR := ProfileBooster.V2_Key_Search_Function_THOR(PB_In,DataRestrictionMask,DataPermissionMask,AttributesVersion, 
-                                            false,
-                                            '',
-																						'1'
-                                            );
+  DataPermissionMask  := Risk_Indicators.iid_constants.default_DataPermission;
+  PB_Search_Function_THOR := ProfileBooster.V2_Key_Search_Function_THOR(PB_In,DataRestrictionMask);
 
   final := PROJECT(PB_Search_Function_THOR, TRANSFORM(dx_ProfileBooster.Layouts.i_lexid, 
                   SELF.DID := LEFT.LexID;
@@ -183,7 +91,6 @@ export V2_Key_File_LexID(STRING8 history_date) := function
                   SELF.DemEduCollMajorBusFlagEv := LEFT.attributes.version2.DemEduCollMajorBusFlagEv;
                   SELF.DemEduCollMajorEduFlagEv := LEFT.attributes.version2.DemEduCollMajorEduFlagEv;
                   SELF.DemEduCollMajorLawFlagEv := LEFT.attributes.version2.DemEduCollMajorLawFlagEv;
-                  // SELF.DemBankingIndex := LEFT.attributes.version2.DemBankingIndx;
                   SELF.IntSportPersonFlagEv := LEFT.attributes.version2.IntSportPersonFlagEv;
                   SELF.IntSportPersonFlag1Y := LEFT.attributes.version2.IntSportPersonFlag1Y;
                   SELF.IntSportPersonFlag5Y := LEFT.attributes.version2.IntSportPersonFlag5Y;
@@ -196,7 +103,6 @@ export V2_Key_File_LexID(STRING8 history_date) := function
                   SELF.LifeAstPurchOldMsnc := LEFT.attributes.version2.LifeAstPurchOldMsnc;
                   SELF.LifeAstPurchNewMsnc := LEFT.attributes.version2.LifeAstPurchNewMsnc;
                   SELF.LifeAddrCnt := LEFT.attributes.version2.LifeAddrCnt;
-                  // SELF.LifeAddrCurrToPrevValRatio5Y := LEFT.attributes.version2.LifeAddrCurrToPrevValRatio5Y;
                   SELF.LifeAddrEconTrajType := LEFT.attributes.version2.LifeAddrEconTrajType;
                   SELF.LifeAddrEconTrajIndx := LEFT.attributes.version2.LifeAddrEconTrajIndx;
                   SELF.AstCurrFlag := LEFT.attributes.version2.AstCurrFlag;
@@ -220,8 +126,6 @@ export V2_Key_File_LexID(STRING8 history_date) := function
                   SELF.CurrAddrBuildYr := LEFT.attributes.version2.CurrAddrBuildYr;
                   SELF.CurrAddrBedCnt := LEFT.attributes.version2.CurrAddrBedCnt;
                   SELF.CurrAddrBldgSize := LEFT.attributes.version2.CurrAddrBldgSize;
-                  // SELF.CurrAddrLat := LEFT.attributes.version2.CurrAddrLat;
-                  // SELF.CurrAddrLng := LEFT.attributes.version2.CurrAddrLng;
                   SELF.CurrAddrIsCollegeFlag := LEFT.attributes.version2.CurrAddrIsCollegeFlag;
                   SELF.CurrAddrAVMVal := LEFT.attributes.version2.CurrAddrAVMVal;
                   SELF.CurrAddrAVMValA1Y := LEFT.attributes.version2.CurrAddrAVMValA1Y;
@@ -235,61 +139,8 @@ export V2_Key_File_LexID(STRING8 history_date) := function
                   SELF.CurrAddrTypeIndx := LEFT.attributes.version2.CurrAddrTypeIndx;
                   SELF.CurrAddrBusRegCnt := LEFT.attributes.version2.CurrAddrBusRegCnt;
                   SELF.CurrAddrIsVacantFlag := LEFT.attributes.version2.CurrAddrIsVacantFlag;
-                  // SELF.CurrAddrForeclosure := LEFT.attributes.version2.CurrAddrForeclosure;
                   SELF.CurrAddrStatus := LEFT.attributes.version2.CurrAddrStatus;
                   SELF.CurrAddrIsAptFlag := LEFT.attributes.version2.CurrAddrIsAptFlag;
-                  // SELF.PurchNewAmt := LEFT.attributes.version2.asdf;
-                  // SELF.PurchTotEv := LEFT.attributes.version2.asdf;
-                  // SELF.PurchCntEv := LEFT.attributes.version2.asdf;
-                  // SELF.PurchNewMsnc := LEFT.attributes.version2.asdf;
-                  // SELF.PurchOldMsnc := LEFT.attributes.version2.asdf;
-                  // SELF.PurchItemCntEv := LEFT.attributes.version2.asdf;
-                  // SELF.PurchAmtAvg := LEFT.attributes.version2.asdf;
-                  // SELF.PurchAge := LEFT.attributes.version2.asdf;
-                  // SELF.PurchGender := LEFT.attributes.version2.asdf;
-                  // SELF.PurchMarried := LEFT.attributes.version2.asdf;
-                  // SELF.AstVehAutoCarCntEv := LEFT.attributes.version2.asdf;
-                  // SELF.AstVehAutoCntEv := LEFT.attributes.version2.asdf;
-                  // SELF.AstVehAutoEliteCntEv := LEFT.attributes.version2.asdf;
-                  // SELF.AstVehAutoExpCntEv := LEFT.attributes.version2.asdf;
-                  // SELF.AstVehAutoLuxuryCntEv := LEFT.attributes.version2.asdf;
-                  // SELF.AstVehAutoMakeCntEv := LEFT.attributes.version2.asdf;
-                  // SELF.AstVehAutoOrigOwnCntEv := LEFT.attributes.version2.asdf;
-                  // SELF.AstVehAutoSUVCntEv := LEFT.attributes.version2.asdf;
-                  // SELF.AstVehAutoTruckCntEv := LEFT.attributes.version2.asdf;
-                  // SELF.AstVehAutoVanCntEv := LEFT.attributes.version2.asdf;
-                  // SELF.AstVehAuto2ndFreqMake := LEFT.attributes.version2.asdf;
-                  // SELF.AstVehAuto2ndFreqMakeCntEv := LEFT.attributes.version2.asdf;
-                  // SELF.AstVehAutoFreqMake := LEFT.attributes.version2.asdf;
-                  // SELF.AstVehAutoFreqMakeCntEv := LEFT.attributes.version2.asdf;
-                  // SELF.AstVehAutoNewTypeIndx := LEFT.attributes.version2.asdf;
-                  // SELF.AstVehAutoEmrgPriceAvg := LEFT.attributes.version2.asdf;
-                  // SELF.AstVehAutoEmrgPriceDiff := LEFT.attributes.version2.asdf;
-                  // SELF.AstVehAutoEmrgPriceMax := LEFT.attributes.version2.asdf;
-                  // SELF.AstVehAutoNewPrice := LEFT.attributes.version2.asdf;
-                  // SELF.AstVehAutoEmrgAgeAvg := LEFT.attributes.version2.asdf;
-                  // SELF.AstVehAutoEmrgAgeMax := LEFT.attributes.version2.asdf;
-                  // SELF.AstVehAutoEmrgAgeMin := LEFT.attributes.version2.asdf;
-                  // SELF.AstVehAutoEmrgSpanAvg := LEFT.attributes.version2.asdf;
-                  // SELF.AstVehAutoLastAgeAvg := LEFT.attributes.version2.asdf;
-                  // SELF.AstVehAutoLastAgeMax := LEFT.attributes.version2.asdf;
-                  // SELF.AstVehAutoLastAgeMin := LEFT.attributes.version2.asdf;
-                  // SELF.AstVehAutoNewMsnc := LEFT.attributes.version2.asdf;
-                  // SELF.AstVehAutoTimeOwnSpanAvg := LEFT.attributes.version2.asdf;
-                  // SELF.AstVehOtherATVCntEv := LEFT.attributes.version2.asdf;
-                  // SELF.AstVehOtherCamperCntEv := LEFT.attributes.version2.asdf;
-                  // SELF.AstVehOtherCntEv := LEFT.attributes.version2.asdf;
-                  // SELF.AstVehOtherCommCntEv := LEFT.attributes.version2.asdf;
-                  // SELF.AstVehOtherMtrCntEv := LEFT.attributes.version2.asdf;
-                  // SELF.AstVehOtherOrigOwnCntEv := LEFT.attributes.version2.asdf;
-                  // SELF.AstVehOtherScooterCntEv := LEFT.attributes.version2.asdf;
-                  // SELF.AstVehOtherNewMsnc := LEFT.attributes.version2.asdf;
-                  // SELF.AstVehOtherNewTypeIndx := LEFT.attributes.version2.asdf;
-                  // SELF.AstVehOtherNewPrice := LEFT.attributes.version2.asdf;
-                  // SELF.AstVehOtherPriceAvg := LEFT.attributes.version2.asdf;
-                  // SELF.AstVehOtherPriceMax := LEFT.attributes.version2.asdf;
-                  // SELF.AstVehOtherPriceMin := LEFT.attributes.version2.asdf;
-                  // SELF.AstVehAutoEmrgPriceMin := LEFT.attributes.version2.asdf;
                   SELF.ProfLicFlagEv := LEFT.attributes.version2.ProfLicFlagEv;
                   SELF.ProfLicActivNewIndx := LEFT.attributes.version2.ProfLicActivNewIndx;
                   SELF.BusAssocFlagEv := LEFT.attributes.version2.BusAssocFlagEv;
@@ -384,49 +235,51 @@ export V2_Key_File_LexID(STRING8 history_date) := function
                   SELF.prev_geo_blk := LEFT.attributes.version2.prev_geo_blk;	
                   SELF.prev_date_first_seen := LEFT.attributes.version2.prev_date_first_seen;	
                   SELF.prev_date_last_seen := LEFT.attributes.version2.prev_date_last_seen;
-                  SELF.datetime := STD.Date.Today();
+                  SELF.history_date := (UNSIGNED)ProfileBooster.V2_Key_Common.convertDateToQuarter((STRING)history_date);
                   // SELF.global_sid   := 0;   
                   // SELF.record_sid   := 0; 
-              SELF := LEFT;
-              SELF := [];), LOCAL);
+                  SELF := LEFT.attributes.version2;
+                  SELF := LEFT;
+                  SELF := [];), LOCAL);
 
-/* ********************
- *  KEL Section *
- ********************* */
-// PP1 := PROJECT(PB_Search_Function_THOR, TRANSFORM(ProfileBooster.ProfileBoosterV2_KEL.ECL_Functions.Layouts.LayoutInputPII, 
-// 	SELF.P_InpArchDt := history_date[1..6]+'01';
-// 	SELF.P_InpLexID := (INTEGER7)LEFT.LexID;
-// 	SELF.P_LexID := (INTEGER7)LEFT.LexID;
-// 	SELF.G_ProcUID := COUNTER;
-// 	SELF.P_InpAcct := LEFT.AcctNo;
-//   SELF.P_InpClnArchDt := (STRING)history_date[1..6]+'01';
-// 	SELF := LEFT;
-// 	SELF := [];
-// 	), LOCAL);	
-// PP := DISTRIBUTE(PP1, P_LexID);
+  /* ********************
+  *  KEL Section *
+  ********************* */
+  // PP1 := PROJECT(PB_Search_Function_THOR, TRANSFORM(ProfileBooster.ProfileBoosterV2_KEL.ECL_Functions.Layouts.LayoutInputPII, 
+  //   SELF.P_InpArchDt := history_date[1..6]+'01';
+  //   SELF.P_InpLexID := (INTEGER7)LEFT.LexID;
+  //   SELF.P_LexID := (INTEGER7)LEFT.LexID;
+  //   SELF.G_ProcUID := COUNTER;
+  //   SELF.P_InpAcct := LEFT.AcctNo;
+  //   SELF.P_InpClnArchDt := (STRING)history_date[1..6]+'01';
+  //   SELF := LEFT;
+  //   SELF := [];
+  //   ), LOCAL);	
+  // PP := DISTRIBUTE(PP1, P_LexID);
 
-// GLBA := 1; 
-// DPPA := 1; 
+  // GLBA := 1; 
+  // DPPA := 1; 
 
-// Options := MODULE(ProfileBooster.ProfileBoosterV2_KEL.Interface_Options)
-// 	EXPORT STRING AttributeSetName := 'Development KEL Attributes';
-// 	EXPORT STRING VersionName := 'Version 1.0';
-// 	EXPORT BOOLEAN isFCRA := FALSE;
-// 	EXPORT STRING ArchiveDate := history_date;
-// 	EXPORT STRING InputFileName := '';
-// 	EXPORT STRING Data_Restriction_Mask := DataRestrictionMask;
-// 	EXPORT STRING Data_Permission_Mask := DataPermissionMask;
-// 	EXPORT UNSIGNED GLBAPurpose := GLBA;
-// 	EXPORT UNSIGNED DPPAPurpose := DPPA;
-// 	EXPORT INTEGER ScoreThreshold := Score_threshold;
-// 	EXPORT BOOLEAN OutputMasterResults := FALSE;
-// 	EXPORT BOOLEAN isMarketing := TRUE; // When TRUE enables Marketing Restrictions
-// END;
+  // Options := MODULE(ProfileBooster.ProfileBoosterV2_KEL.Interface_Options)
+  //   EXPORT STRING AttributeSetName := 'Development KEL Attributes';
+  //   EXPORT STRING VersionName := 'Version 1.0';
+  //   EXPORT BOOLEAN isFCRA := FALSE;
+  //   EXPORT STRING ArchiveDate := history_date;
+  //   EXPORT STRING InputFileName := '';
+  //   EXPORT STRING Data_Restriction_Mask := DataRestrictionMask;
+  //   EXPORT STRING Data_Permission_Mask := DataPermissionMask;
+  //   EXPORT UNSIGNED GLBAPurpose := GLBA;
+  //   EXPORT UNSIGNED DPPAPurpose := DPPA;
+  //   EXPORT INTEGER ScoreThreshold := Score_threshold;
+  //   EXPORT BOOLEAN OutputMasterResults := FALSE;
+  //   EXPORT BOOLEAN isMarketing := TRUE; // When TRUE enables Marketing Restrictions
+  // END;
 
-// pbKelResult:= DISTRIBUTE(ProfileBooster.ProfileBoosterV2_KEL.FnThor_GetPB20Attributes(PP, Options),lexid); 
-finalWithKEL := final;
+  // pbKelResult:= DISTRIBUTE(ProfileBooster.ProfileBoosterV2_KEL.FnThor_GetPB20Attributes(PP, Options),lexid); 
+  finalWithKEL := final;
 /*
-JOIN(final(did<>0), pbKelResult(lexid<>-99999),
+JOIN(DISTRIBUTE(final(did<>0),did), 
+     DISTRIBUTE(pbKelResult(lexid<>-99999),lexid),
                      LEFT.did=RIGHT.lexid,
                      TRANSFORM(dx_ProfileBooster.Layouts.i_lexid,
                      //PROSPECT PURCHASE BEHAVIOUR

@@ -144,7 +144,7 @@ rolledSports :=  rollup(sortSportsdetails, left.seq = right.seq and left.did = r
 										rollSports(left, right));
 										
 //DEBUGGING
-output(choosen(PBslim1,1000), named('sample_PBslim1'));
+// output(choosen(PBslim1,1000), named('sample_PBslim1'));
 // output(choosen(sportsDIDs,1000), named('sample_sportsDIDs'));
 // output(choosen(sportsDetails,1000), named('sample_sportsDetails'));
 // output(choosen(ccwDIDs,1000), named('sample_ccwDIDs'));

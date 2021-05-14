@@ -53,6 +53,24 @@ EXPORT projectUnscorables(inputDS, attributesToProject, inputLayout) := FUNCTION
 
     inputLayout transformToUnscorables(inputLayout le) := TRANSFORM
 	#EXPAND(%'projectionCode'%)
+    SELF.HHMmbrDrgNewMsnc7Y_Count := le.HHMmbrDrgNewMsnc7Y;
+    SELF.HHMmbrDrgNewMsnc7Y_99997 := IF(le.HHMmbrDrgNewMsnc7Y = -99997, 1, 0);
+    SELF.HHMmbrDrgNewMsnc7Y_99998 := IF(le.HHMmbrDrgNewMsnc7Y = -99998, 1, 0);
+    SELF.HHMmbrWCrimFelNewMsnc7Y_Count := le.HHMmbrWCrimFelNewMsnc7Y;
+    SELF.HHMmbrWCrimFelNewMsnc7Y_99997 := IF(le.HHMmbrWCrimFelNewMsnc7Y = -99997, 1, 0);
+    SELF.HHMmbrWCrimFelNewMsnc7Y_99998 := IF(le.HHMmbrWCrimFelNewMsnc7Y = -99998, 1, 0);
+    SELF.HHMmbrWCrimNFelNewMsnc7Y_Count := le.HHMmbrWCrimNFelNewMsnc7Y;
+    SELF.HHMmbrWCrimNFelNewMsnc7Y_99997 := IF(le.HHMmbrWCrimNFelNewMsnc7Y = -99997, 1, 0);
+    SELF.HHMmbrWCrimNFelNewMsnc7Y_99998 := IF(le.HHMmbrWCrimNFelNewMsnc7Y = -99998, 1, 0);
+    SELF.HHMmbrWEvictNewMsnc7Y_Count := le.HHMmbrWEvictNewMsnc7Y;
+    SELF.HHMmbrWEvictNewMsnc7Y_99997 := IF(le.HHMmbrWEvictNewMsnc7Y = -99997, 1, 0);
+    SELF.HHMmbrWEvictNewMsnc7Y_99998 := IF(le.HHMmbrWEvictNewMsnc7Y = -99998, 1, 0);
+    SELF.HHMmbrWLnJNewMsnc7Y_Count := le.HHMmbrWLnJNewMsnc7Y;
+    SELF.HHMmbrWLnJNewMsnc7Y_99997 := IF(le.HHMmbrWLnJNewMsnc7Y = -99997, 1, 0);
+    SELF.HHMmbrWLnJNewMsnc7Y_99998 := IF(le.HHMmbrWLnJNewMsnc7Y = -99998, 1, 0);
+    SELF.HHMmbrWBkNewMsnc10Y_Count := le.HHMmbrWBkNewMsnc10Y;
+    SELF.HHMmbrWBkNewMsnc10Y_99997 := IF(le.HHMmbrWBkNewMsnc10Y = -99997, 1, 0);
+    SELF.HHMmbrWBkNewMsnc10Y_99998 := IF(le.HHMmbrWBkNewMsnc10Y = -99998, 1, 0);
     SELF := le;
     END;    
      
@@ -66,6 +84,26 @@ EXPORT projectUnscorables(inputDS, attributesToProject, inputLayout) := FUNCTION
         SELF.HHMmbrPropAVMMax_Count := MAX(le.HHMmbrPropAVMMax_Count, ri.HHMmbrPropAVMMax_Count);
         SELF.HHMmbrPropAVMMax_99997 := le.HHMmbrPropAVMMax_99997 + ri.HHMmbrPropAVMMax_99997;
         SELF.HHMmbrPropAVMMax_99998 := le.HHMmbrPropAVMMax_99998 + ri.HHMmbrPropAVMMax_99998;
+       
+        SELF.HHMmbrDrgNewMsnc7Y_Count := MIN(ABS(le.HHMmbrDrgNewMsnc7Y_Count),ABS(ri.HHMmbrDrgNewMsnc7Y_Count));
+        SELF.HHMmbrDrgNewMsnc7Y_99997 := le.HHMmbrDrgNewMsnc7Y_99997 + ri.HHMmbrDrgNewMsnc7Y_99997;
+        SELF.HHMmbrDrgNewMsnc7Y_99998 := le.HHMmbrDrgNewMsnc7Y_99998 + ri.HHMmbrDrgNewMsnc7Y_99998;
+        SELF.HHMmbrWCrimFelNewMsnc7Y_Count := MIN(ABS(le.HHMmbrWCrimFelNewMsnc7Y_Count),ABS(ri.HHMmbrWCrimFelNewMsnc7Y_Count));
+        SELF.HHMmbrWCrimFelNewMsnc7Y_99997 := le.HHMmbrWCrimFelNewMsnc7Y_99997 + ri.HHMmbrWCrimFelNewMsnc7Y_99997;
+        SELF.HHMmbrWCrimFelNewMsnc7Y_99998 := le.HHMmbrWCrimFelNewMsnc7Y_99998 + ri.HHMmbrWCrimFelNewMsnc7Y_99998;
+        SELF.HHMmbrWCrimNFelNewMsnc7Y_Count := MIN(ABS(le.HHMmbrWCrimNFelNewMsnc7Y_Count),ABS(ri.HHMmbrWCrimNFelNewMsnc7Y_Count));
+        SELF.HHMmbrWCrimNFelNewMsnc7Y_99997 := le.HHMmbrWCrimNFelNewMsnc7Y_99997 + ri.HHMmbrWCrimNFelNewMsnc7Y_99997;
+        SELF.HHMmbrWCrimNFelNewMsnc7Y_99998 := le.HHMmbrWCrimNFelNewMsnc7Y_99998 + ri.HHMmbrWCrimNFelNewMsnc7Y_99998;
+        SELF.HHMmbrWEvictNewMsnc7Y_Count := MIN(ABS(le.HHMmbrWEvictNewMsnc7Y_Count),ABS(ri.HHMmbrWEvictNewMsnc7Y_Count));
+        SELF.HHMmbrWEvictNewMsnc7Y_99997 := le.HHMmbrWEvictNewMsnc7Y_99997 + ri.HHMmbrWEvictNewMsnc7Y_99997;
+        SELF.HHMmbrWEvictNewMsnc7Y_99998 := le.HHMmbrWEvictNewMsnc7Y_99998 + ri.HHMmbrWEvictNewMsnc7Y_99998;
+        SELF.HHMmbrWLnJNewMsnc7Y_Count := MIN(ABS(le.HHMmbrWLnJNewMsnc7Y_Count),ABS(ri.HHMmbrWLnJNewMsnc7Y_Count));
+        SELF.HHMmbrWLnJNewMsnc7Y_99997 := le.HHMmbrWLnJNewMsnc7Y_99997 + ri.HHMmbrWLnJNewMsnc7Y_99997;
+        SELF.HHMmbrWLnJNewMsnc7Y_99998 := le.HHMmbrWLnJNewMsnc7Y_99998 + ri.HHMmbrWLnJNewMsnc7Y_99998;
+        SELF.HHMmbrWBkNewMsnc10Y_Count := MIN(ABS(le.HHMmbrWBkNewMsnc10Y_Count),ABS(ri.HHMmbrWBkNewMsnc10Y_Count));
+        SELF.HHMmbrWBkNewMsnc10Y_99997 := le.HHMmbrWBkNewMsnc10Y_99997 + ri.HHMmbrWBkNewMsnc10Y_99997;
+        SELF.HHMmbrWBkNewMsnc10Y_99998 := le.HHMmbrWBkNewMsnc10Y_99998 + ri.HHMmbrWBkNewMsnc10Y_99998;
+        
 		SELF := le;
 		SELF := [];
 END;
