@@ -1,4 +1,4 @@
-﻿EXPORT fn_dedup_identitydata(inputs):=FUNCTIONMACRO
+EXPORT fn_dedup_identitydata(inputs):=FUNCTIONMACRO
     IMPORT ut;
     in_srt := sort(inputs(rin_source != 9) , Customer_Id, Customer_State, Customer_Agency_Vertical_Type, Customer_Program, Reason_Description,Date_of_Transaction,Rawlinkid,raw_Full_Name,raw_Title,raw_First_name,
     raw_Middle_Name,raw_Last_Name,raw_Orig_Suffix,SSN,SSN4,Address_Type,Street_1,Street_2,City,State,Zip,Mailing_Street_1,
