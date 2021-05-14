@@ -607,9 +607,9 @@ prop_common_distr := distribute(prop_common, did);
 		self.HHPPCurrOwnedAircrftCnt				    := le.HHPPCurrOwnedAircrftCnt + ri.HHPPCurrOwnedAircrftCnt;
 		self.HHPPCurrOwnedWtrcrftCnt				    := le.HHPPCurrOwnedWtrcrftCnt + ri.HHPPCurrOwnedWtrcrftCnt;
 		
-    self.HHMmbrWDrgCnt7Y								:= le.HHMmbrWDrgCnt7Y + ri.HHMmbrWDrgCnt7Y;
+    	self.HHMmbrWDrgCnt7Y								:= le.HHMmbrWDrgCnt7Y + ri.HHMmbrWDrgCnt7Y;
 		self.HHMmbrWDrgCnt1Y						    := le.HHMmbrWDrgCnt1Y + ri.HHMmbrWDrgCnt1Y;
-		self.HHDrgNewMsnc7Y					            := le.HHDrgNewMsnc7Y + ri.HHDrgNewMsnc7Y;
+		// self.HHDrgNewMsnc7Y					            := le.HHDrgNewMsnc7Y + ri.HHDrgNewMsnc7Y;
 		self.HHMmbrWCrimFelCnt7Y			            := le.HHMmbrWCrimFelCnt7Y + ri.HHMmbrWCrimFelCnt7Y;
 		self.HHMmbrWCrimFelCnt1Y					    := le.HHMmbrWCrimFelCnt1Y + ri.HHMmbrWCrimFelCnt1Y;
 		self.HHMmbrWCrimFelNewMsnc7Y			        := le.HHMmbrWCrimFelNewMsnc7Y + ri.HHMmbrWCrimFelNewMsnc7Y;
@@ -627,9 +627,7 @@ prop_common_distr := distribute(prop_common, did);
 		self.HHMmbrWBkCnt1Y			                    := le.HHMmbrWBkCnt1Y + ri.HHMmbrWBkCnt1Y;
 		self.HHMmbrWBkCnt2Y		            	        := le.HHMmbrWBkCnt2Y + ri.HHMmbrWBkCnt2Y;
 		self.HHMmbrWBkNewMsnc10Y			            := le.HHMmbrWBkNewMsnc10Y + ri.HHMmbrWBkNewMsnc10Y;
-		self.HHMmbrWFrClCnt7Y			                := le.HHMmbrWFrClCnt7Y + ri.HHMmbrWFrClCnt7Y;
-		self.HHMmbrWFrClNewMSnc7Y			            := le.HHMmbrWFrClNewMSnc7Y + ri.HHMmbrWFrClNewMSnc7Y;
-    
+		
 		self.HHInterestSportPersonMmbrCnt		        := le.HHInterestSportPersonMmbrCnt + ri.HHInterestSportPersonMmbrCnt;	
 		self.RaATeenageMmbrCnt							:= le.RaATeenageMmbrCnt + ri.RaATeenageMmbrCnt;
 		self.RaAYoungAdultMmbrCnt						:= le.RaAYoungAdultMmbrCnt + ri.RaAYoungAdultMmbrCnt;

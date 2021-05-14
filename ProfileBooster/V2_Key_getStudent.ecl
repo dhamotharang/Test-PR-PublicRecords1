@@ -112,9 +112,15 @@ ProfileBooster.V2_Key_Layouts.Layout_PB2_Slim_student	addStudent(PBslim le, amer
     isValidDateLastSeen               := Doxie.DOBTools((unsigned8)ri.date_last_seen).IsValidDOB;
     PL_EduCollSrcNewRecOldDtEv        := ri.date_first_seen;
     PL_EduCollSrcNewRecNewDtEv        := ri.date_last_seen;
+    ExpBeginDate                      := ProfileBooster.V2_Key_Common.convertDateTo8((STRING)PL_EduCollSrcNewRecOldDtEv);
+    ExpGradYr2Yrs                     := (INTEGER3)((STRING)STD.Date.AdjustDate((UNSIGNED4)(ExpBeginDate),2,0,0))[1..4];
+    ExpGradYr4Yrs                     := (INTEGER3)((STRING)STD.Date.AdjustDate((UNSIGNED4)(ExpBeginDate),4,0,0))[1..4];
+    ExpEndDate                        := ProfileBooster.V2_Key_Common.convertDateTo8((STRING)STD.Date.AdjustDate((UNSIGNED4)(ExpBeginDate),4,0,0));
+    IsWithin100Yrs                    := STD.Date.YearsBetween((UNSIGNED4)ExpEndDate,(UNSIGNED4)STD.Date.Today())<=100; //need a function to test this
     self.DemEduCollSrcNewExpGradYr    := MAP(
-                                             PL_EduCollRecNewLevelEv=1 AND isValidDateFirstSeen => (INTEGER3)((STRING)STD.Date.AdjustDate((UNSIGNED4)((STRING)(PL_EduCollSrcNewRecOldDtEv+'01')),2,0,0))[1..4],//+2 years
-                                             PL_EduCollRecNewLevelEv=2 AND isValidDateFirstSeen => (INTEGER3)((STRING)STD.Date.AdjustDate((UNSIGNED4)((STRING)(PL_EduCollsrcNewRecOldDtEv+'01')),4,0,0))[1..4],//+4 years
+                                             PL_EduCollRecNewLevelEv=1 AND isValidDateFirstSeen AND IsWithin100Yrs => ExpGradYr2Yrs,//+2 years
+                                             PL_EduCollRecNewLevelEv=2 AND isValidDateFirstSeen AND IsWithin100Yrs => ExpGradYr4Yrs,//+4 years
+                                             ~IsWithin100Yrs                                                       => -99997,
                                              ProfileBooster.ProfileBoosterV2_KEL.ECL_Functions.Constants.NO_DATA_FOUND_INT
                                              );
     self.DemEduCollInstPvtFlagEv      := MAP(

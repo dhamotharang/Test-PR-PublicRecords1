@@ -3,12 +3,7 @@
 onThor := _Control.Environment.OnThor;
 
 EXPORT V2_Key_Search_Function_THOR(DATASET(ProfileBooster.V2_Key_Layouts.Layout_PB2_In) PB_In, 
-										   string50 DataRestrictionMask, 
-										   string50 DataPermissionMask,
-										   string8  AttributesVersion, 
-                                           boolean  domodel=false,
-                                           string   modelname = '',
-										   string   prt = '1'
+										   string50 DataRestrictionMask 
                                           ) := FUNCTION
 
 	isFCRA 		:= false;
@@ -73,7 +68,7 @@ Risk_Indicators.Layout_Input into(PB_In l) := TRANSFORM
 		self := [];
 	END;
 
-	iid_prep_roxie := PROJECT(PB_In, into(left));	
+	iid_prep_roxie := PROJECT(PB_In, into(left), local);	
 
 // NEW::  Calling the AID address cache macro now that Tony added the new feature for us:  https://bugzilla.seisint.com/show_bug.cgi?id=194258
 
@@ -92,7 +87,7 @@ Risk_Indicators.Layout_Input into(PB_In l) := TRANSFORM
 		self.rawAID			:=	0;
 		self	:=	le;
 	end;
-	aid_prepped	:=	project(PB_In, prep_for_AID(left));
+	aid_prepped	:=	project(PB_In, prep_for_AID(left), local);
 
 
 	// new parameter is the NoNewCacheFiles
@@ -107,31 +102,31 @@ Risk_Indicators.Layout_Input into(PB_In l) := TRANSFORM
 														);
 
 	Risk_Indicators.Layout_Input prep_for_thor(my_dataset_with_address_cache l) := TRANSFORM
-		self.did 		:= (integer)l.LexId;
-		self.score := if((integer)l.lexid<>0, 100, 0);  // hard code the DID score if DID is passed in on input
-		self.seq 		:= l.seq;   
-		self.HistoryDate 	:= if(l.historydate=0, risk_indicators.iid_constants.default_history_date, l.HistoryDate);
+		self.did 			 := (integer)l.LexId;
+		self.score      	 := if((integer)l.lexid<>0, 100, 0);  // hard code the DID score if DID is passed in on input
+		self.seq 			 := l.seq;   
+		self.HistoryDate 	 := if(l.historydate=0, risk_indicators.iid_constants.default_history_date, l.HistoryDate);
 
-		self.ssn 		:= l.ssn;
-		dob_val 		:= riskwise.cleandob(l.dob);
-		dob 				:= dob_val;
-		self.dob 		:= if((unsigned)dob=0, '', dob);
+		self.ssn 			 := l.ssn;
+		dob_val 			 := riskwise.cleandob(l.dob);
+		dob 				 := dob_val;
+		self.dob 			 := if((unsigned)dob=0, '', dob);
 
-		fname  			:= l.Name_First ;
-		mname  			:= l.Name_Middle;
-		lname  			:= l.Name_Last ;
-		suffix 			:= l.Name_Suffix ;
-		self.fname  := stringlib.stringtouppercase(fname);
-		self.mname  := stringlib.stringtouppercase(mname);
-		self.lname  := stringlib.stringtouppercase(lname);
-		self.suffix := stringlib.stringtouppercase(suffix);
-		self.Phone10				 := StringLib.StringFilter(l.Phone10, '0123456789');		
+		fname  			 	 := l.Name_First ;
+		mname  				 := l.Name_Middle;
+		lname  			 	 := l.Name_Last ;
+		suffix 			 	 := l.Name_Suffix ;
+		self.fname       	 := stringlib.stringtouppercase(fname);
+		self.mname      	 := stringlib.stringtouppercase(mname);
+		self.lname      	 := stringlib.stringtouppercase(lname);
+		self.suffix     	 := stringlib.stringtouppercase(suffix);
+		self.Phone10		 := StringLib.StringFilter(l.Phone10, '0123456789');		
 		
-		addr_value 	:= trim(l.street_addr);
+		addr_value 	    	 := trim(l.street_addr);
 		self.in_streetAddress:= addr_value;
-		self.in_city         := l.City_name;
-		self.in_state        := l.st;
-		self.in_zipCode      := l.z5;	
+		self.in_city    	 := l.City_name;
+		self.in_state   	 := l.st;
+		self.in_zipCode 	 := l.z5;	
 		
 		self.prim_range      := l.aidwork_acecache.prim_range;
 		self.predir          := l.aidwork_acecache.predir;
@@ -146,7 +141,7 @@ Risk_Indicators.Layout_Input into(PB_In l) := TRANSFORM
 		self.zip4            := l.aidwork_acecache.zip4;
 		self.lat             := l.aidwork_acecache.geo_lat;
 		self.long            := l.aidwork_acecache.geo_long;
-		self.addr_type 			 := risk_indicators.iid_constants.override_addr_type(l.street_addr, l.aidwork_acecache.rec_type[1],l.aidwork_acecache.cart);
+		self.addr_type 		 := risk_indicators.iid_constants.override_addr_type(l.street_addr, l.aidwork_acecache.rec_type[1],l.aidwork_acecache.cart);
 		self.addr_status     := l.aidwork_acecache.err_stat;
 		self.county          := l.aidwork_acecache.county[3..5]; //bytes 1-2 are state code, 3-5 are county number
 		self.geo_blk         := l.aidwork_acecache.geo_blk;		
@@ -154,9 +149,8 @@ Risk_Indicators.Layout_Input into(PB_In l) := TRANSFORM
 		self := [];
 	END;
 
-	iid_prep_thor := project(my_dataset_with_address_cache, prep_for_thor(left));									 
+	iid_prep := project(my_dataset_with_address_cache, prep_for_thor(left));									 
 										 
-	iid_prep := iid_prep_thor;
   	did_prepped_output := ungroup(Risk_Indicators.iid_getDID_prepOutput_THOR(iid_prep, DPPA, GLBA, isFCRA, bsversion, DataRestrictionMask, append_best, gateways, BSOptions));
 
  	// ********************************************************************
@@ -168,7 +162,8 @@ Risk_Indicators.Layout_Input into(PB_In l) := TRANSFORM
   	highestDIDScore := DEDUP(sortDIDs, seq); 
   
  	with_DID := JOIN(distribute(PB_In, seq), distribute(highestDIDScore(DID<>0), seq), 
-									LEFT.seq = RIGHT.seq, TRANSFORM(Risk_Indicators.Layout_Output, SELF.Account := LEFT.AcctNo; SELF := RIGHT), local);
+									LEFT.seq = RIGHT.seq, 
+									TRANSFORM(Risk_Indicators.Layout_Output, SELF.Account := LEFT.AcctNo; SELF := RIGHT), local);
 									
   	donotmail_key := dma.key_DNM_Name_Address;
 
@@ -182,21 +177,8 @@ Risk_Indicators.Layout_Input into(PB_In l) := TRANSFORM
 		self 							:= [];
 	END;
 	
-	withDoNotMail_roxie := join(with_DID, donotmail_key,
-		left.z5 != ''
-		and keyed(left.prim_name = right.l_prim_name) //
-		and keyed(left.prim_range = right.l_prim_range)
-		and keyed(left.st = right.l_st)
-		and keyed(right.l_city_code in doxie.Make_CityCodes(left.p_city_name).rox)
-		and keyed(left.z5= right.l_zip)
-		and keyed(left.sec_range = right.l_sec_range)
-		and keyed(left.lname = right.l_lname)
-		and keyed(left.fname = right.l_fname),
-		setDNMFlag(left,right), left outer, keep(1), atmost(riskwise.max_atmost)
-	);
-
-	withDoNotMail_thor := join(distribute(with_DID, hash64(z5, prim_name, prim_range, st)), 
-															distribute(pull(donotmail_key), hash64(l_zip, l_prim_name, l_prim_range, l_st)),
+	withDoNotMail := join(distribute(with_DID, hash64(z5, prim_name, prim_range, st)), 
+						  distribute(pull(donotmail_key), hash64(l_zip, l_prim_name, l_prim_range, l_st)),
 		left.z5 != ''
 		and left.prim_name = right.l_prim_name
 		and left.prim_range = right.l_prim_range
@@ -209,13 +191,8 @@ Risk_Indicators.Layout_Input into(PB_In l) := TRANSFORM
 		setDNMFlag(left,right), left outer, keep(1), local
 	);
 	
-	#IF(onThor)
-		withDoNotMail := withDoNotMail_thor;
-	#ELSE
-		withDoNotMail := withDoNotMail_roxie;
-	#END
-	
-  	withVerification := ProfileBooster.V2_Key_getVerification_THOR(withDoNotMail);
+	withVerification := ProfileBooster.V2_Key_getVerification_THOR(withDoNotMail);
+	// withVerification := DATASET('~jfrancis::profilebooster20::v2_getverification_thor',ProfileBooster.V2_Key_Layouts.Layout_PB2_Shell,thor);
 
 	//Search Death Master by DID. Set 2 dates (1 with SSA permission and 1 not) and choose appropriately 
 	ProfileBooster.V2_Key_Layouts.Layout_PB2_Shell getDeceasedDID(withVerification le, Doxie.key_Death_masterV2_ssa_DID ri) := transform
@@ -224,32 +201,20 @@ Risk_Indicators.Layout_Input into(PB_In l) := TRANSFORM
 		self 	:= le;
 	end;
 
-	withDeceasedDID_roxie := join(withVerification, Doxie.key_Death_masterV2_ssa_DID,
-									left.DID <> 0 and
-									(UNSIGNED)(RIGHT.dod8[1..6]) < LEFT.historydate AND									
-									keyed(left.DID = right.l_did),
-									getDeceasedDID(left, right), left outer, keep(200), ATMOST(RiskWise.max_atmost));
-
-	withDeceasedDID_thor := join(distribute(withVerification, did), 
-														 distribute(pull(Doxie.key_Death_masterV2_ssa_DID), l_did),
+	withDeceasedDID := join(distribute(withVerification, did), 
+			  			    distribute(pull(Doxie.key_Death_masterV2_ssa_DID), l_did),
 									left.DID <> 0 and
 									(UNSIGNED)(RIGHT.dod8[1..6]) < LEFT.historydate AND									
 									left.DID = right.l_did,
 									getDeceasedDID(left, right), left outer, keep(200), local);
 
-	#IF(onThor)
-		withDeceasedDID := withDeceasedDID_thor;
-	#ELSE
-		withDeceasedDID := withDeceasedDID_roxie;
-	#END
-	
 	sortedDeceased := sort(withDeceasedDID, seq);
 
 	//rollup by Deceased matches and keep whichever record has a DOD
   	ProfileBooster.V2_Key_Layouts.Layout_PB2_Shell rollDeceased(ProfileBooster.V2_Key_Layouts.Layout_PB2_Shell le, ProfileBooster.V2_Key_Layouts.Layout_PB2_Shell ri) := transform
 		self.dod		:= max(le.dod, ri.dod);
-		self.dodSSA	:= max(le.dodSSA, ri.dodSSA);
-		self				:= le;
+		self.dodSSA	    := max(le.dodSSA, ri.dodSSA);
+		self			:= le;
 	end;
 	
   	rolledDeceased := rollup(sortedDeceased, rollDeceased(left,right), seq);
@@ -265,13 +230,10 @@ Risk_Indicators.Layout_Input into(PB_In l) := TRANSFORM
 		self 					:= le;
 	END;
 	
-	withInfutor_thor := join(distribute(rolledDeceased, did), 
-							 distribute(pull(ProfileBooster.V2_Key_Infutor_DID), did),
+	withInfutor := join(distribute(rolledDeceased, did), 
+						distribute(pull(ProfileBooster.V2_Key_Infutor_DID), did),
 							 left.DID = right.DID, 
 							 getInfutor(left,right), left outer, keep(1), local);	
-	// : PERSIST('~PROFILEBOOSTER::with_infutor_thor_full::' + prt); // remove persists because low on disk space and it's rebuilding persist file each time anyway
-	
-	withInfutor := withInfutor_thor;
 	
 	//get business count for the input address
 	ProfileBooster.V2_Key_Layouts.Layout_PB2_Shell getInputBus(withInfutor le, Address_Attributes.key_AML_addr ri)  := TRANSFORM
@@ -279,22 +241,11 @@ Risk_Indicators.Layout_Input into(PB_In l) := TRANSFORM
 		self 											:= le;
 	END;
 
-	withInputBus_roxie := join(withInfutor, Address_Attributes.key_AML_addr, 
-		KEYED(trim(LEFT.z5) 					= RIGHT.zip) AND
-		KEYED(trim(LEFT.prim_range) 	= RIGHT.prim_range) AND
-		KEYED(trim(LEFT.prim_name) 		= RIGHT.prim_name) AND
-		KEYED(trim(LEFT.addr_suffix) 	= RIGHT.addr_suffix) AND
-		KEYED(trim(LEFT.predir) 			= RIGHT.predir) AND
-		KEYED(trim(LEFT.postdir)			= RIGHT.postdir) and
-		trim(left.sec_range)=right.sec_range,
-		getInputBus(LEFT, RIGHT),left outer, keep(1),  //only need to keep 1 because biz_cnt is the same on all records for the address
-		atmost(10000));
-
 	with_infutor_inputaddrpopulated := withInfutor(z5<>'' and prim_name<>'');
 	with_infutor_inputaddr_notpopulated := withInfutor(z5='' or prim_name='');
 
 	withInputBus_thor_hits := join(distribute(with_infutor_inputaddrpopulated, hash64(z5, prim_range, prim_name, addr_suffix, predir, postdir)), 
-														distribute(pull(Address_Attributes.key_AML_addr), hash64(zip, prim_range, prim_name, addr_suffix, predir, postdir)), 
+								   distribute(pull(Address_Attributes.key_AML_addr), hash64(zip, prim_range, prim_name, addr_suffix, predir, postdir)), 
 			trim(LEFT.z5) 					= RIGHT.zip AND
 			trim(LEFT.prim_range) 	= RIGHT.prim_range AND
 			trim(LEFT.prim_name) 		= RIGHT.prim_name AND
@@ -303,15 +254,15 @@ Risk_Indicators.Layout_Input into(PB_In l) := TRANSFORM
 			trim(LEFT.postdir)			= RIGHT.postdir and 
 			trim(left.sec_range)=right.sec_range,
 		getInputBus(LEFT, RIGHT),left outer, keep(1),  //only need to keep 1 because biz_cnt is the same on all records for the address
-			atmost(10000), local);
-	withInputBus_thor := withInputBus_thor_hits + with_infutor_inputaddr_notpopulated;	// add back the records that didn't have input address populated
+			atmost(trim(LEFT.z5) 					= RIGHT.zip AND
+				   trim(LEFT.prim_range) 	= RIGHT.prim_range AND
+				   trim(LEFT.prim_name) 		= RIGHT.prim_name AND
+				   trim(LEFT.addr_suffix) 	= RIGHT.addr_suffix AND
+				   trim(LEFT.predir) 			= RIGHT.predir AND
+				   trim(LEFT.postdir)			= RIGHT.postdir and 
+				   trim(left.sec_range)=right.sec_range,10000), local);
+	withInputBus := withInputBus_thor_hits + with_infutor_inputaddr_notpopulated;	// add back the records that didn't have input address populated
 		
-	#IF(onThor)
-		withInputBus := withInputBus_thor;
-	#ELSE
-		withInputBus := withInputBus_roxie;
-	#END
-
 	//get business count for prospect's current address
 	ProfileBooster.V2_Key_Layouts.Layout_PB2_Shell  getCurrBus(withInputBus le, Address_Attributes.key_AML_addr ri)  := TRANSFORM
 			self.CurrAddrBusRegCnt := if(ri.biz_cnt > 0, ri.biz_cnt, le.CurrAddrBusRegCnt); 
@@ -320,18 +271,6 @@ Risk_Indicators.Layout_Input into(PB_In l) := TRANSFORM
 
 	with_InputBus_curraddrpopulated := withInputBus(curr_z5<>'' and curr_prim_name<>'');
 	with_InputBus_curraddr_notpopulated := withInputBus(curr_z5='' or curr_prim_name='');
-
-	withCurrBus_roxie := join(withInputBus, Address_Attributes.key_AML_addr,
-		KEYED(trim(LEFT.curr_z5) 					= RIGHT.zip) AND
-		KEYED(trim(LEFT.curr_prim_range) 	= RIGHT.prim_range) AND
-		KEYED(trim(LEFT.curr_prim_name) 	= RIGHT.prim_name) AND
-		KEYED(trim(LEFT.curr_addr_suffix) = RIGHT.addr_suffix) AND
-		KEYED(trim(LEFT.curr_predir) 			= RIGHT.predir) AND
-		KEYED(trim(LEFT.curr_postdir)			= RIGHT.postdir) and
-		trim(left.curr_sec_range) = right.sec_range,
-		getCurrBus(LEFT, RIGHT),left outer, keep(1),
-		atmost(RiskWise.max_atmost));
-
 
 	withCurrBus_thor_hits := join(
 	distribute(with_InputBus_curraddrpopulated, hash64(curr_z5, curr_prim_range, curr_prim_name, curr_addr_suffix, curr_predir, curr_postdir)), 
@@ -344,30 +283,22 @@ Risk_Indicators.Layout_Input into(PB_In l) := TRANSFORM
 		trim(LEFT.curr_postdir)			= RIGHT.postdir and
 		trim(left.curr_sec_range) 	= right.sec_range,
 	getCurrBus(LEFT, RIGHT),left outer, keep(1),
-		atmost(RiskWise.max_atmost), local);
-	withCurrBus_thor := withCurrBus_thor_hits + with_InputBus_curraddr_notpopulated;// add back the records that didn't have current address populated
+		atmost(trim(LEFT.curr_z5) 					= RIGHT.zip AND
+		trim(LEFT.curr_prim_range) 	= RIGHT.prim_range AND
+		trim(LEFT.curr_prim_name) 	= RIGHT.prim_name AND
+		trim(LEFT.curr_addr_suffix) = RIGHT.addr_suffix AND
+		trim(LEFT.curr_predir) 			= RIGHT.predir AND
+		trim(LEFT.curr_postdir)			= RIGHT.postdir and
+		trim(left.curr_sec_range) 	= right.sec_range, RiskWise.max_atmost), local);
+	withCurrBus := withCurrBus_thor_hits + with_InputBus_curraddr_notpopulated;// add back the records that didn't have current address populated
 
-#IF(onThor)
-	withCurrBus := withCurrBus_thor;
-#ELSE
-	withCurrBus := withCurrBus_roxie;
-#END
-		
-	//get household members (DIDs) by doing inner join of the HHID to the HHID_Did key
-	//merge Prospect rec, Household recs, Relatives recs into one file
 	allDIDs := withCurrBus;// + hhDIDs + relativeDIDs;
 	
 	//if a DID is both a household member and a relative, keep only the household record so relatives attributes are exclusive
-	unique_DIDs_roxie := dedup(sort(allDIDs, seq, DID2, rec_type), seq, DID2);
-	
 	distributed_allDIDs := distribute(allDIDs, hash(seq, did2));
 	unique_DIDs_thor := dedup(sort(distributed_allDIDs, seq, DID2, rec_type, local), seq, DID2, local);//   : PERSIST('~PROFILEBOOSTER::unique_DIDs_thor');  // remove persists because low on disk space and it's rebuilding persist file each time anyway
 	
-	#IF(onThor)
-		uniqueDIDs := unique_DIDs_thor;
-	#ELSE
-		uniqueDIDs := unique_DIDs_roxie;
-	#END
+	uniqueDIDs := unique_DIDs_thor;
   
 	//slim down the uniqueDIDs records to create a smaller layout to pass into all of the following searches
 	slimShell := project(uniqueDIDs,transform(ProfileBooster.V2_Key_Layouts.Layout_PB2_Slim,self := left));
@@ -643,7 +574,6 @@ Risk_Indicators.Layout_Input into(PB_In l) := TRANSFORM
    	busnAssocRecs := ProfileBooster.V2_Key_getBusnAssoc(slimShell);
    	
    	withBusnAssoc := join(withProfLic, busnAssocRecs,
-   	// withBusnAssoc := join(withProfLic, busnAssocRecs,
    												left.seq = right.seq and
    												left.did2 = right.did2,
    												transform(ProfileBooster.V2_Key_Layouts.Layout_PB2_Shell,
@@ -679,7 +609,7 @@ Risk_Indicators.Layout_Input into(PB_In l) := TRANSFORM
 																	self.IntSportPersonFlag5Y 						:= if(left.rec_type=ProfileBooster.Constants.recType.Prospect, right.IntSportPersonFlag5Y, 0);	
 																	self.IntSportPersonTravelerFlagEv			:= if(left.rec_type=ProfileBooster.Constants.recType.Prospect, right.IntSportPersonTravelerFlagEv, 0);	
 																	self := left), left outer, parallel);
-	with_Sports_thor := withSports_temp;// : PERSIST('~PROFILEBOOSTER::with_Sports_thor::' + prt) ;  // try adding another stopping point here to help out  // remove persists because low on disk space and it's rebuilding persist file each time anyway
+	with_Sports_thor := withSports_temp;
 
 	#IF(onThor)
 		withSports := with_Sports_thor;
@@ -890,27 +820,13 @@ Risk_Indicators.Layout_Input into(PB_In l) := TRANSFORM
 		self := le;
 	end;
 	
-	withProperty_roxie := join(withSports, prop_common,
-												left.seq = right.seq and
-												left.did2 = right.did,
-												append_property(left, right), left outer, parallel);
-
-	
 	withSports_distr := distribute(withSports, did2);
 	prop_common_distr := distribute(prop_common, did);
 	
-	withProperty_thor := join(withSports_distr, prop_common_distr,
+	withProperty := join(withSports_distr, prop_common_distr,
 												left.did2 = right.did,
 												append_property(left, right), left outer, local)
 												;
-	// : PERSIST('~PROFILEBOOSTER::withProperty_thor');// remove persists because low on disk space and it's rebuilding persist file each time anyway
-	
-	#IF(onThor)
-		withProperty := withProperty_thor;
-	#ELSE
-		withProperty := withProperty_roxie;
-	#END
-	
 	withProperty_distributed := distribute(withProperty, seq);
 	sortedProperty :=  sort(withProperty, seq, did2, -sale_date_by_did, -owned_prim_range, -owned_prim_name, local); //within DID, sort most recent sold property to top
 
@@ -1106,18 +1022,6 @@ Risk_Indicators.Layout_Input into(PB_In l) := TRANSFORM
 		SELF.zip := ri.zip;	
 	END;
 	
-	avm1Owned_roxie := join(preAVMOwned, avm_v2.Key_AVM_Address,  
-								left.address_verification.input_address_information.prim_name!='' and left.address_verification.input_address_information.zip5!='' and
-								keyed(left.address_verification.input_address_information.prim_name = right.prim_name) and
-								keyed(left.address_verification.input_address_information.st = right.st) and
-								keyed(left.address_verification.input_address_information.zip5 = right.zip) and
-								keyed(left.address_verification.input_address_information.prim_range = right.prim_range) and
-								keyed(left.address_verification.input_address_information.sec_range = right.sec_range) and	// NNEQ here?
-								left.address_verification.input_address_information.predir=right.predir and 
-								left.address_verification.input_address_information.postdir=right.postdir,
-								add_AVM(left, right),  
-								atmost(RiskWise.max_atmost), keep(100));
-
 	avm1Owned_thor := join(
 		distribute(preAVMOwned, hash64(address_verification.input_address_information.prim_name,
 																address_verification.input_address_information.st,
@@ -1136,11 +1040,7 @@ Risk_Indicators.Layout_Input into(PB_In l) := TRANSFORM
 								atmost(RiskWise.max_atmost), keep(100), 
 			local);
 
-	#IF(onThor)
-		avm1Owned := group(avm1Owned_thor, seq);
-	#ELSE
-		avm1Owned := avm1Owned_roxie;
-	#END
+	avm1Owned := group(avm1Owned_thor, seq);
 	
 	// when choosing which AVM to output if the addr returns more than 1 result, 
 	// always pick the record with the most recent recording date and secondarily the most recent assessed value year
@@ -1235,10 +1135,11 @@ Risk_Indicators.Layout_Input into(PB_In l) := TRANSFORM
 		SELF := le;
 	END;
   
-  	withOneClickKey := JOIN(withEconTraj, OneClickKey,
+  	withOneClickKey := JOIN(DISTRIBUTE(withEconTraj,did2), 
+	                        DISTRIBUTE(OneClickKey,did),
                           LEFT.did2 = RIGHT.did
                           AND (UNSIGNED)((STRING8)RIGHT.dt_first_seen)[1..6] <= (UNSIGNED)((STRING8)LEFT.historydate)[1..6] ,
-                          getOneClick(LEFT, RIGHT), LEFT OUTER);
+                          getOneClick(LEFT, RIGHT), LEFT OUTER, local);
   
 	withOneClickSort 	:= sort(withOneClickKey, seq, rec_type, did2);  //sort prospect record to the top (rec_type = 1)
   
@@ -1350,7 +1251,7 @@ Risk_Indicators.Layout_Input into(PB_In l) := TRANSFORM
 		self.seq								:= le.seq;
 		self.AcctNo								:= le.AcctNo;
 		self.LexID								:= le.did;
-		
+		self.attributes.version2.HHID           := le.HHID;
 		self.attributes.version2.DemEduCollCurrFlag := le.DemEduCollCurrFlag;
 		self.attributes.version2.DemEduCollFlagEv := le.DemEduCollFlagEv;
 		self.attributes.version2.DemEduCollNewLevelEv := le.DemEduCollNewLevelEv;

@@ -596,20 +596,20 @@ address_rank_key := dx_header.key_addr_hist();
 						 left.DID = right.DID,
 					     getLnameCounts(LEFT,RIGHT), left outer, ATMOST(RiskWise.max_atmost), Keep(1));
 // DEBUGGING	
-OUTPUT(CHOOSEN(wInfutorCID,100), NAMED('wInfutorCID'));
-OUTPUT(CHOOSEN(wGong,100), NAMED('wGong'));
-OUTPUT(CHOOSEN(wHeader,100), NAMED('wHeader'));
-OUTPUT(CHOOSEN(wQHeader,100), NAMED('wQHeader'));
-OUTPUT(CHOOSEN(rolledVer,100), NAMED('rolledVer'));
-OUTPUT(CHOOSEN(wVerification,100), NAMED('wVerification'));
+// OUTPUT(CHOOSEN(wInfutorCID,100), NAMED('wInfutorCID'));
+// OUTPUT(CHOOSEN(wGong,100), NAMED('wGong'));
+// OUTPUT(CHOOSEN(wHeader,100), NAMED('wHeader'));
+// OUTPUT(CHOOSEN(wQHeader,100), NAMED('wQHeader'));
+// OUTPUT(CHOOSEN(rolledVer,100), NAMED('rolledVer'));
+// OUTPUT(CHOOSEN(wVerification,100), NAMED('wVerification'));
 // OUTPUT(allHeader, NAMED('allHeader'));
 // OUTPUT(CHOOSEN(dedupHdr,100), NAMED('dedupHdr'));
 // OUTPUT(CHOOSEN(wAddrSeq,100), NAMED('wAddrSeq'));
 // OUTPUT(goodAddrs, NAMED('goodAddrs'));
 // OUTPUT(reseqAddrs, NAMED('reseqAddrs'));
-testDIDs := [59916920346,1377159319,1572947382,848704579,548611871,1495681593,142389283,1879116723,356454149,13251542986];//110099,181264,1600350
-OUTPUT(CHOOSEN(sortVer(did IN testDIDs),100), NAMED('sortVer'));
-OUTPUT(CHOOSEN(withAddrs(did IN testDIDs),100), NAMED('withAddrs'));
+// testDIDs := [59916920346,1377159319,1572947382,848704579,548611871,1495681593,142389283,1879116723,356454149,13251542986];//110099,181264,1600350
+// OUTPUT(CHOOSEN(sortVer(did IN testDIDs),100), NAMED('sortVer'));
+// OUTPUT(CHOOSEN(withAddrs(did IN testDIDs),100), NAMED('withAddrs'));
 // OUTPUT(CHOOSEN(sortedAddrs(seq IN seqDups),100), NAMED('sortedAddrs'));
 // OUTPUT(CHOOSEN(rolledAddrs(did IN testDIDs),100), NAMED('rolledAddrs'));
 // OUTPUT(CHOOSEN(rolledAddrs(curr_addr_rawaid=prev_addr_rawaid),100), NAMED('rolledAddrsDups'));
@@ -626,7 +626,7 @@ OUTPUT(CHOOSEN(withAddrs(did IN testDIDs),100), NAMED('withAddrs'));
 // OUTPUT(CHOOSEN(with_hdr_addr_cache,100), named('with_hdr_addr_cache'));
 // OUTPUT(withaddrs, named('withaddrs'));
 // OUTPUT(CHOOSEN(wLnameCounts(did IN testDIDs),100), NAMED('wLnameCounts_getVer_Final'));
-OUTPUT(wLnameCounts,,'~jfrancis::profilebooster20::V2_getVerification_THOR', OVERWRITE);
+// OUTPUT(wLnameCounts,,'~jfrancis::profilebooster20::V2_getVerification_THOR', OVERWRITE);
 	// output(ids_only,, '~dvstemp::profile_booster_property_testcase::ids_only::mathis_' + thorlib.wuid());
 
 return wLnameCounts;	

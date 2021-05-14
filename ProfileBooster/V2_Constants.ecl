@@ -36,9 +36,11 @@ EXPORT setValidAttributeVersionsV2 := ['PROFILEBOOSTERATTRV2'];
 
 EXPORT Max5       := 5;
 EXPORT Max10      := 10;
+EXPORT Max84      := 84;
 EXPORT Max99      := 99;
 EXPORT Max99_9    := 99.9;
 EXPORT Max100_0   := 100.0;
+EXPORT Max120     := 120;
 EXPORT Max255     := 255;
 EXPORT Max900     := 900;
 EXPORT Max960     := 960;

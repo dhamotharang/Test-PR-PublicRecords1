@@ -28,6 +28,14 @@ EXPORT string8 convertDateTo8(string d1) := FUNCTION
   RETURN Result;
 END;
 
+EXPORT convertDateToQuarter(inDate) := FUNCTIONMACRO
+		quarter := MAP( (INTEGER)inDate[5..6] <= 3  => inDate[1..4]+'0101',
+						(INTEGER)inDate[5..6] <= 6  => inDate[1..4]+'0401',
+						(INTEGER)inDate[5..6] <= 9  => inDate[1..4]+'0701',
+						(INTEGER)inDate[5..6] <= 12 => inDate[1..4]+'1001',
+						inDate[1..4]+'0101');
+		RETURN	quarter;									
+ENDMACRO;
 
 EXPORT STRING6 getProfLicActiveNewTitleType(string occupation, integer category) := FUNCTION
 //   IMPORT STD ;
