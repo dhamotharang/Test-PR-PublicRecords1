@@ -18,6 +18,7 @@ EXPORT LIB_NonFCRAPersonAttributes(DATASET(PublicRecords_KEL.ECL_Functions.Layou
 	// PII Corroboration Summary attributes are NonFCRA only
 	ALLSummaryAttributesNonFCRA := PublicRecords_KEL.FnRoxie_GetSummaryAttributes(MiniAttributeInputRecords, Options, FDCDataset);
 
+	HighRiskAddressAttributes := PublicRecords_KEL.FnRoxie_GetHighRiskAddress(MiniAttributeInputRecords, Options, FDCDataset);
 
 	withPersonAttributes := JOIN(InputPIIAttributes, PersonAttributes, 
 	LEFT.G_ProcUID = RIGHT.G_ProcUID,
@@ -27,7 +28,7 @@ EXPORT LIB_NonFCRAPersonAttributes(DATASET(PublicRecords_KEL.ECL_Functions.Layou
 			SELF := []),
 		LEFT OUTER, KEEP(1), ATMOST(100));
 
-	FinalPersonAttributes := JOIN(withPersonAttributes, ALLSummaryAttributesNonFCRA, 
+	withAllSummaryAttributes := JOIN(withPersonAttributes, ALLSummaryAttributesNonFCRA, 
 	LEFT.G_ProcUID = RIGHT.G_ProcUID,
 		TRANSFORM(PublicRecords_KEL.ECL_Functions.Layouts.LayoutMaster,
 			SELF.G_ProcUID := LEFT.G_procUID, //If right is empty this ensures that G_ProcUID is not blank
@@ -35,6 +36,14 @@ EXPORT LIB_NonFCRAPersonAttributes(DATASET(PublicRecords_KEL.ECL_Functions.Layou
 			SELF := LEFT,
 			SELF := []),
 		LEFT OUTER, KEEP(1), ATMOST(100));		
-	
+
+	FinalPersonAttributes := JOIN(withAllSummaryAttributes, HighRiskAddressAttributes, 
+	LEFT.G_ProcUID = RIGHT.G_ProcUID,
+		TRANSFORM(PublicRecords_KEL.ECL_Functions.Layouts.LayoutMaster,
+			SELF := RIGHT,
+			SELF := LEFT,
+			SELF := []),
+		LEFT OUTER, KEEP(1), ATMOST(100));	
+		
 	EXPORT Results := FinalPersonAttributes;
 END;
