@@ -6,16 +6,25 @@ EXPORT Proc_Copy_Keys_To_Alpha(
 	STRING  pContacts,
 	BOOLEAN pTesting = FALSE
 ) := FUNCTION
-	dUserCreds := ut.Credentials().fGetAppUserInfo();	
-
-	vRemoteUrl := 'http://alpha_prod_thor_esp.risk.regn.net:8010/FileSpray';
-
+	dUserCreds := ut.Credentials().fGetAppUserInfo();
 	vDatasetName := 'VehicleV2Keys';
 	vDesiredKeysSet := [
 		'thor_data400::key::vehiclev2::vin_qa',
 		'thor_data400::key::vehiclev2::main_key_qa',
 		'thor_data400::key::vehiclev2::party_key_qa'
 	];
+	vContacts := pContacts + ',' + 'kerry.wood@lexisnexisrisk.com';
+
+	vCommand := 'server=http://alpha_prod_thor_esp.risk.regn.net:8010 ' 
+		+ 'overwrite=1 ' 
+		+ 'replicate=1 ' 
+		+ 'action=copy ' 
+		+ 'dstcluster=thor400_112 ' 
+		+ 'nosplit=1 '
+		+ 'wrap=1 '
+		+ 'srcdali=10.173.14.201 '
+		+ 'username=' + dUserCreds[1].username + ' password='+ dUserCreds[1].password
+		+ ' transferbuffersize=10000000 ';
 
 	roxie_keys_dataset := dops.GetRoxieKeys(vDatasetName,'B','N','N')(
 		superkey IN vDesiredKeysSet
@@ -41,63 +50,36 @@ EXPORT Proc_Copy_Keys_To_Alpha(
 		);
 	END;
 
-	temp_dataset := PROJECT(roxie_keys_dataset, replaceDate(left));
+	temp_dataset := NOTHOR(
+		PROJECT(
+			GLOBAL(roxie_keys_dataset,few),
+			replaceDate(left)
+		)
+	);
 
-	copy_files :=APPLY(
-		temp_dataset, 
-		IF(
-			STD.File.FileExists(logicalfiles),
+	copy_files := NOTHOR(
+		APPLY(
+			GLOBAL(temp_dataset,few), 
 			IF(
-				COUNT(
-					STD.File.LogicalFileList(
-						REGEXREPLACE('~', logicalfiles, ''),
-						foreigndali := vRemoteUrl
+				STD.File.FileExists(logicalfiles),
+				IF(
+					COUNT(
+						STD.File.LogicalFileList(
+							REGEXREPLACE('~', logicalfiles, ''),
+							foreigndali := 'alpha_prod_thor_dali.risk.regn.net'
+						)
+					) > 0,
+					OUTPUT(logicalfiles + ' already exists in alpha_prod_thor_dali.risk.regn.net'),
+					SEQUENTIAL(
+						OUTPUT('Copying ' +logicalfiles+ ' to alpha_prod_thor_dali.risk.regn.net'),
+						STD.File.DfuPlusExec(vCommand + ' dstname=~'+logicalfiles + ' srcname=~'+logicalfiles),
+						OUTPUT(logicalfiles + ' Was successfully copied to alpha_prod_thor_dali.risk.regn.net')
 					)
-				) > 0,
-				OUTPUT(logicalfiles + ' already exists in ' + vRemoteUrl),
-				SEQUENTIAL(
-					OUTPUT('Copying ' +logicalfiles+ ' to ' + vRemoteUrl),
-					STD.File.RemotePull(
-						remoteEspFsURL := vRemoteUrl,
-						sourcelogicalname := logicalfiles,
-						destinationGroup := 'thor400_112',
-						destinationlogicalname := logicalfiles,
-						allowoverwrite := TRUE,
-						replicate := TRUE,
-						username := dUserCreds[1].username,
-						userPw := dUserCreds[1].password
-					),
-					OUTPUT(logicalfiles + ' Was successfully copied to ' + vRemoteUrl)
-				)
-			),
-			OUTPUT(logicalfiles + ' does not exist')
+				),
+				OUTPUT(logicalfiles + ' does not exist')
+			)
 		)
 	);
 
-	update_dops_alpha_non_fcra := dops.updateversion(
-		'VehicleV2Keys',
-		pVersion,
-		pContacts,
-		l_inenvment := pEnv,
-		l_inloc := 'A'
-	);
-
-	create_insurance_orbit_build_instance := Orbit3Insurance.Proc_Orbit3I_CreateBuild(
-		'Motor Vehicle Registrations',
-		pVersion,
-		pEnv,
-		email_list := STD.Str.FindReplace(pContacts, ',', ';')
-	);
-
-	RETURN SEQUENTIAL(
-		copy_files,
-		IF( 
-			NOT pTesting,
-			update_dops_alpha_non_fcra
-		),
-		IF(
-			NOT pTesting,
-			create_insurance_orbit_build_instance	
-		)
-	);
+	RETURN copy_files;
 END;
